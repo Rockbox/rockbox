@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="fr">
-<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstaller</name>
     <message>
@@ -509,41 +508,41 @@ See http://www.rockbox.org/wiki/SansaE200Install
         <translation type="obsolete">La taille actuelle du cache est %1 Ko.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="558"/>
+        <location filename="configure.cpp" line="559"/>
         <source>Autodetection</source>
         <translation>Autodétection</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="552"/>
+        <location filename="configure.cpp" line="553"/>
         <source>Could not detect a Mountpoint.
 Select your Mountpoint manually.</source>
         <translation>Impossible de détecter un point de montage.
 Veuillez sélectionner manuellement le point de montage.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="560"/>
+        <location filename="configure.cpp" line="561"/>
         <source>Could not detect a device.
 Select your device and Mountpoint manually.</source>
         <translation>Impossible de détecter le périphérique.
 Veuillez sélectionner manuellement le type de périphérique et le point de montage.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="569"/>
+        <location filename="configure.cpp" line="570"/>
         <source>Really delete cache?</source>
         <translation>Supprimer le cache ?</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="572"/>
+        <location filename="configure.cpp" line="573"/>
         <source>Do you really want to delete the cache? Make absolutely sure this setting is correct as it will remove &lt;b&gt;all&lt;/b&gt; files in this folder!</source>
         <translation>Voulez-vous supprimer le cache ? Vérifier bien que ce paramètre est correct car il supprimera &lt;b&gt;tous&lt;/b&gt; les fichiers de ce répertoire !</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="578"/>
+        <location filename="configure.cpp" line="579"/>
         <source>Path wrong!</source>
         <translation>Chemin incorrect !</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="579"/>
+        <location filename="configure.cpp" line="580"/>
         <source>The cache path is invalid. Aborting.</source>
         <translation>Le chemin du cache est invalide. Annulation.</translation>
     </message>
@@ -553,31 +552,31 @@ Veuillez sélectionner manuellement le type de périphérique et le point de mon
         <translation> (%1)</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="432"/>
+        <location filename="configure.cpp" line="433"/>
         <source>Select your device</source>
         <translation>Sélectionnez votre périphérique</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="522"/>
+        <location filename="configure.cpp" line="523"/>
         <source>Sansa e200 in MTP mode found!
 You need to change your player to MSC mode for installation. </source>
         <translation>Sansa e200 en mode MTP trouvé !
 Vous devez mettre votre lecteur audio en mode MSC pour l&apos;installation. </translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="525"/>
+        <location filename="configure.cpp" line="526"/>
         <source>H10 20GB in MTP mode found!
 You need to change your player to UMS mode for installation. </source>
         <translation>H10 20 Go en mode MTP trouvé !
 Vous devez mettre votre lecteur en mode UMS pour l&apos;installation. </translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="526"/>
+        <location filename="configure.cpp" line="527"/>
         <source>Unless you changed this installation will fail!</source>
         <translation>Si vous n&apos;avez pas changé ceci, l&apos;installation échouera !</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="528"/>
+        <location filename="configure.cpp" line="529"/>
         <source>Fatal error</source>
         <translation>Erreur fatale</translation>
     </message>
@@ -587,12 +586,12 @@ Vous devez mettre votre lecteur en mode UMS pour l&apos;installation. </translat
         <translation>La taille actuelle du cache est %L1 ko.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="537"/>
+        <location filename="configure.cpp" line="538"/>
         <source>Detected an unsupported %1 player variant. Sorry, Rockbox doesn&apos;t run on your player.</source>
         <translation>Une variante non supportée %1 de lecteur a été détectée. Malheuresement Rockbox ne supporte pas ce modèle.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="539"/>
+        <location filename="configure.cpp" line="540"/>
         <source>Fatal error: incompatible player found</source>
         <translation>Erreur fatale : lecteur audio incompatible détecté</translation>
     </message>
@@ -838,7 +837,13 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="configure.cpp" line="416"/>
         <source>English</source>
-        <translation>Français</translation>
+        <translation type="obsolete">Français</translation>
+    </message>
+    <message>
+        <location filename="configure.cpp" line="417"/>
+        <source>English</source>
+        <comment>This is the localized language name, i.e. your language.</comment>
+        <translation type="unfinished">Français</translation>
     </message>
 </context>
 <context>
@@ -892,17 +897,12 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
 <context>
     <name>CreateVoiceWindow</name>
     <message>
-        <location filename="createvoicewindow.cpp" line="104"/>
+        <location filename="createvoicewindow.cpp" line="108"/>
         <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Moteur TTS sélectionné : &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="createvoicewindow.cpp" line="106"/>
-        <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>Moteur TTS sélectionné : &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="createvoicewindow.cpp" line="119"/>
+        <location filename="createvoicewindow.cpp" line="124"/>
         <source>Selected encoder: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Encodeur sélectionné : &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -1249,17 +1249,12 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">Profil d&apos;encodage invalide !</translation>
     </message>
     <message>
-        <location filename="installtalkwindow.cpp" line="124"/>
+        <location filename="installtalkwindow.cpp" line="128"/>
         <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Moteur TTS sélectionné : &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="installtalkwindow.cpp" line="126"/>
-        <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>Moteur TTS sélectionné : &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="installtalkwindow.cpp" line="138"/>
+        <location filename="installtalkwindow.cpp" line="143"/>
         <source>Selected encoder: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Encodeur sélectionné : &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -1677,23 +1672,23 @@ Do want to replace the current bootloader?</source>
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;none&lt;/span&gt; at &lt;span style=&quot; font-weight:600;&quot;&gt;unknown&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;none&lt;/span&gt; at &lt;span style=&quot; font-weight:600;&quot;&gt;unknown&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="120"/>
+        <location filename="rbutilqtfrm.ui" line="117"/>
         <source>&amp;Change</source>
         <translation>&amp;Modifier</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="825"/>
+        <location filename="rbutilqtfrm.ui" line="822"/>
         <source>&amp;Quick Start</source>
         <translation>&amp;Démarrage rapide</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="140"/>
+        <location filename="rbutilqtfrm.ui" line="137"/>
         <source>Welcome</source>
         <translation>Bienvenue</translation>
     </message>
@@ -1729,17 +1724,17 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ceci installe le bootloader et une version acuelle de Rockbox. Si vous ne voulez pas le pack des extras, choisissez cette option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="818"/>
+        <location filename="rbutilqtfrm.ui" line="815"/>
         <source>&amp;Installation</source>
         <translation>&amp;Installation</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="234"/>
+        <location filename="rbutilqtfrm.ui" line="231"/>
         <source>Basic Rockbox installation</source>
         <translation>Installation basique de Rockbox</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="240"/>
+        <location filename="rbutilqtfrm.ui" line="237"/>
         <source>Install Bootloader</source>
         <translation>Installation du bootloader</translation>
     </message>
@@ -1757,7 +1752,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Avant de pouvoir lancer Rockbox sur votre lecteur audio, vous pouvez avoir à installer un bootloader. Ceci n&apos;est nécessaier que la première fois que vous installez Rockbox.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="269"/>
+        <location filename="rbutilqtfrm.ui" line="266"/>
         <source>Install Rockbox</source>
         <translation>Installer Rockbox</translation>
     </message>
@@ -1773,17 +1768,17 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Installer Rockbox&lt;/span&gt; sur votre lecteur audio&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="832"/>
+        <location filename="rbutilqtfrm.ui" line="829"/>
         <source>&amp;Extras</source>
         <translation>&amp;Extras</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="331"/>
+        <location filename="rbutilqtfrm.ui" line="328"/>
         <source>Install extras for Rockbox</source>
         <translation>Installer des extras pour Rockbox</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="337"/>
+        <location filename="rbutilqtfrm.ui" line="334"/>
         <source>Install Fonts package</source>
         <translation>Installer le pack des polices de caractères</translation>
     </message>
@@ -1801,7 +1796,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Le pack de polices de caractères contient des polices couramment utilisées. Son installation est fortement recommandée.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="363"/>
+        <location filename="rbutilqtfrm.ui" line="360"/>
         <source>Install themes</source>
         <translation>Installer des thèmes</translation>
     </message>
@@ -1819,7 +1814,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;L&apos;apparence de Rockbox peut être personnalisée avec des thèmes. Vous pouvez choisir et installer différents thèmes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="389"/>
+        <location filename="rbutilqtfrm.ui" line="386"/>
         <source>Install game files</source>
         <translation>Installer des fichier de jeu</translation>
     </message>
@@ -1837,17 +1832,17 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Doom nécessite un fichier wad pour être utilisé.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="840"/>
+        <location filename="rbutilqtfrm.ui" line="837"/>
         <source>&amp;Accessibility</source>
         <translation>&amp;Accessibilité</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="445"/>
+        <location filename="rbutilqtfrm.ui" line="442"/>
         <source>Install accessibility add-ons</source>
         <translation>Installer des add-ons pour l&apos;accessibilité</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="451"/>
+        <location filename="rbutilqtfrm.ui" line="448"/>
         <source>Install Voice files</source>
         <translation>Installer des fichiers de voix</translation>
     </message>
@@ -1865,7 +1860,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Les fichiers de voix sont nécessaires pour faire parler l&apos;interface de Rockbox. La voix est activée par défaut, donc si vous installez les fichiers de voix Rockbox parlera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="477"/>
+        <location filename="rbutilqtfrm.ui" line="474"/>
         <source>Install Talk files</source>
         <translation>Installer des fichiers de voix</translation>
     </message>
@@ -1883,17 +1878,17 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Les fichiers de voix sont nécessaires pour que Rockbox dise les noms des fichiers et des dossiers&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="848"/>
+        <location filename="rbutilqtfrm.ui" line="845"/>
         <source>&amp;Uninstallation</source>
         <translation>&amp;Désinstallation</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="589"/>
+        <location filename="rbutilqtfrm.ui" line="586"/>
         <source>Uninstall Rockbox</source>
         <translation>Désinstaller Rockbox</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="563"/>
+        <location filename="rbutilqtfrm.ui" line="560"/>
         <source>Uninstall Bootloader</source>
         <translation>Désinstaller le bootloader</translation>
     </message>
@@ -1924,52 +1919,52 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ceci laissera le bootloader (Vous devrez le supprimer séparément).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="648"/>
+        <location filename="rbutilqtfrm.ui" line="645"/>
         <source>&amp;Manual</source>
         <translation>&amp;Manuel</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="651"/>
+        <location filename="rbutilqtfrm.ui" line="648"/>
         <source>View and download the manual</source>
         <translation>Voir et télécharger le manuel</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="657"/>
+        <location filename="rbutilqtfrm.ui" line="654"/>
         <source>Read the manual</source>
         <translation>Lire le manuel</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="663"/>
+        <location filename="rbutilqtfrm.ui" line="660"/>
         <source>PDF manual</source>
         <translation>Manuel PDF</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="676"/>
+        <location filename="rbutilqtfrm.ui" line="673"/>
         <source>HTML manual</source>
         <translation>Manuel HTML</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="692"/>
+        <location filename="rbutilqtfrm.ui" line="689"/>
         <source>Download the manual</source>
         <translation>Télécharger le manuel</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="700"/>
+        <location filename="rbutilqtfrm.ui" line="697"/>
         <source>&amp;PDF version</source>
         <translation>Version &amp;PDF</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="707"/>
+        <location filename="rbutilqtfrm.ui" line="704"/>
         <source>&amp;HTML version (zip file)</source>
         <translation>Version &amp;HTML (fichier zip)</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="729"/>
+        <location filename="rbutilqtfrm.ui" line="726"/>
         <source>Down&amp;load</source>
         <translation>Télé&amp;charger</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="753"/>
+        <location filename="rbutilqtfrm.ui" line="750"/>
         <source>Inf&amp;o</source>
         <translation>Inf&amp;o</translation>
     </message>
@@ -1987,240 +1982,245 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;: Si vous avez manuellement installé des composants, ceci ne sera pas correct !&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="773"/>
+        <location filename="rbutilqtfrm.ui" line="770"/>
         <source>1</source>
         <translation>1</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="795"/>
+        <location filename="rbutilqtfrm.ui" line="792"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="889"/>
+        <location filename="rbutilqtfrm.ui" line="886"/>
         <source>&amp;About</source>
         <translation>&amp;A propos</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="866"/>
+        <location filename="rbutilqtfrm.ui" line="863"/>
         <source>Empty local download cache</source>
         <translation>Vider le cache local de téléchargement</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="871"/>
+        <location filename="rbutilqtfrm.ui" line="868"/>
         <source>Install Rockbox Utility on player</source>
         <translation>Installer l&apos;utilitaire Rockbox sur le lecteur</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="876"/>
+        <location filename="rbutilqtfrm.ui" line="873"/>
         <source>&amp;Configure</source>
         <translation>&amp;Configuration</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="881"/>
+        <location filename="rbutilqtfrm.ui" line="878"/>
         <source>E&amp;xit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="884"/>
+        <location filename="rbutilqtfrm.ui" line="881"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="894"/>
+        <location filename="rbutilqtfrm.ui" line="891"/>
         <source>About &amp;Qt</source>
         <translation>A propos de &amp;Qt</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="899"/>
+        <location filename="rbutilqtfrm.ui" line="896"/>
         <source>&amp;Help</source>
         <translation>&amp;Aide</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="146"/>
+        <location filename="rbutilqtfrm.ui" line="143"/>
         <source>Complete Installation</source>
         <translation>Installation complète</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="175"/>
+        <location filename="rbutilqtfrm.ui" line="172"/>
         <source>Small Installation</source>
         <translation>Installation minimale</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="814"/>
+        <location filename="rbutilqtfrm.ui" line="811"/>
         <source>Action&amp;s</source>
         <translation>Action&amp;s</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="904"/>
+        <location filename="rbutilqtfrm.ui" line="901"/>
         <source>Info</source>
         <translation>Information</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="997"/>
+        <location filename="rbutilqtfrm.ui" line="994"/>
         <source>Read PDF manual</source>
         <translation>Lire le manuel PDF</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="1002"/>
+        <location filename="rbutilqtfrm.ui" line="999"/>
         <source>Read HTML manual</source>
         <translation>Lire le manuel HTML</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="1007"/>
+        <location filename="rbutilqtfrm.ui" line="1004"/>
         <source>Download PDF manual</source>
         <translation>Télécharger le manuel PDF</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="1012"/>
+        <location filename="rbutilqtfrm.ui" line="1009"/>
         <source>Download HTML manual (zip)</source>
         <translation>Télécharger le manuel HTML (zip)</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="526"/>
+        <location filename="rbutilqtfrm.ui" line="523"/>
         <source>Create Voice files</source>
         <translation>Créer des fichiers de voix</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="1023"/>
+        <location filename="rbutilqtfrm.ui" line="1020"/>
         <source>Create Voice File</source>
         <translation>Créer un fichier de voix</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="162"/>
+        <location filename="rbutilqtfrm.ui" line="159"/>
         <source>&lt;b&gt;Complete Installation&lt;/b&gt;&lt;br/&gt;This installs the bootloader, a current build and the extras package. This is the recommended method for new installations.</source>
         <translation>&lt;b&gt;Installation complète&lt;/b&gt;&lt;br/&gt;Ceci installe le bootloader, une version actuelle et le paquet des extras. C&apos;est la méthode recommandée pour les nouvelles installations.</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="191"/>
+        <location filename="rbutilqtfrm.ui" line="188"/>
         <source>&lt;b&gt;Small installation&lt;/b&gt;&lt;br/&gt;This installs bootloader and the current build of Rockbox. If you don&apos;t want the extras package, choose this option.</source>
         <translation>&lt;b&gt;Installation minimale&lt;/b&gt;&lt;br/&gt;Ceci installe le bootloader et la version actuelle de Rockbox. Si vous ne voulez pas le paquet des extras, choisissez cette option.</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="256"/>
+        <location filename="rbutilqtfrm.ui" line="253"/>
         <source>&lt;b&gt;Install the bootloader&lt;/b&gt;&lt;br/&gt;Before Rockbox can be run on your audio player, you may have to install a bootloader. This is only necessary the first time Rockbox is installed.</source>
         <translation>&lt;b&gt;Installer le bootloader&lt;/b&gt;&lt;br/&gt;Avant de pouvoir utiliser Rockbox sur votre lecteur audio, vous devez installer un bootloader. Ceci n&apos;est nécessaire que la première fois que vous installez Rockbox.</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="285"/>
+        <location filename="rbutilqtfrm.ui" line="282"/>
         <source>&lt;b&gt;Install Rockbox&lt;/b&gt; on your audio player</source>
         <translation>&lt;b&gt;Installer Rockbox&lt;/b&gt; sur votre lecteur audio</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="353"/>
+        <location filename="rbutilqtfrm.ui" line="350"/>
         <source>&lt;b&gt;Fonts Package&lt;/b&gt;&lt;br/&gt;The Fonts Package contains a couple of commonly used fonts. Installation is highly recommended.</source>
         <translation>&lt;b&gt;Paquet des polices de caractères&lt;/b&gt;&lt;br/&gt;Il contient des polices communément utilisées. Son installation est fortement recommandée.</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="379"/>
+        <location filename="rbutilqtfrm.ui" line="376"/>
         <source>&lt;b&gt;Install Themes&lt;/b&gt;&lt;br/&gt;Rockbox&apos; look can be customized by themes. You can choose and install several officially distributed themes.</source>
         <translation>&lt;b&gt;Installer des thèmes&lt;/b&gt;&lt;br/&gt;L&apos;apparence de Rockbox peut être personnalisée avec des thèmes. Vous pouvez choisir et installer plusieurs thèmes officiellement distribués.</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="405"/>
+        <location filename="rbutilqtfrm.ui" line="402"/>
         <source>&lt;b&gt;Install Game Files&lt;/b&gt;&lt;br/&gt;Doom needs a base wad file to run.</source>
         <translation>&lt;b&gt;Installer les fichiers de jeu&lt;/b&gt;&lt;br/&gt;Doom nécessite un fichier wad pour pouvoir être utilisé.</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="467"/>
+        <location filename="rbutilqtfrm.ui" line="464"/>
         <source>&lt;b&gt;Install Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.</source>
         <translation>&lt;b&gt;Installer le fichier de voix&lt;/b&gt;&lt;br/&gt;Celui-ci est requis pour que Rockbox parle. La synthèse vocale est activée par défaut, donc si vous installez le fichier de voix, Rockbox parlera.</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="493"/>
+        <location filename="rbutilqtfrm.ui" line="490"/>
         <source>&lt;b&gt;Create Talk Files&lt;/b&gt;&lt;br/&gt;Talkfiles are needed to let Rockbox speak File and Foldernames</source>
         <translation>&lt;b&gt;Créer des fichiers d&apos;annonce&lt;/b&gt;&lt;br/&gt;Ceux-ci sont nécessaires pour que Rockbox énonce les noms des fichiers et des dossiers</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="542"/>
+        <location filename="rbutilqtfrm.ui" line="539"/>
         <source>&lt;b&gt;Create Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the  user interface. Speaking is enabled by default, so
  if you installed the voice file Rockbox will speak.</source>
         <translation>&lt;b&gt;Créer le fichier de voix&lt;/b&gt;&lt;br/&gt;celui-ci est requis pour que Rockbox parle. La synthèse vocale est activée par défaut, doncsi vous installez le fichier de voix, Rockbox parlera.</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="579"/>
+        <location filename="rbutilqtfrm.ui" line="576"/>
         <source>&lt;b&gt;Remove the bootloader&lt;/b&gt;&lt;br/&gt;After removing the bootloader you won&apos;t be able to start Rockbox.</source>
         <translation>&lt;b&gt;Désinstaller le bootloader&lt;/b&gt;&lt;br/&gt;Après avoir supprimé le bootloader, vous ne pourrez plus démarrer Rockbox.</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="605"/>
+        <location filename="rbutilqtfrm.ui" line="602"/>
         <source>&lt;b&gt;Uninstall Rockbox from your audio player.&lt;/b&gt;&lt;br/&gt;This will leave the bootloader in place (you need to remove it manually).</source>
         <translation>&lt;b&gt;Désinstaller Rockbox de votre lecteur audio&lt;/b&gt;&lt;br/&gt;Ceci laissera le bootloader (vous devrez le supprimer manuellement).</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="759"/>
+        <location filename="rbutilqtfrm.ui" line="756"/>
         <source>Currently installed packages.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; if you manually installed packages this might not be correct!</source>
         <translation>Paquets actuellement installés.&lt;br/&gt;&lt;b&gt;Note :&lt;/b&gt;Si vous avez installé manuellement des paquets, ceci ne sera peut-être pas correct !</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="804"/>
+        <location filename="rbutilqtfrm.ui" line="801"/>
         <source>Abou&amp;t</source>
         <translation>A &amp;propos</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="920"/>
+        <location filename="rbutilqtfrm.ui" line="917"/>
         <source>&amp;Small Installation</source>
         <translation>Installation &amp;minimale</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="928"/>
+        <location filename="rbutilqtfrm.ui" line="925"/>
         <source>Install &amp;Bootloader</source>
         <translation>Installer le &amp;bootloader</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="936"/>
+        <location filename="rbutilqtfrm.ui" line="933"/>
         <source>Install &amp;Rockbox</source>
         <translation>Installer &amp;Rockbox</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="944"/>
+        <location filename="rbutilqtfrm.ui" line="941"/>
         <source>Install &amp;Fonts Package</source>
         <translation>Installer le pack des &amp;polices de caractères</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="952"/>
+        <location filename="rbutilqtfrm.ui" line="949"/>
         <source>Install &amp;Themes</source>
         <translation>Installer des &amp;thèmes</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="960"/>
+        <location filename="rbutilqtfrm.ui" line="957"/>
         <source>Install &amp;Game Files</source>
         <translation>Installer les fichiers de &amp;jeu</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="968"/>
+        <location filename="rbutilqtfrm.ui" line="965"/>
         <source>&amp;Install Voice File</source>
         <translation>&amp;Installer le fichier de voix</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="976"/>
+        <location filename="rbutilqtfrm.ui" line="973"/>
         <source>Create &amp;Talk Files</source>
         <translation>Installer les fichiers d&apos;&amp;annonce</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="984"/>
+        <location filename="rbutilqtfrm.ui" line="981"/>
         <source>Remove &amp;bootloader</source>
         <translation>Désinstaller le &amp;bootloader</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="992"/>
+        <location filename="rbutilqtfrm.ui" line="989"/>
         <source>Uninstall &amp;Rockbox</source>
         <translation>Désinstaller &amp;Rockbox</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="1020"/>
+        <location filename="rbutilqtfrm.ui" line="1017"/>
         <source>Create &amp;Voice File</source>
         <translation>&amp;Créer le fichier de voix</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="1028"/>
+        <location filename="rbutilqtfrm.ui" line="1025"/>
         <source>&amp;System Info</source>
         <translation>Informations &amp;système</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="912"/>
+        <location filename="rbutilqtfrm.ui" line="909"/>
         <source>&amp;Complete Installation</source>
         <translation>Installation &amp;complète</translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="97"/>
+        <source>device / mountpoint unknown or invalid</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
