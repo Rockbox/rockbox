@@ -885,17 +885,17 @@ Aygitinizi ve baglama noktasini kendiniz se�iniz.</translation>
     <name>CreateVoiceWindow</name>
     <message>
         <location filename="createvoicewindow.cpp" line="104"/>
-        <source>Selected TTS engine : &lt;b&gt;%1&lt;/b&gt;</source>
+        <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="createvoicewindow.cpp" line="106"/>
-        <source>Selected TTS Engine: &lt;b&gt;%1&lt;/b&gt;</source>
+        <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="createvoicewindow.cpp" line="119"/>
-        <source>Selected Encoder: &lt;b&gt;%1&lt;/b&gt;</source>
+        <source>Selected encoder: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1242,17 +1242,17 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="installtalkwindow.cpp" line="124"/>
-        <source>Selected TTS engine : &lt;b&gt;%1&lt;/b&gt;</source>
+        <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="installtalkwindow.cpp" line="126"/>
-        <source>Selected TTS Engine: &lt;b&gt;%1&lt;/b&gt;</source>
+        <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="installtalkwindow.cpp" line="138"/>
-        <source>Selected Encoder: &lt;b&gt;%1&lt;/b&gt;</source>
+        <source>Selected encoder: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

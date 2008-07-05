@@ -101,9 +101,11 @@ void CreateVoiceWindow::updateSettings(void)
     TTSBase* tts = TTSBase::getTTS(ttsName);
     tts->setCfg(settings);
     if(tts->configOk())
-        ui.labelTtsProfile->setText(tr("Selected TTS engine : <b>%1</b>").arg(TTSBase::getTTSName(ttsName)));
+        ui.labelTtsProfile->setText(tr("Selected TTS engine: <b>%1</b>")
+            .arg(TTSBase::getTTSName(ttsName)));
     else
-        ui.labelTtsProfile->setText(tr("Selected TTS Engine: <b>%1</b>").arg("Invalid TTS configuration!"));
+        ui.labelTtsProfile->setText(tr("Selected TTS engine: <b>%1</b>")
+            .arg("Invalid TTS configuration!"));
     
     QString encoder = settings->curEncoder();
     // only proceed if encoder setting is set
@@ -111,12 +113,15 @@ void CreateVoiceWindow::updateSettings(void)
     if(enc != NULL) {
         enc->setCfg(settings);
         if(enc->configOk())
-            ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg(EncBase::getEncoderName(encoder)));
+            ui.labelEncProfile->setText(tr("Selected encoder: <b>%1</b>")
+                .arg(EncBase::getEncoderName(encoder)));
         else
-            ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg("Invalid encoder configuration!"));
+            ui.labelEncProfile->setText(tr("Selected encoder: <b>%1</b>")
+                .arg("Invalid encoder configuration!"));
     }
     else
-        ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg("Invalid encoder configuration!"));
+        ui.labelEncProfile->setText(tr("Selected encoder: <b>%1</b>")
+            .arg("Invalid encoder configuration!"));
     ui.wavtrimthreshold->setValue(settings->wavtrimTh());
     emit settingsUpdated();
 }
