@@ -437,7 +437,7 @@
           <item row="1" column="1" >
            <widget class="QLabel" name="configTTSstatus" >
             <property name="text" >
-             <string>Configuration invalid !</string>
+             <string>Configuration invalid!</string>
             </property>
            </widget>
           </item>
@@ -474,7 +474,7 @@
           <item row="0" column="1" >
            <widget class="QLabel" name="configEncstatus" >
             <property name="text" >
-             <string>Configuration invalid !</string>
+             <string>Configuration invalid!</string>
             </property>
            </widget>
           </item>
@@ -491,7 +491,7 @@
           <item row="0" column="3" >
            <widget class="QPushButton" name="configEncoder" >
             <property name="text" >
-             <string> Configure &amp;Enc</string>
+             <string>Configure &amp;Enc</string>
             </property>
             <property name="icon" >
              <iconset resource="rbutilqt.qrc" >
