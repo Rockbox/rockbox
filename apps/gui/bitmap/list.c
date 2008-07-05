@@ -250,8 +250,14 @@ void list_draw(struct screen *display, struct viewport *parent,
             }
         }
         else
-            display->puts_style_offset(0, i-start, entry_name,
-                                                list_text[display->screen_type].drawmode, item_offset);
+        {
+            if (list->scroll_all)
+                display->puts_scroll_style_offset(0, i-start, entry_name,
+                                                  list_text[display->screen_type].drawmode, item_offset);
+            else
+                display->puts_style_offset(0, i-start, entry_name,
+                                           list_text[display->screen_type].drawmode, item_offset);
+        }
         /* do the icon */
         if (list->callback_get_item_icon && global_settings.show_icons)
         {

@@ -291,6 +291,7 @@ static int info_speak_item(int selected_item, void * data)
 
 #if CONFIG_RTC
     struct tm *tm;
+    static int last_talk = 0;
 #endif
 
     switch (selected_item)
@@ -313,14 +314,18 @@ static int info_speak_item(int selected_item, void * data)
             }
             break;
         case INFO_DATE:
-            tm = get_time();
-            if (valid_time(tm))
+            if (TIME_AFTER(current_tick, last_talk + HZ*60))
             {
-                talk_date(get_time(), true);
-            }
-            else
-            {
-                talk_id(LANG_UNKNOWN, true);
+                tm = get_time();
+                if (valid_time(tm))
+                {
+                    talk_date(get_time(), true);
+                }
+                else
+                {
+                    talk_id(LANG_UNKNOWN, true);
+                }
+                last_talk = current_tick;
             }
             break;
 #endif
@@ -417,13 +422,18 @@ static int info_action_callback(int action, struct gui_synclist *lists)
         return ACTION_REDRAW;
     }
 #if CONFIG_RTC
-    else if (action == ACTION_NONE && lists->selected_item == INFO_TIME)
+    else if (action == ACTION_NONE)
     {
-        static int last_redraw = 0;
-        if (TIME_AFTER(current_tick, last_redraw + HZ/2))
+        if ((global_settings.talk_menu && lists->selected_item == INFO_TIME) ||
+             (!global_settings.talk_menu &&
+               gui_synclist_item_is_onscreen(lists, 0, INFO_TIME)))
         {
-            last_redraw = current_tick;
-            return ACTION_REDRAW;
+            static int last_redraw = 0;
+            if (TIME_AFTER(current_tick, last_redraw + HZ*5))
+            {
+                last_redraw = current_tick;
+                return ACTION_REDRAW;
+            }
         }
     }
 #endif

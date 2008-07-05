@@ -786,6 +786,17 @@ bool list_do_action(int context, int timeout,
     return gui_synclist_do_button(lists, action, wrap);
 }
 
+bool gui_synclist_item_is_onscreen(struct gui_synclist *lists,
+                                   enum screen_type screen, int item)
+{
+    struct viewport vp = *lists->parent[screen];
+#ifdef HAVE_LCD_BITMAP
+    if (list_display_title(lists, lists->parent[screen]))
+        vp.height -= list_title_height(lists, lists->parent[screen]);
+#endif
+    return item <= (lists->start_item[screen] + viewport_get_nb_lines(&vp));
+}
+
 /* Simple use list implementation */
 static int simplelist_line_count = 0;
 static char simplelist_text[SIMPLELIST_MAX_LINES][SIMPLELIST_MAX_LINELENGTH];
