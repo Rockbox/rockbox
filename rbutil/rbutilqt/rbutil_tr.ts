@@ -2673,7 +2673,7 @@ L�tfen ag ve vekil sunucu ayarlarinizi kontrol ediniz.</translation>
     </message>
     <message>
         <location filename="uninstallfrm.ui" line="35"/>
-        <source>Please select the Uninstallation Methodl</source>
+        <source>Please select the Uninstallation Method</source>
         <translation>L�tfen kaldirma y�ntemini se�iniz</translation>
     </message>
     <message>

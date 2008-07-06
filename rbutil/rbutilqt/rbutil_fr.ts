@@ -2330,7 +2330,7 @@ Veuillez vérifier vos paramètres réseau et proxy.</translation>
     </message>
     <message>
         <location filename="uninstallfrm.ui" line="35"/>
-        <source>Please select the Uninstallation Methodl</source>
+        <source>Please select the Uninstallation Method</source>
         <translation>Veuillez choisir la méthode de désinstallation</translation>
     </message>
     <message>

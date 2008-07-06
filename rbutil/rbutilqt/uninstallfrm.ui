@@ -32,7 +32,7 @@
    <item row="0" column="1" colspan="2" >
     <widget class="QLabel" name="label_5" >
      <property name="text" >
-      <string>Please select the Uninstallation Methodl</string>
+      <string>Please select the Uninstallation Method</string>
      </property>
      <property name="wordWrap" >
       <bool>true</bool>

@@ -2686,7 +2686,7 @@ Please check your network and proxy settings.</source>
     </message>
     <message>
         <location filename="uninstallfrm.ui" line="35"/>
-        <source>Please select the Uninstallation Methodl</source>
+        <source>Please select the Uninstallation Method</source>
         <translation>请选择卸载模式</translation>
     </message>
     <message>

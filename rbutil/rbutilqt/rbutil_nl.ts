@@ -2347,8 +2347,8 @@ Gelieve uw netwerk en proxy instellingen te bekijken.</translation>
     </message>
     <message>
         <location filename="uninstallfrm.ui" line="35"/>
-        <source>Please select the Uninstallation Methodl</source>
-        <translation>Gelieve de deïnstallatie methode te selecteren!</translation>
+        <source>Please select the Uninstallation Method</source>
+        <translation>Gelieve de deïnstallatie methode te selecteren</translation>
     </message>
     <message>
         <location filename="uninstallfrm.ui" line="45"/>
