@@ -129,7 +129,13 @@ struct user_settings global_settings = {
 #endif
 };
     
-    
+int getwidth(void) { return LCD_WIDTH; }
+int getheight(void) { return LCD_HEIGHT; }
+#ifdef HAVE_REMOTE_LCD
+int remote_getwidth(void) { return LCD_REMOTE_WIDTH; }
+int remote_getheight(void) { return LCD_REMOTE_HEIGHT; }
+#endif
+
 struct screen screens[NB_SCREENS] =
 {
     {
@@ -142,6 +148,8 @@ struct screen screens[NB_SCREENS] =
 #else
         .is_color=false,
 #endif
+        .getwidth = getwidth,
+        .getheight = getheight,
 #if LCD_DEPTH > 1
         .get_foreground=dummy_func2,
         .get_background=dummy_func2,
@@ -154,6 +162,8 @@ struct screen screens[NB_SCREENS] =
         .lcdheight=LCD_REMOTE_HEIGHT,
         .depth=LCD_REMOTE_DEPTH,
         .is_color=false,/* No color remotes yet */
+        .getwidth = remote_getwidth,
+        .getheight = remote_getheight,
 #if LCD_REMOTE_DEPTH > 1
         .get_foreground=dummy_func2,
         .get_background=dummy_func2,
