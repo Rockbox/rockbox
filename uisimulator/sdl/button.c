@@ -246,6 +246,12 @@ void button_event(int key, bool pressed)
     case SDLK_INSERT:
         new_btn = BUTTON_MENU;
         break;
+    case SDLK_KP9:
+        new_btn = BUTTON_VOL_UP;
+        break;
+    case SDLK_KP3:
+        new_btn = BUTTON_VOL_DOWN;
+        break;
 
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
     case SDLK_KP4:
