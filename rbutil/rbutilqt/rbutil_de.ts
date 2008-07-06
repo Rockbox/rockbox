@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="de">
+<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstaller</name>
     <message>
@@ -557,6 +558,16 @@ Das Gerät muss für die Installation in den UMS-Modus umgestellt werden.</trans
         <location filename="configure.cpp" line="540"/>
         <source>Fatal error: incompatible player found</source>
         <translation>Fataler Fehler: inkompatibles Gerät gefunden </translation>
+    </message>
+    <message>
+        <location filename="configure.cpp" line="329"/>
+        <source>Configuration OK</source>
+        <translation>Konfiguration OK</translation>
+    </message>
+    <message>
+        <location filename="configure.cpp" line="334"/>
+        <source>Configuration INVALID</source>
+        <translation>Konfiguration UNGÜLTIG</translation>
     </message>
 </context>
 <context>

@@ -307,12 +307,12 @@ void Config::updateTtsState(int index)
     
     if(tts->configOk())
     {
-        ui.configTTSstatus->setText("Configuration OK");
+        ui.configTTSstatus->setText(tr("Configuration OK"));
         ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/go-next.png")));
     }
     else
     {
-        ui.configTTSstatus->setText("Configuration INVALID");
+        ui.configTTSstatus->setText(tr("Configuration INVALID"));
         ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/dialog-error.png")));
     }
 }
@@ -326,12 +326,12 @@ void Config::updateEncState()
     
     if(enc->configOk())
     {
-        ui.configEncstatus->setText("Configuration OK");
+        ui.configEncstatus->setText(tr("Configuration OK"));
         ui.configEncstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/go-next.png")));
     }
     else
     {
-        ui.configEncstatus->setText("Configuration INVALID");
+        ui.configEncstatus->setText(tr("Configuration INVALID"));
         ui.configEncstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/dialog-error.png")));
     }        
 }
