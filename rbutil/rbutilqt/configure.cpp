@@ -80,6 +80,7 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     connect(ui.configTts, SIGNAL(clicked()), this, SLOT(configTts()));
     connect(ui.configEncoder, SIGNAL(clicked()), this, SLOT(configEnc()));
     connect(ui.comboTts, SIGNAL(currentIndexChanged(int)), this, SLOT(updateTtsState(int)));
+    connect(ui.treeDevices, SIGNAL(itemSelectionChanged()), this, SLOT(updateEncState()));
      
 }
 
@@ -319,8 +320,19 @@ void Config::updateTtsState(int index)
 
 void Config::updateEncState()
 {
-    ui.encoderName->setText(EncBase::getEncoderName(settings->curEncoder()));
+    // FIXME: this is a workaround to make the encoder follow the device selection
+    // even with the settings (and thus the device) being saved. Needs to be redone
+    // properly later by extending the settings object
+    if(ui.treeDevices->selectedItems().size() == 0)
+        return;
+
+    QString devname = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
+    QString olddevice = settings->curPlatform();
+    settings->setCurPlatform(devname);
     QString encoder = settings->curEncoder();
+    ui.encoderName->setText(EncBase::getEncoderName(settings->curEncoder()));
+    settings->setCurPlatform(olddevice);
+
     EncBase* enc = EncBase::getEncoder(encoder);
     enc->setCfg(settings);
     
