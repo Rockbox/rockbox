@@ -798,7 +798,7 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
     <message>
         <location filename="createvoicefrm.ui" line="64"/>
         <source>TTS profile:</source>
-        <translation>TTS profiel</translation>
+        <translation>TTS profiel:</translation>
     </message>
     <message>
         <location filename="createvoicefrm.ui" line="77"/>
@@ -1492,7 +1492,7 @@ Wilt u de huidige bootloader vervangen?</translation>
     <message>
         <location filename="rbutilqt.cpp" line="510"/>
         <source>Backup successfull</source>
-        <translation>Backup is succesvol beëindigd!</translation>
+        <translation>Backup is succesvol beëindigd</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="514"/>
