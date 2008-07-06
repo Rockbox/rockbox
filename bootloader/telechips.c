@@ -70,12 +70,12 @@ void show_debug_screen(void)
         line = 1;
         button = button_get(false);
 		
-       /* Power-off if POWER button has been held for a long time
+       /* Power-off if POWER button has been held for a time
            This loop is currently running at about 100 iterations/second
          */
         if (button & POWEROFF_BUTTON) {
             power_count++;
-            if (power_count > 200)
+            if (power_count > 100)
                do_power_off = true;
         } else {
             power_count = 0;

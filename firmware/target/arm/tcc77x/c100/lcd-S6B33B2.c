@@ -213,8 +213,6 @@ void lcd_set_flip(bool yesno)
 
 /*** update functions ***/
 
-/*** update functions ***/
-
 void lcd_yuv_set_options(unsigned options)
 {
     lcd_yuv_options = options;
