@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="nl">
+<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstaller</name>
     <message>
@@ -100,7 +101,7 @@
     <message>
         <location filename="installbootloader.cpp" line="1435"/>
         <source>To finish the Bootloader installation, follow the steps below.</source>
-        <translation>Om de Bootloader installatie te beëindigen, gelieven de stappen hier beneden geschreven te volgen.</translation>
+        <translation type="unfinished">Om de Bootloader installatie te beëindigen, gelieven de hieronder beschreven stappen te volgen.</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1436"/>
@@ -305,7 +306,7 @@ sansapatcher for the first time.
 See http://www.rockbox.org/wiki/SansaE200Install
 *********************************************
 </source>
-        <translation>********************************************OUDE ROCKBOX INSTALLATIE HERKEND, INSTALLATIE AFGEBROKEN.U moet de originele Firmware herinstalleren vooraleersansapatcher voor de eerste keer te starten.Zie http://www.rockbox.org/wiki/SansaE200Install (Engelstalig)*********************************************</translation>
+        <translation type="unfinished">********************************************OUDE ROCKBOX INSTALLATIE HERKEND, INSTALLATIE AFGEBROKEN.U moet de originele Firmware herinstalleren vooraleer sansapatcher voor de eerste keer te starten.Zie http://www.rockbox.org/wiki/SansaE200Install (Engelstalig)*********************************************</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1374"/>
@@ -325,7 +326,7 @@ See http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="installbootloader.cpp" line="1377"/>
         <source>invalid file: unrecognized header</source>
-        <translation>ongeldig bestand: onherkende hoofding</translation>
+        <translation type="unfinished">ongeldig bestand: niet herkende hoofding</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1378"/>
@@ -488,12 +489,12 @@ Selecteer uw apparaat en Mountpunt manueel.</translation>
     <message>
         <location filename="configure.cpp" line="570"/>
         <source>Really delete cache?</source>
-        <translation>Wilt u zeker de cache legen?</translation>
+        <translation type="unfinished">Wilt u zeker de cache ledigen?</translation>
     </message>
     <message>
         <location filename="configure.cpp" line="573"/>
         <source>Do you really want to delete the cache? Make absolutely sure this setting is correct as it will remove &lt;b&gt;all&lt;/b&gt; files in this folder!</source>
-        <translation>Wilt u zeker de cache legen? Wees absoluut zeker dat deze instelling correct is aangezien het &lt;b&gt;alle&lt;/b&gt; bestanden in deze map zal verwijderen!</translation>
+        <translation type="unfinished">Wilt u zeker de cache ledigen? Wees absoluut zeker dat deze instelling correct is aangezien het &lt;b&gt;alle&lt;/b&gt; bestanden in deze map zal verwijderen!</translation>
     </message>
     <message>
         <location filename="configure.cpp" line="579"/>
@@ -532,7 +533,7 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
     <message>
         <location filename="configure.cpp" line="527"/>
         <source>Unless you changed this installation will fail!</source>
-        <translation>Tenzij u de installatie veranderd heeft, zal dit falen!</translation>
+        <translation type="unfinished">Tenzij u dit verandert, zal de installatie falen!</translation>
     </message>
     <message>
         <location filename="configure.cpp" line="529"/>
@@ -670,7 +671,7 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
     <message>
         <location filename="configurefrm.ui" line="288"/>
         <source>Rockbox Utility uses a local download cache to save network traffic. You can change the path to the cache and use it as local repository by enabling Offline mode.</source>
-        <translation>Rockbox Utility gebruikt een lokale download cache om netwerkverkeer te besparen. U kan het pad naar deze cache veranderen en het gebruiken als een lokale opslagplaats door Offline modus in te schakelen.</translation>
+        <translation type="unfinished">Rockbox Utility gebruikt een lokale download cache om netwerkverkeer te beperken. U kan het pad naar deze cache veranderen en het gebruiken als een lokale opslagplaats door Offline modus in te schakelen.</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="298"/>
@@ -705,7 +706,7 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
     <message>
         <location filename="configurefrm.ui" line="384"/>
         <source>Clean cache &amp;now</source>
-        <translation>Leeg de cache &amp;nu</translation>
+        <translation type="unfinished">Ledig de cache &amp;nu</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="404"/>
@@ -886,12 +887,12 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
     <message>
         <location filename="install.cpp" line="216"/>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation>Dit is de meest recente Rockbox build. Een huidige build zal upgedatete worden elke keer een verandering is gemaakt. Laatste versie is  r%1 (%2).</translation>
+        <translation type="unfinished">Dit is de meest recente Rockbox build. Een huidige build zal upgedatet worden elke keer een verandering is gemaakt. Laatste versie is  r%1 (%2).</translation>
     </message>
     <message>
         <location filename="install.cpp" line="220"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Pas op:&lt;/b&gt; Deze optie zal altijd een versie kopie downloaden. &lt;b&gt;Dt is de aanbevolen versie.&lt;/b&gt;</translation>
+        <translation type="unfinished">&lt;b&gt;Pas op:&lt;/b&gt; Deze optie zal altijd een versie kopie downloaden. &lt;b&gt;Dit is de aanbevolen versie.&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="install.cpp" line="223"/>
@@ -1409,7 +1410,7 @@ Wilt u verdergaan ?</translation>
     <message>
         <location filename="rbutilqt.cpp" line="887"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
-        <translation>Wilt u zeker Rockbox Utility installeren op uw speler? Na installatie kan u het opstarten van uw speler zijn harde schijf.</translation>
+        <translation type="unfinished">Wilt u zeker Rockbox Utility installeren op uw speler? Na installatie kan u het opstarten vanaf  de harde schijf van uw speler.</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="895"/>
@@ -1471,7 +1472,7 @@ Wilt u de huidige bootloader vervangen?</translation>
     <message>
         <location filename="rbutilqt.cpp" line="185"/>
         <source>Your configuration is invalid. This is most likely due to a new installation of Rockbox Utility or a changed device path. The configuration dialog will now open to allow you correcting the problem.</source>
-        <translation>Uw configuratie is ongeldig. Dit is waarschijnlijk door een nieuwe installatie van Rockbox Utility of een veranderd apparaats pad. Het configuratie scherm zal nu openen zodat u de fout kan herstellen.</translation>
+        <translation type="unfinished">Uw configuratie is ongeldig. Dit is waarschijnlijk door een nieuwe installatie van Rockbox Utility of een veranderd apparaat pad. Het configuratie scherm zal nu openen zodat u de fout kan herstellen.</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="482"/>
@@ -1506,7 +1507,7 @@ Wilt u de huidige bootloader vervangen?</translation>
     <message>
         <location filename="rbutilqt.cpp" line="692"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
-        <translation>Deze applicatie is nog steeds bezig met informatie te downloaden over nieuwe Builds. Gelieve binnen een korte periode opnieuw te proberen.</translation>
+        <translation type="unfinished">Deze applicatie is nog steeds bezig met informatie over nieuwe Builds te downloaden. Gelieve binnen een korte periode opnieuw te proberen.</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="494"/>
@@ -1694,7 +1695,7 @@ Wilt u de huidige bootloader vervangen?</translation>
     <message>
         <location filename="rbutilqtfrm.ui" line="863"/>
         <source>Empty local download cache</source>
-        <translation>Leeg de lokale download cache</translation>
+        <translation type="unfinished">Ledig de lokale download cache</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="868"/>
@@ -2625,10 +2626,10 @@ Gelieve uw netwerk en proxy instellingen te bekijken.</translation>
 
 © 2005 - 2008 The Rockbox Team.
 Released under the GNU General Public License v2.</source>
-        <translation>Installatie en schoonmaak hulpmiddel voor de Rockbox open source digitale audio player firmware.
+        <translation type="unfinished">Installatie en schoonmaak hulpmiddel voor de Rockbox open source digitale audio player firmware.
 
 © 2005 - 2008 Het Rockbox Team.
-Vrijgegeven onder GNU General Public Licensie v2.</translation>
+Vrijgegeven onder GNU General Public License v2.</translation>
     </message>
     <message>
         <location filename="aboutbox.ui" line="72"/>
@@ -2643,7 +2644,7 @@ Vrijgegeven onder GNU General Public Licensie v2.</translation>
     <message>
         <location filename="aboutbox.ui" line="124"/>
         <source>&amp;License</source>
-        <translation>&amp;Licensie</translation>
+        <translation type="unfinished">&amp;Licentie</translation>
     </message>
     <message>
         <location filename="aboutbox.ui" line="157"/>
