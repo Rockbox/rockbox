@@ -220,7 +220,7 @@ void main(void)
     usb_init();
 
     /* Enter USB mode without USB thread */
-    if(usb_detect())
+    if(usb_detect() == USB_INSERTED)
     {
         const char msg[] = "Bootloader USB mode";
         reset_screen();
@@ -233,7 +233,7 @@ void main(void)
         sleep(HZ/20);
         usb_enable(true);
 
-        while (usb_detect())
+        while (usb_detect() == USB_INSERTED)
         {
             ata_spin(); /* Prevent the drive from spinning down */
             sleep(HZ);

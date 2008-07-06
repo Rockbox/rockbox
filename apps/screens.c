@@ -373,7 +373,7 @@ int charging_screen(void)
         button = get_action(CONTEXT_STD,HZ/3);
         if (button == ACTION_STD_OK)
             rc = 2;
-        else if (usb_detect())
+        else if (usb_detect() == USB_INSERTED)
             rc = 3;
         else if (!charger_inserted())
             rc = 1;

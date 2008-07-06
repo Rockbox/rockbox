@@ -115,7 +115,7 @@ void charging_screen(void)
             break; /* start */
         else
         {
-            if (usb_detect())
+            if (usb_detect() == USB_INSERTED)
                 break;
             else if (!charger_inserted())
                 power_off(); /* charger removed: power down */
@@ -192,7 +192,7 @@ void main(void)
 
     //disk_init();
     usb_start_monitoring();
-    while (usb_detect())
+    while (usb_detect() == USB_INSERTED)
     {   /* enter USB mode early, before trying to mount */
         if (button_get_w_tmo(HZ/10) == SYS_USB_CONNECTED)
         {
