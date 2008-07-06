@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="fr">
+<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstaller</name>
     <message>
@@ -195,11 +196,6 @@
         <translation>Numéro de version inconnu dans le firmware (%1)</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="832"/>
-        <source>Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod</source>
-        <translation type="obsolete">Avertissement : Ceci est un MacPod, Rockbox ne fonctionne pas dessus. Convertissez-le en un WinPod</translation>
-    </message>
-    <message>
         <location filename="installbootloader.cpp" line="1025"/>
         <source>Could not open Ipod in RW mode</source>
         <translation>Impossible d&apos;ouvir l&apos;iPod en mode Lecture-Ecriture</translation>
@@ -250,23 +246,6 @@
         <translation>impossible d&apos;ouvrir le sansa</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1017"/>
-        <source>********************************************
-OLD ROCKBOX INSTALLATION DETECTED, ABORTING.
-You must reinstall the original Sansa firmware before running
-sansapatcher for the first time.
-See http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install
-*********************************************
-</source>
-        <translation type="obsolete">********************************************
-ANCIENNE INSTALLATION DE ROCKBOX DETECTEE, ANNULATION.
-Vous devez réinstaller le firmware original du Sansa avant d&apos;exécuter
-sansapatcher pour la première fois.
-Voir http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install (en anglais)
-*********************************************
-</translation>
-    </message>
-    <message>
         <location filename="installbootloader.cpp" line="1203"/>
         <source>Could not open Sansa in RW mode</source>
         <translation>Impossible d&apos;ouvir le sansa en mode Lecture-Ecriture</translation>
@@ -280,21 +259,6 @@ Voir http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install (en anglais)
         <location filename="installbootloader.cpp" line="1264"/>
         <source>Could not detect firmware type</source>
         <translation>Impossible de détecter le type de firmware</translation>
-    </message>
-    <message>
-        <location filename="installbootloader.cpp" line="1148"/>
-        <source>Error in descramble</source>
-        <translation type="obsolete">Erreur dans descramble</translation>
-    </message>
-    <message>
-        <location filename="installbootloader.cpp" line="1158"/>
-        <source>Error in patching</source>
-        <translation type="obsolete">Erreur dans la modification</translation>
-    </message>
-    <message>
-        <location filename="installbootloader.cpp" line="1168"/>
-        <source>Error in scramble</source>
-        <translation type="obsolete">Erreur dans scramble</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1396"/>
@@ -501,11 +465,6 @@ See http://www.rockbox.org/wiki/SansaE200Install
         <location filename="configure.cpp" line="112"/>
         <source>You need to restart the application for the changed language to take effect.</source>
         <translation>Vous devez redémarrer l&apos;application pour que le changement de langue prenne effet.</translation>
-    </message>
-    <message>
-        <location filename="configure.cpp" line="227"/>
-        <source>Current cache size is %1 kiB.</source>
-        <translation type="obsolete">La taille actuelle du cache est %1 Ko.</translation>
     </message>
     <message>
         <location filename="configure.cpp" line="559"/>
@@ -757,39 +716,9 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
         <translation>&amp;Choisir un moteur TTS</translation>
     </message>
     <message>
-        <location filename="configurefrm.ui" line="384"/>
-        <source>TTS executable</source>
-        <translation type="obsolete">Exécutable TTS</translation>
-    </message>
-    <message>
-        <location filename="configurefrm.ui" line="407"/>
-        <source>TTS Options</source>
-        <translation type="obsolete">Options TTS</translation>
-    </message>
-    <message>
         <location filename="configurefrm.ui" line="471"/>
         <source>Encoder Engine</source>
         <translation>Moteur d&apos;encodage</translation>
-    </message>
-    <message>
-        <location filename="configurefrm.ui" line="439"/>
-        <source>Select &amp;encoder profile</source>
-        <translation type="obsolete">Profil d&apos;&amp;encodage</translation>
-    </message>
-    <message>
-        <location filename="configurefrm.ui" line="452"/>
-        <source>Encoder executable</source>
-        <translation type="obsolete">Exécutable de l&apos;encodeur</translation>
-    </message>
-    <message>
-        <location filename="configurefrm.ui" line="465"/>
-        <source>B&amp;rowse</source>
-        <translation type="obsolete">&amp;Parcourir</translation>
-    </message>
-    <message>
-        <location filename="configurefrm.ui" line="475"/>
-        <source>Encoder options</source>
-        <translation type="obsolete">Options de l&apos;encodeur</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="545"/>
@@ -802,18 +731,13 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
         <translation>&amp;Annuler</translation>
     </message>
     <message>
-        <location filename="configurefrm.ui" line="420"/>
-        <source>TTS Language</source>
-        <translation type="obsolete">Langue TTS</translation>
-    </message>
-    <message>
         <location filename="configurefrm.ui" line="433"/>
         <source>Configure TTS Engine</source>
         <translation>Configurer le moteur TTS</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="477"/>
-        <source>Configuration invalid !</source>
+        <source>Configuration invalid!</source>
         <translation>Configuration invalide !</translation>
     </message>
     <message>
@@ -823,7 +747,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="494"/>
-        <source> Configure &amp;Enc</source>
+        <source>Configure &amp;Enc</source>
         <translation>Configurer l&apos;&amp;encodage</translation>
     </message>
     <message>
@@ -835,15 +759,10 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
 <context>
     <name>Configure</name>
     <message>
-        <location filename="configure.cpp" line="416"/>
-        <source>English</source>
-        <translation type="obsolete">Français</translation>
-    </message>
-    <message>
         <location filename="configure.cpp" line="417"/>
         <source>English</source>
         <comment>This is the localized language name, i.e. your language.</comment>
-        <translation type="unfinished">Français</translation>
+        <translation>Français</translation>
     </message>
 </context>
 <context>
@@ -1111,19 +1030,6 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>InstallProgressFrm</name>
-    <message>
-        <location filename="installprogressfrm.ui" line="19"/>
-        <source>Progress</source>
-        <translation type="obsolete">Avancement</translation>
-    </message>
-    <message>
-        <location filename="installprogressfrm.ui" line="56"/>
-        <source>&amp;Abort</source>
-        <translation type="obsolete">&amp;Annuler</translation>
-    </message>
-</context>
-<context>
     <name>InstallTalkFrm</name>
     <message>
         <location filename="installtalkfrm.ui" line="16"/>
@@ -1159,16 +1065,6 @@ p, li { white-space: pre-wrap; }
         <location filename="installtalkfrm.ui" line="105"/>
         <source>Generation options</source>
         <translation>Options de génération</translation>
-    </message>
-    <message>
-        <location filename="installtalkfrm.ui" line="110"/>
-        <source>Overwrite Wavefiles</source>
-        <translation type="obsolete">Ecraser les fichiers WAV</translation>
-    </message>
-    <message>
-        <location filename="installtalkfrm.ui" line="120"/>
-        <source>Remove Wavefiles</source>
-        <translation type="obsolete">Supprimer les fichiers WAV</translation>
     </message>
     <message>
         <location filename="installtalkfrm.ui" line="111"/>
@@ -1217,36 +1113,6 @@ p, li { white-space: pre-wrap; }
         <location filename="installtalkwindow.cpp" line="86"/>
         <source>The Folder to Talk is wrong!</source>
         <translation>Le dossier à dire est faux !</translation>
-    </message>
-    <message>
-        <location filename="installtalkwindow.cpp" line="101"/>
-        <source>Path to Encoder is wrong!</source>
-        <translation type="obsolete">Le chemin vers l&apos;encodeur est faux !</translation>
-    </message>
-    <message>
-        <location filename="installtalkwindow.cpp" line="108"/>
-        <source>Path to TTS is wrong!</source>
-        <translation type="obsolete">Le chemin vers le TTS est faux !</translation>
-    </message>
-    <message>
-        <location filename="installtalkwindow.cpp" line="149"/>
-        <source>TTS Profile: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="obsolete">Profil TTS : &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="installtalkwindow.cpp" line="149"/>
-        <source>Invalid TTS profile!</source>
-        <translation type="obsolete">Profil TTS invalide !</translation>
-    </message>
-    <message>
-        <location filename="installtalkwindow.cpp" line="155"/>
-        <source>Encoder Profile: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="obsolete">Profil d&apos;encodage : &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="installtalkwindow.cpp" line="155"/>
-        <source>Invalid encoder profile!</source>
-        <translation type="obsolete">Profil d&apos;encodage invalide !</translation>
     </message>
     <message>
         <location filename="installtalkwindow.cpp" line="128"/>
@@ -1370,7 +1236,7 @@ New Target: %2.
     <message>
         <location filename="rbspeexcfgfrm.ui" line="45"/>
         <source>Narrowband</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Narrowband</translation>
     </message>
     <message>
         <location filename="rbspeexcfgfrm.ui" line="68"/>
@@ -1476,13 +1342,6 @@ New Target: %2.
         <translation>Installation du bootloader</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="561"/>
-        <source>It seem your Bootloader is already uptodate.
-Do really want to install it?</source>
-        <translation type="obsolete">Il semble que le bootloader soit déjà à jour.
-Voulez-vous vraiment l&apos;installer ?</translation>
-    </message>
-    <message>
         <location filename="rbutilqt.cpp" line="625"/>
         <source>Original Firmware Path is wrong!</source>
         <translation>Le chemin du firmware original est invalide !</translation>
@@ -1563,19 +1422,9 @@ Voulez-vous vraiment l&apos;installer ?</translation>
         <translation>Installation de l&apos;utilitaire Rockbox terminée avec succès.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="573"/>
-        <source>Bootloader installation Skipped!</source>
-        <translation type="obsolete">Etape d&apos;instllation du bootloader sautée !</translation>
-    </message>
-    <message>
         <location filename="rbutilqt.cpp" line="1010"/>
         <source>Configuration error</source>
         <translation>Erreur de configuration</translation>
-    </message>
-    <message>
-        <location filename="rbutilqt.cpp" line="187"/>
-        <source>Your configuration is invalid. This is most likely due to a new installation of Rockbox Utility or a changed device path. The configuation dialog will now open to allow you correcting the problem.</source>
-        <translation type="obsolete">Votre configuration est invalide. Ceci est probablement dû à une nouvelle installation de l&apos;utilitaire Rockbox ou à un changement du chemin du périphérique. La fenêtre de configuration va s&apos;ouvrir pour vous permettre de corriger le problème.</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="726"/>
@@ -1667,17 +1516,6 @@ Do want to replace the current bootloader?</source>
         <translation>Périphérique sélectionné :</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="97"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;none&lt;/span&gt; at &lt;span style=&quot; font-weight:600;&quot;&gt;unknown&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;none&lt;/span&gt; at &lt;span style=&quot; font-weight:600;&quot;&gt;unknown&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="rbutilqtfrm.ui" line="117"/>
         <source>&amp;Change</source>
         <translation>&amp;Modifier</translation>
@@ -1691,37 +1529,6 @@ p, li { white-space: pre-wrap; }
         <location filename="rbutilqtfrm.ui" line="137"/>
         <source>Welcome</source>
         <translation>Bienvenue</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="176"/>
-        <source>...</source>
-        <translation type="obsolete">...</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="162"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Complete Installation&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This installs the bootloader, a current build and the extras package. This is the recommended method for new installations.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Installation complète&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ceci installe le bootloader, une version actuelle et le pack des extras. C&apos;est la méthode recommandée pour les nouvelles installations.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="192"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Small installation&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This installs bootloader and the current build of Rockbox. If you don&apos;t want the extras package, choose this option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Installation légère&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ceci installe le bootloader et une version acuelle de Rockbox. Si vous ne voulez pas le pack des extras, choisissez cette option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="815"/>
@@ -1739,33 +1546,9 @@ p, li { white-space: pre-wrap; }
         <translation>Installation du bootloader</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="261"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install the bootloader&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Before Rockbox can be run on your audio player, you may have to install a bootloader. This is only necessary the first time Rockbox is installed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Installer le bootloader&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Avant de pouvoir lancer Rockbox sur votre lecteur audio, vous pouvez avoir à installer un bootloader. Ceci n&apos;est nécessaier que la première fois que vous installez Rockbox.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="rbutilqtfrm.ui" line="266"/>
         <source>Install Rockbox</source>
         <translation>Installer Rockbox</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="294"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install Rockbox&lt;/span&gt; on your audio player&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Installer Rockbox&lt;/span&gt; sur votre lecteur audio&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="829"/>
@@ -1783,53 +1566,14 @@ p, li { white-space: pre-wrap; }
         <translation>Installer le pack des polices de caractères</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="365"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Fonts Package&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The Fonts Package contains a couple of commonly used fonts. Installation is highly recommended.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Polices de caractères&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Le pack de polices de caractères contient des polices couramment utilisées. Son installation est fortement recommandée.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="rbutilqtfrm.ui" line="360"/>
         <source>Install themes</source>
         <translation>Installer des thèmes</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="395"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install Themes&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rockbox&apos; look can be customized by themes. You can choose and install several officially distributed themes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Installer des Thèmes&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;L&apos;apparence de Rockbox peut être personnalisée avec des thèmes. Vous pouvez choisir et installer différents thèmes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="rbutilqtfrm.ui" line="386"/>
         <source>Install game files</source>
         <translation>Installer des fichier de jeu</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="425"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install Game Files&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Doom needs a base wad file to run.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Installer des fichiers de jeu&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Doom nécessite un fichier wad pour être utilisé.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="837"/>
@@ -1847,35 +1591,9 @@ p, li { white-space: pre-wrap; }
         <translation>Installer des fichiers de voix</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="491"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans Serif&apos;; font-size:9pt;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install Voice file&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans Serif&apos;; font-size:9pt;&quot;&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Installer des fichiers de voix&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Les fichiers de voix sont nécessaires pour faire parler l&apos;interface de Rockbox. La voix est activée par défaut, donc si vous installez les fichiers de voix Rockbox parlera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="rbutilqtfrm.ui" line="474"/>
         <source>Install Talk files</source>
         <translation>Installer des fichiers de voix</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="521"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Create Talk Files&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Talkfiles are needed to let Rockbox speak File and Foldernames&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Créer des fichiers de voix&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Les fichiers de voix sont nécessaires pour que Rockbox dise les noms des fichiers et des dossiers&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="845"/>
@@ -1891,32 +1609,6 @@ p, li { white-space: pre-wrap; }
         <location filename="rbutilqtfrm.ui" line="560"/>
         <source>Uninstall Bootloader</source>
         <translation>Désinstaller le bootloader</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="612"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove the bootloader&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;After removing the bootloader you won&apos;t be able to start Rockbox.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Supprimer le bootloader&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Après avoir supprimé le bootloader, vous ne pourrez plus démarrer Rockbox.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="642"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Uninstall Rockbox&lt;/span&gt; from your audio player.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This will leave the bootloader in place (you need to remove it manually).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Supprimer Rockbox&lt;/span&gt; de votre lecteur audio.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ceci laissera le bootloader (Vous devrez le supprimer séparément).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="645"/>
@@ -1967,19 +1659,6 @@ p, li { white-space: pre-wrap; }
         <location filename="rbutilqtfrm.ui" line="750"/>
         <source>Inf&amp;o</source>
         <translation>Inf&amp;o</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="800"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Currently installed packages.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;: if you manually installed packages this might not be correct!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Composants actuellement installés.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;: Si vous avez manuellement installé des composants, ceci ne sera pas correct !&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="770"/>
@@ -2220,7 +1899,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="rbutilqtfrm.ui" line="97"/>
         <source>device / mountpoint unknown or invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>périphérique / point de montage inconnu ou invalide</translation>
     </message>
 </context>
 <context>
