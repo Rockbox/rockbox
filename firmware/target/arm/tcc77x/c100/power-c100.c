@@ -42,21 +42,6 @@ bool ide_powered(void)
 
 void power_off(void)
 {
-
-	//sleep(HZ/1000);   /* 10ms */
-	//lcd_send_command(0x02);
-	
-	//sleep(HZ/1000);   /* 10ms */
-	//lcd_send_command(0x00);
-	
-	//sleep(HZ/1000);   /* 10ms */
-	sleep(HZ/1000);   /* 10ms */
-	
-	// From MAIN.c
-    GPIOB &= ~(0x04);
-    //GPIOD &= ~(0x80|0x40);
-
-	
 }
 
 #else /* SIMULATOR */
