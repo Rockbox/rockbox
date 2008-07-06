@@ -554,6 +554,16 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
         <source>Fatal error: incompatible player found</source>
         <translation>Fatale fout: incompatibele speler gevonden</translation>
     </message>
+    <message>
+        <location filename="configure.cpp" line="329"/>
+        <source>Configuration OK</source>
+        <translation>Configuratie OK</translation>
+    </message>
+    <message>
+        <location filename="configure.cpp" line="334"/>
+        <source>Configuration INVALID</source>
+        <translation>Configuratie ONGELDIG</translation>
+    </message>
 </context>
 <context>
     <name>ConfigForm</name>
