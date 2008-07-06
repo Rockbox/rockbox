@@ -24,6 +24,7 @@
 #include "lcd.h"
 #include "file.h"
 #ifdef __PCTOOL__
+#include <stdint.h>
 #include <stdarg.h>
 #else
 #include "sprintf.h"

@@ -1,8 +1,30 @@
+/***************************************************************************
+ *             __________               __   ___.                  
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
+ *                     \/            \/     \/    \/            \/ 
+ * $Id$
+ *
+ * Copyright (C) 2008 by Dave Chapman
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include "config.h"
 #include "gwps.h"
+#include "checkwps.h"
 
 #define MIN(x,y) ((x) > (y) ? (y) : (x))
 
@@ -89,11 +111,6 @@ bool load_remote_wps_backdrop(const char* filename)
 
 static char pluginbuf[PLUGIN_BUFFER_SIZE];
 
-static int dummy_func1(void)
-{
-    return 0;
-}
-
 static unsigned dummy_func2(void)
 {
     return 0;
@@ -104,21 +121,27 @@ void* plugin_get_buffer(size_t *buffer_size)
     *buffer_size = PLUGIN_BUFFER_SIZE;
     return pluginbuf;
 }
-
+struct user_settings global_settings = {
+    .statusbar = true,
+#ifdef HAVE_LCD_COLOR
+    .bg_color = LCD_DEFAULT_BG,
+    .fg_color = LCD_DEFAULT_FG,
+#endif
+};
+    
+    
 struct screen screens[NB_SCREENS] =
 {
     {
         .screen_type=SCREEN_MAIN,
-        .width=LCD_WIDTH,
-        .height=LCD_HEIGHT,
+        .lcdwidth=LCD_WIDTH,
+        .lcdheight=LCD_HEIGHT,
         .depth=LCD_DEPTH,
 #ifdef HAVE_LCD_COLOR
         .is_color=true,
 #else
         .is_color=false,
 #endif
-        .getxmargin=dummy_func1,
-        .getymargin=dummy_func1,
 #if LCD_DEPTH > 1
         .get_foreground=dummy_func2,
         .get_background=dummy_func2,
@@ -127,12 +150,10 @@ struct screen screens[NB_SCREENS] =
 #ifdef HAVE_REMOTE_LCD
     {
         .screen_type=SCREEN_REMOTE,
-        .width=LCD_REMOTE_WIDTH,
-        .height=LCD_REMOTE_HEIGHT,
+        .lcdwidth=LCD_REMOTE_WIDTH,
+        .lcdheight=LCD_REMOTE_HEIGHT,
         .depth=LCD_REMOTE_DEPTH,
         .is_color=false,/* No color remotes yet */
-        .getxmargin=dummy_func1,
-        .getymargin=dummy_func1,
 #if LCD_REMOTE_DEPTH > 1
         .get_foreground=dummy_func2,
         .get_background=dummy_func2,

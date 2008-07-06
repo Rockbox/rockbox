@@ -31,6 +31,8 @@
 #define DEBUGF printf
 #define FONT_SYSFIXED 0
 #define FONT_UI 1
+#define SYSFONT_HEIGHT 8
+#include "checkwps.h"
 #else
 #include "debug.h"
 #endif
@@ -818,7 +820,11 @@ static int parse_progressbar(const char *wps_bufptr,
     const char *ptr = wps_bufptr;
     struct progressbar *pb;
     struct viewport *vp = &wps_data->viewports[wps_data->num_viewports].vp;
+#ifndef __PCTOOL__
     int font_height = font_get(vp->font)->height;
+#else 
+    int font_height = 8;
+#endif
     int line_y_pos = font_height*(wps_data->num_lines - 
             wps_data->viewports[wps_data->num_viewports].first_line);
     
