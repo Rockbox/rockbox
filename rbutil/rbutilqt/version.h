@@ -19,4 +19,4 @@
  *
  ****************************************************************************/
 
-#define VERSION "SVN $Revision$ (m1.0.5), built "__DATE__" "__TIME__
+#define VERSION "SVN $Revision$ (m1.0.6), built "__DATE__" "__TIME__
