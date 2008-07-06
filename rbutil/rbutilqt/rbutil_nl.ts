@@ -195,11 +195,6 @@
         <translation>Onbekend versie nummer in firmware (%1)</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="832"/>
-        <source>Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod</source>
-        <translation type="obsolete">Pas op : dit is een MacPod, Rockbox werkt hier niet op. Converteer het naar een WinPod</translation>
-    </message>
-    <message>
         <location filename="installbootloader.cpp" line="1025"/>
         <source>Could not open Ipod in RW mode</source>
         <translation>Kon iPod niet openen in RW-modus</translation>
@@ -250,23 +245,6 @@
         <translation>Kon Sansa niet openen</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1017"/>
-        <source>********************************************
-OLD ROCKBOX INSTALLATION DETECTED, ABORTING.
-You must reinstall the original Sansa firmware before running
-sansapatcher for the first time.
-See http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install
-*********************************************
-</source>
-        <translation type="obsolete">********************************************
-OUDE ROCKBOX INSTALLATIE HERKEND.
-U moet de originele Firmware herinstalleren vooraleer
-sansapatcher voor de eerste keer te starten.
-Zie http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install (Engelstalig)
-*********************************************
-</translation>
-    </message>
-    <message>
         <location filename="installbootloader.cpp" line="1203"/>
         <source>Could not open Sansa in RW mode</source>
         <translation>Kon Sansa niet openen in RW-modus</translation>
@@ -280,21 +258,6 @@ Zie http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install (Engelstalig)
         <location filename="installbootloader.cpp" line="1264"/>
         <source>Could not detect firmware type</source>
         <translation>Kon het Firmware type niet herkennen</translation>
-    </message>
-    <message>
-        <location filename="installbootloader.cpp" line="1148"/>
-        <source>Error in descramble</source>
-        <translation type="obsolete">Fout in decoderen</translation>
-    </message>
-    <message>
-        <location filename="installbootloader.cpp" line="1158"/>
-        <source>Error in patching</source>
-        <translation type="obsolete">Fout in patchen</translation>
-    </message>
-    <message>
-        <location filename="installbootloader.cpp" line="1168"/>
-        <source>Error in scramble</source>
-        <translation type="obsolete">Fout in coderen</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1396"/>
@@ -504,11 +467,6 @@ See http://www.rockbox.org/wiki/SansaE200Install
         <translation>U moet de applicatie herstarten om de veranderde taal in te schakelen.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="227"/>
-        <source>Current cache size is %1 kiB.</source>
-        <translation type="obsolete">La taille actuelle du cache est %1 Ko.</translation>
-    </message>
-    <message>
         <location filename="configure.cpp" line="559"/>
         <source>Autodetection</source>
         <translation>Autoherkenning</translation>
@@ -585,11 +543,6 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
         <location filename="configure.cpp" line="218"/>
         <source>Current cache size is %L1 kiB.</source>
         <translation>Huidige cache grootte is %L1 kiB.</translation>
-    </message>
-    <message>
-        <location filename="configure.cpp" line="418"/>
-        <source>(system proxy is disabled)</source>
-        <translation type="obsolete">(systeem proxy is uitgeschakeld)</translation>
     </message>
     <message>
         <location filename="configure.cpp" line="538"/>
@@ -732,7 +685,7 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
     <message>
         <location filename="configurefrm.ui" line="346"/>
         <source>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</source>
-        <translation>Dit zal proberen alle informatie van de cache te gebruiken, zelfs informatie in verband met updates. Gebruik enkel deze optie als u wilt installeren zonder netwerk verbinding. Pas op: u moet dezelfde installatie eerst doen die u later</translation>
+        <translation>Dit zal proberen alle informatie van de cache te gebruiken, zelfs informatie in verband met updates. Gebruik enkel deze optie als u wilt installeren zonder netwerk verbinding. Pas op: u moet eerst deze installatie doen met een internet verbinding om later ze opnieuw te kunnen uitvoeren vanuit cache.</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="349"/>
@@ -760,39 +713,9 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
         <translation>&amp;Selecteer TTS Engine</translation>
     </message>
     <message>
-        <location filename="configurefrm.ui" line="384"/>
-        <source>TTS executable</source>
-        <translation type="obsolete">Exécutable TTS</translation>
-    </message>
-    <message>
-        <location filename="configurefrm.ui" line="407"/>
-        <source>TTS Options</source>
-        <translation type="obsolete">Options TTS</translation>
-    </message>
-    <message>
         <location filename="configurefrm.ui" line="471"/>
         <source>Encoder Engine</source>
         <translation>Encoder Engine</translation>
-    </message>
-    <message>
-        <location filename="configurefrm.ui" line="439"/>
-        <source>Select &amp;encoder profile</source>
-        <translation type="obsolete">Profil d&apos;&amp;encodage</translation>
-    </message>
-    <message>
-        <location filename="configurefrm.ui" line="452"/>
-        <source>Encoder executable</source>
-        <translation type="obsolete">Exécutable de l&apos;encodeur</translation>
-    </message>
-    <message>
-        <location filename="configurefrm.ui" line="465"/>
-        <source>B&amp;rowse</source>
-        <translation type="obsolete">&amp;Parcourir</translation>
-    </message>
-    <message>
-        <location filename="configurefrm.ui" line="475"/>
-        <source>Encoder options</source>
-        <translation type="obsolete">Options de l&apos;encodeur</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="545"/>
@@ -805,18 +728,13 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
         <translation>&amp;Annuleren</translation>
     </message>
     <message>
-        <location filename="configurefrm.ui" line="420"/>
-        <source>TTS Language</source>
-        <translation type="obsolete">Langue TTS</translation>
-    </message>
-    <message>
         <location filename="configurefrm.ui" line="433"/>
         <source>Configure TTS Engine</source>
         <translation>Configureer TTS Engine</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="477"/>
-        <source>Configuration invalid !</source>
+        <source>Configuration invalid!</source>
         <translation>Configuratie ongeldig!</translation>
     </message>
     <message>
@@ -825,18 +743,8 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
         <translation>Configureer &amp;TTS</translation>
     </message>
     <message>
-        <location filename="configurefrm.ui" line="427"/>
-        <source>Select &amp;encoder</source>
-        <translation type="obsolete">Selecteer een &amp;encoder</translation>
-    </message>
-    <message>
-        <location filename="configurefrm.ui" line="440"/>
-        <source>Configure encoder</source>
-        <translation type="obsolete">Configureer Encoder</translation>
-    </message>
-    <message>
         <location filename="configurefrm.ui" line="494"/>
-        <source> Configure &amp;Enc</source>
+        <source>Configure &amp;Enc</source>
         <translation>Configureer &amp;Enc</translation>
     </message>
     <message>
@@ -847,11 +755,6 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
 </context>
 <context>
     <name>Configure</name>
-    <message>
-        <location filename="configure.cpp" line="416"/>
-        <source>English</source>
-        <translation type="obsolete">Nederlands</translation>
-    </message>
     <message>
         <location filename="configure.cpp" line="417"/>
         <source>English</source>
@@ -1006,26 +909,6 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
         <translation>&lt;b&gt;Pas op:&lt;/b&gt; gearchiveerde versie is r%1(%2).</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="127"/>
-        <source>Device mismatch detected</source>
-        <translation type="obsolete">Verkeerd apparaat herkend</translation>
-    </message>
-    <message>
-        <location filename="install.cpp" line="131"/>
-        <source>Device mismatch detected.
-
-Installed Rockbox is for Device: %1.
-New Rockbox is for Device: %2.
-
-Do you want to continue?</source>
-        <translation type="obsolete">Verkeerd apparaat herkend.
-
-Geïnstalleerde Rockbox voor dit apparaat is: %1.
-Nieuwe Rockbox voor dit apparaat is: %2.
-
-Wilt u verdergaan?</translation>
-    </message>
-    <message>
         <location filename="install.cpp" line="126"/>
         <source>Aborted!</source>
         <translation>Afgebroken!</translation>
@@ -1144,19 +1027,6 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>InstallProgressFrm</name>
-    <message>
-        <location filename="installprogressfrm.ui" line="19"/>
-        <source>Progress</source>
-        <translation type="obsolete">Vooruitgang</translation>
-    </message>
-    <message>
-        <location filename="installprogressfrm.ui" line="56"/>
-        <source>&amp;Abort</source>
-        <translation type="obsolete">&amp;Afbreken</translation>
-    </message>
-</context>
-<context>
     <name>InstallTalkFrm</name>
     <message>
         <location filename="installtalkfrm.ui" line="16"/>
@@ -1192,16 +1062,6 @@ p, li { white-space: pre-wrap; }
         <location filename="installtalkfrm.ui" line="105"/>
         <source>Generation options</source>
         <translation>Generatie instellingen</translation>
-    </message>
-    <message>
-        <location filename="installtalkfrm.ui" line="110"/>
-        <source>Overwrite Wavefiles</source>
-        <translation type="obsolete">Overschrijf Wave bestanden</translation>
-    </message>
-    <message>
-        <location filename="installtalkfrm.ui" line="120"/>
-        <source>Remove Wavefiles</source>
-        <translation type="obsolete">Verwijder Wave bestanden</translation>
     </message>
     <message>
         <location filename="installtalkfrm.ui" line="111"/>
@@ -1250,36 +1110,6 @@ p, li { white-space: pre-wrap; }
         <location filename="installtalkwindow.cpp" line="86"/>
         <source>The Folder to Talk is wrong!</source>
         <translation>De map naar Talk is verkeerd!</translation>
-    </message>
-    <message>
-        <location filename="installtalkwindow.cpp" line="101"/>
-        <source>Path to Encoder is wrong!</source>
-        <translation type="obsolete">Le chemin vers l&apos;encodeur est faux !</translation>
-    </message>
-    <message>
-        <location filename="installtalkwindow.cpp" line="108"/>
-        <source>Path to TTS is wrong!</source>
-        <translation type="obsolete">Le chemin vers le TTS est faux !</translation>
-    </message>
-    <message>
-        <location filename="installtalkwindow.cpp" line="149"/>
-        <source>TTS Profile: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="obsolete">Profil TTS : &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="installtalkwindow.cpp" line="149"/>
-        <source>Invalid TTS profile!</source>
-        <translation type="obsolete">Profil TTS invalide !</translation>
-    </message>
-    <message>
-        <location filename="installtalkwindow.cpp" line="155"/>
-        <source>Encoder Profile: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="obsolete">Profil d&apos;encodage : &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="installtalkwindow.cpp" line="155"/>
-        <source>Invalid encoder profile!</source>
-        <translation type="obsolete">Profil d&apos;encodage invalide !</translation>
     </message>
     <message>
         <location filename="installtalkwindow.cpp" line="128"/>
@@ -1517,13 +1347,6 @@ Wilt u verdergaan ?</translation>
         <translation>Bootloader installatie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="561"/>
-        <source>It seem your Bootloader is already uptodate.
-Do really want to install it?</source>
-        <translation type="obsolete">Il semble que le bootloader soit déjà à jour.
-Voulez-vous vraiment l&apos;installer ?</translation>
-    </message>
-    <message>
         <location filename="rbutilqt.cpp" line="625"/>
         <source>Original Firmware Path is wrong!</source>
         <translation>Oorspronkelijk Firmware pad is verkeerd!</translation>
@@ -1604,19 +1427,9 @@ Voulez-vous vraiment l&apos;installer ?</translation>
         <translation>Rockbox Utility is succesvol geïnstalleerd.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="573"/>
-        <source>Bootloader installation Skipped!</source>
-        <translation type="obsolete">Etape d&apos;instllation du bootloader sautée !</translation>
-    </message>
-    <message>
         <location filename="rbutilqt.cpp" line="1010"/>
         <source>Configuration error</source>
         <translation>Configuratie fout</translation>
-    </message>
-    <message>
-        <location filename="rbutilqt.cpp" line="187"/>
-        <source>Your configuration is invalid. This is most likely due to a new installation of Rockbox Utility or a changed device path. The configuation dialog will now open to allow you correcting the problem.</source>
-        <translation type="obsolete">Uw configuratie is ongeldig. Dit is waarschijnlijk door een nieuwe installatie van Rockbox Utility of een veranderd apparaats pad. Het configuratie scherm zal nu openen zodat u de fout kan herstellen.</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="726"/>
@@ -1652,26 +1465,6 @@ Wilt u de huidige bootloader vervangen?</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="482"/>
-        <source>Target mismatch detected</source>
-        <translation type="obsolete">Verkeerd apparaat herkend</translation>
-    </message>
-    <message>
-        <location filename="rbutilqt.cpp" line="486"/>
-        <source>Target mismatch detected. 
-
-Installed target: %1.
-New Target: %2.
-
-Do you want to continue?</source>
-        <translation type="obsolete">Verkeerd apparaat herkend.
-
-Geïnstalleerde apparaat is: %1.
-Nieuw apparaat is: %2.
-
-Wilt u verdergaan?</translation>
-    </message>
-    <message>
-        <location filename="rbutilqt.cpp" line="482"/>
         <source>Aborted!</source>
         <translation>Afgebroken!</translation>
     </message>
@@ -1684,11 +1477,6 @@ Wilt u verdergaan?</translation>
         <location filename="rbutilqt.cpp" line="491"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
         <translation>Rockbox installatie herkend. Wilt u eerst een backup maken?</translation>
-    </message>
-    <message>
-        <location filename="rbutilqt.cpp" line="502"/>
-        <source>Beginning Backup...</source>
-        <translation type="obsolete">Backup wordt gestart...</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="510"/>
@@ -1734,17 +1522,6 @@ Wilt u verdergaan?</translation>
         <translation>Geselecteerd apparaat:</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="97"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;none&lt;/span&gt; at &lt;span style=&quot; font-weight:600;&quot;&gt;unknown&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;none&lt;/span&gt; at &lt;span style=&quot; font-weight:600;&quot;&gt;unknown&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="rbutilqtfrm.ui" line="117"/>
         <source>&amp;Change</source>
         <translation>&amp;Veranderen</translation>
@@ -1758,37 +1535,6 @@ p, li { white-space: pre-wrap; }
         <location filename="rbutilqtfrm.ui" line="137"/>
         <source>Welcome</source>
         <translation>Welkom</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="176"/>
-        <source>...</source>
-        <translation type="obsolete">...</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="162"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Complete Installation&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This installs the bootloader, a current build and the extras package. This is the recommended method for new installations.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Voltooi installatie&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Dit installeert de bootloader, een huidige build en het extra&apos;s pakket. Dit is de aanbevolen methode voor nieuwe installaties.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="192"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Small installation&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This installs bootloader and the current build of Rockbox. If you don&apos;t want the extras package, choose this option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Kleine installatie&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Dit installeer de bootloader en de huidige Rockbox build. Als je de extra pakketten niet wilt, selecteer dan deze optie.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="815"/>
@@ -1806,33 +1552,9 @@ p, li { white-space: pre-wrap; }
         <translation>Installeer de Bootloader</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="261"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install the bootloader&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Before Rockbox can be run on your audio player, you may have to install a bootloader. This is only necessary the first time Rockbox is installed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Installeer de bootloader&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Vooraleer u Rockbox kan gebruiken op uw audio player, moet u een bootloader installeren. Dit is enkel de eerste keer dat Rockbox wordt geïnstalleerd nodig.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="rbutilqtfrm.ui" line="266"/>
         <source>Install Rockbox</source>
         <translation>Installeer Rockbox</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="294"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install Rockbox&lt;/span&gt; on your audio player&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Installeer Rockbox&lt;/span&gt; op uw audio player&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="829"/>
@@ -1850,53 +1572,14 @@ p, li { white-space: pre-wrap; }
         <translation>Installeer het lettertypen pakket</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="365"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Fonts Package&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The Fonts Package contains a couple of commonly used fonts. Installation is highly recommended.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Lettertypen pakket&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Het lettertypen pakket bevat een aantal veelgebruikte lettertypen. Dit installeren is sterk aanbevolen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="rbutilqtfrm.ui" line="360"/>
         <source>Install themes</source>
         <translation>Thema&apos;s installeren</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="395"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install Themes&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rockbox&apos; look can be customized by themes. You can choose and install several officially distributed themes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Installeer thema&apos;s&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Het uiterlijk van Rockbox kan aangepast worden met behulp van thema&apos;s. U kan kiezen uit verschilende officiëel gedistribueerde thema&apos;s kiezen en deze installeren.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="rbutilqtfrm.ui" line="386"/>
         <source>Install game files</source>
         <translation>Spelbestanden installeren</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="425"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install Game Files&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Doom needs a base wad file to run.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Installeer spelbestanden&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Doom heeft een basis wad bestand nodig om te starten.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="837"/>
@@ -1914,35 +1597,9 @@ p, li { white-space: pre-wrap; }
         <translation>Installeer de spraakbestanden</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="491"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans Serif&apos;; font-size:9pt;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install Voice file&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans Serif&apos;; font-size:9pt;&quot;&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Installeer spraakbestanden&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Spraakbestanden zijn nodig om Rockbox de gebruikersinterface te laten spreken. Dit is standaard ingeschakeld, dus als u dit installeert zal Rockbox spreken.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="rbutilqtfrm.ui" line="474"/>
         <source>Install Talk files</source>
         <translation>Installeer de Talk bestanden</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="521"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Create Talk Files&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Talkfiles are needed to let Rockbox speak File and Foldernames&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Creëer Talk bestanden&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Talk bestanden zijn nodig om Rockbox bestands- en mapnamen te laten spreken.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="845"/>
@@ -1958,32 +1615,6 @@ p, li { white-space: pre-wrap; }
         <location filename="rbutilqtfrm.ui" line="560"/>
         <source>Uninstall Bootloader</source>
         <translation>Deïnstalleer de Bootloader</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="612"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remove the bootloader&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;After removing the bootloader you won&apos;t be able to start Rockbox.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Bootloader verwijderen&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Nadat u de bootloader hebt verwijderd zal u Rockbox niet meer kunnen starten.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="642"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Uninstall Rockbox&lt;/span&gt; from your audio player.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This will leave the bootloader in place (you need to remove it manually).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Rockbox deïnstalleren&lt;/span&gt; van uw audio player.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Dit laat de bootloader onaangetast (u moet hem manueel verwijderen).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="645"/>
@@ -2034,19 +1665,6 @@ p, li { white-space: pre-wrap; }
         <location filename="rbutilqtfrm.ui" line="750"/>
         <source>Inf&amp;o</source>
         <translation>Inf&amp;o</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="800"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Currently installed packages.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;: if you manually installed packages this might not be correct!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Huidig geïnstalleerde pakketten.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Pas op&lt;/span&gt;: indien u manueel pakketten hebt geïnstalleerd kan dit mogelijk niet correct zijn!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="770"/>
@@ -2114,64 +1732,14 @@ p, li { white-space: pre-wrap; }
         <translation>Actie&amp;s</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="859"/>
-        <source>Installation</source>
-        <translation type="obsolete">Installatie</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="866"/>
-        <source>Quick Start</source>
-        <translation type="obsolete">Snelle start</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="873"/>
-        <source>Extras</source>
-        <translation type="obsolete">Extra&apos;s</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="881"/>
-        <source>Accessibility</source>
-        <translation type="obsolete">Toegankelijkheid</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="889"/>
-        <source>Uninstallation</source>
-        <translation type="obsolete">Deïnstallatie</translation>
-    </message>
-    <message>
         <location filename="rbutilqtfrm.ui" line="901"/>
         <source>Info</source>
         <translation>Info</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="985"/>
-        <source>Fonts Package</source>
-        <translation type="obsolete">Lettertypen pakket</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="993"/>
-        <source>Install Themes</source>
-        <translation type="obsolete">Installeer thema&apos;s</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="1001"/>
-        <source>Install Game Files</source>
-        <translation type="obsolete">Installeer spelbestanden</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="1009"/>
-        <source>Install Voice File</source>
-        <translation type="obsolete">Installeer spraakbestanden</translation>
-    </message>
-    <message>
         <location filename="rbutilqtfrm.ui" line="1017"/>
         <source>Create &amp;Voice File</source>
         <translation>Creëer een &amp;Voice bestand</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="1025"/>
-        <source>Remove bootloader</source>
-        <translation type="obsolete">Verwijder de Bootloader</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="994"/>
@@ -2199,25 +1767,9 @@ p, li { white-space: pre-wrap; }
         <translation>Creëer spraakbestanden</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="574"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;span style=&quot; font-size:9pt; font-weight:600;&quot;&gt;Create Voice file&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans Serif&apos;; font-size:9pt;&quot;&gt;Voice files are needed to make Rockbox speak the  user interface. Speaking is enabled by default, so&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans Serif&apos;; font-size:9pt;&quot;&gt; if you installed the voice file Rockbox will speak.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;p, li { white-space: pre-wrap; }&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;span style=&quot; font-size:9pt; font-weight:600;&quot;&gt;Creëer spraak bestanden&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans Serif&apos;; font-size:9pt;&quot;&gt;Spraakbestanden zijn nodig om de interface van Rockbox te laten spreken, dus&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans Serif&apos;; font-size:9pt;&quot;&gt; als je de spraakbestanden hebt geïnstalleerd, zal Rockbox spreken.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="rbutilqtfrm.ui" line="1020"/>
         <source>Create Voice File</source>
         <translation>Creëer spraakbestanden</translation>
-    </message>
-    <message>
-        <location filename="rbutilqtfrm.ui" line="1064"/>
-        <source>Create Voic&lt;resource type=&quot;image&quot; qrc=&quot;C:/cygwin/home/Domonoky/rockbox-svn/rockbox-rbspeex/rbutil/rbutilqt/rbutilqt.qrc&quot; file=&quot;:/icons/icons/talkfile_btn.png&quot; /&gt;
-e File</source>
-        <translation type="obsolete">Creëer spraak&lt;resource type=&quot;image&quot; qrc=&quot;C:/cygwin/home/Domonoky/rockbox-svn/rockbox-rbspeex/rbutil/rbutilqt/rbutilqt.qrc&quot; file=&quot;:/icons/icons/talkfile_btn.png&quot; /&gt;bestanden</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="159"/>
