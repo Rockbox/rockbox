@@ -605,6 +605,8 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_TAGCACHE
     tagcache_get_numeric,
 #endif
+
+    gui_syncyesno_run,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

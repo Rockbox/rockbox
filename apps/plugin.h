@@ -96,6 +96,8 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "lcd-remote.h"
 #endif
 
+#include "yesno.h"
+
 #ifdef PLUGIN
 
 #if defined(DEBUG) || defined(SIMULATOR)
@@ -126,7 +128,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 118
+#define PLUGIN_API_VERSION 119
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -756,6 +758,10 @@ struct plugin_api {
 #ifdef HAVE_TAGCACHE
     long (*tagcache_get_numeric)(const struct tagcache_search *tcs, int tag);
 #endif
+
+    enum yesno_res (*gui_syncyesno_run)(const struct text_message * main_message,
+                                        const struct text_message * yes_message,
+                                        const struct text_message * no_message);
 
 };
 
