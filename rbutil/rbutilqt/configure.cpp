@@ -19,6 +19,7 @@
 
 #include <QtGui>
 
+#include "version.h"
 #include "configure.h"
 #include "autodetection.h"
 #include "ui_configurefrm.h"
@@ -137,6 +138,8 @@ void Config::accept()
     int i = ui.comboTts->currentIndex();
     settings->setCurTTS(ui.comboTts->itemData(i).toString());
    
+    settings->setCurVersion(PUREVERSION);
+
     // sync settings
     settings->sync();
     this->close();

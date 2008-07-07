@@ -77,6 +77,11 @@ QString RbSettings::userSettingFilename()
     return userSettings->fileName();
 }
 
+QString RbSettings::curVersion()
+{
+    return userSettings->value("rbutil_version").toString();
+}
+ 
 bool RbSettings::cacheOffline()
 {
     return userSettings->value("offline").toBool();
@@ -107,7 +112,6 @@ QString RbSettings::bleedingUrl()
 {
     return devices->value("bleeding_url").toString();
 }
-
 
 QString RbSettings::lastRelease()
 {
@@ -327,7 +331,7 @@ bool RbSettings::encoderNarrowband(QString enc)
 {
     return userSettingsGroupGet(enc,"narrowband",false).toBool();
 }
- 
+
 QStringList RbSettings::allPlatforms()
 {
     QStringList result;
@@ -481,6 +485,10 @@ int RbSettings::curTargetId()
     return deviceSettingCurGet("targetid").toInt();
 }
 
+void RbSettings::setCurVersion(QString version)
+{
+    userSettings->setValue("rbutil_version",version);
+}
 
 void RbSettings::setOfPath(QString path)
 {

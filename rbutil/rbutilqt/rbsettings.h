@@ -42,6 +42,7 @@ class RbSettings : public QObject
         QString userSettingFilename();
             
         //! access functions for the settings
+        QString curVersion();
         bool cacheOffline();
         bool cacheDisabled();
         QString mountpoint();
@@ -104,7 +105,8 @@ class RbSettings : public QObject
         QString curResolution();
         int curTargetId();
 
-        //! Set Fucntions
+        //! Set Functions
+        void setCurVersion(QString version);
         void setOfPath(QString path);
         void setCachePath(QString path);
         void setBuild(QString build);

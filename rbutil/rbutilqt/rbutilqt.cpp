@@ -176,13 +176,20 @@ void RbUtilQt::downloadDone(bool error)
     bleeding->setFile(&bleedingInfo);
     bleeding->getFile(QUrl(settings->bleedingInfo()));
 
-    if(chkConfig(false)) {
+    if(settings->curVersion() != PUREVERSION) {
+        QApplication::processEvents();
+        QMessageBox::information(this, tr("New installation"),
+            tr("This is a new installation of Rockbox Utility, or a new version. "
+                "The configuration dialog will now open to allow you to setup the program, "
+                " or review your settings."));
+        configDialog();
+    }
+    else if(chkConfig(false)) {
         QApplication::processEvents();
         QMessageBox::critical(this, tr("Configuration error"),
             tr("Your configuration is invalid. This is most likely due "
-                "to a new installation of Rockbox Utility or a changed device "
-                "path. The configuration dialog will now open to allow you to "
-                "correct the problem."));
+                "to a changed device path. The configuration dialog will "
+                "now open to allow you to correct the problem."));
         configDialog();
     }
 }
