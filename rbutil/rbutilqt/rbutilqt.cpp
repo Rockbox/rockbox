@@ -181,8 +181,8 @@ void RbUtilQt::downloadDone(bool error)
         QMessageBox::critical(this, tr("Configuration error"),
             tr("Your configuration is invalid. This is most likely due "
                 "to a new installation of Rockbox Utility or a changed device "
-                "path. The configuration dialog will now open to allow you "
-                "correcting the problem."));
+                "path. The configuration dialog will now open to allow you to "
+                "correct the problem."));
         configDialog();
     }
 }

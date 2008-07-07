@@ -1410,7 +1410,7 @@ New Target: %2.
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="187"/>
-        <source>Your configuration is invalid. This is most likely due to a new installation of Rockbox Utility or a changed device path. The configuation dialog will now open to allow you correcting the problem.</source>
+        <source>Your configuration is invalid. This is most likely due to a new installation of Rockbox Utility or a changed device path. The configuation dialog will now open to allow you to correct the problem.</source>
         <translation type="obsolete">Yapilandirmaniz ge�ersiz. Bunun nedeni yeni bir Rockbox Araci kullanmaniz ya da aygitinizin yolunu degistirmeniz olabilir. Bu problemi d�zeltmeniz i�in simdi yapilandirma ekrani a�ilacaktir.</translation>
     </message>
     <message>
@@ -1587,7 +1587,7 @@ Mevcut �ny�kleyiciyi degistirmek istiyor musunuz?</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="185"/>
-        <source>Your configuration is invalid. This is most likely due to a new installation of Rockbox Utility or a changed device path. The configuration dialog will now open to allow you correcting the problem.</source>
+        <source>Your configuration is invalid. This is most likely due to a new installation of Rockbox Utility or a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
