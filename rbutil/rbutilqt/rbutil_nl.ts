@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="nl">
-<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstaller</name>
     <message>
@@ -458,110 +457,110 @@ See http://www.rockbox.org/wiki/SansaE200Install
 <context>
     <name>Config</name>
     <message>
-        <location filename="configure.cpp" line="111"/>
+        <location filename="configure.cpp" line="113"/>
         <source>Language changed</source>
         <translation>Taal veranderd</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="112"/>
+        <location filename="configure.cpp" line="114"/>
         <source>You need to restart the application for the changed language to take effect.</source>
         <translation>U moet de applicatie herstarten om de veranderde taal in te schakelen.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="559"/>
+        <location filename="configure.cpp" line="574"/>
         <source>Autodetection</source>
         <translation>Autoherkenning</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="553"/>
+        <location filename="configure.cpp" line="568"/>
         <source>Could not detect a Mountpoint.
 Select your Mountpoint manually.</source>
         <translation>Kon geen Mountpunt herkennen.
 Gelieve uw Mountpunt manueel te selecteren.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="561"/>
+        <location filename="configure.cpp" line="576"/>
         <source>Could not detect a device.
 Select your device and Mountpoint manually.</source>
         <translation>Kon geen apparaat herkennen.
 Selecteer uw apparaat en Mountpunt manueel.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="570"/>
+        <location filename="configure.cpp" line="585"/>
         <source>Really delete cache?</source>
         <translation>Wilt u zeker de cache ledigen?</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="573"/>
+        <location filename="configure.cpp" line="588"/>
         <source>Do you really want to delete the cache? Make absolutely sure this setting is correct as it will remove &lt;b&gt;all&lt;/b&gt; files in this folder!</source>
         <translation>Wilt u zeker de cache ledigen? Wees absoluut zeker dat deze instelling correct is aangezien het &lt;b&gt;alle&lt;/b&gt; bestanden in deze map zal verwijderen!</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="579"/>
+        <location filename="configure.cpp" line="594"/>
         <source>Path wrong!</source>
         <translation>Pad is verkeerd!</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="580"/>
+        <location filename="configure.cpp" line="595"/>
         <source>The cache path is invalid. Aborting.</source>
         <translation>Het cache pad is ongeldig. Bezig met afbreken.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="57"/>
+        <location filename="configure.cpp" line="58"/>
         <source> (%1)</source>
         <translation> (%1)</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="433"/>
+        <location filename="configure.cpp" line="448"/>
         <source>Select your device</source>
         <translation>Selecteer uw apparaat</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="523"/>
+        <location filename="configure.cpp" line="538"/>
         <source>Sansa e200 in MTP mode found!
 You need to change your player to MSC mode for installation. </source>
         <translation>Sansa e200 in MTP modus gevonden!
 U moet uw speler in MSC modus plaatsen voor installatie.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="526"/>
+        <location filename="configure.cpp" line="541"/>
         <source>H10 20GB in MTP mode found!
 You need to change your player to UMS mode for installation. </source>
         <translation>H10 20GB in MTP modus gevonden!
 U moet uw speler in UMS modus plaatsen voor installatie.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="527"/>
+        <location filename="configure.cpp" line="542"/>
         <source>Unless you changed this installation will fail!</source>
         <translation>Tenzij u dit verandert, zal de installatie falen!</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="529"/>
+        <location filename="configure.cpp" line="544"/>
         <source>Fatal error</source>
         <translation>Fatale fout</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="218"/>
+        <location filename="configure.cpp" line="222"/>
         <source>Current cache size is %L1 kiB.</source>
         <translation>Huidige cache grootte is %L1 kiB.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="538"/>
+        <location filename="configure.cpp" line="553"/>
         <source>Detected an unsupported %1 player variant. Sorry, Rockbox doesn&apos;t run on your player.</source>
         <translation>Er is een niet ondersteunde speler %1 herkend. Sorry, Rockbox werkt niet op deze speler.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="540"/>
+        <location filename="configure.cpp" line="555"/>
         <source>Fatal error: incompatible player found</source>
         <translation>Fatale fout: incompatibele speler gevonden</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="329"/>
+        <location filename="configure.cpp" line="344"/>
         <source>Configuration OK</source>
         <translation>Configuratie OK</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="334"/>
+        <location filename="configure.cpp" line="349"/>
         <source>Configuration INVALID</source>
         <translation>Configuratie ONGELDIG</translation>
     </message>
@@ -767,7 +766,7 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
 <context>
     <name>Configure</name>
     <message>
-        <location filename="configure.cpp" line="417"/>
+        <location filename="configure.cpp" line="432"/>
         <source>English</source>
         <comment>This is the localized language name, i.e. your language.</comment>
         <translation>Nederlands</translation>
@@ -1293,226 +1292,241 @@ Wilt u verdergaan ?</translation>
         <translation>Versie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="210"/>
+        <location filename="rbutilqt.cpp" line="217"/>
         <source>Network error: %1. Please check your network and proxy settings.</source>
         <translation>Netwerk fout:%1. Gelieve uw netwerk en proxy instelling te controleren.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="310"/>
+        <location filename="rbutilqt.cpp" line="317"/>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
         <translation>&lt;b&gt;%1 %2&lt;/b&gt; op &lt;b&gt;%3&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="327"/>
+        <location filename="rbutilqt.cpp" line="334"/>
         <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;PDF Handboek&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="329"/>
+        <location filename="rbutilqt.cpp" line="336"/>
         <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;HTML Handboek (opent in een browser)&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="332"/>
+        <location filename="rbutilqt.cpp" line="339"/>
         <source>Select a device for a link to the correct manual</source>
         <translation>Selecteer een apparaat voor een link naar het correcte handboek</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="334"/>
+        <location filename="rbutilqt.cpp" line="341"/>
         <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Handboek overzicht&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="730"/>
+        <location filename="rbutilqt.cpp" line="737"/>
         <source>Confirm Installation</source>
         <translation>Bevestig Installatie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="343"/>
+        <location filename="rbutilqt.cpp" line="350"/>
         <source>Do you really want to make a complete Installation?</source>
         <translation>Wilt u zeker een complete installatie doen?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="899"/>
+        <location filename="rbutilqt.cpp" line="906"/>
         <source>Mount point is wrong!</source>
         <translation>Mount punt is verkeerd!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="395"/>
+        <location filename="rbutilqt.cpp" line="402"/>
         <source>Do you really want to make a small Installation?</source>
         <translation>Wilt u zeker een kleine installatie doen?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="566"/>
+        <location filename="rbutilqt.cpp" line="573"/>
         <source>Do you really want to install the Bootloader?</source>
         <translation>Wilt u zeker de Bootloader installeren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="827"/>
+        <location filename="rbutilqt.cpp" line="834"/>
         <source>Could not get the bootloader info file!</source>
         <translation>Kon het bootloader- info bestand niet vinden!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="600"/>
+        <location filename="rbutilqt.cpp" line="607"/>
         <source>Bootloader Installation</source>
         <translation>Bootloader installatie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="625"/>
+        <location filename="rbutilqt.cpp" line="632"/>
         <source>Original Firmware Path is wrong!</source>
         <translation>Oorspronkelijk Firmware pad is verkeerd!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="638"/>
+        <location filename="rbutilqt.cpp" line="645"/>
         <source>Original Firmware selection Canceled!</source>
         <translation>Oorspronkelijke Firmware selectie afgebroken!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="653"/>
+        <location filename="rbutilqt.cpp" line="660"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>Wilt u zeker het lettertypen pakket installeren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="697"/>
+        <location filename="rbutilqt.cpp" line="704"/>
         <source>Do you really want to install the voice file?</source>
         <translation>Wilt u zeker de spraakbestanden?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="731"/>
+        <location filename="rbutilqt.cpp" line="738"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>Wilt u zeker de spelletjes addon bestanden installeren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="811"/>
+        <location filename="rbutilqt.cpp" line="818"/>
         <source>Confirm Uninstallation</source>
         <translation>Bevestig Deïnstallatie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="812"/>
+        <location filename="rbutilqt.cpp" line="819"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>Wilt u zeker de Bootloader deïnstalleren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="840"/>
+        <location filename="rbutilqt.cpp" line="847"/>
         <source>Confirm download</source>
         <translation>Bevestig download</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="842"/>
+        <location filename="rbutilqt.cpp" line="849"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>Wilt u zeker het handboek downloaden? Dit handboek zal opgeslagen worden in de hoofdmap van uw speler.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="885"/>
+        <location filename="rbutilqt.cpp" line="892"/>
         <source>Confirm installation</source>
         <translation>Bevestig installatie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="887"/>
+        <location filename="rbutilqt.cpp" line="894"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Wilt u zeker Rockbox Utility installeren op uw speler? Na installatie kan u het opstarten vanaf  de harde schijf van uw speler.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="895"/>
+        <location filename="rbutilqt.cpp" line="902"/>
         <source>Installing Rockbox Utility</source>
         <translation>Bezig met installeren van Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="909"/>
+        <location filename="rbutilqt.cpp" line="916"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Fout tijdens installeren van Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="913"/>
+        <location filename="rbutilqt.cpp" line="920"/>
         <source>Installing user configuration</source>
         <translation>Bezig met installeren van gebruikerconfiguratie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="915"/>
+        <location filename="rbutilqt.cpp" line="922"/>
         <source>Error installing user configuration</source>
         <translation>Fout tijdens installeren van gebruikersconfiguratie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="919"/>
+        <location filename="rbutilqt.cpp" line="926"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Rockbox Utility is succesvol geïnstalleerd.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="1010"/>
+        <location filename="rbutilqt.cpp" line="1017"/>
         <source>Configuration error</source>
         <translation>Configuratie fout</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="726"/>
+        <location filename="rbutilqt.cpp" line="733"/>
         <source>Error</source>
         <translation>Fout</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="726"/>
+        <location filename="rbutilqt.cpp" line="733"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>Uw apparaat heeft de Doom plugin niet. Installatie wordt afgebroken.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="1012"/>
+        <location filename="rbutilqt.cpp" line="1019"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Uw configuratie is ongeldig. Gelieve naar het configuratie scherm te gaan en de juiste instellingen te gebruiken.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="602"/>
+        <location filename="rbutilqt.cpp" line="609"/>
         <source>The bootloader is already installed and up to date.
 Do want to replace the current bootloader?</source>
         <translation>De bootloader is alreeds geïnstalleerd en up to date.
 Wilt u de huidige bootloader vervangen?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="606"/>
+        <location filename="rbutilqt.cpp" line="613"/>
         <source>Bootloader installation skipped!</source>
         <translation>Bootloader installatie overgeslagen!</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="185"/>
         <source>Your configuration is invalid. This is most likely due to a new installation of Rockbox Utility or a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
-        <translation>Uw configuratie is ongeldig. Dit is waarschijnlijk door een nieuwe installatie van Rockbox Utility of een veranderd apparaat pad. Het configuratie scherm zal nu openen zodat u de fout kan herstellen.</translation>
+        <translation type="obsolete">Uw configuratie is ongeldig. Dit is waarschijnlijk door een nieuwe installatie van Rockbox Utility of een veranderd apparaat pad. Het configuratie scherm zal nu openen zodat u de fout kan herstellen.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="482"/>
+        <location filename="rbutilqt.cpp" line="489"/>
         <source>Aborted!</source>
         <translation>Afgebroken!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="490"/>
+        <location filename="rbutilqt.cpp" line="497"/>
         <source>Installed Rockbox detected</source>
         <translation>Geïnstalleerde Rockbox herkend</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="491"/>
+        <location filename="rbutilqt.cpp" line="498"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
         <translation>Rockbox installatie herkend. Wilt u eerst een backup maken?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="510"/>
+        <location filename="rbutilqt.cpp" line="517"/>
         <source>Backup successfull</source>
         <translation>Backup is succesvol beëindigd</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="514"/>
+        <location filename="rbutilqt.cpp" line="521"/>
         <source>Backup failed!</source>
         <translation>Backup mislukt!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="691"/>
+        <location filename="rbutilqt.cpp" line="698"/>
         <source>Warning</source>
         <translation>Waarschuwing</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="692"/>
+        <location filename="rbutilqt.cpp" line="699"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
         <translation>Deze applicatie is nog steeds bezig met informatie over nieuwe Builds te downloaden. Gelieve binnen een korte periode opnieuw te proberen.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="494"/>
+        <location filename="rbutilqt.cpp" line="501"/>
         <source>Starting backup...</source>
         <translation>Backup wordt gestart...</translation>
+    </message>
+    <message>
+        <location filename="rbutilqt.cpp" line="181"/>
+        <source>New installation</source>
+        <translation>Nieuwe installatie</translation>
+    </message>
+    <message>
+        <location filename="rbutilqt.cpp" line="184"/>
+        <source>This is a new installation of Rockbox Utility, or a new version. The configuration dialog will now open to allow you to setup the program,  or review your settings.</source>
+        <translation>Dit is een nieuwe installatie van Rockbox Utility, of een nieuwe versie. Het configuratie scherm zal nu openen, zodat u het programma kan instellen, of uw instellingen nakijken.</translation>
+    </message>
+    <message>
+        <location filename="rbutilqt.cpp" line="192"/>
+        <source>Your configuration is invalid. This is most likely due to a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
+        <translation>Uw configuratie is ongeldig. Dit komt waarschijnlijk door een veranderd apparaat pad. Het configuratie scherm zal nu openen zodat u de fout kan herstellen.</translation>
     </message>
 </context>
 <context>
