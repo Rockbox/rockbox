@@ -16,10 +16,11 @@
 /* define this if you have the Player's keyboard */
 #define CONFIG_KEYPAD PLAYER_PAD
 
+#define AB_REPEAT_ENABLE 1
+#define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
+
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x8000
-
-#define AB_REPEAT_ENABLE 1
 
 /* Define this if you have a MAS3507D */
 #define CONFIG_CODEC MAS3507D

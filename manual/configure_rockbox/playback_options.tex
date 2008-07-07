@@ -11,8 +11,8 @@ related to audio playback.
   %
 \item[Repeat]Configures settings related to repeating of directories or
   playlists.\\
-  Options: \setting{Off} / \setting{All} / \setting{One} / \setting{Shuffle}
-  \nopt{ondiosp,ondiofm}{\setting{/A-B}}:
+  Options: \setting{Off} / \setting{All} / \setting{One} / \setting{Shuffle} /
+  \setting{A-B}:
   \begin{description}
     %
   \item[Off]The current playlist will not repeat when it is finished.
@@ -30,32 +30,23 @@ related to audio playback.
   \item[Shuffle]When the current playlist has finished playing, it will
     be shuffled and then repeated.
     %
-  \nopt{ondiosp,ondiofm}{
-    \item[A-B]Repeats between two user defined points within a track,
-      typically used by musicians when attempting to learn a piece of music.
-      This option is more complicated to use than the others as the \dap\
-      must first be placed into A-B repeat mode and then the start and end
-      points defined.\\
-	  
-      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,MROBE100_PAD%
-          ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
-          To set the Start Point (A) press \ActionWpsAbSetAPrevDir{}.
-          Setting the End Point (B) is done accordingly using
-          \ActionWpsAbSetBNextDir{}.  To reset the markers press \ActionWpsAbReset{}.
-      }%
-      \opt{ipod,IAUDIO_X5_PAD}{%
-          To set the Start Point (A) press \ActionWpsBrowse{}. The following
-          press of \ActionWpsBrowse{} will set the End Point (B), and a third
-          successive \ActionWpsBrowse{} will reset the markers.
-      }%
-      \opt{PLAYER_PAD}{%
-        \fixme{
-          Fix Me: Fill in keypresses
-          --- Sets Start Point (A)\\
-          --- Sets End Point (B)\\
-        }
-      }%
-    }
+  \item[A-B]Repeats between two user defined points within a track,
+    typically used by musicians when attempting to learn a piece of music.
+    This option is more complicated to use than the others as the \dap\
+    must first be placed into A-B repeat mode and then the start and end
+    points defined.\\
+
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,MROBE100_PAD%
+        ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
+        To set the Start Point (A) press \ActionWpsAbSetAPrevDir{}.
+        Setting the End Point (B) is done accordingly using
+        \ActionWpsAbSetBNextDir{}.  To reset the markers press \ActionWpsAbReset{}.
+    }%
+    \opt{ipod,IAUDIO_X5_PAD,ONDIO_PAD,PLAYER_PAD}{%
+        To set the Start Point (A) press \ActionWpsBrowse{}. The following
+        press of \ActionWpsBrowse{} will set the End Point (B), and a third
+        successive \ActionWpsBrowse{} will reset the markers.
+    }%
   \end{description}
 
 \item[Play Selected First]This setting controls what happens when you
