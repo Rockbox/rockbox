@@ -238,6 +238,8 @@ long gui_wps_show(void)
            from F1 */
         if (!audio_status())
             exit = true;
+/* The iPods/X5/M5 use a single button for the A-B mode markers,
+   defined as ACTION_WPSAB_SINGLE in their config files. */
 #ifdef ACTION_WPSAB_SINGLE
         if (!global_settings.party_mode && ab_repeat_mode_enabled())
         {

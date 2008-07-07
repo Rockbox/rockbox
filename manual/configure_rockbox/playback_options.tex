@@ -30,64 +30,31 @@ related to audio playback.
   \item[Shuffle]When the current playlist has finished playing, it will
     be shuffled and then repeated.
     %
-    \nopt{ondiosp,ondiofm}{
+  \nopt{ondiosp,ondiofm}{
     \item[A-B]Repeats between two user defined points within a track,
       typically used by musicians when attempting to learn a piece of music.
       This option is more complicated to use than the others as the \dap\
       must first be placed into A-B repeat mode and then the start and end
       points defined.\\
-      \opt{RECORDER_PAD}{
-          To set the Start Point (A) hold \ButtonOn{} and press \ButtonLeft{}.
+	  
+      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,MROBE100_PAD%
+          ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
+          To set the Start Point (A) press \ActionWpsAbSetAPrevDir{}.
           Setting the End Point (B) is done accordingly using
-          \ButtonOn{} and \ButtonRight{}.
-          To reset the markers hold \ButtonOn{} and press \ButtonOff{}.
-      }
-      \opt{h10,h10_5gb}{
-          Hold \ButtonPower{} and press \ButtonRew{} to set the Start Point (A).
-          For setting the End Point (B) hold \ButtonPower{} and press \ButtonFF{}.
-          You can reset the markers by pressing \ButtonPower{} and \ButtonPlay{}.
-      }
-      \opt{ipod,x5}{
-          To set the Start Point (A) press \ButtonSelect{}. The following
-          press of \ButtonSelect{} will set the End Point (B), and a third
-          successive \ButtonSelect{} will reset the markers.
-      }
-      \opt{h1xx,h300}{
-          To set the Start Point (A) hold \ButtonOn{} and press \ButtonLeft{}.
-          Setting the End Point (B) is done accordingly using
-          \ButtonOn{} and \ButtonRight{}.
-          To reset the markers hold \ButtonOn{} and press \ButtonSelect{}.
-      }
-      \opt{sansa}{
-          To set the Start Point (A) hold \ButtonPower{} and press \ButtonLeft{}.
-          Setting the End Point (B) is done accordingly using
-          \ButtonPower{} and \ButtonRight{}.
-          To reset the markers hold \ButtonPower{} and press \ButtonUp{}.
-      }
-      \opt{gigabeatf}{
-          To set the Start Point (A) hold \ButtonA{} and press \ButtonLeft{}.
-          Setting the End Point (B) is done accordingly using
-          \ButtonA{} and \ButtonRight{}.
-          To reset the markers hold \ButtonA{} and press \ButtonSelect{}.
-      }
-      \opt{MROBE100_PAD}{
-          To set the Start Point (A) hold \ButtonDisplay{} and press \ButtonLeft{}.
-          Setting the End Point (B) is done accordingly using
-          \ButtonDisplay{} and \ButtonRight{}.
-          To reset the markers hold \ButtonDisplay{} and press \ButtonSelect{}.
-      }
-      \opt{gigabeats}{
-          To set the Start Point (A) hold \ButtonBack{} and press \ButtonLeft{}.
-          Setting the End Point (B) is done accordingly using
-          \ButtonBack{} and \ButtonRight{}.
-          To reset the markers \ButtonBack{} and press \ButtonSelect{}.
-      }
-      \nopt{h1xx,h300,h10,h10_5gb,ipod,x5,e200,gigabeatf,RECORDER_PAD,MROBE100_PAD,gigabeats}{
+          \ActionWpsAbSetBNextDir{}.  To reset the markers press \ActionWpsAbReset{}.
+      }%
+      \opt{ipod,IAUDIO_X5_PAD}{%
+          To set the Start Point (A) press \ActionWpsBrowse{}. The following
+          press of \ActionWpsBrowse{} will set the End Point (B), and a third
+          successive \ActionWpsBrowse{} will reset the markers.
+      }%
+      \opt{PLAYER_PAD}{%
         \fixme{
+          Fix Me: Fill in keypresses
           --- Sets Start Point (A)\\
           --- Sets End Point (B)\\
         }
-      }
+      }%
     }
   \end{description}
 
