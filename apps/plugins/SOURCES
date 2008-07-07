@@ -56,7 +56,7 @@ text_editor.c
 wavview.c
 robotfindskitten.c
 
-#if HAVE_LCD_COLOR
+#ifdef HAVE_LCD_COLOR
 ppmviewer.c
 #endif
 
