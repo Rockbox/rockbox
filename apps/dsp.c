@@ -1083,6 +1083,7 @@ int dsp_callback(int msg, intptr_t param)
         break;
     case DSP_CALLBACK_SET_TREBLE:
         treble = param;
+        break;
 #endif
     case DSP_CALLBACK_SET_CHANNEL_CONFIG:
         dsp_set_channel_config(param);
