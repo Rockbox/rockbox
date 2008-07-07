@@ -1,21 +1,18 @@
-\fixme{This is merely a copy of the wiki page IaudioBoot, so this section needs
-a more natural language and also error checking by Iaudio owners.}
-
 The \playername{} has a built-in bootloader which performs the
-firmware update, and can also access the hard drive via USB. Therefore the
-Rockbox bootloader can be very minimalistic, without USB mode.
-This also makes it less dangerous to install the Rockbox bootloader, as you can
-always restore it using the \playerman{} bootloader.
+firmware update and can also access the hard drive via USB.  The
+Rockbox bootloader can therefore be very minimalistic, as it does not require
+ it's own USB mode.  This makes it less dangerous to install the Rockbox bootloader
+ as you can always restore it using the \playerman{} bootloader.
 
-\note{The current bootloader is not prepared to coexist with the original
-firmware. It replaces the original firmware.}
+\note{The Rockbox bootloader overwrites the original firmware, making it
+   impossible to dual-boot.}
 
 \subsubsection{Installation}
 \begin{itemize}
 \item Download the Rockbox bootloader binary from 
 \url{http://download.rockbox.org/bootloader/iaudio/}.
-  \opt{x5}{Use the \fname{x5v\_fw.bin} file if your \dap{} is a X5V. If it is a X5,
-    use the \fname{x5\_fw.bin} file.}
+  \opt{x5}{Use the \fname{x5v\_fw.bin} file if your \dap{} is a X5V. If it is a X5
+    or X5L, use the \fname{x5\_fw.bin} file.}
   \opt{m5}{Use the \fname{m5\_fw.bin} file.}
 \item Copy it to the \fname{FIRMWARE} directory on your \dap{}.
 \item Turn the \dap{} off, remove the USB cable and insert the charger. The
