@@ -166,6 +166,9 @@ case $1 in
     target="arm-elf"
     gccpatch="rockbox-multilibs-arm-elf-gcc-4.0.3_2.diff"
     ;;
+  [Ii])
+    target="mipsel-elf"
+    ;;
   *)
     echo "unsupported"
     exit
@@ -261,12 +264,16 @@ echo "Select target arch:"
 echo "s   - sh       (Archos models)"
 echo "m   - m68k     (iriver h1x0/h3x0, ifp7x0 and iaudio)"
 echo "a   - arm      (ipods, iriver H10, Sansa, etc)"
+echo "i   - mips     (Jz4740 and ATJ-based players)"
 echo "all - all three compilers"
 
 arch=`input`
 
 case $arch in
   [Ss])
+    buildone $arch
+    ;;
+  [Ii])
     buildone $arch
     ;;
   [Mm])
@@ -284,6 +291,9 @@ case $arch in
     cleardir $builddir
 
     buildone a
+
+    # include this when we want MIPS added in the "build all"
+    #buildone i
 
     # show the summaries:
     cat $builddir/summary-*
