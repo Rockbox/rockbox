@@ -302,30 +302,30 @@ static int info_speak_item(int selected_item, void * data)
             break;
 #if CONFIG_RTC
         case INFO_TIME:
-            tm = get_time();
-            talk_id(VOICE_CURRENT_TIME, false);
-            if (valid_time(tm))
-            {
-                talk_time(tm, true);
-            }
-            else
-            {
-                talk_id(LANG_UNKNOWN, true);
-            }
-            break;
-        case INFO_DATE:
             if (TIME_AFTER(current_tick, last_talk + HZ*60))
             {
                 tm = get_time();
+                talk_id(VOICE_CURRENT_TIME, false);
                 if (valid_time(tm))
                 {
-                    talk_date(get_time(), true);
+                    talk_time(tm, true);
                 }
                 else
                 {
                     talk_id(LANG_UNKNOWN, true);
                 }
                 last_talk = current_tick;
+            }
+            break;
+        case INFO_DATE:
+            tm = get_time();
+            if (valid_time(tm))
+            {
+                talk_date(get_time(), true);
+            }
+            else
+            {
+                talk_id(LANG_UNKNOWN, true);
             }
             break;
 #endif
