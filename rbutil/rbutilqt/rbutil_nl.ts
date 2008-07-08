@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="nl">
+<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstaller</name>
     <message>
@@ -695,7 +696,9 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
     <message>
         <location filename="configurefrm.ui" line="346"/>
         <source>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</source>
-        <translation>Dit zal proberen alle informatie van de cache te gebruiken, zelfs informatie in verband met updates. Gebruik enkel deze optie als u wilt installeren zonder netwerk verbinding. Pas op: u moet eerst deze installatie doen met een internet verbinding om later ze opnieuw te kunnen uitvoeren vanuit cache.</translation>
+        <translation>Dit zal proberen alle informatie van de cache te gebruiken, zelfs informatie in verband met updates.
+Gebruik enkel deze optie als u wilt installeren zonder netwerk verbinding.
+Pas op: u moet eerst deze installatie doen met een internet verbinding om ze later opnieuw te kunnen uitvoeren vanuit cache.</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="349"/>
@@ -911,7 +914,7 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
     <message>
         <location filename="install.cpp" line="250"/>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
-        <translation>Deze worden elke dag automatisch gebouwd van de huidige ontwikkelings broncode. Deze heeft algemeen gezien meer features dan de laatst stabiele release maar kan minder stabiel zijn. Featuren kunnen regelmatig veranderen.</translation>
+        <translation>Deze worden elke dag automatisch gebouwd van de meest recente broncode. Deze heeft algemeen gezien meer features dan de laatst stabiele release maar kan minder stabiel zijn. Features kunnen regelmatig veranderen.</translation>
     </message>
     <message>
         <location filename="install.cpp" line="252"/>
@@ -994,7 +997,7 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
     <message>
         <location filename="installfrm.ui" line="228"/>
         <source>&amp;Don&apos;t use locally cached copy</source>
-        <translation>Gebruik de lokale cache kopie &amp;niet</translation>
+        <translation>Gebruik de lokale gecachede kopie &amp;niet</translation>
     </message>
     <message>
         <location filename="installfrm.ui" line="130"/>
@@ -1824,7 +1827,7 @@ Wilt u de huidige bootloader vervangen?</translation>
     <message>
         <location filename="rbutilqtfrm.ui" line="376"/>
         <source>&lt;b&gt;Install Themes&lt;/b&gt;&lt;br/&gt;Rockbox&apos; look can be customized by themes. You can choose and install several officially distributed themes.</source>
-        <translation>&lt;b&gt;Installer thema&apos;s&lt;/b&gt;&lt;br/&gt;Het uiterlijk van Rockbox kan aangepast worden met behulp van thema&apos;s. U kan kiezen uit verschillende officiëel gedistribueerde thema&apos;s en deze installeren.</translation>
+        <translation>&lt;b&gt;Installeer thema&apos;s&lt;/b&gt;&lt;br/&gt;Het uiterlijk van Rockbox kan aangepast worden met behulp van thema&apos;s. U kan kiezen uit verschillende officiëel gedistribueerde thema&apos;s en deze installeren.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="402"/>
@@ -2372,7 +2375,7 @@ Gelieve uw netwerk en proxy instellingen te bekijken.</translation>
     <message>
         <location filename="uninstallfrm.ui" line="51"/>
         <source>Complete Uninstallation</source>
-        <translation>Deïnstallatie voltooid</translation>
+        <translation>Volledige Deïnstallatie</translation>
     </message>
     <message>
         <location filename="uninstallfrm.ui" line="58"/>
