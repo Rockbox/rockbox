@@ -372,11 +372,11 @@ void button_event(int key, bool pressed)
         break;
     case SDLK_KP8:
     case SDLK_UP:
-        new_btn = BUTTON_SCROLL_BACK;
+        new_btn = BUTTON_SCROLL_FWD;
         break;
     case SDLK_KP2:
     case SDLK_DOWN:
-        new_btn = BUTTON_SCROLL_FWD;
+        new_btn = BUTTON_SCROLL_BACK;
         break;
     case SDLK_KP_PLUS:
     case SDLK_F8:
