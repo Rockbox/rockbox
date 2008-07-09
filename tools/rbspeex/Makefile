@@ -58,7 +58,7 @@ $(DEPFILE): $(SOURCES)
 	done > $(DEPFILE); \
 	echo "oo" > /dev/null )
 
-librbspeex$(ARCH_CMD).a: $(OBJS) $(DEPFILE) rbspeex.o 
+librbspeex$(ARCH).a: $(OBJS) $(DEPFILE) rbspeex.o 
 	@echo AR librbspeex.a
 	$(SILENT)$(AR) ruv $@ $+ > /dev/null 2>&1
 
@@ -76,7 +76,7 @@ librbspeex$(ARCH_CMD).a: $(OBJS) $(DEPFILE) rbspeex.o
 
 universal: librbspeexppc.a librbspeexi386.a
 	@echo lipo libusb.a
-	@(SILENT) lipo -create librbspeexppc.a librbspeexi386.a -output librbspeex.a
+	lipo -create librbspeexppc.a librbspeexi386.a -output librbspeex.a
 
 clean:
 	rm -f $(OBJS) rbspeex.o libspeex.a librbspeex.a rbspeexenc.o ../rbspeexenc dep-speex

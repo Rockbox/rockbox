@@ -22,7 +22,7 @@ mac {
 rbspeex1.commands = @$(MAKE) -C ../../tools/rbspeex ARCH=ppc librbspeexppc.a
 rbspeex2.commands = @$(MAKE) -C ../../tools/rbspeex clean
 rbspeex3.commands = @$(MAKE) -C ../../tools/rbspeex ARCH=i386 librbspeexi386.a
-rbspeex4.commands = @$(MAKE) -C ../../tools/rbspeex ARCH=ppc universal
+rbspeex4.commands = @$(MAKE) -C ../../tools/rbspeex universal
 rbspeex2.depends = rbspeex1
 rbspeex3.depends = rbspeex2
 rbspeex4.depends = rbspeex3
