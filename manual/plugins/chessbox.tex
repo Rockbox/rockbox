@@ -1,8 +1,8 @@
 % $Id$ %
 \subsection{Chessbox}
 \screenshot{plugins/images/ss-chessbox}{Chessbox}{img:chessbox}
-Chessbox is a chess game with computer AI. The chess engine is a port of 
-GNU Chess 2 by John Stanback.
+Chessbox is a one-person chess game with computer artificial intelligence. 
+The chess engine is a port of GNU Chess 2 by John Stanback.
 
 It also works as a PGN file viewer. Instead of executing the game from the
 plugin menu, look for any file with \fname{.pgn} extension in the file browser
@@ -11,6 +11,12 @@ and allow you to select the one you want to watch. After that, you can scroll
 back and forth through the moves of the game. If the menu is invoked while in
 the viewer, the user is allowed to select a new match from the same file or
 quit the game.
+
+``Force play'' while the computer is thinking will cause it to make it's move
+immediately.  If done while it's your turn, the computer will move
+for you and flip the board so that you are playing from the other side.  If you
+want, you can force play an entire game and watch the artificial intelligence
+ fight against itself.
 
 When you quit the game the current state will be saved and restored when
 you resume the game. The menu also allows the user to reload the last game
@@ -29,10 +35,10 @@ the game.
     & Move the cursor\\
     \opt{RECORDER_PAD}{\ButtonPlay}
     \opt{ONDIO_PAD}{\ButtonMenu}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}
-        {\ButtonSelect}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD%
+	    ,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonSelect}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
-    & Select / Move piece\\
+    & Pick up / Drop piece\\
     \opt{RECORDER_PAD}{\ButtonFOne}
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonOff}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
