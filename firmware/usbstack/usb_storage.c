@@ -39,7 +39,7 @@
  * by not overlapping ata_write_sector() with USB transfers. This does reduce
  * write performance, so we only do it for the affected DAPs
  */
-#if defined(SANSA_C200) || defined(SANSA_E200)
+#ifdef HAVE_ATA_SD
 #define SERIALIZE_WRITES
 #endif
 /* Enable the following define to export only the SD card slot. This
