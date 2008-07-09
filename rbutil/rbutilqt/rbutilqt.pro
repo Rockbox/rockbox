@@ -193,8 +193,8 @@ unix:static {
 
 macx {
     QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
-    QMAKE_LFLAGS_PPC=-mmacosx-version-min=10.4
-    QMAKE_LFLAGS_X86=-mmacosx-version-min=10.4
+    QMAKE_LFLAGS_PPC=-mmacosx-version-min=10.4 -arch ppc
+    QMAKE_LFLAGS_X86=-mmacosx-version-min=10.4 -arch i386
     CONFIG+=x86 ppc
     LIBS += -L/usr/local/lib -framework IOKit
     INCLUDEPATH += /usr/local/include
