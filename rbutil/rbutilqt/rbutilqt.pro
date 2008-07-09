@@ -13,9 +13,22 @@ MOC_DIR = build/moc
 RCC_DIR = build/rcc
 
 # add a custom rule for pre-building librbspeex
+!mac {
 rbspeex.commands = @$(MAKE) -C ../../tools/rbspeex librbspeex.a
 QMAKE_EXTRA_TARGETS += rbspeex
 PRE_TARGETDEPS += rbspeex
+}
+mac {
+rbspeex1.commands = @$(MAKE) -C ../../tools/rbspeex ARCH=ppc librbspeexppc.a
+rbspeex2.commands = @$(MAKE) -C ../../tools/rbspeex clean
+rbspeex3.commands = @$(MAKE) -C ../../tools/rbspeex ARCH=i386 librbspeexi386.a
+rbspeex4.commands = @$(MAKE) -C ../../tools/rbspeex ARCH=ppc universal
+rbspeex2.depends = rbspeex1
+rbspeex3.depends = rbspeex2
+rbspeex4.depends = rbspeex3
+QMAKE_EXTRA_TARGETS += rbspeex1 rbspeex2 rbspeex3 rbspeex4
+PRE_TARGETDEPS += rbspeex1 rbspeex2 rbspeex4 rbspeex4
+}
 
 # rule for creating ctags file
 tags.commands = ctags -R --c++-kinds=+p --fields=+iaS --extra=+q $(SOURCES) 
