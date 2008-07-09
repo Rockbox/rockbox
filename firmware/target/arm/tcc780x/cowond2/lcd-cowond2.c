@@ -359,10 +359,88 @@ void lcd_yuv_set_options(unsigned options)
 }
 
 /* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
-extern void lcd_write_yuv420_lines(fb_data *dst,
-                                   unsigned char const * const src[3],
-                                   int width,
-                                   int stride);
+static void lcd_write_yuv420_lines(fb_data *dst,
+                            unsigned char const * const src[3],
+                            int width,
+                            int stride)
+{
+    int i = 0;
+    int y;
+    int rv, guv, bu;
+    int cb, cr;
+    int r, g, b;
+    unsigned const char *y_p = src[0];
+
+    for (i = 0; i < width/2; i++)
+    {
+        y_p++;
+        
+        /* YCbCr -> RGB conversion */
+        cb = src[1][i] - 128;
+        cr = src[2][i] - 128;
+        
+        rv = (cr*101 + 56) >> 9;
+        guv = (128 - cr*51 + cb*24) >> 8;
+        bu = (cb*128 + 256) >> 9;
+        
+        y = (*y_p - 16)*74;
+        r = (y >> 9) + rv;
+        g = (y >> 8) + guv;
+        b = (y >> 9) + bu;
+        if (r < 0) r = 0;
+        else if (r > 31) r = 31;
+        if (g < 0) g = 0;
+        else if (g > 63) g = 63;
+        if (b < 0) b = 0;
+        else if (b > 31) b = 31;
+        
+        dst[i*2] = (r << 11) | (g << 5) | b;
+
+        /* YCbCr -> RGB conversion */
+        y = (*(y_p+stride) - 16)*74;
+        r = (y >> 9) + rv;
+        g = (y >> 8) + guv;
+        b = (y >> 9) + bu;
+        if (r < 0) r = 0;
+        else if (r > 31) r = 31;
+        if (g < 0) g = 0;
+        else if (g > 63) g = 63;
+        if (b < 0) b = 0;
+        else if (b > 31) b = 31;
+        
+        dst[i*2+LCD_FBWIDTH] = (r << 11) | (g << 5) | b;
+
+        y_p++;
+        
+        /* YCbCr -> RGB conversion */
+        y = (*y_p - 16)*74;
+        r = (y >> 9) + rv;
+        g = (y >> 8) + guv;
+        b = (y >> 9) + bu;
+        if (r < 0) r = 0;
+        else if (r > 31) r = 31;
+        if (g < 0) g = 0;
+        else if (g > 63) g = 63;
+        if (b < 0) b = 0;
+        else if (b > 31) b = 31;
+        
+        dst[i*2+1] = (r << 11) | (g << 5) | b;
+
+        /* YCbCr -> RGB conversion */
+        y = (*(y_p+stride) - 16)*74;
+        r = (y >> 9) + rv;
+        g = (y >> 8) + guv;
+        b = (y >> 9) + bu;
+        if (r < 0) r = 0;
+        else if (r > 31) r = 31;
+        if (g < 0) g = 0;
+        else if (g > 63) g = 63;
+        if (b < 0) b = 0;
+        else if (b > 31) b = 31;
+        
+        dst[i*2+1+LCD_FBWIDTH] = (r << 11) | (g << 5) | b;
+    }
+}
 extern void lcd_write_yuv420_lines_odither(fb_data *dst,
                                            unsigned char const * const src[3],
                                            int width,
@@ -385,8 +463,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
     width &= ~1;
     height >>= 1;
 
-    y = LCD_WIDTH - 1 - y;
-    fb_data *dst = &lcd_driver_framebuffer[x][y];
+    fb_data *dst = &lcd_driver_framebuffer[y][x];
 
     z = stride*src_y;
     yuv_src[0] = src[0] + z + src_x;
@@ -401,7 +478,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
             yuv_src[0] += stride << 1; /* Skip down two luma lines */
             yuv_src[1] += stride >> 1; /* Skip down one chroma line */
             yuv_src[2] += stride >> 1;
-            dst -= 2;
+            dst += 2*LCD_FBWIDTH;
             y -= 2;
         }
         while (--height > 0);
@@ -414,7 +491,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
             yuv_src[0] += stride << 1; /* Skip down two luma lines */
             yuv_src[1] += stride >> 1; /* Skip down one chroma line */
             yuv_src[2] += stride >> 1;
-            dst -= 2;
+            dst += 2*LCD_FBWIDTH;
         }
         while (--height > 0);
     }
