@@ -27,6 +27,11 @@ ifeq ($(findstring MINGW,$(shell uname)),MINGW)
 CC = gcc
 endif
 
+ifeq ($(findstring Darwin,$(shell uname)),Darwin)
+ARCH_CMD = -arch $(ARCH)
+endif
+
+
 # This sets up 'SRC' based on the files mentioned in SOURCES
 SRC := $(shell cat $(SPEEXSRC)/SOURCES | $(CC) $(CFLAGS) -E -P - | grep -v "^\#")
 
@@ -53,7 +58,7 @@ $(DEPFILE): $(SOURCES)
 	done > $(DEPFILE); \
 	echo "oo" > /dev/null )
 
-librbspeex.a: $(OBJS) $(DEPFILE) rbspeex.o 
+librbspeex$(ARCH_CMD).a: $(OBJS) $(DEPFILE) rbspeex.o 
 	@echo AR librbspeex.a
 	$(SILENT)$(AR) ruv $@ $+ > /dev/null 2>&1
 
@@ -63,14 +68,17 @@ librbspeex.a: $(OBJS) $(DEPFILE) rbspeex.o
 
 ../rbspeexdec: $(OBJS) librbspeex.a rbspeexdec.o 
 	@echo Linking ../rbspeexdec
-	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexdec rbspeexdec.o librbspeex.a -lm
+	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexdec rbspeexdec.o librbspeex.a -lm 
 
 %.o:
 	@echo CC $<
-	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
+	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@ $(ARCH_CMD)
 
+universal: librbspeexppc.a librbspeexi386.a
+	@echo lipo libusb.a
+	@(SILENT) lipo -create librbspeexppc.a librbspeexi386.a -output librbspeex.a
 
 clean:
-	rm -f $(OBJS) libspeex.a librbspeex.a rbspeexenc.o ../rbspeexenc dep-speex
+	rm -f $(OBJS) rbspeex.o libspeex.a librbspeex.a rbspeexenc.o ../rbspeexenc dep-speex
 
 -include $(DEPFILE)
