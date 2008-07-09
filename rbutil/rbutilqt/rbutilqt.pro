@@ -19,6 +19,7 @@ QMAKE_EXTRA_TARGETS += rbspeex
 PRE_TARGETDEPS += rbspeex
 }
 mac {
+rbspeex0.commands = @$(MAKE) -C ../../tools/rbspeex clean
 rbspeex1.commands = @$(MAKE) -C ../../tools/rbspeex ARCH=ppc librbspeexppc.a
 rbspeex2.commands = @$(MAKE) -C ../../tools/rbspeex clean
 rbspeex3.commands = @$(MAKE) -C ../../tools/rbspeex ARCH=i386 librbspeexi386.a
