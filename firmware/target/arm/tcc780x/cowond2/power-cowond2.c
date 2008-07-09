@@ -99,6 +99,55 @@ bool charger_inserted(void)
 }
 #endif
 
+#if CONFIG_TUNER
+
+/** Tuner **/
+static bool powered = false;
+
+bool tuner_power(bool status)
+{
+    bool old_status;
+    lv24020lp_lock();
+
+    old_status = powered;
+
+    if (status != old_status)
+    {
+        if (status)
+        {
+            /* When power up, host should initialize the 3-wire bus
+               in host read mode: */
+
+            /* 1. Set direction of the DATA-line to input-mode. */
+            GPIOC_DIR &= ~(1 << 30); 
+
+            /* 2. Drive NR_W low */
+            GPIOC_CLEAR = (1 << 31); 
+            GPIOC_DIR |= (1 << 31); 
+
+            /* 3. Drive CLOCK high */
+            GPIOC_SET = (1 << 29); 
+            GPIOC_DIR |= (1 << 29); 
+
+            lv24020lp_power(true);
+        }
+        else
+        {
+            lv24020lp_power(false);
+
+            /* set all as inputs */
+            GPIOC_DIR &= ~((1 << 29) | (1 << 30) | (1 << 31));
+        }
+
+        powered = status;
+    }
+
+    lv24020lp_unlock();
+    return old_status;
+}
+
+#endif /* CONFIG_TUNER */
+
 #else /* SIMULATOR */
 
 bool charger_inserted(void)
