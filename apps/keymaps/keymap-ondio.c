@@ -136,6 +136,7 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchscreen */
 
+#ifdef HAVE_RECORDING
 static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_REC_PAUSE,             BUTTON_MENU|BUTTON_REL,     BUTTON_MENU },  
     { ACTION_SETTINGS_INC,          BUTTON_RIGHT,               BUTTON_NONE },
@@ -145,6 +146,7 @@ static const struct button_mapping button_context_recscreen[]  = {
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
+#endif
 
 static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT,                           BUTTON_NONE },
@@ -161,6 +163,7 @@ static const struct button_mapping button_context_keyboard[]  = {
 
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
+
 #if CONFIG_TUNER
 static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_MENU,          BUTTON_MENU | BUTTON_REPEAT,           BUTTON_NONE },
@@ -172,13 +175,14 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_STD_PREVREPEAT,   BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },
     { ACTION_STD_NEXT,         BUTTON_RIGHT,                          BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,   BUTTON_RIGHT|BUTTON_REPEAT,            BUTTON_NONE },
-    
-    
+
+
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
-    
+
 };
 #endif
+
 const struct button_mapping* get_context_mapping( int context )
 {
     switch( context )
@@ -206,9 +210,11 @@ const struct button_mapping* get_context_mapping( int context )
             /* else fall through to CUSTOM|CONTEXT_TREE */
         case CONTEXT_CUSTOM|CONTEXT_TREE:
             return button_context_tree;
+#ifdef HAVE_RECORDING
         case CONTEXT_RECSCREEN:
         case CONTEXT_SETTINGS_RECTRIGGER:
             return button_context_recscreen;
+#endif
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
 #if CONFIG_TUNER
