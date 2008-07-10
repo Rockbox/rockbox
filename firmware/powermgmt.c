@@ -467,7 +467,7 @@ static void handle_auto_poweroff(void)
             if(TIME_AFTER(current_tick, sleeptimer_endtick))
             {
                 audio_stop();
-                if (!usb_inserted()
+                if (usb_inserted()
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
                     || ((charger_input_state == CHARGER) ||
                     (charger_input_state == CHARGER_PLUGGED))
