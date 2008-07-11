@@ -1,0 +1,19 @@
+I would like to thank the following people (in alphabetical order):
+
+- Seth Arnold, for contributing to the documentation.
+- Jan-Rudolph Bührmann, for helping me get started on the 64-bit multi-
+  precision integer library.
+- Luca Filipozzi, maintainer/packager of BeeCrypt for Debian GNU/Linux.
+- Jeff Johnson, the guy behind RedHat's Package Manager, who has inspired
+  and contributed to many of the changes for version 3.0.0; 73 de Bob.
+- Jon Sturgeon, bug hunter extraordinaire.
+
+Further thanks go to:
+- AMD, for donating a copy of "AMD x86-64 Architecture Programmer's Manual".
+- ARM Ltd, for donating a copy of "ARM Architecture Reference Manual".
+- HP/Compaq, for their testdrive program, which gave me the opportunity to
+  test and BeeCrypt on many new platforms.
+- SourceForge, for their excellent open source development platform!
+
+Last but not least: thanks to everyone who provided bits of information,
+reported bugs and provided feedback.

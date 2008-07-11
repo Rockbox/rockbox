@@ -1,0 +1,143 @@
+Welcome to the BeeCrypt crypto library!
+
+Copyright (c) 1997, 1998, 1999, 2000, 2001 Virtual Unlimited B.V.
+Copyright (c) 2002, 2003, Bob Deblier (for certain parts)
+
+Author: Bob Deblier <bob.deblier@pandora.be>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+For the specifics of this license, see file 'COPYING.LIB', included in
+this distribution.
+
+
+
+Welcome to version 3.0.0 of BeeCrypt:
+
+AES support has been added, and the library has been thoroughly debugged,
+with the addition of unit tests. Once you've built the library, you can
+verify the correct functioning with 'make check'.
+
+Multi-precision integer routines should now perform dramatically better 
+an 64-bit processors, especially Alpha and Itanium.
+
+Benchmarks can be obtained with 'make bench'.
+
+As usual, your comments are welcome.
+
+
+
+About BeeCrypt:
+
+This library is an ongoing project of Virtual Unlimited B.V. Its goal is
+to provide strong and fast cryptography for use by our products, but
+we're not limiting the use to that. We're releasing it under the LGPL
+license, because we feel that cryptography should be open to inspection
+by everybody, and available for use by everybody to safeguard privacy.
+
+Note that depending on where you are, the use of cryptography may be
+limited or forbidden by law. Before using this library, make sure you
+are legally entitled to do so.
+
+
+For more on Virtual Unlimited B.V. and our products please consult our
+website: http://www.virtualunlimited.com/
+
+
+<plug>
+Most of the algorithms are implemented from reliable sources such as:
+
+"Handbook of Applied Cryptography"
+ Alfred J. Menezes, Paul C. van Oorschot, Scott A. Vanstone
+ CRC Press
+
+"Applied Cryptography", second edition
+ Bruce Schneier
+ Wiley
+
+
+For crypto enthusiasts these books are invaluable background material.
+
+IEEE P1363 "Standard Specifications for Public Key Cryptography" is a
+very interesting draft standard, which we will try to comply with.
+</plug>
+
+The structures in the library are geared towards exchange with Java
+and its security and cryptography classes. This library can also be
+accessed from Java by installing BeeCrypt for Java, a JCE 1.2 crypto
+provider and the counterpart of this library.
+
+
+Included in the library are:
+    - entropy sources for initializing pseudo-random generators
+    - pseudo-random generators: FIPS-186, Mersenne Twister
+    - block ciphers: AES, Blowfish
+    - hash functions: MD5, SHA-1, SHA-256
+    - keyed hash functions: HMAC-MD5, HMAC-SHA-1, HMAC-SHA-256
+    - multi-precision integer library, with assembler-optimized routines
+      for several processors
+    - probabilistic primality testing, with optimized small prime trial
+      division
+    - discrete logarithm parameter generation over a prime field
+    - Diffie-Hellman key agreement
+    - DSA signature scheme
+    - ElGamal signature scheme (two variants)
+    - RSA keypair generation with chinese remainder theorem variables
+    - RSA public & private key operations
+    - DHAES encryption scheme
+
+Planned for the near future are:
+    - compliance with and compliance statements for IEEE P1363
+    - more blockciphers (Twofish, ... )
+	- more hash functions (RIPEMD-160, SHA-384, SHA-512, HAVAL, Tiger)
+	- RSA signatures as specified by RFC-2440.
+	- Elliptic Curves (ECDSA, ... )
+    - more blockcipher modes (OFB, ... )
+
+The library has been tested on the following platforms:
+	- AIX 5.1 ppc
+	- AIX 5.1 ppc64
+	- Darwin 6.5 (a.k.a. MacOS X 10.2)
+    - FreeBSD 4.0 alpha
+    - FreeBSD 4.0, 4.2 x86
+    - Linux glibc 2.x alpha
+    - Linux glibc 2.x arm
+	- Linux glibc 2.x ia64
+    - Linux glibc 2.x ppc
+    - Linux glibc 2.x sparc
+    - Linux glibc 2.x x86
+    - Solaris 2.6/2.7/2.8/2.9 sparc (with Forte or gnu compilers)
+    - Solaris 2.7/2.8 x86 (with Forte or GNU compilers)
+    - Tru64 Unix alpha
+    - Win32 (Windows 95, 98, NT 4.0, 2000, XP)
+
+The library is currently in the process of being ported to:
+    - Cygwin (Can't seem to get the DLL to build properly with the current
+      version of the autotools)
+    - HP/UX is a pain in the backside; I'll try getting it working, but the
+      configure script doesn't seem capable of properly detecting gettimeofday.
+
+For more information, refer to the HTML documentation in the docs directory.
+
+If you want to report bugs, make suggestions, contribute fixes or
+enhancements, please see the beecrypt-specific website:
+
+http://sourceforge.net/projects/beecrypt
+
+or contact me at mailto:bob.deblier@pandora.be
+
+Sincerely,
+
+Bob Deblier

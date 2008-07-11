@@ -1,0 +1,321 @@
+PeLib 0.09 alpha (February 09, 2005)
+
+Added:
+- Added PeHeaderT<x>::setIddBaseRelocRva(dword value)
+- Added PeHeaderT<x>::setIddBaseRelocSize(dword value)
+- Added PeHeaderT<x>::setIddArchitectureRva(dword value)
+- Added PeHeaderT<x>::setIddArchitectureSize(dword value)
+- Added PeHeaderT<x>::setIddComHeaderRva(dword value)
+- Added PeHeaderT<x>::setIddComHeaderSize(dword value)
+- Added void PeHeaderT<x>::setImageDataDirectoryRva(dword dwDirectory, dword value)
+- Added void PeHeaderT<x>::setImageDataDirectorySize(dword dwDirectory, dword value)
+- Added bool PeHeaderT<x>::isValid() const
+- Added int PeHeaderT<x>::read(const unsigned char* pcBuffer, unsigned int uiSize, unsigned int uiOffset);
+- Added int BoundImportDirectory::read(unsigned char* pcBuffer, unsigned int uiSize);
+- Added int BoundImportDirectory::read(InputBuffer& inpBuffer, unsigned char* data, unsigned int dwSize);
+- Added unsigned int BoundImportDirectory::totalModules()
+- Added DebugDirectory::setData to set the debug data of individual entries in the DebugDirectory.
+- Added DebugDirectory::getData to get the debug data of individual entries in the DebugDirectory.
+- Added int IatDirectory::read(unsigned char* buffer, unsigned int buffersize)
+- Optimized the size and rebuild methods to avoid duplicate strings for files that appear
+  more than once in the BoundImport Directory.
+- Added two read functions to TlsDirectory and updated the return values of the old read function.
+- Added two read functions to ComHeaderDirectory and updated the return values of the old read function.
+- Added two read functions to RelocationsDirectory and updated the return values of the old read function.
+- Added void RelocationsDirectory::addRelocation()
+- Added void RelocationsDirectory::removeRelocation(unsigned int index)
+- Added void DebugDirectory::clear()
+- Added void ExportDirectory::removeFunction(unsigned int index)
+- Added void ExportDirectory::clear()
+- Added unsigned int ExportDirectory::calcNumberOfFunctions()
+- Added void ExportDirectory::setAddressOfNameOrdinals(dword value)
+
+Bugfixes:
+- Fixed a bug in TlsDirectory<bits>::size()
+- Fixed a bug in PeHeaderT<64>::isValid(dword)
+- Fixed a bug in PeHeaderT<bits>::removeDataDirectory(dword)
+- Fixed a bug in BoundImportDirectory::rebuild()
+- Fixed a bug in BoundImportDirectory::read() (Potential buffer overflow)
+- Fixed a bug in BoundImportDirectory::read() (Bug caused incorrect results when reading the directory more than once)
+- Fixed a bug when reading the debug data of individual DebugDirectory entries.
+- Fixed a bug that caused non-existing data directories to be read (PeFile).
+- Fixed a bug that caused problems when reading import directories that were located close to the end of the file (ImportDirectory).
+- Fixed a minor bug in PeHeader::calcSizeOfImage
+- Fixed some return values and removed all exception handling blocks.
+
+Changes:
+- Changed return values of PeHeader::addSection
+- Changed return values of PeHeader::read
+- Changed behaviour: PeHeader::m_uiOffset is initialized to 0 in default constructors.
+- Changed return value of BoundImportDirectory::getNumberOfModules() from int to unsigned int
+- Changed name of BoundImportDirectory::getNumberOfModules to calcNumberOfModules
+- Changed the return values of the PeFile::read* functions.
+- Renamed IatDirectory::removeAll to IatDirectory::clear
+- Renamed IatDirectory::numberOfAddresses to IatDirectory::calcNumberOfAddresses
+- Changed the parameter types of IatDirectory::getAddress from dword to unsigned int
+- Changed the parameter types of IatDirectory::removeAddress from dword to unsigned int
+- All constants taken from windows.h that were redefined in PeLibAux.h now have the prefix PELIB_ to avoid
+  conflicts with windows.h if both files are included to a project.
+- Changed PELIB_IMAGE_TLS_DIRECTORY<bits>::size from an enum to a function.
+- Changed the name of RelocationsDirectory::getNumberOfRelocationData to calcNumberOfRelocationData
+- Changed void RelocationsDirectory::removeRelocationData(unsigned int ulRelocation, word wValue)
+  to      void RelocationsDirectory::removeRelocationData(unsigned int relocindex, unsigned int dataindex)
+- Removed dword ExportDirectory::getNumberOfNameOrdinals()
+- Removed dword ExportDirectory::getNumberOfAddressOfFunctionNames()
+- Removed dword ExportDirectory::getNumberOfAddressOfFunctions()
+- Changed the parameters of some functions in ExportDirectory from dword to unsigned int.
+
+
+January 16, 2005 PeLib 0.08 alpha
+
+Added:
+- Added std::string ExportDirectory::getNameString()
+- Added resource type RT_MANIFEST to PeLibAux.h
+- Added the following functions of PeHeaderT<int x>: setIddDebugRva, setIddDebugSize,
+  setIddDelayImportRva, setIddDelayImportSize, setIddExceptionRva, setIddExceptionSize, setIddGlobalPtrRva,
+  setIddGlobalPtrSize, setIddIatRva, setIddIatSize, setIddLoadConfigRva, setIddLoadConfigSize,
+  setIddResourceRva, setIddResourceSize, setIddResourceRva, setIddResourceSize, setIddSecurityRva,
+  setIddSecuritySize, setIddTlsRva, setIddTlsSize
+- ImportDirectory32 and ImportDirectory64 are now available.
+- Added ImportDirectory<bits>::setFileName(dword, currdir, const std::string&)
+- Added ImportDirectory<bits>::setFirstThunk(dword, currdir, dword)
+- Added ImportDirectory<bits>::setForwarderChain(dword, currdir, dword)
+- Added ImportDirectory<bits>::setRvaOfName(dword, currdir, dword)
+- Added ImportDirectory<bits>::setOriginalFirstThunk(dword, currdir, dword)
+- Added ImportDirectory<bits>::setTimeDateStamp(dword, currdir, dword)
+- Added ImportDirectory<bits>::setOriginalFirstThunk(dword, dword, currdir, dword)
+- Added ImportDirectory<bits>::setFirstThunk(dword, dword, currdir, dword)
+- Added ImportDirectory<bits>::setFunctionHint(dword, dword, currdir, word)
+- Added ImportDirectory<bits>::setFunctionName(dword, dword, currdir, const std::string&)
+- Added dword BoundImportDirectory::getTimeDateStamp(dword dwBidnr, dword forwardedModule) const
+- Added word BoundImportDirectory::getOffsetModuleName(dword dwBidnr, dword forwardedModule) const
+- Added word BoundImportDirectory::getNumberOfModuleForwarderRefs(dword dwBidnr, dword forwardedModule) const
+- Added std::string BoundImportDirectory::getModuleName(dword dwBidnr, dword forwardedModule) const
+- Added void BoundImportDirectory::setTimeDateStamp(dword dwBidnr, dword forwardedModule, dword dwTds)
+- Added void BoundImportDirectory::setOffsetModuleName(dword dwBidnr, dword forwardedModule, word wOmn)
+- Added void BoundImportDirectory::setNumberOfModuleForwarderRefs(dword dwBidnr, dword forwardedModule, word wMfr)
+- Added void BoundImportDirectory::setModuleName(dword dwBidnr, dword forwardedModule, const std::string& strModuleName)
+- Added word calcNumberOfModuleForwarderRefs(dword dwBidnr) const
+- Added void addForwardedModule(dword dwBidnr, const std::string& name, dword timeStamp = 0, word offsetModuleName = 0, word forwardedModules = 0)
+- Added void removeForwardedModule(dword dwBidnr, word forwardedModule)
+- Added PeHeaderT<x>::addDataDirectory()
+- Added PeHeaderT<x>::removeDataDirectory(dword)
+
+Bugfixes:
+- Fixed a bug in MzHeader::isValid
+- Fixed a bug in PeHeaderT<x>::size()
+- Fixed a bug in PeHeaderT<x>::calcRva()
+- Fixed a bug in PeHeaderT<x>::calcSizeOfImage()
+- Fixed a bug in PeHeaderT<x>::getSectionName(dword)
+- Fixed a bug in PeHeaderT<x>::calcStartOfCode()
+- Fixed a bug in PELIB_THUNK_DATA<bits>::bool equalHint(word wHint) const
+- Fixed a bug in PELIB_IMAGE_THUNK_DATA<bits>::bool equalHint(word wHint) const
+- Fixed a bug in int ImportDirectory<bits>::removeFunction(const std::string& strFilename, word wHint)
+- Fixed a bug in int ImportDirectory<bits>::removeFile(const std::string& strFilename)
+- Function hints are now properly added when rebuilding import directories.
+- Reading and rebuilding bound import directories now works with forwarded modules.
+
+Changes:
+- Changed behaviour: Removed all exceptions from the MzHeader class. The functions work with return values now.
+- Changed behaviour: The MzHeader::read() functions stopped checking if the MzHeader begins with "MZ".
+- Changed behaviour: PeHeaderT<int x>::addSection(std::string, dword) doesn't use exceptions anymore.
+                     Return values now indicate if the function succeeded or failed.
+- Changed behaviour: PeHeaderT<int x>::getSectionWithOffset(dword) doesn't use exceptions anymore.
+                     Return values now indicate if the function succeeded or failed.
+- Changed behaviour: PeHeaderT<int x>::getSectionWithRva(dword) doesn't use exceptions anymore.
+                     Return values now indicate if the function succeeded or failed.
+- Changed behaviour: PeHeaderT<int x>::rvaToOffset(dword) doesn't use exceptions anymore.
+                     Return values now indicate if the function succeeded or failed.
+- Changed behaviour: PeHeaderT<int x>::write(std::string, unsigned int) doesn't use exceptions anymore.
+                     Return values now indicate if the function succeeded or failed.
+- Changed behaviour: PeHeaderT<int x>::writeSectionData(const std::string& strFilename, word wSecnr,
+					 const std::vector<byte>& vBuffer) doesn't use exceptions anymore.
+                     Return values now indicate if the function succeeded or failed.
+- Changed behaviour: PeHeaderT<int x>::writeSections(std::string) doesn't use exceptions anymore.
+                     Return values now indicate if the function succeeded or failed.
+- Changed behaviour: Return value of PeHeaderT<x>::calcSpaceAfterHeader() changed from unsigned long
+					 to unsigned int.
+- Changed behaviour: Return value of PeHeaderT<x>::calcStartOfCode() changed from unsigned long
+					 to unsigned int.
+- Changed behaviour: Return value of PeHeaderT<x>::calcOffset() changed from unsigned long
+					 to unsigned int.
+- Changed behaviour: Return value of PeHeaderT<x>::offsetToRva(dword) changed from unsigned long
+					 to unsigned int.
+- Changed behaviour: Return value of PeHeaderT<x>::offsetToVa(dword) changed from unsigned long
+					 to unsigned int.
+- Renamed ExportDirectory::setName(std::string) to ExportDirectory::setNameString(std::string)
+- Renamed the PeHeaderT::getId* functions to PeHeaderT::getIdd*
+- Renamed PeHeaderT::getImageDirectoryRva to PeHeaderT::getImageDataDirectoryRva
+- Renamed PeHeaderT::getImageDirectorySize to PeHeaderT::getImageDataDirectorySize
+- Renamed void PeHeaderT<x>::setWinVersionValue(dword dwValue) to void PeHeaderT<x>::setWin32VersionValue(dword dwValue)
+- Renamed the following functions of PeHeaderT<int x>: setIdImportRva to setIddImportRva,
+  setIdImportSize to setIddImportSize, setIdExportRva to setIddExportRva, setIdExportSize to setIddExportSize
+- Renamed dword ImportDirectory<bits>::getName to dword ImportDirectory<bits>::getRvaOfName
+- Changed behaviour: All removeFunction and removeFile functions from ImportDirectory.h return int instead
+  of void now.
+- Changed behavior: ResourceDirectory::resourceTypeNameToIndex returns int instead of unsigned int.
+  
+-------------------------------------------------------------------------------------------------------------
+
+July 18, 2004 PeLib 0.07 alpha
+
+Added:
+- Full support of the PE+ format.
+- ImportDirectory::getName(string, currdir)
+- ImportDirectory::getFirstThunk(dword, currdir)
+- ImportDirectory::getOriginalFirstThunk(dword, currdir)
+- ImportDirectory::getForwarderChain(dword, currdir)
+- ImportDirectory::getName(dword, currdir)
+- ImportDirectory::getTimeDateStamp(dword, currdir)
+- PeLib::getFileType(string)
+- PeLib::openPeFile(string)
+- Added class PeFileVisitor
+- Added PeFile::visit(PeFileVisitor&)
+
+Bugfixes:
+- Fixed a bug in PeHeader::rvaToOffset
+
+Changes:
+- Renamed ImportDirectory::OLD to PeLib::OLDDIR and ImportDirectory::NEW to PeLib::NEWDIR
+- Renamed Relocations to RelocationsDirectory
+- Renamed ImportAddressTable to IatDirectory
+- Renamed ComDescriptor to ComHeader
+- Renamed PeFile::comDescDir to PeFile::comDir
+- Changed unsigned long ExportDirectory::getFunctionIndex to unsigned int ExportDirectory::getFunctionIndex
+
+-------------------------------------------------------------------------------------------------------------
+
+July 4, 2004 PeLib 0.06 alpha
+
+Added:
+- TlsDirectory class
+
+Changes:
+- ResourceElement::read and ResourceElement::rebuild are now protected.
+
+Bugfixes:
+- Fixed a bug in PeHeader::rvaToOffset
+
+-------------------------------------------------------------------------------------------------------------
+
+June 26, 2004 PeLib 0.05 alpha
+
+Added:
+- Constructor, Copy constructor, assignment operator and destructor for ResourceChild.
+- ResourceDirectory::getRoot()
+- ResourceElement::isLeaf()
+- ResourceElement::getElementRva
+- 10 new functions in ResourceLeaf.
+- 22 new functions in ResourceNode.
+- Added the RT_* constants which identify resource types to PeLibAux.h
+- Added a new example (examples/ResourceTree) which shows how to use low level ResourceDirectory functions.
+- Added PELIB_IMAGE_DEBUG_DIRECTORY and PELIB_IMG_DEBUG_DIRECTORY
+- Added the new class DebugDirectory which handles the debug directory of PE files.
+- Added readDebugDirectory() and debugDir() to PeFile.
+
+Removed:
+- ~ResourceNode()
+
+-------------------------------------------------------------------------------------------------------------
+
+June 12, 2004 PeLib 0.04 alpha
+
+New:
+- Finally implemented the class ResourceDirectory. That means lots of new functions I won't explicitly list here.
+  Check the documentation.
+
+Removed:
+- The files buffer/ResTree.cpp and buffer/ResTree.h are obsolete and were removed.
+
+Bugfixes:
+- Fixed PeHeader::calcStartOfCode
+- Fixed PeHeader::getSectionWithRva
+
+Changes:
+- Changed PeHeader::read to throw an exception if the NT signature is not 'PE'\0\0
+- Changed the 2nd parameter of void MzHeader::read(unsigned char*, unsigned long) from unsigned long to unsigned int.
+- Changed the return value of MzHeader::size from long to int.
+- Changed parameters of MzHeader::getReservedWords1, MzHeader::getReservedWords2, MzHeader::setReservedWords1 and
+  MzHeader::setReservedWords2 from long to int.
+- Changed MzHeader::read(std::string) to MzHeader::read(const std::string&)
+- Changed return value of BoundImportDirectory::getModuleIndex from long to int.
+- Changed return value of BoundImportDirectory::size from long to int.
+- Changed return value of ComDescriptor::size from long to int.
+- Changed return value of ImportAddressTable::size from long to int.
+- Changed return value of Relocations::getNumberOfRelocations from long to int.
+- Changed return value of Relocations::getNumberOfRelocationData from long to int.
+- Changed return value of Relocations::size from long to int.
+- Changed parameter of Relocations::getVirtualAddress from long to int.
+- Changed parameter of Relocations::getSizeOfBlock from long to int.
+- Changed parameter of Relocations::getRelocationData from long to int.
+- Changed parameters of Relocations::setRelocationData from long to int.
+- Changed parameters of Relocations::setVirtualAddress from long to int.
+- Changed parameters of Relocations::setSizeOfBlock from long to int.
+- Changed parameters of Relocations::addRelocationData from long to int.
+- Changed parameters of Relocations::removeRelocationData from long to int.
+- Changed return value of ExportDirectory::getFunctionIndex(const std::string&) const from unsigned int to int.
+
+-------------------------------------------------------------------------------------------------------------
+
+May 31, 2004: PeLib 0.03 alpha
+
+Bugfixes:
+- Fixed some bugs in FileDump.cpp
+
+Changes:
+- Modified PeLibAux.cpp to make PeLib VC++ 7.1 compatible.
+- Changed vector access from .at to operator[] all over the project.
+  Real undefined behaviour is probably better than spontaniously terminating applications.
+
+New:
+- Added makefiles for Borland C++ commandline tools (tested on version 5.6.4)
+- Added makefiles for Digital Mars Compiler (tested on version 8.38n)
+  Note that support for DMC is not yet complete. PeLib compiles though, the examples don't yet but the
+  reason for this is that I am unable to correctly specifiy the PeLib object files when compiling.
+- Added makefiles for Visual C++ 7.1 (tested on compiler Version 13.10.3052)
+
+-------------------------------------------------------------------------------------------------------------
+
+Mai 1, 2004: PeLib 0.02 alpha
+
+Bugfixes:
+- Fixed a bug in FileDump's and OON2's makefile.g++
+- Fixed ImportDirectory::size
+- Changed parameter of PELIB_THUNK_DATA::equalHint from dword to word
+- Fixed a bug in PeHeader::read (PeLib always assumed 0x10 data directories in version 0.01 alpha)
+
+Changes:
+- Slightly changed ImportDirectory::removeFile (Changed function's signature)
+- Moved the definitions of byte, word and dword into the PeLib namespace.
+- Renamed PELIB_THUNK_DATA::equalName to PELIB_THUNK_DATA::equalFunctionName
+- Started to add size() functions to structs defined in PeLibAux.h
+- Moved PeFile::writeSectionData to PeHeader::writeSectionData
+- Moved PeFile::writeSections to PeHeader::writeSections
+
+New:
+- Added ImportDirectory::hasFunction
+- Wrote BoundImportDirectory::size
+- Added accumulate function to PeLibAux.h
+- Added PELIB_IMAGE_SECTION_HEADER::biggerFileOffset
+- Added PELIB_IMAGE_SECTION_HEADER::biggerVirtualAddress
+- Added PeHeader::calcSizeOfImage
+- Added PeHeader::enlargeLastSection
+
+Removed:
+- Removed PeFile::write
+- Removed PeFile::writeImportDirectory
+
+Other changes:
+- Rewrote parts of ImportDirectory::read
+- Rewrote ImportDirectory::removeFunction (both version).
+- Changed std::ios:: to std::ios_base:: in ImportDirectory
+- Changed ImportDirectory::addFunction (both versions)
+- Changed ExportDirectory::rebuild
+- Changed ExportDirectory::size
+- Rewrote ImportDirectory::size
+- Rewrote PeHeader::size
+- Rewrote ComDescriptor::size
+
+-------------------------------------------------------------------------------------------------------------
+
+April 9, 2004: PeLib 0.01 alpha Initial release

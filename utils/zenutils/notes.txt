@@ -1,0 +1,77 @@
+zenutils is a collection of utilities for working with firmwares of the Creative Zen range.
+
+The utilities are split into 3 categories:
+1) update_*
+   Operates on the Creative firmware updater executable.
+2) firmware_*
+   Operates on the Creative firmware archive.
+3) zen_crypt
+   Operates on the parts of the firmware archive which requires cryptography.
+
+
+General usage:
+--------------
+A typical use scenario would be: download the firmware updater and run
+ update_extract on it to obtain the firmware archive which it contains.
+Run firmware_extract on the firmware archive to obtain the files
+ which the firmware archive contains and a make file that can later be used
+ to create a new firmware archive. Edit* the extracted files of
+ interest and optionally the associated make file. Create a new firmware
+ archive by running firmware_make. If a NULL entry is present in the firmware
+ then it's signature has to be updated running zen_crypt. If on windows, you
+ can use update_patch to write your newly created firmware archive to the
+ updater executable which you originally extracted it from. The new updater
+ will update your player with the modifications you've made.
+
+* If you're creating or editing executable code, such as the CENC or ©TL entries,
+you'll need to use zen_crypt to decrypt and/or encrypt them.
+In addition, executable code on some players that use the ©TL entries also needs
+ to be signed using zen_crypt, prior to encrypting them.
+Encrypting FBOOT and FRESC is not supported, as these contain the executable 
+ code that makes up the critical Rescue Mode software, contained in flash.
+As opposed to CENC and ©TL which ultimately ends up being stored in the players
+ filesystem as a file named Jukebox2.jrm.
+
+
+Important:
+----------
+The only entries required in a firmware archive is CINF and if present, NULL.
+Including either FBOOT, FRESC or EXT0 in your firmware archive is not advised,
+ the first two are required for the Rescue Mode software operation and EXT0 is
+ unknown, but given that it's contents is sent to an internal device named mcu0,
+ the consequences of failure could be fatal to your player.
+
+
+Supported players:
+------------------
+zen_crypt supports signing, verification, decryption and encryption on the
+ following Creative Zen players:
+  Vision:M (default if no player is specified)
+  Vision W
+  Micro
+  MicroPhoto
+  Sleek
+  SleekPhoto
+  Touch
+  Xtra
+
+The other utilities are not player specific and may work on players not listed.
+Although the Vision:M is the only player I've fully tested.
+
+
+Building the sources:
+---------------------
+The source code uses the CMake (www.cmake.org) build system.
+Once you've installed CMake, you'll need to run it to produce make files for
+ your system. I would recommend producing the make files within in the 'build'
+ directory of this package. Which can be done by typing:
+  zenutils\build\>cmake -g "Visual Studio 8 2005" ..
+  (for msvc8 on windows)
+ or:
+  ~zenutils/build/$ cmake -g "Unix Makefiles" ..
+  (for various 'nixes)
+The windows example will produce a solution file for msvc8.
+The 'nix example will produce a makefile which can be built using make.
+
+The executables will be placed within the 'bin' directory, once built.
+

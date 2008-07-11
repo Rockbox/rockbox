@@ -1,0 +1,6 @@
+ADD_SUBDIRECTORY(firmware_extract)
+ADD_SUBDIRECTORY(firmware_make)
+ADD_SUBDIRECTORY(shared)
+ADD_SUBDIRECTORY(update_extract)
+ADD_SUBDIRECTORY(update_patch)
+ADD_SUBDIRECTORY(zen_crypt)

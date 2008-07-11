@@ -1,0 +1,69 @@
+Legend:
+	- = open bug
+	* = fixed bug
+
+4.1.0:
+	- SuSE 9.2 (x86) compiler is buggy: the MMX-optimized version fails all
+	  test vectors. Since all other Linux distro's handle this perfectly it's
+	  up to them to fix this bug.
+
+3.1.0:
+	* Error in final result computation of mpextgcd_w in certain circumstances.
+	* PowerPC 64-bit assembler symbols aren't defined according to LSB 1.3.
+	
+3.0.0:
+	- Can't seem to generate 64-bit shared libraries on AIX; use
+	  --disable-shared on this platform for now.
+	- Intel icc can't cope with gcj headers. There's also a problem in
+	  combination with aio.h; solution should be to not test gcj when using
+	  this compiler. As a workaround, you can specify --without-javaglue.
+	- GCC 3.3 produces faster output for Blowfish on Pentium 4 than the
+	  included assembler source; try coding two Blowfish rounds (without swap)
+	  in C and compile to assembler to see how GCC accomplishes this.
+
+2.3.0pre:
+	* bug in certain instances of computing modular inverse.
+	* incorrectly translated intel-style assembler version of x86 mp32odd
+	  and mp32even routines into gnu assembler format.
+	* base64 decoding of '+' and '/' characters is wrong.
+	* incorrect testing of the result of the gcd operation in mp32prndconone.
+	* Chinese Remainer Theorem for RSA private key operation doesn't work
+	* incorrect header file inclusion when --disable-threads is selected or
+	  when no multithreading is available.
+
+2.2.0:
+	[ Released by Jeff Johnson of RedHat, Inc.; lint & doxygen enhanced version
+	  of 2.1.0. ]
+
+2.1.0:
+	* Entropy gathering from /dev/dsp contained error; size in words of entropy
+	  data to gather was overwritten with audio sample size - which resulted in
+	  much less entropy.
+
+2.0.0:
+	- Chinese Remainder Theorem for RSA private key operation doesn't work; it
+	  needs fixing.
+
+1.1.2:
+	* SHA-1 i586 assembler code uses local variables below the current stack
+	  frame.
+	
+1.1.1:
+	* discrete logarithm domain parameter generator calculations contains bugs
+	  - was detected in this release but present since the first release.
+
+1.1.0:
+	* The javaglue produces a NullPointerException when initializing with a
+	  null IV; this should be treated correctly, i.e. as an all zero IV.
+
+1.0.2:
+
+1.0.1:
+	* The Windows 2000 bug is still around
+
+1.0.0:
+	* On Windows 2000, the entropy system gets error WAVERR_BADFORMAT in
+	  waveInOpen; So far I've been unable to determine why the system does this
+	  for format WAVE_FORMAT_PCM. Suggestions to fix this problem are more than
+	  welcome.
+	* The assembler code for SHA-1 in gnu/fips180opt.gas.i586.s contains bugs.

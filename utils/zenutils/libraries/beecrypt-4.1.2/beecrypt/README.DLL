@@ -1,0 +1,37 @@
+File beetest.exe is a compiled version of the test program included in
+the source distribution, which you can find on our website:
+http://beecrypt.virtualunlimited.com/
+
+To run, it needs file beecrypt.dll present in the same directory.
+
+For Developers:
+
+Files beecrypt.dll and beecrypt.lib are a pre-compiled version of the
+BeeCrypt library for Pentium Pro processors.
+
+If you want to develop applications with this library, you'll also need
+the header files, included in the source distribution (see higher).
+
+Please make sure you respect the term of the license under which the
+BeeCrypt library is released:
+
+Copyright (c) 1997, 1998, 1999, 2000, 2001 Virtual Unlimited B.V.
+
+Author: Bob Deblier <bob@virtualunlimited.com>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+For the specifics of this license, see file 'COPYING', included in this
+distribution.

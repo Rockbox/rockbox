@@ -1,0 +1,184 @@
+4.1.2:
+	- Fixed Cygwin DLL missing symbols problem.
+	- Fixed GNU-stack assembler section on some platforms (Debian-ARM).
+	- Fixed problem cause by include of <asm/byteorder.h>.
+	- Fixed SHA-384 and SHA-512 code Visual C++ compatibility.
+	- Improved detection of IBM ICU library version; has to be >= 2.8.
+
+4.1.1:
+	- Fixed shared library version info.
+
+4.1.0:
+	- Added SHA-384 and SHA-512 algorithms.
+	- Added HMAC-SHA-384 and HMAC-SHA-512 algorithms.
+	- Added generic SSE2 optimization for the above algorithms.
+	- Added more digest algorithms for PKCS#1 EMSA.
+	- Optimized swap32 and swap64 routines on Linux.
+	- Fixed missing definition in mpopt.h for s390x.
+	- Fixed nostackexec configuration bug.
+	- Fixed problem in Date::toString.
+	- Fixed deadlock problem which occured in certain cases where security
+	  or crypto SPI constructor called getInstance for another security or
+	  crypto SPI.
+	- Fixed a bug in the generic CBC encryption code; when called with
+	  nblocks == 1, the feedback was set incorrectly.
+	- Fixed a bug in mpbsubmod; sometimes it takes multiple additions of
+	  the modulus to get a positive number.
+	- Fixed PowerPC 64-bit configuration problem on Linux.
+
+4.0.0:
+	- Added a C++ API interface, modeled after Java's security & crypto API.
+	- Added the new GNU noexecstack feature.
+	- Added more x86_64 and s390x assembler routines.
+	- Modified i2osp, so that it only requires as many octets as there are
+	  significant bytes in the multi-precision integers.
+	- Fixed a bug in the creation of rsa keypairs; code was not correctly
+	  migrated to new calling sequence. The code now implements the method
+	  described in IEEE P.1363.
+	- Fixed another bug in mpextgcd_w which sometimes returned incorrect
+	  results.
+	- Fixed a bug in mprshiftlsz, which didn't work correctly when size = 1.
+	- Fixed a configuration problem on Tru64 Unix.
+
+3.1.0:
+	- Added wiping of private key components of keypairs before freeing.
+	- Fixed bug in mpextgcd_w which sometimes returned incorrect result.
+	- Fixed error in PowerPC 64-bit assembler symbol definitions.
+
+3.0.0:
+	- Cleaned up installed header files.
+	- Modified the API so that all keys can be passed as arrays of bytes.
+	- Modified the API so that all key sizes are given in bits.
+	- Modified the multi-precision integer library to work better on 64-bit
+	  machines.
+	- Modified the assembly source generation mechanism, employing the m4
+	  macro processor.
+	- Added multi-precision integer vectorized assembler routines for
+	  Itanium.
+	- Added multi-precision integer assembler routines for PowerPC 64-bit.
+	- Added multi-precision integer assembler routines for Alpha.
+	- Added multi-precision integer assembler routines for Opteron.
+	- Added multi-precision integer assembler routines for IBM zSeries 64-bit.
+	- Added multi-precision integer assembler routines for M68K.
+	- Added Jeff Johnson's python bindings.
+	- Added new unit tests.
+	- Added new benchmarking programs.
+
+2.3.0pre:
+	- Modified the header files so that the library now uses self-contained autoconf-generated configuration files; a program employing BeeCrypt can now use the symbols already tested and defined instead of having to regenerate them (thus also eliminating the risk of inconsistencies).
+	- Added the AES algorithm, with assembler routines for i586 and powerpc.
+	- Added the DSA signature algorithm.
+	- Added PowerPC assembler routines for blowfish.
+	- Added Pentium4 SSE2 assembler multiplication routines.
+	- Fixed the RSA CRT algorithm.
+	- Fixed the gas/i386 mp32even and mp32odd routines.
+	- Fixed a bug in modular inverse computation; thanks to Jeff Johnson of RedHat for pointing this out.
+	- Fixed a bug in testing the result of a gcd operation in the mp32prndconone routine.
+	- Fixed an ugly bug in base64 decoding.
+	- Fixed compatibility with the latest automake & autoconf versions.
+	- Replaces CPU optimization mechanism in configure script.
+
+2.1.0:
+	- Added support for automake, autoheader and libtool, which should make compiling the library even easier.
+	- Changed DHAES API to conform to IEEE P.1363 submission and to allow for uneven key splitting.
+	- Improved PKCS#5 padding routines.
+	- Added a hash reset to the hashFunctionContextInit function. This was pointed out by Marko Kreen.
+	- Fixed problem with configuring on i486-pc-linux-gnu. This was pointed out Steve O'Neill.
+	- Fixed problem in the C version of mp32sub where carry would sometimes be missed. This was pointed out by Jon Sturgeon.
+	- Revised entropy gathering system to do timeouts & asynchronous I/O where possible, to avoid hangs in case there's no noise on the audio device (i.e. digital silence), or when no data is available on devices such as /dev/random.
+	- Changed mp32opt i386 assembler routines for slight performance improvement.
+	- Changed mp32opt powerpc assembler routines for slight performance improvement.
+	- Changed mp32opt sparcv9 assembler routines for slight performance improvement.
+	- Added sparcv8 assembler routines for multi-precision integer multiplication.
+	- Added arm assembler routines for multi-precision integer multiplication.
+	- Added prototype 64-bit ia64 assembler routines for multi-precision integer operations.
+	- Started writing the long-awaited documentation.
+
+2.0.0:
+	- Changed mp32barrett struct and operations to be multithread-safe; this required a change in API.
+	- Changed hashFunction struct to incorporate internal block size parameter.
+	- Changed HMAC algorithm and file names to match names in RFC 2104.
+	- Changed SHA-1 C code for slightly faster results.
+	- Changed detection of entropy devices.
+	- Changed most void-returning functions to return int for error conditions.
+	- Changed beecrypt-java class names in javaglue.
+	- Added RSA keypair generation.
+	- Added RSA private & public key operations.
+	- Added SHA-256 hash function.
+	- Added HMAC-MD5 and HMAC-SHA-256 keyed hash functions.
+	- Added PKCS#5 padding.
+	- Added DHAES encryption scheme.
+	- Added Microsoft Visual C support, added Makefile.mak for this purpose.
+	- Added Solaris/Sparc Forte C 64 bit support.
+	- Added configure --disable-optimized option (disables assembler & processor-specific optimizations).
+	- Fixed bug in SHA-1 assembler code for Pentium, where local variables were used below the current stack pointer; this could cause a problem if the routine was interrupted. This was pointed out by Richard Clayton.
+	- Fixed bug in (certain cases of) modular inverse computation.
+	- Fixed buffer overrun in base64 encoding. This was pointed out by Jon Sturgeon.
+	- Fixed various minor bugs.
+	- Renamed text files to match automake conventions.
+
+1.1.2:
+	- Fixed bugs in discrete logarithm domain parameter generator. The code to make a generator of order q and (p-1) was wrong. This was pointed out by Susumu Yamamoto.
+	- Added MD5 hash function.
+
+1.1.1:
+	- Changed autoconfig script for easier porting.
+	- Changed sources for easier compilation on Microsoft Visual C++; no assembler-optimization on this platform yet.
+	- Fixed bug in javaglue when passing null IV to blockcipher.
+	- Shared library is now linked dynamically, with shared object name and version.
+	- Tested on Alpha Linux.
+	- Tested on Alpha FreeBSD.
+	- Added support for Compaq Alpha Tru64 Unix.
+	- Added initial support for QNX.
+
+1.1.0:
+	- Added glue for interfacing from BeeCrypt Java Cryptography Provider.
+	- Changed blockcipher struct to support interfacing with Java.
+	- Added better blockcipher IV handling.
+	- Multi-pass block processing is now possible with blockEncrypt/blockDecrypt.
+	- Updated config.sub and config.guess to latest version from sources.redhat.com
+	- Changed opening of entropy devices to blocking read-only mode instead of non-blocking read-write.
+	- Added win32 'wincrypt' entropy source.
+	- Added win32 'console' entropy source.
+	- Added FreeBSD support.
+	- Added PowerPC assembler optimized multiprecision subtraction routines.
+	- Added initial ia64 support.
+	- Added initial Darwin support (everything compiles, but the shared library doesn't build yet).
+
+1.0.2:
+	- Fixed Windows 2000 entropy bug; instead of using the first waveIn device, entropy now uses WAVE_MAPPER.
+	- Added sparcv9 mp32addsqrtrc GNU assembler routine.
+	- Added more hashFunctionContext and keyedHashFunctionContext functions.
+
+1.0.1:
+	- Added a sliding window modular exponentiation, about 30% faster than left-to-right exponentiation.
+	- Fixed bugs in fips180opt.gas.i586.s (Linux SHA-1 assembler code for Pentium/Pentium Pro) - the Windows/Metrowerks version was okay.
+
+1.0.0:
+	- Added Win32 support; compiled as DLL with MetroWerks CodeWarrior Pro 5, it runs fine on Windows 95, 98, NT 4.0 (if you have a soundcard with a microphone port). Note that there is a know issue on Windows 2000, see BUGS.
+	- Global code overhaul to support Win32
+	- Added more assembler routines, including SHA-1 for Pentium Pro (60% faster)
+	- Added cleanup function to randomGenerator
+	- Added missing functions in endianness.c
+	- Fixed bug in entropy.c where devices might stay open
+	- Eliminated mutex.h include file; it was more clear to do everything conditionally than to expand the macros in this file to encompass the Win32 API calls.
+
+0.9.5:
+	- Added PowerPC assembler optimization for multiprecision integers, 80% faster on our PowerMac 7200/90
+	- Fixed /dev/random entropy provider
+	- Changed name SHA1 to SHA-1 in fips180 for consistency
+
+0.9.4a:
+	- Added missing file 'blowfishopt.o'
+
+0.9.4:
+	- Changes to configure script, to distinguish between different processors of the x86 family
+	- Changes to blowfish code, 586/686 assembler optimization added, 30% faster on Pentium/PentiumPro
+	- Changes to blowfish code, eliminated static blowfishSetupEncrypt; incorporated into regular encrypt
+	- Changes to Makefile to selectively use blowfish assember code, depending on cpu type
+	- Added missing routines 'mp32bzero' and 'mp32bnpowmod' to mp32barrett.c
+	- Fixed 'const register' to 'register const' in mp32.c
+	- Minor fixes in included header files
+
+0.9.3:
+	- Initial public release
