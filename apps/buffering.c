@@ -689,7 +689,7 @@ static void reset_handle(int handle_id)
     if (!h)
         return;
 
-    h->widx = h->data;
+    h->ridx = h->widx = h->data;
     if (h == cur_handle)
         buf_widx = h->widx;
     h->available = 0;
@@ -735,8 +735,6 @@ static void rebuffer_handle(int handle_id, size_t newpos)
     /* Now we ask for a rebuffer */
     LOGFQUEUE("buffering >| Q_BUFFER_HANDLE");
     queue_send(&buffering_queue, Q_BUFFER_HANDLE, handle_id);
-
-    h->ridx = h->data;
 }
 
 static bool close_handle(int handle_id)
@@ -814,8 +812,9 @@ static void shrink_handle(struct memory_handle *h)
 static bool fill_buffer(void)
 {
     logf("fill_buffer()");
-    struct memory_handle *m = first_handle;
-    shrink_handle(m);
+    struct memory_handle *m;
+    shrink_handle(first_handle);
+    m = first_handle;
     while (queue_empty(&buffering_queue) && m) {
         if (m->filerem > 0) {
             if (!buffer_handle(m->id)) {
