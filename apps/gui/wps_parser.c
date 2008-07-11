@@ -828,7 +828,7 @@ static int parse_progressbar(const char *wps_bufptr,
     int line_y_pos = font_height*(wps_data->num_lines - 
             wps_data->viewports[wps_data->num_viewports].first_line);
     
-    if (wps_data->progressbar_count +1 >= MAX_PROGRESSBARS)
+    if (wps_data->progressbar_count >= MAX_PROGRESSBARS)
         return WPS_ERROR_INVALID_PARAM;
     
     pb = &wps_data->progressbar[wps_data->progressbar_count];
@@ -841,8 +841,7 @@ static int parse_progressbar(const char *wps_bufptr,
         pb->height = SYSFONT_HEIGHT-2;
         pb->y = line_y_pos + (font_height-pb->height)/2;
 
-        wps_data->viewports[wps_data->num_viewports].pb =
-                &wps_data->progressbar[wps_data->progressbar_count];
+        wps_data->viewports[wps_data->num_viewports].pb = pb;
         wps_data->progressbar_count++;
         return 0;
     }
@@ -869,9 +868,7 @@ static int parse_progressbar(const char *wps_bufptr,
         pb->y = y;
     else
         pb->y = line_y_pos + (font_height-pb->height)/2;
-    wps_data->progressbar[wps_data->progressbar_count].have_bitmap_pb = false;
-    wps_data->viewports[wps_data->num_viewports].pb =
-            &wps_data->progressbar[wps_data->progressbar_count];
+    wps_data->viewports[wps_data->num_viewports].pb = pb;
     wps_data->progressbar_count++;
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr)-1;
