@@ -126,6 +126,15 @@ struct align_pos {
                                 (1/HZ sec, or 100ths of sec) */
 #define SUBLINE_RESET -1
 
+enum wps_parse_error {
+    PARSE_OK,
+    PARSE_FAIL_UNCLOSED_COND,
+    PARSE_FAIL_INVALID_CHAR,
+    PARSE_FAIL_COND_SYNTAX_ERROR,
+    PARSE_FAIL_COND_INVALID_PARAM,
+    PARSE_FAIL_LIMITS_EXCEEDED,
+};
+
 enum wps_token_type {
     WPS_NO_TOKEN,   /* for WPS tags we don't want to save as tokens */
     WPS_TOKEN_UNKNOWN,

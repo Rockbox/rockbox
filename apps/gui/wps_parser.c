@@ -59,11 +59,6 @@
 
 #define WPS_ERROR_INVALID_PARAM         -1
 
-#define PARSE_FAIL_UNCLOSED_COND        1
-#define PARSE_FAIL_INVALID_CHAR         2
-#define PARSE_FAIL_COND_SYNTAX_ERROR    3
-#define PARSE_FAIL_COND_INVALID_PARAM   4
-
 /* level of current conditional.
    -1 means we're not in a conditional. */
 static int level = -1;
@@ -1186,7 +1181,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
 
     char *stringbuf = data->string_buffer;
     int stringbuf_used = 0;
-    int fail = 0;
+    enum wps_parse_error fail = PARSE_OK;
     int ret;
     line = 1;
     level = -1;
@@ -1205,6 +1200,11 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                     fail = PARSE_FAIL_COND_INVALID_PARAM;
                     break;
                 }
+                else if (level >= WPS_MAX_COND_LEVEL - 1)
+                {
+                    fail = PARSE_FAIL_LIMITS_EXCEEDED;
+                    break;
+                }
                 wps_bufptr += ret;
                 break;
 
@@ -1219,7 +1219,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                 if (data->num_sublines+1 < WPS_MAX_SUBLINES)
                     wps_start_new_subline(data);
                 else
-                    wps_bufptr += skip_end_of_line(wps_bufptr);
+                    fail = PARSE_FAIL_LIMITS_EXCEEDED;
 
                 break;
 
@@ -1343,38 +1343,35 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                     /* If a matching string is found, found is true and i is
                        the index of the string. If not, found is false */
 
-                    /* If it's NOT a duplicate, do nothing if we already have
-                       too many unique strings */
-                    if (found ||
-                        (stringbuf_used < STRING_BUFFER_SIZE - 1 &&
-                         data->num_strings < WPS_MAX_STRINGS))
+                    if (!found)
                     {
-                        if (!found)
+                        /* new string */
+
+                        if (stringbuf_used + len > STRING_BUFFER_SIZE - 1
+                            || data->num_strings >= WPS_MAX_STRINGS)
                         {
-                            /* new string */
-
-                            /* truncate? */
-                            if (stringbuf_used + len > STRING_BUFFER_SIZE - 1)
-                                len = STRING_BUFFER_SIZE - stringbuf_used - 1;
-
-                            strncpy(stringbuf, string_start, len);
-                            *(stringbuf + len) = '\0';
-
-                            data->strings[data->num_strings] = stringbuf;
-                            stringbuf += len + 1;
-                            stringbuf_used += len + 1;
-                            data->tokens[data->num_tokens].value.i =
-                                data->num_strings;
-                            data->num_strings++;
+                            /* too many strings or characters */
+                            fail = PARSE_FAIL_LIMITS_EXCEEDED;
+                            break;
                         }
-                        else
-                        {
-                            /* another ocurrence of an existing string */
-                            data->tokens[data->num_tokens].value.i = i;
-                        }
-                        data->tokens[data->num_tokens].type = WPS_TOKEN_STRING;
-                        data->num_tokens++;
+
+                        strncpy(stringbuf, string_start, len);
+                        *(stringbuf + len) = '\0';
+
+                        data->strings[data->num_strings] = stringbuf;
+                        stringbuf += len + 1;
+                        stringbuf_used += len + 1;
+                        data->tokens[data->num_tokens].value.i =
+                            data->num_strings;
+                        data->num_strings++;
                     }
+                    else
+                    {
+                        /* another occurrence of an existing string */
+                        data->tokens[data->num_tokens].value.i = i;
+                    }
+                    data->tokens[data->num_tokens].type = WPS_TOKEN_STRING;
+                    data->num_tokens++;
                 }
                 break;
         }
@@ -1382,6 +1379,10 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
 
     if (!fail && level >= 0) /* there are unclosed conditionals */
         fail = PARSE_FAIL_UNCLOSED_COND;
+    
+    if (*wps_bufptr && !fail)
+        /* one of the limits of the while loop was exceeded */
+        fail = PARSE_FAIL_LIMITS_EXCEEDED;
 
     data->viewports[data->num_viewports].last_line = data->num_lines - 1;
 

@@ -30,11 +30,6 @@
 #include "debug.h"
 #endif
 
-#define PARSE_FAIL_UNCLOSED_COND        1
-#define PARSE_FAIL_INVALID_CHAR         2
-#define PARSE_FAIL_COND_SYNTAX_ERROR    3
-#define PARSE_FAIL_COND_INVALID_PARAM   4
-
 #if defined(SIMULATOR) || defined(__PCTOOL__)
 extern bool debug_wps;
 extern int wps_verbose_level;
@@ -574,7 +569,7 @@ static void print_wps_strings(struct wps_data *data)
 }
 #endif
 
-void print_debug_info(struct wps_data *data, int fail, int line)
+void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line)
 {
 #if defined(SIMULATOR) || defined(__PCTOOL__)
     if (debug_wps && wps_verbose_level)
@@ -590,13 +585,16 @@ void print_debug_info(struct wps_data *data, int fail, int line)
                WPS_MAX_TOKENS - 1);
     }
 
-    if (fail)
+    if (fail != PARSE_OK)
     {
         char buf[64];
 
         DEBUGF("Failed parsing on line %d : ", line);
         switch (fail)
         {
+            case PARSE_OK:
+                break;
+                
             case PARSE_FAIL_UNCLOSED_COND:
                 DEBUGF("Unclosed conditional");
                 break;
@@ -623,6 +621,10 @@ void print_debug_info(struct wps_data *data, int fail, int line)
                        get_token_desc(&data->tokens[data->num_tokens], data,
                                       buf, sizeof(buf))
                       );
+                break;
+                
+            case PARSE_FAIL_LIMITS_EXCEEDED:
+                DEBUGF("Limits exceeded");
                 break;
         }
         DEBUGF("\n");
