@@ -44,8 +44,6 @@ public:
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
 
     void setOverwriteTalk(bool ov) {m_overwriteTalk = ov;}
-    void setOverwriteWav(bool ov) {m_overwriteWav = ov;}
-    void setRemoveWav(bool ov) {m_removeWav = ov;}
     void setRecursive(bool ov) {m_recursive = ov;}
     void setStripExtensions(bool ov) {m_stripExtensions = ov;}
     void setTalkFolders(bool ov) {m_talkFolders = ov;} 
@@ -55,16 +53,25 @@ private slots:
     void abort();
 
 private:
+    bool cleanup(QStringList list);
+    QString stripExtension(QString filename);
+    void doAbort(QStringList cleanupList);
+    void resetProgress(int max);
+    bool createDirAndFileMaps(QDir startDir,QMultiMap<QString,QString> *dirMap,QMultiMap<QString,QString> *fileMap);
+    bool voiceList(QStringList toSpeak,QString* errString);
+    bool encodeList(QStringList toEncode,QString* errString);
+    bool copyTalkDirFiles(QMultiMap<QString,QString> dirMap,QString* errString);
+    bool copyTalkFileFiles(QMultiMap<QString,QString> fileMap,QString* errString);
+    
     TTSBase* m_tts;
     EncBase* m_enc;
     RbSettings* settings;
    
     QDir   m_dir;
     QString m_mountpoint;
+    int m_progress;
  
     bool m_overwriteTalk;
-    bool m_overwriteWav;
-    bool m_removeWav;
     bool m_recursive;
     bool m_stripExtensions;
     bool m_talkFolders;
