@@ -49,6 +49,7 @@ void Uninstaller::uninstall(ProgressloggerInterface* dp)
     for(int i=0; i< uninstallSections.size() ; i++)
     {
         m_dp->addItem(tr("Uninstalling ") + uninstallSections.at(i) + " ...",LOGINFO);
+        QCoreApplication::processEvents();
         // create list of all other install sections
         QStringList sections = installlog.childGroups();
         sections.removeAt(sections.indexOf(uninstallSections.at(i)));
@@ -80,6 +81,7 @@ void Uninstaller::uninstall(ProgressloggerInterface* dp)
                 if(deleteFile && !QFile::remove(toDelete.filePath()))
                     m_dp->addItem(tr("Could not delete: ")+ toDelete.filePath(),LOGWARNING);
                 installlog.remove(toDeleteList.at(j));
+                qDebug() << "deleted: " << toDelete.filePath() ;
             }
             else  // if it is a dir, remember it for later deletion
             {
@@ -88,6 +90,7 @@ void Uninstaller::uninstall(ProgressloggerInterface* dp)
                 dirList << toDeleteList.at(j);
             }
             installlog.endGroup();
+            QCoreApplication::processEvents();
         }
         // delete the dirs
         installlog.beginGroup(uninstallSections.at(i));
