@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 #include "ata.h"
-#include "ata-target.h"
+#include "ata-nand-target.h"
 #include "system.h"
 #include <string.h>
 #include "led.h"
@@ -47,43 +47,38 @@ static struct mutex ata_mtx SHAREDBSS_ATTR;
 
 #define SECTOR_SIZE 512
 
-/* TCC780x NAND Flash Controller */
+#ifdef COWON_D2
+#define SEGMENT_ID_BIGENDIAN
+#define BLOCKS_PER_SEGMENT  4
+#else
+#define BLOCKS_PER_SEGMENT  1
+#endif
+/* NB: blocks_per_segment should become a runtime check based on NAND id */
 
-#define NFC_CMD    (*(volatile unsigned long *)0xF0053000)
-#define NFC_SADDR  (*(volatile unsigned long *)0xF005300C)
-#define NFC_SDATA  (*(volatile unsigned long *)0xF0053040)
-#define NFC_WDATA  (*(volatile unsigned long *)0xF0053010)
-#define NFC_CTRL   (*(volatile unsigned long *)0xF0053050)
-    #define NFC_16BIT (1<<26)
-    #define NFC_CS0   (1<<23)
-    #define NFC_CS1   (1<<22)
-    #define NFC_READY (1<<20)
-#define NFC_IREQ   (*(volatile unsigned long *)0xF0053060)
-#define NFC_RST    (*(volatile unsigned long *)0xF0053064)
+/* Segment type identifiers - main data area */
+#define SEGMENT_MAIN_LPT   0x12
+#define SEGMENT_MAIN_DATA1 0x13
+#define SEGMENT_MAIN_CACHE 0x15
+#define SEGMENT_MAIN_DATA2 0x17
 
-/* TCC780x ECC Controller */
+/* We don't touch the hidden area at all - these are for reference */
+#define SEGMENT_HIDDEN_LPT   0x22
+#define SEGMENT_HIDDEN_DATA1 0x23
+#define SEGMENT_HIDDEN_CACHE 0x25
+#define SEGMENT_HIDDEN_DATA2 0x27
 
-#define ECC_CTRL    (*(volatile unsigned long *)0xF005B000)
-    #define ECC_M4EN  (1<<6)
-    #define ECC_ENC   (1<<27)
-    #define ECC_READY (1<<26)
-#define ECC_BASE    (*(volatile unsigned long *)0xF005B004)
-#define ECC_CLR     (*(volatile unsigned long *)0xF005B00C)
-#define ECC_MLC0W   (*(volatile unsigned long *)0xF005B030)
-#define ECC_MLC1W   (*(volatile unsigned long *)0xF005B034)
-#define ECC_MLC2W   (*(volatile unsigned long *)0xF005B038)
-#define ECC_ERRADDR (*(volatile unsigned long *)0xF005B050)
-#define ECC_ERRDATA (*(volatile unsigned long *)0xF005B060)
-#define ECC_ERR     (*(volatile unsigned long *)0xF005B070)
+/* Offsets to spare area data */
+#define OFF_CACHE_PAGE_LOBYTE 2
+#define OFF_CACHE_PAGE_HIBYTE 3
+#define OFF_SEGMENT_TYPE      4
 
-/* GPIOs */
-
-#define NAND_GPIO_SET(n)    GPIOB_SET = n
-#define NAND_GPIO_CLEAR(n)  GPIOB_CLEAR = n
-#define NAND_GPIO_OUT_EN(n) GPIOB_DIR |= n
-
-#define WE_GPIO_BIT (1<<19) /* Write Enable */
-#define CS_GPIO_BIT (1<<21) /* Chip Select (4 banks when used with NFC_CSx) */
+#ifdef SEGMENT_ID_BIGENDIAN
+#define OFF_LOG_SEG_LOBYTE    7
+#define OFF_LOG_SEG_HIBYTE    6
+#else
+#define OFF_LOG_SEG_LOBYTE    6
+#define OFF_LOG_SEG_HIBYTE    7
+#endif
 
 /* Chip characteristics, initialised by nand_get_chip_info() */
 
@@ -106,7 +101,6 @@ static int segments_per_bank   = 0;
 #define MAX_SPARE_SIZE      128
 #define MAX_BLOCKS_PER_BANK 8192
 #define MAX_PAGES_PER_BLOCK 128
-#define BLOCKS_PER_SEGMENT  4
 #define MAX_BANKS           4
 
 #define MAX_SEGMENTS (MAX_BLOCKS_PER_BANK * MAX_BANKS / BLOCKS_PER_SEGMENT)
@@ -152,6 +146,7 @@ static unsigned int ecc_fail_count = 0;
 
 static inline int phys_segment_to_page_addr(int phys_segment, int page_in_seg)
 {
+#if BLOCKS_PER_SEGMENT == 4 /* D2 */
     int page_addr = phys_segment * pages_per_block * 2;
 
     if (page_in_seg & 1)
@@ -167,6 +162,9 @@ static inline int phys_segment_to_page_addr(int phys_segment, int page_in_seg)
     }
 
     page_addr += page_in_seg/4;
+#elif BLOCKS_PER_SEGMENT == 1 /* M200 */
+    int page_addr = (phys_segment * pages_per_block) + page_in_seg;
+#endif
 
     return page_addr;
 }
@@ -386,6 +384,18 @@ static void nand_get_chip_info(void)
 
             switch(id_buf[1]) /* Chip Id */
             {
+                case 0xD3:  /* K9K8G08UOM */
+
+                    page_size       = 2048;
+                    spare_size      = 64;
+                    pages_per_block = 64;
+                    blocks_per_bank = 8192;
+                    col_cycles      = 2;
+                    row_cycles      = 3;
+
+                    found = true;
+                    break;
+
                 case 0xD5:  /* K9LAG08UOM */
 
                     page_size       = 2048;
@@ -585,7 +595,8 @@ static void read_lpt_block(int bank, int phys_segment)
                           SECTOR_SIZE, /* offset */
                           16, spare_buf);
 
-            int first_log_segment = (spare_buf[6] << 8) | spare_buf[7];
+            int first_log_segment = (spare_buf[OFF_LOG_SEG_HIBYTE] << 8) |
+                                     spare_buf[OFF_LOG_SEG_LOBYTE];
 
             lpt_ptr = &lpt_lookup[first_log_segment];
 
@@ -636,8 +647,11 @@ static void read_write_cache_segment(int bank, int phys_segment)
                       SECTOR_SIZE, /* offset to first sector's spare */
                       16, spare_buf);
 
-        cached_page = (spare_buf[3] << 8) | spare_buf[2]; /* why does endian */
-        log_segment = (spare_buf[6] << 8) | spare_buf[7]; /* -ness differ? */
+        cached_page = (spare_buf[OFF_CACHE_PAGE_HIBYTE] << 8) |
+                       spare_buf[OFF_CACHE_PAGE_LOBYTE];
+
+        log_segment = (spare_buf[OFF_LOG_SEG_HIBYTE] << 8) |
+                       spare_buf[OFF_LOG_SEG_LOBYTE];
 
         if (cached_page != 0xFFFF)
         {
@@ -751,18 +765,25 @@ int ata_init(void)
 
     if (initialized) return 0;
 
+#ifdef CPU_TCC77X
+    CSCFG2 = 0x318a8010;
+
+    GPIOC_FUNC &= ~(CS_GPIO_BIT | WE_GPIO_BIT);
+    GPIOC_FUNC |= 0x1;
+#endif
+    
     /* Set GPIO direction for chip select & write protect */
     NAND_GPIO_OUT_EN(CS_GPIO_BIT | WE_GPIO_BIT);
 
     /* Get chip characteristics and number of banks */
     nand_get_chip_info();
-    
+
     for (i = 0; i < MAX_SEGMENTS; i++)
     {
         lpt_lookup[i].bank = -1;
         lpt_lookup[i].phys_segment = -1;
     }
-    
+
     write_caches_in_use = 0;
 
     for (i = 0; i < MAX_WRITE_CACHES; i++)
@@ -773,7 +794,7 @@ int ata_init(void)
         write_caches[i].bank = -1;
         write_caches[i].phys_segment = -1;
         
-        for (page = 0; page < MAX_PAGES_PER_BLOCK * 4; page++)
+        for (page = 0; page < MAX_PAGES_PER_BLOCK * BLOCKS_PER_SEGMENT; page++)
         {
             write_caches[i].page_map[page] = -1;
         }
@@ -792,28 +813,30 @@ int ata_init(void)
             switch (spare_buf[4]) /* block type */
             {
 #ifdef USE_TCC_LPT
-                case 0x12:
+                case SEGMENT_MAIN_LPT:
                 {
                     /* Log->Phys Translation table (for Main data area) */
                     read_lpt_block(bank, phys_segment);
                     break;
                 }
 #else
-                case 0x17:
+                case SEGMENT_MAIN_DATA2:
                 {
                     /* Main data area segment */
-                    unsigned short segment = (spare_buf[6] << 8) | spare_buf[7];
+                    unsigned short log_segment
+                      = (spare_buf[OFF_LOG_SEG_HIBYTE] << 8) |
+                         spare_buf[OFF_LOG_SEG_LOBYTE];
 
-                    if (segment < MAX_SEGMENTS)
+                    if (log_segment < MAX_SEGMENTS)
                     {
-                        lpt_lookup[segment].bank = bank;
-                        lpt_lookup[segment].phys_segment = phys_segment;
+                        lpt_lookup[log_segment].bank = bank;
+                        lpt_lookup[log_segment].phys_segment = phys_segment;
                     }
                     break;
                 }
 #endif
 
-                case 0x15:
+                case SEGMENT_MAIN_CACHE:
                 {
                     /* Recently-written page data (for Main data area) */
                     read_write_cache_segment(bank, phys_segment);
@@ -836,16 +859,18 @@ int ata_init(void)
 
             switch (spare_buf[4]) /* block type */
             {
-                case 0x13:
+                case SEGMENT_MAIN_DATA1:
                 {
                     /* Main data area segment */
-                    unsigned short segment = (spare_buf[6] << 8) | spare_buf[7];
+                    unsigned short log_segment
+                      = (spare_buf[OFF_LOG_SEG_HIBYTE] << 8) |
+                         spare_buf[OFF_LOG_SEG_LOBYTE];
 
-                    if (segment < MAX_SEGMENTS)
+                    if (log_segment < MAX_SEGMENTS)
                     {
-                        /* 0x17 seems to override 0x13, so store in our LPT */
-                        lpt_lookup[segment].bank = bank;
-                        lpt_lookup[segment].phys_segment = phys_segment;
+                        /* 0x13 seems to override 0x17, so store in our LPT */
+                        lpt_lookup[log_segment].bank = bank;
+                        lpt_lookup[log_segment].phys_segment = phys_segment;
                     }
                     break;
                 }

@@ -59,6 +59,10 @@
 #define PCLKCFG5   (*(volatile unsigned long *)0x80000430)
 #define PCLKCFG6   (*(volatile unsigned long *)0x80000434)
 
+/* Device bits for SWRESET & BCLKCTR */
+
+#define DEV_NAND (1<<16)
+
 /* ADC */
 
 #define ADCCON     (*(volatile unsigned long *)0x80000a00)
@@ -141,5 +145,19 @@
 #define TF1 (1<<9) /* Timer 1 reference value reached */
 #define TI0 (1<<0) /* Timer 0 IRQ flag */
 #define TI1 (1<<1) /* Timer 1 IRQ flag */
+
+/* NAND Flash Controller */
+
+#define NFC_CMD    (*(volatile unsigned long *)0x90000000)
+#define NFC_SADDR  (*(volatile unsigned long *)0x9000000C)
+#define NFC_SDATA  (*(volatile unsigned long *)0x90000040)
+#define NFC_WDATA  (*(volatile unsigned long *)0x90000010)
+#define NFC_CTRL   (*(volatile unsigned long *)0x90000050)
+    #define NFC_16BIT (1<<26)
+    #define NFC_CS0   (1<<23)
+    #define NFC_CS1   (1<<22)
+    #define NFC_READY (1<<20)
+#define NFC_IREQ   (*(volatile unsigned long *)0x90000060)
+#define NFC_RST    (*(volatile unsigned long *)0x90000064)
 
 #endif

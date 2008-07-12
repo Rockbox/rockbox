@@ -21,4 +21,13 @@
 #ifndef ATA_TARGET_H
 #define ATA_TARGET_H
 
+/* GPIOs */
+
+#define NAND_GPIO_SET(n)    GPIOB_SET = n
+#define NAND_GPIO_CLEAR(n)  GPIOB_CLEAR = n
+#define NAND_GPIO_OUT_EN(n) GPIOB_DIR |= n
+
+#define WE_GPIO_BIT (1<<19) /* Write Enable */
+#define CS_GPIO_BIT (1<<21) /* Chip Select (4 banks when used with NFC_CSx) */
+
 #endif

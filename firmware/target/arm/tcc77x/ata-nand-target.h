@@ -21,4 +21,13 @@
 #ifndef ATA_TARGET_H
 #define ATA_TARGET_H
 
+/* GPIOs */
+
+#define NAND_GPIO_SET(n)    GPIOC |= n
+#define NAND_GPIO_CLEAR(n)  GPIOC &= (~n)
+#define NAND_GPIO_OUT_EN(n) GPIOC_DIR |= n
+
+#define CS_GPIO_BIT (1<<24) /* Chip Select */
+#define WE_GPIO_BIT (1<<25) /* Write Enable */
+
 #endif

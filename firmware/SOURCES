@@ -956,8 +956,8 @@ target/arm/pnx0101/pcm-pnx0101.c
 
 #ifdef LOGIK_DAX
 #ifndef SIMULATOR
+target/arm/ata-nand-telechips.c
 target/arm/tcc77x/adc-tcc77x.c
-target/arm/tcc77x/ata-nand-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/lcd-ssd1815.c
 target/arm/tcc77x/powermgmt-tcc77x.c
@@ -975,8 +975,8 @@ target/arm/tcc77x/pcm-tcc77x.c
 
 #ifdef SANSA_M200
 #ifndef SIMULATOR
+target/arm/ata-nand-telechips.c
 target/arm/tcc77x/adc-tcc77x.c
-target/arm/tcc77x/ata-nand-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/lcd-ssd1815.c
 target/arm/tcc77x/powermgmt-tcc77x.c
@@ -994,8 +994,8 @@ target/arm/tcc77x/pcm-tcc77x.c
 
 #ifdef SANSA_C100
 #ifndef SIMULATOR
+target/arm/ata-nand-telechips.c
 target/arm/tcc77x/adc-tcc77x.c
-target/arm/tcc77x/ata-nand-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/c100/lcd-S6B33B2.c
 target/arm/tcc77x/powermgmt-tcc77x.c
@@ -1013,8 +1013,8 @@ target/arm/tcc77x/pcm-tcc77x.c
 
 #ifdef IAUDIO_7
 #ifndef SIMULATOR
+target/arm/ata-nand-telechips.c
 target/arm/tcc77x/adc-tcc77x.c
-target/arm/tcc77x/ata-nand-tcc77x.c
 target/arm/tcc77x/system-tcc77x.c
 target/arm/tcc77x/iaudio7/lcd-iaudio7.c
 target/arm/tcc77x/iaudio7/power-iaudio7.c
@@ -1025,8 +1025,8 @@ target/arm/tcc77x/iaudio7/power-iaudio7.c
 #ifndef SIMULATOR
 drivers/pcf50606.c
 target/arm/lcd-as-memframe.S
+target/arm/ata-nand-telechips.c
 target/arm/tcc780x/adc-tcc780x.c
-target/arm/tcc780x/ata-nand-tcc780x.c
 target/arm/tcc780x/system-tcc780x.c
 target/arm/tcc780x/cowond2/button-cowond2.c
 target/arm/tcc780x/cowond2/lcd-cowond2.c

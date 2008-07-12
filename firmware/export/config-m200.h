@@ -6,6 +6,9 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 29
 
+/* Enable FAT16 support */
+#define HAVE_FAT16SUPPORT
+
 /* define this if you have recording possibility */
 //#define HAVE_RECORDING
 

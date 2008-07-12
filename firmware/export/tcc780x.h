@@ -195,4 +195,33 @@
 
 #define TCC780_VER (*(volatile unsigned long *)0xE0001FFC)
 
+/* NAND Flash Controller */
+
+#define NFC_CMD    (*(volatile unsigned long *)0xF0053000)
+#define NFC_SADDR  (*(volatile unsigned long *)0xF005300C)
+#define NFC_SDATA  (*(volatile unsigned long *)0xF0053040)
+#define NFC_WDATA  (*(volatile unsigned long *)0xF0053010)
+#define NFC_CTRL   (*(volatile unsigned long *)0xF0053050)
+    #define NFC_16BIT (1<<26)
+    #define NFC_CS0   (1<<23)
+    #define NFC_CS1   (1<<22)
+    #define NFC_READY (1<<20)
+#define NFC_IREQ   (*(volatile unsigned long *)0xF0053060)
+#define NFC_RST    (*(volatile unsigned long *)0xF0053064)
+
+/* ECC Controller */
+
+#define ECC_CTRL    (*(volatile unsigned long *)0xF005B000)
+    #define ECC_M4EN  (1<<6)
+    #define ECC_ENC   (1<<27)
+    #define ECC_READY (1<<26)
+#define ECC_BASE    (*(volatile unsigned long *)0xF005B004)
+#define ECC_CLR     (*(volatile unsigned long *)0xF005B00C)
+#define ECC_MLC0W   (*(volatile unsigned long *)0xF005B030)
+#define ECC_MLC1W   (*(volatile unsigned long *)0xF005B034)
+#define ECC_MLC2W   (*(volatile unsigned long *)0xF005B038)
+#define ECC_ERRADDR (*(volatile unsigned long *)0xF005B050)
+#define ECC_ERRDATA (*(volatile unsigned long *)0xF005B060)
+#define ECC_ERR     (*(volatile unsigned long *)0xF005B070)
+
 #endif
