@@ -97,8 +97,6 @@ void InstallTalkWindow::accept()
     talkcreator->setMountPoint(settings->mountpoint());
     
     talkcreator->setOverwriteTalk(ui.OverwriteTalk->isChecked());
-    talkcreator->setOverwriteWav(true);
-    talkcreator->setRemoveWav(true);
     talkcreator->setRecursive(ui.recursive->isChecked());
     talkcreator->setStripExtensions(ui.StripExtensions->isChecked());
     talkcreator->setTalkFolders(ui.talkFolders->isChecked());
