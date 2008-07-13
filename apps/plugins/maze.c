@@ -176,8 +176,8 @@ void maze_draw(struct maze* maze, struct screen* display)
     int point_width, point_height, point_offset_x, point_offset_y;
     unsigned short cell;
 
-    wx = (int) display->getwidth() / MAZE_WIDTH;
-    wy = (int) display->getheight() / MAZE_HEIGHT;
+    wx = (int) display->lcdwidth / MAZE_WIDTH;
+    wy = (int) display->lcdheight / MAZE_HEIGHT;
 
     if(wx>3){
         point_width=wx-3;
@@ -483,6 +483,9 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     /* Turn off backlight timeout */
     backlight_force_on(rb); /* backlight control in lib/helper.c */
+    
+    FOR_NB_SCREENS(i)
+        rb->screens[i]->set_viewport(NULL);
     
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
