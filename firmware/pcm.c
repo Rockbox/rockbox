@@ -221,7 +221,7 @@ void pcm_play_data(pcm_more_callback_type get_more,
 
     pcm_callback_for_more = get_more;
 
-    logf(" pcm_play_dma_start");
+    logf(" pcm_play_data_start");
     pcm_play_data_start(start, size);
 
     pcm_play_unlock();
