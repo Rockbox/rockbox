@@ -11617,44 +11617,44 @@
 </phrase>
 <phrase>
   id: LANG_STUDY_MODE
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Study Mode"
+    *: ""
   </dest>
   <voice>
-    *: "Study Mode"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_STUDY_HOP_STEP
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Study Increment"
+    *: ""
   </source>
   <dest>
-    *: "Study Increment"
+    *: ""
   </dest>
   <voice>
-    *: "Study Increment"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ENABLE_STUDY_MODE
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Enable Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Enable Study Mode"
+    *: ""
   </dest>
   <voice>
-    *: "Enable Study Mode"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11806,3 +11806,32 @@
     *: "Fast"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SKIP_LENGTH
+  desc: playback settings menu
+  user:
+  <source>
+    *: "Skip Length"
+  </source>
+  <dest>
+    *: "Skip Length"
+  </dest>
+  <voice>
+    *: "Skip Length"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_TRACK
+  desc: skip length setting entry 0
+  user:
+  <source>
+    *: "Skip Track"
+  </source>
+  <dest>
+    *: "Skip Track"
+  </dest>
+  <voice>
+    *: "Skip Track"
+  </voice>
+</phrase>
+

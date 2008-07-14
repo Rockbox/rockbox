@@ -162,9 +162,9 @@ bool update_onvol_change(struct gui_wps * gwps)
 void play_hop(int direction)
 {
     if(!wps_state.id3 || !wps_state.id3->length
-       || global_settings.study_hop_step == 0)
+       || global_settings.skip_length == 0)
         return;
-#define STEP ((unsigned)global_settings.study_hop_step *1000)
+#define STEP ((unsigned)global_settings.skip_length*60*1000)
     if(direction == 1
        && wps_state.id3->length - wps_state.id3->elapsed < STEP+1000) {
 #if CONFIG_CODEC == SWCODEC

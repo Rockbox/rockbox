@@ -362,11 +362,11 @@ long gui_wps_show(void)
                 break;
             /* fast forward 
                 OR next dir if this is straight after ACTION_WPS_SKIPNEXT
-                OR in study mode, next track if straight after SKIPPREV. */
+                OR if skip length set, next track if straight after SKIPPREV. */
             case ACTION_WPS_SEEKFWD:
                 if (global_settings.party_mode)
                     break;
-                if (!global_settings.study_mode
+                if (global_settings.skip_length == 0
                     && current_tick -last_right < HZ)
                 {
                     if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
@@ -378,7 +378,7 @@ long gui_wps_show(void)
                         audio_next_dir();
                     }
                 }
-                else if(global_settings.study_mode
+                else if (global_settings.skip_length > 0
                         && current_tick -last_left < HZ) {
                     next_track();
                     update_track = true;
@@ -388,12 +388,12 @@ long gui_wps_show(void)
                 break;
             /* fast rewind 
                 OR prev dir if this is straight after ACTION_WPS_SKIPPREV,
-                OR in study mode, beg of track or prev track if this is
+                OR if skip length set, beg of track or prev track if this is
                 straight after SKIPPREV */
             case ACTION_WPS_SEEKBACK:
                 if (global_settings.party_mode)
                     break;
-                if (!global_settings.study_mode
+                if (global_settings.skip_length == 0
                     && current_tick -last_left < HZ)
                 {
                     if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
@@ -411,10 +411,10 @@ long gui_wps_show(void)
                         audio_prev_dir();
                     }
                 }
-                else if(global_settings.study_mode
+                else if (global_settings.skip_length > 0
                         && current_tick -last_right < HZ)
                 {
-                    prev_track(3+global_settings.study_hop_step);
+                    prev_track(3+global_settings.skip_length*60);
                     update_track = true;
                 }
                 else ffwd_rew(ACTION_WPS_SEEKBACK);
@@ -446,13 +446,13 @@ long gui_wps_show(void)
                 /* ...otherwise, do it normally */
 #endif
 
-                if(global_settings.study_mode)
+                if (global_settings.skip_length > 0)
                     play_hop(-1);
                 else prev_track(3);
                 break;
 
                 /* next
-                   OR in study mode, hop by predetermined amount. */
+                   OR if skip length set, hop by predetermined amount. */
             case ACTION_WPS_SKIPNEXT:
                 if (global_settings.party_mode)
                     break;
@@ -477,7 +477,7 @@ long gui_wps_show(void)
                 /* ...otherwise, do it normally */
 #endif
 
-                if(global_settings.study_mode)
+                if (global_settings.skip_length > 0)
                     play_hop(1);
                 else next_track();
                 break;
@@ -496,7 +496,7 @@ long gui_wps_show(void)
                 else
 #endif
                 {
-                    if(global_settings.study_mode)
+                    if (global_settings.skip_length > 0)
                         next_track();
                     else audio_next_dir();
                 }
@@ -510,7 +510,7 @@ long gui_wps_show(void)
                 else
 #endif
                 {
-                    if(global_settings.study_mode)
+                    if (global_settings.skip_length > 0)
                         prev_track(3);
                     else audio_prev_dir();
                 }

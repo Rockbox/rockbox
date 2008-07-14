@@ -740,8 +740,7 @@ struct user_settings
     int keyclick_repeats; /* keyclick on repeats */
 #endif
     unsigned char playlist_catalog_dir[MAX_FILENAME+1];
-    bool study_mode; /* study mode enabled */
-    int study_hop_step; /* hop step in study mode, in seconds */
+    int skip_length; /* skip length */
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
     int touchpad_sensitivity;
 #endif

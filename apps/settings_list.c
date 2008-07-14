@@ -257,6 +257,23 @@ static int32_t getlang_unit_0_is_off(int value, int unit)
         return TALK_ID(value,unit);
 }
 
+static void formatter_unit_0_is_skip_track(char *buffer, size_t buffer_size,
+                                           int val, const char *unit)
+{
+    if (val == 0)
+        strcpy(buffer, str(LANG_SKIP_TRACK));
+    else
+        snprintf(buffer, buffer_size, "%d %s", val, unit);
+}
+
+static int32_t getlang_unit_0_is_skip_track(int value, int unit)
+{
+    if (value == 0)
+        return LANG_SKIP_TRACK;
+    else
+        return TALK_ID(value, unit);
+}
+
 #ifdef HAVE_BACKLIGHT
 static void backlight_formatter(char *buffer, size_t buffer_size,
                                 int val, const char *unit)
@@ -1234,10 +1251,10 @@ const struct settings_list settings[] = {
 #endif
     OFFON_SETTING(0,cuesheet,LANG_CUESHEET_ENABLE,false,"cuesheet support",
                   NULL),
-    OFFON_SETTING(0,study_mode,LANG_ENABLE_STUDY_MODE,false,"Study mode",
-                  NULL),
-    INT_SETTING(0, study_hop_step, LANG_STUDY_HOP_STEP, 5, "Study hop step",
-                UNIT_SEC, 0, 250, 1, NULL, NULL, NULL),
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, skip_length,
+                  LANG_SKIP_LENGTH, 0, "skip length", "track",
+                  UNIT_MIN, formatter_unit_0_is_skip_track,
+                  getlang_unit_0_is_skip_track, NULL, 8, 0,1,2,3,4,5,10,15),
     CHOICE_SETTING(0, start_in_screen, LANG_START_SCREEN, 1, 
                    "start in screen", "previous,root,files,db,wps,menu,"
 #ifdef HAVE_RECORDING
