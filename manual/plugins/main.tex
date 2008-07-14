@@ -1,10 +1,10 @@
 % $Id$ %
 \chapter{Plugins}\label{ref:plugins}
-Plugins are little programs that Rockbox can load and run. Only one plugin can
+Plugins are programs that Rockbox can load and run. Only one plugin can
 be loaded at a time. Plugins have exclusive control over the user interface.
-This means you cannot switch back and forth between a plugin and Rockbox, a
-plugin is loaded, run and then exited, which returns control to Rockbox. Most
-plugins will not interfere with music playback but some of them will stop
+This means you cannot switch back and forth between a plugin and Rockbox. When
+a plugin is loaded, you need to exit it to return to the Rockbox interface.
+Most plugins will not interfere with music playback but some of them will stop
 playback while running. Plugins have the file extension \fname{.rock}. Most of
 them can be started from \setting{Browse Plugins} in the \setting{Main Menu}.
 

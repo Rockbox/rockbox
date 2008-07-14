@@ -1,7 +1,7 @@
 % $Id$ %
 \screenshot{configure_rockbox/images/ss-sound-settings}{The sound settings screen}{}
 
-The Sound Settings menu offers a selection of sound properties you may 
+The sound settings menu offers a selection of sound settings you may 
 change to customise your listening experience.
 
 \section{\label{ref:volume}Volume}
@@ -28,22 +28,15 @@ change to customise your listening experience.
   \opt{ipod3g,ipod4g,gigabeatf,mrobe100}{\fixme{add correct volume range.}}
 
 \section{Bass}
-  \opt{player,recorder,recorderv2fm,ondio}{This emphasises or suppresses the
-  lower (bass) frequencies in the track. 0 means that bass sounds are unaltered
-  (flat response).}
-  \opt{h1xx,h300}{The bass setting can be used to increase (but not decrease)
-  frequencies below 300Hz. Bass boost can be set from 0 to 24 dB in
-  increments of 2 dB. A setting of 0 means that low frequencies are unaltered
-  (flat response).}
-  \opt{ipodnano,ipodcolor}{This emphasises or suppresses the
-  lower frequency (bass) sounds in the track. 0dB means that bass in unaltered
-  (flat response). The minimum setting is -6dB and the maximum is 9dB.}
-  \opt{ipodvideo}{This emphasises or suppresses the
-  lower frequency (bass) sounds in the track. 0dB means that bass in unaltered
-  (flat response). The minimum setting is -12dB and the maximum is 12dB.}
-  \opt{x5,sansa,h10,h10_5gb}{This emphasises or suppresses the
-  lower frequency (bass) sounds in the track. 0dB means that bass in unaltered
-  (flat response). The minimum setting is -24dB and the maximum is 24dB.}
+  This setting emphasises
+  \nopt{h1xx,h300}{or suppresses}
+  the lower (bass) frequencies in the sound. A value of 0 dB means that bass
+  sounds are unaltered (flat response).
+  \opt{player,recorder,recorderv2fm,ondio}{}
+  \opt{h1xx,h300}{The minimum setting is 0 dB and the maximum is 24 dB.}
+  \opt{ipodnano,ipodcolor}{The minimum setting is -6 dB and the maximum is 9 dB.}
+  \opt{ipodvideo}{The minimum setting is -12 dB and the maximum is 12 dB.}
+  \opt{x5,sansa,h10,h10_5gb}{The minimum setting is -24 dB and the maximum is 24 dB.}
 
 \opt{ipodvideo}{
 \section{Bass Cutoff}
@@ -53,24 +46,16 @@ change to customise your listening experience.
   value will vary with sample rate.
 }
 
-
 \section{Treble}
-  \opt{player,recorder,recorderv2fm,ondio}{This emphasises or suppresses the
-  higher (treble) sounds in the track. 0 means that treble sounds are
-  unaltered (flat response).}
-  \opt{h1xx,h300}{The Treble setting can be used to increase (but not decrease)
-  frequencies above 1.5kHz. Treble boost can be set from 0 to 6 dB in
-  increments of 2 dB. A setting of 0 means that high frequencies are unaltered
-  (flat response).}
-  \opt{ipodnano,ipodcolor}{This setting emphasises or suppresses
-  the higher frequency (treble) sounds in the track. 0dB means that treble is
-  unaltered (flat response). The minimum setting -6dB and the maximum is 9dB.}
-  \opt{ipodvideo}{This setting emphasises or suppresses
-  the higher frequency (treble) sounds in the track. 0dB means that treble is
-  unaltered (flat response). The minimum setting -12dB and the maximum is 12dB.}
-  \opt{x5,sansa,h10,h10_5gb}{This setting emphasises or suppresses
-  the higher frequency (treble) sounds in the track. 0dB means that treble is
-  unaltered (flat response). The minimum setting -24dB and the maximum is 24dB.}
+  This setting emphasises
+  \nopt{h1xx,h300}{or suppresses}
+  the higher (treble) frequencies in the sound. A value of 0 dB means that
+  treble sounds are unaltered (flat response).
+  \opt{player,recorder,recorderv2fm,ondio}{}
+  \opt{h1xx,h300}{The minimum setting is 0 dB and the maximum is 6 dB.}
+  \opt{ipodnano,ipodcolor}{The minimum setting is -6 dB and the maximum is 9 dB.}
+  \opt{ipodvideo}{The minimum setting is -12 dB and the maximum is 12 dB.}
+  \opt{x5,sansa,h10,h10_5gb}{The minimum setting is -24 dB and the maximum is 24 dB.}
 
 \opt{ipodvideo}{
 \section{Treble Cutoff}
@@ -89,7 +74,7 @@ change to customise your listening experience.
 
 \section{Channels}
   A stereo audio signal consists of two channels, left and right. The
-  \setting{Channels} setting controls if these channels are to be combined in
+  \setting{Channels} setting determines if these channels are to be combined in
   any way, and if so, in what manner they will be combined.
   Available options are:
   %
@@ -154,19 +139,19 @@ change to customise your listening experience.
   values like 20ms are useful for ensuring a constant volume for in-car use and
   other applications where background noise makes a constant loudness desirable.
   A longer timeout means that the change in volume back to the previous level
-  will be smoother, so there will be less sharp changes in volume level.
+  will be smoother, so there will be fewer sharp changes in volume level.
 }
   
 \opt{recorder,recorderv2fm}{
 \section{Super Bass}
   This setting changes the threshold at which bass frequencies are affected by
   the \setting{Loudness} setting, making the sound of drums and bass guitar
-  louder in comparison to the rest of the track.  This setting only has an
+  louder in comparison to the rest of the sound.  This setting only has an
   effect if \setting{Loudness} is set to a value larger than 0dB.
 }
 
 \opt{recorder,recorderv2fm}{
-\section{MDB {}- Micronas Dynamic Bass}
+\section{MDB {}-- Micronas Dynamic Bass}
   The rest of the parameters in this menu relate to the Micronas Dynamic
   Bass (MDB) function. MDB is designed to enable the user to hear bass
   notes that the headphones and/or speakers are not capable of reproducing.
@@ -177,8 +162,7 @@ change to customise your listening experience.
 
   The practical upshot of this is that MDB produces a more authentic sounding
   bass by tricking the brain into believing it is hearing tones that the 
-  headphones or speakers are not capable of reproducing. Try it and see
-  what you think.
+  headphones or speakers are not capable of reproducing.
 
   The MDB parameters are as follows:
   %
@@ -329,7 +313,7 @@ change to customise your listening experience.
         except that it works on the high end of the frequency spectrum rather
         than the low end.
   \end{description}
-  As a general guide, EQ band 0 should be used for lows, EQ bands 1
+  As a general guide, EQ band 0 should be used for low frequencies, EQ bands 1
   through 3 should be used for mids, and EQ band 4 should be used for highs.
 
 \begin {description}

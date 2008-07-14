@@ -3,8 +3,8 @@
 
 \opt{ipodnano}{
   \note{Rockbox presently runs only on the original Ipod Nano. Rockbox does
-  \emph{not} run on the newer, second generation Ipod Nano (the all aluminium
-  version). For information on identifying which Ipod you own, see this page on
+  \emph{not} run on the newer second and third generation Ipod Nano. For
+  information on identifying which Ipod you own, see this page on
   Apple's website: \url{http://www.info.apple.com/kbnum/n61688}.
   }
 }
@@ -41,8 +41,8 @@ installation options.
 \begin{description}
 \opt{HAVE_RB_BL_ON_DISK}{
 \item[The \playerman{} bootloader.]
-  The \playerman{} bootloader is the program that tells your \dap{} how to boot
-  and load the firmware from disk. It is also responsible for the
+  The \playerman{} bootloader is the program that tells your \dap{} how to load
+  and start the firmware from disk. It is also responsible for the
   disk mode on your \dap{}.
 
   This bootloader is stored in special flash memory in your \playerman{}.
@@ -58,7 +58,7 @@ installation options.
 
   \opt{HAVE_RB_BL_IN_FLASH}{
   The bootloader is the program that tells your
-  \dap{} how to boot and load other components of Rockbox. This is the
+  \dap{} how to load and start other components of Rockbox. This is the
   component of Rockbox that is installed to the flash memory of your
   \playerman.}
 
@@ -77,10 +77,10 @@ installation options.
 
 \nopt{player} {
     Apart from the required parts there are some addons you might be interested
-    in installing too.
+    in installing.
     \begin{description}
     \item[Fonts.] Rockbox can load custom fonts. The fonts are
-        distributed as separate package and thus needs to be installed
+        distributed as a separate package and thus need to be installed
         separately. They are not required to run Rockbox itself but
         a lot of themes require the fonts package to be installed.
 
@@ -93,9 +93,8 @@ installation options.
 \section{Prerequisites}\label{sec:prerequisites}
 \index{Installation!Prerequisites}
 Before installing Rockbox you should make sure you meet the prerequisites.
-You may need some additional tools for installation. In most cases these will be
-already available on your computer but if not you need to get some additional
-software.
+You may need some additional tools for installation. In most cases these will already be available on your computer, but if not, installing some additional
+software might be necessary.
 
 \begin{description}
 \item[USB connection.] To transfer Rockbox to your \dap{} you need to
@@ -140,11 +139,10 @@ For manual installation and customization additional software is required.
 \begin{description}
 \item[ZIP utility.]\index{zip}
   Rockbox is distributed as a compressed archive using the
-  \fname{.zip} format, so you'll need a tool which can open it.
-  Usually your computer will have a tool already installed that can
-  do this. Windows XP has built-in support for
-  \fname{.zip} files and presents them to you as directories unless you have
-  installed a third party program that handles compressed files. For
+  \fname{.zip} format. Your computer will normally already have a means of
+  handling such archive files. Windows XP has built-in support for
+  \fname{.zip} files and presents them to you as directories unless you
+  have installed a third party program that handles compressed files. For
   other operating systems this may vary. If the \fname{.zip} file format
   is not recognised on your computer you can find a program to handle them
   at \url{http://www.info-zip.org/} or \url{http://sevenzip.sf.net/}, both of
@@ -158,9 +156,9 @@ For manual installation and customization additional software is required.
 
 \opt{ipod}{
   \note{In addition to the requirements described above, Rockbox only works on
-  Ipods formatted with the FAT32 filesystem (i.e. Ipods initialized by iTunes
+  Ipods formatted with the FAT32 filesystem (i.e. Ipods initialized by Itunes
   for Windows). It does not work with the HFS+ filesystem (i.e. Ipods
-  initialized by iTunes for the Mac). More information and instructions for
+  initialized by Itunes for the Mac). More information and instructions for
   converting an Ipod to FAT32 can be found on the
   \wikilink{IpodConversionToFAT32} wiki
   page on the Rockbox website.  Note that after conversion, you can still use
@@ -180,7 +178,7 @@ For manual installation and customization additional software is required.
 1.05 or greater which may not be available on the download site yet.}} 
 
 To automatically install Rockbox, download the official installer and
-housekeeping tool \textsc{Rockbox Utility}. It allows you to
+housekeeping tool \textsc{Rockbox Utility}. It allows you to:
 \begin{itemize}
 \item Automatically install all needed components for using Rockbox
         (``Small Installation'')
