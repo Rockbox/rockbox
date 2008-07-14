@@ -31,4 +31,6 @@ mrobe500.c
 telechips.c
 #elif defined(MEIZU_M6SL)
 meizu_m6sl.c
+#elif defined(ONDA_VX747)
+ondavx747.c
 #endif

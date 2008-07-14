@@ -985,6 +985,149 @@ static inline void core_sleep(void)
         : : "z"(&SBYCR-GBR) : "r1");
 }
 
+#elif CPU_MIPS == 32
+
+/*---------------------------------------------------------------------------
+ * Start the thread running and terminate it if it returns
+ *---------------------------------------------------------------------------
+ */
+void start_thread(void); /* Provide C access to ASM label */
+#if 0
+static void __attribute__((used)) __start_thread(void)
+{
+
+    /* $v0 = context */
+    asm volatile (
+        ".set noreorder        \n"
+    "_start_thread:            \n" /* Start here - no naked attribute */
+        "lw     $8,   (4)$2    \n" /* Fetch thread function pointer ($8 = $t0, $2 = $v0) */
+        "lw     $29,   (108)$2 \n" /* Set initial sp(=$29) */
+        "jalr   $8             \n" /* Start the thread  ($8 = $t0,)*/
+        "sw     $0,    (116)$2 \n" /* Clear start address ($2 = $v0) */
+        ".set reorder          \n"
+    );
+    thread_exit();
+
+}
+#else
+void start_thread(void)
+{
+    return;
+}
+#endif
+
+/* Place context pointer in $v0 slot, function pointer in $v1 slot, and
+ * start_thread pointer in context_start */
+#define THREAD_STARTUP_INIT(core, thread, function) \
+    ({ (thread)->context.r[0] = (uint32_t)&(thread)->context, \
+       (thread)->context.r[1] = (uint32_t)(function),         \
+       (thread)->context.start = (uint32_t)start_thread; })
+
+/*---------------------------------------------------------------------------
+ * Store non-volatile context.
+ *---------------------------------------------------------------------------
+ */
+static inline void store_context(void* addr)
+{
+#if 0
+    asm volatile (
+        ".set noreorder       \n"
+        ".set noat            \n"
+        "sw    $1, (0)%0      \n"
+        "sw    $2,(4)%0       \n" /* $v0 */
+        "sw    $3,(8)%0       \n" /* $v1 */
+        "sw    $4,(12)%0      \n" /* $a0 */
+        "sw    $5,(16)%0      \n" /* $a1 */
+        "sw    $6,(20)%0      \n" /* $a2 */
+        "sw    $7,(24)%0      \n" /* $a3 */
+        "sw    $8,(28)%0      \n" /* $t0 */
+        "sw    $9,(32)%0      \n" /* $t1 */
+        "sw    $10,(36)%0     \n" /* $t2 */
+        "sw    $11,(40)%0     \n" /* $t3 */
+        "sw    $12,(44)%0     \n" /* $t4 */
+        "sw    $13,(48)%0     \n" /* $t5 */
+        "sw    $14,(52)%0     \n" /* $t6 */
+        "sw    $15,(56)%0     \n" /* $t7 */
+        "sw    $24,(60)%0     \n" /* $t8 */
+        "sw    $25,(64)%0     \n" /* $t9 */
+        "sw    $16,(68)%0     \n" /* $s0 */
+        "sw    $17,(72)%0     \n" /* $s1 */
+        "sw    $18,(76)%0     \n" /* $s2 */
+        "sw    $19,(80)%0     \n" /* $s3 */
+        "sw    $20,(84)%0     \n" /* $s4 */
+        "sw    $21,(88)%0     \n" /* $s5 */
+        "sw    $22,(92)%0     \n" /* $s6 */
+        "sw    $23,(96)%0     \n" /* $s7 */
+        "sw    $28,(100)%0    \n" /* gp */
+        "sw    $30,(104)%0    \n" /* fp */
+        "sw    $29,(108)%0    \n" /* sp */
+        "sw    $31,(112)%0    \n" /* ra */
+        ".set reorder         \n"
+        : : "r" (addr)
+    );
+#endif
+}
+
+/*---------------------------------------------------------------------------
+ * Load non-volatile context.
+ *---------------------------------------------------------------------------
+ */
+static inline void load_context(const void* addr)
+{
+#if 0
+    asm volatile (
+        ".set noat            \n"
+        ".set noreorder       \n"
+        "lw     $8, 116(%0)   \n" /* Get start address ($8 = $t0) */
+        //"tst    r0, r0        \n"
+        "j      .running      \n" /* NULL -> already running */
+        "jr     $8            \n" /* $t0 = $8 = context */
+    ".running:                \n"
+        "lw    $1, (0)%0      \n"
+        "lw    $2,(4)%0       \n" /* $v0 */
+        "lw    $3,(8)%0       \n" /* $v1 */
+        "lw    $4,(12)%0      \n" /* $a0 */
+        "lw    $5,(16)%0      \n" /* $a1 */
+        "lw    $6,(20)%0      \n" /* $a2 */
+        "lw    $7,(24)%0      \n" /* $a3 */
+        "lw    $8,(28)%0      \n" /* $t0 */
+        "lw    $9,(32)%0      \n" /* $t1 */
+        "lw    $10,(36)%0     \n" /* $t2 */
+        "lw    $11,(40)%0     \n" /* $t3 */
+        "lw    $12,(44)%0     \n" /* $t4 */
+        "lw    $13,(48)%0     \n" /* $t5 */
+        "lw    $14,(52)%0     \n" /* $t6 */
+        "lw    $15,(56)%0     \n" /* $t7 */
+        "lw    $24,(60)%0     \n" /* $t8 */
+        "lw    $25,(64)%0     \n" /* $t9 */
+        "lw    $16,(68)%0     \n" /* $s0 */
+        "lw    $17,(72)%0     \n" /* $s1 */
+        "lw    $18,(76)%0     \n" /* $s2 */
+        "lw    $19,(80)%0     \n" /* $s3 */
+        "lw    $20,(84)%0     \n" /* $s4 */
+        "lw    $21,(88)%0     \n" /* $s5 */
+        "lw    $22,(92)%0     \n" /* $s6 */
+        "lw    $23,(96)%0     \n" /* $s7 */
+        "lw    $28,(100)%0    \n" /* gp */
+        "lw    $30,(104)%0    \n" /* fp */
+        "lw    $29,(108)%0    \n" /* sp */
+        "lw    $31,(112)%0    \n" /* ra */
+        ".set reorder         \n"
+        : : "r" (addr) : "v0" /* only! */
+    );
+#endif
+}
+
+/*---------------------------------------------------------------------------
+ * Put core in a power-saving state.
+ *---------------------------------------------------------------------------
+ */
+static inline void core_sleep(void)
+{
+    asm volatile("nop\n");
+}
+
+
 #endif /* CONFIG_CPU == */
 
 /*
@@ -1909,6 +2052,8 @@ static inline void block_thread_on_l(struct thread_entry *thread,
  */
 void switch_thread(void)
 {
+#ifndef ONDA_VX747
+
     const unsigned int core = CURRENT_CORE;
     struct thread_entry *block = cores[core].block_task;
     struct thread_entry *thread = cores[core].running;
@@ -2042,6 +2187,8 @@ void switch_thread(void)
 
 #ifdef RB_PROFILE
     profile_thread_started(thread - threads);
+#endif
+
 #endif
 }
 

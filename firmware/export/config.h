@@ -60,6 +60,7 @@
 #define TCC773L       773
 #define TCC7801      7801
 #define S5L8700      8700
+#define JZ4732       4732
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          1
@@ -92,6 +93,7 @@
 #define SANSA_C100_PAD     28
 #define PHILIPS_HDD1630_PAD 29
 #define MEIZU_M6SL_PAD     30
+#define ONDAVX747_PAD      31
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -134,6 +136,7 @@
 #define LCD_S6B33B2  26 /* as used by the Sansa c100 */
 #define LCD_HDD1630  27 /* as used by the Philips HDD1630 */
 #define LCD_MEIZUM6  28 /* as used by the Meizu M6SP and M6SL (various models) */
+#define LCD_ONDAVX747 29 /* as used by the Onda VX747 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -162,6 +165,7 @@
 #define I2C_TCC780X 11
 #define I2C_DM320   12 /* DM320 style */
 #define I2C_S5L8700 13
+#define I2C_JZ47XX  14 /* Ingenic Jz47XX style */
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player) */
@@ -187,12 +191,14 @@
 #define RTC_MC13783  13 /* Freescale MC13783 PMIC */
 #define RTC_S5L8700  14
 #define RTC_S35390A  15
+#define RTC_JZ47XX   16 /* Ingenic Jz47XX */
 
 /* USB On-the-go */
 #define USBOTG_ISP1362 1362 /* iriver H300 */
 #define USBOTG_ISP1583 1583 /* Creative Zen Vision:M */
 #define USBOTG_M5636   5636 /* iAudio X5 */
 #define USBOTG_ARC     5020 /* PortalPlayer 502x */
+#define USBOTG_JZ4740  4740 /* Ingenic Jz4740/Jz4732 */
 
 /* Multiple cores */
 #define CPU 0
@@ -283,6 +289,8 @@
 #include "config-c100.h"
 #elif defined(MEIZU_M6SL)
 #include "config-meizu-m6sl.h"
+#elif defined(ONDA_VX747)
+#include "config-ondavx747.h"
 #else
 /* no known platform */
 #endif
@@ -446,6 +454,10 @@
 /* Determine if accesses should be strictly long aligned. */
 #if (CONFIG_CPU == SH7034) || defined(CPU_ARM)
 #define ROCKBOX_STRICT_ALIGN 1
+#endif
+
+#if (CONFIG_CPU == JZ4732)
+#define CPU_MIPS 32
 #endif
 
 #ifndef CODEC_SIZE

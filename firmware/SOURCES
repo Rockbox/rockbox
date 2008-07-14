@@ -325,9 +325,11 @@ target/arm/i2c-telechips.c
 #elif CONFIG_I2C == I2C_S3C2440
 /* no i2c driver yet */
 #endif
+
 #if CONFIG_CPU == PNX0101
 target/arm/pnx0101/system-pnx0101.c
 #endif
+
 #if defined(CPU_PP)
 #if CONFIG_CPU == PP5002
 target/arm/system-pp5002.c
@@ -361,6 +363,21 @@ target/arm/s5l8700/crt0.S
 target/arm/crt0.S
 #endif /* defined(CPU_*) */
 #endif /* SIMULATOR */
+
+#elif defined(CPU_MIPS)
+#undef mips
+/*target/mips/memcpy.S
+target/mips/memset.S
+common/memset16.c
+target/mips/strlen.S*/
+common/memcpy.c
+common/memmove.c
+common/memset.c
+common/memset16.c
+common/strlen.c
+#if CONFIG_CPU==JZ4732
+target/mips/ingenic_jz47xx/crt0.S
+#endif /* CONFIG_CPU == JZ4732 */
 
 #else
 
@@ -1054,3 +1071,15 @@ target/arm/s5l8700/meizu-m6sl/lcd-m6sl.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* MEIZU_M6SL */
+
+#if CONFIG_CPU==JZ4732
+target/mips/ingenic_jz47xx/ata-jz4740.c
+target/mips/ingenic_jz47xx/lcd-jz4740.c
+target/mips/ingenic_jz47xx/system-jz4740.c
+#endif
+
+#ifdef ONDA_VX747
+target/mips/ingenic_jz47xx/onda_vx747/backlight-onda_vx747.c
+target/mips/ingenic_jz47xx/onda_vx747/button-onda_vx747.c
+target/mips/ingenic_jz47xx/onda_vx747/lcd-onda_vx747.c
+#endif

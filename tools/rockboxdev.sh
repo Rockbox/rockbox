@@ -168,6 +168,8 @@ case $1 in
     ;;
   [Ii])
     target="mipsel-elf"
+    gccver="4.1.2"
+    binutils="2.17"
     ;;
   *)
     echo "unsupported"
