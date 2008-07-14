@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/lang" >
         <file>rbutil_de.qm</file>
+        <file>rbutil_fi.qm</file>
         <file>rbutil_tr.qm</file>
         <file>rbutil_fr.qm</file>
         <file>rbutil_nl.qm</file>
