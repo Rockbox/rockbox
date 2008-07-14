@@ -40,11 +40,11 @@ extern unsigned char* sansa_sectorbuf;
 int sansa_read_partinfo(struct sansa_t* sansa, int silent);
 int is_sansa(struct sansa_t* sansa);
 int sansa_scan(struct sansa_t* sansa);
-int sansa_read_firmware(struct sansa_t* sansa, char* filename);
-int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type);
+int sansa_read_firmware(struct sansa_t* sansa, const char* filename);
+int sansa_add_bootloader(struct sansa_t* sansa, const char* filename, int type);
 int sansa_delete_bootloader(struct sansa_t* sansa);
-int sansa_update_of(struct sansa_t* sansa,char* filename);
-int sansa_update_ppbl(struct sansa_t* sansa,char* filename);
+int sansa_update_of(struct sansa_t* sansa,const char* filename);
+int sansa_update_ppbl(struct sansa_t* sansa,const char* filename);
 void sansa_list_images(struct sansa_t* sansa);
 
 #ifdef __cplusplus

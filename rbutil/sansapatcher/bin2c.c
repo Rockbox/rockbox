@@ -39,7 +39,7 @@ static off_t filesize(int fd)
     return buf.st_size;
 }
 
-static int write_cfile(unsigned char* buf, off_t len, char* cname)
+static int write_cfile(const unsigned char* buf, off_t len, const char* cname)
 {
     char filename[256];
     FILE* fp;
@@ -72,7 +72,7 @@ static int write_cfile(unsigned char* buf, off_t len, char* cname)
     return 0;
 }
 
-static int write_hfile(off_t len, char* cname)
+static int write_hfile(off_t len, const char* cname)
 {
     char filename[256];
     FILE* fp;

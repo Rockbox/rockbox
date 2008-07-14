@@ -50,7 +50,7 @@ enum {
    UPDATE_PPBL
 };
 
-void print_usage(void)
+static void print_usage(void)
 {
     fprintf(stderr,"Usage: sansapatcher --scan\n");
 #ifdef __WIN32__
@@ -88,10 +88,10 @@ void print_usage(void)
 #endif
 }
 
-char* get_parttype(int pt)
+static const char* get_parttype(int pt)
 {
     int i;
-    static char unknown[]="Unknown";
+    static const char unknown[]="Unknown";
 
     if (pt == -1) {
         return "HFS/HFS+";
@@ -108,7 +108,7 @@ char* get_parttype(int pt)
     return unknown;
 }
 
-void display_partinfo(struct sansa_t* sansa)
+static void display_partinfo(struct sansa_t* sansa)
 {
     int i;
     double sectors_per_MB = (1024.0*1024.0)/sansa->sector_size;

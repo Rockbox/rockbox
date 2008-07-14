@@ -65,14 +65,14 @@ static off_t filesize(int fd) {
 #define MAX_SECTOR_SIZE 2048
 #define SECTOR_SIZE 512
 
-static inline int32_t le2int(unsigned char* buf)
+static inline int32_t le2int(const unsigned char* buf)
 {
    int32_t res = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
 
    return res;
 }
 
-static inline uint32_t le2uint(unsigned char* buf)
+static inline uint32_t le2uint(const unsigned char* buf)
 {
    uint32_t res = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
 
@@ -207,7 +207,7 @@ static unsigned int crc_tab[256];
  *				reached. the crc32-checksum will be
  *				the result.
  */
-static unsigned int chksum_crc32 (unsigned char *block, unsigned int length)
+static unsigned int chksum_crc32 (const unsigned char *block, unsigned int length)
 {
    register unsigned long crc;
    unsigned long i;
@@ -276,7 +276,7 @@ Roger Needham:"
          32.
 */
 
-void tea_decrypt(uint32_t* v0, uint32_t* v1, uint32_t* k) {
+static void tea_decrypt(uint32_t* v0, uint32_t* v1, const uint32_t* k) {
     uint32_t sum=0xF1BBCDC8, i;                    /* set up */
     uint32_t delta=0x9E3779B9;                     /* a key schedule constant */
     uint32_t k0=k[0], k1=k[1], k2=k[2], k3=k[3];   /* cache key */
@@ -291,7 +291,7 @@ void tea_decrypt(uint32_t* v0, uint32_t* v1, uint32_t* k) {
    integers) and the key is incremented after each block
  */
 
-void tea_decrypt_buf(unsigned char* src, unsigned char* dest, size_t n, uint32_t * key)
+static void tea_decrypt_buf(const unsigned char* src, unsigned char* dest, size_t n, uint32_t * key)
 {
     uint32_t v0, v1;
     unsigned int i;
@@ -322,7 +322,7 @@ void tea_decrypt_buf(unsigned char* src, unsigned char* dest, size_t n, uint32_t
     }
 }
 
-static int get_mi4header(unsigned char* buf,struct mi4header_t* mi4header)
+static int get_mi4header(const unsigned char* buf,struct mi4header_t* mi4header)
 {
     if (memcmp(buf,"PPOS",4)!=0)
         return -1;
@@ -337,7 +337,7 @@ static int get_mi4header(unsigned char* buf,struct mi4header_t* mi4header)
     return 0;
 }
 
-static int set_mi4header(unsigned char* buf,struct mi4header_t* mi4header)
+static int set_mi4header(unsigned char* buf,const struct mi4header_t* mi4header)
 {
     if (memcmp(buf,"PPOS",4)!=0)
         return -1;
@@ -394,7 +394,6 @@ int is_sansa(struct sansa_t* sansa)
     int ppbl_length;
 
     /* Check partition layout */
-
     if (((sansa->pinfo[0].type != 0x06) &&
          (sansa->pinfo[0].type != 0x0b) &&
          (sansa->pinfo[0].type != 0x0c) &&
@@ -654,7 +653,7 @@ static int load_original_firmware(struct sansa_t* sansa, unsigned char* buf, str
     return prepare_original_firmware(sansa, buf, mi4header);
 }
 
-int sansa_read_firmware(struct sansa_t* sansa, char* filename)
+int sansa_read_firmware(struct sansa_t* sansa, const char* filename)
 {
     int res;
     int outfile;
@@ -681,7 +680,7 @@ int sansa_read_firmware(struct sansa_t* sansa, char* filename)
 }
 
 
-int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type)
+int sansa_add_bootloader(struct sansa_t* sansa, const char* filename, int type)
 {
     int res;
     int infile = -1;   /* Prevent an erroneous "may be used uninitialised" gcc warning */
@@ -825,7 +824,7 @@ void sansa_list_images(struct sansa_t* sansa)
     }
 }
 
-int sansa_update_of(struct sansa_t* sansa, char* filename)
+int sansa_update_of(struct sansa_t* sansa, const char* filename)
 {
     int n;
     int infile = -1;   /* Prevent an erroneous "may be used uninitialised" gcc warning */
@@ -928,7 +927,7 @@ int sansa_update_of(struct sansa_t* sansa, char* filename)
 }
 
 /* Update the PPBL (bootloader) image in the hidden firmware partition */
-int sansa_update_ppbl(struct sansa_t* sansa, char* filename)
+int sansa_update_ppbl(struct sansa_t* sansa, const char* filename)
 {
     int n;
     int infile = -1;   /* Prevent an erroneous "may be used uninitialised" gcc warning */
