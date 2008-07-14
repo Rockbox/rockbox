@@ -556,7 +556,7 @@ int sansa_scan(struct sansa_t* sansa)
 
 /* Prepare original firmware for writing to the firmware partition by decrypting
    and updating the header */
-static int prepare_original_firmware(unsigned char* buf, struct mi4header_t* mi4header)
+static int prepare_original_firmware(struct sansa_t* sansa, unsigned char* buf, struct mi4header_t* mi4header)
 {
     unsigned char* tmpbuf;
     int i;
@@ -611,7 +611,8 @@ static int prepare_original_firmware(unsigned char* buf, struct mi4header_t* mi4
     set_mi4header(buf,mi4header);
 
     /* Add Rockbox-specific header */
-    memcpy(buf+0x1f8,"RBOFe200",8);
+    memcpy(buf+0x1f8,"RBOF",4);
+    memcpy(buf+0x1fc,sansa->targetname,4);
 
     return 0;
 }
@@ -650,7 +651,7 @@ static int load_original_firmware(struct sansa_t* sansa, unsigned char* buf, str
             return -1;
         }
     }
-    return prepare_original_firmware(buf, mi4header);
+    return prepare_original_firmware(sansa, buf, mi4header);
 }
 
 int sansa_read_firmware(struct sansa_t* sansa, char* filename)
@@ -885,7 +886,7 @@ int sansa_update_of(struct sansa_t* sansa, char* filename)
     }
 
     /* Decrypt and build the header */
-    if(prepare_original_firmware(sansa_sectorbuf, &mi4header)!=0){
+    if(prepare_original_firmware(sansa, sansa_sectorbuf, &mi4header)!=0){
         fprintf(stderr,"[ERR]  Unable to build decrypted mi4 from %s\n"
                       ,filename);
         return -1;
