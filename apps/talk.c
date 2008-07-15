@@ -44,6 +44,7 @@
 #include "playback.h"
 #endif
 #include "debug.h"
+#include "kernel.h"
 
 
 /* Memory layout varies between targets because the
@@ -110,14 +111,27 @@ struct queue_entry /* one entry of the internal queue */
 
 /***************** Globals *****************/
 
-static unsigned char* p_thumbnail = NULL; /* buffer for thumbnail */
-static long size_for_thumbnail; /* leftover buffer size for it */
+static unsigned char* p_thumbnail = NULL; /* buffer for thumbnails */
+/* Multiple thumbnails can be loaded back-to-back in this buffer. */
+static volatile int thumbnail_buf_used SHAREDBSS_ATTR; /* length of data in
+                                                          thumbnail buffer */
+static long size_for_thumbnail; /* total thumbnail buffer size */
 static struct voicefile* p_voicefile; /* loaded voicefile */
 static bool has_voicefile; /* a voicefile file is present */
+static bool need_shutup; /* is there possibly any voice playing to be shutup */
 static struct queue_entry queue[QUEUE_SIZE]; /* queue of scheduled clips */
 static bool force_enqueue_next; /* enqueue next utterance even if enqueue is false */
 static int queue_write; /* write index of queue, by application */
 static int queue_read; /* read index of queue, by ISR context */
+#if CONFIG_CODEC == SWCODEC
+struct mutex queue_mutex SHAREDBSS_ATTR; /* protects queue_read, queue_write
+                                            and thumbnail_buf_used */
+#define talk_queue_lock() ({ mutex_lock(&queue_mutex); })
+#define talk_queue_unlock() ({ mutex_unlock(&queue_mutex); })
+#else
+#define talk_queue_lock() ({ })
+#define talk_queue_unlock() ({ })
+#endif /* CONFIG_CODEC */
 static int sent; /* how many bytes handed over to playback, owned by ISR */
 static unsigned char curr_hd[3]; /* current frame header, for re-sync */
 static int filehandle = -1; /* global, so the MMC variant can keep the file open */
@@ -299,7 +313,11 @@ static void mp3_callback(unsigned char** start, size_t* size)
         *size = sent;
         return;
     }
-    else if (sent > 0) /* go to next entry */
+    talk_queue_lock();
+    if(p_thumbnail
+       && queue[queue_read].buf == p_thumbnail +thumbnail_buf_used)
+        thumbnail_buf_used = 0;
+    if (sent > 0) /* go to next entry */
     {
         queue_read = (queue_read + 1) & QUEUE_MASK;
     }
@@ -321,7 +339,8 @@ re_check:
     }
     else if (p_silence != NULL             /* silence clip available */
              && p_lastclip != p_silence    /* previous clip wasn't silence */
-             && p_lastclip != p_thumbnail) /* ..or thumbnail */
+             && !(p_lastclip >= p_thumbnail /* ..or thumbnail */
+                  && p_lastclip < p_thumbnail +size_for_thumbnail))
     {   /* add silence clip when queue runs empty playing a voice clip */
         queue[queue_write].buf = p_silence;
         queue[queue_write].len = silence_len;
@@ -333,6 +352,7 @@ re_check:
     {
         *size = 0; /* end of data */
     }
+    talk_queue_unlock();
 }
 
 /***************** Public routines *****************/
@@ -388,6 +408,7 @@ void talk_force_shutup(void)
             DTCR3 = sent; /* let the DMA finish this frame */
             CHCR3 |= 0x0001; /* re-enable DMA */
 #endif /* CONFIG_CPU == SH7034 */
+            thumbnail_buf_used = 0;
             return;
         }
     }
@@ -395,14 +416,17 @@ void talk_force_shutup(void)
 
     /* Either SWCODEC, or MAS had nothing to do (was frame boundary or not our clip) */
     mp3_play_stop();
+    talk_queue_lock();
     queue_write = queue_read = 0; /* reset the queue */
-    return;
+    thumbnail_buf_used = 0;
+    talk_queue_unlock();
+    need_shutup = false;
 }
 
 /* Shutup the voice, except if force_enqueue_next is set. */
 void talk_shutup(void)
 {
-    if (!force_enqueue_next)
+    if (need_shutup && !force_enqueue_next)
         talk_force_shutup();
 }
 
@@ -423,6 +447,7 @@ static void queue_clip(unsigned char* buf, long size, bool enqueue)
     /* disable the DMA temporarily, to be safe of race condition */
     CHCR3 &= ~0x0001;
 #endif
+    talk_queue_lock();
     queue_level = QUEUE_LEVEL; /* check old level */
 
     if (queue_level < QUEUE_SIZE - 1) /* space left? */
@@ -431,7 +456,8 @@ static void queue_clip(unsigned char* buf, long size, bool enqueue)
         queue[queue_write].len = size;
         queue_write = (queue_write + 1) & QUEUE_MASK;
     }
-        
+    talk_queue_unlock();
+
     if (queue_level == 0)
     {   /* queue was empty, we have to do the initial start */
         p_lastclip = buf;
@@ -452,6 +478,8 @@ static void queue_clip(unsigned char* buf, long size, bool enqueue)
         CHCR3 |= 0x0001; /* re-enable DMA */
 #endif
     }
+
+    need_shutup = true;
 
     return;
 }
@@ -476,6 +504,7 @@ static void reset_state(void)
     p_thumbnail = audiobuf;
     size_for_thumbnail = audiobufend - audiobuf;
 #endif
+    thumbnail_buf_used = 0;
     p_silence = NULL; /* pause clip not accessible */
 }
 
@@ -498,6 +527,11 @@ void talk_init(void)
         filehandle = -1;
     }
 #endif
+
+#if CONFIG_CODEC == SWCODEC
+    if(!talk_initialized)
+        mutex_init(&queue_mutex);
+#endif /* CONFIG_CODEC == SWCODEC */
 
     talk_initialized = true;
     strncpy((char *) last_lang, (char *)global_settings.lang_file,
@@ -625,6 +659,7 @@ int talk_file(const char* filename, bool enqueue)
 {
     int fd;
     int size;
+    int thumb_used;
 #if CONFIG_CODEC != SWCODEC
     struct mp3entry info;
 #endif
@@ -646,9 +681,20 @@ int talk_file(const char* filename, bool enqueue)
     }
 #endif
 
+    if (!enqueue)
+        /* shutup now to free the thumbnail buffer */
+        talk_shutup();
+
     fd = open(filename, O_RDONLY);
     if (fd < 0) /* failed to open */
     {
+        return 0;
+    }
+
+    thumb_used = thumbnail_buf_used;
+    if(filesize(fd) > size_for_thumbnail -thumb_used)
+    {   /* Don't play truncated  clips */
+        close(fd);
         return 0;
     }
 
@@ -656,17 +702,21 @@ int talk_file(const char* filename, bool enqueue)
     lseek(fd, info.first_frame_offset, SEEK_SET); /* behind ID data */
 #endif
 
-    size = read(fd, p_thumbnail, size_for_thumbnail);
+    size = read(fd, p_thumbnail +thumb_used,
+                size_for_thumbnail -thumb_used);
     close(fd);
 
     /* ToDo: find audio, skip ID headers and trailers */
 
-    if (size > 0 && size != size_for_thumbnail)    /* Don't play missing or truncated clips */
+    if (size > 0)    /* Don't play missing clips */
     {
 #if CONFIG_CODEC != SWCODEC && !defined(SIMULATOR)
         bitswap(p_thumbnail, size);
 #endif
-        queue_clip(p_thumbnail, size, enqueue);
+        talk_queue_lock();
+        thumbnail_buf_used = thumb_used +size;
+        talk_queue_unlock();
+        queue_clip(p_thumbnail +thumb_used, size, true);
     }
 
     return size;

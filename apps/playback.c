@@ -2599,13 +2599,7 @@ void audio_init(void)
 
 } /* audio_init */
 
-void audio_wait_for_init(void)
+bool audio_is_thread_ready(void)
 {
-    /* audio thread will only set this once after it finished the final
-     * audio hardware init so this little construct is safe - even
-     * cross-core. */
-    while (!audio_thread_ready)
-    {
-        sleep(0);
-    }
+    return audio_thread_ready;
 }

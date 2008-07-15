@@ -28,7 +28,7 @@
 /* Functions */
 const char *get_codec_filename(int cod_spec);
 void voice_wait(void);
-void audio_wait_for_init(void);
+bool audio_is_thread_ready(void);
 int audio_track_count(void);
 long audio_filebufused(void);
 void audio_pre_ff_rewind(void);

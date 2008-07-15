@@ -136,11 +136,12 @@ void mp3_play_data(const unsigned char* start, int size,
 /* Stop current voice clip from playing */
 void mp3_play_stop(void)
 {
-    mutex_lock(&voice_mutex); /* Sync against voice_stop */
+    if(!audio_is_thread_ready())
+       return;
 
-    LOGFQUEUE("mp3 > voice Q_VOICE_STOP: 1");
-    queue_remove_from_head(&voice_queue, Q_VOICE_STOP);
-    queue_post(&voice_queue, Q_VOICE_STOP, 1);
+    mutex_lock(&voice_mutex); /* Sync against voice_stop */
+    LOGFQUEUE("mp3 >| voice Q_VOICE_STOP: 1");
+    queue_send(&voice_queue, Q_VOICE_STOP, 1);
 
     mutex_unlock(&voice_mutex);
 }
@@ -167,8 +168,7 @@ void voice_stop(void)
     mutex_lock(&voice_mutex);
 
     /* Stop the output and current clip */
-    LOGFQUEUE("mp3 >| voice Q_VOICE_STOP: 1");
-    queue_send(&voice_queue, Q_VOICE_STOP, 1);
+    mp3_play_stop();
 
     /* Careful if using sync objects in talk.c - make sure locking order is
      * observed with one or the other always granted first */
@@ -298,8 +298,13 @@ static void voice_thread(void)
     struct voice_thread_data td;
 
     voice_data_init(&td);
-    audio_wait_for_init();
-    
+
+    /* audio thread will only set this once after it finished the final
+     * audio hardware init so this little construct is safe - even
+     * cross-core. */
+    while (!audio_is_thread_ready())
+        sleep(0);
+
     goto message_wait;
 
     while (1)
