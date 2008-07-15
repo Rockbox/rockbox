@@ -93,7 +93,7 @@ static char* get_bookmark_info(int list_index,
                                size_t buffer_len);
 static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resume);
 static bool  system_check(void);
-static bool  write_bookmark(bool create_bookmark_file);
+static bool  write_bookmark(bool create_bookmark_file, char *bookmark);
 static int   get_bookmark_count(const char* bookmark_file_name);
 
 static char global_temp_buffer[MAX_PATH+1];
@@ -110,7 +110,7 @@ static char global_filename[MAX_PATH];
 /* ----------------------------------------------------------------------- */
 bool bookmark_create_menu(void)
 {
-    write_bookmark(true);
+    write_bookmark(true, create_bookmark());
     return false;
 }
 
@@ -162,20 +162,27 @@ bool bookmark_mrb_load()
 /* ----------------------------------------------------------------------- */
 bool bookmark_autobookmark(void)
 {
+    char*  bookmark;
     if (!system_check())
         return false;
 
     audio_pause();    /* first pause playback */
+    bookmark = create_bookmark();
+    /* Workaround for inability to speak when paused: all callers will
+       just do audio_stop() when we return, so we can do it right
+       away. This makes it possible to speak the "Create a Bookmark?"
+       prompt and the "Bookmark Created" splash. */
+    audio_stop();
     switch (global_settings.autocreatebookmark)
     {
         case BOOKMARK_YES:
-            return write_bookmark(true);
+            return write_bookmark(true, bookmark);
 
         case BOOKMARK_NO:
             return false;
 
         case BOOKMARK_RECENT_ONLY_YES:
-            return write_bookmark(false);
+            return write_bookmark(false, bookmark);
     }
 #ifdef HAVE_LCD_BITMAP
     const char *lines[]={ID2P(LANG_AUTO_BOOKMARK_QUERY)};
@@ -195,9 +202,9 @@ bool bookmark_autobookmark(void)
     if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
     {
         if (global_settings.autocreatebookmark == BOOKMARK_RECENT_ONLY_ASK)
-            return write_bookmark(false);
+            return write_bookmark(false, bookmark);
         else
-            return write_bookmark(true);
+            return write_bookmark(true, bookmark);
     }
     return false;
 }
@@ -209,15 +216,9 @@ bool bookmark_autobookmark(void)
 /* resume_index*resume_offset*resume_seed*resume_first_index*              */
 /* resume_file*milliseconds*MP3 Title*                                     */
 /* ------------------------------------------------------------------------*/
-static bool write_bookmark(bool create_bookmark_file)
+static bool write_bookmark(bool create_bookmark_file, char *bookmark)
 {
     bool   success=false;
-    char*  bookmark;
-
-    if (!system_check())
-       return false; /* something didn't happen correctly, do nothing */
-
-    bookmark = create_bookmark();
     if (!bookmark)
        return false; /* something didn't happen correctly, do nothing */
 
@@ -320,6 +321,9 @@ static char* create_bookmark()
 {
     int resume_index = 0;
     char *file;
+
+    if (!system_check())
+        return NULL; /* something didn't happen correctly, do nothing */
 
     /* grab the currently playing track */
     struct mp3entry *id3 = audio_current_track();
