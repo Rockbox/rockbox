@@ -43,6 +43,7 @@
 #include "debug.h"
 #include "playlist_catalog.h"
 #include "statusbar.h"
+#include "talk.h"
 
 #define MAX_PLAYLISTS 400
 #define PLAYLIST_DISPLAY_COUNT 10
@@ -95,7 +96,7 @@ static int initialize_catalog(void)
     if (!playlist_dir_exists)
     {
         if (mkdir(playlist_dir) < 0) {
-            gui_syncsplash(HZ*2, str(LANG_CATALOG_NO_DIRECTORY),
+            gui_syncsplash(HZ*2, ID2P(LANG_CATALOG_NO_DIRECTORY),
                 playlist_dir);
             return -1;
         }
@@ -129,7 +130,7 @@ static int create_playlist_list(char** playlists, int num_items,
     
     if (ft_load(tc, playlist_dir) < 0)
     {
-        gui_syncsplash(HZ*2, str(LANG_CATALOG_NO_DIRECTORY),
+        gui_syncsplash(HZ*2, ID2P(LANG_CATALOG_NO_DIRECTORY),
             playlist_dir);
         goto exit;
     }
@@ -209,6 +210,13 @@ static char* playlist_callback_name(int selected_item, void* data,
     return buffer;
 }
 
+static int playlist_callback_voice(int selected_item, void* data)
+{
+    char** playlists = (char**) data;
+    talk_file_or_spell(playlist_dir, playlists[selected_item], NULL, false);
+    return 0;
+}
+
 /* Display all playlists in catalog.  Selected "playlist" is returned.
    If "view" mode is set then we're not adding anything into playlist. */
 static int display_playlists(char* playlist, bool view)
@@ -226,7 +234,7 @@ static int display_playlists(char* playlist, bool view)
 
     if (num_playlists <= 0)
     {
-        gui_syncsplash(HZ*2, str(LANG_CATALOG_NO_PLAYLISTS));
+        gui_syncsplash(HZ*2, ID2P(LANG_CATALOG_NO_PLAYLISTS));
         return -1;
     }
 
@@ -235,16 +243,19 @@ static int display_playlists(char* playlist, bool view)
 
     gui_synclist_init(&playlist_lists, playlist_callback_name, playlists,
                        false, 1, NULL);
+    if(global_settings.talk_menu)
+        gui_synclist_set_voice_callback(&playlist_lists,
+                                        playlist_callback_voice);
     gui_synclist_set_nb_items(&playlist_lists, num_playlists);
     gui_synclist_draw(&playlist_lists);
+    gui_synclist_speak_item(&playlist_lists);
 
     while (!exit)
     {
-        int button = get_action(CONTEXT_LIST,HZ/2);
+        int button;
         char* sel_file;
-
-        gui_synclist_do_button(&playlist_lists, &button,LIST_WRAP_UNLESS_HELD);
-
+        list_do_action(CONTEXT_LIST,HZ/2,
+                       &playlist_lists, &button,LIST_WRAP_UNLESS_HELD);
         sel_file = playlists[gui_synclist_get_sel_pos(&playlist_lists)];
 
         switch (button)
@@ -280,7 +291,10 @@ static int display_playlists(char* playlist, bool view)
                         exit = true;
                     }
                     else
+                    {
                         gui_synclist_draw(&playlist_lists);
+                        gui_synclist_speak_item(&playlist_lists);
+                    }
                 }
                 break;
 
@@ -304,6 +318,15 @@ static int display_playlists(char* playlist, bool view)
    insert */
 static void display_insert_count(int count)
 {
+    static long talked_tick = 0;
+    if(count && (talked_tick == 0
+                 || TIME_AFTER(current_tick, talked_tick+5*HZ)))
+    {
+        talked_tick = current_tick;
+        talk_number(count, false);
+        talk_id(LANG_PLAYLIST_INSERT_COUNT, true);
+    }
+
     gui_syncsplash(0, str(LANG_PLAYLIST_INSERT_COUNT), count,
         str(LANG_OFF_ABORT));
 }
@@ -390,7 +413,7 @@ static int add_to_playlist(const char* playlist, bool new_playlist,
         /* search directory for tracks and append to playlist */
         bool recurse = false;
         const char *lines[] = {
-            str(LANG_RECURSE_DIRECTORY_QUESTION), sel};
+            ID2P(LANG_RECURSE_DIRECTORY_QUESTION), sel};
         const struct text_message message={lines, 2};
         struct add_track_context context;
 

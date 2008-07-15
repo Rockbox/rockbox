@@ -7341,7 +7341,7 @@
     *: "%s doesn't exist"
   </dest>
   <voice>
-    *: ""
+    *: "Playlist directory doesn't exist"
   </voice>
 </phrase>
 <phrase>
@@ -7355,7 +7355,7 @@
     *: "No Playlists"
   </dest>
   <voice>
-    *: ""
+    *: "No Playlists"
   </voice>
 </phrase>
 <phrase>
