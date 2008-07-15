@@ -68,7 +68,7 @@ static bool  check_bookmark(const char* bookmark);
 static char* create_bookmark(void);
 static bool  delete_bookmark(const char* bookmark_file_name, int bookmark_id);
 static void  say_bookmark(const char* bookmark,
-                          int bookmark_id);
+                          int bookmark_id, bool show_playlist_name);
 static bool play_bookmark(const char* bookmark);
 static bool  generate_bookmark_file_name(const char *in);
 static const char* skip_token(const char* s);
@@ -634,6 +634,22 @@ static char* get_bookmark_info(int list_index,
     }
 }
 
+static int bookmark_list_voice_cb(int list_index, void* data)
+{
+    struct bookmark_list* bookmarks = (struct bookmark_list*) data;
+    int index = list_index / 2;
+
+    if (bookmarks->show_dont_resume)
+    {
+        if (index == 0)
+            return talk_id(LANG_BOOKMARK_DONT_RESUME, false);
+        index--;
+    }
+    say_bookmark(bookmarks->items[index - bookmarks->start], index,
+                 bookmarks->show_playlist_name);
+    return 0;
+}
+
 /* ----------------------------------------------------------------------- */
 /* This displays a the bookmarks in a file and allows the user to          */
 /* select one to play.                                                     */
@@ -642,7 +658,6 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
 {
     struct bookmark_list* bookmarks;
     struct gui_synclist list;
-    int last_item = -2;
     int item = 0;
     int action;
     size_t size;
@@ -657,6 +672,8 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
     bookmarks->show_playlist_name
         = strcmp(bookmark_file_name, RECENT_BOOKMARK_FILE) == 0;
     gui_synclist_init(&list, &get_bookmark_info, (void*) bookmarks, false, 2, NULL);
+    if(global_settings.talk_menu)
+        gui_synclist_set_voice_callback(&list, bookmark_list_voice_cb);
     gui_synclist_set_title(&list, str(LANG_BOOKMARK_SELECT_BOOKMARK), 
         Icon_Bookmark);
     gui_syncstatusbar_draw(&statusbars, true);
@@ -695,32 +712,20 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
 
             buffer_bookmarks(bookmarks, bookmarks->start);
             gui_synclist_draw(&list);
+            cond_talk_ids_fq(VOICE_EXT_BMARK);
+            gui_synclist_speak_item(&list);
             refresh = false;
         }
 
-        action = get_action(CONTEXT_BOOKMARKSCREEN, HZ / 2);
-        gui_synclist_do_button(&list, &action, LIST_WRAP_UNLESS_HELD);
+        list_do_action(CONTEXT_BOOKMARKSCREEN, HZ / 2,
+                       &list, &action, LIST_WRAP_UNLESS_HELD);
         item = gui_synclist_get_sel_pos(&list) / 2;
 
         if (bookmarks->show_dont_resume)
         {
             item--;
         }
-        
-        if (item != last_item && global_settings.talk_menu)
-        {
-            last_item = item;
-            
-            if (item == -1)
-            {
-                talk_id(LANG_BOOKMARK_DONT_RESUME, true);
-            }
-            else
-            {
-                say_bookmark(bookmarks->items[item - bookmarks->start], item);
-            }
-        }
-        
+
         if (action == ACTION_STD_CONTEXT)
         {
             MENUITEM_STRINGLIST(menu_items, ID2P(LANG_BOOKMARK_CONTEXT_MENU),
@@ -746,6 +751,7 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
         case ACTION_STD_OK:
             if (item >= 0)
             {
+                talk_shutup();
                 return bookmarks->items[item - bookmarks->start];
             }
             
@@ -762,7 +768,6 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
                 delete_bookmark(bookmark_file_name, item);
                 bookmarks->reload = true;
                 refresh = true;
-                last_item = -2;
             }
             break;
 
@@ -776,6 +781,7 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
         }
     }
 
+    talk_shutup();
     return NULL;
 }
 
@@ -827,41 +833,63 @@ static bool delete_bookmark(const char* bookmark_file_name, int bookmark_id)
 /* This function parses a bookmark, says the voice UI part of it.          */
 /* ------------------------------------------------------------------------*/
 static void say_bookmark(const char* bookmark,
-                         int bookmark_id)
+                         int bookmark_id, bool show_playlist_name)
 {
     int resume_index;
     long ms;
-    bool enqueue = false; /* only the first voice is not queued */
+    bool playlist_shuffle = false;
+    bool is_dir;
 
-    if (!parse_bookmark(bookmark, &resume_index, NULL, NULL, NULL, 
-        global_temp_buffer, sizeof(global_temp_buffer), &ms, NULL, NULL, NULL))
+    if (!parse_bookmark(bookmark, &resume_index, NULL, NULL, NULL,
+                        global_temp_buffer,sizeof(global_temp_buffer),
+                        &ms, NULL, &playlist_shuffle,
+                        global_filename))
     {
-        talk_id(LANG_BOOKMARK_INVALID, true);
+        talk_id(LANG_BOOKMARK_INVALID, false);
         return;
     }
 
-/* disabled, because transition between talkbox and voice UI clip is not nice */
-#if 0 
-    if (global_settings.talk_dir >= 3)
-    {   /* "talkbox" enabled */
-        char* last = strrchr(global_temp_buffer, '/');
-        if (last)
-        {   /* compose filename for talkbox */
-            strncpy(last + 1, dir_thumbnail_name, 
-                sizeof(global_temp_buffer) - (last - global_temp_buffer) - 1);
-            talk_file(global_temp_buffer, enqueue);
-            enqueue = true;
-        }
+    talk_number(bookmark_id + 1, false);
+
+    is_dir = (global_temp_buffer[0]
+              && global_temp_buffer[strlen(global_temp_buffer)-1] == '/');
+#if CONFIG_CODEC == SWCODEC
+    /* HWCODEC cannot enqueue voice file entries and .talk thumbnails
+       together, because there is no guarantee that the same mp3
+       parameters are used. */
+    if(show_playlist_name)
+    {   /* It's useful to know which playlist this is */
+        if(is_dir)
+            talk_dir_or_spell(global_temp_buffer,
+                              TALK_IDARRAY(VOICE_DIR), true);
+        else talk_file_or_spell(NULL, global_temp_buffer,
+                                TALK_IDARRAY(LANG_PLAYLIST), true);
     }
+#else
+    (void)show_playlist_name;
 #endif
-    talk_id(VOICE_EXT_BMARK, enqueue);
-    talk_number(bookmark_id + 1, true);
+
+    if(playlist_shuffle)
+        talk_id(LANG_SHUFFLE, true);
+
     talk_id(VOICE_BOOKMARK_SELECT_INDEX_TEXT, true);
     talk_number(resume_index + 1, true);
     talk_id(LANG_TIME, true);
-    if (ms / 60000)
-        talk_value(ms / 60000, UNIT_MIN, true);
-    talk_value((ms % 60000) / 1000, UNIT_SEC, true);
+    talk_value(ms / 1000, UNIT_TIME, true);
+
+#if CONFIG_CODEC == SWCODEC
+    /* Track filename */
+    if(is_dir)
+        talk_file_or_spell(global_temp_buffer, global_filename,
+                           TALK_IDARRAY(VOICE_FILE), true);
+    else
+    {   /* Unfortunately if this is a playlist, we do not know in which
+           directory the file is and therefore cannot find the track's
+           .talk file. */
+        talk_id(VOICE_FILE, true);
+        talk_spell(global_filename, true);
+    }
+#endif
 }
 
 /* ----------------------------------------------------------------------- */
