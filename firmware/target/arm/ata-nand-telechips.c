@@ -370,7 +370,6 @@ static void nand_read_raw(int bank, int row, int column, int size, void* buf)
 
 static void nand_get_chip_info(void)
 {
-    bool found = false;
     unsigned char manuf_id;
     unsigned char id_buf[8];
 
