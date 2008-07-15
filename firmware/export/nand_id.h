@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: ata.h 17847 2008-06-28 18:10:04Z bagder $
  *
- * Copyright (C) 2008 by Maurus Cuelenaere
+ * Copyright (C) 2002 by Alan Korr
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,23 +18,21 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
-#include "config.h"
-#include "jz4740.h"
-#include "ata.h"
+#ifndef __NAND_ID_H__
+#define __NAND_ID_H__
 
-int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
+struct nand_info
 {
-    (void)start;
-    (void)count;
-    (void)buf;
-    return 0;
-}
+    unsigned char     dev_id;
+    unsigned char     dev_id2;
+    unsigned short    pages_per_block;
+    unsigned short    blocks_per_bank;
+    unsigned short    page_size;
+    unsigned short    spare_size;
+    unsigned short    col_cycles;
+    unsigned short    row_cycles;
+};
 
-int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf)
-{
-    (void)start;
-    (void)count;
-    (void)buf;
-    return 0;
-}
+struct nand_info* nand_identify(unsigned char data[5]);
+
+#endif /* __NAND_ID_H__ */

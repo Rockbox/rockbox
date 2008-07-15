@@ -32,16 +32,16 @@
                       | BTN_MENU | BTN_OFF )
 
 #define SADC_CFG_INIT (   \
-                             (2 << SADC_CFG_CLKOUT_NUM_BIT) |  \
-                                        SADC_CFG_XYZ1Z2                      |  \
-                                        SADC_CFG_SNUM_5                |  \
-                                        (1 << SADC_CFG_CLKDIV_BIT)    |  \
-                                        SADC_CFG_PBAT_HIGH             |  \
-                                        SADC_CFG_CMD_INT_PEN )
+                        (2 << SADC_CFG_CLKOUT_NUM_BIT) |  \
+                        SADC_CFG_XYZ1Z2                |  \
+                        SADC_CFG_SNUM_5                |  \
+                        (1 << SADC_CFG_CLKDIV_BIT)     |  \
+                        SADC_CFG_PBAT_HIGH             |  \
+                        SADC_CFG_CMD_INT_PEN )
 
 bool button_hold(void)
 {
-    return (REG_GPIO_PXPIN(3) ^ BTN_HOLD ? 1 : 0);
+    return (~REG_GPIO_PXPIN(3) & BTN_HOLD ? 1 : 0);
 }
 
 void button_init_device(void)
@@ -54,7 +54,7 @@ void button_init_device(void)
     REG_SADC_CFG = SADC_CFG_INIT;
     
     REG_SADC_SAMETIME = 1;
-    REG_SADC_WAITTIME = 1000; //per 100 HZ
+    REG_SADC_WAITTIME = 1000; /* per 100 HZ */
     REG_SADC_STATE &= (~REG_SADC_STATE);
     REG_SADC_CTRL &= (~(SADC_CTRL_PENDM | SADC_CTRL_TSRDYM));
     REG_SADC_ENA = SADC_ENA_TSEN; // | REG_SADC_ENA;//SADC_ENA_TSEN | SADC_ENA_PBATEN | SADC_ENA_SADCINEN;
@@ -66,14 +66,21 @@ static int touch_to_pixels(short x, short y)
     x -= 300;
     y -= 300;
     
-    x /= 3200 / LCD_WIDTH;
-    y /= 3600 / LCD_HEIGHT;
-
-    return (x << 16) | y;
+    /* X & Y are switched */
+    x /= 3200 / LCD_HEIGHT;
+    y /= 3600 / LCD_WIDTH;
+    
+    x = LCD_HEIGHT - x;
+    y = LCD_WIDTH - y;
+    
+    return (y << 16) | x;
 }
 
 int button_read_device(int *data)
 {
+    if(button_hold())
+        return 0;
+    
     unsigned int key = ~REG_GPIO_PXPIN(3);
     int ret = 0;
     if(key & BTN_MASK)
@@ -114,6 +121,8 @@ int button_read_device(int *data)
         REG_SADC_STATE = 0;
         //__intc_unmask_irq(IRQ_SADC);
     }
+    else
+        *data = 0;
 
     return ret;
 }

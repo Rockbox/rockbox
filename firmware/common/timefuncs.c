@@ -52,10 +52,12 @@ struct tm *get_time(void)
     static long timeout = 0;
 
     /* Don't read the RTC more than once per second */
-    if (current_tick > timeout) {
-        char rtcbuf[7];
+    if (current_tick > timeout)
+    {
         /* Once per second, 1/10th of a second off */
         timeout = HZ * (current_tick / HZ + 1) + HZ / 5;
+#if CONFIG_RTC != RTC_JZ47XX
+        char rtcbuf[7];
         rtc_read_datetime(rtcbuf);
 
         tm.tm_sec = ((rtcbuf[0] & 0x70) >> 4) * 10 + (rtcbuf[0] & 0x0f);
@@ -76,6 +78,9 @@ struct tm *get_time(void)
 
         tm.tm_yday = 0; /* Not implemented for now */
         tm.tm_isdst = -1; /* Not implemented for now */
+#else
+        rtc_read_datetime((unsigned char*)&tm);
+#endif
     }
 #else
     tm.tm_sec = 0;

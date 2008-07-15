@@ -22,19 +22,17 @@
 #include "config.h"
 #include "jz4740.h"
 #include "mipsregs.h"
+#include "panic.h"
 
 void intr_handler(void)
 {
+    _printf("Interrupt!");
     return;
 }
 
 void except_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
 {
-    (void)stack_ptr;
-    (void)cause;
-    (void)epc;
-    REG8(USB_REG_POWER) &= ~USB_POWER_SOFTCONN;
-    while(1);
+    panicf("Exception occurred: [0x%x] at 0x%x (stack at 0x%x)", cause, epc, (unsigned int)stack_ptr);
 }
 
 void system_reboot(void)

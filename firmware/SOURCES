@@ -155,6 +155,8 @@ drivers/rtc/rtc_mr100.c
 drivers/rtc/rtc_mc13783.c
 #elif (CONFIG_RTC == RTC_TCC77X)
 drivers/rtc/rtc_tcc77x.c
+#elif (CONFIG_RTC == RTC_JZ47XX)
+drivers/rtc/rtc_jz4740.c
 #endif /* (CONFIG_RTC == RTC_) */
 #endif /* SIMULATOR */
 
@@ -1073,9 +1075,10 @@ target/arm/s5l8700/meizu-m6sl/lcd-m6sl.c
 #endif /* MEIZU_M6SL */
 
 #if CONFIG_CPU==JZ4732
-target/mips/ingenic_jz47xx/ata-jz4740.c
+target/mips/ingenic_jz47xx/ata-nand-jz4740.c
 target/mips/ingenic_jz47xx/lcd-jz4740.c
 target/mips/ingenic_jz47xx/system-jz4740.c
+drivers/nand_id.c
 #endif
 
 #ifdef ONDA_VX747

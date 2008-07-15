@@ -69,7 +69,6 @@
 
 #define CONFIG_KEYPAD ONDAVX747_PAD
 #define HAS_BUTTON_HOLD
-//#define HAVE_HEADPHONE_DETECTION
 #define HAVE_TOUCHPAD
 #define HAVE_BUTTON_DATA
 
@@ -77,7 +76,7 @@
 #define CONFIG_CODEC SWCODEC
 
 /* define this if you have a real-time clock */
-//#define CONFIG_RTC RTC_RX5X348AB
+#define CONFIG_RTC RTC_JZ47XX
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
@@ -92,7 +91,6 @@
 
 /* Define this if you have a software controlled poweroff */
 //#define HAVE_SW_POWEROFF
-//TODO: enable this back
 
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x80000
@@ -101,7 +99,7 @@
 #define PLUGIN_BUFFER_SIZE 0x100000
 
 /* Define this if you have the */
-//#define HAVE_TLV320
+//#define HAVE_INGENIC_CODEC
 
 #define CONFIG_I2C I2C_JZ47XX
 
@@ -129,7 +127,7 @@
 #define HAVE_POWEROFF_WHILE_CHARGING
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ 16934400
+#define CPU_FREQ 3686400
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
