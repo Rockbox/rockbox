@@ -23,7 +23,7 @@
     *: "Nei"
   </dest>
   <voice>
-    *: "nei"
+    *: "Nei"
   </voice>
 </phrase>
 <phrase>
@@ -37,7 +37,7 @@
     *: "På"
   </dest>
   <voice>
-    *: "pa"
+    *: "På"
   </voice>
 </phrase>
 <phrase>
@@ -51,7 +51,7 @@
     *: "Av"
   </dest>
   <voice>
-    *: "av"
+    *: "Av"
   </voice>
 </phrase>
 <phrase>
@@ -65,7 +65,7 @@
     *: "Alltid"
   </dest>
   <voice>
-    *: "alltid"
+    *: "Alltid"
   </voice>
 </phrase>
 <phrase>
@@ -76,10 +76,10 @@
     *: "Loading..."
   </source>
   <dest>
-    *: "Laster ..."
+    *: "Laster..."
   </dest>
   <voice>
-    *: "laster"
+    *: "Laster"
   </voice>
 </phrase>
 <phrase>
@@ -92,11 +92,11 @@
   </source>
   <dest>
     *: ""
-    soft_shutdown: "Trykk AV for å avslutte"
+    soft_shutdown: "Trykk OFF for å avslutte"
   </dest>
   <voice>
     *: none
-    soft_shutdown: "Trykk AV for å avslutte"
+    soft_shutdown: "Trykk OFF for å avslutte"
   </voice>
 </phrase>
 <phrase>
@@ -110,7 +110,7 @@
     *: "Avslutter..."
   </dest>
   <voice>
-    *: "avslutter"
+    *: "Avslutter"
   </voice>
 </phrase>
 <phrase>
@@ -273,10 +273,10 @@
     *: "Plugins"
   </source>
   <dest>
-    *: "Programmer"
+    *: "Plugin-filer"
   </dest>
   <voice>
-    *: "Programmer"
+    *: "Plugin-filer"
   </voice>
 </phrase>
 <phrase>
@@ -493,12 +493,12 @@
     masf: "AV Decay Time"
   </source>
   <dest>
-    *: "AV-falltid"
-    masf: ""
+    *: none
+    masf: "AV-falltid"
   </dest>
   <voice>
     *: none
-    masf: ""
+    masf: "Falltid for autovolum"
   </voice>
 </phrase>
 <phrase>
@@ -510,11 +510,11 @@
     masf: "Super Bass"
   </source>
   <dest>
-    *: ""
+    *: none
     masf: "Super-bass"
   </dest>
   <voice>
-    *: ""
+    *: none
     masf: "Super-bass"
   </voice>
 </phrase>
@@ -527,11 +527,11 @@
     masf: "MDB Enable"
   </source>
   <dest>
-    *: ""
+    *: none
     masf: "Bruk MDB"
   </dest>
   <voice>
-    *: ""
+    *: none
     masf: "Bruk MDB"
   </voice>
 </phrase>
@@ -544,11 +544,11 @@
     masf: "MDB Strength"
   </source>
   <dest>
-    *: ""
+    *: none
     masf: "MDB-styrke"
   </dest>
   <voice>
-    *: ""
+    *: none
     masf: "MDB-styrke"
   </voice>
 </phrase>
@@ -561,11 +561,11 @@
     masf: "MDB Harmonics"
   </source>
   <dest>
-    *: ""
+    *: none
     masf: "MDB-overtoner"
   </dest>
   <voice>
-    *: ""
+    *: none
     masf: "MDB-overtoner"
   </voice>
 </phrase>
@@ -578,11 +578,11 @@
     masf: "MDB Center Frequency"
   </source>
   <dest>
-    *: ""
+    *: none
     masf: "MDB-midtfrekvens"
   </dest>
   <voice>
-    *: ""
+    *: none
     masf: "MDB-midtfrekvens"
   </voice>
 </phrase>
@@ -595,11 +595,11 @@
     masf: "MDB Shape"
   </source>
   <dest>
-    *: ""
+    *: none
     masf: "MDB-form"
   </dest>
   <voice>
-    *: ""
+    *: none
     masf: "MDB-form"
   </voice>
 </phrase>
@@ -642,7 +642,7 @@
   desc: in settings_menu()
   user:
   <source>
-    *: "Playback"
+    *: "Playback Settings"
   </source>
   <dest>
     *: "Spilleinnstillinger"
@@ -662,7 +662,7 @@
     *: "Filliste"
   </dest>
   <voice>
-    *: "filleste"
+    *: "Filliste"
   </voice>
 </phrase>
 <phrase>
@@ -732,7 +732,7 @@
     *: "Stemme"
   </dest>
   <voice>
-    *: "stemme"
+    *: "Stemme"
   </voice>
 </phrase>
 <phrase>
@@ -746,7 +746,7 @@
     *: "Bla igjennom .cfg-filer"
   </dest>
   <voice>
-    *: "Bla igjennom .cfg-filer"
+    *: "Bla igjennom konfigurasjonsfiler"
   </voice>
 </phrase>
 <phrase>
@@ -788,7 +788,7 @@
     *: "Skriv .cfg-fil"
   </dest>
   <voice>
-    *: "Write Configuration File"
+    *: "Skriv konfigurasjonsfil"
   </voice>
 </phrase>
 <phrase>
@@ -931,7 +931,7 @@
     *: "En"
   </dest>
   <voice>
-    *: "en"
+    *: "En"
   </voice>
 </phrase>
 <phrase>
@@ -1017,11 +1017,11 @@
   </source>
   <dest>
     *: ""
-    swcodec: "Overtoning"
+    swcodec: "Krysstoning"
   </dest>
   <voice>
     *: ""
-    swcodec: "Overtoning"
+    swcodec: "Krysstoning"
   </voice>
 </phrase>
 <phrase>
@@ -1370,11 +1370,11 @@
     lcd_bitmap: "Browse Fonts"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Velg skrifttype"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_bitmap: "Velg skrifttype"
   </voice>
 </phrase>
@@ -1389,7 +1389,7 @@
     *: "Bla igjennom .wps-filer"
   </dest>
   <voice>
-    *: "Browse Configuration Files"
+    *: "Bla igjennom WPS-filer"
   </voice>
 </phrase>
 <phrase>
@@ -1401,12 +1401,12 @@
     remote: "Browse .rwps files"
   </source>
   <dest>
-    *: ""
+    *: none
     remote: "Bla igjennom .rwps-filer"
   </dest>
   <voice>
-    *: ""
-    remote: "Browse remote while-playing-screen files"
+    *: none
+    remote: "Bla igjennom RWPS-filer"
   </voice>
 </phrase>
 <phrase>
@@ -1432,12 +1432,12 @@
     remote: "Remote-LCD Settings"
   </source>
   <dest>
-    *: ""
+    *: none
     remote: "LCD-innstillinger for fjernkontroll"
   </dest>
   <voice>
-    *: ""
-    remote: "L C D innstillinger for fjernkontroll"
+    *: none
+    remote: "LCD-innstillinger for fjernkontroll"
   </voice>
 </phrase>
 <phrase>
@@ -1463,11 +1463,11 @@
     lcd_bitmap: "Status-/Scrollbar"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Status-/rullefelt"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_bitmap: "Status og rullefelt"
   </voice>
 </phrase>
@@ -1539,7 +1539,7 @@
     lcd_bitmap: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Hebraisk (ISO-8859-8)"
   </dest>
   <voice>
@@ -1570,7 +1570,7 @@
     lcd_bitmap: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Thai (ISO-8859-11)"
   </dest>
   <voice>
@@ -1587,7 +1587,7 @@
     lcd_bitmap: "Arabic (CP1256)"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Arabisk (CP1256)"
   </dest>
   <voice>
@@ -1606,7 +1606,7 @@
     *: "Tyrkisk (ISO-8859-9)"
   </dest>
   <voice>
-    *: "tyrkisk"
+    *: "Tyrkisk"
   </voice>
 </phrase>
 <phrase>
@@ -1632,7 +1632,7 @@
     lcd_bitmap: "Japanese (SJIS)"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Japansk (SJIS)"
   </dest>
   <voice>
@@ -1649,8 +1649,8 @@
     lcd_bitmap: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "Kinesisk - forenklet (GB2312)"
+    *: none
+    lcd_bitmap: "Kinesisk forenklet (GB2312)"
   </dest>
   <voice>
     *: none
@@ -1666,7 +1666,7 @@
     lcd_bitmap: "Korean (KSX1001)"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Koreansk (KSX1001)"
   </dest>
   <voice>
@@ -1683,8 +1683,8 @@
     lcd_bitmap: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "Kinesisk - tradisjonelt (BIG5)"
+    *: none
+    lcd_bitmap: "Kinesisk tradisjonelt (BIG5)"
   </dest>
   <voice>
     *: none
@@ -1702,7 +1702,7 @@
     *: "Unicode (UTF-8)"
   </dest>
   <voice>
-    *: "unicode"
+    *: "Unicode"
   </voice>
 </phrase>
 <phrase>
@@ -1742,11 +1742,11 @@
     rtc: "Time & Date"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Dato og klokkeslett"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "Dato og klokkeslett"
   </voice>
 </phrase>
@@ -1787,11 +1787,11 @@
     alarm: "Wake-Up Alarm"
   </source>
   <dest>
-    *: ""
+    *: none
     alarm: "Vekkerklokke"
   </dest>
   <voice>
-    *: ""
+    *: none
     alarm: "Vekkerklokke"
   </voice>
 </phrase>
@@ -1818,12 +1818,12 @@
     recording,player: "Line In"
   </source>
   <dest>
-    *: ""
-    recording,player: "Line in"
+    *: none
+    recording,player: "Linjeinngang"
   </dest>
   <voice>
-    *: ""
-    recording,player: "Linje in"
+    *: none
+    recording,player: "Linjeinngang"
   </voice>
 </phrase>
 <phrase>
@@ -1835,11 +1835,11 @@
     charging: "Car Adapter Mode"
   </source>
   <dest>
-    *: ""
+    *: none
     charging: "Biladapter-modus"
   </dest>
   <voice>
-    *: ""
+    *: none
     charging: "Biladapter-modus"
   </voice>
 </phrase>
@@ -2005,10 +2005,10 @@
     *: ".talk mp3 clip"
   </source>
   <dest>
-    *: ".talk-mp3-klipp"
+    *: ".talk-MP3-klipp"
   </dest>
   <voice>
-    *: "talk-mp3-clip"
+    *: "talk-MP3-klipp"
   </voice>
 </phrase>
 <phrase>
@@ -2020,11 +2020,11 @@
     recording_hwcodec: "Quality"
   </source>
   <dest>
-    *: ""
+    *: none
     recording_hwcodec: "Kvalitet"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording_hwcodec: "Kvalitet"
   </voice>
 </phrase>
@@ -2037,11 +2037,11 @@
     recording: "Frequency"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Frekvens"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Frekvens"
   </voice>
 </phrase>
@@ -2054,11 +2054,11 @@
     recording: "Source"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Kilde"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Kilde"
   </voice>
 </phrase>
@@ -2072,12 +2072,12 @@
     h100,h120,h300: "Internal Microphone"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Mikrofon"
     h100,h120,h300: "Intern mikrofon"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Mikrofon"
     h100,h120,h300: "Intern mikrofon"
   </voice>
@@ -2091,11 +2091,11 @@
     recording: "Digital"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Digital"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Digital"
   </voice>
 </phrase>
@@ -2108,11 +2108,11 @@
     recording_hwcodec: "Independent Frames"
   </source>
   <dest>
-    *: ""
+    *: none
     recording_hwcodec: "Uavhengige rammer"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording_hwcodec: "Uavhengige rammer"
   </voice>
 </phrase>
@@ -2125,11 +2125,11 @@
     recording: "File Split Options"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Filoppdelingsvalg"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Filoppdelingsvalg"
   </voice>
 </phrase>
@@ -2142,12 +2142,12 @@
     recording: "Prerecord Time"
   </source>
   <dest>
-    *: ""
-    recording: "Forinnspillingstid"
+    *: none
+    recording: "Føropptakstid"
   </dest>
   <voice>
-    *: ""
-    recording: "Forinnspillingstid"
+    *: none
+    recording: "Føropptakstid"
   </voice>
 </phrase>
 <phrase>
@@ -2159,11 +2159,11 @@
     recording: "Directory"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Katalog"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Katalog"
   </voice>
 </phrase>
@@ -2176,10 +2176,12 @@
     recording: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    recording: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -2191,11 +2193,11 @@
     recording: "Trigger"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Utløser"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Utløser"
   </voice>
 </phrase>
@@ -2236,12 +2238,12 @@
     swcodec: "Enable Crossfade"
   </source>
   <dest>
-    *: ""
-    swcodec: "Bruk overtoning"
+    *: none
+    swcodec: "Bruk krysstoning"
   </dest>
   <voice>
-    *: ""
-    swcodec: "Bruk overtoning"
+    *: none
+    swcodec: "Bruk krysstoning"
   </voice>
 </phrase>
 <phrase>
@@ -2253,11 +2255,11 @@
     swcodec: "Fade-In Delay"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Inntoningsforsinkelse"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Inntoningsforsinkelse"
   </voice>
 </phrase>
@@ -2270,11 +2272,11 @@
     swcodec: "Fade-In Duration"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Inntoningslengde"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Inntoningslengde"
   </voice>
 </phrase>
@@ -2287,11 +2289,11 @@
     swcodec: "Fade-Out Delay"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Uttoningsforsinkelse"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Uttoningsforsinkelse"
   </voice>
 </phrase>
@@ -2304,11 +2306,11 @@
     swcodec: "Fade-Out Duration"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Uttoningslengde"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Uttoningslengde"
   </voice>
 </phrase>
@@ -2321,11 +2323,11 @@
     swcodec: "Fade-Out Mode"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Uttoningsmodus"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Uttoningsmodus"
   </voice>
 </phrase>
@@ -2338,11 +2340,11 @@
     swcodec: "Mix"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Miks"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Miks"
   </voice>
 </phrase>
@@ -2369,11 +2371,11 @@
     swcodec: "Prevent Clipping"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Unngå klipping"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Unngå klipping"
   </voice>
 </phrase>
@@ -2385,10 +2387,10 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "Avspillingsnivåtype"
+    *: "Replaygain-type"
   </dest>
   <voice>
-    *: "Avspillingsnivåtype"
+    *: "Replaygain-type"
   </voice>
 </phrase>
 <phrase>
@@ -2470,11 +2472,11 @@
     charging: "Backlight (While Plugged In)"
   </source>
   <dest>
-    *: ""
+    *: none
     charging: "Skjermlys (ved strømtilkobling)"
   </dest>
   <voice>
-    *: ""
+    *: none
     charging: "Skjermlys ved strømtilkobling"
   </voice>
 </phrase>
@@ -2501,11 +2503,11 @@
     backlight_fade: "Backlight Fade In"
   </source>
   <dest>
-    *: ""
+    *: none
     backlight_fade: "Ton inn skjermlys"
   </dest>
   <voice>
-    *: ""
+    *: none
     backlight_fade: "Ton inn skjermlys"
   </voice>
 </phrase>
@@ -2518,11 +2520,11 @@
     backlight_fade: "Backlight Fade Out"
   </source>
   <dest>
-    *: ""
+    *: none
     backlight_fade: "Ton ut skjermlys"
   </dest>
   <voice>
-    *: ""
+    *: none
     backlight_fade: "Ton ut skjermlys"
   </voice>
 </phrase>
@@ -2535,11 +2537,11 @@
     backlight_brightness: "Brightness"
   </source>
   <dest>
-    *: ""
+    *: none
     backlight_brightness: "Lysstyrke"
   </dest>
   <voice>
-    *: ""
+    *: none
     backlight_brightness: "Lysstyrke"
   </voice>
 </phrase>
@@ -2566,11 +2568,11 @@
     lcd_invert: "LCD Mode"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_invert: "LCD-modus"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_invert: "LCD-modus"
   </voice>
 </phrase>
@@ -2583,11 +2585,11 @@
     lcd_invert: "Inverse"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_invert: "Invers"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_invert: "Invers"
   </voice>
 </phrase>
@@ -2600,11 +2602,11 @@
     lcd_bitmap: "Upside Down"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Opp-ned"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_bitmap: "Opp-ned"
   </voice>
 </phrase>
@@ -2617,11 +2619,11 @@
     lcd_bitmap: "Line Selector Type"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Menyvalgindikator"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_bitmap: "Menyvalgindikator"
   </voice>
 </phrase>
@@ -2634,11 +2636,11 @@
     lcd_bitmap: "Pointer"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Peker"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_bitmap: "Peker"
   </voice>
 </phrase>
@@ -2651,11 +2653,11 @@
     lcd_bitmap: "Bar (Inverse)"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Felt (invers)"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_bitmap: "Felt invers"
   </voice>
 </phrase>
@@ -2668,11 +2670,11 @@
     remote_ticking: "Reduce Ticking"
   </source>
   <dest>
-    *: ""
+    *: none
     remote_ticking: "Begrens tikkelyd"
   </dest>
   <voice>
-    *: ""
+    *: none
     remote_ticking: "Begrens tikkelyd"
   </voice>
 </phrase>
@@ -2811,11 +2813,11 @@
     lcd_bitmap: "Scroll Bar"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Rullefelt"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_bitmap: "Rullefelt"
   </voice>
 </phrase>
@@ -2828,11 +2830,11 @@
     lcd_bitmap: "Status Bar"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Statusfelt"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_bitmap: "Statusfelt"
   </voice>
 </phrase>
@@ -2845,11 +2847,11 @@
     recorder_pad: "Button Bar"
   </source>
   <dest>
-    *: ""
+    *: none
     recorder_pad: "Knapperad"
   </dest>
   <voice>
-    *: ""
+    *: none
     recorder_pad: "Knapperad"
   </voice>
 </phrase>
@@ -2862,11 +2864,11 @@
     lcd_bitmap: "Volume Display"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Volumvisning"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_bitmap: "Volumvisning"
   </voice>
 </phrase>
@@ -2879,11 +2881,11 @@
     lcd_bitmap: "Battery Display"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Batterivisning"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_bitmap: "Batterivisning"
   </voice>
 </phrase>
@@ -2896,11 +2898,11 @@
     lcd_bitmap: "Graphic"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Grafisk"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_bitmap: "Grafisk"
   </voice>
 </phrase>
@@ -2913,11 +2915,11 @@
     lcd_bitmap: "Numeric"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Numerisk"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_bitmap: "Numerisk"
   </voice>
 </phrase>
@@ -3033,7 +3035,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Logaritmisk decibel"
+    *: "Logaritmisk i decibel"
     masd: none
   </voice>
 </phrase>
@@ -3050,7 +3052,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Lineær prosent"
+    *: "Lineær i prosent"
     masd: none
   </voice>
 </phrase>
@@ -3111,11 +3113,11 @@
     battery_types: "Battery Type"
   </source>
   <dest>
-    *: ""
+    *: none
     battery_types: "Batteritype"
   </dest>
   <voice>
-    *: ""
+    *: none
     battery_types: "Batteritype"
   </voice>
 </phrase>
@@ -3128,12 +3130,12 @@
     battery_types: "Alkaline"
   </source>
   <dest>
-    *: ""
-    battery_types: "Alkaline"
+    *: none
+    battery_types: "Alkalinsk"
   </dest>
   <voice>
-    *: ""
-    battery_types: "Alkaline"
+    *: none
+    battery_types: "Alkalinsk"
   </voice>
 </phrase>
 <phrase>
@@ -3145,11 +3147,11 @@
     battery_types: "NiMH"
   </source>
   <dest>
-    *: ""
+    *: none 
     battery_types: "NiMH"
   </dest>
   <voice>
-    *: ""
+    *: none
     battery_types: "Nikkel metallhydrid"
   </voice>
 </phrase>
@@ -3179,11 +3181,11 @@
     dircache: "Directory Cache"
   </source>
   <dest>
-    *: ""
+    *: none
     dircache: "Kataloghurtigminne"
   </dest>
   <voice>
-    *: ""
+    *: none
     dircache: "Kataloghurtigminne"
   </voice>
 </phrase>
@@ -3195,10 +3197,10 @@
     *: "Time"
   </source>
   <dest>
-    *: "Dato og klokkeslett"
+    *: "Tid"
   </dest>
   <voice>
-    *: "Dato og klokkeslett"
+    *: "Tid"
   </voice>
 </phrase>
 <phrase>
@@ -3210,11 +3212,11 @@
     rtc: "Time Format"
   </source>
   <dest>
-    *: ""
+    *: none 
     rtc: "Tidsformat"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "Tidsformat"
   </voice>
 </phrase>
@@ -3227,11 +3229,11 @@
     rtc: "12 Hour Clock"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "12-timersklokke"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "12-timersklokke"
   </voice>
 </phrase>
@@ -3244,11 +3246,11 @@
     rtc: "24 Hour Clock"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "24-timersklokke"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "24-timersklokke"
   </voice>
 </phrase>
@@ -3358,10 +3360,10 @@
     *: "Delete"
   </source>
   <dest>
-    *: "Slette"
+    *: "Slett"
   </dest>
   <voice>
-    *: "Slette"
+    *: "Slett"
   </voice>
 </phrase>
 <phrase>
@@ -3386,10 +3388,10 @@
     *: "Delete?"
   </source>
   <dest>
-    *: "Slette?"
+    *: "Slett?"
   </dest>
   <voice>
-    *: "Slette?"
+    *: "Slett?"
   </voice>
 </phrase>
 <phrase>
@@ -3414,7 +3416,7 @@
     *: "Open With..."
   </source>
   <dest>
-    *: "Åpne med ..."
+    *: "Åpne med..."
   </dest>
   <voice>
     *: "Åpne med"
@@ -3487,7 +3489,7 @@
     *: "Sett inn som neste"
   </dest>
   <voice>
-    *: "Sett inn neste"
+    *: "Sett inn som neste"
   </voice>
 </phrase>
 <phrase>
@@ -3582,10 +3584,10 @@
     *: "List Bookmarks"
   </source>
   <dest>
-    *: "List opp bokmerker"
+    *: "Vis bokmerker"
   </dest>
   <voice>
-    *: "List opp bokmerker"
+    *: "Vis bokmerker"
   </voice>
 </phrase>
 <phrase>
@@ -3611,7 +3613,7 @@
     charging: "Battery: Charging"
   </source>
   <dest>
-    *: ""
+    *: none 
     charging: "Batteri: lader"
   </dest>
   <voice>
@@ -3628,7 +3630,7 @@
     recorder: "Battery: Top-Off Chg"
   </source>
   <dest>
-    *: ""
+    *: none
     recorder: "Batteri: top-off-lading"
   </dest>
   <voice>
@@ -3645,7 +3647,7 @@
     charging: "Battery: Trickle Chg"
   </source>
   <dest>
-    *: ""
+    *: none
     charging: "Batteri: topplading"
   </dest>
   <voice>
@@ -3684,7 +3686,7 @@
     *: "Disk:"
   </dest>
   <voice>
-    *: "disk:"
+    *: "Disk:"
   </voice>
 </phrase>
 <phrase>
@@ -3698,7 +3700,7 @@
     *: "Ledig:"
   </dest>
   <voice>
-    *: "Ledig disc: "
+    *: "Ledig plaas"
   </voice>
 </phrase>
 <phrase>
@@ -3710,11 +3712,11 @@
     multivolume: "Int:"
   </source>
   <dest>
-    *: ""
+    *: none
     multivolume: "Int:"
   </dest>
   <voice>
-    *: ""
+    *: none
     multivolume: "Intern"
   </voice>
 </phrase>
@@ -3728,12 +3730,12 @@
     ondio*: "MMC:"
   </source>
   <dest>
-    *: ""
+    *: none
     e200,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
-    *: ""
+    *: none
     e200,c200: "mikro S D"
     ondio*: "M M C"
   </voice>
@@ -3751,7 +3753,7 @@
     rtc: ""
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "Gjeldende tid:"
   </voice>
 </phrase>
@@ -3764,7 +3766,7 @@
     pitchscreen: "Pitch Up"
   </source>
   <dest>
-    *: ""
+    *: none
     pitchscreen: "Høyere tonehøyde"
   </dest>
   <voice>
@@ -3781,7 +3783,7 @@
     pitchscreen: "Pitch Down"
   </source>
   <dest>
-    *: ""
+    *: none
     pitchscreen: "Lavere tonehøyde"
   </dest>
   <voice>
@@ -3867,28 +3869,34 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200: "MENU = Revert"
+    ipod*,e200,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
+    mrobe100: "DISPLAY = Revert"
+    gigabeats: "BACK = Revert"
   </source>
   <dest>
-    *: ""
-    rtc: "AV = Tilbakestill"
-    h100,h120,h300: "STOPP = Tilbakestill"
-    ipod*,e200,c200: "MENY = Tilbakestill"
-    x5,m5: "OPPTAK = Tilbakestill"
-    h10,h10_5gb: "FORRIGE = Tilbakestill"
+    *: none
+    rtc: "OFF = Tilbakestill"
+    h100,h120,h300: "STOP = Tilbakestill"
+    ipod*,e200,c200,sa9200: "MENU = Tilbakestill"
+    x5,m5: "RECORD = Tilbakestill"
+    h10,h10_5gb: "PREV = Tilbakestill"
     gigabeatf: "A = Tilbakestill"
+    mrobe100: "DISPLAY = Tilbakestill"
+    gigabeats: "BACK = Tilbakestill"
   </dest>
   <voice>
     *: none
     rtc: "AV = Tilbakestill"
     h100,h120,h300: "STOPP = Tilbakestill"
-    ipod*,e200,c200: "MENY = Tilbakestill"
+    ipod*,e200,c200,sa9200: ""
     x5,m5: "OPPTAK = Tilbakestill"
     h10,h10_5gb: "FORRIGE = Tilbakestill"
     gigabeatf: "a=Tilbakestill"
+    mrobe100: ""
+    gigabeats: ""
   </voice>
 </phrase>
 <phrase>
@@ -3900,12 +3908,12 @@
     recording: "Time:"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Tid:"
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Tid"
   </voice>
 </phrase>
 <phrase>
@@ -3917,12 +3925,12 @@
     recording: "Pre-Recording"
   </source>
   <dest>
-    *: ""
-    recording: "Forinnspilling"
+    *: none
+    recording: "Føropptak"
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Føropptak"
   </voice>
 </phrase>
 <phrase>
@@ -3934,12 +3942,12 @@
     recording: "Gain Left"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Forsterkning venstre"
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Forsterkning venstre"
   </voice>
 </phrase>
 <phrase>
@@ -3951,12 +3959,12 @@
     recording: "Gain Right"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Forsterkning høyre"
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Forsterkning høyre"
   </voice>
 </phrase>
 <phrase>
@@ -3972,10 +3980,10 @@
   </source>
   <dest>
     *: ""
-    recording: "Disken er full. Trykk AV for å fortsette."
-    h100,h120,h300: "Disken er full. Trykk STOPP for å fortsette."
-    m5,x5: "Disken er full. Trykk PÅ for å fortsette."
-    e200,c200: "Disken er full. Trykk OPP for å fortsette."
+    recording: "Disken er full. Trykk OFF for å fortsette."
+    h100,h120,h300: "Disken er full. Trykk STOP for å fortsette."
+    m5,x5: "Disken er full. Trykk POWER for å fortsette."
+    e200,c200: "Disken er full. Trykk UP for å fortsette."
   </dest>
   <voice>
     *: none
@@ -3994,7 +4002,7 @@
     recording: "Once"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Én gang"
   </dest>
   <voice>
@@ -4011,7 +4019,7 @@
     recording: "Start Above"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Start over"
   </dest>
   <voice>
@@ -4028,7 +4036,7 @@
     recording: "Stop Below"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Stopp under"
   </dest>
   <voice>
@@ -4045,7 +4053,7 @@
     recording: "Presplit Gap"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Førdelingsmellomrom"
   </dest>
   <voice>
@@ -4062,7 +4070,7 @@
     recording: "-inf"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "-uendelig"
   </dest>
   <voice>
@@ -4079,7 +4087,7 @@
     alarm: "Alarm Time: %02d:%02d"
   </source>
   <dest>
-    *: ""
+    *: none
     alarm: "Alarmtid: %02d:%02d"
   </dest>
   <voice>
@@ -4096,7 +4104,7 @@
     alarm: "Waking Up In %d:%02d"
   </source>
   <dest>
-    *: ""
+    *: none
     alarm: "Våkner om %d:%02d"
   </dest>
   <voice>
@@ -4113,7 +4121,7 @@
     alarm: "Alarm Set"
   </source>
   <dest>
-    *: ""
+    *: none
     alarm: "Alarm innstilt"
   </dest>
   <voice>
@@ -4130,7 +4138,7 @@
     alarm: "Alarm Time Is Too Soon!"
   </source>
   <dest>
-    *: ""
+    *: none
     alarm: "Vekking om for kort tid!"
   </dest>
   <voice>
@@ -4147,18 +4155,21 @@
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
-    *: ""
-    alarm: "SPILL=Sett AV=Avbryt"
-    ipod*: "VELG=Sett MENY=Avbryt"
-    h10,h10_5gb: "VELG=Sett TILBAKE=Avbryt"
+    *: none
+    alarm: "PLAY=Sett OFF=Avbryt"
+    ipod*: "SELECT=Sett MENU=Avbryt"
+    h10,h10_5gb: "SELECT=Sett PREV=Avbryt"
+    gigabeats: "SELECT=Sett POWER=Avbryt"
   </dest>
   <voice>
     *: none
     alarm: ""
     ipod*: ""
     h10,h10_5gb: ""
+    gigabeats: ""
   </voice>
 </phrase>
 <phrase>
@@ -4170,11 +4181,11 @@
     alarm: "Alarm Disabled"
   </source>
   <dest>
-    *: ""
+    *: none
     alarm: "Alarm avslått"
   </dest>
   <voice>
-    *: ""
+    *: none
     alarm: "Alarm avslått"
   </voice>
 </phrase>
@@ -4383,12 +4394,12 @@
     rtc: "Sun"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Søn"
   </dest>
   <voice>
     *: none
-    rtc: "søndag"
+    rtc: "Søndag"
   </voice>
 </phrase>
 <phrase>
@@ -4400,12 +4411,12 @@
     rtc: "Mon"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Man"
   </dest>
   <voice>
     *: none
-    rtc: "mandag"
+    rtc: "Mandag"
   </voice>
 </phrase>
 <phrase>
@@ -4417,12 +4428,12 @@
     rtc: "Tue"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Tir"
   </dest>
   <voice>
     *: none
-    rtc: "tirsdag"
+    rtc: "Tirsdag"
   </voice>
 </phrase>
 <phrase>
@@ -4434,12 +4445,12 @@
     rtc: "Wed"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Ons"
   </dest>
   <voice>
     *: none
-    rtc: "onsdag"
+    rtc: "Onsdag"
   </voice>
 </phrase>
 <phrase>
@@ -4451,12 +4462,12 @@
     rtc: "Thu"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Tor"
   </dest>
   <voice>
     *: none
-    rtc: "torsdag"
+    rtc: "Torsdag"
   </voice>
 </phrase>
 <phrase>
@@ -4468,12 +4479,12 @@
     rtc: "Fri"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Fre"
   </dest>
   <voice>
     *: none
-    rtc: "fredag"
+    rtc: "Fredag"
   </voice>
 </phrase>
 <phrase>
@@ -4485,12 +4496,12 @@
     rtc: "Sat"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Lør"
   </dest>
   <voice>
     *: none
-    rtc: "lørdag"
+    rtc: "Lørdag"
   </voice>
 </phrase>
 <phrase>
@@ -4502,11 +4513,11 @@
     rtc: "Jan"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Jan"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "Januar"
   </voice>
 </phrase>
@@ -4519,11 +4530,11 @@
     rtc: "Feb"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Feb"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "Februar"
   </voice>
 </phrase>
@@ -4536,11 +4547,11 @@
     rtc: "Mar"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Mar"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "Mars"
   </voice>
 </phrase>
@@ -4553,11 +4564,11 @@
     rtc: "Apr"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Apr"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "April"
   </voice>
 </phrase>
@@ -4570,11 +4581,11 @@
     rtc: "May"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Mai"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "Mai"
   </voice>
 </phrase>
@@ -4587,11 +4598,11 @@
     rtc: "Jun"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Jun"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "Juni"
   </voice>
 </phrase>
@@ -4604,11 +4615,11 @@
     rtc: "Jul"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Jul"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "Juli"
   </voice>
 </phrase>
@@ -4621,11 +4632,11 @@
     rtc: "Aug"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Aug"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "August"
   </voice>
 </phrase>
@@ -4638,11 +4649,11 @@
     rtc: "Sep"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Sep"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "September"
   </voice>
 </phrase>
@@ -4655,11 +4666,11 @@
     rtc: "Oct"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Okt"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "Oktober"
   </voice>
 </phrase>
@@ -4672,11 +4683,11 @@
     rtc: "Nov"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Nov"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "November"
   </voice>
 </phrase>
@@ -4689,11 +4700,11 @@
     rtc: "Dec"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Des"
   </dest>
   <voice>
-    *: ""
+    *: none
     rtc: "Desember"
   </voice>
 </phrase>
@@ -5142,7 +5153,7 @@
     *: ""
   </dest>
   <voice>
-    *: "billion"
+    *: "milliard"
   </voice>
 </phrase>
 <phrase>
@@ -5170,7 +5181,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plus"
+    *: "pluss"
   </voice>
 </phrase>
 <phrase>
@@ -5184,7 +5195,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milliseconds"
+    *: "millisekunder"
   </voice>
 </phrase>
 <phrase>
@@ -5198,7 +5209,7 @@
     *: ""
   </dest>
   <voice>
-    *: "second"
+    *: "sekund"
   </voice>
 </phrase>
 <phrase>
@@ -5212,7 +5223,7 @@
     *: ""
   </dest>
   <voice>
-    *: "seconds"
+    *: "sekunder"
   </voice>
 </phrase>
 <phrase>
@@ -5226,7 +5237,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minute"
+    *: "minutt"
   </voice>
 </phrase>
 <phrase>
@@ -5240,7 +5251,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minutes"
+    *: "minutter"
   </voice>
 </phrase>
 <phrase>
@@ -5254,7 +5265,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hour"
+    *: "time"
   </voice>
 </phrase>
 <phrase>
@@ -5268,7 +5279,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hours"
+    *: "timer"
   </voice>
 </phrase>
 <phrase>
@@ -5310,7 +5321,7 @@
     *: ""
   </dest>
   <voice>
-    *: "percent"
+    *: "prosent"
   </voice>
 </phrase>
 <phrase>
@@ -5324,7 +5335,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milli-amp hours"
+    *: "milli-ampere-timer"
   </voice>
 </phrase>
 <phrase>
@@ -5338,7 +5349,7 @@
     *: ""
   </dest>
   <voice>
-    *: "pixel"
+    *: "piksel"
   </voice>
 </phrase>
 <phrase>
@@ -5352,7 +5363,7 @@
     *: ""
   </dest>
   <voice>
-    *: "per second"
+    *: "per sekund"
   </voice>
 </phrase>
 <phrase>
@@ -5436,7 +5447,7 @@
     *: ","
   </dest>
   <voice>
-    *: "point"
+    *: "komma"
   </voice>
 </phrase>
 <phrase>
@@ -5814,7 +5825,7 @@
     *: ""
   </dest>
   <voice>
-    *: "dot"
+    *: "punkt"
   </voice>
 </phrase>
 <phrase>
@@ -5842,7 +5853,7 @@
     *: ""
   </dest>
   <voice>
-    *: "file"
+    *: "fil"
   </voice>
 </phrase>
 <phrase>
@@ -5856,7 +5867,7 @@
     *: ""
   </dest>
   <voice>
-    *: "folder"
+    *: "katalog"
   </voice>
 </phrase>
 <phrase>
@@ -5884,7 +5895,7 @@
     *: ""
   </dest>
   <voice>
-    *: "configuration"
+    *: "konfigurasjon"
   </voice>
 </phrase>
 <phrase>
@@ -5898,7 +5909,7 @@
     *: ""
   </dest>
   <voice>
-    *: "while-playing-screen"
+    *: "spilleskjerm"
   </voice>
 </phrase>
 <phrase>
@@ -5940,7 +5951,7 @@
     *: ""
   </dest>
   <voice>
-    *: "font"
+    *: "skrifttype"
   </voice>
 </phrase>
 <phrase>
@@ -5954,7 +5965,7 @@
     *: ""
   </dest>
   <voice>
-    *: "bookmark"
+    *: "bokmerke"
   </voice>
 </phrase>
 <phrase>
@@ -6010,10 +6021,10 @@
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "Spillelistebufferet er fullt"
+    *: "Spillelistebufferen er full"
   </dest>
   <voice>
-    *: "Spillelistebufferet er fullt"
+    *: "Spillelistebufferen er full"
   </voice>
 </phrase>
 <phrase>
@@ -6027,7 +6038,7 @@
     *: "Lager"
   </dest>
   <voice>
-    *: ""
+    *: "Lager"
   </voice>
 </phrase>
 <phrase>
@@ -6041,7 +6052,7 @@
     *: "Satte inn %d spor (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Satte inn spor"
   </voice>
 </phrase>
 <phrase>
@@ -6055,7 +6066,7 @@
     *: "La til %d spor i køen (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "La til spor i køen"
   </voice>
 </phrase>
 <phrase>
@@ -6069,7 +6080,7 @@
     *: "Lagret %d spor (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Lagret spor"
   </voice>
 </phrase>
 <phrase>
@@ -6108,10 +6119,10 @@
     *: "Error updating playlist control file"
   </source>
   <dest>
-    *: "Feil under oppdatering av spillelistekontrollfil"
+    *: "Oppdatering av spillelistekontrollfil feilet"
   </dest>
   <voice>
-    *: "Feil under oppdatering av spillelistekontrollfil"
+    *: "Oppdatering av spillelistekontrollfil feilet"
   </voice>
 </phrase>
 <phrase>
@@ -6179,7 +6190,7 @@
     radio: "Station: %d.%02d MHz"
   </source>
   <dest>
-    *: ""
+    *: none 
     radio: "Stasjon: %d.%02d MHz"
   </dest>
   <voice>
@@ -6196,7 +6207,7 @@
     radio: "No presets"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Ingen ferdigoppsett"
   </dest>
   <voice>
@@ -6213,11 +6224,11 @@
     radio: "Add Preset"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Legg til ferdigoppsett"
   </dest>
   <voice>
-    *: " "
+    *: none
     radio: "Legg til ferdigoppsett"
   </voice>
 </phrase>
@@ -6230,7 +6241,7 @@
     radio: "Edit Preset"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Rediger ferdigoppsett"
   </dest>
   <voice>
@@ -6247,7 +6258,7 @@
     radio: "Remove Preset"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Fjern ferdigoppsett"
   </dest>
   <voice>
@@ -6264,7 +6275,7 @@
     radio: "Preset Save Failed"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Kunne ikke lagre ferdigoppsett"
   </dest>
   <voice>
@@ -6281,7 +6292,7 @@
     radio: "The Preset List is Full"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Ferdigoppsettliste er full"
   </dest>
   <voice>
@@ -6298,12 +6309,12 @@
     radio_screen_button_bar: "Menu"
   </source>
   <dest>
-    *: ""
+    *: none
     radio_screen_button_bar: "Meny"
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: ""
+    radio_screen_button_bar: "Meny"
   </voice>
 </phrase>
 <phrase>
@@ -6315,12 +6326,12 @@
     radio_screen_button_bar: "Exit"
   </source>
   <dest>
-    *: ""
+    *: none
     radio_screen_button_bar: "Avslutt"
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: ""
+    radio_screen_button_bar: "Avslutt"
   </voice>
 </phrase>
 <phrase>
@@ -6332,12 +6343,12 @@
     radio_screen_button_bar: "Action"
   </source>
   <dest>
-    *: ""
+    *: none
     radio_screen_button_bar: "Handling"
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: ""
+    radio_screen_button_bar: "Handling"
   </voice>
 </phrase>
 <phrase>
@@ -6349,12 +6360,12 @@
     radio_screen_button_bar: "Add"
   </source>
   <dest>
-    *: ""
+    *: none
     radio_screen_button_bar: "Legg til"
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: ""
+    radio_screen_button_bar: "Legg til"
   </voice>
 </phrase>
 <phrase>
@@ -6366,12 +6377,12 @@
     radio_screen_button_bar: "Record"
   </source>
   <dest>
-    *: ""
+    *: none
     radio_screen_button_bar: "Ta opp"
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: ""
+    radio_screen_button_bar: "Ta opp"
   </voice>
 </phrase>
 <phrase>
@@ -6383,7 +6394,7 @@
     radio: "Force Mono"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Tving mono"
   </dest>
   <voice>
@@ -6400,12 +6411,12 @@
     radio: "Screen frozen!"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Skjerm låst!"
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Skjerm låst"
   </voice>
 </phrase>
 <phrase>
@@ -6417,12 +6428,12 @@
     radio: "Auto-Scan Presets"
   </source>
   <dest>
-    *: ""
-    radio: "Søt automatisk"
+    *: none
+    radio: "Søk automatisk"
   </dest>
   <voice>
-    *: ""
-    radio: "Søt automatisk"
+    *: none
+    radio: "Søk automatisk"
   </voice>
 </phrase>
 <phrase>
@@ -6434,12 +6445,12 @@
     radio: "Clear Current Presets?"
   </source>
   <dest>
-    *: ""
-    radio: "Fjerne nåværende oppsett?"
+    *: none
+    radio: "Fjerne nåværende ferdigoppsett?"
   </dest>
   <voice>
     *: none
-    radio: "Fjerne nåværende oppsett?"
+    radio: "Fjerne nåværende ferdigoppsett?"
   </voice>
 </phrase>
 <phrase>
@@ -6451,7 +6462,7 @@
     radio: "Scanning %d.%02d MHz"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Søker %d.%02d MHz"
   </dest>
   <voice>
@@ -6468,7 +6479,7 @@
     radio: "%d.%02d MHz"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "%d.%02d MHz"
   </dest>
   <voice>
@@ -6485,7 +6496,7 @@
     radio: "Scan"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Søk"
   </dest>
   <voice>
@@ -6589,14 +6600,14 @@
     h10,h10_5gb,e200,c200: "PREV to abort"
   </source>
   <dest>
-    *: ""
-    player,h100,h120,h300: "AV for å avbryte"
-    ipod*: "SPILL/PAUSE for å avbryte"
-    x5,m5: "Hold SPILL for å avbryte"
-    h10,h10_5gb,e200,c200: "TILBAKE for å avbryte"
+    *: none
+    player,h100,h120,h300: "OFF for å avbryte"
+    ipod*: "PLAY/PAUSE for å avbryte"
+    x5,m5: "Hold PLAY for å avbryte"
+    h10,h10_5gb,e200,c200: "PREV for å avbryte"
   </dest>
   <voice>
-    *: ""
+    *: none
     player,h100,h120,h300: "AV for å avbryte"
     ipod*: "SPILL/PAUSE for å avbryte"
     x5,m5: "Hold SPILL for å avbryte"
@@ -6740,7 +6751,7 @@
     *: "Ukompatibel modell"
   </dest>
   <voice>
-    *: ""
+    *: "Ukompatibel modell"
   </voice>
 </phrase>
 <phrase>
@@ -6754,7 +6765,7 @@
     *: "Ukompatibel versjon"
   </dest>
   <voice>
-    *: ""
+    *: "Ukompatibel versjon"
   </voice>
 </phrase>
 <phrase>
@@ -6765,10 +6776,10 @@
     *: "Plugin returned error"
   </source>
   <dest>
-    *: "Plugin returnerte feil"
+    *: "Program returnerte feil"
   </dest>
   <voice>
-    *: ""
+    *: "Program returnerte feil"
   </voice>
 </phrase>
 <phrase>
@@ -6782,7 +6793,7 @@
     *: "Filnavnendingsliste full"
   </dest>
   <voice>
-    *: ""
+    *: "Filnavnendingsliste full"
   </voice>
 </phrase>
 <phrase>
@@ -6796,7 +6807,7 @@
     *: "Filtypeliste full"
   </dest>
   <voice>
-    *: ""
+    *: "Filtypeliste full"
   </voice>
 </phrase>
 <phrase>
@@ -6807,10 +6818,10 @@
     *: "Plugin name too long"
   </source>
   <dest>
-    *: "Plugin-navnet er for langt"
+    *: "Program-navnet er for langt"
   </dest>
   <voice>
-    *: ""
+    *: "Program-navnet er for langt"
   </voice>
 </phrase>
 <phrase>
@@ -6822,7 +6833,7 @@
     radio: "Save Changes?"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Lagre endringer?"
   </dest>
   <voice>
@@ -6839,12 +6850,12 @@
     swcodec: "Advanced EQ Settings"
   </source>
   <dest>
-    *: ""
-    swcodec: "Avanserte innstillinger"
+    *: none
+    swcodec: "Avanserte EQ-innstillinger"
   </dest>
   <voice>
-    *: ""
-    swcodec: "Avanserte innstillinger"
+    *: none
+    swcodec: "Avanserte EQ-innstillinger"
   </voice>
 </phrase>
 <phrase>
@@ -6872,7 +6883,7 @@
     *: "Oppdaterer database"
   </dest>
   <voice>
-    *: ""
+    *: "Oppdaterer database"
   </voice>
 </phrase>
 <phrase>
@@ -6884,11 +6895,11 @@
     swcodec: "Graphical EQ"
   </source>
   <dest>
-    *: ""
+    *: none 
     swcodec: "Grafisk EQ"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Grafisk equalizer"
   </voice>
 </phrase>
@@ -6901,11 +6912,11 @@
     lcd_non-mono: "Clear Backdrop"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_non-mono: "Fjern bakgrunn"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_non-mono: "Fjern bakgrunn"
   </voice>
 </phrase>
@@ -6918,11 +6929,11 @@
     lcd_non-mono: "Background Colour"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_non-mono: "Bakgrunnsfarge"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_non-mono: "Bakgrunnsfarge"
   </voice>
 </phrase>
@@ -6935,11 +6946,11 @@
     swcodec: "Q"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Q"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Kvalitetsfaktor"
   </voice>
 </phrase>
@@ -6980,11 +6991,11 @@
     swcodec: "Precut"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Forforsterkning"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Forforsterkning"
   </voice>
 </phrase>
@@ -7011,11 +7022,11 @@
     lcd_non-mono: "Foreground Colour"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_non-mono: "Forgrunnsfarge"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_non-mono: "Forgrunnsfarge"
   </voice>
 </phrase>
@@ -7042,11 +7053,11 @@
     remote: "Main and Remote Unit"
   </source>
   <dest>
-    *: ""
+    *: none
     remote: "Hovedenhet og fjernkontroll"
   </dest>
   <voice>
-    *: ""
+    *: none
     remote: "Hovedenhet og fjernkontroll"
   </voice>
 </phrase>
@@ -7061,7 +7072,7 @@
     *: ""
   </dest>
   <voice>
-    *: "keyboard"
+    *: "tastaturoppsett"
   </voice>
 </phrase>
 <phrase>
@@ -7074,11 +7085,11 @@
   </source>
   <dest>
     *: ""
-    swcodec: "Lagre EQ-innstilling"
+    swcodec: "Lagre EQ-innstillinger"
   </dest>
   <voice>
     *: ""
-    swcodec: "Lagre EQ-innstilling"
+    swcodec: "Lagre EQ-innstillinger"
   </voice>
 </phrase>
 <phrase>
@@ -7090,11 +7101,11 @@
     remote: "Main Unit Only"
   </source>
   <dest>
-    *: ""
+    *: none
     remote: "Bare hovedenheten"
   </dest>
   <voice>
-    *: ""
+    *: none
     remote: "Bare hovedenheten"
   </voice>
 </phrase>
@@ -7107,11 +7118,11 @@
     radio: "Load Preset List"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Åpne ferdigoppsett"
   </dest>
   <voice>
-    *: ""
+    *: none
     radio: "Åpne ferdigoppsett"
   </voice>
 </phrase>
@@ -7124,11 +7135,11 @@
     tc_ramcache: "Load to RAM"
   </source>
   <dest>
-    *: ""
+    *: none
     tc_ramcache: "Last inn i minnet"
   </dest>
   <voice>
-    *: ""
+    *: none
     tc_ramcache: "Last inn i minnet"
   </voice>
 </phrase>
@@ -7155,11 +7166,11 @@
     pitchscreen: "Pitch"
   </source>
   <dest>
-    *: ""
+    *: none
     pitchscreen: "Tonehøyde"
   </dest>
   <voice>
-    *: ""
+    *: none
     pitchscreen: "Tonehøyde"
   </voice>
 </phrase>
@@ -7200,12 +7211,12 @@
     swcodec: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: ""
-    swcodec: "Høyfrekvens knekkfrekvens"
+    *: none
+    swcodec: "Høy knekkfrekvens"
   </dest>
   <voice>
-    *: ""
-    swcodec: "Høyfrekvens knekkfrekvens"
+    *: none
+    swcodec: "Høy knekkfrekvens"
   </voice>
 </phrase>
 <phrase>
@@ -7217,11 +7228,11 @@
     radio: "Preset List"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Ferdigoppsettsliste"
   </dest>
   <voice>
-    *: ""
+    *: none
     radio: "Ferdigoppsettsliste"
   </voice>
 </phrase>
@@ -7248,7 +7259,7 @@
     lcd_non-mono: "Invalid colour"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_non-mono: "Ugyldig farge"
   </dest>
   <voice>
@@ -7321,12 +7332,12 @@
     lcd_non-mono: "Backdrop Failed"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_non-mono: "Kunne ikke laste inn bakgrunnsbilde"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: ""
+    lcd_non-mono: "Kunne ikke laste inn bakgrunnsbilde"
   </voice>
 </phrase>
 <phrase>
@@ -7338,11 +7349,11 @@
     remote: "Remote Unit Only"
   </source>
   <dest>
-    *: ""
+    *: none 
     remote: "Bare fjernkontroll"
   </dest>
   <voice>
-    *: ""
+    *: none
     remote: "Bare fjernkontroll"
   </voice>
 </phrase>
@@ -7354,10 +7365,10 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Fila/katalogen finnes. Skriv over?"
+    *: "Fil/katalog finnes. Skriv over?"
   </dest>
   <voice>
-    *: "Fila/katalogen finnes. Skriv over?"
+    *: "Fil/katalog finnes. Skriv over?"
   </voice>
 </phrase>
 <phrase>
@@ -7369,11 +7380,11 @@
     swcodec: "Cutoff Frequency"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Knekkfrekvens"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Knekkfrekvens"
   </voice>
 </phrase>
@@ -7386,11 +7397,11 @@
     recording: "Clipping Light"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Lys ved klipping"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Lys ved klipping"
   </voice>
 </phrase>
@@ -7403,11 +7414,11 @@
     lcd_non-mono: "Reset Colours"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_non-mono: "Nullstill farger"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_non-mono: "Nullstill farger"
   </voice>
 </phrase>
@@ -7420,7 +7431,7 @@
     radio: "No settings found. Autoscan?"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Fant ingen innstillinger. Søke automatisk?"
   </dest>
   <voice>
@@ -7437,7 +7448,7 @@
     lcd_color: "RGB"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_color: "RGB"
   </dest>
   <voice>
@@ -7468,7 +7479,7 @@
     swcodec: "%d Hz Band Gain"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Forsterkning for %d Hz-båndet"
   </dest>
   <voice>
@@ -7485,11 +7496,11 @@
     swcodec: "Track Skip Only"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Bare ved sporbytte"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Bare ved sporbytte"
   </voice>
 </phrase>
@@ -7502,11 +7513,11 @@
     swcodec: "Center Frequency"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Midtfrekvens"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Midtfrekvens"
   </voice>
 </phrase>
@@ -7519,12 +7530,12 @@
     radio: "Clear Preset List"
   </source>
   <dest>
-    *: ""
-    radio: "Tøm oppsettliste"
+    *: none
+    radio: "Tøm ferdigoppsettliste"
   </dest>
   <voice>
     *: ""
-    radio: "Tøm oppsettliste"
+    radio: "Tøm ferdigoppsettliste"
   </voice>
 </phrase>
 <phrase>
@@ -7564,11 +7575,11 @@
     swcodec: "Cross Gain"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Krysslydnivå"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Krysslydnivå"
   </voice>
 </phrase>
@@ -7581,11 +7592,11 @@
     radio: "Save Preset List"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Lagre ferdigoppsett"
   </dest>
   <voice>
-    *: ""
+    *: none
     radio: "Lagre ferdigoppsett"
   </voice>
 </phrase>
@@ -7598,7 +7609,7 @@
     lcd_color: "RGB: %02X%02X%02X"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_color: "RGB: %02X%02X%02X"
   </dest>
   <voice>
@@ -7615,11 +7626,11 @@
     swcodec: "Simple EQ Settings"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Enkle EQ-innstillinger"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Enkle EQ-innstillinger"
   </voice>
 </phrase>
@@ -7632,11 +7643,11 @@
     swcodec: "Low Shelf Filter"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Lavfrekvensfilter"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Lavfrekvensfilter"
   </voice>
 </phrase>
@@ -7649,7 +7660,7 @@
     swcodec: "Edit mode: %s"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Redigeringsmodus: %s"
   </dest>
   <voice>
@@ -7666,11 +7677,11 @@
     swcodec: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Høyfrekvensdemping"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Høyfrekvensdemping"
   </voice>
 </phrase>
@@ -7683,11 +7694,11 @@
     swcodec: "Enable EQ"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Bruk EQ"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Bruk EQ"
   </voice>
 </phrase>
@@ -7714,11 +7725,11 @@
     swcodec: "High Shelf Filter"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Høyfrekvensfilter"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Høyfrekvensfilter"
   </voice>
 </phrase>
@@ -7731,12 +7742,12 @@
     swcodec: "Browse EQ Presets"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Bla igjennom EQ-oppsett"
   </dest>
   <voice>
-    *: ""
-    swcodec: "Bla igjennom EQ-oppsett"
+    *: none
+    swcodec: "Bla igjennom equalizer-oppsett"
   </voice>
 </phrase>
 <phrase>
@@ -7748,7 +7759,7 @@
     lcd_non-mono: "Backdrop Loaded"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_non-mono: "Lastet bakgrunnsbilde"
   </dest>
   <voice>
@@ -7765,11 +7776,11 @@
     lcd_non-mono: "Set As Backdrop"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_non-mono: "Bruk som bakgrunn"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_non-mono: "Bruk som bakgrunn"
   </voice>
 </phrase>
@@ -7782,11 +7793,11 @@
     swcodec: "Direct Gain"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Direktelydnivå"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Direktelydnivå"
   </voice>
 </phrase>
@@ -7799,11 +7810,11 @@
     swcodec: "Peak Filter %d"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Midtfrekvensfilter %d"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Midtfrekvensfilter"
   </voice>
 </phrase>
@@ -7851,53 +7862,53 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_YES
-  desc: bool true representation
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Yes"
+    lcd_bitmap: ""
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "Ja"
+    *: none
+    lcd_bitmap: ""
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: "Ja"
+    *: none
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_NO
-  desc: bool false representation
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "No"
+    lcd_bitmap: ""
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "Nei"
+    *: none
+    lcd_bitmap: ""
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: "Nei"
+    *: none
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ON
-  desc: Used in a lot of places
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "On"
+    lcd_bitmap: ""
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "På"
+    *: none
+    lcd_bitmap: ""
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: "På"
+    *: none
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -7909,11 +7920,11 @@
     lcd_bitmap: "Off"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "Av"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_bitmap: "Av"
   </voice>
 </phrase>
@@ -7926,11 +7937,11 @@
     recording: "Volume"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Volum"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Volum"
   </voice>
 </phrase>
@@ -7943,11 +7954,11 @@
     recording: "Stereo"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Stereo"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Stereo"
   </voice>
 </phrase>
@@ -7960,148 +7971,148 @@
     recording: "Mono"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Mono"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Mono"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SHUFFLE
-  desc: in settings_menu
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Shuffle"
+    lcd_bitmap: ""
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "Tilfeldig rekkefølge"
+    *: none
+    lcd_bitmap: ""
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: "Tilfeldig rekkefølge"
+    *: none
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT
-  desc: in settings_menu
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Repeat"
+    lcd_bitmap: ""
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "Gjenta"
+    *: none
+    lcd_bitmap: ""
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: "Gjenta"
+    *: none
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_ONE
-  desc: repeat one song
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "One"
+    lcd_bitmap: ""
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "En"
+    *: none
+    lcd_bitmap: ""
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: "En"
+    *: none
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_AB
-  desc: repeat range from point A to B
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "A-B"
+    lcd_bitmap: ""
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "A-B"
+    *: none
+    lcd_bitmap: ""
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: "A-B"
+    *: none
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER
-  desc: setting name for dir filter
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Show Files"
+    lcd_bitmap: ""
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "Vis filer"
+    *: none
+    lcd_bitmap: ""
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: "Vis filer"
+    *: none
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_SUPPORTED
-  desc: show all file types supported by Rockbox
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Supported"
+    lcd_bitmap: ""
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "Støttede"
+    *: none
+    lcd_bitmap: ""
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: "Støttede"
+    *: none
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_MUSIC
-  desc: show only music-related files
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Music"
+    lcd_bitmap: ""
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "Musikk"
+    *: none
+    lcd_bitmap: ""
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: "Musikk"
+    *: none
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_PLAYLIST
-  desc: show only playlist
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Playlists"
+    lcd_bitmap: ""
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "Spillelister"
+    *: none
+    lcd_bitmap: ""
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: "Spillelister"
+    *: none
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8113,11 +8124,11 @@
     recording_hwcodec: "Quality"
   </source>
   <dest>
-    *: ""
+    *: none
     recording_hwcodec: "Kvalitet"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording_hwcodec: "Kvalitet"
   </voice>
 </phrase>
@@ -8130,11 +8141,11 @@
     recording: "Frequency"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Frekvens"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Frekvens"
   </voice>
 </phrase>
@@ -8147,11 +8158,11 @@
     recording: "Source"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Kilde"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Kilde"
   </voice>
 </phrase>
@@ -8164,11 +8175,11 @@
     recording: "Int. Mic"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Intern mikrofon"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Intern mikrofon"
   </voice>
 </phrase>
@@ -8181,11 +8192,11 @@
     recording: "Digital"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Digital"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Digital"
   </voice>
 </phrase>
@@ -8198,63 +8209,63 @@
     recording: "Trigger"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Utløser"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Utløser"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FLIP_DISPLAY
-  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Upside Down"
+    lcd_bitmap: ""
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "Opp-ned"
+    *: none
+    lcd_bitmap: ""
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: "Opp-ned"
+    *: none
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SCROLL_BAR
-  desc: display menu, F3 substitute
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Scroll Bar"
+    lcd_bitmap: ""
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "Rullefelt"
+    *: none
+    lcd_bitmap: ""
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: "Rullefelt"
+    *: none
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_STATUS_BAR
-  desc: display menu, F3 substitute
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Status Bar"
+    lcd_bitmap: ""
   </source>
   <dest>
-    *: ""
-    lcd_bitmap: "Statusfelt"
+    *: none
+    lcd_bitmap: ""
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: "Statusfelt"
+    *: none
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8266,7 +8277,7 @@
     recording: "Time:"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Tid:"
   </dest>
   <voice>
@@ -8283,7 +8294,7 @@
     recording: "Split Time:"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Deletid:"
   </dest>
   <voice>
@@ -8300,7 +8311,7 @@
     recording: "Size:"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Størrelse:"
   </dest>
   <voice>
@@ -8317,8 +8328,8 @@
     recording: "Pre-Recording"
   </source>
   <dest>
-    *: ""
-    recording: "Forinnspilling"
+    *: none
+    recording: "Føropptak"
   </dest>
   <voice>
     *: none
@@ -8334,12 +8345,12 @@
     recording: "Gain Left"
   </source>
   <dest>
-    *: ""
+    *: none 
     recording: "Forsterkning venstre"
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Forsterkning venstre"
   </voice>
 </phrase>
 <phrase>
@@ -8351,12 +8362,12 @@
     recording: "Gain Right"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Forsterkning høyre"
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Forsterkning høyre"
   </voice>
 </phrase>
 <phrase>
@@ -8370,10 +8381,10 @@
     m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
-    *: ""
-    recording: "Disken er full. Trykk AV for å fortsette."
-    h100,h120,h300: "Disken er full. Trykk STOPP for å fortsette."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "Disken er full. Trykk VENSTRE for å fortsette."
+    *: none 
+    recording: "Disken er full. Trykk OFF for å fortsette."
+    h100,h120,h300: "Disken er full. Trykk STOP for å fortsette."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "Disken er full. Trykk LEFT for å fortsette."
   </dest>
   <voice>
     *: none
@@ -8391,12 +8402,12 @@
     recorder_pad: "Menu"
   </source>
   <dest>
-    *: ""
+    *: none
     recorder_pad: "Meny"
   </dest>
   <voice>
     *: none
-    recorder_pad: ""
+    recorder_pad: "Meny"
   </voice>
 </phrase>
 <phrase>
@@ -8408,12 +8419,12 @@
     recorder_pad: "Option"
   </source>
   <dest>
-    *: ""
+    *: none
     recorder_pad: "Valg"
   </dest>
   <voice>
     *: none
-    recorder_pad: ""
+    recorder_pad: "Valg"
   </voice>
 </phrase>
 <phrase>
@@ -8425,12 +8436,12 @@
     recorder_pad: "LCD"
   </source>
   <dest>
-    *: ""
+    *: none
     recorder_pad: "LCD"
   </dest>
   <voice>
     *: none
-    recorder_pad: ""
+    recorder_pad: "LCD"
   </voice>
 </phrase>
 <phrase>
@@ -8442,11 +8453,11 @@
     swcodec: "Cutoff Frequency"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Knekkfrekvens"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Knekkfrekvens"
   </voice>
 </phrase>
@@ -8459,7 +8470,7 @@
     swcodec: "Edit mode: %s"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Redigeringsmodus: %s"
   </dest>
   <voice>
@@ -8476,11 +8487,11 @@
     agc: "Safety (clip)"
   </source>
   <dest>
-    *: ""
+    *: none
     agc: "Sikker (klipp)"
   </dest>
   <voice>
-    *: ""
+    *: none
     agc: "Sikker klipp"
   </voice>
 </phrase>
@@ -8493,11 +8504,11 @@
     agc: "Voice (fast)"
   </source>
   <dest>  
-    *: ""
+    *: none
     agc: "Stemme (rask)"
   </dest>
   <voice>  
-    *: ""
+    *: none
     agc: "Stemme rask"
   </voice>
 </phrase>
@@ -8510,11 +8521,11 @@
     agc: "Medium"
   </source>
   <dest>
-    *: ""
+    *: none
     agc: "Medium"
   </dest>
   <voice>
-    *: ""
+    *: none
     agc: "Medium"
   </voice>
 </phrase>
@@ -8527,11 +8538,11 @@
     agc: "Live (slow)"
   </source>
   <dest>
-    *: ""
+    *: none
     agc: "Live (treg"
   </dest>
   <voice>
-    *: ""
+    *: none
     agc: "Live (treg)"
   </voice>
 </phrase>
@@ -8544,11 +8555,11 @@
     agc: "DJ-Set (slow)"
   </source>
   <dest>
-    *: ""
+    *: none
     agc: "DJ-sett (treg)"
   </dest>
   <voice>
-    *: ""
+    *: none
     agc: "DJ-sett (treg)"
   </voice>
 </phrase>
@@ -8561,11 +8572,11 @@
     agc: "AGC max. gain"
   </source>
   <dest>
-    *: ""
-    agc: "AGC maks. forsterkning"
+    *: none
+    agc: "AGC maks forsterkning"
   </dest>
   <voice>
-    *: ""
+    *: none
     agc: "AGC maksimal forsterkning"
   </voice>
 </phrase>
@@ -8578,11 +8589,11 @@
     ipodvideo: ""
   </source>
   <dest>
-    *: ""
+    *: none
     ipodvideo: ""
   </dest>
   <voice>
-    *: ""
+    *: none
     ipodvideo: ""
   </voice>
 </phrase>
@@ -8595,11 +8606,11 @@
     recording: "PCM Wave"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "WAV"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "WAV"
   </voice>
 </phrase>
@@ -8612,11 +8623,11 @@
     agc: "Automatic Gain Control"
   </source>
   <dest>
-    *: ""
+    *: none
     agc: "Automatisk nivåkontroll (AGC)"
   </dest>
   <voice>
-    *: ""
+    *: none
     agc: "utomatisk nivåkontroll (AGC)"
   </voice>
 </phrase>
@@ -8631,7 +8642,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilobits per second"
+    *: "kilobiter per sekund"
   </voice>
 </phrase>
 <phrase>
@@ -8643,11 +8654,11 @@
     lcd_sleep: "Never"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_sleep: "Aldri"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_sleep: "Aldri"
   </voice>
 </phrase>
@@ -8660,11 +8671,11 @@
     agc: "DJ-Set (slow)"
   </source>
   <dest>
-    *: ""
+    *: none
     agc: "DJ-sett (treg)"
   </dest>
   <voice>
-    *: ""
+    *: none
     agc: "DJ-sett (treg)"
   </voice>
 </phrase>
@@ -8691,11 +8702,11 @@
     recording_swcodec: "WavPack"
   </source>
   <dest>
-    *: ""
+    *: none
     recording_swcodec: "WavPack"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording_swcodec: "WavPack"
   </voice>
 </phrase>
@@ -8708,11 +8719,11 @@
     lcd_sleep: "Sleep (After Backlight Off)"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_sleep: "Sov (etter at skjermlyset er av)"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_sleep: "Sov (etter at skjermlyset er av)"
   </voice>
 </phrase>
@@ -8725,11 +8736,11 @@
     recording: "Filesize"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Filstørrelse"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Filstørrelse"
   </voice>
 </phrase>
@@ -8742,11 +8753,11 @@
     recording: "(Same As Source)"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "(Samme som kilde)"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Samme som kilde"
   </voice>
 </phrase>
@@ -8759,11 +8770,11 @@
     remote: "Remote Display OFF"
   </source>
   <dest>
-    *: ""
+    *: none
     remote: "Fjernkontrollskjerm AV"
   </dest>
   <voice>
-    *: ""
+    *: none
     remote: "Fjernkontrollskjerm AV"
   </voice>
 </phrase>
@@ -8776,11 +8787,11 @@
     radio: "Europe"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Europa"
   </dest>
   <voice>
-    *: ""
+    *: none
     radio: "Europa"
   </voice>
 </phrase>
@@ -8793,11 +8804,11 @@
     ipodvideo: ""
   </source>
   <dest>
-    *: ""
+    *: none
     ipodvideo: ""
   </dest>
   <voice>
-    *: ""
+    *: none
     ipodvideo: ""
   </voice>
 </phrase>
@@ -8809,7 +8820,7 @@
     *: "WARNING! Low Battery!"
   </source>
   <dest>
-    *: "ADVARSEL! Lavt batteri!"
+    *: "ADVARSEL! Lavt batterinivå!"
   </dest>
   <voice>
     *: ""
@@ -8824,12 +8835,12 @@
     recording: "Encoder Settings"
   </source>
   <dest>
-    *: ""
-    recording: "Lydkoder-oppsett"
+    *: none
+    recording: "Lydkoder-innstillinger"
   </dest>
   <voice>
-    *: ""
-    recording: "Lydkoder-oppsett"
+    *: none
+    recording: "Lydkoder-innstillinger"
   </voice>
 </phrase>
 <phrase>
@@ -8843,7 +8854,7 @@
     *: "Oppdater automatisk"
   </dest>
   <voice>
-    *: "Auto update"
+    *: "Oppdater automatisk"
   </voice>
 </phrase>
 <phrase>
@@ -8855,11 +8866,11 @@
     recording: "Stop recording"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Stopp opptak"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Stopp opptak"
   </voice>
 </phrase>
@@ -8872,11 +8883,11 @@
     recording: "Format"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Format"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Format"
   </voice>
 </phrase>
@@ -8889,11 +8900,11 @@
     swcodec: "Shuffle and Track Skip"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Ved omstokking og sporendring"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: "Ved omstokking og sporendring"
   </voice>
 </phrase>
@@ -8920,11 +8931,11 @@
     recording_swcodec: "Bitrate"
   </source>
   <dest>
-    *: ""
+    *: none
     recording_swcodec: "Bitrate"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording_swcodec: "Bitrate"
   </voice>
 </phrase>
@@ -8965,11 +8976,11 @@
     recording: "New file"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Ny fil"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "Ny fil"
   </voice>
 </phrase>
@@ -8982,11 +8993,11 @@
     remote: "Remote Scrolling Options"
   </source>
   <dest>
-    *: ""
+    *: none
     remote: "Rullevalg for fjernkontroll"
   </dest>
   <voice>
-    *: ""
+    *: none
     remote: "Rullevalg for fjernkontroll"
   </voice>
 </phrase>
@@ -8999,11 +9010,11 @@
     agc: "Live (slow)"
   </source>
   <dest>
-    *: ""
+    *: none
     agc: "Live (treg)"
   </dest>
   <voice>
-    *: ""
+    *: none
     agc: "Live (treg)"
   </voice>
 </phrase>
@@ -9016,11 +9027,11 @@
     recording: "AIFF"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "AIFF"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "AIFF"
   </voice>
 </phrase>
@@ -9033,11 +9044,11 @@
     agc: "Voice (fast)"
   </source>
   <dest>
-    *: ""
+    *: none
     agc: "Stemme (rask)"
   </dest>
   <voice>
-    *: ""
+    *: none
     agc: "Stemme (rask)"
   </voice>
 </phrase>
@@ -9064,11 +9075,11 @@
     recording: "(No Settings)"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "(Ingen innstillinger)"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "(Ingen innstillinger)"
   </voice>
 </phrase>
@@ -9081,7 +9092,7 @@
     recording: "Split Filesize"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Oppdelingsstørrelse"
   </dest>
   <voice>
@@ -9098,7 +9109,7 @@
     remote: "(Vol- : Re-enable)"
   </source>
   <dest>
-    *: ""
+    *: none
     remote: "(Vol- : Slå på igjen)"
   </dest>
   <voice>
@@ -9115,7 +9126,7 @@
     agc: "Medium"
   </source>
   <dest>
-    *: ""
+    *: none
     agc: "Medium"
   </dest>
   <voice>
@@ -9132,7 +9143,7 @@
     recording: "Filename:"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Filnavn:"
   </dest>
   <voice>
@@ -9149,7 +9160,7 @@
     agc: "Safety (clip)"
   </source>
   <dest>
-    *: ""
+    *: none
     agc: "Sikker (klipping)"
   </dest>
   <voice>
@@ -9180,12 +9191,12 @@
     recording: "Split Measure"
   </source>
   <dest>
-    *: ""
-    recording: "Oppdelingsmål"
+    *: none
+    recording: "Del opp etter..."
   </dest>
   <voice>
     *: ""
-    recording: "Oppdelingsmål"
+    recording: "Del opp etter"
   </voice>
 </phrase>
 <phrase>
@@ -9211,7 +9222,7 @@
     radio: "Korea"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Korea"
   </dest>
   <voice>
@@ -9256,7 +9267,7 @@
     radio: "US / Canada"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "USA / Canada"
   </dest>
   <voice>
@@ -9273,7 +9284,7 @@
     radio: "Region"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Region"
   </dest>
   <voice>
@@ -9290,7 +9301,7 @@
     agc: "AGC"
   </source>
   <dest>
-    *: ""
+    *: none
     agc: "AGC"
   </dest>
   <voice>
@@ -9321,7 +9332,7 @@
     recording: "Stop"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Stopp"
   </dest>
   <voice>
@@ -9338,7 +9349,7 @@
     recording: "Split Time"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Oppdelingstid"
   </dest>
   <voice>
@@ -9397,7 +9408,7 @@
     recording: "Start new file"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Start ny fil"
   </dest>
   <voice>
@@ -9414,12 +9425,12 @@
     recording: "What to do when Splitting"
   </source>
   <dest>
-    *: ""
-    recording: "Hva skal gjøres ved oppdeling"
+    *: none
+    recording: "Oppdelingshandling"
   </dest>
   <voice>
     *: ""
-    recording: "Hva skal gjøres ved oppdeling"
+    recording: "Oppdelingshandling"
   </voice>
 </phrase>
 <phrase>
@@ -9431,7 +9442,7 @@
     recording: "Split Filesize"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Oppdelingsstørrelse"
   </dest>
   <voice>
@@ -9448,11 +9459,11 @@
     ipodvideo: ""
   </source>
   <dest>
-    *: ""
+    *: none
     ipodvideo: ""
   </dest>
   <voice>
-    *: ""
+    *: none
     ipodvideo: ""
   </voice>
 </phrase>
@@ -9465,7 +9476,7 @@
     radio: "Japan"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Japan"
   </dest>
   <voice>
@@ -9496,7 +9507,7 @@
     swcodec: "Dithering"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "Dithering"
   </dest>
   <voice>
@@ -9513,11 +9524,11 @@
     ipodvideo: ""
   </source>
   <dest>
-    *: ""
+    *: none
     ipodvideo: ""
   </dest>
   <voice>
-    *: ""
+    *: none
     ipodvideo: ""
   </voice>
 </phrase>
@@ -9558,7 +9569,7 @@
     agc: "AGC clip time"
   </source>
   <dest>
-    *: ""
+    *: none
     agc: "AGC-klipptid"
   </dest>
   <voice>
@@ -9575,7 +9586,7 @@
     recording: "MPEG Layer 3"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "MPEG Layer 3"
   </dest>
   <voice>
@@ -9606,11 +9617,11 @@
     ipodvideo: ""
   </source>
   <dest>
-    *: ""
+    *: none
     ipodvideo: ""
   </dest>
   <voice>
-    *: ""
+    *: none
     ipodvideo: ""
   </voice>
 </phrase>
@@ -9622,10 +9633,10 @@
     *: ""
   </source>
   <dest>
-    *: "Gjeldende tid"
+    *: ""
   </dest>
   <voice>
-    *: "Gjeldende tid"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9665,12 +9676,12 @@
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: ""
-    hold_button: "Skjermlys (når hold-knappen er på)"
+    *: none
+    hold_button: "Skjermlys med hold-knapp på"
   </dest>
   <voice>
     *: ""
-    hold_button: "Skjermlys (når hold-knappen er på)"
+    hold_button: "Skjermlys med hold-knapp på"
   </voice>
 </phrase>
 <phrase>
@@ -9698,7 +9709,7 @@
     *: "Ingen spillelister"
   </dest>
   <voice>
-    *: ""
+    *: "Ingen spillelister"
   </voice>
 </phrase>
 <phrase>
@@ -9710,7 +9721,7 @@
     recording: "Trigtype"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Utløsertype"
   </dest>
   <voice>
@@ -9740,22 +9751,22 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
+    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
-    *: "Bygger database... %d funnet (AV for å gå tilbake)"
-    h100,h120,h300: "Bygger database... %d funnet (STOPP for å gå tilbake)"
-    ipod*: "Bygger database... %d funnet (TILBAKE for å gå tilbake)"
-    x5,m5: "Bygger database... %d funnet (VENSTRE for å gå tilbake)"
-    h10,h10_5gb,e200,c200: "Bygger database... %d funnet (TILBAKE for å gå tilbake)"
+    *: "Bygger database... %d funnet (OFF for å gå tilbake)"
+    h100,h120,h300: "Bygger database... %d funnet (STOP for å gå tilbake)"
+    ipod*: "Bygger database... %d funnet (PREV for å gå tilbake)"
+    x5,m5,gigabeat*,mrobe100: "Bygger database... %d funnet (LEFT for å gå tilbake)"
+    h10,h10_5gb,e200,c200,sa9200: "Bygger database... %d funnet (PREV for å gå tilbake)"
   </dest>
   <voice>
     *: ""
     h100,h120,h300: ""
     ipod*: ""
-    x5,m5: ""
-    h10,h10_5gb,e200,c200: ""
+    x5,m5,gigabeat*,mrobe100: ""
+    h10,h10_5gb,e200,c200,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9795,7 +9806,7 @@
     usb_charging: "Charge During USB Connection"
   </source>
   <dest>
-    *: ""
+    *: none
     usb_charging: "Lad opp under USB-tilkobling"
   </dest>
   <voice>
@@ -9840,7 +9851,7 @@
     alarm: "Alarm Wake up Screen"
   </source>
   <dest>
-    *: ""
+    *: none
     alarm: "Vekkerklokkeskjerm"
   </dest>
   <voice>
@@ -9997,15 +10008,15 @@
   user:
   <source>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf,mrobe100: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf: "Lysstyrke på knapper"
+    gigabeatf,mrobe100: "Knapplysstyrke"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Lysstyrke på knapper"
+    gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -10015,17 +10026,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100: "Button Light Timeout"
+    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
-    e200: "Tid før lys på hjul slukker"
-    c200,gigabeatf,mrobe100: "Tid før lys på knapper slukker"
+    e200: "Slukketid for hjullys"
+    c200,gigabeatf,mrobe100,sa9200: "Slukketid for knapplys"
   </dest>
   <voice>
     *: none
     e200: "Tid før lys på hjul slukker"
-    c200,gigabeatf,mrobe100: "Tid før lys på knapper slukker"
+    c200,gigabeatf,mrobe100,sa9200: "Tid før lys på knapper slukker"
   </voice>
 </phrase>
 <phrase>
@@ -10134,11 +10145,11 @@
   </source>
   <dest>
     *: none
-    recording: "Line in"
+    recording: "Linjeinngang"
   </dest>
   <voice>
     *: none
-    recording: "Line in"
+    recording: "Linjeinngang"
   </voice>
 </phrase>
 <phrase>
@@ -10188,19 +10199,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ALL
-  desc: repeat playlist once all songs have completed
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "All"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Alle"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Alle"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -10278,19 +10289,16 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "No partition?"
-    player: "Partition?"
+    *: ""
   </source>
   <dest>
-    *: "Ingen partisjon?"
-    player: "Partisjon?"
+    *: ""
   </dest>
   <voice>
     *: ""
-    player: ""
   </voice>
 </phrase>
 <phrase>
@@ -10343,16 +10351,16 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "Save Failed"
+    *: ""
   </source>
   <dest>
-    *: "Feil ved lagring"
+    *: ""
   </dest>
   <voice>
-    *: "Feil ved lagring"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10506,19 +10514,19 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
-    *: "SPILL = Ja"
+    *: "PLAY = Ja"
     h100,h120,h300: "NAVI = Ja"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "VELG = Ja"
-    player: "(SPILL/STOPP)"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Ja"
+    player: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: ""
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: ""
     player: ""
   </voice>
 </phrase>
@@ -10530,19 +10538,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
-    rtc: "PÅ = Sett"
+    rtc: "ON = Sett"
     h100,h120,h300: "NAVI = Sett"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "VELG = Sett"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Sett"
   </dest>
   <voice>
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: ""
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -10598,10 +10606,10 @@
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "Bruk fil-.talk-klipp"
+    *: "Bruk .talk-klipp for filer"
   </dest>
   <voice>
-    *: "Bruk fil-.talk-klipp"
+    *: "Bruk .talk-klipp for filer"
   </voice>
 </phrase>
 <phrase>
@@ -10690,11 +10698,11 @@
   </source>
   <dest>
     *: none
-    radio: "Forhåndsinnstilling"
+    radio: "Ferdigoppsett"
   </dest>
   <voice>
     *: none
-    radio: "Forhåndsinnstilling"
+    radio: "Ferdigoppsett"
   </voice>
 </phrase>
 <phrase>
@@ -11009,11 +11017,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Hvor lenge å spole tilbake"
+    headphone_detection: "Hvor langt å spole tilbake"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Hvor lenge å spole tilbake"
+    headphone_detection: "Hvor langt å spole tilbake"
   </voice>
 </phrase>
 <phrase>
@@ -11221,10 +11229,10 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Bruk katalog-.talk-klipp"
+    *: "Bruk .talk-klipp for kataloger"
   </dest>
   <voice>
-    *: "Bruk katalog-.talk-klipp"
+    *: "Bruk .talk-klipp for kataloger"
   </voice>
 </phrase>
 <phrase>
@@ -11492,5 +11500,317 @@
   <voice>
     *: none
     recording: "Bruk som opptakskatalog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_STUDY_MODE
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHPAD_SENSITIVITY
+  desc: touchpad sensitivity setting
+  user: 
+  <source>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Styreflatefølsomhet"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FAST
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Fast"
+  </source>
+  <dest>
+    *: "Rask"
+  </dest>
+  <voice>
+    *: "Fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_LENGTH
+  desc: playback settings menu
+  user: 
+  <source>
+    *: "Skip Length"
+  </source>
+  <dest>
+    *: "Hopplengde"
+  </dest>
+  <voice>
+    *: "Skip Length"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_RANDOM
+  desc: "<Random>" entry in tag browser
+  user: 
+  <source>
+    *: "<Random>"
+  </source>
+  <dest>
+    *: "<Tilfeldig>"
+  </dest>
+  <voice>
+    *: "Random"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACCESSORY_SUPPLY
+  desc: in system settings menu
+  user: 
+  <source>
+    *: none
+    accessory_supply: "Accessory Power Supply"
+  </source>
+  <dest>
+    *: none
+    accessory_supply: "Strømforsyning for tilbehør"
+  </dest>
+  <voice>
+    *: none
+    accessory_supply: "Accessory Power Supply"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING_AND_SHUTDOWN
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "Stop Recording And Shutdown"
+  </source>
+  <dest>
+    *: none
+    recording: "Avslutt opptak og slå av"
+  </dest>
+  <voice>
+    *: none
+    recording: "Stop Recording And Shutdown"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user: 
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "Lagre lydinnstillinger"
+  </dest>
+  <voice>
+    *: "Save Sound Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_MODE
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_HOP_STEP
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_SLOW
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Very slow"
+  </source>
+  <dest>
+    *: "Saktest"
+  </dest>
+  <voice>
+    *: "Very slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK
+  desc: in keyclick settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Keyclick"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Keyclick"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Keyclick"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLOW
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Sakte"
+  </dest>
+  <voice>
+    *: "Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUICKSCREEN
+  desc: spoken only, Announces entering the "quick screen"
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Quick screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_FAST
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Very fast"
+  </source>
+  <dest>
+    *: "Raskest"
+  </dest>
+  <voice>
+    *: "Raskest"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_STUDY_MODE
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN
+  desc: generic string for unknown states, such as an unset clock
+  user: 
+  <source>
+    *: "Unknown"
+  </source>
+  <dest>
+    *: "Ukjent"
+  </dest>
+  <voice>
+    *: "Ukjent"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_TRACK
+  desc: skip length setting entry 0
+  user: 
+  <source>
+    *: "Skip Track"
+  </source>
+  <dest>
+    *: "Bytt spor"
+  </dest>
+  <voice>
+    *: "Bytt spor"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OK
+  desc: spoken only, On exiting a context, specifically the quick screen
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_REPEATS
+  desc: in keyclick settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Keyclick Repeats"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Tastelydgjentagelse"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Tastelydgjentagelse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIGH
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    gigabeatf: "High"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Høy"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Høy"
   </voice>
 </phrase>
