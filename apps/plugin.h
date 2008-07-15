@@ -206,7 +206,7 @@ struct plugin_api {
                          int src_x, int src_y, int stride,
                          int x, int y, int width, int height);
 #if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200) \
-    || defined (IRIVER_H10)
+    || defined(IRIVER_H10) || defined(COWON_D2)
     void (*lcd_yuv_set_options)(unsigned options);
 #endif
 #elif (LCD_DEPTH < 4) && !defined(SIMULATOR)
@@ -395,7 +395,7 @@ struct plugin_api {
                                           size_t stack_size, unsigned flags,
                                           const char *name
                                           IF_PRIO(, int priority)
-					                      IF_COP(, unsigned int core));
+                                          IF_COP(, unsigned int core));
     void (*thread_exit)(void);
     void (*thread_wait)(struct thread_entry *thread);
 #if CONFIG_CODEC == SWCODEC

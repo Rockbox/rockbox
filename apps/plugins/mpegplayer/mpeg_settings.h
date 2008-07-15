@@ -6,7 +6,7 @@
 #define SETTINGS_FILENAME "mpegplayer.cfg"
 
 #if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200) \
-    || defined (IRIVER_H10)
+    || defined(IRIVER_H10) || defined(COWON_D2)
 #define MPEG_OPTION_DITHERING_ENABLED 1
 #endif
 
