@@ -30,6 +30,8 @@
 #include "system.h"
 #include "mips.h"
 #include "button.h"
+#include "timefuncs.h"
+#include "rtc.h"
 
 int _line = 1;
 char _printfbuf[256];
@@ -56,13 +58,93 @@ void _printf(const char *format, ...)
         _line = 1;
 }
 
-void audiotest(void)
+static void audiotest(void)
 {
     __i2s_internal_codec();
     __aic_enable();
     __aic_reset();
     __aic_select_i2s();
     __aic_enable_loopback();
+}
+
+#define JZ_NAND_SELECT(n)     (REG_EMC_NFCSR |=  (EMC_NFCSR_NFCE##n | EMC_NFCSR_NFE##n) )
+#define JZ_NAND_DESELECT(n)   (REG_EMC_NFCSR &= ~(EMC_NFCSR_NFCE##n | EMC_NFCSR_NFE##n) )
+
+#define NAND_CMD_READ1_00  0x00
+#define NAND_CMD_READ_ID1  0x90
+#define NAND_CMD_READ_ID2  0x91
+
+#define NANDFLASH_CLE      0x00008000 //PA[15]
+#define NANDFLASH_ALE      0x00010000 //PA[16]
+
+#define NANDFLASH_BASE     0xB8000000
+#define REG_NAND_DATA      (*((volatile unsigned char *) NANDFLASH_BASE))
+#define REG_NAND_CMD       (*((volatile unsigned char *) (NANDFLASH_BASE + NANDFLASH_CLE)))
+#define REG_NAND_ADDR      (*((volatile unsigned char *) (NANDFLASH_BASE + NANDFLASH_ALE)))
+
+static void jz_nand_scan_id(void)
+{
+    unsigned char cData[5];
+    unsigned int dwNandID;
+    
+    REG_EMC_NFCSR = 0;
+    
+    JZ_NAND_SELECT(1);
+    REG_NAND_CMD = NAND_CMD_READ_ID1;
+    REG_NAND_ADDR = NAND_CMD_READ1_00;
+    cData[0] = REG_NAND_DATA;
+    cData[1] = REG_NAND_DATA;
+    cData[2] = REG_NAND_DATA;
+    cData[3] = REG_NAND_DATA;
+    cData[4] = REG_NAND_DATA;
+    JZ_NAND_DESELECT(1);
+    
+    dwNandID = ((cData[0] & 0xff) << 8) | (cData[1] & 0xff);
+
+    _printf("NAND Flash 1: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
+    
+    JZ_NAND_SELECT(2);
+    REG_NAND_CMD = NAND_CMD_READ_ID1;
+    REG_NAND_ADDR = NAND_CMD_READ1_00;
+    cData[0] = REG_NAND_DATA;
+    cData[1] = REG_NAND_DATA;
+    cData[2] = REG_NAND_DATA;
+    cData[3] = REG_NAND_DATA;
+    cData[4] = REG_NAND_DATA;
+    JZ_NAND_DESELECT(2);
+    
+    dwNandID = ((cData[0] & 0xff) << 8) | (cData[1] & 0xff);
+
+    _printf("NAND Flash 2: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
+    
+    
+    JZ_NAND_SELECT(3);
+    REG_NAND_CMD = NAND_CMD_READ_ID1;
+    REG_NAND_ADDR = NAND_CMD_READ1_00;
+    cData[0] = REG_NAND_DATA;
+    cData[1] = REG_NAND_DATA;
+    cData[2] = REG_NAND_DATA;
+    cData[3] = REG_NAND_DATA;
+    cData[4] = REG_NAND_DATA;
+    JZ_NAND_DESELECT(3);
+    
+    dwNandID = ((cData[0] & 0xff) << 8) | (cData[1] & 0xff);
+
+    _printf("NAND Flash 3: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
+    
+    JZ_NAND_SELECT(4);
+    REG_NAND_CMD = NAND_CMD_READ_ID1;
+    REG_NAND_ADDR = NAND_CMD_READ1_00;
+    cData[0] = REG_NAND_DATA;
+    cData[1] = REG_NAND_DATA;
+    cData[2] = REG_NAND_DATA;
+    cData[3] = REG_NAND_DATA;
+    cData[4] = REG_NAND_DATA;
+    JZ_NAND_DESELECT(4);
+    
+    dwNandID = ((cData[0] & 0xff) << 8) | (cData[1] & 0xff);
+
+    _printf("NAND Flash 4: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
 }
 
 static void jz_store_icache(void)
@@ -99,26 +181,35 @@ int main(void)
     font_init();
     lcd_setfont(FONT_SYSFIXED);
     button_init();
+    rtc_init();
     
     backlight_init();
     
     /* To make the Windows say "ding-dong".. */
     REG8(USB_REG_POWER) &= ~USB_POWER_SOFTCONN;
 
-    int touch;
+    int touch, btn;
     lcd_clear_display();
     _printf("Rockbox bootloader v0.000001");
+    jz_nand_scan_id();
+    _printf("Test");
     while(1)
     {
-        if(button_read_device(&touch) & BUTTON_VOL_DOWN)
+        btn = button_read_device(&touch);
+        if(btn & BUTTON_VOL_DOWN)
             _printf("BUTTON_VOL_DOWN");
-        if(button_read_device(&touch) & BUTTON_MENU)
+        if(btn & BUTTON_MENU)
             _printf("BUTTON_MENU");
-        if(button_read_device(&touch) & BUTTON_VOL_UP)
+        if(btn & BUTTON_VOL_UP)
             _printf("BUTTON_VOL_UP");
-        if(button_read_device(&touch) & BUTTON_POWER)
+        if(btn & BUTTON_POWER)
             _printf("BUTTON_POWER");
-        _printf("X: %d Y: %d", touch>>16, touch&0xFFFF);
+        if(button_hold())
+            _printf("BUTTON_HOLD");
+        if(touch != 0)
+            _printf("X: %d Y: %d", touch>>16, touch&0xFFFF);
+        /*_printf("%02d/%02d/%04d %02d:%02d:%02d", get_time()->tm_mday, get_time()->tm_mon, get_time()->tm_year,
+                                     get_time()->tm_hour, get_time()->tm_min, get_time()->tm_sec);*/
     }
     
     return 0;
