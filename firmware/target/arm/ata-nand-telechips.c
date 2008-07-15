@@ -24,6 +24,7 @@
 #include <string.h>
 #include "led.h"
 #include "panic.h"
+#include "nand_id.h"
 
 /* The NAND driver is currently work-in-progress and as such contains
    some dead code and debug stuff, such as the next few lines. */
@@ -378,56 +379,21 @@ static void nand_get_chip_info(void)
 
     manuf_id = id_buf[0];
 
-    switch (manuf_id)
-    {
-        case 0xEC:  /* SAMSUNG */
+    /* Identify the chip geometry */
+    struct nand_info* nand_data = nand_identify(id_buf);
 
-            switch(id_buf[1]) /* Chip Id */
-            {
-                case 0xD3:  /* K9K8G08UOM */
-
-                    page_size       = 2048;
-                    spare_size      = 64;
-                    pages_per_block = 64;
-                    blocks_per_bank = 8192;
-                    col_cycles      = 2;
-                    row_cycles      = 3;
-
-                    found = true;
-                    break;
-
-                case 0xD5:  /* K9LAG08UOM */
-
-                    page_size       = 2048;
-                    spare_size      = 64;
-                    pages_per_block = 128;
-                    blocks_per_bank = 8192;
-                    col_cycles      = 2;
-                    row_cycles      = 3;
-
-                    found = true;
-                    break;
-
-                case 0xD7:  /* K9LBG08UOM */
-
-                    page_size       = 4096;
-                    spare_size      = 128;
-                    pages_per_block = 128;
-                    blocks_per_bank = 8192;
-                    col_cycles      = 2;
-                    row_cycles      = 3;
-
-                    found = true;
-                    break;
-            }
-            break;
-    }
-
-    if (!found)
+    if (nand_data == NULL)
     {
         panicf("Unknown NAND: 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x",
                 id_buf[0],id_buf[1],id_buf[2],id_buf[3],id_buf[4]);
     }
+
+    page_size       = nand_data->page_size;
+    spare_size      = nand_data->spare_size;
+    pages_per_block = nand_data->pages_per_block;
+    blocks_per_bank = nand_data->blocks_per_bank;
+    col_cycles      = nand_data->col_cycles;
+    row_cycles      = nand_data->row_cycles;
 
     pages_per_bank      = blocks_per_bank * pages_per_block;
     segments_per_bank   = blocks_per_bank / BLOCKS_PER_SEGMENT;

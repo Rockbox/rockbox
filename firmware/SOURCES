@@ -975,6 +975,7 @@ target/arm/pnx0101/pcm-pnx0101.c
 
 #ifdef LOGIK_DAX
 #ifndef SIMULATOR
+drivers/nand_id.c
 target/arm/ata-nand-telechips.c
 target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
@@ -994,6 +995,7 @@ target/arm/tcc77x/pcm-tcc77x.c
 
 #ifdef SANSA_M200
 #ifndef SIMULATOR
+drivers/nand_id.c
 target/arm/ata-nand-telechips.c
 target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
@@ -1013,6 +1015,7 @@ target/arm/tcc77x/pcm-tcc77x.c
 
 #ifdef SANSA_C100
 #ifndef SIMULATOR
+drivers/nand_id.c
 target/arm/ata-nand-telechips.c
 target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
@@ -1032,6 +1035,7 @@ target/arm/tcc77x/pcm-tcc77x.c
 
 #ifdef IAUDIO_7
 #ifndef SIMULATOR
+drivers/nand_id.c
 target/arm/ata-nand-telechips.c
 target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/system-tcc77x.c
@@ -1042,6 +1046,7 @@ target/arm/tcc77x/iaudio7/power-iaudio7.c
 
 #ifdef COWON_D2
 #ifndef SIMULATOR
+drivers/nand_id.c
 drivers/pcf50606.c
 target/arm/lcd-as-memframe.S
 target/arm/ata-nand-telechips.c
