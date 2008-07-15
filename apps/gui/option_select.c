@@ -526,15 +526,14 @@ bool option_screen(const struct settings_list *setting,
             continue;
         else if (action == ACTION_STD_CANCEL)
         {
-            bool show_cancel = false;
-            if (use_temp_var)
-                show_cancel = true;
-            else if (var_type == F_T_INT || var_type == F_T_UINT)
+            bool show_cancel = false, changed = false;
+            if (var_type == F_T_INT || var_type == F_T_UINT)
             {
                 if (*variable != oldvalue)
                 {
                     show_cancel = true;
                     *variable = oldvalue;
+                    changed = true;
                 }
             }
             else
@@ -545,8 +544,11 @@ bool option_screen(const struct settings_list *setting,
                     if (!use_temp_var)
                         *(bool*)setting->setting = oldvalue==1?true:false;
                     *variable = oldvalue;
+                    changed = true;
                 }
             }
+            if (use_temp_var && changed)
+                show_cancel = true;
             if (show_cancel)
                 gui_syncsplash(HZ/2, ID2P(LANG_CANCEL));
             done = true;
