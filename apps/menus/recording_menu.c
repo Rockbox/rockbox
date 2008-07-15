@@ -324,7 +324,7 @@ MENUITEM_SETTING(rec_prerecord_time, &global_settings.rec_prerecord_time, NULL);
 static int clear_rec_directory(void)
 {
     strcpy(global_settings.rec_directory, REC_BASE_DIR);
-    gui_syncsplash(HZ, str(LANG_RESET_DONE_CLEAR));
+    gui_syncsplash(HZ, ID2P(LANG_RESET_DONE_CLEAR));
     return false;
 }
 MENUITEM_FUNCTION(clear_rec_directory_item, 0, ID2P(LANG_CLEAR_REC_DIR), 
@@ -415,15 +415,24 @@ static char * trigger_get_name(int selected_item, void * data,
         return option_get_valuestring(s, buffer, buffer_len, temp);
     }
 }
-static void trigger_speak_item(const struct settings_list *s, bool title)
+static void trigger_speak_item(const struct settings_list **settings,
+                               int selected_setting, bool title)
 {
+    const struct settings_list *s = settings[selected_setting];
     int temp;
     if (!global_settings.talk_menu)
         return;
-    temp = option_value_as_int(s);
     if (title)
         talk_id(s->lang_id, false);
-    option_talk_value(s, temp, title?true:false);
+    temp = option_value_as_int(s);
+    if ((selected_setting == START_THRESHOLD ||
+         selected_setting == STOP_THRESHOLD) &&
+        temp == 0)
+    {
+        talk_id(LANG_OFF, title?true:false);
+    } else {
+        option_talk_value(s, temp, title?true:false);
+    }
 }
 int rectrigger(void)
 {
@@ -495,7 +504,7 @@ int rectrigger(void)
     settings_apply_trigger();
     peak_meter_trigger (global_settings.rec_trigger_mode != TRIG_MODE_OFF);
     
-    trigger_speak_item(settings[0], true);
+    trigger_speak_item(settings, 0, true);
 
     while (!done)
     {
@@ -517,7 +526,7 @@ int rectrigger(void)
         switch (action)
         {
             case ACTION_STD_CANCEL:
-                gui_syncsplash(HZ/2, str(LANG_CANCEL));
+                gui_syncsplash(HZ/2, ID2P(LANG_CANCEL));
                 global_settings.rec_start_thres_db = old_start_thres_db;
                 global_settings.rec_start_thres_linear = old_start_thres_linear;
                 global_settings.rec_start_duration = old_start_duration;
@@ -538,13 +547,13 @@ int rectrigger(void)
             case ACTION_SETTINGS_DEC:
             case ACTION_SETTINGS_DECREPEAT:
                 option_select_next_val(settings[i/2], true, false);
-                trigger_speak_item(settings[i/2], false);
+                trigger_speak_item(settings, i/2, false);
                 changed = true;
                 break;
             case ACTION_SETTINGS_INC:
             case ACTION_SETTINGS_INCREPEAT:
                 option_select_next_val(settings[i/2], false, false);
-                trigger_speak_item(settings[i/2], false);
+                trigger_speak_item(settings, i/2, false);
                 changed = true;
                 break;
             case ACTION_STD_PREV:
@@ -554,14 +563,14 @@ int rectrigger(void)
                     i = (TRIG_OPTION_COUNT*2) - 2;
                 gui_synclist_select_item(&lists, i);
                 i = gui_synclist_get_sel_pos(&lists);
-                trigger_speak_item(settings[i/2], true);
+                trigger_speak_item(settings, i/2, true);
                 changed = true;
                 break;
             case ACTION_STD_NEXT:
             case ACTION_STD_NEXTREPEAT:
                 gui_synclist_select_item(&lists, (i+2) % (TRIG_OPTION_COUNT*2));
                 i = gui_synclist_get_sel_pos(&lists);
-                trigger_speak_item(settings[i/2], true);
+                trigger_speak_item(settings, i/2, true);
                 changed = true;
                 break;
         }
