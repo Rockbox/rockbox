@@ -302,7 +302,12 @@ lcd_write_yuv420_lines:
 #if LCD_WIDTH >= LCD_HEIGHT
     add         r0, r0, #2*LCD_WIDTH
     strh        r12, [r0, #2]
+#if LCD_WIDTH <= 512
     sub         r0, r0, #(2*LCD_WIDTH)-4
+#else
+    sub         r0, r0, #(2*LCD_WIDTH)
+    add         r0, r0, #4
+#endif
 #else
     strh        r12, [r0, #-2]          @ store pixel
 #if LCD_WIDTH < 256
@@ -603,7 +608,12 @@ lcd_write_yuv420_lines_odither:
 #if LCD_WIDTH >= LCD_HEIGHT
     add         r0, r0, #2*LCD_WIDTH
     strh        r1, [r0, #2]            @ store pixel
-    sub         r0, r0, #(2*LCD_WIDTH-4)
+#if LCD_WIDTH <= 512
+    sub         r0, r0, #(2*LCD_WIDTH)-4
+#else
+    sub         r0, r0, #(2*LCD_WIDTH)
+    add         r0, r0, #4
+#endif
 #else
     strh        r1, [r0, #-2]           @ store pixel
 #if LCD_WIDTH < 256
