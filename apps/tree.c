@@ -1049,57 +1049,39 @@ static void say_filetype(int attr)
 
 static int ft_play_dirname(char* name)
 {
-    char dirname_mp3_filename[MAX_PATH+1];
-
 #if CONFIG_CODEC != SWCODEC
     if (audio_status() & AUDIO_STATUS_PLAY)
         return 0;
 #endif
 
-    snprintf(dirname_mp3_filename, sizeof(dirname_mp3_filename), "%s/%s/%s",
-             tc.currdir[1] ? tc.currdir : "" , name, 
-             dir_thumbnail_name);
-
-    DEBUGF("Checking for %s\n", dirname_mp3_filename);
-
-    if (!file_exists(dirname_mp3_filename))
+    if(talk_file(tc.currdir, name, dir_thumbnail_name, NULL,
+                 NULL, false))
     {
-        DEBUGF("Failed to find: %s\n", dirname_mp3_filename);
-        return -1;
+        if(global_settings.talk_filetype)
+            talk_id(VOICE_DIR, true);
+        return 1;
     }
-
-    DEBUGF("Found: %s\n", dirname_mp3_filename);
-
-    talk_file(dirname_mp3_filename, false);
-    if(global_settings.talk_filetype)
-        talk_id(VOICE_DIR, true);
-    return 1;
+    else
+        return -1;
 }
 
 static void ft_play_filename(char *dir, char *file)
 {
-    char name_mp3_filename[MAX_PATH+1];
-
 #if CONFIG_CODEC != SWCODEC
     if (audio_status() & AUDIO_STATUS_PLAY)
         return;
 #endif
 
-    if (strcasecmp(&file[strlen(file) - strlen(file_thumbnail_ext)],
-                    file_thumbnail_ext))
-    {   /* file has no .talk extension */
-        snprintf(name_mp3_filename, sizeof(name_mp3_filename),
-                 "%s/%s%s", dir, file, file_thumbnail_ext);
-
-        talk_file(name_mp3_filename, false);
-    }
+    if (strlen(file) > strlen(file_thumbnail_ext)
+        && strcasecmp(&file[strlen(file) - strlen(file_thumbnail_ext)],
+                      file_thumbnail_ext))
+        /* file has no .talk extension */
+        talk_file(dir, NULL, file, file_thumbnail_ext,
+                  NULL, false);
     else
-    {   /* it already is a .talk file, play this directly */
-        snprintf(name_mp3_filename, sizeof(name_mp3_filename),
-            "%s/%s", dir, file);
-        talk_id(LANG_VOICE_DIR_HOVER, false); /* prefix it */
-        talk_file(name_mp3_filename, true);
-    }
+        /* it already is a .talk file, play this directly, but prefix it. */
+        talk_file(dir, NULL, file, NULL,
+                  TALK_IDARRAY(LANG_VOICE_DIR_HOVER), false);
 }
 
 /* These two functions are called by the USB and shutdown handlers */

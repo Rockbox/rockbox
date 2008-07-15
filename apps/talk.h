@@ -84,7 +84,17 @@ int talk_get_bufsize(void); /* get the loaded voice file size */
 void talk_buffer_steal(void); /* claim the mp3 buffer e.g. for play/record */
 bool is_voice_queued(void); /* Are there more voice clips to be spoken? */
 int talk_id(int32_t id, bool enqueue); /* play a voice ID from voicefont */
-int talk_file(const char* filename, bool enqueue); /* play a thumbnail from file */
+/* play a thumbnail from file */
+int talk_file(const char *root, const char *dir, const char *file,
+              const char *ext, long *prefix_ids, bool enqueue);
+/* play file's thumbnail or spell name */
+int talk_file_or_spell(const char *dirname, const char* filename,
+                       long *prefix_ids, bool enqueue);
+/* play dir's thumbnail or spell name */
+int talk_dir_or_spell(const char* filename,
+                      long *prefix_ids, bool enqueue);
+/* play thumbnails for each components of full path, or spell */
+int talk_fullpath(const char* path, bool enqueue);
 int talk_number(long n, bool enqueue); /* say a number */
 int talk_value(long n, int unit, bool enqueue); /* say a numeric value */
 int talk_value_decimal(long n, int unit, int decimals, bool enqueue);
