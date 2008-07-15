@@ -32,10 +32,11 @@ change to customise your listening experience.
   \nopt{h1xx,h300}{or suppresses}
   the lower (bass) frequencies in the sound. A value of 0 dB means that bass
   sounds are unaltered (flat response).
-  \opt{player,recorder,recorderv2fm,ondio}{}
-  \opt{h1xx,h300}{The minimum setting is 0 dB and the maximum is 24 dB.}
-  \opt{ipodnano,ipodcolor}{The minimum setting is -6 dB and the maximum is 9 dB.}
-  \opt{ipodvideo}{The minimum setting is -12 dB and the maximum is 12 dB.}
+  \opt{masd}{The minimum setting is -15 dB and the maximum is 15 dB.}%
+  \opt{masf}{The minimum setting is -12 dB and the maximum is 12 dB.}%
+  \opt{h1xx,h300}{The minimum setting is 0 dB and the maximum is 24 dB.}%
+  \opt{ipodnano,ipodcolor}{The minimum setting is -6 dB and the maximum is 9 dB.}%
+  \opt{ipodvideo}{The minimum setting is -12 dB and the maximum is 12 dB.}%
   \opt{x5,sansa,h10,h10_5gb}{The minimum setting is -24 dB and the maximum is 24 dB.}
 
 \opt{ipodvideo}{
@@ -51,16 +52,17 @@ change to customise your listening experience.
   \nopt{h1xx,h300}{or suppresses}
   the higher (treble) frequencies in the sound. A value of 0 dB means that
   treble sounds are unaltered (flat response).
-  \opt{player,recorder,recorderv2fm,ondio}{}
-  \opt{h1xx,h300}{The minimum setting is 0 dB and the maximum is 6 dB.}
-  \opt{ipodnano,ipodcolor}{The minimum setting is -6 dB and the maximum is 9 dB.}
-  \opt{ipodvideo}{The minimum setting is -12 dB and the maximum is 12 dB.}
+  \opt{masd}{The minimum setting is -15 dB and the maximum is 15 dB.}%
+  \opt{masf}{The minimum setting is -12 dB and the maximum is 12 dB.}%
+  \opt{h1xx,h300}{The minimum setting is 0 dB and the maximum is 6 dB.}%
+  \opt{ipodnano,ipodcolor}{The minimum setting is -6 dB and the maximum is 9 dB.}%
+  \opt{ipodvideo}{The minimum setting is -12 dB and the maximum is 12 dB.}%
   \opt{x5,sansa,h10,h10_5gb}{The minimum setting is -24 dB and the maximum is 24 dB.}
 
 \opt{ipodvideo}{
 \section{Treble Cutoff}
   This setting controls the frequency above which the treble adjustment applies.
-  The setting has a range from 1 to 4, where a bigger number affects a smaller 
+  The setting has a range from 1 to 4, where a bigger number affects a smaller
   range of treble frequencies. The actual cutoff frequency used for each setting
   value will vary with sample rate.
 }
@@ -120,7 +122,7 @@ change to customise your listening experience.
   the effect of widening the stereo field. A value of 100\% will leave the
   stereo field unaltered.
 
-\opt{recorder,recorderv2fm}{
+\opt{masf}{
   \section{Loudness}
   When listening at low volumes, the ear will tend to make bass and treble
   frequencies sound quieter than they really are. To compensate for this, 
@@ -131,7 +133,7 @@ change to customise your listening experience.
   enhanced bass and treble.
 }
   
-\opt{recorder,recorderv2fm}{
+\opt{masf}{
 \section{Auto Volume}
   Auto volume is a feature that automatically lowers the volume on loud parts,
   and then slowly restores the volume to the previous level over a time
@@ -141,8 +143,8 @@ change to customise your listening experience.
   A longer timeout means that the change in volume back to the previous level
   will be smoother, so there will be fewer sharp changes in volume level.
 }
-  
-\opt{recorder,recorderv2fm}{
+
+\opt{masf}{
 \section{Super Bass}
   This setting changes the threshold at which bass frequencies are affected by
   the \setting{Loudness} setting, making the sound of drums and bass guitar
@@ -150,7 +152,7 @@ change to customise your listening experience.
   effect if \setting{Loudness} is set to a value larger than 0dB.
 }
 
-\opt{recorder,recorderv2fm}{
+\opt{masf}{
 \section{MDB {}-- Micronas Dynamic Bass}
   The rest of the parameters in this menu relate to the Micronas Dynamic
   Bass (MDB) function. MDB is designed to enable the user to hear bass
@@ -348,7 +350,7 @@ change to customise your listening experience.
       & Moves to the next EQ band. \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
-      \opt{IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD,SANSA_E200_PAD}{\ButtonSelect} 
+      \opt{IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD,SANSA_E200_PAD}{\ButtonSelect}
       & Toggles the cursor among the three parameters (gain, center frequency, 
       Q) for the selected EQ band.\\  
       %
