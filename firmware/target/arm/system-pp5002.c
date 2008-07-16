@@ -21,10 +21,11 @@
 #include "system.h"
 
 #ifndef BOOTLOADER
+#include "adc-target.h"
+#include "button-target.h"
+
 extern void TIMER1(void);
 extern void TIMER2(void);
-extern void ipod_3g_button_int(void);
-extern void ipod_2g_adc_int(void);
 
 void irq(void)
 {

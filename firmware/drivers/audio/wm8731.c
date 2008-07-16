@@ -34,6 +34,7 @@
 #include "wmcodec.h"
 #include "audiohw.h"
 #include "i2s.h"
+#include "sound.h"
 
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25},
@@ -236,6 +237,7 @@ void audiohw_set_sample_rate(int sampling_control)
     codec_set_active(true);
 }
 
+#ifdef HAVE_RECORDING
 void audiohw_enable_recording(bool source_mic)
 {
     codec_set_active(false);
@@ -331,3 +333,5 @@ void audiohw_set_monitor(bool enable)
         wm8731_write_or(PDCTRL, PDCTRL_LINEINPD);
     }
 }
+#endif /* HAVE_RECORDING */
+

@@ -32,6 +32,7 @@
 #endif
 #include "rtc.h"
 #include "pcf5060x.h"
+#include "pcf50605.h"
 
 unsigned char pcf50605_wakeup_flags = 0;
 

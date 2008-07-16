@@ -23,6 +23,8 @@
 #include "cpu.h"
 #include "hwcompat.h"
 #include "kernel.h"
+#include "adc.h"
+#include "adc-target.h"
 
 static struct mutex adc_mtx SHAREDBSS_ATTR;
 

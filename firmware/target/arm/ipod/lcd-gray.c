@@ -239,6 +239,7 @@ void lcd_set_flip(bool yesno)
 #endif
 }
 
+#ifdef HAVE_LCD_ENABLE
 void lcd_enable(bool on)
 {
     if (on)
@@ -257,6 +258,7 @@ void lcd_enable(bool on)
                                                        /* enter standby mode */
     }
 }
+#endif /* HAVE_LCD_ENABLE */
 
 /*** update functions ***/
 

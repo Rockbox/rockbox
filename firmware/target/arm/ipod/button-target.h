@@ -31,6 +31,7 @@ void button_init_device(void);
 int button_read_device(void);
 
 void ipod_mini_button_int(void);
+void ipod_3g_button_int(void);
 void ipod_4g_button_int(void);
 
 /* iPod specific button codes */

@@ -21,6 +21,7 @@
 #include "config.h"
 #include "system.h"
 #include "backlight.h"
+#include "backlight-target.h"
 
 void _backlight_on(void)
 {

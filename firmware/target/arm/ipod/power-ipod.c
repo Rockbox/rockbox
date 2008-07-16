@@ -42,6 +42,7 @@ void power_init(void)
 #endif
 }
 
+#if CONFIG_CHARGING
 bool charger_inserted(void)
 {
 #if defined(IPOD_VIDEO)
@@ -60,6 +61,7 @@ bool charger_inserted(void)
 bool charging_state(void) {
     return (GPIOB_INPUT_VAL & 0x01)?false:true;
 }
+#endif /* CONFIG_CHARGING */
 
 
 void ide_power_enable(bool on)

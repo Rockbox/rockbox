@@ -23,11 +23,10 @@
 #include "audio.h"
 #include "sound.h"
 
+#if INPUT_SRC_CAPS != 0
 void audio_set_output_source(int source)
 {
-#if INPUT_SRC_CAPS != 0
     if ((unsigned)source >= AUDIO_NUM_SOURCES)
-#endif
         source = AUDIO_SRC_PLAYBACK;
 } /* audio_set_output_source */
 
@@ -109,5 +108,5 @@ void audio_input_mux(int source, unsigned flags)
 
     last_source = source;
 } /* audio_input_mux */
-
+#endif /* INPUT_SRC_CAPS != 0 */
 

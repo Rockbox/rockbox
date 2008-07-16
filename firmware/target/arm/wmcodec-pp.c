@@ -29,6 +29,7 @@
 #include "system.h"
 #include "audiohw.h"
 #include "i2c-pp.h"
+#include "wmcodec.h"
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(MROBE_100)
 /* The H10's audio codec uses an I2C address of 0x1b */

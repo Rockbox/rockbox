@@ -32,6 +32,7 @@
 #include "button.h"
 #include "timer.h"
 #include "backlight.h"
+#include "backlight-target.h"
 
 static int brightness = 1;   /* 1 to 32 */
 static int current_dim = 16; /* default after enabling the backlight dimmer */
