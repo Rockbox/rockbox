@@ -67,13 +67,12 @@ static int touch_to_pixels(short x, short y)
     y -= 300;
     
     /* X & Y are switched */
-    x /= 3200 / LCD_HEIGHT;
-    y /= 3600 / LCD_WIDTH;
+    x /= 3200 / LCD_WIDTH;
+    y /= 3600 / LCD_HEIGHT;
     
-    x = LCD_HEIGHT - x;
-    y = LCD_WIDTH - y;
+    y = LCD_HEIGHT - y;
     
-    return (y << 16) | x;
+    return (x << 16) | y;
 }
 
 int button_read_device(int *data)

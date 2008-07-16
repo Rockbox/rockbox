@@ -55,11 +55,8 @@
 /* LCD dimensions */
 #define CONFIG_LCD LCD_ONDAVX747
 
-/* choose the lcd orientation. both work */
-#define CONFIG_ORIENTATION SCREEN_PORTRAIT
-
-#define LCD_WIDTH  400
-#define LCD_HEIGHT 240
+#define LCD_WIDTH  240
+#define LCD_HEIGHT 400
 
 #define LCD_DEPTH  16   /* 16bit colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */

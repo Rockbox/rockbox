@@ -96,8 +96,17 @@
 #define DRIVER_OUTPUT_SS_BIT             (1 << 8)
 #define DRIVER_OUTPUT_SM_BIT             (1 << 10)
 
-#define SOFT_RESET_EN                    (1 << 0)
-#define SOFT_RESET_DIS                   (0 << 0)
+#define ENTRY_MODE_TRI                   (1 << 15)
+#define ENTRY_MODE_DFM                   (1 << 14)
+#define ENTRY_MODE_BGR                   (1 << 12)
+#define ENTRY_MODE_HWM                   (1 << 9)
+#define ENTRY_MODE_ORG                   (1 << 7)
+#define ENTRY_MODE_VID                   (1 << 5)
+#define ENTRY_MODE_HID                   (1 << 4)
+#define ENTRY_MODE_AM                    (1 << 3)
+#define ENTRY_MODE_EPF(n)                (n & 3)
+
+#define SOFT_RESET(n)                    (n << 0)
 
 #define ENDIAN_CTRL_BIG                  
 #define ENDIAN_CTRL_LITTLE
