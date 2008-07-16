@@ -106,6 +106,21 @@
 #define ENTRY_MODE_AM                    (1 << 3)
 #define ENTRY_MODE_EPF(n)                (n & 3)
 
+#define DISP_CTRL1_PTDE(n)               ((n & 4) << 12)
+#define DISP_CTRL1_BASEE                 (1 << 8)
+#define DISP_CTRL1_VON                   (1 << 6)
+#define DISP_CTRL1_GON                   (1 << 5)
+#define DISP_CTRL1_DTE                   (1 << 4)
+#define DISP_CTRL1_D(n)                  (n & 3)
+
+#define PWR_CTRL1_SAP(n)                 ((n & 3) << 13)
+#define PWR_CTRL1_SAPE                   (1 << 12)
+#define PWR_CTRL1_BT(n)                  ((n & 7) << 8)
+#define PWR_CTRL1_APE                    (1 << 7)
+#define PWR_CTRL1_AP(n)                  ((n & 7) << 4)
+#define PWR_CTRL1_DSTB                   (1 << 2)
+#define PWR_CTRL1_SLP                    (1 << 1)
+
 #define SOFT_RESET(n)                    (n << 0)
 
 #define ENDIAN_CTRL_BIG                  

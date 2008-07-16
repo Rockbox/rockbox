@@ -57,7 +57,7 @@ static void _display_pin_init(void)
 #define SLCD_SET_DATA(x) WAIT_ON_SLCD; REG_SLCD_DATA = (x) | SLCD_DATA_RS_DATA;
 #define SLCD_SET_COMMAND(x) WAIT_ON_SLCD; REG_SLCD_DATA = (x) | SLCD_DATA_RS_COMMAND;
 #define SLCD_SEND_COMMAND(cmd,val) SLCD_SET_COMMAND(cmd); SLCD_SET_DATA(val);
-static void _display_on(void)
+static void _display_init(void)
 {
     int i;
    
@@ -75,7 +75,7 @@ static void _display_on(void)
     SLCD_SEND_COMMAND(REG_LPCTRL, 0x10);
     SLCD_SEND_COMMAND(REG_EXT_DISP_CTRL1, 0);
     SLCD_SEND_COMMAND(REG_EXT_DISP_CTRL2, 0);
-    SLCD_SEND_COMMAND(REG_DISP_CTRL1, 1);
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, DISP_CTRL1_D(1));
     SLCD_SEND_COMMAND(REG_PAN_INTF_CTRL1, 0x12);
     SLCD_SEND_COMMAND(REG_PAN_INTF_CTRL2, 0x202);
     SLCD_SEND_COMMAND(REG_PAN_INTF_CTRL3, 0x300);
@@ -83,7 +83,7 @@ static void _display_on(void)
     SLCD_SEND_COMMAND(REG_PAN_INTF_CTRL5, 0x202);
     SLCD_SEND_COMMAND(REG_PAN_INTF_CTRL6, 0x100);
     SLCD_SEND_COMMAND(REG_FRM_MRKR_CTRL, 0x8000);
-    SLCD_SEND_COMMAND(REG_PWR_CTRL1, 0x16b0);
+    SLCD_SEND_COMMAND(REG_PWR_CTRL1, (PWR_CTRL1_SAPE | PWR_CTRL1_BT(6) | PWR_CTRL1_APE | PWR_CTRL1_AP(3)));
     SLCD_SEND_COMMAND(REG_PWR_CTRL2, 0x147);
     SLCD_SEND_COMMAND(REG_PWR_CTRL3, 0x1bd);
     SLCD_SEND_COMMAND(REG_PWR_CTRL4, 0x2f00);
@@ -131,12 +131,48 @@ static void _display_on(void)
     SLCD_SEND_COMMAND(0x7f5, 1);
     SLCD_SEND_COMMAND(0x7f0, 0);
     
-    SLCD_SEND_COMMAND(REG_DISP_CTRL1, 0x173);
+    /* LCD ON: */
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_BASEE | DISP_CTRL1_VON
+                                      | DISP_CTRL1_GON | DISP_CTRL1_DTE | DISP_CTRL1_D(3))
+                                      );
     SLEEP(3500000);
-    SLCD_SEND_COMMAND(REG_DISP_CTRL1, 0x171);
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_BASEE | DISP_CTRL1_VON
+                                      | DISP_CTRL1_GON | DISP_CTRL1_DTE | DISP_CTRL1_D(2))
+                                      );
     SLEEP(3500000);
-    SLCD_SEND_COMMAND(REG_DISP_CTRL1, 0x173);
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_BASEE | DISP_CTRL1_VON
+                                      | DISP_CTRL1_GON | DISP_CTRL1_DTE | DISP_CTRL1_D(3))
+                                      );
     SLEEP(3500000);
+}
+
+static void _display_on(void)
+{
+    int i;
+    SLCD_SEND_COMMAND(REG_PWR_CTRL1, (PWR_CTRL1_SAPE | PWR_CTRL1_BT(6) | PWR_CTRL1_APE | PWR_CTRL1_AP(3)));
+    SLEEP(3500000);
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON
+                                      | DISP_CTRL1_D(1))
+                                      );
+    SLEEP(3500000);
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON
+                                      | DISP_CTRL1_DTE | DISP_CTRL1_D(3)
+                                      | DISP_CTRL1_BASEE)
+                                      );
+}
+
+static void _display_off(void)
+{
+    int i;
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON
+                                      | DISP_CTRL1_DTE | DISP_CTRL1_D(2))
+                                      );
+    SLEEP(3500000);
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, DISP_CTRL1_D(1));
+    SLEEP(3500000);
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, DISP_CTRL1_D(0));
+    SLEEP(3500000);
+    SLCD_SEND_COMMAND(REG_PWR_CTRL1, PWR_CTRL1_SLP);
 }
 
 static void _set_lcd_bus(void)
@@ -177,7 +213,7 @@ void lcd_init_controller(void)
     _set_lcd_bus();
     _set_lcd_clock();
     SLEEP(1000);
-    _display_on();
+    _display_init();
 }
 
 void lcd_set_target(short x, short y, short width, short height)
@@ -198,5 +234,5 @@ void lcd_on(void)
 
 void lcd_off(void)
 {
-    return;
+    _display_off();
 }
