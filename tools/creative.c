@@ -23,7 +23,11 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#if !defined(__APPLE__)
 #include <elf.h>
+#else
+#include "mac-elf.h" /* Mac OS X doesn't distribuate elf.h... */
+#endif
 
 #include "creative.h"
 #include "hmac-sha1.h"
