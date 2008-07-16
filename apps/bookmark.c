@@ -93,7 +93,7 @@ static char* get_bookmark_info(int list_index,
                                size_t buffer_len);
 static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resume);
 static bool  system_check(void);
-static bool  write_bookmark(bool create_bookmark_file, char *bookmark);
+static bool  write_bookmark(bool create_bookmark_file, const char *bookmark);
 static int   get_bookmark_count(const char* bookmark_file_name);
 
 static char global_temp_buffer[MAX_PATH+1];
@@ -216,7 +216,7 @@ bool bookmark_autobookmark(void)
 /* resume_index*resume_offset*resume_seed*resume_first_index*              */
 /* resume_file*milliseconds*MP3 Title*                                     */
 /* ------------------------------------------------------------------------*/
-static bool write_bookmark(bool create_bookmark_file, char *bookmark)
+static bool write_bookmark(bool create_bookmark_file, const char *bookmark)
 {
     bool   success=false;
     if (!bookmark)
