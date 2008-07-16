@@ -4201,7 +4201,7 @@
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeat*,mrobe100,sa9200: ""
+    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_5gb,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8114,7 +8114,7 @@
     *: "%s non esiste"
   </dest>
   <voice>
-    *: ""
+    *: "La cartella Playlist non esiste"
   </voice>
 </phrase>
 <phrase>
@@ -8128,7 +8128,7 @@
     *: "Nessuna Playlist"
   </dest>
   <voice>
-    *: ""
+    *: "Nessuna Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -11566,44 +11566,44 @@
 </phrase>
 <phrase>
   id: LANG_STUDY_MODE
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Modo Studio"
+    *: ""
   </dest>
   <voice>
-    *: "Modo Studio"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_STUDY_HOP_STEP
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Study Increment"
+    *: ""
   </source>
   <dest>
-    *: "Passo Studio"
+    *: ""
   </dest>
   <voice>
-    *: "Passo Studio"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ENABLE_STUDY_MODE
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Enable Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Abilita Modo Studio"
+    *: ""
   </dest>
   <voice>
-    *: "Abilita Modo Studio"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11753,5 +11753,47 @@
   </dest>
   <voice>
     *: "Veloce"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_LENGTH
+  desc: playback settings menu
+  user:
+  <source>
+    *: "Skip Length"
+  </source>
+  <dest>
+    *: "Modo Skip"
+  </dest>
+  <voice>
+    *: "Modo Skip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_TRACK
+  desc: skip length setting entry 0
+  user:
+  <source>
+    *: "Skip Track"
+  </source>
+  <dest>
+    *: "Cambio Traccia"
+  </dest>
+  <voice>
+    *: "Cambio Traccia"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_SLASH
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Barra"
   </voice>
 </phrase>
