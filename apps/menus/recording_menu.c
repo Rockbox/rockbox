@@ -71,7 +71,7 @@
 #include "viewport.h"
 
 static bool no_source_in_menu = false;
-int recmenu_callback(int action,const struct menu_item_ex *this_item);
+static int recmenu_callback(int action,const struct menu_item_ex *this_item);
 
 static int recsource_func(void)
 {
@@ -295,7 +295,7 @@ MENUITEM_FUNCTION(enc_global_config_menu_item, 0, ID2P(LANG_ENCODER_SETTINGS),
 #endif /* CONFIG_CODEC == SWCODEC */
 
 
-int recmenu_callback(int action,const struct menu_item_ex *this_item)
+static int recmenu_callback(int action,const struct menu_item_ex *this_item)
 {
     switch (action)
     {

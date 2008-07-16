@@ -345,7 +345,7 @@ static const struct root_items items[] = {
 };
 static const int nb_items = sizeof(items)/sizeof(*items);
 
-int item_callback(int action, const struct menu_item_ex *this_item) ;
+static int item_callback(int action, const struct menu_item_ex *this_item) ;
 
 MENUITEM_RETURNVALUE(file_browser, ID2P(LANG_DIR_BROWSER), GO_TO_FILEBROWSER,
                         NULL, Icon_file_view_menu);
@@ -411,7 +411,7 @@ MAKE_MENU(root_menu_, ID2P(LANG_ROCKBOX_TITLE),
 #endif
         );
 
-int item_callback(int action, const struct menu_item_ex *this_item) 
+static int item_callback(int action, const struct menu_item_ex *this_item) 
 {
     switch (action)
     {
