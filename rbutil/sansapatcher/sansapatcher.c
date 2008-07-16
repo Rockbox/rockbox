@@ -800,28 +800,34 @@ int sansa_delete_bootloader(struct sansa_t* sansa)
     return 0;
 }
 
-void sansa_list_images(struct sansa_t* sansa)
+/** List number of MI4 images on the player, return number.
+ */
+int sansa_list_images(struct sansa_t* sansa)
 {
     struct mi4header_t mi4header;
     loff_t ppmi_length;
+    int num = 0;
 
     /* Check Main firmware header */
     if (sansa_seek_and_read(sansa, sansa->start+PPMI_OFFSET, sansa_sectorbuf, 0x200) < 0) {
-        return;
+        return 0;
     }
 
     ppmi_length = le2int(sansa_sectorbuf+4);
 
     printf("[INFO] Image 1 - %llu bytes\n",ppmi_length);
+    num = 1;
 
     /* Look for an original firmware after the first image */
     if (sansa_seek_and_read(sansa, sansa->start + PPMI_OFFSET + 0x200 + ppmi_length, sansa_sectorbuf, 512) < 0) {
-        return;
+        return 0;
     }
 
     if (get_mi4header(sansa_sectorbuf,&mi4header)==0) {
         printf("[INFO] Image 2 - %d bytes\n",mi4header.mi4size);
+        num = 2;
     }
+    return num;
 }
 
 int sansa_update_of(struct sansa_t* sansa, const char* filename)
