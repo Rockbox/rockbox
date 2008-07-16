@@ -49,29 +49,19 @@ bool lcd_enabled(void)
     return _lcd_on;
 }
 
-void lcd_copy_buffer_rect(fb_data* dest, fb_data* src, int width, int height)
-{
-    int i;
-    for(i=0; i<width*height; i++)
-        *dest++ = *src++;
-}
-
-#define LCDADDR(x, y) ((unsigned int)&lcd_framebuffer[(y)][(x)])
-#define LCD_UNCACHED(addr)	((unsigned int)(addr) | 0xA0000000)
-
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    /* HACKY... */
+    /* STILL HACKY... */
     x=0; y=0; width=400; height=240;
     
     lcd_set_target(x, y, width-1, height-1);
     
     REG_DMAC_DCCSR(0) = 0;
     REG_DMAC_DRSR(0) = DMAC_DRSR_RS_SLCD; /* source = SLCD */
-    REG_DMAC_DSAR(0) = LCDADDR(x, y) & 0x1FFFFFFF;
+    REG_DMAC_DSAR(0) = ((unsigned int)&lcd_framebuffer[y][x]) & 0x1FFFFFFF;
 #if 0
-    REG_DMAC_DTAR(0) = LCD_UNCACHED(SLCD_FIFO);
+    REG_DMAC_DTAR(0) = UNCACHED_ADDRESS(SLCD_FIFO);
 #else
     REG_DMAC_DTAR(0) = 0x130500B0; /* SLCD_FIFO */
 #endif
@@ -87,7 +77,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     while( !(REG_DMAC_DCCSR(0) & DMAC_DCCSR_TT) )
         asm("nop");
-    //REG_DMAC_DCCSR(0) &= ~DMAC_DCCSR_TT;
+    
 }
 
 /* Update the display.

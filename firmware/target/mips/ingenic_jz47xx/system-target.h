@@ -101,3 +101,5 @@ static inline void restore_interrupt(int status)
 
 void sti(void);
 void cli(void);
+
+#define UNCACHED_ADDRESS(addr)    ((unsigned int)(addr) | 0xA0000000)
