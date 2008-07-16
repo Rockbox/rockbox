@@ -26,7 +26,7 @@
 
 void intr_handler(void)
 {
-    _printf("Interrupt!");
+    //printf("Interrupt!");
     return;
 }
 

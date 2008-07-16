@@ -29,6 +29,7 @@
 #define REG_DRIVER_OUTPUT                0x001
 #define REG_LCD_DR_WAVE_CTRL             0x002
 #define REG_ENTRY_MODE                   0x003
+#define REG_OUTL_SHARP_CTRL              0x006
 #define REG_DISP_CTRL1                   0x007
 #define REG_DISP_CTRL2                   0x008
 #define REG_DISP_CTRL3                   0x009
@@ -106,6 +107,12 @@
 #define ENTRY_MODE_AM                    (1 << 3)
 #define ENTRY_MODE_EPF(n)                (n & 3)
 
+#define OUTL_SHARP_CTRL_EGMODE           (1 << 15)
+#define OUTL_SHARP_CTRL_AVST(n)          ((n & 7) << 7)
+#define OUTL_SHARP_CTRL_ADST(n)          ((n & 7) << 4)
+#define OUTL_SHARP_CTRL_DTHU(n)          ((n & 3) << 2)
+#define OUTL_SHARP_CTRL_DTHL(n)          (n & 3)
+
 #define DISP_CTRL1_PTDE(n)               ((n & 4) << 12)
 #define DISP_CTRL1_BASEE                 (1 << 8)
 #define DISP_CTRL1_VON                   (1 << 6)
@@ -122,8 +129,5 @@
 #define PWR_CTRL1_SLP                    (1 << 1)
 
 #define SOFT_RESET(n)                    (n << 0)
-
-#define ENDIAN_CTRL_BIG                  
-#define ENDIAN_CTRL_LITTLE
 
 #endif /* __R61509_H */

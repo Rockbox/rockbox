@@ -69,7 +69,11 @@ static void _display_init(void)
     
     SLCD_SEND_COMMAND(REG_DRIVER_OUTPUT, 0x100);
     SLCD_SEND_COMMAND(REG_LCD_DR_WAVE_CTRL, 0x100);
-    SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_HID));
+#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
+    SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_HID | ENTRY_MODE_HWM));
+#else
+    SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_AM | ENTRY_MODE_HWM));
+#endif
     SLCD_SEND_COMMAND(REG_DISP_CTRL2, 0x503);
     SLCD_SEND_COMMAND(REG_DISP_CTRL3, 1);
     SLCD_SEND_COMMAND(REG_LPCTRL, 0x10);
@@ -193,15 +197,12 @@ static void _set_lcd_clock(void)
 	int pll_div;
     
     __cpm_stop_lcd();
-	pll_div = ( REG_CPM_CPCCR & CPM_CPCCR_PCS ); /* clock source,0:pllout/2 1: pllout */
+	pll_div = ( REG_CPM_CPCCR & CPM_CPCCR_PCS ); /* clock source, 0:pllout/2 1: pllout */
 	pll_div = pll_div ? 1 : 2 ;
 	val = ( __cpm_get_pllout()/pll_div ) / 336000000;
 	val--;
 	if ( val > 0x1ff )
-    {
-		//printf("CPM_LPCDR too large, set it to 0x1ff\n");
-		val = 0x1ff;
-	}
+		val = 0x1ff; /* CPM_LPCDR is too large, set it to 0x1ff */
 	__cpm_set_pixdiv(val);
     __cpm_start_lcd();
 }

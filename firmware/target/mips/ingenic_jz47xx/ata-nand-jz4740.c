@@ -66,3 +66,27 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const v
     (void)buf;
     return 0;
 }
+
+static int jz_device_ready(void)
+{
+	int ready, wait = 10;
+	while (wait--);
+	ready = __gpio_get_pin(32*2+30);
+	return ready;
+}
+
+int ata_init(void)
+{
+    /*
+     * EMC setup
+     */
+    
+	/* Set NFE bit */
+	REG_EMC_NFCSR |= EMC_NFCSR_NFE1;
+
+	/* Read/Write timings */
+	REG_EMC_SMCR1 = (EMC_SMCR_BL_4 | EMC_SMCR_BW_8BIT | 4 << EMC_SMCR_TAS_BIT
+                    | 4 << EMC_SMCR_TAH_BIT | 4 << EMC_SMCR_TBP_BIT | 4 << EMC_SMCR_TAW_BIT
+                    | 4 << EMC_SMCR_STRV_BIT);
+    return 0;
+}

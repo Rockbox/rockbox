@@ -32,31 +32,7 @@
 #include "button.h"
 #include "timefuncs.h"
 #include "rtc.h"
-
-int _line = 1;
-char _printfbuf[256];
-
-/* This is all rather hacky, but it works... */
-void _printf(const char *format, ...)
-{
-    int len;
-    unsigned char *ptr;
-    va_list ap;
-    va_start(ap, format);
-
-    ptr = _printfbuf;
-    len = vsnprintf(ptr, sizeof(_printfbuf), format, ap);
-    va_end(ap);
-
-    int i;
-    for(i=0; i<1; i++)
-    {
-        lcd_puts(0, _line++, ptr);
-        lcd_update();
-    }
-    if(_line >= LCD_HEIGHT/SYSFONT_HEIGHT)
-        _line = 1;
-}
+#include "common.h"
 
 static void audiotest(void)
 {
@@ -101,7 +77,7 @@ static void jz_nand_scan_id(void)
     
     dwNandID = ((cData[0] & 0xff) << 8) | (cData[1] & 0xff);
 
-    _printf("NAND Flash 1: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
+    printf("NAND Flash 1: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
     
     JZ_NAND_SELECT(2);
     REG_NAND_CMD = NAND_CMD_READ_ID1;
@@ -115,7 +91,7 @@ static void jz_nand_scan_id(void)
     
     dwNandID = ((cData[0] & 0xff) << 8) | (cData[1] & 0xff);
 
-    _printf("NAND Flash 2: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
+    printf("NAND Flash 2: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
     
     
     JZ_NAND_SELECT(3);
@@ -130,7 +106,7 @@ static void jz_nand_scan_id(void)
     
     dwNandID = ((cData[0] & 0xff) << 8) | (cData[1] & 0xff);
 
-    _printf("NAND Flash 3: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
+    printf("NAND Flash 3: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
     
     JZ_NAND_SELECT(4);
     REG_NAND_CMD = NAND_CMD_READ_ID1;
@@ -144,7 +120,7 @@ static void jz_nand_scan_id(void)
     
     dwNandID = ((cData[0] & 0xff) << 8) | (cData[1] & 0xff);
 
-    _printf("NAND Flash 4: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
+    printf("NAND Flash 4: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
 }
 
 static void jz_store_icache(void)
@@ -190,24 +166,33 @@ int main(void)
 
     int touch, btn;
     lcd_clear_display();
-    _printf("Rockbox bootloader v0.000001");
+    printf("Rockbox bootloader v0.000001");
     jz_nand_scan_id();
-    _printf("Test");
+    printf("REG_EMC_SACR0: 0x%x", REG_EMC_SACR0 >> EMC_SACR_BASE_BIT);
+    printf("REG_EMC_SACR1: 0x%x", REG_EMC_SACR1 >> EMC_SACR_BASE_BIT);
+    printf("REG_EMC_SACR2: 0x%x", REG_EMC_SACR2 >> EMC_SACR_BASE_BIT);
+    printf("REG_EMC_SACR3: 0x%x", REG_EMC_SACR3 >> EMC_SACR_BASE_BIT);
+    printf("REG_EMC_SACR4: 0x%x", REG_EMC_SACR4 >> EMC_SACR_BASE_BIT);
+    printf("REG_EMC_DMAR0: 0x%x", REG_EMC_DMAR0 >> EMC_DMAR_BASE_BIT);
     while(1)
     {
         btn = button_read_device(&touch);
         if(btn & BUTTON_VOL_DOWN)
-            _printf("BUTTON_VOL_DOWN");
+            printf("BUTTON_VOL_DOWN");
         if(btn & BUTTON_MENU)
-            _printf("BUTTON_MENU");
+            printf("BUTTON_MENU");
         if(btn & BUTTON_VOL_UP)
-            _printf("BUTTON_VOL_UP");
+            printf("BUTTON_VOL_UP");
         if(btn & BUTTON_POWER)
-            _printf("BUTTON_POWER");
+            printf("BUTTON_POWER");
         if(button_hold())
-            _printf("BUTTON_HOLD");
+            printf("BUTTON_HOLD");
         if(touch != 0)
-            _printf("X: %d Y: %d", touch>>16, touch&0xFFFF);
+        {
+            lcd_set_foreground(LCD_RGBPACK(touch & 0xFF, (touch >> 8)&0xFF, (touch >> 16)&0xFF));
+            lcd_fillrect((touch>>16)-10, (touch&0xFFFF)-10, 20, 20);
+            lcd_update();
+        }
         /*_printf("%02d/%02d/%04d %02d:%02d:%02d", get_time()->tm_mday, get_time()->tm_mon, get_time()->tm_year,
                                      get_time()->tm_hour, get_time()->tm_min, get_time()->tm_sec);*/
     }
