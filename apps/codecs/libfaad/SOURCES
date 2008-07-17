@@ -33,3 +33,4 @@ sbr_tf_grid.c
 specrec.c
 syntax.c
 tns.c
+mdct2.c

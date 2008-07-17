@@ -28,6 +28,7 @@
 #include "wmadec.h"
 #include "wmafixed.h"
 #include "bitstream.h"
+#include "mdct2.h"
 
 
 #define VLCBITS 7       /*7 is the lowest without glitching*/
@@ -589,12 +590,16 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
         }
     }
 
-    mdct_init_global();
+    /*Not using the ffmpeg IMDCT anymore*/
+
+    /* mdct_init_global();
 
     for(i = 0; i < s->nb_block_sizes; ++i)
     {
         ff_mdct_init(&s->mdct_ctx[i], s->frame_len_bits - i + 1, 1);
+
     }
+    */
 
     /*ffmpeg uses malloc to only allocate as many window sizes as needed.  However, we're really only interested in the worst case memory usage.
     * In the worst case you can have 5 window sizes, 128 doubling up 2048
@@ -1207,8 +1212,10 @@ static int wma_decode_block(WMADecodeContext *s)
             n=0;
 
           /*
-          *  Previously the IMDCT was run in 17.15 precision to avoid overflow. However rare files could
-          *  overflow here as well, so switch to 17.15 during coefs calculation.
+          *  The calculation of coefs has a shift right by 2 built in.  This prepares samples
+          *  for the Tremor IMDCT which uses a slightly different fixed format then the ffmpeg one.
+          *  If the old ffmpeg imdct is used, each shift storing into coefs should be reduced by 1.
+          *  See SVN logs for details.
           */
 
 
@@ -1223,7 +1230,7 @@ static int wma_decode_block(WMADecodeContext *s)
                 /* very low freqs : noise */
                 for(i = 0;i < s->coefs_start; ++i)
                 {
-                    *coefs++ = fixmul32( (fixmul32(s->noise_table[s->noise_index],(*exponents++))>>4),Fixed32From64(mult1)) >>1;
+                    *coefs++ = fixmul32( (fixmul32(s->noise_table[s->noise_index],(*exponents++))>>4),Fixed32From64(mult1)) >>2;
                     s->noise_index = (s->noise_index + 1) & (NOISE_TAB_SIZE - 1);
                 }
 
@@ -1284,7 +1291,7 @@ static int wma_decode_block(WMADecodeContext *s)
                         {
                             noise = s->noise_table[s->noise_index];
                             s->noise_index = (s->noise_index + 1) & (NOISE_TAB_SIZE - 1);
-                            *coefs++ = fixmul32((fixmul32(*exponents,noise)>>4),Fixed32From64(mult1)) >>1;
+                            *coefs++ = fixmul32((fixmul32(*exponents,noise)>>4),Fixed32From64(mult1)) >>2;
                             ++exponents;
                         }
                     }
@@ -1299,7 +1306,7 @@ static int wma_decode_block(WMADecodeContext *s)
 
                            /*don't forget to renormalize the noise*/
                            temp1 = (((int32_t)*coefs1++)<<16) + (noise>>4);
-                           temp2 = fixmul32(*exponents, mult>>17);
+                           temp2 = fixmul32(*exponents, mult>>18);
                            *coefs++ = fixmul32(temp1, temp2);
                            ++exponents;
                         }
@@ -1311,8 +1318,8 @@ static int wma_decode_block(WMADecodeContext *s)
                 mult2 = fixmul32(mult>>16,exponents[-1]) ;  /*the work around for 32.32 vars are getting stupid*/
                 for (i = 0; i < n; ++i)
                 {
-                    /*renormalize the noise product and then reduce to 17.15 precison*/
-                    *coefs++ = fixmul32(s->noise_table[s->noise_index],mult2) >>5;
+                    /*renormalize the noise product and then reduce to 14.18 precison*/
+                    *coefs++ = fixmul32(s->noise_table[s->noise_index],mult2) >>6;
 
                     s->noise_index = (s->noise_index + 1) & (NOISE_TAB_SIZE - 1);
                 }
@@ -1334,7 +1341,7 @@ static int wma_decode_block(WMADecodeContext *s)
 
                 for(i = 0;i < n; ++i)
                 {
-                    atemp = (coefs1[i] * mult3)>>1;
+                    atemp = (coefs1[i] * mult3)>>2;  /*ffmpeg imdct needs 15.17, while tremor 14.18*/
                     *coefs++=fixmul32(atemp,exponents[i<<bsize>>esize]);
                 }
                 n = s->block_len - s->coefs_end[bsize];
@@ -1379,9 +1386,13 @@ static int wma_decode_block(WMADecodeContext *s)
             n = s->block_len;
             n4 = s->block_len >>1;
 
-            ff_imdct_calc(&s->mdct_ctx[bsize],
-                          output,
-                          (*(s->coefs))[ch]);
+            /*faster IMDCT from Vorbis*/
+            mdct_backward( (1 << (12-bsize)), (int*)(*(s->coefs))[ch], (int*)output);
+
+            /*slower but more easily understood IMDCT from FFMPEG*/
+            //ff_imdct_calc(&s->mdct_ctx[bsize],
+            //              output,
+            //              (*(s->coefs))[ch]);
 
 
             /* add in the frame */

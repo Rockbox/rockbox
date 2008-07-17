@@ -20,6 +20,7 @@ stats.c
 stopwatch.c
 vbrfix.c
 viewer.c
+test_codec.c
 #ifdef HAVE_BACKLIGHT
 lamp.c
 #endif /* HAVE_BACKLIGHT */

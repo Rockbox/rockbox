@@ -303,7 +303,7 @@ static bool dbg_buffering_thread(void)
     lcd_setfont(FONT_SYSFIXED);
     while(!done)
     {
-        button = get_action(CONTEXT_STD,HZ/5);
+        button = get_action(CONTEXT_STD,HZ*2);
         switch(button)
         {
             case ACTION_STD_NEXT:
@@ -2041,9 +2041,9 @@ static int database_callback(int btn, struct gui_synclist *lists)
     simplelist_addline(SIMPLELIST_ADD_LINE, "Commit delayed: %s",
              stat->commit_delayed ? "Yes" : "No");
 
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Queue length: %d", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Queue length: %d",
              stat->queue_length);
-    
+
     if (synced)
     {
         synced = false;
@@ -2068,7 +2068,7 @@ static bool dbg_tagcache_info(void)
     info.action_callback = database_callback;
     info.hide_selection = true;
     info.scroll_all = true;
-    
+
     /* Don't do nonblock here, must give enough processing time
        for tagcache thread. */
     /* info.timeout = TIMEOUT_NOBLOCK; */
@@ -2428,7 +2428,7 @@ static bool dbg_isp1583(void)
     struct simplelist_info isp1583;
     isp1583.scroll_all = true;
     simplelist_info_init(&isp1583, "ISP1583", dbg_usb_num_items(), NULL);
-    isp1583.timeout = HZ/100; 
+    isp1583.timeout = HZ/100;
     isp1583.hide_selection = true;
     isp1583.get_name = dbg_usb_item;
     isp1583.action_callback = isp1583_action_callback;
@@ -2453,7 +2453,7 @@ static bool dbg_pic(void)
     struct simplelist_info pic;
     pic.scroll_all = true;
     simplelist_info_init(&pic, "PIC", pic_dbg_num_items(), NULL);
-    pic.timeout = HZ/100; 
+    pic.timeout = HZ/100;
     pic.hide_selection = true;
     pic.get_name = pic_dbg_item;
     pic.action_callback = pic_action_callback;

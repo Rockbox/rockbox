@@ -392,7 +392,7 @@ static int get_timestamp(int *duration)
     datap += 4;
     *duration = get_short_le(datap);
 
-    /*the get_timestamp function advances us 12-13 bytes past the packet start, 
+    /*the get_timestamp function advances us 12-13 bytes past the packet start,
       need to undo this here so that we stay synced with the packet*/
     ci->seek_buffer(ci->curpos-bytesread);
 
@@ -470,7 +470,7 @@ enum codec_status codec_main(void)
     /* Generic codec initialisation */
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
 
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 30);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
 
 next_track:
 
@@ -505,7 +505,7 @@ restart_track:
     if (resume_offset > ci->id3->first_frame_offset)
     {
         /* Get start of current packet */
-        int packet_offset = (resume_offset - ci->id3->first_frame_offset) 
+        int packet_offset = (resume_offset - ci->id3->first_frame_offset)
             % wfx.packet_size;
         ci->seek_buffer(resume_offset - packet_offset);
         elapsedtime = get_timestamp(&i);
