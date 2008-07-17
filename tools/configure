@@ -69,7 +69,7 @@ findtool(){
 # parse the argument list, returns the value after the = in case of a
 # option=value type option, returns 0 in case of --ccache or --no-ccache,
 # returns 1 if the searched argument type wasn't fount in the argument list
-# Usage [var = ]`parse_args <argumenttype>`, i.e. `parse_args target`
+# Usage [var = ]`parse_args <argumenttype>`, e.g. `parse_args --target`
 
 # var definitons below are needed so that parse_args can see the arguments
 arg1=$1 arg2=$2 arg3=$3 arg4=$4 arg5=$5 arg6=$6 arg7=$7 arg8=$8 arg9=$9
@@ -591,7 +591,7 @@ cat <<EOF
   Usage: configure [OPTION]...
   Options:
     --target=TARGET   Sets the target, TARGET can be either the target ID or
-                      corresponding string. Run without this option to see the
+                      corresponding string. Run without this option to see all
                       available targets.
 
     --ram=RAM         Sets the RAM for certain targets. Even though any number
@@ -601,7 +601,7 @@ cat <<EOF
                       without this option if you are not sure which the right
                       number is.
 
-    --type=TYPE       Sets the build type. The shortcut is valied.
+    --type=TYPE       Sets the build type. The shortcut is also valid.
                       Run without this option to see available types.
     --ccache          Enable ccache use (done by default these days)
     --no-ccache       Disable ccache use
@@ -2065,14 +2065,6 @@ if test "$CC" = "m68k-elf-gcc"; then
   # convert -O to -Os to get smaller binaries!
   GCCOPTS=`echo $GCCOPTS | sed 's/ -O / -Os /'`
 fi
-  for path in $PATH
-  do
-    # echo "checks for $file in $path" >&2
-    if test -f "$path/$file"; then
-      echo "$path/$file"
-      return
-    fi
-  done
 
 if [ "1" != `parse_args --ccache` ]; then
   echo "Enable ccache for building"
