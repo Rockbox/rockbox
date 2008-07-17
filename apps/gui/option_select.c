@@ -514,50 +514,32 @@ bool option_screen(const struct settings_list *setting,
                            &lists, &action,
             allow_wrap? LIST_WRAP_UNLESS_HELD: LIST_WRAP_OFF))
         {
+            /* setting changed */
             selected = gui_synclist_get_sel_pos(&lists);
             *variable = selection_to_val(setting, selected);
-            if (var_type == F_T_BOOL)
-            {
-                if (!use_temp_var)
-                    *(bool*)setting->setting = selected==1?true:false;
-            }
+            if (var_type == F_T_BOOL && !use_temp_var)
+                *(bool*)setting->setting = (*variable==1);
         }
         else if (action == ACTION_NONE)
             continue;
         else if (action == ACTION_STD_CANCEL)
         {
-            bool show_cancel = false, changed = false;
-            if (var_type == F_T_INT || var_type == F_T_UINT)
+            /* setting canceled, restore old value if changed */
+            if (*variable != oldvalue)
             {
-                if (*variable != oldvalue)
-                {
-                    show_cancel = true;
-                    *variable = oldvalue;
-                    changed = true;
-                }
-            }
-            else
-            {
-                if (*variable != oldvalue)
-                {
-                    show_cancel = true;
-                    if (!use_temp_var)
-                        *(bool*)setting->setting = oldvalue==1?true:false;
-                    *variable = oldvalue;
-                    changed = true;
-                }
-            }
-            if (use_temp_var && changed)
-                show_cancel = true;
-            if (show_cancel)
+                *variable = oldvalue;
+                if (var_type == F_T_BOOL && !use_temp_var)
+                    *(bool*)setting->setting = (oldvalue==1);
                 gui_syncsplash(HZ/2, ID2P(LANG_CANCEL));
+            }
             done = true;
         }
         else if (action == ACTION_STD_CONTEXT)
         {
+            /* reset setting to default */
             reset_setting(setting, variable);
             if (var_type == F_T_BOOL && !use_temp_var)
-                *(bool*)setting->setting = temp_var==1?true:false;
+                *(bool*)setting->setting = (*variable==1);
             val_to_selection(setting, *variable, &nb_items,
                              &selected, &function);
             gui_synclist_select_item(&lists, selected);
@@ -566,6 +548,15 @@ bool option_screen(const struct settings_list *setting,
         }
         else if (action == ACTION_STD_OK)
         {
+            /* setting accepted, store now if it used a temp var */
+            if (use_temp_var)
+            {
+                if (var_type == F_T_INT || var_type == F_T_UINT)
+                    *(int*)setting->setting = *variable;
+                else 
+                    *(bool*)setting->setting = (*variable==1);
+            }
+            settings_save();
             done = true;
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
@@ -575,18 +566,6 @@ bool option_screen(const struct settings_list *setting,
         if ( function )
             function(*variable);
     }
-    
-    if (oldvalue != *variable && (action != ACTION_STD_CANCEL))
-    {
-        if (use_temp_var)
-        {
-            if (var_type == F_T_INT || var_type == F_T_UINT)
-                *(int*)setting->setting = *variable;
-            else 
-                *(bool*)setting->setting = *variable?true:false;
-        }
-        settings_save();
-    }
-    
     return false;
 }
+
