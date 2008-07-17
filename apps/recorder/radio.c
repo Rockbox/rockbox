@@ -475,6 +475,7 @@ int radio_screen(void)
             vp[i].height -= BUTTONBAR_HEIGHT;
 #endif
         screens[i].set_viewport(&vp[i]);
+        screens[i].stop_scroll();
         screens[i].clear_viewport();
         screens[i].update_viewport();
     }
