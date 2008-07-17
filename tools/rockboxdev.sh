@@ -134,6 +134,7 @@ buildone () {
 gccpatch="" # default is no gcc patch
 gccver="4.0.3" # default gcc version
 binutils="2.16.1" # The binutils version to use
+gccconfigure="" #default is nothing added to configure
 
 system=`uname -s`
 gccurl="http://www.rockbox.org/gcc"
@@ -170,6 +171,7 @@ case $1 in
     target="mipsel-elf"
     gccver="4.1.2"
     binutils="2.17"
+    gccconfigure="--disable-libssp"
     ;;
   *)
     echo "unsupported"
@@ -250,7 +252,7 @@ mkdir build-gcc
 echo "ROCKBOXDEV: cd build-gcc"
 cd build-gcc
 echo "ROCKBOXDEV: gcc/configure"
-../gcc-$gccver/configure --target=$target --prefix=$prefix/$target --enable-languages=c
+../gcc-$gccver/configure --target=$target --prefix=$prefix/$target --enable-languages=c $gccconfigure
 echo "ROCKBOXDEV: gcc/make"
 $make
 echo "ROCKBOXDEV: gcc/make install to $prefix/$target"
