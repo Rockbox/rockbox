@@ -6,58 +6,6 @@
 
 #ifndef __ASSEMBLY__
 
-#define cache_unroll(base,op)	        	\
-	__asm__ __volatile__("	         	\
-		.set noreorder;		        \
-		.set mips3;		        \
-		cache %1, (%0);	                \
-		.set mips0;			\
-		.set reorder"			\
-		:				\
-		: "r" (base),			\
-		  "i" (op));
-          
-#define Index_Invalidate_I      0x00
-#define Index_Writeback_Inv_D   0x01
-
-#define CFG_DCACHE_SIZE		16384
-#define CFG_ICACHE_SIZE		16384
-#define CFG_CACHELINE_SIZE	32
-
-#define KSEG0BASE 0x80003FFF /* HACK */
-
-static inline void jz_flush_dcache(void)
-{
-	unsigned long start;
-	unsigned long end;
-
-	start = KSEG0BASE;
-	end = start + CFG_DCACHE_SIZE;
-	while (start < end) {
-		cache_unroll(start,Index_Writeback_Inv_D);
-		start += CFG_CACHELINE_SIZE;
-	}
-}
-
-static inline void jz_flush_icache(void)
-{
-	unsigned long start;
-	unsigned long end;
-
-	start = KSEG0BASE;
-	end = start + CFG_ICACHE_SIZE;
-	while(start < end) {
-		cache_unroll(start,Index_Invalidate_I);
-		start += CFG_CACHELINE_SIZE;
-	}
-}
-
-/* cpu pipeline flush */
-static inline void jz_sync(void)
-{
-	__asm__ volatile ("sync");
-}
-
 #define REG8(addr)	(*(volatile unsigned char *)(addr))
 #define REG16(addr)	(*(volatile unsigned short *)(addr))
 #define REG32(addr)	(*(volatile unsigned int *)(addr))

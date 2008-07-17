@@ -293,15 +293,11 @@ int rtc_ioctl(unsigned int cmd,struct rtc_time *val,unsigned int epo)
 }
 #endif
 
-#define udelay(x) for(i=0; i<x*100000; i++) asm("nop");
 void rtc_init(void)
 {
-    int i;
-    REG_RTC_RSR = 0;
-    while(!(REG_RTC_RCR & 0x80));
-    REG_RTC_RCR = 1;
+    REG_RTC_RCR = RTC_RCR_RTCE;
     udelay(70);
-    while(!(REG_RTC_RCR & 0x80));
-    REG_RTC_RGR = 0x7fff; 
+    while( !(REG_RTC_RCR & RTC_RCR_WRDY) );
+    REG_RTC_RGR = (0x7fff | RTC_RGR_LOCK); 
     udelay(70);
 }

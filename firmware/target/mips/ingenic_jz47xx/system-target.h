@@ -18,12 +18,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
+#ifndef __SYSTEM_TARGET_H_
+#define __SYSTEM_TARGET_H_
+
 #include "config.h"
 #include "jz4740.h"
 #include "mipsregs.h"
-
-/* Core-level interrupt masking */
 
 /* This one returns the old status */
 #define HIGHEST_IRQ_LEVEL 0
@@ -99,7 +100,14 @@ static inline void restore_interrupt(int status)
 #define	swap16(x) (((x) & 0xff) << 8 | ((x) >> 8) & 0xff)
 #define	swap32(x) (((x) & 0xff) << 24 | ((x) & 0xff00) << 8 | ((x) & 0xff0000) >> 8 | ((x) >> 24) & 0xff)
 
+#define UNCACHED_ADDRESS(addr)    ((unsigned int)(addr) | 0xA0000000)
+
+void __dcache_writeback_all(void);
+void __dcache_invalidate_all(void);
+void __icache_invalidate_all(void);
+void __flush_dcache_line(unsigned long addr);
 void sti(void);
 void cli(void);
 
-#define UNCACHED_ADDRESS(addr)    ((unsigned int)(addr) | 0xA0000000)
+#endif /* __SYSTEM_TARGET_H_ */
+

@@ -1124,7 +1124,18 @@ static inline void load_context(const void* addr)
  */
 static inline void core_sleep(void)
 {
-    asm volatile("nop\n");
+    /*
+	REG_CPM_LCR &= ~CPM_LCR_LPM_MASK;
+	REG_CPM_LCR |= CPM_LCR_LPM_SLEEP;
+    */
+	asm volatile(".set   mips3  \n"
+                 "wait          \n"
+                 ".set   mips0  \n"
+                 );
+	/*
+    REG_CPM_LCR &= ~CPM_LCR_LPM_MASK;
+	REG_CPM_LCR |= CPM_LCR_LPM_IDLE;
+    */
 }
 
 

@@ -21,18 +21,17 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include <string.h>
 #include "config.h"
 #include "jz4740.h"
 #include "backlight.h"
 #include "font.h"
 #include "lcd.h"
 #include "system.h"
-#include "mips.h"
 #include "button.h"
 #include "timefuncs.h"
 #include "rtc.h"
 #include "common.h"
+#include "mipsregs.h"
 
 static void audiotest(void)
 {
@@ -123,35 +122,8 @@ static void jz_nand_scan_id(void)
     printf("NAND Flash 4: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
 }
 
-static void jz_store_icache(void)
-{
-    unsigned long start;
-    unsigned long end;
-
-    start = KSEG0BASE;
-    end = start + CFG_ICACHE_SIZE;
-    while(start < end)
-    {
-        cache_unroll(start, 8);
-        start += CFG_CACHELINE_SIZE;
-    }
-}
-
 int main(void)
-{
-    cli();
-    
-    write_c0_status(0x10000400);
-    
-    memcpy((void *)A_K0BASE, (void *)0x80E00080, 0x20);
-    memcpy((void *)(A_K0BASE + 0x180), (void *)0x80E00080, 0x20);
-    memcpy((void *)(A_K0BASE + 0x200), (void *)0x80E00080, 0x20);
-    
-    jz_flush_dcache();
-    jz_store_icache();
-    
-    sti();
-    
+{   
     kernel_init();
     lcd_init();
     font_init();
@@ -165,7 +137,8 @@ int main(void)
     REG8(USB_REG_POWER) &= ~USB_POWER_SOFTCONN;
 
     int touch, btn;
-    lcd_clear_display();
+    char datetime[30];
+    reset_screen();
     printf("Rockbox bootloader v0.000001");
     jz_nand_scan_id();
     printf("REG_EMC_SACR0: 0x%x", REG_EMC_SACR0 >> EMC_SACR_BASE_BIT);
@@ -174,6 +147,11 @@ int main(void)
     printf("REG_EMC_SACR3: 0x%x", REG_EMC_SACR3 >> EMC_SACR_BASE_BIT);
     printf("REG_EMC_SACR4: 0x%x", REG_EMC_SACR4 >> EMC_SACR_BASE_BIT);
     printf("REG_EMC_DMAR0: 0x%x", REG_EMC_DMAR0 >> EMC_DMAR_BASE_BIT);
+    unsigned int cpu_id = read_c0_prid();
+    printf("CPU_ID: (0x%x)", cpu_id);
+    printf(" * Company ID: 0x%x", (cpu_id >> 16) & 7);
+    printf(" * Processor ID: 0x%x", (cpu_id >> 8) & 7);
+    printf(" * Revision ID: 0x%x", cpu_id & 7);
     while(1)
     {
         btn = button_read_device(&touch);
@@ -186,15 +164,23 @@ int main(void)
         if(btn & BUTTON_POWER)
             printf("BUTTON_POWER");
         if(button_hold())
+        {
             printf("BUTTON_HOLD");
+            asm("break 7");
+        }
         if(touch != 0)
         {
             lcd_set_foreground(LCD_RGBPACK(touch & 0xFF, (touch >> 8)&0xFF, (touch >> 16)&0xFF));
-            lcd_fillrect((touch>>16)-10, (touch&0xFFFF)-10, 20, 20);
+            lcd_fillrect((touch>>16)-5, (touch&0xFFFF)-5, 10, 10);
             lcd_update();
+            lcd_set_foreground(LCD_WHITE);
         }
-        /*_printf("%02d/%02d/%04d %02d:%02d:%02d", get_time()->tm_mday, get_time()->tm_mon, get_time()->tm_year,
-                                     get_time()->tm_hour, get_time()->tm_min, get_time()->tm_sec);*/
+        snprintf(datetime, 30, "%02d/%02d/%04d %02d:%02d:%02d", get_time()->tm_mday, get_time()->tm_mon, get_time()->tm_year,
+                                     get_time()->tm_hour, get_time()->tm_min, get_time()->tm_sec);
+        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT, datetime);
+        snprintf(datetime, 30, "%d", REG_TCU_TCNT0);
+        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*2, datetime);
+        lcd_update();
     }
     
     return 0;

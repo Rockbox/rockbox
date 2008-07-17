@@ -37,7 +37,8 @@
                         SADC_CFG_SNUM_5                |  \
                         (1 << SADC_CFG_CLKDIV_BIT)     |  \
                         SADC_CFG_PBAT_HIGH             |  \
-                        SADC_CFG_CMD_INT_PEN )
+                        SADC_CFG_CMD_INT_PEN              \
+                        )
 
 bool button_hold(void)
 {
@@ -102,7 +103,7 @@ int button_read_device(int *data)
             REG_SADC_CTRL |= (SADC_CTRL_PENDM);
             unsigned int dat;
             unsigned short xData,yData;
-            short tsz1Data,tsz2Data;
+            short tszData;
             
             dat = REG_SADC_TSDAT;
             
@@ -110,12 +111,11 @@ int button_read_device(int *data)
             yData = (dat >> 16) & 0xfff;
             
             dat = REG_SADC_TSDAT;
-            tsz1Data = (dat >>  0) & 0xfff;
-            tsz2Data = (dat >> 16) & 0xfff;
+            tszData = (dat >>  0) & 0xfff;
+            tszData = tszData - ((dat >> 16) & 0xfff);
             
             *data = touch_to_pixels(xData, yData);
             
-            tsz1Data = tsz2Data - tsz1Data;
         }
         REG_SADC_STATE = 0;
         //__intc_unmask_irq(IRQ_SADC);

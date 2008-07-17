@@ -25,6 +25,10 @@ SECTIONS
     .text : {
         loadaddress = .;
         _loadaddress = .;
+        _resetvectorsstart = .;
+        KEEP(*(.resetvectors));
+        *(.resetvectors);
+        _resetvectorsend = .;
         *(.init.text);
         *(.text*);
         *(.glue_7);
@@ -92,16 +96,13 @@ SECTIONS
     
     . = ALIGN(4);
 
-    .vectors IRAMORIG :
+    .vectors :
     {
         _vectorsstart = .;
-        KEEP(*(.resetvectors));
-        *(.resetvectors);
         KEEP(*(.vectors));
         *(.vectors);
         _vectorsend = .;
-    } AT > DRAM
-    _vectorscopy = LOADADDR(.vectors);
+    } > DRAM
     
     . = ALIGN(4);
 }

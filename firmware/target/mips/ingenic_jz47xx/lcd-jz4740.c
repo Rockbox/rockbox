@@ -71,7 +71,7 @@ void lcd_update_rect(int x, int y, int width, int height)
                        | DMAC_DCMD_DWDH_16 | DMAC_DCMD_DS_16BIT);             /* | (2 << 12) | (3 << 8) */
     REG_DMAC_DCCSR(0) = (DMAC_DCCSR_NDES | DMAC_DCCSR_EN);                     /* (1 << 31) | (1 << 0) */
     
-    jz_flush_dcache();
+    __dcache_writeback_all();
     
     REG_DMAC_DMACR = DMAC_DMACR_DMAE;
 
