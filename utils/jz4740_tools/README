@@ -13,6 +13,11 @@ When you're on Windows, install MingW32 and LibUSB-Win32 and edit "Makefile" to
 make sure "WIN_DRIVERS_LIBUSB_DIR" is set correctly.
 For cleaning: "make clean-win"
 
+When Windows pops up the window when it needs drivers for a "Jz4740 USB Boot
+Device" (VID=601A, PID=4740), point it to the windows_driver/ directory.
+
+On Linux there's no driver installation, everything is handled through LibUSB.
+
 That's all!
 
 
