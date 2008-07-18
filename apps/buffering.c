@@ -711,7 +711,7 @@ static void rebuffer_handle(int handle_id, size_t newpos)
        rebuffer the whole track, just read enough to satisfy */
     if (newpos > h->offset && newpos - h->offset < BUFFERING_DEFAULT_FILECHUNK)
     {
-        LOGFQUEUE("buffering >| Q_BUFFER_HANDLE");
+        LOGFQUEUE("buffering >| Q_BUFFER_HANDLE %d", handle_id);
         queue_send(&buffering_queue, Q_BUFFER_HANDLE, handle_id);
         h->ridx = h->data + newpos;
         return;
@@ -720,7 +720,7 @@ static void rebuffer_handle(int handle_id, size_t newpos)
     h->offset = newpos;
 
     /* Reset the handle to its new offset */
-    LOGFQUEUE("buffering >| Q_RESET_HANDLE");
+    LOGFQUEUE("buffering >| Q_RESET_HANDLE %d", handle_id);
     queue_send(&buffering_queue, Q_RESET_HANDLE, handle_id);
 
     size_t next = (unsigned)((void *)h->next - (void *)buffer);
@@ -733,7 +733,7 @@ static void rebuffer_handle(int handle_id, size_t newpos)
     }
 
     /* Now we ask for a rebuffer */
-    LOGFQUEUE("buffering >| Q_BUFFER_HANDLE");
+    LOGFQUEUE("buffering >| Q_BUFFER_HANDLE %d", handle_id);
     queue_send(&buffering_queue, Q_BUFFER_HANDLE, handle_id);
 }
 
@@ -970,7 +970,7 @@ int bufopen(const char *file, size_t offset, enum data_type type)
     if (type == TYPE_CUESHEET) {
         h->fd = fd;
         /* Immediately start buffering those */
-        LOGFQUEUE("buffering >| Q_BUFFER_HANDLE");
+        LOGFQUEUE("buffering >| Q_BUFFER_HANDLE %d", h->id);
         queue_send(&buffering_queue, Q_BUFFER_HANDLE, h->id);
     } else {
         /* Other types will get buffered in the course of normal operations */
@@ -1337,7 +1337,7 @@ void buffering_thread(void)
         switch (ev.id)
         {
             case Q_START_FILL:
-                LOGFQUEUE("buffering < Q_START_FILL");
+                LOGFQUEUE("buffering < Q_START_FILL %d", (int)ev.data);
                 /* Call buffer callbacks here because this is one of two ways
                  * to begin a full buffer fill */
                 send_event(EVENT_BUFFER_LOW, 0);
@@ -1347,19 +1347,19 @@ void buffering_thread(void)
                 break;
 
             case Q_BUFFER_HANDLE:
-                LOGFQUEUE("buffering < Q_BUFFER_HANDLE");
+                LOGFQUEUE("buffering < Q_BUFFER_HANDLE %d", (int)ev.data);
                 queue_reply(&buffering_queue, 1);
                 buffer_handle((int)ev.data);
                 break;
 
             case Q_RESET_HANDLE:
-                LOGFQUEUE("buffering < Q_RESET_HANDLE");
+                LOGFQUEUE("buffering < Q_RESET_HANDLE %d", (int)ev.data);
                 queue_reply(&buffering_queue, 1);
                 reset_handle((int)ev.data);
                 break;
 
             case Q_CLOSE_HANDLE:
-                LOGFQUEUE("buffering < Q_CLOSE_HANDLE");
+                LOGFQUEUE("buffering < Q_CLOSE_HANDLE %d", (int)ev.data);
                 queue_reply(&buffering_queue, close_handle((int)ev.data));
                 break;
 
@@ -1370,7 +1370,7 @@ void buffering_thread(void)
                 break;
 
             case Q_BASE_HANDLE:
-                LOGFQUEUE("buffering < Q_BASE_HANDLE");
+                LOGFQUEUE("buffering < Q_BASE_HANDLE %d", (int)ev.data);
                 base_handle_id = (int)ev.data;
                 break;
 
