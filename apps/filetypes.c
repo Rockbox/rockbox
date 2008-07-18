@@ -30,7 +30,6 @@
 #include "settings.h"
 #include "debug.h"
 #include "lang.h"
-#include "language.h"
 #include "kernel.h"
 #include "plugin.h"
 #include "filetypes.h"

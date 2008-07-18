@@ -45,7 +45,6 @@
 #include "rolo.h"
 #include "icons.h"
 #include "lang.h"
-#include "language.h"
 #include "screens.h"
 #include "keyboard.h"
 #include "bookmark.h"
