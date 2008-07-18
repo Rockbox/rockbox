@@ -142,7 +142,7 @@ static void ata_lock_unlock(struct ata_lock *l)
 #endif /* MAX_PHYS_SECTOR_SIZE */
 
 static struct mutex ata_mtx SHAREDBSS_ATTR;
-int ata_device; /* device 0 (master) or 1 (slave) */
+static int ata_device; /* device 0 (master) or 1 (slave) */
 
 int ata_spinup_time = 0;
 #if (CONFIG_LED == LED_REAL)
