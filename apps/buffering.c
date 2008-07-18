@@ -724,7 +724,7 @@ static void rebuffer_handle(int handle_id, size_t newpos)
     queue_send(&buffering_queue, Q_RESET_HANDLE, handle_id);
 
     size_t next = (unsigned)((void *)h->next - (void *)buffer);
-    if (next - h->data < h->filesize - newpos)
+    if (RINGBUF_SUB(next, h->data) < h->filesize - newpos)
     {
         /* There isn't enough space to rebuffer all of the track from its new
            offset, so we ask the user to free some */
