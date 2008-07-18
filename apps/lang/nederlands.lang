@@ -11571,44 +11571,44 @@
 </phrase>
 <phrase>
   id: LANG_ENABLE_STUDY_MODE
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Enable Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Activeer studeer mode"
+    *: ""
   </dest>
   <voice>
-    *: "Activeer studeer mode"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_STUDY_MODE
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Studeer mode"
+    *: ""
   </dest>
   <voice>
-    *: "Studeer mode"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_STUDY_HOP_STEP
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Study Increment"
+    *: ""
   </source>
   <dest>
-    *: "Studeertijd vergroten"
+    *: ""
   </dest>
   <voice>
-    *: "Studeertijd vergroten"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11758,5 +11758,47 @@
   </dest>
   <voice>
     *: "Snel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_LENGTH
+  desc: playback settings menu
+  user:
+  <source>
+    *: "Skip Length"
+  </source>
+  <dest>
+    *: "Verspring lengte"
+  </dest>
+  <voice>
+    *: "Verspring lengte"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_SLASH
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "schuine streep"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_TRACK
+  desc: skip length setting entry 0
+  user:
+  <source>
+    *: "Skip Track"
+  </source>
+  <dest>
+    *: "Nummer overslaan"
+  </dest>
+  <voice>
+    *: "Nummer overslaan"
   </voice>
 </phrase>
