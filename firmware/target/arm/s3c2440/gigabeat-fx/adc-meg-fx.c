@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "cpu.h"
 #include "system.h"
+#include "adc.h"
 #include "adc-target.h"
 #include "kernel.h"
 

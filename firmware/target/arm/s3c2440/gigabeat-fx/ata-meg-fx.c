@@ -26,6 +26,7 @@
 #include "power.h"
 #include "panic.h"
 #include "pcf50606.h"
+#include "ata.h"
 #include "ata-target.h"
 #include "backlight-target.h"
 

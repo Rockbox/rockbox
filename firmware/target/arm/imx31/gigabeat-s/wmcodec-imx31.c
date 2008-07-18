@@ -24,6 +24,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "sound.h"
+#include "wmcodec.h"
 #include "i2c-imx31.h"
 
 /* NOTE: Some port-specific bits will have to be moved away (node and GPIO

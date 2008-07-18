@@ -21,6 +21,7 @@
 #include "config.h"
 #include "system.h"
 #include "mc13783.h"
+#include "adc.h"
 #include "adc-target.h"
 #include "kernel.h"
 

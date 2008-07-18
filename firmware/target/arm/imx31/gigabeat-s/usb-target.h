@@ -26,7 +26,7 @@
 #endif
 
 void usb_connect_event(void);
-bool usb_init_device(void);
+void usb_init_device(void);
 int usb_detect(void);
 /* Read the immediate state of the cable from the PMIC */
 bool usb_plugged(void);

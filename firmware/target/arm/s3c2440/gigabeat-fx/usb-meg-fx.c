@@ -24,6 +24,7 @@
 #include "kernel.h"
 #include "ata.h"
 #include "usb.h"
+#include "usb-target.h"
 
 #define USB_RST_ASSERT   GPBDAT &= ~(1 << 4)
 #define USB_RST_DEASSERT GPBDAT |=  (1 << 4)

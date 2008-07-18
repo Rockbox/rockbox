@@ -26,6 +26,7 @@
 #include "logf.h"
 #include "debug.h"
 #include "string.h"
+#include "sc606-meg-fx.h"
 
 #define SLAVE_ADDRESS 0xCC
 

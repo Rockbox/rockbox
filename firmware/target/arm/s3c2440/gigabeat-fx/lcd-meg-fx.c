@@ -47,23 +47,23 @@ bool lcd_enabled(void)
     return lcd_on;
 }
 
-unsigned int LCDBANK(unsigned int address)
+static unsigned int LCDBANK(unsigned int address)
 {
     return ((address >> 22) & 0xff);
 }
 
-unsigned int LCDBASEU(unsigned int address)
+static unsigned int LCDBASEU(unsigned int address)
 {
     return (address & ((1 << 22)-1)) >> 1;
 }
 
-unsigned int LCDBASEL(unsigned int address)
+static unsigned int LCDBASEL(unsigned int address)
 {
     address += 320*240*2;
     return (address & ((1 << 22)-1)) >> 1;
 }
 
-inline void delay_cycles(volatile int delay)
+static inline void delay_cycles(volatile int delay)
 {
     while(delay>0) delay--;
 }
@@ -138,7 +138,7 @@ static void LCD_SPI_send(const unsigned char *array, int count)
     }
 }
 
-void LCD_SPI_setreg(unsigned char reg, unsigned char value)
+static void LCD_SPI_setreg(unsigned char reg, unsigned char value)
 {
     unsigned char regval[] = 
     {
@@ -160,7 +160,7 @@ static void LCD_SPI_SS(bool select)
         GPBDAT&=~0x100;
 }
 
-void LCD_SPI_start(void)
+static void LCD_SPI_start(void)
 {
     s3c_regset(&CLKCON, 0x40000);   /* enable SPI clock */
     LCD_SPI_SS(false);
@@ -171,7 +171,7 @@ void LCD_SPI_start(void)
     LCD_SPI_SS(true);
 }
 
-void LCD_SPI_stop(void)
+static void LCD_SPI_stop(void)
 {
     LCD_SPI_SS(false);
 

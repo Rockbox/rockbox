@@ -29,6 +29,7 @@
 #include "kernel.h"
 #include "sound.h"
 #include "i2c-meg-fx.h"
+#include "wmcodec.h"
 
 void audiohw_init(void)
 {

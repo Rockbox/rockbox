@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 int tx_rdy(void);
+int rx_rdy(void);
 void tx_writec(const char c);
 void dprintf(const char * str, ... );
 

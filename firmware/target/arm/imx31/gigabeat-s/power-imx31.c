@@ -21,6 +21,7 @@
 #include "config.h"
 #include "system.h"
 #include "power.h"
+#include "power-imx31.h"
 #include "backlight.h"
 #include "backlight-target.h"
 #include "avic-imx31.h"
