@@ -27,7 +27,7 @@ ifeq ($(findstring MINGW,$(shell uname)),MINGW)
 CC = gcc
 endif
 
-ifeq ($(findstring Darwin,$(shell uname)),Darwin)
+ifdef ARCH
 ARCH_CMD = -arch $(ARCH)
 endif
 
