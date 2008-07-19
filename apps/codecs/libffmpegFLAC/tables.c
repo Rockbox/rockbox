@@ -1,4 +1,8 @@
+#ifdef BUILD_STANDALONE
+#define ICONST_ATTR
+#else
 #include "../codec.h"
+#endif
 #include <inttypes.h>
 
 /* From ffmpeg - libavutil/common.h */

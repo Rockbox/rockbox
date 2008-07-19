@@ -1,6 +1,6 @@
 # Simple Makefile for standalone testing of decoder
 
-OBJS=main.o decoder.o bitstream.o
+OBJS=main.o decoder.o bitstream.o tables.o
 CFLAGS=-O2 -Wall -DBUILD_STANDALONE
 CC=gcc
 
