@@ -23,7 +23,6 @@
 #include "asf.h"
 #include "bitstream.h" /* For GetBitContext */
 #include "types.h"
-#include "mdct.h"
 //#include "dsputil.h"  /* For MDCTContext */
 
 
@@ -118,7 +117,6 @@ typedef struct WMADecodeContext
     fixed32 max_exponent[MAX_CHANNELS];
     int16_t coefs1[MAX_CHANNELS][BLOCK_MAX_SIZE];
     fixed32 (*coefs)[MAX_CHANNELS][BLOCK_MAX_SIZE];
-    MDCTContext mdct_ctx[BLOCK_NB_SIZES];
     fixed32 *windows[BLOCK_NB_SIZES];
     /* output buffer for one frame and the last for IMDCT windowing */
     fixed32 (*frame_out)[MAX_CHANNELS][BLOCK_MAX_SIZE*2];
