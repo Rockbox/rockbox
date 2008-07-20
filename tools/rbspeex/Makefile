@@ -28,28 +28,29 @@ CC = gcc
 endif
 
 ifdef ARCH
-ARCH_CMD = -arch $(ARCH)
+CFLAGS += -arch $(ARCH)
 endif
 
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
-SRC := $(shell cat $(SPEEXSRC)/SOURCES | $(CC) $(CFLAGS) -E -P - | grep -v "^\#")
+SRC := $(shell cat $(SPEEXSRC)/SOURCES | $(CC) $(CFLAGS) -E -P - | grep -v "^\#" | grep -v "^$$")
 
+OUT = build$(ARCH)
 SOURCES = $(SRC:%.c=$(SPEEXSRC)/%.c) rbspeex.c rbspeexenc.c rbspeexdec.c
-OBJS := $(SRC:%.c=%.o)
-DEPFILE = dep-speex
+OBJS = $(addprefix $(OUT)/,$(SRC:%.c=%.o))
+DEPFILE = $(OUT)/dep-speex
 DIRS = 
 
 .PHONY : all
 
 all: ../rbspeexenc ../rbspeexdec
 
-$(DEPFILE): $(SOURCES)
+$(DEPFILE): $(SOURCES) $(OUT)
 	$(SILENT)rm -f $(DEPFILE)
 	$(SILENT)(for each in $(SOURCES) x; do \
 	    if test "x" != "$$each"; then \
 	        obj=`echo $$each | sed -e 's/\.[cS]/.o/' | sed -e 's/^.*\///' `; \
-	        $(CC) -MG -MM -MT "$$obj" $(CFLAGS) $$each 2>/dev/null; \
+	        $(CC) -MG -MM -MT "$(OUT)/$$obj" $(CFLAGS) $$each 2>/dev/null; \
 	    fi; \
 	    if test -n "$$del"; then \
 	        rm $$del; \
@@ -58,27 +59,46 @@ $(DEPFILE): $(SOURCES)
 	done > $(DEPFILE); \
 	echo "oo" > /dev/null )
 
-librbspeex$(ARCH).a: $(OBJS) $(DEPFILE) rbspeex.o 
-	@echo AR librbspeex.a
+-include $(DEPFILE)
+
+$(OUT)/librbspeex.a: $(OBJS) $(DEPFILE) $(OUT)/rbspeex.o 
+	@echo AR $(OUT)/librbspeex$(ARCH).a
 	$(SILENT)$(AR) ruv $@ $+ > /dev/null 2>&1
 
-../rbspeexenc: $(OBJS) rbspeexenc.o librbspeex.a 
-	@echo Linking ../rbspeexenc
-	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexenc rbspeexenc.o librbspeex.a -lm
+librbspeex$(ARCH).a: $(OUT)/librbspeex.a
+	$(SILENT)cp $(OUT)/librbspeex.a librbspeex$(ARCH).a
 
-../rbspeexdec: $(OBJS) librbspeex.a rbspeexdec.o 
+../rbspeexenc: $(OBJS) $(OUT)/rbspeexenc.o librbspeex$(ARCH).a
+	@echo Linking ../rbspeexenc
+	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexenc $(OUT)/rbspeexenc.o librbspeex$(ARCH).a -lm
+
+../rbspeexdec: $(OBJS) librbspeex$(ARCH).a $(OUT)/rbspeexdec.o 
 	@echo Linking ../rbspeexdec
-	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexdec rbspeexdec.o librbspeex.a -lm 
+	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexdec $(OUT)/rbspeexdec.o librbspeex$(ARCH).a -lm 
 
 %.o:
 	@echo CC $<
-	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@ $(ARCH_CMD)
+	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
 
-universal: librbspeexppc.a librbspeexi386.a
-	@echo lipo libusb.a
+# some trickery to build ppc and i386 from a single call
+ifeq ($(ARCH),)
+librbspeexi386.a:
+	make ARCH=i386 librbspeexi386.a
+
+librbspeexppc.a:
+	make ARCH=ppc librbspeexppc.a
+endif
+
+librbspeex-universal: librbspeexi386.a librbspeexppc.a
+	@echo lipo librbspeex.a
+	$(SILENT) rm -f librbspeex.a
 	lipo -create librbspeexppc.a librbspeexi386.a -output librbspeex.a
 
 clean:
-	rm -f $(OBJS) rbspeex.o libspeex.a librbspeex.a rbspeexenc.o ../rbspeexenc dep-speex
+	rm -f $(OBJS) librbspeex* ../rbspeexenc ../rbspeexdec dep-speex
+	rm -rf build*
 
--include $(DEPFILE)
+build$(ARCH):
+	@echo MKDIR build$(ARCH)
+	$(SILENT)mkdir build$(ARCH)
+
