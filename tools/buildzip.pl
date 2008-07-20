@@ -284,12 +284,8 @@ STOP
 
         find(find_copyfile(qr/.*\.codec/, abs_path('.rockbox/codecs/')), 'apps/codecs');
 
-        my @call = `find .rockbox/codecs -type f 2>/dev/null`;
-        if(!$call[0]) {
-            # no codec was copied, remove directory again
-            rmdir(".rockbox/codecs");
-
-        }
+        # remove directory again if no codec was copied
+        rmdir(".rockbox/codecs");
     }
 
     find(find_copyfile(qr/\.(rock|ovl)/, abs_path('.rockbox/rocks/')), 'apps/plugins');
