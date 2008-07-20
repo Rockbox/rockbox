@@ -206,22 +206,12 @@ sub buildzip {
     
     if($fonts) {
         mkdir ".rockbox/fonts", 0777;
+        chdir(".rockbox/fonts");
+        $cmd = "$ROOT/tools/convbdf -f $ROOT/fonts/*bdf >/dev/null 2>&1";
+        print($cmd);
+        system($cmd);
+        chdir("../../");
 
-        opendir(DIR, "$ROOT/fonts") || die "can't open dir fonts";
-        my @fonts = grep { /\.bdf$/ && -f "$ROOT/fonts/$_" } readdir(DIR);
-        closedir DIR;
-
-        for(@fonts) {
-            my $f = $_;
-
-            print "FONT: $f\n" if($verbose);
-            my $o = $f;
-            $o =~ s/\.bdf/\.fnt/;
-            my $cmd ="$ROOT/tools/convbdf -f -o \".rockbox/fonts/$o\" \"$ROOT/fonts/$f\" >/dev/null 2>&1";
-            print "CMD: $cmd\n" if($verbose);
-            `$cmd`;
-            
-        }
         if($fonts < 2) {
           # fonts-only package, return
           return;
