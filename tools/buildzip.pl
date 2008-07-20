@@ -33,6 +33,7 @@ sub find_copyfile {
         $path = $_;
         if ($path =~ $pattern && filesize($path) > 0 && !($path =~ /\.rockbox/)) {
             copy($path, $destination);
+            chmod(0755, $destination.'/'.$path);
         }
     }
 }
