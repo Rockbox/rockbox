@@ -11555,16 +11555,16 @@
 </phrase>
 <phrase>
   id: LANG_ENABLE_STUDY_MODE
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Enable Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Studiermodus aktivieren"
+    *: ""
   </dest>
   <voice>
-    *: "Studiermodus aktivieren"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11617,30 +11617,30 @@
 </phrase>
 <phrase>
   id: LANG_STUDY_MODE
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Studiermodus"
+    *: ""
   </dest>
   <voice>
-    *: "Studiermodus"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_STUDY_HOP_STEP
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Study Increment"
+    *: ""
   </source>
   <dest>
-    *: "Zeitspanne"
+    *: ""
   </dest>
   <voice>
-    *: "Zeitspanne"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11682,7 +11682,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Quickscreen"
+    *: "Schnelleinstellungen"
   </voice>
 </phrase>
 <phrase>
@@ -11756,5 +11756,47 @@
   <voice>
     *: none
     gigabeatf: "Hoch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_LENGTH
+  desc: playback settings menu
+  user:
+  <source>
+    *: "Skip Length"
+  </source>
+  <dest>
+    *: "Vor-/Zurückspringen"
+  </dest>
+  <voice>
+    *: "Vor- und Zurückspringen"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_SLASH
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Schrägstrich"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_TRACK
+  desc: skip length setting entry 0
+  user:
+  <source>
+    *: "Skip Track"
+  </source>
+  <dest>
+    *: "Titelweise"
+  </dest>
+  <voice>
+    *: "Titelweise"
   </voice>
 </phrase>
