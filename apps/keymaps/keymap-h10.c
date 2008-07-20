@@ -302,8 +302,13 @@ static const struct button_mapping button_context_bmark[]  = {
 }; /* button_context_bmark */
 
 const struct button_mapping button_context_recscreen[]  = {
-    { ACTION_REC_PAUSE,             BUTTON_PLAY,                BUTTON_NONE },
-    
+    { ACTION_REC_PAUSE,      BUTTON_PLAY,                BUTTON_NONE },
+    { ACTION_REC_NEWFILE,    BUTTON_SELECT,              BUTTON_NONE },
+    { ACTION_STD_PREV,       BUTTON_REW,                 BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT, BUTTON_REW|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_STD_NEXT,       BUTTON_FF,                  BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT, BUTTON_FF|BUTTON_REPEAT,    BUTTON_NONE },
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_recscreen */
 
