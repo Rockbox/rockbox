@@ -146,8 +146,8 @@ PLUGIN_HEADER
 #define BJACK_LEFT       BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define BJACK_START      BUTTON_POWER
-#define BJACK_QUIT       BUTTON_A
+#define BJACK_START      BUTTON_A
+#define BJACK_QUIT       BUTTON_POWER
 #define BJACK_MAX        BUTTON_VOL_UP
 #define BJACK_MIN        BUTTON_VOL_DOWN
 #define BJACK_HIT        BUTTON_VOL_UP
@@ -228,7 +228,7 @@ PLUGIN_HEADER
 #define BJACK_MIN        BUTTON_DISPLAY
 #define BJACK_HIT        BUTTON_MENU
 #define BJACK_STAY       BUTTON_DISPLAY
-#define BJACK_DOUBLEDOWN BUTTON_SELECT
+#define BJACK_DOUBLEDOWN BUTTON_DOWN
 #define BJACK_SCORES     BUTTON_RIGHT
 #define BJACK_RESUME     BUTTON_PLAY
 #define BJACK_UP         BUTTON_UP
@@ -1183,13 +1183,23 @@ static unsigned int blackjack_menu(struct game_context* bj) {
             rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
             rb->lcd_puts(0, 9, str);
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-            rb->lcd_puts(0, 2, "POWER to start");
-            rb->lcd_puts(0, 3, "A to exit");
+            rb->lcd_puts(0, 2, "A to start");
+            rb->lcd_puts(0, 3, "POWER to exit");
             rb->lcd_puts(0, 4, "VOL+ to hit");
             rb->lcd_puts(0, 5, "VOL- to stay");
             rb->lcd_puts(0, 6, "CENTER to double down");
             rb->lcd_puts(0, 6, "RIGHT to view highscores ");
             rb->lcd_puts(0, 8, "MENU to save/resume");
+            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
+            rb->lcd_puts(0, 9, str);
+#elif CONFIG_KEYPAD == MROBE100_PAD
+            rb->lcd_puts(0, 2, "CENTER to start");
+            rb->lcd_puts(0, 3, "POWER to exit");
+            rb->lcd_puts(0, 4, "MENU to hit");
+            rb->lcd_puts(0, 5, "DISPLAY to stay");
+            rb->lcd_puts(0, 6, "DOWN to double down");
+            rb->lcd_puts(0, 6, "RIGHT to view highscores ");
+            rb->lcd_puts(0, 8, "PLAY to save/resume");
             rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
             rb->lcd_puts(0, 9, str);
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
