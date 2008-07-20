@@ -4154,7 +4154,7 @@
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeat*,mrobe100,sa9200: ""
+    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_5gb,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -7268,7 +7268,7 @@
     *: "%s finns inte"
   </dest>
   <voice>
-    *: ""
+    *: "Spellistekatalogen finns inte"
   </voice>
 </phrase>
 <phrase>
@@ -7282,7 +7282,7 @@
     *: "Inga spellistor"
   </dest>
   <voice>
-    *: ""
+    *: "Inga spellistor"
   </voice>
 </phrase>
 <phrase>
@@ -11544,44 +11544,44 @@
 </phrase>
 <phrase>
   id: LANG_STUDY_MODE
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Studieläge"
+    *: ""
   </dest>
   <voice>
-    *: "Studieläge"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_STUDY_HOP_STEP
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Study Increment"
+    *: ""
   </source>
   <dest>
-    *: "Studieinkrement"
+    *: ""
   </dest>
   <voice>
-    *: "Studieinkrement"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ENABLE_STUDY_MODE
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Enable Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Aktivera studieläge"
+    *: ""
   </dest>
   <voice>
-    *: "Aktivera studieläge"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11731,5 +11731,47 @@
   </dest>
   <voice>
     *: "Snabb"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_LENGTH
+  desc: playback settings menu
+  user:
+  <source>
+    *: "Skip Length"
+  </source>
+  <dest>
+    *: "Hopplängd"
+  </dest>
+  <voice>
+    *: "Hopplängd"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_TRACK
+  desc: skip length setting entry 0
+  user:
+  <source>
+    *: "Skip Track"
+  </source>
+  <dest>
+    *: "Hoppa spår"
+  </dest>
+  <voice>
+    *: "Hoppa spår"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_SLASH
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "snedstreck"
   </voice>
 </phrase>
