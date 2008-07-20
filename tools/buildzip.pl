@@ -208,7 +208,7 @@ sub buildzip {
         mkdir ".rockbox/fonts", 0777;
         chdir(".rockbox/fonts");
         $cmd = "$ROOT/tools/convbdf -f $ROOT/fonts/*bdf >/dev/null 2>&1";
-        print($cmd);
+        print($cmd."\n") if $verbose;
         system($cmd);
         chdir("../../");
 
