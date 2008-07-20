@@ -93,7 +93,7 @@ sub init_tts {
             $SIG{INT} = sub { print(CMD_IN "QUIT\r\n"); panic_cleanup(); };
             $SIG{KILL} = sub { print(CMD_IN "QUIT\r\n"); panic_cleanup(); };
             print(CMD_IN "QUERY\tVENDOR\r\n");
-            my $vendor = readline(CMD_OUT);
+            my $vendor = readline(*CMD_OUT);
             $vendor =~ s/\r\n//;
             %ret = (%ret,
                     "stdin" => *CMD_IN,
