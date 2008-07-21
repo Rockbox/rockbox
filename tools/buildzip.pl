@@ -20,6 +20,13 @@ sub glob_copy {
     }
 }
 
+sub glob_move {
+    my ($pattern, $destination) = @_;
+    foreach my $path (glob($pattern)) {
+        move($path, $destination);
+    }
+}
+
 sub glob_unlink {
     my ($pattern) = @_;
     foreach my $path (glob($pattern)) {
@@ -264,8 +271,7 @@ STOP
         system("$ROOT/tools/codepages -m");
     }
 
-    glob_copy('*.cp', '.rockbox/codepages/');
-    glob_unlink('*.cp');
+    glob_move('*.cp', '.rockbox/codepages/');
 
     if($bitmap) {
         mkdir ".rockbox/codecs", 0777;
