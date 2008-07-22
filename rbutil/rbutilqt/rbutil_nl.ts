@@ -1166,7 +1166,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="progressloggergui.cpp" line="102"/>
         <source>&amp;Abort</source>
-        <translation>&amp;Annuler</translation>
+        <translation>&amp;Afbreken</translation>
     </message>
 </context>
 <context>
