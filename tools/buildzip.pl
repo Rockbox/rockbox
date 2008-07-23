@@ -47,7 +47,7 @@ sub find_copyfile {
 
 $ROOT="..";
 
-my $ziptool="zip";
+my $ziptool="zip -r";
 my $output="rockbox.zip";
 my $verbose;
 my $exe;
@@ -437,9 +437,9 @@ sub runone {
 
     unlink($output);
     if($verbose) {
-      print "$ziptool -r $output .rockbox >/dev/null\n";
+      print "$ziptool $output .rockbox >/dev/null\n";
     }
-    system("$ziptool -r $output .rockbox >/dev/null");
+    system("$ziptool $output .rockbox >/dev/null");
 
     if($target && ($fonts != 1)) {
         # On some targets, rockbox.* is inside .rockbox

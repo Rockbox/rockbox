@@ -2345,7 +2345,7 @@ fullzip:
 tar:
 	\$(SILENT)rm -f rockbox.tar
 	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done; \\
-	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\$\$feat\" -i \"\$(TARGET_ID)\"  -o "rockbox.tar" -z "tar --no-recursion -uf" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
+	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\$\$feat\" -i \"\$(TARGET_ID)\"  -o "rockbox.tar" -z "tar -uf" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 
 bzip2: tar
 	\$(SILENT)bzip2 -f9 rockbox.tar
