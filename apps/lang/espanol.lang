@@ -563,7 +563,7 @@
   desc: in settings_menu()
   user:
   <source>
-    *: "Playback"
+    *: "Playback Settings"
   </source>
   <dest>
     *: "Reproducción"
@@ -925,7 +925,7 @@
     *: ""
   </dest>
   <voice>
-    *: none
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -939,7 +939,7 @@
     *: ""
   </dest>
   <voice>
-    *: none
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -953,7 +953,7 @@
     *: ""
   </dest>
   <voice>
-    *: none
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2141,7 +2141,7 @@
     *: ""
   </dest>
   <voice>
-    *: none
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2963,28 +2963,34 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200: "MENU = Revert"
+    ipod*,e200,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
+    mrobe100: "DISPLAY = Revert"
+    gigabeats: "BACK = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = Cancelar"
     h100,h120,h300: "STOP = Cancelar"
-    ipod*,e200,c200: "MENU = Cancelar"
+    ipod*,e200,c200,sa9200: "MENU = Cancelar"
     x5,m5: "RECORD = Cancelar"
     h10,h10_5gb: "PREV = Cancelar"
     gigabeatf: "A = Cancelar"
+    mrobe100: "DISPLAY = Cancelar"
+    gigabeats: "BACK = Cancelar"
   </dest>
   <voice>
     *: none
     rtc: "OFF para Cancelar"
     h100,h120,h300: "STOP para Cancelar"
-    ipod*,e200,c200: "MENU para Cancelar"
+    ipod*,e200,c200,sa9200: ""
     x5,m5: "RECORD para Cancelar"
     h10,h10_5gb: "PREV para Cancelar"
     gigabeatf: "A para Cancelar"
+    mrobe100: ""
+    gigabeats: ""
   </voice>
 </phrase>
 <phrase>
@@ -3141,18 +3147,21 @@
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=Acepta OFF=Cancela"
     ipod*: "SELECT=Acepta MENU=Cancela"
     h10,h10_5gb: "SELECT=Acepta PREV=Cancela"
+    gigabeats: "SELECT=Acepta POWER=Cancela"
   </dest>
   <voice>
     *: none
     alarm: "PLAY para Aceptar y OFF para Cancelar"
     ipod*: "SELECT para Aceptar y MENU para Cancelar"
     h10,h10_5gb: "SELECT para Aceptar y PREV para Cancelar"
+    gigabeats: ""
   </voice>
 </phrase>
 <phrase>
@@ -4861,10 +4870,10 @@
     *: ""
   </source>
   <dest>
-    *: ""
+    *: "deprecated"
   </dest>
   <voice>
-    *: none
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4934,7 +4943,7 @@
     *: ""
   </dest>
   <voice>
-    *: none
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5617,53 +5626,53 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_YES
-  desc: bool true representation
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Yes"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Sí"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Sí"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_NO
-  desc: bool false representation
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "No"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "No"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "No"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ON
-  desc: Used in a lot of places
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "On"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Activar"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Activar"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -5736,121 +5745,121 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SHUFFLE
-  desc: in settings_menu
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Shuffle"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Aleatorio"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Aleatorio"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT
-  desc: in settings_menu
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Repeat"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Repetir"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Repetir"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_ONE
-  desc: repeat one song
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "One"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Una"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Una"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER
-  desc: setting name for dir filter
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Show Files"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Mostrar Archivos"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Mostrar Archivos"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_SUPPORTED
-  desc: show all file types supported by Rockbox
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Supported"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Archivos Soportados"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Archivos Soportados"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_MUSIC
-  desc: show only music-related files
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Music"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Archivos de Música"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Archivos de Música"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_PLAYLIST
-  desc: show only playlist
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Playlists"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Listas de Reproducción"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Listas de Reproducción"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -5940,53 +5949,53 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FLIP_DISPLAY
-  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Upside Down"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Invertido"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Invertido"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SCROLL_BAR
-  desc: display menu, F3 substitute
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Scroll Bar"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Barra de Desplazamiento"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Barra de Desplazamiento"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_STATUS_BAR
-  desc: display menu, F3 substitute
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Status Bar"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Barra de Estado"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Barra de Estado"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -6167,19 +6176,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_AB
-  desc: repeat range from point A to B
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "A-B"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "A-B"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "desde A hasta B"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8931,10 +8940,10 @@
     *: ""
   </source>
   <dest>
-    *: "Tiempo Actual"
+    *: ""
   </dest>
   <voice>
-    *: "Tiempo actual"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9192,22 +9201,22 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
+    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Construyendo base de datos... %d encontrados (OFF para volver)"
     h100,h120,h300: "Construyendo base de datos... %d encontrados (STOP para volver)"
     ipod*: "Construyendo base de datos... %d encontrados (PREV para volver)"
-    x5,m5: "Construyendo base de datos... %d encontrados (LEFT para volver)"
-    h10,h10_5gb,e200,c200: "Construyendo base de datos... %d encontrados (PREV para volver)"
+    x5,m5,gigabeat*,mrobe100: "Construyendo base de datos... %d encontrados (LEFT para volver)"
+    h10,h10_5gb,e200,c200,sa9200: "Construyendo base de datos... %d encontrados (PREV para volver)"
   </dest>
   <voice>
     *: "Construyendo base de datos... (OFF para volver)"
     h100,h120,h300: "Construyendo base de datos... (STOP para volver)"
     ipod*: "Construyendo base de datos... (PREV para volver)"
-    x5,m5: "Construyendo base de datos... (LEFT para volver)"
-    h10,h10_5gb,e200,c200: "Construyendo base de datos... (PREV para volver)"
+    x5,m5,gigabeat*,mrobe100: ""
+    h10,h10_5gb,e200,c200,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9220,11 +9229,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: none
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: none
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -9486,19 +9495,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ALL
-  desc: repeat playlist once all songs have completed
+  desc: deprecated
   user: 
   <source>
     *: none
-    lcd_bitmap: "All"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Todos"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Todos"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -9610,19 +9619,16 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "No partition?"
-    player: "Partition?"
+    *: ""
   </source>
   <dest>
-    *: "¿No hay partición?"
-    player: "¿Partición?"
+    *: ""
   </dest>
   <voice>
-    *: "¿No hay partición?"
-    player: "¿Partición?"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9669,11 +9675,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: none
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: none
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -9754,16 +9760,16 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "Save Failed"
+    *: ""
   </source>
   <dest>
-    *: "Fallo al guardar"
+    *: ""
   </dest>
   <voice>
-    *: "Fallo al guardar"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9934,19 +9940,19 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Sí­"
     h100,h120,h300: "NAVI = Sí­"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Sí­"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT= Sí­"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
     *: "PLAY = Sí­"
     h100,h120,h300: "NAVI = Sí­"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Sí­"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: ""
     player: "Plei / estop"
   </voice>
 </phrase>
@@ -9958,19 +9964,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Fijar"
     h100,h120,h300: "NAVI = Fijar"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Fijar"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Fijar"
   </dest>
   <voice>
     *: none
     rtc: "ON = Fijar"
     h100,h120,h300: "NAVI = Fijar"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Fijar"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -10789,15 +10795,15 @@
   user:
   <source>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf,mrobe100: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf: "Botón de brillo"
+    gigabeatf,mrobe100: ""
   </dest>
   <voice>
     *: none
-    gigabeatf: "Botón de brillo"
+    gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -10869,11 +10875,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: none
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: none
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -11055,11 +11061,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: none
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: none
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -11159,17 +11165,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100: "Button Light Timeout"
+    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Tiempo de espera en la luz de la rueda"
-    c200,gigabeatf,mrobe100: "Tiempo de espera en la luz del botón"
+    c200,gigabeatf,mrobe100,sa9200: "Tiempo de espera en la luz de la botón"
   </dest>
   <voice>
     *: none
     e200: "Tiempo de espera en la luz de la rueda"
-    c200,gigabeatf,mrobe100: "Tiempo de espera en la luz del botón"
+    c200,gigabeatf,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -11306,11 +11312,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: none
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: none
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -11551,10 +11557,274 @@
   </source>
   <dest>
     *: none
-    recording: deprecated
+    recording: "deprecated"
   </dest>
   <voice>
     *: none
     recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_STUDY_MODE
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHPAD_SENSITIVITY
+  desc: touchpad sensitivity setting
+  user: 
+  <source>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FAST
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Fast"
+  </source>
+  <dest>
+    *: "Rapido"
+  </dest>
+  <voice>
+    *: "Fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_LENGTH
+  desc: playback settings menu
+  user: 
+  <source>
+    *: "Skip Length"
+  </source>
+  <dest>
+    *: "Skip Length"
+  </dest>
+  <voice>
+    *: "Skip Length"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_SLASH
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "slash"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACCESSORY_SUPPLY
+  desc: in system settings menu
+  user: 
+  <source>
+    *: none
+    accessory_supply: "Accessory Power Supply"
+  </source>
+  <dest>
+    *: none
+    accessory_supply: "Accessory Power Supply"
+  </dest>
+  <voice>
+    *: none
+    accessory_supply: "Accessory Power Supply"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING_AND_SHUTDOWN
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "Stop Recording And Shutdown"
+  </source>
+  <dest>
+    *: none
+    recording: "Stop Recording And Shutdown"
+  </dest>
+  <voice>
+    *: none
+    recording: "Stop Recording And Shutdown"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_MODE
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_HOP_STEP
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_SLOW
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Very slow"
+  </source>
+  <dest>
+    *: "Muy lento"
+  </dest>
+  <voice>
+    *: "Very slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLOW
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Lento"
+  </dest>
+  <voice>
+    *: "Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUICKSCREEN
+  desc: spoken only, Announces entering the "quick screen"
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Quick screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_FAST
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Very fast"
+  </source>
+  <dest>
+    *: "Muy rápidamente"
+  </dest>
+  <voice>
+    *: "Very fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_STUDY_MODE
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN
+  desc: generic string for unknown states, such as an unset clock
+  user: 
+  <source>
+    *: "Unknown"
+  </source>
+  <dest>
+    *: "Unknown"
+  </dest>
+  <voice>
+    *: "Unknown"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_TRACK
+  desc: skip length setting entry 0
+  user: 
+  <source>
+    *: "Skip Track"
+  </source>
+  <dest>
+    *: "Skip Track"
+  </dest>
+  <voice>
+    *: "Skip Track"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OK
+  desc: spoken only, On exiting a context, specifically the quick screen
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIGH
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    gigabeatf: "High"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "High"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "High"
   </voice>
 </phrase>
