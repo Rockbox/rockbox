@@ -514,7 +514,7 @@ bool RbUtilQt::installAuto()
             connect(&backup,SIGNAL(zipProgress(int,int)),logger, SLOT(setProgress(int,int)));
             if(backup.createZip(backupName,settings->mountpoint() + "/.rockbox") == Zip::Ok)
             {
-                logger->addItem(tr("Backup successfull"),LOGOK);
+                logger->addItem(tr("Backup successful"),LOGOK);
             }
             else
             {

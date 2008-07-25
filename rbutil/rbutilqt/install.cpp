@@ -146,7 +146,7 @@ void Install::accept()
         connect(&backup,SIGNAL(zipProgress(int,int)),logger,SLOT(setProgress(int,int)));
         if(backup.createZip(m_backupName,settings->mountpoint() + "/.rockbox") == Zip::Ok)
         {
-            logger->addItem(tr("Backup successfull"),LOGOK);
+            logger->addItem(tr("Backup successful"),LOGOK);
         }
         else
         {
