@@ -252,7 +252,13 @@ QString RbSettings::curVoiceName()
 
 QString RbSettings::curLang()
 {
-    return userSettings->value("lang").toString();
+    // QSettings::value only returns the default when the setting
+    // doesn't exist. Make sure to return the system language if
+    // the language in the configuration is present but empty too.
+    QString lang = userSettings->value("lang").toString();
+    if(lang.isEmpty())
+        lang = QLocale::system().name();
+    return lang;
 }
 
 QString RbSettings::curEncoder()

@@ -37,7 +37,7 @@
 #include <windows.h>
 #endif
 
-#define DEFAULT_LANG "English (C)"
+#define DEFAULT_LANG "English (en)"
 
 Config::Config(QWidget *parent,int index) : QDialog(parent)
 {
@@ -56,14 +56,13 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     QStringList langs = findLanguageFiles();
     for(int i = 0; i < langs.size(); ++i)
         lang.insert(languageName(langs.at(i)) + tr(" (%1)").arg(langs.at(i)), langs.at(i));
-    lang.insert(DEFAULT_LANG, "");
+    lang.insert(DEFAULT_LANG, "en");
     QMap<QString, QString>::const_iterator i = lang.constBegin();
     while (i != lang.constEnd()) {
         ui.listLanguages->addItem(i.key());
         i++;
     }
     ui.listLanguages->setSelectionMode(QAbstractItemView::SingleSelection);
-    connect(ui.listLanguages, SIGNAL(itemSelectionChanged()), this, SLOT(updateLanguage()));
     ui.proxyPass->setEchoMode(QLineEdit::Password);
     ui.treeDevices->setAlternatingRowColors(true);
     ui.listLanguages->setAlternatingRowColors(true);
@@ -109,7 +108,7 @@ void Config::accept()
     settings->setProxyType(proxyType);
 
     // language
-    if(settings->curLang() != language)
+    if(settings->curLang() != language && !language.isEmpty())
         QMessageBox::information(this, tr("Language changed"),
             tr("You need to restart the application for the changed language to take effect."));
     settings->setLang(language);
@@ -188,13 +187,19 @@ void Config::setUserSettings()
             b = i.key();
             break;
         }
+        else if(settings->curLang().startsWith(i.value(), Qt::CaseInsensitive)) {
+            // check if there is a base language (en -> en_US, etc.)
+            b = i.key();
+            break;
+        }
         i++;
     }
     a = ui.listLanguages->findItems(b, Qt::MatchExactly);
-    if(a.size() <= 0)
-        a = ui.listLanguages->findItems(DEFAULT_LANG, Qt::MatchExactly);
     if(a.size() > 0)
         ui.listLanguages->setCurrentItem(a.at(0));
+    // don't connect before language list has been set up to prevent
+    // triggering the signal by selecting the saved language.
+    connect(ui.listLanguages, SIGNAL(itemSelectionChanged()), this, SLOT(updateLanguage()));
 
     // devices tab
     ui.mountPoint->setText(QDir::toNativeSeparators(settings->mountpoint()));

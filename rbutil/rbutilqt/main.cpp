@@ -37,12 +37,16 @@ int main( int argc, char ** argv ) {
         user = new QSettings(absolutePath + "/RockboxUtility.ini", QSettings::IniFormat, 0);
     else user = new QSettings(QSettings::IniFormat, QSettings::UserScope, "rockbox.org", "RockboxUtility");
 
+    QString applang = QLocale::system().name();
     QTranslator translator;
     // install translator
     if(!user->value("lang", "").toString().isEmpty()) {
-        if(!translator.load("rbutil_" + user->value("lang").toString(), absolutePath))
-            translator.load("rbutil_" + user->value("lang").toString(), ":/lang");
-        QLocale::setDefault(user->value("lang").toString());
+        applang = user->value("lang", "").toString();
+    }
+    if(!applang.isEmpty()) {
+        if(!translator.load("rbutil_" + applang, absolutePath))
+            translator.load("rbutil_" + applang, ":/lang");
+        QLocale::setDefault(applang);
     }
     delete user;
     app.installTranslator(&translator);
