@@ -21,6 +21,7 @@ sid.c
 adx.c
 nsf.c
 spc.c
+asap.c
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
 /* encoders */
 aiff_enc.c

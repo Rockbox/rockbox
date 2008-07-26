@@ -196,6 +196,7 @@ struct codec_api {
     void* (*memmove)(void *out, const void *in, size_t n);
     int (*memcmp)(const void *s1, const void *s2, size_t n);
     void *(*memchr)(const void *s1, int c, size_t n);
+    char *(*strcasestr) (const char* phaystack, const char* pneedle);
 
 #if defined(DEBUG) || defined(SIMULATOR)
     void (*debugf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);

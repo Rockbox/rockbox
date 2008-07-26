@@ -1,0 +1,25 @@
+Library: asap-1.2.0 
+Imported: 2008-26-07 by Dominik Wenger
+
+This directory contains a local version of asap (http://asap.sourceforge.net/) for decoding Atari 8bit .sap
+audio streams. 
+
+LICENSING INFORMATION
+
+Asap is available under the terms of the GPL v2 or later
+license, which is both an open source and free software license. 
+The Licence is the same as the rest of Rockbox.
+
+
+IMPORT DETAILS
+
+The .[ch] files in apps/codec/asap are copied from ASAP.
+Some #defines were added, so it uses the ci-> Pointer.
+
+A small modification was needed in asap.h Line 120. 
+(changed the delta buffer to signed char)
+
+Also players.h (contains binarys of players) was generated and copied
+into Rockbox.
+
+

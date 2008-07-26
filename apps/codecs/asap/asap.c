@@ -20,7 +20,7 @@
  * along with ASAP; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
+#include "codeclib.h"
 #if !defined(JAVA) && !defined(CSHARP)
 #include <string.h>
 #endif
@@ -29,6 +29,14 @@
 #if !defined(JAVA) && !defined(CSHARP)
 #include "players.h"
 #endif
+
+#define memcpy ci->memcpy
+#define memcmp ci->memcmp
+#define memset ci->memset
+#define strcpy ci->strcpy
+#define strcmp ci->strcmp
+#define strstr ci->strcasestr
+
 
 #define CMR_BASS_TABLE_OFFSET  0x70f
 
@@ -1012,7 +1020,7 @@ FILE_FUNC abool parse_sap_header(ASAP_ModuleInfo PTR module_info,
 		i = 0;
 		while (module[module_index] != 0x0d) {
 			line[i++] = (char) module[module_index++];
-			if (module_index >= module_len || i >= sizeof(line) - 1)
+			if (module_index >= module_len || (unsigned)i >= sizeof(line) - 1)
 				return FALSE;
 		}
 		if (++module_index >= module_len || module[module_index++] != 0x0a)
@@ -1719,6 +1727,7 @@ int ASAP_SetModuleInfo(const ASAP_ModuleInfo *module_info, const byte ARRAY modu
 const char *ASAP_CanConvert(const char *filename, const ASAP_ModuleInfo *module_info,
                             const byte ARRAY module, int module_len)
 {
+  (void)filename;
 	switch (module_info->type) {
 	case 'B':
 		if (module_info->init == 0x4f3 || module_info->init == 0xf4f3 || module_info->init == 0x4ef)
@@ -1755,6 +1764,7 @@ const char *ASAP_CanConvert(const char *filename, const ASAP_ModuleInfo *module_
 int ASAP_Convert(const char *filename, const ASAP_ModuleInfo *module_info,
                  const byte ARRAY module, int module_len, byte ARRAY out_module)
 {
+    (void) filename;
 	int out_len;
 	byte *dest;
 	int addr;

@@ -20,13 +20,14 @@
  * along with ASAP; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
+#include "codeclib.h"
 #if !defined(JAVA) && !defined(CSHARP)
 #include <string.h>
 #endif
 
 #include "asap_internal.h"
 
+#define memset ci->memset
 #define ULTRASOUND_CYCLES  112
 
 #define MUTE_FREQUENCY     1

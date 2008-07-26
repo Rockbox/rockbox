@@ -124,7 +124,7 @@ struct codec_api ci = {
     memmove,
     memcmp,
     memchr,
-
+    strcasestr,
 #if defined(DEBUG) || defined(SIMULATOR)
     debugf,
 #endif

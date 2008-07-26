@@ -463,7 +463,7 @@ static void init_ci(void)
     ci.memmove = rb->memmove;
     ci.memcmp = rb->memcmp;
     ci.memchr = rb->memchr;
-
+    ci.strcasestr = rb->strcasestr;
 #if defined(DEBUG) || defined(SIMULATOR)
     ci.debugf = rb->debugf;
 #endif

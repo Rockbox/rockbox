@@ -117,7 +117,7 @@ typedef struct {
 	int delta3;
 	int delta4;
 	int skctl;
-	char delta_buffer[888];
+	signed char delta_buffer[888];
 } PokeyState;
 
 /* Player state.

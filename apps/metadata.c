@@ -249,7 +249,17 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
         }
 
         break;
-
+        
+    case AFMT_SAP:
+        if (!get_asap_metadata(fd, id3))
+        {
+            DEBUGF("get_sap_metadata error\n");
+            return false;
+        }
+        id3->filesize = filesize(fd);
+        id3->genre_string = id3_get_num_genre(36);
+        break;
+        
 #endif /* CONFIG_CODEC == SWCODEC */
         
     default:
