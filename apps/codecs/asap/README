@@ -1,0 +1,59 @@
+ASAP - Another Slight Atari Player
+----------------------------------
+
+ASAP is a player of Atari 8-bit music for modern computers.
+It emulates the POKEY sound chip and the 6502 processor.
+The project was initially based on the routines from the Atari800 emulator,
+but the current version has a completely new original emulation core.
+
+The ASAP project includes the following programs:
+* ASAP2WAV - portable command-line utility that generates WAV files
+* WASAP - tiny player for Windows
+* plugin for Apollo
+* plugin for foobar2000 0.9
+* plugin for GSPlayer
+* plugin for MOC
+* plugin for Winamp
+* plugin for XMMS
+* DirectShow source filter (for Windows Media Player)
+* Java version of ASAP2WAV
+* Java applet
+* Java midlet
+* C# version of ASAP2WAV
+
+The following input formats are supported:
+* SAP (Slight Atari Player - standard file format for playing Atari 8-bit
+  music on modern computers)
+* CMC (Chaos Music Composer)
+* CMR (CMC Rzog)
+* DMC (DoublePlay CMC)
+* MPT (Music ProTracker)
+* MPD (MPT DoublePlay)
+* RMT (Raster Music Tracker)
+* TMC, TM8 (Theta Music Composer 1.x)
+* TM2 (Theta Music Composer 2.x)
+
+If you are looking for Atari 8-bit music, there is a single big collection
+of it called Atari SAP Music Archive (http://asma.atari.org).
+
+If you are interested in the ASAP project, please subscribe its mailing list:
+https://lists.sourceforge.net/lists/listinfo/asap-users
+As in the Atari800 project, this is a combined list for end users
+and for developers. Once you subscribe, you can post comments, ideas
+and questions about ASAP. They will be answered ASAP. ;-)
+
+If, for some reason, you do not want to subscribe the mailing list,
+but have a bug report, feature request or a small code patch, you can use
+the sf.net tracker. Use "Bugs", "Feature Requests" or "Patches" link
+on this page:
+http://sourceforge.net/projects/asap/
+
+ASAP is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published
+by the Free Software Foundation; either version 2 of the License,
+or (at your option) any later version.
+
+ASAP is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the included GNU General Public License for more details.

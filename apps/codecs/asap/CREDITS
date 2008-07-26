@@ -1,0 +1,37 @@
+People who have contributed to ASAP
+-----------------------------------
+
+Atari800 Development Team  (http://atari800.sourceforge.net)
+* 6502 and POKEY emulation used in 0.x.y versions of ASAP
+
+Zdenek Eisenhammer  <pg@pinknet.cz>
+* testing
+
+Piotr Fusik  <fox@scene.pl>
+* author and maintainer of ASAP
+
+Maciek Konecki  <maciusk1@wp.pl>
+* porting to C#
+
+Marcin Lewandowski  <jaskier@atari8.info>
+* 6502 routines for playing CMC, MPT, TMC and TM2
+
+Perry McFarlane  <perry_m@fastmail.fm>
+* POKEY reverse-engineering
+
+Kostas Nakos  <knakos@gmail.com>
+* compilation for Windows CE
+
+Slawomir Sledz  <slaves@scene.pl>
+* testing
+
+Radek Sterba  <raster@infos.cz>
+* 6502 routine for playing RMT
+* testing
+
+Lukasz Sychowicz  <xray@scene.pl>
+* Windows icons
+* testing
+
+Michal Szpilowski  <miker@atari.pl>
+* testing
