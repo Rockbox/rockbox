@@ -52,7 +52,7 @@ next_track:
     codec_set_replaygain(ci->id3);
         
     int bytes_done =0;   
-    int filesize;
+    size_t filesize;
     ci->seek_buffer(0);
     module = ci->request_buffer(&filesize, ci->filesize);
     if (!module || (size_t)filesize < (size_t)ci->filesize) 
