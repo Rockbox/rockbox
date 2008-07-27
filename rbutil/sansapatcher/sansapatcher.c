@@ -256,9 +256,10 @@ static uint32_t keys[][4] = {
     { 0xd7b10538, 0xc662945b, 0x1b3fce68, 0xf389c0e6 }, /* "sansa_gh" */
     { 0x1d29ddc0, 0x2579c2cd, 0xce339e1a, 0x75465dfe }, /* sansa 103 */
     
-    { 0xbf2d06fa, 0xf0e23d59, 0x29738132, 0xe2d04ca7 }, /* c200 */
     { 0x2a7968de, 0x15127979, 0x142e60a7, 0xe49c1893 }, /* c200 1.00.03 */
-    { 0xa913d139, 0xf842f398, 0x3e03f1a6, 0x060ee012 }, /* c200 1.00.06 */
+    { 0xbf2d06fa, 0xf0e23d59, 0x29738132, 0xe2d04ca7 }, /* c200 1.00.04 and up*/
+    { 0xa913d139, 0xf842f398, 0x3e03f1a6, 0x060ee012 }, /* c200 1.01.05 and up*/
+    { 0x0fe92902, 0xe8cc0f89, 0x6ff568ba, 0x1eff5161 }, /* c200 1.01.07 */
 };
 
 /*
