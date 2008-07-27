@@ -230,7 +230,7 @@ bool get_asap_metadata(int fd, struct mp3entry* id3)
 
     int filelength = filesize(fd);
     struct module_info *info;
-    info = (struct module_info *) buf;
+    info = (struct module_info *) (((intptr_t)buf + 3) & ~3); /* Align to 4 bytes */
  
     if(parse_sap_header(fd,info,filelength) == false)
     {
