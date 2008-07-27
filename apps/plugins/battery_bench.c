@@ -26,7 +26,7 @@ PLUGIN_HEADER
 
 #define BATTERY_LOG "/battery_bench.txt"
 #define BUF_SIZE 16000
-#define DISK_SPINDOWN_TIMEOUT 3600
+#define DISK_SPINDOWN_TIMEOUT 1800
 
 #define EV_EXIT 1337
 

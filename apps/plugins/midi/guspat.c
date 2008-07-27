@@ -162,10 +162,12 @@ struct GPatch * gusload(char * filename)
 
     int file = rb->open(filename, O_RDONLY);
 
+    DEBUGF("filename: %s\n", filename);
+
     if(file == -1)
     {
-        char message[50];
-        rb->snprintf(message, 50, "Error opening %s", filename);
+        char message[MAX_PATH];
+        rb->snprintf(message, MAX_PATH, "Error opening %s", filename);
         rb->splash(HZ*2, message);
         return NULL;
     }
@@ -197,12 +199,12 @@ struct GPatch * gusload(char * filename)
 
 /*    printf("\nFILE: %s", filename); */
 /*    printf("\nlayerSamples=%d", gp->numWaves); */
-
+DEBUGF("hej\n");
     int a=0;
     for(a=0; a<gp->numWaves; a++)
         gp->waveforms[a] = loadWaveform(file);
 
-
+DEBUGF("hej2\n");
 /*    printf("\nPrecomputing note table"); */
 
     for(a=0; a<128; a++)
@@ -210,7 +212,7 @@ struct GPatch * gusload(char * filename)
         gp->noteTable[a] = selectWaveform(gp, a);
     }
     rb->close(file);
-
+DEBUGF("hej3\n");
     return gp;
 }
 

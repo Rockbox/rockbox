@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:$
+ * $Id$
  *
  * Copyright (C) 2008 Nils Wallménius
  *
@@ -111,13 +111,13 @@ MENUITEM_RETURNVALUE(context_add_entry, "Add entry", 0,
                      NULL, Icon_NOICON);
 MENUITEM_RETURNVALUE(context_edit_title, "Edit title", 1,
                      &context_item_cb, Icon_NOICON);
-MENUITEM_RETURNVALUE(context_edit_name, "Edit user name", 1,
+MENUITEM_RETURNVALUE(context_edit_name, "Edit user name", 2,
                      &context_item_cb, Icon_NOICON);
-MENUITEM_RETURNVALUE(context_edit_password, "Edit password", 2,
+MENUITEM_RETURNVALUE(context_edit_password, "Edit password", 3,
                      &context_item_cb, Icon_NOICON);
-MENUITEM_RETURNVALUE(context_delete_entry, "Delete entry", 3,
+MENUITEM_RETURNVALUE(context_delete_entry, "Delete entry", 4,
                      &context_item_cb, Icon_NOICON);
-MENUITEM_RETURNVALUE(context_debug, "debug", 4,
+MENUITEM_RETURNVALUE(context_debug, "debug", 5,
                      &context_item_cb, Icon_NOICON);
 
 MAKE_MENU(context_m, "Context menu",
@@ -144,9 +144,12 @@ static char * kb_list_cb(int selected_item, void *data,
     struct pw_entry *entry = pw_list.first.next;
     for (i = 0; i < selected_item; i++)
     {
-        if (entry->next)
+        if (entry)
             entry = entry->next;
     }
+    if (!entry)
+        return NULL;
+    
     rb->snprintf(buffer, buffer_len, "%s", entry->title);
 
     return buffer;
@@ -162,21 +165,20 @@ static void init_ll(void)
 static void delete_entry(int selected_item)
 {
     int i;
-    struct pw_entry *entry = pw_list.first.next;
+    struct pw_entry *entry = &pw_list.first;
     struct pw_entry *entry2;
 
     /* find the entry before the one to delete */
-    for (i = 0; i < selected_item - 1; i++)
+    for (i = 0; i < selected_item; i++)
     {
         if (entry->next)
             entry = entry->next;
     }
-    if (entry->next)
-        entry2 = entry->next;
-    else
+    entry2 = entry->next;
+    if (!entry2)
         return;
-    if (entry2->next)
-        entry->next = entry2->next;
+    
+    entry->next = entry2->next;
 
     entry2->used = false;
     entry2->name[0] = '\0';
@@ -201,10 +203,13 @@ static void add_entry(int selected_item)
     }
 
     rb->splash(HZ, "Enter title");
+    pw_list.entries[i].title[0] = '\0';
     rb->kbd_input(pw_list.entries[i].title, FIELD_LEN);
     rb->splash(HZ, "Enter name");
+    pw_list.entries[i].name[0] = '\0';
     rb->kbd_input(pw_list.entries[i].name, FIELD_LEN);
     rb->splash(HZ, "Enter password");
+    pw_list.entries[i].password[0] = '\0';
     rb->kbd_input(pw_list.entries[i].password, FIELD_LEN);
 
     for (j = 0; j < selected_item; j++)
@@ -392,7 +397,7 @@ static void encrypt_buffer(char *buf, size_t size, uint32_t *key)
 static int parse_buffer(void)
 {
     int i;
-    intptr_t len;
+    int len;
     struct pw_entry *entry = pw_list.first.next;
     char *start, *end;
     start = &buffer[HEADER_LEN];
@@ -408,40 +413,36 @@ static int parse_buffer(void)
         return -1;
     }
 
-    for (i=0; i < MAX_ENTRIES; i++)
+    for (i = 0; i < MAX_ENTRIES; i++)
     {
         end = rb->strchr(start, '\0'); /* find eol */
-        len = (intptr_t)end - (intptr_t)&buffer[HEADER_LEN];
-        if ((len > bytes_read + HEADER_LEN)
-            || (intptr_t)start == (intptr_t)end)
+        len = end - &buffer[HEADER_LEN];
+        if ((len > bytes_read + HEADER_LEN) || start == end)
         {
             break;
         }
 
-        rb->strncpy(entry->title, start,
-                    MIN((intptr_t)end - (intptr_t)start, FIELD_LEN));
-        start = end +1;
+        rb->strncpy(entry->title, start, FIELD_LEN);
+        start = end + 1;
 
         end = rb->strchr(start, '\0'); /* find eol */
-        len = (intptr_t)end - (intptr_t)&buffer[HEADER_LEN];
+        len = end - &buffer[HEADER_LEN];
         if (len > bytes_read + HEADER_LEN)
         {
             break;
         }
 
-        rb->strncpy(entry->name, start,
-                    MIN((intptr_t)end - (intptr_t)start, FIELD_LEN));
-        start = end +1;
+        rb->strncpy(entry->name, start, FIELD_LEN);
+        start = end + 1;
 
         end = rb->strchr(start, '\0'); /* find eol */
-        len = (intptr_t)end - (intptr_t)&buffer[HEADER_LEN];
+        len = end - &buffer[HEADER_LEN];
         if (len > bytes_read + HEADER_LEN)
         {
             break;
         }
-        rb->strncpy(entry->password, start,
-                    MIN((intptr_t)end - (intptr_t)start, FIELD_LEN));
-        start = end +1;
+        rb->strncpy(entry->password, start, FIELD_LEN);
+        start = end + 1;
         entry->used = true;
         if (i + 1 < MAX_ENTRIES - 1)
         {
@@ -483,9 +484,10 @@ static void write_output(int fd)
         if (entry->next)
             entry = entry->next;
     }
+    *p++ = '\0'; /* mark the end of the list */
 
     /* round up to a number divisible by BLOCK_SIZE */
-    size = (((intptr_t)p - (intptr_t)&buffer) / BLOCK_SIZE + 1) * BLOCK_SIZE;
+    size = ((p - buffer + BLOCK_SIZE - 1) / BLOCK_SIZE) * BLOCK_SIZE;
 
     salt = rb->rand();
     make_key();

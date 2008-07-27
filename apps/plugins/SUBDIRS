@@ -33,14 +33,14 @@ pacbox
 /* For all the color targets */
 #if defined(HAVE_LCD_COLOR) || defined(MROBE_100) || \
     (LCD_DEPTH == 2) && !defined(ARCHOS_AV300)
-doom
+//doom
 #endif
 
 /* For all the swcodec targets */
 #if CONFIG_CODEC == SWCODEC
 midi
 /* beatbox */
-mpegplayer
+//mpegplayer
 #endif
 
 #endif /* IRIVER_IFP7XX_SERIES */

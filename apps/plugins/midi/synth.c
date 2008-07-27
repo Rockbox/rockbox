@@ -140,10 +140,11 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
         return -1;
     }
 
-    char name[40];
-    char fn[40];
+    char name[MAX_PATH];
+    char fn[MAX_PATH];
 
     /* Scan our config file and load the right patches as needed    */
+    char *p;
     int c = 0;
     name[0] = '\0';
     printf("Loading instruments");
@@ -151,8 +152,12 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     {
         while(readChar(file)!=' ' && !eof(file));
         readTextBlock(file, name);
-
-        rb->snprintf(fn, 40, ROCKBOX_DIR "/patchset/%s.pat", name);
+        DEBUGF("name: %s\n", name);
+        p = rb->strrchr(name, '.');
+        if (!p || rb->strncmp(p, ".pat", 4))
+            rb->snprintf(fn, MAX_PATH, ROCKBOX_DIR "/patchset/%s.pat", name);
+        else
+            rb->snprintf(fn, MAX_PATH, ROCKBOX_DIR "/patchset/%s", name);
 /*        printf("\nLOADING: <%s> ", fn); */
 
         if(patchUsed[a]==1)
@@ -167,7 +172,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
             c = readChar(file);
     }
     rb->close(file);
-
+DEBUGF("drums!!\n");
     file = rb->open(drumConfig, O_RDONLY);
     if(file < 0)
     {
@@ -183,7 +188,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     {
         readTextBlock(file, number);
         readTextBlock(file, name);
-        rb->snprintf(fn, 40, ROCKBOX_DIR "/patchset/%s.pat", name);
+        rb->snprintf(fn, MAX_PATH, ROCKBOX_DIR "/patchset/%s.pat", name);
 
         idx = rb->atoi(number);
         if(idx == 0)
