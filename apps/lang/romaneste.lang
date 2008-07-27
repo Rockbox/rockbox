@@ -2300,7 +2300,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Inchis"
+    lcd_bitmap: "Închis"
   </dest>
   <voice>
     *: none
