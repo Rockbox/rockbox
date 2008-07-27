@@ -1183,10 +1183,10 @@
     *: "Repeat"
   </source>
   <dest>
-    *: "Toista"
+    *: "Uudelleentoisto"
   </dest>
   <voice>
-    *: "Toista"
+    *: "Uudelleentoisto"
   </voice>
 </phrase>
 <phrase>
