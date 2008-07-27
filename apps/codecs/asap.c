@@ -24,9 +24,9 @@
 
 CODEC_HEADER
 
-#define CHUNK_SIZE (1024*8)
+#define CHUNK_SIZE (1024*2)
 
-static byte samples[CHUNK_SIZE];   /* The sample buffer */
+static byte samples[CHUNK_SIZE] IBSS_ATTR;   /* The sample buffer */
 static ASAP_State asap;         /* asap codec state */
 
 /* this is the codec entry point */
