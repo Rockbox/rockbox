@@ -4210,6 +4210,7 @@
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
+    mrobe100: "DISPLAY = Revert"
   </source>
   <dest>
     *: "ВЫКЛ. = Отмена"
@@ -4219,10 +4220,17 @@
     x5,m5: "ЗАПИСЬ = Отмена"
     h10,h10_5gb: "ПРЕД. = Отмена"
     gigabeatf: "А = Отмена"
+    mrobe100: "ПОКАЗ. = Отмена"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_5gb,gigabeatf: ""
+    rtc: ""
+    h100,h120,h300: ""
+    ipod*,e200,c200: ""
+    x5,m5: ""
+    h10,h10_5gb: ""
+    gigabeatf: ""
+    mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -6238,10 +6246,10 @@
     *: ""
   </source>
   <dest>
-    *: ""
+    *: "deprecated"
   </dest>
   <voice>
-    *: "Текст"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7283,11 +7291,11 @@
     recording: "Mono"
   </source>
   <dest>
-    *: mono
+    *: "mono"
     recording: "Моно"
   </dest>
   <voice>
-    *: mono
+    *: "mono"
     recording: "Моно"
   </voice>
 </phrase>
@@ -8107,21 +8115,21 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5: "Building database... %d found (LEFT to return)"
+    x5,m5,gigabeatf,mrobe100: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Построение базы... %d найдено (ВЫКЛ. для отмены)"
     h100,h120,h300: "Построение базы... %d найдено (СТОП для отмены)"
     ipod*: "Построение базы... %d найдено (ПРЕД. для отмены)"
-    x5,m5: "Построение базы... %d найдено (ВЛЕВО для отмены)"
+    x5,m5,gigabeatf,mrobe100: "Построение базы... %d найдено (ВЛЕВО для отмены)"
     h10,h10_5gb,e200,c200: "Построение базы... %d найдено (ПРЕД. для отмены)"
   </dest>
   <voice>
     *: "Построение базы... %d найдено (ВЫКЛ. для отмены)"
     h100,h120,h300: "Построение базы... %d найдено (СТОП для отмены)"
     ipod*: "Построение базы... %d найдено (ПРЕД. для отмены)"
-    x5,m5: "Построение базы... %d найдено (ВЛЕВО для отмены)"
+    x5,m5,gigabeatf,mrobe100: ""
     h10,h10_5gb,e200,c200: "Построение базы... %d найдено (ПРЕД. для отмены)"
   </voice>
 </phrase>
@@ -8468,15 +8476,13 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "No partition?"
-    player: "Partition?"
+    *: ""
   </source>
   <dest>
-    *: "Нет раздела?"
-    player: "Раздел?"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -8670,16 +8676,16 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "Save Failed"
+    *: ""
   </source>
   <dest>
-    *: "Ошибка сохранения"
+    *: ""
   </dest>
   <voice>
-    *: "Ошибка сохранения"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8898,17 +8904,20 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "ВОСПР. = Да"
     h100,h120,h300: "НАВИГ. = Да"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "ВЫБОР = Да"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "ВЫБОР = Да"
     player: "(ВОСПР./СТОП)"
   </dest>
   <voice>
     *: ""
+    h100,h120,h300: ""
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: ""
+    player: ""
   </voice>
 </phrase>
 <phrase>
@@ -8919,17 +8928,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ВКЛ. = Установить"
     h100,h120,h300: "НАВИГ. = Установить"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "ВЫБОР = Установить"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "ВЫБОР = Установить"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: ""
+    rtc: ""
+    h100,h120,h300: ""
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -10373,15 +10384,15 @@
   user:
   <source>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf,mrobe100: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf: "Яркость подсветки кнопок"
+    gigabeatf,mrobe100: "Яркость Подсветки Клавиш"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Яркость подсветки кнопок"
+    gigabeatf,mrobe100: "Яркость Подсветки Клавиш"
   </voice>
 </phrase>
 <phrase>
@@ -11314,5 +11325,239 @@
   <voice>
     *: none
     radio: "Меню FM-радио"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
+  desc: deprecated
+  user: 
+  <source>
+    *: none
+    ipodvideo: ""
+  </source>
+  <dest>
+    *: none
+    ipodvideo: ""
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_CURRENT_DIR
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: none
+    recording: ""
+  </source>
+  <dest>
+    *: none
+    recording: "deprecated"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_V1_FIRST
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_ENABLED
+  desc: deprecated
+  user: 
+  <source>
+    *: none
+    ipodvideo: ""
+  </source>
+  <dest>
+    *: none
+    ipodvideo: ""
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACCESSORY_SUPPLY
+  desc: in keyclick settings menu
+  user: 
+  <source>
+    *: "Accessory Power Supply"
+  </source>
+  <dest>
+    *: "Дополнительный Источник Питания"
+  </dest>
+  <voice>
+    *: "Дополнительный Источник Питания"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ORDER
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK
+  desc: in keyclick settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Keyclick"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Озвучка Клавиш"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Озвучка Клавиш"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_UNITS_PER_READ
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_V2_FIRST
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SHUFFLE
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE
+  desc: deprecated
+  user: 
+  <source>
+    *: none
+    ipodvideo: ""
+  </source>
+  <dest>
+    *: none
+    ipodvideo: ""
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BANDWIDTH
+  desc: deprecated
+  user: 
+  <source>
+    *: none
+    ipodvideo: ""
+  </source>
+  <dest>
+    *: none
+    ipodvideo: ""
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
+  desc: deprecated
+  user: 
+  <source>
+    *: none
+    ipodvideo: ""
+  </source>
+  <dest>
+    *: none
+    ipodvideo: ""
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_TIME
+  desc: deprecated
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_REPEATS
+  desc: in keyclick settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Keyclick Repeats"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Повтор Сигнала"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Повтор Сигнала"
   </voice>
 </phrase>

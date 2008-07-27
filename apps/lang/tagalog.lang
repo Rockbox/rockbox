@@ -243,17 +243,20 @@
  <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
  </source>
  <dest>
     *: "PLAY = Oo"
     h100,h120,h300: "NAVI = Oo"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Oo"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Oo"
     player: "(PLAY/STOP)"
  </dest>
  <voice>
     *: ""
+    h100,h120,h300: ""
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: ""
+    player: ""
  </voice>
 </phrase>
 <phrase>
@@ -820,6 +823,7 @@
 <phrase>
  id: LANG_CROSSFEED_CROSS_GAIN
  desc: in crossfeed settings
+  user:
  <source>
     *: none
     swcodec: "Cross Gain"
@@ -836,6 +840,7 @@
 <phrase>
  id: LANG_CROSSFEED_HF_ATTENUATION
  desc: in crossfeed settings
+  user:
  <source>
     *: none
     swcodec: "High-Frequency Attenuation"
@@ -852,6 +857,7 @@
 <phrase>
  id: LANG_CROSSFEED_HF_CUTOFF
  desc: in crossfeed settings
+  user:
  <source>
     *: none
     swcodec: "High-Frequency Cutoff"
@@ -1147,11 +1153,11 @@
  </source>
  <dest>
     *: none
-    ipodvideo: "Mga Kasangkapang Bakal Equalizer"
+    ipodvideo: ""
  </dest>
  <voice>
     *: none
-    ipodvideo: "Hardware equalizer"
+    ipodvideo: ""
  </voice>
 </phrase>
 <phrase>
@@ -1164,11 +1170,11 @@
  </source>
  <dest>
     *: none
-    ipodvideo: "Magbigay-kaya mga Kasangkapang Bakal EQ"
+    ipodvideo: ""
  </dest>
  <voice>
     *: none
-    ipodvideo: "Enable hardware equalizer"
+    ipodvideo: ""
  </voice>
 </phrase>
 <phrase>
@@ -1181,11 +1187,11 @@
  </source>
  <dest>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
  </dest>
  <voice>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
  </voice>
 </phrase>
 <phrase>
@@ -1198,11 +1204,11 @@
  </source>
  <dest>
     *: none
-    ipodvideo: "Makitid"
+    ipodvideo: ""
  </dest>
  <voice>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
  </voice>
 </phrase>
 <phrase>
@@ -1215,11 +1221,11 @@
  </source>
  <dest>
     *: none
-    ipodvideo: "Malapad"
+    ipodvideo: ""
  </dest>
  <voice>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
  </voice>
 </phrase>
 <phrase>
@@ -1411,7 +1417,7 @@
  desc: in settings_menu()
  user:
  <source>
-    *: "Playback"
+    *: "Playback Settings"
  </source>
  <dest>
     *: "Playback"
@@ -2020,6 +2026,7 @@
 <phrase>
  id: LANG_RANDOM
  desc: random folder
+  user:
  <source>
     *: "Random"
  </source>
@@ -2344,18 +2351,22 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
+    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
  </source>
  <dest>
     *: "Gumawa database... %d found (OFF sa pagbalik)"
     h100,h120,h300: "Gumawa database... %d found (STOP sa pagbalik)"
     ipod*: "Gumawa database... %d found (PLAY/PAUSE sa pagbalik)"
-    x5,m5: "Gumawa database... %d found (LEFT sa pagbalik)"
-    h10,h10_5gb,e200,c200: "Gumawa database... %d found (PREV sa pagbalik)"
+    x5,m5,gigabeat*,mrobe100: "Gumawa database... %d found (LEFT sa pagbalik)"
+    h10,h10_5gb,e200,c200,sa9200: "Gumawa database... %d found (PREV sa pagbalik)"
  </dest>
  <voice>
     *: "entries found for database"
+    h100,h120,h300: ""
+    ipod*: ""
+    x5,m5,gigabeat*,mrobe100: ""
+    h10,h10_5gb,e200,c200,sa9200: ""
  </voice>
 </phrase>
 <phrase>
@@ -2490,6 +2501,7 @@
 <phrase>
  id: LANG_TAGCACHE_BUSY
  desc: when trying to shutdown and tagcache is committing
+  user:
  <source>
     *: "Database is not ready"
  </source>
@@ -3811,17 +3823,17 @@
  <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100: "Button Light Timeout"
+    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
  </source>
  <dest>
     *: none
     e200: "Pahintuin gulong sa ilaw"
-    c200,gigabeatf,mrobe100: "Pahintuin buttones sa ilaw"
+    c200,gigabeatf,mrobe100,sa9200: "Pahintuin buttones sa ilaw"
  </dest>
  <voice>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100: "Button Light Timeout"
+    c200,gigabeatf,mrobe100,sa9200: ""
  </voice>
 </phrase>
 <phrase>
@@ -3830,15 +3842,15 @@
  user:
  <source>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf,mrobe100: "Button Light Brightness"
  </source>
  <dest>
     *: none
-    gigabeatf: "Maliwanag buttones sa ilaw"
+    gigabeatf,mrobe100: "Buttones liwanag sa ilaw"
  </dest>
  <voice>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf,mrobe100: ""
  </voice>
 </phrase>
 <phrase>
@@ -4103,17 +4115,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
  </source>
  <dest>
     *: none
     rtc: "ON = Ilagay"
     h100,h120,h300: "NAVI = Ilagay"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Ilagay"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Ilagay"
  </dest>
  <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeatf: ""
+    rtc: ""
+    h100,h120,h300: ""
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: ""
  </voice>
 </phrase>
 <phrase>
@@ -4124,23 +4138,34 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200: "MENU = Revert"
+    ipod*,e200,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
+    mrobe100: "DISPLAY = Revert"
+    gigabeats: "BACK = Revert"
  </source>
  <dest>
     *: none
-    rtc: "OFF = mabalik"
+    rtc: "OFF = Mabalik"
     h100,h120,h300: "STOP = Mabalik"
-    ipod*,e200,c200: "MENU = Mabalik"
-    x5,m5: "RECORD = mabalik"
+    ipod*,e200,c200,sa9200: "MENU = Mabalik"
+    x5,m5: "RECORD = Mabalik"
     h10,h10_5gb: "PREV = Mabalik"
     gigabeatf: "A = Mabalik"
+    mrobe100: "DISPLAY = Mabalik"
+    gigabeats: "BACK = Mabalik"
  </dest>
  <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeatf: ""
+    rtc: ""
+    h100,h120,h300: ""
+    ipod*,e200,c200,sa9200: ""
+    x5,m5: ""
+    h10,h10_5gb: ""
+    gigabeatf: ""
+    mrobe100: ""
+    gigabeats: ""
  </voice>
 </phrase>
 <phrase>
@@ -4664,15 +4689,21 @@
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
  </source>
  <dest>
     *: none
     alarm: "PLAY=Ilagay OFF=Kanselahin"
     ipod*: "SELECT=Ilagay MENU=Kanselahin"
+    h10,h10_5gb: "SELECT = Ilagay MENU = Kanselahin"
+    gigabeats: "SELECT = Ilagay POWER = Kanselahin"
  </dest>
  <voice>
     *: none
-    alarm,ipod*: ""
+    alarm: ""
+    ipod*: ""
+    h10,h10_5gb: ""
+    gigabeats: ""
  </voice>
 </phrase>
 <phrase>
@@ -5549,6 +5580,7 @@
 <phrase>
  id: LANG_FM_REGION
  desc: fm tuner region setting
+  user:
  <source>
     *: none
     radio: "Region"
@@ -5565,6 +5597,7 @@
 <phrase>
  id: LANG_FM_EUROPE
  desc: fm tuner region europe
+  user:
  <source>
     *: none
     radio: "Europe"
@@ -5581,6 +5614,7 @@
 <phrase>
  id: LANG_FM_US
  desc: fm region us / canada
+  user:
  <source>
     *: none
     radio: "US / Canada"
@@ -5597,6 +5631,7 @@
 <phrase>
  id: LANG_FM_JAPAN
  desc: fm region japan
+  user:
  <source>
     *: none
     radio: "Japan"
@@ -5613,6 +5648,7 @@
 <phrase>
  id: LANG_FM_KOREA
  desc: fm region korea
+  user:
  <source>
     *: none
     radio: "Korea"
@@ -5921,6 +5957,7 @@
 <phrase>
  id: LANG_SPLIT_MEASURE
  desc: in record timesplit options
+  user:
  <source>
     *: none
     recording: "Split Measure"
@@ -5937,6 +5974,7 @@
 <phrase>
  id: LANG_SPLIT_TYPE
  desc: in record timesplit options
+  user:
  <source>
     *: none
     recording: "What to do when Splitting"
@@ -5987,6 +6025,7 @@
 <phrase>
  id: LANG_SPLIT_TIME
  desc: in record timesplit options
+  user:
  <source>
     *: none
     recording: "Split Time"
@@ -6003,6 +6042,7 @@
 <phrase>
  id: LANG_SPLIT_SIZE
  desc: in record timesplit options
+  user:
  <source>
     *: none
     recording: "Split Filesize"
@@ -6077,7 +6117,7 @@
  </source>
  <dest>
     *: none
-    recording: deprecated
+    recording: "deprecated"
  </dest>
  <voice>
     *: none
@@ -6240,6 +6280,7 @@
 <phrase>
  id: LANG_RECORD_TRIGGER_TYPE
  desc: in recording trigger menu
+  user:
  <source>
     *: none
     recording: "Trigtype"
@@ -6256,6 +6297,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
+  user:
   <source>
     *: none
     agc: "AGC max. gain"
@@ -6410,6 +6452,7 @@
 <phrase>
   id: LANG_RECORD_AGC_PRESET
   desc: automatic gain control in record settings
+  user:
   <source>
     *: none
     agc: "Automatic Gain Control"
@@ -6772,6 +6815,7 @@
 <phrase>
   id: LANG_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -6922,36 +6966,36 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_NO
-  desc: bool false representation
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "No"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Hindi"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "No"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ALL
-  desc: repeat playlist once all songs have completed
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "All"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Lahat"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "All"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -7169,6 +7213,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Safety (clip)"
@@ -7226,15 +7271,13 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "No partition?"
-    player: "Partition?"
+    *: ""
   </source>
   <dest>
-    *: "Wala Partisyon?"
-    player: "Partisyon?"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -7500,16 +7543,16 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "Save Failed"
+    *: ""
   </source>
   <dest>
-    *: "Lumagpak Mag-ipun"
+    *: ""
   </dest>
   <voice>
-    *: "Save Failed"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7574,7 +7617,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200,c200: "
+    recording,h100,h120,h300,m5,x5,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -7629,22 +7672,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_SIZE
-  desc: Display of recorded file size
-  user:
-  <source>
-    *: none
-    recording: "Size:"
-  </source>
-  <dest>
-    *: none
-    recording: "Laki:"
-  </dest>
-  <voice>
-    *: none
-    recording: ""
-  </voice>
-<phrase>
   id: LANG_BUFFER_STAT
   desc: the buffer size, %d MB %d fraction of MB
   user:
@@ -7658,6 +7685,7 @@
   </dest>
   <voice>
     *: "Buffer size"
+    player: ""
   </voice>
 </phrase>
 <phrase>
@@ -7755,19 +7783,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_STATUS_BAR
-  desc: display menu, F3 substitute
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Status Bar"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Estado Hadlang"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Status Bar"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -7843,6 +7871,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Medium"
@@ -7900,19 +7929,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ON
-  desc: Used in a lot of places
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "On"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Bukas"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "On"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8149,6 +8178,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_NEWFILESTP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "New file"
@@ -8438,6 +8468,7 @@
 <phrase>
   id: LANG_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Live (slow)"
@@ -8453,19 +8484,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_PLAYLIST
-  desc: show only playlist
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Playlists"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Listahan"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Playlists"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8620,6 +8651,7 @@
 <phrase>
   id: LANG_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Voice (fast)"
@@ -8745,7 +8777,7 @@
     *: ""
   </source>
   <dest>
-    *: deprecated
+    *: "deprecated"
   </dest>
   <voice>
     *: ""
@@ -8827,6 +8859,7 @@
 <phrase>
   id: LANG_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Medium"
@@ -8953,6 +8986,7 @@
 <phrase>
   id: LANG_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Safety (clip)"
@@ -9422,19 +9456,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_ONE
-  desc: repeat one song
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "One"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Isa"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "One"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -9454,6 +9488,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -9497,19 +9532,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_YES
-  desc: bool true representation
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Yes"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Oo"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Yes"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -9531,19 +9566,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_MUSIC
-  desc: show only music-related files
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Music"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Musika"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Music"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -9677,36 +9712,36 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SCROLL_BAR
-  desc: display menu, F3 substitute
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Scroll Bar"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Umikot Hadlang"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll Bar"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_AB
-  desc: repeat range from point A to B
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "A-B"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "A-B"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "A-B"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -9743,6 +9778,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
   desc: automatic gain control in recording screen
+  user:
   <source>
     *: none
     agc: "AGC"
@@ -9804,6 +9840,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_STOP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "Stop"
@@ -9834,6 +9871,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Voice (fast)"
@@ -9894,19 +9932,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT
-  desc: in settings_menu
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Repeat"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Ulitin"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Repeat"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -9984,19 +10022,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FLIP_DISPLAY
-  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Upside Down"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Upside Down"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Upside Down"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -10213,6 +10251,7 @@
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Filesize"
@@ -10389,6 +10428,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Live (slow)"
@@ -10582,6 +10622,7 @@
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
   desc: in record settings
+  user:
   <source>
     *: none
     agc: "AGC clip time"
@@ -11016,19 +11057,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_SUPPORTED
-  desc: show all file types supported by Rockbox
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Supported"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Sustentuhan"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Supported"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -11061,19 +11102,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER
-  desc: setting name for dir filter
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Show Files"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Pakita salansan"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Show Files"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -11362,19 +11403,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SHUFFLE
-  desc: in settings_menu
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Shuffle"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Balasahin"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Shuffle"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -11445,5 +11486,334 @@
   </dest>
   <voice>
     *: "Copying"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_STUDY_MODE
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHPAD_SENSITIVITY
+  desc: touchpad sensitivity setting
+  user: 
+  <source>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Sensitibo Touchpad"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Sensitibo Touchpad"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FAST
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Fast"
+  </source>
+  <dest>
+    *: "Mabilis"
+  </dest>
+  <voice>
+    *: "Mabilis"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_LENGTH
+  desc: playback settings menu
+  user: 
+  <source>
+    *: "Skip Length"
+  </source>
+  <dest>
+    *: "Haba Laktawan"
+  </dest>
+  <voice>
+    *: "Haba Laktawan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_SIZE
+  desc: Display of recorded file size
+  user: 
+  <source>
+    *: none
+    recording: "Size:"
+  </source>
+  <dest>
+    *: none
+    recording: "Laki:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_SLASH
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "slash"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACCESSORY_SUPPLY
+  desc: in system settings menu
+  user: 
+  <source>
+    *: none
+    accessory_supply: "Accessory Power Supply"
+  </source>
+  <dest>
+    *: none
+    accessory_supply: "Kailangan Accessory Power"
+  </dest>
+  <voice>
+    *: none
+    accessory_supply: "Kailangan Accessory Power"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING_AND_SHUTDOWN
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "Stop Recording And Shutdown"
+  </source>
+  <dest>
+    *: none
+    recording: "Hinto Rekording at Magsara"
+  </dest>
+  <voice>
+    *: none
+    recording: "Hinto Rekording at Magsara"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user: 
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "Mag-ipon Tunog Ilagay"
+  </dest>
+  <voice>
+    *: "Mag-ipon Tunog Ilagay"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_MODE
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_HOP_STEP
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_SLOW
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Very slow"
+  </source>
+  <dest>
+    *: "Napaka Makupad"
+  </dest>
+  <voice>
+    *: "Napaka Makupad"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK
+  desc: in keyclick settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Keyclick"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Keyclick"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Keyclick"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLOW
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Makupad"
+  </dest>
+  <voice>
+    *: "Makupad"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUICKSCREEN
+  desc: spoken only, Announces entering the "quick screen"
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Quick screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_FAST
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Very fast"
+  </source>
+  <dest>
+    *: "Napaka Mabilis"
+  </dest>
+  <voice>
+    *: "Napaka Mabilis"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_STUDY_MODE
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN
+  desc: generic string for unknown states, such as an unset clock
+  user: 
+  <source>
+    *: "Unknown"
+  </source>
+  <dest>
+    *: "Di-kilala"
+  </dest>
+  <voice>
+    *: "Di-kilala"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_TRACK
+  desc: skip length setting entry 0
+  user: 
+  <source>
+    *: "Skip Track"
+  </source>
+  <dest>
+    *: "Laktawan Track"
+  </dest>
+  <voice>
+    *: "Laktawan Track"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OK
+  desc: spoken only, On exiting a context, specifically the quick screen
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_REPEATS
+  desc: in keyclick settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Keyclick Repeats"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Ulitin Keyclick"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Ulitin Keyclick"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIGH
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    gigabeatf: "High"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Mataas"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Mataas"
   </voice>
 </phrase>

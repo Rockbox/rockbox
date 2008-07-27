@@ -900,44 +900,44 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: in playback settings screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "ID3 Tag Priority"
+    *: ""
   </source>
   <dest>
-    *: "Prioritat etiqueta ID3"
+    *: ""
   </dest>
   <voice>
-    *: "Prioritat etiqueta ID3"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "V1 then V2"
+    *: ""
   </source>
   <dest>
-    *: "V1 i després V2"
+    *: ""
   </dest>
   <voice>
-    *: "Versió 1 i després versió 2"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "V2 then V1"
+    *: ""
   </source>
   <dest>
-    *: "V2 i després V1"
+    *: ""
   </dest>
   <voice>
-    *: "Versió 2 i després versió 1"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1655,10 +1655,12 @@
     recording: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    recording: "deprecated"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -1801,14 +1803,15 @@
   user:
   <source>
     *: none
-    lcd_bitmap: "Line Selector"
+    lcd_bitmap: "Line Selector Type"
   </source>
   <dest>
   *: none
-    lcd_bitmap: "Selector de línia"
+    lcd_bitmap: "Tipus de Selector de línia"
   </dest>
   <voice>
-    *: "Selector de línia"
+    *: "Tipus de Selector de línia"
+    lcd_bitmap: "Tipus de Selector de línia"
   </voice>
 </phrase>
 <phrase>
@@ -2440,13 +2443,13 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
-    *: "Mostrar Info ID3"
+    *: "Mostrar Info de Cançó"
   </dest>
   <voice>
-    *: "Mostrar Info ID3"
+    *: "Mostrar Info de Cançó"
   </voice>
 </phrase>
 <phrase>
@@ -2910,6 +2913,7 @@
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
+    mrobe100: "DISPLAY = Revert"
   </source>
   <dest>
     *: none
@@ -2919,9 +2923,17 @@
     x5,m5: "RECORD = Cancel·lar"
     h10,h10_5gb: "PREV = Cancel·lar"
     gigabeatf: "A = Cancel·lar"
+    mrobe100: "DISPLAY = Cancel·lar"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
+    h100,h120,h300: ""
+    ipod*,e200,c200: ""
+    x5,m5: ""
+    h10,h10_5gb: ""
+    gigabeatf: ""
+    mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -3086,13 +3098,19 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
+    h10,h10_5gb: "SELECT=Set PREV=Cancel"
   </source>
   <dest>
     *: none
-    alarm: "SELECT=Accepta MENU=Cancela"
+    alarm: "PLAY=Accepta OFF=Cancela"
+    ipod*: "SELECT=Accepta MENU=Cancel·la"
+    h10,h10_5gb: "SELECT=Accepta PREV=Cancel·la"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: ""
+    ipod*: ""
+    h10,h10_5gb: ""
   </voice>
 </phrase>
 <phrase>
@@ -4767,7 +4785,7 @@
     *: ""
   </source>
   <dest>
-    *: ""
+    *: "deprecated"
   </dest>
   <voice>
     *: ""
@@ -4831,13 +4849,13 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_SHUFFLE
-  desc: displayed on screen while shuffling a playlist
+  desc: DEPRECATED
   user:
   <source>
-    *: "Shuffling..."
+    *: ""
   </source>
   <dest>
-    *: "Barrejant..."
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -7666,19 +7684,19 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Estret"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -7855,22 +7873,22 @@
   <source>
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
-    x5,m5: "Building database... %d found (LEFT to return)"
+    ipod*: "Building database... %d found (PREV to return)"
+    x5,m5,gigabeatf,mrobe100: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Construint Base de dades... %d trobats (OFF per tornar)"
     h100,h120,h300: "Construint Base de dades... %d trobats (STOP per tornar)"
-    ipod*: "Construint Base de dades... %d trobats (PLAY/PAUSE per tornar)"
-    x5,m5: "Construint Base de dades... %d trobats (LEFT per tornar)"
+    ipod*: "Construint Base de dades... %d trobats (PREV per tornar)"
+    x5,m5,gigabeatf,mrobe100: "Construint Base de dades... %d trobats (LEFT per tornar)"
     h10,h10_5gb,e200,c200: "Construint Base de dades... %d trobats (PREV per tornar)"
   </dest>
   <voice>
-    *: "entries trobats for database"
+    *: "entrades trobades per base de dades"
     h100,h120,h300: ""
     ipod*: ""
-    x5,m5: ""
+    x5,m5,gigabeatf,mrobe100: ""
     h10,h10_5gb,e200,c200: ""
   </voice>
 </phrase>
@@ -8235,15 +8253,13 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "No partition?"
-    player: "Partition?"
+    *: ""
   </source>
   <dest>
-    *: "Cap partició?"
-    player: "Partició?"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -8285,19 +8301,19 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_ENABLED
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Enable Hardware EQ"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Activar EQ per hardware"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Enable hardware equalizer"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -8409,16 +8425,16 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "Save Failed"
+    *: ""
   </source>
   <dest>
-    *: "Desada fallida"
+    *: ""
   </dest>
   <voice>
-    *: "Save Failed"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8670,17 +8686,20 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Si"
     h100,h120,h300: "NAVI = Si"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Si"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Si"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
+    h100,h120,h300: ""
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: ""
+    player: ""
   </voice>
 </phrase>
 <phrase>
@@ -8691,17 +8710,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Desar"
     h100,h120,h300: "NAVI = Desar"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Desar"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Desar"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeatf: ""
+    rtc: ""
+    h100,h120,h300: ""
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -10018,19 +10039,19 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE
-  desc: in the sound settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Hardware Equalizer"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Equalitzador de Hardware"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Hardware equalizer"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -10170,19 +10191,19 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_BANDWIDTH
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Ample de banda"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -10310,17 +10331,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"
+    c200,gigabeatf,mrobe100: "Button Light Timeout"
   </source>
   <dest>
     *: none
-    e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"
+    e200: "Apagat de llum de roda"
+    c200,gigabeatf,mrobe100: "Apagat de llum de botons"
   </dest>
   <voice>
     *: none
-    e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"    
+    e200: "Apagat de llum de roda"
+    c200,gigabeatf,mrobe100: "Apagat de llum de botons"
   </voice>
 </phrase>
 <phrase>
@@ -10418,19 +10439,19 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Ample"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -10449,16 +10470,16 @@
 </phrase>
 <phrase>
   id: LANG_CURRENT_TIME
-  desc: in run time screen
+  desc: deprecated
   user:
   <source>
-    *: "Current Time"
+    *: ""
   </source>
   <dest>
-    *: "Temps actual"
+    *: ""
   </dest>
   <voice>
-    *: "Current Time"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10998,5 +11019,335 @@
   <voice>
     *: none
     rtc: "en punt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILETYPE
+  desc: voice settings menu
+  user: 
+  <source>
+    *: "Say File Type"
+  </source>
+  <dest>
+    *: "Digues Tipus de Fitxer"
+  </dest>
+  <voice>
+    *: "Digues Tipus de Fitxer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_PRESENT
+  desc: when external memory is not present
+  user: 
+  <source>
+    *: none
+    multivolume: "Not present"
+  </source>
+  <dest>
+    *: none
+    multivolume: "No present"
+  </dest>
+  <voice>
+    *: none
+    multivolume: "No present"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS_CUTOFF
+  desc: Bass setting cut-off frequency
+  user: 
+  <source>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Freq. de tall de baixos"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Frequència de tall de baix"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_START_COLOR
+  desc: line selector color option
+  user: 
+  <source>
+    *: none
+    lcd_color: "Primary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Color Primari"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Color Primari"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLANK
+  desc: keyboard
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Buit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_BATTERY_LEVEL
+  desc: Setting for spontaneous battery level announcement
+  user: 
+  <source>
+    *: "Announce Battery Level"
+  </source>
+  <dest>
+    *: "Anuncia nivell de bateria"
+  </dest>
+  <voice>
+    *: "Anuncia nivell de bateria"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_COLOR_MENU
+  desc: line selector color menu title
+  user: 
+  <source>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Colors del selector de línia"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Colors del selector de línia"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EMPTY_LIST
+  desc: spoken only, when a list dialog contains no elements
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Llista buida"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_RANDOM
+  desc: "<Random>" entry in tag browser
+  user: 
+  <source>
+    *: "<Random>"
+  </source>
+  <dest>
+    *: "<Aleatori>"
+  </dest>
+  <voice>
+    *: "Aleatori"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_TEXT_COLOR
+  desc: line selector text color option
+  user: 
+  <source>
+    *: none
+    lcd_color: "Text Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Color de Text"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Color de Text"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_THEME_MENU
+  desc: in the settings menu
+  user: 
+  <source>
+    *: "Theme Settings"
+  </source>
+  <dest>
+    *: "Preferències de tema"
+  </dest>
+  <voice>
+    *: "Preferències de tema"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user: 
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "Desar Preferències de So"
+  </dest>
+  <voice>
+    *: "Desar Preferències de So"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EDIT
+  desc: keyboard
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Edita"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK
+  desc: in keyclick settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Keyclick"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Clic de tecles"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Clic de tecles"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_GRADIENT
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Barra (Gradient de Color)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Barra (Gradient de Color)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_COLOR
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Barra (Color Sòlid)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Barra (Color Sòlid)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLORS_MENU
+  desc: colours menu under theme settings
+  user: 
+  <source>
+    *: none
+    lcd_color: "Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Colors"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Colors"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user: 
+  <source>
+    *: none
+    lcd_color: "Secondary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Color Secundari"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Color Secundari"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE_CUTOFF
+  desc: Treble setting cut-off frequency
+  user: 
+  <source>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Freq. de tall d'aguts"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Frequència de tall d'aguts"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "Europeu Central (CP1250)"
+  </dest>
+  <voice>
+    *: "Europeu Central"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_REPEATS
+  desc: in keyclick settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Keyclick Repeats"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Repeticions de Clic de tecles"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Repeticions de Clic de tecles"
   </voice>
 </phrase>
