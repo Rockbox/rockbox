@@ -3320,10 +3320,10 @@
     *: "Show Track Info"
   </source>
   <dest>
-    *: "Vis metadata"
+    *: "Vis sanginformation"
   </dest>
   <voice>
-    *: "Vis metadata"
+    *: "Vis sanginformation"
   </voice>
 </phrase>
 <phrase>
@@ -4241,7 +4241,7 @@
     *: "[Tracknum]"
   </source>
   <dest>
-    *: "[Spornummer]"
+    *: "[Sangnummer]"
   </dest>
   <voice>
     *: ""
@@ -11584,16 +11584,16 @@
 </phrase>
 <phrase>
   id: LANG_ENABLE_STUDY_MODE
-  desc: playback settings menu
+  desc: DEPRECATED
   user: 
   <source>
-    *: "Enable Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Aktiver studietilstand"
+    *: ""
   </dest>
   <voice>
-    *: "Aktiver studietilstand"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11649,30 +11649,30 @@
 </phrase>
 <phrase>
   id: LANG_STUDY_MODE
-  desc: playback settings menu
+  desc: DEPRECATED
   user: 
   <source>
-    *: "Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Studietilstand"
+    *: ""
   </dest>
   <voice>
-    *: "Studietilstand"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_STUDY_HOP_STEP
-  desc: playback settings menu
+  desc: DEPRECATED
   user: 
   <source>
-    *: "Study Increment"
+    *: ""
   </source>
   <dest>
-    *: "Studie trin"
+    *: ""
   </dest>
   <voice>
-    *: "Studie trin"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11802,5 +11802,47 @@
   </dest>
   <voice>
     *: "Meget hurtig"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_LENGTH
+  desc: playback settings menu
+  user:
+  <source>
+    *: "Skip Length"
+  </source>
+  <dest>
+    *: "Spring over længde"
+  </dest>
+  <voice>
+    *: "Spring over længde"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_SLASH
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Skråstreg"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_TRACK
+  desc: skip length setting entry 0
+  user:
+  <source>
+    *: "Skip Track"
+  </source>
+  <dest>
+    *: "Spring over sang"
+  </dest>
+  <voice>
+    *: "Spring over sang"
   </voice>
 </phrase>
