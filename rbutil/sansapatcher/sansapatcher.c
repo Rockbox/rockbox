@@ -251,7 +251,7 @@ static void chksum_crc32gentab (void)
 
 /* Known keys for Sansa E200 and C200 firmwares: */
 #define NUM_KEYS ((int)(sizeof(keys)/sizeof(keys[0])))
-static uint32_t keys[][4] = {
+static const uint32_t keys[][4] = {
     { 0xe494e96e, 0x3ee32966, 0x6f48512b, 0xa93fbb42 }, /* "sansa" */
     { 0xd7b10538, 0xc662945b, 0x1b3fce68, 0xf389c0e6 }, /* "sansa_gh" */
     { 0x1d29ddc0, 0x2579c2cd, 0xce339e1a, 0x75465dfe }, /* sansa 103 */
@@ -561,6 +561,7 @@ static int prepare_original_firmware(struct sansa_t* sansa, unsigned char* buf, 
     unsigned char* tmpbuf;
     int i;
     int key_found;
+    uint32_t key[4];
 
     get_mi4header(buf,mi4header);
 
@@ -584,10 +585,11 @@ static int prepare_original_firmware(struct sansa_t* sansa, unsigned char* buf, 
 
         key_found=0;
         for (i=0; i < NUM_KEYS && !key_found ; i++) {
+            memcpy(key, keys[i], sizeof(key));
             tea_decrypt_buf(buf+(mi4header->plaintext+0x200),
                             tmpbuf,
                             mi4header->mi4size-(mi4header->plaintext+0x200),
-                            keys[i]);
+                            key);
             key_found = (le2uint(tmpbuf+mi4header->length-mi4header->plaintext-4) == 0xaa55aa55);
         }
 
