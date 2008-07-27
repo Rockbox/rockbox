@@ -31,6 +31,7 @@ tagalog.lang
 turkce.lang
 wallisertitsch.lang
 #ifdef HAVE_LCD_BITMAP /* Not for the Player */
+arabic.lang
 chinese-simp.lang
 chinese-trad.lang
 hindi.lang
