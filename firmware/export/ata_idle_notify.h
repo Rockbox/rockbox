@@ -25,18 +25,19 @@
 #include <stdbool.h>
 #include "events.h"
 
-#if 0
-                NOTE: ata_idle_nofity usage notes..
-                
-        1) the callbacks are called in the ata thread, not main/your thread.
-        2) Asyncronous callbacks (like the buffer refill) should be avoided.
-            If you must use an async callback, remember to check ata_is_active() before
-            accessing the disk, and nonot call any functions between that check and the
-            disk access which may cause a yield (lcd_update() does this!)
-        3) Do not call cany yielding functions in the callback
-        4) Do not call ata_sleep in the callbacks
-        5) Dont Panic!
-#endif
+/*
+        NOTE: ata_idle_notify usage notes..
+        
+1) The callbacks are called in the ata thread, not main/your thread.
+2) Asynchronous callbacks (like the buffer refill) should be avoided.
+    If you must use an async callback, remember to check ata_is_active() before
+    accessing the disk, and do not call any functions between that check and the
+    disk access which may cause a yield (lcd_update() does this!).
+3) Do not call any yielding functions in the callback.
+4) Do not call ata_sleep in the callbacks.
+5) Don't Panic!
+
+*/
 
 enum {
     DISK_EVENT_SPINUP = (EVENT_CLASS_DISK|1),
