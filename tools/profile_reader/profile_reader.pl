@@ -36,11 +36,11 @@ sub read_map {
     return %retval;
 }
 
-# string (filename.[ao]), hash(string:number)
+# string (filename.(a|o|elf)), hash(number:string), string(objdump_tool)
 # return hash(number:string)
 sub read_library {
-    open(OBJECT_FILE,"objdump -t $_[0] |") || 
-        error("Couldn't pipe objdump for $_[0]");
+    open(OBJECT_FILE,"$_[2] -t $_[0] |") || 
+        error("Couldn't pipe objdump for $_[0]\nCommand was: $_[2] -t $_[0]");
     my $library = $_[1];
     my %library = %$library;
     my %retval;
@@ -62,7 +62,7 @@ sub read_library {
         if ($parts[3] eq $parts[5]) {
             next;
         }
-        if ($parts[3] =~ m/\.(text|data|rodata|bss|icode|idata|irodata|ibss)/) {
+        if ($parts[3] =~ m/\.(text|data|rodata|bss|icode|idata|irodata|ibss|iram)/) {
             my $region = $parts[3];
             my $symbolOffset = hex("0x" . $parts[0]);
             my $sectionOffset = hex($library{$object . $region});
@@ -139,8 +139,16 @@ sub print_sorted {
     my $totalCalls = 0;
     my $totalTicks = 0;
     $pfds = 0;
+    
+    # we use a key sort, which means numerical fields need to be
+    # numerically sortable by an alphanumeric sort - we can simply
+    # do this by giving the numeric keys trailing zeros.  Note that
+    # simple string concatenation (what this used to do) would not do this
     foreach $element(@pfds) {
-        $elements{@$element[$sort_index] . @$element[2]} = $element;
+        $ne = $element;
+        @$ne[0] = sprintf( "%08d", @$element[0]);
+        @$ne[1] = sprintf( "%08d", @$element[1]);
+        $elements{@$ne[$sort_index] . @$element[2]} = $element;
         $pfds++;
         $totalCalls += @$element[0];
         $totalTicks += @$element[1];
@@ -174,13 +182,17 @@ sub usage {
         print STDERR ("Error: @_\n");
     }
     print STDERR ("USAGE:\n");
-    print STDERR ("$0 profile.out map obj[...] [map obj[...]...] sort[...]\n");
+    print STDERR ("$0 profile.out objdump_tool map obj[...] [map obj[...]...] sort[...]\n");
     print STDERR 
         ("\tprofile.out  output from the profiler, extension is .out\n");
+    print STDERR
+        ("\tobjdump_tool name of objdump executable for this platform\n");
+    print STDERR
+        ("\t             e.g. arm-elf-objdump\n");
     print STDERR 
         ("\tmap          map file, extension is .map\n");
     print STDERR
-        ("\tobj          library or object file, extension is .a or .o\n");
+        ("\tobj          library or object file, extension is .a or .o or .elf\n");
     print STDERR
         ("\tformat       0-2[_p] 0: by calls, 1: by ticks, 2: by name\n");
     print STDERR
@@ -195,13 +207,13 @@ sub usage {
 if ($ARGV[0] =~ m/-(h|help|-help)/) {
     usage();
 }
-if (@ARGV < 2) {
-    usage("Requires at least 2 arguments");
+if (@ARGV < 3) {
+    usage("Requires at least 3 arguments");
 }
 if ($ARGV[0] !~ m/\.out$/) {
     usage("Profile file must end in .out");
 }
-my $i = 1;
+my $i = 2;
 my %symbols;
 {
     my %map;
@@ -209,12 +221,12 @@ my %symbols;
         my $file = $ARGV[$i];
         if ($file =~ m/\.map$/) {
             %map = read_map($file);
-        } elsif ($file =~ m/\.[ao]$/) {
+        } elsif ($file =~ m/\.(a|o|elf)$/) {
             if (!%map) {
                 usage("No map file found before first object file");
             }
             my @parts = split(/\//,$file);
-            my %new_symbols = read_library($file,$map{$parts[$#parts]});
+            my %new_symbols = read_library($file,$map{$parts[$#parts]},$ARGV[1]);
             %symbols = merge_hashes(\%symbols,\%new_symbols);
         } else {
             last;
@@ -224,6 +236,9 @@ my %symbols;
 if (!%symbols) {
     warning("No symbols found");
 }
+if ($i >= @ARGV) {
+    error("You forgot to specify any sort ordering on output (e.g. 0, 1_p, 2)");
+}    
 my @pfds = create_list($ARGV[0],\%symbols);
 for (; $i < @ARGV; $i++) {
     print_sorted(\@pfds,split("_",$ARGV[$i]));

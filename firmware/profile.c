@@ -62,7 +62,6 @@
 #include <sys/types.h>
 #include "profile.h"
 
-
 /* PFD is Profiled Function Data */
 
 /* Indices are shorts which means that we use 4k of RAM */
@@ -75,7 +74,7 @@
  * for profiling, and allows for profiling sections of code with up-to
  * 1024 function caller->callee pairs
  */
-#define NUMPFDS 1024
+#define NUMPFDS 512
 
 struct pfd_struct {
     void *self_pc;
@@ -141,7 +140,7 @@ void profile_thread_started(int current_thread) {
         if (profiling < PROF_ERROR) {
             /* After we de-mask, if profiling is active, reactivate the timer */
             timer_register(0, profile_timer_unregister, 
-                    TIMER_FREQ/10000, 0, profile_timer_tick);
+                    TIMER_FREQ/10000, 0, profile_timer_tick IF_COP(, 0 ) );
         }
     }
 }
@@ -168,9 +167,9 @@ void profstart(int current_thread) {
     last_pfd = (struct pfd_struct*)0;
     pfds[0].link = 0;
     pfds[0].self_pc = 0;
-    memset(&indices,0,INDEX_SIZE * sizeof(unsigned short));
+    memset(indices,0,INDEX_SIZE * sizeof(unsigned short));
     timer_register(
-        0, profile_timer_unregister, TIMER_FREQ/10000, 0, profile_timer_tick);
+        0, profile_timer_unregister, TIMER_FREQ/10000, 0, profile_timer_tick IF_COP(, 0 ) );
     profiling = PROF_ON;
 }
 
@@ -179,7 +178,7 @@ static void write_function_recursive(int fd, struct pfd_struct *pfd, int depth){
     fdprintf(fd,"0x%08lX\t%08ld\t%08ld\t%04d\n", (size_t)pfd->self_pc, 
             pfd->count, pfd->time, depth);
     if (link > 0 && link < NUMPFDS) { 
-        write_function_recursive(fd, &pfds[link], depth++);
+        write_function_recursive(fd, &pfds[link], ++depth);
     }
 }
 
@@ -206,7 +205,7 @@ void profstop() {
         }
     }
     fdprintf(fd,"DEBUG PROFILE DATA FOLLOWS\n");
-    fdprintf(fd,"INDEX\tLOCATION\tSELF_PC\t\tCOUNT\t\tTIME\t\tLINK\tCALLER\n");
+    fdprintf(fd,"INDEX\tLOCATION\tSELF_PC\t\tCOUNT\t\tTIME\t\tLINK\tCALLER_IDX\n");
     for (i = 0; i < NUMPFDS; i++) {
         struct pfd_struct *my_last_pfd = &pfds[i];
         if (my_last_pfd->self_pc != 0) {
@@ -214,7 +213,7 @@ void profstop() {
                     "%04d\t0x%08lX\t0x%08lX\t0x%08lX\t0x%08lX\t%04d\t0x%08lX\n",
                     i, (size_t)my_last_pfd, (size_t)my_last_pfd->self_pc,
                     my_last_pfd->count, my_last_pfd->time, my_last_pfd->link,
-                    (size_t)my_last_pfd->caller);
+                    (size_t)my_last_pfd->caller );
         }
     }
     fdprintf(fd,"INDEX_ADDRESS=INDEX\n");
@@ -224,7 +223,7 @@ void profstop() {
     close(fd);
 }
 
-void profile_func_exit(void *self_pc, void *call_site) {
+void __cyg_profile_func_exit(void *self_pc, void *call_site) {
     (void)call_site;
     (void)self_pc;
     /* When we started timing, we set the time to the tick at that time
@@ -255,7 +254,7 @@ void profile_func_exit(void *self_pc, void *call_site) {
     pfd = &pfds[temp];\
     pfd->self_pc = self_pc; pfd->count = 1; pfd->time = 0
 
-void profile_func_enter(void *self_pc, void *from_pc) {
+void __cyg_profile_func_enter(void *self_pc, void *from_pc) {
     struct pfd_struct *pfd;
     struct pfd_struct *prev_pfd;
     unsigned short *pfd_index_pointer;
@@ -339,3 +338,7 @@ overflow:
     profiling = PROF_ERROR;
     return;
 }
+
+
+
+

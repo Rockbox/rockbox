@@ -39,9 +39,9 @@ void profile_thread_stopped(int current_thread)
 void profile_thread_started(int current_thread)
   NO_PROF_ATTR;
 
-void profile_func_exit(void *this_fn, void *call_site)
+void __cyg_profile_func_exit(void *this_fn, void *call_site)
   NO_PROF_ATTR ICODE_ATTR;
-void profile_func_enter(void *this_fn, void *call_site)
+void __cyg_profile_func_enter(void *this_fn, void *call_site)
   NO_PROF_ATTR ICODE_ATTR;
 
 #endif /*_SYS_PROFILE_H*/

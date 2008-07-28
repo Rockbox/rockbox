@@ -7,7 +7,9 @@ wav.c
 a52.c
 mpc.c
 wavpack.c
+#ifndef RB_PROFILE
 alac.c
+#endif
 wma.c
 #if MEMORYSIZE > 1
 aac.c

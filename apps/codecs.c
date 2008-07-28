@@ -138,8 +138,8 @@ struct codec_api ci = {
 #ifdef RB_PROFILE
     profile_thread,
     profstop,
-    profile_func_enter,
-    profile_func_exit,
+    __cyg_profile_func_enter,
+    __cyg_profile_func_exit,
 #endif
 
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
