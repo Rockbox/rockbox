@@ -292,11 +292,14 @@ static void tea_decrypt(uint32_t* v0, uint32_t* v1, const uint32_t* k) {
    integers) and the key is incremented after each block
  */
 
-static void tea_decrypt_buf(const unsigned char* src, unsigned char* dest, size_t n, uint32_t * key)
+static void tea_decrypt_buf(const unsigned char* src, unsigned char* dest,
+                            size_t n, const uint32_t * initial_key)
 {
     uint32_t v0, v1;
     unsigned int i;
+    uint32_t key[4];
 
+    memcpy(key, initial_key, sizeof(key));
     for (i = 0; i < (n / 8); i++) {
         v0 = le2int(src);
         v1 = le2int(src+4);
@@ -561,7 +564,6 @@ static int prepare_original_firmware(struct sansa_t* sansa, unsigned char* buf, 
     unsigned char* tmpbuf;
     int i;
     int key_found;
-    uint32_t key[4];
 
     get_mi4header(buf,mi4header);
 
@@ -585,11 +587,10 @@ static int prepare_original_firmware(struct sansa_t* sansa, unsigned char* buf, 
 
         key_found=0;
         for (i=0; i < NUM_KEYS && !key_found ; i++) {
-            memcpy(key, keys[i], sizeof(key));
             tea_decrypt_buf(buf+(mi4header->plaintext+0x200),
                             tmpbuf,
                             mi4header->mi4size-(mi4header->plaintext+0x200),
-                            key);
+                            keys[i]);
             key_found = (le2uint(tmpbuf+mi4header->length-mi4header->plaintext-4) == 0xaa55aa55);
         }
 
