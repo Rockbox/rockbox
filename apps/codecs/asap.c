@@ -36,7 +36,8 @@ enum codec_status codec_main(void)
     int song;
     int duration;
     char* module;
-
+    int bytesPerSample =2;
+    
     /* Generic codec initialisation */
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
     
@@ -74,10 +75,15 @@ next_track:
     ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
     /* Stereo or Mono output ? */
     if(asap.module_info.channels ==1)
+    {
         ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
+        bytesPerSample = 2;
+    }
     else
+    {
         ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
-        
+        bytesPerSample = 4; 
+    }    
     /* reset eleapsed */
     ci->set_elapsed(0);
 
@@ -115,7 +121,7 @@ next_track:
         n_bytes = ASAP_Generate(&asap, samples, sizeof(samples), ASAP_FORMAT_S16_BE);
         #endif
         
-        ci->pcmbuf_insert(samples, NULL, n_bytes /2);
+        ci->pcmbuf_insert(samples, NULL, n_bytes /bytesPerSample);
         
         bytes_done += n_bytes;
         ci->set_elapsed((bytes_done / 2) / 44.1);
