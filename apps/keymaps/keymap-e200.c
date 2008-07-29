@@ -223,7 +223,7 @@ static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_STD_PREV,           BUTTON_SCROLL_BACK|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_STD_NEXT,           BUTTON_SCROLL_FWD,                BUTTON_NONE },
     { ACTION_STD_NEXT,           BUTTON_SCROLL_FWD|BUTTON_REPEAT,  BUTTON_NONE },
-
+    { ACTION_NONE,               BUTTON_DOWN|BUTTON_REL,           BUTTON_DOWN },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
 
