@@ -2916,7 +2916,7 @@ int playlist_insert_directory(struct playlist_info* playlist,
     if (queue)
         count_str = ID2P(LANG_PLAYLIST_QUEUE_COUNT);
     else
-      count_str = ID2P(LANG_PLAYLIST_INSERT_COUNT);
+        count_str = ID2P(LANG_PLAYLIST_INSERT_COUNT);
 
     display_playlist_count(0, count_str, false);
 

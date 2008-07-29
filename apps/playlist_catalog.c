@@ -319,8 +319,8 @@ static int display_playlists(char* playlist, bool view)
 static void display_insert_count(int count)
 {
     static long talked_tick = 0;
-    if(count && (talked_tick == 0
-                 || TIME_AFTER(current_tick, talked_tick+5*HZ)))
+    if(global_settings.talk_menu && count && 
+        (talked_tick == 0 || TIME_AFTER(current_tick, talked_tick+5*HZ)))
     {
         talked_tick = current_tick;
         talk_number(count, false);
