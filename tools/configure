@@ -281,7 +281,7 @@ arm1136jfscc () {
 }
 
 mipselcc () {
- prefixtools mipsel-linux-
+ prefixtools mipsel-elf-
  GCCOPTS="$CCOPTS -mips32 -mno-abicalls"
  GCCOPTIMIZE="-fomit-frame-pointer"
  GCCOPTS="$GCCOPTS -fno-pic -fno-builtin -fno-exceptions -ffunction-sections -msoft-float -G 0"
