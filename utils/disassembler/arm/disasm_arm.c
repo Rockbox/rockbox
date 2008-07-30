@@ -364,7 +364,10 @@ void block_data(char *stg, ULONG val)
   for(i=0; i<16; i++)
     if(val & (1<<i))
       sprintf(lst+strlen(lst), "%s, ", regs[i]);
-  strcpy(lst+strlen(lst)-2, "}");
+  if(strlen(lst)>2)
+    strcpy(lst+strlen(lst)-2, "}");
+  else
+    strcpy(lst+strlen(lst), "}");
 
   if(val & 0x400000) // load psr or force user mode
   strcpy(lst+strlen(lst), "^");
