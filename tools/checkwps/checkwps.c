@@ -191,12 +191,18 @@ int main(int argc, char **argv)
 
     struct wps_data wps;
 
-    if (argc < 2) {
-        printf("Usage: checkwps [OPTIONS] filename.wps\n");
+    /* No arguments -> print the help text
+     * Also print the help text upon -h or --help */
+    if( (argc < 2) ||
+        strcmp(argv[1],"-h") == 0 ||
+        strcmp(argv[1],"--help") == 0 )
+    {
+        printf("Usage: checkwps [OPTIONS] filename.wps [filename2.wps]...\n");
         printf("\nOPTIONS:\n");
-        printf("\t-v\tverbose\n");
-        printf("\t-vv\tmore verbose\n");
-        printf("\t-vvv\tvery verbose\n");
+        printf("\t-v\t\tverbose\n");
+        printf("\t-vv\t\tmore verbose\n");
+        printf("\t-vvv\t\tvery verbose\n");
+        printf("\t-h,\t--help\tshow this message\n");
         return 1;
     }
 
@@ -216,6 +222,10 @@ int main(int argc, char **argv)
     }
     close(fd);
 
+    /* Go through every wps that was thrown at us, error out at the first
+     * flawed wps */
+    while (argv[filearg]) {
+    printf("Checking %s...\n", argv[filearg]);
     res = wps_data_load(&wps, &screens[0], argv[filearg], true);
 
     if (!res) {
@@ -223,7 +233,9 @@ int main(int argc, char **argv)
       return 3;
     }
 
-    printf("WPS parsed OK\n");
+    printf("WPS parsed OK\n\n");
+    filearg++;
+    }
     return 0;
 }
 
