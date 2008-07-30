@@ -1,7 +1,7 @@
 #include "config.h"
 #undef mips
 
-OUTPUT_FORMAT("elf32-tradlittlemips")
+OUTPUT_FORMAT("elf32-littlemips")
 OUTPUT_ARCH(MIPS)
 ENTRY(_start)
 STARTUP(target/mips/ingenic_jz47xx/crt0.o)
@@ -33,6 +33,7 @@ SECTIONS
         *(.text*);
         *(.glue_7);
         *(.glue_7t);
+        *(.rel.dyn);
         . = ALIGN(0x4);
     } > DRAM
     
