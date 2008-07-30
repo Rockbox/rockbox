@@ -23,6 +23,16 @@ else
     make="make"
 fi
 
+# Use an alternative mirror in case you encounter a slow internet connection.
+# List of other GNU mirrors available in http://www.gnu.org/prep/ftp.html
+#
+# Usage example:
+#         # GNU_MIRROR=http://mirrors.kernel.org/gnu ./rockboxdev.sh 
+#
+if [ -z $GNU_MIRROR ] ; then
+    GNU_MIRROR=ftp://ftp.gnu.org/pub/gnu
+fi
+
 # If detection fails, override the value of make manually:
 # make="make"
 
@@ -206,13 +216,13 @@ cat $summary
 if test -f "$dlwhere/binutils-$binutils.tar.bz2"; then
   echo "binutils $binutils already downloaded"
 else
-  getfile binutils-$binutils.tar.bz2 ftp://ftp.gnu.org/pub/gnu/binutils
+  getfile binutils-$binutils.tar.bz2 $GNU_MIRROR/binutils
 fi
 
 if test -f "$dlwhere/gcc-core-$gccver.tar.bz2"; then
   echo "gcc $gccver already downloaded"
 else
-  getfile gcc-core-$gccver.tar.bz2 ftp://ftp.gnu.org/pub/gnu/gcc/gcc-$gccver
+  getfile gcc-core-$gccver.tar.bz2 $GNU_MIRROR/gcc/gcc-$gccver
 fi
 
 if test -n "$gccpatch"; then
