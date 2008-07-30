@@ -535,8 +535,6 @@ int ft_enter(struct tree_context* c)
                     break;
                 }
 
-                gui_syncsplash(0, ID2P(LANG_WAIT));
-
                 if (plugin_load(buf,NULL) == PLUGIN_USB_CONNECTED)
                 {
                     if(*c->dirfilter > NUM_FILTER_MODES)
