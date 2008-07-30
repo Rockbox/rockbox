@@ -489,13 +489,13 @@ int mimic_of(usb_dev_handle *dh)
     _SLEEP(2);
     _GET_CPU;
     _SET_ADDR(0x80E0 << 16);
-    _SEND_FILE("10.bin");
+    _SEND_FILE("onda.bin");
     _GET_CPU;
-    _VERIFY_DATA("10.bin", 0x80E0 << 16);
+    _VERIFY_DATA("onda.bin", 0x80E0 << 16);
     _GET_CPU;
     _FLUSH;
     _GET_CPU;
-    _STAGE2(0x80e00008);
+    _STAGE2(0x80E00008);
     fprintf(stderr, "[INFO] Done!\n");
     return 0;
 }
