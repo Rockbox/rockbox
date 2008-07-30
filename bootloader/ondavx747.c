@@ -148,27 +148,41 @@ int main(void)
     printf("REG_EMC_SACR4: 0x%x", REG_EMC_SACR4 >> EMC_SACR_BASE_BIT);
     printf("REG_EMC_DMAR0: 0x%x", REG_EMC_DMAR0 >> EMC_DMAR_BASE_BIT);
     unsigned int cpu_id = read_c0_prid();
-    printf("CPU_ID: (0x%x)", cpu_id);
+    printf("CPU_ID: 0x%x", cpu_id);
     printf(" * Company ID: 0x%x", (cpu_id >> 16) & 7);
     printf(" * Processor ID: 0x%x", (cpu_id >> 8) & 7);
     printf(" * Revision ID: 0x%x", cpu_id & 7);
+    unsigned int config_data = read_c0_config();
+    printf("C0_CONFIG: 0x%x", config_data);
+    printf(" * Architecture type: 0x%x", (config_data >> 13) & 3);
+    printf(" * Architecture revision: 0x%x", (config_data >> 10) & 7);
+    printf(" * MMU type: 0x%x", (config_data >> 7) & 7);
+    printf("C0_CONFIG1: 0x%x", read_c0_config1());
+    if(read_c0_config1() & (1 << 0)) printf(" * FP available");
+    if(read_c0_config1() & (1 << 1)) printf(" * EJTAG available");
+    if(read_c0_config1() & (1 << 2)) printf(" * MIPS-16 available");
+    if(read_c0_config1() & (1 << 4)) printf(" * Performace counters available");
+    if(read_c0_config1() & (1 << 5)) printf(" * MDMX available");
+    if(read_c0_config1() & (1 << 6)) printf(" * CP2 available");
+    printf("C0_STATUS: 0x%x", read_c0_status());
     while(1)
     {
         btn = button_read_device(&touch);
-        if(btn & BUTTON_VOL_DOWN)
-            printf("BUTTON_VOL_DOWN");
-        if(btn & BUTTON_MENU)
-            printf("BUTTON_MENU");
-        if(btn & BUTTON_VOL_UP)
-            printf("BUTTON_VOL_UP");
-        if(btn & BUTTON_POWER)
-            printf("BUTTON_POWER");
+#define KNOP(x,y)     lcd_set_foreground(LCD_BLACK); \
+                      if(btn & x) \
+                        lcd_set_foreground(LCD_WHITE); \
+                      lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(#x), LCD_HEIGHT-SYSFONT_HEIGHT*y, #x);
+        KNOP(BUTTON_VOL_UP, 5);
+        KNOP(BUTTON_VOL_DOWN, 6);
+        KNOP(BUTTON_MENU, 7);
+        KNOP(BUTTON_POWER, 8);
+        lcd_set_foreground(LCD_WHITE);
         if(button_hold())
         {
             printf("BUTTON_HOLD");
             asm("break 7");
         }
-        if(touch != 0)
+        if(btn & BUTTON_TOUCH)
         {
             lcd_set_foreground(LCD_RGBPACK(touch & 0xFF, (touch >> 8)&0xFF, (touch >> 16)&0xFF));
             lcd_fillrect((touch>>16)-5, (touch&0xFFFF)-5, 10, 10);
@@ -180,6 +194,10 @@ int main(void)
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT, datetime);
         snprintf(datetime, 30, "%d", REG_TCU_TCNT0);
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*2, datetime);
+        snprintf(datetime, 30, "X: %d Y: %d", touch>>16, touch & 0xFFFF);
+        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*3, datetime);
+        snprintf(datetime, 30, "%d", read_c0_count());
+        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*4, datetime);
         lcd_update();
     }
     
