@@ -97,7 +97,7 @@
     soft_shutdown: "Press OFF to shut down"
   </source>
   <dest>
-    *: ""
+    *: none
     soft_shutdown: "לחץ על OFF כדי לכבות"
   </dest>
   <voice>
@@ -128,12 +128,12 @@
     swcodec: "Restarting playback..."
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "...מאתחל את ההשמעה"
   </dest>
   <voice>
-    *: "Restarting playback..."
-    swcodec: ""
+    *: none
+    swcodec: "Restarting playback..."
   </voice>
 </phrase>
 <phrase>
@@ -145,12 +145,12 @@
     ondio*: "Please remove inserted MMC"
   </source>
   <dest>
-    *: ""
+    *: none
     ondio*: "אנא הסר כרטיס מולטימדיה"
   </dest>
   <voice>
-    *: "Please remove multimedia card"
-    ondio*: ""
+    *: none
+    ondio*: "Please remove multimedia card"
   </voice>
 </phrase>
 <phrase>
@@ -232,12 +232,12 @@
     radio: "FM Radio"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "FM רדיו"
   </dest>
   <voice>
-    *: "FM Radio"
-    radio: ""
+    *: none
+    radio: "FM Radio"
   </voice>
 </phrase>
 <phrase>
@@ -249,12 +249,12 @@
     recording: "Recording"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "הקלטה"
   </dest>
   <voice>
-    *: "Recording"
-    recording: ""
+    *: none
+    recording: "Recording"
   </voice>
 </phrase>
 <phrase>
@@ -280,12 +280,12 @@
     soft_shutdown: "Shut down"
   </source>
   <dest>
-    *: ""
+    *: none
     soft_shutdown: "כיבוי"
   </dest>
   <voice>
-    *: "Shut down"
-    soft_shutdown: ""
+    *: none
+    soft_shutdown: "Shut down"
   </voice>
 </phrase>
 <phrase>
@@ -451,12 +451,12 @@
     masf: "Loudness"
   </source>
   <dest>
-    *: ""
+    *: none
     masf: "עוצמה"
   </dest>
   <voice>
-    *: "Loudness"
-    masf: ""
+    *: none
+    masf: "Loudness"
   </voice>
 </phrase>
 <phrase>
@@ -468,12 +468,12 @@
     masf: "Auto Volume"
   </source>
   <dest>
-    *: ""
+    *: none
     masf: "עוצמת קול אוטומטית"
   </dest>
   <voice>
-    *: "Auto Volume"
-    masf: ""
+    *: none
+    masf: "Auto Volume"
   </voice>
 </phrase>
 <phrase>
@@ -485,7 +485,7 @@
     masf: "AV Decay Time"
   </source>
   <dest>
-    *: ""
+    *: none
     masf: "זמן דעיכת עוצמת קול אוטומטית"
   </dest>
   <voice>
@@ -502,12 +502,12 @@
     masf: "Super Bass"
   </source>
   <dest>
-    *: ""
+    *: none
     masf: "סופר באס"
   </dest>
   <voice>
-    *: "Super bass"
-    masf: ""
+    *: none
+    masf: "Super bass"
   </voice>
 </phrase>
 <phrase>
@@ -519,12 +519,12 @@
     masf: "MDB Enable"
   </source>
   <dest>
-    *: ""
+    *: none
     masf: "MDB פעיל"
   </dest>
   <voice>
-    *: "MDB Enable"
-    masf: ""
+    *: none
+    masf: "MDB Enable"
   </voice>
 </phrase>
 <phrase>
@@ -536,12 +536,12 @@
     masf: "MDB Strength"
   </source>
   <dest>
-    *: ""
+    *: none
     masf: "חוזק MDB"
   </dest>
   <voice>
-    *: "MDB Strength"
-    masf: ""
+    *: none
+    masf: "MDB Strength"
   </voice>
 </phrase>
 <phrase>
@@ -553,12 +553,12 @@
     masf: "MDB Harmonics"
   </source>
   <dest>
-    *: ""
+    *: none
     masf: "הרמוניות MDB"
   </dest>
   <voice>
-    *: "MDB Harmonics"
-    masf: ""
+    *: none
+    masf: "MDB Harmonics"
   </voice>
 </phrase>
 <phrase>
@@ -570,12 +570,12 @@
     masf: "MDB Center Frequency"
   </source>
   <dest>
-    *: ""
+    *: none
     masf: "תדירות מרכזית MDB"
   </dest>
   <voice>
-    *: "MDB Center frequency"
-    masf: ""
+    *: none
+    masf: "MDB Center frequency"
   </voice>
 </phrase>
 <phrase>
@@ -587,12 +587,12 @@
     masf: "MDB Shape"
   </source>
   <dest>
-    *: ""
+    *: none
     masf: "MDB צורת"
   </dest>
   <voice>
-    *: "MDB Shape"
-    masf: ""
+    *: none
+    masf: "MDB Shape"
   </voice>
 </phrase>
 <phrase>
@@ -758,12 +758,12 @@
     recording: "Recording Settings"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "הגדרות הקלטה"
   </dest>
   <voice>
-    *: "Recording Settings"
-    recording: ""
+    *: none
+    recording: "Recording Settings"
   </voice>
 </phrase>
 <phrase>
@@ -974,12 +974,12 @@
     swcodec: "Crossfade"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "מעבר ביניים"
   </dest>
   <voice>
-    *: "Crossfade"
-    swcodec: ""
+    *: none
+    swcodec: "Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -1005,7 +1005,7 @@
     swcodec: "Beep Volume"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "עוצמת הצפצוף"
   </dest>
   <voice>
@@ -1022,7 +1022,7 @@
     swcodec: "Weak"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "חלש"
   </dest>
   <voice>
@@ -1039,7 +1039,7 @@
     swcodec: "Moderate"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "בינוני"
   </dest>
   <voice>
@@ -1056,7 +1056,7 @@
     swcodec: "Strong"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "חזק"
   </dest>
   <voice>
@@ -1073,12 +1073,12 @@
     spdif_power: "Optical Output"
   </source>
   <dest>
-    *: ""
+    *: none
     spdif_power: "יציאה אופטית"
   </dest>
   <voice>
-    *: "Optical output"
-    spdif_power: ""
+    *: none
+    spdif_power: "Optical output"
   </voice>
 </phrase>
 <phrase>
@@ -1328,12 +1328,12 @@
     lcd_bitmap: "Browse Fonts"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "הצג גופנים"
   </dest>
   <voice>
-    *: "Browse Fonts"
-    lcd_bitmap: ""
+    *: none
+    lcd_bitmap: "Browse Fonts"
   </voice>
 </phrase>
 <phrase>
@@ -1373,7 +1373,7 @@
     remote: "Remote-LCD Settings"
   </source>
   <dest>
-    *: ""
+    *: none
     remote: "הגדרות מסך השלט"
   </dest>
   <voice>
@@ -1404,12 +1404,12 @@
     lcd_bitmap: "Status-/Scrollbar"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_bitmap: "שורת מצב ושורת גלילה"
   </dest>
   <voice>
-    *: "Status- and Scrollbar"
-    lcd_bitmap: ""
+    *: none
+    lcd_bitmap: "Status- and Scrollbar"
   </voice>
 </phrase>
 <phrase>
@@ -1466,12 +1466,12 @@
     rtc: "Time & Date"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "תאריך וזמן"
   </dest>
   <voice>
-    *: "Time and Date"
-    rtc: ""
+    *: none
+    rtc: "Time and Date"
   </voice>
 </phrase>
 <phrase>
@@ -1511,12 +1511,12 @@
     alarm: "Wake-Up Alarm"
   </source>
   <dest>
-    *: ""
+    *: none
     alarm: "שעון מעורר"
   </dest>
   <voice>
-    *: "Wake-Up Alarm"
-    alarm: ""
+    *: none
+    alarm: "Wake-Up Alarm"
   </voice>
 </phrase>
 <phrase>
@@ -1542,12 +1542,12 @@
     recording,player: "Line In"
   </source>
   <dest>
-    *: ""
+    *: none
     recording,player: "כניסת שמע"
   </dest>
   <voice>
-    *: "Line In"
-    recording,player: ""
+    *: none
+    recording,player: "Line In"
   </voice>
 </phrase>
 <phrase>
@@ -1559,12 +1559,12 @@
     charging: "Car Adapter Mode"
   </source>
   <dest>
-    *: ""
+    *: none
     charging: "מצב מכונית"
   </dest>
   <voice>
-    *: "Car Adapter Mode"
-    charging: ""
+    *: none
+    charging: "Car Adapter Mode"
   </voice>
 </phrase>
 <phrase>
@@ -1744,12 +1744,12 @@
     recording_hwcodec: "Quality"
   </source>
   <dest>
-    *: ""
+    *: none
     recording_hwcodec: "איכות"
   </dest>
   <voice>
-    *: "Quality"
-    recording_hwcodec: ""
+    *: none
+    recording_hwcodec: "Quality"
   </voice>
 </phrase>
 <phrase>
@@ -1761,12 +1761,12 @@
     recording: "Frequency"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "תדירות"
   </dest>
   <voice>
-    *: "Frequency"
-    recording: ""
+    *: none
+    recording: "Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -1778,12 +1778,12 @@
     recording: "Source"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "מקור"
   </dest>
   <voice>
-    *: "Source"
-    recording: ""
+    *: none
+    recording: "Source"
   </voice>
 </phrase>
 <phrase>
@@ -1796,14 +1796,14 @@
     h100,h120,h300: "Internal Microphone"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "מיקרופון"
     h100,h120,h300: "מיקרופון פנימי"
   </dest>
   <voice>
-    *: "Microphone"
-    recording: ""
-    h100,h120,h300: ""
+    *: none
+    recording: "Microphone"
+    h100,h120,h300: "Internal Microphone"
   </voice>
 </phrase>
 <phrase>
@@ -1815,12 +1815,12 @@
     recording: "Digital"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "כניסת שמע דיגיטלית"
   </dest>
   <voice>
-    *: "Digital"
-    recording: ""
+    *: none
+    recording: "Digital"
   </voice>
 </phrase>
 <phrase>
@@ -1832,12 +1832,12 @@
     recording_hwcodec: "Independent Frames"
   </source>
   <dest>
-    *: ""
+    *: none
     recording_hwcodec: "מסגרות נפרדות"
   </dest>
   <voice>
-    *: "Independent frames"
-    recording_hwcodec: ""
+    *: none
+    recording_hwcodec: "Independent frames"
   </voice>
 </phrase>
 <phrase>
@@ -1849,12 +1849,12 @@
     recording: "File Split Options"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "אפשרויות פיצול לקבצים"
   </dest>
   <voice>
-    *: "Time Split"
-    recording: ""
+    *: none
+    recording: "Time Split"
   </voice>
 </phrase>
 <phrase>
@@ -1866,12 +1866,12 @@
     recording: "Prerecord Time"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "זמן הקלטה מראש"
   </dest>
   <voice>
-    *: "Pre-Record time"
-    recording: ""
+    *: none
+    recording: "Pre-Record time"
   </voice>
 </phrase>
 <phrase>
@@ -1883,12 +1883,12 @@
     recording: "Directory"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "ספריה"
   </dest>
   <voice>
-    *: "Directory"
-    recording: ""
+    *: none
+    recording: "Directory"
   </voice>
 </phrase>
 <phrase>
@@ -1900,10 +1900,10 @@
     recording: ""
   </source>
   <dest>
-    *: ""
+    *: none
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -1915,7 +1915,7 @@
     recording: "Trigger"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "גורם הפעלה"
   </dest>
   <voice>
@@ -1960,12 +1960,12 @@
     swcodec: "Mix"
   </source>
   <dest>
-    *: ""
+    *: none
     swcodec: "ערבוב"
   </dest>
   <voice>
-    *: "Mix"
-    swcodec: ""
+    *: none
+    swcodec: "Mix"
   </voice>
 </phrase>
 <phrase>
@@ -8679,12 +8679,12 @@
     recording: "Split Measure"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "מדידת הפיצול"
   </dest>
   <voice>
-    *: "Split Measure"
-    recording: ""
+    *: none
+    recording: "Split Measure"
   </voice>
 </phrase>
 <phrase>
@@ -8710,12 +8710,12 @@
     recording: "Split Time"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "זמן הפיצול"
   </dest>
   <voice>
-    *: "Split Time"
-    recording: ""
+    *: none
+    recording: "Split Time"
   </voice>
 </phrase>
 <phrase>
@@ -8817,12 +8817,12 @@
     ipodvideo: "Narrow"
   </source>
   <dest>
-    *: ""
+    *: none
     ipodvideo: "צר"
   </dest>
   <voice>
-    *: "Narrow"
-    ipodvideo: ""
+    *: none
+    ipodvideo: "Narrow"
   </voice>
 </phrase>
 <phrase>
@@ -8834,12 +8834,12 @@
     recording: "PCM Wave"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "PCM Wave"
   </dest>
   <voice>
-    *: "PCM Wave"
-    recording: ""
+    *: none
+    recording: "PCM Wave"
   </voice>
 </phrase>
 <phrase>
@@ -8851,12 +8851,12 @@
     agc: "Automatic Gain Control"
   </source>
   <dest>
-    *: ""
+    *: none
     agc: "שליטת הגברה אוטומטית"
   </dest>
   <voice>
-    *: "Automatic gain control"
-    agc: ""
+    *: none
+    agc: "Automatic gain control"
   </voice>
 </phrase>
 <phrase>
@@ -8882,7 +8882,7 @@
     lcd_sleep: "Never"
   </source>
   <dest>
-    *: ""
+    *: none
     lcd_sleep: "אף פעם"
   </dest>
   <voice>
