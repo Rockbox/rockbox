@@ -39,6 +39,7 @@ int main( int argc, char ** argv ) {
 
     QString applang = QLocale::system().name();
     QTranslator translator;
+    QTranslator qttrans;
     // install translator
     if(!user->value("lang", "").toString().isEmpty()) {
         applang = user->value("lang", "").toString();
@@ -46,10 +47,15 @@ int main( int argc, char ** argv ) {
     if(!applang.isEmpty()) {
         if(!translator.load("rbutil_" + applang, absolutePath))
             translator.load("rbutil_" + applang, ":/lang");
+        if(!qttrans.load("qt_" + applang,
+            QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+            translator.load("qt_" + applang, ":/lang");
+
         QLocale::setDefault(applang);
     }
     delete user;
     app.installTranslator(&translator);
+    app.installTranslator(&qttrans);
 
     RbUtilQt window(0);
     window.show();
