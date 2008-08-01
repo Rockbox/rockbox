@@ -1610,64 +1610,58 @@ static void draw_brush( int x, int y )
     }
 }
 
+/* This is an implementation of Bresenham's line algorithm.
+ * See http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm.
+ */
 static void draw_line( int x1, int y1, int x2, int y2 )
 {
-    x1 = x1<<1;
-    y1 = y1<<1;
-    x2 = x2<<1;
-    y2 = y2<<1;
-    int w = x1 - x2;
-    int h = y1 - y2;
-
-    int x, y;
-
-    if( w == 0 && h == 0 )
+    int x = x1;
+    int y = y1;
+    int deltax = x2 - x1;
+    int deltay = y2 - y1;
+    int i;
+    
+    int xerr = abs(deltax);
+    int yerr = abs(deltay);
+    int xstep = deltax > 0 ? 1 : -1;
+    int ystep = deltay > 0 ? 1 : -1;
+    int err;
+    
+    if (yerr > xerr)
     {
-        draw_pixel( x1>>1, y1>>1 );
-        return;
-    }
-
-    if( w < 0 ) w *= -1;
-    if( h < 0 ) h *= -1;
-
-    if( w > h )
-    {
-        if( x1 > x2 )
+        /* more vertical */
+        err = yerr;
+        xerr <<= 1;
+        yerr <<= 1;
+        
+        /* to leave off the last pixel of the line, leave off the "+ 1" */
+        for (i = abs(deltay) + 1; i; --i)
         {
-            x = x2;
-            y = y2;
-            x2 = x1;
-            y2 = y1;
-            x1 = x;
-            y1 = y;
-        }
-        w = x1 - x2;
-        h = y1 - y2;
-        while( x1 <= x2 )
-        {
-            draw_pixel( (x1+1)>>1, (y1+1)>>1 );
-            x1+=2;
-            y1 = y2 - ( x2 - x1 ) * h / w;
+            draw_pixel(x, y);
+            y += ystep;
+            err -= xerr;
+            if (err < 0) {
+                x += xstep;
+                err += yerr;
+            }
         }
     }
-    else /* h > w */
+    else
     {
-        if( y1 > y2 )
+        /* more horizontal */
+        err = xerr;
+        xerr <<= 1;
+        yerr <<= 1;
+        
+        for (i = abs(deltax) + 1; i; --i)
         {
-            x = x2;
-            y = y2;
-            x2 = x1;
-            y2 = y1;
-            x1 = x;
-            y1 = y;
-        }
-        w = x1 - x2;
-        h = y1 - y2;
-        while( y1 <= y2 )
-        {
-            draw_pixel( (x1+1)>>1, (y1+1)>>1 );
-            y1+=2;
-            x1 = x2 - ( y2 - y1 ) * w / h;
+            draw_pixel(x, y);
+            x += xstep;
+            err -= yerr;
+            if (err < 0) {
+                y += ystep;
+                err += xerr;
+            }
         }
     }
 }
