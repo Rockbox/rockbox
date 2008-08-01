@@ -8,3 +8,29 @@ http://download.rockbox.org/bootloader/sandisk-sansa/e200/PP5022.mi4
 http://download.rockbox.org/bootloader/sandisk-sansa/c200/firmware.mi4
 
 Place both these files in the sansapatcher source directory, and type "make".
+
+
+Building your own bootloaders
+-----------------------------
+
+If you would like to compile the bootloaders yourself, they are the output of
+running the "Bootloader" build for the E200 and C200 targets.
+
+NOTE: Unless you know what you are doing, it is recommended that you
+      use the official pre-built binary bootloaders linked to above.
+      Bootloaders compiled from current Rockbox SVN are untested and
+      may contain bugs preventing you from starting the device (or
+      worse...).
+
+In the Rockbox source directory, do:
+
+mkdir build-e200-bootloader
+cd build-e200-bootloader
+../tools/configure
+[Select E200, then B for bootloader]
+make
+
+This will create PP5022.mi4 which you should copy to the sansapatcher
+build directory.
+
+A similar process for the C200 will create firmware.mi4.
