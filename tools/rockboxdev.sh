@@ -23,12 +23,6 @@ else
     make="make"
 fi
 
-# Use an alternative mirror in case you encounter a slow internet connection.
-# List of other GNU mirrors available in http://www.gnu.org/prep/ftp.html
-#
-# Usage example:
-#         # GNU_MIRROR=http://mirrors.kernel.org/gnu ./rockboxdev.sh 
-#
 if [ -z $GNU_MIRROR ] ; then
     GNU_MIRROR=ftp://ftp.gnu.org/pub/gnu
 fi
@@ -49,7 +43,7 @@ findtool(){
   IFS=":"
   for path in $PATH
   do
-    # echo "checks for $file in $path" >&2
+    # echo "Checks for $file in $path" >&2
     if test -f "$path/$file"; then
       echo "$path/$file"
       return
@@ -70,28 +64,27 @@ getfile() {
     tool=`findtool wget`
     if test -n "$tool"; then
       # wget download
-      echo "ROCKBOXDEV: downloads $2/$1 using wget"
+      echo "ROCKBOXDEV: Downloading $2/$1 using wget"
       $tool -O $dlwhere/$1 $2/$1
     fi
   else
      # curl download
-      echo "ROCKBOXDEV: downloads $2/$1 using curl"
+      echo "ROCKBOXDEV: Downloading $2/$1 using curl"
      $tool -Lo $dlwhere/$1 $2/$1
   fi
+
   if test -z "$tool"; then 
-    echo "ROCKBOXDEV: couldn't find any downloader tool to use!"
-    echo "ROCKBOXDEV: install curl or wget and re-run the script"
+    echo "ROCKBOXDEV: No downloader tool found!"
+    echo "ROCKBOXDEV: Please install curl or wget and re-run the script"
     exit
   fi
-  
-
 }
 
 for t in $reqtools; do
   tool=`findtool $t`
   if test -z "$tool"; then
-    echo "ROCKBOXDEV: $t is required for this script to work. Please"
-    echo "ROCKBOXDEV: install and re-run the script."
+    echo "ROCKBOXDEV: $t is required for this script to work."
+    echo "ROCKBOXDEV: Please install $t and re-run the script."
     exit
   fi
 done
@@ -120,8 +113,8 @@ echo "Build dir: $builddir (edit script to change dir)"
 # Verify that we can write in the prefix dir, as otherwise we will hardly
 # be able to install there!
 if test ! -w $prefix; then
-  echo "WARNING: this script is set to install in $prefix but has no"
-  echo "WARNING: write permission to do so! Please fix and re-run this script"
+  echo "WARNING: This script is set to install in $prefix but has no write permissions for it"
+  echo "Please fix this and re-run this script"
   exit
 fi
 
@@ -129,7 +122,8 @@ fi
 ###########################################################################
 # If there's already a build dir, we don't overwrite it
 if test -d $builddir; then
-  echo "you have a $builddir dir already, please remove and rerun"
+  echo "You already have a $builddir directory!"
+  echo "Please remove it and re-run the script"
   exit
 fi
 
@@ -141,6 +135,7 @@ cleardir () {
 
 buildone () {
 
+arch=$1
 gccpatch="" # default is no gcc patch
 gccver="4.0.3" # default gcc version
 binutils="2.16.1" # The binutils version to use
@@ -149,7 +144,7 @@ gccconfigure="" #default is nothing added to configure
 system=`uname -s`
 gccurl="http://www.rockbox.org/gcc"
 
-case $1 in
+case $arch in
   [Ss])
     target="sh-elf"
     gccpatch="gcc-4.0.3-rockbox-1.diff"
@@ -184,7 +179,7 @@ case $1 in
     gccconfigure="--disable-libssp"
     ;;
   *)
-    echo "unsupported"
+    echo "An unsupported architecture option: $arch"
     exit
     ;;
 esac
@@ -201,17 +196,29 @@ cd $builddir
 
 summary="summary-$1"
 
-echo "== Summary ==" > $summary
-echo "Target: $target" >> $summary
-echo "gcc $gccver" >> $summary
+echo "============================ Summary ============================" > $summary
+echo "target:              $target" >> $summary
+echo "gcc version:         $gccver" >> $summary
 if test -n "$gccpatch"; then
-  echo "gcc patch $gccpatch" >> $summary
+    echo "gcc patch:           $gccpatch" >> $summary
 fi
-echo "binutils $binutils" >> $summary
-echo "install in $prefix/$target" >> $summary
-echo "when complete, make your PATH include $bindir" >> $summary
+echo "binutils:            $binutils" >> $summary
+echo "installation target: $prefix/$target" >> $summary
+echo "" >> $summary
+echo "When done, append $bindir to PATH" >> $summary
+echo "=================================================================" >> $summary
 
 cat $summary
+
+echo ""
+echo "In case you encounter a slow internet connection, you can use an alternative mirror."
+echo "A list of other GNU mirrors is available here: http://www.gnu.org/prep/ftp.html"
+echo ""
+echo "Usage: GNU_MIRROR=[URL] ./rockboxdev.sh"
+echo ""
+echo "Example:"
+echo "$ GNU_MIRROR=http://mirrors.kernel.org/gnu ./rockboxdev.sh"
+echo ""
 
 if test -f "$dlwhere/binutils-$binutils.tar.bz2"; then
   echo "binutils $binutils already downloaded"
@@ -276,13 +283,15 @@ cd .. # get out of $builddir
 echo ""
 echo "Select target arch:"
 echo "s   - sh       (Archos models)"
+echo "i   - mips     (Jz4740 and ATJ-based players)"
 echo "m   - m68k     (iriver h1x0/h3x0, ifp7x0 and iaudio)"
 echo "a   - arm      (ipods, iriver H10, Sansa, etc)"
-echo "i   - mips     (Jz4740 and ATJ-based players)"
 echo "all - all three compilers"
+echo ""
 
 arch=`input`
 
+echo ""
 case $arch in
   [Ss])
     buildone $arch
@@ -297,7 +306,8 @@ case $arch in
     buildone $arch
     ;;
   all)
-    echo "build ALL compilers!"
+    echo "Building all compilers..."
+    echo ""
     buildone s
     cleardir $builddir
 
@@ -313,11 +323,12 @@ case $arch in
     cat $builddir/summary-*
     ;;
   *)
-    echo "unsupported architecture option"
+    echo "An unsupported architecture option: $arch"
     exit
     ;;
 esac
 
-echo "done"
+echo ""
+echo "Done!"
 echo ""
 echo "Make your PATH include $pathadd"
