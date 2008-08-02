@@ -137,36 +137,7 @@ void TTSExesGui::showCfg(QString name)
     m_name = name;
     // try to get config from settings
     QString exepath =settings->ttsPath(m_name);
-    ui.ttsoptions->setText(settings->ttsOptions(m_name));   
-    
-    if(exepath == "")
-    {
-     
-        //try autodetect tts   
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
-        QStringList path = QString(getenv("PATH")).split(":", QString::SkipEmptyParts);
-#elif defined(Q_OS_WIN)
-        QStringList path = QString(getenv("PATH")).split(";", QString::SkipEmptyParts);
-#endif
-        qDebug() << path;
-        for(int i = 0; i < path.size(); i++) 
-        {
-            QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + m_name;
-#if defined(Q_OS_WIN)
-            executable += ".exe";
-            QStringList ex = executable.split("\"", QString::SkipEmptyParts);
-            executable = ex.join("");
-#endif
-            qDebug() << executable;
-            if(QFileInfo(executable).isExecutable())
-            {
-                exepath= QDir::toNativeSeparators(executable);
-                break;
-            }
-        }
-     
-    }
-    
+    ui.ttsoptions->setText(settings->ttsOptions(m_name));       
     ui.ttspath->setText(exepath);
     
      //show dialog

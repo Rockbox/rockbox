@@ -97,6 +97,43 @@ TTSExes::TTSExes(QString name) : TTSBase()
        
 }
 
+void TTSExes::setCfg(RbSettings* sett)
+{
+    // call function of base class
+    TTSBase::setCfg(sett);
+    
+    // if the config isnt OK, try to autodetect
+    if(!configOk())
+    {
+        QString exepath;
+        //try autodetect tts   
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+        QStringList path = QString(getenv("PATH")).split(":", QString::SkipEmptyParts);
+#elif defined(Q_OS_WIN)
+        QStringList path = QString(getenv("PATH")).split(";", QString::SkipEmptyParts);
+#endif
+        qDebug() << path;
+        for(int i = 0; i < path.size(); i++) 
+        {
+            QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + m_name;
+#if defined(Q_OS_WIN)
+            executable += ".exe";
+            QStringList ex = executable.split("\"", QString::SkipEmptyParts);
+            executable = ex.join("");
+#endif
+            qDebug() << executable;
+            if(QFileInfo(executable).isExecutable())
+            {
+                exepath= QDir::toNativeSeparators(executable);
+                break;
+            }
+        }
+        settings->setTTSPath(m_name,exepath);
+        settings->sync();
+    }
+    
+}
+
 bool TTSExes::start(QString *errStr)
 {
     m_TTSexec = settings->ttsPath(m_name);

@@ -46,7 +46,7 @@ class TTSBase : public QObject
         virtual void showCfg(){}
         virtual bool configOk() { return false; }
 
-        void setCfg(RbSettings* sett) { settings = sett; }
+        virtual void setCfg(RbSettings* sett) { settings = sett; }
         
         static TTSBase* getTTS(QString ttsname);
         static QStringList getTTSList();
@@ -105,6 +105,8 @@ class TTSExes : public TTSBase
         virtual void showCfg();
         virtual bool configOk();
 
+        virtual void setCfg(RbSettings* sett);
+        
     private:
         QString m_name;
         QString m_TTSexec;
