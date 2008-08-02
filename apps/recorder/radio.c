@@ -1112,7 +1112,7 @@ void radio_load_presets(char *filename)
         snprintf(filepreset, sizeof(filepreset), "%s/%s.fmr",
             FMPRESET_PATH, filename);
     
-    fd = open(filepreset, O_RDONLY);
+    fd = open_utf8(filepreset, O_RDONLY);
     if(fd >= 0)
     {
         while(!done && num_presets < MAX_PRESETS)

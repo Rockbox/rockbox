@@ -200,9 +200,6 @@ static long playlist_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char playlist_thread_name[] = "playlist cachectrl";
 #endif
 
-#define BOM "\xef\xbb\xbf"
-#define BOM_SIZE 3
-
 /* Check if the filename suggests M3U or M3U8 format. */
 static bool is_m3u8(const char* filename)
 {
@@ -212,11 +209,6 @@ static bool is_m3u8(const char* filename)
     return !(len > 4 && strcasecmp(&filename[len - 4], ".m3u") == 0);
 }
 
-/* Check if a strings starts with an UTF-8 byte-order mark. */
-static bool is_utf8_bom(const char* str, int len)
-{
-    return len >= BOM_SIZE && memcmp(str, BOM, BOM_SIZE) == 0;
-}
 
 /* Convert a filename in an M3U playlist to UTF-8. 
  *
@@ -538,9 +530,11 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     int result = 0;
 
     if(-1 == playlist->fd)
-        playlist->fd = open(playlist->filename, O_RDONLY);
+        playlist->fd = open_utf8(playlist->filename, O_RDONLY);
     if(playlist->fd < 0)
         return -1; /* failure */
+    if(lseek(playlist->fd, 0, SEEK_CUR) > 0)
+        playlist->utf8 = true; /* Override any earlier indication. */
     
     gui_syncsplash(0, ID2P(LANG_WAIT));
 
@@ -567,14 +561,6 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
             break;
         
         p = (unsigned char *)buffer;
-
-        /* utf8 BOM at beginning of file? */
-        if(i == 0 && is_utf8_bom(p, nread)) {
-            nread -= BOM_SIZE;
-            p += BOM_SIZE;
-            i += BOM_SIZE;
-            playlist->utf8 = true;  /* Override any earlier indication. */
-        }
 
         for(count=0; count < nread; count++,p++) {
 
@@ -2972,7 +2958,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
         return -1;
     }
 
-    fd = open(filename, O_RDONLY);
+    fd = open_utf8(filename, O_RDONLY);
     if (fd < 0)
     {
         gui_syncsplash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
@@ -3010,12 +2996,6 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
         if (action_userabort(TIMEOUT_NOBLOCK))
             break;
     
-        if (count == 0 && is_utf8_bom(temp_buf, max))
-        {
-            max -= BOM_SIZE;
-            memmove(temp_buf, temp_buf + BOM_SIZE, max);
-        }
-
         if (temp_buf[0] != '#' && temp_buf[0] != '\0')
         {
             int insert_pos;
@@ -3413,7 +3393,15 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         overwrite_current = true;
     }
 
-    fd = open(path, O_CREAT|O_WRONLY|O_TRUNC);
+    if (is_m3u8(path))
+    {
+        fd = open_utf8(path, O_CREAT|O_WRONLY|O_TRUNC);
+    }
+    else
+    {
+        /* some applications require a BOM to read the file properly */
+        fd = open(path, O_CREAT|O_WRONLY|O_TRUNC);
+    }
     if (fd < 0)
     {
         gui_syncsplash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
@@ -3423,12 +3411,6 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT), false);
 
     cpu_boost(true);
-    
-    if (is_m3u8(path))
-    {
-        /* some applications require a BOM to read the file properly */
-        write(fd, BOM, BOM_SIZE);
-    }
 
     index = playlist->first_index;
     for (i=0; i<playlist->amount; i++)
@@ -3496,7 +3478,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         {
             if (rename(path, playlist->filename) >= 0)
             {
-                playlist->fd = open(playlist->filename, O_RDONLY);
+                playlist->fd = open_utf8(playlist->filename, O_RDONLY);
                 if (playlist->fd >= 0)
                 {
                     index = playlist->first_index;

@@ -265,7 +265,7 @@ bool settings_load_config(const char* file, bool apply)
     char* name;
     char* value;
     int i;
-    fd = open(file, O_RDONLY);
+    fd = open_utf8(file, O_RDONLY);
     if (fd < 0)
         return false;
 

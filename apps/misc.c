@@ -1154,7 +1154,7 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename)
 {
     char *dot = strrchr(filename, '.');
     int len;
-    
+
     if (buffer_size <= 0)
     {
         return NULL;
@@ -1179,6 +1179,35 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename)
     return buffer;
 }
 #endif /* !defined(__PCTOOL__) */
+
+/** Open a UTF-8 file and set file descriptor to first byte after BOM.
+ *  If no BOM is present this behaves like open().
+ *  If the file is opened for writing and O_TRUNC is set, write a BOM to
+ *  the opened file and leave the file pointer set after the BOM.
+ */
+int open_utf8(const char* pathname, int flags)
+{
+    int fd;
+    unsigned char bom[BOM_SIZE];
+
+    fd = open(pathname, flags);
+    if(fd < 0)
+        return fd;
+
+    if(flags & (O_TRUNC | O_WRONLY))
+    {
+        write(fd, BOM, BOM_SIZE);
+    }
+    else
+    {
+        read(fd, bom, BOM_SIZE);
+        /* check for BOM */
+        if(memcmp(bom, BOM, BOM_SIZE))
+	    lseek(fd, 0, SEEK_SET);
+    }
+    return fd;
+}
+
 
 #ifdef HAVE_LCD_COLOR
 /*

@@ -23,6 +23,10 @@
 
 #include <stdbool.h>
 #include <inttypes.h>
+
+#define BOM "\xef\xbb\xbf"
+#define BOM_SIZE 3
+
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
  * units) if possible, and 3 significant digits are shown. If a buffer is
@@ -105,6 +109,8 @@ extern int show_logo(void);
  */
 int get_replaygain_mode(bool have_track_gain, bool have_album_gain);
 #endif
+
+int open_utf8(const char* pathname, int flags);
 
 #ifdef BOOTFILE
 #if !defined(USB_NONE) && !defined(USB_IPODSTYLE)

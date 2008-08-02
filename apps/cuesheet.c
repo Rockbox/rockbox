@@ -147,7 +147,7 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
     char *s;
 
     DEBUGF("cue parse\n");
-    int fd = open(file,O_RDONLY);
+    int fd = open_utf8(file,O_RDONLY);
     if (fd < 0)
     {
         /* couln't open the file */

@@ -141,7 +141,7 @@ int load_kbd(unsigned char* filename)
         return 0;
     }
 
-    fd = open(filename, O_RDONLY|O_BINARY);
+    fd = open_utf8(filename, O_RDONLY|O_BINARY);
     if (fd < 0)
         return 1;
 

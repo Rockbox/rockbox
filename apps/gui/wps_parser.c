@@ -1527,19 +1527,6 @@ static bool load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
 
 #endif /* HAVE_LCD_BITMAP */
 
-/* Skip leading UTF-8 BOM, if present. */
-static char *skip_utf8_bom(char *buf)
-{
-    unsigned char *s = (unsigned char *)buf;
-
-    if(s[0] == 0xef && s[1] == 0xbb && s[2] == 0xbf)
-    {
-        buf += 3;
-    }
-
-    return buf;
-}
-
 /* to setup up the wps-data from a format-buffer (isfile = false)
    from a (wps-)file (isfile = true)*/
 bool wps_data_load(struct wps_data *wps_data,
@@ -1604,7 +1591,7 @@ bool wps_data_load(struct wps_data *wps_data,
 #endif
 #endif /* __PCTOOL__ */
 
-        int fd = open(buf, O_RDONLY);
+        int fd = open_utf8(buf, O_RDONLY);
 
         if (fd < 0)
             return false;
@@ -1638,9 +1625,6 @@ bool wps_data_load(struct wps_data *wps_data,
         /* Set all filename pointers to NULL */
         memset(bmp_names, 0, sizeof(bmp_names));
 #endif
-
-        /* Skip leading UTF-8 BOM, if present. */
-        wps_buffer = skip_utf8_bom(wps_buffer);
 
         /* parse the WPS source */
         if (!wps_parse(wps_data, wps_buffer)) {
