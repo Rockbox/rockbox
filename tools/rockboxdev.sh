@@ -283,10 +283,10 @@ cd .. # get out of $builddir
 echo ""
 echo "Select target arch:"
 echo "s   - sh       (Archos models)"
-echo "i   - mips     (Jz4740 and ATJ-based players)"
 echo "m   - m68k     (iriver h1x0/h3x0, ifp7x0 and iaudio)"
 echo "a   - arm      (ipods, iriver H10, Sansa, etc)"
-echo "all - all three compilers"
+echo "all - all three compilers above"
+echo "i   - mips     (Jz4740 and ATJ-based players)"
 echo ""
 
 arch=`input`
