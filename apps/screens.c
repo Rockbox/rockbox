@@ -844,16 +844,17 @@ bool browse_id3(void)
 static char* runtime_get_data(int selected_item, void* data,
                               char* buffer, size_t buffer_len)
 {
-    (void)data;
-    unsigned char *headers[] = {str(LANG_RUNNING_TIME), str(LANG_TOP_TIME) };
+    (void)data;    
     int t;
-    if(!(selected_item%2))
-        return headers[selected_item/2];
-
-    if(selected_item/2)
-        t = global_status.topruntime;
-
-    else t = global_status.runtime;
+    switch (selected_item)
+    {
+        case 0: return str(LANG_RUNNING_TIME);
+        case 1: t = global_status.runtime;      break;
+        case 2: return str(LANG_TOP_TIME);
+        case 3: t = global_status.topruntime;   break;
+        default:
+            return "";
+    }
 
     snprintf(buffer, buffer_len, "%dh %dm %ds",
         t / 3600, (t % 3600) / 60, t % 60);
@@ -863,10 +864,9 @@ static char* runtime_get_data(int selected_item, void* data,
 static int runtime_speak_data(int selected_item, void* data)
 {
     (void) data;
-    long title_ids[] = {LANG_RUNNING_TIME, LANG_TOP_TIME};
     talk_ids(false,
-             title_ids[selected_item/2],
-             TALK_ID((selected_item == 0) ? global_status.runtime
+             (selected_item < 2) ? LANG_RUNNING_TIME : LANG_TOP_TIME,
+             TALK_ID((selected_item < 2) ? global_status.runtime
                      : global_status.topruntime, UNIT_TIME));
     return 0;
 }
