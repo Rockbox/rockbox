@@ -326,7 +326,7 @@
     soft_shutdown: "Luk ned"
   </dest>
   <voice>
-    *: ""
+    *: none
     soft_shutdown: "Luk ned"
   </voice>
 </phrase>
@@ -3894,7 +3894,7 @@
     gigabeats: "BACK = Revert"
   </source>
   <dest>
-    *: "SLUK: Fortryd"
+    *: none
     rtc: "SLUK = Fortryd"
     h100,h120,h300: "STOP = Fortryd"
     ipod*,e200,c200,sa9200: "MENU = Fortryd"
@@ -6008,7 +6008,7 @@
     remote: ""
   </source>
   <dest>
-    *: ""
+    *: none
     remote: ""
   </dest>
   <voice>
@@ -6364,7 +6364,7 @@
     radio_screen_button_bar: "Handling"
   </dest>
   <voice>
-    *: ""
+    *: none
     radio_screen_button_bar: ""
   </voice>
 </phrase>
@@ -6513,7 +6513,7 @@
     radio: "Scan"
   </source>
   <dest>
-    *: ""
+    *: none
     radio: "Skan"
   </dest>
   <voice>
