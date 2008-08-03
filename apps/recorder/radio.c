@@ -98,8 +98,8 @@
 #define FM_RECORD_DBLPRE
 #define FM_RECORD
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || (CONFIG_KEYPAD == SANSA_C200_PAD)
-#define FM_MENU     
-#define FM_PRESET    
+#define FM_MENU
+#define FM_PRESET
 #define FM_STOP
 #define FM_MODE
 #define FM_EXIT
@@ -115,7 +115,7 @@ static int radio_mode = RADIO_SCAN_MODE;
 static int search_dir = 0;
 
 static int radio_status = FMRADIO_OFF;
-static bool in_screen = false; 
+static bool in_screen = false;
 
 #define MAX_PRESETS 64
 static bool presets_loaded = false, presets_changed = false;
@@ -159,13 +159,13 @@ int get_radio_status(void)
     return radio_status;
 }
 
-bool in_radio_screen(void)   
-{   
-    return in_screen;   
-} 
+bool in_radio_screen(void)
+{
+    return in_screen;
+}
 
-/* TODO: Move some more of the control functionality to an HAL and clean up the
-   mess */
+/* TODO: Move some more of the control functionality to firmware
+         and clean up the mess */
 
 /* secret flag for starting paused - prevents unmute */
 #define FMRADIO_START_PAUSED 0x8000
@@ -186,8 +186,7 @@ void radio_start(void)
     if(radio_status == FMRADIO_OFF)
         tuner_power(true);
 
-    curr_freq = global_status.last_frequency 
-        * fmr->freq_step + fmr->freq_min;
+    curr_freq = global_status.last_frequency * fmr->freq_step + fmr->freq_min;
 
     tuner_set(RADIO_SLEEP, 0); /* wake up the tuner */
 
@@ -233,7 +232,7 @@ void radio_pause(void)
 
     if(radio_status == FMRADIO_OFF)
     {
-        radio_status |= FMRADIO_START_PAUSED;    
+        radio_status |= FMRADIO_START_PAUSED;
         radio_start();
     }
 
@@ -335,7 +334,7 @@ static void next_preset(int direction)
 {
     if (num_presets < 1)
         return;
-            
+
     if (curr_preset == -1)
         curr_preset = find_closest_preset(curr_freq, direction);
     else
@@ -479,20 +478,20 @@ int radio_screen(void)
         screens[i].clear_viewport();
         screens[i].update_viewport();
     }
-    
+
     fh = font_get(FONT_UI)->height;
-    
+
     /* Adjust for font size, trying to center the information vertically */
     if(fh < 10)
         top_of_screen = 1;
-    
+
     if(num_presets <= 0)
     {
         memset(presets, 0, sizeof(presets));
         radio_load_presets(global_settings.fmr_file);
     }
-                                       
-    if(radio_status == FMRADIO_OFF)    
+
+    if(radio_status == FMRADIO_OFF)
         audio_stop();
 #ifndef SIMULATOR
 
@@ -530,7 +529,7 @@ int radio_screen(void)
 
    if(num_presets < 1 && yesno_pop(ID2P(LANG_FM_FIRST_AUTOSCAN)))
         scan_presets(vp);
-    
+
     curr_preset = find_preset(curr_freq);
     if(curr_preset != -1)
          radio_mode = RADIO_PRESET_MODE;
@@ -624,7 +623,7 @@ int radio_screen(void)
                 {
                     rec_lastclick = current_tick;
                     break;
-                }    
+                }
 #endif /* FM_RECORD_DBLPRE */
 #ifndef SIMULATOR
                 if(audio_status() == AUDIO_STATUS_RECORD)
@@ -659,12 +658,12 @@ int radio_screen(void)
                             save_preset_list();
                         else
                             radio_save_presets();
-                    }                    
+                    }
                 }
-                
+
                 /* Clear the preset list on exit. */
                 clear_preset_list();
-                
+
                 break;
 
             case ACTION_STD_PREV:
@@ -738,7 +737,7 @@ int radio_screen(void)
 #endif
                 update_screen = true;
                 break;
-      
+
 #ifdef FM_PRESET
             case ACTION_FM_PRESET:
                 if(num_presets < 1)
@@ -772,7 +771,7 @@ int radio_screen(void)
                 update_screen = true;
                 break;
 #endif /* FM_PRESET */
-                
+
 #ifdef FM_FREEZE
             case ACTION_FM_FREEZE:
                 if(!screen_freeze)
@@ -835,7 +834,7 @@ int radio_screen(void)
                 talk = true;
                 break;
 #endif
-                
+
             default:
                 default_event_handler(button);
                 break;
@@ -851,7 +850,7 @@ int radio_screen(void)
 #endif
 
         if(!screen_freeze)
-        {           
+        {
             /* Only display the peak meter when not recording */
 #if CONFIG_CODEC != SWCODEC
             if(!audio_status())
@@ -860,8 +859,10 @@ int radio_screen(void)
                 {
                     screens[i].set_viewport(&vp[i]);
                     peak_meter_screen(&screens[i],0,
-                                          STATUSBAR_HEIGHT + fh*(top_of_screen + 4), fh);
-                    screens[i].update_rect(0, STATUSBAR_HEIGHT + fh*(top_of_screen + 4),
+                                      STATUSBAR_HEIGHT + fh*(top_of_screen + 4),
+                                      fh);
+                    screens[i].update_rect(0,
+                                      STATUSBAR_HEIGHT + fh*(top_of_screen + 4),
                                            screens[i].getwidth(), fh);
                     screens[i].set_viewport(NULL);
                 }
@@ -903,18 +904,19 @@ int radio_screen(void)
                 {
                     screens[i].set_viewport(&vp[i]);
                 }
-                
+
                 snprintf(buf, 128, curr_preset >= 0 ? "%d. %s" : " ",
                          curr_preset + 1, presets[curr_preset].name);
 
                 FOR_NB_SCREENS(i)
                     screens[i].puts_scroll(0, top_of_screen, buf);
-                
+
                 freq = curr_freq / 10000;
-                snprintf(buf, 128, str(LANG_FM_STATION), freq / 100, freq % 100);
+                snprintf(buf, 128, str(LANG_FM_STATION),
+                         freq / 100, freq % 100);
                 FOR_NB_SCREENS(i)
                     screens[i].puts_scroll(0, top_of_screen + 1, buf);
-                
+
                 snprintf(buf, 128, stereo?str(LANG_CHANNEL_STEREO):
                                           str(LANG_CHANNEL_MONO));
                 FOR_NB_SCREENS(i)
@@ -954,7 +956,7 @@ int radio_screen(void)
                     screens[i].update_viewport();
                     screens[i].set_viewport(NULL);
                 }
-                    
+
 #ifdef HAVE_BUTTONBAR
                 gui_buttonbar_draw(&buttonbar);
 #endif
@@ -1016,7 +1018,7 @@ int radio_screen(void)
                 break;
         }
     }
-    
+
     audio_init_playback();
 #endif /* CONFIG_CODEC != SWCODEC */
 
@@ -1065,7 +1067,7 @@ static void radio_save_presets(void)
 {
     int fd;
     int i;
-          
+
     fd = creat(filepreset);
     if(fd >= 0)
     {
@@ -1074,7 +1076,7 @@ static void radio_save_presets(void)
             fdprintf(fd, "%d:%s\n", presets[i].frequency, presets[i].name);
         }
         close(fd);
-        
+
         if(!strncasecmp(FMPRESET_PATH, filepreset, strlen(FMPRESET_PATH)))
             set_file(filepreset, global_settings.fmr_file, MAX_FILENAME);
         presets_changed = false;
@@ -1082,7 +1084,7 @@ static void radio_save_presets(void)
     else
     {
         gui_syncsplash(HZ, ID2P(LANG_FM_PRESET_SAVE_FAILED));
-    }    
+    }
 }
 
 void radio_load_presets(char *filename)
@@ -1098,20 +1100,20 @@ void radio_load_presets(char *filename)
     memset(presets, 0, sizeof(presets));
     num_presets = 0;
 
-/* No Preset in configuration. */
+    /* No Preset in configuration. */
     if(filename[0] == '\0')
     {
         filepreset[0] = '\0';
         return;
     }
-/* Temporary preset, loaded until player shuts down. */
+    /* Temporary preset, loaded until player shuts down. */
     else if(filename[0] == '/') 
         strncpy(filepreset, filename, sizeof(filepreset));
-/* Preset from default directory. */
+    /* Preset from default directory. */
     else
         snprintf(filepreset, sizeof(filepreset), "%s/%s.fmr",
             FMPRESET_PATH, filename);
-    
+
     fd = open_utf8(filepreset, O_RDONLY);
     if(fd >= 0)
     {
@@ -1153,7 +1155,7 @@ static int radio_add_preset(void)
     if(num_presets < MAX_PRESETS)
     {
         memset(buf, 0, MAX_FMPRESET_LEN);
-        
+
         if (!kbd_input(buf, MAX_FMPRESET_LEN))
         {
             struct fmstation * const fms = &presets[num_presets];
@@ -1218,7 +1220,7 @@ static int radio_delete_preset(void)
         radio_mode = RADIO_SCAN_MODE;
         presets_loaded = false;
     }
-        
+
     return 1;
 }
 
@@ -1228,7 +1230,7 @@ static int load_preset_list(void)
 }
 
 static int save_preset_list(void)
-{   
+{
     if(num_presets > 0)
     { 
         bool bad_file_name = true;
@@ -1255,7 +1257,7 @@ static int save_preset_list(void)
                 if((!p1) || (len > MAX_FILENAME) || (len == 0))
                 {
                     /* no slash, too long or too short */
-                    gui_syncsplash(HZ, ID2P(LANG_INVALID_FILENAME));                    
+                    gui_syncsplash(HZ, ID2P(LANG_INVALID_FILENAME));
                 }
                 else
                 {
@@ -1276,7 +1278,7 @@ static int save_preset_list(void)
     }
     else
         gui_syncsplash(HZ, ID2P(LANG_FM_NO_PRESETS));
-        
+
     return true;
 }
 
@@ -1284,14 +1286,14 @@ static int clear_preset_list(void)
 {
     /* Clear all the preset entries */
     memset(presets, 0, sizeof (presets));
-    
+
     num_presets = 0;
     presets_loaded = false;
     /* The preset list will be cleared switch to Scan Mode. */
     radio_mode = RADIO_SCAN_MODE;
-         
+
     presets_changed = false; /* Don't ask to save when clearing the list. */
-    
+
     return true;
 }
 
@@ -1443,12 +1445,12 @@ static int scan_presets(void *viewports)
     bool do_scan = true;
     int i;
     struct viewport *vp = (struct viewport *)viewports;
-    
+
     FOR_NB_SCREENS(i)
         screens[i].set_viewport(vp?&vp[i]:NULL);
     if(num_presets > 0) /* Do that to avoid 2 questions. */
         do_scan = yesno_pop(ID2P(LANG_FM_CLEAR_PRESETS));
-        
+
     if(do_scan)
     {
         const struct fm_region_data * const fmr =
@@ -1464,7 +1466,7 @@ static int scan_presets(void *viewports)
         while(curr_freq <= fmr->freq_max)
         {
             int freq, frac;
-            if (num_presets >= MAX_PRESETS || action_userabort(TIMEOUT_NOBLOCK))
+            if(num_presets >= MAX_PRESETS || action_userabort(TIMEOUT_NOBLOCK))
                 break;
 
             freq = curr_freq / 10000;
@@ -1489,7 +1491,7 @@ static int scan_presets(void *viewports)
             tuner_set(RADIO_MUTE, 0);
 
         presets_changed = true;
-        
+
         FOR_NB_SCREENS(i)
         {
             screens[i].clear_viewport();
@@ -1559,35 +1561,35 @@ static int fm_recording_settings(void)
 #endif /* HAVE_RECORDING */
 
 #ifdef FM_RECORDING_SCREEN
-MENUITEM_FUNCTION(recscreen_item, 0, ID2P(LANG_RECORDING), 
+MENUITEM_FUNCTION(recscreen_item, 0, ID2P(LANG_RECORDING),
                     fm_recording_screen, NULL, NULL, Icon_Recording);
 #endif
 #ifdef FM_RECORDING_SETTINGS
-MENUITEM_FUNCTION(recsettings_item, 0, ID2P(LANG_RECORDING_SETTINGS), 
+MENUITEM_FUNCTION(recsettings_item, 0, ID2P(LANG_RECORDING_SETTINGS),
                     fm_recording_settings, NULL, NULL, Icon_Recording);
 #endif
 #ifndef FM_PRESET
-MENUITEM_FUNCTION(radio_presets_item, 0, ID2P(LANG_PRESET), 
+MENUITEM_FUNCTION(radio_presets_item, 0, ID2P(LANG_PRESET),
                     handle_radio_presets, NULL, NULL, Icon_NOICON);
 #endif
 #ifndef FM_PRESET_ADD
-MENUITEM_FUNCTION(radio_addpreset_item, 0, ID2P(LANG_FM_ADD_PRESET), 
+MENUITEM_FUNCTION(radio_addpreset_item, 0, ID2P(LANG_FM_ADD_PRESET),
                     radio_add_preset, NULL, NULL, Icon_NOICON);
 #endif
 
 
-MENUITEM_FUNCTION(presetload_item, 0, ID2P(LANG_FM_PRESET_LOAD), 
+MENUITEM_FUNCTION(presetload_item, 0, ID2P(LANG_FM_PRESET_LOAD),
                     load_preset_list, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(presetsave_item, 0, ID2P(LANG_FM_PRESET_SAVE), 
+MENUITEM_FUNCTION(presetsave_item, 0, ID2P(LANG_FM_PRESET_SAVE),
                     save_preset_list, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(presetclear_item, 0, ID2P(LANG_FM_PRESET_CLEAR), 
+MENUITEM_FUNCTION(presetclear_item, 0, ID2P(LANG_FM_PRESET_CLEAR),
                     clear_preset_list, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(scan_presets_item, MENU_FUNC_USEPARAM,
                     ID2P(LANG_FM_SCAN_PRESETS),
                     scan_presets, NULL, NULL, Icon_NOICON);
 
-MAKE_MENU(radio_settings_menu, ID2P(LANG_FM_MENU), NULL, 
-            Icon_Radio_screen, 
+MAKE_MENU(radio_settings_menu, ID2P(LANG_FM_MENU), NULL,
+            Icon_Radio_screen,
 #ifndef FM_PRESET
             &radio_presets_item,
 #endif
@@ -1610,7 +1612,8 @@ MAKE_MENU(radio_settings_menu, ID2P(LANG_FM_MENU), NULL,
 /* main menu of the radio screen */
 static bool radio_menu(void)
 {
-    return do_menu(&radio_settings_menu, NULL, NULL, false) == MENU_ATTACHED_USB;
+    return do_menu(&radio_settings_menu, NULL, NULL, false) ==
+                                                              MENU_ATTACHED_USB;
 }
 
 #endif
