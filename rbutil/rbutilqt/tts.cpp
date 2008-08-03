@@ -91,9 +91,9 @@ TTSExes::TTSExes(QString name) : TTSBase()
 {
     m_name = name;
     
-    m_TemplateMap["espeak"] = "\"%exe\" \"%options\" -w \"%wavfile\" \"%text\"";
-    m_TemplateMap["flite"] = "\"%exe\" \"%options\" -o \"%wavfile\" \"%text\"";
-    m_TemplateMap["swift"] = "\"%exe\" \"%options\" -o \"%wavfile\" \"%text\"";
+    m_TemplateMap["espeak"] = "\"%exe\" %options -w \"%wavfile\" \"%text\"";
+    m_TemplateMap["flite"] = "\"%exe\" %options -o \"%wavfile\" \"%text\"";
+    m_TemplateMap["swift"] = "\"%exe\" %options -o \"%wavfile\" \"%text\"";
        
 }
 
