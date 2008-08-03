@@ -9295,12 +9295,12 @@
   desc: the buffer size, %d MB %d fraction of MB
   user: 
   <source>
-    *: "Buffer: %d.%03dMB"
-    player: "Buf: %d.%03dMB"
+    *: "Buffer:"
+    player: "Buf:"
   </source>
   <dest>
-    *: "缓冲: %d.%03dMB"
-    player: "Buf: %d.%03dMB"
+    *: "缓冲:"
+    player: "Buf:"
   </dest>
   <voice>
     *: "缓冲大小"

@@ -8829,16 +8829,16 @@
   desc: the buffer size, %d MB %d fraction of MB
   user:
   <source>
-    *: "Buffer: %d.%03dMB"
-    player: "Buf: %d.%03dMB"
+    *: "Buffer:"
+    player: "Buf:"
   </source>
   <dest>
-    *: "Буфер: %d.%03dМб"
-    player: "Буф: %d.%03dМб"
+    *: "Буфер:"
+    player: "Буф:"
   </dest>
   <voice>
-    *: "Буфер: %d.%03dМб"
-    player: "Буф: %d.%03dМб"
+    *: "Буфер:"
+    player: "Буф:"
   </voice>
 </phrase>
 <phrase>

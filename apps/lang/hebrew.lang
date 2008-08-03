@@ -10506,12 +10506,12 @@
   desc: the buffer size, %d MB %d fraction of MB
   user:
   <source>
-    *: "Buffer: %d.%03dMB"
-    player: "Buf: %d.%03dMB"
+    *: "Buffer:"
+    player: "Buf:"
   </source>
   <dest>
-    *: "חוצץ: %d.%03dMB"
-    player: "חצץ: %d.%03dMB"
+    *: "חוצץ:"
+    player: "חצץ:"
   </dest>
   <voice>
     *: ""

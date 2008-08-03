@@ -6819,12 +6819,12 @@
   desc: the buffer size, %d MB %d fraction of MB
   user:
   <source>
-    *: "Buffer: %d.%03dMB"
-    player: "Buf: %d.%03dMB"
+    *: "Buffer:"
+    player: "Buf:"
   </source>
   <dest>
-    *: "Μνήμη: %d.%03dMB"
-    player: "Μνη: %d.%03dMB"
+    *: "Μνήμη:"
+    player: "Μνη:"
   </dest>
   <voice>
     *: "Μέγεθος μνήμης"

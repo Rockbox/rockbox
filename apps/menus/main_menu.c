@@ -220,11 +220,9 @@ static char* info_getname(int selected_item, void *data,
 #endif
         case INFO_BUFFER: /* buffer */
         {
-            long buflen = ((audiobufend - audiobuf) * 2) / 2097;  /* avoid overflow */
-            int integer = buflen / 1000;
-            int decimal = buflen % 1000;
-            snprintf(buffer, buffer_len, (char *)str(LANG_BUFFER_STAT),
-                     integer, decimal);
+            long kib = (audiobufend - audiobuf) / 1024; /* to KiB */
+            output_dyn_value(s1, sizeof(s1), kib, kbyte_units, true);
+            snprintf(buffer, buffer_len, "%s %s", str(LANG_BUFFER_STAT), s1);
         }
         break;
         case INFO_BATTERY: /* battery */
@@ -332,8 +330,8 @@ static int info_speak_item(int selected_item, void * data)
         case INFO_BUFFER: /* buffer */
         {
             talk_id(LANG_BUFFER_STAT, false);
-            long buflen = ((audiobufend - audiobuf) * 2) / 2097;  /* avoid overflow */
-            output_dyn_value(NULL, 0, buflen, kbyte_units, true);
+            long kib = (audiobufend - audiobuf) / 1024; /* to KiB */
+            output_dyn_value(NULL, 0, kib, kbyte_units, true);
             break;
         }
         case INFO_BATTERY: /* battery */
