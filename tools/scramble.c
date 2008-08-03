@@ -145,6 +145,7 @@ int main (int argc, char** argv)
     char modelname[5];
     int model_id;
     enum { none, scramble, xor, tcc_sum, tcc_crc, add } method = scramble;
+    bool creative_enable_ciff;
 
     model_id = ARCHOS_PLAYER;
     
@@ -341,20 +342,32 @@ int main (int argc, char** argv)
         oname = argv[3];
         return ipod_encode(iname, oname, 3, true);  /* Firmware image v3 */
     }
-    else if(!strncmp(argv[1], "-creative=", 10)) {
-        iname = argv[2];
-        oname = argv[3];
+    else if(!strncmp(argv[1], "-creative=", 10))
+    {
+        if(!strcmp(argv[2], "-no-ciff"))
+        {
+            creative_enable_ciff = false;
+            iname = argv[3];
+            oname = argv[4];
+        }
+        else
+        {
+            creative_enable_ciff = true;
+            iname = argv[2];
+            oname = argv[3];
+        }
         if(!strcmp(&argv[1][10], "zvm"))
-            return zvm_encode(iname, oname, ZENVISIONM);
+            return zvm_encode(iname, oname, ZENVISIONM, creative_enable_ciff);
         else if(!strcmp(&argv[1][10], "zvm60"))
-            return zvm_encode(iname, oname, ZENVISIONM60);
+            return zvm_encode(iname, oname, ZENVISIONM60, creative_enable_ciff);
         else if(!strcmp(&argv[1][10], "zenvision"))
-            return zvm_encode(iname, oname, ZENVISION);
+            return zvm_encode(iname, oname, ZENVISION, creative_enable_ciff);
         else if(!strcmp(&argv[1][10], "zenv"))
-            return zvm_encode(iname, oname, ZENV);
+            return zvm_encode(iname, oname, ZENV, creative_enable_ciff);
         else if(!strcmp(&argv[1][10], "zen"))
-            return zvm_encode(iname, oname, ZEN);
-        else {
+            return zvm_encode(iname, oname, ZEN, creative_enable_ciff);
+        else
+        {
             fprintf(stderr, "unsupported Creative device: %s\n", &argv[1][10]);
             return 2;
         }

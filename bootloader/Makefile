@@ -98,7 +98,7 @@ $(OBJDIR)/bootloader.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX) $(BITMAP
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Wl,--gc-sections -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -L$(BUILDDIR)/firmware -lrockbox $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/bootloader.map
 
 $(OBJDIR)/bootloader.bin : $(OBJDIR)/bootloader.elf
-	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
+	$(call PRINTS,OBJCOPY $(@F))$(OC) $(if $(filter yes, $(USE_ELF)), -S -x, -O binary) $< $@
 
 $(OBJDIR)/bootloader.asm: $(OBJDIR)/bootloader.bin
 	$(TOOLSDIR)/sh2d -sh1 $< > $@

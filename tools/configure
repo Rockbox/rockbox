@@ -1489,7 +1489,7 @@ fi
     plugins=""
     swcodec="yes"
     toolset=$ipodbitmaptools
-    boottool="$rootdir/tools/scramble -creative=zvm"
+    boottool="$rootdir/tools/scramble -creative=zvm -no-ciff"
     bootoutput="rockbox.zvmboot"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
@@ -1507,7 +1507,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
-    tool="$rootdir/tools/scramble -creative=zvm60"
+    tool="$rootdir/tools/scramble -creative=zvm60 -no-ciff"
     USE_ELF="yes"
     output="rockbox.zvm60"
     appextra="recorder:gui"
@@ -1532,7 +1532,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
-    tool="$rootdir/tools/scramble -creative=zenvision"
+    tool="$rootdir/tools/scramble -creative=zenvision -no-ciff"
     USE_ELF="yes"
     output="rockbox.zv"
     appextra="recorder:gui"

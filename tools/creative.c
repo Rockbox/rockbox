@@ -155,7 +155,7 @@ static int make_jrm_file(const unsigned char *inbuf, unsigned char *outbuf)
     return 0xC+length;
 }
 
-int zvm_encode(const char *iname, const char *oname, int device)
+int zvm_encode(const char *iname, const char *oname, int device, bool enable_ciff)
 {
     size_t len;
     int length;
@@ -164,7 +164,8 @@ int zvm_encode(const char *iname, const char *oname, int device)
     unsigned char *buf;
 
     file = fopen(iname, "rb");
-    if (!file) {
+    if (!file)
+    {
         perror(iname);
         return -1;
     }
@@ -174,20 +175,23 @@ int zvm_encode(const char *iname, const char *oname, int device)
     fseek(file, 0, SEEK_SET);
 
     buf = (unsigned char*)malloc(length);
-    if ( !buf ) {
+    if ( !buf )
+    {
         printf("Out of memory!\n");
         return -1;
     }
 
     len = fread(buf, 1, length, file);
-    if(len < (size_t)length) {
+    if(len < (size_t)length)
+    {
         perror(iname);
         return -2;
     }
     fclose(file);
 
     outbuf = (unsigned char*)malloc(length+0x300);
-    if ( !outbuf ) {
+    if ( !outbuf )
+    {
         free(buf);
         printf("Out of memory!\n");
         return -1;
@@ -200,20 +204,33 @@ int zvm_encode(const char *iname, const char *oname, int device)
         printf("Error in making JRM file!\n");
         return -1;
     }
-    buf = (unsigned char*)malloc(length+0x200);
-    memset(buf, 0, length+0x200);
-    length = make_ciff_file(outbuf, length, buf, device);
-    free(outbuf);
+    if(enable_ciff)
+    {
+        buf = (unsigned char*)malloc(length+0x200);
+        if ( !buf )
+        {
+            free(outbuf);
+            printf("Out of memory!\n");
+            return -1;
+        }
+        memset(buf, 0, length+0x200);
+        length = make_ciff_file(outbuf, length, buf, device);
+        free(outbuf);
+    }
+    else
+        buf = outbuf;
 
     file = fopen(oname, "wb");
-    if (!file) {
+    if (!file)
+    {
         free(buf);
         perror(oname);
         return -3;
     }
 
     len = fwrite(buf, 1, length, file);
-    if(len < (size_t)length) {
+    if(len < (size_t)length)
+    {
         free(buf);
         perror(oname);
         return -4;

@@ -38,6 +38,6 @@ struct device_info
     const char* null;
 };
 
-int zvm_encode(const char *iname, const char *oname, int device);
+int zvm_encode(const char *iname, const char *oname, int device, bool enable_ciff);
 
 #endif /*CREATIVE_H_*/
