@@ -34,7 +34,7 @@ Const SPSF_48kHz16BitMono = 38
 
 Dim oShell, oArgs, oEnv
 Dim bVerbose, bSAPI4, bList
-Dim sLanguage, sVoice, sSpeed
+Dim sLanguage, sVoice, sSpeed, sVendor
 
 Dim oSpVoice, oSpFS ' SAPI5 voice and filestream
 Dim oTTS, nMode ' SAPI4 TTS object, mode selector
@@ -109,6 +109,10 @@ If bSAPI4 Then
 
     ' Speed selection
     If sSpeed <> "" Then oTTS.Speed = sSpeed
+    
+    ' Get vendor infomration
+    sVendor = oTTS.MfgName(nMode)
+
 Else ' SAPI5
     ' Create SAPI5 object
     Set oSpVoice = CreateObject("SAPI.SpVoice")
@@ -154,9 +158,16 @@ Else ' SAPI5
     ' Speed selection
     If sSpeed <> "" Then oSpVoice.Rate = sSpeed
 
+    ' Get vendor information, protect from missing attribute
+    sVendor = oSpVoice.Voice.GetAttribute("Vendor")
+    If Err.Number <> 0 Then
+        Err.Clear
+        sVendor = "(unknown)"
+    End If
+
     ' Filestream object for output
     Set oSpFS = CreateObject("SAPI.SpFileStream")
-    oSpFS.Format.Type = AudioFormat(oSpVoice.Voice.GetAttribute("Vendor"))
+    oSpFS.Format.Type = AudioFormat(sVendor)
 End If
 
 Do
@@ -169,11 +180,7 @@ Do
         Case "QUERY"
             Select Case aLine(1)
                 Case "VENDOR"
-                    If bSAPI4 Then
-                        WScript.StdOut.WriteLine oTTS.MfgName(nMode)
-                    Else
-                        WScript.StdOut.WriteLine oSpVoice.Voice.GetAttribute("Vendor")
-                    End If
+                    WScript.StdOut.WriteLine sVendor
             End Select
         Case "SPEAK"
             aData = Split(aLine(1), vbTab, 2)
