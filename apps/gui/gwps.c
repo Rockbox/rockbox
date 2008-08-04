@@ -787,7 +787,7 @@ static void statusbar_toggle_handler(void *data)
         struct wps_viewport *vp = &gui_wps[i].data->viewports[0];
         if (gui_wps[i].data->wps_sb_tag)
             draw = gui_wps[i].data->show_sb_on_wps;
-        if (!global_settings.statusbar && !draw)
+        if (!draw)
         {
             vp->vp.y = 0;
             vp->vp.height = screens[i].lcdheight;
