@@ -181,7 +181,7 @@
     *: "Mislukt"
   </dest>
   <voice>
-    *: ""
+    *: "Mislukt"
   </voice>
 </phrase>
 <phrase>
@@ -797,7 +797,7 @@
     *: "Gewist"
   </dest>
   <voice>
-    *: ""
+    *: "Gewist"
   </voice>
 </phrase>
 <phrase>
@@ -1015,7 +1015,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    swcodec: "Piek filter"
   </voice>
 </phrase>
 <phrase>
@@ -1153,7 +1153,7 @@
     *: "Waarschuwen bij wissen dynamische speellijst"
   </dest>
   <voice>
-    *: ""
+    *: "Waarschuwen bij wissen dynamische speellijst"
   </voice>
 </phrase>
 <phrase>
@@ -1536,10 +1536,10 @@
     *: "Updating in background"
   </source>
   <dest>
-    *: "Vernieuwd op de achtergrond"
+    *: "Vernieuwen op de achtergrond"
   </dest>
   <voice>
-    *: ""
+    *: "Vernieuwen op de achtergrond"
   </voice>
 </phrase>
 <phrase>
@@ -1553,7 +1553,7 @@
     *: "Database aanmaken"
   </dest>
   <voice>
-    *: ""
+    *: "Database aanmaken"
   </voice>
 </phrase>
 <phrase>
@@ -1876,7 +1876,7 @@
     *: "Standaard codepagina"
   </dest>
   <voice>
-    *: ""
+    *: "Standaard codepagina"
   </voice>
 </phrase>
 <phrase>
@@ -4048,7 +4048,7 @@
     *: "Verwijderen?"
   </dest>
   <voice>
-    *: ""
+    *: "Verwijderen?"
   </voice>
 </phrase>
 <phrase>
@@ -4062,7 +4062,7 @@
     *: "Verwijderd"
   </dest>
   <voice>
-    *: ""
+    *: "Verwijderd"
   </voice>
 </phrase>
 <phrase>
@@ -4450,7 +4450,8 @@
   </dest>
   <voice>
     *: none
-    e200,ondio*: "Multimedia kaart"
+    e200,c200: "micro S D"
+    ondio*: "Multimedia kaart"
   </voice>
 </phrase>
 <phrase>
@@ -4529,7 +4530,7 @@
     *: "Maak een bladwijzer?"
   </dest>
   <voice>
-    *: ""
+    *: "Maak een bladwijzer?"
   </voice>
 </phrase>
 <phrase>
@@ -6804,7 +6805,7 @@
     *: "Speellijst Buffer Vol"
   </dest>
   <voice>
-    *: ""
+    *: "Speellijst Buffer Vol"
   </voice>
 </phrase>
 <phrase>
@@ -6874,7 +6875,7 @@
     *: "Ook sub-mappen?"
   </dest>
   <voice>
-    *: ""
+    *: "Ook sub-mappen?"
   </voice>
 </phrase>
 <phrase>
@@ -6888,7 +6889,7 @@
     *: "Dynamische speellijst wissen?"
   </dest>
   <voice>
-    *: ""
+    *: "Dynamische speellijst wissen?"
   </voice>
 </phrase>
 <phrase>
@@ -6916,7 +6917,7 @@
     *: "Fout in bijwerken speellijst stuurbestand"
   </dest>
   <voice>
-    *: ""
+    *: "Fout in bijwerken speellijst stuurbestand"
   </voice>
 </phrase>
 <phrase>
@@ -6930,7 +6931,7 @@
     *: "Fout tijdens benaderen speellijst bestand"
   </dest>
   <voice>
-    *: ""
+    *: "Fout tijdens benaderen speellijst bestand"
   </voice>
 </phrase>
 <phrase>
@@ -6944,7 +6945,7 @@
     *: "Fout tijdens benaderen speellijst stuurbestand"
   </dest>
   <voice>
-    *: ""
+    *: "Fout tijdens benaderen speellijst stuurbestand"
   </voice>
 </phrase>
 <phrase>
@@ -6958,7 +6959,7 @@
     *: "Fout bij toegang map"
   </dest>
   <voice>
-    *: ""
+    *: "Fout bij toegang map"
   </voice>
 </phrase>
 <phrase>
@@ -6972,7 +6973,7 @@
     *: "Speellijst stuurbestand is niet geldig"
   </dest>
   <voice>
-    *: ""
+    *: "Speellijst stuurbestand is niet geldig"
   </voice>
 </phrase>
 <phrase>
@@ -7309,7 +7310,7 @@
     *: "Map Buffer Is Vol!"
   </dest>
   <voice>
-    *: ""
+    *: "Map Buffer Is Vol!"
   </voice>
 </phrase>
 <phrase>
@@ -7323,7 +7324,7 @@
     *: "Nieuwe Taal"
   </dest>
   <voice>
-    *: ""
+    *: "Nieuwe taal"
   </voice>
 </phrase>
 <phrase>
@@ -7337,7 +7338,7 @@
     *: "Instellingen geladen"
   </dest>
   <voice>
-    *: ""
+    *: "Instellingen geladen"
   </voice>
 </phrase>
 <phrase>
@@ -7351,7 +7352,7 @@
     *: "Instellingen opgeslagen"
   </dest>
   <voice>
-    *: ""
+    *: "Instellingen opgeslagen"
   </voice>
 </phrase>
 <phrase>
@@ -7365,7 +7366,7 @@
     *: "Opstart bestand gewijzigd"
   </dest>
   <voice>
-    *: ""
+    *: "Opstart bestand gewijzigd"
   </voice>
 </phrase>
 <phrase>
@@ -7379,7 +7380,7 @@
     *: "Opnieuw starten?"
   </dest>
   <voice>
-    *: ""
+    *: "Opnieuw starten?"
   </voice>
 </phrase>
 <phrase>
@@ -7463,7 +7464,7 @@
     *: "Nieuw Toetsenbord"
   </dest>
   <voice>
-    *: ""
+    *: "Nieuw Toetsenbord"
   </voice>
 </phrase>
 <phrase>
@@ -7631,7 +7632,7 @@
     *: "Extensies lijst vol"
   </dest>
   <voice>
-    *: ""
+    *: "Extensies lijst vol"
   </voice>
 </phrase>
 <phrase>
@@ -7645,7 +7646,7 @@
     *: "Bestandstype lijst vol"
   </dest>
   <voice>
-    *: ""
+    *: "Bestandstype lijst vol"
   </voice>
 </phrase>
 <phrase>
@@ -7659,7 +7660,7 @@
     *: "Plugin naam is te lang"
   </dest>
   <voice>
-    *: ""
+    *: "Plugin naam is te lang"
   </voice>
 </phrase>
 <phrase>
@@ -9285,7 +9286,7 @@
     *: "Start opnieuw om toe te passen"
   </dest>
   <voice>
-    *: ""
+    *: "Start opnieuw om toe te passen"
   </voice>
 </phrase>
 <phrase>
@@ -9503,7 +9504,7 @@
     *: "LET OP! Batterij bijna leeg!"
   </dest>
   <voice>
-    *: ""
+    *: "LET OP! Batterij bijna leeg!"
   </voice>
 </phrase>
 <phrase>
@@ -9517,7 +9518,7 @@
     *: "Batterij leeg! OPLADEN!"
   </dest>
   <voice>
-    *: ""
+    *: "Batterij leeg! OPLADEN!"
   </voice>
 </phrase>
 <phrase>
@@ -9768,7 +9769,7 @@
   </dest>
   <voice>
     *: none
-    usb_charging: "Charge During U S B Connection"
+    usb_charging: "Opladen bij U S B verbinding"
   </voice>
 </phrase>
 <phrase>
@@ -9964,7 +9965,7 @@
     h10,h10_5gb,e200,c200,sa9200: "Aanmaken van database... %d gevonden (PREV = terug)"
   </dest>
   <voice>
-    *: ""
+    *: "Aanmaken van database"
   </voice>
 </phrase>
 <phrase>
@@ -10355,7 +10356,7 @@
     *: "Schijf wordt doorzocht..."
   </dest>
   <voice>
-    *: ""
+    *: "Schijf wordt doorzocht..."
   </voice>
 </phrase>
 <phrase>
@@ -10478,7 +10479,7 @@
     player: "Buf:"
   </dest>
   <voice>
-    *: ""
+    *: "Buffergrootte"
   </voice>
 </phrase>
 <phrase>
@@ -10612,7 +10613,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Voorkeuze"
   </voice>
 </phrase>
 <phrase>
@@ -10628,7 +10629,7 @@
     player: "Einde lijst"
   </dest>
   <voice>
-    *: ""
+    *: "Einde lijst"
   </voice>
 </phrase>
 <phrase>
@@ -10693,7 +10694,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Zeker voor"
   </voice>
 </phrase>
 <phrase>
