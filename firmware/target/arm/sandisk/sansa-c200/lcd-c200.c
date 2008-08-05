@@ -26,6 +26,7 @@
 
 /* Display status */
 static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
+static bool is_lcd_enabled = true;
 
 /* LCD command set for Samsung S6B33B2 */
 
@@ -188,6 +189,29 @@ void lcd_set_invert_display(bool yesno)
     /* TODO: Implement lcd_set_invert_display() */
     (void)yesno;
 }
+
+void lcd_enable(bool yesno)
+{
+    if (yesno == is_lcd_enabled)
+        return;
+
+    if (yesno)
+    {
+        lcd_send_command(R_STANDBY_OFF);
+        lcd_send_command(R_DISPLAY_ON);
+    }
+    else
+    {
+        lcd_send_command(R_STANDBY_ON);
+    }
+    is_lcd_enabled = yesno;
+}
+
+bool lcd_enabled(void)
+{
+    return is_lcd_enabled;
+}
+
 
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)

@@ -48,7 +48,7 @@
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
 /* define this if you have LCD enable function */
-/* TODO: #define HAVE_LCD_ENABLE */
+#define HAVE_LCD_ENABLE
 
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
    should be defined as well. */
