@@ -45,7 +45,7 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    /* Sansa Li Ion 750mAH FIXME*/
+    /* Sansa c200 has a 530 mAh LiPo battery */
     3300, 3390, 3480, 3570, 3660, 3750, 3840, 3930, 4020, 4110, 4200
 };
 
