@@ -295,7 +295,7 @@ Function AudioFormat(ByRef sVendor)
             AudioFormat = SPSF_16kHz16BitMono
         Case Else
             AudioFormat = SPSF_22kHz16BitMono
-            WScript.StdOut.WriteLine "Warning - unknown vendor """ & sVendor _
+            WScript.StdErr.WriteLine "Warning - unknown vendor """ & sVendor _
                                      & """ - using default wave format"
     End Select
 End Function
