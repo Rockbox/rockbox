@@ -37,7 +37,10 @@ void lcd_init_device(void)
 void lcd_enable(bool state)
 {
     if(state)
+    {
         lcd_on();
+        lcd_call_enable_hook();
+    }
     else
         lcd_off();
     
