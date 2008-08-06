@@ -58,7 +58,6 @@ SECTIONS
         *(.irodata);
         *(.idata);
         *(.data*);
-        *(.scommon*);
         *(.sdata*);
         . = ALIGN(0x4);
         _dataend = . ;
@@ -92,6 +91,7 @@ SECTIONS
          *(.bss*);
          *(.ibss);
          *(COMMON)
+         *(.scommon*);
          _end = .;
     } > DRAM
     

@@ -1128,10 +1128,18 @@ static inline void core_sleep(void)
 	REG_CPM_LCR &= ~CPM_LCR_LPM_MASK;
 	REG_CPM_LCR |= CPM_LCR_LPM_SLEEP;
     */
-	asm volatile(".set   mips3  \n"
-                 "wait          \n"
-                 ".set   mips0  \n"
+    #if 0
+	asm volatile(".set   mips32             \n"
+                 "mfc0   t0, 12             \n"
+                 "move   t1, t0             \n"
+                 "ori    t0, t0, 0x8000000  \n" /* Enable reduced power mode */
+                 "mtc0   t0, 12             \n"
+                 "wait                      \n"
+                 "mtc0   t1, 12             \n"
+                 ".set   mips0              \n"
+                 ::: "t0", "t1"
                  );
+     #endif
 	/*
     REG_CPM_LCR &= ~CPM_LCR_LPM_MASK;
 	REG_CPM_LCR |= CPM_LCR_LPM_IDLE;

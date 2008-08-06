@@ -1662,13 +1662,13 @@
 #define EMC_SMCR_TAS_BIT	8
 #define EMC_SMCR_TAS_MASK	(0x07 << EMC_SMCR_TAS_BIT)
 #define EMC_SMCR_BW_BIT		6
-#define EMC_SMCR_BW_MASK	(0x03 << EMC_SMCR_BW_BIT)
+#define EMC_SMCR_BW_MASK	(0x03 << EMC_SMCR_BW_BIT) /* Bus Width? */
   #define EMC_SMCR_BW_8BIT	(0 << EMC_SMCR_BW_BIT)
   #define EMC_SMCR_BW_16BIT	(1 << EMC_SMCR_BW_BIT)
   #define EMC_SMCR_BW_32BIT	(2 << EMC_SMCR_BW_BIT)
 #define EMC_SMCR_BCM		(1 << 3)
 #define EMC_SMCR_BL_BIT		1
-#define EMC_SMCR_BL_MASK	(0x03 << EMC_SMCR_BL_BIT)
+#define EMC_SMCR_BL_MASK	(0x03 << EMC_SMCR_BL_BIT) /* Bus Latency? */
   #define EMC_SMCR_BL_4		(0 << EMC_SMCR_BL_BIT)
   #define EMC_SMCR_BL_8		(1 << EMC_SMCR_BL_BIT)
   #define EMC_SMCR_BL_16	(2 << EMC_SMCR_BL_BIT)

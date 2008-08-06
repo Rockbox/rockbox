@@ -209,6 +209,28 @@ void __dcache_writeback_all(void)
     SYNC_WB();
 }
 
+void dma_cache_wback_inv(unsigned long addr, unsigned long size)
+{
+	unsigned long end, a;
+
+	if (size >= CACHE_SIZE)
+		__dcache_writeback_all();
+	else
+    {
+		unsigned long dc_lsize = CACHE_LINE_SIZE;
+        
+		a = addr & ~(dc_lsize - 1);
+		end = (addr + size - 1) & ~(dc_lsize - 1);
+		while (1)
+        {
+			__flush_dcache_line(a);	/* Hit_Writeback_Inv_D */
+			if (a == end)
+				break;
+			a += dc_lsize;
+		}
+	}
+}
+
 extern void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
 #define USE_RTC_CLOCK 0
@@ -251,14 +273,20 @@ extern unsigned int _vectorsend; /* see boot.lds/app.lds */
 void system_main(void)
 {
     cli();
-    write_c0_status(0x10000400);
+    write_c0_status(1 << 28 | 1 << 10); /* Enable CP | Mask interrupt 2 */
     
-    memcpy((void *)A_K0BASE, (void *)&_loadaddress, 0x20);
+    memcpy((void *)A_K0BASE, (void *)&_vectorsstart, 0x20);
     memcpy((void *)(A_K0BASE + 0x180), (void *)&_vectorsstart, 0x20);
     memcpy((void *)(A_K0BASE + 0x200), (void *)&_vectorsstart, 0x20);
     
     __dcache_writeback_all();
     __icache_invalidate_all();
+    
+    (*((unsigned int*)(0x80000200))) = 0x42;
+    (*((unsigned int*)(0x80000204))) = 0x45;
+    (*((unsigned int*)(0x80000208))) = 0x10020;
+
+    set_c0_status(1 << 22); /* Enable Boot Exception Vectors */
     
     sti();
     

@@ -129,6 +129,9 @@ void panicf( const char *fmt, ...)
 #endif /* CONFIG_KEYPAD */
 #elif defined(CREATIVE_ZVx)
         if(false)
+#elif defined(ONDA_VX747)
+        /* check for power button without including any .h file */
+        if( (~(*(volatile unsigned int *)(0xB0010300))) & (1 << 29) )
 #endif /* CPU */
             system_reboot();
 #endif /* !SIMULATOR */

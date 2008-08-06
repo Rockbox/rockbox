@@ -98,14 +98,15 @@ _init_cache_loop:
     mtc0    t0, C0_CONFIG
     nop
     
-	//----------------------------------------------------
-	// clear BSS section
-	//----------------------------------------------------
-	la	t0, _edata
-	la	t1, _end
-1:	sw	zero, 0(t0)
-	bne	t0, t1, 1b
-	addiu	t0, 4
+    //----------------------------------------------------
+    // clear BSS section
+    //----------------------------------------------------
+    la     t0, _edata
+    la     t1, _end
+_init_bss_loop:
+    sw     zero, 0(t0)
+    bne    t0, t1, _init_bss_loop
+    addiu  t0, 4
 
     //----------------------------------------------------
     // setup stack, jump to C code

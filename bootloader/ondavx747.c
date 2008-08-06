@@ -42,86 +42,6 @@ static void audiotest(void)
     __aic_enable_loopback();
 }
 
-#define JZ_NAND_SELECT(n)     (REG_EMC_NFCSR |=  (EMC_NFCSR_NFCE##n | EMC_NFCSR_NFE##n) )
-#define JZ_NAND_DESELECT(n)   (REG_EMC_NFCSR &= ~(EMC_NFCSR_NFCE##n | EMC_NFCSR_NFE##n) )
-
-#define NAND_CMD_READ1_00  0x00
-#define NAND_CMD_READ_ID1  0x90
-#define NAND_CMD_READ_ID2  0x91
-
-#define NANDFLASH_CLE      0x00008000 //PA[15]
-#define NANDFLASH_ALE      0x00010000 //PA[16]
-
-#define NANDFLASH_BASE     0xB8000000
-#define REG_NAND_DATA      (*((volatile unsigned char *) NANDFLASH_BASE))
-#define REG_NAND_CMD       (*((volatile unsigned char *) (NANDFLASH_BASE + NANDFLASH_CLE)))
-#define REG_NAND_ADDR      (*((volatile unsigned char *) (NANDFLASH_BASE + NANDFLASH_ALE)))
-
-static void jz_nand_scan_id(void)
-{
-    unsigned char cData[5];
-    unsigned int dwNandID;
-    
-    REG_EMC_NFCSR = 0;
-    
-    JZ_NAND_SELECT(1);
-    REG_NAND_CMD = NAND_CMD_READ_ID1;
-    REG_NAND_ADDR = NAND_CMD_READ1_00;
-    cData[0] = REG_NAND_DATA;
-    cData[1] = REG_NAND_DATA;
-    cData[2] = REG_NAND_DATA;
-    cData[3] = REG_NAND_DATA;
-    cData[4] = REG_NAND_DATA;
-    JZ_NAND_DESELECT(1);
-    
-    dwNandID = ((cData[0] & 0xff) << 8) | (cData[1] & 0xff);
-
-    printf("NAND Flash 1: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
-    
-    JZ_NAND_SELECT(2);
-    REG_NAND_CMD = NAND_CMD_READ_ID1;
-    REG_NAND_ADDR = NAND_CMD_READ1_00;
-    cData[0] = REG_NAND_DATA;
-    cData[1] = REG_NAND_DATA;
-    cData[2] = REG_NAND_DATA;
-    cData[3] = REG_NAND_DATA;
-    cData[4] = REG_NAND_DATA;
-    JZ_NAND_DESELECT(2);
-    
-    dwNandID = ((cData[0] & 0xff) << 8) | (cData[1] & 0xff);
-
-    printf("NAND Flash 2: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
-    
-    
-    JZ_NAND_SELECT(3);
-    REG_NAND_CMD = NAND_CMD_READ_ID1;
-    REG_NAND_ADDR = NAND_CMD_READ1_00;
-    cData[0] = REG_NAND_DATA;
-    cData[1] = REG_NAND_DATA;
-    cData[2] = REG_NAND_DATA;
-    cData[3] = REG_NAND_DATA;
-    cData[4] = REG_NAND_DATA;
-    JZ_NAND_DESELECT(3);
-    
-    dwNandID = ((cData[0] & 0xff) << 8) | (cData[1] & 0xff);
-
-    printf("NAND Flash 3: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
-    
-    JZ_NAND_SELECT(4);
-    REG_NAND_CMD = NAND_CMD_READ_ID1;
-    REG_NAND_ADDR = NAND_CMD_READ1_00;
-    cData[0] = REG_NAND_DATA;
-    cData[1] = REG_NAND_DATA;
-    cData[2] = REG_NAND_DATA;
-    cData[3] = REG_NAND_DATA;
-    cData[4] = REG_NAND_DATA;
-    JZ_NAND_DESELECT(4);
-    
-    dwNandID = ((cData[0] & 0xff) << 8) | (cData[1] & 0xff);
-
-    printf("NAND Flash 4: 0x%x is found [0x%x 0x%x 0x%x]", dwNandID, cData[2], cData[3], cData[4]);
-}
-
 int main(void)
 {   
     kernel_init();
@@ -133,20 +53,21 @@ int main(void)
     
     backlight_init();
     
-    /* To make the Windows say "ding-dong".. */
+    ata_init();
+    
+    /* To make Windows say "ding-dong".. */
     REG8(USB_REG_POWER) &= ~USB_POWER_SOFTCONN;
 
     int touch, btn;
     char datetime[30];
     reset_screen();
     printf("Rockbox bootloader v0.000001");
-    jz_nand_scan_id();
-    printf("REG_EMC_SACR0: 0x%x", REG_EMC_SACR0 >> EMC_SACR_BASE_BIT);
-    printf("REG_EMC_SACR1: 0x%x", REG_EMC_SACR1 >> EMC_SACR_BASE_BIT);
-    printf("REG_EMC_SACR2: 0x%x", REG_EMC_SACR2 >> EMC_SACR_BASE_BIT);
-    printf("REG_EMC_SACR3: 0x%x", REG_EMC_SACR3 >> EMC_SACR_BASE_BIT);
-    printf("REG_EMC_SACR4: 0x%x", REG_EMC_SACR4 >> EMC_SACR_BASE_BIT);
-    printf("REG_EMC_DMAR0: 0x%x", REG_EMC_DMAR0 >> EMC_DMAR_BASE_BIT);
+    printf("REG_EMC_SACR0: 0x%x", REG_EMC_SACR0);
+    printf("REG_EMC_SACR1: 0x%x", REG_EMC_SACR1);
+    printf("REG_EMC_SACR2: 0x%x", REG_EMC_SACR2);
+    printf("REG_EMC_SACR3: 0x%x", REG_EMC_SACR3);
+    printf("REG_EMC_SACR4: 0x%x", REG_EMC_SACR4);
+    printf("REG_EMC_DMAR0: 0x%x", REG_EMC_DMAR0);
     unsigned int cpu_id = read_c0_prid();
     printf("CPU_ID: 0x%x", cpu_id);
     printf(" * Company ID: 0x%x", (cpu_id >> 16) & 7);
@@ -165,6 +86,29 @@ int main(void)
     if(read_c0_config1() & (1 << 5)) printf(" * MDMX available");
     if(read_c0_config1() & (1 << 6)) printf(" * CP2 available");
     printf("C0_STATUS: 0x%x", read_c0_status());
+    unsigned char testdata[4096];
+    char msg[30];
+    int j = 0;
+    while(1)
+    {
+        memset(testdata, 0, 4096);
+        jz_nand_read_page(j, &testdata);
+        reset_screen();
+        printf("Page %d", j);
+        int i;
+        for(i=0; i<16; i+=8)
+        {
+            snprintf(msg, 30, "%x%x%x%x%x%x%x%x", testdata[i], testdata[i+1], testdata[i+2], testdata[i+3], testdata[i+4], testdata[i+5], testdata[i+6], testdata[i+7]);
+            printf(msg);
+        }
+        while(!((btn = button_read_device(&touch)) & (BUTTON_VOL_UP|BUTTON_VOL_DOWN)));
+        if(btn & BUTTON_VOL_UP)
+            j++;
+        if(btn & BUTTON_VOL_DOWN)
+            j--;
+        if(j<0)
+            j = 0;
+    }
     while(1)
     {
         btn = button_read_device(&touch);
