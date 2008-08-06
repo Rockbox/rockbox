@@ -344,11 +344,11 @@ static int agc_preset_func(void)
         { STR(LANG_AGC_VOICE) },
     };
     if (global_settings.rec_source)
-        return set_option(str(LANG_RECORD_AGC_PRESET),
+        return set_option(str(LANG_RECORDING_AGC_PRESET),
                           &global_settings.rec_agc_preset_line,
                           INT, names, 6, NULL );
     else
-        return set_option(str(LANG_RECORD_AGC_PRESET),
+        return set_option(str(LANG_RECORDING_AGC_PRESET),
                           &global_settings.rec_agc_preset_mic,
                           INT, names, 6, NULL );
 }
@@ -362,13 +362,13 @@ static int agc_cliptime_func(void)
         { "800ms", TALK_ID(800, UNIT_MS) },
         { "1s", TALK_ID(1, UNIT_SEC) }
     };
-    return set_option(str(LANG_RECORD_AGC_CLIPTIME),
+    return set_option(str(LANG_RECORDING_AGC_CLIPTIME),
                       &global_settings.rec_agc_cliptime,
                       INT, names, 5, NULL );
 }
-MENUITEM_FUNCTION(agc_preset, 0, ID2P(LANG_RECORD_AGC_PRESET), 
+MENUITEM_FUNCTION(agc_preset, 0, ID2P(LANG_RECORDING_AGC_PRESET), 
                     agc_preset_func, NULL, NULL, Icon_Menu_setting);
-MENUITEM_FUNCTION(agc_cliptime, 0, ID2P(LANG_RECORD_AGC_CLIPTIME), 
+MENUITEM_FUNCTION(agc_cliptime, 0, ID2P(LANG_RECORDING_AGC_CLIPTIME), 
                     agc_cliptime_func, NULL, NULL, Icon_Menu_setting);
 #endif /* HAVE_AGC */
 
@@ -441,12 +441,14 @@ int rectrigger(void)
     int i, action = ACTION_REDRAW;
     bool done = false, changed = true;
     const struct settings_list *settings[TRIG_OPTION_COUNT];
-    
+
+    int pm_x[NB_SCREENS];
     int pm_y[NB_SCREENS];
+    int pm_h[NB_SCREENS];
     int trig_xpos[NB_SCREENS];
     int trig_ypos[NB_SCREENS];
     int trig_width[NB_SCREENS];
-    
+
     int old_start_thres_db = global_settings.rec_start_thres_db;
     int old_start_thres_linear = global_settings.rec_start_thres_linear;
     int old_start_duration = global_settings.rec_start_duration;
@@ -466,7 +468,9 @@ int rectrigger(void)
         vp[i].height -= SYSFONT_HEIGHT*2;
         trig_xpos[i] = 0;
         trig_ypos[i] =  vp[i].y + vp[i].height;
+        pm_x[i] = 0;
         pm_y[i] = screens[i].getheight() - SYSFONT_HEIGHT;
+        pm_h[i] = SYSFONT_HEIGHT;
         trig_width[i] = screens[i].getwidth();
     }
     /* TODO: what to do if there is < 4 lines on the screen? */
@@ -518,8 +522,8 @@ int rectrigger(void)
         }
         
         peak_meter_draw_trig(trig_xpos, trig_ypos, trig_width, NB_SCREENS);
-        action = peak_meter_draw_get_btn(CONTEXT_SETTINGS_RECTRIGGER, 0, pm_y,
-                                         SYSFONT_HEIGHT, NB_SCREENS);
+        action = peak_meter_draw_get_btn(CONTEXT_SETTINGS_RECTRIGGER,
+                                         pm_x, pm_y, pm_h, NB_SCREENS);
         FOR_NB_SCREENS(i)
             screens[i].update();
         i = gui_synclist_get_sel_pos(&lists);

@@ -47,7 +47,7 @@
 #if CONFIG_CODEC == SWCODEC
 #include "pcm.h"
 
-#ifdef HAVE_RECORDING        
+#ifdef HAVE_RECORDING
 #include "pcm_record.h"
 #endif
 
@@ -265,7 +265,7 @@ int calc_db (int isample)
             }
         }
     }
-   
+
     return n + (m * (long)(isample - istart)) / 100L;
 }
 
@@ -319,13 +319,13 @@ int peak_meter_db2sample(int db)
     /* range check: db value to big */
     if (max_peak_db + db < 0) {
         retval = 0;
-    } 
-    
+    }
+
     /* range check: db value too small */
     else if (max_peak_db + db >= max_peak_db) {
         retval = MAX_PEAK -1;
-    } 
-    
+    }
+
     /* value in range: find the matching linear value */
     else {
         retval = db_to_sample_bin_search(0, MAX_PEAK, max_peak_db + db);
@@ -359,7 +359,7 @@ static void peak_meter_set_min(int newmin)
     }
 
     pm_range = peak_meter_range_max - peak_meter_range_min;
-    
+
     /* Avoid division by zero. */
     if (pm_range == 0) {
         pm_range = 1;
@@ -586,10 +586,10 @@ void peak_meter_peek(void)
 #if CONFIG_CODEC == SWCODEC
     if (pm_playback)
         pcm_calculate_peaks(&pm_cur_left, &pm_cur_right);
-#ifdef HAVE_RECORDING        
+#ifdef HAVE_RECORDING
     else
         pcm_calculate_rec_peaks(&pm_cur_left, &pm_cur_right);
-#endif        
+#endif
     left  = pm_cur_left;
     right = pm_cur_right;
 #else
@@ -812,7 +812,7 @@ static int peak_meter_read_l(void)
     /* reset pm_max_left so that subsequent calls of peak_meter_peek don't
        get fooled by an old maximum value */
     pm_max_left = pm_cur_left;
-    
+
 #if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     srand(current_tick);
     retval = rand()%MAX_PEAK;
@@ -1328,8 +1328,8 @@ void peak_meter_draw_trig(int xpos[], int ypos[],
 }
 #endif
 
-int peak_meter_draw_get_btn(int action_context, int x, int y[],
-                            int height, int nb_screens)
+int peak_meter_draw_get_btn(int action_context, int x[], int y[],
+                            int height[], int nb_screens)
 {
     int button = BUTTON_NONE;
     long next_refresh = current_tick;
@@ -1362,10 +1362,10 @@ int peak_meter_draw_get_btn(int action_context, int x, int y[],
         if (TIME_AFTER(current_tick, next_refresh)) {
             for(i = 0; i < nb_screens; i++)
             {
-                peak_meter_screen(&screens[i], x, y[i], height);
-                screens[i].update_viewport_rect(x, y[i],
-                                                screens[i].getwidth() - x,
-                                                height);
+                peak_meter_screen(&screens[i], x[i], y[i], height[i]);
+                screens[i].update_viewport_rect(x[i], y[i],
+                                                screens[i].getwidth() - x[i],
+                                                height[i]);
             }
             next_refresh += HZ / PEAK_METER_FPS;
             dopeek = true;
@@ -1429,4 +1429,5 @@ bool peak_meter_histogram(void)
     return false;
 }
 #endif
+
 

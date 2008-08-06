@@ -899,11 +899,11 @@ const struct settings_list settings[] = {
 #endif /* DEFAULT_REC_MIC_GAIN */
 #ifdef DEFAULT_REC_LEFT_GAIN
     {F_T_INT|F_RECSETTING,&global_settings.rec_left_gain,
-        LANG_RECORDING_LEFT,INT(DEFAULT_REC_LEFT_GAIN),
+        LANG_GAIN_LEFT,INT(DEFAULT_REC_LEFT_GAIN),
         "rec left gain",NULL,UNUSED},
 #endif /* DEFAULT_REC_LEFT_GAIN */
 #ifdef DEFAULT_REC_RIGHT_GAIN
-    {F_T_INT|F_RECSETTING,&global_settings.rec_right_gain,LANG_RECORDING_RIGHT,
+    {F_T_INT|F_RECSETTING,&global_settings.rec_right_gain,LANG_GAIN_RIGHT,
         INT(DEFAULT_REC_RIGHT_GAIN),
         "rec right gain",NULL,UNUSED},
 #endif /* DEFAULT_REC_RIGHT_GAIN */
@@ -1180,16 +1180,16 @@ const struct settings_list settings[] = {
 #endif
 
 #ifdef HAVE_AGC
-    {F_T_INT,&global_settings.rec_agc_preset_mic,LANG_RECORD_AGC_PRESET,INT(1),
-        "agc mic preset",NULL,UNUSED},
-    {F_T_INT,&global_settings.rec_agc_preset_line,LANG_RECORD_AGC_PRESET,INT(1),
-        "agc line preset",NULL,UNUSED},
+    {F_T_INT,&global_settings.rec_agc_preset_mic,LANG_RECORDING_AGC_PRESET,
+        INT(1),"agc mic preset",NULL,UNUSED},
+    {F_T_INT,&global_settings.rec_agc_preset_line,LANG_RECORDING_AGC_PRESET,
+        INT(1),"agc line preset",NULL,UNUSED},
     {F_T_INT,&global_settings.rec_agc_maxgain_mic,-1,INT(104),
         "agc maximum mic gain",NULL,UNUSED},
     {F_T_INT,&global_settings.rec_agc_maxgain_line,-1,INT(96),
         "agc maximum line gain",NULL,UNUSED},
-    {F_T_INT,&global_settings.rec_agc_cliptime,LANG_RECORD_AGC_CLIPTIME,INT(1),
-        "agc cliptime","0.2s,0.4s,0.6s,0.8,1s",UNUSED},
+    {F_T_INT,&global_settings.rec_agc_cliptime,LANG_RECORDING_AGC_CLIPTIME,
+        INT(1),"agc cliptime","0.2s,0.4s,0.6s,0.8,1s",UNUSED},
 #endif
 
 #ifdef HAVE_REMOTE_LCD
