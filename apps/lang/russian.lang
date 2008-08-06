@@ -21,6 +21,7 @@
 # - Evgeniy Kachalin
 # - Alexander Kuzmenkov
 # - Adrian Osoianu
+# - Dennis Ivanov
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -665,13 +666,13 @@
   desc: in settings_menu()
   user:
   <source>
-    *: "Playback"
+    *: "Playback Settings"
   </source>
   <dest>
-    *: "Воспроизведение"
+    *: "Настройки Воспроизведения"
   </dest>
   <voice>
-    *: "Воспроизведение"
+    *: "Настройки Воспроизведения"
   </voice>
 </phrase>
 <phrase>
@@ -4229,31 +4230,34 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200: "MENU = Revert"
+    ipod*,e200,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
     mrobe100: "DISPLAY = Revert"
+    gigabeats: "BACK = Revert"
   </source>
   <dest>
     *: "ВЫКЛ. = Отмена"
     rtc: "ВЫКЛ. = Отмена"
     h100,h120,h300: "СТОП = Отмена"
-    ipod*,e200,c200: "МЕНЮ = Отмена"
+    ipod*,e200,c200,sa9200: "МЕНЮ = Отмена"
     x5,m5: "ЗАПИСЬ = Отмена"
     h10,h10_5gb: "ПРЕД. = Отмена"
     gigabeatf: "А = Отмена"
     mrobe100: "ПОКАЗ. = Отмена"
+    gigabeats: "НАЗАД = Отмена"
   </dest>
   <voice>
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,e200,c200: ""
+    ipod*,e200,c200,sa9200: ""
     x5,m5: ""
     h10,h10_5gb: ""
     gigabeatf: ""
     mrobe100: ""
+    gigabeats: ""
   </voice>
 </phrase>
 <phrase>
@@ -4509,16 +4513,21 @@
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
     *: "ВОСПР.=Уст., ВЫКЛ.=Отм."
     alarm: "ВОСПР.=Уст., ВЫКЛ.=Отм."
     ipod*: "ВЫБОР=Уст., МЕНЮ=Отм."
     h10,h10_5gb: "ВЫБОР=Уст., ПРЕД.=Отм."
+    gigabeats: "ВЫБОР=Уст., ВЫКЛ.=Отм."
   </dest>
   <voice>
     *: none
-	alarm,ipod*: ""
+    alarm: ""
+    ipod*: ""
+    h10,h10_5gb: ""
+    gigabeats: ""
   </voice>
 </phrase>
 <phrase>
@@ -7205,53 +7214,53 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_YES
-  desc: bool true representation
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Yes"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Да"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Да"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_NO
-  desc: bool false representation
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "No"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Нет"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Нет"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ON
-  desc: Used in a lot of places
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "On"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Вкл"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Вкл"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -7358,138 +7367,138 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SHUFFLE
-  desc: in settings_menu
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Shuffle"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Случайно"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Случайно"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT
-  desc: in settings_menu
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Repeat"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Повтор"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Повтор"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_ONE
-  desc: repeat one song
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "One"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Трек"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Трек"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_AB
-  desc: repeat range from point A to B
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "A-B"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "А-Б"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "А-Б"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER
-  desc: setting name for dir filter
+  desc: deprecated
   user: 
   <source>
     *: none
-    lcd_bitmap: "Show Files"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Показывать файлы"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Показывать файлы"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_SUPPORTED
-  desc: show all file types supported by Rockbox
+  desc: deprecated
   user: 
   <source>
     *: none
-    lcd_bitmap: "Supported"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Поддерживаемые"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Поддерживаемые"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_MUSIC
-  desc: show only music-related files
+  desc: deprecated
   user: 
   <source>
     *: none
-    lcd_bitmap: "Music"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Музыка"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Музыка"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_PLAYLIST
-  desc: show only playlist
+  desc: deprecated
   user: 
   <source>
     *: none
-    lcd_bitmap: "Playlists"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Списки воспроизведения"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Списки воспроизведения"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -7596,53 +7605,53 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FLIP_DISPLAY
-  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Upside Down"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Перевёрнутый"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Перевёрнутый"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SCROLL_BAR
-  desc: display menu, F3 substitute
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Scroll Bar"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Панель прокрутки"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Панель прокрутки"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_STATUS_BAR
-  desc: display menu, F3 substitute
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Status Bar"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Панель состояния"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Панель состояния"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8138,22 +8147,22 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5,gigabeatf,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
+    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Построение базы... %d найдено (ВЫКЛ. для отмены)"
     h100,h120,h300: "Построение базы... %d найдено (СТОП для отмены)"
     ipod*: "Построение базы... %d найдено (ПРЕД. для отмены)"
-    x5,m5,gigabeatf,mrobe100: "Построение базы... %d найдено (ВЛЕВО для отмены)"
-    h10,h10_5gb,e200,c200: "Построение базы... %d найдено (ПРЕД. для отмены)"
+    x5,m5,gigabeat*,mrobe100: ""
+    h10,h10_5gb,e200,c200,sa9200: ""
   </dest>
   <voice>
-    *: "Построение базы... %d найдено (ВЫКЛ. для отмены)"
-    h100,h120,h300: "Построение базы... %d найдено (СТОП для отмены)"
-    ipod*: "Построение базы... %d найдено (ПРЕД. для отмены)"
-    x5,m5,gigabeatf,mrobe100: ""
-    h10,h10_5gb,e200,c200: "Построение базы... %d найдено (ПРЕД. для отмены)"
+    *: "найдено записей в базе"
+    h100,h120,h300: ""
+    ipod*: ""
+    x5,m5,gigabeat*,mrobe100: ""
+    h10,h10_5gb,e200,c200,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8293,19 +8302,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ALL
-  desc: repeat playlist once all songs have completed
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "All"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Все"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Все"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8927,19 +8936,19 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "ВОСПР. = Да"
     h100,h120,h300: "НАВИГ. = Да"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "ВЫБОР = Да"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "ВЫБОР = Да"
     player: "(ВОСПР./СТОП)"
   </dest>
   <voice>
     *: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: ""
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: ""
     player: ""
   </voice>
 </phrase>
@@ -8951,19 +8960,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ВКЛ. = Установить"
     h100,h120,h300: "НАВИГ. = Установить"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "ВЫБОР = Установить"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "ВЫБОР = Установить"
   </dest>
   <voice>
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: ""
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -10946,17 +10955,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100: "Button Light Timeout"
+    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Таймаут подсветки колёсика"
-    c200,gigabeatf,mrobe100: "Таймаут подсветки кнопок"
+    c200,gigabeatf,mrobe100,sa9200: "Таймаут подсветки клавиш"
   </dest>
   <voice>
     *: none
     e200: "Таймаут подсветки колёсика"
-    c200,gigabeatf,mrobe100: "Таймаут подсветки кнопок"
+    c200,gigabeatf,mrobe100,sa9200: "Таймаут подсветки клавиш"
   </voice>
 </phrase>
 <phrase>
@@ -11417,16 +11426,19 @@
 </phrase>
 <phrase>
   id: LANG_ACCESSORY_SUPPLY
-  desc: in keyclick settings menu
+  desc: in system settings menu
   user: 
   <source>
-    *: "Accessory Power Supply"
+    *: none
+    accessory_supply: "Accessory Power Supply"
   </source>
   <dest>
-    *: "Дополнительный Источник Питания"
+    *: "ничего"
+    accessory_supply: "Дополнительный источник питания"
   </dest>
   <voice>
-    *: "Дополнительный Источник Питания"
+    *: "ничего"
+    accessory_supply: "Дополнительный источник питания"
   </voice>
 </phrase>
 <phrase>
@@ -11582,5 +11594,252 @@
   <voice>
     *: none
     swcodec: "Повтор Сигнала"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_STUDY_MODE
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHPAD_SENSITIVITY
+  desc: touchpad sensitivity setting
+  user: 
+  <source>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Чувствительность тачпада"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Чувствительность тачпада"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FAST
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Fast"
+  </source>
+  <dest>
+    *: "Быстро"
+  </dest>
+  <voice>
+    *: "Быстро"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_LENGTH
+  desc: playback settings menu
+  user: 
+  <source>
+    *: "Skip Length"
+  </source>
+  <dest>
+    *: "Пропустить длину"
+  </dest>
+  <voice>
+    *: "Пропустить длину"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_SLASH
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "слэш"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING_AND_SHUTDOWN
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "Stop Recording And Shutdown"
+  </source>
+  <dest>
+    *: none
+    recording: "Остановить запись и выключить"
+  </dest>
+  <voice>
+    *: none
+    recording: "Остановить запись и выключить"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_MODE
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_HOP_STEP
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_SLOW
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Very slow"
+  </source>
+  <dest>
+    *: "Очень медленно"
+  </dest>
+  <voice>
+    *: "Очень медленно"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLOW
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Медленно"
+  </dest>
+  <voice>
+    *: "Медленно"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUICKSCREEN
+  desc: spoken only, Announces entering the "quick screen"
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Возврат к информации"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_FAST
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Very fast"
+  </source>
+  <dest>
+    *: "Очень быстро"
+  </dest>
+  <voice>
+    *: "Очень быстро"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_STUDY_MODE
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN
+  desc: generic string for unknown states, such as an unset clock
+  user: 
+  <source>
+    *: "Unknown"
+  </source>
+  <dest>
+    *: "Неизвестно"
+  </dest>
+  <voice>
+    *: "Неизвестно"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_TRACK
+  desc: skip length setting entry 0
+  user: 
+  <source>
+    *: "Skip Track"
+  </source>
+  <dest>
+    *: "Пропустить трек"
+  </dest>
+  <voice>
+    *: "Пропустить трек"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OK
+  desc: spoken only, On exiting a context, specifically the quick screen
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIGH
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    gigabeatf: "High"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Высокий"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Высокий"
   </voice>
 </phrase>
