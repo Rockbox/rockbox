@@ -32,7 +32,12 @@ Const SPSF_32kHz16BitMono = 30
 Const SPSF_44kHz16BitMono = 34
 Const SPSF_48kHz16BitMono = 38
 
+Const STDIN  = 0
+Const STDOUT = 1
+Const STDERR = 2
+
 Dim oShell, oArgs, oEnv
+Dim oFSO, oStdIn, oStdOut
 Dim bVerbose, bSAPI4, bList
 Dim sLanguage, sVoice, sSpeed, sVendor
 
@@ -44,6 +49,10 @@ Dim nLangID, sSelectString
 Dim aLine, aData    ' used in command reading
 
 On Error Resume Next
+
+Set oFSO = CreateObject("Scripting.FileSystemObject")
+Set oStdIn = oFSO.GetStandardStream(STDIN, true)
+Set oStdOut = oFSO.GetStandardStream(STDOUT, true)
 
 Set oShell = CreateObject("WScript.Shell")
 Set oEnv = oShell.Environment("Process")
@@ -171,7 +180,7 @@ Else ' SAPI5
 End If
 
 Do
-    aLine = Split(WScript.StdIn.ReadLine, vbTab, 2)
+    aLine = Split(oStdIn.ReadLine, vbTab, 2)
     If Err.Number <> 0 Then
         WScript.StdErr.WriteLine "Error " & Err.Number & ": " & Err.Description
         WScript.Quit 1
@@ -180,11 +189,10 @@ Do
         Case "QUERY"
             Select Case aLine(1)
                 Case "VENDOR"
-                    WScript.StdOut.WriteLine sVendor
+                    oStdOut.WriteLine sVendor
             End Select
         Case "SPEAK"
             aData = Split(aLine(1), vbTab, 2)
-            aData(1) = UTF8decode(aData(1))
             If bVerbose Then WScript.StdErr.WriteLine "Saying " & aData(1) _
                                                       & " in " & aData(0)
             If bSAPI4 Then
@@ -217,7 +225,7 @@ Do
             End If
         Case "SYNC"
             If bVerbose Then WScript.StdErr.WriteLine "Syncing"
-            WScript.StdOut.WriteLine aLine(1) ' Just echo what was passed
+            oStdOut.WriteLine aLine(1) ' Just echo what was passed
         Case "QUIT"
             If bVerbose Then WScript.StdErr.WriteLine "Quitting"
             WScript.Quit 0
@@ -226,59 +234,6 @@ Loop
 
 ' Subroutines
 ' -----------
-
-' Decode an UTF-8 string into a standard windows unicode string (UTF-16)
-Function UTF8decode(ByRef sText)
-    Dim i, c, nCode, nTail, nTextLen
-    
-    UTF8decode = ""
-    nTail = 0
-    nTextLen = Len(sText)
-    i = 1
-    While i <= nTextLen
-        c = Asc(Mid(sText, i, 1))
-        i = i + 1
-        If c <= &h7F Or c >= &hC2 Then ' Start of new character
-            If c < &h80 Then     ' U-00000000 - U-0000007F, 1 byte
-                nCode = c
-            ElseIf c < &hE0 Then ' U-00000080 - U-000007FF, 2 bytes
-                nTail = 1
-                nCode = c And &h1F
-            ElseIf c < &hF0 Then ' U-00000800 - U-0000FFFF, 3 bytes
-                nTail = 2
-                nCode = c And &h0F
-            ElseIf c < &hF5 Then ' U-00010000 - U-001FFFFF, 4 bytes
-                nTail = 3
-                nCode = c And 7
-            Else                 ' Invalid size
-                nCode = &hFFFD
-            End If
-
-            While nTail > 0 And i <= nTextLen
-                nTail = nTail - 1
-                c = Asc(Mid(sText, i, 1))
-                i = i + 1
-                If (c And &hC0) = &h80 Then ' Valid continuation char
-                    nCode = nCode * &h40 + (c And &h3F)
-                Else                        ' Invalid continuation char
-                    nCode = &hFFFD
-                    i = i - 1
-                    nTail = 0
-                End If
-            Wend
-
-        Else
-            nCode = &hFFFD
-        End If
-        If nCode >= &h10000 Then ' Character outside BMP - use surrogate pair
-            nCode = nCode - &h10000
-            c = &hD800 + ((nCode \ &h400) And &h3FF) ' high surrogate
-            UTF8decode = UTF8decode & ChrW(c)
-            nCode = &hDC00 + (nCode And &h3FF)       ' low surrogate
-        End If
-        UTF8decode = UTF8decode & ChrW(nCode)
-    Wend
-End Function
 
 ' SAPI5 output format selection based on engine
 Function AudioFormat(ByRef sVendor)

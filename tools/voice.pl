@@ -25,6 +25,7 @@ use IPC::Open2;
 use IPC::Open3;
 use Digest::MD5 qw(md5_hex);
 use DirHandle;
+use open IN => ':utf8';
 
 sub printusage {
     print <<USAGE
@@ -90,6 +91,8 @@ sub init_tts {
             $cmd =~ s/\\/\\\\/g;
             print("> cscript //nologo $cmd\n") if $verbose;
             my $pid = open2(*CMD_OUT, *CMD_IN, "cscript //nologo $cmd");
+            binmode(*CMD_IN, ':encoding(utf16le)');
+            binmode(*CMD_OUT, ':encoding(utf16le)');
             $SIG{INT} = sub { print(CMD_IN "QUIT\r\n"); panic_cleanup(); };
             $SIG{KILL} = sub { print(CMD_IN "QUIT\r\n"); panic_cleanup(); };
             print(CMD_IN "QUERY\tVENDOR\r\n");
@@ -330,7 +333,7 @@ sub generateclips {
     my $voice = '';
     my $cmd = "genlang -o -t=$target -e=$english $langfile 2>/dev/null";
     my $pool_file;
-    open(VOICEFONTIDS, "> voicefontids");
+    open(VOICEFONTIDS, ">:utf8", "voicefontids");
     my $i = 0;
     local $| = 1; # make progress indicator work reliably
 
