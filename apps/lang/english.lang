@@ -10734,15 +10734,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_SIZE
-  desc: Display of recorded file size
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Size:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Size:"
+    recording: ""
   </dest>
   <voice>
     *: none
