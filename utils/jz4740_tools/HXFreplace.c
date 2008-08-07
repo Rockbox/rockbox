@@ -119,11 +119,11 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-	if((infile = fopen(argv[1], "rb")) == NULL)
+    if((infile = fopen(argv[1], "rb")) == NULL)
     {
-		fprintf(stderr, "[ERR]  Cannot open %s\n", argv[1]);
-		return 2;
-	}
+        fprintf(stderr, "[ERR]  Cannot open %s\n", argv[1]);
+        return 2;
+    }
     
     if(fseek(infile, 0x40, SEEK_SET) != 0)
     {

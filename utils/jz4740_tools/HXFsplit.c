@@ -31,11 +31,11 @@
 #define VERSION "0.2"
 
 struct header{
-	char main_header[20];
-	unsigned int size;
-	unsigned int checksum;
-	unsigned int unknown;
-	char other_header[32];
+    char main_header[20];
+    unsigned int size;
+    unsigned int checksum;
+    unsigned int unknown;
+    char other_header[32];
 };
 
 static char* basepath(char* path)
@@ -197,7 +197,7 @@ static int split_hxf(const unsigned char* infile, unsigned int size, const char*
             if(!file_exists(filename))
             {
                 printf("[INFO] %s: %d bytes\n", filename, filesize);
-            	if((outfile = fopen(filename, "wb")) == NULL)
+                if((outfile = fopen(filename, "wb")) == NULL)
                 {
                     fprintf(stderr, "[ERR]  Error opening file %s\n", filename);
                     return -1;
@@ -251,20 +251,20 @@ int main(int argc, char *argv[])
 #ifdef _WIN32
     if(strcmp((char*)(argv[2]+strlen(argv[2])-1), "\\") != 0)
     {
-		fprintf(stderr, "[ERR]  Output path must end with a \\\n");
+        fprintf(stderr, "[ERR]  Output path must end with a \\\n");
 #else
     if(strcmp((char*)(argv[2]+strlen(argv[2])-1), "/") != 0)
     {
-		fprintf(stderr, "[ERR]  Output path must end with a /\n");
+        fprintf(stderr, "[ERR]  Output path must end with a /\n");
 #endif
-		return 2;
+        return 2;
     }
 
-	if((infile = fopen(argv[1], "rb")) == NULL)
+    if((infile = fopen(argv[1], "rb")) == NULL)
     {
-		fprintf(stderr, "[ERR]  Cannot open %s\n", argv[1]);
-		return 3;
-	}
+        fprintf(stderr, "[ERR]  Cannot open %s\n", argv[1]);
+        return 3;
+    }
     
     if((inbuffer = (unsigned char*)malloc(sizeof(struct header))) == NULL)
     {
@@ -273,12 +273,12 @@ int main(int argc, char *argv[])
         return 4;
     }
 
-	if(fread(inbuffer, sizeof(struct header), 1, infile) != 1)
+    if(fread(inbuffer, sizeof(struct header), 1, infile) != 1)
     {
         fclose(infile);
-		fprintf(stderr, "Cannot read header of %s\n", argv[1]);
-		return 5;
-	}
+        fprintf(stderr, "Cannot read header of %s\n", argv[1]);
+        return 5;
+    }
     
     memcpy(hdr.main_header, inbuffer, 20);
     hdr.size = le2int(&inbuffer[20]);
@@ -290,8 +290,8 @@ int main(int argc, char *argv[])
     if(strcmp(hdr.other_header, "Chinachip PMP firmware V1.0") != 0)
     {
         fclose(infile);
-		fprintf(stderr, "[ERR]  Header doesn't match\n");
-		return 6;
+        fprintf(stderr, "[ERR]  Header doesn't match\n");
+        return 6;
     }
     
     if((inbuffer = (unsigned char*)malloc(hdr.size)) == NULL)
@@ -303,13 +303,13 @@ int main(int argc, char *argv[])
     
     fseek(infile, sizeof(struct header), SEEK_SET);
     
-	if(fread(inbuffer, hdr.size-sizeof(struct header), 1, infile) != 1)
+    if(fread(inbuffer, hdr.size-sizeof(struct header), 1, infile) != 1)
     {
         fclose(infile);
         free(inbuffer);
-		fprintf(stderr, "[ERR]  Cannot read file in buffer\n");
-		return 8;
-	}
+        fprintf(stderr, "[ERR]  Cannot read file in buffer\n");
+        return 8;
+    }
     
     fclose(infile);
     

@@ -143,12 +143,12 @@ static void merge_hxf(const char* indir, FILE* outfile, const char* add)
                 unsigned int filesize;
                 strcpy(file, dir);
                 strcat(file, dirs->d_name);
-            	if((filehandle = fopen(file, "rb")) == NULL)
+                if((filehandle = fopen(file, "rb")) == NULL)
                 {
-            		fprintf(stderr, "[ERR]  Cannot open %s\n", file);
+                    fprintf(stderr, "[ERR]  Cannot open %s\n", file);
                     closedir(indir_handle);
-            		return;
-            	}
+                    return;
+                }
                 filesize = _filesize(filehandle);
                 if(filesize > 0)
                 {
@@ -179,7 +179,7 @@ static void merge_hxf(const char* indir, FILE* outfile, const char* add)
                     WRITE(int2le(strlen(dirs->d_name)+strlen(add)), 4);
 #endif
 #ifndef _WIN32
-                    WRITE(replace(&add), strlen(add)-1);
+                    WRITE(replace((char*)add), strlen(add)-1);
 #else
                     WRITE(add, strlen(add)-1);
 #endif
@@ -276,20 +276,20 @@ int main(int argc, char *argv[])
 #ifdef _WIN32
     if(strcmp((char*)(argv[1]+strlen(argv[1])-1), "\\") != 0)
     {
-		fprintf(stderr, "[ERR]  Input path must end with a \\\n");
+        fprintf(stderr, "[ERR]  Input path must end with a \\\n");
 #else
     if(strcmp((char*)(argv[1]+strlen(argv[1])-1), "/") != 0)
     {
-		fprintf(stderr, "[ERR]  Input path must end with a /\n");
+        fprintf(stderr, "[ERR]  Input path must end with a /\n");
 #endif
-		return 2;
+        return 2;
     }
 
-	if((outfile = fopen(argv[2], "wb+")) == NULL)
+    if((outfile = fopen(argv[2], "wb+")) == NULL)
     {
-		fprintf(stderr, "[ERR]  Cannot open %s\n", argv[2]);
-		return 3;
-	}
+        fprintf(stderr, "[ERR]  Cannot open %s\n", argv[2]);
+        return 3;
+    }
     
     fseek(outfile, 0x40, SEEK_SET);
     

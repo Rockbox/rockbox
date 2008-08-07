@@ -127,30 +127,30 @@ int filesize(FILE* fd)
     return tmp;
 }
 
-#define SEND_COMMAND(cmd, arg) err = usb_control_msg(dh, USB_ENDPOINT_OUT | USB_TYPE_VENDOR, cmd, arg>>16, arg&0xFFFF, NULL, 0, TOUT);\
+#define SEND_COMMAND(cmd, arg) err = usb_control_msg(dh, USB_ENDPOINT_OUT | USB_TYPE_VENDOR, (cmd), (arg)>>16, (arg)&0xFFFF, NULL, 0, TOUT);\
                                if (err < 0) \
                                { \
                                    fprintf(stderr,"\n[ERR]  Error sending control message (%d, %s)\n", err, usb_strerror()); \
                                    return -1; \
                                }
 
-#define GET_CPU_INFO(s)        err = usb_control_msg(dh, USB_ENDPOINT_IN | USB_TYPE_VENDOR, VR_GET_CPU_INFO, 0, 0, s, 8, TOUT); \
+#define GET_CPU_INFO(s)        err = usb_control_msg(dh, USB_ENDPOINT_IN | USB_TYPE_VENDOR, VR_GET_CPU_INFO, 0, 0, (s), 8, TOUT); \
                                if (err < 0) \
                                { \
                                    fprintf(stderr,"\n[ERR]  Error sending control message (%d, %s)\n", err, usb_strerror()); \
                                    return -1; \
                                }
 
-#define SEND_DATA(ptr, size)   err = usb_bulk_write(dh, USB_ENDPOINT_OUT | EP_BULK_TO, ptr, size, TOUT); \
-                               if (err != size)  \
+#define SEND_DATA(ptr, size)   err = usb_bulk_write(dh, USB_ENDPOINT_OUT | EP_BULK_TO, ((char*)(ptr)), (size), TOUT); \
+                               if (err != (size))  \
                                { \
                                    fprintf(stderr,"\n[ERR]  Error writing data\n"); \
                                    fprintf(stderr,"[ERR]  Bulk write error (%d, %s)\n", err, strerror(-err)); \
                                    return -1; \
                                }
 
-#define GET_DATA(ptr, size)    err = usb_bulk_read(dh, USB_ENDPOINT_IN | EP_BULK_TO, ptr, size, TOUT); \
-                               if (err != size)  \
+#define GET_DATA(ptr, size)    err = usb_bulk_read(dh, USB_ENDPOINT_IN | EP_BULK_TO, ((char*)(ptr)), (size), TOUT); \
+                               if (err != (size))  \
                                { \
                                    fprintf(stderr,"\n[ERR]  Error writing data\n"); \
                                    fprintf(stderr,"[ERR]  Bulk write error (%d, %s)\n", err, strerror(-err)); \
