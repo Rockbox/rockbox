@@ -31,6 +31,7 @@
 #include "lcd.h"
 #include "font.h"
 #include "ata.h"
+#include "adc.h"
 #include "button.h"
 #include "disk.h"
 #include "crc32-mi4.h"
@@ -459,6 +460,7 @@ void* main(void)
     font_init();
     show_logo();
 
+    adc_init();
     button_init();
 #if defined(SANSA_E200) || defined(PHILIPS_SA9200)
     i2c_init();
