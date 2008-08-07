@@ -241,6 +241,7 @@ sub voicestring {
     our $verbose;
     my ($string, $output, $tts_engine_opts, $tts_object) = @_;
     my $cmd;
+    binmode(STDOUT, ':encoding(UTF-8)');
     printf("Generate \"%s\" with %s in file %s\n", $string, $$tts_object{"name"}, $output) if $verbose;
     switch($$tts_object{"name"}) {
         case "festival" {
@@ -251,6 +252,7 @@ sub voicestring {
             # Open command, and filehandles for STDIN, STDOUT, STDERR
             my $pid = open3(*CMD_IN, *CMD_OUT, *CMD_ERR, $cmd);
             # Put the string to speak into STDIN and close it
+            binmode(CMD_IN, ':encoding(utf8)');
             print(CMD_IN $string);
             close(CMD_IN);
             # Read all output from festival_client (because it LIES TO US)
@@ -265,10 +267,9 @@ sub voicestring {
             `$cmd`;
         }
         case "espeak" {
-            # xxx: $tts_engine_opts isn't used
             $cmd = "espeak $tts_engine_opts -w \"$output\"";
             print("> $cmd\n") if $verbose;
-            open(ESPEAK, "| $cmd");
+            open(ESPEAK, "|-:encoding(utf8)", $cmd);
             print ESPEAK $string . "\n";
             close(ESPEAK);
         }
