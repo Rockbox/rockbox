@@ -1202,12 +1202,12 @@ bool recording_screen(bool no_source)
         }
         else
         {
-            int trigStat = peak_meter_trigger_status();
+            int trig_stat = peak_meter_trigger_status();
             /*
              * other trigger stati than trig_off and trig_steady
              * already imply that we are recording.
              */
-            if (trigStat == TRIG_STEADY)
+            if (trig_stat == TRIG_STEADY)
             {
                 if (--led_countdown <= 0)
                 {
