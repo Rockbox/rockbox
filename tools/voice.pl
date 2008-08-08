@@ -91,13 +91,13 @@ sub init_tts {
             $cmd =~ s/\\/\\\\/g;
             print("> cscript //nologo $cmd\n") if $verbose;
             my $pid = open2(*CMD_OUT, *CMD_IN, "cscript //nologo $cmd");
-            binmode(*CMD_IN, ':encoding(utf16le)');
-            binmode(*CMD_OUT, ':encoding(utf16le)');
-            $SIG{INT} = sub { print(CMD_IN "QUIT\r\n"); panic_cleanup(); };
-            $SIG{KILL} = sub { print(CMD_IN "QUIT\r\n"); panic_cleanup(); };
-            print(CMD_IN "QUERY\tVENDOR\r\n");
+            binmode(*CMD_IN, ':encoding(utf16le):crlf');
+            binmode(*CMD_OUT, ':encoding(utf16le):crlf');
+            $SIG{INT} = sub { print(CMD_IN "QUIT\n"); panic_cleanup(); };
+            $SIG{KILL} = sub { print(CMD_IN "QUIT\n"); panic_cleanup(); };
+            print(CMD_IN "QUERY\tVENDOR\n");
             my $vendor = readline(*CMD_OUT);
-            $vendor =~ s/\r\n//;
+            chomp($vendor);
             %ret = (%ret,
                     "stdin" => *CMD_IN,
                     "stdout" => *CMD_OUT,
@@ -116,7 +116,7 @@ sub shutdown_tts {
             kill TERM => $$tts_object{"pid"};
         }
         case "sapi" {
-            print({$$tts_object{"stdin"}} "QUIT\r\n");
+            print({$$tts_object{"stdin"}} "QUIT\n");
             close($$tts_object{"stdin"});
         }
     }
@@ -274,7 +274,7 @@ sub voicestring {
             close(ESPEAK);
         }
         case "sapi" {
-            print({$$tts_object{"stdin"}} "SPEAK\t$output\t$string\r\n");
+            print({$$tts_object{"stdin"}} "SPEAK\t$output\t$string\n");
         }
         case "swift" {
             $cmd = "swift $tts_engine_opts -o \"$output\" \"$string\"";
@@ -291,7 +291,7 @@ sub wavtrim {
     printf("Trim \"%s\"\n", $file) if $verbose;
     my $cmd = "wavtrim \"$file\" $threshold";
     if ($$tts_object{"name"} eq "sapi") {
-        print({$$tts_object{"stdin"}} "EXEC\t$cmd\r\n");
+        print({$$tts_object{"stdin"}} "EXEC\t$cmd\n");
     }
     else {
         print("> $cmd\n") if $verbose;
@@ -306,7 +306,7 @@ sub encodewav {
     printf("Encode \"%s\" with %s in file %s\n", $input, $encoder, $output) if $verbose;
     my $cmd = "$encoder $encoder_opts \"$input\" \"$output\"";
     if ($$tts_object{"name"} eq "sapi") {
-        print({$$tts_object{"stdin"}} "EXEC\t$cmd\r\n");
+        print({$$tts_object{"stdin"}} "EXEC\t$cmd\n");
     }
     else {
         print("> $cmd\n") if $verbose;
@@ -318,7 +318,7 @@ sub encodewav {
 sub synchronize {
     my ($tts_object) = @_;
     if ($$tts_object{"name"} eq "sapi") {
-        print({$$tts_object{"stdin"}} "SYNC\t42\r\n");
+        print({$$tts_object{"stdin"}} "SYNC\t42\n");
         my $wait = readline($$tts_object{"stdout"});
         #ignore what's actually returned
     }
