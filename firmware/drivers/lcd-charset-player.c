@@ -64,12 +64,14 @@ enum {
     XF_aBREVE, XF_aOGONEK, XF_cACUTE, XF_cCARON,
     XF_dCARON, XF_dSTROKE, XF_eOGONEK, XF_eCARON,
     XF_GBREVE, XF_gBREVE, XF_IDOT, XF_DOTLESSi,
-    XF_lSTROKE, XF_nACUTE, XF_nCARON, XF_ODBLACUTE,
-    XF_oDBLACUTE, XF_rCARON, XF_sACUTE, XF_SCEDILLA,
-    XF_sCEDILLA, XF_sCARON, XF_tCEDILLA, XF_tCARON,
-    XF_uRING, XF_UDBLACUTE, XF_uDBLACUTE, XF_zACUTE,
-    XF_zDOT, XF_zCARON,
+    XF_LSTROKE, XF_lSTROKE, XF_nACUTE, XF_nCARON,
+    XF_ODBLACUTE, XF_oDBLACUTE, XF_RCARON, XF_rCARON,
+    XF_sACUTE, XF_SCEDILLA, XF_sCEDILLA, XF_sCARON,
+    XF_tCEDILLA, XF_tCARON, XF_uRING, XF_UDBLACUTE,
+    XF_uDBLACUTE, XF_zACUTE, XF_zDOT, XF_zCARON,
 #define XF_DSTROKE XF_ETH
+#define XF_SACUTE  XF_sACUTE
+#define XF_SCARON  XF_sCARON
 
     /* Greek */
     XF_GR_DELTA, XF_GR_THETA, XF_GR_LAMBDA, XF_GR_XI,
@@ -321,15 +323,19 @@ const struct xchar_info xchar_info_newlcd[] = {
     { 0x011f, XF_gBREVE,      1, 0x67 }, /* g breve */
     { 0x0130, XF_IDOT,        1, 0x49 }, /* I with dot above */
     { 0x0131, XF_DOTLESSi,    1, 0x69 }, /* dotless i */
+    { 0x0141, XF_LSTROKE,     1, 0x4c }, /* L stroke */
     { 0x0142, XF_lSTROKE,     1, 0x6c }, /* l stroke */
     { 0x0144, XF_nACUTE,      1, 0x6e }, /* n acute */
     { 0x0148, XF_nCARON,      1, 0x6e }, /* n caron */
     { 0x0150, XF_ODBLACUTE,   1, 0x4f }, /* O double acute */
     { 0x0151, XF_oDBLACUTE,   1, 0x6f }, /* o double acute */
+    { 0x0158, XF_RCARON,      1, 0x52 }, /* R caron */
     { 0x0159, XF_rCARON,      1, 0x72 }, /* r caron */
+    { 0x015a, XF_SACUTE,      1, 0x53 }, /* S acute */
     { 0x015b, XF_sACUTE,      1, 0x73 }, /* s acute */
     { 0x015e, XF_SCEDILLA,    1, 0x53 }, /* S cedilla */
     { 0x015f, XF_sCEDILLA,    1, 0x73 }, /* s cedilla */
+    { 0x0160, XF_SCARON,      1, 0x53 }, /* S caron */
     { 0x0161, XF_sCARON,      1, 0x73 }, /* s caron */
     { 0x0163, XF_tCEDILLA,    1, 0x74 }, /* t cedilla */
     { 0x0165, XF_tCARON,      1, 0x74 }, /* t caron */
@@ -416,6 +422,8 @@ const struct xchar_info xchar_info_newlcd[] = {
     { 0x03cc, XF_GR_omicronTONOS, 1, 0x6f }, /* greek omicron with tonos */
     { 0x03cd, XF_GR_upsilonTONOS, 1, 0x75 }, /* greek upsilon with tonos */
     { 0x03ce, XF_GR_omegaTONOS,   1, 0x77 }, /* greek omega with tonos */
+
+    { 0x03f3, 0, 0, 0x6a }, /* greek yot */
 
     /* Cyrillic */
     { 0x0400, XF_CYR_IEGRAVE,1, 0x45 }, /* cyrillic IE grave */
@@ -823,15 +831,19 @@ const struct xchar_info xchar_info_oldlcd[] = {
     { 0x011f, 0, 0, 0xc2 }, /* g breve */
     { 0x0130, 0, 0, 0xc5 }, /* I with dot above */
     { 0x0131, 0, 0, 0xc6 }, /* dotless i */
+    { 0x0141, XF_LSTROKE, 1, 0x50 }, /* L stroke */
     { 0x0142, 0, 0, 0xb8 }, /* l stroke */
     { 0x0144, 0, 0, 0xb7 }, /* n acute */
     { 0x0148, 0, 0, 0xba }, /* n caron */
     { 0x0150, 0, 0, 0xc8 }, /* O double acute */
     { 0x0151, 0, 0, 0xca }, /* o double acute */
+    { 0x0158, XF_RCARON,  1, 0x56 }, /* R caron */
     { 0x0159, 0, 0, 0xaa }, /* r caron */
+    { 0x015a, 0, 0, 0xb6 }, /* S acute */
     { 0x015b, 0, 0, 0xb6 }, /* s acute */
     { 0x015e, 0, 0, 0xc3 }, /* S cedilla */
     { 0x015f, 0, 0, 0xc4 }, /* s cedilla */
+    { 0x0160, 0, 0, 0xac }, /* S caron */
     { 0x0161, 0, 0, 0xac }, /* s caron */
     { 0x0163, 0, 0, 0xd9 }, /* t cedilla */
     { 0x0165, 0, 0, 0xbb }, /* t caron */
@@ -918,6 +930,8 @@ const struct xchar_info xchar_info_oldlcd[] = {
     { 0x03cc, 0, 0, 0xa4 }, /* greek omicron with tonos */
     { 0x03cd, XF_GR_upsilonTONOS, 1, 0xa7 }, /* greek upsilon with tonos */
     { 0x03ce, XF_GR_omegaTONOS,   1, 0x7b }, /* greek omega with tonos */
+
+    { 0x03f3, 0, 0, 0x6e }, /* greek yot */
 
     /* Cyrillic */
     { 0x0400, 0, 0, 0x90 }, /* cyrillic IE grave */
@@ -1162,11 +1176,13 @@ const unsigned char xfont_fixed[][HW_PATTERN_SIZE] = {
     [XF_gBREVE] =        { 0x1f, 0x00, 0x0f, 0x11, 0x0f, 0x01, 0x0e},
     [XF_IDOT] =          { 0x04, 0x00, 0x0e, 0x04, 0x04, 0x04, 0x0e},
     [XF_DOTLESSi] =      { 0x00, 0x00, 0x0c, 0x04, 0x04, 0x04, 0x0e},
+    [XF_LSTROKE] =       { 0x10, 0x10, 0x14, 0x18, 0x10, 0x10, 0x1f},
     [XF_lSTROKE] =       { 0x0c, 0x04, 0x06, 0x0c, 0x04, 0x04, 0x0e},
     [XF_nACUTE] =        { 0x02, 0x04, 0x16, 0x19, 0x11, 0x11, 0x11},
     [XF_nCARON] =        { 0x0a, 0x04, 0x16, 0x19, 0x11, 0x11, 0x11},
     [XF_ODBLACUTE] =     { 0x09, 0x12, 0x0e, 0x11, 0x11, 0x11, 0x0e},
     [XF_oDBLACUTE] =     { 0x09, 0x12, 0x00, 0x0e, 0x11, 0x11, 0x0e},
+    [XF_RCARON] =        { 0x0a, 0x04, 0x1e, 0x11, 0x1e, 0x12, 0x11},
     [XF_rCARON] =        { 0x0a, 0x04, 0x0b, 0x0c, 0x08, 0x08, 0x08},
     [XF_sACUTE] =        { 0x02, 0x04, 0x0e, 0x10, 0x0e, 0x01, 0x1e},
     [XF_SCEDILLA] =      { 0x0e, 0x10, 0x0e, 0x01, 0x0e, 0x04, 0x0c},
