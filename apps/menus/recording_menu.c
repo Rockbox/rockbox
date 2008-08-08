@@ -69,6 +69,7 @@
 #include "settings_list.h"
 #include "list.h"
 #include "viewport.h"
+#include "exported_menus.h"
 
 static bool no_source_in_menu = false;
 static int recmenu_callback(int action,const struct menu_item_ex *this_item);
@@ -586,13 +587,6 @@ int rectrigger(void)
 MENUITEM_FUNCTION(rectrigger_item, 0, ID2P(LANG_RECORD_TRIGGER), 
                   rectrigger, NULL, NULL, Icon_Menu_setting);
 
-
-
-/* from main_menu.c */
-struct browse_folder_info {
-    const char* dir;
-    int show_options;
-};
 static struct browse_folder_info rec_config_browse = {RECPRESETS_DIR, SHOW_CFG};
 int browse_folder(void *param);
 MENUITEM_FUNCTION(browse_recconfigs, MENU_FUNC_USEPARAM, ID2P(LANG_CUSTOM_CFG), 
@@ -626,6 +620,9 @@ MAKE_MENU(recording_settings_menu, ID2P(LANG_RECORDING_SETTINGS),
             &rectrigger_item,
 #ifdef HAVE_AGC
             &agc_preset, &agc_cliptime,
+#endif
+#ifdef HAVE_LCD_BITMAP
+            &peak_meter_menu,
 #endif
             &browse_recconfigs, &save_recpresets_item
 );
