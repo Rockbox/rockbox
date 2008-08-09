@@ -45,7 +45,7 @@
     .extern system_main
 
     .global    _start
-    .section .resetvectors,"ax",%progbits
+    .section .init.text
     .set    noreorder
     .set    noat
     
@@ -125,12 +125,12 @@ _init_stack_loop:
     nop
 
     
-    .section .vectors,"ax",%progbits
-    .extern exception_handler
+    .section .vectors, "ax", %progbits
+    .extern real_exception_handler
     .global except_common_entry
     .type   except_common_entry,@function
 except_common_entry:
-    la     k0, exception_handler
+    la     k0, real_exception_handler
     jr     k0
     nop
     nop
@@ -138,10 +138,10 @@ except_common_entry:
 
     .extern _int
     .extern _exception
-    .global exception_handler
-    .type   exception_handler,@function
+    .global real_exception_handler
+    .type   real_exception_handler,@function
     .set noreorder
-exception_handler:
+real_exception_handler:
 
 
     addiu   sp, -0x80
@@ -257,15 +257,14 @@ _int:
     eret                   # Exception Return
     nop
     
-    .extern _except_handler
+    .extern _exception_handler
     .global _exception
     .type   _exception,@function
 _exception:
     move    a0, sp
     mfc0    a1, C0_CAUSE       # C0_CAUSE of last exception
     mfc0    a2, C0_EPC         # Exception Program Counter
-    la      k0, except_handler
+    la      k0, exception_handler
     jr      k0
     nop
-
     .set reorder

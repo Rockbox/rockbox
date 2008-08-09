@@ -22,19 +22,18 @@ SECTIONS
 {
     . = DRAMORIG;
 
-    .text : {
+    .text :
+    {
         loadaddress = .;
         _loadaddress = .;
-        _resetvectorsstart = .;
-        KEEP(*(.resetvectors));
-        *(.resetvectors);
-        _resetvectorsend = .;
         *(.init.text);
         *(.text*);
         *(.glue_7);
         *(.glue_7t);
         *(.rel.dyn);
-        . = ALIGN(0x4);
+        _vectorsstart = .;
+        KEEP(*(.vectors))
+        *(.vectors);
     } > DRAM
     
     . = ALIGN(4);
@@ -50,10 +49,9 @@ SECTIONS
         /* Pseudo-allocate the copies of the data sections */
         _datacopy = .;
     } > DRAM
-    
-    . = ALIGN(4);
 
-    .data : {
+    .data :
+    {
         *(.icode);
         *(.irodata);
         *(.idata);
@@ -63,12 +61,11 @@ SECTIONS
         _dataend = . ;
     } > DRAM
     
-    . = ALIGN(4);
-    
     _gp = ALIGN(16);
-    .got : {
+    .got :
+    {
         *(.got*)
-    }> DRAM
+    } > DRAM
     
     . = ALIGN(4);
 
@@ -94,16 +91,4 @@ SECTIONS
          *(.scommon*);
          _end = .;
     } > DRAM
-    
-    . = ALIGN(4);
-
-    .vectors :
-    {
-        _vectorsstart = .;
-        KEEP(*(.vectors));
-        *(.vectors);
-        _vectorsend = .;
-    } > DRAM
-    
-    . = ALIGN(4);
 }

@@ -31,8 +31,6 @@
 
 #define set_irq_level(status) \
     set_interrupt_status((status), ST0_IE)
-#define set_fiq_status(status) \
-    set_interrupt_status((status), ST0_IE)
 
 static inline int set_interrupt_status(int status, int mask)
 {
@@ -64,12 +62,6 @@ static inline void disable_interrupt(void)
 #define enable_irq() \
     enable_interrupt()
 
-#define disable_fiq() \
-    disable_interrupt()
-
-#define enable_fiq() \
-    enable_interrupt()
-
 static inline int disable_interrupt_save(int mask)
 {
 	unsigned int oldstatus;
@@ -83,19 +75,13 @@ static inline int disable_interrupt_save(int mask)
 #define disable_irq_save() \
     disable_interrupt_save(ST0_IE)
 
-#define disable_fiq_save() \
-    disable_interrupt_save(ST0_IE)
-
 static inline void restore_interrupt(int status)
 {
     write_c0_status(status);
 }
 
-#define restore_irq(cpsr) \
-    restore_interrupt(cpsr)
-
-#define restore_fiq(cpsr) \
-    restore_interrupt(cpsr)
+#define restore_irq(c0_status) \
+    restore_interrupt(c0_status)
     
 #define	swap16(x) (((x) & 0xff) << 8 | ((x) >> 8) & 0xff)
 #define	swap32(x) (((x) & 0xff) << 24 | ((x) & 0xff00) << 8 | ((x) & 0xff0000) >> 8 | ((x) >> 24) & 0xff)
@@ -108,6 +94,7 @@ void __dcache_invalidate_all(void);
 void __icache_invalidate_all(void);
 void __flush_dcache_line(unsigned long addr);
 void dma_cache_wback_inv(unsigned long addr, unsigned long size);
+int request_irq(unsigned int irq, void (*handler)(void));
 void sti(void);
 void cli(void);
 

@@ -86,7 +86,7 @@ int main(void)
     if(read_c0_config1() & (1 << 5)) printf(" * MDMX available");
     if(read_c0_config1() & (1 << 6)) printf(" * CP2 available");
     printf("C0_STATUS: 0x%x", read_c0_status());
-    unsigned char testdata[4096];
+  /*  unsigned char testdata[4096];
     char msg[30];
     int j = 0;
     while(1)
@@ -108,7 +108,7 @@ int main(void)
             j--;
         if(j<0)
             j = 0;
-    }
+    }*/
     while(1)
     {
         btn = button_read_device(&touch);
