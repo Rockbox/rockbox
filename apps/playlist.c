@@ -533,9 +533,9 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
         playlist->fd = open_utf8(playlist->filename, O_RDONLY);
     if(playlist->fd < 0)
         return -1; /* failure */
-    if(lseek(playlist->fd, 0, SEEK_CUR) > 0)
+    if((i = lseek(playlist->fd, 0, SEEK_CUR)) > 0)
         playlist->utf8 = true; /* Override any earlier indication. */
-    
+
     gui_syncsplash(0, ID2P(LANG_WAIT));
 
     if (!buffer)
@@ -550,7 +550,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
         buffer = (char *)audio_get_buffer(false, &buflen);
 #endif
     }
-    
+
     store_index = true;
 
     while(1)
@@ -559,7 +559,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
         /* Terminate on EOF */
         if(nread <= 0)
             break;
-        
+
         p = (unsigned char *)buffer;
 
         for(count=0; count < nread; count++,p++) {
