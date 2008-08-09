@@ -4260,7 +4260,7 @@
 </phrase>
 <phrase>
   id: LANG_RECORDING_LEFT
-  desc: deprecated  
+  desc: deprecated
   user:
   <source>
     *: none
