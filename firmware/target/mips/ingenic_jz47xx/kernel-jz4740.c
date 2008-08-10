@@ -22,8 +22,6 @@
 #include "config.h"
 #include "system.h"
 #include "kernel.h"
-#include "timer.h"
-#include "thread.h"
 #include "jz4740.h"
 
 extern void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
@@ -35,7 +33,9 @@ void tick_start(unsigned int interval_in_ms)
     unsigned int latch;
     __cpm_start_tcu();
     
+    __tcu_stop_counter(0);
     __tcu_disable_pwm_output(0);
+    
     __tcu_mask_half_match_irq(0); 
     __tcu_unmask_full_match_irq(0);
 
@@ -49,15 +49,19 @@ void tick_start(unsigned int interval_in_ms)
     
     latch = (JZ_EXTAL / 4 + (tps>>1)) / tps;
 #endif
+    REG_TCU_TCNT(0) = 0;
     REG_TCU_TDFR(0) = latch;
     REG_TCU_TDHR(0) = latch;
+    //REG_TCU_TDHR(0) = 0;
 
     __tcu_clear_full_match_flag(0);
     __tcu_start_counter(0);
     
-    //printf("TCSR = 0x%04x\r\n",*(volatile u16 *)0xb000204C);
+    system_enable_irq(IRQ_TCU0);
+    
 }
 
+/* Interrupt handler */
 void TCU0(void)
 {
     int i;

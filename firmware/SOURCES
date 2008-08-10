@@ -1089,6 +1089,6 @@ drivers/nand_id.c
 
 #ifdef ONDA_VX747
 target/mips/ingenic_jz47xx/onda_vx747/backlight-onda_vx747.c
-target/mips/ingenic_jz47xx/onda_vx747/button-onda_vx747.c
 target/mips/ingenic_jz47xx/onda_vx747/lcd-onda_vx747.c
+target/mips/ingenic_jz47xx/onda_vx747/sadc-onda_vx747.c
 #endif

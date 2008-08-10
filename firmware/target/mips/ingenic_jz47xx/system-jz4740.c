@@ -32,9 +32,10 @@
 #define NUM_GPIO 128
 #define IRQ_MAX  (IRQ_GPIO_0 + NUM_GPIO)
 
+static int irq;
 static void UIRQ(void)
 {
-    panicf("Unhandled interrupt occurred\n");
+    panicf("Unhandled interrupt occurred: %d\n", irq);
 }
 
 #define default_interrupt(name) \
@@ -51,7 +52,6 @@ default_interrupt(SSI);
 default_interrupt(CIM);
 default_interrupt(AIC);
 default_interrupt(ETH);
-default_interrupt(TCU3);
 default_interrupt(TCU2);
 default_interrupt(TCU1);
 default_interrupt(TCU0);
@@ -197,11 +197,12 @@ default_interrupt(GPIO127);
 
 static void (* const irqvector[])(void) =
 {
-    I2C,EMC,UHC,UART0,SADC,MSC,RTC,SSI,
-    CIM,AIC,ETH,UIRQ,TCU3,TCU2,TCU1,TCU0,
-    UDC,UIRQ,UIRQ,UIRQ,UIRQ,IPU,LCD,UIRQ,
-    DMA0,DMA1,DMA2,DMA3,DMA4,DMA5,UIRQ,UIRQ,
-    UIRQ,UIRQ,UIRQ,UIRQ,UIRQ,UIRQ,UIRQ,UIRQ,
+    I2C,EMC,UHC,UIRQ,UIRQ,UIRQ,UIRQ,UIRQ,
+    UART0,UIRQ,UIRQ,SADC,UIRQ,MSC,RTC,SSI,
+    CIM,AIC,ETH,UIRQ,TCU2,TCU1,TCU0,UDC,
+    UIRQ,UIRQ,UIRQ,UIRQ,IPU,LCD,UIRQ,DMA0,
+    DMA1,DMA2,DMA3,DMA4,DMA5,UIRQ,UIRQ,UIRQ,
+    UIRQ,UIRQ,UIRQ,UIRQ,UIRQ,UIRQ,UIRQ,
     GPIO0,GPIO1,GPIO2,GPIO3,GPIO4,GPIO5,GPIO6,GPIO7,
     GPIO8,GPIO9,GPIO10,GPIO11,GPIO12,GPIO13,GPIO14,GPIO15,
     GPIO16,GPIO17,GPIO18,GPIO19,GPIO20,GPIO21,GPIO22,GPIO23,
@@ -223,7 +224,7 @@ static void (* const irqvector[])(void) =
 static unsigned int dma_irq_mask = 0;
 static unsigned int gpio_irq_mask[4] = {0};
 
-static void ena_irq(unsigned int irq)
+void system_enable_irq(unsigned int irq)
 {
     register unsigned int t;
     if ((irq >= IRQ_GPIO_0) && (irq <= IRQ_GPIO_0 + NUM_GPIO))
@@ -333,7 +334,7 @@ static int get_irq_number(void)
 
 void intr_handler(void)
 {
-    register int irq = get_irq_number();
+    irq = get_irq_number();
     if(irq < 0)
         return;
     
@@ -341,7 +342,6 @@ void intr_handler(void)
     if(irq > 0)
         irqvector[irq-1]();
     
-    printf("Interrupt!");
     return;
 }
 
@@ -558,18 +558,11 @@ void system_main(void)
     
     __dcache_writeback_all();
     __icache_invalidate_all();
-
-    //set_c0_status(1 << 22); /* Enable Boot Exception Vectors */
     
-    /* Init interrupt handlers */
+    /* Init interrupt handling */
     ipl = 0;
     for(i=0;i<IRQ_MAX;i++)
-    {
-        if(irqvector[i] == UIRQ)
-            dis_irq(i);
-        else
-            ena_irq(i);
-    }
+        dis_irq(i);
     
     sti();
     

@@ -94,8 +94,11 @@ void __dcache_invalidate_all(void);
 void __icache_invalidate_all(void);
 void __flush_dcache_line(unsigned long addr);
 void dma_cache_wback_inv(unsigned long addr, unsigned long size);
+void system_enable_irq(unsigned int irq);
 void sti(void);
 void cli(void);
+void udelay(unsigned int usec);
+void mdelay(unsigned int msec);
 
 #endif /* __SYSTEM_TARGET_H_ */
 

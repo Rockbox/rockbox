@@ -43,7 +43,8 @@ static void audiotest(void)
 }
 
 int main(void)
-{   
+{
+    cli();
     kernel_init();
     lcd_init();
     font_init();
@@ -54,6 +55,8 @@ int main(void)
     backlight_init();
     
     ata_init();
+    
+    sti();
     
     /* To make Windows say "ding-dong".. */
     REG8(USB_REG_POWER) &= ~USB_POWER_SOFTCONN;
@@ -136,12 +139,10 @@ int main(void)
         snprintf(datetime, 30, "%02d/%02d/%04d %02d:%02d:%02d", get_time()->tm_mday, get_time()->tm_mon, get_time()->tm_year,
                                      get_time()->tm_hour, get_time()->tm_min, get_time()->tm_sec);
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT, datetime);
-        snprintf(datetime, 30, "%d", REG_TCU_TCNT0);
+        snprintf(datetime, 30, "%d", current_tick);
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*2, datetime);
         snprintf(datetime, 30, "X: %d Y: %d", touch>>16, touch & 0xFFFF);
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*3, datetime);
-        snprintf(datetime, 30, "%d", read_c0_count());
-        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*4, datetime);
         lcd_update();
     }
     
