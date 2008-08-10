@@ -27,7 +27,11 @@
 #include "dir.h"
 #include "debug.h"
 
+#if ((defined(MEMORYSIZE) && (MEMORYSIZE > 8)) || MEM > 8)
+#define MAX_OPEN_DIRS 16
+#else
 #define MAX_OPEN_DIRS 8
+#endif
 
 static DIR_UNCACHED opendirs[MAX_OPEN_DIRS];
 

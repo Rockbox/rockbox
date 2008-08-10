@@ -49,7 +49,11 @@
 #define DIRCACHE_BUILD 1
 #define DIRCACHE_STOP  2
 
+#if ((defined(MEMORYSIZE) && (MEMORYSIZE > 8)) || MEM > 8)
+#define MAX_OPEN_DIRS 16
+#else
 #define MAX_OPEN_DIRS 8
+#endif
 static DIR_CACHED opendirs[MAX_OPEN_DIRS];
 
 static struct dircache_entry *fd_bindings[MAX_OPEN_FILES];
