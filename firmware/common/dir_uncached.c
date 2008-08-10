@@ -28,7 +28,7 @@
 #include "debug.h"
 
 #if ((defined(MEMORYSIZE) && (MEMORYSIZE > 8)) || MEM > 8)
-#define MAX_OPEN_DIRS 16
+#define MAX_OPEN_DIRS 12
 #else
 #define MAX_OPEN_DIRS 8
 #endif
