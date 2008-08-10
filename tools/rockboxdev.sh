@@ -73,6 +73,12 @@ getfile() {
      $tool -Lo $dlwhere/$1 $2/$1
   fi
 
+  if [ $? -ne 0 ] ; then
+      echo "ROCKBOXDEV: couldn't download the file!"
+      echo "ROCKBOXDEV: check your internet connection"
+      exit
+  fi
+
   if test -z "$tool"; then 
     echo "ROCKBOXDEV: No downloader tool found!"
     echo "ROCKBOXDEV: Please install curl or wget and re-run the script"
