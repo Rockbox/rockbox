@@ -978,6 +978,8 @@ bool recording_screen(bool no_source)
     int pm_h[NB_SCREENS];           /* peakmeter height */
     int trig_ypos[NB_SCREENS];      /* trigger bar y pos */
     int trig_width[NB_SCREENS];     /* trigger bar width */
+    bool compact_view[NB_SCREENS];  /* tweak layout tiny screens / big fonts */
+
     struct gui_synclist lists;      /* the list in the bottom vp */
 #ifdef HAVE_FMRADIO_REC
     int prev_rec_source = global_settings.rec_source; /* detect source change */
@@ -1051,9 +1053,20 @@ bool recording_screen(bool no_source)
            NOTE: one could limit the list to 1 line and get away with 5 lines */
         v = &vp_top[i];
         viewport_set_defaults(v, i); /*already takes care of statusbar*/
-        if (viewport_get_nb_lines(v) < (4+2)) /*top=4,list=2*/
+        if (viewport_get_nb_lines(v) < 4)
+        {
+            /* compact needs 4 lines total */
             v->font = FONT_SYSFIXED;
-        v->height = (font_get(v->font)->height)*4;
+            compact_view[i] = false;
+        }
+        else
+        {
+            if (viewport_get_nb_lines(v) < (4+2)) /*top=4,list=2*/
+                compact_view[i] = true;
+            else
+                compact_view[i] = false;
+        }
+        v->height = (font_get(v->font)->height)*(compact_view[i] ? 3 : 4);
 
         /* list section, rest of the screen */
         v = &vp_list[i];
@@ -1066,6 +1079,8 @@ bool recording_screen(bool no_source)
         screens[i].getstringsize("W", &w, &h);
         pm_y[i] = font_get(vp_top[i].font)->height * 2;
         trig_ypos[i] = font_get(vp_top[i].font)->height * 3;
+        if(compact_view[i])
+           trig_ypos[i] -= (font_get(vp_top[i].font)->height)/2;
     }
 
     /* init the bottom list */
@@ -1102,6 +1117,8 @@ bool recording_screen(bool no_source)
                     pm_h[i] = font_get(vp_top[i].font)->height * 2;
                 else
                     pm_h[i] = font_get(vp_top[i].font)->height;
+                if(compact_view[i])
+                    pm_h[i] /= 2;
                 trig_width[i] = vp_top[i].width - pm_x[i];
                 screens[i].clear_display();
                 screens[i].update();
