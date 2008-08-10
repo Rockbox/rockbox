@@ -32,8 +32,6 @@ typedef long long ogg_int64_t;
 #  define LOOKUP_T const ogg_int32_t
 #endif
 
-//#include "ivorbiscodec.h"
-
 #include <codecs.h>
 #include "asm_arm.h"
 #include "asm_mcf5249.h"
@@ -65,10 +63,8 @@ typedef long long ogg_int64_t;
 #define cPI1_8 (0x7641af3d)
 #endif
 
-//extern void mdct_forward(int n, DATA_TYPE *in, DATA_TYPE *out);
+
 extern void mdct_backward(int n, ogg_int32_t *in, DATA_TYPE *out);
-//extern void mdct_bitreverse(DATA_TYPE *x,int n,int step,int shift);
-//extern void mdct_butterflies(DATA_TYPE *x,int points,int shift);
 
 #endif
 

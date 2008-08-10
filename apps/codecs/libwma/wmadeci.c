@@ -918,7 +918,7 @@ static int decode_exp_vlc(WMADecodeContext *s, int ch)
 
 /* return 0 if OK. return 1 if last block of frame. return -1 if
    unrecorrable error. */
-static int wma_decode_block(WMADecodeContext *s)
+static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
 {
     int n, v, a, ch, code, bsize;
     int coef_nb_bits, total_gain;
@@ -1383,14 +1383,13 @@ static int wma_decode_block(WMADecodeContext *s)
     {
         if (s->channel_coded[ch])
         {
-            static fixed32  output[BLOCK_MAX_SIZE * 2] IBSS_ATTR;
             int n4, index, n;
 
             n = s->block_len;
             n4 = s->block_len >>1;
 
             /*faster IMDCT from Vorbis*/
-            mdct_backward( (1 << (12-bsize)), (int*)(*(s->coefs))[ch], (int*)output);
+            mdct_backward( (1 << (12-bsize)), (int*)(*(s->coefs))[ch], (int*)scratch_buffer);
 
             /*slower but more easily understood IMDCT from FFMPEG*/
             //ff_imdct_calc(&s->mdct_ctx[bsize],
@@ -1400,7 +1399,7 @@ static int wma_decode_block(WMADecodeContext *s)
 
             /* add in the frame */
             index = (s->frame_len / 2) + s->block_pos - n4;
-            wma_window(s, output, &((*s->frame_out)[ch][index]));
+            wma_window(s, scratch_buffer, &((*s->frame_out)[ch][index]));
 
 
 
@@ -1408,7 +1407,7 @@ static int wma_decode_block(WMADecodeContext *s)
                channel if it is not coded */
             if (s->ms_stereo && !s->channel_coded[1])
             {
-                wma_window(s, output, &((*s->frame_out)[1][index]));
+                wma_window(s, scratch_buffer, &((*s->frame_out)[1][index]));
             }
         }
     }
@@ -1440,7 +1439,7 @@ static int wma_decode_frame(WMADecodeContext *s, int32_t *samples)
 
     for(;;)
     {
-        ret = wma_decode_block(s);
+        ret = wma_decode_block(s, samples);
         if (ret < 0)
         {
 
@@ -1485,7 +1484,7 @@ int wma_decode_superframe_init(WMADecodeContext* s,
         s->last_superframe_len = 0;
         return 0;
     }
-
+    
     s->current_frame = 0;
 
     init_get_bits(&s->gb, buf, buf_size*8);

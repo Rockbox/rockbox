@@ -35,7 +35,7 @@ int packet_count=0;
    BLOCK_MAX_SIZE is 2048 (samples) and MAX_CHANNELS is 2.
  */
 
-static uint32_t decoded[BLOCK_MAX_SIZE * MAX_CHANNELS];
+static uint32_t decoded[BLOCK_MAX_SIZE * MAX_CHANNELS] IBSS_ATTR;
 
 /* NOTE: WMADecodeContext is 120152 bytes (on x86) */
 static WMADecodeContext wmadec;
