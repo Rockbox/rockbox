@@ -964,7 +964,7 @@ const struct settings_list settings[] = {
        "trigger mode","off,once,repeat", NULL ,3,
        ID2P(LANG_OFF), ID2P(LANG_RECORD_TRIG_NOREARM), ID2P(LANG_REPEAT)),
     CHOICE_SETTING(F_RECSETTING, rec_trigger_type, LANG_RECORD_TRIGGER_TYPE, TRIG_TYPE_STOP,
-       "trigger mode","off,once,repeat", NULL ,3,
+        "trigger type","stop,pause,nf stp", NULL ,3,
        ID2P(LANG_RECORD_TRIGGER_STOP), ID2P(LANG_PAUSE), ID2P(LANG_RECORD_TRIGGER_NEWFILESTP)),
 #endif /* HAVE_RECORDING */
 
