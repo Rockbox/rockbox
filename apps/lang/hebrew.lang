@@ -8856,15 +8856,15 @@
   user:
   <source>
     *: none
-    recording: ""
+    agc: ""
   </source>
   <dest>
     *: none
-    recording: ""
+    agc: ""
   </dest>
   <voice>
     *: none
-    recording: ""
+    agc: ""
   </voice>
 </phrase>
 <phrase>
