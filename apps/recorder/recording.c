@@ -1727,8 +1727,9 @@ bool recording_screen(bool no_source)
                 snprintf(clpstr, 32, "%4d", pm_get_clipcount());
                 FOR_NB_ACTIVE_SCREENS(i)
                 {
-                    screens[i].puts(0, 2,str(LANG_PM_CLIPCOUNT));
-                    screens[i].puts(0, 3, clpstr);
+                    if(!compact_view[i])
+                        screens[i].puts(0, 2,str(LANG_PM_CLIPCOUNT));
+                    screens[i].puts(0, compact_view[i] ? 2 : 3, clpstr);
                 }
             }
 
