@@ -2054,8 +2054,13 @@ bool gui_wps_refresh(struct gui_wps *gwps,
                     /* found a line with a peak meter -> remember that we must
                         enable it later */
                     enable_pm = true;
+                    peak_meter_enabled = true;
                     peak_meter_screen(gwps->display, 0, peak_meter_y,
                                       MIN(h, display->getheight() - peak_meter_y));
+                }
+                else
+                {
+                    peak_meter_enabled = false;
                 }
             }
 
