@@ -3,21 +3,24 @@
 \section{\label{ref:Supportedfileformats}Supported file formats}
 \begin{table}
 \begin{center}
-\begin{tabularx}{\textwidth}{lllX}\toprule
+\begin{tabularx}{\textwidth}{llXX}\toprule
 \textbf{Icon} & \textbf{File Type} & \textbf{Extension} 
   & \textbf{Action when selected} \\\midrule
 \includegraphics[width=0.37cm]{appendix/images/icon-directory.png} 
   & Directory & \emph{none} & The browser enters that directory \\
 \includegraphics[width=0.37cm]{appendix/images/icon-audio-file.png} 
   & Audio file & 
-  \opt{MASCODEC}{mp3}\opt{swcodec}{\emph{various}}
+  \opt{MASCODEC}{\fname{.mp2, .mp3}}\opt{swcodec}{\emph{various (see
+    \reference{ref:Supportedaudioformats}})}
   & Rockbox takes you to the WPS and starts playing the file \\
   \includegraphics[width=0.37cm]{appendix/images/icon-cuesheet.png} 
   & Cuesheet & \fname{.cue} & View a cuesheet file \\
-\includegraphics[width=0.37cm]{appendix/images/icon-wav-file.png} 
-  & Wave Audio File & \fname{.wav} & Play a WAV file \\%
+\opt{masf}{
+  \includegraphics[width=0.37cm]{appendix/images/icon-wav-file.png} 
+    & Wave Audio File & \fname{.wav} & Play a WAV file \\%
+}
 \includegraphics[width=0.37cm]{appendix/images/icon-playlist.png}
-  & Playlist & \fname{.m3u,.m3u8} & Rockbox loads the playlist and starts playing 
+  & Playlist & \fname{.m3u, .m3u8} & Rockbox loads the playlist and starts playing 
     the first file \\
 \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
   & Rockbox firmware & 
@@ -54,3 +57,49 @@
 \end{center}
 \end{table}
 
+\opt{swcodec}{
+  \section{\label{ref:Supportedaudioformats}Supported audio formats}
+  \begin{table}
+  \begin{center}
+  \begin{tabularx}{\textwidth}{lXX}\toprule
+  \textbf{Format} & \textbf{Extension} & \textbf{Notes} \\\midrule
+    \emph{Lossy codecs} \\
+    \midrule
+    MPEG audio & \fname{.mp1, .mpa, .mp2, .mp3} & \\
+    OGG/Vorbis & \fname{.ogg} & Some old ``floor 0'' files may crash Rockbox. \\
+    Musepack & \fname{.mpc} & \\
+    Advanced Audio Coding & \fname{.m4a, .m4b, .mp4} & \\
+    Windows Media Audio & \fname{.wma, .wmv, .asf} & \\
+    ATSC A/52 & \fname{.a52, .ac3} & Supports downmixing for playback of 5.1 streams in stereo. \\
+    ADX & \fname{.adx} & \\
+    Speex & \fname{.spx} & \\
+    \\
+    \midrule
+    \emph{Lossless codecs} \\
+    \midrule
+    Waveform audio format & \fname{.wav} & \\
+    Audio Interchange File Format & \fname{.aif, .aiff} & \\
+    Free Lossless Audio & \fname{.flac} & \\
+    Apple Lossless & \fname{.m4a, .mp4} & \\
+    Wavpack & \fname{.wv} & \\
+    Shorten & \fname{.shn} & Seeking not supported.\\
+    \opt{h1xx,h300,x5,m5,m3}{
+      Monkey's Audio & \fname{.ape, .mac} & Only -c1000 decodes fast enough to be useful. \\
+    }
+    \opt{gigabeat}{
+      Monkey's Audio & \fname{.ape, .mac} & -c1000 to -c3000 decodes fast enough to be useful. \\
+    }
+    \\
+    \midrule
+    \emph{Other codecs} \\
+    \midrule
+    Sound Interface Device & \fname{.sid} & \\
+    MOD & \fname{.mod} & \\
+    NES Sound Format & \fname{.nsf, .nsfe} & \\
+    SPC700 & \fname{.spc} & \\
+    Atari SAP & \fname{.sap} & \\
+  \bottomrule
+  \end{tabularx}
+  \end{center}
+  \end{table}
+}
