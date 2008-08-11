@@ -359,6 +359,7 @@ my $voiceid=0x8000; # counter for voice-only ID numbers
 
 open(LANG, "<$input") || die "Error: couldn't read language file named $input\n";
 my @phrase;
+my $header = 1;
 while(<LANG>) {
 
     $line++;
@@ -367,9 +368,13 @@ while(<LANG>) {
     $_ =~ s/\r//g;
 
     if($_ =~ /^( *\#|[ \t\n\r]*\z)/) {
-        # comment or empty line
+        # comment or empty line - output it if it's part of the header
+        if ($header eq 1) {
+            print($_);
+        }
         next;
     }
+    $header = 0;
 
     my $ll = $_;
 
