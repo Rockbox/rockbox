@@ -2062,8 +2062,9 @@ int playlist_resume(void)
         char *str2 = NULL;
         char *str3 = NULL;
         unsigned long last_tick = current_tick;
+        bool useraborted = false;
         
-        for(count=0; count<nread && !exit_loop; count++,p++)
+        for(count=0; count<nread && !exit_loop && !useraborted; count++,p++)
         {
             /* So a splash while we are loading. */
             if (current_tick - last_tick > HZ/4)
@@ -2073,9 +2074,8 @@ int playlist_resume(void)
                                str(LANG_OFF_ABORT));
                 if (action_userabort(TIMEOUT_NOBLOCK))
                 {
-                    /* FIXME: 
-                     * Not sure how to implement this, somebody more familiar
-                     * with the code, please fix this. */
+                    useraborted = true;
+                    break;
                 }
                 last_tick = current_tick;
             }
@@ -2341,6 +2341,11 @@ int playlist_resume(void)
             return result;
         }
 
+        if (useraborted)
+        {
+            gui_syncsplash(HZ*2, ID2P(LANG_CANCEL));
+            return -1;
+        }
         if (!newline || (exit_loop && count<nread))
         {
             if ((total_read + count) >= control_file_size)
