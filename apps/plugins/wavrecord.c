@@ -3103,12 +3103,6 @@ static struct i2c_block maspcm[] = {
 #define CFGFILE_VERSION 0     /* Current config file version */
 #define CFGFILE_MINVERSION 0  /* Minimum config file version to accept */
 
-#ifdef HAVE_MMC
-#define REC_BASE_DIRECTORY "/<MMC1>/recordings"
-#else
-#define REC_BASE_DIRECTORY "/recordings"
-#endif
-
 #define PCM_MAIN_IO_CONTROL      0x0661
 #define PCM_IF_STATUS_CONTROL    0x0662
 #define PCM_OFREQ_CONTROL        0x0663
@@ -3207,7 +3201,6 @@ struct configdata disk_config[] = {
 };
 
 static char recfilename[MAX_PATH];
-static const char recbasedir[] = REC_BASE_DIRECTORY;
 
 static unsigned char *aud_buf;
 static ssize_t aud_size;
@@ -3733,8 +3726,10 @@ static int recording_menu(void)
                 break;
 
             case 3: /* Start recording */
-                rb->create_numbered_filename(recfilename, recbasedir, "rec_",
-                                             ".wav", 4 IF_CNFN_NUM_(, NULL));
+                rb->create_numbered_filename(recfilename, 
+                                             rb->global_settings->rec_directory,
+                                             "rec_", ".wav", 4
+                                             IF_CNFN_NUM_(, NULL));
                 rc = record_file(recfilename);
                 done = true;
                 break;
@@ -3759,7 +3754,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 	ssize_t buf_size;
 	int align;
 	int rc;
-	DIR *dir;
+	const char *recbasedir;
 
     (void)parameter;
     rb = api;
@@ -3770,20 +3765,17 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         rb->splash(HZ, "Out of memory.");
         return PLUGIN_ERROR;
     }
-
-    if ((dir = rb->opendir(recbasedir)) == NULL)
+    
+    recbasedir = rb->global_settings->rec_directory;
+    if (rb->strcmp(recbasedir, "/") && !rb->dir_exists(recbasedir))
     {
         rc = rb->mkdir(recbasedir);
         if (rc < 0)
         {
-            rb->splash(HZ*2, "Can't create the %s directory. Error code %d.",
+            rb->splash(HZ*2, "Can't create directory %s. Error %d.",
                        recbasedir, rc);
             return PLUGIN_ERROR;
         }
-    }
-    else
-    {
-        rb->closedir(dir);
     }
 
     aud_buf = rb->plugin_get_audio_buffer((size_t *)&aud_size);
