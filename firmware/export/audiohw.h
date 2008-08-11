@@ -133,11 +133,11 @@ enum Channel {
 
 struct sound_settings_info {
     const char *unit;
-    int numdecimals;
-    int steps;
-    int minval;
-    int maxval;
-    int defaultval;
+    char numdecimals;
+    char steps;
+    short minval;
+    short maxval;
+    short defaultval;
 };
 
 /* This struct is used by every driver to export its min/max/default values for
