@@ -47,7 +47,7 @@ struct player_info_t
 {
     const char* name;
     const char* null_key;  // HMAC-SHA1 key
-    const char* fresc_key_v1; // BlowFish key
+    const char* fresc_key; // BlowFish key
     const char* tl_key;    // BlowFish key
     bool big_endian;
 };
@@ -469,7 +469,7 @@ bool decrypt(shared::bytes& data, int mode, player_info_t* pi,
             std::cout << "[*] Decrypting input file..." << std::endl;
 
         dword iv[2] = {shared::swap(data.size()), 0};
-        if (!zen::bf_cbc_decrypt((const byte*)pi->fresc_key_v1,
+        if (!zen::bf_cbc_decrypt((const byte*)pi->fresc_key,
                                  strlen(pi->fresc_key_v1)+1, &data[0],
                                  data.size(), (const byte*)iv))
         {
