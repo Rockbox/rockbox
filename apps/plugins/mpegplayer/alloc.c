@@ -256,11 +256,3 @@ void *memset(void *s, int c, size_t n)
     return rb->memset(s,c,n);
 }
 
-void abort(void)
-{
-    rb->lcd_putsxy(0,0,"ABORT!");
-    rb->lcd_update();
-
-    while (1);
-    /* Let's hope this is never called */
-}
