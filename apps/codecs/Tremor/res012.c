@@ -41,7 +41,7 @@ typedef struct {
 
 } vorbis_look_residue0;
 
-void res0_free_info(vorbis_info_residue *i){
+static void res0_free_info(vorbis_info_residue *i){
   vorbis_info_residue0 *info=(vorbis_info_residue0 *)i;
   if(info){
     memset(info,0,sizeof(*info));
@@ -49,7 +49,7 @@ void res0_free_info(vorbis_info_residue *i){
   }
 }
 
-void res0_free_look(vorbis_look_residue *i){
+static void res0_free_look(vorbis_look_residue *i){
   int j;
   if(i){
 
@@ -86,7 +86,7 @@ static int icount(unsigned int v){
 }
 
 /* vorbis_info is for range checking */
-vorbis_info_residue *res0_unpack(vorbis_info *vi,oggpack_buffer *opb){
+static vorbis_info_residue *res0_unpack(vorbis_info *vi,oggpack_buffer *opb){
   int j,acc=0;
   vorbis_info_residue0 *info=(vorbis_info_residue0 *)_ogg_calloc(1,sizeof(*info));
   codec_setup_info     *ci=(codec_setup_info *)vi->codec_setup;
@@ -118,8 +118,8 @@ vorbis_info_residue *res0_unpack(vorbis_info *vi,oggpack_buffer *opb){
   return(NULL);
 }
 
-vorbis_look_residue *res0_look(vorbis_dsp_state *vd,vorbis_info_mode *vm,
-                          vorbis_info_residue *vr){
+static vorbis_look_residue *res0_look(vorbis_dsp_state *vd,vorbis_info_mode *vm,
+                                      vorbis_info_residue *vr){
   vorbis_info_residue0 *info=(vorbis_info_residue0 *)vr;
   vorbis_look_residue0 *look=(vorbis_look_residue0 *)_ogg_calloc(1,sizeof(*look));
   codec_setup_info     *ci=(codec_setup_info *)vd->vi->codec_setup;
@@ -234,8 +234,8 @@ static int _01inverse(vorbis_block *vb,vorbis_look_residue *vl,
   return(0);
 }
 
-int res0_inverse(vorbis_block *vb,vorbis_look_residue *vl,
-                 ogg_int32_t **in,int *nonzero,int ch){
+static int res0_inverse(vorbis_block *vb,vorbis_look_residue *vl,
+                        ogg_int32_t **in,int *nonzero,int ch){
   int i,used=0;
   for(i=0;i<ch;i++)
     if(nonzero[i])
@@ -246,8 +246,8 @@ int res0_inverse(vorbis_block *vb,vorbis_look_residue *vl,
     return(0);
 }
 
-int res1_inverse(vorbis_block *vb,vorbis_look_residue *vl,
-                 ogg_int32_t **in,int *nonzero,int ch){
+static int res1_inverse(vorbis_block *vb,vorbis_look_residue *vl,
+                        ogg_int32_t **in,int *nonzero,int ch){
   int i,used=0;
   for(i=0;i<ch;i++)
     if(nonzero[i])

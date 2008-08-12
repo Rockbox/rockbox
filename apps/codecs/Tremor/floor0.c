@@ -133,11 +133,11 @@ static const unsigned char MLOOP_2[64] ICONST_ATTR ={
 
 static const unsigned char MLOOP_3[8] ICONST_ATTR ={0,1,2,2,3,3,3,3};
 
-void vorbis_lsp_to_curve(ogg_int32_t *curve,int *map,int n,int ln,
-			 ogg_int32_t *lsp,int m,
-			 ogg_int32_t amp,
-			 ogg_int32_t ampoffset,
-			 ogg_int32_t *icos){
+static void vorbis_lsp_to_curve(ogg_int32_t *curve,int *map,int n,int ln,
+                                ogg_int32_t *lsp,int m,
+                                ogg_int32_t amp,
+                                ogg_int32_t ampoffset,
+                                ogg_int32_t *icos){
 
   (void)ln;
   /* 0 <= m < 256 */

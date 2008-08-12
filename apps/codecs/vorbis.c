@@ -27,13 +27,13 @@ CODEC_HEADER
 
 /* Some standard functions and variables needed by Tremor */
 
-size_t read_handler(void *ptr, size_t size, size_t nmemb, void *datasource)
+static size_t read_handler(void *ptr, size_t size, size_t nmemb, void *datasource)
 {
     (void)datasource;
     return ci->read_filebuf(ptr, nmemb*size);
 }
 
-int initial_seek_handler(void *datasource, ogg_int64_t offset, int whence)
+static int initial_seek_handler(void *datasource, ogg_int64_t offset, int whence)
 {
     (void)datasource;
     (void)offset;
@@ -41,7 +41,7 @@ int initial_seek_handler(void *datasource, ogg_int64_t offset, int whence)
     return -1;
 }
 
-int seek_handler(void *datasource, ogg_int64_t offset, int whence)
+static int seek_handler(void *datasource, ogg_int64_t offset, int whence)
 {
     (void)datasource;
 
@@ -58,13 +58,13 @@ int seek_handler(void *datasource, ogg_int64_t offset, int whence)
     return -1;
 }
 
-int close_handler(void *datasource)
+static int close_handler(void *datasource)
 {
     (void)datasource;
     return 0;
 }
 
-long tell_handler(void *datasource)
+static long tell_handler(void *datasource)
 {
     (void)datasource;
     return ci->curpos;
@@ -74,7 +74,7 @@ long tell_handler(void *datasource)
  * (sampling rate, number of channels, etc).  It also tries to guess
  * reasonable buffer parameters based on the current quality setting.
  */
-bool vorbis_set_codec_parameters(OggVorbis_File *vf)
+static bool vorbis_set_codec_parameters(OggVorbis_File *vf)
 {
     vorbis_info *vi;
 

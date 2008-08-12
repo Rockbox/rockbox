@@ -37,7 +37,7 @@ CODEC_HEADER
 
 spx_int16_t output[MAX_FRAME_SIZE] IBSS_ATTR;
 
-int get_more_data(spx_ogg_sync_state *oy)
+static int get_more_data(spx_ogg_sync_state *oy)
 {
     int bytes;
     char *buffer;
@@ -182,9 +182,9 @@ static spx_int64_t seek_backwards(spx_ogg_sync_state *oy, spx_ogg_page *og,
     return -1;
 }
 
-int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
-                            spx_ogg_sync_state *oy,
-                            spx_int64_t headerssize)
+static int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
+                                   spx_ogg_sync_state *oy,
+                                   spx_int64_t headerssize)
 {
     /* TODO: Someone may want to try to implement seek to packet, 
              instead of just to page (should be more accurate, not be any 

@@ -194,7 +194,7 @@ static ogg_reference *ogg_buffer_sub(ogg_reference *or,long begin,long length){
   return ret;
 }
 
-ogg_reference *ogg_buffer_dup(ogg_reference *or){
+static ogg_reference *ogg_buffer_dup(ogg_reference *or){
   ogg_reference *ret=0,*head=0;
   /* duplicate the reference chain; increment refcounts */
   while(or){
