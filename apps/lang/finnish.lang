@@ -4604,7 +4604,7 @@
     gigabeats: "BACK = Peruuta"
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -9942,10 +9942,6 @@
   </dest>
   <voice>
     *: "tietokantaa varten löytyi merkintöjä"
-    h100,h120,h300: "tietokantaa varten löytyi merkintöjä"
-    ipod*: "tietokantaa varten löytyi merkintöjä"
-    x5,m5,gigabeat*,mrobe100: "tietokantaa varten löytyi merkintöjä"
-    h10,h10_5gb,e200,c200,sa9200: "tietokantaa varten löytyi merkintöjä"
   </voice>
 </phrase>
 <phrase>

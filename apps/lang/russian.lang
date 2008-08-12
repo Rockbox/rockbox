@@ -3005,7 +3005,7 @@
     *: "Пример скорости прокрутки"
   </dest>
   <voice>
-    *: "Пример скорости прокрутки"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4032,8 +4032,6 @@
   </dest>
   <voice>
     *: "%d%% %dч %dм"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dч %dм"
-    h10,ipodmini,ipodmini2g: "%d%% %dч %dм"
   </voice>
 </phrase>
 <phrase>
@@ -4238,7 +4236,7 @@
     gigabeats: "BACK = Revert"
   </source>
   <dest>
-    *: "ВЫКЛ. = Отмена"
+    *: none
     rtc: "ВЫКЛ. = Отмена"
     h100,h120,h300: "СТОП = Отмена"
     ipod*,e200,c200,sa9200: "МЕНЮ = Отмена"
@@ -4291,7 +4289,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Предзапись"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4340,7 +4338,7 @@
     e200,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
-    *: "Диск заполнен. Нажмите ВЫКЛ. для продолжения."
+    *: none
     recording: "Диск заполнен. Нажмите ВЫКЛ. для продолжения."
     h100,h120,h300: "Диск заполнен. Нажмите СТОП для продолжения."
     m5,x5: "Диск заполнен. Нажмите ВЫКЛ. для продолжения."
@@ -4516,7 +4514,7 @@
     gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
-    *: "ВОСПР.=Уст., ВЫКЛ.=Отм."
+    *: none
     alarm: "ВОСПР.=Уст., ВЫКЛ.=Отм."
     ipod*: "ВЫБОР=Уст., МЕНЮ=Отм."
     h10,h10_5gb: "ВЫБОР=Уст., ПРЕД.=Отм."
@@ -4558,7 +4556,7 @@
     *: "[Название]"
   </dest>
   <voice>
-    *: "[Название]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4572,7 +4570,7 @@
     *: "[Исполнитель]"
   </dest>
   <voice>
-    *: "[Исполнитель]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4586,7 +4584,7 @@
     *: "[Альбом]"
   </dest>
   <voice>
-    *: "[Альбом]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4600,7 +4598,7 @@
     *: "[Номер трека]"
   </dest>
   <voice>
-    *: "[Номер трека]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4614,7 +4612,7 @@
     *: "[Жанр]"
   </dest>
   <voice>
-    *: "[Жанр]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4628,7 +4626,7 @@
     *: "[Год]"
   </dest>
   <voice>
-    *: "[Год]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4642,7 +4640,7 @@
     *: "[Список]"
   </dest>
   <voice>
-    *: "[Список]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4656,7 +4654,7 @@
     *: "[Битрейт]"
   </dest>
   <voice>
-    *: "[Битрейт]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4670,7 +4668,7 @@
     *: " (Переменный)"
   </dest>
   <voice>
-    *: " (Переменный)"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4684,7 +4682,7 @@
     *: "[Частота]"
   </dest>
   <voice>
-    *: "[Частота]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4698,7 +4696,7 @@
     *: "[Усиление трека]"
   </dest>
   <voice>
-    *: "[Усиление трека]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4712,7 +4710,7 @@
     *: "[Усиление альбома]"
   </dest>
   <voice>
-    *: "[Усиление альбома]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4726,7 +4724,7 @@
     *: "[Путь]"
   </dest>
   <voice>
-    *: "[Путь]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4740,7 +4738,7 @@
     *: "<Нет информ.>"
   </dest>
   <voice>
-    *: "<Нет информ.>"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6706,7 +6704,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "е"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -7323,11 +7321,11 @@
     recording: "Mono"
   </source>
   <dest>
-    *: "mono"
+    *: none
     recording: "Моно"
   </dest>
   <voice>
-    *: "mono"
+    *: none
     recording: "Моно"
   </voice>
 </phrase>
@@ -7782,12 +7780,12 @@
     recorder_pad: "Menu"
   </source>
   <dest>
-    *: "Меню"
-    recorder_pad: ""
+    *: none
+    recorder_pad: "Меню"
   </dest>
   <voice>
-    *: "Меню"
-    recorder_pad: ""
+    *: none
+    recorder_pad: "Меню"
   </voice>
 </phrase>
 <phrase>
@@ -7804,7 +7802,7 @@
   </dest>
   <voice>
     *: none
-    recorder_pad: "Параметр"
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -7821,7 +7819,7 @@
   </dest>
   <voice>
     *: none
-    recorder_pad: "ЖКД"
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -8228,7 +8226,7 @@
     *: "[Комментарий]"
   </dest>
   <voice>
-    *: "[Комментарий]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8843,7 +8841,6 @@
   </dest>
   <voice>
     *: "Буфер:"
-    player: "Буф:"
   </voice>
 </phrase>
 <phrase>
@@ -9927,7 +9924,7 @@
     *: "[Работа]"
   </dest>
   <voice>
-    *: "[Работа]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9972,7 +9969,7 @@
     *: "[Длина]"
   </dest>
   <voice>
-    *: "[Длина]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10479,7 +10476,7 @@
     *: "[Номер диска]"
   </dest>
   <voice>
-    *: "[Номер диска]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10975,7 +10972,7 @@
     *: "[Исполнитель]"
   </dest>
   <voice>
-    *: "[Исполнитель]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11429,11 +11426,11 @@
     accessory_supply: "Accessory Power Supply"
   </source>
   <dest>
-    *: "ничего"
+    *: none
     accessory_supply: "Дополнительный источник питания"
   </dest>
   <voice>
-    *: "ничего"
+    *: none
     accessory_supply: "Дополнительный источник питания"
   </voice>
 </phrase>

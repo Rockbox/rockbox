@@ -261,19 +261,19 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Да"
     h100,h120,h300: "NAVI = Да"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Да"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Да"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100: ""
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: ""
     player: ""
   </voice>
 </phrase>
@@ -1435,7 +1435,7 @@
   desc: in settings_menu()
   user:
   <source>
-    *: "Playback"
+    *: "Playback Settings"
   </source>
   <dest>
     *: "Репродукција"
@@ -2370,21 +2370,21 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Креирам базу података... %d пронађено (OFF за повратак)"
     h100,h120,h300: "Креирам базу података... %d пронађено (STOP за повратак)"
     ipod*: "Креирам базу података... %d пронађено (PREV за повратак)"
     x5,m5,gigabeat*,mrobe100: "Креирам базу података... %d пронађено (LEFT за повратак)"
-    h10,h10_5gb,e200,c200: "Креирам базу података... %d пронађено (PREV за повратак)"
+    h10,h10_5gb,e200,c200,sa9200: "Креирам базу података... %d пронађено (PREV за повратак)"
   </dest>
   <voice>
     *: "улази за базу података"
     h100,h120,h300: ""
     ipod*: ""
     x5,m5,gigabeat*,mrobe100: ""
-    h10,h10_5gb,e200,c200: ""
+    h10,h10_5gb,e200,c200,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -3841,17 +3841,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100: "Button Light Timeout"
+    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100: "Тајмаут светла за тастере"
+    c200,gigabeatf,mrobe100,sa9200: ""
   </dest>
   <voice>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100: "Тајмаут светла за тастере"
+    c200,gigabeatf,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4133,19 +4133,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Постави"
     h100,h120,h300: "NAVI = Постави"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100: "SELECT = Постави"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Постави"
   </dest>
   <voice>
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100: ""
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4156,7 +4156,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200: "MENU = Revert"
+    ipod*,e200,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4167,7 +4167,7 @@
     *: none
     rtc: "OFF = Врати на старо"
     h100,h120,h300: "STOP = Врати на старо"
-    ipod*,e200,c200: "MENU = Врати на старо"
+    ipod*,e200,c200,sa9200: "MENU = Врати на старо"
     x5,m5: "RECORD = Врати на старо"
     h10,h10_5gb: "PREV = Врати на старо"
     gigabeatf: "A = Врати на старо"
@@ -4178,7 +4178,7 @@
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,e200,c200: ""
+    ipod*,e200,c200,sa9200: ""
     x5,m5: ""
     h10,h10_5gb: ""
     gigabeatf: ""
@@ -6132,7 +6132,7 @@
   </source>
   <dest>
     *: none
-    recording: deprecated
+    recording: "deprecated"
   </dest>
   <voice>
     *: none
@@ -6430,15 +6430,15 @@
 </phrase>
 <phrase>
   id: LANG_RECORDING_LEFT
-  desc: in the recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Gain Left"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Pojacanje levog"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -6447,15 +6447,15 @@
 </phrase>
 <phrase>
   id: LANG_RECORDING_RIGHT
-  desc: in the recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Gain Right"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Pojacanje desnog"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -6464,19 +6464,19 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_AGC_PRESET
-  desc: automatic gain control in record settings
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Automatic Gain Control"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Аутоматска контрола појачања"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Аутоматска контрола појачања"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -6566,19 +6566,19 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
-  desc: in record settings
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "AGC clip time"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "AРП време клиповања"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "AРП време клиповања"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -9932,7 +9932,7 @@
     *: ""
   </source>
   <dest>
-    *: deprecated
+    *: "deprecated"
   </dest>
   <voice>
     *: ""
@@ -10123,19 +10123,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_OFF
-  desc: Used in a lot of places
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Off"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Iskljuceno"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Iskljuceno"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -10463,19 +10463,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_DISK_FULL
-  desc: in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Disk je pun. Pritisnite OFF za nastavak."
-    h100,h120,h300: "Disk je pun. Pritisnite STOP za nastavak."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "Disk je pun. Pritisnite LEFT za nastavak."
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10484,19 +10480,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_VOLUME
-  desc: in sound_settings
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Volume"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Jacina"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Jacina"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -10671,15 +10667,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_TIME
-  desc: Display of recorded time
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Time:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Vreme:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10688,15 +10684,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_TIMESPLIT_REC
-  desc: Display of record timer interval setting, on the record screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Split Time:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Vreme do podele:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10705,15 +10701,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_SIZE
-  desc: Display of recorded file size
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Size:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Velicina:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10722,15 +10718,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_PRERECORD
-  desc: in recording and radio screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Pre-Recording"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Pred-snimanje"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10773,32 +10769,32 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
-  desc: in record timesplit options
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Split Filesize"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Velicina jednog dela"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Velicina jednog dela"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_FILENAME
-  desc: Filename header in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Filename:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Ime datoteke:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10807,121 +10803,121 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
-  desc: automatic gain control in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "AGC"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "ARP"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Automatska regulacija pojacanja"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Safety (clip)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Sigurnost (klip)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Sigurnost (klip)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Live (slow)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Uzivo (sporo)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Uzivo (sporo)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "DJ-Set (slow)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "DJ-set (sporo)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "DJ-set (sporo)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Medium"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Srednje"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Srednje"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Voice (fast)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Glas (brzo)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Glas (brzo)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
-  desc: AGC maximum gain in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "AGC max. gain"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "ARP maks. pojacanje"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "ARP maksimalno pojacanje"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -11137,15 +11133,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_PM_CLIPCOUNT
-  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "CLIP:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "KLIP:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -11569,16 +11565,16 @@
 </phrase>
 <phrase>
   id: LANG_ENABLE_STUDY_MODE
-  desc: WPS context menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Enable Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Активирај мод учења"
+    *: ""
   </dest>
   <voice>
-    *: "Активирај мод учења"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11600,30 +11596,30 @@
 </phrase>
 <phrase>
   id: LANG_STUDY_MODE
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Мод учења"
+    *: ""
   </dest>
   <voice>
-    *: "Мод учења"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_STUDY_HOP_STEP
-  desc: playback settings menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Study Increment"
+    *: ""
   </source>
   <dest>
-    *: "Корак учења"
+    *: ""
   </dest>
   <voice>
-    *: "Корак учења"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11642,16 +11638,16 @@
 </phrase>
 <phrase>
   id: LANG_DISABLE_STUDY_MODE
-  desc: WPS context menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Disable Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Искључи мод учења"
+    *: ""
   </dest>
   <voice>
-    *: "Искључи мод учења"
+    *: ""
   </voice>
 </phrase>
 <phrase>
