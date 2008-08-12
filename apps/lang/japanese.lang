@@ -18,6 +18,9 @@
 # - Toshihiko Itoh
 # - Naoaki Okazaki
 # - Kenjiro Arai
+# - Takumi Suzuki
+# - Shunsuke Shimizu
+# - Tadayuki Nishizono
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -236,10 +239,10 @@
     *: "Channels"
   </source>
   <dest>
-    *: "チャネルの設定"
+    *: "チャンネルの設定"
   </dest>
   <voice>
-    *: "チャネルの設定"
+    *: "チャンネルの設定"
   </voice>
 </phrase>
 <phrase>
@@ -274,9 +277,6 @@
   </dest>
   <voice>
     *: ""
-    h100,h120,h300: ""
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: ""
-    player: ""
   </voice>
 </phrase>
 <phrase>
@@ -304,7 +304,7 @@
     *: "Rockbox"
   </source>
   <dest>
-    *: "ロックボックス"
+    *: "Rockbox"
   </dest>
   <voice>
     *: "ロックボックス"
@@ -349,7 +349,7 @@
     *: "データベース"
   </dest>
   <voice>
-    *: "Database"
+    *: "データベース"
   </voice>
 </phrase>
 <phrase>
@@ -450,10 +450,10 @@
     *: "Plugins"
   </source>
   <dest>
-    *: "プラグインの閲覧"
+    *: "プラグインの参照"
   </dest>
   <voice>
-    *: "プラグインの閲覧"
+    *: "プラグインの参照"
   </voice>
 </phrase>
 <phrase>
@@ -534,10 +534,10 @@
     *: "Bookmark Actions"
   </source>
   <dest>
-    *: "ブックマークアクション"
+    *: "ブックマーク操作"
   </dest>
   <voice>
-    *: "ブックマークアクション"
+    *: "ブックマーク操作"
   </voice>
 </phrase>
 <phrase>
@@ -702,10 +702,10 @@
     *: "Channel Configuration"
   </source>
   <dest>
-    *: "チャネルの設定"
+    *: "チャンネルの設定"
   </dest>
   <voice>
-    *: "チャネルの設定"
+    *: "チャンネルの設定"
   </voice>
 </phrase>
 <phrase>
@@ -843,7 +843,6 @@
 <phrase>
   id: LANG_CROSSFEED_CROSS_GAIN
   desc: in crossfeed settings
-  user:
   <source>
     *: none
     swcodec: "Cross Gain"
@@ -860,7 +859,6 @@
 <phrase>
   id: LANG_CROSSFEED_HF_ATTENUATION
   desc: in crossfeed settings
-  user:
   <source>
     *: none
     swcodec: "High-Frequency Attenuation"
@@ -877,7 +875,6 @@
 <phrase>
   id: LANG_CROSSFEED_HF_CUTOFF
   desc: in crossfeed settings
-  user:
   <source>
     *: none
     swcodec: "High-Frequency Cutoff"
@@ -918,11 +915,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "イコライザの有効/無効"
+    swcodec: "イコライザの有効化"
   </dest>
   <voice>
     *: none
-    swcodec: "イコライザの有効 無効"
+    swcodec: "イコライザの有効化"
   </voice>
 </phrase>
 <phrase>
@@ -1003,11 +1000,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "EQプリセットを保存"
+    swcodec: "EQプリセットの保存"
   </dest>
   <voice>
     *: none
-    swcodec: "イコライザプリセットを保存"
+    swcodec: "イコライザプリセットの保存"
   </voice>
 </phrase>
 <phrase>
@@ -1020,11 +1017,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "EQプリセットを閲覧"
+    swcodec: "EQプリセットの参照"
   </dest>
   <voice>
     *: none
-    swcodec: "イコライザプリセットを閲覧"
+    swcodec: "イコライザプリセットの参照"
   </voice>
 </phrase>
 <phrase>
@@ -1054,11 +1051,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "%d Hz ゲイン"
+    swcodec: "%d Hz帯 ゲイン"
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    swcodec: "ヘルツたい ゲイン"
   </voice>
 </phrase>
 <phrase>
@@ -1160,7 +1157,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Q値"
+    swcodec: "きゅーち"
   </voice>
 </phrase>
 <phrase>
@@ -1329,7 +1326,7 @@
     masf: "超低音"
   </dest>
   <voice>
-    *: ""
+    *: none
     masf: "超低音"
   </voice>
 </phrase>
@@ -1377,7 +1374,7 @@
   </source>
   <dest>
     *: none
-    masf: "MBDハーモニクス"
+    masf: "MDBハーモニクス"
   </dest>
   <voice>
     *: none
@@ -1583,10 +1580,10 @@
   <dest>
     *: "音飛び防止バッファ"
     flash_storage: none
-    </dest>
+  </dest>
   <voice>
     *: "音飛び防止バッファ"
-    flash_storage: none   
+    flash_storage: none
   </voice>
 </phrase>
 <phrase>
@@ -1854,10 +1851,10 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "アルバム・ゲイン"
+    *: "アルバムゲイン"
   </dest>
   <voice>
-    *: "アルバム・ゲイン"
+    *: "アルバムゲイン"
   </voice>
 </phrase>
 <phrase>
@@ -1868,10 +1865,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "トラック・ゲイン"
+    *: "トラックゲイン"
   </dest>
   <voice>
-    *: "トラック・ゲイン"
+    *: "トラックゲイン"
   </voice>
 </phrase>
 <phrase>
@@ -1882,10 +1879,10 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "シャッフル時にトラック・ゲインを使用"
+    *: "シャッフル時にトラックゲインを使用"
   </dest>
   <voice>
-    *: "シャッフル時にトラック・ゲインを使用"
+    *: "シャッフル時にトラックゲインを使用"
   </voice>
 </phrase>
 <phrase>
@@ -1989,7 +1986,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: DEPRECATED
+  desc: DEPRECATED 
   user:
   <source>
     *: ""
@@ -2003,7 +2000,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: DEPRECATED
+  desc: DEPRECATED 
   user:
   <source>
     *: ""
@@ -2017,7 +2014,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: DEPRECATED
+  desc: DEPRECATED 
   user:
   <source>
     *: ""
@@ -2037,16 +2034,15 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "フォルダ間の自動移動"
+    *: "ディレクトリ間の自動移動"
   </dest>
   <voice>
-    *: "フォルダ間の自動移動"
+    *: "ディレクトリ間の自動移動"
   </voice>
 </phrase>
 <phrase>
   id: LANG_RANDOM
   desc: random folder
-  user:
   <source>
     *: "Random"
   </source>
@@ -2079,7 +2075,7 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "キューシートの対応"
+    *: "Cueシートの対応"
   </dest>
   <voice>
     *: "キューシートの対応"
@@ -2146,11 +2142,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Disable resume on startup if phones unplugged"
+    headphone_detection: "起動時にヘッドホンが無い場合レジュームしない"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Disable resume on startup if phones unplugged"
+    headphone_detection: "起動時にヘッドホンが無い場合レジュームしない"
   </voice>
 </phrase>
 <phrase>
@@ -2189,10 +2185,10 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "フォルダの並び順"
+    *: "ディレクトリの並び順"
   </dest>
   <voice>
-    *: "フォルダの並び順"
+    *: "ディレクトリの並び順"
   </voice>
 </phrase>
 <phrase>
@@ -2217,10 +2213,10 @@
     *: "Alphabetical"
   </source>
   <dest>
-    *: "アルファベット順"
+    *: "名前順"
   </dest>
   <voice>
-    *: "アルファベット順"
+    *: "名前順"
   </voice>
 </phrase>
 <phrase>
@@ -2231,10 +2227,10 @@
     *: "By Date"
   </source>
   <dest>
-    *: "日付順"
+    *: "日付順(昇順)"
   </dest>
   <voice>
-    *: "日付順"
+    *: "日付順 昇順"
   </voice>
 </phrase>
 <phrase>
@@ -2245,10 +2241,10 @@
     *: "By Newest Date"
   </source>
   <dest>
-    *: "最新の日付順"
+    *: "日付順(降順)"
   </dest>
   <voice>
-    *: "最新の日付順"
+    *: "日付順 降順"
   </voice>
 </phrase>
 <phrase>
@@ -2378,15 +2374,11 @@
     *: "データベース構築中... %d 件 (OFFで戻る)"
     h100,h120,h300: "データベース構築中... %d 件 (STOPで戻る)"
     ipod*: "データベース構築中... %d 件 (PLAY/PAUSEで戻る)"
-    x5,m5,gigabeat*,mrobe100: "データベース構築中... %d 件 (LEFTで戻る)"
+    x5,m5,gigabeat*,mrobe100: "データベース構築中... %d 件 (左で戻る)"
     h10,h10_5gb,e200,c200,sa9200: "データベース構築中... %d 件 (PREVで戻る)"
   </dest>
   <voice>
-    *: "entries found for database"
-    h100,h120,h300: ""
-    ipod*: ""
-    x5,m5,gigabeat*,mrobe100: ""
-    h10,h10_5gb,e200,c200,sa9200: ""
+    *: "データベースに登録"
   </voice>
 </phrase>
 <phrase>
@@ -2521,7 +2513,6 @@
 <phrase>
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
-  user:
   <source>
     *: "Database is not ready"
   </source>
@@ -2570,11 +2561,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "フォントの閲覧"
+    lcd_bitmap: "フォントの参照"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "フォントの閲覧"
+    lcd_bitmap: "フォントの参照"
   </voice>
 </phrase>
 <phrase>
@@ -2585,10 +2576,10 @@
     *: "Browse .wps files"
   </source>
   <dest>
-    *: ".wpsファイルの閲覧"
+    *: ".wpsファイルの参照"
   </dest>
   <voice>
-    *: ".wpsファイルの閲覧"
+    *: ".wpsファイルの参照"
   </voice>
 </phrase>
 <phrase>
@@ -2601,11 +2592,11 @@
   </source>
   <dest>
     *: none
-    remote: ".rwpsファイルの閲覧"
+    remote: ".rwpsファイルの参照"
   </dest>
   <voice>
     *: none
-    remote: ".rwpsファイルの閲覧"
+    remote: ".rwpsファイルの参照"
   </voice>
 </phrase>
 <phrase>
@@ -2630,10 +2621,10 @@
     *: "Backlight"
   </source>
   <dest>
-    *: "バックライト持続時間 (バッテリー使用時)"
+    *: "バックライト点灯時間 (バッテリー使用時)"
   </dest>
   <voice>
-    *: "バッテリー使用時のバックライト持続時間"
+    *: "バッテリー使用時のバックライト点灯時間"
   </voice>
 </phrase>
 <phrase>
@@ -2646,11 +2637,11 @@
   </source>
   <dest>
     *: none
-    charging: "バックライト持続時間 (給電時)"
+    charging: "バックライト点灯時間 (給電時)"
   </dest>
   <voice>
     *: none
-    charging: "給電時のバックライト持続時間"
+    charging: "給電時のバックライト点灯時間"
   </voice>
 </phrase>
 <phrase>
@@ -2663,11 +2654,11 @@
   </source>
   <dest>
     *: none
-    hold_button: "Hold時のバックライト"
+    hold_button: "ホールド時のバックライト"
   </dest>
   <voice>
     *: none
-    hold_button: "Hold時のバックライト"
+    hold_button: "ホールド時のバックライト"
   </voice>
 </phrase>
 <phrase>
@@ -2726,10 +2717,10 @@
     *: "First Buttonpress Enables Backlight Only"
   </source>
   <dest>
-    *: "最初のキー操作ではバックライトのみ"
+    *: "最初のキー操作ではバックライト点灯のみ"
   </dest>
   <voice>
-    *: "最初のキー操作ではバックライトのみ"
+    *: "最初のキー操作ではバックライト点灯のみ"
   </voice>
 </phrase>
 <phrase>
@@ -2820,15 +2811,15 @@
   user:
   <source>
     *: none
-    lcd_invert,remote_lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert:"Inverse"
   </source>
   <dest>
     *: none
-    lcd_invert,remote_lcd_invert: "反転"
+    lcd_invert,remote_lcd_invert:"反転"
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: "反転"
+    lcd_invert,remote_lcd_invert:"反転"
   </voice>
 </phrase>
 <phrase>
@@ -2909,11 +2900,11 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "背景を消去"
+    lcd_non-mono: "背景の消去"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "背景を消去"
+    lcd_non-mono: "背景の消去"
   </voice>
 </phrase>
 <phrase>
@@ -2976,11 +2967,11 @@
     lcd_color: "RGB"
   </source>
   <dest>
-   *: none
+    *: none
     lcd_color: "RGB"
   </dest>
   <voice>
-   *: none
+    *: none
     lcd_color: ""
   </voice>
 </phrase>
@@ -2989,15 +2980,15 @@
   desc: in color screen
   user:
   <source>
-   *: none
+    *: none
     lcd_color: "RGB: %02X%02X%02X"
   </source>
   <dest>
-   *: none
+    *: none
     lcd_color: "RGB: %02X%02X%02X"
   </dest>
   <voice>
-   *: none
+    *: none
     lcd_color: ""
   </voice>
 </phrase>
@@ -3006,15 +2997,15 @@
   desc: splash when user selects an invalid colour
   user:
   <source>
-   *: none
+    *: none
     lcd_non-mono: "Invalid colour"
   </source>
   <dest>
-   *: none
+    *: none
     lcd_non-mono: "無効な色指定です"
   </dest>
   <voice>
-   *: none
+    *: none
     lcd_non-mono: ""
   </voice>
 </phrase>
@@ -3105,7 +3096,7 @@
     *: "スクロール速度"
   </dest>
   <voice>
-    *: "スクロール速度設定の例"
+    *: "スクロール速度"
   </voice>
 </phrase>
 <phrase>
@@ -3313,7 +3304,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "ステータス/スクロールバー"
+    lcd_bitmap: "ステータスバー スクロールバー"
   </voice>
 </phrase>
 <phrase>
@@ -3364,7 +3355,7 @@
   </dest>
   <voice>
     *: none
-    recorder_pad: "ボタン・バー"
+    recorder_pad: "ボタンバー"
   </voice>
 </phrase>
 <phrase>
@@ -3641,10 +3632,10 @@
     *: "Latin1 (ISO-8859-1)"
   </source>
   <dest>
-    *: "西欧 (ISO-8859-1)"
+    *: "西欧諸語 (ISO-8859-1)"
   </dest>
   <voice>
-    *: "西欧"
+    *: "西欧諸語"
   </voice>
 </phrase>
 <phrase>
@@ -3655,10 +3646,10 @@
     *: "Greek (ISO-8859-7)"
   </source>
   <dest>
-    *: "ギリシャ文字 (ISO-8859-7)"
+    *: "ギリシャ語 (ISO-8859-7)"
   </dest>
   <voice>
-    *: "ギリシャ文字"
+    *: "ギリシャ語"
   </voice>
 </phrase>
 <phrase>
@@ -3748,10 +3739,10 @@
     *: "Latin Extended (ISO-8859-2)"
   </source>
   <dest>
-    *: "東欧 (ISO-8859-2)"
+    *: "東欧諸語 (ISO-8859-2)"
   </dest>
   <voice>
-    *: "東欧"
+    *: "東欧諸語"
   </voice>
 </phrase>
 <phrase>
@@ -3848,12 +3839,12 @@
   <dest>
     *: none
     e200: "ホイールライトのタイムアウト"
-    c200,gigabeatf,mrobe100,sa9200: ""
+    c200,gigabeatf,mrobe100,sa9200: "ボタンライトのタイムアウト"
   </dest>
   <voice>
     *: none
     e200: "ホイールライトのタイムアウト"
-    c200,gigabeatf,mrobe100,sa9200: ""
+    c200,gigabeatf,mrobe100,sa9200: "ボタンライトのタイムアウト"
   </voice>
 </phrase>
 <phrase>
@@ -4145,9 +4136,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
-    h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: ""
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4178,14 +4167,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
-    h100,h120,h300: ""
-    ipod*,e200,c200,sa9200: ""
-    x5,m5: ""
-    h10,h10_5gb: ""
-    gigabeatf: ""
-    mrobe100: ""
-    gigabeats: ""
+    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_5gb,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4317,7 +4299,7 @@
   </source>
   <dest>
     *: none
-    rtc: "1月"
+    rtc: "Jan"
   </dest>
   <voice>
     *: none
@@ -4334,7 +4316,7 @@
   </source>
   <dest>
     *: none
-    rtc: "2月"
+    rtc: "Feb"
   </dest>
   <voice>
     *: none
@@ -4351,7 +4333,7 @@
   </source>
   <dest>
     *: none
-    rtc: "3月"
+    rtc: "Mar"
   </dest>
   <voice>
     *: none
@@ -4368,7 +4350,7 @@
   </source>
   <dest>
     *: none
-    rtc: "4月"
+    rtc: "Apr"
   </dest>
   <voice>
     *: none
@@ -4385,7 +4367,7 @@
   </source>
   <dest>
     *: none
-    rtc: "5月"
+    rtc: "May"
   </dest>
   <voice>
     *: none
@@ -4402,7 +4384,7 @@
   </source>
   <dest>
     *: none
-    rtc: "6月"
+    rtc: "Jun"
   </dest>
   <voice>
     *: none
@@ -4419,7 +4401,7 @@
   </source>
   <dest>
     *: none
-    rtc: "7月"
+    rtc: "Jul"
   </dest>
   <voice>
     *: none
@@ -4436,7 +4418,7 @@
   </source>
   <dest>
     *: none
-    rtc: "8月"
+    rtc: "Aug"
   </dest>
   <voice>
     *: none
@@ -4453,7 +4435,7 @@
   </source>
   <dest>
     *: none
-    rtc: "9月"
+    rtc: "Sep"
   </dest>
   <voice>
     *: none
@@ -4470,7 +4452,7 @@
   </source>
   <dest>
     *: none
-    rtc: "10月"
+    rtc: "Oct"
   </dest>
   <voice>
     *: none
@@ -4487,7 +4469,7 @@
   </source>
   <dest>
     *: none
-    rtc: "11月"
+    rtc: "Nov"
   </dest>
   <voice>
     *: none
@@ -4504,7 +4486,7 @@
   </source>
   <dest>
     *: none
-    rtc: "12月"
+    rtc: "Dec"
   </dest>
   <voice>
     *: none
@@ -4625,11 +4607,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Alarm Wake up Screen"
+    alarm: "アラーム起動時の画面"
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Wake up Screen"
+    alarm: "アラーム起動時の画面"
   </voice>
 </phrase>
 <phrase>
@@ -4642,7 +4624,7 @@
   </source>
   <dest>
     *: none
-    alarm: "時刻: %02d:%02d"
+    alarm: "アラーム時刻: %02d:%02d"
   </dest>
   <voice>
     *: none
@@ -4680,7 +4662,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "目覚ましを設定しました"
   </voice>
 </phrase>
 <phrase>
@@ -4697,7 +4679,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "設定時刻が不正です"
   </voice>
 </phrase>
 <phrase>
@@ -4720,10 +4702,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
-    ipod*: ""
-    h10,h10_5gb: ""
-    gigabeats: ""
+    alarm,ipod*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4740,7 +4719,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "アラームが解除されました"
   </voice>
 </phrase>
 <phrase>
@@ -4807,10 +4786,10 @@
     *: "Load Last Bookmark"
   </source>
   <dest>
-    *: "最近のブックマークを読み込む"
+    *: "最近のブックマークの読み込み"
   </dest>
   <voice>
-    *: "最近のブックマークを読み込む"
+    *: "最近のブックマークの読み込み"
   </voice>
 </phrase>
 <phrase>
@@ -4905,10 +4884,10 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "フォルダ名を音読"
+    *: "ディレクトリ名を音読"
   </dest>
   <voice>
-    *: "フォルダ名を音読"
+    *: "ディレクトリ名を音読"
   </voice>
 </phrase>
 <phrase>
@@ -4922,7 +4901,7 @@
     *: "MP3ファイルを使用"
   </dest>
   <voice>
-    *: "MP3ファイルを使用"
+    *: "エムピースリーファイルを使用"
   </voice>
 </phrase>
 <phrase>
@@ -4950,7 +4929,7 @@
     *: "MP3ファイルを使用"
   </dest>
   <voice>
-    *: "MP3ファイルを使用"
+    *: "エムピースリーファイルを使用"
   </voice>
 </phrase>
 <phrase>
@@ -4992,7 +4971,7 @@
     *: "MP3ファイルを使用"
   </dest>
   <voice>
-    *: "MP3ファイルを使用"
+    *: "エムピースリーファイルを使用"
   </voice>
 </phrase>
 <phrase>
@@ -5017,10 +4996,10 @@
     *: "Browse .cfg Files"
   </source>
   <dest>
-    *: ".cfgファイルの閲覧"
+    *: ".cfgファイルの参照"
   </dest>
   <voice>
-    *: ".cfgファイルの閲覧"
+    *: ".cfgファイルの参照"
   </voice>
 </phrase>
 <phrase>
@@ -5031,10 +5010,10 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "設定をロードしました"
+    *: "設定を読み込みました"
   </dest>
   <voice>
-    *: "設定をロードしました"
+    *: "設定を読み込みました"
   </voice>
 </phrase>
 <phrase>
@@ -5073,10 +5052,10 @@
     *: "Save .cfg File"
   </source>
   <dest>
-    *: ".cfgファイルに書き出す"
+    *: ".cfgファイルの保存"
   </dest>
   <voice>
-    *: ".cfgファイルに書き出す"
+    *: ".cfgファイルの保存"
   </voice>
 </phrase>
 <phrase>
@@ -5115,10 +5094,10 @@
     *: "Browse Themes"
   </source>
   <dest>
-    *: "テーマの閲覧"
+    *: "テーマの参照"
   </dest>
   <voice>
-    *: "テーマの閲覧"
+    *: "テーマの参照"
   </voice>
 </phrase>
 <phrase>
@@ -5339,7 +5318,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "プリセット"
   </voice>
 </phrase>
 <phrase>
@@ -5492,7 +5471,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "スキャン"
   </voice>
 </phrase>
 <phrase>
@@ -5505,11 +5484,11 @@
   </source>
   <dest>
     *: none
-    radio: "プリセットをロードします"
+    radio: "プリセットの読込み"
   </dest>
   <voice>
     *: none
-    radio: "プリセットをロードします"
+    radio: "プリセットの読み込み"
   </voice>
 </phrase>
 <phrase>
@@ -5522,11 +5501,11 @@
   </source>
   <dest>
     *: none
-    radio: "プリセットを保存します"
+    radio: "プリセットの保存"
   </dest>
   <voice>
     *: none
-    radio: "プリセットを保存します"
+    radio: "プリセットの保存"
   </voice>
 </phrase>
 <phrase>
@@ -5600,7 +5579,6 @@
 <phrase>
   id: LANG_FM_REGION
   desc: fm tuner region setting
-  user:
   <source>
     *: none
     radio: "Region"
@@ -5617,7 +5595,6 @@
 <phrase>
   id: LANG_FM_EUROPE
   desc: fm tuner region europe
-  user:
   <source>
     *: none
     radio: "Europe"
@@ -5634,7 +5611,6 @@
 <phrase>
   id: LANG_FM_US
   desc: fm region us / canada
-  user:
   <source>
     *: none
     radio: "US / Canada"
@@ -5651,7 +5627,6 @@
 <phrase>
   id: LANG_FM_JAPAN
   desc: fm region japan
-  user:
   <source>
     *: none
     radio: "Japan"
@@ -5668,7 +5643,6 @@
 <phrase>
   id: LANG_FM_KOREA
   desc: fm region korea
-  user:
   <source>
     *: none
     radio: "Korea"
@@ -5713,7 +5687,7 @@
   </dest>
   <voice>
     *: none
-    recording: "MP3"
+    recording: "エムピースリー"
   </voice>
 </phrase>
 <phrase>
@@ -5747,7 +5721,7 @@
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording_swcodec: "ウェーブパック"
   </voice>
 </phrase>
 <phrase>
@@ -5977,7 +5951,6 @@
 <phrase>
   id: LANG_SPLIT_MEASURE
   desc: in record timesplit options
-  user:
   <source>
     *: none
     recording: "Split Measure"
@@ -5994,7 +5967,6 @@
 <phrase>
   id: LANG_SPLIT_TYPE
   desc: in record timesplit options
-  user:
   <source>
     *: none
     recording: "What to do when Splitting"
@@ -6045,7 +6017,6 @@
 <phrase>
   id: LANG_SPLIT_TIME
   desc: in record timesplit options
-  user:
   <source>
     *: none
     recording: "Split Time"
@@ -6062,7 +6033,6 @@
 <phrase>
   id: LANG_SPLIT_SIZE
   desc: in record timesplit options
-  user:
   <source>
     *: none
     recording: "Split Filesize"
@@ -6300,7 +6270,6 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_TYPE
   desc: in recording trigger menu
-  user:
   <source>
     *: none
     recording: "Trigtype"
@@ -6317,7 +6286,6 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_NEWFILESTP
   desc: trigger types
-  user:
   <source>
     *: none
     recording: "New file"
@@ -6334,7 +6302,6 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_STOP
   desc: trigger types
-  user:
   <source>
     *: none
     recording: "Stop"
@@ -6362,7 +6329,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "録音開始レベル"
   </voice>
 </phrase>
 <phrase>
@@ -6379,7 +6346,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "少なくとも"
   </voice>
 </phrase>
 <phrase>
@@ -6396,7 +6363,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "録音停止レベル"
   </voice>
 </phrase>
 <phrase>
@@ -6413,7 +6380,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "プリスプリットギャップ"
   </voice>
 </phrase>
 <phrase>
@@ -6435,15 +6402,15 @@
 </phrase>
 <phrase>
   id: LANG_RECORDING_LEFT
-  desc: in the recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Gain Left"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "左ゲイン"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -6452,19 +6419,165 @@
 </phrase>
 <phrase>
   id: LANG_RECORDING_RIGHT
-  desc: in the recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Gain Right"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "右ゲイン"
+    recording: ""
   </dest>
   <voice>
     *: none
     recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_PRESET
+  desc: deprecated
+  <source>
+    *: none
+    recording: ""
+  </source>
+  <dest>
+    *: none
+    recording: ""
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_SAFETY
+  desc: AGC preset
+  <source>
+    *: none
+    agc: "Safety (clip)"
+  </source>
+  <dest>
+    *: none
+    agc: "Safety (clip)"
+  </dest>
+  <voice>
+    *: none
+    agc: "Safety (clip)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_LIVE
+  desc: AGC preset
+  <source>
+    *: none
+    agc: "Live (slow)"
+  </source>
+  <dest>
+    *: none
+    agc: "Live (slow)"
+  </dest>
+  <voice>
+    *: none
+    agc: "Live (slow)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_DJSET
+  desc: AGC preset
+  <source>
+    *: none
+    agc: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: none
+    agc: "DJ-Set (slow)"
+  </dest>
+  <voice>
+    *: none
+    agc: "DJ set (slow)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: none
+    agc: "Medium"
+  </source>
+  <dest>
+    *: none
+    agc: "Medium"
+  </dest>
+  <voice>
+    *: none
+    agc: "Medium"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: none
+    agc: "Voice (fast)"
+  </source>
+  <dest>
+    *: none
+    agc: "Voice (fast)"
+  </dest>
+  <voice>
+    *: none
+    agc: "Voice (fast)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_CLIPTIME
+  desc: deprecated
+  <source>
+    *: none
+    agc: ""
+  </source>
+  <dest>
+    *: none
+    agc: ""
+  </dest>
+  <voice>
+    *: none
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_OFF
+  desc: Remote lcd off splash in recording screen
+  user:
+  <source>
+    *: none
+    remote: "Remote Display OFF"
+  </source>
+  <dest>
+    *: none
+    remote: "リモコン表示オフ"
+  </dest>
+  <voice>
+    *: none
+    remote: "リモコン表示オフ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_ON
+  desc: Remote lcd off splash in recording screen
+  user:
+  <source>
+    *: none
+    remote: "(Vol- : Re-enable)"
+  </source>
+  <dest>
+    *: none
+    remote: "(Vol- : 再有効化)"
+  </dest>
+  <voice>
+    *: none
+    remote: "(Vol- : 再有効化)"
   </voice>
 </phrase>
 <phrase>
@@ -6482,6 +6595,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_PLAYLISTVIEWER_SETTINGS
+  desc: title for the playlist viewer settings menus
+  user:
+  <source>
+    *: "Playlist Viewer Settings"
+  </source>
+  <dest>
+    *: "プレイリスト表示設定"
+  </dest>
+  <voice>
+    *: "プレイリスト表示設定"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_VIEW_DYNAMIC_PLAYLIST
   desc: in playlist menu.
   user:
@@ -6489,10 +6616,10 @@
     *: "View Current Playlist"
   </source>
   <dest>
-    *: "現在のプレイリストを閲覧"
+    *: "現在のプレイリストの参照"
   </dest>
   <voice>
-    *: "現在のプレイリストを閲覧"
+    *: "現在のプレイリストの参照"
   </voice>
 </phrase>
 <phrase>
@@ -6615,10 +6742,10 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "追加時にサブフォルダを含める"
+    *: "追加時にサブディレクトリを含める"
   </dest>
   <voice>
-    *: "追加時にサブフォルダを含める"
+    *: "追加時にサブディレクトリを含める"
   </voice>
 </phrase>
 <phrase>
@@ -6629,10 +6756,10 @@
     *: "Recursively?"
   </source>
   <dest>
-    *: "サブフォルダも含めますか？"
+    *: "サブディレクトリも含めますか？"
   </dest>
   <voice>
-    *: "サブフォルダも含めますか？"
+    *: "サブディレクトリも含めますか？"
   </voice>
 </phrase>
 <phrase>
@@ -6688,7 +6815,7 @@
     *: "Rockbox Info"
   </source>
   <dest>
-    *: "ロックボックス情報"
+    *: "Rockbox情報"
   </dest>
   <voice>
     *: "ロックボックス情報"
@@ -6707,7 +6834,7 @@
     player: "バッファ:"
   </dest>
   <voice>
-    *: ""
+    *: "バッファサイズ"
   </voice>
 </phrase>
 <phrase>
@@ -6739,7 +6866,7 @@
     *: "ディスク:"
   </dest>
   <voice>
-    *: ""
+    *: "ディスク容量"
   </voice>
 </phrase>
 <phrase>
@@ -7053,10 +7180,10 @@
     *: "View"
   </source>
   <dest>
-    *: "閲覧"
+    *: "参照"
   </dest>
   <voice>
-    *: "閲覧"
+    *: "参照"
   </voice>
 </phrase>
 <phrase>
@@ -7109,10 +7236,10 @@
     *: "View Catalog"
   </source>
   <dest>
-    *: "カタログの閲覧"
+    *: "カタログの参照"
   </dest>
   <voice>
-    *: "カタログの閲覧"
+    *: "カタログの参照"
   </voice>
 </phrase>
 <phrase>
@@ -7154,7 +7281,7 @@
     *: "%s は存在しません"
   </dest>
   <voice>
-    *: ""
+    *: "プレイリストディレクトリは存在しません。"
   </voice>
 </phrase>
 <phrase>
@@ -7168,7 +7295,7 @@
     *: "プレイリストがありません"
   </dest>
   <voice>
-    *: ""
+    *: "プレイリストがありません"
   </voice>
 </phrase>
 <phrase>
@@ -7249,10 +7376,10 @@
     *: "Browse Cuesheet"
   </source>
   <dest>
-    *: "キューシートの閲覧"
+    *: "Cueシートの参照"
   </dest>
   <voice>
-    *: "キューシートの閲覧"
+    *: "キューシートの参照"
   </voice>
 </phrase>
 <phrase>
@@ -7403,7 +7530,7 @@
     *: "[Album Artist]"
   </source>
   <dest>
-    *: "[アルバムのアーティスト]"
+    *: "[アルバムアーティスト]"
   </dest>
   <voice>
     *: ""
@@ -7613,10 +7740,10 @@
     *: "Delete Directory"
   </source>
   <dest>
-    *: "フォルダの削除"
+    *: "ディレクトリの削除"
   </dest>
   <voice>
-    *: "フォルダの削除"
+    *: "ディレクトリの削除"
   </voice>
 </phrase>
 <phrase>
@@ -7716,7 +7843,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "背景をロードしました"
+    lcd_non-mono: "背景を変更しました"
   </dest>
   <voice>
     *: none
@@ -7733,7 +7860,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "背景のロードに失敗しました"
+    lcd_non-mono: "背景の変更に失敗しました"
   </dest>
   <voice>
     *: none
@@ -7782,7 +7909,7 @@
     *: "プロパティ"
   </voice>
 </phrase>
-<phrase>  
+<phrase>
   id: LANG_ADD_TO_FAVES
   desc:
   user:
@@ -8162,10 +8289,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
-    h100,h120,h300: ""
-    m5,x5: ""
-    e200,c200: ""
+    recording,h100,h120,h300,m5,x5,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8364,7 +8488,7 @@
     *: "プラグインがエラーを返しました"
   </dest>
   <voice>
-    *: ""
+    *: "プラグインがエラーを返しました"
   </voice>
 </phrase>
 <phrase>
@@ -8558,7 +8682,7 @@
     *: "B"
   </dest>
   <voice>
-    *: ""
+    *: "バイト"
   </voice>
 </phrase>
 <phrase>
@@ -8614,7 +8738,7 @@
     *: "."
   </dest>
   <voice>
-    *: "ポイント"
+    *: "点"
   </voice>
 </phrase>
 <phrase>
@@ -9300,7 +9424,7 @@
     *: ""
   </dest>
   <voice>
-    *: "キロビット・パー・セカンド"
+    *: "キロビット毎秒"
   </voice>
 </phrase>
 <phrase>
@@ -9773,7 +9897,7 @@
     *: ""
   </source>
   <dest>
-    *: "deprecated"
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -9964,19 +10088,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_OFF
-  desc: Used in a lot of places
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Off"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Off"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Off"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -10304,42 +10428,36 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_DISK_FULL
-  desc: in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: ""
-    h100,h120,h300: ""
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_VOLUME
-  desc: in sound_settings
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Volume"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Volume"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Volume"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -10437,11 +10555,11 @@
   </source>
   <dest>
     *: none
-    recording: "Mic"
+    recording: "Int. Mic"
   </dest>
   <voice>
     *: none
-    recording: "Mic"
+    recording: "Internal Microphone"
   </voice>
 </phrase>
 <phrase>
@@ -10514,15 +10632,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_TIME
-  desc: Display of recorded time
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Time:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Time:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10531,15 +10649,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_TIMESPLIT_REC
-  desc: Display of record timer interval setting, on the record screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Split Time:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Split Time:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10548,15 +10666,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_SIZE
-  desc: Display of recorded file size
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Size:"	
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Size:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10565,15 +10683,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_PRERECORD
-  desc: in recording and radio screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Pre-Recording"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Pre-Recording"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10616,32 +10734,32 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
-  desc: in record timesplit options
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Split Filesize"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Split Filesize"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Split Filesize"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_FILENAME
-  desc: Filename header in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Filename:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Filename:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10650,172 +10768,114 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
-  desc: automatic gain control in recording screen
-  user:
+  desc: deprecated
   <source>
     *: none
-    agc: "AGC"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "AGC"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "AGC"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
-  desc: AGC preset
-  user:
+  desc: deprecated
   <source>
     *: none
-    agc: "Safety (clip)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Safety (clip)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Safety (clip)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
-  desc: AGC preset
-  user:
+  desc: deprecated
   <source>
     *: none
-    agc: "Live (slow)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Live (slow)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Live (slow)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
-  desc: AGC preset
-  user:
+  desc: deprecated
   <source>
     *: none
-    agc: "DJ-Set (slow)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "DJ-Set (slow)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "DJ-Set (slow)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
-  desc: AGC preset
-  user:
+  desc: deprecated
   <source>
     *: none
-    agc: "Medium"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Medium"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Medium"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
-  desc: AGC preset
-  user:
+  desc: deprecated
   <source>
     *: none
-    agc: "Voice (fast)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Voice (fast)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Voice (fast)"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_AGC_CLIPTIME
-  desc: in record settings
-  user:
-  <source>
-    *: none
-    agc: "AGC clip time"
-  </source>
-  <dest>
-    *: none
-    agc: "AGCクリップ時間"
-  </dest>
-  <voice>
-    *: none
-    agc: "AGCクリップ時間"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOTE_LCD_OFF
-  desc: Remote lcd off splash in recording screen
-  user:
-  <source>
-    *: none
-    remote: "Remote Display OFF"
-  </source>
-  <dest>
-    *: none
-    remote: "リモコン表示オフ"
-  </dest>
-  <voice>
-    *: none
-    remote: "リモコン表示オフ"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOTE_LCD_ON
-  desc: Remote lcd off splash in recording screen
-  user:
-  <source>
-    *: none
-    remote: "(Vol- : Re-enable)"
-  </source>
-  <dest>
-    *: none
-    remote: "(Vol- : 再有効化)"
-  </dest>
-  <voice>
-    *: none
-    remote: "(Vol- : 再有効化)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
-  desc: AGC maximum gain in recording screen
-  user:
+  desc: deprecated
   <source>
     *: none
-    agc: "AGC max. gain"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "AGC max. gain"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "AGC maximum gain"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -10931,23 +10991,9 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_VOICE_FILETYPE
-  desc: voice settings menu
-  user: 
-  <source>
-    *: "Say File Type"
-  </source>
-  <dest>
-    *: "ファイルタイプを音読"
-  </dest>
-  <voice>
-    *: "ファイルタイプを音読"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_PM_UNITS_PER_TICK
   desc: spoken only, peak meter release unit
-  user: 
+  user:
   <source>
     *: ""
   </source>
@@ -10959,136 +11005,43 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_NOT_PRESENT
-  desc: when external memory is not present
-  user: 
+  id: VOICE_OCLOCK
+  desc: spoken only, for wall clock announce
+  user:
   <source>
     *: none
-    multivolume: "Not present"
+    rtc: ""
   </source>
   <dest>
     *: none
-    multivolume: "なし"
+    rtc: ""
   </dest>
   <voice>
     *: none
-    multivolume: "なし"
+    rtc: "じ 丁度"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_USBSTACK
-  desc: in settings_menu
-  user: 
+  id: VOICE_PM
+  desc: spoken only, for wall clock announce
+  user:
   <source>
     *: none
-    usbstack: "USB Stack"
+    rtc: ""
   </source>
   <dest>
     *: none
-    usbstack: "USBスタック"
+    rtc: ""
   </dest>
   <voice>
     *: none
-    usbstack: "USB スタック"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BASS_CUTOFF
-  desc: Bass setting cut-off frequency
-  user: 
-  <source>
-    *: none
-    ipodvideo: "Bass Cutoff"
-  </source>
-  <dest>
-    *: none
-    ipodvideo: "低音域カットオフ"
-  </dest>
-  <voice>
-    *: none
-    ipodvideo: "低音域カットオフ"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SELECTOR_START_COLOR
-  desc: line selector color option
-  user: 
-  <source>
-    *: none
-    lcd_color: "Primary Colour"
-  </source>
-  <dest>
-    *: none
-    lcd_color: "プライマリカラー"
-  </dest>
-  <voice>
-    *: none
-    lcd_color: "プライマリカラー"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_BLANK
-  desc: keyboard
-  user: 
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "ブランク"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PM_CLIPCOUNTER
-  desc: in settings, for recording peak meter
-  user: 
-  <source>
-    *: none
-    recording: "Clip Counter"
-  </source>
-  <dest>
-    *: none
-    recording: "クリップカウンター"
-  </dest>
-  <voice>
-    *: none
-    recording: "クリップカウンター"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TALK_BATTERY_LEVEL
-  desc: Setting for spontaneous battery level announcement
-  user: 
-  <source>
-    *: "Announce Battery Level"
-  </source>
-  <dest>
-    *: "バッテリーレベルのアナウンス"
-  </dest>
-  <voice>
-    *: "バッテリーレベルのアナウンス"
-  </voice>
-</phrase>
-  <phrase>
-  id: VOICE_EMPTY_LIST
-  desc: spoken only, when a list dialog contains no elements
-  user: 
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "から のリスト"
+    rtc: "午後"
   </voice>
 </phrase>
 <phrase>
   id: VOICE_AM
   desc: spoken only, for wall clock announce
-  user: 
+  user:
   <source>
     *: none
     rtc: ""
@@ -11103,71 +11056,9 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_USBSTACK_HOST
-  desc: in usbstack settings
-  user: 
-  <source>
-    *: none
-    usbstack: "Host"
-  </source>
-  <dest>
-    *: none
-    usbstack: "ホスト"
-  </dest>
-  <voice>
-    *: none
-    usbstack: "ホスト"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
-  user: 
-  <source>
-    *: "<Random>"
-  </source>
-  <dest>
-    *: "<ランダム>"
-  </dest>
-  <voice>
-    *: "ランダム"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SELECTOR_TEXT_COLOR
-  desc: line selector text color option
-  user: 
-  <source>
-    *: none
-    lcd_color: "Text Colour"
-  </source>
-  <dest>
-    *: none
-    lcd_color: "文字色"
-  </dest>
-  <voice>
-    *: none
-    lcd_color: "文字色"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_THEME_MENU
-  desc: in the settings menu
-  user: 
-  <source>
-    *: "Theme Settings"
-  </source>
-  <dest>
-    *: "テーマ設定"
-  </dest>
-  <voice>
-    *: "テーマ設定"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_OH
   desc: spoken only, for wall clock announce
-  user: 
+  user:
   <source>
     *: none
     rtc: ""
@@ -11182,9 +11073,60 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user:
+  <source>
+    *: none
+    recording: "Clip Counter"
+  </source>
+  <dest>
+    *: none
+    recording: "クリップカウンター"
+  </dest>
+  <voice>
+    *: none
+    recording: "クリップカウンター"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PM_CLIPCOUNT
+  desc: deprecated
+  user:
+  <source>
+    *: none
+    recording: ""
+  </source>
+  <dest>
+    *: none
+    recording: ""
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack"
+  </source>
+  <dest>
+    *: none
+    usbstack: "USBスタック"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB スタック"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_USBSTACK_MODE
   desc: in usbstack settings
-  user: 
+  user:
   <source>
     *: none
     usbstack: "USB Stack Mode"
@@ -11201,7 +11143,7 @@
 <phrase>
   id: LANG_USBSTACK_DEVICE
   desc: in usbstack settings
-  user: 
+  user:
   <source>
     *: none
     usbstack: "Device"
@@ -11216,71 +11158,26 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_PM
-  desc: spoken only, for wall clock announce
-  user: 
+  id: LANG_USBSTACK_HOST
+  desc: in usbstack settings
+  user:
   <source>
     *: none
-    rtc: ""
+    usbstack: "Host"
   </source>
   <dest>
     *: none
-    rtc: ""
+    usbstack: "ホスト"
   </dest>
   <voice>
     *: none
-    rtc: "午後"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SAVE_SOUND
-  desc: save a sound config file
-  user: 
-  <source>
-    *: "Save Sound Settings"
-  </source>
-  <dest>
-    *: "サウンド設定の保存"
-  </dest>
-  <voice>
-    *: "サウンド設定の保存"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PM_CLIPCOUNT
-  desc: in recording GUI, for recording peak meter. MAX 5 characters!
-  user: 
-  <source>
-    *: none
-    recording: "CLIP:"
-  </source>
-  <dest>
-    *: none
-    recording: "CLIP:"
-  </dest>
-  <voice>
-    *: none
-    recording: ""
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_EDIT
-  desc: keyboard
-  user: 
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "編集"
+    usbstack: "ホスト"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE_DRIVER
   desc: in usbstack settings
-  user: 
+  user:
   <source>
     *: none
     usbstack: "Device Driver"
@@ -11295,43 +11192,60 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_KEYCLICK
-  desc: in keyclick settings menu
-  user: 
+  id: LANG_SELECTOR_START_COLOR
+  desc: line selector color option
+  user:
   <source>
     *: none
-    swcodec: "Keyclick"
+    lcd_color: "Primary Colour"
   </source>
   <dest>
     *: none
-    swcodec: "クリッカー"
+    lcd_color: "プライマリカラー"
   </dest>
   <voice>
     *: none
-    swcodec: "クリッカー"
+    lcd_color: "プライマリカラー"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_INVERT_CURSOR_GRADIENT
-  desc: in settings_menu
-  user: 
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user:
   <source>
     *: none
-    lcd_color: "Bar (Gradient Colour)"
+    lcd_color: "Secondary Colour"
   </source>
   <dest>
     *: none
-    lcd_color: "バー (グラデーション)"
+    lcd_color: "セカンダリカラー"
   </dest>
   <voice>
     *: none
-    lcd_color: "バー (グラデーション)"
+    lcd_color: "セカンダリカラー"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_TEXT_COLOR
+  desc: line selector text color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Text Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "文字色"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "文字色"
   </voice>
 </phrase>
 <phrase>
   id: LANG_INVERT_CURSOR_COLOR
   desc: in settings_menu
-  user: 
+  user:
   <source>
     *: none
     lcd_color: "Bar (Solid Colour)"
@@ -11342,30 +11256,58 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "バー (単一の色)"
+    lcd_color: "バー 単一の色"
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_OCLOCK
-  desc: spoken only, for wall clock announce
-  user: 
+  id: LANG_INVERT_CURSOR_GRADIENT
+  desc: in settings_menu
+  user:
   <source>
     *: none
-    rtc: ""
+    lcd_color: "Bar (Gradient Colour)"
   </source>
   <dest>
     *: none
-    rtc: ""
+    lcd_color: "バー (グラデーション)"
   </dest>
   <voice>
     *: none
-    rtc: "ちょうど"
+    lcd_color: "バー  グラデーション"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "中央ヨーロッパ (CP1250)"
+  </dest>
+  <voice>
+    *: "中央ヨーロッパ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_THEME_MENU
+  desc: in the settings menu
+  user:
+  <source>
+    *: "Theme Settings"
+  </source>
+  <dest>
+    *: "テーマ設定"
+  </dest>
+  <voice>
+    *: "テーマ設定"
   </voice>
 </phrase>
 <phrase>
   id: LANG_COLORS_MENU
   desc: colours menu under theme settings
-  user: 
+  user:
   <source>
     *: none
     lcd_color: "Colours"
@@ -11397,26 +11339,113 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SELECTOR_END_COLOR
-  desc: line selector color option
-  user: 
+  id: VOICE_EDIT
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "編集"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLANK
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "ブランク"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EMPTY_LIST
+  desc: spoken only, when a list dialog contains no elements
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "から のリスト"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_PRESENT
+  desc: when external memory is not present
+  user:
   <source>
     *: none
-    lcd_color: "Secondary Colour"
+    multivolume: "Not present"
   </source>
   <dest>
     *: none
-    lcd_color: "セカンダリカラー"
+    multivolume: "なし"
   </dest>
   <voice>
     *: none
-    lcd_color: "セカンダリカラー"
+    multivolume: "なし"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_BATTERY_LEVEL
+  desc: Setting for spontaneous battery level announcement
+  user:
+  <source>
+    *: "Announce Battery Level"
+  </source>
+  <dest>
+    *: "バッテリーレベルのアナウンス"
+  </dest>
+  <voice>
+    *: "バッテリーレベルのアナウンス"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILETYPE
+  desc: voice settings menu
+  user:
+  <source>
+    *: "Say File Type"
+  </source>
+  <dest>
+    *: "ファイルタイプを音読"
+  </dest>
+  <voice>
+    *: "ファイルタイプを音読"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS_CUTOFF
+  desc: Bass setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "低音域カットオフ"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "低音域カットオフ"
   </voice>
 </phrase>
 <phrase>
   id: LANG_TREBLE_CUTOFF
   desc: Treble setting cut-off frequency
-  user: 
+  user:
   <source>
     *: none
     ipodvideo: "Treble Cutoff"
@@ -11431,23 +11460,54 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
-  desc: in codepage setting menu
-  user: 
+  id: LANG_TAGNAVI_RANDOM
+  desc: "<Random>" entry in tag browser
+  user:
   <source>
-    *: "Central European (CP1250)"
+    *: "<Random>"
   </source>
   <dest>
-    *: "中央ヨーロッパ (CP1250)"
+    *: "<ランダム>"
   </dest>
   <voice>
-    *: "中央ヨーロッパ"
+    *: "ランダム"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user:
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "サウンド設定の保存"
+  </dest>
+  <voice>
+    *: "サウンド設定の保存"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK
+  desc: in keyclick settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Keyclick"
+  </source>
+  <dest>
+    *: none
+    swcodec: "クリッカー"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "クリッカー"
   </voice>
 </phrase>
 <phrase>
   id: LANG_KEYCLICK_REPEATS
   desc: in keyclick settings menu
-  user: 
+  user:
   <source>
     *: none
     swcodec: "Keyclick Repeats"
@@ -11471,11 +11531,11 @@
   </source>
   <dest>
     *: "アクセサリへの電源供給"
-    accessory_supply: ""
+    accessory_supply: "アクセサリへの電源供給"
   </dest>
   <voice>
     *: "アクセサリへの電源供給"
-    accessory_supply: ""
+    accessory_supply: "アクセサリへの電源供給"
   </voice>
 </phrase>
 <phrase>
@@ -11490,5 +11550,389 @@
   </dest>
   <voice>
     *: "不明"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_MODE
+  desc: DEPRECATED
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_HOP_STEP
+  desc: DEPRECATED
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_STUDY_MODE
+  desc: DEPRECATED
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_STUDY_MODE
+  desc: DEPRECATED
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUICKSCREEN
+  desc: spoken only, Announces entering the "quick screen"
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "クイックスクリーン"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OK
+  desc: spoken only, On exiting a context, specifically the quick screen
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING_AND_SHUTDOWN
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "Stop Recording And Shutdown"
+  </source>
+  <dest>
+    *: none
+    recording: "録音を停止してシャットダウン"
+  </dest>
+  <voice>
+    *: none
+    recording: "録音を停止してシャットダウン"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHPAD_SENSITIVITY
+  desc: touchpad sensitivity setting
+  user: 
+  <source>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "タッチパッド感度"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "タッチパッド感度"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIGH
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    gigabeatf: "High"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "高"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "こう"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_SLOW
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Very slow"
+  </source>
+  <dest>
+    *: "とても遅い"
+  </dest>
+  <voice>
+    *: "とても遅い"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLOW
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "遅い"
+  </dest>
+  <voice>
+    *: "遅い"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_FAST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Very fast"
+  </source>
+  <dest>
+    *: "とても速い"
+  </dest>
+  <voice>
+    *: "とても速い"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FAST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Fast"
+  </source>
+  <dest>
+    *: "速い"
+  </dest>
+  <voice>
+    *: "速い"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_LENGTH
+  desc: playback settings menu
+  user:
+  <source>
+    *: "Skip Length"
+  </source>
+  <dest>
+    *: "スキップ単位"
+  </dest>
+  <voice>
+    *: "スキップ単位"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_TRACK
+  desc: skip length setting entry 0
+  user:
+  <source>
+    *: "Skip Track"
+  </source>
+  <dest>
+    *: "トラック単位"
+  </dest>
+  <voice>
+    *: "トラック単位"
+  </voice>
+</phrase>
+
+<phrase>
+  id: VOICE_CHAR_SLASH
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "スラッシュ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN_LEFT
+  desc: in the recording screen
+  user:
+  <source>
+    *: none
+    recording: "Gain L"
+  </source>
+  <dest>
+    *: none
+    recording: "左ゲイン"
+  </dest>
+  <voice>
+    *: none
+    recording: "左ゲイン"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN_RIGHT
+  desc: in the recording screen
+  user:
+  <source>
+    *: none
+    recording: "Gain R"
+  </source>
+  <dest>
+    *: none
+    recording: "右ゲイン"
+  </dest>
+  <voice>
+    *: none
+    recording: "右ゲイン"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_PRESET
+  desc: automatic gain control in record settings and screen
+  <source>
+    *: none
+    agc: "AGC"
+  </source>
+  <dest>
+    *: none
+    agc: "AGC(自動ゲインコントロール)"
+  </dest>
+  <voice>
+    *: none
+    agc: "AGC 自動ゲインコントロール"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_CLIPTIME
+  desc: in record settings
+  <source>
+    *: none
+    agc: "AGC clip time"
+  </source>
+  <dest>
+    *: none
+    agc: "AGCクリップ時間"
+  </dest>
+  <voice>
+    *: none
+    agc: "AGCクリップ時間"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  <source>
+    *: none
+    agc: "AGC max. gain"
+  </source>
+  <dest>
+    *: none
+    agc: "AGC最大ゲイン"
+  </dest>
+  <voice>
+    *: none
+    agc: "AGC最大ゲイン"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user:
+  <source>
+    *: none
+    recording: "Filename:"
+  </source>
+  <dest>
+    *: none
+    recording: "ファイル名:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user:
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "CLIP:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_TIMESPLIT_REC
+  desc: Display of record timer interval setting, on the record screen
+  user:
+  <source>
+    *: none
+    recording: "分割する時間:"
+  </source>
+  <dest>
+    *: none
+    recording: "分割する時間:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SIZE
+  desc: Display of recorded file size
+  user:
+  <source>
+    *: none
+    recording: "Size:"
+  </source>
+  <dest>
+    *: none
+    recording: "サイズ:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
   </voice>
 </phrase>
