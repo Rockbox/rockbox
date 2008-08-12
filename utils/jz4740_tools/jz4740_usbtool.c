@@ -561,6 +561,8 @@ found:
         return -5;
     }
     
+/* usb_set_configuration() calls are already done in Linux */
+#ifdef _WIN32
     err = usb_set_configuration(dh, 1);
 
     if (err < 0)
@@ -569,6 +571,7 @@ found:
         usb_close(dh);
         return -6;
     }
+#endif
     
     /* "must be called" written in the libusb documentation */
     err = usb_claim_interface(dh, 0);
