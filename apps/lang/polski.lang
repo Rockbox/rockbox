@@ -3044,15 +3044,15 @@
   user: 
   <source>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </source>
   <dest>
     *: none
-    lcd_invert: "Tryb LCD"
+    lcd_invert,remote_lcd_invert: "Tryb LCD"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Tryb elsidi"
+    lcd_invert,remote_lcd_invert: "Tryb elsidi"
   </voice>
 </phrase>
 <phrase>
@@ -3061,15 +3061,15 @@
   user: 
   <source>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </source>
   <dest>
     *: none
-    lcd_invert: "Negatyw"
+    lcd_invert,remote_lcd_invert: "Negatyw"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Negatyw"
+    lcd_invert,remote_lcd_invert: "Negatyw"
   </voice>
 </phrase>
 <phrase>

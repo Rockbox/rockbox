@@ -2787,15 +2787,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </source>
   <dest>
     *: none
-    lcd_invert: "Képernyő mód"
+    lcd_invert,remote_lcd_invert: "Képernyő mód"
   </dest>
   <voice>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </voice>
 </phrase>
 <phrase>
@@ -2804,15 +2804,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </source>
   <dest>
     *: none
-    lcd_invert: "Negatív kép"
+    lcd_invert,remote_lcd_invert: "Negatív kép"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </voice>
 </phrase>
 <phrase>

@@ -3040,15 +3040,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </source>
   <dest>
     *: none
-    lcd_invert: "液晶顯示模式"
+    lcd_invert,remote_lcd_invert: "液晶顯示模式"
   </dest>
   <voice>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </voice>
 </phrase>
 <phrase>
@@ -3057,15 +3057,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </source>
   <dest>
     *: none
-    lcd_invert: "反轉"
+    lcd_invert,remote_lcd_invert: "反轉"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </voice>
 </phrase>
 <phrase>

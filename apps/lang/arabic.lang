@@ -652,15 +652,15 @@
   user: 
   <source>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </source>
   <dest>
     *: none
-    lcd_invert: "معكوسة"
+    lcd_invert,remote_lcd_invert: "معكوسة"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </voice>
 </phrase>
 <phrase>
@@ -2079,15 +2079,15 @@
   user: 
   <source>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </source>
   <dest>
     *: none
-    lcd_invert: "وضع الشاشة"
+    lcd_invert,remote_lcd_invert: "وضع الشاشة"
   </dest>
   <voice>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </voice>
 </phrase>
 <phrase>

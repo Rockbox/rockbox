@@ -2850,15 +2850,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </source>
   <dest>
     *: none
-    lcd_invert: "Режим ЖКД"
+    lcd_invert,remote_lcd_invert: "Режим ЖКД"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Режим ЖКД"
+    lcd_invert,remote_lcd_invert: "Режим ЖКД"
   </voice>
 </phrase>
 <phrase>
@@ -2867,15 +2867,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </source>
   <dest>
     *: none
-    lcd_invert: "Инверсивный"
+    lcd_invert,remote_lcd_invert: "Инверсивный"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Инверсивный"
+    lcd_invert,remote_lcd_invert: "Инверсивный"
   </voice>
 </phrase>
 <phrase>

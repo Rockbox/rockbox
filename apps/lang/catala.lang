@@ -1773,11 +1773,11 @@
   user:
   <source>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </source>
   <dest>
     *: none
-    lcd_invert: "Mode LCD"
+    lcd_invert,remote_lcd_invert: "Mode LCD"
   </dest>
   <voice>
     *: "Mode LCD"
@@ -1789,11 +1789,11 @@
   user:
   <source>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </source>
   <dest>
     *: none
-    lcd_invert: "Invertit"
+    lcd_invert,remote_lcd_invert: "Invertit"
   </dest>
   <voice>
     *: "Invertit"

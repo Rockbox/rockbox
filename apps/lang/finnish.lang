@@ -3041,15 +3041,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </source>
   <dest>
     *: none
-    lcd_invert: "LCD-tila"
+    lcd_invert,remote_lcd_invert: "LCD-tila"
   </dest>
   <voice>
     *: none
-    lcd_invert: "LCD tila"
+    lcd_invert,remote_lcd_invert: "LCD tila"
   </voice>
 </phrase>
 <phrase>
@@ -3058,15 +3058,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </source>
   <dest>
     *: none
-    lcd_invert: "Käänteinen"
+    lcd_invert,remote_lcd_invert: "Käänteinen"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Käänteinen"
+    lcd_invert,remote_lcd_invert: "Käänteinen"
   </voice>
 </phrase>
 <phrase>

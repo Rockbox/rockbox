@@ -2800,15 +2800,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </source>
   <dest>
     *: none
-    lcd_invert: "Mód displeje"
+    lcd_invert,remote_lcd_invert: "Mód displeje"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Mód displeje"
+    lcd_invert,remote_lcd_invert: "Mód displeje"
   </voice>
 </phrase>
 <phrase>
@@ -2817,15 +2817,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </source>
   <dest>
     *: none
-    lcd_invert: "Inverzní"
+    lcd_invert,remote_lcd_invert: "Inverzní"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Inverzní"
+    lcd_invert,remote_lcd_invert: "Inverzní"
   </voice>
 </phrase>
 <phrase>

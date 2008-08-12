@@ -2156,15 +2156,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </source>
   <dest>
     *: ""
-    lcd_invert: "מצב המסך"
+    lcd_invert,remote_lcd_invert: "מצב המסך"
   </dest>
   <voice>
     *: "LCD Mode"
-    lcd_invert: ""
+    lcd_invert,remote_lcd_invert: ""
   </voice>
 </phrase>
 <phrase>
@@ -2173,15 +2173,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </source>
   <dest>
     *: ""
-    lcd_invert: "הפוך"
+    lcd_invert,remote_lcd_invert: "הפוך"
   </dest>
   <voice>
     *: "Inverse"
-    lcd_invert: ""
+    lcd_invert,remote_lcd_invert: ""
   </voice>
 </phrase>
 <phrase>

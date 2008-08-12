@@ -60,7 +60,7 @@ lcd_color
 lcd_flip
 #endif
 
-#if defined(HAVE_LCD_INVERT) || defined(HAVE_REMOTE_LCD)
+#if defined(HAVE_LCD_INVERT)
 lcd_invert
 #endif
 
@@ -110,6 +110,7 @@ recording_hwcodec
 
 #if defined(HAVE_REMOTE_LCD)
 remote
+remote_lcd_invert
 #endif
 
 #if defined(HAVE_REMOTE_LCD_TICKING)

@@ -3730,15 +3730,15 @@
   user: 
   <source>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </source>
   <dest>
     *: none
-    lcd_invert: "Инвертиран"
+    lcd_invert,remote_lcd_invert: "Инвертиран"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </voice>
 </phrase>
 <phrase>
@@ -8059,15 +8059,15 @@
   user: 
   <source>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </source>
   <dest>
     *: none
-    lcd_invert: "LCD режим"
+    lcd_invert,remote_lcd_invert: "LCD режим"
   </dest>
   <voice>
     *: ""
-    lcd_invert: ""
+    lcd_invert,remote_lcd_invert: ""
   </voice>
 </phrase>
 <phrase>

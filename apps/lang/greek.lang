@@ -2793,15 +2793,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </source>
   <dest>
     *: none
-    lcd_invert: "Κατάσταση LCD"
+    lcd_invert,remote_lcd_invert: "Κατάσταση LCD"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Κατάσταση Ελ Σι Ντι"
+    lcd_invert,remote_lcd_invert: "Κατάσταση Ελ Σι Ντι"
   </voice>
 </phrase>
 <phrase>
@@ -2810,15 +2810,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </source>
   <dest>
     *: none
-    lcd_invert: "Ανεστραμμένα"
+    lcd_invert,remote_lcd_invert: "Ανεστραμμένα"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Ανεστραμμένα"
+    lcd_invert,remote_lcd_invert: "Ανεστραμμένα"
   </voice>
 </phrase>
 <phrase>

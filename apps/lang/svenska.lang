@@ -2795,15 +2795,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </source>
   <dest>
     *: none
-    lcd_invert: "LCD-läge"
+    lcd_invert,remote_lcd_invert: "LCD-läge"
   </dest>
   <voice>
     *: none
-    lcd_invert: "LCD-läge"
+    lcd_invert,remote_lcd_invert: "LCD-läge"
   </voice>
 </phrase>
 <phrase>
@@ -2812,15 +2812,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </source>
   <dest>
     *: none
-    lcd_invert: "Inverterad"
+    lcd_invert,remote_lcd_invert: "Inverterad"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Inverterad"
+    lcd_invert,remote_lcd_invert: "Inverterad"
   </voice>
 </phrase>
 <phrase>
