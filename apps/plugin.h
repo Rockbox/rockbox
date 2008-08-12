@@ -36,6 +36,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void* plugin_get_buffer(size_t *buffer_size);
 
