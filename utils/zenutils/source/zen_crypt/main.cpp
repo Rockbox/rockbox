@@ -47,23 +47,35 @@ struct player_info_t
 {
     const char* name;
     const char* null_key;  // HMAC-SHA1 key
-    const char* fresc_key; // BlowFish key
+    const char* fresc_key_v1; // BlowFish key
     const char* tl_key;    // BlowFish key
     bool big_endian;
 };
 }; //namespace
 
 
-static const char VERSION[] = "0.1";
+static const char VERSION[] = "0.2";
 
 static const char null_key_v1[]  = "CTL:N0MAD|PDE0.SIGN.";
 static const char null_key_v2[]  = "CTL:N0MAD|PDE0.DPMP.";
+static const char null_key_v3[]  = "CTL:N0MAD|PDE0.DPFP.";
+static const char null_key_v4[]  = "CTL:Z3N07|PDE0.DPMP.";
 
-static const char fresc_key[]    = "Copyright (C) CTL. -"
+static const char fresc_key_v1[] = "Copyright (C) CTL. -"
                                    " zN0MAD iz v~p0wderful!";
+static const char fresc_key_v2[] = ""; /* Unknown atm */
 
 static const char tl_zvm_key[]   = "1sN0TM3D az u~may th1nk*"
                                    "Creative Zen Vision:M";
+static const char tl_zvm60_key[] = "1sN0TM3D az u~may th1nk*"
+                                   "Creative Zen Vision:M (D"
+                                   "VP-HD0004)";
+static const char tl_zen_key[]   = "1sN0TM3D az u~may th1nk*"
+                                   "Creative ZEN";
+static const char tl_zenxf_key[] = "1sN0TM3D az u~may th1nk*"
+                                   "Creative ZEN X-Fi";
+static const char tl_zv_key[]    = "1sN0TM3D az u~may th1nk*"
+                                   "Creative Zen Vision";
 static const char tl_zvw_key[]   = "1sN0TM3D az u~may th1nk*"
                                    "Creative ZEN Vision W";
 static const char tl_zm_key[]    = "1sN0TM3D az u~may th1nk*"
@@ -78,16 +90,29 @@ static const char tl_zt_key[]    = "1sN0TM3D az u~may th1nk*"
                                    "Creative Zen Touch";
 static const char tl_zx_key[]    = "1sN0TM3D az u~may th1nk*"
                                    "NOMAD Jukebox Zen Xtra";
+static const char tl_zenv_key[]  = "1sN0TM3D az u~may th1nk*"
+                                   "Creative ZEN V";
+static const char tl_zenvp_key[] = "1sN0TM3D az u~may th1nk*"
+                                   "Creative ZEN V Plus";
+static const char tl_zenvv_key[] = "1sN0TM3D az u~may th1nk*"
+                                   "Creative ZEN V (Video)";
 
 player_info_t players[] = {
-    {"Vision:M", null_key_v2, fresc_key, tl_zvm_key, false},
-    {"Vision W", null_key_v2, fresc_key, tl_zvw_key, false},
-    {"Micro", null_key_v1, fresc_key, tl_zm_key, true},
-    {"MicroPhoto", null_key_v1, fresc_key, tl_zmp_key, true},
-    {"Sleek", null_key_v1, fresc_key, tl_zs_key, true},
-    {"SleekPhoto", null_key_v1, fresc_key, tl_zsp_key, true},
-    {"Touch", null_key_v1, fresc_key, tl_zt_key, true},
-    {"Xtra", null_key_v1, fresc_key, tl_zx_key, true},
+    {"Zen Vision:M", null_key_v2, fresc_key_v1, tl_zvm_key, false},
+    {"Zen Vision:M 60GB", null_key_v2, fresc_key_v1, tl_zvm60_key, false},
+    {"ZEN", null_key_v4, fresc_key_v2, tl_zen_key, false},
+    {"ZEN X-Fi", null_key_v4, fresc_key_v2, tl_zenxf_key, false},
+    {"Zen Vision", null_key_v2, fresc_key_v1, tl_zv_key, false},
+    {"Zen Vision W", null_key_v2, fresc_key_v1, tl_zvw_key, false},
+    {"Zen Micro", null_key_v1, fresc_key_v1, tl_zm_key, true},
+    {"Zen MicroPhoto", null_key_v1, fresc_key_v1, tl_zmp_key, true},
+    {"Zen Sleek", null_key_v1, fresc_key_v1, tl_zs_key, true},
+    {"Zen SleekPhoto", null_key_v1, fresc_key_v1, tl_zsp_key, true},
+    {"Zen Touch", null_key_v1, fresc_key_v1, tl_zt_key, true},
+    {"Zen Xtra", null_key_v1, fresc_key_v1, tl_zx_key, true},
+    {"Zen V", null_key_v3, fresc_key_v1, tl_zenv_key, false},
+    {"Zen V Plus", null_key_v3, fresc_key_v1, tl_zenvp_key, false},
+    {"Zen V Video", null_key_v3, fresc_key_v1, tl_zenvv_key, false},
     {NULL, NULL, NULL, NULL, false}
 };
 
@@ -96,7 +121,7 @@ player_info_t* find_player_info(std::string player)
 {
     for (int i = 0; players[i].name != NULL; i++)
     {
-        if (!stricmp(players[i].name, player.c_str()))
+        if (!strcasecmp(players[i].name, player.c_str()))
         {
             return &players[i];
         }
@@ -444,8 +469,8 @@ bool decrypt(shared::bytes& data, int mode, player_info_t* pi,
             std::cout << "[*] Decrypting input file..." << std::endl;
 
         dword iv[2] = {shared::swap(data.size()), 0};
-        if (!zen::bf_cbc_decrypt((const byte*)pi->fresc_key,
-                                 strlen(pi->fresc_key)+1, &data[0],
+        if (!zen::bf_cbc_decrypt((const byte*)pi->fresc_key_v1,
+                                 strlen(pi->fresc_key_v1)+1, &data[0],
                                  data.size(), (const byte*)iv))
         {
             std::cerr << "Failed to decrypt the input file." << std::endl;
@@ -555,11 +580,11 @@ int process_arguments(int argc, char*argv[])
         std::string name = cl.next("");
         if (!name.empty())
         {
-            if (!stricmp(name.c_str(), "CENC"))
+            if (!strcasecmp(name.c_str(), "CENC"))
                 mode = mode_cenc;
-            else if (!stricmp(name.c_str(), "FRESC"))
+            else if (!strcasecmp(name.c_str(), "FRESC"))
                 mode = mode_fresc;
-            else if (!stricmp(name.c_str(), "TL"))
+            else if (!strcasecmp(name.c_str(), "TL"))
                 mode = mode_tl;
         }
         if (mode == mode_none)

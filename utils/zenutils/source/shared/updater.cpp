@@ -99,6 +99,24 @@ bool zen::find_firmware_archive(const std::string& filename, dword& va, dword& p
 
 bool zen::crypt_firmware(const char* key, byte* buffer, size_t len)
 {
+#if 1
+    char key_cpy[255];
+    unsigned int i;
+    unsigned int tmp = 0;
+    int key_length = strlen(key);
+    
+    strcpy(key_cpy, key);
+    for(i=0; i < strlen(key); i++)
+        key_cpy[i] = key[i] - 1;
+    
+    for(i=0; i < len; i++)
+    {
+        buffer[i] ^= key_cpy[tmp] | 0x80;
+        tmp = (tmp + 1) % key_length;
+    }
+    
+    return true;
+#else
     // Determine if the key length is dword aligned.
     int keylen = strlen(key);
     int keylen_rem = keylen % sizeof(dword);
@@ -148,4 +166,5 @@ bool zen::crypt_firmware(const char* key, byte* buffer, size_t len)
     }
 
     return true;
+#endif
 }
