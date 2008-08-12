@@ -362,7 +362,7 @@ unsigned int read_file(const char *name, unsigned char **buffer)
     int len, n;
     
     fd = fopen(name, "rb");
-    if (fd < 0)
+    if (fd == NULL)
     {
         fprintf(stderr, "[ERR]  Could not open %s\n", name);
         return 0;
@@ -397,12 +397,16 @@ unsigned int read_file(const char *name, unsigned char **buffer)
                      SEND_COMMAND(VR_SET_DATA_ADDRESS, a); \
                      fprintf(stderr, " Done!\n");
 #define _SEND_FILE(a) fsize = read_file(a, &buffer); \
+                      if(fsize == 0) \
+                        return -1; \
                       fprintf(stderr, "[INFO] Sending file %s: %d bytes...", a, fsize); \
                       SEND_DATA(buffer, fsize); \
                       free(buffer); \
                       fprintf(stderr, " Done!\n");
 #define _VERIFY_DATA(a,c) fprintf(stderr, "[INFO] Verifying data (%s)...", a); \
                           fsize = read_file(a, &buffer); \
+                          if(fsize == 0) \
+                            return -1; \
                           buffer2 = (unsigned char*)malloc(fsize); \
                           SEND_COMMAND(VR_SET_DATA_ADDRESS, c); \
                           SEND_COMMAND(VR_SET_DATA_LENGTH,  fsize); \
@@ -424,7 +428,7 @@ unsigned int read_file(const char *name, unsigned char **buffer)
 #else
  #define _SLEEP(x) sleep(x);
 #endif
-int mimic_of(usb_dev_handle *dh)
+int mimic_of(usb_dev_handle *dh, bool vx767)
 {
     int err, fsize;
     unsigned char *buffer, *buffer2;
@@ -495,12 +499,19 @@ int mimic_of(usb_dev_handle *dh)
     _GET_CPU;
     _FLUSH;
     _GET_CPU;
-    _STAGE2(0x80E00008);
+    if(vx767)
+    {
+        _STAGE2(0x80E10008);
+    }
+    else
+    {
+        _STAGE2(0x80E00008);
+    }
     fprintf(stderr, "[INFO] Done!\n");
     return 0;
 }
 
-void jzconnect(int address, unsigned char* buf, int len, int func)
+int jzconnect(int address, unsigned char* buf, int len, int func)
 {
     struct usb_bus *bus;
     struct usb_device *tmp_dev;
@@ -514,26 +525,24 @@ void jzconnect(int address, unsigned char* buf, int len, int func)
     if(usb_find_busses() < 0)
     {
         fprintf(stderr, "[ERR]  Could not find any USB busses.\n");
-        return;
+        return -2;
     }
 
     if (usb_find_devices() < 0)
     {
         fprintf(stderr, "[ERR]  USB devices not found(nor hubs!).\n");
-        return;
+        return -3;
     }
 
     for (bus = usb_get_busses(); bus; bus = bus->next)
     {
         for (tmp_dev = bus->devices; tmp_dev; tmp_dev = tmp_dev->next)
         {
-            //printf("Found Vendor %04x Product %04x\n",tmp_dev->descriptor.idVendor, tmp_dev->descriptor.idProduct);
             if (tmp_dev->descriptor.idVendor == VID &&
                 tmp_dev->descriptor.idProduct == PID)
             {
                 dev = tmp_dev;
                 goto found;
-
             }
         }
     }
@@ -542,14 +551,14 @@ void jzconnect(int address, unsigned char* buf, int len, int func)
     {
         fprintf(stderr, "[ERR]  Device not found.\n");
         fprintf(stderr, "[ERR]  Ensure your device is in USB boot mode and run usbtool again.\n");
-        return;
+        return -4;
     }
 
 found:
     if ( (dh = usb_open(dev)) == NULL)
     {
         fprintf(stderr,"[ERR]  Unable to open device.\n");
-        return;
+        return -5;
     }
     
     err = usb_set_configuration(dh, 1);
@@ -558,7 +567,7 @@ found:
     {
         fprintf(stderr, "[ERR]  usb_set_configuration failed (%d, %s)\n", err, usb_strerror());
         usb_close(dh);
-        return;
+        return -6;
     }
     
     /* "must be called" written in the libusb documentation */
@@ -567,7 +576,7 @@ found:
     {
         fprintf(stderr, "[ERR]  Unable to claim interface (%d, %s)\n", err, usb_strerror());
         usb_close(dh);
-        return;
+        return -7;
     }
 
     fprintf(stderr,"[INFO] Found device, uploading application.\n");
@@ -590,7 +599,8 @@ found:
             err = probe_device(dh);
         break;
         case 6:
-            err = mimic_of(dh);
+        case 7:
+            err = mimic_of(dh, (func == 7));
         break;
     }
     
@@ -598,6 +608,8 @@ found:
     usb_release_interface(dh, 0);
 
     usb_close(dh);
+    
+    return err;
 }
 
 void print_usage(void)
@@ -608,15 +620,20 @@ void print_usage(void)
     fprintf(stderr, "Usage: usbtool [CMD] [FILE] [ADDRESS] [LEN]\n");
 #endif
     fprintf(stderr, "\t[ADDRESS] has to be in 0xHEXADECIMAL format\n");
-    fprintf(stderr, "\t[CMD]:\n\t\t1 -> upload file to specified address and boot from it\n\t\t2 -> read data from [ADDRESS] with length [LEN] to [FILE]\n");
-    fprintf(stderr, "\t\t3 -> read device status\n\t\t4 -> probe keys (only Onda VX747)\n");
-    fprintf(stderr, "\t\t5 -> same as 1 but do a stage 2 boot\n\t\t6 -> mimic OF fw recovery\n");
+    fprintf(stderr, "\t[CMD]:\n");
+    fprintf(stderr, "\t\t1 -> upload file to specified address and boot from it\n");
+    fprintf(stderr, "\t\t2 -> read data from [ADDRESS] with length [LEN] to [FILE]\n");
+    fprintf(stderr, "\t\t3 -> read device status\n");
+    fprintf(stderr, "\t\t4 -> probe keys (only Onda VX747)\n");
+    fprintf(stderr, "\t\t5 -> same as 1 but do a stage 2 boot\n");
+    fprintf(stderr, "\t\t6 -> mimic VX747 OF fw recovery\n");
+    fprintf(stderr, "\t\t7 -> mimic VX767 OF fw recovery\n");
 #ifdef _WIN32
-    fprintf(stderr, "\nExample:\n\t usbtool.exe 1 fw.bin 0x80000000");
-    fprintf(stderr, "\n\t usbtool.exe 2 save.bin 0x81000000 1024");
+    fprintf(stderr, "\nExample:\n\t usbtool.exe 1 fw.bin 0x80000000\n");
+    fprintf(stderr, "\t usbtool.exe 2 save.bin 0x81000000 1024\n");
 #else
-    fprintf(stderr, "\nExample:\n\t usbtool 1 fw.bin 0x80000000");
-    fprintf(stderr, "\n\t usbtool 2 save.bin 0x81000000 1024");
+    fprintf(stderr, "\nExample:\n\t usbtool 1 fw.bin 0x80000000\n");
+    fprintf(stderr, "\t usbtool 2 save.bin 0x81000000 1024\n");
 #endif
 }
 
@@ -682,7 +699,7 @@ int main(int argc, char* argv[])
             
             fprintf(stderr, "[INFO] File size: %d bytes\n", n);
             
-            jzconnect(address, buf, len, cmd);
+            return jzconnect(address, buf, len, cmd);
         break;
         case 2:
             if (sscanf(argv[3], "0x%x", &address) <= 0)
@@ -708,7 +725,7 @@ int main(int argc, char* argv[])
                 return 6;
             }
             
-            jzconnect(address, buf, len, 2);
+            int err = jzconnect(address, buf, len, 2);
             
             n = fwrite(buf, 1, len, fd);
             if (n != len)
@@ -718,11 +735,14 @@ int main(int argc, char* argv[])
                 return 7;
             }
             fclose(fd);
+            
+            return err;
         break;
         case 3:
         case 4:
         case 6:
-            jzconnect(address, NULL, 0, cmd);
+        case 7:
+            return jzconnect(address, NULL, 0, cmd);
         break;
         default:
             print_usage();
