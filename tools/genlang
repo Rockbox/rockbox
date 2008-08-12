@@ -369,7 +369,7 @@ while(<LANG>) {
 
     if($_ =~ /^( *\#|[ \t\n\r]*\z)/) {
         # comment or empty line - output it if it's part of the header
-        if ($header eq 1) {
+        if ($header and $update) {
             print($_);
         }
         next;
