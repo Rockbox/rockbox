@@ -34,20 +34,21 @@
     balance         & -100 to +100      & \%\\
     channels        & stereo, mono, custom, mono left, mono right, karaoke
                                         & N/A\\
+    stereo\_width   & 0 to 250          & \%\\
     shuffle         & on, off               & N/A\\
     repeat          & off, all, one, shuffle, ab
                                         & N/A\\
     play selected   & on, off           & N/A\\
-    resume          & on, off           & N/A\\
+    party mode      & on, off           & N/A\\
     scan min step   & 1, 2, 3, 4, 5, 6, 8, 10, 15, 20, 25, 30, 45, 60
                                         & seconds\\
-    scan accel      & 0 to 15           & seconds\\
-    antiskip        & 0 to 7            & seconds\\
+    seek acceleration & very fast, fast, normal, slow, very slow & N/A\\
+    antiskip        & 5s, 15s, 30s, 1min, 2min, 3min, 5min, 10min & N/A\\
     volume fade     & on, off           & N/A\\
     id3 tag priority & v2-v1, v1-v2     & N/A\\
     sort case       & on, off           & N/A\\
-    show files  & all, supported, music, playlists
-                                        & N/A\\
+    show files      & all, supported, music, playlists & N/A\\
+    show filename exts & off, on, unknown, view\_all & N/A\\
     follow playlist & on, off           & N/A\\
     playlist viewer icons
                     & on, off           & N/A\\
@@ -57,23 +58,38 @@
                     & track name,full path
                                         & N/A\\
     recursive directory insert
-                    & on, off           & N/A\\
+                    & on, off, ask      & N/A\\
     scroll speed    & 1 to 25           & Hz\\
-    scroll delay    & 0 to 250          & 1/10s\\
-    scroll step     & 1 to 112          & pixels\\
+    scroll delay    & 0 to 2500         & ms\\
+    scroll step     & \fixme{device a way to get ranges from config-*.h} & pixels\\
+    screen scroll step & \fixme{device a way to get ranges from config-*.h} & pixels\\
+    Screen Scrolls Out Of View & on, off & N/A\\
     bidir limit     & 0 to 200          & \% screen\\
+    scroll paginated & on, off & N/A\\
+    hold\_lr\_for\_scroll\_in\_list & on, off & N/A\\
+    \opt{lcd_bitmap}{
+      show path in browser & off, current directory, full path & N/A\\
+    }
     contrast        & 0 to 63           & N/A\\
     backlight timeout
                     & off, on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30,
-                      45, 60, 90        & seconds\\
+                      45, 60, 90, 120        & seconds\\
     backlight timeout plugged
                     & off, on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30,
-                      45, 60, 90        & seconds\\
+                      45, 60, 90, 120        & seconds\\
+    backlight filters first keypress & on, off & N/A\\
+    backlight on button hold & normal, off, on & N/A\\
+    caption backlight & on, off & N/A\\
+    brightness      & \fixme{device a way to get ranges from config-*.h} & N/A\\
     disk spindown   & 3 to 254          & seconds\\
-    battery capacity
-                    & 1500 - 3200      & mAh\\
+    battery capacity & \fixme{device a way to get ranges from config-*.h} & mAh\\
+    \opt{HAVE_CAR_ADAPTER_MODE}{
+      car adapter mode & on, off & N/A\\
+    }
     idle poweroff   & off, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 30, 45, 60
                                         & minutes\\
+    max files in playlist & 1000 - 32000 & N/A\\
+    max files in dir & 50 - 10000       & N/A\\
     lang            & /path/filename.lng & N/A\\
     wps             & /path/filename.wps & N/A\\
     autocreate bookmarks
@@ -82,16 +98,40 @@
                     & off, on           & N/A\\
     use most-recent-bookmarks
                     & off, on           & N/A\\
-    talk dir        & off, number, spell, enter, hover
-                                        & N/A\\
+    pause on headphone unplug & off, pause, pause and resume & N/A\\
+    rewind duration on pause & 0 to 15  & seconds\\
+    disable autoresume if phones not present & off, on & N/A\\
+    Last.fm Logging & off, on           & N/A\\
+    talk dir        & off, number, spell& N/A\\
+    talk dir clip   & off, on           & N/A\\
     talk file       & off, number, spell& N/A\\
+    talk file clip  & off, on           & N/A\\
+    talk filetype   & off, on           & N/A\\
     talk menu       & off, on           & N/A\\
+    Announce Battery Level & off, on    & N/A\\
+    sort files      & alpha, oldest, newest, type & N/A\\
+    sort dirs       & alpha, oldest, newest & N/A\\
     tagcache\_autoupdate
                     & on, off           & N/A\\
     warn when erasing dynamic playlist
                     & on, off           & N/A\\
     cuesheet support
                     & on, off           & N/A\\
+    folder navigation & off, on, random & N/A\\
+    gather runtime data & off, on       & N/A\\
+    \opt{usb_charging}{
+      usb charging  & on, off           & N/A\\
+    }
+    skip length     & track, 1, 2, 3, 4, 5, 10, 15 & minutes\\
+    start in screen & previous, root, files, db, wps, menu,
+      \opt{recording}{recording, }
+      \opt{radio}{radio, }
+      bookmarks                         & N/A\\
+    playlist catalog directory & /path/to/dir & N/A\\
+    \opt{scrollwheel}{
+      list\_accel\_start\_delay & 0 to 10  & ms\\
+      list\_accel\_wait        & 1 to 10  & seconds\\
+    }
 %
     \opt{swcodec}{
       replaygain    & on, off           & N/A\\
@@ -144,8 +184,10 @@
       eq band 3 gain & -240 to 240      & 0.1dB\\
       eq band 4 gain & -240 to 240      & 0.1dB\\
 %
-      beep          & off, weak, moderate, strong
-                                        & N/A\\
+      dithering enabled & on, off       & N/A\\
+      beep          & off, weak, moderate, strong & N/A\\
+      keyclick      & off, weak, moderate, strong & N/A\\
+      keyclick repeats & on, off        & N/A\\
       dircache      & on, off           & N/A\\
       tagcache\_ram & on, off           & N/A\\
     }%
@@ -185,7 +227,18 @@
       battery display
                     & graphic, numeric  & N/A\\
       font          & /path/filename.fnt & N/A\\
-      invert        & on, off           & N/A\\
+      kbd           & /path/filename.kbd & N/A\\
+      \opt{lcd_invert}{
+        invert        & on, off           & N/A\\
+      }
+      \opt{lcd_flip}{
+        flip display  & on, off           & N/A\\
+      }
+      selector type   & pointer, bar (inverse)
+        \opt{lcd_color}{, bar (color), bar (gradient)} & N/A\\
+      show icons    & on, off           & N/A\\
+      iconset       & /path/filename.bmp & N/A\\
+      viewers iconset & /path/filename.bmp & N/A\\
     }%
 
     \opt{swcodec}{% This doesn't depend on swcodec but using a \nopt here
@@ -198,6 +251,8 @@
       background color & 000000 to FFFFFF   & RRGGBB\\
       line selector start color & 000000 to FFFFFF  & RRGGBB\\
       line selector end color   & 000000 to FFFFFF  & RRGGBB\\
+      line selector text color  & 000000 to FFFFFF  & RRGGBB\\
+      filetype colours & /path/filename.colours & N/A\\
     }
 
     \opt{HAVE_REMOTE_LCD}{
@@ -221,11 +276,13 @@
       remote scroll step
                 & 1 to 160              & N/A\\
       remote scroll delay
-                & 0 to 250              & N/A\\ 
+                & 0 to 2500             & ms\\ 
       remote bidir limit
                 & 0 to 200              & N/A\\
       backlight filters first remote keypress
                 & on, off               & N/A\\
+      remote iconset & /path/filename.bmp & N/A\\
+      remote viewers iconset & /path/filename.bmp & N/A\\
       \opt{h1xx,h300}{
         remote reduce ticking
                 & on, off               & N/A\\
@@ -251,8 +308,10 @@
                   8:00, 16:00, 24:00    & h:mm\\
      pre-recording time
                 & off, 1 to 30          & seconds\\
-     rec directory
-                & /recordings,current   & N/A\\
+     rec directory & /path/to/dir       & N/A\\
+    }%
+    \opt{spdif_power}{
+      spdif enable & off, on            & N/A\\
     }%
     \opt{radio}{
       force fm mono
