@@ -299,6 +299,7 @@ int codec_load_file(const char* codec, struct codec_api *api);
 
 /* defined by the codec */
 enum codec_status codec_start(struct codec_api* rockbox);
+enum codec_status codec_main(void);
 
 #ifndef CACHE_FUNCTION_WRAPPERS
 
