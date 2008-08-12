@@ -2811,7 +2811,7 @@
   user:
   <source>
     *: none
-    lcd_invert,remote_lcd_invert:"Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </source>
   <dest>
     *: none
@@ -6439,15 +6439,15 @@
   desc: deprecated
   <source>
     *: none
-    recording: ""
+    agc: ""
   </source>
   <dest>
     *: none
-    recording: ""
+    agc: ""
   </dest>
   <voice>
     *: none
-    recording: ""
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -11771,7 +11771,6 @@
     *: "トラック単位"
   </voice>
 </phrase>
-
 <phrase>
   id: VOICE_CHAR_SLASH
   desc: spoken only, for spelling
@@ -11908,7 +11907,7 @@
   user:
   <source>
     *: none
-    recording: "分割する時間:"
+    recording: "Split Time:"
   </source>
   <dest>
     *: none
