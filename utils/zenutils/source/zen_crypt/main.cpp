@@ -470,7 +470,7 @@ bool decrypt(shared::bytes& data, int mode, player_info_t* pi,
 
         dword iv[2] = {shared::swap(data.size()), 0};
         if (!zen::bf_cbc_decrypt((const byte*)pi->fresc_key,
-                                 strlen(pi->fresc_key_v1)+1, &data[0],
+                                 strlen(pi->fresc_key)+1, &data[0],
                                  data.size(), (const byte*)iv))
         {
             std::cerr << "Failed to decrypt the input file." << std::endl;
