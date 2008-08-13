@@ -49,7 +49,7 @@ int main( int argc, char ** argv ) {
             translator.load("rbutil_" + applang, ":/lang");
         if(!qttrans.load("qt_" + applang,
             QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
-            translator.load("qt_" + applang, ":/lang");
+            qttrans.load("qt_" + applang, ":/lang");
 
         QLocale::setDefault(applang);
     }
