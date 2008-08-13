@@ -942,7 +942,7 @@ bool recording_screen(bool no_source)
     char buf[32];       /* for preparing strings */
     char buf2[32];      /* for preparing strings */
     int w, h;           /* character width/height */
-    int update_countdown = 1;   /* refresh counter */
+    int update_countdown = 0;   /* refresh counter */
     unsigned int seconds;
     int hours, minutes;
     int audio_stat = 0;         /* status of the audio system */
@@ -1155,7 +1155,7 @@ bool recording_screen(bool no_source)
 #endif
 
             set_gain();
-            update_countdown = 1; /* Update immediately */
+            update_countdown = 0; /* Update immediately */
 
             /* populate translation table for list id -> enum */
             if(global_settings.rec_source == AUDIO_SRC_MIC)
@@ -1340,7 +1340,7 @@ bool recording_screen(bool no_source)
 #endif /* HAVE_AGC */
                 }
                 set_gain();
-                update_countdown = 1; /* Update immediately */
+                update_countdown = 0; /* Update immediately */
                 break;
             case ACTION_SETTINGS_DEC:
             case ACTION_SETTINGS_DECREPEAT:
@@ -1406,7 +1406,7 @@ bool recording_screen(bool no_source)
 #endif /* HAVE_AGC */
                 }
                 set_gain();
-                update_countdown = 1; /* Update immediately */
+                update_countdown = 0; /* Update immediately */
                 break;
             case ACTION_STD_CANCEL:
                 /* turn off the trigger */
@@ -1425,7 +1425,7 @@ bool recording_screen(bool no_source)
 #endif
                     done = 1;
                 }
-                update_countdown = 1; /* Update immediately */
+                update_countdown = 0; /* Update immediately */
                 break;
 #ifdef HAVE_REMOTE_LCD
             case ACTION_REC_LCD:
@@ -1451,7 +1451,7 @@ bool recording_screen(bool no_source)
                     screen_update = NB_SCREENS;
                 }
                 remote_display_on = !remote_display_on; /* toggle */
-                update_countdown = 1; /* Update immediately */
+                update_countdown = 0; /* Update immediately */
                 break;
 #endif
             case ACTION_REC_PAUSE:
@@ -1509,7 +1509,7 @@ bool recording_screen(bool no_source)
                         }
                     }
                 }
-                update_countdown = 1; /* Update immediately */
+                update_countdown = 0; /* Update immediately */
                 break;
             case ACTION_STD_MENU:
 #if CONFIG_CODEC == SWCODEC
@@ -1552,7 +1552,7 @@ bool recording_screen(bool no_source)
                         done = true;
                     }
                     else
-                        update_countdown = 1; /* Update immediately */
+                        update_countdown = 0; /* Update immediately */
                 }
                 break;
 
@@ -1574,7 +1574,7 @@ bool recording_screen(bool no_source)
                         done = true;
                     }
                     else
-                        update_countdown = 1; /* Update immediately */
+                        update_countdown = 0; /* Update immediately */
                 }
                 break;
 #endif /*  CONFIG_KEYPAD == RECORDER_PAD */
@@ -1717,7 +1717,7 @@ bool recording_screen(bool no_source)
                     else
                         rec_command(RECORDING_CMD_STOP_SHUTDOWN);
                 }
-                update_countdown = 1;
+                update_countdown = 0;
             }
 
             /* draw the clipcounter just in front of the peakmeter */
