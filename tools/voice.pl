@@ -210,10 +210,6 @@ sub correct_string {
             $string =~ s/BITRATE/bit reit/ig;
             $string =~ s/Codepage/cod page/ig;
             $string =~ s/PCM Wave/pcm Ue'iv/ig;
-            $string =~ s/Ã¨/è/ig;
-            $string =~ s/\b(s*)Ã¬\b/$1ì/ig;
-            $string =~ s/\b(s*)Ã¹\b/$1ù/ig;
-            $string =~ s/\b(s*)Ã \b/$1à/ig;
             switch($$tts_object{"name"}) {
                  case "sapi" {   # just for SAPI
                     switch($$tts_object{"vendor"}) {
