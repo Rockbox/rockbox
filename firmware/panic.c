@@ -80,7 +80,7 @@ void panicf( const char *fmt, ...)
     /* no LCD */
 #endif
     lcd_update();
-    DEBUGF(panic_buf);
+    DEBUGF("%s", panic_buf);
 
     set_cpu_frequency(0);
     

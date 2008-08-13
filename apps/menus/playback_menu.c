@@ -143,7 +143,7 @@ static int audioscrobbler_callback(int action,const struct menu_item_ex *this_it
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
             if (!scrobbler_is_enabled() && global_settings.audioscrobbler)
-                gui_syncsplash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
+                gui_syncsplash(HZ*2, "%s", ID2P(LANG_PLEASE_REBOOT));
         
             if(scrobbler_is_enabled() && !global_settings.audioscrobbler)
                 scrobbler_shutdown();
@@ -161,7 +161,7 @@ static int cuesheet_callback(int action,const struct menu_item_ex *this_item)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
             if (!cuesheet_is_enabled() && global_settings.cuesheet)
-                gui_syncsplash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
+                gui_syncsplash(HZ*2, "%s", ID2P(LANG_PLEASE_REBOOT));
             break;
     }
     return action;
