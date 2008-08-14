@@ -88,6 +88,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "buffering.h"
 #include "tagcache.h"
 #include "viewport.h"
+#include "ata_idle_notify.h"
 
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
@@ -129,12 +130,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 120
+#define PLUGIN_API_VERSION 121
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 120
+#define PLUGIN_MIN_API_VERSION 121
 
 /* plugin return codes */
 enum plugin_status {
@@ -324,6 +325,9 @@ struct plugin_api {
     bool (*gui_synclist_do_button)(struct gui_synclist * lists,
                                          unsigned *action, enum list_wrap wrap);
     void (*gui_synclist_set_title)(struct gui_synclist *lists, char* title, int icon);
+    enum yesno_res (*gui_syncyesno_run)(const struct text_message * main_message,
+                                        const struct text_message * yes_message,
+                                        const struct text_message * no_message);
     void (*simplelist_info_init)(struct simplelist_info *info, char* title,
            int count, void* data);
     bool (*simplelist_show_list)(struct simplelist_info *info);
@@ -367,9 +371,12 @@ struct plugin_api {
     int (*read_line)(int fd, char* buffer, int buffer_size);
     bool (*settings_parseline)(char* line, char** name, char** value);
     void (*ata_sleep)(void);
-    bool (*ata_disk_is_active)(void);
     void (*ata_spin)(void);
     void (*ata_spindown)(int seconds);
+#if USING_ATA_CALLBACK
+    void (*register_ata_idle_func)(ata_idle_notify function);
+    void (*unregister_ata_idle_func)(ata_idle_notify function, bool run);
+#endif /* USING_ATA_CALLBACK */
     void (*reload_directory)(void);
     char *(*create_numbered_filename)(char *buffer, const char *path,
                                       const char *prefix, const char *suffix,
@@ -746,6 +753,7 @@ struct plugin_api {
     bool (*tagcache_retrieve)(struct tagcache_search *tcs, int idxid,
                            int tag, char *buf, long size);
     void (*tagcache_search_finish)(struct tagcache_search *tcs);
+    long (*tagcache_get_numeric)(const struct tagcache_search *tcs, int tag);
 #endif
 
 #ifdef HAVE_ALBUMART
@@ -756,13 +764,6 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-#ifdef HAVE_TAGCACHE
-    long (*tagcache_get_numeric)(const struct tagcache_search *tcs, int tag);
-#endif
-
-    enum yesno_res (*gui_syncyesno_run)(const struct text_message * main_message,
-                                        const struct text_message * yes_message,
-                                        const struct text_message * no_message);
 
 };
 

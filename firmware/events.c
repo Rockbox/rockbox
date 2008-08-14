@@ -72,8 +72,6 @@ void remove_event(unsigned short id, void (*handler))
             return;
         }
     }
-    
-    panicf("event %d not found", (int)id);
 }
 
 void send_event(unsigned short id, void *data)

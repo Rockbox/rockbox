@@ -26,7 +26,6 @@ PLUGIN_HEADER
 
 #define BATTERY_LOG "/battery_bench.txt"
 #define BUF_SIZE 16000
-#define DISK_SPINDOWN_TIMEOUT 3600
 
 #define EV_EXIT 1337
 
@@ -198,12 +197,15 @@ struct batt_info
     unsigned short flags;
 } bat[BUF_SIZE/sizeof(struct batt_info)];
 
-struct thread_entry *thread_id;
-struct event_queue thread_q;
+#define BUF_ELEMENTS    (sizeof(bat)/sizeof(struct batt_info))
+
+static struct thread_entry *thread_id;
+static struct event_queue thread_q;
+static bool in_usb_mode;
+static unsigned int buf_idx;
 
 bool exit_tsr(bool reenter)
 {
-    bool exit = true;
     (void)reenter;
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Batt.Bench is currently running.");
@@ -213,9 +215,7 @@ bool exit_tsr(bool reenter)
 #endif
     rb->lcd_update();
 
-    if (rb->button_get(true) != BATTERY_OFF)
-        exit = false;
-    if (exit)
+    if (rb->button_get(true) == BATTERY_OFF)
     {
         rb->queue_post(&thread_q, EV_EXIT, 0);
         rb->thread_wait(thread_id);
@@ -236,174 +236,119 @@ bool exit_tsr(bool reenter)
 unsigned long thread_stack[THREAD_STACK_SIZE/sizeof(long)];
 
 #if CONFIG_CHARGING || defined(HAVE_USB_POWER)
-unsigned int charge_state(void)
+static unsigned int charge_state(void)
 {
     unsigned int ret = 0;
 #if CONFIG_CHARGING
-    if(rb->charger_inserted())
+    if (rb->charger_inserted())
         ret = BIT_CHARGER;
 #if CONFIG_CHARGING == CHARGING_MONITOR
-    if(rb->charging_state())
+    if (rb->charging_state())
         ret |= BIT_CHARGING;
 #endif
 #endif
 #ifdef HAVE_USB_POWER
-    if(rb->usb_powered())
+    if (rb->usb_powered())
         ret |= BIT_USB_POWER;
 #endif
     return ret; 
 }
 #endif
 
+
+static bool flush_buffer(void)
+{
+    int fd, secs;
+    unsigned int i;
+
+    /* don't access the disk when in usb mode, or when no data is available */
+    if (in_usb_mode || (buf_idx == 0))
+    {
+        return false;
+    }
+
+    fd = rb->open(BATTERY_LOG, O_RDWR | O_CREAT | O_APPEND);
+    if (fd < 0)
+    {
+        return false;
+    }
+
+    for (i = 0; i < buf_idx; i++)
+    {
+        secs = bat[i].ticks/HZ;
+        rb->fdprintf(fd,
+                "%02d:%02d:%02d,  %05d,     %03d%%,     "
+                "%02d:%02d,         %04d,   "
+#if CONFIG_CHARGING
+                "  %c"
+#if CONFIG_CHARGING == CHARGING_MONITOR
+                ",  %c"
+#endif
+#endif
+#ifdef HAVE_USB_POWER
+                ",  %c"
+#endif
+                "\n",
+
+                HMS(secs), secs, bat[i].level,
+                bat[i].eta / 60, bat[i].eta % 60,
+                bat[i].voltage
+#if CONFIG_CHARGING
+                , (bat[i].flags & BIT_CHARGER) ? 'A' : '-'
+#if CONFIG_CHARGING == CHARGING_MONITOR
+                , (bat[i].flags & BIT_CHARGING) ? 'C' : '-'
+#endif
+#endif
+#ifdef HAVE_USB_POWER
+                , (bat[i].flags & BIT_USB_POWER) ? 'U' : '-'
+#endif
+        );
+    }
+    rb->close(fd);
+
+    buf_idx = 0;
+    return true;
+}
+
+
 void thread(void)
 {
-    bool got_info = false, timeflag = false, in_usb_mode = false;
-    int fd, buffelements, tick = 1, i = 0, skipped = 0, exit = 0;
-    int fst = 0, lst = 0; /* first and last skipped tick */
-    unsigned int last_voltage = 0;
-#if  CONFIG_CHARGING || defined(HAVE_USB_POWER)
-    unsigned int last_state = 0;
-#endif    
-    long sleep_time = 5 * HZ;
-    
+    bool exit = false;
+    char *exit_reason = "unknown";
+    long sleep_time = 60 * HZ;
     struct queue_event ev;
+    int fd;
 
-    buffelements = sizeof(bat)/sizeof(struct batt_info);
+    in_usb_mode = false;
+    buf_idx = 0;
 
-#ifndef HAVE_FLASH_STORAGE
-    if(rb->global_settings->disk_spindown > 1)
-        sleep_time = (rb->global_settings->disk_spindown - 1) * HZ;
-#endif
-
-    do
+    while (!exit)
     {
-        if(!in_usb_mode && got_info && 
-            (exit || timeflag || rb->ata_disk_is_active()) )
+        /* add data to buffer */
+        if (buf_idx < BUF_ELEMENTS)
         {
-            int last, secs, j, temp = skipped;
-            
-            fd = rb->open(BATTERY_LOG, O_RDWR | O_CREAT | O_APPEND);
-            if(fd < 0)
-                exit = 1;
-            else
-            {
-               do
-                {
-                    if(skipped)
-                    {
-                        last = buffelements;
-                        fst /= HZ;
-                        lst /= HZ;
-                        rb->fdprintf(fd,"-Skipped %d measurements from "
-                            "%02d:%02d:%02d to %02d:%02d:%02d-\n",skipped,
-                            HMS(fst),HMS(lst));
-                        skipped = 0;
-                    }
-                    else
-                    {
-                        last = i;
-                        i = 0;
-                    }
-
-                    for(j = i; j < last; j++)
-                    {
-                         secs = bat[j].ticks/HZ;
-                         rb->fdprintf(fd,
-                                "%02d:%02d:%02d,  %05d,     %03d%%,     "
-                                "%02d:%02d,           %04d,     %04d"
-#if CONFIG_CHARGING
-                                ",  %c"
-#if CONFIG_CHARGING == CHARGING_MONITOR
-                                ",  %c"
-#endif
-#endif
-#ifdef HAVE_USB_POWER
-                                ",  %c"
-#endif
-                                "\n",
-                                
-                                HMS(secs), secs, bat[j].level,
-                                bat[j].eta / 60, bat[j].eta % 60, 
-                                bat[j].voltage,
-                                temp + 1 + (j-i)
-#if CONFIG_CHARGING
-                                ,(bat[j].flags & BIT_CHARGER)?'A':'-'
-#if CONFIG_CHARGING == CHARGING_MONITOR
-                                ,(bat[j].flags & BIT_CHARGING)?'C':'-'
-#endif
-#endif
-#ifdef HAVE_USB_POWER
-                                ,(bat[j].flags & BIT_USB_POWER)?'U':'-'
-#endif
-                                        
-                                        );
-                         if(!j % 100 && !j) /* yield() at every 100 writes */
-                            rb->yield();
-                    }
-                    temp += j - i;
- 
-                }while(i != 0);
-           
-                rb->close(fd);
-                tick = *rb->current_tick;
-                got_info = false;
-                timeflag = false;
-            }
-        }
-        else
-        {            
-            unsigned int current_voltage;
-            if(
-#if CONFIG_CODEC == SWCODEC                
-                !rb->pcm_is_playing()
-#else
-                !rb->mp3_is_playing()
-#endif                
-                && (*rb->current_tick - tick) > DISK_SPINDOWN_TIMEOUT * HZ)
-                timeflag = true;
-            
-            if(last_voltage != (current_voltage=rb->battery_voltage())
+            bat[buf_idx].ticks = *rb->current_tick;
+            bat[buf_idx].level = rb->battery_level();
+            bat[buf_idx].eta = rb->battery_time();
+            bat[buf_idx].voltage = rb->battery_voltage();
 #if CONFIG_CHARGING || defined(HAVE_USB_POWER)
-                || last_state != charge_state()
+            bat[buf_idx].flags = charge_state();
 #endif
-                            )
-            {
-                if(i == buffelements)
-                {
-                    if(!skipped++)
-                        fst = bat[0].ticks;
-                    i = 0;
-                } 
-                else if(skipped)
-                {
-                        skipped++;
-                        lst = bat[i].ticks;
-                }
-                bat[i].ticks = *rb->current_tick;
-                bat[i].level = rb->battery_level();
-                bat[i].eta = rb->battery_time();
-                last_voltage = bat[i].voltage = current_voltage;
-#if CONFIG_CHARGING || defined(HAVE_USB_POWER)
-                bat[i].flags = last_state = charge_state();
-#endif                
-                i++;
-                got_info = true;
-            }            
- 
-       }
-        
-        if(exit)
-        {
-            if(exit == 2)
-                    rb->splash(HZ,
-#ifdef HAVE_LCD_BITMAP                                    
-                        "Exiting battery_bench...");
-#else
-                        "bench exit");
-#endif                        
-            return;
+            buf_idx++;
+            rb->register_ata_idle_func(flush_buffer);
         }
         
+        /* What to do when the measurement buffer is full:
+           1) save our measurements to disk but waste some power doing so?
+           2) throw away measurements to save some power?
+           The choice made here is to save the measurements. It is quite unusual
+           for this to occur because it requires > 16 hours of no disk activity.
+         */
+        if (buf_idx == BUF_ELEMENTS) {
+            flush_buffer();
+        }
+        
+        /* sleep some time until next measurement */
         rb->queue_wait_w_tmo(&thread_q, &ev, sleep_time);
         switch (ev.id)
         {
@@ -416,20 +361,38 @@ void thread(void)
                 rb->usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
                 break;
             case SYS_POWEROFF:
-                exit = 1;
+                exit_reason = "power off";
+                exit = true;
                 break;
             case EV_EXIT:
-                exit = 2;
+#ifdef HAVE_LCD_BITMAP
+                rb->splash(HZ, "Exiting battery_bench...");
+#else
+                rb->splash(HZ, "bench exit");
+#endif
+                exit_reason = "plugin exit";
+                exit = true;
                 break;
         }
-    } while (1);
+    }
+
+    /* unregister flush callback and flush to disk */
+    rb->unregister_ata_idle_func(flush_buffer, true);
+    
+    /* log end of bench and exit reason */
+    fd = rb->open(BATTERY_LOG, O_RDWR | O_CREAT | O_APPEND);
+    if (fd >= 0)
+    {
+        rb->fdprintf(fd, "--Battery bench ended, reason: %s--\n", exit_reason);
+        rb->close(fd);
+    }
 }
 
 
 #ifdef HAVE_LCD_BITMAP
 typedef void (*plcdfunc)(int x, int y, const unsigned char *str);
 
-void put_centered_str(const char* str, plcdfunc putsxy, int lcd_width, int line)
+static void put_centered_str(const char* str, plcdfunc putsxy, int lcd_width, int line)
 {
     int strwdt, strhgt;
     rb->lcd_getstringsize(str, &strwdt, &strhgt);
@@ -452,7 +415,7 @@ int main(void)
     rb->lcd_clear_display();
     rb->lcd_setfont(FONT_SYSFIXED);
 
-    for(i = 0; i<(int)(sizeof(msgs)/sizeof(char *)); i++)
+    for (i = 0; i<(int)(sizeof(msgs)/sizeof(char *)); i++)
         put_centered_str(msgs[i],rb->lcd_putsxy,LCD_WIDTH,i+1);
 #else
     rb->lcd_puts_scroll(0, 0, "Batt.Bench.");
@@ -473,7 +436,7 @@ int main(void)
     do
     {
         button = rb->button_get(true);
-        switch(button)
+        switch (button)
         {
             case BATTERY_ON:
 #ifdef BATTERY_RC_ON
@@ -484,23 +447,24 @@ int main(void)
             case BATTERY_OFF: 
 #ifdef BATTERY_RC_OFF
             case BATTERY_RC_OFF:
-#endif                        
+#endif
                 return PLUGIN_OK;
-                
-            default: if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+
+            default:
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
         }
     }while(!on);
     
     fd = rb->open(BATTERY_LOG, O_RDONLY);
-    if(fd < 0)
+    if (fd < 0)
     {
         fd = rb->open(BATTERY_LOG, O_RDWR | O_CREAT);
-        if(fd >= 0)
+        if (fd >= 0)
         {
             rb->fdprintf(fd,
                 "This plugin will log your battery performance in a\n"
-                "file (%s) every time the disk is accessed (or every hour).\n"
+                "file (%s) every minute.\n"
                 "To properly test your battery:\n"
                 "1) Select and playback an album. "
                 "(Be sure to be more than the player's buffer)\n"
@@ -512,13 +476,10 @@ int main(void)
                 "Do not enter another plugin during the test or else the "
                 "logging activity will end.\n\n"
                 "P.S: You can decide how you will make your tests.\n"
-                "Just don't open another  plugin to be sure that your log "
-                "will continue.\n"
-                "M/DA (Measurements per Disk Activity) shows how many times\n"
-                "data was logged in the buffer between Disk Activity.\n\n"
+                "Just don't open another plugin to be sure that your log "
+                "will continue.\n\n"
                 "Battery type: %d mAh      Buffer Entries: %d\n"
-                "  Time:,  Seconds:,  Level:,  Time Left:,  Voltage[mV]:,"
-                "  M/DA:"
+                "  Time:,  Seconds:,  Level:,  Time Left:,  Voltage[mV]:"
 #if CONFIG_CHARGING
                 ", C:"
 #endif
@@ -530,7 +491,7 @@ int main(void)
 #endif
                 "\n"
                 ,BATTERY_LOG,rb->global_settings->battery_capacity,
-                BUF_SIZE / (unsigned)sizeof(struct batt_info));
+                (int)BUF_ELEMENTS);
             rb->close(fd);
         }
         else
@@ -548,10 +509,10 @@ int main(void)
     }
     
     rb->queue_init(&thread_q, true); /* put the thread's queue in the bcast list */
-    if((thread_id = rb->create_thread(thread, thread_stack,
+    if ((thread_id = rb->create_thread(thread, thread_stack,
         sizeof(thread_stack), 0, "Battery Benchmark" 
         IF_PRIO(, PRIORITY_BACKGROUND)
-	    IF_COP(, CPU))) == NULL)
+        IF_COP(, CPU))) == NULL)
     {
         rb->splash(HZ, "Cannot create thread!");
         return PLUGIN_ERROR;
@@ -562,4 +523,4 @@ int main(void)
     return PLUGIN_OK;
 }
 
-#endif
+#endif /* SIMULATOR */

@@ -220,6 +220,7 @@ static const struct plugin_api rockbox_api = {
     gui_synclist_limit_scroll,
     gui_synclist_do_button,
     gui_synclist_set_title,
+    gui_syncyesno_run,
     simplelist_info_init,
     simplelist_show_list,
 
@@ -263,9 +264,12 @@ static const struct plugin_api rockbox_api = {
     read_line,
     settings_parseline,
     ata_sleep,
-    ata_disk_is_active,
     ata_spin,
     ata_spindown,
+#if USING_ATA_CALLBACK
+    register_ata_idle_func,
+    unregister_ata_idle_func,
+#endif /* USING_ATA_CALLBACK */
     reload_directory,
     create_numbered_filename,
     file_exists,
@@ -593,6 +597,7 @@ static const struct plugin_api rockbox_api = {
     tagcache_get_next,
     tagcache_retrieve,
     tagcache_search_finish,
+    tagcache_get_numeric,
 #endif
 
 #ifdef HAVE_ALBUMART
@@ -602,11 +607,7 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-#ifdef HAVE_TAGCACHE
-    tagcache_get_numeric,
-#endif
 
-    gui_syncyesno_run,
 };
 
 int plugin_load(const char* plugin, const void* parameter)
