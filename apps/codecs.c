@@ -239,7 +239,6 @@ int codec_load_buf(unsigned int hid, struct codec_api *api) {
 
 int codec_load_file(const char *plugin, struct codec_api *api)
 {
-    char msgbuf[80];
     char path[MAX_PATH];
     int fd;
     int rc;
@@ -248,9 +247,8 @@ int codec_load_file(const char *plugin, struct codec_api *api)
     
     fd = open(path, O_RDONLY);
     if (fd < 0) {
-        snprintf(msgbuf, sizeof(msgbuf)-1, "Couldn't load codec: %s", path);
         logf("Codec load error:%d", fd);
-        gui_syncsplash(HZ*2, msgbuf);
+        gui_syncsplash(HZ*2, "Couldn't load codec: %s", path);
         return fd;
     }
     
