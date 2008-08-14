@@ -1,4 +1,5 @@
 #include "zxconfig.h"
+#include "helpers.h"
 
 int my_getc(int fd){
     unsigned char c;
