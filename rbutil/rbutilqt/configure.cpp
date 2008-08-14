@@ -38,6 +38,7 @@
 #endif
 
 #define DEFAULT_LANG "English (en)"
+#define DEFAULT_LANG_CODE "en"
 
 Config::Config(QWidget *parent,int index) : QDialog(parent)
 {
@@ -55,8 +56,9 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     // build language list and sort alphabetically
     QStringList langs = findLanguageFiles();
     for(int i = 0; i < langs.size(); ++i)
-        lang.insert(languageName(langs.at(i)) + tr(" (%1)").arg(langs.at(i)), langs.at(i));
-    lang.insert(DEFAULT_LANG, "en");
+        lang.insert(languageName(langs.at(i))
+            + QString(" (%1)").arg(langs.at(i)), langs.at(i));
+    lang.insert(DEFAULT_LANG, DEFAULT_LANG_CODE);
     QMap<QString, QString>::const_iterator i = lang.constBegin();
     while (i != lang.constEnd()) {
         ui.listLanguages->addItem(i.key());
@@ -108,10 +110,11 @@ void Config::accept()
     settings->setProxyType(proxyType);
 
     // language
-    if(settings->curLang() != language && !language.isEmpty())
+    if(settings->curLang() != language && !language.isEmpty()) {
         QMessageBox::information(this, tr("Language changed"),
             tr("You need to restart the application for the changed language to take effect."));
-    settings->setLang(language);
+        settings->setLang(language);
+    }
 
     // mountpoint
     QString mp = ui.mountPoint->text();
