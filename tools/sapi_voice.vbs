@@ -39,7 +39,7 @@ Const STDERR = 2
 Dim oShell, oArgs, oEnv
 Dim oFSO, oStdIn, oStdOut
 Dim bVerbose, bSAPI4, bList
-Dim sLanguage, sVoice, sSpeed, sVendor
+Dim sLanguage, sVoice, sSpeed, sName, sVendor
 
 Dim oSpVoice, oSpFS ' SAPI5 voice and filestream
 Dim oTTS, nMode ' SAPI4 TTS object, mode selector
@@ -103,7 +103,10 @@ If bSAPI4 Then
         nMode = oTTS.Find(sSelectString)
         If oTTS.LanguageID(nMode) = nLangID And (sVoice = "" Or _
            oTTS.Speaker(nMode) = sVoice Or oTTS.ModeName(nMode) = sVoice) Then
-            If bVerbose Then WScript.StdErr.WriteLine "Using " & sSelectString
+            sName = oTTS.ModeName(nMode)
+            If bVerbose Then 
+                WScript.StdErr.WriteLine "Using " & sName & " for " & sSelectString
+            End If
             Exit For
         Else
             sSelectString = ""
@@ -151,7 +154,10 @@ Else ' SAPI5
         End If
         Set oSpVoice.Voice = oSpVoice.GetVoices(sSelectString).Item(0)
         If Err.Number = 0 Then
-            If bVerbose Then WScript.StdErr.WriteLine "Using " & sSelectString
+            sName = oSpVoice.Voice.GetAttribute("Name")
+            If bVerbose Then
+                WScript.StdErr.WriteLine "Using " & sName & " for " & sSelectString
+            End If
             Exit For
         Else
             sSelectString = ""
@@ -172,6 +178,10 @@ Else ' SAPI5
     If Err.Number <> 0 Then
         Err.Clear
         sVendor = "(unknown)"
+        ' Some L&H engines don't set the vendor attribute - check the name
+        If Len(sName) > 3 And Left(sName, 3) = "LH " Then
+            sVendor = "L&H"
+        End If
     End If
 
     ' Filestream object for output
