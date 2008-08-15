@@ -70,6 +70,16 @@ static void invert_display(void);
 
 #define CONTRAST_REG_H 0x400
 
+#if defined(IPOD_1G2G)
+#define DEFAULT_CONTRAST 45
+#elif defined(IPOD_3G)
+#define DEFAULT_CONTRAST 55
+#elif defined(IPOD_MINI) || defined(IPOD_MINI2G)
+#define DEFAULT_CONTRAST 42
+#elif defined(IPOD_4G)
+#define DEFAULT_CONTRAST 35
+#endif
+
 /* needed for flip */
 static int addr_offset;
 #if defined(IPOD_MINI) || defined(IPOD_MINI2G)
@@ -135,6 +145,7 @@ void lcd_init_device(void)
                      /* C waveform, no EOR, 9 lines inversion */
     lcd_cmd_and_data(R_POWER_CONTROL, POWER_REG_H | 0xc);
     lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0019);
+    lcd_set_contrast(DEFAULT_CONTRAST);
 #ifdef HAVE_BACKLIGHT_INVERSION
     invert_display();
 #endif
@@ -146,15 +157,7 @@ void lcd_init_device(void)
 
 int lcd_default_contrast(void)
 {
-#if defined(IPOD_1G2G)
-    return 45;
-#elif defined(IPOD_3G)
-    return 55;
-#elif defined(IPOD_MINI) || defined(IPOD_MINI2G)
-    return 42;
-#elif defined(IPOD_4G)
-    return 35;
-#endif
+    return DEFAULT_CONTRAST;
 }
 
 /* Rockbox stores the contrast as 0..63 - we add 64 to it */
