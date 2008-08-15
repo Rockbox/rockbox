@@ -69,11 +69,12 @@ void panicf( const char *fmt, ...)
     {
         /* wrap panic line */
         int i, y=1, len = strlen(panic_buf);
-        for (i=0; i<len; i+=18) {
-            unsigned char c = panic_buf[i+18];
-            panic_buf[i+18] = 0;
+#define STEP (LCD_WIDTH/SYSFONT_WIDTH)
+        for (i=0; i<len; i+=STEP) {
+            unsigned char c = panic_buf[i+STEP];
+            panic_buf[i+STEP] = 0;
             lcd_puts(0, y++, (unsigned char *)panic_buf+i);
-            panic_buf[i+18] = c;
+            panic_buf[i+STEP] = c;
         }
     }
 #else
