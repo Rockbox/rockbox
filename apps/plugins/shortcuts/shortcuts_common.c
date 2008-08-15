@@ -90,7 +90,7 @@ bool load_sc_file(sc_file_t *file, char *filename, bool must_exist,
             if (fd < 0){
                 /* For some reason we couldn't create the file,
                  * so return an error message and exit */
-                rb->splash(HZ*2, "Couldn't create the shortcuts file %s",
+                rb->splashf(HZ*2, "Couldn't create the shortcuts file %s",
                            filename);
                 goto end_of_proc;
             }
@@ -98,7 +98,7 @@ bool load_sc_file(sc_file_t *file, char *filename, bool must_exist,
             ret_val = true;
             goto end_of_proc;
         } else {
-            rb->splash(HZ, "Couldn't open %s", filename);
+            rb->splashf(HZ, "Couldn't open %s", filename);
             goto end_of_proc;
         }
     }
@@ -108,7 +108,7 @@ bool load_sc_file(sc_file_t *file, char *filename, bool must_exist,
             continue;
         }
         if (file->entry_cnt >= file->max_entries) {
-            rb->splash(HZ*2, "Too many entries in the file, max allowed: %d",
+            rb->splashf(HZ*2, "Too many entries in the file, max allowed: %d",
                        file->max_entries);
             goto end_of_proc;
         }
@@ -320,7 +320,7 @@ bool dump_sc_file(sc_file_t *file, char *filename)
     * thing. */
     fd = rb->open(filename, O_WRONLY|O_TRUNC);
     if (fd < 0) {
-        rb->splash(HZ*2, "Could not open shortcuts file %s for writing",
+        rb->splashf(HZ*2, "Could not open shortcuts file %s for writing",
                 filename);
         return false;
     }

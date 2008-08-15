@@ -276,10 +276,10 @@ bool check_rockboxdir(void)
         int i;
         FOR_NB_SCREENS(i)
             screens[i].clear_display();
-        gui_syncsplash(HZ*2, "No .rockbox directory");
+        splash(HZ*2, "No .rockbox directory");
         FOR_NB_SCREENS(i)
             screens[i].clear_display();
-        gui_syncsplash(HZ*2, "Installation incomplete");
+        splash(HZ*2, "Installation incomplete");
         return false;
     }
     return true;
@@ -394,7 +394,7 @@ static int update_dir(void)
 #endif
         (tc.dirfull || tc.filesindir == global_settings.max_files_in_dir) )
         {
-            gui_syncsplash(HZ, ID2P(LANG_SHOWDIR_BUFFER_FULL));
+            splash(HZ, ID2P(LANG_SHOWDIR_BUFFER_FULL));
         }
     }
 #ifdef HAVE_TAGCACHE
@@ -635,7 +635,7 @@ static int dirbrowse()
 
     if (*tc.dirfilter > NUM_FILTER_MODES && numentries==0)
     {
-        gui_syncsplash(HZ*2, ID2P(LANG_NO_FILES));
+        splash(HZ*2, ID2P(LANG_NO_FILES));
         return GO_TO_PREVIOUS;  /* No files found for rockbox_browser() */
     }
     
@@ -889,7 +889,7 @@ bool create_playlist(void)
 
     snprintf(filename, sizeof filename, "%s.m3u8",
              tc.currdir[1] ? tc.currdir : "/root");
-    gui_syncsplash(0, "%s %s", str(LANG_CREATING), filename);
+    splashf(0, "%s %s", str(LANG_CREATING), filename);
 
     trigger_cpu_boost();
     catalog_add_to_a_playlist(tc.currdir, ATTR_DIRECTORY, true, filename);
@@ -1134,7 +1134,7 @@ void tree_restore(void)
     if (global_settings.dircache)
     {
         /* Print "Scanning disk..." to the display. */
-        gui_syncsplash(0, str(LANG_SCANNING_DISK));
+        splash(0, str(LANG_SCANNING_DISK));
 
         dircache_build(global_status.dircache_size);
     }

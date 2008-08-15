@@ -162,7 +162,7 @@ static int init_dircache(bool preinit)
             {
                 /* This will be in default language, settings are not
                    applied yet. Not really any easy way to fix that. */
-                gui_syncsplash(0, str(LANG_SCANNING_DISK));
+                splash(0, str(LANG_SCANNING_DISK));
                 clear = true;
             }
             
@@ -180,7 +180,7 @@ static int init_dircache(bool preinit)
         {
             if (global_status.dircache_size <= 0)
             {
-                gui_syncsplash(0, str(LANG_SCANNING_DISK));
+                splash(0, str(LANG_SCANNING_DISK));
                 clear = true;
             }
             result = dircache_build(global_status.dircache_size);
@@ -191,7 +191,7 @@ static int init_dircache(bool preinit)
             /* Initialization of dircache failed. Manual action is
              * necessary to enable dircache again.
              */
-            gui_syncsplash(0, "Dircache failed, disabled. Result: %d", result);
+            splashf(0, "Dircache failed, disabled. Result: %d", result);
             global_settings.dircache = false;
         }
             
@@ -244,7 +244,7 @@ static void init_tagcache(void)
             }
 #endif
 #ifdef HAVE_LCD_BITMAP
-            gui_syncsplash(0, "%s [%d/%d]",
+            splashf(0, "%s [%d/%d]",
                 str(LANG_TAGCACHE_INIT), ret, 
                 tagcache_get_max_commit_step());
 #else
@@ -504,7 +504,7 @@ static void init(void)
     if (button_hold())
 #endif
     {
-        gui_syncsplash(HZ*2, str(LANG_RESET_DONE_CLEAR));
+        splash(HZ*2, str(LANG_RESET_DONE_CLEAR));
         settings_reset();
     }
     else

@@ -293,7 +293,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
     if (!have_list)
     {
         /* Nothing to view, exit */
-        gui_syncsplash(HZ, str(LANG_CATALOG_NO_PLAYLISTS));
+        splash(HZ, str(LANG_CATALOG_NO_PLAYLISTS));
         return false;
     }
 
@@ -680,8 +680,8 @@ bool playlist_viewer_ex(const char* filename)
                     ret_val = playlist_move(viewer.playlist, viewer.move_track,
                         current_track->index);
                     if (ret_val < 0)
-                         gui_syncsplash(HZ, (unsigned char *)"%s %s",
-                             str(LANG_MOVE), str(LANG_FAILED));
+                         splashf(HZ, (unsigned char *)"%s %s", str(LANG_MOVE),
+                                                               str(LANG_FAILED));
                     update_playlist(true);
                     viewer.move_track = -1;
                 }
@@ -795,7 +795,7 @@ bool search_playlist(void)
     playlist_count = playlist_amount_ex(viewer.playlist);
     for (i=0;(i<playlist_count)&&(found_indicies_count<MAX_PLAYLIST_ENTRIES);i++)
     {
-        gui_syncsplash(0, str(LANG_PLAYLIST_SEARCH_MSG),found_indicies_count,
+        splashf(0, str(LANG_PLAYLIST_SEARCH_MSG), found_indicies_count,
                    str(LANG_OFF_ABORT));
         if (action_userabort(TIMEOUT_NOBLOCK))
         {

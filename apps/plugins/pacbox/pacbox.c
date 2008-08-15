@@ -421,7 +421,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
                             SETTINGS_VERSION);
         }
     } else {
-        rb->splash(HZ*2, "No ROMs in %s/pacman/", ROCKBOX_DIR);
+        rb->splashf(HZ*2, "No ROMs in %s/pacman/", ROCKBOX_DIR);
     }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ

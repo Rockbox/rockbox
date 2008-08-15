@@ -58,7 +58,7 @@ static void hash_file( int out, const char *path )
     {
         char string[MD5_STRING_LENGTH+1];
         done++;
-        rb->splash( 0, "%d / %d : %s", done, count, path );
+        rb->splashf( 0, "%d / %d : %s", done, count, path );
         if( hash( string, path ) )
             rb->write( out, "error", 5 );
         else
@@ -140,7 +140,7 @@ static void hash_check( int out, const char *path )
         {
             const char *filename = rb->strchr( line, ' ' );
             done++;
-            rb->splash( 0, "%d / %d : %s", done, count, filename );
+            rb->splashf( 0, "%d / %d : %s", done, count, filename );
             if( !filename || len < MD5_STRING_LENGTH + 2 )
             {
                 const char error[] = "Malformed input line ... skipping";

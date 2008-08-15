@@ -168,9 +168,7 @@ int mmc_remove_request(void)
     int i;
     FOR_NB_SCREENS(i)
         screens[i].clear_display();
-    gui_syncsplash(1, str(LANG_REMOVE_MMC));
-    if (global_settings.talk_menu)
-        talk_id(LANG_REMOVE_MMC, false);
+    splash(0, ID2P(LANG_REMOVE_MMC));
 
     while (1)
     {
@@ -389,7 +387,7 @@ int charging_screen(void)
 #if CONFIG_CHARGING
 void charging_splash(void)
 {
-    gui_syncsplash(2*HZ, (unsigned char *)str(LANG_BATTERY_CHARGE));
+    splash(2*HZ, str(LANG_BATTERY_CHARGE));
     button_clear_queue();
 }
 #endif
@@ -669,7 +667,7 @@ bool shutdown_screen(void)
 
     lcd_stop_scroll();
 
-    gui_syncsplash(0, str(LANG_CONFIRM_SHUTDOWN));
+    splash(0, str(LANG_CONFIRM_SHUTDOWN));
 
     while(!done && TIME_BEFORE(current_tick,time_entered+HZ*2))
     {

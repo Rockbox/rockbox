@@ -109,7 +109,7 @@ static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
                              w+1, (display->lcdheight-h)/2, 7, 8);
 
         /* "Pitch" */
-        snprintf((char *)buf, sizeof(buf), str(LANG_PITCH));
+        snprintf((char *)buf, sizeof(buf), "%s", str(LANG_PITCH));
         display->getstringsize(buf,&w,&h);
         display->putsxy((display->lcdwidth-w)/2, (display->lcdheight/2)-h, buf);
         /* "XX.X%" */

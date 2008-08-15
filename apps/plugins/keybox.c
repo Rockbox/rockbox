@@ -312,9 +312,9 @@ static void splash_pw(int selected_item)
             entry = entry->next;
     }
     if (entry->name != '\0')
-        rb->splash(0, "%s  %s", entry->name, entry->password);
+        rb->splashf(0, "%s  %s", entry->name, entry->password);
     else
-        rb->splash(0, "%s", entry->password);
+        rb->splashf(0, "%s", entry->password);
     rb->get_action(CONTEXT_STD, TIMEOUT_BLOCK);
 }
 

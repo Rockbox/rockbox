@@ -237,8 +237,8 @@ static bool write_bookmark(bool create_bookmark_file, const char *bookmark)
         }
     }
 
-    gui_syncsplash(HZ, success ? ID2P(LANG_BOOKMARK_CREATE_SUCCESS)
-        : ID2P(LANG_BOOKMARK_CREATE_FAILURE));
+    splash(HZ, success ? ID2P(LANG_BOOKMARK_CREATE_SUCCESS)
+           : ID2P(LANG_BOOKMARK_CREATE_FAILURE));
 
     return true;
 }
@@ -400,7 +400,7 @@ bool bookmark_autoload(const char* file)
             if (!play_bookmark(bookmark))
             {
                 /* Selected bookmark not found. */
-                gui_syncsplash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
+                splash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
             }
 
             /* Act as if autoload was done even if it failed, since the 
@@ -445,7 +445,7 @@ bool bookmark_load(const char* file, bool autoload)
             /* Selected bookmark not found. */
             if (!autoload)
             {
-                gui_syncsplash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
+                splash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
             }
             
             return false;
@@ -694,7 +694,7 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
             if (bookmarks->total_count < 1)
             {
                 /* No more bookmarks, delete file and exit */
-                gui_syncsplash(HZ, ID2P(LANG_BOOKMARK_LOAD_EMPTY));
+                splash(HZ, ID2P(LANG_BOOKMARK_LOAD_EMPTY));
                 remove(bookmark_file_name);
                 return NULL;
             }

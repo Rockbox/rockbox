@@ -151,7 +151,7 @@ static inline void disk_buf_buffer(void)
             wm : AVERAGE(disk_buf.low_wm, wm, 16);
 
 #if 0
-        rb->splash(0, "*%10ld %10ld", disk_buf.low_wm,
+        rb->splashf(0, "*%10ld %10ld", disk_buf.low_wm,
                    disk_buf.win_right - sw.right);
 #endif
 

@@ -2520,12 +2520,12 @@ static void goto_menu(void)
                 {
                     if( load_bitmap( filename ) <= 0 )
                     {
-                        rb->splash( 1*HZ, "Error while loading %s",
+                        rb->splashf( 1*HZ, "Error while loading %s",
                                     filename );
                     }
                     else
                     {
-                        rb->splash( 1*HZ, "Image loaded (%s)", filename );
+                        rb->splashf( 1*HZ, "Image loaded (%s)", filename );
                         restore_screen();
                         inv_cursor(true);
                         return;
@@ -2542,7 +2542,7 @@ static void goto_menu(void)
                     rb->strcasecmp(&filename[rb->strlen(filename)-4], ".bmp"))
                         rb->strcat(filename, ".bmp");
                     save_bitmap( filename );
-                    rb->splash( 1*HZ, "File saved (%s)", filename );
+                    rb->splashf( 1*HZ, "File saved (%s)", filename );
                 }
                 break;
 
@@ -3011,7 +3011,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         }
         else
         {
-            rb->splash( 1*HZ, "Image loaded (%s)", (char *)parameter );
+            rb->splashf( 1*HZ, "Image loaded (%s)", (char *)parameter );
             restore_screen();
             rb->strcpy( filename, parameter );
         }

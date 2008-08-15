@@ -172,7 +172,7 @@ static int get_action_worker(int context, int timeout,
         {
             last_button = BUTTON_NONE;
             keys_locked = false;
-            gui_syncsplash(HZ/2, str(LANG_KEYLOCK_OFF));
+            splash(HZ/2, str(LANG_KEYLOCK_OFF));
             return ACTION_REDRAW;
         }
         else
@@ -181,7 +181,7 @@ static int get_action_worker(int context, int timeout,
 #endif
         {
             if ((button & BUTTON_REL))
-                gui_syncsplash(HZ/2, str(LANG_KEYLOCK_ON));
+                splash(HZ/2, str(LANG_KEYLOCK_ON));
             return ACTION_REDRAW;
         }
     }
@@ -220,7 +220,7 @@ static int get_action_worker(int context, int timeout,
     {
         unlock_combo = button;
         keys_locked = true;
-        gui_syncsplash(HZ/2, str(LANG_KEYLOCK_ON));
+        splash(HZ/2, str(LANG_KEYLOCK_ON));
 
         button_clear_queue();
         return ACTION_REDRAW;

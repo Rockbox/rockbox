@@ -149,7 +149,7 @@ bool list_sc(bool is_editable)
         case SCLA_SELECT:
             return goto_entry(sc_file.entries[selected_item].path);
         case SCLA_DELETE:
-            rb->splash(HZ, "Deleting %s", sc_file.entries[selected_item].disp);
+            rb->splashf(HZ, "Deleting %s", sc_file.entries[selected_item].disp);
             remove_entry(&sc_file, selected_item);
             dump_sc_file(&sc_file, link_filename);
             return (sc_file.entry_cnt == 0);
@@ -175,7 +175,7 @@ bool goto_entry(char *file_or_dir)
     }
 
     if (!exists) {
-        rb->splash(HZ*2, "%s %s no longer exists on disk", what, file_or_dir);
+        rb->splashf(HZ*2, "%s %s no longer exists on disk", what, file_or_dir);
         return false;
     }
     /* Set the browsers dirfilter to the global setting

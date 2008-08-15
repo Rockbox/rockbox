@@ -532,7 +532,7 @@ static void init_load(const void *parameter)
   check_params(parameter);
   if(spcf_init_snapshot != NULL) {
 #ifndef USE_GREY
-    rb->splash(HZ, "Loading snapshot '%s'", spcf_init_snapshot);
+    rb->splashf(HZ, "Loading snapshot '%s'", spcf_init_snapshot);
 #endif
     
     load_snapshot_file_type(spcf_init_snapshot, spcf_init_snapshot_type);

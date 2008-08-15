@@ -1261,7 +1261,7 @@ static void jewels_nextlevel(struct game_context* bj) {
             while(bj->score >= LEVEL_PTS) {
                 bj->score -= LEVEL_PTS;
                 bj->level++;
-                rb->splash(HZ*2, "Level %d", bj->level);
+                rb->splashf(HZ*2, "Level %d", bj->level);
                 jewels_drawboard(bj);
             }
 
@@ -1283,7 +1283,7 @@ static void jewels_nextlevel(struct game_context* bj) {
                 rb->splash(HZ*2, "You win!");
                 bj->level = 1;
             } else {
-                rb->splash(HZ*2, "Level %d", bj->level);
+                rb->splashf(HZ*2, "Level %d", bj->level);
             }
             break;
     }

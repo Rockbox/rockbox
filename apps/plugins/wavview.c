@@ -203,7 +203,7 @@ static int readwavpeaks(const char *filename)
         }
         if(((bytes_read/4)*4) != bytes_read)
         {
-            rb->splash(HZ*2, "bytes_read/*4 err: %ld",(long int)bytes_read);
+            rb->splashf(HZ*2, "bytes_read/*4 err: %ld",(long int)bytes_read);
             rb->close (file);
             return -1;
         }
@@ -438,12 +438,12 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void *parame
             /* zoom out */
             if(zoomlevel > 1)
                 zoomlevel /= 2;
-            rb->splash(HZ/2, "ZOOM: %dx",(int)zoomlevel);
+            rb->splashf(HZ/2, "ZOOM: %dx",(int)zoomlevel);
             break;
         case ACTION_KBD_DOWN:
             if(zoomlevel < (mempeakcount / LCD_WIDTH / 2))
                 zoomlevel *= 2;
-            rb->splash(HZ/2, "ZOOM: %dx",(int)zoomlevel);
+            rb->splashf(HZ/2, "ZOOM: %dx",(int)zoomlevel);
             break;
         case ACTION_KBD_LEFT:
             center -= 10 * (mempeakcount / LCD_WIDTH) / zoomlevel;

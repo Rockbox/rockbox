@@ -606,9 +606,9 @@ int rec_create_directory(void)
         {
             while (action_userabort(HZ) == false)
             {
-                gui_syncsplash(0, "%s %s", 
-                               str(LANG_REC_DIR_NOT_WRITABLE),
-                               str(LANG_OFF_ABORT));
+                splashf(0, "%s %s", 
+                        str(LANG_REC_DIR_NOT_WRITABLE),
+                        str(LANG_OFF_ABORT));
             }
         }
         else
@@ -1442,7 +1442,6 @@ bool recording_screen(bool no_source)
                     screens[1].puts(0, 0, str(LANG_REMOTE_LCD_OFF));
                     screens[1].puts(0, 1, str(LANG_REMOTE_LCD_ON));
                     screens[1].update_viewport();
-                    gui_splash(&screens[0], 0, str(LANG_REMOTE_LCD_OFF));
                 }
                 else
                 {
@@ -1789,7 +1788,7 @@ bool recording_screen(bool no_source)
     audio_stat = audio_status();
     if (audio_stat & AUDIO_STATUS_ERROR)
     {
-        gui_syncsplash(0, str(LANG_DISK_FULL));
+        splash(0, str(LANG_DISK_FULL));
         gui_syncstatusbar_draw(&statusbars, true);
 
         FOR_NB_SCREENS(i)

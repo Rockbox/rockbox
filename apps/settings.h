@@ -187,10 +187,10 @@ extern unsigned char vp_dummy[VIRT_SIZE];
 #define ID2P(id) (VIRT_PTR + id)
 
 /* resolve a pointer which could be a virtualized ID or a literal */
-#define P2STR(p) (char *)((p>=VIRT_PTR && p<=VIRT_PTR+VIRT_SIZE) ? str(p-VIRT_PTR) : p)
+#define P2STR(p) (char *)((p>=VIRT_PTR && p<VIRT_PTR+VIRT_SIZE) ? str(p-VIRT_PTR) : p)
 
 /* get the string ID from a virtual pointer, -1 if not virtual */
-#define P2ID(p) ((p>=VIRT_PTR && p<=VIRT_PTR+VIRT_SIZE) ? p-VIRT_PTR : -1)
+#define P2ID(p) ((p>=VIRT_PTR && p<VIRT_PTR+VIRT_SIZE) ? p-VIRT_PTR : -1)
 
 /* !defined(HAVE_LCD_COLOR) implies HAVE_LCD_CONTRAST with default 40.
    Explicitly define HAVE_LCD_CONTRAST in config file for newer ports for

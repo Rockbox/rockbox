@@ -85,7 +85,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* void_p
     if (!found) {
         /* Something's gone properly pear shaped -
          * we couldn't even find the entry */
-        rb->splash(HZ*2, "File/Dir not found: %s", parameter);
+        rb->splashf(HZ*2, "File/Dir not found: %s", parameter);
         return PLUGIN_ERROR;
     }
 

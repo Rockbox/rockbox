@@ -292,7 +292,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     if(!found)
     {
         /* weird: we couldn't find the entry. This Should Never Happen (TM) */
-        rb->splash(0, "File/Dir not found: %s", file);
+        rb->splashf(0, "File/Dir not found: %s", file);
         rb->action_userabort(TIMEOUT_BLOCK);
         return PLUGIN_OK;
     }

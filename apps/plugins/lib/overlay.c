@@ -57,7 +57,7 @@ enum plugin_status run_overlay(const struct plugin_api* rb, const void* paramete
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
     {
-        rb->splash(2*HZ, "Can't open %s", filename);
+        rb->splashf(2*HZ, "Can't open %s", filename);
         return PLUGIN_ERROR;
     }
     readsize = rb->read(fd, &header, sizeof(header));
@@ -67,17 +67,17 @@ enum plugin_status run_overlay(const struct plugin_api* rb, const void* paramete
 
     if (readsize != sizeof(header))
     {
-        rb->splash(2*HZ, "Reading %s overlay failed.", name);
+        rb->splashf(2*HZ, "Reading %s overlay failed.", name);
         return PLUGIN_ERROR;
     }
     if (header.magic != PLUGIN_MAGIC || header.target_id != TARGET_ID)
     {
-        rb->splash(2*HZ, "%s overlay: Incompatible model.", name);
+        rb->splashf(2*HZ, "%s overlay: Incompatible model.", name);
         return PLUGIN_ERROR;
     }
     if (header.api_version != PLUGIN_API_VERSION) 
     {
-        rb->splash(2*HZ, "%s overlay: Incompatible version.", name);
+        rb->splashf(2*HZ, "%s overlay: Incompatible version.", name);
         return PLUGIN_ERROR;
     }
 
@@ -85,14 +85,14 @@ enum plugin_status run_overlay(const struct plugin_api* rb, const void* paramete
     if (header.load_addr < audiobuf ||
         header.end_addr > audiobuf + audiobuf_size)
     {
-        rb->splash(2*HZ, "%s overlay doesn't fit into memory.", name);
+        rb->splashf(2*HZ, "%s overlay doesn't fit into memory.", name);
         return PLUGIN_ERROR;
     }
 
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
     {
-        rb->splash(2*HZ, "Can't open %s", filename);
+        rb->splashf(2*HZ, "Can't open %s", filename);
         return PLUGIN_ERROR;
     }
     readsize = rb->read(fd, header.load_addr, header.end_addr - header.load_addr);
@@ -100,7 +100,7 @@ enum plugin_status run_overlay(const struct plugin_api* rb, const void* paramete
 
     if (readsize < 0)
     {
-        rb->splash(2*HZ, "Reading %s overlay failed.", name);
+        rb->splashf(2*HZ, "Reading %s overlay failed.", name);
         return PLUGIN_ERROR;
     }
     /* Zero out bss area */

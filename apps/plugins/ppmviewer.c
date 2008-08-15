@@ -36,7 +36,7 @@ PLUGIN_HEADER
 #define PPM_OVERALLMAXVAL 65535
 #define PPM_MAXSIZE (300*1024)/sizeof(fb_data)
 
-#define ppm_error(...) rb->splash(HZ*2, __VA_ARGS__ )
+#define ppm_error(...) rb->splashf(HZ*2, __VA_ARGS__ )
 
 static fb_data buffer[PPM_MAXSIZE];
 static fb_data lcd_buf[LCD_WIDTH * LCD_HEIGHT];

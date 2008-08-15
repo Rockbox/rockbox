@@ -219,7 +219,7 @@ void generate(void)
     rb->write(fd,&dirs_count,sizeof(int));
     if (fd < 0)
     {
-        rb->splash(HZ, "Couldnt open %s", RFA_FILE);
+        rb->splashf(HZ, "Couldnt open %s", RFA_FILE);
         return;
     }
 #ifndef HAVE_LCD_CHARCELLS
@@ -295,7 +295,7 @@ int edit_list(void)
     /* load the dat file if not already done */
     if ((list == NULL || list->count == 0) && (i = load_list()) != 0)
     {
-        rb->splash(HZ*2, "Could not load %s, rv = %d", RFA_FILE, i);
+        rb->splashf(HZ*2, "Could not load %s, rv = %d", RFA_FILE, i);
         return -1;
     }
     
@@ -387,13 +387,13 @@ int export_list_to_file_text(void)
     /* load the dat file if not already done */
     if ((list == NULL || list->count == 0) && (i = load_list()) != 0)
     {
-        rb->splash(HZ*2, "Could not load %s, rv = %d", RFA_FILE, i);
+        rb->splashf(HZ*2, "Could not load %s, rv = %d", RFA_FILE, i);
         return 0;
     }
         
     if (list->count <= 0)
     {
-        rb->splash(HZ*2, "no dirs in list file: %s", RFA_FILE);
+        rb->splashf(HZ*2, "no dirs in list file: %s", RFA_FILE);
         return 0;
     }
         
@@ -401,7 +401,7 @@ int export_list_to_file_text(void)
     int myfd = rb->creat(RFA_FILE_TEXT);
     if (myfd < 0)
     {
-        rb->splash(HZ*4, "failed to open: fd = %d, file = %s", 
+        rb->splashf(HZ*4, "failed to open: fd = %d, file = %s", 
             myfd, RFA_FILE_TEXT);
         return -1;
     }
@@ -434,7 +434,7 @@ int import_list_from_file_text(void)
     int myfd = rb->open(RFA_FILE_TEXT, O_RDONLY);
     if (myfd < 0)
     {
-        rb->splash(HZ*2, "failed to open: %s", RFA_FILE_TEXT);
+        rb->splashf(HZ*2, "failed to open: %s", RFA_FILE_TEXT);
         return -1;
     }
     

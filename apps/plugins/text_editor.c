@@ -350,7 +350,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         fd = rb->open(filename,O_RDONLY);
         if (fd<0)
         {
-            rb->splash(HZ*2,"Couldnt open file: %s",(char*)parameter);
+            rb->splashf(HZ*2,"Couldnt open file: %s",(char*)parameter);
             return PLUGIN_ERROR;
         }
 #ifdef HAVE_LCD_COLOR
@@ -363,7 +363,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         {
             if (!do_action(ACTION_INSERT,temp_line,line_count))
             {
-                rb->splash(HZ*2,"Error reading file: %s",(char*)parameter);
+                rb->splashf(HZ*2,"Error reading file: %s",(char*)parameter);
                 rb->close(fd);
                 return PLUGIN_ERROR;
             }

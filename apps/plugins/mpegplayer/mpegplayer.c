@@ -1674,7 +1674,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
                 errstring = "Error opening file: %d";
             }
 
-            rb->splash(HZ*2, errstring, err);
+            rb->splashf(HZ*2, errstring, err);
         }
     }
 

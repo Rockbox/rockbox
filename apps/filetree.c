@@ -92,7 +92,7 @@ bool ft_play_playlist(char* pathname, char* dirname, char* filename)
 {
     if (global_settings.party_mode) 
     {
-        gui_syncsplash(HZ, ID2P(LANG_PARTY_MODE));
+        splash(HZ, ID2P(LANG_PARTY_MODE));
         return false;
     }
 
@@ -101,7 +101,7 @@ bool ft_play_playlist(char* pathname, char* dirname, char* filename)
         return false;
     }
 
-    gui_syncsplash(0, ID2P(LANG_WAIT));
+    splash(0, ID2P(LANG_WAIT));
 
     /* about to create a new current playlist...
        allow user to cancel the operation */
@@ -397,7 +397,7 @@ int ft_enter(struct tree_context* c)
                 if (bookmark_autoload(c->currdir))
                     break;
 
-                gui_syncsplash(0, ID2P(LANG_WAIT));
+                splash(0, ID2P(LANG_WAIT));
 
                 /* about to create a new current playlist...
                    allow user to cancel the operation */
@@ -408,7 +408,7 @@ int ft_enter(struct tree_context* c)
                 {
                     playlist_insert_track(NULL, buf,
                                           PLAYLIST_INSERT_LAST, true, true);
-                    gui_syncsplash(HZ, ID2P(LANG_QUEUE_LAST));
+                    splash(HZ, ID2P(LANG_QUEUE_LAST));
                 }
                 else if (playlist_create(c->currdir, NULL) != -1)
                 {
@@ -432,8 +432,7 @@ int ft_enter(struct tree_context* c)
 #if CONFIG_TUNER
                 /* fmr preset file */
             case FILE_ATTR_FMR:
-
-                gui_syncsplash(0, ID2P(LANG_WAIT));
+                splash(0, ID2P(LANG_WAIT));
 
                 /* Preset inside the default folder. */
                 if(!strncasecmp(FMPRESET_PATH, buf, strlen(FMPRESET_PATH)))
@@ -460,7 +459,7 @@ int ft_enter(struct tree_context* c)
 
                 /* wps config file */
             case FILE_ATTR_WPS:
-                gui_syncsplash(0, ID2P(LANG_WAIT));
+                splash(0, ID2P(LANG_WAIT));
 #if LCD_DEPTH > 1
                 unload_wps_backdrop();
 #endif
@@ -472,7 +471,7 @@ int ft_enter(struct tree_context* c)
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
                 /* remote-wps config file */
             case FILE_ATTR_RWPS:
-                gui_syncsplash(0, ID2P(LANG_WAIT));
+                splash(0, ID2P(LANG_WAIT));
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
                 unload_remote_wps_backdrop();
 #endif
@@ -483,39 +482,39 @@ int ft_enter(struct tree_context* c)
 #endif
 
             case FILE_ATTR_CFG:
-                gui_syncsplash(0, ID2P(LANG_WAIT));
+                splash(0, ID2P(LANG_WAIT));
                 if (!settings_load_config(buf,true))
                     break;
-                gui_syncsplash(HZ, ID2P(LANG_SETTINGS_LOADED));
+                splash(HZ, ID2P(LANG_SETTINGS_LOADED));
                 break;
 
             case FILE_ATTR_BMARK:
-                gui_syncsplash(0, ID2P(LANG_WAIT));
+                splash(0, ID2P(LANG_WAIT));
                 bookmark_load(buf, false);
                 reload_dir = true;
                 break;
 
             case FILE_ATTR_LNG:
-                gui_syncsplash(0, ID2P(LANG_WAIT));
+                splash(0, ID2P(LANG_WAIT));
                 if(!lang_load(buf)) {
                     set_file(buf, (char *)global_settings.lang_file,
                              MAX_FILENAME);
                     talk_init(); /* use voice of same language */
-                    gui_syncsplash(HZ, ID2P(LANG_LANGUAGE_LOADED));
+                    splash(HZ, ID2P(LANG_LANGUAGE_LOADED));
                 }
                 break;
 
 #ifdef HAVE_LCD_BITMAP
             case FILE_ATTR_FONT:
-                gui_syncsplash(0, ID2P(LANG_WAIT));
+                splash(0, ID2P(LANG_WAIT));
                 font_load(buf);
                 set_file(buf, (char *)global_settings.font_file, MAX_FILENAME);
                 break;
 
             case FILE_ATTR_KBD:
-                gui_syncsplash(0, ID2P(LANG_WAIT));
+                splash(0, ID2P(LANG_WAIT));
                 if (!load_kbd(buf))
-                    gui_syncsplash(HZ, ID2P(LANG_KEYBOARD_LOADED));
+                    splash(HZ, ID2P(LANG_KEYBOARD_LOADED));
                 set_file(buf, (char *)global_settings.kbd_file, MAX_FILENAME);
                 break;
 #endif
@@ -523,7 +522,7 @@ int ft_enter(struct tree_context* c)
 #ifndef SIMULATOR
                 /* firmware file */
             case FILE_ATTR_MOD:
-                gui_syncsplash(0, ID2P(LANG_WAIT));
+                splash(0, ID2P(LANG_WAIT));
                 rolo_load(buf);
                 break;
 #endif
@@ -531,7 +530,7 @@ int ft_enter(struct tree_context* c)
                 /* plugin file */
             case FILE_ATTR_ROCK:
                 if (global_settings.party_mode) {
-                    gui_syncsplash(HZ, ID2P(LANG_PARTY_MODE));
+                    splash(HZ, ID2P(LANG_PARTY_MODE));
                     break;
                 }
 
@@ -555,7 +554,7 @@ int ft_enter(struct tree_context* c)
                 const char* plugin;
 
                 if (global_settings.party_mode) {
-                    gui_syncsplash(HZ, ID2P(LANG_PARTY_MODE));
+                    splash(HZ, ID2P(LANG_PARTY_MODE));
                     break;
                 }
 

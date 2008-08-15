@@ -119,7 +119,7 @@ static int insert_data_in_file(const char *fname, int fpos, char *buf, int num_b
 
 static void fileerror(int rc)
 {
-    rb->splash(HZ*2, "File error: %d", rc);
+    rb->splashf(HZ*2, "File error: %d", rc);
 }
 
 static const unsigned char empty_id3_header[] =

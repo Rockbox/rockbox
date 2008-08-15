@@ -57,13 +57,13 @@
 static void tagcache_rebuild_with_splash(void)
 {
     tagcache_rebuild();
-    gui_syncsplash(HZ*2, ID2P(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));   
+    splash(HZ*2, ID2P(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));   
 }
 
 static void tagcache_update_with_splash(void)
 {
     tagcache_update();
-    gui_syncsplash(HZ*2, ID2P(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));
+    splash(HZ*2, ID2P(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));
 }
 
 #ifdef HAVE_TC_RAMCACHE
@@ -187,7 +187,7 @@ static int dircache_callback(int action,const struct menu_item_ex *this_item)
             {
                 case true:
                     if (!dircache_is_enabled())
-                        gui_syncsplash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
+                        splash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
                     break;
                 case false:
                     if (dircache_is_enabled())

@@ -690,7 +690,7 @@ static int save(
 
                 if (close_stat != 0)
                 {
-                    rb->splash(0, "failed closing file1: error %d", close_stat);
+                    rb->splashf(0, "failed closing file1: error %d", close_stat);
                     rb->button_get(true);
                     rb->button_get(true);
                 } else {
@@ -702,7 +702,7 @@ static int save(
             }
             else
             {
-                rb->splash(0, "Can't write File1: error %d", file1);
+                rb->splashf(0, "Can't write File1: error %d", file1);
                 rb->button_get(true);
                 rb->button_get(true);
                 retval = -1;
@@ -713,7 +713,7 @@ static int save(
         {
             if (rb->lseek(src_file, end, SEEK_SET) < (off_t)end)
             {
-                rb->splash(0, "Src file to short: error %d", src_file);
+                rb->splashf(0, "Src file to short: error %d", src_file);
                 rb->button_get(true);
                 rb->button_get(true);
             }
@@ -731,7 +731,7 @@ static int save(
 
                 if (close_stat != 0)
                 {
-                    rb->splash(0, "failed: closing file2: error %d",
+                    rb->splashf(0, "failed: closing file2: error %d",
                                close_stat);
                     rb->button_get(true);
                     rb->button_get(true);
@@ -744,7 +744,7 @@ static int save(
             }
             else
             {
-                rb->splash(0, "Can't write File2: error %d", file2);
+                rb->splashf(0, "Can't write File2: error %d", file2);
                 rb->button_get(true);
                 rb->button_get(true);
                 retval = -2;
@@ -754,7 +754,7 @@ static int save(
         close_stat = rb->close(src_file);
         if (close_stat != 0)
         {
-            rb->splash(0, "failed: closing src: error %d", close_stat);
+            rb->splashf(0, "failed: closing src: error %d", close_stat);
             rb->button_get(true);
             rb->button_get(true);
         }

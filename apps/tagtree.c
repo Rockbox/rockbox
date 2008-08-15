@@ -711,10 +711,10 @@ static void tagtree_track_finish_event(struct mp3entry *id3)
 
 bool tagtree_export(void)
 {
-    gui_syncsplash(0, str(LANG_CREATING));
+    splash(0, str(LANG_CREATING));
     if (!tagcache_create_changelog(&tcs))
     {
-        gui_syncsplash(HZ*2, ID2P(LANG_FAILED));
+        splash(HZ*2, ID2P(LANG_FAILED));
     }
     
     return false;
@@ -722,10 +722,10 @@ bool tagtree_export(void)
 
 bool tagtree_import(void)
 {
-    gui_syncsplash(0, ID2P(LANG_WAIT));
+    splash(0, ID2P(LANG_WAIT));
     if (!tagcache_import_changelog())
     {
-        gui_syncsplash(HZ*2, ID2P(LANG_FAILED));
+        splash(HZ*2, ID2P(LANG_FAILED));
     }
     
     return false;
@@ -942,8 +942,7 @@ static bool show_search_progress(bool init, int count)
     /* Update progress every 1/10 of a second */
     if (current_tick - last_tick > HZ/10)
     {
-        gui_syncsplash(0, str(LANG_PLAYLIST_SEARCH_MSG), count,
-                          str(LANG_OFF_ABORT));
+        splashf(0, str(LANG_PLAYLIST_SEARCH_MSG), count, str(LANG_OFF_ABORT));
         if (action_userabort(TIMEOUT_NOBLOCK))
             return false;
         last_tick = current_tick;
@@ -1266,7 +1265,7 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     
     if (!sort && (sort_inverse || sort_limit))
     {
-        gui_syncsplash(HZ*4, ID2P(LANG_SHOWDIR_BUFFER_FULL), total_count);
+        splashf(HZ*4, ID2P(LANG_SHOWDIR_BUFFER_FULL), total_count);
         logf("Too small dir buffer");
         return 0;
     }
@@ -1369,7 +1368,7 @@ int tagtree_load(struct tree_context* c)
     {
         c->dirlevel = 0;
         count = load_root(c);
-        gui_syncsplash(HZ, str(LANG_TAGCACHE_BUSY));
+        splash(HZ, str(LANG_TAGCACHE_BUSY));
     }
 
     /* The _total_ numer of entries available. */
@@ -1566,7 +1565,7 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
     cpu_boost(true);
     if (!tagcache_search(&tcs, tag_filename))
     {
-        gui_syncsplash(HZ, ID2P(LANG_TAGCACHE_BUSY));
+        splash(HZ, ID2P(LANG_TAGCACHE_BUSY));
         cpu_boost(false);
         return false;
     }
@@ -1674,12 +1673,12 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
     }
 
     if (tc->filesindir <= 0)
-        gui_syncsplash(HZ, ID2P(LANG_END_PLAYLIST));
+        splash(HZ, ID2P(LANG_END_PLAYLIST));
     else
     {
         logf("insert_all_playlist");
         if (!insert_all_playlist(tc, position, queue))
-            gui_syncsplash(HZ*2, ID2P(LANG_FAILED));
+            splash(HZ*2, ID2P(LANG_FAILED));
     }
     
     /* Finally return the dirlevel to its original value. */

@@ -3026,7 +3026,7 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
 #endif
     if (status)
     {
-        rb->splash(HZ, "decode error %d", status);
+        rb->splashf(HZ, "decode error %d", status);
         file_pt[curfile] = '\0';
         return NULL;
     }
@@ -3212,7 +3212,7 @@ int load_and_show(char* filename)
 
     if (status < 0 || (status & (DQT | SOF0)) != (DQT | SOF0))
     {   /* bad format or minimum components not contained */
-        rb->splash(HZ, "unsupported %d", status);
+        rb->splashf(HZ, "unsupported %d", status);
         file_pt[curfile] = '\0';
         return change_filename(direction);
     }

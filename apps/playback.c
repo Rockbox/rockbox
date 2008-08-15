@@ -822,7 +822,7 @@ void audio_set_crossfade(int enable)
     {
         /* Store the track resume position */
         offset = curtrack_id3.offset;
-        gui_syncsplash(0, str(LANG_RESTARTING_PLAYBACK));
+        splash(0, str(LANG_RESTARTING_PLAYBACK));
     }
 
     /* Blast it - audio buffer will have to be setup again next time
@@ -1334,7 +1334,7 @@ static void codec_thread(void)
                         if (!ci.new_track)
                         {
                             logf("Codec failure");
-                            gui_syncsplash(HZ*2, "Codec failure");
+                            splash(HZ*2, "Codec failure");
                         }
 
                         if (!codec_load_next_track())
@@ -1395,7 +1395,7 @@ static void codec_thread(void)
                     break;
 
                 logf("Encoder failure");
-                gui_syncsplash(HZ*2, "Encoder failure");
+                splash(HZ*2, "Encoder failure");
 
                 if (ci.enc_codec_loaded < 0)
                     break;
@@ -1717,7 +1717,6 @@ static bool audio_load_track(size_t offset, bool start_play)
    buffering_handle_finished_callback callback. */
 static void audio_finish_load_track(void)
 {
-    char msgbuf[80];
     size_t file_offset = 0;
     size_t offset = 0;
     bool start_play = start_play_g;
@@ -1791,9 +1790,8 @@ static void audio_finish_load_track(void)
 
         /* This is an error condition, either no codec was found, or reading
          * the codec file failed part way through, either way, skip the track */
-        snprintf(msgbuf, sizeof(msgbuf)-1, "No codec for: %s", track_id3->path);
-        /* We should not use gui_syncplash from audio thread! */
-        gui_syncsplash(HZ*2, msgbuf);
+        /* FIXME: We should not use splashf from audio thread! */
+        splashf(HZ*2, "No codec for: %s", track_id3->path);
         /* Skip invalid entry from playlist. */
         playlist_skip_entry(NULL, last_peek_offset);
         return;

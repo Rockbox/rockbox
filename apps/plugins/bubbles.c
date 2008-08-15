@@ -2319,7 +2319,7 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
 
         case BUBBLES_START:  /* pause the game */
             start = *rb->current_tick;
-            rb->splash(1, "Paused");
+            rb->splash(0, "Paused");
             while(pluginlib_getaction(rb,TIMEOUT_BLOCK,plugin_contexts,2)
                  != (BUBBLES_START));
             bb->startedshot += *rb->current_tick-start;

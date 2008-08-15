@@ -25,20 +25,17 @@
 #include "screen_access.h"
 
 /*
- * Puts a splash message centered on the given screen for a given period
- *  - screen : the screen to put the splash on
- *  - ticks : how long the splash is displayed (in rb ticks)
- *  - fmt : what to say *printf style
- */
-extern void gui_splash(struct screen * screen, int ticks,
-                       const char *fmt, ...) ATTRIBUTE_PRINTF(3, 4);
-
-/*
  * Puts a splash message centered on all the screens for a given period
  *  - ticks : how long the splash is displayed (in rb ticks)
  *  - fmt : what to say *printf style
  */
-extern void gui_syncsplash(int ticks, const char *fmt, ...)
-                           ATTRIBUTE_PRINTF(2, 3);
+extern void splashf(int ticks, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
 
+/*
+ * Puts a splash message centered on all the screens for a given period
+ *  - ticks : how long the splash is displayed (in rb ticks)
+ *  - str : what to say, if this is a LANG_* string (from ID2P)
+ *          it will be voiced
+ */
+extern void splash(int ticks, const char *str);
 #endif /* _GUI_ICON_H_ */

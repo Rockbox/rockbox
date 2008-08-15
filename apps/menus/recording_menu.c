@@ -325,7 +325,7 @@ MENUITEM_SETTING(rec_prerecord_time, &global_settings.rec_prerecord_time, NULL);
 static int clear_rec_directory(void)
 {
     strcpy(global_settings.rec_directory, REC_BASE_DIR);
-    gui_syncsplash(HZ, ID2P(LANG_RESET_DONE_CLEAR));
+    splash(HZ, ID2P(LANG_RESET_DONE_CLEAR));
     return false;
 }
 MENUITEM_FUNCTION(clear_rec_directory_item, 0, ID2P(LANG_CLEAR_REC_DIR), 
@@ -531,7 +531,7 @@ int rectrigger(void)
         switch (action)
         {
             case ACTION_STD_CANCEL:
-                gui_syncsplash(HZ/2, ID2P(LANG_CANCEL));
+                splash(HZ/2, ID2P(LANG_CANCEL));
                 global_settings.rec_start_thres_db = old_start_thres_db;
                 global_settings.rec_start_thres_linear = old_start_thres_linear;
                 global_settings.rec_start_duration = old_start_duration;

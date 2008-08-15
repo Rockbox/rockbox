@@ -3500,7 +3500,7 @@ int play_file(char* filename)
     format = letoh16(*(uint16_t *)(aud_buf + 20));
     if (format != 1)
     {
-        rb->splash(2*HZ, "Unsupported format: %d", format);
+        rb->splashf(2*HZ, "Unsupported format: %d", format);
         rb->close(fd);
         return PLAY_ERROR;
     }
@@ -3508,7 +3508,7 @@ int play_file(char* filename)
     channels = letoh16(*(uint16_t *)(aud_buf + 22));
     if (channels > 2)
     {
-        rb->splash(2*HZ, "Too many channels: %d", channels);
+        rb->splashf(2*HZ, "Too many channels: %d", channels);
         rb->close(fd);
         return PLAY_ERROR;
     }
@@ -3516,7 +3516,7 @@ int play_file(char* filename)
     samplebits = letoh16(*(uint16_t *)(aud_buf + 34));
     if (samplebits != 16)
     {
-        rb->splash(2*HZ, "Unsupported sample depth: %dbit", samplebits);
+        rb->splashf(2*HZ, "Unsupported sample depth: %dbit", samplebits);
         rb->close(fd);
         return PLAY_ERROR;
     }
@@ -3534,7 +3534,7 @@ int play_file(char* filename)
         case 44100:  rate =  9; break;
         case 48000:  rate = 10; break;
         default:
-            rb->splash(2*HZ, "Unsupported samplerate: %dHz", samplerate);
+            rb->splashf(2*HZ, "Unsupported samplerate: %dHz", samplerate);
             rb->close(fd);
             return PLAY_ERROR;
     }

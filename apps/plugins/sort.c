@@ -207,7 +207,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         rc = write_file();
         if(rc < 0) {
             rb->lcd_clear_display();
-            rb->splash(HZ, "Can't write file: %d", rc);
+            rb->splashf(HZ, "Can't write file: %d", rc);
         } else {
             rb->lcd_clear_display();
             rb->splash(HZ, "Done");
@@ -215,7 +215,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     } else {
         if(rc < 0) {
             rb->lcd_clear_display();
-            rb->splash(HZ, "Can't read file: %d", rc);
+            rb->splashf(HZ, "Can't read file: %d", rc);
         } else {
             rb->lcd_clear_display();
             rb->splash(HZ, "The file is too big");

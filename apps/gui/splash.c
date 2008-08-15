@@ -45,7 +45,7 @@
 
 #endif
 
-static void splash(struct screen * screen, const char *fmt, va_list ap)
+static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 {
     char splash_buf[MAXBUFFER];
     short widths[MAXLINES];
@@ -187,41 +187,35 @@ static void splash(struct screen * screen, const char *fmt, va_list ap)
     screen->update();
 }
 
-void gui_splash(struct screen * screen, int ticks, 
-                const char *fmt, ...)
+void splashf(int ticks, const char *fmt, ...)
 {
     va_list ap;
-    va_start( ap, fmt );
-    splash(screen, fmt, ap);
-    va_end( ap );
+    int i;
+
+    /* If fmt is a lang ID then get the corresponding string (which
+       still might contain % place holders). */
+    fmt = P2STR((unsigned char *)fmt);
+    FOR_NB_SCREENS(i)
+    {
+        va_start(ap, fmt);
+        screens[i].set_viewport(NULL);
+        splash_internal(&(screens[i]), fmt, ap);
+        va_end(ap);
+    }
 
     if(ticks)
         sleep(ticks);
 }
 
-void gui_syncsplash(int ticks, const char *fmt, ...)
+void splash(int ticks, const char *str)
 {
-    va_list ap;
-    int i;
 #if !defined(SIMULATOR) || CONFIG_CODEC == SWCODEC
     long id;
     /* fmt may be a so called virtual pointer. See settings.h. */
-    if((id = P2ID((unsigned char *)fmt)) >= 0)
+    if((id = P2ID((const unsigned char*)str)) >= 0)
         /* If fmt specifies a voicefont ID, and voice menus are
            enabled, then speak it. */
         cond_talk_ids_fq(id);
 #endif
-    /* If fmt is a lang ID then get the corresponding string (which
-       still might contain % place holders). */
-    fmt = P2STR((unsigned char *)fmt);
-    va_start( ap, fmt );
-    FOR_NB_SCREENS(i)
-    {
-        screens[i].set_viewport(NULL);
-        splash(&(screens[i]), fmt, ap);
-    }
-    va_end( ap );
-
-    if(ticks)
-        sleep(ticks);
+    splashf(ticks, "%s", P2STR((const unsigned char*)str));
 }

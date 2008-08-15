@@ -106,7 +106,7 @@ static const struct filetype inbuilt_filetypes[] = {
     { "cue",  FILE_ATTR_CUE,   Icon_Bookmark,  VOICE_EXT_CUESHEET },
 #ifdef BOOTFILE_EXT
     { BOOTFILE_EXT, FILE_ATTR_MOD, Icon_Firmware, VOICE_EXT_AJZ },
-#endif /* #ifndef SIMULATOR */
+#endif
 };
 
 void tree_get_filetypes(const struct filetype** types, int* count)
@@ -300,7 +300,7 @@ static void read_config(char* config_file)
     {
         if (filetype_count >= MAX_FILETYPES)
         {
-            gui_syncsplash(HZ, ID2P(LANG_FILETYPES_FULL));
+            splash(HZ, ID2P(LANG_FILETYPES_FULL));
             break;
         }
         rm_whitespaces(line);
@@ -485,7 +485,7 @@ int filetype_list_viewers(const char* current_file)
     if (count == 0)
     {
         /* FIX: translation! */
-        gui_syncsplash(HZ*2, (unsigned char *)"No viewers found");
+        splash(HZ*2, "No viewers found");
         return PLUGIN_OK;
     }
 #endif

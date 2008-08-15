@@ -749,12 +749,12 @@ enum minesweeper_status minesweeper( void )
                     break;
                 flags_used = count_flags();
                 if (flags_used == 1) {
-                    rb->splash( HZ*2, "You marked 1 field. There are %d mines.",
+                    rb->splashf( HZ*2, "You marked 1 field. There are %d mines.",
                                 mine_num );
                 }
                 else
                 {
-                    rb->splash( HZ*2, "You marked %d fields. There are %d mines.",
+                    rb->splashf( HZ*2, "You marked %d fields. There are %d mines.",
                                 flags_used, mine_num );
                 }
                 break;

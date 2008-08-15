@@ -530,7 +530,7 @@ bool option_screen(const struct settings_list *setting,
                 *variable = oldvalue;
                 if (var_type == F_T_BOOL && !use_temp_var)
                     *(bool*)setting->setting = (oldvalue==1);
-                gui_syncsplash(HZ/2, ID2P(LANG_CANCEL));
+                splash(HZ/2, ID2P(LANG_CANCEL));
             }
             done = true;
         }

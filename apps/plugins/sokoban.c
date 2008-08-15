@@ -618,7 +618,7 @@ static bool read_levels(bool initialize)
         buffered_boards.start = 0;
 
     if ((fd = rb->open(buffered_boards.filename, O_RDONLY)) < 0) {
-        rb->splash(HZ*2, "Unable to open %s", buffered_boards.filename);
+        rb->splashf(HZ*2, "Unable to open %s", buffered_boards.filename);
         return false;
     }
 
@@ -930,7 +930,7 @@ static bool save(char *filename, bool solution)
 
     if (filename[0] == '\0' ||
         (fd = rb->open(filename, O_WRONLY|O_CREAT|O_TRUNC)) < 0) {
-        rb->splash(HZ*2, "Unable to open %s", filename);
+        rb->splashf(HZ*2, "Unable to open %s", filename);
         return false;
     }
 
@@ -965,7 +965,7 @@ static bool load(char *filename, bool silent)
 
     if (filename[0] == '\0' || (fd = rb->open(filename, O_RDONLY)) < 0) {
         if (!silent)
-            rb->splash(HZ*2, "Unable to open %s", filename);
+            rb->splashf(HZ*2, "Unable to open %s", filename);
         return false;
     }
 

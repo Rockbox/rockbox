@@ -406,7 +406,7 @@ static int info_action_callback(int action, struct gui_synclist *lists)
 #ifndef SIMULATOR
         struct info_data *info = (struct info_data *)lists->data;
         info->new_data = true;
-        gui_syncsplash(0, ID2P(LANG_SCANNING_DISK));
+        splash(0, ID2P(LANG_SCANNING_DISK));
         fat_recalc_free(IF_MV(0));
 #ifdef HAVE_MULTIVOLUME
         if (fat_ismounted(1))

@@ -166,7 +166,7 @@ static bool add_to_playlist(int position, bool queue)
     };
     const struct text_message message={lines, 2};
 
-    gui_syncsplash(0, ID2P(LANG_WAIT));
+    splash(0, ID2P(LANG_WAIT));
     
     if (new_playlist)
         playlist_create(NULL, NULL);
@@ -476,7 +476,7 @@ static int remove_dir(char* dirname, int len)
             break;
 
         dirname[dirlen] ='\0';
-        gui_syncsplash(0, dirname);
+        splash(0, dirname);
         
         /* append name to current directory */
         snprintf(dirname+dirlen, len-dirlen, "/%s", entry->d_name);
@@ -499,7 +499,7 @@ static int remove_dir(char* dirname, int len)
         }
         if(ACTION_STD_CANCEL == get_action(CONTEXT_STD,TIMEOUT_NOBLOCK))
         {
-            gui_syncsplash(HZ, ID2P(LANG_CANCEL));
+            splash(HZ, ID2P(LANG_CANCEL));
             result = -1;
             break;
         }
@@ -538,7 +538,7 @@ static bool delete_handler(bool is_dir)
     if(gui_syncyesno_run(&message, &yes_message, NULL)!=YESNO_YES)
         return false;
     
-    gui_syncsplash(0, str(LANG_DELETING));
+    splash(0, str(LANG_DELETING));
 
     int res;
     if (is_dir)
@@ -574,13 +574,13 @@ static bool set_backdrop(void)
 {
     /* load the image */
     if(load_main_backdrop(selected_file)) {
-        gui_syncsplash(HZ, str(LANG_BACKDROP_LOADED));
+        splash(HZ, str(LANG_BACKDROP_LOADED));
         set_file(selected_file, (char *)global_settings.backdrop_file,
             MAX_FILENAME);
         show_main_backdrop();
         return true;
     } else {
-        gui_syncsplash(HZ, str(LANG_BACKDROP_FAILED));
+        splash(HZ, str(LANG_BACKDROP_FAILED));
         return false;
     }
 }
@@ -630,8 +630,8 @@ static bool create_dir(void)
     rc = mkdir(dirname);
     if (rc < 0) {
         cond_talk_ids_fq(LANG_CREATE_DIR, LANG_FAILED);
-        gui_syncsplash(HZ, (unsigned char *)"%s %s",
-                       str(LANG_CREATE_DIR), str(LANG_FAILED));
+        splashf(HZ, (unsigned char *)"%s %s", str(LANG_CREATE_DIR),
+                                              str(LANG_FAILED));
     } else {
         onplay_result = ONPLAY_RELOAD_DIR;
     }
@@ -886,11 +886,11 @@ static bool clipboard_paste(void)
     }
 
     if (clipboard_is_copy) {
-        gui_syncsplash(0, ID2P(LANG_COPYING));
+        splash(0, ID2P(LANG_COPYING));
     }
     else
     {
-        gui_syncsplash(0, ID2P(LANG_MOVING));
+        splash(0, ID2P(LANG_MOVING));
     }
 
     /* Now figure out what we're doing */
@@ -930,8 +930,8 @@ static bool clipboard_paste(void)
         onplay_result = ONPLAY_RELOAD_DIR;
     } else {
         cond_talk_ids_fq(LANG_PASTE, LANG_FAILED);
-        gui_syncsplash(HZ, (unsigned char *)"%s %s",
-               str(LANG_PASTE), str(LANG_FAILED));
+        splashf(HZ, (unsigned char *)"%s %s", str(LANG_PASTE),
+                                              str(LANG_FAILED));
     }
 
     return true;
@@ -949,7 +949,7 @@ static int set_rating_inline(void)
         tagcache_update_numeric(id3->tagcache_idx-1, tag_rating, id3->rating);
     }
     else
-        gui_syncsplash(HZ*2, ID2P(LANG_ID3_NO_INFO));
+        splash(HZ*2, ID2P(LANG_ID3_NO_INFO));
     return 0;
 }
 static int ratingitem_callback(int action,const struct menu_item_ex *this_item)

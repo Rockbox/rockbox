@@ -248,7 +248,7 @@ int codec_load_file(const char *plugin, struct codec_api *api)
     fd = open(path, O_RDONLY);
     if (fd < 0) {
         logf("Codec load error:%d", fd);
-        gui_syncsplash(HZ*2, "Couldn't load codec: %s", path);
+        splashf(HZ*2, "Couldn't load codec: %s", path);
         return fd;
     }
     

@@ -3772,7 +3772,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         rc = rb->mkdir(recbasedir);
         if (rc < 0)
         {
-            rb->splash(HZ*2, "Can't create directory %s. Error %d.",
+            rb->splashf(HZ*2, "Can't create directory %s. Error %d.",
                        recbasedir, rc);
             return PLUGIN_ERROR;
         }

@@ -96,8 +96,7 @@ static int initialize_catalog(void)
     if (!playlist_dir_exists)
     {
         if (mkdir(playlist_dir) < 0) {
-            gui_syncsplash(HZ*2, ID2P(LANG_CATALOG_NO_DIRECTORY),
-                playlist_dir);
+            splashf(HZ*2, ID2P(LANG_CATALOG_NO_DIRECTORY), playlist_dir);
             return -1;
         }
         else {
@@ -130,8 +129,7 @@ static int create_playlist_list(char** playlists, int num_items,
     
     if (ft_load(tc, playlist_dir) < 0)
     {
-        gui_syncsplash(HZ*2, ID2P(LANG_CATALOG_NO_DIRECTORY),
-            playlist_dir);
+        splashf(HZ*2, ID2P(LANG_CATALOG_NO_DIRECTORY), playlist_dir);
         goto exit;
     }
     
@@ -234,7 +232,7 @@ static int display_playlists(char* playlist, bool view)
 
     if (num_playlists <= 0)
     {
-        gui_syncsplash(HZ*2, ID2P(LANG_CATALOG_NO_PLAYLISTS));
+        splash(HZ*2, ID2P(LANG_CATALOG_NO_PLAYLISTS));
         return -1;
     }
 
@@ -327,8 +325,7 @@ static void display_insert_count(int count)
         talk_id(LANG_PLAYLIST_INSERT_COUNT, true);
     }
 
-    gui_syncsplash(0, str(LANG_PLAYLIST_INSERT_COUNT), count,
-        str(LANG_OFF_ABORT));
+    splashf(0, str(LANG_PLAYLIST_INSERT_COUNT), count, str(LANG_OFF_ABORT));
 }
 
 /* Add specified track into playlist.  Callback from directory insert */

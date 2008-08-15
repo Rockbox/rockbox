@@ -2136,7 +2136,7 @@ static bool dbg_save_roms(void)
         restore_irq(old_irq_level);
 
         if (err)
-            gui_syncsplash(HZ*3, "Eeprom read failure (%d)",err);
+            splashf(HZ*3, "Eeprom read failure (%d)", err);
         else
         {
             write(fd, buf, sizeof buf);
@@ -2233,7 +2233,7 @@ extern bool do_screendump_instead_of_usb;
 static bool dbg_screendump(void)
 {
     do_screendump_instead_of_usb = !do_screendump_instead_of_usb;
-    gui_syncsplash(HZ, "Screendump %s",
+    splashf(HZ, "Screendump %s",
                  do_screendump_instead_of_usb?"enabled":"disabled");
     return false;
 }
@@ -2277,21 +2277,21 @@ static bool dbg_write_eeprom(void)
 
             err = eeprom_24cxx_write(0, buf, sizeof buf);
             if (err)
-                gui_syncsplash(HZ*3, "Eeprom write failure (%d)",err);
+                splashf(HZ*3, "Eeprom write failure (%d)", err);
             else
-                gui_syncsplash(HZ*3, "Eeprom written successfully");
+                splash(HZ*3, "Eeprom written successfully");
 
             restore_irq(old_irq_level);
         }
         else
         {
-            gui_syncsplash(HZ*3, "File read error (%d)",rc);
+            splashf(HZ*3, "File read error (%d)",rc);
         }
         close(fd);
     }
     else
     {
-        gui_syncsplash(HZ*3, "Failed to open 'internal_eeprom.bin'");
+        splash(HZ*3, "Failed to open 'internal_eeprom.bin'");
     }
 
     return false;
@@ -2396,7 +2396,7 @@ static bool logf_usb_serial(void)
 {
     bool serial_enabled = !usb_core_driver_enabled(USB_DRIVER_SERIAL);
     usb_core_enable_driver(USB_DRIVER_SERIAL,serial_enabled);
-    gui_syncsplash(HZ, "USB logf %s",
+    splashf(HZ, "USB logf %s",
                  serial_enabled?"enabled":"disabled");
     return false;
 }
@@ -2405,7 +2405,7 @@ static bool logf_usb_serial(void)
 #if defined(HAVE_USBSTACK) && defined(USB_STORAGE)
 static bool usb_reconnect(void)
 {
-    gui_syncsplash(HZ, "Reconnect mass storage");
+    splash(HZ, "Reconnect mass storage");
     usb_storage_reconnect();
     return false;
 }

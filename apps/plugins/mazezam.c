@@ -715,7 +715,7 @@ static void play_level(short level, short lives, bool new_level)
      */
     rb->lcd_remote_clear_display();
 #endif
-    rb->splash(MAZEZAM_DELAY_LIVES, MAZEZAM_TEXT_LIVES,
+    rb->splashf(MAZEZAM_DELAY_LIVES, MAZEZAM_TEXT_LIVES,
                level+1, lives);
 
     /* ensure keys pressed during the splash screen are ignored */

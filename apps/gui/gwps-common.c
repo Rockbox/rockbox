@@ -152,7 +152,7 @@ bool update_onvol_change(struct gui_wps * gwps)
     gui_wps_refresh(gwps, 0, WPS_REFRESH_NON_STATIC);
 
 #ifdef HAVE_LCD_CHARCELLS
-    gui_splash(gwps->display, 0, "Vol: %3d dB",
+    splashf(0, "Vol: %3d dB",
                sound_val2phys(SOUND_VOLUME, global_settings.volume));
     return true;
 #endif
@@ -329,7 +329,7 @@ bool gui_wps_display(void)
 #ifdef HAVE_LCD_BITMAP
         gui_syncstatusbar_draw(&statusbars, true);
 #endif
-        gui_syncsplash(HZ, ID2P(LANG_END_PLAYLIST));
+        splash(HZ, ID2P(LANG_END_PLAYLIST));
         return true;
     }
     else
@@ -485,16 +485,11 @@ bool update(struct gui_wps *gwps)
 
 void display_keylock_text(bool locked)
 {
-    char* s;
     int i;
     FOR_NB_SCREENS(i)
         gui_wps[i].display->stop_scroll();
 
-    if(locked)
-        s = str(LANG_KEYLOCK_ON);
-    else
-        s = str(LANG_KEYLOCK_OFF);
-    gui_syncsplash(HZ, s);
+    splash(HZ, locked ? ID2P(LANG_KEYLOCK_ON) : ID2P(LANG_KEYLOCK_OFF));
 }
 
 #ifdef HAVE_LCD_BITMAP

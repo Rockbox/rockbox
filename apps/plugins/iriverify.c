@@ -159,13 +159,13 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         FOR_NB_SCREENS(i)
             rb->screens[i]->clear_display();
         if(rc < 0) {
-            rb->splash(HZ, "Can't write file: %d", rc);
+            rb->splashf(HZ, "Can't write file: %d", rc);
         } else {
             rb->splash(HZ, "Done");
         }
     } else {
         if(rc < 0) {
-            rb->splash(HZ, "Can't read file: %d", rc);
+            rb->splashf(HZ, "Can't read file: %d", rc);
         } else {
             rb->splash(HZ, "The file is too big");
         }

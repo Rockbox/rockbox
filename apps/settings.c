@@ -634,15 +634,15 @@ bool settings_save_config(int options)
             break;
         }
         else {
-            gui_syncsplash(HZ, ID2P(LANG_CANCEL));
+            splash(HZ, ID2P(LANG_CANCEL));
             return false;
         }
     }
 
     if (settings_write_config(filename, options))
-        gui_syncsplash(HZ, ID2P(LANG_SETTINGS_SAVED));
+        splash(HZ, ID2P(LANG_SETTINGS_SAVED));
     else
-        gui_syncsplash(HZ, ID2P(LANG_FAILED));
+        splash(HZ, ID2P(LANG_FAILED));
     return true;
 }
 
