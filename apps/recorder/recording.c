@@ -1435,8 +1435,7 @@ bool recording_screen(bool no_source)
                    NOTE 2: to be replaced by a global LCD_off() routine */
                 if(remote_display_on)
                 {
-                    /* switch to single screen and put up a splash on the main.
-                       On the remote we put a two line message */
+                    /* switch to single screen, leave message on remote */
                     screen_update = 1;
                     screens[1].clear_viewport();
                     screens[1].puts(0, 0, str(LANG_REMOTE_LCD_OFF));
