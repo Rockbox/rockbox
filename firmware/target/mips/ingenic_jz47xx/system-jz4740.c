@@ -345,9 +345,36 @@ void intr_handler(void)
     return;
 }
 
+#define EXC(x,y) if(_cause == (x)) return (y);
+static char* parse_exception(unsigned int cause)
+{
+    unsigned int _cause = cause & M_CauseExcCode;
+    EXC(EXC_INT, "Interrupt");
+    EXC(EXC_MOD, "TLB Modified");
+    EXC(EXC_TLBL, "TLB Exception (Load or Ifetch)");
+    EXC(EXC_ADEL, "Address Error (Load or Ifetch)");
+    EXC(EXC_ADES, "Address Error (Store)");
+    EXC(EXC_TLBS, "TLB Exception (Store)");
+    EXC(EXC_IBE, "Instruction Bus Error");
+    EXC(EXC_DBE, "Data Bus Error");
+    EXC(EXC_SYS, "Syscall");
+    EXC(EXC_BP, "Breakpoint");
+    EXC(EXC_RI, "Reserved Instruction");
+    EXC(EXC_CPU, "Coprocessor Unusable");
+    EXC(EXC_OV, "Overflow");
+    EXC(EXC_TR, "Trap Instruction");
+    EXC(EXC_FPE, "Floating Point Exception");
+    EXC(EXC_C2E, "COP2 Exception");
+    EXC(EXC_MDMX, "MDMX Exception");
+    EXC(EXC_WATCH, "Watch Exception");
+    EXC(EXC_MCHECK, "Machine Check Exception");
+    EXC(EXC_CacheErr, "Cache error caused re-entry to Debug Mode");
+    return NULL;
+}
+
 void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
 {
-    panicf("Exception occurred: [0x%x] at 0x%x (stack at 0x%x)", cause, epc, (unsigned int)stack_ptr);
+    panicf("Exception occurred: %s [0x%08x] at 0x%08x (stack at 0x%08x)", parse_exception(cause), cause, epc, (unsigned int)stack_ptr);
 }
 
 static const int FR2n[] = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
@@ -559,9 +586,8 @@ void system_main(void)
     __dcache_writeback_all();
     __icache_invalidate_all();
     
-    /* Init interrupt handling */
-    ipl = 0;
-    for(i=0;i<IRQ_MAX;i++)
+    /* Disable all interrupts */
+    for(i=0; i<IRQ_MAX; i++)
         dis_irq(i);
     
     sti();

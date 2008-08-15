@@ -135,15 +135,14 @@ except_common_entry:
     nop
     nop
     nop
-
+    .fill 0x20
+    
     .extern _int
     .extern _exception
     .global real_exception_handler
     .type   real_exception_handler,@function
     .set noreorder
 real_exception_handler:
-
-
     addiu   sp, -0x80
     sw      ra, 0(sp)
     sw      fp, 4(sp)
@@ -196,8 +195,7 @@ real_exception_handler:
     and     k0, k1
     beq     zero, k0, _int
     nop
-    la    k0, _exception
-    jr    k0
+    j       _exception
     nop
     
     .global _int
@@ -261,9 +259,17 @@ _int:
     .global _exception
     .type   _exception,@function
 _exception:
-    move    a0, sp
+    add     a0, sp, $0
     mfc0    a1, C0_CAUSE       # C0_CAUSE of last exception
+    sll     zero, 1
+    sll     zero, 1
+    sll     zero, 1
+    sll     zero, 1
     mfc0    a2, C0_EPC         # Exception Program Counter
+    sll     zero, 1
+    sll     zero, 1
+    sll     zero, 1
+    sll     zero, 1
     la      k0, exception_handler
     jr      k0
     nop
