@@ -129,7 +129,7 @@ Translations
 NOTE: Any languages without a dedicated maintainer are maintained by
 the person(s) named next to "General".
 
-:General:
+:General: Jonas Häggqvist
 :Italian: Alessio Lenzi
 :Dutch: Peter D'Hoye
 :Swedish: Magnus Holmgren
@@ -137,6 +137,7 @@ the person(s) named next to "General".
 :German: Marianne Arnold
 :Finnish: Jani Kinnunen
 :Français: Mustapha Senhaji
+:Hebrew: Tomer Shalev
 
 
 Plugins
