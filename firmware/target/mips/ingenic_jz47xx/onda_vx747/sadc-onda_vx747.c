@@ -66,10 +66,10 @@ void button_init_device(void)
     system_enable_irq(IRQ_SADC);
     
     REG_SADC_SAMETIME = 350;
-    REG_SADC_WAITTIME = 100; /* per 10 HZ */
+    REG_SADC_WAITTIME = 100;
     REG_SADC_STATE &= (~REG_SADC_STATE);
     REG_SADC_CTRL &= (~(SADC_CTRL_PENDM | SADC_CTRL_PENUM | SADC_CTRL_TSRDYM));
-    REG_SADC_ENA = (SADC_ENA_TSEN | REG_SADC_ENA); //| SADC_ENA_PBATEN | SADC_ENA_SADCINEN);
+    REG_SADC_ENA = SADC_ENA_TSEN; //| SADC_ENA_PBATEN | SADC_ENA_SADCINEN);
     
     __gpio_port_as_input(3, 29);
     __gpio_port_as_input(3, 27);
@@ -78,21 +78,28 @@ void button_init_device(void)
     __gpio_port_as_input(3, 0);
 }
 
-//static unsigned short touchdivider[2] = {14.5833*1000, 9*1000};
 static int touch_to_pixels(short x, short y)
 { 
     /* X:300 -> 3800 Y:300->3900 */
     x -= 300;
     y -= 300;
     
+#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
     x /= 3200 / LCD_WIDTH;
     y /= 3600 / LCD_HEIGHT;
-    //x /= touchdivider[0];
-    //y /= touchdivider[1];
-    
+
     y = LCD_HEIGHT - y;
     
     return (x << 16) | y;
+#else
+    x /= 3200 / LCD_HEIGHT;
+    y /= 3600 / LCD_WIDTH;
+
+    y = LCD_WIDTH - y;
+    x = LCD_HEIGHT - x;
+    
+    return (y << 16) | x;
+#endif
 }
 
 int button_read_device(int *data)
@@ -144,7 +151,7 @@ void SADC(void)
     {
         /* Pen down IRQ */
         REG_SADC_CTRL &= (~(SADC_CTRL_PENUM |  SADC_CTRL_TSRDYM));
-        REG_SADC_CTRL |= (SADC_CTRL_PENDM);// | SADC_CTRL_TSRDYM);
+        REG_SADC_CTRL |= (SADC_CTRL_PENDM);
         pendown_flag = true;
     }
     if(state & SADC_CTRL_PENUM)

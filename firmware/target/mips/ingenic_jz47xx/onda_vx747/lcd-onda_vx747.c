@@ -95,10 +95,17 @@ static void _display_init(void)
     SLCD_SEND_COMMAND(REG_PWR_CTRL6, 1);
     SLCD_SEND_COMMAND(REG_RAM_HADDR_SET, 0); /* set cursor at x_start */
     SLCD_SEND_COMMAND(REG_RAM_VADDR_SET, 0); /* set cursor at y_start */
+#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
     SLCD_SEND_COMMAND(REG_RAM_HADDR_START, 0); /* y_start*/
     SLCD_SEND_COMMAND(REG_RAM_HADDR_END, 239); /* y_end */
     SLCD_SEND_COMMAND(REG_RAM_VADDR_START, 0); /* x_start */
     SLCD_SEND_COMMAND(REG_RAM_VADDR_END, 399); /* x_end */
+#else
+    SLCD_SEND_COMMAND(REG_RAM_HADDR_START, 0); /* y_start*/
+    SLCD_SEND_COMMAND(REG_RAM_HADDR_END, 399); /* y_end */
+    SLCD_SEND_COMMAND(REG_RAM_VADDR_START, 0); /* x_start */
+    SLCD_SEND_COMMAND(REG_RAM_VADDR_END, 239); /* x_end */
+#endif
     SLCD_SEND_COMMAND(REG_RW_NVM, 0);
     SLCD_SEND_COMMAND(REG_VCOM_HVOLTAGE1, 6);
     SLCD_SEND_COMMAND(REG_VCOM_HVOLTAGE2, 0);
@@ -219,10 +226,17 @@ void lcd_init_controller(void)
 
 void lcd_set_target(short x, short y, short width, short height)
 {
+#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
     SLCD_SEND_COMMAND(REG_RAM_HADDR_START, y); /* y_start */
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_END, y+height); /* y_end */
+    SLCD_SEND_COMMAND(REG_RAM_HADDR_END, y+width-1); /* y_end */
     SLCD_SEND_COMMAND(REG_RAM_VADDR_START, x); /* x_start */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_END, x+width); /* x_end */
+    SLCD_SEND_COMMAND(REG_RAM_VADDR_END, x+height-1); /* x_end */
+#else
+    SLCD_SEND_COMMAND(REG_RAM_HADDR_START, y); /* y_start */
+    SLCD_SEND_COMMAND(REG_RAM_HADDR_END, y+height-1); /* y_end */
+    SLCD_SEND_COMMAND(REG_RAM_VADDR_START, x); /* x_start */
+    SLCD_SEND_COMMAND(REG_RAM_VADDR_END, x+width-1); /* x_end */
+#endif
     SLCD_SEND_COMMAND(REG_RAM_HADDR_SET, x); /* set cursor at x_start */
     SLCD_SEND_COMMAND(REG_RAM_VADDR_SET, y); /* set cursor at y_start */
     SLCD_SET_COMMAND(REG_RW_GRAM); /* write data to GRAM */

@@ -23,6 +23,7 @@
 #include "jz4740.h"
 #include "lcd.h"
 #include "lcd-target.h"
+#include "system-target.h"
 
 static volatile bool _lcd_on = false;
 static volatile bool lcd_poweroff = false;
@@ -55,26 +56,19 @@ bool lcd_enabled(void)
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    /* STILL HACKY... */
-    x=0; y=0; width=400; height=240;
-    
-    lcd_set_target(x, y, width-1, height-1);
+    lcd_set_target(x, y, width, height);
     
     REG_DMAC_DCCSR(0) = 0;
     REG_DMAC_DRSR(0) = DMAC_DRSR_RS_SLCD; /* source = SLCD */
     REG_DMAC_DSAR(0) = ((unsigned int)&lcd_framebuffer[y][x]) & 0x1FFFFFFF;
-#if 0
-    REG_DMAC_DTAR(0) = UNCACHED_ADDRESS(SLCD_FIFO);
-#else
     REG_DMAC_DTAR(0) = 0x130500B0; /* SLCD_FIFO */
-#endif
-    REG_DMAC_DTCR(0) = (width*height);
+    REG_DMAC_DTCR(0) = width*height;
     
-    REG_DMAC_DCMD(0) = (DMAC_DCMD_SAI | DMAC_DCMD_RDIL_IGN | DMAC_DCMD_SWDH_32 /* (1 << 23) | (0 << 16) | (0 << 14) */
+    REG_DMAC_DCMD(0) = (DMAC_DCMD_SAI | DMAC_DCMD_RDIL_2 | DMAC_DCMD_SWDH_32 /* (1 << 23) | (0 << 16) | (0 << 14) */
                        | DMAC_DCMD_DWDH_16 | DMAC_DCMD_DS_16BIT);             /* | (2 << 12) | (3 << 8) */
     REG_DMAC_DCCSR(0) = (DMAC_DCCSR_NDES | DMAC_DCCSR_EN);                     /* (1 << 31) | (1 << 0) */
     
-    __dcache_writeback_all();
+    dma_cache_wback_inv((unsigned long)&lcd_framebuffer[y][x], width*height);
     
     REG_DMAC_DMACR = DMAC_DMACR_DMAE;
 
