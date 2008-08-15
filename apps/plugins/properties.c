@@ -207,7 +207,7 @@ static bool dir_properties(char* selected_file)
     if(false == _dir_properties(&dps))
         return false;
 
-    rb->snprintf(str_dirname, MAX_PATH, selected_file);
+    rb->snprintf(str_dirname, MAX_PATH, "%s", selected_file);
     rb->snprintf(str_dircount, sizeof str_dircount, "Subdirs: %d", dps.dc);
     rb->snprintf(str_filecount, sizeof str_filecount, "Files: %d", dps.fc);
     rb->snprintf(str_size, sizeof str_size, "Size: %s",
