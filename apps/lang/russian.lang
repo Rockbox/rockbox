@@ -22,6 +22,7 @@
 # - Alexander Kuzmenkov
 # - Adrian Osoianu
 # - Dennis Ivanov
+# - Alexander Levin
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -269,7 +270,7 @@
   </dest>
   <voice>
     *: none
-    radio: "FM-радио"
+    radio: "Радио"
   </voice>
 </phrase>
 <phrase>
@@ -603,11 +604,11 @@
   </source>
   <dest>
     *: none
-    masf: "Центрайльная частота MDB"
+    masf: "Центральная частота MDB"
   </dest>
   <voice>
     *: none
-    masf: "Центрайльная частота MDB"
+    masf: "Центральная частота MDB"
   </voice>
 </phrase>
 <phrase>
@@ -669,10 +670,10 @@
     *: "Playback Settings"
   </source>
   <dest>
-    *: "Настройки Воспроизведения"
+    *: "Настройки воспроизведения"
   </dest>
   <voice>
-    *: "Настройки Воспроизведения"
+    *: "Настройки воспроизведения"
   </voice>
 </phrase>
 <phrase>
@@ -965,7 +966,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "%d Гц"
+    swcodec: "%d Герц"
   </voice>
 </phrase>
 <phrase>
@@ -1120,10 +1121,10 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Рекурсивная вставка директорий"
+    *: "Рекурсивная вставка папок"
   </dest>
   <voice>
-    *: "Рекурсивная вставка директорий"
+    *: "Рекурсивная вставка папок"
   </voice>
 </phrase>
 <phrase>
@@ -1651,10 +1652,10 @@
     *: "LCD Settings"
   </source>
   <dest>
-    *: "Настройка ЖКД"
+    *: "Экран плеера"
   </dest>
   <voice>
-    *: "Настройка ЖКД"
+    *: "Экран плеера"
   </voice>
 </phrase>
 <phrase>
@@ -1667,11 +1668,11 @@
   </source>
   <dest>
     *: none
-    remote: "Настройка ЖКД пульта"
+    remote: "Экран пульта"
   </dest>
   <voice>
     *: none
-    remote: "Настройка ЖКД пульта"
+    remote: "Экран пульта"
   </voice>
 </phrase>
 <phrase>
@@ -2360,11 +2361,11 @@
   </source>
   <dest>
     *: none
-    recording: "Разделение по времени"
+    recording: "Разбиение файла"
   </dest>
   <voice>
     *: none
-    recording: "Разделение по времени"
+    recording: "Разбиение файла"
   </voice>
 </phrase>
 <phrase>
@@ -2672,7 +2673,7 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "Тип усиления."
+    *: "Тип усиления"
   </dest>
   <voice>
     *: "Тип усиления"
@@ -2888,11 +2889,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Перевёрнуть"
+    lcd_bitmap: "Вверх ногами"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Перевёрнуть"
+    lcd_bitmap: "Вверх ногами"
   </voice>
 </phrase>
 <phrase>
@@ -2905,11 +2906,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Выбор черты"
+    lcd_bitmap: "Вид курсора"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Выбор черты"
+    lcd_bitmap: "Вид курсора"
   </voice>
 </phrase>
 <phrase>
@@ -3226,11 +3227,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Индикатор батареи"
+    lcd_bitmap: "Индикатор аккумулятора"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Индикатор батареи"
+    lcd_bitmap: "Индикатор аккумулятора"
   </voice>
 </phrase>
 <phrase>
@@ -3365,7 +3366,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Логарифмическая (дБ)"
+    *: "Логарифмическая в децибелах"
     masd: none
   </voice>
 </phrase>
@@ -3382,7 +3383,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Линейная (%)"
+    *: "Линейная в процентах"
     masd: none
   </voice>
 </phrase>
@@ -3959,10 +3960,10 @@
     *: "Rockbox Info"
   </source>
   <dest>
-    *: "Информация о прошивке:"
+    *: "Информация о прошивке"
   </dest>
   <voice>
-    *: "Информация о прошивке:"
+    *: "Информация о прошивке"
   </voice>
 </phrase>
 <phrase>
@@ -4031,7 +4032,7 @@
     h10,ipodmini,ipodmini2g: "%d%% %dч %dм"
   </dest>
   <voice>
-    *: "%d%% %dч %dм"
+    *: "Заряд аккумулятора"
   </voice>
 </phrase>
 <phrase>
@@ -4461,11 +4462,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Проснуться в %d:%02d"
+    alarm: "Проснуться через %d:%02d"
   </dest>
   <voice>
     *: none
-    alarm: "Проснуться в %d:%02d"
+    alarm: "Проснуться через %d:%02d"
   </voice>
 </phrase>
 <phrase>
@@ -5761,7 +5762,7 @@
     *: "Кб"
   </dest>
   <voice>
-    *: "Кб"
+    *: "Килобайт"
   </voice>
 </phrase>
 <phrase>
@@ -5775,7 +5776,7 @@
     *: "Мб"
   </dest>
   <voice>
-    *: "Мб"
+    *: "Мегабайт"
   </voice>
 </phrase>
 <phrase>
@@ -5789,7 +5790,7 @@
     *: "Гб"
   </dest>
   <voice>
-    *: "Гб"
+    *: "Гигабайт"
   </voice>
 </phrase>
 <phrase>
@@ -6321,7 +6322,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Тест"
+    *: "Закладка"
   </voice>
 </phrase>
 <phrase>
@@ -6517,10 +6518,10 @@
     *: "Error accessing directory"
   </source>
   <dest>
-    *: "Ошибка доступа к директории"
+    *: "Ошибка доступа к папке"
   </dest>
   <voice>
-    *: "Ошибка доступа к директории"
+    *: "Ошибка доступа к папке"
   </voice>
 </phrase>
 <phrase>
@@ -6602,7 +6603,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Редакт. предустановку"
+    radio: "Редактировать предустановку"
   </voice>
 </phrase>
 <phrase>
@@ -6789,7 +6790,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Автоскан. радиостанций"
+    radio: "Сканирование радиостанций"
   </voice>
 </phrase>
 <phrase>
@@ -8256,11 +8257,11 @@
   </source>
   <dest>
     *: none
-    recording: "Счётчик фрагментов"
+    recording: "Счётчик перегрузок"
   </dest>
   <voice>
     *: none
-    recording: "Счётчик фрагментов"
+    recording: "Счётчик перегрузок"
   </voice>
 </phrase>
 <phrase>
@@ -8901,11 +8902,11 @@
   </source>
   <dest>
     *: none
-    recording: "Запись в директорию невозможна"
+    recording: "Запись в папку невозможна"
   </dest>
   <voice>
     *: none
-    recording: "Запись в директорию невозможна"
+    recording: "Запись в папку невозможна"
   </voice>
 </phrase>
 <phrase>
@@ -9398,11 +9399,11 @@
   </source>
   <dest>
     *: none
-    recording: "Очистить директорию записи"
+    recording: "Очистить папку записи"
   </dest>
   <voice>
     *: none
-    recording: "Очистить директорию записи"
+    recording: "Очистить папку записи"
   </voice>
 </phrase>
 <phrase>
@@ -11000,10 +11001,10 @@
     *: "Current Directory Only"
   </source>
   <dest>
-    *: "Только текущую директорию"
+    *: "Только текущую папку"
   </dest>
   <voice>
-    *: "Только текущую директорию"
+    *: "Только текущую папку"
   </voice>
 </phrase>
 <phrase>
@@ -11328,11 +11329,11 @@
   </source>
   <dest>
     *: none
-    recording: "Установить как директорию записи"
+    recording: "Установить как папку записи"
   </dest>
   <voice>
     *: none
-    recording: "Установить как директорию записи"
+    recording: "Установить как папку записи"
   </voice>
 </phrase>
 <phrase>
