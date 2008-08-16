@@ -95,11 +95,12 @@
     soft_shutdown: "Press OFF to shut down"
   </source>
   <dest>
-    *:none
+    *: none
     soft_shutdown: "Prem OFF per apagar"
   </dest>
   <voice>
-    *: ""
+    *: none
+    soft_shutdown: ""
   </voice>
 </phrase>
 <phrase>
@@ -113,7 +114,7 @@
     *: "Apagant..."
   </dest>
   <voice>
-    *: ""
+    *: "Apagant..."
   </voice>
 </phrase>
 <phrase>
@@ -125,11 +126,12 @@
     ondio*: "Please remove inserted MMC"
   </source>
   <dest>
-    *:none
+    *: none
     ondio*: "Sisplau retiri la tarjeta MMC insertada"
   </dest>
   <voice>
-    *: "Sisplau retiri la tarjeta MMC insertada"
+    *: none
+    ondio*: "Sisplau retiri la tarjeta MMC insertada"
   </voice>
 </phrase>
 <phrase>
@@ -143,7 +145,7 @@
     *: "Fallada"
   </dest>
   <voice>
-    *: ""
+    *: "Fallada"
   </voice>
 </phrase>
 <phrase>
@@ -211,11 +213,12 @@
     radio: "FM Radio"
   </source>
   <dest>
-    *:none
-    radio*: "Radio FM"
+    *: none
+    radio: "FM Radio"
   </dest>
   <voice>
-    *: "Radio FM"
+    *: none
+    radio: "FM Radio"
   </voice>
 </phrase>
 <phrase>
@@ -227,11 +230,12 @@
     recording: "Recording"
   </source>
   <dest>
-    *:none
-    recording*: "Grabació"
+    *: none
+    recording: "Recording"
   </dest>
   <voice>
-    *: "Grabació"
+    *: none
+    recording: "Recording"
   </voice>
 </phrase>
 <phrase>
@@ -257,11 +261,12 @@
     soft_shutdown: "Shut down"
   </source>
   <dest>
-    *:none
+    *: none
     soft_shutdown: "Apagar"
   </dest>
   <voice>
-    *: "Apagar"
+    *: none
+    soft_shutdown: "Apagar"
   </voice>
 </phrase>
 <phrase>
@@ -427,11 +432,12 @@
     masf: "Loudness"
   </source>
   <dest>
-    *:none
+    *: none
     masf: "Sonoritat"
   </dest>
   <voice>
-    *: "Sonoritat"
+    *: none
+    masf: "Sonoritat"
   </voice>
 </phrase>
 <phrase>
@@ -447,7 +453,8 @@
     masf: "Auto Volum"
   </dest>
   <voice>
-    *: "Auto Volum"
+    *: none
+    masf: "Auto Volum"
   </voice>
 </phrase>
 <phrase>
@@ -463,7 +470,7 @@
     masf: "Temps de caiguda del AV"
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -479,7 +486,8 @@
     masf: "Super greus"
   </dest>
   <voice>
-    *: "Super greus"
+    *: none
+    masf: "Super greus"
   </voice>
 </phrase>
 <phrase>
@@ -495,7 +503,8 @@
     masf: "Activar MDB"
   </dest>
   <voice>
-    *: "Activar MDB"
+    *: none
+    masf: "Activar MDB"
   </voice>
 </phrase>
 <phrase>
@@ -511,7 +520,8 @@
     masf: "Potencia MDB"
   </dest>
   <voice>
-    *: "Potencia MDB"
+    *: none
+    masf: "Potencia MDB"
   </voice>
 </phrase>
 <phrase>
@@ -527,7 +537,8 @@
     masf: "Harmònics MDB"
   </dest>
   <voice>
-    *: "Harmònics MDB"
+    *: none
+    masf: "Harmònics MDB"
   </voice>
 </phrase>
 <phrase>
@@ -543,7 +554,8 @@
     masf: "Freqüència central MDB"
   </dest>
   <voice>
-    *: "Freqüència central MDB"
+    *: none
+    masf: "Freqüència central MDB"
   </voice>
 </phrase>
 <phrase>
@@ -559,7 +571,8 @@
     masf: "Forma de MDB"
   </dest>
   <voice>
-    *: "Forma de MDB"
+    *: none
+    masf: "Forma de MDB"
   </voice>
 </phrase>
 <phrase>
@@ -699,7 +712,7 @@
     *: "Opcions esborrades"
   </dest>
   <voice>
-    *: ""
+    *: "Opcions esborrades"
   </voice>
 </phrase>
 <phrase>
@@ -726,10 +739,11 @@
   </source>
   <dest>
     *: none
-    recording: "Opcions de Grabació"
+     recording: "Opcions de Grabació"
   </dest>
   <voice>
-    *: "Opcions de Grabació"
+    *: none
+     recording: "Opcions de Grabació"
   </voice>
 </phrase>
 <phrase>
@@ -1139,7 +1153,8 @@
     lcd_bitmap: "Mostrar Tipus de Lletra"
   </dest>
   <voice>
-    *: "Mostrar tipus de lletra"
+    *: none
+    lcd_bitmap: "Mostrar Tipus de Lletra"
   </voice>
 </phrase>
 <phrase>
@@ -1197,7 +1212,8 @@
     lcd_bitmap: "Barres d'Estat/Desplaçament"
   </dest>
   <voice>
-    *: "Barres d'Estat/Desplaçament"
+    *: none
+    lcd_bitmap: "Barres d'Estat i Desplaçament"
   </voice>
 </phrase>
 <phrase>
@@ -1209,11 +1225,12 @@
     masd: none
   </source>
   <dest>
-    *: none
-    masd: "Analitzador de pics"
+    *: "Analitzador de pics"
+    masd: none
   </dest>
   <voice>
     *: "Analitzador de pics"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -1257,7 +1274,8 @@
     rtc: "Data i Hora"
   </dest>
   <voice>
-    *: "Data i Hora"
+    *: none
+    rtc: "Data i Hora"
   </voice>
 </phrase>
 <phrase>
@@ -1301,7 +1319,8 @@
     alarm: "Alarma despertador"
   </dest>
   <voice>
-    *: "Alarma despertador"
+    *: none
+    alarm: "Alarma despertador"
   </voice>
 </phrase>
 <phrase>
@@ -1331,7 +1350,8 @@
     recording,player: "Línia d'entrada"
   </dest>
   <voice>
-    *: "Línia d'entrada"
+    *: none
+    recording,player: "Línia d'entrada"
   </voice>
 </phrase>
 <phrase>
@@ -1347,7 +1367,8 @@
     charging: "Mode d'Adaptador de Cotxe"
   </dest>
   <voice>
-    *: "Mode d'Adaptador de Cotxe"
+    *: none
+    charging: "Mode d'Adaptador de Cotxe"
   </voice>
 </phrase>
 <phrase>
@@ -1531,7 +1552,8 @@
     recording_hwcodec: "Qualitat"
   </dest>
   <voice>
-    *: "Qualitat"
+    *: none
+    recording_hwcodec: "Qualitat"
   </voice>
 </phrase>
 <phrase>
@@ -1547,7 +1569,8 @@
     recording: "Freqüència"
   </dest>
   <voice>
-    *: "Freqüència"
+    *: none
+    recording: "Freqüència"
   </voice>
 </phrase>
 <phrase>
@@ -1563,7 +1586,8 @@
     recording: "Font"
   </dest>
   <voice>
-    *: "Font"
+    *: none
+    recording: "Font"
   </voice>
 </phrase>
 <phrase>
@@ -1576,12 +1600,14 @@
     h100,h120,h300: "Internal Microphone"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Micròfon"
     h100,h120,h300: "Micròfon intern"
   </dest>
   <voice>
-    *: "Micròfon"
+    *: none
+    recording: "Micròfon"
+    h100,h120,h300: "Micròfon intern"
   </voice>
 </phrase>
 <phrase>
@@ -1597,7 +1623,8 @@
     recording: "Digital"
   </dest>
   <voice>
-    *: "Digital"
+    *: none
+    recording: "Digital"
   </voice>
 </phrase>
 <phrase>
@@ -1609,11 +1636,12 @@
     recording_hwcodec: "Independent Frames"
   </source>
   <dest>
-  *: none
+    *: none
     recording_hwcodec: "Marcs independents"
   </dest>
   <voice>
-    *: "Marcs independents"
+    *: none
+    recording_hwcodec: "Marcs independents"
   </voice>
 </phrase>
 <phrase>
@@ -1629,7 +1657,8 @@
     recording: "Separació per Temps"
   </dest>
   <voice>
-    *: "Separació per Temps"
+    *: none
+    recording: "Separació per Temps"
   </voice>
 </phrase>
 <phrase>
@@ -1645,7 +1674,8 @@
     recording: "Temps de Pregrabació"
   </dest>
   <voice>
-    *: "Temps de Pregrabació"
+    *: none
+    recording: "Temps de Pregrabació"
   </voice>
 </phrase>
 <phrase>
@@ -1661,7 +1691,8 @@
     recording: "Directori"
   </dest>
   <voice>
-    *: "Directori"
+    *: none
+    recording: "Directori"
   </voice>
 </phrase>
 <phrase>
@@ -1674,7 +1705,7 @@
   </source>
   <dest>
     *: none
-    recording: "deprecated"
+    recording: deprecated
   </dest>
   <voice>
     *: none
@@ -1736,7 +1767,8 @@
     charging: "Il·luminat mentre endollat"
   </dest>
   <voice>
-    *: "Il·luminat mentre endollat"
+    *: none
+    charging: "Il·luminat mentre endollat"
   </voice>
 </phrase>
 <phrase>
@@ -1780,7 +1812,8 @@
     lcd_invert,remote_lcd_invert: "Mode LCD"
   </dest>
   <voice>
-    *: "Mode LCD"
+    *: none
+    lcd_invert,remote_lcd_invert: "Mode LCD"
   </voice>
 </phrase>
 <phrase>
@@ -1796,7 +1829,8 @@
     lcd_invert,remote_lcd_invert: "Invertit"
   </dest>
   <voice>
-    *: "Invertit"
+    *: none
+    lcd_invert,remote_lcd_invert: "Invertit"
   </voice>
 </phrase>
 <phrase>
@@ -1812,7 +1846,8 @@
     lcd_bitmap: "Cap per avall"
   </dest>
   <voice>
-    *: "Cap per avall"
+    *: none
+    lcd_bitmap: "Cap per avall"
   </voice>
 </phrase>
 <phrase>
@@ -1828,7 +1863,7 @@
     lcd_bitmap: "Tipus de Selector de línia"
   </dest>
   <voice>
-    *: "Tipus de Selector de línia"
+    *: none
     lcd_bitmap: "Tipus de Selector de línia"
   </voice>
 </phrase>
@@ -1845,7 +1880,8 @@
     lcd_bitmap: "Punter"
   </dest>
   <voice>
-    *: "Punter"
+    *: none
+    lcd_bitmap: "Punter"
   </voice>
 </phrase>
 <phrase>
@@ -1861,7 +1897,8 @@
     lcd_bitmap: "Barra (inversa)"
   </dest>
   <voice>
-    *: "Barra inversa"
+    *: none
+    lcd_bitmap: "Barra inversa"
   </voice>
 </phrase>
 <phrase>
@@ -2003,7 +2040,8 @@
     lcd_bitmap: "Barra de Desplaçament"
   </dest>
   <voice>
-    *: "Barra de desplaçament"
+    *: none
+    lcd_bitmap: "Barra de Desplaçament"
   </voice>
 </phrase>
 <phrase>
@@ -2019,7 +2057,8 @@
     lcd_bitmap: "Barra d'Estat"
   </dest>
   <voice>
-    *: "Barra d'estat"
+    *: none
+    lcd_bitmap: "Barra d'Estat"
   </voice>
 </phrase>
 <phrase>
@@ -2035,7 +2074,8 @@
     recorder_pad: "Barra de Botons"
   </dest>
   <voice>
-    *: "Barra de Botons"
+    *: none
+    recorder_pad: "Barra de Botons"
   </voice>
 </phrase>
 <phrase>
@@ -2051,7 +2091,8 @@
     lcd_bitmap: "Indicador de volum"
   </dest>
   <voice>
-    *: "Indicador de volum"
+    *: none
+    lcd_bitmap: "Indicador de volum"
   </voice>
 </phrase>
 <phrase>
@@ -2067,7 +2108,8 @@
     lcd_bitmap: "Indicador de Batería"
   </dest>
   <voice>
-    *: "Indicador de Batería"
+    *: none
+    lcd_bitmap: "Indicador de Batería"
   </voice>
 </phrase>
 <phrase>
@@ -2079,11 +2121,12 @@
     lcd_bitmap: "Graphic"
   </source>
   <dest>
-    *:none
+    *: none
     lcd_bitmap: "Gràfic"
   </dest>
   <voice>
-    *: "Gràfic"
+    *: none
+    lcd_bitmap: "Gràfic"
   </voice>
 </phrase>
 <phrase>
@@ -2096,10 +2139,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap:"Numèric"
+    lcd_bitmap: "Numèric"
   </dest>
   <voice>
-    *: "Numèric"
+    *: none
+    lcd_bitmap: "Numèric"
   </voice>
 </phrase>
 <phrase>
@@ -2111,11 +2155,12 @@
     masd: none
   </source>
   <dest>
-    *: none
-    masd: "Caiguda de l'analitzador"
+    *: "Caiguda de l'analitzador"
+    masd: none
   </dest>
   <voice>
     *: "Caiguda de l'analitzador"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2178,6 +2223,7 @@
   </dest>
   <voice>
     *: "Etern"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2194,6 +2240,7 @@
   </dest>
   <voice>
     *: "Escala"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2210,6 +2257,7 @@
   </dest>
   <voice>
     *: "Logarítmica decibeli"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2226,6 +2274,7 @@
   </dest>
   <voice>
     *: "Percentatge linial"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2242,6 +2291,7 @@
   </dest>
   <voice>
     *: "Mínim de rang"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2258,6 +2308,7 @@
   </dest>
   <voice>
     *: "Màxim de rang"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2287,7 +2338,8 @@
     battery_types: "Tipus de batería"
   </dest>
   <voice>
-    *: "Tipus de batería"
+    *: none
+    battery_types: "Tipus de batería"
   </voice>
 </phrase>
 <phrase>
@@ -2303,7 +2355,8 @@
     battery_types: "Alcalina"
   </dest>
   <voice>
-    *: "Alcalina"
+    *: none
+    battery_types: "Alcalina"
   </voice>
 </phrase>
 <phrase>
@@ -2319,7 +2372,8 @@
     battery_types: "NiMH"
   </dest>
   <voice>
-    *: "Níquel hidrur de metall"
+    *: none
+    battery_types: "NiMH"
   </voice>
 </phrase>
 <phrase>
@@ -2336,6 +2390,7 @@
   </dest>
   <voice>
     *: "Aturada del disc dur"
+    flash_storage: none
   </voice>
 </phrase>
 <phrase>
@@ -2365,7 +2420,8 @@
     rtc: "Format d'hora"
   </dest>
   <voice>
-    *: "Format d'hora"
+    *: none
+    rtc: "Format d'hora"
   </voice>
 </phrase>
 <phrase>
@@ -2378,10 +2434,11 @@
   </source>
   <dest>
     *: none
-    rtc:"12 hores"
+    rtc: "12 hores"
   </dest>
   <voice>
-    *: "12 hores"
+    *: none
+    rtc: "12 hores"
   </voice>
 </phrase>
 <phrase>
@@ -2394,10 +2451,11 @@
   </source>
   <dest>
     *: none
-    rtc:"24 hores"
+    rtc: "24 hores"
   </dest>
   <voice>
-    *: "24 hores"
+    *: none
+    rtc: "24 hores"
   </voice>
 </phrase>
 <phrase>
@@ -2523,7 +2581,7 @@
     *: "Segur que vol Esborrar?"
   </dest>
   <voice>
-    *: ""
+    *: "Segur que vol Esborrar?"
   </voice>
 </phrase>
 <phrase>
@@ -2537,7 +2595,7 @@
     *: "Esborrat"
   </dest>
   <voice>
-    *: ""
+    *: "Esborrat"
   </voice>
 </phrase>
 <phrase>
@@ -2705,7 +2763,7 @@
     *: "Info. de rockbox"
   </dest>
   <voice>
-    *: ""
+    *: "Info. de rockbox"
   </voice>
 </phrase>
 <phrase>
@@ -2721,7 +2779,8 @@
     charging: "Batería: Carregant"
   </dest>
   <voice>
-    *: ""
+    *: none
+    charging: "Batería: Carregant"
   </voice>
 </phrase>
 <phrase>
@@ -2737,7 +2796,8 @@
     recorder: "Batería: Top-Off Chg"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recorder: "Batería: Top-Off Chg"
   </voice>
 </phrase>
 <phrase>
@@ -2753,7 +2813,8 @@
     charging: "Batería: Trickle Chg"
   </dest>
   <voice>
-    *: ""
+    *: none
+    charging: "Batería: Trickle Chg"
   </voice>
 </phrase>
 <phrase>
@@ -2811,10 +2872,12 @@
     rtc: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    rtc: ""
   </dest>
   <voice>
-    *: "Current time:"
+    *: none
+    rtc: "Current time:"
   </voice>
 </phrase>
 <phrase>
@@ -2830,7 +2893,7 @@
     pitchscreen: "Accelerar"
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -2846,7 +2909,7 @@
     pitchscreen: "Ralentitzar"
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -2860,7 +2923,7 @@
     *: "Pausa"
   </dest>
   <voice>
-    *: ""
+    *: "Pausa"
   </voice>
 </phrase>
 <phrase>
@@ -2874,7 +2937,7 @@
     *: "Crear un Punt de pàgina?"
   </dest>
   <voice>
-    *: ""
+    *: "Crear un Punt de pàgina?"
   </voice>
 </phrase>
 <phrase>
@@ -2888,7 +2951,7 @@
     *: "Punts de pàgina Creat"
   </dest>
   <voice>
-    *: ""
+    *: "Punts de pàgina Creat"
   </voice>
 </phrase>
 <phrase>
@@ -2902,7 +2965,7 @@
     *: "Errada en crear el Punt de pàgina"
   </dest>
   <voice>
-    *: ""
+    *: "Errada en crear el Punt de pàgina"
   </voice>
 </phrase>
 <phrase>
@@ -2916,7 +2979,7 @@
     *: "Punt de pàgina Buit"
   </dest>
   <voice>
-    *: ""
+    *: "Punt de pàgina Buit"
   </voice>
 </phrase>
 <phrase>
@@ -2947,14 +3010,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
-    h100,h120,h300: ""
-    ipod*,e200,c200,sa9200: ""
-    x5,m5: ""
-    h10,h10_5gb: ""
-    gigabeatf: ""
-    mrobe100: ""
-    gigabeats: ""
+    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_5gb,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -2967,10 +3023,11 @@
   </source>
   <dest>
     *: none
-    recording:"Temps"
+    recording: "Temps"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -2986,7 +3043,8 @@
     recording: "Pregrabació"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -3043,10 +3101,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
-    h100,h120,h300: ""
-    m5,x5: ""
-    e200,c200: ""
+    recording,h100,h120,h300,m5,x5,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -3062,7 +3117,8 @@
     alarm: "Hora d'Alarma:  %02d:%02d"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
@@ -3078,7 +3134,8 @@
     alarm: "Llevant-se en %d:%02d"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: "Llevant-se en"
   </voice>
 </phrase>
 <phrase>
@@ -3094,7 +3151,8 @@
     alarm: "Alarma Configurada"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: "Alarma Configurada"
   </voice>
 </phrase>
 <phrase>
@@ -3110,7 +3168,8 @@
     alarm: "Alarma massa aviat"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: "Alarma massa aviat"
   </voice>
 </phrase>
 <phrase>
@@ -3133,10 +3192,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
-    ipod*: ""
-    h10,h10_5gb: ""
-    gigabeats: ""
+    alarm,ipod*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3152,7 +3208,8 @@
     alarm: "Alarma Desactivada"
   </dest>
   <voice>
-    *: "Alarma Desactivada"
+    *: none
+    alarm: "Alarma Desactivada"
   </voice>
 </phrase>
 <phrase>
@@ -3308,7 +3365,7 @@
     rtc: "Diu"
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -3324,7 +3381,8 @@
     rtc: "Dll"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3340,7 +3398,8 @@
     rtc: "Dma"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3356,7 +3415,8 @@
     rtc: "Dme"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3372,7 +3432,8 @@
     rtc: "Dij"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3388,7 +3449,8 @@
     rtc: "Div"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3404,7 +3466,8 @@
     rtc: "Dis"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3420,7 +3483,8 @@
     rtc: "Gen"
   </dest>
   <voice>
-    *: "Gener"
+    *: none
+    rtc: "Gener"
   </voice>
 </phrase>
 <phrase>
@@ -3436,7 +3500,8 @@
     rtc: "Feb"
   </dest>
   <voice>
-    *: "Febrer"
+    *: none
+    rtc: "Febrer"
   </voice>
 </phrase>
 <phrase>
@@ -3452,7 +3517,8 @@
     rtc: "Mar"
   </dest>
   <voice>
-    *: "Març"
+    *: none
+    rtc: "Març"
   </voice>
 </phrase>
 <phrase>
@@ -3468,7 +3534,8 @@
     rtc: "Abr"
   </dest>
   <voice>
-    *: "Abril"
+    *: none
+    rtc: "Abril"
   </voice>
 </phrase>
 <phrase>
@@ -3484,7 +3551,8 @@
     rtc: "Mag"
   </dest>
   <voice>
-    *: "Maig"
+    *: none
+    rtc: "Maig"
   </voice>
 </phrase>
 <phrase>
@@ -3500,7 +3568,8 @@
     rtc: "Jun"
   </dest>
   <voice>
-    *: "Juny"
+    *: none
+    rtc: "Juny"
   </voice>
 </phrase>
 <phrase>
@@ -3516,7 +3585,8 @@
     rtc: "Jul"
   </dest>
   <voice>
-    *: "Juliol"
+    *: none
+    rtc: "Juliol"
   </voice>
 </phrase>
 <phrase>
@@ -3532,7 +3602,8 @@
     rtc: "Ago"
   </dest>
   <voice>
-    *: "Agost"
+    *: none
+    rtc: "Agost"
   </voice>
 </phrase>
 <phrase>
@@ -3545,10 +3616,11 @@
   </source>
   <dest>
     *: none
-    rtc: "Sep"
+    rtc: "Set"
   </dest>
   <voice>
-    *: "Setembre"
+    *: none
+    rtc: "Setembre"
   </voice>
 </phrase>
 <phrase>
@@ -3564,7 +3636,8 @@
     rtc: "Oct"
   </dest>
   <voice>
-    *: "Octubre"
+    *: none
+    rtc: "Octubre"
   </voice>
 </phrase>
 <phrase>
@@ -3580,7 +3653,8 @@
     rtc: "Nov"
   </dest>
   <voice>
-    *: "Noviembre"
+    *: none
+    rtc: "Novembre"
   </voice>
 </phrase>
 <phrase>
@@ -3596,7 +3670,8 @@
     rtc: "Des"
   </dest>
   <voice>
-    *: "Desembre"
+    *: none
+    rtc: "Desembre"
   </voice>
 </phrase>
 <phrase>
@@ -4898,7 +4973,7 @@
     *: "El búfer de la llista està ple"
   </dest>
   <voice>
-    *: ""
+    *: "El búfer de la llista està ple"
   </voice>
 </phrase>
 <phrase>
@@ -4926,7 +5001,7 @@
     *: "Afegides %d Pistes (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "tracks inserted"
   </voice>
 </phrase>
 <phrase>
@@ -4954,7 +5029,7 @@
     *: "Desades %d Pistes (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "tracks saved"
   </voice>
 </phrase>
 <phrase>
@@ -4968,7 +5043,7 @@
     *: "Recursivament?"
   </dest>
   <voice>
-    *: ""
+    *: "Recursivament?"
   </voice>
 </phrase>
 <phrase>
@@ -4982,7 +5057,7 @@
     *: "Error en Actualizar l'arxiu de control de Llistes de Reproducció"
   </dest>
   <voice>
-    *: ""
+    *: "Error en Actualizar l'arxiu de control de Llistes de Reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -4996,7 +5071,7 @@
     *: "Error en accedir a la Llista de Reproducció"
   </dest>
   <voice>
-    *: ""
+    *: "Error en accedir a la Llista de Reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -5010,7 +5085,7 @@
     *: "Error en accedir a l'arxiu de control de Llistes de Reproducció"
   </dest>
   <voice>
-    *: ""
+    *: "Error en accedir a l'arxiu de control de Llistes de Reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -5024,7 +5099,7 @@
     *: "Error en Accedir al Directori"
   </dest>
   <voice>
-    *: ""
+    *: "Error en Accedir al Directori"
   </voice>
 </phrase>
 <phrase>
@@ -5038,7 +5113,7 @@
     *: "Arxiu de control de Llistes de Reproducció invàlid"
   </dest>
   <voice>
-    *: ""
+    *: "Arxiu de control de Llistes de Reproducció invàlid"
   </voice>
 </phrase>
 <phrase>
@@ -5054,7 +5129,7 @@
     radio: "Emisora: %d.%dMHz"
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -5067,10 +5142,11 @@
   </source>
   <dest>
    *: none
-    radio: ""
+    radio: "No presets"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: "No presets"
   </voice>
 </phrase>
 <phrase>
@@ -5086,7 +5162,8 @@
     radio: "Editar presintonía"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: "Editar presintonía"
   </voice>
 </phrase>
 <phrase>
@@ -5102,7 +5179,8 @@
     radio: "Eliminar Sintonia"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: "Eliminar Sintonia"
   </voice>
 </phrase>
 <phrase>
@@ -5118,7 +5196,8 @@
     radio: "Errada en desar Sintonia"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: "Errada en desar Sintonia"
   </voice>
 </phrase>
 <phrase>
@@ -5134,7 +5213,8 @@
     radio: "Llista de Sintonies plena"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: "Llista de Sintonies plena"
   </voice>
 </phrase>
 <phrase>
@@ -5150,7 +5230,8 @@
     radio_screen_button_bar: "Menu"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5166,7 +5247,8 @@
     radio_screen_button_bar: "Sortir"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5179,10 +5261,11 @@
   </source>
   <dest>
     *: none
-    radio_screen_button_bar:"Acció"
+    radio_screen_button_bar: "Acció"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5198,7 +5281,8 @@
     radio_screen_button_bar: "Afegir"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5214,7 +5298,8 @@
     radio_screen_button_bar: "Enregistrar"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5230,7 +5315,8 @@
     radio: "Forçar mono"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: "Forçar mono"
   </voice>
 </phrase>
 <phrase>
@@ -5244,7 +5330,7 @@
     *: "Buffer de directori Ple!"
   </dest>
   <voice>
-    *: ""
+    *: "Buffer de directori Ple!"
   </voice>
 </phrase>
 <phrase>
@@ -5258,7 +5344,7 @@
     *: "Nou idioma"
   </dest>
   <voice>
-    *: ""
+    *: "Nou idioma"
   </voice>
 </phrase>
 <phrase>
@@ -5272,7 +5358,7 @@
     *: "Opcions Carregades"
   </dest>
   <voice>
-    *: ""
+    *: "Opcions Carregades"
   </voice>
 </phrase>
 <phrase>
@@ -5286,7 +5372,7 @@
     *: "Opcions Desades"
   </dest>
   <voice>
-    *: ""
+    *: "Opcions Desades"
   </voice>
 </phrase>
 <phrase>
@@ -5300,7 +5386,7 @@
     *: "Arranc Modificat"
   </dest>
   <voice>
-    *: ""
+    *: "Arranc Modificat"
   </voice>
 </phrase>
 <phrase>
@@ -5314,7 +5400,7 @@
     *: "Reiniciar ara?"
   </dest>
   <voice>
-    *: ""
+    *: "Reiniciar ara?"
   </voice>
 </phrase>
 <phrase>
@@ -5350,7 +5436,7 @@
     *: "No hi ha arxius"
   </dest>
   <voice>
-    *: ""
+    *: "No hi ha arxius"
   </voice>
 </phrase>
 <phrase>
@@ -5518,7 +5604,7 @@
     *: "Llista d'extensions plena"
   </dest>
   <voice>
-    *: ""
+    *: "Llista d'extensions plena"
   </voice>
 </phrase>
 <phrase>
@@ -5532,7 +5618,7 @@
     *: "Llista de tipus d'arxiu plena"
   </dest>
   <voice>
-    *: ""
+    *: "Llista de tipus d'arxiu plena"
   </voice>
 </phrase>
 <phrase>
@@ -5546,7 +5632,7 @@
     *: "Nom de connector massa llarg"
   </dest>
   <voice>
-    *: ""
+    *: "Nom de connector massa llarg"
   </voice>
 </phrase>
 <phrase>
@@ -5559,10 +5645,11 @@
   </source>
   <dest>
     *: none
-    radio:"Desar els Canvis?"
+    radio: "Desar els Canvis?"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: "Desar els Canvis?"
   </voice>
 </phrase>
 <phrase>
@@ -5578,7 +5665,8 @@
     swcodec: "Opcions d'EQ avançades"
   </dest>
   <voice>
-    *: "Opcions d'EQ avançades"
+    *: none
+    swcodec: "Opcions d'equalitzador avançades"
   </voice>
 </phrase>
 <phrase>
@@ -5592,7 +5680,7 @@
     *: "Avisa quan s'esborri una llista dinàmica"
   </dest>
   <voice>
-    *: ""
+    *: "Avisa quan s'esborri una llista dinàmica"
   </voice>
 </phrase>
 <phrase>
@@ -5608,7 +5696,8 @@
     spdif_power: "Línia de sortida òptica"
   </dest>
   <voice>
-    *: "Línia de sortida òptica"
+    *: none
+    spdif_power: "Línia de sortida òptica"
   </voice>
 </phrase>
 <phrase>
@@ -5636,7 +5725,7 @@
     *: "Desant base de dades"
   </dest>
   <voice>
-    *: ""
+    *: "Desant base de dades"
   </voice>
 </phrase>
 <phrase>
@@ -5694,7 +5783,8 @@
     swcodec: "EQ Gràfic"
   </dest>
   <voice>
-    *: "Equalitzador gràfic"
+    *: none
+    swcodec: "Equalitzador Gràfic"
   </voice>
 </phrase>
 <phrase>
@@ -5707,10 +5797,11 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono:"Esborrar fons"
+    lcd_non-mono: "Esborrar fons"
   </dest>
   <voice>
-    *: "Esborrar fons"
+    *: none
+    lcd_non-mono: "Esborrar fons"
   </voice>
 </phrase>
 <phrase>
@@ -5740,7 +5831,8 @@
     swcodec: "Moderat"
   </dest>
   <voice>
-    *: "Moderat"
+    *: none
+    swcodec: "Moderat"
   </voice>
 </phrase>
 <phrase>
@@ -5756,7 +5848,7 @@
     remote: "Veure fitxers .rwps"
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -5772,7 +5864,7 @@
     radio: "%d.%01dMHz"
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -5788,7 +5880,8 @@
     swcodec: "Activar Crossfade"
   </dest>
   <voice>
-    *: "Activar Crossfade"
+    *: none
+    swcodec: "Activar Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -5804,7 +5897,8 @@
     lcd_non-mono: "Color de Fons"
   </dest>
   <voice>
-    *: "Color de Fons"
+    *: none
+    lcd_non-mono: "Color de Fons"
   </voice>
 </phrase>
 <phrase>
@@ -5820,7 +5914,8 @@
     swcodec: "Q"
   </dest>
   <voice>
-    *: "Q"
+    *: none
+    swcodec: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -5850,7 +5945,8 @@
     remote_ticking: "Reduir Ticking"
   </dest>
   <voice>
-    *: "Reduir Ticking"
+    *: none
+    remote_ticking: "Reduir Ticking"
   </voice>
 </phrase>
 <phrase>
@@ -5866,7 +5962,8 @@
     lcd_bitmap: "Tailandès (ISO-8859-11)"
   </dest>
   <voice>
-    *: "Thai"
+    *: none
+    lcd_bitmap: "Tailandès"
   </voice>
 </phrase>
 <phrase>
@@ -5910,7 +6007,8 @@
     swcodec: "Fort"
   </dest>
   <voice>
-    *: "Fort"
+    *: none
+    swcodec: "Fort"
   </voice>
 </phrase>
 <phrase>
@@ -5926,7 +6024,8 @@
     backlight_fade: "Il·luminació progressiva"
   </dest>
   <voice>
-    *: "Il·luminació progressiva"
+    *: none
+    backlight_fade: "Il·luminació progressiva"
   </voice>
 </phrase>
 <phrase>
@@ -5942,7 +6041,8 @@
     swcodec: "Pretall"
   </dest>
   <voice>
-    *: "Pre-cut"
+    *: none
+    swcodec: "Pretall"
   </voice>
 </phrase>
 <phrase>
@@ -5955,9 +6055,11 @@
   </source>
   <dest>
     *: none
+    lcd_bitmap: "Japanese (SJIS)"
   </dest>
   <voice>
-    *: "Japanese"
+    *: none
+    lcd_bitmap: "Japanese"
   </voice>
 </phrase>
 <phrase>
@@ -5987,7 +6089,8 @@
     lcd_bitmap: "Hebreu (ISO-8859-8)"
   </dest>
   <voice>
-    *: "Hebrew"
+    *: none
+    lcd_bitmap: "Hebreu"
   </voice>
 </phrase>
 <phrase>
@@ -6001,7 +6104,7 @@
     *: "Esborrar llista dinàmica?"
   </dest>
   <voice>
-    *: ""
+    *: "Esborrar llista dinàmica?"
   </voice>
 </phrase>
 <phrase>
@@ -6017,7 +6120,8 @@
     swcodec: "Evitar saturació"
   </dest>
   <voice>
-    *: "Prevent Clipping"
+    *: none
+    swcodec: "Evitar saturació"
   </voice>
 </phrase>
 <phrase>
@@ -6033,7 +6137,8 @@
     recording: "Trigger"
   </dest>
   <voice>
-    *: "Trigger"
+    *: none
+    recording: "Trigger"
   </voice>
 </phrase>
 <phrase>
@@ -6047,7 +6152,7 @@
     *: "Base de dades no llesta"
   </dest>
   <voice>
-    *: "Tagcache no està llest"
+    *: "Base de dades no llesta"
   </voice>
 </phrase>
 <phrase>
@@ -6063,7 +6168,8 @@
     lcd_bitmap: "Koreà (KSX1001)"
   </dest>
   <voice>
-    *: "Korean"
+    *: none
+    lcd_bitmap: "Koreà"
   </voice>
 </phrase>
 <phrase>
@@ -6077,7 +6183,7 @@
     *: "Turc (ISO-8859-9)"
   </dest>
   <voice>
-    *: "Turkish"
+    *: "Turc"
   </voice>
 </phrase>
 <phrase>
@@ -6090,10 +6196,11 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono:"Color del Text"
+    lcd_non-mono: "Color del Text"
   </dest>
   <voice>
-    *: "Foreground Colour"
+    *: none
+    lcd_non-mono: "Color del Text"
   </voice>
 </phrase>
 <phrase>
@@ -6109,7 +6216,8 @@
     lcd_bitmap: "Xinès Simp. (GB2312)"
   </dest>
   <voice>
-    *: "Simplified Chinese"
+    *: none
+    lcd_bitmap: "Xinès Simplificat"
   </voice>
 </phrase>
 <phrase>
@@ -6139,7 +6247,8 @@
     remote: "Unitat principal i remota"
   </dest>
   <voice>
-    *: "Unitat principal i remota"
+    *: none
+    remote: "Unitat principal i remota"
   </voice>
 </phrase>
 <phrase>
@@ -6169,7 +6278,8 @@
     swcodec: "Volum de Bip"
   </dest>
   <voice>
-    *: "Beep Volume"
+    *: none
+    swcodec: "Volum de Bip"
   </voice>
 </phrase>
 <phrase>
@@ -6185,7 +6295,8 @@
     backlight_brightness: "Brillantor"
   </dest>
   <voice>
-    *: "Brightness"
+    *: none
+    backlight_brightness: "Brillantor"
   </voice>
 </phrase>
 <phrase>
@@ -6201,7 +6312,8 @@
     swcodec: "Desar EQ"
   </dest>
   <voice>
-    *: "Save equalizer preset"
+    *: none
+    swcodec: "Desar equalitzador"
   </voice>
 </phrase>
 <phrase>
@@ -6217,7 +6329,8 @@
     remote: "Només unitat principal"
   </dest>
   <voice>
-    *: "Main unit only"
+    *: none
+    remote: "Només unitat principal"
   </voice>
 </phrase>
 <phrase>
@@ -6233,7 +6346,8 @@
     radio: "Carrega llista de sintoníes"
   </dest>
   <voice>
-    *: "Load Preset List"
+    *: none
+    radio: "Carrega llista de sintoníes"
   </voice>
 </phrase>
 <phrase>
@@ -6249,7 +6363,8 @@
     backlight_fade: "Apagat progresiu de il·lum."
   </dest>
   <voice>
-    *: "Backlight Fade Out"
+    *: none
+    backlight_fade: "Apagat progresiu de il·lum."
   </voice>
 </phrase>
 <phrase>
@@ -6265,7 +6380,8 @@
     swcodec: "Reiniciant reproducció..."
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -6281,7 +6397,8 @@
     tc_ramcache: "Carregar a RAM"
   </dest>
   <voice>
-    *: "Load to RAM"
+    *: none
+    tc_ramcache: "Carregar a RAM"
   </voice>
 </phrase>
 <phrase>
@@ -6297,7 +6414,8 @@
     swcodec: "Crossfeed"
   </dest>
   <voice>
-    *: "Crossfeed"
+    *: none
+    swcodec: "Crossfeed"
   </voice>
 </phrase>
 <phrase>
@@ -6311,7 +6429,7 @@
     *: "Grec (ISO-8859-7)"
   </dest>
   <voice>
-    *: "Greek"
+    *: "Grec"
   </voice>
 </phrase>
 <phrase>
@@ -6327,7 +6445,8 @@
     remote: "Opcions de desplaçament remot"
   </dest>
   <voice>
-    *: "Remote Scrolling Options"
+    *: none
+    remote: "Opcions de desplaçament remot"
   </voice>
 </phrase>
 <phrase>
@@ -6343,7 +6462,8 @@
     multivolume: "Int:"
   </dest>
   <voice>
-    *: "Internal"
+    *: none
+    multivolume: "Intern"
   </voice>
 </phrase>
 <phrase>
@@ -6373,7 +6493,8 @@
     lcd_bitmap: "Xinès Trad. (BIG5)"
   </dest>
   <voice>
-    *: "Traditional Chinese"
+    *: none
+    lcd_bitmap: "Xinès Tradicional"
   </voice>
 </phrase>
 <phrase>
@@ -6401,7 +6522,7 @@
     *: "Copiar"
   </dest>
   <voice>
-    *: "Copy"
+    *: "Copiar"
   </voice>
 </phrase>
 <phrase>
@@ -6431,7 +6552,8 @@
     radio: "Scanning %d.%01dMHz"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -6447,7 +6569,8 @@
     radio: "Pantalla congelada!"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -6463,7 +6586,8 @@
     pitchscreen: "Acceleració"
   </dest>
   <voice>
-    *: "Pitch"
+    *: none
+    pitchscreen: "Acceleració"
   </voice>
 </phrase>
 <phrase>
@@ -6477,7 +6601,7 @@
     *: "Mida del pas de desplaçament"
   </dest>
   <voice>
-    *: "Screen Scroll Step Size"
+    *: "Mida del pas de desplaçament"
   </voice>
 </phrase>
 <phrase>
@@ -6493,7 +6617,8 @@
     radio: "Scan"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: "Scan"
   </voice>
 </phrase>
 <phrase>
@@ -6507,7 +6632,7 @@
     *: "Cirilic (CP1251)"
   </dest>
   <voice>
-    *: "Cyrillic"
+    *: "Cirilic"
   </voice>
 </phrase>
 <phrase>
@@ -6537,7 +6662,8 @@
     swcodec: "Tall d'alta freqüència"
   </dest>
   <voice>
-    *: "High-frequency cutoff"
+    *: none
+    swcodec: "Tall d'alta freqüència"
   </voice>
 </phrase>
 <phrase>
@@ -6553,7 +6679,8 @@
     radio: "Llista de presintonies"
   </dest>
   <voice>
-    *: "Preset List"
+    *: none
+    radio: "Llista de presintonies"
   </voice>
 </phrase>
 <phrase>
@@ -6569,7 +6696,8 @@
     swcodec: "Retard de Fade-Out"
   </dest>
   <voice>
-    *: "Fade-Out Delay"
+    *: none
+    swcodec: "Retard de Fade-Out"
   </voice>
 </phrase>
 <phrase>
@@ -6628,7 +6756,7 @@
     *: "Inicialitzar ara"
   </dest>
   <voice>
-    *: "Force Tag Cache Update"
+    *: "Inicialitzar ara"
   </voice>
 </phrase>
 <phrase>
@@ -6656,7 +6784,7 @@
     *: "Afegeix barrejades"
   </dest>
   <voice>
-    *: ""
+    *: "Afegeix barrejades"
   </voice>
 </phrase>
 <phrase>
@@ -6728,7 +6856,8 @@
     lcd_non-mono: "Backdrop Failed"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -6744,7 +6873,8 @@
     remote: "Només unitat remota"
   </dest>
   <voice>
-    *: "Només unitat remota"
+    *: none
+    remote: "Només unitat remota"
   </voice>
 </phrase>
 <phrase>
@@ -6758,7 +6888,7 @@
     *: "El fitxer/directori existeix. Sobreescriure?"
   </dest>
   <voice>
-    *: ""
+    *: "El fitxer/directori existeix. Sobreescriure?"
   </voice>
 </phrase>
 <phrase>
@@ -6774,7 +6904,8 @@
     recording: "Un cop"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "Un cop"
   </voice>
 </phrase>
 <phrase>
@@ -6790,7 +6921,8 @@
     swcodec: "Freqüència de Tall"
   </dest>
   <voice>
-    *: "Cutoff Frequency"
+    *: none
+    swcodec: "Freqüència de Tall"
   </voice>
 </phrase>
 <phrase>
@@ -6804,7 +6936,7 @@
     *: "Carregant..."
   </dest>
   <voice>
-    *: ""
+    *: "Carregant..."
   </voice>
 </phrase>
 <phrase>
@@ -6820,7 +6952,8 @@
     recording: "Llum de saturació"
   </dest>
   <voice>
-    *: "Llum de saturació"
+    *: none
+    recording: "Llum de saturació"
   </voice>
 </phrase>
 <phrase>
@@ -6836,7 +6969,8 @@
     lcd_non-mono: "Reiniciar Colors"
   </dest>
   <voice>
-    *: "Reiniciar Colors"
+    *: none
+    lcd_non-mono: "Reiniciar Colors"
   </voice>
 </phrase>
 <phrase>
@@ -6852,7 +6986,8 @@
     swcodec: "Durada de Fade-In"
   </dest>
   <voice>
-    *: "Fade-In Duration"
+    *: none
+    swcodec: "Durada de Fade-In"
   </voice>
 </phrase>
 <phrase>
@@ -6868,7 +7003,8 @@
     swcodec: "Durada de Fade-Out"
   </dest>
   <voice>
-    *: "Fade-Out Duration"
+    *: none
+    swcodec: "Durada de Fade-Out"
   </voice>
 </phrase>
 <phrase>
@@ -6884,7 +7020,8 @@
     radio: "No s'han trobat presintoníes, AutoScan?"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: "No s'han trobat presintoníes, AutoScan?"
   </voice>
 </phrase>
 <phrase>
@@ -6900,7 +7037,8 @@
     lcd_color: "RGB"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_color: ""
   </voice>
 </phrase>
 <phrase>
@@ -6916,7 +7054,8 @@
     dircache: "Caché de directoris"
   </dest>
   <voice>
-    *: "Caché de directoris"
+    *: none
+    dircache: "Caché de directoris"
   </voice>
 </phrase>
 <phrase>
@@ -6946,7 +7085,8 @@
     swcodec: "%d Hz Band Gain"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: "hertz band gain"
   </voice>
 </phrase>
 <phrase>
@@ -6962,7 +7102,8 @@
     swcodec: "Només en canviar de cançó manualment"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: "Només en canviar de cançó manualment"
   </voice>
 </phrase>
 <phrase>
@@ -6978,7 +7119,8 @@
     swcodec: "Freqüència Central"
   </dest>
   <voice>
-    *: "Center frequency"
+    *: none
+    swcodec: "Freqüència Central"
   </voice>
 </phrase>
 <phrase>
@@ -6994,7 +7136,8 @@
     radio: "Esborrar llista de presintonies"
   </dest>
   <voice>
-    *: "Clear Preset List"
+    *: none
+    radio: "Esborrar llista de presintonies"
   </voice>
 </phrase>
 <phrase>
@@ -7008,7 +7151,7 @@
     *: "Nou teclat"
   </dest>
   <voice>
-    *: ""
+    *: "Nou teclat"
   </voice>
 </phrase>
 <phrase>
@@ -7022,7 +7165,7 @@
     *: "Llatí Extès (ISO-8859-2)"
   </dest>
   <voice>
-    *: "Latin extended"
+    *: "Llatí Extès"
   </voice>
 </phrase>
 <phrase>
@@ -7040,7 +7183,9 @@
     ondio*: "MMC:"
   </dest>
   <voice>
-    *: "Multimedia card"
+    *: none
+    e200,c200: "micro S D"
+    ondio*: "M M C"
   </voice>
 </phrase>
 <phrase>
@@ -7054,7 +7199,7 @@
     *: "Base de dades"
   </dest>
   <voice>
-    *: "Tag Cache"
+    *: "Base de dades"
   </voice>
 </phrase>
 <phrase>
@@ -7098,7 +7243,8 @@
     recording: "Presplit Gap"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "Presplit Gap"
   </voice>
 </phrase>
 <phrase>
@@ -7112,7 +7258,7 @@
     *: "Recollir Runtime Data"
   </dest>
   <voice>
-    *: "Gather Runtime Data"
+    *: "Recollir Runtime Data"
   </voice>
 </phrase>
 <phrase>
@@ -7154,7 +7300,7 @@
     *: "Activar Replaygain"
   </dest>
   <voice>
-    *: "Enable Replaygain"
+    *: "Activar Replaygain"
   </voice>
 </phrase>
 <phrase>
@@ -7170,7 +7316,8 @@
     swcodec: "Cross Gain"
   </dest>
   <voice>  
-    *: "Cross gain"
+    *: none
+    swcodec: "Cross Gain"
   </voice>
 </phrase>
 <phrase>
@@ -7186,7 +7333,8 @@
     lcd_bitmap: "Àrab (CP1256)"
   </dest>
   <voice>
-    *: "Arabic"
+    *: none
+    lcd_bitmap: "Àrab"
   </voice>
 </phrase>
 <phrase>
@@ -7202,7 +7350,8 @@
     radio: "Desar Llista de presintonies"
     </dest>
   <voice>
-    *: "Save Preset List"
+    *: none
+    radio: "Desar Llista de presintonies"
   </voice>
 </phrase>
 <phrase>
@@ -7235,7 +7384,8 @@
     remote: "Opcions de LCD remot"
     </dest>
   <voice>
-    *: "Remote LCD settings"
+    *: none
+    remote: "Opcions de LCD remot"
   </voice>
 </phrase>
 <phrase>
@@ -7251,8 +7401,8 @@
     swcodec: "EQ senzill"
   </dest>
   <voice>
-    *: "Simple equalizer settings"
-  </voice>
+    *: none
+    swcodec: "Equalitzador senzill"
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_BAND_LOW_SHELF
@@ -7267,7 +7417,8 @@
     swcodec: "Low Shelf Filter"
   </dest>
   <voice>
-    *: "Low shelf filter"
+    *: none
+    swcodec: "Low Shelf Filter"
   </voice>
 </phrase>
 <phrase>
@@ -7283,7 +7434,8 @@
     radio: "Afegir presintonia"
   </dest>
   <voice>
-    *: "Add Preset"
+    *: none
+    radio: "Afegir presintonia"
   </voice>
 </phrase>
 <phrase>
@@ -7299,7 +7451,8 @@
     swcodec: "Feble"
   </dest>
   <voice>
-    *: "Feble"
+    *: none
+    swcodec: "Feble"
   </voice>
 </phrase>
 <phrase>
@@ -7315,7 +7468,8 @@
     recording: "-inf"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "-inf"
   </voice>
 </phrase>
 <phrase>
@@ -7331,7 +7485,7 @@
     swcodec: "Editar mode: %s"
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -7347,7 +7501,8 @@
     swcodec: "Atenuació d'alta freqüència"
   </dest>
   <voice>
-    *: "High-frequency attenuation"
+    *: none
+    swcodec: "Atenuació d'alta freqüència"
   </voice>
 </phrase>
 <phrase>
@@ -7363,7 +7518,8 @@
     swcodec: "Crossfade"
   </dest>
   <voice>
-    *: "Crossfade"
+    *: none
+    swcodec: "Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -7379,7 +7535,8 @@
     swcodec: "Activar EQ"
   </dest>
   <voice>
-    *: "Enable equalizer"
+    *: none
+    swcodec: "Activar equalitzador"
   </voice>
 </phrase>
 <phrase>
@@ -7409,7 +7566,8 @@
     recording: "Aturar-se per sota de"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "Aturar-se per sota de"
   </voice>
 </phrase>
 <phrase>
@@ -7425,7 +7583,8 @@
     swcodec: "High Shelf Filter"
   </dest>
   <voice>
-    *: "High shelf filter"
+    *: none
+    swcodec: "High Shelf Filter"
   </voice>
 </phrase>
 <phrase>
@@ -7437,10 +7596,12 @@
     remote: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    remote: ""
   </dest>
   <voice>
-    *: "remote while-playing-screen"
+    *: none
+    remote: "remote while-playing-screen"
   </voice>
 </phrase>
 <phrase>
@@ -7470,7 +7631,8 @@
     radio: "Auto-Scan Presets"
   </dest>
   <voice>
-    *: "Auto scan presets"
+    *: none
+    radio: "Auto-Scan Presets"
   </voice>
 </phrase>
 <phrase>
@@ -7486,7 +7648,8 @@
     swcodec: "Veure EQ desats"
   </dest>
   <voice>
-    *: "Browse equalizer presets"
+    *: none
+    swcodec: "Veure equalitzador desats"
   </voice>
 </phrase>
 <phrase>
@@ -7516,7 +7679,8 @@
     swcodec: "Mode de Fade-Out"
   </dest>
   <voice>
-    *: "Fade-Out Mode"
+    *: none
+    swcodec: "Mode de Fade-Out"
   </voice>
 </phrase>
 <phrase>
@@ -7532,7 +7696,8 @@
     swcodec: "Equalitzador"
   </dest>
   <voice>
-    *: "Equalitzador"
+    *: none
+    swcodec: "Equalitzador"
   </voice>
 </phrase>
 <phrase>
@@ -7546,7 +7711,7 @@
     *: "Res a reprendre"
   </dest>
   <voice>
-    *: ""
+    *: "Res a reprendre"
   </voice>
 </phrase>
 <phrase>
@@ -7562,7 +7727,8 @@
     lcd_non-mono: "Backdrop Loaded"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7578,7 +7744,8 @@
     recording: "Començar per sobre de"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "Començar per sobre de"
   </voice>
 </phrase>
 <phrase>
@@ -7594,7 +7761,8 @@
     lcd_non-mono: "Establir de fons"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_non-mono: "Establir de fons"
   </voice>
 </phrase>
 <phrase>
@@ -7610,7 +7778,8 @@
     swcodec: "Guany directe"
   </dest>
   <voice>
-    *: "Direct gain"
+    *: none
+    swcodec: "Guany directe"
   </voice>
 </phrase>
 <phrase>
@@ -7626,7 +7795,8 @@
     radio: "Esborrar presintonies actuals?"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: "Esborrar presintonies actuals?"
   </voice>
 </phrase>
 <phrase>
@@ -7642,7 +7812,8 @@
     swcodec: "Peak Filter %d"
   </dest>
   <voice>
-    *: "Peak filter"
+    *: none
+    swcodec: "Peak Filter"
   </voice>
 </phrase>
 <phrase>
@@ -7658,7 +7829,8 @@
     swcodec: "Retard de Fade-In"
   </dest>
   <voice>
-    *: "Fade-In Delay"
+    *: none
+    swcodec: "Retard de Fade-In"
   </voice>
 </phrase>
 <phrase>
@@ -7672,7 +7844,7 @@
     *: "Updating in background"
   </dest>
   <voice>
-    *: ""
+    *: "Updating in background"
   </voice>
 </phrase>
 <phrase>
@@ -7688,7 +7860,8 @@
     swcodec: "Mix"
   </dest>
   <voice>
-    *: "Mix"
+    *: none
+    swcodec: "Mix"
   </voice>
 </phrase>
 <phrase>
@@ -7739,7 +7912,7 @@
   </dest>
   <voice>
     *: none
-    recording: "PCM Wave"
+    recording: "Ona PCM"
   </voice>
 </phrase>
 <phrase>
@@ -7872,7 +8045,7 @@
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Never"
+    lcd_sleep: "Mai"
   </voice>
 </phrase>
 <phrase>
@@ -7889,7 +8062,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Line In"
+    recording: "Linia d'entrada"
   </voice>
 </phrase>
 <phrase>
@@ -7912,10 +8085,6 @@
   </dest>
   <voice>
     *: "entrades trobades per base de dades"
-    h100,h120,h300: ""
-    ipod*: ""
-    x5,m5,gigabeat*,mrobe100: ""
-    h10,h10_5gb,e200,c200,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -7929,7 +8098,7 @@
     *: "Escanejant disc..."
   </dest>
   <voice>
-    *: "Scanning disk"
+    *: "Escanejant disc..."
   </voice>
 </phrase>
 <phrase>
@@ -7943,7 +8112,7 @@
     *: "Fitxers"
   </dest>
   <voice>
-    *: "Files"
+    *: "Fitxers"
   </voice>
 </phrase>
 <phrase>
@@ -8090,7 +8259,7 @@
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Sleep after backlight off"
+    lcd_sleep: "Dormir després d'apagar llum"
   </voice>
 </phrase>
 <phrase>
@@ -8124,7 +8293,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Filesize"
+    recording: "Mida del fitxer"
   </voice>
 </phrase>
 <phrase>
@@ -8186,7 +8355,7 @@
   </dest>
   <voice>
     *: none
-    usb_charging: "Charge During U S B Connection"
+    usb_charging: "Carregar durant connexió U S B"
   </voice>
 </phrase>
 <phrase>
@@ -8203,7 +8372,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Display OFF"
+    remote: "Apagar pantalla remota"
   </voice>
 </phrase>
 <phrase>
@@ -8220,7 +8389,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Same As Source"
+    recording: "Igual que la font"
   </voice>
 </phrase>
 <phrase>
@@ -8237,7 +8406,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Disable resume on startup if phones unplugged"
+    headphone_detection: "Desactivar la reproducció en engegar si els auriculars estan desconnectats"
   </voice>
 </phrase>
 <phrase>
@@ -8299,7 +8468,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Europe"
+    radio: "Europa"
   </voice>
 </phrase>
 <phrase>
@@ -8347,7 +8516,7 @@
     *: "AVIS! Bateria Baixa!"
   </dest>
   <voice>
-    *: "WARNING! Low Battery!"
+    *: "AVIS! Bateria Baixa!"
   </voice>
 </phrase>
 <phrase>
@@ -8364,7 +8533,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Encoder Settings"
+    recording: "Preferencies del codificador"
   </voice>
 </phrase>
 <phrase>
@@ -8378,7 +8547,7 @@
     *: "Preferencies de visualització de llistes de repr."
   </dest>
   <voice>
-    *: "Playlist Viewer Settings"
+    *: "Preferencies de visualització de llistes de repr."
   </voice>
 </phrase>
 <phrase>
@@ -8409,7 +8578,7 @@
     *: "Actualització Automàtica"
   </dest>
   <voice>
-    *: "Auto Update"
+    *: "Actualització Automàtica"
   </voice>
 </phrase>
 <phrase>
@@ -8423,7 +8592,7 @@
     *: "Reproduïnt"
   </dest>
   <voice>
-    *: "Now Playing"
+    *: "Reproduïnt"
   </voice>
 </phrase>
 <phrase>
@@ -8440,7 +8609,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop recording"
+    recording: "Aturar la grabació"
   </voice>
 </phrase>
 <phrase>
@@ -8516,7 +8685,7 @@
     *: "Accions de punts de pàgina"
   </dest>
   <voice>
-    *: "Bookmark Actions"
+    *: "Accions de punts de pàgina"
   </voice>
 </phrase>
 <phrase>
@@ -8533,7 +8702,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Shuffle and Track Skip"
+    swcodec: "Aleatori i canvi manual"
   </voice>
 </phrase>
 <phrase>
@@ -8567,7 +8736,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Source"
+    recording: "Font"
   </voice>
 </phrase>
 <phrase>
@@ -8649,7 +8818,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause and Resume"
+    headphone_detection: "Aturar i reprendre"
   </voice>
 </phrase>
 <phrase>
@@ -8666,7 +8835,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Can't write to recording directory"
+    recording: "No es pot escriure al directori"
   </voice>
 </phrase>
 <phrase>
@@ -8680,7 +8849,7 @@
     *: "Configuració de canals"
   </dest>
   <voice>
-    *: "Channel Configuration"
+    *: "Configuració de canals"
   </voice>
 </phrase>
 <phrase>
@@ -8718,9 +8887,6 @@
   </dest>
   <voice>
     *: ""
-    h100,h120,h300: ""
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: ""
-    player: ""
   </voice>
 </phrase>
 <phrase>
@@ -8741,9 +8907,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
-    h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: ""
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8774,7 +8938,7 @@
     *: "Actualitzar ara"
   </dest>
   <voice>
-    *: "Update Now"
+    *: "Actualitzar ara"
   </voice>
 </phrase>
 <phrase>
@@ -8881,7 +9045,7 @@
     *: "Usar fitxers .talk"
   </dest>
   <voice>
-    *: "Use File .talk Clips"
+    *: "Usar fitxers .talk"
   </voice>
 </phrase>
 <phrase>
@@ -8895,7 +9059,7 @@
     *: "Aleatori"
   </dest>
   <voice>
-    *: "Random"
+    *: "Aleatori"
   </voice>
 </phrase>
 <phrase>
@@ -8909,7 +9073,7 @@
     *: "Tots"
   </dest>
   <voice>
-    *: "All"
+    *: "Tots"
   </voice>
 </phrase>
 <phrase>
@@ -8926,7 +9090,7 @@
   </dest>
   <voice>
     *: none
-    recording: "New file"
+    recording: "Nou fitxer"
   </voice>
 </phrase>
 <phrase>
@@ -8940,7 +9104,7 @@
     *: "Afegir a enllaços directes"
   </dest>
   <voice>
-    *: "Add to Shortcuts"
+    *: "Afegir a enllaços directes"
   </voice>
 </phrase>
 <phrase>
@@ -8957,7 +9121,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Presintonia"
   </voice>
 </phrase>
 <phrase>
@@ -8971,7 +9135,7 @@
     *: "Menu Principal"
   </dest>
   <voice>
-    *: "Main Menu"
+    *: "Menu Principal"
   </voice>
 </phrase>
 <phrase>
@@ -8985,7 +9149,7 @@
     *: "Jocs"
   </dest>
   <voice>
-    *: "Games"
+    *: "Jocs"
   </voice>
 </phrase>
 <phrase>
@@ -9001,8 +9165,8 @@
     player: "Fi Llista"
   </dest>
   <voice>
-    *: "End of Song List"
-    player: "End of List"
+    *: "Fi de la Llista de Cançons"
+    player: "Fi Llista"
   </voice>
 </phrase>
 <phrase>
@@ -9019,7 +9183,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Gain"
+    lcd_bitmap: "Guany"
   </voice>
 </phrase>
 <phrase>
@@ -9036,7 +9200,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Wake up Screen"
+    alarm: "Pantalla d'Alarma"
   </voice>
 </phrase>
 <phrase>
@@ -9053,7 +9217,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Clear Recording Directory"
+    recording: "Buidar Directori de gravació"
   </voice>
 </phrase>
 <phrase>
@@ -9115,7 +9279,7 @@
     *: "Desar Configuració de Tema"
   </dest>
   <voice>
-    *: "Save Theme Settings"
+    *: "Desar Configuració de Tema"
   </voice>
 </phrase>
 <phrase>
@@ -9149,7 +9313,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Frequency"
+    recording: "Freqüència"
   </voice>
 </phrase>
 <phrase>
@@ -9197,7 +9361,7 @@
     *: "Exportar Modificacions"
   </dest>
   <voice>
-    *: "Export Modifications"
+    *: "Exportar Modificacions"
   </voice>
 </phrase>
 <phrase>
@@ -9231,7 +9395,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "durant al menys"
   </voice>
 </phrase>
 <phrase>
@@ -9248,7 +9412,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Filesize"
+    recording: "Mida de Separació"
   </voice>
 </phrase>
 <phrase>
@@ -9262,7 +9426,7 @@
     *: "Canals"
   </dest>
   <voice>
-    *: "Channels"
+    *: "Canals"
   </voice>
 </phrase>
 <phrase>
@@ -9293,7 +9457,7 @@
     *: "Preguntar"
   </dest>
   <voice>
-    *: "Ask"
+    *: "Preguntar"
   </voice>
 </phrase>
 <phrase>
@@ -9406,7 +9570,7 @@
     *: "Reprendre Reproducció"
   </dest>
   <voice>
-    *: "Resume Playback"
+    *: "Reprendre Reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -9423,7 +9587,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause on Headphone Unplug"
+    headphone_detection: "Aturar en desconnectar auriculars"
   </voice>
 </phrase>
 <phrase>
@@ -9451,7 +9615,7 @@
     *: "Catàleg de Llistes de reproducció"
   </dest>
   <voice>
-    *: "Playlist Catalog"
+    *: "Catàleg de Llistes de reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -9496,7 +9660,7 @@
     *: "Bateria Buida! RECARREGA!"
   </dest>
   <voice>
-    *: "Battery empty! RECHARGE!"
+    *: "Bateria Buida! RECARREGA!"
   </voice>
 </phrase>
 <phrase>
@@ -9527,7 +9691,7 @@
     *: "Temps Funcionant"
   </dest>
   <voice>
-    *: "Running Time"
+    *: "Temps Funcionant"
   </voice>
 </phrase>
 <phrase>
@@ -9680,7 +9844,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Region"
+    radio: "Regió"
   </voice>
 </phrase>
 <phrase>
@@ -9725,7 +9889,7 @@
     *: "Afegir a Nova Llista de Reproducció"
   </dest>
   <voice>
-    *: "Add to New Playlist"
+    *: "Afegir a Nova Llista de Reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -9759,7 +9923,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop"
+    recording: "Aturar"
   </voice>
 </phrase>
 <phrase>
@@ -9824,7 +9988,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Time"
+    recording: "Temps de separació"
   </voice>
 </phrase>
 <phrase>
@@ -9855,7 +10019,7 @@
     *: "Reinicia per Activar-ho"
   </dest>
   <voice>
-    *: "Please reboot to enable"
+    *: "Reinicia per Activar-ho"
   </voice>
 </phrase>
 <phrase>
@@ -9886,7 +10050,7 @@
     *: "Menu de Context"
   </dest>
   <voice>
-    *: "Context Menu"
+    *: "Menu de Context"
   </voice>
 </phrase>
 <phrase>
@@ -9917,7 +10081,7 @@
     *: "Pantalla anterior"
   </dest>
   <voice>
-    *: "Previous Screen"
+    *: "Pantalla anterior"
   </voice>
 </phrase>
 <phrase>
@@ -9931,7 +10095,7 @@
     *: "Afegir a Llista de reproducció"
   </dest>
   <voice>
-    *: "Add to Playlist"
+    *: "Afegir a Llista de reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -10007,7 +10171,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Start new file"
+    recording: "Començar nou fitxer"
   </voice>
 </phrase>
 <phrase>
@@ -10024,7 +10188,7 @@
   </dest>
   <voice>
     *: none
-    recording: "What to do when Splitting"
+    recording: "Que fer quan es separa"
   </voice>
 </phrase>
 <phrase>
@@ -10038,7 +10202,7 @@
     *: "Pantalla d'inici"
   </dest>
   <voice>
-    *: "Start Screen"
+    *: "Pantalla d'inici"
   </voice>
 </phrase>
 <phrase>
@@ -10086,7 +10250,7 @@
     *: "<No reprendre>"
   </dest>
   <voice>
-    *: "Do not resume"
+    *: "No reprendre"
   </voice>
 </phrase>
 <phrase>
@@ -10100,7 +10264,7 @@
     *: "Esborrar"
   </dest>
   <voice>
-    *: "Delete"
+    *: "Esborrar"
   </voice>
 </phrase>
 <phrase>
@@ -10117,7 +10281,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Japan"
+    radio: "Japó"
   </voice>
 </phrase>
 <phrase>
@@ -10131,7 +10295,7 @@
     *: "Mostrar Camí"
   </dest>
   <voice>
-    *: "Show Path"
+    *: "Mostrar Camí"
   </voice>
 </phrase>
 <phrase>
@@ -10145,7 +10309,7 @@
     *: "Escollir Punt de Pàgina"
   </dest>
   <voice>
-    *: "Select Bookmark"
+    *: "Escollir Punt de Pàgina"
   </voice>
 </phrase>
 <phrase>
@@ -10162,7 +10326,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Dithering"
+    swcodec: "Suavitzat de quantitzat"
   </voice>
 </phrase>
 <phrase>
@@ -10176,7 +10340,7 @@
     *: "Aplicacions"
   </dest>
   <voice>
-    *: "Applications"
+    *: "Aplicacions"
   </voice>
 </phrase>
 <phrase>
@@ -10207,7 +10371,7 @@
     *: "Movent..."
   </dest>
   <voice>
-    *: "Moving"
+    *: "Movent"
   </voice>
 </phrase>
 <phrase>
@@ -10238,7 +10402,7 @@
     *: "Usar Directori .talk"
   </dest>
   <voice>
-    *: "Use Directory .talk Clips"
+    *: "Usar Directori .talk"
   </voice>
 </phrase>
 <phrase>
@@ -10269,7 +10433,7 @@
     *: "Propietats"
     </dest>
   <voice>
-    *: "Properties"
+    *: "Propietats"
   </voice>
 </phrase>
 <phrase>
@@ -10283,7 +10447,7 @@
     *: "Veure Catàleg"
   </dest>
   <voice>
-    *: "View Catalog"
+    *: "Veure Catàleg"
   </voice>
 </phrase>
 <phrase>
@@ -10325,7 +10489,7 @@
     *: "<Punt de Pàgina invàlid>"
   </dest>
   <voice>
-    *: "Invalid Bookmark"
+    *: "Punt de Pàgina invàlid"
   </voice>
 </phrase>
 <phrase>
@@ -10407,7 +10571,7 @@
     *: "Només Directori Actual"
   </dest>
   <voice>
-    *: "Current Directory Only"
+    *: "Només Directori Actual"
   </voice>
 </phrase>
 <phrase>
@@ -10424,7 +10588,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Channels"
+    recording: "Canals"
   </voice>
 </phrase>
 <phrase>
@@ -10455,7 +10619,7 @@
     *: "Llistes de Reproducció"
   </dest>
   <voice>
-    *: "Playlists"
+    *: "Llistes de Reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -10517,7 +10681,7 @@
   </dest>
   <voice>
     *: none
-    recording_hwcodec: "Quality"
+    recording_hwcodec: "Qualitat"
   </voice>
 </phrase>
 <phrase>
@@ -10565,7 +10729,7 @@
     *: "Esborrar Temps?"
   </dest>
   <voice>
-    *: "Clear Time?"
+    *: "Esborrar Temps?"
   </voice>
 </phrase>
 <phrase>
@@ -10613,7 +10777,7 @@
   </dest>
   <voice>
     *: none
-    hold_button: "Backlight on hold key"
+    hold_button: "Llum quan Bloquejat"
   </voice>
 </phrase>
 <phrase>
@@ -10627,7 +10791,7 @@
     *: "Preferències"
   </dest>
   <voice>
-    *: "Settings"
+    *: "Preferències"
   </voice>
 </phrase>
 <phrase>
@@ -10641,7 +10805,7 @@
     *: "Cancelat"
   </dest>
   <voice>
-    *: "Cancelled"
+    *: "Cancelat"
   </voice>
 </phrase>
 <phrase>
@@ -10686,7 +10850,7 @@
     *: "Estàs Segur?"
   </dest>
   <voice>
-    *: "Are You Sure?"
+    *: "Estàs Segur?"
   </voice>
 </phrase>
 <phrase>
@@ -10731,7 +10895,7 @@
     *: "Cap Llista de Reproducció"
   </dest>
   <voice>
-    *: ""
+    *: "Cap Llista de Reproducció"
   </voice>
 </phrase>
 <phrase>
@@ -10745,7 +10909,7 @@
     *: "Copiant..."
   </dest>
   <voice>
-    *: "Copying"
+    *: "Copiant"
   </voice>
 </phrase>
 <phrase>
@@ -10779,7 +10943,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Set As Recording Directory"
+    recording: "Establir com Directori de Gravació"
   </voice>
 </phrase>
 <phrase>
@@ -10796,7 +10960,7 @@
   </dest>
   <voice>
     *: none
-    radio: "FM Radio Menu"
+    radio: "Menu de Radio F M"
   </voice>
 </phrase>
 <phrase>
@@ -10810,7 +10974,7 @@
     *: "Mostrar les extensions dels fitxers"
   </dest>
   <voice>
-    *: "Show filename extensions"
+    *: "Mostrar les extensions dels fitxers"
   </voice>
 </phrase>
 <phrase>
@@ -10824,7 +10988,7 @@
     *: "Només quan es mostres tots els tipus"
   </dest>
   <voice>
-    *: "Only when viewing all types"
+    *: "Només quan es mostres tots els tipus"
   </voice>
 </phrase>
 <phrase>
@@ -10838,7 +11002,7 @@
     *: "Només els tipus desconeguts"
   </dest>
   <voice>
-    *: "Only unknown types"
+    *: "Només els tipus desconeguts"
   </voice>
 </phrase>
 <phrase>
@@ -10869,7 +11033,7 @@
   </dest>
   <voice>
     *: none
-    usbstack: "Stack USB"
+    usbstack: "Stack U S B"
   </voice>
 </phrase>
 <phrase>
@@ -10954,7 +11118,7 @@
   </dest>
   <voice>
     *: none
-    usbstack: "Mode USB Stack"
+    usbstack: "Mode U S B Stack"
   </voice>
 </phrase>
 <phrase>
