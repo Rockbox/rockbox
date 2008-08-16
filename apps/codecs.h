@@ -82,12 +82,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 24
+#define CODEC_API_VERSION 25
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 24
+#define CODEC_MIN_API_VERSION 25
 
 /* codec return codes */
 enum codec_status {
