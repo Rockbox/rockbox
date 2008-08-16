@@ -47,7 +47,7 @@ sub find_copyfile {
 
 $ROOT="..";
 
-my $ziptool="zip -r";
+my $ziptool="zip -r9";
 my $output="rockbox.zip";
 my $verbose;
 my $exe;
