@@ -6314,19 +6314,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
-  desc: AGC maximum gain in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "AGC max. gain"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "AGC sukduean tubo"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "AGC maximum gain"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -6435,15 +6435,15 @@
 </phrase>
 <phrase>
   id: LANG_RECORDING_LEFT
-  desc: in the recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Gain Left"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Kaliwa ng tubo"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -6469,19 +6469,19 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_AGC_PRESET
-  desc: automatic gain control in record settings
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Automatic Gain Control"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Magpigil Kusa ng tubo"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Automatic gain control"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -6562,15 +6562,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_PRERECORD
-  desc: in recording and radio screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Pre-Recording"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Pre-Rekording"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -6610,19 +6610,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_OFF
-  desc: Used in a lot of places
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Off"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Isara"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Off"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -7018,19 +7018,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_DISK_FULL
-  desc: in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Puno disk. Magpatuloy Pindutin OFF."
-    h100,h120,h300: "Puno disk. Magpatuloy Pindutin STOP."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "Puno disk. Magpatuloy Pindutin LEFT."
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -7230,19 +7226,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Safety (clip)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Katiwasayan (klip)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Safety (clip)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -7640,19 +7636,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_VOLUME
-  desc: in sound_settings
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Volume"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Bulumen"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Volume"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -7888,19 +7884,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Medium"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Panggitna"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Medium"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -8938,15 +8934,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_FILENAME
-  desc: Filename header in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Filename:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Pangalan ng salansan:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -8972,15 +8968,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_PM_CLIPCOUNT
-  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "CLIP:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "KLIP:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -9505,19 +9501,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "DJ-Set (slow)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "DJ-Set (magbagal)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "DJ set (slow)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -9795,19 +9791,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
-  desc: automatic gain control in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "AGC"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "AGC"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "AGC"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -9888,32 +9884,32 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Voice (fast)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Boses (mabilis)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Voice (fast)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_TIMESPLIT_REC
-  desc: Display of record timer interval setting, on the record screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Split Time:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Maghati-hati oras:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10268,19 +10264,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
-  desc: in record timesplit options
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Split Filesize"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Maghati-hati salansan"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Split Filesize"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -10445,32 +10441,32 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Live (slow)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Buhay (magbagal)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Live (slow)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORDING_RIGHT
-  desc: in the recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Gain Right"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Tubo Deretso"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10639,19 +10635,19 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
-  desc: in record settings
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "AGC clip time"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "AGC Klip oras"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "AGC clip time"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -11182,15 +11178,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_TIME
-  desc: Display of recorded time
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Time:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Oras:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -11567,15 +11563,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_SIZE
-  desc: Display of recorded file size
+  desc: deprecated
   user: 
   <source>
     *: none
-    recording: "Size:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Laki:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -11833,5 +11829,158 @@
   <voice>
     *: none
     gigabeatf: "Mataas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SIZE
+  desc: Display of recorded file size
+  user: 
+  <source>
+    *: none
+    recording: "Size:"
+  </source>
+  <dest>
+    *: none
+    recording: "Laki:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  user:
+  <source>
+    *: none
+    agc: "AGC max. gain"
+  </source>
+  <dest>
+    *: none
+    agc: "AGC sukduean tubo"
+  </dest>
+  <voice>
+    *: none
+    agc: "AGC sukduean tubo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_TIMESPLIT_REC
+  desc: Display of record timer interval setting, on the record screen
+  user: 
+  <source>
+    *: none
+    recording: "Split Time:"
+  </source>
+  <dest>
+    *: none
+    recording: "Hatiin Oras:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user: 
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "KLIP:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN_RIGHT
+  desc: in the recording screen
+  user: 
+  <source>
+    *: none
+    recording: "Gain R"
+  </source>
+  <dest>
+    *: none
+    recording: "Tubo Kanan"
+  </dest>
+  <voice>
+    *: none
+    recording: "Tubo Kanan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user: 
+  <source>
+    *: none
+    recording: "Filename:"
+  </source>
+  <dest>
+    *: none
+    recording: "Pangalan ng salansan:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN_LEFT
+  desc: in the recording screen
+  user: 
+  <source>
+    *: none
+    recording: "Gain L"
+  </source>
+  <dest>
+    *: none
+    recording: "Tubo Kaliwa"
+  </dest>
+  <voice>
+    *: none
+    recording: "Tubo Kaliwa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_PRESET
+  desc: automatic gain control in record settings and screen
+  user:
+  <source>
+    *: none
+    agc: "AGC"
+  </source>
+  <dest>
+    *: none
+    agc: "ATK"
+  </dest>
+  <voice>
+    *: none
+    agc: "Awtomatiko tubo kontrol"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_CLIPTIME
+  desc: in record settings
+  user:
+  <source>
+    *: none
+    agc: "AGC clip time"
+  </source>
+  <dest>
+    *: none
+    agc: "ATK klip oras"
+  </dest>
+  <voice>
+    *: none
+    agc: "ATK klip oras"
   </voice>
 </phrase>
