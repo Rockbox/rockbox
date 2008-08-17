@@ -727,7 +727,6 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     int skip;
     bool global_unsynch = false;
     bool unsynch = false;
-    int data_length_ind;
     int i, j;
     int rc;
 
@@ -851,7 +850,6 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         }
 
         unsynch = false;
-        data_length_ind = 0;
 
         if(flags)
         {
@@ -885,7 +883,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                     if(4 != read(fd, tmp, 4))
                         return;
 
-                    data_length_ind = unsync(tmp[0], tmp[1], tmp[2], tmp[3]);
+                    /* We don't need the data length */
                     framelen -= 4;
                 }
             }
@@ -1016,9 +1014,6 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             if(global_unsynch && version <= ID3_VER_2_3) {
                 size -= skip_unsynched(fd, totframelen);
             } else {
-                if(data_length_ind)
-                    totframelen = data_length_ind;
-
                 size -= totframelen;
                 if( lseek(fd, totframelen, SEEK_CUR) == -1 )
                     return;
