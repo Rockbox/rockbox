@@ -439,7 +439,7 @@
     *: "Mono venstre"
   </dest>
   <voice>
-    *: "Mono vestre"
+    *: "Mono venstre"
   </voice>
 </phrase>
 <phrase>
@@ -676,10 +676,10 @@
     *: "File View"
   </source>
   <dest>
-    *: "Fil-browser"
+    *: "Filbrowser"
   </dest>
   <voice>
-    *: "Fil browser"
+    *: "Filbrowser"
   </voice>
 </phrase>
 <phrase>
@@ -1006,7 +1006,7 @@
     flash_storage: none
   </dest>
   <voice>
-    *: "Anti-hop Buffer"
+    *: "Anti-hop buffer"
     flash_storage: none
   </voice>
 </phrase>
@@ -1018,10 +1018,10 @@
     *: "Fade on Stop/Pause"
   </source>
   <dest>
-    *: "Skru ned ved Stop/Pause"
+    *: "Skru ned ved stop/pause"
   </dest>
   <voice>
-    *: "Skru ned ved Stop og Pause"
+    *: "Skru ned ved stop og pause"
   </voice>
 </phrase>
 <phrase>
@@ -2194,7 +2194,7 @@
   </source>
   <dest>
     *: none
-    recording: "deprecated"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -2418,7 +2418,7 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Lydstyrke pr. album"
+    *: "Lydstyrke per album"
   </dest>
   <voice>
     *: "Lydstyrke per album"
@@ -2432,7 +2432,7 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Lydstyrke pr. sang"
+    *: "Lydstyrke per sang"
   </dest>
   <voice>
     *: "Lydstyrke per sang"
@@ -2446,7 +2446,7 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "Lydstyrkekontrol pr. sang ved tilfældig afspilning"
+    *: "Lydstyrkekontrol per sang ved tilfældig afspilning"
   </dest>
   <voice>
     *: "Lydstyrkekontrol per sang ved tilfældig afspilning"
@@ -2953,7 +2953,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Spids frigivelse"
+    *: "Spidsfrigivelse"
     masd: none
   </voice>
 </phrase>
@@ -3573,7 +3573,7 @@
     *: "Queue Last"
   </source>
   <dest>
-    *: "Sæt i køen sidst"
+    *: "Sæt i kø sidst"
   </dest>
   <voice>
     *: "Sæt i kø sidst"
@@ -5937,7 +5937,7 @@
     *: ""
   </source>
   <dest>
-    *: "deprecated"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -8215,7 +8215,7 @@
     *: "Ingen sætlister"
   </dest>
   <voice>
-    *: ""
+    *: "Ingen sætlister"
   </voice>
 </phrase>
 <phrase>
@@ -10526,7 +10526,7 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Pause and genoptag"
+    headphone_detection: "Pause og genoptag"
   </dest>
   <voice>
     *: none
