@@ -38,7 +38,11 @@ Usage: genlang [options] <langv2 file>
 
  -e=<english lang file>
     Point out the english (original source) file, to use that as master
-    language template. Used in combination with -b or -u.
+    language template. Used in combination with -b, -u or -s.
+
+ -s
+    Sort the Update language file in the same order as the strings in the
+    English file.
 
  -t=<target>
     Specify which target you want the translations/phrases for. Required when
@@ -77,23 +81,25 @@ MOO
 my $prefix = $p;
 my $binary = $b;
 my $update = $u;
+my $sortfile = $s;
 
 my $english = $e;
 my $voiceout = $o;
 
-my $check = ($binary?1:0) + ($prefix?1:0) + ($update?1:0) + ($voiceout?1:0);
+my $check = ($binary?1:0) + ($prefix?1:0) + ($update?1:0) + ($voiceout?1:0) + ($sortfile?1:0);
 
 if($check > 1) {
-    print "Please use only one of -p, -u, -o and -b\n";
+    print "Please use only one of -p, -u, -o, -b and -s\n";
     exit;
 }
 if(!$check) {
-    print "Please use at least one of -p, -u, -o and -b\n";
+    print "Please use at least one of -p, -u, -o, -b and -s\n";
     exit;
 }
 
-if(($binary || $update || $voiceout) && !$english) {
-    print "Please use -e too when you use -b, -o or -u\n";
+
+if(($binary || $update || $voiceout || $sortfile) && !$english) {
+    print "Please use -e too when you use -b, -o, -u or -s\n";
     exit;
 }
 
@@ -104,7 +110,7 @@ if($binary && !$target_id) {
 }
 
 my $target = $t;
-if(!$target && !$update) {
+if(!$target && !$update && !$sortfile) {
     print "Please specify a target (with -t)!\n";
     exit;
 }
@@ -113,6 +119,7 @@ my $verbose=$v;
 my %id; # string to num hash
 my @idnum; # num to string array
 
+my %allphrases;  # For sorting - an array of the <phrase> elements
 my %source; # id string to source phrase hash
 my %dest; # id string to dest phrase hash
 my %voice; # id string to voice phrase hash
@@ -201,6 +208,7 @@ if($english) {
     my $id;
     my $maybeid;
     my $withindest;
+    my $numphrases = 0;
     while(<ENG>) {
 
         # get rid of DOS newlines
@@ -268,6 +276,7 @@ if($english) {
 
         if($_ =~ /^ *id: ([^ \t\n]+)/i) {
             $maybeid=$1;
+            $sortorder{$maybeid}=$numphrases++;
         }
     }
     close(ENG);
@@ -369,7 +378,7 @@ while(<LANG>) {
 
     if($_ =~ /^( *\#|[ \t\n\r]*\z)/) {
         # comment or empty line - output it if it's part of the header
-        if ($header and $update) {
+        if ($header and ($update || $sortfile)) {
             print($_);
         }
         next;
@@ -402,6 +411,9 @@ while(<LANG>) {
                 elsif($dest =~ /^none\z/i) {
                     # "none" as dest (without quotes) means that this entire
                     # phrase is to be ignored
+                }
+                elsif($sortfile) {
+                    $allphrases{$idstr}=join('',@phrase);
                 }
                 elsif(!$update) {
                     # we don't do the fully detailed analysis when we "update"
@@ -508,6 +520,12 @@ if($update) {
             print $english{$_};
             print "</phrase>\n";
         }
+    }
+}
+
+if ($sortfile) {
+    for(sort { $sortorder{$a} <=> $sortorder{$b} } keys %allphrases) {
+         print $allphrases{$_};
     }
 }
 
