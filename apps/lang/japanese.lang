@@ -6107,7 +6107,7 @@
   </source>
   <dest>
     *: none
-    recording: "deprecated"
+    recording: deprecated
   </dest>
   <voice>
     *: none

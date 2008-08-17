@@ -9905,7 +9905,7 @@
     *: ""
   </source>
   <dest>
-    *: "deprecated"
+    *: deprecated
   </dest>
   <voice>
     *: ""

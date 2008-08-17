@@ -2553,7 +2553,7 @@
   </source>
   <dest>
     *: none
-    recording: "deprecated"
+    recording: deprecated
   </dest>
   <voice>
     *: none
@@ -6702,7 +6702,7 @@
     *: ""
   </source>
   <dest>
-    *: "deprecated"
+    *: deprecated
   </dest>
   <voice>
     *: ""

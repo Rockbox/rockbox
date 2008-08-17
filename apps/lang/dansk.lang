@@ -6467,7 +6467,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Slet nuværende stationer?"
+    radio: "Vil du slette nuværende stationer?"
   </voice>
 </phrase>
 <phrase>
@@ -6602,7 +6602,7 @@
     *: "Genstart nu?"
   </dest>
   <voice>
-    *: "Genstart nu?"
+    *: "Vil du genstarte nu?"
   </voice>
 </phrase>
 <phrase>
@@ -6855,7 +6855,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Gem ændringer?"
+    radio: "Vil du gemme ændringer?"
   </voice>
 </phrase>
 <phrase>
@@ -7027,7 +7027,7 @@
     *: "Slet dynamisk sætliste?"
   </dest>
   <voice>
-    *: "Slet dynamisk sætliste?"
+    *: "Vil du slette dynamisk sætliste?"
   </voice>
 </phrase>
 <phrase>
@@ -7436,7 +7436,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Ingen stationer fundet, skan automatisk?"
+    radio: "Ingen stationer fundet, vil du skanne automatisk?"
   </voice>
 </phrase>
 <phrase>
@@ -9999,7 +9999,7 @@
     *: "Nulstil tid?"
   </dest>
   <voice>
-    *: "Nulstil tid?"
+    *: "Vil du nulstille tid?"
   </voice>
 </phrase>
 <phrase>
