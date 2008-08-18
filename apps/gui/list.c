@@ -905,8 +905,6 @@ bool simplelist_show_list(struct simplelist_info *info)
             if (info->get_name == NULL)
                 gui_synclist_set_nb_items(&lists, simplelist_line_count*info->selection_size);
             gui_synclist_draw(&lists);
-            if (action != ACTION_NONE)
-                gui_synclist_speak_item(&lists);
             old_line_count = simplelist_line_count;
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
