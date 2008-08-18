@@ -414,7 +414,7 @@ long gui_wps_show(void)
                 else if (global_settings.skip_length > 0
                         && current_tick -last_right < HZ)
                 {
-                    prev_track(3+global_settings.skip_length*60);
+                    prev_track(3+global_settings.skip_length);
                     update_track = true;
                 }
                 else ffwd_rew(ACTION_WPS_SEEKBACK);
