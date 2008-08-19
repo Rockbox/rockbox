@@ -25,7 +25,8 @@ use IPC::Open2;
 use IPC::Open3;
 use Digest::MD5 qw(md5_hex);
 use DirHandle;
-use open IN => ':utf8';
+use open ':encoding(utf8)';
+use open ':std';
 
 sub printusage {
     print <<USAGE
@@ -91,13 +92,13 @@ sub init_tts {
             $cmd =~ s/\\/\\\\/g;
             print("> cscript //nologo $cmd\n") if $verbose;
             my $pid = open2(*CMD_OUT, *CMD_IN, "cscript //nologo $cmd");
-            binmode(*CMD_IN, ':encoding(utf16le):crlf');
-            binmode(*CMD_OUT, ':encoding(utf16le):crlf');
-            $SIG{INT} = sub { print(CMD_IN "QUIT\n"); panic_cleanup(); };
-            $SIG{KILL} = sub { print(CMD_IN "QUIT\n"); panic_cleanup(); };
-            print(CMD_IN "QUERY\tVENDOR\n");
+            binmode(*CMD_IN, ':encoding(utf16le)');
+            binmode(*CMD_OUT, ':encoding(utf16le)');
+            $SIG{INT} = sub { print(CMD_IN "QUIT\r\n"); panic_cleanup(); };
+            $SIG{KILL} = sub { print(CMD_IN "QUIT\r\n"); panic_cleanup(); };
+            print(CMD_IN "QUERY\tVENDOR\r\n");
             my $vendor = readline(*CMD_OUT);
-            chomp($vendor);
+            $vendor =~ s/\r\n//;
             %ret = (%ret,
                     "stdin" => *CMD_IN,
                     "stdout" => *CMD_OUT,
@@ -116,7 +117,7 @@ sub shutdown_tts {
             kill TERM => $$tts_object{"pid"};
         }
         case "sapi" {
-            print({$$tts_object{"stdin"}} "QUIT\n");
+            print({$$tts_object{"stdin"}} "QUIT\r\n");
             close($$tts_object{"stdin"});
         }
     }
@@ -237,7 +238,6 @@ sub voicestring {
     our $verbose;
     my ($string, $output, $tts_engine_opts, $tts_object) = @_;
     my $cmd;
-    binmode(STDOUT, ':encoding(UTF-8)');
     printf("Generate \"%s\" with %s in file %s\n", $string, $$tts_object{"name"}, $output) if $verbose;
     switch($$tts_object{"name"}) {
         case "festival" {
@@ -248,7 +248,6 @@ sub voicestring {
             # Open command, and filehandles for STDIN, STDOUT, STDERR
             my $pid = open3(*CMD_IN, *CMD_OUT, *CMD_ERR, $cmd);
             # Put the string to speak into STDIN and close it
-            binmode(CMD_IN, ':encoding(utf8)');
             print(CMD_IN $string);
             close(CMD_IN);
             # Read all output from festival_client (because it LIES TO US)
@@ -265,12 +264,12 @@ sub voicestring {
         case "espeak" {
             $cmd = "espeak $tts_engine_opts -w \"$output\"";
             print("> $cmd\n") if $verbose;
-            open(ESPEAK, "|-:encoding(utf8)", $cmd);
+            open(ESPEAK, "| $cmd");
             print ESPEAK $string . "\n";
             close(ESPEAK);
         }
         case "sapi" {
-            print({$$tts_object{"stdin"}} "SPEAK\t$output\t$string\n");
+            print({$$tts_object{"stdin"}} "SPEAK\t$output\t$string\r\n");
         }
         case "swift" {
             $cmd = "swift $tts_engine_opts -o \"$output\" \"$string\"";
@@ -287,7 +286,7 @@ sub wavtrim {
     printf("Trim \"%s\"\n", $file) if $verbose;
     my $cmd = "wavtrim \"$file\" $threshold";
     if ($$tts_object{"name"} eq "sapi") {
-        print({$$tts_object{"stdin"}} "EXEC\t$cmd\n");
+        print({$$tts_object{"stdin"}} "EXEC\t$cmd\r\n");
     }
     else {
         print("> $cmd\n") if $verbose;
@@ -302,7 +301,7 @@ sub encodewav {
     printf("Encode \"%s\" with %s in file %s\n", $input, $encoder, $output) if $verbose;
     my $cmd = "$encoder $encoder_opts \"$input\" \"$output\"";
     if ($$tts_object{"name"} eq "sapi") {
-        print({$$tts_object{"stdin"}} "EXEC\t$cmd\n");
+        print({$$tts_object{"stdin"}} "EXEC\t$cmd\r\n");
     }
     else {
         print("> $cmd\n") if $verbose;
@@ -314,7 +313,7 @@ sub encodewav {
 sub synchronize {
     my ($tts_object) = @_;
     if ($$tts_object{"name"} eq "sapi") {
-        print({$$tts_object{"stdin"}} "SYNC\t42\n");
+        print({$$tts_object{"stdin"}} "SYNC\t42\r\n");
         my $wait = readline($$tts_object{"stdout"});
         #ignore what's actually returned
     }
@@ -330,7 +329,7 @@ sub generateclips {
     my $voice = '';
     my $cmd = "genlang -o -t=$target -e=$english $langfile 2>/dev/null";
     my $pool_file;
-    open(VOICEFONTIDS, ">:utf8", "voicefontids");
+    open(VOICEFONTIDS, "> voicefontids");
     my $i = 0;
     local $| = 1; # make progress indicator work reliably
 
