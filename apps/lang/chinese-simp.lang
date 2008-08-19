@@ -83,10 +83,10 @@
     *: "Always"
   </source>
   <dest>
-    *: "永远"
+    *: "总是"
   </dest>
   <voice>
-    *: "永远"
+    *: "总是"
   </voice>
 </phrase>
 <phrase>
@@ -97,10 +97,10 @@
     *: "Loading..."
   </source>
   <dest>
-    *: "读取中..."
+    *: "读取..."
   </dest>
   <voice>
-    *: "读取中..."
+    *: "读取中"
   </voice>
 </phrase>
 <phrase>
@@ -117,7 +117,7 @@
   </dest>
   <voice>
     *: none
-    soft_shutdown: "按下 OFF 关机"
+    soft_shutdown: ""
   </voice>
 </phrase>
 <phrase>
@@ -128,7 +128,7 @@
     *: "Shutting down..."
   </source>
   <dest>
-    *: "关机中..."
+    *: "关机..."
   </dest>
   <voice>
     *: "关机中"
@@ -144,11 +144,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "重新开始播放..."
+    swcodec: "重启播放..."
   </dest>
   <voice>
     *: none
-    swcodec: "重新开始播放"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -161,11 +161,11 @@
   </source>
   <dest>
     *: none
-    ondio*: "请移除插入的MMC卡"
+    ondio*: "请取出MMC卡"
   </dest>
   <voice>
     *: none
-    ondio*: "请移除插入的 M M C 卡"
+    ondio*: "请取出MMC卡"
   </voice>
 </phrase>
 <phrase>
@@ -204,10 +204,10 @@
     *: "Sound Settings"
   </source>
   <dest>
-    *: "声音设定"
+    *: "声音设置"
   </dest>
   <voice>
-    *: "声音设定"
+    *: "声音设置"
   </voice>
 </phrase>
 <phrase>
@@ -218,10 +218,10 @@
     *: "General Settings"
   </source>
   <dest>
-    *: "一般设定"
+    *: "一般设置"
   </dest>
   <voice>
-    *: "一般设定"
+    *: "一般设置"
   </voice>
 </phrase>
 <phrase>
@@ -232,10 +232,10 @@
     *: "Manage Settings"
   </source>
   <dest>
-    *: "管理设定"
+    *: "管理设置"
   </dest>
   <voice>
-    *: "管理设定"
+    *: "管理设置"
   </voice>
 </phrase>
 <phrase>
@@ -262,11 +262,11 @@
   </source>
   <dest>
     *: none
-    radio: "收听FM广播"
+    radio: "FM广播"
   </dest>
   <voice>
     *: none
-    radio: "收听 F M 广播"
+    radio: "FM广播"
   </voice>
 </phrase>
 <phrase>
@@ -339,10 +339,10 @@
     *: "Bass"
   </source>
   <dest>
-    *: "低音音量"
+    *: "低频增益"
   </dest>
   <voice>
-    *: "低音音量"
+    *: "低频增益"
   </voice>
 </phrase>
 <phrase>
@@ -353,10 +353,10 @@
     *: "Treble"
   </source>
   <dest>
-    *: "高音音量"
+    *: "高频增益"
   </dest>
   <voice>
-    *: "高音音量"
+    *: "高频增益"
   </voice>
 </phrase>
 <phrase>
@@ -367,10 +367,10 @@
     *: "Balance"
   </source>
   <dest>
-    *: "平衡"
+    *: "左右声道平衡"
   </dest>
   <voice>
-    *: "平衡"
+    *: "左右声道平衡"
   </voice>
 </phrase>
 <phrase>
@@ -423,7 +423,7 @@
     *: "Mono Left"
   </source>
   <dest>
-    *: "单声道（左）"
+    *: "单声道(左)"
   </dest>
   <voice>
     *: "单声道 左"
@@ -437,7 +437,7 @@
     *: "Mono Right"
   </source>
   <dest>
-    *: "单声道（右）"
+    *: "单声道(右)"
   </dest>
   <voice>
     *: "单声道 右"
@@ -454,7 +454,7 @@
     *: "卡啦OK"
   </dest>
   <voice>
-    *: "卡啦 O K "
+    *: "卡啦 OK "
   </voice>
 </phrase>
 <phrase>
@@ -519,7 +519,7 @@
   </dest>
   <voice>
     *: none
-    masf: "自动音量调整衰減时间"
+    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -549,11 +549,11 @@
   </source>
   <dest>
     *: none
-    masf: "MDB有效"
+    masf: "MDB启用"
   </dest>
   <voice>
     *: none
-    masf: "M D B 有效"
+    masf: "MDB启用"
   </voice>
 </phrase>
 <phrase>
@@ -566,7 +566,7 @@
   </source>
   <dest>
     *: none
-    masf: "M D B 强度"
+    masf: "MDB强度"
   </dest>
   <voice>
     *: none
@@ -587,7 +587,7 @@
   </dest>
   <voice>
     *: none
-    masf: "M D B 泛音"
+    masf: "MDB泛音"
   </voice>
 </phrase>
 <phrase>
@@ -604,7 +604,7 @@
   </dest>
   <voice>
     *: none
-    masf: "M D B 中心频率"
+    masf: "MDB中心频率"
   </voice>
 </phrase>
 <phrase>
@@ -621,7 +621,7 @@
   </dest>
   <voice>
     *: none
-    masf: "M D B 形状"
+    masf: "MDB形状"
   </voice>
 </phrase>
 <phrase>
@@ -634,11 +634,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "交叉供音"
+    swcodec: "交叉馈音"
   </dest>
   <voice>
     *: none
-    swcodec: "交叉供音"
+    swcodec: "交叉馈音"
   </voice>
 </phrase>
 <phrase>
@@ -666,10 +666,10 @@
     *: "Playback Settings"
   </source>
   <dest>
-    *: "播放设定"
+    *: "播放设置"
   </dest>
   <voice>
-    *: "播放设定"
+    *: "播放设置"
   </voice>
 </phrase>
 <phrase>
@@ -680,10 +680,10 @@
     *: "File View"
   </source>
   <dest>
-    *: "文件查看设定"
+    *: "文件查看设置"
   </dest>
   <voice>
-    *: "文件查看设定"
+    *: "文件查看设置"
   </voice>
 </phrase>
 <phrase>
@@ -694,10 +694,10 @@
     *: "Display"
   </source>
   <dest>
-    *: "显示设定"
+    *: "显示设置"
   </dest>
   <voice>
-    *: "显示设定"
+    *: "显示设置"
   </voice>
 </phrase>
 <phrase>
@@ -722,10 +722,10 @@
     *: "Bookmarking"
   </source>
   <dest>
-    *: "书签设定"
+    *: "书签设置"
   </dest>
   <voice>
-    *: "书签设定"
+    *: "书签设置"
   </voice>
 </phrase>
 <phrase>
@@ -736,10 +736,10 @@
     *: "Language"
   </source>
   <dest>
-    *: "语言设定"
+    *: "语言设置"
   </dest>
   <voice>
-    *: "语言设定"
+    *: "语言设置"
   </voice>
 </phrase>
 <phrase>
@@ -767,7 +767,7 @@
     *: "浏览.cfg文件"
   </dest>
   <voice>
-    *: "浏览 c f g 文件"
+    *: "浏览.cfg文件"
   </voice>
 </phrase>
 <phrase>
@@ -778,10 +778,10 @@
     *: "Reset Settings"
   </source>
   <dest>
-    *: "重新设定"
+    *: "重置所有设置"
   </dest>
   <voice>
-    *: "重新设定"
+    *: "重置所有设置"
   </voice>
 </phrase>
 <phrase>
@@ -809,7 +809,7 @@
     *: "保存.cfg文件"
   </dest>
   <voice>
-    *: "保存 c f g 文件"
+    *: "保存.cfg文件"
   </voice>
 </phrase>
 <phrase>
@@ -822,11 +822,11 @@
   </source>
   <dest>
     *: none
-    recording: "录音设定"
+    recording: "录音设置"
   </dest>
   <voice>
     *: none
-    recording: "录音设定"
+    recording: "录音设置"
   </voice>
 </phrase>
 <phrase>
@@ -873,11 +873,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "预切"
+    swcodec: "预增益"
   </dest>
   <voice>
     *: none
-    swcodec: "预切"
+    swcodec: "预增益"
   </voice>
 </phrase>
 <phrase>
@@ -890,11 +890,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "简易均衡器设定"
+    swcodec: "简易均衡器设置"
   </dest>
   <voice>
     *: none
-    swcodec: "简易均衡器设定"
+    swcodec: "简易均衡器设置"
   </voice>
 </phrase>
 <phrase>
@@ -907,11 +907,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "详细均衡器设定"
+    swcodec: "进阶均衡器设置"
   </dest>
   <voice>
     *: none
-    swcodec: "详细均衡器设定"
+    swcodec: "进阶均衡器设置"
   </voice>
 </phrase>
 <phrase>
@@ -924,11 +924,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "保存均衡器设定"
+    swcodec: "保存均衡器设置"
   </dest>
   <voice>
     *: none
-    swcodec: "保存均衡器设定"
+    swcodec: "保存均衡器设置"
   </voice>
 </phrase>
 <phrase>
@@ -941,11 +941,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "浏览均衡器设定"
+    swcodec: "浏览均衡器设置"
   </dest>
   <voice>
     *: none
-    swcodec: "浏览均衡器设定"
+    swcodec: "浏览均衡器设置"
   </voice>
 </phrase>
 <phrase>
@@ -958,11 +958,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "编辑模式: %s"
+    swcodec: "编辑模式:%s"
   </dest>
   <voice>
     *: none
-    swcodec: "编辑模式 %s"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -975,11 +975,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "%d Hz 频带增益"
+    swcodec: "%dHz频段增益"
   </dest>
   <voice>
     *: none
-    swcodec: "%d 频带增益"
+    swcodec: "%d频段增益"
   </voice>
 </phrase>
 <phrase>
@@ -992,11 +992,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "低峰值过滤"
+    swcodec: "低通滤波器"
   </dest>
   <voice>
     *: none
-    swcodec: "低峰值过滤"
+    swcodec: "低通滤波器"
   </voice>
 </phrase>
 <phrase>
@@ -1009,11 +1009,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "峰值过滤 %d"
+    swcodec: "带通滤波器%d"
   </dest>
   <voice>
     *: none
-    swcodec: "峰值过滤 %d"
+    swcodec: "带通滤波器%d"
   </voice>
 </phrase>
 <phrase>
@@ -1026,11 +1026,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "高峰值过滤"
+    swcodec: "高通滤波器"
   </dest>
   <voice>
     *: none
-    swcodec: "高峰值过滤"
+    swcodec: "高通滤波器"
   </voice>
 </phrase>
 <phrase>
@@ -1043,11 +1043,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "截断频率"
+    swcodec: "截止频率"
   </dest>
   <voice>
     *: none
-    swcodec: "截断频率"
+    swcodec: "截止频率"
   </voice>
 </phrase>
 <phrase>
@@ -1077,11 +1077,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Q"
+    swcodec: "Q值(品质因素)"
   </dest>
   <voice>
     *: none
-    swcodec: "Q"
+    swcodec: "Q值(品质因素)"
   </voice>
 </phrase>
 <phrase>
@@ -1092,10 +1092,10 @@
     *: "Create Playlist"
   </source>
   <dest>
-    *: "建立播放清单"
+    *: "创建播放列表"
   </dest>
   <voice>
-    *: "建立播放清单"
+    *: "创建播放列表"
   </voice>
 </phrase>
 <phrase>
@@ -1106,10 +1106,10 @@
     *: "View Current Playlist"
   </source>
   <dest>
-    *: "查看当前播放清单"
+    *: "查看当前播放列表"
   </dest>
   <voice>
-    *: "查看当前播放清单"
+    *: "查看当前播放列表"
   </voice>
 </phrase>
 <phrase>
@@ -1120,10 +1120,10 @@
     *: "Save Current Playlist"
   </source>
   <dest>
-    *: "保存当前播放清单"
+    *: "保存当前播放列表"
   </dest>
   <voice>
-    *: "保存当前播放清单"
+    *: "保存当前播放列表"
   </voice>
 </phrase>
 <phrase>
@@ -1134,10 +1134,10 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "递归插入目录"
+    *: "递归插入子目录"
   </dest>
   <voice>
-    *: "递归插入目录"
+    *: "递归插入子目录"
   </voice>
 </phrase>
 <phrase>
@@ -1148,10 +1148,10 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "消除动态播放清单时警告"
+    *: "动态播放列表擦除前警告"
   </dest>
   <voice>
-    *: "消除动态播放清单时警告"
+    *: "动态播放列表擦除前警告"
   </voice>
 </phrase>
 <phrase>
@@ -1176,10 +1176,10 @@
     *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "调试(请勿进入!)"
+    *: "调试(勿入!)"
   </dest>
   <voice>
-    *: "调试 请勿进入"
+    *: "调试 勿入"
   </voice>
 </phrase>
 <phrase>
@@ -1190,10 +1190,10 @@
     *: "Shuffle"
   </source>
   <dest>
-    *: "随机播放"
+    *: "乱序播放"
   </dest>
   <voice>
-    *: "随机播放"
+    *: "乱序播放"
   </voice>
 </phrase>
 <phrase>
@@ -1204,10 +1204,10 @@
     *: "Repeat"
   </source>
   <dest>
-    *: "重覆"
+    *: "重复"
   </dest>
   <voice>
-    *: "重覆"
+    *: "重复"
   </voice>
 </phrase>
 <phrase>
@@ -1218,10 +1218,10 @@
     *: "One"
   </source>
   <dest>
-    *: "一首"
+    *: "单曲"
   </dest>
   <voice>
-    *: "一首"
+    *: "单曲"
   </voice>
 </phrase>
 <phrase>
@@ -1232,10 +1232,10 @@
     *: "A-B"
   </source>
   <dest>
-    *: "A-B"
+    *: "A-B段"
   </dest>
   <voice>
-    *: "A B"
+    *: "AB段"
   </voice>
 </phrase>
 <phrase>
@@ -1246,10 +1246,10 @@
     *: "Play Selected First"
   </source>
   <dest>
-    *: "先播放选择的档案"
+    *: "先播放选中的文件"
   </dest>
   <voice>
-    *: "先播放选择的档案"
+    *: "先播放选中的文件"
   </voice>
 </phrase>
 <phrase>
@@ -1275,11 +1275,11 @@
     flash_storage: none
   </source>
   <dest>
-    *: "防抖动缓冲"
+    *: "防跳音缓冲"
     flash_storage: none
   </dest>
   <voice>
-    *: "防抖动缓冲"
+    *: "防跳音缓冲"
     flash_storage: none
   </voice>
 </phrase>
@@ -1305,10 +1305,10 @@
     *: "Party Mode"
   </source>
   <dest>
-    *: "派对模式"
+    *: "聚会模式"
   </dest>
   <voice>
-    *: "派对模式"
+    *: "聚会模式"
   </voice>
 </phrase>
 <phrase>
@@ -1321,11 +1321,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "交叉淡变"
+    swcodec: "淡入淡出"
   </dest>
   <voice>
     *: none
-    swcodec: "交叉淡变"
+    swcodec: "淡入淡出"
   </voice>
 </phrase>
 <phrase>
@@ -1336,10 +1336,10 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Replaygain"
+    *: "播放增益"
   </dest>
   <voice>
-    *: "Replaygain"
+    *: "播放增益"
   </voice>
 </phrase>
 <phrase>
@@ -1352,11 +1352,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "哔音量"
+    swcodec: "哔声音量"
   </dest>
   <voice>
     *: none
-    swcodec: "哔音量"
+    swcodec: "哔声音量"
   </voice>
 </phrase>
 <phrase>
@@ -1386,11 +1386,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "中"
+    swcodec: "适中"
   </dest>
   <voice>
     *: none
-    swcodec: "中"
+    swcodec: "适中"
   </voice>
 </phrase>
 <phrase>
@@ -1477,10 +1477,10 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "自动修改目录"
+    *: "自动跳转目录"
   </dest>
   <voice>
-    *: "自动修改目录"
+    *: "自动跳转目录"
   </voice>
 </phrase>
 <phrase>
@@ -1491,10 +1491,10 @@
     *: "Database"
   </source>
   <dest>
-    *: "标签信息库"
+    *: "标签数据库"
   </dest>
   <voice>
-    *: "标签信息库"
+    *: "标签数据库"
   </voice>
 </phrase>
 <phrase>
@@ -1550,10 +1550,10 @@
     *: "Committing database"
   </source>
   <dest>
-    *: "提交信息库"
+    *: "提交数据库"
   </dest>
   <voice>
-    *: "提交信息库"
+    *: "提交数据库"
   </voice>
 </phrase>
 <phrase>
@@ -1564,10 +1564,10 @@
     *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "收集运行时数据"
+    *: "搜集运行时数据"
   </dest>
   <voice>
-    *: "收集运行时数据"
+    *: "搜集运行时数据"
   </voice>
 </phrase>
 <phrase>
@@ -1578,10 +1578,10 @@
     *: "Sort Case Sensitive"
   </source>
   <dest>
-    *: "排序时区別大小写"
+    *: "排序时区分大小写"
   </dest>
   <voice>
-    *: "排序时区別大小写"
+    *: "排序时区分大小写"
   </voice>
 </phrase>
 <phrase>
@@ -1690,10 +1690,10 @@
     *: "Supported"
   </source>
   <dest>
-    *: "支持的"
+    *: "Rockbox支持的"
   </dest>
   <voice>
-    *: "支持的"
+    *: "Rockbox支持的"
   </voice>
 </phrase>
 <phrase>
@@ -1704,10 +1704,10 @@
     *: "Music"
   </source>
   <dest>
-    *: "音乐"
+    *: "音乐文件"
   </dest>
   <voice>
-    *: "音乐"
+    *: "音乐文件"
   </voice>
 </phrase>
 <phrase>
@@ -1718,10 +1718,10 @@
     *: "Follow Playlist"
   </source>
   <dest>
-    *: "跟随播放清单"
+    *: "跟随播放列表"
   </dest>
   <voice>
-    *: "跟随播放清单"
+    *: "跟随播放列表"
   </voice>
 </phrase>
 <phrase>
@@ -1766,7 +1766,7 @@
     *: "浏览.wps文件"
   </dest>
   <voice>
-    *: "浏览 w p s 文件"
+    *: "浏览.wps文件"
   </voice>
 </phrase>
 <phrase>
@@ -1783,7 +1783,7 @@
   </dest>
   <voice>
     *: none
-    remote: "浏览 r w p s 文件"
+    remote: "浏览.rwps文件"
   </voice>
 </phrase>
 <phrase>
@@ -1794,10 +1794,10 @@
     *: "LCD Settings"
   </source>
   <dest>
-    *: "显示屏设定"
+    *: "屏幕设置"
   </dest>
   <voice>
-    *: "显示屏设定"
+    *: "屏幕设置"
   </voice>
 </phrase>
 <phrase>
@@ -1810,11 +1810,11 @@
   </source>
   <dest>
     *: none
-    remote: "线控液晶屏设定"
+    remote: "线控屏幕设置"
   </dest>
   <voice>
     *: none
-    remote: "线控液晶屏设定"
+    remote: "线控屏幕设置"
   </voice>
 </phrase>
 <phrase>
@@ -1825,10 +1825,10 @@
     *: "Scrolling"
   </source>
   <dest>
-    *: "滚动设定"
+    *: "滚动设置"
   </dest>
   <voice>
-    *: "滚动设定"
+    *: "滚动设置"
   </voice>
 </phrase>
 <phrase>
@@ -1841,11 +1841,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "状态栏 / 列/滚动条"
+    lcd_bitmap: "状态栏/滚动条"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "状态栏或列滚动条"
+    lcd_bitmap: "状态栏或滚动条"
   </voice>
 </phrase>
 <phrase>
@@ -1857,11 +1857,11 @@
     masd: none
   </source>
   <dest>
-    *: "高峰显示表"
+    *: "峰值电平表"
     masd: none
   </dest>
   <voice>
-    *: "高峰显示表"
+    *: "峰值电平表"
     masd: none
   </voice>
 </phrase>
@@ -1887,10 +1887,10 @@
     *: "Latin1 (ISO-8859-1)"
   </source>
   <dest>
-    *: "拉丁文1 (ISO-8859-1)"
+    *: "拉丁文1(ISO-8859-1)"
   </dest>
   <voice>
-    *: "拉丁文 1"
+    *: "拉丁文1"
   </voice>
 </phrase>
 <phrase>
@@ -1901,7 +1901,7 @@
     *: "Greek (ISO-8859-7)"
   </source>
   <dest>
-    *: "希腊文 (ISO-8859-7)"
+    *: "希腊文(ISO-8859-7)"
   </dest>
   <voice>
     *: "希腊文"
@@ -1917,7 +1917,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "希伯来文 (ISO-8859-8)"
+    lcd_bitmap: "希伯来文(ISO-8859-8)"
   </dest>
   <voice>
     *: none
@@ -1932,7 +1932,7 @@
     *: "Cyrillic (CP1251)"
   </source>
   <dest>
-    *: "西里尔文 (CP1251)"
+    *: "西里尔文(CP1251)"
   </dest>
   <voice>
     *: "西里尔文"
@@ -1948,7 +1948,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "泰语 (ISO-8859-11)"
+    lcd_bitmap: "泰语(ISO-8859-11)"
   </dest>
   <voice>
     *: none
@@ -1965,7 +1965,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "阿拉伯文 (CP1256)"
+    lcd_bitmap: "阿拉伯文(CP1256)"
   </dest>
   <voice>
     *: none
@@ -1980,7 +1980,7 @@
     *: "Turkish (ISO-8859-9)"
   </source>
   <dest>
-    *: "土尔其文 (ISO-8859-9)"
+    *: "土尔其文(ISO-8859-9)"
   </dest>
   <voice>
     *: "土尔其文"
@@ -1994,10 +1994,10 @@
     *: "Latin Extended (ISO-8859-2)"
   </source>
   <dest>
-    *: "扩大拉丁文 (ISO-8859-2)"
+    *: "扩展拉丁文(ISO-8859-2)"
   </dest>
   <voice>
-    *: "扩大拉丁文"
+    *: "扩展拉丁文"
   </voice>
 </phrase>
 <phrase>
@@ -2010,7 +2010,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "日文 (SJIS)"
+    lcd_bitmap: "日文(SJIS)"
   </dest>
   <voice>
     *: none
@@ -2027,7 +2027,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "简体中文 (GB2312)"
+    lcd_bitmap: "简体中文(GB2312)"
   </dest>
   <voice>
     *: none
@@ -2044,7 +2044,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "韩文 (KSX1001)"
+    lcd_bitmap: "韩文(KSX1001)"
   </dest>
   <voice>
     *: none
@@ -2061,7 +2061,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "繁体中文 (BIG5)"
+    lcd_bitmap: "繁体中文(BIG5)"
   </dest>
   <voice>
     *: none
@@ -2076,7 +2076,7 @@
     *: "Unicode (UTF-8)"
   </source>
   <dest>
-    *: "万国码 (UTF-8)"
+    *: "万国码(UTF-8)"
   </dest>
   <voice>
     *: "万国码"
@@ -2135,10 +2135,10 @@
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "自动关闭电源"
+    *: "闲置自动关机"
   </dest>
   <voice>
-    *: "自动关闭电源"
+    *: "闲置自动关机"
   </voice>
 </phrase>
 <phrase>
@@ -2196,11 +2196,11 @@
   </source>
   <dest>
     *: none
-    recording,player: "声音输入"
+    recording,player: "线路输入"
   </dest>
   <voice>
     *: none
-    recording,player: "声音输入"
+    recording,player: "线路输入"
   </voice>
 </phrase>
 <phrase>
@@ -2228,10 +2228,10 @@
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "停止时保存书签"
+    *: "播放停止时保存书签"
   </dest>
   <voice>
-    *: "停止时保存书签"
+    *: "播放停止时保存书签"
   </voice>
 </phrase>
 <phrase>
@@ -2242,10 +2242,10 @@
     *: "Yes - Recent only"
   </source>
   <dest>
-    *: "是 - 只保存到最近的书签"
+    *: "是-保存到最近的书签"
   </dest>
   <voice>
-    *: "是  只保存到最近的书签"
+    *: "是 保存到最近的书签"
   </voice>
 </phrase>
 <phrase>
@@ -2256,10 +2256,10 @@
     *: "Ask - Recent only"
   </source>
   <dest>
-    *: "询问 - 只保存到最近的书签"
+    *: "每次询问-保存到最近的书签"
   </dest>
   <voice>
-    *: "询问  只保存到最近的书签"
+    *: "每次询问 保存到最近的书签"
   </voice>
 </phrase>
 <phrase>
@@ -2270,10 +2270,10 @@
     *: "Load Last Bookmark"
   </source>
   <dest>
-    *: "载入最近的书签"
+    *: "载入最近书签"
   </dest>
   <voice>
-    *: "载入最近的书签"
+    *: "载入最近书签"
   </voice>
 </phrase>
 <phrase>
@@ -2284,10 +2284,10 @@
     *: "Maintain a List of Recent Bookmarks?"
   </source>
   <dest>
-    *: "维护最近书签清单?"
+    *: "维护最近书签列表?"
   </dest>
   <voice>
-    *: "维护最近书签清单吗"
+    *: "维护最近书签列表吗"
   </voice>
 </phrase>
 <phrase>
@@ -2298,10 +2298,10 @@
     *: "Unique only"
   </source>
   <dest>
-    *: "只包存唯一的"
+    *: "只保存唯一一份"
   </dest>
   <voice>
-    *: "只包存唯一的"
+    *: "只保存唯一一份"
   </voice>
 </phrase>
 <phrase>
@@ -2340,10 +2340,10 @@
     *: "Voice Filenames"
   </source>
   <dest>
-    *: "语音文件名称"
+    *: "语音文件名"
   </dest>
   <voice>
-    *: "语音文件名称"
+    *: "语音文件名"
   </voice>
 </phrase>
 <phrase>
@@ -2382,10 +2382,10 @@
     *: ".talk mp3 clip"
   </source>
   <dest>
-    *: ".talk 片段"
+    *: ".talk mp3 片段"
   </dest>
   <voice>
-    *: "talk 片段"
+    *: ".talk mp3片段"
   </voice>
 </phrase>
 <phrase>
@@ -2520,11 +2520,11 @@
   </source>
   <dest>
     *: none
-    recording: "预录时间"
+    recording: "预录时长"
   </dest>
   <voice>
     *: none
-    recording: "预录时间"
+    recording: "预录时长"
   </voice>
 </phrase>
 <phrase>
@@ -2588,11 +2588,11 @@
   </source>
   <dest>
     *: none
-    recording: "削波显示灯"
+    recording: "削波指示灯"
   </dest>
   <voice>
     *: none
-    recording: "削波显示灯"
+    recording: "削波指示灯"
   </voice>
 </phrase>
 <phrase>
@@ -2605,11 +2605,11 @@
   </source>
   <dest>
     *: none
-    remote: "只有主机"
+    remote: "只是主机"
   </dest>
   <voice>
     *: none
-    remote: "只有主机"
+    remote: "只是主机"
   </voice>
 </phrase>
 <phrase>
@@ -2622,11 +2622,11 @@
   </source>
   <dest>
     *: none
-    remote: "只有遥控"
+    remote: "只是线控"
   </dest>
   <voice>
     *: none
-    remote: "只有遥控"
+    remote: "只是线控"
   </voice>
 </phrase>
 <phrase>
@@ -2639,11 +2639,11 @@
   </source>
   <dest>
     *: none
-    remote: "主机与遥控"
+    remote: "主机与线控"
   </dest>
   <voice>
     *: none
-    remote: "主机与遥控"
+    remote: "主机与线控"
   </voice>
 </phrase>
 <phrase>
@@ -2654,10 +2654,10 @@
     *: "FF/RW Min Step"
   </source>
   <dest>
-    *: "快进/快退最小间隔"
+    *: "快进/快退步长"
   </dest>
   <voice>
-    *: "快进或快退最小间隔"
+    *: "快进或快退步长"
   </voice>
 </phrase>
 <phrase>
@@ -2684,11 +2684,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "开启Crossfade"
+    swcodec: "开启淡入淡出"
   </dest>
   <voice>
     *: none
-    swcodec: "开启 Crossfade"
+    swcodec: "开启淡入淡出"
   </voice>
 </phrase>
 <phrase>
@@ -2701,11 +2701,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "仅在跳文件时"
+    swcodec: "仅在曲目跳变时"
   </dest>
   <voice>
     *: none
-    swcodec: "仅在跳文件时"
+    swcodec: "仅在曲目跳变时"
   </voice>
 </phrase>
 <phrase>
@@ -2718,11 +2718,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "淡入延迟"
+    swcodec: "淡入时滞"
   </dest>
   <voice>
     *: none
-    swcodec: "淡入延迟"
+    swcodec: "淡入时滞"
   </voice>
 </phrase>
 <phrase>
@@ -2735,11 +2735,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "淡入长度"
+    swcodec: "淡入时长"
   </dest>
   <voice>
     *: none
-    swcodec: "淡入长度"
+    swcodec: "淡入时长"
   </voice>
 </phrase>
 <phrase>
@@ -2752,11 +2752,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "淡出延迟"
+    swcodec: "淡出时滞"
   </dest>
   <voice>
     *: none
-    swcodec: "淡出延迟"
+    swcodec: "淡出时滞"
   </voice>
 </phrase>
 <phrase>
@@ -2769,11 +2769,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "淡出长度"
+    swcodec: "淡出时长"
   </dest>
   <voice>
     *: none
-    swcodec: "淡出长度"
+    swcodec: "淡出时长"
   </voice>
 </phrase>
 <phrase>
@@ -2818,10 +2818,10 @@
     *: "Enable Replaygain"
   </source>
   <dest>
-    *: "开启Replaygain"
+    *: "开启播放增益"
   </dest>
   <voice>
-    *: "开启 Replaygain"
+    *: "开启播放增益"
   </voice>
 </phrase>
 <phrase>
@@ -2834,11 +2834,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "防止截断"
+    swcodec: "防止削波"
   </dest>
   <voice>
     *: none
-    swcodec: "防止截断"
+    swcodec: "防止削波"
   </voice>
 </phrase>
 <phrase>
@@ -2849,10 +2849,10 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "Replaygain种类"
+    *: "播放增益种类"
   </dest>
   <voice>
-    *: "Replaygain 种类"
+    *: "播放增益种类"
   </voice>
 </phrase>
 <phrase>
@@ -2863,10 +2863,10 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Album Gain"
+    *: "专辑增益"
   </dest>
   <voice>
-    *: "Album Gain"
+    *: "专辑增益"
   </voice>
 </phrase>
 <phrase>
@@ -2877,10 +2877,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Track Gain"
+    *: "单曲增益"
   </dest>
   <voice>
-    *: "Track Gain"
+    *: "单曲增益"
   </voice>
 </phrase>
 <phrase>
@@ -2891,10 +2891,10 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "随机播放时使用Track Gain"
+    *: "乱序播放时使用单曲增益"
   </dest>
   <voice>
-    *: "随机播放时使用Track Gain"
+    *: "乱序播放时使用单曲增益"
   </voice>
 </phrase>
 <phrase>
@@ -2905,10 +2905,10 @@
     *: "Pre-amp"
   </source>
   <dest>
-    *: "前置放大"
+    *: "预增益"
   </dest>
   <voice>
-    *: "前置放大"
+    *: "预增益"
   </voice>
 </phrase>
 <phrase>
@@ -2950,10 +2950,10 @@
     *: "Caption Backlight"
   </source>
   <dest>
-    *: "标题背光"
+    *: "曲目切换时的背光"
   </dest>
   <voice>
-    *: "标题背光"
+    *: "曲目切换时的背光"
   </voice>
 </phrase>
 <phrase>
@@ -3015,10 +3015,10 @@
     *: "Contrast"
   </source>
   <dest>
-    *: "对比"
+    *: "对比度"
   </dest>
   <voice>
-    *: "对比"
+    *: "对比度"
   </voice>
 </phrase>
 <phrase>
@@ -3029,10 +3029,10 @@
     *: "First Buttonpress Enables Backlight Only"
   </source>
   <dest>
-    *: "第一次按钮只开启背光"
+    *: "首次按键仅开启背光"
   </dest>
   <voice>
-    *: "第一次按钮只开启背光"
+    *: "首次按键仅开启背光"
   </voice>
 </phrase>
 <phrase>
@@ -3079,11 +3079,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "上下反转"
+    lcd_bitmap: "上下翻转"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "上下反转"
+    lcd_bitmap: "上下翻转"
   </voice>
 </phrase>
 <phrase>
@@ -3096,11 +3096,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "项目选择方式"
+    lcd_bitmap: "项目选择条类型"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "项目选择方式"
+    lcd_bitmap: "项目选择条类型"
   </voice>
 </phrase>
 <phrase>
@@ -3113,11 +3113,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "指示器"
+    lcd_bitmap: "指示符"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "指示器"
+    lcd_bitmap: "指示符"
   </voice>
 </phrase>
 <phrase>
@@ -3130,11 +3130,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "整行反白"
+    lcd_bitmap: "反色条"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "整行反白"
+    lcd_bitmap: "反色条"
   </voice>
 </phrase>
 <phrase>
@@ -3181,11 +3181,11 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "前景颜色"
+    lcd_non-mono: "字体颜色"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "前景颜色"
+    lcd_non-mono: "字体颜色"
   </voice>
 </phrase>
 <phrase>
@@ -3198,11 +3198,11 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "重设颜色"
+    lcd_non-mono: "重置颜色"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "重设颜色"
+    lcd_non-mono: "重置颜色"
   </voice>
 </phrase>
 <phrase>
@@ -3230,10 +3230,10 @@
     *: "Scroll Speed"
   </source>
   <dest>
-    *: "卷动速度"
+    *: "滚动速度"
   </dest>
   <voice>
-    *: "卷动速度"
+    *: "滚动速度"
   </voice>
 </phrase>
 <phrase>
@@ -3244,10 +3244,10 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "卷动速度设定范例: Setting Example"
+    *: "滚动速度设置范例文字"
   </dest>
   <voice>
-    *: "卷动速度设定范例: Setting Example"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3258,10 +3258,10 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "卷动开始延迟"
+    *: "滚动开始时滞"
   </dest>
   <voice>
-    *: "卷动开始延迟"
+    *: "滚动开始时滞"
   </voice>
 </phrase>
 <phrase>
@@ -3272,10 +3272,10 @@
     *: "Scroll Step Size"
   </source>
   <dest>
-    *: "卷动间隔"
+    *: "滚动步长"
   </dest>
   <voice>
-    *: "卷动间隔"
+    *: "滚动步长"
   </voice>
 </phrase>
 <phrase>
@@ -3286,10 +3286,10 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "卷动间隔设定范例文字: Example Text"
+    *: "滚动步长设置范例文字"
   </dest>
   <voice>
-    *: "卷动间隔设定范例文字: Example Text"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3300,10 +3300,10 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "双向卷动限制"
+    *: "双向滚动限制"
   </dest>
   <voice>
-    *: "双向卷动限制"
+    *: "双向滚动限制"
   </voice>
 </phrase>
 <phrase>
@@ -3314,10 +3314,10 @@
     *: "Jump Scroll"
   </source>
   <dest>
-    *: "跳跃卷动"
+    *: "跳跃滚动"
   </dest>
   <voice>
-    *: "跳跃卷动"
+    *: "跳跃滚动"
   </voice>
 </phrase>
 <phrase>
@@ -3342,10 +3342,10 @@
     *: "Jump Scroll Delay"
   </source>
   <dest>
-    *: "跳跃卷动延迟时间"
+    *: "跳跃滚动时滞"
   </dest>
   <voice>
-    *: "跳跃卷动延迟时间"
+    *: "跳跃滚动时滞"
   </voice>
 </phrase>
 <phrase>
@@ -3356,10 +3356,10 @@
     *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: "画面范围外卷动"
+    *: "屏幕范围外滚动"
   </dest>
   <voice>
-    *: "画面范围外卷动"
+    *: "屏幕范围外滚动"
   </voice>
 </phrase>
 <phrase>
@@ -3370,10 +3370,10 @@
     *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: "画面卷动间隔"
+    *: "屏幕滚动步长"
   </dest>
   <voice>
-    *: "画面卷动间隔"
+    *: "屏幕滚动步长"
   </voice>
 </phrase>
 <phrase>
@@ -3384,10 +3384,10 @@
     *: "Paged Scrolling"
   </source>
   <dest>
-    *: "页卷动"
+    *: "页滚动"
   </dest>
   <voice>
-    *: "页卷动"
+    *: "页滚动"
   </voice>
 </phrase>
 <phrase>
@@ -3400,11 +3400,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "卷动轴"
+    lcd_bitmap: "滚动条"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "卷动轴"
+    lcd_bitmap: "滚动条"
   </voice>
 </phrase>
 <phrase>
@@ -3417,11 +3417,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "状态列"
+    lcd_bitmap: "状态栏"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "状态列"
+    lcd_bitmap: "状态栏"
   </voice>
 </phrase>
 <phrase>
@@ -3434,11 +3434,11 @@
   </source>
   <dest>
     *: none
-    recorder_pad: "按钮列"
+    recorder_pad: "按键条"
   </dest>
   <voice>
     *: none
-    recorder_pad: "按钮列"
+    recorder_pad: "按键条"
   </voice>
 </phrase>
 <phrase>
@@ -3468,11 +3468,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "电池显示"
+    lcd_bitmap: "电量显示"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "电池显示"
+    lcd_bitmap: "电量显示"
   </voice>
 </phrase>
 <phrase>
@@ -3485,11 +3485,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "图形"
+    lcd_bitmap: "图形式"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "图形"
+    lcd_bitmap: "图形式"
   </voice>
 </phrase>
 <phrase>
@@ -3502,11 +3502,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "数值"
+    lcd_bitmap: "数值式"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "数值"
+    lcd_bitmap: "数值式"
   </voice>
 </phrase>
 <phrase>
@@ -3518,11 +3518,11 @@
     masd: none
   </source>
   <dest>
-    *: "Peak Release"
+    *: "峰值释放速度"
     masd: none
   </dest>
   <voice>
-    *: "Peak Release"
+    *: "峰值释放速度"
     masd: none
   </voice>
 </phrase>
@@ -3549,11 +3549,11 @@
     masd: none
   </source>
   <dest>
-    *: "Peak Hold Time"
+    *: "峰值保持时长"
     masd: none
   </dest>
   <voice>
-    *: "Peak Hold Time"
+    *: "峰值保持时长"
     masd: none
   </voice>
 </phrase>
@@ -3566,11 +3566,11 @@
     masd: none
   </source>
   <dest>
-    *: "Clip Hold Time"
+    *: "削波保持时长"
     masd: none
   </dest>
   <voice>
-    *: "Clip Hold Time"
+    *: "削波保持时长"
     masd: none
   </voice>
 </phrase>
@@ -3583,11 +3583,11 @@
     masd: none
   </source>
   <dest>
-    *: "Eternal"
+    *: "外部"
     masd: none
   </dest>
   <voice>
-    *: "Eternal"
+    *: "外部"
     masd: none
   </voice>
 </phrase>
@@ -3600,11 +3600,11 @@
     masd: none
   </source>
   <dest>
-    *: "Scale"
+    *: "范围坐标"
     masd: none
   </dest>
   <voice>
-    *: "Scale"
+    *: "范围坐标"
     masd: none
   </voice>
 </phrase>
@@ -3617,11 +3617,11 @@
     masd: none
   </source>
   <dest>
-    *: "对数 (dB)"
+    *: "对数(dB)坐标"
     masd: none
   </dest>
   <voice>
-    *: "对数 (dB)"
+    *: "对数坐标"
     masd: none
   </voice>
 </phrase>
@@ -3634,11 +3634,11 @@
     masd: none
   </source>
   <dest>
-    *: "线性 (%)"
+    *: "线性(%)坐标"
     masd: none
   </dest>
   <voice>
-    *: "线性 (%)"
+    *: "线性坐标"
     masd: none
   </voice>
 </phrase>
@@ -3651,11 +3651,11 @@
     masd: none
   </source>
   <dest>
-    *: "最小范围"
+    *: "范围最小值"
     masd: none
   </dest>
   <voice>
-    *: "最小范围"
+    *: "范围最小值"
     masd: none
   </voice>
 </phrase>
@@ -3668,11 +3668,11 @@
     masd: none
   </source>
   <dest>
-    *: "最大范围"
+    *: "范围最大值"
     masd: none
   </dest>
   <voice>
-    *: "最大范围"
+    *: "范围最大值"
     masd: none
   </voice>
 </phrase>
@@ -3734,11 +3734,11 @@
   </source>
   <dest>
     *: none
-    battery_types: "N i M H "
+    battery_types: "锂镁氢"
   </dest>
   <voice>
     *: none
-    battery_types: "NiMH"
+    battery_types: "锂镁氢"
   </voice>
 </phrase>
 <phrase>
@@ -3783,10 +3783,10 @@
     *: "Time"
   </source>
   <dest>
-    *: "设定日期时间"
+    *: "按照时长"
   </dest>
   <voice>
-    *: "设定日期时间"
+    *: "按照时长"
   </voice>
 </phrase>
 <phrase>
@@ -3848,10 +3848,10 @@
     *: "Max Entries in File Browser"
   </source>
   <dest>
-    *: "目录浏览器最大文件数"
+    *: "文件浏览器最大条目数"
   </dest>
   <voice>
-    *: "目录浏览器最大文件数"
+    *: "文件浏览器最大条目数"
   </voice>
 </phrase>
 <phrase>
@@ -3862,10 +3862,10 @@
     *: "Max Playlist Size"
   </source>
   <dest>
-    *: "最大播放清单歌曲数"
+    *: "播放列表最大曲目数"
   </dest>
   <voice>
-    *: "最大播放清单歌曲数"
+    *: "播放列表最大曲目数"
   </voice>
 </phrase>
 <phrase>
@@ -3876,10 +3876,10 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "播放清单"
+    *: "播放列表"
   </dest>
   <voice>
-    *: "播放清单"
+    *: "播放列表"
   </voice>
 </phrase>
 <phrase>
@@ -3904,10 +3904,10 @@
     *: "Show Track Info"
   </source>
   <dest>
-    *: "显示音轨信息"
+    *: "显示曲目信息"
   </dest>
   <voice>
-    *: "显示音轨信息"
+    *: "显示曲目信息"
   </voice>
 </phrase>
 <phrase>
@@ -3918,10 +3918,10 @@
     *: "Set Song Rating"
   </source>
   <dest>
-    *: "设定歌曲评分"
+    *: "设置曲目评分"
   </dest>
   <voice>
-    *: "设定歌曲评分"
+    *: "设置曲目评分"
   </voice>
 </phrase>
 <phrase>
@@ -3988,7 +3988,7 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "文件/目录已存在。覆盖？"
+    *: "文件/目录已存在.覆盖?"
   </dest>
   <voice>
     *: "文件/目录已存在 覆盖吗"
@@ -4018,11 +4018,11 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "设定为背景"
+    lcd_non-mono: "设置为背景"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "设定为背景"
+    lcd_non-mono: "设置为背景"
   </voice>
 </phrase>
 <phrase>
@@ -4050,7 +4050,7 @@
     *: "确认刪除?"
   </dest>
   <voice>
-    *: "确认刪除?"
+    *: "确认刪除吗"
   </voice>
 </phrase>
 <phrase>
@@ -4075,10 +4075,10 @@
     *: "Open With..."
   </source>
   <dest>
-    *: "打开文件为..."
+    *: "打开方式..."
   </dest>
   <voice>
-    *: "打开文件为"
+    *: "打开方式"
   </voice>
 </phrase>
 <phrase>
@@ -4089,10 +4089,10 @@
     *: "Create Directory"
   </source>
   <dest>
-    *: "建立目录"
+    *: "创建目录"
   </dest>
   <voice>
-    *: "建立目录"
+    *: "创建目录"
   </voice>
 </phrase>
 <phrase>
@@ -4162,10 +4162,10 @@
     *: "Insert Next"
   </source>
   <dest>
-    *: "插入下一个"
+    *: "插入为下一个"
   </dest>
   <voice>
-    *: "插入下一个"
+    *: "插入为下一个"
   </voice>
 </phrase>
 <phrase>
@@ -4204,10 +4204,10 @@
     *: "Queue"
   </source>
   <dest>
-    *: "队列"
+    *: "排队"
   </dest>
   <voice>
-    *: "队列"
+    *: "排队"
   </voice>
 </phrase>
 <phrase>
@@ -4218,10 +4218,10 @@
     *: "Queue Next"
   </source>
   <dest>
-    *: "队列中下一个"
+    *: "排队到下一个"
   </dest>
   <voice>
-    *: "队列中下一个"
+    *: "排队到下一个"
   </voice>
 </phrase>
 <phrase>
@@ -4232,10 +4232,10 @@
     *: "Queue Last"
   </source>
   <dest>
-    *: "队列最后"
+    *: "排队到最后"
   </dest>
   <voice>
-    *: "队列最后"
+    *: "排队到最后"
   </voice>
 </phrase>
 <phrase>
@@ -4246,10 +4246,10 @@
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "随机队列"
+    *: "乱序排队"
   </dest>
   <voice>
-    *: "随机队列"
+    *: "乱序排队"
   </voice>
 </phrase>
 <phrase>
@@ -4260,10 +4260,10 @@
     *: "Search In Playlist"
   </source>
   <dest>
-    *: "在播放清单內查找"
+    *: "在播放列表中查找"
   </dest>
   <voice>
-    *: "在播放清单內查找"
+    *: "在播放列表中查找"
   </voice>
 </phrase>
 <phrase>
@@ -4271,13 +4271,13 @@
   desc: splash number of tracks inserted
   user: 
   <source>
-    *: "Searching... %d found (%s)"
+    *: "Searching...%d found (%s)"
   </source>
   <dest>
-    *: "正在寻找... %d 已找到 (%s)"
+    *: "寻找...%d已找到(%s)"
   </dest>
   <voice>
-    *: "正在寻找 %d 已找到 %s"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4288,10 +4288,10 @@
     *: "Create Bookmark"
   </source>
   <dest>
-    *: "建立书签"
+    *: "创建书签"
   </dest>
   <voice>
-    *: "建立书签"
+    *: "创建书签"
   </voice>
 </phrase>
 <phrase>
@@ -4319,7 +4319,7 @@
     *: "Rockbox信息:"
   </dest>
   <voice>
-    *: "Rockbox 信息:"
+    *: "Rockbox信息如下"
   </voice>
 </phrase>
 <phrase>
@@ -4332,11 +4332,11 @@
   </source>
   <dest>
     *: none
-    charging: "电池: 充电中"
+    charging: "电池:充电中"
   </dest>
   <voice>
     *: none
-    charging: "电池  充电中"
+    charging: "电池 充电中"
   </voice>
 </phrase>
 <phrase>
@@ -4349,11 +4349,11 @@
   </source>
   <dest>
     *: none
-    recorder: "电池: 完成充电"
+    recorder: "电池:恒流快速充电"
   </dest>
   <voice>
     *: none
-    recorder: "电池 完成充电"
+    recorder: "电池 恒流快速充电"
   </voice>
 </phrase>
 <phrase>
@@ -4366,11 +4366,11 @@
   </source>
   <dest>
     *: none
-    charging: "电池: 涓流充电"
+    charging: "电池:恒压涓流充电"
   </dest>
   <voice>
     *: none
-    charging: "电池 涓流充电"
+    charging: "电池 恒压涓流充电"
   </voice>
 </phrase>
 <phrase>
@@ -4383,14 +4383,12 @@
     h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "电池: %d%% %dh %dm"
+    *: "电量:%d%% %dh %dm"
     player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "电量:%d%% %dh %dm"
   </dest>
   <voice>
-    *: "%d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "%d%% %dh %dm"
+    *: "电量"
   </voice>
 </phrase>
 <phrase>
@@ -4404,7 +4402,7 @@
     *: "磁盘:"
   </dest>
   <voice>
-    *: "磁盘:"
+    *: "磁盘大小为"
   </voice>
 </phrase>
 <phrase>
@@ -4418,7 +4416,7 @@
     *: "剩余容量:"
   </dest>
   <voice>
-    *: "剩余容量:"
+    *: "剩余容量为"
   </voice>
 </phrase>
 <phrase>
@@ -4431,11 +4429,11 @@
   </source>
   <dest>
     *: none
-    multivolume: "內建:"
+    multivolume: "内部:"
   </dest>
   <voice>
     *: none
-    multivolume: "內建:"
+    multivolume: "内部大小为"
   </voice>
 </phrase>
 <phrase>
@@ -4449,13 +4447,13 @@
   </source>
   <dest>
     *: none
-    e200,c200: "MMC:"
-    ondio*: none
+    e200,c200: "mSD:"
+    ondio*: "MMC:"
   </dest>
   <voice>
     *: none
-    e200,c200: "M M C "
-    ondio*: none
+    e200,c200: "mSD卡"
+    ondio*: "MMC卡"
   </voice>
 </phrase>
 <phrase>
@@ -4468,7 +4466,7 @@
   </source>
   <dest>
     *: none
-    rtc: none
+    rtc: ""
   </dest>
   <voice>
     *: none
@@ -4489,7 +4487,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "音调升高"
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -4506,7 +4504,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "音调降低"
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -4531,10 +4529,10 @@
     *: "Create a Bookmark?"
   </source>
   <dest>
-    *: "建立书签?"
+    *: "创建书签?"
   </dest>
   <voice>
-    *: "建立书签吗"
+    *: "创建书签吗"
   </voice>
 </phrase>
 <phrase>
@@ -4545,10 +4543,10 @@
     *: "Bookmark Created"
   </source>
   <dest>
-    *: "已建立书签"
+    *: "书签已创建"
   </dest>
   <voice>
-    *: "已建立书签"
+    *: "书签已创建"
   </voice>
 </phrase>
 <phrase>
@@ -4559,10 +4557,10 @@
     *: "Bookmark Failed!"
   </source>
   <dest>
-    *: "建立书签失败!"
+    *: "书签创建失败!"
   </dest>
   <voice>
-    *: "建立书签失败"
+    *: "书签创建失败"
   </voice>
 </phrase>
 <phrase>
@@ -4573,10 +4571,10 @@
     *: "Bookmark Empty"
   </source>
   <dest>
-    *: "书签为空"
+    *: "没有书签"
   </dest>
   <voice>
-    *: "书签为空"
+    *: "没有书签"
   </voice>
 </phrase>
 <phrase>
@@ -4596,25 +4594,17 @@
   </source>
   <dest>
     *: none
-    rtc: "OFF = 回去"
-    h100,h120,h300: "STOP = 回去"
-    ipod*,e200,c200,sa9200: "MENU = 回去"
-    x5,m5: "RECORD = 回去"
-    h10,h10_5gb: "PREV = 回去"
-    gigabeatf: "A = 回去"
-    mrobe100: "DISPLAY = 回去"
-    gigabeats: "BACK = 回去"
+    rtc: "OFF=放弃"
+    h100,h120,h300: "STOP=放弃"
+    ipod*,e200,c200,sa9200: "MENU=放弃"
+    x5,m5: "RECORD=放弃"
+    h10,h10_5gb: "PREV=放弃"
+    gigabeatf: "A=放弃"
+    mrobe100: "DISPLAY=放弃"
+    gigabeats: "BACK=放弃"
   </dest>
   <voice>
     *: none
-    rtc: "OFF  恢复"
-    h100,h120,h300: "STOP  恢复"
-    ipod*,e200,c200,sa9200: ""
-    x5,m5: "RECORD  恢复"
-    h10,h10_5gb: "PREV  恢复"
-    gigabeatf: "A  恢复"
-    mrobe100: ""
-    gigabeats: ""
   </voice>
 </phrase>
 <phrase>
@@ -4631,7 +4621,7 @@
   </dest>
   <voice>
     *: none
-    recording: "时间"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4648,7 +4638,7 @@
   </dest>
   <voice>
     *: none
-    recording: "预录"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4698,17 +4688,13 @@
   </source>
   <dest>
     *: none
-    recording: "磁盘已满，按下OFF继续。"
-    h100,h120,h300: "磁盘已满，按下STOP继续。"
-    m5,x5: "磁盘已满，按下POWER继续。"
-    e200,c200: "磁盘已满，按下UP继续。"
+    recording: "磁盘已满，按下OFF继续."
+    h100,h120,h300: "磁盘已满，按下STOP继续."
+    m5,x5: "磁盘已满，按下POWER继续."
+    e200,c200: "磁盘，按下UP继续."
   </dest>
   <voice>
     *: none
-    recording: "磁盘已满 按下 OFF 继续"
-    h100,h120,h300: "磁盘已满按下 STOP 继续"
-    m5,x5: "磁盘已满 按下POWER继续"
-    e200,c200: "磁盘已满按下UP继续"
   </voice>
 </phrase>
 <phrase>
@@ -4738,11 +4724,11 @@
   </source>
   <dest>
     *: none
-    recording: "在之上开始"
+    recording: "录音开始阈值"
   </dest>
   <voice>
     *: none
-    recording: "在之上开始"
+    recording: "录音开始阈值"
   </voice>
 </phrase>
 <phrase>
@@ -4755,11 +4741,11 @@
   </source>
   <dest>
     *: none
-    recording: "在之下停止"
+    recording: "录音停止阈值"
   </dest>
   <voice>
     *: none
-    recording: "在之下停止"
+    recording: "录音停止阈值"
   </voice>
 </phrase>
 <phrase>
@@ -4772,11 +4758,11 @@
   </source>
   <dest>
     *: none
-    recording: "先设分割的间隔"
+    recording: "预设分割间隙"
   </dest>
   <voice>
     *: none
-    recording: "先设分割的间隔"
+    recording: "预设分割间隙"
   </voice>
 </phrase>
 <phrase>
@@ -4789,11 +4775,11 @@
   </source>
   <dest>
     *: none
-    recording: "-inf"
+    recording: "负无穷大"
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "负无穷大"
   </voice>
 </phrase>
 <phrase>
@@ -4806,11 +4792,11 @@
   </source>
   <dest>
     *: none
-    alarm: "闹铃时间: %02d:%02d"
+    alarm: "闹铃时间:%02d:%02d"
   </dest>
   <voice>
     *: none
-    alarm: "闹铃时间是 %02d:%02d"
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
@@ -4823,11 +4809,11 @@
   </source>
   <dest>
     *: none
-    alarm: "在 %d:%02d 內关闭闹铃"
+    alarm: "闹铃时长:%d:%02d"
   </dest>
   <voice>
     *: none
-    alarm: "在 %d:%02d 內关闭闹铃"
+    alarm: "闹铃时长是%d:%02d"
   </voice>
 </phrase>
 <phrase>
@@ -4840,11 +4826,11 @@
   </source>
   <dest>
     *: none
-    alarm: "已设定闹铃"
+    alarm: "闹铃已设"
   </dest>
   <voice>
     *: none
-    alarm: "已设定闹铃"
+    alarm: "闹铃已设"
   </voice>
 </phrase>
 <phrase>
@@ -4857,11 +4843,11 @@
   </source>
   <dest>
     *: none
-    alarm: "闹铃设定时间不正确!"
+    alarm: "闹铃时间设置不正确!"
   </dest>
   <voice>
     *: none
-    alarm: "闹铃设定时间不正确!"
+    alarm: "闹铃时间设置不正确!"
   </voice>
 </phrase>
 <phrase>
@@ -4877,10 +4863,10 @@
   </source>
   <dest>
     *: none
-    alarm: "PLAY=设定 OFF=取消"
-    ipod*: "SELECT=设定 MENU=取消"
-    h10,h10_5gb: "SELECT=设定 PREV=取消"
-    gigabeats: "SELECT=设定 POWER=取消"
+    alarm: "PLAY=设置 OFF=取消"
+    ipod*: "SELECT=设置 MENU=取消"
+    h10,h10_5gb: "SELECT=设置 PREV=取消"
+    gigabeats: "SELECT=设置 POWER=取消"
   </dest>
   <voice>
    *: none
@@ -4917,11 +4903,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "RGB"
+    lcd_color: "红绿蓝"
   </dest>
   <voice>
     *: none
-    lcd_color: "R G B"
+    lcd_color: ""
   </voice>
 </phrase>
 <phrase>
@@ -4934,11 +4920,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "RGB: %02X%02X%02X"
+    lcd_color: "红绿蓝:%02X%02X%02X"
   </dest>
   <voice>
     *: none
-    lcd_color: "R G B %02X%02X%02X"
+    lcd_color: ""
   </voice>
 </phrase>
 <phrase>
@@ -4951,11 +4937,11 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "无效的颜色"
+    lcd_non-mono: "颜色无效"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "无效的颜色"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -4969,7 +4955,7 @@
     *: "[标题]"
   </dest>
   <voice>
-    *: "标题"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4983,7 +4969,7 @@
     *: "[艺术家]"
   </dest>
   <voice>
-    *: "艺术家"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4997,7 +4983,7 @@
     *: "[专辑]"
   </dest>
   <voice>
-    *: "专辑"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5011,7 +4997,7 @@
     *: "[曲目编号]"
   </dest>
   <voice>
-    *: "曲目编号"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5025,7 +5011,7 @@
     *: "[流派]"
   </dest>
   <voice>
-    *: "流派"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5039,7 +5025,7 @@
     *: "[年份]"
   </dest>
   <voice>
-    *: "年份"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5053,7 +5039,7 @@
     *: "[长度]"
   </dest>
   <voice>
-    *: "长度"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5064,10 +5050,10 @@
     *: "[Playlist]"
   </source>
   <dest>
-    *: "[播放清单]"
+    *: "[播放列表]"
   </dest>
   <voice>
-    *: "播放清单"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5081,7 +5067,7 @@
     *: "[码率]"
   </dest>
   <voice>
-    *: "码率"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5092,10 +5078,10 @@
     *: " (VBR)"
   </source>
   <dest>
-    *: " (VBR)"
+    *: "(VBR)"
   </dest>
   <voice>
-    *: " V B R"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5109,7 +5095,7 @@
     *: "[频率]"
   </dest>
   <voice>
-    *: "频率"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5120,10 +5106,10 @@
     *: "[Track Gain]"
   </source>
   <dest>
-    *: "[Track Gain]"
+    *: "[单曲增益]"
   </dest>
   <voice>
-    *: "Track Gain"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5134,10 +5120,10 @@
     *: "[Album Gain]"
   </source>
   <dest>
-    *: "[Album Gain]"
+    *: "[专辑增益]"
   </dest>
   <voice>
-    *: "Album Gain"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5151,7 +5137,7 @@
     *: "[路径]"
   </dest>
   <voice>
-    *: "路径"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5162,10 +5148,10 @@
     *: "<No Info>"
   </source>
   <dest>
-    *: "<没资料>"
+    *: "<无信息>"
   </dest>
   <voice>
-    *: "没资料"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5178,11 +5164,11 @@
   </source>
   <dest>
     *: none
-    rtc: "日"
+    rtc: "星期日"
   </dest>
   <voice>
     *: none
-    rtc: "日"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -5195,11 +5181,11 @@
   </source>
   <dest>
     *: none
-    rtc: "一"
+    rtc: "星期一"
   </dest>
   <voice>
     *: none
-    rtc: "一"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -5212,11 +5198,11 @@
   </source>
   <dest>
     *: none
-    rtc: "二"
+    rtc: "星期二"
   </dest>
   <voice>
     *: none
-    rtc: "二"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -5229,11 +5215,11 @@
   </source>
   <dest>
     *: none
-    rtc: "三"
+    rtc: "星期三"
   </dest>
   <voice>
     *: none
-    rtc: "三"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -5246,11 +5232,11 @@
   </source>
   <dest>
     *: none
-    rtc: "四"
+    rtc: "星期四"
   </dest>
   <voice>
     *: none
-    rtc: "四"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -5263,11 +5249,11 @@
   </source>
   <dest>
     *: none
-    rtc: "五"
+    rtc: "星期五"
   </dest>
   <voice>
     *: none
-    rtc: "五"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -5280,11 +5266,11 @@
   </source>
   <dest>
     *: none
-    rtc: "六"
+    rtc: "星期六"
   </dest>
   <voice>
     *: none
-    rtc: "六"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -5297,7 +5283,7 @@
   </source>
   <dest>
     *: none
-    rtc: "１月"
+    rtc: "1月"
   </dest>
   <voice>
     *: none
@@ -5331,7 +5317,7 @@
   </source>
   <dest>
     *: none
-    rtc: "３月"
+    rtc: "3月"
   </dest>
   <voice>
     *: none
@@ -5348,7 +5334,7 @@
   </source>
   <dest>
     *: none
-    rtc: "４月"
+    rtc: "4月"
   </dest>
   <voice>
     *: none
@@ -5365,7 +5351,7 @@
   </source>
   <dest>
     *: none
-    rtc: "５月"
+    rtc: "5月"
   </dest>
   <voice>
     *: none
@@ -5382,7 +5368,7 @@
   </source>
   <dest>
     *: none
-    rtc: "６月"
+    rtc: "6月"
   </dest>
   <voice>
     *: none
@@ -5399,10 +5385,11 @@
   </source>
   <dest>
     *: none
-    rtc: "７月"
+    rtc: "7月"
   </dest>
   <voice>
-    *: "七月"
+    *: none
+    rtc: "七月"
   </voice>
 </phrase>
 <phrase>
@@ -5415,7 +5402,7 @@
   </source>
   <dest>
     *: none
-    rtc: "８月"
+    rtc: "8月"
   </dest>
   <voice>
     *: none
@@ -5432,7 +5419,7 @@
   </source>
   <dest>
     *: none
-    rtc: "９月"
+    rtc: "9月"
   </dest>
   <voice>
     *: none
@@ -5935,7 +5922,7 @@
     *: ""
   </dest>
   <voice>
-    *: "亿万"
+    *: "十亿"
   </voice>
 </phrase>
 <phrase>
@@ -5963,7 +5950,7 @@
     *: ""
   </dest>
   <voice>
-    *: "加"
+    *: "负"
   </voice>
 </phrase>
 <phrase>
@@ -6075,7 +6062,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilohertz"
+    *: "千赫兹"
   </voice>
 </phrase>
 <phrase>
@@ -6089,7 +6076,7 @@
     *: ""
   </dest>
   <voice>
-    *: "decibel"
+    *: "分贝"
   </voice>
 </phrase>
 <phrase>
@@ -6117,7 +6104,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milli-amp hours"
+    *: "毫安时"
   </voice>
 </phrase>
 <phrase>
@@ -6131,7 +6118,7 @@
     *: ""
   </dest>
   <voice>
-    *: "pixel"
+    *: "点"
   </voice>
 </phrase>
 <phrase>
@@ -6159,7 +6146,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hertz"
+    *: "赫兹"
   </voice>
 </phrase>
 <phrase>
@@ -6173,7 +6160,7 @@
     *: "B"
   </dest>
   <voice>
-    *: "B"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6187,7 +6174,7 @@
     *: "KB"
   </dest>
   <voice>
-    *: "KB"
+    *: "B"
   </voice>
 </phrase>
 <phrase>
@@ -6607,7 +6594,7 @@
     *: ""
   </dest>
   <voice>
-    *: "dot"
+    *: "点"
   </voice>
 </phrase>
 <phrase>
@@ -6649,7 +6636,7 @@
     *: ""
   </dest>
   <voice>
-    *: "文件夹"
+    *: "目录"
   </voice>
 </phrase>
 <phrase>
@@ -6761,7 +6748,7 @@
     *: ""
   </dest>
   <voice>
-    *: "软体"
+    *: "软件"
   </voice>
 </phrase>
 <phrase>
@@ -6774,11 +6761,11 @@
   </source>
   <dest>
     *: none
-    remote: none
+    remote: ""
   </dest>
   <voice>
     *: none
-    remote: "遥控现在播放屏幕"
+    remote: "线控现在播放屏幕"
   </voice>
 </phrase>
 <phrase>
@@ -6792,7 +6779,7 @@
     *: ""
   </dest>
   <voice>
-    *: "键盘"
+    *: "按键"
   </voice>
 </phrase>
 <phrase>
@@ -6817,10 +6804,10 @@
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "播放清单缓冲区已满"
+    *: "播放列表缓冲区已满"
   </dest>
   <voice>
-    *: "播放清单缓冲区已满"
+    *: "播放列表缓冲区已满"
   </voice>
 </phrase>
 <phrase>
@@ -6831,10 +6818,10 @@
     *: "Creating"
   </source>
   <dest>
-    *: "正在建立"
+    *: "正在创建"
   </dest>
   <voice>
-    *: "正在建立"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6845,10 +6832,10 @@
     *: "Inserted %d tracks (%s)"
   </source>
   <dest>
-    *: "插入 %d 首歌曲 (%s)"
+    *: "插入了%d首曲目(%s)"
   </dest>
   <voice>
-    *: "插入 %d 首歌曲 %s"
+    *: "插入了%d首曲目%s"
   </voice>
 </phrase>
 <phrase>
@@ -6859,10 +6846,10 @@
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: "列入了 %d 首歌曲 (%s)"
+    *: "列入了%d首曲目(%s)"
   </dest>
   <voice>
-    *: "列入了 %d 首歌曲 %s"
+    *: "列入了%d首曲目%s"
   </voice>
 </phrase>
 <phrase>
@@ -6873,10 +6860,10 @@
     *: "Saved %d tracks (%s)"
   </source>
   <dest>
-    *: "储存 %d 首歌曲 (%s)"
+    *: "保存了%d首曲目(%s)"
   </dest>
   <voice>
-    *: "储存 %d 首歌曲 %s"
+    *: "保存了%d首曲目%s"
   </voice>
 </phrase>
 <phrase>
@@ -6901,10 +6888,10 @@
     *: "Erase dynamic playlist?"
   </source>
   <dest>
-    *: "消除动态播放清单?"
+    *: "擦除动态播放列表?"
   </dest>
   <voice>
-    *: "消除动态播放清单吗"
+    *: "擦除动态播放列表吗"
   </voice>
 </phrase>
 <phrase>
@@ -6915,10 +6902,10 @@
     *: "Nothing to resume"
   </source>
   <dest>
-    *: "无法继续上次播放"
+    *: "没有可恢复播放的"
   </dest>
   <voice>
-    *: "无法继续上次播放"
+    *: "没有可恢复播放的"
   </voice>
 </phrase>
 <phrase>
@@ -6929,10 +6916,10 @@
     *: "Error updating playlist control file"
   </source>
   <dest>
-    *: "更新播放清单控制文件错误"
+    *: "更新播放列表控制文件错误"
   </dest>
   <voice>
-    *: "更新播放清单控制文件错误"
+    *: "更新播放列表控制文件错误"
   </voice>
 </phrase>
 <phrase>
@@ -6943,10 +6930,10 @@
     *: "Error accessing playlist file"
   </source>
   <dest>
-    *: "存取播放清单文件错误"
+    *: "存取播放列表文件错误"
   </dest>
   <voice>
-    *: "存取播放清单文件错误"
+    *: "存取播放列表文件错误"
   </voice>
 </phrase>
 <phrase>
@@ -6957,10 +6944,10 @@
     *: "Error accessing playlist control file"
   </source>
   <dest>
-    *: "存取播放清单控制文件错误"
+    *: "存取播放列表控制文件错误"
   </dest>
   <voice>
-    *: "存取播放清单控制文件错误"
+    *: "存取播放列表控制文件错误"
   </voice>
 </phrase>
 <phrase>
@@ -6985,10 +6972,10 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "无效的播放清单控制文件"
+    *: "无效的播放列表控制文件"
   </dest>
   <voice>
-    *: "无效的播放清单控制文件"
+    *: "无效的播放列表控制文件"
   </voice>
 </phrase>
 <phrase>
@@ -7001,11 +6988,11 @@
   </source>
   <dest>
     *: none
-    radio: "电台: %d.%02d MHz"
+    radio: "频道:%d.%02dMHz"
   </dest>
   <voice>
     *: none
-    radio: "电台 %d.%02d MHz"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -7035,11 +7022,11 @@
   </source>
   <dest>
     *: none
-    radio: "增加预设"
+    radio: "新增预设"
   </dest>
   <voice>
     *: none
-    radio: "增加预设"
+    radio: "新增预设"
   </voice>
 </phrase>
 <phrase>
@@ -7086,11 +7073,11 @@
   </source>
   <dest>
     *: none
-    radio: "储存预设失败"
+    radio: "保存预设失败"
   </dest>
   <voice>
     *: none
-    radio: "储存预设失败"
+    radio: "保存预设失败"
   </voice>
 </phrase>
 <phrase>
@@ -7124,7 +7111,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "选单"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -7137,11 +7124,11 @@
   </source>
   <dest>
     *: none
-    radio_screen_button_bar: "离开"
+    radio_screen_button_bar: "退出"
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "离开"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -7158,7 +7145,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "动作"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -7175,7 +7162,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "增加"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -7192,7 +7179,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "录音"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -7205,11 +7192,11 @@
   </source>
   <dest>
     *: none
-    radio: "强迫使用单声道"
+    radio: "强制使用单声道"
   </dest>
   <voice>
     *: none
-    radio: "强迫使用单声道"
+    radio: "强制使用单声道"
   </voice>
 </phrase>
 <phrase>
@@ -7226,7 +7213,7 @@
   </dest>
   <voice>
     *: none
-    radio: "显示冻结!"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -7256,11 +7243,11 @@
   </source>
   <dest>
     *: none
-    radio: "清除现在预设?"
+    radio: "清除当前预设?"
   </dest>
   <voice>
     *: none
-    radio: "清除现在预设吗"
+    radio: "清除当前预设吗"
   </voice>
 </phrase>
 <phrase>
@@ -7273,11 +7260,11 @@
   </source>
   <dest>
     *: none
-    radio: "扫描 %d.%02d MHz"
+    radio: "扫描%d.%02dMHz"
   </dest>
   <voice>
     *: none
-    radio: "正在扫描 %d.%02d MHz"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -7290,11 +7277,11 @@
   </source>
   <dest>
     *: none
-    radio: "%d.%02d MHz"
+    radio: "%d.%02dMHz"
   </dest>
   <voice>
     *: none
-    radio: "%d.%02d MHz"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -7350,10 +7337,10 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "设定已载入"
+    *: "设置已载入"
   </dest>
   <voice>
-    *: "设定已载入"
+    *: "设置已载入"
   </voice>
 </phrase>
 <phrase>
@@ -7364,10 +7351,10 @@
     *: "Settings Saved"
   </source>
   <dest>
-    *: "设定已储存"
+    *: "设置已保存"
   </dest>
   <voice>
-    *: "设定已储存"
+    *: "设置已保存"
   </voice>
 </phrase>
 <phrase>
@@ -7378,10 +7365,10 @@
     *: "Boot changed"
   </source>
   <dest>
-    *: "开机文件已改变"
+    *: "引导文件已改变"
   </dest>
   <voice>
-    *: "开机文件已改变"
+    *: "引导文件已改变"
   </voice>
 </phrase>
 <phrase>
@@ -7392,10 +7379,10 @@
     *: "Reboot now?"
   </source>
   <dest>
-    *: "现在要重启?"
+    *: "现在重启?"
   </dest>
   <voice>
-    *: "现在要重启吗"
+    *: "现在重启吗"
   </voice>
 </phrase>
 <phrase>
@@ -7410,18 +7397,14 @@
     h10,h10_5gb,e200,c200: "PREV to abort"
   </source>
   <dest>
-    *: "用 OFF 键取消"
-    player,h100,h120,h300: "用 STOP 键取消"
-    ipod*: "用 PLAY PAUSE 键取消"
-    x5,m5: "用长按 PLAY 键取消"
-    h10,h10_5gb,e200,c200: "用 PREV 键取消"
+    *: "按OFF键取消"
+    player,h100,h120,h300: "按STOP键取消"
+    ipod*: "按PLAY/PAUSE键取消"
+    x5,m5: "长按PLAY键取消"
+    h10,h10_5gb,e200,c200: "按PREV键取消"
   </dest>
   <voice>
-    *: "OFF: 取消"
-    player,h100,h120,h300: "STOP: 取消"
-    ipod*: "PLAY/PAUSE: 取消"
-    x5,m5: "Long PLAY: 取消"
-    h10,h10_5gb,e200,c200: "PREV: 取消"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7452,7 +7435,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "已载入背景"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7469,7 +7452,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "背景载入失败"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7480,10 +7463,10 @@
     *: "New Keyboard"
   </source>
   <dest>
-    *: "新键盘"
+    *: "新按键"
   </dest>
   <voice>
-    *: "新键盘"
+    *: "新按键"
   </voice>
 </phrase>
 <phrase>
@@ -7578,10 +7561,10 @@
     *: "Can't open %s"
   </source>
   <dest>
-    *: "无法打开 %s"
+    *: "无法打开%s"
   </dest>
   <voice>
-    *: "无法打开 %s"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7592,10 +7575,10 @@
     *: "Failed reading %s"
   </source>
   <dest>
-    *: "读取 %s 失败"
+    *: "读取%s失败"
   </dest>
   <voice>
-    *: "读取 %s 失败"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7609,7 +7592,7 @@
     *: "不兼容机型"
   </dest>
   <voice>
-    *: "不兼容机型"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7623,7 +7606,7 @@
     *: "不兼容版本"
   </dest>
   <voice>
-    *: "不兼容版本"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7637,7 +7620,7 @@
     *: "插件返回错误"
   </dest>
   <voice>
-    *: "插件返回错误"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7662,10 +7645,10 @@
     *: "Filetype array full"
   </source>
   <dest>
-    *: "文件类型对列已满"
+    *: "文件类型队列已满"
   </dest>
   <voice>
-    *: "文件类型对列已满"
+    *: "文件类型队列已满"
   </voice>
 </phrase>
 <phrase>
@@ -7709,11 +7692,11 @@
   </source>
   <dest>
     *: none
-    radio: "储存预设清单"
+    radio: "保存预设清单"
   </dest>
   <voice>
     *: none
-    radio: "储存预设清单"
+    radio: "保存预设清单"
   </voice>
 </phrase>
 <phrase>
@@ -7726,11 +7709,11 @@
   </source>
   <dest>
     *: none
-    radio: "清除预设清单"
+    radio: "清空预设清单"
   </dest>
   <voice>
     *: none
-    radio: "清除预设清单"
+    radio: "清空预设清单"
   </voice>
 </phrase>
 <phrase>
@@ -7760,11 +7743,11 @@
   </source>
   <dest>
     *: none
-    radio: "找不到设定，自动扫描?"
+    radio: "找不到设置，自动扫描?"
   </dest>
   <voice>
     *: none
-    radio: "找不到设定，自动扫描吗"
+    radio: "找不到设置 自动扫描吗"
   </voice>
 </phrase>
 <phrase>
@@ -7777,11 +7760,11 @@
   </source>
   <dest>
     *: none
-    radio: "储存变动?"
+    radio: "保存变动?"
   </dest>
   <voice>
     *: none
-    radio: "储存变动吗"
+    radio: "保存变动吗"
   </voice>
 </phrase>
 <phrase>
@@ -7794,11 +7777,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "直接增加"
+    swcodec: "直接增益"
   </dest>
   <voice>
     *: none
-    swcodec: "直接增加"
+    swcodec: "直接增益"
   </voice>
 </phrase>
 <phrase>
@@ -7811,11 +7794,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "交叉增加"
+    swcodec: "交叉增益"
   </dest>
   <voice>
     *: none
-    swcodec: "交叉增加"
+    swcodec: "交叉增益"
   </voice>
 </phrase>
 <phrase>
@@ -7828,11 +7811,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "高频度加重"
+    swcodec: "高频衰减"
   </dest>
   <voice>
     *: none
-    swcodec: "高频度加重"
+    swcodec: "高频衰减"
   </voice>
 </phrase>
 <phrase>
@@ -7845,11 +7828,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "高频度削去"
+    swcodec: "高频截止频率"
   </dest>
   <voice>
     *: none
-    swcodec: "高频度削去"
+    swcodec: "高频截止频率"
   </voice>
 </phrase>
 <phrase>
@@ -7860,10 +7843,10 @@
     *: "Database is not ready"
   </source>
   <dest>
-    *: "标签缓存尚未准备好"
+    *: "标签数据库尚未准备好"
   </dest>
   <voice>
-    *: "标签缓存尚未准备好"
+    *: "标签数据库尚未准备好"
   </voice>
 </phrase>
 <phrase>
@@ -7888,10 +7871,10 @@
     *: "Invalid Filename!"
   </source>
   <dest>
-    *: "无效的文件名!"
+    *: "无效文件名!"
   </dest>
   <voice>
-    *: "无效的文件名!"
+    *: "无效文件名"
   </voice>
 </phrase>
 <phrase>
@@ -7904,11 +7887,11 @@
   </source>
   <dest>
     *: none
-    remote: "线控卷动设定"
+    remote: "线控滚动设置"
   </dest>
   <voice>
     *: none
-    remote: "线控卷动设定"
+    remote: "线控滚动设置"
   </voice>
 </phrase>
 <phrase>
@@ -7919,10 +7902,10 @@
     *: "Update Now"
   </source>
   <dest>
-    *: "立刻更新"
+    *: "立即更新"
   </dest>
   <voice>
-    *: "立刻更新"
+    *: "立即更新"
   </voice>
 </phrase>
 <phrase>
@@ -8082,11 +8065,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "编辑模式:%s"
   </dest>
   <voice>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8099,11 +8082,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "截止频率"
   </dest>
   <voice>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "截止频率"
   </voice>
 </phrase>
 <phrase>
@@ -8252,11 +8235,11 @@
   </source>
   <dest>
     *: none
-    recording_hwcodec: "Quality"
+    recording_hwcodec: "品质"
   </dest>
   <voice>
     *: none
-    recording_hwcodec: "Quality"
+    recording_hwcodec: "品质"
   </voice>
 </phrase>
 <phrase>
@@ -8269,11 +8252,11 @@
   </source>
   <dest>
     *: none
-    recording: "Frequency"
+    recording: "频率"
   </dest>
   <voice>
     *: none
-    recording: "Frequency"
+    recording: "频率"
   </voice>
 </phrase>
 <phrase>
@@ -8286,11 +8269,11 @@
   </source>
   <dest>
     *: none
-    recording: "Source"
+    recording: "来源"
   </dest>
   <voice>
     *: none
-    recording: "Source"
+    recording: "来源"
   </voice>
 </phrase>
 <phrase>
@@ -8303,11 +8286,11 @@
   </source>
   <dest>
     *: none
-    recording: "Mic"
+    recording: "内部麦克风"
   </dest>
   <voice>
     *: none
-    recording: "Mic"
+    recording: "内部麦克风"
   </voice>
 </phrase>
 <phrase>
@@ -8320,11 +8303,11 @@
   </source>
   <dest>
     *: none
-    recording: "Digital"
+    recording: "数码"
   </dest>
   <voice>
     *: none
-    recording: "Digital"
+    recording: "数码"
   </voice>
 </phrase>
 <phrase>
@@ -8337,11 +8320,11 @@
   </source>
   <dest>
     *: none
-    recording: "Trigger"
+    recording: "触发"
   </dest>
   <voice>
     *: none
-    recording: "Trigger"
+    recording: "触发"
   </voice>
 </phrase>
 <phrase>
@@ -8473,11 +8456,11 @@
   </source>
   <dest>
     *: none
-    recording: "Gain Left"
+    recording: "左声道增益"
   </dest>
   <voice>
     *: none
-    recording: "Gain Left"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8490,11 +8473,11 @@
   </source>
   <dest>
     *: none
-    recording: "Gain Right"
+    recording: "右声道增益"
   </dest>
   <voice>
     *: none
-    recording: "Gain Right"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8524,11 +8507,11 @@
   </source>
   <dest>
     *: none
-    recorder_pad: "Menu"
+    recorder_pad: "选单"
   </dest>
   <voice>
     *: none
-    recorder_pad: "Menu"
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -8541,11 +8524,11 @@
   </source>
   <dest>
     *: none
-    recorder_pad: "Option"
+    recorder_pad: "选项"
   </dest>
   <voice>
     *: none
-    recorder_pad: "Option"
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -8558,11 +8541,11 @@
   </source>
   <dest>
     *: none
-    recorder_pad: "LCD"
+    recorder_pad: "屏幕"
   </dest>
   <voice>
     *: none
-    recorder_pad: "LCD"
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -8694,7 +8677,7 @@
   </source>
   <dest>
     *: none
-    recording: "PCM Wave"
+    recording: "PCM Wave(.wav)"
   </dest>
   <voice>
     *: none
@@ -8712,7 +8695,7 @@
     *: ""
   </dest>
   <voice>
-    *: "units per tick"
+    *: "单位每时钟"
   </voice>
 </phrase>
 <phrase>
@@ -8743,7 +8726,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilobits per second"
+    *: "千比特每秒"
   </voice>
 </phrase>
 <phrase>
@@ -8773,11 +8756,11 @@
   </source>
   <dest>
     *: none
-    recording: "Line In"
+    recording: "线路输入"
   </dest>
   <voice>
     *: none
-    recording: "Line In"
+    recording: "线路输入"
   </voice>
 </phrase>
 <phrase>
@@ -8792,14 +8775,14 @@
     h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
-    *: "更新资料库... 找到 %d  (按 OFF 退回)"
-    h100,h120,h300: "更新资料库... 找到 %d  (按 STOP 退回)"
-    ipod*: "更新资料库... 找到 %d  (按 PREV 退回)"
-    x5,m5,gigabeat*,mrobe100: "更新资料库... 找到 %d  (按 LEFT 退回)"
-    h10,h10_5gb,e200,c200,sa9200: "更新资料库... 找到 %d  (按 PREV 退回)"
+    *: "数据库更新...%d已找到(按OFF返回)"
+    h100,h120,h300: "数据库更新...%d已找到(按STOP返回)"
+    ipod*: "数据库更新...%d已找到(按PREV返回)"
+    x5,m5,gigabeat*,mrobe100: "数据库更新...%d已找到(按LEFT返回)"
+    h10,h10_5gb,e200,c200,sa9200: "数据库更新...%d已找到(按PREV返回)"
   </dest>
   <voice>
-    *: "正在给资料库添加项目"
+    *: "数据库更新中"
     h100,h120,h300: ""
     ipod*: ""
     x5,m5,gigabeat*,mrobe100: ""
@@ -8817,7 +8800,7 @@
     *: "扫描文件..."
   </dest>
   <voice>
-    *: "正在扫描文件"
+    *: "扫描文件中"
   </voice>
 </phrase>
 <phrase>
@@ -8842,10 +8825,10 @@
     *: "[Comment]"
   </source>
   <dest>
-    *: "[注解]"
+    *: "[注释]"
   </dest>
   <voice>
-    *: "[注解]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8858,11 +8841,11 @@
   </source>
   <dest>
     *: none
-    agc: "DJ-Set (慢)"
+    agc: "DJ设置(慢)"
   </dest>
   <voice>
     *: none
-    agc: "DJ-Set (慢)"
+    agc: "DJ设置 慢"
   </voice>
 </phrase>
 <phrase>
@@ -8873,10 +8856,10 @@
     *: "Import Modifications"
   </source>
   <dest>
-    *: "载入更改数据"
+    *: "导入更改"
   </dest>
   <voice>
-    *: "载入更改数据"
+    *: "导入更改"
   </voice>
 </phrase>
 <phrase>
@@ -8889,7 +8872,7 @@
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording_swcodec: "WavPack(.wv)"
   </dest>
   <voice>
     *: none
@@ -8923,11 +8906,11 @@
   </source>
   <dest>
     *: none
-    lcd_sleep: "在关屏幕灯后睡眠"
+    lcd_sleep: "休眠(背光关闭后)时滞"
   </dest>
   <voice>
     *: none
-    lcd_sleep: "在关屏幕灯后睡眠"
+    lcd_sleep: "在背光关闭后休眠时滞"
   </voice>
 </phrase>
 <phrase>
@@ -8940,11 +8923,11 @@
   </source>
   <dest>
     *: none
-    recording: "文件大小"
+    recording: "按照文件大小"
   </dest>
   <voice>
     *: none
-    recording: "文件大小"
+    recording: "按照文件大小"
   </voice>
 </phrase>
 <phrase>
@@ -8955,10 +8938,10 @@
     *: "Gain"
   </source>
   <dest>
-    *: "添加"
+    *: "增益"
   </dest>
   <voice>
-    *: "添加"
+    *: "增益"
   </voice>
 </phrase>
 <phrase>
@@ -8969,10 +8952,10 @@
     *: "Deleting..."
   </source>
   <dest>
-    *: "正删除中..."
+    *: "删除..."
   </dest>
   <voice>
-    *: "正删除中"
+    *: "删除中"
   </voice>
 </phrase>
 <phrase>
@@ -8985,11 +8968,11 @@
   </source>
   <dest>
     *: none
-    usb_charging: "连接USB时冲电"
+    usb_charging: "USB连接时充电"
   </dest>
   <voice>
     *: none
-    usb_charging: "连接USB时冲电"
+    usb_charging: "USB连接时充电"
   </voice>
 </phrase>
 <phrase>
@@ -9002,11 +8985,11 @@
   </source>
   <dest>
     *: none
-    remote: "关闭遥控屏幕"
+    remote: "线控屏幕关闭"
   </dest>
   <voice>
     *: none
-    remote: "关闭遥控屏幕"
+    remote: "线控屏幕关闭"
   </voice>
 </phrase>
 <phrase>
@@ -9019,11 +9002,11 @@
   </source>
   <dest>
     *: none
-    recording: "(与原文件一样)"
+    recording: "(与来源相同)"
   </dest>
   <voice>
     *: none
-    recording: "与原文件一样"
+    recording: "与来源相同"
   </voice>
 </phrase>
 <phrase>
@@ -9036,11 +9019,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "如没耳机插入开机时不播放"
+    headphone_detection: "如没耳机插入时开机 不恢复播放"
   </dest>
   <voice>
     *: none
-    headphone_detection: "如没耳机插入开机时不播放"
+    headphone_detection: "如没耳机插入时开机 不恢复播放"
   </voice>
 </phrase>
 <phrase>
@@ -9051,10 +9034,10 @@
     *: "Resume"
   </source>
   <dest>
-    *: "恢复播发"
+    *: "恢复播放"
   </dest>
   <voice>
-    *: "恢复播发"
+    *: "恢复播放"
   </voice>
 </phrase>
 <phrase>
@@ -9113,10 +9096,10 @@
     *: "WARNING! Low Battery!"
   </source>
   <dest>
-    *: "警告! 低电池!"
+    *: "警告!电量低!"
   </dest>
   <voice>
-    *: "警告 低电池"
+    *: "警告 电量低"
   </voice>
 </phrase>
 <phrase>
@@ -9144,10 +9127,10 @@
     *: "Playlist Viewer Settings"
   </source>
   <dest>
-    *: "播放清单设置"
+    *: "播放列表查看设置"
   </dest>
   <voice>
-    *: "播放清单设置"
+    *: "播放列表查看设置"
   </voice>
 </phrase>
 <phrase>
@@ -9221,11 +9204,11 @@
     scrollwheel: none
   </source>
   <dest>
-    *: "列表加速速度"
+    *: "列表加速度"
     scrollwheel: none
   </dest>
   <voice>
-    *: "列表加速速度"
+    *: "列表加速度"
     scrollwheel: none
   </voice>
 </phrase>
@@ -9270,11 +9253,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "随机与文件跳过"
+    swcodec: "乱序与曲目跳转"
   </dest>
   <voice>
     *: none
-    swcodec: "随机与文件跳过"
+    swcodec: "乱序与曲目跳转"
   </voice>
 </phrase>
 <phrase>
@@ -9304,7 +9287,7 @@
     player: "Buf:"
   </dest>
   <voice>
-    *: "缓冲大小"
+    *: "缓冲大小为"
   </voice>
 </phrase>
 <phrase>
@@ -9366,16 +9349,13 @@
     player: "(PLAY/STOP)"
   </source>
   <dest>
-    *: "PLAY = 是"
-    h100,h120,h300: "NAVI = 是"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = 是"
+    *: "PLAY=是"
+    h100,h120,h300: "NAVI=是"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT=是"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
-    h100,h120,h300: ""
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: ""
-    player: ""
   </voice>
 </phrase>
 <phrase>
@@ -9390,15 +9370,12 @@
   </source>
   <dest>
     *: none
-    rtc: "ON = 设定"
-    h100,h120,h300: "NAVI = 设定"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = 设定"
+    rtc: "ON=设置"
+    h100,h120,h300: "NAVI=设置"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT=设置"
   </dest>
   <voice>
     *: none
-    rtc: "ON = 设定"
-    h100,h120,h300: "NAVI = 设定"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9410,7 +9387,7 @@
     player: none
   </source>
   <dest>
-    *: "Any Other = 否"
+    *: "Any Other=否"
     player: none
   </dest>
   <voice>
@@ -9425,10 +9402,10 @@
     *: "Browse Cuesheet"
   </source>
   <dest>
-    *: "浏览 Cuesheet"
+    *: "浏览Cuesheet"
   </dest>
   <voice>
-    *: "浏览 Cuesheet"
+    *: "浏览Cue sheet"
   </voice>
 </phrase>
 <phrase>
@@ -9439,10 +9416,10 @@
     *: "Demos"
   </source>
   <dest>
-    *: "样品程序"
+    *: "演示程序"
   </dest>
   <voice>
-    *: "样品程序"
+    *: "演示程序"
   </voice>
 </phrase>
 <phrase>
@@ -9484,10 +9461,10 @@
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "使用 .talk 文件"
+    *: "使用.talk文件"
   </dest>
   <voice>
-    *: "使用 talk 文件"
+    *: "使用talk文件"
   </voice>
 </phrase>
 <phrase>
@@ -9512,10 +9489,10 @@
     *: "All"
   </source>
   <dest>
-    *: "全部"
+    *: "所有"
   </dest>
   <voice>
-    *: "全部"
+    *: "所有"
   </voice>
 </phrase>
 <phrase>
@@ -9543,10 +9520,10 @@
     *: "Add to Shortcuts"
   </source>
   <dest>
-    *: "添加到快捷"
+    *: "添加到方式"
   </dest>
   <voice>
-    *: "添加到快捷"
+    *: "添加到方式"
   </voice>
 </phrase>
 <phrase>
@@ -9574,10 +9551,10 @@
     *: "Main Menu"
   </source>
   <dest>
-    *: "主菜单"
+    *: "主选单"
   </dest>
   <voice>
-    *: "主菜单"
+    *: "主选单"
   </voice>
 </phrase>
 <phrase>
@@ -9603,11 +9580,11 @@
     player: "End of List"
   </source>
   <dest>
-    *: "列表结束"
+    *: "曲目列表结束"
     player: "列表结束"
   </dest>
   <voice>
-    *: "列表结束"
+    *: "曲目列表结束"
     player: "列表结束"
   </voice>
 </phrase>
@@ -9621,11 +9598,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "增加"
+    lcd_bitmap: "增益"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "增加"
+    lcd_bitmap: "增益"
   </voice>
 </phrase>
 <phrase>
@@ -9638,11 +9615,11 @@
   </source>
   <dest>
     *: none
-    alarm: "闹钟开机画面"
+    alarm: "闹铃开机画面"
   </dest>
   <voice>
     *: none
-    alarm: "闹钟开机画面"
+    alarm: "闹铃开机画面"
   </voice>
 </phrase>
 <phrase>
@@ -9655,11 +9632,11 @@
   </source>
   <dest>
     *: none
-    recording: "清除录音目录"
+    recording: "清空录音目录"
   </dest>
   <voice>
     *: none
-    recording: "清除录音目录"
+    recording: "清空录音目录"
   </voice>
 </phrase>
 <phrase>
@@ -9670,10 +9647,10 @@
     *: "Buttons Unlocked"
   </source>
   <dest>
-    *: "键盘开锁"
+    *: "按键开锁"
   </dest>
   <voice>
-    *: "键盘开锁"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9686,7 +9663,7 @@
   </source>
   <dest>
     *: none
-    agc: "实时 (慢)"
+    agc: "实时(慢)"
   </dest>
   <voice>
     *: none
@@ -9701,10 +9678,10 @@
     *: "Save Theme Settings"
   </source>
   <dest>
-    *: "储存主题设置"
+    *: "保存主题设置"
   </dest>
   <voice>
-    *: "储存主题设置"
+    *: "保存主题设置"
   </voice>
 </phrase>
 <phrase>
@@ -9734,11 +9711,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Mode:"
+    lcd_bitmap: "模式:"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Mode:"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -9751,7 +9728,7 @@
   </source>
   <dest>
     *: none
-    agc: "人声 (快)"
+    agc: "人声(快)"
   </dest>
   <voice>
     *: none
@@ -9768,11 +9745,11 @@
   </source>
   <dest>
     *: none
-    recording: "(没设置)"
+    recording: "(无设置项)"
   </dest>
   <voice>
     *: none
-    recording: "没设置"
+    recording: "无设置项"
   </voice>
 </phrase>
 <phrase>
@@ -9785,11 +9762,11 @@
   </source>
   <dest>
     *: none
-    recording: "最少"
+    recording: "持续"
   </dest>
   <voice>
     *: none
-    recording: "最少"
+    recording: "持续"
   </voice>
 </phrase>
 <phrase>
@@ -9802,11 +9779,11 @@
   </source>
   <dest>
     *: none
-    recording: "文件分割大小"
+    recording: "分割文件大小"
   </dest>
   <voice>
     *: none
-    recording: "文件分割大小"
+    recording: "分割文件大小"
   </voice>
 </phrase>
 <phrase>
@@ -9833,11 +9810,11 @@
   </source>
   <dest>
     *: none
-    remote: "(Vol- : 重新使用)"
+    remote: "(Vol- :重新启用)"
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : 重新使用)"
+    remote: "音量减重新启用"
   </voice>
 </phrase>
 <phrase>
@@ -9848,10 +9825,10 @@
     *: "Ask"
   </source>
   <dest>
-    *: "每次提问"
+    *: "每次询问"
   </dest>
   <voice>
-    *: "每次提问"
+    *: "每次询问"
   </voice>
 </phrase>
 <phrase>
@@ -9865,7 +9842,7 @@
     *: "模式:"
   </dest>
   <voice>
-    *: "模式:"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9899,7 +9876,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "调低半音"
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -9929,11 +9906,11 @@
   </source>
   <dest>
     *: none
-    agc: "安全 (clip)"
+    agc: "安全(削波)"
   </dest>
   <voice>
     *: none
-    agc: "安全 (clip)"
+    agc: "安全 削波"
   </voice>
 </phrase>
 <phrase>
@@ -9975,10 +9952,10 @@
     *: "Play Next"
   </source>
   <dest>
-    *: "下一个播放"
+    *: "播放下一个"
   </dest>
   <voice>
-    *: "下一个播放"
+    *: "播放下一个"
   </voice>
 </phrase>
 <phrase>
@@ -9989,10 +9966,10 @@
     *: "Playlist Catalog"
   </source>
   <dest>
-    *: "播放清单库"
+    *: "播放列表录"
   </dest>
   <voice>
-    *: "播放清单库"
+    *: "播放列表录"
   </voice>
 </phrase>
 <phrase>
@@ -10005,11 +9982,11 @@
   </source>
   <dest>
     *: none
-    recording: "分割 Measure"
+    recording: "分割依据"
   </dest>
   <voice>
     *: none
-    recording: "分割 Measure"
+    recording: "分割依据"
   </voice>
 </phrase>
 <phrase>
@@ -10023,7 +10000,7 @@
     *: "[作品]"
   </dest>
   <voice>
-    *: "[作品]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10034,10 +10011,10 @@
     *: "Battery empty! RECHARGE!"
   </source>
   <dest>
-    *: "电池没电! 请冲电!"
+    *: "无电量!请充电!"
   </dest>
   <voice>
-    *: "电池没电 请冲电"
+    *: "无电量!请充电!"
   </voice>
 </phrase>
 <phrase>
@@ -10081,11 +10058,11 @@
   </source>
   <dest>
     *: none
-    radio: "美国 / 加拿大"
+    radio: "美国/加拿大"
   </dest>
   <voice>
     *: none
-    radio: "美国  加拿大"
+    radio: "美国 加拿大"
   </voice>
 </phrase>
 <phrase>
@@ -10132,11 +10109,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "倒退时间"
+    headphone_detection: "快退前时滞"
   </dest>
   <voice>
     *: none
-    headphone_detection: "倒退时间"
+    headphone_detection: "快退前时滞"
   </voice>
 </phrase>
 <phrase>
@@ -10153,7 +10130,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "调高半音"
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -10178,10 +10155,10 @@
     *: "Add to New Playlist"
   </source>
   <dest>
-    *: "增加到新播放清单"
+    *: "添加到新播放列表"
   </dest>
   <voice>
-    *: "增加到新播放清单"
+    *: "添加到新播放列表"
   </voice>
 </phrase>
 <phrase>
@@ -10212,7 +10189,7 @@
     *: ""
   </dest>
   <voice>
-    *: "指数"
+    *: "序号"
   </voice>
 </phrase>
 <phrase>
@@ -10225,11 +10202,11 @@
   </source>
   <dest>
     *: none
-    recording: "分割时间"
+    recording: "分割时长"
   </dest>
   <voice>
     *: none
-    recording: "分割时间"
+    recording: "分割时长"
   </voice>
 </phrase>
 <phrase>
@@ -10240,10 +10217,10 @@
     *: "Please reboot to enable"
   </source>
   <dest>
-    *: "请先重启再使用"
+    *: "重启后启用"
   </dest>
   <voice>
-    *: "请先重启再使用"
+    *: "重启后启用"
   </voice>
 </phrase>
 <phrase>
@@ -10254,10 +10231,10 @@
     *: "Context Menu"
   </source>
   <dest>
-    *: "有关菜单"
+    *: "相关选单"
   </dest>
   <voice>
-    *: "有关菜单"
+    *: "相关选单"
   </voice>
 </phrase>
 <phrase>
@@ -10268,10 +10245,10 @@
     *: "Previous Screen"
   </source>
   <dest>
-    *: "最后关机画面"
+    *: "关机前画面"
   </dest>
   <voice>
-    *: "最后关机画面"
+    *: "关机前画面"
   </voice>
 </phrase>
 <phrase>
@@ -10282,10 +10259,10 @@
     *: "Add to Playlist"
   </source>
   <dest>
-    *: "添加到播放菜单"
+    *: "添加到播放列表"
   </dest>
   <voice>
-    *: "添加到播放菜单"
+    *: "添加到播放列表"
   </voice>
 </phrase>
 <phrase>
@@ -10298,11 +10275,11 @@
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "按钮光度"
+    gigabeatf,mrobe100: "按键背光亮度"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "按钮光度"
+    gigabeatf,mrobe100: "按键背光亮度"
   </voice>
 </phrase>
 <phrase>
@@ -10313,10 +10290,10 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "使用 Cuesheet"
+    *: "Cuesheet支持"
   </dest>
   <voice>
-    *: "使用 Cuesheet"
+    *: "Cue sheet支持"
   </voice>
 </phrase>
 <phrase>
@@ -10327,10 +10304,10 @@
     *: "[Discnum]"
   </source>
   <dest>
-    *: "[唱片编号]"
+    *: "[碟片编号]"
   </dest>
   <voice>
-    *: "[唱片编号]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10341,10 +10318,10 @@
     *: "Show Filename Extensions"
   </source>
   <dest>
-    *: "显示文件后缀"
+    *: "显示文件名后缀"
   </dest>
   <voice>
-    *: "显示文件后缀"
+    *: "显示文件名后缀"
   </voice>
 </phrase>
 <phrase>
@@ -10355,10 +10332,10 @@
     *: "Loading... %d%% done (%s)"
   </source>
   <dest>
-    *: "正在处理... %d%% (%s)"
+    *: "读取...%d%%已读取(%s)"
   </dest>
   <voice>
-    *: "正在处理 %d%% (%s)"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10388,11 +10365,11 @@
   </source>
   <dest>
     *: none
-    recording: "分割时做什么"
+    recording: "分割时动作"
   </dest>
   <voice>
     *: none
-    recording: "分割时做什么"
+    recording: "分割时动作"
   </voice>
 </phrase>
 <phrase>
@@ -10403,10 +10380,10 @@
     *: "Start Screen"
   </source>
   <dest>
-    *: "开始画面"
+    *: "开机画面"
   </dest>
   <voice>
-    *: "开始画面"
+    *: "开机画面"
   </voice>
 </phrase>
 <phrase>
@@ -10451,10 +10428,10 @@
     *: "<Don't Resume>"
   </source>
   <dest>
-    *: "<不要恢复书签>"
+    *: "<不恢复书签>"
   </dest>
   <voice>
-    *: "<不要恢复书签>"
+    *: "<不恢复书签>"
   </voice>
 </phrase>
 <phrase>
@@ -10496,10 +10473,10 @@
     *: "Show Path"
   </source>
   <dest>
-    *: "显示全文件径"
+    *: "显示路径"
   </dest>
   <voice>
-    *: "显示全文件径"
+    *: "显示路径"
   </voice>
 </phrase>
 <phrase>
@@ -10526,11 +10503,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "添加抖动"
+    swcodec: "高频抖动"
   </dest>
   <voice>
     *: none
-    swcodec: "添加抖动"
+    swcodec: "高频抖动"
   </voice>
 </phrase>
 <phrase>
@@ -10556,11 +10533,11 @@
     scrollwheel: none
   </source>
   <dest>
-    *: "列表加速缓冲"
+    *: "列表加速前时滞"
     scrollwheel: none
   </dest>
   <voice>
-    *: "列表加速缓冲"
+    *: "列表加速前时滞"
     scrollwheel: none
   </voice>
 </phrase>
@@ -10572,10 +10549,10 @@
     *: "Moving..."
   </source>
   <dest>
-    *: "正在移动..."
+    *: "移动..."
   </dest>
   <voice>
-    *: "正在移动..."
+    *: "移动中"
   </voice>
 </phrase>
 <phrase>
@@ -10603,10 +10580,10 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "使用 .talk 文件夹"
+    *: "目录使用.talk文件"
   </dest>
   <voice>
-    *: "使用 talk 文件夹"
+    *: "目录使用.talk文件"
   </voice>
 </phrase>
 <phrase>
@@ -10631,10 +10608,10 @@
     *: "View Catalog"
   </source>
   <dest>
-    *: "查看播放清单库"
+    *: "查看播放列表录"
   </dest>
   <voice>
-    *: "查看播放清单库"
+    *: "查看播放列表录"
   </voice>
 </phrase>
 <phrase>
@@ -10648,7 +10625,7 @@
     *: ""
   </dest>
   <voice>
-    *: "cuesheet"
+    *: "cue sheet"
   </voice>
 </phrase>
 <phrase>
@@ -10662,7 +10639,7 @@
     *: ", 乱序"
   </dest>
   <voice>
-    *: ", 乱序"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10707,13 +10684,13 @@
   </source>
   <dest>
     *: none
-    e200: "转盘灯自动关时间"
-    c200,gigabeatf,mrobe100,sa9200: ""
+    e200: "转盘背光自动关闭时滞"
+    c200,gigabeatf,mrobe100,sa9200: "按键背光自动关闭时滞"
   </dest>
   <voice>
     *: none
-    e200: "转盘灯自动关时间"
-    c200,gigabeatf,mrobe100,sa9200: ""
+    e200: "转盘背光自动关闭时滞"
+    c200,gigabeatf,mrobe100,sa9200: "按键背光自动关闭时滞"
   </voice>
 </phrase>
 <phrase>
@@ -10727,7 +10704,7 @@
     *: "[专辑艺术家]"
   </dest>
   <voice>
-    *: "[专辑艺术家]"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10740,11 +10717,11 @@
   </source>
   <dest>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "MP3"
   </dest>
   <voice>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "MP3"
   </voice>
 </phrase>
 <phrase>
@@ -10755,10 +10732,10 @@
     *: "Current Directory Only"
   </source>
   <dest>
-    *: "只显示本文件夹"
+    *: "只显示当前目录"
   </dest>
   <voice>
-    *: "只显示本文件夹"
+    *: "只显示当前目录"
   </voice>
 </phrase>
 <phrase>
@@ -10786,10 +10763,10 @@
     *: "Playlists"
   </source>
   <dest>
-    *: "播放清单"
+    *: "播放列表"
   </dest>
   <voice>
-    *: "播放清单"
+    *: "播放列表"
   </voice>
 </phrase>
 <phrase>
@@ -10800,10 +10777,10 @@
     *: "Only When Viewing All Types"
   </source>
   <dest>
-    *: "浏览所有格式时才显示"
+    *: "浏览所有文件时才显示"
   </dest>
   <voice>
-    *: "浏览所有格式时才显示"
+    *: "浏览所有文件时才显示"
   </voice>
 </phrase>
 <phrase>
@@ -10814,10 +10791,10 @@
     *: "Only Unknown Types"
   </source>
   <dest>
-    *: "不明格式才显示"
+    *: "未知格式才显示"
   </dest>
   <voice>
-    *: "不明格式才显示"
+    *: "未知格式才显示"
   </voice>
 </phrase>
 <phrase>
@@ -10845,10 +10822,10 @@
     *: "Buttons Locked"
   </source>
   <dest>
-    *: "键盘已锁"
+    *: "按键已锁"
   </dest>
   <voice>
-    *: "键盘已锁"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10887,10 +10864,10 @@
     *: "Last.fm Log"
   </source>
   <dest>
-    *: "Last.fm 标签"
+    *: "Last.fm日志"
   </dest>
   <voice>
-    *: "Last.fm 标签"
+    *: "Last.fm日志"
   </voice>
 </phrase>
 <phrase>
@@ -10903,11 +10880,11 @@
   </source>
   <dest>
     *: none
-    hold_button: "键盘锁定时的屏幕背灯"
+    hold_button: "按键锁定时的背光"
   </dest>
   <voice>
     *: none
-    hold_button: "键盘锁定时的屏幕背灯"
+    hold_button: "按键锁定时的背光"
   </voice>
 </phrase>
 <phrase>
@@ -10960,10 +10937,10 @@
     *: "Are You Sure?"
   </source>
   <dest>
-    *: "你肯定吗?"
+    *: "确认重置?"
   </dest>
   <voice>
-    *: "你肯定吗"
+    *: "确认重置吗"
   </voice>
 </phrase>
 <phrase>
@@ -10974,10 +10951,10 @@
     *: "%s doesn't exist"
   </source>
   <dest>
-    *: "%s 不存在"
+    *: "%s不存在"
   </dest>
   <voice>
-    *: "%s 不存在"
+    *: "%s不存在"
   </voice>
 </phrase>
 <phrase>
@@ -10988,10 +10965,10 @@
     *: "No Playlists"
   </source>
   <dest>
-    *: "没有播发清单"
+    *: "没有播放列表"
   </dest>
   <voice>
-    *: "没有播发清单"
+    *: "没有播放列表"
   </voice>
 </phrase>
 <phrase>
@@ -11002,10 +10979,10 @@
     *: "Copying..."
   </source>
   <dest>
-    *: "正在复制中..."
+    *: "复制..."
   </dest>
   <voice>
-    *: "正在复制中"
+    *: "复制中"
   </voice>
 </phrase>
 <phrase>
@@ -11052,11 +11029,11 @@
   </source>
   <dest>
     *: none
-    radio: "FM 收音机菜单"
+    radio: "FM广播选单"
   </dest>
   <voice>
     *: none
-    radio: "FM 收音机菜单"
+    radio: "FM广播选单"
   </voice>
 </phrase>
 <phrase>
@@ -11073,7 +11050,7 @@
   </dest>
   <voice>
     *: none
-    usbstack: "U S B 接口"
+    usbstack: "USB接口"
   </voice>
 </phrase>
 <phrase>
@@ -11086,11 +11063,11 @@
   </source>
   <dest>
     *: none
-    recording: "削波屡计"
+    recording: "削波计数"
   </dest>
   <voice>
     *: none
-    recording: "削波屡计"
+    recording: "削波计数"
   </voice>
 </phrase>
 <phrase>
@@ -11107,7 +11084,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "A M"
+    rtc: "上午"
   </voice>
 </phrase>
 <phrase>
@@ -11120,11 +11097,11 @@
   </source>
   <dest>
     *: none
-    usbstack: "USB主控"
+    usbstack: "USB主控模式"
   </dest>
   <voice>
     *: none
-    usbstack: "U S B 主控"
+    usbstack: "USB主控模式"
   </voice>
 </phrase>
 <phrase>
@@ -11158,7 +11135,7 @@
   </dest>
   <voice>
     *: none
-    usbstack: "U S B 接口模式"
+    usbstack: "USB接口模式"
   </voice>
 </phrase>
 <phrase>
@@ -11171,11 +11148,11 @@
   </source>
   <dest>
     *: none
-    usbstack: "仪器"
+    usbstack: "设备"
   </dest>
   <voice>
     *: none
-    usbstack: "仪器"
+    usbstack: "设备"
   </voice>
 </phrase>
 <phrase>
@@ -11192,7 +11169,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "P M"
+    rtc: "下午"
   </voice>
 </phrase>
 <phrase>
@@ -11205,11 +11182,11 @@
   </source>
   <dest>
     *: none
-    usbstack: "驱动程序"
+    usbstack: "设备驱动程序"
   </dest>
   <voice>
     *: none
-    usbstack: "驱动程序"
+    usbstack: "设备驱动程序"
   </voice>
 </phrase>
 <phrase>
@@ -11243,7 +11220,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "o'clock"
+    rtc: "点整"
   </voice>
 </phrase>
 <phrase>
@@ -11287,11 +11264,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "低音截断"
+    ipodvideo: "低频截止频率"
   </dest>
   <voice>
     *: none
-    ipodvideo: "低音截断"
+    ipodvideo: "低频截止频率"
   </voice>
 </phrase>
 <phrase>
@@ -11304,11 +11281,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "项目选择条主要颜色"
+    lcd_color: "主要颜色"
   </dest>
   <voice>
     *: none
-    lcd_color: "项目选择条主要颜色"
+    lcd_color: "主要颜色"
   </voice>
 </phrase>
 <phrase>
@@ -11322,7 +11299,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Blank"
+    *: "空"
   </voice>
 </phrase>
 <phrase>
@@ -11333,10 +11310,10 @@
     *: "Announce Battery Level"
   </source>
   <dest>
-    *: "读出电池剩余容量"
+    *: "语音提示剩余电量"
   </dest>
   <voice>
-    *: "读出电池剩余容量"
+    *: "语音提示剩余电量"
   </voice>
 </phrase>
 <phrase>
@@ -11367,7 +11344,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Empty list"
+    *: "空列表"
   </voice>
 </phrase>
 <phrase>
@@ -11380,11 +11357,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "字体颜色"
+    lcd_color: "选中字体颜色"
   </dest>
   <voice>
     *: none
-    lcd_color: "字体颜色"
+    lcd_color: "选中字体颜色"
   </voice>
 </phrase>
 <phrase>
@@ -11395,10 +11372,10 @@
     *: "Theme Settings"
   </source>
   <dest>
-    *: "主题设定"
+    *: "主题设置"
   </dest>
   <voice>
-    *: "主题设定"
+    *: "主题设置"
   </voice>
 </phrase>
 <phrase>
@@ -11412,7 +11389,7 @@
     *: ""
   </dest>
   <voice>
-    *: "编辑模式"
+    *: "编辑"
   </voice>
 </phrase>
 <phrase>
@@ -11425,11 +11402,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "渐变颜色条"
+    lcd_color: "颜色渐变条"
   </dest>
   <voice>
     *: none
-    lcd_color: "渐变颜色条"
+    lcd_color: "颜色渐变条"
   </voice>
 </phrase>
 <phrase>
@@ -11442,11 +11419,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "实色条"
+    lcd_color: "单色条"
   </dest>
   <voice>
     *: none
-    lcd_color: "实色条"
+    lcd_color: "单色条"
   </voice>
 </phrase>
 <phrase>
@@ -11476,11 +11453,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "项目选择条次要颜色"
+    lcd_color: "渐变颜色"
   </dest>
   <voice>
     *: none
-    lcd_color: "项目选择条次要颜色"
+    lcd_color: "渐变颜色"
   </voice>
 </phrase>
 <phrase>
@@ -11493,11 +11470,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "高声截断"
+    ipodvideo: "高频截止频率"
   </dest>
   <voice>
     *: none
-    ipodvideo: "高声截断"
+    ipodvideo: "高频截止频率"
   </voice>
 </phrase>
 <phrase>
@@ -11508,7 +11485,7 @@
     *: "Central European (CP1250)"
   </source>
   <dest>
-    *: "欧洲中部 (CP1250)"
+    *: "欧洲中部(CP1250)"
   </dest>
   <voice>
     *: "欧洲中部"
@@ -11536,10 +11513,10 @@
     *: "Save Sound Settings"
   </source>
   <dest>
-    *: "保存声音设定"
+    *: "保存声音设置"
   </dest>
   <voice>
-    *: "保存声音设定"
+    *: "保存声音设置"
   </voice>
 </phrase>
 <phrase>
@@ -11552,11 +11529,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "关键点"
+    swcodec: "按键声"
   </dest>
   <voice>
     *: none
-    swcodec: "关键点"
+    swcodec: "按键声"
   </voice>
 </phrase>
 <phrase>
@@ -11569,11 +11546,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "关键点击重"
+    swcodec: "重复按键声"
   </dest>
   <voice>
     *: none
-    swcodec: "关键点击重"
+    swcodec: "重复按键声"
   </voice>
 </phrase>
 <phrase>
@@ -11586,11 +11563,11 @@
   </source>
   <dest>
     *: none
-    accessory_supply: "东西的电"
+    accessory_supply: "附件供电"
   </dest>
   <voice>
     *: none
-    accessory_supply: "东西的电"
+    accessory_supply: "附件供电"
   </voice>
 </phrase>
 <phrase>
@@ -11617,7 +11594,7 @@
   </source>
   <dest>
     *: none
-    recording: "已录制文件大小："
+    recording: "已录制文件大小:"
   </dest>
   <voice>
     *: none
@@ -11741,7 +11718,7 @@
   </source>
   <dest>
     *: none
-    recording: "分割时间："
+    recording: "分割时长:"
   </dest>
   <voice>
     *: none
@@ -11800,7 +11777,7 @@
   </source>
   <dest>
     *: none
-    recording: "峰值："
+    recording: "峰值:"
   </dest>
   <voice>
     *: none
@@ -11834,7 +11811,7 @@
   </source>
   <dest>
     *: none
-    recording: "文件名："
+    recording: "文件名:"
   </dest>
   <voice>
     *: none
@@ -11941,11 +11918,11 @@
   </source>
   <dest>
     *: none
-    agc: "自动增益控制峰值时长"
+    agc: "自动增益控制削波时长"
   </dest>
   <voice>
     *: none
-    agc: "自动增益控制峰值时长"
+    agc: "自动增益控制削波时长"
   </voice>
 </phrase>
 <phrase>

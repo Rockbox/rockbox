@@ -1142,7 +1142,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: DEPRECATED 
+  desc: DEPRECATED
   user:
   <source>
     *: ""
@@ -1156,7 +1156,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: DEPRECATED 
+  desc: DEPRECATED
   user:
   <source>
     *: ""
@@ -1170,7 +1170,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: DEPRECATED 
+  desc: DEPRECATED
   user:
   <source>
     *: ""
@@ -2194,7 +2194,7 @@
   </source>
   <dest>
     *: none
-    recording: ""
+    recording: deprecated
   </dest>
   <voice>
     *: none
@@ -4064,7 +4064,7 @@
 <phrase>
   id: LANG_RECORD_STOP_GAP
   desc: in recording settings_menu
-  user: 
+  user:
   <source>
     *: none
     recording: "Presplit Gap"
@@ -5246,7 +5246,7 @@
 <phrase>
   id: VOICE_MINUTE
   desc: spoken only, a unit postfix
-  user: 
+  user:
   <source>
     *: ""
   </source>
@@ -5937,7 +5937,7 @@
     *: ""
   </source>
   <dest>
-    *: ""
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -6557,10 +6557,10 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "Indstillinger Hentet"
+    *: "Indstillinger hentet"
   </dest>
   <voice>
-    *: "Indstillinger Hentet"
+    *: "Indstillinger hentet"
   </voice>
 </phrase>
 <phrase>
@@ -6571,10 +6571,10 @@
     *: "Settings Saved"
   </source>
   <dest>
-    *: "Indstillinger Gemt"
+    *: "Indstillinger gemt"
   </dest>
   <voice>
-    *: "Indstillinger Gemt"
+    *: "Indstillinger gemt"
   </voice>
 </phrase>
 <phrase>
@@ -7524,7 +7524,7 @@
 <phrase>
   id: LANG_FM_PRESET_CLEAR
   desc: clear preset list in fm radio
-  user: 
+  user:
   <source>
     *: none
     radio: "Clear Preset List"
@@ -7541,7 +7541,7 @@
 <phrase>
   id: LANG_KEYBOARD_LOADED
   desc: shown when a keyboard has been loaded from the dir browser
-  user: 
+  user:
   <source>
     *: "New Keyboard"
   </source>
@@ -7555,7 +7555,7 @@
 <phrase>
   id: LANG_TAGCACHE
   desc: in the main menu and the settings menu
-  user: 
+  user:
   <source>
     *: "Database"
   </source>
@@ -7569,7 +7569,7 @@
 <phrase>
   id: LANG_FM_PRESET_SAVE
   desc: Save preset list in fm radio
-  user: 
+  user:
   <source>
     *: none
     radio: "Save Preset List"
@@ -7586,7 +7586,7 @@
 <phrase>
   id: LANG_COLOR_RGB_VALUE
   desc: in color screen
-  user: 
+  user:
   <source>
     *: none
     lcd_color: "RGB: %02X%02X%02X"
@@ -7603,7 +7603,7 @@
 <phrase>
   id: LANG_EQUALIZER_GAIN
   desc: in the equalizer settings menu
-  user: 
+  user:
   <source>
     *: none
     swcodec: "Simple EQ Settings"
@@ -7620,7 +7620,7 @@
 <phrase>
   id: LANG_EQUALIZER_BAND_LOW_SHELF
   desc: in the equalizer settings menu
-  user: 
+  user:
   <source>
     *: none
     swcodec: "Low Shelf Filter"
@@ -7637,7 +7637,7 @@
 <phrase>
   id: LANG_EQUALIZER_EDIT_MODE
   desc: in the equalizer settings menu
-  user: 
+  user:
   <source>
     *: none
     swcodec: "Edit mode: %s"
@@ -7654,7 +7654,7 @@
 <phrase>
   id: LANG_EQUALIZER_ENABLED
   desc: in the equalizer settings menu
-  user: 
+  user:
   <source>
     *: none
     swcodec: "Enable EQ"
@@ -7671,7 +7671,7 @@
 <phrase>
   id: LANG_CUT
   desc: The verb/action Cut
-  user: 
+  user:
   <source>
     *: "Cut"
   </source>
@@ -7685,7 +7685,7 @@
 <phrase>
   id: LANG_EQUALIZER_BAND_HIGH_SHELF
   desc: in the equalizer settings menu
-  user: 
+  user:
   <source>
     *: none
     swcodec: "High Shelf Filter"
@@ -7702,7 +7702,7 @@
 <phrase>
   id: LANG_EQUALIZER_BROWSE
   desc: in the equalizer settings menu
-  user: 
+  user:
   <source>
     *: none
     swcodec: "Browse EQ Presets"
@@ -7719,7 +7719,7 @@
 <phrase>
   id: LANG_EQUALIZER
   desc: in the sound settings menu
-  user: 
+  user:
   <source>
     *: none
     swcodec: "Equalizer"
@@ -7736,7 +7736,7 @@
 <phrase>
   id: LANG_BACKDROP_LOADED
   desc: text for splash to indicate a new backdrop has been loaded successfully
-  user: 
+  user:
   <source>
     *: none
     lcd_non-mono: "Backdrop Loaded"
@@ -7753,7 +7753,7 @@
 <phrase>
   id: LANG_SET_AS_BACKDROP
   desc: text for onplay menu entry
-  user: 
+  user:
   <source>
     *: none
     lcd_non-mono: "Set As Backdrop"
@@ -10052,7 +10052,7 @@
 </phrase>
 <phrase>
   id: LANG_DELETING
-  desc: 
+  desc:
   user:
   <source>
     *: "Deleting..."
@@ -10111,7 +10111,7 @@
 </phrase>
 <phrase>
   id: LANG_REC_DIR_NOT_WRITABLE
-  desc: 
+  desc:
   user:
   <source>
     *: none
@@ -10128,7 +10128,7 @@
 </phrase>
 <phrase>
   id: LANG_BROWSE_CUESHEET
-  desc: 
+  desc:
   user:
   <source>
     *: "Browse Cuesheet"
@@ -10156,7 +10156,7 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_REC_DIR
-  desc: 
+  desc:
   user:
   <source>
     *: none
@@ -10277,7 +10277,7 @@
 </phrase>
 <phrase>
   id: LANG_MOVING
-  desc: 
+  desc:
   user:
   <source>
     *: "Moving..."
@@ -10333,7 +10333,7 @@
 </phrase>
 <phrase>
   id: LANG_COPYING
-  desc: 
+  desc:
   user:
   <source>
     *: "Copying..."
@@ -10372,11 +10372,11 @@
   </source>
   <dest>
     *: none
-    recording: "Line In"
+    recording: "Line in"
   </dest>
   <voice>
     *: none
-    recording: "Line In"
+    recording: "Line in"
   </voice>
 </phrase>
 <phrase>
@@ -10640,7 +10640,7 @@
 </phrase>
 <phrase>
   id: LANG_ADD_TO_FAVES
-  desc: 
+  desc:
   user:
   <source>
     *: "Add to Shortcuts"
@@ -10919,7 +10919,7 @@
 </phrase>
 <phrase>
   id: VOICE_EXT_CUESHEET
-  desc: 
+  desc:
   user:
   <source>
     *: ""
@@ -11049,7 +11049,7 @@
 <phrase>
   id: LANG_EXT_ONLY_VIEW_ALL
   desc: in settings_menu
-  user: 
+  user:
   <source>
     *: "Only When Viewing All Types"
   </source>
@@ -11128,7 +11128,7 @@
 <phrase>
   id: VOICE_OH
   desc: spoken only, for wall clock announce
-  user: 
+  user:
   <source>
     *: none
     rtc: ""
@@ -11594,7 +11594,7 @@
 <phrase>
   id: LANG_ENABLE_STUDY_MODE
   desc: DEPRECATED
-  user: 
+  user:
   <source>
     *: ""
   </source>
@@ -11608,7 +11608,7 @@
 <phrase>
   id: LANG_TOUCHPAD_SENSITIVITY
   desc: touchpad sensitivity setting
-  user: 
+  user:
   <source>
     *: none
     gigabeatf: "Touchpad Sensitivity"
@@ -11625,7 +11625,7 @@
 <phrase>
   id: LANG_ACCESSORY_SUPPLY
   desc: in system settings menu
-  user: 
+  user:
   <source>
     *: none
     accessory_supply: "Accessory Power Supply"
@@ -11642,7 +11642,7 @@
 <phrase>
   id: LANG_STOP_RECORDING_AND_SHUTDOWN
   desc: in record timesplit options
-  user: 
+  user:
   <source>
     *: none
     recording: "Stop Recording And Shutdown"
@@ -11659,7 +11659,7 @@
 <phrase>
   id: LANG_STUDY_MODE
   desc: DEPRECATED
-  user: 
+  user:
   <source>
     *: ""
   </source>
@@ -11673,7 +11673,7 @@
 <phrase>
   id: LANG_STUDY_HOP_STEP
   desc: DEPRECATED
-  user: 
+  user:
   <source>
     *: ""
   </source>
@@ -11687,7 +11687,7 @@
 <phrase>
   id: VOICE_QUICKSCREEN
   desc: spoken only, Announces entering the "quick screen"
-  user: 
+  user:
   <source>
     *: ""
   </source>
@@ -11701,7 +11701,7 @@
 <phrase>
   id: LANG_DISABLE_STUDY_MODE
   desc: DEPRECATED
-  user: 
+  user:
   <source>
     *: ""
   </source>
@@ -11715,7 +11715,7 @@
 <phrase>
   id: LANG_UNKNOWN
   desc: generic string for unknown states, such as an unset clock
-  user: 
+  user:
   <source>
     *: "Unknown"
   </source>
@@ -11729,7 +11729,7 @@
 <phrase>
   id: VOICE_OK
   desc: spoken only, On exiting a context, specifically the quick screen
-  user: 
+  user:
   <source>
     *: ""
   </source>
@@ -11743,7 +11743,7 @@
 <phrase>
   id: LANG_HIGH
   desc: in settings_menu
-  user: 
+  user:
   <source>
     *: none
     gigabeatf: "High"
@@ -11760,7 +11760,7 @@
 <phrase>
   id: LANG_FAST
   desc: in settings_menu
-  user: 
+  user:
   <source>
     *: "Fast"
   </source>
@@ -11774,7 +11774,7 @@
 <phrase>
   id: LANG_VERY_SLOW
   desc: in settings_menu
-  user: 
+  user:
   <source>
     *: "Very slow"
   </source>
@@ -11788,7 +11788,7 @@
 <phrase>
   id: LANG_SLOW
   desc: in settings_menu
-  user: 
+  user:
   <source>
     *: "Slow"
   </source>
@@ -11802,7 +11802,7 @@
 <phrase>
   id: LANG_VERY_FAST
   desc: in settings_menu
-  user: 
+  user:
   <source>
     *: "Very fast"
   </source>
@@ -11858,7 +11858,7 @@
 <phrase>
   id: LANG_RECORDING_SIZE
   desc: Display of recorded file size
-  user: 
+  user:
   <source>
     *: none
     recording: "Size:"
@@ -11892,7 +11892,7 @@
 <phrase>
   id: LANG_RECORDING_TIMESPLIT_REC
   desc: Display of record timer interval setting, on the record screen
-  user: 
+  user:
   <source>
     *: none
     recording: "Split Time:"
@@ -11909,7 +11909,7 @@
 <phrase>
   id: LANG_PM_CLIPCOUNT
   desc: in recording GUI, for recording peak meter. MAX 5 characters!
-  user: 
+  user:
   <source>
     *: none
     recording: "CLIP:"
@@ -11926,7 +11926,7 @@
 <phrase>
   id: LANG_GAIN_RIGHT
   desc: in the recording screen
-  user: 
+  user:
   <source>
     *: none
     recording: "Gain R"
@@ -11943,7 +11943,7 @@
 <phrase>
   id: LANG_RECORDING_FILENAME
   desc: Filename header in recording screen
-  user: 
+  user:
   <source>
     *: none
     recording: "Filename:"
@@ -11960,7 +11960,7 @@
 <phrase>
   id: LANG_GAIN_LEFT
   desc: in the recording screen
-  user: 
+  user:
   <source>
     *: none
     recording: "Gain L"
