@@ -90,7 +90,7 @@ int ft_build_playlist(struct tree_context* c, int start_index)
  */
 bool ft_play_playlist(char* pathname, char* dirname, char* filename)
 {
-    if (global_settings.party_mode) 
+    if (global_settings.party_mode && audio_status()) 
     {
         splash(HZ, ID2P(LANG_PARTY_MODE));
         return false;
@@ -404,7 +404,7 @@ int ft_enter(struct tree_context* c)
                 if (!warn_on_pl_erase())
                     break;
 
-                if (global_settings.party_mode) 
+                if (global_settings.party_mode && audio_status()) 
                 {
                     playlist_insert_track(NULL, buf,
                                           PLAYLIST_INSERT_LAST, true, true);
@@ -529,7 +529,7 @@ int ft_enter(struct tree_context* c)
 
                 /* plugin file */
             case FILE_ATTR_ROCK:
-                if (global_settings.party_mode) {
+                if (global_settings.party_mode && audio_status()) {
                     splash(HZ, ID2P(LANG_PARTY_MODE));
                     break;
                 }
@@ -553,7 +553,7 @@ int ft_enter(struct tree_context* c)
             {
                 const char* plugin;
 
-                if (global_settings.party_mode) {
+                if (global_settings.party_mode && audio_status()) {
                     splash(HZ, ID2P(LANG_PARTY_MODE));
                     break;
                 }
