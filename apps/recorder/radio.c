@@ -1391,6 +1391,8 @@ static int handle_radio_presets(void)
             case ACTION_STD_CONTEXT:
                 selected_preset = gui_synclist_get_sel_pos(&lists);
                 do_menu(&handle_radio_preset_menu, NULL, NULL, false);
+                gui_synclist_set_nb_items(&lists, num_presets);
+                gui_synclist_select_item(&lists, selected_preset);
                 gui_synclist_speak_item(&lists);
                 break;
             default:
