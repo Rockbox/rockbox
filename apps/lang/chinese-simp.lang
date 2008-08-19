@@ -4271,7 +4271,7 @@
   desc: splash number of tracks inserted
   user: 
   <source>
-    *: "Searching...%d found (%s)"
+    *: "Searching... %d found (%s)"
   </source>
   <dest>
     *: "寻找...%d已找到(%s)"
