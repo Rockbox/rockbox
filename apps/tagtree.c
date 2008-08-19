@@ -1489,6 +1489,10 @@ int tagtree_enter(struct tree_context* c)
         case allsubentries:
             if (newextra == playtrack)
             {
+                if (global_settings.party_mode && audio_status()) {
+                    splash(HZ, ID2P(LANG_PARTY_MODE));
+                    break;
+                }
                 c->dirlevel--;
                 /* about to create a new current playlist...
                  allow user to cancel the operation */
