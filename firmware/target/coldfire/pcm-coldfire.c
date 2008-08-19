@@ -479,11 +479,12 @@ void DMA1(void)
     }
 #ifdef HAVE_SPDIF_REC
     else if (DATAINCONTROL == 0xc038 &&
-        (INTERRUPTSTAT & ((1 << 24) | (1 << 23) | (1 << 22))))
+        (INTERRUPTSTAT & ((1 << 23) | (1 << 22))))
     {
-        /* reason: valnogood, symbolerr, parityerr */
-        /* clear: ebu1cnew, valnogood, symbolerr, parityerr */
-        INTERRUPTCLEAR = (1 << 25) | (1 << 24) | (1 << 23) | (1 << 22);
+        /* reason: symbolerr, parityerr.
+         * Ignore valnogood since several sources don't set it properly. */
+        /* clear: ebu1cnew, symbolerr, parityerr */
+        INTERRUPTCLEAR = (1 << 25) | (1 << 23) | (1 << 22);
         status = DMA_REC_ERROR_SPDIF;
         logf("spdif err");
     }
