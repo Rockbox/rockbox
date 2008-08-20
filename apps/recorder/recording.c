@@ -2178,6 +2178,11 @@ unsigned long pcm_rec_get_warnings(void)
     return 0;
 }
 
+unsigned long pcm_rec_sample_rate(void)
+{
+    return 0;
+}
+
 unsigned long audio_recorded_time(void)
 {
     return 123;
