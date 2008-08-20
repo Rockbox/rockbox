@@ -797,7 +797,7 @@ enum rec_list_items_stereo {
     ITEM_FILENAME = 6,
     ITEM_COUNT = 7,
 #else
-    ITEM_FILENAME = 4,
+    ITEM_FILENAME = 6,
     ITEM_COUNT = 5,
 #endif
 };
@@ -811,10 +811,18 @@ enum rec_list_items_mono {
     ITEM_FILENAME_M = 6,
     ITEM_COUNT_M = 5,
 #else
-    ITEM_FILENAME_M = 4,
+    ITEM_FILENAME_M = 6,
     ITEM_COUNT_M = 3,
 #endif
 };
+
+#ifdef HAVE_SPDIF_REC
+enum rec_list_items_spdif {
+    ITEM_VOLUME_D = 0,
+    ITEM_FILENAME_D = 6,
+    ITEM_COUNT_D = 2,
+};
+#endif
 
 static int listid_to_enum[ITEM_COUNT];
 
@@ -1158,7 +1166,17 @@ bool recording_screen(bool no_source)
             update_countdown = 0; /* Update immediately */
 
             /* populate translation table for list id -> enum */
-            if(global_settings.rec_source == AUDIO_SRC_MIC)
+#ifdef HAVE_SPDIF_REC
+            if(global_settings.rec_source == AUDIO_SRC_SPDIF)
+            {
+                listid_to_enum[0] = ITEM_VOLUME_D;
+                listid_to_enum[1] = ITEM_FILENAME_D;
+                gui_synclist_set_nb_items(&lists, ITEM_COUNT_D);   /* spdif */
+            }
+            else
+#endif
+            if((global_settings.rec_source == AUDIO_SRC_MIC) ||
+               (global_settings.rec_channels == 1))
             {
                 listid_to_enum[0] = ITEM_VOLUME_M;
                 listid_to_enum[1] = ITEM_GAIN_M;
@@ -1169,6 +1187,7 @@ bool recording_screen(bool no_source)
 #else
                 listid_to_enum[2] = ITEM_FILENAME_M;
 #endif
+                gui_synclist_set_nb_items(&lists, ITEM_COUNT_M); /* mono */
             }
             else
             {
@@ -1183,12 +1202,9 @@ bool recording_screen(bool no_source)
 #else
                 listid_to_enum[4] = ITEM_FILENAME;
 #endif
+                gui_synclist_set_nb_items(&lists, ITEM_COUNT);   /* stereo */
             }
 
-            if(global_settings.rec_source == AUDIO_SRC_MIC)
-                gui_synclist_set_nb_items(&lists, ITEM_COUNT_M); /* mono */
-            else
-                gui_synclist_set_nb_items(&lists, ITEM_COUNT);   /* stereo */
             gui_synclist_draw(&lists);
         } /* if(done < 0) */
 
