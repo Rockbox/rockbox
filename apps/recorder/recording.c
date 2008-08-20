@@ -794,10 +794,10 @@ enum rec_list_items_stereo {
 #ifdef HAVE_AGC
     ITEM_AGC_MODE = 4,
     ITEM_AGC_MAXDB = 5,
-    ITEM_FILENAME = 6,
+    ITEM_FILENAME = 7,
     ITEM_COUNT = 7,
 #else
-    ITEM_FILENAME = 6,
+    ITEM_FILENAME = 7,
     ITEM_COUNT = 5,
 #endif
 };
@@ -808,10 +808,10 @@ enum rec_list_items_mono {
 #ifdef HAVE_AGC
     ITEM_AGC_MODE_M = 4,
     ITEM_AGC_MAXDB_M = 5,
-    ITEM_FILENAME_M = 6,
+    ITEM_FILENAME_M = 7,
     ITEM_COUNT_M = 5,
 #else
-    ITEM_FILENAME_M = 6,
+    ITEM_FILENAME_M = 7,
     ITEM_COUNT_M = 3,
 #endif
 };
@@ -819,8 +819,14 @@ enum rec_list_items_mono {
 #ifdef HAVE_SPDIF_REC
 enum rec_list_items_spdif {
     ITEM_VOLUME_D = 0,
-    ITEM_FILENAME_D = 6,
+#if CONFIG_CODEC == SWCODEC
+    ITEM_SAMPLERATE_D = 6,
+    ITEM_FILENAME_D = 7,
+    ITEM_COUNT_D = 3,
+#else
+    ITEM_FILENAME_D = 7,
     ITEM_COUNT_D = 2,
+#endif
 };
 #endif
 
@@ -910,6 +916,15 @@ static char * reclist_get_name(int selected_item, void * data,
                                   buf3, sizeof(buf3)));
             break;
 #endif
+#if CONFIG_CODEC == SWCODEC
+#ifdef HAVE_SPDIF_REC
+        case ITEM_SAMPLERATE_D:
+            snprintf(buffer, buffer_len, "%s: %d",
+                     str(LANG_RECORDING_FREQUENCY),
+                     pcm_rec_sample_rate());
+            break;
+#endif
+#endif
         case ITEM_FILENAME:
         {
             if(audio_status() & AUDIO_STATUS_RECORD)
@@ -960,6 +975,12 @@ bool recording_screen(bool no_source)
 #if CONFIG_CODEC == SWCODEC
     int warning_counter = 0;
     #define WARNING_PERIOD 7
+#endif
+
+#if CONFIG_CODEC == SWCODEC
+#ifdef HAVE_SPDIF_REC
+    unsigned long prev_sample_rate = 0;
+#endif
 #endif
 
 #ifdef HAVE_FMRADIO_REC
@@ -1170,7 +1191,13 @@ bool recording_screen(bool no_source)
             if(global_settings.rec_source == AUDIO_SRC_SPDIF)
             {
                 listid_to_enum[0] = ITEM_VOLUME_D;
+#if CONFIG_CODEC == SWCODEC
+                listid_to_enum[1] = ITEM_SAMPLERATE_D;
+                listid_to_enum[2] = ITEM_FILENAME_D;
+#else
                 listid_to_enum[1] = ITEM_FILENAME_D;
+#endif
+
                 gui_synclist_set_nb_items(&lists, ITEM_COUNT_D);   /* spdif */
             }
             else
@@ -1775,6 +1802,18 @@ bool recording_screen(bool no_source)
                     change_recording_gain(false, false, true);
             }
 #endif /* HAVE_AGC */
+
+#if CONFIG_CODEC == SWCODEC
+#ifdef HAVE_SPDIF_REC
+            if((global_settings.rec_source == AUDIO_SRC_SPDIF) &&
+               (prev_sample_rate != pcm_rec_sample_rate()))
+            {
+                /* spdif samplerate changed */
+                prev_sample_rate = pcm_rec_sample_rate();
+                update_list = true;
+            }
+#endif
+#endif
 
             if(update_list)
             {
