@@ -324,6 +324,9 @@ static void usb_thread(void)
 #ifdef HAVE_USBSTACK
                 if(exclusive_ata_access)
                 {
+                    int rc = disk_mount_all();
+                    if (rc <= 0) /* no partition */
+                        panicf("mount: %d",rc);
                     exclusive_ata_access = false;
 #endif
                     /* Tell all threads that we are back in business */
