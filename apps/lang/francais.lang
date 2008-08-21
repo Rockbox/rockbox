@@ -1461,13 +1461,13 @@
   desc: in settings_menu()
   user:
   <source>
-    *: "Playback"
+    *: "Playback Settings"
   </source>
   <dest>
-    *: "Lecture"
+    *: "Réglages Lecture"
   </dest>
   <voice>
-    *: "Lecture"
+    *: "Réglages Lecture"
   </voice>
 </phrase>
 <phrase>
@@ -2823,15 +2823,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Mode"
   </source>
   <dest>
     *: none
-    lcd_invert: "Mode d'affichage"
+    lcd_invert,remote_lcd_invert: "Mode d'affichage"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Mode d'affichage"
+    lcd_invert,remote_lcd_invert: "Mode d'affichage"
   </voice>
 </phrase>
 <phrase>
@@ -2840,15 +2840,15 @@
   user:
   <source>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Inverse"
   </source>
   <dest>
     *: none
-    lcd_invert: "Inversé"
+    lcd_invert,remote_lcd_invert: "Inversé"
   </dest>
   <voice>
     *: none
-    lcd_invert: "Inversé"
+    lcd_invert,remote_lcd_invert: "Inversé"
   </voice>
 </phrase>
 <phrase>
@@ -6144,10 +6144,10 @@
     recording: ""
   </source>
   <dest>
-    *: ""
+    *: none
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -7761,7 +7761,7 @@
     *: "Fichier/dossier existant. Ecraser ?"
   </dest>
   <voice>
-    *: ""
+    *: "Fichier/dossier existant. Ecraser ?"
   </voice>
 </phrase>
 <phrase>
@@ -7803,7 +7803,7 @@
     *: "Effacer?"
   </dest>
   <voice>
-    *: ""
+    *: "Effacer?"
   </voice>
 </phrase>
 <phrase>
@@ -8430,9 +8430,9 @@
   </source>
   <dest>
     *: "OFF pour Annuler"
-    h100,h120,h300: "STOP pour Annuler"
+    player,h100,h120,h300: "STOP pour Annuler"
     ipod*: "PLAY/PAUSE pour Annuler"
-    x5: "Long PLAY pour Annuler"
+    x5,m5: "Long PLAY pour Annuler"
     h10,h10_5gb,e200,c200: "PREV pour Annuler"
   </dest>
   <voice>
@@ -11573,7 +11573,8 @@
     *: none
     swcodec: "Répéter les clics"
   </voice>
-</phrase><phrase>
+</phrase>
+<phrase>
   id: LANG_ACCESSORY_SUPPLY
   desc: in system settings menu
   user:
@@ -11606,7 +11607,7 @@
 </phrase>
 <phrase>
   id: LANG_STUDY_MODE
-  desc: deprecated
+  desc: DEPRECATED
   user:
   <source>
     *: ""
@@ -11620,7 +11621,7 @@
 </phrase>
 <phrase>
   id: LANG_STUDY_HOP_STEP
-  desc: playback settings menu
+  desc: DEPRECATED
   user: deprecated
   <source>
     *: ""
@@ -11634,7 +11635,7 @@
 </phrase>
 <phrase>
   id: LANG_ENABLE_STUDY_MODE
-  desc: deprecated
+  desc: DEPRECATED
   user:
   <source>
     *: ""
@@ -11648,7 +11649,7 @@
 </phrase>
 <phrase>
   id: LANG_DISABLE_STUDY_MODE
-  desc: deprecated
+  desc: DEPRECATED
   user:
   <source>
     *: ""
