@@ -11715,11 +11715,11 @@
   </source>
   <dest>
     *: none
-    gigabeatf: "Sensibilité écran tactile"
+    gigabeatf: "Sensibilité du pavé tactile"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Sensibilité de l'écran tactile"
+    gigabeatf: "Sensibilité du pavé tactile"
   </voice>
 </phrase>
 <phrase>
@@ -11880,7 +11880,7 @@
   </source>
   <dest>
     *: none
-    agc: "AGC"
+    agc: "CAG"
   </dest>
   <voice>
     *: none
