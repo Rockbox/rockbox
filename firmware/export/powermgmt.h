@@ -126,7 +126,13 @@ extern int trickle_sec;          /* trickle charge: How many seconds per minute 
 # define CURRENT_NORMAL     45  /* Should be nearly identical to E200 */
 # define CURRENT_BACKLIGHT  40  /* Screen is about 20, blue LEDs are another 20, so 40 if both */
 # define CURRENT_RECORD     40  /* flash player, so this is just unboosted current*/
-#else /* Not iriver H1x0, H3x0, nor Archos Ondio, nor iPod nano/Video, nor Sansas */
+#elif defined(IPOD_4G)       /* iPOD 4G */
+# define CURRENT_NORMAL     100  /* MP3: ~10.5h out of 1100mAh battery  */
+# define CURRENT_BACKLIGHT  20  /* FIXME: this needs adjusting */
+#if defined(HAVE_RECORDING)
+# define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
+#endif
+#else /* Not iriver H1x0, H3x0, nor Archos Ondio, nor iPod nano/Video/4G, nor Sansas */
 # define CURRENT_NORMAL    145  /* usual current in mA when using the AJB including some disk/backlight/... activity */
 # define CURRENT_BACKLIGHT  30  /* additional current when backlight always on */
 #if defined(HAVE_RECORDING)
