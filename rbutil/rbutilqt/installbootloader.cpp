@@ -469,8 +469,13 @@ void BootloaderInstaller::iaudioPrepare()
 void BootloaderInstaller::iaudioFinish()
 {
     QString firmware;
+    QDir dir(m_mountpoint + "/FIRMWARE/");
+    if(!dir.exists())
+    {
+        dir.mkpath(m_mountpoint + "/FIRMWARE/");
+    }
     firmware = resolvePathCase(m_mountpoint + "/FIRMWARE/") + "/" + m_bootloadername;
-
+     
     //copy the firmware
     if(!downloadFile.copy(firmware))
     {
