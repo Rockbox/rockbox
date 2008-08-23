@@ -213,7 +213,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef VUMETER_QUIT
 #define VUMETER_QUIT      BUTTON_TOPLEFT
 #define LABEL_QUIT        "TOPLEFT"

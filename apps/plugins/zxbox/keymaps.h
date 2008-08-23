@@ -127,7 +127,7 @@
 
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef ZX_UP
 #define ZX_UP           BUTTON_TOPMIDDLE
 #endif

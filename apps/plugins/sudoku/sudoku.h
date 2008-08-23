@@ -190,7 +190,7 @@
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef SUDOKU_BUTTON_QUIT
 #define SUDOKU_BUTTON_QUIT     BUTTON_TOPLEFT
 #endif

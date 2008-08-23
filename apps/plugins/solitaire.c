@@ -307,7 +307,7 @@ static const struct plugin_api* rb;
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 //#ifndef SOL_QUIT
 //#   define SOL_QUIT          BUTTON_TOPLEFT
 //endif

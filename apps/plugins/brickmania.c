@@ -173,7 +173,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef LEFT
 #define LEFT    BUTTON_MIDLEFT
 #endif
@@ -448,7 +448,7 @@ enum menu_items {
 #endif
 
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #include "lib/touchscreen.h"
 
 static struct ts_mapping main_menu_items[4] =
@@ -1024,8 +1024,8 @@ int game_menu(int when)
         rb->lcd_update();
 
         button = rb->button_get(true);
-#ifdef HAVE_TOUCHPAD
-        if(button & BUTTON_TOUCHPAD)
+#ifdef HAVE_TOUCHSCREEN
+        if(button & BUTTON_TOUCHSCREEN)
         {
             unsigned int result = touchscreen_map(&main_menu, rb->button_get_data() >> 16, rb->button_get_data() & 0xffff);
             if(result != (unsigned)-1 && button & BUTTON_REL)
@@ -1176,8 +1176,8 @@ int help(int when)
 #ifdef RC_QUIT
             case RC_QUIT:
 #endif
-#ifdef HAVE_TOUCHPAD
-            case BUTTON_TOUCHPAD:
+#ifdef HAVE_TOUCHSCREEN
+            case BUTTON_TOUCHSCREEN:
 #endif
             case QUIT:
                 switch (game_menu(when)) {
@@ -1871,8 +1871,8 @@ int game_loop(void)
             button = QUIT;
 #endif
 
-#ifdef HAVE_TOUCHPAD
-            if(button & BUTTON_TOUCHPAD)
+#ifdef HAVE_TOUCHSCREEN
+            if(button & BUTTON_TOUCHSCREEN)
             {
                 short touch_x, touch_y;
                 touch_x = rb->button_get_data() >> 16;
@@ -1936,7 +1936,7 @@ int game_loop(void)
                         pad_pos_x-=8;
                     }
                 }
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
             }
 #endif
 

@@ -104,7 +104,7 @@ static int plasma_frequency;
 
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef PLASMA_QUIT
 #define PLASMA_QUIT               BUTTON_TOPLEFT
 #endif
@@ -114,7 +114,7 @@ static int plasma_frequency;
 #ifndef PLASMA_DECREASE_FREQUENCY
 #define PLASMA_DECREASE_FREQUENCY BUTTON_MIDLEFT
 #endif
-#endif /* HAVE_TOUCHPAD */
+#endif /* HAVE_TOUCHSCREEN */
 
 #ifndef PLASMA_QUIT
 #define PLASMA_QUIT               BUTTON_OFF
@@ -147,11 +147,11 @@ static int plasma_frequency;
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
 #define PLASMA_REGEN_COLORS BUTTON_SELECT
 #endif
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef PLASMA_REGEN_COLORS
 #define PLASMA_REGEN_COLORS BUTTON_CENTER
 #endif
-#endif /* HAVE_TOUCHPAD */
+#endif /* HAVE_TOUCHSCREEN */
 #endif /* HAVE_LCD_COLOR */
 
 #define WAV_AMP 90

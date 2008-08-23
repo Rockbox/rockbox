@@ -250,7 +250,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 // not enough touchfields, so CUBE_QUIT have to be 
 // mapped to a real button
 //ifndef CUBE_QUIT

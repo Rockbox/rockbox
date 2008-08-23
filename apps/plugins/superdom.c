@@ -134,7 +134,7 @@ char buf[255];
 
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef SUPERDOM_OK
 #define SUPERDOM_OK     BUTTON_CENTER
 #endif

@@ -148,7 +148,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef PUZZLE_QUIT
 #define PUZZLE_QUIT    BUTTON_TOPLEFT
 #endif
@@ -676,7 +676,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         rb->lcd_putsxy(0, 28, "[MODE] shuffle");
         rb->lcd_putsxy(0, 38, "[MENU] change pic");
 #endif
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
         rb->lcd_putsxy(0, 18, PUZZLE_QUIT_TEXT " to stop");
         rb->lcd_putsxy(0, 28, PUZZLE_SHUFFLE_TEXT " shuffle");
         rb->lcd_putsxy(0, 38, PUZZLE_PICTURE_TEXT " change pic");

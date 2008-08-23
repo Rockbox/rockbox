@@ -274,7 +274,7 @@
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef CB_LEVEL
 #define CB_LEVEL          BUTTON_TOPLEFT
 #endif

@@ -148,7 +148,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef BOUNCE_LEFT
 #define BOUNCE_LEFT BUTTON_MIDLEFT
 #endif

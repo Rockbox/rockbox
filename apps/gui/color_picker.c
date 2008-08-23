@@ -330,13 +330,13 @@ static void draw_screen(struct screen *display, char *title,
     set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
 }
 
-#ifdef HAVE_TOUCHPAD
-static int touchpad_slider(struct rgb_pick *rgb, int *selected_slider)
+#ifdef HAVE_TOUCHSCREEN
+static int touchscreen_slider(struct rgb_pick *rgb, int *selected_slider)
 {
     short     x,y;
     int       text_top,i,x1;
     int       slider_left, slider_width;
-    unsigned  button = action_get_touchpad_press(&x, &y);
+    unsigned  button = action_get_touchscreen_press(&x, &y);
     bool      display_three_rows;
     int       max_label_width;
     struct screen *display = &screens[SCREEN_MAIN];
@@ -426,9 +426,9 @@ bool set_color(struct screen *display, char *title, unsigned *color,
         }
 
         button = get_action(CONTEXT_SETTINGS_COLOURCHOOSER, TIMEOUT_BLOCK);
-#ifdef HAVE_TOUCHPAD
-        if (button == ACTION_TOUCHPAD)
-            button = touchpad_slider(&rgb, &slider);
+#ifdef HAVE_TOUCHSCREEN
+        if (button == ACTION_TOUCHSCREEN)
+            button = touchscreen_slider(&rgb, &slider);
 #endif
 
         switch (button)

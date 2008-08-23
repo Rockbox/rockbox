@@ -265,7 +265,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef CALCULATOR_LEFT
 #define CALCULATOR_LEFT           BUTTON_MIDLEFT
 #endif
@@ -1549,8 +1549,8 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     while (calStatus != cal_exit ) {
         btn = rb->button_get_w_tmo(HZ/2);
-#ifdef HAVE_TOUCHPAD
-        if(btn & BUTTON_TOUCHPAD)
+#ifdef HAVE_TOUCHSCREEN
+        if(btn & BUTTON_TOUCHSCREEN)
         {
             struct ts_raster_result res;
             if(touchscreen_map_raster(&calc_raster, rb->button_get_data() >> 16, rb->button_get_data() & 0xffff, &res) == 1)
@@ -1575,7 +1575,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
                             sciButtonsProcess();
                             break;
                     }
-                    btn = BUTTON_TOUCHPAD;
+                    btn = BUTTON_TOUCHSCREEN;
                 }
             }
         }

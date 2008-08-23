@@ -103,7 +103,7 @@ extern const fb_data matrix_normal[];
 #error Unsupported keypad
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef MATRIX_EXIT
 #define MATRIX_EXIT       BUTTON_TOPLEFT
 #endif

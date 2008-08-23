@@ -82,8 +82,8 @@ enum {
     ACTION_NONE = BUTTON_NONE,
     ACTION_UNKNOWN,
     ACTION_REDRAW, /* returned if keys are locked and we splash()'ed */
-    ACTION_TOUCHPAD,
-    ACTION_TOUCHPAD_MODE, /* toggle the touchpad mode */
+    ACTION_TOUCHSCREEN,
+    ACTION_TOUCHSCREEN_MODE, /* toggle the touchscreen mode */
     
     /* standard actions, use these first */
     ACTION_STD_PREV, 
@@ -265,13 +265,13 @@ int get_action_statuscode(int *button);
    BUTTON_NONE or flagged with SYS_EVENT */
 intptr_t get_action_data(void);
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 /* return BUTTON_NONE on error
           BUTTON_REPEAT if repeated press
           BUTTON_REL    if its a short press
-          BUTTON_TOUCHPAD   otherwise
+          BUTTON_TOUCHSCREEN   otherwise
 */
-int action_get_touchpad_press(short *x, short *y);
+int action_get_touchscreen_press(short *x, short *y);
 #endif
 
 #endif /* __ACTION_H__ */

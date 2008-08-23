@@ -194,7 +194,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef CHC_SETTINGS_OK
 #define CHC_SETTINGS_OK  BUTTON_CENTER
 #endif

@@ -160,7 +160,7 @@ const unsigned char rockbox16x7[] = {
 #endif
 #endif /* CONFIG_REMOTE_KEYPAD */
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef LP_QUIT
 #define LP_QUIT  BUTTON_TOPLEFT
 #endif

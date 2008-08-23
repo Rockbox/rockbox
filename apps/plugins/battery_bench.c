@@ -154,7 +154,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef BATTERY_ON
 #define BATTERY_ON       BUTTON_CENTER
 #endif

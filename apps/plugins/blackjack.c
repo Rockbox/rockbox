@@ -261,7 +261,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef BJACK_START
 #define BJACK_START      BUTTON_CENTER
 #endif
@@ -1238,7 +1238,7 @@ static unsigned int blackjack_menu(struct game_context* bj) {
             rb->lcd_puts(0, 10, str);
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
             rb->lcd_puts(0, 2, "LCD CENTRE      to start & to hit");
             rb->lcd_puts(0, 3, "LCD BOTTOMLEFT  to stay");
             rb->lcd_puts(0, 4, "LCD BOTTOMRIGHT to save/resume");

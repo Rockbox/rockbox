@@ -60,30 +60,30 @@ void wheel_send_events(bool send);
 int button_apply_acceleration(const unsigned int data);
 #endif
 
-#define BUTTON_NONE    0x00000000
+#define BUTTON_NONE        0x00000000
 
 /* Button modifiers */
-#define BUTTON_REL      0x02000000
-#define BUTTON_REPEAT   0x04000000
-#define BUTTON_TOUCHPAD 0x08000000
+#define BUTTON_REL         0x02000000
+#define BUTTON_REPEAT      0x04000000
+#define BUTTON_TOUCHSCREEN 0x08000000
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #if !defined(BUTTON_TOPLEFT) || !defined(BUTTON_TOPMIDDLE) \
  || !defined(BUTTON_TOPRIGHT) || !defined(BUTTON_MIDLEFT) \
  || !defined(BUTTON_CENTER) || !defined(BUTTON_MIDRIGHT) \
  || !defined(BUTTON_BOTTOMLEFT) || !defined(BUTTON_BOTTOMMIDDLE) \
  || !defined(BUTTON_BOTTOMRIGHT)
-#error Touchpad button mode BUTTON_* defines not set up correctly
+#error Touchscreen button mode BUTTON_* defines not set up correctly
 #endif
-enum touchpad_mode {
-    TOUCHPAD_POINT = 0, /* touchpad returns pixel co-ords */
-    TOUCHPAD_BUTTON,    /* touchpad returns BUTTON_* area codes
-                           actual pixel value will still be accessable
-                           from button_get_data */
+enum touchscreen_mode {
+    TOUCHSCREEN_POINT = 0, /* touchscreen returns pixel co-ords */
+    TOUCHSCREEN_BUTTON,    /* touchscreen returns BUTTON_* area codes
+                                  actual pixel value will still be accessable
+                                  from button_get_data */
 };
 /* maybe define the number of buttons in button-target.h ? */
-void touchpad_set_mode(enum touchpad_mode mode);
-enum touchpad_mode touchpad_get_mode(void);
+void touchscreen_set_mode(enum touchscreen_mode mode);
+enum touchscreen_mode touchscreen_get_mode(void);
 #endif
 
 #endif /* _BUTTON_H_ */

@@ -218,7 +218,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef JPEG_UP
 #define JPEG_UP         BUTTON_TOPMIDDLE
 #endif

@@ -227,7 +227,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef MANDELBROT_UP
 #define MANDELBROT_UP            BUTTON_TOPMIDDLE
 #endif

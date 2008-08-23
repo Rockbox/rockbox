@@ -345,8 +345,8 @@ struct plugin_api {
 #ifdef HAS_BUTTON_HOLD
     bool (*button_hold)(void);
 #endif
-#ifdef HAVE_TOUCHPAD
-    void (*touchpad_set_mode)(enum touchpad_mode);
+#ifdef HAVE_TOUCHSCREEN
+    void (*touchscreen_set_mode)(enum touchscreen_mode);
 #endif
 #ifdef HAVE_BUTTON_LIGHT
     void (*buttonlight_set_timeout)(int value);

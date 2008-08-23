@@ -155,7 +155,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef PONG_QUIT
 #define PONG_QUIT       BUTTON_TOPMIDDLE
 #endif
@@ -398,7 +398,7 @@ int keys(struct pong *p)
 #endif
 
     /* number of ticks this function will loop reading keys */
-#ifndef HAVE_TOUCHPAD
+#ifndef HAVE_TOUCHSCREEN
     int time = 4;
 #else
     int time = 1;
@@ -409,9 +409,9 @@ int keys(struct pong *p)
     while(end > *rb->current_tick) {
         key = rb->button_get_w_tmo(end - *rb->current_tick);
         
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
     short touch_x, touch_y;
-    if(key & BUTTON_TOUCHPAD)
+    if(key & BUTTON_TOUCHSCREEN)
     {
         touch_x = rb->button_get_data() >> 16;
         touch_y = rb->button_get_data() & 0xFFFF;

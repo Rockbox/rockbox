@@ -157,7 +157,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef JEWELS_UP
 #define JEWELS_UP     BUTTON_TOPMIDDLE
 #endif
@@ -1610,7 +1610,7 @@ static int jewels_main(struct game_context* bj) {
     #warning: missing help text.
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
                 rb->lcd_puts(0, 2, "Swap pairs of jewels to");
                 rb->lcd_puts(0, 3, "form connected segments");
                 rb->lcd_puts(0, 4, "of three or more of the");

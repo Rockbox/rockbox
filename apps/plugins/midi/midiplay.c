@@ -154,7 +154,7 @@ PLUGIN_IRAM_DECLARE
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef BTN_QUIT
 #define BTN_QUIT         BUTTON_TOPLEFT
 #endif

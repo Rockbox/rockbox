@@ -89,7 +89,7 @@ test_fps,apps
 test_grey,apps
 test_sampr,apps
 test_scanrate,apps
-test_touchpad,apps
+test_touchscreen,apps
 test_viewports,apps
 text_editor,apps
 vbrfix,viewers

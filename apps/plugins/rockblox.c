@@ -221,7 +221,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef ROCKBLOX_OFF
 #define ROCKBLOX_OFF           BUTTON_TOPLEFT
 #endif

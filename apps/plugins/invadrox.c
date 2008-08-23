@@ -124,7 +124,7 @@ PLUGIN_HEADER
     #error INVADROX: Unsupported keypad
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef QUIT
 #define QUIT     BUTTON_TOPLEFT
 #endif

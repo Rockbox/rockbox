@@ -216,7 +216,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef FLIPIT_LEFT
 #define FLIPIT_LEFT         BUTTON_MIDLEFT
 #endif
@@ -675,7 +675,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     rb->lcd_putsxy(2, 48, "[MENU] step by step");
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
     rb->lcd_putsxy(2, 8, "[BOTTOMLEFT]  to stop");
     rb->lcd_putsxy(2, 18, "[CENTRE]      toggle");
     rb->lcd_putsxy(2, 28, "[TOPRIGHT]    shuffle");

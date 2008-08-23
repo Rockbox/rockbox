@@ -154,7 +154,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef STOPWATCH_QUIT
 #define STOPWATCH_QUIT        BUTTON_TOPLEFT
 #endif

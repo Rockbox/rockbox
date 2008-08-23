@@ -237,8 +237,8 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAS_BUTTON_HOLD
     button_hold,
 #endif
-#ifdef HAVE_TOUCHPAD
-    touchpad_set_mode,
+#ifdef HAVE_TOUCHSCREEN
+    touchscreen_set_mode,
 #endif
     
 #ifdef HAVE_BUTTON_LIGHT

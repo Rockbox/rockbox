@@ -77,7 +77,7 @@ static const struct plugin_api* rb;
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef BTN_MENU
 #define BTN_MENU (BUTTON_TOPLEFT|BUTTON_REL)
 #endif

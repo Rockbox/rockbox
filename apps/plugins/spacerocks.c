@@ -209,7 +209,7 @@ static const struct plugin_api* rb; /* global api struct pointer */
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef AST_PAUSE
 #define AST_PAUSE       BUTTON_CENTER
 #endif

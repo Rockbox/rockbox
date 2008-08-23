@@ -297,7 +297,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef SNAKE2_LEFT 
 #define SNAKE2_LEFT        BUTTON_MIDLEFT
 #endif

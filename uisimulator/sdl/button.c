@@ -32,16 +32,16 @@
 
 static intptr_t button_data; /* data value from last message dequeued */
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 static int mouse_coords = 0;
-static enum touchpad_mode touchpad_mode = TOUCHPAD_POINT;
-void touchpad_set_mode(enum touchpad_mode mode)
+static enum touchscreen_mode touchscreen_mode = TOUCHSCREEN_POINT;
+void touchscreen_set_mode(enum touchscreen_mode mode)
 {
-    touchpad_mode = mode;
+    touchscreen_mode = mode;
 }
-enum touchpad_mode touchpad_get_mode(void)
+enum touchscreen_mode touchscreen_get_mode(void)
 {
-    return touchpad_mode;
+    return touchscreen_mode;
 }
 #endif
 /* how long until repeat kicks in */
@@ -120,23 +120,23 @@ void button_event(int key, bool pressed)
     switch (key)
     {
 
-#ifdef HAVE_TOUCHPAD
-    case BUTTON_TOUCHPAD:
+#ifdef HAVE_TOUCHSCREEN
+    case BUTTON_TOUCHSCREEN:
         data = mouse_coords;
-        switch (touchpad_mode)
+        switch (touchscreen_mode)
         {
-            case TOUCHPAD_POINT:
-                new_btn = BUTTON_TOUCHPAD;
+            case TOUCHSCREEN_POINT:
+                new_btn = BUTTON_TOUCHSCREEN;
                 break;
-            case TOUCHPAD_BUTTON:
+            case TOUCHSCREEN_BUTTON:
             {
-                static int touchpad_buttons[3][3] = {
+                static int touchscreen_buttons[3][3] = {
                     {BUTTON_TOPLEFT, BUTTON_TOPMIDDLE, BUTTON_TOPRIGHT},
                     {BUTTON_MIDLEFT, BUTTON_CENTER, BUTTON_MIDRIGHT},
                     {BUTTON_BOTTOMLEFT, BUTTON_BOTTOMMIDDLE, BUTTON_BOTTOMRIGHT},
                 };
                 int px_x = ((data&0xffff0000)>>16), px_y = ((data&0x0000ffff));
-                new_btn = touchpad_buttons[px_y/(LCD_HEIGHT/3)][px_x/(LCD_WIDTH/3)];
+                new_btn = touchscreen_buttons[px_y/(LCD_HEIGHT/3)][px_x/(LCD_WIDTH/3)];
                 break;
             }
         }
@@ -171,8 +171,8 @@ void button_event(int key, bool pressed)
     case SDLK_F4:
         if(pressed)
         {
-            touchpad_mode = (touchpad_mode == TOUCHPAD_POINT ? TOUCHPAD_BUTTON : TOUCHPAD_POINT);
-            printf("Touchpad mode: %s\n", touchpad_mode == TOUCHPAD_POINT ? "TOUCHPAD_POINT" : "TOUCHPAD_BUTTON");
+            touchscreen_mode = (touchscreen_mode == TOUCHSCREEN_POINT ? TOUCHSCREEN_BUTTON : TOUCHSCREEN_POINT);
+            printf("Touchscreen mode: %s\n", touchscreen_mode == TOUCHSCREEN_POINT ? "TOUCHSCREEN_POINT" : "TOUCHSCREEN_BUTTON");
         }
         break;
             
@@ -1105,7 +1105,7 @@ long button_get_w_tmo(int ticks)
 
 intptr_t button_get_data(void)
 {
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
     return button_data;
 #else
     /* Needed by the accelerating wheel driver for Sansa e200 */
@@ -1113,7 +1113,7 @@ intptr_t button_get_data(void)
 #endif
 }
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 extern bool debug_wps;
 void mouse_tick_task(void)
 {
@@ -1134,7 +1134,7 @@ void mouse_tick_task(void)
         }
         
         mouse_coords = (x<<16)|y;
-        button_event(BUTTON_TOUCHPAD, true);
+        button_event(BUTTON_TOUCHSCREEN, true);
         if (debug_wps)
             printf("Mouse at: (%d, %d)\n", x, y);
     }
@@ -1142,7 +1142,7 @@ void mouse_tick_task(void)
 #endif
 void button_init(void)
 {
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
     tick_add_task(mouse_tick_task);
 #endif
 }

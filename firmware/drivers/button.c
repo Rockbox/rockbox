@@ -517,7 +517,7 @@ static int button_read(void)
 
     /* Filter the button status. It is only accepted if we get the same
        status twice in a row. */
-#ifndef HAVE_TOUCHPAD
+#ifndef HAVE_TOUCHSCREEN
     if (btn != last_read)
             retval = lastbtn;
     else

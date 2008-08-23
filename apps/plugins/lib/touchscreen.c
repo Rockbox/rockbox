@@ -21,7 +21,7 @@
 
 #include "plugin.h"
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 
 #include "touchscreen.h"
 
@@ -132,4 +132,4 @@ struct ts_raster_button_result touchscreen_raster_map_button(struct ts_raster_bu
     return ret;
 }
 
-#endif /* HAVE_TOUCHPAD */
+#endif /* HAVE_TOUCHSCREEN */

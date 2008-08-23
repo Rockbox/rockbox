@@ -192,7 +192,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef OSCILLOSCOPE_QUIT
 #define OSCILLOSCOPE_QUIT         BUTTON_TOPLEFT
 #endif

@@ -66,7 +66,7 @@
 
 #define CONFIG_KEYPAD ONDAVX747_PAD
 #define HAS_BUTTON_HOLD
-#define HAVE_TOUCHPAD
+#define HAVE_TOUCHSCREEN
 #define HAVE_BUTTON_DATA
 
 /* Define this if you do software codec */

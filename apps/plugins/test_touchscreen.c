@@ -23,11 +23,11 @@
 PLUGIN_HEADER
 
 #if (CONFIG_KEYPAD == COWOND2_PAD)
-#define TOUCHPAD_QUIT   BUTTON_POWER
-#define TOUCHPAD_TOGGLE BUTTON_MENU
+#define TOUCHSCREEN_QUIT   BUTTON_POWER
+#define TOUCHSCREEN_TOGGLE BUTTON_MENU
 #elif (CONFIG_KEYPAD == MROBE500_PAD)
-#define TOUCHPAD_QUIT   BUTTON_POWER
-#define TOUCHPAD_TOGGLE BUTTON_RC_MODE
+#define TOUCHSCREEN_QUIT   BUTTON_POWER
+#define TOUCHSCREEN_TOGGLE BUTTON_RC_MODE
 #endif
 
 static const struct plugin_api* rb;
@@ -36,13 +36,13 @@ static const struct plugin_api* rb;
 enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int button = 0;
-    enum touchpad_mode mode = TOUCHPAD_BUTTON;
+    enum touchscreen_mode mode = TOUCHSCREEN_BUTTON;
 
     /* standard stuff */
     (void)parameter;
     rb = api;
     
-    rb->touchpad_set_mode(mode);
+    rb->touchscreen_set_mode(mode);
 
     /* wait until user closes plugin */
     do
@@ -99,10 +99,10 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
             x = 2*(LCD_WIDTH/3); y = 2*(LCD_HEIGHT/3);
         }
 
-        if (button & TOUCHPAD_TOGGLE && (button & BUTTON_REL))
+        if (button & TOUCHSCREEN_TOGGLE && (button & BUTTON_REL))
         {
-            mode = (mode == TOUCHPAD_POINT) ? TOUCHPAD_BUTTON : TOUCHPAD_POINT;
-            rb->touchpad_set_mode(mode);
+            mode = (mode == TOUCHSCREEN_POINT) ? TOUCHSCREEN_BUTTON : TOUCHSCREEN_POINT;
+            rb->touchscreen_set_mode(mode);
         }
         
         if (button & BUTTON_REL) draw_rect = false;
@@ -115,7 +115,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
             rb->lcd_fillrect(x, y, LCD_WIDTH/3, LCD_HEIGHT/3);
         }
 
-        if (draw_rect || button & BUTTON_TOUCHPAD)
+        if (draw_rect || button & BUTTON_TOUCHSCREEN)
         {
             intptr_t button_data = rb->button_get_data();
             x = button_data >> 16;
@@ -125,7 +125,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
             rb->lcd_fillrect(x-7, y-7, 14, 14);
             
             /* in stylus mode, show REL position in black */
-            if (mode == TOUCHPAD_POINT && (button & BUTTON_REL))
+            if (mode == TOUCHSCREEN_POINT && (button & BUTTON_REL))
                 rb->lcd_set_foreground(LCD_BLACK);
             else
                 rb->lcd_set_foreground(LCD_WHITE);
@@ -135,7 +135,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         }
         rb->lcd_update();
 
-    } while (button != TOUCHPAD_QUIT);
+    } while (button != TOUCHSCREEN_QUIT);
 
     return PLUGIN_OK;
 }

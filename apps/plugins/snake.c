@@ -149,7 +149,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef SNAKE_QUIT
 #define SNAKE_QUIT      BUTTON_TOPLEFT
 #endif

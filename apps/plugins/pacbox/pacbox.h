@@ -153,7 +153,7 @@
 
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef PACMAN_UP
 #define PACMAN_UP       BUTTON_MIDRIGHT
 #endif

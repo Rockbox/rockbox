@@ -112,7 +112,7 @@ Still To do:
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef QUIT
 #define QUIT        BUTTON_TOPLEFT
 #endif

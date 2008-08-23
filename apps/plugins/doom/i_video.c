@@ -272,7 +272,7 @@ void I_ShutdownGraphics(void)
 #error Keymap not defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef DOOMBUTTON_UP
 #define DOOMBUTTON_UP      BUTTON_TOPMIDDLE
 #endif

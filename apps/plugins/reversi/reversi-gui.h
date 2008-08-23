@@ -151,7 +151,7 @@
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef REVERSI_QUIT
 #define REVERSI_QUIT                BUTTON_TOPLEFT
 #endif

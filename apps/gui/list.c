@@ -576,9 +576,9 @@ void gui_synclist_speak_item(struct gui_synclist * lists)
 }
 
 extern intptr_t get_action_data(void);
-#if  defined(HAVE_TOUCHPAD)
+#if  defined(HAVE_TOUCHSCREEN)
 /* this needs to be fixed if we ever get more than 1 touchscreen on a target */
-unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewport *parent);
+unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list, struct viewport *parent);
 #endif
 
 bool gui_synclist_do_button(struct gui_synclist * lists,
@@ -619,9 +619,9 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
     }
 #endif
     
-#if defined(HAVE_TOUCHPAD)
-    if (action == ACTION_TOUCHPAD)
-        action = *actionptr = gui_synclist_do_touchpad(lists, &parent[SCREEN_MAIN]);
+#if defined(HAVE_TOUCHSCREEN)
+    if (action == ACTION_TOUCHSCREEN)
+        action = *actionptr = gui_synclist_do_touchscreen(lists, &parent[SCREEN_MAIN]);
 #endif
 
     switch (wrap)

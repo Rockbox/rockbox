@@ -79,7 +79,7 @@ PLUGIN_HEADER
 #endif
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 # ifndef LAMP_LEFT
 #   define LAMP_LEFT       BUTTON_MIDLEFT
 # endif

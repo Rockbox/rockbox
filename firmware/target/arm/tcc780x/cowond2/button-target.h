@@ -44,7 +44,7 @@ void button_set_touch_available(void);
 #define BUTTON_UP    BUTTON_TOPMIDDLE
 #define BUTTON_DOWN  BUTTON_BOTTOMMIDDLE
 
-/* Touchpad Screen Area Buttons */
+/* Touch Screen Area Buttons */
 #define BUTTON_TOPLEFT      0x00000010
 #define BUTTON_TOPMIDDLE    0x00000020
 #define BUTTON_TOPRIGHT     0x00000040

@@ -92,7 +92,7 @@ static const struct plugin_api* rb; /* global api struct pointer */
 #define STARFIELD_QUIT BUTTON_POWER
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef STARFIELD_QUIT
 #define STARFIELD_QUIT              BUTTON_TOPLEFT
 #endif

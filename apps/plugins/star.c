@@ -237,7 +237,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 //#ifndef STAR_QUIT
 //#define STAR_QUIT           BUTTON_TOPLEFT
 //#define STAR_QUIT_NAME           "[TOPLEFT]"
@@ -1075,7 +1075,7 @@ static int star_menu(void)
                                   "[PLAY+RIGHT] Reset level\n"
                                   "[PLAY+UP] Next level", true);
 #endif
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
                 star_display_text("KEYS\n\n"
                                   STAR_TOGGLE_CONTROL_NAME " Toggle Control\n"
                                   STAR_QUIT_NAME " Exit\n"

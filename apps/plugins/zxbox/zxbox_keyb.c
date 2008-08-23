@@ -138,7 +138,7 @@
 
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef KBD_SELECT
 #define KBD_SELECT BUTTON_CENTER
 #endif

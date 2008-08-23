@@ -192,7 +192,7 @@ enum minesweeper_status {
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef MINESWP_QUIT
 #   define MINESWP_QUIT     BUTTON_TOPLEFT
 #endif
@@ -305,7 +305,7 @@ int stack_pos = 0;
 /* a usefull string for snprintf */
 char str[30];
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 
 #include "lib/touchscreen.h"
 static struct ts_raster mine_raster = { 0, 0, MAX_WIDTH, MAX_HEIGHT, TileSize, TileSize };
@@ -485,7 +485,7 @@ void mine_show( void )
         button = rb->button_get(true);
     while( ( button == BUTTON_NONE )
            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
     button = BUTTON_NONE;
 #endif
 }
@@ -582,7 +582,7 @@ enum minesweeper_status minesweeper( void )
     top = (LCD_HEIGHT-height*TileSize)/2;
     left = (LCD_WIDTH-width*TileSize)/2;
     
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
     mine_raster.tl_x = left;
     mine_raster.tl_y = top;
     mine_raster.width = width*TileSize;
@@ -633,21 +633,21 @@ enum minesweeper_status minesweeper( void )
         rb->lcd_update();
 
         button = rb->button_get(true);
-#ifdef HAVE_TOUCHPAD
-        if(button & BUTTON_TOUCHPAD)
+#ifdef HAVE_TOUCHSCREEN
+        if(button & BUTTON_TOUCHSCREEN)
         {
             struct ts_raster_result res;
             if(touchscreen_map_raster(&mine_raster, rb->button_get_data() >> 16, rb->button_get_data() & 0xffff, &res) == 1)
             {
-                button &= ~BUTTON_TOUCHPAD;
-                lastbutton &= ~BUTTON_TOUCHPAD;
+                button &= ~BUTTON_TOUCHSCREEN;
+                lastbutton &= ~BUTTON_TOUCHSCREEN;
                 
                 if(button & BUTTON_REPEAT && lastbutton != MINESWP_TOGGLE && lastbutton ^ BUTTON_REPEAT)
                     button = MINESWP_TOGGLE;
                 else if(button == BUTTON_REL && lastbutton ^ BUTTON_REPEAT)
                     button = MINESWP_DISCOVER;
                 else
-                    button |= BUTTON_TOUCHPAD;
+                    button |= BUTTON_TOUCHSCREEN;
                 
                 x = res.x;
                 y = res.y;

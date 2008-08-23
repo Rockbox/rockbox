@@ -285,17 +285,17 @@ void list_draw(struct screen *display, struct viewport *parent,
 }
 
 
-#if defined(HAVE_TOUCHPAD)
+#if defined(HAVE_TOUCHSCREEN)
 /* This needs to be fixed if we ever get more than 1 touchscreen on a target.
  * This also assumes the whole screen is used, which is a bad assumption but
  * fine until customizable lists comes in...
  */
 static bool scrolling=false;
 
-unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewport *parent)
+unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list, struct viewport *parent)
 {
     short x, y;
-    unsigned button = action_get_touchpad_press(&x, &y);
+    unsigned button = action_get_touchscreen_press(&x, &y);
     int line;
     struct screen *display = &screens[SCREEN_MAIN];
     if (button == BUTTON_NONE)

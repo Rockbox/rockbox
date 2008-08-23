@@ -282,7 +282,7 @@ PLUGIN_HEADER
 #error Unsupported keymap!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef PEGBOX_QUIT
 #define PEGBOX_QUIT     BUTTON_TOPLEFT
 #endif
@@ -370,7 +370,7 @@ PLUGIN_HEADER
 #define BOARD_Y   0
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #include "lib/touchscreen.h"
 
 static struct ts_mapping main_menu_items[5] =
@@ -385,7 +385,7 @@ static struct ts_mapping main_menu_items[5] =
 #elif LCD_WIDTH > 112
 0, LCD_HEIGHT - 8, SYSFONT_WIDTH*28, SYSFONT_HEIGHT
 #else
-#error "Touchpad isn't supported on non-bitmap screens!"
+#error "Touchscreen isn't supported on non-bitmap screens!"
 #endif
 }
 
@@ -640,8 +640,8 @@ static void display_text(char *str, bool waitkey)
                 key = rb->button_get(true);
                 switch (key)
                 {
-#ifdef HAVE_TOUCHPAD
-                    case BUTTON_TOUCHPAD:
+#ifdef HAVE_TOUCHSCREEN
+                    case BUTTON_TOUCHSCREEN:
 #endif
                     case PEGBOX_QUIT:
                     case PEGBOX_LEFT:
@@ -769,8 +769,8 @@ static void new_piece(struct game_context* pb, unsigned int x_loc,
     while (!exit) {
         draw_board(pb);
         button = rb->button_get(true);
-#ifdef HAVE_TOUCHPAD
-        if(button & BUTTON_TOUCHPAD)
+#ifdef HAVE_TOUCHSCREEN
+        if(button & BUTTON_TOUCHSCREEN)
         {
             pegbox_raster_btn.two_d_from.y = x_loc;
             pegbox_raster_btn.two_d_from.x = y_loc;
@@ -1107,8 +1107,8 @@ static unsigned int pegbox_menu(struct game_context* pb) {
         /* handle menu button presses */
         button = rb->button_get(true);
         
-#ifdef HAVE_TOUCHPAD
-        if(button & BUTTON_TOUCHPAD)
+#ifdef HAVE_TOUCHSCREEN
+        if(button & BUTTON_TOUCHSCREEN)
         {
             unsigned int result = touchscreen_map(&main_menu, rb->button_get_data() >> 16, rb->button_get_data() & 0xffff);
             if(result != (unsigned)-1 && button & BUTTON_REL)
@@ -1240,8 +1240,8 @@ static int pegbox(struct game_context* pb) {
 
     while (true) {
         temp_var = rb->button_get(true);
-#ifdef HAVE_TOUCHPAD
-        if(temp_var & BUTTON_TOUCHPAD)
+#ifdef HAVE_TOUCHSCREEN
+        if(temp_var & BUTTON_TOUCHSCREEN)
         {
             pegbox_raster_btn.two_d_from.y = pb->player_row;
             pegbox_raster_btn.two_d_from.x = pb->player_col;

@@ -39,7 +39,7 @@ static intptr_t last_data = 0;
 static int last_action = ACTION_NONE;
 static bool repeated = false;
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 static bool short_press = false;
 #endif
 
@@ -145,12 +145,12 @@ static int get_action_worker(int context, int timeout,
         return ACTION_NONE; /* "safest" return value */
     }
     last_context = context;
-#ifdef HAVE_TOUCHPAD
-    if (button & BUTTON_TOUCHPAD)
+#ifdef HAVE_TOUCHSCREEN
+    if (button & BUTTON_TOUCHSCREEN)
     {
         repeated = false;
         short_press = false;
-        if (last_button & BUTTON_TOUCHPAD)
+        if (last_button & BUTTON_TOUCHSCREEN)
         {
             if ((button & BUTTON_REL) &&
                 ((last_button & BUTTON_REPEAT)==0))
@@ -161,7 +161,7 @@ static int get_action_worker(int context, int timeout,
                 repeated = true;
         }
         last_button = button;
-        return ACTION_TOUCHPAD;
+        return ACTION_TOUCHSCREEN;
     }
 #endif
 #ifndef HAS_BUTTON_HOLD
@@ -282,18 +282,18 @@ int get_action_statuscode(int *button)
     return ret;
 }
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 /* return BUTTON_NONE               on error
  *        BUTTON_REPEAT             if repeated press
  *        BUTTON_REPEAT|BUTTON_REL  if release after repeated press
  *        BUTTON_REL                if its a short press = release after press
- *        BUTTON_TOUCHPAD           if press
+ *        BUTTON_TOUCHSCREEN        if press
  */
-int action_get_touchpad_press(short *x, short *y)
+int action_get_touchscreen_press(short *x, short *y)
 {
     static int last_data = 0;
     int data;
-    if ((last_button & BUTTON_TOUCHPAD) == 0)
+    if ((last_button & BUTTON_TOUCHSCREEN) == 0)
         return BUTTON_NONE;
     data = button_get_data();
     if (last_button & BUTTON_REL)
@@ -314,6 +314,6 @@ int action_get_touchpad_press(short *x, short *y)
     /* This is to return a BUTTON_REL after a BUTTON_REPEAT. */
     if (last_button & BUTTON_REL)
         return BUTTON_REPEAT|BUTTON_REL;
-    return BUTTON_TOUCHPAD;
+    return BUTTON_TOUCHSCREEN;
 }
 #endif

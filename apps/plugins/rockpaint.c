@@ -126,7 +126,7 @@ PLUGIN_HEADER
 #error "Please define keys for this keypad"
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef ROCKPAINT_QUIT
 #define ROCKPAINT_QUIT      BUTTON_TOPLEFT
 #endif

@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-/* Button Code Definitions for touchpad targets */
+/* Button Code Definitions for touchscreen targets */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -34,7 +34,7 @@ const struct button_mapping* target_get_context_mapping(int context);
    get_context_mapping() at the bottom of the file is called by action.c as usual.
    if the context is for the remote control its then passed straight to
    target_get_context_mapping().
-   These tables are only used for the touchpad buttons, so at the end of each
+   These tables are only used for the touchscreen buttons, so at the end of each
    CONTEXT_CUSTOM2 is OR'ed with the context and then sent to target_get_context_mapping()
    (NOTE: CONTEXT_CUSTOM2 will be stripped before being sent to make it easier.)
    In the target keymap, remember to |CONTEXT_CUSTOM2 in the  LAST_ITEM_IN_LIST__NEXTLIST() macro
@@ -43,7 +43,7 @@ const struct button_mapping* target_get_context_mapping(int context);
  */
 
 
-/* touchpad "buttons"
+/* touchscreen "buttons"
    screen is split into a 3x3 grid for buttons...
     BUTTON_TOPLEFT      BUTTON_TOPMIDDLE    BUTTON_TOPRIGHT 
     BUTTON_MIDLEFT      BUTTON_CENTER       BUTTON_MIDRIGHT

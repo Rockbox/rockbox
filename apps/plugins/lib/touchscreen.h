@@ -22,7 +22,9 @@
 #ifndef _PLUGIN_LIB_TOUCHSCREEN_H_
 #define _PLUGIN_LIB_TOUCHSCREEN_H_
 
-#ifdef HAVE_TOUCHPAD
+#include "plugin.h"
+
+#ifdef HAVE_TOUCHSCREEN
 
 struct ts_mapping
 {
@@ -88,5 +90,5 @@ struct ts_raster_button_result
 
 struct ts_raster_button_result touchscreen_raster_map_button(struct ts_raster_button_mapping *map, int x, int y, int button);
 
-#endif /* HAVE_TOUCHPAD */
+#endif /* HAVE_TOUCHSCREEN */
 #endif /* _PLUGIN_LIB_TOUCHSCREEN_H_ */

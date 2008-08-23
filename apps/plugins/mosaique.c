@@ -131,7 +131,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef MOSAIQUE_QUIT
 #define MOSAIQUE_QUIT    BUTTON_TOPLEFT
 #endif

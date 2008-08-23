@@ -86,7 +86,7 @@ static void setoptions (void)
     fd = open(optionsave, O_RDONLY);
     if(fd < 0) /* no options to read, set defaults */
     {
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
         options.LEFT=BUTTON_MIDLEFT;
         options.RIGHT=BUTTON_MIDRIGHT;
 #else
@@ -219,7 +219,7 @@ static void setoptions (void)
 #error No Keymap Defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
         options.UP=BUTTON_TOPMIDDLE;
         options.DOWN=BUTTON_BOTTOMMIDDLE;
 

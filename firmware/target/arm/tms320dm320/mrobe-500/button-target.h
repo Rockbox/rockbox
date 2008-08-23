@@ -33,7 +33,7 @@ int button_read_device(int *data);
 struct touch_calibration_point {
     short px_x; /* known pixel value */
     short px_y;
-    short val_x; /* touchpad value at the known pixel */
+    short val_x; /* touchscreen value at the known pixel */
     short val_y;
 };
 void use_calibration(bool enable);
@@ -55,7 +55,7 @@ void use_calibration(bool enable);
 
 #define BUTTON_TOUCH        0x00000200
 
-/* Touchpad Screen Area Buttons */
+/* Touch Screen Area Buttons */
 #define BUTTON_TOPLEFT      0x00004000
 #define BUTTON_TOPMIDDLE    0x00008000
 #define BUTTON_TOPRIGHT     0x00010000
@@ -67,8 +67,8 @@ void use_calibration(bool enable);
 #define BUTTON_BOTTOMRIGHT  0x00400000
 
 /* compatibility hacks
-   not mapped to the touchpad button areas because
-   the touchpad is not always in that mode */
+   not mapped to the touchscreen button areas because
+   the touchscreen is not always in that mode */
 #define BUTTON_LEFT     BUTTON_RC_REW
 #define BUTTON_RIGHT    BUTTON_RC_FF
 

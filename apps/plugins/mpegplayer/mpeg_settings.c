@@ -128,7 +128,7 @@ struct mpeg_settings settings;
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef MPEG_START_TIME_SELECT
 #define MPEG_START_TIME_SELECT      BUTTON_CENTER
 #endif

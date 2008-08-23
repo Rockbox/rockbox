@@ -280,7 +280,7 @@ PLUGIN_HEADER
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef SOKOBAN_LEFT
 #define SOKOBAN_LEFT          BUTTON_MIDLEFT
 #endif
@@ -1240,7 +1240,7 @@ static int sokoban_menu(void)
                 rb->lcd_putsxy(3, 56, "[SELECT+UP] Next Level");
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
                 rb->lcd_putsxy(3,  6, SOKOBAN_MENU_NAME " Menu");
                 rb->lcd_putsxy(3, 16, SOKOBAN_UNDO_NAME " Undo");
                 rb->lcd_putsxy(3, 26, SOKOBAN_REDO_NAME " Redo");

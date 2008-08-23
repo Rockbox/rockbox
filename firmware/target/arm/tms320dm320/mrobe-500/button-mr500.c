@@ -42,18 +42,18 @@
 static short last_x, last_y, last_z1, last_z2; /* for the touch screen */
 static bool touch_available = false;
 
-static enum touchpad_mode current_mode = TOUCHPAD_POINT;
-static int touchpad_buttons[3][3] = {
+static enum touchscreen_mode current_mode = TOUCHSCREEN_POINT;
+static int touchscreen_buttons[3][3] = {
     {BUTTON_TOPLEFT, BUTTON_TOPMIDDLE, BUTTON_TOPRIGHT},
     {BUTTON_MIDLEFT, BUTTON_CENTER, BUTTON_MIDRIGHT},
     {BUTTON_BOTTOMLEFT, BUTTON_BOTTOMMIDDLE, BUTTON_BOTTOMRIGHT},
 };
 
-void touchpad_set_mode(enum touchpad_mode mode)
+void touchscreen_set_mode(enum touchscreen_mode mode)
 {
     current_mode = mode;
 }
-enum touchpad_mode touchpad_get_mode(void)
+enum touchscreen_mode touchscreen_get_mode(void)
 {
     return current_mode;
 }
@@ -185,13 +185,13 @@ int button_read_device(int *data)
             *data = touch_to_pixels(x, y);
             switch (current_mode)
             {
-                case TOUCHPAD_POINT:
-                    r_button |= BUTTON_TOUCHPAD;
+                case TOUCHSCREEN_POINT:
+                    r_button |= BUTTON_TOUCHSCREEN;
                     break;
-                case TOUCHPAD_BUTTON:
+                case TOUCHSCREEN_BUTTON:
                 {
                     int px_x = ((*data&0xffff0000)>>16), px_y = ((*data&0x0000ffff));
-                    r_button |= touchpad_buttons[px_y/(LCD_HEIGHT/3)][px_x/(LCD_WIDTH/3)];
+                    r_button |= touchscreen_buttons[px_y/(LCD_HEIGHT/3)][px_x/(LCD_WIDTH/3)];
                     oldbutton = r_button;
                     break;
                 }
@@ -233,7 +233,7 @@ int button_read_device(int *data)
     return r_button;
 }
 
-/* Touchpad data available interupt */
+/* Touchscreen data available interupt */
 void read_battery_inputs(void);
 void GIO14(void)
 {

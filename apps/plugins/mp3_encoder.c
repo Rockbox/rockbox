@@ -2460,7 +2460,7 @@ void get_mp3_filename(const char *wav_name)
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef MP3ENC_PREV
 #define MP3ENC_PREV   BUTTON_MIDLEFT
 #endif

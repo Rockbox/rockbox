@@ -54,13 +54,13 @@ extern int line;
 #if 0
 struct touch_calibration_point tl, br;
 
-void touchpad_get_one_point(struct touch_calibration_point *p)
+void touchscreen_get_one_point(struct touch_calibration_point *p)
 {
     int data = 0;
     int start = current_tick;
     while (TIME_AFTER(start+(HZ/3), current_tick))
     {
-        if (button_read_device()&BUTTON_TOUCHPAD)
+        if (button_read_device()&BUTTON_TOUCHSCREEN)
         {
             data = button_get_last_touch();
             p->val_x = data>>16;
@@ -74,7 +74,7 @@ void touchpad_get_one_point(struct touch_calibration_point *p)
 
 #define MARGIN 25
 #define LEN    7
-void touchpad_calibrate_screen(void)
+void touchscreen_calibrate_screen(void)
 {
     reset_screen();
     printf("touch the center of the crosshairs to calibrate");
@@ -83,7 +83,7 @@ void touchpad_calibrate_screen(void)
     lcd_vline(MARGIN, MARGIN-LEN, MARGIN+LEN);
     lcd_update();
     tl.px_x = MARGIN; tl.px_y = MARGIN;
-    touchpad_get_one_point(&tl);
+    touchscreen_get_one_point(&tl);
     reset_screen();
     printf("touch the center of the crosshairs to calibrate");
     /* get the topright value */
@@ -91,7 +91,7 @@ void touchpad_calibrate_screen(void)
     lcd_vline(LCD_WIDTH-MARGIN, LCD_HEIGHT-MARGIN-LEN, LCD_HEIGHT-MARGIN+LEN);
     lcd_update();
     br.px_x = LCD_WIDTH-MARGIN; br.px_y = LCD_HEIGHT-MARGIN;
-    touchpad_get_one_point(&br);
+    touchscreen_get_one_point(&br);
     reset_screen();
     line++;
     printf("tl %d %d", tl.val_x, tl.val_y);
@@ -108,7 +108,7 @@ void mrdebug(void)
     int button=0;
 #if 0
     use_calibration(false);
-    touchpad_calibrate_screen();
+    touchscreen_calibrate_screen();
     use_calibration(true);
 #endif
 
@@ -148,15 +148,15 @@ void mrdebug(void)
         else if (button == BUTTON_RC_HEART)
         {
             printf("POINT");
-            touchpad_set_mode(TOUCHPAD_POINT);
+            touchscreen_set_mode(TOUCHSCREEN_POINT);
         }
         else if (button == BUTTON_RC_MODE)
         {
             printf("BUTTON");
-            touchpad_set_mode(TOUCHPAD_BUTTON);
+            touchscreen_set_mode(TOUCHSCREEN_BUTTON);
         }
 #if 1
-        else if (button&BUTTON_TOUCHPAD)
+        else if (button&BUTTON_TOUCHSCREEN)
         {
             if (button&BUTTON_REL)
                 continue;

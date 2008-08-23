@@ -146,8 +146,8 @@ metadata/asap.c
 #ifdef HAVE_TAGCACHE
 tagcache.c
 #endif
-#ifdef HAVE_TOUCHPAD
-keymaps/keymap-touchpad.c
+#ifdef HAVE_TOUCHSCREEN
+keymaps/keymap-touchscreen.c
 #endif
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) \
     || (CONFIG_KEYPAD == IRIVER_H300_PAD)

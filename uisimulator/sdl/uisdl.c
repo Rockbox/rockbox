@@ -78,7 +78,7 @@ void gui_message_loop(void)
                 button_event(event.key.keysym.sym, false);
                 sim_exit_irq_handler();
                 break;
-#ifndef HAVE_TOUCHPAD
+#ifndef HAVE_TOUCHSCREEN
             case SDL_MOUSEBUTTONDOWN:
                 if (debug_wps && event.button.button == 1)
                 {
@@ -88,7 +88,7 @@ void gui_message_loop(void)
 #else 
             case SDL_MOUSEBUTTONUP:
                 sim_enter_irq_handler();
-                button_event(BUTTON_TOUCHPAD, false);
+                button_event(BUTTON_TOUCHSCREEN, false);
                 sim_exit_irq_handler();
                 break;
 #endif

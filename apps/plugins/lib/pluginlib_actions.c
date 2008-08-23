@@ -67,7 +67,7 @@ const struct button_mapping remote_directions[] =
 
 const struct button_mapping generic_directions[] =
 {
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
     { PLA_UP,                BUTTON_TOPMIDDLE,                  BUTTON_NONE},
     { PLA_DOWN,              BUTTON_BOTTOMMIDDLE,               BUTTON_NONE},
     { PLA_LEFT,              BUTTON_MIDLEFT,                    BUTTON_NONE},
@@ -162,7 +162,7 @@ const struct button_mapping generic_directions[] =
 
 const struct button_mapping generic_left_right_fire[] =
 {
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
     { PLA_LEFT,              BUTTON_MIDLEFT,                BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_MIDLEFT|BUTTON_REPEAT,  BUTTON_NONE},
     { PLA_RIGHT,             BUTTON_MIDRIGHT,               BUTTON_NONE},
@@ -266,7 +266,7 @@ const struct button_mapping generic_left_right_fire[] =
 /* these were taken from the bubbles plugin, so may need tweaking */
 const struct button_mapping generic_actions[] = 
 {
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
     {PLA_QUIT,          BUTTON_BOTTOMRIGHT,                 BUTTON_NONE},
     {PLA_START,         BUTTON_CENTER,                      BUTTON_NONE},
     {PLA_MENU,          BUTTON_TOPLEFT,                     BUTTON_NONE},
@@ -399,7 +399,7 @@ const struct button_mapping generic_actions[] =
 
 const struct button_mapping generic_increase_decrease[] =
 {
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
     {PLA_INC,             BUTTON_TOPMIDDLE,                  BUTTON_NONE},
     {PLA_DEC,             BUTTON_BOTTOMMIDDLE,               BUTTON_NONE},
     {PLA_INC_REPEAT,      BUTTON_TOPMIDDLE|BUTTON_REPEAT,    BUTTON_NONE},

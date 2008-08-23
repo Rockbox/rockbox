@@ -1086,7 +1086,7 @@ STATIC void chip8 (void)
 #error No keymap defined!
 #endif
 
-#ifdef HAVE_TOUCHPAD
+#ifdef HAVE_TOUCHSCREEN
 #ifndef CHIP8_OFF
 #define CHIP8_OFF  BUTTON_TOPLEFT
 #endif
