@@ -50,19 +50,18 @@ const char* zen::find_firmware_key(const byte* buffer, size_t len)
 
 dword zen::find_firmware_offset(byte* buffer, size_t len)
 {
-    for (dword i = 0; i < static_cast<dword>(len); i += 0x10)
+    for (dword i = 0; i < static_cast<dword>(len); i += 4)
     {
         dword size = *(dword*)&buffer[i];
-        if (size < (i + len) && size > (len >> 1))
+        if (buffer[i + sizeof(dword)] != 0
+            && buffer[i + sizeof(dword) + 1] != 0
+            && buffer[i + sizeof(dword) + 2] != 0
+            && buffer[i + sizeof(dword) + 3] != 0)
         {
-            if (buffer[i + sizeof(dword)] != 0
-                && buffer[i + sizeof(dword) + 1] != 0
-                && buffer[i + sizeof(dword) + 2] != 0
-                && buffer[i + sizeof(dword) + 3] != 0)
-            {
-                return i;
-            }
+            return i;
         }
+        if(i > 0xFF) /* Arbitrary guess */
+            return 0;
     }
     return 0;
 }
@@ -105,7 +104,6 @@ bool zen::crypt_firmware(const char* key, byte* buffer, size_t len)
     unsigned int tmp = 0;
     int key_length = strlen(key);
     
-    strcpy(key_cpy, key);
     for(i=0; i < strlen(key); i++)
         key_cpy[i] = key[i] - 1;
     

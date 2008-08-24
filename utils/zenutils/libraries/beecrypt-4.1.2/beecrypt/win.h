@@ -39,7 +39,7 @@
 # else
 #  error Unknown CPU type in MetroWerks CodeWarrior
 # endif
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) || defined(__MINGW32__)
 # if defined(_M_IX86)
 #  define WORDS_BIGENDIAN		0
 #  define ROTL32(x, s) _rotl(x, s)
@@ -51,7 +51,7 @@
 # error Unknown compiler for WIN32
 #endif
 
-#if defined(_MSC_VER) || __MWERKS__
+#if defined(_MSC_VER) || defined(__MINGW32__) || __MWERKS__
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -128,6 +128,8 @@ typedef unsigned __int64 uint64_t;
 
 typedef long off_t;
 
+#elif defined(__MINGW32__)
+#include <stdint.h>
 #endif
 
 #define MP_WBITS	32U
