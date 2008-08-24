@@ -511,6 +511,116 @@ int mimic_of(usb_dev_handle *dh, bool vx767)
     return 0;
 }
 
+#define SEND_NAND_COMMAND(cs, cmd, option) SEND_COMMAND(VR_NAND_OPS, ((cmd&0xF)|((cs&0xFF)<<4)|((option&0xFF)<<12)) );
+#define LENGTH 1024*1024*5
+int nand_dump(usb_dev_handle *dh)
+{
+    int err;
+    unsigned int n;
+    FILE *fd;
+    unsigned char* buffer;
+    
+    fd = fopen("nand_dump.bin", "wb");
+    if (fd == NULL)
+    {
+        fprintf(stderr, "[ERR]  Could not open nand_dump.bin\n");
+        return 0;
+    }
+    
+    buffer = (unsigned char*)malloc(LENGTH);
+    if (buffer == NULL)
+    {
+        fprintf(stderr, "[ERR]  Could not allocate memory.\n");
+        fclose(fd);
+        return 0;
+    }
+    memset(buffer, 0, LENGTH);
+    
+    SEND_NAND_COMMAND(0, NAND_INIT, 0);
+    /*
+    fprintf(stderr, "[INFO] Querying NAND...\n");
+    SEND_NAND_COMMAND(0, NAND_QUERY, 0);
+    GET_DATA(buffer, 4);
+    printf("[INFO] %x %x %x %x\n", buffer[0], buffer[1], buffer[2], buffer[3]);
+    */
+    SEND_COMMAND(VR_SET_DATA_ADDRESS, 0);
+    SEND_COMMAND(VR_SET_DATA_LENGTH, LENGTH);
+    SEND_NAND_COMMAND(0, NAND_READ, NO_OOB);
+    
+    fprintf(stderr, "[INFO] Reading data...\n");
+    err = usb_bulk_read(dh, USB_ENDPOINT_IN | EP_BULK_TO, (char*)buffer, LENGTH, TOUT);
+    if (err != (size)) 
+    {
+        fprintf(stderr,"\n[ERR]  Error writing data\n");
+        fprintf(stderr,"[ERR]  Bulk write error (%d, %s)\n", err, strerror(-err));
+        return -1;
+    }
+    
+    n = fwrite(buffer, 1, LENGTH, fd);
+    if (n != LENGTH)
+    {
+        fprintf(stderr, "[ERR]  Short write.\n");
+        fclose(fd);
+        free(buffer);
+        return 0;
+    }
+    fclose(fd);
+    free(buffer);
+    
+    return n;
+}
+#undef LENGTH
+
+#define LENGTH 0x1000*16
+int rom_dump(usb_dev_handle *dh)
+{
+    int err;
+    unsigned int n;
+    FILE *fd;
+    unsigned char* buffer;
+    
+    fd = fopen("rom_dump.bin", "wb");
+    if (fd == NULL)
+    {
+        fprintf(stderr, "[ERR]  Could not open rom_dump.bin\n");
+        return 0;
+    }
+    
+    buffer = (unsigned char*)malloc(LENGTH);
+    if (buffer == NULL)
+    {
+        fprintf(stderr, "[ERR]  Could not allocate memory.\n");
+        fclose(fd);
+        return 0;
+    }
+    memset(buffer, 0, LENGTH);
+    
+    SEND_COMMAND(VR_SET_DATA_ADDRESS, 0x1FC00000);
+    SEND_COMMAND(VR_SET_DATA_LENGTH, LENGTH);
+    
+    fprintf(stderr, "[INFO] Reading data...\n");
+    err = usb_bulk_read(dh, USB_ENDPOINT_IN | EP_BULK_TO, (char*)buffer, LENGTH, TOUT);
+    if (err != (size)) 
+    {
+        fprintf(stderr,"\n[ERR]  Error writing data\n");
+        fprintf(stderr,"[ERR]  Bulk write error (%d, %s)\n", err, strerror(-err));
+        return -1;
+    }
+    
+    n = fwrite(buffer, 1, LENGTH, fd);
+    if (n != LENGTH)
+    {
+        fprintf(stderr, "[ERR]  Short write.\n");
+        fclose(fd);
+        free(buffer);
+        return 0;
+    }
+    fclose(fd);
+    free(buffer);
+    
+    return n;
+}
+
 int jzconnect(int address, unsigned char* buf, int len, int func)
 {
     struct usb_bus *bus;
@@ -605,6 +715,12 @@ found:
         case 7:
             err = mimic_of(dh, (func == 7));
         break;
+        case 8:
+            err = nand_dump(dh);
+        break;
+        case 9:
+            err = rom_dump(dh);
+        break;
     }
     
     /* release claimed interface */
@@ -631,6 +747,8 @@ void print_usage(void)
     fprintf(stderr, "\t\t5 -> same as 1 but do a stage 2 boot\n");
     fprintf(stderr, "\t\t6 -> mimic VX747 OF fw recovery\n");
     fprintf(stderr, "\t\t7 -> mimic VX767 OF fw recovery\n");
+    fprintf(stderr, "\t\t8 -> do a NAND dump\n");
+    fprintf(stderr, "\t\t9 -> do a ROM dump\n");
 #ifdef _WIN32
     fprintf(stderr, "\nExample:\n\t usbtool.exe 1 fw.bin 0x80000000\n");
     fprintf(stderr, "\t usbtool.exe 2 save.bin 0x81000000 1024\n");
@@ -745,6 +863,8 @@ int main(int argc, char* argv[])
         case 4:
         case 6:
         case 7:
+        case 8:
+        case 9:
             return jzconnect(address, NULL, 0, cmd);
         break;
         default:
