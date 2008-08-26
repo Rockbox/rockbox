@@ -40,7 +40,7 @@
 
     .text
     
-    .set mips3
+    .set mips32
 
     .extern system_main
 
@@ -53,28 +53,36 @@
     .word 0 /* HACK */
     .word 0 /* HACK */
 #endif
+
 _start:
     la      ra, _start
-    //----------------------------------------------------
-    // init cp0 registers.
-    //----------------------------------------------------
+    /*
+      ----------------------------------------------------
+       init cp0 registers.
+      ----------------------------------------------------
+    */
     mtc0    zero, C0_WATCHLO
     mtc0    zero, C0_WATCHHI
 
     li      t0, (M_StatusBEV  | M_StatusIM7 | M_StatusIM6 \
                 | M_StatusIM5 | M_StatusIM4 | M_StatusIM3 \
-                | M_StatusIM2 | M_StatusERL)
-             //  BEV = Enable Boot Exception Vectors
-             //  IMx = Interrupt mask
-             //  ERL = Denotes error level
+                | M_StatusIM2 | M_StatusERL | M_StatusSM)
+             /*
+                 BEV = Enable Boot Exception Vectors
+                 IMx = Interrupt mask
+                 ERL = Denotes error level
+                 SM  = Supervisor Mode
+             */
     mtc0    t0, C0_STATUS
 
     li      t1, M_CauseIV
     mtc0    t1, C0_CAUSE
 
-    //----------------------------------------------------
-    // init caches, assumes a 4way*128set*32byte i/d cache
-    //----------------------------------------------------
+    /*
+      ----------------------------------------------------
+       init caches, assumes a 4way*128set*32byte i/d cache
+      ----------------------------------------------------
+    */
     li      t0, 3            // enable cache for kseg0 accesses
     mtc0    t0, C0_CONFIG    // CONFIG reg
     la      t0, 0x80000000   // an idx op should use a unmappable address
@@ -82,35 +90,70 @@ _start:
     mtc0    zero, C0_TAGLO   // TAGLO reg
     mtc0    zero, C0_TAGHI   // TAGHI reg
 
-_init_cache_loop:    
+_init_cache_loop:
     cache   0x8, 0(t0)       // index store icache tag
     cache   0x9, 0(t0)       // index store dcache tag
     bne     t0, t1, _init_cache_loop
     addiu   t0, t0, 0x20     // 32 bytes per cache line
     nop
 
-    //----------------------------------------------------
-    // Invalidate BTB
-    //----------------------------------------------------
+    /*
+      ----------------------------------------------------
+       Invalidate BTB
+      ----------------------------------------------------
+    */
     mfc0    t0, C0_CONFIG
     nop
     ori     t0, 2
     mtc0    t0, C0_CONFIG
     nop
     
-    //----------------------------------------------------
-    // clear BSS section
-    //----------------------------------------------------
+    /*
+      ----------------------------------------------------
+       clear BSS section
+      ----------------------------------------------------
+    */
     la     t0, _edata
     la     t1, _end
 _init_bss_loop:
     sw     zero, 0(t0)
     bne    t0, t1, _init_bss_loop
     addiu  t0, 4
+    
+#ifndef BOOTLOADER
+    /*
+      ----------------------------------------------------
+       clear IBSS section
+      ----------------------------------------------------
+    */
+    la     t0, _iedata
+    la     t1, _iend
+_init_ibss_loop:
+    sw     zero, 0(t0)
+    bne    t0, t1, _init_ibss_loop
+    addiu  t0, 4
+    
+    /*
+      ----------------------------------------------------
+       copy IRAM section
+      ----------------------------------------------------
+    */
+    la     t0, _iramcopy
+    la     t1, _iramstart
+    la     t2, _iramend
+_init_iram_loop:
+    lw     t3, 0(t0)
+    sw     t3, 0(t1)
+    addiu  t1, 4
+    bne    t1, t2, _init_iram_loop
+    addiu  t0, 4
+#endif
 
-    //----------------------------------------------------
-    // setup stack, jump to C code
-    //----------------------------------------------------
+    /*
+      ----------------------------------------------------
+       setup stack, jump to C code
+      ----------------------------------------------------
+    */
     la      sp, stackend
     la      t0, stackbegin
     li      t1, 0xDEADBEEF

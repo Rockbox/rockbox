@@ -99,6 +99,8 @@ void sti(void);
 void cli(void);
 void udelay(unsigned int usec);
 void mdelay(unsigned int msec);
+void power_off(void);
+void system_reboot(void);
 
 #endif /* __SYSTEM_TARGET_H_ */
 

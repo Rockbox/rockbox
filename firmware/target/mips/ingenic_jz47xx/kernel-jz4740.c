@@ -35,6 +35,11 @@ void tick_start(unsigned int interval_in_ms)
     
     __tcu_stop_counter(0);
     __tcu_disable_pwm_output(0);
+    __tcu_stop_counter(1);
+    __tcu_disable_pwm_output(1);
+    __tcu_stop_counter(2);
+    __tcu_disable_pwm_output(2);
+    __tcu_clear_full_match_flag(2);
     
     __tcu_mask_half_match_irq(0); 
     __tcu_unmask_full_match_irq(0);
@@ -58,12 +63,13 @@ void tick_start(unsigned int interval_in_ms)
     __tcu_start_counter(0);
     
     system_enable_irq(IRQ_TCU0);
-    
 }
 
 /* Interrupt handler */
 void TCU0(void)
 {
+    __tcu_clear_full_match_flag(0);
+    
     int i;
 
     /* Run through the list of tick tasks */

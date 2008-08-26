@@ -36,7 +36,7 @@
 #define TS_AD_COUNT      5
 #define M_SADC_CFG_SNUM  ((TS_AD_COUNT - 1) << SADC_CFG_SNUM_BIT)
 
-#define SADC_CFG_INIT (   \
+#define SADC_CFG_INIT (                                   \
                         (2 << SADC_CFG_CLKOUT_NUM_BIT) |  \
                         SADC_CFG_XYZ1Z2                |  \
                         M_SADC_CFG_SNUM                |  \
@@ -109,6 +109,7 @@ int button_read_device(int *data)
     
     unsigned int key = ~(__gpio_get_port(3));
     int ret = 0;
+    
     if(key & BTN_MASK)
     {
         if(key & BTN_VOL_DOWN)
@@ -132,10 +133,33 @@ int button_read_device(int *data)
     return ret;
 }
 
+/*
+static enum touchpad_mode current_mode = TOUCHPAD_POINT;
+
+static bool touch_available = false;
+
+static int touchpad_buttons[3][3] =
+{
+    {BUTTON_TOPLEFT,    BUTTON_TOPMIDDLE,    BUTTON_TOPRIGHT},
+    {BUTTON_MIDLEFT,    BUTTON_CENTER,       BUTTON_MIDRIGHT},
+    {BUTTON_BOTTOMLEFT, BUTTON_BOTTOMMIDDLE, BUTTON_BOTTOMRIGHT}
+};
+
+void touchpad_set_mode(enum touchpad_mode mode)
+{
+    current_mode = mode;
+}
+
+enum touchpad_mode touchpad_get_mode(void)
+{
+    return current_mode;
+}
+
 void button_set_touch_available(void)
 {
-    return;
+    touch_available = true;
 }
+*/
 
 /* Interrupt handler */
 void SADC(void)
@@ -167,51 +191,50 @@ void SADC(void)
     }
     if(state & SADC_CTRL_TSRDYM)
     {
-    	unsigned int   dat;
-    	unsigned short xData, yData;
-    	short          tsz1Data, tsz2Data;
-    	
-    	dat = REG_SADC_TSDAT;
-    	
-    	xData = (dat >>  0) & 0xfff;
-    	yData = (dat >> 16) & 0xfff;
-    		
-    	dat = REG_SADC_TSDAT;
-        tsz1Data = (dat >>  0) & 0xfff;
-    	tsz2Data = (dat >> 16) & 0xfff;
+        unsigned int   dat;
+        unsigned short xData, yData;
+        short          tsz1Data, tsz2Data;
         
-    	if(!pendown_flag)
-    		return ;
-    	
-         tsz1Data = tsz2Data - tsz1Data;
-    	
-    	if((tsz1Data > 15) || (tsz1Data < -15))
+        dat = REG_SADC_TSDAT;
+        
+        xData = (dat >>  0) & 0xfff;
+        yData = (dat >> 16) & 0xfff;
+            
+        dat = REG_SADC_TSDAT;
+        tsz1Data = (dat >>  0) & 0xfff;
+        tsz2Data = (dat >> 16) & 0xfff;
+        
+        if(!pendown_flag)
+            return ;
+        
+        tsz1Data = tsz2Data - tsz1Data;
+        
+        if((tsz1Data > 15) || (tsz1Data < -15))
         {
-    		if(x_pos == -1)
-    			x_pos = xData;
-    		else
-    			x_pos = (x_pos + xData) / 2;
-    		
-    		if(y_pos == -1)
-    			y_pos = yData;
-    		else
-    			y_pos = (y_pos + yData) / 2;
+            if(x_pos == -1)
+                x_pos = xData;
+            else
+                x_pos = (x_pos + xData) / 2;
+            
+            if(y_pos == -1)
+                y_pos = yData;
+            else
+                y_pos = (y_pos + yData) / 2;
         }
         
         datacount++;
-    	
-    	if(datacount > TS_AD_COUNT - 1)
-    	{
-    		if(x_pos != -1)
-    		{
+        
+        if(datacount > TS_AD_COUNT - 1)
+        {
+            if(x_pos != -1)
+            {
                 stable_x_pos = x_pos;
                 stable_y_pos = y_pos;
-    			x_pos = -1;
-    			y_pos = -1;
-    		}
-    		
-    		datacount = 0;
-    	}
+                x_pos = -1;
+                y_pos = -1;
+            }
+            datacount = 0;
+        }
     }
     if(state & SADC_CTRL_PBATRDYM)
     {

@@ -1084,6 +1084,7 @@ target/mips/ingenic_jz47xx/ata-nand-jz4740.c
 target/mips/ingenic_jz47xx/lcd-jz4740.c
 target/mips/ingenic_jz47xx/kernel-jz4740.c
 target/mips/ingenic_jz47xx/system-jz4740.c
+target/mips/ingenic_jz47xx/usb-jz4740.c
 drivers/nand_id.c
 #endif
 

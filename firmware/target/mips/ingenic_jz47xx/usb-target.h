@@ -18,9 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef USB_TARGET_H
-#define USB_TARGET_H
 
+#include <stdbool.h>
+int usb_detect(void);
 void usb_init_device(void);
-
-#endif
+bool usb_drv_connected(void);

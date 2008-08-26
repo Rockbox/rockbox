@@ -706,6 +706,8 @@ do {									\
 #define read_c0_cache()		__read_32bit_c0_register($7, 0)	/* TX39xx */
 #define write_c0_cache(val)	__write_32bit_c0_register($7, 0, val)
 
+#define read_c0_badvaddr()  __read_32bit_c0_register($8, 0)
+
 #define read_c0_count()		__read_32bit_c0_register($9, 0)
 #define write_c0_count(val)	__write_32bit_c0_register($9, 0, val)
 

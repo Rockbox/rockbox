@@ -42,6 +42,48 @@ static void audiotest(void)
     __aic_enable_loopback();
 }
 
+/* CP0 hazard avoidance. */
+#define BARRIER __asm__ __volatile__(".set noreorder\n\t" \
+                     "nop; nop; nop; nop; nop; nop;\n\t" \
+                     ".set reorder\n\t")
+static void show_tlb(void)
+{
+#define ASID_MASK 0xFF
+
+    unsigned int old_ctx;
+    unsigned int entry;
+    unsigned int entrylo0, entrylo1, entryhi;
+    unsigned int pagemask;
+
+    cli();
+
+    /* Save old context */
+    old_ctx = (read_c0_entryhi() & 0xff);
+
+    printf("TLB content:");
+    for(entry = 0; entry < 32; entry++)
+    {
+        write_c0_index(entry);
+        BARRIER;
+        tlb_read();
+        BARRIER;
+        entryhi = read_c0_entryhi();
+        entrylo0 = read_c0_entrylo0();
+        entrylo1 = read_c0_entrylo1();
+        pagemask = read_c0_pagemask();
+        printf("%02d: ASID=%02d%s VA=0x%08x", entry, entryhi & ASID_MASK, (entrylo0 & entrylo1 & 1) ? "(G)" : "   ", entryhi & ~ASID_MASK);
+        printf("PA0=0x%08x C0=%x %s%s%s", (entrylo0>>6)<<12, (entrylo0>>3) & 7, (entrylo0 & 4) ? "Dirty " : "", (entrylo0 & 2) ? "Valid " : "Invalid ", (entrylo0 & 1) ? "Global" : "");
+        printf("PA1=0x%08x C1=%x %s%s%s", (entrylo1>>6)<<12, (entrylo1>>3) & 7, (entrylo1 & 4) ? "Dirty " : "", (entrylo1 & 2) ? "Valid " : "Invalid ", (entrylo1 & 1) ? "Global" : "");
+
+        printf("pagemask=0x%08x entryhi=0x%08x", pagemask, entryhi);
+        printf("entrylo0=0x%08x entrylo1=0x%08x", entrylo0, entrylo1);
+    }
+    BARRIER;
+    write_c0_entryhi(old_ctx);
+
+    sti();
+}
+
 int main(void)
 {
     cli();
@@ -51,6 +93,7 @@ int main(void)
     lcd_setfont(FONT_SYSFIXED);
     button_init();
     rtc_init();
+    usb_init();
     
     backlight_init();
     
@@ -59,7 +102,7 @@ int main(void)
     sti();
     
     /* To make Windows say "ding-dong".. */
-    REG8(USB_REG_POWER) &= ~USB_POWER_SOFTCONN;
+    //REG8(USB_REG_POWER) &= ~USB_POWER_SOFTCONN;
 
     int touch, btn;
     char datetime[30];
@@ -89,7 +132,9 @@ int main(void)
     if(read_c0_config1() & (1 << 5)) printf(" * MDMX available");
     if(read_c0_config1() & (1 << 6)) printf(" * CP2 available");
     printf("C0_STATUS: 0x%x", read_c0_status());
-  /*  unsigned char testdata[4096];
+    
+#if 0
+    unsigned char testdata[4096];
     char msg[30];
     int j = 0;
     while(1)
@@ -111,7 +156,8 @@ int main(void)
             j--;
         if(j<0)
             j = 0;
-    }*/
+    }
+#endif
     while(1)
     {
         btn = button_read_device(&touch);
@@ -127,7 +173,16 @@ int main(void)
         if(button_hold())
         {
             printf("BUTTON_HOLD");
-            asm("break 7");
+            asm("break 0x7");
+        }
+        if(btn & BUTTON_VOL_DOWN)
+        {
+            reset_screen();
+            show_tlb();
+        }
+        if(btn & BUTTON_POWER)
+        {
+            power_off();
         }
         if(btn & BUTTON_TOUCH)
         {
@@ -143,6 +198,16 @@ int main(void)
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*2, datetime);
         snprintf(datetime, 30, "X: %d Y: %d", touch>>16, touch & 0xFFFF);
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*3, datetime);
+        snprintf(datetime, 30, "PIN3: 0x%x", REG_GPIO_PXPIN(3));
+        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*4, datetime);
+        snprintf(datetime, 30, "PIN2: 0x%x", REG_GPIO_PXPIN(2));
+        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*5, datetime);
+        snprintf(datetime, 30, "PIN1: 0x%x", REG_GPIO_PXPIN(1));
+        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*6, datetime);
+        snprintf(datetime, 30, "PIN0: 0x%x", REG_GPIO_PXPIN(0));
+        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*7, datetime);
+        snprintf(datetime, 30, "ICSR: 0x%x", read_c0_badvaddr());
+        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*8, datetime);
         lcd_update();
     }
     

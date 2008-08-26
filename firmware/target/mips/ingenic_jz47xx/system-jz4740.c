@@ -269,25 +269,15 @@ static void dis_irq(unsigned int irq)
 
 static void ack_irq(unsigned int irq)
 {
-    __intc_ack_irq(irq);
     if ((irq >= IRQ_GPIO_0) && (irq <= IRQ_GPIO_0 + NUM_GPIO))
     {
         __intc_ack_irq(IRQ_GPIO0 - ((irq - IRQ_GPIO_0)>>5));
         __gpio_ack_irq(irq - IRQ_GPIO_0);
     }
     else if ((irq >= IRQ_DMA_0) && (irq <= IRQ_DMA_0 + NUM_DMA))
-    {
         __intc_ack_irq(IRQ_DMAC);
-    }
     else if (irq < 32)
-    {
         __intc_ack_irq(irq);
-        /* TODO: check if really needed */
-        if (irq == IRQ_TCU0)
-        {
-          __tcu_clear_full_match_flag(0);
-        }
-    }
 }
 
 static unsigned long ipl;
@@ -296,7 +286,7 @@ static int get_irq_number(void)
     register int irq = 0;
     
     ipl |= REG_INTC_IPR;
-
+    
     if (ipl == 0)
         return -1;
 
@@ -341,8 +331,6 @@ void intr_handler(void)
     ack_irq(irq);
     if(irq > 0)
         irqvector[irq-1]();
-    
-    return;
 }
 
 #define EXC(x,y) if(_cause == (x)) return (y);
@@ -386,7 +374,6 @@ static void detect_clock(void)
     cfcr = REG_CPM_CPCCR;
     pllout = (__cpm_get_pllm() + 2)* JZ_EXTAL / (__cpm_get_plln() + 2);
     iclk = pllout / FR2n[__cpm_get_cdiv()];
-    /*printf("EXTAL_CLK = %dM PLL = %d iclk = %d\r\n",EXTAL_CLK / 1000 /1000,pllout,iclk);*/
 }
 
 void udelay(unsigned int usec)
@@ -450,11 +437,11 @@ void sti(void)
 
 #define SYNC_WB() __asm__ __volatile__ ("sync")
 
-#define cache_op(op,addr)                    \
+#define __CACHE_OP(op, addr)                   \
     __asm__ __volatile__(                    \
     "    .set    noreorder        \n"        \
     "    .set    mips32\n\t       \n"        \
-    "    cache    %0, %1          \n"        \
+    "    cache   %0, %1           \n"        \
     "    .set    mips0            \n"        \
     "    .set    reorder          \n"        \
     :                                        \
@@ -462,7 +449,7 @@ void sti(void)
 
 void __flush_dcache_line(unsigned long addr)
 {
-    cache_op(Hit_Writeback_Inv_D, addr);
+    __CACHE_OP(Hit_Writeback_Inv_D, addr);
     SYNC_WB();
 }
 
@@ -470,6 +457,7 @@ void __icache_invalidate_all(void)
 {
     unsigned int i;
 
+/*
     do 
     {
         unsigned long __k0_addr;
@@ -484,17 +472,19 @@ void __icache_invalidate_all(void)
                              : "r" (0x20000000)
                              );
     } while(0);
+*/
 
     asm volatile (".set   noreorder  \n"
                   ".set   mips32     \n"
-                  "mtc0   $0,$28     \n"
-                  "mtc0   $0,$29     \n"
+                  "mtc0   $0, $28    \n" /* TagLo */
+                  "mtc0   $0, $29    \n" /* TagHi */
                   ".set   mips0      \n"
                   ".set   reorder    \n"
                   );
     for(i=KSEG0; i<KSEG0+CACHE_SIZE; i+=CACHE_LINE_SIZE)
-        cache_op(Index_Store_Tag_I, i);
+        __CACHE_OP(Index_Store_Tag_I, i);
 
+/*
     do
     {
         unsigned long __k0_addr;
@@ -507,16 +497,17 @@ void __icache_invalidate_all(void)
                              : "=&r" (__k0_addr)
                              );
     } while(0);
+*/
 
     do
     {
         unsigned long tmp;
         __asm__ __volatile__(
         ".set mips32       \n"
-        "mfc0 %0, $16, 7   \n"
+        "mfc0 %0, $16, 7   \n" /* Config */
         "nop               \n"
         "ori  %0, 2        \n"
-        "mtc0 %0, $16, 7   \n"
+        "mtc0 %0, $16, 7   \n" /* Config */
         "nop               \n"
         ".set mips0        \n"
         : "=&r" (tmp));
@@ -529,20 +520,20 @@ void __dcache_invalidate_all(void)
 
     asm volatile (".set   noreorder  \n"
                   ".set   mips32     \n"
-                  "mtc0   $0,$28     \n"
-                  "mtc0   $0,$29     \n"
+                  "mtc0   $0, $28    \n"
+                  "mtc0   $0, $29    \n"
                   ".set   mips0      \n"
                   ".set   reorder    \n"
                   );
     for (i=KSEG0; i<KSEG0+CACHE_SIZE; i+=CACHE_LINE_SIZE)
-        cache_op(Index_Store_Tag_D, i);
+        __CACHE_OP(Index_Store_Tag_D, i);
 }
 
 void __dcache_writeback_all(void)
 {
     unsigned int i;
     for(i=KSEG0; i<KSEG0+CACHE_SIZE; i+=CACHE_LINE_SIZE)
-        cache_op(Index_Writeback_Inv_D, i);
+        __CACHE_OP(Index_Writeback_Inv_D, i);
     
     SYNC_WB();
 }
@@ -559,36 +550,128 @@ void dma_cache_wback_inv(unsigned long addr, unsigned long size)
         
         a = addr & ~(dc_lsize - 1);
         end = (addr + size - 1) & ~(dc_lsize - 1);
-        while (1)
-        {
+        for(; a < end; a += dc_lsize)
             __flush_dcache_line(a);    /* Hit_Writeback_Inv_D */
-            if (a == end)
-                break;
-            a += dc_lsize;
-        }
     }
 }
 
 extern int main(void);
-extern unsigned int _vectorsstart; /* see boot.lds/app.lds */
+extern void except_common_entry(void);
+
+#define mtc0_tlbw_hazard()                 \
+    __asm__ __volatile__(                  \
+    "    .set    noreorder          \n"    \
+    "    nop                        \n"    \
+    "    nop                        \n"    \
+    "    nop                        \n"    \
+    "    nop                        \n"    \
+    "    nop                        \n"    \
+    "    nop                        \n"    \
+    "    .set    reorder            \n");
+
+#define tlbw_use_hazard()                  \
+    __asm__ __volatile__(                  \
+    "    .set    noreorder          \n"    \
+    "    nop                        \n"    \
+    "    nop                        \n"    \
+    "    nop                        \n"    \
+    "    nop                        \n"    \
+    "    nop                        \n"    \
+    "    nop                        \n"    \
+    "    .set    reorder            \n");
+
+
+#define PAGE_SHIFT           PL_4K
+#define PM_DEFAULT_MASK      PM_4K
+#define UNIQUE_ENTRYHI(idx)  (A_K0BASE + ((idx) << (PAGE_SHIFT + 1)))
+static void local_flush_tlb_all(void)
+{
+    unsigned long old_ctx;
+    int entry;
+    unsigned int old_irq = disable_irq_save();
+    
+    /* Save old context and create impossible VPN2 value */
+    old_ctx = read_c0_entryhi();
+    write_c0_entrylo0(0);
+    write_c0_entrylo1(0);
+
+    /* Blast 'em all away. */
+    for(entry = read_c0_wired(); entry < 32; entry++)
+    {
+        /* Make sure all entries differ. */
+        write_c0_entryhi(UNIQUE_ENTRYHI(entry));
+        write_c0_index(entry);
+        mtc0_tlbw_hazard();
+        tlb_write_indexed();
+    }
+    tlbw_use_hazard();
+    write_c0_entryhi(old_ctx);
+    
+    restore_irq(old_irq);
+}
+
+
+static void tlb_init(void)
+{
+    write_c0_pagemask(PM_DEFAULT_MASK);
+    write_c0_wired(0);
+    write_c0_framemask(0);
+    
+    local_flush_tlb_all();
+}
+
+static void tlb_refill_handler(void)
+{
+#if 1
+    panicf("TLB refill handler! [0x%x] [0x%x]", read_c0_badvaddr(), read_c0_epc());
+#else
+    __asm__ __volatile__(
+    "mfc0 k0, C0_BADVADDR\n"
+    "lui  k1, pgdc\n"
+    "lw   k1, pgdc>>16(k0)\n"
+    "srl  k0, k0, 22\n"
+    "sll  k0, k0, 2\n"
+    "addu k1, k1, k0\n"
+    "mfc0 k0, C0_CONTEXT\n"
+    "lw   k1, 0(k1)\n"
+    "andi k0, k0, 0xFFC\n"
+    "addu k1, k1, k0\n"
+    "lw   k0, 0(k1)\n"
+    "nop\n"
+    "mtc0 k0, C0_ENTRYLO0\n"
+    "mfc0 k1, C0_EPC\n"
+    "tlbwr\n"
+    "jr   k1\n"
+    "rfe\n"
+    );
+#endif
+}
 
 void system_main(void)
 {
     int i;
     
-    cli();
-    write_c0_status(1 << 28 | 1 << 10); /* Enable CP | Mask interrupt 2 */
-    
-    memcpy((void *)A_K0BASE, (void *)&_vectorsstart, 0x20);
-    memcpy((void *)(A_K0BASE + 0x180), (void *)&_vectorsstart, 0x20);
-    memcpy((void *)(A_K0BASE + 0x200), (void *)&_vectorsstart, 0x20);
+    /*
+     * 0x0   - Simple TLB refill handler
+     * 0x100 - Cache error handler
+     * 0x180 - Exception/Interrupt handler
+     * 0x200 - Special Exception Interrupt handler (when IV is set in CP0_CAUSE)
+     */
+    memcpy((void *)A_K0BASE, (void *)&tlb_refill_handler, 0x20);
+    memcpy((void *)(A_K0BASE + 0x100), (void *)&except_common_entry, 0x20);
+    memcpy((void *)(A_K0BASE + 0x180), (void *)&except_common_entry, 0x20);
+    memcpy((void *)(A_K0BASE + 0x200), (void *)&except_common_entry, 0x20);
     
     __dcache_writeback_all();
     __icache_invalidate_all();
     
+    write_c0_status(1 << 28 | 1 << 10 | 1 << 3); /* Enable CP | Mask interrupt 2 | Supervisor mode */
+    
     /* Disable all interrupts */
     for(i=0; i<IRQ_MAX; i++)
         dis_irq(i);
+    
+    tlb_init();
     
     sti();
     
@@ -608,4 +691,18 @@ void system_reboot(void)
     REG_WDT_TCER = WDT_TCER_TCEN;  /* wdt start */
     
     while (1);
+}
+
+void power_off(void)
+{
+    /* Put system into hibernate mode */
+    __rtc_clear_alarm_flag();
+    __rtc_clear_hib_stat_all();
+    //__rtc_set_scratch_pattern(0x12345678);
+    __rtc_enable_alarm_wakeup();
+    __rtc_set_hrcr_val(0xfe0);
+    __rtc_set_hwfcr_val((0xFFFF << 4));
+    __rtc_power_down();
+    
+    while(1);
 }

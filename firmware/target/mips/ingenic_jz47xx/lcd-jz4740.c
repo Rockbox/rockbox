@@ -64,7 +64,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     REG_DMAC_DTAR(0) = 0x130500B0; /* SLCD_FIFO */
     REG_DMAC_DTCR(0) = width*height;
     
-    REG_DMAC_DCMD(0) = (DMAC_DCMD_SAI | DMAC_DCMD_RDIL_2 | DMAC_DCMD_SWDH_32 /* (1 << 23) | (0 << 16) | (0 << 14) */
+    REG_DMAC_DCMD(0) = (DMAC_DCMD_SAI | DMAC_DCMD_RDIL_IGN | DMAC_DCMD_SWDH_32 /* (1 << 23) | (0 << 16) | (0 << 14) */
                        | DMAC_DCMD_DWDH_16 | DMAC_DCMD_DS_16BIT);             /* | (2 << 12) | (3 << 8) */
     REG_DMAC_DCCSR(0) = (DMAC_DCCSR_NDES | DMAC_DCCSR_EN);                     /* (1 << 31) | (1 << 0) */
     

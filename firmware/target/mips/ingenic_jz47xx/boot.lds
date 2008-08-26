@@ -31,6 +31,10 @@ SECTIONS
         *(.glue_7);
         *(.glue_7t);
         *(.rel.dyn);
+    } > DRAM
+    
+    .vectors :
+    {
         _vectorsstart = .;
         KEEP(*(.vectors))
         *(.vectors);
@@ -69,18 +73,6 @@ SECTIONS
     
     . = ALIGN(4);
 
-    .stack :
-    {
-         *(.stack)
-         _stackbegin = .;
-         stackbegin = .;
-         . += 0x2000;
-         _stackend = .;
-         stackend = .;
-    } > DRAM
-    
-    . = ALIGN(4);
-
     .bss :
     {
          _edata = .;
@@ -91,4 +83,36 @@ SECTIONS
          *(.scommon*);
          _end = .;
     } > DRAM
+    
+    .iram IRAMORIG:
+    {
+        . = 0x220; /* Vectors take in 0x80000000 -> 0x80000220 */
+        _iramstart = .;
+        *(.icode)
+        *(.irodata)
+        *(.idata)
+        . = ALIGN(0x4);
+        _iramend = .;
+    } > IRAM AT> DRAM
+
+    _iramcopy = LOADADDR(.iram);
+
+    .ibss (NOLOAD) :
+    {
+        _iedata = .;
+        *(.ibss)
+        . = ALIGN(0x4);
+        _iend = .;
+    } > IRAM
+    
+    .stack :
+    {
+         *(.stack)
+         . = ALIGN(0x4);
+         _stackbegin = .;
+         stackbegin = .;
+         . += 0x2000;
+         _stackend = .;
+         stackend = .;
+    } > IRAM
 }

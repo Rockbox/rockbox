@@ -42,7 +42,9 @@
 #define NANDFLASH_ALE                     0x00010000 //PA[16]
 
 #define NANDFLASH_BASE                    0xB8000000
-#define REG_NAND_DATA                     (*((volatile unsigned char *)NANDFLASH_BASE))
+#define REG_NAND_DATA8                    (*((volatile unsigned char *)NANDFLASH_BASE))
+#define REG_NAND_DATA16                   (*((volatile unsigned short *)NANDFLASH_BASE))
+#define REG_NAND_DATA                     REG_NAND_DATA8
 #define REG_NAND_CMD                      (*((volatile unsigned char *)(NANDFLASH_BASE + NANDFLASH_CLE)))
 #define REG_NAND_ADDR                     (*((volatile unsigned char *)(NANDFLASH_BASE + NANDFLASH_ALE)))
 
