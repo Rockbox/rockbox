@@ -508,7 +508,8 @@ static void refresh_board (void)
     rb->lcd_putsxy (BOARD_X + CUBE_SIZE * BOARD_W - 24, BOARD_Y, str);
     rb->snprintf (str, sizeof (str), "Score: %d", player.score);
     rb->lcd_putsxy (BOARD_X, BOARD_Y + CUBE_SIZE * BOARD_H - 8, str);
-    rb->snprintf (str, sizeof (str), "%d Lives", player.lives);
+    rb->snprintf (str, sizeof (str),
+                 (player.lives != 1) ? "%d Lives" : "%d Life", player.lives);
 #if LCD_DEPTH>=2
     rb->lcd_putsxy (BOARD_X + CUBE_SIZE * BOARD_W - 60,
                     BOARD_Y + CUBE_SIZE * BOARD_H - 8, str);
