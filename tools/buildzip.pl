@@ -433,26 +433,22 @@ sub runone {
     # build a full install .rockbox directory
     buildzip($target, $fonts);
 
-    # create a zip file from the .rockbox dfir
-
     unlink($output);
-    if($verbose) {
-      print "$ziptool $output .rockbox >/dev/null\n";
-    }
-    system("$ziptool $output .rockbox >/dev/null");
 
-    if($target && ($fonts != 1)) {
-        # On some targets, rockbox.* is inside .rockbox
-        if($target !~ /(mod|ajz|wma)\z/i) {
-            copy("$target", ".rockbox/$target");
-            $target = ".rockbox/".$target;
-        }
-        
-        if($verbose) {
-            print "$ziptool $output $target >/dev/null\n";
-        }
-        system("$ziptool $output $target >/dev/null");
+    if($fonts == 1) {
+        # Don't include image file in fonts-only package
+        undef $target;
     }
+    if($target && ($target !~ /(mod|ajz|wma)\z/i)) {
+        # On some targets, the image goes into .rockbox.
+        copy("$target", ".rockbox/$target");
+        undef $target;
+    }
+
+    if($verbose) {
+        print "$ziptool $output .rockbox $target >/dev/null\n";
+    }
+    system("$ziptool $output .rockbox $target >/dev/null");
 
     # remove the .rockbox afterwards
     rmtree('.rockbox');
