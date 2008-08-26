@@ -192,7 +192,7 @@ sub filesize {
 }
 
 sub buildzip {
-    my ($zip, $image, $fonts)=@_;
+    my ($image, $fonts)=@_;
 
     my ($bitmap, $depth, $icon_w, $icon_h, $recording, $swcodec,
         $remote_depth, $remote_icon_w, $remote_icon_h) = &gettargetinfo();
@@ -431,7 +431,7 @@ sub runone {
     my ($target, $fonts)=@_;
 
     # build a full install .rockbox directory
-    buildzip($output, $target, $fonts);
+    buildzip($target, $fonts);
 
     # create a zip file from the .rockbox dfir
 
