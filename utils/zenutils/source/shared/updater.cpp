@@ -115,18 +115,18 @@ bool zen::crypt_firmware(const char* key, byte* buffer, size_t len)
     
     return true;
 #else
-    // Determine if the key length is dword aligned.
+    /* Determine if the key length is dword aligned. */
     int keylen = strlen(key);
     int keylen_rem = keylen % sizeof(dword);
 
-    // Determine how many times the key must be repeated to be dword aligned.
+    /* Determine how many times the key must be repeated to be dword aligned. */
     int keycycle = keylen_rem ? (sizeof(dword) / keylen_rem) : 1;
     int keyscount = (keylen * keycycle) / sizeof(dword);
 
-    // Allocate a buffer to hold the key as an array of dwords.
+    /* Allocate a buffer to hold the key as an array of dwords. */
     dword* keys = new dword[keyscount];
 
-    // Copy the key into the key array, whilst mutating it.
+    /* Copy the key into the key array, whilst mutating it. */
     for (int i = 0; i < keyscount; i++)
     {
         dword val;
@@ -145,19 +145,19 @@ bool zen::crypt_firmware(const char* key, byte* buffer, size_t len)
         keys[i] = (val - 0x01010101) | 0x80808080;
     }
 
-    // Determine the number of dwords in the buffer.
+    /* Determine the number of dwords in the buffer. */
     int len_div = len / sizeof(dword);
 
-    // Decrypt all dwords of the buffer.
+    /* Decrypt all dwords of the buffer. */
     for (int i = 0; i < len_div; i++)
     {
         ((dword*)buffer)[i] ^= keys[i % keyscount];
     }
 
-    // Determine the remaining number of bytes in the buffer.
+    /* Determine the remaining number of bytes in the buffer. */
     int len_rem = len % sizeof(dword);
 
-    // Decrypt the remaining number of bytes in the buffer.
+    /* Decrypt the remaining number of bytes in the buffer. */
     for (int i = len_div * sizeof(dword); i < len; i++)
     {
         buffer[i] ^= ((key[i % keylen] - 0x01) | 0x80);

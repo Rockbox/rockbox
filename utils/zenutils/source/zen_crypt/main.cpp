@@ -46,12 +46,12 @@ enum mode_t
 struct player_info_t
 {
     const char* name;
-    const char* null_key;  // HMAC-SHA1 key
-    const char* fresc_key; // BlowFish key
-    const char* tl_key;    // BlowFish key
+    const char* null_key;  /* HMAC-SHA1 key */
+    const char* fresc_key; /* BlowFish key */
+    const char* tl_key;    /* BlowFish key */
     bool big_endian;
 };
-}; //namespace
+}; /* namespace */
 
 
 static const char VERSION[] = "0.2";
@@ -210,7 +210,7 @@ bool sign(shared::bytes& data, player_info_t* pi, const std::string& file,
     if (index)
     {
         if (verbose)
-            std::cout << "[*] Found NULL signature at: "
+            std::cout << "[*] Found NULL signature at: 0x"
                       << std::hex << index << std::endl;
 
         if (verbose)
@@ -317,7 +317,7 @@ bool verify(shared::bytes& data, player_info_t* pi, bool verbose)
         return false;
     }
     if (verbose)
-        std::cout << "[*] Found NULL signature at: "
+        std::cout << "[*] Found NULL signature at: 0x"
                   << std::hex << index << std::endl;
 
     if (verbose)
@@ -382,8 +382,26 @@ bool encrypt(shared::bytes& data, int mode, player_info_t* pi,
     }
     else if (mode == mode_fresc)
     {
-        std::cerr << "FRESC mode is not supported." << std::endl;
-        return false;
+        if (verbose)
+            std::cout << "[*] Encrypting input file..." << std::endl;
+
+        dword iv[2] = {shared::swap(data.size()), 0};
+        if (!zen::bf_cbc_encrypt((const byte*)pi->fresc_key,
+                                 strlen(pi->fresc_key)+1, &data[0],
+                                 data.size(), (const byte*)iv))
+        {
+            std::cerr << "Failed to encrypt the input file." << std::endl;
+            return false;
+        }
+
+        if (verbose)
+            std::cout << "[*] Writing file data..." << std::endl;
+
+        if (!shared::write_file(file, data, true))
+        {
+            std::cerr << "Failed to save the output file." << std::endl;
+            return false;
+        }
     }
     else if (mode == mode_tl)
     {
@@ -413,7 +431,7 @@ bool encrypt(shared::bytes& data, int mode, player_info_t* pi,
         if (!zen::bf_cbc_encrypt((const byte*)pi->tl_key, strlen(pi->tl_key)+1,
                             &outbuf[0], len, (const byte*)iv))
         {
-            std::cerr << "Failed to decrypt the input file." << std::endl;
+            std::cerr << "Failed to encrypt the input file." << std::endl;
             return false;
         }
 
@@ -540,9 +558,11 @@ bool decrypt(shared::bytes& data, int mode, player_info_t* pi,
 
 int process_arguments(int argc, char*argv[])
 {
-    //--------------------------------------------------------------------
-    // Parse input variables.
-    //--------------------------------------------------------------------
+    /*
+      --------------------------------------------------------------------
+       Parse input variables.
+      --------------------------------------------------------------------
+    */
 
     GetPot cl(argc, argv);
     if (cl.size() == 1 || cl.search(2, "-h", "--help"))
@@ -636,9 +656,11 @@ int process_arguments(int argc, char*argv[])
         pi->big_endian = big_endian;
 
 
-    //--------------------------------------------------------------------
-    // Read the input file.
-    //--------------------------------------------------------------------
+    /*
+      --------------------------------------------------------------------
+       Read the input file.
+      --------------------------------------------------------------------
+    */
 
     if (verbose)
         std::cout << "[*] Reading input file..." << std::endl;
@@ -651,9 +673,11 @@ int process_arguments(int argc, char*argv[])
     }
 
 
-    //--------------------------------------------------------------------
-    // Process the input file.
-    //--------------------------------------------------------------------
+    /*
+      --------------------------------------------------------------------
+       Process the input file.
+      --------------------------------------------------------------------
+    */
 
     switch (command)
     {
