@@ -2305,7 +2305,8 @@ toolsclean:
 
 clean:
 	\$(SILENT)echo Cleaning build directory
-	\$(SILENT)rm -rf rockbox.zip TAGS @APPS@ firmware comsim sim lang.[ch]\
+	\$(SILENT)rm -rf rockbox.zip rockbox.7z rockbox.tar rockbox.tar.gz \
+                  rockbox.tar.bz2 TAGS @APPS@ firmware comsim sim lang.[ch] \
                   manual *.pdf *.a credits.raw @OUTPUT@ bitmaps pluginbitmaps \
                   @ARCHOSROM@ @FLASHFILE@ UI256.bmp rockbox-full.zip \
 	          html txt rockbox-manual*.zip sysfont.h rockbox-info.txt \
