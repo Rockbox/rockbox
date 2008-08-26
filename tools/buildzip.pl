@@ -208,10 +208,6 @@ sub buildzip {
         # always disable fonts on non-bitmap targets
         $fonts = 0;
     }
-    # create the file so the database does not try indexing a folder
-    open(IGNORE, ">.rockbox/database.ignore")  || die "can't open database.ignore";
-    close(IGNORE);
-    
     if($fonts) {
         mkdir ".rockbox/fonts", 0777;
         chdir(".rockbox/fonts");
@@ -226,6 +222,10 @@ sub buildzip {
         }
     }
 
+    # create the file so the database does not try indexing a folder
+    open(IGNORE, ">.rockbox/database.ignore")  || die "can't open database.ignore";
+    close(IGNORE);
+    
     mkdir ".rockbox/langs", 0777;
     mkdir ".rockbox/rocks", 0777;
     mkdir ".rockbox/rocks/games", 0777;
