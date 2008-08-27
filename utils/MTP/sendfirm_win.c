@@ -28,7 +28,7 @@
 #include <wchar.h>
 #include <stdbool.h>
 
-extern __declspec(dllimport) bool send_fw(LPWSTR file, int filesize);
+extern __declspec(dllimport) bool send_fw(LPWSTR file, int filesize, void (*callback)(unsigned int progress, unsigned int max));
 
 void usage(void)
 {
@@ -37,9 +37,9 @@ void usage(void)
 
 int filesize(char* filename)
 {
-	FILE* fd;
+    FILE* fd;
     int tmp;
-	fd = fopen(filename, "r");
+    fd = fopen(filename, "r");
     if(fd == NULL)
     {
         fprintf(stderr, "Error while opening %s!\n", filename);
@@ -47,8 +47,15 @@ int filesize(char* filename)
     }
     fseek(fd, 0, SEEK_END);
     tmp = ftell(fd);
-	fclose(fd);
+    fclose(fd);
     return tmp;
+}
+
+void callback(unsigned int progress, unsigned int max)
+{
+    unsigned int normalized = progress*1000/max;
+    printf("Progress: %d.%d%%\r", normalized/10, normalized%10);
+    fflush(stdout);
 }
 
 int main(int argc, char **argv)
@@ -69,7 +76,7 @@ int main(int argc, char **argv)
     
     fprintf(stdout, "Sending firmware...\n");
     
-    if(send_fw(tmp, filesize(argv[1])))
+    if(send_fw(tmp, filesize(argv[1]), &callback))
         fprintf(stdout, "Firmware sent successfully!\n");
     else
         fprintf(stdout, "Error occured during sending!\n");
