@@ -44,14 +44,14 @@ void main(void)
     int(*kernel_entry)(void);
     int ret;
     
-	/* Make sure interrupts are disabled */
-	set_irq_level(IRQ_DISABLED);
+    /* Make sure interrupts are disabled */
+    set_irq_level(IRQ_DISABLED);
     set_fiq_status(FIQ_DISABLED);
     system_init();
     kernel_init();
-	
-	/* Now enable interrupts */
-	set_irq_level(IRQ_ENABLED);
+    
+    /* Now enable interrupts */
+    set_irq_level(IRQ_ENABLED);
     set_fiq_status(FIQ_ENABLED);
     backlight_init();
     lcd_init();
@@ -64,9 +64,9 @@ void main(void)
     printf("Rockbox boot loader");
     printf("Version %s", APPSVERSION);
     
-	ret = ata_init();
-	if(ret)
-		printf("ATA error: %d", ret);
+    ret = ata_init();
+    if(ret)
+        printf("ATA error: %d", ret);
     
     if(1)
     {
@@ -76,7 +76,7 @@ void main(void)
         ret = load_minifs_file("creativeos.jrm", loadbuffer);
         if(ret != -1)
         {
-        	set_irq_level(IRQ_DISABLED);
+            set_irq_level(IRQ_DISABLED);
             set_fiq_status(FIQ_DISABLED);
             /* Doesn't return! */
             load_fw(loadbuffer, ret);
