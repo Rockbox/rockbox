@@ -11850,6 +11850,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_PRESET
   desc: automatic gain control in record settings and screen
+  user:
   <source>
     *: none
     agc: "AGC"
@@ -11866,6 +11867,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_CLIPTIME
   desc: in record settings
+  user:
   <source>
     *: none
     agc: "AGC clip time"
@@ -11882,6 +11884,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
+  user:
   <source>
     *: none
     agc: "AGC max. gain"
