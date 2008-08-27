@@ -28,6 +28,8 @@
 #include "panic.h"
 #include "ata-target.h"
 #include "dm320.h"
+#include "ata.h"
+#include "string.h"
 
 void sleep_ms(int ms)
 {
@@ -108,4 +110,107 @@ void GIO2(void)
 #endif
     IO_INTC_IRQ1 = INTR_IRQ1_EXT2; /* Mask GIO2 interrupt */
     return;
+}
+
+/*
+ ---------------------------------------------------------------------------
+ Creative File Systems parsing code
+ ---------------------------------------------------------------------------
+ */
+
+struct main_header
+{
+    char mblk[4];
+    unsigned char sector_size[4];
+    unsigned char disk_size[8];
+    struct partition_header
+    {
+        unsigned char end[4];
+        unsigned char start[4];
+        char name[8];
+    } partitions[31];
+};
+
+struct minifs_file
+{
+    char name[0x10];
+    unsigned char unk[4];
+    unsigned char size[4];
+    unsigned char chain1[4];
+    unsigned char chain2[4];
+};
+
+struct minifs_chain
+{
+    unsigned char unknown[4];
+    unsigned char chain[2*0x27FE];
+    unsigned char unknown2[4];
+    unsigned char length[4];
+};
+
+
+#define DIR_BITMAP_START       0x0143
+#define DIR_START              0x0144
+#define DATASPACE_BITMAP_START 0x0145
+#define DATASPACE_START        0x0146
+
+#define CLUSTER_CHAIN_SIZE     0x5008
+#define CLUSTER_CHAIN_HEAD     0x0000
+#define CLUSTER_CHAIN_BITMAP   0x0001
+#define CLUSTER_CHAIN_CHAIN    0x0002
+
+
+static unsigned short le2int16(unsigned char* buf)
+{
+   return (buf[1] << 8) | buf[0];
+}
+
+static unsigned int le2int32(unsigned char* buf)
+{
+   return (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
+}
+
+int load_minifs_file(char* filename, unsigned char* location)
+{
+    struct main_header *hdr;
+    static struct minifs_file files[128];
+    struct minifs_chain *chain;
+    unsigned int i;
+    int found = -1;
+    unsigned char sector[512];
+    static unsigned char chain_data[42*512]; /* stack overflow if not static */
+    
+    /* Reading MBLK */
+    ata_read_sectors(0, 1, &sector);
+    hdr = (struct main_header*)&sector;
+    
+    /* Reading directory listing */
+#define CLUSTER2SECTOR(x) ( (le2int32(hdr->partitions[0].start) + (x)*8) )
+    ata_read_sectors(CLUSTER2SECTOR(DIR_START), 8, &files);
+    
+    for(i=0; i<127; i++)
+    {
+        if(strcmp(files[i].name, filename) == 0)
+            found = i;
+    }
+    
+    if(found == -1)
+        return -1;
+    
+#define GET_CHAIN(x)   ( CLUSTER2SECTOR(CLUSTER_CHAIN_CHAIN)*512 + (x)*CLUSTER_CHAIN_SIZE )
+#define FILE2SECTOR(x) ( CLUSTER2SECTOR(DATASPACE_START + (x)) )
+    
+    /* Reading chain list */
+    ata_read_sectors(GET_CHAIN(le2int32(files[found].chain1))/512, 41, &chain_data[0]);
+    
+    chain = (struct minifs_chain*)&chain_data[GET_CHAIN(le2int32(files[found].chain1))%512];
+    
+    /* Copying data */
+    for(i=0; i<le2int32(chain->length); i++)
+    {
+        ata_read_sectors(FILE2SECTOR(le2int16(&chain->chain[i*2])), 8, location);
+        location += 0x1000;
+    }
+    
+    return le2int32(files[found].size);
 }

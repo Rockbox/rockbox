@@ -7,7 +7,7 @@ STARTUP(target/arm/tms320dm320/crt0.o)
 
 #define DRAMSIZE (MEMORYSIZE * 0x100000)
 
-#define DRAMORIG 0x00900000
+#define DRAMORIG 0x01900000 /* actually it's 0x00900000 */
 #define IRAMORIG 0x00000000
 #define IRAMSIZE 16K
 #define FLASHORIG 0x00100000
@@ -22,7 +22,7 @@ MEMORY
 
 SECTIONS
 {
-    . = DRAMORIG + 0x1000000;
+    . = DRAMORIG;
 
     .text : {
         loadaddress = .;

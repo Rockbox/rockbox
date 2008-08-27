@@ -166,11 +166,11 @@
 #define USB_PRODUCT_ID 0x4133
 
 /*DEBUGGING!*/
-#ifdef BOOTLOADER
+/*
 #define THREAD_EXTRA_CHECKS 1
 #define DEBUG 1
 #define debug(msg) printf(msg)
 #define BUTTON_DEBUG
-#endif
+*/
 
 #endif

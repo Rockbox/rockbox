@@ -33,4 +33,6 @@ telechips.c
 meizu_m6sl.c
 #elif defined(ONDA_VX747)
 ondavx747.c
+#elif defined(CREATIVE_ZVM)
+creativezvm.c
 #endif

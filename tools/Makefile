@@ -13,7 +13,7 @@ LDFLAGS := -g
 
 CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
  generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat database \
- lngdump telechips gigabeats creative hmac-sha1 mktccboot mknkboot rbspeexenc
+ lngdump telechips gigabeats creative hmac-sha1 mktccboot mknkboot rbspeexenc mkzenboot
 
 all:
 	@echo "Run make in your build directory!"
@@ -50,6 +50,12 @@ mktccboot: mktccboot.c telechips.o
 
 mknkboot: mknkboot.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
+
+mkzenboot.o: mkzenboot.c
+	$(SILENT)$(CC) $(CFLAGS) -DSTANDALONE -c -o $@ $+
+
+mkzenboot: mkzenboot.o hmac-sha1.o
+	$(SILENT)$(CC) $(LDFLAGS) -lz $+ -o $@
 
 lngdump: lngdump.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@

@@ -74,5 +74,6 @@ void ata_reset(void);
 void ata_device_init(void);
 bool ata_is_coldstart(void);
 void ide_power_enable(bool on);
+int load_minifs_file(char* filename, unsigned char* location);
 
 #endif
