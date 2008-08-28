@@ -835,7 +835,8 @@ bool checkString(int fd, char *string)
 
   rb->read(fd, temp, 4);
 
-  return (*(long*)temp == *(long*)string) ? 1 : 0;
+  /* return 1 on match, 0 on no match */
+  return !rb->memcmp(temp, string, 4);
 }
 
 int Read16BitsLowHigh(int fd)
