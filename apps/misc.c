@@ -21,11 +21,13 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "config.h"
+#include "misc.h"
 #include "lcd.h"
 #include "file.h"
 #ifdef __PCTOOL__
 #include <stdint.h>
 #include <stdarg.h>
+#include <unistd.h>
 #else
 #include "sprintf.h"
 #include "lang.h"
@@ -71,7 +73,6 @@
 #include "gui/gwps-common.h"
 #include "bookmark.h"
 
-#include "misc.h"
 #include "playback.h"
 
 #ifdef BOOTFILE
@@ -1183,6 +1184,9 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename)
  *  If the file is opened for writing and O_TRUNC is set, write a BOM to
  *  the opened file and leave the file pointer set after the BOM.
  */
+#define BOM "\xef\xbb\xbf"
+#define BOM_SIZE 3
+
 int open_utf8(const char* pathname, int flags)
 {
     int fd;
