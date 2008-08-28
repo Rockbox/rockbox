@@ -382,6 +382,7 @@ void usb_storage_init_connection(void)
     static unsigned char _transfer_buffer[BUFFER_SIZE*2]
         USBDEVBSS_ATTR __attribute__((aligned(32)));
     tb.transfer_buffer = (void *)_transfer_buffer;
+    cached_transfer_buffer = tb.transfer_buffer;
 #else
     /* TODO : check if bufsize is at least 32K ? */
     size_t bufsize;
@@ -432,7 +433,9 @@ void usb_storage_transfer_complete(int ep,bool in,int status,int length)
 
                 /* Now write the data that just came in, while the host is
                    sending the next bit */
+#if CONFIG_CPU == IMX31L || CONFIG_USBOTG == USBOTG_ISP1583
                 invalidate_icache();
+#endif
                 int result = ata_write_sectors(IF_MV2(cur_cmd.lun,)
                                          cur_cmd.sector,
                                          MIN(BUFFER_SIZE/SECTOR_SIZE,
