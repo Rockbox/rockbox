@@ -777,11 +777,75 @@ static inline uint32_t swap(uint32_t val)
            | ((val & 0xFF000000) >> 24);
 }
 
-const char *tl_key = "1sN0TM3D az u~may th1nk*"
-                     "Creative Zen Vision:M";
-const char *null_key = "CTL:N0MAD|PDE0.DPMP.";
+static const char null_key_v1[]  = "CTL:N0MAD|PDE0.SIGN.";
+static const char null_key_v2[]  = "CTL:N0MAD|PDE0.DPMP.";
+static const char null_key_v3[]  = "CTL:N0MAD|PDE0.DPFP.";
+static const char null_key_v4[]  = "CTL:Z3N07|PDE0.DPMP.";
 
-int mkboot(const char* infile, const char* bootfile, const char* outfile)
+static const char fresc_key_v1[] = "Copyright (C) CTL. -"
+                                   " zN0MAD iz v~p0wderful!";
+static const char fresc_key_v2[] = ""; /* Unknown atm */
+
+static const char tl_zvm_key[]   = "1sN0TM3D az u~may th1nk*"
+                                   "Creative Zen Vision:M";
+static const char tl_zvm60_key[] = "1sN0TM3D az u~may th1nk*"
+                                   "Creative Zen Vision:M (D"
+                                   "VP-HD0004)";
+static const char tl_zen_key[]   = "1sN0TM3D az u~may th1nk*"
+                                   "Creative ZEN";
+static const char tl_zenxf_key[] = "1sN0TM3D az u~may th1nk*"
+                                   "Creative ZEN X-Fi";
+static const char tl_zv_key[]    = "1sN0TM3D az u~may th1nk*"
+                                   "Creative Zen Vision";
+static const char tl_zvw_key[]   = "1sN0TM3D az u~may th1nk*"
+                                   "Creative ZEN Vision W";
+static const char tl_zm_key[]    = "1sN0TM3D az u~may th1nk*"
+                                   "Creative Zen Micro";
+static const char tl_zmp_key[]   = "1sN0TM3D az u~may th1nk*"
+                                   "Creative Zen MicroPhoto";
+static const char tl_zs_key[]    = "1sN0TM3D az u~may th1nk*"
+                                   "Creative Zen Sleek";
+static const char tl_zsp_key[]   = "1sN0TM3D az u~may th1nk*"
+                                   "Creative Zen Sleek Photo";
+static const char tl_zt_key[]    = "1sN0TM3D az u~may th1nk*"
+                                   "Creative Zen Touch";
+static const char tl_zx_key[]    = "1sN0TM3D az u~may th1nk*"
+                                   "NOMAD Jukebox Zen Xtra";
+static const char tl_zenv_key[]  = "1sN0TM3D az u~may th1nk*"
+                                   "Creative ZEN V";
+static const char tl_zenvp_key[] = "1sN0TM3D az u~may th1nk*"
+                                   "Creative ZEN V Plus";
+static const char tl_zenvv_key[] = "1sN0TM3D az u~may th1nk*"
+                                   "Creative ZEN V (Video)";
+struct player_info_t
+{
+    const char* name;
+    const char* null_key;  /* HMAC-SHA1 key */
+    const char* fresc_key; /* BlowFish key */
+    const char* tl_key;    /* BlowFish key */
+    bool big_endian;
+};
+
+static struct player_info_t players[] = {
+    {"Zen Vision:M", null_key_v2, fresc_key_v1, tl_zvm_key, false},
+    {"Zen Vision:M 60GB", null_key_v2, fresc_key_v1, tl_zvm60_key, false},
+    {"ZEN", null_key_v4, fresc_key_v2, tl_zen_key, false},
+    {"ZEN X-Fi", null_key_v4, fresc_key_v2, tl_zenxf_key, false},
+    {"Zen Vision", null_key_v2, fresc_key_v1, tl_zv_key, false},
+    {"Zen Vision W", null_key_v2, fresc_key_v1, tl_zvw_key, false},
+    {"Zen Micro", null_key_v1, fresc_key_v1, tl_zm_key, true},
+    {"Zen MicroPhoto", null_key_v1, fresc_key_v1, tl_zmp_key, true},
+    {"Zen Sleek", null_key_v1, fresc_key_v1, tl_zs_key, true},
+    {"Zen SleekPhoto", null_key_v1, fresc_key_v1, tl_zsp_key, true},
+    {"Zen Touch", null_key_v1, fresc_key_v1, tl_zt_key, true},
+    {"Zen Xtra", null_key_v1, fresc_key_v1, tl_zx_key, true},
+    {"Zen V", null_key_v3, fresc_key_v1, tl_zenv_key, false},
+    {"Zen V Plus", null_key_v3, fresc_key_v1, tl_zenvp_key, false},
+    {"Zen V Video", null_key_v3, fresc_key_v1, tl_zenvv_key, false},
+    {NULL, NULL, NULL, NULL, false}
+};
+
+int mkboot(const char* infile, const char* bootfile, const char* outfile, struct player_info_t *player)
 {
     FILE *infd, *bootfd, *outfd;
     unsigned char *buffer, *out_buffer, enc_data[40], hash_key[20];
@@ -976,7 +1040,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile)
     
     iv[0] = 0;
     iv[1] = swap(le2int(&out_buffer[i+4]));
-    if(bf_cbc_decrypt((unsigned char*)tl_key, strlen(tl_key)+1, &out_buffer[i+8],
+    if(bf_cbc_decrypt((unsigned char*)player->tl_key, strlen(player->tl_key)+1, &out_buffer[i+8],
                       le2int(&out_buffer[i+4]), (const unsigned char*)&iv)
        == false)
     {
@@ -1139,7 +1203,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile)
         return -31;
     }
     
-    hmac_sha1((unsigned char*)null_key, strlen(null_key), &buffer[0], filesize(outfd)-28, &hash_key);
+    hmac_sha1((unsigned char*)player->null_key, strlen(player->null_key), &buffer[0], filesize(outfd)-28, &hash_key);
     
     fseek(outfd, filesize(outfd)-20, SEEK_SET);
     if(fwrite(hash_key, 20, 1, outfd) != 1)
@@ -1159,23 +1223,41 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile)
 #ifdef STANDALONE
 static void usage(void)
 {
-    printf("Usage: mkzenboot <firmware file> <boot file> <output file>\n");
+    int i;
+    
+    printf("Usage: mkzenboot <firmware file> <boot file> <output file> <player>\n");
+    printf("Players:\n");
+    for (i = 0; players[i].name != NULL; i++)
+        printf(" * \"%s\"\n", players[i].name);
+    
     exit(1);
 }
 
 int main(int argc, char *argv[])
 {
     char *infile, *bootfile, *outfile;
+    int i;
+    struct player_info_t *player = NULL;
 
-    if(argc < 3)
-    {
+    if(argc < 5)
         usage();
-    }
 
     infile = argv[1];
     bootfile = argv[2];
     outfile = argv[3];
     
-    return mkboot(infile, bootfile, outfile);
+    for (i = 0; players[i].name != NULL; i++)
+    {
+        if(!strcasecmp(players[i].name, argv[4]))
+            player = &players[i];
+    }
+    
+    if(player == NULL)
+    {
+        fprintf(stderr, "[ERR]  %s isn't listed as a player!\n", argv[4]);
+        exit(1);
+    }
+    
+    return mkboot(infile, bootfile, outfile, player);
 }
 #endif

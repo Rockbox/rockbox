@@ -57,6 +57,9 @@ mkzenboot.o: mkzenboot.c
 mkzenboot: mkzenboot.o hmac-sha1.o
 	$(SILENT)$(CC) $(LDFLAGS) -lz $+ -o $@
 
+mkzenboot.exe: mkzenboot.o hmac-sha1.o
+	$(SILENT)$(CC) $(LDFLAGS) -lz $+ C:\MingW\lib\libz.a -o $@
+
 lngdump: lngdump.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
 
