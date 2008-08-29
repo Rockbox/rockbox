@@ -27,7 +27,10 @@
 #ifdef __PCTOOL__
 #include <stdint.h>
 #include <stdarg.h>
-#include <unistd.h>
+#include <stdio.h>
+#ifdef WPSEDITOR
+#include "string.h"
+#endif
 #else
 #include "sprintf.h"
 #include "lang.h"
@@ -196,26 +199,6 @@ char *create_numbered_filename(char *buffer, const char *path,
     return buffer;
 }
 
-/* Format time into buf.
- *
- * buf      - buffer to format to.
- * buf_size - size of buffer.
- * t        - time to format, in milliseconds.
- */
-void format_time(char* buf, int buf_size, long t)
-{
-    if ( t < 3600000 ) 
-    {
-      snprintf(buf, buf_size, "%d:%02d",
-               (int) (t / 60000), (int) (t % 60000 / 1000));
-    } 
-    else
-    {
-      snprintf(buf, buf_size, "%d:%02d:%02d",
-               (int) (t / 3600000), (int) (t % 3600000 / 60000),
-               (int) (t % 60000 / 1000));
-    }
-}
 
 #if CONFIG_RTC
 /* Create a filename with a date+time part.
@@ -1178,6 +1161,28 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename)
     return buffer;
 }
 #endif /* !defined(__PCTOOL__) */
+
+/* Format time into buf.
+ *
+ * buf      - buffer to format to.
+ * buf_size - size of buffer.
+ * t        - time to format, in milliseconds.
+ */
+void format_time(char* buf, int buf_size, long t)
+{
+    if ( t < 3600000 ) 
+    {
+      snprintf(buf, buf_size, "%d:%02d",
+               (int) (t / 60000), (int) (t % 60000 / 1000));
+    } 
+    else
+    {
+      snprintf(buf, buf_size, "%d:%02d:%02d",
+               (int) (t / 3600000), (int) (t % 3600000 / 60000),
+               (int) (t % 60000 / 1000));
+    }
+}
+
 
 /** Open a UTF-8 file and set file descriptor to first byte after BOM.
  *  If no BOM is present this behaves like open().

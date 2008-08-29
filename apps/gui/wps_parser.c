@@ -28,14 +28,25 @@
 #include "plugin.h"
 
 #ifdef __PCTOOL__
+#ifdef WPSEDITOR
+#include "proxy.h"
+#include "settings.h"
+#include "sysfont.h"
+#include "gwps.h"
+#include "font.h"
+#include "bmp.h" 
+#include "backdrop.h" 
+#include "ctype.h" 
+#else
+#include "checkwps.h"
+#define SYSFONT_HEIGHT 8
 #define DEBUGF printf
+#endif /*WPSEDITOR*/
 #define FONT_SYSFIXED 0
 #define FONT_UI 1
-#define SYSFONT_HEIGHT 8
-#include "checkwps.h"
 #else
 #include "debug.h"
-#endif
+#endif /*__PCTOOL__*/
 
 #ifndef __PCTOOL__
 #include <ctype.h>

@@ -1,0 +1,43 @@
+<ui version="4.0" >
+ <class>slider</class>
+ <widget class="QWidget" name="slider" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>295</width>
+    <height>37</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Value</string>
+  </property>
+  <widget class="QSlider" name="horslider" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>10</y>
+     <width>291</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="minimum" >
+    <number>-78</number>
+   </property>
+   <property name="maximum" >
+    <number>24</number>
+   </property>
+   <property name="singleStep" >
+    <number>1</number>
+   </property>
+   <property name="value" >
+    <number>-78</number>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

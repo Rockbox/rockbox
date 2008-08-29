@@ -550,6 +550,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
     return bytecount;
 }
 
+#ifndef __PCTOOL__
 static void long2bytes(unsigned char *buf, long val)
 {
     buf[0] = (val >> 24) & 0xff;
@@ -558,7 +559,6 @@ static void long2bytes(unsigned char *buf, long val)
     buf[3] = val & 0xff;
 }
 
-#ifndef __PCTOOL__
 int count_mp3_frames(int fd, int startpos, int filesize,
                      void (*progressfunc)(int))
 {

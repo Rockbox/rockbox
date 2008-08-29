@@ -1,0 +1,290 @@
+<ui version="4.0" >
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>882</width>
+    <height>669</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>WPS Editor</string>
+  </property>
+  <widget class="QWidget" name="centralwidget" >
+   <property name="geometry" >
+    <rect>
+     <x>260</x>
+     <y>21</y>
+     <width>344</width>
+     <height>345</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>882</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>File</string>
+    </property>
+    <addaction name="actOpenWps" />
+    <addaction name="actSetVolume" />
+    <addaction name="actSetProgress" />
+    <addaction name="actShowGrid" />
+    <addaction name="actClearLog" />
+    <addaction name="actVerboseLevel" />
+    <addaction name="actQuit" />
+   </widget>
+   <widget class="QMenu" name="menuPlay" >
+    <property name="title" >
+     <string>Play</string>
+    </property>
+   </widget>
+   <addaction name="menuFile" />
+   <addaction name="menuPlay" />
+  </widget>
+  <widget class="QStatusBar" name="statusbar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>650</y>
+     <width>882</width>
+     <height>19</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QDockWidget" name="dockPlainWps" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>370</y>
+     <width>882</width>
+     <height>280</height>
+    </rect>
+   </property>
+   <property name="minimumSize" >
+    <size>
+     <width>0</width>
+     <height>30</height>
+    </size>
+   </property>
+   <property name="windowTitle" >
+    <string>PlainWps</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_3" >
+    <property name="geometry" >
+     <rect>
+      <x>0</x>
+      <y>22</y>
+      <width>882</width>
+      <height>258</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_2" >
+     <item rowspan="2" row="0" column="0" >
+      <widget class="QTextEdit" name="plainWpsEdit" >
+       <property name="autoFillBackground" >
+        <bool>false</bool>
+       </property>
+       <property name="readOnly" >
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1" >
+      <widget class="QPushButton" name="btnUpdatePlainWps" >
+       <property name="text" >
+        <string>Update WPS</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" >
+      <spacer name="verticalSpacer" >
+       <property name="orientation" >
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0" >
+        <size>
+         <width>20</width>
+         <height>211</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="m_dockWidget" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>21</y>
+     <width>256</width>
+     <height>345</height>
+    </rect>
+   </property>
+   <property name="windowTitle" >
+    <string>Property Editor</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>1</number>
+   </attribute>
+   <widget class="QPropertyEditorWidget" name="m_propertyEditor" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="geometry" >
+     <rect>
+      <x>0</x>
+      <y>22</y>
+      <width>256</width>
+      <height>323</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget" >
+   <property name="geometry" >
+    <rect>
+     <x>608</x>
+     <y>21</y>
+     <width>274</width>
+     <height>345</height>
+    </rect>
+   </property>
+   <property name="minimumSize" >
+    <size>
+     <width>0</width>
+     <height>30</height>
+    </size>
+   </property>
+   <property name="windowTitle" >
+    <string>Log</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents" >
+    <property name="geometry" >
+     <rect>
+      <x>0</x>
+      <y>22</y>
+      <width>274</width>
+      <height>323</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout" >
+     <item row="0" column="0" >
+      <widget class="QTextEdit" name="logEdit" >
+       <property name="autoFillBackground" >
+        <bool>false</bool>
+       </property>
+       <property name="readOnly" >
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actQuit" >
+   <property name="text" >
+    <string>Quit</string>
+   </property>
+  </action>
+  <action name="actOpenWps" >
+   <property name="text" >
+    <string>Open WPS</string>
+   </property>
+  </action>
+  <action name="actSetVolume" >
+   <property name="text" >
+    <string>Set Volume</string>
+   </property>
+  </action>
+  <action name="actSetProgress" >
+   <property name="text" >
+    <string>Set Progress</string>
+   </property>
+  </action>
+  <action name="actShowGrid" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>Show Grid</string>
+   </property>
+  </action>
+  <action name="actClearLog" >
+   <property name="text" >
+    <string>Clear Log</string>
+   </property>
+  </action>
+  <action name="actVerboseLevel" >
+   <property name="text" >
+    <string>Verbose Level</string>
+   </property>
+  </action>
+  <action name="actUpdatePlainWps" >
+   <property name="text" >
+    <string>Update WPS</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QPropertyEditorWidget</class>
+   <extends>QTreeView</extends>
+   <header>QPropertyEditorWidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnUpdatePlainWps</sender>
+   <signal>clicked()</signal>
+   <receiver>actUpdatePlainWps</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>835</x>
+     <y>411</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actQuit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>440</x>
+     <y>334</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

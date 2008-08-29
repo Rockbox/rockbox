@@ -25,7 +25,11 @@
 #include <string.h>
 #include "gwps.h"
 #ifdef __PCTOOL__
+#ifdef WPSEDITOR
+#include "proxy.h"
+#else
 #define DEBUGF printf
+#endif
 #else
 #include "debug.h"
 #endif
@@ -589,18 +593,18 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
     {
         char buf[64];
 
-        DEBUGF("Failed parsing on line %d : ", line);
+        DEBUGF("ERR: Failed parsing on line %d : ", line);
         switch (fail)
         {
             case PARSE_OK:
                 break;
                 
             case PARSE_FAIL_UNCLOSED_COND:
-                DEBUGF("Unclosed conditional");
+                DEBUGF("ERR: Unclosed conditional");
                 break;
 
             case PARSE_FAIL_INVALID_CHAR:
-                DEBUGF("unexpected conditional char after token %d: \"%s\"",
+                DEBUGF("ERR: Unexpected conditional char after token %d: \"%s\"",
                        data->num_tokens-1,
                        get_token_desc(&data->tokens[data->num_tokens-1], data,
                                       buf, sizeof(buf))
@@ -608,7 +612,7 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
                 break;
 
             case PARSE_FAIL_COND_SYNTAX_ERROR:
-                DEBUGF("Conditional syntax error after token %d: \"%s\"",
+                DEBUGF("ERR: Conditional syntax error after token %d: \"%s\"",
                        data->num_tokens-1,
                        get_token_desc(&data->tokens[data->num_tokens-1], data,
                                       buf, sizeof(buf))
@@ -616,7 +620,7 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
                 break;
 
             case PARSE_FAIL_COND_INVALID_PARAM:
-                DEBUGF("Invalid parameter list for token %d: \"%s\"",
+                DEBUGF("ERR: Invalid parameter list for token %d: \"%s\"",
                        data->num_tokens,
                        get_token_desc(&data->tokens[data->num_tokens], data,
                                       buf, sizeof(buf))
@@ -624,7 +628,7 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
                 break;
                 
             case PARSE_FAIL_LIMITS_EXCEEDED:
-                DEBUGF("Limits exceeded");
+                DEBUGF("ERR: Limits exceeded");
                 break;
         }
         DEBUGF("\n");

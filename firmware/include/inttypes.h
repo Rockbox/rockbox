@@ -22,6 +22,8 @@
 #ifndef __INTTYPES_H__
 #define __INTTYPES_H__
 
+#ifndef WPSEDITOR
+
 #include <limits.h>
 
 /* 8 bit */
@@ -103,5 +105,8 @@
 #define uint64_t    unsigned long long
 
 #endif
+#else
+#include <stdint.h>
+#endif /* !WPSEDITOR*/
 
 #endif /* __INTTYPES_H__ */

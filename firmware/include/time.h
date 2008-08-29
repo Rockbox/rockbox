@@ -7,6 +7,11 @@
 #ifndef _TIME_H_
 #define _TIME_H_
 
+#ifdef WPSEDITOR
+#include <sys/types.h>
+#include <time.h>
+#endif
+
 struct tm
 {
   int	tm_sec;
@@ -33,4 +38,5 @@ struct tm *localtime(const time_t *timep);
 #endif /* SIMULATOR */
 
 #endif /* _TIME_H_ */
+
 

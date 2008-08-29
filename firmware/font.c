@@ -522,9 +522,11 @@ void glyph_cache_save(void)
 {
 
     if (fnt_file >= 0) {
-
+#ifdef WPSEDITOR
+        glyph_file = open(GLYPH_CACHE_FILE, O_WRONLY|O_CREAT|O_TRUNC);
+#else
         glyph_file = creat(GLYPH_CACHE_FILE);
-
+#endif
         if (glyph_file < 0) return;
 
         lru_traverse(&font_cache_ui._lru, glyph_file_write);
