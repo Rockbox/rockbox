@@ -24,16 +24,20 @@
 
 #include "id3.h"
 
+/**
+ Note: When adding new tags, make sure to update index_entry_ec in 
+ tagcache.c and bump up the header version too.
+ */
 enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
     tag_filename, tag_composer, tag_comment, tag_albumartist, tag_grouping, tag_year, 
     tag_discnumber, tag_tracknumber, tag_bitrate, tag_length, tag_playcount, tag_rating,
     tag_playtime, tag_lastplayed, tag_commitid, tag_mtime,
+    /* Real tags end here, count them. */
+    TAG_COUNT,
     /* Virtual tags */
     tag_virt_length_min, tag_virt_length_sec,
     tag_virt_playtime_min, tag_virt_playtime_sec,
     tag_virt_entryage, tag_virt_autoscore };
-
-#define TAG_COUNT 20
 
 /* Maximum length of a single tag. */
 #define TAG_MAXLEN (MAX_PATH*2)

@@ -55,6 +55,8 @@
  * 
  */
 
+/* #define LOGF_ENABLE */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -100,7 +102,6 @@ static const char tagcache_thread_name[] = "tagcache";
 
 /* Previous path when scanning directory tree recursively. */
 static char curpath[TAG_MAXLEN+32];
-static long curpath_size = sizeof(curpath);
 
 /* Used when removing duplicates. */
 static char *tempbuf;     /* Allocated when needed. */
@@ -190,7 +191,11 @@ struct master_header {
 
 /* For the endianess correction */
 static const char *tagfile_entry_ec   = "ss";
-static const char *index_entry_ec     = "lllllllllllllllllllll"; /* (1 + TAG_COUNT) * l */
+/**
+ Note: This should be (1 + TAG_COUNT) amount of l's.
+ */
+static const char *index_entry_ec     = "lllllllllllllllllllll";
+
 static const char *tagcache_header_ec = "lll";
 static const char *master_header_ec   = "llllll";
 
@@ -654,8 +659,9 @@ static bool write_index(int masterfd, int idxid, struct index_entry *idx)
             }
         }
         
-        /* Don't touch the dircache flag. */
-        idx_ram->flag = idx->flag | (idx_ram->flag & FLAG_DIRCACHE);
+        /* Don't touch the dircache flag or attributes. */
+        idx_ram->flag = (idx->flag & 0x0000ffff) 
+            | (idx_ram->flag & (0xffff0000 | FLAG_DIRCACHE));
     }
 #endif
     
@@ -1693,6 +1699,9 @@ static void add_tagcache(char *path, unsigned long mtime
     {
         struct index_entry idx;
         
+        /* TODO: Mark that the index exists (for fast reverse scan) */
+        //found_idx[idx_id/8] |= idx_id%8;
+        
         if (!get_index(-1, idx_id, &idx, true))
         {
             logf("failed to retrieve index entry");
@@ -2621,7 +2630,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 
                 if (idxbuf[j].tag_seek[index_type] < 0)
                 {
-                    logf("update error: %d/%d/%ld", 
+                    logf("update error: %d/%d/%d", 
                          idxbuf[j].flag, i+j, tcmh.tch.entry_count);
                     error = true;
                     goto error_exit;
@@ -3308,8 +3317,8 @@ static int parse_changelog_line(int line_n, const char *buf, void *parameters)
         
         idx.tag_seek[import_tags[i]] = data;
         
-        if (import_tags[i] == tag_lastplayed && data > current_tcmh.serial)
-            current_tcmh.serial = data;
+        if (import_tags[i] == tag_lastplayed && data >= current_tcmh.serial)
+            current_tcmh.serial = data + 1;
         else if (import_tags[i] == tag_commitid && data >= current_tcmh.commitid)
             current_tcmh.commitid = data + 1;
     }
@@ -4114,7 +4123,7 @@ static bool check_dir(const char *dirname, int add_files)
         yield();
         
         len = strlen(curpath);
-        snprintf(&curpath[len], curpath_size - len, "/%s",
+        snprintf(&curpath[len], sizeof(curpath) - len, "/%s",
                  entry->d_name);
         
         processed_dir_count++;
