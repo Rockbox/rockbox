@@ -1,0 +1,10 @@
+
+Meizu DFU tool for Linux
+
+This tool can restore the firmware on M3, M6 SP, M6 TP and M6 SL.
+
+Notes:
+1. SST39VF800.dfu is taken from the official dfu tool provided by Meizu.
+2. updateNAND_BE_070831.dfu is taken from the unofficial dfu tool for M6 SL.
+3. To compile, just run `make'.
+
