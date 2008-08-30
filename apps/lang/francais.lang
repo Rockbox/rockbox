@@ -277,10 +277,10 @@
     *: "Are You Sure?"
   </source>
   <dest>
-    *: "Etes-Vous Sûr?"
+    *: "Etes-Vous Sûr ?"
   </dest>
   <voice>
-    *: "Etes-Vous Sûr?"
+    *: "Etes-Vous Sûr ?"
   </voice>
 </phrase>
 <phrase>
@@ -600,10 +600,10 @@
     *: "Create a Bookmark?"
   </source>
   <dest>
-    *: "Créer un signet?"
+    *: "Créer un signet ?"
   </dest>
   <voice>
-    *: "Créer un signet?"
+    *: "Créer un signet ?"
   </voice>
 </phrase>
 <phrase>
@@ -628,10 +628,10 @@
     *: "Bookmark Failed!"
   </source>
   <dest>
-    *: "Erreur de signet!"
+    *: "La création du signet a échoué !"
   </dest>
   <voice>
-    *: "Erreur de signet!"
+    *: "La création du signet a échoué !"
   </voice>
 </phrase>
 <phrase>
@@ -925,11 +925,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Equaliseur"
+    swcodec: "Egaliseur"
   </dest>
   <voice>
     *: none
-    swcodec: "équaliseur"
+    swcodec: "égaliseur"
   </voice>
 </phrase>
 <phrase>
@@ -946,7 +946,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Activer l'équaliseur"
+    swcodec: "Activer l'égaliseur"
   </voice>
 </phrase>
 <phrase>
@@ -963,7 +963,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "équaliseur graphique"
+    swcodec: "égaliseur graphique"
   </voice>
 </phrase>
 <phrase>
@@ -997,7 +997,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Options équaliseur simples"
+    swcodec: "Options égaliseur simples"
   </voice>
 </phrase>
 <phrase>
@@ -1014,7 +1014,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Options équaliseur avancées"
+    swcodec: "Options égaliseur avancées"
   </voice>
 </phrase>
 <phrase>
@@ -1031,7 +1031,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Sauvegarder une configuration équaliseur"
+    swcodec: "Sauvegarder une configuration égaliseur"
   </voice>
 </phrase>
 <phrase>
@@ -1048,7 +1048,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Sélectionner une configuration équaliseur"
+    swcodec: "Sélectionner une configuration égaliseur"
   </voice>
 </phrase>
 <phrase>
@@ -1464,10 +1464,10 @@
     *: "Playback Settings"
   </source>
   <dest>
-    *: "Réglages Lecture"
+    *: "Réglages lecture"
   </dest>
   <voice>
-    *: "Réglages Lecture"
+    *: "Réglages lecture"
   </voice>
 </phrase>
 <phrase>
@@ -4704,11 +4704,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Le réveil est trop tôt!"
+    alarm: "Le réveil est trop tôt !"
   </dest>
   <voice>
     *: none
-    alarm: "Le réveil est trop tôt!"
+    alarm: "Le réveil est trop tôt !"
   </voice>
 </phrase>
 <phrase>
@@ -4829,10 +4829,10 @@
     *: "Maintain a List of Recent Bookmarks?"
   </source>
   <dest>
-    *: "Maintenir liste des derniers signets?"
+    *: "Maintenir liste des derniers signets ?"
   </dest>
   <voice>
-    *: "Maintenir la liste des derniers signets?"
+    *: "Maintenir la liste des derniers signets ?"
   </voice>
 </phrase>
 <phrase>
@@ -5411,7 +5411,7 @@
   </source>
   <dest>
     *: none
-    radio: "Ecran figé!"
+    radio: "Ecran figé !"
   </dest>
   <voice>
     *: none
@@ -5445,11 +5445,11 @@
   </source>
   <dest>
     *: none
-    radio: "Effacer stations actuelles?"
+    radio: "Effacer stations actuelles ?"
   </dest>
   <voice>
     *: none
-    radio: "Effacer les stations actuelles?"
+    radio: "Effacer les stations actuelles ?"
   </voice>
 </phrase>
 <phrase>
@@ -5581,11 +5581,11 @@
   </source>
   <dest>
     *: none
-    radio: "Aucune présélection trouvée, scanner?"
+    radio: "Aucune présélection trouvée, scanner ?"
   </dest>
   <voice>
     *: none
-    radio: "Aucune présélection trouvée, scanner?"
+    radio: "Aucune présélection trouvée, scanner ?"
   </voice>
 </phrase>
 <phrase>
@@ -5598,11 +5598,11 @@
   </source>
   <dest>
     *: none
-    radio: "Sauvegarder les changements?"
+    radio: "Sauvegarder les changements ?"
   </dest>
   <voice>
     *: none
-    radio: "Sauvegarder les changements?"
+    radio: "Sauvegarder les changements ?"
   </voice>
 </phrase>
 <phrase>
@@ -6704,7 +6704,7 @@
     *: "Track Display"
   </source>
   <dest>
-    *: "Affichage des Pistes"
+    *: "Affichage des pistes"
   </dest>
   <voice>
     *: "Affichage des pistes"
@@ -6802,10 +6802,10 @@
     *: "Recursively?"
   </source>
   <dest>
-    *: "Récursivement?"
+    *: "Récursivement ?"
   </dest>
   <voice>
-    *: "Récursivement?"
+    *: "Récursivement ?"
   </voice>
 </phrase>
 <phrase>
@@ -6830,10 +6830,10 @@
     *: "Erase dynamic playlist?"
   </source>
   <dest>
-    *: "Effacer liste de lecture dynamique?"
+    *: "Effacer liste de lecture dynamique ?"
   </dest>
   <voice>
-    *: "Effacer la liste de lecture dynamique?"
+    *: "Effacer la liste de lecture dynamique ?"
   </voice>
 </phrase>
 <phrase>
@@ -7030,10 +7030,10 @@
     *: "Clear Time?"
   </source>
   <dest>
-    *: "Réinitialiser le compteur?"
+    *: "Réinitialiser le compteur ?"
   </dest>
   <voice>
-    *: "Réinitialiser le compteur?"
+    *: "Réinitialiser le compteur ?"
   </voice>
 </phrase>
 <phrase>
@@ -7047,7 +7047,7 @@
     *: "Déboguage (Attention !)"
   </dest>
   <voice>
-    *: "Déboguage, attention!"
+    *: "Déboguage, attention !"
   </voice>
 </phrase>
 <phrase>
@@ -7758,10 +7758,10 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Fichier/dossier existant. Ecraser ?"
+    *: "Fichier/dossier existant. Remplacer ?"
   </dest>
   <voice>
-    *: "Fichier/dossier existant. Ecraser ?"
+    *: "Fichier/dossier existant. Remplacer ?"
   </voice>
 </phrase>
 <phrase>
@@ -7800,10 +7800,10 @@
     *: "Delete?"
   </source>
   <dest>
-    *: "Effacer?"
+    *: "Effacer ?"
   </dest>
   <voice>
-    *: "Effacer?"
+    *: "Effacer ?"
   </voice>
 </phrase>
 <phrase>
@@ -8411,10 +8411,10 @@
     *: "Reboot now?"
   </source>
   <dest>
-    *: "Redémarrer?"
+    *: "Redémarrer ?"
   </dest>
   <voice>
-    *: "Redémarrer?"
+    *: "Redémarrer ?"
   </voice>
 </phrase>
 <phrase>
@@ -8573,10 +8573,10 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Tampon rép. plein!"
+    *: "Tampon rép. plein !"
   </dest>
   <voice>
-    *: "Tampon des répertoires plein!"
+    *: "Tampon des répertoires plein !"
   </voice>
 </phrase>
 <phrase>
@@ -8587,10 +8587,10 @@
     *: "Invalid Filename!"
   </source>
   <dest>
-    *: "Nom de fichier invalide!"
+    *: "Nom de fichier invalide !"
   </dest>
   <voice>
-    *: "Nom de fichier invalide"
+    *: "Nom de fichier invalide !"
   </voice>
 </phrase>
 <phrase>
@@ -8697,10 +8697,10 @@
     *: "WARNING! Low Battery!"
   </source>
   <dest>
-    *: "ATTENTION! Batterie faible!"
+    *: "ATTENTION ! Batterie faible !"
   </dest>
   <voice>
-    *: "ATTENTION! Batterie faible!"
+    *: "ATTENTION ! Batterie faible !"
   </voice>
 </phrase>
 <phrase>
@@ -8711,10 +8711,10 @@
     *: "Battery empty! RECHARGE!"
   </source>
   <dest>
-    *: "Batterie vide! RECHARGEZ!"
+    *: "Batterie vide ! RECHARGEZ !"
   </dest>
   <voice>
-    *: "Batterie vide! RECHARGEZ!"
+    *: "Batterie vide ! RECHARGEZ !"
   </voice>
 </phrase>
 <phrase>
@@ -8725,7 +8725,7 @@
     *: "B"
   </source>
   <dest>
-    *: "B"
+    *: "o"
   </dest>
   <voice>
     *: ""
@@ -8739,10 +8739,10 @@
     *: "KB"
   </source>
   <dest>
-    *: "KB"
+    *: "Ko"
   </dest>
   <voice>
-    *: "Kilobit"
+    *: "Kilooctet"
   </voice>
 </phrase>
 <phrase>
@@ -8753,10 +8753,10 @@
     *: "MB"
   </source>
   <dest>
-    *: "MB"
+    *: "Mo"
   </dest>
   <voice>
-    *: "Megabit"
+    *: "Megaoctet"
   </voice>
 </phrase>
 <phrase>
@@ -8767,10 +8767,10 @@
     *: "GB"
   </source>
   <dest>
-    *: "GB"
+    *: "Go"
   </dest>
   <voice>
-    *: "Gigabit"
+    *: "Gigaoctet"
   </voice>
 </phrase>
 <phrase>
@@ -9470,7 +9470,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilobytes par seconde"
+    *: "kilobits par seconde"
   </voice>
 </phrase>
 <phrase>
