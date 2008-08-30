@@ -19,9 +19,12 @@
  *
  ****************************************************************************/
 
-#define VERSION "SVN $Revision$ (m1.0.6), built "__DATE__" "__TIME__
-
 // PUREVERSION is needed to be able to just compare versions. It does not
 // contain a build timestamp because it needs to be the same in different
 // files
+// VERSION is the plain version number, used for http User-Agent string.
+#define VERSION "m1.0.6"
 #define PUREVERSION "SVN $Revision$"
+
+#define FULLVERSION PUREVERSION" ("VERSION"), built "__DATE__" "__TIME__
+

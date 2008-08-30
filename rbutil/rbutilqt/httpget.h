@@ -57,6 +57,8 @@ class HttpGet : public QObject
             { m_globalProxy = p; }
         static void setGlobalDumbCache(bool b) //< set "dumb" (ignore server status) caching mode
             { m_globalDumbCache = b; }
+        static void setGlobalUserAgent(QString u) //< set global user agent string
+            { m_globalUserAgent = u; }
 
     public slots:
         void abort(void);
@@ -89,14 +91,17 @@ class HttpGet : public QObject
         QString m_cachefile; // cached filename
         bool m_cached;
         QUrl m_proxy;
-        static QDir m_globalCache; //< global cache path value
-        static QUrl m_globalProxy; //< global proxy value
-        static bool m_globalDumbCache; //< cache "dumb" mode global setting
         QDateTime m_serverTimestamp; //< timestamp of file on server
         QString m_query; //< constructed query to pass http getter
         QString m_path; //< constructed path to pass http getter
         QString m_hash; //< caching hash
         bool m_dumbCache; //< true if caching should ignore the server header
+        QHttpRequestHeader m_header;
+
+        static QDir m_globalCache; //< global cache path value
+        static QUrl m_globalProxy; //< global proxy value
+        static bool m_globalDumbCache; //< cache "dumb" mode global setting
+        static QString m_globalUserAgent; //< global user agent string
 };
 
 #endif

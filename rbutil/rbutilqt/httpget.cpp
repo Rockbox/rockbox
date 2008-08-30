@@ -26,6 +26,7 @@
 QDir HttpGet::m_globalCache; //< global cach path value for new objects
 QUrl HttpGet::m_globalProxy; //< global proxy value for new objects
 bool HttpGet::m_globalDumbCache = false; //< globally set cache "dumb" mode
+QString HttpGet::m_globalUserAgent; //< globally set user agent for requests
 
 HttpGet::HttpGet(QObject *parent)
     : QObject(parent)
@@ -199,13 +200,19 @@ bool HttpGet::getFile(const QUrl &url)
     m_hash = QCryptographicHash::hash(url.toEncoded(), QCryptographicHash::Md5).toHex();
     m_path = QString(QUrl::toPercentEncoding(url.path(), "/"));
 
+    // construct request header
+    m_header.setValue("Host", url.host());
+    m_header.setValue("User-Agent", m_globalUserAgent);
+    m_header.setValue("Connection", "Keep-Alive");
+
     if(m_dumbCache || !m_usecache) {
         getFileFinish();
     }
     else {
-        // request HTTP header
+        // schedule HTTP header request
         connect(this, SIGNAL(headerFinished()), this, SLOT(getFileFinish()));
-        headRequest = http.head(m_path + m_query);
+        m_header.setRequest("HEAD", m_path + m_query);
+        headRequest = http.request(m_header);
     }
 
     return true;
@@ -262,15 +269,16 @@ void HttpGet::getFileFinish()
     else {
         qDebug() << "[HTTP] cache DISABLED";
     }
-
+    // schedule GET request
+    m_header.setRequest("GET", m_path + m_query);
     if(outputToBuffer) {
         qDebug() << "[HTTP] downloading to buffer.";
-        getRequest = http.get(m_path + m_query);
+        getRequest = http.request(m_header);
     }
     else {
         qDebug() << "[HTTP] downloading to file:"
             << qPrintable(outputFile->fileName());
-        getRequest = http.get(m_path + m_query, outputFile);
+       getRequest = http.request(m_header, 0, outputFile);
     }
     qDebug() << "[HTTP] GET request scheduled, id:" << getRequest;
 

@@ -57,7 +57,8 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     
     settings = new RbSettings();
     settings->open();
-    
+    HttpGet::setGlobalUserAgent("rbutil/"VERSION);
+
     m_gotInfo = false;
     
     // manual tab
@@ -241,7 +242,7 @@ void RbUtilQt::about()
     QString rline = r.readAll();
     about.browserCredits->insertPlainText(rline);
     about.browserCredits->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
-    QString title = QString("<b>The Rockbox Utility</b><br/>Version %1").arg(VERSION);
+    QString title = QString("<b>The Rockbox Utility</b><br/>Version %1").arg(FULLVERSION);
     about.labelTitle->setText(title);
     about.labelHomepage->setText("<a href='http://www.rockbox.org'>http://www.rockbox.org</a>");
 
