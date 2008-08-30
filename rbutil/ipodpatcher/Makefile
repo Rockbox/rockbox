@@ -28,7 +28,7 @@ NATIVECC = gcc
 CC = $(CROSS)gcc
 WINDRES = $(CROSS)windres
 
-SRC = main.c ipodpatcher.c fat32format.c parttypes.h arc4.c
+SRC = main.c ipodpatcher.c fat32format.c arc4.c
 
 all: $(OUTPUT)
 
