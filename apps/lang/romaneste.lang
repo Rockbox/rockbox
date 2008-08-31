@@ -18,6 +18,7 @@
 # - Unknown (FS#1419)
 # - Tiberiu Gabriel Ana
 # - George Tamplaru
+# - Florin Popescu
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
