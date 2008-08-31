@@ -10,7 +10,7 @@ HTOPTS3 := "-dhtml/"
 .PHONY: all cleaner buildmanual output
 
 buildmanual: rockbox-build.tex pdf
-	@cp $(OBJDIR)/rockbox-build.pdf $(OBJDIR)/../rockbox-$(ARCHOS)-$(VERSION).pdf
+	@cp $(OBJDIR)/rockbox-build.pdf $(OBJDIR)/../rockbox-$(MODELNAME)-$(VERSION).pdf
 
 buildhtml: rockbox-build.tex
 	@mkdir -p $(OBJDIR)/html
