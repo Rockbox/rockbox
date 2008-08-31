@@ -49,8 +49,6 @@ uint32_t crc32(char *data, int len, uint32_t poly, uint32_t init)
   return crc;
 }
 
-#define BLOCK_SIZE 2048
-
 typedef struct {
   char *name;
   char *data;
@@ -69,8 +67,14 @@ typedef struct {
   uint8_t suf_len;
 } image_attr_t;
 
+#define BLOCK_SIZE 2048
+#define DFU_TIMEOUT 0xa000
 #define DFU_CRC_POLY 0xedb88320
 #define DFU_INIT_CRC 0xffffffff
+
+#define USB_VID_SAMSUNG 0x0419
+#define USB_PID_M6SL    0x0145
+#define USB_PID_M6      0x0141
 
 void init_img(image_data_t *img, const char *filename, image_attr_t *attr)
 {
@@ -119,16 +123,11 @@ void init_img(image_data_t *img, const char *filename, image_attr_t *attr)
   printf("OK\n");
 }
 
-#define DFU_VEN 0x0419
-#define DFU_DEV 0x0141
-#define DFU_DEV_M6SL 0x0145
-usb_dev_handle *device;
-int timeout = 0xa0000;
-
-void usb_dev_open()
+usb_dev_handle *usb_dev_open(uint16_t dfu_vid, uint16_t dfu_pid)
 {
   struct usb_bus *bus;
   struct usb_device *dev;
+  usb_dev_handle *device;
 
   printf("USB initialization...");
   fflush(stdout);
@@ -139,9 +138,8 @@ void usb_dev_open()
 
   for (bus = usb_get_busses(); bus != NULL; bus = bus->next)
     for (dev = bus->devices; dev != NULL; dev = dev->next)
-      if (dev->descriptor.idVendor == DFU_VEN
-          && ( dev->descriptor.idProduct == DFU_DEV
-            || dev->descriptor.idProduct == DFU_DEV_M6SL))
+      if (dev->descriptor.idVendor == dfu_vid
+          && dev->descriptor.idProduct == dfu_pid)
         goto found;
 
   printf("\nNo device found, exiting.\n");
@@ -151,30 +149,31 @@ found:
   printf(" Device found.\n");
   device = usb_open(dev);
   usb_claim_interface(device, 0);
+  return device;
 }
 
-void usb_mimic_windows()
+void usb_mimic_windows(usb_dev_handle *device)
 {
   char data[1024];
 
-  usb_control_msg(device, 0x80, 0x06, 0x0100, 0x0000, data, 0x0012, timeout);
-  usb_control_msg(device, 0x80, 0x06, 0x0200, 0x0000, data, 0x0009, timeout);
-  usb_control_msg(device, 0x80, 0x06, 0x0200, 0x0000, data, 0x001b, timeout);
-  usb_control_msg(device, 0x80, 0x06, 0x0100, 0x0000, data, 0x0040, timeout);
-  usb_control_msg(device, 0x80, 0x06, 0x0100, 0x0000, data, 0x0012, timeout);
-  usb_control_msg(device, 0x80, 0x06, 0x0200, 0x0000, data, 0x0009, timeout);
-  usb_control_msg(device, 0x80, 0x06, 0x0300, 0x0000, data, 0x00ff, timeout);
-  usb_control_msg(device, 0x80, 0x06, 0x0303, 0x0409, data, 0x00ff, timeout);
-  usb_control_msg(device, 0x80, 0x06, 0x0200, 0x0000, data, 0x00ff, timeout);
-  usb_control_msg(device, 0x80, 0x06, 0x0300, 0x0000, data, 0x00ff, timeout);
-  usb_control_msg(device, 0x80, 0x06, 0x0302, 0x0409, data, 0x00ff, timeout);
-  usb_control_msg(device, 0x80, 0x06, 0x0300, 0x0000, data, 0x00ff, timeout);
-  usb_control_msg(device, 0x80, 0x06, 0x0302, 0x0409, data, 0x00ff, timeout);
-  usb_control_msg(device, 0x80, 0x06, 0x0100, 0x0000, data, 0x0012, timeout);
-  usb_control_msg(device, 0x80, 0x06, 0x0200, 0x0000, data, 0x0209, timeout);
+  usb_control_msg(device, 0x80, 0x06, 0x0100, 0x0000, data, 0x0012, DFU_TIMEOUT);
+  usb_control_msg(device, 0x80, 0x06, 0x0200, 0x0000, data, 0x0009, DFU_TIMEOUT);
+  usb_control_msg(device, 0x80, 0x06, 0x0200, 0x0000, data, 0x001b, DFU_TIMEOUT);
+  usb_control_msg(device, 0x80, 0x06, 0x0100, 0x0000, data, 0x0040, DFU_TIMEOUT);
+  usb_control_msg(device, 0x80, 0x06, 0x0100, 0x0000, data, 0x0012, DFU_TIMEOUT);
+  usb_control_msg(device, 0x80, 0x06, 0x0200, 0x0000, data, 0x0009, DFU_TIMEOUT);
+  usb_control_msg(device, 0x80, 0x06, 0x0300, 0x0000, data, 0x00ff, DFU_TIMEOUT);
+  usb_control_msg(device, 0x80, 0x06, 0x0303, 0x0409, data, 0x00ff, DFU_TIMEOUT);
+  usb_control_msg(device, 0x80, 0x06, 0x0200, 0x0000, data, 0x00ff, DFU_TIMEOUT);
+  usb_control_msg(device, 0x80, 0x06, 0x0300, 0x0000, data, 0x00ff, DFU_TIMEOUT);
+  usb_control_msg(device, 0x80, 0x06, 0x0302, 0x0409, data, 0x00ff, DFU_TIMEOUT);
+  usb_control_msg(device, 0x80, 0x06, 0x0300, 0x0000, data, 0x00ff, DFU_TIMEOUT);
+  usb_control_msg(device, 0x80, 0x06, 0x0302, 0x0409, data, 0x00ff, DFU_TIMEOUT);
+  usb_control_msg(device, 0x80, 0x06, 0x0100, 0x0000, data, 0x0012, DFU_TIMEOUT);
+  usb_control_msg(device, 0x80, 0x06, 0x0200, 0x0000, data, 0x0209, DFU_TIMEOUT);
 }
 
-void usb_dev_close()
+void usb_dev_close(usb_dev_handle *device)
 {
   printf("Releasing interface...");
   fflush(stdout);
@@ -184,15 +183,17 @@ void usb_dev_close()
   printf(" OK\n");
 }
 
-#define DFU_DETACH      0
-#define DFU_DOWNLOAD    1
-#define DFU_UPLOAD      2
-#define DFU_GETSTATUS   3
-#define DFU_CLRSTATUS   4
-#define DFU_GETSTATE    5
-#define DFU_ABORT       6
+enum DFU_REQUEST {
+  DFU_DETACH = 0,
+  DFU_DOWNLOAD,
+  DFU_UPLOAD,
+  DFU_GETSTATUS,
+  DFU_CLRSTATUS,
+  DFU_GETSTATE,
+  DFU_ABORT
+};
 
-void get_cpu()
+void get_cpu(usb_dev_handle *device)
 {
   char data[64];
   int req_out_if = USB_ENDPOINT_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE;
@@ -202,7 +203,7 @@ void get_cpu()
   fflush(stdout);
 
   // check for "S5L8700 Rev.1"
-  len = usb_control_msg(device, req_out_if, 0xff, 0x0002, 0, data, 0x003f, timeout);
+  len = usb_control_msg(device, req_out_if, 0xff, 0x0002, 0, data, 0x003f, DFU_TIMEOUT);
   if (len < 0) {
     printf("\nError trying to get CPU model, exiting.\n");
     exit(1);
@@ -212,7 +213,7 @@ void get_cpu()
   printf(", got: %s\n", data);
 }
 
-void send_file(image_data_t *img)
+void send_file(usb_dev_handle *device, image_data_t *img)
 {
   char dfu_ret[6];
   char *data;
@@ -229,24 +230,24 @@ void send_file(image_data_t *img)
   // loop for the file
   for (i = 0, idx = 0; i < len; i += BLOCK_SIZE, ++idx) {
     writelen = ((len - i) < BLOCK_SIZE) ? (len - i) : BLOCK_SIZE;
-    usb_control_msg(device, req_out_if, DFU_DOWNLOAD, idx, 0, data + i, writelen, timeout);
+    usb_control_msg(device, req_out_if, DFU_DOWNLOAD, idx, 0, data + i, writelen, DFU_TIMEOUT);
     dfu_ret[4] = 0x00;
     while (dfu_ret[4] != 0x05)
-      usb_control_msg(device, req_in_if, DFU_GETSTATUS, 0, 0, dfu_ret, 6, timeout);
+      usb_control_msg(device, req_in_if, DFU_GETSTATUS, 0, 0, dfu_ret, 6, DFU_TIMEOUT);
     printf("#");
     fflush(stdout);
   }
 
-  usb_control_msg(device, req_out_if, DFU_DOWNLOAD, idx, 0, NULL, 0, timeout);
+  usb_control_msg(device, req_out_if, DFU_DOWNLOAD, idx, 0, NULL, 0, DFU_TIMEOUT);
   dfu_ret[4] = 0x00;
   while (dfu_ret[4] != 0x07)
-    usb_control_msg(device, req_in_if, DFU_GETSTATUS, 0, 0, dfu_ret, 6, timeout);
+    usb_control_msg(device, req_in_if, DFU_GETSTATUS, 0, 0, dfu_ret, 6, DFU_TIMEOUT);
 
   printf(" OK\n");
   fflush(stdout);
 }
 
-void clear_status()
+void clear_status(usb_dev_handle *device)
 {
   char dfu_ret[6];
   int usb_in_if = USB_ENDPOINT_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE;
@@ -257,13 +258,13 @@ void clear_status()
 
   dfu_ret[4] = 0x00;
   while (dfu_ret[4] != 0x08)
-    usb_control_msg(device, usb_in_if, DFU_GETSTATUS, 0, 0, dfu_ret, 6, timeout);
-  usb_control_msg(device, usb_out_if, DFU_CLRSTATUS, 0, 0, NULL, 0, timeout);
+    usb_control_msg(device, usb_in_if, DFU_GETSTATUS, 0, 0, dfu_ret, 6, DFU_TIMEOUT);
+  usb_control_msg(device, usb_out_if, DFU_CLRSTATUS, 0, 0, NULL, 0, DFU_TIMEOUT);
 
   printf(" OK\n");
 }
 
-void dfu_detach()
+void dfu_detach(usb_dev_handle *device)
 {
   char usb_ret[4];
   int usb_in_oth = USB_ENDPOINT_IN | USB_TYPE_CLASS | USB_RECIP_OTHER;
@@ -272,13 +273,13 @@ void dfu_detach()
   printf("Detaching...");
   fflush(stdout);
 
-  usb_control_msg(device, usb_in_oth, DFU_DETACH, 0x0000, 3, usb_ret, 4, timeout);
-  usb_control_msg(device, usb_out_oth, DFU_DOWNLOAD, 0x0010, 3, NULL, 0, timeout);
-  usb_control_msg(device, usb_in_oth, DFU_DETACH, 0x0000, 3, usb_ret, 4, timeout);
-  usb_control_msg(device, usb_in_oth, DFU_DETACH, 0x0000, 3, usb_ret, 4, timeout);
-  usb_control_msg(device, usb_in_oth, DFU_DETACH, 0x0000, 3, usb_ret, 4, timeout);
-  usb_control_msg(device, usb_in_oth, DFU_DETACH, 0x0000, 3, usb_ret, 4, timeout);
-  usb_control_msg(device, usb_in_oth, DFU_DETACH, 0x0000, 3, usb_ret, 4, timeout);
+  usb_control_msg(device, usb_in_oth, DFU_DETACH, 0x0000, 3, usb_ret, 4, DFU_TIMEOUT);
+  usb_control_msg(device, usb_out_oth, DFU_DOWNLOAD, 0x0010, 3, NULL, 0, DFU_TIMEOUT);
+  usb_control_msg(device, usb_in_oth, DFU_DETACH, 0x0000, 3, usb_ret, 4, DFU_TIMEOUT);
+  usb_control_msg(device, usb_in_oth, DFU_DETACH, 0x0000, 3, usb_ret, 4, DFU_TIMEOUT);
+  usb_control_msg(device, usb_in_oth, DFU_DETACH, 0x0000, 3, usb_ret, 4, DFU_TIMEOUT);
+  usb_control_msg(device, usb_in_oth, DFU_DETACH, 0x0000, 3, usb_ret, 4, DFU_TIMEOUT);
+  usb_control_msg(device, usb_in_oth, DFU_DETACH, 0x0000, 3, usb_ret, 4, DFU_TIMEOUT);
 
   printf(" OK\n");
 }
@@ -287,6 +288,7 @@ void dfu_m3_m6(char *file1, char *file2)
 {
   image_data_t img1, img2;
   image_attr_t attr1, attr2;
+  usb_dev_handle *device;
 
   attr1.delay = 1000;
   attr1.pre_off = 0x20;
@@ -311,28 +313,29 @@ void dfu_m3_m6(char *file1, char *file2)
   init_img(&img1, file1, &attr1);
   init_img(&img2, file2, &attr2);
 
-  usb_dev_open();
+  device = usb_dev_open(USB_VID_SAMSUNG, USB_PID_M6);
 //  usb_mimic_windows();
-  get_cpu();
-  get_cpu();
-  send_file(&img1);
+  get_cpu(device);
+  get_cpu(device);
+  send_file(device, &img1);
 
   printf("Wait a sec (literally)...");
   fflush(stdout);
   sleep(1);
   printf(" OK\n");
 
-  clear_status();
-  get_cpu();
-  send_file(&img2);
-  dfu_detach();
-  usb_dev_close();
+  clear_status(device);
+  get_cpu(device);
+  send_file(device, &img2);
+  dfu_detach(device);
+  usb_dev_close(device);
 }
 
 void dfu_m6sl(char *file1, char *file2)
 {
   image_data_t img1, img2;
   image_attr_t attr1, attr2;
+  usb_dev_handle *device;
 
   attr1.delay = 1000;
   attr1.pre_off = 0x20;
@@ -357,23 +360,23 @@ void dfu_m6sl(char *file1, char *file2)
   init_img(&img1, file1, &attr1);
   init_img(&img2, file2, &attr2);
 
-  usb_dev_open();
-  get_cpu();
-  get_cpu();
-  send_file(&img1);
+  device = usb_dev_open(USB_VID_SAMSUNG, USB_PID_M6SL);
+  get_cpu(device);
+  get_cpu(device);
+  send_file(device, &img1);
 
   printf("Wait a sec (literally)...");
   fflush(stdout);
   sleep(1);
   printf(" OK\n");
-  usb_dev_close();
+  usb_dev_close(device);
 
-  usb_dev_open();
-  get_cpu();
-  get_cpu();
-  send_file(&img2);
-  dfu_detach();
-  usb_dev_close();
+  device = usb_dev_open(USB_VID_SAMSUNG, USB_PID_M6SL);
+  get_cpu(device);
+  get_cpu(device);
+  send_file(device, &img2);
+  dfu_detach(device);
+  usb_dev_close(device);
 }
 
 
