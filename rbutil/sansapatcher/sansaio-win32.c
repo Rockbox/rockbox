@@ -44,7 +44,7 @@ static int lock_volume(HANDLE hDisk)
   DWORD dummy;
 
   return DeviceIoControl(hDisk, FSCTL_LOCK_VOLUME, NULL, 0, NULL, 0,
-			 &dummy, NULL);
+                         &dummy, NULL);
 }
 
 static int unlock_volume(HANDLE hDisk)
@@ -52,7 +52,7 @@ static int unlock_volume(HANDLE hDisk)
   DWORD dummy;
 
   return DeviceIoControl(hDisk, FSCTL_UNLOCK_VOLUME, NULL, 0, NULL, 0,
-			 &dummy, NULL);
+                         &dummy, NULL);
 }
 
 #ifndef RBUTIL

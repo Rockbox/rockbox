@@ -86,7 +86,7 @@ int sansa_open(struct sansa_t* sansa, int silent)
         if (!silent) {
             fprintf(stderr,"[ERR] ioctl() call to get sector size failed, defaulting to %d\n"
                    ,sansa->sector_size);
-	}
+        }
     }
     return 0;
 }
