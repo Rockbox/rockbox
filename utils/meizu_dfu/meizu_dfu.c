@@ -121,6 +121,7 @@ void init_img(image_data_t *img, const char *filename, image_attr_t *attr)
 
 #define DFU_VEN 0x0419
 #define DFU_DEV 0x0141
+#define DFU_DEV_M6SL 0x0145
 usb_dev_handle *device;
 int timeout = 0xa0000;
 
@@ -139,7 +140,8 @@ void usb_dev_open()
   for (bus = usb_get_busses(); bus != NULL; bus = bus->next)
     for (dev = bus->devices; dev != NULL; dev = dev->next)
       if (dev->descriptor.idVendor == DFU_VEN
-          || dev->descriptor.idProduct == DFU_DEV)
+          && ( dev->descriptor.idProduct == DFU_DEV
+            || dev->descriptor.idProduct == DFU_DEV_M6SL))
         goto found;
 
   printf("\nNo device found, exiting.\n");
