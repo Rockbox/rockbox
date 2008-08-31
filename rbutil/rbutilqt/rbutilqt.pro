@@ -12,6 +12,14 @@ UI_DIR = build/ui
 MOC_DIR = build/moc
 RCC_DIR = build/rcc
 
+# check version of Qt installation
+VER = $$find(QT_VERSION, ^4\.[3-9]+.*)
+isEmpty(VER) {
+    !isEmpty(QT_VERSION) error("Qt found:" $$[QT_VERSION])
+    error("Qt >= 4.3 required!")
+}
+message("Qt version used:" $$VER)
+
 # add a custom rule for pre-building librbspeex
 !mac {
 rbspeex.commands = @$(MAKE) -C ../../tools/rbspeex librbspeex.a
