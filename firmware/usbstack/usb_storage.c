@@ -235,7 +235,6 @@ static union {
     struct command_status_wrapper* csw;
     char *max_lun;
 } tb;
-unsigned char* cached_transfer_buffer;
 
 static struct {
     unsigned int sector;
@@ -243,7 +242,6 @@ static struct {
     unsigned int tag;
     unsigned int lun;
     unsigned char *data[2];
-    unsigned char *cached_data[2];
     unsigned char data_select;
     unsigned int last_result;
 } cur_cmd;
@@ -382,17 +380,14 @@ void usb_storage_init_connection(void)
     static unsigned char _transfer_buffer[BUFFER_SIZE*2]
         USBDEVBSS_ATTR __attribute__((aligned(32)));
     tb.transfer_buffer = (void *)_transfer_buffer;
-    cached_transfer_buffer = tb.transfer_buffer;
 #else
     /* TODO : check if bufsize is at least 32K ? */
     size_t bufsize;
     unsigned char * audio_buffer;
 
     audio_buffer = audio_get_buffer(false,&bufsize);
-    cached_transfer_buffer =
-        (void *)((unsigned int)(audio_buffer + 31) & 0xffffffe0);
     tb.transfer_buffer =
-        (void *)UNCACHED_ADDR(cached_transfer_buffer);
+        (void *)UNCACHED_ADDR((unsigned int)(audio_buffer + 31) & 0xffffffe0);
     invalidate_icache();
 #endif
     usb_drv_recv(usb_endpoint, tb.transfer_buffer, 1024);
@@ -433,14 +428,11 @@ void usb_storage_transfer_complete(int ep,bool in,int status,int length)
 
                 /* Now write the data that just came in, while the host is
                    sending the next bit */
-#if CONFIG_CPU == IMX31L || CONFIG_USBOTG == USBOTG_ISP1583
-                invalidate_icache();
-#endif
                 int result = ata_write_sectors(IF_MV2(cur_cmd.lun,)
                                          cur_cmd.sector,
                                          MIN(BUFFER_SIZE/SECTOR_SIZE,
                                              cur_cmd.count),
-                                         cur_cmd.cached_data[cur_cmd.data_select]);
+                                         cur_cmd.data[cur_cmd.data_select]);
                 if(result != 0) {
                     send_csw(UMS_STATUS_FAIL);
                     cur_sense_data.sense_key=SENSE_MEDIUM_ERROR;
@@ -658,10 +650,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
     cur_cmd.tag = cbw->tag;
     cur_cmd.lun = lun;
-    cur_cmd.cached_data[0] = cached_transfer_buffer;
-    cur_cmd.cached_data[1] = &cached_transfer_buffer[BUFFER_SIZE];
-    cur_cmd.data[0] = tb.transfer_buffer;
-    cur_cmd.data[1] = &tb.transfer_buffer[BUFFER_SIZE];
 
     switch (cbw->command_block[0]) {
         case SCSI_TEST_UNIT_READY:
@@ -917,6 +905,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 cur_sense_data.ascq=0;
                 break;
             }
+            cur_cmd.data[0] = tb.transfer_buffer;
+            cur_cmd.data[1] = &tb.transfer_buffer[BUFFER_SIZE];
             cur_cmd.data_select=0;
             cur_cmd.sector = block_size_mult *
                (cbw->command_block[2] << 24 |
@@ -954,6 +944,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 cur_sense_data.ascq=0;
                 break;
             }
+            cur_cmd.data[0] = tb.transfer_buffer;
+            cur_cmd.data[1] = &tb.transfer_buffer[BUFFER_SIZE];
             cur_cmd.data_select=0;
             cur_cmd.sector = block_size_mult *
                (cbw->command_block[2] << 24 |
