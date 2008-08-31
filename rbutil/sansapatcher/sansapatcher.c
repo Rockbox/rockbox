@@ -527,8 +527,8 @@ int sansa_scan(struct sansa_t* sansa)
         }
 
         if (is_sansa(sansa) < 0) {
-            continue;
             sansa_close(sansa);
+            continue;
         }
 
 #ifdef __WIN32__
