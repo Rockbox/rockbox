@@ -11459,11 +11459,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Озвучка Клавиш"
+    swcodec: "Озвучивание нажатия кнопок"
   </dest>
   <voice>
     *: none
-    swcodec: "Озвучка Клавиш"
+    swcodec: "Озвучивание нажатия кнопок"
   </voice>
 </phrase>
 <phrase>
