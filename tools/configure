@@ -99,7 +99,7 @@ simcc () {
  prefixtools ""
 
  simver=sdl
- GCCOPTS='-W -Wall -g -fno-builtin -fPIC'
+ GCCOPTS='-W -Wall -g -fno-builtin'
 
  output="rockboxui" # use this as default output binary name
 
