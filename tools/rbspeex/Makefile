@@ -27,15 +27,15 @@ ifeq ($(findstring MINGW,$(shell uname)),MINGW)
 CC = gcc
 endif
 
-ifdef ARCH
-CFLAGS += -arch $(ARCH)
+ifdef RBARCH
+CFLAGS += -arch $(RBARCH)
 endif
 
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 SRC := $(shell cat $(SPEEXSRC)/SOURCES | $(CC) $(CFLAGS) -E -P - | grep -v "^\#" | grep -v "^$$")
 
-OUT = build$(ARCH)
+OUT = build$(RBARCH)
 SOURCES = $(SRC:%.c=$(SPEEXSRC)/%.c) rbspeex.c rbspeexenc.c rbspeexdec.c
 OBJS = $(addprefix $(OUT)/,$(SRC:%.c=%.o))
 DEPFILE = $(OUT)/dep-speex
@@ -62,31 +62,31 @@ $(DEPFILE): $(SOURCES) $(OUT)
 -include $(DEPFILE)
 
 $(OUT)/librbspeex.a: $(OBJS) $(DEPFILE) $(OUT)/rbspeex.o 
-	@echo AR $(OUT)/librbspeex$(ARCH).a
+	@echo AR $(OUT)/librbspeex$(RBARCH).a
 	$(SILENT)$(AR) ruv $@ $+ > /dev/null 2>&1
 
-librbspeex$(ARCH).a: $(OUT)/librbspeex.a
-	$(SILENT)cp $(OUT)/librbspeex.a librbspeex$(ARCH).a
+librbspeex$(RBARCH).a: $(OUT)/librbspeex.a
+	$(SILENT)cp $(OUT)/librbspeex.a librbspeex$(RBARCH).a
 
-../rbspeexenc: $(OBJS) $(OUT)/rbspeexenc.o librbspeex$(ARCH).a
+../rbspeexenc: $(OBJS) $(OUT)/rbspeexenc.o librbspeex$(RBARCH).a
 	@echo Linking ../rbspeexenc
-	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexenc $(OUT)/rbspeexenc.o librbspeex$(ARCH).a -lm
+	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexenc $(OUT)/rbspeexenc.o librbspeex$(RBARCH).a -lm
 
-../rbspeexdec: $(OBJS) librbspeex$(ARCH).a $(OUT)/rbspeexdec.o 
+../rbspeexdec: $(OBJS) librbspeex$(RBARCH).a $(OUT)/rbspeexdec.o 
 	@echo Linking ../rbspeexdec
-	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexdec $(OUT)/rbspeexdec.o librbspeex$(ARCH).a -lm 
+	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexdec $(OUT)/rbspeexdec.o librbspeex$(RBARCH).a -lm 
 
 %.o:
 	@echo CC $<
 	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
 
 # some trickery to build ppc and i386 from a single call
-ifeq ($(ARCH),)
+ifeq ($(RBARCH),)
 librbspeexi386.a:
-	make ARCH=i386 librbspeexi386.a
+	make RBARCH=i386 librbspeexi386.a
 
 librbspeexppc.a:
-	make ARCH=ppc librbspeexppc.a
+	make RBARCH=ppc librbspeexppc.a
 endif
 
 librbspeex-universal: librbspeexi386.a librbspeexppc.a
@@ -98,7 +98,7 @@ clean:
 	rm -f $(OBJS) librbspeex* ../rbspeexenc ../rbspeexdec dep-speex
 	rm -rf build*
 
-build$(ARCH):
-	@echo MKDIR build$(ARCH)
-	$(SILENT)mkdir build$(ARCH)
+build$(RBARCH):
+	@echo MKDIR build$(RBARCH)
+	$(SILENT)mkdir build$(RBARCH)
 
