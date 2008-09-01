@@ -549,7 +549,7 @@ int nand_dump(usb_dev_handle *dh)
     
     fprintf(stderr, "[INFO] Reading data...\n");
     err = usb_bulk_read(dh, USB_ENDPOINT_IN | EP_BULK_TO, (char*)buffer, LENGTH, TOUT);
-    if (err != (size)) 
+    if (err != LENGTH) 
     {
         fprintf(stderr,"\n[ERR]  Error writing data\n");
         fprintf(stderr,"[ERR]  Bulk write error (%d, %s)\n", err, strerror(-err));
@@ -600,7 +600,7 @@ int rom_dump(usb_dev_handle *dh)
     
     fprintf(stderr, "[INFO] Reading data...\n");
     err = usb_bulk_read(dh, USB_ENDPOINT_IN | EP_BULK_TO, (char*)buffer, LENGTH, TOUT);
-    if (err != (size)) 
+    if (err != LENGTH) 
     {
         fprintf(stderr,"\n[ERR]  Error writing data\n");
         fprintf(stderr,"[ERR]  Bulk write error (%d, %s)\n", err, strerror(-err));
