@@ -74,7 +74,7 @@ typedef struct {
 
 #define USB_VID_SAMSUNG 0x0419
 #define USB_PID_M6SL    0x0145
-#define USB_PID_M6      0x0141
+#define USB_PID_M3_M6   0x0141
 
 void init_img(image_data_t *img, const char *filename, image_attr_t *attr)
 {
@@ -130,7 +130,6 @@ usb_dev_handle *usb_dev_open(uint16_t dfu_vid, uint16_t dfu_pid)
   usb_dev_handle *device;
 
   printf("USB initialization...");
-  fflush(stdout);
 
   usb_init();
   usb_find_busses();
@@ -176,7 +175,6 @@ void usb_mimic_windows(usb_dev_handle *device)
 void usb_dev_close(usb_dev_handle *device)
 {
   printf("Releasing interface...");
-  fflush(stdout);
 
   usb_release_interface(device, 0);
 
@@ -200,7 +198,6 @@ void get_cpu(usb_dev_handle *device)
   int len;
 
   printf("GET CPU");
-  fflush(stdout);
 
   // check for "S5L8700 Rev.1"
   len = usb_control_msg(device, req_out_if, 0xff, 0x0002, 0, data, 0x003f, DFU_TIMEOUT);
@@ -222,7 +219,6 @@ void send_file(usb_dev_handle *device, image_data_t *img)
   int len, idx, writelen, i;
 
   printf("Sending %s... ", img->name);
-  fflush(stdout);
 
   len = img->len;
   data = img->data;
@@ -235,7 +231,6 @@ void send_file(usb_dev_handle *device, image_data_t *img)
     while (dfu_ret[4] != 0x05)
       usb_control_msg(device, req_in_if, DFU_GETSTATUS, 0, 0, dfu_ret, 6, DFU_TIMEOUT);
     printf("#");
-    fflush(stdout);
   }
 
   usb_control_msg(device, req_out_if, DFU_DOWNLOAD, idx, 0, NULL, 0, DFU_TIMEOUT);
@@ -244,7 +239,6 @@ void send_file(usb_dev_handle *device, image_data_t *img)
     usb_control_msg(device, req_in_if, DFU_GETSTATUS, 0, 0, dfu_ret, 6, DFU_TIMEOUT);
 
   printf(" OK\n");
-  fflush(stdout);
 }
 
 void clear_status(usb_dev_handle *device)
@@ -254,7 +248,6 @@ void clear_status(usb_dev_handle *device)
   int usb_out_if = USB_ENDPOINT_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE;
 
   printf("Clearing status...");
-  fflush(stdout);
 
   dfu_ret[4] = 0x00;
   while (dfu_ret[4] != 0x08)
@@ -271,7 +264,6 @@ void dfu_detach(usb_dev_handle *device)
   int usb_out_oth = USB_ENDPOINT_OUT | USB_TYPE_CLASS | USB_RECIP_OTHER;
 
   printf("Detaching...");
-  fflush(stdout);
 
   usb_control_msg(device, usb_in_oth, DFU_DETACH, 0x0000, 3, usb_ret, 4, DFU_TIMEOUT);
   usb_control_msg(device, usb_out_oth, DFU_DOWNLOAD, 0x0010, 3, NULL, 0, DFU_TIMEOUT);
@@ -313,14 +305,13 @@ void dfu_m3_m6(char *file1, char *file2)
   init_img(&img1, file1, &attr1);
   init_img(&img2, file2, &attr2);
 
-  device = usb_dev_open(USB_VID_SAMSUNG, USB_PID_M6);
+  device = usb_dev_open(USB_VID_SAMSUNG, USB_PID_M3_M6);
 //  usb_mimic_windows();
   get_cpu(device);
   get_cpu(device);
   send_file(device, &img1);
 
   printf("Wait a sec (literally)...");
-  fflush(stdout);
   sleep(1);
   printf(" OK\n");
 
@@ -366,7 +357,6 @@ void dfu_m6sl(char *file1, char *file2)
   send_file(device, &img1);
 
   printf("Wait a sec (literally)...");
-  fflush(stdout);
   sleep(1);
   printf(" OK\n");
   usb_dev_close(device);
@@ -384,6 +374,8 @@ int main(int argc, char **argv)
 {
   if (argc != 4)
     usage();
+
+  setvbuf(stdout, NULL, _IONBF, 0);
 
   if (!strcmp(argv[1], "m3"))
     dfu_m3_m6(argv[2], argv[3]);
