@@ -39,6 +39,18 @@ start:
 newstart:
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
 
+    /* set PWRON to 1 */
+    ldr     r1, =0x3CF00014
+    ldr     r2, [r1]
+    orr     r2, r2, #0x8
+    str     r2, [r1]
+
+    ldr     r1, =0x3CF00010
+    ldr     r2, [r1]
+    bic     r2, r2, #0xf000
+    orr     r2, r2, #0x1000
+    str     r2, [r1]
+
     /* Initialise bss section to zero */
     ldr     r2, =_edata
     ldr     r3, =_end
