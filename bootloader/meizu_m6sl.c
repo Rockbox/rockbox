@@ -50,6 +50,7 @@ char version[] = APPSVERSION;
 
 void main(void)
 {
+    int counter=0;
     //Set backlight pin to output and enable
     int oldval = PCON0;
     PCON0 = ((oldval & ~(3 << 4)) | (1 << 4));
@@ -67,7 +68,7 @@ void main(void)
     PDAT5 |= (1 << 1); //Toggle piezo +
 
     //toggle backlight on PLAY
-    while(true)
+    while(counter<20)
     {
         // Wait for play to be pressed
         while(!(PDAT1 & (1 << 4)))
@@ -75,12 +76,21 @@ void main(void)
         }
 
         PDAT5 ^= (1 << 1); //Toggle piezo +
-        PDAT0 ^= (1 << 2); //Toggle packlight
+        PDAT0 ^= (1 << 2); //Toggle backlight
+        counter++;
 
         // Wait for play to be released
         while(PDAT1 & (1 << 4))
         {
         }
     }
+    //toggle a few times to warn that we're done
+    for(counter=0;counter<10;counter++)
+    {
+        volatile int i;
+        for(i=0;i<50000;i++);
+        PDAT0 ^= (1 << 2); //Toggle backlight
+    }
+    PDAT1&=~(1<<3);
 }
 
