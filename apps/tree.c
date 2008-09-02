@@ -224,7 +224,6 @@ static int tree_voice_cb(int selected_item, void * data)
     {
         if(global_settings.talk_dir_clip)
         {
-            DEBUGF("Playing directory thumbnail: %s", local_tc->currdir);
             did_clip = true;
             if(ft_play_dirname(name) <0)
                 /* failed, not existing */
@@ -234,8 +233,6 @@ static int tree_voice_cb(int selected_item, void * data)
         if (global_settings.talk_file_clip && (attr & FILE_ATTR_THUMBNAIL))
         {
             did_clip = true;
-            DEBUGF("Playing file thumbnail: %s/%s%s\n",
-                   local_tc->currdir, name, file_thumbnail_ext);
             ft_play_filename(local_tc->currdir, name);
         }
     }
@@ -1071,7 +1068,7 @@ static void ft_play_filename(char *dir, char *file)
         return;
 #endif
 
-    if (strlen(file) > strlen(file_thumbnail_ext)
+    if (strlen(file) >= strlen(file_thumbnail_ext)
         && strcasecmp(&file[strlen(file) - strlen(file_thumbnail_ext)],
                       file_thumbnail_ext))
         /* file has no .talk extension */
