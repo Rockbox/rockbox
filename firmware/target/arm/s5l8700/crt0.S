@@ -37,7 +37,6 @@ start:
     .word 0x43554644 /* DFUC */
 
 newstart:
-#if 0
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
 
     /* Initialise bss section to zero */
@@ -74,8 +73,7 @@ newstart:
 
     /* Switch back to supervisor mode */
     msr     cpsr_c, #0xd3
-#endif
-   bl      main
+    bl      main
 
 
     .text
