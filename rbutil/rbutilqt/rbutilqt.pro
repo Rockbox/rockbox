@@ -178,6 +178,7 @@ win32 {
 TRANSLATIONS += rbutil_de.ts \
  rbutil_fi.ts \
  rbutil_fr.ts \
+ rbutil_gr.ts \
  rbutil_nl.ts \
  rbutil_tr.ts \
  rbutil_zh_CN.ts \
@@ -232,4 +233,5 @@ unix {
     target.path = /usr/local/bin
     INSTALLS += target
 }
+
 
