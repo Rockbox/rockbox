@@ -1,0 +1,129 @@
+               __________               __   ___.
+     Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+     Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+     Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+     Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+                       \/            \/     \/    \/            \/
+
+                         Rockbox Font Collection
+
+Fonts put here need to follow a few rules:
+
+1. All fonts must be in standard unicode encoding (ISO10646-1). ISO8859-1
+   would also work, but should be avoided for consistency, and converted to
+   unicode (it's a trivial change of declaration, the actual code positions
+   stay the same).
+   Other encodings will break text output in rockbox for any non-ASCII text
+   and are hence not allowed.
+   
+2. All fonts need to adhere to the following naming convention for easy
+   browsing in rockbox:
+
+      NN-Family-Variant.bdf
+
+   NN is the height _in pixels_ when converted to .fnt with convbdf, zero
+   padded for proper sorting in the file browser.
+
+   "Family" is the font family (might consist of more than one part, e.g.
+   "Adobe-Helvetica")
+   
+   "Variant" covers the weight and variant (might also consist of more than
+   one part e.g. "Cond-BoldItalic"). This part should be left out if it is
+   Regular/Normal/Medium. Do not abbreviate variant names unless they're
+   overly long (keep in mind that the rockbox target displays vary a lot in
+   size).
+
+3. Fonts must have a suitable license for redistribution.
+
+4. Fonts should be carefully selected, judging quality over quantity. A font
+   that only covers ASCII isn't worth much. Rockbox supports a lot of
+   languages.
+
+
+Reference table for theme authors
+
+Old Name                   New Name              Remarks
+-------------------------------------------------------------------------------
+00-Starmap_r400-8          -                     removed, use another 8px font
+5x7                        07-Fixed
+5x8                        08-Fixed
+6+12x13                    13-Fixed
+6x9                        09-Fixed
+6x10                       10-Fixed
+6x12                       12-Fixed-SemiCond
+6x13                       13-Fixed-SemiCond
+6x13B                      13-Fixed-SemiCond-Bold
+8x13B                      13-Fixed-Bold
+9+18x18                    18-Fixed
+9+18x18B                   18-Fixed-Bold
+alt8x8                     -                     removed, use another 8px font
+atadore                    08-Atadore
+atari-small                -                     removed, use another 8px font
+clR6x8-8859-2              08-Schumacher-Clean   *
+courB08                    -                     removed, use another 10px font
+courB14                    -                     removed, use another 18px font
+Hebrew-Bold                -                     removed, use another 8px font
+Hebrew-Large               -                     removed, use another 8px font
+Hebrew-Medium              -                     removed, use another 8px font
+Hebrew-Small               -                     removed, use another 8px font
+helvR10                    12-Adobe-Helvetica
+helvR12                    15-Adobe-Helvetica
+helvR14                    16-Adobe-Helvetica
+jackash-16                 16-Jackash
+mix12                      14-Rockbox-Mix
+namil-8                    08-Namil
+nedore-8                   08-Nedore
+nedore-9                   09-Nedore
+nimbus-10                  10-Nimbus
+nimbus-11                  11-Nimbus
+nimbus-12                  12-Nimbus
+nimbus-13                  13-Nimbus
+nimbus-14                  14-Nimbus
+nimbus-19                  19-Nimbus
+ProFont_r400-10            10-ProFont
+ProFont_r400-11            11-ProFont
+ProFont_r400-12            12-ProFont
+ProFont_r400-15            15-ProFont
+ProFont_r400-17            17-ProFont
+ProFont_r400-22            22-ProFont
+ProFont_r400-29            29-ProFont
+proportional               08-Rockbox-Propfont
+rockbox_default            08-Schumacher-Clean   *
+rockfont-8                 08-Rockfont
+Sazanami-Mincho-Regular-8  08-Sazanami-Mincho
+Sazanami-Mincho-Regular-9  09-Sazanami-Mincho
+Sazanami-Mincho-Regular-10 10-Sazanami-Mincho
+Sazanami-Mincho-Regular-11 11-Sazanami-Mincho
+Sazanami-Mincho-Regular-12 12-Sazanami-Mincho
+Sazanami-Mincho-Regular-13 13-Sazanami-Mincho
+Sazanami-Mincho-Regular-14 14-Sazanami-Mincho
+snap                       10-Artwiz-Snap
+ter-u12n                   12-Terminus
+ter-u14b                   14-Terminus-Bold
+ter-u14n                   14-Terminus
+ter-u14v                   -                     removed, use 14-Terminus-Bold
+ter-u16b                   16-Terminus-Bold
+ter-u16n                   16-Terminus
+ter-u16v                   -                     removed, use 16-Terminus-Bold
+ter-u20b                   20-Terminus-Bold
+ter-u20n                   20-Terminus
+ter-u24b                   24-Terminus-Bold
+ter-u24n                   24-Terminus
+ter-u28b                   28-Terminus-Bold
+ter-u28n                   28-Terminus
+ter-u32b                   32-Terminus-Bold
+ter-u32n                   32-Terminus
+timR08                     -                     removed, use another 11px font
+Tiny-Prop-5                05-Tiny
+Tiny-Prop-6                06-Tiny
+unifont                    16-GNU-Unifont
+uwe_prop                   -                     removed, use 08-Rockbox-Propfont
+win_crox0c                 -                     removed, use another 10px font
+win_crox1c                 -                     removed, use another 13px font
+win_crox2c                 -                     removed, use another 16px font
+win_crox3c                 -                     removed, use another 20px font
+win_crox4h                 -                     removed, use another 24px font
+win_crox5t                 -                     removed, use another 27px font
+
+* this is not a mistake. Those were 2 encoding variants of the same font,
+  which are now combined.

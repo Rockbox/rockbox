@@ -42,10 +42,10 @@ clean:
 $(OBJDIR)/thread.o: thread.c export/thread.h
 	$(call PRINTS,CC thread.c)$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
 
-$(BUILDDIR)/sysfont.h: ../fonts/rockbox_default.bdf
+$(BUILDDIR)/sysfont.h: ../fonts/08-Schumacher-Clean.bdf
 	$(call PRINTS,Create sysfont.h)$(TOOLSDIR)/convbdf -l 255 -h -o $@ $<
 
-$(OBJDIR)/sysfont.o: ../fonts/rockbox_default.bdf
+$(OBJDIR)/sysfont.o: ../fonts/08-Schumacher-Clean.bdf
 	$(call PRINTS,CONVBDF)$(TOOLSDIR)/convbdf -l 255 -c -o $(OBJDIR)/sysfont.c $<
 	$(call PRINTS,CC sysfont.c)$(CC) $(CFLAGS) -c $(OBJDIR)/sysfont.c -o $@
 

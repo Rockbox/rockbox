@@ -27,7 +27,7 @@ RWPS: rockbox_default.rwps
 # Name of the creator of the WPS
 Author: xameius
 # preferred font
-Font: nimbus-12.fnt
+Font: 12-Nimbus.fnt
 # whether the WPS is designed to have the statusbar present or not
 Statusbar: on
 # whether a menu backdrop should be set
@@ -45,7 +45,7 @@ selector type: bar (inverse)
 Name: rockbox_default.wps
 RWPS: rockbox_default.rwps
 Author: Rockbox team
-Font: rockbox_default.fnt
+Font: 08-Schumacher-Clean.fnt
 Statusbar: on
 Foreground Color: 000000
 Background Color: B6C6E5
@@ -59,7 +59,7 @@ selector type: bar (inverse)
 Name: boxes.wps
 rwps: boxes.rwps
 Author: Christi Scarborough (after Magnus Westerlund)
-Font: rockbox_default.fnt
+Font: 08-Schumacher-Clean.fnt
 Statusbar: on
 # themes with colour screen versions need to set the colours too
 Foreground Color: 000000
@@ -74,7 +74,7 @@ selector type: bar (inverse)
 Name: engineeer2.wps
 RWPS: engineeer2.rwps
 Author: Magnus Westerlund
-Font: nedore-8.fnt
+Font: 08-Nedore.fnt
 Statusbar: on
 backdrop:
 iconset:
@@ -86,7 +86,7 @@ selector type: bar (inverse)
 Name: iAmp.wps
 RWPS: iAmp.rwps
 Author: Raymond Hoh
-Font: nimbus-12.fnt
+Font: 12-Nimbus.fnt
 backdrop:
 iconset:
 viewers iconset:
@@ -98,7 +98,7 @@ Statusbar: on
 Name: zezayer.wps
 RWPS: zezayer.rwps
 Author: Jake Owen
-Font: nedore-8.fnt
+Font: 08-Nedore.fnt
 Statusbar: on
 backdrop:
 iconset:
@@ -109,35 +109,35 @@ selector type: bar (inverse)
 <rwps>
 Name: zezayer.rwps
 Author: Dominik Riebeling
-Font: nedore-8.fnt
+Font: 08-Nedore.fnt
 Statusbar: on
 </rwps>
 
 <rwps>
 Name: rockbox_default.rwps
 Author: Rockbox team
-Font: rockbox_default.fnt
+Font: 08-Schumacher-Clean.fnt
 Statusbar: on
 </rwps>
 
 <rwps>
 Name: iAmp.rwps
 Author: Raymond Hoh
-Font: nimbus-12.fnt
+Font: 12-Nimbus.fnt
 Statusbar: on
 </rwps>
 
 <rwps>
 Name: boxes.rwps
 Author: Christi Scarborough
-Font: rockbox_default.fnt
+Font: 08-Schumacher-Clean.fnt
 Statusbar: on
 </rwps>
 
 <rwps>
 Name: engineeer2.rwps
 Author: Magnus Westerlund
-Font: nedore-8.fnt
+Font: 08-Nedore.fnt
 Statusbar: on
 </rwps>
 
@@ -145,7 +145,7 @@ Statusbar: on
 Name: marquee.wps
 RWPS: marquee.rwps
 Author: Mike Sobel
-Font: nimbus-13.fnt
+Font: 13-Nimbus.fnt
 Statusbar: on
 backdrop:
 iconset:
@@ -156,7 +156,7 @@ selector type: bar (inverse)
 <rwps>
 Name: marquee.rwps
 Author: Mike Sobel
-Font: nimbus-13.fnt
+Font: 13-Nimbus.fnt
 Statusbar: on
 </rwps>
 
@@ -164,7 +164,7 @@ Statusbar: on
 Name: DancePuffDuo.wps
 RWPS: DancePuffDuo.rwps
 Author: Chris Oxtoby
-Font: nimbus-13.fnt
+Font: 13-Nimbus.fnt
 Statusbar: on
 Foreground Color: 000000
 Background Color: B6C6E5
@@ -177,7 +177,7 @@ selector type: bar (inverse)
 <rwps>
 Name: DancePuffDuo.rwps
 Author: Chris Oxtoby
-Font: nimbus-13.fnt
+Font: 13-Nimbus.fnt
 Statusbar: on
 </rwps>
 
@@ -185,17 +185,17 @@ Statusbar: on
 Name: iCatcher.wps
 RWPS: iCatcher.rwps
 Author: Ioannis Koutoulakis
-Font.112x64x1: rockfont-8.fnt
-Font.128x128x16: nedore-9.fnt
-Font.132x80x16: nedore-9.fnt
-Font.138x110x2: nedore-8.fnt
-Font.160x128x2: nedore-9.fnt
-Font.160x128x16: nedore-9.fnt
-Font.176x132x16: nedore-9.fnt
-Font.176x220x16: nimbus-12.fnt
-Font.220x176x16: nimbus-14.fnt
-Font.240x320x16: nimbus-19.fnt
-Font.320x240x16: nimbus-19.fnt
+Font.112x64x1: 08-Rockfont.fnt
+Font.128x128x16: 09-Nedore.fnt
+Font.132x80x16: 09-Nedore.fnt
+Font.138x110x2: 08-Nedore.fnt
+Font.160x128x2: 09-Nedore.fnt
+Font.160x128x16: 09-Nedore.fnt
+Font.176x132x16: 09-Nedore.fnt
+Font.176x220x16: 12-Nimbus.fnt
+Font.220x176x16: 14-Nimbus.fnt
+Font.240x320x16: 19-Nimbus.fnt
+Font.320x240x16: 19-Nimbus.fnt
 Foreground Color: 000000
 Background Color: FFFFFF
 Statusbar: on
@@ -208,8 +208,8 @@ selector type: bar (inverse)
 <rwps>
 Name: iCatcher.rwps
 Author: Ioannis Koutoulakis
-Font.160x128x2: nedore-9.fnt
-Font.220x176x16: nimbus-14.fnt
+Font.160x128x2: 09-Nedore.fnt
+Font.220x176x16: 14-Nimbus.fnt
 Statusbar: on
 </rwps>
 
@@ -217,7 +217,7 @@ Statusbar: on
 Name: UniCatcher.wps
 RWPS: UniCatcher.rwps
 Author: Ioannis Koutoulakis
-Font: unifont.fnt
+Font: 16-GNU-Unifont.fnt
 Foreground Color: 000000
 Background Color: FFFFFF
 Statusbar: on
@@ -230,7 +230,7 @@ selector type: bar (inverse)
 <rwps>
 Name: UniCatcher.rwps
 Author: Ioannis Koutoulakis
-Font: unifont.fnt
+Font: 16-GNU-Unifont.fnt
 Statusbar: on
 </rwps>
 
@@ -238,17 +238,17 @@ Statusbar: on
 Name: Rockboxed.wps
 RWPS: rockbox_default.rwps
 Author: Roan Horning
-Font.112x64x1: rockbox_default.fnt
-Font.128x128x16: nimbus-12.fnt
-Font.132x80x16: nimbus-10.fnt
-Font.138x110x2: nimbus-12.fnt
-Font.160x128x16: nimbus-12.fnt
-Font.160x128x2: nimbus-12.fnt
-Font.176x132x16: nimbus-12.fnt
-Font.176x220x16: nimbus-12.fnt
-Font.220x176x16: nimbus-14.fnt
-Font.240x320x16: nimbus-19.fnt
-Font.320x240x16: nimbus-19.fnt
+Font.112x64x1: 08-Schumacher-Clean.fnt
+Font.128x128x16: 12-Nimbus.fnt
+Font.132x80x16: 10-Nimbus.fnt
+Font.138x110x2: 12-Nimbus.fnt
+Font.160x128x16: 12-Nimbus.fnt
+Font.160x128x2: 12-Nimbus.fnt
+Font.176x132x16: 12-Nimbus.fnt
+Font.176x220x16: 12-Nimbus.fnt
+Font.220x176x16: 14-Nimbus.fnt
+Font.240x320x16: 19-Nimbus.fnt
+Font.320x240x16: 19-Nimbus.fnt
 Foreground Color: 000000
 Background Color: FFC000
 Statusbar: on
@@ -270,18 +270,18 @@ RWPS: cabbiev2.rwps
 Author: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
 
 # Preferred font (including .fnt extension - leave blank for player):
-Font.320x240x16: helvR12.fnt
-Font.240x320x16: helvR12.fnt
-Font.220x176x16: helvR10.fnt
-Font.176x220x16: helvR10.fnt
-Font.176x132x16: helvR10.fnt
-Font.160x128x16: helvR10.fnt
-Font.160x128x2: helvR10.fnt
-Font.160x128x1: helvR10.fnt
-Font.138x110x2: helvR10.fnt
-Font.128x128x16: helvR10.fnt
-Font.132x80x16: Sazanami-Mincho-Regular-11.fnt
-Font.112x64x1: rockfont-8.fnt
+Font.320x240x16: 15-Adobe-Helvetica.fnt
+Font.240x320x16: 15-Adobe-Helvetica.fnt
+Font.220x176x16: 12-Adobe-Helvetica.fnt
+Font.176x220x16: 12-Adobe-Helvetica.fnt
+Font.176x132x16: 12-Adobe-Helvetica.fnt
+Font.160x128x16: 12-Adobe-Helvetica.fnt
+Font.160x128x2: 12-Adobe-Helvetica.fnt
+Font.160x128x1: 12-Adobe-Helvetica.fnt
+Font.138x110x2: 12-Adobe-Helvetica.fnt
+Font.128x128x16: 12-Adobe-Helvetica.fnt
+Font.132x80x16: 11-Sazanami-Mincho.fnt
+Font.112x64x1: 08-Rockfont.fnt
 
 #misc settings that should be ignored on grayscale targets
 foreground color: CCCCCC
@@ -346,6 +346,6 @@ Statusbar: on
 <rwps>
 Name: cabbiev2.rwps
 Author: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
-Font: helvR10.fnt
+Font: 12-Adobe-Helvetica.fnt
 Statusbar: on
 </rwps>
