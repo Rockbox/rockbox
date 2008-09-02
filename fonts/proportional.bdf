@@ -1,5 +1,5 @@
 STARTFONT 2.1
-FONT -classic-rockboxpropfont-Medium-R-Normal--8-80-75-75-P-50-FontSpecific-0
+FONT -classic-rockboxpropfont-Medium-R-Normal--8-80-75-75-P-50-ISO10646-1
 SIZE 8 75 75
 FONTBOUNDINGBOX 7 8 1 0
 STARTPROPERTIES 25
@@ -23,8 +23,8 @@ RESOLUTION_Y 75
 RESOLUTION 75
 SPACING "P"
 AVERAGE_WIDTH 50
-CHARSET_REGISTRY "FontSpecific"
-CHARSET_ENCODING "0"
+CHARSET_REGISTRY "ISO10646"
+CHARSET_ENCODING "1"
 CHARSET_COLLECTIONS "ASCII ISOLatin1Encoding FontSpecific"
 FULL_NAME "rockbox-prop-font medium"
 COPYRIGHT "by Uwe Freese, mail@uwe-freese.de 09/2002. V1.1"
