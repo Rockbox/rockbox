@@ -49,11 +49,6 @@
     .set    noreorder
     .set    noat
     
-#ifdef BOOTLOADER
-    .word 0 /* HACK */
-    .word 0 /* HACK */
-#endif
-
 _start:
     la      ra, _start
     /*

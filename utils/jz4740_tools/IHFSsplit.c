@@ -105,7 +105,11 @@ void mkdir_p(const char *path)
     if (strchr(dir, '/'))
         mkdir_p(dir);
 
+#ifdef _WIN32
+    mkdir(dir);
+#else
     mkdir(dir, 0755);
+#endif
 }
 
 #define BUF_SIZE 4096

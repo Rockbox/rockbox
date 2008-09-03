@@ -39,7 +39,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define VERSION "0.3"
+#define VERSION "0.4"
 
 #define MAX_FIRMWARESIZE   (64*1024*1024)   /* Arbitrary limit (for safety) */
 
@@ -49,8 +49,8 @@
 #endif
 
 /* USB IDs for USB Boot Mode */
-#define VID		 0x601A
-#define PID		 0x4740
+#define VID              0x601A
+#define PID              0x4740
 
 #define EP_BULK_TO       0x01
 #define TOUT             5000
@@ -102,12 +102,11 @@ enum NAND_OPS_TYPE
 enum SDRAM_OPS_TYPE
 {
     SDRAM_LOAD,
-
 };
 
 enum DATA_STRUCTURE_OB
 {
-    DS_flash_info ,
+    DS_flash_info,
     DS_hand
 };
 
@@ -120,11 +119,11 @@ enum OPTION
 
 int filesize(FILE* fd)
 {
-    int tmp;
+    int ret;
     fseek(fd, 0, SEEK_END);
-    tmp = ftell(fd);
+    ret = ftell(fd);
     fseek(fd, 0, SEEK_SET);
-    return tmp;
+    return ret;
 }
 
 #define SEND_COMMAND(cmd, arg) err = usb_control_msg(dh, USB_ENDPOINT_OUT | USB_TYPE_VENDOR, (cmd), (arg)>>16, (arg)&0xFFFF, NULL, 0, TOUT);\
@@ -299,7 +298,6 @@ int test_device(usb_dev_handle* dh)
     TEST(CPM_CLKGR, 4);
     
     fprintf(stderr, "\n");
-    //or_reg(dh, SADC_ENA, SADC_ENA_TSEN, 1);
     TEST(SADC_ENA, 1);
     TEST(SADC_CTRL, 1);
     TEST(SADC_TSDAT, 4);
@@ -326,7 +324,6 @@ int probe_device(usb_dev_handle* dh)
 {
     int tmp;
     
-    //or_reg(dh, SADC_ENA, SADC_ENA_TSEN, 1);
     while(1)
     {
         if(read_reg(dh, SADC_STATE, 1) & SADC_STATE_TSRDY)
@@ -493,9 +490,9 @@ int mimic_of(usb_dev_handle *dh, bool vx767)
     _SLEEP(2);
     _GET_CPU;
     _SET_ADDR(0x80E0 << 16);
-    _SEND_FILE("onda.bin");
+    _SEND_FILE("10.bin");
     _GET_CPU;
-    _VERIFY_DATA("onda.bin", 0x80E0 << 16);
+    _VERIFY_DATA("10.bin", 0x80E0 << 16);
     _GET_CPU;
     _FLUSH;
     _GET_CPU;
@@ -507,6 +504,33 @@ int mimic_of(usb_dev_handle *dh, bool vx767)
     {
         _STAGE2(0x80E00008);
     }
+    fprintf(stderr, "[INFO] Done!\n");
+    return 0;
+}
+
+int send_rockbox(usb_dev_handle *dh)
+{
+    int err, fsize;
+    unsigned char *buffer, *buffer2;
+    char cpu[8];
+    
+    fprintf(stderr, "[INFO] Start!\n");
+    _GET_CPU;
+    _SET_ADDR(0x8000 << 16);
+    _SEND_FILE("1.bin");
+    _GET_CPU;
+    _VERIFY_DATA("1.bin", 0x8000 << 16);
+    _STAGE1(0x8000 << 16);
+    _SLEEP(3);
+    _GET_CPU;
+    _SET_ADDR(0x080004000);
+    _SEND_FILE("onda.bin");
+    _GET_CPU;
+    _VERIFY_DATA("onda.bin", 0x080004000);
+    _GET_CPU;
+    _FLUSH;
+    _GET_CPU;
+    _STAGE2(0x080004000);
     fprintf(stderr, "[INFO] Done!\n");
     return 0;
 }
@@ -721,6 +745,9 @@ found:
         case 9:
             err = rom_dump(dh);
         break;
+        case 10:
+            err = send_rockbox(dh);
+        break;
     }
     
     /* release claimed interface */
@@ -734,21 +761,24 @@ found:
 void print_usage(void)
 {
 #ifdef _WIN32
-    fprintf(stderr, "Usage: usbtool.exe [CMD] [FILE] [ADDRESS] [LEN]\n");
+    fprintf(stderr, "Usage: usbtool.exe <CMD> [FILE] [ADDRESS] [LEN]\n");
 #else
-    fprintf(stderr, "Usage: usbtool [CMD] [FILE] [ADDRESS] [LEN]\n");
+    fprintf(stderr, "Usage: usbtool <CMD> [FILE] [ADDRESS] [LEN]\n");
 #endif
+
     fprintf(stderr, "\t[ADDRESS] has to be in 0xHEXADECIMAL format\n");
-    fprintf(stderr, "\t[CMD]:\n");
-    fprintf(stderr, "\t\t1 -> upload file to specified address and boot from it\n");
-    fprintf(stderr, "\t\t2 -> read data from [ADDRESS] with length [LEN] to [FILE]\n");
-    fprintf(stderr, "\t\t3 -> read device status\n");
-    fprintf(stderr, "\t\t4 -> probe keys (only Onda VX747)\n");
-    fprintf(stderr, "\t\t5 -> same as 1 but do a stage 2 boot\n");
-    fprintf(stderr, "\t\t6 -> mimic VX747 OF fw recovery\n");
-    fprintf(stderr, "\t\t7 -> mimic VX767 OF fw recovery\n");
-    fprintf(stderr, "\t\t8 -> do a NAND dump\n");
-    fprintf(stderr, "\t\t9 -> do a ROM dump\n");
+    fprintf(stderr, "\tCMD:\n");
+    fprintf(stderr, "\t\t 1 -> upload file to specified address and boot from it\n");
+    fprintf(stderr, "\t\t 2 -> read data from [ADDRESS] with length [LEN] to [FILE]\n");
+    fprintf(stderr, "\t\t 3 -> read device status\n");
+    fprintf(stderr, "\t\t 4 -> probe keys (only Onda VX747)\n");
+    fprintf(stderr, "\t\t 5 -> same as 1 but do a stage 2 boot\n");
+    fprintf(stderr, "\t\t 6 -> mimic VX747 OF fw recovery\n");
+    fprintf(stderr, "\t\t 7 -> mimic VX767 OF fw recovery\n");
+    fprintf(stderr, "\t\t 8 -> do a NAND dump\n");
+    fprintf(stderr, "\t\t 9 -> do a ROM dump\n");
+    fprintf(stderr, "\t\t10 -> send Rockbox bootloader to SDRAM\n");
+
 #ifdef _WIN32
     fprintf(stderr, "\nExample:\n\t usbtool.exe 1 fw.bin 0x80000000\n");
     fprintf(stderr, "\t usbtool.exe 2 save.bin 0x81000000 1024\n");
@@ -865,6 +895,7 @@ int main(int argc, char* argv[])
         case 7:
         case 8:
         case 9:
+        case 10:
             return jzconnect(address, NULL, 0, cmd);
         break;
         default:

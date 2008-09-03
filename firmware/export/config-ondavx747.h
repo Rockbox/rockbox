@@ -24,7 +24,7 @@
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
-#define CONFIG_SDRAM_START 0x80E00000 /* HACK! */
+#define CONFIG_SDRAM_START 0x80004000
 
 #define ONDA_VX747 1
 
