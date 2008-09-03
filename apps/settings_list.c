@@ -174,15 +174,15 @@ static const char graphic_numeric[] = "graphic,numeric";
 #ifdef HAVE_LCD_BITMAP
 
 #if LCD_HEIGHT <= 64
-  #define DEFAULT_FONTNAME "rockfont-8"
+  #define DEFAULT_FONTNAME "08-Rockfont"
 #elif LCD_HEIGHT <= 80
-  #define DEFAULT_FONTNAME "Sazanami-Mincho-Regular-11"
+  #define DEFAULT_FONTNAME "11-Sazanami-Mincho"
 #elif LCD_HEIGHT <= 220
-  #define DEFAULT_FONTNAME "helvR10"
+  #define DEFAULT_FONTNAME "12-Adobe-Helvetica"
 #elif LCD_HEIGHT <= 320
-  #define DEFAULT_FONTNAME "helvR12"
+  #define DEFAULT_FONTNAME "15-Adobe-Helvetica"
 #else
-  #define DEFAULT_FONTNAME "helvR10"
+  #define DEFAULT_FONTNAME "12-Adobe-Helvetica"
 #endif
 
 #else
