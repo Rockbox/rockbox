@@ -4,4 +4,6 @@ cat targets.txt | (
     do
         make MODEL=$model TARGET=$target build
     done
+    cp *.dll ../gui/bin
+    cp *.so ../gui/bin
 )

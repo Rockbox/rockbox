@@ -1,5 +1,5 @@
 TEMPLATE = lib
-CONFIG += staticlib debug_and_release
+CONFIG += staticlib debug
 SOURCES = ColorCombo.cpp \
  Property.cpp \
  QPropertyEditorWidget.cpp \

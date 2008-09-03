@@ -5,6 +5,7 @@
 
 #define DEBUGF1 qlogger
 #define DEBUGF2(...)
+#define DEBUGF3 qDebug
 
 extern int qlogger(const char* fmt,...);
 extern int qlogger(const QString& s);

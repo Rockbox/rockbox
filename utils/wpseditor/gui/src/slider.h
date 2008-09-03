@@ -7,6 +7,7 @@
 //
 class Slider : public QDialog , Ui::slider {
     Q_OBJECT
+    QString mCaption;
 public slots:
     void slotValueChanged(int step);
 signals:

@@ -4,11 +4,9 @@
 #include "wpsstate.h"
 #include <QObject>
 
-class QWpsState;
-
 class QTrackState : public QObject {
     Q_OBJECT
-    Q_CLASSINFO ( "QTrackState", "Mp3 State" );
+    Q_CLASSINFO ( "QTrackState", "Track State" );
     Q_PROPERTY ( QString Title READ title WRITE setTitle DESIGNABLE true USER true )
     Q_PROPERTY ( QString Artist READ artist WRITE setArtist DESIGNABLE true USER true )
     Q_PROPERTY ( QString Album READ album WRITE setAlbum DESIGNABLE true USER true )
@@ -16,7 +14,6 @@ class QTrackState : public QObject {
     Q_CLASSINFO("Length", "readOnly=true;value=100");
     Q_PROPERTY ( int Elapsed READ elapsed WRITE setElapsed DESIGNABLE true USER true )
     Q_CLASSINFO("Elapsed", "minimum=0;maximum=100;value=50");
-
 
     trackstate state;
 

@@ -15,10 +15,10 @@
   <widget class="QWidget" name="centralwidget" >
    <property name="geometry" >
     <rect>
-     <x>260</x>
-     <y>21</y>
-     <width>344</width>
-     <height>345</height>
+     <x>262</x>
+     <y>19</y>
+     <width>340</width>
+     <height>346</height>
     </rect>
    </property>
   </widget>
@@ -28,7 +28,7 @@
      <x>0</x>
      <y>0</y>
      <width>882</width>
-     <height>21</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile" >
@@ -48,8 +48,14 @@
      <string>Play</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuTarget" >
+    <property name="title" >
+     <string>Target</string>
+    </property>
+   </widget>
    <addaction name="menuFile" />
    <addaction name="menuPlay" />
+   <addaction name="menuTarget" />
   </widget>
   <widget class="QStatusBar" name="statusbar" >
    <property name="geometry" >
@@ -65,9 +71,9 @@
    <property name="geometry" >
     <rect>
      <x>0</x>
-     <y>370</y>
+     <y>371</y>
      <width>882</width>
-     <height>280</height>
+     <height>279</height>
     </rect>
    </property>
    <property name="minimumSize" >
@@ -86,9 +92,9 @@
     <property name="geometry" >
      <rect>
       <x>0</x>
-      <y>22</y>
+      <y>20</y>
       <width>882</width>
-      <height>258</height>
+      <height>259</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_2" >
@@ -129,9 +135,9 @@
    <property name="geometry" >
     <rect>
      <x>0</x>
-     <y>21</y>
+     <y>19</y>
      <width>256</width>
-     <height>345</height>
+     <height>346</height>
     </rect>
    </property>
    <property name="windowTitle" >
@@ -147,9 +153,9 @@
     <property name="geometry" >
      <rect>
       <x>0</x>
-      <y>22</y>
+      <y>20</y>
       <width>256</width>
-      <height>323</height>
+      <height>326</height>
      </rect>
     </property>
    </widget>
@@ -158,9 +164,9 @@
    <property name="geometry" >
     <rect>
      <x>608</x>
-     <y>21</y>
+     <y>19</y>
      <width>274</width>
-     <height>345</height>
+     <height>346</height>
     </rect>
    </property>
    <property name="minimumSize" >
@@ -179,9 +185,9 @@
     <property name="geometry" >
      <rect>
       <x>0</x>
-      <y>22</y>
+      <y>20</y>
       <width>274</width>
-      <height>323</height>
+      <height>326</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout" >

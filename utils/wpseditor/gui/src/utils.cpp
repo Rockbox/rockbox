@@ -19,7 +19,6 @@ int qlogger(const char* fmt,...) {
         s = "<font color=red>"+s+"</font>";
     if (win!=0)
         win->logMsg(s);
-    va_end(ap);
     return s.length();
 }
 

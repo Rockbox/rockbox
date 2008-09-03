@@ -1,11 +1,14 @@
+#include <stdarg.h>
+
+#include <QtGui>
+#include <QLibrary>
+
 #include "qwpsdrawer.h"
 #include "slider.h"
 #include "utils.h"
-#include <QtGui>
-#include <QLibrary>
-#include <stdarg.h>
-//
-
+#include "qtrackstate.h"
+#include "qwpsstate.h"
+#include "api.h"
 
 QPointer<QWpsDrawer> drawer;
 QPixmap   *QWpsDrawer::pix = NULL;
@@ -14,34 +17,38 @@ QImage    QWpsDrawer::backdrop;
 proxy_api QWpsDrawer::api;
 
 QWpsDrawer::QWpsDrawer( QWpsState *ws,QTrackState *ms, QWidget *parent )
-        : QWidget(parent),wpsState(ws),trackState(ms),showGrid(false),mTargetLibName("libwps") {
+        : QWidget(parent),wpsState(ws),trackState(ms),showGrid(false),mCurTarget("h10_5gb") {
 
     tryResolve();
-    memset(&api,0,sizeof(struct proxy_api));
-
-    api.verbose = 2;
-    api.putsxy =                    &QWpsDrawer::putsxy;
-    api.transparent_bitmap_part =   &QWpsDrawer::transparent_bitmap_part;
-    api.bitmap_part =               &QWpsDrawer::bitmap_part;
-    api.drawpixel =                 &QWpsDrawer::drawpixel;
-    api.fillrect =                  &QWpsDrawer::fillrect;
-    api.hline =                     &QWpsDrawer::hline;
-    api.vline =                     &QWpsDrawer::vline;
-    api.clear_viewport =            &QWpsDrawer::clear_viewport;
-    api.load_wps_backdrop =         &QWpsDrawer::load_wps_backdrop;
-    api.read_bmp_file =             &QWpsDrawer::read_bmp_file;
-    api.debugf =                    &qlogger;
     newTempWps();
 }
 
 bool QWpsDrawer::tryResolve() {
-    QLibrary lib(qApp->applicationDirPath()+"/"+mTargetLibName);
-    wps_init = (pfwps_init)lib.resolve("wps_init");
-    wps_display = (pfwps_display)lib.resolve("wps_display");
-    wps_refresh = (pfwps_refresh)lib.resolve("wps_refresh");
-    mResolved = wps_init && wps_display && wps_refresh;
+    QLibrary lib(qApp->applicationDirPath()+"/libwps_"+mCurTarget);
+    lib_wps_init = (pfwps_init)lib.resolve("wps_init");
+    lib_wps_display = (pfwps_display)lib.resolve("wps_display");
+    lib_wps_refresh = (pfwps_refresh)lib.resolve("wps_refresh");
+    lib_get_model_name = (pfget_model_name)lib.resolve("get_model_name");
+    mResolved = lib_wps_init && lib_wps_display && lib_wps_refresh && lib_get_model_name;
     if (!mResolved)
         DEBUGF1(tr("ERR: Failed to resolve funcs!"));
+    else {
+        int v = api.verbose;
+        memset(&api,0,sizeof(struct proxy_api));
+        api.verbose = v;
+        api.putsxy =                    &QWpsDrawer::putsxy;
+        api.transparent_bitmap_part =   &QWpsDrawer::transparent_bitmap_part;
+        api.bitmap_part =               &QWpsDrawer::bitmap_part;
+        api.drawpixel =                 &QWpsDrawer::drawpixel;
+        api.fillrect =                  &QWpsDrawer::fillrect;
+        api.hline =                     &QWpsDrawer::hline;
+        api.vline =                     &QWpsDrawer::vline;
+        api.clear_viewport =            &QWpsDrawer::clear_viewport;
+        api.load_wps_backdrop =         &QWpsDrawer::load_wps_backdrop;
+        api.read_bmp_file =             &QWpsDrawer::read_bmp_file;
+        api.debugf =                    &qlogger;
+        qDebug()<<(qApp->applicationDirPath()+"/libwps_"+mCurTarget+" resolved");
+    }
     return mResolved;
 }
 QWpsDrawer::~QWpsDrawer() {
@@ -56,20 +63,20 @@ void QWpsDrawer::mouseReleaseEvent ( QMouseEvent * event ) {
     DEBUGF1("x=%d,y=%d",x,y);*/
 }
 void QWpsDrawer::newTempWps() {
-    QTemporaryFile    tmpWps;
+    QTemporaryFile tmpWps;
     tmpWps.setAutoRemove(false);
     tmpWps.setFileTemplate(QDir::tempPath()+"/XXXXXXXXXX.wps");
     if (tmpWps.open()) {
         QString tmpDir = tmpWps.fileName().left(tmpWps.fileName().length()-4);
         if (QDir::temp().mkpath(tmpDir)) {
             mTmpWpsString = tmpDir;
-            DEBUGF1(mTmpWpsString);
+            DEBUGF3(QString("Created :"+mTmpWpsString).toAscii());
         }
     }
 }
 
 void QWpsDrawer::WpsInit(QString buffer, bool isFile) {
-
+	DEBUGF3("QWpsDrawer::WpsInit");
     if (!mResolved)
         if (!tryResolve())
             return;
@@ -87,22 +94,24 @@ void QWpsDrawer::WpsInit(QString buffer, bool isFile) {
         if (tfile.open(QIODevice::WriteOnly | QIODevice::Text))
             tfile.write(mWpsString.toAscii(),mWpsString.length());
     }
-
+    backdrop.fill(Qt::black);
+    DEBUGF3("clear backdrop");
     if (isFile)
-        wps_init(buffer.toAscii(), &api, isFile);
+        lib_wps_init(buffer.toAscii(), &api, isFile);
     else
-        wps_init(QString(mTmpWpsString+".wps").toAscii(), &api, true);
+        lib_wps_init(QString(mTmpWpsString+".wps").toAscii(), &api, true);
     pix = new QPixmap(api.getwidth(),api.getheight());
+    pix->fill(Qt::black);
 
     drawBackdrop();
 
     setMinimumWidth(api.getwidth());
     setMinimumHeight(api.getheight());
-
     update();
 }
 
 void QWpsDrawer::paintEvent(QPaintEvent * event) {
+    DEBUGF3("QWpsDrawer::paintEvent()");
     if (!mResolved)
         return;
     if (pix==NULL)
@@ -111,7 +120,7 @@ void QWpsDrawer::paintEvent(QPaintEvent * event) {
     QRect rect = event->rect();
 
     drawBackdrop();
-    wps_refresh();
+    lib_wps_refresh();
 
     if (showGrid) {
         QPainter g(pix);
@@ -172,10 +181,13 @@ void QWpsDrawer::slotShowGrid(bool show) {
 }
 
 void QWpsDrawer::drawBackdrop() {
+    DEBUGF3("QWpsDrawer::drawBackdrop()");
+    if (backdrop.isNull())
+    	return;
     QPainter b(pix);
     QImage pink = backdrop.createMaskFromColor(qRgb(255,0,255),Qt::MaskOutColor);
     backdrop.setAlphaChannel(pink);
-    b.drawImage(0,0,backdrop);
+    b.drawImage(0,0,backdrop,0,0,pix->width(),pix->height());
 }
 
 void QWpsDrawer::slotSetAudioStatus(int status) {
@@ -197,4 +209,36 @@ void QWpsDrawer::closeEvent(QCloseEvent *event) {
     qDebug()<<"QWpsDrawer::closeEvent()";
     cleanTemp();
     event->accept();
+}
+
+QString QWpsDrawer::getModelName(QString libraryName) {
+    QLibrary lib(libraryName);
+    if ((pfget_model_name)lib.resolve("get_model_name"))
+        return ((pfget_model_name)lib.resolve("get_model_name"))();
+    DEBUGF1("ERR: failed to resolve <get_model_name>");
+    return "unknown";
+}
+
+QList<QString> QWpsDrawer::getTargets() {
+    QList<QString> list ;
+    QDir d = QDir(qApp->applicationDirPath());
+    QFileInfoList libs = d.entryInfoList(QStringList("libwps*"));
+    qDebug() << libs.size()<<"libs found";
+    for (int i = 0; i < libs.size(); i++) {
+        QString modelName = getModelName(libs[i].absoluteFilePath());
+        qDebug() << libs[i].fileName()<<modelName;
+        if (modelName == "unknown")
+            continue;
+        list.append(modelName);
+    }
+    return list;
+}
+bool QWpsDrawer::setTarget(QString target) {
+    QLibrary lib(qApp->applicationDirPath()+"/libwps_"+mCurTarget);
+    //lib.unload();
+    if (getModelName("libwps_"+target)!="unknown") {
+        mCurTarget = target;
+        return tryResolve();
+    }
+    return false;
 }

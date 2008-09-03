@@ -1,7 +1,19 @@
-* Enable ability in gui to load different targets on the fly
+* Make better logging system
+* Replace checkwps functionality
+* Include 'screenshot utility' functionality
+* Options
 * Enable animation(timers,sliding lines, etc)
 * Test on Mac OS
 * Redesign GUI for more usability
-* Replace checkwps functionality
-* Include 'screenshot utility' functionality
 * Make editing via gui
+* Use native rockbox fonts
+* Replace shared libs as Qt Plugins
+* Edit wiki :-)
+
+Partially solved
+* Enable ability in gui to load different targets on the fly [Not all targets are built yet]
+* Syntax highlight [Comments are done; enable for logEdit; tag highlight]
+
+THE BUGZ ARE COMING!
+* While loading wps for the first time, gui doesn't show properties from editor properly
+* Strange text horisontal position in cabbie(probably other themes)

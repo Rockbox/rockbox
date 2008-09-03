@@ -3,14 +3,14 @@
 #include <QFile>
 #include <QFileInfo>
 #include "utils.h"
+#include "api.h"
 
 void QWpsDrawer::putsxy(int x, int y, const unsigned char *str) {
+    DEBUGF3("putsxy(int x=%d, int y=%d, *str=%s)",x,y,str);
     QPainter p(pix);
     viewport_api avp;
     api.get_current_vp(&avp);
     p.setPen(Qt::gray);
-
-
     QFont font("times",avp.fontheight,QFont::Bold);
     p.setFont(font);
     p.drawText(x+avp.x,y + avp.fontheight + avp.y,(char*)str);
@@ -54,7 +54,7 @@ void QWpsDrawer::vline(int x, int y1, int y2) {
     p.drawLine(x,y1,x,y2);
 }
 bool QWpsDrawer::load_wps_backdrop(char* filename) {
-    DEBUGF2("load backdrop: %s", filename);
+    DEBUGF3("load backdrop: %s", filename);
     QFile file(filename);
     QFileInfo info(file);
     file.copy(mTmpWpsString+"/"+info.fileName());
@@ -70,7 +70,6 @@ int QWpsDrawer::read_bmp_file(const char* filename,int *width, int *height) {
     file.copy(mTmpWpsString+"/"+info.fileName());
 
     img.load(filename);
-    //qDebug()<<"QWpsDrawer::read_bmp_file"<<img.width()<<img.height();
     *width = img.width();
     *height = img.height();
     return 1;

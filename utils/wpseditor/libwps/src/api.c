@@ -32,8 +32,7 @@ bool load_remote_wps_backdrop(char* filename) {
 }
 
 int read_bmp_file(const char* filename,struct bitmap *bm, int maxsize,int format) {
-    if (!xapi->read_bmp_file)
-    {
+    if (!xapi->read_bmp_file) {
         DEBUGF1("can't read bmp file! NULL api!\n");
         return -1;
     }
@@ -84,7 +83,7 @@ int getstringsize(const unsigned char *str, int *w, int *h) {
     return 1;
 }
 
-void set_wpsstate(struct wpsstate state){
+void set_wpsstate(struct wpsstate state) {
     sysfont.height = state.fontheight;
     sysfont.maxwidth = state.fontwidth;
     global_settings.volume = state.volume;
@@ -92,7 +91,10 @@ void set_wpsstate(struct wpsstate state){
     _audio_status = state.audio_status;
 }
 
-void set_trackstate(struct trackstate state){
+void set_trackstate(struct trackstate state) {
+    if (!(gui_wps[0].state) ||
+        !(gui_wps[0].state->id3))
+        return;
     gui_wps[0].state->id3->title = state.title;
     gui_wps[0].state->id3->artist = state.artist;
     gui_wps[0].state->id3->album = state.album;
@@ -100,8 +102,7 @@ void set_trackstate(struct trackstate state){
     gui_wps[0].state->id3->length = state.length;
 }
 
-void set_next_trackstate(struct trackstate state)
-{
+void set_next_trackstate(struct trackstate state) {
     gui_wps[0].state->nid3->title = state.title;
     gui_wps[0].state->nid3->artist = state.artist;
     gui_wps[0].state->nid3->album = state.album;
@@ -110,21 +111,21 @@ void set_next_trackstate(struct trackstate state)
 }
 
 enum api_playmode playmodes[PLAYMODES_NUM] = {
-    API_STATUS_PLAY,
-    API_STATUS_STOP,
-    API_STATUS_PAUSE,
-    API_STATUS_FASTFORWARD,
-    API_STATUS_FASTBACKWARD
-};
+            API_STATUS_PLAY,
+            API_STATUS_STOP,
+            API_STATUS_PAUSE,
+            API_STATUS_FASTFORWARD,
+            API_STATUS_FASTBACKWARD
+        };
 
 const char *playmodeNames[] = {
-    "Play", "Stop", "Pause", "FastForward", "FastBackward"
-};
+                                  "Play", "Stop", "Pause", "FastForward", "FastBackward"
+                              };
 
 
-void set_audio_status(int status){
+void set_audio_status(int status) {
     DEBUGF1("%s",playmodeNames[status]);
-    switch(status){
+    switch (status) {
         case API_STATUS_PLAY:
             _audio_status = AUDIO_STATUS_PLAY;
             status_set_ffmode(STATUS_PLAY);
@@ -203,8 +204,6 @@ int set_api(struct proxy_api* api) {
 #else
     screens[0].is_color=false;
 #endif
-    if (api->getwidth)
-        screens[0].getwidth = api->getwidth;
     if (api->stop_scroll)
         screens[0].stop_scroll=api->stop_scroll;
     screens[0].scroll_stop = lcd_scroll_stop;
@@ -260,6 +259,7 @@ int set_api(struct proxy_api* api) {
     xapi = api;
     return 0;
 }
+
 
 
 

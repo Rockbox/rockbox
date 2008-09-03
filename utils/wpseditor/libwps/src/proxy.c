@@ -69,7 +69,7 @@ void* plugin_get_buffer(size_t *buffer_size)
 int checkwps(const char *filename, int verbose){
     int res;
     int fd;
-    
+
     struct wps_data wps;
     wps_verbose_level = verbose;
 
@@ -104,9 +104,8 @@ int wps_init(const char* filename,struct proxy_api *api, bool isfile){
     if (!res)
     {
       DEBUGF1("ERR: WPS parsing failure\n");
-      return 3;
-    }
-    DEBUGF1("WPS parsed OK\n");
+    } else
+        DEBUGF1("WPS parsed OK\n");
     DEBUGF1("\n-------------------------------------------------\n");
     wps_state.paused = true;
     gwps.data = &wpsdata;
@@ -115,7 +114,7 @@ int wps_init(const char* filename,struct proxy_api *api, bool isfile){
     gwps.state->id3 = &id3;
     gwps.state->nid3 = &nid3;
     gui_wps[0] = gwps;
-    return res;
+    return (res?res:3);
 }
 
 int wps_display(){

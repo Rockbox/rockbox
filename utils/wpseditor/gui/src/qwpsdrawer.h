@@ -1,25 +1,30 @@
 #ifndef WPSDRAWER_H
 #define WPSDRAWER_H
-//
+
 #include <QWidget>
 #include <QPixmap>
 #include <QPointer>
 #include <QTemporaryFile>
-#include "api.h"
-#include "qtrackstate.h"
-#include "qwpsstate.h"
-//
+
+#include "wpsstate.h"
+
+struct proxy_api;
+
+class QWpsState;
+class QTrackState;
 
 typedef int (*pfwps_init)(const char* buff,struct proxy_api *api, bool isfile);
 typedef int (*pfwps_display)();
 typedef int (*pfwps_refresh)();
+typedef const char* (*pfget_model_name)();
 
 class QWpsDrawer : public QWidget {
     Q_OBJECT
 
-    pfwps_init    wps_init;
-    pfwps_display wps_display;
-    pfwps_refresh wps_refresh;
+    pfwps_init       lib_wps_init;
+    pfwps_display    lib_wps_display;
+    pfwps_refresh    lib_wps_refresh;
+    pfget_model_name lib_get_model_name;
 
     static QPixmap    *pix;
     static QImage     backdrop;
@@ -30,7 +35,7 @@ class QWpsDrawer : public QWidget {
     bool              showGrid;
     bool              mResolved;
     QString           mWpsString;
-    QString           mTargetLibName;
+    QString           mCurTarget;
     static QString    mTmpWpsString;
 
 
@@ -42,6 +47,7 @@ protected:
     void newTempWps();
     void cleanTemp(bool fileToo=true);
     bool tryResolve();
+    QString getModelName(QString libraryName);
 public:
     QWpsDrawer(QWpsState *ws,QTrackState *ms, QWidget *parent=0);
     ~QWpsDrawer();
@@ -53,6 +59,8 @@ public:
     QString tempWps() const {
         return mTmpWpsString;
     };
+    QList<QString> getTargets();
+    bool setTarget(QString target);
 
 
     static proxy_api api;
@@ -73,7 +81,6 @@ public:
 public slots:
     void slotSetVolume();
     void slotSetProgress();
-
     void slotShowGrid(bool);
     void slotWpsStateChanged(wpsstate);
     void slotTrackStateChanged(trackstate);
