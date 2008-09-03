@@ -11,7 +11,7 @@ class QSyntaxer : public QSyntaxHighlighter {
         QRegExp pattern;
         QTextCharFormat format;
     };
-    QMap<QString,HighlightingRule> hrules;
+    QMap<int,HighlightingRule> hrules;
 public:
     QSyntaxer(QTextDocument *parent = 0);
 

@@ -6,24 +6,23 @@ QSyntaxer::QSyntaxer(QTextDocument *parent)
         : QSyntaxHighlighter(parent) {
     HighlightingRule rule;
 
-    hrules["operator"].pattern = QRegExp("%[^\\| \n<\\?%]{1,2}");
-    hrules["operator"].format.setFontWeight(QFont::Bold);
-    hrules["operator"].format.setForeground(Qt::darkBlue);
+    hrules[0].pattern = QRegExp("%[^\\| \n<\\?%]{1,2}");
+    hrules[0].format.setFontWeight(QFont::Bold);
+    hrules[0].format.setForeground(Qt::darkBlue);
 
     
-    hrules["question"].pattern = QRegExp("%[\\?]{1}[^<]{1,2}");
-    hrules["question"].format.setForeground(Qt::darkMagenta);
+    hrules[1].pattern = QRegExp("%[\\?]{1}[^<]{1,2}");
+    hrules[1].format.setForeground(Qt::darkMagenta);
     
-    hrules["question2"].pattern = QRegExp("(<|>)");
-    hrules["question2"].format.setForeground(Qt::red);
-    
+    hrules[2].pattern = QRegExp("(<|>)");
+    hrules[2].format.setForeground(Qt::red);
 
-    hrules["limiter"].pattern = QRegExp("\\|");
-    hrules["limiter"].format.setForeground(Qt::darkRed);
+    hrules[3].pattern = QRegExp("\\|");
+    hrules[3].format.setForeground(Qt::darkRed);
     
-    hrules["comment"].pattern = QRegExp("#[^\n]*");
-    hrules["comment"].format.setForeground(Qt::darkGreen);
-    hrules["comment"].format.setFontItalic(true);
+    hrules[4].pattern = QRegExp("#[^\n]*");
+    hrules[4].format.setForeground(Qt::darkGreen);
+    hrules[4].format.setFontItalic(true);
 }
 //
 void QSyntaxer::highlightBlock(const QString &text) {
