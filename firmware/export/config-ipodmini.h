@@ -6,7 +6,7 @@
 #define IPOD_ARCH 1
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 9 /* TODO: change to 9 */
+#define MODEL_NUMBER 9
 
 /* define this if you use an ATA controller */
 #define HAVE_ATA
