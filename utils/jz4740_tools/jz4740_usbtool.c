@@ -530,7 +530,7 @@ int send_rockbox(usb_dev_handle *dh)
     _GET_CPU;
     _FLUSH;
     _GET_CPU;
-    _STAGE2(0x080004000);
+    _STAGE2(0x080004008);
     fprintf(stderr, "[INFO] Done!\n");
     return 0;
 }

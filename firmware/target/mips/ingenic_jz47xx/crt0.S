@@ -48,6 +48,11 @@
     .section .init.text
     .set    noreorder
     .set    noat
+
+#ifdef BOOTLOADER
+    .word 0 /* Unknown */
+    .word 0 /* Filesize */
+#endif
     
 _start:
     la      ra, _start
