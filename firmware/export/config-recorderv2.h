@@ -1,6 +1,8 @@
 /* define this if you use an ATA controller */
 #define HAVE_ATA
 
+#define MODEL_NAME   "Archos Recorder v2"
+
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 

@@ -1,9 +1,0 @@
-IRIVER_H10 h10
-IRIVER_H10_5GB h10_5gb
-IPOD_COLOR ipodcolor
-IPOD_NANO ipodnano
-IPOD_VIDEO ipodvideo
-GIGABEAT_F gigabeatf
-GIGABEAT_S gigabeats
-SANSA_E200 e200
-SANSA_C200 c200

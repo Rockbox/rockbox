@@ -4,6 +4,8 @@
  */
 #define IRIVER_H300_SERIES 1
 
+#define MODEL_NAME "iriver H300 series"
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 2
 

@@ -5,7 +5,7 @@
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 20
-#define MODEL_NAME   "Sandisk Sansa c200"
+#define MODEL_NAME   "Sandisk Sansa c200 series"
 
 #define HW_SAMPR_CAPS       (SAMPR_CAP_44)
 

@@ -6,6 +6,8 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 29
 
+#define MODEL_NAME   "Sandisk Sansa m200 series"
+
 /* Enable FAT16 support */
 #define HAVE_FAT16SUPPORT
 

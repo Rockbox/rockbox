@@ -6,6 +6,8 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 24
 
+#define MODEL_NAME   "Cowon iAudio D2"
+
 /* Produce a dual-boot bootloader.bin for mktccboot */
 #define TCCBOOT
 

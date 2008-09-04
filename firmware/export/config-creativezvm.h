@@ -28,6 +28,8 @@
 
 #define CREATIVE_ZVM 1
 
+#define MODEL_NAME   "Creative Zen Vision: M"
+
 /* This makes it part of the Creative Zen Vision family :) */
 #define CREATIVE_ZVx 1
 
@@ -160,7 +162,7 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
-#define CONFIG_USBOTG	USBOTG_ISP1583
+#define CONFIG_USBOTG USBOTG_ISP1583
 #define HAVE_USBSTACK
 #define USB_VENDOR_ID 0x041e 
 #define USB_PRODUCT_ID 0x4133

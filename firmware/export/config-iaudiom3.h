@@ -6,6 +6,8 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 25
 
+#define MODEL_NAME   "iAudio M3"
+
 /* define this if you use an ATA controller */
 #define HAVE_ATA
 

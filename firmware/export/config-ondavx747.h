@@ -28,6 +28,8 @@
 
 #define ONDA_VX747 1
 
+#define MODEL_NAME  "Onda VX747"
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 30
 

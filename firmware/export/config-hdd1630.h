@@ -1,5 +1,5 @@
 /*
- * This config file is for the iriver H10 20Gb
+ * This config file is for the Philips GoGear HDD1630
  */
 
 #define TARGET_TREE /* this target is using the target tree system */

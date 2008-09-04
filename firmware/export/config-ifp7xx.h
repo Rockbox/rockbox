@@ -5,6 +5,8 @@
 
 #define IRIVER_IFP7XX_SERIES 1
 
+#define MODEL_NAME   "iriver iFP-799"
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 6
 

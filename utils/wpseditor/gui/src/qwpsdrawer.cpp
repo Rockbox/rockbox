@@ -17,14 +17,14 @@ QImage    QWpsDrawer::backdrop;
 proxy_api QWpsDrawer::api;
 
 QWpsDrawer::QWpsDrawer( QWpsState *ws,QTrackState *ms, QWidget *parent )
-        : QWidget(parent),wpsState(ws),trackState(ms),showGrid(false),mCurTarget("h10_5gb") {
+        : QWidget(parent),wpsState(ws),trackState(ms),showGrid(false),mCurTarget(qApp->applicationDirPath()+"/libwps_IRIVER_H10_5GB") {
 
     tryResolve();
     newTempWps();
 }
 
 bool QWpsDrawer::tryResolve() {
-    QLibrary lib(qApp->applicationDirPath()+"/libwps_"+mCurTarget);
+    QLibrary lib(mCurTarget);
     lib_wps_init = (pfwps_init)lib.resolve("wps_init");
     lib_wps_display = (pfwps_display)lib.resolve("wps_display");
     lib_wps_refresh = (pfwps_refresh)lib.resolve("wps_refresh");
@@ -47,7 +47,7 @@ bool QWpsDrawer::tryResolve() {
         api.load_wps_backdrop =         &QWpsDrawer::load_wps_backdrop;
         api.read_bmp_file =             &QWpsDrawer::read_bmp_file;
         api.debugf =                    &qlogger;
-        qDebug()<<(qApp->applicationDirPath()+"/libwps_"+mCurTarget+" resolved");
+        qDebug()<<(mCurTarget+" resolved");
     }
     return mResolved;
 }
@@ -222,7 +222,7 @@ QString QWpsDrawer::getModelName(QString libraryName) {
 QList<QString> QWpsDrawer::getTargets() {
     QList<QString> list ;
     QDir d = QDir(qApp->applicationDirPath());
-    QFileInfoList libs = d.entryInfoList(QStringList("libwps*"));
+    QFileInfoList libs = d.entryInfoList(QStringList("libwps_*"));
     qDebug() << libs.size()<<"libs found";
     for (int i = 0; i < libs.size(); i++) {
         QString modelName = getModelName(libs[i].absoluteFilePath());
@@ -230,15 +230,24 @@ QList<QString> QWpsDrawer::getTargets() {
         if (modelName == "unknown")
             continue;
         list.append(modelName);
+        libs_array[i].target_name = modelName;
+        libs_array[i].lib = libs[i].absoluteFilePath();
     }
     return list;
 }
 bool QWpsDrawer::setTarget(QString target) {
-    QLibrary lib(qApp->applicationDirPath()+"/libwps_"+mCurTarget);
-    //lib.unload();
-    if (getModelName("libwps_"+target)!="unknown") {
-        mCurTarget = target;
-        return tryResolve();
+    foreach(lib_t cur_lib, libs_array)
+    {
+        if(cur_lib.target_name == target)
+        {
+            QLibrary lib(cur_lib.lib);
+            //lib.unload();
+            if (getModelName(cur_lib.lib) != "unknown")
+            {
+                mCurTarget = cur_lib.lib;
+                return tryResolve();
+            }
+        }
     }
     return false;
 }

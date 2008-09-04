@@ -8,15 +8,13 @@
 #
 ROOT=../../..
 
-OS = w32
-CC = gcc
-MKDIR = mkdir -p
-
-ifeq ($(findstring MINGW,$(shell uname)),MINGW)
+ifneq ($or($(findstring MINGW,$(shell uname)),$(findstring Windows_NT,$(OS))),)
   OS = w32
   CC = mingw32-gcc
   COPY = copy
-  RM = rm
+  RM = del
+  EXT = .dll
+  LDFLAGS = -DBUILD_DLL
 endif
 
 ifeq ($(findstring Linux,$(shell uname)),Linux)
@@ -24,39 +22,48 @@ ifeq ($(findstring Linux,$(shell uname)),Linux)
   CC = gcc
   COPY = cp
   RM = rm -f
+  EXT = .so
+  LDFLAGS = -fPIC
 endif
 
-
+TARGETS=IRIVER_H10 \
+        IRIVER_H10_5GB \
+        IPOD_COLOR \
+        IPOD_NANO \
+        IPOD_VIDEO \
+        GIGABEAT_F \
+        GIGABEAT_S \
+        SANSA_E200 \
+        SANSA_C200
 
 SOURCES= \
-	   src/api.c \
-	   src/dummies.c \
-	   src/lcd.c \
-	   src/proxy.c \
-	   $(ROOT)/apps/gui/scrollbar.c \
-	   $(ROOT)/apps/gui/gwps-common.c \
-	   $(ROOT)/apps/gui/wps_parser.c \
-	   $(ROOT)/apps/gui/wps_debug.c \
-	   $(ROOT)/apps/recorder/peakmeter.c \
-	   $(ROOT)/apps/recorder/icons.c \
-	   $(ROOT)/apps/misc.c \
-	   $(ROOT)/apps/status.c \
-	   $(ROOT)/firmware/common/ctype.c \
-	   $(ROOT)/firmware/common/timefuncs.c \
-	   $(ROOT)/firmware/common/unicode.c \
-	   $(ROOT)/firmware/font.c \
-	   $(ROOT)/firmware/font_cache.c \
-	   $(ROOT)/firmware/id3.c \
-	   $(ROOT)/firmware/lru.c \
-	   $(ROOT)/firmware/mp3data.c \
-	   $(ROOT)/firmware/replaygain.c 
-
-#	   $(ROOT)/apps/recorder/bmp.c
-#	   $(ROOT)/apps/abrepeat.c \
-#	   $(ROOT)/apps/action.c \
-#   	   $(ROOT)/apps/cuesheet.c \
-#	   $(ROOT)/apps/gui/statusbar.c \
-#	   $(ROOT)/apps/gui/gwps.c \
+        src/api.c \
+        src/dummies.c \
+        src/lcd.c \
+        src/proxy.c \
+        $(ROOT)/apps/gui/scrollbar.c \
+        $(ROOT)/apps/gui/gwps-common.c \
+        $(ROOT)/apps/gui/wps_parser.c \
+        $(ROOT)/apps/gui/wps_debug.c \
+        $(ROOT)/apps/recorder/peakmeter.c \
+        $(ROOT)/apps/recorder/icons.c \
+        $(ROOT)/apps/misc.c \
+        $(ROOT)/apps/status.c \
+        $(ROOT)/firmware/common/ctype.c \
+        $(ROOT)/firmware/common/timefuncs.c \
+        $(ROOT)/firmware/common/unicode.c \
+        $(ROOT)/firmware/font.c \
+        $(ROOT)/firmware/font_cache.c \
+        $(ROOT)/firmware/id3.c \
+        $(ROOT)/firmware/lru.c \
+        $(ROOT)/firmware/mp3data.c \
+        $(ROOT)/firmware/replaygain.c 
+#        $(ROOT)/apps/recorder/bmp.c
+#        $(ROOT)/apps/abrepeat.c \
+#        $(ROOT)/apps/action.c \
+#        $(ROOT)/apps/cuesheet.c \
+#        $(ROOT)/apps/gui/statusbar.c \
+#        $(ROOT)/apps/gui/gwps.c \
 
 INCLUDE=-I src/include \
         -I $(ROOT)/apps/gui \
@@ -68,34 +75,14 @@ INCLUDE=-I src/include \
 
 CFLAGS = -g -Wall -D__PCTOOL__ -DWPSEDITOR -DDEBUG -DROCKBOX_DIR_LEN=1 -DBUTTON_REMOTE
 
-all:
-	@echo To build, run the buildall.sh script
+RESULTS := $(patsubst %,libwps_%$(EXT),$(TARGETS))
 
-build: build-$(OS)
+all: $(RESULTS)
+	@$(COPY) $(RESULTS) ../gui/bin/
 
-build-w32: $(SOURCES)
-	@echo CC [$(TARGET)]
-	@$(CC) $(INCLUDE) $(CFLAGS) -D$(TARGET) -DTARGET_MODEL=\"$(MODEL)\" -DBUILD_DLL $(SOURCES) -shared -o libwps_$(MODEL).dll
+libwps_%$(EXT): $(SOURCES)
+	@echo CC [$(subst libwps_,,$(subst $(EXT),,$@))]
+	@$(CC) $(INCLUDE) $(CFLAGS) -D$(subst libwps_,,$(subst $(EXT),,$@)) $(LDFLAGS) -shared -o $@ $+
 
-build-linux: $(SOURCES)
-	@echo CC [$(TARGET)]
-	@$(CC) $(INCLUDE) $(CFLAGS) -D$(TARGET) -DTARGET_MODEL=\"$(MODEL)\" -shared -Wl,-soname,libwps_$(MODEL).so,-olibwps_$(MODEL).so -fPIC $(SOURCES)
-
-clean: clean-$(OS)
-
-clean-w32:
-	$(RM) "libwps_$(MODEL).dll"
-
-clean-linux:
-	$(RM) "libwps_$(MODEL).so"
-
-shared: shared-$(OS)
-
-shared-w32: $(SOURCES)
-	@echo CC [IRIVER_H10_5GB]
-	@$(CC) $(INCLUDE) $(CFLAGS) -DIRIVER_H10_5GB -DTARGET_MODEL=\"h10_5gb\" -DBUILD_DLL -shared $(SOURCES) -o ../gui/bin/libwps_h10_5gb.dll
-
-shared-linux: $(SOURCES)
-	@echo CC [IRIVER_H10_5GB]
-	@$(CC) $(INCLUDE) $(CFLAGS) -DIRIVER_H10_5GB -DTARGET_MODEL=\"h10_5gb\" -shared -Wl,-soname,libwps_h10_5gb.so,-olibwps_h10_5gb.so -fPIC $(SOURCES)
-	@$(COPY) libwps_h10_5gb.so ../gui/bin/libwps_h10_5gb.so
+clean:
+	$(RM) $(RESULTS)

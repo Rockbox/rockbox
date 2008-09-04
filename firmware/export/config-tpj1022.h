@@ -4,6 +4,8 @@
 
 #define TARGET_TREE /* this target is using the target tree system */
 
+#define MODEL_NAME "Tatung Elio TPJ-1022"
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 15
 

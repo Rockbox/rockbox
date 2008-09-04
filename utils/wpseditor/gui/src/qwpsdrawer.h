@@ -5,6 +5,7 @@
 #include <QPixmap>
 #include <QPointer>
 #include <QTemporaryFile>
+#include <QMap>
 
 #include "wpsstate.h"
 
@@ -37,6 +38,13 @@ class QWpsDrawer : public QWidget {
     QString           mWpsString;
     QString           mCurTarget;
     static QString    mTmpWpsString;
+    
+    struct lib_t
+    {
+        QString target_name;
+        QString lib;
+    };
+    QMap<int, lib_t> libs_array;
 
 
 protected:

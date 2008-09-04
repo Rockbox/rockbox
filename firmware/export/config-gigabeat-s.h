@@ -7,6 +7,8 @@
 
 #define TOSHIBA_GIGABEAT_S 1
 
+#define MODEL_NAME "Toshiba Gigabeat S"
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 21
 

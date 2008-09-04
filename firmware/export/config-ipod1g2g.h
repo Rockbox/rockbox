@@ -5,6 +5,8 @@
 
 #define IPOD_ARCH 1
 
+#define MODEL_NAME   "Apple iPod 1g/2g"
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 19
 

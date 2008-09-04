@@ -27,6 +27,7 @@
 #define CONFIG_SDRAM_START 0x00900000
 
 #define OLYMPUS_MROBE_500 1
+#define MODEL_NAME   "Olympus M:Robe 500i"
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 22

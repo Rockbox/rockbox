@@ -28,6 +28,8 @@
 
 #define CREATIVE_ZVM60GB 1
 
+#define MODEL_NAME   "Creative Zen Vision:M 60GB"
+
 /* This makes it part of the Creative Zen Vision family :) */
 #define CREATIVE_ZVx 1
 

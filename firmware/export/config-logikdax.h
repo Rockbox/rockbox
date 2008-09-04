@@ -6,6 +6,8 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 27
 
+#define MODEL_NAME   "Logik DAX MP3/DAB"
+
 /* define this if you have recording possibility */
 //#define HAVE_RECORDING
 

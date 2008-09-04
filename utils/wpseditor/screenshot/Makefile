@@ -8,31 +8,17 @@
 #
 ROOT=../../..
 
-OS = w32
-CC = gcc
-
-ifeq ($(findstring MINGW,$(shell uname)),MINGW)
-OS = w32
-CC = mingw32-gcc
-RM = rm
-endif
-
-ifeq ($(findstring Linux,$(shell uname)),Linux)
-OS = linux
 CC = gcc
 RM = rm -f
-endif
 
+COMMON = main.c gd_bmp.c
 
-
-COMMON= main.c gd_bmp.c
-
-INCLUDE=-I ../libwps/src \
-	    -I $(ROOT)/apps/gui \
-        -I $(ROOT)/firmware/export \
-		-I $(ROOT)/apps/recorder \
-        -I $(ROOT)/apps \
-		-I .
+INCLUDE = -I ../libwps/src \
+          -I $(ROOT)/apps/gui \
+          -I $(ROOT)/firmware/export \
+          -I $(ROOT)/apps/recorder \
+          -I $(ROOT)/apps \
+          -I .
 
 CFLAGS = -g -Wall
 

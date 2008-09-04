@@ -23,8 +23,8 @@ pfdebugf dbgf = 0;
 static char pluginbuf[PLUGIN_BUFFER_SIZE];
 
 const char* get_model_name(){
-#ifdef TARGET_MODEL
-    return TARGET_MODEL;
+#ifdef MODEL_NAME
+    return MODEL_NAME;
 #else
     return "unknown";
 #endif
