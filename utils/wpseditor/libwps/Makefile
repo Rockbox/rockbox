@@ -75,7 +75,7 @@ INCLUDE=-I src/include \
         -I $(ROOT)/apps \
         -I src
 
-CFLAGS = -g -Wall -Wno-format -Wno-pointer-sign -D__PCTOOL__ -DWPSEDITOR -DDEBUG -DROCKBOX_DIR_LEN=1 -DBUTTON_REMOTE 
+CFLAGS = -g -Wall -Wno-format -D__PCTOOL__ -DWPSEDITOR -DDEBUG -DROCKBOX_DIR_LEN=1 -DBUTTON_REMOTE 
 
 RESULTS := $(patsubst %,libwps_%$(EXT),$(TARGETS))
 
