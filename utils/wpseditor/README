@@ -5,20 +5,27 @@
      Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
                        \/            \/     \/    \/            \/
 
-Installation 
+/----------------------------------------------------------------\
+|                        Installation                            |
+\----------------------------------------------------------------/
 
-To make a release version, change value in CONFIG from "debug" to "release" in gui.pro and QPropertyEditor.pro.
+To make a release version, change the value CONFIG in gui.pro and QPropertyEditor.pro from "debug" to "release".
 
-Windows:
 
- * be sure that you have properly installed mingw, QT > 4.3.* and bin directories are set properly
+/----------------------------------------------------------------\
+|                           Windows                              |
+\----------------------------------------------------------------/
+
+ * make sure that you have properly installed MingW, Qt > 4.3.* and bin directories are set properly
  * if you want to debug wpseditor, you'll have to build Qt debug libraries
- * if you haven't qmake from PATH enviromet use Qts command line.
- * run 'buildall.bat' in utils\wpseditor\
- * the binary is then in utils\wpseditor\gui\bin\wpseditord.exe
+ * if you don't have qmake in your PATH environment, use the Qt command prompt
+ * run 'qmake && make' in utils\wpseditor\
+ * the binary is then in utils\wpseditor\gui\bin\wpseditor.exe
 
-Linux:
+/----------------------------------------------------------------\
+|                            Linux                               |
+\----------------------------------------------------------------/
 
- * Make sure you have libqt4-dev installed and you have a working Rockbox environment
- * cd to utils/wpseditor/ and run 'buildall.sh' 
+ * make sure you have libqt4-dev installed and you have a working Rockbox environment
+ * cd to utils/wpseditor/ and run 'qmake-qt4 && make' 
  * cd to gui/bin/ and start WPS editor with './wpseditord'

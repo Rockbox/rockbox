@@ -2,7 +2,7 @@
 * Replace checkwps functionality
 * Include 'screenshot utility' functionality
 * Options
-* Enable animation(timers,sliding lines, etc)
+* Enable animation (timers, sliding lines, etc)
 * Test on Mac OS
 * Redesign GUI for more usability
 * Make editing via gui
@@ -16,4 +16,4 @@ Partially solved
 
 THE BUGZ ARE COMING!
 * While loading wps for the first time, gui doesn't show properties from editor properly
-* Strange text horisontal position in cabbie(probably other themes)
+* Strange text horizontal position in cabbiev2 (probably other themes too)

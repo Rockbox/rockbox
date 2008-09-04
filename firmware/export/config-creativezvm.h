@@ -28,7 +28,7 @@
 
 #define CREATIVE_ZVM 1
 
-#define MODEL_NAME   "Creative Zen Vision: M"
+#define MODEL_NAME   "Creative Zen Vision:M"
 
 /* This makes it part of the Creative Zen Vision family :) */
 #define CREATIVE_ZVx 1

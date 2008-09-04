@@ -11,7 +11,8 @@ ROOT=../../..
 ifneq ($or($(findstring MINGW,$(shell uname)),$(findstring Windows_NT,$(OS))),)
   OS = w32
   CC = mingw32-gcc
-  COPY = copy
+  COPY = copy /Y
+  COPY_TO = ..\\gui\\bin
   RM = del
   EXT = .dll
   LDFLAGS = -DBUILD_DLL
@@ -20,7 +21,8 @@ endif
 ifeq ($(findstring Linux,$(shell uname)),Linux)
   OS = linux
   CC = gcc
-  COPY = cp
+  COPY = cp -f
+  COPY_TO = ../gui/bin
   RM = rm -f
   EXT = .so
   LDFLAGS = -fPIC
@@ -78,11 +80,11 @@ CFLAGS = -g -Wall -D__PCTOOL__ -DWPSEDITOR -DDEBUG -DROCKBOX_DIR_LEN=1 -DBUTTON_
 RESULTS := $(patsubst %,libwps_%$(EXT),$(TARGETS))
 
 all: $(RESULTS)
-	@$(COPY) $(RESULTS) ../gui/bin/
 
 libwps_%$(EXT): $(SOURCES)
 	@echo CC [$(subst libwps_,,$(subst $(EXT),,$@))]
 	@$(CC) $(INCLUDE) $(CFLAGS) -D$(subst libwps_,,$(subst $(EXT),,$@)) $(LDFLAGS) -shared -o $@ $+
+	@$(COPY) $@ $(COPY_TO)
 
 clean:
 	$(RM) $(RESULTS)
