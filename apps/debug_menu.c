@@ -2402,15 +2402,6 @@ static bool logf_usb_serial(void)
 }
 #endif
 
-#if defined(HAVE_USBSTACK) && defined(USB_STORAGE)
-static bool usb_reconnect(void)
-{
-    splash(HZ, "Reconnect mass storage");
-    usb_storage_reconnect();
-    return false;
-}
-#endif
-
 #if CONFIG_USBOTG == USBOTG_ISP1583
 extern int dbg_usb_num_items(void);
 extern char* dbg_usb_item(int selected_item, void *data, char *buffer, size_t buffer_len);
@@ -2546,9 +2537,6 @@ static const struct the_menu_item menuitems[] = {
 #endif
 #if defined(HAVE_USBSTACK) && defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL)
         {"logf over usb",logf_usb_serial },
-#endif
-#if defined(HAVE_USBSTACK) && defined(USB_STORAGE)
-        {"reconnect usb storage",usb_reconnect},
 #endif
 #ifdef CPU_BOOST_LOGGING
         {"cpu_boost log",cpu_boost_log},
