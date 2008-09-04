@@ -438,6 +438,9 @@ static int button_flip(int button)
 #if CONFIG_KEYPAD == RECORDER_PAD
         | BUTTON_F1 | BUTTON_F3
 #endif
+#if CONFIG_KEYPAD == SANSA_C200_PAD
+        | BUTTON_VOL_UP | BUTTON_VOL_DOWN
+#endif
         );
 
     if (button & BUTTON_LEFT)
@@ -461,6 +464,12 @@ static int button_flip(int button)
         newbutton |= BUTTON_F3;
     if (button & BUTTON_F3)
         newbutton |= BUTTON_F1;
+#endif
+#if CONFIG_KEYPAD == SANSA_C200_PAD
+    if (button & BUTTON_VOL_UP)
+        newbutton |= BUTTON_VOL_DOWN;
+    if (button & BUTTON_VOL_DOWN)
+        newbutton |= BUTTON_VOL_UP;
 #endif
 
     return newbutton;
