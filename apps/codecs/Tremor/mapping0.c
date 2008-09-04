@@ -21,7 +21,7 @@
 #include <math.h>
 #include "ogg.h"
 #include "ivorbiscodec.h"
-#include "mdct.h"
+#include <codecs/lib/codeclib.h>
 #include "codec_internal.h"
 #include "codebook.h"
 #include "window.h"
@@ -303,7 +303,7 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
     if(nonzero[i]) {
 	look->floor_func[submap]->
 	  inverse2(vb,look->floor_look[submap],floormemo[i],pcm);
-        mdct_backward(n, pcm, pcm);
+        mdct_backward(n, (int32_t*) pcm, (int32_t*) pcm);
         /* window the data */
         _vorbis_apply_window(pcm,b->window,ci->blocksizes,vb->lW,vb->W,vb->nW);
       }

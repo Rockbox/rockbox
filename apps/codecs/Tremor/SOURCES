@@ -6,10 +6,6 @@ floor1.c
 framing.c
 info.c
 mapping0.c
-mdct.c
-#ifdef CPU_ARM
-mdct_arm.S
-#endif
 registry.c
 res012.c
 sharedbook.c

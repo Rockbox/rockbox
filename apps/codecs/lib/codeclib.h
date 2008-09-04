@@ -55,6 +55,10 @@ void qsort(void *base, size_t nmemb, size_t size, int(*compar)(const void *, con
 #define abs(x) ((x)>0?(x):-(x))
 #define labs(x) abs(x)
 
+/*MDCT library functions*/
+
+extern void mdct_backward(int n, int32_t *in, int32_t *out);
+
 /* Various codec helper functions */
 
 int codec_init(void);

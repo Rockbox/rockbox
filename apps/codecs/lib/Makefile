@@ -20,11 +20,17 @@ endif
 CFLAGS = $(INCLUDES) $(GCCOPTS) \
 $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} -DCODEC
 
+# Sectioned compilation for target
+ifndef SIMVER
+	CFLAGS += -ffunction-sections -fdata-sections
+endif
+
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
 
 SOURCES = $(SRC)
-OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
+OBJS2 := $(SRC:%.c=$(OBJDIR)/%.o)
+OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DEPFILE = $(OBJDIR)/dep-codeclib
 DIRS = .
 

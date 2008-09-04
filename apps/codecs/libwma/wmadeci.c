@@ -28,7 +28,6 @@
 #include "wmadec.h"
 #include "wmafixed.h"
 #include "bitstream.h"
-#include "mdct2.h"
 
 
 #define VLCBITS 7       /*7 is the lowest without glitching*/
@@ -1389,7 +1388,7 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
             n4 = s->block_len >>1;
 
             /*faster IMDCT from Vorbis*/
-            mdct_backward( (1 << (12-bsize)), (int*)(*(s->coefs))[ch], (int*)scratch_buffer);
+            mdct_backward( (1 << (12-bsize)), (int32_t*)(*(s->coefs))[ch], (int32_t*)scratch_buffer);
 
             /*slower but more easily understood IMDCT from FFMPEG*/
             //ff_imdct_calc(&s->mdct_ctx[bsize],
@@ -1435,7 +1434,7 @@ static int wma_decode_frame(WMADecodeContext *s, int32_t *samples)
     /* read each block */
     s->block_num = 0;
     s->block_pos = 0;
-
+    
 
     for(;;)
     {

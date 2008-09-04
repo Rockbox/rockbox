@@ -958,8 +958,7 @@ uint8_t reconstruct_single_channel(NeAACDecHandle hDecoder, ic_stream *ics,
     if (hDecoder->object_type != SSR)
     {
 #endif
-        ifilter_bank(hDecoder->fb, ics->window_sequence, ics->window_shape,
-            hDecoder->window_shape_prev[sce->channel], spec_coef,
+        ifilter_bank(ics->window_sequence,spec_coef,
             hDecoder->time_out[sce->channel], hDecoder->fb_intermed[sce->channel],
             hDecoder->object_type, hDecoder->frameLength);
 #ifdef SSR_DEC
@@ -1197,12 +1196,10 @@ uint8_t reconstruct_channel_pair(NeAACDecHandle hDecoder, ic_stream *ics1, ic_st
     if (hDecoder->object_type != SSR)
     {
 #endif
-        ifilter_bank(hDecoder->fb, ics1->window_sequence, ics1->window_shape,
-            hDecoder->window_shape_prev[cpe->channel], spec_coef1,
+        ifilter_bank(ics1->window_sequence, spec_coef1,
             hDecoder->time_out[cpe->channel], hDecoder->fb_intermed[cpe->channel],
             hDecoder->object_type, hDecoder->frameLength);
-        ifilter_bank(hDecoder->fb, ics2->window_sequence, ics2->window_shape,
-            hDecoder->window_shape_prev[cpe->paired_channel], spec_coef2,
+        ifilter_bank(ics2->window_sequence,spec_coef2,
             hDecoder->time_out[cpe->paired_channel], hDecoder->fb_intermed[cpe->paired_channel],
             hDecoder->object_type, hDecoder->frameLength);
 #ifdef SSR_DEC

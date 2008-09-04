@@ -289,7 +289,7 @@ int32_t NEAACDECAPI NeAACDecInit(NeAACDecHandle hDecoder, uint8_t *buffer,
         hDecoder->fb = ssr_filter_bank_init(hDecoder->frameLength/SSR_BANDS);
     else
 #endif
-        hDecoder->fb = filter_bank_init(hDecoder->frameLength);
+
 
 #ifdef LD_DEC
     if (hDecoder->object_type == LD)
@@ -383,7 +383,6 @@ int8_t NEAACDECAPI NeAACDecInit2(NeAACDecHandle hDecoder, uint8_t *pBuffer,
         hDecoder->fb = ssr_filter_bank_init(hDecoder->frameLength/SSR_BANDS);
     else
 #endif
-        hDecoder->fb = filter_bank_init(hDecoder->frameLength);
 
 #ifdef LD_DEC
     if (hDecoder->object_type == LD)
@@ -429,7 +428,6 @@ int8_t NEAACDECAPI NeAACDecInitDRM(NeAACDecHandle *hDecoder, uint32_t samplerate
         (*hDecoder)->sbr_present_flag = 1;    
 #endif        
 
-    (*hDecoder)->fb = filter_bank_init((*hDecoder)->frameLength);
 
     return 0;
 }
@@ -471,7 +469,7 @@ void NEAACDECAPI NeAACDecClose(NeAACDecHandle hDecoder)
         ssr_filter_bank_end(hDecoder->fb);
     else
 #endif
-        filter_bank_end(hDecoder->fb);
+    
 
     drc_end(hDecoder->drc);
 

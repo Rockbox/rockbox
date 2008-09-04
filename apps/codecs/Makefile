@@ -74,7 +74,7 @@ $(OBJDIR)/asap.elf : $(OBJDIR)/asap.o $(BUILDDIR)/libasap.a $(OBJDIR)/codec_crt0
 
 $(OBJDIR)/%.elf: $(OBJDIR)/codec_crt0.o
 	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $^ -L$(BUILDDIR) -lcodec -lgcc \
-			-T$(LINKCODEC) -Wl,-Map,$(OBJDIR)/$*.map
+			-T$(LINKCODEC) -Wl,--gc-sections,-Map,$(OBJDIR)/$*.map 
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@

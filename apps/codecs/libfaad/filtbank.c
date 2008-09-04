@@ -41,7 +41,7 @@
 #include "syntax.h"
 #include "kbd_win.h"
 #include "sine_win.h"
-#include "mdct.h"
+
 
 /*Windowing functions borrowed from libwmai*/
 
@@ -169,95 +169,6 @@ static inline void vector_fmul_reverse(real_t *dst, const real_t *src0, const re
 }
 #endif
 
-fb_info *filter_bank_init(uint16_t frame_len)
-{
-    uint16_t nshort = frame_len/8;
-#ifdef LD_DEC
-    uint16_t frame_len_ld = frame_len/2;
-#endif
-
-    fb_info *fb = (fb_info*)faad_malloc(sizeof(fb_info));
-    memset(fb, 0, sizeof(fb_info));
-
-    /* normal */
-    fb->mdct256 = faad_mdct_init(2*nshort);
-    fb->mdct2048 = faad_mdct_init(2*frame_len);
-#ifdef LD_DEC
-    /* LD */
-    fb->mdct1024 = faad_mdct_init(2*frame_len_ld);
-#endif
-
-#ifdef ALLOW_SMALL_FRAMELENGTH
-    if (frame_len == 1024)
-    {
-#endif
-        fb->long_window[0]  = sine_long_1024;
-        fb->short_window[0] = sine_short_128;
-        fb->long_window[1]  = kbd_long_1024;
-        fb->short_window[1] = kbd_short_128;
-#ifdef LD_DEC
-        fb->ld_window[0] = sine_mid_512;
-        fb->ld_window[1] = ld_mid_512;
-#endif
-#ifdef ALLOW_SMALL_FRAMELENGTH
-    } else /* (frame_len == 960) */ {
-        fb->long_window[0]  = sine_long_960;
-        fb->short_window[0] = sine_short_120;
-        fb->long_window[1]  = kbd_long_960;
-        fb->short_window[1] = kbd_short_120;
-#ifdef LD_DEC
-        fb->ld_window[0] = sine_mid_480;
-        fb->ld_window[1] = ld_mid_480;
-#endif
-    }
-#endif
-
-    return fb;
-}
-
-void filter_bank_end(fb_info *fb)
-{
-    if (fb != NULL)
-    {
-#ifdef PROFILE
-        printf("FB:                 %I64d cycles\n", fb->cycles);
-#endif
-
-        faad_mdct_end(fb->mdct256);
-        faad_mdct_end(fb->mdct2048);
-#ifdef LD_DEC
-        faad_mdct_end(fb->mdct1024);
-#endif
-
-        faad_free(fb);
-    }
-}
-
-static INLINE void imdct_long(fb_info *fb, real_t *in_data, real_t *out_data, uint16_t len)
-{
-#ifdef LD_DEC
-    mdct_info *mdct = NULL;
-
-    switch (len)
-    {
-    case 2048:
-    case 1920:
-        mdct = fb->mdct2048;
-        break;
-    case 1024:
-    case 960:
-        mdct = fb->mdct1024;
-        break;
-    }
-
-    faad_imdct(mdct, in_data, out_data);
-#else
-    (void) len;
-    faad_imdct(fb->mdct2048, in_data, out_data);
-#endif
-}
-
-
 #ifdef LTP_DEC
 static INLINE void mdct(fb_info *fb, real_t *in_data, real_t *out_data, uint16_t len)
 {
@@ -287,8 +198,8 @@ static INLINE void mdct(fb_info *fb, real_t *in_data, real_t *out_data, uint16_t
 
 ALIGN real_t transf_buf[2*1024] IBSS_ATTR;
 
-void ifilter_bank(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
-                  uint8_t window_shape_prev, real_t *freq_in,
+void ifilter_bank(uint8_t window_sequence,
+                  real_t *freq_in,
                   real_t *time_out, real_t *overlap,
                   uint8_t object_type, uint16_t frame_len)
 {
@@ -320,10 +231,12 @@ void ifilter_bank(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
 #else
         (void) object_type;
 #endif
-        window_long       = fb->long_window[window_shape];
-        window_long_prev  = fb->long_window[window_shape_prev];
-        window_short      = fb->short_window[window_shape];
-        window_short_prev = fb->short_window[window_shape_prev];
+
+        window_long       = sine_long_1024;
+        window_long_prev  = kbd_long_1024;
+        window_short      = sine_short_128;
+        window_short_prev = kbd_short_128;
+
 #ifdef LD_DEC
     }
 #endif
@@ -342,7 +255,7 @@ void ifilter_bank(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
     {
     case ONLY_LONG_SEQUENCE:
         /* perform iMDCT */
-        imdct_long(fb, freq_in, transf_buf, 2*nlong);
+        mdct_backward(2048, freq_in, transf_buf);
 
         /* add second half output of previous frame to windowed output of current frame */
         vector_fmul_add_add(time_out, transf_buf, window_long_prev, overlap,  nlong);
@@ -354,7 +267,7 @@ void ifilter_bank(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
 
     case LONG_START_SEQUENCE:
         /* perform iMDCT */
-        imdct_long(fb, freq_in, transf_buf, 2*nlong);
+        mdct_backward(2048, freq_in, transf_buf);
 
         /* add second half output of previous frame to windowed output of current frame */
         vector_fmul_add_add(time_out, transf_buf, window_long_prev, overlap,  nlong);
@@ -373,14 +286,14 @@ void ifilter_bank(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
          /*this could be assemblerized too, but this case is extremely uncommon*/   
          
         /* perform iMDCT for each short block */
-        faad_imdct(fb->mdct256, freq_in+0*nshort, transf_buf+2*nshort*0);
-        faad_imdct(fb->mdct256, freq_in+1*nshort, transf_buf+2*nshort*1);
-        faad_imdct(fb->mdct256, freq_in+2*nshort, transf_buf+2*nshort*2);
-        faad_imdct(fb->mdct256, freq_in+3*nshort, transf_buf+2*nshort*3);
-        faad_imdct(fb->mdct256, freq_in+4*nshort, transf_buf+2*nshort*4);
-        faad_imdct(fb->mdct256, freq_in+5*nshort, transf_buf+2*nshort*5);
-        faad_imdct(fb->mdct256, freq_in+6*nshort, transf_buf+2*nshort*6);
-        faad_imdct(fb->mdct256, freq_in+7*nshort, transf_buf+2*nshort*7);
+        mdct_backward(256, freq_in+0*nshort,  transf_buf+2*nshort*0);
+        mdct_backward(256, freq_in+1*nshort, transf_buf+2*nshort*1);
+        mdct_backward(256, freq_in+2*nshort, transf_buf+2*nshort*2);
+        mdct_backward(256, freq_in+3*nshort, transf_buf+2*nshort*3);
+        mdct_backward(256, freq_in+4*nshort, transf_buf+2*nshort*4);
+        mdct_backward(256, freq_in+5*nshort, transf_buf+2*nshort*5);
+        mdct_backward(256, freq_in+6*nshort, transf_buf+2*nshort*6);
+        mdct_backward(256, freq_in+7*nshort, transf_buf+2*nshort*7);
 
         /* add second half output of previous frame to windowed output of current frame */
         for (i = 0; i < nflat_ls; i++)
@@ -411,7 +324,7 @@ void ifilter_bank(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
 
     case LONG_STOP_SEQUENCE:
         /* perform iMDCT */
-        imdct_long(fb, freq_in, transf_buf, 2*nlong);
+        mdct_backward(2048, freq_in, transf_buf);
 
         /* add second half output of previous frame to windowed output of current frame */
         /* construct first half window using padding with 1's and 0's */

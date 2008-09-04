@@ -1,5 +1,4 @@
 bits.c
-cfft.c
 common.c
 decoder.c
 drc.c
@@ -11,7 +10,6 @@ huffman.c
 ic_predict.c
 is.c
 lt_predict.c
-mdct.c
 mp4.c
 ms.c
 output.c

@@ -1,7 +1,3 @@
 wmadeci.c
 wmafixed.c
 bitstream.c
-mdct2.c
-#ifdef CPU_ARM
-mdct_arm.S
-#endif

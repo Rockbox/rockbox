@@ -1,5 +1,12 @@
 #if CONFIG_CODEC == SWCODEC /* software codec platforms */
 codeclib.c
+
+
+mdct2.c
+#ifdef CPU_ARM
+mdct_arm.S
+#endif
+
 #elif defined(SIMULATOR) && defined(__APPLE__)
 osx.dummy.c
 #endif
