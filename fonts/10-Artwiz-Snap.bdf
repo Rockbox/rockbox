@@ -32,7 +32,7 @@ CHARSET_COLLECTIONS "ASCII ISO8859-8 ISO10646-1"
 FULL_NAME "snapheb normal"
 COPYRIGHT "Copyright artwiz, fixed by aLEczapKA, .se layout by vendis, 8859-15 completed by rasher"
 ENDPROPERTIES
-CHARS 252
+CHARS 218
 STARTCHAR char32
 ENCODING 32
 SWIDTH 200 0
