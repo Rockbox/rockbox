@@ -26,12 +26,12 @@
 
 #define CONFIG_SDRAM_START 0x80004000
 
-#define ONDA_VX747 1
+#define ONDA_VX767 1
 
-#define MODEL_NAME  "Onda VX747"
+#define MODEL_NAME  "Onda VX767"
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 30
+#define MODEL_NUMBER 31
 
 /* define this if you use an ATA controller */
 //#define HAVE_ATA
@@ -55,21 +55,19 @@
 #define HAVE_VOLUME_IN_LIST
 
 /* LCD dimensions */
-#define CONFIG_LCD LCD_ONDAVX747
+#define CONFIG_LCD LCD_ONDAVX767
 
-#define LCD_WIDTH  240
-#define LCD_HEIGHT 400
+#define LCD_WIDTH  320
+#define LCD_HEIGHT 240
 
 #define LCD_DEPTH  16   /* 16bit colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
 /* Define this if your LCD can be enabled/disabled */
-#define HAVE_LCD_ENABLE
+//#define HAVE_LCD_ENABLE
 
-#define CONFIG_KEYPAD ONDAVX747_PAD
+#define CONFIG_KEYPAD ONDAVX767_PAD
 #define HAS_BUTTON_HOLD
-#define HAVE_TOUCHSCREEN
-#define HAVE_BUTTON_DATA
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
@@ -146,7 +144,7 @@
 /* Define this if you have adjustable CPU frequency */
 /* #define HAVE_ADJUSTABLE_CPU_FREQ */
 
-#define BOOTFILE_EXT "vx747"
+#define BOOTFILE_EXT "vx767"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 

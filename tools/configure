@@ -700,6 +700,7 @@ cat <<EOF
  
  ==Onda==
  120) VX747
+ 121) VX767
 EOF
 
   buildfor=`input`;
@@ -1780,6 +1781,28 @@ fi
     t_cpu="mips"
     t_manufacturer="ingenic_jz47xx"
     t_model="onda_vx747"
+    ;;
+    
+    121|ondavx767)
+    target_id=45
+    modelname="ondavx767"
+    target="-DONDA_VX767"
+    memory=16 #FIXME
+    mipselcc
+    tool="cp"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.vx767"
+    appextra="recorder:gui"
+    plugins="no" #FIXME
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    boottool="cp"
+    bootoutput="rockboot.vx767"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="mips"
+    t_manufacturer="ingenic_jz47xx"
+    t_model="onda_vx767"
     ;;
    *)
     echo "Please select a supported target platform!"

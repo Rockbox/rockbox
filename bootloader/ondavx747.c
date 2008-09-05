@@ -160,7 +160,11 @@ int main(void)
 #endif
     while(1)
     {
+#ifdef ONDA_VX747
         btn = button_read_device(&touch);
+#else
+        btn = button_read_device();
+#endif
 #define KNOP(x,y)     lcd_set_foreground(LCD_BLACK); \
                       if(btn & x) \
                         lcd_set_foreground(LCD_WHITE); \
@@ -184,6 +188,7 @@ int main(void)
         {
             power_off();
         }
+#ifdef ONDA_VX747
         if(btn & BUTTON_TOUCH)
         {
             lcd_set_foreground(LCD_RGBPACK(touch & 0xFF, (touch >> 8)&0xFF, (touch >> 16)&0xFF));
@@ -191,6 +196,7 @@ int main(void)
             lcd_update();
             lcd_set_foreground(LCD_WHITE);
         }
+#endif
         snprintf(datetime, 30, "%02d/%02d/%04d %02d:%02d:%02d", get_time()->tm_mday, get_time()->tm_mon, get_time()->tm_year,
                                      get_time()->tm_hour, get_time()->tm_min, get_time()->tm_sec);
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT, datetime);

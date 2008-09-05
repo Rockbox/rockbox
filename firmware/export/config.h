@@ -94,6 +94,7 @@
 #define PHILIPS_HDD1630_PAD 29
 #define MEIZU_M6SL_PAD     30
 #define ONDAVX747_PAD      31
+#define ONDAVX767_PAD      32
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -137,6 +138,7 @@
 #define LCD_HDD1630  27 /* as used by the Philips HDD1630 */
 #define LCD_MEIZUM6  28 /* as used by the Meizu M6SP and M6SL (various models) */
 #define LCD_ONDAVX747 29 /* as used by the Onda VX747 */
+#define LCD_ONDAVX767 30 /* as used by the Onda VX767 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -291,6 +293,8 @@
 #include "config-meizu-m6sl.h"
 #elif defined(ONDA_VX747)
 #include "config-ondavx747.h"
+#elif defined(ONDA_VX767)
+#include "config-ondavx767.h"
 #else
 /* no known platform */
 #endif

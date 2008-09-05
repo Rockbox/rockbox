@@ -555,10 +555,7 @@ void dma_cache_wback_inv(unsigned long addr, unsigned long size)
     }
 }
 
-extern int main(void);
-extern void except_common_entry(void);
-
-#define mtc0_tlbw_hazard()                 \
+#define BARRIER                            \
     __asm__ __volatile__(                  \
     "    .set    noreorder          \n"    \
     "    nop                        \n"    \
@@ -569,21 +566,13 @@ extern void except_common_entry(void);
     "    nop                        \n"    \
     "    .set    reorder            \n");
 
-#define tlbw_use_hazard()                  \
-    __asm__ __volatile__(                  \
-    "    .set    noreorder          \n"    \
-    "    nop                        \n"    \
-    "    nop                        \n"    \
-    "    nop                        \n"    \
-    "    nop                        \n"    \
-    "    nop                        \n"    \
-    "    nop                        \n"    \
-    "    .set    reorder            \n");
-
-
-#define PAGE_SHIFT           PL_4K
-#define PM_DEFAULT_MASK      PM_4K
-#define UNIQUE_ENTRYHI(idx)  (A_K0BASE + ((idx) << (PAGE_SHIFT + 1)))
+#define DEFAULT_PAGE_SHIFT       PL_4K
+#define DEFAULT_PAGE_MASK        PM_4K
+#define UNIQUE_ENTRYHI(idx, ps)  (A_K0BASE + ((idx) << (ps + 1)))
+#define ASID_MASK                M_EntryHiASID
+#define VPN2_SHIFT               S_EntryHiVPN2
+#define PFN_SHIFT                S_EntryLoPFN
+#define PFN_MASK                 0xffffff
 static void local_flush_tlb_all(void)
 {
     unsigned long old_ctx;
@@ -594,58 +583,91 @@ static void local_flush_tlb_all(void)
     old_ctx = read_c0_entryhi();
     write_c0_entrylo0(0);
     write_c0_entrylo1(0);
+    BARRIER;
 
     /* Blast 'em all away. */
-    for(entry = read_c0_wired(); entry < 32; entry++)
+    for(entry = 0; entry < 32; entry++)
     {
         /* Make sure all entries differ. */
-        write_c0_entryhi(UNIQUE_ENTRYHI(entry));
+        write_c0_entryhi(UNIQUE_ENTRYHI(entry, DEFAULT_PAGE_SHIFT));
         write_c0_index(entry);
-        mtc0_tlbw_hazard();
+        BARRIER;
         tlb_write_indexed();
     }
-    tlbw_use_hazard();
+    BARRIER;
     write_c0_entryhi(old_ctx);
     
     restore_irq(old_irq);
 }
 
+static void add_wired_entry(unsigned long entrylo0, unsigned long entrylo1,
+                            unsigned long entryhi,  unsigned long pagemask)
+{
+    unsigned long wired;
+    unsigned long old_pagemask;
+    unsigned long old_ctx;
+    unsigned int  old_irq = disable_irq_save();
+    
+    old_ctx = read_c0_entryhi() & ASID_MASK;
+    old_pagemask = read_c0_pagemask();
+    wired = read_c0_wired();
+    write_c0_wired(wired + 1);
+    write_c0_index(wired);
+    BARRIER;
+    write_c0_pagemask(pagemask);
+    write_c0_entryhi(entryhi);
+    write_c0_entrylo0(entrylo0);
+    write_c0_entrylo1(entrylo1);
+    BARRIER;
+    tlb_write_indexed();
+    BARRIER;
+
+    write_c0_entryhi(old_ctx);
+    BARRIER;
+    write_c0_pagemask(old_pagemask);
+    local_flush_tlb_all();
+    restore_irq(old_irq);
+}
+
+static void map_address(unsigned long virtual, unsigned long physical, unsigned long length)
+{
+    unsigned long entry0  = (physical & PFN_MASK) << PFN_SHIFT;
+    unsigned long entry1  = ((physical+length) & PFN_MASK) << PFN_SHIFT;
+    unsigned long entryhi = virtual & ~VPN2_SHIFT;
+    
+    entry0 |= (M_EntryLoG | M_EntryLoV | (K_CacheAttrC << S_EntryLoC) );
+    entry1 |= (M_EntryLoG | M_EntryLoV | (K_CacheAttrC << S_EntryLoC) );
+    
+    add_wired_entry(entry0, entry1, entryhi, DEFAULT_PAGE_MASK);
+}
+
 
 static void tlb_init(void)
 {
-    write_c0_pagemask(PM_DEFAULT_MASK);
+    write_c0_pagemask(DEFAULT_PAGE_MASK);
     write_c0_wired(0);
     write_c0_framemask(0);
     
     local_flush_tlb_all();
+/*
+    map_address(0x80000000, 0x80000000, 0x4000);
+    map_address(0x80004000, 0x80004000, MEM * 0x100000);
+*/
 }
 
-static void tlb_refill_handler(void)
+void tlb_refill_handler(void)
 {
-#if 1
-    panicf("TLB refill handler! [0x%x] [0x%x]", read_c0_badvaddr(), read_c0_epc());
-#else
-    __asm__ __volatile__(
-    "mfc0 k0, C0_BADVADDR\n"
-    "lui  k1, pgdc\n"
-    "lw   k1, pgdc>>16(k0)\n"
-    "srl  k0, k0, 22\n"
-    "sll  k0, k0, 2\n"
-    "addu k1, k1, k0\n"
-    "mfc0 k0, C0_CONTEXT\n"
-    "lw   k1, 0(k1)\n"
-    "andi k0, k0, 0xFFC\n"
-    "addu k1, k1, k0\n"
-    "lw   k0, 0(k1)\n"
-    "nop\n"
-    "mtc0 k0, C0_ENTRYLO0\n"
-    "mfc0 k1, C0_EPC\n"
-    "tlbwr\n"
-    "jr   k1\n"
-    "rfe\n"
-    );
-#endif
+    panicf("TLB refill handler! [0x%x] [0x%lx]", read_c0_badvaddr(), read_c0_epc());
 }
+
+static void tlb_call_refill(void)
+{
+    asm("la $8, tlb_refill_handler \n"
+        "jr $8                     \n");
+}
+
+extern int main(void);
+extern void except_common_entry(void);
 
 void system_main(void)
 {
@@ -657,7 +679,7 @@ void system_main(void)
      * 0x180 - Exception/Interrupt handler
      * 0x200 - Special Exception Interrupt handler (when IV is set in CP0_CAUSE)
      */
-    memcpy((void *)A_K0BASE, (void *)&tlb_refill_handler, 0x20);
+    memcpy((void *)A_K0BASE, (void *)&tlb_call_refill, 0x20);
     memcpy((void *)(A_K0BASE + 0x100), (void *)&except_common_entry, 0x20);
     memcpy((void *)(A_K0BASE + 0x180), (void *)&except_common_entry, 0x20);
     memcpy((void *)(A_K0BASE + 0x200), (void *)&except_common_entry, 0x20);
@@ -671,7 +693,7 @@ void system_main(void)
     for(i=0; i<IRQ_MAX; i++)
         dis_irq(i);
     
-    tlb_init();
+    //tlb_init();
     
     sti();
     

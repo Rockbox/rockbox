@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004 by Linus Nielsen Feltzing
+ * Copyright (C) 2008 by Maurus Cuelenaere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,47 +18,37 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef BUTTON_TARGET_H
+#define BUTTON_TARGET_H
+
+#include <stdbool.h>
 #include "config.h"
 
-#if CONFIG_CPU == SH7034
-#include "sh7034.h"
-#endif
-#if CONFIG_CPU == MCF5249
-#include "mcf5249.h"
-#endif
-#if CONFIG_CPU == MCF5250
-#include "mcf5250.h"
-#endif
-#if (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022)
-#include "pp5020.h"
-#endif
-#if CONFIG_CPU == PP5002
-#include "pp5002.h"
-#endif
-#if CONFIG_CPU == PP5024
-#include "pp5024.h"
-#endif
-#if CONFIG_CPU == PNX0101
-#include "pnx0101.h"
-#endif
-#if CONFIG_CPU == S3C2440
-#include "s3c2440.h"
-#endif
-#if CONFIG_CPU == DM320
-#include "dm320.h"
-#endif
-#if CONFIG_CPU == IMX31L
-#include "imx31l.h"
-#endif
-#ifdef CPU_TCC77X
-#include "tcc77x.h"
-#endif
-#ifdef CPU_TCC780X
-#include "tcc780x.h"
-#endif
-#if CONFIG_CPU == S5L8700
-#include "s5l8700.h"
-#endif
-#if CONFIG_CPU == JZ4732
-#include "jz4740.h"
-#endif
+#define HAS_BUTTON_HOLD
+
+bool button_hold(void);
+void button_init_device(void);
+int button_read_device(void);
+
+/* Main unit's buttons */
+#define BUTTON_POWER      0x00000001
+#define BUTTON_VOL_UP     0x00000002
+#define BUTTON_VOL_DOWN   0x00000004
+#define BUTTON_MENU       0x00000008
+
+/* Compatibility hacks for flipping. Needs a somewhat better fix. */
+#define BUTTON_LEFT  0
+#define BUTTON_RIGHT 0
+#define BUTTON_UP    0
+#define BUTTON_DOWN  0
+
+#define BUTTON_MAIN  (BUTTON_POWER | BUTTON_VOL_UP | BUTTON_VOL_DOWN | BUTTON_MENU)
+
+/* No remote */
+#define BUTTON_REMOTE 0
+
+/* Software power-off */
+#define POWEROFF_BUTTON BUTTON_POWER
+#define POWEROFF_COUNT 10
+
+#endif /* BUTTON_TARGET_H */
