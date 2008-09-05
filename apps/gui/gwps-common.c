@@ -1138,12 +1138,12 @@ static char *get_token_value(struct gui_wps *gwps,
         case WPS_TOKEN_REPEAT_MODE:
             if (intval)
                 *intval = global_settings.repeat_mode + 1;
-            snprintf(buf, buf_size, "%d", *intval);
+            snprintf(buf, buf_size, "%d", global_settings.repeat_mode);
             return buf;
         case WPS_TOKEN_RTC_12HOUR_CFG:
             if (intval)
                 *intval = global_settings.timeformat + 1;
-            snprintf(buf, buf_size, "%d", *intval);
+            snprintf(buf, buf_size, "%d", global_settings.timeformat);
             return buf;
 #if CONFIG_RTC
         case WPS_TOKEN_RTC_DAY_OF_MONTH:
