@@ -33,11 +33,22 @@ TARGETS=IRIVER_H10 \
         IPOD_COLOR \
         IPOD_NANO \
         IPOD_VIDEO \
+        IPOD_3G \
+        IPOD_4G \
+        IPOD_MINI \
+        IPOD_MINI2G \
+        IPOD_1G2G \
         GIGABEAT_F \
         GIGABEAT_S \
         SANSA_E200 \
-        SANSA_C200
-
+        SANSA_C200 \
+        IRIVER_H100 \
+        IRIVER_H120 \
+        IRIVER_H300 \
+        IAUDIO_X5 \
+        IAUDIO_M5 \
+        IAUDIO_M3 \
+        
 SOURCES= \
         src/api.c \
         src/dummies.c \

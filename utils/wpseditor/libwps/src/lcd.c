@@ -12,13 +12,19 @@ static struct viewport default_vp =
     .y        = 0,
     .width    = LCD_WIDTH,
     .height   = LCD_HEIGHT,
+#ifdef HAVE_LCD_BITMAP    
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
+#endif    
+#if LCD_DEPTH > 1
     .fg_pattern = LCD_DEFAULT_FG,
     .bg_pattern = LCD_DEFAULT_BG,
+#ifdef HAVE_LCD_COLOR    
     .lss_pattern = LCD_DEFAULT_BG,
     .lse_pattern = LCD_DEFAULT_BG,
     .lst_pattern = LCD_DEFAULT_BG,
+#endif
+#endif        
 };
 
 struct viewport* current_vp = &default_vp;
@@ -65,7 +71,7 @@ int lcd_get_drawmode(void)
 {
     return current_vp->drawmode;
 }
-
+#if LCD_DEPTH > 1
 void lcd_set_foreground(unsigned color)
 {
     current_vp->fg_pattern = color;
@@ -86,6 +92,7 @@ unsigned lcd_get_background(void)
     return current_vp->bg_pattern;
 }
 
+#ifdef HAVE_LCD_COLOR
 void lcd_set_selector_start(unsigned color)
 {
     current_vp->lss_pattern = color;
@@ -107,7 +114,8 @@ void lcd_set_drawinfo(int mode, unsigned fg_color, unsigned bg_color)
     current_vp->fg_pattern = fg_color;
     current_vp->bg_pattern = bg_color;
 }
-
+#endif
+#endif
 int lcd_getwidth(void)
 {
     return current_vp->width;

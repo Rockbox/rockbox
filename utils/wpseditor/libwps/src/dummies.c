@@ -177,7 +177,7 @@ void cue_draw_markers(struct screen *screen, unsigned long tracklen,
 int x1, int x2, int y, int h){}
 #endif
 
-
+#ifdef HAVE_ALBUMART
 void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
 {
     if (!gwps || !gwps->data || !gwps->display || handle_id < 0)
@@ -240,7 +240,7 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
         gwps->display->set_drawmode(DRMODE_SOLID);
     }
 }
-
+#endif
 /* Update the "data" pointer to make the handle's data available to the caller.
 Return the length of the available linear data or < 0 for failure (handle
 not found).
@@ -274,6 +274,10 @@ void unload_wps_backdrop(void)
 {
 
 }
+void unload_remote_wps_backdrop(void)
+{
+
+}
 
 #if CONFIG_CODEC == SWCODEC
 int get_replaygain_mode(bool have_track_gain, bool have_album_gain)
@@ -299,6 +303,8 @@ int rtc_write_datetime(unsigned char* buf){return 0;}
 void backlight_on(void){}
 void backlight_off(void){}
 
+void remote_backlight_on(void){}
+void remote_backlight_off(void){}
 
 void debugf(const char *fmt, ...)
 {}
