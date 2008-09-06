@@ -767,7 +767,8 @@ static char* get_dir(char* buf, int buf_size, const char* path, int level)
    intval is used with conditionals/enums: when this function is called,
    intval should contain the number of options in the conditional/enum.
    When this function returns, intval is -1 if the tag is non numeric or,
-   if the tag is numeric, intval is the enum case we want to go to.
+   if the tag is numeric, *intval is the enum case we want to go to (between 1
+   and the original value of *intval, inclusive).
    When not treating a conditional/enum, intval should be NULL.
 */
 static char *get_token_value(struct gui_wps *gwps,
@@ -815,7 +816,7 @@ static char *get_token_value(struct gui_wps *gwps,
         limit = *intval;
         *intval = -1;
     }
-    
+
     switch (token->type)
     {
         case WPS_TOKEN_CHARACTER:
@@ -909,7 +910,7 @@ static char *get_token_value(struct gui_wps *gwps,
 
         case WPS_TOKEN_METADATA_GROUPING:
             return id3->grouping;
-            
+
         case WPS_TOKEN_METADATA_GENRE:
             return id3->genre_string;
 
@@ -1415,8 +1416,8 @@ static int find_conditional_end(struct wps_data *data, int index)
     return ret;
 }
 
-/* Return the index of the appropriate case for the conditional
-   that starts at cond_index.
+/* Evaluate the conditional that is at *token_index and return whether a skip
+   has ocurred. *token_index is updated with the new position.
 */
 static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
 {
@@ -1449,7 +1450,7 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
 
     data->tokens[cond_index].value.i = (intval << 8) + num_options;
 
-    /* skip to the right enum case */
+    /* skip to the appropriate enum case */
     int next = cond_index + 2;
     for (i = 1; i < intval; i++)
     {
