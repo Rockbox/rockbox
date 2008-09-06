@@ -378,7 +378,8 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
   \begin{table}
     \begin{btnmap}{}{}
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
-      \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu{} / \ButtonSelect}%
+      \opt{IPOD_4G_PAD}{\ButtonMenu{} / \ButtonSelect}%
+      \opt{IPOD_3G_PAD}{\ButtonMenu{} / \ButtonPlay}%
       \opt{ONDIO_PAD}{\ButtonOff}\opt{RECORDER_PAD,PLAYER_PAD}%
           {Long \ButtonOn}%
       \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD}
@@ -422,23 +423,35 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
   {
   \subsection{Starting the original firmware}
   \label{ref:Dualboot}
-  \opt{ipod}
+  \opt{ipod4g,ipodcolor,ipodvideo,ipodnano,ipodmini}
     {
     Rockbox has a dual-boot feature. To boot into the original firmware, shut
     down the device as described above. Turn on the \ButtonHold{} switch
-    immediately after turning the player on. Once Rockbox displays the
-    message ``Loading original firmware ...'' you may turn the \ButtonHold{}
-    switch off. Rockbox will boot into the original firmware.
+    immediately after turning the player on. The Apple logo for
+    display for a few seconds as Rockbox loads the original firmware.
     
-    \note{The described method of dual-booting works with Rockbox bootloader
-    version 2, which was released 16 December 2006. If you have the older
-    bootloader, boot the original firmware by pressing \ButtonMenu{}
-    immediately after turning on your Ipod.  Do not release the
-    \ButtonMenu{} button until you see the ``Loading original firmware...''
-    message on the screen.}
-    
+    You can also load the original firmware shutting down the device,
+    then clicking the \ButtonHold{} switch on and connecting the iPod
+    to your computer.
+ 
     Regardless of which method you use to boot to the original firmware, you can
     return to Rockbox by pressing and holding \ButtonMenu{} and \ButtonSelect{}
+    simultaneously until the player hard resets.
+    }
+
+  \opt{ipod1g2g,ipod3g}
+    {
+    Rockbox has a dual-boot feature. To boot into the original firmware, shut
+    down the device as described above. Turn on the \ButtonHold{} switch
+    immediately after turning the player on. The Apple logo for
+    display for a few seconds as Rockbox loads the original firmware.
+    
+    You can also load the original firmware shutting down the device,
+    then clicking the \ButtonHold{} switch on and connecting the iPod
+    to your computer.
+ 
+    Regardless of which method you use to boot to the original firmware, you can
+    return to Rockbox by pressing and holding \ButtonMenu{} and \ButtonPlay{}
     simultaneously until the player hard resets.
     }
 
