@@ -154,6 +154,15 @@ const struct button_mapping generic_directions[] =
     { PLA_DOWN_REPEAT,       BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_RC_REW|BUTTON_REPEAT,       BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RC_FF|BUTTON_REPEAT,        BUTTON_NONE},
+#elif (CONFIG_KEYPAD == IAUDIO67_PAD)
+    { PLA_UP,                BUTTON_STOP,                       BUTTON_NONE},
+    { PLA_DOWN,              BUTTON_PLAY,                       BUTTON_NONE},
+    { PLA_LEFT,              BUTTON_LEFT,                       BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_RIGHT,                      BUTTON_NONE},
+    { PLA_UP_REPEAT,         BUTTON_STOP|BUTTON_REPEAT,         BUTTON_NONE},
+    { PLA_DOWN_REPEAT,       BUTTON_PLAY|BUTTON_REPEAT,         BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_NONE},
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif
@@ -257,6 +266,13 @@ const struct button_mapping generic_left_right_fire[] =
     { PLA_RIGHT_REPEAT,      BUTTON_RC_FF|BUTTON_REPEAT,   BUTTON_NONE},
     { PLA_FIRE,              BUTTON_RC_MODE,               BUTTON_NONE},
     { PLA_FIRE_REPEAT,       BUTTON_RC_MODE|BUTTON_REPEAT, BUTTON_NONE},
+#elif (CONFIG_KEYPAD == IAUDIO67_PAD)
+    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    { PLA_FIRE,              BUTTON_MENU,                BUTTON_NONE},
+    { PLA_FIRE_REPEAT,       BUTTON_MENU|BUTTON_REPEAT,  BUTTON_NONE},
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif
@@ -391,6 +407,12 @@ const struct button_mapping generic_actions[] =
     {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
     {PLA_FIRE,          BUTTON_SELECT,                  BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
+#elif (CONFIG_KEYPAD == IAUDIO67_PAD)
+    {PLA_QUIT,          BUTTON_POWER,                   BUTTON_NONE},
+    {PLA_START,         BUTTON_PLAY,                    BUTTON_NONE},
+    {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
+    {PLA_FIRE,          BUTTON_VOLUP,                   BUTTON_NONE},
+    {PLA_FIRE_REPEAT,   BUTTON_VOLUP|BUTTON_REPEAT,     BUTTON_NONE},
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif
@@ -456,6 +478,11 @@ const struct button_mapping generic_increase_decrease[] =
     {PLA_DEC,             BUTTON_MINUS,                      BUTTON_NONE},
     {PLA_INC_REPEAT,      BUTTON_PLUS|BUTTON_REPEAT,         BUTTON_NONE},
     {PLA_DEC_REPEAT,      BUTTON_MINUS|BUTTON_REPEAT,        BUTTON_NONE},
+#elif CONFIG_KEYPAD == IAUDIO67_PAD
+    {PLA_INC,             BUTTON_VOLUP,                       BUTTON_NONE},
+    {PLA_DEC,             BUTTON_VOLDOWN,                     BUTTON_NONE},
+    {PLA_INC_REPEAT,      BUTTON_VOLUP|BUTTON_REPEAT,         BUTTON_NONE},
+    {PLA_DEC_REPEAT,      BUTTON_VOLDOWN|BUTTON_REPEAT,       BUTTON_NONE},
 #else
 #error pluginlib_actions: Unsupported keypad
 #endif

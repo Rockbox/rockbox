@@ -1291,7 +1291,7 @@ fi
     target="-DIAUDIO_7"
     memory=16 # always
     arm946cc
-    tool="$rootdir/tools/scramble -add i7"
+    tool="$rootdir/tools/scramble -add=i7"
     boottool="$rootdir/tools/scramble -tcc=crc"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"

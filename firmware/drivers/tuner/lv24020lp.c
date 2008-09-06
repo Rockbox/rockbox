@@ -67,6 +67,21 @@ static int fd_log = -1;
 #define FM_NRW_PIN      3
 #define FM_CLOCK_PIN    4
 #define FM_DATA_PIN     5
+#elif defined(IAUDIO_7)
+#define GPIO_OUTPUT_EN  GPIOA_DIR
+#define GPIO_OUTPUT_VAL GPIOA
+#define GPIO_INPUT_VAL  GPIOA
+#define FM_CLOCK_PIN    5
+#define FM_DATA_PIN     6
+#define FM_NRW_PIN      7
+//#define udelay(x)       /* Remove hack when D2 has udelay */
+
+static void udelay(int usecs)
+{
+    while (usecs--)
+	asm("nop;nop;");
+}
+
 #elif defined(COWON_D2)
 #define GPIO_OUTPUT_EN  GPIOC_DIR
 #define GPIO_OUTPUT_VAL GPIOC

@@ -59,8 +59,13 @@
 #define PCLKCFG5   (*(volatile unsigned long *)0x80000430)
 #define PCLKCFG6   (*(volatile unsigned long *)0x80000434)
 
+#define PCLK_DAI   PCLKCFG6
+
 /* Device bits for SWRESET & BCLKCTR */
 
+#define DEV_DAI  (1<<0)
+#define DEV_USBD (1<<4)
+#define DEV_ECC  (1<<9)
 #define DEV_NAND (1<<16)
 
 /* ADC */
@@ -86,9 +91,23 @@
 
 
 /* IRQ Controller */
+#define EXT0_IRQ_MASK    (1<<0)
+#define EXT1_IRQ_MASK    (1<<1)
+#define EXT2_IRQ_MASK    (1<<2)
+#define EXT3_IRQ_MASK    (1<<3)
+#define I2SR_IRQ_MASK    (1<<4)
+#define I2ST_IRQ_MASK    (1<<5)
+#define TIMER0_IRQ_MASK  (1<<6)
+#define USBD_IRQ_MASK    (1<<8)  /* USB 2.0 device */
+#define USBH_IRQ_MASK    (1<<10) /* USB 1.1 host */
+#define ADC_IRQ_MASK     (1<<16)
+#define USB_DMA_IRQ_MASK (1<<26) /* USB DMA */
+#define ECC_IRQ_MASK     (1<<27)
 
-#define TIMER0_IRQ_MASK (1<<6)
-#define ADC_IRQ_MASK (1<<16)
+#define DAI_RX_IRQ_MASK  I2SR_IRQ_MASK
+#define DAI_TX_IRQ_MASK  I2ST_IRQ_MASK
+
+#define USB_DMA_IRQ_MASK (1<<26) /* USB DMA */
 
 #define IEN      (*(volatile unsigned long *)0x80000100)
 #define CREQ     (*(volatile unsigned long *)0x80000104)
@@ -159,5 +178,84 @@
     #define NFC_READY (1<<20)
 #define NFC_IREQ   (*(volatile unsigned long *)0x90000060)
 #define NFC_RST    (*(volatile unsigned long *)0x90000064)
+
+
+/* ECC controller */
+
+#define ECC_CTRL   (*(volatile unsigned long *)0x80000900)
+    #define ECC_DMA_REQ (1<<28)
+    #define ECC_ENC     (1<<27) /* MLC ECC3/4 */
+    #define ECC_FLG     (1<<26)
+    #define ECC_IEN     (1<<25)
+    #define ECC_MANUAL  (1<<22)
+    #define ECC_WCNT    (1<<12) /* [21:12] */
+    #define ECC_HOLD    (1<<7)
+    #define ECC_M4EN    (1<<6)
+    #define ECC_ZERO    (1<<5)
+    #define ECC_M3EN    (1<<4)
+    #define ECC_CNT_MASK (7<<1)
+    #define ECC_CNT     (1<<1)
+    #define ECC_SLC     (1<<0)
+    
+#define ECC_BASE   (*(volatile unsigned long *)0x80000904)
+#define ECC_MASK   (*(volatile unsigned long *)0x80000908)
+#define ECC_CLR    (*(volatile unsigned long *)0x8000090c)
+#define SLC_ECC0   (*(volatile unsigned long *)0x80000910)
+#define SLC_ECC1   (*(volatile unsigned long *)0x80000914)
+#define SLC_ECC2   (*(volatile unsigned long *)0x80000918)
+#define SLC_ECC3   (*(volatile unsigned long *)0x8000091c)
+#define SLC_ECC4   (*(volatile unsigned long *)0x80000920)
+#define SLC_ECC5   (*(volatile unsigned long *)0x80000924)
+#define SLC_ECC6   (*(volatile unsigned long *)0x80000928)
+#define SLC_ECC7   (*(volatile unsigned long *)0x8000092c)
+#define MLC_ECC0W  (*(volatile unsigned long *)0x80000930)
+#define MLC_ECC1W  (*(volatile unsigned long *)0x80000934)
+#define MLC_ECC2W  (*(volatile unsigned long *)0x80000938)
+#define MLC_ECC0R  (*(volatile unsigned long *)0x80000940)
+#define MLC_ECC1R  (*(volatile unsigned long *)0x80000944)
+#define MLC_ECC2R  (*(volatile unsigned long *)0x80000948)
+#define ECC_CORR_START (*(volatile unsigned long *)0x8000094c)
+#define ECC_ERRADDR1 (*(volatile unsigned long *)0x80000950)
+#define ECC_ERRADDR2 (*(volatile unsigned long *)0x80000954)
+#define ECC_ERRADDR3 (*(volatile unsigned long *)0x80000958)
+#define ECC_ERRADDR4 (*(volatile unsigned long *)0x8000095c)
+#define ECC_ERRDATA1 (*(volatile unsigned long *)0x80000960)
+#define ECC_ERRDATA2 (*(volatile unsigned long *)0x80000964)
+#define ECC_ERRDATA3 (*(volatile unsigned long *)0x80000968)
+#define ECC_ERRDATA4 (*(volatile unsigned long *)0x8000096c)
+#define ECC_ERR_NUM  (*(volatile unsigned long *)0x80000970)
+
+#define ECC_ERRDATA(x) (*(volatile unsigned long *)(0x80000960 + (x) * 4))
+#define ECC_ERRADDR(x) (*(volatile unsigned long *)(0x80000950 + (x) * 4))
+
+/* Digital Audio Interface */
+#define DADI_L0    (*(volatile unsigned long *)0x80000000)
+#define DADI_R0    (*(volatile unsigned long *)0x80000004)
+#define DADI_L1    (*(volatile unsigned long *)0x80000008)
+#define DADI_R1    (*(volatile unsigned long *)0x8000000C)
+#define DADI_L2    (*(volatile unsigned long *)0x80000010)
+#define DADI_R2    (*(volatile unsigned long *)0x80000014)
+#define DADI_L3    (*(volatile unsigned long *)0x80000018)
+#define DADI_R3    (*(volatile unsigned long *)0x8000001c)
+
+#define DADO_L0    (*(volatile unsigned long *)0x80000020)
+#define DADO_R0    (*(volatile unsigned long *)0x80000024)
+#define DADO_L1    (*(volatile unsigned long *)0x80000028)
+#define DADO_R1    (*(volatile unsigned long *)0x8000002C)
+#define DADO_L2    (*(volatile unsigned long *)0x80000030)
+#define DADO_R2    (*(volatile unsigned long *)0x80000034)
+#define DADO_L3    (*(volatile unsigned long *)0x80000038)
+#define DADO_R3    (*(volatile unsigned long *)0x8000003c)
+
+#define DAMR       (*(volatile unsigned long *)0x80000040)
+#define DAVC       (*(volatile unsigned long *)0x80000044)
+
+#define DADI_L(x)  (*(volatile unsigned long *)(0x80000000 + (x) * 8))
+#define DADI_R(x)  (*(volatile unsigned long *)(0x80000004 + (x) * 8))
+#define DADO_L(x)  (*(volatile unsigned long *)(0x80000020 + (x) * 8))
+#define DADO_R(x)  (*(volatile unsigned long *)(0x80000024 + (x) * 8))
+
+/* USB 2.0 device system MMR base address */
+#define USB_BASE 0x90000b00
 
 #endif

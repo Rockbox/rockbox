@@ -481,7 +481,6 @@
     (((CONFIG_CPU == SH7034) && !defined(PLUGIN)) || /* SH1 archos: core only */ \
     defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
     defined(CPU_PP) ||  /* PortalPlayer: core, plugins, codecs */ \
-    defined(CPU_TCC77X) ||  /* Telechips: core, plugins, codecs */ \
     (CONFIG_CPU == PNX0101) || \
     (CONFIG_CPU == S5L8700)) /* Samsung S5L8700: core, plugins, codecs */
 #define ICODE_ATTR      __attribute__ ((section(".icode")))

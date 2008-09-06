@@ -279,6 +279,8 @@ int main (int argc, char** argv)
             modelnum = 26;
         else if(!strcmp(&argv[1][5], "1630")) /* Philips HDD1630 */
             modelnum = 31;
+        else if (!strcmp(&argv[1][5], "i7"))
+    	    modelnum = 32;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

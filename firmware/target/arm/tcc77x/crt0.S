@@ -82,12 +82,15 @@ start_loc:
 
 #ifdef TCCBOOT
     mov    r0, #0x80000000
-#ifdef LOGIK_DAX
+#if defined(LOGIK_DAX)
     ldr    r0, [r0, #0x300]     /* Hold button is GPIO A, pin 0x2 */
     tst    r0, #0x2
 #elif defined(SANSA_M200)
     ldr    r0, [r0, #0x310]     /* Hold button is GPIO B, pin 0x200 */
     tst    r0, #0x200
+#elif defined(IAUDIO_7)
+    ldr    r0, [r0, #0x300]     /* Hold button is !GPIO A, pin 0x2 */
+    tst  r0, #0x2
 #else
     #error No bootup key detection implemented for this target
 #endif

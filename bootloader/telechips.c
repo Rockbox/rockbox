@@ -44,9 +44,15 @@
 #include "file.h"
 #include "common.h"
 
-#if defined(COWON_D2)
-#include "pcf50606.h"
-#define LOAD_ADDRESS 0x20000000 /* DRAM_START */
+#if defined(COWON_D2) || defined(IAUDIO_7) && defined(TCCBOOT)
+# define REAL_BOOT
+#endif
+
+#ifdef REAL_BOOT
+# if defined(COWON_D2) || defined(IAUDIO_7)
+#  include "pcf50606.h"
+# endif
+# define LOAD_ADDRESS 0x20000000 /* DRAM_START */
 #endif
 
 char version[] = APPSVERSION;
@@ -80,14 +86,14 @@ void show_debug_screen(void)
         } else {
             power_count = 0;
         }
-		    
+#ifdef BUTTON_SELECT
         if (button & BUTTON_SELECT){
-		    _backlight_off();
+            _backlight_off();
         }
         else{
             _backlight_on();
         }
-		
+#endif
         /*printf("Btn: 0x%08x",button);
         printf("Tick: %d",current_tick);
         printf("GPIOA: 0x%08x",GPIOA);
@@ -172,13 +178,13 @@ void show_debug_screen(void)
 
 void* main(void)
 {
-#if defined(COWON_D2) && defined(TCCBOOT)
+#ifdef REAL_BOOT
     int rc;
     unsigned char* loadbuffer = (unsigned char*)LOAD_ADDRESS;
 #endif
 
-    power_init();
     system_init();
+    power_init();
 #ifndef COWON_D2
     /* The D2 doesn't enable threading or interrupts */
     kernel_init();
@@ -197,7 +203,7 @@ void* main(void)
 
 /* Only load the firmware if TCCBOOT is defined - this ensures SDRAM_START is
    available for loading the firmware. Otherwise display the debug screen. */
-#if defined(COWON_D2) && defined(TCCBOOT)
+#ifdef REAL_BOOT
     printf("Rockbox boot loader");
     printf("Version %s", version);
 

@@ -27,6 +27,9 @@
 #include "sound.h"
 #include "pcm.h"
 
+/* Just for tests enable it to play simple tone */
+//#define PCM_TELECHIPS_TEST
+
 struct dma_data
 {
 /* NOTE: The order of size and p is important if you use assembler
@@ -59,7 +62,9 @@ static unsigned long pcm_freq SHAREDDATA_ATTR = HW_SAMPR_DEFAULT; /* 44.1 is def
 
 void pcm_postinit(void)
 {
-    /*audiohw_postinit();*/
+#if defined(IAUDIO_7)
+    audiohw_postinit(); /* implemented not for all codecs */
+#endif
     pcm_apply_settings();
 }
 
@@ -73,6 +78,8 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
 
 void pcm_play_dma_init(void)
 {
+    DAVC = 0x0;         /* Digital Volume = max */
+#ifdef COWON_D2
     /* Set DAI clock divided from PLL0 (192MHz).
        The best approximation of 256*44.1kHz is 11.291MHz. */
     BCLKCTR &= ~DEV_DAI;
@@ -81,8 +88,15 @@ void pcm_play_dma_init(void)
     
     /* Enable DAI block in Master mode, 256fs->32fs, 16bit LSB */
     DAMR = 0x3c8e80;
-    DAVC = 0x0;         /* Digital Volume = max */
-    
+#elif defined(IAUDIO_7)
+    BCLKCTR &= ~DEV_DAI;
+    PCLK_DAI = (0x800b << 16) | (PCLK_DAI & 0xffff);
+    BCLKCTR |= DEV_DAI;
+    /* Master mode, 256->64fs, 16bit LSB*/
+    DAMR = 0x3cce20;
+#else
+#error "Target isn't supported"
+#endif
     /* Set DAI interrupts as FIQs */
     IRQSEL = ~(DAI_RX_IRQ_MASK | DAI_TX_IRQ_MASK);
     
@@ -201,7 +215,47 @@ size_t pcm_get_bytes_waiting(void)
     return dma_play_data.size & ~3;
 }
 
-#if 1
+#ifdef HAVE_RECORDING
+/* TODO: implement */
+void pcm_rec_dma_init(void)
+{
+}
+
+void pcm_rec_dma_close(void)
+{
+}
+
+void pcm_rec_dma_start(void *addr, size_t size)
+{
+    (void) addr;
+    (void) size;
+}
+
+void pcm_rec_dma_stop(void)
+{
+}
+
+void pcm_rec_lock(void)
+{
+}
+
+void pcm_rec_unlock(void)
+{
+}
+
+const void * pcm_rec_dma_get_peak_buffer(int *count)
+{
+    *count = 0;
+    return NULL;
+}
+
+void pcm_record_more(void *start, size_t size)
+{
+}
+#endif
+
+#if defined(COWON_D2)
+/* TODO: hardcoded hex values differs for tcc7xx and tcc8xx */
 void fiq_handler(void) ICODE_ATTR __attribute__((naked));
 void fiq_handler(void)
 {
@@ -310,5 +364,71 @@ void fiq_handler(void)
     asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
                     "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
                     "subs  pc, lr, #4           \n"); /* Return from FIQ */
+}
+#endif
+
+/* TODO: required by wm8531 codec, why not to implement  */
+void i2s_reset(void)
+{
+/* DAMR = 0; */
+}
+
+#ifdef PCM_TELECHIPS_TEST
+#include "lcd.h"
+#include "sprintf.h"
+#include "backlight-target.h"
+
+static int frame = 0;
+static void test_callback_for_more(unsigned char **start, size_t *size)
+{
+    static unsigned short data[8];
+    static int cntr = 0;
+    int i;
+
+    for (i = 0; i < 8; i ++) {
+        unsigned short val;
+
+        if (0x100 == (cntr & 0x100))
+            val = 0x0fff;
+        else
+            val = 0x0000;
+        data[i] = val;
+        cntr++;
+    }
+
+    *start = data;
+    *size = sizeof(data);
+
+    frame++;
+}
+
+void pcm_telechips_test(void)
+{
+    static char buf[100];
+    unsigned char *data;
+    size_t size;
+    
+    _backlight_on();
+
+    audiohw_preinit();
+    pcm_play_dma_init();
+    pcm_postinit();
+
+    audiohw_mute(false);
+    audiohw_set_master_vol(0x7f, 0x7f);
+
+    pcm_callback_for_more = test_callback_for_more;    
+    test_callback_for_more(&data, &size);
+    pcm_play_dma_start(data, size);
+
+    while (1) {
+        int line = 0;
+        lcd_clear_display();
+        lcd_puts(0, line++, __func__);
+        snprintf(buf, sizeof(buf), "frame: %d", frame);
+        lcd_puts(0, line++, buf);
+        lcd_update();
+        sleep(1);
+    }
 }
 #endif

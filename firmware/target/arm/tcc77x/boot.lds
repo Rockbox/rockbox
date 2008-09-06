@@ -14,7 +14,11 @@ STARTUP(target/arm/tcc77x/crt0.o)
 
 MEMORY
 {
+#ifdef TCCBOOT
    DRAM : ORIGIN = DRAMORIG + DRAMSIZE - 0x100000, LENGTH = 0x100000
+#else
+   DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
+#endif
    IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
 }
 
@@ -34,6 +38,7 @@ SECTIONS
         *(.idata)
         *(.data*)
         *(.rodata.*)
+        *(.rodata)
         . = ALIGN(0x4);
         _dataend = . ;
     } > DRAM

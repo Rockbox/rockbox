@@ -7,14 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * TCC specific code for Wolfson audio codecs
- *
- * Based on code from the ipodlinux project - http://ipodlinux.org/
- * Adapted for Rockbox in December 2005
- *
- * Original file: linux/arch/armnommu/mach-ipod/audio.c
- *
- * Copyright (c) 2003-2005 Bernard Leach (leachbj@bouncycastle.org)
+ * Copyright (C) 2008 Vitja Makarov
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,34 +18,29 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef BACKLIGHT_TARGET_H
+#define BACKLIGHT_TARGET_H
 
-#include "system.h"
-#include "audiohw.h"
-#include "i2c.h"
-#include "wmcodec.h"
+#include <stdbool.h>
+#include "tcc77x.h"
 
-#if defined(COWON_D2)
-/* The D2's audio codec uses an I2C address of 0x34 */
-#define I2C_AUDIO_ADDRESS 0x34
-#elif defined (IAUDIO_7)
-#define I2C_AUDIO_ADDRESS 0x34
-#else
-#error wmcodec not implemented for this target!
-#endif
+void power_touch_panel(bool on);
 
-
-void audiohw_init(void)
+static inline bool _backlight_init(void)
 {
-#if defined(HAVE_WM8731) || defined(HAVE_WM8751)
-    audiohw_preinit();
-#endif
+    GPIOD_DIR |= 0x2;
+    return true;
 }
 
-void wmcodec_write(int reg, int data)
+static inline void _backlight_on(void)
 {
-    unsigned char d[2];
-    d[0] = (reg << 1) | ((data & 0x100) >> 8);
-    d[1] = data;
-    
-    i2c_write(I2C_AUDIO_ADDRESS, d, 2);
+    GPIOD |= 0x2;
+    power_touch_panel(true);
 }
+
+static inline void _backlight_off(void)
+{
+    GPIOD &= ~0x2;
+    power_touch_panel(false);
+}
+#endif /* BACKLIGHT_TARGET_H */

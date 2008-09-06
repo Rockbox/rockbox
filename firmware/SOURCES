@@ -988,7 +988,7 @@ target/arm/tcc77x/logikdax/button-logikdax.c
 target/arm/tcc77x/logikdax/power-logikdax.c
 #ifndef BOOTLOADER
 target/arm/tcc77x/debug-tcc77x.c
-target/arm/tcc77x/pcm-tcc77x.c
+target/arm/pcm-telechips.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* LOGIK_DAX */
@@ -1008,7 +1008,7 @@ target/arm/tcc77x/m200/button-m200.c
 target/arm/tcc77x/m200/power-m200.c
 #ifndef BOOTLOADER
 target/arm/tcc77x/debug-tcc77x.c
-target/arm/tcc77x/pcm-tcc77x.c
+target/arm/pcm-telechips.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* SANSA_M200 */
@@ -1028,7 +1028,7 @@ target/arm/tcc77x/c100/button-c100.c
 target/arm/tcc77x/c100/power-c100.c
 #ifndef BOOTLOADER
 target/arm/tcc77x/debug-tcc77x.c
-target/arm/tcc77x/pcm-tcc77x.c
+target/arm/pcm-telechips.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* SANSA_C100 */
@@ -1036,11 +1036,24 @@ target/arm/tcc77x/pcm-tcc77x.c
 #ifdef IAUDIO_7
 #ifndef SIMULATOR
 drivers/nand_id.c
+drivers/pcf50606.c
 target/arm/ata-nand-telechips.c
-target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/system-tcc77x.c
+target/arm/tcc77x/kernel-tcc77x.c
+target/arm/tcc77x/timer-tcc77x.c
+target/arm/tcc77x/adc-tcc77x.c
+target/arm/tcc77x/powermgmt-tcc77x.c
+target/arm/tcc77x/usb-tcc77x.c
 target/arm/tcc77x/iaudio7/lcd-iaudio7.c
 target/arm/tcc77x/iaudio7/power-iaudio7.c
+target/arm/tcc77x/iaudio7/button-iaudio7.c
+target/arm/tcc77x/iaudio7/ata2501.c
+#ifndef BOOTLOADER
+target/arm/wmcodec-telechips.c
+target/arm/pcm-telechips.c
+target/arm/tcc77x/debug-tcc77x.c
+target/arm/tcc77x/iaudio7/audio-iaudio7.c
+#endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* IAUDIO_7 */
 
@@ -1063,7 +1076,7 @@ target/arm/tcc780x/kernel-tcc780x.c
 target/arm/tcc780x/timer-tcc780x.c
 target/arm/wmcodec-telechips.c
 target/arm/tcc780x/debug-tcc780x.c
-target/arm/tcc780x/pcm-tcc780x.c
+target/arm/pcm-telechips.c
 target/arm/tcc780x/cowond2/audio-cowond2.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */

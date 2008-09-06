@@ -56,8 +56,11 @@ bool __dbg_hw_info(void)
         button = button_get(false);
         
         button &= ~BUTTON_REPEAT;
-        
+#ifdef BUTTON_SELECT
         if (button == BUTTON_SELECT)
+#else
+        if (button == BUTTON_STOP)
+#endif
             done=true;
 
         snprintf(buf, sizeof(buf), "current tick: %08x Seconds running: %08d",

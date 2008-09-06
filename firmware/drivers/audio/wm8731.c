@@ -167,7 +167,11 @@ void audiohw_preinit(void)
 
     /* 3) Set required values in all other registers except 12h (Active). */
     wmcodec_write(AINTFCE, AINTFCE_FORMAT_I2S | AINTFCE_IWL_16BIT |
+#ifdef CODEC_SLAVE
+                           0);
+#else
                            AINTFCE_MS);
+#endif
     wm8731_write(AAPCTRL, wm8731_regs[AAPCTRL]);
     wm8731_write(DAPCTRL, wm8731_regs[DAPCTRL]);
     wmcodec_write(SAMPCTRL, WM8731_USB24_44100HZ);

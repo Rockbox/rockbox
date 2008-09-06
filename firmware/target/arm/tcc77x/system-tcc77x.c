@@ -26,6 +26,7 @@
 /* Externally defined interrupt handlers */
 extern void TIMER(void);
 extern void ADC(void);
+extern void USBD_IRQ(void);
 
 void irq(void)
 {
@@ -36,14 +37,22 @@ void irq(void)
         TIMER();
     else if (irq & ADC_IRQ_MASK)
         ADC();
+#ifdef HAVE_USBSTACK 
+    else if (irq & USBD_IRQ_MASK)
+        USBD_IRQ();
+#endif
     else
         panicf("Unhandled IRQ 0x%08X", irq);
 }
 
+void fiq_handler(void) __attribute__((interrupt ("FIQ"), naked)); 
+
+#ifdef BOOTLOADER
 void fiq_handler(void)
 {
     /* TODO */
 }
+#endif
 
 void system_reboot(void)
 {
@@ -94,7 +103,7 @@ static void gpio_init(void)
     GPIOC = 0;
     GPIOD = 0x180;
     GPIOE = 0;
-    GPIOA_DIR = 0x84b0
+    GPIOA_DIR = 0x84b0;
     GPIOB_DIR = 0x80800;
     GPIOC_DIR = 0x2000000;
     GPIOD_DIR = 0x3e3;

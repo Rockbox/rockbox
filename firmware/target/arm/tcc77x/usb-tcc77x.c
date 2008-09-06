@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2008 by [whoever fills in these functions]
+ * Copyright (C) 2008 by Vitja Makarov
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,9 +21,15 @@
 
 #include "config.h"
 #include "usb.h"
+#include "system.h"
+#include "usb-tcc7xx.h"
 
 void usb_init_device(void)
 {
+    /* simply switch USB off for now */
+    BCLKCTR |= DEV_USBD;
+    TCC7xx_USB_PHY_CFG = 0x3e4c;
+    BCLKCTR &= ~DEV_USBD;
 }
 
 void usb_enable(bool on)

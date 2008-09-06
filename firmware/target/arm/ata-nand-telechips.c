@@ -48,7 +48,7 @@ static struct mutex ata_mtx SHAREDBSS_ATTR;
 
 #define SECTOR_SIZE 512
 
-#ifdef COWON_D2
+#if defined(COWON_D2) || defined(IAUDIO_7)
 #define SEGMENT_ID_BIGENDIAN
 #define BLOCKS_PER_SEGMENT  4
 #else

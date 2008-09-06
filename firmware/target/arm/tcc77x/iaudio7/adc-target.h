@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2008 by [whoever fills in these functions]
+ * Copyright (C) 2007 Dave Chapman
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,60 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "system.h"
-#include "kernel.h"
-#include "logf.h"
-#include "audio.h"
-#include "sound.h"
-#include "file.h"
+#ifndef _ADC_TARGET_H_
+#define _ADC_TARGET_H_
 
-void pcm_postinit(void)
-{
-}
+#define NUM_ADC_CHANNELS 8
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    (void)count;
-    return 0;
-}
+#define ADC_BUTTONS         0
 
-void pcm_play_dma_init(void)
-{
-}
-
-void pcm_apply_settings(void)
-{
-}
-
-void pcm_set_frequency(unsigned int frequency)
-{
-    (void)frequency;
-}
-
-void pcm_play_dma_start(const void *addr, size_t size)
-{
-    (void)addr;
-    (void)size;
-}
-
-void pcm_play_dma_stop(void)
-{
-}
-
-void pcm_play_lock(void)
-{
-}
-
-void pcm_play_unlock(void)
-{
-}
-
-void pcm_play_dma_pause(bool pause)
-{
-    (void)pause;
-}
-
-size_t pcm_get_bytes_waiting(void)
-{
-    return 0;
-}
+#endif /* _ADC_TARGET_H_ */

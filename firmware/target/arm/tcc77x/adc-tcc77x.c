@@ -104,6 +104,9 @@ unsigned short adc_read(int channel)
 
 void adc_init(void)
 {
+    /* Initialize ADC clocks */
+    PCLKCFG6 = (PCLKCFG6 & 0xffff0000) | 4004;
+
     ADCCON = (1<<4);         /* Leave standby mode */
 
     /* IRQ enable, auto power-down, single-mode */
