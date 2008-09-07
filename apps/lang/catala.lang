@@ -125,7 +125,7 @@
     *: "Guany"
   </dest>
   <voice>
-    *: "Gain"
+    *: "Guany"
   </voice>
 </phrase>
 <phrase>
@@ -220,10 +220,10 @@
     *: "Failed"
   </source>
   <dest>
-    *: "Fallada"
+    *: "ha fallat"
   </dest>
   <voice>
-    *: "Fallada"
+    *: "ha fallat"
   </voice>
 </phrase>
 <phrase>
@@ -845,11 +845,11 @@
   </source>
   <dest>  
     *: none
-    swcodec: "Cross Gain"
+    swcodec: "Guany Creuat"
   </dest>
   <voice>  
     *: none
-    swcodec: "Cross Gain"
+    swcodec: "Guany Creuat"
   </voice>
 </phrase>
 <phrase>
@@ -1047,11 +1047,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "%d Hz Band Gain"
+    swcodec: "Guany Banda %d Hz"
   </dest>
   <voice>
     *: none
-    swcodec: "hertz band gain"
+    swcodec: "hertz guany banda"
   </voice>
 </phrase>
 <phrase>
@@ -1064,11 +1064,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Low Shelf Filter"
+    swcodec: "Filtre nivell baix"
   </dest>
   <voice>
     *: none
-    swcodec: "Low Shelf Filter"
+    swcodec: "Filtre nivell baix"
   </voice>
 </phrase>
 <phrase>
@@ -1081,11 +1081,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Peak Filter %d"
+    swcodec: "Filtre passabanda %d"
   </dest>
   <voice>
     *: none
-    swcodec: "Peak Filter"
+    swcodec: "Filtre passabanda"
   </voice>
 </phrase>
 <phrase>
@@ -1098,11 +1098,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "High Shelf Filter"
+    swcodec: "Filtre nivell alt"
   </dest>
   <voice>
     *: none
-    swcodec: "High Shelf Filter"
+    swcodec: "Filtre nivell alt"
   </voice>
 </phrase>
 <phrase>
@@ -1602,10 +1602,10 @@
     *: "Party Mode"
   </source>
   <dest>
-    *: "Party Mode"
+    *: "Mode Festa"
   </dest>
   <voice>
-    *: "Party Mode"
+    *: "Mode Festa"
   </voice>
 </phrase>
 <phrase>
@@ -1831,10 +1831,10 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "Replaygain Type"
+    *: "Tipus de Replaygain"
   </dest>
   <voice>
-    *: "Replaygain Type"
+    *: "Tipus de Replaygain"
   </voice>
 </phrase>
 <phrase>
@@ -1845,10 +1845,10 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Album Gain"
+    *: "Guany d'Àlbum"
   </dest>
   <voice>
-    *: "Album Gain"
+    *: "Guany d'Àlbum"
   </voice>
 </phrase>
 <phrase>
@@ -1859,10 +1859,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Track Gain"
+    *: "Guany de pista"
   </dest>
   <voice>
-    *: "Track Gain"
+    *: "Guany de pista"
   </voice>
 </phrase>
 <phrase>
@@ -1873,10 +1873,10 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "Track Gain if Shuffling"
+    *: "Guany de pista en mode aleatori"
   </dest>
   <voice>
-    *: "Track Gain if Shuffling"
+    *: "Guany de pista en mode aleatori"
   </voice>
 </phrase>
 <phrase>
@@ -1890,7 +1890,7 @@
     *: "Pre-amp"
   </dest>
   <voice>
-    *: "Preamp"
+    *: "Preamplificació"
   </voice>
 </phrase>
 <phrase>
@@ -1980,7 +1980,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: DEPRECATED
+  desc: DEPRECATED 
   user:
   <source>
     *: ""
@@ -1994,7 +1994,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: DEPRECATED
+  desc: DEPRECATED 
   user:
   <source>
     *: ""
@@ -2008,7 +2008,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: DEPRECATED
+  desc: DEPRECATED 
   user:
   <source>
     *: ""
@@ -2056,10 +2056,10 @@
     *: "Last.fm Log"
   </source>
   <dest>
-    *: "Last.fm Log"
+    *: "Registre Last.fm"
   </dest>
   <voice>
-    *: "Last.fm Log"
+    *: "Registre Last.fm"
   </voice>
 </phrase>
 <phrase>
@@ -2070,10 +2070,10 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "Cuesheet Support"
+    *: "Suport Cuesheet"
   </dest>
   <voice>
-    *: "Cuesheet Support"
+    *: "Suport Cuesheet"
   </voice>
 </phrase>
 <phrase>
@@ -2120,11 +2120,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Duration to Rewind"
+    headphone_detection: "Durada a rebobinar"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Duration to Rewind"
+    headphone_detection: "Durada a rebobinar"
   </voice>
 </phrase>
 <phrase>
@@ -2474,7 +2474,7 @@
     *: "Importar Modificacions"
   </dest>
   <voice>
-    *: "Import Modifications"
+    *: "Importar Modificacions"
   </voice>
 </phrase>
 <phrase>
@@ -2485,10 +2485,10 @@
     *: "Updating in background"
   </source>
   <dest>
-    *: "Updating in background"
+    *: "Actualitzant en segon plà"
   </dest>
   <voice>
-    *: "Updating in background"
+    *: "Actualitzant en segon plà"
   </voice>
 </phrase>
 <phrase>
@@ -2592,6 +2592,7 @@
   </dest>
   <voice>
     *: none
+    remote: "Veure fitxers wps remot"
   </voice>
 </phrase>
 <phrase>
@@ -2975,7 +2976,7 @@
   desc: in color screen
   user:
   <source>
-   *: none
+    *: none
     lcd_color: "RGB: %02X%02X%02X"
   </source>
   <dest>
@@ -2992,7 +2993,7 @@
   desc: splash when user selects an invalid colour
   user:
   <source>
-   *: none
+    *: none
     lcd_non-mono: "Invalid colour"
   </source>
   <dest>
@@ -3217,10 +3218,10 @@
     *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: "Screen Scrolls Out Of View"
+    *: "Desplaçament fora de la pantalla"
   </dest>
   <voice>
-    *: "Screen Scrolls Out Of View"
+    *: "Desplaçament fora de la pantalla"
   </voice>
 </phrase>
 <phrase>
@@ -3245,10 +3246,10 @@
     *: "Paged Scrolling"
   </source>
   <dest>
-    *: "Paged Scrolling"
+    *: "Desplaçament per pàgines"
   </dest>
   <voice>
-    *: "Paged scrolling"
+    *: "Desplaçament per pàgines"
   </voice>
 </phrase>
 <phrase>
@@ -3260,11 +3261,11 @@
     scrollwheel: none
   </source>
   <dest>
-    *: "List Acceleration Start Delay"
+    *: "Retard abans d'acceleració de llista"
     scrollwheel: none
   </dest>
   <voice>
-    *: "List Acceleration Start Delay"
+    *: "Retard abans d'acceleració de llista"
     scrollwheel: none
   </voice>
 </phrase>
@@ -3277,11 +3278,11 @@
     scrollwheel: none
   </source>
   <dest>
-    *: "List Acceleration Speed"
+    *: "Velocitat d'acceleració"
     scrollwheel: none
   </dest>
   <voice>
-    *: "List Acceleration Speed"
+    *: "Velocitat d'acceleració"
     scrollwheel: none
   </voice>
 </phrase>
@@ -3611,10 +3612,10 @@
     *: "Default Codepage"
   </source>
   <dest>
-    *: "Default Codepage"
+    *: "Codificació per defecte"
   </dest>
   <voice>
-    *: "Default codepage"
+    *: "Codificació per defecte"
   </voice>
 </phrase>
 <phrase>
@@ -3748,11 +3749,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Japanese (SJIS)"
+    lcd_bitmap: "Japonés (SJIS)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Japanese"
+    lcd_bitmap: "Japonés"
   </voice>
 </phrase>
 <phrase>
@@ -4057,7 +4058,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Set Time and Date"
+    rtc: "Posar Hora/Data"
   </voice>
 </phrase>
 <phrase>
@@ -5152,11 +5153,11 @@
   </source>
   <dest>
    *: none
-    radio: "No presets"
+    radio: "Cap presintonia"
   </dest>
   <voice>
     *: none
-    radio: "No presets"
+    radio: "Cap presintonia"
   </voice>
 </phrase>
 <phrase>
@@ -5390,11 +5391,11 @@
   </source>
   <dest>
     *: none
-    radio: "Auto-Scan Presets"
+    radio: "Auto-Escanejar Presintonies"
   </dest>
   <voice>
     *: none
-    radio: "Auto-Scan Presets"
+    radio: "Auto-Escanejar Presintonies"
   </voice>
 </phrase>
 <phrase>
@@ -5424,7 +5425,7 @@
   </source>
   <dest>
     *: none
-    radio: "Scanning %d.%01dMHz"
+    radio: "Escanejant %d.%02d MHz"
   </dest>
   <voice>
     *: none
@@ -5441,7 +5442,7 @@
   </source>
   <dest>
     *: none
-    radio: "%d.%01dMHz"
+    radio: "%d.%02d MHz"
   </dest>
   <voice>
     *: none
@@ -5457,11 +5458,11 @@
   </source>
   <dest>
     *: none
-    radio: "Scan"
+    radio: "Escanejar"
   </dest>
   <voice>
     *: none
-    radio: "Scan"
+    radio: "Escanejar"
   </voice>
 </phrase>
 <phrase>
@@ -5784,7 +5785,7 @@
   </dest>
   <voice>
     *: none
-    recording: "No settings available"
+    recording: "Sense preferències"
   </voice>
 </phrase>
 <phrase>
@@ -5953,11 +5954,11 @@
   </source>
   <dest>
     *: none
-    recording: "Split Measure"
+    recording: "Mesura de separació"
   </dest>
   <voice>
     *: none
-    recording: "Split Measure"
+    recording: "Mesura de separació"
   </voice>
 </phrase>
 <phrase>
@@ -6242,11 +6243,11 @@
   </source>
   <dest>
     *: none
-    recording: "Trigger"
+    recording: "Disparador"
   </dest>
   <voice>
     *: none
-    recording: "Trigger"
+    recording: "Disparador"
   </voice>
 </phrase>
 <phrase>
@@ -6276,11 +6277,11 @@
   </source>
   <dest>
     *: none
-    recording: "Trigtype"
+    recording: "Tipus disp."
   </dest>
   <voice>
     *: none
-    recording: "Trigtype"
+    recording: "Tipus disparador"
   </voice>
 </phrase>
 <phrase>
@@ -6463,11 +6464,11 @@
   </source>
   <dest>
     *: none
-    agc: "Safety (clip)"
+    agc: "Seguretat (trunca)"
   </dest>
   <voice>
     *: none
-    agc: "Safety (clip)"
+    agc: "Seguretat (trunca)"
   </voice>
 </phrase>
 <phrase>
@@ -6480,11 +6481,11 @@
   </source>
   <dest>
     *: none
-    agc: "Live (slow)"
+    agc: "Directe (lent)"
   </dest>
   <voice>
     *: none
-    agc: "Live (slow)"
+    agc: "Directe (lent)"
   </voice>
 </phrase>
 <phrase>
@@ -6497,11 +6498,11 @@
   </source>
   <dest>
     *: none
-    agc: "DJ-Set (slow)"
+    agc: "DJ-Set (lent)"
   </dest>
   <voice>
     *: none
-    agc: "DJ set (slow)"
+    agc: "DJ set (lent)"
   </voice>
 </phrase>
 <phrase>
@@ -6514,11 +6515,11 @@
   </source>
   <dest>
     *: none
-    agc: "Medium"
+    agc: "Mitjà"
   </dest>
   <voice>
     *: none
-    agc: "Medium"
+    agc: "Mitjà"
   </voice>
 </phrase>
 <phrase>
@@ -6531,11 +6532,11 @@
   </source>
   <dest>
     *: none
-    agc: "Voice (fast)"
+    agc: "Veu (ràpid)"
   </dest>
   <voice>
     *: none
-    agc: "Voice (fast)"
+    agc: "Veu (ràpid)"
   </voice>
 </phrase>
 <phrase>
@@ -6582,11 +6583,11 @@
   </source>
   <dest>
     *: none
-    remote: "(Vol- : Re-enable)"
+    remote: "(Vol- : Engegar)"
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : Re-enable)"
+    remote: "(Vol- : Engegar)"
   </voice>
 </phrase>
 <phrase>
@@ -6726,7 +6727,7 @@
     *: "Desades %d Pistes (%s)"
   </dest>
   <voice>
-    *: "tracks saved"
+    *: "pistes desades"
   </voice>
 </phrase>
 <phrase>
@@ -6839,11 +6840,11 @@
     player: "Buf:"
   </source>
   <dest>
-    *: "Buffer: %d.%03dMB"
-    player: "Buf: %d.%03dMB"
+    *: "Buffer:"
+    player: "Buf:"
   </dest>
   <voice>
-    *: ""
+    *: "Mida de Buffer"
     player: ""
   </voice>
 </phrase>
@@ -6859,7 +6860,7 @@
   <dest>
     *: "Bateria: %d%% %dh %dm"
     player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Bat: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Nivell de batería"
@@ -6876,7 +6877,7 @@
     *: "Disc:"
   </dest>
   <voice>
-    *: ""
+    *: "Mida de disc"
   </voice>
 </phrase>
 <phrase>
@@ -6983,7 +6984,7 @@
     *: "Temps màxim"
   </dest>
   <voice>
-    *: "Top Time"
+    *: "Temps màxim"
   </voice>
 </phrase>
 <phrase>
@@ -7151,7 +7152,7 @@
     *: "Reproduir Següent"
   </dest>
   <voice>
-    *: "Play Next"
+    *: "Reproduir Següent"
   </voice>
 </phrase>
 <phrase>
@@ -7165,7 +7166,7 @@
     *: "Afegides %d Pistes (%s)"
   </dest>
   <voice>
-    *: "tracks inserted"
+    *: "pistes afegides"
   </voice>
 </phrase>
 <phrase>
@@ -7179,7 +7180,7 @@
     *: "En cua %d Pistes (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "pistes en cua"
   </voice>
 </phrase>
 <phrase>
@@ -7291,7 +7292,7 @@
     *: "%s no existeix"
   </dest>
   <voice>
-    *: ""
+    *: "El directori no existeix"
   </voice>
 </phrase>
 <phrase>
@@ -7386,10 +7387,10 @@
     *: "Browse Cuesheet"
   </source>
   <dest>
-    *: "Browse Cuesheet"
+    *: "Navegar per Cuesheet"
   </dest>
   <voice>
-    *: "Browse Cuesheet"
+    *: "Navegar per Cuesheet"
   </voice>
 </phrase>
 <phrase>
@@ -7400,10 +7401,10 @@
     *: "Show Track Info"
   </source>
   <dest>
-    *: "Mostrar Info de Cançó"
+    *: "Mostrar Info de Pista"
   </dest>
   <voice>
-    *: "Mostrar Info de Cançó"
+    *: "Mostrar Info de Pista"
   </voice>
 </phrase>
 <phrase>
@@ -7610,7 +7611,7 @@
     *: "[Track Gain]"
   </source>
   <dest>
-    *: "[Track Gain]"
+    *: "[Guany de pista]"
   </dest>
   <voice>
     *: ""
@@ -7795,7 +7796,7 @@
     *: "Esborrant..."
   </dest>
   <voice>
-    *: "Deleting"
+    *: "Esborrant"
   </voice>
 </phrase>
 <phrase>
@@ -7836,11 +7837,11 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Establir de fons"
+    lcd_non-mono: "Establir com fons"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Establir de fons"
+    lcd_non-mono: "Establir com fons"
   </voice>
 </phrase>
 <phrase>
@@ -7853,7 +7854,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Backdrop Loaded"
+    lcd_non-mono: "Fons carregat"
   </dest>
   <voice>
     *: none
@@ -7870,7 +7871,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Backdrop Failed"
+    lcd_non-mono: "Càrrega de Fons Fallida"
   </dest>
   <voice>
     *: none
@@ -7992,7 +7993,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Semitone Up"
+    pitchscreen: "Semitó Amunt"
   </dest>
   <voice>
     *: none
@@ -8009,7 +8010,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Semitone Down"
+    pitchscreen: "Semitó Avall"
   </dest>
   <voice>
     *: none
@@ -9432,7 +9433,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilobits per second"
+    *: "kilobits per segon"
   </voice>
 </phrase>
 <phrase>
@@ -9981,7 +9982,7 @@
   </dest>
   <voice>
     *: none
-    remote: "remote while-playing-screen"
+    remote: "pantalla de reproducció remota"
   </voice>
 </phrase>
 <phrase>
@@ -10040,7 +10041,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Current time:"
+    rtc: "Hora actual:"
   </voice>
 </phrase>
 <phrase>
@@ -10142,7 +10143,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Freqüència de tall"
   </voice>
 </phrase>
 <phrase>
@@ -10478,11 +10479,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stereo"
+    recording: "Estèreo"
   </dest>
   <voice>
     *: none
-    recording: "Stereo"
+    recording: "Estèreo"
   </voice>
 </phrase>
 <phrase>
@@ -10563,11 +10564,11 @@
   </source>
   <dest>
     *: none
-    recording: "Int. Mic"
+    recording: "Mic. Intern"
   </dest>
   <voice>
     *: none
-    recording: "Internal Microphone"
+    recording: "Micròfon intern"
   </voice>
 </phrase>
 <phrase>
@@ -10631,11 +10632,11 @@
   </source>
   <dest>
     *: none
-    recording: "Trigger"
+    recording: "Disparador"
   </dest>
   <voice>
     *: none
-    recording: "Trigger"
+    recording: "Disparador"
   </voice>
 </phrase>
 <phrase>
@@ -10904,7 +10905,7 @@
     *: ""
   </dest>
   <voice>
-    *: "of"
+    *: "de"
   </voice>
 </phrase>
 <phrase>
@@ -11084,7 +11085,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "oh"
+    rtc: "zero"
   </voice>
 </phrase>
 <phrase>
@@ -11148,11 +11149,11 @@
   </source>
   <dest>
     *: none
-    usbstack: "Mode USB Stack"
+    usbstack: "Mode Stack USB"
   </dest>
   <voice>
     *: none
-    usbstack: "Mode U S B Stack"
+    usbstack: "Mode Stack U S B"
   </voice>
 </phrase>
 <phrase>
@@ -11182,11 +11183,11 @@
   </source>
   <dest>
     *: none
-    usbstack: "Host"
+    usbstack: "Hoste"
   </dest>
   <voice>
     *: none
-    usbstack: "Host"
+    usbstack: "Hoste"
   </voice>
 </phrase>
 <phrase>
@@ -11546,11 +11547,11 @@
   </source>
   <dest>
     *: none
-    accessory_supply: "Accessory Power Supply"
+    accessory_supply: "Font d'alimentació acc."
   </dest>
   <voice>
     *: none
-    accessory_supply: "Accessory Power Supply"
+    accessory_supply: "Font d'alimentació accesoria"
   </voice>
 </phrase>
 <phrase>
@@ -11561,10 +11562,10 @@
     *: "Unknown"
   </source>
   <dest>
-    *: "Unknown"
+    *: "Desconegut"
   </dest>
   <voice>
-    *: "Unknown"
+    *: "Desconegut"
   </voice>
 </phrase>
 <phrase>
@@ -11634,7 +11635,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Quick screen"
+    *: "Menú ràpid"
   </voice>
 </phrase>
 <phrase>
@@ -11661,11 +11662,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stop Recording And Shutdown"
+    recording: "Atura gravació i apaga"
   </dest>
   <voice>
     *: none
-    recording: "Stop Recording And Shutdown"
+    recording: "Atura gravació i apaga"
   </voice>
 </phrase>
 <phrase>
@@ -11678,11 +11679,11 @@
   </source>
   <dest>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatf: "Sensibilitat de Touchpad"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Touchpad Sensitivity"
+    gigabeatf: "Sensibilitat de Touchpad"
   </voice>
 </phrase>
 <phrase>
@@ -11766,10 +11767,10 @@
     *: "Skip Length"
   </source>
   <dest>
-    *: "Skip Length"
+    *: "Llargada de salt"
   </dest>
   <voice>
-    *: "Skip Length"
+    *: "Llargada de salt"
   </voice>
 </phrase>
 <phrase>
@@ -11780,10 +11781,10 @@
     *: "Skip Track"
   </source>
   <dest>
-    *: "Skip Track"
+    *: "Saltar Pista"
   </dest>
   <voice>
-    *: "Skip Track"
+    *: "Saltar Pista"
   </voice>
 </phrase>
 <phrase>
@@ -11810,11 +11811,11 @@
   </source>
   <dest>
     *: none
-    recording: "Gain L"
+    recording: "Guany L"
   </dest>
   <voice>
     *: none
-    recording: "Gain Left"
+    recording: "Guany Esquerra"
   </voice>
 </phrase>
 <phrase>
@@ -11827,11 +11828,11 @@
   </source>
   <dest>
     *: none
-    recording: "Gain R"
+    recording: "Guany R"
   </dest>
   <voice>
     *: none
-    recording: "Gain Right"
+    recording: "Guany Dreta"
   </voice>
 </phrase>
 <phrase>
@@ -11848,7 +11849,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Automatic gain control"
+    agc: "Control Automàtic de guany"
   </voice>
 </phrase>
 <phrase>
@@ -11861,11 +11862,11 @@
   </source>
   <dest>
     *: none
-    agc: "AGC clip time"
+    agc: "AGC llargada truncació"
   </dest>
   <voice>
     *: none
-    agc: "AGC clip time"
+    agc: "AGC llargada truncació"
   </voice>
 </phrase>
 <phrase>
@@ -11878,11 +11879,11 @@
   </source>
   <dest>
     *: none
-    agc: "AGC max. gain"
+    agc: "AGC guany màxim"
   </dest>
   <voice>
     *: none
-    agc: "AGC maximum gain"
+    agc: "AGC guany màxim"
   </voice>
 </phrase>
 <phrase>
@@ -11929,7 +11930,7 @@
   </source>
   <dest>
     *: none
-    recording: "Split Time:"
+    recording: "Temps Separació:"
   </dest>
   <voice>
     *: none
