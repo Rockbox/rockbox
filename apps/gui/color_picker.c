@@ -340,7 +340,7 @@ static int touchscreen_slider(struct rgb_pick *rgb, int *selected_slider)
     struct screen *display = &screens[SCREEN_MAIN];
     int      pressed_slider;
     char buf[2];
-    
+
     if (button == BUTTON_NONE)
         return ACTION_NONE;
     /* same logic as draw_screen */
@@ -375,7 +375,7 @@ static int touchscreen_slider(struct rgb_pick *rgb, int *selected_slider)
             return ACTION_STD_CANCEL;
     }
     y -= text_top;
-    pressed_slider = y/display->char_height;
+    pressed_slider = y/display->getcharheight();
     if (pressed_slider > (display_three_rows?2:0))
     {
         if (button == BUTTON_REL)
