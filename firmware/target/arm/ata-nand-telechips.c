@@ -184,11 +184,7 @@ static void nand_chip_select(int bank)
     else
     {
         /* NFC chip select */
-#ifdef USE_TCC_LPT
-        if (!(bank & 1))
-#else
         if (bank & 1)
-#endif
         {
             NFC_CTRL &= ~NFC_CS0;
             NFC_CTRL |= NFC_CS1;
@@ -524,11 +520,44 @@ static bool nand_read_sector_of_logical_segment(int log_segment, int sector,
 }
 
 
+/* Miscellaneous helper functions */
+
+static inline char get_segment_type(char* spare_buf)
+{
+    return spare_buf[OFF_SEGMENT_TYPE];
+}
+
+static inline unsigned short get_log_segment_id(char* spare_buf)
+{
+    return (spare_buf[OFF_LOG_SEG_HIBYTE] << 8) |
+            spare_buf[OFF_LOG_SEG_LOBYTE];
+}
+
+static inline unsigned short get_cached_page_id(char* spare_buf)
+{
+    return (spare_buf[OFF_CACHE_PAGE_HIBYTE] << 8) |
+            spare_buf[OFF_CACHE_PAGE_LOBYTE];
+}
+
+
+
 #ifdef USE_TCC_LPT
 
 /* Reading the LPT from NAND is not yet fully understood. This code is therefore
    not enabled by default, as it gives much worse results than the bank-scanning
-   approach currently used. */
+   approach currently used.
+   
+   The LPT is stored in a number of physical segments marked with type 0x12.
+   These are spread non-contiguously across the NAND, and are not stored in
+   sequential order.
+   
+   The LPT data is stored in Sector 0 of the first <n> pages of each segment.
+   Each 32-bit value in sequence represents the physical location of a logical
+   segment. This is stored as (physical segment number * bank number).
+   
+   NOTE: The bank numbers stored appear to be in reverse order to that required
+   by the nand_chip_select() function. The reason for this anomoly is unknown.
+*/
 
 static void read_lpt_block(int bank, int phys_segment)
 {
@@ -553,6 +582,10 @@ static void read_lpt_block(int bank, int phys_segment)
             int first_bank = int_buf[0] / segments_per_bank;
             int first_phys_segment = int_buf[0] % segments_per_bank;
 
+            /* Reverse the stored bank number */
+            if (total_banks > 1)
+                first_bank = (total_banks-1) - first_bank;
+
             unsigned char spare_buf[16];
 
             nand_read_raw(first_bank,
@@ -560,23 +593,24 @@ static void read_lpt_block(int bank, int phys_segment)
                           SECTOR_SIZE, /* offset */
                           16, spare_buf);
 
-            int first_log_segment = (spare_buf[OFF_LOG_SEG_HIBYTE] << 8) |
-                                     spare_buf[OFF_LOG_SEG_LOBYTE];
+            int first_log_segment = get_log_segment_id(spare_buf);
 
             lpt_ptr = &lpt_lookup[first_log_segment];
-
-#if defined(BOOTLOADER) && 1
-            printf("lpt @ %lx:%lx (ls:%lx)",
-                   first_bank, first_phys_segment, first_log_segment);
-#endif
         }
 
         while (cont && (i < SECTOR_SIZE/4))
         {
             if (int_buf[i] != 0xFFFFFFFF)
             {
-                lpt_ptr->bank = int_buf[i] / segments_per_bank;
-                lpt_ptr->phys_segment = int_buf[i] % segments_per_bank;
+                int bank = int_buf[i] / segments_per_bank;
+                int phys_segment = int_buf[i]  % segments_per_bank;
+
+                /* Reverse the stored bank number */
+                if (total_banks > 1)
+                    bank = (total_banks-1) - bank;
+
+                lpt_ptr->bank = bank;
+                lpt_ptr->phys_segment = phys_segment;
 
                 lpt_ptr++;
                 i++;
@@ -612,11 +646,8 @@ static void read_write_cache_segment(int bank, int phys_segment)
                       SECTOR_SIZE, /* offset to first sector's spare */
                       16, spare_buf);
 
-        cached_page = (spare_buf[OFF_CACHE_PAGE_HIBYTE] << 8) |
-                       spare_buf[OFF_CACHE_PAGE_LOBYTE];
-
-        log_segment = (spare_buf[OFF_LOG_SEG_HIBYTE] << 8) |
-                       spare_buf[OFF_LOG_SEG_LOBYTE];
+        cached_page = get_cached_page_id(spare_buf);
+        log_segment = get_log_segment_id(spare_buf);
 
         if (cached_page != 0xFFFF)
         {
@@ -775,7 +806,7 @@ int ata_init(void)
                           SECTOR_SIZE, /* offset */
                           16, spare_buf);
 
-            switch (spare_buf[4]) /* block type */
+            switch (get_segment_type(spare_buf))
             {
 #ifdef USE_TCC_LPT
                 case SEGMENT_MAIN_LPT:
@@ -788,9 +819,7 @@ int ata_init(void)
                 case SEGMENT_MAIN_DATA2:
                 {
                     /* Main data area segment */
-                    unsigned short log_segment
-                      = (spare_buf[OFF_LOG_SEG_HIBYTE] << 8) |
-                         spare_buf[OFF_LOG_SEG_LOBYTE];
+                    unsigned short log_segment = get_log_segment_id(spare_buf);
 
                     if (log_segment < MAX_SEGMENTS)
                     {
@@ -822,14 +851,12 @@ int ata_init(void)
                           SECTOR_SIZE, /* offset */
                           16, spare_buf);
 
-            switch (spare_buf[4]) /* block type */
+            switch (get_segment_type(spare_buf)) /* block type */
             {
                 case SEGMENT_MAIN_DATA1:
                 {
                     /* Main data area segment */
-                    unsigned short log_segment
-                      = (spare_buf[OFF_LOG_SEG_HIBYTE] << 8) |
-                         spare_buf[OFF_LOG_SEG_LOBYTE];
+                    unsigned short log_segment = get_log_segment_id(spare_buf);
 
                     if (log_segment < MAX_SEGMENTS)
                     {
