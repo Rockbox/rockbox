@@ -66,19 +66,6 @@ int tenthdb2master(int db)
     }
 }
 
-/* convert tenth of dB volume (-780..0) to mixer volume register value */
-int tenthdb2mixer(int db)
-{
-    if (db < -660)                 /* 1.5 dB steps */
-        return (2640 - db) / 15;
-    else if (db < -600)            /* 0.75 dB steps */
-        return (990 - db) * 2 / 15;
-    else if (db < -460)            /* 0.5 dB steps */
-        return (460 - db) / 5; 
-    else                           /* 0.25 dB steps */
-        return -db * 2 / 5;
-}
-
 void audiohw_mute(bool mute)
 {
     if (mute)

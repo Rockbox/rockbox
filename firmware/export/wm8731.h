@@ -27,7 +27,6 @@
 #define VOLUME_MAX  60
 
 extern int tenthdb2master(int db);
-extern int tenthdb2mixer(int db);
 
 extern void audiohw_set_master_vol(int vol_l, int vol_r);
 extern void audiohw_set_nsorder(int order);
