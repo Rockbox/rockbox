@@ -70,23 +70,27 @@ static gdImagePtr backdrop;
 extern gdImagePtr gdImageCreateFromBmp(FILE * inFile);
 extern char *get_current_dir_name (void) __THROW;
 
+static bool next_nl = false;
+
 int _debug(const char* fmt,...)
 {
-#if 0 /* Doesn't want to compile ?? */
-    struct va_list ap;
+    va_list ap;
     
     va_start(ap, fmt);
     
-    fprintf(stdout, "[DBG]  ");
+    if(!next_nl)
+        fprintf(stdout, "[DBG]  ");
+    
     vfprintf(stdout, fmt, ap);
-    fprintf(stdout, "\n");
+    
+    if(fmt[strlen(fmt)-1] != 0xa)
+        next_nl = true;
+    else
+        next_nl = false;
     
     va_end(ap);
 
     return 0;
-#else
-    return -1;
-#endif
 }
 
 void _putsxy(int x, int y, const unsigned char *str)
@@ -106,7 +110,7 @@ void _transparent_bitmap_part(const void *src, int src_x, int src_y,
     gdImagePtr image;
     int pink;
     
-    DEBUGF2("transparent_bitmap_part(const void *src=%s, int src_x=%d, int src_y=%d, int stride=%d, int x=%d, int y=%d, int width=%d, int height=%d", (char*)src, src_x, src_y, stride, x, y, width, height);
+    DEBUGF2("transparent_bitmap_part(const void *src=%s, int src_x=%d, int src_y=%d, int stride=%d, int x=%d, int y=%d, int width=%d, int height=%d\n", (char*)src, src_x, src_y, stride, x, y, width, height);
     
     _image = fopen(src, "rb");
     if(_image == NULL)
@@ -129,7 +133,7 @@ void _bitmap_part(const void *src, int src_x, int src_y,
     FILE *_image;
     gdImagePtr image;
     
-    DEBUGF2("bitmap_part(const void *src=%s, int src_x=%d, int src_y=%d, int stride=%d, int x=%d, int y=%d, int width=%d, int height=%d", (char*)src, src_x, src_y, stride, x, y, width, height);
+    DEBUGF2("bitmap_part(const void *src=%s, int src_x=%d, int src_y=%d, int stride=%d, int x=%d, int y=%d, int width=%d, int height=%d\n", (char*)src, src_x, src_y, stride, x, y, width, height);
     
     _image = fopen(src, "rb");
     if(_image == NULL)
@@ -231,6 +235,7 @@ static int screenshot(char *model, char *wps, char *png)
     char lib[255];
     void *handle;
     FILE *out, *in;
+    int res;
     
     in = fopen(wps, "rb");
     if(in == NULL)
@@ -287,25 +292,19 @@ static int screenshot(char *model, char *wps, char *png)
     api.read_bmp_file =              &_read_bmp_file;
     api.debugf =                     &_debug;
     
-    wps_init(wps, &api, true);
+    res = wps_init(wps, &api, true);
+    if(res != 1)
+    {
+        fprintf(stderr, "[ERR]  WPS wasn't correctly inited\n");
+        dlclose(handle);
+        fclose(out);
+        return -5;
+    }
     
     framebuffer = gdImageCreateTrueColor(api.getwidth(), api.getheight());
 
     _drawBackdrop();
     
-    if(strcmp(api.get_model_name(), model) != 0)
-    {
-        fprintf(stderr, "[ERR]  Model name doesn't match the one supplied by the library\n");
-        fprintf(stderr, "       %s <-> %s\n", model, api.get_model_name());
-        dlclose(handle);
-        fclose(out);
-        gdImageDestroy(framebuffer);
-        gdImageDestroy(backdrop);
-        wps_init = NULL;
-        wps_display = NULL;
-        wps_refresh = NULL;
-        return -5;
-    }
     fprintf(stdout, "[INFO] Model: %s\n", api.get_model_name());
     
     wpsdata.fontheight = getFont()->h;
@@ -323,7 +322,8 @@ static int screenshot(char *model, char *wps, char *png)
     dlclose(handle);
     fclose(out);
     gdImageDestroy(framebuffer);
-    gdImageDestroy(backdrop);
+    if(backdrop != NULL)
+        gdImageDestroy(backdrop);
     
     wps_init = NULL;
     wps_display = NULL;
@@ -334,13 +334,29 @@ static int screenshot(char *model, char *wps, char *png)
 
 static void usage(void)
 {
-    fprintf(stderr, "Usage: screenshot [-V] <MODEL> <WPS_FILE> <OUT_PNG>\n");
-    fprintf(stderr, "Example: screenshot h10_5gb iCatcher.wps out.png\n");
+    fprintf(stderr, "Rockbox WPS screenshot utility\n");
+    fprintf(stderr, "Made by Maurus Cuelenaere\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "Usage: screenshot [-V] <MODEL> <WPS> <OUT>.png\n");
+    fprintf(stderr, "     -> creates a PNG screenshot of the WPS for the specific MODEL\n");
+    fprintf(stderr, "     -> libwps_<MODEL>.so must be present in the same directory\n");
+    fprintf(stderr, "     -> -V sets verbose mode ON\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "Example: screenshot IRIVER_H10_5GB iCatcher.wps out.png\n");
 }
 
 int main(int argc, char ** argv)
 {  
     if(argc < 4)
+    {
+        usage();
+        return -1;
+    }
+    
+    if(argv[1] == NULL || argv[2] == NULL ||
+       argv[3] == NULL ||
+       (strcmp(argv[1], "-V") == 0 && argv[4] == NULL)
+      )
     {
         usage();
         return -1;

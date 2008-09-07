@@ -21,6 +21,7 @@
  *
  ****************************************************************************/
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
@@ -845,6 +846,8 @@ static struct player_info_t players[] = {
     {NULL, NULL, NULL, NULL, false}
 };
 
+void log_message(const char* format, ...);
+
 int mkboot(const char* infile, const char* bootfile, const char* outfile, struct player_info_t *player)
 {
     FILE *infd, *bootfd, *outfd;
@@ -856,21 +859,21 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     infd = fopen(infile, "rb");
     if(infd == NULL)
     {
-        fprintf(stderr, "[ERR]  Could not open %s\n", infile);
+        log_message("[ERR]  Could not open %s\n", infile);
         return -1;
     }
     
     buffer = malloc(filesize(infd));
     if(buffer == NULL)
     {
-        fprintf(stderr, "[ERR]  Could not allocate %d unsigned chars\n", filesize(infd));
+        log_message("[ERR]  Could not allocate %d unsigned chars\n", filesize(infd));
         fclose(infd);
         return -2;
     }
     
     if(fread(buffer, filesize(infd), 1, infd) != 1)
     {
-        fprintf(stderr, "[ERR]  Short read\n");
+        log_message("[ERR]  Short read\n");
         fclose(infd);
         free(buffer);
         return -3;
@@ -882,7 +885,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     if(memcmp(&buffer[0], "MZ", 2) != 0 &&
        memcmp(&buffer[0x118], "PE", 2) != 0)
     {
-        fprintf(stderr, "[ERR]  Input file isn't an executable\n");
+        log_message("[ERR]  Input file isn't an executable\n");
         free(buffer);
         return -4;
     }
@@ -900,46 +903,46 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     
     if(data_ptr == 0 || data_size == 0)
     {
-        fprintf(stderr, "[ERR]  Couldn't find .data section\n");
+        log_message("[ERR]  Couldn't find .data section\n");
         free(buffer);
         return -5;
     }
     
-    fprintf(stderr, "[INFO] .data section is at 0x%x with size 0x%x\n", data_ptr, data_size);
+    log_message("[INFO] .data section is at 0x%x with size 0x%x\n", data_ptr, data_size);
     
     fw_offset = find_firmware_offset(&buffer[data_ptr], data_size);
     if(fw_offset == 0)
     {
-        fprintf(stderr, "[ERR]  Couldn't find firmware offset\n");
+        log_message("[ERR]  Couldn't find firmware offset\n");
         free(buffer);
         return -6;
     }
     fw_size = le2int(&buffer[data_ptr+fw_offset]);
-    fprintf(stderr, "[INFO] Firmware offset is at 0x%x with size 0x%x\n", data_ptr+fw_offset, fw_size);
+    log_message("[INFO] Firmware offset is at 0x%x with size 0x%x\n", data_ptr+fw_offset, fw_size);
     
     fw_key = find_firmware_key(&buffer[0], filesize(infd));
     if(fw_key == NULL)
     {
-        fprintf(stderr, "[ERR]  Couldn't find firmware key\n");
+        log_message("[ERR]  Couldn't find firmware key\n");
         free(buffer);
         return -7;
     }
-    fprintf(stderr, "[INFO] Firmware key is %s\n", fw_key);
+    log_message("[INFO] Firmware key is %s\n", fw_key);
     
-    fprintf(stderr, "[INFO] Descrambling firmware... ");
+    log_message("[INFO] Descrambling firmware... ");
     if(!crypt_firmware(fw_key, &buffer[data_ptr+fw_offset+4], fw_size))
     {
-        fprintf(stderr, "Fail!\n");
+        log_message("Fail!\n");
         free(buffer);
         return -8;
     }
     else
-        fprintf(stderr, "Done!\n");
+        log_message("Done!\n");
     
     out_buffer = malloc(fw_size*2);
     if(out_buffer == NULL)
     {
-        fprintf(stderr, "[ERR]  Couldn't allocate %d unsigned chars", fw_size*2);
+        log_message("[ERR]  Couldn't allocate %d unsigned chars", fw_size*2);
         free(buffer);
         return -9;
     }
@@ -947,23 +950,23 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     memset(out_buffer, 0, fw_size*2);
     
     err_msg = NULL;
-    fprintf(stderr, "[INFO] Decompressing firmware... ");
+    log_message("[INFO] Decompressing firmware... ");
     if(!inflate_to_buffer(&buffer[data_ptr+fw_offset+4], fw_size, out_buffer, fw_size*2, &err_msg))
     {
-        fprintf(stderr, "Fail!\n[ERR]  ZLib error: %s\n", err_msg);
+        log_message("Fail!\n[ERR]  ZLib error: %s\n", err_msg);
         free(buffer);
         free(out_buffer);
         return -10;
     }
     else
     {
-        fprintf(stderr, "Done!\n");
+        log_message("Done!\n");
         free(buffer);
     }
     
     if(memcmp(out_buffer, "FFIC", 4) != 0)
     {
-        fprintf(stderr, "[ERR]  CIFF header doesn't match\n");
+        log_message("[ERR]  CIFF header doesn't match\n");
         free(out_buffer);
         return -11;
     }
@@ -973,7 +976,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     bootfd = fopen(bootfile, "rb");
     if(bootfd == NULL)
     {
-        fprintf(stderr, "[ERR]  Could not open %s\n", bootfile);
+        log_message("[ERR]  Could not open %s\n", bootfile);
         free(out_buffer);
         return -12;
     }
@@ -981,12 +984,12 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     out_buffer = realloc(out_buffer, ciff_size+filesize(bootfd));
     if(out_buffer == NULL)
     {
-        fprintf(stderr, "[ERR]  Cannot allocate %d unsigned chars\n", ciff_size+40+filesize(bootfd));
+        log_message("[ERR]  Cannot allocate %d unsigned chars\n", ciff_size+40+filesize(bootfd));
         fclose(bootfd);
         return -13;
     }
     
-    fprintf(stderr, "[INFO] Locating encoded block... ");
+    log_message("[INFO] Locating encoded block... ");
     
     i = 8;
     while(memcmp(&out_buffer[i], " LT©", 4) != 0 && i < ciff_size)
@@ -1001,7 +1004,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         }
         else
         {
-            fprintf(stderr, "Fail!\n[ERR]  Unknown block\n");
+            log_message("Fail!\n[ERR]  Unknown block\n");
             fclose(bootfd);
             free(out_buffer);
             return -14;
@@ -1010,18 +1013,18 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     
     if(i > ciff_size || memcmp(&out_buffer[i], " LT©", 4) != 0)
     {
-        fprintf(stderr, "Fail!\n[ERR]  Couldn't find encoded block\n");
+        log_message("Fail!\n[ERR]  Couldn't find encoded block\n");
         fclose(bootfd);
         free(out_buffer);
         return -15;
     }
     
-    fprintf(stderr, "Done!\n");
+    log_message("Done!\n");
     
     outfd = fopen(outfile, "wb+");
     if(outfd == NULL)
     {
-        fprintf(stderr, "[ERR]  Could not open %s\n", outfile);
+        log_message("[ERR]  Could not open %s\n", outfile);
         fclose(bootfd);
         free(out_buffer);
         return -16;
@@ -1029,14 +1032,14 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     
     if(fwrite(&out_buffer[0], i, 1, outfd) != 1)
     {
-        fprintf(stderr, "[ERR]  Short write\n");
+        log_message("[ERR]  Short write\n");
         fclose(bootfd);
         fclose(outfd);
         free(out_buffer);
         return -17;
     }
     
-    fprintf(stderr, "[INFO] Decrypting encoded block... ");
+    log_message("[INFO] Decrypting encoded block... ");
     
     iv[0] = 0;
     iv[1] = swap(le2int(&out_buffer[i+4]));
@@ -1044,20 +1047,20 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
                       le2int(&out_buffer[i+4]), (const unsigned char*)&iv)
        == false)
     {
-        fprintf(stderr, "Fail!\n[ERR]  Couldn't decrypt encoded block\n");
+        log_message("Fail!\n[ERR]  Couldn't decrypt encoded block\n");
         fclose(bootfd);
         fclose(outfd);
         free(out_buffer);
         return -18;
     }
     
-    fprintf(stderr, "Done!\n");
+    log_message("Done!\n");
     
     cenc_size = le2int(&out_buffer[i+8]);
     
     if(cenc_size > le2int(&out_buffer[i+4])*3)
     {
-        fprintf(stderr, "[ERR]  Decrypted length of encoded block is unexpectedly large: 0x%08x\n", cenc_size);
+        log_message("[ERR]  Decrypted length of encoded block is unexpectedly large: 0x%08x\n", cenc_size);
         fclose(bootfd);
         fclose(outfd);
         free(out_buffer);
@@ -1067,7 +1070,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     buffer = malloc(cenc_size);
     if(buffer == NULL)
     {
-        fprintf(stderr, "[ERR]  Couldn't allocate %d unsigned chars\n", cenc_size);
+        log_message("[ERR]  Couldn't allocate %d unsigned chars\n", cenc_size);
         fclose(bootfd);
         fclose(outfd);
         free(out_buffer);
@@ -1076,11 +1079,11 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     
     memset(buffer, 0, cenc_size);
     
-    fprintf(stderr, "[INFO] Decompressing encoded block... ");
+    log_message("[INFO] Decompressing encoded block... ");
     
     if(!cenc_decode(&out_buffer[i+12], le2int(&out_buffer[i+4])-4, &buffer[0], cenc_size))
     {
-        fprintf(stderr, "Fail!\n[ERR]  Couldn't decompress the encoded block\n");
+        log_message("Fail!\n[ERR]  Couldn't decompress the encoded block\n");
         fclose(bootfd);
         fclose(outfd);
         free(out_buffer);
@@ -1088,9 +1091,9 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         return -21;
     }
     
-    fprintf(stderr, "Done!\n");
+    log_message("Done!\n");
     
-    fprintf(stderr, "[INFO] Renaming encoded block to Hcreativeos.jrm... ");
+    log_message("[INFO] Renaming encoded block to Hcreativeos.jrm... ");
     
     memcpy(&enc_data, "ATAD", 4);
     int2le(cenc_size+32, &enc_data[4]);
@@ -1098,7 +1101,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     memcpy(&enc_data[8], "H\0c\0r\0e\0a\0t\0i\0v\0e\0o\0s\0.\0j\0r\0m", 30);
     if(fwrite(enc_data, 40, 1, outfd) != 1)
     {
-        fprintf(stderr, "Fail!\n[ERR]  Short write\n");
+        log_message("Fail!\n[ERR]  Short write\n");
         fclose(bootfd);
         fclose(outfd);
         free(out_buffer);
@@ -1108,7 +1111,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     
     if(fwrite(&buffer[0], cenc_size, 1, outfd) != 1)
     {
-        fprintf(stderr, "Fail!\n[ERR]  Short write\n");
+        log_message("Fail!\n[ERR]  Short write\n");
         fclose(bootfd);
         fclose(outfd);
         free(out_buffer);
@@ -1117,7 +1120,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     }
     
     free(buffer);
-    fprintf(stderr, "Done!\n[INFO] Adding Hjukebox2.jrm... ");
+    log_message("Done!\n[INFO] Adding Hjukebox2.jrm... ");
     
     memcpy(&enc_data, "ATAD", 4);
     int2le(filesize(bootfd)+32, &enc_data[4]);
@@ -1125,7 +1128,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     memcpy(&enc_data[8], "H\0j\0u\0k\0e\0b\0o\0x\0""2\0.\0j\0r\0m", 26);
     if(fwrite(enc_data, 40, 1, outfd) != 1)
     {
-        fprintf(stderr, "Fail!\n[ERR]  Short write\n");
+        log_message("Fail!\n[ERR]  Short write\n");
         fclose(bootfd);
         fclose(outfd);
         free(out_buffer);
@@ -1134,7 +1137,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     
     if(fread(&out_buffer[ciff_size], filesize(bootfd), 1, bootfd) != 1)
     {
-        fprintf(stderr, "Fail!\n[ERR]  Short read\n");
+        log_message("Fail!\n[ERR]  Short read\n");
         fclose(bootfd);
         fclose(outfd);
         free(out_buffer);
@@ -1143,7 +1146,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     
     if(memcmp(&out_buffer[ciff_size], "EDOC", 4) != 0)
     {
-        fprintf(stderr, "Fail!\n[ERR]  Faulty bootloader\n");
+        log_message("Fail!\n[ERR]  Faulty bootloader\n");
         free(out_buffer);
         fclose(bootfd);
         fclose(outfd);
@@ -1152,7 +1155,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     
     if(fwrite(&out_buffer[ciff_size], filesize(bootfd), 1, outfd) != 1)
     {
-        fprintf(stderr, "Fail!\n[ERR]  Short write\n");
+        log_message("Fail!\n[ERR]  Short write\n");
         fclose(bootfd);
         fclose(outfd);
         free(out_buffer);
@@ -1160,11 +1163,11 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     }
     
     fclose(bootfd);
-    fprintf(stderr, "Done!\n");
+    log_message("Done!\n");
     
     if(fwrite(&out_buffer[i+8+le2int(&out_buffer[i+4])], ciff_size-i-8-le2int(&out_buffer[i+4]), 1, outfd) != 1)
     {
-        fprintf(stderr, "[ERR]  Short write\n");
+        log_message("[ERR]  Short write\n");
         fclose(bootfd);
         fclose(outfd);
         free(out_buffer);
@@ -1175,7 +1178,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     int2le(filesize(outfd)-8-28, enc_data);
     if(fwrite(enc_data, 4, 1, outfd) != 1)
     {
-        fprintf(stderr, "[ERR]  Short write\n");
+        log_message("[ERR]  Short write\n");
         fclose(outfd);
         free(out_buffer);
         return -29;
@@ -1184,12 +1187,12 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     free(out_buffer);
     fflush(outfd);
     
-    fprintf(stderr, "[INFO] Updating checksum... ");
+    log_message("[INFO] Updating checksum... ");
     
     buffer = malloc(filesize(outfd)-28);
     if(buffer == NULL)
     {
-        fprintf(stderr, "Fail!\n[ERR]  Couldn't allocate %d unsigned chars\n", filesize(outfd)-28);
+        log_message("Fail!\n[ERR]  Couldn't allocate %d unsigned chars\n", filesize(outfd)-28);
         fclose(outfd);
         return -30;
     }
@@ -1197,7 +1200,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     fseek(outfd, 0, SEEK_SET);
     if(fread(buffer, filesize(outfd)-28, 1, outfd) != 1)
     {
-        fprintf(stderr, "Fail!\n[ERR]  Short read\n");
+        log_message("Fail!\n[ERR]  Short read\n");
         fclose(outfd);
         free(buffer);
         return -31;
@@ -1208,7 +1211,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     fseek(outfd, filesize(outfd)-20, SEEK_SET);
     if(fwrite(hash_key, 20, 1, outfd) != 1)
     {
-        fprintf(stderr, "Fail!\n[ERR]  Short write\n");
+        log_message("Fail!\n[ERR]  Short write\n");
         fclose(outfd);
         free(buffer);
         return -32;
@@ -1216,7 +1219,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     
     fclose(outfd);
     
-    fprintf(stderr, "Done!\n");
+    log_message("Done!\n");
     return 0;
 }
 
@@ -1225,12 +1228,23 @@ static void usage(void)
 {
     int i;
     
-    printf("Usage: mkzenboot <firmware file> <boot file> <output file> <player>\n");
-    printf("Players:\n");
+    fprintf(stdout, "Usage: mkzenboot <firmware file> <boot file> <output file> <player>\n");
+    fprintf(stdout, "Players:\n");
     for (i = 0; players[i].name != NULL; i++)
-        printf(" * \"%s\"\n", players[i].name);
+        fprintf(stdout, " * \"%s\"\n", players[i].name);
     
     exit(1);
+}
+
+void log_message(const char* format, ...)
+{
+    va_list ap;
+    
+    va_start(ap, format);
+    
+    vfprintf(stderr, format, ap);
+    
+    va_end(ap);
 }
 
 int main(int argc, char *argv[])
