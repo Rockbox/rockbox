@@ -197,7 +197,7 @@ else
   pathadd="$bindir"
 fi
 
-mkdir $builddir
+mkdir -p $builddir
 cd $builddir
 
 summary="summary-$1"
@@ -291,12 +291,15 @@ echo "Select target arch:"
 echo "s   - sh       (Archos models)"
 echo "m   - m68k     (iriver h1x0/h3x0, ifp7x0 and iaudio)"
 echo "a   - arm      (ipods, iriver H10, Sansa, etc)"
-echo "all - all three compilers above"
 echo "i   - mips     (Jz4740 and ATJ-based players)"
+echo "separate multiple targets with spaces"
+echo "(i.e. \"s m a\" will build sh, m86k and arm)"
 echo ""
 
-arch=`input`
+selarch=`input`
 
+for arch in $selarch
+do
 echo ""
 case $arch in
   [Ss])
@@ -311,30 +314,20 @@ case $arch in
   [Aa])
     buildone $arch
     ;;
-  all)
-    echo "Building all compilers..."
-    echo ""
-    buildone s
-    cleardir $builddir
-
-    buildone m
-    cleardir $builddir
-
-    buildone a
-
-    # include this when we want MIPS added in the "build all"
-    #buildone i
-
-    # show the summaries:
-    cat $builddir/summary-*
-    ;;
   *)
     echo "An unsupported architecture option: $arch"
     exit
     ;;
 esac
 
+echo "Cleaning up build folder"
+cleardir $builddir
 echo ""
 echo "Done!"
 echo ""
 echo "Make your PATH include $pathadd"
+
+done
+
+# show the summaries:
+cat $builddir/summary-*
