@@ -32,6 +32,73 @@
 
 #include "screen_access.h"
 
+/* some helper functions to calculate metrics on the fly */
+static int screen_helper_getcharwidth(void)
+{
+#ifdef HAVE_LCD_BITMAP
+    return font_get(lcd_getfont())->maxwidth;
+#else
+    return 1;
+#endif
+}
+
+static int screen_helper_getcharheight(void)
+{
+#ifdef HAVE_LCD_BITMAP
+    return font_get(lcd_getfont())->height;
+#else
+    return 1;
+#endif
+}
+
+static int screen_helper_getnblines(void)
+{
+    int height=screens[0].lcdheight;
+#ifdef HAVE_LCD_BITMAP
+    if(global_settings.statusbar)
+        height -= STATUSBAR_HEIGHT;
+#ifdef HAVE_BUTTONBAR
+    if(global_settings.buttonbar && screens[0].has_buttonbar)
+        height -= BUTTONBAR_HEIGHT;
+#endif
+#endif
+    return height / screens[0].getcharheight();
+}
+
+#if NB_SCREENS == 2
+static int screen_helper_remote_getcharwidth(void)
+{
+#ifdef HAVE_LCD_BITMAP
+    return font_get(lcd_remote_getfont())->maxwidth;
+#else
+    return 1;
+#endif
+}
+
+static int screen_helper_remote_getcharheight(void)
+{
+#ifdef HAVE_LCD_BITMAP
+    return font_get(lcd_remote_getfont())->height;
+#else
+    return 1;
+#endif
+}
+
+static int screen_helper_remote_getnblines(void)
+{
+    int height=screens[1].lcdheight;
+#ifdef HAVE_LCD_BITMAP
+    if(global_settings.statusbar)
+        height -= STATUSBAR_HEIGHT;
+#ifdef HAVE_BUTTONBAR
+    if(global_settings.buttonbar && screens[0].has_buttonbar)
+        height -= BUTTONBAR_HEIGHT;
+#endif
+#endif
+    return height / screens[1].getcharheight();
+}
+#endif
+
 struct screen screens[NB_SCREENS] =
 {
     {
@@ -39,6 +106,7 @@ struct screen screens[NB_SCREENS] =
         .lcdwidth=LCD_WIDTH,
         .lcdheight=LCD_HEIGHT,
         .depth=LCD_DEPTH,
+        .getnblines=&screen_helper_getnblines,
 #if defined(HAVE_LCD_COLOR)
         .is_color=true,
 #else
@@ -47,6 +115,8 @@ struct screen screens[NB_SCREENS] =
 #ifdef HAVE_LCD_BITMAP
         .pixel_format=LCD_PIXELFORMAT,
 #endif
+        .getcharwidth=screen_helper_getcharwidth,
+        .getcharheight=screen_helper_getcharheight,
 #if (CONFIG_LED == LED_VIRTUAL)
         .has_disk_led=false,
 #elif defined(HAVE_REMOTE_LCD)
@@ -137,8 +207,11 @@ struct screen screens[NB_SCREENS] =
         .lcdwidth=LCD_REMOTE_WIDTH,
         .lcdheight=LCD_REMOTE_HEIGHT,
         .depth=LCD_REMOTE_DEPTH,
+        .getnblines=&screen_helper_remote_getnblines,
         .is_color=false,/* No color remotes yet */
         .pixel_format=LCD_REMOTE_PIXELFORMAT,
+        .getcharwidth=screen_helper_remote_getcharwidth,
+        .getcharheight=screen_helper_remote_getcharheight,
         .has_disk_led=false,
         .set_viewport=&lcd_remote_set_viewport,
         .getwidth=&lcd_remote_getwidth,
@@ -219,32 +292,3 @@ void screen_clear_area(struct screen * display, int xstart, int ystart,
     display->set_drawmode(DRMODE_SOLID);
 }
 #endif
-
-void screen_access_init(void)
-{
-    int i;
-    struct screen *display;
-    FOR_NB_SCREENS(i)
-    {
-        display = &screens[i];
-#ifdef HAVE_LCD_BITMAP
-        ((struct screen*)&screens[i])->setfont(FONT_UI);
-#endif
-
-        int height=display->lcdheight;
-#ifdef HAVE_LCD_BITMAP
-        if(global_settings.statusbar)
-            height -= STATUSBAR_HEIGHT;
-#ifdef HAVE_BUTTONBAR
-        if(global_settings.buttonbar && display->has_buttonbar)
-            height -= BUTTONBAR_HEIGHT;
-#endif
-        display->getstringsize((unsigned char *)"A", &display->char_width,
-                                &display->char_height);
-#else
-        display->char_width  = 1;
-        display->char_height = 1;
-#endif
-        display->nb_lines = height / display->char_height;
-    }
-}

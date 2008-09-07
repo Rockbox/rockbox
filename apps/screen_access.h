@@ -60,12 +60,12 @@ struct screen
     enum screen_type screen_type;
     int lcdwidth, lcdheight;
     int depth;
-    int nb_lines;
+    int (*getnblines)(void);
 #ifdef HAVE_LCD_BITMAP
     int pixel_format;
 #endif
-    int char_width;
-    int char_height;
+    int (*getcharwidth)(void);
+    int (*getcharheight)(void);
     bool is_color;
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     bool has_disk_led;
@@ -164,11 +164,6 @@ struct screen
 void screen_clear_area(struct screen * display, int xstart, int ystart,
                        int width, int height);
 #endif
-
-/*
- * Initializes the whole screen_access api
- */
-extern void screen_access_init(void);
 
 /*
  * exported screens array that should be used

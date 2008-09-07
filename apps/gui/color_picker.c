@@ -158,11 +158,12 @@ static void draw_screen(struct screen *display, char *title,
        enough to display the selected slider - calculate total height
        of display with three sliders present */
     display_three_rows =
-        display->getheight() >= MARGIN_TOP             +
-                                display->char_height*4 + /* Title + 3 sliders */
-                                TITLE_MARGIN_BOTTOM    +
-                                SELECTOR_TB_MARGIN*6   + /* 2 margins/slider  */
-                                MARGIN_BOTTOM;
+        display->getheight() >=
+            MARGIN_TOP                 +
+            display->getcharheight()*4 + /* Title + 3 sliders */
+            TITLE_MARGIN_BOTTOM        +
+            SELECTOR_TB_MARGIN*6       + /* 2 margins/slider  */
+            MARGIN_BOTTOM;
 
     /* Figure out widest label character in case they vary -
        this function assumes labels are one character */
@@ -185,8 +186,8 @@ static void draw_screen(struct screen *display, char *title,
     slider_left  = MARGIN_LEFT + SELECTOR_WIDTH + SELECTOR_LR_MARGIN +
                    max_label_width + SLIDER_MARGIN_LEFT;
     slider_width = display->getwidth() - slider_left - SLIDER_MARGIN_RIGHT -
-                   display->char_width*2 - SELECTOR_LR_MARGIN - SELECTOR_WIDTH -
-                   MARGIN_RIGHT;
+                   display->getcharwidth()*2 - SELECTOR_LR_MARGIN -
+                   SELECTOR_WIDTH - MARGIN_RIGHT;
 
     for (i = 0; i < 3; i++)
     {
@@ -209,7 +210,7 @@ static void draw_screen(struct screen *display, char *title,
                 display->fillrect(0,
                                   text_top - SELECTOR_TB_MARGIN,
                                   display->getwidth(),
-                                  display->char_height +
+                                  display->getcharheight() +
                                   SELECTOR_TB_MARGIN*2);
 
                 if (display->depth < 16)
@@ -221,7 +222,7 @@ static void draw_screen(struct screen *display, char *title,
             else if (display_three_rows)
             {
                 /* Draw ">    <" around sliders */
-                int top = text_top + (display->char_height -
+                int top = text_top + (display->getcharheight() -
                                       SELECTOR_HEIGHT) / 2;
                 screen_put_iconxy(display, MARGIN_LEFT, top, Icon_Cursor);
                 screen_put_iconxy(display, 
@@ -244,7 +245,7 @@ static void draw_screen(struct screen *display, char *title,
         /* Draw label */
         buf[0] = str(LANG_COLOR_RGB_LABELS)[i];
         buf[1] = '\0';
-        display->putsxy(slider_left - display->char_width -
+        display->putsxy(slider_left - display->getcharwidth() -
                         SLIDER_MARGIN_LEFT, text_top, buf);
 
         /* Draw color value */
@@ -255,23 +256,20 @@ static void draw_screen(struct screen *display, char *title,
         /* Draw scrollbar */
         gui_scrollbar_draw(display,
                            slider_left,
-                           text_top + display->char_height / 4,
+                           text_top + display->getcharheight() / 4,
                            slider_width,
-                           display->char_height / 2,
+                           display->getcharheight() / 2,
                            rgb_max[i],
                            0,
                            rgb->rgb_val[i],
                            sb_flags);
 
         /* Advance to next line */
-        text_top += display->char_height + 2*SELECTOR_TB_MARGIN;
+        text_top += display->getcharheight() + 2*SELECTOR_TB_MARGIN;
 
         if (!display_three_rows)
             break;
     } /* end for */
-
-    /* Draw color value in system font */
-    display->setfont(FONT_SYSFIXED);
 
     /* Format RGB: #rrggbb */
     snprintf(buf, sizeof(buf), str(LANG_COLOR_RGB_VALUE),
@@ -287,7 +285,7 @@ static void draw_screen(struct screen *display, char *title,
         int height = display->getheight() - top - MARGIN_BOTTOM;
 
         /* Only draw if room */
-        if (height >= display->char_height + 2)
+        if (height >= display->getcharheight() + 2)
         {
             display->set_foreground(rgb->color);
             display->fillrect(left, top, width, height);
@@ -357,19 +355,21 @@ static int touchscreen_slider(struct rgb_pick *rgb, int *selected_slider)
             max_label_width = x1;
     }
     /* Get slider positions and top starting position */
-    text_top     = MARGIN_TOP + display->char_height + TITLE_MARGIN_BOTTOM + SELECTOR_TB_MARGIN;
+    text_top     = MARGIN_TOP + display->getcharheight() + TITLE_MARGIN_BOTTOM +
+                   SELECTOR_TB_MARGIN;
     slider_left  = MARGIN_LEFT + SELECTOR_WIDTH + SELECTOR_LR_MARGIN +
                    max_label_width + SLIDER_MARGIN_LEFT;
     slider_width = display->getwidth() - slider_left - SLIDER_MARGIN_RIGHT -
-                   display->char_width*2 - SELECTOR_LR_MARGIN - SELECTOR_WIDTH -
-                   MARGIN_RIGHT;
+                   display->getcharwidth()*2 - SELECTOR_LR_MARGIN -
+                   SELECTOR_WIDTH - MARGIN_RIGHT;
     display_three_rows =
-        display->getheight() >= MARGIN_TOP        +
-                           display->char_height*4 + /* Title + 3 sliders */
-                           TITLE_MARGIN_BOTTOM    +
-                           SELECTOR_TB_MARGIN*6   + /* 2 margins/slider  */
-                           MARGIN_BOTTOM;
-    if (y < MARGIN_TOP+display->char_height)
+        display->getheight() >=
+            MARGIN_TOP                 +
+            display->getcharheight()*4 + /* Title + 3 sliders */
+            TITLE_MARGIN_BOTTOM        +
+            SELECTOR_TB_MARGIN*6       + /* 2 margins/slider  */
+            MARGIN_BOTTOM;
+    if (y < MARGIN_TOP+display->getcharheight())
     {
         if (button == BUTTON_REL)
             return ACTION_STD_CANCEL;

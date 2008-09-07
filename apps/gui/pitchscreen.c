@@ -60,12 +60,12 @@ static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
 
     display->clear_display();
 
-    if (display->nb_lines < 4) /* very small screen, just show the pitch value */
+    if (display->getnblines() < 4) /* very small screen, just show pitch value*/
     {
         w = snprintf((char *)buf, sizeof(buf), "%s: %d.%d%%",str(LANG_PITCH),
                   pitch / 10, pitch % 10 );
-        display->putsxy((display->lcdwidth-(w*display->char_width))/2,
-                         display->nb_lines/2,buf);
+        display->putsxy((display->lcdwidth-(w*display->getcharwidth()))/2,
+                         display->getnblines()/2,buf);
     }
     else /* bigger screen, show everything... */
     {
@@ -242,7 +242,7 @@ bool pitch_screen(void)
                 nudged = (new_pitch != pitch);
                 pitch = new_pitch;
                 break;
-                
+
             case ACTION_PS_NUDGE_LEFTOFF:
                 if (nudged) {
                     pitch = pitch_increase(pitch, PITCH_NUDGE_DELTA, false);
@@ -268,7 +268,7 @@ bool pitch_screen(void)
                     return 1;
                 break;
         }
-        
+
         if(delta)
         {
             if (pitch_mode == PITCH_MODE_ABSOLUTE) {
@@ -276,10 +276,10 @@ bool pitch_screen(void)
             } else {
                 pitch = pitch_increase_semitone(pitch, delta > 0 ? true:false);
             }
-            
+
             delta = 0;
         }
-        
+
     }
 #if CONFIG_CODEC == SWCODEC
     pcmbuf_set_low_latency(false);

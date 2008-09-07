@@ -674,8 +674,9 @@ static void draw_slider(void)
     int i;
     FOR_NB_SCREENS(i)
     {
-        show_busy_slider(&screens[i], 1, LCD_HEIGHT-2*screens[i].char_height,
-                         LCD_WIDTH-2, 2*screens[i].char_height-1);
+        show_busy_slider(&screens[i], 1,
+                         LCD_HEIGHT-2*screens[i].getcharheight(),
+                         LCD_WIDTH-2, 2*screens[i].getcharheight()-1);
         screens[i].update();
     }
 }
