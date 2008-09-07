@@ -82,7 +82,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     while (dirIt.hasNext()) 
     {
         dirIt.next();
-        // insert only non dublicate dir entrys into list
+        // insert only non dublicate dir entries into list
         if(!toSpeakList.contains(dirIt.value()))
         {
             qDebug() << "toSpeaklist dir:" << dirIt.value();
@@ -93,7 +93,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     while (fileIt.hasNext()) 
     {
         fileIt.next();
-        // insert only non- dublictae file entrys into list
+        // insert only non- dublictae file entries into list
         if(!toSpeakList.contains(fileIt.value()))
         {
             if(m_stripExtensions)
@@ -103,8 +103,8 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         }
     }
     
-    // Voice entrys
-    m_logger->addItem(tr("Voicing entrys..."),LOGINFO);
+    // Voice entryies
+    m_logger->addItem(tr("Voicing entries..."),LOGINFO);
     if(voiceList(toSpeakList,&errStr) == false)
     {
         m_logger->addItem(errStr,LOGERROR);
@@ -112,7 +112,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         return false;
     }
     
-    // Encoding Entrys
+    // Encoding Entries
     m_logger->addItem(tr("Encoding files..."),LOGINFO);
     if(encodeList(toSpeakList,&errStr) == false)
     {
@@ -244,7 +244,7 @@ bool TalkFileCreator::createDirAndFileMaps(QDir startDir,QMultiMap<QString,QStri
 
 //! \brief Voices a List of string to the temp dir. Progress is handled inside.
 //!
-//!  \param toSpeak QStringList with the Entrys to voice.
+//!  \param toSpeak QStringList with the Entries to voice.
 //! \param errString pointer to where the Error cause is written
 //! \returns true on success, false on error or user abort
 bool TalkFileCreator::voiceList(QStringList toSpeak,QString* errString)
@@ -276,7 +276,7 @@ bool TalkFileCreator::voiceList(QStringList toSpeak,QString* errString)
 //! \brief Encodes a List of strings from/to the temp dir. Progress is handled inside.
 //! It expects the inputfile in the temp dir with the name in the List appended with ".wav" 
 //!
-//!  \param toSpeak QStringList with the Entrys to encode.
+//!  \param toSpeak QStringList with the Entries to encode.
 //! \param errString pointer to where the Error cause is written
 //! \returns true on success, false on error or user abort
 bool TalkFileCreator::encodeList(QStringList toEncode,QString* errString)

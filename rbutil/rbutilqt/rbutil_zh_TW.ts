@@ -53,7 +53,7 @@
         <translation>正在寫入安裝日志</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1272"/>
+        <location filename="installbootloader.cpp" line="1277"/>
         <source>Downloading file %1.%2</source>
         <translation>正在下載文件 %1.%2</translation>
     </message>
@@ -63,12 +63,12 @@
         <translation>找不到厂家固件在: %1</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="719"/>
+        <location filename="installbootloader.cpp" line="724"/>
         <source>Could not remove the Firmware at: %1</source>
         <translation>刪除不了固件在: %1</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="728"/>
+        <location filename="installbootloader.cpp" line="733"/>
         <source>Could not copy the Firmware from: %1 to %2</source>
         <translation>不能复制固件從 %1 到 %2 </translation>
     </message>
@@ -83,27 +83,27 @@
         <translation>找不到固件在: %1</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="773"/>
+        <location filename="installbootloader.cpp" line="778"/>
         <source>Could not rename: %1 to %2</source>
         <translation>不能把 %1 重命名為 %2</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1424"/>
+        <location filename="installbootloader.cpp" line="1429"/>
         <source>Could not copy: %1 to %2</source>
         <translation>不能复制 %1 到 %2</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1434"/>
+        <location filename="installbootloader.cpp" line="1439"/>
         <source>Bootloader install finished successfully.</source>
         <translation>成功安裝啟動程序</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1435"/>
+        <location filename="installbootloader.cpp" line="1440"/>
         <source>To finish the Bootloader installation, follow the steps below.</source>
         <translation>請按照以下步驟完成啟動程序的安裝</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1436"/>
+        <location filename="installbootloader.cpp" line="1441"/>
         <source>1. Eject/Unmount your Device.</source>
         <translation>1. 彈出/退出你的播放机.</translation>
     </message>
@@ -128,47 +128,47 @@
         <translation>5. 按POWER啟動 Rockbox 的啟動程序.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="490"/>
+        <location filename="installbootloader.cpp" line="495"/>
         <source>2. Turn you Device OFF.</source>
         <translation>2. 關閉你的播放器.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="491"/>
+        <location filename="installbootloader.cpp" line="496"/>
         <source>3. Insert Charger.</source>
         <translation>3. 插入充電器.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="754"/>
+        <location filename="installbootloader.cpp" line="759"/>
         <source>Firmware does not exist: %1</source>
         <translation>固件不存在: %1</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="816"/>
+        <location filename="installbootloader.cpp" line="821"/>
         <source>Searching for ipods</source>
         <translation>正在尋找 iPods</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="822"/>
+        <location filename="installbootloader.cpp" line="827"/>
         <source>No Ipods found</source>
         <translation>找不到 iPods</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="828"/>
+        <location filename="installbootloader.cpp" line="833"/>
         <source>Too many Ipods found</source>
         <translation>找到太多的 iPods</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="959"/>
+        <location filename="installbootloader.cpp" line="964"/>
         <source>could not open ipod</source>
         <translation>打開不了 iPods</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1175"/>
+        <location filename="installbootloader.cpp" line="1180"/>
         <source>could not read partitiontable</source>
         <translation>讀不了分區表</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="973"/>
+        <location filename="installbootloader.cpp" line="978"/>
         <source>No partition 0 on disk</source>
         <translation>硬盤上沒有0分區</translation>
     </message>
@@ -178,17 +178,17 @@
         <translation type="obsolete">[INFO] 分區    開始磁區    結算磁區   大小 (MB)   類別</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="984"/>
+        <location filename="installbootloader.cpp" line="989"/>
         <source>[INFO]    %1      %2    %3  %4   %5 (%6)</source>
         <translation>[INFO]    %1      %2    %3  %4   %5 (%6)</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1001"/>
+        <location filename="installbootloader.cpp" line="1006"/>
         <source>Failed to read firmware directory</source>
         <translation>讀不了固件文件夾</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1007"/>
+        <location filename="installbootloader.cpp" line="1012"/>
         <source>Unknown version number in firmware (%1)</source>
         <translation>固件版本不明 (%1)</translation>
     </message>
@@ -198,52 +198,52 @@
         <translation type="obsolete">警告: 這是苹果格式的iPod, Rockbox 不能在這運行. 請轉換成 Windows 格式的iPod.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1025"/>
+        <location filename="installbootloader.cpp" line="1030"/>
         <source>Could not open Ipod in RW mode</source>
         <translation>不能以讀寫方式打開iPod</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="929"/>
+        <location filename="installbootloader.cpp" line="934"/>
         <source>No bootloader detected.</source>
         <translation>找不到啟動程序.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1145"/>
+        <location filename="installbootloader.cpp" line="1150"/>
         <source>Successfully removed Bootloader</source>
         <translation>成功刪除啟動程序</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1153"/>
+        <location filename="installbootloader.cpp" line="1158"/>
         <source>--delete-bootloader failed.</source>
         <translation>--刪除啟動程序失敗.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1210"/>
+        <location filename="installbootloader.cpp" line="1215"/>
         <source>Successfully added Bootloader</source>
         <translation>成功添加啟動程序</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1218"/>
+        <location filename="installbootloader.cpp" line="1223"/>
         <source>failed to add Bootloader</source>
         <translation>添加啟動程序失敗</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1060"/>
+        <location filename="installbootloader.cpp" line="1065"/>
         <source>Searching for sansas</source>
         <translation>正在尋找 sansas</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1066"/>
+        <location filename="installbootloader.cpp" line="1071"/>
         <source>No Sansa found</source>
         <translation>找不到 Sansa</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1072"/>
+        <location filename="installbootloader.cpp" line="1077"/>
         <source>Too many Sansas found</source>
         <translation>找到了太多的 sansas</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1168"/>
+        <location filename="installbootloader.cpp" line="1173"/>
         <source>could not open Sansa</source>
         <translation>打開不了 sansa</translation>
     </message>
@@ -270,17 +270,17 @@ See http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install
 </translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1203"/>
+        <location filename="installbootloader.cpp" line="1208"/>
         <source>Could not open Sansa in RW mode</source>
         <translation>不能以讀寫方式打開 sansa</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1234"/>
+        <location filename="installbootloader.cpp" line="1239"/>
         <source>Could not MD5Sum original firmware</source>
         <translation>不能驗證厂家固件的MD5sum</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1264"/>
+        <location filename="installbootloader.cpp" line="1269"/>
         <source>Could not detect firmware type</source>
         <translation>找不到固件類別</translation>
     </message>
@@ -300,49 +300,49 @@ See http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install
         <translation type="obsolete">scramble 錯誤</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1396"/>
+        <location filename="installbootloader.cpp" line="1401"/>
         <source>Error in checksumming</source>
         <translation>驗證錯誤</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1437"/>
+        <location filename="installbootloader.cpp" line="1442"/>
         <source>2. Boot into the original Firmware.</source>
         <translation>2. 啟動到厂家固件.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1438"/>
+        <location filename="installbootloader.cpp" line="1443"/>
         <source>3. Use the Firmware flash option in the Original Firmware.</source>
         <translation>3. 在厂家固件里選擇快閃記憶體.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1439"/>
+        <location filename="installbootloader.cpp" line="1444"/>
         <source>4. Reboot.</source>
         <translation>4. 重新開机.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="707"/>
+        <location filename="installbootloader.cpp" line="712"/>
         <source>Original Firmware does not exist: %1</source>
         <translation>厂家固件不存在 : %1</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="978"/>
+        <location filename="installbootloader.cpp" line="983"/>
         <source>[INFO] Part    Start Sector    End Sector   Size (MB)   Type
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1017"/>
+        <location filename="installbootloader.cpp" line="1022"/>
         <source>Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod
 See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1184"/>
+        <location filename="installbootloader.cpp" line="1189"/>
         <source>Disk is not a Sansa (%1), aborting.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1196"/>
+        <location filename="installbootloader.cpp" line="1201"/>
         <source>********************************************
 OLD ROCKBOX INSTALLATION DETECTED, ABORTING.
 You must reinstall the original Sansa firmware before running
@@ -353,97 +353,97 @@ See http://www.rockbox.org/wiki/SansaE200Install
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1374"/>
+        <location filename="installbootloader.cpp" line="1379"/>
         <source>Can&apos;t open input file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1375"/>
+        <location filename="installbootloader.cpp" line="1380"/>
         <source>Can&apos;t open output file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1376"/>
+        <location filename="installbootloader.cpp" line="1381"/>
         <source>invalid file: header length wrong</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1377"/>
+        <location filename="installbootloader.cpp" line="1382"/>
         <source>invalid file: unrecognized header</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1378"/>
+        <location filename="installbootloader.cpp" line="1383"/>
         <source>invalid file: &quot;length&quot; field wrong</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1379"/>
+        <location filename="installbootloader.cpp" line="1384"/>
         <source>invalid file: &quot;length2&quot; field wrong</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1380"/>
+        <location filename="installbootloader.cpp" line="1385"/>
         <source>invalid file: internal checksum error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1381"/>
+        <location filename="installbootloader.cpp" line="1386"/>
         <source>invalid file: &quot;length3&quot; field wrong</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1382"/>
+        <location filename="installbootloader.cpp" line="1387"/>
         <source>unknown</source>
         <translation type="unfinished">不明</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1341"/>
+        <location filename="installbootloader.cpp" line="1346"/>
         <source>Error in descramble: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1353"/>
+        <location filename="installbootloader.cpp" line="1358"/>
         <source>could not open input file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1354"/>
+        <location filename="installbootloader.cpp" line="1359"/>
         <source>reading header failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1355"/>
+        <location filename="installbootloader.cpp" line="1360"/>
         <source>reading firmware failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1356"/>
+        <location filename="installbootloader.cpp" line="1361"/>
         <source>can&apos;t open bootloader file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1357"/>
+        <location filename="installbootloader.cpp" line="1362"/>
         <source>reading bootloader file failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1358"/>
+        <location filename="installbootloader.cpp" line="1363"/>
         <source>can&apos;t open output file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1359"/>
+        <location filename="installbootloader.cpp" line="1364"/>
         <source>writing output file failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1361"/>
+        <location filename="installbootloader.cpp" line="1366"/>
         <source>Error in patching: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1384"/>
+        <location filename="installbootloader.cpp" line="1389"/>
         <source>Error in scramble: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -502,12 +502,12 @@ See http://www.rockbox.org/wiki/SansaE200Install
 <context>
     <name>Config</name>
     <message>
-        <location filename="configure.cpp" line="111"/>
+        <location filename="configure.cpp" line="114"/>
         <source>Language changed</source>
         <translation>語言已改變</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="112"/>
+        <location filename="configure.cpp" line="115"/>
         <source>You need to restart the application for the changed language to take effect.</source>
         <translation>你需要重新開啟本軟件才能使用新語言.</translation>
     </message>
@@ -517,89 +517,94 @@ See http://www.rockbox.org/wiki/SansaE200Install
         <translation type="obsolete">現在緩沖的大小是 %1 kiB.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="559"/>
+        <location filename="configure.cpp" line="582"/>
         <source>Autodetection</source>
         <translation>自動識別</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="553"/>
+        <location filename="configure.cpp" line="576"/>
         <source>Could not detect a Mountpoint.
 Select your Mountpoint manually.</source>
         <translation>找不到 mountpoint
 請手動選擇你的 mountpoing.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="561"/>
+        <location filename="configure.cpp" line="584"/>
         <source>Could not detect a device.
 Select your device and Mountpoint manually.</source>
         <translation>不能識別你的播放器
 請手動選擇.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="570"/>
+        <location filename="configure.cpp" line="593"/>
         <source>Really delete cache?</source>
         <translation>你肯定要刪除緩沖嗎?</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="573"/>
+        <location filename="configure.cpp" line="596"/>
         <source>Do you really want to delete the cache? Make absolutely sure this setting is correct as it will remove &lt;b&gt;all&lt;/b&gt; files in this folder!</source>
         <translation>你真的肯定要刪除緩沖嗎? 請确認你的設定是正确的因為這會刪除 &lt;b&gt;全部&lt;/b&gt; 的文件在此文件夾 !</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="579"/>
+        <location filename="configure.cpp" line="602"/>
         <source>Path wrong!</source>
         <translation>路徑錯誤!</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="580"/>
+        <location filename="configure.cpp" line="603"/>
         <source>The cache path is invalid. Aborting.</source>
         <translation>緩沖路徑錯誤. 正在取消.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="57"/>
-        <source> (%1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="configure.cpp" line="218"/>
+        <location filename="configure.cpp" line="230"/>
         <source>Current cache size is %L1 kiB.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="433"/>
+        <location filename="configure.cpp" line="456"/>
         <source>Select your device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="523"/>
+        <location filename="configure.cpp" line="546"/>
         <source>Sansa e200 in MTP mode found!
 You need to change your player to MSC mode for installation. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="526"/>
+        <location filename="configure.cpp" line="549"/>
         <source>H10 20GB in MTP mode found!
 You need to change your player to UMS mode for installation. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="527"/>
+        <location filename="configure.cpp" line="550"/>
         <source>Unless you changed this installation will fail!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="529"/>
+        <location filename="configure.cpp" line="552"/>
         <source>Fatal error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="538"/>
+        <location filename="configure.cpp" line="561"/>
         <source>Detected an unsupported %1 player variant. Sorry, Rockbox doesn&apos;t run on your player.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="540"/>
+        <location filename="configure.cpp" line="563"/>
         <source>Fatal error: incompatible player found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="configure.cpp" line="352"/>
+        <source>Configuration OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="configure.cpp" line="357"/>
+        <source>Configuration INVALID</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -817,7 +822,7 @@ You need to change your player to UMS mode for installation. </source>
     </message>
     <message>
         <location filename="configurefrm.ui" line="477"/>
-        <source>Configuration invalid !</source>
+        <source>Configuration invalid!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -827,7 +832,7 @@ You need to change your player to UMS mode for installation. </source>
     </message>
     <message>
         <location filename="configurefrm.ui" line="494"/>
-        <source> Configure &amp;Enc</source>
+        <source>Configure &amp;Enc</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -844,7 +849,7 @@ You need to change your player to UMS mode for installation. </source>
         <translation type="obsolete">中文 (Chinese Traditional)</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="417"/>
+        <location filename="configure.cpp" line="440"/>
         <source>English</source>
         <comment>This is the localized language name, i.e. your language.</comment>
         <translation type="unfinished">中文 (Chinese Traditional)</translation>
@@ -1013,7 +1018,7 @@ You need to change your player to UMS mode for installation. </source>
     </message>
     <message>
         <location filename="install.cpp" line="149"/>
-        <source>Backup successfull</source>
+        <source>Backup successful</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1268,12 +1273,12 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">無效轉化器設置!</translation>
     </message>
     <message>
-        <location filename="installtalkwindow.cpp" line="128"/>
+        <location filename="installtalkwindow.cpp" line="126"/>
         <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installtalkwindow.cpp" line="143"/>
+        <location filename="installtalkwindow.cpp" line="141"/>
         <source>Selected encoder: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1420,77 +1425,77 @@ New Target: %2.
 <context>
     <name>RbUtilQt</name>
     <message>
-        <location filename="rbutilqt.cpp" line="69"/>
+        <location filename="rbutilqt.cpp" line="70"/>
         <source>File</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="69"/>
+        <location filename="rbutilqt.cpp" line="70"/>
         <source>Version</source>
         <translation>版本</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="210"/>
+        <location filename="rbutilqt.cpp" line="218"/>
         <source>Network error: %1. Please check your network and proxy settings.</source>
         <translation>网絡錯誤： %1. 請檢查你的网絡和代理服務的設置.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="310"/>
+        <location filename="rbutilqt.cpp" line="318"/>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
         <translation>&lt;b&gt;%1 %2&lt;/b&gt; 在 &lt;b&gt;%3&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="327"/>
+        <location filename="rbutilqt.cpp" line="335"/>
         <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;PDF 用戶手冊(英文)&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="329"/>
+        <location filename="rbutilqt.cpp" line="337"/>
         <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;HTML 用戶手冊(英文,在瀏覽器打開)&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="332"/>
+        <location filename="rbutilqt.cpp" line="340"/>
         <source>Select a device for a link to the correct manual</source>
         <translation>請選擇你的播放器</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="334"/>
+        <location filename="rbutilqt.cpp" line="342"/>
         <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;用戶手冊總觀&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="730"/>
+        <location filename="rbutilqt.cpp" line="738"/>
         <source>Confirm Installation</source>
         <translation>确認安裝</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="343"/>
+        <location filename="rbutilqt.cpp" line="351"/>
         <source>Do you really want to make a complete Installation?</source>
         <translation>你确認要一個完整的安裝?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="899"/>
+        <location filename="rbutilqt.cpp" line="907"/>
         <source>Mount point is wrong!</source>
         <translation>Mountpoint 錯誤!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="395"/>
+        <location filename="rbutilqt.cpp" line="403"/>
         <source>Do you really want to make a small Installation?</source>
         <translation>你确認要一個智能的安裝?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="566"/>
+        <location filename="rbutilqt.cpp" line="574"/>
         <source>Do you really want to install the Bootloader?</source>
         <translation>你确認要安裝啟動程序?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="827"/>
+        <location filename="rbutilqt.cpp" line="835"/>
         <source>Could not get the bootloader info file!</source>
         <translation>找不到啟動程序的資料!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="600"/>
+        <location filename="rbutilqt.cpp" line="608"/>
         <source>Bootloader Installation</source>
         <translation>安裝啟動程序</translation>
     </message>
@@ -1507,82 +1512,82 @@ Do really want to install it?</source>
         <translation type="obsolete">啟動程序安裝被取消!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="625"/>
+        <location filename="rbutilqt.cpp" line="633"/>
         <source>Original Firmware Path is wrong!</source>
         <translation>厂家固件路徑錯誤!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="638"/>
+        <location filename="rbutilqt.cpp" line="646"/>
         <source>Original Firmware selection Canceled!</source>
         <translation>厂家固件安裝被取消!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="653"/>
+        <location filename="rbutilqt.cpp" line="661"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>你确認要安裝字體包裹嗎?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="697"/>
+        <location filename="rbutilqt.cpp" line="705"/>
         <source>Do you really want to install the voice file?</source>
         <translation>你确認要安裝語音文件嗎?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="731"/>
+        <location filename="rbutilqt.cpp" line="739"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>你确認要安裝游戲附件嗎?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="811"/>
+        <location filename="rbutilqt.cpp" line="819"/>
         <source>Confirm Uninstallation</source>
         <translation>确認安裝</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="812"/>
+        <location filename="rbutilqt.cpp" line="820"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>你确認要卸載啟動程序嗎?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="840"/>
+        <location filename="rbutilqt.cpp" line="848"/>
         <source>Confirm download</source>
         <translation>确認下載</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="842"/>
+        <location filename="rbutilqt.cpp" line="850"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>你确認要下載用戶手冊嗎? 用戶手冊將會被放在你播放器的主目錄里.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="885"/>
+        <location filename="rbutilqt.cpp" line="893"/>
         <source>Confirm installation</source>
         <translation>确認安裝</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="887"/>
+        <location filename="rbutilqt.cpp" line="895"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>你确認要安裝Rockbox安裝程序到你的播放器上嗎? 安裝后你可以從你播放器上運行此程序.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="895"/>
+        <location filename="rbutilqt.cpp" line="903"/>
         <source>Installing Rockbox Utility</source>
         <translation>安裝 Rockbox安裝程序</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="909"/>
+        <location filename="rbutilqt.cpp" line="917"/>
         <source>Error installing Rockbox Utility</source>
         <translation>安裝 Rockbox安裝程序錯誤!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="913"/>
+        <location filename="rbutilqt.cpp" line="921"/>
         <source>Installing user configuration</source>
         <translation>安裝用戶設置</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="915"/>
+        <location filename="rbutilqt.cpp" line="923"/>
         <source>Error installing user configuration</source>
         <translation>安裝用戶設置錯誤</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="919"/>
+        <location filename="rbutilqt.cpp" line="927"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>成功安裝 Rockbox安裝程序.</translation>
     </message>
@@ -1592,79 +1597,89 @@ Do really want to install it?</source>
         <translation type="obsolete">啟動程序安裝過程被跳過!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="1010"/>
+        <location filename="rbutilqt.cpp" line="1018"/>
         <source>Configuration error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="602"/>
+        <location filename="rbutilqt.cpp" line="610"/>
         <source>The bootloader is already installed and up to date.
 Do want to replace the current bootloader?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="606"/>
+        <location filename="rbutilqt.cpp" line="614"/>
         <source>Bootloader installation skipped!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="726"/>
+        <location filename="rbutilqt.cpp" line="734"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="726"/>
+        <location filename="rbutilqt.cpp" line="734"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="1012"/>
+        <location filename="rbutilqt.cpp" line="1020"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="185"/>
-        <source>Your configuration is invalid. This is most likely due to a new installation of Rockbox Utility or a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="rbutilqt.cpp" line="482"/>
-        <source>Aborted!</source>
+        <source>This is a new installation of Rockbox Utility, or a new version. The configuration dialog will now open to allow you to setup the program,  or review your settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="490"/>
+        <source>Aborted!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqt.cpp" line="498"/>
         <source>Installed Rockbox detected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="491"/>
+        <location filename="rbutilqt.cpp" line="499"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="510"/>
-        <source>Backup successfull</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="rbutilqt.cpp" line="514"/>
+        <location filename="rbutilqt.cpp" line="522"/>
         <source>Backup failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="691"/>
+        <location filename="rbutilqt.cpp" line="699"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="692"/>
+        <location filename="rbutilqt.cpp" line="700"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="494"/>
+        <location filename="rbutilqt.cpp" line="502"/>
         <source>Starting backup...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqt.cpp" line="182"/>
+        <source>New installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqt.cpp" line="193"/>
+        <source>Your configuration is invalid. This is most likely due to a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqt.cpp" line="518"/>
+        <source>Backup successful</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2344,7 +2359,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>TTSExes</name>
     <message>
-        <location filename="tts.cpp" line="114"/>
+        <location filename="tts.cpp" line="151"/>
         <source>TTS executable not found</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2395,12 +2410,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>TTSSapi</name>
     <message>
-        <location filename="tts.cpp" line="181"/>
+        <location filename="tts.cpp" line="218"/>
         <source>Could not copy the Sapi-script</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="tts.cpp" line="202"/>
+        <location filename="tts.cpp" line="239"/>
         <source>Could not start the Sapi-script</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2408,48 +2423,73 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>TalkFileCreator</name>
     <message>
-        <location filename="talkfile.cpp" line="31"/>
+        <location filename="talkfile.cpp" line="40"/>
         <source>Starting Talk file generation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="talkfile.cpp" line="41"/>
+        <location filename="talkfile.cpp" line="49"/>
         <source>Init of TTS engine failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="talkfile.cpp" line="52"/>
+        <location filename="talkfile.cpp" line="60"/>
         <source>Init of Encoder engine failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="talkfile.cpp" line="75"/>
+        <location filename="talkfile.cpp" line="373"/>
         <source>Talk file creation aborted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="talkfile.cpp" line="144"/>
-        <source>Voicing of %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="talkfile.cpp" line="147"/>
+        <location filename="talkfile.cpp" line="266"/>
         <source>Voicing of %s failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="talkfile.cpp" line="156"/>
-        <source>Encoding of %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="talkfile.cpp" line="159"/>
+        <location filename="talkfile.cpp" line="298"/>
         <source>Encoding of %1 failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="talkfile.cpp" line="188"/>
+        <location filename="talkfile.cpp" line="148"/>
         <source>Finished creating Talk files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="talkfile.cpp" line="72"/>
+        <source>Reading Filelist...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="talkfile.cpp" line="107"/>
+        <source>Voicing entries...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="talkfile.cpp" line="116"/>
+        <source>Encoding files...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="talkfile.cpp" line="125"/>
+        <source>Copying Talkfile for Dirs...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="talkfile.cpp" line="134"/>
+        <source>Copying Talkfile for Files...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="talkfile.cpp" line="394"/>
+        <source>Copying of %1 to %2 failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="talkfile.cpp" line="416"/>
+        <source>Cleaning up..</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2748,12 +2788,12 @@ Please check your network and proxy settings.</source>
         <translation>正在卸載</translation>
     </message>
     <message>
-        <location filename="uninstall.cpp" line="81"/>
+        <location filename="uninstall.cpp" line="82"/>
         <source>Could not delete: </source>
         <translation>無法刪除: </translation>
     </message>
     <message>
-        <location filename="uninstall.cpp" line="108"/>
+        <location filename="uninstall.cpp" line="111"/>
         <source>Uninstallation finished</source>
         <translation>完成卸載</translation>
     </message>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="el_GR">
-<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstaller</name>
     <message>
@@ -54,7 +53,7 @@
         <translation>Επεξεργασία αρχείου καταγραφής εγκατάστασης</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1272"/>
+        <location filename="installbootloader.cpp" line="1277"/>
         <source>Downloading file %1.%2</source>
         <translation>Λήψη αρχείου %1.%2</translation>
     </message>
@@ -64,12 +63,12 @@
         <translation>Αδύνατη η εύρεση του αυθεντικού firmware στο: %1</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="719"/>
+        <location filename="installbootloader.cpp" line="724"/>
         <source>Could not remove the Firmware at: %1</source>
         <translation>Αδύνατη η αφαίρεση του firmware στο: %1</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="728"/>
+        <location filename="installbootloader.cpp" line="733"/>
         <source>Could not copy the Firmware from: %1 to %2</source>
         <translation>Αδύνατη η αντιγραφή του firmware από: %1 στο %2</translation>
     </message>
@@ -84,27 +83,27 @@
         <translation>Αδύνατη η εύρεση του firmware στο: %1</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="773"/>
+        <location filename="installbootloader.cpp" line="778"/>
         <source>Could not rename: %1 to %2</source>
         <translation>Αδήνατη η μετονομασία: %1 σε %2</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1424"/>
+        <location filename="installbootloader.cpp" line="1429"/>
         <source>Could not copy: %1 to %2</source>
         <translation>Αδύνατη η αντιγραφή: %1 σε %2</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1434"/>
+        <location filename="installbootloader.cpp" line="1439"/>
         <source>Bootloader install finished successfully.</source>
         <translation>Η εγκατάσταση του bootloader ολοκληρώθηκε με επιτυχία.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1435"/>
+        <location filename="installbootloader.cpp" line="1440"/>
         <source>To finish the Bootloader installation, follow the steps below.</source>
         <translation>Για να ολοκληρώσετε την εγκατάσταση του bootloader, ακολουθήστε τα παρακάτω βήματα.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1436"/>
+        <location filename="installbootloader.cpp" line="1441"/>
         <source>1. Eject/Unmount your Device.</source>
         <translation>1. Εξάγετε\αποπροσαρτήστε τη συσκευή.</translation>
     </message>
@@ -129,140 +128,140 @@
         <translation>5. Κρατήστε το κουμπί POWER για να ξεκινήσετε το bootloader του Rockbox.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="490"/>
+        <location filename="installbootloader.cpp" line="495"/>
         <source>2. Turn you Device OFF.</source>
         <translation>2. Απενεργοποιήστε τη συσκευή σας.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="491"/>
+        <location filename="installbootloader.cpp" line="496"/>
         <source>3. Insert Charger.</source>
         <translation>3. Εισάγετε το φορτιστή.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="754"/>
+        <location filename="installbootloader.cpp" line="759"/>
         <source>Firmware does not exist: %1</source>
         <translation>Δεν υπάρχει firmware: %1</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="707"/>
+        <location filename="installbootloader.cpp" line="712"/>
         <source>Original Firmware does not exist: %1</source>
         <translation>Δεν υπάρχει αυθεντικό firmware: %1 </translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="816"/>
+        <location filename="installbootloader.cpp" line="821"/>
         <source>Searching for ipods</source>
         <translation>Αναζήτηση συσκευών ipod</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="822"/>
+        <location filename="installbootloader.cpp" line="827"/>
         <source>No Ipods found</source>
         <translation>Δεν βρέθηκαν συσκευές ipod</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="828"/>
+        <location filename="installbootloader.cpp" line="833"/>
         <source>Too many Ipods found</source>
         <translation>Βρέθηκαν παραπάνω συσκευές ipod</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="959"/>
+        <location filename="installbootloader.cpp" line="964"/>
         <source>could not open ipod</source>
         <translation>Αδύνατο το άνοιγμα του ipod</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1175"/>
+        <location filename="installbootloader.cpp" line="1180"/>
         <source>could not read partitiontable</source>
         <translation>Αδύνατη η ανάγνωση του πίνακα κατάτμησης</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="973"/>
+        <location filename="installbootloader.cpp" line="978"/>
         <source>No partition 0 on disk</source>
         <translation>Δεν υπάρχει τμήμα 0 στο δίσκο</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="978"/>
+        <location filename="installbootloader.cpp" line="983"/>
         <source>[INFO] Part    Start Sector    End Sector   Size (MB)   Type
 </source>
         <translation>[ΠΛΗΡ.] Τμήμα Αρχικός Τομέας Τελικός Τομέας Μέγεθος (MB) Τύπος</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="984"/>
+        <location filename="installbootloader.cpp" line="989"/>
         <source>[INFO]    %1      %2    %3  %4   %5 (%6)</source>
         <translation>[ΠΛΗΡ.]    %1      %2    %3  %4   %5 (%6)</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1001"/>
+        <location filename="installbootloader.cpp" line="1006"/>
         <source>Failed to read firmware directory</source>
         <translation>Αποτυχία ανάγνωσης του φακέλου που βρίσκεται το firmware</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1007"/>
+        <location filename="installbootloader.cpp" line="1012"/>
         <source>Unknown version number in firmware (%1)</source>
         <translation>Άγνωστος αριθμός έκδοσης firmware (%1)</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1017"/>
+        <location filename="installbootloader.cpp" line="1022"/>
         <source>Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod
 See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation>Προσοχή, η συσκευή σας δουλεύει σαν MacPod, το Rockbox δεν το υποστηρίζει. Μετατρέψτε το σε WinPod.
 Βλέπετε http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1025"/>
+        <location filename="installbootloader.cpp" line="1030"/>
         <source>Could not open Ipod in RW mode</source>
         <translation>Αδύνατη η προσπέλαση του ipod με τρόπο RW</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="929"/>
+        <location filename="installbootloader.cpp" line="934"/>
         <source>No bootloader detected.</source>
         <translation>Δεν ανιχνεύθηκε o bootloader.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1145"/>
+        <location filename="installbootloader.cpp" line="1150"/>
         <source>Successfully removed Bootloader</source>
         <translation>Επιτυχής αφαίρεση bootloader</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1153"/>
+        <location filename="installbootloader.cpp" line="1158"/>
         <source>--delete-bootloader failed.</source>
         <translation>--αφαίρεση-bootloader απέτυχε.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1210"/>
+        <location filename="installbootloader.cpp" line="1215"/>
         <source>Successfully added Bootloader</source>
         <translation>Επιτυχής επισύναψη του bootloader</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1218"/>
+        <location filename="installbootloader.cpp" line="1223"/>
         <source>failed to add Bootloader</source>
         <translation>Ανεπιτυχής επισύναψη του bootloader</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1060"/>
+        <location filename="installbootloader.cpp" line="1065"/>
         <source>Searching for sansas</source>
         <translation>Αναζήτηση συσκευών sansa</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1066"/>
+        <location filename="installbootloader.cpp" line="1071"/>
         <source>No Sansa found</source>
         <translation>Δεν βρέθηκαν συσκευές sansa</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1072"/>
+        <location filename="installbootloader.cpp" line="1077"/>
         <source>Too many Sansas found</source>
         <translation>Βρέθηκαν παραπάνω συσκευές sansa</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1168"/>
+        <location filename="installbootloader.cpp" line="1173"/>
         <source>could not open Sansa</source>
         <translation>Αδύνατο το άνοιγμα του sansa</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1184"/>
+        <location filename="installbootloader.cpp" line="1189"/>
         <source>Disk is not a Sansa (%1), aborting.</source>
         <translation>Ο δίσκος δεν είναι sansa (%1), ματαίωση.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1196"/>
+        <location filename="installbootloader.cpp" line="1201"/>
         <source>********************************************
 OLD ROCKBOX INSTALLATION DETECTED, ABORTING.
 You must reinstall the original Sansa firmware before running
@@ -279,132 +278,132 @@ See http://www.rockbox.org/wiki/SansaE200Install
 </translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1203"/>
+        <location filename="installbootloader.cpp" line="1208"/>
         <source>Could not open Sansa in RW mode</source>
         <translation>Αδύνατη η προσπέλαση του sansa με τρόπο RW</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1234"/>
+        <location filename="installbootloader.cpp" line="1239"/>
         <source>Could not MD5Sum original firmware</source>
         <translation>Αδύνατη η δημιουργία MD5sum του αυθεντικού firmware</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1264"/>
+        <location filename="installbootloader.cpp" line="1269"/>
         <source>Could not detect firmware type</source>
         <translation>Αδύνατος ο εντοπισμός τύπου του firmware </translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1374"/>
+        <location filename="installbootloader.cpp" line="1379"/>
         <source>Can&apos;t open input file</source>
         <translation>Αδύνατο άνοιγμα αρχείο εισόδου</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1375"/>
+        <location filename="installbootloader.cpp" line="1380"/>
         <source>Can&apos;t open output file</source>
         <translation>Αδύνατο άνοιγμα αρχείο εξόδου</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1376"/>
+        <location filename="installbootloader.cpp" line="1381"/>
         <source>invalid file: header length wrong</source>
         <translation>Μη έγκυρο αρχείο: λάθος μήκος κεφαλίδας</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1377"/>
+        <location filename="installbootloader.cpp" line="1382"/>
         <source>invalid file: unrecognized header</source>
         <translation>Μη έγκυρο αρχείο: μη αναγνωρίσιμη κεφαλίδα</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1378"/>
+        <location filename="installbootloader.cpp" line="1383"/>
         <source>invalid file: &quot;length&quot; field wrong</source>
         <translation>Μη έγκυρο αρχείο: λάθος πεδίο &quot;μήκους&quot;</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1379"/>
+        <location filename="installbootloader.cpp" line="1384"/>
         <source>invalid file: &quot;length2&quot; field wrong</source>
         <translation>Μη έγκυρο αρχείο: λάθος πεδίο &quot;μήκους2&quot;</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1380"/>
+        <location filename="installbootloader.cpp" line="1385"/>
         <source>invalid file: internal checksum error</source>
         <translation>Μη έγκυρο αρχείο: λάθος εσωτερικό άθροισμα ελέγχου</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1381"/>
+        <location filename="installbootloader.cpp" line="1386"/>
         <source>invalid file: &quot;length3&quot; field wrong</source>
         <translation>Μη έγκυρο αρχείο: λάθος πεδίο &quot;μήκους3&quot;</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1382"/>
+        <location filename="installbootloader.cpp" line="1387"/>
         <source>unknown</source>
         <translation>άγνωστο</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1341"/>
+        <location filename="installbootloader.cpp" line="1346"/>
         <source>Error in descramble: %1</source>
         <translation>Σφάλμα διαδικασίας descramble: %1</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1353"/>
+        <location filename="installbootloader.cpp" line="1358"/>
         <source>could not open input file</source>
         <translation>Αδύνατο άνοιγμα αρχείο εισόδου</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1354"/>
+        <location filename="installbootloader.cpp" line="1359"/>
         <source>reading header failed</source>
         <translation>Αποτυχία ανάγνωσης της κεφαλίδας</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1355"/>
+        <location filename="installbootloader.cpp" line="1360"/>
         <source>reading firmware failed</source>
         <translation>Αποτυχια ανάγνωσης του firmware</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1356"/>
+        <location filename="installbootloader.cpp" line="1361"/>
         <source>can&apos;t open bootloader file</source>
         <translation>Αδύνατο το άνοιγμα του αρχείου bootloader</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1357"/>
+        <location filename="installbootloader.cpp" line="1362"/>
         <source>reading bootloader file failed</source>
         <translation>Αποτυχία ανάγνωσης του αρχείου bootloader</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1358"/>
+        <location filename="installbootloader.cpp" line="1363"/>
         <source>can&apos;t open output file</source>
         <translation>Αδύνατο άνοιγμα αρχείο εξόδου</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1359"/>
+        <location filename="installbootloader.cpp" line="1364"/>
         <source>writing output file failed</source>
         <translation>Αποτυχία εγγραφής αρχείου εξόδου</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1361"/>
+        <location filename="installbootloader.cpp" line="1366"/>
         <source>Error in patching: %1</source>
         <translation>Σφάλμα διαδικασίας patching: %1</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1384"/>
+        <location filename="installbootloader.cpp" line="1389"/>
         <source>Error in scramble: %1</source>
         <translation>Σφάλμα διαδικασίας scramble: %1</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1396"/>
+        <location filename="installbootloader.cpp" line="1401"/>
         <source>Error in checksumming</source>
         <translation>Σφάλμα άθροισης ελέγχου</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1437"/>
+        <location filename="installbootloader.cpp" line="1442"/>
         <source>2. Boot into the original Firmware.</source>
         <translation>2. Ξεκινήστε το αυθεντικό firmware.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1438"/>
+        <location filename="installbootloader.cpp" line="1443"/>
         <source>3. Use the Firmware flash option in the Original Firmware.</source>
         <translation>3. Χρησιμοποιήστε την επιλογή firmware flash στο αυθεντικό firmware.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1439"/>
+        <location filename="installbootloader.cpp" line="1444"/>
         <source>4. Reboot.</source>
         <translation>4. Κάντε επανεκκίνηση της συσκευής.</translation>
     </message>
@@ -1291,244 +1290,244 @@ New Target: %2.
 <context>
     <name>RbUtilQt</name>
     <message>
-        <location filename="rbutilqt.cpp" line="69"/>
+        <location filename="rbutilqt.cpp" line="70"/>
         <source>File</source>
         <translation>Αρχείο</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="69"/>
+        <location filename="rbutilqt.cpp" line="70"/>
         <source>Version</source>
         <translation>Έκδοση</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="181"/>
+        <location filename="rbutilqt.cpp" line="182"/>
         <source>New installation</source>
         <translation>Νέα εγκατάσταση</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="184"/>
+        <location filename="rbutilqt.cpp" line="185"/>
         <source>This is a new installation of Rockbox Utility, or a new version. The configuration dialog will now open to allow you to setup the program,  or review your settings.</source>
         <translation>Αυτή είναι μια καινούργια εγκατάσταση του Rockbox Utility ή πρόκειται για μια νέα έκδοση. Το παράθυρο ρυθμίσεων θα εμφανισθεί τώρα για να σας επιτρέψει να παραμετροποιήσετε το πρόγραμμα ή να δείτε ξανά τις ρυθμίσεις σας. </translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="1017"/>
+        <location filename="rbutilqt.cpp" line="1018"/>
         <source>Configuration error</source>
         <translation>Σφάλμα ρυθμίσεων</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="192"/>
+        <location filename="rbutilqt.cpp" line="193"/>
         <source>Your configuration is invalid. This is most likely due to a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
         <translation>Οι ρυθμίσεις σας δεν είναι έγκυρες. Πιθανότατα αυτό συμβαίνει λόγο αλλαγής διαδρομής της συσκευής. Το παράθυρο ρυθμίσεων θα εμφανισθεί τώρα για να σας επιτρέψει να διορθώσετε το πρόβλημα.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="217"/>
+        <location filename="rbutilqt.cpp" line="218"/>
         <source>Network error: %1. Please check your network and proxy settings.</source>
         <translation>Σφάλμα δικτύου: %1. Παρακαλώ ελέγξτε τις ρυθμίσεις δικτύου.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="317"/>
+        <location filename="rbutilqt.cpp" line="318"/>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
         <translation>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="334"/>
+        <location filename="rbutilqt.cpp" line="335"/>
         <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Εγχειρίδιο μορφής PDF&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="336"/>
+        <location filename="rbutilqt.cpp" line="337"/>
         <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Εγχειρίδιο μορφής HTML (ανοίγει σε πλοηγό)&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="339"/>
+        <location filename="rbutilqt.cpp" line="340"/>
         <source>Select a device for a link to the correct manual</source>
         <translation>Επιλέξτε συσκευή για ένα σύνδεσμο για το σωστό εγχειρίδιο</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="341"/>
+        <location filename="rbutilqt.cpp" line="342"/>
         <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Περίληψη εγχειριδίου&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="737"/>
+        <location filename="rbutilqt.cpp" line="738"/>
         <source>Confirm Installation</source>
         <translation>Επαλήθευση εγκατάστασης</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="350"/>
+        <location filename="rbutilqt.cpp" line="351"/>
         <source>Do you really want to make a complete Installation?</source>
         <translation>Θέλετε σίγουρα να έχετε την πλήρη εγκατάσταση;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="402"/>
+        <location filename="rbutilqt.cpp" line="403"/>
         <source>Do you really want to make a small Installation?</source>
         <translation>Θέλετε σίγουρα να έχετε τη μικρή εγκατάσταση;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="906"/>
+        <location filename="rbutilqt.cpp" line="907"/>
         <source>Mount point is wrong!</source>
         <translation>Το σημείο προσάρτησης είναι λάθος!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="489"/>
+        <location filename="rbutilqt.cpp" line="490"/>
         <source>Aborted!</source>
         <translation>Ματαιώθηκε!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="497"/>
+        <location filename="rbutilqt.cpp" line="498"/>
         <source>Installed Rockbox detected</source>
         <translation>Εντοπίστηκε εγκατάσταη Rockbox</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="498"/>
+        <location filename="rbutilqt.cpp" line="499"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
         <translation>Εντοπίστηκε εγκατάσταση του Rockbox. Θέλετε ένα αντίγραφο ασφαλείας πρώτα;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="501"/>
+        <location filename="rbutilqt.cpp" line="502"/>
         <source>Starting backup...</source>
         <translation>Έναρξη αντίγραφου ασφαλείας...</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="517"/>
+        <location filename="rbutilqt.cpp" line="518"/>
         <source>Backup successful</source>
         <translation>Επιτυχία αντίγραφου ασφαλείας</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="521"/>
+        <location filename="rbutilqt.cpp" line="522"/>
         <source>Backup failed!</source>
         <translation>Αποτυχία αντίγραφου ασφάλειας!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="573"/>
+        <location filename="rbutilqt.cpp" line="574"/>
         <source>Do you really want to install the Bootloader?</source>
         <translation>Θέλετε σίγουρα να εγκαταστήσετε το bootloader;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="834"/>
+        <location filename="rbutilqt.cpp" line="835"/>
         <source>Could not get the bootloader info file!</source>
         <translation>Αδύνατη η λήψη του αρχείου πληροφοριών του bootloader!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="607"/>
+        <location filename="rbutilqt.cpp" line="608"/>
         <source>Bootloader Installation</source>
         <translation>Εγκατάσταση bootloader</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="609"/>
+        <location filename="rbutilqt.cpp" line="610"/>
         <source>The bootloader is already installed and up to date.
 Do want to replace the current bootloader?</source>
         <translation>Ο bootloader είναι ήδη εγκατεστημένος και ενημερωμένος.
 Θέλετε να αντικαταστήσετε τον τωρινό bootloader;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="613"/>
+        <location filename="rbutilqt.cpp" line="614"/>
         <source>Bootloader installation skipped!</source>
         <translation>Η εγκατάσταση του bootloader παραλείφθηκε!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="632"/>
+        <location filename="rbutilqt.cpp" line="633"/>
         <source>Original Firmware Path is wrong!</source>
         <translation>Η διαδρομή του αυθεντικού firmware είναι λάθος!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="645"/>
+        <location filename="rbutilqt.cpp" line="646"/>
         <source>Original Firmware selection Canceled!</source>
         <translation>Η επιλογή του αυθεντικού firmware ακυρώθηκε!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="660"/>
+        <location filename="rbutilqt.cpp" line="661"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>Θέλετε σίγουρα να εγκαταστήσετε το πακέτο γραμματοσειρών;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="698"/>
+        <location filename="rbutilqt.cpp" line="699"/>
         <source>Warning</source>
         <translation>Προσοχη</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="699"/>
+        <location filename="rbutilqt.cpp" line="700"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
         <translation>Η εφαρμογή λαμβάνει ακόμα πληροφορίες για καινούργιες εκδόσεις. Παρακαλώ προσπαθήστε ξανά σύντομα.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="704"/>
+        <location filename="rbutilqt.cpp" line="705"/>
         <source>Do you really want to install the voice file?</source>
         <translation>Θέλετε σίγουρα να εγκαταστήσετε το αρχείο φωνής;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="733"/>
+        <location filename="rbutilqt.cpp" line="734"/>
         <source>Error</source>
         <translation>Σφάλμα</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="733"/>
+        <location filename="rbutilqt.cpp" line="734"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>Η συσκευή σας δεν διαθέτει το plugin doom. Ματαίωση.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="738"/>
+        <location filename="rbutilqt.cpp" line="739"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>Θέλετε σίγουρα να εγκαταστήσετε τα αρχεία πρόσθετων παιχνιδιών;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="818"/>
+        <location filename="rbutilqt.cpp" line="819"/>
         <source>Confirm Uninstallation</source>
         <translation>Επαλήθευση απεγκατάστασης</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="819"/>
+        <location filename="rbutilqt.cpp" line="820"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>Θέλετε σίγουρα να απεγκαταστήσετε το bootloader;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="847"/>
+        <location filename="rbutilqt.cpp" line="848"/>
         <source>Confirm download</source>
         <translation>Επαλήθευση λήψης</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="849"/>
+        <location filename="rbutilqt.cpp" line="850"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>Θέλετε σιγουρα να λάβετε το εγχειρίδιο; Το εγχειρίδιο θα αποθηκευθεί στον αρχικό φάκλεο της συσκευής σας.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="892"/>
+        <location filename="rbutilqt.cpp" line="893"/>
         <source>Confirm installation</source>
         <translation>Επαλήθευση εγκατάστασης</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="894"/>
+        <location filename="rbutilqt.cpp" line="895"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Θέλετε σίγουρα να εγκαταστήσετε το Rockbox Utility στη συσκευή σας; Μετά την εγκατάσταση θα μπορείτε να το τρέξετε από το σκληρό δίσκο της συσκευής σας.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="902"/>
+        <location filename="rbutilqt.cpp" line="903"/>
         <source>Installing Rockbox Utility</source>
         <translation>Εγκατάσταση Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="916"/>
+        <location filename="rbutilqt.cpp" line="917"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Σφάλμα εγκατάστασης Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="920"/>
+        <location filename="rbutilqt.cpp" line="921"/>
         <source>Installing user configuration</source>
         <translation>Εγκατάσταση ρυθμίσεων χρήστη</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="922"/>
+        <location filename="rbutilqt.cpp" line="923"/>
         <source>Error installing user configuration</source>
         <translation>Σφάλμα εγκατάστασης ρυθμίσεων χρήστη</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="926"/>
+        <location filename="rbutilqt.cpp" line="927"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Επιτυχία εγκατάστασης Rockbox Utility.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="1019"/>
+        <location filename="rbutilqt.cpp" line="1020"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Οι ρυθμίσεις σας δεν είναι έγκυρες. Παρακαλώ δείτε το παράθυρο ρυθμίσεων και σιγουρευτείτε ότι οι επιλεγμένες τιμές είναι σωστές.</translation>
     </message>
@@ -1824,8 +1823,8 @@ Do want to replace the current bootloader?</source>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="881"/>
-        <source>CtrlQ</source>
-        <translation>CtrlQ</translation>
+        <source>Ctrl+Q</source>
+        <translation type="unfinished">CtrlQ</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="886"/>
@@ -2130,8 +2129,8 @@ Do want to replace the current bootloader?</source>
     </message>
     <message>
         <location filename="talkfile.cpp" line="107"/>
-        <source>Voicing entrys...</source>
-        <translation>Εκφώνηση καταχωρήσεων...</translation>
+        <source>Voicing entries...</source>
+        <translation type="unfinished">Εκφώνηση καταχωρήσεων...</translation>
     </message>
     <message>
         <location filename="talkfile.cpp" line="116"/>
