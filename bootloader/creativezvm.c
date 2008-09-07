@@ -68,7 +68,8 @@ void main(void)
     if(ret)
         printf("ATA error: %d", ret);
     
-    if(1)
+    /* If no button is held, start the OF */
+    if(button_read_device() == 0)
     {
         printf("Loading Creative firmware...");
         

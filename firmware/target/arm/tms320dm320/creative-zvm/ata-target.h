@@ -22,6 +22,8 @@
 #ifndef ATA_TARGET_H
 #define ATA_TARGET_H
 
+#include "ata.h"
+
 /* DMA optimized reading and writing */
 #define ATA_OPTIMIZED_READING
 #define ATA_OPTIMIZED_WRITING
@@ -32,6 +34,12 @@
 */
 void copy_read_sectors(const unsigned char* buf, int wordcount);
 void copy_write_sectors(const unsigned char* buf, int wordcount);
+
+/* Nasty hack, but Creative is nasty... */
+#define ata_read_sectors _ata_read_sectors
+#define ata_write_sectors _ata_write_sectors
+extern int _ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf);
+extern int _ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
 
 /* General purpose memory region #1 */
 #define ATA_IOBASE      0x50FEE000
@@ -52,15 +60,15 @@ void copy_write_sectors(const unsigned char* buf, int wordcount);
 #define STATUS_ERR      0x01
 #define ERROR_ABRT      0x04
 
-#define WRITE_PATTERN1 0xa5
-#define WRITE_PATTERN2 0x5a
-#define WRITE_PATTERN3 0xaa
-#define WRITE_PATTERN4 0x55
+#define WRITE_PATTERN1  0xa5
+#define WRITE_PATTERN2  0x5a
+#define WRITE_PATTERN3  0xaa
+#define WRITE_PATTERN4  0x55
 
-#define READ_PATTERN1 0xa5
-#define READ_PATTERN2 0x5a
-#define READ_PATTERN3 0xaa
-#define READ_PATTERN4 0x55
+#define READ_PATTERN1   0xa5
+#define READ_PATTERN2   0x5a
+#define READ_PATTERN3   0xaa
+#define READ_PATTERN4   0x55
 
 #define READ_PATTERN1_MASK 0xff
 #define READ_PATTERN2_MASK 0xff
