@@ -114,7 +114,6 @@ zxbox.c
 fireworks.c
 #endif
 xobox.c
-spacerocks.c
 #if LCD_DEPTH >= 16
 rockpaint.c
 #endif
