@@ -51,13 +51,13 @@ void list_draw(struct screen *display, struct viewport *parent,
     int i;
     int lines;
     int start, end;
-    
+
     display->set_viewport(NULL);
-    lines = display->nb_lines;
-    
+    lines = display->getnblines();
+
     display->clear_display();
     start = 0;
-    end = display->nb_lines;
+    end = display->getnblines();
     gui_list->last_displayed_start_item[display->screen_type] = 
                                 gui_list->start_item[display->screen_type];
 

@@ -58,7 +58,7 @@
 
 /* The number of items between the selected one and the end/start of
  * the buffer under which the buffer must reload */
-#define MIN_BUFFER_MARGIN (screens[0].nb_lines+1)
+#define MIN_BUFFER_MARGIN (screens[0].getnblines()+1)
 
 /* Information about a specific track */
 struct playlist_entry {
@@ -182,7 +182,7 @@ static void playlist_buffer_load_entries_screen(struct playlist_buffer * pb,
 {
     if(direction==FORWARD)
     {
-        int min_start=viewer.selected_track-2*screens[0].nb_lines;
+        int min_start=viewer.selected_track-2*screens[0].getnblines();
         while(min_start<0)
             min_start+=viewer.num_tracks;
         min_start %= viewer.num_tracks;
@@ -190,7 +190,7 @@ static void playlist_buffer_load_entries_screen(struct playlist_buffer * pb,
     }
      else
     {
-        int max_start=viewer.selected_track+2*screens[0].nb_lines;
+        int max_start=viewer.selected_track+2*screens[0].getnblines();
         max_start%=viewer.num_tracks;
         playlist_buffer_load_entries(pb, max_start, BACKWARD);
     }

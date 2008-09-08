@@ -288,7 +288,6 @@ static void init(void)
     debug_init();
 #endif
     /* Must be done before any code uses the multi-screen APi */
-    screen_access_init();
     gui_syncstatusbar_init(&statusbars);
     ata_init();
     settings_reset();
@@ -404,13 +403,12 @@ static void init(void)
     button_init();
 
     powermgmt_init();
-    
+
 #if CONFIG_TUNER
     radio_init();
 #endif
 
     /* Must be done before any code uses the multi-screen APi */
-    screen_access_init();
     gui_syncstatusbar_init(&statusbars);
 
 #if CONFIG_CHARGING && (CONFIG_CPU == SH7034)
@@ -448,11 +446,11 @@ static void init(void)
 #ifdef HAVE_EEPROM_SETTINGS
     eeprom_settings_init();
 #endif
-    
+
     usb_start_monitoring();
 #ifndef HAVE_USBSTACK
     while (usb_detect() == USB_INSERTED)
-    {   
+    {
 #ifdef HAVE_EEPROM_SETTINGS
         firmware_settings.disk_clean = false;
 #endif
@@ -517,7 +515,7 @@ static void init(void)
         remove(TAGCACHE_STATEFILE);
 #endif
     }
-    
+
     gui_sync_wps_init();
     settings_apply(true);
     init_dircache(false);

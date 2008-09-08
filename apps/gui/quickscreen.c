@@ -207,7 +207,7 @@ static void gui_quickscreen_draw(struct gui_quickscreen *qs,
         value = option_get_valuestring((struct settings_list*)qs->items[i],
                                        buf, MAX_PATH, temp);
 
-        if (vps[screen][i].height < display->char_height*2)
+        if (vps[screen][i].height < display->getcharheight()*2)
         {
             char text[MAX_PATH];
             snprintf(text, MAX_PATH, "%s: %s", title, value);
