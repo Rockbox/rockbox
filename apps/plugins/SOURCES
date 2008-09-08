@@ -156,5 +156,3 @@ invadrox.c
 superdom.c
 #endif
 #endif /* m:robe 500 */
-
-md5sum.c
