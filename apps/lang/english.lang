@@ -12037,3 +12037,17 @@
     recording: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: time-domain speed compress/stretch
+  user:
+  <source>
+    *: "Speed"
+  </source>
+  <dest>
+    *: "Speed"
+  </dest>
+  <voice>
+    *: "Speed"
+  </voice>
+</phrase>

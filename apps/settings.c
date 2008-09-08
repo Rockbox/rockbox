@@ -913,6 +913,7 @@ void settings_apply(bool read_disk)
     }
 
     dsp_dither_enable(global_settings.dithering_enabled);
+    dsp_set_speed(global_settings.sound_speed);
 #endif
 
 #ifdef HAVE_SPDIF_POWER
