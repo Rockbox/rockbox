@@ -30,6 +30,7 @@
 #include "dm320.h"
 #include "ata.h"
 #include "string.h"
+#include "buffer.h"
 
 #undef ata_read_sectors
 #undef ata_write_sectors
@@ -121,7 +122,7 @@ void GIO2(void)
  ---------------------------------------------------------------------------
  */
 
-#define VFAT_SECTOR_SIZE ( (1*1024*1024*1024)/0x8000 ) /* 1GB array requires 80kB of RAM */
+#define VFAT_SECTOR_SIZE(x) ( (x)/0x8000 ) /* 1GB array requires 80kB of RAM */
 
 extern int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf);
 extern int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
@@ -199,7 +200,7 @@ struct cfs_direntry_item
 
 static bool cfs_inited = false;
 static unsigned long cfs_start;
-static unsigned long sectors[VFAT_SECTOR_SIZE];
+static unsigned long *sectors;
 
 #define CFS_START              ( ((hdr->partitions[1].start*hdr->sector_size) & ~0xFFFF) + 0x10000 )
 #define CFS_CLUSTER2CLUSTER(x) ( CFS_START+((x)-1)*64 )
@@ -277,9 +278,18 @@ static void cfs_init(void)
             vfat_inodes_nr[i-1] = vfat_direntry_items[i].inode_number;
     }
     
+    /* Determine size of VFAT file */
+    _ata_read_sectors(CFS_CLUSTER2CLUSTER(vfat_inodes_nr[1]), 1, &sector);
+    inode = (struct cfs_inode*)&sector;
+    sectors = (unsigned long*)buffer_alloc(VFAT_SECTOR_SIZE(inode->filesize));
+    
+    //printf("VFAT file size: 0x%x", inode->filesize);
+    
+    /* Clear data sectors */
+    memset(&sectors, 0, VFAT_SECTOR_SIZE(inode->filesize)*sizeof(unsigned long));
+    
     /* Read all data sectors' addresses in memory */
     vfat_sector_count = 0;
-    memset(&sectors, 0, VFAT_SECTOR_SIZE*sizeof(unsigned int));
     for(i=0; vfat_inodes_nr[i] != 0; i++)
     {
         _ata_read_sectors(CFS_CLUSTER2CLUSTER(vfat_inodes_nr[i]), 1, &sector);
