@@ -177,12 +177,17 @@ const struct picture logos[]={
     {pictureflow_logo, BMPWIDTH_pictureflow_logo, BMPHEIGHT_pictureflow_logo},
 };
 
+enum show_album_name_values { album_name_hide = 0, album_name_bottom , album_name_top };
+
 struct config_data {
     long avg_album_width;
     int spacing_between_slides;
     int extra_spacing_for_center_slide;
     int show_slides;
     int zoom;
+    bool show_fps;
+    bool resize;
+    enum show_album_name_values show_album_name;
 };
 
 /** below we allocate the memory we want to use **/
@@ -200,7 +205,6 @@ static int center_index; /* index of the slide that is in the center */
 static int itilt;
 static PFreal offsetX;
 static PFreal offsetY;
-static bool show_fps; /* show fps in the main screen */
 static int number_of_slides;
 
 static struct slide_cache cache[SLIDE_CACHE_SIZE];
@@ -459,7 +463,7 @@ int create_track_index(const int slide_index)
     /* now fix the track list order */
     l = 0;
     track_count = 0;
-    while (l < heighest_index && 
+    while (l <= heighest_index && 
            string_index <  MAX_TRACKS*AVG_TRACK_NAME_LENGTH)
     {
         if (temp_titles[l][0] != '\0')
@@ -913,7 +917,7 @@ bool create_bmp(struct bitmap *input_bmp, char *target_path, bool resize)
         /* resize image */
         output_bmp.width = config.avg_album_width;
         output_bmp.height = config.avg_album_width;
-        simple_resize_bitmap(input_bmp, &output_bmp);
+        smooth_resize_bitmap(input_bmp, &output_bmp);
 
         /* Resized bitmap is now in the output buffer,
            copy it back to the input buffer */
@@ -1567,7 +1571,7 @@ int settings_menu(void) {
         selection=rb->do_menu(&settings_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
-                rb->set_bool("Show FPS", &show_fps);
+                rb->set_bool("Show FPS", &(config.show_fps));
                 break;
 
             case 1:
@@ -1594,12 +1598,11 @@ int settings_menu(void) {
                 break;
 
             case 4:
-                rb->set_int("Number of slides", "", 1, &(config.zoom),
+                rb->set_int("Zoom", "", 1, &(config.zoom),
                             NULL, 1, 10, 300, NULL );
                 recalc_table();
                 reset_slides();
                 break;
-
             case 5:
                 rb->remove(CACHE_PREFIX "/ready");
                 rb->remove(EMPTY_SLIDE);
@@ -1658,6 +1661,9 @@ void set_default_config(void)
     config.show_slides = 3;
     config.avg_album_width = 0;
     config.zoom = 100;
+    config.show_fps = false;
+    config.resize = true;
+    config.show_album_name = album_name_bottom;
 }
 
 /**
@@ -1765,7 +1771,8 @@ void reset_track_list(void)
     int albumtxt_w, albumtxt_h;
     const char* albumtxt = get_album_name(center_index);
     rb->lcd_getstringsize(albumtxt, &albumtxt_w, &albumtxt_h);
-    const int height = LCD_HEIGHT-albumtxt_h-10;
+    const int height =
+            LCD_HEIGHT-albumtxt_h-10 - (config.show_fps?(albumtxt_h + 5):0);
     track_list_visible_entries = fmin( height/albumtxt_h , track_count );
     start_index_track_list = 0;
     track_scroll_index = 0;
@@ -1784,7 +1791,7 @@ void show_track_list(void)
         reset_track_list();
     }
     static int titletxt_w, titletxt_h, titletxt_y, titletxt_x, i, color;
-    titletxt_y = 0;
+    rb->lcd_getstringsize("W", NULL, &titletxt_h);
     if (track_list_visible_entries >= track_count)
     {
         int albumtxt_h;
@@ -1792,11 +1799,16 @@ void show_track_list(void)
         rb->lcd_getstringsize(albumtxt, NULL, &albumtxt_h);
         titletxt_y = ((LCD_HEIGHT-albumtxt_h-10)-(track_count*albumtxt_h))/2;
     }
+    else
+    {
+        if (config.show_fps)
+            titletxt_y = titletxt_h + 5;
+    }
         
     int track_i;
     for (i=0; i < track_list_visible_entries; i++) {
         track_i = i+start_index_track_list;
-        rb->lcd_getstringsize(get_track_name(track_i), &titletxt_w, &titletxt_h);
+        rb->lcd_getstringsize(get_track_name(track_i), &titletxt_w, NULL);
         titletxt_x = (LCD_WIDTH-titletxt_w)/2;
         if ( track_i == selected_track ) {
             draw_gradient(titletxt_y, titletxt_h);
@@ -1970,7 +1982,6 @@ int main(void)
     step = 0;
     target = 0;
     fade = 256;
-    show_fps = false;
 
     recalc_table();
     reset_slides();
@@ -2027,7 +2038,7 @@ int main(void)
         }
 
         /* Draw FPS */
-        if (show_fps) {
+        if (config.show_fps) {
             rb->lcd_set_foreground(LCD_RGBPACK(255, 0, 0));
             rb->snprintf(fpstxt, sizeof(fpstxt), "FPS: %d", fps);
             rb->lcd_putsxy(0, 0, fpstxt);
@@ -2095,8 +2106,10 @@ int main(void)
 #endif
 
         case PICTUREFLOW_SELECT_ALBUM:
-            if ( pf_state == pf_idle )
+            if ( pf_state == pf_idle ) {
+                reset_track_list();
                 pf_state = pf_cover_in;
+            }
             if ( pf_state == pf_show_tracks )
                 pf_state = pf_cover_out;
             break;
