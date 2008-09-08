@@ -89,8 +89,6 @@ MENUITEM_SETTING(stereo_width, &global_settings.stereo_width,
               
     MENUITEM_SETTING(dithering_enabled,
                      &global_settings.dithering_enabled, lowlatency_callback);
-    MENUITEM_SETTING(sound_speed, &global_settings.sound_speed,
-                     lowlatency_callback);
 #endif
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
@@ -118,7 +116,7 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
 #endif
           &balance,&channel_config,&stereo_width
 #if CONFIG_CODEC == SWCODEC
-          ,&crossfeed_menu, &equalizer_menu, &dithering_enabled, &sound_speed
+         ,&crossfeed_menu, &equalizer_menu, &dithering_enabled
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
          ,&loudness,&avc,&superbass,&mdb_enable,&mdb_strength

@@ -32,7 +32,6 @@
 #include "replaygain.h"
 #include "misc.h"
 #include "debug.h"
-#include "tdspeed.h"
 
 /* 16-bit samples are scaled based on these constants. The shift should be
  * no more than 15.
@@ -42,14 +41,8 @@
 
 #define NATIVE_DEPTH        16
 /* If the buffer sizes change, check the assembly code! */
-#define SMALL_SAMPLE_BUF_COUNT    256
-#define SMALL_RESAMPLE_BUF_COUNT  (256 * 4)   /* Enough for 11,025 Hz -> 44,100 Hz*/
-#define BIG_SAMPLE_BUF_COUNT    4096
-#define BIG_RESAMPLE_BUF_COUNT  (4096 * 4)   /* Enough for 11,025 Hz -> 44,100 Hz*/
-int sample_buf_count;
-int resample_buf_count;
-#define SAMPLE_BUF_COUNT sample_buf_count
-#define RESAMPLE_BUF_COUNT resample_buf_count
+#define SAMPLE_BUF_COUNT    256
+#define RESAMPLE_BUF_COUNT  (256 * 4)   /* Enough for 11,025 Hz -> 44,100 Hz*/
 #define DEFAULT_GAIN        0x01000000
 #define SAMPLE_BUF_LEFT_CHANNEL 0
 #define SAMPLE_BUF_RIGHT_CHANNEL (SAMPLE_BUF_COUNT/2)
@@ -170,8 +163,6 @@ struct dsp_config
     int  sample_depth;
     int  sample_bytes;
     int  stereo_mode;
-    bool tdspeed_active;
-    int tdspeed_factor; /* % */
     int  frac_bits;
 #ifdef HAVE_SW_TONE_CONTROLS
     /* Filter struct for software bass/treble controls */
@@ -235,12 +226,8 @@ static bool crossfeed_enabled;
  * of copying needed is minimized for that case.
  */
 
-int32_t small_sample_buf[SMALL_SAMPLE_BUF_COUNT] IBSS_ATTR;
-static int32_t small_resample_buf[SMALL_RESAMPLE_BUF_COUNT] IBSS_ATTR;
-int32_t big_sample_buf[BIG_SAMPLE_BUF_COUNT];
-static int32_t big_resample_buf[BIG_RESAMPLE_BUF_COUNT];
-int32_t *sample_buf;
-static int32_t *resample_buf;
+int32_t sample_buf[SAMPLE_BUF_COUNT] IBSS_ATTR;
+static int32_t resample_buf[RESAMPLE_BUF_COUNT] IBSS_ATTR;
 
 #if 0
 /* Clip sample to arbitrary limits where range > 0 and min + range = max */
@@ -275,30 +262,6 @@ void sound_set_pitch(int permille)
     pitch_ratio = permille;
     dsp_configure(&audio_dsp, DSP_SWITCH_FREQUENCY,
                   audio_dsp.codec_frequency);
-}
-
-void tdspeed_setup(struct dsp_config *dspc)
-{
-    if(dspc == &dsp_conf[CODEC_IDX_AUDIO]) {
-#if 0
-        mylog("tdspeed_setup: CODEC_IDX_AUDIO, factor %d, %d, %d\n",
-              dspc->tdspeed_factor, dspc->codec_frequency,
-              dspc->stereo_mode != STEREO_MONO);
-#endif
-        if(dspc->tdspeed_factor == 0 || dspc->tdspeed_factor == 100)
-            dspc->tdspeed_active = false;
-        else dspc->tdspeed_active
-            = tdspeed_init(dspc->codec_frequency == 0 ? NATIVE_FREQUENCY
-                           : dspc->codec_frequency,
-                           dspc->stereo_mode != STEREO_MONO,
-                           dspc->tdspeed_factor);
-    }
-}
-
-void dsp_set_speed(int percent)
-{
-    dsp_conf[CODEC_IDX_AUDIO].tdspeed_factor = percent;
-    tdspeed_setup(&dsp_conf[CODEC_IDX_AUDIO]);
 }
 
 /* Convert count samples to the internal format, if needed.  Updates src
@@ -1174,9 +1137,6 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 
         dsp->input_samples(samples, src, tmp);
 
-        if(dsp->tdspeed_active)
-            samples = tdspeed_doit(tmp, samples);
-
         if (dsp->apply_gain)
             dsp->apply_gain(samples, &dsp->data, tmp);
 
@@ -1228,19 +1188,6 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 /* dsp_input_size MUST be called afterwards */
 int dsp_output_count(struct dsp_config *dsp, int count)
 {
-    if(!dsp->tdspeed_active) {
-        sample_buf = small_sample_buf;
-        resample_buf = small_resample_buf;
-        sample_buf_count = SMALL_SAMPLE_BUF_COUNT;
-        resample_buf_count = SMALL_RESAMPLE_BUF_COUNT;
-    } else {
-        sample_buf = big_sample_buf;
-        resample_buf = big_resample_buf;
-        sample_buf_count = BIG_SAMPLE_BUF_COUNT;
-        resample_buf_count = BIG_RESAMPLE_BUF_COUNT;
-    }
-    if(dsp->tdspeed_active)
-        count = tdspeed_est_output_size(count);
     if (dsp->resample)
     {
         count = (int)(((unsigned long)count * NATIVE_FREQUENCY
@@ -1273,9 +1220,6 @@ int dsp_input_count(struct dsp_config *dsp, int count)
         count = (int)(((unsigned long)count *
                       dsp->data.resample_data.delta) >> 16);
     }
-
-    if(dsp->tdspeed_active)
-        count = tdspeed_est_input_size(count);
 
     return count;
 }
@@ -1324,7 +1268,6 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
             dsp->frequency = dsp->codec_frequency;
 
         resampler_new_delta(dsp);
-        tdspeed_setup(dsp);
         break;
 
     case DSP_SET_SAMPLE_DEPTH:
@@ -1354,7 +1297,6 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
         dsp->stereo_mode = value;
         dsp->data.num_channels = value == STEREO_MONO ? 1 : 2;
         dsp_update_functions(dsp);
-        tdspeed_setup(dsp);
         break;
 
     case DSP_RESET:
@@ -1379,7 +1321,6 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
 
         dsp_update_functions(dsp);
         resampler_new_delta(dsp);
-        tdspeed_setup(dsp);
         break;
 
     case DSP_FLUSH:
@@ -1387,7 +1328,6 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
                sizeof (dsp->data.resample_data));
         resampler_new_delta(dsp);
         dither_init(dsp);
-        tdspeed_setup(dsp);
         break;
 
     case DSP_SET_TRACK_GAIN:

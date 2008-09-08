@@ -201,4 +201,3 @@ keymaps/keymap-hdd1630.c
 #elif CONFIG_KEYPAD == IAUDIO67_PAD
 keymaps/keymap-iaudio67.c
 #endif
-tdspeed.c

@@ -633,7 +633,6 @@ struct user_settings
     int eq_band4_gain;          /* +/- dB */
 
     bool dithering_enabled;
-    int sound_speed;
 #endif
 
 

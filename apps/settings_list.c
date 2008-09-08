@@ -1106,9 +1106,6 @@ const struct settings_list settings[] = {
     /* dithering */
     OFFON_SETTING(F_SOUNDSETTING, dithering_enabled, LANG_DITHERING, false,
                   "dithering enabled", dsp_dither_enable),
-    INT_SETTING(0, sound_speed, LANG_SPEED, 100, "speed",
-                UNIT_INT, 35, 250, 5,
-                NULL, NULL, dsp_set_speed),
 #endif
 #ifdef HAVE_WM8758
     SOUND_SETTING(F_NO_WRAP, bass_cutoff, LANG_BASS_CUTOFF,
