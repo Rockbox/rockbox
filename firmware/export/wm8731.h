@@ -67,11 +67,11 @@ extern void audiohw_set_sample_rate(int sampling_control);
 
 #define DAPCTRL                 0x05  /* Digital audio path control */
 #define DAPCTRL_ADCHPD          (1 << 0)
-#define DAPCTRL_DEEMP_DISABLE   (0 << 2)
-#define DAPCTRL_DEEMP_32KHz     (1 << 2)
-#define DAPCTRL_DEEMP_44KHz     (2 << 2)
-#define DAPCTRL_DEEMP_48KHz     (3 << 2)
-#define DAPCTRL_DEEMP_MASK      (3 << 2)
+#define DAPCTRL_DEEMP_DISABLE   (0 << 1)
+#define DAPCTRL_DEEMP_32KHz     (1 << 1)
+#define DAPCTRL_DEEMP_44KHz     (2 << 1)
+#define DAPCTRL_DEEMP_48KHz     (3 << 1)
+#define DAPCTRL_DEEMP_MASK      (3 << 1)
 #define DAPCTRL_DACMU           (1 << 3)
 #define DAPCTRL_HPOR            (1 << 4)
 
