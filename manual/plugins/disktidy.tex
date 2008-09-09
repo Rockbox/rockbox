@@ -1,16 +1,23 @@
 % $Id $ %
 \subsection{Disk Tidy}
   Disk Tidy deletes junk files left behind by Windows, Linux or OS X after a USB connection.
-  Select the OS's files you want to delete in the 'Files to Clean' menu and select 'Start Cleaning' to begin to process.
+  Select the OS's files you want to delete in the 'Files to Clean'
+  menu and select 'Start Cleaning' to begin to process. The settings
+  are stored in .rockbox/rocks/apps/disktidy.config, in a plain text
+  file that is user-modifiable to allow more entries to be added.
 
   \subsubsection{Available Options}
   \begin{description}
-    \item[All] deletes Linux, OS X and Windows files.
-    \item[Linux] deletes Linux files, \fname{.dolphinview}, and \fname{.d3lphinview}.
-    \item[Win] deletes Windows files, \fname{Thumbs.db}, \fname{/Recycled} and
+    \item[All] selects all Linux, OS X, and Windows files.
+    \item[None] deselects all file options.
+    \item[Linux] selects Linux files. Default files are
+      \fname{.dolphinview}, \fname{.d3lphinview}, and \fname{.Trash-*/}.
+    \item[Windows] selects Windows files. Default files are
+      \fname{Thumbs.db}, \fname{RECYCLE.BIN}, \fname{Desktop.ini}, \fname{/Recycled} and
       \fname{/System Volume Information}.
-    \item[Mac] deletes OS X files, \fname{.\_*}, \fname{.DS\_Store} and
+    \item[Mac] selects OS X files. Default files are \fname{.\_*}, \fname{.DS\_Store} and
       \fname{/.Trashes}.
+    \item[Other] selects additional files added in by the user.
   \end{description}
   
   \begin{table}
@@ -18,7 +25,7 @@
       \opt{PLAYER_PAD}{\ButtonStop}%
       \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}%
       \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}%
-      \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}%
+      \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}%
       & Exit\ /\ Abort\\
     \end{btnmap}
 \end{table}
