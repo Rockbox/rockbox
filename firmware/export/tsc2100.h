@@ -28,6 +28,8 @@ void tsc2100_read_values(short *x, short* y, short *z1, short *z2);
 short tsc2100_readreg(int page, int address);
 /* write a value to the register */
 void tsc2100_writereg(int page, int address, short value);
+/* produce a key click (doesn't work?) */
+void tsc2100_keyclick(void);
 
 /* ts adc page defines (page 1, 00h ) (refer to page 40 of the datasheet) */
 #define TSADC_PAGE          1

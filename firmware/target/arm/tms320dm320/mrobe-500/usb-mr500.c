@@ -25,6 +25,7 @@
 #include "kernel.h"
 #include "ata.h"
 #include "usb.h"
+#include "usb-target.h"
 
 #define USB_RST_ASSERT
 #define USB_RST_DEASSERT

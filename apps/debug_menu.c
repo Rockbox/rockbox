@@ -1464,7 +1464,7 @@ static bool dbg_cpufreq(void)
 
 #if defined(HAVE_TSC2100) && !defined(SIMULATOR)
 #include "tsc2100.h"
-char *itob(int n, int len)
+static char *itob(int n, int len)
 {
     static char binary[64];
     int i,j;
@@ -1519,7 +1519,7 @@ static int tsc2100debug_action_callback(int action, struct gui_synclist *lists)
     }
     return action;
 }
-bool tsc2100_debug(void)
+static bool tsc2100_debug(void)
 {
     int page = 0;
     char title[32] = "tsc2100 registers - Page 0";

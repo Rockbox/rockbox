@@ -29,6 +29,7 @@
 #include "kernel.h"
 #include "memory.h"
 #include "system-target.h"
+#include "lcd.h"
 #include "lcd-target.h"
 
 /* Copies a rectangle from one framebuffer to another. Can be used in
