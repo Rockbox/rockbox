@@ -274,8 +274,8 @@ void GIO0(void)
 #endif
 }
 
-void send_command_to_pic(const unsigned char in, unsigned char* out,
-                         const unsigned int length)
+static void send_command_to_pic(const unsigned char in, unsigned char* out,
+                                const unsigned int length)
 {
     /* Disable GIO0 interrupt */
     IO_INTC_EINT1 &= ~INTR_EINT1_EXT0;

@@ -23,6 +23,7 @@
 #include "system.h"
 #include "string.h"
 #include "panic.h"
+#include "uart-target.h"
 
 #define MAX_UART_BUFFER     31
 #define SEND_RING_SIZE      256
