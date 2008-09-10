@@ -8,5 +8,6 @@
         <file>rbutil_zh_CN.qm</file>
         <file>rbutil_zh_TW.qm</file>
         <file>rbutil_gr.qm</file>
+        <file>rbutil_he.qm</file>
     </qresource>
 </RCC>
