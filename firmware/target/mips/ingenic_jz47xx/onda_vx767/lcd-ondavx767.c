@@ -192,6 +192,11 @@ void lcd_set_target(short x, short y, short width, short height)
     SLCD_SEND_COMMAND(0x52, x);
     SLCD_SEND_COMMAND(0x53, x+width-1);
     /* TODO */
+    
+    __gpio_clear_pin(PIN_UNK_N);
+    SLCD_SET_COMMAND(0x22);
+    WAIT_ON_SLCD;
+    __gpio_set_pin(PIN_UNK_N);
 }
 
 void lcd_on(void)
