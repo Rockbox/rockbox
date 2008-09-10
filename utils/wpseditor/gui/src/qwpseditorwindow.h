@@ -35,7 +35,7 @@
 
 class QWpsEditorWindow : public QMainWindow, public Ui::MainWindow {
     Q_OBJECT
-    
+
     QWpsState wpsState;
     QTrackState trackState;
     QPointer<QWpsDrawer> drawer;
@@ -47,9 +47,11 @@ class QWpsEditorWindow : public QMainWindow, public Ui::MainWindow {
     QHash<QString,QAction *> actTargets;
     QActionGroup             *actGroupTargets;
     QSignalMapper            *targetsSignalMapper;
-    
+
+    int scrollingLine;
 protected:
     void connectActions();
+    void postWpsUpdate();
 public:
     QWpsEditorWindow( QWidget * parent = 0, Qt::WFlags f = 0 );
     void logMsg(QString s);
@@ -69,6 +71,7 @@ signals:
 
 };
 #endif
+
 
 
 

@@ -47,6 +47,7 @@ const char *playmodeNames[] = {
 QWpsEditorWindow::QWpsEditorWindow( QWidget * parent, Qt::WFlags f)
         : QMainWindow(parent, f) {
     logEdit = 0;
+    scrollingLine = -1;
     setupUi(this);
     drawer = new QWpsDrawer(&wpsState,&trackState, this);
     QWpsDrawer::api.verbose = 1;
@@ -54,7 +55,8 @@ QWpsEditorWindow::QWpsEditorWindow( QWidget * parent, Qt::WFlags f)
     connectActions();
     m_propertyEditor->addObject(&trackState);
     m_propertyEditor->addObject(&wpsState);
-    new QSyntaxer(plainWpsEdit->document());
+    new QSyntaxer(plainWpsEdit->textEdit()->document());
+    plainWpsEdit->markLine(-1);
 }
 
 void QWpsEditorWindow::connectActions() {
@@ -65,7 +67,7 @@ void QWpsEditorWindow::connectActions() {
     connect(actShowGrid,    SIGNAL(triggered(bool)), drawer, SLOT(slotShowGrid(bool)));
 
     connect(actUpdatePlainWps,       SIGNAL(triggered()),              SLOT(slotUpdatePlainWps()));
-    connect(plainWpsEdit->document(),SIGNAL(modificationChanged(bool)),SLOT(slotPlainDocModChanged(bool)));
+    connect(plainWpsEdit->textEdit()->document(),SIGNAL(modificationChanged(bool)),SLOT(slotPlainDocModChanged(bool)));
 
     connect(&wpsState,   SIGNAL(stateChanged(wpsstate)),   drawer, SLOT(slotWpsStateChanged(wpsstate)));
     connect(&trackState, SIGNAL(stateChanged(trackstate)), drawer, SLOT(slotTrackStateChanged(trackstate)));
@@ -124,17 +126,23 @@ void QWpsEditorWindow::slotOpenWps() {
         DEBUGF1(tr("File wasn't chosen"));
         return;
     }
-    m_propertyEditor->setEnabled(true);
+    scrollingLine = -1;
     drawer->WpsInit(wpsfile);
-    plainWpsEdit->clear();
-    plainWpsEdit->append(drawer->wpsString());
-    trackState.setAlbum(trackState.album()); ////updating property editor
-    actGroupAudios->setEnabled(true);
-    
+    plainWpsEdit->textEdit()->clear();
+    plainWpsEdit->textEdit()->append(drawer->wpsString());
+    postWpsUpdate();
 }
 
 void QWpsEditorWindow::logMsg(QString s) {
     logEdit->append(s);
+    // check for error line:
+    if (s.contains("ERR: Failed parsing on line ")) {
+        QRegExp error("\\d+");
+        if (error.indexIn(s) != -1) {
+            scrollingLine = error.cap(0).toInt();
+            plainWpsEdit->markLine(scrollingLine);
+        }
+    }
 }
 
 void QWpsEditorWindow::slotVerboseLevel() {
@@ -146,18 +154,18 @@ void QWpsEditorWindow::slotVerboseLevel() {
 
 void QWpsEditorWindow::slotUpdatePlainWps() {
     DEBUGF1(tr("Updating WPS"));
-    plainWpsEdit->document()->setModified(false);
-    drawer->WpsInit(plainWpsEdit->toPlainText(),false);
-    m_propertyEditor->setEnabled(true);
-    actGroupAudios->setEnabled(true);
-    trackState.setAlbum(trackState.album()); //updating property editor
+    scrollingLine = -1;
+    drawer->WpsInit(plainWpsEdit->textEdit()->toPlainText(),false);
+    postWpsUpdate();
 }
 
 void QWpsEditorWindow::slotPlainDocModChanged(bool changed) {
-    if (changed)
+    if (changed) {
         dockPlainWps->setWindowTitle(tr("PlainWps*"));
-    else
+        plainWpsEdit->markLine(-1);
+    } else {
         dockPlainWps->setWindowTitle(tr("PlainWps"));
+    }
 }
 void QWpsEditorWindow::slotSetTarget(const QString & target) {
     if (drawer->setTarget(target)) {
@@ -167,6 +175,16 @@ void QWpsEditorWindow::slotSetTarget(const QString & target) {
         DEBUGF1(tr("ERR: Target <%1> failed!").arg(target));
     update();
     slotUpdatePlainWps();
+}
+
+void QWpsEditorWindow::postWpsUpdate() {
+    m_propertyEditor->setEnabled(true);
+    actGroupAudios->setEnabled(true);
+    trackState.setAlbum(trackState.album()); ////updating property editor
+    plainWpsEdit->markLine(scrollingLine);
+    plainWpsEdit->textEdit()->document()->setModified(false);
+    plainWpsEdit->scrolltoLine(scrollingLine);
+    scrollingLine = -1;
 }
 
 

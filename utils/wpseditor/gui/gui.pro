@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET =
 DEPENDPATH += . build src ui
-INCLUDEPATH += . src/QPropertyEditor ../libwps/src
+INCLUDEPATH += . src src/QPropertyEditor ../libwps/src
 DESTDIR = bin
 OBJECTS_DIR = build
 MOC_DIR = build
@@ -17,7 +17,9 @@ HEADERS += ../libwps/src/api.h \
  src/qwpseditorwindow.h \
  src/utils.h \
  src/qwpsdrawer.h \
- src/qsyntaxer.h
+ src/qsyntaxer.h \
+ src/numberedtextview.h
+ 
 FORMS += ui/mainwindow.ui ui/slider.ui
 SOURCES += src/main.cpp \
  src/slider.cpp \
@@ -27,8 +29,10 @@ SOURCES += src/main.cpp \
  src/utils.cpp \
  src/qwpsdrawer.cpp \
  src/qwpsdrawer_static.cpp \
- src/qsyntaxer.cpp
-LIBS += -Lbin
+ src/qsyntaxer.cpp \
+ src/numberedtextview.cpp
+ 
+ LIBS += -Lbin
 CONFIG(debug, debug|release) {
  LIBS +=  -lQPropertyEditord
  TARGET =  wpseditord
