@@ -59,9 +59,17 @@ static void _display_pin_init(void)
 }
 
 #define WAIT_ON_SLCD while(REG_SLCD_STATE & SLCD_STATE_BUSY);
-#define SLCD_SET_DATA(x) WAIT_ON_SLCD; REG_SLCD_DATA = (x) | SLCD_DATA_RS_DATA;
-#define SLCD_SET_COMMAND(x) WAIT_ON_SLCD; REG_SLCD_DATA = (x) | SLCD_DATA_RS_COMMAND;
-#define SLCD_SEND_COMMAND(cmd,val) SLCD_SET_COMMAND(cmd); __gpio_set_pin(PIN_UNK_N); SLCD_SET_DATA(val); __gpio_clear_pin(PIN_UNK_N);
+#define SLCD_SET_DATA(x) REG_SLCD_DATA = (x) | SLCD_DATA_RS_DATA;
+#define SLCD_SET_COMMAND(x) REG_SLCD_DATA = (x) | SLCD_DATA_RS_COMMAND;
+
+#define SLCD_SEND_COMMAND(cmd,val) \
+         __gpio_clear_pin(PIN_UNK_N); \
+         SLCD_SET_COMMAND(cmd); \
+         WAIT_ON_SLCD; \
+         __gpio_set_pin(PIN_UNK_N); \
+         SLCD_SET_DATA(val); \
+         WAIT_ON_SLCD;
+         
 static void _display_init(void)
 {
     int i;
@@ -125,7 +133,9 @@ static void _display_init(void)
     SLCD_SEND_COMMAND(0x98, 0);
     SLCD_SEND_COMMAND(0x7, 0x173);
     
+    __gpio_clear_pin(PIN_UNK_N);
     SLCD_SET_COMMAND(0x22);
+    WAIT_ON_SLCD;
     __gpio_set_pin(PIN_UNK_N);
 }
 
