@@ -244,6 +244,24 @@ static void LCD_SPI_init(void)
 /* LCD init */
 void lcd_init_device(void)
 {
+#ifdef BOOTLOADER
+    int i;
+    /* When the Rockbox bootloader starts, we are changing framebuffer address,
+       but we don't want what's shown on the LCD to change until we do an
+       lcd_update(), so copy the data from the old framebuffer to the new one */
+    unsigned short *buf = (unsigned short*)FRAME;
+
+    memcpy(FRAME, (short *)((LCDSADDR1)<<1), 320*240*2);
+
+    /* The Rockbox bootloader is transitioning from RGB555I to RGB565 mode
+       so convert the frambuffer data accordingly */
+    for(i=0; i< 320*240; i++){
+        *buf = ((*buf>>1) & 0x1F) | (*buf & 0xffc0);
+        buf++;
+    }
+#endif
+
+
     /* Set pins up */
 
     GPHUP   &= 0x600;
