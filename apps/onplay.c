@@ -528,7 +528,7 @@ static bool delete_handler(bool is_dir)
         file_to_delete
     };
     const char *yes_lines[]={
-        ID2P(LANG_DELETED),
+        ID2P(LANG_DELETING),
         file_to_delete
     };
 
