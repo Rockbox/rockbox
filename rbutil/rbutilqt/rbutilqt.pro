@@ -183,9 +183,9 @@ TRANSLATIONS += rbutil_de.ts \
  rbutil_nl.ts \
  rbutil_tr.ts \
  rbutil_zh_CN.ts \
- rbutil_zh_TW.ts
- rbutil_ja.ts \
- 
+ rbutil_zh_TW.ts \
+ rbutil_ja.ts
+
 QT += network
 DEFINES += RBUTIL _LARGEFILE64_SOURCE
 
