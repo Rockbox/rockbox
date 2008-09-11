@@ -365,7 +365,7 @@ void pcm_play_dma_init(void)
     /* Initialize default register values. */
     audiohw_init();
 
-#if !defined(HAVE_WM8731) && !defined(HAVE_WM8751)
+#if !defined(HAVE_WM8731) && !defined(HAVE_WM8751) && !defined(HAVE_WM8975)
     /* Power on */
     audiohw_enable_output(true);
     /* Unmute the master channel (DAC should be at zero point now). */
@@ -590,6 +590,13 @@ void pcm_rec_dma_start(void *addr, size_t size)
 void pcm_rec_dma_close(void)
 {
     pcm_rec_dma_stop();
+
+#if defined(IPOD_COLOR) || defined (IPOD_4G)
+    /* The usual magic from IPL - I'm guessing this configures the headphone
+       socket to be input or output - in this case, output. */
+    GPIO_SET_BITWISE(GPIOI_OUTPUT_VAL, 0x40);
+    GPIO_SET_BITWISE(GPIOA_OUTPUT_VAL, 0x04);
+#endif
 } /* pcm_close_recording */
 
 void pcm_rec_dma_init(void)
@@ -597,8 +604,8 @@ void pcm_rec_dma_init(void)
 #if defined(IPOD_COLOR) || defined (IPOD_4G)
     /* The usual magic from IPL - I'm guessing this configures the headphone
        socket to be input or output - in this case, input. */
-    GPIOI_OUTPUT_VAL &= ~0x40;
-    GPIOA_OUTPUT_VAL &= ~0x4;
+    GPIO_CLEAR_BITWISE(GPIOI_OUTPUT_VAL, 0x40);
+    GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_VAL, 0x04);
 #endif
 
     pcm_rec_dma_stop();

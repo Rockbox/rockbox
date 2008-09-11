@@ -96,13 +96,13 @@ void audiohw_init(void) {
 #endif /* IPOD_1G2G/3G */
 #endif
     
-#if defined(HAVE_WM8731) || defined(HAVE_WM8751)
+#if defined(HAVE_WM8731) || defined(HAVE_WM8751) || defined(HAVE_WM8975)
     audiohw_preinit();
 #endif
    
 }
 
-#if !defined(HAVE_WM8731) && !defined(HAVE_WM8751)
+#if !defined(HAVE_WM8731) && !defined(HAVE_WM8751) && !defined(HAVE_WM8975)
 void audiohw_postinit(void)
 {
 }
