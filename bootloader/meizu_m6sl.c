@@ -43,6 +43,7 @@
 #include "common.h"
 #include "rbunicode.h"
 #include "usb.h"
+#include "qt1106.h"
 
 #include <stdarg.h>
 
@@ -51,122 +52,10 @@ char version[] = APPSVERSION;
 #define SHORT_DELAY  50000
 #define PAUSE_DELAY  50000
 
-#define SPIDELAY(_x) void(_x);
-#define SETMOSI() PDAT1 |= (1 << 6)
-#define CLRMOSI() PDAT1 &= ~(1 << 6)
-
-#define MISO ((PDAT0 >> 3) & 1)
-#define RDY (PDAT1 & (1 << 5))
-
-#define SETCLK() PDAT0 |= (1 << 1)
-#define CLRCLK() PDAT0 &= ~(1 << 1)
-
-#define SETSS() PDAT0 |= (1 << 0)
-#define CLRSS() PDAT0 &= ~(1 << 0)
-
-#define SPISPEED 10000
-
-#define QT_CT 0x00800000
-
-#define QT_AKS_DISABLED 0x00000000
-#define QT_AKS_GLOBAL   0x00010000
-#define QT_AKS_MODE1    0x00020000
-#define QT_AKS_MODE2    0x00030000
-#define QT_AKS_MODE3    0x00040000
-#define QT_AKS_MODE4    0x00050000
-
-#define QT_SLD_WHEEL    0x00000000
-#define QT_SLD_SLIDER   0x00080000
-
-#define QT_KEY7_NORMAL  0x00000000
-#define QT_KEY7_PROX    0x00100000
-
-#define QT_MODE_FREE    0x00000000
-#define QT_MODE_LP1     0x00000100
-#define QT_MODE_LP2     0x00000200
-#define QT_MODE_LP3     0x00000300
-#define QT_MODE_LP4     0x00000400
-#define QT_MODE_SYNC    0x00000500
-#define QT_MODE_SLEEP   0x00000600
-
-#define QT_LPB          0x00000800
-#define QT_DI           0x00001000
-
-#define QT_MOD_10       0x00000000
-#define QT_MOD_20       0x00002000
-#define QT_MOD_60       0x00004000
-#define QT_MOD_INF      0x00006000
-
-#define QT_CAL_ALL      0x00000000
-#define QT_CAL_KEYS     0x00000008
-#define QT_CAL_WHEEL    0x00000010
-#define QT_RES_4        0x00000020
-#define QT_RES_8        0x00000040
-#define QT_RES_16       0x00000060
-#define QT_RES_32       0x00000080
-#define QT_RES_64       0x000000A0
-#define QT_RES_128      0x000000C0
-#define QT_RES_256      0x000000E0
-
-
 static inline void delay(int duration)
 {
     volatile int i;
     for(i=0;i<duration;i++);
-}
-
-
-void init_qt1106(void)
-{
-    int oldval;
-
-    oldval = PCON0;
-    //Set P0.0 and P0.1 to output, set P0.3 to input
-    PCON0 = ((oldval & ~(3 << 0 || 3 << 2 || 3 << 6)) | (1 << 0 | 1 << 2));
-
-    oldval = PCON1;
-    //Set P1.5 to input, set P1.6 to input
-    PCON1 = ((oldval & ~(0xf << 20 || 0xf << 24)) | (1 << 24));
-
-    SETSS();
-    SETCLK();
-}
-
-unsigned read_qt1106(unsigned int input)
-{
-    int output = 0;
-    int i;
-
-    while(!RDY) {}
-
-    delay(10);  // < 470 us
-
-    CLRSS();
-    delay(13); // > 22 us
-
-    for (i = 0; i < 24; i++) {
-
-        CLRCLK();
-
-        if (input & (1 << 23))
-            SETMOSI();
-        else
-            CLRMOSI();
-        input <<= 1;
-
-        delay(20); // >> 6.7 us
-
-        SETCLK();
-
-        output |= MISO;
-        output <<= 1;
-
-        delay(20); // >> 6.7 us
-    }
-
-    SETSS();
-
-    return (output & 0x00FFFFFF);
 }
 
 
@@ -178,7 +67,6 @@ void bl_debug(bool bit)
         delay(LONG_DELAY);
         PDAT0 ^= (1 << 2); //Toggle backlight
         delay(LONG_DELAY);
-        //for(i=0;i<pause_delay;i++);
     }
     else
     {
@@ -186,7 +74,6 @@ void bl_debug(bool bit)
         delay(SHORT_DELAY);
         PDAT0 ^= (1 << 2); //Toggle backlight
         delay(SHORT_DELAY);
-        //for(i=0;i<pause_delay;i++);
     }
 }
 
@@ -223,14 +110,16 @@ void main(void)
     PDAT0 ^= (1 << 2); //Toggle backlight
 
     /* Calibrate the lot */
-    read_qt1106(QT_MODE_FREE | QT_MOD_INF | QT_DI | QT_SLD_SLIDER | QT_CAL_WHEEL | QT_CAL_KEYS | QT_RES_4);
+    qt1106_io(QT1106_MODE_FREE | QT1106_MOD_INF | QT1106_DI | QT1106_SLD_SLIDER | QT1106_CAL_WHEEL | QT1106_CAL_KEYS | QT1106_RES_4);
 
     /* Set to maximum sensitivity */
-    read_qt1106(QT_CT | (0x00 << 8) );
+    qt1106_io(QT1106_CT | (0x00 << 8) );
 
     while(true)
     {
-        int slider = read_qt1106(QT_MODE_FREE | QT_MOD_INF | QT_DI | QT_SLD_SLIDER | QT_RES_4);
+        qt1106_wait();
+
+        int slider = qt1106_io(QT1106_MODE_FREE | QT1106_MOD_INF | QT1106_DI | QT1106_SLD_SLIDER | QT1106_RES_4);
         bl_debug_int(((slider&0xff)) + 1);
     }
 
