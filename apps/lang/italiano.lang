@@ -7792,7 +7792,7 @@
     *: "Copia..."
   </dest>
   <voice>
-    *: "Copia!"
+    *: "Copia in corso!"
   </voice>
 </phrase>
 <phrase>
@@ -7806,7 +7806,7 @@
     *: "Cancellazione..."
   </dest>
   <voice>
-    *: "Cancellazione!"
+    *: "Cancellazione in corso!"
   </voice>
 </phrase>
 <phrase>
@@ -7820,7 +7820,7 @@
     *: "Spostamento..."
   </dest>
   <voice>
-    *: "Spostamento!"
+    *: "Spostamento in corso!"
   </voice>
 </phrase>
 <phrase>
