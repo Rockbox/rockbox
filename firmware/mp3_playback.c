@@ -151,7 +151,7 @@ void demand_irq_enable(bool on)
 #endif /* #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 
 
-void play_tick(void)
+static void play_tick(void)
 {
     if(playing && !paused)
     {
