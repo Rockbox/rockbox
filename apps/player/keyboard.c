@@ -31,6 +31,7 @@
 #include "misc.h"
 #include "rbunicode.h"
 #include "lang.h"
+#include "keyboard.h"
 
 #define KBD_BUF_SIZE  64
 #define KEYBOARD_PAGES 3

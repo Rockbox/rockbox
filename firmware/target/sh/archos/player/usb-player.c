@@ -23,6 +23,7 @@
 #include "cpu.h"
 #include "system.h"
 #include "usb.h"
+#include "usb-target.h"
 
 int usb_detect(void)
 {

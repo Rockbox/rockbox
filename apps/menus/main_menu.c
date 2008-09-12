@@ -497,7 +497,7 @@ MAKE_MENU(info_menu, ID2P(LANG_SYSTEM), 0, Icon_Questionmark,
 
 
 #ifdef HAVE_LCD_CHARCELLS
-int mainmenu_callback(int action,const struct menu_item_ex *this_item)
+static int mainmenu_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
     switch (action)
