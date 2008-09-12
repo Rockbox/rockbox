@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 #include "jz4740.h"
 #include "ata.h"
@@ -26,232 +26,381 @@
 #include "system.h"
 #include "panic.h"
 
-#define NAND_CMD_READ1_00                 0x00
-#define NAND_CMD_READ1_01                 0x01
-#define NAND_CMD_READ2                    0x50
-#define NAND_CMD_READ_ID1                 0x90
-#define NAND_CMD_READ_ID2                 0x91
-#define NAND_CMD_RESET                    0xFF
-#define NAND_CMD_PAGE_PROGRAM_START       0x80
-#define NAND_CMD_PAGE_PROGRAM_STOP        0x10
-#define NAND_CMD_BLOCK_ERASE_START        0x60
-#define NAND_CMD_BLOCK_ERASE_CONFIRM      0xD0
-#define NAND_CMD_READ_STATUS              0x70
+/*
+ * Standard NAND flash commands
+ */
+#define NAND_CMD_READ0        0
+#define NAND_CMD_READ1        1
+#define NAND_CMD_RNDOUT        5
+#define NAND_CMD_PAGEPROG    0x10
+#define NAND_CMD_READOOB    0x50
+#define NAND_CMD_ERASE1        0x60
+#define NAND_CMD_STATUS        0x70
+#define NAND_CMD_STATUS_MULTI    0x71
+#define NAND_CMD_SEQIN        0x80
+#define NAND_CMD_RNDIN        0x85
+#define NAND_CMD_READID        0x90
+#define NAND_CMD_ERASE2        0xd0
+#define NAND_CMD_RESET        0xff
 
-#define NANDFLASH_CLE                     0x00008000 //PA[15]
-#define NANDFLASH_ALE                     0x00010000 //PA[16]
+/* Extended commands for large page devices */
+#define NAND_CMD_READSTART    0x30
+#define NAND_CMD_RNDOUTSTART    0xE0
+#define NAND_CMD_CACHEDPROG    0x15
 
-#define NANDFLASH_BASE                    0xB8000000
-#define REG_NAND_DATA8                    (*((volatile unsigned char *)NANDFLASH_BASE))
-#define REG_NAND_DATA16                   (*((volatile unsigned short *)NANDFLASH_BASE))
-#define REG_NAND_DATA                     REG_NAND_DATA8
-#define REG_NAND_CMD                      (*((volatile unsigned char *)(NANDFLASH_BASE + NANDFLASH_CLE)))
-#define REG_NAND_ADDR                     (*((volatile unsigned char *)(NANDFLASH_BASE + NANDFLASH_ALE)))
+/* Status bits */
+#define NAND_STATUS_FAIL    0x01
+#define NAND_STATUS_FAIL_N1    0x02
+#define NAND_STATUS_TRUE_READY    0x20
+#define NAND_STATUS_READY    0x40
+#define NAND_STATUS_WP        0x80
 
-#define JZ_NAND_SELECT                    (REG_EMC_NFCSR |=  EMC_NFCSR_NFCE1 )
-#define JZ_NAND_DESELECT                  (REG_EMC_NFCSR &= ~(EMC_NFCSR_NFCE1))
+/*
+ * NAND parameter struct
+ */
+struct nand_param
+{
+    unsigned int bus_width;        /* data bus width: 8-bit/16-bit */
+    unsigned int row_cycle;        /* row address cycles: 2/3 */
+    unsigned int page_size;        /* page size in bytes: 512/2048 */
+    unsigned int oob_size;        /* oob size in bytes: 16/64 */
+    unsigned int page_per_block;    /* pages per block: 32/64/128 */
+};
 
-#define __nand_enable()                   (REG_EMC_NFCSR |= (EMC_NFCSR_NFE1 | EMC_NFCSR_NFCE1))
-#define __nand_disable()                  (REG_EMC_NFCSR &= ~(EMC_NFCSR_NFCE1))
-#define __nand_ecc_disable()              (REG_EMC_NFECR &= ~EMC_NFECR_ECCE)
-#define __nand_ecc_encode_sync()          while (!(REG_EMC_NFINTS & EMC_NFINTS_ENCF))
-#define __nand_ecc_decode_sync()          while (!(REG_EMC_NFINTS & EMC_NFINTS_DECF))
+/*
+ * jz4740_nand.c
+ *
+ * NAND read routine for JZ4740
+ *
+ * Copyright (c) 2005-2008 Ingenic Semiconductor Inc.
+ *
+ */
+
+#define NAND_DATAPORT        0xb8000000
+#define NAND_ADDRPORT        0xb8010000
+#define NAND_COMMPORT        0xb8008000
+
+#define ECC_BLOCK        512
+#define ECC_POS            6
+#define PAR_SIZE        9
+
+#define __nand_cmd(n)        (REG8(NAND_COMMPORT) = (n))
+#define __nand_addr(n)        (REG8(NAND_ADDRPORT) = (n))
+#define __nand_data8()        REG8(NAND_DATAPORT)
+#define __nand_data16()        REG16(NAND_DATAPORT)
+
+#define __nand_enable()        (REG_EMC_NFCSR |= EMC_NFCSR_NFE1 | EMC_NFCSR_NFCE1)
+#define __nand_disable()    (REG_EMC_NFCSR &= ~(EMC_NFCSR_NFCE1))
 #define __nand_ecc_rs_encoding() \
     (REG_EMC_NFECR = EMC_NFECR_ECCE | EMC_NFECR_ERST | EMC_NFECR_RS | EMC_NFECR_RS_ENCODING)
 #define __nand_ecc_rs_decoding() \
     (REG_EMC_NFECR = EMC_NFECR_ECCE | EMC_NFECR_ERST | EMC_NFECR_RS | EMC_NFECR_RS_DECODING)
+#define __nand_ecc_disable()    (REG_EMC_NFECR &= ~EMC_NFECR_ECCE)
+#define __nand_ecc_encode_sync() while (!(REG_EMC_NFINTS & EMC_NFINTS_ENCF))
+#define __nand_ecc_decode_sync() while (!(REG_EMC_NFINTS & EMC_NFINTS_DECF))
 
-#define my__gpio_as_nand()            \
-do {                        \
-    REG_GPIO_PXFUNS(1) = 0x1E018000;    \
-    REG_GPIO_PXSELC(1) = 0x1E018000;    \
-    REG_GPIO_PXFUNS(2) = 0x30000000;    \
-    REG_GPIO_PXSELC(2) = 0x30000000;    \
-    REG_GPIO_PXFUNC(2) = 0x40000000;    \
-    REG_GPIO_PXSELC(2) = 0x40000000;    \
-    REG_GPIO_PXDIRC(2) = 0x40000000;    \
-    REG_GPIO_PXFUNS(1) = 0x00400000;    \
-    REG_GPIO_PXSELC(1) = 0x00400000;    \
-} while (0)
+/*--------------------------------------------------------------*/
 
 static struct nand_info* chip_info = NULL;
-#define NAND_BLOCK_SIZE                   (chip_info->pages_per_block * chip_info->page_size)
-#define NAND_OOB_SIZE                     (chip_info->page_size / 32)
+static struct nand_param internal_param;
 
-struct nand_page_info_t
+static inline void nand_wait_ready(void)
 {
-    unsigned char   block_status;
-    unsigned int    reserved;
-    unsigned short  block_addr_field;
-    unsigned int    lifetime;
-    unsigned char   ecc_field[50];//[NAND_OOB_SIZE - 11];    
-} __attribute__ ((packed));
-
-static void nand_wait_ready(void)
-{
-    int wait = 100;
-    while(REG_GPIO_PXPIN(2) & (1 << 30) && wait--);
+    unsigned int timeout = 1000;
+    while ((REG_GPIO_PXPIN(2) & 0x40000000) && timeout--);
     while (!(REG_GPIO_PXPIN(2) & 0x40000000));
 }
 
-static inline void nand_read_memcpy(void *target, void *source, unsigned int len)
-{
-    int ch = 2;
-	
-	if(((unsigned int)source < 0xa0000000) && len)
-		dma_cache_wback_inv((unsigned long)source, len);
-	
-	if(((unsigned int)target < 0xa0000000) && len)
-		dma_cache_wback_inv((unsigned long)target, len);
-	
-	REG_DMAC_DSAR(ch) = PHYSADDR((unsigned long)source);       
-	REG_DMAC_DTAR(ch) = PHYSADDR((unsigned long)target);       
-	REG_DMAC_DTCR(ch) = len / 4;	            	    
-	REG_DMAC_DRSR(ch) = DMAC_DRSR_RS_AUTO;	        	
-	REG_DMAC_DCMD(ch) = DMAC_DCMD_SAI | DMAC_DCMD_DAI | DMAC_DCMD_SWDH_8 | DMAC_DCMD_DWDH_32 | DMAC_DCMD_DS_32BIT;
-	REG_DMAC_DCCSR(ch) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
-	while (	REG_DMAC_DTCR(ch) );
-}
-
-static void rs_correct(unsigned char *buf, int idx, int mask)
-{
-	int i, j;
-	unsigned short d, d1, dm;
-
-	i = (idx * 9) >> 3;
-	j = (idx * 9) & 0x7;
-
-	i = (j == 0) ? (i - 1) : i;
-	j = (j == 0) ? 7 : (j - 1);
-    if(i >= 512)
-		return;
-	
-	d = (buf[i] << 8) | buf[i - 1];
-
-	d1 = (d >> j) & 0x1ff;
-	d1 ^= mask;
-
-	dm = ~(0x1ff << j);
-	d = (d & dm) | (d1 << j);
-    
-	buf[i - 1] = d & 0xff;
-	buf[i] = (d >> 8) & 0xff;
-	
-	
-}
-
-static inline int nand_rs_correct(unsigned char *data)
-{
-	unsigned int stat = REG_EMC_NFINTS;
-	if (stat & EMC_NFINTS_ERR) {
-		if (stat & EMC_NFINTS_UNCOR)
-        {
-            panicf("Uncorrectable ECC error occurred!\n stat = 0x%x", stat);
-			return -1;
-		}
-		else
-        {
-			unsigned int errcnt = (stat & EMC_NFINTS_ERRCNT_MASK) >> EMC_NFINTS_ERRCNT_BIT;
-			switch (errcnt)
-            {
-    			case 4:
-    				rs_correct(data, (REG_EMC_NFERR3 & EMC_NFERR_INDEX_MASK) >> EMC_NFERR_INDEX_BIT, (REG_EMC_NFERR3 & EMC_NFERR_MASK_MASK) >> EMC_NFERR_MASK_BIT);
-    				break;
-    				
-    			case 3:
-    				rs_correct(data, (REG_EMC_NFERR2 & EMC_NFERR_INDEX_MASK) >> EMC_NFERR_INDEX_BIT, (REG_EMC_NFERR2 & EMC_NFERR_MASK_MASK) >> EMC_NFERR_MASK_BIT);
-    				break;
-    				
-    			case 2:
-    				rs_correct(data, (REG_EMC_NFERR1 & EMC_NFERR_INDEX_MASK) >> EMC_NFERR_INDEX_BIT, (REG_EMC_NFERR1 & EMC_NFERR_MASK_MASK) >> EMC_NFERR_MASK_BIT);
-    				break;
-    				
-    			case 1:
-    				rs_correct(data, (REG_EMC_NFERR0 & EMC_NFERR_INDEX_MASK) >> EMC_NFERR_INDEX_BIT, (REG_EMC_NFERR0 & EMC_NFERR_MASK_MASK) >> EMC_NFERR_MASK_BIT);
-    				break;
-			}
-		}
-		
-	}
-	return 0;	
-}
-
-static inline void nand_send_readaddr(unsigned int pageaddr, unsigned int offset)
+static inline void nand_read_buf16(void *buf, int count)
 {
     int i;
-    
-    /* Read command */
-    REG_NAND_CMD = 0x00;
-    
-    /* Write column address */
-    for (i = 0; i < chip_info->col_cycles; i++)
-    {
-        REG_NAND_ADDR = offset & 0xFF;
-        offset = offset >> 8;
-    }
+    unsigned short *p = (unsigned short *)buf;
 
-    /* Write row address */
-    for (i = 0; i < chip_info->row_cycles; i++)
-    {
-        REG_NAND_ADDR = pageaddr & 0xFF;
-        pageaddr = pageaddr >> 8;
-    }
+    for (i = 0; i < count; i += 2)
+        *p++ = __nand_data16();
 }
 
-static inline void nand_send_readcacheaddr(unsigned short offset)
+static inline void nand_read_buf8(void *buf, int count)
 {
-    REG_NAND_CMD = 0x05;
-    REG_NAND_ADDR = (unsigned char)((offset & 0x000000FF) >> 0);
-    REG_NAND_ADDR = (unsigned char)((offset & 0x0000FF00) >> 8);
-    REG_NAND_CMD = 0xe0;
+    int i;
+    unsigned char *p = (unsigned char *)buf;
+
+    for (i = 0; i < count; i++)
+        *p++ = __nand_data8();
 }
 
-static inline int nand_read_oob(int page, unsigned char *data)
+static inline void nand_read_buf(void *buf, int count, int bw)
 {
-    unsigned short i;
-    
-    nand_send_readaddr(page, chip_info->page_size);
-        
-    REG_NAND_CMD = 0x30;
-    
+    if (bw == 8)
+        nand_read_buf8(buf, count);
+    else
+        nand_read_buf16(buf, count);
+}
+
+/*
+ * Correct 1~9-bit errors in 512-bytes data 
+ */
+static void rs_correct(unsigned char *dat, int idx, int mask)
+{
+    int i, j;
+    unsigned short d, d1, dm;
+
+    i = (idx * 9) >> 3;
+    j = (idx * 9) & 0x7;
+
+    i = (j == 0) ? (i - 1) : i;
+    j = (j == 0) ? 7 : (j - 1);
+
+    if (i > 512) return;
+
+    if (i == 512)
+        d = dat[i - 1];
+    else
+        d = (dat[i] << 8) | dat[i - 1];
+
+    d1 = (d >> j) & 0x1ff;
+    d1 ^= mask;
+
+    dm = ~(0x1ff << j);
+    d = (d & dm) | (d1 << j);
+
+    dat[i - 1] = d & 0xff;
+    if (i < 512)
+        dat[i] = (d >> 8) & 0xff;
+}
+
+/*
+ * Read oob
+ */
+static int nand_read_oob(int page_addr, unsigned char *buf, int size)
+{
+    struct nand_param *nandp = &internal_param;
+    int page_size, row_cycle, bus_width;
+    int col_addr;
+
+    page_size = nandp->page_size;
+    row_cycle = nandp->row_cycle;
+    bus_width = nandp->bus_width;
+
+    if (page_size >= 2048)
+        col_addr = page_size;
+    else
+        col_addr = 0;
+
+    if (page_size >= 2048)
+        /* Send READ0 command */
+        __nand_cmd(NAND_CMD_READ0);
+    else
+        /* Send READOOB command */
+        __nand_cmd(NAND_CMD_READOOB);
+
+    /* Send column address */
+    __nand_addr(col_addr & 0xff);
+    if (page_size >= 2048)
+        __nand_addr((col_addr >> 8) & 0xff);
+
+    /* Send page address */
+    __nand_addr(page_addr & 0xff);
+    __nand_addr((page_addr >> 8) & 0xff);
+    if (row_cycle == 3)
+        __nand_addr((page_addr >> 16) & 0xff);
+
+    /* Send READSTART command for 2048 ps NAND */
+    if (page_size >= 2048)
+        __nand_cmd(NAND_CMD_READSTART);
+
+    /* Wait for device ready */
     nand_wait_ready();
-       
-    for ( i = 0; i < NAND_OOB_SIZE; i++) 
-        *data++ = REG_NAND_ADDR;
+
+    /* Read oob data */
+    nand_read_buf(buf, size, bus_width);
+
+    return 0;
+}
+
+
+/*
+ * nand_read_page()
+ *
+ * Input:
+ *
+ *    block - block number: 0, 1, 2, ...
+ *    page - page number within a block: 0, 1, 2, ...
+ *    dst - pointer to target buffer
+ */
+static int nand_read_page(int block, int page, unsigned char *dst)
+{
+    struct nand_param *nandp = &internal_param;
+    int page_size, oob_size, page_per_block;
+    int row_cycle, bus_width, ecc_count;
+    int page_addr, i, j;
+    unsigned char *data_buf;
+    unsigned char oob_buf[128];
+
+    page_size = nandp->page_size;
+    oob_size = nandp->oob_size;
+    page_per_block = nandp->page_per_block;
+    row_cycle = nandp->row_cycle;
+    bus_width = nandp->bus_width;
+
+    page_addr = page + block * page_per_block;
+
+    /*
+     * Read oob data
+     */
+    nand_read_oob(page_addr, oob_buf, oob_size);
+
+    /*
+     * Read page data
+     */
+
+    /* Send READ0 command */
+    __nand_cmd(NAND_CMD_READ0);
+
+    /* Send column address */
+    __nand_addr(0);
+    if (page_size >= 2048)
+        __nand_addr(0);
+
+    /* Send page address */
+    __nand_addr(page_addr & 0xff);
+    __nand_addr((page_addr >> 8) & 0xff);
+    if (row_cycle == 3)
+        __nand_addr((page_addr >> 16) & 0xff);
+
+    /* Send READSTART command for 2048 ps NAND */
+    if (page_size >= 2048)
+        __nand_cmd(NAND_CMD_READSTART);
+
+    /* Wait for device ready */
+    nand_wait_ready();
+
+    /* Read page data */
+    data_buf = dst;
+
+    ecc_count = page_size / ECC_BLOCK;
+
+    for (i = 0; i < ecc_count; i++)
+    {
+        volatile unsigned char *paraddr = (volatile unsigned char *)EMC_NFPAR0;
+        unsigned int stat;
+
+        /* Enable RS decoding */
+        REG_EMC_NFINTS = 0x0;
+        __nand_ecc_rs_decoding();
+
+        /* Read data */
+        nand_read_buf((void *)data_buf, ECC_BLOCK, bus_width);
+
+        /* Set PAR values */
+        for (j = 0; j < PAR_SIZE; j++)
+            *paraddr++ = oob_buf[ECC_POS + i*PAR_SIZE + j];
+
+        /* Set PRDY */
+        REG_EMC_NFECR |= EMC_NFECR_PRDY;
+
+        /* Wait for completion */
+        __nand_ecc_decode_sync();
+
+        /* Disable decoding */
+        __nand_ecc_disable();
+
+        /* Check result of decoding */
+        stat = REG_EMC_NFINTS;
+        if (stat & EMC_NFINTS_ERR)
+        {
+            /* Error occurred */
+            if (stat & EMC_NFINTS_UNCOR) {
+                /* Uncorrectable error occurred */
+            }
+            else
+            {
+                unsigned int errcnt, index, mask;
+
+                errcnt = (stat & EMC_NFINTS_ERRCNT_MASK) >> EMC_NFINTS_ERRCNT_BIT;
+                switch (errcnt)
+                {
+                case 4:
+                    index = (REG_EMC_NFERR3 & EMC_NFERR_INDEX_MASK) >> EMC_NFERR_INDEX_BIT;
+                    mask = (REG_EMC_NFERR3 & EMC_NFERR_MASK_MASK) >> EMC_NFERR_MASK_BIT;
+                    rs_correct(data_buf, index, mask);
+                case 3:
+                    index = (REG_EMC_NFERR2 & EMC_NFERR_INDEX_MASK) >> EMC_NFERR_INDEX_BIT;
+                    mask = (REG_EMC_NFERR2 & EMC_NFERR_MASK_MASK) >> EMC_NFERR_MASK_BIT;
+                    rs_correct(data_buf, index, mask);
+                case 2:
+                    index = (REG_EMC_NFERR1 & EMC_NFERR_INDEX_MASK) >> EMC_NFERR_INDEX_BIT;
+                    mask = (REG_EMC_NFERR1 & EMC_NFERR_MASK_MASK) >> EMC_NFERR_MASK_BIT;
+                    rs_correct(data_buf, index, mask);
+                case 1:
+                    index = (REG_EMC_NFERR0 & EMC_NFERR_INDEX_MASK) >> EMC_NFERR_INDEX_BIT;
+                    mask = (REG_EMC_NFERR0 & EMC_NFERR_MASK_MASK) >> EMC_NFERR_MASK_BIT;
+                    rs_correct(data_buf, index, mask);
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+
+        data_buf += ECC_BLOCK;
+    }
+
+    return 0;
+}
+
+/*
+ * Enable NAND controller
+ */
+static void nand_enable(void)
+{
+    __nand_enable();
+
+    REG_EMC_SMCR1 = 0x04444400;
+}
+
+/*
+ * Disable NAND controller
+ */
+static void nand_disable(void)
+{
+    __nand_disable();
+}
+
+int ata_init(void)
+{
+    unsigned char cData[5];
+    
+    nand_enable();
+    
+    __nand_cmd(NAND_CMD_READID);
+    __nand_addr(NAND_CMD_READ0);
+    cData[0] = __nand_data8();
+    cData[1] = __nand_data8();
+    cData[2] = __nand_data8();
+    cData[3] = __nand_data8();
+    cData[4] = __nand_data8();
+    
+    chip_info = nand_identify(cData);
+    if(chip_info == NULL)
+    {
+        panicf("Unknown NAND flash chip: 0x%x 0x%x 0x%x 0x%x 0x%x", cData[0],
+                                      cData[1], cData[2], cData[3], cData[4]);
+        return -1;
+    }
+    
+    internal_param.bus_width = 8;
+    internal_param.row_cycle = chip_info->row_cycles;
+    internal_param.page_size = chip_info->page_size;
+    internal_param.oob_size = chip_info->page_size/32;
+    internal_param.page_per_block = chip_info->pages_per_block;
     
     return 0;
 }
 
-static int nand_read_page_info(int page, struct nand_page_info_t *info)
+void jz_nand_read(int block, int page, unsigned char *buf)
 {
-    int ret;
-    
-    JZ_NAND_SELECT;
-    ret = nand_read_oob(page, (unsigned char*)info);
-    JZ_NAND_DESELECT;
-    
-    return ret;
-}
-
-static struct nand_page_info_t page_info;
-
-int jz_nand_read_page (int page, unsigned char *data)
-{
-    int ret, i;
-    
-    JZ_NAND_SELECT;
-    ret = nand_read_oob(page, &page_info);
-    
-    nand_send_readcacheaddr(0);
-    
-    /* TODO: use information from page_info */
-    
-    for ( i = 0; i < chip_info->page_size; i++) 
-        *data++ = REG_NAND_ADDR;
-    
-    JZ_NAND_DESELECT;
-    
-    return ret;
+    nand_read_page(block, page, buf);
 }
 
 int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
@@ -270,40 +419,42 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const v
     return 0;
 }
 
-int ata_init(void)
-{   
-    /* Read/Write timings */
-#define SET_STANDARD_TIMING(x) x = (((x) & ~0xFF) | 0x4621200)
-    SET_STANDARD_TIMING(REG_EMC_SMCR1);
-    SET_STANDARD_TIMING(REG_EMC_SMCR2);
-    SET_STANDARD_TIMING(REG_EMC_SMCR3);
-    SET_STANDARD_TIMING(REG_EMC_SMCR4);
-    
-    /* Set NFE bit */
-    REG_EMC_NFCSR = EMC_NFCSR_NFE1;
-    
-    __nand_ecc_disable();
-    
-    unsigned char cData[5];
-    JZ_NAND_SELECT;
-    REG_NAND_CMD = NAND_CMD_READ_ID1;
-    REG_NAND_ADDR = NAND_CMD_READ1_00;
-    cData[0] = REG_NAND_DATA;
-    cData[1] = REG_NAND_DATA;
-    cData[2] = REG_NAND_DATA;
-    cData[3] = REG_NAND_DATA;
-    cData[4] = REG_NAND_DATA;
-    JZ_NAND_DESELECT;
-    
-    chip_info = nand_identify(cData);
-    if(chip_info == NULL)
-    {
-        panicf("Unknown NAND flash chip: 0x%x 0x%x 0x%x 0x%x 0x%x", cData[0],
-                                      cData[1], cData[2], cData[3], cData[4]);
-        return -1;
-    }
-    
-    /* Set timings */
-    
+void ata_spindown(int seconds)
+{
+    /* null */
+    (void)seconds;
+}
+
+bool ata_disk_is_active(void)
+{
+    /* null */
+    return false;
+}
+
+void ata_sleep(void)
+{
+    /* null */
+}
+
+void ata_spin(void)
+{
+    /* null */
+}
+
+int ata_hard_reset(void)
+{
+    /* null */
     return 0;
+}
+
+int ata_soft_reset(void)
+{
+    /* null */
+    return 0;
+}
+
+void ata_enable(bool on)
+{
+    /* null - flash controller is enabled/disabled as needed. */
+    (void)on;
 }
