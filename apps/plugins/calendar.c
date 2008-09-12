@@ -111,7 +111,7 @@ static void draw_headers(void)
     char *Dayname[7] = {"M","T","W","T","F","S","S"};
     int ws = 2;
     rb->lcd_getstringsize("A",&w,&h);
-    for (i = 0; i < 8;)
+    for (i = 0; i < 7;)
     {
         rb->lcd_putsxy(ws, 0 , Dayname[i++]);
         ws += space;
