@@ -16,6 +16,16 @@
 
 #include <usb.h>
 
+#define	bswap_16(value)  \
+ 	((((value) & 0xff) << 8) | ((value) >> 8))
+
+#define	bswap_32(value)	\
+ 	(((uint32_t)bswap_16((uint16_t)((value) & 0xffff)) << 16) | \
+ 	(uint32_t)bswap_16((uint16_t)((value) >> 16)))
+
+#define host_to_le32(_x) bswap_32(htonl(_x))
+#define host_to_le16(_x) bswap_16(htons(_x))
+
 void usage()
 {
   fprintf(stderr, "usage: meizu_dfu m3 <SST39VF800.dfu> <M3.EBN>\n");
@@ -82,6 +92,7 @@ void init_img(image_data_t *img, const char *filename, image_attr_t *attr)
   struct stat statbuf;
   char buf[BLOCK_SIZE];
   uint32_t dfu_crc;
+  uint32_t le_len;
 
   printf("Reading %s...", filename);
 
@@ -100,8 +111,15 @@ void init_img(image_data_t *img, const char *filename, image_attr_t *attr)
   }
   close(fd);
 
+  le_len = host_to_le32(img->len);
   // patch the data size in after the signature
-  memcpy(img->data + attr->pre_off + 4, &img->len, 4);
+  memcpy(img->data + attr->pre_off + 4, &le_len, 4);
+
+  /* convert to little endian */
+  attr->suf_dev = host_to_le16(attr->suf_dev);
+  attr->suf_prod = host_to_le16(attr->suf_prod);
+  attr->suf_ven = host_to_le16(attr->suf_ven);
+  attr->suf_dfu = host_to_le16(attr->suf_dfu);
 
   // append the suffix (excluding the checksum)
   memcpy(img->data + len, &attr->suf_dev, 2);
@@ -111,7 +129,7 @@ void init_img(image_data_t *img, const char *filename, image_attr_t *attr)
   memcpy(img->data + len + 8, &attr->suf_sig, 3);
   memcpy(img->data + len + 11, &attr->suf_len, 1);
 
-  dfu_crc = crc32(img->data, len + 12, DFU_CRC_POLY, DFU_INIT_CRC);
+  dfu_crc = host_to_le32(crc32(img->data, len + 12, DFU_CRC_POLY, DFU_INIT_CRC));
   memcpy(img->data + len + 12, &dfu_crc, 4);
 
 #if 0
