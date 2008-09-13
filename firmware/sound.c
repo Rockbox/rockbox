@@ -625,8 +625,8 @@ void sound_set(int setting, int value)
         sound_set_val(value);
 }
 
-#if (!defined(HAVE_AS3514) && !defined (HAVE_WM8731)  && !defined (HAVE_WM8975) \
-  && !defined(HAVE_TSC2100)) || defined(SIMULATOR)
+#if (!defined(HAVE_AS3514) && !defined (HAVE_WM8731) && !defined(HAVE_WM8975) \
+  && !defined(HAVE_WM8758) && !defined(HAVE_TSC2100)) || defined(SIMULATOR)
 int sound_val2phys(int setting, int value)
 {
 #if CONFIG_CODEC == MAS3587F
