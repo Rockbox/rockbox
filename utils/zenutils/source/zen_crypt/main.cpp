@@ -74,6 +74,8 @@ static const char tl_zen_key[]   = "1sN0TM3D az u~may th1nk*"
                                    "Creative ZEN";
 static const char tl_zenxf_key[] = "1sN0TM3D az u~may th1nk*"
                                    "Creative ZEN X-Fi";
+static const char tl_zenmo_key[] = "1sN0TM3D az u~may th1nk*"
+                                   "Creative ZEN Mozaic";
 static const char tl_zv_key[]    = "1sN0TM3D az u~may th1nk*"
                                    "Creative Zen Vision";
 static const char tl_zvw_key[]   = "1sN0TM3D az u~may th1nk*"
@@ -102,6 +104,7 @@ player_info_t players[] = {
     {"Zen Vision:M 60GB", null_key_v2, fresc_key_v1, tl_zvm60_key, false},
     {"ZEN", null_key_v4, fresc_key_v2, tl_zen_key, false},
     {"ZEN X-Fi", null_key_v4, fresc_key_v2, tl_zenxf_key, false},
+    {"ZEN Mozaic", null_key_v4, fresc_key_v2, tl_zenmo_key, false},
     {"Zen Vision", null_key_v2, fresc_key_v1, tl_zv_key, false},
     {"Zen Vision W", null_key_v2, fresc_key_v1, tl_zvw_key, false},
     {"Zen Micro", null_key_v1, fresc_key_v1, tl_zm_key, true},
@@ -492,6 +495,13 @@ bool decrypt(shared::bytes& data, int mode, player_info_t* pi,
                                  data.size(), (const byte*)iv))
         {
             std::cerr << "Failed to decrypt the input file." << std::endl;
+            return false;
+        }
+        
+        if (*(dword*)&data[0] != 'EDOC' &&
+            *(dword*)&data[0] != 'CODE')
+        {
+            std::cerr << "Failed to decode the input file." << std::endl;
             return false;
         }
 
