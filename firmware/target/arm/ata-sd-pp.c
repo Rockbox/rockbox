@@ -1260,9 +1260,6 @@ tCardInfo *card_get_info_target(int card_no)
     for(i=0; i<4; i++)  card.cid[i] = card_info[card_no].cid[3-i];
     card.numblocks    = card_info[card_no].numblocks;
     card.blocksize    = card_info[card_no].block_size;
-    card.size         = card_info[card_no].capacity < 0xffffffff ?
-                        card_info[card_no].capacity : 0xffffffff;
-    card.block_exp    = card_info[card_no].block_exp;
     temp              = card_extract_bits(card.csd, 29, 3);
     card.speed        = mantissa[card_extract_bits(card.csd, 25, 4)]
                       * exponent[temp > 2 ? 7 : temp + 4];

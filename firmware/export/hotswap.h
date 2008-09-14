@@ -21,9 +21,11 @@
 #ifndef __HOTSWAP_H__
 #define __HOTSWAP_H__
 
+#include <stdbool.h>
+
 typedef struct
 {  
-    int initialized;
+    bool initialized;
     unsigned char bitrate_register;
     unsigned long read_timeout;   /* n * 8 clock cycles */
     unsigned long write_timeout;  /* n * 8 clock cycles */
@@ -35,10 +37,8 @@ typedef struct
     unsigned int nsac;            /* clock cycles */
     unsigned long tsac;           /* n * 0.1 ns */
     unsigned int r2w_factor;
-    unsigned long size;           /* size in bytes */
     unsigned long numblocks;      /* size in flash blocks */
     unsigned int blocksize;       /* block size in bytes */
-    unsigned int block_exp;       /* block size exponent */
 } tCardInfo;
 
 #ifdef HAVE_ATA_SD
