@@ -52,6 +52,7 @@ static const unsigned int sum_monthday[13] = {
     365
 };
 
+#if 0
 static unsigned int jz_mktime(int year, int mon, int day, int hour, int min, int sec)
 {
     unsigned int seccounter;
@@ -78,6 +79,7 @@ static unsigned int jz_mktime(int year, int mon, int day, int hour, int min, int
 
     return seccounter;
 }
+#endif
 
 static void jz_gettime(unsigned int rtc, int *year, int *mon, int *day, int *hour,
          int *min, int *sec, int *weekday)

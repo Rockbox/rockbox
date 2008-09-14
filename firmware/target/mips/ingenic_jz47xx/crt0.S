@@ -66,17 +66,16 @@ _start:
 
     li      t0, (M_StatusBEV  | M_StatusIM7 | M_StatusIM6 \
                 | M_StatusIM5 | M_StatusIM4 | M_StatusIM3 \
-                | M_StatusIM2 | M_StatusERL | M_StatusSM)
+                | M_StatusIM2 | M_StatusERL)
              /*
                  BEV = Enable Boot Exception Vectors
                  IMx = Interrupt mask
                  ERL = Denotes error level
-                 SM  = Supervisor Mode
              */
     mtc0    t0, C0_STATUS
 
-    li      t1, M_CauseIV
-    mtc0    t1, C0_CAUSE
+    li      t0, M_CauseIV
+    mtc0    t0, C0_CAUSE
 
     /*
       ----------------------------------------------------
@@ -85,7 +84,7 @@ _start:
     */
     li      t0, 3            // enable cache for kseg0 accesses
     mtc0    t0, C0_CONFIG    // CONFIG reg
-    la      t0, 0x80000000   // an idx op should use a unmappable address
+    la      t0, 0x80000000   // an idx op should use an unmappable address
     ori     t1, t0, 0x4000   // 16kB cache
     mtc0    zero, C0_TAGLO   // TAGLO reg
     mtc0    zero, C0_TAGHI   // TAGHI reg
@@ -215,25 +214,26 @@ real_exception_handler:
     sw      v1, 0x64(sp)
     sw      v0, 0x68(sp)
     sw      $1, 0x6C(sp)
-    mflo    t0             # Move From LO
+    mflo    k0             # Move From LO
     nop
-    sw      t0, 0x70(sp)
-    mfhi    t0             # Move From HI
+    sw      k0, 0x70(sp)
+    mfhi    k0             # Move From HI
     nop
-    sw      t0, 0x74(sp)
-    mfc0    t0, C0_STATUS  # Status register
+    sw      k0, 0x74(sp)
+    mfc0    k0, C0_STATUS  # Status register
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
-    sw      t0, 0x78(sp)
-    mfc0    t0, C0_EPC     # Exception Program Counter
+    sw      k0, 0x78(sp)
+    mfc0    k0, C0_EPC     # Exception Program Counter
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
-    sw      t0, 0x7C(sp)
-    li      k1, 0x7C
+    sw      k0, 0x7C(sp)
+    
+    li      k1, M_CauseExcCode
     mfc0    k0, C0_CAUSE   # C0_CAUSE of last exception
     and     k0, k1
     beq     zero, k0, _int
@@ -273,7 +273,7 @@ _int:
     lw      a0, 0x60(sp)
     lw      v1, 0x64(sp)
     lw      v0, 0x68(sp)
-    lw      v1, 0x6C(sp)
+    lw      $1, 0x6C(sp)
     lw      k0, 0x70(sp)
     mtlo    k0             # Move To LO
     nop
@@ -313,7 +313,57 @@ _exception:
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
-    la      k0, exception_handler
-    jr      k0
+    jal     exception_handler
+    nop
+    lw      ra, 0(sp)
+    lw      fp, 4(sp)
+    sw      gp, 8(sp)
+    lw      t9, 0xC(sp)
+    lw      t8, 0x10(sp)
+    lw      s7, 0x14(sp)
+    lw      s6, 0x18(sp)
+    lw      s5, 0x1C(sp)
+    lw      s4, 0x20(sp)
+    lw      s3, 0x24(sp)
+    lw      s2, 0x28(sp)
+    lw      s1, 0x2C(sp)
+    lw      s0, 0x30(sp)
+    lw      t7, 0x34(sp)
+    lw      t6, 0x38(sp)
+    lw      t5, 0x3C(sp)
+    lw      t4, 0x40(sp)
+    lw      t3, 0x44(sp)
+    lw      t2, 0x48(sp)
+    lw      t1, 0x4C(sp)
+    lw      t0, 0x50(sp)
+    lw      a3, 0x54(sp)
+    lw      a2, 0x58(sp)
+    lw      a1, 0x5C(sp)
+    lw      a0, 0x60(sp)
+    lw      v1, 0x64(sp)
+    lw      v0, 0x68(sp)
+    lw      $1, 0x6C(sp)
+    lw      k0, 0x70(sp)
+    mtlo    k0             # Move To LO
+    nop
+    lw      k0, 0x74(sp)
+    mthi    k0             # Move To HI
+    nop
+    lw      k0, 0x78(sp)
+    nop
+    mtc0    k0, C0_STATUS  # Status register
+    sll     zero, 1
+    sll     zero, 1
+    sll     zero, 1
+    sll     zero, 1
+    lw      k0, 0x7C(sp)
+    nop
+    mtc0    k0, C0_EPC     # Exception Program Counter
+    sll     zero, 1
+    sll     zero, 1
+    sll     zero, 1
+    sll     zero, 1
+    addiu   sp, 0x80
+    eret                   # Exception Return
     nop
     .set reorder

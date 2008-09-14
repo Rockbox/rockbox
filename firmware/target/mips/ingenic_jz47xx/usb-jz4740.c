@@ -824,25 +824,21 @@ void usbHandleStandDevReq(u8 *buf)
 
 extern char printfbuf[256];
 
-int GET_CUP_INFO_Handle()
-{
-	HW_SendPKT(0, printfbuf, 64);
-	udc_state = IDLE;
-	return 0;
-}
-
 void usbHandleVendorReq(u8 *buf)
 {
-	int ret_state;
+	int ret_state, i;
 	USB_DeviceRequest *dreq = (USB_DeviceRequest *)buf;
-	switch (dreq->bRequest) {
-	case 0xAB:
-		ret_state=GET_CUP_INFO_Handle();
-		break;
-    case 0x12:
-    	HW_SendPKT(0, "TEST", 4);
-    	udc_state = IDLE;
-        break;
+	switch (dreq->bRequest)
+    {
+    	case 0xAB:
+            //for(i=0; i<256; i+=64)
+                HW_SendPKT(0, printfbuf, 64);
+        	udc_state = IDLE;
+    		break;
+        case 0x12:
+        	HW_SendPKT(0, "TEST", 4);
+        	udc_state = IDLE;
+            break;
 	}
 }
 
@@ -1032,6 +1028,9 @@ void __udc_start(void)
     system_enable_irq(IRQ_UDC);
 }
 
-void usb_init_device(void){}
+void usb_init_device(void)
+{
+    __udc_start();
+}
 
 #endif

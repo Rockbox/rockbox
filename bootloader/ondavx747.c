@@ -86,7 +86,6 @@ static void show_tlb(void)
 
 int main(void)
 {
-    cli();
     kernel_init();
     lcd_init();
     font_init();
@@ -98,11 +97,6 @@ int main(void)
     backlight_init();
     
     ata_init();
-    
-    sti();
-    
-    /* To make Windows say "ding-dong".. */
-    //REG8(USB_REG_POWER) &= ~USB_POWER_SOFTCONN;
 
     int touch, btn;
     char datetime[30];
@@ -136,17 +130,17 @@ int main(void)
 #if 0
     unsigned char testdata[4096];
     char msg[30];
-    int j = 0;
+    int j = 1;
     while(1)
     {
         memset(testdata, 0, 4096);
-        jz_nand_read_page(j, &testdata);
         reset_screen();
+        jz_nand_read(2, j, &testdata);
         printf("Page %d", j);
         int i;
-        for(i=0; i<16; i+=8)
+        for(i=0; i<256; i+=8)
         {
-            snprintf(msg, 30, "%x%x%x%x%x%x%x%x", testdata[i], testdata[i+1], testdata[i+2], testdata[i+3], testdata[i+4], testdata[i+5], testdata[i+6], testdata[i+7]);
+            snprintf(msg, 30, "%02c%02c%02c%02c%02c%02c%02c%02c", testdata[i], testdata[i+1], testdata[i+2], testdata[i+3], testdata[i+4], testdata[i+5], testdata[i+6], testdata[i+7]);
             printf(msg);
         }
         while(!((btn = button_read_device(&touch)) & (BUTTON_VOL_UP|BUTTON_VOL_DOWN)));
@@ -161,18 +155,19 @@ int main(void)
     while(1)
     {
 #ifdef ONDA_VX747
-        btn = button_read_device(&touch);
+        btn = button_get(false);
+        touch = button_get_data();
 #else
         btn = button_read_device();
 #endif
 #define KNOP(x,y)     lcd_set_foreground(LCD_BLACK); \
                       if(btn & x) \
                         lcd_set_foreground(LCD_WHITE); \
-                      lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(#x), LCD_HEIGHT-SYSFONT_HEIGHT*y, #x);
-        KNOP(BUTTON_VOL_UP, 5);
-        KNOP(BUTTON_VOL_DOWN, 6);
-        KNOP(BUTTON_MENU, 7);
-        KNOP(BUTTON_POWER, 8);
+                      lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(#x), SYSFONT_HEIGHT*y, #x);
+        KNOP(BUTTON_VOL_UP, 0);
+        KNOP(BUTTON_VOL_DOWN, 1);
+        KNOP(BUTTON_MENU, 2);
+        KNOP(BUTTON_POWER, 3);
         lcd_set_foreground(LCD_WHITE);
         if(button_hold())
         {
@@ -192,7 +187,7 @@ int main(void)
         if(btn & BUTTON_TOUCH)
         {
             lcd_set_foreground(LCD_RGBPACK(touch & 0xFF, (touch >> 8)&0xFF, (touch >> 16)&0xFF));
-            lcd_fillrect((touch>>16)-5, (touch&0xFFFF)-5, 10, 10);
+            lcd_fillrect((touch>>16)-10, (touch&0xFFFF)-5, 10, 10);
             lcd_update();
             lcd_set_foreground(LCD_WHITE);
         }
@@ -202,19 +197,22 @@ int main(void)
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT, datetime);
         snprintf(datetime, 30, "%d", current_tick);
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*2, datetime);
-        snprintf(datetime, 30, "X: %d Y: %d", touch>>16, touch & 0xFFFF);
+        snprintf(datetime, 30, "X: %03d Y: %03d", touch>>16, touch & 0xFFFF);
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*3, datetime);
-        snprintf(datetime, 30, "PIN3: 0x%x", REG_GPIO_PXPIN(3));
+        snprintf(datetime, 30, "PIN3: 0x%08x", REG_GPIO_PXPIN(3));
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*4, datetime);
-        snprintf(datetime, 30, "PIN2: 0x%x", REG_GPIO_PXPIN(2));
+        snprintf(datetime, 30, "PIN2: 0x%08x", REG_GPIO_PXPIN(2));
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*5, datetime);
-        snprintf(datetime, 30, "PIN1: 0x%x", REG_GPIO_PXPIN(1));
+        snprintf(datetime, 30, "PIN1: 0x%08x", REG_GPIO_PXPIN(1));
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*6, datetime);
-        snprintf(datetime, 30, "PIN0: 0x%x", REG_GPIO_PXPIN(0));
+        snprintf(datetime, 30, "PIN0: 0x%08x", REG_GPIO_PXPIN(0));
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*7, datetime);
-        snprintf(datetime, 30, "ICSR: 0x%x", read_c0_badvaddr());
+        snprintf(datetime, 30, "BadVAddr: 0x%08x", read_c0_badvaddr());
         lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*8, datetime);
+        snprintf(datetime, 30, "ICSR: 0x%08x", REG_INTC_ISR);
+        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*9, datetime);
         lcd_update();
+        yield();
     }
     
     return 0;

@@ -122,13 +122,16 @@ int button_read_device(int *data)
             ret |= BUTTON_POWER;
     }
     
-    if(pendown_flag)
+    if(data != NULL)
     {
-        *data = touch_to_pixels(stable_x_pos, stable_y_pos);
-        ret |= BUTTON_TOUCH;
+        if(pendown_flag)
+        {
+            *data = touch_to_pixels(stable_x_pos, stable_y_pos);
+            ret |= BUTTON_TOUCH;
+        }
+        else
+            *data = 0;
     }
-    else
-        *data = 0;
 
     return ret;
 }
@@ -199,7 +202,7 @@ void SADC(void)
         
         xData = (dat >>  0) & 0xfff;
         yData = (dat >> 16) & 0xfff;
-            
+        
         dat = REG_SADC_TSDAT;
         tsz1Data = (dat >>  0) & 0xfff;
         tsz2Data = (dat >> 16) & 0xfff;

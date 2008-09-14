@@ -324,7 +324,7 @@ static int get_irq_number(void)
 
 void intr_handler(void)
 {
-    irq = get_irq_number();
+    int irq = get_irq_number();
     if(irq < 0)
         return;
     
@@ -361,7 +361,7 @@ static char* parse_exception(unsigned int cause)
 }
 
 void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
-{
+{  
     panicf("Exception occurred: %s [0x%08x] at 0x%08x (stack at 0x%08x)", parse_exception(cause), cause, epc, (unsigned int)stack_ptr);
 }
 
@@ -457,23 +457,6 @@ void __icache_invalidate_all(void)
 {
     unsigned int i;
 
-/*
-    do 
-    {
-        unsigned long __k0_addr;
-        
-        __asm__ __volatile__(
-                             "la    %0, 1f      \n"
-                             "or    %0, %0, %1  \n"
-                             "jr    %0          \n"
-                             "nop               \n"
-                             "1: nop            \n"
-                             : "=&r"(__k0_addr)
-                             : "r" (0x20000000)
-                             );
-    } while(0);
-*/
-
     asm volatile (".set   noreorder  \n"
                   ".set   mips32     \n"
                   "mtc0   $0, $28    \n" /* TagLo */
@@ -484,34 +467,16 @@ void __icache_invalidate_all(void)
     for(i=KSEG0; i<KSEG0+CACHE_SIZE; i+=CACHE_LINE_SIZE)
         __CACHE_OP(Index_Store_Tag_I, i);
 
-/*
-    do
-    {
-        unsigned long __k0_addr;
-        __asm__ __volatile__(
-                             "nop;nop;nop;nop;nop;nop;nop  \n"
-                             "la    %0, 1f                 \n"
-                             "jr    %0                     \n"
-                             "nop                          \n"
-                             "1:    nop                    \n"
-                             : "=&r" (__k0_addr)
-                             );
-    } while(0);
-*/
-
-    do
-    {
-        unsigned long tmp;
-        __asm__ __volatile__(
-        ".set mips32       \n"
-        "mfc0 %0, $16, 7   \n" /* Config */
-        "nop               \n"
-        "ori  %0, 2        \n"
-        "mtc0 %0, $16, 7   \n" /* Config */
-        "nop               \n"
-        ".set mips0        \n"
-        : "=&r" (tmp));
-    } while(0);
+    /* invalidate btb */
+    asm volatile (
+        ".set mips32        \n"
+        "mfc0 %0, $16, 7    \n"
+        "nop                \n"
+        "ori  %0, 2         \n"
+        "mtc0 %0, $16, 7    \n"
+        ".set mips0         \n"
+        :
+        : "r" (i));
 }
 
 void __dcache_invalidate_all(void)
@@ -657,13 +622,14 @@ static void tlb_init(void)
 
 void tlb_refill_handler(void)
 {
-    panicf("TLB refill handler! [0x%x] [0x%lx]", read_c0_badvaddr(), read_c0_epc());
+    panicf("TLB refill handler at 0x%08lx! [0x%x]", read_c0_epc(), read_c0_badvaddr());
 }
 
 static void tlb_call_refill(void)
 {
     asm("la $8, tlb_refill_handler \n"
-        "jr $8                     \n");
+        "jr $8                     \n"
+       );
 }
 
 extern int main(void);
@@ -687,17 +653,17 @@ void system_main(void)
     __dcache_writeback_all();
     __icache_invalidate_all();
     
-    write_c0_status(1 << 28 | 1 << 10 | 1 << 3); /* Enable CP | Mask interrupt 2 | Supervisor mode */
+    write_c0_status(1 << 28 | 1 << 10 ); /* Enable CP | Mask interrupt 2 */
     
     /* Disable all interrupts */
     for(i=0; i<IRQ_MAX; i++)
         dis_irq(i);
     
-    //tlb_init();
-    
-    sti();
+    tlb_init();
     
     detect_clock();
+    
+    sti();
     
     main();
     

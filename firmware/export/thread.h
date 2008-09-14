@@ -112,10 +112,10 @@ struct regs
 #elif defined(CPU_MIPS)
 struct regs
 {
-    uint32_t r[27]; /* 0-104 - Registers $1, v0-v1, a0-a3, t0-t9, s0-s7, gp, fp */
-    uint32_t sp;    /*   108 - Stack pointer */
-    uint32_t ra;    /*   112 - Return address */
-    uint32_t start; /*   116 - Thread start address, or NULL when started */
+    uint32_t r[10]; /* 0-36 - Registers s0-s7, gp, fp */
+    uint32_t sp;    /*   40 - Stack pointer */
+    uint32_t ra;    /*   44 - Return address */
+    uint32_t start; /*   48 - Thread start address, or NULL when started */
 };
 #endif /* CONFIG_CPU */
 #else
