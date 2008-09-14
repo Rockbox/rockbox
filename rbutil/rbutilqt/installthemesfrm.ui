@@ -36,7 +36,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="2" colspan="2" >
+   <item row="0" column="2" colspan="3" >
     <widget class="QGroupBox" name="groupBox" >
      <property name="sizePolicy" >
       <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
@@ -48,7 +48,7 @@
       <string>Selected Theme</string>
      </property>
      <layout class="QGridLayout" >
-      <item row="0" column="0" >
+      <item row="0" column="0" colspan="3" >
        <widget class="PreviewLabel" name="themePreview" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="MinimumExpanding" hsizetype="MinimumExpanding" >
@@ -67,17 +67,17 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
+      <item row="2" column="0" colspan="3" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
          <string>Description</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" >
+      <item row="3" column="0" colspan="3" >
        <widget class="QTextBrowser" name="themeDescription" />
       </item>
-      <item row="3" column="0" >
+      <item row="4" column="0" colspan="3" >
        <widget class="QLabel" name="labelSize" >
         <property name="text" >
          <string>Download size:</string>
@@ -88,34 +88,31 @@
     </widget>
    </item>
    <item row="1" column="1" colspan="2" >
+    <widget class="QLabel" name="label_2" >
+     <property name="text" >
+      <string>Hold Ctrl to select multiple item, Shift for a range</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3" >
     <spacer>
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="sizeHint" >
       <size>
-       <width>261</width>
-       <height>34</height>
+       <width>241</width>
+       <height>20</height>
       </size>
      </property>
     </spacer>
    </item>
-   <item row="1" column="3" >
+   <item row="1" column="4" >
     <layout class="QHBoxLayout" >
      <item>
       <widget class="QPushButton" name="buttonOk" >
        <property name="text" >
         <string>&amp;Install</string>
-       </property>
-       <property name="icon" >
-        <iconset resource="rbutilqt.qrc" >:/icons/go-next.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="buttonOkAll" >
-       <property name="text" >
-        <string>Install &amp;All</string>
        </property>
        <property name="icon" >
         <iconset resource="rbutilqt.qrc" >:/icons/go-next.png</iconset>

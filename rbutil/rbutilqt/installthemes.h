@@ -44,7 +44,6 @@ class ThemesInstallWindow : public QDialog
 
     public slots:
         void accept(void);
-        void acceptAll(void);
 
     private:
         Ui::ThemeInstallFrm ui;
