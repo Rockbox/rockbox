@@ -1089,7 +1089,6 @@ static inline void load_context(const void* addr)
  */
 static inline void core_sleep(void)
 {
-#if 0
 #if CONFIG_CPU == JZ4732
 	REG_CPM_LCR &= ~CPM_LCR_LPM_MASK;
 	REG_CPM_LCR |= CPM_LCR_LPM_SLEEP;
@@ -1108,7 +1107,6 @@ static inline void core_sleep(void)
 #if CONFIG_CPU == JZ4732
     REG_CPM_LCR &= ~CPM_LCR_LPM_MASK;
 	REG_CPM_LCR |= CPM_LCR_LPM_IDLE;
-#endif
 #endif
 }
 
