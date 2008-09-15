@@ -3052,19 +3052,19 @@
 </phrase>
 <phrase>
   id: LANG_RECORDING_LEFT
-  desc: in the recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Gain Left"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Ganancia Izquierda"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Ganancia Izquierda"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -5700,36 +5700,36 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_OFF
-  desc: Used in a lot of places
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Off"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Desactivar"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Desactivar"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_VOLUME
-  desc: in sound_settings
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Volume"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Volumen"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Volumen"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -6023,70 +6023,70 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_TIME
-  desc: Display of recorded time
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Time:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Tiempo:"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Tiempo"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_TIMESPLIT_REC
-  desc: Display of record timer interval setting, on the record screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Split Time:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Tiempo de división:"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Tiempo de división"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_SIZE
-  desc: Display of recorded file size
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Size:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Tamaño:"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Tamaño"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_PRERECORD
-  desc: in recording and radio screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Pre-Recording"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Pregrabación"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Pregrabación"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -6125,25 +6125,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_DISK_FULL
-  desc: in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Disco duro lleno. Pulse OFF para continuar"
-    h100,h120,h300: "Disco duro lleno. Pulse STOP para continuar"
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "Disco duro lleno. Pulse LEFT para continuar"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Disco duro lleno. Pulse OFF para continuar"
-    h100,h120,h300: "Disco duro lleno. Pulse STOP para continuar"
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "Disco duro lleno. Pulse LEFT para continuar"
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -7356,7 +7350,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Velocidad" #not only acceleration, also slowen -FV
+    pitchscreen: "Velocidad"
   </dest>
   <voice>
     *: none
@@ -7480,11 +7474,11 @@
   </source>
   <dest>
     *: none
-    radio: "Lista de presintonías" #fuzzy, why the hyphen? -FV
+    radio: "Lista de presintonías"
   </dest>
   <voice>
     *: none
-    radio: "Lista de presintonías" #maybe for proper pronunciation -FV
+    radio: "Lista de presintonías"
   </voice>
 </phrase>
 <phrase>
@@ -7753,7 +7747,7 @@
   </source>
   <dest>
     *: none
-    recording: "Luz de clipping" # in English but still better -FV
+    recording: "Luz de clipping"
   </dest>
   <voice>
     *: none
@@ -7869,11 +7863,10 @@
   </source>
   <dest>
     *: none
-    lcd_color: "RGB" #fuzzy, maybe R V A in Spanish -FV
+    lcd_color: "RGB"
   </dest>
   <voice>
     *: none
-    lcd_color: "R G B" #fuzzy, not to be spoken -FV
   </voice>
 </phrase>
 <phrase>
@@ -7968,7 +7961,7 @@
   </source>
   <dest>
     *: none
-    radio: "Borrar lista de presintonías" #fuzzy, why the hyphen? -FV
+    radio: "Borrar lista de presintonías"
   </dest>
   <voice>
     *: none
@@ -7997,7 +7990,7 @@
     *: "Latin Extended (ISO-8859-2)"
   </source>
   <dest>
-    *: "Latín Extendido (ISO-8859-2)" #hyphen superfluous -FV
+    *: "Latín Extendido (ISO-8859-2)"
   </dest>
   <voice>
     *: "Latín extendido, iso 8859 2"
@@ -8160,19 +8153,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
-  desc: in record timesplit options
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Split Filesize"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Tamaño de archivo para dividir"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Tamaño de archivo para dividir"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8528,7 +8521,7 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Unificación de volumen de pistas
+    *: "Unificación de volumen de pistas"
   </dest>
   <voice>
     *: "Unificación de volumen de pistas"
@@ -8810,104 +8803,104 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Safety (clip)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Con seguridad (clip)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Con seguridad (clip)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Voice (fast)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Voz (rápido)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Voz, rápido"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Medium"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Medio"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Medio"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Live (slow)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Directo (lento)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Directo, lento"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "DJ-Set (slow)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Modo DJ (lento)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "modo Di Yei, lento"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
-  desc: AGC maximum gain in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "AGC max. gain"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "AGC máx. ganancia"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "A G C máxima ganancia"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -9078,7 +9071,7 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "Soporte de Cuesheet" #fuzzy, in English -FV
+    *: "Soporte de Cuesheet"
   </dest>
   <voice>
     *: "Soporte de kiusiit"
@@ -9323,19 +9316,19 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_AGC_PRESET
-  desc: automatic gain control in record settings
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Automatic Gain Control"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Control automático de ganancia" # this is not auto track gain -FV
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Control automático de ganancia"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -9492,7 +9485,7 @@
   </source>
   <dest>
     *: none
-    recording: "Contador de clips" #In English, but still better than cortes -FV
+    recording: "Contador de clips"
   </dest>
   <voice>
     *: none
@@ -9558,7 +9551,7 @@
     *: "Gain"
   </source>
   <dest>
-    *: "Ganancia" # it is not anymore track volume unifying but a generic string -FV
+    *: "Ganancia"
   </dest>
   <voice>
     *: "Ganancia"
@@ -10274,7 +10267,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Ganancia" #this is not auto track gain -FV
+    lcd_bitmap: "Ganancia"
   </dest>
   <voice>
     *: none
@@ -10323,7 +10316,7 @@
     *: "Buttons Unlocked"
   </source>
   <dest>
-    *: "Botones desbloqueados" #for symmetry w/ buttons locked -FV
+    *: "Botones desbloqueados"
   </dest>
   <voice>
     *: "Botones desbloqueados"
@@ -10526,36 +10519,36 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_FILENAME
-  desc: Filename header in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Filename:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Nombre del archivo:"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Nombre del archivo"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_PM_CLIPCOUNT
-  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "CLIP:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "CLIP:"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "c l i p"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -10631,7 +10624,7 @@
     *: "[Work]"
   </source>
   <dest>
-    *: "[Trabajo]" #fuzzy. Obra? -FV
+    *: "[Trabajo]"
   </dest>
   <voice>
     *: "Trabajo"
@@ -10687,19 +10680,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
-  desc: automatic gain control in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "AGC"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "AGC"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "a g c, control automático de ganancia" #this is not auto track gain -FV
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -11166,19 +11159,19 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
-  desc: in record settings
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "AGC clip time"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Tiempo de corte del AGC"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Tiempo de corte del A G C"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -11538,19 +11531,19 @@
 </phrase>
 <phrase>
   id: LANG_RECORDING_RIGHT
-  desc: in the recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Gain Right"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Ganancia derecha"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Ganancia derecha"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -11831,7 +11824,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Okei" #fuzzy, in English but funny -FV
+    *: "Okei"
   </voice>
 </phrase>
 <phrase>
@@ -11844,10 +11837,163 @@
   </source>
   <dest>
     *: none
-    gigabeatf: "Alto" #fuzzy, missing context -FV
+    gigabeatf: "Alto"
   </dest>
   <voice>
     *: none
     gigabeatf: "Alto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SIZE
+  desc: Display of recorded file size
+  user:
+  <source>
+    *: none
+    recording: "Size:"
+  </source>
+  <dest>
+    *: none
+    recording: "Tamaño:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  user:
+  <source>
+    *: none
+    agc: "AGC max. gain"
+  </source>
+  <dest>
+    *: none
+    agc: "Ganancia máx. de CAG"
+  </dest>
+  <voice>
+    *: none
+    agc: "Ganancia máxima de C A G"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_TIMESPLIT_REC
+  desc: Display of record timer interval setting, on the record screen
+  user:
+  <source>
+    *: none
+    recording: "Split Time:"
+  </source>
+  <dest>
+    *: none
+    recording: "Tiempo de división:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user:
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "CLIP:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN_RIGHT
+  desc: in the recording screen
+  user:
+  <source>
+    *: none
+    recording: "Gain R"
+  </source>
+  <dest>
+    *: none
+    recording: "Ganancia Der."
+  </dest>
+  <voice>
+    *: none
+    recording: "Ganancia derecha"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user:
+  <source>
+    *: none
+    recording: "Filename:"
+  </source>
+  <dest>
+    *: none
+    recording: "Nombre:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN_LEFT
+  desc: in the recording screen
+  user:
+  <source>
+    *: none
+    recording: "Gain L"
+  </source>
+  <dest>
+    *: none
+    recording: "Ganancia Izq."
+  </dest>
+  <voice>
+    *: none
+    recording: "Ganancia izquierda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_PRESET
+  desc: automatic gain control in record settings and screen
+  user:
+  <source>
+    *: none
+    agc: "AGC"
+  </source>
+  <dest>
+    *: none
+    agc: "CAG"
+  </dest>
+  <voice>
+    *: none
+    agc: "C A G control automático de ganancia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_CLIPTIME
+  desc: in record settings
+  user:
+  <source>
+    *: none
+    agc: "AGC clip time"
+  </source>
+  <dest>
+    *: none
+    agc: "Tiempo de clip de CAG"
+  </dest>
+  <voice>
+    *: none
+    agc: "Tiempo de clip de C A G control automático de ganancia"
   </voice>
 </phrase>
