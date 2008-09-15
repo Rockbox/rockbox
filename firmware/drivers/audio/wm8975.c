@@ -29,6 +29,7 @@
 #include "system.h"
 #include "string.h"
 #include "audio.h"
+#include "sound.h"
 
 #include "wmcodec.h"
 #include "audiohw.h"
