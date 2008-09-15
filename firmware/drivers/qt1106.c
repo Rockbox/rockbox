@@ -46,11 +46,11 @@ void init_qt1106(void)
 
     oldval = PCON0;
     //Set P0.0 and P0.1 to output, set P0.3 and P0.4 to input
-    PCON0 = ((oldval & ~(3 << 0 || 3 << 2 || 3 << 6 || 3 << 8)) | (1 << 0 | 1 << 2));
+    PCON0 = ((oldval & ~(3 << 0 | 3 << 2 | 3 << 6 | 3 << 8)) | (1 << 0 | 1 << 2));
 
     oldval = PCON1;
-    //Set P1.5 to input, set P1.6 to input
-    PCON1 = ((oldval & ~(0xf << 20 || 0xf << 24)) | (1 << 24));
+    //Set P1.5 to input, set P1.6 to output
+    PCON1 = ((oldval & ~(0xf << 20 | 0xf << 24)) | (1 << 24));
 
 
     SETSS();
