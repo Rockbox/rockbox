@@ -120,13 +120,9 @@ static const unsigned char dummy[] = {
 
 /* 2 buffers used alternatively for writing, including start token,
  * dummy CRC and an extra byte to keep word alignment. */
-static unsigned char block_buffer[2][BLOCK_SIZE+4];
+static unsigned char write_buffer[2][BLOCK_SIZE+4];
 static int current_buffer = 0;
-
-/* globals for background copy and swap */
-static const unsigned char *bcs_src = NULL;
-static unsigned char *bcs_dest = NULL;
-static unsigned long bcs_len = 0;
+static const unsigned char *send_block_addr = NULL;
 
 static tCardInfo card_info[2];
 #ifndef HAVE_MULTIVOLUME
@@ -152,9 +148,10 @@ static unsigned char poll_busy(long timeout);
 static int send_cmd(int cmd, unsigned long parameter, unsigned char *response);
 static int receive_cxd(unsigned char *buf);
 static int initialize_card(int card_no);
-static void bg_copy_swap(void);
 static int receive_block(unsigned char *inbuf, long timeout);
-static int send_block(unsigned char start_token, long timeout);
+static void send_block_prepare(void);
+static int send_block_send(unsigned char start_token, long timeout,
+                           bool prepare_next);
 static void mmc_tick(void);
 
 /* implementation */
@@ -504,32 +501,11 @@ tCardInfo *mmc_card_info(int card_no)
     return card;
 }
 
-/* Copy and swap in the background
- * If destination is NULL, use the next block buffer */
-static void bg_copy_swap(void)
-{
-    if (!bcs_len)
-        return;
-    
-    if (!bcs_dest)
-    {
-        current_buffer ^= 1; /* toggle buffer */
-        bcs_dest = block_buffer[current_buffer] + 2;
-    }
-    if (bcs_src)
-    {
-        memcpy(bcs_dest, bcs_src, bcs_len);
-        bcs_src += bcs_len;
-    }
-    bitswap(bcs_dest, bcs_len);
-    bcs_dest += bcs_len;
-    bcs_len = 0;
-}
-
-/* Receive one block with dma, possibly swapping the previously received
- * block in the background */
+/* Receive one block with DMA and bitswap it (chasing bitswap). */
 static int receive_block(unsigned char *inbuf, long timeout)
 {
+    unsigned long buf_end;
+
     if (poll_byte(timeout) != DT_START_BLOCK)
     {
         write_transfer(dummy, 1);
@@ -549,14 +525,28 @@ static int receive_block(unsigned char *inbuf, long timeout)
     CHCR0 = 0x4601;               /* fixed source address, RXI1, enable */
     DMAOR = 0x0001;
     SCR1 = (SCI_RE|SCI_RIE);      /* kick off DMA */
-    
-    /* dma receives 2 bytes more than DTCR2, but the last 2 bytes are not
+
+    /* DMA receives 2 bytes more than DTCR2, but the last 2 bytes are not
      * stored. The first extra byte is available from RDR1 after the DMA ends,
-     * the second one is lost because of the SCI overrun. However, this 
+     * the second one is lost because of the SCI overrun. However, this
      * behaviour conveniently discards the crc. */
 
-    bg_copy_swap();
     yield();                      /* be nice */
+    
+    /* Bitswap received data, chasing the DMA pointer */
+    buf_end = (unsigned long)inbuf + BLOCK_SIZE;
+    do
+    {
+        /* Call bitswap whenever (a multiple of) 8 bytes are
+         * available (value optimised by experimentation). */
+        int swap_now = (DAR0 - (unsigned long)inbuf) & ~0x00000007;
+        if (swap_now)
+        {
+            bitswap(inbuf, swap_now);
+            inbuf += swap_now;
+        }
+    }
+    while ((unsigned long)inbuf < buf_end);
 
     while (!(CHCR0 & 0x0002));    /* wait for end of DMA */
     while (!(SSR1 & SCI_ORER));   /* wait for the trailing bytes */
@@ -568,13 +558,29 @@ static int receive_block(unsigned char *inbuf, long timeout)
     return 0;
 }
 
-/* Send one block with dma from the current block buffer, possibly preparing
- * the next block within the next block buffer in the background. */
-static int send_block(unsigned char start_token, long timeout)
+/* Prepare a block for sending by copying it to the next write buffer
+ * and bitswapping it. */
+static void send_block_prepare(void)
+{
+    unsigned char *dest;
+
+    current_buffer ^= 1; /* toggle buffer */
+    dest = write_buffer[current_buffer] + 2;
+
+    memcpy(dest, send_block_addr, BLOCK_SIZE);
+    bitswap(dest, BLOCK_SIZE);
+
+    send_block_addr += BLOCK_SIZE;
+}
+
+/* Send one block with DMA from the current write buffer, possibly preparing
+ * the next block within the next write buffer in the background. */
+static int send_block_send(unsigned char start_token, long timeout, 
+                           bool prepare_next)
 {
     int rc = 0;
-    unsigned char *curbuf = block_buffer[current_buffer];
-    
+    unsigned char *curbuf = write_buffer[current_buffer];
+
     curbuf[1] = fliptable[(signed char)start_token];
     *(unsigned short *)(curbuf + BLOCK_SIZE + 2) = 0xFFFF;
 
@@ -592,7 +598,8 @@ static int send_block(unsigned char start_token, long timeout)
     DMAOR = 0x0001;
     SCR1 = (SCI_TE|SCI_TIE);      /* kick off DMA */
 
-    bg_copy_swap();
+    if (prepare_next)
+        send_block_prepare();
     yield();                      /* be nice */
 
     while (!(CHCR0 & 0x0002));    /* wait for end of DMA */
@@ -644,9 +651,6 @@ int ata_read_sectors(IF_MV2(int drive,)
     if (end_block == card->numblocks)
         lastblock = 1;
         
-    bcs_src = NULL;
-    bcs_dest = inbuf;
-
     if (incount > 1)
     {
         rc = send_cmd(CMD_READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, &response);
@@ -664,9 +668,8 @@ int ata_read_sectors(IF_MV2(int drive,)
                 rc = rc * 10 - 4;
                 goto error;
             }
-            bcs_len = BLOCK_SIZE;
             inbuf += BLOCK_SIZE;
-            start++; 
+            start++;
             /* ^^ necessary for the abovementioned last block special case */
         }
         rc = send_cmd(CMD_STOP_TRANSMISSION, 0, &response);
@@ -691,9 +694,7 @@ int ata_read_sectors(IF_MV2(int drive,)
             rc = rc * 10 - 7;
             goto error;
         }
-        bcs_len = BLOCK_SIZE;
     }
-    bg_copy_swap();
 
   error:
 
@@ -727,10 +728,8 @@ int ata_write_sectors(IF_MV2(int drive,)
     if (start + count  > card->numblocks)
         panicf("Writing past end of card");
 
-    bcs_src  = buf;
-    bcs_dest = NULL;      /* next block buffer */
-    bcs_len  = BLOCK_SIZE;
-    bg_copy_swap();
+    send_block_addr = buf;
+    send_block_prepare();
 
     if (count > 1)
     {
@@ -752,16 +751,14 @@ int ata_write_sectors(IF_MV2(int drive,)
 
     while (--count > 0)
     {
-        bcs_dest = NULL;      /* next block cache */
-        bcs_len = BLOCK_SIZE;
-        rc = send_block(start_token, card->write_timeout);
+        rc = send_block_send(start_token, card->write_timeout, true);
         if (rc)
         {
             rc = rc * 10 - 3;
             goto error;
         }
     }
-    rc = send_block(start_token, card->write_timeout);
+    rc = send_block_send(start_token, card->write_timeout, false);
     if (rc)
     {
         rc = rc * 10 - 4;
