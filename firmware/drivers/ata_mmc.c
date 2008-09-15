@@ -37,8 +37,7 @@
 #include "bitswap.h"
 #include "disk.h" /* for mount/unmount */
 
-#define SECTOR_SIZE     512
-#define MAX_BLOCK_SIZE  2048
+#define BLOCK_SIZE  512   /* fixed */
 
 /* Command definitions */
 #define CMD_GO_IDLE_STATE        0x40  /* R1 */
@@ -119,22 +118,10 @@ static const unsigned char dummy[] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
 
-struct block_cache_entry {
-    bool inuse;
-#ifdef HAVE_MULTIVOLUME
-    int drive;
-#endif
-    unsigned long blocknum;
-    unsigned char data[MAX_BLOCK_SIZE+4];
-    /* include start token, dummy crc, and an extra byte at the start 
-     * to keep the data word aligned. */
-};
-
-/* 2 buffers used alternatively for writing, and also for reading
- * and sub-block writing if block size > sector size */
-#define NUMCACHES 2
-static struct block_cache_entry block_cache[NUMCACHES];
-static int current_cache = 0;
+/* 2 buffers used alternatively for writing, including start token,
+ * dummy CRC and an extra byte to keep word alignment. */
+static unsigned char block_buffer[2][BLOCK_SIZE+4];
+static int current_buffer = 0;
 
 /* globals for background copy and swap */
 static const unsigned char *bcs_src = NULL;
@@ -146,8 +133,8 @@ static tCardInfo card_info[2];
 static int current_card = 0;
 #endif
 static bool last_mmc_status = false;
-static int countdown;  /* for mmc switch debouncing */
-static bool usb_activity; /* monitoring the USB bridge */
+static int countdown = HZ/3; /* for mmc switch debouncing */
+static bool usb_activity;    /* monitoring the USB bridge */
 static long last_usb_activity;
 
 /* private function declarations */
@@ -166,10 +153,8 @@ static int send_cmd(int cmd, unsigned long parameter, unsigned char *response);
 static int receive_cxd(unsigned char *buf);
 static int initialize_card(int card_no);
 static void bg_copy_swap(void);
-static int receive_block(unsigned char *inbuf, int size, long timeout);
-static int send_block(int size, unsigned char start_token, long timeout);
-static int cache_block(IF_MV2(int drive,) unsigned long blocknum,
-                       int size, long timeout);
+static int receive_block(unsigned char *inbuf, long timeout);
+static int send_block(unsigned char start_token, long timeout);
 static void mmc_tick(void);
 
 /* implementation */
@@ -402,7 +387,8 @@ static int receive_cxd(unsigned char *buf)
 
 static int initialize_card(int card_no)
 {
-    int rc, i, temp;
+    int rc, i;
+    int blk_exp, ts_exp, taac_exp;
     unsigned char response[5];
     tCardInfo *card = &card_info[card_no];
 
@@ -419,7 +405,7 @@ static int initialize_card(int card_no)
         mmc_status = MMC_TOUCHED;
     /* switch to SPI mode */
     send_cmd(CMD_GO_IDLE_STATE, 0, response);
-    if (response[0] != 0x01)
+    if (response[0] != 0x01)      
         return -1;                /* error response */
 
     /* initialize card */
@@ -451,38 +437,30 @@ static int initialize_card(int card_no)
     if (rc)
         return rc * 10 - 6;
 
-    /* check block sizes */
-    card->block_exp = card_extract_bits(card->csd, 44, 4);
-    card->blocksize = 1 << card->block_exp;
-    if ((card_extract_bits(card->csd, 102, 4) != card->block_exp)
-        || card->blocksize > MAX_BLOCK_SIZE)
-    {
+    blk_exp = card_extract_bits(card->csd, 44, 4);
+    if (blk_exp < 9) /* block size < 512 bytes not supported */
         return -7;
-    }
 
-    if (card->blocksize != SECTOR_SIZE)
-    {
-        rc = send_cmd(CMD_SET_BLOCKLEN, card->blocksize, response);
-        if (rc)
-            return rc * 10 - 8;
-    }
+    card->numblocks = (card_extract_bits(card->csd, 54, 12) + 1)
+                   << (card_extract_bits(card->csd, 78, 3) + 2 + blk_exp - 9);
+    card->blocksize = BLOCK_SIZE;
 
     /* max transmission speed, clock divider */
-    temp = card_extract_bits(card->csd, 29, 3);
-    temp = (temp > 3) ? 3 : temp;
+    ts_exp = card_extract_bits(card->csd, 29, 3);
+    ts_exp = (ts_exp > 3) ? 3 : ts_exp;
     card->speed = mantissa[card_extract_bits(card->csd, 25, 4)]
-                * exponent[temp + 4];
+                * exponent[ts_exp + 4];
     card->bitrate_register = (FREQ/4-1) / card->speed;
 
     /* NSAC, TSAC, read timeout */
     card->nsac = 100 * card_extract_bits(card->csd, 16, 8);
     card->tsac = mantissa[card_extract_bits(card->csd, 9, 4)];
-    temp = card_extract_bits(card->csd, 13, 3);
+    taac_exp = card_extract_bits(card->csd, 13, 3);
     card->read_timeout = ((FREQ/4) / (card->bitrate_register + 1)
-                         * card->tsac / exponent[9 - temp]
+                         * card->tsac / exponent[9 - taac_exp]
                          + (10 * card->nsac));
     card->read_timeout /= 8;      /* clocks -> bytes */
-    card->tsac = card->tsac * exponent[temp] / 10;
+    card->tsac = card->tsac * exponent[taac_exp] / 10;
 
     /* r2w_factor, write timeout */
     card->r2w_factor = 1 << card_extract_bits(card->csd, 99, 3);
@@ -494,14 +472,14 @@ static int initialize_card(int card_no)
     else
         card->write_timeout = card->read_timeout * card->r2w_factor;
 
-    /* card size */
-    card->numblocks = (card_extract_bits(card->csd, 54, 12) + 1)
-            * (1 << (card_extract_bits(card->csd, 78, 3) + 2));
-    card->size = card->numblocks * card->blocksize;
-
     /* switch to full speed */
     setup_sci1(card->bitrate_register);
-    
+
+    /* always use 512 byte blocks */
+    rc = send_cmd(CMD_SET_BLOCKLEN, BLOCK_SIZE, response);
+    if (rc)
+        return rc * 10 - 8;
+
     /* get CID register */
     rc = send_cmd(CMD_SEND_CID, 0, response);
     if (rc)
@@ -526,8 +504,8 @@ tCardInfo *mmc_card_info(int card_no)
     return card;
 }
 
-/* copy and swap in the background. If destination is NULL, use the next
- * block cache entry */
+/* Copy and swap in the background
+ * If destination is NULL, use the next block buffer */
 static void bg_copy_swap(void)
 {
     if (!bcs_len)
@@ -535,9 +513,8 @@ static void bg_copy_swap(void)
     
     if (!bcs_dest)
     {
-        current_cache = (current_cache + 1) % NUMCACHES; /* next cache */
-        block_cache[current_cache].inuse = false;
-        bcs_dest = block_cache[current_cache].data + 2;
+        current_buffer ^= 1; /* toggle buffer */
+        bcs_dest = block_buffer[current_buffer] + 2;
     }
     if (bcs_src)
     {
@@ -551,7 +528,7 @@ static void bg_copy_swap(void)
 
 /* Receive one block with dma, possibly swapping the previously received
  * block in the background */
-static int receive_block(unsigned char *inbuf, int size, long timeout)
+static int receive_block(unsigned char *inbuf, long timeout)
 {
     if (poll_byte(timeout) != DT_START_BLOCK)
     {
@@ -568,7 +545,7 @@ static int receive_block(unsigned char *inbuf, int size, long timeout)
     CHCR0 = 0;                    /* disable */
     SAR0 = RDR1_ADDR;
     DAR0 = (unsigned long) inbuf;
-    DTCR0 = size;
+    DTCR0 = BLOCK_SIZE;
     CHCR0 = 0x4601;               /* fixed source address, RXI1, enable */
     DMAOR = 0x0001;
     SCR1 = (SCI_RE|SCI_RIE);      /* kick off DMA */
@@ -591,15 +568,15 @@ static int receive_block(unsigned char *inbuf, int size, long timeout)
     return 0;
 }
 
-/* Send one block with dma from the current block cache, possibly preparing
- * the next block within the next block cache in the background. */
-static int send_block(int size, unsigned char start_token, long timeout)
+/* Send one block with dma from the current block buffer, possibly preparing
+ * the next block within the next block buffer in the background. */
+static int send_block(unsigned char start_token, long timeout)
 {
     int rc = 0;
-    unsigned char *curbuf = block_cache[current_cache].data;
+    unsigned char *curbuf = block_buffer[current_buffer];
     
     curbuf[1] = fliptable[(signed char)start_token];
-    *(unsigned short *)(curbuf + size + 2) = 0xFFFF;
+    *(unsigned short *)(curbuf + BLOCK_SIZE + 2) = 0xFFFF;
 
     while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
 
@@ -610,7 +587,7 @@ static int send_block(int size, unsigned char start_token, long timeout)
     CHCR0 = 0;                    /* disable */
     SAR0 = (unsigned long)(curbuf + 1);
     DAR0 = TDR1_ADDR;
-    DTCR0 = size + 3;             /* start token + block + dummy crc */
+    DTCR0 = BLOCK_SIZE + 3;       /* start token + block + dummy crc */
     CHCR0 = 0x1701;               /* fixed dest. address, TXI1, enable */
     DMAOR = 0x0001;
     SCR1 = (SCI_TE|SCI_TIE);      /* kick off DMA */
@@ -632,64 +609,20 @@ static int send_block(int size, unsigned char start_token, long timeout)
     return rc;
 }
 
-static int cache_block(IF_MV2(int drive,) unsigned long blocknum,
-                       int size, long timeout)
-{
-    int rc, i;
-    unsigned char response;
-    
-    /* check whether the block is already cached */
-    for (i = 0; i < NUMCACHES; i++)
-    {
-        if (block_cache[i].inuse && (block_cache[i].blocknum == blocknum)
-#ifdef HAVE_MULTIVOLUME
-            && (block_cache[i].drive == drive)
-#endif
-           )
-        {
-            current_cache = i;
-            bg_copy_swap();
-            return 0;
-        }
-    }
-    /* not found: read the block */
-    current_cache = (current_cache + 1) % NUMCACHES;
-    rc = send_cmd(CMD_READ_SINGLE_BLOCK, blocknum * size, &response);
-    if (rc)
-        return rc * 10 - 1;
-
-    block_cache[current_cache].inuse = false;
-    rc = receive_block(block_cache[current_cache].data + 2, size, timeout);
-    if (rc)
-        return rc * 10 - 2;
-
-#ifdef HAVE_MULTIVOLUME
-    block_cache[current_cache].drive = drive;
-#endif
-    block_cache[current_cache].blocknum = blocknum;
-    block_cache[current_cache].inuse = true;
-
-    return 0;
-}
-
 int ata_read_sectors(IF_MV2(int drive,)
                      unsigned long start,
                      int incount,
                      void* inbuf)
 {
     int rc = 0;
-    unsigned int blocksize, offset;
-    unsigned long c_addr, c_end_addr;
-    unsigned long c_block, c_end_block;
+    int lastblock = 0;
+    unsigned long end_block;
     unsigned char response;
     tCardInfo *card;
 #ifndef HAVE_MULTIVOLUME
     int drive = current_card;
 #endif
 
-    c_addr = start * SECTOR_SIZE;
-    c_end_addr = c_addr + incount * SECTOR_SIZE;
-    
     card = &card_info[drive];
     rc = select_card(drive);
     if (rc)
@@ -697,88 +630,68 @@ int ata_read_sectors(IF_MV2(int drive,)
         rc = rc * 10 - 1;
         goto error;
     }
-    if (c_end_addr > card->size)
+
+    end_block = start + incount;
+    if (end_block > card->numblocks)
     {
         rc = -2;
         goto error;
     }
 
-    blocksize = card->blocksize;
-    offset = c_addr & (blocksize - 1);
-    c_block = c_addr >> card->block_exp;
-    c_end_block = c_end_addr >> card->block_exp;
+    /* Some cards don't like reading the very last block with
+     * CMD_READ_MULTIPLE_BLOCK, so make sure this block is always
+     * read with CMD_READ_SINGLE_BLOCK. */
+    if (end_block == card->numblocks)
+        lastblock = 1;
+        
+    bcs_src = NULL;
     bcs_dest = inbuf;
 
-    if (offset) /* first partial block */
+    if (incount > 1)
     {
-        unsigned long len = MIN(c_end_addr - c_addr, blocksize - offset);
-
-        rc = cache_block(IF_MV2(drive,) c_block, blocksize,
-                         card->read_timeout);
+        rc = send_cmd(CMD_READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, &response);
+                      /* MMC4.2: make multiplication conditional */
         if (rc)
         {
             rc = rc * 10 - 3;
             goto error;
-        }                          
-        bcs_src = block_cache[current_cache].data + 2 + offset;
-        bcs_len = len;
-        inbuf += len;
-        c_addr += len;
-        c_block++;
-    }
-    /* some cards don't like reading the very last block with
-     * CMD_READ_MULTIPLE_BLOCK, so make sure this block is always
-     * read with CMD_READ_SINGLE_BLOCK. Let the 'last partial block'
-     * read catch this. */
-    if (c_end_block == card->numblocks)
-        c_end_block--;
-
-    if (c_block < c_end_block)
-    {
-        int read_cmd = (c_end_block - c_block > 1) ?
-                       CMD_READ_MULTIPLE_BLOCK : CMD_READ_SINGLE_BLOCK;
-
-        rc = send_cmd(read_cmd, c_addr, &response);
+        }
+        while (incount-- > lastblock)
+        {
+            rc = receive_block(inbuf, card->read_timeout);
+            if (rc)
+            {
+                rc = rc * 10 - 4;
+                goto error;
+            }
+            bcs_len = BLOCK_SIZE;
+            inbuf += BLOCK_SIZE;
+            start++; 
+            /* ^^ necessary for the abovementioned last block special case */
+        }
+        rc = send_cmd(CMD_STOP_TRANSMISSION, 0, &response);
         if (rc)
         {
-            rc = rc * 10 - 4;
+            rc = rc * 10 - 5;
             goto error;
         }
-        while (c_block < c_end_block)
-        {
-            rc = receive_block(inbuf, blocksize, card->read_timeout);
-            if (rc)
-            {
-                rc = rc * 10 - 5;
-                goto error;
-            }
-            bcs_src = NULL;
-            bcs_len = blocksize;
-            inbuf += blocksize;
-            c_addr += blocksize;
-            c_block++;
-        }
-        if (read_cmd == CMD_READ_MULTIPLE_BLOCK)
-        {
-            rc = send_cmd(CMD_STOP_TRANSMISSION, 0, &response);
-            if (rc)
-            {
-                rc = rc * 10 - 6;
-                goto error;
-            }
-        }
     }
-    if (c_addr < c_end_addr) /* last partial block */
+    if (incount > 0)
     {
-        rc = cache_block(IF_MV2(drive,) c_block, blocksize,
-                         card->read_timeout);
+        rc = send_cmd(CMD_READ_SINGLE_BLOCK, start * BLOCK_SIZE, &response);
+                      /* MMC4.2: make multiplication conditional */
+        if (rc)
+        {
+            rc = rc * 10 - 6;
+            goto error;
+        }
+        rc = receive_block(inbuf, card->read_timeout);
         if (rc)
         {
             rc = rc * 10 - 7;
             goto error;
-        }     
-        bcs_src = block_cache[current_cache].data + 2;
-        bcs_len = c_end_addr - c_addr;
+        }
+        bcs_len = BLOCK_SIZE;
     }
     bg_copy_swap();
 
@@ -795,17 +708,13 @@ int ata_write_sectors(IF_MV2(int drive,)
                       const void* buf)
 {
     int rc = 0;
-    unsigned int blocksize, offset;
-    unsigned long c_addr, c_end_addr;
-    unsigned long c_block, c_end_block;
+    int write_cmd;
+    unsigned char start_token;
     unsigned char response;
     tCardInfo *card;
 #ifndef HAVE_MULTIVOLUME
     int drive = current_card;
 #endif
-
-    c_addr = start * SECTOR_SIZE;
-    c_end_addr = c_addr + count * SECTOR_SIZE;
 
     card = &card_info[drive];
     rc = select_card(drive);
@@ -814,120 +723,56 @@ int ata_write_sectors(IF_MV2(int drive,)
         rc = rc * 10 - 1;
         goto error;
     }
-
-    if (c_end_addr  > card->size)
+    
+    if (start + count  > card->numblocks)
         panicf("Writing past end of card");
 
-    blocksize = card->blocksize;
-    offset = c_addr & (blocksize - 1);
-    c_block = c_addr >> card->block_exp;
-    c_end_block = c_end_addr >> card->block_exp;
-    bcs_src = buf;
+    bcs_src  = buf;
+    bcs_dest = NULL;      /* next block buffer */
+    bcs_len  = BLOCK_SIZE;
+    bg_copy_swap();
 
-    /* Special case: first block is trimmed at both ends. May only happen
-     * if (blocksize > 2 * sectorsize), i.e. blocksize == 2048 */
-    if ((c_block == c_end_block) && offset)
-        c_end_block++;
-
-    if (c_block < c_end_block)
+    if (count > 1)
     {
-        int write_cmd;
-        unsigned char start_token;
-        
-        if (c_end_block - c_block > 1)
-        {
-            write_cmd   = CMD_WRITE_MULTIPLE_BLOCK;
-            start_token = DT_START_WRITE_MULTIPLE;
-        }
-        else
-        {
-            write_cmd   = CMD_WRITE_BLOCK;
-            start_token = DT_START_BLOCK;
-        }
+        write_cmd   = CMD_WRITE_MULTIPLE_BLOCK;
+        start_token = DT_START_WRITE_MULTIPLE;
+    }
+    else
+    {
+        write_cmd   = CMD_WRITE_BLOCK;
+        start_token = DT_START_BLOCK;
+    }
+    rc = send_cmd(write_cmd, start * BLOCK_SIZE, &response);
+                  /* MMC4.2: make multiplication conditional */
+    if (rc)
+    {
+        rc = rc * 10 - 2;
+        goto error;
+    }
 
-        if (offset)
-        {
-            unsigned long len = MIN(c_end_addr - c_addr, blocksize - offset);
-            
-            rc = cache_block(IF_MV2(drive,) c_block, blocksize,
-                             card->read_timeout);
-            if (rc)
-            {
-                rc = rc * 10 - 2;
-                goto error;
-            }
-            bcs_dest = block_cache[current_cache].data + 2 + offset;
-            bcs_len = len;
-            c_addr -= offset;
-        }
-        else
-        {
-            bcs_dest = NULL;      /* next block cache */
-            bcs_len = blocksize;
-        }
-        bg_copy_swap();
-        rc = send_cmd(write_cmd, c_addr, &response);
+    while (--count > 0)
+    {
+        bcs_dest = NULL;      /* next block cache */
+        bcs_len = BLOCK_SIZE;
+        rc = send_block(start_token, card->write_timeout);
         if (rc)
         {
             rc = rc * 10 - 3;
             goto error;
         }
-        c_block++;  /* early increment to simplify the loop */
-        
-        while (c_block < c_end_block)
-        {
-            bcs_dest = NULL;      /* next block cache */
-            bcs_len = blocksize;
-            rc = send_block(blocksize, start_token, card->write_timeout);
-            if (rc)
-            {
-                rc = rc * 10 - 4;
-                goto error;
-            }
-            c_addr += blocksize;
-            c_block++;
-        }
-        rc = send_block(blocksize, start_token, card->write_timeout);
-        if (rc)
-        {
-            rc = rc * 10 - 5;
-            goto error;
-        }
-        c_addr += blocksize;
-        /* c_block++ was done early */
-
-        if (write_cmd == CMD_WRITE_MULTIPLE_BLOCK)
-        {
-            response = DT_STOP_TRAN;
-            write_transfer(&response, 1);
-            poll_busy(card->write_timeout);
-        }
     }
-    
-    if (c_addr < c_end_addr) /* last partial block */
+    rc = send_block(start_token, card->write_timeout);
+    if (rc)
     {
-        rc = cache_block(IF_MV2(drive,) c_block, blocksize,
-                         card->read_timeout);
-        if (rc)
-        {
-            rc = rc * 10 - 6;
-            goto error;
-        }
-        bcs_dest = block_cache[current_cache].data + 2;
-        bcs_len = c_end_addr - c_addr;
-        bg_copy_swap();
-        rc = send_cmd(CMD_WRITE_BLOCK, c_addr, &response);
-        if (rc)
-        {
-            rc = rc * 10 - 7;
-            goto error;
-        }
-        rc = send_block(blocksize, DT_START_BLOCK, card->write_timeout);
-        if (rc)
-        {
-            rc = rc * 10 - 8;
-            goto error;
-        }
+        rc = rc * 10 - 4;
+        goto error;
+    }
+
+    if (write_cmd == CMD_WRITE_MULTIPLE_BLOCK)
+    {
+        response = DT_STOP_TRAN;
+        write_transfer(&response, 1);
+        poll_busy(card->write_timeout);
     }
 
   error:
@@ -1017,7 +862,7 @@ bool mmc_touched(void)
 {
     if (mmc_status == MMC_UNKNOWN) /* try to detect */
     {
-        unsigned char response;
+        unsigned char response;  
 
         mutex_lock(&mmc_mutex);
         setup_sci1(7);             /* safe value */
@@ -1064,7 +909,7 @@ static void mmc_tick(void)
         if (current_status != last_mmc_status)
         {
             last_mmc_status = current_status;
-            countdown = 30;
+            countdown = HZ/3;
         }
         else
         {

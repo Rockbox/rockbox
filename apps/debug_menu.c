@@ -1784,11 +1784,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                      CARDTYPE " v%s", temp < 5 ?
                             spec_vers[temp] : "?.?");
             simplelist_addline(SIMPLELIST_ADD_LINE,
-                    "Blocks: 0x%06lx", card->numblocks);
-            simplelist_addline(SIMPLELIST_ADD_LINE,
-                    "Blksz.: %d P:%c%c", card->blocksize,
-                    card_extract_bits(card->csd, 48, 1) ? 'R' : '-',
-                    card_extract_bits(card->csd, 106, 1) ? 'W' : '-');
+                    "Blocks: 0x%08lx", card->numblocks);
             output_dyn_value(pbuf, sizeof pbuf, card->speed / 1000,
                                             kbit_units, false);
             simplelist_addline(SIMPLELIST_ADD_LINE,
