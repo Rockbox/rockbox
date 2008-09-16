@@ -118,7 +118,7 @@ drivers/ata_flash.c
 drivers/ata.c
 #endif /* HAVE_MMC */
 drivers/fat.c
-#if defined(HAVE_HOTSWAP) || defined(HAVE_ATA_SD)
+#if defined(HAVE_MMC) || defined(HAVE_ATA_SD)
 hotswap.c
 #endif
 #endif /* SIMULATOR */
