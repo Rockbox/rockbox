@@ -13,7 +13,7 @@
    explicitly if different */
 #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | SRC_CAP_FMRADIO)
 
-/* define hardware samples rate caps mask */                                                                                                  
+/* define hardware samples rate caps mask */
 #define HW_SAMPR_CAPS   (/*SAMPR_CAP_88 | */SAMPR_CAP_44/* | SAMPR_CAP_22 | SAMPR_CAP_11*/)
 
 /* define the bitmask of recording sample rates */
@@ -30,6 +30,9 @@
 
 /* define this if you can invert the colours on your LCD */
 //#define HAVE_LCD_INVERT
+
+/* define this if you want album art for this target */
+#define HAVE_ALBUMART
 
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
@@ -100,11 +103,8 @@
 /* Codec is slave on serial bus */
 #define CODEC_SLAVE
 
-/* Define this if you have the TLV320 audio codec */
-//#define HAVE_TLV320
-
-/* TLV320 has no tone controls, so we use the software ones */
-//#define HAVE_SW_TONE_CONTROLS
+/* WM8731 has no tone controls, so we use the software ones */
+#define HAVE_SW_TONE_CONTROLS
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
@@ -132,9 +132,6 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ      120000000
 
-/* Offset ( in the firmware file's header ) to the file length */
-//#define FIRMWARE_OFFSET_FILE_LENGTH 0
-
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
 
@@ -146,12 +143,12 @@
 
 #define CONFIG_LCD LCD_IAUDIO67
 
-/* FM Tuner */                                                                                                                                
+/* FM Tuner */
 #define CONFIG_TUNER LV24020LP
 #define HAVE_TUNER_PWR_CTRL
 
-/* Define this for FM radio input available */                                                                                                
-#define HAVE_FMRADIO_IN                                                                                                                       
+/* Define this for FM radio input available */
+#define HAVE_FMRADIO_IN
 
 #define BOOTFILE_EXT "iaudio"
 #define BOOTFILE "rockbox." BOOTFILE_EXT

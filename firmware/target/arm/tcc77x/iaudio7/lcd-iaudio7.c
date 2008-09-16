@@ -31,6 +31,7 @@
 #include <cpu.h>
 #include <lcd.h>
 #include <system-target.h>
+#include <panic.h>
 
 #include "hd66789r.h"
 
@@ -142,7 +143,7 @@ void lcd_enable(bool on)
 
     if (on) {
         _display_on();
-//      lcd_call_enable_hook();
+      lcd_call_enable_hook();
     } else {
         /** Off sequence according to datasheet, p. 130 **/
         lcd_write_reg(R_FRAME_CYCLE_CONTROL, 0x0002);   /* EQ=0, 18 clks/line */
@@ -242,6 +243,13 @@ void lcd_blit_yuv(unsigned char *const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
+    (void) src;
+    (void) src_x;
+    (void) src_y;
+    (void) stride;
+    (void) x;
+    (void) y;
+
     if (!display_on)
         return;
 

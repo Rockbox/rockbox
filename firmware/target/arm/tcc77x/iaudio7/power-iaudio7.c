@@ -73,6 +73,7 @@ void power_touch_panel(bool on)
 
 void ide_power_enable(bool on)
 {
+    (void) on;
 }
 
 bool ide_powered(void)

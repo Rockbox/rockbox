@@ -131,6 +131,15 @@ copied_start:
     msr    cpsr, r0
     ldr    sp, =fiq_stack
 
+#ifndef BOOTLOADER
+    /* Load the banked FIQ mode registers with useful values here.
+       These values will be used in the FIQ handler in pcm-telechips.c */
+    .equ   DADO_BASE,  0x80000020
+
+    ldr    r10, =DADO_BASE
+    ldr    r11, =dma_play_data
+#endif
+
     /* Let abort and undefined modes use IRQ stack */
     mov    r0,#0xd7
     msr    cpsr, r0

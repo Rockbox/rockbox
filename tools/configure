@@ -1294,7 +1294,7 @@ fi
     tool="$rootdir/tools/scramble -add=i7"
     boottool="$rootdir/tools/scramble -tcc=crc"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.iaudio"
     appextra="recorder:gui"
     plugins="yes"

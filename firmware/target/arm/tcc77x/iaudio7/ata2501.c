@@ -86,7 +86,7 @@ unsigned short ata2501_read(void)
     return ret;
 }
 
-#define ATA2501_TEST
+//#define ATA2501_TEST
 #ifdef ATA2501_TEST
 #include "lcd.h"
 #include "sprintf.h"
@@ -108,7 +108,7 @@ void ata2501_test(void)
 
     while (1) {
         unsigned short data;
-        int i, line = 0;
+        int line = 0;
 
         data = ata2501_read();
         lcd_clear_display();

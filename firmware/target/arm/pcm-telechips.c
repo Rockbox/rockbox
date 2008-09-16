@@ -207,7 +207,11 @@ void pcm_play_unlock(void)
 
 void pcm_play_dma_pause(bool pause)
 {
-    (void) pause;
+    if (pause) {
+        play_stop_pcm();
+    } else {
+        play_start_pcm();
+    }
 }
 
 size_t pcm_get_bytes_waiting(void)
@@ -251,11 +255,12 @@ const void * pcm_rec_dma_get_peak_buffer(int *count)
 
 void pcm_record_more(void *start, size_t size)
 {
+    (void) start;
+    (void) size;
 }
 #endif
 
-#if defined(COWON_D2)
-/* TODO: hardcoded hex values differs for tcc7xx and tcc8xx */
+#if defined(CPU_TCC77X) || defined(CPU_TCC780X)
 void fiq_handler(void) ICODE_ATTR __attribute__((naked));
 void fiq_handler(void)
 {
@@ -266,10 +271,14 @@ void fiq_handler(void)
      * r0-r3 and r12 is a working register.
      */
     asm volatile (        
+#if defined(CPU_TCC780X)
         "mov     r8, #0xc000         \n" /* DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK */
         "ldr     r9, =0xf3001004     \n" /* CREQ */
+#elif defined(CPU_TCC77X)
+        "mov     r8, #0x0030         \n" /* DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK */
+        "ldr     r9, =0x80000104     \n" /* CREQ */
+#endif
         "str     r8, [r9]            \n" /* clear DAI IRQs */
-        
         "ldmia   r11, { r8-r9 }      \n" /* r8 = p, r9 = size */
         "cmp     r9, #0x10           \n" /* is size <16? */
         "blt     .more_data          \n" /* if so, ask pcmbuf for more data */

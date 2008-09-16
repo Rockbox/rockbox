@@ -40,11 +40,12 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_NEXT,          BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
 
-    { ACTION_STD_OK,            BUTTON_PLAY|BUTTON_REL,       BUTTON_PLAY },
-    { ACTION_STD_OK,            BUTTON_PLAY,                    BUTTON_NONE   },
-    { ACTION_STD_CANCEL,        BUTTON_STOP,                    BUTTON_NONE   },
+    { ACTION_STD_OK,            BUTTON_PLAY|BUTTON_REL,         BUTTON_PLAY },
+    { ACTION_STD_OK,            BUTTON_PLAY,                    BUTTON_NONE },
+    { ACTION_STD_CANCEL,        BUTTON_STOP,                    BUTTON_NONE },
+    { ACTION_STD_CANCEL,        BUTTON_POWER,                   BUTTON_NONE },
 
-    { ACTION_STD_MENU,          BUTTON_MENU|BUTTON_REL,        BUTTON_MENU  },
+    { ACTION_STD_MENU,          BUTTON_MENU|BUTTON_REL,       BUTTON_MENU },
     { ACTION_STD_CONTEXT,       BUTTON_PLAY|BUTTON_REPEAT,    BUTTON_PLAY },
 //    { ACTION_STD_QUICKSCREEN,   BUTTON_REC|BUTTON_PLAY,       BUTTON_NONE   },
 
@@ -69,7 +70,8 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_SEEKFWD,       BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE  },
     { ACTION_WPS_STOPSEEK,      BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT|BUTTON_REPEAT },
 
-    { ACTION_WPS_STOP,          BUTTON_STOP,         BUTTON_NONE },
+    { ACTION_WPS_PLAY,          BUTTON_PLAY|BUTTON_REL,         BUTTON_PLAY },
+    { ACTION_WPS_STOP,          BUTTON_STOP,                    BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */

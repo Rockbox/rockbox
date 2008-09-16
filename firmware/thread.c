@@ -777,13 +777,7 @@ static inline void core_sleep(void)
         "msr    cpsr_c, r0      \n" /* Enable IRQ, restore FIQ */
         :  :  : "r0", "r1", "r2");
 }
-#elif defined(CPU_TCC77X)
-static inline void core_sleep(void)
-{
-    #warning TODO: Implement core_sleep
-    enable_irq();
-}
-#elif defined(CPU_TCC780X)
+#elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
 static inline void core_sleep(void)
 {
     /* Single core only for now. Use the generic ARMv5 wait for IRQ */
