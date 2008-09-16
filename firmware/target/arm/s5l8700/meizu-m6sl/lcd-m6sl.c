@@ -29,6 +29,110 @@
 /*** definitions ***/
 
 
+#define SPIDELAY(_x) void(_x);
+
+#define SETMOSI() (PDAT4 |= (1 << 3))
+#define CLRMOSI() (PDAT4 &= ~(1 << 3))
+
+#define MISO ((PDAT1 >> 1) & 1)
+
+#define SETCLK() (PDAT4 |= (1 << 2))
+#define CLRCLK() (PDAT4 &= ~(1 << 2))
+
+#define SETSS() (PDAT7 |= (1 << 1))
+#define CLRSS() (PDAT7 &= ~(1 << 1))
+
+void init_lcd_spi(void)
+{
+    int oldval;
+
+    oldval = PCON1;
+    //Set P1.1 to input
+    PCON1 = ((oldval & ~(0xf << 4)));
+
+    oldval = PCON4;
+    //Set P4.2 and 4.3 to output
+    PCON4 = ((oldval & ~(0xf << 8 | 0xf << 12)) | (1 << 8 | 1 << 12));
+
+    oldval = PCON4;
+    //Set P4.2 and 4.3 to output
+    PCON4 = ((oldval & ~(0xf << 8 | 0xf << 12)) | (1 << 8 | 1 << 12));
+
+    oldval = PCON7;
+    //Set P7.0 and 7.1 to output
+    PCON7 = ((oldval & ~(0xf << 0 | 0xf << 4)) | (1 << 0 | 1 << 4));
+
+    SETSS();
+    SETCLK();
+}
+
+static inline void delay(int duration)
+{
+    volatile int i;
+    for(i=0;i<duration;i++);
+}
+
+unsigned int lcd_spi_io(unsigned int output,unsigned int bits,unsigned int inskip)
+{
+    unsigned int input = 0;
+    unsigned int i;
+
+    //delay(10);  // < 470 us
+
+    CLRSS();
+    //delay(13); // > 22 us
+
+    for (i = 0; i < bits+inskip; i++) {
+
+        CLRCLK();
+
+        if(i<bits)
+        {
+            if (output & (1 << (bits-1)))
+                SETMOSI();
+            else
+                CLRMOSI();
+            output <<= 1;
+        }
+        else
+        {
+            CLRMOSI();
+        }
+
+        //delay(20); // >> 6.7 us
+
+        SETCLK();
+
+        if(i>=inskip)
+        {
+            input <<= 1;
+            input |= MISO;
+        }
+
+        //delay(20); // >> 6.7 us
+    }
+
+    SETSS();
+
+    return (input);
+}
+
+
+void spi_set_reg(unsigned char reg,unsigned short value)
+{
+    lcd_spi_io(0x700000|reg,24,0); // possibly 0x74
+    lcd_spi_io(0x720000|value,24,0); // possibly 0x77
+}
+
+unsigned int lcd_read_id(void)
+{
+    unsigned int device_code;
+    lcd_spi_io(0x700000,24,0); // possibly 0x74
+
+    device_code=lcd_spi_io(0x7300,16,24); // possibly 0x77
+    return device_code;
+}
+
 /** globals **/
 
 static int xoffset; /* needed for flip */
