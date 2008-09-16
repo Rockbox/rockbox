@@ -94,8 +94,8 @@ unsigned int qt1106_io(unsigned int output)
 
         SETCLK();
 
-        input |= MISO;
         input <<= 1;
+        input |= MISO;
 
         delay(20); // >> 6.7 us
     }
