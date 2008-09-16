@@ -7,23 +7,36 @@ This is a fully featured analogue and digital clock plugin.
 
 \begin{table}
 \begin{btnmap}{}{}
-    \opt{RECORDER_PAD,IRIVER_H300_PAD}{\ButtonOn}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD,MROBE100_PAD}{\ButtonPlay}
-    \opt{SANSA_E200_PAD}{\ButtonUp}
-    \opt{GIGABEAT_PAD}{\ButtonA}
-    & Start / Stop Counter \\
-    \opt{RECORDER_PAD,IRIVER_H300_PAD}{\ButtonOn}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD,MROBE100_PAD}{\ButtonPlay}
-    \opt{GIGABEAT_PAD}{\ButtonA}
-    (Hold) & Reset Counter \\
-    \opt{RECORDER_PAD}{\ButtonPlay}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IRIVER_H300_PAD,SANSA_E200_PAD}{\ButtonSelect}
-    \opt{GIGABEAT_PAD,MROBE100_PAD}{\ButtonMenu}
-    \opt{IRIVER_H10_PAD}{\ButtonRew}
+    \ButtonLeft{} / \ButtonRight
+    & Cycle through modes \\
+    \opt{RECORDER_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD%
+        ,MROBE100_PAD}{\ButtonUp{} / \ButtonDown}
+    \opt{IPOD_3G_PAD,IPOD_4G_PAD,SANSA_E200_PAD}{\ButtonScrollFwd{} / \ButtonScrollBack}
+    \opt{SANSA_C200_PAD}{\ButtonVolUp{} / \ButtonVolDown}
+    \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
+    & Cycle through skins \\
+    \opt{RECORDER_PAD}{\ButtonFOne}
+    \opt{IAUDIO_X5_PAD}{\ButtonRec}
+    \opt{IRIVER_H300_PAD}{\ButtonMode}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonMenu}
+    \opt{SANSA_C200_PAD,SANSA_E200_PAD}{\ButtonDown}
+    \opt{IRIVER_H10_PAD}{\ButtonFF}
     & Main Menu \\
+    \opt{RECORDER_PAD}{\ButtonPlay}
+    \opt{IRIVER_H10_PAD}{\ButtonRew}
+    \opt{IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD,SANSA_C200_PAD%
+        ,SANSA_E200_PAD,MROBE100_PAD,GIGABEAT_PAD}{\ButtonSelect}
+    & Start / Stop Counter \\
+    Long
+    \opt{RECORDER_PAD_PAD}{\ButtonPlay}%
+    \opt{IRIVER_H10_PAD}{\ButtonRew}%
+    \opt{IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD,SANSA_C200_PAD%
+        ,SANSA_E200_PAD,MROBE100_PAD,GIGABEAT_PAD}{\ButtonSelect}
+    & Reset Counter \\
     \opt{RECORDER_PAD,IRIVER_H300_PAD}{\ButtonOff}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
-    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu + \ButtonSelect}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
+        ,MROBE100_PAD}{\ButtonPower}
     & Save Settings (if enabled) and Exit \\
 \end{btnmap}
 \end{table}
@@ -33,7 +46,8 @@ This is a fully featured analogue and digital clock plugin.
 \item[View Clock] Exits the menu and returns to the current clock mode display.
 \item[Mode Selector] Opens a menu from which you can select a clock mode to view.
 \item[Counter Settings] Opens a menu from which you can adjust settings pertaining to the counter.
-\item[Mode Settings] Opens a menu from which you can adjust settings pertaining to the current clock mode.
+\item[Mode Settings] Opens a menu from which you can adjust settings pertaining to
+    the current clock mode (analog, digital, binary).
 \item[General Settings]
     \begin{description}
     \item[Reset Settings]
