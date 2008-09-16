@@ -369,14 +369,14 @@ static void usb_thread(void)
                     usb_enable(false);
                     usb_mmc_countdown = HZ/2; /* re-enable after 0.5 sec */
                 }
-                break;
 #endif
+                break;
 
             case USB_REENABLE:
                 if(usb_state == USB_INSERTED)
                     usb_enable(true);  /* reenable only if still inserted */
                 break;
-#endif
+#endif /* HAVE_HOTSWAP */
             case USB_REQUEST_REBOOT:
 #ifdef HAVE_USB_POWER
                 if((button_status() & ~USBPOWER_BTN_IGNORE) != USBPOWER_BUTTON)
