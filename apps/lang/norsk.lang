@@ -294,10 +294,10 @@
     *: "Plugins"
   </source>
   <dest>
-    *: "Plugin-filer"
+    *: "Programmer"
   </dest>
   <voice>
-    *: "Plugin-filer"
+    *: "Programmer"
   </voice>
 </phrase>
 <phrase>
@@ -921,10 +921,10 @@
     *: "Shuffle"
   </source>
   <dest>
-    *: "Stokk om"
+    *: "Tilfeldig rekkefølge"
   </dest>
   <voice>
-    *: "Stokk om"
+    *: "Tilfeldig rekkefølge"
   </voice>
 </phrase>
 <phrase>
@@ -991,10 +991,10 @@
     *: "Fast-Forward/Rewind"
   </source>
   <dest>
-    *: "Spol forover/bakover"
+    *: "Spoling"
   </dest>
   <voice>
-    *: "Spol forover/bakover"
+    *: "Spoling"
   </voice>
 </phrase>
 <phrase>
@@ -2198,7 +2198,7 @@
   </source>
   <dest>
     *: none
-    recording: ""
+    recording: deprecated
   </dest>
   <voice>
     *: none
@@ -2230,10 +2230,10 @@
     *: "FF/RW Min Step"
   </source>
   <dest>
-    *: "Minimum søkesteg"
+    *: "Minste spolesteg"
   </dest>
   <voice>
-    *: "Minimum søkesteg"
+    *: "Minste spolesteg"
   </voice>
 </phrase>
 <phrase>
@@ -2244,10 +2244,10 @@
     *: "FF/RW Accel"
   </source>
   <dest>
-    *: "Søkeaksellerasjon"
+    *: "Spoleeaksellerasjon"
   </dest>
   <voice>
-    *: "Søkeaksellerasjon"
+    *: "Spoleaksellerasjon"
   </voice>
 </phrase>
 <phrase>
@@ -3949,15 +3949,15 @@
 </phrase>
 <phrase>
   id: LANG_RECORDING_LEFT
-  desc: in the recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Gain Left"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Forsterkning venstre"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -3966,15 +3966,15 @@
 </phrase>
 <phrase>
   id: LANG_RECORDING_RIGHT
-  desc: in the recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Gain Right"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Forsterkning høyre"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -5931,7 +5931,7 @@
     *: ""
   </source>
   <dest>
-    *: ""
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -6786,7 +6786,7 @@
     *: "Program returnerte feil"
   </dest>
   <voice>
-    *: "Program returnerte feil"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6797,10 +6797,10 @@
     *: "Extension array full"
   </source>
   <dest>
-    *: "Filnavnendingsliste full"
+    *: "Filnavnendelsesliste full"
   </dest>
   <voice>
-    *: "Filnavnendingsliste full"
+    *: "Filnavnendelsesliste full"
   </voice>
 </phrase>
 <phrase>
@@ -7045,10 +7045,10 @@
     *: "First Buttonpress Enables Backlight Only"
   </source>
   <dest>
-    *: "Det første tastetrykket slår bare på lyset"
+    *: "Første tastetrykk slår bare på lys"
   </dest>
   <voice>
-    *: "Det første tastetrykket slår bare på lyset"
+    *: "Første tastetrykk slår bare på lys"
   </voice>
 </phrase>
 <phrase>
@@ -7219,11 +7219,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Høy knekkfrekvens"
+    swcodec: "Høyfrekvensgrense"
   </dest>
   <voice>
     *: none
-    swcodec: "Høy knekkfrekvens"
+    swcodec: "Høyfrekvensgrense"
   </voice>
 </phrase>
 <phrase>
@@ -7920,36 +7920,36 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_OFF
-  desc: Used in a lot of places
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Off"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Av"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Av"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_VOLUME
-  desc: in sound_settings
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Volume"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Volum"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Volum"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8277,15 +8277,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_TIME
-  desc: Display of recorded time
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Time:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Tid:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -8294,15 +8294,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_TIMESPLIT_REC
-  desc: Display of record timer interval setting, on the record screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Split Time:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Deletid:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -8311,15 +8311,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_SIZE
-  desc: Display of recorded file size
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Size:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Størrelse:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -8328,15 +8328,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_PRERECORD
-  desc: in recording and radio screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Pre-Recording"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Føropptak"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -8379,25 +8379,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_DISK_FULL
-  desc: in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
+    recording: ""
   </source>
   <dest>
     *: none 
-    recording: "Disken er full. Trykk OFF for å fortsette."
-    h100,h120,h300: "Disken er full. Trykk STOP for å fortsette."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "Disken er full. Trykk LEFT for å fortsette."
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: ""
-    h100,h120,h300: ""
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8487,104 +8481,104 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Safety (clip)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Sikker (klipp)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Sikker klipp"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>  
     *: none
-    agc: "Voice (fast)"
+    agc: ""
   </source>
   <dest>  
     *: none
-    agc: "Stemme (rask)"
+    agc: ""
   </dest>
   <voice>  
     *: none
-    agc: "Stemme rask"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Medium"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Medium"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Medium"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Live (slow)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Live (treg"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Live (treg)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
-  desc: AGC preset
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "DJ-Set (slow)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "DJ-sett (treg)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "DJ-sett (treg)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
-  desc: AGC maximum gain in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "AGC max. gain"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "AGC maks forsterkning"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "AGC maksimal forsterkning"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -8623,19 +8617,19 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_AGC_PRESET
-  desc: automatic gain control in record settings
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "Automatic Gain Control"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Automatisk nivåkontroll (AGC)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "utomatisk nivåkontroll (AGC)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -9143,15 +9137,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_FILENAME
-  desc: Filename header in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Filename:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Filnavn:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -9301,19 +9295,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
-  desc: automatic gain control in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "AGC"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "AGC"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "A G C"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -9442,19 +9436,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
-  desc: in record timesplit options
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Split Filesize"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Oppdelingsstørrelse"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Oppdelingsstørrelse"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9569,19 +9563,19 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
-  desc: in record settings
+  desc: deprecated
   user:
   <source>
     *: none
-    agc: "AGC clip time"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "AGC-klipptid"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "A G C klipptid"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -9912,10 +9906,10 @@
     *: "Previous Screen"
   </source>
   <dest>
-    *: "Forrige skjerm"
+    *: "Siste skjerm"
   </dest>
   <voice>
-    *: "Forrige skjerm"
+    *: "Siste skjerm"
   </voice>
 </phrase>
 <phrase>
@@ -10933,15 +10927,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_PM_CLIPCOUNT
-  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "CLIP:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "CLIP:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -11097,10 +11091,10 @@
     *: "Show Filename Extensions"
   </source>
   <dest>
-    *: "Vis filnavnending"
+    *: "Vis filnavnendelse"
   </dest>
   <voice>
-    *: "Vis filnavnending"
+    *: "Vis filnavnendelse"
   </voice>
 </phrase>
 <phrase>
@@ -11561,7 +11555,7 @@
     *: "Hopplengde"
   </dest>
   <voice>
-    *: "Skip Length"
+    *: "Hopplengde"
   </voice>
 </phrase>
 <phrase>
@@ -11678,11 +11672,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Keyclick"
+    swcodec: "Tastelyd"
   </dest>
   <voice>
     *: none
-    swcodec: "Keyclick"
+    swcodec: "Tastelyd"
   </voice>
 </phrase>
 <phrase>
@@ -11829,5 +11823,158 @@
   </dest>
   <voice>
     *: "skråstrek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SIZE
+  desc: Display of recorded file size
+  user:
+  <source>
+    *: none
+    recording: "Size:"
+  </source>
+  <dest>
+    *: none
+    recording: "Størrelse:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  user:
+  <source>
+    *: none
+    agc: "AGC max. gain"
+  </source>
+  <dest>
+    *: none
+    agc: "AGC maks forsterkning"
+  </dest>
+  <voice>
+    *: none
+    agc: "AGC maksimum forsterkning"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_TIMESPLIT_REC
+  desc: Display of record timer interval setting, on the record screen
+  user:
+  <source>
+    *: none
+    recording: "Split Time:"
+  </source>
+  <dest>
+    *: none
+    recording: "Splittid:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user:
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "CLIP:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN_RIGHT
+  desc: in the recording screen
+  user:
+  <source>
+    *: none
+    recording: "Gain R"
+  </source>
+  <dest>
+    *: none
+    recording: "Lydnivå H"
+  </dest>
+  <voice>
+    *: none
+    recording: "Lydnivå for høyre kanal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user:
+  <source>
+    *: none
+    recording: "Filename:"
+  </source>
+  <dest>
+    *: none
+    recording: "Filnavn:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN_LEFT
+  desc: in the recording screen
+  user:
+  <source>
+    *: none
+    recording: "Gain L"
+  </source>
+  <dest>
+    *: none
+    recording: "Lydnivå V"
+  </dest>
+  <voice>
+    *: none
+    recording: "Lydnivå for venstre kanal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_PRESET
+  desc: automatic gain control in record settings and screen
+  user:
+  <source>
+    *: none
+    agc: "AGC"
+  </source>
+  <dest>
+    *: none
+    agc: "AGC"
+  </dest>
+  <voice>
+    *: none
+    agc: "Automatisk forsterkningskontroll"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_CLIPTIME
+  desc: in record settings
+  user:
+  <source>
+    *: none
+    agc: "AGC clip time"
+  </source>
+  <dest>
+    *: none
+    agc: "AGC klipptid"
+  </dest>
+  <voice>
+    *: none
+    agc: "AGC klipptid"
   </voice>
 </phrase>
