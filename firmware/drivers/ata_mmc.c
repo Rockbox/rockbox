@@ -575,7 +575,7 @@ static void send_block_prepare(void)
 
 /* Send one block with DMA from the current write buffer, possibly preparing
  * the next block within the next write buffer in the background. */
-static int send_block_send(unsigned char start_token, long timeout, 
+static int send_block_send(unsigned char start_token, long timeout,
                            bool prepare_next)
 {
     int rc = 0;
@@ -665,6 +665,9 @@ int ata_read_sectors(IF_MV2(int drive,)
             rc = receive_block(inbuf, card->read_timeout);
             if (rc)
             {
+                /* If an error occurs during multiple block reading, the
+                 * host still needs to send CMD_STOP_TRANSMISSION */
+                send_cmd(CMD_STOP_TRANSMISSION, 0, &response);
                 rc = rc * 10 - 4;
                 goto error;
             }
@@ -755,15 +758,17 @@ int ata_write_sectors(IF_MV2(int drive,)
         if (rc)
         {
             rc = rc * 10 - 3;
-            goto error;
+            break;
         }
     }
-    rc = send_block_send(start_token, card->write_timeout, false);
-    if (rc)
+    if (rc == 0)
     {
-        rc = rc * 10 - 4;
-        goto error;
-    }
+        rc = send_block_send(start_token, card->write_timeout, false);
+        if (rc)
+            rc = rc * 10 - 4;
+    }                 
+    /* If an error occurs during multiple block writing, the STOP_TRAN token
+     * still needs to be sent, hence the special error handling above. */
 
     if (write_cmd == CMD_WRITE_MULTIPLE_BLOCK)
     {
@@ -802,7 +807,7 @@ static void mmc_thread(void)
 {
     struct queue_event ev;
     bool idle_notified = false;
-    
+
     while (1) {
         queue_wait_w_tmo(&mmc_queue, &ev, HZ);
         switch ( ev.id ) 
