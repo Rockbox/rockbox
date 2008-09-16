@@ -25,6 +25,7 @@
 #include "lcd.h"
 #include "system.h"
 #include "cpu.h"
+#include "s6d0154.h"
 
 /*** definitions ***/
 
@@ -41,6 +42,8 @@
 
 #define SETSS() (PDAT7 |= (1 << 1))
 #define CLRSS() (PDAT7 &= ~(1 << 1))
+
+static unsigned short controller_type = 0;
 
 void init_lcd_spi(void)
 {
@@ -117,7 +120,6 @@ unsigned int lcd_spi_io(unsigned int output,unsigned int bits,unsigned int inski
     return (input);
 }
 
-
 void spi_set_reg(unsigned char reg,unsigned short value)
 {
     lcd_spi_io(0x700000|reg,24,0); // possibly 0x74
@@ -172,6 +174,81 @@ void lcd_set_flip(bool yesno)
 /* LCD init */
 void lcd_init_device(void)
 {
+    controller_type = lcd_read_id();
+    switch(controller_type)
+    {
+    case 0x0154:
+        spi_set_reg(S6D0154_REG_EXTERNAL_INTERFACE_CONTROL, 0x130);
+        spi_set_reg(S6D0154_REG_MTP_TEST_KEY, 0x8d);
+        spi_set_reg(0x92, 0x10);
+        spi_set_reg(S6D0154_REG_POWER_CONTROL_2, 0x1b);
+        spi_set_reg(S6D0154_REG_POWER_CONTROL_3, 0x3101);
+        spi_set_reg(S6D0154_REG_POWER_CONTROL_4, 0x105f);
+        spi_set_reg(S6D0154_REG_POWER_CONTROL_5, 0x667f);
+        spi_set_reg(S6D0154_REG_POWER_CONTROL_1, 0x800);
+        delay(20);
+        spi_set_reg(S6D0154_REG_POWER_CONTROL_2, 0x11b);
+        delay(20);
+        spi_set_reg(S6D0154_REG_POWER_CONTROL_2, 0x31b);
+        delay(20);
+        spi_set_reg(S6D0154_REG_POWER_CONTROL_2, 0x71b);
+        delay(20);
+        spi_set_reg(S6D0154_REG_POWER_CONTROL_2, 0xf1b);
+        delay(20);
+        spi_set_reg(S6D0154_REG_POWER_CONTROL_2, 0xf3b);
+        delay(20);
+        spi_set_reg(S6D0154_REG_DRIVER_OUTPUT_CONTROL, 0x2128);
+        spi_set_reg(S6D0154_REG_LCD_DRIVING_WAVEFORM_CONTROL, 0x100);
+        spi_set_reg(S6D0154_REG_ENTRY_MODE, 0x1030);
+        spi_set_reg(S6D0154_REG_DISPLAY_CONTROL, 0);
+        spi_set_reg(S6D0154_REG_BLANK_PERIOD_CONTROL, 0x808);
+        spi_set_reg(S6D0154_REG_FRAME_CYCLE_CONTROL, 0x1100);
+        spi_set_reg(S6D0154_REG_START_OSCILLATION, 0xf01);
+        spi_set_reg(S6D0154_REG_VCI_RECYCLING, 0);
+        spi_set_reg(S6D0154_REG_GATE_SCAN_POSITION, 0);
+        spi_set_reg(S6D0154_REG_PARTIAL_SCREEN_DRIVING_POSITION_1, 0x13f);
+        spi_set_reg(S6D0154_REG_PARTIAL_SCREEN_DRIVING_POSITION_2, 0);
+        spi_set_reg(S6D0154_REG_HORIZONTAL_WINDOW_ADDRESS_1, 0xef);
+        spi_set_reg(S6D0154_REG_HORIZONTAL_WINDOW_ADDRESS_2, 0);
+        spi_set_reg(S6D0154_REG_VERTICAL_WINDOW_ADDRESS_1, 0x13f);
+        spi_set_reg(S6D0154_REG_VERTICAL_WINDOW_ADDRESS_2, 0);
+        spi_set_reg(S6D0154_REG_GAMMA_CONTROL_1, 0);
+        spi_set_reg(S6D0154_REG_GAMMA_CONTROL_2, 0xf00);
+        spi_set_reg(S6D0154_REG_GAMMA_CONTROL_3, 0xa03);
+        spi_set_reg(S6D0154_REG_GAMMA_CONTROL_4, 0x300);
+        spi_set_reg(S6D0154_REG_GAMMA_CONTROL_5, 0xc05);
+        spi_set_reg(S6D0154_REG_GAMMA_CONTROL_6, 0xf00);
+        spi_set_reg(S6D0154_REG_GAMMA_CONTROL_7, 0xf00);
+        spi_set_reg(S6D0154_REG_GAMMA_CONTROL_8, 3);
+        spi_set_reg(S6D0154_REG_GAMMA_CONTROL_9, 0x1f07);
+        spi_set_reg(S6D0154_REG_GAMMA_CONTROL_10, 0x71f);
+        break;
+    }
+}
+
+
+void lcd_off(void)
+{
+    switch(controller_type)
+    {
+    case 0x0154:
+        spi_set_reg(S6D0154_REG_DISPLAY_CONTROL, 0x12);
+        delay(20);
+        spi_set_reg(S6D0154_REG_DISPLAY_CONTROL, 0x00);
+        break;
+    }
+}
+
+void lcd_on(void)
+{
+    switch(controller_type)
+    {
+    case 0x0154:
+        spi_set_reg(S6D0154_REG_DISPLAY_CONTROL, 0x12);
+        delay(20);
+        spi_set_reg(S6D0154_REG_DISPLAY_CONTROL, 0x13);
+        break;
+    }
 }
 
 /*** Update functions ***/
