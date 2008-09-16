@@ -137,8 +137,13 @@ static const struct button_mapping button_context_pitchscreen[]  = {
 }; /* button_context_pitchcreen */
 
 static const struct button_mapping button_context_keyboard[]  = {
+    { ACTION_KBD_PAGE_FLIP,    BUTTON_MENU,                   BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_MINUS,                  BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_MINUS|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_PLUS,                   BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_PLUS|BUTTON_REPEAT,     BUTTON_NONE },
+    
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
-    //LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
 
 const struct button_mapping* target_get_context_mapping(int context)

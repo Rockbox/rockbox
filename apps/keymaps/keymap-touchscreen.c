@@ -59,17 +59,19 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_OK,          BUTTON_CENTER|BUTTON_REL,          BUTTON_CENTER },
     { ACTION_STD_OK,          BUTTON_MIDRIGHT|BUTTON_REL,        BUTTON_MIDRIGHT },
     { ACTION_STD_OK,          BUTTON_MIDRIGHT|BUTTON_REPEAT,     BUTTON_MIDRIGHT },
+    { ACTION_STD_CANCEL,      BUTTON_MIDLEFT,                    BUTTON_NONE },
+    { ACTION_STD_CANCEL,      BUTTON_MIDLEFT|BUTTON_REPEAT,      BUTTON_NONE },
 
     { ACTION_STD_MENU,        BUTTON_TOPLEFT,                    BUTTON_NONE },
     { ACTION_STD_QUICKSCREEN, BUTTON_TOPLEFT|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_STD_CONTEXT,     BUTTON_CENTER|BUTTON_REPEAT,       BUTTON_CENTER },
-    { ACTION_STD_CANCEL,      BUTTON_MIDLEFT,                BUTTON_NONE },
-    { ACTION_STD_CANCEL,      BUTTON_MIDLEFT|BUTTON_REPEAT,  BUTTON_NONE },
+    
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_STD)
 }; /* button_context_standard */
 
 static const struct button_mapping button_context_wps[]  = {
     
+    { ACTION_WPS_PLAY,        BUTTON_TOPRIGHT|BUTTON_REL,        BUTTON_TOPRIGHT },
     { ACTION_WPS_SKIPNEXT,    BUTTON_MIDRIGHT|BUTTON_REL,        BUTTON_MIDRIGHT },
     { ACTION_WPS_SKIPPREV,    BUTTON_MIDLEFT|BUTTON_REL,         BUTTON_MIDLEFT },
 
@@ -78,8 +80,10 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_STOPSEEK,    BUTTON_MIDLEFT|BUTTON_REL,         BUTTON_MIDLEFT|BUTTON_REPEAT },
     { ACTION_WPS_STOPSEEK,    BUTTON_MIDRIGHT|BUTTON_REL,        BUTTON_MIDRIGHT|BUTTON_REPEAT },
     
+    { ACTION_WPS_BROWSE,      BUTTON_CENTER|BUTTON_REL,          BUTTON_CENTER },
     { ACTION_WPS_CONTEXT,     BUTTON_CENTER|BUTTON_REPEAT,       BUTTON_CENTER },
-    { ACTION_WPS_QUICKSCREEN, BUTTON_TOPRIGHT|BUTTON_REPEAT,     BUTTON_TOPRIGHT },
+    { ACTION_WPS_QUICKSCREEN, BUTTON_TOPLEFT|BUTTON_REPEAT,      BUTTON_TOPLEFT },
+    
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_WPS)
 }; /* button_context_wps */
 
@@ -103,6 +107,8 @@ static const struct button_mapping button_context_list[]  = {
 }; /* button_context_list */
 
 static const struct button_mapping button_context_tree[]  = {
+    { ACTION_TREE_WPS,    BUTTON_TOPRIGHT|BUTTON_REL,         BUTTON_TOPRIGHT },
+    
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_CUSTOM2|CONTEXT_TREE)
 }; /* button_context_tree */
 
@@ -136,15 +142,17 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_MIDLEFT|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_STD_OK,                BUTTON_CENTER,                  BUTTON_NONE },
     { ACTION_STD_CANCEL,            BUTTON_TOPLEFT,                 BUTTON_NONE },
+    
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_CUSTOM|CONTEXT_SETTINGS)
 }; /* button_context_settingsgraphical */
 
 static const struct button_mapping button_context_yesno[]  = {
-    { ACTION_YESNO_ACCEPT,            BUTTON_MIDLEFT,                 BUTTON_NONE },
+    { ACTION_YESNO_ACCEPT,  BUTTON_TOPRIGHT,  BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_YESNOSCREEN)
 }; /* button_context_settings_yesno */
 
 static const struct button_mapping button_context_colorchooser[]  = {
+    { ACTION_STD_OK,  BUTTON_CENTER|BUTTON_REL,  BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_SETTINGS_COLOURCHOOSER),
 }; /* button_context_colorchooser */
 
@@ -192,6 +200,24 @@ static const struct button_mapping button_context_pitchscreen[]  = {
 }; /* button_context_pitchcreen */
 
 static const struct button_mapping button_context_keyboard[]  = {
+
+    { ACTION_KBD_LEFT,         BUTTON_MIDLEFT,                    BUTTON_NONE },
+    { ACTION_KBD_LEFT,         BUTTON_MIDLEFT|BUTTON_REPEAT,      BUTTON_NONE },   
+    { ACTION_KBD_RIGHT,        BUTTON_MIDRIGHT,                   BUTTON_NONE },
+    { ACTION_KBD_RIGHT,        BUTTON_MIDRIGHT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_TOPLEFT,                    BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_TOPLEFT|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_TOPRIGHT,                   BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_TOPRIGHT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_KBD_SELECT,       BUTTON_CENTER|BUTTON_REL,          BUTTON_NONE },
+    { ACTION_KBD_DONE,         BUTTON_CENTER|BUTTON_REPEAT,       BUTTON_CENTER },
+    { ACTION_KBD_ABORT,        BUTTON_POWER,                      BUTTON_NONE },
+    { ACTION_KBD_BACKSPACE,    BUTTON_BOTTOMLEFT,                 BUTTON_NONE },
+    { ACTION_KBD_BACKSPACE,    BUTTON_BOTTOMLEFT|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_TOPMIDDLE,                  BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_TOPMIDDLE|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_BOTTOMMIDDLE,               BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT, BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_KEYBOARD)
 }; /* button_context_keyboard */

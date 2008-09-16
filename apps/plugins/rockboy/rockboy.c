@@ -193,6 +193,7 @@ static void setoptions (void)
         options.START=BUTTON_REW;
         options.SELECT=BUTTON_NONE;
         options.MENU=BUTTON_POWER;
+        
 #elif CONFIG_KEYPAD == MROBE500_PAD
         options.UP=BUTTON_RC_PLAY;
         options.DOWN=BUTTON_RC_DOWN;
@@ -204,7 +205,11 @@ static void setoptions (void)
         options.START=BUTTON_RC_HEART;
         options.SELECT=BUTTON_RC_MODE;
         options.MENU=BUTTON_POWER;
+
 #elif CONFIG_KEYPAD == COWOND2_PAD
+        options.A=BUTTON_PLUS;
+        options.B=BUTTON_MINUS;
+        options.MENU=BUTTON_MENU;
 
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
         options.UP=BUTTON_UP;
@@ -222,12 +227,13 @@ static void setoptions (void)
 #ifdef HAVE_TOUCHSCREEN
         options.UP=BUTTON_TOPMIDDLE;
         options.DOWN=BUTTON_BOTTOMMIDDLE;
-
-        options.A=BUTTON_MIDLEFT;
-        options.B=BUTTON_MIDRIGHT;
         options.START=BUTTON_TOPRIGHT;
         options.SELECT=BUTTON_CENTER;
+#if CONFIG_KEYPAD != COWOND2_PAD
+        options.A=BUTTON_BOTTOMLEFT;
+        options.B=BUTTON_BOTTOMRIGHT;
         options.MENU=BUTTON_TOPLEFT;
+#endif
 #endif
 
       options.maxskip=4;
