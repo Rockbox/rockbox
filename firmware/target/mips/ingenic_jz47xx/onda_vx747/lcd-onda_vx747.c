@@ -194,8 +194,6 @@ static void _set_lcd_bus(void)
     REG_SLCD_CFG = (SLCD_CFG_BURST_8_WORD | SLCD_CFG_DWIDTH_16 | SLCD_CFG_CWIDTH_16BIT
                    | SLCD_CFG_CS_ACTIVE_LOW | SLCD_CFG_RS_CMD_LOW | SLCD_CFG_CLK_ACTIVE_FALLING
                    | SLCD_CFG_TYPE_PARALLEL);
-    
-    REG_SLCD_CTRL = SLCD_CTRL_DMA_EN;
 }
 
 static void _set_lcd_clock(void)

@@ -22,21 +22,22 @@
 #include "config.h"
 #include "system.h"
 #include "jz4740.h"
+#include "button.h"
 #include "button-target.h"
 
-#define BTN_VOL_DOWN (1 << 27)
-#define BTN_VOL_UP   (1 << 0)
-#define BTN_MENU     (1 << 1)
 #define BTN_OFF      (1 << 29)
+#define BTN_VOL_DOWN (1 << 27)
 #define BTN_HOLD     (1 << 16)
-#define BTN_MASK     (BTN_VOL_DOWN | BTN_VOL_UP \
-                      | BTN_MENU | BTN_OFF )
+#define BTN_MENU     (1 << 1)
+#define BTN_VOL_UP   (1 << 0)
+#define BTN_MASK     (BTN_OFF | BTN_VOL_DOWN | \
+                      BTN_MENU | BTN_VOL_UP)
 
 
-#define TS_AD_COUNT      5
-#define M_SADC_CFG_SNUM  ((TS_AD_COUNT - 1) << SADC_CFG_SNUM_BIT)
+#define TS_AD_COUNT     5
+#define M_SADC_CFG_SNUM ((TS_AD_COUNT - 1) << SADC_CFG_SNUM_BIT)
 
-#define SADC_CFG_INIT (                                   \
+#define SADC_CFG_INIT   (                                 \
                         (2 << SADC_CFG_CLKOUT_NUM_BIT) |  \
                         SADC_CFG_XYZ1Z2                |  \
                         M_SADC_CFG_SNUM                |  \
@@ -45,20 +46,23 @@
                         SADC_CFG_CMD_INT_PEN              \
                         )
 
-static bool pendown_flag = false;
 static short x_pos = -1, y_pos = -1, datacount = 0;
-static short stable_x_pos = -1, stable_y_pos = -1;
+static bool pen_down = false;
+static int cur_touch = 0;
 
-bool button_hold(void)
+static enum touchscreen_mode current_mode = TOUCHSCREEN_POINT;
+static int touchscreen_buttons[3][3] =
 {
-    return (~REG_GPIO_PXPIN(3) & BTN_HOLD ? 1 : 0);
-}
+    {BUTTON_TOPLEFT,    BUTTON_TOPMIDDLE,    BUTTON_TOPRIGHT},
+    {BUTTON_MIDLEFT,    BUTTON_CENTER,       BUTTON_MIDRIGHT},
+    {BUTTON_BOTTOMLEFT, BUTTON_BOTTOMMIDDLE, BUTTON_BOTTOMRIGHT}
+};
 
 void button_init_device(void)
 {
     REG_SADC_ENA = 0;
     REG_SADC_STATE &= (~REG_SADC_STATE);
-    REG_SADC_CTRL = 0x1f;
+    REG_SADC_CTRL = 0x1F;
     
     __cpm_start_sadc();
     REG_SADC_CFG = SADC_CFG_INIT;
@@ -71,15 +75,15 @@ void button_init_device(void)
     REG_SADC_CTRL &= (~(SADC_CTRL_PENDM | SADC_CTRL_PENUM | SADC_CTRL_TSRDYM));
     REG_SADC_ENA = SADC_ENA_TSEN; //| SADC_ENA_PBATEN | SADC_ENA_SADCINEN);
     
-    __gpio_port_as_input(3, 29);
-    __gpio_port_as_input(3, 27);
-    __gpio_port_as_input(3, 16);
-    __gpio_port_as_input(3, 1);
-    __gpio_port_as_input(3, 0);
+    __gpio_as_input(32*3 + 29);
+    __gpio_as_input(32*3 + 27);
+    __gpio_as_input(32*3 + 16);
+    __gpio_as_input(32*3 + 1);
+    __gpio_as_input(32*3 + 0);
 }
 
 static int touch_to_pixels(short x, short y)
-{ 
+{
     /* X:300 -> 3800 Y:300->3900 */
     x -= 300;
     y -= 300;
@@ -102,67 +106,55 @@ static int touch_to_pixels(short x, short y)
 #endif
 }
 
+bool button_hold(void)
+{
+    return ((~REG_GPIO_PXPIN(3)) & BTN_HOLD ? true : false);
+}
+
 int button_read_device(int *data)
 {
-    if(button_hold())
+    int ret = 0, tmp;
+
+    if((~REG_GPIO_PXPIN(3)) & BTN_HOLD)
         return 0;
-    
-    unsigned int key = ~(__gpio_get_port(3));
-    int ret = 0;
-    
-    if(key & BTN_MASK)
+
+    tmp = (~REG_GPIO_PXPIN(3)) & BTN_MASK;
+
+    if(tmp & BTN_VOL_DOWN)
+        ret |= BUTTON_VOL_DOWN;
+    if(tmp & BTN_VOL_UP)
+        ret |= BUTTON_VOL_UP;
+    if(tmp & BTN_MENU)
+        ret |= BUTTON_MENU;
+    if(tmp & BTN_OFF)
+        ret |= BUTTON_POWER;
+
+    if(current_mode == TOUCHSCREEN_BUTTON && cur_touch != 0)
     {
-        if(key & BTN_VOL_DOWN)
-            ret |= BUTTON_VOL_DOWN;
-        if(key & BTN_VOL_UP)
-            ret |= BUTTON_VOL_UP;
-        if(key & BTN_MENU)
-            ret |= BUTTON_MENU;
-        if(key & BTN_OFF)
-            ret |= BUTTON_POWER;
+        int px_x = cur_touch >> 16;
+        int px_y = cur_touch & 0xFFFF;
+        ret |= touchscreen_buttons[px_y/(LCD_HEIGHT/3)]
+                                  [px_x/(LCD_WIDTH/3)];
     }
-    
-    if(data != NULL)
+    else if(pen_down)
     {
-        if(pendown_flag)
-        {
-            *data = touch_to_pixels(stable_x_pos, stable_y_pos);
-            ret |= BUTTON_TOUCH;
-        }
-        else
-            *data = 0;
+        ret |= BUTTON_TOUCH;
+        if(data != NULL)
+            *data = cur_touch;
     }
 
     return ret;
 }
 
-/*
-static enum touchpad_mode current_mode = TOUCHPAD_POINT;
-
-static bool touch_available = false;
-
-static int touchpad_buttons[3][3] =
-{
-    {BUTTON_TOPLEFT,    BUTTON_TOPMIDDLE,    BUTTON_TOPRIGHT},
-    {BUTTON_MIDLEFT,    BUTTON_CENTER,       BUTTON_MIDRIGHT},
-    {BUTTON_BOTTOMLEFT, BUTTON_BOTTOMMIDDLE, BUTTON_BOTTOMRIGHT}
-};
-
-void touchpad_set_mode(enum touchpad_mode mode)
+void touchscreen_set_mode(enum touchscreen_mode mode)
 {
     current_mode = mode;
 }
 
-enum touchpad_mode touchpad_get_mode(void)
+enum touchscreen_mode touchscreen_get_mode(void)
 {
     return current_mode;
 }
-
-void button_set_touch_available(void)
-{
-    touch_available = true;
-}
-*/
 
 /* Interrupt handler */
 void SADC(void)
@@ -179,18 +171,17 @@ void SADC(void)
         /* Pen down IRQ */
         REG_SADC_CTRL &= (~(SADC_CTRL_PENUM |  SADC_CTRL_TSRDYM));
         REG_SADC_CTRL |= (SADC_CTRL_PENDM);
-        pendown_flag = true;
+        pen_down = true;
     }
     if(state & SADC_CTRL_PENUM)
     {
         /* Pen up IRQ */
         REG_SADC_CTRL &= (~SADC_CTRL_PENDM );
         REG_SADC_CTRL |= SADC_CTRL_PENUM;
-        pendown_flag = false;
+        pen_down = false;
         x_pos = -1;
         y_pos = -1;
-        stable_x_pos = -1;
-        stable_y_pos = -1;
+        cur_touch = 0;
     }
     if(state & SADC_CTRL_TSRDYM)
     {
@@ -200,15 +191,15 @@ void SADC(void)
         
         dat = REG_SADC_TSDAT;
         
-        xData = (dat >>  0) & 0xfff;
-        yData = (dat >> 16) & 0xfff;
+        xData = (dat >>  0) & 0xFFF;
+        yData = (dat >> 16) & 0xFFF;
         
         dat = REG_SADC_TSDAT;
-        tsz1Data = (dat >>  0) & 0xfff;
-        tsz2Data = (dat >> 16) & 0xfff;
+        tsz1Data = (dat >>  0) & 0xFFF;
+        tsz2Data = (dat >> 16) & 0xFFF;
         
-        if(!pendown_flag)
-            return ;
+        if( !pen_down )
+            return;
         
         tsz1Data = tsz2Data - tsz1Data;
         
@@ -231,8 +222,7 @@ void SADC(void)
         {
             if(x_pos != -1)
             {
-                stable_x_pos = x_pos;
-                stable_y_pos = y_pos;
+                cur_touch = touch_to_pixels(x_pos, y_pos);
                 x_pos = -1;
                 y_pos = -1;
             }

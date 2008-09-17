@@ -83,10 +83,10 @@
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* Main LCD backlight brightness range and defaults */
-#define MIN_BRIGHTNESS_SETTING          0 /* TODO */
-#define MAX_BRIGHTNESS_SETTING          127
-#define DEFAULT_BRIGHTNESS_SETTING      85
-#define DEFAULT_DIMNESS_SETTING         22
+#define MIN_BRIGHTNESS_SETTING          100
+#define MAX_BRIGHTNESS_SETTING          300
+#define DEFAULT_BRIGHTNESS_SETTING      300 /* "full brightness" */
+#define DEFAULT_DIMNESS_SETTING         100 /* "most dim" */
 
 /* Define this if you have a software controlled poweroff */
 //#define HAVE_SW_POWEROFF

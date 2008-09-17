@@ -42,48 +42,6 @@ static void audiotest(void)
     __aic_enable_loopback();
 }
 
-/* CP0 hazard avoidance. */
-#define BARRIER __asm__ __volatile__(".set noreorder\n\t" \
-                     "nop; nop; nop; nop; nop; nop;\n\t" \
-                     ".set reorder\n\t")
-static void show_tlb(void)
-{
-#define ASID_MASK 0xFF
-
-    unsigned int old_ctx;
-    unsigned int entry;
-    unsigned int entrylo0, entrylo1, entryhi;
-    unsigned int pagemask;
-
-    cli();
-
-    /* Save old context */
-    old_ctx = (read_c0_entryhi() & 0xff);
-
-    printf("TLB content:");
-    for(entry = 0; entry < 32; entry++)
-    {
-        write_c0_index(entry);
-        BARRIER;
-        tlb_read();
-        BARRIER;
-        entryhi = read_c0_entryhi();
-        entrylo0 = read_c0_entrylo0();
-        entrylo1 = read_c0_entrylo1();
-        pagemask = read_c0_pagemask();
-        printf("%02d: ASID=%02d%s VA=0x%08x", entry, entryhi & ASID_MASK, (entrylo0 & entrylo1 & 1) ? "(G)" : "   ", entryhi & ~ASID_MASK);
-        printf("PA0=0x%08x C0=%x %s%s%s", (entrylo0>>6)<<12, (entrylo0>>3) & 7, (entrylo0 & 4) ? "Dirty " : "", (entrylo0 & 2) ? "Valid " : "Invalid ", (entrylo0 & 1) ? "Global" : "");
-        printf("PA1=0x%08x C1=%x %s%s%s", (entrylo1>>6)<<12, (entrylo1>>3) & 7, (entrylo1 & 4) ? "Dirty " : "", (entrylo1 & 2) ? "Valid " : "Invalid ", (entrylo1 & 1) ? "Global" : "");
-
-        printf("pagemask=0x%08x entryhi=0x%08x", pagemask, entryhi);
-        printf("entrylo0=0x%08x entrylo1=0x%08x", entrylo0, entrylo1);
-    }
-    BARRIER;
-    write_c0_entryhi(old_ctx);
-
-    sti();
-}
-
 int main(void)
 {
     kernel_init();
@@ -135,12 +93,15 @@ int main(void)
     {
         memset(testdata, 0, 4096);
         reset_screen();
-        jz_nand_read(2, j, &testdata);
+        jz_nand_read(0, j, &testdata);
         printf("Page %d", j);
         int i;
-        for(i=0; i<256; i+=8)
+        for(i=0; i<768; i+=16)
         {
-            snprintf(msg, 30, "%02c%02c%02c%02c%02c%02c%02c%02c", testdata[i], testdata[i+1], testdata[i+2], testdata[i+3], testdata[i+4], testdata[i+5], testdata[i+6], testdata[i+7]);
+            snprintf(msg, 30, "%02x%02x%02x%02x%02x%02x%02x%02x %02x%02x%02x%02x%02x%02x%02x%02x",
+            testdata[i], testdata[i+1], testdata[i+2], testdata[i+3], testdata[i+4], testdata[i+5], testdata[i+6], testdata[i+7],
+            testdata[i+8], testdata[i+9], testdata[i+10], testdata[i+11], testdata[i+12], testdata[i+13], testdata[i+14], testdata[i+15]
+            );
             printf(msg);
         }
         while(!((btn = button_read_device(&touch)) & (BUTTON_VOL_UP|BUTTON_VOL_DOWN)));
@@ -155,8 +116,12 @@ int main(void)
     while(1)
     {
 #ifdef ONDA_VX747
+#if 1
         btn = button_get(false);
         touch = button_get_data();
+#else
+        btn = button_read_device(&touch);
+#endif
 #else
         btn = button_read_device();
 #endif
@@ -173,11 +138,6 @@ int main(void)
         {
             printf("BUTTON_HOLD");
             asm("break 0x7");
-        }
-        if(btn & BUTTON_VOL_DOWN)
-        {
-            reset_screen();
-            show_tlb();
         }
         if(btn & BUTTON_POWER)
         {

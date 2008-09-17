@@ -24,6 +24,7 @@
 #include "lcd.h"
 #include "lcd-target.h"
 #include "system-target.h"
+#include "kernel.h"
 
 static volatile bool _lcd_on = false;
 static volatile bool lcd_poweroff = false;
@@ -70,11 +71,18 @@ void lcd_update_rect(int x, int y, int width, int height)
     
     __dcache_writeback_all(); /* Size of framebuffer is way bigger than cache size */
     
+    while(REG_SLCD_STATE & SLCD_STATE_BUSY);
+    REG_SLCD_CTRL = SLCD_CTRL_DMA_EN;
+    
     REG_DMAC_DMACR = DMAC_DMACR_DMAE;
 
     while( !(REG_DMAC_DCCSR(0) & DMAC_DCCSR_TT) )
-        asm("nop");
+        yield();
     
+    REG_DMAC_DMACR = 0;
+    
+    while(REG_SLCD_STATE & SLCD_STATE_BUSY);
+    REG_SLCD_CTRL = 0;
 }
 
 /* Update the display.

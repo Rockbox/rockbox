@@ -497,7 +497,7 @@ static inline u32 jz_readl(u32 address)
 
 #define TXFIFOEP0 USB_FIFO_EP0
 
-u32 Bulk_in_buf[BULK_IN_BUF_SIZE];
+u8 *Bulk_in_buf;
 u32 Bulk_out_buf[BULK_OUT_BUF_SIZE];
 u32 Bulk_in_size,Bulk_in_finish,Bulk_out_size;
 u16 handshake_PKT[4]={0,0,0,0};
@@ -560,12 +560,14 @@ void HW_SendPKT(int ep, const u8 *buf, int size)
 				     Bulk_in_size - Bulk_in_finish);
 			usb_setb(USB_REG_INCSR, USB_INCSR_INPKTRDY);
 			Bulk_in_finish = Bulk_in_size;
-		} else 
+		}
+        else 
 		{
 			udcWriteFifo((u8 *)((u32)buf+Bulk_in_finish),
 				     fifosize[ep]);
 			usb_setb(USB_REG_INCSR, USB_INCSR_INPKTRDY);
 			Bulk_in_finish += fifosize[ep];
+            Bulk_in_buf = (u8*)buf;
 		}
 	}
 	else  //EP0
@@ -645,7 +647,7 @@ static struct {
 			(1 << 7) | 1,// endpoint 2 is IN endpoint
 			2, /* bulk */
 			512,
-			16
+			0
 		},
 		{
 			sizeof(USB_EndPointDescriptor),
@@ -653,7 +655,7 @@ static struct {
 			(0 << 7) | 1,// endpoint 5 is OUT endpoint
 			2, /* bulk */
 			512, /* OUT EP FIFO size */
-			16
+			0
 		}
 	}
 };
@@ -822,21 +824,27 @@ void usbHandleStandDevReq(u8 *buf)
 	}
 }
 
-extern char printfbuf[256];
+unsigned char nandbuffer[4096];
 
 void usbHandleVendorReq(u8 *buf)
 {
-	int ret_state, i;
 	USB_DeviceRequest *dreq = (USB_DeviceRequest *)buf;
 	switch (dreq->bRequest)
     {
+        case 0xB0:
+            memset(&nandbuffer, 0, 4096);
+            jz_nand_read(dreq->wValue, dreq->wIndex, &nandbuffer);
+            //printf("Read block %d page %d", dreq->wValue, dreq->wIndex);
+            udc_state = IDLE;
+            break;
     	case 0xAB:
-            //for(i=0; i<256; i+=64)
-                HW_SendPKT(0, printfbuf, 64);
-        	udc_state = IDLE;
+            HW_SendPKT(1, nandbuffer, 4096);
+            //printf("Send data");
+        	//udc_state = BULK_OUT;
     		break;
         case 0x12:
         	HW_SendPKT(0, "TEST", 4);
+            //printf("Send test");
         	udc_state = IDLE;
             break;
 	}
@@ -874,7 +882,7 @@ void EP0_Handler (void)
 	byCSR0 = jz_readb(USB_REG_CSR0);
 
 /* Check for SentStall 
-   if sendtall is set ,clear the sendstall bit*/
+   if sendstall is set ,clear the sendstall bit*/
 	if (byCSR0 & USB_CSR0_SENTSTALL) 
 	{
 		jz_writeb(USB_REG_CSR0, (byCSR0 & ~USB_CSR0_SENDSTALL));
@@ -942,7 +950,8 @@ void EPIN_Handler(u8 EP)
 			     Bulk_in_size - Bulk_in_finish);
 		usb_setw(USB_REG_INCSR, USB_INCSR_INPKTRDY);
 		Bulk_in_finish = Bulk_in_size;
-	} else 
+	}
+    else 
 	{
 		udcWriteFifo((u8 *)((u32)Bulk_in_buf+Bulk_in_finish),
 			    fifosize[EP]);
@@ -1030,6 +1039,8 @@ void __udc_start(void)
 
 void usb_init_device(void)
 {
+    REG_USB_REG_POWER &= ~USB_POWER_SOFTCONN;
+    REG_USB_REG_POWER |= USB_POWER_SOFTCONN;
     __udc_start();
 }
 
