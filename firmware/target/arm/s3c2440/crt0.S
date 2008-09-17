@@ -40,8 +40,19 @@ vectors:
     b   irq_handler
     b   fiq_handler
 
+/* This branch is used to make sure that we know where the shutdown routine
+ *  is located in flash (0x04000020)
+ */
+    b   rom_shutdown
+
+/* Add some strings to detect the bootloader in flash and give it a version
+ * number.  (0x04000024, 0x04000028)
+ */
+.string "ROCKBOX"
+.word   0x0001
+
 /*
- * Function: code_copy
+ * Function: word_copy
  *  Variables:
  *      r0 = from
  *      r1 = to
@@ -53,8 +64,7 @@ vectors:
 .global     word_copy
 .type       word_copy, %function
 word_copy: 
-    sub     r2, r2, #0x04
-    cmp     r2, #0
+    subs    r2, r2, #0x04
     ldrge   r3, [r0], #4
     strge   r3, [r1], #4
     bgt     word_copy
@@ -83,14 +93,18 @@ start:
     /* Mask all Interupts to be safe */
     ldr     r2, =0xFFFFFFFF
     mov     r1, #0x4A000000
-    str     r2, [r1]
+    str     r2, [r1, #0x08]
 
     /* Submask too */
     ldr     r2, =0x00003FFF
     str     r2, [r1, #0x1C]
 
-    /* Check if loaded by the old bootloader or by the OF
-     * Be careful with code size above this as well.
+    /* Check if loaded by the old bootloader or by the OF.  This copy routine
+     * cannot run/copy properly until the memory has been initialized, so the copy
+     * routine later is still necessary.  The old bootloader/OF will initialize the
+     * memory.
+     * Be careful with code size above this as well since this routine has to start
+     * before 0x100 for it to work right.
      */
 
     /* Get the execute address (cannot be past 0x100 for this to work */
@@ -125,6 +139,13 @@ start:
     skipreset:  
 
     /* Initial Clock Setup */
+    /* set Bus to Asynchronous mode (full speed) */    
+    mov     r0, #0
+    mrc     p15, 0, r0, c1, c0, 0
+    ldr     r1,  =0xC0000000
+    orr     r0, r0, r1 
+    mcr     p15, 0, r0, c1, c0, 0
+
     mov     r2, #0x7
     mov     r1, #0x4C000000
     str     r2, [r1, #0x14]
@@ -159,47 +180,10 @@ start:
     nop
     nop
 
-    /* If we want to disable extraneous clocks, uncomment, but it can 
-     *  freeze the device 
-     */
-#if 0
-    ldr     r2, =0x6030
-    mov     r1, #0x4C000000
-    str     r2, [r1, #0x0C]
-#endif
-
-    /* set Bus to Asynchronous mode (full speed) */    
-    mov     r0, #0
-    mrc     p15, 0, r0, c1, c0, 0
-    ldr     r1,  =0xC0000000
-    orr     r0, r0, r1 
-    mcr     p15, 0, r0, c1, c0, 0
-
     /* Setup MISCCR */
     ldr     r2, =0x00613020
     mov     r1, #0x56000000
     str     r2, [r1, #0x80]
-
-    /* Setup some unknown outputs in GPB and GPH */
-    ldr     r2, [r1, #0x10] 
-    mov     r3, #0x05
-    orr     r2, r3, r2
-    str     r2, [r1, #0x10]
-
-    ldr     r2, [r1, #0x14]
-    mov     r3, #0x03
-    orr     r2, r3, r2
-    str     r2, [r1, #0x14]
-
-    ldr     r2, [r1, #0x70] 
-    mov     r3, #0x05
-    orr     r2, r3, r2
-    str     r2, [r1, #0x70]
-
-    ldr     r2, [r1, #0x74]
-    mov     r3, #0x03
-    orr     r2, r3, r2
-    str     r2, [r1, #0x74]
 
     /* Memory setup (taken from 0x5070) */
 
@@ -323,6 +307,18 @@ start:
     /* MRSRB7 */
     str     r2, [r1, #0x30]
     
+    /*
+        0x56000000 0x1FFFCFF
+                 4 0x1FFFEFF
+        0X4800002C 0X0
+        0X560000
+    */
+
+    /* GPACON */
+    mov     r1, #0x56000000 
+    ldr     r2, =0x00FFFFFF
+    str     r2, [r1]
+
 #if 0
     /* GPACON */
     mov     r1, #0x56000000
@@ -448,8 +444,10 @@ stackmunge:
     /* Start the main function */
     ldr     pc, =main
 
-    /* Should never get here, but let's restart in case */
-//    b       vectors
+    /* Should never get here, but let's restart in case (also needed when
+     * linking)
+     */
+    b       vectors
 
 /* All illegal exceptions call into UIE with exception address as first
    parameter. This is calculated differently depending on which exception
@@ -485,6 +483,148 @@ fiq_handler:
 
 UIE:
     b UIE
+
+/*
+ * Function: rom_shutdown
+ *  Variables:
+ *      none
+ */
+
+.section    .init.text, "ax", %progbits
+.align      0x04
+.global     rom_shutdown
+.type       rom_shutdown, %function
+rom_shutdown:
+    /* Turn off the MMU */
+    mrc     p15, 0, r1, c1, c0, 0
+    bic     r1, r1, #0x0001
+    mcr     p15, 0, r1, c1, c0, 0
+
+    /* Taken from 0x10010 */
+    ldr     r2, =0x56000014 //GPBDAT     
+    ldr     r1, =0x56000010 //GPBCON     
+    ldr     r3, =0x00015450 
+    ldr     r8, =0x56000024 //GPCDAT     
+    ldr     r10, =0x56000020 //GPCCON    
+    ldr     r5, =0xAAA054A8 
+    ldr     r6, =0x56000024 //GPDDAT     
+    ldr     r7, =0x56000030 //GPDCON     
+    ldr     r12, =0x56000044 //GPEDAT    
+    ldr     lr, =0x56000040 //GPECON     
+    ldr     r0, =0x56000054 //GPFDAT     
+    mov     r4, #0          
+    str     r4, [r2]        
+    str     r3, [r1]        
+    ldr     r1, =0xAAA0AAA5 
+    ldr     r2, =0xAA8002AA 
+    mov     r3, #0x80       
+    str     r3, [r8]        
+    add     r3, r3, #0x980  
+    str     r5, [r10]       
+    mov     r5, #4          
+    str     r4, [r6]        
+    str     r1, [r7]        
+    str     r4, [r12]       
+    str     r2, [lr]        
+    str     r4, [r0],#(0x56000064-0x56000054) //(GPGDAT - GPFDAT) 
+    add     r12, r12, #(0x56000060-0x56000044)//(GPGCON - GPEDAT) 
+    ldr     r1, =0x56000050 //GPFCON     
+    ldr     r2, =0x01401002 
+    mov    lr, #0xFFFFFFFF
+    str     r3, [r1],#(0x56000074-0x56000050)// (GPHDAT - GPFCON) 
+    str     r4, [r0],#(0x56000060-0x56000054)// (GPGCON - GPFDAT) 
+//    str     r2, [r12]
+    ldr     r2, =0x140A5    
+    mov     r3, #0x81       
+    str     r3, [r1]        
+    ldr     r12, =0x4A000008 //INTMSK    
+
+//    mov     r3, #0x200000   // disable EINT13
+    ldr     r3, =0xFFFFFECF
+
+    str     r2, [r0]        // GPFDAT=0x140A5
+    ldr     r2, =0x56000088 //EXTINT0    
+    ldr     r0, =0x4A000010 //INTPND 
+
+    add     r1, r1, #(0x56000068 - 0x56000050) // (GPGUP - GPFCON) (0x18)
+    str     lr, [r12]       /* INTMSK = 0xFFFFFFFF */
+    str     r3, [r2],#(0x560000A4 - 0x56000088) // (EINTMASK - EXTINT0) disable EINT13 (0x1C)
+//    mov    r3, #0xFFFFFECF
+    mov    r3, #0xFFFFFEFF
+    str     r5, [r1],#(0x56000074-0x56000058) //(GPHDAT - GPFUP) (0x1C) DCLKCON
+    str     r3, [r2]
+
+    ldr     r11, =0x56000060
+    ldr     r6, =0x01401002
+    str     r6, [r11]
+
+//    add     r3, r3, #0x00000100 
+    ldr     r3, =0xFFFFFFDF;
+    str     r3, [r12]       // disable INT_TICK
+
+    mov     r3, #0x4A000000     
+    add     r2, r2, #(0x560000B0-0x56000088) //(GSTATUS1 - EXTINT0) //; 0x600 (0x28)
+    str     lr, [r1]        
+    str     lr, [r3]        
+    mov     r3, #0x600      
+    str     lr, [r0]        
+    str     r3, [r2]        // GSTATUS1 = 0x600 /* what for ??? */
+
+    ldr     r12, =0x56000080 //MISCCr    
+    mov     r2, #0x58000000 //ADCCON     
+    str     r5, [r2]        
+    add     r2, r2, #(0x4D000000-0x58000000) //(LCDCON1 - ADCCON) // LCDCON1 (0xF5000000)
+    ldr     r3, [r12]       
+    ldr     r0, =0x48000024 // REFRESH   
+    bic     r3, r3, #0x700000 
+    bic     r3, r3, #0x3000
+    orr     r3, r3, #0x600000
+    orr     r3, r3, #0x3000 
+    str     r3, [r12]       // MISCCR = (MISCCR & ~0x100000) | 0x603000;
+    /* clear [20] BATTFLT_FUNC - BATT_FLT function On/Off.
+     *            0, Battery fault function will be turned on.
+     * set [21] BATTFLT_INTR - BATT_FLT Interrupt On/Off.
+     *            1, Battery fault interrupt will be masked by hardware.
+     * set [13] SEL_SUSPND1 - USB Port 1 Suspend mode
+     *            1= suspend mode
+     * set [12] SEL_SUSPND0 - USB Port 0 Suspend mode
+     *            1= suspend mode
+    */
+    mov     r3, #0x4C000000 // LOCKTIME   
+    str     r4, [r2]     
+  
+    str     lr, [r3]        
+    ldr     r1, [r0]        
+    ldr     lr, =0x4C00000C // CLKCON     
+//    str     r1, [r11,#-0x28] 
+    ldr     r2, [lr]        
+//    str     r2, [r11,#-0x28] 
+    ldr     r3, [r0]        
+    Orr     r3, r3, #0x00400000
+    /* REFRESH
+     * [22] TREFMD - SDRAM Refresh Mode
+     */
+    str     r3, [r0]        
+    ldr     r2, [r12]       
+
+    ldr     r3, =0x00004018
+    /* [3] SLEEP - Control SLEEP mode of S3C2440X.
+     * [4] NAND - Control HCLK into NAND Flash Controller block.
+     * [14] RTC - Control PCLK into RTC control block.
+     */
+    orr     r2, r2, #0x000E0000 
+    /* [17] nEN_SCLK0 - SCLK0 output enable (1: SCLK 0 = 0)
+     * [18] nEN_SCLK1 - SCLK1 output enable (1: SCLK 1 = 0)
+     * [19] OFFREFRESH - Self refresh retain enable after wake-up from sleep
+     */
+
+    str     r2, [r12]       
+    str     r3, [lr]
+    
+    1:
+    b 1b
+.ltorg  
+.size       rom_shutdown, .-rom_shutdown
 
 .section .text
 /* 256 words of IRQ stack */

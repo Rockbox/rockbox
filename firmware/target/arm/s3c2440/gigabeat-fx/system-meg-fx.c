@@ -144,51 +144,49 @@ void s3c_regclr(volatile int *reg, unsigned int mask)
 
 void system_init(void)
 {
-    /* Disable interrupts and set all to IRQ mode */
-    INTMSK = -1;
-    INTMOD =  0;
-    SRCPND = -1;
-    INTPND = -1;
-    INTSUBMSK = -1;
-    SUBSRCPND = -1;
+    INTMSK = 0xFFFFFFFF;
+     INTMOD =  0;
+    SRCPND = 0xFFFFFFFF;
+    INTPND = 0xFFFFFFFF;
+    INTSUBMSK = 0xFFFFFFFF;
+    SUBSRCPND = 0xFFFFFFFF;
+
+    GPBCON |= 0x85;
+    GPBDAT |= 0x07;
+    GPBUP  |= 0x20F;
+ 
+    /* Take care of flash related pins */
+    GPCCON |= 0x1000;
+    GPCDAT &= ~0x40;
+    GPCUP  |= 0x51;
+
+    GPDCON |= 0x05;
+    GPDUP  |= 0x03;
+    GPDDAT &= ~0x03;
+
+    GPFCON |= 0x00000AAA;
+    GPFUP  |= 0xFF;
+
+    GPGCON |= 0x01001000;
+    GPGUP  |= 0x70;
+
+    GPHCON |= 0x4005;
+    GPHDAT |= 0x03;   
 
     /* TODO: do something with PRIORITY */
-    
-    
-    /* Turn off currently-not or never-needed devices  */
-
-    CLKCON &= ~(
-        /* Turn off AC97 and Camera */
-        (1<<19) | (1<<20)
-
-        /* Turn off SPI */
-        | (1 << 18)
-
-        /* Turn off IIS */
-        | (1 << 17)
-
-        /* Turn off I2C */
-        | (1 << 16)
-
-        /* Turn off all of the UARTS */
-        | ( (1<<10) | (1<<11) |(1<<12) )
-
-        /* Turn off MMC/SD/SDIO Controller (SDI) */
-        | (1 << 9)
-
-        /* Turn off USB device */
-        | (1 << 7)
-
-        /* Turn off USB host */
-        | (1 << 6)
-
-        /* Turn off NAND flash controller */
-        | (1 << 4)
-
-        );
-    
-    /* Turn off the USB PLL */
-    CLKSLOW |= (1 << 7);
+ 
+    /* Turn off currently-not or never-needed devices.
+     *  Be careful here, it is possible to freeze the device by disabling
+     *  clocks at the wrong time.
+     *
+     * Turn off AC97, Camera, SPI, IIS, I2C, UARTS, MMC/SD/SDIO Controller 
+     * USB device, USB host, NAND flash controller.
+     *
+     * IDLE, Sleep, LCDC, PWM timer, GPIO, RTC, and ADC are untouched (on)
+     */
+    CLKCON &= ~0xFF1ED0;
+ 
+    CLKSLOW |= 0x80;
 }
 
 int system_memory_guard(int newmode)
