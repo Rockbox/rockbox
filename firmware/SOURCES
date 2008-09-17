@@ -1082,9 +1082,12 @@ target/arm/tcc780x/cowond2/audio-cowond2.c
 #endif /* SIMULATOR */
 #endif /* COWON_D2 */
 
-#ifdef MEIZU_M6SL
+#if CONFIG_CPU==S5L8700
 target/arm/s5l8700/system-s5l8700.c
 target/arm/s5l8700/ata-nand-s5l8700.c
+#endif
+
+#ifdef MEIZU_M6SL
 target/arm/s5l8700/meizu-m6sl/lcd-m6sl.c
 drivers/qt1106.c
 #ifndef SIMULATOR
@@ -1092,6 +1095,23 @@ drivers/qt1106.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* MEIZU_M6SL */
+
+#ifdef MEIZU_M6SP
+target/arm/s5l8700/meizu-m6sp/lcd-m6sp.c
+#ifndef SIMULATOR
+#ifndef BOOTLOADER
+#endif /* BOOTLOADER */
+#endif /* SIMULATOR */
+#endif /* MEIZU_M6SP */
+
+#ifdef MEIZU_M3
+target/arm/s5l8700/meizu-m3/lcd-m3.c
+drivers/qt1106.c
+#ifndef SIMULATOR
+#ifndef BOOTLOADER
+#endif /* BOOTLOADER */
+#endif /* SIMULATOR */
+#endif /* MEIZU_M3 */
 
 #if CONFIG_CPU==JZ4732
 target/mips/ingenic_jz47xx/ata-nand-jz4740.c

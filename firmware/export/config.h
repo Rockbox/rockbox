@@ -95,6 +95,8 @@
 #define MEIZU_M6SL_PAD     30
 #define ONDAVX747_PAD      31
 #define ONDAVX767_PAD      32
+#define MEIZU_M6SP_PAD     33
+#define MEIZU_M3_PAD       34
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -291,6 +293,10 @@
 #include "config-c100.h"
 #elif defined(MEIZU_M6SL)
 #include "config-meizu-m6sl.h"
+#elif defined(MEIZU_M6SP)
+#include "config-meizu-m6sp.h"
+#elif defined(MEIZU_M3)
+#include "config-meizu-m3.h"
 #elif defined(ONDA_VX747)
 #include "config-ondavx747.h"
 #elif defined(ONDA_VX767)
