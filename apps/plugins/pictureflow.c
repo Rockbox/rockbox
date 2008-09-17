@@ -1799,12 +1799,11 @@ void show_track_list(void)
         rb->lcd_getstringsize(albumtxt, NULL, &albumtxt_h);
         titletxt_y = ((LCD_HEIGHT-albumtxt_h-10)-(track_count*albumtxt_h))/2;
     }
+    else if (config.show_fps)
+        titletxt_y = titletxt_h + 5;
     else
-    {
-        if (config.show_fps)
-            titletxt_y = titletxt_h + 5;
-    }
-        
+        titletxt_y = 0;
+
     int track_i;
     for (i=0; i < track_list_visible_entries; i++) {
         track_i = i+start_index_track_list;
