@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: adc-target.h 17847 2008-06-28 18:10:04Z bagder $
+ * $Id$
  *
  * Copyright (C) 2008 by Frank Gevaerts
  *
