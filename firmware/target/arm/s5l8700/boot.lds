@@ -8,9 +8,15 @@ STARTUP(target/arm/s5l8700/crt0.o)
 /* DRAMORIG is in fact 0x8000000 but remapped to 0x0 */
 #define DRAMORIG 0x0
 #define DRAMSIZE 16M
-#
+
 #define IRAMORIG 0x22000000
 #define IRAMSIZE 256K
+
+#ifdef MEIZU_M6SL
+#define DFULOADADDR IRAMORIG
+#else
+#define DFULOADADDR (IRAMORIG+0x20000)
+#endif
 
 /* This is not available in all versions of the S5L8700 */
 #define FLASHORIG 0x24000000
@@ -18,7 +24,9 @@ STARTUP(target/arm/s5l8700/crt0.o)
 
 SECTIONS
 {
-  . = IRAMORIG;
+  /*. = IRAMORIG; */
+  /* As long as we don't flash the code, use the DFU load address */
+  . = DFULOADADDR;
 
   .text : {
     *(.init.text)
