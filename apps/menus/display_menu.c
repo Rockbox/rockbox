@@ -187,7 +187,7 @@ MENUITEM_SETTING(remote_flip_display,
                     &global_settings.remote_flip_display, flipdisplay_callback);
 
 #ifdef HAVE_REMOTE_LCD_TICKING
-int ticking_callback(int action,const struct menu_item_ex *this_item)
+static int ticking_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
     switch (action)
