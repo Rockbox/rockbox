@@ -49,6 +49,6 @@ public:
 
     static bool check(RbSettings* settings,bool permission,int targetId);
 
-#endif
 };
+#endif
 
