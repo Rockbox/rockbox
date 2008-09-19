@@ -643,7 +643,7 @@ int ata_read_sectors(IF_MV2(int drive,)
             rc =  -3;
             goto error;
         }
-        while (incount-- > lastblock)
+        while (--incount >= lastblock)
         {
             rc = receive_block(inbuf, card->read_timeout);
             if (rc)
@@ -730,25 +730,17 @@ int ata_write_sectors(IF_MV2(int drive,)
         rc = -2;
         goto error;
     }
-
-    while (--count > 0)
+    while (--count >= 0)
     {
-        rc = send_block_send(start_token, card->write_timeout, true);
+        rc = send_block_send(start_token, card->write_timeout, count > 0);
         if (rc)
         {
             rc = rc * 10 - 3;
             break;
+            /* If an error occurs during multiple block writing,
+             * the STOP_TRAN token still needs to be sent. */
         }
     }
-    if (rc == 0)
-    {
-        rc = send_block_send(start_token, card->write_timeout, false);
-        if (rc)
-            rc = rc * 10 - 4;
-    }                 
-    /* If an error occurs during multiple block writing, the STOP_TRAN token
-     * still needs to be sent, hence the special error handling above. */
-
     if (write_cmd == CMD_WRITE_MULTIPLE_BLOCK)
     {
         static const unsigned char stop_tran = DT_STOP_TRAN;
