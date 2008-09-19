@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "config.h"
+#include "system.h"
 #include "cpu.h"
 #include "button.h"
 
@@ -31,39 +32,27 @@
 #define SIFMD (1<<7)
 #define STB_DELAY 200
 
-#define udelay _udelay
-
-/* do we really need it? */
-static void _udelay(int cycles)
+static inline void ndelay(unsigned long nsecs)
 {
-    cycles /= 8;
-    while (cycles--) {
-        asm("nop;nop;");
-    }
+    nsecs /= 8;
+    while (nsecs)
+        nsecs--;
 }
 
 /*
-  TODO: sensitivity using GPIOS
+  TODO: sensitivity
 */
 void ata2501_init(void)
 {
     GPIOD_DIR |= (RESET | STB | SIFMD | (1 << 8) | (1 << 9));
-    GPIOD_DIR &= ~(SDATA);
-
-    GPIOD &= ~RESET;
-    udelay(1000);
-
-    GPIOD |= RESET;
+    GPIOD_DIR &= ~SDATA;
 
     GPIOD &= ~STB;
+    GPIOD |= (1 << 8) | SIFMD | (1 << 9);
 
-#if 1
-    GPIOD &= ~((1 << 9) | (1 << 8));
-    GPIOD |= ((1 << 8) | SIFMD) | (1 << 9);
-#else
-    GPIOD |= ((1 << 9) | (1 << 8));
-    GPIOD &= ~(SIFMD);
-#endif
+    GPIOD &= ~RESET;
+    ndelay(1000);
+    GPIOD |= RESET;
 }
 
 unsigned short ata2501_read(void)
@@ -73,14 +62,12 @@ unsigned short ata2501_read(void)
 
     for (i = 0; i < 12; i++) {
         GPIOD |= STB;
-        udelay(50);
-
+        ndelay(100);
         ret <<= 1;
         if (GPIOD & SDATA)
             ret |= 1;
-        udelay(50);
         GPIOD &= ~STB;
-        udelay(100);
+        ndelay(100);
     }
 
     return ret;
@@ -118,7 +105,7 @@ void ata2501_test(void)
         lcd_puts(0, line++, buf);
 
         lcd_update();
-        udelay(2000);
+        sleep(HZ/10);
     }
 }
 #endif
