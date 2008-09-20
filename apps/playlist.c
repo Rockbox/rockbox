@@ -300,7 +300,6 @@ static void empty_playlist(struct playlist_info* playlist, bool resume)
 
         /* Reset resume settings */
         global_status.resume_first_index = 0;
-        global_status.resume_seed = -1;
     }
 }
 
@@ -442,12 +441,6 @@ static int recreate_control(struct playlist_info* playlist)
     playlist->shuffle_modified = false;
     playlist->deleted = false;
     playlist->num_inserted_tracks = 0;
-
-    if (playlist->current)
-    {
-        global_status.resume_seed = -1;
-        status_save();
-    }
 
     for (i=0; i<playlist->amount; i++)
     {
@@ -989,8 +982,6 @@ static int randomise_playlist(struct playlist_info* playlist,
     {
         update_control(playlist, PLAYLIST_COMMAND_SHUFFLE, seed,
             playlist->first_index, NULL, NULL, NULL);
-        global_status.resume_seed = seed;
-        status_save();
     }
 
     return 0;
@@ -1029,8 +1020,6 @@ static int sort_playlist(struct playlist_info* playlist, bool start_current,
     {
         update_control(playlist, PLAYLIST_COMMAND_UNSHUFFLE,
             playlist->first_index, -1, NULL, NULL, NULL);
-        global_status.resume_seed = 0;
-        status_save();
     }
 
     return 0;
@@ -1819,12 +1808,6 @@ static int flush_cached_control(struct playlist_info* playlist)
 
     if (result > 0)
     {
-        if (global_status.resume_seed >= 0)
-        {
-            global_status.resume_seed = -1;
-            status_save();
-        }
-
         playlist->num_cached = 0;
         playlist->pending_control_sync = true;
 
@@ -2207,7 +2190,6 @@ int playlist_resume(void)
                         if (randomise_playlist(playlist, seed, false,
                                 false) < 0)
                             return -1;
-
                         sorted = false;
                         break;
                     }
@@ -2372,21 +2354,6 @@ int playlist_resume(void)
         /* Terminate on EOF */
         if(nread <= 0)
         {
-            if (global_status.resume_seed >= 0)
-            {
-                /* Apply shuffle command saved in settings */
-                if (global_status.resume_seed == 0)
-                    sort_playlist(playlist, false, true);
-                else
-                {
-                    if (!sorted)
-                        sort_playlist(playlist, false, false);
-
-                    randomise_playlist(playlist, global_status.resume_seed,
-                        false, true);
-                }
-            }
-
             playlist->first_index = global_status.resume_first_index;
             break;
         }

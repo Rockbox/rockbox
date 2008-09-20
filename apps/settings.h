@@ -271,8 +271,6 @@ struct system_status
     int resume_index;  /* index in playlist (-1 for no active resume) */
     int resume_first_index;  /* index of first track in playlist */
     uint32_t resume_offset; /* byte offset in mp3 file */
-    int resume_seed;   /* shuffle seed (-1=no resume shuffle 0=sorted
-                          >0=shuffled) */
     int runtime;       /* current runtime since last charge */
     int topruntime;    /* top known runtime */
 #ifdef HAVE_DIRCACHE
