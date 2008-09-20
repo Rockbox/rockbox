@@ -130,7 +130,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 123
+#define PLUGIN_API_VERSION 124
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -762,6 +762,15 @@ struct plugin_api {
     bool (*search_albumart_files)(const struct mp3entry *id3, const char *size_string,
                                   char *buf, int buflen);
 #endif
+
+    void (*thread_thaw)(struct thread_entry *thread); 
+    void (*semaphore_init)(struct semaphore *s, int max, int start);
+    void (*semaphore_wait)(struct semaphore *s);
+    void (*semaphore_release)(struct semaphore *s);
+    void (*event_init)(struct event *e, unsigned int flags);
+    void (*event_wait)(struct event *e, unsigned int for_state);
+    void (*event_set_state)(struct event *e, unsigned int state);
+
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */

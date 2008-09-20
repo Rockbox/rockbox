@@ -606,6 +606,14 @@ static const struct plugin_api rockbox_api = {
     search_albumart_files,
 #endif
 
+    thread_thaw,
+    semaphore_init,
+    semaphore_wait,
+    semaphore_release,
+    event_init,
+    event_wait,
+    event_set_state,
+
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 

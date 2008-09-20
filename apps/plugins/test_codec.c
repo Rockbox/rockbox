@@ -485,6 +485,19 @@ static void init_ci(void)
     ci.invalidate_icache = invalidate_icache;
     ci.flush_icache = flush_icache;
 #endif
+
+#if NUM_CORES > 1
+    ci.create_thread = rb->create_thread;
+    ci.thread_thaw = rb->thread_thaw;
+    ci.thread_wait = rb->thread_wait;
+    ci.semaphore_init = rb->semaphore_init;
+    ci.semaphore_wait = rb->semaphore_wait;
+    ci.semaphore_release = rb->semaphore_release;
+    ci.event_init = rb->event_init;
+    ci.event_wait = rb->event_wait;
+    ci.event_set_state = rb->event_set_state;
+#endif
+
 }
 
 static void codec_thread(void)
