@@ -763,14 +763,16 @@ struct plugin_api {
                                   char *buf, int buflen);
 #endif
 
-    void (*thread_thaw)(struct thread_entry *thread); 
+    void (*thread_thaw)(struct thread_entry *thread);
+
+#if (CONFIG_CODEC == SWCODEC) 
     void (*semaphore_init)(struct semaphore *s, int max, int start);
     void (*semaphore_wait)(struct semaphore *s);
     void (*semaphore_release)(struct semaphore *s);
     void (*event_init)(struct event *e, unsigned int flags);
     void (*event_wait)(struct event *e, unsigned int for_state);
     void (*event_set_state)(struct event *e, unsigned int state);
-
+#endif
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
