@@ -592,14 +592,14 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
   int sb;
   unsigned int phase, ch, s, p;
   mad_fixed_t *pcm, (*filter)[2][2][16][8];
-  mad_fixed_t const (*sbsample)[36][32];
+  mad_fixed_t (*sbsample)[36][32];
   mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
   mad_fixed_t const (*D0ptr)[32];
   mad_fixed_t const (*D1ptr)[32];
   mad_fixed64hi_t hi0, hi1;
 
   for (ch = 0; ch < nch; ++ch) {
-    sbsample = &frame->sbsample[ch];
+    sbsample = &*frame->sbsample_prev[ch];
     filter   = &synth->filter[ch];
     phase    = synth->phase;
     pcm      = synth->pcm.samples[ch];
@@ -1053,7 +1053,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
   int          p;
   unsigned int phase, ch, s;
   mad_fixed_t *pcm, (*filter)[2][2][16][8];
-  mad_fixed_t const (*sbsample)[36][32];
+  mad_fixed_t  (*sbsample)[36][32];
   mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
   mad_fixed_t const (*D0ptr)[32], *ptr;
   mad_fixed_t const (*D1ptr)[32];
@@ -1061,7 +1061,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
   mad_fixed64lo_t lo;
 
   for (ch = 0; ch < nch; ++ch) {
-    sbsample = &frame->sbsample[ch];
+    sbsample = &(*frame->sbsample_prev)[ch];
     filter   = &synth->filter[ch];
     phase    = synth->phase;
     pcm      = synth->pcm.samples[ch];
@@ -1202,7 +1202,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
   mad_fixed64lo_t lo;
 
   for (ch = 0; ch < nch; ++ch) {
-    sbsample = &frame->sbsample[ch];
+    sbsample = &frame->sbsample_prev[ch];
     filter   = &synth->filter[ch];
     phase    = synth->phase;
     pcm      = synth->pcm.samples[ch];
@@ -1403,14 +1403,14 @@ void synth_half(struct mad_synth *synth, struct mad_frame const *frame,
 {
   unsigned int phase, ch, s, sb, pe, po;
   mad_fixed_t *pcm1, *pcm2, (*filter)[2][2][16][8];
-  mad_fixed_t const (*sbsample)[36][32];
+  mad_fixed_t  (*sbsample)[36][32];
   register mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
   register mad_fixed_t const (*Dptr)[32], *ptr;
   register mad_fixed64hi_t hi;
   register mad_fixed64lo_t lo;
 
   for (ch = 0; ch < nch; ++ch) {
-    sbsample = &frame->sbsample[ch];
+    sbsample = &(*frame->sbsample_prev)[ch];
     filter   = &synth->filter[ch];
     phase    = synth->phase;
     pcm1     = synth->pcm.samples[ch];

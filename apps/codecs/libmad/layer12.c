@@ -185,7 +185,7 @@ int mad_layer_I(struct mad_stream *stream, struct mad_frame *frame)
     for (sb = 0; sb < bound; ++sb) {
       for (ch = 0; ch < nch; ++ch) {
 	nb = allocation[ch][sb];
-	frame->sbsample[ch][s][sb] = nb ?
+	(*frame->sbsample)[ch][s][sb] = nb ?
 	  mad_f_mul(I_sample(&stream->ptr, nb),
 		    sf_table[scalefactor[ch][sb]]) : 0;
       }
@@ -198,13 +198,13 @@ int mad_layer_I(struct mad_stream *stream, struct mad_frame *frame)
 	sample = I_sample(&stream->ptr, nb);
 
 	for (ch = 0; ch < nch; ++ch) {
-	  frame->sbsample[ch][s][sb] =
+	  (*frame->sbsample)[ch][s][sb] =
 	    mad_f_mul(sample, sf_table[scalefactor[ch][sb]]);
 	}
       }
       else {
 	for (ch = 0; ch < nch; ++ch)
-	  frame->sbsample[ch][s][sb] = 0;
+	  (*frame->sbsample)[ch][s][sb] = 0;
       }
     }
   }
@@ -492,13 +492,13 @@ int mad_layer_II(struct mad_stream *stream, struct mad_frame *frame)
 	  II_samples(&stream->ptr, &qc_table[index], samples);
 
 	  for (s = 0; s < 3; ++s) {
-	    frame->sbsample[ch][3 * gr + s][sb] =
+	    (*frame->sbsample)[ch][3 * gr + s][sb] =
 	      mad_f_mul(samples[s], sf_table[scalefactor[ch][sb][gr / 4]]);
 	  }
 	}
 	else {
 	  for (s = 0; s < 3; ++s)
-	    frame->sbsample[ch][3 * gr + s][sb] = 0;
+	    (*frame->sbsample)[ch][3 * gr + s][sb] = 0;
 	}
       }
     }
@@ -512,7 +512,7 @@ int mad_layer_II(struct mad_stream *stream, struct mad_frame *frame)
 
 	for (ch = 0; ch < nch; ++ch) {
 	  for (s = 0; s < 3; ++s) {
-	    frame->sbsample[ch][3 * gr + s][sb] =
+	    (*frame->sbsample)[ch][3 * gr + s][sb] =
 	      mad_f_mul(samples[s], sf_table[scalefactor[ch][sb][gr / 4]]);
 	  }
 	}
@@ -520,7 +520,7 @@ int mad_layer_II(struct mad_stream *stream, struct mad_frame *frame)
       else {
 	for (ch = 0; ch < nch; ++ch) {
 	  for (s = 0; s < 3; ++s)
-	    frame->sbsample[ch][3 * gr + s][sb] = 0;
+	    (*frame->sbsample)[ch][3 * gr + s][sb] = 0;
 	}
       }
     }
@@ -528,7 +528,7 @@ int mad_layer_II(struct mad_stream *stream, struct mad_frame *frame)
     for (ch = 0; ch < nch; ++ch) {
       for (s = 0; s < 3; ++s) {
 	for (sb = sblimit; sb < 32; ++sb)
-	  frame->sbsample[ch][3 * gr + s][sb] = 0;
+	  (*frame->sbsample)[ch][3 * gr + s][sb] = 0;
       }
     }
   }

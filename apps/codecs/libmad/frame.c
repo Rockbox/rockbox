@@ -31,6 +31,7 @@
 # include "timer.h"
 # include "layer12.h"
 # include "layer3.h"
+# include "../lib/codeclib.h"
 
 static
 unsigned long const bitrate_table[5][15] = {
@@ -467,7 +468,9 @@ int mad_frame_decode(struct mad_frame *frame, struct mad_stream *stream)
 
     mad_bit_finish(&next_frame);
   }
-
+    
+ 
+    
   return 0;
 
  fail:
@@ -485,8 +488,8 @@ void mad_frame_mute(struct mad_frame *frame)
 
   for (s = 0; s < 36; ++s) {
     for (sb = 0; sb < 32; ++sb) {
-      frame->sbsample[0][s][sb] =
-      frame->sbsample[1][s][sb] = 0;
+      (*frame->sbsample)[0][s][sb] =
+      (*frame->sbsample)[1][s][sb] = 0;
     }
   }
 

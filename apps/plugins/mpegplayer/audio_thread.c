@@ -55,6 +55,9 @@ static struct mad_stream stream IBSS_ATTR;
 static struct mad_frame  frame IBSS_ATTR;
 static struct mad_synth  synth IBSS_ATTR;
 
+/*sbsample buffer for mad_frame*/
+mad_fixed_t sbsample[2][36][32];
+
 /* 2567 bytes */
 static unsigned char mad_main_data[MAD_BUFFER_MDLEN];
 
@@ -229,6 +232,10 @@ static int audio_buffer(struct stream *str, enum stream_parse_mode type)
 /* Initialise libmad */
 static void init_mad(void)
 {
+    /*init the sbsample buffer*/
+    frame.sbsample = &sbsample;
+    frame.sbsample_prev = &sbsample;
+    
     mad_stream_init(&stream);
     mad_frame_init(&frame);
     mad_synth_init(&synth);

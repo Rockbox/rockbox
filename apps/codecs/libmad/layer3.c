@@ -3112,7 +3112,7 @@ enum mad_error III_decode(struct mad_bitptr *ptr, struct mad_frame *frame,
 
     for (ch = 0; ch < nch; ++ch) {
       struct channel const *channel = &granule->ch[ch];
-      mad_fixed_t (*sample)[32] = &frame->sbsample[ch][18 * gr];
+      mad_fixed_t (*sample)[32] = &((*frame->sbsample)[ch][18 * gr]);
       unsigned int sb, l, i, sblimit;
       mad_fixed_t output[36];
 

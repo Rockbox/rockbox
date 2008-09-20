@@ -25,13 +25,34 @@
 
 CODEC_HEADER
 
+#if (CONFIG_CPU == PP5024 || CONFIG_CPU == PP5022 || CONFIG_CPU == PP5020 \
+    || CONFIG_CPU == PP5002) && !defined(MPEGPLAYER)
+#define MPA_SYNTH_ON_COP
+#endif
+
 struct mad_stream stream IBSS_ATTR;
 struct mad_frame frame IBSS_ATTR;
 struct mad_synth synth IBSS_ATTR;
 
+#ifdef MPA_SYNTH_ON_COP
+volatile short synth_running IBSS_ATTR;  /*synthesis is running*/
+volatile short die IBSS_ATTR;            /*thread should die*/
+
+#if (CONFIG_CPU == PP5024) || (CONFIG_CPU == PP5022)
+mad_fixed_t sbsample_prev[2][36][32] IBSS_ATTR;
+#else
+mad_fixed_t sbsample_prev[2][36][32] SHAREDBSS_ATTR; 
+#endif
+
+struct semaphore synth_done_sem IBSS_ATTR;
+struct semaphore synth_pending_sem IBSS_ATTR;
+#endif
+
 #define INPUT_CHUNK_SIZE   8192
 
 mad_fixed_t mad_frame_overlap[2][32][18] IBSS_ATTR;
+mad_fixed_t sbsample[2][36][32] IBSS_ATTR;
+
 unsigned char mad_main_data[MAD_BUFFER_MDLEN] IBSS_ATTR;
 /* TODO: what latency does layer 1 have? */
 int mpeg_latency[3] = { 0, 481, 529 };
@@ -43,6 +64,14 @@ void init_mad(void)
     ci->memset(&frame, 0, sizeof(struct mad_frame));
     ci->memset(&synth, 0, sizeof(struct mad_synth));
 
+#ifdef MPA_SYNTH_ON_COP
+    frame.sbsample_prev = &sbsample_prev;
+#else
+    frame.sbsample_prev = &sbsample;
+#endif
+
+    frame.sbsample=&sbsample;
+
     mad_stream_init(&stream);
     mad_frame_init(&frame);
     mad_synth_init(&synth);
@@ -51,6 +80,8 @@ void init_mad(void)
     ci->memset(mad_frame_overlap, 0, sizeof(mad_frame_overlap));
     frame.overlap = &mad_frame_overlap;
     stream.main_data = &mad_main_data;
+    
+    
 }
 
 int get_file_pos(int newtime)
@@ -159,6 +190,90 @@ static void set_elapsed(struct mp3entry* id3)
     }
 }
 
+#ifdef MPA_SYNTH_ON_COP
+
+/*
+ * Run the synthesis filter on the COProcessor 
+ */
+
+static int mad_synth_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)/2] IBSS_ATTR;
+
+static const unsigned char * const mad_synth_thread_name = "mp3dec";
+static struct thread_entry *mad_synth_thread_p;
+
+
+static void mad_synth_thread(void){
+
+    while(1){
+        ci->semaphore_wait(&synth_pending_sem);
+        
+        if(die){
+            die=0;
+            invalidate_icache();
+            return ;
+        }   
+        synth_running = 1;
+        mad_synth_frame(&synth, &frame);
+        synth_running = 0;
+        ci->semaphore_release(&synth_done_sem);        
+    }    
+}
+
+
+static int mad_synth_thread_wait_pcm(void){
+    ci->semaphore_wait(&synth_done_sem);
+    return 0;  
+}
+
+static void mad_synth_thread_ready(void){
+    mad_fixed_t (*temp)[2][36][32];
+    while(1){
+        /*check if synth is currently running before changing its inputs! */
+        if(!synth_running){    
+            /*circular buffer that holds 2 frames' samples*/
+            temp=frame.sbsample;
+            frame.sbsample = frame.sbsample_prev;
+            frame.sbsample_prev=temp;
+            
+            ci->semaphore_release(&synth_pending_sem);
+            return ;
+        }
+        ci->yield(); /*synth thread currently running, wait for it*/
+    }
+}
+
+static int mad_synth_thread_create(void){
+       synth_running=0;
+       die=0;
+           
+       ci->semaphore_init(&synth_done_sem, 1, 0);
+       ci->semaphore_init(&synth_pending_sem, 1, 0);
+       
+       mad_synth_thread_p = ci->create_thread(mad_synth_thread, 
+                            mad_synth_thread_stack,
+                               sizeof(mad_synth_thread_stack), 0,
+                               mad_synth_thread_name 
+                               IF_PRIO(, PRIORITY_PLAYBACK), COP);
+    
+        if (mad_synth_thread_p == NULL)
+            return false;
+    
+        return true;    
+    
+}
+#else
+static void mad_synth_thread_ready(void){
+	 mad_synth_frame(&synth, &frame);
+}
+static int mad_synth_thread_create(void){
+	return 0;
+}
+static int mad_synth_thread_wait_pcm(void){
+	return 0;
+}
+
+#endif
+
 /* this is the codec entry point */
 enum codec_status codec_main(void)
 {
@@ -180,8 +295,12 @@ enum codec_status codec_main(void)
     /* Create a decoder instance */
 
     ci->configure(DSP_SET_SAMPLE_DEPTH, MAD_F_FRACBITS);
-
+    
 next_track:
+
+    /*does nothing on 1 processor systems*/
+    mad_synth_thread_create();
+
     status = CODEC_OK;
 
     /* Reinitializing seems to be necessary to avoid playback quircks when seeking. */
@@ -300,6 +419,9 @@ next_track:
            data (not the one just decoded above). When we exit the decoding
            loop we will need to process the final frame that was decoded. */
         if (framelength > 0) {
+            
+            mad_synth_thread_wait_pcm();
+            
             /* In case of a mono file, the second array will be ignored. */
             ci->pcmbuf_insert(&synth.pcm.samples[0][samples_to_skip],
                               &synth.pcm.samples[1][samples_to_skip],
@@ -308,8 +430,9 @@ next_track:
             /* Only skip samples for the first frame added. */
             samples_to_skip = 0;
         }
-
-        mad_synth_frame(&synth, &frame);
+        
+        mad_synth_thread_ready();
+        //mad_synth_frame(&synth, &frame);
 
         /* Check if sample rate and stereo settings changed in this frame. */
         if (frame.header.samplerate != current_frequency) {
@@ -345,11 +468,20 @@ next_track:
 
     /* Finish the remaining decoded frame.
        Cut the required samples from the end. */
-    if (framelength > stop_skip)
+    if (framelength > stop_skip){
+        mad_synth_thread_wait_pcm();
         ci->pcmbuf_insert(synth.pcm.samples[0], synth.pcm.samples[1],
                           framelength - stop_skip);
-
+}
+#ifdef MPA_SYNTH_ON_COP
+    /*mop up COP thread*/
+    die=1;
+    ci->semaphore_release(&synth_pending_sem);
+    ci->thread_wait(mad_synth_thread_p);
+    invalidate_icache();
     stream.error = 0;
+#endif
+    
 
     if (ci->request_next_track())
         goto next_track;
