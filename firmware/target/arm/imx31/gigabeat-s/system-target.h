@@ -24,7 +24,12 @@
 #include "system-arm.h"
 #include "mmu-arm.h"
 
-#define CPUFREQ_NORMAL 532000000
+#ifndef HAVE_ADJUSTABLE_CPU_FREQ
+/* TODO: implement CPU frequency scaling */
+#define CPUFREQ_DEFAULT CPU_FREQ
+#define CPUFREQ_NORMAL CPU_FREQ
+#define CPUFREQ_MAX CPU_FREQ
+#endif
 
 #if 0
 static inline void udelay(unsigned int usecs)
@@ -49,7 +54,7 @@ static inline void invalidate_icache(void)
     asm volatile(
         /* Clean and invalidate entire data cache */
         "mcr p15, 0, %0, c7, c14, 0 \n"
-        /* Invalidate entire intruction cache
+        /* Invalidate entire instruction cache
          * Also flushes the branch target cache */
         "mcr p15, 0, %0, c7, c5, 0  \n"
         /* Data synchronization barrier */
