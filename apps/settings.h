@@ -269,7 +269,6 @@ bool set_option(const char* string, const void* variable, enum optiontype type,
 struct system_status
 {
     int resume_index;  /* index in playlist (-1 for no active resume) */
-    int resume_first_index;  /* index of first track in playlist */
     uint32_t resume_offset; /* byte offset in mp3 file */
     int runtime;       /* current runtime since last charge */
     int topruntime;    /* top known runtime */

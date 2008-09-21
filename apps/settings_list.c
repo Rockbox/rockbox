@@ -425,7 +425,6 @@ const struct settings_list settings[] = {
     /* playback */
     OFFON_SETTING(0, playlist_shuffle, LANG_SHUFFLE, false, "shuffle", NULL),
     SYSTEM_SETTING(NVRAM(4), resume_index, -1),
-    SYSTEM_SETTING(NVRAM(4), resume_first_index, 0),
     SYSTEM_SETTING(NVRAM(4), resume_offset, -1),
     CHOICE_SETTING(0, repeat_mode, LANG_REPEAT, REPEAT_ALL, "repeat",
                    "off,all,one,shuffle"

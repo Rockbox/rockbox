@@ -297,9 +297,6 @@ static void empty_playlist(struct playlist_info* playlist, bool resume)
         /* start with fresh playlist control file when starting new
            playlist */
         create_control(playlist);
-
-        /* Reset resume settings */
-        global_status.resume_first_index = 0;
     }
 }
 
@@ -788,11 +785,6 @@ static int add_track_to_playlist(struct playlist_info* playlist,
     {
         playlist->first_index++;
 
-        if (seek_pos < 0 && playlist->current)
-        {
-            global_status.resume_first_index = playlist->first_index;
-            status_save();
-        }
     }
 
     if (insert_position < playlist->last_insert_pos ||
@@ -903,12 +895,6 @@ static int remove_track_from_playlist(struct playlist_info* playlist,
     if (position < playlist->first_index)
     {
         playlist->first_index--;
-
-        if (write)
-        {
-            global_status.resume_first_index = playlist->first_index;
-            status_save();
-        }
     }
 
     if (position <= playlist->last_insert_pos)
@@ -1190,12 +1176,6 @@ static void find_and_set_playlist_index(struct playlist_info* playlist,
         if (playlist->indices[i] == seek)
         {
             playlist->index = playlist->first_index = i;
-
-            if (playlist->current)
-            {
-                global_status.resume_first_index = i;
-                status_save();
-            }
 
             break;
         }
@@ -2354,7 +2334,6 @@ int playlist_resume(void)
         /* Terminate on EOF */
         if(nread <= 0)
         {
-            playlist->first_index = global_status.resume_first_index;
             break;
         }
     }
@@ -2406,8 +2385,7 @@ int playlist_shuffle(int random_seed, int start_index)
     {
         /* store the seek position before the shuffle */
         seek_pos = playlist->indices[start_index];
-        playlist->index = global_status.resume_first_index =
-            playlist->first_index = start_index;
+        playlist->index = playlist->first_index = start_index;
         start_current = true;
     }
     
@@ -2541,7 +2519,7 @@ int playlist_next(int steps)
             playlist->amount > 1)
         {
             /* Repeat shuffle mode.  Re-shuffle playlist and resume play */
-            playlist->first_index = global_status.resume_first_index = 0;
+            playlist->first_index = 0;
             sort_playlist(playlist, false, false);
             randomise_playlist(playlist, current_tick, false, true);
 #if CONFIG_CODEC != SWCODEC
