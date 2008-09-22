@@ -599,7 +599,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
   mad_fixed64hi_t hi0, hi1;
 
   for (ch = 0; ch < nch; ++ch) {
-    sbsample = &*frame->sbsample_prev[ch];
+    sbsample = &(*frame->sbsample_prev)[ch];
     filter   = &synth->filter[ch];
     phase    = synth->phase;
     pcm      = synth->pcm.samples[ch];
