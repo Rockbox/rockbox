@@ -44,6 +44,7 @@
     #define TCC7xx_USB_SYS_STAT_SUSPEND (1<<1) /* Host forced suspend */
     #define TCC7xx_USB_SYS_STAT_RESUME  (1<<2) /* Host forced resume */
     #define TCC7xx_USB_SYS_STAT_HIGH    (1<<4) /* High speed */
+    #define TCC7xx_USB_SYS_STAT_SPD_END (1<<6) /* Speed detection end */
     #define TCC7xx_USB_SYS_STAT_VBON    (1<<8)
     #define TCC7xx_USB_SYS_STAT_VBOF    (1<<9)
     #define TCC7xx_USB_SYS_STAT_EOERR   (1<<10) /* overrun error */
@@ -85,9 +86,20 @@
 
 /* Indexed registers,  write endpoint number to TCC7xx_USB_INDEX */
 #define TCC7xx_USB_EP_STAT  MMR_REG16(USB_BASE, 0x2c) /* EP status register */
+    #define TCC7xx_USP_EP_STAT_RPS   (1 << 0) /* Packet received */
+    #define TCC7xx_USP_EP_STAT_TPS   (1 << 1) /* Packet transmited */
+    #define TCC7xx_USP_EP_STAT_LWO   (1 << 4) /* Last word odd */
 #define TCC7xx_USB_EP_CTRL  MMR_REG16(USB_BASE, 0x30) /* EP control register */
-    #define TCC7xx_USB_EP_CTRL_CDP   (1 << 2) /* Clear Data PID */
-    #define TCC7xx_USB_EP_CTRL_FLUSH (1 << 6) /* Flush FIFO */
+    #define TCC7xx_USB_EP_CTRL_TZLS  (1 << 0)  /* TX Zero Length Set */
+    #define TCC7xx_USB_EP_CTRL_ESS   (1 << 1)  /* Endpoint Stall Set */
+    #define TCC7xx_USB_EP_CTRL_CDP   (1 << 2)  /* Clear Data PID */
+    #define TCC7xx_USB_EP_CTRL_TTE   (1 << 5)  /* TX Toggle Enable */
+    #define TCC7xx_USB_EP_CTRL_FLUSH (1 << 6)  /* Flush FIFO */
+    #define TCC7xx_USB_EP_CTRL_DUEN  (1 << 7)  /* Dual FIFO Mode */
+    #define TCC7xx_USB_EP_CTRL_IME   (1 << 8)  /* ISO Mode */
+    #define TCC7xx_USB_EP_CTRL_OUTHD (1 << 11) /* OUT Packet Hold */
+    #define TCC7xx_USB_EP_CTRL_INHLD (1 << 12) /* IN Packet Hold */
+
 #define TCC7xx_USB_EP_BRCR  MMR_REG16(USB_BASE, 0x34) /* EP byte read count register */
 #define TCC7xx_USB_EP_BWCR  MMR_REG16(USB_BASE, 0x38) /* EP byte write count register */
 #define TCC7xx_USB_EP_MAXP  MMR_REG16(USB_BASE, 0x3c) /* EP max packet register */

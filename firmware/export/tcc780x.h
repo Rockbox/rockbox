@@ -224,4 +224,7 @@
 #define ECC_ERRDATA (*(volatile unsigned long *)0xF005B060)
 #define ECC_ERR     (*(volatile unsigned long *)0xF005B070)
 
+/* USB 2.0 device system MMR base address */
+#define USB_BASE 0xf0010000
+
 #endif
