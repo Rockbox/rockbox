@@ -774,6 +774,7 @@ struct plugin_api {
     void (*event_set_state)(struct event *e, unsigned int state);
 #endif
 
+	const char *appsversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 

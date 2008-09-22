@@ -37,6 +37,7 @@
 #include "logf.h"
 #include "option_select.h"
 #include "talk.h"
+#include "version.h"
 
 #if CONFIG_CHARGING
 #include "power.h"
@@ -616,6 +617,7 @@ static const struct plugin_api rockbox_api = {
     event_wait,
     event_set_state,
 #endif
+    appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 

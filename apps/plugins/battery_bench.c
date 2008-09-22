@@ -21,6 +21,7 @@
  ****************************************************************************/
 #ifndef SIMULATOR /* not for the simulator */
 
+#include "version.h"
 #include "plugin.h"
 PLUGIN_HEADER
 
@@ -483,7 +484,12 @@ int main(void)
                 "logging activity will end.\n\n"
                 "P.S: You can decide how you will make your tests.\n"
                 "Just don't open another plugin to be sure that your log "
-                "will continue.\n\n"
+                "will continue.\n\n",BATTERY_LOG);
+            rb->fdprintf(fd,
+                "Battery bench run for %s version %s\n\n"
+                ,MODEL_NAME,rb->appsversion);
+
+            rb->fdprintf(fd,
                 "Battery type: %d mAh      Buffer Entries: %d\n"
                 "  Time:,  Seconds:,  Level:,  Time Left:,  Voltage[mV]:"
 #if CONFIG_CHARGING
@@ -496,7 +502,7 @@ int main(void)
                 ", U:"
 #endif
                 "\n"
-                ,BATTERY_LOG,rb->global_settings->battery_capacity,
+                ,rb->global_settings->battery_capacity,
                 (int)BUF_ELEMENTS);
             rb->close(fd);
         }
@@ -511,6 +517,9 @@ int main(void)
         rb->close(fd);
         fd = rb->open(BATTERY_LOG, O_RDWR | O_APPEND);
         rb->fdprintf(fd, "\n--File already present. Resuming Benchmark--\n");
+        rb->fdprintf(fd,
+            "Battery bench run for %s version %s\n\n"
+            ,MODEL_NAME,rb->appsversion);
         rb->close(fd);
     }
     
