@@ -16,9 +16,9 @@ aac.c
 sid.c
 ape.c
 nsf.c
-#endif
 spc.c
 asap.c
+#endif
 mod.c
 shorten.c
 aiff.c
