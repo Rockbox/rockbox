@@ -25,8 +25,7 @@
 
 CODEC_HEADER
 
-#if (CONFIG_CPU == PP5024 || CONFIG_CPU == PP5022 || CONFIG_CPU == PP5020 \
-    || CONFIG_CPU == PP5002) && !defined(MPEGPLAYER)
+#if defined(CPU_PP) && !defined(MPEGPLAYER)
 #define MPA_SYNTH_ON_COP
 #endif
 
@@ -64,8 +63,12 @@ void init_mad(void)
     ci->memset(&frame, 0, sizeof(struct mad_frame));
     ci->memset(&synth, 0, sizeof(struct mad_synth));
 
+    ci->memset(&sbsample, 0, sizeof(sbsample));
+
 #ifdef MPA_SYNTH_ON_COP
     frame.sbsample_prev = &sbsample_prev;
+    ci->memset(&sbsample_prev, 0, sizeof(sbsample_prev));
+    synth_running=0;
 #else
     frame.sbsample_prev = &sbsample;
 #endif
@@ -358,10 +361,15 @@ next_track:
         ci->yield();
         if (ci->stop_codec || ci->new_track)
             break;
-    
+
         if (ci->seek_time) {
             int newpos;
 
+#ifdef MPA_SYNTH_ON_COP
+            /*make sure the synth thread is idle before seeking*/
+            if(synth_running)
+                mad_synth_thread_wait_pcm();
+#endif        
             samplesdone = ((int64_t)(ci->seek_time-1))*current_frequency/1000;
 
             if (ci->seek_time-1 == 0) {
