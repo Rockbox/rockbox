@@ -89,6 +89,7 @@
 
 /* Device bits for SWRESET & BCLKCTR */
 
+#define DEV_USBD  (1<<1)
 #define DEV_LCDC  (1<<2)
 #define DEV_SDMMC (1<<6)
 #define DEV_NAND  (1<<9)
@@ -112,7 +113,7 @@
 #define POL     (*(volatile unsigned long *)0xF300101C)
 #define MIRQ    (*(volatile unsigned long *)0xF3001028)
 #define MFIQ    (*(volatile unsigned long *)0xF300102C)
-#define MODE    (*(volatile unsigned long *)0xF3001030)
+#define TMODE   (*(volatile unsigned long *)0xF3001030)
 #define ALLMASK (*(volatile unsigned long *)0xF3001044)
 #define VAIRQ   (*(volatile unsigned long *)0xF3001080)
 #define VAFIQ   (*(volatile unsigned long *)0xF3001084)
@@ -126,6 +127,7 @@
 #define TIMER0_IRQ_MASK (1<<6)
 #define DAI_RX_IRQ_MASK (1<<14)
 #define DAI_TX_IRQ_MASK (1<<15)
+#define USBD_IRQ_MASK   (1<<21)
 #define ADC_IRQ_MASK    (1<<30)
 
 /* Timer / Counters */

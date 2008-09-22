@@ -254,7 +254,7 @@ void system_init(void)
     IRQSEL = ~(DAI_RX_IRQ_MASK | DAI_TX_IRQ_MASK);
 
     POL = 0x200108;     /* IRQs 3,8,21 active low (as OF) */
-    MODE = 0x20ce07c0;  /* IRQs 6-10,17-19,22-23,29 level-triggered (as OF) */
+    TMODE = 0x20ce07c0; /* IRQs 6-10,17-19,22-23,29 level-triggered (as OF) */
 
     VCTRL |= (1<<31);   /* Reading from VNIRQ clears that interrupt */
 
