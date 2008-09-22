@@ -94,6 +94,10 @@ void pcm_play_dma_init(void)
     BCLKCTR |= DEV_DAI;
     /* Master mode, 256->64fs, 16bit LSB*/
     DAMR = 0x3cce20;
+#elif defined(LOGIK_DAX)
+    /* TODO */
+#elif defined(SANSA_M200)
+    /* TODO */
 #else
 #error "Target isn't supported"
 #endif

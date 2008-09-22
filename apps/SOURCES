@@ -200,4 +200,6 @@ keymaps/keymap-sa9200.c
 keymaps/keymap-hdd1630.c
 #elif CONFIG_KEYPAD == IAUDIO67_PAD
 keymaps/keymap-iaudio67.c
+#elif CONFIG_KEYPAD == LOGIK_DAX_PAD
+keymaps/keymap-logikdax.c
 #endif

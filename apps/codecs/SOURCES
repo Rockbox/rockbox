@@ -5,25 +5,25 @@ mpa.c
 flac.c
 wav.c
 a52.c
-mpc.c
 wavpack.c
 #ifndef RB_PROFILE
 alac.c
 #endif
+#if MEMORYSIZE > 2
+mpc.c
 wma.c
-#if MEMORYSIZE > 1
 aac.c
-#endif
+sid.c
 ape.c
+nsf.c
+#endif
+spc.c
+asap.c
 mod.c
 shorten.c
 aiff.c
 speex.c
-sid.c
 adx.c
-nsf.c
-spc.c
-asap.c
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
 /* encoders */
 aiff_enc.c

@@ -987,8 +987,10 @@ target/arm/tcc77x/usb-tcc77x.c
 target/arm/tcc77x/logikdax/button-logikdax.c
 target/arm/tcc77x/logikdax/power-logikdax.c
 #ifndef BOOTLOADER
+target/arm/wmcodec-telechips.c
 target/arm/tcc77x/debug-tcc77x.c
 target/arm/pcm-telechips.c
+target/arm/tcc77x/logikdax/audio-logikdax.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* LOGIK_DAX */
@@ -1007,8 +1009,10 @@ target/arm/tcc77x/usb-tcc77x.c
 target/arm/tcc77x/m200/button-m200.c
 target/arm/tcc77x/m200/power-m200.c
 #ifndef BOOTLOADER
+target/arm/wmcodec-telechips.c
 target/arm/tcc77x/debug-tcc77x.c
 target/arm/pcm-telechips.c
+target/arm/tcc77x/m200/audio-m200.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* SANSA_M200 */

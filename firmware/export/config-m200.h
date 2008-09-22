@@ -57,8 +57,11 @@
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
+/* The number of bytes reserved for loadable codecs */
+#define CODEC_SIZE 0x20000
+
 /* The number of bytes reserved for loadable plugins */
-#define PLUGIN_BUFFER_SIZE 0x8000
+#define PLUGIN_BUFFER_SIZE 0x10000
 
 #define AB_REPEAT_ENABLE 1
 
@@ -117,5 +120,15 @@
 #define BOOTFILE_EXT "m200"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/"
+
+#define IBSS_ATTR_VOICE_STACK
+#define ICODE_ATTR_TREMOR_NOT_MDCT
+#define ICODE_ATTR_TREMOR_MDCT
+#define ICODE_ATTR_FLAC
+#define IBSS_ATTR_FLAC_DECODED0
+#define ICONST_ATTR_MPA_HUFFMAN
+#define IBSS_ATTR_MPC_SAMPLE_BUF
+#define ICODE_ATTR_ALAC
+#define IBSS_ATTR_SHORTEN_DECODED0
 
 #endif /* SIMULATOR */

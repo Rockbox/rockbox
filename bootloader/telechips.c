@@ -44,16 +44,12 @@
 #include "file.h"
 #include "common.h"
 
-#if defined(COWON_D2) || defined(IAUDIO_7) && defined(TCCBOOT)
-# define REAL_BOOT
+#if defined(COWON_D2) || defined(IAUDIO_7)
+#include "pcf50606.h"
 #endif
 
-#ifdef REAL_BOOT
-# if defined(COWON_D2) || defined(IAUDIO_7)
-#  include "pcf50606.h"
-# endif
-# define LOAD_ADDRESS 0x20000000 /* DRAM_START */
-#endif
+/* Address to load main Rockbox image to */
+#define LOAD_ADDRESS 0x20000000 /* DRAM_START */
 
 char version[] = APPSVERSION;
 
@@ -70,13 +66,12 @@ void show_debug_screen(void)
     int count = 0;
     bool do_power_off = false;
 	
-    /*lcd_puts_scroll(0,0,"this is a very long line to test scrolling");*/
-    while(!do_power_off) {
-	
+    lcd_puts_scroll(0,0,"this is a very long line to test scrolling");
+    while (!do_power_off) {
         line = 1;
         button = button_get(false);
 		
-       /* Power-off if POWER button has been held for a time
+        /* Power-off if POWER button has been held for a time
            This loop is currently running at about 100 iterations/second
          */
         if (button & POWEROFF_BUTTON) {
@@ -86,7 +81,7 @@ void show_debug_screen(void)
         } else {
             power_count = 0;
         }
-#ifdef BUTTON_SELECT
+#if 0
         if (button & BUTTON_SELECT){
             _backlight_off();
         }
@@ -94,17 +89,19 @@ void show_debug_screen(void)
             _backlight_on();
         }
 #endif
-        /*printf("Btn: 0x%08x",button);
+        printf("Btn: 0x%08x",button);
+#if 0
         printf("Tick: %d",current_tick);
         printf("GPIOA: 0x%08x",GPIOA);
         printf("GPIOB: 0x%08x",GPIOB);
         printf("GPIOC: 0x%08x",GPIOC);
         printf("GPIOD: 0x%08x",GPIOD);
-        printf("GPIOE: 0x%08x",GPIOE);*/
+        printf("GPIOE: 0x%08x",GPIOE);
+#endif
 
 #if 0
         int i;
-        for (i = 1; i<4; i++)
+        for (i = 0; i<4; i++)
         {
             printf("ADC%d: 0x%04x",i,adc_read(i));
         }
@@ -124,9 +121,10 @@ void show_debug_screen(void)
 
     printf("(NOT) POWERED OFF");
     while (true);
-	
 }
+
 #else /* !CPU_TCC77X */
+
 void show_debug_screen(void)
 {
     int button;
@@ -178,7 +176,7 @@ void show_debug_screen(void)
 
 void* main(void)
 {
-#ifdef REAL_BOOT
+#ifdef TCCBOOT
     int rc;
     unsigned char* loadbuffer = (unsigned char*)LOAD_ADDRESS;
 #endif
@@ -203,7 +201,7 @@ void* main(void)
 
 /* Only load the firmware if TCCBOOT is defined - this ensures SDRAM_START is
    available for loading the firmware. Otherwise display the debug screen. */
-#ifdef REAL_BOOT
+#ifdef TCCBOOT
     printf("Rockbox boot loader");
     printf("Version %s", version);
 

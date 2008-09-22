@@ -129,21 +129,8 @@ void lcd_set_invert_display(bool yesno)
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-    /* TODO: flip mode isn't working.  The commands in the else part of
-       this function are how the original firmware inits the LCD */
-
-    if (yesno)
-    {
-        lcd_write_command(LCD_SET_SEGMENT_REMAP | 0x01);
-        lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION);
-        xoffset = 132 - LCD_WIDTH; /* 132 colums minus the 128 we have */
-    }
-    else 
-    {
-        lcd_write_command(LCD_SET_SEGMENT_REMAP);
-        lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION | 0x08);
-        xoffset = 0;
-    }
+    (void)yesno;
+    /* TODO */
 }
 
 
