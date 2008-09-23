@@ -683,7 +683,7 @@ cat <<EOF
   6) AV300                                       26) Mini 2G
                                                  27) 1G, 2G
  
-==iAudio==               ==Toshiba==            ==SanDisk==
+ ==iAudio==               ==Toshiba==            ==SanDisk==
  30) X5/X5V/X5L           40) Gigabeat F         50) Sansa e200
  31) M5/M5L               41) Gigabeat S         51) Sansa e200R
  32) 7                                           52) Sansa c200
@@ -694,7 +694,7 @@ cat <<EOF
  60) Elio TPJ-1022        70) M:Robe 500         80) DAX 1GB MP3/DAB
                           71) M:Robe 100
  
-==Creative==              ==Philips==            ==Meizu==
+ ==Creative==             ==Philips==            ==Meizu==
  90) Zen Vision:M 30GB    100) GoGear SA9200     110) M6SL
  91) Zen Vision:M 60GB    101) GoGear HDD1630    111) M6SP
  92) Zen Vision                                  112) M3
