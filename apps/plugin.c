@@ -609,10 +609,12 @@ static const struct plugin_api rockbox_api = {
 
     thread_thaw,
 
-#if (CONFIG_CODEC == SWCODEC)
+#ifdef HAVE_SEMAPHORE_OBJECTS
     semaphore_init,
     semaphore_wait,
     semaphore_release,
+#endif
+#ifdef HAVE_EVENT_OBJECTS
     event_init,
     event_wait,
     event_set_state,

@@ -764,11 +764,13 @@ struct plugin_api {
 #endif
 
     void (*thread_thaw)(struct thread_entry *thread);
-
-#if (CONFIG_CODEC == SWCODEC) 
+ 
+#ifdef HAVE_SEMAPHORE_OBJECTS
     void (*semaphore_init)(struct semaphore *s, int max, int start);
     void (*semaphore_wait)(struct semaphore *s);
     void (*semaphore_release)(struct semaphore *s);
+#endif
+#ifdef HAVE_EVENT_OBJECTS
     void (*event_init)(struct event *e, unsigned int flags);
     void (*event_wait)(struct event *e, unsigned int for_state);
     void (*event_set_state)(struct event *e, unsigned int state);
