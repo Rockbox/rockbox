@@ -282,7 +282,7 @@ arm1136jfscc () {
 
 mipselcc () {
  prefixtools mipsel-elf-
- GCCOPTS="$CCOPTS -mips32 -mno-abicalls"
+ GCCOPTS="$CCOPTS -march=mips32 -mno-mips16 -mno-abicalls -mlong-calls"
  GCCOPTIMIZE="-fomit-frame-pointer"
  GCCOPTS="$GCCOPTS -fno-pic -fno-builtin -fno-exceptions -ffunction-sections -msoft-float -G 0"
  endian="little"
@@ -673,33 +673,35 @@ if [ "1" != `parse_args --target` ]; then
 else
   echo "Enter target platform:"
 cat <<EOF
- ==Archos==            ==iriver==             ==Apple iPod==
-  0) Player/Studio     10) H120/H140          20) Color/Photo
-  1) Recorder          11) H320/H340          21) Nano
-  2) FM Recorder       12) iHP-100/110/115    22) Video
-  3) Recorder v2       13) iFP-790            23) 3G
-  4) Ondio SP          14) H10 20Gb           24) 4G Grayscale
-  5) Ondio FM          15) H10 5/6Gb          25) Mini 1G
-  6) AV300                                    26) Mini 2G
-                                              27) 1G, 2G
+ ==Archos==               ==iriver==             ==Apple iPod==
+  0) Player/Studio        10) H120/H140          20) Color/Photo
+  1) Recorder             11) H320/H340          21) Nano
+  2) FM Recorder          12) iHP-100/110/115    22) Video
+  3) Recorder v2          13) iFP-790            23) 3G
+  4) Ondio SP             14) H10 20Gb           24) 4G Grayscale
+  5) Ondio FM             15) H10 5/6Gb          25) Mini 1G
+  6) AV300                                       26) Mini 2G
+                                                 27) 1G, 2G
+ 
+ ==iAudio==               ==Toshiba==            ==SanDisk==
+ 30) X5/X5V/X5L           40) Gigabeat F         50) Sansa e200
+ 31) M5/M5L               41) Gigabeat S         51) Sansa e200R
+ 32) 7                                           52) Sansa c200
+ 33) Cowon D2                                    53) Sansa m200
+ 34) M3/M3L                                      54) Sansa c100
 
- ==iAudio==            ==Toshiba==            ==SanDisk==
- 30) X5/X5V/X5L        40) Gigabeat F         50) Sansa e200
- 31) M5/M5L            41) Gigabeat S         51) Sansa e200R
- 32) 7                                        52) Sansa c200
- 33) Cowon D2                                 53) Sansa m200
- 34) M3/M3L                                   54) Sansa c100
-
- ==Tatung==            ==Olympus==            ==Logik==
- 60) Elio TPJ-1022     70) M:Robe 500         80) DAX 1GB MP3/DAB
-                       71) M:Robe 100
- ==Creative==          ==Philips==            ==Meizu==
- 90) Zen Vision:M 30GB 100) GoGear SA9200     110) M6SL
- 91) Zen Vision:M 60GB 101) GoGear HDD1630
- 92) Zen Vision
+ ==Tatung==               ==Olympus==            ==Logik==
+ 60) Elio TPJ-1022        70) M:Robe 500         80) DAX 1GB MP3/DAB
+                          71) M:Robe 100
+ 
+ ==Creative==             ==Philips==            ==Meizu==
+ 90) Zen Vision:M 30GB    100) GoGear SA9200     110) M6SL
+ 91) Zen Vision:M 60GB    101) GoGear HDD1630    111) M6SP
+ 92) Zen Vision                                  112) M3
  
  ==Onda==
  120) VX747
+ 121) VX767
 EOF
 
   buildfor=`input`;
@@ -1290,10 +1292,10 @@ fi
     target="-DIAUDIO_7"
     memory=16 # always
     arm946cc
-    tool="$rootdir/tools/scramble -add i7"
+    tool="$rootdir/tools/scramble -add=i7"
     boottool="$rootdir/tools/scramble -tcc=crc"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.iaudio"
     appextra="recorder:gui"
     plugins="yes"
@@ -1649,18 +1651,21 @@ fi
    54|c100)
     target_id=42 
     modelname="c100" 
-    target="-DSANSA_C100" # The #define used in firmware/export/config.h for conditional compilation     
-    memory=32  # how many megabytes of RAM
-    arm946cc # Which compiler to use, see the beginning of the file
-    tool="$rootdir/tools/scramble -add=c100" # Which command to use for creating a rockbox binary to be loaded by the bootloader
-	boottool="$rootdir/tools/scramble -tcc=crc"
+    target="-DSANSA_C100"     
+    memory=32  # unsure, must check
+    arm946cc
+    tool="$rootdir/tools/scramble -add=c100"
+    boottool="$rootdir/tools/scramble -tcc=crc"
     bootoutput="player.rom"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0" # How to create a monochrome bitmap
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4" # How to create a native bitmap
-    output="rockbox.c100" # The name of the Rockbox binary file
-    appextra="recorder:gui" # What directories in the apps/ tree to include in compilation
-    plugins="" # Does it support plugins?
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.c100"
+    appextra="recorder:gui"
+    plugins=""
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
     toolset=$tccbitmaptools
+    # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="tcc77x"
     t_model="c100"
@@ -1760,6 +1765,50 @@ fi
     t_model="meizu-m6sl"
     ;;
     
+   111|meizum6sp)
+    target_id=46
+    modelname="meizum6sp"
+    target="-DMEIZU_M6SP"
+    memory=16 # always
+    arm940tbecc
+    tool="cp"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.meizu"
+    appextra="recorder:gui"
+    plugins="no" #FIXME
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    boottool="cp"
+    bootoutput="rockboot.ebn"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="s5l8700"
+    t_model="meizu-m6sp"
+    ;;
+    
+   112|meizum3)
+    target_id=47
+    modelname="meizum3"
+    target="-DMEIZU_M3"
+    memory=16 # always
+    arm940tbecc
+    tool="cp"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.meizu"
+    appextra="recorder:gui"
+    plugins="no" #FIXME
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    boottool="cp"
+    bootoutput="rockboot.ebn"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="s5l8700"
+    t_model="meizu-m3"
+    ;;
+    
     120|ondavx747)
     target_id=44
     modelname="ondavx747"
@@ -1780,6 +1829,28 @@ fi
     t_cpu="mips"
     t_manufacturer="ingenic_jz47xx"
     t_model="onda_vx747"
+    ;;
+    
+    121|ondavx767)
+    target_id=45
+    modelname="ondavx767"
+    target="-DONDA_VX767"
+    memory=16 #FIXME
+    mipselcc
+    tool="cp"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.vx767"
+    appextra="recorder:gui"
+    plugins="no" #FIXME
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    boottool="cp"
+    bootoutput="rockboot.vx767"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="mips"
+    t_manufacturer="ingenic_jz47xx"
+    t_model="onda_vx767"
     ;;
    *)
     echo "Please select a supported target platform!"
