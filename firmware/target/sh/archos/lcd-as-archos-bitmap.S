@@ -203,7 +203,7 @@ _lcd_write_data:
     /* This is the place to reenable the interrupts, if we have disabled
      * them. See above. */
 
-
+#ifndef BOOTLOADER
     .align      2
     .global     _lcd_grey_data
     .type       _lcd_grey_data,@function
@@ -345,7 +345,10 @@ _lcd_grey_data:
     .short  0x0080
 
     .align  2
-.lcdr:
-    .long   LCDR
 .pmask:
     .long   0x80808080
+#endif
+
+    .align  2
+.lcdr:
+    .long   LCDR
