@@ -12,6 +12,10 @@ agc
 alarm
 #endif
 
+#if defined(HAVE_ALBUMART)
+albumart
+#endif
+
 #if defined(HAVE_BACKLIGHT_BRIGHTNESS)
 backlight_brightness
 #endif

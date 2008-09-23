@@ -49,6 +49,7 @@
 #endif
 #include "version.h"
 #include "time.h"
+#include "gwps.h"
 
 static const struct browse_folder_info config = {ROCKBOX_DIR, SHOW_CFG};
 
@@ -142,6 +143,9 @@ enum infoscreenorder
     INFO_DISK1, /* capacity or internal capacity/free on hotswap */
     INFO_DISK2, /* free space or external capacity/free on hotswap */
     INFO_BUFFER,
+#ifdef HAVE_ALBUMART
+    INFO_ALBUMART,
+#endif
     INFO_VERSION,
 #if CONFIG_RTC
     INFO_DATE,
@@ -279,6 +283,20 @@ static char* info_getname(int selected_item, void *data,
             snprintf(buffer, buffer_len, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
 #endif
             break;
+#ifdef HAVE_ALBUMART
+        case INFO_ALBUMART: /* album art dimenstions */
+            if (gui_sync_wps_uses_albumart())
+            {
+                snprintf(buffer, buffer_len, "%s %dx%d", str(LANG_ALBUMART),
+                         gui_wps[0].data->albumart_max_width, 
+                         gui_wps[0].data->albumart_max_height);
+            }
+            else
+            {
+                snprintf(buffer, buffer_len, "%s %s", str(LANG_ALBUMART),
+                         str(LANG_SET_BOOL_NO));
+            }
+#endif
     }
     return buffer;
 }
@@ -383,6 +401,20 @@ static int info_speak_item(int selected_item, void * data)
             output_dyn_value(NULL, 0, info->size, kbyte_units, true);
 #endif
             break;
+#ifdef HAVE_ALBUMART
+            case INFO_ALBUMART: /* album art dimenstions */
+                if (gui_sync_wps_uses_albumart())
+                {
+                    talk_id(LANG_ALBUMART, false);
+                    talk_value(gui_wps[0].data->albumart_max_width, UNIT_PIXEL, true);
+                    talk_value(gui_wps[0].data->albumart_max_height, UNIT_PIXEL, true);
+                }
+                else
+                {
+                    talk_id(LANG_ALBUMART, false);
+                    talk_id(LANG_SET_BOOL_NO, true);
+                }
+#endif
     }
     return 0;
 }

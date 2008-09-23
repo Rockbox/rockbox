@@ -12037,3 +12037,20 @@
     recording: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ALBUMART
+  desc: Display the expected AA size
+  user:
+  <source>
+    *: none
+    albumart: "Album Art:"
+  </source>
+  <dest>
+    *: none
+    albumart: "Album Art:"
+  </dest>
+  <voice>
+    *: none
+    albumart: ""
+  </voice>
+</phrase>
