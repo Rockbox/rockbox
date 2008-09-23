@@ -5,135 +5,171 @@ formatting, has top{}-of{}-file and bottom{}-of{}-file buttons. You can view
 files without a \fname{.txt} extension by using \emph{Open with} from the
 \emph{Context Menu} (see \reference{ref:Contextmenu}).
 
-\subsubsection{Mode settings}
-
-\begin{description}
-\item[Word mode] toggles between Wrap and Chop.
-    \begin{description}
-        \item[Wrap] breaks lines at white space or hyphen.
-        \item[Chop] breaks lines at the maximum column limit.
-    \end{description}  
-\item[Line mode] cycles through Normal, Join and Expand.
-    \begin{description}
-        \item[Normal] breaks lines at newline characters.
-        \item[Join] ignores unpaired newline characters (i.e., joins lines).
-        Useful for adopting the orphans that occur with e{}-mail style
-        (i.e.,pre{}-wrapped) text files.
-        \item[Expand] doubles unpaired newlines (i.e., adds a blank line).
-        Useful for making the paragraphs clearer in some book style text files.
-    \end{description}
-\item[View mode] toggles between Narrow and Wide.
-    \begin{description}
-        \item[Narrow] sets maximum column to the screen width.
-        \item[Wide] sets maximum column to 114. Useful for navigating large files. (Currently, Wide and Join cannot be selected together.)
-    \end{description}
-\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,SANSA_E200_PAD}{
-\item[Page mode] toggles between Normal and Overlap.
-    \begin{description}
-        \item[Normal] sets page{}-down/page{}-up to one full screen.
-        \item[Overlap] tells page{}-down/page{}-up to retain one line from previous screen.    
-    \end{description}
-\item[Scrollbar mode] toggles scrollbar for the current View mode.
-    \begin{description}
-        \item[Narrow mode] has no scrollbar by default, until toggled.
-        \item[Wide mode] has a scrollbar by default, until toggled.
-    \end{description}
-}
-\end{description}
-Settings are not remembered after the viewer has been exited.
-\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,ANSA_E200_PAD}{
-If file fits on one screen, there is no scrollbar and toggling Scrollbar mode has no effect.}
 
 \begin{table}
     \begin{btnmap}{}{}
     \opt{PLAYER_PAD}{\ButtonLeft}
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonUp}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollBack} 
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
+        ,SANSA_E200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonUp}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollBack}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
-        & Page{}-up (one screen up)\\
-        
+    \opt{SANSA_C200_PAD}{\ButtonVolUp}
+        & Scroll{}-up\\
+
     \opt{PLAYER_PAD}{\ButtonRight}
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonDown}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd} 
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
+        ,SANSA_E200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonDown}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd}
     \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
-    & Page{}-down (one screen down)\\
-        
+    \opt{SANSA_C200_PAD}{\ButtonVolDown}
+        & Scroll{}-down\\
+
     \opt{PLAYER_PAD}{\ButtonMenu+\ButtonLeft}
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonLeft} 
-    & Top of file (Narrow mode) One screen left (Wide mode)\\
-        
+    \nopt{PLAYER_PAD}{\ButtonLeft}
+        & Top of file (Narrow mode) /
+        One screen left (Wide mode)\\
+
     \opt{PLAYER_PAD}{\ButtonMenu+\ButtonRight}
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,GIGABEAT_PAD,MROBE100_PAD}
-        {\ButtonRight} 
-    & Bottom of file (Narrow mode) One screen right (Wide mode)\\
-        
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}
-       {\ButtonOn+\ButtonUp & One line up\\}
-    
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}
-       {\ButtonOn+\ButtonDown & One line down\\}
-    
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}
-       {\ButtonOn+\ButtonLeft & One column left\\}
-        
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}
-       {\ButtonOn+\ButtonRight & One column right\\}
-        
-    \opt{PLAYER_PAD}{\ButtonOn+\ButtonLeft}
+    \nopt{PLAYER_PAD}{\ButtonRight}
+        & Bottom of file (Narrow mode) /
+        One screen right (Wide mode)\\
+
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
+        \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonUp}
+        \opt{SANSA_E200_PAD}{\ButtonScrollBack}
+        \opt{SANSA_C200_PAD}{\ButtonUp}
+        & One line up\\
+    }
+
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
+        \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonDown}
+        \opt{SANSA_E200_PAD}{\ButtonScrollFwd}
+        \opt{SANSA_C200_PAD}{\ButtonDown}
+        & One line down\\
+    }
+
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{
+        \ButtonOn+\ButtonLeft
+        & One column left\\
+    }
+
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{
+        \ButtonOn+\ButtonRight
+        & One column right\\
+    }
+
+    \opt{RECORDER_PAD,PLAYER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{GIGABEAT_PAD}{\ButtonA}
+    \opt{SANSA_C200_PAD,SANSA_E200_PAD}{\ButtonRec}
+    \opt{MROBE100_PAD}{\ButtonDisplay}
+        & Toggle autoscroll\\
+
     \opt{RECORDER_PAD}{\ButtonFOne}
-    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonLeft}
-    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}
-    \opt{SANSA_E200_PAD}{\ButtonScrollBack}
-        & Toggles Word mode\\
-        
-    \opt{PLAYER_PAD}{\ButtonOn+\ButtonMenu+\ButtonRight}
-    \opt{RECORDER_PAD}{\ButtonFTwo}
-    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonUp}
+    \opt{ONDIO_PAD}{Long \ButtonMenu}
+    \opt{PLAYER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonMenu}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}
-    \opt{IAUDIO_X5_PAD}{Long press on \ButtonPlay}
-    \opt{IRIVER_H10_PAD,SANSA_E200_PAD}{n/a}
-        & Cycles line mode\\
-        
-    \opt{PLAYER_PAD}{\ButtonOn+\ButtonRight}
-    \opt{RECORDER_PAD}{\ButtonFThree}
-    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonRight}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonRight}
-    \opt{IRIVER_H10_PAD,SANSA_E200_PAD}{n/a}
-        & Toggles view mode\\
-        
-    \opt{RECORDER_PAD}{\ButtonOn+\ButtonFOne & Toggles page mode\\}
-    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonDown & Toggles page mode\\}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}
-        {\ButtonOn+\ButtonMode & Toggles page mode\\}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}
-        {\ButtonSelect+\ButtonMenu+\ButtonLeft & Toggles page mode\\}
-        
-    \opt{RECORDER_PAD}{\ButtonOn+\ButtonFThree & Toggles scrollbar mode\\}
-    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonOff & Toggles scrollbar mode\\}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}
-        {\ButtonOn+\ButtonRec & Toggles scrollbar mode\\}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}
-        {\ButtonSelect+\ButtonLeft+\ButtonRight & Toggles scrollbar mode\\}
-        
+    \opt{IAUDIO_X5_PAD,SANSA_C200_PAD,SANSA_E200_PAD}{\ButtonSelect}
+    \opt{IRIVER_H10_PAD}{\ButtonRew}
+        & Enter menu\\
+
     \opt{PLAYER_PAD}{\ButtonStop}
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
-    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
+        ,MROBE100_PAD}{\ButtonPower}
         & Exit text viewer\\
+
     \end{btnmap}
 \end{table}
+
+\subsubsection{The Viewer's Menu}
+
+\begin{description}
+\item[Quit] Exits the plugin.
+\item[Viewer Options]
+    \begin{description}
+    \item[Encoding]
+    sets the codepage in the text viewer.
+% ToDo: wrap some of the following settings into a \opt{lcd_bitmap} to exlude
+% ones that don't work on charcell - as soon as the plugin itself does
+    Available settings:
+    \setting{UTF-8} (Unicode),
+    \setting{BIG5} (Traditional Chinese),
+    \setting{KSX-1001} (Korean),
+    \setting{GB-2312} (Simple Chinese),
+    \setting{SJIS} (Japanese),
+    \setting{CP1250} (Central European),
+    \setting{ISO-8859-2} (Latin Extended),
+    \setting{ISO-8859-9} (Turkish),
+    \setting{ISO-8859-6} (Arabic),
+    \setting{ISO-8859-11} (Thai),
+    \setting{CP1251} (Cyrillic),
+    \setting{ISO-8859-8} (Hebrew),
+    \setting{ISO-8859-7} (Greek),
+    \setting{ISO-8859-1} (Latin 1).
+    This setting only applies to the plugin and is independent from the
+    \setting{Default Codepage} setting (see \reference{ref:Defaultcodepage}).
+    \item[Word Wrap] toggles between Wrap and Chop.
+        \begin{description}
+            \item[Off (Chop Words)] breaks lines at white space or hyphen.
+            \item[On] breaks lines at the maximum column limit.
+        \end{description}
+    \item[Line Mode] cycles through Normal, Join and Expand and Reflow Lines.
+        \begin{description}
+            \opt{lcd_bitmap}{
+            \item[Reflow Lines] justifies the text fully.
+            }
+            \item[Expand] adds a blank line. Useful for making the paragraphs
+            clearer in some book style text files.
+            \item[Join] joins lines. Useful for adopting the orphans that
+            occur with e{}-mail style (i.e. pre{}-wrapped) text files.
+            \item[Normal] breaks lines at newline characters.
+        \end{description}
+    \item[Wide View] toggles between Narrow and Wide.
+        \begin{description}
+            \item[Yes] sets maximum column to 114. Useful for navigating large files.
+            (Currently, Wide and Join cannot be selected together.)
+            \item[No (Narrow)] sets maximum column to the screen width.
+        \end{description}
+    \opt{lcd_bitmap}{
+    \item[Show Scrollbar] toggles scrollbar for the current View mode. If the
+    file fits on one screen, there is no scrollbar and toggling this setting
+    has no effect.
+        \begin{description}
+            \item[On] has a scrollbar by default, until toggled.
+            \item[Off] has no scrollbar by default, until toggled.
+        \end{description}
+    \item[Overlap Pages] toggles between Normal and Overlap.
+        \begin{description}
+            \item[Yes] tells page{}-down/page{}-up to retain one line from previous screen.
+            \item[No] sets page{}-down/page{}-up to one full screen.
+        \end{description}
+    }
+    \item[Scroll Mode] controls the function of the ``Scroll-up'' and
+    ``Scroll-down'' buttons.
+        \begin{description}
+            \item[Scroll by Line]
+            \item[Scroll by Page]
+        \end{description}
+    \item[Auto-scroll Speed]
+    controls the speed of auto-scrolling in number of lines per scroll step,
+    available options are \setting{1} to \setting{10} lines. As an example,
+    a setting of \setting{4} will scroll up the text four lines per second.
+    \end{description}
+
+\item[Show Playback Menu] controls the playback of the currently loaded playlist
+and change the volume of your \dap without leaving the plugin.
+\item[Return] to the text view.
+\end{description}
+
+\note{The text viewer automatically saves its settings and also stores the
+current position in the viewed text files (up to the last 46 files).}
 
 \subsubsection{Compatibility}
 
 \begin{itemize}
-\item Correctly reads plain text files in Unix, Win/DOS, or Macintosh
-format. Latin{}-alphabet Unicode files are  \emph{almost} readable.
-\item Currently prefers fixed{}-width fonts. With proportional fonts,
-pretends all characters are the width of a lower{}-case `o'.
-\item Currently messages are in English 
+\item Currently messages are in English
 \item Does not currently support right{}-to{}-left languages.
 \end{itemize}
