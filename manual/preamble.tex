@@ -31,6 +31,7 @@
 \floatstyle{ruled}
 
 \usepackage{hyperref}
+\usepackage{enumitem}
 
 \usepackage{optional}
 
@@ -125,6 +126,13 @@
 \long\gdef\IfN@Ught#1 #2!{\blank{#2}}
 \long\gdef\Ifbl@nk#1#2Q#3!{\ifx#3}% same as above
 } 
+
+% environment for setting the changelog.
+\newenvironment{changelog}%
+    {\renewcommand{\labelitemi}{$\star$}\setitemize{noitemsep,topsep=0pt}%
+    \begin{itemize}}%
+    {\end{itemize}}
+
 
 % add screenshot image.
 % Usage: \screenshot{filename}{caption}{label}
