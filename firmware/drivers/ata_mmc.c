@@ -145,7 +145,7 @@ static void read_transfer(unsigned char *buf, int len)
             __attribute__ ((section(".icode")));
 static unsigned char poll_byte(long timeout);
 static unsigned char poll_busy(long timeout);
-static int send_cmd(int cmd, unsigned long parameter, unsigned char *response);
+static unsigned char send_cmd(int cmd, unsigned long parameter, void *data);
 static int receive_cxd(unsigned char *buf);
 static int initialize_card(int card_no);
 static int receive_block(unsigned char *inbuf, long timeout);
@@ -171,6 +171,8 @@ static int select_card(int card_no)
     mutex_lock(&mmc_mutex);
     led(true);
     last_disk_activity = current_tick;
+
+    mmc_enable_int_flash_clock(card_no == 0);
 
     if (!card_info[card_no].initialized)
     {
@@ -316,30 +318,25 @@ static unsigned char poll_busy(long timeout)
     return (dummy == 0xFF) ? data : 0;
 }
 
-/* Send MMC command and get response */
-static int send_cmd(int cmd, unsigned long parameter, unsigned char *response)
+/* Send MMC command and get response. Returns R1 byte directly.
+ * Returns further R2 or R3 bytes in *data (can be NULL for other commands) */
+static unsigned char send_cmd(int cmd, unsigned long parameter, void *data)
 {
-    unsigned char command[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95, 0xFF};
+    static struct {
+        unsigned char cmd;
+        unsigned long parameter;
+        const unsigned char crc7;    /* fixed, valid for CMD0 only */
+        const unsigned char trailer;
+    } __attribute__((packed)) command = {0x40, 0, 0x95, 0xFF};
 
-    command[0] = cmd;
-    
-    if (parameter != 0)
-    {
-        command[1] = (parameter >> 24) & 0xFF;
-        command[2] = (parameter >> 16) & 0xFF;
-        command[3] = (parameter >> 8) & 0xFF;
-        command[4] = parameter & 0xFF;
-    }
-    
-    write_transfer(command, 7);
+    unsigned char ret;
 
-    response[0] = poll_byte(20);
+    command.cmd = cmd;
+    command.parameter = htobe32(parameter);
 
-    if (response[0] != 0x00)
-    {
-        write_transfer(dummy, 1);
-        return -1;
-    }
+    write_transfer((unsigned char *)&command, sizeof(command));
+
+    ret = poll_byte(20);
 
     switch (cmd)
     {
@@ -347,24 +344,21 @@ static int send_cmd(int cmd, unsigned long parameter, unsigned char *response)
         case CMD_SEND_CID:
         case CMD_READ_SINGLE_BLOCK:
         case CMD_READ_MULTIPLE_BLOCK:
-            break;
-            
+            return ret;
+
         case CMD_SEND_STATUS:     /* R2 response, close with dummy */
-            read_transfer(response + 1, 1);
-            write_transfer(dummy, 1);
+            read_transfer(data, 1);
             break;
-            
+
         case CMD_READ_OCR:        /* R3 response, close with dummy */
-            read_transfer(response + 1, 4);
-            write_transfer(dummy, 1);
+            read_transfer(data, 4);
             break;
 
         default:                  /* R1 response, close with dummy */
-            write_transfer(dummy, 1);
             break;                /* also catches block writes */
     }
-
-    return 0;
+    write_transfer(dummy, 1);
+    return ret;
 }
 
 /* Receive CID/ CSD data (16 bytes) */
@@ -386,7 +380,6 @@ static int initialize_card(int card_no)
 {
     int rc, i;
     int blk_exp, ts_exp, taac_exp;
-    unsigned char response[5];
     tCardInfo *card = &card_info[card_no];
 
     static const char mantissa[] = {  /* *10 */
@@ -400,43 +393,40 @@ static int initialize_card(int card_no)
 
     if (card_no == 1)
         mmc_status = MMC_TOUCHED;
+
     /* switch to SPI mode */
-    send_cmd(CMD_GO_IDLE_STATE, 0, response);
-    if (response[0] != 0x01)      
-        return -1;                /* error response */
+    if (send_cmd(CMD_GO_IDLE_STATE, 0, NULL) != 0x01)
+        return -1;                /* error or no response */
 
     /* initialize card */
-    for (i = 0; i < 100; i++)     /* timeout 1 sec */
+    for (i = HZ;;)                /* try for 1 second*/
     {
         sleep(1);
-        if (send_cmd(CMD_SEND_OP_COND, 0, response) == 0)
+        if (send_cmd(CMD_SEND_OP_COND, 0, NULL) == 0)
             break;
+        if (--i <= 0)
+            return -2;            /* timeout */
     }
-    if (response[0] != 0x00)
-        return -2;                /* not ready */
-        
+
     /* get OCR register */
-    rc = send_cmd(CMD_READ_OCR, 0, response);
-    if (rc)
-        return rc * 10 - 3;
-    card->ocr = (response[1] << 24) | (response[2] << 16)
-              | (response[3] << 8) | response[4];
-        
+    if (send_cmd(CMD_READ_OCR, 0, &card->ocr))
+        return -3;
+    card->ocr = betoh32(card->ocr); /* no-op on big endian */
+
     /* check voltage */
     if (!(card->ocr & 0x00100000)) /* 3.2 .. 3.3 V */
         return -4;
-    
+
     /* get CSD register */
-    rc = send_cmd(CMD_SEND_CSD, 0, response);
-    if (rc)
-        return rc * 10 - 5;
+    if (send_cmd(CMD_SEND_CSD, 0, NULL))
+        return -5;
     rc = receive_cxd((unsigned char*)card->csd);
     if (rc)
-        return rc * 10 - 6;
+        return rc * 10 - 5;
 
     blk_exp = card_extract_bits(card->csd, 44, 4);
     if (blk_exp < 9) /* block size < 512 bytes not supported */
-        return -7;
+        return -6;
 
     card->numblocks = (card_extract_bits(card->csd, 54, 12) + 1)
                    << (card_extract_bits(card->csd, 78, 3) + 2 + blk_exp - 9);
@@ -461,29 +451,24 @@ static int initialize_card(int card_no)
 
     /* r2w_factor, write timeout */
     card->r2w_factor = 1 << card_extract_bits(card->csd, 99, 3);
-    if (card->r2w_factor > 32)    /* dirty MMC spec violation */
-    {
-        card->read_timeout *= 4;  /* add safety factor */
-        card->write_timeout = card->read_timeout * 8;
-    }
-    else
-        card->write_timeout = card->read_timeout * card->r2w_factor;
+    card->write_timeout = card->read_timeout * card->r2w_factor;
+
+    if (card->r2w_factor > 32) /* Such cards often need extra read delay */
+        card->read_timeout *= 4;
 
     /* switch to full speed */
     setup_sci1(card->bitrate_register);
 
     /* always use 512 byte blocks */
-    rc = send_cmd(CMD_SET_BLOCKLEN, BLOCK_SIZE, response);
-    if (rc)
-        return rc * 10 - 8;
+    if (send_cmd(CMD_SET_BLOCKLEN, BLOCK_SIZE, NULL))
+        return -7;
 
     /* get CID register */
-    rc = send_cmd(CMD_SEND_CID, 0, response);
-    if (rc)
-        return rc * 10 - 9;
+    if (send_cmd(CMD_SEND_CID, 0, NULL))
+        return -8;
     rc = receive_cxd((unsigned char*)card->cid);
     if (rc)
-        return rc * 10 - 9;
+        return rc * 10 - 8;
 
     card->initialized = true;
     return 0;
@@ -624,7 +609,6 @@ int ata_read_sectors(IF_MV2(int drive,)
     int rc = 0;
     int lastblock = 0;
     unsigned long end_block;
-    unsigned char response;
     tCardInfo *card;
 #ifndef HAVE_MULTIVOLUME
     int drive = current_card;
@@ -653,21 +637,20 @@ int ata_read_sectors(IF_MV2(int drive,)
         
     if (incount > 1)
     {
-        rc = send_cmd(CMD_READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, &response);
-                      /* MMC4.2: make multiplication conditional */
-        if (rc)
+                     /* MMC4.2: make multiplication conditional */
+        if (send_cmd(CMD_READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, NULL))
         {
-            rc = rc * 10 - 3;
+            rc =  -3;
             goto error;
         }
-        while (incount-- > lastblock)
+        while (--incount >= lastblock)
         {
             rc = receive_block(inbuf, card->read_timeout);
             if (rc)
             {
                 /* If an error occurs during multiple block reading, the
                  * host still needs to send CMD_STOP_TRANSMISSION */
-                send_cmd(CMD_STOP_TRANSMISSION, 0, &response);
+                send_cmd(CMD_STOP_TRANSMISSION, 0, NULL);
                 rc = rc * 10 - 4;
                 goto error;
             }
@@ -675,20 +658,18 @@ int ata_read_sectors(IF_MV2(int drive,)
             start++;
             /* ^^ necessary for the abovementioned last block special case */
         }
-        rc = send_cmd(CMD_STOP_TRANSMISSION, 0, &response);
-        if (rc)
+        if (send_cmd(CMD_STOP_TRANSMISSION, 0, NULL))
         {
-            rc = rc * 10 - 5;
+            rc = -5;
             goto error;
         }
     }
     if (incount > 0)
     {
-        rc = send_cmd(CMD_READ_SINGLE_BLOCK, start * BLOCK_SIZE, &response);
-                      /* MMC4.2: make multiplication conditional */
-        if (rc)
+                     /* MMC4.2: make multiplication conditional */
+        if (send_cmd(CMD_READ_SINGLE_BLOCK, start * BLOCK_SIZE, NULL))
         {
-            rc = rc * 10 - 6;
+            rc = -6;
             goto error;
         }
         rc = receive_block(inbuf, card->read_timeout);
@@ -714,7 +695,6 @@ int ata_write_sectors(IF_MV2(int drive,)
     int rc = 0;
     int write_cmd;
     unsigned char start_token;
-    unsigned char response;
     tCardInfo *card;
 #ifndef HAVE_MULTIVOLUME
     int drive = current_card;
@@ -744,36 +724,27 @@ int ata_write_sectors(IF_MV2(int drive,)
         write_cmd   = CMD_WRITE_BLOCK;
         start_token = DT_START_BLOCK;
     }
-    rc = send_cmd(write_cmd, start * BLOCK_SIZE, &response);
-                  /* MMC4.2: make multiplication conditional */
-    if (rc)
+                 /* MMC4.2: make multiplication conditional */
+    if (send_cmd(write_cmd, start * BLOCK_SIZE, NULL))
     {
-        rc = rc * 10 - 2;
+        rc = -2;
         goto error;
     }
-
-    while (--count > 0)
+    while (--count >= 0)
     {
-        rc = send_block_send(start_token, card->write_timeout, true);
+        rc = send_block_send(start_token, card->write_timeout, count > 0);
         if (rc)
         {
             rc = rc * 10 - 3;
             break;
+            /* If an error occurs during multiple block writing,
+             * the STOP_TRAN token still needs to be sent. */
         }
     }
-    if (rc == 0)
-    {
-        rc = send_block_send(start_token, card->write_timeout, false);
-        if (rc)
-            rc = rc * 10 - 4;
-    }                 
-    /* If an error occurs during multiple block writing, the STOP_TRAN token
-     * still needs to be sent, hence the special error handling above. */
-
     if (write_cmd == CMD_WRITE_MULTIPLE_BLOCK)
     {
-        response = DT_STOP_TRAN;
-        write_transfer(&response, 1);
+        static const unsigned char stop_tran = DT_STOP_TRAN;
+        write_transfer(&stop_tran, 1);
         poll_busy(card->write_timeout);
     }
 
@@ -864,13 +835,10 @@ bool mmc_touched(void)
 {
     if (mmc_status == MMC_UNKNOWN) /* try to detect */
     {
-        unsigned char response;  
-
         mutex_lock(&mmc_mutex);
         setup_sci1(7);             /* safe value */
         and_b(~0x02, &PADRH);      /* assert CS */
-        send_cmd(CMD_SEND_OP_COND, 0, &response);
-        if (response == 0xFF)
+        if (send_cmd(CMD_SEND_OP_COND, 0, NULL) == 0xFF)
             mmc_status = MMC_UNTOUCHED;
         else
             mmc_status = MMC_TOUCHED;
@@ -943,18 +911,15 @@ int ata_soft_reset(void)
 
 void ata_enable(bool on)
 {
-    PBCR1 &= ~0x0CF0; /* PB13, PB11 and PB10 become GPIOs, if not modified below */
-    PACR2 &= ~0x4000; /* use PA7 (bridge reset) as GPIO */
+    PBCR1 &= ~0x0CF0;      /* PB13, PB11 and PB10 become GPIO,
+                            * if not modified below */
     if (on)
-    {
-        PBCR1 |= 0x08A0;    /* as SCK1, TxD1, RxD1 */
-        IPRE &= 0x0FFF;     /* disable SCI1 interrupts for the CPU */
-        mmc_enable_int_flash_clock(true);  /* always enabled in SPI mode */
-    }
-    and_b(~0x80, &PADRL); /* assert reset */
-    sleep(HZ/20);
-    or_b(0x80, &PADRL);   /* de-assert reset */
-    sleep(HZ/20);
+        PBCR1 |= 0x08A0;   /* as SCK1, TxD1, RxD1 */
+
+    and_b(~0x80, &PADRL);  /* assert flash reset */
+    sleep(HZ/100);
+    or_b(0x80, &PADRL);    /* de-assert flash reset */
+    sleep(HZ/100);
     card_info[0].initialized = false;
     card_info[1].initialized = false;
 }
@@ -971,35 +936,32 @@ int ata_init(void)
     mutex_lock(&mmc_mutex);
     led(false);
 
-    /* Port setup */
-    PACR1 &= ~0x0F00; /* GPIO function for PA12, /IRQ1 for PA13 */
-    PACR1 |= 0x0400;
-    PADR |= 0x0680;   /* set all the selects + reset high (=inactive) */
-    PAIOR |= 0x1680;  /* make outputs for them and the PA12 clock gate */
-
-    PBDR |= 0x2C00;   /* SCK1, TxD1 and RxD1 high when GPIO  CHECKME: mask */
-    PBIOR |= 0x2000;  /* SCK1 output */
-    PBIOR &= ~0x0C00; /* TxD1, RxD1 input */
-
     last_mmc_status = mmc_detect();
 #ifndef HAVE_MULTIVOLUME
-    if (last_mmc_status)
-    {   /* MMC inserted */
-        current_card = 1;
-    }
-    else
-    {   /* no MMC, use internal memory */
-        current_card = 0;
-    }
+    /* Use MMC if inserted, internal flash otherwise */
+    current_card = last_mmc_status ? 1 : 0;
 #endif
 
-    new_mmc_circuit = ((HW_MASK & MMC_CLOCK_POLARITY) != 0);
-    ata_enable(true);
-    
-    if ( !initialized ) 
+    if (!initialized)
     {
         if (!last_mmc_status)
             mmc_status = MMC_UNTOUCHED;
+
+        /* Port setup */
+        PACR1 &= ~0x0F3C;  /* GPIO function for PA13 (flash busy), PA12
+                            * (clk gate), PA10 (flash CS), PA9 (MMC CS) */
+        PACR2 &= ~0x4000;  /* GPIO for PA7 (flash reset) */
+        PADR  |=  0x0680;  /* set all the selects + reset high (=inactive) */
+        PAIOR |=  0x1680;  /* make outputs for them and the PA12 clock gate */
+
+        PBCR1 &= ~0x0CF0;  /* GPIO function for PB13, PB11 and PB10 */
+        PBDR  |=  0x2C00;  /* SCK1, TxD1 and RxD1 high in GPIO */
+        PBIOR |=  0x2000;  /* SCK1 output */
+        PBIOR &= ~0x0C00;  /* TxD1, RxD1 input */
+
+        IPRE  &=  0x0FFF;  /* disable SCI1 interrupts for the CPU */
+
+        new_mmc_circuit = ((HW_MASK & MMC_CLOCK_POLARITY) != 0);
 
         create_thread(mmc_thread, mmc_stack,
                       sizeof(mmc_stack), 0, mmc_thread_name
@@ -1008,6 +970,7 @@ int ata_init(void)
         tick_add_task(mmc_tick);
         initialized = true;
     }
+    ata_enable(true);
 
     mutex_unlock(&mmc_mutex);
     return rc;
