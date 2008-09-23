@@ -210,37 +210,29 @@ PLUGIN_HEADER
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-// not enough touchfields, so CUBE_QUIT have to be 
-// mapped to a real button
-//ifndef CUBE_QUIT
-//#define CUBE_QUIT          BUTTON_TOPLEFT
-//#endif
-#ifndef CUBE_X_INC
-#define CUBE_X_INC         BUTTON_MIDRIGHT
+#ifndef CUBE_QUIT
+#define CUBE_QUIT          BUTTON_TOPLEFT
 #endif
-#ifndef CUBE_X_DEC
-#define CUBE_X_DEC         BUTTON_MIDLEFT
+#ifndef CUBE_NEXT
+#define CUBE_NEXT          BUTTON_MIDRIGHT
 #endif
-#ifndef CUBE_Y_INC
-#define CUBE_Y_INC         BUTTON_TOPMIDDLE
+#ifndef CUBE_PREV
+#define CUBE_PREV          BUTTON_MIDLEFT
 #endif
-#ifndef CUBE_Y_DEC
-#define CUBE_Y_DEC         BUTTON_BOTTOMMIDDLE
+#ifndef CUBE_INC
+#define CUBE_INC           BUTTON_TOPMIDDLE
 #endif
-#ifndef CUBE_Z_INC
-#define CUBE_Z_INC         BUTTON_BOTTOMRIGHT
-#endif
-#ifndef CUBE_Z_DEC
-#define CUBE_Z_DEC         BUTTON_BOTTOMLEFT
+#ifndef CUBE_DEC
+#define CUBE_DEC           BUTTON_BOTTOMMIDDLE
 #endif
 #ifndef CUBE_MODE
 #define CUBE_MODE          BUTTON_TOPRIGHT
 #endif
 #ifndef CUBE_PAUSE
-#define CUBE_PAUSE        (BUTTON_CENTER | BUTTON_REL)
+#define CUBE_PAUSE         BUTTON_CENTER
 #endif
 #ifndef CUBE_HIGHSPEED
-#define CUBE_HIGHSPEED     BUTTON_TOPLEFT
+#define CUBE_HIGHSPEED     BUTTON_BOTTOMRIGHT
 #endif
 #endif
 
