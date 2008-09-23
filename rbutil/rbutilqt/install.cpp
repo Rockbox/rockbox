@@ -93,7 +93,7 @@ void Install::accept()
     if(ui.radioStable->isChecked()) {
         file = QString("%1/rockbox-%2-%3.zip")
                 .arg(settings->downloadUrl(),
-                    settings->lastRelease(), buildname);
+                    buildname, settings->lastRelease());
         fileName = QString("rockbox-%1-%2.zip")
                    .arg(settings->lastRelease(), buildname);
         settings->setBuild("stable");
