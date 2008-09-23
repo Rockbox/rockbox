@@ -26,8 +26,6 @@
  */
 #include "config.h"
 
-#if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
-
 #include <stdio.h>
 #include <string.h>
 #include "inttypes.h"
@@ -37,9 +35,12 @@
 #include "debug.h"
 #include "panic.h"
 #include "rbunicode.h"
+
+#ifndef BOOTLOADER
 /* Font cache includes */
 #include "font_cache.h"
 #include "lru.h"
+#endif
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -47,6 +48,8 @@
 
 /* compiled-in font */
 extern struct font sysfont;
+
+#ifndef BOOTLOADER
 
 /* structure filled in by font_load */
 static struct font font_ui;
@@ -378,27 +381,6 @@ struct font* font_get(int font)
             panicf("No font!");
     }
 }
-/*
- * Returns the stringsize of a given string. 
- */
-int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
-{
-    struct font* pf = font_get(fontnumber);
-    unsigned short ch;
-    int width = 0;
-
-    for (str = utf8decode(str, &ch); ch != 0 ; str = utf8decode(str, &ch))
-    {
-
-        /* get proportional width and glyph bits*/
-        width += font_get_width(pf,ch);
-    }
-    if ( w )
-        *w = width;
-    if ( h )
-        *h = pf->height;
-    return width;
-}
 
 /*
  * Reads an entry into cache entry
@@ -565,8 +547,73 @@ static void glyph_cache_load(void)
     }
     return;
 }
+#else /* BOOTLOADER */
 
-#endif /* HAVE_LCD_BITMAP */
+void font_init(void)
+{
+}
+
+/*
+ * Bootloader only supports the built-in sysfont.
+ */
+struct font* font_get(int font)
+{
+    (void)font;
+	return &sysfont;
+}
+
+/*
+ * Returns width of character
+ */
+int font_get_width(struct font* pf, unsigned short char_code)
+{
+    /* check input range*/
+    if (char_code < pf->firstchar || char_code >= pf->firstchar+pf->size)
+        char_code = pf->defaultchar;
+    char_code -= pf->firstchar;
+
+    return pf->width? pf->width[char_code]: pf->maxwidth;
+}
+ 
+const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
+{
+    const unsigned char* bits;
+
+    /* check input range*/
+    if (char_code < pf->firstchar || char_code >= pf->firstchar+pf->size)
+        char_code = pf->defaultchar;
+    char_code -= pf->firstchar;
+
+    bits = pf->bits + (pf->offset?
+            pf->offset[char_code]:
+            (((pf->height + 7) / 8) * pf->maxwidth * char_code));
+        
+    return bits;
+}
+
+#endif /* BOOTLOADER */
+
+/*
+ * Returns the stringsize of a given string. 
+ */
+int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
+{
+    struct font* pf = font_get(fontnumber);
+    unsigned short ch;
+    int width = 0;
+
+    for (str = utf8decode(str, &ch); ch != 0 ; str = utf8decode(str, &ch))
+    {
+
+        /* get proportional width and glyph bits*/
+        width += font_get_width(pf,ch);
+    }
+    if ( w )
+        *w = width;
+    if ( h )
+        *h = pf->height;
+    return width;
+}
 
 /* -----------------------------------------------------------------
  * vim: et sw=4 ts=8 sts=4 tw=78
