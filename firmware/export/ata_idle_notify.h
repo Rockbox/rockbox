@@ -44,7 +44,8 @@ enum {
 };
 
 #define USING_ATA_CALLBACK  !defined(SIMULATOR)             \
-                            && !defined(HAVE_FLASH_DISK)
+                            && !defined(HAVE_FLASH_DISK)    \
+                            && !defined(BOOTLOADER)
 
 typedef bool (*ata_idle_notify)(void);
 
