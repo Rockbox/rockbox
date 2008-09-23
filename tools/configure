@@ -673,31 +673,31 @@ if [ "1" != `parse_args --target` ]; then
 else
   echo "Enter target platform:"
 cat <<EOF
- ==Archos==            ==iriver==             ==Apple iPod==
-  0) Player/Studio     10) H120/H140          20) Color/Photo
-  1) Recorder          11) H320/H340          21) Nano
-  2) FM Recorder       12) iHP-100/110/115    22) Video
-  3) Recorder v2       13) iFP-790            23) 3G
-  4) Ondio SP          14) H10 20Gb           24) 4G Grayscale
-  5) Ondio FM          15) H10 5/6Gb          25) Mini 1G
-  6) AV300                                    26) Mini 2G
-                                              27) 1G, 2G
+ ==Archos==               ==iriver==             ==Apple iPod==
+  0) Player/Studio        10) H120/H140          20) Color/Photo
+  1) Recorder             11) H320/H340          21) Nano
+  2) FM Recorder          12) iHP-100/110/115    22) Video
+  3) Recorder v2          13) iFP-790            23) 3G
+  4) Ondio SP             14) H10 20Gb           24) 4G Grayscale
+  5) Ondio FM             15) H10 5/6Gb          25) Mini 1G
+  6) AV300                                       26) Mini 2G
+                                                 27) 1G, 2G
+ 
+==iAudio==               ==Toshiba==            ==SanDisk==
+ 30) X5/X5V/X5L           40) Gigabeat F         50) Sansa e200
+ 31) M5/M5L               41) Gigabeat S         51) Sansa e200R
+ 32) 7                                           52) Sansa c200
+ 33) Cowon D2                                    53) Sansa m200
+ 34) M3/M3L                                      54) Sansa c100
 
- ==iAudio==            ==Toshiba==            ==SanDisk==
- 30) X5/X5V/X5L        40) Gigabeat F         50) Sansa e200
- 31) M5/M5L            41) Gigabeat S         51) Sansa e200R
- 32) 7                                        52) Sansa c200
- 33) Cowon D2                                 53) Sansa m200
- 34) M3/M3L                                   54) Sansa c100
-
- ==Tatung==            ==Olympus==            ==Logik==
- 60) Elio TPJ-1022     70) M:Robe 500         80) DAX 1GB MP3/DAB
-                       71) M:Robe 100
-
- ==Creative==          ==Philips==            ==Meizu==
- 90) Zen Vision:M 30GB 100) GoGear SA9200     110) M6SL
- 91) Zen Vision:M 60GB 101) GoGear HDD1630    111) M6SP
- 92) Zen Vision                               112) M3
+ ==Tatung==               ==Olympus==            ==Logik==
+ 60) Elio TPJ-1022        70) M:Robe 500         80) DAX 1GB MP3/DAB
+                          71) M:Robe 100
+ 
+==Creative==              ==Philips==            ==Meizu==
+ 90) Zen Vision:M 30GB    100) GoGear SA9200     110) M6SL
+ 91) Zen Vision:M 60GB    101) GoGear HDD1630    111) M6SP
+ 92) Zen Vision                                  112) M3
  
  ==Onda==
  120) VX747
