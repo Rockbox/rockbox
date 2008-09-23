@@ -203,9 +203,9 @@ static const unsigned char * const mad_synth_thread_name = "mp3dec";
 static struct thread_entry *mad_synth_thread_p;
 
 
-static void mad_synth_thread(void){
-
-    while(1){
+static void mad_synth_thread(void)
+{
+    while(1) {
         ci->semaphore_release(&synth_done_sem);
         ci->semaphore_wait(&synth_pending_sem);
         
@@ -218,19 +218,22 @@ static void mad_synth_thread(void){
 
 /* wait for the synth thread to go idle which indicates a PCM frame has been
  * synthesized */
-static inline void mad_synth_thread_wait_pcm(void){
+static inline void mad_synth_thread_wait_pcm(void)
+{
     ci->semaphore_wait(&synth_done_sem);
 }
 
 /* increment the done semaphore - used after a wait for idle to preserve the
  * semaphore count */
-static inline void mad_synth_thread_unwait_pcm(void){
+static inline void mad_synth_thread_unwait_pcm(void)
+{
     ci->semaphore_release(&synth_done_sem);
 }
 
 /* after synth thread has gone idle - switch decoded frames and commence
  * synthesis on it */
-static void mad_synth_thread_ready(void){
+static void mad_synth_thread_ready(void)
+{
     mad_fixed_t (*temp)[2][36][32];
 
     /*circular buffer that holds 2 frames' samples*/
@@ -241,7 +244,8 @@ static void mad_synth_thread_ready(void){
     ci->semaphore_release(&synth_pending_sem);
 }
 
-static bool mad_synth_thread_create(void){
+static bool mad_synth_thread_create(void)
+{
     ci->semaphore_init(&synth_done_sem, 1, 0);
     ci->semaphore_init(&synth_pending_sem, 1, 0);
        
@@ -258,7 +262,8 @@ static bool mad_synth_thread_create(void){
     return true;
 }
 
-static void mad_synth_thread_quit(void){
+static void mad_synth_thread_quit(void)
+{
     /*mop up COP thread*/
     die=1;
     ci->semaphore_release(&synth_pending_sem);
@@ -266,19 +271,28 @@ static void mad_synth_thread_quit(void){
     invalidate_icache();
 }
 #else
-static inline void mad_synth_thread_ready(void){
+static inline void mad_synth_thread_ready(void)
+{
 	 mad_synth_frame(&synth, &frame);
 }
-static inline bool mad_synth_thread_create(void){
+
+static inline bool mad_synth_thread_create(void)
+{
 	return true;
 }
-static inline void mad_synth_thread_quit(void){
+
+static inline void mad_synth_thread_quit(void)
+{
 }
-static inline void mad_synth_thread_wait_pcm(void){
+
+static inline void mad_synth_thread_wait_pcm(void)
+{
 }
-static inline void mad_synth_thread_unwait_pcm(void){
+
+static inline void mad_synth_thread_unwait_pcm(void)
+{
 }
-#endif
+#endif /* MPA_SYNTH_ON_COP */
 
 /* this is the codec entry point */
 enum codec_status codec_main(void)
