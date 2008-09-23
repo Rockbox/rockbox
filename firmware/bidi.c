@@ -43,6 +43,7 @@
 #define _isnewline(c) ((c=='\n' || c=='\r') ? 1 : 0)
 #define XOR(a,b) ((a||b) && !(a&&b))
 
+#ifndef BOOTLOADER
 static const arab_t * arab_lookup(unsigned short uchar)
 {
     if (uchar >= 0x621 && uchar <= 0x63a)
@@ -132,14 +133,18 @@ static void arabjoin(unsigned short * stringprt, int length)
         }
     }
 }
+#endif /* !BOOTLOADER */
 
 unsigned short *bidi_l2v(const unsigned char *str, int orientation)
 {
-    int length = utf8length(str);
     static unsigned short  utf16_buf[SCROLL_LINE_SIZE];
+    unsigned short *target, *tmp;
+#ifndef BOOTLOADER
     static unsigned short  bidi_buf[SCROLL_LINE_SIZE];
-    unsigned short *heb_str, *target, *tmp; /* *broken_str */
+    unsigned short *heb_str; /* *broken_str */
     int block_start, block_end, block_type, block_length, i;
+    int length = utf8length(str);
+#endif
     /*
     long max_chars=0;
     int begin, end, char_count, orig_begin;
@@ -151,6 +156,11 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
         str = utf8decode(str, target++);
     *target = 0;
 
+#ifdef BOOTLOADER
+    (void)orientation;
+    return utf16_buf;
+	
+#else /* !BOOTLOADER */
     if (target == utf16_buf) /* empty string */
         return target;
 
@@ -282,5 +292,6 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
     return broken_str;
 #endif
     return heb_str;
+#endif /* !BOOTLOADER */
 }
 
