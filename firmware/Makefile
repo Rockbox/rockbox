@@ -12,6 +12,13 @@ INCLUDES=$(TARGET_INC) -Iinclude -I$(FIRMDIR) -Iexport -Icommon -Idrivers -I$(BU
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET) $(BUILDDATE) $(EXTRA_DEFINES) \
  -DMEM=${MEMORYSIZE}
 
+# Limits for the built-in sysfont: ASCII for bootloaders, ISO8859-1 for normal builds
+ifneq (,$(findstring -DBOOTLOADER,$(EXTRA_DEFINES)))
+	MAXCHAR = 127
+else
+	MAXCHAR = 255
+endif
+
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
 
@@ -43,10 +50,10 @@ $(OBJDIR)/thread.o: thread.c export/thread.h
 	$(call PRINTS,CC thread.c)$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
 
 $(BUILDDIR)/sysfont.h: ../fonts/08-Schumacher-Clean.bdf
-	$(call PRINTS,Create sysfont.h)$(TOOLSDIR)/convbdf -l 255 -h -o $@ $<
+	$(call PRINTS,Create sysfont.h)$(TOOLSDIR)/convbdf -l $(MAXCHAR) -h -o $@ $<
 
 $(OBJDIR)/sysfont.o: ../fonts/08-Schumacher-Clean.bdf
-	$(call PRINTS,CONVBDF)$(TOOLSDIR)/convbdf -l 255 -c -o $(OBJDIR)/sysfont.c $<
+	$(call PRINTS,CONVBDF)$(TOOLSDIR)/convbdf -l $(MAXCHAR) -c -o $(OBJDIR)/sysfont.c $<
 	$(call PRINTS,CC sysfont.c)$(CC) $(CFLAGS) -c $(OBJDIR)/sysfont.c -o $@
 
 -include $(DEPFILE)

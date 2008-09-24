@@ -48,13 +48,11 @@
 #include "logf.h"
 
 /* Conditions under which we want the entire driver */
-#if !defined(BOOTLOADER) || \
+#if !defined(BOOTLOADER) || (CONFIG_CPU == SH7034) || \
      (defined(TOSHIBA_GIGABEAT_S) && defined(USE_ROCKBOX_USB) && defined(USB_STORAGE)) || \
      (defined(CREATIVE_ZVx) && defined(HAVE_USBSTACK))
 #define USB_FULL_INIT
 #endif
-
-extern void dbg_ports(void); /* NASTY! defined in apps/ */
 
 #ifdef HAVE_LCD_BITMAP
 bool do_screendump_instead_of_usb = false;
@@ -122,18 +120,7 @@ static void usb_slave_mode(bool on)
 
         rc = ata_init();
         if(rc)
-        {
-            /* fixme: can we remove this? (already such in main.c) */
-            char str[32];
-            lcd_clear_display();
-            snprintf(str, 31, "ATA error: %d", rc);
-            lcd_puts(0, 0, str);
-            lcd_puts(0, 1, "Press ON to debug");
-            lcd_update();
-            while(!(button_get(true) & BUTTON_REL)) {};
-            dbg_ports();
             panicf("ata: %d",rc);
-        }
     
         rc = disk_mount_all();
         if (rc <= 0) /* no partition */
