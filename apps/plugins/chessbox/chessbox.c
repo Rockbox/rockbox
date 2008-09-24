@@ -257,7 +257,7 @@ void cb_levelup ( void ) {
         cb_setlevel ( 1 );
     else
         cb_setlevel ( Level+1 );
-    rb->splash ( 50 , level_string[Level-1] );
+    rb->splash ( HZ/2 , level_string[Level-1] );
 };
 
 /* ---- Save current position ---- */
@@ -452,7 +452,7 @@ void cb_start_viewer(char* filename){
 
     first_game = pgn_list_games(rb, filename);
     if (first_game == NULL){
-        rb->splash ( 200 , "No games found !" );
+        rb->splash ( HZ*2 , "No games found !" );
         return;
     }
 
@@ -482,7 +482,7 @@ void cb_start_viewer(char* filename){
                         if (curr_ply->prev_node != NULL){
                             curr_ply = curr_ply->prev_node;
                         } else {
-                            rb->splash ( 200 , "At the begining of the game" );
+                            rb->splash ( HZ*2 , "At the begining of the game" );
                             break;
                         }
                         board[locn[curr_ply->row_from][curr_ply->column_from]] 
@@ -528,7 +528,7 @@ void cb_start_viewer(char* filename){
                     case COMMAND_NEXT:
                         /* apply the current move */
                         if (curr_ply->player == neutral){
-                            rb->splash ( 200 , "At the end of the game" );
+                            rb->splash ( HZ*2 , "At the end of the game" );
                             break;
                         }
                         board[locn[curr_ply->row_to][curr_ply->column_to]]
@@ -580,7 +580,7 @@ void cb_start_viewer(char* filename){
                 }
             } while (!exit_game && !exit_viewer);
         } else {
-            rb->splash ( 200 , "Error parsing game !");
+            rb->splash ( HZ*2 , "Error parsing game !");
         }
     } while (!exit_viewer);
 }
@@ -781,7 +781,7 @@ void cb_play_game(void) {
 
     while (!exit) {
         if ( mate ) {
-            rb->splash ( 500 , "Checkmate!" );
+            rb->splash ( HZ*3 , "Checkmate!" );
             rb->button_get(true);
             pgn_store_game(rb, game);
             GNUChess_Initialize();
@@ -792,7 +792,7 @@ void cb_play_game(void) {
         switch (command.type) {
             case COMMAND_MOVE:
                 if ( ! VerifyMove (opponent, command.mv_s , 0 , &command.mv, move_buffer ) ) {
-                    rb->splash ( 50 , "Illegal move!" );
+                    rb->splash ( HZ/2 , "Illegal move!" );
                     cb_drawboard();
                 } else {
                     cb_drawboard();
