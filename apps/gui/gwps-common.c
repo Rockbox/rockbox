@@ -771,10 +771,10 @@ static char* get_dir(char* buf, int buf_size, const char* path, int level)
    and the original value of *intval, inclusive).
    When not treating a conditional/enum, intval should be NULL.
 */
-static char *get_token_value(struct gui_wps *gwps,
-                             struct wps_token *token,
-                             char *buf, int buf_size,
-                             int *intval)
+static const char *get_token_value(struct gui_wps *gwps,
+                                   struct wps_token *token,
+                                   char *buf, int buf_size,
+                                   int *intval)
 {
     if (!gwps)
         return NULL;
@@ -978,8 +978,7 @@ static char *get_token_value(struct gui_wps *gwps,
 
         case WPS_TOKEN_ALBUMART_FOUND:
             if (audio_current_aa_hid() >= 0) {
-                snprintf(buf, buf_size, "C");
-                return buf;
+                return "C";
             }
             return NULL;
 #endif
@@ -988,7 +987,7 @@ static char *get_token_value(struct gui_wps *gwps,
             if(id3->bitrate)
                 snprintf(buf, buf_size, "%d", id3->bitrate);
             else
-                snprintf(buf, buf_size, "?");
+                return "?";
             return buf;
 
         case WPS_TOKEN_FILE_CODEC:
@@ -1080,7 +1079,7 @@ static char *get_token_value(struct gui_wps *gwps,
             if (t >= 0)
                 snprintf(buf, buf_size, "%dh %dm", t / 60, t % 60);
             else
-                strncpy(buf, "?h ?m", buf_size);
+                return "?h ?m";
             return buf;
         }
 
@@ -1208,23 +1207,19 @@ static char *get_token_value(struct gui_wps *gwps,
 
         case WPS_TOKEN_RTC_AM_PM_UPPER:
             /* p: upper case AM or PM indicator */
-            snprintf(buf, buf_size, (tm->tm_hour/12 == 0) ? "AM" : "PM");
-            return buf;
+            return tm->tm_hour/12 == 0 ? "AM" : "PM";
 
         case WPS_TOKEN_RTC_AM_PM_LOWER:
             /* P: lower case am or pm indicator */
-            snprintf(buf, buf_size, (tm->tm_hour/12 == 0) ? "am" : "pm");
-            return buf;
+            return tm->tm_hour/12 == 0 ? "am" : "pm";
 
         case WPS_TOKEN_RTC_WEEKDAY_NAME:
             /* a: abbreviated weekday name (Sun..Sat) */
-            snprintf(buf, buf_size, "%s",str(LANG_WEEKDAY_SUNDAY + tm->tm_wday));
-            return buf;
+            return str(LANG_WEEKDAY_SUNDAY + tm->tm_wday);
 
         case WPS_TOKEN_RTC_MONTH_NAME:
             /* b: abbreviated month name (Jan..Dec) */
-            snprintf(buf, buf_size, "%s",str(LANG_MONTH_JANUARY + tm->tm_mon));
-            return buf;
+            return str(LANG_MONTH_JANUARY + tm->tm_mon);
 
         case WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON:
             /* u: day of week (1..7); 1 is Monday */
@@ -1252,19 +1247,15 @@ static char *get_token_value(struct gui_wps *gwps,
         case WPS_TOKEN_RTC_AM_PM_UPPER:
         case WPS_TOKEN_RTC_AM_PM_LOWER:
         case WPS_TOKEN_RTC_YEAR_2_DIGITS:
-            strncpy(buf, "--", buf_size);
-            return buf;
+            return "--";
         case WPS_TOKEN_RTC_YEAR_4_DIGITS:
-            strncpy(buf, "----", buf_size);
-            return buf;
+            return "----";
         case WPS_TOKEN_RTC_WEEKDAY_NAME:
         case WPS_TOKEN_RTC_MONTH_NAME:
-            strncpy(buf, "---", buf_size);
-            return buf;
+            return "---";
         case WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON:
         case WPS_TOKEN_RTC_DAY_OF_WEEK_START_SUN:
-            strncpy(buf, "-", buf_size);
-            return buf;
+            return "-";
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -1280,12 +1271,12 @@ static char *get_token_value(struct gui_wps *gwps,
             {
                 /* we need 11 characters (full line) for
                     progress-bar */
-                snprintf(buf, buf_size, "           ");
+                strncpy(buf, "           ", buf_size);
             }
             else
             {
                 /* Tell the user if we have an OldPlayer */
-                snprintf(buf, buf_size, " <Old LCD> ");
+                strncpy(buf, " <Old LCD> ", buf_size);
             }
             return buf;
 #endif
@@ -1428,7 +1419,8 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
 
     int i, cond_end;
     int cond_index = *token_index;
-    char result[128], *value;
+    char result[128];
+    const char *value;
     unsigned char num_options = data->tokens[cond_index].value.i & 0xFF;
     unsigned char prev_val = (data->tokens[cond_index].value.i & 0xFF00) >> 8;
 
@@ -1598,7 +1590,7 @@ static bool get_line(struct gui_wps *gwps,
             default:
             {
                 /* get the value of the tag and copy it to the buffer */
-                char *value = get_token_value(gwps, &data->tokens[i],
+                const char *value = get_token_value(gwps, &data->tokens[i],
                                               temp_buf, sizeof(temp_buf), NULL);
                 if (value)
                 {

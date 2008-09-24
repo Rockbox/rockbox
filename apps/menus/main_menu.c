@@ -204,7 +204,7 @@ static char* info_getname(int selected_item, void *data,
             }
             else
             {
-                snprintf(buffer, buffer_len, "%s", "--:--:--");
+                strncpy(buffer, "--:--:--", buffer_len);
             }
             break;
         case INFO_DATE:
@@ -218,7 +218,7 @@ static char* info_getname(int selected_item, void *data,
             }
             else
             {
-                snprintf(buffer, buffer_len, "%s", str(LANG_UNKNOWN));
+                strncpy(buffer, str(LANG_UNKNOWN), buffer_len);
             }
             break;
 #endif
@@ -492,7 +492,7 @@ static void sleep_timer_formatter(char* buffer, size_t buffer_size, int value,
         minutes = value - (hours * 60);
         snprintf(buffer, buffer_size, "%d:%02d", hours, minutes);
    } else {
-        snprintf(buffer, buffer_size, "%s", str(LANG_OFF));
+        strncpy(buffer, str(LANG_OFF), buffer_size);
     }
 }
 

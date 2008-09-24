@@ -272,8 +272,7 @@ static char *list_get_name_cb(int selected_item,
     struct cuesheet *cue = (struct cuesheet *)data;
 
     if (selected_item & 1)
-        snprintf(buffer, buffer_len, "%s",
-                 cue->tracks[selected_item/2].title);
+        strncpy(buffer, cue->tracks[selected_item/2].title, buffer_len);
     else
         snprintf(buffer, buffer_len, "%02d. %s", selected_item/2+1,
                  cue->tracks[selected_item/2].performer);

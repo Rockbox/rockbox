@@ -1067,7 +1067,7 @@ static void set_option_formatter(char* buf, size_t size, int item, const char* u
 {
     (void)unit;
     const unsigned char *text = set_option_options[item].string;
-    snprintf(buf, size, "%s", P2STR(text));
+    strncpy(buf, P2STR(text), size);
 }
 static int32_t set_option_get_talk_id(int value, int unit)
 {

@@ -1894,8 +1894,8 @@ void playlist_init(void)
     struct playlist_info* playlist = &current_playlist;
 
     playlist->current = true;
-    snprintf(playlist->control_filename, sizeof(playlist->control_filename),
-        "%s", PLAYLIST_CONTROL_FILE);
+    strncpy(playlist->control_filename, PLAYLIST_CONTROL_FILE,
+            sizeof(playlist->control_filename));
     playlist->fd = -1;
     playlist->control_fd = -1;
     playlist->max_playlist_size = global_settings.max_files_in_playlist;
@@ -3230,7 +3230,7 @@ char *playlist_name(const struct playlist_info* playlist, char *buf,
     if (!playlist)
         playlist = &current_playlist;
 
-    snprintf(buf, buf_size, "%s", playlist->filename+playlist->dirlen);
+    strncpy(buf, playlist->filename+playlist->dirlen, buf_size);
   
     if (!buf[0])
         return NULL;
@@ -3250,7 +3250,7 @@ char *playlist_get_name(const struct playlist_info* playlist, char *buf,
     if (!playlist)
         playlist = &current_playlist;
 
-    snprintf(buf, buf_size, "%s", playlist->filename);
+    strncpy(buf, playlist->filename, buf_size);
 
     if (!buf[0])
         return NULL;

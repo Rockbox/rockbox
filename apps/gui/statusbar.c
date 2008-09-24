@@ -741,15 +741,15 @@ static void gui_statusbar_icon_recording_info(struct screen * display)
     if (global_settings.rec_source == AUDIO_SRC_SPDIF)
     {
         /* Can't measure S/PDIF sample rate on Archos/Sim yet */
-        snprintf(buffer, sizeof(buffer), "--");
+        strncpy(buffer, "--", sizeof(buffer));
     }
     else
 #endif /* HAVE_SPDIF_IN */
     {
         static char const * const freq_strings[12] =
         { "44", "48", "32", "22", "24", "16" };
-        snprintf(buffer, sizeof(buffer), "%s",
-                 freq_strings[global_settings.rec_frequency]);
+        strncpy(buffer, freq_strings[global_settings.rec_frequency],
+                sizeof(buffer));
     }
 
     display->getstringsize(buffer, &width, &height);
