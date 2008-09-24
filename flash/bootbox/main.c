@@ -55,14 +55,12 @@ void usb_screen(void)
     }
 }
 
-int show_logo(void)
+void show_logo(void)
 {
     lcd_clear_display();
     lcd_puts(0, 0, "Rockbox");
     lcd_puts(0, 1, "Rescue boot");
     lcd_update();
-
-    return 0;
 }
 
 #if CONFIG_CHARGING
@@ -190,7 +188,6 @@ void main(void)
         panicf("ata: %d", rc);
     }
 
-    //disk_init();
     usb_start_monitoring();
     while (usb_detect() == USB_INSERTED)
     {   /* enter USB mode early, before trying to mount */
@@ -219,15 +216,6 @@ void main(void)
 /* These functions are present in the firmware library, but we reimplement
    them here because the originals do a lot more than we want */
 
-void screen_dump(void)
-{
-}
-
-int dbg_ports(void)
-{
-   return 0;
-}
-
 void audio_stop(void)
 {
 }
@@ -244,12 +232,3 @@ void audio_stop_recording(void)
 void mp3_shutdown(void)
 {
 }
-/*
-void i2c_init(void)
-{
-}
-
-void backlight_on(void)
-{
-}
-*/
