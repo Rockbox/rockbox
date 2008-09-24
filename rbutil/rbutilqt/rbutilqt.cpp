@@ -467,7 +467,7 @@ void RbUtilQt::installBtn()
 bool RbUtilQt::installAuto()
 {
     QString file = QString("%1%2/rockbox.zip")
-            .arg(settings->bleedingUrl(), settings->curPlatform());
+            .arg(settings->bleedingUrl(), settings->curPlatformName());
 
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
