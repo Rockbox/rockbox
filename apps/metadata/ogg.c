@@ -104,6 +104,8 @@ bool get_ogg_metadata(int fd, struct mp3entry* id3)
     }
     else
     {
+        /* Unsupported format, try to print the marker, catches Ogg/FLAC at least */
+        DEBUGF("Usupported format in Ogg stream: %16s\n", &buf[28]);
         return false;
     }
 
