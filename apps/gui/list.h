@@ -206,7 +206,9 @@ struct simplelist_info {
     bool hide_selection;
     bool scroll_all;
     int  timeout;
-    int  start_selection; /* the item to select when the list is first displayed */
+    int  selection; /* the item to select when the list is first displayed */
+                    /* when the list is exited, this will be set to the
+                       index of the last item selected */
     int (*action_callback)(int action, struct gui_synclist *lists); /* can be NULL */
         /* action_callback notes:
             action == the action pressed by the user 
@@ -244,7 +246,7 @@ void simplelist_addline(int line_number, const char *fmt, ...);
     info.get_name = NULL;
     info.get_voice = NULL;
     info.timeout = HZ/10;
-    info.start_selection = 0;
+    info.selection = 0;
 */
 void simplelist_info_init(struct simplelist_info *info, char* title,
                           int count, void* data);

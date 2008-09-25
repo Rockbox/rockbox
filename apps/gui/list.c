@@ -876,7 +876,7 @@ bool simplelist_show_list(struct simplelist_info *info)
     else
         gui_synclist_set_nb_items(&lists, info->count*info->selection_size);
     
-    gui_synclist_select_item(&lists, info->start_selection);
+    gui_synclist_select_item(&lists, info->selection);
     
     gui_synclist_draw(&lists);
     gui_synclist_speak_item(&lists);
@@ -910,6 +910,7 @@ bool simplelist_show_list(struct simplelist_info *info)
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
             return true;
     }
+    info->selection = gui_synclist_get_sel_pos(&lists);
     talk_shutup();
     return false;
 }
@@ -923,7 +924,7 @@ void simplelist_info_init(struct simplelist_info *info, char* title,
     info->hide_selection = false;
     info->scroll_all = false;
     info->timeout = HZ/10;
-    info->start_selection = 0;
+    info->selection = 0;
     info->action_callback = NULL;
     info->get_icon = NULL;
     info->get_name = NULL;
