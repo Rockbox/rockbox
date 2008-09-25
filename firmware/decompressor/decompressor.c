@@ -36,8 +36,8 @@ extern char loadaddress[], dramend[];
 extern void start(void);
 
 void main(void) ICODE_ATTR;
-int ucl_nrv2e_decompress_8(const unsigned char *src, unsigned char *dst,
-                           unsigned long *dst_len) ICODE_ATTR;
+static int ucl_nrv2e_decompress_8(const unsigned char *src, unsigned char *dst,
+                                  unsigned long *dst_len) ICODE_ATTR;
 
 /* Vector table */
 void (*vbr[]) (void) __attribute__ ((section (".vectors"))) =
@@ -55,8 +55,8 @@ void (*vbr[]) (void) __attribute__ ((section (".vectors"))) =
 #define GETBIT(bb, src, ilen) \
     (((bb = bb & 0x7f ? bb*2 : ((unsigned)src[ilen++]*2+1)) >> 8) & 1)
 
-int ucl_nrv2e_decompress_8(const unsigned char *src, unsigned char *dst,
-                           unsigned long *dst_len)
+static int ucl_nrv2e_decompress_8(const unsigned char *src, unsigned char *dst,
+                                  unsigned long *dst_len)
 {
     unsigned long bb = 0;
     unsigned ilen = 0, olen = 0, last_m_off = 1;
