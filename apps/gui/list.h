@@ -208,7 +208,8 @@ struct simplelist_info {
     int  timeout;
     int  selection; /* the item to select when the list is first displayed */
                     /* when the list is exited, this will be set to the
-                       index of the last item selected */
+                       index of the last item selected, or -1 if the list
+                       was exited with ACTION_STD_CANCEL                  */
     int (*action_callback)(int action, struct gui_synclist *lists); /* can be NULL */
         /* action_callback notes:
             action == the action pressed by the user 

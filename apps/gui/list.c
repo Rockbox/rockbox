@@ -893,12 +893,22 @@ bool simplelist_show_list(struct simplelist_info *info)
 
         if (info->action_callback)
         {
+            bool stdok = action==ACTION_STD_OK;
             action = info->action_callback(action, &lists);
+            if (stdok && action == ACTION_STD_CANCEL) /* callback asked us to exit */
+            {
+                info->selection = gui_synclist_get_sel_pos(&lists);
+                break;
+            }
+                
             if (info->get_name == NULL)
                 gui_synclist_set_nb_items(&lists, simplelist_line_count*info->selection_size);
         }
         if (action == ACTION_STD_CANCEL)
+        {
+            info->selection = -1;
             break;
+        }
         else if ((action == ACTION_REDRAW) ||
                  (old_line_count != simplelist_line_count))
         {
@@ -910,7 +920,6 @@ bool simplelist_show_list(struct simplelist_info *info)
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
             return true;
     }
-    info->selection = gui_synclist_get_sel_pos(&lists);
     talk_shutup();
     return false;
 }
