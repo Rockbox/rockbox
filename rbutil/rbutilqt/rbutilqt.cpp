@@ -348,7 +348,9 @@ void RbUtilQt::completeInstall()
 {
     if(chkConfig(true)) return;
     if(QMessageBox::question(this, tr("Confirm Installation"),
-           tr("Do you really want to make a complete Installation?"),
+           tr("Do you really want to make a complete Installation? "
+              "This will install the latest build available, not the latest "
+              "released version."),
               QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
 
     // create logger
@@ -400,7 +402,9 @@ void RbUtilQt::smallInstall()
 {
     if(chkConfig(true)) return;
     if(QMessageBox::question(this, tr("Confirm Installation"),
-           tr("Do you really want to make a small Installation?"),
+           tr("Do you really want to make a small Installation? "
+              "This will install the latest build available, not the latest "
+              "released version."),
               QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
 
     // create logger
