@@ -64,12 +64,23 @@ bool ide_powered(void)
 
 void power_off(void)
 {
+    int(*reboot_point)(void);
+    reboot_point=(void*)(unsigned char*) 0x00000000;
     /* turn off backlight and wait for 1 second */
     _backlight_off();
     _buttonlight_off();
     sleep(HZ);
-    /* set SLEEP bit to on in CLKCON to turn off */
+
+    /* Rockbox never properly shutdown the player.  When the sleep bit is set
+     * the player actually wakes up in some type of "zombie" state 
+     * because the shutdown routine is not set up properly.  So far the
+     * shutdown routines tried leave the player consuming excess power
+     * so we rely on the OF to shut everything down instead. (mmu apears to be
+     * reset when the sleep bit is set)
+     */  
     CLKCON |=(1<<3);
+
+    reboot_point();
 }
 
 #else /* SIMULATOR */
