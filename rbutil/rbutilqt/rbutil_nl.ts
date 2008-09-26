@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="nl">
+<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstaller</name>
     <message>
@@ -1324,149 +1325,149 @@ Wilt u verdergaan ?</translation>
         <translation>&lt;a href=&apos;%1&apos;&gt;Handboek overzicht&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="738"/>
+        <location filename="rbutilqt.cpp" line="742"/>
         <source>Confirm Installation</source>
         <translation>Bevestig Installatie</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="351"/>
         <source>Do you really want to make a complete Installation?</source>
-        <translation>Wilt u zeker een complete installatie doen?</translation>
+        <translation type="obsolete">Wilt u zeker een complete installatie doen?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="907"/>
+        <location filename="rbutilqt.cpp" line="911"/>
         <source>Mount point is wrong!</source>
         <translation>Mount punt is verkeerd!</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="403"/>
         <source>Do you really want to make a small Installation?</source>
-        <translation>Wilt u zeker een kleine installatie doen?</translation>
+        <translation type="obsolete">Wilt u zeker een kleine installatie doen?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="574"/>
+        <location filename="rbutilqt.cpp" line="578"/>
         <source>Do you really want to install the Bootloader?</source>
         <translation>Wilt u zeker de Bootloader installeren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="835"/>
+        <location filename="rbutilqt.cpp" line="839"/>
         <source>Could not get the bootloader info file!</source>
         <translation>Kon het bootloader- info bestand niet vinden!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="608"/>
+        <location filename="rbutilqt.cpp" line="612"/>
         <source>Bootloader Installation</source>
         <translation>Bootloader installatie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="633"/>
+        <location filename="rbutilqt.cpp" line="637"/>
         <source>Original Firmware Path is wrong!</source>
         <translation>Oorspronkelijk Firmware pad is verkeerd!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="646"/>
+        <location filename="rbutilqt.cpp" line="650"/>
         <source>Original Firmware selection Canceled!</source>
         <translation>Oorspronkelijke Firmware selectie afgebroken!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="661"/>
+        <location filename="rbutilqt.cpp" line="665"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>Wilt u zeker het lettertypen pakket installeren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="705"/>
+        <location filename="rbutilqt.cpp" line="709"/>
         <source>Do you really want to install the voice file?</source>
         <translation>Wilt u zeker de spraakbestanden?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="739"/>
+        <location filename="rbutilqt.cpp" line="743"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>Wilt u zeker de spelletjes addon bestanden installeren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="819"/>
+        <location filename="rbutilqt.cpp" line="823"/>
         <source>Confirm Uninstallation</source>
         <translation>Bevestig Deïnstallatie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="820"/>
+        <location filename="rbutilqt.cpp" line="824"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>Wilt u zeker de Bootloader deïnstalleren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="848"/>
+        <location filename="rbutilqt.cpp" line="852"/>
         <source>Confirm download</source>
         <translation>Bevestig download</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="850"/>
+        <location filename="rbutilqt.cpp" line="854"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>Wilt u zeker het handboek downloaden? Dit handboek zal opgeslagen worden in de hoofdmap van uw speler.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="893"/>
+        <location filename="rbutilqt.cpp" line="897"/>
         <source>Confirm installation</source>
         <translation>Bevestig installatie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="895"/>
+        <location filename="rbutilqt.cpp" line="899"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Wilt u zeker Rockbox Utility installeren op uw speler? Na installatie kan u het opstarten vanaf  de harde schijf van uw speler.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="903"/>
+        <location filename="rbutilqt.cpp" line="907"/>
         <source>Installing Rockbox Utility</source>
         <translation>Bezig met installeren van Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="917"/>
+        <location filename="rbutilqt.cpp" line="921"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Fout tijdens installeren van Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="921"/>
+        <location filename="rbutilqt.cpp" line="925"/>
         <source>Installing user configuration</source>
         <translation>Bezig met installeren van gebruikerconfiguratie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="923"/>
+        <location filename="rbutilqt.cpp" line="927"/>
         <source>Error installing user configuration</source>
         <translation>Fout tijdens installeren van gebruikersconfiguratie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="927"/>
+        <location filename="rbutilqt.cpp" line="931"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Rockbox Utility is succesvol geïnstalleerd.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="1018"/>
+        <location filename="rbutilqt.cpp" line="1022"/>
         <source>Configuration error</source>
         <translation>Configuratie fout</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="734"/>
+        <location filename="rbutilqt.cpp" line="738"/>
         <source>Error</source>
         <translation>Fout</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="734"/>
+        <location filename="rbutilqt.cpp" line="738"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>Uw apparaat heeft de Doom plugin niet. Installatie wordt afgebroken.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="1020"/>
+        <location filename="rbutilqt.cpp" line="1024"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Uw configuratie is ongeldig. Gelieve naar het configuratie scherm te gaan en de juiste instellingen te gebruiken.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="610"/>
+        <location filename="rbutilqt.cpp" line="614"/>
         <source>The bootloader is already installed and up to date.
 Do want to replace the current bootloader?</source>
         <translation>De bootloader is alreeds geïnstalleerd en up to date.
 Wilt u de huidige bootloader vervangen?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="614"/>
+        <location filename="rbutilqt.cpp" line="618"/>
         <source>Bootloader installation skipped!</source>
         <translation>Bootloader installatie overgeslagen!</translation>
     </message>
@@ -1476,17 +1477,17 @@ Wilt u de huidige bootloader vervangen?</translation>
         <translation>Dit is een nieuwe installatie van Rockbox Utility, of een nieuwe versie. Het configuratie scherm zal nu openen, zodat u het programma kan instellen, of uw instellingen nakijken.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="490"/>
+        <location filename="rbutilqt.cpp" line="494"/>
         <source>Aborted!</source>
         <translation>Afgebroken!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="498"/>
+        <location filename="rbutilqt.cpp" line="502"/>
         <source>Installed Rockbox detected</source>
         <translation>Geïnstalleerde Rockbox herkend</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="499"/>
+        <location filename="rbutilqt.cpp" line="503"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
         <translation>Rockbox installatie herkend. Wilt u eerst een backup maken?</translation>
     </message>
@@ -1496,22 +1497,22 @@ Wilt u de huidige bootloader vervangen?</translation>
         <translation type="obsolete">Backup is succesvol beëindigd</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="522"/>
+        <location filename="rbutilqt.cpp" line="526"/>
         <source>Backup failed!</source>
         <translation>Backup mislukt!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="699"/>
+        <location filename="rbutilqt.cpp" line="703"/>
         <source>Warning</source>
         <translation>Waarschuwing</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="700"/>
+        <location filename="rbutilqt.cpp" line="704"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
         <translation>Deze applicatie is nog steeds bezig met informatie over nieuwe Builds te downloaden. Gelieve binnen een korte periode opnieuw te proberen.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="502"/>
+        <location filename="rbutilqt.cpp" line="506"/>
         <source>Starting backup...</source>
         <translation>Backup wordt gestart...</translation>
     </message>
@@ -1526,9 +1527,19 @@ Wilt u de huidige bootloader vervangen?</translation>
         <translation>Uw configuratie is ongeldig. Dit komt waarschijnlijk door een veranderd apparaat pad. Het configuratie scherm zal nu openen zodat u de fout kan herstellen.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="518"/>
+        <location filename="rbutilqt.cpp" line="522"/>
         <source>Backup successful</source>
         <translation>Backup is succesvol beëindigd</translation>
+    </message>
+    <message>
+        <location filename="rbutilqt.cpp" line="353"/>
+        <source>Do you really want to make a complete Installation? This will install the latest build available, not the latest released version.</source>
+        <translation>Bent u zeker dat u een complete installatie wilt doen? Dit zal de laatst beschikbare build installeren, niet de laatste vrijgegeven versie.</translation>
+    </message>
+    <message>
+        <location filename="rbutilqt.cpp" line="407"/>
+        <source>Do you really want to make a small Installation? This will install the latest build available, not the latest released version.</source>
+        <translation>Bent u zeker dat u een kleine installatie wilt doen? Dit zal de laatst beschikbare build installeren, niet de laatste vrijgegeven versie.</translation>
     </message>
 </context>
 <context>
@@ -2204,19 +2215,24 @@ Wilt u de huidige bootloader vervangen?</translation>
         <translation>Download grootte:</translation>
     </message>
     <message>
-        <location filename="installthemesfrm.ui" line="128"/>
+        <location filename="installthemesfrm.ui" line="125"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Annuleren</translation>
     </message>
     <message>
-        <location filename="installthemesfrm.ui" line="108"/>
+        <location filename="installthemesfrm.ui" line="115"/>
         <source>&amp;Install</source>
         <translation>&amp;Installeren</translation>
     </message>
     <message>
         <location filename="installthemesfrm.ui" line="118"/>
         <source>Install &amp;All</source>
-        <translation>&amp;Alles installeren</translation>
+        <translation type="obsolete">&amp;Alles installeren</translation>
+    </message>
+    <message>
+        <location filename="installthemesfrm.ui" line="93"/>
+        <source>Hold Ctrl to select multiple item, Shift for a range</source>
+        <translation>Houd CTRL ingedrukt om meerdere items te selecteren en SHIFT om een bereik te selecteren.</translation>
     </message>
 </context>
 <context>
@@ -2227,61 +2243,61 @@ Wilt u de huidige bootloader vervangen?</translation>
         <translation>geen thema geselecteerd</translation>
     </message>
     <message>
-        <location filename="installthemes.cpp" line="101"/>
+        <location filename="installthemes.cpp" line="100"/>
         <source>Network error: %1.
 Please check your network and proxy settings.</source>
         <translation>Netwerk fout: %1.
 Gelieve uw netwerk en proxy instellingen te bekijken.</translation>
     </message>
     <message>
-        <location filename="installthemes.cpp" line="112"/>
+        <location filename="installthemes.cpp" line="111"/>
         <source>the following error occured:
 %1</source>
         <translation>de volgende fout is opgetreden:
 %1</translation>
     </message>
     <message>
-        <location filename="installthemes.cpp" line="117"/>
+        <location filename="installthemes.cpp" line="116"/>
         <source>done.</source>
         <translation>klaar.</translation>
     </message>
     <message>
-        <location filename="installthemes.cpp" line="145"/>
+        <location filename="installthemes.cpp" line="144"/>
         <source>fetching details for %1</source>
         <translation>bezig met ophalen van details voor %1</translation>
     </message>
     <message>
-        <location filename="installthemes.cpp" line="147"/>
+        <location filename="installthemes.cpp" line="146"/>
         <source>fetching preview ...</source>
         <translation>bezig met ophalen van voorbeeld...</translation>
     </message>
     <message>
-        <location filename="installthemes.cpp" line="155"/>
+        <location filename="installthemes.cpp" line="154"/>
         <source>Download size %L1 kiB</source>
         <translation>Download grootte: %L1 kiB</translation>
     </message>
     <message>
-        <location filename="installthemes.cpp" line="168"/>
+        <location filename="installthemes.cpp" line="167"/>
         <source>&lt;b&gt;Author:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Auteur :&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="installthemes.cpp" line="169"/>
+        <location filename="installthemes.cpp" line="168"/>
         <source>unknown</source>
         <translation>onbekend</translation>
     </message>
     <message>
-        <location filename="installthemes.cpp" line="169"/>
+        <location filename="installthemes.cpp" line="168"/>
         <source>&lt;b&gt;Version:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Versie:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="installthemes.cpp" line="170"/>
+        <location filename="installthemes.cpp" line="169"/>
         <source>&lt;b&gt;Description:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Beschrijving:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="installthemes.cpp" line="170"/>
+        <location filename="installthemes.cpp" line="169"/>
         <source>no description</source>
         <translation>geen beschrijving</translation>
     </message>
@@ -2296,7 +2312,7 @@ Gelieve uw netwerk en proxy instellingen te bekijken.</translation>
         <translation>bezig met ophalen van thema informatie...</translation>
     </message>
     <message>
-        <location filename="installthemes.cpp" line="290"/>
+        <location filename="installthemes.cpp" line="284"/>
         <source>Mount point is wrong!</source>
         <translation>Mount punt is verkeerd!</translation>
     </message>
