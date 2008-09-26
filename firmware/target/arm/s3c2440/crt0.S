@@ -9,7 +9,8 @@
  *
  * Copyright (C) 2008 by Karl Kurbjun
  *
- * Arm bootloader and startup code based on startup.s from the iPodLinux loader
+ * Arm bootloader and startup code based on startup.s from the iPodLinux
+ * loader
  *  Copyright (c) 2003, Daniel Palffy (dpalffy (at) rainstorm.org)
  *  Copyright (c) 2005, Bernard Leach <leachbj@bouncycastle.org>
  *
@@ -41,12 +42,12 @@ vectors:
     b   fiq_handler
 
 /* This branch is used to make sure that we know where the shutdown routine
- *  is located in flash (0x04000020)
+ *  is located in flash (0x040A0020)
  */
     b   rom_shutdown
 
 /* Add some strings to detect the bootloader in flash and give it a version
- * number.  (0x04000024, 0x04000028)
+ * number.  (0x040A0028, 0x040A002C)
  */
 .string "ROCKBOX"
 .word   0x0001
@@ -80,10 +81,56 @@ word_copy:
 
 .section    .init.text,"ax",%progbits
 .code       32
-.align      0x04 /* Align */
+.align      0x04 
 .global     start
 start:
-    msr     cpsr, #0xd3 /* enter supervisor mode, disable IRQ */
+
+    /* Get the execute address; R0 is used to store the address and it should
+     * not be written to till the rest of the execution checks are done below.
+     * This is done first thing since we have to check if the code was started
+     * with the old rockbox bootloader that offset the image by 100 bytes.
+     */
+    ldr     r0, =0xffffff00
+    and     r0, pc, r0
+
+    /************************** DO NOT WRITE TO R0 ***************************/
+
+    /* Check if the code is running from flash. If not skip all these checks */
+    cmp     r0, #0xA0000
+    bne     poweron
+
+    /* Set GPG up to read power and menu status */
+    ldr     r2, =0x56000050
+    ldr     r1, [r2, #0x18]
+    orr     r1, r1, #0x03
+    str     r1, [r2, #0x18]
+
+    /* Check if menu is held down */
+    ldr     r1, [r2, #0x14]
+    ands    r3, r1, #0x02
+    bne     bootOF
+
+    /* Check if power is held down  */
+    ands    r3, r1, #0x01
+    bne     poweron
+
+    /* Set GPF up to read charger connection if power is not held down */
+    ldr     r1, [r2, #0x08]
+    orr     r1, r1, #0x10
+    str     r1, [r2, #0x08]
+
+    /* Check if charger is connected */
+    ldr     r1, [r2, #0x04]
+    ands    r1, r1, #0x10
+    beq     poweron
+
+bootOF:
+    /* power is not down || menu is held || the charger is not connected */
+    mov     pc, #0x70
+
+poweron:
+    /* enter supervisor mode, disable IRQ */
+    msr     cpsr, #0xd3 
 
     /* Disable the watchdog */
     ldr     r2, =0x00000000
@@ -100,16 +147,10 @@ start:
     str     r2, [r1, #0x1C]
 
     /* Check if loaded by the old bootloader or by the OF.  This copy routine
-     * cannot run/copy properly until the memory has been initialized, so the copy
-     * routine later is still necessary.  The old bootloader/OF will initialize the
-     * memory.
-     * Be careful with code size above this as well since this routine has to start
-     * before 0x100 for it to work right.
+     * cannot run/copy properly until the memory has been initialized, so the
+     * copy routine later is still necessary.  The old bootloader/OF will
+     * initialize the memory.
      */
-
-    /* Get the execute address (cannot be past 0x100 for this to work */
-    ldr     r0, =0xffffff00
-    and     r0, pc, r0
 
     /* Calculate the length of the code needed to run/copy */
     ldr     r1, = _vectorstart
@@ -124,19 +165,21 @@ start:
     /* There's enough space, skip copying */
     bgt     skipreset
 
-    /* Is this code running from 0x0?  If so skip copy. */
-    cmplt   r0, #0
+    /* Is this code running from 0xA0000?  If so skip copy. */
+    cmplt   r0, #0xA0000
     beq     skipreset
+
+    /****************************** OK TO USE R0 *****************************/
     
-    /* There's not enough space to copy without overwriting, copy to safe spot
-     * and reset
+    /* There's not enough space to copy without overwriting, copy to safe
+     * spot and reset
      */
     mov     r1, #0x31000000     /* copy location */
     bl      word_copy
 
     mov     pc, #0x31000000
 
-    skipreset:  
+skipreset:  
 
     /* Initial Clock Setup */
     /* set Bus to Asynchronous mode (full speed) */    
@@ -319,39 +362,6 @@ start:
     ldr     r2, =0x00FFFFFF
     str     r2, [r1]
 
-#if 0
-    /* GPACON */
-    mov     r1, #0x56000000
-    ldr     r2, =0x01FFFCFF /* 0x01FFFCFF */
-    str     r2, [r1]
-    
-    /* GPADAT */
-    ldr     r2, =0x01FFFEFF
-    str     r2, [r1, #0x04]
-
-    /* MRSRB6 */
-    mov     r1, #0x48000000
-    mov     r2, #0x00000000
-    str     r2, [r1, #0x2C]
-
-    /* GPADAT */
-    mov     r1, #0x56000000
-    ldr     r2, =0x01FFFFFF     
-    str     r2, [r1, #0x04]
-
-    /* MRSRB6 */
-    mov     r1, #0x48000000
-    mov     r2, #0x00000030
-    str     r2, [r1, #0x2C]
-
-    /* GPACON */
-    mov     r1, #0x56000000 
-    mov     r2, #0x01FFFFFF
-    str     r2, [r1]
-
-    /* End of the unknown */
-#endif
-
     /* The builds have two potential load addresses, one being from flash, 
      * and the other from some "unknown" location right now the assumption
      * is that the code is not at 0x3000000.
@@ -373,7 +383,7 @@ start:
     ldr     r1, =donecopy
     ldr     r2, =0x30000000
     add     r1, r1, r2
-    mov     pc, r1           /* The code is located where we want it-jump*/
+    mov     pc, r1           /* The code is located where we want it so jump */
 
 donecopy: 
 
@@ -444,7 +454,7 @@ stackmunge:
     /* Start the main function */
     ldr     pc, =main
 
-    /* Should never get here, but let's restart in case (also needed when
+    /* Should never get here, but let's restart in case (also needed for
      * linking)
      */
     b       vectors
@@ -600,7 +610,7 @@ rom_shutdown:
     ldr     r2, [lr]        
 //    str     r2, [r11,#-0x28] 
     ldr     r3, [r0]        
-    Orr     r3, r3, #0x00400000
+    orr     r3, r3, #0x00C00000
     /* REFRESH
      * [22] TREFMD - SDRAM Refresh Mode
      */
