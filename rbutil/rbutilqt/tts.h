@@ -81,7 +81,7 @@ class TTSSapi : public TTSBase
         QStringList getVoiceList(QString language);
     private:
         QProcess* voicescript;
-        
+        QTextStream* voicestream;
         QString defaultLanguage;
         
         QString m_TTSexec;

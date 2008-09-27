@@ -246,6 +246,10 @@ bool TTSSapi::start(QString *errStr)
         if(*errStr != "")
             return false;    
     }
+    
+    voicestream = new QTextStream(voicescript);
+    voicestream->setCodec("UTF16-LE");
+    
     return true;
 }
 
@@ -272,9 +276,10 @@ QStringList TTSSapi::getVoiceList(QString language)
     qDebug() << "init" << execstring; 
     voicescript = new QProcess(NULL);
     voicescript->start(execstring);
+    qDebug() << "wait for started"; 
     if(!voicescript->waitForStarted())
         return result;
- 
+    voicescript->closeWriteChannel();
     voicescript->waitForReadyRead();
     
     QString dataRaw = voicescript->readAllStandardError().data();
@@ -303,17 +308,20 @@ bool TTSSapi::voice(QString text,QString wavfile)
 {
     QString query = "SPEAK\t"+wavfile+"\t"+text+"\r\n";
     qDebug() << "voicing" << query;
-    voicescript->write(query.toLocal8Bit());
-    voicescript->write("SYNC\tbla\r\n");
+    *voicestream << query;
+    *voicestream << "SYNC\tbla\r\n";
+    voicestream->flush();
     voicescript->waitForReadyRead();
     return true;
 }
 
 bool TTSSapi::stop()
 {   
-    QString query = "QUIT\r\n";
-    voicescript->write(query.toLocal8Bit());
+   
+    *voicestream << "QUIT\r\n";
+    voicestream->flush();
     voicescript->waitForFinished();
+    delete voicestream;
     delete voicescript;
     QFile::setPermissions(QDir::tempPath() +"/sapi_voice.vbs",QFile::ReadOwner |QFile::WriteOwner|QFile::ExeOwner 
                                                              |QFile::ReadUser| QFile::WriteUser| QFile::ExeUser
