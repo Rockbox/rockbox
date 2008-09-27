@@ -1,9 +1,23 @@
-/*
-  Copyright 2008 William Poetra Yoga Hadisoeseno <williampoetra@gmail.com>
-                 Frank Gevaerts <frank@gevaerts.be>
-  This file is licensed under GPL v2.
-*/
-
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2008 by William Poetra Yoga Hadisoeseno and Frank Gevaerts
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -83,8 +97,8 @@ typedef struct {
 #define DFU_INIT_CRC 0xffffffff
 
 #define USB_VID_SAMSUNG 0x0419
-#define USB_PID_M6SL    0x0145
-#define USB_PID_M3_M6   0x0141
+#define USB_PID_M6SL    0x1240
+#define USB_PID_M3_M6   0x1240
 
 void init_img(image_data_t *img, const char *filename, image_attr_t *attr)
 {
