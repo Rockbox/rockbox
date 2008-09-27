@@ -97,8 +97,8 @@ typedef struct {
 #define DFU_INIT_CRC 0xffffffff
 
 #define USB_VID_SAMSUNG 0x0419
-#define USB_PID_M6SL    0x1240
-#define USB_PID_M3_M6   0x1240
+#define USB_PID_M6SL    0x0145
+#define USB_PID_M3_M6   0x0141
 
 void init_img(image_data_t *img, const char *filename, image_attr_t *attr)
 {
