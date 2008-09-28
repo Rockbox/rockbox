@@ -159,7 +159,7 @@ case $arch in
     target="m68k-elf"
     gccver="3.4.6"
     case $system in
-      CYGWIN* | Darwin | FreeBSD)
+      CYGWIN* | Darwin | FreeBSD | Interix)
         gccpatch="gcc-3.4.6.patch"
         ;;
       Linux)
