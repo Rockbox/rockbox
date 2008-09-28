@@ -94,9 +94,13 @@ static int sr_ctrl = MROBE100_44100HZ;
 #endif
 
 void pcm_set_frequency(unsigned int frequency)
-{
-    (void)frequency;
+{  
+#ifdef HAVE_WM8731
+	pcm_freq = frequency;
+#else
+	(void)frequency;
     pcm_freq = HW_SAMPR_DEFAULT;
+#endif
 #ifdef HAVE_WM8751
     sr_ctrl  = MROBE100_44100HZ;
 #endif
@@ -106,6 +110,10 @@ void pcm_apply_settings(void)
 {
 #ifdef HAVE_WM8751
     audiohw_set_frequency(sr_ctrl);
+#endif
+
+#ifdef HAVE_WM8731
+	audiohw_set_sample_rate(pcm_freq);
 #endif
     pcm_curr_sampr = pcm_freq;
 }

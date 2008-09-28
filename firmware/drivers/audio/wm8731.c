@@ -223,8 +223,30 @@ void audiohw_set_nsorder(int order)
 
 void audiohw_set_sample_rate(int sampling_control)
 {
+	int rate = 0;
+	switch(sampling_control)
+	{
+		case SAMPR_96:
+			rate = WM8731_USB24_96000HZ;
+			break;
+		case SAMPR_88:
+			rate = WM8731_USB24_88200HZ;
+			break;
+		case SAMPR_48:
+			rate = WM8731_USB24_48000HZ;
+			break;
+		case SAMPR_44:
+			rate = WM8731_USB24_44100HZ;
+			break;
+		case SAMPR_32:
+			rate = WM8731_USB24_32000HZ;
+			break;
+		case SAMPR_8:
+			rate = WM8731_USB24_8000HZ;
+			break;
+	}			
     codec_set_active(false);
-    wmcodec_write(SAMPCTRL, sampling_control);
+    wmcodec_write(SAMPCTRL, rate);
     codec_set_active(true);
 }
 
