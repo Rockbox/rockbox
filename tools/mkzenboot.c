@@ -783,10 +783,6 @@ static const char null_key_v2[]  = "CTL:N0MAD|PDE0.DPMP.";
 static const char null_key_v3[]  = "CTL:N0MAD|PDE0.DPFP.";
 static const char null_key_v4[]  = "CTL:Z3N07|PDE0.DPMP.";
 
-static const char fresc_key_v1[] = "Copyright (C) CTL. -"
-                                   " zN0MAD iz v~p0wderful!";
-static const char fresc_key_v2[] = ""; /* Unknown atm */
-
 static const char tl_zvm_key[]   = "1sN0TM3D az u~may th1nk*"
                                    "Creative Zen Vision:M";
 static const char tl_zvm60_key[] = "1sN0TM3D az u~may th1nk*"
@@ -796,6 +792,8 @@ static const char tl_zen_key[]   = "1sN0TM3D az u~may th1nk*"
                                    "Creative ZEN";
 static const char tl_zenxf_key[] = "1sN0TM3D az u~may th1nk*"
                                    "Creative ZEN X-Fi";
+static const char tl_zenmo_key[] = "1sN0TM3D az u~may th1nk*"
+                                   "Creative ZEN Mozaic";
 static const char tl_zv_key[]    = "1sN0TM3D az u~may th1nk*"
                                    "Creative Zen Vision";
 static const char tl_zvw_key[]   = "1sN0TM3D az u~may th1nk*"
@@ -822,27 +820,27 @@ struct player_info_t
 {
     const char* name;
     const char* null_key;  /* HMAC-SHA1 key */
-    const char* fresc_key; /* BlowFish key */
     const char* tl_key;    /* BlowFish key */
     bool big_endian;
 };
 
 static struct player_info_t players[] = {
-    {"Zen Vision:M", null_key_v2, fresc_key_v1, tl_zvm_key, false},
-    {"Zen Vision:M 60GB", null_key_v2, fresc_key_v1, tl_zvm60_key, false},
-    {"ZEN", null_key_v4, fresc_key_v2, tl_zen_key, false},
-    {"ZEN X-Fi", null_key_v4, fresc_key_v2, tl_zenxf_key, false},
-    {"Zen Vision", null_key_v2, fresc_key_v1, tl_zv_key, false},
-    {"Zen Vision W", null_key_v2, fresc_key_v1, tl_zvw_key, false},
-    {"Zen Micro", null_key_v1, fresc_key_v1, tl_zm_key, true},
-    {"Zen MicroPhoto", null_key_v1, fresc_key_v1, tl_zmp_key, true},
-    {"Zen Sleek", null_key_v1, fresc_key_v1, tl_zs_key, true},
-    {"Zen SleekPhoto", null_key_v1, fresc_key_v1, tl_zsp_key, true},
-    {"Zen Touch", null_key_v1, fresc_key_v1, tl_zt_key, true},
-    {"Zen Xtra", null_key_v1, fresc_key_v1, tl_zx_key, true},
-    {"Zen V", null_key_v3, fresc_key_v1, tl_zenv_key, false},
-    {"Zen V Plus", null_key_v3, fresc_key_v1, tl_zenvp_key, false},
-    {"Zen V Video", null_key_v3, fresc_key_v1, tl_zenvv_key, false},
+    {"Zen Vision:M", null_key_v2, tl_zvm_key, false},
+    {"Zen Vision:M 60GB", null_key_v2, tl_zvm60_key, false},
+    {"ZEN", null_key_v4, tl_zen_key, false},
+    {"ZEN X-Fi", null_key_v4, tl_zenxf_key, false},
+    {"ZEN Mozaic", null_key_v4, tl_zenmo_key, false},
+    {"Zen Vision", null_key_v2, tl_zv_key, false},
+    {"Zen Vision W", null_key_v2, tl_zvw_key, false},
+    {"Zen Micro", null_key_v1, tl_zm_key, true},
+    {"Zen MicroPhoto", null_key_v1, tl_zmp_key, true},
+    {"Zen Sleek", null_key_v1, tl_zs_key, true},
+    {"Zen SleekPhoto", null_key_v1, tl_zsp_key, true},
+    {"Zen Touch", null_key_v1, tl_zt_key, true},
+    {"Zen Xtra", null_key_v1, tl_zx_key, true},
+    {"Zen V", null_key_v3, tl_zenv_key, false},
+    {"Zen V Plus", null_key_v3, tl_zenvp_key, false},
+    {"Zen V Video", null_key_v3, tl_zenvv_key, false},
     {NULL, NULL, NULL, NULL, false}
 };
 
@@ -855,6 +853,13 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     char *err_msg;
     const char *fw_key;
     uint32_t i, fw_offset, fw_size, data_ptr, data_size, ciff_size, cenc_size, iv[2];
+    
+    /* TODO */
+    if(player->big_endian)
+    {
+        log_message("[ERR]  Big-endian players are currently unsupported\n");
+        return -255;
+    }
     
     infd = fopen(infile, "rb");
     if(infd == NULL)
