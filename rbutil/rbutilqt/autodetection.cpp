@@ -64,9 +64,9 @@ bool Autodetection::detect()
     {
         // do the file checking
         QDir dir(mountpoints.at(i));
+        qDebug() << "paths to check for player specific files:" << mountpoints;
         if(dir.exists())
         {
-            qDebug() << "file checking:" << mountpoints.at(i);
             // check logfile first.
             if(QFile(mountpoints.at(i) + "/.rockbox/rbutil.log").exists()) {
                 QSettings log(mountpoints.at(i) + "/.rockbox/rbutil.log",
@@ -153,7 +153,10 @@ bool Autodetection::detect()
     }
 
     int n;
-    //try ipodpatcher
+    // try ipodpatcher
+    // initialize sector buffer. Needed.
+    ipod_sectorbuf = NULL;
+    ipod_alloc_buffer(&ipod_sectorbuf, BUFFER_SIZE);
     struct ipod_t ipod;
     n = ipod_scan(&ipod);
     if(n == 1) {
@@ -165,8 +168,13 @@ bool Autodetection::detect()
     else {
         qDebug() << "ipodpatcher: no Ipod found." << n;
     }
+    free(ipod_sectorbuf);
+    ipod_sectorbuf = NULL;
 
-    //try sansapatcher
+    // try sansapatcher
+    // initialize sector buffer. Needed.
+    sansa_sectorbuf = NULL;
+    sansa_alloc_buffer(&sansa_sectorbuf, BUFFER_SIZE);
     struct sansa_t sansa;
     n = sansa_scan(&sansa);
     if(n == 1) {
@@ -178,6 +186,8 @@ bool Autodetection::detect()
     else {
         qDebug() << "sansapatcher: no Sansa found." << n;
     }
+    free(sansa_sectorbuf);
+    sansa_sectorbuf = NULL;
 
     if(m_mountpoint.isEmpty() && m_device.isEmpty() && m_errdev.isEmpty() && m_incompat.isEmpty())
         return false;
@@ -288,7 +298,8 @@ QString Autodetection::resolveMountPoint(QString device)
         }
 
     }
-    return result + ":/";
+    if(!result.isEmpty())
+        return result + ":/";
 #endif
     return QString("");
 }

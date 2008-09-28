@@ -31,7 +31,7 @@ QMAKE_EXTRA_TARGETS += rbspeex
 PRE_TARGETDEPS += rbspeex
 
 # rule for creating ctags file
-tags.commands = ctags -R --c++-kinds=+p --fields=+iaS --extra=+q $(SOURCES) 
+tags.commands = ctags -R --c++-kinds=+p --fields=+iaS --extra=+q $(SOURCES)
 tags.depends = $(SOURCES)
 QMAKE_EXTRA_TARGETS += tags
 
@@ -51,21 +51,17 @@ SOURCES += rbutilqt.cpp \
  zip/zip.cpp \
  zip/unzip.cpp \
  installzip.cpp \
- installbootloader.cpp \
  progressloggergui.cpp \
  installtalkwindow.cpp \
  talkfile.cpp \
  autodetection.cpp \
  ../ipodpatcher/ipodpatcher.c \
  ../sansapatcher/sansapatcher.c \
- irivertools/irivertools.cpp \
- irivertools/md5sum.cpp  \
  browsedirtree.cpp \
  installthemes.cpp \
  uninstall.cpp \
  uninstallwindow.cpp \
  utils.cpp \
- browseof.cpp \
  preview.cpp \
  encoders.cpp \
  encodersgui.cpp \
@@ -78,9 +74,17 @@ SOURCES += rbutilqt.cpp \
  rbsettings.cpp \
  rbunzip.cpp \
  rbzip.cpp \
+ detect.cpp \
  sysinfo.cpp \
- detect.cpp
- 
+ bootloaderinstallbase.cpp \
+ bootloaderinstallmi4.cpp \
+ bootloaderinstallhex.cpp \
+ bootloaderinstallipod.cpp \
+ bootloaderinstallsansa.cpp \
+ bootloaderinstallfile.cpp \
+ ../../tools/mkboot.c \
+ ../../tools/iriver.c
+
 HEADERS += rbutilqt.h \
  install.h \
  httpget.h \
@@ -92,7 +96,6 @@ HEADERS += rbutilqt.h \
  zip/zip_p.h \
  version.h \
  installzip.h \
- installbootloader.h \
  installtalkwindow.h \
  talkfile.h \
  autodetection.h \
@@ -103,18 +106,14 @@ HEADERS += rbutilqt.h \
  ../ipodpatcher/parttypes.h \
  ../sansapatcher/sansapatcher.h \
  ../sansapatcher/sansaio.h \
- irivertools/irivertools.h \
- irivertools/md5sum.h \
  irivertools/h100sums.h \ 
  irivertools/h120sums.h \
  irivertools/h300sums.h \
- irivertools/checksums.h \
  browsedirtree.h \
  installthemes.h \
  uninstall.h \
  uninstallwindow.h \
  utils.h \
- browseof.h \
  preview.h \
  encoders.h \
  encodersgui.h \
@@ -128,11 +127,19 @@ HEADERS += rbutilqt.h \
  rbunzip.h \
  rbzip.h \
  sysinfo.h \
- detect.h
- 
+ detect.h \
+ bootloaderinstallbase.h \
+ bootloaderinstallmi4.h \
+ bootloaderinstallhex.h \
+ bootloaderinstallipod.h \
+ bootloaderinstallsansa.h \
+ bootloaderinstallfile.h \
+ ../../tools/mkboot.h \
+ ../../tools/iriver.h
+
 # Needed by QT on Win
 INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher ../../tools/rbspeex ../../tools
- 
+
 LIBS += -L../../tools/rbspeex -lrbspeex
 
 TEMPLATE = app
@@ -158,7 +165,6 @@ FORMS += rbutilqtfrm.ui \
  installtalkfrm.ui \
  installthemesfrm.ui \
  uninstallfrm.ui \
- browseoffrm.ui \
  previewfrm.ui \
  rbspeexcfgfrm.ui \
  encexescfgfrm.ui \

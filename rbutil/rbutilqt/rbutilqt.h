@@ -30,7 +30,7 @@
 #include "httpget.h"
 #include "installzip.h"
 #include "progressloggergui.h"
-#include "installbootloader.h"
+#include "bootloaderinstallbase.h"
 
 #include "rbsettings.h"
 
@@ -44,7 +44,7 @@ class RbUtilQt : public QMainWindow
     private:
         Ui::RbUtilQtFrm ui;
         RbSettings* settings;
-       
+
         void initDeviceNames(void);
         QString deviceName(QString);
         QString platform;
@@ -56,14 +56,15 @@ class RbUtilQt : public QMainWindow
         void updateManual(void);
         ProgressLoggerGui *logger;
         ZipInstaller *installer;
-        BootloaderInstaller* blinstaller;
         QUrl proxy(void);
         QMap<QString, QString> versmap;
         bool chkConfig(bool);
 
         volatile bool m_installed;
         volatile bool m_error;
+        QString m_networkerror;
         bool m_gotInfo;
+        bool m_auto;
 
     private slots:
         void about(void);
@@ -85,6 +86,7 @@ class RbUtilQt : public QMainWindow
         void installBootloaderBtn(void);
         bool installBootloaderAuto(void);
         void installBootloader(void);
+        void installBootloaderPost(bool error);
 
         void installFontsBtn(void);
         bool installFontsAuto(void);
@@ -101,6 +103,7 @@ class RbUtilQt : public QMainWindow
         void downloadDone(int, bool);
         void downloadBleedingDone(bool);
         void downloadInfo(void);
+
         void installVoice(void);
         void installThemes(void);
         void uninstall(void);

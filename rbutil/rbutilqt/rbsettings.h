@@ -103,6 +103,7 @@ class RbSettings : public QObject
         QString curEncoder();
         QString curTTS();
         QString curResolution();
+        QString curBootloaderFile();
         int curTargetId();
 
         //! Set Functions

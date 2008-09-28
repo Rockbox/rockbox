@@ -6,43 +6,39 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- *   Copyright (C) 2007 by Dominik Wenger
- *   $Id$
+ *   Copyright (C) 2008 by Dominik Riebeling
+ *   $Id:$
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
  ****************************************************************************/
 
-#ifndef BROWSEOF_H
-#define BROWSEOF_H
+#include <QtCore>
+#include "progressloggerinterface.h"
+#include "bootloaderinstallbase.h"
 
-#include <QtGui>
-#include "ui_browseoffrm.h"
 
-class BrowseOF : public QDialog
+// mi4 bootloader file based installation.
+// Puts the bootloader file to the correct location and
+// renames the OF to OF.mi4.
+class BootloaderInstallMi4 : public BootloaderInstallBase
 {
     Q_OBJECT
 
     public:
-        BrowseOF(QWidget *parent = 0);
-        void setFile(QString file);
-        QString getFile();
-
+        BootloaderInstallMi4(QObject *parent = 0);
+        bool install(void);
+        bool uninstall(void);
+        BootloaderInstallBase::BootloaderType installed(void);
+        Capabilities capabilities(void);
 
     private slots:
-        void onBrowse();
+        void installStage2(void);
 
     private:
-        Ui::BrowseOFFrm ui;
-
-    private slots:
-        void accept(void);
 };
 
-#endif

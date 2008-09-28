@@ -51,13 +51,15 @@ class Install : public QDialog
         QMap<QString, QString> version;
         QString m_backupName;
 
+        void changeBackupPath(QString);
+
     private slots:
         void setCached(bool);
         void setDetailsCurrent(bool);
         void setDetailsStable(bool);
         void setDetailsArchived(bool);
         void done(bool);
-        void changeBackupPath();
+        void changeBackupPath(void);
         void backupCheckboxChanged(int state);
 
 };

@@ -245,6 +245,11 @@ QString RbSettings::curBootloaderName()
     return deviceSettingCurGet("bootloadername").toString();
 }
 
+QString RbSettings::curBootloaderFile()
+{
+    return deviceSettingCurGet("bootloaderfile").toString();
+}
+
 QString RbSettings::curVoiceName()
 {
     return deviceSettingCurGet("voicename").toString();
@@ -623,3 +628,4 @@ void RbSettings::setEncoderNarrowband(QString enc,bool nb)
 {
     userSettingsGroupSet(enc,"narrowband",nb);
 }
+

@@ -28,14 +28,21 @@
 #include "installtalkwindow.h"
 #include "createvoicewindow.h"
 #include "httpget.h"
-#include "installbootloader.h"
 #include "installthemes.h"
 #include "uninstallwindow.h"
-#include "browseof.h"
 #include "utils.h"
 #include "rbzip.h"
 #include "sysinfo.h"
 #include "detect.h"
+
+#include "progressloggerinterface.h"
+
+#include "bootloaderinstallbase.h"
+#include "bootloaderinstallmi4.h"
+#include "bootloaderinstallhex.h"
+#include "bootloaderinstallipod.h"
+#include "bootloaderinstallsansa.h"
+#include "bootloaderinstallfile.h"
 
 #if defined(Q_OS_LINUX)
 #include <stdio.h>
@@ -52,17 +59,19 @@
 RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 {
     absolutePath = qApp->applicationDirPath();
-  
-    ui.setupUi(this);
-    
+
     settings = new RbSettings();
     settings->open();
     HttpGet::setGlobalUserAgent("rbutil/"VERSION);
+    // init startup & autodetection
+    ui.setupUi(this);
+    updateSettings();
+    downloadInfo();
 
     m_gotInfo = false;
-    
+    m_auto = false;
+
     // manual tab
-    updateSettings();
     ui.radioPdf->setChecked(true);
 
     // info tab
@@ -112,10 +121,6 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.actionInstall_Rockbox_Utility_on_player, SIGNAL(triggered()), this, SLOT(installPortable()));
 #endif
 
-    initIpodpatcher();
-    initSansapatcher();
-    downloadInfo();
-
 }
 
 
@@ -158,6 +163,8 @@ void RbUtilQt::downloadDone(bool error)
 {
     if(error) {
         qDebug() << "network error:" << daily->error();
+        QMessageBox::critical(this, tr("Network error"),
+            tr("Can't get version information."));
         return;
     }
     qDebug() << "network status:" << daily->error();
@@ -218,8 +225,9 @@ void RbUtilQt::downloadDone(int id, bool error)
         .arg(daily->errorString());
     if(error) {
         QMessageBox::about(this, "Network Error", errorString);
+        m_networkerror = daily->errorString();
     }
-    qDebug() << "downloadDone:" << id << error;
+    qDebug() << "downloadDone:" << id << "error:" << error;
 }
 
 
@@ -428,6 +436,7 @@ bool RbUtilQt::smallInstallInner()
     {
         m_error = false;
         m_installed = false;
+        m_auto = true;
         if(!installBootloaderAuto())
             return true;
         else
@@ -436,6 +445,7 @@ bool RbUtilQt::smallInstallInner()
             while(!m_installed)
                 QApplication::processEvents();
         }
+        m_auto = false;
         if(m_error) return true;
         logger->undoAbort();
     }    
@@ -452,6 +462,7 @@ bool RbUtilQt::smallInstallInner()
           QApplication::processEvents();
     }
 
+    installBootloaderPost(false);
     return false;
 }
 
@@ -580,82 +591,167 @@ void RbUtilQt::installBootloaderBtn()
 
     // create logger
     logger = new ProgressLoggerGui(this);
-    logger->show();
-  
+
     installBootloader();
 }
 
 void RbUtilQt::installBootloader()
 {
     QString platform = settings->curPlatform();
+    QString backupDestination = "";
+    m_error = false;
 
     // create installer
-    blinstaller  = new BootloaderInstaller(this);
-
-    blinstaller->setMountPoint(settings->mountpoint());
-
-    blinstaller->setDevice(platform);
-    blinstaller->setBootloaderMethod(settings->curBootloaderMethod());
-    blinstaller->setBootloaderName(settings->curBootloaderName());
-    blinstaller->setBootloaderBaseUrl(settings->bootloaderUrl());
-    blinstaller->setBootloaderInfoUrl(settings->bootloaderInfoUrl());
-    if(!blinstaller->downloadInfo())
-    {
-        logger->addItem(tr("Could not get the bootloader info file!"),LOGERROR);
+    BootloaderInstallBase *bl;
+    QString type = settings->curBootloaderMethod();
+    if(type == "mi4") {
+        bl = new BootloaderInstallMi4(this);
+    }
+    else if(type == "hex") {
+        bl = new BootloaderInstallHex(this);
+    }
+    else if(type == "sansa") {
+        bl = new BootloaderInstallSansa(this);
+    }
+    else if(type == "ipod") {
+        bl = new BootloaderInstallIpod(this);
+    }
+    else if(type == "file") {
+        bl = new BootloaderInstallFile(this);
+    }
+    else {
+        logger->addItem(tr("No install method known."), LOGERROR);
         logger->abort();
-        m_error = true;
         return;
     }
 
-    if(blinstaller->uptodate())
+    // set bootloader filename. Do this now as installed() needs it.
+    QString blfile;
+    blfile = settings->mountpoint() + settings->curBootloaderFile();
+    // special case for H10 pure: this player can have a different
+    // bootloader file filename. This is handled here to keep the install
+    // class clean, though having it here is also not the nicest solution.
+    if(settings->curPlatformName() == "h10_ums"
+        || settings->curPlatformName() == "h10_mtp") {
+        if(resolvePathCase(blfile).isEmpty())
+            blfile = settings->mountpoint()
+                + settings->curBootloaderName().replace("H10",
+                    "H10EMP", Qt::CaseInsensitive);
+    }
+    bl->setBlFile(blfile);
+    QUrl url(settings->bootloaderUrl() + settings->curBootloaderName());
+    bl->setBlUrl(url);
+    bl->setLogfile(settings->mountpoint() + "/.rockbox/rbutil.log");
+
+    if(bl->installed() == BootloaderInstallBase::BootloaderRockbox) {
+        if(QMessageBox::question(this, tr("Bootloader detected"),
+            tr("Bootloader already installed. Do you want to reinstall the bootloader?"),
+            QMessageBox::Yes | QMessageBox::No) == QMessageBox::No) {
+                logger->close();
+                m_error = true;
+                return;
+        }
+    }
+    else if(bl->installed() == BootloaderInstallBase::BootloaderOther
+        && bl->capabilities() & BootloaderInstallBase::Backup)
     {
-        int ret = QMessageBox::question(this, tr("Bootloader Installation"),
-                    tr("The bootloader is already installed and up to date.\n"
-                    "Do want to replace the current bootloader?"),
-                    QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        if(ret == QMessageBox::No)
-        {
-            logger->addItem(tr("Bootloader installation skipped!"), LOGINFO);
-            logger->abort();
-            m_installed = true;
-            return;
+        QString targetFolder = settings->name(settings->curPlatform())
+                + " Firmware Backup";
+        // remove invalid character(s)
+        targetFolder.remove(QRegExp("[:/]"));
+        if(QMessageBox::question(this, tr("Create Bootloader backup"),
+            tr("You can create a backup of the original bootloader "
+               "file. Press \"Yes\" to select an output folder on your "
+               "computer to save the file to. The file will get placed "
+               "in a new folder \"%1\" created below the selected folder.\n"
+               "Press \"No\" to skip this step.").arg(targetFolder),
+            QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+            BrowseDirtree tree(this, tr("Browse backup folder"));
+            tree.setDir(QDir::home());
+            tree.exec();
+
+            backupDestination = tree.getSelected() + "/" + targetFolder;
+            qDebug() << backupDestination;
+            // backup needs to be done after the logger has been set up.
         }
     }
 
-    // if fwpatcher , ask for extra file
-    QString offirmware;
-    if(settings->curBootloaderMethod() == "fwpatcher")
+    if(bl->capabilities() & BootloaderInstallBase::NeedsFlashing)
     {
-        BrowseOF ofbrowser(this);
-        ofbrowser.setFile(settings->ofPath());
-        if(ofbrowser.exec() == QDialog::Accepted)
-        {
-            offirmware = ofbrowser.getFile();
-            qDebug() << offirmware;
-            if(!QFileInfo(offirmware).exists())
-            {
-                logger->addItem(tr("Original Firmware Path is wrong!"),LOGERROR);
-                logger->abort();
-                m_error = true;
-                return;
-            }
-            else
-            {
-                settings->setOfPath(offirmware);
-                settings->sync();
-            }
-        }
-        else
-        {
-            logger->addItem(tr("Original Firmware selection Canceled!"),LOGERROR);
-            logger->abort();
+        int ret;
+        ret = QMessageBox::information(this, tr("Prerequisites"),
+            tr("Bootloader installation requires you to provide "
+               "a firmware file of the original firmware (hex file). "
+               "You need to download this file yourself due to legal "
+               "reasons. Please refer to the "
+               "<a href='http://www.rockbox.org/manual.shtml'>manual</a> and the "
+               "<a href='http://www.rockbox.org/wiki/IriverBoot"
+               "#Download_and_extract_a_recent_ve'>IriverBoot</a> wiki page on "
+               "how to obtain this file.<br/>"
+               "Press Ok to continue and browse your computer for the firmware "
+               "file."),
+               QMessageBox::Ok | QMessageBox::Abort);
+        if(ret != QMessageBox::Ok) {
             m_error = true;
             return;
         }
+        // open dialog to browse to hex file
+        QString hexfile;
+        hexfile = QFileDialog::getOpenFileName(this,
+                tr("Select firmware file"), QDir::homePath(), "*.hex");
+        if(!QFileInfo(hexfile).isReadable()) {
+            logger->addItem(tr("Error opening firmware file"), LOGERROR);
+            m_error = true;
+            return;
+        }
+        ((BootloaderInstallHex*)bl)->setHexfile(hexfile);
     }
-    blinstaller->setOrigFirmwarePath(offirmware);
-    connect(blinstaller,SIGNAL(done(bool)),this,SLOT(installdone(bool)));
-    blinstaller->install(logger);
+
+    // the bootloader install class does NOT use any GUI stuff.
+    // All messages are passed via signals.
+    connect(bl, SIGNAL(done(bool)), logger, SLOT(abort()));
+    connect(bl, SIGNAL(done(bool)), this, SLOT(installBootloaderPost(bool)));
+    connect(bl, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(bl, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+
+    // show logger and start install.
+    logger->show();
+    if(!backupDestination.isEmpty()) {
+        if(!bl->backup(backupDestination)) {
+            if(QMessageBox::warning(this, tr("Backup error"),
+                    tr("Could not create backup file. Continue?"),
+                    QMessageBox::No | QMessageBox::Yes)
+                == QMessageBox::No) {
+                logger->abort();
+                return;
+            }
+        }
+    }
+    bl->install();
+}
+
+void RbUtilQt::installBootloaderPost(bool error)
+{
+    qDebug() << __func__ << error;
+    // if an error occured don't perform post install steps.
+    if(error) {
+        m_error = true;
+        return;
+    }
+    else
+        m_error = false;
+
+    m_installed = true;
+    // end here if automated install
+    if(m_auto)
+        return;
+
+    QString msg = BootloaderInstallBase::postinstallHints(settings->curPlatform());
+    if(!msg.isEmpty()) {
+        QMessageBox::information(this, tr("Manual steps required"), msg);
+        logger->close();
+    }
+
 }
 
 void RbUtilQt::installFontsBtn()
@@ -825,23 +921,52 @@ void RbUtilQt::uninstallBootloader(void)
            QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
     // create logger
     ProgressLoggerGui* logger = new ProgressLoggerGui(this);
+    logger->setProgressVisible(false);
     logger->show();
 
-    BootloaderInstaller blinstaller(this);
-    blinstaller.setMountPoint(settings->mountpoint());
-    blinstaller.setDevice(settings->curPlatform());
-    blinstaller.setBootloaderMethod(settings->curBootloaderMethod());
-    blinstaller.setBootloaderName(settings->curBootloaderName());
-    blinstaller.setBootloaderBaseUrl(settings->bootloaderUrl());
-    blinstaller.setBootloaderInfoUrl(settings->bootloaderInfoUrl());
-    if(!blinstaller.downloadInfo())
-    {
-        logger->addItem(tr("Could not get the bootloader info file!"),LOGERROR);
+    QString platform = settings->curPlatform();
+
+    // create installer
+    BootloaderInstallBase *bl;
+    QString type = settings->curBootloaderMethod();
+    if(type == "mi4") {
+        bl = new BootloaderInstallMi4();
+    }
+    else if(type == "hex") {
+        bl = new BootloaderInstallHex();
+    }
+    else if(type == "sansa") {
+        bl = new BootloaderInstallSansa();
+    }
+    else if(type == "ipod") {
+        bl = new BootloaderInstallIpod();
+    }
+    else if(type == "file") {
+        bl = new BootloaderInstallFile();
+    }
+    else {
+        logger->addItem(tr("No uninstall method known."), LOGERROR);
         logger->abort();
         return;
     }
 
-    blinstaller.uninstall(logger);
+    QString blfile = settings->mountpoint() + settings->curBootloaderFile();
+    if(settings->curPlatformName() == "h10_ums"
+        || settings->curPlatformName() == "h10_mtp") {
+        if(resolvePathCase(blfile).isEmpty())
+            blfile = settings->mountpoint()
+                + settings->curBootloaderName().replace("H10",
+                    "H10EMP", Qt::CaseInsensitive);
+    }
+    bl->setBlFile(blfile);
+
+    connect(bl, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(bl, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+
+    int result;
+    result = bl->uninstall();
+
+    logger->abort();
 
 }
 
