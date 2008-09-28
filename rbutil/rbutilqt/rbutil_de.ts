@@ -1305,7 +1305,7 @@ Neues Gerät: %2.
     <message>
         <location filename="rbutilqt.cpp" line="340"/>
         <source>Select a device for a link to the correct manual</source>
-        <translation>Ein Gerät muss ausgewählt sein damit ein Link zum entsprechenden Handbuch angezeigt wird</translation>
+        <translation>Ein Gerät muss ausgewählt sein, damit ein Link zum entsprechenden Handbuch angezeigt wird</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="342"/>
@@ -1472,7 +1472,7 @@ Aktuellen Bootloader ersetzen?</translation>
     <message>
         <location filename="rbutilqt.cpp" line="185"/>
         <source>This is a new installation of Rockbox Utility, or a new version. The configuration dialog will now open to allow you to setup the program,  or review your settings.</source>
-        <translation type="unfinished">Die Konfiguration ist ungültig. Grund ist typischerweise der erste Start von Rockbox Utillity oder geänderte Pfade. Der Konfigurationsdialog wird nun automatisch geöffnet damit das Problem korrigiert werden kann.</translation>
+        <translation type="unfinished">Die Konfiguration ist ungültig. Grund ist typischerweise der erste Start von Rockbox Utillity oder geänderte Pfade. Der Konfigurationsdialog wird nun automatisch geöffnet, damit das Problem korrigiert werden kann.</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="490"/>
@@ -1830,18 +1830,18 @@ Aktuellen Bootloader ersetzen?</translation>
     <message>
         <location filename="rbutilqtfrm.ui" line="464"/>
         <source>&lt;b&gt;Install Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.</source>
-        <translation>&lt;b&gt;Installiere Sprachdatei&lt;/b&gt;&lt;br&gt;Sprachdateien werden benötigt damit Rockbox die Menüs vorlesen kann. Sprachausgabe ist standardmäßig angeschaltet. Sobald eine Sprachdatei installiert ist werden die Menüs gesprochen.</translation>
+        <translation>&lt;b&gt;Installiere Sprachdatei&lt;/b&gt;&lt;br&gt;Sprachdateien werden benötigt, damit Rockbox die Menüs vorlesen kann. Sprachausgabe ist standardmäßig angeschaltet. Sobald eine Sprachdatei installiert ist werden die Menüs gesprochen.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="490"/>
         <source>&lt;b&gt;Create Talk Files&lt;/b&gt;&lt;br/&gt;Talkfiles are needed to let Rockbox speak File and Foldernames</source>
-        <translation>&lt;b&gt;Erstelle Talk Dateien&lt;/b&gt;&lt;br/&gt;Talkdateien werden benötigt damit Rockbox Dateien und Ordner vorlesen kann</translation>
+        <translation>&lt;b&gt;Erstelle Talk Dateien&lt;/b&gt;&lt;br/&gt;Talkdateien werden benötigt, damit Rockbox Dateien und Ordner vorlesen kann</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="539"/>
         <source>&lt;b&gt;Create Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the  user interface. Speaking is enabled by default, so
  if you installed the voice file Rockbox will speak.</source>
-        <translation>&lt;b&gt;Erzeuge Sprachdatei&lt;/b&gt;&lt;br&gt; Sprachdateien werden benötigt damit Rockbox seine Benutzeroberfläche vorlesen kann. Sprachausgabe ist Standardmäßig angeschaltet, sobald sie eine Sprachdatei installieren wird Rockbox sprechen.</translation>
+        <translation>&lt;b&gt;Erzeuge Sprachdatei&lt;/b&gt;&lt;br&gt; Sprachdateien werden benötigt, damit Rockbox seine Benutzeroberfläche vorlesen kann. Sprachausgabe ist Standardmäßig angeschaltet, sobald sie eine Sprachdatei installieren wird Rockbox sprechen.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="576"/>
