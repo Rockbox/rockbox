@@ -841,7 +841,7 @@ static struct player_info_t players[] = {
     {"Zen V", null_key_v3, tl_zenv_key, false},
     {"Zen V Plus", null_key_v3, tl_zenvp_key, false},
     {"Zen V Video", null_key_v3, tl_zenvv_key, false},
-    {NULL, NULL, NULL, NULL, false}
+    {NULL, NULL, NULL, false}
 };
 
 void log_message(const char* format, ...);
