@@ -94,11 +94,11 @@ static int sr_ctrl = MROBE100_44100HZ;
 #endif
 
 void pcm_set_frequency(unsigned int frequency)
-{  
+{
 #ifdef HAVE_WM8731
-	pcm_freq = frequency;
+    pcm_freq = frequency;
 #else
-	(void)frequency;
+    (void)frequency;
     pcm_freq = HW_SAMPR_DEFAULT;
 #endif
 #ifdef HAVE_WM8751
@@ -113,7 +113,7 @@ void pcm_apply_settings(void)
 #endif
 
 #ifdef HAVE_WM8731
-	audiohw_set_sample_rate(pcm_freq);
+    audiohw_set_sample_rate(pcm_freq);
 #endif
     pcm_curr_sampr = pcm_freq;
 }
@@ -144,7 +144,7 @@ void fiq_playback(void)
      */
     asm volatile (
         "stmfd   sp!, { r0-r3, lr }  \n" /* stack scratch regs and lr */
-        
+
 #if CONFIG_CPU == PP5002
         "ldr     r12, =0xcf001040    \n" /* Some magic from iPodLinux */
         "ldr     r12, [r12]          \n"
@@ -157,12 +157,12 @@ void fiq_playback(void)
     ".check_fifo:                    \n"   
         "ldr     r0, [r10, %[cfg]]   \n" /* read IISFIFO_CFG to check FIFO status */
         "and     r0, r0, %[mask]     \n" /* r0 = IIS_TX_FREE_COUNT << 16 (PP502x) */
-        
-        "mov     r1, r0, lsr #16     \n" /* number of free FIFO slots */     
+
+        "mov     r1, r0, lsr #16     \n" /* number of free FIFO slots */
         "cmp     r1, r9, lsr #2      \n" /* number of words from source */
         "movgt   r1, r9, lsr #2      \n" /* r1 = amount of allowed loops */
         "sub     r9, r9, r1, lsl #2  \n" /* r1 words will be written in following loop */
-        
+
         "subs    r1, r1, #2          \n"
     ".fifo_loop_2:                   \n"
         "ldmgeia r8!, {r2, r12}      \n" /* load four samples */
@@ -170,15 +170,15 @@ void fiq_playback(void)
         "strge   r12, [r10, %[wr]]   \n" /* write sample 2-3 to IISFIFO_WR */
         "subges  r1, r1, #2          \n" /* one more loop? */
         "bge     .fifo_loop_2        \n" /* yes, continue */
-        
+
         "tst     r1, #1              \n" /* two samples (one word) left? */
         "ldrne   r12, [r8], #4       \n" /* load two samples */
         "strne   r12, [r10, %[wr]]   \n" /* write sample 0-1 to IISFIFO_WR */
-        
+
         "cmp     r9, #0              \n" /* either FIFO is full or source buffer is empty */
         "bgt     .exit               \n" /* if source buffer is not empty, FIFO must be full */
 #elif SAMPLE_SIZE == 32
-    ".check_fifo:                    \n"   
+    ".check_fifo:                    \n"
         "ldr     r0, [r10, %[cfg]]   \n" /* read IISFIFO_CFG to check FIFO status */
         "and     r0, r0, %[mask]     \n" /* r0 = IIS_TX_FREE_COUNT << 23 (PP5002) */
 
@@ -187,7 +187,7 @@ void fiq_playback(void)
         "cmp     r1, r9, lsr #2      \n" /* number of words from source */
         "movgt   r1, r9, lsr #2      \n" /* r1 = amount of allowed loops */
         "sub     r9, r9, r1, lsl #2  \n" /* r1 words will be written in following loop */
-        
+
     ".fifo_loop:                     \n"
         "ldr     r12, [r8], #4       \n" /* load two samples */
         "mov     r2 , r12, lsl #16   \n" /* put left sample at the top bits */
@@ -195,11 +195,11 @@ void fiq_playback(void)
         "str     r12, [r10, %[wr]]   \n" /* write low sample to IISFIFO_WR*/
         "subs    r1, r1, #1          \n" /* one more loop? */
         "bgt     .fifo_loop          \n" /* yes, continue */
-        
+
         "cmp     r9, #0              \n" /* either FIFO is full or source buffer is empty */
         "bgt     .exit               \n" /* if source buffer is not empty, FIFO must be full */
 #endif
-        
+
     ".more_data:                     \n"
         "ldr     r2, =pcm_callback_for_more \n"
         "ldr     r2, [r2]            \n" /* get callback address */

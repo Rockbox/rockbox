@@ -223,28 +223,28 @@ void audiohw_set_nsorder(int order)
 
 void audiohw_set_sample_rate(int sampling_control)
 {
-	int rate = 0;
-	switch(sampling_control)
-	{
-		case SAMPR_96:
-			rate = WM8731_USB24_96000HZ;
-			break;
-		case SAMPR_88:
-			rate = WM8731_USB24_88200HZ;
-			break;
-		case SAMPR_48:
-			rate = WM8731_USB24_48000HZ;
-			break;
-		case SAMPR_44:
-			rate = WM8731_USB24_44100HZ;
-			break;
-		case SAMPR_32:
-			rate = WM8731_USB24_32000HZ;
-			break;
-		case SAMPR_8:
-			rate = WM8731_USB24_8000HZ;
-			break;
-	}			
+    int rate = 0;
+    switch(sampling_control)
+    {
+        case SAMPR_96:
+            rate = WM8731_USB24_96000HZ;
+            break;
+        case SAMPR_88:
+            rate = WM8731_USB24_88200HZ;
+            break;
+        case SAMPR_48:
+            rate = WM8731_USB24_48000HZ;
+            break;
+        case SAMPR_44:
+            rate = WM8731_USB24_44100HZ;
+            break;
+        case SAMPR_32:
+            rate = WM8731_USB24_32000HZ;
+            break;
+        case SAMPR_8:
+            rate = WM8731_USB24_8000HZ;
+            break;
+    }
     codec_set_active(false);
     wmcodec_write(SAMPCTRL, rate);
     codec_set_active(true);
@@ -254,13 +254,13 @@ void audiohw_set_sample_rate(int sampling_control)
 void audiohw_enable_recording(bool source_mic)
 {
     codec_set_active(false);
-    
+
     wm8731_regs[PDCTRL] &= ~PDCTRL_ADCPD;
     /* NOTE: When switching to digital monitoring we will not want
      * the DAC disabled. */
     wm8731_regs[PDCTRL] |= PDCTRL_DACPD;
     wm8731_regs[AAPCTRL] &= ~AAPCTRL_DACSEL;
-    
+
     if (source_mic) {
         wm8731_write_or(LINVOL, LINVOL_LINMUTE);
         wm8731_write_or(RINVOL, RINVOL_RINMUTE);
