@@ -634,7 +634,7 @@ int talk_id(int32_t id, bool enqueue)
     return 0;
 }
 /* Speaks zero or more IDs (from an array). */
-int talk_idarray(long *ids, bool enqueue)
+int talk_idarray(const long *ids, bool enqueue)
 {
     int r;
     if(!ids)
@@ -657,7 +657,8 @@ void talk_force_enqueue_next(void)
 /* play a thumbnail from file */
 /* Returns size of spoken thumbnail, so >0 means something is spoken,
    <=0 means something went wrong. */
-static int _talk_file(const char* filename, long *prefix_ids, bool enqueue)
+static int _talk_file(const char* filename,
+                      const long *prefix_ids, bool enqueue)
 {
     int fd;
     int size;
@@ -729,9 +730,8 @@ static int _talk_file(const char* filename, long *prefix_ids, bool enqueue)
     return size;
 }
 
-int
-talk_file(const char *root, const char *dir, const char *file,
-          const char *ext, long *prefix_ids, bool enqueue)
+int talk_file(const char *root, const char *dir, const char *file,
+              const char *ext, const long *prefix_ids, bool enqueue)
 /* Play a thumbnail file */
 {
     char buf[MAX_PATH];
@@ -746,9 +746,8 @@ talk_file(const char *root, const char *dir, const char *file,
     return _talk_file(buf, prefix_ids, enqueue);
 }
 
-static int
-talk_spell_basename(const char *path,
-                    long *prefix_ids, bool enqueue)
+static int talk_spell_basename(const char *path,
+                               const long *prefix_ids, bool enqueue)
 {
     if(prefix_ids)
     {
@@ -771,7 +770,7 @@ talk_spell_basename(const char *path,
 /* Play a file's .talk thumbnail, fallback to spelling the filename, or
    go straight to spelling depending on settings. */
 int talk_file_or_spell(const char *dirname, const char *filename,
-                       long *prefix_ids, bool enqueue)
+                       const long *prefix_ids, bool enqueue)
 {
     if (global_settings.talk_file_clip)
     {   /* .talk clips enabled */
@@ -788,7 +787,7 @@ int talk_file_or_spell(const char *dirname, const char *filename,
 /* Play a directory's .talk thumbnail, fallback to spelling the filename, or
    go straight to spelling depending on settings. */
 int talk_dir_or_spell(const char* dirname,
-                       long *prefix_ids, bool enqueue)
+                      const long *prefix_ids, bool enqueue)
 {
     if (global_settings.talk_dir_clip)
     {   /* .talk clips enabled */
@@ -800,33 +799,6 @@ int talk_dir_or_spell(const char* dirname,
         /* Either .talk clips disabled or as a fallback */
         return talk_spell_basename(dirname, prefix_ids, enqueue);
     return 0;
-}
-
-/* Speak thumbnail for each component of a full path, again falling
-   back or going straight to spelling depending on settings. */
-int talk_fullpath(const char* path, bool enqueue)
-{
-    if (!enqueue)
-        talk_shutup();
-    if(path[0] != '/')
-        /* path ought to start with /... */
-        return talk_spell(path, true);
-    talk_id(VOICE_CHAR_SLASH, true);
-    char buf[MAX_PATH];
-    strncpy(buf, path, MAX_PATH);
-    char *start = buf+1; /* start of current component */
-    char *ptr = strchr(start, '/'); /* end of current component */
-    while(ptr) { /* There are more slashes ahead */
-        /* temporarily poke a NULL at end of component to truncate string */
-        *ptr = '\0';
-        talk_dir_or_spell(buf, NULL, true);
-        *ptr = '/'; /* restore string */
-        talk_id(VOICE_CHAR_SLASH, true);
-        start = ptr+1; /* setup for next component */
-        ptr = strchr(start, '/');
-    }
-    /* no more slashes, final component is a filename */
-    return talk_file_or_spell(NULL, buf, NULL, true);
 }
 
 /* say a numeric value, this word ordering works for english,
@@ -1099,14 +1071,14 @@ void talk_setting(const void *global_settings_variable)
 
 
 #if CONFIG_RTC
-void talk_date(struct tm *tm, bool enqueue)
+void talk_date(const struct tm *tm, bool enqueue)
 {
     talk_id(LANG_MONTH_JANUARY + tm->tm_mon, enqueue);
     talk_number(tm->tm_mday, true);
     talk_number(1900 + tm->tm_year, true);
 }
 
-void talk_time(struct tm *tm, bool enqueue)
+void talk_time(const struct tm *tm, bool enqueue)
 {
     if (global_settings.timeformat == 1)
     {

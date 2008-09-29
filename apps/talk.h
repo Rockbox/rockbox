@@ -86,15 +86,13 @@ bool is_voice_queued(void); /* Are there more voice clips to be spoken? */
 int talk_id(int32_t id, bool enqueue); /* play a voice ID from voicefont */
 /* play a thumbnail from file */
 int talk_file(const char *root, const char *dir, const char *file,
-              const char *ext, long *prefix_ids, bool enqueue);
+              const char *ext, const long *prefix_ids, bool enqueue);
 /* play file's thumbnail or spell name */
 int talk_file_or_spell(const char *dirname, const char* filename,
-                       long *prefix_ids, bool enqueue);
+                       const long *prefix_ids, bool enqueue);
 /* play dir's thumbnail or spell name */
 int talk_dir_or_spell(const char* filename,
-                      long *prefix_ids, bool enqueue);
-/* play thumbnails for each components of full path, or spell */
-int talk_fullpath(const char* path, bool enqueue);
+                      const long *prefix_ids, bool enqueue);
 int talk_number(long n, bool enqueue); /* say a number */
 int talk_value(long n, int unit, bool enqueue); /* say a numeric value */
 int talk_value_decimal(long n, int unit, int decimals, bool enqueue);
@@ -108,8 +106,8 @@ void talk_shutup(void); /* Interrupt voice, as when enqueue is false */
 void talk_fractional(char *tbuf, int value, int unit);
 
 #if CONFIG_RTC
-void talk_time(struct tm *tm, bool enqueue);
-void talk_date(struct tm *tm, bool enqueue);
+void talk_time(const struct tm *tm, bool enqueue);
+void talk_date(const struct tm *tm, bool enqueue);
 #endif /* CONFIG_RTC */
 
 /* This (otherwise invalid) ID signals the end of the array. */
@@ -120,7 +118,7 @@ void talk_date(struct tm *tm, bool enqueue);
 void talk_force_enqueue_next(void);
 
 /* speaks one or more IDs (from an array)). */
-int talk_idarray(long *idarray, bool enqueue);
+int talk_idarray(const long *idarray, bool enqueue);
 /* This makes an initializer for the array of IDs and takes care to
    put the final sentinel element at the end. */
 #define TALK_IDARRAY(ids...) ((long[]){ids,TALK_FINAL_ID})
