@@ -808,6 +808,7 @@ bool search_playlist(void)
         {
             found_indicies[found_indicies_count++] = track.index;
         }
+        yield();
     }
     if (!found_indicies_count)
     {
