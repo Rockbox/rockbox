@@ -195,17 +195,13 @@ int main(int argc, char* argv[])
     fprintf(stderr,"New total size of firmware - 0x%08x\n",new_length);
 
     if (firmware_paddedsize != new_paddedsize) {
-        /* Move everything after the firmare block "bootloader_size"
-           bytes forward to make room for the bootloader */
+        /* We don't know how to safely increase the firmware size, so abort */
 
-        fprintf(stderr,"Calling memmove(buf + 0x%08x,buf + 0x%08x,0x%08x)\n",
-                0x400 + new_paddedsize,
-                0x400 + firmware_paddedsize,
-                (int)len - firmware_paddedsize);
+        fprintf(stderr,
+                "[ERR]  Bootloader too large (%d bytes - %d bytes available), aborting.\n",
+                bootloader_size, firmware_paddedsize - firmware_size);
 
-        memmove(buf + 0x400 + new_paddedsize,
-                buf + 0x400 + firmware_paddedsize,
-                len - firmware_paddedsize);
+        return 1;
     }
 
     ldr = get_uint32le(&buf[0x400]);
