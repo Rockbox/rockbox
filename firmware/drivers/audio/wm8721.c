@@ -104,7 +104,7 @@ void audiohw_enable_output(bool enable)
 
         /* DACSEL=1 */
         wmcodec_write(0x4, 0x10);
-    
+
         /* set power register to POWEROFF=0 on OUTPD=0, DACPD=0 */
         wmcodec_write(PDCTRL, 0x67);
 
@@ -123,7 +123,7 @@ void audiohw_enable_output(bool enable)
 
         /* 5. Set DACMU = 0 to soft-un-mute the audio DACs. */
         wmcodec_write(DAPCTRL, 0x0);
-        
+
         audiohw_mute(0);
     } else {
         audiohw_mute(1);
@@ -168,7 +168,29 @@ void audiohw_set_nsorder(int order)
 
 void audiohw_set_sample_rate(int sampling_control)
 {
+    int rate = 0;
+    switch(sampling_control)
+    {
+        case SAMPR_96:
+            rate = WM8721_USB24_96000HZ;
+            break;
+        case SAMPR_88:
+            rate = WM8721_USB24_88200HZ;
+            break;
+        case SAMPR_48:
+            rate = WM8721_USB24_48000HZ;
+            break;
+        case SAMPR_44:
+            rate = WM8721_USB24_44100HZ;
+            break;
+        case SAMPR_32:
+            rate = WM8721_USB24_32000HZ;
+            break;
+        case SAMPR_8:
+            rate = WM8721_USB24_8000HZ;
+            break;
+    }
     codec_set_active(0x0);
-    wmcodec_write(SAMPCTRL, sampling_control);
+    wmcodec_write(SAMPCTRL, rate);
     codec_set_active(0x1);
 }
