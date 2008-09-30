@@ -146,7 +146,6 @@ gccpatch="" # default is no gcc patch
 gccver="4.0.3" # default gcc version
 binutils="2.16.1" # The binutils version to use
 gccconfigure="" #default is nothing added to configure
-binutilsconf="" #default is nothing added to configure
 
 system=`uname -s`
 gccurl="http://www.rockbox.org/gcc"
@@ -187,7 +186,6 @@ case $arch in
     case $system in
       Interix)
         gccpatch="gcc-4.1.2-interix.diff"
-		binutilsconf="--disable-werror"
         ;;
       *)
         ;;
@@ -270,7 +268,7 @@ mkdir build-binu
 echo "ROCKBOXDEV: cd build-binu"
 cd build-binu
 echo "ROCKBOXDEV: binutils/configure"
-../binutils-$binutils/configure --target=$target --prefix=$prefix/$target $binutilsconf
+../binutils-$binutils/configure --target=$target --prefix=$prefix/$target
 echo "ROCKBOXDEV: binutils/make"
 $make
 echo "ROCKBOXDEV: binutils/make install to $prefix/$target"
