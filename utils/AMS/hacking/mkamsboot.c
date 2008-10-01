@@ -76,6 +76,12 @@ compressed image is stored at the end of the destination buffer.
 #define PAD_TO_BOUNDARY(x) (((x) + 0x1ff) & ~0x1ff)
 
 
+/* This magic should appear at the start of any UCL file */
+static const unsigned char uclmagic[] = {
+    0x00, 0xe9, 0x55, 0x43, 0x4c, 0xff, 0x01, 0x1a
+};
+
+
 static off_t filesize(int fd) {
     struct stat buf;
 
@@ -90,6 +96,12 @@ static off_t filesize(int fd) {
 static uint32_t get_uint32le(unsigned char* p)
 {
     return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+}
+
+static uint32_t get_uint32be(unsigned char* p)
+{
+    return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
+
 }
 
 static void put_uint32le(unsigned char* p, uint32_t x)
@@ -123,6 +135,7 @@ int main(int argc, char* argv[])
     char *infile, *uclfile, *bootfile, *uclunpackfile, *outfile;
     int fdin, fducl, fdboot, fduclunpack, fdout;
     off_t len;
+    unsigned char uclheader[26];
     uint32_t n;
     unsigned char* buf;
     uint32_t firmware_size;
@@ -173,8 +186,29 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    ucl_size = filesize(fducl);
+    /* Some UCL file sanity checks */
+    n = read(fducl, uclheader, sizeof(uclheader));
 
+    if (n != sizeof(uclheader)) {
+        fprintf(stderr,"[ERR]  Could not read header from UCL file\n");
+        return 1;
+    }
+
+    if (memcmp(uclmagic, uclheader, sizeof(uclmagic))!=0) {
+        fprintf(stderr,"[ERR]  Invalid UCL file\n");
+        return 1;
+    }
+
+    if (uclheader[12] != 0x2e) {
+        fprintf(stderr,"[ERR]  Unsupported UCL encryption format (0x%02x) - only 0x2e supported.\n",uclheader[12]);
+        return 1;
+    }
+    ucl_size = get_uint32be(&uclheader[22]) + 8;
+
+    if (ucl_size + 26 > filesize(fducl)) {
+        fprintf(stderr, "[ERR]  Size mismatch in UCL file\n");
+        return 1;
+    }
 
     /* Open the firmware file */
     fdin = open(infile,O_RDONLY|O_BINARY);
