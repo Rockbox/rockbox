@@ -269,6 +269,7 @@ int main(int argc, char* argv[])
 
     put_uint32le(&buf[0x420], firmware_size + 1);  /* UCL unpack entry point */
     put_uint32le(&buf[0x424], firmware_size - ucl_size);  /* Location of OF */
+    put_uint32le(&buf[0x428], ucl_size);           /* Size of UCL image */
 
     /* Update checksum */
     sum = calc_checksum(buf + 0x400,firmware_size + uclunpack_size);

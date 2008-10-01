@@ -18,6 +18,7 @@
 /* These values are filled in by mkamsboot - don't move them from offset 0x20 */
 ucl_unpack:      .word   0 /* Entry point (plus 1 - for thumb) of ucl_unpack */
 ucl_start:       .word   0 /* Start of the ucl-compressed OF image */
+ucl_size:        .word   0 /* Length in bytes of the compressed OF image */
 
 
 start:
@@ -29,6 +30,7 @@ loop:   subs  r1, r1, #1
         /* Call the ucl decompress function, which will branch to 0x0
            on completion */
         ldr   r0, ucl_start   /* Source */
-        mov   r1, #0          /* Destination */
-        ldr   r2, ucl_unpack
-        bx    r2
+        ldr   r1, ucl_size    /* Source length */
+        mov   r2, #0          /* Destination */
+        ldr   r3, ucl_unpack
+        bx    r3
