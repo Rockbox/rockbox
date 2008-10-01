@@ -27,10 +27,30 @@ start:
 loop:   subs  r1, r1, #1
         bne   loop
 
-        /* Call the ucl decompress function, which will branch to 0x0
-           on completion */
+        /* First copy the compressed firmware to unused RAM */
+
         ldr   r0, ucl_start   /* Source */
         ldr   r1, ucl_size    /* Source length */
+
+        mov   r2, #0x40000    /* Destination end */
+        sub   r2, r2, r1
+
+memcpy:
+        ldrb  r3, [r0]
+        strb  r3, [r2]
+        adds  r0, r0, #1
+        adds  r2, r2, #1
+        cmp   r2, #0x40000    /* Stop when we reached dest_end */
+        bne   memcpy
+
+        sub   r0, r2, r1      /* Point to the compressed firmware */
+
+        /* Call the ucl decompress function, which will branch to 0x0 */
+        /* on completion */
+
         mov   r2, #0          /* Destination */
+
         ldr   r3, ucl_unpack
         bx    r3
+
+        /* never reached */
