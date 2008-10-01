@@ -200,12 +200,12 @@ int main(int argc, char* argv[])
     }
 
     if (uclheader[12] != 0x2e) {
-        fprintf(stderr,"[ERR]  Unsupported UCL encryption format (0x%02x) - only 0x2e supported.\n",uclheader[12]);
+        fprintf(stderr,"[ERR]  Unsupported UCL compression format (0x%02x) - only 0x2e supported.\n",uclheader[12]);
         return 1;
     }
     ucl_size = get_uint32be(&uclheader[22]) + 8;
 
-    if (ucl_size + 26 > filesize(fducl)) {
+    if (ucl_size + 26 > (unsigned)filesize(fducl)) {
         fprintf(stderr, "[ERR]  Size mismatch in UCL file\n");
         return 1;
     }
