@@ -26,26 +26,33 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 Insert a Rockbox bootloader into an AMS original firmware file.
 
-The first instruction in an AMS firmware file is always of the form:
+We replace the main firmware block (bytes 0x400..padded_firmware_size+0x400)
+with the following:
 
-   ldr     pc, [pc, #xxx]
+Bytes 0..(firmware_size-ucl_size) - Our bootloader code
+Bytes (firmware_size-ucl_size)..firmware_size - UCL compressed OF image
+Bytes firmware_size..padded_firmware_size - UCL decompress function
 
-where [pc, #xxx] contains the entry point of the firmware - e.g. 0x00000138
+mkamsboot writes the following values at offsets into our bootloader code:
 
-mkamsboot appends the Rockbox bootloader to the end of the original
-firmware block in the firmware file and shifts the remaining contents of the firmware file to make space for it.
+0x20 - Entry point (plus 1 - for thumb mode) of the ucl_unpack function
+0x24 - Location of the UCL compressed version of the original firmware block
 
-It also replaces the contents of [pc, #xxx] with the entry point of
-our bootloader - i.e. the length of the original firmware block plus 4
-bytes.
+mkamsboot then corrects the length (to include the UCL decompress
+function) and checksum in the main firmware headers (both copies),
+creating a new legal firmware file which can be installed on the
+device.
 
-It then stores the original entry point from [pc, #xxx] in the first
-four bytes of the Rockbox bootloader image, which is used by the
-bootloader to dual-boot.
+Our bootloader first checks for the "dual-boot" keypress, and then either:
 
-Finally, mkamsboot corrects the length and checksum in the main
-firmware headers (both copies), creating a new legal firmware file
-which can be installed on the device.
+a) Branches to the ucl_unpack function, which will then branch to 0x0 after 
+   decompressing the OF.
+
+b) Continues running with our test code
+
+This method uses no RAM outside the padded area of the original
+firmware block - the UCL compression can happen in-place when the
+compressed image is stored at the end of the destination buffer.
 
 */
 
@@ -106,35 +113,35 @@ static int calc_checksum(unsigned char* buf, uint32_t n)
 
 void usage(void)
 {
-    printf("Usage: mkamsboot <firmware file> <boot file> <output file>\n");
+    printf("Usage: mkamsboot <firmware file> <ucl image> <boot file> <ucl unpack file> <output file>\n");
 
     exit(1);
 }
 
 int main(int argc, char* argv[])
 {
-    char *infile, *bootfile, *outfile;
-    int fdin, fdboot,fdout;
+    char *infile, *uclfile, *bootfile, *uclunpackfile, *outfile;
+    int fdin, fducl, fdboot, fduclunpack, fdout;
     off_t len;
     uint32_t n;
     unsigned char* buf;
-    uint32_t ldr;
-    uint32_t origoffset;
     uint32_t firmware_size;
     uint32_t firmware_paddedsize;
     uint32_t bootloader_size;
-    uint32_t new_paddedsize;
+    uint32_t ucl_size;
+    uint32_t uclunpack_size;
     uint32_t sum,filesum;
-    uint32_t new_length;
     uint32_t i;
 
-    if(argc != 4) {
+    if(argc != 6) {
         usage();
     }
 
     infile = argv[1];
-    bootfile = argv[2];
-    outfile = argv[3];
+    uclfile = argv[2];
+    bootfile = argv[3];
+    uclunpackfile = argv[4];
+    outfile = argv[5];
 
     /* Open the bootloader file */
     fdboot = open(bootfile, O_RDONLY|O_BINARY);
@@ -145,6 +152,28 @@ int main(int argc, char* argv[])
     }
 
     bootloader_size = filesize(fdboot);
+
+
+    /* Open the UCL-compressed image of the firmware block */
+    fduclunpack = open(uclunpackfile, O_RDONLY|O_BINARY);
+    if (fduclunpack < 0)
+    {
+        fprintf(stderr,"[ERR]  Could not open %s for reading\n",uclunpackfile);
+        return 1;
+    }
+
+    uclunpack_size = filesize(fduclunpack);
+
+
+    /* Open the UCL-compressed image of the firmware block */
+    fducl = open(uclfile, O_RDONLY|O_BINARY);
+    if (fducl < 0)
+    {
+        fprintf(stderr,"[ERR]  Could not open %s for reading\n",uclfile);
+        return 1;
+    }
+
+    ucl_size = filesize(fducl);
 
 
     /* Open the firmware file */
@@ -158,9 +187,8 @@ int main(int argc, char* argv[])
     if ((len = filesize(fdin)) < 0)
         return 1;
 
-    /* We will need no more memory than the total size plus the bootloader size
-       padded to a boundary */
-    if ((buf = malloc(len + PAD_TO_BOUNDARY(bootloader_size))) == NULL) {
+    /* Allocate memory for the OF image - we don't change the size */
+    if ((buf = malloc(len)) == NULL) {
         fprintf(stderr,"[ERR]  Could not allocate buffer for input file (%d bytes)\n",(int)len);
         return 1;
     }
@@ -181,91 +209,83 @@ int main(int argc, char* argv[])
 
     firmware_paddedsize = PAD_TO_BOUNDARY(firmware_size);
 
-    /* Total new size */
-    new_paddedsize = PAD_TO_BOUNDARY(firmware_size + bootloader_size);
+    fprintf(stderr,"Original firmware size - %d bytes\n",firmware_size);
+    fprintf(stderr,"Padded firmware size - %d bytes\n",firmware_paddedsize);
+    fprintf(stderr,"Bootloader size - %d bytes\n",bootloader_size);
+    fprintf(stderr,"UCL image size - %d bytes\n",ucl_size);
+    fprintf(stderr,"UCL unpack function size - %d bytes\n",uclunpack_size);
+    fprintf(stderr,"Original total size of firmware - %d bytes\n",(int)len);
 
-    /* Total new size of firmware file */
-    new_length = len + (new_paddedsize - firmware_paddedsize);
-
-    fprintf(stderr,"Original firmware size - 0x%08x\n",firmware_size);
-    fprintf(stderr,"Padded firmware size - 0x%08x\n",firmware_paddedsize);
-    fprintf(stderr,"Bootloader size - 0x%08x\n",bootloader_size);
-    fprintf(stderr,"New padded size - 0x%08x\n",new_paddedsize);
-    fprintf(stderr,"Original total size of firmware - 0x%08x\n",(int)len);
-    fprintf(stderr,"New total size of firmware - 0x%08x\n",new_length);
-
-    if (firmware_paddedsize != new_paddedsize) {
-        /* We don't know how to safely increase the firmware size, so abort */
-
-        fprintf(stderr,
-                "[ERR]  Bootloader too large (%d bytes - %d bytes available), aborting.\n",
-                bootloader_size, firmware_paddedsize - firmware_size);
-
+    /* Check we have room for our bootloader - in the future, we could UCL
+       pack this image as well if we need to. */
+    if (bootloader_size > (firmware_size - ucl_size)) {
+        fprintf(stderr,"[ERR] Bootloader too large (%d bytes, %d available)\n",
+                bootloader_size, firmware_size - ucl_size);
         return 1;
     }
 
-    ldr = get_uint32le(&buf[0x400]);
-
-    if ((ldr & 0xfffff000) != 0xe59ff000) {
-        fprintf(stderr,"[ERR]  Firmware file doesn't start with an \"ldr pc, [pc, #xx]\" instruction.\n");
+    /* Check we have enough room for the UCL unpack function.  This
+       needs to be outside the firmware block, so if we wanted to
+       support every firmware version, we could store this function in
+       the main firmware block, and then copy it to an unused part of
+       RAM. */
+    if (uclunpack_size > (firmware_paddedsize - firmware_size)) {
+        fprintf(stderr,"[ERR] UCL unpack function too large (%d bytes, %d available)\n",
+                uclunpack_size, firmware_paddedsize - firmware_size);
         return 1;
     }
-    origoffset = (ldr&0xfff) + 8;
 
-    printf("original firmware entry point: 0x%08x\n",get_uint32le(buf + 0x400 + origoffset));
-    printf("New entry point: 0x%08x\n", firmware_size + 4);
+    /* Zero the original firmware area - not needed, but helps debugging */
+    memset(buf + 0x400, 0, firmware_size);
 
-#if 0
-    /* Replace the "Product: Express" string with "Rockbox" */
-    i = 0x400 + firmware_size - 7;
-    while ((i > 0x400) && (memcmp(&buf[i],"Express",7)!=0))
-        i--;
-
-    i = (i + 3) & ~0x3;
-
-    if (i >= 0x400) {
-        printf("Replacing \"Express\" string at offset 0x%08x\n",i);
-        memcpy(&buf[i],"Rockbox",7);
-    } else {
-        printf("Could not find \"Express\" string to replace\n");
-    }
-#endif
-
-    n = read(fdboot, buf + 0x400 + firmware_size, bootloader_size);
+    /* Locate our bootloader code at the start of the firmware block */
+    n = read(fdboot, buf + 0x400, bootloader_size);
 
     if (n != bootloader_size) {
-        fprintf(stderr,"[ERR] Could not bootloader file\n");
+        fprintf(stderr,"[ERR] Could not load bootloader file\n");
         return 1;
     }
     close(fdboot);
 
-    /* Replace first word of the bootloader with the original entry point */
-    put_uint32le(buf + 0x400 + firmware_size, get_uint32le(buf + 0x400 + origoffset));
+    /* Locate the compressed image of the original firmware block at the end
+       of the firmware block */
+    n = read(fducl, buf + 0x400 + firmware_size - ucl_size, ucl_size);
 
-#if 1
-    put_uint32le(buf + 0x400 + origoffset, firmware_size + 4);
-#endif
+    if (n != ucl_size) {
+        fprintf(stderr,"[ERR] Could not load ucl file\n");
+        return 1;
+    }
+    close(fducl);
+
+
+    /* Locate our UCL unpack function in the padding after the firmware block */
+    n = read(fduclunpack, buf + 0x400 + firmware_size, uclunpack_size);
+
+    if (n != uclunpack_size) {
+        fprintf(stderr,"[ERR] Could not load uclunpack file\n");
+        return 1;
+    }
+    close(fduclunpack);
+
+    put_uint32le(&buf[0x420], firmware_size + 1);  /* UCL unpack entry point */
+    put_uint32le(&buf[0x424], firmware_size - ucl_size);  /* Location of OF */
 
     /* Update checksum */
-    sum = calc_checksum(buf + 0x400,firmware_size + bootloader_size);
+    sum = calc_checksum(buf + 0x400,firmware_size + uclunpack_size);
 
     put_uint32le(&buf[0x04], sum);
     put_uint32le(&buf[0x204], sum);
 
-    /* Update firmware block count */
-    put_uint32le(&buf[0x08], new_paddedsize / 0x200);
-    put_uint32le(&buf[0x208], new_paddedsize / 0x200);
-
     /* Update firmware size */
-    put_uint32le(&buf[0x0c], firmware_size + bootloader_size);
-    put_uint32le(&buf[0x20c], firmware_size + bootloader_size);
+    put_uint32le(&buf[0x0c], firmware_size + uclunpack_size);
+    put_uint32le(&buf[0x20c], firmware_size + uclunpack_size);
 
     /* Update the whole-file checksum */
     filesum = 0;
-    for (i=0;i < new_length - 4; i+=4)
+    for (i=0;i < (unsigned)len - 4; i+=4)
         filesum += get_uint32le(&buf[i]);
 
-    put_uint32le(buf + new_length - 4, filesum);
+    put_uint32le(buf + len - 4, filesum);
 
 
     /* Write the new firmware */
@@ -276,7 +296,12 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    write(fdout, buf, new_length);
+    n = write(fdout, buf, len);
+
+    if (n != (unsigned)len) {
+        fprintf(stderr,"[ERR]  Could not write firmware file\n");
+        return 1;
+    }
 
     close(fdout);
 

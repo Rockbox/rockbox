@@ -77,13 +77,15 @@ ucl_nrv2e_decompress_8: .globl ucl_nrv2e_decompress_8  @ ARM mode
    For SAFE mode: at call, *plen_dst must be allowed length of output buffer.
 */
         adr r12,1+.thumb_nrv2e_d8; bx r12  @ enter THUMB mode
+#endif
         .code 16  @ THUMB mode
         .thumb_func
-#endif
 
 .thumb_nrv2e_d8:
+#if 0
         push {r2,r3, r4,r5,r6,r7, lr}
 #define sp_DST0 0  /* stack offset of original dst */
+#endif
         add srclim,len,src  @ srclim= eof_src;
 #if 1==SAFE  /*{*/
         ldr tmp,[r3]  @ len_dst
@@ -103,12 +105,17 @@ bad_src_n2e:  # return value will be 1
         add src,#1
 #endif  /*}*/
 eof_n2e:
+#if 0
         pop {r3,r4}  @ r3= orig_dst; r4= plen_dst
         sub src,srclim  @ 0 if actual src length equals expected length
         sub dst,r3  @ actual dst length
         str dst,[r4]
         pop {r4,r5,r6,r7 /*,pc*/}
         pop {r1}; bx r1  @ "pop {,pc}" fails return to ARM mode on ARMv4T
+#else
+        mov  r0, #0
+        bx   r0    /* Branch to 0x0, switch to ARM mode */
+#endif
 
 get1_n2e:  @ In: Carry set [from adding 0x80000000 (1<<31) to itself]
           ldrb bits,[src]  @ zero-extend next byte
