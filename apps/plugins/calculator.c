@@ -890,86 +890,6 @@ static void move_with_wrap_and_shift(
 }
 
 /* -----------------------------------------------------------------------
-move button index
-Invert display new button, invert back previous button
------------------------------------------------------------------------ */
-void moveButton(int button){
-    switch(button){
-        case CALCULATOR_LEFT:
-        case CALCULATOR_LEFT | BUTTON_REPEAT:
-            move_with_wrap_and_shift(
-                &btn_col, -1, BUTTON_COLS,
-                &btn_row,  0, BUTTON_ROWS);
-            break;
-
-        case CALCULATOR_RIGHT:
-        case CALCULATOR_RIGHT | BUTTON_REPEAT:
-            move_with_wrap_and_shift(
-                &btn_col,  1, BUTTON_COLS,
-                &btn_row,  0, BUTTON_ROWS);
-            break;
-
-#ifdef CALCULATOR_UP
-        case CALCULATOR_UP:
-        case CALCULATOR_UP | BUTTON_REPEAT:
-            move_with_wrap_and_shift(
-                &btn_row, -1, BUTTON_ROWS,
-                &btn_col,  0, BUTTON_COLS);
-            break;
-#endif
-#ifdef CALCULATOR_DOWN
-        case CALCULATOR_DOWN:
-        case CALCULATOR_DOWN | BUTTON_REPEAT:
-            move_with_wrap_and_shift(
-                &btn_row,  1, BUTTON_ROWS,
-                &btn_col,  0, BUTTON_COLS);
-            break;
-#endif
-
-#ifdef CALCULATOR_UP_W_SHIFT
-        case CALCULATOR_UP_W_SHIFT:
-        case CALCULATOR_UP_W_SHIFT | BUTTON_REPEAT:
-            move_with_wrap_and_shift(
-                &btn_row, -1, BUTTON_ROWS,
-                &btn_col, -1, BUTTON_COLS);
-            break;
-#endif
-#ifdef CALCULATOR_DOWN_W_SHIFT
-        case CALCULATOR_DOWN_W_SHIFT:
-        case CALCULATOR_DOWN_W_SHIFT | BUTTON_REPEAT:
-            move_with_wrap_and_shift(
-                &btn_row,  1, BUTTON_ROWS,
-                &btn_col,  1, BUTTON_COLS);
-            break;
-#endif
-#ifdef CALCULATOR_LEFT_W_SHIFT
-        case CALCULATOR_LEFT_W_SHIFT:
-        case CALCULATOR_LEFT_W_SHIFT | BUTTON_REPEAT:
-            move_with_wrap_and_shift(
-                &btn_col, -1, BUTTON_COLS,
-                &btn_row, -1, BUTTON_ROWS);
-            break;
-#endif
-#ifdef CALCULATOR_RIGHT_W_SHIFT
-        case CALCULATOR_RIGHT_W_SHIFT:
-        case CALCULATOR_RIGHT_W_SHIFT | BUTTON_REPEAT:
-            move_with_wrap_and_shift(
-                &btn_col,  1, BUTTON_COLS,
-                &btn_row,  1, BUTTON_ROWS);
-            break;
-#endif
-    }
-
-    drawButtons(buttonGroup);
-    drawLines();
-
-    rb->lcd_update();
-
-    prev_btn_row = btn_row;
-    prev_btn_col = btn_col;
-}
-
-/* -----------------------------------------------------------------------
 Print buttons when switching 1st and 2nd
 int group = {basicButtons, sciButtons}
 ----------------------------------------------------------------------- */
@@ -1536,6 +1456,123 @@ void sciButtonsProcess(void){
 }
 
 /* -----------------------------------------------------------------------
+move button index
+Invert display new button, invert back previous button
+----------------------------------------------------------------------- */
+int handleButton(int button){
+    switch(button)
+    {
+        case CALCULATOR_INPUT:
+        case CALCULATOR_CALC:
+#ifdef CALCULATOR_INPUT_CALC_PRE
+            if (lastbtn != CALCULATOR_INPUT_CALC_PRE)
+                break;
+            /* no unconditional break; here! */
+#endif
+#ifdef CALCULATOR_OPERATORS
+        case CALCULATOR_OPERATORS:
+#endif
+            switch(buttonGroup){
+                case basicButtons:
+                    basicButtonsProcess();
+                    break;
+                case sciButtons:
+                    sciButtonsProcess();
+                    break;
+            }
+            break;
+
+#ifdef CALCULATOR_CLEAR
+        case CALCULATOR_CLEAR:
+            switch(calStatus){
+                case cal_typing:
+                case cal_dotted:
+                    doDelete();
+                    break;
+                default: /* cal_normal, cal_error, cal_exit */
+                    clearMem();
+                    break;
+            }
+            printResult();
+            break;
+#endif
+        case CALCULATOR_LEFT:
+        case CALCULATOR_LEFT | BUTTON_REPEAT:
+            move_with_wrap_and_shift(
+                &btn_col, -1, BUTTON_COLS,
+                &btn_row,  0, BUTTON_ROWS);
+            break;
+
+        case CALCULATOR_RIGHT:
+        case CALCULATOR_RIGHT | BUTTON_REPEAT:
+            move_with_wrap_and_shift(
+                &btn_col,  1, BUTTON_COLS,
+                &btn_row,  0, BUTTON_ROWS);
+            break;
+
+#ifdef CALCULATOR_UP
+        case CALCULATOR_UP:
+        case CALCULATOR_UP | BUTTON_REPEAT:
+            move_with_wrap_and_shift(
+                &btn_row, -1, BUTTON_ROWS,
+                &btn_col,  0, BUTTON_COLS);
+            break;
+#endif
+#ifdef CALCULATOR_DOWN
+        case CALCULATOR_DOWN:
+        case CALCULATOR_DOWN | BUTTON_REPEAT:
+            move_with_wrap_and_shift(
+                &btn_row,  1, BUTTON_ROWS,
+                &btn_col,  0, BUTTON_COLS);
+            break;
+#endif
+
+#ifdef CALCULATOR_UP_W_SHIFT
+        case CALCULATOR_UP_W_SHIFT:
+        case CALCULATOR_UP_W_SHIFT | BUTTON_REPEAT:
+            move_with_wrap_and_shift(
+                &btn_row, -1, BUTTON_ROWS,
+                &btn_col, -1, BUTTON_COLS);
+            break;
+#endif
+#ifdef CALCULATOR_DOWN_W_SHIFT
+        case CALCULATOR_DOWN_W_SHIFT:
+        case CALCULATOR_DOWN_W_SHIFT | BUTTON_REPEAT:
+            move_with_wrap_and_shift(
+                &btn_row,  1, BUTTON_ROWS,
+                &btn_col,  1, BUTTON_COLS);
+            break;
+#endif
+#ifdef CALCULATOR_LEFT_W_SHIFT
+        case CALCULATOR_LEFT_W_SHIFT:
+        case CALCULATOR_LEFT_W_SHIFT | BUTTON_REPEAT:
+            move_with_wrap_and_shift(
+                &btn_col, -1, BUTTON_COLS,
+                &btn_row, -1, BUTTON_ROWS);
+            break;
+#endif
+#ifdef CALCULATOR_RIGHT_W_SHIFT
+        case CALCULATOR_RIGHT_W_SHIFT:
+        case CALCULATOR_RIGHT_W_SHIFT | BUTTON_REPEAT:
+            move_with_wrap_and_shift(
+                &btn_col,  1, BUTTON_COLS,
+                &btn_row,  1, BUTTON_ROWS);
+            break;
+#endif
+#ifdef CALCULATOR_RC_QUIT
+        case CALCULATOR_RC_QUIT:
+#endif
+        case CALCULATOR_QUIT:
+            return -1;
+    }
+
+    return 0;
+
+    prev_btn_row = btn_row;
+    prev_btn_col = btn_col;
+}
+
+/* -----------------------------------------------------------------------
 Main();
 ----------------------------------------------------------------------- */
 enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
@@ -1553,7 +1590,8 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         if(btn & BUTTON_TOUCHSCREEN)
         {
             struct ts_raster_result res;
-            if(touchscreen_map_raster(&calc_raster, rb->button_get_data() >> 16, rb->button_get_data() & 0xffff, &res) == 1)
+            if(touchscreen_map_raster(&calc_raster, rb->button_get_data() >> 16,
+                                      rb->button_get_data() & 0xffff, &res) == 1)
             {
                 btn_row = res.y;
                 btn_col = res.x;
@@ -1580,85 +1618,26 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
             }
         }
 #endif
-        switch (btn) {
-            case CALCULATOR_INPUT:
-            case CALCULATOR_CALC:
-#ifdef CALCULATOR_INPUT_CALC_PRE
-                if (lastbtn != CALCULATOR_INPUT_CALC_PRE)
-                    break;
-                /* no unconditional break; here! */
-#endif
-#ifdef CALCULATOR_OPERATORS
-            case CALCULATOR_OPERATORS:
-#endif
-                switch(buttonGroup){
-                    case basicButtons:
-                        basicButtonsProcess();
-                        break;
-                    case sciButtons:
-                        sciButtonsProcess();
-                        break;
-                }
-                break;
+        if (handleButton(btn) == -1)
+        {
+            calStatus = cal_exit;
+            printResult();
+        }
+        else
+        {
+            drawButtons(buttonGroup);
+            drawLines();
+        }
 
-#ifdef CALCULATOR_CLEAR
-            case CALCULATOR_CLEAR:
-                switch(calStatus){
-                    case cal_typing:
-                    case cal_dotted:
-                        doDelete();
-                        break;
-                    default: /* cal_normal, cal_error, cal_exit */
-                        clearMem();
-                        break;
-                }
-                printResult();
-                break;
-#endif
+        rb->lcd_update();
 
-            case CALCULATOR_LEFT:
-            case CALCULATOR_LEFT | BUTTON_REPEAT:
-            case CALCULATOR_RIGHT:
-            case CALCULATOR_RIGHT | BUTTON_REPEAT:
-#ifdef CALCULATOR_UP
-            case CALCULATOR_UP:
-            case CALCULATOR_UP | BUTTON_REPEAT:
-#endif
-#ifdef CALCULATOR_DOWN
-            case CALCULATOR_DOWN:
-            case CALCULATOR_DOWN | BUTTON_REPEAT:
-#endif
-#ifdef CALCULATOR_UP_W_SHIFT
-            case CALCULATOR_UP_W_SHIFT:
-#endif
-#ifdef CALCULATOR_DOWN_W_SHIFT
-            case CALCULATOR_DOWN_W_SHIFT:
-#endif
-#ifdef CALCULATOR_LEFT_W_SHIFT
-            case CALCULATOR_LEFT_W_SHIFT:
-#endif
-#ifdef CALCULATOR_RIGHT_W_SHIFT
-            case CALCULATOR_RIGHT_W_SHIFT:
-#endif
-                moveButton(btn);
-                break;
-#ifdef CALCULATOR_RC_QUIT
-            case CALCULATOR_RC_QUIT:
-#endif
-            case CALCULATOR_QUIT:
-                calStatus = cal_exit;
-                printResult();
-                break;
-            default:
-                if(rb->default_event_handler(btn) == SYS_USB_CONNECTED)
-                    return PLUGIN_USB_CONNECTED;
-                break;
-        }  /* switch (btn) */
+        if(rb->default_event_handler(btn) == SYS_USB_CONNECTED)
+            return PLUGIN_USB_CONNECTED;
+
         if (btn != BUTTON_NONE)
             lastbtn = btn;
     } /* while (calStatus != cal_exit ) */
 
-    /*  rb->splash(HZ*2, "Hello world!"); */
     rb->button_clear_queue();
     return PLUGIN_OK;
 }
