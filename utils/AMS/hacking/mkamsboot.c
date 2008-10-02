@@ -26,33 +26,40 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 Insert a Rockbox bootloader into an AMS original firmware file.
 
-We replace the main firmware block (bytes 0x400..padded_firmware_size+0x400)
-with the following:
+We replace the main firmware block (bytes 0x400..0x400+firmware_size)
+as follows:
 
-Bytes 0..(firmware_size-ucl_size) - Our bootloader code
-Bytes (firmware_size-ucl_size)..firmware_size - UCL compressed OF image
-Bytes firmware_size..padded_firmware_size - UCL decompress function
 
-mkamsboot writes the following values at offsets into our bootloader code:
+ ---------------------  0x0
+|                     |
+| Rockbox bootloader  |
+|                     |
+|---------------------|
+|    EMPTY SPACE      |
+|---------------------|
+| ucl unpack function |
+|---------------------|
+|                     |
+| compressed OF image |
+|                     |
+|                     |
+ ---------------------
 
-0x20 - Entry point (plus 1 - for thumb mode) of the ucl_unpack function
-0x24 - Location of the UCL compressed version of the original firmware block
+This entire block fits into the space previously occupied by the main
+firmware block, and gives about 40KB of space to store the Rockbox
+bootloader.  This could be increased if we also UCL compress the
+Rockbox bootloader.
 
-mkamsboot then corrects the length (to include the UCL decompress
-function) and checksum in the main firmware headers (both copies),
-creating a new legal firmware file which can be installed on the
-device.
+mkamsboot then corrects the checksums and writes a new legal firmware
+file which can be installed on the device.
 
 Our bootloader first checks for the "dual-boot" keypress, and then either:
 
-a) Branches to the ucl_unpack function, which will then branch to 0x0 after 
-   decompressing the OF.
+a) Copies the ucl unpack function and compressed OF image to an unused
+   part of RAM and then branches to the ucl_unpack function, which
+   will then branch to 0x0 after decompressing the OF to that location.
 
 b) Continues running with our test code
-
-This method uses no RAM outside the padded area of the original
-firmware block - the UCL compression can happen in-place when the
-compressed image is stored at the end of the destination buffer.
 
 */
 
@@ -142,6 +149,7 @@ int main(int argc, char* argv[])
     uint32_t firmware_paddedsize;
     uint32_t bootloader_size;
     uint32_t ucl_size;
+    uint32_t ucl_paddedsize;
     uint32_t uclunpack_size;
     uint32_t sum,filesum;
     uint32_t i;
@@ -204,6 +212,7 @@ int main(int argc, char* argv[])
         return 1;
     }
     ucl_size = get_uint32be(&uclheader[22]) + 8;
+    ucl_paddedsize = (ucl_size + 3) & ~0x3;
 
     if (ucl_size + 26 > (unsigned)filesize(fducl)) {
         fprintf(stderr, "[ERR]  Size mismatch in UCL file\n");
@@ -246,26 +255,15 @@ int main(int argc, char* argv[])
     fprintf(stderr,"Original firmware size - %d bytes\n",firmware_size);
     fprintf(stderr,"Padded firmware size - %d bytes\n",firmware_paddedsize);
     fprintf(stderr,"Bootloader size - %d bytes\n",bootloader_size);
-    fprintf(stderr,"UCL image size - %d bytes\n",ucl_size);
+    fprintf(stderr,"UCL image size - %d bytes (%d bytes padded)\n",ucl_size,ucl_paddedsize);
     fprintf(stderr,"UCL unpack function size - %d bytes\n",uclunpack_size);
     fprintf(stderr,"Original total size of firmware - %d bytes\n",(int)len);
 
     /* Check we have room for our bootloader - in the future, we could UCL
        pack this image as well if we need to. */
-    if (bootloader_size > (firmware_size - ucl_size)) {
+    if (bootloader_size > (firmware_size - ucl_paddedsize - uclunpack_size)) {
         fprintf(stderr,"[ERR] Bootloader too large (%d bytes, %d available)\n",
-                bootloader_size, firmware_size - ucl_size);
-        return 1;
-    }
-
-    /* Check we have enough room for the UCL unpack function.  This
-       needs to be outside the firmware block, so if we wanted to
-       support every firmware version, we could store this function in
-       the main firmware block, and then copy it to an unused part of
-       RAM. */
-    if (uclunpack_size > (firmware_paddedsize - firmware_size)) {
-        fprintf(stderr,"[ERR] UCL unpack function too large (%d bytes, %d available)\n",
-                uclunpack_size, firmware_paddedsize - firmware_size);
+                bootloader_size, firmware_size - ucl_paddedsize - uclunpack_size);
         return 1;
     }
 
@@ -283,7 +281,7 @@ int main(int argc, char* argv[])
 
     /* Locate the compressed image of the original firmware block at the end
        of the firmware block */
-    n = read(fducl, buf + 0x400 + firmware_size - ucl_size, ucl_size);
+    n = read(fducl, buf + 0x400 + firmware_size - ucl_paddedsize, ucl_size);
 
     if (n != ucl_size) {
         fprintf(stderr,"[ERR] Could not load ucl file\n");
@@ -292,8 +290,8 @@ int main(int argc, char* argv[])
     close(fducl);
 
 
-    /* Locate our UCL unpack function in the padding after the firmware block */
-    n = read(fduclunpack, buf + 0x400 + firmware_size, uclunpack_size);
+    /* Locate our UCL unpack function before copy of the compressed firmware */
+    n = read(fduclunpack, buf + 0x400 + firmware_size - ucl_paddedsize - uclunpack_size, uclunpack_size);
 
     if (n != uclunpack_size) {
         fprintf(stderr,"[ERR] Could not load uclunpack file\n");
@@ -301,19 +299,17 @@ int main(int argc, char* argv[])
     }
     close(fduclunpack);
 
-    put_uint32le(&buf[0x420], firmware_size + 1);  /* UCL unpack entry point */
-    put_uint32le(&buf[0x424], firmware_size - ucl_size);  /* Location of OF */
+    put_uint32le(&buf[0x420], 0x40000 - ucl_paddedsize - uclunpack_size + 1);  /* UCL unpack entry point */
+    put_uint32le(&buf[0x424], 0x40000 - ucl_paddedsize);  /* Location of OF */
     put_uint32le(&buf[0x428], ucl_size);           /* Size of UCL image */
+    put_uint32le(&buf[0x42c], firmware_size - uclunpack_size - ucl_paddedsize);  /* Start of data to copy */
+    put_uint32le(&buf[0x430], uclunpack_size + ucl_paddedsize);           /* Size of data to copy */
 
     /* Update checksum */
-    sum = calc_checksum(buf + 0x400,firmware_size + uclunpack_size);
+    sum = calc_checksum(buf + 0x400,firmware_size);
 
     put_uint32le(&buf[0x04], sum);
     put_uint32le(&buf[0x204], sum);
-
-    /* Update firmware size */
-    put_uint32le(&buf[0x0c], firmware_size + uclunpack_size);
-    put_uint32le(&buf[0x20c], firmware_size + uclunpack_size);
 
     /* Update the whole-file checksum */
     filesum = 0;
