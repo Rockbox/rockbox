@@ -275,16 +275,16 @@ int main (int argc, char** argv)
             modelnum = 24;
         else if(!strcmp(&argv[1][5], "iam3"))
             modelnum = 25;
-        else if(!strcmp(&argv[1][5], "9200")) /* Philips SA9200 */
-            modelnum = 26;
-        else if (!strcmp(&argv[1][5], "ldax"))
-    	    modelnum = 27;
         else if (!strcmp(&argv[1][5], "m200"))
-    	    modelnum = 29;
+            modelnum = 29;
         else if(!strcmp(&argv[1][5], "1630")) /* Philips HDD1630 */
             modelnum = 31;
         else if (!strcmp(&argv[1][5], "i7"))
-    	    modelnum = 32;
+            modelnum = 32;
+        else if (!strcmp(&argv[1][5], "ldax"))
+            modelnum = 33;
+        else if(!strcmp(&argv[1][5], "9200")) /* Philips SA9200 */
+            modelnum = 34;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

@@ -4,7 +4,7 @@
 #define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 27
+#define MODEL_NUMBER 33
 
 #define MODEL_NAME   "Logik DAX MP3/DAB"
 
@@ -93,6 +93,8 @@
 
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
+
+#define HAVE_FAT16SUPPORT
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      120000000

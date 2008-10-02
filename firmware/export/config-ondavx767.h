@@ -31,7 +31,7 @@
 #define MODEL_NAME  "Onda VX767"
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 31
+#define MODEL_NUMBER 36
 
 /* define this if you use an ATA controller */
 //#define HAVE_ATA

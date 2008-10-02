@@ -4,7 +4,7 @@
 #define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 26
+#define MODEL_NUMBER 34
 #define MODEL_NAME   "Philips GoGear SA200"
 
 #define HW_SAMPR_CAPS       (SAMPR_CAP_44)
