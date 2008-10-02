@@ -884,6 +884,9 @@ static void ata_thread(void)
     static long last_sleep = 0;
     struct queue_event ev;
     static long last_seen_mtx_unlock = 0;
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+    static bool usb_mode = false;
+#endif
     
     while (1) {
         queue_wait_w_tmo(&ata_queue, &ev, HZ/2);
@@ -898,7 +901,10 @@ static void ata_thread(void)
                             last_seen_mtx_unlock = current_tick;
                         if (TIME_AFTER(current_tick, last_seen_mtx_unlock+(HZ*2)))
                         {
-                            call_ata_idle_notifys(false);
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+                            if(!usb_mode)
+#endif
+                                call_ata_idle_notifys(false);
                             last_seen_mtx_unlock = 0;
                         }
                     }
@@ -908,7 +914,10 @@ static void ata_thread(void)
                          TIME_AFTER( current_tick, 
                                     last_disk_activity + sleep_timeout ) )
                     {
-                        call_ata_idle_notifys(true);
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+                        if(!usb_mode)
+#endif
+                            call_ata_idle_notifys(true);
                         ata_perform_sleep();
                         last_sleep = current_tick;
                     }
@@ -940,12 +949,28 @@ static void ata_thread(void)
                 DEBUGF("ata_thread got SYS_USB_CONNECTED\n");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+                usb_mode = true;
+#else
                 /* Wait until the USB cable is extracted again */
                 usb_wait_for_disconnect(&ata_queue);
+#endif
+                break;
+                
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+            case SYS_USB_DISCONNECTED:
+                /* Tell the USB thread that we are ready again */
+                DEBUGF("ata_thread got SYS_USB_DISCONNECTED\n");
+                usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
+                usb_mode = false;
                 break;
 #endif
+#endif
             case Q_SLEEP:
-                call_ata_idle_notifys(false);
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+                if(!usb_mode)
+#endif
+                    call_ata_idle_notifys(false);
                 last_disk_activity = current_tick - sleep_timeout + (HZ/2);
                 break;
 
