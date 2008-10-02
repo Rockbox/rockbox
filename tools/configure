@@ -1625,7 +1625,7 @@ fi
     ;;
 
    53|m200)
-    target_id=31
+    target_id=48
     modelname="m200"
     target="-DSANSA_M200"
     memory=2 # always
@@ -1744,7 +1744,7 @@ fi
     ;;
 
    110|meizum6sl)
-    target_id=20
+    target_id=49
     modelname="meizum6sl"
     target="-DMEIZU_M6SL"
     memory=16 # always
