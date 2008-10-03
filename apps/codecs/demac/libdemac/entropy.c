@@ -28,6 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #include "parser.h"
 #include "entropy.h"
 #include "rangecoding.h"   /* Range-coding (static inline) functions */
+#include "demac_iram.h"
 
 #define MODEL_ELEMENTS 64
 
@@ -270,11 +271,11 @@ void init_entropy_decoder(struct ape_ctx_t* ape_ctx,
     *firstbyte = bytebufferoffset;
 }
 
-int entropy_decode(struct ape_ctx_t* ape_ctx,
-                   unsigned char* inbuffer, int* firstbyte,
-                   int* bytesconsumed,
-                   int32_t* decoded0, int32_t* decoded1,
-                   int blockstodecode)
+int ICODE_ATTR_DEMAC entropy_decode(struct ape_ctx_t* ape_ctx,
+                                    unsigned char* inbuffer, int* firstbyte,
+                                    int* bytesconsumed,
+                                    int32_t* decoded0, int32_t* decoded1,
+                                    int blockstodecode)
 {
     bytebuffer = inbuffer;
     bytebufferoffset = *firstbyte;

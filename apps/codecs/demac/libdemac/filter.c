@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #include "demac.h"
 #include "filter.h"
+#include "demac_iram.h"
 
 #ifdef CPU_COLDFIRE
 #include "vector_math16_cf.h"
@@ -85,11 +86,16 @@ struct filter_t {
 #define FP_HALF  (1 << (FRACBITS - 1))   /* 0.5 in fixed-point format. */
 #define FP_TO_INT(x) ((x + FP_HALF) >> FRACBITS);  /* round(x) */
 
+#if ARM_ARCH >= 6
+#define SATURATE(x) ({int __res; asm("ssat %0, #16, %1" : "=r"(__res) : "r"(x)); __res; })
+#else
 #define SATURATE(x) (int16_t)(((x) == (int16_t)(x)) ? (x) : ((x) >> 31) ^ 0x7FFF);
+#endif
 
 /* Apply the filter with state f to count entries in data[] */
 
-static void do_apply_filter_3980(struct filter_t* f, int32_t* data, int count)
+static void ICODE_ATTR_DEMAC do_apply_filter_3980(struct filter_t* f,
+                                                  int32_t* data, int count)
 {
     int res;
     int absres;
@@ -146,7 +152,8 @@ static void do_apply_filter_3980(struct filter_t* f, int32_t* data, int count)
     }
 }
 
-static void do_apply_filter_3970(struct filter_t* f, int32_t* data, int count)
+static void ICODE_ATTR_DEMAC do_apply_filter_3970(struct filter_t* f,
+                                                  int32_t* data, int count)
 {
     int res;
     
@@ -216,7 +223,8 @@ void INIT_FILTER(int16_t* buf)
     do_init_filter(&filter1, buf + ORDER * 3 + HISTORY_SIZE);
 }
 
-int APPLY_FILTER(int fileversion, int32_t* data0, int32_t* data1, int count)
+int ICODE_ATTR_DEMAC APPLY_FILTER(int fileversion, int32_t* data0,
+                                  int32_t* data1, int count)
 {
     if (fileversion >= 3980) {
         do_apply_filter_3980(&filter0, data0, count);

@@ -21,8 +21,9 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 */
+#include "demac_iram.h"
 
-    .section    .text,"ax",%progbits
+    .section    ICODE_SECTION_DEMAC_ARM,"ax",%progbits
 
     .align      2
 

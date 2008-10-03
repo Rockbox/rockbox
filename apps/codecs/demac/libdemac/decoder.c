@@ -29,6 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #include "predictor.h"
 #include "entropy.h"
 #include "filter.h"
+#include "demac_iram.h"
 
 /* Statically allocate the filter buffers */
 
@@ -40,7 +41,7 @@ static int16_t filterbuf256[(256*3 + HISTORY_SIZE) * 2]   /* 5120 bytes */
 /* This is only needed for "insane" files, and no Rockbox targets can
    hope to decode them in realtime anyway. */
 static int16_t filterbuf1280[(1280*3 + HISTORY_SIZE) * 2] /* 17408 bytes */
-               __attribute__((aligned(16)));
+               IBSS_ATTR_DEMAC_INSANEBUF __attribute__((aligned(16)));
 
 void init_frame_decoder(struct ape_ctx_t* ape_ctx,
                         unsigned char* inbuffer, int* firstbyte,
@@ -74,11 +75,11 @@ void init_frame_decoder(struct ape_ctx_t* ape_ctx,
     }
 }
 
-int decode_chunk(struct ape_ctx_t* ape_ctx,
-                 unsigned char* inbuffer, int* firstbyte,
-                 int* bytesconsumed,
-                 int32_t* decoded0, int32_t* decoded1, 
-                 int count)
+int ICODE_ATTR_DEMAC decode_chunk(struct ape_ctx_t* ape_ctx,
+                                  unsigned char* inbuffer, int* firstbyte,
+                                  int* bytesconsumed,
+                                  int32_t* decoded0, int32_t* decoded1,
+                                  int count)
 {
     int res;
     int32_t left, right;

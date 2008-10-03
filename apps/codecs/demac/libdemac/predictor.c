@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #include "parser.h"
 #include "predictor.h"
+#include "demac_iram.h"
 
 /* Return 0 if x is zero, -1 if x is positive, 1 if x is negative */
 #define SIGN(x) (x) ? (((x) > 0) ? -1 : 1) : 0
@@ -67,7 +68,10 @@ void init_predictor_decoder(struct predictor_t* p)
 }
 
 #if !defined(CPU_ARM) && !defined(CPU_COLDFIRE)
-int predictor_decode_stereo(struct predictor_t* p, int32_t* decoded0, int32_t* decoded1, int count)
+int ICODE_ATTR_DEMAC predictor_decode_stereo(struct predictor_t* p,
+                                             int32_t* decoded0,
+                                             int32_t* decoded1,
+                                             int count)
 {
     int32_t predictionA, predictionB; 
 
@@ -203,7 +207,9 @@ int predictor_decode_stereo(struct predictor_t* p, int32_t* decoded0, int32_t* d
 }
 #endif
 
-int predictor_decode_mono(struct predictor_t* p, int32_t* decoded0, int count)
+int ICODE_ATTR_DEMAC predictor_decode_mono(struct predictor_t* p,
+                                           int32_t* decoded0,
+                                           int count)
 {
     int32_t predictionA, currentA, A;
 
