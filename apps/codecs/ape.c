@@ -25,7 +25,7 @@
 
 CODEC_HEADER
 
-#define BLOCKS_PER_LOOP     4608
+#define BLOCKS_PER_LOOP     1024
 #define MAX_CHANNELS        2
 #define MAX_BYTESPERSAMPLE  3
 
