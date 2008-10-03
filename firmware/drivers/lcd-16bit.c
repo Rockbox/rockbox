@@ -515,7 +515,7 @@ void lcd_vline(int x, int y1, int y2)
     }
 
     /* nothing to draw? */
-    if ((x >= current_vp->width) || 
+    if (((unsigned)x >= (unsigned)current_vp->width) ||
         (y1 >= current_vp->height) ||
         (y2 < 0))
         return;
