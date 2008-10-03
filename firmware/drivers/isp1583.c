@@ -51,6 +51,7 @@ struct usb_endpoint
     unsigned char enabled[2];
     short max_pkt_size[2];
     short type;
+    char allocation;
 };
 
 static unsigned char setup_pkt_buf[8];
@@ -600,6 +601,30 @@ void usb_drv_cancel_all_transfers(void)
     for(i=0;i<NUM_ENDPOINTS-1;i++)
         endpoints[i].halt[0] = endpoints[i].halt[1] = 1;
 }
+
+int usb_drv_request_endpoint(int dir)
+{
+    int i, bit;
+
+    bit=(dir & USB_DIR_IN)? 2:1;
+
+    for (i=1; i < NUM_ENDPOINTS; i++) {
+        if((endpoints[i].allocation & bit)!=0)
+            continue;
+        endpoints[i].allocation |= bit;
+        return i | dir;
+    }
+
+    return -1;
+}
+
+void usb_drv_release_endpoint(int ep)
+{
+    int mask = (ep & USB_DIR_IN)? ~2:~1;
+    endpoints[ep & 0x7f].allocation &= mask;
+}
+
+
 
 static void bus_reset(void)
 {
