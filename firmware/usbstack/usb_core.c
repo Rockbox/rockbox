@@ -22,7 +22,7 @@
 #include "thread.h"
 #include "kernel.h"
 #include "string.h"
-#define LOGF_ENABLE
+//#define LOGF_ENABLE
 #include "logf.h"
 
 #include "usb.h"

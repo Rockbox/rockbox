@@ -22,7 +22,7 @@
 #include "system.h"
 #include "usb_core.h"
 #include "usb_drv.h"
-#define LOGF_ENABLE
+//#define LOGF_ENABLE
 #include "logf.h"
 #include "ata.h"
 #include "hotswap.h"
