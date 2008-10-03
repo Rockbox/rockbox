@@ -32,6 +32,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #include "vector_math16_cf.h"
 #elif ARM_ARCH >= 6
 #include "vector_math16_armv6.h"
+#elif ARM_ARCH >= 5 /* Assume all our ARMv5 targets are ARMv5te(j) */
+#include "vector_math16_armv5te.h"
 #elif defined CPU_ARM7TDMI
 #include "vector_math16_arm7.h"
 #else

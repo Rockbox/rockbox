@@ -205,9 +205,7 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
 
 /* This version fetches data as 32 bit words, and *requires* v1 to be
  * 32 bit aligned, otherwise it will result either in a data abort, or
- * incorrect results (if ARM aligncheck is disabled). It is optimised
- * for ARM7TDMI. Using it for ARM9 or higher results in worse performance
- * than the C version. */
+ * incorrect results (if ARM aligncheck is disabled). */
 static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
 {
     int res = 0;
