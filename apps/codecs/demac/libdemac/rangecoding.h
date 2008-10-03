@@ -2,7 +2,7 @@
 
 libdemac - A Monkey's Audio decoder
 
-$Id:$
+$Id$
 
 Copyright (C) Dave Chapman 2007
 
@@ -97,7 +97,7 @@ struct rangecoder_t
     unsigned int buffer; /* buffer for input/output */
 };
 
-static struct rangecoder_t rc;
+static struct rangecoder_t rc IBSS_ATTR;
 
 /* Start the decoder */
 static inline void range_start_decoding(void)
