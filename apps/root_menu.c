@@ -500,7 +500,7 @@ void root_menu(void)
     int next_screen = GO_TO_ROOT;
     int selected = 0;
 
-    if ((global_status.last_screen&0xff) == -1)
+    if (global_status.last_screen == (char)-1)
         global_status.last_screen = GO_TO_ROOT;
     
     if (global_settings.start_in_screen == 0)
