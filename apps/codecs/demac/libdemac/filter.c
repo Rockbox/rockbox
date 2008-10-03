@@ -86,7 +86,7 @@ struct filter_t {
 #define FP_HALF  (1 << (FRACBITS - 1))   /* 0.5 in fixed-point format. */
 #define FP_TO_INT(x) ((x + FP_HALF) >> FRACBITS);  /* round(x) */
 
-#if ARM_ARCH >= 6
+#if defined(CPU_ARM) && (ARM_ARCH >= 6)
 #define SATURATE(x) ({int __res; asm("ssat %0, #16, %1" : "=r"(__res) : "r"(x)); __res; })
 #else
 #define SATURATE(x) (int16_t)(((x) == (int16_t)(x)) ? (x) : ((x) >> 31) ^ 0x7FFF);
