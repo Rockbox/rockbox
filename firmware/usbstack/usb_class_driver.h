@@ -35,18 +35,15 @@ struct usb_class_driver {
 	/* Set this to true if the driver needs exclusive disk access (e.g. usb storage) */
     bool needs_exclusive_ata;
 
+    /* Let the driver request endpoints it need. Returns zero on success */
+    int (*request_endpoints)(struct usb_class_driver *);
+
     /* Tells the driver what its first interface number will be. The driver
        returns the number of the first available interface for the next driver
        (i.e. a driver with one interface will return interface+1)
 	   A driver must have at least one interface
 	   Mandatory function */
     int (*set_first_interface)(int interface);
-
-    /* Tells the driver what its first endpoint pair number will be. The driver
-       returns the number of the first available endpoint pair for the next
-       driver (i.e. a driver with one endpoint pair will return endpoint +1)
-	   Mandatory function */
-    int (*set_first_endpoint)(int endpoint);
 
     /* Asks the driver to put the interface descriptor and all other
        needed descriptor for this driver at dest.
@@ -69,10 +66,10 @@ struct usb_class_driver {
 	   Optional function */
     void (*disconnect)(void);
 
-    /* Tells the driver that a usb transfer has been completed. Note that "in"
+    /* Tells the driver that a usb transfer has been completed. Note that "dir"
        is relative to the host 
 	   Optional function */
-    void (*transfer_complete)(int ep,bool in, int status, int length);
+    void (*transfer_complete)(int ep,int dir, int status, int length);
 
     /* Tells the driver that a control request has come in. If the driver is
        able to handle it, it should ack the request, and return true. Otherwise

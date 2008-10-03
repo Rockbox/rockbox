@@ -23,12 +23,12 @@
 
 #include "usb_ch9.h"
 
-int usb_storage_set_first_endpoint(int endpoint);
+int usb_storage_request_endpoints(struct usb_class_driver *);
 int usb_storage_set_first_interface(int interface);
 int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size);
 void usb_storage_init_connection(void);
 void usb_storage_init(void);
-void usb_storage_transfer_complete(int ep,bool in,int state,int length);
+void usb_storage_transfer_complete(int ep,int dir,int state,int length);
 bool usb_storage_control_request(struct usb_ctrlrequest* req);
 #ifdef HAVE_HOTSWAP
 void usb_storage_notify_hotswap(int volume,bool inserted);

@@ -41,5 +41,7 @@ int usb_drv_port_speed(void);
 void usb_drv_cancel_all_transfers(void);
 void usb_drv_set_test_mode(int mode);
 bool usb_drv_connected(void);
+int usb_drv_request_endpoint(int dir);
+void usb_drv_release_endpoint(int ep);
 
 #endif

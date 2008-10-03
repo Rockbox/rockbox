@@ -85,7 +85,7 @@ enum {
 struct usb_transfer_completion_event_data
 {
     unsigned char endpoint;
-    bool in;
+    int dir;
     int status;
     int length;
     void* data;

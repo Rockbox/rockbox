@@ -22,7 +22,7 @@
 #include "thread.h"
 #include "kernel.h"
 #include "string.h"
-//#define LOGF_ENABLE
+#define LOGF_ENABLE
 #include "logf.h"
 
 #include "usb.h"
@@ -164,10 +164,13 @@ static enum { DEFAULT, ADDRESS, CONFIGURED } usb_state;
 
 static int usb_core_num_interfaces;
 
+typedef void (*completion_handler_t)(int ep,int dir, int status, int length);
+typedef bool (*control_handler_t)(struct usb_ctrlrequest* req);
+
 static struct
 {
-    void (*completion_handler)(int ep,bool in, int status, int length);
-    bool (*control_handler)(struct usb_ctrlrequest* req);
+    completion_handler_t completion_handler[2];
+    control_handler_t control_handler[2];
     struct usb_transfer_completion_event_data completion_event;
 } ep_data[NUM_ENDPOINTS];
 
@@ -179,8 +182,8 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .needs_exclusive_ata = true,
         .first_interface = 0,
         .last_interface = 0,
+        .request_endpoints = usb_storage_request_endpoints,
         .set_first_interface = usb_storage_set_first_interface,
-        .set_first_endpoint = usb_storage_set_first_endpoint,
         .get_config_descriptor = usb_storage_get_config_descriptor,
         .init_connection = usb_storage_init_connection,
         .init = usb_storage_init,
@@ -198,8 +201,8 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .needs_exclusive_ata = false,
         .first_interface = 0,
         .last_interface = 0,
+        .request_endpoints = usb_serial_request_endpoints,
         .set_first_interface = usb_serial_set_first_interface,
-        .set_first_endpoint = usb_serial_set_first_endpoint,
         .get_config_descriptor = usb_serial_get_config_descriptor,
         .init_connection = usb_serial_init_connection,
         .init = usb_serial_init,
@@ -217,8 +220,8 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .needs_exclusive_ata = false,
         .first_interface = 0,
         .last_interface = 0,
+        .request_endpoints = usb_charging_only_request_endpoints,
         .set_first_interface = usb_charging_only_set_first_interface,
-        .set_first_endpoint = usb_charging_only_set_first_endpoint,
         .get_config_descriptor = usb_charging_only_get_config_descriptor,
         .init_connection = NULL,
         .init = NULL,
@@ -339,6 +342,7 @@ void usb_core_handle_transfer_completion(
               struct usb_transfer_completion_event_data* event)
 {
     int ep = event->endpoint;
+
     switch(ep) {
         case EP_CONTROL:
             logf("ctrl handled %ld",current_tick);
@@ -346,8 +350,8 @@ void usb_core_handle_transfer_completion(
                                     (struct usb_ctrlrequest*)event->data);
             break;
         default:
-            if(ep_data[ep].completion_handler != NULL)
-                ep_data[ep].completion_handler(ep,event->in,
+            if(ep_data[ep].completion_handler[event->dir>>7] != NULL)
+                ep_data[ep].completion_handler[event->dir>>7](ep,event->dir,
                                               event->status,event->length);
             break;
     }
@@ -388,34 +392,60 @@ static void usb_core_set_serial_function_id(void)
     usb_string_iSerial.wString[0] = hex[id];
 }
 
+int usb_core_request_endpoint(int dir, struct usb_class_driver *drv)
+{
+    int ret, ep;
+
+    ret = usb_drv_request_endpoint(dir);
+
+    if (ret == -1)
+        return -1;
+
+    ep = ret & 0x7f;
+    dir = ret >> 7;
+
+    ep_data[ep].completion_handler[dir] = drv->transfer_complete;
+    ep_data[ep].control_handler[dir] = drv->control_request;
+
+    return ret;
+}
+
+void usb_core_release_endpoint(int ep)
+{
+    int dir;
+
+    usb_drv_release_endpoint(ep);
+
+    dir = ep >> 7;
+    ep &= 0x7f;
+
+    ep_data[ep].completion_handler[dir] = NULL;
+    ep_data[ep].control_handler[dir] = NULL;
+}
+
 static void allocate_interfaces_and_endpoints(void)
 {
-    int i,j;
+    int i;
     int interface=0;
-    int endpoint=1;
 
     memset(ep_data,0,sizeof(ep_data));
 
-    for(i=0;i<USB_NUM_DRIVERS;i++) {
+    for (i = 0; i < NUM_ENDPOINTS; i++) {
+        usb_drv_release_endpoint(i | USB_DIR_OUT);
+        usb_drv_release_endpoint(i | USB_DIR_IN);
+    }
+
+    for(i=0; i < USB_NUM_DRIVERS; i++) {
         if(drivers[i].enabled) {
-            int oldendpoint = endpoint;
             drivers[i].first_interface = interface;
 
-            endpoint = drivers[i].set_first_endpoint(endpoint);
-            if(endpoint>NUM_ENDPOINTS) {
+            if (drivers[i].request_endpoints(&drivers[i])) {
                 drivers[i].enabled = false;
                 continue;
             }
+
             interface = drivers[i].set_first_interface(interface);
             drivers[i].last_interface = interface;
-
-            for(j=oldendpoint;j<endpoint;j++) {
-               ep_data[j].completion_handler=drivers[i].transfer_complete;
-               ep_data[j].control_handler=drivers[i].control_request;
-            }
-        }
-        if(endpoint>NUM_ENDPOINTS) {
-            drivers[i].enabled = false;
         }
     }
     usb_core_num_interfaces = interface;
@@ -666,8 +696,8 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
                     break;
                 default: {
                     bool handled=false;
-                    if(ep_data[req->wIndex & 0xf].control_handler != NULL)
-                        handled = ep_data[req->wIndex & 0xf].control_handler(req);
+                    if(ep_data[req->wIndex & 0xf].control_handler[0] != NULL)
+                        handled = ep_data[req->wIndex & 0xf].control_handler[0](req);
                     if(!handled) {
                         /* nope. flag error */
                         logf("usb bad req %d", req->bRequest);
@@ -689,7 +719,7 @@ void usb_core_bus_reset(void)
 }
 
 /* called by usb_drv_transfer_completed() */
-void usb_core_transfer_complete(int endpoint, bool in, int status,int length)
+void usb_core_transfer_complete(int endpoint, int dir, int status,int length)
 {
     switch (endpoint) {
         case EP_CONTROL:
@@ -698,7 +728,7 @@ void usb_core_transfer_complete(int endpoint, bool in, int status,int length)
 
         default:
             ep_data[endpoint].completion_event.endpoint=endpoint;
-            ep_data[endpoint].completion_event.in=in;
+            ep_data[endpoint].completion_event.dir=dir;
             ep_data[endpoint].completion_event.data=0;
             ep_data[endpoint].completion_event.status=status;
             ep_data[endpoint].completion_event.length=length;
@@ -712,7 +742,7 @@ void usb_core_transfer_complete(int endpoint, bool in, int status,int length)
 void usb_core_control_request(struct usb_ctrlrequest* req)
 {
     ep_data[0].completion_event.endpoint=0;
-    ep_data[0].completion_event.in=0;
+    ep_data[0].completion_event.dir=0;
     ep_data[0].completion_event.data=(void *)req;
     ep_data[0].completion_event.status=0;
     ep_data[0].completion_event.length=0;

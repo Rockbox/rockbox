@@ -22,7 +22,7 @@
 #include "system.h"
 #include "usb_core.h"
 #include "usb_drv.h"
-//#define LOGF_ENABLE
+#define LOGF_ENABLE
 #include "logf.h"
 #include "ata.h"
 #include "hotswap.h"
@@ -263,8 +263,8 @@ static void identify2inquiry(int lun);
 static void send_and_read_next(void);
 static bool ejected[NUM_VOLUMES];
 
-static int usb_endpoint;
 static int usb_interface;
+static int ep_in, ep_out;
 
 static enum {
     WAITING_FOR_COMMAND,
@@ -321,7 +321,7 @@ void usb_storage_reconnect(void)
        && usb_inserted()) {
         for(i=0;i<NUM_VOLUMES;i++)
             ejected[i] = !check_disk_present(IF_MV(i));
-
+        logf("%s", __func__);
         usb_request_exclusive_ata();
     }
 }
@@ -336,12 +336,23 @@ void usb_storage_init(void)
     logf("usb_storage_init done");
 }
 
-
-int usb_storage_set_first_endpoint(int endpoint)
+int usb_storage_request_endpoints(struct usb_class_driver *drv)
 {
-    usb_endpoint = endpoint;
-    return endpoint + 1;
+    ep_in = usb_core_request_endpoint(USB_DIR_IN, drv);
+
+    if (ep_in < 0)
+        return -1;
+    
+    ep_out = usb_core_request_endpoint(USB_DIR_OUT, drv);
+
+    if (ep_out < 0) {
+        usb_core_release_endpoint(ep_in);
+        return -1;
+    }
+
+    return 0;
 }
+
 int usb_storage_set_first_interface(int interface)
 {
     usb_interface = interface;
@@ -357,12 +368,12 @@ int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size)
            sizeof(struct usb_interface_descriptor));
     dest+=sizeof(struct usb_interface_descriptor);
 
-    endpoint_descriptor.bEndpointAddress = usb_endpoint | USB_DIR_IN;
+    endpoint_descriptor.bEndpointAddress = ep_in;
     memcpy(dest,&endpoint_descriptor,
            sizeof(struct usb_endpoint_descriptor));
     dest+=sizeof(struct usb_endpoint_descriptor);
 
-    endpoint_descriptor.bEndpointAddress = usb_endpoint | USB_DIR_OUT;
+    endpoint_descriptor.bEndpointAddress = ep_out;
     memcpy(dest,&endpoint_descriptor,
            sizeof(struct usb_endpoint_descriptor));
 
@@ -376,7 +387,8 @@ void usb_storage_init_connection(void)
     /* prime rx endpoint. We only need room for commands */
     state = WAITING_FOR_COMMAND;
 
-#if CONFIG_CPU == IMX31L || CONFIG_USBOTG == USBOTG_ISP1583
+#if CONFIG_CPU == IMX31L || CONFIG_USBOTG == USBOTG_ISP1583 || \
+        defined(CPU_TCC77X) || defined(CPU_TCC780X)
     static unsigned char _transfer_buffer[BUFFER_SIZE*2]
         USBDEVBSS_ATTR __attribute__((aligned(32)));
     tb.transfer_buffer = (void *)_transfer_buffer;
@@ -390,11 +402,11 @@ void usb_storage_init_connection(void)
         (void *)UNCACHED_ADDR((unsigned int)(audio_buffer + 31) & 0xffffffe0);
     invalidate_icache();
 #endif
-    usb_drv_recv(usb_endpoint, tb.transfer_buffer, 1024);
+    usb_drv_recv(ep_out, tb.transfer_buffer, 1024);
 }
 
 /* called by usb_core_transfer_complete() */
-void usb_storage_transfer_complete(int ep,bool in,int status,int length)
+void usb_storage_transfer_complete(int ep,int dir,int status,int length)
 {
     (void)ep;
     struct command_block_wrapper* cbw = (void*)tb.transfer_buffer;
@@ -402,7 +414,7 @@ void usb_storage_transfer_complete(int ep,bool in,int status,int length)
     //logf("transfer result %X %d", status, length);
     switch(state) {
         case RECEIVING_BLOCKS:
-            if(in==true) {
+            if(dir==USB_DIR_IN) {
                 logf("IN received in RECEIVING");
             }
             logf("scsi write %d %d", cur_cmd.sector, cur_cmd.count);
@@ -470,7 +482,7 @@ void usb_storage_transfer_complete(int ep,bool in,int status,int length)
             }
             break;
         case WAITING_FOR_COMMAND:
-            if(in==true) {
+            if(dir==USB_DIR_IN) {
                 logf("IN received in WAITING_FOR_COMMAND");
             }
             //logf("command received");
@@ -478,20 +490,20 @@ void usb_storage_transfer_complete(int ep,bool in,int status,int length)
                 handle_scsi(cbw);
             }
             else {
-                usb_drv_stall(usb_endpoint, true,true);
-                usb_drv_stall(usb_endpoint, true,false);
+                usb_drv_stall(ep_in, true,true);
+                usb_drv_stall(ep_out, true,false);
             }
             break;
         case SENDING_CSW:
-            if(in==false) {
+            if(dir==USB_DIR_OUT) {
                 logf("OUT received in SENDING_CSW");
             }
             //logf("csw sent, now go back to idle");
             state = WAITING_FOR_COMMAND;
-            usb_drv_recv(usb_endpoint, tb.transfer_buffer, 1024);
+            usb_drv_recv(ep_out, tb.transfer_buffer, 1024);
             break;
         case SENDING_RESULT:
-            if(in==false) {
+            if(dir==USB_DIR_OUT) {
                 logf("OUT received in SENDING");
             }
             if(status==0) {
@@ -509,13 +521,13 @@ void usb_storage_transfer_complete(int ep,bool in,int status,int length)
             }
             break;
         case SENDING_FAILED_RESULT:
-            if(in==false) {
+            if(dir==USB_DIR_OUT) {
                 logf("OUT received in SENDING");
             }
             send_csw(UMS_STATUS_FAIL);
             break;
         case SENDING_BLOCKS:
-            if(in==false) {
+            if(dir==USB_DIR_OUT) {
                 logf("OUT received in SENDING");
             }
             if(status==0) {
@@ -567,8 +579,8 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req)
                data toggle bits and endpoint STALL conditions despite
                the Bulk-Only Mass Storage Reset. */
 #if 0
-            usb_drv_reset_endpoint(usb_endpoint, false);
-            usb_drv_reset_endpoint(usb_endpoint, true);
+            usb_drv_reset_endpoint(ep_in, false);
+            usb_drv_reset_endpoint(ep_out, true);
 #endif
             
             usb_drv_send(EP_CONTROL, NULL, 0);  /* ack */
@@ -972,7 +984,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
         default:
             logf("scsi unknown cmd %x",cbw->command_block[0x0]);
-            usb_drv_stall(usb_endpoint, true,true);
+            usb_drv_stall(ep_in, true,true);
             send_csw(UMS_STATUS_FAIL);
             break;
     }
@@ -980,25 +992,25 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
 static void send_block_data(void *data,int size)
 {
-    usb_drv_send_nonblocking(usb_endpoint, data,size);
+    usb_drv_send_nonblocking(ep_in, data,size);
     state = SENDING_BLOCKS;
 }
 
 static void send_command_result(void *data,int size)
 {
-    usb_drv_send_nonblocking(usb_endpoint, data,size);
+    usb_drv_send_nonblocking(ep_in, data,size);
     state = SENDING_RESULT;
 }
 
 static void send_command_failed_result(void)
 {
-    usb_drv_send_nonblocking(usb_endpoint, NULL, 0);
+    usb_drv_send_nonblocking(ep_in, NULL, 0);
     state = SENDING_FAILED_RESULT;
 }
 
 static void receive_block_data(void *data,int size)
 {
-    usb_drv_recv(usb_endpoint, data, size);
+    usb_drv_recv(ep_out, data, size);
     state = RECEIVING_BLOCKS;
 }
 
@@ -1009,7 +1021,7 @@ static void send_csw(int status)
     tb.csw->data_residue = 0;
     tb.csw->status = status;
 
-    usb_drv_send_nonblocking(usb_endpoint, tb.csw,
+    usb_drv_send_nonblocking(ep_in, tb.csw,
                              sizeof(struct command_status_wrapper));
     state = SENDING_CSW;
     //logf("CSW: %X",status);

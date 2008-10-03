@@ -23,13 +23,13 @@
 
 #include "usb_ch9.h"
 
-int usb_serial_set_first_endpoint(int endpoint);
+int usb_serial_request_endpoints(struct usb_class_driver *);
 int usb_serial_set_first_interface(int interface);
 int usb_serial_get_config_descriptor(unsigned char *dest,int max_packet_size);
 void usb_serial_init_connection(void);
 void usb_serial_init(void);
 void usb_serial_disconnect(void);
-void usb_serial_transfer_complete(int ep,bool in, int status, int length);
+void usb_serial_transfer_complete(int ep,int dir, int status, int length);
 bool usb_serial_control_request(struct usb_ctrlrequest* req);
 
 void usb_serial_send(unsigned char *data,int length);

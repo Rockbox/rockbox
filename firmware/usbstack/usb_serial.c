@@ -72,7 +72,7 @@ static int buffer_start;
 static int buffer_length;
 static bool active = false;
 
-static int usb_endpoint;
+static int ep_in, ep_out;
 static int usb_interface;
 
 static struct mutex sendlock SHAREDBSS_ATTR;
@@ -82,22 +82,33 @@ static void sendout(void)
     if(buffer_start+buffer_length > BUFFER_SIZE)
     {
         /* Buffer wraps. Only send the first part */
-        usb_drv_send_nonblocking(usb_endpoint, &send_buffer[buffer_start],
+        usb_drv_send_nonblocking(ep_in, &send_buffer[buffer_start],
                                  (BUFFER_SIZE - buffer_start));
     }
     else
     {
         /* Send everything */
-        usb_drv_send_nonblocking(usb_endpoint, &send_buffer[buffer_start],
+        usb_drv_send_nonblocking(ep_in, &send_buffer[buffer_start],
                                  buffer_length);
     }
     busy_sending=true;
 }
 
-int usb_serial_set_first_endpoint(int endpoint)
+int usb_serial_request_endpoints(struct usb_class_driver *drv)
 {
-    usb_endpoint = endpoint;
-    return endpoint + 1;
+    ep_in = usb_core_request_endpoint(USB_DIR_IN, drv);
+
+    if (ep_in < 0)
+        return -1;
+    
+    ep_out = usb_core_request_endpoint(USB_DIR_OUT, drv);
+
+    if (ep_out < 0) {
+        usb_core_release_endpoint(ep_in);
+        return -1;
+    }
+
+    return 0;
 }
 
 int usb_serial_set_first_interface(int interface)
@@ -117,11 +128,11 @@ int usb_serial_get_config_descriptor(unsigned char *dest,int max_packet_size)
     memcpy(dest,&interface_descriptor,sizeof(struct usb_interface_descriptor));
     dest+=sizeof(struct usb_interface_descriptor);
 
-    endpoint_descriptor.bEndpointAddress = usb_endpoint | USB_DIR_IN;
+    endpoint_descriptor.bEndpointAddress = ep_in;
     memcpy(dest,&endpoint_descriptor,sizeof(struct usb_endpoint_descriptor));
     dest+=sizeof(struct usb_endpoint_descriptor);
 
-    endpoint_descriptor.bEndpointAddress = usb_endpoint | USB_DIR_OUT;
+    endpoint_descriptor.bEndpointAddress = ep_out;
     memcpy(dest,&endpoint_descriptor,sizeof(struct usb_endpoint_descriptor));
     dest+=sizeof(struct usb_endpoint_descriptor);
 
@@ -131,7 +142,7 @@ int usb_serial_get_config_descriptor(unsigned char *dest,int max_packet_size)
 void usb_serial_init_connection(void)
 {
     /* prime rx endpoint */
-    usb_drv_recv(usb_endpoint, receive_buffer, sizeof receive_buffer);
+    usb_drv_recv(ep_out, receive_buffer, sizeof receive_buffer);
 
     /* we come here too after a bus reset, so reset some data */
     mutex_lock(&sendlock);
@@ -202,17 +213,17 @@ void usb_serial_send(unsigned char *data,int length)
 }
 
 /* called by usb_core_transfer_complete() */
-void usb_serial_transfer_complete(int ep,bool in, int status, int length)
+void usb_serial_transfer_complete(int ep,int dir, int status, int length)
 {
     (void)ep;
-    switch (in) {
-        case false:
+    switch (dir) {
+        case USB_DIR_OUT:
             logf("serial: %s", receive_buffer);
             /* Data received. TODO : Do something with it ? */
-            usb_drv_recv(usb_endpoint, receive_buffer, sizeof receive_buffer);
+            usb_drv_recv(ep_out, receive_buffer, sizeof receive_buffer);
             break;
 
-        case true:
+        case USB_DIR_IN:
             mutex_lock(&sendlock);
             /* Data sent out. Update circular buffer */
             if(status == 0)

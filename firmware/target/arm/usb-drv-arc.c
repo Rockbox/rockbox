@@ -363,6 +363,8 @@ static const unsigned int pipe2mask[] = {
     0x10, 0x100000,
 };
 
+static char ep_allocation[NUM_ENDPOINTS];
+
 /*-------------------------------------------------------------------------*/
 static void transfer_completed(void);
 static void control_received(void);
@@ -534,23 +536,23 @@ void usb_drv_int(void)
 bool usb_drv_stalled(int endpoint,bool in)
 {
     if(in) {
-        return ((REG_ENDPTCTRL(endpoint) & EPCTRL_TX_EP_STALL)!=0);
+        return ((REG_ENDPTCTRL(endpoint&0x7f) & EPCTRL_TX_EP_STALL)!=0);
     }
     else {
-        return ((REG_ENDPTCTRL(endpoint) & EPCTRL_RX_EP_STALL)!=0);
+        return ((REG_ENDPTCTRL(endpoint&0x7f) & EPCTRL_RX_EP_STALL)!=0);
     }
 
 }
 void usb_drv_stall(int endpoint, bool stall,bool in)
 {
-    logf("%sstall %d", stall?"":"un", endpoint);
+    logf("%sstall %d", stall?"":"un", endpoint&0x7f);
 
     if(in) {
         if (stall) {
-            REG_ENDPTCTRL(endpoint) |= EPCTRL_TX_EP_STALL;
+            REG_ENDPTCTRL(endpoint&0x7f) |= EPCTRL_TX_EP_STALL;
         }
         else {
-            REG_ENDPTCTRL(endpoint) &= ~EPCTRL_TX_EP_STALL;
+            REG_ENDPTCTRL(endpoint&0x7f) &= ~EPCTRL_TX_EP_STALL;
         }
     }
     else {
@@ -565,23 +567,23 @@ void usb_drv_stall(int endpoint, bool stall,bool in)
 
 int usb_drv_send_nonblocking(int endpoint, void* ptr, int length)
 {
-    return prime_transfer(endpoint, ptr, length, true, false);
+    return prime_transfer(endpoint&0x7f, ptr, length, true, false);
 }
 
 int usb_drv_send(int endpoint, void* ptr, int length)
 {
-    return prime_transfer(endpoint, ptr, length, true, true);
+    return prime_transfer(endpoint&0x7f, ptr, length, true, true);
 }
 
 int usb_drv_recv(int endpoint, void* ptr, int length)
 {
     //logf("usbrecv(%x, %d)", ptr, length);
-    return prime_transfer(endpoint, ptr, length, false, false);
+    return prime_transfer(endpoint&0x7f, ptr, length, false, false);
 }
 
 void usb_drv_wait(int endpoint, bool send)
 {
-    int pipe = endpoint * 2 + (send ? 1 : 0);
+    int pipe = (endpoint&0x7f) * 2 + (send ? 1 : 0);
     struct queue_head* qh = &qh_array[pipe];
 
     while (qh->dtd.size_ioc_sts & QH_STATUS_ACTIVE) {
@@ -609,7 +611,7 @@ void usb_drv_set_address(int address)
 
 void usb_drv_reset_endpoint(int endpoint, bool send)
 {
-    int pipe = endpoint * 2 + (send ? 1 : 0);
+    int pipe = (endpoint&0x7f) * 2 + (send ? 1 : 0);
     unsigned int mask = pipe2mask[pipe];
     REG_ENDPTFLUSH = mask;
     while (REG_ENDPTFLUSH & mask);
@@ -753,6 +755,29 @@ void usb_drv_cancel_all_transfers(void)
     }
 }
 
+int usb_drv_request_endpoint(int dir)
+{
+    int i, bit;
+
+    bit=(dir & USB_DIR_IN)? 2:1;
+
+    for (i=1; i < NUM_ENDPOINTS; i++) {
+        if((ep_allocation[i] & bit)!=0)
+            continue;
+        ep_allocation[i] |= bit;
+        return i | dir;
+    }
+
+    return -1;
+}
+
+void usb_drv_release_endpoint(int ep)
+{
+    int mask = (ep & USB_DIR_IN)? ~2:~1;
+    ep_allocation[ep & 0x7f] &= mask;
+}
+
+
 static void prepare_td(struct transfer_descriptor* td,
                        struct transfer_descriptor* previous_td,
                        void *ptr, int len,int pipe)
@@ -831,7 +856,7 @@ static void transfer_completed(void)
                     qh->wait=0;
                     wakeup_signal(&transfer_completion_signal[pipe]);
                 }
-                usb_core_transfer_complete(ep, dir, qh->status, qh->length);
+                usb_core_transfer_complete(ep, dir?USB_DIR_IN:USB_DIR_OUT, qh->status, qh->length);
             }
         }
     }
@@ -900,6 +925,7 @@ static void init_bulk_queue_heads(void)
         rx_packetsize = 64;
         tx_packetsize = 64;
     }
+    /* TODO: this should take ep_allocation into account */
 
     /*** bulk ***/
     for(i=1;i<NUM_ENDPOINTS;i++) {
@@ -913,6 +939,7 @@ static void init_bulk_queue_heads(void)
 static void init_endpoints(void)
 {
     int i;
+    /* TODO: this should take ep_allocation into account */
     /* bulk */
     for(i=1;i<NUM_ENDPOINTS;i++) {
         REG_ENDPTCTRL(i) =
