@@ -884,7 +884,7 @@ static void ata_thread(void)
     static long last_sleep = 0;
     struct queue_event ev;
     static long last_seen_mtx_unlock = 0;
-#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB) && !defined(BOOTLOADER)
     static bool usb_mode = false;
 #endif
     
@@ -901,7 +901,7 @@ static void ata_thread(void)
                             last_seen_mtx_unlock = current_tick;
                         if (TIME_AFTER(current_tick, last_seen_mtx_unlock+(HZ*2)))
                         {
-#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB) && !defined(BOOTLOADER)
                             if(!usb_mode)
 #endif
                                 call_ata_idle_notifys(false);
@@ -914,7 +914,7 @@ static void ata_thread(void)
                          TIME_AFTER( current_tick, 
                                     last_disk_activity + sleep_timeout ) )
                     {
-#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB) && !defined(BOOTLOADER)
                         if(!usb_mode)
 #endif
                             call_ata_idle_notifys(true);
@@ -949,7 +949,7 @@ static void ata_thread(void)
                 DEBUGF("ata_thread got SYS_USB_CONNECTED\n");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
-#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB) && !defined(BOOTLOADER)
                 usb_mode = true;
 #else
                 /* Wait until the USB cable is extracted again */
@@ -957,7 +957,7 @@ static void ata_thread(void)
 #endif
                 break;
                 
-#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB) && !defined(BOOTLOADER)
             case SYS_USB_DISCONNECTED:
                 /* Tell the USB thread that we are ready again */
                 DEBUGF("ata_thread got SYS_USB_DISCONNECTED\n");
@@ -967,7 +967,7 @@ static void ata_thread(void)
 #endif
 #endif
             case Q_SLEEP:
-#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB) && !defined(BOOTLOADER)
                 if(!usb_mode)
 #endif
                     call_ata_idle_notifys(false);
