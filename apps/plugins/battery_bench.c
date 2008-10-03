@@ -38,7 +38,7 @@ PLUGIN_HEADER
 #define BATTERY_ON BUTTON_PLAY
 #define BATTERY_OFF BUTTON_OFF
 #define BATTERY_ON_TXT  "PLAY - start"
-#define BATTERY_OFF_TXT "OFF"
+#define BATTERY_OFF_TXT "OFF  - quit"
 
 #if BUTTON_REMOTE != 0
 #define BATTERY_RC_ON BUTTON_RC_PLAY
@@ -50,7 +50,7 @@ PLUGIN_HEADER
 #define BATTERY_ON BUTTON_RIGHT
 #define BATTERY_OFF BUTTON_OFF
 #define BATTERY_ON_TXT  "RIGHT - start"
-#define BATTERY_OFF_TXT "OFF"
+#define BATTERY_OFF_TXT "OFF   - quit"
 
 #elif CONFIG_KEYPAD == PLAYER_PAD
 
@@ -70,7 +70,7 @@ PLUGIN_HEADER
 #define BATTERY_RC_OFF BUTTON_RC_STOP
 
 #define BATTERY_ON_TXT  "PLAY - start"
-#define BATTERY_OFF_TXT "STOP"
+#define BATTERY_OFF_TXT "STOP - quit"
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
@@ -79,63 +79,63 @@ PLUGIN_HEADER
 #define BATTERY_ON  BUTTON_PLAY
 #define BATTERY_OFF BUTTON_MENU
 #define BATTERY_ON_TXT  "PLAY - start"
-#define BATTERY_OFF_TXT "MENU"
+#define BATTERY_OFF_TXT "MENU - quit"
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 
 #define BATTERY_ON  BUTTON_SELECT
 #define BATTERY_OFF BUTTON_POWER
 #define BATTERY_ON_TXT  "SELECT - start"
-#define BATTERY_OFF_TXT "POWER"
+#define BATTERY_OFF_TXT "POWER  - quit"
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 
 #define BATTERY_ON  BUTTON_SELECT
 #define BATTERY_OFF BUTTON_PLAY
 #define BATTERY_ON_TXT  "SELECT - start"
-#define BATTERY_OFF_TXT "PLAY"
+#define BATTERY_OFF_TXT "PLAY   - quit"
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
 (CONFIG_KEYPAD == SANSA_C200_PAD)
 #define BATTERY_ON BUTTON_SELECT
 #define BATTERY_OFF BUTTON_POWER
 #define BATTERY_ON_TXT  "SELECT - start"
-#define BATTERY_OFF_TXT "POWER"
+#define BATTERY_OFF_TXT "POWER  - quit"
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 
 #define BATTERY_ON  BUTTON_PLAY
 #define BATTERY_OFF BUTTON_POWER
 #define BATTERY_ON_TXT  "PLAY  - start"
-#define BATTERY_OFF_TXT "POWER"
+#define BATTERY_OFF_TXT "POWER - quit"
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 
 #define BATTERY_ON  BUTTON_SELECT
 #define BATTERY_OFF BUTTON_POWER
 #define BATTERY_ON_TXT  "SELECT - start"
-#define BATTERY_OFF_TXT "POWER"
+#define BATTERY_OFF_TXT "POWER  - quit"
 
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
 
 #define BATTERY_ON  BUTTON_SELECT
 #define BATTERY_OFF BUTTON_BACK
 #define BATTERY_ON_TXT  "SELECT - start"
-#define BATTERY_OFF_TXT "BACK"
+#define BATTERY_OFF_TXT "BACK  - quit"
 
 #elif CONFIG_KEYPAD == MROBE500_PAD
 
 #define BATTERY_ON  BUTTON_RC_PLAY
 #define BATTERY_OFF BUTTON_POWER
 #define BATTERY_ON_TXT  "PLAY - start"
-#define BATTERY_OFF_TXT "POWER"
+#define BATTERY_OFF_TXT "POWER  - quit"
 
 #elif CONFIG_KEYPAD == MROBE100_PAD
 
 #define BATTERY_ON  BUTTON_SELECT
 #define BATTERY_OFF BUTTON_POWER
 #define BATTERY_ON_TXT  "SELECT - start"
-#define BATTERY_OFF_TXT "POWER"
+#define BATTERY_OFF_TXT "POWER  - quit"
 
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
 
@@ -144,17 +144,17 @@ PLUGIN_HEADER
 #define BATTERY_RC_ON  BUTTON_RC_PLAY
 #define BATTERY_RC_OFF BUTTON_RC_REC
 #define BATTERY_ON_TXT  "PLAY - start"
-#define BATTERY_OFF_TXT "REC"
+#define BATTERY_OFF_TXT "REC  - quit"
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 
 #define BATTERY_OFF BUTTON_POWER
-#define BATTERY_OFF_TXT "POWER"
+#define BATTERY_OFF_TXT "POWER  - quit"
 
 #elif CONFIG_KEYPAD == IAUDIO67_PAD
 
 #define BATTERY_OFF BUTTON_POWER
-#define BATTERY_OFF_TXT "POWER"
+#define BATTERY_OFF_TXT "POWER  - quit"
 #define BATTERY_ON BUTTON_PLAY
 #define BATTERY_ON_TXT  "PLAY - start"
 #else
@@ -172,7 +172,7 @@ PLUGIN_HEADER
 #define BATTERY_ON_TXT  "CENTRE - start"
 #endif
 #ifndef BATTERY_OFF_TXT
-#define BATTERY_OFF_TXT "TOPLEFT"
+#define BATTERY_OFF_TXT "TOPLEFT  - quit"
 #endif
 #endif
 
@@ -216,7 +216,7 @@ bool exit_tsr(bool reenter)
     (void)reenter;
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Batt.Bench is currently running.");
-    rb->lcd_puts_scroll(0, 1, "Press " BATTERY_OFF_TXT " to cancel the test");
+    rb->lcd_puts_scroll(0, 1, "Press OFF to cancel the test");
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_puts_scroll(0, 2, "Anything else will resume");
 #endif
@@ -414,7 +414,7 @@ int main(void)
 #ifdef HAVE_LCD_BITMAP
     int i;
     const char *msgs[] = { "Battery Benchmark","Check file", BATTERY_LOG,
-                           "for more info", BATTERY_ON_TXT, BATTERY_OFF_TXT " - quit" };
+                           "for more info", BATTERY_ON_TXT, BATTERY_OFF_TXT };
 #endif    
     rb->lcd_clear_display();
 
