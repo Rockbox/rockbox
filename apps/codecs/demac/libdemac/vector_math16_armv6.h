@@ -128,7 +128,6 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
 
     "10:                             \n"
         "ldrh    r4, [%[v2]], #2     \n"
-        "mov     r4, r4, lsl #16     \n"
     "1:                              \n"
         "ldmia   %[v2]!, {r5-r8}     \n"
         "ldmia   %[v1],  {r0-r3}     \n"
@@ -244,10 +243,10 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "smlatb  %[res], r3, r8, %[res]  \n"
 #if ORDER > 16
         "mov     r4, r8                  \n"
-        "subs    %[cnt], %[cnt], #1  \n"
-        "bne     1b                  \n"
+        "subs    %[cnt], %[cnt], #1      \n"
+        "bne     1b                      \n"
 #endif
-        "b       99f                 \n"
+        "b       99f                     \n"
 
     "20:                                 \n"
     "1:                                  \n"
