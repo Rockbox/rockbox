@@ -91,10 +91,6 @@ static void calendar_init(struct today *today, struct shown *shown)
     today->year = 2000+tm->tm_year%100;
     today->wday = tm->tm_wday-1;
     today->mday = tm->tm_mday;
-#ifdef SIMULATOR
-    today->wday = 3;
-    today->mday = 13;
-#endif
     shown->mday = today->mday;
     shown->mon = today->mon;
     shown->year = today->year;
