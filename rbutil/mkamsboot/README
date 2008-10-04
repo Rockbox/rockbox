@@ -1,0 +1,10 @@
+mkamsboot
+---------
+
+A tool to inject some code (contained in test.S) into a firmware file.
+
+Edit the INFILE variable in the Makefile to point to the original
+firmware file you want to patch, edit "test.S" appropriately, and then
+type "make".
+
+
