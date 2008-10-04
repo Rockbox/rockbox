@@ -30,7 +30,7 @@ PLUGIN_HEADER
 static const struct plugin_api* rb;
 
 static bool leap_year;
-static int days_in_month[2][13] = {
+static const int days_in_month[2][13] = {
     {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
     {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
 };
@@ -104,25 +104,25 @@ static int space = LCD_WIDTH / 7;
 static void draw_headers(void)
 {
     int i,w,h;
-    char *Dayname[7] = {"M","T","W","T","F","S","S"};
+    const char *Dayname[7] = {"M","T","W","T","F","S","S"};
     int ws = 2;
     rb->lcd_getstringsize("A",&w,&h);
-    for (i = 0; i < 7;)
+    for (i = 0; i < 7; i++)
     {
-        rb->lcd_putsxy(ws, 0 , Dayname[i++]);
+        rb->lcd_putsxy(ws, 0 , Dayname[i]);
         ws += space;
     }
     rb->lcd_hline(0, LCD_WIDTH-1 ,h);
 }
 
-static bool day_has_memo[31];
-static bool wday_has_memo[6];
+static bool day_has_memo[32];
+static bool wday_has_memo[7];
 static void draw_calendar(struct shown *shown)
 {
     int w,h;
     int ws,row,pos,days_per_month,j;
     char buffer[9];
-    char *Monthname[] = {
+    const char *Monthname[] = {
                           "Jan",
                           "Feb",
                           "Mar",
@@ -430,7 +430,7 @@ static bool edit_memo(int change, struct shown *shown)
             rb->lcd_puts(0,0,"New :");
             rb->lcd_puts(2,1,"weekly : Left");
             rb->lcd_puts(2,2,"monthly : Play");
-            rb->lcd_puts(2,3,"anualy : Right");
+            rb->lcd_puts(2,3,"annually : Right");
             rb->lcd_puts(2,4,"one off : On");
         }
         rb->lcd_update();
