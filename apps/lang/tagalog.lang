@@ -8086,6 +8086,8 @@
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
     h10,h10_5gb,e200,c200: "PREV to abort"
+    gigabeats: "BACK to abort"
+    gigabeatf: "POWER to abort"
   </source>
   <dest>
     *: "OFF sa agas"
@@ -8093,6 +8095,8 @@
     ipod*: "PLAY/PAUSE sa agas"
     x5,m5: "Long PLAY sa agas"
     h10,h10_5gb,e200,c200: "PREV sa agas"
+    gigabeats: "BACK sa agas"
+    gigabeatf: "POWER sa agas"
   </dest>
   <voice>
     *: ""
@@ -11982,5 +11986,22 @@
   <voice>
     *: none
     agc: "ATK klip oras"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMART
+  desc: Display the expected AA size
+  user:
+  <source>
+    *: none
+    albumart: "Album Art:"
+  </source>
+  <dest>
+    *: none
+    albumart: "Album Arte:"
+  </dest>
+  <voice>
+    *: none
+    albumart: ""
   </voice>
 </phrase>
