@@ -181,16 +181,16 @@ win32 {
     RESOURCES += rbutilqt-lang.qrc
 }
 
-TRANSLATIONS += rbutil_de.ts \
- rbutil_fi.ts \
- rbutil_fr.ts \
- rbutil_gr.ts \
- rbutil_he.ts \
- rbutil_nl.ts \
- rbutil_tr.ts \
- rbutil_zh_CN.ts \
- rbutil_zh_TW.ts \
- rbutil_ja.ts
+TRANSLATIONS += lang/rbutil_de.ts \
+ lang/rbutil_fi.ts \
+ lang/rbutil_fr.ts \
+ lang/rbutil_gr.ts \
+ lang/rbutil_he.ts \
+ lang/rbutil_nl.ts \
+ lang/rbutil_tr.ts \
+ lang/rbutil_zh_CN.ts \
+ lang/rbutil_zh_TW.ts \
+ lang/rbutil_ja.ts
 
 QT += network
 DEFINES += RBUTIL _LARGEFILE64_SOURCE
