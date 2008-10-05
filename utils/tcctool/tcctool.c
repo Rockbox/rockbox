@@ -59,6 +59,7 @@ static struct device_t devices[] =
     {"iaudio6",  "iAudio 6",                     0xb021, 0x20000000, 0x62e97010 },
     {"iaudio7",  "iAudio 7",                     0xb021, 0x20000000, 0x62e97010 },
     {"logikdax", "Logik DAX 1GB DAB/MP3 player", 0xb021, 0x20000000, 0x52e97410 },
+    {"x20",      "iRiver X20",                   0xb051, 0x20000000, 0x02e92010 },
     {"ypp2",     "Samsung YP-P2",                0xb011, 0x20000000, 0x22e92010 },
     {"ypk3",     "Samsung YP-K3",                0xb021, 0x20000000, 0x62e92018 },
 };

@@ -121,14 +121,17 @@ ServiceBinary  = %12%\libusb0.sys
 [Devices]
 "TCC77x usb-boot mode"=LIBUSB_DEV, USB\VID_140E&PID_B021
 "TCC7801 usb-boot mode"=LIBUSB_DEV, USB\VID_140E&PID_B011
+"TCC8200 usb-boot mode"=LIBUSB_DEV, USB\VID_140E&PID_B051
 
 [Devices.NT]
 "TCC77x usb-boot mode"=LIBUSB_DEV, USB\VID_140E&PID_B021
 "TCC7801 usb-boot mode"=LIBUSB_DEV, USB\VID_140E&PID_B011
+"TCC8200 usb-boot mode"=LIBUSB_DEV, USB\VID_140E&PID_B051
 
 [Devices.NTAMD64]
 "TCC77x usb-boot mode"=LIBUSB_DEV, USB\VID_140E&PID_B021
 "TCC7801 usb-boot mode"=LIBUSB_DEV, USB\VID_140E&PID_B011
+"TCC8200 usb-boot mode"=LIBUSB_DEV, USB\VID_140E&PID_B051
 
 
 ;--------------------------------------------------------------------------
