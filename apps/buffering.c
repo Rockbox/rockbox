@@ -944,11 +944,11 @@ int bufopen(const char *file, size_t offset, enum data_type type)
         int rc;
         mutex_lock(&llist_mutex); /* Lock because load_bitmap yields */
         rc = load_bitmap(fd);
+        mutex_unlock(&llist_mutex);
         if (rc <= 0)
         {
             rm_handle(h);
             close(fd);
-            mutex_unlock(&llist_mutex);
             return ERR_FILE_ERROR;
         }
         h->filerem = 0;
@@ -956,7 +956,6 @@ int bufopen(const char *file, size_t offset, enum data_type type)
         h->available = rc;
         h->widx = buf_widx + rc; /* safe because the data doesn't wrap */
         buf_widx += rc;  /* safe too */
-        mutex_unlock(&llist_mutex);
     }
     else
 #endif
