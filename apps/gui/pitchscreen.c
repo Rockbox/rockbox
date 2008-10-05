@@ -45,16 +45,13 @@
 #define ICON_BORDER 12
 
 static int pitch_mode = PITCH_MODE_ABSOLUTE; /* 1 - absolute, -1 - semitone */
-enum PITCHSCREEN_VALUES
-{
-    PITCH_SMALL_DELTA =     1,
-    PITCH_BIG_DELTA   =    10,
-    PITCH_NUDGE_DELTA =    20,
-    PITCH_MIN         =   500,
-    PITCH_MAX         =  2000,
-};
+#define PITCH_MAX         2000
+#define PITCH_MIN         500
+#define PITCH_SMALL_DELTA 1
+#define PITCH_BIG_DELTA   10
+#define PITCH_NUDGE_DELTA 20
 
-enum PITCHSCREEN_ITEMS
+enum
 {
     PITCH_TOP = 0,
     PITCH_MID,
