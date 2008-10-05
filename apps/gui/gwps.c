@@ -60,6 +60,7 @@
 #include "root_menu.h"
 #include "backdrop.h"
 #include "quickscreen.h"
+#include "pitchscreen.h"
 
 /* currently only on wps_state is needed */
 struct wps_state wps_state;
@@ -567,7 +568,7 @@ long gui_wps_show(void)
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
                 show_remote_main_backdrop();
 #endif
-                if (1 == pitch_screen())
+                if (1 == gui_syncpitchscreen_run())
                     return SYS_USB_CONNECTED;
 #if LCD_DEPTH > 1
                 show_wps_backdrop();

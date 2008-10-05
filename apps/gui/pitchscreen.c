@@ -36,93 +36,156 @@
 #include "icons.h"
 #include "screen_access.h"
 #include "screens.h"
-
-#define PITCH_MAX         2000
-#define PITCH_MIN         500
-#define PITCH_SMALL_DELTA 1
-#define PITCH_BIG_DELTA   10
-#define PITCH_NUDGE_DELTA 20
+#include "statusbar.h"
+#include "viewport.h"
+#include "pitchscreen.h"
 
 #define PITCH_MODE_ABSOLUTE 1
 #define PITCH_MODE_SEMITONE -PITCH_MODE_ABSOLUTE
+#define ICON_BORDER 12
 
 static int pitch_mode = PITCH_MODE_ABSOLUTE; /* 1 - absolute, -1 - semitone */
+enum PITCHSCREEN_VALUES
+{
+    PITCH_SMALL_DELTA =     1,
+    PITCH_BIG_DELTA   =    10,
+    PITCH_NUDGE_DELTA =    20,
+    PITCH_MIN         =   500,
+    PITCH_MAX         =  2000,
+};
 
-/* returns:
-   0 if no key was pressed
-   1 if USB was connected */
+enum PITCHSCREEN_ITEMS
+{
+    PITCH_TOP = 0,
+    PITCH_MID,
+    PITCH_BOTTOM,
+    PITCH_ITEM_COUNT,
+};
 
-static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
+static void pitchscreen_fix_viewports(enum screen_type screen,
+        struct viewport *parent,
+        struct viewport pitch_viewports[NB_SCREENS][PITCH_ITEM_COUNT])
+{
+    short n, height;
+    height = font_get(parent->font)->height;
+    for (n = 0; n < PITCH_ITEM_COUNT; n++)
+    {
+        pitch_viewports[screen][n] = *parent;
+        pitch_viewports[screen][n].height = height;
+    }
+    pitch_viewports[screen][PITCH_TOP].y += ICON_BORDER;
+
+    pitch_viewports[screen][PITCH_MID].x += ICON_BORDER;
+    pitch_viewports[screen][PITCH_MID].width = parent->width - ICON_BORDER*2;
+    pitch_viewports[screen][PITCH_MID].height = height * 2;
+    pitch_viewports[screen][PITCH_MID].y += parent->height / 2 -
+            pitch_viewports[screen][PITCH_MID].height / 2;
+    pitch_viewports[screen][PITCH_BOTTOM].y += parent->height - height -
+            ICON_BORDER;
+}
+
+/* must be called before pitchscreen_draw, or within
+ * since it neither clears nor updates the display */
+static void pitchscreen_draw_icons (struct screen *display,
+        struct viewport *parent)
+{
+    display->set_viewport(parent);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
+            parent->width/2 - 3,
+            2, 7, 8);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
+            parent->width /2 - 3,
+            parent->height - 10, 7, 8);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
+            parent->width - 10,
+            parent->height /2 - 4, 7, 8);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
+            2,
+            parent->height /2 - 4, 7, 8);
+}
+
+static void pitchscreen_draw (
+        struct screen *display,
+        int max_lines,
+        struct viewport pitch_viewports[PITCH_ITEM_COUNT],
+        int pitch)
 {
     unsigned char* ptr;
     unsigned char buf[32];
     int w, h;
+    bool show_lang_pitch;
 
-    display->clear_display();
-
-    if (display->getnblines() < 4) /* very small screen, just show pitch value*/
+     /* Hide "Pitch up/Pitch down" for a small screen */
+    if (max_lines >= 5)
     {
-        w = snprintf((char *)buf, sizeof(buf), "%s: %d.%d%%",str(LANG_PITCH),
-                  pitch / 10, pitch % 10 );
-        display->putsxy((display->lcdwidth-(w*display->getcharwidth()))/2,
-                         display->getnblines()/2,buf);
-    }
-    else /* bigger screen, show everything... */
-    {
-
         /* UP: Pitch Up */
+        display->set_viewport(&pitch_viewports[PITCH_TOP]);
         if (pitch_mode == PITCH_MODE_ABSOLUTE) {
             ptr = str(LANG_PITCH_UP);
         } else {
             ptr = str(LANG_PITCH_UP_SEMITONE);
         }
         display->getstringsize(ptr,&w,&h);
-        display->putsxy((display->lcdwidth-w)/2, 0, ptr);
-        display->mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
-                        display->lcdwidth/2 - 3, h, 7, 8);
+        display->clear_viewport();
+        /* draw text */
+        display->putsxy((pitch_viewports[PITCH_TOP].width / 2) -
+                (w / 2), 0, ptr);
 
         /* DOWN: Pitch Down */
+        display->set_viewport(&pitch_viewports[PITCH_BOTTOM]);
         if (pitch_mode == PITCH_MODE_ABSOLUTE) {
             ptr = str(LANG_PITCH_DOWN);
         } else {
             ptr = str(LANG_PITCH_DOWN_SEMITONE);
         }
         display->getstringsize(ptr,&w,&h);
-        display->putsxy((display->lcdwidth-w)/2, display->lcdheight - h, ptr);
-        display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                             display->lcdwidth/2 - 3,
-                             display->lcdheight - h*2, 7, 8);
-
-        /* RIGHT: +2% */
-        ptr = "+2%";
-        display->getstringsize(ptr,&w,&h);
-        display->putsxy(display->lcdwidth-w, (display->lcdheight-h)/2, ptr);
-        display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
-                             display->lcdwidth-w-8,
-                             (display->lcdheight-h)/2, 7, 8);
-
-        /* LEFT: -2% */
-        ptr = "-2%";
-        display->getstringsize(ptr,&w,&h);
-        display->putsxy(0, (display->lcdheight-h)/2, ptr);
-        display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
-                             w+1, (display->lcdheight-h)/2, 7, 8);
-
-        /* "Pitch" */
-        snprintf((char *)buf, sizeof(buf), "%s", str(LANG_PITCH));
-        display->getstringsize(buf,&w,&h);
-        display->putsxy((display->lcdwidth-w)/2, (display->lcdheight/2)-h, buf);
-        /* "XX.X%" */
-        snprintf((char *)buf, sizeof(buf), "%d.%d%%",
-                pitch / 10, pitch % 10 );
-        display->getstringsize(buf,&w,&h);
-        display->putsxy((display->lcdwidth-w)/2, display->lcdheight/2, buf);
+        display->clear_viewport();
+        /* draw text */
+        display->putsxy((pitch_viewports[PITCH_BOTTOM].width / 2) -
+                (w / 2), 0, ptr);
     }
+    display->set_viewport(&pitch_viewports[PITCH_MID]);
 
+    snprintf((char *)buf, sizeof(buf), "%s", str(LANG_PITCH));
+    display->getstringsize(buf,&w,&h);
+    /* lets hide LANG_PITCH for smaller screens */
+    display->clear_viewport();
+    if ((show_lang_pitch = (max_lines >= 3)))
+        display->putsxy((pitch_viewports[PITCH_MID].width / 2) - (w / 2),
+                0, buf);
+
+    /* we don't need max_lines any more, reuse it*/
+    max_lines = w;
+    /* "XXX.X%" */
+    snprintf((char *)buf, sizeof(buf), "%d.%d%%",
+            pitch / 10, pitch % 10 );
+    display->getstringsize(buf,&w,&h);
+    display->putsxy((pitch_viewports[PITCH_MID].width / 2) - (w / 2),
+            (show_lang_pitch? h : h/2), buf);
+
+    /* What's wider? LANG_PITCH or the value?
+     * Only interesting if LANG_PITCH is actually drawn */
+    max_lines = (show_lang_pitch ? ((max_lines > w) ? max_lines : w) : w);
+
+    /* Let's treat '+' and '-' as equally wide
+     * This saves a getstringsize call
+     * Also, it wouldn't look nice if -2% shows up, but +2% not */
+    display->getstringsize("+2%",&w,&h);
+    max_lines += 2*w;
+    /* hide +2%/-2% for a narrow screens */
+    if (max_lines < pitch_viewports[PITCH_MID].width)
+    {
+        /* RIGHT: +2% */
+        display->putsxy(pitch_viewports[PITCH_MID].width - w, h /2, "+2%");
+        /* LEFT: -2% */
+        display->putsxy(0, h / 2, "-2%");
+    }
+    /* Lastly, a fullscreen update */
+    display->set_viewport(NULL);
     display->update();
 }
 
-static int pitch_increase(int pitch, int delta, bool allow_cutoff)
+ static int pitch_increase(int pitch, int delta, bool allow_cutoff)
 {
     int new_pitch;
 
@@ -188,25 +251,46 @@ static int pitch_increase_semitone(int pitch, bool up)
     return pitch_increase(pitch, tmp - pitch, false);
 }
 
-bool pitch_screen(void)
+/*
+    returns:
+    0 on exit
+    1 if USB was connected
+*/
+
+int gui_syncpitchscreen_run(void)
 {
     int button;
     int pitch = sound_get_pitch();
     int new_pitch, delta = 0;
     bool nudged = false;
     bool exit = false;
-    int i;
+    short i;
+    struct viewport parent[NB_SCREENS]; /* should be a parameter of this function */
+    short max_lines[NB_SCREENS];
+    struct viewport pitch_viewports[NB_SCREENS][PITCH_ITEM_COUNT];
 
+    /* initialize pitchscreen vps */
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].clear_display();
+        viewport_set_defaults(&parent[i], i);
+        max_lines[i] = viewport_get_nb_lines(&parent[i]);
+        pitchscreen_fix_viewports(i, &parent[i], pitch_viewports);
+
+        /* also, draw the icons now, it's only needed once */
+        pitchscreen_draw_icons(&screens[i], &parent[i]);
+    }
 #if CONFIG_CODEC == SWCODEC
     pcmbuf_set_low_latency(true);
 #endif
-
+    i = 0;
     while (!exit)
     {
         FOR_NB_SCREENS(i)
-            pitch_screen_draw(&screens[i], pitch, pitch_mode);
-
-        button = get_action(CONTEXT_PITCHSCREEN,TIMEOUT_BLOCK);
+            pitchscreen_draw(&screens[i], max_lines[i],
+                              pitch_viewports[i], pitch);
+        gui_syncstatusbar_draw(&statusbars, true);
+        button = get_action(CONTEXT_PITCHSCREEN,HZ);
         switch (button) {
             case ACTION_PS_INC_SMALL:
                 delta = PITCH_SMALL_DELTA;
@@ -268,7 +352,6 @@ bool pitch_screen(void)
                     return 1;
                 break;
         }
-
         if(delta)
         {
             if (pitch_mode == PITCH_MODE_ABSOLUTE) {
@@ -279,11 +362,9 @@ bool pitch_screen(void)
 
             delta = 0;
         }
-
     }
 #if CONFIG_CODEC == SWCODEC
     pcmbuf_set_low_latency(false);
 #endif
-    lcd_setfont(FONT_UI);
     return 0;
 }

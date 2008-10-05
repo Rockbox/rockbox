@@ -64,6 +64,7 @@
 #endif
 #include "cuesheet.h"
 #include "backdrop.h"
+#include "pitchscreen.h"
 
 static int context;
 static char* selected_file = NULL;
@@ -1002,7 +1003,7 @@ MENUITEM_FUNCTION(browse_id3_item, 0, ID2P(LANG_MENU_SHOW_ID3_INFO),
                   browse_id3, NULL, NULL, Icon_NOICON);
 #ifdef HAVE_PITCHSCREEN
 MENUITEM_FUNCTION(pitch_screen_item, 0, ID2P(LANG_PITCH),
-                  pitch_screen, NULL, NULL, Icon_Audio);
+                  gui_syncpitchscreen_run, NULL, NULL, Icon_Audio);
 #endif
 
 /* CONTEXT_[TREE|ID3DB] items */
