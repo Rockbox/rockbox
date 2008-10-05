@@ -25,12 +25,14 @@
 #include "lcd.h"
 #include "system.h"
 #include "cpu.h"
+#include "inttypes.h"
+#include "s5l8700.h"
 
 /*** definitions ***/
 
 
 /** globals **/
-
+static uint8_t lcd_type;
 static int xoffset; /* needed for flip */
 
 /*** hardware configuration ***/
@@ -64,10 +66,88 @@ void lcd_set_flip(bool yesno)
     }
 }
 
+static void lcd_sleep(uint32_t t) {
+    uint32_t i;
+
+    for(i=0;i<t;++i) t=t;
+}
+
+static uint8_t lcd_readdata() {
+        LCD_RDATA = 0;
+        lcd_sleep(64);
+        return (LCD_DBUFF/* & 0xff*/);
+}
+
+void lcd_on() {
+    if (lcd_type == 1) {
+        LCD_WCMD = 0x29;    
+    } else {
+    
+    }
+}
+
+void lcd_off() {
+    /* FIXME wait for DMA to finnish */
+    if (lcd_type == 1) {
+        LCD_WCMD = 0x28;
+	LCD_WDATA = 0;
+    } else {
+    
+    }
+}
 
 /* LCD init */
 void lcd_init_device(void)
 {
+    uint8_t data[5];
+
+/* init basic things */
+    PWRCON &= ~0x800;
+    PCON_ASRAM = 0x2;
+    PCON7 = 0x12222233;
+
+    LCD_CON = 0xca0;
+    LCD_PHTIME = 0;
+    LCD_INTCON = 0;
+    LCD_RST_TIME = 0x7ff;
+
+/* detect lcd type */
+    LCD_WCMD = 0x1;
+    lcd_sleep(166670);
+    LCD_WCMD = 0x11;
+    lcd_sleep(2000040);
+    lcd_readdata();
+    LCD_WCMD = 0x4;
+    lcd_sleep(100);
+    data[0]=lcd_readdata();
+    data[1]=lcd_readdata();
+    data[2]=lcd_readdata();
+    data[3]=lcd_readdata();
+    data[4]=lcd_readdata();
+    
+    lcd_type=0;
+    if (((data[1]==0x38) && ((data[2] & 0xf0) == 0x80)) ||
+        ((data[2]==0x38) && ((data[3] & 0xf0) == 0x80)))
+        lcd_type=1;
+    
+/* init lcd */
+    if (lcd_type == 1) {
+        LCD_WCMD = 0x3a;
+        LCD_WDATA = 0x6;
+        LCD_WCMD = 0xab;
+        LCD_WCMD = 0x35;
+        LCD_WDATA = 0;
+        LCD_WCMD=0x13;
+        LCD_WCMD = 0x2a;
+        LCD_WDATA = 0;
+        LCD_WDATA = 0;
+        LCD_WCMD = 0x2b;
+        LCD_WDATA = 0;
+        LCD_WDATA = 0;
+        LCD_WCMD = 0x29;
+    } else {
+        
+    }
 }
 
 /*** Update functions ***/
@@ -103,33 +183,36 @@ void lcd_blit_grey_phase_blit(unsigned char *values, unsigned char *phases,
 void lcd_update(void) ICODE_ATTR;
 void lcd_update(void)
 {
-    int y;
+    int i;
+    fb_data *p;
 
     /* Copy display bitmap to hardware */
-    for (y = 0; y < LCD_FBHEIGHT; y++)
-    {
-    }
+    if (lcd_type == 1) {
+        LCD_WCMD = 0x2a;
+	LCD_WDATA = 0;
+	LCD_WDATA = 0;
+	LCD_WDATA = 0;
+	LCD_WDATA = 0xaf;
+        LCD_WCMD = 0x2b;
+	LCD_WDATA = 0;
+	LCD_WDATA = 0;
+	LCD_WDATA = 0;
+	LCD_WDATA = 0x83;
+	LCD_WCMD = 0x2c;
+        for(p=&lcd_framebuffer[0][0], i=0;i<LCD_WIDTH*LCD_FBHEIGHT;++i, ++p) {
+            LCD_WDATA = RGB_UNPACK_RED(*p)<<3;
+            LCD_WDATA = RGB_UNPACK_GREEN(*p)<<2;
+            LCD_WDATA = RGB_UNPACK_BLUE(*p)<<3;
+            lcd_sleep(1); /* if data is sent too fast to lcdif, machine freezes */
+        }
+    } else {
+    
+    }    
 }
 
 /* Update a fraction of the display. */
 void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    int ymax;
-
-    /* The Y coordinates have to work on even 8 pixel rows */
-    ymax = (y + height-1) >> 3;
-    y >>= 3;
-
-    if(x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (width <= 0)
-        return; /* nothing left to do, 0 is harmful to lcd_write_data() */
-    if(ymax >= LCD_FBHEIGHT)
-        ymax = LCD_FBHEIGHT-1;
-
-    /* Copy specified rectange bitmap to hardware */
-    for (; y <= ymax; y++)
-    {
-    }
+    lcd_update();
 }

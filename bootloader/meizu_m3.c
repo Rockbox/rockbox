@@ -101,6 +101,26 @@ void bl_debug_int(unsigned int input,unsigned int count)
 
 void main(void)
 {
+    char mystring[64];
+    int tmpval;
+
+    /* set clock to 200 MHz */
+    CLKCON = 0x00800080;
+    CLKCON2= 0x00;
+    PLL0PMS = 0x1ad200;
+    PLLCON = 1;
+    while (!(PLLLOCK & 1)) ;
+    CLKCON = 0x20802080;
+
+    /* mask all interrupts
+       this is done, because the lcd framebuffer
+       overwrites some stuff, which leads to a freeze
+       when an irq is generated after the dfu upload.
+       crt0 should have disabled irqs,
+       but the bootrom hands us execution in
+       user mode so we can't switch interrupts off */
+    INTMSK = 0;
+
     //Set backlight pin to output and enable
     int oldval = PCON0;
     PCON0 = ((oldval & ~(3 << 4)) | (1 << 4));
@@ -109,6 +129,15 @@ void main(void)
     //Set PLAY to input
     oldval = PCON1;
     PCON1 = ((oldval & ~(0xf << 16)) | (0 << 16));
+
+    asm volatile("mrs %0, cpsr \n\t"
+		 : "=r" (tmpval)
+    );
+
+    lcd_init();
+    snprintf(mystring, 64, "tmpval: %x", tmpval);
+    lcd_putsxy(0,0,mystring);
+    lcd_update();
 
     init_qt1106();
 
