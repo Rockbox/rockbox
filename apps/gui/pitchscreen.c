@@ -42,14 +42,18 @@
 
 #define PITCH_MODE_ABSOLUTE 1
 #define PITCH_MODE_SEMITONE -PITCH_MODE_ABSOLUTE
-#define ICON_BORDER 12
+#define ICON_BORDER 12 /* icons are currently 7x8, so add ~2 pixels  */
+                       /*   on both sides when drawing */
+                          
 
-static int pitch_mode = PITCH_MODE_ABSOLUTE; /* 1 - absolute, -1 - semitone */
 #define PITCH_MAX         2000
 #define PITCH_MIN         500
 #define PITCH_SMALL_DELTA 1
 #define PITCH_BIG_DELTA   10
 #define PITCH_NUDGE_DELTA 20
+
+
+static int pitch_mode = PITCH_MODE_ABSOLUTE; /* 1 - absolute, -1 - semitone */
 
 enum
 {
@@ -59,32 +63,30 @@ enum
     PITCH_ITEM_COUNT,
 };
 
-static void pitchscreen_fix_viewports(enum screen_type screen,
-        struct viewport *parent,
-        struct viewport pitch_viewports[NB_SCREENS][PITCH_ITEM_COUNT])
+static void pitchscreen_fix_viewports(struct viewport *parent,
+        struct viewport pitch_viewports[PITCH_ITEM_COUNT])
 {
     short n, height;
     height = font_get(parent->font)->height;
     for (n = 0; n < PITCH_ITEM_COUNT; n++)
     {
-        pitch_viewports[screen][n] = *parent;
-        pitch_viewports[screen][n].height = height;
+        pitch_viewports[n] = *parent;
+        pitch_viewports[n].height = height;
     }
-    pitch_viewports[screen][PITCH_TOP].y += ICON_BORDER;
+    pitch_viewports[PITCH_TOP].y += ICON_BORDER;
 
-    pitch_viewports[screen][PITCH_MID].x += ICON_BORDER;
-    pitch_viewports[screen][PITCH_MID].width = parent->width - ICON_BORDER*2;
-    pitch_viewports[screen][PITCH_MID].height = height * 2;
-    pitch_viewports[screen][PITCH_MID].y += parent->height / 2 -
-            pitch_viewports[screen][PITCH_MID].height / 2;
-    pitch_viewports[screen][PITCH_BOTTOM].y += parent->height - height -
-            ICON_BORDER;
+    pitch_viewports[PITCH_MID].x += ICON_BORDER;
+    pitch_viewports[PITCH_MID].width = parent->width - ICON_BORDER*2;
+    pitch_viewports[PITCH_MID].height = height * 2;
+    pitch_viewports[PITCH_MID].y += parent->height / 2 -
+            pitch_viewports[PITCH_MID].height / 2;
+    pitch_viewports[PITCH_BOTTOM].y += parent->height - height - ICON_BORDER;
 }
 
 /* must be called before pitchscreen_draw, or within
  * since it neither clears nor updates the display */
 static void pitchscreen_draw_icons (struct screen *display,
-        struct viewport *parent)
+                                    struct viewport *parent)
 {
     display->set_viewport(parent);
     display->mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
@@ -101,11 +103,8 @@ static void pitchscreen_draw_icons (struct screen *display,
             parent->height /2 - 4, 7, 8);
 }
 
-static void pitchscreen_draw (
-        struct screen *display,
-        int max_lines,
-        struct viewport pitch_viewports[PITCH_ITEM_COUNT],
-        int pitch)
+static void pitchscreen_draw (struct screen *display, int max_lines,
+        struct viewport pitch_viewports[PITCH_ITEM_COUNT], int pitch)
 {
     unsigned char* ptr;
     unsigned char buf[32];
@@ -182,7 +181,7 @@ static void pitchscreen_draw (
     display->update();
 }
 
- static int pitch_increase(int pitch, int delta, bool allow_cutoff)
+static int pitch_increase(int pitch, int delta, bool allow_cutoff)
 {
     int new_pitch;
 
@@ -262,7 +261,8 @@ int gui_syncpitchscreen_run(void)
     bool nudged = false;
     bool exit = false;
     short i;
-    struct viewport parent[NB_SCREENS]; /* should be a parameter of this function */
+    struct viewport parent[NB_SCREENS]; /* should maybe 
+                                           be a parameter of this function */
     short max_lines[NB_SCREENS];
     struct viewport pitch_viewports[NB_SCREENS][PITCH_ITEM_COUNT];
 
@@ -272,7 +272,7 @@ int gui_syncpitchscreen_run(void)
         screens[i].clear_display();
         viewport_set_defaults(&parent[i], i);
         max_lines[i] = viewport_get_nb_lines(&parent[i]);
-        pitchscreen_fix_viewports(i, &parent[i], pitch_viewports);
+        pitchscreen_fix_viewports(&parent[i], pitch_viewports[i]);
 
         /* also, draw the icons now, it's only needed once */
         pitchscreen_draw_icons(&screens[i], &parent[i]);
