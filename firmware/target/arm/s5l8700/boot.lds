@@ -1,7 +1,7 @@
 #include "config.h"
 
 ENTRY(start)
-OUTPUT_FORMAT(elf32-littlearm)
+OUTPUT_FORMAT(elf32-bigarm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/s5l8700/crt0.o)
 
@@ -47,7 +47,7 @@ SECTIONS
      *(.stack)
      _stackbegin = .;
      stackbegin = .;
-     . += 0x2000;
+     . += 0x1000;
      _stackend = .;
      stackend = .;
   }
