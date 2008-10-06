@@ -6998,16 +6998,19 @@
   user:
   <source>
     *: none
+    multivolume: "HD1"
     e200,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
+    multivolume: "HD1"
     e200,c200: "MSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
+    multivolume: "H D 1"
     e200,c200: "micro S D"
     ondio*: "M M C"
   </voice>
