@@ -1,0 +1,2564 @@
+# Auto generated documentation by Rockbox plugin API generator v2
+# Made by Maurus Cuelenaere
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+# $Id$
+#
+# Generated from http://svn.rockbox.org/viewvc.cgi/trunk/apps/plugin.h
+#
+# Format:
+# \group memory and strings
+# \conditions defined(HAVE_BACKLIGHT)
+# \param fmt
+# \return
+# \description
+# \see func1 func2 [S[apps/plugin.c]]
+#
+# Markup:
+# [W[wiki url]]
+# [S[svn url]]
+# [F[function]]
+# [[url]]
+# %BR%
+# =code=
+
+char *strcasestr (const char* phaystack, const char* pneedle)
+    \group strings and memory
+    \param phaystack
+    \param pneedle
+    \return
+    \description
+
+bool action_userabort(int timeout)
+    \group action handling
+    \param timeout
+    \return
+    \description
+
+size_t align_buffer(void **start, size_t size, size_t align)
+    \group kernel/ system
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param start
+    \param size
+    \param align
+    \return
+    \description
+
+const char *appsversion
+    \return version of the plugin API
+    \description
+
+void ata_sleep(void)
+    \group file
+    \description Give the disk some rest
+
+void ata_spin(void)
+    \group file
+    \description
+
+void ata_spindown(int seconds)
+    \group file
+    \param seconds
+    \description
+
+int atoi(const char *str)
+    \group strings and memory
+    \param str
+    \return
+    \description he atoi() function converts the initial portion of a string pointed to by str to int
+
+struct mp3entry* audio_current_track(void)
+    \group playback control
+    \return the mp3entry struct of the currently playing track
+    \description
+    \see [S[firmware/export/id3.h]]
+
+void audio_ff_rewind(long newtime)
+    \group playback control
+    \param newtime
+    \description
+
+void audio_flush_and_reload_tracks(void)
+    \group playback control
+    \description
+
+int audio_get_file_pos(void)
+    \group playback control
+    \return
+    \description
+
+bool audio_has_changed_track(void)
+    \group playback control
+    \return
+    \description
+
+void audio_next(void)
+    \group playback control
+    \description
+
+struct mp3entry* audio_next_track(void)
+    \group playback control
+    \return the mp3entry struct of the upcoming track
+    \description
+    \see [S[firmware/export/id3.h]]
+
+void audio_pause(void)
+    \group playback control
+    \description
+
+void audio_prev(void)
+    \group playback control
+    \description
+
+void audio_resume(void)
+    \group playback control
+    \description
+
+void audio_set_input_source(int source, unsigned flags)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC) && (INPUT_SRC_CAPS != 0)
+    \param source
+    \param flags
+    \description
+
+void audio_set_output_source(int monitor)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC) && (INPUT_SRC_CAPS != 0)
+    \param monitor
+    \description
+
+void audio_set_recording_gain(int left, int right, int type)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \param left
+    \param right
+    \param type
+    \description
+
+int audio_status(void)
+    \group playback control
+    \return
+    \description
+
+void audio_stop(void)
+    \group playback control
+    \description
+
+void backlight_off(void)
+    \group backlight
+    \description Turns the backlight off
+
+void backlight_on(void)
+    \group backlight
+    \description Turns the backlight on
+
+void backlight_set_brightness(int val)
+    \group backlight
+    \conditions (defined(HAVE_BACKLIGHT_BRIGHTNESS))
+    \param val
+    \description
+
+void backlight_set_timeout(int index)
+    \group backlight
+    \param index 0 : backlight always off%BR%1 : no time out%BR%2 : 1s%BR%3 : 2s%BR%4 : 3s%BR%5 : 4s%BR%6 : 5s%BR%7 : 6s%BR%8 : 7s%BR%9 : 8s%BR%10 : 9s%BR%11 : 10s%BR%12 : 15s%BR%13 : 20s%BR%14 : 25s%BR%15 : 30s%BR%16 : 45s%BR%17 : 60s%BR%18 : 90s%BR%other : backlight always off
+    \description Set the backlight timeout
+
+void backlight_set_timeout_plugged(int index)
+    \conditions (CONFIG_CHARGING)
+    \param index
+    \description
+
+int battery_level(void)
+    \group power
+    \return battery level in percent
+    \description On the simulator, battery_level is always 75
+
+bool battery_level_safe(void)
+    \group power
+    \return
+    \description
+
+int battery_time(void)
+    \group power
+    \return
+    \description
+
+unsigned int battery_voltage(void)
+    \group power
+    \conditions (!defined(SIMULATOR))
+    \return
+    \description
+
+unsigned short *bidi_l2v( const unsigned char *str, int orientation )
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param str
+    \param orientation
+    \return
+    \description
+
+void bitswap(unsigned char *data, int length)
+    \group sound
+    \conditions (!defined(SIMULATOR)) && (CONFIG_CODEC != SWCODEC)
+    \param data
+    \param length
+    \description Swap the bits for each element of array =data= of size =length=
+
+int bufadvance(int handle_id, off_t offset)
+    \group buffering API
+    \conditions ((CONFIG_CODEC == SWCODEC))
+    \param handle_id
+    \param offset
+    \return
+    \description
+
+int bufalloc(const void *src, size_t size, enum data_type type)
+    \group buffering API
+    \conditions ((CONFIG_CODEC == SWCODEC))
+    \param src
+    \param size
+    \param type
+    \return
+    \description
+
+bool bufclose(int handle_id)
+    \group buffering API
+    \conditions ((CONFIG_CODEC == SWCODEC))
+    \param handle_id
+    \return
+    \description
+
+ssize_t bufcuttail(int handle_id, size_t size)
+    \group buffering API
+    \conditions ((CONFIG_CODEC == SWCODEC))
+    \param handle_id
+    \param size
+    \return
+    \description
+
+ssize_t bufgetdata(int handle_id, size_t size, void **data)
+    \group buffering API
+    \conditions ((CONFIG_CODEC == SWCODEC))
+    \param handle_id
+    \param size
+    \param data
+    \return
+    \description
+
+ssize_t bufgettail(int handle_id, size_t size, void **data)
+    \group buffering API
+    \conditions ((CONFIG_CODEC == SWCODEC))
+    \param handle_id
+    \param size
+    \param data
+    \return
+    \description
+
+int bufopen(const char *file, size_t offset, enum data_type type)
+    \group buffering API
+    \conditions ((CONFIG_CODEC == SWCODEC))
+    \param file
+    \param offset
+    \param type
+    \return
+    \description
+
+ssize_t bufread(int handle_id, size_t size, void *dest)
+    \group buffering API
+    \conditions ((CONFIG_CODEC == SWCODEC))
+    \param handle_id
+    \param size
+    \param dest
+    \return
+    \description
+
+int bufseek(int handle_id, size_t newpos)
+    \group buffering API
+    \conditions ((CONFIG_CODEC == SWCODEC))
+    \param handle_id
+    \param newpos
+    \return
+    \description
+
+ssize_t buf_get_offset(int handle_id, void *ptr)
+    \conditions ((CONFIG_CODEC == SWCODEC))
+    \param handle_id
+    \param ptr
+    \return
+    \description
+
+ssize_t buf_handle_offset(int handle_id)
+    \conditions ((CONFIG_CODEC == SWCODEC))
+    \param handle_id
+    \return
+    \description
+
+void buf_request_buffer_handle(int handle_id)
+    \conditions ((CONFIG_CODEC == SWCODEC))
+    \param handle_id
+    \description
+
+void buf_set_base_handle(int handle_id)
+    \conditions ((CONFIG_CODEC == SWCODEC))
+    \param handle_id
+    \description
+
+size_t buf_used(void)
+    \conditions ((CONFIG_CODEC == SWCODEC))
+    \return
+    \description
+
+void buttonlight_off(void)
+    \group button
+    \conditions (defined(HAVE_BUTTON_LIGHT))
+    \description
+
+void buttonlight_on(void)
+    \group button
+    \conditions (defined(HAVE_BUTTON_LIGHT))
+    \description
+
+void buttonlight_set_brightness(int val)
+    \group button
+    \conditions (defined(HAVE_BUTTON_LIGHT)) && (defined(HAVE_BUTTONLIGHT_BRIGHTNESS))
+    \param val
+    \description
+
+void buttonlight_set_timeout(int value)
+    \group button
+    \conditions (defined(HAVE_BUTTON_LIGHT))
+    \param value
+    \description
+
+void button_clear_queue(void)
+    \group button
+    \description Empty the button queue
+
+long button_get(bool block)
+    \group button
+    \param block If is set TRUE, button_get won't return until a key is pressed
+    \return a bitmask for which keys were pressed
+    \description
+
+intptr_t button_get_data(void)
+    \group button
+    \conditions (defined(HAVE_BUTTON_DATA))
+    \return
+    \description
+
+long button_get_w_tmo(int ticks)
+    \group button
+    \param ticks
+    \return a bitmask for which keys were pressed; if no key was pressed, return BUTTON_NONE
+    \description Wait for a key press for =ticks= ticks. (there are HZ ticks per second)
+
+bool button_hold(void)
+    \group button
+    \conditions (defined(HAS_BUTTON_HOLD))
+    \return
+    \description
+
+struct event_queue *button_queue
+    \conditions !defined(HAVE_LCD_CHARCELLS) )) && (defined(HAVE_LCD_ENABLE
+    \return
+    \description
+
+int button_queue_count(void)
+    \group button
+    \return
+    \description
+
+int button_status(void)
+    \group button
+    \return a bitmask for which keys are currently pressed
+    \description
+
+void cancel_cpu_boost(void)
+    \conditions (defined(HAVE_SCHEDULER_BOOSTCTRL))
+    \description Unboosts the CPU for the current thread
+
+const unsigned char *font_get_bits( struct font *pf, unsigned short char_code )
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param pf
+    \param char_code
+    \return
+    \description
+
+const unsigned char* utf8decode(const unsigned char *utf8, unsigned short *ucs)
+    \group unicode stuff
+    \param utf8
+    \param ucs
+    \return
+    \description
+
+const unsigned char *_ctype_
+    \group strings and memory
+    \return
+    \description
+
+bool charger_inserted(void)
+    \group power
+    \conditions (CONFIG_CHARGING)
+    \return
+    \description
+
+bool charging_state(void)
+    \group power
+    \conditions (CONFIG_CHARGING) && (CONFIG_CHARGING == CHARGING_MONITOR)
+    \return
+    \description
+
+int closedir(DIR* dir)
+    \group dir
+    \param dir
+    \return
+    \description The closedir() function closes the directory stream associated with =dir=. The directory stream descriptor dir is not available after this call.
+
+int codec_load_file(const char* codec, struct codec_api *api)
+    \group misc
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param codec
+    \param api
+    \return
+    \description
+
+int count_mp3_frames(int fd, int startpos, int filesize, void (*progressfunc)(int))
+    \group misc
+    \param fd
+    \param startpos
+    \param filesize
+    \param progressfunc
+    \return
+    \description
+
+void cpu_boost(bool on_off)
+    \conditions (!defined(SIMULATOR)) && (defined(HAVE_ADJUSTABLE_CPU_FREQ)) && !defined(CPU_BOOST_LOGGING) 
+    \param on_off
+    \description Boosts the CPU if =on_off= is true, otherwise it unboosts the CPU
+
+void cpu_boost_(bool on_off,char*location,int line)
+    \conditions (!defined(SIMULATOR)) && (defined(HAVE_ADJUSTABLE_CPU_FREQ)) && (defined(CPU_BOOST_LOGGING))
+    \param on_off
+    \param charlocation
+    \param line
+    \description
+
+long *cpu_frequency
+    \conditions (!defined(SIMULATOR))
+    \return the current cpu frequency
+    \description
+
+char *create_numbered_filename(char *buffer, const char *path, const char *prefix, const char *suffix, int numberlen IF_CNFN_NUM_(, int *num))
+    \group file
+    \param buffer
+    \param path
+    \param prefix
+    \param suffix
+    \param num
+    \param numberlen
+    \return
+    \description
+
+struct thread_entry* create_thread(void (*function)(void), void* stack, size_t stack_size, unsigned flags, const char *name IF_PRIO(, int priority) IF_COP(, unsigned int core))
+    \group kernel/ system
+    \param function
+    \param stack
+    \param stack_size
+    \param flags
+    \param priority
+    \param core
+    \param name
+    \return its ID if context area could be allocated, else return -1
+    \description Creates a thread
+    \see [W[RockboxKernel#struct_thread_entry_create_threa]]
+
+int create_xing_header(int fd, long startpos, long filesize, unsigned char *buf, unsigned long num_frames, unsigned long rec_time, unsigned long header_template, void (*progressfunc)(int), bool generate_toc)
+    \group misc
+    \param fd
+    \param startpos
+    \param filesize
+    \param buf
+    \param num_frames
+    \param rec_time
+    \param header_template
+    \param progressfunc
+    \param generate_toc
+    \return
+    \description
+
+volatile long* current_tick
+    \group kernel/ system
+    \return
+    \description
+
+void debugf(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2)
+    \group misc
+    \conditions (defined(DEBUG) || defined(SIMULATOR))
+    \param fmt
+    \description Prints =fmt= in a printf-like fashion to STDERR
+
+long default_event_handler(long event)
+    \group kernel/ system
+    \param event
+    \return SYS_USB_CONNECTED and call usb_screen() if =event= equals to SYS_USB_CONNECTED, else do nothing and return 0
+    \description
+
+long default_event_handler_ex(long event, void (*callback)(void *), void *parameter)
+    \group kernel/ system
+    \param event
+    \param callback
+    \param parameter
+    \return
+    \description
+
+bool detect_flashed_ramimage(void)
+    \group Routines for the iriver_flash -plugin.
+    \conditions (defined(IRIVER_H100_SERIES))
+    \return
+    \description
+
+bool detect_flashed_romimage(void)
+    \group Routines for the iriver_flash -plugin.
+    \conditions (defined(IRIVER_H100_SERIES))
+    \return
+    \description
+
+bool detect_original_firmware(void)
+    \group Routines for the iriver_flash -plugin.
+    \conditions (defined(IRIVER_H100_SERIES))
+    \return
+    \description
+
+bool dir_exists(const char *path)
+    \group dir
+    \param path
+    \return
+    \description
+
+int do_menu(const struct menu_item_ex *menu, int *start_selected, struct viewport parent[NB_SCREENS], bool hide_bars)
+    \group menu
+    \param menu
+    \param start_selected
+    \param parent[NB_SCREENS]
+    \param hide_bars
+    \return
+    \description
+
+intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param dsp
+    \param setting
+    \param value
+    \return
+    \description
+
+void dsp_dither_enable(bool enable)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param enable
+    \description
+
+int dsp_process(struct dsp_config *dsp, char *dest, const char *src[], int count)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param dsp
+    \param dest
+    \param src[]
+    \param count
+    \return
+    \description
+
+void dsp_set_crossfeed(bool enable)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param enable
+    \description
+
+void dsp_set_eq(bool enable)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param enable
+    \description
+
+void event_init(struct event *e, unsigned int flags)
+    \conditions (defined(HAVE_EVENT_OBJECTS))
+    \param e
+    \param flags
+    \description
+
+void event_set_state(struct event *e, unsigned int state)
+    \conditions (defined(HAVE_EVENT_OBJECTS))
+    \param e
+    \param state
+    \description
+
+void event_wait(struct event *e, unsigned int for_state)
+    \conditions (defined(HAVE_EVENT_OBJECTS))
+    \param e
+    \param for_state
+    \description
+
+int fdprintf(int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3)
+    \group file
+    \param fd
+    \param fmt
+    \return number of characters writen to =fd= or a negative value upon error
+    \description Write a formated string in the =fd=
+
+bool file_exists(const char *file)
+    \group file
+    \param file
+    \return
+    \description
+
+bool find_albumart(const struct mp3entry *id3, char *buf, int buflen)
+    \conditions (defined(HAVE_ALBUMART))
+    \param id3
+    \param buf
+    \param buflen
+    \return
+    \description
+
+unsigned long find_next_frame(int fd, long *offset, long max_offset, unsigned long last_header)
+    \group misc
+    \param fd
+    \param offset
+    \param max_offset
+    \param last_header
+    \return
+    \description
+
+void flush_icache(void)
+    \conditions (defined(CACHE_FUNCTIONS_AS_CALL))
+    \description
+
+struct font* font_get(int font)
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param font
+    \return the font structure for =font=
+    \description If the requested font isn't loaded/compiled-in, decrement the font number and try again.
+    \see [S[firmware/export/font.h]]
+
+int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param str
+    \param w
+    \param h
+    \param fontnumber
+    \return
+    \description
+
+int font_get_width(struct font* pf, unsigned short char_code)
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param pf
+    \param char_code
+    \return
+    \description
+
+struct font* font_load(const char *path)
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param path
+    \return
+    \description Load font =path= and returns a struct font pointer for it
+    \see [S[firmware/export/font.h]]
+
+int get_action(int context, int timeout)
+    \group action handling
+    \param context
+    \param timeout
+    \return
+    \description
+
+const char *get_codec_filename(int cod_spec)
+    \group misc
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param cod_spec
+    \return
+    \description
+
+int get_custom_action(int context,int timeout, const struct button_mapping* (*get_context_map)(int))
+    \group action handling
+    \param context
+    \param timeout
+    \param get_context_map
+    \return
+    \description
+
+bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
+    \group misc
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param id3
+    \param fd
+    \param trackname
+    \return
+    \description
+
+struct tm* get_time(void)
+    \group misc
+    \return current time
+    \description
+    \see [S[firmware/include/time.h]]
+
+struct user_settings* global_settings
+    \group misc
+    \return the global_settings struct
+    \description
+    \see [S[apps/settings.h]]
+
+struct system_status *global_status
+    \group misc
+    \return the global_status struct
+    \description
+    \see [S[apps/settings.h]]
+
+void gui_scrollbar_draw(struct screen * screen, int x, int y, int width, int height, int items, int min_shown, int max_shown, unsigned flags)
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param screen
+    \param x
+    \param y
+    \param width
+    \param height
+    \param items
+    \param min_shown
+    \param max_shown
+    \param flags
+    \description
+
+void gui_synclist_add_item(struct gui_synclist * lists)
+    \group list
+    \param lists
+    \description
+
+void gui_synclist_del_item(struct gui_synclist * lists)
+    \group list
+    \param lists
+    \description
+
+bool gui_synclist_do_button(struct gui_synclist * lists, unsigned *action, enum list_wrap wrap)
+    \group list
+    \param lists
+    \param action
+    \param wrap
+    \return
+    \description
+
+void gui_synclist_draw(struct gui_synclist * lists)
+    \group list
+    \param lists
+    \description
+
+int gui_synclist_get_nb_items(struct gui_synclist * lists)
+    \group list
+    \param lists
+    \return
+    \description
+
+int gui_synclist_get_sel_pos(struct gui_synclist * lists)
+    \group list
+    \param lists
+    \return
+    \description
+
+void gui_synclist_init(struct gui_synclist * lists, list_get_name callback_get_item_name, void * data, bool scroll_all,int selected_size, struct viewport parent[NB_SCREENS])
+    \group list
+    \param lists
+    \param callback_get_item_name
+    \param data
+    \param scroll_all
+    \param selected_size
+    \param parent[NB_SCREENS]
+    \description
+
+void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll)
+    \group list
+    \param lists
+    \param scroll
+    \description
+
+void gui_synclist_select_item(struct gui_synclist * lists, int item_number)
+    \group list
+    \param lists
+    \param item_number
+    \description
+
+void gui_synclist_set_icon_callback(struct gui_synclist * lists, list_get_icon icon_callback)
+    \group list
+    \param lists
+    \param icon_callback
+    \description
+
+void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items)
+    \group list
+    \param lists
+    \param nb_items
+    \description
+
+void gui_synclist_set_title(struct gui_synclist *lists, char* title, int icon)
+    \group list
+    \param lists
+    \param title
+    \param icon
+    \description
+
+void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars, bool force_redraw)
+    \group scroll bar
+    \param bars
+    \param force_redraw refreshes =bars= if true
+    \description Draws an initialized statusbar =bars= on the screen and refreshs it if =force_redraw= is true.
+    \see [S[apps/gui/statusbar.h]]
+
+enum yesno_res gui_syncyesno_run(const struct text_message * main_message, const struct text_message * yes_message, const struct text_message * no_message)
+    \group list
+    \param main_message
+    \param yes_message
+    \param no_message
+    \return
+    \description
+
+void i2c_begin(void)
+    \group MAS communication
+    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)) && ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
+    \description
+
+void i2c_end(void)
+    \group MAS communication
+    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)) && ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
+    \description
+
+int i2c_write(int address, const unsigned char* buf, int count )
+    \group MAS communication
+    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)) && ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
+    \param address
+    \param buf
+    \param count
+    \return
+    \description
+
+void invalidate_icache(void)
+    \conditions (defined(CACHE_FUNCTIONS_AS_CALL))
+    \description
+
+unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8, int cp, int count)
+    \group unicode stuff
+    \param iso
+    \param utf8
+    \param cp
+    \param count
+    \return
+    \description
+
+bool is_backlight_on(bool ignore_always_off)
+    \param ignore_always_off
+    \return
+    \description
+
+int kbd_input(char* buffer, int buflen)
+    \group misc
+    \param buffer
+    \param buflen
+    \return FALSE upon success
+    \description Prompt for a string to be stored in =buffer= which is of length =buflen=
+
+void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \param src
+    \param x
+    \param y
+    \param width
+    \param height
+    \description Put a bitmap at given XY coordinates. Element src[i] is the binary representation of column number i of the bitmap read from bottom to top.
+
+void lcd_bitmap_part(const fb_data *src, int src_x, int src_y, int stride, int x, int y, int width, int height)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \param src
+    \param src_x
+    \param src_y
+    \param stride
+    \param x
+    \param y
+    \param width
+    \param height
+    \description
+
+void lcd_bitmap_transparent(const fb_data *src, int x, int y, int width, int height)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH == 16)
+    \param src
+    \param x
+    \param y
+    \param width
+    \param height
+    \description
+
+void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y, int stride, int x, int y, int width, int height)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH == 16)
+    \param src
+    \param src_x
+    \param src_y
+    \param stride
+    \param x
+    \param y
+    \param width
+    \param height
+    \description
+
+void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases, int bx, int by, int bwidth, int bheight, int stride)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) )) && ((LCD_DEPTH < 4) && !defined(SIMULATOR
+    \param values
+    \param phases
+    \param bx
+    \param by
+    \param bwidth
+    \param bheight
+    \param stride
+    \description
+
+void lcd_blit_mono(const unsigned char *data, int x, int by, int width, int bheight, int stride)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) )) && ((LCD_DEPTH < 4) && !defined(SIMULATOR
+    \param data
+    \param x
+    \param by
+    \param width
+    \param bheight
+    \param stride
+    \description
+
+void lcd_blit_yuv(unsigned char * const src[3], int src_x, int src_y, int stride, int x, int y, int width, int height)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH == 16)
+    \param src[3]
+    \param src_x
+    \param src_y
+    \param stride
+    \param x
+    \param y
+    \param width
+    \param height
+    \description
+
+void lcd_clear_display(void)
+    \group lcd
+    \description Clears the LCD and the framebuffer
+
+void lcd_define_pattern(unsigned long ucs, const char *pattern)
+    \group lcd
+    \conditions (defined(HAVE_LCD_CHARCELLS))
+    \param ucs
+    \param pattern is a 8x8 pixelbitmap
+    \description Define a custom pattern for index =ucs=
+
+void lcd_double_height(bool on)
+    \group lcd
+    \conditions (defined(HAVE_LCD_CHARCELLS))
+    \param on
+    \description
+
+void lcd_drawline(int x1, int y1, int x2, int y2)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param x1 X top coordinate
+    \param y1 Y top coordinate
+    \param x2 X bottom coordinate
+    \param y2 Y bottom coordinate
+    \description Draws a line at (=x1=, =y1=) -> (=x2=, =y2=) within current drawing mode
+
+void lcd_drawpixel(int x, int y)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param x
+    \param y
+    \description Draws a pixel at (=x=, =y=) within current drawing mode
+
+void lcd_drawrect(int x, int y, int width, int height)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param x
+    \param y
+    \param width
+    \param height
+    \description Draws a rectangle at (=x=, =y=) -> (=x= + =width=, =y= + =height=) within current drawing mode
+
+void lcd_fillrect(int x, int y, int width, int height)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param x
+    \param y
+    \param width
+    \param height
+    \description Draws a filled rectangle at (=x=, =y=) -> (=x= + =width=, =y= + =height=) within current drawing mode
+
+fb_data* lcd_framebuffer
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \return
+    \description Pointer to the framebuffer
+    \see [S[firmware/export/lcd.h]]
+
+int lcd_getstringsize(const unsigned char *str, int *w, int *h)
+    \group lcd
+    \param str String
+    \param w Width
+    \param h Height
+    \return Success or not
+    \description Stores the width and height of the string in =w= and =h=
+
+fb_data* lcd_get_backdrop(void)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \return Pointer to framebuffer data
+    \description Gets the current backdrop
+    \see lcd_framebuffer
+
+unsigned lcd_get_background(void)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \return
+    \description
+
+int lcd_get_drawmode(void)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \return current LCD drawing mode
+    \description
+
+unsigned lcd_get_foreground(void)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \return
+    \description
+
+unsigned long lcd_get_locked_pattern(void)
+    \group lcd
+    \conditions (defined(HAVE_LCD_CHARCELLS))
+    \return
+    \description Get a locked pattern index
+    \see [S[firmware/drivers/lcd-player.c]]
+
+void lcd_hline(int x1, int x2, int y)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param x1 X start coordinate
+    \param x2 X end coordinate
+    \param y Y coordinate
+    \description Draws a horizontal line at (=x1=, =y=) -> (=x2=, =y=) within current drawing mode
+
+void lcd_icon(int icon, bool enable)
+    \group lcd
+    \conditions (defined(HAVE_LCD_CHARCELLS))
+    \param icon
+    \param enable
+    \description
+    \see [S[firmware/drivers/lcd-player.c]]
+
+void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int height)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param src
+    \param x
+    \param y
+    \param width
+    \param height
+    \description
+
+void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y, int stride, int x, int y, int width, int height)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param src
+    \param src_x
+    \param src_y
+    \param stride
+    \param x
+    \param y
+    \param width
+    \param height
+    \description
+
+void lcd_putc(int x, int y, unsigned long ucs)
+    \group lcd
+    \conditions (defined(HAVE_LCD_CHARCELLS))
+    \param x
+    \param y
+    \param ucs
+    \description Put character =ucs= at coordinates (=x=, =y=)
+
+void lcd_puts(int x, int y, const unsigned char *string)
+    \group lcd
+    \param x Row X
+    \param y Column Y
+    \param string
+    \description Puts string on the LCD at row =x= and column =y=
+
+void lcd_putsxy(int x, int y, const unsigned char *string)
+    \group lcd
+    \param x X coordinate
+    \param y Y coordinate
+    \param string
+    \description Puts string on the LCD at position (=x=, =y=)
+
+void lcd_puts_scroll(int x, int y, const unsigned char* string)
+    \group lcd
+    \param x Row X
+    \param y Column Y
+    \param string
+    \description Puts scrolling string on the LCD at row =x= and column =y=. The scrolling style is STYLE_DEFAULT.
+
+void lcd_puts_scroll_style(int x, int y, const unsigned char* string, int style)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param x
+    \param y
+    \param string
+    \param style
+    \description Same as lcd_puts_style, but with scrolling is enabled
+    \see lcd_puts_style
+
+void lcd_puts_style(int x, int y, const unsigned char *str, int style)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param x Row X
+    \param y Column Y
+    \param str
+    \param style can be STYLE_DEFAULT for black text display or STYLE_INVERT for white text display
+    \description Put a string at row =x= and column =y=
+
+void lcd_put_cursor(int x, int y, unsigned long ucs)
+    \group lcd
+    \conditions (defined(HAVE_LCD_CHARCELLS))
+    \param x
+    \param y
+    \param ucs
+    \description Put cursor at coordinates (=x=, =y=)
+    \see [S[firmware/export/lcd.h]]
+
+void lcd_remote_bitmap(const fb_remote_data *src, int x, int y, int width, int height)
+    \conditions (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+    \param src
+    \param x
+    \param y
+    \param width
+    \param height
+    \description
+
+void lcd_remote_bitmap_part(const fb_remote_data *src, int src_x, int src_y, int stride, int x, int y, int width, int height)
+    \conditions (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+    \param src
+    \param src_x
+    \param src_y
+    \param stride
+    \param x
+    \param y
+    \param width
+    \param height
+    \description
+
+void lcd_remote_clear_display(void)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \description
+
+void lcd_remote_drawline(int x1, int y1, int x2, int y2)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param x1 X top coordinate
+    \param y1 Y top coordinate
+    \param x2 X bottom coordinate
+    \param y2 Y bottom coordinate
+    \description Draws a line at (=x1=, =y1=) -> (=x2=, =y2=) within current drawing mode
+
+void lcd_remote_drawpixel(int x, int y)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param x
+    \param y
+    \description Draws a pixel at (=x=, =y=) within current drawing mode
+
+void lcd_remote_drawrect(int x, int y, int nx, int ny)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param x
+    \param y
+    \param nx
+    \param ny
+    \description
+
+void lcd_remote_fillrect(int x, int y, int nx, int ny)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param x
+    \param y
+    \param nx
+    \param ny
+    \description
+
+fb_remote_data* lcd_remote_framebuffer
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \return
+    \description
+
+int lcd_remote_getstringsize(const unsigned char *str, int *w, int *h)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param str String
+    \param w Width
+    \param h Height
+    \return Success or not
+    \description Stores the width and height of the string in =w= and =h=
+
+unsigned lcd_remote_get_background(void)
+    \conditions (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+    \return
+    \description
+
+int lcd_remote_get_drawmode(void)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \return
+    \description
+
+unsigned lcd_remote_get_foreground(void)
+    \conditions (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+    \return
+    \description
+
+void lcd_remote_hline(int x1, int x2, int y)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param x1
+    \param x2
+    \param y
+    \description
+
+void lcd_remote_mono_bitmap(const unsigned char *src, int x, int y, int width, int height)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param src
+    \param x
+    \param y
+    \param width
+    \param height
+    \description
+
+void lcd_remote_mono_bitmap_part(const unsigned char *src, int src_x, int src_y, int stride, int x, int y, int width, int height)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param src
+    \param src_x
+    \param src_y
+    \param stride
+    \param x
+    \param y
+    \param width
+    \param height
+    \description
+
+void lcd_remote_puts(int x, int y, const unsigned char *string)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param x
+    \param y
+    \param string
+    \description
+
+void lcd_remote_putsxy(int x, int y, const unsigned char *string)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param x
+    \param y
+    \param string
+    \description
+
+void lcd_remote_puts_scroll(int x, int y, const unsigned char* string)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param x
+    \param y
+    \param string
+    \description
+
+void lcd_remote_puts_scroll_style(int x, int y, const unsigned char* string, int style)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param x
+    \param y
+    \param string
+    \param style
+    \description
+
+void lcd_remote_puts_style(int x, int y, const unsigned char *str, int style)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param x
+    \param y
+    \param str
+    \param style
+    \description
+
+void lcd_remote_setfont(int font)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param font
+    \description Set default font
+
+void lcd_remote_set_background(unsigned background)
+    \conditions (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+    \param background
+    \description
+
+void lcd_remote_set_contrast(int x)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param x
+    \description
+
+void lcd_remote_set_drawmode(int mode)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param mode
+    \description
+
+void lcd_remote_set_foreground(unsigned foreground)
+    \conditions (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+    \param foreground
+    \description
+
+void lcd_remote_stop_scroll(void)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \description Stop all scrolling lines on the screen
+
+void lcd_remote_update(void)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \description
+
+void lcd_remote_update_rect(int x, int y, int width, int height)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param x
+    \param y
+    \param width
+    \param height
+    \description
+
+void lcd_remote_vline(int x, int y1, int y2)
+    \group remote lcd
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param x
+    \param y1
+    \param y2
+    \description
+
+void lcd_remove_cursor(void)
+    \group lcd
+    \conditions (defined(HAVE_LCD_CHARCELLS))
+    \description Remove the cursor from the screen
+
+void lcd_setfont(int font)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param font
+    \description Set default font
+
+void lcd_set_backdrop(fb_data* backdrop)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \param backdrop Pointer to backdrop image
+    \description Set the backdrop to =backdrop=
+    \see lcd_framebuffer
+
+void lcd_set_background(unsigned foreground)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \param foreground
+    \description
+
+void lcd_set_contrast(int x)
+    \group lcd
+    \param x Should be between =MIN_CONTRAST_SETTING= and =MAX_CONTRAST_SETTING=
+    \description Sets LCD contrast to value =x=
+
+void lcd_set_drawmode(int mode)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param mode
+    \description
+
+void lcd_set_enable_hook(void (*enable_hook)(void))
+    \conditions !defined(HAVE_LCD_CHARCELLS) )) && (defined(HAVE_LCD_ENABLE
+    \param enable_hook
+    \description
+
+void lcd_set_foreground(unsigned foreground)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \param foreground
+    \description
+
+void lcd_set_invert_display(bool yesno)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) )) && (defined(HAVE_LCD_INVERT
+    \param yesno
+    \description
+
+void lcd_stop_scroll(void)
+    \group lcd
+    \description Stop all scrolling lines on the screen
+
+void lcd_unlock_pattern(unsigned long ucs)
+    \group lcd
+    \conditions (defined(HAVE_LCD_CHARCELLS))
+    \param ucs
+    \description Unlock pattern of index =ucs=
+
+void lcd_update(void)
+    \group lcd
+    \description Pushes LCD framebuffer changes to the LCD
+
+void lcd_update_rect(int x, int y, int width, int height)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param x measured in pixels
+    \param y measured in pixels
+    \param width measured in pixels
+    \param height measured in pixels
+    \description Pushes LCD framebuffer changes to the LCD within rectangle (=x=, =y=) -> (=x= + =width=, =y= + =height=). Notice that the smallest vertical resolution in updates that the hardware supports is 8 pixels.
+
+void lcd_vline(int x, int y1, int y2)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param x X coordinate
+    \param y1 Y start coordinate
+    \param y2 Y end coordinate
+    \description Draws a vertical line at (=x=, =y1=) -> (=x=, =y2=) within current drawing mode
+
+void lcd_yuv_set_options(unsigned options)
+    \group lcd
+    \conditions !defined(HAVE_LCD_CHARCELLS) )) && (LCD_DEPTH == 16) && (defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)  || defined(IRIVER_H10) || defined(COWON_D2
+    \param options
+    \description
+
+void led(bool on)
+    \param on
+    \description
+
+void logf(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2)
+    \group misc
+    \conditions (defined(ROCKBOX_HAS_LOGF))
+    \param fmt
+    \description
+
+const unsigned long *audio_master_sampr_list
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \return
+    \description
+
+const unsigned long *hw_freq_sampr
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \return
+    \description
+
+const unsigned long *rec_freq_sampr
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \return
+    \description
+
+int mas_codec_readreg(int reg)
+    \group MAS communication
+    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)) && ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
+    \param reg
+    \return
+    \description
+
+int mas_codec_writereg(int reg, unsigned int val)
+    \group MAS communication
+    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)) && ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
+    \param reg
+    \param val
+    \return
+    \description
+
+int mas_readmem(int bank, int addr, unsigned long* dest, int len)
+    \group MAS communication
+    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC))
+    \param bank
+    \param addr
+    \param dest
+    \param len
+    \return
+    \description
+
+int mas_readreg(int reg)
+    \group MAS communication
+    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC))
+    \param reg
+    \return
+    \description
+
+int mas_writemem(int bank, int addr, const unsigned long* src, int len)
+    \group MAS communication
+    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC))
+    \param bank
+    \param addr
+    \param src
+    \param len
+    \return
+    \description
+
+int mas_writereg(int reg, unsigned int val)
+    \group MAS communication
+    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC))
+    \param reg
+    \param val
+    \return
+    \description
+
+void *memchr(const void *s1, int c, size_t n)
+    \group strings and memory
+    \param s1
+    \param c
+    \param n
+    \return
+    \description
+
+int memcmp(const void *s1, const void *s2, size_t n)
+    \group strings and memory
+    \param s1
+    \param s2
+    \param n
+    \return
+    \description
+
+void* memcpy(void *out, const void *in, size_t n)
+    \group strings and memory
+    \param out
+    \param in
+    \param n
+    \return
+    \description Copies =n= bytes of data in memory from =in= to =out=
+
+void* memmove(void *out, const void *in, size_t n)
+    \group strings and memory
+    \param out
+    \param in
+    \param n
+    \return
+    \description
+
+void* memset(void *dst, int c, size_t length)
+    \group strings and memory
+    \param dst
+    \param c
+    \param length
+    \return
+    \description Fills a memory region with specified byte value =c=
+
+int mkdir(const char *name)
+    \group dir
+    \param name
+    \return
+    \description
+
+time_t mktime(struct tm *t)
+    \group misc
+    \conditions (CONFIG_RTC)
+    \param t
+    \return
+    \description
+
+bool mp3info(struct mp3entry *entry, const char *filename)
+    \group misc
+    \param entry
+    \param filename
+    \return FALSE if successfull
+    \description The given =entry= is filled in with whatever id3 info it could find about the given =filename=
+
+bool mp3_is_playing(void)
+    \group sound
+    \conditions (!defined(SIMULATOR))
+    \return true if an mp3 is playing, else return false
+    \description Note: a paused mp3 is considered as a playing mp3
+
+void mp3_play_data(const unsigned char* start, int size, void (*get_more)(unsigned char** start, size_t* size))
+    \group sound
+    \conditions (!defined(SIMULATOR))
+    \param start points to the begining of the file to play
+    \param size is the size to play
+    \param get_more is a callback function
+    \description Plays a chunk of an mp3 file
+
+void mp3_play_pause(bool play)
+    \group sound
+    \conditions (!defined(SIMULATOR))
+    \param play
+    \description If playback was paused and =play= is TRUE, resume playback. If playback isn't paused and =play= is FALSE, pause playback.
+
+void mp3_play_stop(void)
+    \group sound
+    \conditions (!defined(SIMULATOR))
+    \description Stops playback
+
+unsigned long mpeg_get_last_header(void)
+    \group playback control
+    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC))
+    \return
+    \description
+
+void mutex_init(struct mutex *m)
+    \group kernel/ system
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param m
+    \description
+
+void mutex_lock(struct mutex *m)
+    \group kernel/ system
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param m
+    \description
+
+void mutex_unlock(struct mutex *m)
+    \group kernel/ system
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param m
+    \description
+
+DIR* opendir(const char* name)
+    \group dir
+    \param name
+    \return a pointer to the directory stream
+    \description The opendir() function opens a directory stream corresponding to the directory name.  The stream is positioned at the first entry in the directory.
+
+bool option_screen(const struct settings_list *setting, struct viewport parent[NB_SCREENS], bool use_temp_var, unsigned char* option_title)
+    \group options
+    \param setting
+    \param parent[NB_SCREENS]
+    \param use_temp_var
+    \param option_title
+    \return
+    \description
+
+void pcm_apply_settings(void)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \description
+
+void pcm_calculate_peaks(int *left, int *right)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param left
+    \param right
+    \description
+
+void pcm_calculate_rec_peaks(int *left, int *right)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \param left
+    \param right
+    \description
+
+void pcm_close_recording(void)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \description
+
+size_t pcm_get_bytes_waiting(void)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \return
+    \description
+
+void pcm_init_recording(void)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \description
+
+bool pcm_is_paused(void)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \return true if playback is paused, else false
+    \description
+
+bool pcm_is_playing(void)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \return true unless playback is paused
+    \description
+
+void pcm_play_data(pcm_more_callback_type get_more, unsigned char* start, size_t size)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param get_more
+    \param start
+    \param size
+    \description
+
+void pcm_play_lock(void)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \description
+
+void pcm_play_pause(bool play)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param play
+    \description Pauses or unpauses the playback depending on the truth value of =play=
+
+void pcm_play_stop(void)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \description Stops the playback and empties the audio buffer unlike [F[pcm_play_pause]]
+
+void pcm_play_unlock(void)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \description
+
+void pcm_record_data(pcm_more_callback_type2 more_ready, void *start, size_t size)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \param more_ready
+    \param start
+    \param size
+    \description
+
+void pcm_record_more(void *start, size_t size)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \param start
+    \param size
+    \description
+
+void pcm_set_frequency(unsigned int frequency)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param frequency
+    \description
+
+void pcm_stop_recording(void)
+    \group sound
+    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \description
+
+bool peak_meter_get_use_dbfs(void)
+    \conditions ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
+    \return 1 if the meter currently is displaying dBfs values, 0 if the meter is displaying percent values
+    \description
+
+unsigned short peak_meter_scale_value(unsigned short val, int meterwidth)
+    \conditions ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
+    \param val is the volume value (range: 0 <= val < MAX_PEAK)
+    \param meterwidth is the width of the meter in pixel
+    \return a value between 0 and meterwidth
+    \description Scales a peak value as read from the MAS to the range of =meterwidth=. The scaling is performed according to the scaling method (dBfs / linear) and the range (peak_meter_range_min .. peak_meter_range_max).
+
+void peak_meter_set_use_dbfs(bool use)
+    \conditions ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
+    \param use If =use= is 0 use linear percent scale, else use dBfs
+    \description Specifies whether the values displayed are scaled as dBfs or as linear percent values
+
+int playlist_amount(void)
+    \group playback control
+    \return the number of tracks in current playlist
+    \description
+
+int playlist_resume(void)
+    \group playback control
+    \return
+    \description
+
+int playlist_start(int start_index, int offset)
+    \group playback control
+    \param start_index
+    \param offset
+    \return
+    \description
+
+void* plugin_get_audio_buffer(size_t *buffer_size)
+    \group misc
+    \param buffer_size
+    \return
+    \description Steals =buffer_size= bytes from the available RAM, reducing the available buffer for audio buffering
+
+void* plugin_get_buffer(size_t *buffer_size)
+    \group misc
+    \param buffer_size this is the memory size left in plugin buffer upon return
+    \return a pointer to the portion of the plugin buffer that is not already being used. If no plugin is loaded, returns the entire plugin buffer.
+    \description
+
+char* plugin_get_current_filename(void)
+    \group misc
+    \return
+    \description
+
+void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size, char *iedata, size_t iedata_size)
+    \group misc
+    \conditions (defined(PLUGIN_USE_IRAM))
+    \param iramstart
+    \param iramcopy
+    \param iram_size
+    \param iedata
+    \param iedata_size
+    \description
+
+void plugin_tsr(bool (*exit_callback)(bool reenter))
+    \group misc
+    \param exit_callback
+    \description
+
+void PREFIX(audio_play)(long offset)
+    \group playback control
+    \param audio_play
+    \param offset
+    \description
+
+int PREFIX(close)(int fd)
+    \group file
+    \param close
+    \param fd
+    \return 0 upon success
+    \description The close() function will deallocate the file descriptor indicated by =fd=.  To deallocate means to make the file descriptor available for return by subsequent calls to open() or other functions that allocate file descriptors.
+
+int PREFIX(creat)(const char *pathname)
+    \group file
+    \param creat
+    \param pathname
+    \return the file descriptor associated to this file
+    \description Create a file with mode O_RDONLY, O_WRONLY or O_RDWR
+
+off_t PREFIX(filesize)(int fd)
+    \group file
+    \param filesize
+    \param fd
+    \return size of a file; upon error, returns -1
+    \description
+
+int PREFIX(ftruncate)(int fd, off_t length)
+    \group file
+    \param ftruncate
+    \param fd
+    \param length
+    \return
+    \description Truncate file to the specified =length=
+
+off_t PREFIX(lseek)(int fd, off_t offset, int whence)
+    \group file
+    \param lseek
+    \param fd
+    \param offset
+    \param whence
+    \return
+    \description The lseek() function sets the file pointer associated with the open file descriptor specified by =fd= as follows: If =whence= is SEEK_SET, the pointer is set to =offset= bytes. If =whence= is SEEK_CUR, the pointer is set to its current location plus =offset=. If =whence= is SEEK_END, the pointer is set to the size of the file plus =offset=.
+
+int PREFIX(open)(const char* pathname, int flags)
+    \group file
+    \param open
+    \param pathname
+    \param flags
+    \return
+    \description The open() function establishes the connection between a file and a file descriptor. It creates an open file description that refers to a file and a file descriptor that refers to that open file description. The file descriptor is used by other I/O functions to refer to that file.
+
+ssize_t PREFIX(read)(int fd, void* buf, size_t count)
+    \group file
+    \param read
+    \param fd
+    \param buf
+    \param count
+    \return
+    \description The read() function attempts to read =count= bytes from the file associated with the open file descriptor, =fd=, into the buffer pointed to by =buf=
+
+int PREFIX(remove)(const char* pathname)
+    \group file
+    \param remove
+    \param pathname
+    \return
+    \description remove() deletes a name from the filesystem. It calls unlink for files, and rmdir for directories.
+
+int PREFIX(rename)(const char* path, const char* newname)
+    \group file
+    \param rename
+    \param path points to the pathname of the file to be renamed
+    \param newname points to the new pathname of the file
+    \return
+    \description The rename() function changes the name of a file
+
+void PREFIX(sleep)(int ticks)
+    \group kernel/ system
+    \param sleep
+    \param ticks
+    \description Sleep a specified number of =ticks=, we have HZ ticks per second
+
+ssize_t PREFIX(write)(int fd, const void* buf, size_t count)
+    \group file
+    \param write
+    \param fd
+    \param buf
+    \param count
+    \return
+    \description Write writes up to =count= bytes to the file referenced by the file descriptor =fd= from the buffer starting at =buf=
+
+void profile_func_enter(void *this_fn, void *call_site)
+    \conditions (defined(RB_PROFILE))
+    \param this_fn
+    \param call_site
+    \description
+
+void profile_func_exit(void *this_fn, void *call_site)
+    \conditions (defined(RB_PROFILE))
+    \param this_fn
+    \param call_site
+    \description
+
+void profile_thread(void)
+    \conditions (defined(RB_PROFILE))
+    \description
+
+void profstop(void)
+    \conditions (defined(RB_PROFILE))
+    \description
+
+void qsort(void *base, size_t nmemb, size_t size, int(*compar)(const void *, const void *))
+    \group misc
+    \param base start of array
+    \param nmemb number of elements
+    \param size describes the size of each element of the array
+    \param compar
+    \description qsort sorts an array (begining at =base=) of =nmemb= objects
+
+void queue_delete(struct event_queue *q)
+    \param q
+    \description
+
+bool queue_empty(const struct event_queue *q)
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param q
+    \return
+    \description
+
+void queue_enable_queue_send(struct event_queue *q, struct queue_sender_list *send, struct thread_entry *owner)
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param q
+    \param send
+    \param owner
+    \description
+
+void queue_init(struct event_queue *q, bool register_queue)
+    \param q
+    \param register_queue
+    \description
+
+void queue_post(struct event_queue *q, long id, intptr_t data)
+    \param q
+    \param id
+    \param data
+    \description
+
+void queue_reply(struct event_queue *q, intptr_t retval)
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param q
+    \param retval
+    \description
+
+intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param q
+    \param id
+    \param data
+    \return
+    \description
+
+void queue_wait(struct event_queue *q, struct queue_event *ev)
+    \conditions (CONFIG_CODEC == SWCODEC)
+    \param q
+    \param ev
+    \description
+
+void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
+    \param q
+    \param ev
+    \param ticks
+    \description
+
+int rand(void)
+    \group misc
+    \return a pseudo random number between 0 and 0x7fffffff
+    \description
+
+struct dirent* readdir(DIR* dir)
+    \group dir
+    \param dir
+    \return a pointer to a dirent structure representing the next directory entry in the directory stream pointed to by =dir= or NULL on reaching the end-of-file or if an error occurred
+    \description
+
+int read_bmp_file(const char* filename, struct bitmap *bm, int maxsize, int format)
+    \conditions (defined(HAVE_LCD_BITMAP))
+    \param filename
+    \param bm
+    \param maxsize
+    \param format
+    \return
+    \description
+
+int read_line(int fd, char* buffer, int buffer_size)
+    \group file
+    \param fd
+    \param buffer
+    \param buffer_size
+    \return number of bytes read (which may be larger than the number of bytes stored in buffer) or upon error -1 (and buffer contains whatever could be read)
+    \description Read (up to) a line of text from =fd= into =buffer=. A line is terminated by a LF char. Neither LF nor CR chars are stored in buffer.
+
+void register_ata_idle_func(ata_idle_notify function)
+    \group file
+    \conditions (USING_ATA_CALLBACK)
+    \param function
+    \description
+
+void reload_directory(void)
+    \group file
+    \description
+
+void remote_backlight_off(void)
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \description Turns the remote backlight off
+
+void remote_backlight_on(void)
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \description Turns the remote backlight on
+
+void remote_backlight_set_timeout(int index)
+    \conditions (defined(HAVE_REMOTE_LCD))
+    \param index
+    \description
+
+void remote_backlight_set_timeout_plugged(int index)
+    \conditions (defined(HAVE_REMOTE_LCD)) && (CONFIG_CHARGING)
+    \param index
+    \description
+
+void reset_poweroff_timer(void)
+    \description The function name pretty much says what it's supposed to do
+
+int rmdir(const char *name)
+    \group dir
+    \param name
+    \return
+    \description
+
+struct screen* screens[NB_SCREENS]
+    \return
+    \description
+
+void screen_clear_area(struct screen * display, int xstart, int ystart, int width, int height)
+    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \param display
+    \param xstart
+    \param ystart
+    \param width
+    \param height
+    \description
+
+void screen_dump_set_hook(void (*hook)(int fh))
+    \conditions (defined(HAVE_LCD_BITMAP))
+    \param hook
+    \description
+
+bool search_albumart_files(const struct mp3entry *id3, const char *size_string, char *buf, int buflen)
+    \conditions (defined(HAVE_ALBUMART))
+    \param id3
+    \param size_string
+    \param buf Pointer to output
+    \param buflen Max length for =buf=
+    \return true if an album art was found
+    \description Searches the the album art file for the given =id3= struct, appending the =size_string= to the search pattern (cover.bmp). It writes the complete path into =buf=, but not more bytes than =buflen=.
+
+void semaphore_init(struct semaphore *s, int max, int start)
+    \conditions (defined(HAVE_SEMAPHORE_OBJECTS))
+    \param s
+    \param max
+    \param start
+    \description
+
+void semaphore_release(struct semaphore *s)
+    \conditions (defined(HAVE_SEMAPHORE_OBJECTS))
+    \param s
+    \description
+
+void semaphore_wait(struct semaphore *s)
+    \conditions (defined(HAVE_SEMAPHORE_OBJECTS))
+    \param s
+    \description
+
+const struct settings_list* find_setting(const void* variable, int *id)
+    \group options
+    \param variable
+    \param id
+    \return
+    \description
+
+bool settings_parseline(char* line, char** name, char** value)
+    \group file
+    \param line
+    \param name
+    \param value
+    \return false if no valid config entry was found
+    \description Parse a line from a configuration file. The line format is: 'name: value'. Any whitespace before setting name or value (after ':') is ignored. A # as first non-whitespace character discards the whole line. Function sets pointers to null-terminated setting name and value.
+
+bool set_bool(const char* string, const bool* variable )
+    \group options
+    \param string
+    \param variable
+    \return
+    \description
+
+bool set_bool_options(const char* string, const bool* variable, const char* yes_str, int yes_voice, const char* no_str, int no_voice, void (*function)(bool))
+    \group options
+    \param string
+    \param variable
+    \param yes_str
+    \param yes_voice
+    \param no_str
+    \param no_voice
+    \param function
+    \return
+    \description
+
+bool set_color(struct screen *display, char *title, unsigned *color, unsigned banned_color)
+    \conditions (defined(HAVE_LCD_COLOR))
+    \param display
+    \param title
+    \param color
+    \param banned_color
+    \return
+    \description
+
+void set_current_file(char* path)
+    \param path
+    \description
+
+void set_dirfilter(int l_dirfilter)
+    \param l_dirfilter
+    \description
+
+bool set_int(const unsigned char* string, const char* unit, int voice_unit, const int* variable, void (*function)(int), int step, int min, int max, void (*formatter)(char*, size_t, int, const char*) )
+    \group options
+    \param string
+    \param unit
+    \param voice_unit
+    \param variable
+    \param function
+    \param step
+    \param min
+    \param max
+    \param formatter
+    \return
+    \description
+
+bool set_option(const char* string, const void* variable, enum optiontype type, const struct opt_items* options, int numoptions, void (*function)(int))
+    \group options
+    \param string
+    \param variable
+    \param type
+    \param options
+    \param numoptions
+    \param function
+    \return
+    \description
+
+int set_time(const struct tm *tm)
+    \group misc
+    \param tm
+    \return FALSE upon success
+    \description Set current time
+    \see get_time
+
+int show_logo(void)
+    \return
+    \description
+
+void simplelist_info_init(struct simplelist_info *info, char* title, int count, void* data)
+    \group list
+    \param info
+    \param title
+    \param count
+    \param data
+    \description
+
+bool simplelist_show_list(struct simplelist_info *info)
+    \group list
+    \param info
+    \return
+    \description
+
+void sim_lcd_ex_init(int shades, unsigned long (*getpixel)(int, int))
+    \group special simulator hooks
+    \conditions (defined(SIMULATOR)) && (defined(HAVE_LCD_BITMAP) && LCD_DEPTH < 8)
+    \param shades
+    \param getpixel
+    \description
+
+void sim_lcd_ex_update_rect(int x, int y, int width, int height)
+    \group special simulator hooks
+    \conditions (defined(SIMULATOR)) && (defined(HAVE_LCD_BITMAP) && LCD_DEPTH < 8)
+    \param x
+    \param y
+    \param width
+    \param height
+    \description
+
+int snprintf(char *buf, size_t size, const char *fmt, ...) ATTRIBUTE_PRINTF(3, 4)
+    \group strings and memory
+    \param buf
+    \param size
+    \param fmt
+    \return the number of characters printed or that would have been printed if the output was truncated (not including the trailing '\0') upon success
+    \description Write a formatted string =fmt= in buffer =buf= of size =size= (including the trailing '\0'). These support %c, %s, %d and %x only with the width and zero padding flag only.
+
+int sound_default(int setting)
+    \group sound
+    \param setting
+    \return
+    \description
+
+int sound_max(int setting)
+    \group sound
+    \param setting
+    \return
+    \description
+
+int sound_min(int setting)
+    \group sound
+    \param setting
+    \return
+    \description
+
+void sound_set(int setting, int value)
+    \group sound
+    \param setting
+    \param value
+    \description
+
+void sound_set_pitch(int pitch)
+    \group playback control
+    \conditions ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) ||  (CONFIG_CODEC == SWCODEC))
+    \param pitch
+    \description
+
+const char * sound_unit(int setting)
+    \group sound
+    \param setting
+    \return
+    \description
+
+int sound_val2phys(int setting, int value)
+    \group sound
+    \param setting
+    \param value
+    \return
+    \description
+
+void splash(int ticks, const char *str)
+    \param ticks
+    \param str
+    \description Display a formatted string in a box for =ticks= time. The string is formatted as with the printf function. (there are =HZ= ticks per second)
+
+void splashf(int ticks, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3)
+    \param ticks
+    \param fmt
+    \description
+
+void srand(unsigned int seed)
+    \group misc
+    \param seed
+    \description Seed the random number generator
+
+struct gui_syncstatusbar *statusbars
+    \group scroll bar
+    \return
+    \description
+
+int strcasecmp(const char *, const char *)
+    \group strings and memory
+    \param 
+    \param 
+    \return an integer less than, equal to, or greater than zero if s1 is found, respectively, to be less than, to match, or be greater than s2
+    \description The  strcasecmp() function compares the two strings s1 and s2, ignoring the case of the characters
+
+char *strcat(char *s1, const char *s2)
+    \group strings and memory
+    \param s1
+    \param s2
+    \return =s1= concatenated with =s2=
+    \description Appends =s2= to =s1=, replacing the NULL terminating character of =s1= and returns it
+
+char *strchr(const char *s, int c)
+    \group strings and memory
+    \param s
+    \param c
+    \return
+    \description
+
+int strcmp(const char *, const char *)
+    \group strings and memory
+    \param 
+    \param 
+    \return
+    \description strcmp() compares the string a to string b. If a sorts lexicographically after b, strcmp returns a number greater than zero. If the two strings match, strcmp returns zero. If a sorts lexicographically before b, strcmp returns a number less than zero.
+
+char* strcpy(char *dst, const char *src)
+    \group strings and memory
+    \param dst
+    \param src
+    \return the initial value of =dst=
+    \description strcpy() copies the string pointed to by =src= (including the terminating null character) to the array pointed to by =dst=
+
+size_t strlen(const char *str)
+    \group strings and memory
+    \param str
+    \return the character count
+    \description The strlen() function works out the length of the string starting at =str= by counting characters until it reaches a null character.
+
+int strncasecmp(const char *s1, const char *s2, size_t n)
+    \group strings and memory
+    \param s1
+    \param s2
+    \param n
+    \return
+    \description Like strcasecmp() but only on the first =n= characters
+    \see strcasecmp
+
+int strncmp(const char *, const char *, size_t)
+    \group strings and memory
+    \param 
+    \param 
+    \param size_t
+    \return
+    \description
+
+char* strncpy(char *dst, const char *src, size_t length)
+    \group strings and memory
+    \param dst
+    \param src
+    \param length
+    \return the initial value of =dst=
+    \description strncpy() copies not more than =length= characters from the string pointed to by =src= (including the terminating null character) to the array pointed to by =dst=. If the string pointed to by =src= is shorter than length characters, null characters are appended to the destination array until a total of =length= characters have been written.
+
+char * strrchr(const char *s, int c)
+    \group strings and memory
+    \param s
+    \param c
+    \return a pointer to the located character, or a null pointer if =c= does not occur in string.
+    \description This function finds the last occurence of =c= (converted to a char) in the string pointed to by string (including the terminating null character)
+
+char* strtok_r(char *ptr, const char *sep, char **end)
+    \group strings and memory
+    \param ptr
+    \param sep
+    \param end
+    \return
+    \description
+
+int system_memory_guard(int newmode)
+    \conditions (!defined(SIMULATOR))
+    \param newmode
+    \return
+    \description
+
+bool tagcache_get_next(struct tagcache_search *tcs)
+    \conditions (defined(HAVE_TAGCACHE))
+    \param tcs
+    \return
+    \description
+
+long tagcache_get_numeric(const struct tagcache_search *tcs, int tag)
+    \conditions (defined(HAVE_TAGCACHE))
+    \param tcs
+    \param tag
+    \return
+    \description
+
+bool tagcache_retrieve(struct tagcache_search *tcs, int idxid, int tag, char *buf, long size)
+    \conditions (defined(HAVE_TAGCACHE))
+    \param tcs
+    \param idxid
+    \param tag
+    \param buf
+    \param size
+    \return
+    \description
+
+bool tagcache_search(struct tagcache_search *tcs, int tag)
+    \conditions (defined(HAVE_TAGCACHE))
+    \param tcs
+    \param tag
+    \return
+    \description
+
+bool tagcache_search_add_filter(struct tagcache_search *tcs, int tag, int seek)
+    \conditions (defined(HAVE_TAGCACHE))
+    \param tcs
+    \param tag
+    \param seek
+    \return
+    \description
+
+void tagcache_search_finish(struct tagcache_search *tcs)
+    \conditions (defined(HAVE_TAGCACHE))
+    \param tcs
+    \description
+
+void tagcache_search_set_uniqbuf(struct tagcache_search *tcs, void *buffer, long length)
+    \conditions (defined(HAVE_TAGCACHE))
+    \param tcs
+    \param buffer
+    \param length
+    \description
+
+void talk_disable(bool disable)
+    \group misc
+    \param disable
+    \description
+
+struct thread_entry* threads
+    \group kernel/ system
+    \return
+    \description
+
+void thread_exit(void)
+    \group kernel/ system
+    \description
+
+void thread_thaw(struct thread_entry *thread)
+    \param thread
+    \description
+
+void thread_wait(struct thread_entry *thread)
+    \group kernel/ system
+    \param thread
+    \description
+
+bool timer_register(int reg_prio, void (*unregister_callback)(void), long cycles, int int_prio, void (*timer_callback)(void) IF_COP(, int core))
+    \param reg_prio
+    \param unregister_callback
+    \param cycles
+    \param int_prio
+    \param core
+    \param timer_callback
+    \return
+    \description
+
+bool timer_set_period(long count)
+    \param count
+    \return
+    \description
+
+void timer_unregister(void)
+    \description
+
+void touchscreen_set_mode(enum touchscreen_mode)
+    \group button
+    \conditions (defined(HAVE_TOUCHSCREEN))
+    \param touchscreen_mode
+    \description
+
+struct tree_context* tree_get_context(void)
+    \return
+    \description
+
+void trigger_cpu_boost(void)
+    \conditions (defined(HAVE_SCHEDULER_BOOSTCTRL))
+    \description Boosts the CPU for the current thread
+
+void unregister_ata_idle_func(ata_idle_notify function, bool run)
+    \group file
+    \conditions (USING_ATA_CALLBACK)
+    \param function
+    \param run
+    \description
+
+void usb_acknowledge(long id)
+    \param id
+    \description
+
+bool usb_powered(void)
+    \group power
+    \conditions (defined(HAVE_USB_POWER))
+    \return
+    \description
+
+unsigned char* utf8encode(unsigned long ucs, unsigned char *utf8)
+    \group unicode stuff
+    \param ucs
+    \param utf8
+    \return
+    \description
+
+unsigned long utf8length(const unsigned char *utf8)
+    \group unicode stuff
+    \param utf8
+    \return
+    \description
+
+int utf8seek(const unsigned char* utf8, int offset)
+    \group unicode stuff
+    \param utf8
+    \param offset
+    \return
+    \description
+
+unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8, int count)
+    \group unicode stuff
+    \param utf16
+    \param utf8
+    \param count
+    \return
+    \description
+
+unsigned char* utf16LEdecode(const unsigned char *utf16, unsigned char *utf8, int count)
+    \group unicode stuff
+    \param utf16
+    \param utf8
+    \param count
+    \return
+    \description
+
+void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
+    \param vp
+    \param screen
+    \description
+
+int vsnprintf(char *buf, int size, const char *fmt, va_list ap)
+    \group strings and memory
+    \param buf
+    \param size
+    \param fmt
+    \param ap
+    \return
+    \description
+
+void wheel_send_events(bool send)
+    \conditions (defined(HAVE_WHEEL_POSITION))
+    \param send
+    \description
+
+int wheel_status(void)
+    \conditions (defined(HAVE_WHEEL_POSITION))
+    \return
+    \description
+
+void yield(void)
+    \group kernel/ system
+    \description Let another thread run. This should be used as soon as you have to "wait" for something or similar, and also if you do anything that takes "a long time". This function is the entire foundation that our "cooperative multitasking" is based on. Use it!
+    \see [W[RockboxKernel]]
+
+# END

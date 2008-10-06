@@ -1,0 +1,108 @@
+body
+{
+    font-family: Verdana;
+}
+
+li
+{
+    font-size: 10px;
+}
+
+code
+{
+    color: #00A;
+}
+
+.see, .see a
+{
+    color: #559;
+}
+
+.group
+{
+    font-size: 12px;
+}
+
+.group h3
+{
+    font-size: 14px;
+}
+
+h2
+{
+    color: #D11;
+}
+
+a
+{
+    color: blue;
+}
+
+a:hover
+{
+    color: red;
+}
+
+.top
+{
+    font-size: 10px;
+    color: green;
+}
+
+.extra
+{
+    font-weight: bold;
+    color: #992;
+}
+
+dl
+{
+    border-left: 1px solid #CCC;
+    padding-left: 10px;
+}
+
+dt, dd
+{
+    font-style: normal;
+}
+
+dd
+{
+    margin-left: 12em;
+}
+
+dt
+{
+    clear: left;
+    display: block;
+    float: left;
+    font-weight: bold;
+    width: 12em;
+}
+
+hr
+{
+    border: 1px solid #CCCCCC;
+    margin: 1em 0;
+}
+
+#content
+{
+    margin-left: 14em;
+    margin-right: 1em;
+    padding: 0;
+}
+
+#menu
+{
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 14em;
+    padding: 0;
+}
+
+#menu ul
+{
+    padding-left: 1em;
+}

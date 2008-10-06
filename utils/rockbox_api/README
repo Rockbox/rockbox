@@ -1,0 +1,29 @@
+==============================
+generate.php
+==============================
+
+ php generate.php > output.txt
+
+--------------
+ Generates output.txt of apps/plugin.h
+
+==============================
+update.php
+==============================
+
+ php update.php input_file.txt > output.txt
+
+--------------
+ Updates input_file.txt with newer values of apps/plugin.h
+
+==============================
+gen_html.php
+==============================
+
+ php gen_html.php input_file.txt
+
+--------------
+ Generates HTML output of input_file.txt in output/*.html
+ 
+ Known issues:
+  * [F[function]] doesn't work with functions outside of the current .html
