@@ -64,6 +64,10 @@ findtool(){
       return
     fi
   done
+  # check whether caller wants literal return value if not found
+  if [ "$2" = "--lit" ]; then
+    echo "$file"
+  fi
 }
 
 # parse the argument list, returns the value after the = in case of a
@@ -2149,6 +2153,19 @@ else
   fi
 fi
 
+# figure out the full path to the various commands if possible
+HOSTCC=`findtool gcc --lit`
+HOSTAR=`findtool ar --lit`
+CC=`findtool ${CC} --lit`
+LD=`findtool ${AR} --lit`
+AR=`findtool ${AR} --lit`
+AS=`findtool ${AS} --lit`
+OC=`findtool ${OC} --lit`
+WINDRES=`findtool ${WINDRES} --lit`
+DLLTOOL=`findtool ${DLLTOOL} --lit`
+DLLWRAP=`findtool ${DLLWRAP} --lit`
+RANLIB=`findtool ${RANLIB} --lit`
+
 if test -n "$ccache"; then
   CC="$ccache $CC"
 fi
@@ -2222,6 +2239,8 @@ sed > Makefile \
  -e "s,@LANGUAGE@,${language},g" \
  -e "s:@VOICELANGUAGE@:${voicelanguage}:g" \
  -e "s,@PWD@,${pwd},g" \
+ -e "s,@HOSTCC@,${HOSTCC},g" \
+ -e "s,@HOSTAR@,${HOSTAR},g" \
  -e "s,@CC@,${CC},g" \
  -e "s,@LD@,${LD},g" \
  -e "s,@AR@,${AR},g" \
@@ -2315,8 +2334,8 @@ export APPEXTRA=@APPEXTRA@
 export ENABLEDPLUGINS=@PLUGINS@
 export SOFTWARECODECS=@CODECS@
 export EXTRA_DEFINES=@EXTRADEF@
-export HOSTCC=gcc
-export HOSTAR=ar
+export HOSTCC=@HOSTCC@
+export HOSTAR=@HOSTAR@
 export CC=@CC@
 export LD=@LD@
 export AR=@AR@
