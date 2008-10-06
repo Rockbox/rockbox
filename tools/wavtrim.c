@@ -130,6 +130,7 @@ int wavtrim(char * filename, int maxsilence ,char* errstring,int errsize)
     }
 
     datalen = Read32(pBuf+datapos-4);
+    skip_head = skip_tail = 0;
     
     sps = Read32(pBuf + 24);
     pad_head = sps * 10 / 1000; /* 10 ms */

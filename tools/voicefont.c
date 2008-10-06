@@ -217,6 +217,7 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output)
 #ifndef RBUTIL
 int main (int argc, char** argv)
 {
+    FILE *ids, *output;
 
     if (argc < 2)
     {
@@ -228,14 +229,14 @@ int main (int argc, char** argv)
         return -1;
     }
     
-    FILE* ids = fopen(argv[1], "r");
+    ids = fopen(argv[1], "r");
     if (ids == NULL)
     {
         printf("Error opening language file %s\n", argv[1]);
         return -2;
     }
 
-    FILE* output = fopen(argv[4], "wb");
+    output = fopen(argv[4], "wb");
     if (output == NULL)
     {
         printf("Error opening output file %s\n", argv[4]);
