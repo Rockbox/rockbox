@@ -63,6 +63,8 @@
 #define POWEROFF_BUTTON     BUTTON_POWER
 #define POWEROFF_COUNT      10
 
+#define HAS_BUTTON_HOLD
+
 void button_init_device(void);
 int button_read_device(void);
 bool headphones_inserted(void);
