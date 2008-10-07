@@ -23,15 +23,15 @@
 #include "jz4740.h"
 #include "lcd-target.h"
 
-#define PIN_CS_N 	(32*1+17) /* Chip select */
+#define PIN_CS_N     (32*1+17) /* Chip select */
 #define PIN_RESET_N (32*1+18) /* Reset */
 #define PIN_UNK_N   (32*2+19)
 
-#define my__gpio_as_lcd_16bit()			\
-do {						\
-	REG_GPIO_PXFUNS(2) = 0x0014ffff;	\
-	REG_GPIO_PXSELC(2) = 0x0014ffff;	\
-	REG_GPIO_PXPES(2) = 0x0014ffff;		\
+#define my__gpio_as_lcd_16bit()            \
+do {                        \
+    REG_GPIO_PXFUNS(2) = 0x0014ffff;    \
+    REG_GPIO_PXSELC(2) = 0x0014ffff;    \
+    REG_GPIO_PXPES(2) = 0x0014ffff;        \
 } while (0)
 
 
@@ -50,12 +50,12 @@ static void _display_pin_init(void)
     __gpio_clear_pin(PIN_CS_N);
     DELAY; /* delay_ms(10); */
     
-	__gpio_set_pin(PIN_RESET_N);
-	DELAY; /* delay_ms(10); */	
-	__gpio_clear_pin(PIN_RESET_N);
-	DELAY; /* delay_ms(10); */
-	__gpio_set_pin(PIN_RESET_N);
-	DELAY; /* delay_ms(10); */
+    __gpio_set_pin(PIN_RESET_N);
+    DELAY; /* delay_ms(10); */    
+    __gpio_clear_pin(PIN_RESET_N);
+    DELAY; /* delay_ms(10); */
+    __gpio_set_pin(PIN_RESET_N);
+    DELAY; /* delay_ms(10); */
 }
 
 #define WAIT_ON_SLCD while(REG_SLCD_STATE & SLCD_STATE_BUSY);
@@ -150,7 +150,7 @@ static void _display_off(void)
 static void _set_lcd_bus(void)
 {
     REG_LCD_CFG &= ~LCD_CFG_LCDPIN_MASK;
-	REG_LCD_CFG |= LCD_CFG_LCDPIN_SLCD;
+    REG_LCD_CFG |= LCD_CFG_LCDPIN_SLCD;
     
     REG_SLCD_CFG = (SLCD_CFG_BURST_4_WORD | SLCD_CFG_DWIDTH_18 | SLCD_CFG_CWIDTH_18BIT
                    | SLCD_CFG_CS_ACTIVE_LOW | SLCD_CFG_RS_CMD_LOW | SLCD_CFG_CLK_ACTIVE_FALLING
@@ -161,17 +161,17 @@ static void _set_lcd_bus(void)
 
 static void _set_lcd_clock(void)
 {
-	unsigned int val;
-	int pll_div;
+    unsigned int val;
+    int pll_div;
     
     __cpm_stop_lcd();
-	pll_div = ( REG_CPM_CPCCR & CPM_CPCCR_PCS ); /* clock source, 0:pllout/2 1: pllout */
-	pll_div = pll_div ? 1 : 2 ;
-	val = ( __cpm_get_pllout()/pll_div ) / 336000000;
-	val--;
-	if ( val > 0x1ff )
-		val = 0x1ff; /* CPM_LPCDR is too large, set it to 0x1ff */
-	__cpm_set_pixdiv(val);
+    pll_div = ( REG_CPM_CPCCR & CPM_CPCCR_PCS ); /* clock source, 0:pllout/2 1: pllout */
+    pll_div = pll_div ? 1 : 2 ;
+    val = ( __cpm_get_pllout()/pll_div ) / 336000000;
+    val--;
+    if ( val > 0x1ff )
+        val = 0x1ff; /* CPM_LPCDR is too large, set it to 0x1ff */
+    __cpm_set_pixdiv(val);
     __cpm_start_lcd();
 }
 
