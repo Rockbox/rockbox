@@ -44,6 +44,8 @@
 #include "rbunicode.h"
 #include "usb.h"
 #include "qt1106.h"
+#include "rockboxlogo.h"
+
 
 #include <stdarg.h>
 
@@ -105,12 +107,14 @@ void main(void)
     int tmpval;
 
     /* set clock to 200 MHz */
+    #if 0
     CLKCON = 0x00800080;
     CLKCON2= 0x00;
     PLL0PMS = 0x1ad200;
     PLLCON = 1;
     while (!(PLLLOCK & 1)) ;
     CLKCON = 0x20802080;
+    #endif
 
     /* mask all interrupts
        this is done, because the lcd framebuffer
@@ -136,21 +140,18 @@ void main(void)
 
     lcd_init();
     snprintf(mystring, 64, "tmpval: %x", tmpval);
-    lcd_putsxy(0,0,mystring);
+    lcd_puts(0,0,mystring);
     lcd_update();
 
     init_qt1106();
 
-    // Wait for play to be pressed
-    while(!(PDAT1 & (1 << 4)));
-    // Wait for play to be released
-    while((PDAT1 & (1 << 4)));
-    PDAT0 ^= (1 << 2); //Toggle backlight
-    delay(LONG_DELAY);
-
     /* Calibrate the lot */
     qt1106_io(QT1106_MODE_FREE | QT1106_MOD_INF | QT1106_DI \
-       | QT1106_SLD_SLIDER | QT1106_CAL_WHEEL | QT1106_CAL_KEYS | QT1106_RES_4);
+       | QT1106_SLD_SLIDER | QT1106_CAL_WHEEL | QT1106_CAL_KEYS | QT1106_RES_256);
+
+    lcd_clear_display();
+    lcd_bitmap(rockboxlogo, 0, 30, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
+    lcd_update();
 
     /* Set to maximum sensitivity */
     qt1106_io(QT1106_CT | (0x00 << 8) );
@@ -160,9 +161,14 @@ void main(void)
         qt1106_wait();
 
         int slider = qt1106_io(QT1106_MODE_FREE | QT1106_MOD_INF \
-            | QT1106_DI | QT1106_SLD_SLIDER | QT1106_RES_4);
+            | QT1106_DI | QT1106_SLD_SLIDER | QT1106_RES_256);
+        snprintf(mystring, 64, "%x %2.2x",(slider & 0x008000)>>15, slider&0xff);
+        lcd_puts(0,1,mystring);
+        lcd_update();
+        /*
         if(slider & 0x008000)
             bl_debug_count(((slider&0xff)) + 1);
+        */
     }
 
     //power off
