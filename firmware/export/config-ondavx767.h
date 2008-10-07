@@ -67,7 +67,6 @@
 //#define HAVE_LCD_ENABLE
 
 #define CONFIG_KEYPAD ONDAVX767_PAD
-#define HAVE_BUTTON_HOLD
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC

@@ -989,7 +989,6 @@ static inline void core_sleep(void)
 void start_thread(void); /* Provide C access to ASM label */
 static void __attribute__((used)) _start_thread(void)
 {
-
     /* $t1 = context */
     asm volatile (
       "start_thread:          \n"
@@ -1004,7 +1003,6 @@ static void __attribute__((used)) _start_thread(void)
         ".set reorder         \n"
     );
     thread_exit();
-
 }
 
 /* Place context pointer in $s0 slot, function pointer in $s1 slot, and
@@ -1084,10 +1082,9 @@ static inline void load_context(const void* addr)
 static inline void core_sleep(void)
 {
 #if CONFIG_CPU == JZ4732
-	REG_CPM_LCR &= ~CPM_LCR_LPM_MASK;
-	REG_CPM_LCR |= CPM_LCR_LPM_SLEEP;
+    __cpm_idle_mode();
 #endif
-	asm volatile(".set   mips32r2           \n"
+    asm volatile(".set   mips32r2           \n"
                  "mfc0   $8, $12            \n" /* mfc $t0, $12 */
                  "move   $9, $8             \n" /* move $t1, $t0 */
                  "la     $10, 0x8000000     \n" /* la $t2, 0x8000000 */
@@ -1098,10 +1095,6 @@ static inline void core_sleep(void)
                  ".set   mips0              \n"
                  ::: "t0", "t1", "t2"
                  );
-#if CONFIG_CPU == JZ4732
-    REG_CPM_LCR &= ~CPM_LCR_LPM_MASK;
-	REG_CPM_LCR |= CPM_LCR_LPM_IDLE;
-#endif
 }
 
 

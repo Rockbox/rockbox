@@ -2354,31 +2354,32 @@
 
 
 /* Power register bit masks */
-#define USB_POWER_SUSPENDM    0x01
+#define USB_POWER_SUSPENDM  0x01
 #define USB_POWER_RESUME    0x04
 #define USB_POWER_HSMODE    0x10
 #define USB_POWER_HSENAB    0x20
-#define USB_POWER_SOFTCONN    0x40
+#define USB_POWER_SOFTCONN  0x40
 
 /* Interrupt register bit masks */
 #define USB_INTR_SUSPEND    0x01
-#define USB_INTR_RESUME        0x02
-#define USB_INTR_RESET        0x04
+#define USB_INTR_RESUME     0x02
+#define USB_INTR_RESET      0x04
 
 #define USB_INTR_EP0        0x0001
-#define USB_INTR_INEP1        0x0002
-#define USB_INTR_INEP2        0x0004
-#define USB_INTR_OUTEP1        0x0002
+#define USB_INTR_INEP1      0x0002
+#define USB_INTR_INEP2      0x0004
+#define USB_INTR_OUTEP1     0x0002
+#define USB_INTR_OUTEP2     0x0004
 
 /* CSR0 bit masks */
 #define USB_CSR0_OUTPKTRDY    0x01
-#define USB_CSR0_INPKTRDY    0x02
+#define USB_CSR0_INPKTRDY     0x02
 #define USB_CSR0_SENTSTALL    0x04
-#define USB_CSR0_DATAEND    0x08
-#define USB_CSR0_SETUPEND    0x10
+#define USB_CSR0_DATAEND      0x08
+#define USB_CSR0_SETUPEND     0x10
 #define USB_CSR0_SENDSTALL    0x20
-#define USB_CSR0_SVDOUTPKTRDY    0x40
-#define USB_CSR0_SVDSETUPEND    0x80
+#define USB_CSR0_SVDOUTPKTRDY 0x40
+#define USB_CSR0_SVDSETUPEND  0x80
 
 /* Endpoint CSR register bits */
 #define USB_INCSRH_AUTOSET    0x80
