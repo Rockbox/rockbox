@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 Robert Keevil
+ * Copyright (C) 2006-2008 Robert Keevil
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -42,7 +42,7 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 
 #include "scrobbler.h"
 
-#define SCROBBLER_VERSION "1.0"
+#define SCROBBLER_VERSION "1.1"
 
 #if CONFIG_RTC
 #define SCROBBLER_FILE "/.scrobbler.log"
@@ -151,24 +151,26 @@ static void add_to_cache(unsigned long play_length)
     {
         ret = snprintf(scrobbler_cache+(SCROBBLER_CACHE_LEN*cache_pos),
                 SCROBBLER_CACHE_LEN,
-                "%s\t%s\t%s\t%d\t%d\t%c\t%ld\n",
+                "%s\t%s\t%s\t%d\t%d\t%c\t%ld\t%s\n",
                 scrobbler_entry.artist,
                 scrobbler_entry.album?scrobbler_entry.album:"",
                 scrobbler_entry.title,
                 scrobbler_entry.tracknum,
                 (int)scrobbler_entry.length/1000,
                 rating,
-                (long)timestamp);
+                (long)timestamp,
+                scrobbler_entry.mb_track_id?scrobbler_entry.mb_track_id:"");
     } else {
         ret = snprintf(scrobbler_cache+(SCROBBLER_CACHE_LEN*cache_pos),
                 SCROBBLER_CACHE_LEN,
-                "%s\t%s\t%s\t\t%d\t%c\t%ld\n",
+                "%s\t%s\t%s\t\t%d\t%c\t%ld\t%s\n",
                 scrobbler_entry.artist,
                 scrobbler_entry.album?scrobbler_entry.album:"",
                 scrobbler_entry.title,
                 (int)scrobbler_entry.length/1000,
                 rating,
-                (long)timestamp);
+                (long)timestamp,
+                scrobbler_entry.mb_track_id?scrobbler_entry.mb_track_id:"");
     }
 
     if ( ret >= SCROBBLER_CACHE_LEN )

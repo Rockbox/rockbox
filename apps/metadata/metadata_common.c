@@ -293,6 +293,11 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
     {
         p = &(id3->grouping);
     }
+    else if (strcasecmp(name, "musicbrainz_trackid") == 0
+        || strcasecmp(name, "http://musicbrainz.org") == 0 )
+    {
+        p = &(id3->mb_track_id);
+    }
     else
     {
         len = parse_replaygain(name, value, id3, buf, buf_remaining);

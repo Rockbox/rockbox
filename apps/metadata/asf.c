@@ -465,6 +465,9 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                                 id3buf = value;
                                 id3buf_remaining = buf_len;
                             }
+                        } else if (!strcmp("MusicBrainz/Track Id", utf8buf)) {
+                            id3->mb_track_id = id3buf;
+                            asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
                         } else {
                             lseek(fd, length, SEEK_CUR);
                         }

@@ -223,6 +223,9 @@ struct mp3entry {
 
     /* Cuesheet support */
     int cuesheet_type;      /* 0: none, 1: external, 2: embedded */
+
+    /* Musicbrainz Track ID */
+    char* mb_track_id;
 };
 
 enum {

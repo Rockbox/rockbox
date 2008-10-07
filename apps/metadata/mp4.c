@@ -498,6 +498,11 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                     DEBUGF("AAC: lead_trim %d, tail_trim %d\n", 
                         id3->lead_trim, id3->tail_trim);
                 }
+                else if (strcasecmp(tag_name, "musicbrainz track id") == 0)
+                {
+                    read_mp4_tag_string(fd, size, &buffer, &buffer_left,
+                        &id3->mb_track_id);
+                }
                 else
                 {
                     char* any;

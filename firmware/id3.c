@@ -486,6 +486,31 @@ static int parserva2( struct mp3entry* entry, char* tag, int bufferpos )
 }
 #endif
 
+static int parsembtid( struct mp3entry* entry, char* tag, int bufferpos )
+{
+    char* value = NULL;
+    int desc_len = strlen(tag);
+    /*DEBUGF("MBID len: %d\n", desc_len);*/
+    int value_len = 0;
+
+    if ((tag - entry->id3v2buf + desc_len + 2) < bufferpos)
+    {
+        value = tag + desc_len + 1;
+
+        if (strcasecmp(tag, "http://musicbrainz.org") == 0)
+        {
+            /* Musicbrainz track IDs are always 36 chars long plus null */
+            value_len = 37;
+
+            entry->mb_track_id = value;
+
+            /*DEBUGF("ENTRY: %s LEN: %d\n", entry->mb_track_id, strlen(entry->mb_track_id));*/
+        }
+    }
+
+    return tag - entry->id3v2buf + value_len;
+}
+
 static const struct tag_resolver taglist[] = {
     { "TPE1", 4, offsetof(struct mp3entry, artist), NULL, false },
     { "TP1",  3, offsetof(struct mp3entry, artist), NULL, false },
@@ -511,6 +536,7 @@ static const struct tag_resolver taglist[] = {
     { "TXXX", 4, 0, &parseuser, false },
     { "RVA2", 4, 0, &parserva2, true },
 #endif
+    { "UFID", 4, 0, &parsembtid, false },
 };
 
 #define TAGLIST_SIZE ((int)(sizeof(taglist) / sizeof(taglist[0])))
@@ -1261,6 +1287,8 @@ void adjust_mp3entry(struct mp3entry *entry, void *dest, const void *orig)
     if (entry->album_gain_string)
         entry->album_gain_string += offset;
 #endif
+    if (entry->mb_track_id)
+        entry->mb_track_id += offset;
 }
 
 void copy_mp3entry(struct mp3entry *dest, const struct mp3entry *orig)
