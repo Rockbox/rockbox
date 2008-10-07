@@ -33,6 +33,8 @@
 #include "button.h"
 #include <sprintf.h>
 
+#define SECTOR_SIZE 512
+
 /* #define USE_TCC_LPT */
 /* #define USE_ECC_CORRECTION */
 
@@ -41,12 +43,13 @@ int ata_spinup_time = 0;
 
 long last_disk_activity = -1;
 
+/* as we aren't actually ata manually fill some fields */
+static unsigned short ata_identify[SECTOR_SIZE/2];
+
 /** static, private data **/
 static bool initialized = false;
 
 static struct mutex ata_mtx SHAREDBSS_ATTR;
-
-#define SECTOR_SIZE 512
 
 #if defined(COWON_D2) || defined(IAUDIO_7)
 #define SEGMENT_ID_BIGENDIAN
@@ -754,6 +757,41 @@ void ata_enable(bool on)
     (void)on;
 }
 
+static void fill_identify(void)
+{
+    char buf[80];
+    unsigned short *wbuf = (unsigned short *) buf;
+    unsigned long blocks;
+    int i;
+
+    memset(ata_identify, 0, sizeof(ata_identify));
+
+    /* firmware version */
+    memset(buf, ' ', 8);
+    memcpy(buf, "0.00", 4);
+
+    for (i = 0; i < 4; i++)
+        ata_identify[23 + i] = betoh16(wbuf[i]);
+
+    /* model field, need better name? */
+    memset(buf, ' ', 80);
+    memcpy(buf, "TNFL", 4);
+
+    for (i = 0; i < 40; i++)
+        ata_identify[27 + i] = betoh16(wbuf[i]);
+
+    /* blocks count */
+    blocks = (pages_per_block * blocks_per_bank / SECTOR_SIZE)
+                 * page_size * total_banks;
+    ata_identify[60] = blocks & 0xffff;
+    ata_identify[61] = blocks >> 16;
+
+    /* TODO: discover where is s/n in TNFL */
+    for (i = 10; i < 20; i++) {
+        ata_identify[i] = 0;
+    }
+}
+
 int ata_init(void)
 {
     int i, bank, phys_segment;
@@ -871,14 +909,13 @@ int ata_init(void)
     }
 #endif
     
+    fill_identify();
     initialized = true;
 
     return 0;
 }
 
-
-/* TEMP: This will return junk, it's here for compilation only */
 unsigned short* ata_get_identify(void)
 {
-    return (unsigned short*)0x21000000; /* Unused DRAM */
+    return ata_identify;
 }
