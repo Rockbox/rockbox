@@ -535,7 +535,7 @@ static void recalculate_watermark(int bitrate)
     }
 }
 
-#ifndef HAVE_FLASH_STORAGE
+#ifdef HAVE_DISK_STORAGE
 void audio_set_buffer_margin(int seconds)
 {
     low_watermark_margin = seconds;

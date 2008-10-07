@@ -1245,7 +1245,7 @@ static void playlist_thread(void)
 
     int sleep_time = 5;
 
-#ifndef HAVE_FLASH_STORAGE
+#ifdef HAVE_DISK_STORAGE
     if (global_settings.disk_spindown > 1 &&
         global_settings.disk_spindown <= 5)
         sleep_time = global_settings.disk_spindown - 1;

@@ -55,6 +55,10 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_PCF50606
 
+/* define this if you have a disk storage, i.e. something
+   that needs spinups and can cause skips when shaked */
+#define HAVE_DISK_STORAGE
+
 /* Define this if you have an remote lcd */
 #define HAVE_REMOTE_LCD
 

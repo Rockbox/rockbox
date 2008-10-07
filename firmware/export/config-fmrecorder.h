@@ -65,6 +65,10 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
+/* define this if you have a disk storage, i.e. something
+   that needs spinups and can cause skips when shaked */
+#define HAVE_DISK_STORAGE
+
 #define CONFIG_I2C I2C_PLAYREC
 
 #define BATTERY_CAPACITY_DEFAULT 2200 /* default battery capacity */

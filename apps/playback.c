@@ -783,7 +783,7 @@ int audio_get_file_pos(void)
     return 0;
 }
 
-#ifndef HAVE_FLASH_STORAGE
+#ifdef HAVE_DISK_STORAGE
 void audio_set_buffer_margin(int setting)
 {
     static const int lookup[] = {5, 15, 30, 60, 120, 180, 300, 600};
@@ -2187,7 +2187,7 @@ static void audio_play_start(size_t offset)
     /* Officially playing */
     queue_reply(&audio_queue, 1);
 
-#ifndef HAVE_FLASH_STORAGE
+#ifdef HAVE_DISK_STORAGE
     set_filebuf_watermark(buffer_margin, 0);
 #endif
 
@@ -2584,7 +2584,7 @@ void audio_init(void)
     audio_is_initialized = true;
 
     sound_settings_apply();
-#ifndef HAVE_FLASH_STORAGE
+#ifdef HAVE_DISK_STORAGE
     audio_set_buffer_margin(global_settings.buffer_margin);
 #endif
 

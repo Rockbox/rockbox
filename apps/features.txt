@@ -36,6 +36,10 @@ dircache
 flash_storage
 #endif
 
+#if defined(HAVE_DISK_STORAGE)
+disk_storage
+#endif
+
 #if defined(HAVE_HEADPHONE_DETECTION)
 headphone_detection
 #endif

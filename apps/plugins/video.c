@@ -656,7 +656,7 @@ int PlayTick(int fd)
         }
 
         if (!gPlay.bRefilling
-#ifndef HAVE_FLASH_STORAGE
+#ifdef HAVE_DISK_STORAGE
             && rb->global_settings->disk_spindown < 20  /* condition for test only */
 #endif
             )

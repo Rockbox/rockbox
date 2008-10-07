@@ -85,6 +85,10 @@
 /* define this if you have a real-time clock */
 //#define CONFIG_RTC RTC_RX5X348AB
 
+/* define this if you have a disk storage, i.e. something
+   that needs spinups and can cause skips when shaked */
+#define HAVE_DISK_STORAGE
+
 /* Define this for LCD backlight available */
 //#define HAVE_BACKLIGHT
 

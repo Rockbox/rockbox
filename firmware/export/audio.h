@@ -92,7 +92,7 @@ struct mp3entry* audio_current_track(void);
 struct mp3entry* audio_next_track(void);
 bool audio_has_changed_track(void);
 void audio_get_debugdata(struct audio_debug *dbgdata);
-#ifndef HAVE_FLASH_STORAGE
+#ifdef HAVE_DISK_STORAGE
 void audio_set_buffer_margin(int seconds);
 #endif
 unsigned int audio_error(void);

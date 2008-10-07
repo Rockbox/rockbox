@@ -101,6 +101,10 @@
 /* #define CONFIG_TUNER TEA5767 */
 /* #define CONFIG_TUNER_XTAL  32768 */
 
+/* define this if you have a disk storage, i.e. something
+   that needs spinups and can cause skips when shaked */
+#define HAVE_DISK_STORAGE
+
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 /* #define HAVE_BACKLIGHT_BRIGHTNESS */

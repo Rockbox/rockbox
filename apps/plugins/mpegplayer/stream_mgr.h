@@ -152,7 +152,7 @@ static inline bool stream_can_seek(void)
 /* Keep the disk spinning (for seeking and browsing) */
 static inline void stream_keep_disk_active(void)
 {
-#ifndef HAVE_FLASH_STORAGE
+#ifdef HAVE_DISK_STORAGE
     rb->ata_spin();
 #endif
     }

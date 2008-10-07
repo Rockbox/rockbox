@@ -695,22 +695,22 @@ const struct settings_list settings[] = {
                    "seek acceleration", "very fast,fast,normal,slow,very slow", NULL, 5,
                    ID2P(LANG_VERY_FAST), ID2P(LANG_FAST), ID2P(LANG_NORMAL),
                    ID2P(LANG_SLOW) , ID2P(LANG_VERY_SLOW)),
-#if (CONFIG_CODEC == SWCODEC) && !defined(HAVE_FLASH_STORAGE)
+#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_DISK_STORAGE)
     STRINGCHOICE_SETTING(0, buffer_margin, LANG_MP3BUFFER_MARGIN, 0,"antiskip",
                          "5s,15s,30s,1min,2min,3min,5min,10min", NULL, 8,
                          TALK_ID(5, UNIT_SEC), TALK_ID(15, UNIT_SEC),
                          TALK_ID(30, UNIT_SEC), TALK_ID(1, UNIT_MIN),
                          TALK_ID(2, UNIT_MIN), TALK_ID(3, UNIT_MIN),
                          TALK_ID(5, UNIT_MIN), TALK_ID(10, UNIT_MIN)),
-#elif !defined(HAVE_FLASH_STORAGE)
+#elif defined(HAVE_DISK_STORAGE)
     INT_SETTING(0, buffer_margin, LANG_MP3BUFFER_MARGIN, 0, "antiskip",
                 UNIT_SEC, 0, 7, 1, NULL, NULL, audio_set_buffer_margin),
 #endif
     /* disk */
-#ifndef HAVE_FLASH_STORAGE
+#ifdef HAVE_DISK_STORAGE
     INT_SETTING(0, disk_spindown, LANG_SPINDOWN, 5, "disk spindown",
                     UNIT_SEC, 3, 254, 1, NULL, NULL, ata_spindown),
-#endif /* HAVE_FLASH_STORAGE */
+#endif /* HAVE_DISK_STORAGE */
     /* browser */
     CHOICE_SETTING(0, dirfilter, LANG_FILTER, SHOW_SUPPORTED, "show files",
                    "all,supported,music,playlists", NULL, 4, ID2P(LANG_ALL),

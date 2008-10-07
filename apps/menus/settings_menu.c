@@ -173,7 +173,7 @@ MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
 #endif
          );
 /* Disk */
-#ifndef HAVE_FLASH_STORAGE
+#ifdef HAVE_DISK_STORAGE
 MENUITEM_SETTING(disk_spindown, &global_settings.disk_spindown, NULL);
 #endif
 #ifdef HAVE_DIRCACHE
@@ -200,9 +200,9 @@ static int dircache_callback(int action,const struct menu_item_ex *this_item)
 }
 MENUITEM_SETTING(dircache, &global_settings.dircache, dircache_callback);
 #endif
-#if defined(HAVE_DIRCACHE) || !defined(HAVE_FLASH_STORAGE)
+#if defined(HAVE_DIRCACHE) || defined(HAVE_DISK_STORAGE)
 MAKE_MENU(disk_menu, ID2P(LANG_DISK_MENU), 0, Icon_NOICON,
-#ifndef HAVE_FLASH_STORAGE
+#ifdef HAVE_DISK_STORAGE
           &disk_spindown,
 #endif
 #ifdef HAVE_DIRCACHE
@@ -374,7 +374,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #if (BATTERY_CAPACITY_INC > 0) || (BATTERY_TYPES_COUNT > 1)
             &battery_menu,
 #endif
-#if defined(HAVE_DIRCACHE) || !defined(HAVE_FLASH_STORAGE)
+#if defined(HAVE_DIRCACHE) || defined(HAVE_DISK_STORAGE)
             &disk_menu,
 #endif
 #if CONFIG_RTC

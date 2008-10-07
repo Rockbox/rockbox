@@ -721,7 +721,7 @@ void settings_apply(bool read_disk)
 
     sound_settings_apply();
 
-#ifndef HAVE_FLASH_STORAGE
+#ifdef HAVE_DISK_STORAGE
     audio_set_buffer_margin(global_settings.buffer_margin);
 #endif
 
@@ -767,7 +767,7 @@ void settings_apply(bool read_disk)
 #ifdef HAVE_BUTTON_LIGHT
     buttonlight_set_timeout(global_settings.buttonlight_timeout);
 #endif
-#ifndef HAVE_FLASH_STORAGE
+#ifdef HAVE_DISK_STORAGE
     ata_spindown(global_settings.disk_spindown);
 #endif
 #if (CONFIG_CODEC == MAS3507D) && !defined(SIMULATOR)

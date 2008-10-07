@@ -2633,7 +2633,7 @@ int show_menu(void) /* return 1 to quit */
             break;
     }
 
-#if !defined(SIMULATOR) && !defined(HAVE_FLASH_STORAGE)
+#if !defined(SIMULATOR) && defined(HAVE_DISK_STORAGE)
     /* change ata spindown time based on slideshow time setting */
     immediate_ata_off = false;
     rb->ata_spindown(rb->global_settings->disk_spindown);
@@ -3412,7 +3412,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
                         ARRAYLEN(jpeg_config), JPEG_SETTINGS_VERSION);
     }
 
-#if !defined(SIMULATOR) && !defined(HAVE_FLASH_STORAGE)
+#if !defined(SIMULATOR) && defined(HAVE_DISK_STORAGE)
     /* set back ata spindown time in case we changed it */
     rb->ata_spindown(rb->global_settings->disk_spindown);
 #endif

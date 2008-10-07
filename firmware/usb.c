@@ -132,7 +132,7 @@ static void usb_slave_mode(bool on)
 
 static void try_reboot(void)
 {
-#ifndef HAVE_FLASH_STORAGE
+#ifdef HAVE_DISK_STORAGE
     ata_sleepnow(); /* Immediately spindown the disk. */
     sleep(HZ*2);
 #endif

@@ -30,6 +30,10 @@
 /* Define this if you have a DAC3550A */
 #define HAVE_DAC3550A
 
+/* define this if you have a disk storage, i.e. something
+   that needs spinups and can cause skips when shaked */
+#define HAVE_DISK_STORAGE
+
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
