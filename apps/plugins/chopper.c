@@ -108,6 +108,12 @@ Still To do:
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define QUIT BUTTON_POWER
 
+#elif CONFIG_KEYPAD == IAUDIO67_PAD
+#define QUIT BUTTON_POWER
+#define ACTION BUTTON_PLAY
+#define ACTION2 BUTTON_STOP
+#define ACTIONTEXT "PLAY"
+
 #else
 #error No keymap defined!
 #endif

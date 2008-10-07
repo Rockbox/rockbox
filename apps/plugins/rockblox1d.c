@@ -82,6 +82,10 @@ PLUGIN_HEADER
 #define ONEDROCKBLOX_DOWN              BUTTON_MENU
 #define ONEDROCKBLOX_QUIT              BUTTON_POWER
 
+#elif CONFIG_KEYPAD == IAUDIO67_PAD
+#define ONEDROCKBLOX_DOWN              BUTTON_MENU
+#define ONEDROCKBLOX_QUIT              BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

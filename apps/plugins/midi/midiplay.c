@@ -149,6 +149,13 @@ PLUGIN_IRAM_DECLARE
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define BTN_QUIT         BUTTON_POWER
 
+#elif CONFIG_KEYPAD == IAUDIO67_PAD
+#define BTN_QUIT         BUTTON_POWER
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_LEFT         BUTTON_LEFT
+#define BTN_UP           BUTTON_STOP
+#define BTN_DOWN         BUTTON_PLAY
+#define BTN_PLAY         BUTTON_MENU
 
 #else
 #error No keymap defined!

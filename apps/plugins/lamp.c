@@ -74,6 +74,10 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 
+#elif CONFIG_KEYPAD == IAUDIO67_PAD
+#   define LAMP_LEFT       BUTTON_LEFT
+#   define LAMP_RIGHT      BUTTON_RIGHT
+
 #else
 #   error Missing key definitions for this keypad
 #endif

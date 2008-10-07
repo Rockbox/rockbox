@@ -73,6 +73,9 @@ static const struct plugin_api* rb;
 #define BTN_FIRE BUTTON_RC_PLAY
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 #define BTN_MENU (BUTTON_MENU|BUTTON_REL)
+#elif CONFIG_KEYPAD == IAUDIO67_PAD
+#define BTN_MENU BUTTON_MENU
+#define BTN_FIRE BUTTON_PLAY
 #else
 #error No keymap defined!
 #endif

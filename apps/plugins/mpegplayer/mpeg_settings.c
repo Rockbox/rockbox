@@ -124,6 +124,14 @@ struct mpeg_settings settings;
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
 
+#elif CONFIG_KEYPAD == IAUDIO67_PAD
+#define MPEG_START_TIME_SELECT      BUTTON_MENU
+#define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
+#define MPEG_START_TIME_UP          BUTTON_STOP
+#define MPEG_START_TIME_DOWN        BUTTON_PLAY
+#define MPEG_START_TIME_EXIT        BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

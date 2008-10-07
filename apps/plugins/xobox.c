@@ -145,6 +145,15 @@ PLUGIN_HEADER
 
 #define QUIT BUTTON_POWER
 
+#elif CONFIG_KEYPAD == IAUDIO67_PAD
+
+#define QUIT BUTTON_POWER
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define UP BUTTON_STOP
+#define DOWN BUTTON_PLAY
+#define PAUSE BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

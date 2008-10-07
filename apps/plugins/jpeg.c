@@ -214,6 +214,17 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 
+#elif CONFIG_KEYPAD == IAUDIO67_PAD
+#define JPEG_ZOOM_IN     BUTTON_VOLUP
+#define JPEG_ZOOM_OUT    BUTTON_VOLDOWN
+#define JPEG_UP          BUTTON_STOP
+#define JPEG_DOWN        BUTTON_PLAY
+#define JPEG_LEFT        BUTTON_LEFT
+#define JPEG_RIGHT       BUTTON_RIGHT
+#define JPEG_MENU        BUTTON_MENU
+#define JPEG_NEXT        (BUTTON_PLAY|BUTTON_VOLUP)
+#define JPEG_PREVIOUS    (BUTTON_PLAY|BUTTON_VOLDOWN)
+
 #else
 #error No keymap defined!
 #endif

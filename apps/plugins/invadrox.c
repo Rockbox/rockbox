@@ -120,6 +120,13 @@ PLUGIN_HEADER
 
 #define QUIT BUTTON_POWER
 
+#elif CONFIG_KEYPAD == IAUDIO67_PAD
+
+#define QUIT BUTTON_POWER
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define FIRE BUTTON_PLAY
+
 #else
     #error INVADROX: Unsupported keypad
 #endif

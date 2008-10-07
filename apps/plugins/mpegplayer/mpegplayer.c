@@ -231,6 +231,15 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_VOLDOWN    BUTTON_MINUS
 #define MPEG_VOLUP      BUTTON_PLUS
 
+#elif CONFIG_KEYPAD == IAUDIO67_PAD
+#define MPEG_MENU       BUTTON_MENU
+#define MPEG_STOP       BUTTON_STOP
+#define MPEG_PAUSE      BUTTON_PLAY
+#define MPEG_VOLDOWN    BUTTON_VOLDOWN
+#define MPEG_VOLUP      BUTTON_VOLUP
+#define MPEG_RW         BUTTON_LEFT
+#define MPEG_FF         BUTTON_RIGHT
+
 #else
 #error No keymap defined!
 #endif

@@ -5,6 +5,7 @@
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 32
+#define MODEL_NAME   "Cowon iAudio7"
 
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
