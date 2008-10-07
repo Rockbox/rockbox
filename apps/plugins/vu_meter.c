@@ -298,6 +298,9 @@ int last_num_left_leds;
 int last_num_right_leds;
 
 int i;
+#ifdef HAVE_LCD_COLOR
+int screen_foreground;
+#endif
 
 #define MAX_PEAK 0x8000
 
@@ -510,6 +513,9 @@ void draw_analog_minimeters(void) {
 }
 
 void draw_digital_minimeters(void) {
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(LCD_RGBPACK(255, 255 - 23 * num_left_leds, 0));
+#endif
     rb->lcd_mono_bitmap(sound_speaker, 34, half_height-8, 4, 8);
     rb->lcd_set_drawmode(DRMODE_FG);
     if(1<num_left_leds)
@@ -521,6 +527,9 @@ void draw_digital_minimeters(void) {
     if(8<num_left_leds)
         rb->lcd_mono_bitmap(sound_max_level, 46, half_height-8, 3, 8);
 
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(LCD_RGBPACK(255, 255 - 23 * num_right_leds, 0));
+#endif
     rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_mono_bitmap(sound_speaker, 34, half_height+8, 4, 8);
     rb->lcd_set_drawmode(DRMODE_FG);
@@ -533,6 +542,10 @@ void draw_digital_minimeters(void) {
     if(8<(num_right_leds))
         rb->lcd_mono_bitmap(sound_max_level, 46, half_height+8, 3, 8);
     rb->lcd_set_drawmode(DRMODE_SOLID);
+    
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(screen_foreground);
+#endif
 }
 
 void analog_meter(void) {
@@ -621,15 +634,26 @@ void digital_meter(void) {
 
     rb->lcd_set_drawmode(DRMODE_FG);
     /* LEDS */
-    for(i=0; i<num_left_leds; i++)
+    for(i=0; i<num_left_leds; i++) {
+#ifdef HAVE_LCD_COLOR
+        rb->lcd_set_foreground(LCD_RGBPACK(255, 255 - 23 * i, 0));
+#endif
         rb->lcd_fillrect((digital_lead + (i*digital_block_width)),
             14, digital_block_width - digital_block_gap, digital_block_height);
+    }
 
-    for(i=0; i<num_right_leds; i++)
+    for(i=0; i<num_right_leds; i++) {
+#ifdef HAVE_LCD_COLOR
+        rb->lcd_set_foreground(LCD_RGBPACK(255, 255 - 23 * i, 0));
+#endif
         rb->lcd_fillrect((digital_lead + (i*digital_block_width)),
             (half_height + 20), digital_block_width - digital_block_gap, 
             digital_block_height);
-
+    }
+    
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(screen_foreground);
+#endif
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
     if(vumeter_settings.digital_minimeters)
@@ -661,6 +685,9 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     load_settings();
     rb->lcd_setfont(FONT_SYSFIXED);
+#ifdef HAVE_LCD_COLOR
+    screen_foreground = rb->lcd_get_foreground();
+#endif
 
     while (1)
     {
