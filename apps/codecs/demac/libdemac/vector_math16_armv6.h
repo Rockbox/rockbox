@@ -39,37 +39,38 @@ static inline void vector_add(int16_t* v1, int16_t* v2)
 
     "10:                             \n"
         "ldrh    r4, [%[v2]], #2     \n"
+        "ldr     r5, [%[v2]], #4     \n"
         "mov     r4, r4, lsl #16     \n"
     "1:                              \n"
-        "ldmia   %[v2]!, {r5-r8}     \n"
+        "ldmia   %[v2]!, {r6-r7}     \n"
         "ldmia   %[v1],  {r0-r3}     \n"
         "mov     r5, r5, ror #16     \n"
         "pkhtb   r4, r5, r4, asr #16 \n"
         "sadd16  r0, r0, r4          \n"
         "pkhbt   r5, r5, r6, lsl #16 \n"
         "sadd16  r1, r1, r5          \n"
+        "ldmia   %[v2]!, {r4-r5}     \n"
         "mov     r7, r7, ror #16     \n"
         "pkhtb   r6, r7, r6, asr #16 \n"
         "sadd16  r2, r2, r6          \n"
-        "pkhbt   r7, r7, r8, lsl #16 \n"
+        "pkhbt   r7, r7, r4, lsl #16 \n"
         "sadd16  r3, r3, r7          \n"
         "stmia   %[v1]!, {r0-r3}     \n"
-        "mov     r4, r8              \n"
-        "ldmia   %[v2]!, {r5-r8}     \n"
+        "ldmia   %[v2]!, {r6-r7}     \n"
         "ldmia   %[v1],  {r0-r3}     \n"
         "mov     r5, r5, ror #16     \n"
         "pkhtb   r4, r5, r4, asr #16 \n"
         "sadd16  r0, r0, r4          \n"
         "pkhbt   r5, r5, r6, lsl #16 \n"
         "sadd16  r1, r1, r5          \n"
+        "ldmia   %[v2]!, {r4-r5}     \n"
         "mov     r7, r7, ror #16     \n"
         "pkhtb   r6, r7, r6, asr #16 \n"
         "sadd16  r2, r2, r6          \n"
-        "pkhbt   r7, r7, r8, lsl #16 \n"
+        "pkhbt   r7, r7, r4, lsl #16 \n"
         "sadd16  r3, r3, r7          \n"
         "stmia   %[v1]!, {r0-r3}     \n"
 #if ORDER > 16
-        "mov     r4, r8              \n"
         "subs    %[cnt], %[cnt], #1  \n"
         "bne     1b                  \n"
 #endif
@@ -106,7 +107,7 @@ static inline void vector_add(int16_t* v1, int16_t* v2)
         : /* inputs */
         : /* clobbers */
         "r0", "r1", "r2", "r3", "r4",
-        "r5", "r6", "r7", "r8", "memory"
+        "r5", "r6", "r7", "memory"
     );
 }
 
@@ -125,37 +126,38 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
 
     "10:                             \n"
         "ldrh    r4, [%[v2]], #2     \n"
+        "ldr     r5, [%[v2]], #4     \n"
         "mov     r4, r4, lsl #16     \n"
     "1:                              \n"
-        "ldmia   %[v2]!, {r5-r8}     \n"
+        "ldmia   %[v2]!, {r6-r7}     \n"
         "ldmia   %[v1],  {r0-r3}     \n"
         "mov     r5, r5, ror #16     \n"
         "pkhtb   r4, r5, r4, asr #16 \n"
         "ssub16  r0, r0, r4          \n"
         "pkhbt   r5, r5, r6, lsl #16 \n"
         "ssub16  r1, r1, r5          \n"
+        "ldmia   %[v2]!, {r4-r5}     \n"
         "mov     r7, r7, ror #16     \n"
         "pkhtb   r6, r7, r6, asr #16 \n"
         "ssub16  r2, r2, r6          \n"
-        "pkhbt   r7, r7, r8, lsl #16 \n"
+        "pkhbt   r7, r7, r4, lsl #16 \n"
         "ssub16  r3, r3, r7          \n"
         "stmia   %[v1]!, {r0-r3}     \n"
-        "mov     r4, r8              \n"
-        "ldmia   %[v2]!, {r5-r8}     \n"
+        "ldmia   %[v2]!, {r6-r7}     \n"
         "ldmia   %[v1],  {r0-r3}     \n"
         "mov     r5, r5, ror #16     \n"
         "pkhtb   r4, r5, r4, asr #16 \n"
         "ssub16  r0, r0, r4          \n"
         "pkhbt   r5, r5, r6, lsl #16 \n"
         "ssub16  r1, r1, r5          \n"
+        "ldmia   %[v2]!, {r4-r5}     \n"
         "mov     r7, r7, ror #16     \n"
         "pkhtb   r6, r7, r6, asr #16 \n"
         "ssub16  r2, r2, r6          \n"
-        "pkhbt   r7, r7, r8, lsl #16 \n"
+        "pkhbt   r7, r7, r4, lsl #16 \n"
         "ssub16  r3, r3, r7          \n"
         "stmia   %[v1]!, {r0-r3}     \n"
 #if ORDER > 16
-        "mov     r4, r8              \n"
         "subs    %[cnt], %[cnt], #1  \n"
         "bne     1b                  \n"
 #endif
@@ -192,7 +194,7 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
         : /* inputs */
         : /* clobbers */
         "r0", "r1", "r2", "r3", "r4",
-        "r5", "r6", "r7", "r8", "memory"
+        "r5", "r6", "r7", "memory"
     );
 }
 
