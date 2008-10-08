@@ -246,6 +246,7 @@ struct enc_inputs
 {
     unsigned long sample_rate;     /* out - pcm frequency                  */
     int           num_channels;    /* out - number of audio channels       */
+    int           rec_mono_mode;   /* out - how to create mono             */
     struct encoder_config *config; /* out - encoder settings               */
 };
 

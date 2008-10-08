@@ -341,6 +341,9 @@ struct user_settings
                           4 = 24kHz
                           5 = 16kHz */
     int rec_channels;  /* 0=Stereo, 1=Mono */
+#if CONFIG_CODEC == SWCODEC
+    int rec_mono_mode; /* how to create mono: L, R, L+R */
+#endif
     int rec_mic_gain;   /* depends on target */
     int rec_left_gain;  /* depends on target */
     int rec_right_gain; /* depands on target */

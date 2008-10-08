@@ -90,6 +90,7 @@ static int           rec_source;         /* current rec_source setting     */
 static int           rec_frequency;      /* current frequency setting      */
 static unsigned long sample_rate;        /* Sample rate in HZ              */
 static int           num_channels;       /* Current number of channels     */
+static int           rec_mono_mode;      /* how mono is created            */
 static struct encoder_config enc_config; /* Current encoder configuration  */
 static unsigned long  pre_record_ticks;  /* pre-record time in ticks       */
   
@@ -1178,6 +1179,7 @@ static void pcmrec_set_recording_options(
     rec_frequency      = options->rec_frequency;
     rec_source         = options->rec_source;
     num_channels       = options->rec_channels == 1 ? 1 : 2;
+    rec_mono_mode      = options->rec_mono_mode;
     pre_record_ticks   = options->rec_prerecord_time * HZ;
     enc_config         = options->enc_config;
     enc_config.afmt    = rec_format_afmt[enc_config.rec_format];
@@ -1526,17 +1528,18 @@ void enc_get_inputs(struct enc_inputs *inputs)
 {
     inputs->sample_rate  = sample_rate;
     inputs->num_channels = num_channels;
+    inputs->rec_mono_mode = rec_mono_mode;
     inputs->config       = &enc_config;
 } /* enc_get_inputs */
-        
+
 /* set the encoder dimensions (called by encoder codec at initialization and
    termination) */
 void enc_set_parameters(struct enc_parameters *params)
 {
     size_t bufsize, resbytes;
-        
+
     logf("enc_set_parameters");
-    
+
     if (!params)
     {
         logf("reset");

@@ -866,6 +866,10 @@ const struct settings_list settings[] = {
                          TALK_ID(1792, UNIT_MB)),
     {F_T_INT|F_RECSETTING, &global_settings.rec_channels, LANG_CHANNELS, INT(0),
      "rec channels","stereo,mono",UNUSED},
+#if CONFIG_CODEC == SWCODEC
+    {F_T_INT|F_RECSETTING, &global_settings.rec_mono_mode,
+     LANG_RECORDING_MONO_MODE, INT(0), "rec mono mode","L+R,L,R",UNUSED},
+#endif
     CHOICE_SETTING(F_RECSETTING, rec_split_type, LANG_SPLIT_TYPE, 0,
                    "rec split type", "Split,Stop,Shutdown", NULL, 3,
                    ID2P(LANG_START_NEW_FILE), ID2P(LANG_STOP_RECORDING),ID2P(LANG_STOP_RECORDING_AND_SHUTDOWN)),

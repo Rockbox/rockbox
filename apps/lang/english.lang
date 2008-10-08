@@ -847,6 +847,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_CHANNEL_LEFTRIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Mono Left plus Right"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_CHANNEL_KARAOKE
   desc: in sound_settings
   user:
@@ -12059,5 +12076,22 @@
   <voice>
     *: none
     albumart: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MONO_MODE
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono mode"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Mono mode"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Mono mode"
   </voice>
 </phrase>

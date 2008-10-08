@@ -60,6 +60,7 @@ struct riff_header
 #define PCM_CHUNK_SIZE          (PCM_SAMP_PER_CHUNK*4)
 
 static int      num_channels IBSS_ATTR;
+static int      rec_mono_mode IBSS_ATTR;
 static uint32_t sample_rate;
 static uint32_t enc_size;
 static int32_t  err          IBSS_ATTR;
@@ -215,15 +216,36 @@ static inline void sample_to_mono(uint32_t **src, uint32_t **dst)
 {
     int32_t lr1, lr2;
 
-    lr1 = *(*src)++;
-    lr1 = (int16_t)lr1 + (lr1 >> 16) + err;
-    err = lr1 & 1;
-    lr1 >>= 1;
+    switch(rec_mono_mode)
+    {
+        case 1:
+            /* mono = L */
+            lr1 = *(*src)++;
+            lr1 = lr1 >> 16;
+            lr2 = *(*src)++;
+            lr2 = lr2 >> 16;
+            break;
+        case 2:
+            /* mono = R */
+            lr1 = *(*src)++;
+            lr1 = (uint16_t)lr1;
+            lr2 = *(*src)++;
+            lr2 = (uint16_t)lr2;
+            break;
+        case 0:
+        default:
+            /* mono = (L+R)/2 */
+            lr1 = *(*src)++;
+            lr1 = (int16_t)lr1 + (lr1 >> 16) + err;
+            err = lr1 & 1;
+            lr1 >>= 1;
 
-    lr2 = *(*src)++;
-    lr2 = (int16_t)lr2 + (lr2 >> 16) + err;
-    err = lr2 & 1;
-    lr2 >>= 1; 
+            lr2 = *(*src)++;
+            lr2 = (int16_t)lr2 + (lr2 >> 16) + err;
+            err = lr2 & 1;
+            lr2 >>= 1;
+            break;
+    }
     *(*dst)++ = swap_odd_even_be32((lr1 << 16) | (uint16_t)lr2);
 } /* sample_to_mono */
 
@@ -305,6 +327,7 @@ static bool init_encoder(void)
 
     sample_rate  = inputs.sample_rate;
     num_channels = inputs.num_channels;
+    rec_mono_mode = inputs.rec_mono_mode;
     err          = 0;
 
     /* configure the buffer system */

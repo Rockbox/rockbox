@@ -628,6 +628,7 @@ void rec_init_recording_options(struct audio_recording_options *options)
     options->rec_channels          = global_settings.rec_channels;
     options->rec_prerecord_time    = global_settings.rec_prerecord_time;
 #if CONFIG_CODEC == SWCODEC
+    options->rec_mono_mode         = global_settings.rec_mono_mode;
     options->rec_source_flags      = 0;
     options->enc_config.rec_format = global_settings.rec_format;
     global_to_encoder_config(&options->enc_config);

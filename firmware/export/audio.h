@@ -176,6 +176,7 @@ struct audio_recording_options
     int  rec_channels;
     int  rec_prerecord_time;
 #if CONFIG_CODEC == SWCODEC
+    int  rec_mono_mode;
     int  rec_source_flags;  /* for rec_set_source */
     struct encoder_config enc_config;
 #else

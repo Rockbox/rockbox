@@ -265,6 +265,26 @@ MENUITEM_FUNCTION(recchannels, 0, ID2P(LANG_CHANNELS),
 
 #if CONFIG_CODEC == SWCODEC
 
+static int recmonomode_func(void)
+{
+    static const struct opt_items names[3] = {
+        [0] = { STR(LANG_CHANNEL_LEFTRIGHT) },
+        [1] = { STR(LANG_CHANNEL_LEFT) },
+        [2] = { STR(LANG_CHANNEL_RIGHT) },
+    };
+
+    int rec_mono_mode = global_settings.rec_mono_mode;
+    bool ret = set_option(str(LANG_RECORDING_MONO_MODE), &rec_mono_mode,
+                     INT, names, 3, NULL );
+
+    if (rec_mono_mode != global_settings.rec_mono_mode)
+        global_settings.rec_mono_mode = rec_mono_mode;
+
+    return ret;
+}
+MENUITEM_FUNCTION(recmonomode, 0, ID2P(LANG_RECORDING_MONO_MODE),
+                  recmonomode_func, NULL, NULL, Icon_Menu_setting);
+
 static int recformat_func(void)
 {
     static const struct opt_items names[REC_NUM_FORMATS] = {
@@ -608,6 +628,9 @@ MAKE_MENU(recording_settings_menu, ID2P(LANG_RECORDING_SETTINGS),
 #endif
             &recfrequency, &recsource, /* recsource not shown if no_source */
             &recchannels,
+#if CONFIG_CODEC == SWCODEC
+            &recmonomode,
+#endif
 #if CONFIG_CODEC == MAS3587F
             &rec_editable,
 #endif

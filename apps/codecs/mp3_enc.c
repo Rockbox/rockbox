@@ -90,6 +90,7 @@ typedef struct {
     int               mean_bits;
     int               ResvSize;
     int               channels;
+    int               rec_mono_mode;
     int               granules;
     long              samplerate;
 } config_t;
@@ -1972,12 +1973,14 @@ static int find_samplerate_index(long freq, int *mp3_type)
 
 bool init_mp3_encoder_engine(int sample_rate,
                              int num_channels,
+                             int rec_mono_mode,
                              struct encoder_config *enc_cfg)
 {
     const bool stereo = num_channels > 1;
     uint32_t avg_byte_per_frame;
 
     cfg.channels      = stereo ? 2 : 1;
+    cfg.rec_mono_mode = rec_mono_mode;
     cfg.mpg.mode      = stereo ? 0 : 3; /* 0=stereo, 3=mono */
     cfg.mpg.smpl_id   = find_samplerate_index(sample_rate, &cfg.mpg.type);
     cfg.samplerate    = sampr_index[cfg.mpg.type][cfg.mpg.smpl_id];
@@ -2093,9 +2096,26 @@ STATICIRAM void to_mono_mm(void)
     inline void to_mono(uint32_t **samp)
     {
         int32_t lr = **samp;
-        int32_t m  = (int16_t)lr + (lr >> 16) + err;
-        err = m & 1;
-        m >>= 1;
+        int32_t m;
+
+        switch(cfg.rec_mono_mode)
+        {
+            case 1:
+                /* mono = L */
+                m  = lr >> 16;
+                break;
+            case 2:
+                /* mono = R */
+                m  = (int16_t)lr;
+                break;
+            case 0:
+            default:
+                /* mono = (L+R)/2 */
+                m  = (int16_t)lr + (lr >> 16) + err;
+                err = m & 1;
+                m >>= 1;
+                break;
+        }
         *(*samp)++ = (m << 16) | (uint16_t)m;
     } /* to_mono */
 
@@ -2517,7 +2537,7 @@ static bool enc_init(void)
         return false;
 
     init_mp3_encoder_engine(inputs.sample_rate, inputs.num_channels,
-                            inputs.config);
+                            inputs.rec_mono_mode, inputs.config);
 
     err = 0;
 
