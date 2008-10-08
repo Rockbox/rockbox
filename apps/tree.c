@@ -900,6 +900,7 @@ int rockbox_browse(const char *root, int dirfilter)
     int ret_val = 0;
     int *last_filter = tc.dirfilter;
     tc.dirfilter = &dirfilter;
+    tc.sort_dir = global_settings.sort_dir;
     
     reload_dir = true;
     if (dirfilter >= NUM_FILTER_MODES)
@@ -940,6 +941,7 @@ void tree_mem_init(void)
     /* initialize tree context struct */
     memset(&tc, 0, sizeof(tc));
     tc.dirfilter = &global_settings.dirfilter;
+    tc.sort_dir = global_settings.sort_dir;
 
     tc.name_buffer_size = AVERAGE_FILENAME_LENGTH * max_files;
     tc.name_buffer = buffer_alloc(tc.name_buffer_size);

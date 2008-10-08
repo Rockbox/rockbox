@@ -139,6 +139,10 @@ enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, SHOW_ID3DB,
        NUM_FILTER_MODES,
        SHOW_WPS, SHOW_RWPS, SHOW_FMR, SHOW_CFG, SHOW_LNG, SHOW_MOD, SHOW_FONT, SHOW_PLUGINS};
 
+/* file and dir sort options */
+enum { SORT_ALPHA, SORT_DATE, SORT_DATE_REVERSED, SORT_TYPE, /* available as settings */
+       SORT_ALPHA_REVERSED, SORT_TYPE_REVERSED };            /* internal use only */
+
 /* recursive dir insert options */
 enum { RECURSE_OFF, RECURSE_ON, RECURSE_ASK };
 

@@ -55,6 +55,8 @@
 
 #include "backdrop.h"
 
+static int compare_sort_dir; /* qsort key for sorting directories */
+
 int ft_build_playlist(struct tree_context* c, int start_index)
 {
     int i;
@@ -189,13 +191,13 @@ static int compare(const void* p1, const void* p2)
 
     if (e1->attr & ATTR_DIRECTORY && e2->attr & ATTR_DIRECTORY)
     {   /* two directories */
-        criteria = global_settings.sort_dir;
+        criteria = compare_sort_dir;
 
 #ifdef HAVE_MULTIVOLUME
         if (e1->attr & ATTR_VOLUME || e2->attr & ATTR_VOLUME)
         {   /* a volume identifier is involved */
             if (e1->attr & ATTR_VOLUME && e2->attr & ATTR_VOLUME)
-                criteria = 0; /* two volumes: sort alphabetically */
+                criteria = SORT_ALPHA; /* two volumes: sort alphabetically */
             else /* only one is a volume: volume first */
                 return (e2->attr & ATTR_VOLUME) - (e1->attr & ATTR_VOLUME);
         }
@@ -207,11 +209,12 @@ static int compare(const void* p1, const void* p2)
         criteria = global_settings.sort_file;
     }
     else /* dir and file, dir goes first */
-        return ( e2->attr & ATTR_DIRECTORY ) - ( e1->attr & ATTR_DIRECTORY );
+        return (e2->attr & ATTR_DIRECTORY) - (e1->attr & ATTR_DIRECTORY);
 
     switch(criteria)
     {
-        case 3: /* sort type */
+        case SORT_TYPE:
+        case SORT_TYPE_REVERSED:
         {
             int t1 = e1->attr & FILE_ATTR_MASK;
             int t2 = e2->attr & FILE_ATTR_MASK;
@@ -221,27 +224,31 @@ static int compare(const void* p1, const void* p2)
             if (!t2) /* unknown type */
                 t2 = INT_MAX; /* gets a high number, to sort after known */
 
-            if (t1 - t2) /* if different */
-                return t1 - t2;
+            if (t1 != t2) /* if different */
+                return (t1 - t2) * (criteria == SORT_TYPE_REVERSED ? -1 : 1);
             /* else fall through to alphabetical sorting */
         }
-        case 0: /* sort alphabetically asc */
+
+        case SORT_DATE:
+        case SORT_DATE_REVERSED:
+            /* Ignore SORT_TYPE */
+            if (criteria == SORT_DATE || criteria == SORT_DATE_REVERSED)
+            {
+                if (e1->time_write != e2->time_write)
+                    return (e1->time_write - e2->time_write)
+                           * (criteria == SORT_DATE_REVERSED ? -1 : 1);
+                /* else fall through to alphabetical sorting */
+            }
+
+        case SORT_ALPHA:
+        case SORT_ALPHA_REVERSED:
             if (global_settings.sort_case)
-                return strncmp(e1->name, e2->name, MAX_PATH);
+                return strncmp(e1->name, e2->name, MAX_PATH)
+                       * (criteria == SORT_ALPHA_REVERSED ? -1 : 1);
             else
-                return strncasecmp(e1->name, e2->name, MAX_PATH);
+                return strncasecmp(e1->name, e2->name, MAX_PATH)
+                       * (criteria == SORT_ALPHA_REVERSED ? -1 : 1);
 
-        case 4: /* sort alphabetically desc */
-            if (global_settings.sort_case)
-                return strncmp(e2->name, e1->name, MAX_PATH);
-            else
-                return strncasecmp(e2->name, e1->name, MAX_PATH);
-
-        case 1: /* sort date */
-            return e1->time_write - e2->time_write;
-
-        case 2: /* sort date, newest first */
-            return e2->time_write - e1->time_write;
     }
     return 0; /* never reached */
 }
@@ -345,6 +352,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
     c->dirlength = i;
     closedir(dir);
 
+    compare_sort_dir = c->sort_dir;
     qsort(c->dircache,i,sizeof(struct entry),compare);
 
     /* If thumbnail talking is enabled, make an extra run to mark files with

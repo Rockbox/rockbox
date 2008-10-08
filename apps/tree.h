@@ -67,6 +67,7 @@ struct tree_context {
     int name_buffer_size;
     int dentry_size;
     bool dirfull;
+    int sort_dir; /* directory sort order */
 };
 
 void tree_mem_init(void);
