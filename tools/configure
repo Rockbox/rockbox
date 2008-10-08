@@ -410,7 +410,7 @@ voiceconfig () {
     echo "Building $thislang voice for $modelname. Select options"
     echo ""
 
-    if [ -f "`which flite`" ]; then
+    if [ -n "`findtool flite`" ]; then
         FLITE="F(l)ite "
         FLITE_OPTS=""
         DEFAULT_TTS="flite"
@@ -418,7 +418,7 @@ voiceconfig () {
         DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="L"
     fi
-    if [ -f "`which espeak`" ]; then
+    if [ -n "`findtool espeak`" ]; then
         ESPEAK="(e)Speak "
         ESPEAK_OPTS=""
         DEFAULT_TTS="espeak"
@@ -426,7 +426,7 @@ voiceconfig () {
         DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="e"
     fi
-    if [ -f "`which festival`" ]; then
+    if [ -n "`findtool festival`" ]; then
         FESTIVAL="(F)estival "
         case "$thislang" in
             "italiano")
@@ -450,7 +450,7 @@ voiceconfig () {
         DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="F"
     fi
-    if [ -f "`which swift`" ]; then
+    if [ -n "`findtool swift`" ]; then
         SWIFT="S(w)ift "
         SWIFT_OPTS=""
         DEFAULT_TTS="swift"
@@ -459,7 +459,7 @@ voiceconfig () {
         DEFAULT_CHOICE="w"
     fi
     # Allow SAPI if Windows is in use
-    if [ -f "`which winver`" ]; then
+    if [ -n "`findtool winver`" ]; then
         SAPI="(S)API "
         SAPI_OPTS=""
         DEFAULT_TTS="sapi"
@@ -522,7 +522,7 @@ voiceconfig () {
         ENC_CMD="rbspeexenc"
         ENC_OPTS="-q 4 -c 10"
     else
-        if [ -f "`which lame`" ]; then
+        if [ -n "`findtool lame`" ]; then
             ENCODER="lame"
             ENC_CMD="lame"
             ENC_OPTS="--resample 12 -t -m m -h -V 9 -S -B 64 --vbr-new"
@@ -543,7 +543,7 @@ voiceconfig () {
     fi
 
     TEMPDIR="${pwd}"
-    if [ -f "`which cygpath`" ]; then
+    if [ -n "`findtool cygpath`" ]; then
         TEMPDIR=`cygpath . -a -w`
     fi
 }
