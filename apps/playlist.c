@@ -1483,23 +1483,18 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
     tc->sort_dir = global_settings.sort_dir;
     if (!is_forward)
     {
-        /* Sort options, indices of forward/reverse options differ in bit 0 */
-        const int sortpairs[] = 
+        static const char sortpairs[] =
         {
-            SORT_ALPHA, SORT_ALPHA_REVERSED,
-            SORT_DATE, SORT_DATE_REVERSED,
-            SORT_TYPE, SORT_TYPE_REVERSED,
-            -1
+            [SORT_ALPHA] = SORT_ALPHA_REVERSED,
+            [SORT_DATE] = SORT_DATE_REVERSED,
+            [SORT_TYPE] = SORT_TYPE_REVERSED,
+            [SORT_ALPHA_REVERSED] = SORT_ALPHA,
+            [SORT_DATE_REVERSED] = SORT_DATE,
+            [SORT_TYPE_REVERSED] = SORT_TYPE,
         };
-
-        for (i = 0; sortpairs[i] >= 0; i++)
-        {
-            if (sortpairs[i] == global_settings.sort_dir)
-            {
-                tc->sort_dir = sortpairs[i^1];
-                break;
-            }
-        }
+        
+        if ((unsigned)tc->sort_dir < sizeof(sortpairs))
+            tc->sort_dir = sortpairs[tc->sort_dir];
     }
 
     while (!exit)
