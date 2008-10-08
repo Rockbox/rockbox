@@ -81,6 +81,12 @@
   for mono recording, only the left channel is recorded. Mono recordings
   are usually somewhat smaller than stereo.
 
+\opt{swcodec}{
+  \section{Mono Mode}
+    When configured to record to mono and the source is a stereo signal, use this
+    setting to configure how the mono signal is created. Options are L, R and L+R.
+}
+
 \opt{MASCODEC}{
   \section{Independent Frames}
     The independent frames option tells the \dap{} to encode with the bit
