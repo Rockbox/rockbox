@@ -22,7 +22,7 @@
 # - Olivier Plamont
 # - Jean Boullier
 # - Mourad Jaber
-# - Erik Lassauge
+# - Eric Lassauge
 # - Manuel Dejonghe
 # - Jean-Philippe Bernardy
 # - Mustapha Senhaji
@@ -179,7 +179,7 @@
     *: "Loading... %d%% done (%s)"
   </source>
   <dest>
-    *: "Chargement... %d%% Fait (%s)"
+    *: "Chargement... %d%% fait (%s)"
   </dest>
   <voice>
     *: ""
@@ -207,10 +207,10 @@
     *: "Shutting down..."
   </source>
   <dest>
-    *: "Arrêt en Cours..."
+    *: "Arrêt en cours..."
   </dest>
   <voice>
-    *: "Arrêt en Cours"
+    *: "Arrêt en cours"
   </voice>
 </phrase>
 <phrase>
@@ -4072,7 +4072,7 @@
   </source>
   <dest>
     *: none
-    rtc: "Date & Heure"
+    rtc: "Date & heure"
   </dest>
   <voice>
     *: none
@@ -4653,7 +4653,7 @@
   </source>
   <dest>
     *: none
-    alarm: "Heure de réveil: %02d:%02d"
+    alarm: "Heure de réveil : %02d:%02d"
   </dest>
   <voice>
     *: none
@@ -5173,7 +5173,7 @@
   </source>
   <dest>
     *: none
-    radio: "Station: %d.%02d MHz"
+    radio: "Station : %d.%02d MHz"
   </dest>
   <voice>
     *: none
@@ -5581,11 +5581,11 @@
   </source>
   <dest>
     *: none
-    radio: "Aucune présélection trouvée, scanner ?"
+    radio: "Aucune présélection trouvée, recherche auto ?"
   </dest>
   <voice>
     *: none
-    radio: "Aucune présélection trouvée, scanner ?"
+    radio: "Aucune présélection trouvée, recherche auto ?"
   </voice>
 </phrase>
 <phrase>
@@ -6145,9 +6145,11 @@
   </source>
   <dest>
     *: none
+    recording: deprecated
   </dest>
   <voice>
     *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8308,7 +8310,7 @@
   </source>
   <dest>
     *: none
-    recording: "Durée:"
+    recording: "Durée :"
   </dest>
   <voice>
     *: none
@@ -10981,10 +10983,10 @@
     *: "Demos"
   </source>
   <dest>
-    *: "Demos"
+    *: "Démos"
   </dest>
   <voice>
-    *: "Demos"
+    *: "Démos"
   </voice>
 </phrase>
 <phrase>
@@ -10995,7 +10997,7 @@
     *: "[Work]"
   </source>
   <dest>
-    *: "[Work]"
+    *: "[Œuvre]"
   </dest>
   <voice>
     *: ""
@@ -11875,6 +11877,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_PRESET
   desc: automatic gain control in record settings and screen
+  user:
   <source>
     *: none
     agc: "AGC"
@@ -11891,6 +11894,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_CLIPTIME
   desc: in record settings
+  user:
   <source>
     *: none
     agc: "AGC clip time"
@@ -11907,6 +11911,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
+  user:
   <source>
     *: none
     agc: "AGC max. gain"
@@ -11964,7 +11969,7 @@
   </source>
   <dest>
     *: none
-    recording: "Temps de coupe:"
+    recording: "Temps de coupe :"
   </dest>
   <voice>
     *: none
@@ -11981,10 +11986,27 @@
   </source>
   <dest>
     *: none
-    recording: "Taille:"
+    recording: "Taille :"
   </dest>
   <voice>
     *: none
     recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMART
+  desc: Display the expected AA size
+  user:
+  <source>
+    *: none
+    albumart: "Album Art:"
+  </source>
+  <dest>
+    *: none
+    albumart: "Illustration album :"
+  </dest>
+  <voice>
+    *: none
+    albumart: ""
   </voice>
 </phrase>
