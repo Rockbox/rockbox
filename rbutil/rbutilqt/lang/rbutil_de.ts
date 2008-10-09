@@ -1830,7 +1830,7 @@ Aktuellen Bootloader ersetzen?</translation>
     <message>
         <location filename="rbutilqtfrm.ui" line="464"/>
         <source>&lt;b&gt;Install Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.</source>
-        <translation>&lt;b&gt;Installiere Sprachdatei&lt;/b&gt;&lt;br&gt;Sprachdateien werden benötigt, damit Rockbox die Menüs vorlesen kann. Sprachausgabe ist standardmäßig angeschaltet. Sobald eine Sprachdatei installiert ist werden die Menüs gesprochen.</translation>
+        <translation>&lt;b&gt;Installiere Sprachdatei&lt;/b&gt;&lt;br&gt;Sprachdateien werden benötigt, damit Rockbox die Menüs vorlesen kann. Sprachausgabe ist standardmäßig angeschaltet. Sobald eine Sprachdatei installiert ist, werden die Menüs gesprochen.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="490"/>
