@@ -292,7 +292,10 @@ enum wps_token_type {
 #endif
 
     /* Viewport display */
-    WPS_VIEWPORT_ENABLE
+    WPS_VIEWPORT_ENABLE,
+
+    /* buttons */
+    WPS_TOKEN_BUTTON_VOLUME
 };
 
 struct wps_token {
@@ -423,6 +426,9 @@ struct wps_data
     int num_strings;
 
     bool wps_loaded;
+    
+    /* tick the volume button was last pressed */
+    unsigned int button_time_volume;
 };
 
 /* initial setup of wps_data */

@@ -1388,6 +1388,11 @@ static const char *get_token_value(struct gui_wps *gwps,
             else
                 return NULL;
 #endif
+        case WPS_TOKEN_BUTTON_VOLUME:
+            if (data->button_time_volume && 
+                TIME_BEFORE(current_tick, data->button_time_volume+2*HZ/3))
+                return ".:|";
+            return NULL;
         default:
             return NULL;
     }

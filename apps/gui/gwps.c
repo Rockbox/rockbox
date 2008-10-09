@@ -329,6 +329,8 @@ long gui_wps_show(void)
                 /* volume up */
             case ACTION_WPS_VOLUP:
             {
+                FOR_NB_SCREENS(i)
+                    gui_wps[i].data->button_time_volume = current_tick;
                 global_settings.volume++;
                 bool res = false;
                 setvol();
@@ -347,6 +349,8 @@ long gui_wps_show(void)
                 /* volume down */
             case ACTION_WPS_VOLDOWN:
             {
+                FOR_NB_SCREENS(i)
+                    gui_wps[i].data->button_time_volume = current_tick;
                 global_settings.volume--;
                 setvol();
                 bool res = false;

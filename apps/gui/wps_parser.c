@@ -279,6 +279,7 @@ static const struct wps_tag all_tags[] = {
 
     { WPS_TOKEN_REPEAT_MODE,              "mm",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_PLAYBACK_STATUS,          "mp",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_BUTTON_VOLUME,            "mv",  WPS_REFRESH_DYNAMIC, NULL },
 
 #ifdef HAVE_LCD_BITMAP
     { WPS_TOKEN_PEAKMETER,                "pm", WPS_REFRESH_PEAK_METER, NULL },
@@ -1443,6 +1444,7 @@ void wps_data_init(struct wps_data *wps_data)
     }
     wps_data->full_line_progressbar = false;
 #endif
+    wps_data->button_time_volume = 0;
     wps_data->wps_loaded = false;
 }
 
