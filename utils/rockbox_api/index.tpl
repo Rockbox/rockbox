@@ -27,6 +27,7 @@
     Documentation
 
     </div>
+    <img width=16 height=16 src='http://www.rockbox.org/silk_icons/help.png' align='top'> <a class="menulink" href="http://www.rockbox.org/twiki/bin/view/Main/GeneralFAQ">FAQ</a><br>
     <img width=16 height=16 src='http://www.rockbox.org/silk_icons/page_white_acrobat.png' align='top'> <a class="menulink" href="http://www.rockbox.org/manual.shtml">manual</a><br>
     <img width=16 height=16 src='http://www.rockbox.org/silk_icons/application_edit.png' align='top'> <a class="menulink" href="http://www.rockbox.org/twiki/">wiki</a><br>
     <img width=16 height=16 src='http://www.rockbox.org/silk_icons/book_open.png' align='top'> <a class="menulink" href="http://www.rockbox.org/twiki/bin/view/Main/DocsIndex">docs index</a>
@@ -34,16 +35,16 @@
     Support
     </div>
     <img width=16 height=16 src='http://www.rockbox.org/silk_icons/email.png' align='top'> <a class="menulink" href="http://www.rockbox.org/mail/">mailing lists</a><br>
-    <img width=16 height=16 src='http://www.rockbox.org/silk_icons/group.png' align='top'> <a class="menulink" href="http://www.rockbox.org/irc/">IRC</a><br>
 
+    <img width=16 height=16 src='http://www.rockbox.org/silk_icons/group.png' align='top'> <a class="menulink" href="http://www.rockbox.org/irc/">IRC</a><br>
     <img width=16 height=16 src='http://www.rockbox.org/silk_icons/comment_edit.png' align='top'> <a class="menulink" href="http://forums.rockbox.org/">forums</a>
     <div class="submenu">
     Tracker
     </div>
     <img width=16 height=16 src='http://www.rockbox.org/silk_icons/bug.png' align='top'> <a class="menulink" href="http://www.rockbox.org/tracker/index.php?type=2">bugs</a><br>
     <img width=16 height=16 src='http://www.rockbox.org/silk_icons/brick.png' align='top'> <a class="menulink" href="http://www.rockbox.org/tracker/index.php?type=4">patches</a><br>
-    <img width=16 height=16 src='http://www.rockbox.org/silk_icons/lightbulb.png' align='top'>&nbsp;<a class="menulink" href="http://www.rockbox.org/tracker/index.php?type=1">requests</a><br>
     <div class="submenu">
+
     Search
     </div>
 
