@@ -6,6 +6,7 @@ $input = file_get_contents($argv[1]);
 
 $input = parse_documentation($input);
 
+/* Format input */
 foreach($input as $rootname => $rootel)
 {
     foreach($rootel as $name => $el)
@@ -15,6 +16,7 @@ foreach($input as $rootname => $rootel)
 
 $new = get_newest();
 
+/* Format new */
 foreach($new as $name => $el)
 {
     unset($new[$name]);
@@ -43,8 +45,48 @@ foreach($new as $name => $el)
         $new[$name]["return"][0] = "";
 }
 
+/* Compare and merge both */
+$merged = array();
+foreach($new as $name => $el)
+{
+    if(isset($input[$name]))
+    {
+        $merged[$name] = $input[$name];
+        $merged[$name]["conditions"] = $new[$name]["conditions"];
+        
+        if(strlen($el["group"][0]) > 0)
+            $merged[$name]["group"] = $el["group"];
+        
+        if(isset($el["param"]))
+        {
+            foreach($el["param"] as $nr => $parel)
+            {
+                if($parel != $input[$name]["param"][$nr])
+                {
+                    $param = trim($parel);
+                    $p1 = substr($param, 0, strpos($param, " "));
+                    
+                    $param = trim($input[$name]["param"][$nr]);
+                    $p2 = substr($param, strpos($param, " "));
+                    $merged[$name]["params"][] = $p1." ".$p2." [AUTO-ADDED]";
+                }
+                else
+                    $merged[$name]["params"][] = $parel;
+            }
+        }
+        
+        if(!isset($el["return"]) && isset($merged[$name]["return"]))
+            unset($merged[$name]["return"]);
+        
+        unset($input[$name]);
+    }
+    else
+        $merged[$name] = $el;
+}
 
-$merged = array_merge($new, $input);
+/* Now to the rest of input */
+foreach($input as $name => $el)
+    $merged[$name." [DEPRECATED]"] = $el;
 
 uksort($merged, "func_sort");
 

@@ -13,7 +13,10 @@ function get_newest()
 {
     global $svn;
     
-    $text = file_get_contents("../../apps/plugin.h");
+    $mypath = $_SERVER['SCRIPT_FILENAME'];
+    $mypath = substr($mypath, 0, strrpos($mypath, "/"))."/";
+    
+    $text = file_get_contents($mypath."../../apps/plugin.h");
 
     $text = str_replace(array("\r\n", "\r"), "\n", $text);
 
