@@ -2221,8 +2221,8 @@ int snprintf(char *buf, size_t size, const char *fmt, ...) ATTRIBUTE_PRINTF(3, 4
     \param buf
     \param size
     \param fmt
-    \return the number of characters printed or that would have been printed if the output was truncated (not including the trailing '\0') upon success
-    \description Write a formatted string =fmt= in buffer =buf= of size =size= (including the trailing '\0'). These support %c, %s, %d and %x only with the width and zero padding flag only.
+    \return the number of characters printed or that would have been printed if the output was truncated (not including the trailing NULL character) upon success
+    \description Write a formatted string =fmt= in buffer =buf= of size =size= (including the trailing NULL character). These support %c, %s, %d and %x only with the width and zero padding flag only.
 
 int sound_default(int setting)
     \group sound

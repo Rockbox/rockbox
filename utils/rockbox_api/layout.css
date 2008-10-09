@@ -1,77 +1,77 @@
-body
+.plugincontent
 {
     font-family: Verdana;
 }
 
-li
+.plugincontent li
 {
     font-size: 10px;
 }
 
-code
+.plugincontent code
 {
     color: #00A;
 }
 
-.see, .see a
+.plugincontent .see, .plugincontent .see a
 {
     color: #559;
 }
 
-.group
+.plugincontent .group
 {
     font-size: 12px;
 }
 
-.group h3
+.plugincontent .group h3
 {
     font-size: 14px;
 }
 
-h2
+.plugincontent h2
 {
     color: #D11;
 }
 
-a
+.plugincontent a
 {
     color: blue;
 }
 
-a:hover
+.plugincontent a:hover
 {
     color: red;
 }
 
-.top
+.plugincontent .top
 {
     font-size: 10px;
     color: green;
 }
 
-.extra
+.plugincontent .extra
 {
     font-weight: bold;
     color: #992;
 }
 
-dl
+.plugincontent dl
 {
     border-left: 1px solid #CCC;
     padding-left: 10px;
 }
 
-dt, dd
+.plugincontent dt, .plugincontent dd
 {
     font-style: normal;
 }
 
-dd
+.plugincontent dd
 {
     margin-left: 12em;
 }
 
-dt
+.plugincontent dt
 {
     clear: left;
     display: block;
@@ -80,29 +80,28 @@ dt
     width: 12em;
 }
 
-hr
+.plugincontent hr
 {
     border: 1px solid #CCCCCC;
     margin: 1em 0;
 }
 
-#content
+.plugincontent #content
 {
     margin-left: 14em;
     margin-right: 1em;
     padding: 0;
 }
 
-#menu
+.plugincontent #menu
 {
-    position: fixed;
-    top: 0px;
-    left: 0px;
+    position: absolute;
+    left: 120px; /* I hate IE */
     width: 14em;
     padding: 0;
 }
 
-#menu ul
+.plugincontent #menu ul
 {
     padding-left: 1em;
 }
