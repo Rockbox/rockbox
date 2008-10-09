@@ -19,13 +19,8 @@ $inh = parse_documentation($input);
 $index_tpl = file_get_contents($mypath."index.tpl");
 
 $group_data = array();
-$group_tpl = array();
-ereg("%GROUP_START%.*%GROUP_END%", $index_tpl, $group_tpl);
-$group_tpl = str_replace(array("%GROUP_START%", "%GROUP_END%"), "", $group_tpl[0]);
-
-$func_tpl = array();
-ereg("%FUNCTION_START%.*%FUNCTION_END%", $group_tpl, $func_tpl);
-$func_tpl = str_replace(array("%FUNCTION_START%", "%FUNCTION_END%"), "", $func_tpl[0]);
+$group_tpl = get_tpl_part(array("%GROUP_START%", "%GROUP_END%"), $index_tpl);
+$func_tpl = get_tpl_part(array("%FUNCTION_START%", "%FUNCTION_END%"), $index_tpl);
 
 foreach($inh as $group_name => $group)
 {
@@ -46,10 +41,7 @@ $index_tpl = ereg_replace("%GROUP_START%.*%GROUP_END%", implode("", $group_data)
 file_put_contents("output/index.html", $index_tpl);
 
 $menu_tpl = file_get_contents($mypath."menu.tpl");
-
-$group_tpl = array();
-ereg("%GROUP_START%.*%GROUP_END%", $menu_tpl, $group_tpl);
-$group_tpl = str_replace(array("%GROUP_START%", "%GROUP_END%"), "", $group_tpl[0]);
+$group_tpl = get_tpl_part(array("%GROUP_START%", "%GROUP_END%"), $menu_tpl);
 
 $menu = array();
 foreach($inh as $group_name => $group)
@@ -65,33 +57,13 @@ $menu = ereg_replace("%GROUP_START%.*%GROUP_END%", implode("", $menu), $menu_tpl
 
 $section_tpl = file_get_contents($mypath."section.tpl");
 
-$func_tpl = array();
-ereg("%FUNCTION_START%.*%FUNCTION_END%", $section_tpl, $func_tpl);
-$func_tpl = str_replace(array("%FUNCTION_START%", "%FUNCTION_END%"), "", $func_tpl[0]);
-
-$description_tpl = array();
-ereg("%DESCRIPTION_START%.*%DESCRIPTION_END%", $func_tpl, $description_tpl);
-$description_tpl = str_replace(array("%DESCRIPTION_START%", "%DESCRIPTION_END%"), "", $description_tpl[0]);
-
-$parameter_tpl = array();
-ereg("%PARAMETER_START%.*%PARAMETER_END%", $func_tpl, $parameter_tpl);
-$parameter_tpl = str_replace(array("%PARAMETER_START%", "%PARAMETER_END%"), "", $parameter_tpl[0]);
-
-$parameters_tpl = array();
-ereg("%PARAMETERS_START%.*%PARAMETERS_END%", $parameter_tpl, $parameters_tpl);
-$parameters_tpl = str_replace(array("%PARAMETERS_START%", "%PARAMETERS_END%"), "", $parameters_tpl[0]);
-
-$return_tpl = array();
-ereg("%RETURN_START%.*%RETURN_END%", $func_tpl, $return_tpl);
-$return_tpl = str_replace(array("%RETURN_START%", "%RETURN_END%"), "", $return_tpl[0]);
-
-$conditions_tpl = array();
-ereg("%CONDITIONS_START%.*%CONDITIONS_END%", $func_tpl, $conditions_tpl);
-$conditions_tpl = str_replace(array("%CONDITIONS_START%", "%CONDITIONS_END%"), "", $conditions_tpl[0]);
-
-$see_tpl = array();
-ereg("%SEE_START%.*%SEE_END%", $func_tpl, $see_tpl);
-$see_tpl = str_replace(array("%SEE_START%", "%SEE_END%"), "", $see_tpl[0]);
+$func_tpl = get_tpl_part(array("%FUNCTION_START%", "%FUNCTION_END%"), $section_tpl);
+$description_tpl = get_tpl_part(array("%DESCRIPTION_START%", "%DESCRIPTION_END%"), $section_tpl);
+$parameter_tpl = get_tpl_part(array("%PARAMETER_START%", "%PARAMETER_END%"), $section_tpl);
+$parameters_tpl = get_tpl_part(array("%PARAMETERS_START%", "%PARAMETERS_END%"), $section_tpl);
+$return_tpl = get_tpl_part(array("%RETURN_START%", "%RETURN_END%"), $section_tpl);
+$conditions_tpl = get_tpl_part(array("%CONDITIONS_START%", "%CONDITIONS_END%"), $section_tpl);
+$see_tpl = get_tpl_part(array("%SEE_START%", "%SEE_END%"), $section_tpl);
 
 foreach($inh as $group_name => $group)
 {

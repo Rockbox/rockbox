@@ -334,4 +334,11 @@ function do_markup($data)
 
     return $data;
 }
+
+function get_tpl_part($search, $haystack)
+{
+    $tpl = array();
+    ereg($search[0].".*".$search[1], $haystack, $tpl);
+    return str_replace(array($search[0], $search[1]), "", $tpl[0]);
+}
 ?>
