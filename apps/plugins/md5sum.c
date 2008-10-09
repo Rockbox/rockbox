@@ -28,20 +28,29 @@ static const struct plugin_api *rb;
 
 MEM_FUNCTION_WRAPPERS(rb);
 
+#define BUFFERSIZE 16384
+
 static int count = 0;
 static int done = 0;
+static bool quit = false;
 
 static int hash( char *string, const char *path )
 {
-    char *buffer[512];
+    static char buffer[BUFFERSIZE];
     ssize_t len;
     struct md5_s md5;
     int in = rb->open( path, O_RDONLY );
     if( in < 0 ) return -1;
 
     InitMD5( &md5 );
-    while( ( len = rb->read( in, buffer, 512 ) ) > 0 )
+    while( !quit && ( len = rb->read( in, buffer, sizeof(buffer) ) ) > 0 )
+    {
         AddMD5( &md5, buffer, len );
+        
+        if( rb->get_action(CONTEXT_STD, TIMEOUT_NOBLOCK) == ACTION_STD_CANCEL )
+            quit = true;
+    }
+    
     EndMD5( &md5 );
 
     psz_md5_hash( string, &md5 );
@@ -57,19 +66,26 @@ static void hash_file( int out, const char *path )
     else
     {
         char string[MD5_STRING_LENGTH+1];
+        int status;
         done++;
         rb->splashf( 0, "%d / %d : %s", done, count, path );
-        if( hash( string, path ) )
+        status = hash( string, path );
+        
+        if( quit )
+            return;
+        
+        if( status )
             rb->write( out, "error", 5 );
         else
             rb->write( out, string, MD5_STRING_LENGTH );
         rb->write( out, "  ", 2 );
         rb->write( out, path, rb->strlen( path ) );
         rb->write( out, "\n", 1 );
+        
+        rb->yield();
     }
 }
 
-static void hash_dir( int out, const char *path );
 static void hash_dir( int out, const char *path )
 {
     DIR *dir;
@@ -78,11 +94,11 @@ static void hash_dir( int out, const char *path )
     dir = rb->opendir( path );
     if( dir )
     {
-        while( ( entry = rb->readdir( dir ) ) )
+        while( !quit && ( entry = rb->readdir( dir ) ) )
         {
             char childpath[MAX_PATH];
             rb->snprintf( childpath, MAX_PATH, "%s/%s",
-                          path, entry->d_name );
+                          rb->strcmp( path, "/" ) ? path : "", entry->d_name );
             if( entry->attribute & ATTR_DIRECTORY )
             {
                 if( rb->strcmp( entry->d_name, "." )
@@ -108,7 +124,7 @@ static void hash_list( int out, const char *path )
     char newpath[MAX_PATH];
     if( list < 0 ) return;
 
-    while( rb->read_line( list, newpath, MAX_PATH ) > 0 )
+    while( !quit && rb->read_line( list, newpath, MAX_PATH ) > 0 )
     {
         DIR *dir = rb->opendir( newpath );
         if( dir )
@@ -132,7 +148,7 @@ static void hash_check( int out, const char *path )
     int len;
     if( list < 0 ) return;
 
-    while( ( len = rb->read_line( list, line, MD5_STRING_LENGTH+1+MAX_PATH+1 ) ) > 0 )
+    while( !quit && ( len = rb->read_line( list, line, MD5_STRING_LENGTH+1+MAX_PATH+1 ) ) > 0 )
     {
         if( out < 0 )
             count++;
@@ -236,7 +252,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     done = 0;
     action( out, arg );
 
-    out = rb->open( filename, O_WRONLY|O_CREAT );
+    out = rb->open( filename, O_WRONLY|O_CREAT|O_TRUNC );
     if( out < 0 ) return PLUGIN_ERROR;
     action( out, arg );
     rb->close( out );
