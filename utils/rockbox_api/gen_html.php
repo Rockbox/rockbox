@@ -9,102 +9,157 @@ function get_group($text)
 
 $input = file_get_contents($argv[1]);
 
+$mypath = $_SERVER['SCRIPT_FILENAME'];
+$mypath = substr($mypath, 0, strrpos($mypath, "/"))."/";
+
 $inh = parse_documentation($input);
 
 @mkdir("output");
 
-$h = fopen("output/index.html", "w");
+$index_tpl = file_get_contents($mypath."index.tpl");
 
-fwrite($h, '<html><head><link href="layout.css" rel="stylesheet" type="text/css" /><title>Plugin API - INDEX</title></head><body>');
+$group_data = array();
+$group_tpl = array();
+ereg("%GROUP_START%.*%GROUP_END%", $index_tpl, $group_tpl);
+$group_tpl = str_replace(array("%GROUP_START%", "%GROUP_END%"), "", $group_tpl[0]);
 
-fwrite($h, "<h1>Plugin API reference</h1>");
-fwrite($h, "<ul>");
+$func_tpl = array();
+ereg("%FUNCTION_START%.*%FUNCTION_END%", $group_tpl, $func_tpl);
+$func_tpl = str_replace(array("%FUNCTION_START%", "%FUNCTION_END%"), "", $func_tpl[0]);
 
 foreach($inh as $group_name => $group)
 {
     if(strlen($group_name) > 0)
     {
-        fwrite($h, '<li>'.ucwords($group_name)."<ul>");
-        
+        $func_data = array();
         foreach($group as $el_name => $el)
-            fwrite($h, "<li><a href=\"".get_group($group_name).".html#".get_func($el_name)."\">".$el_name."</a></li>");
+            $func_data[] = str_replace(array("%GROUP%", "%FUNCTION%", "%FUNCTION_NAME%"),
+                                       array(get_group($group_name), get_func($el_name), $el_name),
+                                       $func_tpl);
         
-        fwrite($h, "</ul></li>");
+        $tmp = str_replace("%GROUP_NAME%", ucwords($group_name), $group_tpl);
+        $group_data[] = ereg_replace("%FUNCTION_START%.*%FUNCTION_END%", implode("\n", $func_data), $tmp);
     }
 }
-fwrite($h, "</ul></body></html>");
 
-fclose($h);
+$index_tpl = ereg_replace("%GROUP_START%.*%GROUP_END%", implode("", $group_data), $index_tpl);
+file_put_contents("output/index.html", $index_tpl);
 
-$menu = '<ul><li><a href="index.html">INDEX</a></li><ul>';
-$_menu = array();
+$menu_tpl = file_get_contents($mypath."menu.tpl");
+
+$group_tpl = array();
+ereg("%GROUP_START%.*%GROUP_END%", $menu_tpl, $group_tpl);
+$group_tpl = str_replace(array("%GROUP_START%", "%GROUP_END%"), "", $group_tpl[0]);
+
+$menu = array();
 foreach($inh as $group_name => $group)
 {
     if(strlen($group_name) > 0)
-        $_menu[strtolower($group_name)] = '<li><a href="'.get_group($group_name).'.html">'.ucwords($group_name).'</a></li>';
+        $menu[strtolower($group_name)] = str_replace(array("%GROUP%", "%GROUP_NAME%"),
+                                                     array(get_group($group_name), ucwords($group_name)),
+                                                     $group_tpl);
 }
+ksort($menu);
 
-ksort($_menu);
-$menu .= implode("\n", $_menu);
-$menu .= "</ul></ul>";
+$menu = ereg_replace("%GROUP_START%.*%GROUP_END%", implode("", $menu), $menu_tpl);
+
+$section_tpl = file_get_contents($mypath."section.tpl");
+
+$func_tpl = array();
+ereg("%FUNCTION_START%.*%FUNCTION_END%", $section_tpl, $func_tpl);
+$func_tpl = str_replace(array("%FUNCTION_START%", "%FUNCTION_END%"), "", $func_tpl[0]);
+
+$description_tpl = array();
+ereg("%DESCRIPTION_START%.*%DESCRIPTION_END%", $func_tpl, $description_tpl);
+$description_tpl = str_replace(array("%DESCRIPTION_START%", "%DESCRIPTION_END%"), "", $description_tpl[0]);
+
+$parameter_tpl = array();
+ereg("%PARAMETER_START%.*%PARAMETER_END%", $func_tpl, $parameter_tpl);
+$parameter_tpl = str_replace(array("%PARAMETER_START%", "%PARAMETER_END%"), "", $parameter_tpl[0]);
+
+$parameters_tpl = array();
+ereg("%PARAMETERS_START%.*%PARAMETERS_END%", $parameter_tpl, $parameters_tpl);
+$parameters_tpl = str_replace(array("%PARAMETERS_START%", "%PARAMETERS_END%"), "", $parameters_tpl[0]);
+
+$return_tpl = array();
+ereg("%RETURN_START%.*%RETURN_END%", $func_tpl, $return_tpl);
+$return_tpl = str_replace(array("%RETURN_START%", "%RETURN_END%"), "", $return_tpl[0]);
+
+$conditions_tpl = array();
+ereg("%CONDITIONS_START%.*%CONDITIONS_END%", $func_tpl, $conditions_tpl);
+$conditions_tpl = str_replace(array("%CONDITIONS_START%", "%CONDITIONS_END%"), "", $conditions_tpl[0]);
+
+$see_tpl = array();
+ereg("%SEE_START%.*%SEE_END%", $func_tpl, $see_tpl);
+$see_tpl = str_replace(array("%SEE_START%", "%SEE_END%"), "", $see_tpl[0]);
 
 foreach($inh as $group_name => $group)
 {
-    $h = fopen("output/".get_group($group_name).".html", "w");
-
-    fwrite($h, '<html><head><link href="layout.css" rel="stylesheet" type="text/css" /><title>Plugin API - '.ucwords($group_name).'</title></head><body>');
-    fwrite($h, '<div id="menu">'.ucwords($menu).'</div>');
-    fwrite($h, '<div id="content">');
-    fwrite($h, '<a link="top"></a>');
-
-    fwrite($h, "<h2>".ucwords($group_name)."</h2>");
-    fwrite($h, '<span class="group">');
+    $section_data = str_replace(array("%MENU%", "%GROUP_NAME%"), array($menu, ucwords($group_name)), $section_tpl);
+    
+    $funcs_data = array();
     foreach($group as $func_name => $func)
     {
-        fwrite($h, '<a id="'.get_func($func_name).'"></a>');
-
-        fwrite($h, "<h3>$func_name</h3>");
+        $func_data = str_replace(array("%FUNCTION_NAME%", "%FUNCTION%"), array(get_func($func_name), $func_name), $func_tpl);
         
         if(strlen($func["description"][0]) > 0)
-            fwrite($h, do_markup($func["description"][0])."<br /><br />");
-
+            $func_data = ereg_replace("%DESCRIPTION_START%.*%DESCRIPTION_END%",
+                                          str_replace("%FUNCTION_DESCRIPTION%", do_markup($func["description"][0]), $description_tpl),
+                                          $func_data);
+        else
+            $func_data = ereg_replace("%DESCRIPTION_START%.*%DESCRIPTION_END%", "", $func_data);
+        
         if(isset($func["param"]))
         {
-            $params = "";
+            $params_data = array();
             foreach($func["param"] as $param)
             {
                 $param = trim($param);
                 $p1 = substr($param, 0, strpos($param, " "));
-                $p2 = substr($param, strpos($param, " "));
+                $p2 = do_markup(substr($param, strpos($param, " ")));
+                
                 if(strlen($p1) > 0 && strlen($p2) > 0)
-                    $params .= '<dt>'.$p1.'</dt><dd> '.do_markup($p2).'</dd>';
+                    $params_data[] = str_replace(array("%PARAM1%", "%PARAM2%"), array($p1, $p2), $parameters_tpl);
             }
             
-            if(strlen($params) > 0)
-            {
-                fwrite($h, '<span class="extra">Parameters:</span><dl>');
-                fwrite($h, $params);
-                fwrite($h, "</dl>");
-            }
+            
+            if(count($params_data) > 0)
+                $func_data = ereg_replace("%PARAMETER_START%.*%PARAMETER_END%",
+                                          ereg_replace("%PARAMETERS_START%.*%PARAMETERS_END%", implode("\n", $params_data), $parameter_tpl),
+                                          $func_data);
+            else
+                $func_data = ereg_replace("%PARAMETER_START%.*%PARAMETER_END%", "", $func_data);
         }
+        else
+            $func_data = ereg_replace("%PARAMETER_START%.*%PARAMETER_END%", "", $func_data);
 
         if(isset($func["return"]) && strlen($func["return"][0]) > 0)
-            fwrite($h, '<span class="extra">Returns:</span> '.do_markup($func["return"][0]).'<br /><br />');
+            $func_data = ereg_replace("%RETURN_START%.*%RETURN_END%",
+                                      str_replace("%RETURN%", do_markup($func["return"][0]), $return_tpl),
+                                      $func_data);
+        else
+            $func_data = ereg_replace("%RETURN_START%.*%RETURN_END%", "", $func_data);
         
         if(isset($func["conditions"]))
-            fwrite($h, '<span class="extra">Conditions:</span> '.$func["conditions"][0].'<br /><br />');
+            $func_data = ereg_replace("%CONDITIONS_START%.*%CONDITIONS_END%",
+                                      str_replace("%CONDITIONS%", $func["conditions"][0], $conditions_tpl),
+                                      $func_data);
+        else
+            $func_data = ereg_replace("%CONDITIONS_START%.*%CONDITIONS_END%", "", $func_data);
 
         if(isset($func["see"]))
-            fwrite($h, '<span class="see">Also see '.do_see_markup(explode(" ", trim($func["see"][0]))).'</span><br /><br />');
-
-        fwrite($h, '<a href="#top" class="top">To top</a><hr />');
+            $func_data = ereg_replace("%SEE_START%.*%SEE_END%",
+                                      str_replace("%SEE%", do_see_markup(explode(" ", trim($func["see"][0]))), $see_tpl),
+                                      $func_data);
+        else
+            $func_data = ereg_replace("%SEE_START%.*%SEE_END%", "", $func_data);
+        
+        $funcs_data[] = $func_data;
     }
-    fwrite($h, "</span>");
+    $section_data = ereg_replace("%FUNCTION_START%.*%FUNCTION_END%", implode("", $funcs_data), $section_data);
     
-    fwrite($h, "</div></body></html>");
-    
-    fclose($h);
+    file_put_contents("output/".get_group($group_name).".html", $section_data);
 }
 
-copy("layout.css", "output/layout.css");
+copy($mypath."layout.css", "output/layout.css");
 ?>
