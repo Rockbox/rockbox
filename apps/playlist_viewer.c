@@ -782,48 +782,60 @@ bool search_playlist(void)
     char search_str[32] = "";
     bool ret = false, exit = false;
     int i, playlist_count;
-    int found_indicies[MAX_PLAYLIST_ENTRIES],found_indicies_count = 0;
+    int found_indicies[MAX_PLAYLIST_ENTRIES];
+    int found_indicies_count = 0, last_found_count = -1;
     int button;
     struct gui_synclist playlist_lists;
     struct playlist_track_info track;
 
     if (!playlist_viewer_init(&viewer, 0, false))
         return ret;
-    if (kbd_input(search_str,sizeof(search_str)) == -1)
+    if (kbd_input(search_str, sizeof(search_str)) == -1)
         return ret;
     lcd_clear_display();
     playlist_count = playlist_amount_ex(viewer.playlist);
-    for (i=0;(i<playlist_count)&&(found_indicies_count<MAX_PLAYLIST_ENTRIES);i++)
+
+    cpu_boost(true);
+
+    for (i=0; (i<playlist_count)&&(found_indicies_count<MAX_PLAYLIST_ENTRIES); i++)
     {
-        splashf(0, str(LANG_PLAYLIST_SEARCH_MSG), found_indicies_count,
-                   str(LANG_OFF_ABORT));
+        if (found_indicies_count != last_found_count)
+        {
+            splashf(0, str(LANG_PLAYLIST_SEARCH_MSG), found_indicies_count,
+                       str(LANG_OFF_ABORT));
+            last_found_count = found_indicies_count;
+        }
+
         if (action_userabort(TIMEOUT_NOBLOCK))
-        {
-            if (!found_indicies_count)
-                return ret;
             break;
-        }
-        playlist_get_track_info(viewer.playlist,i,&track);
+
+        playlist_get_track_info(viewer.playlist, i, &track);
+
         if (strcasestr(track.filename,search_str))
-        {
             found_indicies[found_indicies_count++] = track.index;
-        }
+
         yield();
     }
+
+    cpu_boost(false);
+
     if (!found_indicies_count)
     {
         return ret;
     }
     backlight_on();
+
     gui_synclist_init(&playlist_lists, playlist_search_callback_name,
                       found_indicies, false, 1, NULL);
+    gui_synclist_set_title(&playlist_lists, str(LANG_SEARCH_RESULTS), NOICON);
     gui_synclist_set_icon_callback(&playlist_lists, NULL);
     gui_synclist_set_nb_items(&playlist_lists, found_indicies_count);
     gui_synclist_select_item(&playlist_lists, 0);
     gui_synclist_draw(&playlist_lists);
     while (!exit)
     {
-        button = get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
+        gui_syncstatusbar_draw(&statusbars, false);
+        button = get_action(CONTEXT_LIST, HZ/4);
         if (gui_synclist_do_button(&playlist_lists, &button, LIST_WRAP_UNLESS_HELD))
             continue;
         switch (button)
@@ -838,8 +850,7 @@ bool search_playlist(void)
                     ,0);
                 exit = 1;
             break;
-            case ACTION_NONE:
-                break;
+
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                 {

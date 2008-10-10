@@ -12095,3 +12095,17 @@
     recording_swcodec: "Mono mode"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "Search Results"
+  </dest>
+  <voice>
+    *: "Search Results"
+  </voice>
+</phrase>
