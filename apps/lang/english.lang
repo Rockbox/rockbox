@@ -12097,7 +12097,7 @@
 </phrase>
 <phrase>
   id: LANG_SEARCH_RESULTS
-  desc: in sound_settings
+  desc: title for the list of results displayed after searching in a playlist
   user:
   <source>
     *: "Search Results"
