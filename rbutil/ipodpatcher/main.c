@@ -31,7 +31,7 @@
 #include "ipodpatcher.h"
 #include "ipodio.h"
 
-#define VERSION "2.0 with v2.0 bootloaders"
+#define VERSION "3.0 with v3.0 bootloaders"
 
 enum {
    NONE,
