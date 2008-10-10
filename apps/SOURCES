@@ -7,6 +7,7 @@ abrepeat.c
 bookmark.c
 debug_menu.c
 filetypes.c
+id3.c
 language.c
 main.c
 menu.c
@@ -17,6 +18,9 @@ menus/theme_menu.c
 menus/eq_menu.c
 buffering.c
 voice_thread.c
+replaygain.c
+#else  /* !SWCODEC */
+mpeg.c
 #endif
 menus/main_menu.c
 menus/playback_menu.c

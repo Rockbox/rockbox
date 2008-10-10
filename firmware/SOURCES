@@ -2,7 +2,6 @@ ata_idle_notify.c
 events.c
 backlight.c
 buffer.c
-id3.c
 powermgmt.c
 system.c
 usb.c
@@ -189,7 +188,6 @@ sound.c
 #ifndef BOOTLOADER
 general.c
 pcm_sampr.c
-replaygain.c
 pcm.c
 #ifdef HAVE_RECORDING
 enc_base.c
@@ -202,7 +200,6 @@ pcm_record.c
 #else  /* !SWCODEC */
 
 #ifndef BOOTLOADER
-mpeg.c
 #ifndef SIMULATOR
 drivers/mas.c
 #endif /* SIMULATOR */

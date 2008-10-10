@@ -43,7 +43,6 @@
 #ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"
-#include "dac.h"
 #include "system.h"
 #include "usb.h"
 #include "file.h"
@@ -2864,8 +2863,10 @@ void audio_init(void)
 #endif /* CONFIG_CODEC == MAS3587F */
 
 #ifdef DEBUG
+#ifndef SIMULATOR
     dbg_timer_start();
     dbg_cnt2us(0);
+#endif /* !SIMULATOR */
 #endif /* DEBUG */
 }
 
