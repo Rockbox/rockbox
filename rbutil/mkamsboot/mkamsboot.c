@@ -30,36 +30,46 @@ We replace the main firmware block (bytes 0x400..0x400+firmware_size)
 as follows:
 
 
- ---------------------  0x0
-|                     |
-| Rockbox bootloader  |
-|                     |
-|---------------------|
-|    EMPTY SPACE      |
-|---------------------|
-| ucl unpack function |
-|---------------------|
-|                     |
-| compressed OF image |
-|                     |
-|                     |
- ---------------------
+ ----------------------  0x0
+|                      |
+|    Dual-boot code    |
+|                      |
+|----------------------|
+|     EMPTY SPACE      |
+|----------------------|
+|                      |
+| compressed RB image  |
+|                      |
+|----------------------|
+|                      |
+| compressed OF image  |
+|                      |
+|----------------------|
+| UCL unpack function  |
+ ----------------------
 
 This entire block fits into the space previously occupied by the main
-firmware block, and gives about 40KB of space to store the Rockbox
-bootloader.  This could be increased if we also UCL compress the
-Rockbox bootloader.
+firmware block - the space saved by compressing the OF image is used
+to store the compressed version of the Rockbox bootloader.  The OF
+image is typically about 120KB, which allows us to store a Rockbox
+bootloader with an uncompressed size of about 60KB-70KB.
 
 mkamsboot then corrects the checksums and writes a new legal firmware
 file which can be installed on the device.
 
-Our bootloader first checks for the "dual-boot" keypress, and then either:
+When the Sansa device boots, this firmware block is loaded to RAM at
+address 0x0 and executed.
 
-a) Copies the ucl unpack function and compressed OF image to an unused
-   part of RAM and then branches to the ucl_unpack function, which
-   will then branch to 0x0 after decompressing the OF to that location.
+Firstly, the dual-boot code will copy the UCL unpack function to the
+end of RAM.
 
-b) Continues running with our test code
+Then, depending on the detection of the dual-boot keypress, either the
+OF image or the Rockbox image is copied to the end of RAM (just before
+the ucl unpack function) and uncompress it to the start of RAM.
+
+Finally, the ucl unpack function branches to address 0x0, passing
+execution to the uncompressed firmware.
+
 
 */
 
@@ -73,14 +83,62 @@ b) Continues running with our test code
 #include <unistd.h>
 #include <string.h>
 
+#include <ucl/ucl.h>
+
+/* Headers for ARM code binaries */
+#include "uclimg.h"
+#include "bootimg_clip.h"
+#include "bootimg_e200v2.h"
 
 /* Win32 compatibility */
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
 
+#ifndef VERSION
+#define VERSION "0.1"
+#endif
 
-#define PAD_TO_BOUNDARY(x) (((x) + 0x1ff) & ~0x1ff)
+enum
+{
+    MODEL_UNKNOWN = -1,
+    MODEL_FUZE = 0,
+    MODEL_CLIP,
+    MODEL_CLIPV2,
+    MODEL_E200,
+    MODEL_M200,
+    MODEL_C200
+};
+
+static const char* model_names[] = 
+{
+    "Fuze",
+    "Clip",
+    "Clip V2",
+    "E200",
+    "M200",
+    "C200"
+};
+
+static const unsigned char* bootloaders[] = 
+{
+    NULL,
+    bootimg_clip,
+    NULL,
+    bootimg_e200v2,
+    NULL,
+    NULL
+};
+
+static const int bootloader_sizes[] = 
+{
+    0,
+    sizeof(bootimg_clip),
+    0,
+    sizeof(bootimg_e200v2),
+    0,
+    0
+};
 
 
 /* This magic should appear at the start of any UCL file */
@@ -105,12 +163,6 @@ static uint32_t get_uint32le(unsigned char* p)
     return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 }
 
-static uint32_t get_uint32be(unsigned char* p)
-{
-    return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
-
-}
-
 static void put_uint32le(unsigned char* p, uint32_t x)
 {
     p[0] = x & 0xff;
@@ -130,186 +182,271 @@ static int calc_checksum(unsigned char* buf, uint32_t n)
     return sum;
 }
 
-void usage(void)
+static int get_model(int model_id)
 {
-    printf("Usage: mkamsboot <firmware file> <ucl image> <boot file> <ucl unpack file> <output file>\n");
+    switch(model_id)
+    {
+        case 0x1e:
+            return MODEL_FUZE;
+        case 0x22:
+            return MODEL_CLIP;
+        case 0x23:
+            return MODEL_C200;
+        case 0x24:
+            return MODEL_E200;
+        case 0x25:
+            return MODEL_M200;
+        case 0x27:
+            return MODEL_CLIPV2;
+    }
 
-    exit(1);
+    return MODEL_UNKNOWN;
 }
+
+
+static unsigned char* uclpack(unsigned char* inbuf, int insize, int* outsize)
+{
+    int maxsize;
+    unsigned char* outbuf;
+    int r;
+
+    /* The following formula comes from the UCL documentation */
+    maxsize = insize + (insize / 8) + 256;
+
+    /* Allocate some memory for the output buffer */
+    outbuf = malloc(maxsize);
+
+    if (outbuf == NULL) {
+        return NULL;
+    }
+        
+    r = ucl_nrv2e_99_compress(
+            (const ucl_bytep) inbuf,
+            (ucl_uint) insize,
+            (ucl_bytep) outbuf,
+            (ucl_uintp) outsize,
+            0, 10, NULL, NULL);
+
+    if (r != UCL_E_OK || *outsize > maxsize)
+    {
+        /* this should NEVER happen, and implies memory corruption */
+        fprintf(stderr, "internal error - compression failed: %d\n", r);
+        free(outbuf);
+        return NULL;
+    }
+
+    return outbuf;
+}
+
+static unsigned char* load_file(char* filename, off_t* bufsize)
+{
+    int fd;
+    unsigned char* buf;
+    off_t n;
+
+    fd = open(filename, O_RDONLY|O_BINARY);
+    if (fd < 0)
+    {
+        fprintf(stderr,"[ERR]  Could not open %s for reading\n",filename);
+        return NULL;
+    }
+
+    *bufsize = filesize(fd);
+
+    buf = malloc(*bufsize);
+    if (buf == NULL) {
+        fprintf(stderr,"[ERR]  Could not allocate memory for %s\n",filename);
+        return NULL;
+    }
+
+    n = read(fd, buf, *bufsize);
+
+    if (n != *bufsize) {
+        fprintf(stderr,"[ERR]  Could not read file %s\n",filename);
+        return NULL;
+    }
+
+    return buf;
+}
+
 
 int main(int argc, char* argv[])
 {
-    char *infile, *uclfile, *bootfile, *uclunpackfile, *outfile;
-    int fdin, fducl, fdboot, fduclunpack, fdout;
+    char *infile, *bootfile, *outfile;
+    int fdout;
     off_t len;
-    unsigned char uclheader[26];
     uint32_t n;
     unsigned char* buf;
-    uint32_t firmware_size;
-    uint32_t firmware_paddedsize;
-    uint32_t bootloader_size;
+    int firmware_size;
+    off_t bootloader_size;
     uint32_t ucl_size;
     uint32_t ucl_paddedsize;
-    uint32_t uclunpack_size;
     uint32_t sum,filesum;
+    uint8_t  model_id;
+    int model;
     uint32_t i;
+    unsigned char* of_packed;
+    int of_packedsize;
+    unsigned char* rb_unpacked;
+    unsigned char* rb_packed;
+    int rb_packedsize;
+    int fw_version;
+    int totalsize;
+    unsigned char* p;
 
-    if(argc != 6) {
-        usage();
+    fprintf(stderr,"mkamsboot v" VERSION " - (C) Dave Chapman 2008\n");
+    fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
+    fprintf(stderr,"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
+
+    if(argc != 4) {
+        printf("Usage: mkamsboot <firmware file> <boot file> <output file>\n\n");
+        return 1;
     }
 
     infile = argv[1];
-    uclfile = argv[2];
-    bootfile = argv[3];
-    uclunpackfile = argv[4];
-    outfile = argv[5];
+    bootfile = argv[2];
+    outfile = argv[3];
 
-    /* Open the bootloader file */
-    fdboot = open(bootfile, O_RDONLY|O_BINARY);
-    if (fdboot < 0)
-    {
-        fprintf(stderr,"[ERR]  Could not open %s for reading\n",bootfile);
+    /* Load bootloader file */
+    rb_unpacked = load_file(bootfile, &bootloader_size);
+    if (rb_unpacked == NULL) {
+        fprintf(stderr,"[ERR]  Could not load %s\n",bootfile);
         return 1;
     }
 
-    bootloader_size = filesize(fdboot);
+    /* Load original firmware file */
+    buf = load_file(infile, &len);
 
-
-    /* Open the UCL-compressed image of the firmware block */
-    fduclunpack = open(uclunpackfile, O_RDONLY|O_BINARY);
-    if (fduclunpack < 0)
-    {
-        fprintf(stderr,"[ERR]  Could not open %s for reading\n",uclunpackfile);
+    if (buf == NULL) {
+        fprintf(stderr,"[ERR]  Could not load bootloader file\n");
         return 1;
     }
 
-    uclunpack_size = filesize(fduclunpack);
+    /* TODO: Do some more sanity checks on the OF image - e.g. checksum */
 
+    if (get_uint32le(&buf[0x204])==0x0000f000) {
+        fw_version = 2;
+        model_id = buf[0x219];
+    } else {
+        fw_version = 1;
+        model_id = buf[0x215];
+    }
 
-    /* Open the UCL-compressed image of the firmware block */
-    fducl = open(uclfile, O_RDONLY|O_BINARY);
-    if (fducl < 0)
-    {
-        fprintf(stderr,"[ERR]  Could not open %s for reading\n",uclfile);
+    model = get_model(model_id);
+
+    if (model == MODEL_UNKNOWN) {
+        fprintf(stderr,"[ERR]  Unknown firmware - model id 0x%02x\n",model_id);
         return 1;
     }
 
-    /* Some UCL file sanity checks */
-    n = read(fducl, uclheader, sizeof(uclheader));
-
-    if (n != sizeof(uclheader)) {
-        fprintf(stderr,"[ERR]  Could not read header from UCL file\n");
+    if (bootloaders[model] == NULL) {
+        fprintf(stderr,"[ERR]  Unsupported model - \"%s\"\n",model_names[model]);
+        free(buf);
+        free(rb_unpacked);
         return 1;
     }
 
-    if (memcmp(uclmagic, uclheader, sizeof(uclmagic))!=0) {
-        fprintf(stderr,"[ERR]  Invalid UCL file\n");
-        return 1;
-    }
-
-    if (uclheader[12] != 0x2e) {
-        fprintf(stderr,"[ERR]  Unsupported UCL compression format (0x%02x) - only 0x2e supported.\n",uclheader[12]);
-        return 1;
-    }
-    ucl_size = get_uint32be(&uclheader[22]) + 8;
-    ucl_paddedsize = (ucl_size + 3) & ~0x3;
-
-    if (ucl_size + 26 > (unsigned)filesize(fducl)) {
-        fprintf(stderr, "[ERR]  Size mismatch in UCL file\n");
-        return 1;
-    }
-
-    /* Open the firmware file */
-    fdin = open(infile,O_RDONLY|O_BINARY);
-
-    if (fdin < 0) {
-        fprintf(stderr,"[ERR]  Could not open %s for reading\n",infile);
-        return 1;
-    }
-
-    if ((len = filesize(fdin)) < 0)
-        return 1;
-
-    /* Allocate memory for the OF image - we don't change the size */
-    if ((buf = malloc(len)) == NULL) {
-        fprintf(stderr,"[ERR]  Could not allocate buffer for input file (%d bytes)\n",(int)len);
-        return 1;
-    }
-
-    n = read(fdin, buf, len);
-
-    if (n != (uint32_t)len) {
-        fprintf(stderr,"[ERR] Could not read firmware file\n");
-        return 1;
-    }
-
-    close(fdin);
+    printf("[INFO] Patching %s firmware\n",model_names[model]);
 
     /* Get the firmware size */
     firmware_size = get_uint32le(&buf[0x0c]);
 
-    /* Round size up to next multiple of 0x200 */
+    /* Compress the original firmware image */
+    of_packed = uclpack(buf + 0x400, firmware_size, &of_packedsize);
+    if (of_packed == NULL) {
+        fprintf(stderr,"[ERR]  Could not compress original firmware\n");
+        free(buf);
+        free(rb_unpacked);
+        return 1;
+    }
 
-    firmware_paddedsize = PAD_TO_BOUNDARY(firmware_size);
+    rb_packed = uclpack(rb_unpacked, bootloader_size, &rb_packedsize);
+    if (rb_packed == NULL) {
+        fprintf(stderr,"[ERR]  Could not compress %s\n",bootfile);
+        free(buf);
+        free(rb_unpacked);
+        free(of_packed);
+        return 1;
+    }
 
-    fprintf(stderr,"Original firmware size - %d bytes\n",firmware_size);
-    fprintf(stderr,"Padded firmware size - %d bytes\n",firmware_paddedsize);
-    fprintf(stderr,"Bootloader size - %d bytes\n",bootloader_size);
-    fprintf(stderr,"UCL image size - %d bytes (%d bytes padded)\n",ucl_size,ucl_paddedsize);
-    fprintf(stderr,"UCL unpack function size - %d bytes\n",uclunpack_size);
-    fprintf(stderr,"Original total size of firmware - %d bytes\n",(int)len);
+    /* We are finished with the unpacked version of the bootloader */
+    free(rb_unpacked);
 
-    /* Check we have room for our bootloader - in the future, we could UCL
-       pack this image as well if we need to. */
-    if (bootloader_size > (firmware_size - ucl_paddedsize - uclunpack_size)) {
-        fprintf(stderr,"[ERR] Bootloader too large (%d bytes, %d available)\n",
-                bootloader_size, firmware_size - ucl_paddedsize - uclunpack_size);
+    fprintf(stderr,"[INFO] Original firmware size:   %d bytes\n",firmware_size);
+    fprintf(stderr,"[INFO] Packed OF size:           %d bytes\n",of_packedsize);
+    fprintf(stderr,"[INFO] Bootloader size:          %d bytes\n",(int)bootloader_size);
+    fprintf(stderr,"[INFO] Packed bootloader size:   %d bytes\n",rb_packedsize);
+    fprintf(stderr,"[INFO] Dual-boot function size:  %d bytes\n",bootloader_sizes[model]);
+    fprintf(stderr,"[INFO] UCL unpack function size: %d bytes\n",sizeof(uclimg));
+
+    totalsize = bootloader_sizes[model] + sizeof(uclimg) + of_packedsize + 
+                rb_packedsize;
+
+    fprintf(stderr,"[INFO] Total size of new image:  %d bytes\n",totalsize);
+
+    if (totalsize > firmware_size) {
+        fprintf(stderr,"[ERR]  No room to insert bootloader, aborting\n");
+        free(buf);
+        free(rb_unpacked);
+        free(of_packed);
         return 1;
     }
 
     /* Zero the original firmware area - not needed, but helps debugging */
     memset(buf + 0x400, 0, firmware_size);
 
-    /* Locate our bootloader code at the start of the firmware block */
-    n = read(fdboot, buf + 0x400, bootloader_size);
 
-    if (n != bootloader_size) {
-        fprintf(stderr,"[ERR] Could not load bootloader file\n");
-        return 1;
-    }
-    close(fdboot);
+    /* Insert dual-boot bootloader at offset 0 */
+    memcpy(buf + 0x400, bootloaders[model], bootloader_sizes[model]);
 
-    /* Locate the compressed image of the original firmware block at the end
-       of the firmware block */
-    n = read(fducl, buf + 0x400 + firmware_size - ucl_paddedsize, ucl_size);
+    /* We are filling the firmware buffer backwards from the end */
+    p = buf + 0x400 + firmware_size;
 
-    if (n != ucl_size) {
-        fprintf(stderr,"[ERR] Could not load ucl file\n");
-        return 1;
-    }
-    close(fducl);
+    /* 1 - UCL unpack function */
+    p -= sizeof(uclimg);
+    memcpy(p, uclimg, sizeof(uclimg));
+
+    /* 2 - Compressed copy of original firmware */
+    p -= of_packedsize;
+    memcpy(p, of_packed, of_packedsize);
+
+    /* 3 - Compressed copy of Rockbox bootloader */
+    p -= rb_packedsize;
+    memcpy(p, rb_packed, rb_packedsize);
+
+    /* Write the locations of the various images to the variables at the 
+       start of the dualboot image - we save the location of the last byte
+       in each image, along with the size in bytes */
+
+    /* UCL unpack function */
+    put_uint32le(&buf[0x420], firmware_size);
+    put_uint32le(&buf[0x424], sizeof(uclimg));
+
+    /* Compressed original firmware image */
+    put_uint32le(&buf[0x428], firmware_size - sizeof(uclimg));
+    put_uint32le(&buf[0x42c], of_packedsize);
+
+    /* Compressed Rockbox image */
+    put_uint32le(&buf[0x430], firmware_size - sizeof(uclimg) - of_packedsize);
+    put_uint32le(&buf[0x434], rb_packedsize);
 
 
-    /* Locate our UCL unpack function before copy of the compressed firmware */
-    n = read(fduclunpack, buf + 0x400 + firmware_size - ucl_paddedsize - uclunpack_size, uclunpack_size);
-
-    if (n != uclunpack_size) {
-        fprintf(stderr,"[ERR] Could not load uclunpack file\n");
-        return 1;
-    }
-    close(fduclunpack);
-
-    put_uint32le(&buf[0x420], 0x40000 - ucl_paddedsize - uclunpack_size + 1);  /* UCL unpack entry point */
-    put_uint32le(&buf[0x424], 0x40000 - ucl_paddedsize);  /* Location of OF */
-    put_uint32le(&buf[0x428], ucl_size);           /* Size of UCL image */
-    put_uint32le(&buf[0x42c], firmware_size - uclunpack_size - ucl_paddedsize);  /* Start of data to copy */
-    put_uint32le(&buf[0x430], uclunpack_size + ucl_paddedsize);           /* Size of data to copy */
-
-    /* Update checksum */
+    /* Update the firmware block checksum */
     sum = calc_checksum(buf + 0x400,firmware_size);
 
-    put_uint32le(&buf[0x04], sum);
-    put_uint32le(&buf[0x204], sum);
+    if (fw_version == 1) {
+        put_uint32le(&buf[0x04], sum);
+        put_uint32le(&buf[0x204], sum);
+    } else {
+        /* TODO: Verify that this is correct for the v2 firmware */
+
+        put_uint32le(&buf[0x08], sum);
+        put_uint32le(&buf[0x208], sum);
+
+        /* Update the header checksums */
+        put_uint32le(&buf[0x1fc], calc_checksum(buf, 0x1fc));
+        put_uint32le(&buf[0x3fc], calc_checksum(buf + 0x200, 0x1fc));
+    }
 
     /* Update the whole-file checksum */
     filesum = 0;
