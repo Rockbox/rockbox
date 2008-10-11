@@ -471,6 +471,10 @@ int main(int argc, char* argv[])
 
     close(fdout);
 
+    fprintf(stderr," *****************************************************************************\n");
+    fprintf(stderr," *** THIS CODE IS UNTESTED - DO NOT USE IF YOU CAN NOT RECOVER YOUR DEVICE ***\n");
+    fprintf(stderr," *****************************************************************************\n");
+
     return 0;
 
 }

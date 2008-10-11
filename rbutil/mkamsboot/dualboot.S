@@ -44,7 +44,7 @@ start:
 uclcopy:
         ldrb  r4, [r0], #-1
         strb  r4, [r3], #-1
-        cmp   r2, r3
+        cmp   r2, r0
         bne   uclcopy
 
         add   r5, r2, #2            /* r5 is entry point of copy of uclunpack */
