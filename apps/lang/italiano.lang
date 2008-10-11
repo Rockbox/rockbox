@@ -12024,3 +12024,17 @@
     recording_swcodec: "Modo mono"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user:
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "Risultati Ricerca"
+  </dest>
+  <voice>
+    *: "Risultati Ricerca"
+  </voice>
+</phrase>
