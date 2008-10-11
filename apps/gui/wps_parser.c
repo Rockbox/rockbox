@@ -131,7 +131,7 @@ struct wps_tag {
 };
 
 /* prototypes of all special parse functions : */
-static int parse_subline_timeout(const char *wps_bufptr,
+static int parse_timeout(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_progressbar(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
@@ -279,7 +279,8 @@ static const struct wps_tag all_tags[] = {
 
     { WPS_TOKEN_REPEAT_MODE,              "mm",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_PLAYBACK_STATUS,          "mp",  WPS_REFRESH_DYNAMIC, NULL },
-    { WPS_TOKEN_BUTTON_VOLUME,            "mv",  WPS_REFRESH_DYNAMIC, NULL },
+    { WPS_TOKEN_BUTTON_VOLUME,            "mv",  WPS_REFRESH_DYNAMIC, 
+                                                             parse_timeout },
 
 #ifdef HAVE_LCD_BITMAP
     { WPS_TOKEN_PEAKMETER,                "pm", WPS_REFRESH_PEAK_METER, NULL },
@@ -314,7 +315,7 @@ static const struct wps_tag all_tags[] = {
 #endif
 
     { WPS_NO_TOKEN,                       "s",   WPS_REFRESH_SCROLL,  NULL },
-    { WPS_TOKEN_SUBLINE_TIMEOUT,          "t",   0,  parse_subline_timeout },
+    { WPS_TOKEN_SUBLINE_TIMEOUT,          "t",   0,  parse_timeout },
 
 #ifdef HAVE_LCD_BITMAP
     { WPS_NO_TOKEN,                       "we",  0, parse_statusbar_enable },
@@ -766,9 +767,9 @@ static int parse_dir_level(const char *wps_bufptr,
     return 1;
 }
 
-static int parse_subline_timeout(const char *wps_bufptr,
-                                 struct wps_token *token,
-                                 struct wps_data *wps_data)
+static int parse_timeout(const char *wps_bufptr,
+                         struct wps_token *token,
+                         struct wps_data *wps_data)
 {
     int skip = 0;
     int val = 0;
@@ -1109,7 +1110,6 @@ static int parse_albumart_conditional(const char *wps_bufptr,
     }
 };
 #endif /* HAVE_ALBUMART */
-
 
 /* Parse a generic token from the given string. Return the length read */
 static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
