@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:$
+ * $Id$
  *
  * mkamsboot.c - a tool for merging bootloader code into an Sansa V2
  *               (AMS) firmware file
@@ -138,12 +138,6 @@ static const int bootloader_sizes[] =
     sizeof(bootimg_e200v2),
     0,
     0
-};
-
-
-/* This magic should appear at the start of any UCL file */
-static const unsigned char uclmagic[] = {
-    0x00, 0xe9, 0x55, 0x43, 0x4c, 0xff, 0x01, 0x1a
 };
 
 
@@ -292,7 +286,7 @@ int main(int argc, char* argv[])
     int totalsize;
     unsigned char* p;
 
-    fprintf(stderr,"mkamsboot v" VERSION " - (C) Dave Chapman 2008\n");
+    fprintf(stderr,"mkamsboot v" VERSION " - (C) Dave Chapman and Rafaël Carré 2008\n");
     fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
     fprintf(stderr,"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 
