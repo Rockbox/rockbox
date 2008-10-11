@@ -39,7 +39,7 @@ start:
         ldr   r1, uclunpack_size    /* Source length */
         sub   r2, r0, r1            /* Source start - 1*/
 
-        ldr   r3, =DRAM_SIZE        /* Destination end */
+        ldr   r3, =(DRAM_SIZE-1)    /* Destination end */
 
 uclcopy:
         ldrb  r4, [r0], #-1

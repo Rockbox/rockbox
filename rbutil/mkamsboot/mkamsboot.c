@@ -279,8 +279,6 @@ int main(int argc, char* argv[])
     unsigned char* buf;
     int firmware_size;
     off_t bootloader_size;
-    uint32_t ucl_size;
-    uint32_t ucl_paddedsize;
     uint32_t sum,filesum;
     uint8_t  model_id;
     int model;
@@ -419,15 +417,15 @@ int main(int argc, char* argv[])
        in each image, along with the size in bytes */
 
     /* UCL unpack function */
-    put_uint32le(&buf[0x420], firmware_size);
+    put_uint32le(&buf[0x420], firmware_size - 1);
     put_uint32le(&buf[0x424], sizeof(uclimg));
 
     /* Compressed original firmware image */
-    put_uint32le(&buf[0x428], firmware_size - sizeof(uclimg));
+    put_uint32le(&buf[0x428], firmware_size - sizeof(uclimg) - 1);
     put_uint32le(&buf[0x42c], of_packedsize);
 
     /* Compressed Rockbox image */
-    put_uint32le(&buf[0x430], firmware_size - sizeof(uclimg) - of_packedsize);
+    put_uint32le(&buf[0x430], firmware_size - sizeof(uclimg) - of_packedsize - 1);
     put_uint32le(&buf[0x434], rb_packedsize);
 
 
