@@ -34,24 +34,11 @@ start:
     b       reserved_handler
     b       irq_handler
     b       fiq_handler
+#if CONFIG_CPU==S5L8700
     .word 0x43554644 /* DFUC */
-
+#endif
 newstart:
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
-
-#if 0
-    /* set PWRON to 1 */
-    ldr     r1, =0x3CF00014
-    ldr     r2, [r1]
-    orr     r2, r2, #0x8
-    str     r2, [r1]
-
-    ldr     r1, =0x3CF00010
-    ldr     r2, [r1]
-    bic     r2, r2, #0xf000
-    orr     r2, r2, #0x1000
-    str     r2, [r1]
-#endif
      
     /* Initialise bss section to zero */
     ldr     r2, =_edata
@@ -127,5 +114,3 @@ irq_stack:
 fiq_stack:
 
 end:
-    /*.word 0xA5A5A5A5
-    .word 0x5A5A5A5A*/

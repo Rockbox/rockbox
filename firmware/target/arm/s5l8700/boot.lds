@@ -3,7 +3,7 @@
 ENTRY(start)
 OUTPUT_FORMAT(elf32-bigarm)
 OUTPUT_ARCH(arm)
-STARTUP(target/arm/s5l8700/crt0.o)
+STARTUP(target/arm/crt0.o)
 
 /* DRAMORIG is in fact 0x8000000 but remapped to 0x0 */
 #define DRAMORIG 0x0
