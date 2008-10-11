@@ -802,6 +802,18 @@ static int parse_timeout(const char *wps_bufptr,
     if (have_tenth == false)
         val *= 10;
 
+    if (val == 0 && skip == 0)
+    {
+        /* decide what to do if no value was specified */
+        switch (token->type)
+        {
+            case WPS_TOKEN_SUBLINE_TIMEOUT:
+                return -1;
+            case WPS_TOKEN_BUTTON_VOLUME:
+                val = HZ;
+                break;
+        }
+    }
     token->value.i = val;
 
     return skip;

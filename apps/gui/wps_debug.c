@@ -431,7 +431,10 @@ static char *get_token_desc(struct wps_token *token, struct wps_data *data,
             snprintf(buf, bufsize, "enable VP:%d",
                      token->value.i);
             break;
-
+        case WPS_TOKEN_BUTTON_VOLUME:
+            snprintf(buf, bufsize, "Volume button timeout:%d",
+                     token->value.i);
+            break;
         default:
             snprintf(buf, bufsize, "FIXME (code: %d)",
                     token->type);
