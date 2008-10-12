@@ -170,6 +170,28 @@ Example: \config{\%?mm{\textless}Off{\textbar}All{\textbar}One{\textbar}Shuffle%
 Example: \config{\%?mp{\textless}Stop{\textbar}Play{\textbar}Pause{\textbar}%
 Ffwd{\textbar}Rew{\textgreater}}
 
+\section{Changing Volume}
+\begin{table}
+  \begin{tagmap}{}{}
+    \config{\%mv[t]} & ``v'' if the volume is being changed\\
+  \end{tagmap}
+\end{table}
+
+The tag produces the letter ``v'' while the volume is being changed and some
+amount of time after that, i.e. after the volume button has been released. The
+optional parameter \config{t} specifies that amout of time. If it is not
+specified, 1 sec is assumed.
+
+The tag can be used as the switch in a conditional tag to display different things
+depending on whether the volume is being changed. It can produce neat effects
+when used with conditional viewports.
+
+Example: \config{\%?mv2.5{\textless}Volume changing{\textbar}\%pv{\textgreater}}
+
+The example above will display the text ``Volume changing'' if the volume is
+being changed and 2.5 secs after the volume button has been released. After
+that, it will display the volume value.
+
 \section{Images}
 \begin{table}
   \begin{tagmap}{}{}
