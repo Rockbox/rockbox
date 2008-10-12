@@ -76,26 +76,9 @@ typedef struct
 #define FLASH_BASE 0x02000000 // start of the flash memory
 #define FW_VERSION *(unsigned short*)(FLASH_BASE + 0xFE) // firmware version
 
-
 // prototypes
 void _main(void) __attribute__ ((section (".startup")));
 int main(void);
-void PlatformInit(void);
-void DramInit(void);
-int ucl_nrv2e_decompress_8(const UINT8 *src, UINT8 *dst, UINT32* dst_len);
-void DecompressStart(tImage* pImage);
-#ifdef USE_ADC
-int ReadADC(int channel);
-#endif
-int ButtonPressed(void);
-tImage* GetStartImage(int nPreferred);
-// test functions
-void SetLed(BOOL bOn);
-void UartInit(void);
-UINT8 UartRead(void);
-void UartWrite(UINT8 byte);
-void MiniMon(void);
-
 
 // minimon commands
 #define BAUDRATE       0x00 // followed by BRR value; response: command byte

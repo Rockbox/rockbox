@@ -44,7 +44,7 @@
 #include "usb.h"
 #include "powermgmt.h"
 
-void usb_screen(void)
+static void usb_screen(void)
 {
     lcd_clear_display();
     lcd_puts(0, 0, "USB mode");
@@ -55,7 +55,7 @@ void usb_screen(void)
     }
 }
 
-void show_logo(void)
+static void show_logo(void)
 {
     lcd_clear_display();
     lcd_puts(0, 0, "Rockbox");
@@ -64,13 +64,7 @@ void show_logo(void)
 }
 
 #if CONFIG_CHARGING
-/*
-bool backlight_get_on_when_charging(void)
-{
-    return false;
-}
-*/
-void charging_screen(void)
+static void charging_screen(void)
 {
     unsigned int button;
     const char* msg;
@@ -123,7 +117,7 @@ void charging_screen(void)
 #endif /* CONFIG_CHARGING */
 
 /* prompt user to plug USB and fix a problem */
-void prompt_usb(const char* msg1, const char* msg2)
+static void prompt_usb(const char* msg1, const char* msg2)
 {
     int button;
     lcd_clear_display();

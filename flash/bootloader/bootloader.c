@@ -27,6 +27,22 @@
 #include "sh7034.h"
 #include "bootloader.h"
 
+// prototypes
+static void PlatformInit(void);
+static int ucl_nrv2e_decompress_8(const UINT8 *src, UINT8 *dst, UINT32* dst_len);
+static void DecompressStart(tImage* pImage);
+#ifdef USE_ADC
+static int ReadADC(int channel);
+#endif
+static int ButtonPressed(void);
+static tImage* GetStartImage(int nPreferred);
+// test functions
+static void SetLed(BOOL bOn);
+static void UartInit(void);
+static UINT8 UartRead(void);
+static void UartWrite(UINT8 byte);
+static void MiniMon(void);
+
 
 #ifdef NO_ROM
 /* start with the vector table */
@@ -71,7 +87,7 @@ void _main(void)
 }
 
 
-void BootInit(void)
+static void BootInit(void)
 {
     /* inits from the boot ROM, whether they make sense or not */
     PBDR  &= 0xFFBF; /* LED off (0x131E) */
@@ -117,7 +133,7 @@ int main(void)
 
 
 /* init code that is specific to certain platform */
-void PlatformInit(void)
+static void PlatformInit(void)
 {
 #ifdef NO_ROM
     BootInit(); /* if not started by boot ROM, we need to init what it did */
@@ -177,7 +193,7 @@ void PlatformInit(void)
 #define GETBIT(bb, src, ilen) \
     (((bb = bb & 0x7f ? bb*2 : ((unsigned)src[ilen++]*2+1)) >> 8) & 1)
 
-int ucl_nrv2e_decompress_8(
+static int ucl_nrv2e_decompress_8(
     const UINT8 *src, UINT8 *dst, UINT32* dst_len)
 {
     UINT32 bb = 0;
@@ -239,7 +255,7 @@ int ucl_nrv2e_decompress_8(
 
 
 /* move the image into place and start it */
-void DecompressStart(tImage* pImage)
+static void DecompressStart(tImage* pImage)
 {
     UINT32* pSrc;
     UINT32* pDest;
@@ -273,7 +289,7 @@ void DecompressStart(tImage* pImage)
 }
 
 #ifdef USE_ADC
-int ReadADC(int channel)
+static int ReadADC(int channel)
 {
     /* after channel 3, the ports wrap and get re-used */
     volatile UINT16* pResult = (UINT16*)(ADDRAH_ADDR + 2 * (channel & 0x03));
@@ -289,7 +305,7 @@ int ReadADC(int channel)
 
 /* This function is platform-dependent,
  * until I figure out how to distinguish at runtime. */
-int ButtonPressed(void) /* return 1,2,3 for F1,F2,F3, 0 if none pressed */
+static int ButtonPressed(void) /* return 1,2,3 for F1,F2,F3, 0 if none pressed */
 {
 #ifdef USE_ADC
     int value = ReadADC(CHANNEL);
@@ -316,7 +332,7 @@ int ButtonPressed(void) /* return 1,2,3 for F1,F2,F3, 0 if none pressed */
 
 
 /* Determine the image to be started */
-tImage* GetStartImage(int nPreferred)
+static tImage* GetStartImage(int nPreferred)
 {
     tImage* pImage1;
     tImage* pImage2 = NULL; /* default to not present */
@@ -357,7 +373,7 @@ tImage* GetStartImage(int nPreferred)
 
 /* diagnostic functions */
 
-void SetLed(BOOL bOn)
+static void SetLed(BOOL bOn)
 {
     if (bOn)
         PBDR |= 0x0040;
@@ -366,7 +382,7 @@ void SetLed(BOOL bOn)
 }
 
 
-void UartInit(void)
+static void UartInit(void)
 {
     PBIOR &= 0xFBFF; /* input: RXD1 remote pin */
     PBCR1 |= 0x00A0; /* set PB11+PB10 to UART */
@@ -378,7 +394,7 @@ void UartInit(void)
 }
 
 
-UINT8 UartRead(void)
+static UINT8 UartRead(void)
 {
     UINT8 byte;
     while (!(SSR1 & SCI_RDRF)); /* wait for char to be available */
@@ -388,7 +404,7 @@ UINT8 UartRead(void)
 }
 
 
-void UartWrite(UINT8 byte)
+static void UartWrite(UINT8 byte)
 {
     while (!(SSR1 & SCI_TDRE)); /* wait for transmit buffer empty */
     TDR1 = byte;
@@ -397,7 +413,7 @@ void UartWrite(UINT8 byte)
 
 
 /* include the mini monitor as a rescue feature, started with F3 */
-void MiniMon(void)
+static void MiniMon(void)
 {
     UINT8 cmd;
     UINT32 addr;
