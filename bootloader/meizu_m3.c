@@ -106,15 +106,15 @@ void main(void)
     char mystring[64];
     int tmpval;
 
-    /* set clock to 200 MHz */
-    #if 0
+    /* set fclk = 200MHz, hclk = 100MHz, pclk = 50MHz, others off */
     CLKCON = 0x00800080;
-    CLKCON2= 0x00;
+    PLLCON = 0;
     PLL0PMS = 0x1ad200;
+    PLL0LCNT = 8100;
     PLLCON = 1;
     while (!(PLLLOCK & 1)) ;
-    CLKCON = 0x20802080;
-    #endif
+    CLKCON2= 0x80;
+    CLKCON = 0x20803180;
 
     /* mask all interrupts
        this is done, because the lcd framebuffer

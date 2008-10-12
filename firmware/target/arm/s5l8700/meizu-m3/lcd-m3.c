@@ -96,7 +96,7 @@ void lcd_on() {
 	lcd_sleep(70000);
 	lcd_writereg(0x7, 0x21);
 	lcd_writereg(0x12, 0x1137);
-	lcd_sleep(70000);
+	lcd_sleep(700000);
 	lcd_writereg(0x7, 0x233);
     }
 }
@@ -128,9 +128,9 @@ void lcd_init_device(void)
 
 /* detect lcd type */
     LCD_WCMD = 0x1;
-    lcd_sleep(16667);
+    lcd_sleep(166670);
     LCD_WCMD = 0x11;
-    lcd_sleep(20000);
+    lcd_sleep(2000040);
     lcd_readdata();
     LCD_WCMD = 0x4;
     lcd_sleep(100);
@@ -165,9 +165,9 @@ void lcd_init_device(void)
         LCD_WCMD = 0x0;
         LCD_WCMD = 0x0;
         LCD_WCMD = 0x0;
-        lcd_sleep(7000);
+        lcd_sleep(700000);
 	lcd_writereg(0xa4, 0x1);
-        lcd_sleep(11000);
+        lcd_sleep(1100000);
 	lcd_writereg(0x1, 0x100);
 	lcd_writereg(0x2, 0x300);
 	lcd_writereg(0x3, 0x9230);
@@ -227,7 +227,7 @@ void lcd_init_device(void)
 	lcd_writereg(0x9b, 0x300);
 	LCD_WCMD = 0x0;
 	LCD_WCMD = 0x22;
-	lcd_sleep(7000);
+	lcd_sleep(700000);
 	lcd_on();
     }
 }
@@ -291,7 +291,7 @@ void lcd_update(void)
         LCD_WDATA = RGB_UNPACK_RED(*p)<<3;
         LCD_WDATA = RGB_UNPACK_GREEN(*p)<<2;
         LCD_WDATA = RGB_UNPACK_BLUE(*p)<<3;
-        lcd_sleep(1); /* if data is sent too fast to lcdif, machine freezes */
+        lcd_sleep(3); /* if data is sent too fast to lcdif, machine freezes */
     }
 }
 
