@@ -345,9 +345,6 @@ static void gui_list_select_at_offset(struct gui_synclist * gui_list,
     }
     else if (gui_list->show_selection_marker == false)
     {
-        /* NOTE: this part doesnt work as well as it used to, the problem is
-                 we want to scroll the lists seperatly but we only have one
-                 selected item now, I dont think this is such a big deal though  */
         int i, nb_lines, screen_top;
         FOR_NB_SCREENS(i)
         {
@@ -363,12 +360,14 @@ static void gui_list_select_at_offset(struct gui_synclist * gui_list,
                 if (screen_top < 0)
                     screen_top = 0;
                 gui_list->start_item[i] = MIN(screen_top, gui_list->start_item[i] + 
-                                                          gui_list->selected_size);
+                                                gui_list->selected_size);
+                gui_list->selected_item = gui_list->start_item[i];
             }
             else
             {
                 gui_list->start_item[i] = MAX(0, gui_list->start_item[i] - 
-                                                 gui_list->selected_size);
+                                                    gui_list->selected_size);
+                gui_list->selected_item = gui_list->start_item[i] + nb_lines;
             }
         }
         return;
@@ -848,6 +847,7 @@ bool simplelist_show_list(struct simplelist_info *info)
     struct viewport vp[NB_SCREENS];
     int action, old_line_count = simplelist_line_count,i;
     char* (*getname)(int item, void * data, char *buffer, size_t buffer_len);
+    int wrap = LIST_WRAP_UNLESS_HELD;
     if (info->get_name)
         getname = info->get_name;
     else
@@ -866,7 +866,11 @@ bool simplelist_show_list(struct simplelist_info *info)
     if (info->get_talk)
         gui_synclist_set_voice_callback(&lists, info->get_talk);
     
-    gui_synclist_hide_selection_marker(&lists, info->hide_selection);
+    if (info->hide_selection)
+    {
+        gui_synclist_hide_selection_marker(&lists, true);
+        wrap = LIST_WRAP_OFF;
+    }
     
     if (info->action_callback)
         info->action_callback(ACTION_REDRAW, &lists);
@@ -885,7 +889,7 @@ bool simplelist_show_list(struct simplelist_info *info)
     {
         gui_syncstatusbar_draw(&statusbars, true);
         list_do_action(CONTEXT_STD, info->timeout,
-                       &lists, &action, LIST_WRAP_UNLESS_HELD);
+                       &lists, &action, wrap);
 
         /* We must yield in this case or no other thread can run */
         if (info->timeout == TIMEOUT_NOBLOCK)
