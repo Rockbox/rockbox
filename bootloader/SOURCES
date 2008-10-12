@@ -39,4 +39,7 @@ meizu_m3.c
 ondavx747.c
 #elif defined(CREATIVE_ZVx)
 creativezvm.c
+#elif defined(HAVE_AS3525)
+sansa_as3525.c
+show_logo.c
 #endif

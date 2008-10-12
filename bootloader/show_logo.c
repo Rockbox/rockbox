@@ -29,8 +29,12 @@
 int show_logo( void )
 {
     char boot_version[32];
-    
+
+#if LCD_WIDTH <= 128
+    snprintf(boot_version, sizeof(boot_version), "Boot %s", APPSVERSION);
+#else
     snprintf(boot_version, sizeof(boot_version), "Boot Ver. %s", APPSVERSION);
+#endif
 
     lcd_clear_display();
     lcd_bitmap(rockboxlogo, 0, 10, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);

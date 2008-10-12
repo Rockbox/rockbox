@@ -693,6 +693,7 @@ cat <<EOF
  32) 7                                           52) Sansa c200
  33) Cowon D2                                    53) Sansa m200
  34) M3/M3L                                      54) Sansa c100
+                                                 55) Sansa Clip
 
  ==Tatung==               ==Olympus==            ==Logik==
  60) Elio TPJ-1022        70) M:Robe 500         80) DAX 1GB MP3/DAB
@@ -721,6 +722,7 @@ fi
   ipodbitmaptools="$toolset scramble bmp2rb"
   gigabeatbitmaptools="$toolset scramble descramble bmp2rb"
   tccbitmaptools="$toolset scramble mktccboot bmp2rb"
+  ams3525bitmaptools="$toolset bmp2rb"
   # generic is used by IFP, H10, Sansa-e200
   genericbitmaptools="$toolset bmp2rb"
 
@@ -1674,6 +1676,25 @@ fi
     t_manufacturer="tcc77x"
     t_model="c100"
     ;;
+
+   55|Clip|clip)
+    target_id=50
+    modelname="clip"
+    target="-DSANSA_CLIP"
+    memory=1 # In fact, 0.3125
+    arm9tdmicc
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$bmp2rb_mono"
+    boottool="cp"
+    bootoutput="rockbox.bin"
+    appextra="recorder:gui"
+    plugins=""
+    toolset="$ams3525bitmaptools"
+    t_cpu="arm"
+    t_manufacturer="as3525"
+    t_model="clip"
+    ;;
+
 
    60|tpj1022)
     target_id=25

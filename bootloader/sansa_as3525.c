@@ -5,10 +5,13 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id:$
  *
- * Copyright (C) 2004 by Linus Nielsen Feltzing
+ * Copyright (C) 2008 by Rafaël Carré
  *
+ * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
+ * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -18,50 +21,38 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
+#include <stdio.h>
+#include <system.h>
+#include <inttypes.h>
+#include "lcd.h"
+#include "common.h"
 #include "config.h"
 
-#if CONFIG_CPU == SH7034
-#include "sh7034.h"
+int show_logo(void);
+void main(void)
+{
+    lcd_init_device();
+    lcd_clear_display();
+
+    lcd_update();
+
+    lcd_enable(true);
+
+    show_logo();
+
+#ifdef SANSA_CLIP
+    /* Use hardware scrolling */
+
+    lcd_write_command(0x26); /* scroll setup */
+    lcd_write_command(0x01); /* columns scrolled per step */
+    lcd_write_command(0x00); /* start page */
+    lcd_write_command(0x00); /* steps freqency */
+    lcd_write_command(0x07); /* end page (including) */
+
+    lcd_write_command(0x2F); /* start horizontal scrolling */
 #endif
-#if CONFIG_CPU == MCF5249
-#include "mcf5249.h"
-#endif
-#if CONFIG_CPU == MCF5250
-#include "mcf5250.h"
-#endif
-#if (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022)
-#include "pp5020.h"
-#endif
-#if CONFIG_CPU == PP5002
-#include "pp5002.h"
-#endif
-#if CONFIG_CPU == PP5024
-#include "pp5024.h"
-#endif
-#if CONFIG_CPU == PNX0101
-#include "pnx0101.h"
-#endif
-#if CONFIG_CPU == S3C2440
-#include "s3c2440.h"
-#endif
-#if CONFIG_CPU == DM320
-#include "dm320.h"
-#endif
-#if CONFIG_CPU == IMX31L
-#include "imx31l.h"
-#endif
-#ifdef CPU_TCC77X
-#include "tcc77x.h"
-#endif
-#ifdef CPU_TCC780X
-#include "tcc780x.h"
-#endif
-#if CONFIG_CPU == S5L8700
-#include "s5l8700.h"
-#endif
-#if CONFIG_CPU == JZ4732
-#include "jz4740.h"
-#endif
-#if CONFIG_CPU == AS3525
-#include "as3525.h"
-#endif
+
+    /* never returns */
+    while(1) ;
+}

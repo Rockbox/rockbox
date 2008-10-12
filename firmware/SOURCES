@@ -329,6 +329,14 @@ target/arm/i2c-telechips.c
 target/arm/pnx0101/system-pnx0101.c
 #endif
 
+#if CONFIG_CPU == AS3525
+target/arm/as3525/system-as3525.c
+#ifdef SANSA_CLIP
+target/arm/as3525/clip/lcd-ssd1303.c
+target/arm/as3525/clip/button-clip.c
+#endif
+#endif
+
 #if defined(CPU_PP)
 #if CONFIG_CPU == PP5002
 target/arm/system-pp5002.c

@@ -61,6 +61,7 @@
 #define TCC7801      7801
 #define S5L8700      8700
 #define JZ4732       4732
+#define AS3525       3525
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          1
@@ -97,6 +98,7 @@
 #define ONDAVX767_PAD      32
 #define MEIZU_M6SP_PAD     33
 #define MEIZU_M3_PAD       34
+#define SANSA_CLIP_PAD     35
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -141,6 +143,7 @@
 #define LCD_MEIZUM6  28 /* as used by the Meizu M6SP and M6SL (various models) */
 #define LCD_ONDAVX747 29 /* as used by the Onda VX747 */
 #define LCD_ONDAVX767 30 /* as used by the Onda VX767 */
+#define LCD_SSD1303   31 /* as used by the Sansa Clip */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -301,6 +304,8 @@
 #include "config-ondavx747.h"
 #elif defined(ONDA_VX767)
 #include "config-ondavx767.h"
+#elif defined(SANSA_CLIP)
+#include "config-clip.h"
 #else
 /* no known platform */
 #endif
@@ -450,7 +455,7 @@
 #define ARM_ARCH 6 /* ARMv6 */
 #endif
 
-#if defined(CPU_TCC77X) || defined(CPU_TCC780X) || (CONFIG_CPU == DM320)
+#if defined(CPU_TCC77X) || defined(CPU_TCC780X) || (CONFIG_CPU == DM320) || (CONFIG_CPU == AS3525)
 #define CPU_ARM
 #define ARM_ARCH 5 /* ARMv5 */
 #endif
