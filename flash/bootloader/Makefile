@@ -35,7 +35,7 @@ DEFINES= -DPLATFORM_$(PLATFORM)
 
 OBJDIR := .
 
-CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(DEFINES)
+CFLAGS = -Os -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(DEFINES)
 AFLAGS += -small -relax
 
 
