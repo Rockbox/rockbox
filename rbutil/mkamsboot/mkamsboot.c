@@ -140,6 +140,30 @@ static const int bootloader_sizes[] =
     0
 };
 
+/* Model names used in the Rockbox header in ".sansa" files - these match the
+   -add parameter to the "scramble" tool */
+static const char* rb_model_names[] =
+{
+    NULL,
+    "clip",
+    NULL,
+    "e2v2",
+    NULL,
+    NULL
+};
+
+/* Model numbers used to initialise the checksum in the Rockbox header in
+   ".sansa" files - these are the same as MODEL_NUMBER in config-target.h */
+static const int rb_model_num[] =
+{
+    0,
+    50,
+    0,
+    51,
+    0,
+    0
+};
+
 
 static off_t filesize(int fd) {
     struct stat buf;
@@ -157,6 +181,11 @@ static uint32_t get_uint32le(unsigned char* p)
     return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 }
 
+static uint32_t get_uint32be(unsigned char* p)
+{
+    return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
+}
+
 static void put_uint32le(unsigned char* p, uint32_t x)
 {
     p[0] = x & 0xff;
@@ -165,7 +194,7 @@ static void put_uint32le(unsigned char* p, uint32_t x)
     p[3] = (x >> 24) & 0xff;
 }
 
-static int calc_checksum(unsigned char* buf, uint32_t n)
+static uint32_t calc_checksum(unsigned char* buf, uint32_t n)
 {
     uint32_t sum = 0;
     uint32_t i;
@@ -264,6 +293,65 @@ static unsigned char* load_file(char* filename, off_t* bufsize)
 }
 
 
+static unsigned char* load_rockbox_file(char* filename, int model, off_t* bufsize)
+{
+    int fd;
+    unsigned char* buf;
+    unsigned char header[8];
+    uint32_t sum;
+    off_t n;
+    int i;
+
+    fd = open(filename, O_RDONLY|O_BINARY);
+    if (fd < 0)
+    {
+        fprintf(stderr,"[ERR]  Could not open %s for reading\n",filename);
+        return NULL;
+    }
+
+    /* Read Rockbox header */
+    n = read(fd, header, sizeof(header));
+    if (n != sizeof(header)) {
+        fprintf(stderr,"[ERR]  Could not read file %s\n",filename);
+        return NULL;
+    }
+
+    /* Check for correct model string */
+    if (memcmp(rb_model_names[model],header + 4,4)!=0) {
+        fprintf(stderr,"[ERR]  Model name \"%s\" not found in %s\n",
+                       rb_model_names[model],filename);
+    }
+
+    *bufsize = filesize(fd) - sizeof(header);
+
+    buf = malloc(*bufsize);
+    if (buf == NULL) {
+        fprintf(stderr,"[ERR]  Could not allocate memory for %s\n",filename);
+        return NULL;
+    }
+
+    n = read(fd, buf, *bufsize);
+
+    if (n != *bufsize) {
+        fprintf(stderr,"[ERR]  Could not read file %s\n",filename);
+        return NULL;
+    }
+
+    /* Check checksum */
+    sum = rb_model_num[model];
+    for (i = 0; i < *bufsize; i++) {
+         /* add 8 unsigned bits but keep a 32 bit sum */
+         sum += buf[i];
+    }
+
+    if (sum != get_uint32be(header)) {
+        fprintf(stderr,"[ERR]  Checksum mismatch in %s\n",filename);
+        return NULL;
+    }
+    return buf;
+}
+
+
 int main(int argc, char* argv[])
 {
     char *infile, *bootfile, *outfile;
@@ -299,13 +387,6 @@ int main(int argc, char* argv[])
     bootfile = argv[2];
     outfile = argv[3];
 
-    /* Load bootloader file */
-    rb_unpacked = load_file(bootfile, &bootloader_size);
-    if (rb_unpacked == NULL) {
-        fprintf(stderr,"[ERR]  Could not load %s\n",bootfile);
-        return 1;
-    }
-
     /* Load original firmware file */
     buf = load_file(infile, &len);
 
@@ -314,7 +395,12 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    /* TODO: Do some more sanity checks on the OF image - e.g. checksum */
+    /* TODO: Do some more sanity checks on the OF image */
+
+    if (get_uint32le(buf + len - 4) != calc_checksum(buf, len - 4)) {
+        fprintf(stderr,"[ERR]  Whole file checksum failed - %s\n",infile);
+        return 1;
+    }
 
     if (get_uint32le(&buf[0x204])==0x0000f000) {
         fw_version = 2;
@@ -335,6 +421,13 @@ int main(int argc, char* argv[])
         fprintf(stderr,"[ERR]  Unsupported model - \"%s\"\n",model_names[model]);
         free(buf);
         free(rb_unpacked);
+        return 1;
+    }
+
+    /* Load bootloader file */
+    rb_unpacked = load_rockbox_file(bootfile, model, &bootloader_size);
+    if (rb_unpacked == NULL) {
+        fprintf(stderr,"[ERR]  Could not load %s\n",bootfile);
         return 1;
     }
 

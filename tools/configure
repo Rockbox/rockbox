@@ -722,9 +722,10 @@ fi
   ipodbitmaptools="$toolset scramble bmp2rb"
   gigabeatbitmaptools="$toolset scramble descramble bmp2rb"
   tccbitmaptools="$toolset scramble mktccboot bmp2rb"
-  ams3525bitmaptools="$toolset bmp2rb"
-  # generic is used by IFP, H10, Sansa-e200
+  # generic is used by IFP, Meizu and Onda
   genericbitmaptools="$toolset bmp2rb"
+  # scramble is used by all other targets
+  scramblebitmaptools="$genericbitmaptools scramble"
 
 
   #  ---- For each target ----
@@ -1030,7 +1031,7 @@ fi
     bootoutput="H10_20GC.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$genericbitmaptools scramble"
+    toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="iriver"
@@ -1054,7 +1055,7 @@ fi
     bootoutput="H10.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$genericbitmaptools scramble"
+    toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="iriver"
@@ -1449,7 +1450,7 @@ fi
     bootoutput="pp5020.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$genericbitmaptools scramble"
+    toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="olympus"
@@ -1572,7 +1573,7 @@ fi
     bootoutput="PP5022.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$genericbitmaptools scramble"
+    toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="sandisk"
@@ -1599,7 +1600,7 @@ fi
     bootoutput="pp5022.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$genericbitmaptools scramble"
+    toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="sandisk"
@@ -1623,7 +1624,7 @@ fi
     bootoutput="firmware.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$genericbitmaptools scramble"
+    toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="sandisk"
@@ -1685,11 +1686,12 @@ fi
     arm9tdmicc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"
-    boottool="cp"
-    bootoutput="rockbox.bin"
+    tool="$rootdir/tools/scramble -add=clip"
+    output="rockbox.sansa"
+    bootoutput="bootloader-clip.sansa"
     appextra="recorder:gui"
     plugins=""
-    toolset="$ams3525bitmaptools"
+    toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-clip"
@@ -1713,7 +1715,7 @@ fi
     bootoutput="pp5020.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$genericbitmaptools scramble"
+    toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="tatung"
@@ -1737,7 +1739,7 @@ fi
     bootoutput="FWImage.ebn"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$genericbitmaptools scramble"
+    toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="philips"
@@ -1761,7 +1763,7 @@ fi
     bootoutput="FWImage.ebn"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$genericbitmaptools scramble"
+    toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="philips"
