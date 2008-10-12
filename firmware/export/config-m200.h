@@ -90,8 +90,8 @@
 
 #ifndef SIMULATOR
 
-/* Define this if you have a TCC773L */
-#define CONFIG_CPU TCC773L
+/* Define this if you have a TCC770 */
+#define CONFIG_CPU TCC770
 
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
@@ -99,18 +99,11 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ      120000000
 
-/* Offset ( in the firmware file's header ) to the file length */
-#define FIRMWARE_OFFSET_FILE_LENGTH 0
-
 /* Offset ( in the firmware file's header ) to the file CRC */
-#define FIRMWARE_OFFSET_FILE_CRC 4
+#define FIRMWARE_OFFSET_FILE_CRC 0
 
 /* Offset ( in the firmware file's header ) to the real data */
-#define FIRMWARE_OFFSET_FILE_DATA 6
-
-/* The start address index for ROM builds */
-/* #define ROM_START 0x11010 for behind original Archos */
-#define ROM_START 0x7010 /* for behind BootBox */
+#define FIRMWARE_OFFSET_FILE_DATA 8
 
 /* Software controlled LED */
 #define CONFIG_LED LED_VIRTUAL

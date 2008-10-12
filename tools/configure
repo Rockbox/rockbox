@@ -1635,7 +1635,7 @@ fi
     target_id=48
     modelname="m200"
     target="-DSANSA_M200"
-    memory=2 # always
+    memory=1 # always
     arm946cc
     tool="$rootdir/tools/scramble -add=m200"
     boottool="$rootdir/tools/scramble -tcc=crc"
