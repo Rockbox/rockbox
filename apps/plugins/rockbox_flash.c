@@ -30,7 +30,7 @@ PLUGIN_HEADER
 /* define DUMMY if you only want to "play" with the UI, does no harm */
 /* #define DUMMY */
 
-#define LATEST_BOOTLOADER_VERSION 1 /* update this with the bootloader */
+#define LATEST_BOOTLOADER_VERSION 2 /* update this with the bootloader */
 
 #ifndef UINT8
 #define UINT8 unsigned char
@@ -939,7 +939,7 @@ void DoUserDialog(char* filename)
             rb->lcd_puts_scroll(0, 1, "File invalid. Blocksize too small?");
             break;
     case eBadRomLink:
-            rb->lcd_puts_scroll(0, 1, "BootBox mismatch");
+            rb->lcd_puts_scroll(0, 1, "RomBox mismatch.");
             break;
     default:
             rb->lcd_puts_scroll(0, 1, "Check failed.");

@@ -75,8 +75,7 @@
 #define FIRMWARE_OFFSET_FILE_DATA 6
 
 /* The start address index for ROM builds */
-/* #define ROM_START 0xD010 for behind original Archos */
-#define ROM_START 0x6010 /* for behind BootBox */
+#define ROM_START 0x7010 /* for behind BootBox */
 
 /* Software controlled LED */
 #define CONFIG_LED LED_REAL
