@@ -258,7 +258,7 @@ void print_usage(void)
 int main(int argc, char* argv[])
 {
     char* buf;
-    int n,len;
+    int n,len,padded_len;
     int fd;
     int device;
 
@@ -306,7 +306,10 @@ int main(int argc, char* argv[])
         return 5;
     }
 
-    buf = malloc(len);
+    /* Round len up to multiple of PACKET_SIZE */
+    padded_len = (len + PACKET_SIZE) & ~(PACKET_SIZE-1);
+
+    buf = malloc(padded_len);
     if (buf == NULL)
     {
         printf("[ERR]  Could not allocate memory.\n");
@@ -323,7 +326,7 @@ int main(int argc, char* argv[])
     }
     close(fd);
 
-    do_patching(device, buf, len);
+    do_patching(device, buf, padded_len);
 
     return 0;
 }
