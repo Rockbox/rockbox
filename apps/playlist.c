@@ -136,8 +136,6 @@
 #define PLAYLIST_QUEUED                 0x20000000
 #define PLAYLIST_SKIPPED                0x10000000
 
-#define PLAYLIST_DISPLAY_COUNT          10
-
 struct directory_search_context {
     struct playlist_info* playlist;
     int position;
@@ -2040,7 +2038,7 @@ int playlist_resume(void)
         for(count=0; count<nread && !exit_loop && !useraborted; count++,p++)
         {
             /* So a splash while we are loading. */
-            if (current_tick - last_tick > HZ/4)
+            if (TIME_AFTER(current_tick, last_tick + HZ/4))
             {
                 splashf(0, str(LANG_LOADING_PERCENT), 
                            (total_read+count)*100/control_file_size,

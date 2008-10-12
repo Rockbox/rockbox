@@ -32,6 +32,8 @@
 #define PLAYLIST_ATTR_SKIPPED   0x04
 #define PLAYLIST_MAX_CACHE      16
 
+#define PLAYLIST_DISPLAY_COUNT  10
+
 #define DEFAULT_DYNAMIC_PLAYLIST_NAME "/dynamic.m3u8"
 
 enum playlist_command {

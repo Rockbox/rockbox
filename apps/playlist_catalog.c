@@ -46,7 +46,6 @@
 #include "talk.h"
 
 #define MAX_PLAYLISTS 400
-#define PLAYLIST_DISPLAY_COUNT 10
 
 /* Use for recursive directory search */
 struct add_track_context {
