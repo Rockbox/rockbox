@@ -26,21 +26,30 @@
 
 #include "rockboxlogo.h"
 
-int show_logo( void )
-{
-    char boot_version[32];
-
 #if LCD_WIDTH <= 128
-    snprintf(boot_version, sizeof(boot_version), "Boot %s", APPSVERSION);
+#define BOOT_VERSION ("Boot " APPSVERSION)
 #else
-    snprintf(boot_version, sizeof(boot_version), "Boot Ver. %s", APPSVERSION);
+#define BOOT_VERSION ("Boot Ver. " APPSVERSION)
 #endif
 
+/* Ensure TEXT_XPOS is >= 0 */
+#define TEXT_WIDTH ((sizeof(BOOT_VERSION)-1)*SYSFONT_WIDTH)
+#define TEXT_XPOS ((TEXT_WIDTH > LCD_WIDTH) ? 0 : ((LCD_WIDTH - TEXT_WIDTH) / 2))
+
+int show_logo( void )
+{
     lcd_clear_display();
-    lcd_bitmap(rockboxlogo, 0, 10, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
     lcd_setfont(FONT_SYSFIXED);
-    lcd_putsxy((LCD_WIDTH/2) - ((strlen(boot_version)*SYSFONT_WIDTH)/2),
-               LCD_HEIGHT-SYSFONT_HEIGHT, (unsigned char *)boot_version);
+
+#ifdef SANSA_CLIP
+    /* The top 16 lines of the Sansa Clip screen are yellow, and the bottom 48 
+       are blue, so we reverse the usual positioning */
+    lcd_putsxy(TEXT_XPOS, 0, BOOT_VERSION);
+    lcd_bitmap(rockboxlogo, 0, 16, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
+#else
+    lcd_bitmap(rockboxlogo, 0, 10, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
+    lcd_putsxy(TEXT_XPOS, LCD_HEIGHT-SYSFONT_HEIGHT, BOOT_VERSION);
+#endif
 
     lcd_update();
     
