@@ -1122,7 +1122,7 @@ void sys_poweroff(void)
 #if (defined(IAUDIO_X5) || defined(IAUDIO_M5)) && !defined (SIMULATOR)
         pcf50606_reset_timeout(); /* Reset timer on first attempt only */
 #endif
-#ifdef HAVE_RECORDING
+#if defined(HAVE_RECORDING) && !defined(BOOTLOADER)
         if (audio_status() & AUDIO_STATUS_RECORD)
             shutdown_timeout += HZ*8;
 #endif
