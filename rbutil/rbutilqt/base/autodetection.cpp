@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 
+#include <QtCore>
 #include "autodetection.h"
 
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2008 by Dominik Riebeling
- *   $Id:$
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,28 +17,41 @@
  *
  ****************************************************************************/
 
+#ifndef BOOTLOADERINSTALLHEX_H
+#define BOOTLOADERINSTALLHEX_H
+
 #include <QtCore>
-#include "progressloggerinterface.h"
 #include "bootloaderinstallbase.h"
 
 
-// mi4 bootloader file based installation.
-// Puts the bootloader file to the correct location and
-// renames the OF to OF.mi4.
-class BootloaderInstallMi4 : public BootloaderInstallBase
+// bootloader installation derivate based on fwpatcher
+// This will patch a given hex file using (de)scramble / mkboot
+// and put it on the player.
+class BootloaderInstallHex : public BootloaderInstallBase
 {
     Q_OBJECT
 
     public:
-        BootloaderInstallMi4(QObject *parent = 0);
+        BootloaderInstallHex(QObject *parent = 0);
         bool install(void);
         bool uninstall(void);
         BootloaderInstallBase::BootloaderType installed(void);
         Capabilities capabilities(void);
 
-    private slots:
-        void installStage2(void);
+        void setHexfile(QString h)
+            { m_hex = h; }
 
     private:
+        QString m_hex;
+        int m_hashindex;
+        int m_model;
+        QTemporaryFile m_descrambled;
+        QString scrambleError(int);
+
+    private slots:
+        void installStage2(void);
 };
+
+
+#endif
 

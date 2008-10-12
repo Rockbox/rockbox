@@ -46,7 +46,7 @@ QMAKE_EXTRA_TARGETS += lrelease
 SOURCES += rbutilqt.cpp \
            main.cpp \
  install.cpp \
- httpget.cpp \
+ base/httpget.cpp \
  configure.cpp \
  zip/zip.cpp \
  zip/unzip.cpp \
@@ -54,14 +54,14 @@ SOURCES += rbutilqt.cpp \
  progressloggergui.cpp \
  installtalkwindow.cpp \
  talkfile.cpp \
- autodetection.cpp \
+ base/autodetection.cpp \
  ../ipodpatcher/ipodpatcher.c \
  ../sansapatcher/sansapatcher.c \
  browsedirtree.cpp \
  installthemes.cpp \
  uninstall.cpp \
  uninstallwindow.cpp \
- utils.cpp \
+ base/utils.cpp \
  preview.cpp \
  encoders.cpp \
  encodersgui.cpp \
@@ -72,22 +72,22 @@ SOURCES += rbutilqt.cpp \
  voicefile.cpp \
  createvoicewindow.cpp \
  rbsettings.cpp \
- rbunzip.cpp \
- rbzip.cpp \
+ base/rbunzip.cpp \
+ base/rbzip.cpp \
  detect.cpp \
  sysinfo.cpp \
- bootloaderinstallbase.cpp \
- bootloaderinstallmi4.cpp \
- bootloaderinstallhex.cpp \
- bootloaderinstallipod.cpp \
- bootloaderinstallsansa.cpp \
- bootloaderinstallfile.cpp \
+ base/bootloaderinstallbase.cpp \
+ base/bootloaderinstallmi4.cpp \
+ base/bootloaderinstallhex.cpp \
+ base/bootloaderinstallipod.cpp \
+ base/bootloaderinstallsansa.cpp \
+ base/bootloaderinstallfile.cpp \
  ../../tools/mkboot.c \
  ../../tools/iriver.c
 
 HEADERS += rbutilqt.h \
  install.h \
- httpget.h \
+ base/httpget.h \
  configure.h \
  zip/zip.h \
  zip/unzip.h \
@@ -98,7 +98,7 @@ HEADERS += rbutilqt.h \
  installzip.h \
  installtalkwindow.h \
  talkfile.h \
- autodetection.h \
+ base/autodetection.h \
  progressloggerinterface.h \
  progressloggergui.h \
  ../ipodpatcher/ipodpatcher.h \
@@ -113,7 +113,7 @@ HEADERS += rbutilqt.h \
  installthemes.h \
  uninstall.h \
  uninstallwindow.h \
- utils.h \
+ base/utils.h \
  preview.h \
  encoders.h \
  encodersgui.h \
@@ -124,21 +124,22 @@ HEADERS += rbutilqt.h \
  voicefile.h \
  createvoicewindow.h \
  rbsettings.h \
- rbunzip.h \
- rbzip.h \
+ base/rbunzip.h \
+ base/rbzip.h \
  sysinfo.h \
  detect.h \
- bootloaderinstallbase.h \
- bootloaderinstallmi4.h \
- bootloaderinstallhex.h \
- bootloaderinstallipod.h \
- bootloaderinstallsansa.h \
- bootloaderinstallfile.h \
+ base/bootloaderinstallbase.h \
+ base/bootloaderinstallmi4.h \
+ base/bootloaderinstallhex.h \
+ base/bootloaderinstallipod.h \
+ base/bootloaderinstallsansa.h \
+ base/bootloaderinstallfile.h \
  ../../tools/mkboot.h \
  ../../tools/iriver.h
 
 # Needed by QT on Win
 INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher ../../tools/rbspeex ../../tools
+INCLUDEPATH += base
 
 LIBS += -L../../tools/rbspeex -lrbspeex
 

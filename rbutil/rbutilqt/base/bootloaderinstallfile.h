@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2008 by Dominik Riebeling
- *   $Id:$
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,22 +17,20 @@
  *
  ****************************************************************************/
 
-#ifndef BOOTLOADERINSTALLIPOD_H
-#define BOOTLOADERINSTALLIPOD_H
-
 #include <QtCore>
+#include "progressloggerinterface.h"
 #include "bootloaderinstallbase.h"
-#include "../ipodpatcher/ipodpatcher.h"
 
-// installer class derivate for Ipod installation
-// based on ipodpatcher.
-class BootloaderInstallIpod : public BootloaderInstallBase
+//! install a bootloader by putting a single file on the player.
+//  This installation method is used by Iaudio (firmware is flashed
+//  automatically) and Gigabeat (Firmware is a file, OF needs to get
+//  renamed).
+class BootloaderInstallFile : public BootloaderInstallBase
 {
     Q_OBJECT
 
     public:
-        BootloaderInstallIpod(QObject *parent = 0);
-        ~BootloaderInstallIpod();
+        BootloaderInstallFile(QObject *parent = 0);
         bool install(void);
         bool uninstall(void);
         BootloaderInstallBase::BootloaderType installed(void);
@@ -42,9 +40,5 @@ class BootloaderInstallIpod : public BootloaderInstallBase
         void installStage2(void);
 
     private:
-        bool ipodInitialize(struct ipod_t *);
 };
-
-
-#endif
 

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2008 by Dominik Riebeling
- *   $Id:$
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,39 +17,32 @@
  *
  ****************************************************************************/
 
-#ifndef BOOTLOADERINSTALLHEX_H
-#define BOOTLOADERINSTALLHEX_H
+#ifndef BOOTLOADERINSTALLIPOD_H
+#define BOOTLOADERINSTALLIPOD_H
 
 #include <QtCore>
 #include "bootloaderinstallbase.h"
+#include "../ipodpatcher/ipodpatcher.h"
 
-
-// bootloader installation derivate based on fwpatcher
-// This will patch a given hex file using (de)scramble / mkboot
-// and put it on the player.
-class BootloaderInstallHex : public BootloaderInstallBase
+// installer class derivate for Ipod installation
+// based on ipodpatcher.
+class BootloaderInstallIpod : public BootloaderInstallBase
 {
     Q_OBJECT
 
     public:
-        BootloaderInstallHex(QObject *parent = 0);
+        BootloaderInstallIpod(QObject *parent = 0);
+        ~BootloaderInstallIpod();
         bool install(void);
         bool uninstall(void);
         BootloaderInstallBase::BootloaderType installed(void);
         Capabilities capabilities(void);
 
-        void setHexfile(QString h)
-            { m_hex = h; }
-
-    private:
-        QString m_hex;
-        int m_hashindex;
-        int m_model;
-        QTemporaryFile m_descrambled;
-        QString scrambleError(int);
-
     private slots:
         void installStage2(void);
+
+    private:
+        bool ipodInitialize(struct ipod_t *);
 };
 
 

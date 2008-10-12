@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2008 by Dominik Riebeling
- *   $Id:$
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,32 +17,28 @@
  *
  ****************************************************************************/
 
-#ifndef BOOTLOADERINSTALLSANSA_H
-#define BOOTLOADERINSTALLSANSA_H
-
 #include <QtCore>
+#include "progressloggerinterface.h"
 #include "bootloaderinstallbase.h"
 
 
-// bootloader installation class for devices handled by sansapatcher.
-class BootloaderInstallSansa : public BootloaderInstallBase
+// mi4 bootloader file based installation.
+// Puts the bootloader file to the correct location and
+// renames the OF to OF.mi4.
+class BootloaderInstallMi4 : public BootloaderInstallBase
 {
     Q_OBJECT
 
     public:
-        BootloaderInstallSansa(QObject *parent = 0);
-        ~BootloaderInstallSansa();
+        BootloaderInstallMi4(QObject *parent = 0);
         bool install(void);
         bool uninstall(void);
         BootloaderInstallBase::BootloaderType installed(void);
         Capabilities capabilities(void);
 
-    private:
-
     private slots:
         void installStage2(void);
+
+    private:
 };
-
-
-#endif
 
