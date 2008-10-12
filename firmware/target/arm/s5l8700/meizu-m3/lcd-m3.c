@@ -288,9 +288,9 @@ void lcd_update(void)
 	LCD_WCMD = 0x22;
     }
     for(p=&lcd_framebuffer[0][0], i=0;i<LCD_WIDTH*LCD_FBHEIGHT;++i, ++p) {
-        LCD_WDATA = RGB_UNPACK_RED(*p)<<3;
-        LCD_WDATA = RGB_UNPACK_GREEN(*p)<<2;
-        LCD_WDATA = RGB_UNPACK_BLUE(*p)<<3;
+        LCD_WDATA = RGB_UNPACK_RED(*p);
+        LCD_WDATA = RGB_UNPACK_GREEN(*p);
+        LCD_WDATA = RGB_UNPACK_BLUE(*p);
         lcd_sleep(3); /* if data is sent too fast to lcdif, machine freezes */
     }
 }
