@@ -154,7 +154,7 @@ int upload_app(usb_dev_handle* dh, int device, char* p, int len)
 
 /* The main function */
 
-void do_patching(int device, char* buf, int len)
+int do_patching(int device, char* buf, int len)
 {
     struct usb_bus *busses;
     struct usb_bus *bus;
@@ -168,12 +168,12 @@ void do_patching(int device, char* buf, int len)
     usb_init();
     if(usb_find_busses() < 0) {
         fprintf(stderr, "[ERR]  Could not find any USB busses.\n");
-        return;
+        return -1;
     }
 
     if (usb_find_devices() < 0) {
         fprintf(stderr, "[ERR]  USB devices not found(nor hubs!).\n");
-        return;
+        return -1;
     }
 
     /* C calling convention, it's not nice to use global stuff */
@@ -195,13 +195,13 @@ void do_patching(int device, char* buf, int len)
     if (dev == NULL) {
         fprintf(stderr, "[ERR]  TCC device not found.\n");
         fprintf(stderr, "[ERR]  Ensure your TCC device is in USB boot mode and run tcctool again.\n");
-        return;
+        return -1;
     }
 
 found:
     if ( (dh = usb_open(dev)) == NULL) {
         fprintf(stderr,"[ERR]  Unable to open TCC device.\n");
-        return;
+        return -1;
     }
 
     err = usb_set_configuration(dh, 1);
@@ -209,7 +209,7 @@ found:
     if (err < 0)  {
         fprintf(stderr, "[ERR]  usb_set_configuration failed (%d)\n", err);
         usb_close(dh);
-        return;
+        return -1;
     }
 
     /* "must be called" written in the libusb documentation */
@@ -217,14 +217,14 @@ found:
     if (err < 0) {
         fprintf(stderr, "[ERR]  Unable to claim interface (%d)\n", err);
         usb_close(dh);
-        return;
+        return -1;
     }
 
     fprintf(stderr,"[INFO] Found TCC device, uploading application.\n");
 
     /* Now we can transfer the application to the device. */ 
 
-    if (upload_app(dh, device, buf, len) < 0)
+    if ( (err = upload_app(dh, device, buf, len)) < 0)
     {
         fprintf(stderr,"[ERR]  Upload of application failed.\n");
     }
@@ -235,8 +235,9 @@ found:
 
     /* release claimed interface */
     usb_release_interface(dh, dev->config->interface->altsetting->bInterfaceNumber);
-
     usb_close(dh);
+
+    return err < 0 ? -1: 0;
 }
 
 off_t filesize(int fd) {
@@ -326,7 +327,10 @@ int main(int argc, char* argv[])
     }
     close(fd);
 
-    do_patching(device, buf, padded_len);
+    if (do_patching(device, buf, padded_len))
+    {
+        return 8;
+    }
 
     return 0;
 }
