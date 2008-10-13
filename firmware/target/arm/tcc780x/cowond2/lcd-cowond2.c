@@ -73,24 +73,36 @@ void lcd_set_contrast(int val)
 
 /* LTV250QV panel functions */
 
+/* Delay loop based on CPU frequency (FREQ>>23 is 3..22 for 32MHz..192MHz) */
+static void delay_loop(void)
+{
+    unsigned long x;
+    for (x = (unsigned)(FREQ>>23); x; x--);
+}
+#define DELAY delay_loop()
+
 static void ltv250qv_write(unsigned int command)
 {
     int i;
     
     GPIOA_CLEAR = LTV250QV_CS;
+    DELAY;
 
     for (i = 23; i >= 0; i--)
     {
       GPIOA_CLEAR = LTV250QV_SCL;
+      DELAY;
 
       if ((command>>i) & 1)
         GPIOA_SET = LTV250QV_SDI;
       else
         GPIOA_CLEAR = LTV250QV_SDI;
       
+      DELAY;
       GPIOA_SET = LTV250QV_SCL;
     }
 
+    DELAY;
     GPIOA_SET = LTV250QV_CS;
 }
 
@@ -162,7 +174,7 @@ static void lcd_display_on(void)
     lcd_write_reg(3,  0xE100);
     lcd_write_reg(4,  0x1000);
     lcd_write_reg(5,  0x5033);
-    lcd_write_reg(6,  0x4);
+    lcd_write_reg(6,  0x2);     /* vertical back porch adjusted from 0x4 in OF */
     lcd_write_reg(7,  0x30);
     lcd_write_reg(8,  0x41C);
     lcd_write_reg(16, 0x207);
