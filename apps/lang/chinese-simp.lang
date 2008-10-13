@@ -97,7 +97,7 @@
     *: "Loading..."
   </source>
   <dest>
-    *: "读取..."
+    *: "读取中..."
   </dest>
   <voice>
     *: "读取中"
@@ -128,7 +128,7 @@
     *: "Shutting down..."
   </source>
   <dest>
-    *: "关机..."
+    *: "关机中..."
   </dest>
   <voice>
     *: "关机中"
@@ -204,10 +204,10 @@
     *: "Sound Settings"
   </source>
   <dest>
-    *: "声音设置"
+    *: "音频设置"
   </dest>
   <voice>
-    *: "声音设置"
+    *: "音频设置"
   </voice>
 </phrase>
 <phrase>
@@ -232,10 +232,10 @@
     *: "Manage Settings"
   </source>
   <dest>
-    *: "管理设置"
+    *: "设置管理"
   </dest>
   <voice>
-    *: "管理设置"
+    *: "设置管理"
   </voice>
 </phrase>
 <phrase>
@@ -426,7 +426,7 @@
     *: "单声道(左)"
   </dest>
   <voice>
-    *: "单声道 左"
+    *: "单声道 左边"
   </voice>
 </phrase>
 <phrase>
@@ -440,7 +440,7 @@
     *: "单声道(右)"
   </dest>
   <voice>
-    *: "单声道 右"
+    *: "单声道 右边"
   </voice>
 </phrase>
 <phrase>
@@ -736,10 +736,10 @@
     *: "Language"
   </source>
   <dest>
-    *: "语言设置"
+    *: "语言"
   </dest>
   <voice>
-    *: "语言设置"
+    *: "语言"
   </voice>
 </phrase>
 <phrase>
@@ -907,11 +907,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "进阶均衡器设置"
+    swcodec: "高级均衡器设置"
   </dest>
   <voice>
     *: none
-    swcodec: "进阶均衡器设置"
+    swcodec: "高级均衡器设置"
   </voice>
 </phrase>
 <phrase>
@@ -979,7 +979,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "%d频段增益"
+    swcodec: "%d赫兹频段增益"
   </voice>
 </phrase>
 <phrase>
@@ -1148,10 +1148,10 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "动态播放列表擦除前警告"
+    *: "确认删除动态播放列表"
   </dest>
   <voice>
-    *: "动态播放列表擦除前警告"
+    *: "确认删除动态播放列表"
   </voice>
 </phrase>
 <phrase>
@@ -1491,10 +1491,10 @@
     *: "Database"
   </source>
   <dest>
-    *: "标签数据库"
+    *: "媒体库"
   </dest>
   <voice>
-    *: "标签数据库"
+    *: "媒体库"
   </voice>
 </phrase>
 <phrase>
@@ -1564,10 +1564,10 @@
     *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "搜集运行时数据"
+    *: "收集运行数据"
   </dest>
   <voice>
-    *: "搜集运行时数据"
+    *: "收集运行数据"
   </voice>
 </phrase>
 <phrase>
@@ -1662,10 +1662,10 @@
     *: "By Type"
   </source>
   <dest>
-    *: "按类型"
+    *: "按文件类型"
   </dest>
   <voice>
-    *: "按类型"
+    *: "按文件类型"
   </voice>
 </phrase>
 <phrase>
@@ -1676,10 +1676,10 @@
     *: "Show Files"
   </source>
   <dest>
-    *: "显示文件"
+    *: "文件显示"
   </dest>
   <voice>
-    *: "显示文件"
+    *: "文件显示"
   </voice>
 </phrase>
 <phrase>
@@ -2284,10 +2284,10 @@
     *: "Maintain a List of Recent Bookmarks?"
   </source>
   <dest>
-    *: "维护最近书签列表?"
+    *: "维护最近书签列表"
   </dest>
   <voice>
-    *: "维护最近书签列表吗"
+    *: "是否维护最近书签列表"
   </voice>
 </phrase>
 <phrase>
@@ -2312,10 +2312,10 @@
     *: "Voice Menus"
   </source>
   <dest>
-    *: "语音选单"
+    *: "读出菜单项目"
   </dest>
   <voice>
-    *: "语音选单"
+    *: "读出菜单项目"
   </voice>
 </phrase>
 <phrase>
@@ -2326,10 +2326,10 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "语音目录"
+    *: "读出目录名"
   </dest>
   <voice>
-    *: "语音目录"
+    *: "读出目录名"
   </voice>
 </phrase>
 <phrase>
@@ -2340,10 +2340,10 @@
     *: "Voice Filenames"
   </source>
   <dest>
-    *: "语音文件名"
+    *: "读出文件名"
   </dest>
   <voice>
-    *: "语音文件名"
+    *: "读出文件名"
   </voice>
 </phrase>
 <phrase>
@@ -2939,7 +2939,7 @@
   </dest>
   <voice>
     *: none
-    charging: "背光 使用外部电源时"
+    charging: "使用外部电源时的背光"
   </voice>
 </phrase>
 <phrase>
@@ -2950,10 +2950,10 @@
     *: "Caption Backlight"
   </source>
   <dest>
-    *: "曲目切换时的背光"
+    *: "曲目切换时开启背光"
   </dest>
   <voice>
-    *: "曲目切换时的背光"
+    *: "曲目切换时开启背光"
   </voice>
 </phrase>
 <phrase>
@@ -3000,11 +3000,11 @@
   </source>
   <dest>
     *: none
-    backlight_brightness: "亮度"
+    backlight_brightness: "背光亮度"
   </dest>
   <voice>
     *: none
-    backlight_brightness: "亮度"
+    backlight_brightness: "背光亮度"
   </voice>
 </phrase>
 <phrase>
@@ -3096,11 +3096,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "项目选择条类型"
+    lcd_bitmap: "选择条类型"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "项目选择条类型"
+    lcd_bitmap: "选择条类型"
   </voice>
 </phrase>
 <phrase>
@@ -3258,10 +3258,10 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "滚动开始时滞"
+    *: "滚动启动延迟"
   </dest>
   <voice>
-    *: "滚动开始时滞"
+    *: "滚动启动延迟"
   </voice>
 </phrase>
 <phrase>
@@ -3300,10 +3300,10 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "双向滚动限制"
+    *: "双向滚动上限"
   </dest>
   <voice>
-    *: "双向滚动限制"
+    *: "双向滚动上限"
   </voice>
 </phrase>
 <phrase>
@@ -3356,10 +3356,10 @@
     *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: "屏幕范围外滚动"
+    *: "允许屏幕滚动"
   </dest>
   <voice>
-    *: "屏幕范围外滚动"
+    *: "允许屏幕滚动"
   </voice>
 </phrase>
 <phrase>
@@ -3384,10 +3384,10 @@
     *: "Paged Scrolling"
   </source>
   <dest>
-    *: "页滚动"
+    *: "翻页滚动"
   </dest>
   <voice>
-    *: "页滚动"
+    *: "翻页滚动"
   </voice>
 </phrase>
 <phrase>
@@ -3600,11 +3600,11 @@
     masd: none
   </source>
   <dest>
-    *: "范围坐标"
+    *: "标尺类型"
     masd: none
   </dest>
   <voice>
-    *: "范围坐标"
+    *: "标尺类型"
     masd: none
   </voice>
 </phrase>
@@ -3651,11 +3651,11 @@
     masd: none
   </source>
   <dest>
-    *: "范围最小值"
+    *: "量程最小值"
     masd: none
   </dest>
   <voice>
-    *: "范围最小值"
+    *: "量程最小值"
     masd: none
   </voice>
 </phrase>
@@ -3668,11 +3668,11 @@
     masd: none
   </source>
   <dest>
-    *: "范围最大值"
+    *: "量程最大值"
     masd: none
   </dest>
   <voice>
-    *: "范围最大值"
+    *: "量程最大值"
     masd: none
   </voice>
 </phrase>
@@ -4274,7 +4274,7 @@
     *: "Searching... %d found (%s)"
   </source>
   <dest>
-    *: "寻找...%d已找到(%s)"
+    *: "寻找中...已找到%d个(%s)"
   </dest>
   <voice>
     *: ""
@@ -4316,10 +4316,10 @@
     *: "Rockbox Info"
   </source>
   <dest>
-    *: "Rockbox信息:"
+    *: "Rockbox信息"
   </dest>
   <voice>
-    *: "Rockbox信息如下"
+    *: "Rockbox信息"
   </voice>
 </phrase>
 <phrase>
@@ -4383,12 +4383,12 @@
     h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "电量:%d%% %dh %dm"
+    *: "剩余电量:%d%% %dh %dm"
     player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
     h10,ipodmini,ipodmini2g: "电量:%d%% %dh %dm"
   </dest>
   <voice>
-    *: "电量"
+    *: "剩余电量"
   </voice>
 </phrase>
 <phrase>
@@ -4399,7 +4399,7 @@
     *: "Disk:"
   </source>
   <dest>
-    *: "磁盘:"
+    *: "磁盘大小:"
   </dest>
   <voice>
     *: "磁盘大小为"
@@ -4442,16 +4442,19 @@
   user: 
   <source>
     *: none
+    multivolume: "HD1"
     e200,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
+    multivolume: "磁盘1"
     e200,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
+    multivolume: "磁盘1"
     e200,c200: "mSD卡"
     ondio*: "MMC卡"
   </voice>
@@ -4809,11 +4812,11 @@
   </source>
   <dest>
     *: none
-    alarm: "闹铃时长:%d:%02d"
+    alarm: "离闹铃响起还有:%d:%02d"
   </dest>
   <voice>
     *: none
-    alarm: "闹铃时长是%d:%02d"
+    alarm: "离闹铃响起还有%d:%02d"
   </voice>
 </phrase>
 <phrase>
@@ -7395,6 +7398,8 @@
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
     h10,h10_5gb,e200,c200: "PREV to abort"
+    gigabeats: "BACK to abort"
+    gigabeatf:"POWER to abort"
   </source>
   <dest>
     *: "按OFF键取消"
@@ -7402,6 +7407,8 @@
     ipod*: "按PLAY/PAUSE键取消"
     x5,m5: "长按PLAY键取消"
     h10,h10_5gb,e200,c200: "按PREV键取消"
+    gigabeats: "按BACK键取消"
+    gigabeatf:"按POWER键取消"
   </dest>
   <voice>
     *: ""
@@ -7533,10 +7540,10 @@
     *: "Full Path"
   </source>
   <dest>
-    *: "完整路径"
+    *: "显示完整路径"
   </dest>
   <voice>
-    *: "完整路径"
+    *: "显示完整路径"
   </voice>
 </phrase>
 <phrase>
@@ -7843,10 +7850,10 @@
     *: "Database is not ready"
   </source>
   <dest>
-    *: "标签数据库尚未准备好"
+    *: "媒体库尚未准备好"
   </dest>
   <voice>
-    *: "标签数据库尚未准备好"
+    *: "媒体库尚未准备好"
   </voice>
 </phrase>
 <phrase>
@@ -8775,11 +8782,11 @@
     h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
-    *: "数据库更新...%d已找到(按OFF返回)"
-    h100,h120,h300: "数据库更新...%d已找到(按STOP返回)"
-    ipod*: "数据库更新...%d已找到(按PREV返回)"
-    x5,m5,gigabeat*,mrobe100: "数据库更新...%d已找到(按LEFT返回)"
-    h10,h10_5gb,e200,c200,sa9200: "数据库更新...%d已找到(按PREV返回)"
+    *: "数据库更新中...已找到%d个(按OFF返回)"
+    h100,h120,h300: "数据库更新中...已找到%d个(按STOP返回)"
+    ipod*: "数据库更新中...已找到%d个(按PREV返回)"
+    x5,m5,gigabeat*,mrobe100: "数据库更新中...已找到%d个(按LEFT返回)"
+    h10,h10_5gb,e200,c200,sa9200: "数据库更新中...已找到%d个(按PREV返回)"
   </dest>
   <voice>
     *: "数据库更新中"
@@ -8797,7 +8804,7 @@
     *: "Scanning disk..."
   </source>
   <dest>
-    *: "扫描文件..."
+    *: "扫描文件中..."
   </dest>
   <voice>
     *: "扫描文件中"
@@ -8811,10 +8818,10 @@
     *: "Files"
   </source>
   <dest>
-    *: "文件"
+    *: "文件浏览"
   </dest>
   <voice>
-    *: "文件"
+    *: "文件浏览"
   </voice>
 </phrase>
 <phrase>
@@ -8952,7 +8959,7 @@
     *: "Deleting..."
   </source>
   <dest>
-    *: "删除..."
+    *: "删除中..."
   </dest>
   <voice>
     *: "删除中"
@@ -9019,11 +9026,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "如没耳机插入时开机 不恢复播放"
+    headphone_detection: "若开机时无耳机插入,不恢复播放"
   </dest>
   <voice>
     *: none
-    headphone_detection: "如没耳机插入时开机 不恢复播放"
+    headphone_detection: "若开机时无耳机插入 不恢复播放"
   </voice>
 </phrase>
 <phrase>
@@ -9096,10 +9103,10 @@
     *: "WARNING! Low Battery!"
   </source>
   <dest>
-    *: "警告!电量低!"
+    *: "请注意:电量低!"
   </dest>
   <voice>
-    *: "警告 电量低"
+    *: "请注意 电量低"
   </voice>
 </phrase>
 <phrase>
@@ -9283,11 +9290,11 @@
     player: "Buf:"
   </source>
   <dest>
-    *: "缓冲:"
+    *: "缓冲区:"
     player: "Buf:"
   </dest>
   <voice>
-    *: "缓冲大小为"
+    *: "缓冲区大小为"
   </voice>
 </phrase>
 <phrase>
@@ -9447,10 +9454,10 @@
     *: "Top Time"
   </source>
   <dest>
-    *: "最高时间"
+    *: "最高运行时间"
   </dest>
   <voice>
-    *: "最高时间"
+    *: "最高运行时间"
   </voice>
 </phrase>
 <phrase>
@@ -9461,10 +9468,10 @@
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "使用.talk文件"
+    *: "为文件使用.talk文件"
   </dest>
   <voice>
-    *: "使用talk文件"
+    *: "为文件使用.talk文件"
   </voice>
 </phrase>
 <phrase>
@@ -10011,10 +10018,10 @@
     *: "Battery empty! RECHARGE!"
   </source>
   <dest>
-    *: "无电量!请充电!"
+    *: "电池没电,请充电!"
   </dest>
   <voice>
-    *: "无电量!请充电!"
+    *: "电池没电 请充电"
   </voice>
 </phrase>
 <phrase>
@@ -10109,11 +10116,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "快退前时滞"
+    headphone_detection: "倒回长度"
   </dest>
   <voice>
     *: none
-    headphone_detection: "快退前时滞"
+    headphone_detection: "倒回长度"
   </voice>
 </phrase>
 <phrase>
@@ -10332,7 +10339,7 @@
     *: "Loading... %d%% done (%s)"
   </source>
   <dest>
-    *: "读取...%d%%已读取(%s)"
+    *: "读取中...已读取%d%%(%s)"
   </dest>
   <voice>
     *: ""
@@ -10549,7 +10556,7 @@
     *: "Moving..."
   </source>
   <dest>
-    *: "移动..."
+    *: "移动中..."
   </dest>
   <voice>
     *: "移动中"
@@ -10580,10 +10587,10 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "目录使用.talk文件"
+    *: "为目录使用.talk文件"
   </dest>
   <voice>
-    *: "目录使用.talk文件"
+    *: "为目录使用.talk文件"
   </voice>
 </phrase>
 <phrase>
@@ -10608,10 +10615,10 @@
     *: "View Catalog"
   </source>
   <dest>
-    *: "查看播放列表录"
+    *: "查看所有播放列表"
   </dest>
   <voice>
-    *: "查看播放列表录"
+    *: "查看所有播放列表"
   </voice>
 </phrase>
 <phrase>
@@ -10777,10 +10784,10 @@
     *: "Only When Viewing All Types"
   </source>
   <dest>
-    *: "浏览所有文件时才显示"
+    *: "显示所有文件时才显示"
   </dest>
   <voice>
-    *: "浏览所有文件时才显示"
+    *: "显示所有文件时才显示"
   </voice>
 </phrase>
 <phrase>
@@ -10850,10 +10857,10 @@
     *: "Clear Time?"
   </source>
   <dest>
-    *: "清除时间?"
+    *: "将时间清零?"
   </dest>
   <voice>
-    *: "清除时间吗"
+    *: "是否将时间清零"
   </voice>
 </phrase>
 <phrase>
@@ -10880,7 +10887,7 @@
   </source>
   <dest>
     *: none
-    hold_button: "按键锁定时的背光"
+    hold_button: "背光(按键锁定时)"
   </dest>
   <voice>
     *: none
@@ -10979,7 +10986,7 @@
     *: "Copying..."
   </source>
   <dest>
-    *: "复制..."
+    *: "复制中..."
   </dest>
   <voice>
     *: "复制中"
@@ -11326,11 +11333,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "项目选择条颜色"
+    lcd_color: "选择条颜色"
   </dest>
   <voice>
     *: none
-    lcd_color: "项目选择条颜色"
+    lcd_color: "选择条颜色"
   </voice>
 </phrase>
 <phrase>
@@ -11513,10 +11520,10 @@
     *: "Save Sound Settings"
   </source>
   <dest>
-    *: "保存声音设置"
+    *: "保存音频设置"
   </dest>
   <voice>
-    *: "保存声音设置"
+    *: "保存音频设置"
   </voice>
 </phrase>
 <phrase>
@@ -11563,11 +11570,11 @@
   </source>
   <dest>
     *: none
-    accessory_supply: "附件供电"
+    accessory_supply: "给附件供电"
   </dest>
   <voice>
     *: none
-    accessory_supply: "附件供电"
+    accessory_supply: "给附件供电"
   </voice>
 </phrase>
 <phrase>
@@ -11968,5 +11975,70 @@
   <voice>
     *: none
     gigabeatf: "高"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFTRIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "单声道(左)+单声道(右)"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "单声道 左边 和 单声道 右边"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMART
+  desc: Display the expected AA size
+  user:
+  <source>
+    *: none
+    albumart: "Album Art:"
+  </source>
+  <dest>
+    *: none
+    albumart: "专辑封面:"
+  </dest>
+  <voice>
+    *: none
+    albumart: "专辑封面"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MONO_MODE
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono mode"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "单声道模式"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "单声道模式"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user:
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "搜索结果"
+  </dest>
+  <voice>
+    *: "搜索结果"
   </voice>
 </phrase>
