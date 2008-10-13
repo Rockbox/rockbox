@@ -1,16 +1,16 @@
 % $Id$ %
-\section{\label{ref:PlaybackOptions}Playback}
-The \setting{Playback} sub menu allows you to configure settings
+The \setting{Playback Settings} menu allows you to configure settings
 related to audio playback.
-\begin{description}
-\item[Shuffle]Turning shuffle on will cause Rockbox to randomly re-order the
+
+\section{Shuffle}
+  Turning shuffle on will cause Rockbox to randomly re-order the
   playlist. Thus, to shuffle all of the audio files on the player, you first
   need to create a playlist containing all of them. For more information on
   creating playlists refer to \reference{ref:working_with_playlists}.\\
   Options: \setting{Yes}/\setting{No}.
   %
-\item[Repeat]Configures settings related to repeating of directories or
-  playlists.\\
+\section{Repeat}
+  Configures settings related to repeating of directories or playlists.\\
   Options: \setting{Off} / \setting{All} / \setting{One} / \setting{Shuffle} /
   \setting{A-B}:
   \begin{description}
@@ -49,65 +49,70 @@ related to audio playback.
     }%
   \end{description}
 
-\item[Play Selected First]This setting controls what happens when you
+\section{Play Selected First}
+  This setting controls what happens when you
   select a file for playback while shuffle mode is on. If the
   \setting{Play Selected First} setting is \setting{Yes}, the file you
   selected will be played first. If this setting is \setting{No}, a random
   file in the directory will be played first.
 
-  \item[Fast-Forward/Rewind]These settings control the speed and acceleration during fast forward and rewind.
+\section{Fast-Forward/Rewind}
+  These settings control the speed and acceleration during fast forward and rewind.
   The setting \setting{FF/RW Min Step} controls the initial speed and \setting{FF/RW Accel} controls the acceleration.
 
-  \item[Anti-Skip Buffer]This setting allows you to control how much music is
-    stored in the \daps{} memory whilst playing a song, acting as a buffer
-    against shock or playback problems. The \dap{} transfers the selected
-    amount of the forthcoming song into its memory at high speed whilst you are
-    playing the song. It keeps a ``rolling'' buffer, which keeps feeding more
-    of the forthcoming song into memory as it goes along.
-    If the \dap{} is knocked, shaken or jogged heavily while Rockbox is trying
-    to read the hard drive, Rockbox might not be able to read the drive.
-    Rockbox will retry over and over again until it succeeds, but may
-    eventually reach the end of the memory buffer. When that happens, Rockbox
-    must stop playing and wait for more data from the disk, which causes your
-    music to skip. The anti-skip setting tells Rockbox how much extra buffer
-    memory to spare to handle this situation. This setting therefore allows you
-    to reduce the chances of there being a gap or pause during playback of
-    songs.
+\section{Anti-Skip Buffer}
+  This setting allows you to control how much music is
+  stored in the \daps{} memory whilst playing a song, acting as a buffer
+  against shock or playback problems. The \dap{} transfers the selected
+  amount of the forthcoming song into its memory at high speed whilst you are
+  playing the song. It keeps a ``rolling'' buffer, which keeps feeding more
+  of the forthcoming song into memory as it goes along.
+  If the \dap{} is knocked, shaken or jogged heavily while Rockbox is trying
+  to read the hard drive, Rockbox might not be able to read the drive.
+  Rockbox will retry over and over again until it succeeds, but may
+  eventually reach the end of the memory buffer. When that happens, Rockbox
+  must stop playing and wait for more data from the disk, which causes your
+  music to skip. The anti-skip setting tells Rockbox how much extra buffer
+  memory to spare to handle this situation. This setting therefore allows you
+  to reduce the chances of there being a gap or pause during playback of
+  songs.
     
-    \nopt{ondio}{
-      \opt{MASCODEC}{The anti-skip buffer can be set to a value between 0 and 7
-        seconds.}
-    }%
-    \opt{ondio}{
-      The anti-skip buffer can safely be kept at zero. It will eventually be 
-      eliminated.
-    }%
-    \opt{swcodec}{The anti-skip buffer can be set to various values between
-      5 seconds and 10 minutes.}%
-    
-    \note{Having a large anti-skip buffer tends to use more power, and may
-      reduce your battery life. It is recommended to always use the lowest
-      possible setting that allows correct and continuous playback.}
-    
-  \item[Fade on Stop/Pause]Enables and disables a fade effect when you
-    pause or stop playing a song. If the Fade on Stop/Pause option is
-    set to \setting{Yes}, your music will fade out when you stop or pause 
-    playback, and fade in when you resume playback.
-    
-  \item[Party Mode]Enables unstoppable music playback. When new songs are
-    selected, they are queued at the end of the current dynamic playlist
-    instead of being played immediately. Pausing and stopping playback is
-    disabled as well as skipping songs and launching plugins.
+  \nopt{ondio}{
+    \opt{MASCODEC}{The anti-skip buffer can be set to a value between 0 and 7
+      seconds.}
+  }%
+  \opt{ondio}{
+    The anti-skip buffer can safely be kept at zero. It will eventually be 
+    eliminated.
+  }%
+  \opt{swcodec}{The anti-skip buffer can be set to various values between
+    5 seconds and 10 minutes.}%
 
-    \opt{swcodec}{
-    \item[Crossfade]
-      This setting enables a cross-fader. At the end of a song, the song will 
-      fade out as the next song fades in, creating a smooth transition between 
-      songs. The crossfade setting is particularly effective when the player is 
-        set on shuffle.\\
+  \note{Having a large anti-skip buffer tends to use more power, and may
+    reduce your battery life. It is recommended to always use the lowest
+    possible setting that allows correct and continuous playback.}
+    
+\section{Fade on Stop/Pause}
+  Enables and disables a fade effect when you
+  pause or stop playing a song. If the Fade on Stop/Pause option is
+  set to \setting{Yes}, your music will fade out when you stop or pause 
+  playback, and fade in when you resume playback.
+    
+\section{Party Mode}
+  Enables unstoppable music playback. When new songs are
+  selected, they are queued at the end of the current dynamic playlist
+  instead of being played immediately. Pausing and stopping playback is
+  disabled as well as skipping songs and launching plugins.
 
-      Options for crossfade settings are:
-      \begin{description}
+\opt{swcodec}{
+  \section{Crossfade}
+    This setting enables a cross-fader. At the end of a song, the song will 
+    fade out as the next song fades in, creating a smooth transition between 
+    songs. The crossfade setting is particularly effective when the player is 
+      set on shuffle.\\
+
+    Options for crossfade settings are:
+    \begin{description}
       \item[Enable Crossfade]If set to \setting{Off}, crossfade is disabled.
         If set to \setting{Always}, songs will always crossfade into one
         another. If set to \setting{Shuffle}, crossfade is enabled when the
@@ -145,20 +150,19 @@ related to audio playback.
           The graphic below illustrates how the different settings work in practice.
 
          \includegraphics[width=14cm]{configure_rockbox/images/crossfade_graphic.png}
-    }%
     
-    \opt{swcodec}{
-    \item[Replaygain]This allows you to control the replaygain function.
-      The purpose of replaygain is to adjust the volume of the music played
-      so that all songs (or albums, depending on your settings) have the
-      same apparent volume. This prevents sudden changes in volume when
-      changing between songs recorded at different volume levels.
-      For replaygain to work, the songs must have been processed by a program
-      that adds replaygain information to the ID3 tags (or Vorbis tags).
-      \note{APEv2 tags are not currently supported.}
+  \section{Replaygain}
+    This allows you to control the replaygain function.
+    The purpose of replaygain is to adjust the volume of the music played
+    so that all songs (or albums, depending on your settings) have the
+    same apparent volume. This prevents sudden changes in volume when
+    changing between songs recorded at different volume levels.
+    For replaygain to work, the songs must have been processed by a program
+    that adds replaygain information to the ID3 tags (or Vorbis tags).
+    \note{APEv2 tags are not currently supported.}
       
-      Options for replaygain are:
-      \begin{description}
+    Options for replaygain are:
+    \begin{description}
       \item[Enable Replaygain]This turns on/off the replaygain function.
         %
       \item[Prevent Clipping]Avoid clipping of a song's waveform.
@@ -188,20 +192,22 @@ related to audio playback.
         prevent clipping is enabled.  The pre-amp can be set to any
         decibel (dB) value between -12dB and +12dB, in increments of 0.1{}dB.
       \end{description}
-    }
-    \opt{swcodec}{
-      \item[Beep Volume]Controls the volume of the beep that is heard when
-        skipping forward or backward between tracks. The beep is disabled when
-        set to \setting{Off}.
-    }
 
-    \opt{spdif_power}{
-      \item[Optical Output. ]Enables or disables the optical S/PDIF output to 
-         allow a digital connection to a suitable external decoder.  To enable
-         optical output, set to \setting{Yes}
-    }
+  \section{Beep Volume}
+    Controls the volume of the beep that is heard when
+    skipping forward or backward between tracks. The beep is disabled when
+    set to \setting{Off}.
+}%\opt{swcodec}
 
-\item[Auto-Change Directory]Control what Rockbox does when it reaches the end
+\opt{spdif_power}{
+  \section{Optical Output}
+    Enables or disables the optical S/PDIF output to 
+    allow a digital connection to a suitable external decoder.  To enable
+    optical output, set to \setting{Yes}
+}
+
+\section{Auto-Change Directory}
+  Control what Rockbox does when it reaches the end
   of a directory. If \setting{Auto-Change Directory} is set to \setting{Yes},
   Rockbox will continue to the next directory. If
   \setting{Auto-Change Directory} is set to \setting{No}, playback will stop at
@@ -215,7 +221,8 @@ related to audio playback.
 
   %
 \opt{headphone_detection}{
-\item[Pause on Headphone Unplug] Enables and disables automatic pausing of 
+\section{Pause on Headphone Unplug}
+  Enables and disables automatic pausing of 
   playback when the headphones are disconnected from the \daps{} headphone 
   socket.
   %
@@ -240,7 +247,7 @@ related to audio playback.
 
 }%
 
-\item[Last.fm Log]\index{Last.fm Log}\index{Audioscrobbler|see{Last.fm Log}}
+\section{Last.fm Log}\index{Last.fm Log}\index{Audioscrobbler|see{Last.fm Log}}
   Enables logging of your played tracks for submittal to 
   \url{http://www.last.fm}. This service was formely known as 
   \emph{Audioscrobbler}. When you enable this option, you'll have to reboot to
@@ -251,7 +258,7 @@ related to audio playback.
   \note{See \wikilink{LastFMLog} for a further description, and for tools you 
     can use to submit your Last.fm log.}
 
-\item[Cuesheet Support]\index{Cuesheet Support}
+\section{Cuesheet Support}\index{Cuesheet Support}
   Enables reading of cuesheet files for played tracks. If a cuesheet is found
   for a track, track markers are displayed on the progressbar and it is
   possible to skip between the tracks within the cuesheet. Also the information
@@ -259,7 +266,7 @@ related to audio playback.
   When you enable this option, you'll have to reboot for it to come into
   effect.
   
-\item[Skip Length]\index{Skip Length}
+\section{Skip Length}\index{Skip Length}
   Designed to speed up navigation and prevent unintentional track skipping when
   listening to long audio tracks, \setting{Skip Length} changes the behavior of
   the \ActionWpsSkipPrev{} and \ActionWpsSkipNext{} buttons so that they skip
@@ -267,6 +274,5 @@ related to audio playback.
 
   \note{To skip tracks with this setting set to a time interval, press Short 
     \ActionWpsSkipPrev{} + Long \ActionWpsSkipNext{} to go forward and Short 
-    \ActionWpsSkipNext{} + Long \ActionWpsSkipPrev{} to go back.}  
-	
-\end{description}
+    \ActionWpsSkipNext{} + Long \ActionWpsSkipPrev{} to go back.}
+

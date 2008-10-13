@@ -549,6 +549,7 @@ static int mainmenu_callback(int action,const struct menu_item_ex *this_item)
 MAKE_MENU(main_menu_, ID2P(LANG_SETTINGS), mainmenu_callback,
         Icon_Submenu_Entered,
         &sound_settings,
+        &playback_settings,
         &settings_menu_item, &theme_menu,
 #ifdef HAVE_RECORDING
         &recording_settings,
