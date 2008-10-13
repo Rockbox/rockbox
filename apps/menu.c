@@ -500,9 +500,14 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         {
             bool exiting_menu = false;
             in_stringlist = false;
+            /* might be leaving list, so stop scrolling */
+            FOR_NB_SCREENS(i)
+            {
+                screens[i].stop_scroll();
+            }
             if (menu_callback)
                 menu_callback(ACTION_EXIT_MENUITEM, menu);
-            
+
             if (menu->flags&MENU_EXITAFTERTHISMENU)
                 done = true;
             else if ((menu->flags&MENU_TYPE_MASK) == MT_MENU)
@@ -528,6 +533,11 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         else if (action == ACTION_STD_OK)
         {
             int type;
+            /* entering an item that may not be a list, so stop scrolling */
+            FOR_NB_SCREENS(i)
+            {
+                screens[i].stop_scroll();
+            }
 #ifdef HAVE_BUTTONBAR
             if (!hide_bars)
             {
