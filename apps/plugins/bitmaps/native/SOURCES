@@ -324,49 +324,73 @@ minesweeper_tiles.8x8x1.bmp
 #endif
 
 /* PegBox */
-#if (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240) && (LCD_DEPTH >= 16)
+#ifdef HAVE_LCD_COLOR
+/* currently only LCD_WIDTH is important, e.g. Nano and e200 use the same set */
+#if LCD_WIDTH >= 320
 pegbox_menu_top.320x68x16.bmp
 pegbox_menu_items.120x32x16.bmp
 pegbox_pieces.24x24x16.bmp
 pegbox_header.320x40x16.bmp
-#elif (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 192) && (LCD_DEPTH >= 16)
+#elif LCD_WIDTH >= 240
 pegbox_menu_top.240x80x16.bmp
 pegbox_menu_items.120x32x16.bmp
 pegbox_pieces.16x16x16.bmp
 pegbox_header.240x40x16.bmp
-#elif (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH >= 16)
+#elif LCD_WIDTH >= 220
 pegbox_menu_top.220x60x16.bmp
 pegbox_menu_items.70x20x16.bmp
 pegbox_pieces.16x16x16.bmp
 pegbox_header.220x40x16.bmp
-#elif (LCD_WIDTH >= 176) && (LCD_HEIGHT >= 132) && (LCD_DEPTH >= 16)
+#elif LCD_WIDTH >= 176
 pegbox_menu_top.176x46x16.bmp
 pegbox_menu_items.60x17x16.bmp
 pegbox_pieces.12x12x16.bmp
 pegbox_header.176x28x16.bmp
-#elif (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) && (LCD_DEPTH >= 16)
+#elif LCD_WIDTH >= 160
 pegbox_menu_top.160x42x16.bmp
 pegbox_menu_items.60x17x16.bmp
 pegbox_pieces.12x12x16.bmp
 pegbox_header.160x24x16.bmp
-#elif (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) && (LCD_DEPTH > 1)
-pegbox_menu_top.160x42x4.bmp
-pegbox_menu_items.60x17x4.bmp
-pegbox_pieces.12x12x4.bmp
-pegbox_header.160x24x4.bmp
-#elif (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110) && (LCD_DEPTH > 1)
-pegbox_menu_top.138x34x4.bmp
-pegbox_menu_items.60x17x4.bmp
-pegbox_pieces.8x8x1.bmp
-pegbox_header.138x28x4.bmp
-#elif (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) && (LCD_DEPTH == 1)
+#elif LCD_WIDTH >= 132
+pegbox_menu_top.132x17x16.bmp
+pegbox_menu_items.60x13x16.bmp
+pegbox_pieces.9x9x16.bmp
+pegbox_header.22x80x16.bmp
+#elif LCD_WIDTH >= 128
+pegbox_menu_top.128x42x16.bmp
+pegbox_menu_items.60x17x16.bmp
+pegbox_pieces.10x10x16.bmp
+pegbox_header.128x42x16.bmp
+#endif /* different colour displays */
+#elif LCD_DEPTH > 1
+#if LCD_WIDTH >= 160
+pegbox_menu_top.160x42x2.bmp
+pegbox_menu_items.60x17x2.bmp
+pegbox_pieces.12x12x2.bmp
+pegbox_header.160x24x2.bmp
+#elif LCD_WIDTH >= 138
+pegbox_menu_top.138x31x2.bmp
+pegbox_menu_items.60x17x2.bmp
+pegbox_pieces.10x10x2.bmp
+pegbox_header.138x26x2.bmp
+#elif LCD_WIDTH >= 128
+pegbox_menu_top.128x27x2.bmp
+pegbox_menu_items.60x15x2.bmp
+pegbox_pieces.10x10x2.bmp
+pegbox_header.128x16x2.bmp
+#endif /* different greyscale displays */
+#else /* mono */
+#if LCD_WIDTH >= 160
 pegbox_menu_top.160x42x1.bmp
 pegbox_menu_items.60x17x1.bmp
 pegbox_pieces.12x12x1.bmp
 pegbox_header.160x24x1.bmp
-#else
-pegbox_pieces.8x8x1.bmp
+#elif LCD_WIDTH >= 112
+pegbox_header.112x8x1.bmp
+pegbox_pieces.9x7x1.bmp
 #endif
+#endif
+
 
 /* Rockblox */
 #if LCD_DEPTH == 16 /* colour versions*/

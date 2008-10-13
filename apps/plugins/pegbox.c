@@ -20,12 +20,17 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#if (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110)
+#include "pegbox_header.h"
+#include "pegbox_pieces.h"
+
+#if LCD_HEIGHT >= 80 /* enough space for a graphical menu */
 #include "pegbox_menu_top.h"
 #include "pegbox_menu_items.h"
-#include "pegbox_header.h"
+#define MENU_X      (LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2
+#define MENU_Y      BMPHEIGHT_pegbox_menu_top
+#define ITEM_WIDTH  BMPWIDTH_pegbox_menu_items
+#define ITEM_HEIGHT (BMPHEIGHT_pegbox_menu_items/9)
 #endif
-#include "pegbox_pieces.h"
 
 static const struct plugin_api* rb;
 
@@ -327,61 +332,112 @@ PLUGIN_HEADER
 #endif
 #endif
 
-#if (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240)
+
+/* get several sizes from the bitmaps */
+#define PIECE_WIDTH    BMPWIDTH_pegbox_pieces
+#define PIECE_HEIGHT   (BMPHEIGHT_pegbox_pieces/7)
+#define BOARD_WIDTH    (12*PIECE_WIDTH)
+#define BOARD_HEIGHT   (8*PIECE_HEIGHT)
+
+
+/* define a wide layout where the statistics are alongside the board, not above
+*  base calculation on the piece bitmaps for the 8x12 board */
+#if (LCD_WIDTH - BOARD_WIDTH) > (LCD_HEIGHT - BOARD_HEIGHT)
+#define WIDE_LAYOUT
+#endif
+
+
+#define HEADER_WIDTH    BMPWIDTH_pegbox_header
+#define HEADER_HEIGHT   BMPHEIGHT_pegbox_header
+
+
+#if defined WIDE_LAYOUT
+
+#if ((BOARD_WIDTH + HEADER_WIDTH + 4) <= LCD_WIDTH)
+#define BOARD_X   2
+#else
+#define BOARD_X   1
+#endif
+#define BOARD_Y   (LCD_HEIGHT-BOARD_HEIGHT)/2
+
+#if (LCD_WIDTH >= 132) && (LCD_HEIGHT >= 80)
+#define TEXT_X         116
+#define LEVEL_TEXT_Y   14
+#define PEGS_TEXT_Y    58
+#else
+#error "Unsupported screen size"
+#endif
+
+#else /* "normal" layout */
+
+#define BOARD_X   (LCD_WIDTH-BOARD_WIDTH)/2
+#if ((BOARD_HEIGHT + HEADER_HEIGHT + 4) <= LCD_HEIGHT)
+#define BOARD_Y   HEADER_HEIGHT+2
+#else
+#define BOARD_Y   HEADER_HEIGHT
+#endif
+
+#if LCD_WIDTH >= 320
 #define LEVEL_TEXT_X   59
 #define PEGS_TEXT_X    276
 #define TEXT_Y         28
-#elif (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 192)
+#elif LCD_WIDTH >= 240
 #define LEVEL_TEXT_X   59
 #define PEGS_TEXT_X    196
 #define TEXT_Y         28
-#elif (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176)
+#elif LCD_WIDTH >= 220
 #define LEVEL_TEXT_X   49
 #define PEGS_TEXT_X    186
 #define TEXT_Y         28
-#elif (LCD_WIDTH >= 176) && (LCD_HEIGHT >= 132)
+#elif LCD_WIDTH >= 176
 #define LEVEL_TEXT_X   38
 #define PEGS_TEXT_X    155
 #define TEXT_Y         17
-#elif (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128)
+#elif LCD_WIDTH >= 160
 #define LEVEL_TEXT_X   37
 #define PEGS_TEXT_X    140
 #define TEXT_Y         13
-#elif (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110)
+#elif LCD_WIDTH >= 138
 #define LEVEL_TEXT_X   28
 #define PEGS_TEXT_X    119
 #define TEXT_Y         15
-#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128)
-#define LEVEL_TEXT_X   28
-#define PEGS_TEXT_X    119
-#define TEXT_Y         15
-#endif
+#elif LCD_WIDTH >= 128
+#if HEADER_HEIGHT > 16
+#define LEVEL_TEXT_X   26
+#define PEGS_TEXT_X    107
+#define TEXT_Y         31
+#else
+#define LEVEL_TEXT_X   15
+#define PEGS_TEXT_X    100
+#define TEXT_Y         5
+#endif /* HEADER_HEIGHT */
+#elif LCD_WIDTH >= 112
+#define LEVEL_TEXT_X   25
+#define PEGS_TEXT_X    90
+#define TEXT_Y         0
+#endif /* LCD_WIDTH */
+
+#endif /* WIDE_LAYOUT */
+
 
 #ifdef HAVE_LCD_COLOR
 #define BG_COLOR           LCD_BLACK
 #define TEXT_BG            LCD_RGBPACK(189,189,189)
 #endif
 
-#define BOARD_X   (LCD_WIDTH-12*BMPWIDTH_pegbox_pieces)/2
-
-#if (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110)
-#define BOARD_Y   BMPHEIGHT_pegbox_header+2
-#else
-#define BOARD_Y   0
-#endif
 
 #ifdef HAVE_TOUCHSCREEN
 #include "lib/touchscreen.h"
 
 static struct ts_mapping main_menu_items[5] =
 {
-{(LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, BMPHEIGHT_pegbox_menu_top, BMPWIDTH_pegbox_menu_items,       (BMPHEIGHT_pegbox_menu_items/9)},
-{(LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, BMPHEIGHT_pegbox_menu_top+(BMPHEIGHT_pegbox_menu_items/9),   BMPWIDTH_pegbox_menu_items, (BMPHEIGHT_pegbox_menu_items/9)},
-{(LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, BMPHEIGHT_pegbox_menu_top+(BMPHEIGHT_pegbox_menu_items/9)*2, BMPWIDTH_pegbox_menu_items, (BMPHEIGHT_pegbox_menu_items/9)},
-{(LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, BMPHEIGHT_pegbox_menu_top+(BMPHEIGHT_pegbox_menu_items/9)*3, BMPWIDTH_pegbox_menu_items, (BMPHEIGHT_pegbox_menu_items/9)},
+{MENU_X, MENU_Y, ITEM_WIDTH,       ITEM_HEIGHT},
+{MENU_X, MENU_Y+ITEM_HEIGHT,   ITEM_WIDTH, ITEM_HEIGHT},
+{MENU_X, MENU_Y+ITEM_HEIGHT*2, ITEM_WIDTH, ITEM_HEIGHT},
+{MENU_X, MENU_Y+ITEM_HEIGHT*3, ITEM_WIDTH, ITEM_HEIGHT},
 {
-#if (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110)
-0, BMPHEIGHT_pegbox_menu_top+4*(BMPHEIGHT_pegbox_menu_items/9)+8, SYSFONT_WIDTH*28, SYSFONT_HEIGHT
+#if (LCD_WIDTH >= 138) && (LCD_HEIGHT > 110)
+0, MENU_Y+4*ITEM_HEIGHT+8, SYSFONT_WIDTH*28, SYSFONT_HEIGHT
 #elif LCD_WIDTH > 112
 0, LCD_HEIGHT - 8, SYSFONT_WIDTH*28, SYSFONT_HEIGHT
 #else
@@ -392,8 +448,11 @@ static struct ts_mapping main_menu_items[5] =
 };
 static struct ts_mappings main_menu = {main_menu_items, 5};
 
-static struct ts_raster pegbox_raster = { BOARD_X, BOARD_Y, COLS*BMPWIDTH_pegbox_pieces, ROWS*BMPWIDTH_pegbox_pieces, BMPWIDTH_pegbox_pieces, BMPWIDTH_pegbox_pieces };
-static struct ts_raster_button_mapping pegbox_raster_btn = { &pegbox_raster, false, false, true, false, true, {0, 0}, 0, 0, 0 };
+static struct ts_raster pegbox_raster =
+    { BOARD_X, BOARD_Y, COLS*PIECE_WIDTH, ROWS*PIECE_HEIGHT,
+      PIECE_WIDTH, PIECE_HEIGHT };
+static struct ts_raster_button_mapping pegbox_raster_btn =
+    { &pegbox_raster, false, false, true, false, true, {0, 0}, 0, 0, 0 };
 #endif
 
 struct game_context {
@@ -670,34 +729,26 @@ static void display_text(char *str, bool waitkey)
 static void draw_board(struct game_context* pb) {
     unsigned int r, c, type;
     pb->num_left = 0;
-#if (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110)
     char str[5];
 
     rb->lcd_clear_display();
-    rb->lcd_bitmap(pegbox_header,0,0,LCD_WIDTH, BMPHEIGHT_pegbox_header);
-    rb->lcd_drawrect((LCD_WIDTH-12*BMPWIDTH_pegbox_pieces)/2-2,
-                     BMPHEIGHT_pegbox_header,
-                     12*BMPWIDTH_pegbox_pieces+4,8*BMPWIDTH_pegbox_pieces+4);
-
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_fillrect((LCD_WIDTH-12*BMPWIDTH_pegbox_pieces)/2-1,BMPHEIGHT_pegbox_header+1,
-                     12*BMPWIDTH_pegbox_pieces+2,8*BMPWIDTH_pegbox_pieces+2);
-    rb->lcd_set_foreground(LCD_BLACK);
-    rb->lcd_set_background(TEXT_BG);
-#endif
-
+#ifdef WIDE_LAYOUT
+    rb->lcd_bitmap(pegbox_header,LCD_WIDTH-HEADER_WIDTH,0,
+                   HEADER_WIDTH,LCD_HEIGHT);
 #else
-    rb->lcd_clear_display();
+    rb->lcd_bitmap(pegbox_header,(LCD_WIDTH-HEADER_WIDTH)/2,0,
+                   HEADER_WIDTH, HEADER_HEIGHT);
+#endif /* WIDE_LAYOUT */
+
+#if ((BOARD_HEIGHT + HEADER_HEIGHT + 4) <= LCD_HEIGHT)
+    rb->lcd_drawrect(BOARD_X-2,BOARD_Y-2,BOARD_WIDTH+4,BOARD_HEIGHT+4);
+#endif /* enough space for a frame? */
 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_fillrect((LCD_WIDTH-12*BMPWIDTH_pegbox_pieces)/2-1,0,
-                     12*BMPWIDTH_pegbox_pieces+2,8*BMPWIDTH_pegbox_pieces+1);
+    rb->lcd_fillrect(BOARD_X-1,BOARD_Y-1,BOARD_WIDTH+2,BOARD_HEIGHT+2);
     rb->lcd_set_foreground(LCD_BLACK);
     rb->lcd_set_background(TEXT_BG);
-#endif
-
 #endif
 
     for (r=0 ; r < ROWS ; r++) {
@@ -710,13 +761,10 @@ static void draw_board(struct game_context* pb) {
                     break;
 
                 default:
-                    rb->lcd_bitmap_part(pegbox_pieces, 0, 
-                                        (type-1)*BMPWIDTH_pegbox_pieces, 
-                                        BMPWIDTH_pegbox_pieces, 
-                                        c * BMPWIDTH_pegbox_pieces + BOARD_X, 
-                                        r * BMPWIDTH_pegbox_pieces + BOARD_Y, 
-                                        BMPWIDTH_pegbox_pieces, 
-                                        BMPWIDTH_pegbox_pieces);
+                    rb->lcd_bitmap_part(pegbox_pieces, 0, (type-1)*PIECE_HEIGHT,
+                                        PIECE_WIDTH, c * PIECE_WIDTH + BOARD_X,
+                                        r * PIECE_HEIGHT + BOARD_Y, PIECE_WIDTH,
+                                        PIECE_HEIGHT);
                     break;
             }
 
@@ -728,12 +776,18 @@ static void draw_board(struct game_context* pb) {
                 pb->num_left++;
         }
     }
-#if (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110)
+
+#ifdef WIDE_LAYOUT
+    rb->snprintf(str, 3, "%d", pb->level);
+    rb->lcd_putsxy(TEXT_X, LEVEL_TEXT_Y, str);
+    rb->snprintf(str, 3, "%d", pb->num_left);
+    rb->lcd_putsxy(TEXT_X, PEGS_TEXT_Y, str);
+#else
     rb->snprintf(str, 3, "%d", pb->level);
     rb->lcd_putsxy(LEVEL_TEXT_X, TEXT_Y, str);
     rb->snprintf(str, 3, "%d", pb->num_left);
     rb->lcd_putsxy(PEGS_TEXT_X, TEXT_Y, str);
-#endif
+#endif /*WIDE_LAYOUT*/
 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_background(BG_COLOR);
@@ -774,8 +828,12 @@ static void new_piece(struct game_context* pb, unsigned int x_loc,
         {
             pegbox_raster_btn.two_d_from.y = x_loc;
             pegbox_raster_btn.two_d_from.x = y_loc;
-            
-            struct ts_raster_button_result ret = touchscreen_raster_map_button(&pegbox_raster_btn, rb->button_get_data() >> 16, rb->button_get_data() & 0xffff, button);
+
+            struct ts_raster_button_result ret =
+                  touchscreen_raster_map_button(&pegbox_raster_btn,
+                                                rb->button_get_data() >> 16,
+                                                rb->button_get_data() & 0xffff,
+                                                button);
             if(ret.action == TS_ACTION_TWO_D_MOVEMENT)
             {
                 if(ret.to.x > ret.from.x)
@@ -787,7 +845,9 @@ static void new_piece(struct game_context* pb, unsigned int x_loc,
                 else if(ret.to.y < ret.from.y)
                     button = PEGBOX_RIGHT;
             }
-            else if(ret.action == TS_ACTION_CLICK && (unsigned)ret.to.x == y_loc && (unsigned)ret.to.y == x_loc)
+            else if(ret.action == TS_ACTION_CLICK
+                    && (unsigned)ret.to.x == y_loc
+                    && (unsigned)ret.to.y == x_loc)
                 button = PEGBOX_SAVE;
         }
 #endif
@@ -979,101 +1039,50 @@ static unsigned int pegbox_menu(struct game_context* pb) {
         can_resume = true;
         
     while(!breakout){
-#if (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110)
+#if LCD_HEIGHT >= 80
         rb->lcd_clear_display();
         rb->lcd_bitmap(pegbox_menu_top,0,0,LCD_WIDTH, BMPHEIGHT_pegbox_menu_top);
 
          /* menu bitmaps */
         if (loc == 0) {
-            rb->lcd_bitmap_part(pegbox_menu_items, 0, 
-                                (BMPHEIGHT_pegbox_menu_items/9), 
-                                BMPWIDTH_pegbox_menu_items, 
-                                (LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, 
-                                BMPHEIGHT_pegbox_menu_top, 
-                                BMPWIDTH_pegbox_menu_items, 
-                                (BMPHEIGHT_pegbox_menu_items/9));
+            rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT, ITEM_WIDTH,
+                                MENU_X, MENU_Y, ITEM_WIDTH, ITEM_HEIGHT);
         }
         else {
-            rb->lcd_bitmap_part(pegbox_menu_items, 0, 0, 
-                                BMPWIDTH_pegbox_menu_items, 
-                                (LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, 
-                                BMPHEIGHT_pegbox_menu_top, 
-                                BMPWIDTH_pegbox_menu_items, 
-                                (BMPHEIGHT_pegbox_menu_items/9));
+            rb->lcd_bitmap_part(pegbox_menu_items, 0, 0, ITEM_WIDTH,
+                                MENU_X, MENU_Y, ITEM_WIDTH, ITEM_HEIGHT);
         }
         if (can_resume) {
             if (loc == 1) {
-                rb->lcd_bitmap_part(pegbox_menu_items, 0, 
-                                    (BMPHEIGHT_pegbox_menu_items/9)*3, 
-                                    BMPWIDTH_pegbox_menu_items, 
-                                    (LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, 
-                                    BMPHEIGHT_pegbox_menu_top+
-                                    (BMPHEIGHT_pegbox_menu_items/9), 
-                                    BMPWIDTH_pegbox_menu_items, 
-                                    (BMPHEIGHT_pegbox_menu_items/9));
+                rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT*3, ITEM_WIDTH,
+                                    MENU_X, MENU_Y+ITEM_HEIGHT, ITEM_WIDTH, ITEM_HEIGHT);
             }
             else {
-                rb->lcd_bitmap_part(pegbox_menu_items, 0, 
-                                    (BMPHEIGHT_pegbox_menu_items/9)*2, 
-                                    BMPWIDTH_pegbox_menu_items, 
-                                    (LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, 
-                                    BMPHEIGHT_pegbox_menu_top+
-                                    (BMPHEIGHT_pegbox_menu_items/9), 
-                                    BMPWIDTH_pegbox_menu_items, 
-                                    (BMPHEIGHT_pegbox_menu_items/9));
+                rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT*2, ITEM_WIDTH,
+                                    MENU_X, MENU_Y+ITEM_HEIGHT, ITEM_WIDTH, ITEM_HEIGHT);
             }
-        } 
+        }
         else {
-            rb->lcd_bitmap_part(pegbox_menu_items, 0, 
-                                (BMPHEIGHT_pegbox_menu_items/9)*4, 
-                                BMPWIDTH_pegbox_menu_items, 
-                                (LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, 
-                                BMPHEIGHT_pegbox_menu_top+
-                                (BMPHEIGHT_pegbox_menu_items/9), 
-                                BMPWIDTH_pegbox_menu_items, 
-                                (BMPHEIGHT_pegbox_menu_items/9));
+            rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT*4, ITEM_WIDTH,
+                                MENU_X, MENU_Y+ITEM_HEIGHT, ITEM_WIDTH, ITEM_HEIGHT);
         }
 
         if (loc==2) {
-            rb->lcd_bitmap_part(pegbox_menu_items, 0, 
-                                (BMPHEIGHT_pegbox_menu_items/9)*6, 
-                                BMPWIDTH_pegbox_menu_items, 
-                                (LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, 
-                                BMPHEIGHT_pegbox_menu_top+
-                                (BMPHEIGHT_pegbox_menu_items/9)*2, 
-                                BMPWIDTH_pegbox_menu_items, 
-                                (BMPHEIGHT_pegbox_menu_items/9));
+            rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT*6, ITEM_WIDTH,
+                                MENU_X, MENU_Y+ITEM_HEIGHT*2, ITEM_WIDTH, ITEM_HEIGHT);
         }
         else {
-            rb->lcd_bitmap_part(pegbox_menu_items, 0, 
-                                (BMPHEIGHT_pegbox_menu_items/9)*5, 
-                                BMPWIDTH_pegbox_menu_items, 
-                                (LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, 
-                                BMPHEIGHT_pegbox_menu_top+
-                                (BMPHEIGHT_pegbox_menu_items/9)*2, 
-                                BMPWIDTH_pegbox_menu_items, 
-                                (BMPHEIGHT_pegbox_menu_items/9));
+            rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT*5, ITEM_WIDTH,
+                                MENU_X, MENU_Y+ITEM_HEIGHT*2, ITEM_WIDTH, ITEM_HEIGHT);
         }
 
         if (loc==3) {
-            rb->lcd_bitmap_part(pegbox_menu_items, 0, 
-                                (BMPHEIGHT_pegbox_menu_items/9)*8, 
-                                BMPWIDTH_pegbox_menu_items, 
-                                (LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, 
-                                BMPHEIGHT_pegbox_menu_top+
-                                (BMPHEIGHT_pegbox_menu_items/9)*3, 
-                                BMPWIDTH_pegbox_menu_items, 
-                                (BMPHEIGHT_pegbox_menu_items/9));
+            rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT*8, ITEM_WIDTH,
+                                MENU_X, MENU_Y+ITEM_HEIGHT*3, ITEM_WIDTH, ITEM_HEIGHT);
         }
         else {
-            rb->lcd_bitmap_part(pegbox_menu_items, 0, 
-                                (BMPHEIGHT_pegbox_menu_items/9)*7, 
-                                BMPWIDTH_pegbox_menu_items, 
-                                (LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, 
-                                BMPHEIGHT_pegbox_menu_top+
-                                (BMPHEIGHT_pegbox_menu_items/9)*3, 
-                                BMPWIDTH_pegbox_menu_items, 
-                                (BMPHEIGHT_pegbox_menu_items/9));
+            rb->lcd_bitmap_part(pegbox_menu_items, 0, ITEM_HEIGHT*7, ITEM_WIDTH,
+                                MENU_X, MENU_Y+ITEM_HEIGHT*3, ITEM_WIDTH, ITEM_HEIGHT);
         }
 #else
         unsigned int w,h;
@@ -1084,33 +1093,34 @@ static unsigned int pegbox_menu(struct game_context* pb) {
         rb->lcd_putsxy((LCD_WIDTH)/4, 24, "Resume");
         rb->lcd_putsxy((LCD_WIDTH)/4, 32, "Help");
         rb->lcd_putsxy((LCD_WIDTH)/4, 40, "Quit");
-        
+
         if(!can_resume)
             rb->lcd_hline((LCD_WIDTH)/4, (LCD_WIDTH)/4+30, 28);
-        
+
         rb->lcd_putsxy((LCD_WIDTH)/4-8, loc*8+16, "*");
-        
-        
+
+
 #endif
-        rb->snprintf(str, 28, "Start on level %d of %d", startlevel, 
+        rb->snprintf(str, 28, "Start on level %d of %d", startlevel,
                      pb->highlevel);
-#if (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110)
-        rb->lcd_putsxy(0, BMPHEIGHT_pegbox_menu_top+4*
-                         (BMPHEIGHT_pegbox_menu_items/9)+8, str);
-#elif LCD_WIDTH > 112
+#if LCD_HEIGHT > 110
+        rb->lcd_putsxy(0, MENU_Y+4*ITEM_HEIGHT+8, str);
+#elif LCD_HEIGHT > 64
         rb->lcd_putsxy(0, LCD_HEIGHT - 8, str);
 #else
         rb->lcd_puts_scroll(0, 7, str);
 #endif
         rb->lcd_update();
-        
+
         /* handle menu button presses */
         button = rb->button_get(true);
-        
+
 #ifdef HAVE_TOUCHSCREEN
         if(button & BUTTON_TOUCHSCREEN)
         {
-            unsigned int result = touchscreen_map(&main_menu, rb->button_get_data() >> 16, rb->button_get_data() & 0xffff);
+            unsigned int result = touchscreen_map(&main_menu,
+                                               rb->button_get_data() >> 16,
+                                               rb->button_get_data() & 0xffff);
             if(result != (unsigned)-1 && button & BUTTON_REL)
             {
                 if(result == 4)
@@ -1246,7 +1256,11 @@ static int pegbox(struct game_context* pb) {
             pegbox_raster_btn.two_d_from.y = pb->player_row;
             pegbox_raster_btn.two_d_from.x = pb->player_col;
             
-            struct ts_raster_button_result ret = touchscreen_raster_map_button(&pegbox_raster_btn, rb->button_get_data() >> 16, rb->button_get_data() & 0xffff, temp_var);
+            struct ts_raster_button_result ret =
+                  touchscreen_raster_map_button(&pegbox_raster_btn,
+                                                rb->button_get_data() >> 16,
+                                                rb->button_get_data() & 0xffff,
+                                                temp_var);
             if(ret.action == TS_ACTION_TWO_D_MOVEMENT)
                 move_player(pb, ret.to.x - ret.from.x, ret.to.y - ret.from.y);
         }
