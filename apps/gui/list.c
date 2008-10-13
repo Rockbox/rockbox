@@ -101,6 +101,7 @@ static struct viewport parent[NB_SCREENS] =
 void list_init_viewports(struct gui_synclist *list)
 {
     (void)list;
+    force_list_reinit = false;
 }
 #endif
 
@@ -231,7 +232,7 @@ void gui_synclist_draw(struct gui_synclist *gui_list)
         gui_list->nb_items != last_count)
     {
         list_init_viewports(gui_list);
-        force_list_reinit = false;
+        gui_synclist_select_item(gui_list, gui_list->selected_item);
     }
 #ifdef HAVE_BUTTONBAR
     last_buttonbar = screens[SCREEN_MAIN].has_buttonbar;
