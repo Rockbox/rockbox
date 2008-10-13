@@ -83,5 +83,16 @@ install_name_tool -change $QTDIR/lib/QtNetwork.framework/Versions/4/QtNetwork  @
 install_name_tool -change $QTDIR/lib/QtCore.framework/Versions/4/QtCore  @executable_path/../Frameworks/QtCore.framework/Versions/4/QtCore rbutilqt.app/Contents/Frameworks/QtGui.framework/Versions/4/QtGui
 install_name_tool -change $QTDIR/lib/QtCore.framework/Versions/4/QtCore  @executable_path/../Frameworks/QtCore.framework/Versions/4/QtCore rbutilqt.app/Contents/Frameworks/QtNetwork.framework/Versions/4/QtNetwork
 
+echo "insert accessibility plugins"
+
+mkdir -p rbutilqt.app/Contents/plugins/accessible
+
+cp $QTDIR/plugins/accessible/*.dylib rbutilqt.app/Contents/plugins/accessible
+
+install_name_tool -change $QTDIR/lib/QtCore.framework/Versions/4/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/4/QtCore rbutilqt.app/Contents/plugins/accessible/libqtaccessiblewidgets.dylib
+install_name_tool -change $QTDIR/lib/QtGui.framework/Versions/4/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/4/QtGui rbutilqt.app/Contents/plugins/accessible/libqtaccessiblewidgets.dylib
+install_name_tool -change $QTDIR/lib/QtCore.framework/Versions/4/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/4/QtCore rbutilqt.app/Contents/plugins/accessible/libqtaccessiblecompatwidgets.dylib
+install_name_tool -change $QTDIR/lib/QtGui.framework/Versions/4/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/4/QtGui rbutilqt.app/Contents/plugins/accessible/libqtaccessiblecompatwidgets.dylib
+
 echo "Creating disk image"
 hdiutil create -srcfolder rbutilqt.app -ov rbutilqt.dmg

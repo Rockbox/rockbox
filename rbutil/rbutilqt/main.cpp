@@ -28,7 +28,12 @@ Q_IMPORT_PLUGIN(qtaccessiblewidgets)
 
 int main( int argc, char ** argv ) {
     QApplication app( argc, argv );
-
+#if defined(Q_OS_MAC)
+    QDir dir(QApplication::applicationDirPath());
+    dir.cdUp();
+    dir.cd("plugins");
+    QApplication::addLibraryPath(dir.absolutePath());
+#endif
     QString absolutePath = QCoreApplication::instance()->applicationDirPath();
     // portable installation:
     // check for a configuration file in the program folder.
