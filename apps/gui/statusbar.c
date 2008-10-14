@@ -26,6 +26,9 @@
 #include "sprintf.h"
 #include "sound.h"
 #include "settings.h"
+#if CONFIG_CODEC == SWCODEC
+#include "id3.h"
+#endif
 #include "icons.h"
 #include "powermgmt.h"
 #include "usb.h"

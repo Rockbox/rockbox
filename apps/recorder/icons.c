@@ -28,6 +28,7 @@
 
 #include "settings.h"
 
+#include "id3.h"
 #include "icons.h"
 
 const unsigned char bitmap_icons_5x8[][5] =
