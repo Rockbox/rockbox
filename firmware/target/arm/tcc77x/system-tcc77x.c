@@ -26,7 +26,7 @@
 /* Externally defined interrupt handlers */
 extern void TIMER(void);
 extern void ADC(void);
-extern void USBD_IRQ(void);
+extern void USB_DEVICE(void);
 
 void irq(void)
 {
@@ -37,9 +37,9 @@ void irq(void)
         TIMER();
     else if (irq & ADC_IRQ_MASK)
         ADC();
-#ifdef HAVE_USBSTACK 
+#ifdef HAVE_USBSTACK
     else if (irq & USBD_IRQ_MASK)
-        USBD_IRQ();
+        USB_DEVICE();
 #endif
     else
         panicf("Unhandled IRQ 0x%08X", irq);

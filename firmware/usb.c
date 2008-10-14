@@ -50,7 +50,8 @@
 /* Conditions under which we want the entire driver */
 #if !defined(BOOTLOADER) || (CONFIG_CPU == SH7034) || \
      (defined(TOSHIBA_GIGABEAT_S) && defined(USE_ROCKBOX_USB) && defined(USB_STORAGE)) || \
-     (defined(CREATIVE_ZVx) && defined(HAVE_USBSTACK))
+     (defined(HAVE_USBSTACK) && (defined(CREATIVE_ZVx) || \
+     defined(CPU_TCC77X) || defined(CPU_TCC780X)))
 #define USB_FULL_INIT
 #endif
 
