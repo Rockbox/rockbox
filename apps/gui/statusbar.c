@@ -37,6 +37,7 @@
 #ifdef HAVE_RECORDING
 #include "audio.h"
 #include "recording.h"
+#include "pcm_record.h"
 #endif
 
 /* FIXME: should be removed from icon.h to avoid redefinition,

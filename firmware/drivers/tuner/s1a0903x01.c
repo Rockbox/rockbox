@@ -27,6 +27,7 @@
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio.h" /* physical interface driver */
 #include "sound.h"
+#include "mas.h"
 
 #define DEFAULT_IN1 0x100003 /* Mute */
 #define DEFAULT_IN2 0x140884 /* 5kHz, 7.2MHz crystal */

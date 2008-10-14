@@ -23,6 +23,30 @@
 
 #include <sys/types.h>
 
+#define DMA_REC_ERROR_DMA       (-1)
+#ifdef HAVE_SPDIF_REC
+#define DMA_REC_ERROR_SPDIF     (-2)
+#endif
+
+/** Warnings **/
+/* pcm (dma) buffer has overflowed */
+#define PCMREC_W_PCM_BUFFER_OVF         0x00000001
+/* encoder output buffer has overflowed */
+#define PCMREC_W_ENC_BUFFER_OVF         0x00000002
+/** Errors **/
+/* failed to load encoder */
+#define PCMREC_E_LOAD_ENCODER           0x80001000
+/* error originating in encoder */
+#define PCMREC_E_ENCODER                0x80002000
+/* filename queue has desynced from stream markers */
+#define PCMREC_E_FNQ_DESYNC             0x80004000
+/* I/O error has occurred */
+#define PCMREC_E_IO                     0x80008000
+#ifdef DEBUG
+/* encoder has written past end of allotted space */
+#define PCMREC_E_CHUNK_OVF              0x80010000
+#endif /* DEBUG */
+
 /** RAW PCM routines used with playback and recording **/
 
 /* Typedef for registered callback */
