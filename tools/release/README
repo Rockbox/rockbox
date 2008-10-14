@@ -1,0 +1,32 @@
+             __________               __   ___.
+   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+                     \/            \/     \/    \/            \/
+
+ This directory contains useful scripts when creating and building
+ releases. The plan is to hopefully create a single top-level script that will
+ run everything needed to make a complete and full release and put all
+ generated data into a separate output directory.
+
+ NOTE that these scripts assume that you have the necessary compilers already
+ present in your PATH.
+
+ The scripts:
+
+ bins.pl          Builds all the binary rockbox zip files.
+
+ manuals.pl       Builds all manuals
+
+ voices.pl        Builds all english voice files
+
+ tarball.sh       Builds the source tarball
+
+
+ STATUS
+
+ All these scripts have a "version" variable at the top that needs editing and
+ each of this script needs to be run at the source tree root to function. Most
+ of them put their generated files in a subdir called 'output' which the
+ scripts create.
