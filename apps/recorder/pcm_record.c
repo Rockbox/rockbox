@@ -18,6 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "pcm_record.h"
 #include "system.h"
 #include "kernel.h"
 #include "logf.h"

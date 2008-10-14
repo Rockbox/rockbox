@@ -2432,6 +2432,15 @@ void audio_set_recording_options(struct audio_recording_options *options)
 
     DEBUGF("mas_writemem(MAS_BANK_D0, ENCODER_CONTROL, %x)\n", shadow_encoder_control);
 
+#if CONFIG_TUNER & S1A0903X01
+    /* Store the (unpitched) MAS PLL frequency. Used for avoiding FM
+       interference with the Samsung tuner. */
+    if (rec_frequency_index)
+        mas_store_pllfreq(24576000);
+    else
+        mas_store_pllfreq(22579000);
+#endif    
+
     shadow_soft_mute = options->rec_editable?4:0;
     mas_writemem(MAS_BANK_D0, MAS_D0_SOFT_MUTE, &shadow_soft_mute,1);
 
@@ -2483,22 +2492,6 @@ void audio_set_recording_gain(int left, int right, int type)
                         0x0007;
     mas_codec_writereg(0x0, shadow_codec_reg0);
 }
-
-#if CONFIG_TUNER & S1A0903X01
-/* Get the (unpitched) MAS PLL frequency, for avoiding FM interference with the
- * Samsung tuner. Zero means unknown. Currently handles recording from analog
- * input only. */
-int mpeg_get_mas_pllfreq(void)
-{
-    if (mpeg_mode != MPEG_ENCODER)
-        return 0;
-
-    if (rec_frequency_index == 0)  /* 44.1 kHz / 22.05 kHz */
-        return 22579000;
-    else
-        return 24576000;
-}
-#endif /* CONFIG_TUNER & S1A0903X01 */
 
 /* try to make some kind of beep, also in recording mode */
 void audio_beep(int duration)

@@ -466,3 +466,20 @@ unsigned long mas_readver(void)
 }
 
 #endif
+
+#if CONFIG_TUNER & S1A0903X01
+static int pllfreq;
+
+void mas_store_pllfreq(int freq)
+{
+    pllfreq = freq;
+}
+
+int mas_get_pllfreq(void)
+{
+    return pllfreq;
+}
+#endif
+
+
+

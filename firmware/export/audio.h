@@ -30,8 +30,6 @@
 #include "pcm_sampr.h"
 #include "pcm.h"
 #ifdef HAVE_RECORDING
-#include "pcm_record.h"
-#include "id3.h"
 #include "enc_base.h"
 #endif /* HAVE_RECORDING */
 #endif /* CONFIG_CODEC == SWCODEC */

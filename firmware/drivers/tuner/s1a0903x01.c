@@ -26,7 +26,6 @@
 #include "kernel.h"
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio.h" /* physical interface driver */
-#include "mpeg.h"
 #include "sound.h"
 
 #define DEFAULT_IN1 0x100003 /* Mute */
@@ -64,7 +63,7 @@ int s1a0903x01_set(int setting, int value)
             int pitch = 1000;
             
             /* 4th harmonic falls in the FM frequency range */
-            int if_freq = 4 * mpeg_get_mas_pllfreq();
+            int if_freq = 4 * mas_get_pllfreq();
 
             /* shift the mas harmonic >= 300 kHz away using the direction
              * which needs less shifting. */

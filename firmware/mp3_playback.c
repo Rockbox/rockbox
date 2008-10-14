@@ -26,7 +26,6 @@
 #include "debug.h"
 #include "panic.h"
 #include <kernel.h>
-#include "mpeg.h" /* ToDo: remove crosslinks */
 #include "mp3_playback.h"
 #include "sound.h"
 #ifndef SIMULATOR
@@ -75,6 +74,10 @@ bool audio_is_initialized = false;
 #endif
 
 /* FIX: this code pretty much assumes a MAS */
+
+/* dirty calls to mpeg.c */
+extern void playback_tick(void);
+extern void rec_tick(void);
 
 #ifndef SIMULATOR
 

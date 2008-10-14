@@ -191,9 +191,6 @@ pcm_sampr.c
 pcm.c
 #ifdef HAVE_RECORDING
 enc_base.c
-#ifndef SIMULATOR
-pcm_record.c
-#endif /* SIMULATOR */
 #endif /* HAVE_RECORDING */
 #endif /* BOOTLOADER */
 

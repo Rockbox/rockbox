@@ -116,6 +116,9 @@ codecs.c
 dsp.c
 #ifdef HAVE_RECORDING
 enc_config.c
+#ifndef SIMULATOR
+recorder/pcm_record.c
+#endif /* SIMULATOR */
 #endif
 eq.c	 	
 #if defined(CPU_COLDFIRE)

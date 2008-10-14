@@ -163,3 +163,9 @@ int mas_codec_readreg(int reg);
 unsigned long mas_readver(void);
 
 #endif
+
+#if CONFIG_TUNER & S1A0903X01
+void mas_store_pllfreq(int freq);
+int mas_get_pllfreq(void);
+#endif
+

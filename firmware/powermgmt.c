@@ -46,9 +46,6 @@
 #ifdef HAVE_LCD_BITMAP
 #include "font.h"
 #endif
-#if defined(HAVE_RECORDING) && (CONFIG_CODEC == SWCODEC)
-#include "pcm_record.h"
-#endif
 #include "logf.h"
 #include "lcd-remote.h"
 #ifdef SIMULATOR
