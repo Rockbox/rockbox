@@ -8382,6 +8382,8 @@
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
     h10,h10_5gb,e200,c200: "PREV to abort"
+    gigabeats: "BACK to abort"
+    gigabeatf:"POWER to abort"
   </source>
   <dest>
     *: "AV = avbryt"
@@ -8389,6 +8391,8 @@
     ipod*: "SPELA/PAUSA = Avbryt"
     x5,m5: "Lång SPELA = Avbryt"
     h10,h10_5gb,e200,c200: "FÖREGÅENDE = Avbryt"
+    gigabeats: "BAKÅT = Avbryt"
+    gigabeatf: "PÅ/AV = Avbryt"
   </dest>
   <voice>
     *: ""
@@ -11934,5 +11938,53 @@
   <voice>
     *: none
     recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMART
+  desc: Display the expected AA size
+  user:
+  <source>
+    *: none
+    albumart: "Album Art:"
+  </source>
+  <dest>
+    *: none
+    albumart: "Skivomslag:"
+  </dest>
+  <voice>
+    *: none
+    albumart: "Skivomslag:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MONO_MODE
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono mode"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Monoläge"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Monoläge"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user:
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "Sökresultat"
+  </dest>
+  <voice>
+    *: "Sökresultat"
   </voice>
 </phrase>
