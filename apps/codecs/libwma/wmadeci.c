@@ -1388,7 +1388,7 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
             n4 = s->block_len >>1;
 
             /*faster IMDCT from Vorbis*/
-            mdct_backward( (1 << (12-bsize)), (int32_t*)(*(s->coefs))[ch], (int32_t*)scratch_buffer);
+            mdct_backward( (1 << (s->block_len_bits+1)), (int32_t*)(*(s->coefs))[ch], (int32_t*)scratch_buffer);
 
             /*slower but more easily understood IMDCT from FFMPEG*/
             //ff_imdct_calc(&s->mdct_ctx[bsize],
