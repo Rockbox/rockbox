@@ -79,6 +79,7 @@
 #ifdef HAVE_RECORDING
 #include "recording.h"
 #include "talk.h"
+#include "pcm_record.h"
 #endif
 
 #define PLAYBACK_VOICE
