@@ -69,7 +69,7 @@
 #include "string.h"
 #include "usb.h"
 #include "metadata.h"
-#include "id3.h"
+#include "metadata.h"
 #include "tagcache.h"
 #include "buffer.h"
 #include "crc32.h"

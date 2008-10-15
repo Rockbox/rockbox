@@ -25,7 +25,7 @@
 #ifdef HAVE_ALBUMART
 
 #include <stdbool.h>
-#include "id3.h"
+#include "metadata.h"
 #include "gwps.h"
 
 /* Look for albumart bitmap in the same dir as the track and in its parent dir.

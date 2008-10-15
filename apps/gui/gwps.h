@@ -23,7 +23,7 @@
 
 #include "screen_access.h"
 #include "statusbar.h"
-#include "id3.h"
+#include "metadata.h"
 
 /* constants used in line_type and as refresh_mode for wps_refresh */
 #define WPS_REFRESH_STATIC          1    /* line doesn't change over time */

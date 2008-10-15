@@ -22,7 +22,7 @@
 #ifndef _TAGCACHE_H
 #define _TAGCACHE_H
 
-#include "id3.h"
+#include "metadata.h"
 
 /**
  Note: When adding new tags, make sure to update index_entry_ec in 

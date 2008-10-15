@@ -52,7 +52,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "usb.h"
 #include "font.h"
 #include "lcd.h"
-#include "id3.h"
+#include "metadata.h"
 #include "sound.h"
 #include "mpeg.h"
 #include "audio.h"

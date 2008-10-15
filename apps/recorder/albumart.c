@@ -23,7 +23,7 @@
 #include "sprintf.h"
 #include "system.h"
 #include "albumart.h"
-#include "id3.h"
+#include "metadata.h"
 #include "gwps.h"
 #include "buffering.h"
 #include "dircache.h"

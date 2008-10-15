@@ -25,7 +25,7 @@
 #include <stdbool.h>
 #include "screens.h"
 #include "file.h"
-#include "id3.h"
+#include "metadata.h"
 
 #define MAX_NAME 80    /* Max length of information strings */
 #define MAX_TRACKS 99  /* Max number of tracks in a cuesheet */

@@ -27,7 +27,7 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 #include "sprintf.h"
 #include "playback.h"
 #include "logf.h"
-#include "id3.h"
+#include "metadata.h"
 #include "kernel.h"
 #include "audio.h"
 #include "buffer.h"

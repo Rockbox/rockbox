@@ -36,7 +36,7 @@
 #include "audio.h"
 #include "lang.h"
 #include "talk.h"
-#include "id3.h"
+#include "metadata.h"
 #include "logf.h"
 #include "bitswap.h"
 #include "structec.h"

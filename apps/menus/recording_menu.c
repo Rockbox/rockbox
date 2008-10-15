@@ -55,7 +55,7 @@
 #endif
 #include "splash.h"
 #if CONFIG_CODEC == SWCODEC
-#include "id3.h"
+#include "metadata.h"
 #include "dsp.h"
 #include "menus/eq_menu.h"
 #ifdef HAVE_RECORDING

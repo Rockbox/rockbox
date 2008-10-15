@@ -7,7 +7,6 @@ abrepeat.c
 bookmark.c
 debug_menu.c
 filetypes.c
-id3.c
 language.c
 main.c
 menu.c
@@ -31,6 +30,7 @@ menus/recording_menu.c
 menus/settings_menu.c
 menus/sound_menu.c
 misc.c
+mp3data.c
 onplay.c
 playlist.c
 playlist_catalog.c
@@ -130,6 +130,7 @@ eq_arm.S
 #endif
 #endif
 metadata.c
+metadata/mp3.c
 #if CONFIG_CODEC == SWCODEC
 metadata/metadata_common.c
 metadata/aiff.c

@@ -18,7 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "id3.h"
+
+char* id3_get_num_genre(unsigned int genre_num);
+bool id3_is_genre_string(const char *string);
+int getid3v2len(int fd);
+bool get_mp3_metadata(int fd, struct mp3entry* id3, const char *filename);
 
 bool get_adx_metadata(int fd, struct mp3entry* id3);
 bool get_aiff_metadata(int fd, struct mp3entry* id3);

@@ -37,7 +37,7 @@
 #include "kernel.h"
 #include "keyboard.h"
 #include "mp3data.h"
-#include "id3.h"
+#include "metadata.h"
 #include "screens.h"
 #include "tree.h"
 #include "buffer.h"

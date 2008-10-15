@@ -25,7 +25,7 @@
 #include <stdbool.h>
 #include "file.h"
 #include "kernel.h"
-#include "id3.h"
+#include "metadata.h"
 
 #define PLAYLIST_ATTR_QUEUED    0x01
 #define PLAYLIST_ATTR_INSERTED  0x02

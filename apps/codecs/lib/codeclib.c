@@ -25,7 +25,7 @@
 #include "codecs.h"
 #include "dsp.h"
 #include "codeclib.h"
-#include "id3.h"
+#include "metadata.h"
 
 long mem_ptr;
 long bufsize;

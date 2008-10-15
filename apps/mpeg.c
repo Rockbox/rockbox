@@ -26,7 +26,7 @@
 
 #include "debug.h"
 #include "panic.h"
-#include "id3.h"
+#include "metadata.h"
 #include "mpeg.h"
 #include "audio.h"
 #include "ata.h"

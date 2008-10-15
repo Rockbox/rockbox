@@ -25,8 +25,9 @@
 #include <inttypes.h>
 
 #include "system.h"
-#include "id3.h"
+#include "metadata.h"
 #include "metadata_common.h"
+#include "metadata_parsers.h"
 #include "replaygain.h"
 
 /* Skip an ID3v2 tag if it can be found. We assume the tag is located at the

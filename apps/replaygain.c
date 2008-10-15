@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <system.h>
-#include "id3.h"
+#include "metadata.h"
 #include "debug.h"
 #include "replaygain.h"
 

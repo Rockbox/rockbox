@@ -46,7 +46,7 @@
 #include "action.h"
 #include "talk.h"
 #include "misc.h"
-#include "id3.h"
+#include "metadata.h"
 #include "screens.h"
 #include "debug.h"
 #include "led.h"

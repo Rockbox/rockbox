@@ -36,7 +36,7 @@
 #include "config.h"
 #include "kernel.h"
 #include "system.h"
-#include "id3.h"
+#include "metadata.h"
 #include "audio.h"
 #ifdef RB_PROFILE
 #include "profile.h"

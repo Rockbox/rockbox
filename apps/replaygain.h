@@ -22,7 +22,7 @@
 #ifndef _REPLAYGAIN_H
 #define _REPLAYGAIN_H
 
-#include "id3.h"
+#include "metadata.h"
 
 long get_replaygain_int(long int_gain);
 long parse_replaygain(const char* key, const char* value,

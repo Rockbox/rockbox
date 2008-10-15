@@ -24,6 +24,7 @@
 #ifndef PLUGIN
 
 #include <lcd.h>
+#include "metadata.h"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -88,7 +89,7 @@ enum Glyphs_4x8 {
 extern const unsigned char bitmap_glyphs_4x8[Glyph_4x8Last][4];
 
 #define BM_MPA_L3_M_WIDTH 6
-#ifdef ID3_H
+
 /* This enum is redundant but sort of in keeping with the style */
 enum rec_format_18x8 {
     Format_18x8_AIFF    = REC_FORMAT_AIFF,
@@ -98,7 +99,7 @@ enum rec_format_18x8 {
     Format_18x8Last     = REC_NUM_FORMATS
 };
 extern const unsigned char bitmap_formats_18x8[Format_18x8Last][18];
-#endif /* ID3_H */
+
 #endif /* CONFIG_CODEC == SWCODEC && defined (HAVE_RECORDING) */
 
 extern const unsigned char bitmap_icons_5x8[Icon5x8Last][5];

@@ -27,7 +27,7 @@
 #include "sound.h"
 #include "settings.h"
 #if CONFIG_CODEC == SWCODEC
-#include "id3.h"
+#include "metadata.h"
 #endif
 #include "icons.h"
 #include "powermgmt.h"

@@ -30,7 +30,7 @@
 #include "general.h"
 #include "audio.h"
 #include "sound.h"
-#include "id3.h"
+#include "metadata.h"
 #ifdef HAVE_SPDIF_IN
 #include "spdif.h"
 #endif

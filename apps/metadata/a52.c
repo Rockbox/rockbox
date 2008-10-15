@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-#include "id3.h"
+#include "metadata.h"
 #include "logf.h"
 
 #include "metadata_parsers.h"

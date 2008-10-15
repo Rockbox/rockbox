@@ -25,7 +25,7 @@
 #include <ctype.h>
 #include <inttypes.h>
 
-#include "id3.h"
+#include "metadata.h"
 #include "replaygain.h"
 #include "debug.h"
 #include "rbunicode.h"

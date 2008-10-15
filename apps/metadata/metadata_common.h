@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "id3.h"
+#include "metadata.h"
 
 #ifdef ROCKBOX_BIG_ENDIAN
 #define IS_BIG_ENDIAN 1
