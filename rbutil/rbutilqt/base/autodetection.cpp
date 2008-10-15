@@ -20,6 +20,9 @@
 #include <QtCore>
 #include "autodetection.h"
 
+#include "../ipodpatcher/ipodpatcher.h"
+#include "../sansapatcher/sansapatcher.h"
+
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
 #include <stdio.h>
 #include <usb.h>
@@ -47,7 +50,6 @@
 
 Autodetection::Autodetection(QObject* parent): QObject(parent)
 {
-
 }
 
 bool Autodetection::detect()
@@ -190,7 +192,8 @@ bool Autodetection::detect()
     free(sansa_sectorbuf);
     sansa_sectorbuf = NULL;
 
-    if(m_mountpoint.isEmpty() && m_device.isEmpty() && m_errdev.isEmpty() && m_incompat.isEmpty())
+    if(m_mountpoint.isEmpty() && m_device.isEmpty()
+            && m_errdev.isEmpty() && m_incompat.isEmpty())
         return false;
     return true;
 }
@@ -362,17 +365,17 @@ bool Autodetection::detectAjbrec(QString root)
     qDebug() << "file len:" << f.size();
     if((f.size() - 6) == len)
         m_device = "recorder";
-    
+
     // size didn't match, now we need to assume we have a headerlength of 24.
     switch(header[11]) {
         case 2:
             m_device = "recorderv2";
             break;
-            
+
         case 4:
             m_device = "fmrecorder";
             break;
-            
+
         case 8:
             m_device = "ondiofm";
             break;
@@ -385,7 +388,8 @@ bool Autodetection::detectAjbrec(QString root)
             break;
     }
     f.close();
-    
+
     if(m_device.isEmpty()) return false;
     return true;
 }
+

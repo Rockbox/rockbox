@@ -26,9 +26,6 @@
 #include <QtCore>
 #include "rbsettings.h"
 
-#include "../ipodpatcher/ipodpatcher.h"
-#include "../sansapatcher/sansapatcher.h"
-
 class Autodetection :public QObject
 {
     Q_OBJECT
@@ -61,3 +58,4 @@ private:
 
 
 #endif /*AUTODETECTION_H_*/
+
