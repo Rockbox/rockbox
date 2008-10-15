@@ -18,7 +18,7 @@ svnversion_safe() {
         if [ "$OUTPUT" = "exported" ]; then
             echo "unknown"
         else
-            echo "r$OUTPUT-3.0"
+            echo "r$OUTPUT-3.0.1"
         fi
     else
         echo "unknown"
