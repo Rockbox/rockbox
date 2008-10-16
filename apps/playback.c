@@ -559,7 +559,6 @@ int audio_current_aa_hid(void)
 struct mp3entry* audio_current_track(void)
 {
     const char *filename;
-    const char *p;
     static struct mp3entry temp_id3;
     struct playlist_track_info trackinfo;
     int cur_idx;
@@ -602,14 +601,12 @@ struct mp3entry* audio_current_track(void)
         return &temp_id3;
 #endif
 
-    p = strrchr(filename, '/');
-    if (!p)
-        p = filename;
+    strncpy(temp_id3.path, filename, sizeof(temp_id3.path)-1);
+    temp_id3.title = strrchr(temp_id3.path, '/');
+    if (!temp_id3.title)
+        temp_id3.title = &temp_id3.path[0];
     else
-        p++;
-
-    strncpy(temp_id3.path, p, sizeof(temp_id3.path)-1);
-    temp_id3.title = &temp_id3.path[0];
+        temp_id3.title++;
 
     return &temp_id3;
 }
