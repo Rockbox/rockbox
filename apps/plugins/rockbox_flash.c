@@ -30,7 +30,7 @@ PLUGIN_HEADER
 /* define DUMMY if you only want to "play" with the UI, does no harm */
 /* #define DUMMY */
 
-#define LATEST_BOOTLOADER_VERSION 1 /* update this with the bootloader */
+#define LATEST_BOOTLOADER_VERSION 2 /* update this with the bootloader */
 
 #ifndef UINT8
 #define UINT8 unsigned char
@@ -105,7 +105,8 @@ static UINT8* sector; /* better not place this on the stack... */
 
 
 /* read the manufacturer and device ID */
-bool ReadID(volatile UINT8* pBase, UINT8* pManufacturerID, UINT8* pDeviceID)
+static bool ReadID(volatile UINT8* pBase, UINT8* pManufacturerID,
+                   UINT8* pDeviceID)
 {
     UINT8 not_manu, not_id; /* read values before switching to ID mode */
     UINT8 manu, id; /* read values when in ID mode */
@@ -141,7 +142,7 @@ bool ReadID(volatile UINT8* pBase, UINT8* pManufacturerID, UINT8* pDeviceID)
 }
 
 /* erase the sector which contains the given address */
-bool EraseSector(volatile UINT8* pAddr)
+static bool EraseSector(volatile UINT8* pAddr)
 {
 #ifdef DUMMY
     (void)pAddr; /* prevents warning */
@@ -168,7 +169,7 @@ bool EraseSector(volatile UINT8* pAddr)
 }
 
 /* address must be in an erased location */
-inline bool ProgramByte(volatile UINT8* pAddr, UINT8 data)
+static inline bool ProgramByte(volatile UINT8* pAddr, UINT8 data)
 {
 #ifdef DUMMY
     (void)pAddr; /* prevents warnings */
@@ -195,7 +196,7 @@ inline bool ProgramByte(volatile UINT8* pAddr, UINT8 data)
 }
 
 /* this returns true if supported and fills the info struct */
-bool GetFlashInfo(tFlashInfo* pInfo)
+static bool GetFlashInfo(tFlashInfo* pInfo)
 {
     rb->memset(pInfo, 0, sizeof(tFlashInfo));
 
@@ -225,17 +226,8 @@ bool GetFlashInfo(tFlashInfo* pInfo)
 
 /*********** Tool Functions ************/
 
-/* place a 32 bit value into memory, big endian */
-void Write32(UINT8* pByte, UINT32 value)
-{
-    pByte[0] = (UINT8)(value >> 24);    
-    pByte[1] = (UINT8)(value >> 16);    
-    pByte[2] = (UINT8)(value >> 8);    
-    pByte[3] = (UINT8)(value);    
-}
-
 /* read a 32 bit value from memory, big endian */
-UINT32 Read32(UINT8* pByte)
+static UINT32 Read32(UINT8* pByte)
 {
     UINT32 value;
 
@@ -248,7 +240,7 @@ UINT32 Read32(UINT8* pByte)
 }
 
 /* get the start address of the second image */
-tImageHeader* GetSecondImage(void)
+static tImageHeader* GetSecondImage(void)
 {
     tImageHeader* pImage1;
     UINT32 pos = 0;    /* default: not found */
@@ -277,88 +269,17 @@ tImageHeader* GetSecondImage(void)
     return (tImageHeader*)pos;
 }
 
-
-/* Tool function to calculate a CRC32 across some buffer */
-/* third argument is either 0xFFFFFFFF to start or value from last piece */
-UINT32 crc_32(unsigned char* buf, unsigned len, unsigned crc32)
+/* return bootloader version */
+static inline unsigned BootloaderVersion(void)
 {
-    /* CCITT standard polynomial 0x04C11DB7 */
-    static const UINT32 crc32_lookup[16] = 
-    {   /* lookup table for 4 bits at a time is affordable */
-        0x00000000, 0x04C11DB7, 0x09823B6E, 0x0D4326D9, 
-        0x130476DC, 0x17C56B6B, 0x1A864DB2, 0x1E475005, 
-        0x2608EDB8, 0x22C9F00F, 0x2F8AD6D6, 0x2B4BCB61, 
-        0x350C9B64, 0x31CD86D3, 0x3C8EA00A, 0x384FBDBD
-    };
-    
-    unsigned char byte;
-    UINT32 t;
-
-    while (len--)
-    {   
-        byte = *buf++; /* get one byte of data */
-
-        /* upper nibble of our data */
-        t = crc32 >> 28; /* extract the 4 most significant bits */
-        t ^= byte >> 4; /* XOR in 4 bits of data into the extracted bits */
-        crc32 <<= 4; /* shift the CRC register left 4 bits */     
-        crc32 ^= crc32_lookup[t]; /* do the table lookup and XOR the result */
-
-        /* lower nibble of our data */
-        t = crc32 >> 28; /* extract the 4 most significant bits */
-        t ^= byte & 0x0F; /* XOR in 4 bits of data into the extracted bits */
-        crc32 <<= 4; /* shift the CRC register left 4 bits */     
-        crc32 ^= crc32_lookup[t]; /* do the table lookup and XOR the result */
-    }
-    
-    return crc32;
+    return FB[BOOT_VERS_ADR];
 }
-
-
-/* test if the bootloader is up-to-date, returns 0 if yes, else CRC */
-unsigned CheckBootloader(void)
-{
-    unsigned crc;
-    UINT32* pFlash = (UINT32*)FB;
-    int bootloader_version = FB[BOOT_VERS_ADR];
-
-    if (bootloader_version) /* this is a newer image, with a version number */
-    {
-        if (bootloader_version < LATEST_BOOTLOADER_VERSION)
-            return bootloader_version;
-        else
-            return 0;
-    }
-
-    /* checksum the bootloader, unfortunately I have no version info yet */
-    crc = crc_32((unsigned char*)pFlash[2], pFlash[3], -1);
-
-    /* Here I have to check for ARCHOS_* defines in source code, which is 
-       generally strongly discouraged. But here I'm not checking for a certain 
-       feature, I'm checking for the model itself. */
-#if defined(ARCHOS_PLAYER)
-    if (crc == 0x78DAC94A)
-        return 0;
-#elif defined(ARCHOS_RECORDER)
-    if (crc == 0xE968702E || crc == 0x7C3D93B4) /* normal or ROMless each */
-        return 0;
-#elif defined(ARCHOS_RECORDERV2)
-    if (crc == 0x4511E9B5 || crc == 0x3A93DBDF)
-        return 0;
-#elif defined(ARCHOS_FMRECORDER)
-    if (crc == 0x4511E9B5 || crc == 0x3A93DBDF)
-        return 0;
-#endif
-
-    return crc;
-}
-
 
 /*********** Image File Functions ************/
 
 /* so far, only compressed images in UCL NRV algorithm 2e supported */
-tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader,
-                            UINT8* pos)
+tCheckResult CheckImageFile(char* filename, int space,
+                            tImageHeader* pHeader, UINT8* pos)
 {
     int i;
     int fd;
@@ -487,8 +408,9 @@ tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader,
 
 
 /* returns the # of failures, 0 on success */
-unsigned ProgramImageFile(char* filename, UINT8* pos,
-                          tImageHeader* pImageHeader, int start, int size)
+static unsigned ProgramImageFile(char* filename, UINT8* pos,
+                                 tImageHeader* pImageHeader,
+                                 int start, int size)
 {
     int i;
     int fd;
@@ -537,8 +459,9 @@ unsigned ProgramImageFile(char* filename, UINT8* pos,
 }
 
 /* returns the # of failures, 0 on success */
-unsigned VerifyImageFile(char* filename, UINT8* pos,
-                         tImageHeader* pImageHeader, int start, int size)
+static unsigned VerifyImageFile(char* filename, UINT8* pos,
+                                tImageHeader* pImageHeader,
+                                int start, int size)
 {
     int i;
     int fd;
@@ -586,7 +509,7 @@ unsigned VerifyImageFile(char* filename, UINT8* pos,
 
 /***************** User Interface Functions *****************/
 
-int WaitForButton(void)
+static int WaitForButton(void)
 {
     int button;
     
@@ -598,8 +521,9 @@ int WaitForButton(void)
     return button;
 }
 
+#ifdef HAVE_LCD_BITMAP
 /* helper for DoUserDialog() */
-void ShowFlashInfo(tFlashInfo* pInfo, tImageHeader* pImageHeader)
+static void ShowFlashInfo(tFlashInfo* pInfo, tImageHeader* pImageHeader)
 {
     char buf[32];
 
@@ -636,9 +560,8 @@ void ShowFlashInfo(tFlashInfo* pInfo, tImageHeader* pImageHeader)
 
 
 /* Kind of our main function, defines the application flow. */
-#ifdef HAVE_LCD_BITMAP
 /* recorder version */
-void DoUserDialog(char* filename)
+static void DoUserDialog(char* filename)
 {
     tImageHeader ImageHeader;
     tFlashInfo FlashInfo;
@@ -648,7 +571,7 @@ void DoUserDialog(char* filename)
     UINT32 space, aligned_size, true_size;
     UINT8* pos;
     ssize_t memleft;
-    UINT32 crc;
+    unsigned bl_version;
     bool show_greet = false;
     
     /* this can only work if Rockbox runs in DRAM, not flash ROM */
@@ -692,10 +615,10 @@ void DoUserDialog(char* filename)
         return; /* exit */
     }
 
-    crc = CheckBootloader();
-    if (crc) /* outdated version found */
+    bl_version = BootloaderVersion();
+    if (bl_version < LATEST_BOOTLOADER_VERSION)
     {
-        rb->snprintf(buf, sizeof(buf), "(check=0x%08lx)", crc);
+        rb->snprintf(buf, sizeof(buf), "Bootloader V%d", bl_version);
         rb->lcd_puts(0, 0, buf);
         rb->lcd_puts(0, 1, "Hint: You're not  ");
         rb->lcd_puts(0, 2, "using the latest  ");
@@ -842,7 +765,7 @@ void DoUserDialog(char* filename)
 #else /* #ifdef HAVE_LCD_BITMAP */
 
 /* Player version */
-void DoUserDialog(char* filename)
+static void DoUserDialog(char* filename)
 {
     tImageHeader ImageHeader;
     tFlashInfo FlashInfo;
@@ -852,7 +775,7 @@ void DoUserDialog(char* filename)
     UINT32 space, aligned_size, true_size;
     UINT8* pos;
     ssize_t memleft;
-    UINT32 crc;
+    unsigned bl_version;
 
     /* this can only work if Rockbox runs in DRAM, not flash ROM */
     if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
@@ -890,8 +813,8 @@ void DoUserDialog(char* filename)
         return; /* exit */
     }
     
-    crc = CheckBootloader();
-    if (crc) /* outdated version found */
+    bl_version = BootloaderVersion();
+    if (bl_version < LATEST_BOOTLOADER_VERSION)
     {
         rb->lcd_puts_scroll(0, 0, "Hint: You're not using the latest bootloader. A full reflash is recommended, but not required.");
         rb->lcd_puts_scroll(0, 1, "Press [Menu] to ignore");
@@ -939,7 +862,7 @@ void DoUserDialog(char* filename)
             rb->lcd_puts_scroll(0, 1, "File invalid. Blocksize too small?");
             break;
     case eBadRomLink:
-            rb->lcd_puts_scroll(0, 1, "BootBox mismatch");
+            rb->lcd_puts_scroll(0, 1, "RomBox mismatch.");
             break;
     default:
             rb->lcd_puts_scroll(0, 1, "Check failed.");
