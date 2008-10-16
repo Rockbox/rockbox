@@ -34,6 +34,7 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 #include "settings.h"
 #include "ata_idle_notify.h"
 #include "misc.h"
+#include "appevents.h"
 
 #if CONFIG_RTC
 #include "time.h"

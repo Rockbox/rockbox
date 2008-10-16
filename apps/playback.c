@@ -44,7 +44,7 @@
 #include "codecs.h"
 #include "audio.h"
 #include "buffering.h"
-#include "events.h"
+#include "appevents.h"
 #include "voice_thread.h"
 #include "mp3_playback.h"
 #include "usb.h"
@@ -2134,7 +2134,7 @@ static void audio_stop_playback(void)
 
         prev_track_elapsed = curtrack_id3.elapsed;
 
-        remove_event(EVENT_BUFFER_LOW, buffering_low_buffer_callback);
+        remove_event(BUFFER_EVENT_BUFFER_LOW, buffering_low_buffer_callback);
     }
 
     paused = false;
@@ -2194,7 +2194,7 @@ static void audio_play_start(size_t offset)
 
     audio_fill_file_buffer(true, offset);
 
-    add_event(EVENT_BUFFER_LOW, false, buffering_low_buffer_callback);
+    add_event(BUFFER_EVENT_BUFFER_LOW, false, buffering_low_buffer_callback);
 
     LOGFQUEUE("audio > audio Q_AUDIO_TRACK_CHANGED");
     queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
@@ -2578,8 +2578,8 @@ void audio_init(void)
 #endif
     }
 
-    add_event(EVENT_HANDLE_REBUFFER, false, buffering_handle_rebuffer_callback);
-    add_event(EVENT_HANDLE_FINISHED, false, buffering_handle_finished_callback);
+    add_event(BUFFER_EVENT_REBUFFER, false, buffering_handle_rebuffer_callback);
+    add_event(BUFFER_EVENT_FINISHED, false, buffering_handle_finished_callback);
 
     /* Probably safe to say */
     audio_is_initialized = true;

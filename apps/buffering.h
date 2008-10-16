@@ -24,7 +24,7 @@
 
 #include <sys/types.h>
 #include <stdbool.h>
-#include "events.h"
+#include "appevents.h"
 
 
 enum data_type {
@@ -36,14 +36,6 @@ enum data_type {
     TYPE_BITMAP,
     TYPE_BUFFER,
     TYPE_UNKNOWN,
-};
-
-enum callback_event {
-    EVENT_BUFFER_LOW = (EVENT_CLASS_BUFFERING|1),
-    EVENT_HANDLE_REBUFFER,
-    EVENT_HANDLE_CLOSED,
-    EVENT_HANDLE_MOVED,
-    EVENT_HANDLE_FINISHED,
 };
 
 /* Error return values */

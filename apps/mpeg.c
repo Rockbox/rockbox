@@ -39,7 +39,7 @@
 #include "mp3_playback.h"
 #include "sound.h"
 #include "bitswap.h"
-#include "events.h"
+#include "appevents.h"
 #ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"

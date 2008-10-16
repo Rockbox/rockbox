@@ -50,7 +50,7 @@
 #include "pcmbuf.h"
 #include "buffer.h"
 #include "bmp.h"
-#include "events.h"
+#include "appevents.h"
 #include "metadata.h"
 
 #if MEM > 1
@@ -600,7 +600,7 @@ static bool buffer_handle(int handle_id)
         h->filerem = 0;
         h->available = sizeof(struct mp3entry);
         h->widx += sizeof(struct mp3entry);
-        send_event(EVENT_HANDLE_FINISHED, &h->id);
+        send_event(BUFFER_EVENT_FINISHED, &h->id);
         return true;
     }
 
@@ -673,7 +673,7 @@ static bool buffer_handle(int handle_id)
         /* finished buffering the file */
         close(h->fd);
         h->fd = -1;
-        send_event(EVENT_HANDLE_FINISHED, &h->id);
+        send_event(BUFFER_EVENT_FINISHED, &h->id);
     }
 
     return true;
@@ -729,7 +729,7 @@ static void rebuffer_handle(int handle_id, size_t newpos)
         /* There isn't enough space to rebuffer all of the track from its new
            offset, so we ask the user to free some */
         DEBUGF("rebuffer_handle: space is needed\n");
-        send_event(EVENT_HANDLE_REBUFFER, &handle_id);
+        send_event(BUFFER_EVENT_REBUFFER, &handle_id);
     }
 
     /* Now we ask for a rebuffer */
@@ -1339,7 +1339,7 @@ void buffering_thread(void)
                 LOGFQUEUE("buffering < Q_START_FILL %d", (int)ev.data);
                 /* Call buffer callbacks here because this is one of two ways
                  * to begin a full buffer fill */
-                send_event(EVENT_BUFFER_LOW, 0);
+                send_event(BUFFER_EVENT_BUFFER_LOW, 0);
                 shrink_buffer();
                 queue_reply(&buffering_queue, 1);
                 filling |= buffer_handle((int)ev.data);
@@ -1401,7 +1401,7 @@ void buffering_thread(void)
 
         /* If the buffer is low, call the callbacks to get new data */
         if (num_handles > 0 && data_counters.useful <= conf_watermark)
-            send_event(EVENT_BUFFER_LOW, 0);
+            send_event(BUFFER_EVENT_BUFFER_LOW, 0);
 
 #if 0
         /* TODO: This needs to be fixed to use the idle callback, disable it
@@ -1411,7 +1411,7 @@ void buffering_thread(void)
         else if (ata_disk_is_active() && queue_empty(&buffering_queue))
         {
             if (num_handles > 0 && data_counters.useful <= high_watermark)
-                send_event(EVENT_BUFFER_LOW, 0);
+                send_event(BUFFER_EVENT_BUFFER_LOW, 0);
 
             if (data_counters.remaining > 0 && BUF_USED <= high_watermark)
             {

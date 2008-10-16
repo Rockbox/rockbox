@@ -61,6 +61,7 @@
 #include "backdrop.h"
 #include "quickscreen.h"
 #include "pitchscreen.h"
+#include "appevents.h"
 
 /* currently only on wps_state is needed */
 struct wps_state wps_state;
@@ -820,7 +821,7 @@ void gui_sync_wps_init(void)
         gui_wps_set_statusbar(&gui_wps[i], &statusbars.statusbars[i]);
     }
 #ifdef HAVE_LCD_BITMAP
-    add_event(STATUSBAR_TOGGLE_EVENT, false, statusbar_toggle_handler);
+    add_event(GUI_EVENT_STATUSBAR_TOGGLE, false, statusbar_toggle_handler);
 #endif
 #if LCD_DEPTH > 1
     unload_wps_backdrop();

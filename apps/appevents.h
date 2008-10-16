@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: events.h 17847 2008-06-28 18:10:04Z bagder $
  *
- * Copyright (C) 2008 by Miika Pekkarinen
+ * Copyright (C) 2008 by Jonathan Gordon
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,28 +19,38 @@
  *
  ****************************************************************************/
 
-#ifndef _EVENTS_H
-#define _EVENTS_H
+#ifndef _APPEVENTS_H
+#define _APPEVENTS_H
 
 #include <stdbool.h>
+#include "events.h"
 
-/** Only CLASS defines and firmware/ level events should be defined here.
- *  apps/ level events are defined in apps/appevents.h 
+/** Only app/ level events should be defined here.
+ *  firmware/ level events and CLASS's are defined in firmware/export/events.h
  */
 
-/**
- * High byte = Event class definition
- * Low byte  = Event ID
- */
+/** Playback events **/
+enum {
+    PLAYBACK_EVENT_TRACK_BUFFER = (EVENT_CLASS_PLAYBACK|1),
+    PLAYBACK_EVENT_TRACK_FINISH,
+    PLAYBACK_EVENT_TRACK_CHANGE,
+};
 
-#define EVENT_CLASS_DISK       0x0100
-#define EVENT_CLASS_PLAYBACK   0x0200
-#define EVENT_CLASS_BUFFERING  0x0400
-#define EVENT_CLASS_GUI        0x0800
+/** Buffering events **/
+enum {
+    BUFFER_EVENT_BUFFER_LOW = (EVENT_CLASS_BUFFERING|1),
+    BUFFER_EVENT_REBUFFER,
+    BUFFER_EVENT_CLOSED,
+    BUFFER_EVENT_MOVED,
+    BUFFER_EVENT_FINISHED,
+};
 
-bool add_event(unsigned short id, bool oneshot, void (*handler));
-void remove_event(unsigned short id, void (*handler));
-void send_event(unsigned short id, void *data);
+/** Generic GUI class events **/
+enum {
+    GUI_EVENT_THEME_CHANGED = (EVENT_CLASS_GUI|1),
+    GUI_EVENT_STATUSBAR_TOGGLE,
+};
 
 #endif
+
 

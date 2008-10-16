@@ -47,7 +47,7 @@
 #include "misc.h"
 #include "filetypes.h"
 #include "audio.h"
-#include "events.h"
+#include "appevents.h"
 
 #define FILE_SEARCH_INSTRUCTIONS ROCKBOX_DIR "/tagnavi.config"
 
