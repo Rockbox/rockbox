@@ -194,7 +194,7 @@ $(BUILDDIR)/$(BINARY) : $(OBJS) $(DEPFILE) $(BUILDDIR)/libsim.a \
 endif
 
 $(BUILDDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
-	$(call PRINTS,UCLPACK rockbox)$(TOOLSDIR)/uclpack --best --2e $< $@ >/dev/null 2>&1
+	$(call PRINTS,UCLPACK rockbox)$(TOOLSDIR)/uclpack --best --2e -b1048576 $< $@ >/dev/null 2>&1
 
 $(BUILDDIR)/rombox.ucl: $(OBJDIR)/rombox.bin $(MAXOUTFILE)
 	$(call PRINTS,UCLPACK rombox)$(TOOLSDIR)/uclpack --none $< $@ >/dev/null 2>&1; \
