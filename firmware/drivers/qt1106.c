@@ -75,10 +75,10 @@ unsigned int qt1106_io(unsigned int output)
 
     while(!RDY) {}
 
-    delay(10);  // < 470 us
+    delay(10*100);  // < 470 us
 
     CLRSS();
-    delay(13); // > 22 us
+    delay(13*100); // > 22 us
 
     for (i = 0; i < 24; i++) {
 
@@ -90,14 +90,14 @@ unsigned int qt1106_io(unsigned int output)
             CLRMOSI();
         output <<= 1;
 
-        delay(20); // >> 6.7 us
+        delay(20*100); // >> 6.7 us
 
         SETCLK();
 
         input <<= 1;
         input |= MISO;
 
-        delay(20); // >> 6.7 us
+        delay(20*100); // >> 6.7 us
     }
 
     SETSS();

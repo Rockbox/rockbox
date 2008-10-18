@@ -104,43 +104,32 @@ void bl_debug_int(unsigned int input,unsigned int count)
 void main(void)
 {
     char mystring[64];
-    int tmpval;
-
-    /* set fclk = 200MHz, hclk = 100MHz, pclk = 50MHz, others off */
-    CLKCON = 0x00800080;
-    PLLCON = 0;
-    PLL0PMS = 0x1ad200;
-    PLL0LCNT = 8100;
-    PLLCON = 1;
-    while (!(PLLLOCK & 1)) ;
-    CLKCON2= 0x80;
-    CLKCON = 0x20803180;
-
-    /* mask all interrupts
-       this is done, because the lcd framebuffer
-       overwrites some stuff, which leads to a freeze
-       when an irq is generated after the dfu upload.
-       crt0 should have disabled irqs,
-       but the bootrom hands us execution in
-       user mode so we can't switch interrupts off */
-    INTMSK = 0;
 
     //Set backlight pin to output and enable
     int oldval = PCON0;
     PCON0 = ((oldval & ~(3 << 4)) | (1 << 4));
     PDAT0 |= (1 << 2);
 
-    //Set PLAY to input
+    //power on
+//    oldval = PCON1;
+//    PCON1 = ((oldval & ~(0xf << 12)) | (1 << 12));
+//    PDAT1|=(1<<3);
+
+    //Set PLAY to EINT4
     oldval = PCON1;
-    PCON1 = ((oldval & ~(0xf << 16)) | (0 << 16));
+    PCON1 = ((oldval & ~(0xf << 16)) | (2 << 16));
 
-    asm volatile("mrs %0, cpsr \n\t"
-		 : "=r" (tmpval)
-    );
+    //Set MENU to EINT0
+    oldval = PCON1;
+    PCON1 = (oldval & ~(0xf)) | 2;
 
+    // enable external interrupts
+    EINTPOL = 0x11;
+    INTMSK = 0x11;
+    EINTMSK = 0x11;
+    asm volatile("msr cpsr_c, #0x13\n\t"); // enable interrupts
+        
     lcd_init();
-    snprintf(mystring, 64, "tmpval: %x", tmpval);
-    lcd_puts(0,0,mystring);
     lcd_update();
 
     init_qt1106();

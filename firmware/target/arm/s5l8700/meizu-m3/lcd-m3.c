@@ -69,7 +69,7 @@ void lcd_set_flip(bool yesno)
 static void lcd_sleep(uint32_t t)
 {
     volatile uint32_t i;
-    for(i=0;i<t;++i) t=t;
+    for(i=0;i<t;++i);
 }
 
 static uint8_t lcd_readdata()
@@ -115,6 +115,7 @@ void lcd_off() {
 void lcd_init_device(void)
 {
     uint8_t data[5];
+    int i;
 
 /* init basic things */
     PWRCON &= ~0x800;
@@ -126,25 +127,26 @@ void lcd_init_device(void)
     LCD_INTCON = 0;
     LCD_RST_TIME = 0x7ff;
 
-/* detect lcd type */
-    LCD_WCMD = 0x1;
-    lcd_sleep(166670);
-    LCD_WCMD = 0x11;
-    lcd_sleep(2000040);
-    lcd_readdata();
-    LCD_WCMD = 0x4;
-    lcd_sleep(100);
-    data[0]=lcd_readdata();
-    data[1]=lcd_readdata();
-    data[2]=lcd_readdata();
-    data[3]=lcd_readdata();
-    data[4]=lcd_readdata();
-    
-    lcd_type=0;
-    if (((data[1]==0x38) && ((data[2] & 0xf0) == 0x80)) ||
-        ((data[2]==0x38) && ((data[3] & 0xf0) == 0x80)))
-        lcd_type=1;
-    
+/* detect lcd type, it's not detected the first time for some reason */
+    for(i=0;i<3;++i) {
+	LCD_WCMD = 0x1;
+	lcd_sleep(166670);
+	LCD_WCMD = 0x11;
+	lcd_sleep(2000040);
+	lcd_readdata();
+	LCD_WCMD = 0x4;
+	lcd_sleep(100);
+	data[0]=lcd_readdata();
+	data[1]=lcd_readdata();
+	data[2]=lcd_readdata();
+	data[3]=lcd_readdata();
+	data[4]=lcd_readdata();
+
+	lcd_type=0;
+	if (((data[1]==0x38) && ((data[2] & 0xf0) == 0x80)) ||
+    	    ((data[2]==0x38) && ((data[3] & 0xf0) == 0x80)))
+    	    lcd_type=1;
+    }
 /* init lcd */
     if (lcd_type == 1) {
         LCD_WCMD = 0x3a;
