@@ -82,7 +82,7 @@ PLUGIN_HEADER
    it's nice not to have to pass the api pointer in all function calls
    in the plugin */
 
-const struct plugin_api* rb;
+extern const struct plugin_api* rb;
 
 /* Default game - used to initialise sudoku.ss if it doesn't exist. */
 static const char default_game[9][9] =

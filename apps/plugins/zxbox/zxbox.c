@@ -24,7 +24,7 @@
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
 
-const struct plugin_api* rb;
+extern const struct plugin_api* rb;
 
 #include "spkey_p.h"
 

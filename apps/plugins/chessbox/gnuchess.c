@@ -64,7 +64,7 @@
 #define taxicab(a,b) (abs(column[a]-column[b]) + abs(row[a]-row[b]))
 
 /* ---- RockBox datatypes and variables */
-const struct plugin_api* rb;
+extern const struct plugin_api* rb;
 
 /* ---- Chess datatypes and variables ---- */
 struct leaf

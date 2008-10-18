@@ -34,7 +34,7 @@
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
 
-const struct plugin_api* rb;
+extern const struct plugin_api* rb;
 
 struct pacman_settings {
     int difficulty;

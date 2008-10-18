@@ -268,7 +268,7 @@ PLUGIN_IRAM_DECLARE
 #endif
 #endif
 
-const struct plugin_api* rb;
+extern const struct plugin_api* rb;
 
 CACHE_FUNCTION_WRAPPERS(rb);
 ALIGN_BUFFER_WRAPPER(rb);

@@ -101,7 +101,7 @@ int my_close(int id)
    return 0;
 }
 #endif
-const struct plugin_api* rb;
+extern const struct plugin_api* rb;
 #define MAXARGVS  100
 
 bool noprintf=0;  // Variable disables printf lcd updates to protect grayscale lib/direct lcd updates

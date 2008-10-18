@@ -32,7 +32,7 @@ struct tea5767_region_data
     unsigned char band; /* 0: europe, 1: japan (BL in TEA spec)*/
 } __attribute__((packed));
 
-const struct tea5767_region_data tea5767_region_data[TUNER_NUM_REGIONS];
+extern const struct tea5767_region_data tea5767_region_data[TUNER_NUM_REGIONS];
 
 struct tea5767_dbg_info
 {

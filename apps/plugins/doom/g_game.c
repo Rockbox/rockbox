@@ -108,7 +108,7 @@ int             consoleplayer; // player taking events and displaying
 int             displayplayer; // view being displayed
 int             gametic;
 int             levelstarttic; // gametic at level start
-int             basetic;       /* killough 9/29/98: for demo sync */
+extern int      basetic;       /* killough 9/29/98: for demo sync */
 int             totalkills, totallive, totalitems, totalsecret;    // for intermission
 boolean         demorecording;
 boolean         demoplayback;
