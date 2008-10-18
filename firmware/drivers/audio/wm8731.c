@@ -204,23 +204,6 @@ void audiohw_close(void)
     /* 2) Remove the WM8731 supplies. */
 }
 
-void audiohw_set_nsorder(int order)
-{
-    static const unsigned char deemp[4] =
-    {
-        DAPCTRL_DEEMP_DISABLE,
-        DAPCTRL_DEEMP_32KHz,
-        DAPCTRL_DEEMP_44KHz,
-        DAPCTRL_DEEMP_48KHz
-    };
-
-    if ((unsigned)order >= ARRAYLEN(deemp))
-        order = 0;
-
-    wm8731_write(DAPCTRL,
-        (wm8731_regs[DAPCTRL] & ~DAPCTRL_DEEMP_MASK) | deemp[order]);
-}
-
 void audiohw_set_sample_rate(int sampling_control)
 {
     int rate = 0;

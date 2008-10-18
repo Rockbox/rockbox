@@ -172,11 +172,6 @@ void audiohw_close(void)
     wmcodec_write(PWRMGMT2, PWRMGMT2_SLEEP);
 }
 
-void audiohw_set_nsorder(int order)
-{
-    (void)order;
-}
-
 /* Note: Disable output before calling this function */
 void audiohw_set_sample_rate(int sampling_control)
 {

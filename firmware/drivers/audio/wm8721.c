@@ -160,12 +160,6 @@ void audiohw_close(void)
     wmcodec_write(PDCTRL, 0xff);
 }
 
-/* Change the order of the noise shaper, 5th order is recommended above 32kHz */
-void audiohw_set_nsorder(int order)
-{
-    (void)order;
-}
-
 void audiohw_set_sample_rate(int sampling_control)
 {
     int rate = 0;
