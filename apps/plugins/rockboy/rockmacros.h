@@ -109,7 +109,7 @@ struct options {
    int dirty;
 };
 
-extern bool plugbuf;
+bool plugbuf;
 
 extern struct options options;
 #define savedir ROCKBOX_DIR "/rockboy"

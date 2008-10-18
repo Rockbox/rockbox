@@ -32,7 +32,7 @@ PLUGIN_IRAM_DECLARE
 /* here is a global api struct pointer. while not strictly necessary,
    it's nice not to have to pass the api pointer in all function calls
    in the plugin */
-bool plugbuf;
+const struct plugin_api* rb;
 int shut,cleanshut;
 char *errormsg;
 
