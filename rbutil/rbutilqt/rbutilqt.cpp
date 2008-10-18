@@ -491,7 +491,7 @@ bool RbUtilQt::installAuto()
     if(settings->curReleased()) {
         // only set the keys if needed -- querying will yield an empty string
         // if not set.
-        versmap.insert("rel_rev", settings->lastRelease());
+        versmap.insert("rel_rev", settings->lastRelease(settings->curPlatform()));
         versmap.insert("rel_date", ""); // FIXME: provide the release timestamp
     }
 
@@ -568,7 +568,7 @@ void RbUtilQt::install()
     if(settings->curReleased()) {
         // only set the keys if needed -- querying will yield an empty string
         // if not set.
-        versmap.insert("rel_rev", settings->lastRelease());
+        versmap.insert("rel_rev", settings->lastRelease(settings->curPlatform()));
         versmap.insert("rel_date", ""); // FIXME: provide the release timestamp
     }
     installWindow->setVersionStrings(versmap);

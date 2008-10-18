@@ -91,11 +91,11 @@ void Install::accept()
     QString myversion;
     QString buildname = settings->curPlatformName();
     if(ui.radioStable->isChecked()) {
-        file = QString("%1/rockbox-%2-%3.zip")
-                .arg(settings->downloadUrl(),
-                    buildname, settings->lastRelease());
+        file = QString("%1/%2/rockbox-%3-%4.zip")
+                .arg(settings->releaseUrl(),settings->lastRelease(settings->curPlatform()),
+                    buildname, settings->lastRelease(settings->curPlatform()));
         fileName = QString("rockbox-%1-%2.zip")
-                   .arg(settings->lastRelease(), buildname);
+                   .arg(settings->lastRelease(settings->curPlatform()), buildname);
         settings->setBuild("stable");
         myversion = version.value("rel_rev");
     }

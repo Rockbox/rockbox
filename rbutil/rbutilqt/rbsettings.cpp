@@ -113,9 +113,9 @@ QString RbSettings::bleedingUrl()
     return devices->value("bleeding_url").toString();
 }
 
-QString RbSettings::lastRelease()
+QString RbSettings::lastRelease(QString plattform)
 {
-    return devices->value("last_release").toString();
+    return deviceSettingCurGet("last_release").toString();
 }
 
 QString RbSettings::cachePath()
@@ -148,9 +148,9 @@ QString RbSettings::doomUrl()
     return devices->value("doom_url").toString();
 }
 
-QString RbSettings::downloadUrl()
+QString RbSettings::releaseUrl()
 {
-    return devices->value("download_url").toString();
+    return devices->value("release_url").toString();
 }
 
 QString RbSettings::dailyUrl()

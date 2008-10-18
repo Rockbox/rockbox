@@ -48,14 +48,14 @@ class RbSettings : public QObject
         QString mountpoint();
         QString manualUrl();
         QString bleedingUrl();
-        QString lastRelease();
+        QString lastRelease(QString plattform);
         QString cachePath();
         QString bootloaderUrl();
         QString bootloaderInfoUrl();
         QString fontUrl();
         QString voiceUrl();
         QString doomUrl();
-        QString downloadUrl();
+        QString releaseUrl();
         QString dailyUrl();
         QString serverConfUrl();
         QString themeUrl();
