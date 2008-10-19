@@ -286,11 +286,11 @@ int main (int argc, char** argv)
         else if(!strcmp(&argv[1][5], "9200")) /* Philips SA9200 */
             modelnum = 34;
         else if (!strcmp(&argv[1][5], "clip"))
-            modelnum = 50;
+            modelnum = 40;
         else if (!strcmp(&argv[1][5], "e2v2"))
-            modelnum = 51;
+            modelnum = 41;
         else if (!strcmp(&argv[1][5], "m2v2"))
-            modelnum = 52;
+            modelnum = 42;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;
