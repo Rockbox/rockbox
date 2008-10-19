@@ -91,7 +91,7 @@
 //#define HAVE_SW_POWEROFF
 
 /* The number of bytes reserved for loadable codecs */
-#define CODEC_SIZE 0x80000
+#define CODEC_SIZE 0x100000
 
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x100000

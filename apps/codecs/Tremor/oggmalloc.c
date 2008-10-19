@@ -5,7 +5,7 @@ static size_t bufsize, tmp_ptr, mem_ptr;
 
 void ogg_malloc_init(void)
 {
-    mallocbuf = ci->get_codec_memory(&bufsize);
+    mallocbuf = ci->codec_get_buffer(&bufsize);
     tmp_ptr = bufsize & ~3;
     mem_ptr = 0;
 }

@@ -82,12 +82,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 25
+#define CODEC_API_VERSION 26
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 25
+#define CODEC_MIN_API_VERSION 26
 
 /* codec return codes */
 enum codec_status {
@@ -125,7 +125,7 @@ struct codec_api {
     struct dsp_config *dsp;
     
     /* Returns buffer to malloc array. Only codeclib should need this. */
-    void* (*get_codec_memory)(size_t *size);
+    void* (*codec_get_buffer)(size_t *size);
     /* Insert PCM data into audio buffer for playback. Playback will start
        automatically. */
     bool (*pcmbuf_insert)(const void *ch1, const void *ch2, int count);
@@ -255,6 +255,9 @@ struct codec_header {
     unsigned char *end_addr;
     enum codec_status(*entry_point)(struct codec_api*);
 };
+
+extern unsigned char codecbuf[];
+extern size_t codec_size;
 
 #ifdef CODEC
 #ifndef SIMULATOR

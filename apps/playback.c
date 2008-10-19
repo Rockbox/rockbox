@@ -166,10 +166,8 @@ enum filling_state {
 
 /* As defined in plugins/lib/xxx2wav.h */
 #if MEM > 1
-#define MALLOC_BUFSIZE (512*1024)
 #define GUARD_BUFSIZE  (32*1024)
 #else
-#define MALLOC_BUFSIZE (100*1024)
 #define GUARD_BUFSIZE  (8*1024)
 #endif
 
@@ -924,10 +922,12 @@ static bool codec_pcmbuf_insert_callback(
     return true;
 } /* codec_pcmbuf_insert_callback */
 
-static void* codec_get_memory_callback(size_t *size)
+static void* codec_get_buffer(size_t *size)
 {
-    *size = MALLOC_BUFSIZE;
-    return malloc_buf;
+    if (codec_size >= CODEC_SIZE)
+        return NULL;
+    *size = CODEC_SIZE - codec_size;
+    return &codecbuf[codec_size];
 }
 
 /* Between the codec and PCM track change, we need to keep updating the
@@ -2297,7 +2297,7 @@ static void audio_finalise_track_change(void)
 
 /*
  * Layout audio buffer as follows - iram buffer depends on target:
- * [|SWAP:iram][|TALK]|MALLOC|FILE|GUARD|PCM|[SWAP:dram[|iram]|]
+ * [|SWAP:iram][|TALK]|FILE|GUARD|PCM|[SWAP:dram[|iram]|]
  */
 static void audio_reset_buffer(void)
 {
@@ -2313,7 +2313,7 @@ static void audio_reset_buffer(void)
     /* Align the malloc buf to line size. Especially important to cf
        targets that do line reads/writes. */
     malloc_buf = (unsigned char *)(((uintptr_t)malloc_buf + 15) & ~15);
-    filebuf    = malloc_buf + MALLOC_BUFSIZE; /* filebuf line align implied */
+    filebuf    = malloc_buf; /* filebuf line align implied */
     filebuflen = audiobufend - filebuf;
 
     filebuflen &= ~15;
@@ -2338,7 +2338,6 @@ static void audio_reset_buffer(void)
         size_t pcmbufsize;
         const unsigned char *pcmbuf = pcmbuf_get_meminfo(&pcmbufsize);
         logf("mabuf:  %08X", (unsigned)malloc_buf);
-        logf("mabufe: %08X", (unsigned)(malloc_buf + MALLOC_BUFSIZE));
         logf("fbuf:   %08X", (unsigned)filebuf);
         logf("fbufe:  %08X", (unsigned)(filebuf + filebuflen));
         logf("gbuf:   %08X", (unsigned)(filebuf + filebuflen));
@@ -2513,7 +2512,7 @@ void audio_init(void)
      /* Initialize codec api. */
     ci.read_filebuf        = codec_filebuf_callback;
     ci.pcmbuf_insert       = codec_pcmbuf_insert_callback;
-    ci.get_codec_memory    = codec_get_memory_callback;
+    ci.codec_get_buffer    = codec_get_buffer;
     ci.request_buffer      = codec_request_buffer_callback;
     ci.advance_buffer      = codec_advance_buffer_callback;
     ci.advance_buffer_loc  = codec_advance_buffer_loc_callback;

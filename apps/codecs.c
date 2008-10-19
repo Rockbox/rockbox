@@ -66,6 +66,8 @@ void sim_codec_close(void *pd);
 extern unsigned char codecbuf[];
 #endif
 
+size_t codec_size;
+
 extern void* plugin_get_audio_buffer(size_t *buffer_size);
 
 struct codec_api ci = {
@@ -78,7 +80,7 @@ struct codec_api ci = {
     0, /* new_track */
     0, /* seek_time */
     NULL, /* struct dsp_config *dsp */
-    NULL, /* get_codec_memory */
+    NULL, /* codec_get_buffer */
     NULL, /* pcmbuf_insert */
     NULL, /* set_elapsed */
     NULL, /* read_filebuf */
@@ -193,6 +195,9 @@ static int codec_load_ram(int size, struct codec_api *api)
         logf("codec header error");
         return CODEC_ERROR;
     }
+
+    codec_size = hdr->end_addr - codecbuf;
+
 #else /* SIMULATOR */
     void *pd;
     
@@ -211,6 +216,9 @@ static int codec_load_ram(int size, struct codec_api *api)
         sim_codec_close(pd);
         return CODEC_ERROR;
     }
+
+    codec_size = codecbuf - codecbuf;
+
 #endif /* SIMULATOR */
     if (hdr->api_version > CODEC_API_VERSION
         || hdr->api_version < CODEC_MIN_API_VERSION) {
@@ -226,7 +234,8 @@ static int codec_load_ram(int size, struct codec_api *api)
     return status;
 }
 
-int codec_load_buf(unsigned int hid, struct codec_api *api) {
+int codec_load_buf(unsigned int hid, struct codec_api *api)
+{
     int rc;
     rc = bufread(hid, CODEC_SIZE, codecbuf);
     if (rc < 0) {

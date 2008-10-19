@@ -36,7 +36,7 @@ unsigned char* filebuf;    // The rest of the MP3 buffer
 int codec_init(void)
 {
     mem_ptr = 0;
-    mallocbuf = (unsigned char *)ci->get_codec_memory((size_t *)&bufsize);
+    mallocbuf = (unsigned char *)ci->codec_get_buffer((size_t *)&bufsize);
   
     return 0;
 }

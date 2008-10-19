@@ -24,8 +24,6 @@
 #include "system.h"
 #include <sys/types.h>
 
-#define MALLOC_BUFSIZE (512*1024)
-
 extern struct codec_api *ci;
 extern long mem_ptr;
 extern long bufsize;
