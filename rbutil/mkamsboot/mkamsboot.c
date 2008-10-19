@@ -391,7 +391,7 @@ int main(int argc, char* argv[])
     buf = load_file(infile, &len);
 
     if (buf == NULL) {
-        fprintf(stderr,"[ERR]  Could not load bootloader file\n");
+        fprintf(stderr,"[ERR]  Could not load %s\n",infile);
         return 1;
     }
 
