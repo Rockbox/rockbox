@@ -139,6 +139,7 @@ void lcd_init_device(void)
     lcd_write_command(LCD_SET_POWER_CONTROL_REGISTER|0x7);
     lcd_write_command(LCD_SET_DISPLAY_ON);
     lcd_write_command(LCD_SET_DISPLAY_START_LINE);
+    lcd_write_command(LCD_SET_NORMAL_DISPLAY);
 }
 
 

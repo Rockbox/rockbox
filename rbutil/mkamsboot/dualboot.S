@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:$
+ * $Id$
  *
  * Copyright (C) 2008 Rafaël Carré
  *
@@ -77,6 +77,8 @@ uclcopy:
         orr   r1, r1, #(1<<16)
         str   r1, [r0]
 
+        
+#ifndef SANSA_M200V2  /* this doesnt work for m200 */         
         /* we check A3 unconditionally of the model because it seems to be */
         /* either hold, either usb on every model */
 
@@ -87,6 +89,7 @@ uclcopy:
 
         cmp   r1, #0
         bne   boot_of
+#endif
 
         /* here are model specific tests, for dual boot without a computer */
 
@@ -108,6 +111,22 @@ uclcopy:
 
         cmp   r1, #0             /* C6 = #0 means button pressed */
         beq   boot_of
+#elif defined(SANSA_M200V2)
+.set row, (1<<5) /* 4 or <<5 or <<6 */
+        /* enable output on A3-A5 */
+        /* set keyscan row A0-A3 */
+        ldr   r0, =GPIOA
+        mov   r1, #row
+        str   r1, [r0, #0x400]
+        str   r1, [r0, #(4*row)]
+
+.set col, (1<<0) /* 0 or 1, 2, 3 */
+        /* read keyscan column A0-A3 */
+        ldr   r2, [r0, #(4*col)]
+
+        /* check value read (compare to 0!) */
+        cmp   r2, #0
+        beq   boot_of        /* for beginning we jump if button select is not pressed */
 #else
         #error No target-specific key check defined!
 #endif

@@ -89,6 +89,7 @@ execution to the uncompressed firmware.
 #include "uclimg.h"
 #include "bootimg_clip.h"
 #include "bootimg_e200v2.h"
+#include "bootimg_m200v2.h"
 
 /* Win32 compatibility */
 #ifndef O_BINARY
@@ -126,7 +127,7 @@ static const unsigned char* bootloaders[] =
     bootimg_clip,
     NULL,
     bootimg_e200v2,
-    NULL,
+    bootimg_m200v2,
     NULL
 };
 
@@ -136,7 +137,7 @@ static const int bootloader_sizes[] =
     sizeof(bootimg_clip),
     0,
     sizeof(bootimg_e200v2),
-    0,
+    sizeof(bootimg_m200v2),
     0
 };
 
@@ -373,6 +374,7 @@ int main(int argc, char* argv[])
     int fw_version;
     int totalsize;
     unsigned char* p;
+    uint32_t checksum;
 
     fprintf(stderr,"mkamsboot v" VERSION " - (C) Dave Chapman and Rafaël Carré 2008\n");
     fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
@@ -395,9 +397,10 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    /* TODO: Do some more sanity checks on the OF image */
+    /* TODO: Do some more sanity checks on the OF image. Some images (like m200v2) dont have a checksum at the end, only padding (0xdeadbeef). */
+    checksum = get_uint32le(buf + len - 4); 
+    if (checksum != 0xefbeadde && checksum != calc_checksum(buf, len - 4)) {
 
-    if (get_uint32le(buf + len - 4) != calc_checksum(buf, len - 4)) {
         fprintf(stderr,"[ERR]  Whole file checksum failed - %s\n",infile);
         return 1;
     }
@@ -420,7 +423,6 @@ int main(int argc, char* argv[])
     if (bootloaders[model] == NULL) {
         fprintf(stderr,"[ERR]  Unsupported model - \"%s\"\n",model_names[model]);
         free(buf);
-        free(rb_unpacked);
         return 1;
     }
 
