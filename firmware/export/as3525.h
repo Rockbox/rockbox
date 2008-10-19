@@ -296,20 +296,20 @@ interface */
 
 /* GPIO registers */
 
-#define GPIOA_DIR       (*(volatile unsigned long*)(GPIOA_BASE+0x400))
+#define GPIOA_DIR       (*(volatile unsigned char*)(GPIOA_BASE+0x400))
 #define GPIOA_AFSEL     (*(volatile unsigned char*)(GPIOA_BASE+0x420))
-#define GPIOA_PIN(a)    (*(volatile unsigned long*)(GPIOA_BASE+4*(1<<(a))))
+#define GPIOA_PIN(a)    (*(volatile unsigned char*)(GPIOA_BASE+4*(1<<(a))))
 
-#define GPIOB_DIR       (*(volatile unsigned long*)(GPIOB_BASE+0x400))
+#define GPIOB_DIR       (*(volatile unsigned char*)(GPIOB_BASE+0x400))
 #define GPIOB_AFSEL     (*(volatile unsigned char*)(GPIOB_BASE+0x420))
-#define GPIOB_PIN(a)    (*(volatile unsigned long*)(GPIOB_BASE+4*(1<<(a))))
+#define GPIOB_PIN(a)    (*(volatile unsigned char*)(GPIOB_BASE+4*(1<<(a))))
 
-#define GPIOC_DIR       (*(volatile unsigned long*)(GPIOC_BASE+0x400))
+#define GPIOC_DIR       (*(volatile unsigned char*)(GPIOC_BASE+0x400))
 #define GPIOC_AFSEL     (*(volatile unsigned char*)(GPIOC_BASE+0x420))
-#define GPIOC_PIN(a)    (*(volatile unsigned long*)(GPIOC_BASE+4*(1<<(a))))
+#define GPIOC_PIN(a)    (*(volatile unsigned char*)(GPIOC_BASE+4*(1<<(a))))
 
-#define GPIOD_DIR       (*(volatile unsigned long*)(GPIOD_BASE+0x400))
+#define GPIOD_DIR       (*(volatile unsigned char*)(GPIOD_BASE+0x400))
 #define GPIOD_AFSEL     (*(volatile unsigned char*)(GPIOD_BASE+0x420))
-#define GPIOD_PIN(a)    (*(volatile unsigned long*)(GPIOD_BASE+4*(1<<(a))))
+#define GPIOD_PIN(a)    (*(volatile unsigned char*)(GPIOD_BASE+4*(1<<(a))))
 
 #endif /*__AS3525_H__*/
