@@ -68,6 +68,82 @@
 #define LCD_CNTL_HIGHCOL        0x10    /* Upper column address */
 #define LCD_CNTL_LOWCOL         0x00    /* Lower column address */
 
+
+#if CONFIG_CPU == AS3525
+#include "as3525.h"
+
+void lcd_write_command(int byte)
+{
+    DBOP_TIMPOL_23 = 0x6006E;
+    DBOP_DOUT = byte;
+
+    /* While push fifo is not empty */
+    while ((DBOP_STAT & (1<<10)) == 0)
+                ;
+
+    DBOP_TIMPOL_23 = 0x6E06F;
+}
+
+void lcd_write_data(const fb_data* p_bytes, int count)
+{
+    while (count--)
+    {
+        /* Write pixels */
+        DBOP_DOUT = *p_bytes++;
+
+        /* While push fifo is not empty */
+        while ((DBOP_STAT & (1<<10)) == 0)
+            ;
+    }
+}
+
+static inline void ams3525_dbop_init(void)
+{
+    int clkdiv = 4 - 1;
+
+    CGU_DBOP |= (1<<3) /* clk enable */ | clkdiv /* clkdiv: 3 bits */ ;
+
+    GPIOB_AFSEL = 0x0f; /* DBOP on pin 3:0 */
+    GPIOC_AFSEL = 0xff; /* DBOP on pins 7:0 */
+
+    DBOP_CTRL      = 0x50008;
+    DBOP_TIMPOL_01 = 0xA167E167;
+    DBOP_TIMPOL_23 = 0x6E06F; /* this value is used for data (pixels) write */
+}
+
+
+/* LCD init, largely based on what OF does */
+void lcd_init_device(void)
+{
+    int delay;
+
+    ams3525_dbop_init();
+
+    GPIOB_DIR |= (1<<4);
+    GPIOD_DIR |= (1<<1)|(1<<3);
+
+    GPIOD_PIN(1) = (1<<1); /* backlight on */
+
+    GPIOD_PIN(3) = (1<<3);
+    delay = 10; while(delay--) ;
+
+    GPIOB_PIN(4) = (1<<4);
+    delay = 10; while(delay--) ;
+
+    lcd_write_command(LCD_SET_LCD_BIAS);
+    lcd_write_command(LCD_SET_SEGMENT_REMAP);
+    lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION);
+    lcd_write_command(LCD_SET_INTERNAL_REGULATOR_RESISTOR_RATIO|0x5);
+    lcd_set_contrast(lcd_default_contrast());
+    lcd_write_command(LCD_SET_REVERSE_DISPLAY);
+    lcd_write_command(LCD_SET_POWER_CONTROL_REGISTER|0x7);
+    lcd_write_command(LCD_SET_DISPLAY_ON);
+    lcd_write_command(LCD_SET_DISPLAY_START_LINE);
+}
+
+
+#elif defined(CPU_TCC77X)
+
 /* TCC77x specific defines */
 #define LCD_BASE 0x50000000
 #define LCD_CMD   *(volatile unsigned char*)(LCD_BASE)
@@ -97,42 +173,6 @@ void lcd_write_data(const fb_data* p_bytes, int count)
         );
     }
 }
-
-/* End of TCC77x specific defines */
-
-
-/** globals **/
-
-static int xoffset; /* needed for flip */
-
-/*** hardware configuration ***/
-
-int lcd_default_contrast(void)
-{
-    return 0x1f;
-}
-
-void lcd_set_contrast(int val)
-{
-    lcd_write_command(LCD_CNTL_CONTRAST);
-    lcd_write_command(val);
-}
-
-void lcd_set_invert_display(bool yesno)
-{
-    if (yesno) 
-        lcd_write_command(LCD_SET_REVERSE_DISPLAY);
-    else 
-        lcd_write_command(LCD_SET_NORMAL_DISPLAY);
-}
-
-/* turn the display upside down (call lcd_update() afterwards) */
-void lcd_set_flip(bool yesno)
-{
-    (void)yesno;
-    /* TODO */
-}
-
 
 /* LCD init */
 void lcd_init_device(void)
@@ -174,6 +214,43 @@ void lcd_init_device(void)
     lcd_clear_display();
     lcd_update();
 }
+
+/* End of TCC77x specific defines */
+#endif
+
+
+/** globals **/
+
+static int xoffset; /* needed for flip */
+
+/*** hardware configuration ***/
+
+int lcd_default_contrast(void)
+{
+    return 0x1f;
+}
+
+void lcd_set_contrast(int val)
+{
+    lcd_write_command(LCD_CNTL_CONTRAST);
+    lcd_write_command(val);
+}
+
+void lcd_set_invert_display(bool yesno)
+{
+    if (yesno) 
+        lcd_write_command(LCD_SET_REVERSE_DISPLAY);
+    else 
+        lcd_write_command(LCD_SET_NORMAL_DISPLAY);
+}
+
+/* turn the display upside down (call lcd_update() afterwards) */
+void lcd_set_flip(bool yesno)
+{
+    (void)yesno;
+    /* TODO */
+}
+
 
 /*** Update functions ***/
 

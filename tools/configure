@@ -694,6 +694,8 @@ cat <<EOF
  33) Cowon D2                                    53) Sansa m200
  34) M3/M3L                                      54) Sansa c100
                                                  55) Sansa Clip
+                                                 56) Sansa e200v2
+                                                 57) Sansa m200v2
 
  ==Tatung==               ==Olympus==            ==Logik==
  60) Elio TPJ-1022        70) M:Robe 500         80) DAX 1GB MP3/DAB
@@ -1695,6 +1697,46 @@ fi
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-clip"
+    ;;
+
+
+   56|e200v2)
+    target_id=51
+    modelname="e200v2"
+    target="-DSANSA_E200V2"
+    memory=2 # FIXME - a guess
+    arm9tdmicc
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$bmp2rb_mono"
+    tool="$rootdir/tools/scramble -add=e2v2"
+    output="rockbox.sansa"
+    bootoutput="bootloader-e200v2.sansa"
+    appextra="recorder:gui"
+    plugins=""
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="as3525"
+    t_model="sansa-clip"
+    ;;
+
+
+   57|m200v2)
+    target_id=52
+    modelname="m200v2"
+    target="-DSANSA_M200V2"
+    memory=2 # FIXME - A guess
+    arm9tdmicc
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$bmp2rb_mono"
+    tool="$rootdir/tools/scramble -add=m2v2"
+    output="rockbox.sansa"
+    bootoutput="bootloader-m200v2.sansa"
+    appextra="recorder:gui"
+    plugins=""
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="as3525"
+    t_model="sansa-m200v2"
     ;;
 
 

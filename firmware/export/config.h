@@ -173,6 +173,7 @@
 #define I2C_DM320   12 /* DM320 style */
 #define I2C_S5L8700 13
 #define I2C_JZ47XX  14 /* Ingenic Jz47XX style */
+#define I2C_AS3525  15
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player) */
@@ -199,6 +200,7 @@
 #define RTC_S5L8700  14
 #define RTC_S35390A  15
 #define RTC_JZ47XX   16 /* Ingenic Jz47XX */
+#define RTC_AS3525   17
 
 /* USB On-the-go */
 #define USBOTG_ISP1362 1362 /* iriver H300 */
@@ -206,6 +208,7 @@
 #define USBOTG_M5636   5636 /* iAudio X5 */
 #define USBOTG_ARC     5020 /* PortalPlayer 502x */
 #define USBOTG_JZ4740  4740 /* Ingenic Jz4740/Jz4732 */
+#define USBOTG_AS3525  3525 /* AMS AS3525 */
 
 /* Multiple cores */
 #define CPU 0
@@ -306,6 +309,10 @@
 #include "config-ondavx767.h"
 #elif defined(SANSA_CLIP)
 #include "config-clip.h"
+#elif defined(SANSA_E200V2)
+#include "config-e200v2.h"
+#elif defined(SANSA_M200V2)
+#include "config-m200v2.h"
 #else
 /* no known platform */
 #endif

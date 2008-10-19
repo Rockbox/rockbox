@@ -148,7 +148,7 @@ static const char* rb_model_names[] =
     "clip",
     NULL,
     "e2v2",
-    NULL,
+    "m2v2",
     NULL
 };
 
@@ -157,10 +157,10 @@ static const char* rb_model_names[] =
 static const int rb_model_num[] =
 {
     0,
-    50,
+    40,
     0,
-    51,
-    0,
+    41,
+    42,
     0
 };
 

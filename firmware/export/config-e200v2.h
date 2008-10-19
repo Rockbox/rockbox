@@ -1,15 +1,12 @@
 /*
- * This config file is for the Sandisk Sansa e200
+ * This config file is for the Sandisk Sansa e200v2
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 40
-#define MODEL_NAME   "Sandisk Sansa Clip"
-#define FIRMWARE_OFFSET_FILE_DATA 0
-#define FIRMWARE_OFFSET_FILE_CRC 0
+#define MODEL_NUMBER 41
+#define MODEL_NAME   "Sandisk Sansa e200v2 series"
 
-#if 0
 #define HW_SAMPR_CAPS       (SAMPR_CAP_44)
 
 /* define this if you have recording possibility */
@@ -19,55 +16,62 @@
 #define REC_FREQ_DEFAULT    REC_FREQ_22 /* Default is not 44.1kHz */
 #define REC_SAMPR_DEFAULT   SAMPR_22
 
-
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
 #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_FMRADIO)
-#endif
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
+
+/* define this if you have a colour LCD */
+#define HAVE_LCD_COLOR
+
+/* define this if you want album art for this target */
+#define HAVE_ALBUMART
 
 /* define this if you have a light associated with the buttons */
 #define HAVE_BUTTON_LIGHT
 
 /* define this if you have access to the quickscreen */
-//#define HAVE_QUICKSCREEN
+#define HAVE_QUICKSCREEN
 
 /* define this if you have access to the pitchscreen */
-//#define HAVE_PITCHSCREEN
+#define HAVE_PITCHSCREEN
 
 /* define this if you would like tagcache to build on this target */
-//#define HAVE_TAGCACHE
+#define HAVE_TAGCACHE
 
 /* LCD dimensions */
-#define LCD_WIDTH  128
-#define LCD_HEIGHT 64
-#define LCD_DEPTH  1
-#define LCD_PIXELFORMAT VERTICAL_PACKING
+#define LCD_WIDTH  176
+#define LCD_HEIGHT 220
+#define LCD_DEPTH  16   /* 65536 colours */
+#define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
 /* define this if you have LCD enable function */
 #define HAVE_LCD_ENABLE
 
-#ifndef BOOTLOADER
-
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
    should be defined as well. */
-//#define HAVE_LCD_SLEEP
-//#define HAVE_LCD_SLEEP_SETTING
-#endif
+#define HAVE_LCD_SLEEP
+#define HAVE_LCD_SLEEP_SETTING
 
 /* define this if you can flip your LCD */
-//#define HAVE_LCD_FLIP
+#define HAVE_LCD_FLIP
+
+/* define this if you can invert the colours on your LCD */
+#define HAVE_LCD_INVERT
 
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
 
-#define CONFIG_KEYPAD SANSA_CLIP_PAD
+#define CONFIG_KEYPAD SANSA_E200_PAD
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS
+
+/* Define this if you have an AMS AS3525 */
+#define HAVE_AS3525
 
 /* define this if you have a real-time clock */
 #ifndef BOOTLOADER
@@ -75,26 +79,33 @@
 #endif
 
 /* Define this if you have a software controlled poweroff */
-//#define HAVE_SW_POWEROFF
+#define HAVE_SW_POWEROFF
 
+/* Some Sansa E200s seem to be FAT16 formatted */
 #define HAVE_FAT16SUPPORT
 
 /* The number of bytes reserved for loadable codecs */
-#define CODEC_SIZE 0
-//#define CODEC_SIZE 0x100000
+#define CODEC_SIZE 0x100000
 
 /* The number of bytes reserved for loadable plugins */
-//#define PLUGIN_BUFFER_SIZE 0x80000
+#define PLUGIN_BUFFER_SIZE 0x80000
 
 #define AB_REPEAT_ENABLE 1
 
 /* FM Tuner */
-//#define CONFIG_TUNER LV24020LP
-//#define HAVE_TUNER_PWR_CTRL
+/* #define CONFIG_TUNER LV24020LP */
+/* #define HAVE_TUNER_PWR_CTRL */
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
+
+/* define this if the unit uses a scrollwheel for navigation */
+#define HAVE_SCROLLWHEEL
+/* define from which rotation speed [degree/sec] on the acceleration starts */
+#define WHEEL_ACCEL_START 540
+/* define type of acceleration (1 = ^2, 2 = ^3, 3 = ^4) */
+#define WHEEL_ACCELERATION 1
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
@@ -117,10 +128,10 @@
 /** Non-simulator section **/
 #ifndef SIMULATOR
 
-/* Define this if you have a PortalPlayer PP5024 */
+/* Define this if you have an AMS AS3525*/
 #define CONFIG_CPU AS3525
 
-/* Define this if you want to use the PP5024 i2c interface */
+/* Define this if you want to use the AS2525 i2c interface */
 #define CONFIG_I2C I2C_AS3525
 
 /* define this if the hardware can be powered off while charging */
@@ -131,23 +142,30 @@
 #define ROM_START 0x00000000
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ      250000000
+#define CPU_FREQ      75000000
 
-/* Type of LCD */
-#define CONFIG_LCD LCD_SSD1303
+/* Type of LCD TODO: hopefully the same as the x5 but check this*/
+#define CONFIG_LCD LCD_X5
+
+/* Offset ( in the firmware file's header ) to the file CRC and data. These are
+   only used when loading the old format rockbox.e200 file */
+#define FIRMWARE_OFFSET_FILE_CRC    0x0
+#define FIRMWARE_OFFSET_FILE_DATA   0x8
 
 #ifndef BOOTLOADER
 #define HAVE_MULTIVOLUME
 #define HAVE_HOTSWAP
+#endif
+
+/* #define USB_IPODSTYLE */
 
 /* USB On-the-go */
-#define CONFIG_USBOTG USBOTG_ARC
+#define CONFIG_USBOTG USBOTG_AS3525
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
 #define USB_VENDOR_ID 0x0781
-#define USB_PRODUCT_ID 0x7433
-#endif /* BOOTLOADER */
+#define USB_PRODUCT_ID 0x7423
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
@@ -177,3 +195,8 @@
 #define DEFAULT_REC_MIC_GAIN    23
 #define DEFAULT_REC_LEFT_GAIN   23
 #define DEFAULT_REC_RIGHT_GAIN  23
+
+#ifdef E200R_INSTALLER
+#define IRAMORIG 0x40004000
+#endif
+

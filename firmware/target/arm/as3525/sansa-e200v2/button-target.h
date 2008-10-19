@@ -7,11 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2008 by Rafaël Carré
+ * Copyright (C) 2006 by Barry Wardell
  *
- * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
- * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
- * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -22,39 +19,42 @@
  *
  ****************************************************************************/
 
-#include <stdio.h>
-#include <system.h>
-#include <inttypes.h>
-#include "lcd.h"
-#include "common.h"
+#ifndef _BUTTON_TARGET_H_
+#define _BUTTON_TARGET_H_
+
+#include <stdbool.h>
 #include "config.h"
 
-int show_logo(void);
-void main(void)
-{
-    lcd_init_device();
-    lcd_clear_display();
+#define HAS_BUTTON_HOLD
 
-    lcd_update();
-
-#ifdef HAVE_LCD_ENABLE
-    lcd_enable(true);
+bool button_hold(void);
+void button_init_device(void);
+int button_read_device(void);
+#ifndef BOOTLOADER
+void clickwheel_int(void);
 #endif
+void button_int(void);
 
-    show_logo();
+/* Sandisk Sansa E200 button codes */
 
-#ifdef SANSA_CLIP
-    /* Use hardware scrolling */
+/* Main unit's buttons */
+#define BUTTON_REC          0x00000001
+#define BUTTON_DOWN         0x00000002
+#define BUTTON_RIGHT        0x00000004
+#define BUTTON_LEFT         0x00000008
+#define BUTTON_SELECT       0x00000010
+#define BUTTON_UP           0x00000020
+#define BUTTON_POWER        0x00000040
 
-    lcd_write_command(0x26); /* scroll setup */
-    lcd_write_command(0x01); /* columns scrolled per step */
-    lcd_write_command(0x00); /* start page */
-    lcd_write_command(0x00); /* steps freqency */
-    lcd_write_command(0x07); /* end page (including) */
+#define BUTTON_SCROLL_BACK  0x00000080
+#define BUTTON_SCROLL_FWD   0x00000100
 
-    lcd_write_command(0x2F); /* start horizontal scrolling */
-#endif
+#define BUTTON_MAIN         0x00000fff
 
-    /* never returns */
-    while(1) ;
-}
+/* No Remote control */
+#define BUTTON_REMOTE 0
+
+#define POWEROFF_BUTTON BUTTON_POWER
+#define POWEROFF_COUNT 10
+
+#endif /* _BUTTON_TARGET_H_ */

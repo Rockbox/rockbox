@@ -7,11 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2008 by Rafaël Carré
+ * Copyright (C) 2007 by Dave Chapman
  *
- * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
- * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
- * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -22,39 +19,36 @@
  *
  ****************************************************************************/
 
-#include <stdio.h>
-#include <system.h>
-#include <inttypes.h>
-#include "lcd.h"
-#include "common.h"
+#ifndef _BUTTON_TARGET_H_
+#define _BUTTON_TARGET_H_
+
+#include <stdbool.h>
 #include "config.h"
 
-int show_logo(void);
-void main(void)
-{
-    lcd_init_device();
-    lcd_clear_display();
+#define HAS_BUTTON_HOLD
 
-    lcd_update();
+void button_init_device(void);
+int button_read_device(void);
+bool button_hold(void);
 
-#ifdef HAVE_LCD_ENABLE
-    lcd_enable(true);
-#endif
+/* Main unit's buttons */
+#define BUTTON_MENU         0x00000001
+#define BUTTON_VOLUP        0x00000002
+#define BUTTON_VOLDOWN      0x00000004
+#define BUTTON_PLAYPAUSE    0x00000008
+#define BUTTON_REPEATAB     0x00000010
+#define BUTTON_LEFT         0x00000020
+#define BUTTON_RIGHT        0x00000040
+#define BUTTON_SELECT       0x00000080
 
-    show_logo();
+#define BUTTON_MAIN (BUTTON_MENU|BUTTON_VOLUP|BUTTON_VOLDOWN\
+                    |BUTTON_PLAYPAUSE|BUTTON_REPEATAB|BUTTON_LEFT\
+                    |BUTTON_RIGHT|BUTTON_SELECT)
 
-#ifdef SANSA_CLIP
-    /* Use hardware scrolling */
+#define BUTTON_REMOTE 0
 
-    lcd_write_command(0x26); /* scroll setup */
-    lcd_write_command(0x01); /* columns scrolled per step */
-    lcd_write_command(0x00); /* start page */
-    lcd_write_command(0x00); /* steps freqency */
-    lcd_write_command(0x07); /* end page (including) */
-
-    lcd_write_command(0x2F); /* start horizontal scrolling */
-#endif
-
-    /* never returns */
-    while(1) ;
-}
+/* Software power-off */
+#define POWEROFF_BUTTON BUTTON_MENU
+#define POWEROFF_COUNT 40
+                
+#endif /* _BUTTON_TARGET_H_ */

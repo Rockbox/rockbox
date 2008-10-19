@@ -327,10 +327,6 @@ target/arm/pnx0101/system-pnx0101.c
 
 #if CONFIG_CPU == AS3525
 target/arm/as3525/system-as3525.c
-#ifdef SANSA_CLIP
-target/arm/as3525/sansa-clip/lcd-ssd1303.c
-target/arm/as3525/sansa-clip/button-clip.c
-#endif
 #endif
 
 #if defined(CPU_PP)
@@ -978,9 +974,9 @@ target/arm/pnx0101/pcm-pnx0101.c
 #ifndef SIMULATOR
 drivers/nand_id.c
 target/arm/ata-nand-telechips.c
+target/arm/lcd-ssd1815.c
 target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
-target/arm/tcc77x/lcd-ssd1815.c
 target/arm/tcc77x/powermgmt-tcc77x.c
 target/arm/tcc77x/system-tcc77x.c
 target/arm/tcc77x/timer-tcc77x.c
@@ -999,10 +995,10 @@ target/arm/tcc77x/logikdax/audio-logikdax.c
 #ifdef SANSA_M200
 #ifndef SIMULATOR
 drivers/nand_id.c
+target/arm/lcd-ssd1815.c
 target/arm/ata-nand-telechips.c
 target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
-target/arm/tcc77x/lcd-ssd1815.c
 target/arm/tcc77x/powermgmt-tcc77x.c
 target/arm/tcc77x/system-tcc77x.c
 target/arm/tcc77x/timer-tcc77x.c
@@ -1037,6 +1033,27 @@ target/arm/pcm-telechips.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* SANSA_C100 */
+
+#ifdef SANSA_CLIP
+#ifndef SIMULATOR
+target/arm/as3525/sansa-clip/lcd-ssd1303.c
+target/arm/as3525/sansa-clip/button-clip.c
+#endif /* !SIMULATOR */
+#endif /* SANSA_CLIP */
+
+#ifdef SANSA_E200V2
+#ifndef SIMULATOR
+target/arm/as3525/sansa-e200v2/lcd-e200v2.c
+target/arm/as3525/sansa-e200v2/button-e200v2.c
+#endif /* !SIMULATOR */
+#endif /* SANSA_E200V2 */
+
+#ifdef SANSA_M200V2
+#ifndef SIMULATOR
+target/arm/lcd-ssd1815.c
+target/arm/as3525/sansa-m200v2/button-m200v2.c
+#endif /* !SIMULATOR */
+#endif /* SANSA_M200V2 */
 
 #ifdef IAUDIO_7
 #ifndef SIMULATOR

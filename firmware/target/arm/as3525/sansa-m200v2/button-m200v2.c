@@ -7,11 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2008 by Rafaël Carré
+ * Copyright (C) 2008 by ??
  *
- * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
- * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
- * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -22,39 +19,25 @@
  *
  ****************************************************************************/
 
-#include <stdio.h>
-#include <system.h>
-#include <inttypes.h>
-#include "lcd.h"
-#include "common.h"
 #include "config.h"
+#include "cpu.h"
+#include "button.h"
+#include "adc.h"
 
-int show_logo(void);
-void main(void)
+void button_init_device(void)
 {
-    lcd_init_device();
-    lcd_clear_display();
 
-    lcd_update();
+}
 
-#ifdef HAVE_LCD_ENABLE
-    lcd_enable(true);
-#endif
+int button_read_device(void)
+{
+    int btn = BUTTON_NONE;
 
-    show_logo();
+    return btn;
+}
 
-#ifdef SANSA_CLIP
-    /* Use hardware scrolling */
-
-    lcd_write_command(0x26); /* scroll setup */
-    lcd_write_command(0x01); /* columns scrolled per step */
-    lcd_write_command(0x00); /* start page */
-    lcd_write_command(0x00); /* steps freqency */
-    lcd_write_command(0x07); /* end page (including) */
-
-    lcd_write_command(0x2F); /* start horizontal scrolling */
-#endif
-
-    /* never returns */
-    while(1) ;
+bool button_hold(void)
+{
+    /* TODO */
+    return false;
 }
