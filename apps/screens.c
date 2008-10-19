@@ -717,103 +717,108 @@ static const int id3_headers[]=
 #endif
     LANG_ID3_PATH,
 };
-
+struct id3view_info {
+    struct mp3entry* id3;
+    int count;
+    int info_id[sizeof(id3_headers)/sizeof(id3_headers[0])];
+};
 static char * id3_get_info(int selected_item, void* data,
                            char *buffer, size_t buffer_len)
 {
-    struct mp3entry* id3 =(struct mp3entry*)data;
+    struct id3view_info *info = (struct id3view_info*)data;
+    struct mp3entry* id3 =info->id3;
     int info_no=selected_item/2;
     if(!(selected_item%2))
     {/* header */
-        return( str(id3_headers[info_no]));
+        return( str(id3_headers[info->info_id[info_no]]));
     }
     else
     {/* data */
 
-        char * info=NULL;
-        switch(info_no)
+        char * val=NULL;
+        switch(info->info_id[info_no])
         {
             case 0:/*LANG_ID3_TITLE*/
-                info=id3->title;
+                val=id3->title;
                 break;
             case 1:/*LANG_ID3_ARTIST*/
-                info=id3->artist;
+                val=id3->artist;
                 break;
             case 2:/*LANG_ID3_ALBUM*/
-                info=id3->album;
+                val=id3->album;
                 break;
             case 3:/*LANG_ID3_ALBUMARTIST*/
-                info=id3->albumartist;
+                val=id3->albumartist;
                 break;
             case 4:/*LANG_ID3_GROUPING*/
-                info=id3->grouping;
+                val=id3->grouping;
                 break;
             case 5:/*LANG_ID3_DISCNUM*/
                 if (id3->disc_string)
-                    info = id3->disc_string;
+                    val = id3->disc_string;
                 else if (id3->discnum)
                 {
                     snprintf(buffer, buffer_len, "%d", id3->discnum);
-                    info = buffer;
+                    val = buffer;
                 }
                 break;
             case 6:/*LANG_ID3_TRACKNUM*/
                 if (id3->track_string)
-                    info = id3->track_string;
+                    val = id3->track_string;
                 else if (id3->tracknum)
                 {
                     snprintf(buffer, buffer_len, "%d", id3->tracknum);
-                    info = buffer;
+                    val = buffer;
                 }
                 break;
             case 7:/*LANG_ID3_COMMENT*/
-                info=id3->comment;
+                val=id3->comment;
                 break;
             case 8:/*LANG_ID3_GENRE*/
-                info = id3->genre_string;
+                val = id3->genre_string;
                 break;
             case 9:/*LANG_ID3_YEAR*/
                 if (id3->year_string)
-                    info = id3->year_string;
+                    val = id3->year_string;
                 else if (id3->year)
                 {
                     snprintf(buffer, buffer_len, "%d", id3->year);
-                    info = buffer;
+                    val = buffer;
                 }
                 break;
             case 10:/*LANG_ID3_LENGTH*/
                 format_time(buffer, buffer_len, id3->length);
-                info=buffer;
+                val=buffer;
                 break;
             case 11:/*LANG_ID3_PLAYLIST*/
                 snprintf(buffer, buffer_len, "%d/%d",
                          playlist_get_display_index(), playlist_amount());
-                info=buffer;
+                val=buffer;
                 break;
             case 12:/*LANG_ID3_BITRATE*/
                 snprintf(buffer, buffer_len, "%d kbps%s", id3->bitrate,
             id3->vbr ? str(LANG_ID3_VBR) : (const unsigned char*) "");
-                info=buffer;
+                val=buffer;
                 break;
             case 13:/*LANG_ID3_FREQUENCY*/
                 snprintf(buffer, buffer_len, "%ld Hz", id3->frequency);
-                info=buffer;
+                val=buffer;
                 break;
 #if CONFIG_CODEC == SWCODEC
             case 14:/*LANG_ID3_TRACK_GAIN*/
-                info=id3->track_gain_string;
+                val=id3->track_gain_string;
                 break;
             case 15:/*LANG_ID3_ALBUM_GAIN*/
-                info=id3->album_gain_string;
+                val=id3->album_gain_string;
                 break;
             case 16:/*LANG_ID3_PATH*/
 #else
             case 14:/*LANG_ID3_PATH*/
 #endif
-                info=id3->path;
+                val=id3->path;
                 break;
         }
-        return info && *info ? info : (char*) str(LANG_ID3_NO_INFO);
+        return val && *val ? val : NULL;
     }
 }
 
@@ -822,10 +827,20 @@ bool browse_id3(void)
     struct gui_synclist id3_lists;
     struct mp3entry* id3 = audio_current_track();
     int key;
+    unsigned int i;
+    struct id3view_info info;
+    info.count = 0;
+    info.id3 = id3;
+    for (i=0; i<sizeof(id3_headers)/sizeof(id3_headers[0]); i++)
+    {
+        char temp[8];
+        info.info_id[i] = i;
+        if (id3_get_info((i*2)+1, &info, temp, 8) != NULL)
+            info.info_id[info.count++] = i;
+    }
 
-    gui_synclist_init(&id3_lists, &id3_get_info, id3, true, 2, NULL);
-    gui_synclist_set_nb_items(&id3_lists, 
-        sizeof(id3_headers)/sizeof(id3_headers[0])*2);
+    gui_synclist_init(&id3_lists, &id3_get_info, &info, true, 2, NULL);
+    gui_synclist_set_nb_items(&id3_lists, info.count*2);
     gui_synclist_draw(&id3_lists);
     gui_syncstatusbar_draw(&statusbars, true);
     while (true) {
