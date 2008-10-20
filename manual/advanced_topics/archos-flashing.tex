@@ -48,7 +48,7 @@ outside, even if the flash ROM is completely erased.
 If the first $\approx$2KB of the flash ROM are flashed ok, \emph{Minimon} can
 be used for the same purpose.
 
-\subsection{Terminology and Basic operation}
+\subsection{Terminology and Basic Operation}
 
 \begin{description}
 \item[Firmware:] The flash ROM contents as a whole.
@@ -114,14 +114,14 @@ a safe place.
 \item Unzip the flash package to the root of your \dap.
   \nopt{ondio}{This will extract two files to the root,
     \fname{firmware\_{\textless}model{\textgreater}.bin} and
-    \fname{firmware\_{\textless}model{\textgreater}\_norom.bin}. The flash
-    plugin will select the correct one for your \dap.
+    \fname{firmware\_{\textless}model{\textgreater}\_norom.bin}.
+    \opt{recorder,recorderv2fm}{(The {\textless}model{\textgreater} part is
+      slighty different from that in the .zip file name.)
+    }
+    The flash plugin will select the correct one for your \dap.
   }
   \opt{ondio}{This will extract one file to the root,
     \fname{firmware\_{\textless}model{\textgreater}.bin}.
-  }
-  \opt{recorder,recorderv2fm}{(The {\textless}model{\textgreater} part is
-    slighty different from that in the .zip file name.)
   }
   Now safely disconnect USB.
 \item
@@ -148,6 +148,12 @@ a safe place.
 
 \note{After successful flashing you may delete the \fname{.bin} files from the
   root of your \dap.
+}
+
+\note{There are no separate flash packages for {\dap}s modified to have 8MB
+  of RAM. You need to use the corresponding package for non-modified
+  \playertype. You should then install a rockbox image that makes use of all
+  available RAM as described in the following section.
 }
 
 \subsection{Updating the Rockbox Image in Flash}
