@@ -35,7 +35,7 @@
 
 #define TCC7xx_USB_EPIF_IRQ_MASK 0xf
 
-static int dbg_level = 0x02;
+static int dbg_level = 0x00;
 static int global_ep_irq_mask = 0x1;
 #define DEBUG(level, fmt, args...) do { if (dbg_level & (level)) printf(fmt, ## args); } while (0)
 
@@ -91,7 +91,7 @@ static struct tcc_ep tcc_endpoints[] = {
     },
 } ;
 
-static int usb_drv_write_packet(volatile unsigned short *buf, unsigned char *data, int len, int max);
+static bool usb_drv_write_ep(struct tcc_ep *ep);
 static void usb_set_speed(int);
 
 int usb_drv_request_endpoint(int dir)
@@ -315,36 +315,27 @@ void handle_ep_in(struct tcc_ep *tcc_ep, uint16_t stat)
 static
 void handle_ep_out(struct tcc_ep *tcc_ep, uint16_t stat)
 {
+    bool done;
     (void) stat;
 
     if (tcc_ep->dir != USB_DIR_IN) {
         panicf_my("ep%d: is out only", tcc_ep->id);
     }
 
-    if (tcc_ep->buf == NULL) {
-        panicf_my("%s:%d", __FILE__, __LINE__);
-    }
+//    if (tcc_ep->buf == NULL) {
+//        panicf_my("%s:%d", __FILE__, __LINE__);
+//    }
 
-    if (tcc_ep->max_len) {
-        int count = usb_drv_write_packet(tcc_ep->ep,
-                                            tcc_ep->buf,
-                                            tcc_ep->max_len,
-                                            512);
-        tcc_ep->buf += count;
-        tcc_ep->max_len -= count;
-        tcc_ep->count += count;
-    } else {
-        tcc_ep->buf = NULL;
-    }
+    done = usb_drv_write_ep(tcc_ep);
 
-    TCC7xx_USB_EP_STAT = 0x2; /* Clear TX stat */
+//    TCC7xx_USB_EP_STAT = 0x2; /* Clear TX stat */
     TCC7xx_USB_EPIF = tcc_ep->mask;
 
-    if (tcc_ep->buf == NULL) {
+    if (done) { // tcc_ep->buf == NULL) {
         TCC7xx_USB_EPIE &= ~tcc_ep->mask;
         global_ep_irq_mask &= ~tcc_ep->mask;
 
-        usb_core_transfer_complete(tcc_ep->id, USB_DIR_IN, 0, tcc_ep->count);
+//        usb_core_transfer_complete(tcc_ep->id, USB_DIR_IN, 0, tcc_ep->count);
     }
 }
 
@@ -528,6 +519,29 @@ static int usb_drv_write_packet(volatile unsigned short *buf, unsigned char *dat
     return len;
 }
 
+static bool usb_drv_write_ep(struct tcc_ep *ep)
+{
+    int count;
+
+    if (ep->max_len == 0)
+        return true;
+
+    count = usb_drv_write_packet(ep->ep, ep->buf, ep->max_len, 512);
+    TCC7xx_USB_EP_STAT = 0x2; /* Clear TX stat */
+
+    ep->buf += count;
+    ep->count += count;
+    ep->max_len -= count;
+
+    if (ep->max_len == 0) {
+        usb_core_transfer_complete(ep->id, USB_DIR_IN, 0, ep->count);
+        ep->buf = NULL;
+//        return true;
+    }
+
+    return false;
+}
+
 int usb_drv_send(int endpoint, void *ptr, int length)
 {
     int flags = disable_irq_save();
@@ -556,6 +570,7 @@ int usb_drv_send(int endpoint, void *ptr, int length)
     return rc;
 }
 
+
 int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
 {
     int flags;
@@ -574,20 +589,24 @@ int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
         panicf_my("%s: ep is already busy", __func__);
     }
 
-    TCC7xx_USB_INDEX = ep->id;
-
-    count = usb_drv_write_packet(ep->ep, data, length, 512);
-
-    data += count;
-    length -= count;
-
     ep->buf = data;
     ep->max_len = length;
     ep->count = count;
 
-    TCC7xx_USB_EPIE |= ep->mask;
-    global_ep_irq_mask |= ep->mask;
-
+    TCC7xx_USB_INDEX = ep->id;
+#if 1
+    TCC7xx_USB_EP_STAT = 0x2;
+    /* TODO: use interrupts instead */
+    while (!usb_drv_write_ep(ep)) {
+        while (0==(TCC7xx_USB_EP_STAT & 0x2))
+            ;
+    }
+#else
+    if (!usb_drv_write_ep(ep)) {
+        TCC7xx_USB_EPIE |= ep->mask;
+        global_ep_irq_mask |= ep->mask;
+    }
+#endif
     restore_irq(flags);
 
     DEBUG(2, "%s end", __func__);
