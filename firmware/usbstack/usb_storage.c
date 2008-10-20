@@ -48,6 +48,10 @@
  */
 //#define ONLY_EXPOSE_CARD_SLOT
 
+#ifdef USB_USE_RAMDISK
+#define RAMDISK_SIZE 2048
+#endif
+
 #define SECTOR_SIZE 512
 
 /* We can currently use up to 20k buffer size. More than that requires
@@ -266,6 +270,10 @@ static bool ejected[NUM_VOLUMES];
 static int usb_interface;
 static int ep_in, ep_out;
 
+#ifdef USB_USE_RAMDISK
+static unsigned char* ramdisk_buffer;
+#endif
+
 static enum {
     WAITING_FOR_COMMAND,
     SENDING_BLOCKS,
@@ -277,8 +285,12 @@ static enum {
 
 static bool check_disk_present(IF_MV_NONVOID(int volume))
 {
+#ifdef USB_USE_RAMDISK
+    return true;
+#else
     unsigned char sector[512];
     return ata_read_sectors(IF_MV2(volume,)0,1,sector) == 0;
+#endif
 }
 
 static void try_release_ata(void)
@@ -401,6 +413,9 @@ void usb_storage_init_connection(void)
     tb.transfer_buffer =
         (void *)UNCACHED_ADDR((unsigned int)(audio_buffer + 31) & 0xffffffe0);
     invalidate_icache();
+#ifdef USB_USE_RAMDISK
+    ramdisk_buffer = tb.transfer_buffer + BUFFER_SIZE*2;
+#endif
 #endif
     usb_drv_recv(ep_out, tb.transfer_buffer, 1024);
 }
@@ -440,6 +455,11 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
 
                 /* Now write the data that just came in, while the host is
                    sending the next bit */
+#ifdef USB_USE_RAMDISK
+                memcpy(ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
+                       cur_cmd.data[cur_cmd.data_select],
+                       MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
+#else
                 int result = ata_write_sectors(IF_MV2(cur_cmd.lun,)
                                          cur_cmd.sector,
                                          MIN(BUFFER_SIZE/SECTOR_SIZE,
@@ -452,6 +472,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                     cur_sense_data.ascq=0;
                     break;
                 }
+#endif                
 #ifdef SERIALIZE_WRITES
                 if(next_count!=0) {
                     /* Ask the host to send more, to the other buffer */
@@ -613,11 +634,17 @@ static void send_and_read_next(void)
     if(cur_cmd.count!=0){
         /* already read the next bit, so we can send it out immediately when the
          * current transfer completes.  */
+#ifdef USB_USE_RAMDISK
+        memcpy(cur_cmd.data[cur_cmd.data_select],
+               ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
+               MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
+#else
         cur_cmd.last_result = ata_read_sectors(IF_MV2(cur_cmd.lun,)
                                            cur_cmd.sector,
                                            MIN(BUFFER_SIZE/SECTOR_SIZE,
                                                cur_cmd.count),
                                            cur_cmd.data[cur_cmd.data_select]);
+#endif
     }
 }
 /****************************************************************************/
@@ -637,6 +664,10 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     unsigned char lun = cbw->lun;
 #endif
     unsigned int block_size_mult = 1;
+#ifdef USB_USE_RAMDISK
+    block_size = SECTOR_SIZE;
+    block_count = RAMDISK_SIZE;
+#else
 #if defined(HAVE_ATA_SD) || defined(HAVE_HOTSWAP)
     tCardInfo* cinfo = card_get_info(lun);
     if(cinfo->initialized && cinfo->numblocks > 0) {
@@ -651,6 +682,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     unsigned short* identify = ata_get_identify();
     block_size = SECTOR_SIZE;
     block_count = (identify[61] << 16 | identify[60]);
+#endif
 #endif
 
     if(ejected[lun])
@@ -938,11 +970,17 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 cur_sense_data.ascq=0;
             }
             else {
+#ifdef USB_USE_RAMDISK
+                memcpy(cur_cmd.data[cur_cmd.data_select],
+                       ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
+                       MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
+#else
                 cur_cmd.last_result = ata_read_sectors(IF_MV2(cur_cmd.lun,)
                                              cur_cmd.sector,
                                              MIN(BUFFER_SIZE/SECTOR_SIZE,
                                                  cur_cmd.count),
                                              cur_cmd.data[cur_cmd.data_select]);
+#endif
                 send_and_read_next();
             }
             break;
