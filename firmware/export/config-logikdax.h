@@ -15,6 +15,14 @@
    explicitly if different */
 //#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | SRC_CAP_SPDIF)
 
+#if 0 /* Enable for USB driver test */
+#define HAVE_USBSTACK
+#define USE_HIGH_SPEED
+#define USB_VENDOR_ID 0x13d1
+#define USB_PRODUCT_ID 0x1002
+#endif
+
+
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
 
