@@ -17,6 +17,7 @@ rockboy
 /* For all targets with a bitmap display */
 #ifdef HAVE_LCD_BITMAP
 chessbox
+jpeg
 sudoku
 reversi
 #ifndef OLYMPUS_MROBE_500

@@ -1,0 +1,5 @@
+jpeg.c
+jpeg_decoder.c
+#ifdef HAVE_LCD_COLOR
+yuv2rgb.c
+#endif

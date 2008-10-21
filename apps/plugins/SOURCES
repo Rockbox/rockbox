@@ -24,11 +24,6 @@ viewer.c
 lamp.c
 #endif /* HAVE_BACKLIGHT */
 
-#ifdef OLYMPUS_MROBE_500
-/* remove these once the plugins before it are compileable */
-jpeg.c
-#endif
-
 #ifndef OLYMPUS_MROBE_500
 
 #if (CONFIG_CODEC == SWCODEC) || !defined(SIMULATOR)
@@ -62,7 +57,6 @@ ppmviewer.c
 
 /* Plugins needing the grayscale lib on low-depth LCDs */
 fire.c
-jpeg.c
 mandelbrot.c
 plasma.c
 
