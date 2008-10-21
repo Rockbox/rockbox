@@ -191,7 +191,7 @@ bool mp3info(struct mp3entry *entry, const char *filename)
     if (fd < 0)
         return true;
 
-    result = !get_metadata(entry, fd, filename);
+    result = !get_mp3_metadata(fd, entry, filename);
 
     close(fd);
 
