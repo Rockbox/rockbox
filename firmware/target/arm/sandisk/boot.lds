@@ -23,7 +23,11 @@ MEMORY
 
 SECTIONS
 {
+#ifdef C200_ERASE
+  . = IRAMORIG+0x4000;
+#else
   . = IRAMORIG;
+#endif
 
   .text : {
     *(.init.text)

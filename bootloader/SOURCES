@@ -13,6 +13,10 @@ gigabeat-s.c
       defined(PHILIPS_HDD1630)
 #ifdef E200R_INSTALLER
 main-e200r-installer.c
+#elif defined(C240_ERASE)
+main-c240wipe.c
+#elif defined(C250_ERASE)
+main-c250wipe.c
 #else
 show_logo.c
 main-pp.c

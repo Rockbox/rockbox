@@ -1990,6 +1990,9 @@ case $modelname in
   e200r|e200)
      gdbstub="(I)installer, "
      ;;
+  c200)
+     gdbstub="(E)raser, "
+     ;;
   *)
      ;;
 esac
@@ -2007,6 +2010,24 @@ fi
       extradefines="-DBOOTLOADER -DE200R_INSTALLER -ffunction-sections -fdata-sections"
       bootloader="1"
       echo "e200R-installer build selected"
+      ;;
+    [Ee])
+      appsdir='\$(ROOTDIR)/bootloader'
+      apps="bootloader"
+      echo "C2(4)0 or C2(5)0"
+      variant=`input`
+      case $variant in
+        4)
+           extradefines="-DBOOTLOADER -DC200_ERASE -DC240_ERASE -ffunction-sections -fdata-sections"
+           echo "c240 eraser build selected"
+        ;;
+        5)
+           extradefines="-DBOOTLOADER -DC200_ERASE -DC250_ERASE -ffunction-sections -fdata-sections"
+           echo "c240 eraser build selected"
+        ;;
+      esac
+      bootloader="1"
+      echo "c200 eraser build selected"
       ;;
     [Bb])
       if test $t_manufacturer = "archos"; then
