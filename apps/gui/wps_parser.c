@@ -870,26 +870,45 @@ static int parse_progressbar(const char *wps_bufptr,
     if (!(ptr = parse_list("sdddd", &set, '|', ptr, &filename,
                                                  &x, &y, &width, &height)))
         return WPS_ERROR_INVALID_PARAM;
+
     if (LIST_VALUE_PARSED(set, PB_FILENAME)) /* filename */
         bmp_names[PROGRESSBAR_BMP+wps_data->progressbar_count] = filename;
+
     if (LIST_VALUE_PARSED(set, PB_X)) /* x */
         pb->x = x;
     else
         pb->x = vp->x;
+
     if (LIST_VALUE_PARSED(set, PB_WIDTH)) /* width */
+    {
+        /* A zero width causes a divide-by-zero error later, so reject it */
+        if (width == 0)
+            return WPS_ERROR_INVALID_PARAM;
+
         pb->width = width;
+    }
     else
         pb->width = vp->width - pb->x;
+
     if (LIST_VALUE_PARSED(set, PB_HEIGHT)) /* height, default to font height */
+    {
+        /* A zero height makes no sense - reject it */
+        if (height == 0)
+            return WPS_ERROR_INVALID_PARAM;
+
         pb->height = height;
+    }
     else
         pb->height = font_height;
+
     if (LIST_VALUE_PARSED(set, PB_Y)) /* y */
         pb->y = y;
     else
         pb->y = line_y_pos + (font_height-pb->height)/2;
+
     wps_data->viewports[wps_data->num_viewports].pb = pb;
     wps_data->progressbar_count++;
+
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr)-1;
 #else
