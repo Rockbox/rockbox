@@ -810,7 +810,33 @@ void button_event(int key, bool pressed)
     case SDLK_KP_ENTER:
         new_btn = BUTTON_MENU;
         break;
-
+#elif CONFIG_KEYPAD == IAUDIO67_PAD
+    case SDLK_UP:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case SDLK_DOWN:
+        new_btn = BUTTON_LEFT;
+        break;
+    case SDLK_LEFT:
+        new_btn = BUTTON_STOP;
+        break;
+    case SDLK_RETURN:
+    case SDLK_KP_ENTER:
+    case SDLK_RIGHT:
+        new_btn = BUTTON_PLAY;
+        break;
+    case SDLK_PLUS:
+        new_btn = BUTTON_VOLUP;
+        break;
+    case SDLK_MINUS:
+        new_btn = BUTTON_VOLDOWN;
+        break;
+    case SDLK_SPACE:
+        new_btn = BUTTON_MENU;
+        break;
+    case SDLK_BACKSPACE:
+        new_btn = BUTTON_POWER;
+        break;
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
     case SDLK_KP1:
         new_btn = BUTTON_BACK;

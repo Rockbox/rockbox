@@ -376,6 +376,19 @@
 #define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
 #define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 
+#elif defined(IAUDIO_7)
+#define UI_TITLE                    "iAudio7"
+#define UI_WIDTH                    494 /* width of GUI window */
+#define UI_HEIGHT                   214 /* height of GUI window */
+#define UI_LCD_BGCOLOR              90, 145, 90 /* bkgnd color of LCD (no backlight) */
+#define UI_LCD_BGCOLORLIGHT         173, 216, 230 /* bkgnd color of LCD (backlight) */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
+#define UI_LCD_POSX                 131 /* x position of lcd */
+#define UI_LCD_POSY                 38 /* y position of lcd */
+#define UI_LCD_WIDTH                160
+#define UI_LCD_HEIGHT               128
+
 #elif defined(CREATIVE_ZVM) || defined(CREATIVE_ZVM60GB)
 #ifdef CREATIVE_ZVM
  #define UI_TITLE                    "Creative Zen Vision:M 30GB"

@@ -14,6 +14,13 @@
    explicitly if different */
 #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | SRC_CAP_FMRADIO)
 
+/* FM Tuner */
+#define CONFIG_TUNER LV24020LP
+#define HAVE_TUNER_PWR_CTRL
+
+/* Define this for FM radio input available */
+#define HAVE_FMRADIO_IN
+
 /* define hardware samples rate caps mask */
 #define HW_SAMPR_CAPS   (/*SAMPR_CAP_88 | */SAMPR_CAP_44/* | SAMPR_CAP_22 | SAMPR_CAP_11*/)
 
@@ -49,7 +56,7 @@
 
 #define HAVE_FAT16SUPPORT
 
-#if 0 /* Enable for USB driver test */
+#if 0 && !defined(SIMULATOR) /* Enable for USB driver test */
 #define HAVE_USBSTACK
 #define USE_HIGH_SPEED
 #define USB_VENDOR_ID   0x0e21
@@ -143,13 +150,6 @@
 #define CONFIG_LED LED_VIRTUAL
 
 #define CONFIG_LCD LCD_IAUDIO67
-
-/* FM Tuner */
-#define CONFIG_TUNER LV24020LP
-#define HAVE_TUNER_PWR_CTRL
-
-/* Define this for FM radio input available */
-#define HAVE_FMRADIO_IN
 
 #define BOOTFILE_EXT "iaudio"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
