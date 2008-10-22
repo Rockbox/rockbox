@@ -76,7 +76,8 @@ GREY_INFO_STRUCT
 
 /******************************* Globals ***********************************/
 
-const struct plugin_api* rb;
+const struct plugin_api* rb;  /* Exported to other .c files in this plugin */
+
 MEM_FUNCTION_WRAPPERS(rb);
 
 static int slideshow_enabled = false;   /* run slideshow */
@@ -133,7 +134,7 @@ static struct configdata jpeg_config[] =
 };
 
 #if LCD_DEPTH > 1
-fb_data* old_backdrop;
+static fb_data* old_backdrop;
 #endif
 
 /**************** begin Application ********************/
@@ -158,31 +159,31 @@ struct t_disp
 /************************* Globals ***************************/
 
 /* decompressed image in the possible sizes (1,2,4,8), wasting the other */
-struct t_disp disp[9];
+static struct t_disp disp[9];
 
 /* my memory pool (from the mp3 buffer) */
-char print[32]; /* use a common snprintf() buffer */
-unsigned char* buf; /* up to here currently used by image(s) */
+static char print[32]; /* use a common snprintf() buffer */
+static unsigned char* buf; /* up to here currently used by image(s) */
 
 /* the remaining free part of the buffer for compressed+uncompressed images */
-unsigned char* buf_images;
+static unsigned char* buf_images;
 
-ssize_t buf_size, buf_images_size;
+static ssize_t buf_size, buf_images_size;
 /* the root of the images, hereafter are decompresed ones */
-unsigned char* buf_root;
-int root_size;
+static unsigned char* buf_root;
+static int root_size;
 
-int ds, ds_min, ds_max; /* downscaling and limits */
+static int ds, ds_min, ds_max; /* downscaling and limits */
 static struct jpeg jpg; /* too large for stack */
 
 static struct tree_context *tree;
 
 /* the current full file name */
 static char np_file[MAX_PATH];
-int curfile = 0, direction = DIR_NONE, entries = 0;
+static int curfile = 0, direction = DIR_NONE, entries = 0;
 
 /* list of the jpeg files */
-char **file_pt;
+static char **file_pt;
 /* are we using the plugin buffer or the audio buffer? */
 bool plug_buf = false;
 
