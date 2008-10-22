@@ -2134,8 +2134,8 @@ static void audio_stop_playback(void)
         remove_event(BUFFER_EVENT_BUFFER_LOW, buffering_low_buffer_callback);
     }
 
-    paused = false;
     audio_stop_codec_flush();
+    paused = false;
     playing = false;
     track_load_started = false;
 
