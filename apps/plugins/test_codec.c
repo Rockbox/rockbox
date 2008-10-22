@@ -192,10 +192,10 @@ void close_wav(void) {
 }
 
 /* Returns buffer to malloc array. Only codeclib should need this. */
-static void* get_codec_memory(size_t *size)
+static void* codec_get_buffer(size_t *size)
 {
-   DEBUGF("get_codec_memory(%d)\n",(int)size);
-   *size = 512*1024;
+   DEBUGF("codec_get_buffer(%d)\n",(int)size);
+   *size = CODEC_SIZE;
    return codec_mallocbuf;
 }
 
@@ -427,7 +427,7 @@ static void init_ci(void)
 {
     /* --- Our "fake" implementations of the codec API functions. --- */
 
-    ci.get_codec_memory = get_codec_memory;
+    ci.codec_get_buffer = codec_get_buffer;
 
     if (wavinfo.fd >= 0) {
         ci.pcmbuf_insert = pcmbuf_insert_wav;
@@ -707,9 +707,9 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     }
 #endif
 
-    codec_stack_copy = codec_mallocbuf + 512*1024;
+    codec_stack_copy = codec_mallocbuf + CODEC_SIZE;
     audiobuf = SKIPBYTES(codec_stack_copy, codec_stack_size);
-    audiosize -= 512*1024 + codec_stack_size;
+    audiosize -= CODEC_SIZE + codec_stack_size;
 
 #ifndef SIMULATOR
     /* Backup the codec thread's stack */
