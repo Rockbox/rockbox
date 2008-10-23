@@ -105,7 +105,7 @@
     not just a char pointer.
     prefix: The absolute path to not save in the variable, ex /.rockbox/wps_file
     suffix: The file extention (usually...) e.g .wps_file
-    If the prefix is set (not NULL), the the suffix must be set as well.
+    If the prefix is set (not NULL), then the suffix must be set as well.
  */
 #define TEXT_SETTING(flags,var,name,default,prefix,suffix)      \
             {flags|F_T_UCHARPTR, &global_settings.var,-1,           \
