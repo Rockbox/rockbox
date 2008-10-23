@@ -493,9 +493,6 @@ static void init_ci(void)
     ci.semaphore_init = rb->semaphore_init;
     ci.semaphore_wait = rb->semaphore_wait;
     ci.semaphore_release = rb->semaphore_release;
-    ci.event_init = rb->event_init;
-    ci.event_wait = rb->event_wait;
-    ci.event_set_state = rb->event_set_state;
 #endif
 
 }

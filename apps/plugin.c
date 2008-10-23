@@ -614,11 +614,7 @@ static const struct plugin_api rockbox_api = {
     semaphore_wait,
     semaphore_release,
 #endif
-#ifdef HAVE_EVENT_OBJECTS
-    event_init,
-    event_wait,
-    event_set_state,
-#endif
+
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */

@@ -176,17 +176,6 @@ struct semaphore
 };
 #endif
 
-#ifdef HAVE_EVENT_OBJECTS
-struct event
-{
-    struct thread_entry *queues[2];     /* waiters for each state */
-    unsigned char automatic;            /* event performs auto-reset */
-    unsigned char state;                /* state: 1 = signaled */
-    IF_COP( struct corelock cl; )       /* multiprocessor sync */
-};
-#endif
-
-
 #ifdef HAVE_WAKEUP_OBJECTS
 struct wakeup
 {
@@ -286,13 +275,6 @@ extern void semaphore_init(struct semaphore *s, int max, int start);
 extern void semaphore_wait(struct semaphore *s);
 extern void semaphore_release(struct semaphore *s);
 #endif /* HAVE_SEMAPHORE_OBJECTS */
-#ifdef HAVE_EVENT_OBJECTS
-#define EVENT_AUTOMATIC 0x10
-#define EVENT_MANUAL    0x00
-extern void event_init(struct event *e, unsigned int flags);
-extern void event_wait(struct event *e, unsigned int for_state);
-extern void event_set_state(struct event *e, unsigned int state);
-#endif /* HAVE_EVENT_OBJECTS */
 
 #ifdef HAVE_WAKEUP_OBJECTS
 extern void wakeup_init(struct wakeup *w);

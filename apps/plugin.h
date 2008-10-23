@@ -130,12 +130,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 124
+#define PLUGIN_API_VERSION 125
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 123
+#define PLUGIN_MIN_API_VERSION 125
 
 /* plugin return codes */
 enum plugin_status {
@@ -769,11 +769,6 @@ struct plugin_api {
     void (*semaphore_init)(struct semaphore *s, int max, int start);
     void (*semaphore_wait)(struct semaphore *s);
     void (*semaphore_release)(struct semaphore *s);
-#endif
-#ifdef HAVE_EVENT_OBJECTS
-    void (*event_init)(struct event *e, unsigned int flags);
-    void (*event_wait)(struct event *e, unsigned int for_state);
-    void (*event_set_state)(struct event *e, unsigned int state);
 #endif
 
 	const char *appsversion;

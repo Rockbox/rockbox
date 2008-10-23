@@ -105,9 +105,6 @@ struct codec_api ci = {
     semaphore_init,
     semaphore_wait,
     semaphore_release,
-    event_init,
-    event_wait,
-    event_set_state,
 #endif
 
 #ifdef CACHE_FUNCTIONS_AS_CALL

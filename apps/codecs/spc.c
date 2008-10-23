@@ -230,7 +230,7 @@ static struct
     int head, tail;
     struct semaphore emu_sem_head;
     struct semaphore emu_sem_tail;
-    struct event emu_evt_reply;
+    struct semaphore emu_evt_reply;
     intptr_t retval;
     struct sample_queue_chunk wav_chunk[WAV_NUM_CHUNKS];
 } sample_queue SHAREDBSS_ATTR;
@@ -284,7 +284,7 @@ static intptr_t emu_thread_send_msg(long id, intptr_t data)
 
     if (id != SPC_EMU_QUIT) {
         /* Wait for a response */
-        ci->event_wait(&sample_queue.emu_evt_reply, STATE_SIGNALED);
+        ci->semaphore_wait(&sample_queue.emu_evt_reply);
     }
 
     return sample_queue.retval;    
@@ -316,7 +316,7 @@ static bool emu_thread_process_msg(struct sample_queue_chunk *chunk)
     }
 
     if (id != SPC_EMU_QUIT) {
-        ci->event_set_state(&sample_queue.emu_evt_reply, STATE_SIGNALED);
+        ci->semaphore_release(&sample_queue.emu_evt_reply);
     }
 
     return ret;
@@ -361,8 +361,7 @@ static bool spc_emu_start(void)
 
     /* Initialize audio queue as full to prevent emu thread from trying to run the
        emulator before loading something */
-    ci->event_init(&sample_queue.emu_evt_reply,
-                   EVENT_AUTOMATIC | STATE_NONSIGNALED);
+    ci->semaphore_init(&sample_queue.emu_evt_reply, 1, 0);
     ci->semaphore_init(&sample_queue.emu_sem_tail, 2, 0);
     ci->semaphore_init(&sample_queue.emu_sem_head, 2, 2);
     sample_queue.head = 0;

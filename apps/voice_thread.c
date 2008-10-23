@@ -61,8 +61,8 @@ static const char voice_thread_name[] = "voice";
 /* Voice thread synchronization objects */
 static struct event_queue voice_queue SHAREDBSS_ATTR;
 static struct mutex voice_mutex SHAREDBSS_ATTR;
-static struct event voice_event SHAREDBSS_ATTR;
 static struct queue_sender_list voice_queue_sender_list SHAREDBSS_ATTR;
+static bool voice_done SHAREDDATA_ATTR = true;
 
 /* Buffer for decoded samples */
 static spx_int16_t voice_output_buf[VOICE_FRAME_SIZE] CACHEALIGN_ATTR;
@@ -189,9 +189,9 @@ void voice_wait(void)
     /* NOTE: One problem here is that we can't tell if another thread started a
      * new clip by the time we wait. This should be resolvable if conditions
      * ever require knowing the very clip you requested has finished. */
-    event_wait(&voice_event, STATE_SIGNALED);
+
     /* Wait for PCM buffer to be exhausted. Works only if not playing. */
-    while(!playback_is_playing() && pcm_is_playing())
+    while(!voice_done || (!playback_is_playing() && pcm_is_playing()))
         sleep(1);
 }
 
@@ -219,7 +219,7 @@ static void voice_message(struct voice_thread_data *td)
         case Q_VOICE_PLAY:
             LOGFQUEUE("voice < Q_VOICE_PLAY");
             /* Put up a block for completion signal */
-            event_set_state(&voice_event, STATE_NONSIGNALED);
+            voice_done = false;
 
             /* Copy the clip info */
             td->vi = *(struct voice_info *)td->ev.data;
@@ -264,7 +264,7 @@ static void voice_message(struct voice_thread_data *td)
             cancel_cpu_boost();
 
             td->state = TSTATE_STOPPED;
-            event_set_state(&voice_event, STATE_SIGNALED);
+            voice_done = true;
             break;
 
         case Q_VOICE_STATE:
@@ -433,7 +433,7 @@ void voice_thread_init(void)
     logf("Starting voice thread");
     queue_init(&voice_queue, false);
     mutex_init(&voice_mutex);
-    event_init(&voice_event, STATE_SIGNALED | EVENT_MANUAL);
+
     voice_thread_p = create_thread(voice_thread, voice_stack,
             sizeof(voice_stack), CREATE_THREAD_FROZEN,
             voice_thread_name IF_PRIO(, PRIORITY_PLAYBACK) IF_COP(, CPU));
