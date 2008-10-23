@@ -100,14 +100,19 @@
             {flags|F_T_INT, &global_status.var,-1, INT(default),    \
                 NULL, NULL, UNUSED}
 
-/* setting which stores as a filename in the .cfgvals
+/* setting which stores as a filename (or another string) in the .cfgvals
+    The string must be a char array (which all of our string settings are),
+    not just a char pointer.
     prefix: The absolute path to not save in the variable, ex /.rockbox/wps_file
-    suffx:  The file extention (usually...) e.g .wps_file   */
-#define FILENAME_SETTING(flags,var,name,default,prefix,suffix,len)  \
+    suffix: The file extention (usually...) e.g .wps_file
+    If the prefix is set (not NULL), the the suffix must be set as well.
+ */
+#define TEXT_SETTING(flags,var,name,default,prefix,suffix)      \
             {flags|F_T_UCHARPTR, &global_settings.var,-1,           \
                 CHARPTR(default),name,NULL,                         \
                 {.filename_setting=                                 \
-                    (struct filename_setting[]){{prefix,suffix,len}}} }
+                    (struct filename_setting[]){                    \
+                        {prefix,suffix,sizeof(global_settings.var)}}} }
 
 /*  Used for settings which use the set_option() setting screen.
     The ... arg is a list of pointers to strings to display in the setting
@@ -887,8 +892,8 @@ const struct settings_list settings[] = {
                 "prerecording time", UNIT_SEC, 0, 30, 1,
                 formatter_unit_0_is_off, getlang_unit_0_is_off, NULL),
 
-    FILENAME_SETTING(F_RECSETTING, rec_directory, "rec path",
-                     REC_BASE_DIR, NULL, NULL, MAX_FILENAME+1),
+    TEXT_SETTING(F_RECSETTING, rec_directory, "rec path",
+                     REC_BASE_DIR, NULL, NULL),
 #ifdef HAVE_BACKLIGHT
     CHOICE_SETTING(F_RECSETTING, cliplight, LANG_CLIP_LIGHT, 0,
                    "cliplight", "off,main,both,remote", NULL,
@@ -1231,26 +1236,26 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, audioscrobbler, LANG_AUDIOSCROBBLER, false,
                   "Last.fm Logging", NULL),
 #if CONFIG_TUNER
-    FILENAME_SETTING(0, fmr_file, "fmr", "",
-                     FMPRESET_PATH "/", ".fmr", MAX_FILENAME+1),
+    TEXT_SETTING(0, fmr_file, "fmr", "",
+                     FMPRESET_PATH "/", ".fmr"),
 #endif
 #ifdef HAVE_LCD_BITMAP
-    FILENAME_SETTING(F_THEMESETTING, font_file, "font",
-                     DEFAULT_FONTNAME, FONT_DIR "/", ".fnt", MAX_FILENAME+1),
+    TEXT_SETTING(F_THEMESETTING, font_file, "font",
+                     DEFAULT_FONTNAME, FONT_DIR "/", ".fnt"),
 #endif
-    FILENAME_SETTING(F_THEMESETTING,wps_file, "wps",
-                     DEFAULT_WPSNAME, WPS_DIR "/", ".wps", MAX_FILENAME+1),
-    FILENAME_SETTING(0,lang_file,"lang","",LANG_DIR "/",".lng",MAX_FILENAME+1),
+    TEXT_SETTING(F_THEMESETTING,wps_file, "wps",
+                     DEFAULT_WPSNAME, WPS_DIR "/", ".wps"),
+    TEXT_SETTING(0,lang_file,"lang","",LANG_DIR "/",".lng"),
 #ifdef HAVE_REMOTE_LCD
-    FILENAME_SETTING(F_THEMESETTING,rwps_file,"rwps",
-                     DEFAULT_WPSNAME, WPS_DIR "/", ".rwps", MAX_FILENAME+1),
+    TEXT_SETTING(F_THEMESETTING,rwps_file,"rwps",
+                     DEFAULT_WPSNAME, WPS_DIR "/", ".rwps"),
 #endif
 #if LCD_DEPTH > 1
-    FILENAME_SETTING(F_THEMESETTING,backdrop_file,"backdrop",
-                     DEFAULT_BACKDROP, BACKDROP_DIR "/", ".bmp",MAX_FILENAME+1),
+    TEXT_SETTING(F_THEMESETTING,backdrop_file,"backdrop",
+                     DEFAULT_BACKDROP, BACKDROP_DIR "/", ".bmp"),
 #endif
 #ifdef HAVE_LCD_BITMAP
-    FILENAME_SETTING(0,kbd_file,"kbd","",ROCKBOX_DIR "/",".kbd",MAX_FILENAME+1),
+    TEXT_SETTING(0,kbd_file,"kbd","",ROCKBOX_DIR "/",".kbd"),
 #endif
 #ifdef HAVE_USB_POWER
 #if CONFIG_CHARGING
@@ -1301,22 +1306,22 @@ const struct settings_list settings[] = {
 
     /* Customizable icons */
 #ifdef HAVE_LCD_BITMAP
-    FILENAME_SETTING(F_THEMESETTING, icon_file, "iconset", DEFAULT_ICONSET,
-                     ICON_DIR "/", ".bmp", MAX_FILENAME+1),
-    FILENAME_SETTING(F_THEMESETTING, viewers_icon_file, "viewers iconset",
+    TEXT_SETTING(F_THEMESETTING, icon_file, "iconset", DEFAULT_ICONSET,
+                     ICON_DIR "/", ".bmp"),
+    TEXT_SETTING(F_THEMESETTING, viewers_icon_file, "viewers iconset",
                      DEFAULT_VIEWERS_ICONSET,
-                     ICON_DIR "/", ".bmp", MAX_FILENAME+1),
+                     ICON_DIR "/", ".bmp"),
 #endif
 #ifdef HAVE_REMOTE_LCD
-    FILENAME_SETTING(F_THEMESETTING, remote_icon_file, "remote iconset", "",
-                     ICON_DIR "/", ".bmp", MAX_FILENAME+1),
-    FILENAME_SETTING(F_THEMESETTING, remote_viewers_icon_file,
+    TEXT_SETTING(F_THEMESETTING, remote_icon_file, "remote iconset", "",
+                     ICON_DIR "/", ".bmp"),
+    TEXT_SETTING(F_THEMESETTING, remote_viewers_icon_file,
                      "remote viewers iconset", "",
-                     ICON_DIR "/", ".bmp", MAX_FILENAME+1),
+                     ICON_DIR "/", ".bmp"),
 #endif /* HAVE_REMOTE_LCD */
 #ifdef HAVE_LCD_COLOR
-    FILENAME_SETTING(F_THEMESETTING, colors_file, "filetype colours", "-",
-                     THEME_DIR "/", ".colours", MAX_FILENAME+1),
+    TEXT_SETTING(F_THEMESETTING, colors_file, "filetype colours", "-",
+                     THEME_DIR "/", ".colours"),
 #endif
 #ifdef HAVE_BUTTON_LIGHT
     TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, buttonlight_timeout,
@@ -1352,8 +1357,8 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, keyclick_repeats, LANG_KEYCLICK_REPEATS, false,
                   "keyclick repeats", NULL),
 #endif /* CONFIG_CODEC == SWCODEC */
-    FILENAME_SETTING(0, playlist_catalog_dir, "playlist catalog directory",
-                     PLAYLIST_CATALOG_DEFAULT_DIR, NULL, NULL, MAX_FILENAME+1),
+    TEXT_SETTING(0, playlist_catalog_dir, "playlist catalog directory",
+                     PLAYLIST_CATALOG_DEFAULT_DIR, NULL, NULL),
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
     CHOICE_SETTING(0, touchpad_sensitivity, LANG_TOUCHPAD_SENSITIVITY, 0,
                    "touchpad sensitivity", "normal,high", touchpad_set_sensitivity, 2,
