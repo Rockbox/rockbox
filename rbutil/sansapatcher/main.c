@@ -32,7 +32,7 @@
 #include "sansaio.h"
 #include "parttypes.h"
 
-#define VERSION "0.6 with v4.0 bootloaders"
+#define VERSION "0.7 with v5.0 bootloaders"
 
 enum {
    NONE,
