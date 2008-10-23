@@ -463,16 +463,158 @@ int show_menu(void) /* return 1 to quit */
     menu_exit(m);
     return 0;
 }
+
+/* Pan the viewing window right - move image to the left and fill in
+   the right-hand side */
+static void pan_view_right(struct t_disp* pdisp)
+{
+    int move;
+
+    move = MIN(HSCROLL, pdisp->width - pdisp->x - LCD_WIDTH);
+    if (move > 0)
+    {
+        MYXLCD(scroll_left)(move); /* scroll left */
+        pdisp->x += move;
+#ifdef HAVE_LCD_COLOR
+        yuv_bitmap_part(
+            pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
+            pdisp->x + LCD_WIDTH - move, pdisp->y, pdisp->stride,
+            LCD_WIDTH - move, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
+            move, MIN(LCD_HEIGHT, pdisp->height),    /* w, h */
+            jpeg_settings.colour_mode, jpeg_settings.dither_mode);
+#else
+        MYXLCD(gray_bitmap_part)(
+            pdisp->bitmap[0], pdisp->x + LCD_WIDTH - move,
+            pdisp->y, pdisp->stride,
+            LCD_WIDTH - move, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
+            move, MIN(LCD_HEIGHT, pdisp->height));   /* w, h */
+#endif
+        MYLCD_UPDATE();
+    }
+}
+
+/* Pan the viewing window left - move image to the right and fill in
+   the left-hand side */
+static void pan_view_left(struct t_disp* pdisp)
+{
+    int move;
+
+    move = MIN(HSCROLL, pdisp->x);
+    if (move > 0)
+    {
+        MYXLCD(scroll_right)(move); /* scroll right */
+        pdisp->x -= move;
+#ifdef HAVE_LCD_COLOR
+        yuv_bitmap_part(
+            pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
+            pdisp->x, pdisp->y, pdisp->stride,
+            0, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
+            move, MIN(LCD_HEIGHT, pdisp->height),    /* w, h */
+            jpeg_settings.colour_mode, jpeg_settings.dither_mode);
+#else
+        MYXLCD(gray_bitmap_part)(
+            pdisp->bitmap[0], pdisp->x, pdisp->y, pdisp->stride,
+            0, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
+            move, MIN(LCD_HEIGHT, pdisp->height));   /* w, h */
+#endif
+        MYLCD_UPDATE();
+    }
+}
+
+
+/* Pan the viewing window up - move image down and fill in
+   the top */
+static void pan_view_up(struct t_disp* pdisp)
+{
+    int move;
+
+    move = MIN(VSCROLL, pdisp->y);
+    if (move > 0)
+    {
+        MYXLCD(scroll_down)(move); /* scroll down */
+        pdisp->y -= move;
+#ifdef HAVE_LCD_COLOR
+        if (jpeg_settings.dither_mode == DITHER_DIFFUSION)
+        {
+            /* Draw over the band at the top of the last update
+               caused by lack of error history on line zero. */
+            move = MIN(move + 1, pdisp->y + pdisp->height);
+        }
+
+        yuv_bitmap_part(
+            pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
+            pdisp->x, pdisp->y, pdisp->stride,
+            MAX(0, (LCD_WIDTH-pdisp->width)/2), 0,   /* x, y */
+            MIN(LCD_WIDTH, pdisp->width), move,      /* w, h */
+            jpeg_settings.colour_mode, jpeg_settings.dither_mode);
+#else
+        MYXLCD(gray_bitmap_part)(
+            pdisp->bitmap[0], pdisp->x, pdisp->y, pdisp->stride,
+            MAX(0, (LCD_WIDTH-pdisp->width)/2), 0,   /* x, y */
+            MIN(LCD_WIDTH, pdisp->width), move);     /* w, h */
+#endif
+        MYLCD_UPDATE();
+    }
+}
+
+/* Pan the viewing window down - move image up and fill in
+   the bottom */
+static void pan_view_down(struct t_disp* pdisp)
+{
+    int move;
+
+    move = MIN(VSCROLL, pdisp->height - pdisp->y - LCD_HEIGHT);
+    if (move > 0)
+    {
+        MYXLCD(scroll_up)(move); /* scroll up */
+        pdisp->y += move;
+#ifdef HAVE_LCD_COLOR
+        if (jpeg_settings.dither_mode == DITHER_DIFFUSION)
+        {
+            /* Save the line that was on the last line of the display
+               and draw one extra line above then recover the line with
+               image data that had an error history when it was drawn.
+             */
+            move++, pdisp->y--;
+            rb->memcpy(rgb_linebuf,
+                   rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
+                   LCD_WIDTH*sizeof (fb_data));
+        }
+
+        yuv_bitmap_part(
+            pdisp->bitmap, pdisp->csub_x, pdisp->csub_y, pdisp->x,
+            pdisp->y + LCD_HEIGHT - move, pdisp->stride,
+            MAX(0, (LCD_WIDTH-pdisp->width)/2), LCD_HEIGHT - move, /* x, y */
+            MIN(LCD_WIDTH, pdisp->width), move,     /* w, h */
+            jpeg_settings.colour_mode, jpeg_settings.dither_mode);
+
+        if (jpeg_settings.dither_mode == DITHER_DIFFUSION)
+        {
+            /* Cover the first row drawn with previous image data. */
+            rb->memcpy(rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
+                   rgb_linebuf,
+                   LCD_WIDTH*sizeof (fb_data));
+            pdisp->y++;
+        }
+#else
+        MYXLCD(gray_bitmap_part)(
+            pdisp->bitmap[0], pdisp->x,
+            pdisp->y + LCD_HEIGHT - move, pdisp->stride,
+            MAX(0, (LCD_WIDTH-pdisp->width)/2), LCD_HEIGHT - move, /* x, y */
+            MIN(LCD_WIDTH, pdisp->width), move);     /* w, h */
+#endif
+        MYLCD_UPDATE();
+    }
+}
+
 /* interactively scroll around the image */
 int scroll_bmp(struct t_disp* pdisp)
 {
+    int button;
     int lastbutton = 0;
 
     while (true)
     {
-        int button;
-        int move;
-
         if (slideshow_enabled)
             button = rb->button_get_w_tmo(jpeg_settings.ss_timeout * HZ);
         else button = rb->button_get(true);
@@ -485,131 +627,26 @@ int scroll_bmp(struct t_disp* pdisp)
             if (!(ds < ds_max) && entries > 0 && jpg.x_size <= MAX_X_SIZE)
                 return change_filename(DIR_PREV);
         case JPEG_LEFT | BUTTON_REPEAT:
-            move = MIN(HSCROLL, pdisp->x);
-            if (move > 0)
-            {
-                MYXLCD(scroll_right)(move); /* scroll right */
-                pdisp->x -= move;
-#ifdef HAVE_LCD_COLOR
-                yuv_bitmap_part(
-                    pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
-                    pdisp->x, pdisp->y, pdisp->stride,
-                    0, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
-                    move, MIN(LCD_HEIGHT, pdisp->height),    /* w, h */
-                    jpeg_settings.colour_mode, jpeg_settings.dither_mode);
-#else
-                MYXLCD(gray_bitmap_part)(
-                    pdisp->bitmap[0], pdisp->x, pdisp->y, pdisp->stride,
-                    0, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
-                    move, MIN(LCD_HEIGHT, pdisp->height));   /* w, h */
-#endif
-                MYLCD_UPDATE();
-            }
+            pan_view_left(pdisp);
             break;
 
         case JPEG_RIGHT:
             if (!(ds < ds_max) && entries > 0 && jpg.x_size <= MAX_X_SIZE)
                 return change_filename(DIR_NEXT);
         case JPEG_RIGHT | BUTTON_REPEAT:
-            move = MIN(HSCROLL, pdisp->width - pdisp->x - LCD_WIDTH);
-            if (move > 0)
-            {
-                MYXLCD(scroll_left)(move); /* scroll left */
-                pdisp->x += move;
-#ifdef HAVE_LCD_COLOR
-                yuv_bitmap_part(
-                    pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
-                    pdisp->x + LCD_WIDTH - move, pdisp->y, pdisp->stride,
-                    LCD_WIDTH - move, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
-                    move, MIN(LCD_HEIGHT, pdisp->height),    /* w, h */
-                    jpeg_settings.colour_mode, jpeg_settings.dither_mode);
-#else
-                MYXLCD(gray_bitmap_part)(
-                    pdisp->bitmap[0], pdisp->x + LCD_WIDTH - move,
-                    pdisp->y, pdisp->stride,
-                    LCD_WIDTH - move, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
-                    move, MIN(LCD_HEIGHT, pdisp->height));   /* w, h */
-#endif
-                MYLCD_UPDATE();
-            }
+            pan_view_right(pdisp);
             break;
 
         case JPEG_UP:
         case JPEG_UP | BUTTON_REPEAT:
-            move = MIN(VSCROLL, pdisp->y);
-            if (move > 0)
-            {
-                MYXLCD(scroll_down)(move); /* scroll down */
-                pdisp->y -= move;
-#ifdef HAVE_LCD_COLOR
-                if (jpeg_settings.dither_mode == DITHER_DIFFUSION)
-                {
-                    /* Draw over the band at the top of the last update
-                       caused by lack of error history on line zero. */
-                    move = MIN(move + 1, pdisp->y + pdisp->height);
-                }
-
-                yuv_bitmap_part(
-                    pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
-                    pdisp->x, pdisp->y, pdisp->stride,
-                    MAX(0, (LCD_WIDTH-pdisp->width)/2), 0,   /* x, y */
-                    MIN(LCD_WIDTH, pdisp->width), move,      /* w, h */
-                    jpeg_settings.colour_mode, jpeg_settings.dither_mode);
-#else
-                MYXLCD(gray_bitmap_part)(
-                    pdisp->bitmap[0], pdisp->x, pdisp->y, pdisp->stride,
-                    MAX(0, (LCD_WIDTH-pdisp->width)/2), 0,   /* x, y */
-                    MIN(LCD_WIDTH, pdisp->width), move);     /* w, h */
-#endif
-                MYLCD_UPDATE();
-            }
+            pan_view_up(pdisp);
             break;
 
         case JPEG_DOWN:
         case JPEG_DOWN | BUTTON_REPEAT:
-            move = MIN(VSCROLL, pdisp->height - pdisp->y - LCD_HEIGHT);
-            if (move > 0)
-            {
-                MYXLCD(scroll_up)(move); /* scroll up */
-                pdisp->y += move;
-#ifdef HAVE_LCD_COLOR
-                if (jpeg_settings.dither_mode == DITHER_DIFFUSION)
-                {
-                    /* Save the line that was on the last line of the display
-                       and draw one extra line above then recover the line with
-                       image data that had an error history when it was drawn.
-                     */
-                    move++, pdisp->y--;
-                    rb->memcpy(rgb_linebuf,
-                           rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
-                           LCD_WIDTH*sizeof (fb_data));
-                }
-
-                yuv_bitmap_part(
-                    pdisp->bitmap, pdisp->csub_x, pdisp->csub_y, pdisp->x,
-                    pdisp->y + LCD_HEIGHT - move, pdisp->stride,
-                    MAX(0, (LCD_WIDTH-pdisp->width)/2), LCD_HEIGHT - move, /* x, y */
-                    MIN(LCD_WIDTH, pdisp->width), move,     /* w, h */
-                    jpeg_settings.colour_mode, jpeg_settings.dither_mode);
-
-                if (jpeg_settings.dither_mode == DITHER_DIFFUSION)
-                {
-                    /* Cover the first row drawn with previous image data. */
-                    rb->memcpy(rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
-                           rgb_linebuf,
-                           LCD_WIDTH*sizeof (fb_data));
-                    pdisp->y++;
-                }
-#else
-                MYXLCD(gray_bitmap_part)(
-                    pdisp->bitmap[0], pdisp->x,
-                    pdisp->y + LCD_HEIGHT - move, pdisp->stride,
-                    MAX(0, (LCD_WIDTH-pdisp->width)/2), LCD_HEIGHT - move, /* x, y */
-                    MIN(LCD_WIDTH, pdisp->width), move);     /* w, h */
-#endif
-                MYLCD_UPDATE();
-            }
+            pan_view_down(pdisp);
             break;
+
         case BUTTON_NONE:
             if (!slideshow_enabled)
                 break;
@@ -1194,8 +1231,8 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     xlcd_init(rb);
 #endif
 
-    /* should be ok to just load settings since a parameter is present
-       here and the drive should be spinning */
+    /* should be ok to just load settings since the plugin itself has
+       just been loaded from disk and the drive should be spinning */
     configfile_init(rb);
     configfile_load(JPEG_CONFIGFILE, jpeg_config,
                     ARRAYLEN(jpeg_config), JPEG_SETTINGS_MINVERSION);
