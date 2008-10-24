@@ -22,10 +22,9 @@
 
 #include <QtCore>
 #include <QDebug>
+
 #include <cstdlib>
 #include <stdio.h>
-#include <QMessageBox>
-
 
 // Windows Includes
 #if defined(Q_OS_WIN32)
@@ -72,11 +71,11 @@ enum Detect::userlevel Detect::userPermissions(void)
     DWORD usersize = UNLEN;
     BOOL status;
     enum userlevel result;
-   
+
     status = GetUserNameW(userbuf, &usersize);
     if(!status)
         return ERR;
- 
+
     napistatus = NetUserGetInfo(NULL, userbuf, (DWORD)1, (LPBYTE*)&buf);
 
     switch(buf->usri1_priv) {
@@ -122,7 +121,7 @@ QString Detect::userPermissionsString(void)
     return result;
 }
 #endif
-    
+
 
 /** @brief detects current Username.
  *  @return string with Username.
@@ -133,7 +132,7 @@ QString Detect::userName(void)
     wchar_t userbuf[UNLEN];
     DWORD usersize = UNLEN;
     BOOL status;
- 
+
     status = GetUserNameW(userbuf, &usersize);
 
     return QString::fromWCharArray(userbuf);
@@ -331,7 +330,7 @@ QUrl Detect::systemProxy(void)
 
     ret = RegQueryValueEx(hk, _TEXT("ProxyServer"), NULL, NULL, (LPBYTE)proxyval, &buflen);
     if(ret != ERROR_SUCCESS) return QUrl("");
-    
+
     ret = RegQueryValueEx(hk, _TEXT("ProxyEnable"), NULL, NULL, (LPBYTE)&enable, &enalen);
     if(ret != ERROR_SUCCESS) return QUrl("");
 
@@ -341,9 +340,9 @@ QUrl Detect::systemProxy(void)
     if(enable != 0)
         return QUrl("http://" + QString::fromWCharArray(proxyval));
     else
-        return QUrl("");      
+        return QUrl("");
 #else
-    return QUrl("");        
+    return QUrl("");
 #endif
 }
 
@@ -359,14 +358,14 @@ QString Detect::installedVersion(QString mountpoint)
     {
         return "";
     }
-    
+
     while (!info.atEnd()) {
         QString line = info.readLine();
-        
+
         if(line.contains("Version:"))
         {
             return line.remove("Version:").trimmed();
-        }        
+        }
     }
     info.close();
     return "";
@@ -384,15 +383,15 @@ int Detect::installedTargetId(QString mountpoint)
     {
         return -1;
     }
-    
-    while (!info.atEnd()) 
+
+    while (!info.atEnd())
     {
         QString line = info.readLine();
         if(line.contains("Target id:"))
         {
             qDebug() << line;
             return line.remove("Target id:").trimmed().toInt();
-        }        
+        }
     }
     info.close();
     return -1;
@@ -403,9 +402,9 @@ int Detect::installedTargetId(QString mountpoint)
  *  @param settings A pointer to rbutils settings class
  *  @param permission if it should check for permission
  *  @param targetId the targetID to check for. if it is -1 no check is done.
- *  @return true if everything is ok, or user wants to continue
+ *  @return string with error messages if problems occurred, empty strings if none.
  */
-bool Detect::check(RbSettings* settings,bool permission,int targetId)
+QString Detect::check(RbSettings* settings, bool permission, int targetId)
 {
     QString text = "";
 
@@ -415,36 +414,28 @@ bool Detect::check(RbSettings* settings,bool permission,int targetId)
 #if defined(Q_OS_WIN32)
         if(Detect::userPermissions() != Detect::ADMIN)
         {
-            text += QObject::tr("Permissions are not sufficient! \n Run with admin rights. \n\n"); 
-        }               
+            text += QObject::tr("<li>Permissions insufficient for bootloader "
+                    "installation.\nAdministrator priviledges are necessary.</li>");
+        }
 #endif
     }
 
     // Check TargetId
     if(targetId > 0)
-    {    
+    {
         int installedID = Detect::installedTargetId(settings->mountpoint());
         if( installedID != -1 && installedID != targetId)
         {
-            text += QObject::tr("Target mismatch detected. \n\n"
-                          "Installed target: %1.\n"
-                          "New Target: %2.\n\n").arg(settings->nameOfTargetId(installedID),settings->curName());
-           
-        }        
+            text += QObject::tr("<li>Target mismatch detected.\n"
+                    "Installed target: %1, selected target: %2.</li>")
+                    .arg(settings->nameOfTargetId(installedID),settings->curName());
+        }
     }
 
-    // show message Box
-    if(text != "")
-    {
-        text += QObject::tr("\n Do you want to continue ?");
-        if(QMessageBox::warning(NULL, QObject::tr("Problems detected"),text,
-           QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
-        {
-            return false;
-        }            
-    }
-
-    return true;
+    if(!text.isEmpty())
+        return QObject::tr("Problem detected:") + "<ul>" + text + "</ul>";
+    else
+        return text;
 }
 
 

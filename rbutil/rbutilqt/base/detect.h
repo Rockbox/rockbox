@@ -27,17 +27,17 @@
 #include <QUrl>
 #include "rbsettings.h"
 
-class Detect 
+class Detect
 {
 public:
     Detect() {}
-    
+
 #if defined(Q_OS_WIN32)
     enum userlevel { ERR, GUEST, USER, ADMIN };
     static enum userlevel userPermissions(void);
     static QString userPermissionsString(void);
 #endif
-    
+
     static QString userName(void);
     static QString osVersionString(void);
     static QList<uint32_t> listUsbIds(void);
@@ -47,7 +47,7 @@ public:
     static QString installedVersion(QString mountpoint);
     static int installedTargetId(QString mountpoint);
 
-    static bool check(RbSettings* settings,bool permission,int targetId);
+    static QString check(RbSettings* settings, bool permission, int targetId);
 
 };
 #endif

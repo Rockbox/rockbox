@@ -496,17 +496,22 @@ bool RbUtilQt::installAuto()
     }
 
     QString myversion = "r" + versmap.value("bleed_rev");
-    
-    // check installed Version and Target
-    QString rbVersion = Detect::installedVersion(settings->mountpoint()); 
 
-    if(Detect::check(settings,false,settings->curTargetId()) == false)
+    // check installed Version and Target
+    QString rbVersion = Detect::installedVersion(settings->mountpoint());
+    QString warning = Detect::check(settings, false, settings->curTargetId());
+
+    if(!warning.isEmpty())
     {
-       logger->addItem(tr("Aborted!"),LOGERROR);
-       logger->abort();
-       return false;
+        if(QMessageBox::warning(this, tr("Really continue?"), warning,
+            QMessageBox::Ok | QMessageBox::Abort, QMessageBox::Abort) == QMessageBox::Abort)
+        {
+            logger->addItem(tr("Aborted!"), LOGERROR);
+            logger->abort();
+            return false;
+        }
     }
-  
+
     // check version
     if(rbVersion != "")
     {
@@ -516,7 +521,7 @@ bool RbUtilQt::installAuto()
         {
             logger->addItem(tr("Starting backup..."),LOGINFO);
             QString backupName = settings->mountpoint() + "/.backup/rockbox-backup-"+rbVersion+".zip";
-            
+
             //! create dir, if it doesnt exist
             QFileInfo backupFile(backupName);
             if(!QDir(backupFile.path()).exists())

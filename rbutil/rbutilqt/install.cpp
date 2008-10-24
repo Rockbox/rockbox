@@ -120,19 +120,25 @@ void Install::accept()
         return;
     }
     settings->sync();
-  
-    if(Detect::check(settings,false,settings->curTargetId()) == false)
+
+    QString warning = Detect::check(settings, false, settings->curTargetId());
+    if(!warning.isEmpty())
     {
-        logger->addItem(tr("Aborted!"),LOGERROR);
-        logger->abort();
-        return;
-    }    
-    
+        if(QMessageBox::warning(this, tr("Really continue?"), warning,
+            QMessageBox::Ok | QMessageBox::Abort, QMessageBox::Abort)
+            == QMessageBox::Abort)
+        {
+            logger->addItem(tr("Aborted!"),LOGERROR);
+            logger->abort();
+            return;
+        }
+    }
+
     //! check if we should backup
     if(ui.backup->isChecked())
     {
         logger->addItem(tr("Beginning Backup..."),LOGINFO);
-        
+
         //! create dir, if it doesnt exist
         QFileInfo backupFile(m_backupName);
         if(!QDir(backupFile.path()).exists())
@@ -140,7 +146,7 @@ void Install::accept()
             QDir a;
             a.mkpath(backupFile.path());
         }
-        
+
         //! create backup
         RbZip backup;
         connect(&backup,SIGNAL(zipProgress(int,int)),logger,SLOT(setProgress(int,int)));
@@ -155,7 +161,7 @@ void Install::accept()
             return;
         }
     }
-    
+
     //! install build
     installer = new ZipInstaller(this);
     installer->setUrl(file);
