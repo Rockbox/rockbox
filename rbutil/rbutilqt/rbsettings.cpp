@@ -113,8 +113,9 @@ QString RbSettings::bleedingUrl()
     return devices->value("bleeding_url").toString();
 }
 
-QString RbSettings::lastRelease(QString plattform)
+QString RbSettings::lastRelease(QString platform)
 {
+    (void)platform;
     return deviceSettingCurGet("last_release").toString();
 }
 

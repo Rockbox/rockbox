@@ -32,15 +32,15 @@ class RbSettings : public QObject
 
     public:
         RbSettings() {}
-        
+
         //! open the settings files
         void open();
         //! call this to flush the user Settings
         void sync();
-        
+
         // returns the filename of the usersettings file
         QString userSettingFilename();
-            
+
         //! access functions for the settings
         QString curVersion();
         bool cacheOffline();
@@ -48,7 +48,7 @@ class RbSettings : public QObject
         QString mountpoint();
         QString manualUrl();
         QString bleedingUrl();
-        QString lastRelease(QString plattform);
+        QString lastRelease(QString platform);
         QString cachePath();
         QString bootloaderUrl();
         QString bootloaderInfoUrl();
