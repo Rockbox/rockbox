@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 
+#include <QtCore>
 #include "uninstall.h"
 #include "utils.h"
 
@@ -125,3 +126,4 @@ bool Uninstaller::uninstallPossible()
 {
     return QFileInfo(m_mountpoint +"/.rockbox/rbutil.log").exists();
 }
+

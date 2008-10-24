@@ -23,10 +23,7 @@
 #ifndef UNINSTALL_H
 #define UNINSTALL_H
 
-
-
-#include <QtGui>
-
+#include <QtCore>
 
 #include "progressloggerinterface.h"
 

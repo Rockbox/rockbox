@@ -59,7 +59,7 @@ SOURCES += rbutilqt.cpp \
  ../sansapatcher/sansapatcher.c \
  browsedirtree.cpp \
  installthemes.cpp \
- uninstall.cpp \
+ base/uninstall.cpp \
  uninstallwindow.cpp \
  base/utils.cpp \
  preview.cpp \
@@ -111,7 +111,7 @@ HEADERS += rbutilqt.h \
  irivertools/h300sums.h \
  browsedirtree.h \
  installthemes.h \
- uninstall.h \
+ base/uninstall.h \
  uninstallwindow.h \
  base/utils.h \
  preview.h \
