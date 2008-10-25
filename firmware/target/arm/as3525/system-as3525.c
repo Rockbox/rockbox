@@ -67,10 +67,10 @@ default_interrupt(INT_GPIOC);
 static void (* const irqvector[])(void) =
 {
     INT_WATCHDOG, INT_TIMER1, INT_TIMER2, INT_USB, INT_DMAC, INT_NAND, INT_IDE, INT_MCI0,
-    INT_MCI1, INT_AUDIO, INT_SSP, INT_I2C_MS, INT_I2C_AUDIO, INT_I2SIN, INT_I2SOUT, 
+    INT_MCI1, INT_AUDIO, INT_SSP, INT_I2C_MS, INT_I2C_AUDIO, INT_I2SIN, INT_I2SOUT,
     INT_UART, INT_GPIOD, RESERVED1 /* 17 */ ,INT_CGU, INT_MEMORY_STICK, INT_DBOP,
-    RESERVED2 /* 21 */, RESERVED3 /* 22 */, RESERVED4 /* 23 */, RESERVED5 /* 24 */, 
-    RESERVED6 /* 25 */, RESERVED7 /* 26 */, RESERVED8 /* 27 */, RESERVED9 /* 28 */, 
+    RESERVED2 /* 21 */, RESERVED3 /* 22 */, RESERVED4 /* 23 */, RESERVED5 /* 24 */,
+    RESERVED6 /* 25 */, RESERVED7 /* 26 */, RESERVED8 /* 27 */, RESERVED9 /* 28 */,
     INT_GPIOA, INT_GPIOB, INT_GPIOC
 };
 
@@ -111,7 +111,7 @@ void irq_handler(void)
     {
         irqvector[irq_no]();
     }
-    
+
     asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
                     "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
                     "subs  pc, lr, #4           \n"); /* Return from IRQ */
