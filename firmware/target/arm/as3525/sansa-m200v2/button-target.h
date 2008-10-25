@@ -40,10 +40,11 @@ bool button_hold(void);
 #define BUTTON_LEFT         0x00000020
 #define BUTTON_RIGHT        0x00000040
 #define BUTTON_SELECT       0x00000080
+#define BUTTON_HOLD         0x00000100
 
 #define BUTTON_MAIN (BUTTON_MENU|BUTTON_VOLUP|BUTTON_VOLDOWN\
                     |BUTTON_PLAYPAUSE|BUTTON_REPEATAB|BUTTON_LEFT\
-                    |BUTTON_RIGHT|BUTTON_SELECT)
+                    |BUTTON_RIGHT|BUTTON_SELECT|BUTTON_HOLD)
 
 #define BUTTON_REMOTE 0
 

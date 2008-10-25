@@ -23,15 +23,18 @@
 
 static inline bool _backlight_init(void)
 {
+    GPIOD_DIR |= (1<<1);
     return true;
 }
 
 static inline void _backlight_on(void)
 {
+    GPIOD_PIN(1) = (1<<1);
 }
 
 static inline void _backlight_off(void)
 {
+    GPIOD_PIN(1) = 0x00;
 }
 
 #endif
