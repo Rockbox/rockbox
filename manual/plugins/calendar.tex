@@ -2,15 +2,40 @@
 \subsection{Calendar}
 \screenshot{plugins/images/ss-calendar}{Calendar}{img:calendar}
 This is a small and simple calendar application with memo saving function.
-Dots indicate dates with memos. To add a new memo press \ButtonPlay\ on the
-date and choose which type of memo to add. The available types are: one off,
-annual, monthly, and weekly memos.
+Dots indicate dates with memos. The available memo types are: one off,
+yearly, monthly, and weekly memos.
+
 \begin{table}
-  \begin{btnmap}{}{}
-  \ButtonPlay & monthly \\
-  \ButtonLeft & weekly \\
-  \ButtonRight & annually \\
-  \ButtonOn & one off \\
-  \ButtonOff & Exit \\
-  \end{btnmap}
+\begin{btnmap}{}{}
+    \ButtonLeft{} / \ButtonRight{} /
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
+        ,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD}{\ButtonUp{} / \ButtonDown}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD}{\ButtonScrollFwd{} / \ButtonScrollBack}
+    \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
+    & Move the selector\\
+    %
+    \opt{RECORDER_PAD}{\ButtonPlay}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD%
+        ,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD}{\ButtonSelect}
+    \opt{IRIVER_H10_PAD}{\ButtonPlay}
+    & Show memos for the selected day\\
+    %
+    \opt{RECORDER_PAD}{\ButtonOn{} + \ButtonUp{} / \ButtonDown}
+    \opt{ONDIO_PAD,MROBE100_PAD}{\ButtonMenu{} + \ButtonUp{} / \ButtonDown}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode{} / \ButtonRec}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonPlay{} / \ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonPlay{} + \ButtonUp{} / \ButtonDown}
+    \opt{GIGABEAT_PAD,SANSA_C200_PAD}{\ButtonVolUp{} / \ButtonVolDown}
+    \opt{GIGABEAT_S_PAD}{\ButtonNext{} / \ButtonPrev}
+    \opt{SANSA_E200_PAD}{\ButtonUp{} / \ButtonDown}
+    \opt{IRIVER_H10_PAD}{\ButtonFF{} / \ButtonRew}
+    & Previous / Next month\\
+    %
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
+    \opt{GIGABEAT_S_PAD}{\ButtonBack}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}
+    & Quit\\
+\end{btnmap}
 \end{table}
