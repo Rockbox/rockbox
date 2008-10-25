@@ -34,7 +34,7 @@
 
 static bool display_on = false; /* is the display turned on? */
 static bool display_flipped = false;
-static int xoffset = 0; /* needed for flip */
+static int y_offset = 0; /* needed for flip */
 
 /* register defines */
 #define R_START_OSC             0x00
@@ -79,23 +79,22 @@ static int xoffset = 0; /* needed for flip */
 #define R_HORIZ_RAM_ADDR_POS    0x44
 #define R_VERT_RAM_ADDR_POS     0x45
 
-#define LCD_CMD  (*(volatile unsigned short *)0xf0000000)
-#define LCD_DATA (*(volatile unsigned short *)0xf0000002)
-
 #define R_ENTRY_MODE_HORZ 0x7030
 #define R_ENTRY_MODE_VERT 0x7038
+#define R_ENTRY_MODE_SOLID_VERT  0x1038
 
 /* TODO: Implement this function */
 static void lcd_delay(int x)
 {
-    (void)x;
+    /* This is just arbitrary - the OF does something more complex */
+    x *= 1024;
+    while (x--);
 }
 
 /* DBOP initialisation, do what OF does */
 static void ams3525_dbop_init(void)
 {
-
-    /* TODO: More... */
+    /* TODO: The OF calls some other functions here, but maybe not important */
 
     DBOP_TIMPOL_01 = 0xe167e167;
     DBOP_TIMPOL_23 = 0xe167006e;
@@ -109,35 +108,43 @@ static void ams3525_dbop_init(void)
     DBOP_TIMPOL_01 = 0x6e167;
     DBOP_TIMPOL_23 = 0xa167e06f;
 
-    /* TODO: More... */
+    /* TODO: The OF calls some other functions here, but maybe not important */
 }
 
-static void lcd_write_reg(int reg, int value)
+
+static void lcd_write_cmd(int cmd)
 {
+    /* Write register */
     DBOP_CTRL &= ~(1<<14);
 
     DBOP_TIMPOL_23 = 0xa167006e;
 
-    DBOP_DOUT = reg;
+    DBOP_DOUT = cmd;
 
     /* Wait for fifo to empty */
     while ((DBOP_STAT & (1<<10)) == 0);
 
     DBOP_TIMPOL_23 = 0xa167e06f;
-
-
-    DBOP_DOUT = value;
-
-    /* Wait for fifo to empty */
-    while ((DBOP_STAT & (1<<10)) == 0);
 }
 
 void lcd_write_data(const fb_data* p_bytes, int count)
 {
-    (void)p_bytes;
-    (void)count;
+    while (count--)
+    {
+        DBOP_DOUT = *p_bytes++;
+
+        /* Wait for fifo to empty */
+        while ((DBOP_STAT & (1<<10)) == 0);
+    }
 }
 
+static void lcd_write_reg(int reg, int value)
+{
+    unsigned short data = value;
+
+    lcd_write_cmd(reg);
+    lcd_write_data(&data, 1);
+}
 
 /*** hardware configuration ***/
 
@@ -161,7 +168,7 @@ static void flip_lcd(bool yesno)
 void lcd_set_flip(bool yesno)
 {
     display_flipped = yesno;
-    xoffset = yesno ? 4 : 0;
+    y_offset = yesno ? 4 : 0;   /* FIXME: Is a y_offset needed? */
 
     if (display_on)
         flip_lcd(yesno);
@@ -277,42 +284,42 @@ static void _display_on(void)
 /* LCD init */
 void lcd_init_device(void)
 {
-  ams3525_dbop_init();
+    ams3525_dbop_init();
 
-  /* Init GPIOs the same as the OF */
+    /* Init GPIOs the same as the OF */
 
-  GPIOA_DIR |= (1<<5);
-  GPIOA_PIN(5) = 0;
+    GPIOA_DIR |= (1<<5);
+    GPIOA_PIN(5) = 0;
 
-  GPIOA_PIN(3) = (1<<3);
+    GPIOA_PIN(3) = (1<<3);
 
-  GPIOA_DIR |= (3<<3);
+    GPIOA_DIR |= (3<<3);
 
-  GPIOA_PIN(3) = (1<<3);
+    GPIOA_PIN(3) = (1<<3);
 
-  GPIOA_PIN(4) = 0;  //c80b0040 := 0;
+    GPIOA_PIN(4) = 0;  //c80b0040 := 0;
 
-  GPIOA_DIR |= (1<<7);
-  GPIOA_PIN(7) = 0;
+    GPIOA_DIR |= (1<<7);
+    GPIOA_PIN(7) = 0;
 
-  CCU_IO &= ~(1<<2);
-  CCU_IO &= ~(1<<3);
+    CCU_IO &= ~(1<<2);
+    CCU_IO &= ~(1<<3);
 
-  GPIOD_DIR |= (1<<7);
+    GPIOD_DIR |= (1<<7);
 
 #if 0
-  /* TODO: This code is conditional on a variable in the OF init, we need to
-           work out what it means */
+    /* TODO: This code is conditional on a variable in the OF init, we need to
+       work out what it means */
 
-  GPIOD_PIN(7) = (1<<7);
-  GPIOD_DIR |= (1<<7);
+    GPIOD_PIN(7) = (1<<7);
+    GPIOD_DIR |= (1<<7);
 #endif
 
-  lcd_delay(1);
+    lcd_delay(1);
 
-  GPIOA_PIN(5) = (1<<5);
+    GPIOA_PIN(5) = (1<<5);
 
-  lcd_delay(1);
+    lcd_delay(1);
 
     _display_on();
 }
@@ -361,25 +368,64 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
-void lcd_update(void) ICODE_ATTR;
 void lcd_update(void)
 {
-    if(display_on){
-        /* TODO */
-    }
-}
+    if (!display_on)
+        return;
+
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_SOLID_VERT);
+
+    /* Set start position and window */
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 
+                  ((y_offset + LCD_HEIGHT-1) << 8) | y_offset);
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, (LCD_WIDTH-1) << 8);
+    lcd_write_reg(R_RAM_ADDR_SET, y_offset);
+
+    lcd_write_cmd(R_WRITE_DATA_2_GRAM);
+
+    lcd_write_data((unsigned short *)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
+} /* lcd_update */
 
 
 /* Update a fraction of the display. */
-void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
+    int ymax;
+    const unsigned short *ptr;
 
-    if(display_on) {
-        /* TODO */
+    if (!display_on)
+        return;
+
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x; /* Clip right */
+    if (x < 0)
+        width += x, x = 0; /* Clip left */
+    if (width <= 0)
+        return; /* nothing left to do */
+
+    ymax = y + height;
+    if (ymax > LCD_HEIGHT)
+        ymax = LCD_HEIGHT; /* Clip bottom */
+    if (y < 0)
+        y = 0; /* Clip top */
+    if (y >= ymax)
+        return; /* nothing left to do */
+
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_SOLID_VERT);
+    /* Set start position and window */
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 
+                  ((y_offset + LCD_HEIGHT-1) << 8) | y_offset);
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, ((x + width - 1) << 8) | x);
+    lcd_write_reg(R_RAM_ADDR_SET, (x << 8) | (y + y_offset));
+
+    lcd_write_cmd(R_WRITE_DATA_2_GRAM);
+
+    ptr = (unsigned short *)&lcd_framebuffer[y][x];
+
+    do
+    {
+        lcd_write_data(ptr, width);
+        ptr += LCD_WIDTH;
     }
-}
+    while (++y < ymax);
+} /* lcd_update_rect */
