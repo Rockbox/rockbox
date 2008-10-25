@@ -109,6 +109,9 @@ static const char default_game[9][9] =
 #define CELL_WIDTH  8
 #define CELL_HEIGHT 6
 #define SMALL_BOARD
+#define MARK_OFFS   1   /* Pixels between border and mark */
+#define MARK_SPACE  1   /* Pixels between two marks */
+#define MARK_SIZE   1   /* Mark width and height */
 
 #elif ((LCD_HEIGHT==80) && (LCD_WIDTH==132))
 /* C200, 9 cells @ 8x8 with 8 border lines */
@@ -117,6 +120,9 @@ static const char default_game[9][9] =
 #define CELL_WIDTH  8
 #define CELL_HEIGHT 8
 #define SMALL_BOARD
+#define MARK_OFFS   1   /* Pixels between border and mark */
+#define MARK_SPACE  1   /* Pixels between two marks */
+#define MARK_SIZE   1   /* Mark width and height */
 
 #elif ((LCD_HEIGHT==96) && (LCD_WIDTH==128))
 /* iAudio M3, 9 cells @ 9x9 with 14 border lines */
@@ -124,6 +130,9 @@ static const char default_game[9][9] =
 /* Internal dimensions of a cell */
 #define CELL_WIDTH  9
 #define CELL_HEIGHT 9
+#define MARK_OFFS   1   /* Pixels between border and mark */
+#define MARK_SPACE  2   /* Pixels between two marks */
+#define MARK_SIZE   1   /* Mark width and height */
 
 #elif (LCD_HEIGHT==110) && (LCD_WIDTH==138) \
    || (LCD_HEIGHT==128) && (LCD_WIDTH==128)
@@ -133,6 +142,9 @@ static const char default_game[9][9] =
 /* Internal dimensions of a cell */
 #define CELL_WIDTH  10
 #define CELL_HEIGHT 10
+#define MARK_OFFS   1   /* Pixels between border and mark */
+#define MARK_SPACE  1   /* Pixels between two marks */
+#define MARK_SIZE   2   /* Mark width and height */
 
 #elif ((LCD_HEIGHT==128) && (LCD_WIDTH==160)) \
    || ((LCD_HEIGHT==132) && (LCD_WIDTH==176))
@@ -142,6 +154,9 @@ static const char default_game[9][9] =
 /* Internal dimensions of a cell */
 #define CELL_WIDTH  12
 #define CELL_HEIGHT 12
+#define MARK_OFFS   1   /* Pixels between border and mark */
+#define MARK_SPACE  2   /* Pixels between two marks */
+#define MARK_SIZE   2   /* Mark width and height */
 
 #elif ((LCD_HEIGHT==176) && (LCD_WIDTH==220))
 /* Iriver h300, iPod Color/Photo - 220x176, 9 cells @ 16x16 with 14 border lines */
@@ -149,6 +164,9 @@ static const char default_game[9][9] =
 /* Internal dimensions of a cell */
 #define CELL_WIDTH  16
 #define CELL_HEIGHT 16
+#define MARK_OFFS   1   /* Pixels between border and mark */
+#define MARK_SPACE  1   /* Pixels between two marks */
+#define MARK_SIZE   4   /* Mark width and height */
 
 #elif (LCD_HEIGHT>=240) && (LCD_WIDTH>=320)
 /* iPod Video - 320x240, 9 cells @ 24x24 with 14 border lines */
@@ -156,6 +174,9 @@ static const char default_game[9][9] =
 /* Internal dimensions of a cell */
 #define CELL_WIDTH  24
 #define CELL_HEIGHT 24
+#define MARK_OFFS   1   /* Pixels between border and mark */
+#define MARK_SPACE  2   /* Pixels between two marks */
+#define MARK_SIZE   6   /* Mark width and height */
 
 #else
   #error SUDOKU: Unsupported LCD size
@@ -170,6 +191,9 @@ static const char default_game[9][9] =
 /* Internal dimensions of a cell */
 #define CELL_WIDTH  16
 #define CELL_HEIGHT 16
+#define MARK_OFFS   1   /* Pixels between border and mark */
+#define MARK_SPACE  1   /* Pixels between two marks */
+#define MARK_SIZE   4   /* Mark width and height */
 
 #elif (LCD_HEIGHT>=320) && (LCD_WIDTH>=240)
 /* Gigabeat - 240x320, 9 cells @ 24x24 with 14 border lines */
@@ -177,6 +201,9 @@ static const char default_game[9][9] =
 /* Internal dimensions of a cell */
 #define CELL_WIDTH  24
 #define CELL_HEIGHT 24
+#define MARK_OFFS   1   /* Pixels between border and mark */
+#define MARK_SPACE  2   /* Pixels between two marks */
+#define MARK_SIZE   6   /* Mark width and height */
 
 #else
   #error SUDOKU: Unsupported LCD size
@@ -187,20 +214,45 @@ static const char default_game[9][9] =
 #define CFGFILE_VERSION 0     /* Current config file version */
 #define CFGFILE_MINVERSION 0  /* Minimum config file version to accept */
 
-#ifdef HAVE_LCD_COLOR
+#if defined(HAVE_LCD_COLOR) || defined(SUDOKU_BUTTON_POSSIBLE)
 /* settings */
 struct sudoku_config {
+#ifdef HAVE_LCD_COLOR
     int number_display;
+#endif
+#ifdef SUDOKU_BUTTON_POSSIBLE
+    int show_markings;
+#endif
 };
-struct sudoku_config sudcfg_disk = { 0 };
+
+struct sudoku_config sudcfg_disk = {
+#ifdef HAVE_LCD_COLOR
+    0,
+#endif
+#ifdef SUDOKU_BUTTON_POSSIBLE
+    1,
+#endif
+};
 struct sudoku_config sudcfg;
 
 static const char cfg_filename[] =  "sudoku.cfg";
+#ifdef HAVE_LCD_COLOR
 static char *number_str[2] = { "black", "coloured" };
+#endif
+#ifdef SUDOKU_BUTTON_POSSIBLE
+static char *mark_str[2] = { "hide", "show" };
+#endif
 
 struct configdata disk_config[] = {
+#ifdef HAVE_LCD_COLOR
    { TYPE_ENUM, 0, 2, &sudcfg_disk.number_display, "numbers", number_str, NULL },
+#endif
+#ifdef SUDOKU_BUTTON_POSSIBLE
+   { TYPE_ENUM, 0, 2, &sudcfg_disk.show_markings, "markings", mark_str, NULL },
+#endif
 };
+#endif
+#ifdef HAVE_LCD_COLOR
 #define NUMBER_TYPE (sudcfg.number_display*CELL_WIDTH)
 #else
 #define NUMBER_TYPE 0
@@ -830,6 +882,9 @@ void update_cell(struct sudoku_state_t* state, int r, int c)
 void display_board(struct sudoku_state_t* state) 
 {
     int r,c;
+#ifdef SUDOKU_BUTTON_POSSIBLE
+    int i;
+#endif
 
     /* Clear the display buffer */
     rb->lcd_clear_display();
@@ -961,7 +1016,7 @@ void display_board(struct sudoku_state_t* state)
                2) Starting number
                3) Cursor in cell
             */
-            
+
             if ((r==state->y) && (c==state->x)) {
                 rb->lcd_bitmap_part(sudoku_inverse,NUMBER_TYPE,
                                     BITMAP_HEIGHT*(state->currentboard[r][c]-
@@ -985,6 +1040,30 @@ void display_board(struct sudoku_state_t* state)
                                         XOFS+cellxpos[c],YOFS+cellypos[r],
                                         CELL_WIDTH,CELL_HEIGHT);
                 }
+
+#ifdef SUDOKU_BUTTON_POSSIBLE
+                /* Draw the possible number markings on the board */
+                if(sudcfg.show_markings && state->startboard[r][c]=='0'
+                    && state->currentboard[r][c]=='0') {
+                    for(i=0;i<9;i++) {
+                        if(state->possiblevals[r][c]&(2<<i)) {
+#if LCD_DEPTH > 1
+                            /* draw markings in dark grey */
+                            rb->lcd_set_foreground(LCD_DARKGRAY);
+#endif
+                            rb->lcd_fillrect(XOFS+cellxpos[c]+MARK_OFFS
+                                             +(i%3)*(MARK_SIZE+MARK_SPACE),
+                                             YOFS+cellypos[r]+MARK_OFFS
+                                             +(i/3)*(MARK_SIZE+MARK_SPACE),
+                                             MARK_SIZE,
+                                             MARK_SIZE);
+#if LCD_DEPTH > 1
+                            rb->lcd_set_foreground(LCD_BLACK);
+#endif
+                        }
+                    }
+                }
+#endif /* SUDOKU_BUTTON_POSSIBLE */
             }
         }
     }
@@ -1040,10 +1119,26 @@ static bool numdisplay_setting(void)
 }
 #endif
 
+#ifdef SUDOKU_BUTTON_POSSIBLE
+static bool showmarkings_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"Hide",  -1},
+        {"Show",  -1},
+    };
+
+    return rb->set_option("Show Markings", &sudcfg.show_markings, INT, names,
+                          sizeof(names) / sizeof(names[0]), NULL);
+}
+#endif
+
 enum {
     SM_AUDIO_PLAYBACK = 0,
 #ifdef HAVE_LCD_COLOR
     SM_NUMBER_DISPLAY,
+#endif
+#ifdef SUDOKU_BUTTON_POSSIBLE
+    SM_SHOW_MARKINGS,
 #endif
     SM_SAVE,
     SM_RELOAD,
@@ -1063,6 +1158,9 @@ bool sudoku_menu(struct sudoku_state_t* state)
         [SM_AUDIO_PLAYBACK] = { "Audio Playback", NULL },
 #ifdef HAVE_LCD_COLOR
         [SM_NUMBER_DISPLAY] = { "Number Display", NULL },
+#endif
+#ifdef SUDOKU_BUTTON_POSSIBLE
+        [SM_SHOW_MARKINGS] = { "Show Markings", NULL },
 #endif
         [SM_SAVE]     = { "Save", NULL },
         [SM_RELOAD]   = { "Reload", NULL },
@@ -1086,6 +1184,12 @@ bool sudoku_menu(struct sudoku_state_t* state)
 #ifdef HAVE_LCD_COLOR
         case SM_NUMBER_DISPLAY:
             numdisplay_setting();
+            break;
+#endif
+
+#ifdef SUDOKU_BUTTON_POSSIBLE
+        case SM_SHOW_MARKINGS:
+            showmarkings_setting();
             break;
 #endif
         case SM_SAVE:
@@ -1204,7 +1308,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     rb = api;
     /* end of plugin init */
     
-#ifdef HAVE_LCD_COLOR
+#if defined(HAVE_LCD_COLOR) || defined(SUDOKU_BUTTON_POSSIBLE)
     configfile_init(rb);
     configfile_load(cfg_filename, disk_config,
                     sizeof(disk_config) / sizeof(disk_config[0]),
@@ -1438,7 +1542,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
         display_board(&state);
     }
-#ifdef HAVE_LCD_COLOR
+#if defined(HAVE_LCD_COLOR) || defined(SUDOKU_BUTTON_POSSIBLE)
     if (rb->memcmp(&sudcfg, &sudcfg_disk, sizeof(sudcfg))) /* save settings if changed */
     {
         rb->memcpy(&sudcfg_disk, &sudcfg, sizeof(sudcfg));
