@@ -27,6 +27,162 @@
 
 PLUGIN_HEADER
 
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define CALENDAR_QUIT       BUTTON_OFF
+#define CALENDAR_SELECT     BUTTON_PLAY
+#define CALENDAR_NEXT_WEEK  BUTTON_DOWN
+#define CALENDAR_PREV_WEEK  BUTTON_UP
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH (BUTTON_ON|BUTTON_DOWN)
+#define CALENDAR_PREV_MONTH (BUTTON_ON|BUTTON_UP)
+
+#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
+#define CALENDAR_QUIT       BUTTON_OFF
+#define CALENDAR_SELECT     BUTTON_SELECT
+#define CALENDAR_NEXT_WEEK  BUTTON_DOWN
+#define CALENDAR_PREV_WEEK  BUTTON_UP
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH (BUTTON_ON|BUTTON_DOWN)
+#define CALENDAR_PREV_MONTH (BUTTON_ON|BUTTON_UP)
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define CALENDAR_QUIT       BUTTON_OFF
+#define CALENDAR_SELECT     (BUTTON_MENU|BUTTON_REL)
+#define CALENDAR_NEXT_WEEK  BUTTON_DOWN
+#define CALENDAR_PREV_WEEK  BUTTON_UP
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH (BUTTON_MENU|BUTTON_DOWN)
+#define CALENDAR_PREV_MONTH (BUTTON_MENU|BUTTON_UP)
+
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+      (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define CALENDAR_QUIT       BUTTON_OFF
+#define CALENDAR_SELECT     BUTTON_SELECT
+#define CALENDAR_NEXT_WEEK  BUTTON_DOWN
+#define CALENDAR_PREV_WEEK  BUTTON_UP
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH BUTTON_MODE
+#define CALENDAR_PREV_MONTH BUTTON_REC
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
+#define CALENDAR_QUIT       (BUTTON_SELECT|BUTTON_MENU)
+#define CALENDAR_SELECT     (BUTTON_SELECT|BUTTON_PLAY)
+#define CALENDAR_NEXT_WEEK  BUTTON_SCROLL_FWD
+#define CALENDAR_PREV_WEEK  BUTTON_SCROLL_BACK
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH BUTTON_PLAY
+#define CALENDAR_PREV_MONTH BUTTON_MENU
+
+#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
+#define CALENDAR_QUIT       BUTTON_POWER
+#define CALENDAR_SELECT     BUTTON_SELECT
+#define CALENDAR_NEXT_WEEK  BUTTON_DOWN
+#define CALENDAR_PREV_WEEK  BUTTON_UP
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH (BUTTON_PLAY|BUTTON_DOWN)
+#define CALENDAR_PREV_MONTH (BUTTON_PLAY|BUTTON_UP)
+
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+#define CALENDAR_QUIT       BUTTON_POWER
+#define CALENDAR_SELECT     BUTTON_SELECT
+#define CALENDAR_NEXT_WEEK  BUTTON_DOWN
+#define CALENDAR_PREV_WEEK  BUTTON_UP
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH BUTTON_VOL_DOWN
+#define CALENDAR_PREV_MONTH BUTTON_VOL_UP
+
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+#define CALENDAR_QUIT       BUTTON_POWER
+#define CALENDAR_SELECT     BUTTON_SELECT
+#define CALENDAR_NEXT_WEEK  BUTTON_SCROLL_FWD
+#define CALENDAR_PREV_WEEK  BUTTON_SCROLL_BACK
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH BUTTON_DOWN
+#define CALENDAR_PREV_MONTH BUTTON_UP
+
+#elif CONFIG_KEYPAD == SANSA_C200_PAD
+#define CALENDAR_QUIT       BUTTON_POWER
+#define CALENDAR_SELECT     BUTTON_SELECT
+#define CALENDAR_NEXT_WEEK  BUTTON_DOWN
+#define CALENDAR_PREV_WEEK  BUTTON_UP
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH BUTTON_VOL_UP
+#define CALENDAR_PREV_MONTH BUTTON_VOL_DOWN
+
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#define CALENDAR_QUIT       BUTTON_POWER
+#define CALENDAR_SELECT     BUTTON_PLAY
+#define CALENDAR_NEXT_WEEK  BUTTON_SCROLL_DOWN
+#define CALENDAR_PREV_WEEK  BUTTON_SCROLL_UP
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH BUTTON_FF
+#define CALENDAR_PREV_MONTH BUTTON_REW
+
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+#define CALENDAR_QUIT       BUTTON_BACK
+#define CALENDAR_SELECT     BUTTON_SELECT
+#define CALENDAR_NEXT_WEEK  BUTTON_DOWN
+#define CALENDAR_PREV_WEEK  BUTTON_UP
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH BUTTON_NEXT
+#define CALENDAR_PREV_MONTH BUTTON_PREV
+
+#elif CONFIG_KEYPAD == MROBE100_PAD
+#define CALENDAR_QUIT       BUTTON_POWER
+#define CALENDAR_SELECT     BUTTON_SELECT
+#define CALENDAR_NEXT_WEEK  BUTTON_DOWN
+#define CALENDAR_PREV_WEEK  BUTTON_UP
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH (BUTTON_MENU|BUTTON_DOWN)
+#define CALENDAR_PREV_MONTH (BUTTON_MENU|BUTTON_UP)
+
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define CALENDAR_QUIT       BUTTON_RC_REC
+#define CALENDAR_SELECT     BUTTON_RC_PLAY
+#define CALENDAR_NEXT_WEEK  BUTTON_RC_VOL_DOWN
+#define CALENDAR_PREV_WEEK  BUTTON_RC_VOL_UP
+#define CALENDAR_NEXT_DAY   BUTTON_RC_FF
+#define CALENDAR_PREV_DAY   BUTTON_RC_REW
+#define CALENDAR_NEXT_MONTH BUTTON_RC_MODE
+#define CALENDAR_PREV_MONTH BUTTON_RC_MENU
+
+#elif (CONFIG_KEYPAD == COWOND2_PAD)
+#define CALENDAR_QUIT       BUTTON_POWER
+#define CALENDAR_SELECT     BUTTON_CENTER
+#define CALENDAR_NEXT_WEEK  BUTTON_DOWN
+#define CALENDAR_PREV_WEEK  BUTTON_UP
+#define CALENDAR_NEXT_DAY   BUTTON_RIGHT
+#define CALENDAR_PREV_DAY   BUTTON_LEFT
+#define CALENDAR_NEXT_MONTH BUTTON_BOTTOMRIGHT
+#define CALENDAR_PREV_MONTH BUTTON_BOTTOMLEFT
+
+#else
+#error "No keypad setting."
+#endif
+
+#define X_OFFSET ((LCD_WIDTH%7)/2)
+#if LCD_HEIGHT <= 80
+#define Y_OFFSET 1
+#else
+#define Y_OFFSET 4
+#endif
+#define CELL_WIDTH  (LCD_WIDTH / 7)
+#define CELL_HEIGHT (LCD_HEIGHT / 7)
+
 static const struct plugin_api* rb;
 
 static bool leap_year;
@@ -35,6 +191,9 @@ static const int days_in_month[2][13] = {
     {31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
     {31, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
 };
+
+static const char *dayname_long[7] = {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
+static const char *dayname_short[7] = {"M","T","W","T","F","S","S"};
 
 struct today {
     int     mday;        /* day of the month */
@@ -101,17 +260,27 @@ static void calendar_init(struct today *today, struct shown *shown)
     leap_year = is_leap_year(shown->year);
 }
 
-static int space = LCD_WIDTH / 7;
 static void draw_headers(void)
 {
     int i,w,h;
-    const char *dayname[7] = {"M","T","W","T","F","S","S"};
-    int ws = 2;
+    int x = X_OFFSET;
+    const char **dayname = (const char**)&dayname_long;
+
+    for (i = 0; i < 7; i++)
+    {
+        rb->lcd_getstringsize(dayname[i],&w,&h);
+        if (w > CELL_WIDTH)
+        {
+            dayname = (const char**)&dayname_short;
+            break;
+        }
+    }
+
     rb->lcd_getstringsize("A",&w,&h);
     for (i = 0; i < 7; i++)
     {
-        rb->lcd_putsxy(ws, 0 , dayname[i]);
-        ws += space;
+        rb->lcd_putsxy(x, 0 , dayname[i]);
+        x += CELL_WIDTH;
     }
     rb->lcd_hline(0, LCD_WIDTH-1 ,h);
 }
@@ -121,7 +290,7 @@ static bool wday_has_memo[7];
 static void draw_calendar(struct shown *shown)
 {
     int w,h;
-    int ws,row,pos,days_per_month,j;
+    int x,y,pos,days_per_month,j;
     char buffer[9];
     const char *monthname[] = {
                           "Jan",
@@ -137,42 +306,49 @@ static void draw_calendar(struct shown *shown)
                           "Nov",
                           "Dec"
                         };
+    if(use_system_font)
+        rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_getstringsize("A",&w,&h);
     rb->lcd_clear_display();
     draw_headers();
     if (shown->firstday > 6)
         shown->firstday -= 7;
-    row = 1;
     pos = shown->firstday;
     days_per_month = days_in_month[leap_year][shown->mon];
-    ws = 2 + (pos * space);
-    for (j = 0; j < days_per_month;)
+    x = X_OFFSET + (pos * CELL_WIDTH);
+    y = Y_OFFSET + h;
+    for (j = 1; j <= days_per_month; j++)
     {
-        if ( (day_has_memo[++j]) || (wday_has_memo[pos]) )
+        if ( (day_has_memo[j]) || (wday_has_memo[pos]) )
             rb->snprintf(buffer,4,"%02d.", j);
         else
             rb->snprintf(buffer,4,"%02d", j);
-        rb->lcd_putsxy(ws, (row * h) + 5 ,buffer);
         if (shown->mday == j)
         {
-            rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-            rb->lcd_fillrect(ws, row*h+5, space, h);
             rb->lcd_set_drawmode(DRMODE_SOLID);
+            rb->lcd_fillrect(x, y - 1, CELL_WIDTH - 1, CELL_HEIGHT);
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
             shown->wday = pos;
         }
-        ws += space;
+        else
+        {
+            rb->lcd_set_drawmode(DRMODE_SOLID);
+        }
+        rb->lcd_putsxy(x, y, buffer);
+        x += CELL_WIDTH;
         pos++;
         if (pos >= 7)
         {
-            row++;
             pos = 0;
-            ws = 2;
+            x = X_OFFSET;
+            y += CELL_HEIGHT;
         }
     }
-    rb->lcd_vline(60,LCD_HEIGHT-h-3,LCD_HEIGHT-1);
-    rb->lcd_hline(60,LCD_WIDTH-1,LCD_HEIGHT-h-3);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
+    rb->lcd_vline(LCD_WIDTH-w*8-10,LCD_HEIGHT-h-3,LCD_HEIGHT-1);
+    rb->lcd_hline(LCD_WIDTH-w*8-10,LCD_WIDTH-1,LCD_HEIGHT-h-3);
     rb->snprintf(buffer,9,"%s %04d",monthname[shown->mon-1],shown->year);
-    rb->lcd_putsxy(62,(LCD_HEIGHT-h-1),buffer);
+    rb->lcd_putsxy(LCD_WIDTH-w*8-8,LCD_HEIGHT-h-1,buffer);
     shown->lastday = pos;
     rb->lcd_update();
 }
@@ -394,80 +570,129 @@ static void add_memo(struct shown *shown, int type)
     if(use_system_font)
         rb->lcd_setfont(FONT_SYSFIXED);
     if (saved)
-        rb->lcd_puts(0,0,"Event added");
+        rb->splash(HZ/2,"Event added");
     else
-        rb->lcd_puts(0,0,"Event not added");
-    rb->lcd_update();
-    rb->sleep(HZ/2);
+        rb->splash(HZ/2,"Event not added");
+}
+
+static int edit_menu_cb(int action, const struct menu_item_ex *this_item)
+{
+    (void) this_item;
+    if (action == ACTION_REQUEST_MENUITEM && memos_in_shown_memory <= 0)
+        return ACTION_EXIT_MENUITEM;
+    return action;
 }
 
 static bool edit_memo(int change, struct shown *shown)
 {
     bool exit = false;
-    int button;
-    
+    int selected = 0;
+
+    MENUITEM_RETURNVALUE(edit_menu_remove, "Remove", 0,
+                         edit_menu_cb, Icon_NOICON);
+    MENUITEM_RETURNVALUE(edit_menu_edit, "Edit", 1,
+                         edit_menu_cb, Icon_NOICON);
+    MENUITEM_RETURNVALUE(edit_menu_weekly, "New Weekly", 2,
+                         NULL, Icon_NOICON);
+    MENUITEM_RETURNVALUE(edit_menu_monthly, "New Monthly", 3,
+                         NULL, Icon_NOICON);
+    MENUITEM_RETURNVALUE(edit_menu_yearly, "New Yearly", 4,
+                         NULL, Icon_NOICON);
+    MENUITEM_RETURNVALUE(edit_menu_oneoff, "New One off", 5,
+                         NULL, Icon_NOICON);
+
+    MAKE_MENU(edit_menu, "Edit menu",
+              NULL, Icon_NOICON,
+              &edit_menu_remove, &edit_menu_edit,
+              &edit_menu_weekly, &edit_menu_monthly,
+              &edit_menu_yearly, &edit_menu_oneoff);
+
     while (!exit)
     {
-        rb->lcd_clear_display();
-        if (memos_in_shown_memory > 0)
+        switch (rb->do_menu(&edit_menu, &selected, NULL, false))
         {
-            rb->lcd_puts(0,0,"Remove : Up");
-            rb->lcd_puts(0,1,"Edit : Down");
-            rb->lcd_puts(0,2,"New :");
-            rb->lcd_puts(2,3,"weekly : Left");
-            rb->lcd_puts(2,4,"monthly : Play");
-            rb->lcd_puts(2,5,"annually : Right");
-            rb->lcd_puts(2,6,"one off : On");
-        }
-        else
-        {
-            rb->lcd_puts(0,0,"New :");
-            rb->lcd_puts(2,1,"weekly : Left");
-            rb->lcd_puts(2,2,"monthly : Play");
-            rb->lcd_puts(2,3,"annually : Right");
-            rb->lcd_puts(2,4,"one off : On");
-        }
-        rb->lcd_update();
-        button = rb->button_get(true);
-        switch (button)
-        {
-            case BUTTON_OFF:
+            case 0: /* remove */
+                save_memo(pointer_array[change],false,shown);
                 return false;
 
-            case BUTTON_LEFT:
+            case 1: /* edit */
+                if(rb->kbd_input(memos[pointer_array[change]].message,
+                           sizeof memos[pointer_array[change]].message) != -1)
+                    save_memo(pointer_array[change],true,shown);
+                return false;
+
+            case 2: /* weekly */
                 add_memo(shown,0);
                 return false;
 
-            case BUTTON_PLAY:
+            case 3: /* monthly */
                 add_memo(shown,1);
                 return false;
 
-            case BUTTON_RIGHT:
+            case 4: /* yearly */
                 add_memo(shown,2);
                 return false;
 
-            case BUTTON_ON:
+            case 5: /* one off */
                 add_memo(shown,3);
                 return false;
 
-            case BUTTON_DOWN:
-                if (memos_in_shown_memory > 0)
-                {
-                    if(rb->kbd_input(memos[pointer_array[change]].message,
-                                     sizeof memos[pointer_array[change]].message) != -1)
-                        save_memo(pointer_array[change],true,shown);
-                    if(use_system_font)
-                        rb->lcd_setfont(FONT_SYSFIXED);
-                    exit = true;
-                }
+            case GO_TO_PREVIOUS:
+                return false;
+
+            case MENU_ATTACHED_USB:
+                been_in_usb_mode = true;
+                break;
+        }
+    }
+    return false;
+}
+
+static char * get_event_text(int selected, void *data,
+                                  char *buffer, size_t buffer_len)
+{
+    struct shown *shown = (struct shown *) data;
+    if (selected < 0 || memos_in_shown_memory <= selected)
+    {
+        return NULL;
+    }
+    if (memos[pointer_array[selected]].type == 2)
+        rb->snprintf(buffer, buffer_len, "%s (%d yrs)",
+                     memos[pointer_array[selected]].message,
+                     shown->year - memos[pointer_array[selected]].year);
+    else
+        rb->snprintf(buffer, buffer_len, "%s",
+                     memos[pointer_array[selected]].message);
+    return buffer;
+}
+
+static bool view_events(int selected, struct shown *shown)
+{
+    struct gui_synclist gui_memos;
+    bool exit=false;
+    int button;
+
+    rb->gui_synclist_init(&gui_memos, &get_event_text, shown, false, 1, NULL);
+    rb->gui_synclist_set_title(&gui_memos, "Events (play : menu)", NOICON);
+    rb->gui_synclist_set_nb_items(&gui_memos, memos_in_shown_memory);
+    rb->gui_synclist_select_item(&gui_memos, selected);
+    rb->gui_synclist_draw(&gui_memos);
+     
+    while (!exit)
+    {
+        rb->gui_syncstatusbar_draw(rb->statusbars, true);
+        button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
+        rb->gui_synclist_do_button(&gui_memos,&button,LIST_WRAP_UNLESS_HELD);
+
+        switch (button)
+        {
+            case ACTION_STD_OK:
+                selected = rb->gui_synclist_get_sel_pos(&gui_memos);
+                return edit_memo(selected, shown);
                 break;
 
-            case BUTTON_UP:
-                if (memos_in_shown_memory > 0)
-                {
-                    save_memo(pointer_array[change],false,shown);
-                    exit = true;
-                }
+            case ACTION_STD_CANCEL:
+                return false;
                 break;
 
             default:
@@ -476,56 +701,14 @@ static bool edit_memo(int change, struct shown *shown)
                 break;
         }
     }
+
     return false;
-}
-
-static int start = 0;
-
-static void show_lines(int selected, struct shown *shown)
-{
-    int lines,j = 1,w,h,i,k = 0, pos = 1,m = 0;
-    char temp[MAX_CHAR_MEMO_LEN + 12];
-    rb->lcd_getstringsize("A",&w,&h);
-    lines = (LCD_HEIGHT / h) - 1;
-        
-    rb->lcd_clear_display();
-    rb->lcd_puts(0,0,"Events (play : menu)");
-    
-    while (selected >= (lines + start))
-        start++;
-    while (selected < start)
-        start--;
-    i = start;
-    while ( (i < memos_in_shown_memory) && (k < lines) )
-    {
-        if (memos[pointer_array[i]].type == 2)
-            rb->snprintf(temp, sizeof temp, "%s (%d yrs)",
-                         memos[pointer_array[i]].message,
-                         shown->year - memos[pointer_array[i]].year);
-        else
-            rb->snprintf(temp, sizeof temp, "%s",
-                         memos[pointer_array[i]].message);
-        m = 0;
-        if (i == selected)
-        {
-            pos = k + 1;
-            rb->lcd_puts_scroll(m,j++,temp);
-        }
-        else
-            rb->lcd_puts(m,j++,temp);
-        k++;
-        i++;
-    }
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    rb->lcd_fillrect(0, (pos) * h, LCD_WIDTH, h);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
 static void update_memos_shown(struct shown *shown)
 {
     int i;
     memos_in_shown_memory = 0;
-    start = 0;
     for (i = 0; i < memos_in_memory; i++)
         if (
             (
@@ -545,59 +728,15 @@ static void update_memos_shown(struct shown *shown)
 
 static bool any_events(struct shown *shown, bool force)
 {
-    int lines_displayed = 0;
-    bool exit=false;
-    int button;
-    
     update_memos_shown(shown);
+
     if (memos_in_shown_memory > 0)
-        show_lines(lines_displayed,shown);
+        return view_events(0, shown);
     else if (force)
-        return edit_memo(lines_displayed, shown);
+        return edit_memo(0, shown);
     else
         return false;
-    rb->lcd_update();
-    while (!exit)
-    {
-        button = rb->button_get(true);
-        switch (button)
-        {
-            case BUTTON_DOWN:
-                if (memos_in_shown_memory > 0)
-                {
-                    lines_displayed++;
-                    if (lines_displayed >= memos_in_shown_memory)
-                        lines_displayed = memos_in_shown_memory - 1;
-                    show_lines(lines_displayed,shown);
-                    rb->lcd_update();
-                }
-                break;
 
-            case BUTTON_UP:
-                if (memos_in_shown_memory > 0)
-                {
-                    lines_displayed--;
-                    if (lines_displayed < 0)
-                        lines_displayed = 0;
-                    show_lines(lines_displayed,shown);
-                    rb->lcd_update();
-                }
-                break;
-
-            case BUTTON_PLAY:
-                return edit_memo(lines_displayed, shown);
-
-            case BUTTON_OFF:
-                return false;
-
-            default:
-                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    been_in_usb_mode = true;
-                show_lines(lines_displayed,shown);
-                rb->lcd_update();
-                break;
-        }
-    }
     return false;
 }
 
@@ -675,40 +814,40 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         button = rb->button_get(true);
         switch (button)
         {
-            case BUTTON_OFF:
-                return false;
+            case CALENDAR_QUIT:
+                return PLUGIN_OK;
 
-            case BUTTON_ON | BUTTON_DOWN:
-            case BUTTON_ON | BUTTON_DOWN | BUTTON_REPEAT:
+            case CALENDAR_NEXT_MONTH:
+            case CALENDAR_NEXT_MONTH | BUTTON_REPEAT:
                 next_month(&shown, 0);
                 break;
 
-            case BUTTON_ON | BUTTON_UP:
-            case BUTTON_ON | BUTTON_UP | BUTTON_REPEAT:
+            case CALENDAR_PREV_MONTH:
+            case CALENDAR_PREV_MONTH | BUTTON_REPEAT:
                 prev_month(&shown, 0);
                 break;
 
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
+            case CALENDAR_NEXT_WEEK:
+            case CALENDAR_NEXT_WEEK | BUTTON_REPEAT:
                 next_day(&shown, 7);
                 break;
 
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
+            case CALENDAR_PREV_WEEK:
+            case CALENDAR_PREV_WEEK | BUTTON_REPEAT:
                 prev_day(&shown, 7);
                 break;
 
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
+            case CALENDAR_PREV_DAY:
+            case CALENDAR_PREV_DAY | BUTTON_REPEAT:
                 prev_day(&shown, 1);
                 break;
 
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
+            case CALENDAR_NEXT_DAY:
+            case CALENDAR_NEXT_DAY | BUTTON_REPEAT:
                 next_day(&shown, 1);
                 break;
 
-            case BUTTON_PLAY:
+            case CALENDAR_SELECT:
                 any_events(&shown, true);
                 draw_calendar(&shown);
                 break;
