@@ -290,6 +290,7 @@ static void audio_thread(void);
 static void audio_initiate_track_change(long direction);
 static bool audio_have_tracks(void);
 static void audio_reset_buffer(void);
+static void audio_stop_playback(void);
 
 /* Codec thread */
 extern struct codec_api ci;
@@ -1657,6 +1658,13 @@ static bool audio_load_track(size_t offset, bool start_play)
         logf("End-of-playlist");
         memset(&lasttrack_id3, 0, sizeof(struct mp3entry));
         filling = STATE_END_OF_PLAYLIST;
+
+        if (curtrack_id3.length == 0 && curtrack_id3.filesize == 0)
+        {
+            /* Stop playback if no valid track was found. */
+            audio_stop_playback();
+        }
+
         return false;
     }
 
@@ -1692,6 +1700,7 @@ static bool audio_load_track(size_t offset, bool start_play)
 
         if (track_widx == track_ridx)
         {
+            /* TODO: Superfluos buffering call? */
             buf_request_buffer_handle(tracks[track_widx].id3_hid);
             copy_mp3entry(&curtrack_id3, bufgetid3(tracks[track_widx].id3_hid));
             curtrack_id3.offset = offset;
