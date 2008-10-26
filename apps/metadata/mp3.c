@@ -43,6 +43,7 @@
 #include "system.h"
 #include "replaygain.h"
 #include "rbunicode.h"
+#include "metadata_parsers.h"
 
 static unsigned long unsync(unsigned long b0,
                             unsigned long b1,
