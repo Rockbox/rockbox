@@ -28,10 +28,14 @@
 #include "lcd.h"
 #include "common.h"
 #include "config.h"
+#include "as3525-codec.h"
 
 int show_logo(void);
 void main(void)
 {
+    int i;
+    unsigned char buf[8];
+
     lcd_init_device();
     lcd_clear_display();
 
@@ -43,6 +47,13 @@ void main(void)
 
     show_logo();
 
+    /* show player id to demonstrate communication with codec part */
+    as3525_codec_init();
+    for (i = 0; i < 8; i++) {
+        buf[i] = as3525_codec_read(0x38 + i);
+    }
+    printf("ID: %02X%02X%02X%02X%02X%02X%02X%02X", buf[7], buf[6], buf[5], buf[4], buf[3], buf[2], buf[1], buf[0]);
+    
 #ifdef SANSA_CLIP
     /* Use hardware scrolling */
 
