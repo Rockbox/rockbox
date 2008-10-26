@@ -33,7 +33,10 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
         return;
     if (group && (setting->flags&group) == 0) /* not in the group we are dumping */
         return;
-    else if (!group && (setting->flags&(F_THEMESETTING|F_RECSETTING|F_EQSETTING|F_SOUNDSETTING)))
+    else if (!group && (setting->flags&(F_THEMESETTING|
+                                        F_RECSETTING|
+                                        F_EQSETTING|
+                                        F_SOUNDSETTING)))
         return;
     setting_count++;
     if (setting_count%10 == 0)
@@ -56,7 +59,8 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
                              setting->flags&F_ALLOW_ARBITRARY_VALS? " (And any value between)":"");
                 for(i=0;i<setting->table_setting->count;i++)
                 {
-                    rb->snprintf(temp, 8, "%d, ", setting->table_setting->values[i]);
+                    rb->snprintf(temp, 8, "%d, ", 
+                                 setting->table_setting->values[i]);
                     rb->strcat(text, temp);
                 }
             }
@@ -68,14 +72,16 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
                 rb->snprintf(text, sizeof(text), "Min: %d, Max: %d, Step size: %d",
                          min, max, step);
             }
-            else if (setting->flags&F_CHOICE_SETTING && (setting->cfg_vals == NULL))
+            else if (setting->flags&F_CHOICE_SETTING &&
+                     (setting->cfg_vals == NULL))
             {
                 char temp[64];
                 int i;
                 temp[0] = '\0';
                 for(i=0;i<setting->choice_setting->count;i++)
                 {
-                    rb->snprintf(temp, 64, "%s, ", setting->choice_setting->desc[i]);
+                    rb->snprintf(temp, 64, "%s, ", 
+                                 setting->choice_setting->desc[i]);
                     rb->strcat(text, temp);
                 }
             }
@@ -89,17 +95,16 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
             break;
         case F_T_CHARPTR:
         case F_T_UCHARPTR:
-            if (setting->flags&F_FILENAME)
+            rb->snprintf(text, sizeof(text), "Text.. Up to %d characters. ",
+                         setting->filename_setting->max_len-1);
+            if (setting->filename_setting->prefix &&
+                setting->filename_setting->suffix)
             {
-                rb->snprintf(text, sizeof(text), "Up to %d characters.", setting->filename_setting->max_len-1);
-                if (setting->filename_setting->prefix && setting->filename_setting->suffix)
-                {
-                    rb->strcat(text, "Should start with:\"");
-                    rb->strcat(text, setting->filename_setting->prefix);
-                    rb->strcat(text, "\" And end with:\"");
-                    rb->strcat(text, setting->filename_setting->suffix);
-                    rb->strcat(text, "\"");
-                }
+                rb->strcat(text, "Should start with:\"");
+                rb->strcat(text, setting->filename_setting->prefix);
+                rb->strcat(text, "\" and end with:\"");
+                rb->strcat(text, setting->filename_setting->suffix);
+                rb->strcat(text, "\"");
             }
             break;
     }
@@ -109,7 +114,8 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
 
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api,
+                                const void* parameter)
 {
     const struct settings_list *list;
     int setting_count, i;
