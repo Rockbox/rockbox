@@ -89,6 +89,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "tagcache.h"
 #include "viewport.h"
 #include "ata_idle_notify.h"
+#include "settings_list.h"
 
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
@@ -774,6 +775,7 @@ struct plugin_api {
 	const char *appsversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    const struct settings_list* (*get_settings_list)(int*count);
 
 };
 

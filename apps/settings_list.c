@@ -1367,3 +1367,9 @@ const struct settings_list settings[] = {
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);
+
+const struct settings_list* get_settings_list(int*count)
+{
+    *count = nb_settings;
+    return settings;
+}

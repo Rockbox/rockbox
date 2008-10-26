@@ -139,7 +139,7 @@ struct settings_list {
         const struct table_setting *table_setting; /* F_TABLE_SETTING */
     };
 };
-
+const struct settings_list* get_settings_list(int*count);
 #ifndef PLUGIN
 /* not needed for plugins and just causes compile error,
    possibly fix proberly later */
