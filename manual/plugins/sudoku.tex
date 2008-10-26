@@ -1,29 +1,31 @@
 \subsection{\label{ref:Sudoku}Sudoku}
 \screenshot{plugins/images/ss-sudoku}{Sudoku}{fig:sudoku}
-Sudoku in Rockbox is implemented as both a plugin and a viewer.
-When you start Sudoku in plugin mode from the \setting{Browse Plugins} menu, a 
+Sudoku in Rockbox can act as both a plugin and a viewer.
+When starting Sudoku from the \setting{Browse Plugins} menu, a 
 random game will be generated automatically, and an estimate of its difficulty
 (very easy, easy, medium, hard or fiendish) will be displayed on the screen.
 New games can be generated from the \setting{Generate} menu option.
-
-When you use Sudoku as a viewer for playing pre-generated Sudoku games.
-You need sudoku games stored (one game per file) in text files with the
-\fname{.ss} extension (see links below). You then browse these games using the
-normal \setting{File Browser}, and open the file to launch Sudoku.
+When ``playing'' an existing Sudoku game file from Rockbox' file browser
+the plugin is invoked as viewer. The selected Sudoku will get loaded and you
+can start solving it. The sudoku games need to be stored as text
+files with the extension \fname{.ss} as single file per game.
 
 You can create and save your own grids under the \setting{New} menu option.
 Enter the menu (as described in the key table below) when you have finished and
- enter the full path to save to including the \fname{.ss} extension 
- (e.g. \fname{/sudoku/new.ss}).
+enter the full path to save to including the \fname{.ss} extension 
+(e.g. \fname{/sudoku/new.ss}).
 
-\subsubsection{The thing on the left (AKA the scratchpad)}
+\subsubsection{The scratchpad}
 When you play Sudoku on paper most people like to mark numbers in cells that 
 are possible candidates for the cells.
-This can be done with the column on the left. Change the number
-under the cursor to a number which might be valid and press the scratchpad
-button, the number will then be added on the left.
-The column is stored seperatly for every cell on the board.
-These are \emph{NOT} saved when saving the game.
+This can be done with the scratchpad, shown as separate column.
+Change the number under the cursor to the number you want to put on the
+scratchpad and press the scratchpad button, the number will then be added.
+If the number was already on the scratchpad it will get removed again.
+The column is stored seperatly for every cell on the board. The stored values
+can be displayed inline as small dots by enabling the \setting{Show Markings}
+settings.
+\note{The scratchpad is \emph{not} saved when saving the game.}
 
 \begin{table}
     \begin{btnmap}{}{}
