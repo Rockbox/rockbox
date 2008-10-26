@@ -22,6 +22,7 @@
 # - Przemysław Hołubowski
 # - Mateusz Kubica
 # - Maciej Adamczak
+# - Marcin Łukasik
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -851,7 +852,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Wzm. crossfeed'a"
+    swcodec: "Wzm. crossfeedu"
   </dest>
   <voice>
     *: none
@@ -6839,7 +6840,7 @@
     *: "Rockbox Info"
   </source>
   <dest>
-    *: "Informacje Rockbox'a"
+    *: "Informacje Rockboksa"
   </dest>
   <voice>
     *: "Informacje rokboksa"
