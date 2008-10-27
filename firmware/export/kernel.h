@@ -191,8 +191,24 @@ struct wakeup
 /* We don't enable interrupts in the iPod bootloader, so we need to fake
    the current_tick variable */
 #define current_tick (signed)(USEC_TIMER/10000)
+
+static inline void call_tick_tasks(void)
+{
+}
 #else
 extern volatile long current_tick;
+
+/* inline helper for implementing target interrupt handler */
+static inline void call_tick_tasks(void)
+{
+    extern void (*tick_funcs[MAX_NUM_TICK_TASKS+1])(void);
+    int i;
+
+    current_tick++;
+
+    for (i = 0; tick_funcs[i] != NULL; i++)
+        tick_funcs[i]();
+}
 #endif
 
 #ifdef SIMULATOR
@@ -206,18 +222,6 @@ extern void sleep(int ticks);
 int tick_add_task(void (*f)(void));
 int tick_remove_task(void (*f)(void));
 extern void tick_start(unsigned int interval_in_ms);
-
-/* inline helper for implementing target interrupt handler */
-static inline void call_tick_tasks(void)
-{
-    extern void (*tick_funcs[MAX_NUM_TICK_TASKS+1])(void);
-    int i;
-
-    current_tick++;
-
-    for (i = 0; tick_funcs[i] != NULL; i++)
-        tick_funcs[i]();
-}
 
 struct timeout;
 

@@ -42,8 +42,6 @@ static int interrupt_level = HIGHEST_IRQ_LEVEL;
 static int handlers_pending = 0;
 static int status_reg = 0;
 
-extern void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
-
 /* Nescessary logic:
  * 1) All threads must pass unblocked
  * 2) Current handler must always pass unblocked
@@ -129,26 +127,16 @@ Uint32 tick_timer(Uint32 interval, void *param)
         
     if(new_tick != current_tick)
     {
-        long t;
-        for(t = new_tick - current_tick; t > 0; t--)
+        while(current_tick < new_tick)
         {
-            int i;
-
             sim_enter_irq_handler();
 
-            /* Run through the list of tick tasks */
-            for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
-            {
-                if(tick_funcs[i])
-                {
-                    tick_funcs[i]();
-                }
-            }
+            /* Run through the list of tick tasks - increments tick
+             * on each iteration. */
+            call_tick_tasks();
 
             sim_exit_irq_handler();
         }
-
-        current_tick = new_tick;
     }
     
     return 1;
