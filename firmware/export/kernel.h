@@ -207,6 +207,18 @@ int tick_add_task(void (*f)(void));
 int tick_remove_task(void (*f)(void));
 extern void tick_start(unsigned int interval_in_ms);
 
+/* inline helper for implementing target interrupt handler */
+static inline void call_tick_tasks(void)
+{
+    extern void (*tick_funcs[MAX_NUM_TICK_TASKS+1])(void);
+    int i;
+
+    current_tick++;
+
+    for (i = 0; tick_funcs[i] != NULL; i++)
+        tick_funcs[i]();
+}
+
 struct timeout;
 
 /* timeout callback type

@@ -25,8 +25,6 @@
 #include "timer.h"
 #include "thread.h"
 
-extern void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
-
 void tick_start(unsigned int interval_in_ms)
 {
 /*    TODO: set up TIMER1 clock settings
@@ -53,16 +51,7 @@ void tick_start(unsigned int interval_in_ms)
 void TIMER1(void)
 {
     IO_INTC_IRQ0 = INTR_IRQ0_TMR1;
-    
-    int i;
 
     /* Run through the list of tick tasks */
-    for(i = 0; i < MAX_NUM_TICK_TASKS; i++)
-    {
-        if(tick_funcs[i])
-        {
-            tick_funcs[i]();
-        }
-    }
-    current_tick++;
+    call_tick_tasks();
 }

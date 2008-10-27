@@ -24,8 +24,6 @@
 #include "kernel.h"
 #include "jz4740.h"
 
-extern void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
-
 #define USE_RTC_CLOCK 0
 void tick_start(unsigned int interval_in_ms)
 {
@@ -70,13 +68,6 @@ void TCU0(void)
 {
     __tcu_clear_full_match_flag(0);
     
-    int i;
-
     /* Run through the list of tick tasks */
-    for(i = 0; i < MAX_NUM_TICK_TASKS; i++)
-    {
-        if(tick_funcs[i])
-            tick_funcs[i]();
-    }
-    current_tick++;
+    call_tick_tasks();
 }

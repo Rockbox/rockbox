@@ -27,22 +27,12 @@
 #include "kernel.h"
 #include "thread.h"
 
-extern void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
-
 static __attribute__((interrupt("IRQ"))) void EPIT1_HANDLER(void)
 {
-    int i;
-
     EPITSR1 = EPITSR_OCIF; /* Clear the pending status */
 
     /* Run through the list of tick tasks */
-    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
-    {
-        if(tick_funcs[i])
-            tick_funcs[i]();
-    }
-
-    current_tick++;
+    call_tick_tasks();
 }
 
 void tick_start(unsigned int interval_in_ms)

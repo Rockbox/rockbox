@@ -46,25 +46,12 @@ void __timer_unregister(void)
 
 
 /* Timer interrupt processing - all timers (inc. tick) have a single IRQ */
-
-extern void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
-
 void TIMER0(void)
 {
     if (TIREQ & TF0)    /* Timer0 reached ref value */
     {
-        int i;
-
         /* Run through the list of tick tasks */
-        for(i = 0; i < MAX_NUM_TICK_TASKS; i++)
-        {
-            if(tick_funcs[i])
-            {
-                tick_funcs[i]();
-            }
-        }
-
-        current_tick++;
+        call_tick_tasks();
         
         /* reset Timer 0 IRQ & ref flags */
         TIREQ |= TI0 | TF0;

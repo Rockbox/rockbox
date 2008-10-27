@@ -54,7 +54,9 @@
 volatile long current_tick SHAREDDATA_ATTR = 0;
 #endif
 
-void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
+/* List of tick tasks - final element always NULL for termination */
+void (*tick_funcs[MAX_NUM_TICK_TASKS+1])(void);
+static int num_tick_funcs = 0;
 
 extern struct core_entry cores[NUM_CORES];
 
@@ -128,18 +130,8 @@ void tick_start(unsigned int interval_in_ms)
 void IMIA0(void) __attribute__ ((interrupt_handler));
 void IMIA0(void)
 {
-    int i;
-
     /* Run through the list of tick tasks */
-    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
-    {
-        if(tick_funcs[i])
-        {
-            tick_funcs[i]();
-        }
-    }
-
-    current_tick++;
+    call_tick_tasks();
 
     TSR0 &= ~0x01;
 }
@@ -178,18 +170,8 @@ void tick_start(unsigned int interval_in_ms)
 void TIMER0(void) __attribute__ ((interrupt_handler));
 void TIMER0(void)
 {
-    int i;
-
     /* Run through the list of tick tasks */
-    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
-    {
-        if(tick_funcs[i])
-        {
-            tick_funcs[i]();
-        }
-    }
-
-    current_tick++;
+    call_tick_tasks();
 
     TER0 = 0xff; /* Clear all events */
 }
@@ -199,27 +181,17 @@ void TIMER0(void)
 #ifndef BOOTLOADER
 void TIMER1(void)
 {
-    int i;
-
     /* Run through the list of tick tasks (using main core) */
     TIMER1_VAL; /* Read value to ack IRQ */
 
     /* Run through the list of tick tasks using main CPU core - 
        wake up the COP through its control interface to provide pulse */
-    for (i = 0;i < MAX_NUM_TICK_TASKS;i++)
-    {
-        if (tick_funcs[i])
-        {
-            tick_funcs[i]();
-        }
-    }
+    call_tick_tasks();
 
 #if NUM_CORES > 1
     /* Pulse the COP */
     core_wake(COP);
 #endif /* NUM_CORES */
-
-    current_tick++;
 }
 #endif
 
@@ -243,16 +215,8 @@ void tick_start(unsigned int interval_in_ms)
 
 void timer_handler(void)
 {
-    int i;
-
     /* Run through the list of tick tasks */
-    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
-    {
-        if(tick_funcs[i])
-            tick_funcs[i]();
-    }
-
-    current_tick++;
+    call_tick_tasks();
 
     TIMER0.clr = 0;
 }
@@ -274,19 +238,16 @@ void tick_start(unsigned int interval_in_ms)
 
 int tick_add_task(void (*f)(void))
 {
-    int i;
     int oldlevel = disable_irq_save();
 
     /* Add a task if there is room */
-    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
+    if(num_tick_funcs < MAX_NUM_TICK_TASKS)
     {
-        if(tick_funcs[i] == NULL)
-        {
-            tick_funcs[i] = f;
-            restore_irq(oldlevel);
-            return 0;
-        }
+        tick_funcs[num_tick_funcs++] = f;
+        restore_irq(oldlevel);
+        return 0;
     }
+
     restore_irq(oldlevel);
     panicf("Error! tick_add_task(): out of tasks");
     return -1;
@@ -298,11 +259,16 @@ int tick_remove_task(void (*f)(void))
     int oldlevel = disable_irq_save();
 
     /* Remove a task if it is there */
-    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
+    for(i = 0;i < num_tick_funcs;i++)
     {
         if(tick_funcs[i] == f)
         {
-            tick_funcs[i] = NULL;
+            /* Compact function list - propagates NULL-terminator as well */
+            for(; i < num_tick_funcs; i++)
+                tick_funcs[i] = tick_funcs[i+1];
+
+            num_tick_funcs--;
+
             restore_irq(oldlevel);
             return 0;
         }
