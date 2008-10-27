@@ -4,8 +4,8 @@ WIN_LIBUSB_LIB_DIR = "$(WIN_DRIVERS_LIBUSB_DIR)\lib\gcc"
 
 CFLAGS=-Wall
 
-linux: usbtool HXFmerge HXFreplace HXFsplit IHFSsplit HXF2IHFS
-win: usbtool_win HXFmerge_win HXFsplit_win HXFreplace_win IHFSsplit_win HXF2IHFS_win
+linux: usbtool HXFmerge HXFreplace HXFsplit IHFSsplit HXF2IHFS DLanalyser
+win: usbtool_win HXFmerge_win HXFsplit_win HXFreplace_win IHFSsplit_win HXF2IHFS_win DLanalyser_win
 
 usbtool:
 	$(CC) $(CFLAGS) -o usbtool jz4740_usbtool.c -lusb
@@ -22,6 +22,8 @@ IHFSsplit:
 	$(CC) $(CFLAGS) -o IHFSsplit IHFSsplit.c
 HXF2IHFS:
 	$(CC) $(CFLAGS) -o HXF2IHFS HXF2IHFS.c
+DLanalyser:
+	$(CC) $(CFLAGS) -o DLanalyser DLanalyser.c
 
 HXFmerge_win:
 	$(CC) $(CFLAGS) -o HXFmerge.exe HXFmerge.c
@@ -33,8 +35,10 @@ IHFSsplit_win:
 	$(CC) $(CFLAGS) -o IHFSsplit.exe IHFSsplit.c
 HXF2IHFS_win:
 	$(CC) $(CFLAGS) -o HXF2IHFS.exe HXF2IHFS.c
+ DLanalyser_win:
+	$(CC) $(CFLAGS) -o DLanalyser.exe DLanalyser.c
 
 clean-linux:
-	rm HXFmerge HXFreplace HXFsplit usbtool IHFSsplit HXF2IHFS
+	rm HXFmerge HXFreplace HXFsplit usbtool IHFSsplit HXF2IHFS DLanalyser
 clean-win:
-	del HXFmerge.exe HXFreplace.exe HXFsplit.exe usbtool.exe IHFSsplit.exe HXF2IHFS.exe
+	del HXFmerge.exe HXFreplace.exe HXFsplit.exe usbtool.exe IHFSsplit.exe HXF2IHFS.exe DLanalyser.exe
