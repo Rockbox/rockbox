@@ -125,18 +125,15 @@ Uint32 tick_timer(Uint32 interval, void *param)
     
     new_tick = (SDL_GetTicks() - start_tick) / (1000/HZ);
         
-    if(new_tick != current_tick)
+    while(new_tick != current_tick)
     {
-        while(current_tick < new_tick)
-        {
-            sim_enter_irq_handler();
+        sim_enter_irq_handler();
 
-            /* Run through the list of tick tasks - increments tick
-             * on each iteration. */
-            call_tick_tasks();
+        /* Run through the list of tick tasks - increments tick
+         * on each iteration. */
+        call_tick_tasks();
 
-            sim_exit_irq_handler();
-        }
+        sim_exit_irq_handler();
     }
     
     return 1;
