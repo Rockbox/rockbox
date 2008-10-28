@@ -139,7 +139,7 @@ sub trim {
 sub match {
     my ($string, $pattern)=@_;
 
-    $pattern =~ s/\*/.?*/g;
+    $pattern =~ s/\*/.*/g;
     $pattern =~ s/\?/./g;
 
     return ($string =~ /^$pattern\z/);
