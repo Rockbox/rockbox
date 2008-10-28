@@ -67,11 +67,11 @@ dualboot-e200v2.bin: dualboot-e200v2.elf
 bootimg_e200v2.c bootimg_e200v2.h: dualboot-e200v2.bin bin2c
 	./bin2c dualboot-e200v2.bin bootimg_e200v2
 
+bootimg_e200v2.o: bootimg_e200v2.c
+	gcc -c -o bootimg_e200v2.o bootimg_e200v2.c
+
 # M200V2    
     
-bootimg_m200v2.o: bootimg_m200v2.c
-	gcc -c -o bootimg_m200v2.o bootimg_m200v2.c
-
 dualboot-m200v2.o: dualboot.S
 	arm-elf-gcc -DSANSA_M200V2 -c -o dualboot-m200v2.o dualboot.S
 
