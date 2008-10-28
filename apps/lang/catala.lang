@@ -261,13 +261,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Si"
     h100,h120,h300: "NAVI = Si"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Si"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Si"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -2363,14 +2363,14 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Construint Base de dades... %d trobats (OFF per tornar)"
     h100,h120,h300: "Construint Base de dades... %d trobats (STOP per tornar)"
     ipod*: "Construint Base de dades... %d trobats (PREV per tornar)"
     x5,m5,gigabeat*,mrobe100: "Construint Base de dades... %d trobats (LEFT per tornar)"
-    h10,h10_5gb,e200,c200,sa9200: "Construint Base de dades... %d trobats (PREV per tornar)"
+    h10,h10_5gb,e200*,c200,sa9200: "Construint Base de dades... %d trobats (PREV per tornar)"
   </dest>
   <voice>
     *: "entrades trobades per base de dades"
@@ -3827,17 +3827,17 @@
   user:
   <source>
     *: none
-    e200: "Wheel Light Timeout"
+    e200*: "Wheel Light Timeout"
     c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
-    e200: "Apagat de llum de roda"
+    e200*: "Apagat de llum de roda"
     c200,gigabeatf,mrobe100,sa9200: "Apagat de llum de botons"
   </dest>
   <voice>
     *: none
-    e200: "Apagat de llum de roda"
+    e200*: "Apagat de llum de roda"
     c200,gigabeatf,mrobe100,sa9200: "Apagat de llum de botons"
   </voice>
 </phrase>
@@ -4120,17 +4120,17 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Desar"
     h100,h120,h300: "NAVI = Desar"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Desar"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Desar"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeat*,mrobe100,sa9200: ""
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200*,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4141,7 +4141,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200,sa9200: "MENU = Revert"
+    ipod*,e200*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4152,7 +4152,7 @@
     *: none
     rtc: "OFF = Cancel·lar"
     h100,h120,h300: "STOP = Cancel·lar"
-    ipod*,e200,c200,sa9200: "MENU = Cancel·lar"
+    ipod*,e200*,c200,sa9200: "MENU = Cancel·lar"
     x5,m5: "RECORD = Cancel·lar"
     h10,h10_5gb: "PREV = Cancel·lar"
     gigabeatf: "A = Cancel·lar"
@@ -4161,7 +4161,7 @@
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_5gb,gigabeat*,mrobe100,sa9200: ""
+    rtc,h100,h120,h300,ipod*,e200*,c200,x5,m5,h10,h10_5gb,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -6917,17 +6917,17 @@
   user:
   <source>
     *: none
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
-    e200,c200: "micro S D"
+    e200*,c200: "micro S D"
     ondio*: "M M C"
   </voice>
 </phrase>
@@ -8287,18 +8287,18 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "Disc ple. Prem OFF per continuar"
     h100,h120,h300: "Disc ple. Prem STOP per continuar"
     m5,x5: "Disc ple. Prem POWER per continuar"
-    e200,c200: "Disc ple. Prem UP per continuar"
+    e200*,c200: "Disc ple. Prem UP per continuar"
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8389,14 +8389,14 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200,c200: "PREV to abort"
+    h10,h10_5gb,e200*,c200: "PREV to abort"
   </source>
   <dest>
     *: "OFF per cancelar"
     player,h100,h120,h300: "STOP to cancelar"
     ipod*: "PLAY/PAUSE to cancelar"
     x5,m5: "Long PLAY to cancelar"
-    h10,h10_5gb,e200,c200: "PREV to cancelar"
+    h10,h10_5gb,e200*,c200: "PREV to cancelar"
   </dest>
   <voice>
     *: ""
@@ -10449,7 +10449,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>

@@ -262,13 +262,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = ใช่"
     h100,h120,h300: "NAVI = ใช่"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = ใช่"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = ใช่"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -2368,14 +2368,14 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (OFF เพื่อย้อนกลับ)"
     h100,h120,h300: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (STOP เพื่อย้อนกลับ)"
     ipod*: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
     x5,m5,gigabeat*,mrobe100: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (LEFT เพื่อย้อนกลับ)"
-    h10,h10_5gb,e200,c200,sa9200: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
+    h10,h10_5gb,e200*,c200,sa9200: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -3834,17 +3834,17 @@
   user:
   <source>
     *: none
-    e200: "Wheel Light Timeout"
+    e200*: "Wheel Light Timeout"
     c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
-    e200: "เวลาเปิดไฟล้อหมุน"
+    e200*: "เวลาเปิดไฟล้อหมุน"
     c200,gigabeatf,mrobe100,sa9200: ""
   </dest>
   <voice>
     *: none
-    e200: "Wheel Light Timeout"
+    e200*: "Wheel Light Timeout"
     c200,gigabeatf,mrobe100,sa9200: ""
   </voice>
 </phrase>
@@ -4127,13 +4127,13 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = ตั้งค่า"
     h100,h120,h300: "NAVI = ตั้งค่า"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = ตั้งค่า"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = ตั้งค่า"
   </dest>
   <voice>
     *: none
@@ -4147,7 +4147,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200,sa9200: "MENU = Revert"
+    ipod*,e200*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4158,7 +4158,7 @@
     *: none
     rtc: "OFF = ยกเลิก"
     h100,h120,h300: "STOP = ยกเลิก"
-    ipod*,e200,c200,sa9200: "MENU = ยกเลิก"
+    ipod*,e200*,c200,sa9200: "MENU = ยกเลิก"
     x5,m5: "RECORD = ยกเลิก"
     h10,h10_5gb: "PREV = ยกเลิก"
     gigabeatf: "A = ยกเลิก"
@@ -6923,17 +6923,17 @@
   user:
   <source>
     *: none
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
-    e200,c200: "micro Secure Digital card:"
+    e200*,c200: "micro Secure Digital card:"
     ondio*: "Multimedia card"
   </voice>
 </phrase>
@@ -8295,18 +8295,18 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "ดีสก์เต็ม กดปุ่ม OFF เพื่อทำงานต่อ"
     h100,h120,h300: "ดีสก์เต็ม กดปุ่ม STOP เพื่อทำงานต่อ"
     m5,x5: "ดีสก์เต็ม กดปุ่ม POWER เพื่อทำงานต่อ"
-    e200,c200: "ดีสก์เต็ม กดปุ่ม UP เพื่อทำงานต่อ"
+    e200*,c200: "ดีสก์เต็ม กดปุ่ม UP เพื่อทำงานต่อ"
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8397,14 +8397,14 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200,c200: "PREV to abort"
+    h10,h10_5gb,e200*,c200: "PREV to abort"
   </source>
   <dest>
     *: "OFF เพื่อยกเลิก"
     player,h100,h120,h300: "STOP เพื่อยกเลิก"
     ipod*: "PLAY/PAUSE เพื่อยกเลิก"
     x5,m5: "Long PLAY เพื่อยกเลิก"
-    h10,h10_5gb,e200,c200: "PREV เพื่อยกเลิก"
+    h10,h10_5gb,e200*,c200: "PREV เพื่อยกเลิก"
   </dest>
   <voice>
     *: ""
@@ -10457,7 +10457,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>

@@ -4443,19 +4443,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200,c200: "MSD:"
+    e200*,c200: "MSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "Kiintolevy1"
-    e200,c200: "micro s d muistikortti"
+    e200*,c200: "micro s d muistikortti"
     ondio*: "m m c muistikortti"
   </voice>
 </phrase>
@@ -4588,7 +4588,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200,sa9200: "MENU = Revert"
+    ipod*,e200*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4599,7 +4599,7 @@
     *: none
     rtc: "OFF = Peruuta"
     h100,h120,h300: "STOP = Peruuta"
-    ipod*,e200,c200,sa9200: "MENU = Peruuta"
+    ipod*,e200*,c200,sa9200: "MENU = Peruuta"
     x5,m5: "RECORD = Peruuta"
     h10,h10_5gb: "PREV = Peruuta"
     gigabeatf: "A = Peruuta"
@@ -4687,21 +4687,21 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "Levy täynnä. Jatka painamalla OFF."
     h100,h120,h300: "Levy täynnä. Jatka painamalla STOP."
     m5,x5: "Levy täynnä. Jatka painamalla POWER."
-    e200,c200: "Levy täynnä. Jatka painamalla UP."
+    e200*,c200: "Levy täynnä. Jatka painamalla UP."
   </dest>
   <voice>
     *: none
     recording: ""
     h100,h120,h300: ""
     m5,x5: ""
-    e200,c200: ""
+    e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -7398,7 +7398,7 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200,c200: "PREV to abort"
+    h10,h10_5gb,e200*,c200: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatf:"POWER to abort"
   </source>
@@ -7407,7 +7407,7 @@
     player,h100,h120,h300: "STOP keskeyttää"
     ipod*: "PLAY/PAUSE keskeyttää"
     x5,m5: "Pitkä PLAY keskeyttää"
-    h10,h10_5gb,e200,c200: "PREV keskeyttää"
+    h10,h10_5gb,e200*,c200: "PREV keskeyttää"
     gigabeats: "BACK keskeyttää"
     gigabeatf:"POWER keskeyttää"
   </dest>
@@ -7416,7 +7416,7 @@
     player,h100,h120,h300: ""
     ipod*: ""
     x5,m5: ""
-    h10,h10_5gb,e200,c200: ""
+    h10,h10_5gb,e200*,c200: ""
     gigabeats: ""
     gigabeatf:""
   </voice>
@@ -8800,13 +8800,13 @@
     *: none
     recording: ""
     h100,h120,h300: ""
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
   </dest>
   <voice>
     *: none
     recording: ""
     h100,h120,h300: ""
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9940,14 +9940,14 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Luodaan tietokantaa... %d löytyi (OFF = palaa)"
     h100,h120,h300: "Luodaan tietokantaa... %d löytyi (STOP = palaa)"
     ipod*: "Luodaan tietokantaa... %d löytyi (PREV = palaa)"
     x5,m5,gigabeat*,mrobe100: "Luodaan tietokantaa... %d löytyi (LEFT = palaa)"
-    h10,h10_5gb,e200,c200,sa9200: "Luodaan tietokantaa... %d löytyi (PREV = palaa)"
+    h10,h10_5gb,e200*,c200,sa9200: "Luodaan tietokantaa... %d löytyi (PREV = palaa)"
   </dest>
   <voice>
     *: "tietokantaa varten löytyi merkintöjä"
@@ -9973,17 +9973,17 @@
   user:
   <source>
     *: none
-    e200: "Wheel Light Timeout"
+    e200*: "Wheel Light Timeout"
     c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
-    e200: "Rullavalon aikakatkaisu"
+    e200*: "Rullavalon aikakatkaisu"
     c200,gigabeatf,mrobe100,sa9200: "Painikevalon aikakatkaisu"
   </dest>
   <voice>
     *: none
-    e200: "Rullavalon aikakatkaisu"
+    e200*: "Rullavalon aikakatkaisu"
     c200,gigabeatf,mrobe100,sa9200: "Painikevalon aikakatkaisu"
   </voice>
 </phrase>
@@ -10491,13 +10491,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Kyllä"
     h100,h120,h300: "NAVI = Kyllä"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Kyllä"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Kyllä"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -10512,17 +10512,17 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Aseta"
     h100,h120,h300: "NAVI = Aseta"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Aseta"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Aseta"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: ""
+    rtc,h100,h120,h300,ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>

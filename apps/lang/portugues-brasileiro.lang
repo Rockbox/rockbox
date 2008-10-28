@@ -261,19 +261,19 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Sim"
     h100,h120,h300: "NAVI = Sim"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Sim"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Sim"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: ""
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: ""
     player: ""
   </voice>
 </phrase>
@@ -2370,21 +2370,21 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Construindo Base de Dados... %d encontrados (OFF para retornar)"
     h100,h120,h300: "Construindo Base de Dados... %d encontrados (STOP para retornar)"
     ipod*: "Construindo Base de Dados... %d encontrados (PREV para retornar)"
     x5,m5,gigabeat*,mrobe100: "Construindo Base de Dados... %d encontrados (LEFT para retornar)"
-    h10,h10_5gb,e200,c200,sa9200: "Construindo Base de Dados... %d encontrados (PREV para retornar)"
+    h10,h10_5gb,e200*,c200,sa9200: "Construindo Base de Dados... %d encontrados (PREV para retornar)"
   </dest>
   <voice>
     *: "entradas encontradas para a base de dados"
     h100,h120,h300: ""
     ipod*: ""
     x5,m5,gigabeat*,mrobe100: ""
-    h10,h10_5gb,e200,c200,sa9200: ""
+    h10,h10_5gb,e200*,c200,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -3840,17 +3840,17 @@
   user:
   <source>
     *: none
-    e200: "Wheel Light Timeout"
+    e200*: "Wheel Light Timeout"
     c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
-    e200: "Duração da Luz da Roda"
+    e200*: "Duração da Luz da Roda"
     c200,gigabeatf,mrobe100,sa9200: "Duração da Luz do Botão"
   </dest>
   <voice>
     *: none
-    e200: "Duração da Luz da Roda"
+    e200*: "Duração da Luz da Roda"
     c200,gigabeatf,mrobe100,sa9200: "Duração da Luz do Botão"
   </voice>
 </phrase>
@@ -4133,19 +4133,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Ajustar"
     h100,h120,h300: "NAVI = Ajustar"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Ajustar"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Ajustar"
   </dest>
   <voice>
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: ""
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4156,7 +4156,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200,sa9200: "MENU = Revert"
+    ipod*,e200*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4167,7 +4167,7 @@
     *: none
     rtc: "OFF = Reverter"
     h100,h120,h300: "STOP = Reverter"
-    ipod*,e200,c200,sa9200: "MENU = Reverter"
+    ipod*,e200*,c200,sa9200: "MENU = Reverter"
     x5,m5: "RECORD = Reverter"
     h10,h10_5gb: "PREV = Reverter"
     gigabeatf: "A = Reverter"
@@ -4176,7 +4176,7 @@
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_5gb,gigabeat*,mrobe100,sa9200: ""
+    rtc,h100,h120,h300,ipod*,e200*,c200,x5,m5,h10,h10_5gb,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -6915,17 +6915,17 @@
   user:
   <source>
     *: none
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
-    e200,c200: "MSD:"
+    e200*,c200: "MSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
-    e200,c200: "micro S D"
+    e200*,c200: "micro S D"
     ondio*: "M M C"
   </voice>
 </phrase>
@@ -8287,18 +8287,18 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "O disco está cheio. Pressione OFF para continuar."
     h100,h120,h300: "O disco está cheio. Pressione STOP para continuar."
     m5,x5: "O disco está cheio. Pressione POWER para continuar."
-    e200,c200: "O disco está cheio. Pressione UP para continuar."
+    e200*,c200: "O disco está cheio. Pressione UP para continuar."
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8389,14 +8389,14 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200,c200: "PREV to abort"
+    h10,h10_5gb,e200*,c200: "PREV to abort"
   </source>
   <dest>
     *: "OFF para abortar"
     player,h100,h120,h300: "STOP para abortar"
     ipod*: "PLAY/PAUSE para abortar"
     x5,m5: "PLAY Longo para abortar"
-    h10,h10_5gb,e200,c200: "PREV para abortar"
+    h10,h10_5gb,e200*,c200: "PREV para abortar"
   </dest>
   <voice>
     *: ""
@@ -10449,7 +10449,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>

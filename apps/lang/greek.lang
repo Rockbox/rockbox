@@ -265,13 +265,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Επικύρωση"
     h100,h120,h300: "NAVI = Επικύρωση"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Επικύρωση"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Επικύρωση"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -2371,14 +2371,14 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (OFF για επιστροφή)"
     h100,h120,h300: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (STOP για επιστροφή)"
     ipod*: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (PREV για επιστροφή)"
     x5,m5,gigabeat*,mrobe100: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (LEFT για επιστροφή)"
-    h10,h10_5gb,e200,c200,sa9200: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (PREV για επιστροφή)"
+    h10,h10_5gb,e200*,c200,sa9200: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (PREV για επιστροφή)"
   </dest>
   <voice>
     *: "Kαταχωρήσεις βρέθηκαν για τη βάση δεδομένων"
@@ -3837,17 +3837,17 @@
   user:
   <source>
     *: none
-    e200: "Wheel Light Timeout"
+    e200*: "Wheel Light Timeout"
     c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
-    e200: "Χρόνος σβησίματος τροχού"
+    e200*: "Χρόνος σβησίματος τροχού"
     c200,gigabeatf,mrobe100,sa9200: "Χρόνος σβησίματος πλήκτρων"
   </dest>
   <voice>
     *: none
-    e200: "Χρόνος σβησίματος τροχού"
+    e200*: "Χρόνος σβησίματος τροχού"
     c200,gigabeatf,mrobe100,sa9200: "Χρόνος σβησίματος πλήκτρων"
   </voice>
 </phrase>
@@ -4130,13 +4130,13 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Ρύθμιση"
     h100,h120,h300: "NAVI = Ρύθμιση"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Ρύθμιση"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Ρύθμιση"
   </dest>
   <voice>
     *: none
@@ -4150,7 +4150,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200,sa9200: "MENU = Revert"
+    ipod*,e200*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4161,7 +4161,7 @@
     *: none
     rtc: "OFF = Ακύρωση"
     h100,h120,h300: "STOP = Ακύρωση"
-    ipod*,e200,c200,sa9200: "MENU = Ακύρωση"
+    ipod*,e200*,c200,sa9200: "MENU = Ακύρωση"
     x5,m5: "RECORD = Ακύρωση"
     h10,h10_5gb: "PREV = Ακύρωση"
     gigabeatf: "A = Ακύρωση"
@@ -6926,17 +6926,17 @@
   user:
   <source>
     *: none
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
-    e200,c200: "μάικρο Ες Ντι"
+    e200*,c200: "μάικρο Ες Ντι"
     ondio*: "Εμ Εμ Σι"
   </voice>
 </phrase>
@@ -8298,18 +8298,18 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "Ο δίσκος είναι γεμάτος. Πατήστε OFF για συνέχεια."
     h100,h120,h300: "Ο δίσκος είναι γεμάτος. Πατήστε STOP για συνέχεια."
     m5,x5: "Ο δίσκος είναι γεμάτος. Πατήστε POWER για συνέχεια.."
-    e200,c200: "Ο δίσκος είναι γεμάτος. Πατήστε UP για συνέχεια."
+    e200*,c200: "Ο δίσκος είναι γεμάτος. Πατήστε UP για συνέχεια."
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8400,14 +8400,14 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200,c200: "PREV to abort"
+    h10,h10_5gb,e200*,c200: "PREV to abort"
   </source>
   <dest>
     *: "OFF για ακύρωση"
     player,h100,h120,h300: "STOP για ακύρωση"
     ipod*: "PLAY/PAUSE για ακύρωση"
     x5,m5: "Long PLAY για ακύρωση"
-    h10,h10_5gb,e200,c200: "PREV για ακύρωση"
+    h10,h10_5gb,e200*,c200: "PREV για ακύρωση"
   </dest>
   <voice>
     *: ""
@@ -10460,7 +10460,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>

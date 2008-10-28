@@ -3744,19 +3744,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "Hard disk 1"
-    e200,c200: "Mikro SD kort"
+    e200*,c200: "Mikro SD kort"
     ondio*: "Multimedie kort"
   </voice>
 </phrase>
@@ -3889,7 +3889,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200,sa9200: "MENU = Revert"
+    ipod*,e200*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -3900,7 +3900,7 @@
     *: none
     rtc: "SLUK = Fortryd"
     h100,h120,h300: "STOP = Fortryd"
-    ipod*,e200,c200,sa9200: "MENU = Fortryd"
+    ipod*,e200*,c200,sa9200: "MENU = Fortryd"
     x5,m5: "OPTAG = Fortryd"
     h10,h10_5gb: "FORRIGE = Fortryd"
     gigabeatf: "TÆND/SLUK = Fortryd"
@@ -3911,7 +3911,7 @@
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,e200,c200,sa9200: ""
+    ipod*,e200*,c200,sa9200: ""
     x5,m5: ""
     h10,h10_5gb: ""
     gigabeatf: ""
@@ -3996,21 +3996,21 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "Disken er fuld. Tryk SLUK for at fortsætte."
     h100,h120,h300: "Disken er fuld. Tryk STOP for at fortsætte."
     m5,x5: "Disken er fuld. Tryk TÆND/SLUK for at fortsætte."
-    e200,c200: "Disken er fuld. Tryk OP for at fortsætte."
+    e200*,c200: "Disken er fuld. Tryk OP for at fortsætte."
   </dest>
   <voice>
     *: none
     recording: ""
     h100,h120,h300: ""
     m5,x5: ""
-    e200,c200: ""
+    e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -6617,7 +6617,7 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200,c200: "PREV to abort"
+    h10,h10_5gb,e200*,c200: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatf:"POWER to abort"
   </source>
@@ -6626,7 +6626,7 @@
     player,h100,h120,h300: "STOP for at afbryde"
     ipod*: "SPIL/PAUSE for at afbryde"
     x5,m5: "Lang SPIL for at afbryde"
-    h10,h10_5gb,e200,c200: "FORRIGE for at afbryde"
+    h10,h10_5gb,e200*,c200: "FORRIGE for at afbryde"
     gigabeats: "TILBAGE for at afbryde"
     gigabeatf: "TÆND/SLUK for at afbryde"
   </dest>
@@ -8745,7 +8745,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9323,21 +9323,21 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Bygger database... %d fundet (SLUK for at stoppe)"
     h100,h120,h300: "Bygger database... %d fundet (STOP for at stoppe)"
     ipod*: "Bygger database... %d fundet (FORRIGE for at stoppe)"
     x5,m5,gigabeat*,mrobe100: "Bygger database... %d fundet (VENSTRE for at stoppe)"
-    h10,h10_5gb,e200,c200,sa9200: "Bygger database... %d fundet (FORRIGE for at stoppe)"
+    h10,h10_5gb,e200*,c200,sa9200: "Bygger database... %d fundet (FORRIGE for at stoppe)"
   </dest>
   <voice>
     *: "filer fundet til databasen"
     h100,h120,h300: ""
     ipod*: ""
     x5,m5,gigabeat*,mrobe100: ""
-    h10,h10_5gb,e200,c200,sa9200: ""
+    h10,h10_5gb,e200*,c200,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9932,17 +9932,17 @@
   user:
   <source>
     *: none
-    e200: "Wheel Light Timeout"
+    e200*: "Wheel Light Timeout"
     c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
-    e200: "Hjul-lys sluk"
+    e200*: "Hjul-lys sluk"
     c200,gigabeatf,mrobe100,sa9200: "Knap-lys sluk"
   </dest>
   <voice>
     *: none
-    e200: "Hjul-lys sluk"
+    e200*: "Hjul-lys sluk"
     c200,gigabeatf,mrobe100,sa9200: "Knap-lys sluk"
   </voice>
 </phrase>
@@ -10557,19 +10557,19 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "SPIL = Ja"
     h100,h120,h300: "NAVI = Ja"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "VÆLG = Ja"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "VÆLG = Ja"
     player: "(SPIL/STOP)"
   </dest>
   <voice>
     *: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: ""
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: ""
     player: ""
   </voice>
 </phrase>
@@ -10581,19 +10581,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "Tænd = Indstil"
     h100,h120,h300: "NAVI = Indstil"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "VÆLG = Indstil"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "VÆLG = Indstil"
   </dest>
   <voice>
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: ""
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>

@@ -303,8 +303,12 @@
 #define UI_LCD_WIDTH                LCD_WIDTH /* * 1.5 */
 #define UI_LCD_HEIGHT               LCD_HEIGHT  /* * 1.5 */
 
-#elif defined(SANSA_E200)
+#elif defined(SANSA_E200) || defined(SANSA_E200V2)
+#ifdef SANSA_E200
 #define UI_TITLE                    "Sansa e200"
+#else
+#define UI_TITLE                    "Sansa e200v2"
+#endif
 #define UI_WIDTH                    260 /* width of GUI window */
 #define UI_HEIGHT                   502 /* height of GUI window */
 /* high-colour */

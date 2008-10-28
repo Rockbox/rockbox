@@ -1707,12 +1707,13 @@ fi
     memory=8
     arm9tdmicc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$bmp2rb_mono"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     tool="$rootdir/tools/scramble -add=e2v2"
     output="rockbox.sansa"
     bootoutput="bootloader-e200v2.sansa"
     appextra="recorder:gui"
-    plugins=""
+    plugins="yes"
+    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="as3525"

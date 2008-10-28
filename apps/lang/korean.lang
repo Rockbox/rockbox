@@ -866,7 +866,7 @@
     x5: "SELECT = Yes"
     h10,h10_5gb: "SELECT = Yes"
     gigabeatf: "SELECT = Yes"
-    e200,c200: "SELECT = Yes"
+    e200*,c200: "SELECT = Yes"
   </source>
   <dest>
     *: "[재생]: 예"
@@ -875,7 +875,7 @@
     x5: "[선택]: 예"
     h10,h10_5gb: "[선택]: 예"
     gigabeatf: "[선택]: 예"
-    e200,c200: "[선택]: 예"
+    e200*,c200: "[선택]: 예"
   </dest>
   <voice>
     *: ""
@@ -4735,7 +4735,7 @@
     x5: "RECORD = Exit"
     h10,h10_5gb: "PREV = Exit"
     gigabeatf: "A = Exit"
-    e200,c200: "POWER = Exit"
+    e200*,c200: "POWER = Exit"
   </source>
   <dest>
     *: "[꺼짐]: 나가기"
@@ -4744,7 +4744,7 @@
     x5: "[녹음]: 나가기"
     h10,h10_5gb: "[이전]: 나가기"
     gigabeatf: "[A버튼]: 나가기"
-    e200,c200: "[전원]: 나가기"
+    e200*,c200: "[전원]: 나가기"
   </dest>
   <voice>
     *: ""
@@ -4803,7 +4803,7 @@
     x5: "SELECT = Select"
     h10,h10_5gb: "SELECT = Select"
     gigabeatf: "SELECT = Select"
-    e200,c200: "SELECT = Select"
+    e200*,c200: "SELECT = Select"
   </source>
   <dest>
     *: "[재생]: 선택"
@@ -4812,7 +4812,7 @@
     x5: "[선택]: 선택"
     h10,h10_5gb: "[선택]: 선택"
     gigabeatf: "[선택]: 선택"
-    e200,c200: "[선택]: 선택"
+    e200*,c200: "[선택]: 선택"
   </dest>
   <voice>
     *: ""
@@ -4829,7 +4829,7 @@
     x5: "Long RECORD = Delete"
     h10,h10_5gb: "REWIND = Delete"
     gigabeatf: "POWER = Delete"
-    e200,c200: "PLAY = Delete"
+    e200*,c200: "PLAY = Delete"
   </source>
   <dest>
     *: "[켜짐]+[재생]: 삭제"
@@ -4838,7 +4838,7 @@
     x5: "[녹음버튼 길게]: 삭제"
     h10,h10_5gb: "[되감기]: 삭제"
     gigabeatf: "[전원]: 삭제"
-    e200,c200: "[재생]: 삭제"
+    e200*,c200: "[재생]: 삭제"
   </dest>
   <voice>
     *: ""
@@ -4925,7 +4925,7 @@
     x5: "SELECT = Set"
     h10,h10_5gb: "SELECT = Set"
     gigabeatf: "SELECT = Set"
-    e200,c200: "SELECT = Set"
+    e200*,c200: "SELECT = Set"
   </source>
   <dest>
     *: "[재생]: 설정 저장"
@@ -4934,7 +4934,7 @@
     x5: "[선택]: 설정 저장"
     h10,h10_5gb: "[선택]: 설정 저장"
     gigabeatf: "[선택]: 설정 저장"
-    e200,c200: "[선택]: 설정 저장"
+    e200*,c200: "[선택]: 설정 저장"
   </dest>
   <voice>
     *: ""
@@ -4951,7 +4951,7 @@
     x5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "POWER = Revert"
-    e200,c200: "PREV = Revert"
+    e200*,c200: "PREV = Revert"
   </source>
   <dest>
     *: "[꺼짐]: 원상태 복구"
@@ -4960,7 +4960,7 @@
     x5: "[녹음]: 원상태 복구"
     h10,h10_5gb: "[이전]: 원상태 복구"
     gigabeatf: "[전원]: 원상태 복구"
-    e200,c200: "[이전]: 원상태 복구"
+    e200*,c200: "[이전]: 원상태 복구"
   </dest>
   <voice>
     *: ""
@@ -7936,7 +7936,7 @@
     ipod*: "PLAY/PAUSE to abort"
     x5: "Long PLAY to abort"
     h10,h10_5gb: "PREV to abort"
-    e200,c200: "PREV to abort"
+    e200*,c200: "PREV to abort"
   </source>
   <dest>
     *: "[꺼짐]: 취소"
@@ -7944,7 +7944,7 @@
     ipod*: "[재생/일시정지]: 취소"
     x5: "[재생버튼 길게]: 취소"
     h10,h10_5gb: "[이전]: 나가기"
-    e200,c200: "[이전]: 나가기"
+    e200*,c200: "[이전]: 나가기"
   </dest>
   <voice>
     *: ""
@@ -10727,7 +10727,7 @@
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
     x5: "Building database... %d found (Long PLAY to return)"
     h10,h10_5gb: "Building database... %d found (PREV to return)"
-    e200,c200: "Building database... %d found (PREV to return)"
+    e200*,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "음악 DB 생성 중... %d개 완료 ([꺼짐]: 취소)"
@@ -10735,7 +10735,7 @@
     ipod*: "음악 DB 생성 중... %d개 완료 ([재생/일시정지]: 취소)"
     x5: "음악 DB 생성 중... %d개 완료 ([재생버튼 길게]: 취소)"
     h10,h10_5gb: "음악 DB 생성 중... %d개 완료 ([이전]: 취소)"
-    e200,c200: "음악 DB 생성 중... %d개 완료 ([이전]: 취소)"
+    e200*,c200: "음악 DB 생성 중... %d개 완료 ([이전]: 취소)"
   </dest>
   <voice>
     *: ""
@@ -10761,17 +10761,17 @@
   user:
   <source>
     *: ""
-    e200: "Wheel Light Timeout"
+    e200*: "Wheel Light Timeout"
     c200,gigabeatf,mrobe100: "Button Light Timeout"
   </source>
   <dest>
     *: ""
-    e200: "휠버튼 조명 시간"
+    e200*: "휠버튼 조명 시간"
     c200,gigabeatf,mrobe100: "버튼 조명 시간"
   </dest>
   <voice>
     *: ""
-    e200: "휠버튼 조명 시간"
+    e200*: "휠버튼 조명 시간"
     c200,gigabeatf,mrobe100: "버튼 조명 시간"
   </voice>
 </phrase>

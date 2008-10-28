@@ -4443,19 +4443,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "磁盘1"
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "磁盘1"
-    e200,c200: "mSD卡"
+    e200*,c200: "mSD卡"
     ondio*: "MMC卡"
   </voice>
 </phrase>
@@ -4588,7 +4588,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200,sa9200: "MENU = Revert"
+    ipod*,e200*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4599,7 +4599,7 @@
     *: none
     rtc: "OFF=放弃"
     h100,h120,h300: "STOP=放弃"
-    ipod*,e200,c200,sa9200: "MENU=放弃"
+    ipod*,e200*,c200,sa9200: "MENU=放弃"
     x5,m5: "RECORD=放弃"
     h10,h10_5gb: "PREV=放弃"
     gigabeatf: "A=放弃"
@@ -4687,14 +4687,14 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "磁盘已满，按下OFF继续."
     h100,h120,h300: "磁盘已满，按下STOP继续."
     m5,x5: "磁盘已满，按下POWER继续."
-    e200,c200: "磁盘，按下UP继续."
+    e200*,c200: "磁盘，按下UP继续."
   </dest>
   <voice>
     *: none
@@ -7397,7 +7397,7 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200,c200: "PREV to abort"
+    h10,h10_5gb,e200*,c200: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatf:"POWER to abort"
   </source>
@@ -7406,7 +7406,7 @@
     player,h100,h120,h300: "按STOP键取消"
     ipod*: "按PLAY/PAUSE键取消"
     x5,m5: "长按PLAY键取消"
-    h10,h10_5gb,e200,c200: "按PREV键取消"
+    h10,h10_5gb,e200*,c200: "按PREV键取消"
     gigabeats: "按BACK键取消"
     gigabeatf:"按POWER键取消"
   </dest>
@@ -8501,7 +8501,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8779,21 +8779,21 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "数据库更新中...已找到%d个(按OFF返回)"
     h100,h120,h300: "数据库更新中...已找到%d个(按STOP返回)"
     ipod*: "数据库更新中...已找到%d个(按PREV返回)"
     x5,m5,gigabeat*,mrobe100: "数据库更新中...已找到%d个(按LEFT返回)"
-    h10,h10_5gb,e200,c200,sa9200: "数据库更新中...已找到%d个(按PREV返回)"
+    h10,h10_5gb,e200*,c200,sa9200: "数据库更新中...已找到%d个(按PREV返回)"
   </dest>
   <voice>
     *: "数据库更新中"
     h100,h120,h300: ""
     ipod*: ""
     x5,m5,gigabeat*,mrobe100: ""
-    h10,h10_5gb,e200,c200,sa9200: ""
+    h10,h10_5gb,e200*,c200,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9352,13 +9352,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY=是"
     h100,h120,h300: "NAVI=是"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT=是"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT=是"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -9373,13 +9373,13 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON=设置"
     h100,h120,h300: "NAVI=设置"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT=设置"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT=设置"
   </dest>
   <voice>
     *: none
@@ -10686,17 +10686,17 @@
   user: 
   <source>
     *: none
-    e200: "Wheel Light Timeout"
+    e200*: "Wheel Light Timeout"
     c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
-    e200: "转盘背光自动关闭时滞"
+    e200*: "转盘背光自动关闭时滞"
     c200,gigabeatf,mrobe100,sa9200: "按键背光自动关闭时滞"
   </dest>
   <voice>
     *: none
-    e200: "转盘背光自动关闭时滞"
+    e200*: "转盘背光自动关闭时滞"
     c200,gigabeatf,mrobe100,sa9200: "按键背光自动关闭时滞"
   </voice>
 </phrase>

@@ -4086,17 +4086,17 @@
   user:
   <source>
     *: none
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
-    e200,c200: "mSD"
+    e200*,c200: "mSD"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
-    e200,c200: "mSD"
+    e200*,c200: "mSD"
     ondio*: "MMC:"
   </voice>
 </phrase>
@@ -4229,7 +4229,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200,sa9200: "MENU = Revert"
+    ipod*,e200*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4240,7 +4240,7 @@
     *: none
     rtc: "ВЫКЛ. = Отмена"
     h100,h120,h300: "СТОП = Отмена"
-    ipod*,e200,c200,sa9200: "МЕНЮ = Отмена"
+    ipod*,e200*,c200,sa9200: "МЕНЮ = Отмена"
     x5,m5: "ЗАПИСЬ = Отмена"
     h10,h10_5gb: "ПРЕД. = Отмена"
     gigabeatf: "А = Отмена"
@@ -4251,7 +4251,7 @@
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,e200,c200,sa9200: ""
+    ipod*,e200*,c200,sa9200: ""
     x5,m5: ""
     h10,h10_5gb: ""
     gigabeatf: ""
@@ -4336,18 +4336,18 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "Диск заполнен. Нажмите ВЫКЛ. для продолжения."
     h100,h120,h300: "Диск заполнен. Нажмите СТОП для продолжения."
     m5,x5: "Диск заполнен. Нажмите ВЫКЛ. для продолжения."
-    e200,c200: "Диск заполнен. Нажмите ВВЕРХ для продолжения."
+    e200*,c200: "Диск заполнен. Нажмите ВВЕРХ для продолжения."
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -6954,14 +6954,14 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200,c200: "PREV to abort"
+    h10,h10_5gb,e200*,c200: "PREV to abort"
   </source>
   <dest>
     *: "ВЫКЛ. для отмены"
     player,h100,h120,h300: "СТОП для отмены"
     ipod*: "ПАУЗА для отмены"
     x5,m5: "ВОСПР. для отмены"
-    h10,h10_5gb,e200,c200: "ПРЕД. для отмены"
+    h10,h10_5gb,e200*,c200: "ПРЕД. для отмены"
   </dest>
   <voice>
     *: ""
@@ -7769,7 +7769,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8143,21 +8143,21 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Построение базы... %d найдено (ВЫКЛ. для отмены)"
     h100,h120,h300: "Построение базы... %d найдено (СТОП для отмены)"
     ipod*: "Построение базы... %d найдено (ПРЕД. для отмены)"
     x5,m5,gigabeat*,mrobe100: ""
-    h10,h10_5gb,e200,c200,sa9200: ""
+    h10,h10_5gb,e200*,c200,sa9200: ""
   </dest>
   <voice>
     *: "найдено записей в базе"
     h100,h120,h300: ""
     ipod*: ""
     x5,m5,gigabeat*,mrobe100: ""
-    h10,h10_5gb,e200,c200,sa9200: ""
+    h10,h10_5gb,e200*,c200,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8930,19 +8930,19 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "ВОСПР. = Да"
     h100,h120,h300: "НАВИГ. = Да"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "ВЫБОР = Да"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "ВЫБОР = Да"
     player: "(ВОСПР./СТОП)"
   </dest>
   <voice>
     *: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: ""
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: ""
     player: ""
   </voice>
 </phrase>
@@ -8954,19 +8954,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ВКЛ. = Установить"
     h100,h120,h300: "НАВИГ. = Установить"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "ВЫБОР = Установить"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "ВЫБОР = Установить"
   </dest>
   <voice>
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: ""
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -10948,17 +10948,17 @@
   user:
   <source>
     *: none
-    e200: "Wheel Light Timeout"
+    e200*: "Wheel Light Timeout"
     c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
-    e200: "Таймаут подсветки колёсика"
+    e200*: "Таймаут подсветки колёсика"
     c200,gigabeatf,mrobe100,sa9200: "Таймаут подсветки клавиш"
   </dest>
   <voice>
     *: none
-    e200: "Таймаут подсветки колёсика"
+    e200*: "Таймаут подсветки колёсика"
     c200,gigabeatf,mrobe100,sa9200: "Таймаут подсветки клавиш"
   </voice>
 </phrase>

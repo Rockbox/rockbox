@@ -261,19 +261,19 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Да"
     h100,h120,h300: "NAVI = Да"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Да"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Да"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: ""
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: ""
     player: ""
   </voice>
 </phrase>
@@ -2370,21 +2370,21 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Креирам базу података... %d пронађено (OFF за повратак)"
     h100,h120,h300: "Креирам базу података... %d пронађено (STOP за повратак)"
     ipod*: "Креирам базу података... %d пронађено (PREV за повратак)"
     x5,m5,gigabeat*,mrobe100: "Креирам базу података... %d пронађено (LEFT за повратак)"
-    h10,h10_5gb,e200,c200,sa9200: "Креирам базу података... %d пронађено (PREV за повратак)"
+    h10,h10_5gb,e200*,c200,sa9200: "Креирам базу података... %d пронађено (PREV за повратак)"
   </dest>
   <voice>
     *: "улази за базу података"
     h100,h120,h300: ""
     ipod*: ""
     x5,m5,gigabeat*,mrobe100: ""
-    h10,h10_5gb,e200,c200,sa9200: ""
+    h10,h10_5gb,e200*,c200,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -3840,17 +3840,17 @@
   user:
   <source>
     *: none
-    e200: "Wheel Light Timeout"
+    e200*: "Wheel Light Timeout"
     c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
-    e200: "Wheel Light Timeout"
+    e200*: "Wheel Light Timeout"
     c200,gigabeatf,mrobe100,sa9200: ""
   </dest>
   <voice>
     *: none
-    e200: "Wheel Light Timeout"
+    e200*: "Wheel Light Timeout"
     c200,gigabeatf,mrobe100,sa9200: ""
   </voice>
 </phrase>
@@ -4133,19 +4133,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Постави"
     h100,h120,h300: "NAVI = Постави"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Постави"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Постави"
   </dest>
   <voice>
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: ""
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4156,7 +4156,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200,sa9200: "MENU = Revert"
+    ipod*,e200*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4167,7 +4167,7 @@
     *: none
     rtc: "OFF = Врати на старо"
     h100,h120,h300: "STOP = Врати на старо"
-    ipod*,e200,c200,sa9200: "MENU = Врати на старо"
+    ipod*,e200*,c200,sa9200: "MENU = Врати на старо"
     x5,m5: "RECORD = Врати на старо"
     h10,h10_5gb: "PREV = Врати на старо"
     gigabeatf: "A = Врати на старо"
@@ -4178,7 +4178,7 @@
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,e200,c200,sa9200: ""
+    ipod*,e200*,c200,sa9200: ""
     x5,m5: ""
     h10,h10_5gb: ""
     gigabeatf: ""
@@ -6941,17 +6941,17 @@
   user:
   <source>
     *: none
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
-    e200,c200: "мајкро Ес Де"
+    e200*,c200: "мајкро Ес Де"
     ondio*: "M M C"
   </voice>
 </phrase>
@@ -8313,18 +8313,18 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "Диск је пун. Притисните OFF за наставак."
     h100,h120,h300: "Диск је пун. Притисните STOP за наставак."
     m5,x5: "Диск је пун. Притисните POWER за наставак."
-    e200,c200: "Диск је пун. Притисните UP за наставак."
+    e200*,c200: "Диск је пун. Притисните UP за наставак."
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8415,14 +8415,14 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200,c200: "PREV to abort"
+    h10,h10_5gb,e200*,c200: "PREV to abort"
   </source>
   <dest>
     *: "OFF to abort"
     player,h100,h120,h300: "STOP за прекид"
     ipod*: "PLAY/PAUSE за прекид"
     x5,m5: "Long PLAY за прекид"
-    h10,h10_5gb,e200,c200: "PREV за прекид"
+    h10,h10_5gb,e200*,c200: "PREV за прекид"
   </dest>
   <voice>
     *: ""
@@ -10475,7 +10475,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>

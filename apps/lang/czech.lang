@@ -263,13 +263,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Ano"
     h100,h120,h300: "NAVI = Ano"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Ano"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Ano"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -2369,14 +2369,14 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Vytvářím databázi... %d found (OFF pro návrat)"
     h100,h120,h300: "Vytvářím databázi... %d found (STOP pro návrat)"
     ipod*: "Vytvářím databázi... %d found (PREV pro návrat)"
     x5,m5,gigabeat*,mrobe100: "Vytvářím databázi... %d found (LEFT pro návrat)"
-    h10,h10_5gb,e200,c200,sa9200: "Vytvářím databázi... %d found (PREV pro návrat)"
+    h10,h10_5gb,e200*,c200,sa9200: "Vytvářím databázi... %d found (PREV pro návrat)"
   </dest>
   <voice>
     *: "záznamy nalezené v databázi"
@@ -3835,17 +3835,17 @@
   user:
   <source>
     *: none
-    e200: "Wheel Light Timeout"
+    e200*: "Wheel Light Timeout"
     c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
-    e200: "Časový limit osvětlení kolečka"
+    e200*: "Časový limit osvětlení kolečka"
     c200,gigabeatf,mrobe100,sa9200: ""
   </dest>
   <voice>
     *: none
-    e200: "Časový limit osvětlení kolečka"
+    e200*: "Časový limit osvětlení kolečka"
     c200,gigabeatf,mrobe100,sa9200: ""
   </voice>
 </phrase>
@@ -4128,13 +4128,13 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Nastavit"
     h100,h120,h300: "NAVI = Nastavit"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Nastavit"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Nastavit"
   </dest>
   <voice>
     *: none
@@ -4148,7 +4148,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200,sa9200: "MENU = Revert"
+    ipod*,e200*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4159,7 +4159,7 @@
     *: none
     rtc: "OFF = Vrátit zpět"
     h100,h120,h300: "STOP = Vrátit zpět"
-    ipod*,e200,c200,sa9200: "MENU = Vrátit zpět"
+    ipod*,e200*,c200,sa9200: "MENU = Vrátit zpět"
     x5,m5: "RECORD = Vrátit zpět"
     h10,h10_5gb: "PREV = Vrátit zpět"
     gigabeatf: "A = Vrátit zpět"
@@ -6924,17 +6924,17 @@
   user:
   <source>
     *: none
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
-    e200,c200: "mSD:"
+    e200*,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
-    e200,c200: "micro S D"
+    e200*,c200: "micro S D"
     ondio*: "M M C"
   </voice>
 </phrase>
@@ -8296,18 +8296,18 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
     recording: "Disk je plný. Pro pokračování stiskněte OFF."
     h100,h120,h300: "Disk je plný. Pro pokračování stiskněte STOP."
     m5,x5: "Disk je plný. Pro pokračování stiskněte POWER."
-    e200,c200: "Disk je plný. Pro pokračování stiskněte UP."
+    e200*,c200: "Disk je plný. Pro pokračování stiskněte UP."
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8398,14 +8398,14 @@
     player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
-    h10,h10_5gb,e200,c200: "PREV to abort"
+    h10,h10_5gb,e200*,c200: "PREV to abort"
   </source>
   <dest>
     *: "OFF=zrušit"
     player,h100,h120,h300: "STOP=zrušit"
     ipod*: "PLAY/PAUSE=zrušit"
     x5,m5: "Long PLAY=zrušit"
-    h10,h10_5gb,e200,c200: "PREV=zrušit"
+    h10,h10_5gb,e200*,c200: "PREV=zrušit"
   </dest>
   <voice>
     *: ""
@@ -10458,7 +10458,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>

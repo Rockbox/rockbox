@@ -67,11 +67,13 @@
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
+
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS
 
-/* Define this if you have an AMS AS3525 */
-#define HAVE_AS3525
+/* We're working on the assumption that the AS3525 has something
+   similar to the AS3514 for audio codec etc */
+#define HAVE_AS3514
 
 /* define this if you have a real-time clock */
 #ifndef BOOTLOADER
@@ -92,8 +94,8 @@
 
 #define AB_REPEAT_ENABLE 1
 
-/* FM Tuner */
-/* #define CONFIG_TUNER LV24020LP */
+/* FM Tuner - suspected to be the SI4702, but use SI4700 for now */
+#define CONFIG_TUNER SI4700
 /* #define HAVE_TUNER_PWR_CTRL */
 
 /* Define this for LCD backlight available */
