@@ -1716,7 +1716,7 @@ fi
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="as3525"
-    t_model="sansa-clip"
+    t_model="sansa-e200v2"
     ;;
 
 
