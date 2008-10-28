@@ -95,10 +95,17 @@ uclcopy:
 
 #ifdef SANSA_CLIP
         /* HOME button */
+.set row, (1<<6) /* enable output on C6 */
+        ldr   r0, =GPIOC
+        mov   r1, #row
+        str   r1, [r0, #0x400]
+        str   r1, [r0, #(4*row)]
+
+.set col, (1<<2) /* read keyscan column B2 */
         ldr   r0, =GPIOB
         mov   r1, #0
         str   r1, [r0, #0x400]
-        ldr   r1, [r0, #0x10]   /* read pin B2 */
+        ldr   r1, [r0, #(4*col)]
 
         cmp   r1, #0
         bne   boot_of
@@ -112,21 +119,19 @@ uclcopy:
         cmp   r1, #0             /* C6 = #0 means button pressed */
         beq   boot_of
 #elif defined(SANSA_M200V2)
-.set row, (1<<5) /* 4 or <<5 or <<6 */
-        /* enable output on A3-A5 */
-        /* set keyscan row A0-A3 */
+        /* SELECT button */
+.set row, (1<<5) /* enable output on A5 */
         ldr   r0, =GPIOA
         mov   r1, #row
         str   r1, [r0, #0x400]
         str   r1, [r0, #(4*row)]
 
-.set col, (1<<0) /* 0 or 1, 2, 3 */
-        /* read keyscan column A0-A3 */
+.set col, (1<<0) /* read keyscan column A0 */
         ldr   r2, [r0, #(4*col)]
 
-        /* check value read (compare to 0!) */
+        /* check value read (0 means button pressed) */
         cmp   r2, #0
-        beq   boot_of        /* for beginning we jump if button select is not pressed */
+        beq   boot_of
 #else
         #error No target-specific key check defined!
 #endif
