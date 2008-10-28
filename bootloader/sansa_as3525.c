@@ -36,6 +36,8 @@ void main(void)
     int i;
     unsigned char buf[8];
 
+    system_init();
+
     lcd_init_device();
     lcd_clear_display();
 

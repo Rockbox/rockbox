@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2007 by Rob Purchase
+ * Copyright © 2008 Rafaël Carré
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -124,10 +125,83 @@ void fiq_handler(void)
     );
 }
 
+static void sdram_delay(void)
+{
+    int delay = 1024; /* arbitrary */
+    while (delay--) ;
+}
+
+/* Use the same initialization than OF */
+static void sdram_init(void)
+{
+    CGU_PERI &= ~(0xf<<2);  /* clear div0 (memclock) */
+    CGU_PERI |= (1<<2);     /* divider = 2 */
+
+    CGU_PERI |= (1<<26)|(1<<27); /* extmem & extmem intf clocks */
+
+    MPMC_CONTROL = 0x1; /* enable MPMC */
+
+    MPMC_DYNAMIC_CONTROL = 0x183; /* SDRAM NOP, all clocks high */
+    sdram_delay();
+
+    MPMC_DYNAMIC_CONTROL = 0x103; /* SDRAM PALL, all clocks high */
+    sdram_delay();
+
+    MPMC_DYNAMIC_REFRESH = 0x138; /* 0x138 * 16 HCLK ticks between SDRAM refresh cycles */
+
+    MPMC_CONFIG = 0; /* little endian, HCLK:MPMCCLKOUT[3:0] ratio = 1:1 */
+
+    if(MPMC_PERIPH_ID2 & 0xf0)
+        MPMC_DYNAMIC_READ_CONFIG = 0x1; /* command delayed, clock out not delayed */
+
+    /* timings */
+    MPMC_DYNAMIC_tRP    = 2;
+    MPMC_DYNAMIC_tRAS   = 4;
+    MPMC_DYNAMIC_tSREX  = 5;
+    MPMC_DYNAMIC_tAPR   = 0;
+    MPMC_DYNAMIC_tDAL   = 4;
+    MPMC_DYNAMIC_tWR    = 2;
+    MPMC_DYNAMIC_tRC    = 5;
+    MPMC_DYNAMIC_tRFC   = 5;
+    MPMC_DYNAMIC_tXSR   = 5;
+    MPMC_DYNAMIC_tRRD   = 2;
+    MPMC_DYNAMIC_tMRD   = 2;
+
+#if defined(SANSA_CLIP) || defined(SANSA_M200V2)
+#   define MEMORY_MODEL 0x21
+    /* 16 bits external bus, low power SDRAM, 16 Mbits = 2 Mbytes */
+#elif defined(SANSA_E200V2)
+#   define MEMORY_MODEL 0x5
+    /* 16 bits external bus, high performance SDRAM, 64 Mbits = 8 Mbytes */
+#else
+#   error "The external memory in your player is unknown"
+#endif
+
+    MPMC_DYNAMIC_RASCAS_0 = (2<<8)|2; /* CAS & RAS latency = 2 clock cycles */
+    MPMC_DYNAMIC_CONFIG_0 = (MEMORY_MODEL << 7);
+
+    MPMC_DYNAMIC_RASCAS_1 = MPMC_DYNAMIC_CONFIG_1 =
+    MPMC_DYNAMIC_RASCAS_2 = MPMC_DYNAMIC_CONFIG_2 =
+    MPMC_DYNAMIC_RASCAS_3 = MPMC_DYNAMIC_CONFIG_3 = 0;
+
+    MPMC_DYNAMIC_CONTROL = 0x82; /* SDRAM MODE, MPMCCLKOUT runs continuously */
+
+    /* this part is required, if you know why please explain */
+    unsigned int tmp = *(volatile unsigned int*)(0x30000000+0x2300*MEM);
+    (void)tmp; /* we just need to read from this location */
+
+    MPMC_DYNAMIC_CONTROL = 0x2; /* SDRAM NORMAL, MPMCCLKOUT runs continuously */
+
+    MPMC_DYNAMIC_CONFIG_0 |= (1<<19); /* buffer enable */
+}
 
 void system_init(void)
 {
-/*    CGU_PERI |= CGU_GPIO_CLOCK_ENABLE; */
+#if 0 /* the GPIO clock is already enabled by the dualboot function */
+    CGU_PERI |= CGU_GPIO_CLOCK_ENABLE;
+#endif
+
+    sdram_init();
 }
 
 void system_reboot(void)

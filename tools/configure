@@ -1684,7 +1684,7 @@ fi
     target_id=50
     modelname="clip"
     target="-DSANSA_CLIP"
-    memory=1 # In fact, 0.3125
+    memory=2
     arm9tdmicc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"
@@ -1704,7 +1704,7 @@ fi
     target_id=51
     modelname="e200v2"
     target="-DSANSA_E200V2"
-    memory=2 # FIXME - a guess
+    memory=8
     arm9tdmicc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"
@@ -1724,7 +1724,7 @@ fi
     target_id=52
     modelname="m200v2"
     target="-DSANSA_M200V2"
-    memory=2 # FIXME - A guess
+    memory=2
     arm9tdmicc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"

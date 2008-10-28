@@ -312,4 +312,39 @@ interface */
 #define GPIOD_AFSEL     (*(volatile unsigned char*)(GPIOD_BASE+0x420))
 #define GPIOD_PIN(a)    (*(volatile unsigned char*)(GPIOD_BASE+4*(1<<(a))))
 
+/* ARM PL172 Memory Controller registers */
+
+#define MPMC_CONTROL              (*(volatile unsigned long*)(MPMC_BASE+0x000))
+#define MPMC_STATUS               (*(volatile unsigned long*)(MPMC_BASE+0x004))
+#define MPMC_CONFIG               (*(volatile unsigned long*)(MPMC_BASE+0x008))
+
+#define MPMC_DYNAMIC_CONTROL      (*(volatile unsigned long*)(MPMC_BASE+0x020))
+#define MPMC_DYNAMIC_REFRESH      (*(volatile unsigned long*)(MPMC_BASE+0x024))
+#define MPMC_DYNAMIC_READ_CONFIG  (*(volatile unsigned long*)(MPMC_BASE+0x028))
+#define MPMC_DYNAMIC_tRP          (*(volatile unsigned long*)(MPMC_BASE+0x030))
+#define MPMC_DYNAMIC_tRAS         (*(volatile unsigned long*)(MPMC_BASE+0x034))
+#define MPMC_DYNAMIC_tSREX        (*(volatile unsigned long*)(MPMC_BASE+0x038))
+#define MPMC_DYNAMIC_tAPR         (*(volatile unsigned long*)(MPMC_BASE+0x03C))
+#define MPMC_DYNAMIC_tDAL         (*(volatile unsigned long*)(MPMC_BASE+0x040))
+#define MPMC_DYNAMIC_tWR          (*(volatile unsigned long*)(MPMC_BASE+0x044))
+#define MPMC_DYNAMIC_tRC          (*(volatile unsigned long*)(MPMC_BASE+0x048))
+#define MPMC_DYNAMIC_tRFC         (*(volatile unsigned long*)(MPMC_BASE+0x04C))
+#define MPMC_DYNAMIC_tXSR         (*(volatile unsigned long*)(MPMC_BASE+0x050))
+#define MPMC_DYNAMIC_tRRD         (*(volatile unsigned long*)(MPMC_BASE+0x054))
+#define MPMC_DYNAMIC_tMRD         (*(volatile unsigned long*)(MPMC_BASE+0x058))
+
+#define MPMC_STATIC_EXTENDED_WAIT (*(volatile unsigned long*)(MPMC_BASE+0x080))
+
+#define MPMC_DYNAMIC_CONFIG_0     (*(volatile unsigned long*)(MPMC_BASE+0x100))
+#define MPMC_DYNAMIC_CONFIG_1     (*(volatile unsigned long*)(MPMC_BASE+0x120))
+#define MPMC_DYNAMIC_CONFIG_2     (*(volatile unsigned long*)(MPMC_BASE+0x140))
+#define MPMC_DYNAMIC_CONFIG_3     (*(volatile unsigned long*)(MPMC_BASE+0x160))
+
+#define MPMC_DYNAMIC_RASCAS_0     (*(volatile unsigned long*)(MPMC_BASE+0x104))
+#define MPMC_DYNAMIC_RASCAS_1     (*(volatile unsigned long*)(MPMC_BASE+0x124))
+#define MPMC_DYNAMIC_RASCAS_2     (*(volatile unsigned long*)(MPMC_BASE+0x144))
+#define MPMC_DYNAMIC_RASCAS_3     (*(volatile unsigned long*)(MPMC_BASE+0x164))
+
+#define MPMC_PERIPH_ID2           (*(volatile unsigned long*)(MPMC_BASE+0xFE8))
+
 #endif /*__AS3525_H__*/
