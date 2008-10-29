@@ -267,6 +267,7 @@ drivers/i2c.c
 target/sh/adc-sh.c
 target/sh/bitswap.S
 target/sh/crt0.S
+target/sh/kernel-sh.c
 target/sh/memcpy-sh.S
 target/sh/memmove-sh.S
 target/sh/memset-sh.S
@@ -291,6 +292,7 @@ target/coldfire/strlen-coldfire.S
  || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
 target/coldfire/memset16-coldfire.S
 #endif
+target/coldfire/kernel-coldfire.c
 target/coldfire/system-coldfire.c
 #ifndef BOOTLOADER
 target/coldfire/pcm-coldfire.c
@@ -322,6 +324,7 @@ target/arm/i2c-telechips.c
 #endif
 
 #if CONFIG_CPU == PNX0101
+target/arm/pnx0101/kernel-pnx0101.c
 target/arm/pnx0101/system-pnx0101.c
 #endif
 
@@ -330,6 +333,7 @@ target/arm/as3525/system-as3525.c
 #endif
 
 #if defined(CPU_PP)
+target/arm/kernel-pp.c
 #if CONFIG_CPU == PP5002
 target/arm/system-pp5002.c
 #elif defined CPU_PP502x

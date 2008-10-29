@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by BjÃ¶rn Stenberg
+ * Copyright (C) 2002 by Björn Stenberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -92,150 +92,9 @@ void kernel_init(void)
 }
 
 /****************************************************************************
- * Timer tick
+ * Timer tick - Timer initialization and interrupt handler is defined at
+ * the target level.
  ****************************************************************************/
-#if CONFIG_CPU == SH7034
-void tick_start(unsigned int interval_in_ms)
-{
-    unsigned long count;
-
-    count = CPU_FREQ * interval_in_ms / 1000 / 8;
-
-    if(count > 0x10000)
-    {
-        panicf("Error! The tick interval is too long (%d ms)\n",
-               interval_in_ms);
-        return;
-    }
-    
-    /* We are using timer 0 */
-    
-    TSTR &= ~0x01; /* Stop the timer */
-    TSNC &= ~0x01; /* No synchronization */
-    TMDR &= ~0x01; /* Operate normally */
-
-    TCNT0 = 0;   /* Start counting at 0 */
-    GRA0 = (unsigned short)(count - 1);
-    TCR0 = 0x23; /* Clear at GRA match, sysclock/8 */
-
-    /* Enable interrupt on level 1 */
-    IPRC = (IPRC & ~0x00f0) | 0x0010;
-    
-    TSR0 &= ~0x01;
-    TIER0 = 0xf9; /* Enable GRA match interrupt */
-
-    TSTR |= 0x01; /* Start timer 1 */
-}
-
-void IMIA0(void) __attribute__ ((interrupt_handler));
-void IMIA0(void)
-{
-    /* Run through the list of tick tasks */
-    call_tick_tasks();
-
-    TSR0 &= ~0x01;
-}
-#elif defined(CPU_COLDFIRE)
-void tick_start(unsigned int interval_in_ms)
-{
-    unsigned long count;
-    int prescale;
-
-    count = CPU_FREQ/2 * interval_in_ms / 1000 / 16;
-
-    if(count > 0x10000)
-    {
-        panicf("Error! The tick interval is too long (%d ms)\n",
-               interval_in_ms);
-        return;
-    }
-
-    prescale = cpu_frequency / CPU_FREQ;
-    /* Note: The prescaler is later adjusted on-the-fly on CPU frequency
-       changes within timer.c */
-    
-    /* We are using timer 0 */
-
-    TRR0 = (unsigned short)(count - 1); /* The reference count */
-    TCN0 = 0; /* reset the timer */
-    TMR0 = 0x001d | ((unsigned short)(prescale - 1) << 8); 
-           /* restart, CLK/16, enabled, prescaler */
-
-    TER0 = 0xff; /* Clear all events */
-
-    ICR1 = 0x8c; /* Interrupt on level 3.0 */
-    IMR &= ~0x200;
-}
-
-void TIMER0(void) __attribute__ ((interrupt_handler));
-void TIMER0(void)
-{
-    /* Run through the list of tick tasks */
-    call_tick_tasks();
-
-    TER0 = 0xff; /* Clear all events */
-}
-
-#elif defined(CPU_PP)
-
-#ifndef BOOTLOADER
-void TIMER1(void)
-{
-    /* Run through the list of tick tasks (using main core) */
-    TIMER1_VAL; /* Read value to ack IRQ */
-
-    /* Run through the list of tick tasks using main CPU core - 
-       wake up the COP through its control interface to provide pulse */
-    call_tick_tasks();
-
-#if NUM_CORES > 1
-    /* Pulse the COP */
-    core_wake(COP);
-#endif /* NUM_CORES */
-}
-#endif
-
-/* Must be last function called init kernel/thread initialization */
-void tick_start(unsigned int interval_in_ms)
-{
-#ifndef BOOTLOADER
-    TIMER1_CFG = 0x0;
-    TIMER1_VAL;
-    /* enable timer */
-    TIMER1_CFG = 0xc0000000 | (interval_in_ms*1000 - 1);
-    /* unmask interrupt source */
-    CPU_INT_EN = TIMER1_MASK;
-#else
-    /* We don't enable interrupts in the bootloader */
-    (void)interval_in_ms;
-#endif
-}
-
-#elif CONFIG_CPU == PNX0101
-
-void timer_handler(void)
-{
-    /* Run through the list of tick tasks */
-    call_tick_tasks();
-
-    TIMER0.clr = 0;
-}
-
-void tick_start(unsigned int interval_in_ms)
-{
-    TIMER0.ctrl &= ~0x80; /* Disable the counter */
-    TIMER0.ctrl |= 0x40;  /* Reload after counting down to zero */
-    TIMER0.load = 3000000 * interval_in_ms / 1000;
-    TIMER0.ctrl &= ~0xc;  /* No prescaler */
-    TIMER0.clr = 1;       /* Clear the interrupt request */
-
-    irq_set_int_handler(IRQ_TIMER0, timer_handler);
-    irq_enable_int(IRQ_TIMER0);
-
-    TIMER0.ctrl |= 0x80;  /* Enable the counter */
-}
-#endif
-
 int tick_add_task(void (*f)(void))
 {
     int oldlevel = disable_irq_save();
