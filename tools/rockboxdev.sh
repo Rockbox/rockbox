@@ -285,7 +285,9 @@ mkdir build-gcc
 echo "ROCKBOXDEV: cd build-gcc"
 cd build-gcc
 echo "ROCKBOXDEV: gcc/configure"
-../gcc-$gccver/configure --target=$target --prefix=$prefix/$target --enable-languages=c $gccconfigure
+# we undefine _FORTIFY_SOURCE to make the gcc build go through fine on
+# recent Ubuntu installations
+CPPFLAGS=-U_FORTIFY_SOURCE ../gcc-$gccver/configure --target=$target --prefix=$prefix/$target --enable-languages=c $gccconfigure
 echo "ROCKBOXDEV: gcc/make"
 $make
 echo "ROCKBOXDEV: gcc/make install to $prefix/$target"
