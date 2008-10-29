@@ -1046,6 +1046,7 @@ target/arm/as3525/as3525-codec.c
 #ifndef SIMULATOR
 target/arm/as3525/sansa-e200v2/lcd-e200v2.c
 target/arm/as3525/sansa-e200v2/button-e200v2.c
+target/arm/as3525/sansa-e200v2/backlight-e200v2.c
 target/arm/as3525/as3525-codec.c
 #endif /* !SIMULATOR */
 #endif /* SANSA_E200V2 */

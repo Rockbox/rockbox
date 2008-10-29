@@ -228,6 +228,8 @@ void lcd_init_device(void)
         lcd_write_data(p_bytes, LCD_FULLSCREEN /* overscan */);
     }
 
+    lcd_enable(true);
+
     lcd_update();
 }
 

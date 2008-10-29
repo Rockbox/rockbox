@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2008 ??
+ * Copyright (C) 2006 Barry Wardell
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,17 +21,12 @@
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-static inline bool _backlight_init(void)
-{
-    return true;
-}
+#define _backlight_init() true
+void _backlight_on(void);
+void _backlight_off(void);
+void _backlight_set_brightness(int brightness);
+int  __backlight_is_on(void);
 
-static inline void _backlight_on(void)
-{
-}
-
-static inline void _backlight_off(void)
-{
-}
-
+void _buttonlight_on(void);
+void _buttonlight_off(void);
 #endif

@@ -25,10 +25,11 @@
 #include <stdio.h>
 #include <system.h>
 #include <inttypes.h>
-#include "lcd.h"
-#include "common.h"
 #include "config.h"
+#include "lcd.h"
+#include "backlight-target.h"
 #include "as3525-codec.h"
+#include "common.h"
 
 int show_logo(void);
 void main(void)
@@ -38,19 +39,15 @@ void main(void)
 
     system_init();
 
-    lcd_init_device();
-    lcd_clear_display();
-
-    lcd_update();
-
-#ifdef HAVE_LCD_ENABLE
-    lcd_enable(true);
-#endif
+    lcd_init();
 
     show_logo();
 
+    as3525_codec_init();  /* Required for backlight on e200v2 */
+
+    _backlight_on();
+
     /* show player id to demonstrate communication with codec part */
-    as3525_codec_init();
     for (i = 0; i < 8; i++) {
         buf[i] = as3525_codec_read(0x38 + i);
     }
