@@ -31,11 +31,9 @@ DEPFILE = $(OBJDIR)/dep-firmware
 
 all: $(OUTPUT) $(EXTRA_TARGETS)
 
-$(DEPFILE): $(BUILDDIR)/sysfont.h
-
 dep: $(DEPFILE)
 
-$(OUTPUT): $(OBJS) $(DEPFILE)
+$(OUTPUT): $(BUILDDIR)/sysfont.h $(OBJS) $(DEPFILE)
 	$(call PRINTS,AR+RANLIB $(@F))$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
 	$(SILENT)$(RANLIB) $@
 
