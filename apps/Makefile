@@ -106,19 +106,19 @@ build-codecs:
 	$(SILENT)$(MAKE) -C codecs/lib OBJDIR=$(OBJDIR)/codecs/lib
 	$(SILENT)$(MAKE) -C codecs OBJDIR=$(OBJDIR)/codecs
 
-build-bitmapsmono:
+recorder/icons.h: $(BITMAPLIBS)
+
+$(BUILDDIR)/libbitmapsmono.a:
 	$(call PRINTS,MAKE in bitmaps/mono)$(MAKE) -C bitmaps/mono OBJDIR=$(OBJDIR)/bitmaps/mono
 
-build-bitmapsnative:
+$(BUILDDIR)/libbitmapsnative.a:
 	$(call PRINTS,MAKE in bitmaps/native)$(MAKE) -C bitmaps/native OBJDIR=$(OBJDIR)/bitmaps/native
 
-build-bitmapsremotemono:
+$(BUILDDIR)/libbitmapsremotemono.a:
 	$(call PRINTS,MAKE in bitmaps/remote_mono)$(MAKE) -C bitmaps/remote_mono OBJDIR=$(OBJDIR)/bitmaps/remote_mono
 
-build-bitmapsremotenative:
+$(BUILDDIR)/libbitmapsremotenative.a:
 	$(call PRINTS,MAKE in bitmaps/remote_native)$(MAKE) -C bitmaps/remote_native OBJDIR=$(OBJDIR)/bitmaps/remote_native
-
-$(BITMAPLIBS): $(BUILDDIR)/lib%.a: build-%
 
 rocks: build-codecs
 	$(SILENT)$(MAKE) -C plugins/lib OBJDIR=$(OBJDIR)/plugins/lib
