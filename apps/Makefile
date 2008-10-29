@@ -94,8 +94,6 @@ endif
 all: $(REALBIN) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
 endif
 
-$(DEPFILE): $(BITMAPLIBS)
-
 dep: $(DEPFILE)
 
 features: $(OBJDIR)/features
@@ -138,12 +136,12 @@ $(MAXOUTFILE):
 	$(SILENT)cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
 	$(SILENT)rm $(MAXINFILE)
 
-$(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(DEPFILE) $(LIBROCKBOX) $(VOICE) $(BITMAPLIBS)
+$(OBJDIR)/rombox.elf : $(BITMAPLIBS) $(OBJS) $(LINKROM) $(DEPFILE) $(LIBROCKBOX) $(VOICE)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lgcc $(LINKVOICE) $(LINKBITMAPS) -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
 
 ifndef SIMVER
 
-$(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX) $(VOICE) $(BITMAPLIBS)
+$(OBJDIR)/rockbox.elf : $(BITMAPLIBS) $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX) $(VOICE) 
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS)  -L$(BUILDDIR)/firmware -L$(BUILDDIR) -lrockbox $(LINKVOICE) $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 $(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf
@@ -188,8 +186,8 @@ else
 #SIMULATOR_MAP=-Wl,-Map,$(OBJDIR)/rockbox.map
 endif
 
-$(BUILDDIR)/$(BINARY) : $(OBJS) $(DEPFILE) $(BUILDDIR)/libsim.a \
-	$(BUILDDIR)/libcomsim.a $(LIBROCKBOX) $(VOICE) $(BITMAPLIBS)
+$(BUILDDIR)/$(BINARY) : $(BITMAPLIBS) $(OBJS) $(DEPFILE) $(BUILDDIR)/libsim.a \
+	$(BUILDDIR)/libcomsim.a $(LIBROCKBOX) $(VOICE) 
 	$(call PRINTS,LD $(BINARY))$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lsim -lcomsim $(LINKVOICE) $(LINKBITMAPS) $(LDOPTS) $(EXTRAOBJ) $(SIMULATOR_MAP)
 endif
 
