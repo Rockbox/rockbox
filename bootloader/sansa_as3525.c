@@ -30,6 +30,7 @@
 #include "backlight-target.h"
 #include "as3525-codec.h"
 #include "common.h"
+#include "ata.h"
 
 int show_logo(void);
 void main(void)
@@ -52,7 +53,9 @@ void main(void)
         buf[i] = as3525_codec_read(0x38 + i);
     }
     printf("ID: %02X%02X%02X%02X%02X%02X%02X%02X", buf[7], buf[6], buf[5], buf[4], buf[3], buf[2], buf[1], buf[0]);
-    
+
+    ata_init();
+
 #ifdef SANSA_CLIP
     /* Use hardware scrolling */
 
