@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# Abort execution as soon as an error is encountered
+# That way the script do not let the user think the process completed correctly
+# and leave the opportunity to fix the problem and restart compilation where
+# it stopped
+set -e
+
 # this is where this script will store downloaded files and check for already
 # downloaded files
 dlwhere="/tmp/rbdev-dl"
