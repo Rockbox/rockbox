@@ -92,7 +92,7 @@ extern int trickle_sec;          /* trickle charge: How many seconds per minute 
 
 #endif /* CONFIG_CHARGING == CHARGING_CONTROL */
 
-#ifdef HAVE_MMC  /* Values for Ondio */
+#if defined(ARCHOS_ONDIOSP) || defined(ARCHOS_ONDIOFM) /* Values for Ondio */
 # define CURRENT_NORMAL     95  /* average, nearly proportional to 1/U */
 # define CURRENT_USB         1  /* host powered in USB mode; avoid zero-div */
 # define CURRENT_BACKLIGHT   0  /* no backlight */
