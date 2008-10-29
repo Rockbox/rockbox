@@ -601,9 +601,6 @@ void default_state(struct sudoku_state_t* state)
 
     /* initialize the saved board so reload function works */
     rb->memcpy(state->savedboard,state->currentboard,81);
-#ifdef SUDOKU_BUTTON_POSSIBLE
-    rb->memcpy(state->savedpossible,state->possiblevals,81);
-#endif
 
     state->x=0;
     state->y=0;
@@ -1111,9 +1108,6 @@ bool sudoku_generate(struct sudoku_state_t* state)
     }
     /* initialize the saved board so reload function works */
     rb->memcpy(state->savedboard,state->currentboard,81);
-#ifdef SUDOKU_BUTTON_POSSIBLE
-    rb->memcpy(state->savedpossible,state->possiblevals,81);
-#endif
     return res;
 }
 
