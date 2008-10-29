@@ -81,15 +81,6 @@ eof_n2e:
     rts
     mov     src, r0
 
-    .align  2
-get1_n2e:  ! in: T bit set
-    mov.b   @src+, bits ! SH1 sign-extends on load
-    rotcl   bits        ! LSB = T, T = MSB
-    shll16  bits
-    rts
-    shll8   bits
-
-    .align  2
 lit_n2e:
     mov.b   @src, tmp
     add     #1, src     ! Need to fill the pipeline latency anyway
@@ -135,6 +126,13 @@ len_n2e:
     bra     gotlen_n2e
     add     #6-2, len
 
+get1_n2e:               ! in: T bit set
+    mov.b   @src+, bits ! SH1 sign-extends on load
+    rotcl   bits        ! LSB = T, T = MSB
+    shll16  bits
+    rts
+    shll8   bits
+
 lenlast_n2e:
     getnextb(len)       ! 0,1,2,3
     add     #2, len
@@ -143,11 +141,11 @@ gotlen_n2e:
     movt    tmp          ! too far away, so minimum match length is 3
     add     tmp, len
 copy_n2e:
-    add     #-1, len
     mov.b   @(off,dst), tmp
-    tst     len, len
+    add     #-1, len
     mov.b   tmp, @dst
     add     #1, dst
+    tst     len, len
     bf      copy_n2e
     bra     top_n2e
     nop
