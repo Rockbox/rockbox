@@ -94,7 +94,7 @@ static void lcd_delay(int x)
 /* DBOP initialisation, do what OF does */
 static void ams3525_dbop_init(void)
 {
-    CGU_DBOP = (1<<3) | (4-1);
+    CGU_DBOP = (1<<3) | (4-1);
 
     DBOP_TIMPOL_01 = 0xe167e167;
     DBOP_TIMPOL_23 = 0xe167006e;
@@ -373,7 +373,7 @@ void lcd_update(void)
     if (!display_on)
         return;
 
-    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_SOLID_VERT);
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
 
     /* Set start position and window */
     lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 
@@ -411,7 +411,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (y >= ymax)
         return; /* nothing left to do */
 
-    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_SOLID_VERT);
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
     /* Set start position and window */
     lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 
                   ((y_offset + LCD_HEIGHT-1) << 8) | y_offset);
