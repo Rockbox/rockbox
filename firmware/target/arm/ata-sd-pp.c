@@ -127,7 +127,7 @@
 #define SD_APP_OP_COND  41
 
 /** global, exported variables **/
-#ifdef HAVE_HOTSWAP
+#ifdef HAVE_MULTIVOLUME
 #define NUM_VOLUMES 2
 #else
 #define NUM_VOLUMES 1
@@ -156,7 +156,7 @@ struct sd_card_status
 static struct sd_card_status sd_status[NUM_VOLUMES] =
 {
     { 0, 1  },
-#ifdef HAVE_HOTSWAP
+#ifdef HAVE_MULTIVOLUME
     { 0, 10 }
 #endif
 };
@@ -794,7 +794,7 @@ static void ata_led(bool onoff)
 int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
-#ifndef HAVE_HOTSWAP
+#ifndef HAVE_MULTIVOLUME
     const int drive = 0;
 #endif
     int ret;
@@ -911,7 +911,7 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
 /* Write support is not finished yet */
 /* TODO: The standard suggests using ACMD23 prior to writing multiple blocks
    to improve performance */
-#ifndef HAVE_HOTSWAP
+#ifndef HAVE_MULTIVOLUME
     const int drive = 0;
 #endif
     int ret;
