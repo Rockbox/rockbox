@@ -292,8 +292,9 @@ static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
     }
 }
 
-#if CONFIG_CODEC == SWCODEC
-/* parse user defined text, looking for replaygain information. */
+/* parse user defined text, looking for album artist and replaygain 
+ * information.
+ */
 static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
 {
     char* value = NULL;
@@ -305,13 +306,24 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
          * parse it
          */
         value = tag + desc_len + 1;
-        value_len = parse_replaygain(tag, value, entry, tag,
-            bufferpos - (tag - entry->id3v2buf));
+        value_len = bufferpos - (tag - entry->id3v2buf);
+        
+        if (!strcasecmp(tag, "ALBUM ARTIST")) {
+            strncpy(tag, value, value_len);
+            tag[value_len - 1] = 0;
+            entry->albumartist = tag;
+#if CONFIG_CODEC == SWCODEC
+        } else {
+            value_len = parse_replaygain(tag, value, entry, tag,
+                value_len);
+#endif
+        }
     }
 
     return tag - entry->id3v2buf + value_len;
 }
 
+#if CONFIG_CODEC == SWCODEC
 /* parse RVA2 binary data and convert to replaygain information. */
 static int parserva2( struct mp3entry* entry, char* tag, int bufferpos )
 {
@@ -427,8 +439,8 @@ static const struct tag_resolver taglist[] = {
     { "COMM", 4, offsetof(struct mp3entry, comment), NULL, false }, 
     { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre, false },
     { "TCO",  3, offsetof(struct mp3entry, genre_string), &parsegenre, false },
-#if CONFIG_CODEC == SWCODEC
     { "TXXX", 4, 0, &parseuser, false },
+#if CONFIG_CODEC == SWCODEC
     { "RVA2", 4, 0, &parserva2, true },
 #endif
     { "UFID", 4, 0, &parsembtid, false },
