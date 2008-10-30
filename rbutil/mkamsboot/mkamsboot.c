@@ -91,6 +91,7 @@ execution to the uncompressed firmware.
 
 #include "bootimg_clip.h"
 #include "bootimg_e200v2.h"
+#include "bootimg_fuze.h"
 #include "bootimg_m200v2.h"
 
 /* Win32 compatibility */
@@ -125,7 +126,7 @@ static const char* model_names[] =
 
 static const unsigned char* bootloaders[] = 
 {
-    NULL,
+    bootimg_fuze,
     bootimg_clip,
     NULL,
     bootimg_e200v2,
@@ -135,7 +136,7 @@ static const unsigned char* bootloaders[] =
 
 static const int bootloader_sizes[] = 
 {
-    0,
+    sizeof(bootimg_fuze),
     sizeof(bootimg_clip),
     0,
     sizeof(bootimg_e200v2),
@@ -147,7 +148,7 @@ static const int bootloader_sizes[] =
    -add parameter to the "scramble" tool */
 static const char* rb_model_names[] =
 {
-    NULL,
+    "fuze",
     "clip",
     NULL,
     "e2v2",
@@ -159,7 +160,7 @@ static const char* rb_model_names[] =
    ".sansa" files - these are the same as MODEL_NUMBER in config-target.h */
 static const int rb_model_num[] =
 {
-    0,
+    43,
     40,
     0,
     41,

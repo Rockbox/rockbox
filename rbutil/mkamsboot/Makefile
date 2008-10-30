@@ -10,8 +10,8 @@ LIBUCL=../../tools/ucl/src/libucl.a
 #
 # If anyone reading this wants to improve this makefile, please do!
 
-BOOTIMAGES = bootimg_clip.o bootimg_e200v2.o bootimg_m200v2.o
-BOOTHEADERS = bootimg_clip.h bootimg_e200v2.h bootimg_m200v2.h
+BOOTIMAGES = bootimg_clip.o bootimg_e200v2.o bootimg_m200v2.o bootimg_fuze.o
+BOOTHEADERS = bootimg_clip.h bootimg_e200v2.h bootimg_m200v2.h bootimg_fuze.h
 
 CLIPFILES = dualboot-clip.o dualboot-clip.elf dualboot-clip.o \
             dualboot-clip.bin bootimg_clip.c bootimg_clip.h
@@ -21,6 +21,9 @@ E200V2FILES = dualboot-e200v2.o dualboot-e200v2.elf dualboot-e200v2.o \
 
 M200V2FILES = dualboot-m200v2.o dualboot-m200v2.elf dualboot-m200v2.o \
               dualboot-m200v2.bin bootimg_m200v2.c bootimg_m200v2.h
+
+FUZEFILES = dualboot-fuze.o dualboot-fuze.elf dualboot-fuze.o \
+              dualboot-fuze.bin bootimg_fuze.c bootimg_fuze.h
 
 all: mkamsboot
 
@@ -55,6 +58,23 @@ bootimg_clip.c bootimg_clip.h: dualboot-clip.bin bin2c
 
 bootimg_clip.o: bootimg_clip.c
 	gcc -c -o bootimg_clip.o bootimg_clip.c
+
+# FUZE
+
+dualboot-fuze.o: dualboot.S
+	arm-elf-gcc -DSANSA_FUZE -c -o dualboot-fuze.o dualboot.S
+
+dualboot-fuze.elf: dualboot-fuze.o
+	arm-elf-ld -e 0 -Ttext=0 -o dualboot-fuze.elf dualboot-fuze.o
+
+dualboot-fuze.bin: dualboot-fuze.elf
+	arm-elf-objcopy -O binary dualboot-fuze.elf dualboot-fuze.bin
+
+bootimg_fuze.c bootimg_fuze.h: dualboot-fuze.bin bin2c
+	./bin2c dualboot-fuze.bin bootimg_fuze
+
+bootimg_fuze.o: bootimg_fuze.c
+	gcc -c -o bootimg_fuze.o bootimg_fuze.c
 
 # E200V2
 
@@ -114,4 +134,4 @@ bin2c: bin2c.c
 clean:
 	rm -f mkamsboot mkamsboot.o nrv2e_d8.o nrv2e_d8.elf nrv2e_d8.bin *~ \
 	bin2c uclimg.c uclimg.h uclimg.o md5.o \
-	$(BOOTIMAGES) $(CLIPFILES) $(E200V2FILES) $(M200V2FILES)
+	$(BOOTIMAGES) $(CLIPFILES) $(E200V2FILES) $(M200V2FILES) $(FUZEFILES)

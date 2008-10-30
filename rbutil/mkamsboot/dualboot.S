@@ -132,6 +132,8 @@ uclcopy:
         /* check value read (0 means button pressed) */
         cmp   r2, #0
         beq   boot_of
+#elif defined(SANSA_FUZE)
+        /* no pinout known except A3 */
 #else
         #error No target-specific key check defined!
 #endif
