@@ -277,7 +277,9 @@ mkdir build-binu
 echo "ROCKBOXDEV: cd build-binu"
 cd build-binu
 echo "ROCKBOXDEV: binutils/configure"
-../binutils-$binutils/configure --target=$target --prefix=$prefix/$target $binutilsconf
+# we undefine _FORTIFY_SOURCE to make the binutils built run fine on recent
+# Ubuntu installations
+CFLAGS=-U_FORTIFY_SOURCE ../binutils-$binutils/configure --target=$target --prefix=$prefix/$target $binutilsconf
 echo "ROCKBOXDEV: binutils/make"
 $make
 echo "ROCKBOXDEV: binutils/make install to $prefix/$target"
@@ -293,7 +295,7 @@ cd build-gcc
 echo "ROCKBOXDEV: gcc/configure"
 # we undefine _FORTIFY_SOURCE to make the gcc build go through fine on
 # recent Ubuntu installations
-CPPFLAGS=-U_FORTIFY_SOURCE ../gcc-$gccver/configure --target=$target --prefix=$prefix/$target --enable-languages=c $gccconfigure
+CFLAGS=-U_FORTIFY_SOURCE ../gcc-$gccver/configure --target=$target --prefix=$prefix/$target --enable-languages=c $gccconfigure
 echo "ROCKBOXDEV: gcc/make"
 $make
 echo "ROCKBOXDEV: gcc/make install to $prefix/$target"
