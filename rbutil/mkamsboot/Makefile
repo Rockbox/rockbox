@@ -20,18 +20,21 @@ E200V2FILES = dualboot-e200v2.o dualboot-e200v2.elf dualboot-e200v2.o \
               dualboot-e200v2.bin bootimg_e200v2.c bootimg_e200v2.h
 
 M200V2FILES = dualboot-m200v2.o dualboot-m200v2.elf dualboot-m200v2.o \
-              dualboot-m200v2.bin bootimg_m200v2.c bootimg_m200v2.h              
-              
+              dualboot-m200v2.bin bootimg_m200v2.c bootimg_m200v2.h
+
 all: mkamsboot
 
 $(LIBUCL):
 	make -C ../../tools/ucl/src libucl.a
 
-mkamsboot.o: mkamsboot.c $(BOOTHEADERS) uclimg.h
+md5.o: md5.c md5.h
+	gcc $(CFLAGS) -c -o md5.o -W -Wall md5.c
+
+mkamsboot.o: mkamsboot.c $(BOOTHEADERS) uclimg.h md5.h
 	gcc $(CFLAGS) -c -o mkamsboot.o -W -Wall mkamsboot.c
 
-mkamsboot: mkamsboot.o $(BOOTIMAGES) uclimg.o $(LIBUCL)
-	gcc -o mkamsboot mkamsboot.o $(BOOTIMAGES) uclimg.o $(LIBUCL)
+mkamsboot: mkamsboot.o $(BOOTIMAGES) uclimg.o md5.o $(LIBUCL)
+	gcc -o mkamsboot mkamsboot.o $(BOOTIMAGES) uclimg.o md5.o $(LIBUCL)
 
 # Rules for our test ARM application - assemble, link, then extract
 # the binary code
@@ -110,5 +113,5 @@ bin2c: bin2c.c
 
 clean:
 	rm -f mkamsboot mkamsboot.o nrv2e_d8.o nrv2e_d8.elf nrv2e_d8.bin *~ \
-	bin2c uclimg.c uclimg.h uclimg.o \
+	bin2c uclimg.c uclimg.h uclimg.o md5.o \
 	$(BOOTIMAGES) $(CLIPFILES) $(E200V2FILES) $(M200V2FILES)

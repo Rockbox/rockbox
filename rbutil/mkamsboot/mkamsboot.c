@@ -87,6 +87,8 @@ execution to the uncompressed firmware.
 
 /* Headers for ARM code binaries */
 #include "uclimg.h"
+#include "md5.h"
+
 #include "bootimg_clip.h"
 #include "bootimg_e200v2.h"
 #include "bootimg_m200v2.h"
@@ -165,6 +167,39 @@ static const int rb_model_num[] =
     0
 };
 
+struct md5sums {
+    int model;
+    char *version;
+    int fw_version;
+    char *md5;
+};
+
+/* Checksums of unmodified original firmwares - for safety, and device
+   detection */
+static struct md5sums sansasums[] = {
+    /* NOTE: Different regional versions of the firmware normally only
+             differ in the filename - the md5sums are identical */
+    { MODEL_E200, "3.01.11",   1, "e622ca8cb6df423f54b8b39628a1f0a3" },
+    { MODEL_E200, "3.01.14",   1, "2c1d0383fc3584b2cc83ba8cc2243af6" },
+    { MODEL_E200, "3.01.16",   1, "12563ad71b25a1034cf2092d1e0218c4" },
+
+    { MODEL_FUZE, "1.01.11",   1, "cac8ffa03c599330ac02c4d41de66166" },
+    { MODEL_FUZE, "1.01.15",   1, "df0e2c1612727f722c19a3c764cff7f2" },
+
+    { MODEL_C200, "3.02.05",   1, "b6378ebd720b0ade3fad4dc7ab61c1a5" },
+
+    { MODEL_M200, "4.00.45",   1, "82e3194310d1514e3bbcd06e84c4add3" },
+    { MODEL_M200, "4.01.08-A", 1, "fc9dd6116001b3e6a150b898f1b091f0" },
+    { MODEL_M200, "4.01.08-E", 1, "d3fb7d8ec8624ee65bc99f8dab0e2369" },
+
+    { MODEL_CLIP, "1.01.17",   1, "12caad785d506219d73f538772afd99e" },
+    { MODEL_CLIP, "1.01.18",   1, "d720b266bd5afa38a198986ef0508a45" },
+    { MODEL_CLIP, "1.01.20",   1, "236d8f75189f468462c03f6d292cf2ac" },
+    { MODEL_CLIP, "1.01.29",   1, "b07fe36b338241944c241de21fb1e490" },
+    { MODEL_CLIP, "1.01.30",   1, "f2974d47c536549c9d8259170f1dbe4d" },
+};
+
+#define NUM_MD5S (sizeof(sansasums)/sizeof(sansasums[0]))
 
 static off_t filesize(int fd) {
     struct stat buf;
@@ -194,6 +229,21 @@ static void put_uint32le(unsigned char* p, uint32_t x)
     p[2] = (x >> 16) & 0xff;
     p[3] = (x >> 24) & 0xff;
 }
+
+void calc_MD5(unsigned char* buf, int len, char *md5str)
+{
+    int i;
+    md5_context ctx;
+    unsigned char md5sum[16];
+    
+    md5_starts(&ctx);
+    md5_update(&ctx, buf, len);
+    md5_finish(&ctx, md5sum);
+
+    for (i = 0; i < 16; ++i)
+        sprintf(md5str + 2*i, "%02x", md5sum[i]);
+}
+
 
 static uint32_t calc_checksum(unsigned char* buf, uint32_t n)
 {
@@ -375,6 +425,7 @@ int main(int argc, char* argv[])
     int totalsize;
     unsigned char* p;
     uint32_t checksum;
+    char md5sum[33]; /* 32 hex digits, plus terminating zero */
 
     fprintf(stderr,"mkamsboot v" VERSION " - (C) Dave Chapman and Rafaël Carré 2008\n");
     fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
@@ -397,26 +448,48 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    /* Calculate MD5 checksum of OF */
+    calc_MD5(buf, len, md5sum);
+
+    fprintf(stderr,"[INFO] MD5 sum - %s\n",md5sum);
+
+    i = 0;
+    while ((i < NUM_MD5S) && (strcmp(sansasums[i].md5, md5sum) != 0))
+        i++;
+
+    if (i < NUM_MD5S) {
+        model = sansasums[i].model;
+        fw_version = sansasums[i].fw_version;
+        fprintf(stderr,"[INFO] Original firmware MD5 checksum match - %s %s\n",
+                       model_names[model], sansasums[i].version);
+    } else {
+        fprintf(stderr,"[WARN] ****** Original firmware unknown ******\n");
+        
+        if (get_uint32le(&buf[0x204])==0x0000f000) {
+            fw_version = 2;
+            model_id = buf[0x219];
+        } else {
+            fw_version = 1;
+            model_id = buf[0x215];
+        }
+
+        model = get_model(model_id);
+
+        if (model == MODEL_UNKNOWN) {
+            fprintf(stderr,"[ERR]  Unknown firmware - model id 0x%02x\n",
+                           model_id);
+            free(buf);
+            return 1;
+        }
+    }
+    
+
     /* TODO: Do some more sanity checks on the OF image. Some images (like m200v2) dont have a checksum at the end, only padding (0xdeadbeef). */
     checksum = get_uint32le(buf + len - 4); 
     if (checksum != 0xefbeadde && checksum != calc_checksum(buf, len - 4)) {
 
         fprintf(stderr,"[ERR]  Whole file checksum failed - %s\n",infile);
-        return 1;
-    }
-
-    if (get_uint32le(&buf[0x204])==0x0000f000) {
-        fw_version = 2;
-        model_id = buf[0x219];
-    } else {
-        fw_version = 1;
-        model_id = buf[0x215];
-    }
-
-    model = get_model(model_id);
-
-    if (model == MODEL_UNKNOWN) {
-        fprintf(stderr,"[ERR]  Unknown firmware - model id 0x%02x\n",model_id);
+        free(buf);
         return 1;
     }
 
@@ -430,6 +503,7 @@ int main(int argc, char* argv[])
     rb_unpacked = load_rockbox_file(bootfile, model, &bootloader_size);
     if (rb_unpacked == NULL) {
         fprintf(stderr,"[ERR]  Could not load %s\n",bootfile);
+        free(buf);
         return 1;
     }
 
