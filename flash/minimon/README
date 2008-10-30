@@ -4,3 +4,6 @@ MiniMon is the tiny but powerful-enough piece of code that can be loaded
 with the UART boot mod. 
 It allows to read and write memory, flash program, execute code.
 This is suitable to reflash the box, load Rockbox or the gdb stub, etc.
+
+The SVN version is linked to 0x0ffff000, i.e. start of IRAM.
+This address has to match the address uart_boot downloads it to.

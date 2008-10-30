@@ -46,7 +46,7 @@ int main(void)
 	UINT32 size;
 	UINT32 content;
 	volatile UINT8* paddr = 0;
-	volatile UINT8* pflash; // flash base address
+	volatile UINT8* pflash = 0; // flash base address
 
 	while (1)
 	{

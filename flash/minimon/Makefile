@@ -40,7 +40,7 @@ LINKFILE = $(OBJDIR)/$(TARGET).lds
 
 $(OBJDIR)/$(TARGET).bin : $(OBJDIR)/$(TARGET).elf
 	$(OC) -O binary $(OBJDIR)/$(TARGET).elf $(OBJDIR)/$(TARGET).bin
-	$(TOOLSDIR)/sh2d $(OBJDIR)/$(TARGET).bin -o 0900000 > $(OBJDIR)/$(TARGET).asm
+	$(TOOLSDIR)/sh2d $(OBJDIR)/$(TARGET).bin -o 0x0ffff000 > $(OBJDIR)/$(TARGET).asm
 
 $(OBJDIR)/$(TARGET).elf : $(OBJS) 
 	$(CC) -Os -nostdlib -o $(OBJDIR)/$(TARGET).elf -L$(OBJDIR) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$(TARGET).map

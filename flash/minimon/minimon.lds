@@ -3,7 +3,7 @@ INPUT(minimon.o)
 
 MEMORY
 {
-	DRAM : ORIGIN = 0x09000000, LENGTH = 0x200000
+	IRAM : ORIGIN = 0x0FFFF000, LENGTH = 0x500
 }
 
 SECTIONS
@@ -12,22 +12,22 @@ SECTIONS
 	{
 		*(.startvector)    
 		. = ALIGN(0x4);
-	} > DRAM
+	} > IRAM
 
 	.got :
 	{
 	   *(.got)
-	} > DRAM
+	} > IRAM
 
 	.got.plt :
 	{
 	   *(.got.plt)
-	} > DRAM
+	} > IRAM
 
 	.rela.got :
 	{
 	   *(.rela.got)
-	} > DRAM
+	} > IRAM
 
 	.text :    
 	{	 
@@ -35,26 +35,26 @@ SECTIONS
 		*(.entry)
 		*(.text)	
 		. = ALIGN(0x4);
-	} > DRAM
+	} > IRAM
 	
 	.data :
 	{
 		*(.data)
-	} > DRAM
+	} > IRAM
 
 	.rodata :
 	{
 		*(.rodata)
 		. = ALIGN(0x4);
-	} > DRAM
+	} > IRAM
 
 	.bss :
 	{
 	   *(.bss)
-	} > DRAM
+	} > IRAM
 
 	.stack :
 	{
 	   *(.stack)
-	} > DRAM
+	} > IRAM
 }
