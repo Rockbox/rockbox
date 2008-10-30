@@ -584,6 +584,20 @@ void sudoku_solve(struct sudoku_state_t* state)
     return;
 }
 
+/* Copies the current to the saved board */
+static void save_state(struct sudoku_state_t *state)
+{
+    rb->memcpy(state->savedboard, state->currentboard,
+            sizeof(state->savedboard));
+}
+
+/* Copies the saved to the current board */
+static void restore_state(struct sudoku_state_t *state)
+{
+    rb->memcpy(state->currentboard, state->savedboard,
+            sizeof(state->savedboard));
+}
+
 void default_state(struct sudoku_state_t* state)
 {
     int r,c;
@@ -600,7 +614,7 @@ void default_state(struct sudoku_state_t* state)
     }
 
     /* initialize the saved board so reload function works */
-    rb->memcpy(state->savedboard,state->currentboard,81);
+    save_state(state);
 
     state->x=0;
     state->y=0;
@@ -775,7 +789,7 @@ bool load_sudoku(struct sudoku_state_t* state, char* filename)
 
     /* Save a copy of the saved state - so we can reload without using the
        disk */
-    rb->memcpy(state->savedboard,state->currentboard,81);
+    save_state(state);
     return(true);
 }
 
@@ -823,16 +837,11 @@ bool save_sudoku(struct sudoku_state_t* state)
         rb->reload_directory();
         /* Save a copy of the saved state - so we can reload without
            using the disk */
-        rb->memcpy(state->savedboard,state->currentboard,81);
+        save_state(state);
         return true;
     } else {
         return false;
     }
-}
-
-void restore_state(struct sudoku_state_t* state)
-{
-    rb->memcpy(state->currentboard,state->savedboard,81);
 }
 
 void clear_board(struct sudoku_state_t* state)
@@ -1107,7 +1116,7 @@ bool sudoku_generate(struct sudoku_state_t* state)
         rb->splash(HZ*2, "Aborted");
     }
     /* initialize the saved board so reload function works */
-    rb->memcpy(state->savedboard,state->currentboard,81);
+    save_state(state);
     return res;
 }
 
