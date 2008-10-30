@@ -2,13 +2,19 @@
 
 This tool composes a firmware file, out of:
 1. Template for the first Flash page
-2. Bootloader
-3. Archos image
-4. Rockbox image
+2. Flash bootloader
+3. First (alternate) image - usually bootbox
+4. Second (main) image - rockbox or rombox. Can be left blank
 
 Use with extreme caution, the components have to match!
 The aspects are:
-- Model (Player, Recorder, FM, V2)
+- Model (Player, Recorder, FM, V2, Ondio FM, Ondio SP)
 - boot type (standard boot ROM or ROMless)
+
+If you need to adjust the size of the flash bootloader or the first
+image in order to match a desired rombox link address, do not try to
+pad the files manually! It will most probably lead to a non-working
+firmware file. You can pad the bootloader by including a dummy
+initialized array instead (at least one element needs to be non-zero).
 
 Such a firmware file can then be programmed with "firmware_flash.rock".
