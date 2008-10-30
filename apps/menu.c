@@ -397,6 +397,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         menu = &main_menu_;
     else menu = start_menu;
     
+    init_default_menu_viewports(menu_vp, hide_bars);
+    
     if (parent)
     {
         vps = parent;
@@ -405,7 +407,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     else
     {
         vps = menu_vp;
-        init_default_menu_viewports(vps, hide_bars);
     }
     FOR_NB_SCREENS(i)
     {
@@ -438,7 +439,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                             list_do_action_timeout(&lists, HZ));
         /* HZ so the status bar redraws corectly */
         
-        if (action != ACTION_NONE && menu_callback)
+        if (menu_callback)
         {
             int old_action = action;
             action = menu_callback(action, menu);
@@ -584,12 +585,11 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                         return_value = temp->function->function();
                     if (!(menu->flags&MENU_EXITAFTERTHISMENU) || (temp->flags&MENU_EXITAFTERTHISMENU))
                     {
-                        init_default_menu_viewports(menu_vp, hide_bars);
                         init_menu_lists(menu, &lists, selected, true, vps);
                     }
                     if (temp->flags&MENU_FUNC_CHECK_RETVAL)
                     {
-                        if (return_value == 1)
+                        if (return_value != 0)
                         {
                             done = true;
                             ret =  return_value;
@@ -602,7 +602,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 {
                     if (do_setting_from_menu(temp, menu_vp))
                     {
-                        init_default_menu_viewports(menu_vp, hide_bars);
                         init_menu_lists(menu, &lists, selected, true,vps);
                         redraw_lists = false; /* above does the redraw */
                     }
@@ -661,6 +660,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         
         if (redraw_lists && !done)
         {
+            if (menu_callback)
+                menu_callback(ACTION_REDRAW, menu);
             gui_synclist_draw(&lists);
             gui_synclist_speak_item(&lists);
         }
