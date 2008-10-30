@@ -2,7 +2,6 @@
    where the flash ROM is mirrored to address zero */
 
 OUTPUT_FORMAT(elf32-sh)
-INPUT(bootloader.o)
 
 MEMORY
 {
@@ -29,6 +28,7 @@ SECTIONS
 	{	 
 		_begin_text = .;
 		*(.text)	
+		*(.icode)
 		. = ALIGN(0x4);
 		_end_text = .;
 	} > IRAM

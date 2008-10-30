@@ -1,5 +1,4 @@
 OUTPUT_FORMAT(elf32-sh)
-INPUT(bootloader.o)
 
 MEMORY
 {
@@ -19,6 +18,7 @@ SECTIONS
 	.text :
 	{	 
 		*(.text)	
+		*(.icode)
 		. = ALIGN(0x4);
 	} > IRAM
 	

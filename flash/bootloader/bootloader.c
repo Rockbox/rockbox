@@ -29,7 +29,6 @@
 
 // prototypes
 static void PlatformInit(void);
-static int ucl_nrv2e_decompress_8(const UINT8 *src, UINT8 *dst, UINT32* dst_len);
 static void DecompressStart(tImage* pImage);
 #ifdef USE_ADC
 static int ReadADC(int channel);
@@ -41,7 +40,7 @@ static void SetLed(BOOL bOn);
 static void UartInit(void);
 static UINT8 UartRead(void);
 static void UartWrite(UINT8 byte);
-static void MiniMon(void);
+static void MiniMon(void);    
 
 
 #ifdef NO_ROM
@@ -185,72 +184,6 @@ static void PlatformInit(void)
     DCR |= 0x1000; /* enable burst mode on DRAM */
     BCR |= 0x2000; /* activate Warp mode (simultaneous internal and external
                     * mem access) */
-}
-
-
-/* Thinned out version of the UCL 2e decompression sourcecode
- * Original (C) Markus F.X.J Oberhumer under GNU GPL license */
-#define GETBIT(bb, src, ilen) \
-    (((bb = bb & 0x7f ? bb*2 : ((unsigned)src[ilen++]*2+1)) >> 8) & 1)
-
-static int ucl_nrv2e_decompress_8(
-    const UINT8 *src, UINT8 *dst, UINT32* dst_len)
-{
-    UINT32 bb = 0;
-    unsigned ilen = 0, olen = 0, last_m_off = 1;
-
-    for (;;)
-    {
-        unsigned m_off, m_len;
-
-        while (GETBIT(bb,src,ilen))
-        {
-            dst[olen++] = src[ilen++];
-        }
-        m_off = 1;
-        for (;;)
-        {
-            m_off = m_off*2 + GETBIT(bb,src,ilen);
-            if (GETBIT(bb,src,ilen)) break;
-            m_off = (m_off-1)*2 + GETBIT(bb,src,ilen);
-        }
-        if (m_off == 2)
-        {
-            m_off = last_m_off;
-            m_len = GETBIT(bb,src,ilen);
-        }
-        else
-        {
-            m_off = (m_off-3)*256 + src[ilen++];
-            if (m_off == 0xffffffff)
-                break;
-            m_len = (m_off ^ 0xffffffff) & 1;
-            m_off >>= 1;
-            last_m_off = ++m_off;
-        }
-        if (m_len)
-            m_len = 1 + GETBIT(bb,src,ilen);
-        else if (GETBIT(bb,src,ilen))
-            m_len = 3 + GETBIT(bb,src,ilen);
-        else
-        {
-            m_len++;
-            do {
-                m_len = m_len*2 + GETBIT(bb,src,ilen);
-            } while (!GETBIT(bb,src,ilen));
-            m_len += 3;
-        }
-        m_len += (m_off > 0x500);
-        {
-            const UINT8 *m_pos;
-            m_pos = dst + olen - m_off;
-            dst[olen++] = *m_pos++;
-            do dst[olen++] = *m_pos++; while (--m_len > 0);
-        }
-    }
-    *dst_len = olen;
-
-    return ilen;
 }
 
 

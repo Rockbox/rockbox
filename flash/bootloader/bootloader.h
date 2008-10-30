@@ -77,6 +77,7 @@ typedef struct
 #define FW_VERSION *(unsigned short*)(FLASH_BASE + 0xFE) // firmware version
 
 // prototypes
+int ucl_nrv2e_decompress_8(const UINT8 *src, UINT8 *dst, UINT32* dst_len);
 void _main(void) __attribute__ ((section (".startup")));
 int main(void);
 

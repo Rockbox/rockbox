@@ -46,7 +46,7 @@ endif
 
 SRC := $(wildcard *.c)
 
-OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
+OBJS := $(SRC:%.c=$(OBJDIR)/%.o) $(OBJDIR)/sh_nrv2e_d8.o
 
 ifdef NO_ROM
 LINKFILE = $(OBJDIR)/no_rom.lds
@@ -64,9 +64,12 @@ ifndef NO_ROM
 	$(TOOLSDIR)/scramble $(OBJDIR)/$(TARGET).bin $(OBJDIR)/$(TARGET).ajz
 endif
 
-$(OBJDIR)/$(TARGET).elf : $(OBJS) 
-	$(CC) -Os -nostdlib -o $(OBJDIR)/$(TARGET).elf -L$(OBJDIR) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$(TARGET).map
+$(OBJDIR)/$(TARGET).elf : $(OBJS)
+	$(CC) -Os -nostdlib -o $@ $(OBJS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$(TARGET).map
 
+# cross-reference, saves code duplication
+$(OBJDIR)/sh_nrv2e_d8.o : ../../firmware/decompressor/sh_nrv2e_d8.S
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	-rm -f \
