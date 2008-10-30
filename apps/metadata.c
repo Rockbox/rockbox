@@ -66,7 +66,7 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
         AFMT_ENTRY("WAV",  "wav",     "wav_enc",     "wav\0"      ),
     /* Ogg Vorbis */
     [AFMT_OGG_VORBIS] =
-        AFMT_ENTRY("Ogg",  "vorbis",  NULL,          "ogg\0"      ),
+        AFMT_ENTRY("Ogg",  "vorbis",  NULL,          "ogg\0oga\0" ),
     /* FLAC */
     [AFMT_FLAC] =
         AFMT_ENTRY("FLAC", "flac",    NULL,          "flac\0"     ),

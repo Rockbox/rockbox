@@ -57,6 +57,7 @@ static const struct filetype inbuilt_filetypes[] = {
     /* Temporary hack to allow playlist creation */
     { "mp1", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "ogg", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "oga", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "wma", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "wmv", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "asf", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
