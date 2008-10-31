@@ -83,9 +83,15 @@ printf O ("Manufacturer: %s\n", $ENV{'MANUFACTURER'});
 printf O ("Version: %s\n", $ENV{'VERSION'});
 printf O ("Binary: %s\n", $ENV{'BINARY'});
 printf O ("Binary size: %s\n", filesize($ENV{'BINARY'}));
-printf O ("Actual size: %s\n", filesize("apps/rockbox.bin"));
-printf O ("RAM usage: %s\n", mapscan("apps/rockbox.map"));
-printf O ("Features: %s\n", features("apps/features"));
+
+if ($ENV{'APPSDIR'} =~ /\/apps$/) {
+  printf O ("Actual size: %s\n", filesize("apps/rockbox.bin"));
+  printf O ("RAM usage: %s\n", mapscan("apps/rockbox.map"));
+  printf O ("Features: %s\n", features("apps/features"));
+} elsif ($ENV{'APPSDIR'} =~ /\/bootloader$/) {
+  printf O ("Actual size: %s\n", filesize("bootloader/bootloader.bin"));
+  printf O ("RAM usage: %s\n", mapscan("bootloader/bootloader.map"));
+}
 
 # Variables identifying tool and build environment details
 printf O ("gcc: %s\n", cmd1line("$ENV{'CC'} --version"));
