@@ -31,7 +31,7 @@
 
 #define     NAND_AS3525 0
 #define     SD_AS3525   1
-static int pl180_base[2] = { NAND_FLASH_BASE, SD_MCI_BASE };
+static const int pl180_base[2] = { NAND_FLASH_BASE, SD_MCI_BASE };
 
 /* ARM PL180 registers */
 #define MMC_POWER(i)       (*(volatile unsigned long *) (pl180_base[i]+0x00))
@@ -298,7 +298,7 @@ int ata_init(void)
 
     GPIOC_DIR &= ~(1<<1);
     if(GPIOC_PIN(1))
-        CCU_SPARE1 |= 4;    /* sets bit 3 of undocumented register */
+        CCU_SPARE1 |= 4;    /* sets bit 2 of undocumented register */
     else
         CCU_SPARE1 &= ~4;   /* or clear it */
 
