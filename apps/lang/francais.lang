@@ -43,7 +43,7 @@
 #    
 #    Refonte totale du fichier par Mustapha Senhaji (Moos) <moos75 AT gmail.com>
 #    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006, Mar 2007, Sep 2007,
-#    Oct 2007, Nov 2007, Dec 2007, Jan 2008, Avril 2008, Août 2008
+#    Oct 2007, Nov 2007, Dec 2007, Jan 2008, Avril 2008, Août 2008, Oct 2008
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -800,6 +800,23 @@
   </dest>
   <voice>
     *: "Mono droit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFTRIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Mono gauche + droit"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Mono gauche plus droit"
   </voice>
 </phrase>
 <phrase>
@@ -8429,6 +8446,8 @@
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
     h10,h10_5gb,e200*,c200: "PREV to abort"
+    gigabeats: "BACK to abort"
+    gigabeatf:"POWER to abort"
   </source>
   <dest>
     *: "OFF pour Annuler"
@@ -8436,6 +8455,8 @@
     ipod*: "PLAY/PAUSE pour Annuler"
     x5,m5: "Long PLAY pour Annuler"
     h10,h10_5gb,e200*,c200: "PREV pour Annuler"
+    gigabeats: "BACK pour Annuler"
+    gigabeatf:"POWER pour Annuler"
   </dest>
   <voice>
     *: ""
@@ -8758,7 +8779,7 @@
     *: "Mo"
   </dest>
   <voice>
-    *: "Megaoctet"
+    *: "Mégaoctet"
   </voice>
 </phrase>
 <phrase>
@@ -11806,10 +11827,10 @@
     *: "Skip Length"
   </source>
   <dest>
-    *: "Taille du saut"
+    *: "Exploration d'une piste par saut"
   </dest>
   <voice>
-    *: "Taille du saut"
+    *: "Exploration d'une piste par saut"
   </voice>
 </phrase>
 <phrase>
@@ -11820,10 +11841,10 @@
     *: "Skip Track"
   </source>
   <dest>
-    *: "Exploration d'une piste par saut"
+    *: "Désactiver"
   </dest>
   <voice>
-    *: "Exploration d'une piste par saut"
+    *: "Désactiver"
   </voice>
 </phrase>
 <phrase>
@@ -11969,7 +11990,7 @@
   </source>
   <dest>
     *: none
-    recording: "Temps de coupe :"
+    recording: "Temps de coupe:"
   </dest>
   <voice>
     *: none
@@ -11986,7 +12007,7 @@
   </source>
   <dest>
     *: none
-    recording: "Taille :"
+    recording: "Taille:"
   </dest>
   <voice>
     *: none
@@ -12003,10 +12024,41 @@
   </source>
   <dest>
     *: none
-    albumart: "Illustration album :"
+    albumart: "Illustration album:"
   </dest>
   <voice>
     *: none
-    albumart: ""
+    albumart: "Illustration album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MONO_MODE
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono mode"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Mode mono"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Mode mono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user:
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "Résultats de la recherche"
+  </dest>
+  <voice>
+    *: "Résultats de la recherche"
   </voice>
 </phrase>
