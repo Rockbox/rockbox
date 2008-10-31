@@ -1044,7 +1044,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                     case LOOP_MODE_TO:
                         rb->audio_pause();
                         rb->audio_ff_rewind(range_start);
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
 /* MMC is slow - wait some time to allow track reload to finish */
                         rb->sleep(HZ/20);
                         if (mp3->elapsed > play_end) /* reload in progress */
@@ -1056,7 +1056,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                     case LOOP_MODE_FROM:
                         rb->audio_pause();
                         rb->audio_ff_rewind(xpos_to_time(split_x));
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
 /* MMC is slow - wait some time to allow track reload to finish */
                         rb->sleep(HZ/20);
                         if (mp3->elapsed > play_end) /* reload in progress */

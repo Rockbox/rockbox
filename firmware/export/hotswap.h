@@ -41,14 +41,14 @@ typedef struct
     unsigned int blocksize;       /* block size in bytes */
 } tCardInfo;
 
-#ifdef HAVE_ATA_SD
+#if (CONFIG_STORAGE & STORAGE_SD)
 #include "ata-sd-target.h"
 #define card_detect            card_detect_target
 #define card_get_info          card_get_info_target
 #ifdef HAVE_HOTSWAP
 #define card_enable_monitoring card_enable_monitoring_target
 #endif
-#else /* HAVE_MMC */
+#else /* STORAGE_MMC */
 #include "ata_mmc.h"
 #define card_detect            mmc_detect
 #define card_get_info          mmc_card_info

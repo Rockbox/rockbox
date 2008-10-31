@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include <stdbool.h>
 #include "config.h"
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
 #include "ata_mmc.h"
 #else
 #include "hotswap.h"

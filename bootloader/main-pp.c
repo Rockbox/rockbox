@@ -80,7 +80,7 @@ unsigned char *loadbuffer = (unsigned char *)DRAM_START;
 char version[] = APPSVERSION;
         
 /* Locations and sizes in hidden partition on Sansa */
-#if defined(HAVE_ATA_SD)
+#if (CONFIG_STORAGE & STORAGE_SD)
 #define PPMI_SECTOR_OFFSET  1024
 #define PPMI_SECTORS        1
 #define MI4_HEADER_SECTORS  1
@@ -361,7 +361,7 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
     return EOK;
 }
 
-#if defined(HAVE_ATA_SD)
+#if (CONFIG_STORAGE & STORAGE_SD)
 /* Load mi4 firmware from a hidden disk partition */
 int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
                   unsigned int buffer_size, bool disable_rebuild)
@@ -506,7 +506,7 @@ void* main(void)
     printf(MODEL_NAME);
 
     i=ata_init();
-#if !defined(HAVE_ATA_SD)
+#if !(CONFIG_STORAGE & STORAGE_SD)
     if (i==0) {
         identify_info=ata_get_identify();
         /* Show model */
@@ -550,7 +550,7 @@ void* main(void)
         */
         printf("Loading original firmware...");
 
-#if defined(HAVE_ATA_SD)
+#if (CONFIG_STORAGE & STORAGE_SD)
         /* First try a (hidden) firmware partition */
         printf("Trying firmware partition");
         pinfo = disk_partinfo(1);

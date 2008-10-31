@@ -15,7 +15,7 @@
 #define MODEL_NUMBER 1
 
 /* define this if you use an ATA controller */
-#define HAVE_ATA
+#define CONFIG_STORAGE STORAGE_ATA
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP

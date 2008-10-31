@@ -10,7 +10,7 @@
 #define MODEL_NUMBER 15
 
 /* define this if you use an ATA controller */
-#define HAVE_ATA
+#define CONFIG_STORAGE STORAGE_ATA
 
 /* define this if you have recording possibility */
 /*#define HAVE_RECORDING*/ /* TODO: add support for this */

@@ -89,7 +89,7 @@
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
 #include "ata_mmc.h"
 #endif
 
@@ -377,7 +377,7 @@ static void init(void)
 #ifdef DEBUG
     debug_init();
 #else
-#if !defined(HAVE_FMADC) && !defined(HAVE_MMC)
+#if !defined(HAVE_FMADC) && !(CONFIG_STORAGE & STORAGE_MMC)
     serial_setup();
 #endif
 #endif
@@ -456,7 +456,7 @@ static void init(void)
 #endif
         /* enter USB mode early, before trying to mount */
         if (button_get_w_tmo(HZ/10) == SYS_USB_CONNECTED)
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
             if (!mmc_touched() ||
                 (mmc_remove_request() == SYS_HOTSWAP_EXTRACTED))
 #endif

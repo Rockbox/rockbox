@@ -28,6 +28,12 @@
 
 /* symbolic names for multiple choice configurations: */
 
+/* CONFIG_STORAGE (note these are combineable bit-flags) */
+#define STORAGE_ATA  0x01
+#define STORAGE_MMC  0x02
+#define STORAGE_SD   0x04
+#define STORAGE_NAND 0x08
+
 /* CONFIG_TUNER (note these are combineable bit-flags) */
 #define S1A0903X01 0x01 /* Samsung */
 #define TEA5767    0x02 /* Philips */
@@ -180,8 +186,9 @@
 #define LED_VIRTUAL  2 /* Virtual LED (icon) (Archos Ondio) */
 /* else                   HW controlled LED (iRiver H1x0) */
 
-/* CONFIG_FLASH */
-#define FLASH_IFP7XX 1
+/* CONFIG_NAND */
+#define NAND_IFP7XX 1
+#define NAND_TCC    2
 
 /* CONFIG_RTC */
 #define RTC_M41ST84W 1 /* Archos Recorder */

@@ -9,7 +9,7 @@
 #define MODEL_NAME   "Philips GoGear HDD1630"
 
 /* define this if you use an ATA controller */
-#define HAVE_ATA
+#define CONFIG_STORAGE STORAGE_ATA
 
 /* define this if you have recording possibility */
 /* #define HAVE_RECORDING */

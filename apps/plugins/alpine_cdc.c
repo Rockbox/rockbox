@@ -34,7 +34,7 @@
 #include "plugin.h"
 
 /* Only build for (correct) target */
-#if CONFIG_CPU==SH7034 && !defined(HAVE_MMC)
+#if CONFIG_CPU==SH7034 && !(CONFIG_STORAGE & STORAGE_MMC)
 
 PLUGIN_HEADER
 
@@ -1199,4 +1199,4 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     return (main(parameter)==0) ? PLUGIN_OK : PLUGIN_ERROR;
 }
 
-#endif /* CONFIG_CPU==SH7034 && !defined(HAVE_MMC) */
+#endif /* CONFIG_CPU==SH7034 && !(CONFIG_STORAGE & STORAGE_MMC) */

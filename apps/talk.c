@@ -187,7 +187,7 @@ static unsigned char* get_clip(long id, long* p_size)
         return NULL;
     clipbuf = (unsigned char *) p_voicefile + p_voicefile->index[id].offset;
 
-#ifdef HAVE_MMC /* dynamic loading, on demand */
+#if (CONFIG_STORAGE & STORAGE_MMC) /* dynamic loading, on demand */
     if (!(clipsize & LOADED_MASK))
     {   /* clip used for the first time, needs loading */
         lseek(filehandle, p_voicefile->index[id].offset, SEEK_SET);
@@ -225,7 +225,7 @@ static void load_voicefile(void)
     if (file_size > audiobufend - audiobuf) /* won't fit? */
         goto load_err;
 
-#ifdef HAVE_MMC /* load only the header for now */
+#if (CONFIG_STORAGE & STORAGE_MMC) /* load only the header for now */
     load_size = offsetof(struct voicefile, index);
 #else /* load the full file */
     load_size = file_size; 
@@ -266,7 +266,7 @@ static void load_voicefile(void)
         structec_convert(&p_voicefile->index[i], "ll", 1, true);
 #endif
 
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
     /* load the index table, now that we know its size from the header */
     load_size = (p_voicefile->id1_max + p_voicefile->id2_max)
                 * sizeof(struct clip_entry);
@@ -520,7 +520,7 @@ void talk_init(void)
         return;
     }
 
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
     if (filehandle >= 0) /* MMC: An old voice file might still be open */
     {
         close(filehandle);
@@ -577,7 +577,7 @@ void talk_buffer_steal(void)
 #if CONFIG_CODEC != SWCODEC
     mp3_play_stop();
 #endif
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
     if (filehandle >= 0) /* only relevant for MMC */
     {
         close(filehandle);

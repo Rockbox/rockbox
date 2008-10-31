@@ -3587,7 +3587,7 @@ static int record_file(char *filename)
             if (to_save > aud_size)
             {
                 rec_tick_enable(false);
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
                 rb->splash(HZ, "Data overrun (slow MMC)");
 #else
                 rb->splash(HZ, "Data overrun");
@@ -3597,7 +3597,7 @@ static int record_file(char *filename)
                 break;
             }
             write_now = MIN(to_save, aud_size - aud_read);
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
             write_now = MIN(write_now, 256*1024);
 #else
             write_now = MIN(write_now, 1024*1024);
@@ -3802,7 +3802,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     return rc;
 
 #if 0
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
     return record_file("/<MMC1>/test.wav");
 #else
     return record_file("/test.wav");

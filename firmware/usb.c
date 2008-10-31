@@ -71,7 +71,7 @@ static int countdown;
 
 static int usb_state;
 
-#if defined(HAVE_MMC) && defined(USB_FULL_INIT)
+#if (CONFIG_STORAGE & STORAGE_MMC) && defined(USB_FULL_INIT)
 static int usb_mmc_countdown = 0;
 #endif
 
@@ -435,7 +435,7 @@ static void usb_tick(void)
             }
         }
     }
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
     if(usb_mmc_countdown > 0)
     {
         usb_mmc_countdown--;

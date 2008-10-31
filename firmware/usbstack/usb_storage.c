@@ -39,7 +39,7 @@
  * by not overlapping ata_write_sector() with USB transfers. This does reduce
  * write performance, so we only do it for the affected DAPs
  */
-#ifdef HAVE_ATA_SD
+#if (CONFIG_STORAGE & STORAGE_SD)
 #define SERIALIZE_WRITES
 #endif
 /* Enable the following define to export only the SD card slot. This
@@ -668,7 +668,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     block_size = SECTOR_SIZE;
     block_count = RAMDISK_SIZE;
 #else
-#if defined(HAVE_ATA_SD) || defined(HAVE_HOTSWAP)
+#if (CONFIG_STORAGE & STORAGE_SD) || defined(HAVE_HOTSWAP)
     tCardInfo* cinfo = card_get_info(lun);
     if(cinfo->initialized && cinfo->numblocks > 0) {
         block_size = cinfo->blocksize;

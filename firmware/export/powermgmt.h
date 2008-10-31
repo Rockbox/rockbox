@@ -142,7 +142,7 @@ extern int trickle_sec;          /* trickle charge: How many seconds per minute 
 #define CURRENT_USB        500  /* usual current in mA in USB mode */
 #ifdef HAVE_REMOTE_LCD
 # define CURRENT_REMOTE      8  /* add. current when H100-remote connected */
-#endif /* HAVE_MMC */
+#endif /* HAVE_REMOTE_LCD */
 
 # define CURRENT_MIN_CHG    70  /* minimum charge current */
 # define MIN_CHG_V        8500  /* at 8.5v charger voltage get CURRENT_MIN_CHG */
@@ -152,7 +152,7 @@ extern int trickle_sec;          /* trickle charge: How many seconds per minute 
 #  define CURRENT_MAX_CHG  350  /* maximum charging current */
 # endif
 # define MAX_CHG_V       10250  /* anything over 10.25v gives CURRENT_MAX_CHG */
-#endif /* not HAVE_MMC */
+#endif /* not ONDIO */
 
 extern unsigned short power_history[POWER_HISTORY_LEN];
 extern const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT];

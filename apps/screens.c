@@ -68,7 +68,7 @@
 #include <bitmaps/remote_usblogo.h>
 #endif
 
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
 #include "ata_mmc.h"
 #endif
 #if CONFIG_CODEC == SWCODEC
@@ -145,9 +145,9 @@ void usb_screen(void)
     usb_acknowledge(SYS_USB_CONNECTED_ACK);
     while(usb_wait_for_disconnect_w_tmo(&button_queue, HZ)) {
         if(usb_inserted()) {
-#ifdef HAVE_MMC /* USB-MMC bridge can report activity */
+#if (CONFIG_STORAGE & STORAGE_MMC) /* USB-MMC bridge can report activity */
             led(mmc_usb_active(HZ));
-#endif /* HAVE_MMC */
+#endif /* STORAGE_MMC */
             gui_syncstatusbar_draw(&statusbars, false);
         }
     }
@@ -161,7 +161,7 @@ void usb_screen(void)
 #endif /* USB_NONE */
 }
 
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
 int mmc_remove_request(void)
 {
     struct queue_event ev;

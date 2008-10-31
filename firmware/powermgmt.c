@@ -492,7 +492,7 @@ static int runcurrent(void)
 {
     int current;
 
-#if MEM == 8 && !defined(HAVE_MMC)
+#if MEM == 8 && !(defined(ARCHOS_ONDIOSP) || defined(ARCHOS_ONDIOFM))
     /* assuming 192 kbps, the running time is 22% longer with 8MB */
     current = (CURRENT_NORMAL*100/122);
 #else
@@ -1059,7 +1059,7 @@ static void power_thread(void)
     /* initialize the voltages for the exponential filter */
     avgbat = battery_adc_voltage() + 15;
 
-#ifndef HAVE_MMC  /* this adjustment is only needed for HD based */
+#ifdef HAVE_DISK_STORAGE /* this adjustment is only needed for HD based */
         /* The battery voltage is usually a little lower directly after
            turning on, because the disk was used heavily. Raise it by 5% */
 #ifdef HAVE_CHARGING
@@ -1067,7 +1067,7 @@ static void power_thread(void)
 #endif
         avgbat += (percent_to_volt_discharge[battery_type][6] -
                    percent_to_volt_discharge[battery_type][5]) / 2;
-#endif /* not HAVE_MMC */
+#endif /* HAVE_DISK_STORAGE */
 
     avgbat = avgbat * BATT_AVE_SAMPLES;
     battery_millivolts = avgbat / BATT_AVE_SAMPLES;

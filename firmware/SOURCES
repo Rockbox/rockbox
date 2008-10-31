@@ -109,15 +109,17 @@ drivers/serial.c
 
 /* Storage */
 #ifndef SIMULATOR
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
 drivers/ata_mmc.c
-#elif defined(HAVE_FLASH_DISK)
+#elif (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND & NAND_IFP7XX)
 drivers/ata_flash.c
-#elif defined(HAVE_ATA)
+#elif (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND & NAND_TCC)
+target/arm/ata-nand-telechips.c
+#elif (CONFIG_STORAGE & STORAGE_ATA)
 drivers/ata.c
-#endif /* HAVE_MMC */
+#endif /* CONFIG_STORAGE */
 drivers/fat.c
-#if defined(HAVE_MMC) || defined(HAVE_ATA_SD)
+#if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
 hotswap.c
 #endif
 #endif /* SIMULATOR */
@@ -981,7 +983,6 @@ target/arm/pnx0101/pcm-pnx0101.c
 #ifdef LOGIK_DAX
 #ifndef SIMULATOR
 drivers/nand_id.c
-target/arm/ata-nand-telechips.c
 target/arm/lcd-ssd1815.c
 target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
@@ -1004,7 +1005,6 @@ target/arm/tcc77x/logikdax/audio-logikdax.c
 #ifndef SIMULATOR
 drivers/nand_id.c
 target/arm/lcd-ssd1815.c
-target/arm/ata-nand-telechips.c
 target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/powermgmt-tcc77x.c
@@ -1025,7 +1025,6 @@ target/arm/tcc77x/m200/audio-m200.c
 #ifdef SANSA_C100
 #ifndef SIMULATOR
 drivers/nand_id.c
-target/arm/ata-nand-telechips.c
 target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/c100/lcd-S6B33B2.c
@@ -1071,7 +1070,6 @@ target/arm/as3525/as3525-codec.c
 #ifndef SIMULATOR
 drivers/nand_id.c
 drivers/pcf50606.c
-target/arm/ata-nand-telechips.c
 target/arm/tcc77x/system-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/timer-tcc77x.c
@@ -1096,7 +1094,6 @@ target/arm/tcc77x/iaudio7/audio-iaudio7.c
 drivers/nand_id.c
 drivers/pcf50606.c
 target/arm/lcd-as-memframe.S
-target/arm/ata-nand-telechips.c
 target/arm/tcc780x/adc-tcc780x.c
 target/arm/tcc780x/system-tcc780x.c
 target/arm/tcc780x/cowond2/button-cowond2.c

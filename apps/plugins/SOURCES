@@ -120,7 +120,8 @@ nim.c
 mp3_encoder.c
 wav2wv.c
 #else                              /* hardware codec platforms */
-#ifndef HAVE_MMC                   /* not for Ondio, has no remote control pin */
+#if !defined(ARCHOS_ONDIOSP) && !defined(ARCHOS_ONDIOFM)
+    /* not for Ondio, has no remote control pin */
 alpine_cdc.c
 #endif
 splitedit.c

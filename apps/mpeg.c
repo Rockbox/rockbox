@@ -1603,7 +1603,8 @@ static void mpeg_thread(void)
                 /* Don't read more than until the end of the buffer */
                 amount_to_read = MIN(audiobuflen - audiobuf_write,
                                      amount_to_read);
-#ifdef HAVE_MMC /* MMC is slow, so don't read too large chunks */
+#if (CONFIG_STORAGE & STORAGE_MMC)
+    /* MMC is slow, so don't read too large chunks */
                 amount_to_read = MIN(0x40000, amount_to_read);
 #elif MEM == 8
                 amount_to_read = MIN(0x100000, amount_to_read);
@@ -1912,7 +1913,8 @@ static void mpeg_thread(void)
 
                     amount_to_save = MIN(amount_to_save,
                                          audiobuflen - audiobuf_read);
-#ifdef HAVE_MMC /* MMC is slow, so don't save too large chunks at once */
+#if (CONFIG_STORAGE & STORAGE_MMC)
+    /* MMC is slow, so don't save too large chunks at once */
                     amount_to_save = MIN(0x40000, amount_to_save);
 #elif MEM == 8
                     amount_to_save = MIN(0x100000, amount_to_save);

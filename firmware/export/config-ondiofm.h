@@ -106,7 +106,7 @@
 #define HAVE_ONDIO_ADC
 
 /* Define this for MMC support instead of ATA harddisk */
-#define HAVE_MMC
+#define CONFIG_STORAGE STORAGE_MMC
 
 /* Define this to support mounting FAT16 partitions */
 #define HAVE_FAT16SUPPORT

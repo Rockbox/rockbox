@@ -34,7 +34,7 @@ int charging_screen(void);
 void charging_splash(void);
 #endif
 
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
 int mmc_remove_request(void);
 #endif
 

@@ -3574,7 +3574,7 @@ int play_file(char* filename)
     while (!(SSR0 & SCI_TEND)); /* wait for end of transfer */
     BRR0 = 0;                   /* maximum speed, ~3 MBit/s */
 
-#ifndef HAVE_MMC
+#if !(CONFIG_STORAGE & STORAGE_MMC)
     low_water =   5 /* seconds */
                 * 2 /* bytes per sample */
                 * channels 
@@ -3603,7 +3603,7 @@ int play_file(char* filename)
             else
             {
                 wanted = MIN(free_space, aud_size - aud_write);
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
                 wanted = MIN(wanted, 256*1024);
 #elif MEM == 8
                 wanted = MIN(wanted, 1024*1024);

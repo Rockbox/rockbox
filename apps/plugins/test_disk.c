@@ -29,7 +29,7 @@ PLUGIN_HEADER
 #define TEST_FILE   TESTBASEDIR "/test_disk.tmp"
 #define FRND_SEED   0x78C3     /* arbirary */
 
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
 #define TEST_SIZE (20*1024*1024)
 #else
 #define TEST_SIZE (300*1024*1024)

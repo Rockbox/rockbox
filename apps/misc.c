@@ -61,7 +61,7 @@
 #include "playlist.h"
 #include "yesno.h"
 
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
 #include "ata_mmc.h"
 #endif
 #include "tree.h"
@@ -910,7 +910,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
         case SYS_USB_CONNECTED:
             if (callback != NULL)
                 callback(parameter);
-#ifdef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_MMC)
             if (!mmc_touched() ||
                 (mmc_remove_request() == SYS_HOTSWAP_EXTRACTED))
 #endif

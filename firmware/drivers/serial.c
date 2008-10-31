@@ -39,7 +39,7 @@
 /* iFP7xx has no remote */
 
 #if !defined(HAVE_FMADC) /* Recorder FM/V2 has no remote control pin */ \
- && !defined(HAVE_MMC)   /* MMC takes serial port 1, so don't mess with it */
+ && !(CONFIG_STORAGE & STORAGE_MMC)   /* MMC takes serial port 1, so don't mess with it */
 
 /* Received byte identifiers */
 #define PLAY  0xC1
@@ -146,7 +146,7 @@ int remote_control_rx(void)
     return ret;
 }
 
-#endif /* !HAVE_FMADC && !HAVE_MMC */
+#endif /* !HAVE_FMADC && !STORAGE_MMC */
 #elif defined(CPU_COLDFIRE) && defined(HAVE_SERIAL)
 
 void serial_tx(const unsigned char *buf)

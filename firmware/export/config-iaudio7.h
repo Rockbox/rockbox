@@ -155,6 +155,10 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/"
 
+#define CONFIG_STORAGE STORAGE_NAND
+
+#define CONFIG_NAND NAND_TCC
+
 #ifdef BOOTLOADER
 #define TCCBOOT
 #endif

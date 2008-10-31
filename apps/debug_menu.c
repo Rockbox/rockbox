@@ -63,7 +63,7 @@
 #include "fat.h"
 #include "mas.h"
 #include "eeprom_24cxx.h"
-#if defined(HAVE_MMC) || defined(HAVE_ATA_SD)
+#if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
 #include "hotswap.h"
 #endif
 #if CONFIG_TUNER
@@ -1730,8 +1730,8 @@ static bool view_battery(void)
 #endif
 
 #ifndef SIMULATOR
-#if defined(HAVE_MMC) || defined(HAVE_ATA_SD)
-#if defined(HAVE_MMC)
+#if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
+#if (CONFIG_STORAGE & STORAGE_MMC)
 #define CARDTYPE "MMC"
 #else
 #define CARDTYPE "microSD"
@@ -1812,7 +1812,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         {
             simplelist_addline(SIMPLELIST_ADD_LINE, "Not Found!");
         }
-#ifndef HAVE_MMC
+#if (CONFIG_STORAGE & STORAGE_SD)
         else /* card->initialized < 0 */
         {
             simplelist_addline(SIMPLELIST_ADD_LINE, "Init Error! (%d)", card->initialized);
@@ -1826,7 +1826,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     }
     return btn;
 }
-#else /* !defined(HAVE_MMC) && !defined(HAVE_ATA_SD) */
+#else /* !(CONFIG_STORAGE & STORAGE_MMC) && !(CONFIG_STORAGE & STORAGE_SD) */
 static int disk_callback(int btn, struct gui_synclist *lists)
 {
     (void)lists;
@@ -1960,13 +1960,13 @@ static bool dbg_identify_info(void)
     }
     return false;
 }
-#endif /* !defined(HAVE_MMC) && !defined(HAVE_ATA_SD) */
+#endif /* !(CONFIG_STORAGE & STORAGE_MMC) && !(CONFIG_STORAGE & STORAGE_SD) */
 
 static bool dbg_disk_info(void)
 {
     struct simplelist_info info;
     simplelist_info_init(&info, "Disk Info", 1, NULL);
-#if defined(HAVE_MMC) || defined(HAVE_ATA_SD)
+#if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
     char title[16];
     int card = 0;
     info.callback_data = (void*)&card;
@@ -2146,7 +2146,7 @@ static bool dbg_save_roms(void)
 
     return false;
 }
-#elif defined(CPU_PP) && !defined(HAVE_ATA_SD)
+#elif defined(CPU_PP) && !(CONFIG_STORAGE & STORAGE_SD)
 static bool dbg_save_roms(void)
 {
     int fd;
@@ -2467,7 +2467,7 @@ struct the_menu_item {
 };
 static const struct the_menu_item menuitems[] = {
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || \
-    (defined(CPU_PP) && !defined(HAVE_ATA_SD))
+    (defined(CPU_PP) && !(CONFIG_STORAGE & STORAGE_SD))
         { "Dump ROM contents", dbg_save_roms },
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP) \
@@ -2504,7 +2504,7 @@ static const struct the_menu_item menuitems[] = {
 #endif
 #ifndef SIMULATOR
         { "View disk info", dbg_disk_info },
-#if !defined(HAVE_MMC) && !defined(HAVE_ATA_SD)
+#if !(CONFIG_STORAGE & STORAGE_MMC) && !(CONFIG_STORAGE & STORAGE_SD)
         { "Dump ATA identify info", dbg_identify_info},
 #endif
 #endif

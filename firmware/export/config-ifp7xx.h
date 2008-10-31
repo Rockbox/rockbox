@@ -31,7 +31,9 @@
 
 #define CONFIG_KEYPAD IRIVER_IFP7XX_PAD
 
-#define CONFIG_FLASH FLASH_IFP7XX
+#define CONFIG_STORAGE STORAGE_NAND
+
+#define CONFIG_NAND NAND_IFP7XX
 
 #define HAVE_FAT16SUPPORT
 
@@ -49,8 +51,6 @@
 
 /* Define this if you have the WM8975 audio codec */
 /* #define HAVE_WM8975 */
-
-#define HAVE_FLASH_DISK
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
