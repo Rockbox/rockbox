@@ -272,9 +272,6 @@
   </dest>
   <voice>
     *: ""
-    h100,h120,h300: ""
-    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: ""
-    player: ""
   </voice>
 </phrase>
 <phrase>
@@ -774,6 +771,23 @@
   </dest>
   <voice>
     *: "Mono do Lado Direito"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFTRIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Mono Esquerdo + Direito"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Mono Esquerdo mais Direito"
   </voice>
 </phrase>
 <phrase>
@@ -2381,10 +2395,6 @@
   </dest>
   <voice>
     *: "entradas encontradas para a base de dados"
-    h100,h120,h300: ""
-    ipod*: ""
-    x5,m5,gigabeat*,mrobe100: ""
-    h10,h10_5gb,e200*,c200,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4143,9 +4153,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
-    h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: ""
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200*,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -5588,6 +5596,7 @@
 <phrase>
   id: LANG_FM_REGION
   desc: fm tuner region setting
+  user: 
   <source>
     *: none
     radio: "Region"
@@ -5604,6 +5613,7 @@
 <phrase>
   id: LANG_FM_EUROPE
   desc: fm tuner region europe
+  user:
   <source>
     *: none
     radio: "Europe"
@@ -5620,6 +5630,7 @@
 <phrase>
   id: LANG_FM_US
   desc: fm region us / canada
+  user:
   <source>
     *: none
     radio: "US / Canada"
@@ -5636,6 +5647,7 @@
 <phrase>
   id: LANG_FM_JAPAN
   desc: fm region japan
+  user:
   <source>
     *: none
     radio: "Japan"
@@ -5652,6 +5664,7 @@
 <phrase>
   id: LANG_FM_KOREA
   desc: fm region korea
+  user:
   <source>
     *: none
     radio: "Korea"
@@ -5960,6 +5973,7 @@
 <phrase>
   id: LANG_SPLIT_MEASURE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Measure"
@@ -5976,6 +5990,7 @@
 <phrase>
   id: LANG_SPLIT_TYPE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "What to do when Splitting"
@@ -6026,6 +6041,7 @@
 <phrase>
   id: LANG_SPLIT_TIME
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Time"
@@ -6042,6 +6058,7 @@
 <phrase>
   id: LANG_SPLIT_SIZE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Filesize"
@@ -6279,6 +6296,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_TYPE
   desc: in recording trigger menu
+  user:
   <source>
     *: none
     recording: "Trigtype"
@@ -6295,6 +6313,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_NEWFILESTP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "New file"
@@ -6311,6 +6330,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_STOP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "Stop"
@@ -6446,6 +6466,7 @@
 <phrase>
   id: LANG_RECORD_AGC_PRESET
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -6462,6 +6483,7 @@
 <phrase>
   id: LANG_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Safety (clip)"
@@ -6478,6 +6500,7 @@
 <phrase>
   id: LANG_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Live (slow)"
@@ -6494,6 +6517,7 @@
 <phrase>
   id: LANG_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -6510,6 +6534,7 @@
 <phrase>
   id: LANG_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Medium"
@@ -6526,6 +6551,7 @@
 <phrase>
   id: LANG_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Voice (fast)"
@@ -6542,6 +6568,7 @@
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -6915,16 +6942,19 @@
   user:
   <source>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
+    multivolume: "HD1"
     e200*,c200: "MSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
+    multivolume: "H D 1"
     e200*,c200: "micro S D"
     ondio*: "M M C"
   </voice>
@@ -8390,6 +8420,8 @@
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
     h10,h10_5gb,e200*,c200: "PREV to abort"
+    gigabeats: "BACK to abort"
+    gigabeatf: "POWER to abort"
   </source>
   <dest>
     *: "OFF para abortar"
@@ -8397,6 +8429,8 @@
     ipod*: "PLAY/PAUSE para abortar"
     x5,m5: "PLAY Longo para abortar"
     h10,h10_5gb,e200*,c200: "PREV para abortar"
+    gigabeats: "BACK para abortar"
+    gigabeatf: "POWER para abortar"
   </dest>
   <voice>
     *: ""
@@ -10744,6 +10778,7 @@
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
   desc: deprecated
+  user:
   <source>
     *: none
     recording: ""
@@ -10777,6 +10812,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -10793,6 +10829,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -10809,6 +10846,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -10825,6 +10863,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -10841,6 +10880,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -10857,6 +10897,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -10873,6 +10914,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -11779,7 +11821,6 @@
     *: "Pular Faixa"
   </voice>
 </phrase>
-
 <phrase>
   id: VOICE_CHAR_SLASH
   desc: spoken only, for spelling
@@ -11831,6 +11872,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_PRESET
   desc: automatic gain control in record settings and screen
+  user:
   <source>
     *: none
     agc: "AGC"
@@ -11847,6 +11889,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_CLIPTIME
   desc: in record settings
+  user:
   <source>
     *: none
     agc: "AGC clip time"
@@ -11863,6 +11906,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
+  user:
   <source>
     *: none
     agc: "AGC max. gain"
@@ -11942,5 +11986,53 @@
   <voice>
     *: none
     recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMART
+  desc: Display the expected AA size
+  user:
+  <source>
+    *: none
+    albumart: "Album Art:"
+  </source>
+  <dest>
+    *: none
+    albumart: "Capa:"
+  </dest>
+  <voice>
+    *: none
+    albumart: "Capa:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MONO_MODE
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono mode"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Modo mono"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Modo mono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user:
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "Resultados da Busca"
+  </dest>
+  <voice>
+    *: "Resultados da Busca"
   </voice>
 </phrase>

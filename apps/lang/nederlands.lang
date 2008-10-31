@@ -2553,10 +2553,12 @@
     recording: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    recording: deprecated
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -6690,7 +6692,7 @@
     *: ""
   </source>
   <dest>
-    *: ""
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -8491,11 +8493,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Ondersteunde"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Ondersteunde"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8801,7 +8803,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -11839,6 +11841,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
+  user:
   <source>
     *: none
     agc: "AGC max. gain"
@@ -11940,6 +11943,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_PRESET
   desc: automatic gain control in record settings and screen
+  user:
   <source>
     *: none
     agc: "AGC"
@@ -11956,6 +11960,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_CLIPTIME
   desc: in record settings
+  user:
   <source>
     *: none
     agc: "AGC clip time"
@@ -12018,5 +12023,19 @@
   <voice>
     *: none
     recording_swcodec: "Mono mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user:
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "Zoekresultaten"
+  </dest>
+  <voice>
+    *: "Zoekresultaten"
   </voice>
 </phrase>
