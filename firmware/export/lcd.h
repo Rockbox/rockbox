@@ -338,9 +338,13 @@ void lcd_poweroff(void);
 /* Enable/disable the main display. */
 extern void lcd_enable(bool on);
 extern bool lcd_enabled(void);
+
+#ifdef HAVE_LCD_COLOR
 /* Register a hook that is called when the lcd is powered and after the
  * framebuffer data is synchronized */
 void lcd_set_enable_hook(void (*enable_hook)(void));
+#endif /* HAVE_LCD_COLOR */
+
 #endif /* HAVE_LCD_ENABLE */
 void lcd_call_enable_hook(void);
 

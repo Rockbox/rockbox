@@ -612,11 +612,11 @@ static void wvs_backlight_on_video_mode(bool video_on)
         /* Turn off backlight timeout */
         /* backlight control in lib/helper.c */
         backlight_force_on(rb);
-#ifdef HAVE_LCD_ENABLE
+#if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
         rb->lcd_set_enable_hook(NULL);
 #endif
     } else {
-#ifdef HAVE_LCD_ENABLE
+#if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
         rb->lcd_set_enable_hook(wvs_lcd_enable_hook);
 #endif
         /* Revert to user's backlight settings */
@@ -1605,7 +1605,7 @@ static void button_loop(void)
 
     wvs_stop();
 
-#ifdef HAVE_LCD_ENABLE
+#if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
     /* Be sure hook is removed before exiting since the stop will put it
      * back because of the backlight restore. */
     rb->lcd_set_enable_hook(NULL);

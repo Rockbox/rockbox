@@ -571,7 +571,7 @@ static int get_start_time(uint32_t duration)
     lcd_(clear_display)();
     lcd_(update)();
 
-#ifdef HAVE_LCD_ENABLE
+#if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
     rb->lcd_set_enable_hook(get_start_time_lcd_enable_hook);
 #endif
 
@@ -762,11 +762,11 @@ static int get_start_time(uint32_t duration)
         rb->yield();
     }
 
+#ifdef HAVE_LCD_COLOR
 #ifdef HAVE_LCD_ENABLE
     rb->lcd_set_enable_hook(NULL);
 #endif
-
-#ifndef HAVE_LCD_COLOR
+#else
     stream_gray_show(false);
     grey_clear_display();
     grey_update();

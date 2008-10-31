@@ -226,7 +226,7 @@ struct plugin_api {
     void (*lcd_set_invert_display)(bool yesno);
 #endif /* HAVE_LCD_INVERT */
     
-#ifdef HAVE_LCD_ENABLE
+#if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
     void (*lcd_set_enable_hook)(void (*enable_hook)(void));
     struct event_queue *button_queue;
 #endif

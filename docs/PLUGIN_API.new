@@ -1394,7 +1394,7 @@ void lcd_set_drawmode(int mode)
     \description
 
 void lcd_set_enable_hook(void (*enable_hook)(void))
-    \conditions !defined(HAVE_LCD_CHARCELLS) )) && (defined(HAVE_LCD_ENABLE
+    \conditions !defined(HAVE_LCD_CHARCELLS) && defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
     \param enable_hook
     \description
 

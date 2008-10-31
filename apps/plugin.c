@@ -133,7 +133,7 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_LCD_INVERT
     lcd_set_invert_display,
 #endif /* HAVE_LCD_INVERT */
-#ifdef HAVE_LCD_ENABLE
+#if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
     lcd_set_enable_hook,
     &button_queue,
 #endif
