@@ -59,13 +59,16 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
     const int screen = 0;
 #endif
 
-    int char_height, i;
-    int left_width, right_width, bottom_lines = 3;
+    int char_height, i, width, pad = 0;
+    int left_width, right_width, bottom_lines = 2;
     unsigned char *s;
     int nb_lines = viewport_get_nb_lines(parent);
     char_height = parent->height/nb_lines;
 
+    /* center the icons VP first */
     vp_icons[screen] = *parent;
+    vp_icons[screen].width = CENTER_ICONAREA_WIDTH; /* abosulte smallest allowed */
+    vp_icons[screen].x = (parent->width-parent->x-CENTER_ICONAREA_WIDTH)/2;
 
     vps[screen][QUICKSCREEN_BOTTOM] = *parent;
     if (nb_lines <= MIN_LINES) /* make the bottom item use 1 line */
@@ -86,10 +89,38 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
     s = P2STR(ID2P(qs->items[QUICKSCREEN_RIGHT]->lang_id));
     right_width = display->getstringsize(s, NULL, NULL);
     nb_lines -= bottom_lines;
-
+    
+    width = MAX(left_width, right_width);
+    if (width*2 + vp_icons[screen].width > display->lcdwidth)
+        width = (display->lcdwidth - vp_icons[screen].width)/2;
+    else /* add more gap in icons vp */
+    {
+        int excess = display->lcdwidth - vp_icons[screen].width - width*2;
+        if (excess > CENTER_MARGIN*4)
+        {
+            pad = CENTER_MARGIN;
+            excess -= CENTER_MARGIN*2;
+        }
+        vp_icons[screen].x -= excess/2;
+        vp_icons[screen].width += excess;
+    }
     vps[screen][QUICKSCREEN_LEFT] = *parent;
+    vps[screen][QUICKSCREEN_LEFT].x = parent->x + pad;
+    vps[screen][QUICKSCREEN_LEFT].width = width;
+    
     vps[screen][QUICKSCREEN_RIGHT] = *parent;
-    vps[screen][QUICKSCREEN_LEFT].x = parent->x;
+    vps[screen][QUICKSCREEN_RIGHT].x = parent->x + parent->width - width - pad;
+    vps[screen][QUICKSCREEN_RIGHT].width = width;
+    
+    /* shrink the icons vp by a few pixels if there is room so the arrows
+       arnt' drawn right next to the text */
+    if (vp_icons[screen].width > CENTER_ICONAREA_WIDTH+8)
+    {
+        vp_icons[screen].width -= 8;
+        vp_icons[screen].x += 4;
+    }
+    
+
     if (nb_lines <= MIN_LINES)
         i = 0;
     else
@@ -106,48 +137,6 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
     vp_icons[screen].y = vps[screen][QUICKSCREEN_LEFT].y + (char_height/2);
     vp_icons[screen].height =
                 vps[screen][QUICKSCREEN_BOTTOM].y - vp_icons[screen].y;
-
-    if (MAX(left_width, right_width)*2 > parent->width - CENTER_ICONAREA_WIDTH)
-    {
-        /* scrolling needed */
-        int center = (parent->width - CENTER_ICONAREA_WIDTH)/2;
-        int width = MIN(center, MIN(left_width, right_width));
-        vps[screen][QUICKSCREEN_LEFT].width = width;
-        vps[screen][QUICKSCREEN_RIGHT].width = width;
-        vps[screen][QUICKSCREEN_RIGHT].x = parent->x+parent->width - width;
-        vp_icons[screen].x = parent->x + center;
-        vp_icons[screen].width = CENTER_ICONAREA_WIDTH;
-    }
-    else
-    {
-        int width, pad = 0;
-        if (left_width > right_width)
-            width = left_width;
-        else
-            width = right_width;
-        width += CENTER_MARGIN;
-        if (width*2 < parent->width/2)
-        {
-            width += parent->width/6;
-            /* add some padding on the edges */
-            pad = CENTER_MARGIN;
-        }
-        vps[screen][QUICKSCREEN_LEFT].width = width;
-        vps[screen][QUICKSCREEN_RIGHT].width = width;
-        vps[screen][QUICKSCREEN_RIGHT].x = parent->x + parent->width - width;
-        vp_icons[screen].x = parent->x + width;
-        if (pad)
-        {
-            vp_icons[screen].x += pad;
-            vps[screen][QUICKSCREEN_LEFT].x += pad;
-            vps[screen][QUICKSCREEN_RIGHT].x -= pad;
-            /* need to add the pad to the bottom to make it all centered nicely */
-            vps[screen][QUICKSCREEN_BOTTOM].x += pad;
-            vps[screen][QUICKSCREEN_BOTTOM].width -= pad;
-        }
-        vp_icons[screen].width = vps[screen][QUICKSCREEN_RIGHT].x - (vps[screen][QUICKSCREEN_LEFT].x+width);
-        
-    }
 }
 
 static void quickscreen_draw_text(char *s, int item, bool title,
