@@ -11959,7 +11959,7 @@
 </phrase>
 <phrase>
   id: LANG_RECORDING_MONO_MODE
-  desc: in sound_settings
+  desc: in the recording settings
   user:
   <source>
     *: none
