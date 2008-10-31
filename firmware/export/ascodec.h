@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Barry Wardell
+ * Copyright (C) 2008 by Dave Chapman
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,38 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "adc.h"
-#include "kernel.h"
-#include "ascodec.h"
-#include "as3514.h"
 
-/* Read 10-bit channel data */
-unsigned short adc_read(int channel)
-{
-    unsigned short data = 0;
+#ifndef _ASCODEC_H
+#define _ASCODEC_H
 
-    if ((unsigned)channel < NUM_ADC_CHANNELS)
-    {
-        ascodec_lock();
+#include "ascodec-target.h"
 
-        /* Select channel */
-        if (ascodec_write(AS3514_ADC_0, (channel << 4)) >= 0)
-        {
-            unsigned char buf[2];
-
-            /* Read data */
-            if (ascodec_readbytes(AS3514_ADC_0, 2, buf) >= 0)
-            {
-                data = (((buf[0] & 0x3) << 8) | buf[1]);
-            }
-        }
-
-        ascodec_unlock();
-    }
-    
-    return data;
-}
-
-void adc_init(void)
-{
-}
+#endif

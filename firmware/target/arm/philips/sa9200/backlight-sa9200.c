@@ -23,7 +23,7 @@
 #include "system.h"
 #include "lcd.h"
 #include "backlight.h"
-#include "i2c-pp.h"
+#include "ascodec.h"
 #include "as3514.h"
 
 static unsigned short backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
@@ -46,12 +46,12 @@ void _backlight_on(void)
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
 #endif
-    pp_i2c_send(AS3514_I2C_ADDR, AS3514_DCDC15, backlight_brightness);
+    ascodec_write(AS3514_DCDC15, backlight_brightness);
 }
 
 void _backlight_off(void)
 {
-    pp_i2c_send(AS3514_I2C_ADDR, AS3514_DCDC15, 0x0);
+    ascodec_write(AS3514_DCDC15, 0x0);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
 #endif

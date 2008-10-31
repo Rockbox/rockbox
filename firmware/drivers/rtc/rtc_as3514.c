@@ -22,6 +22,7 @@
 #include "rtc.h"
 #include "i2c-pp.h"
 #include "as3514.h"
+#include "ascodec.h"
 
 #define MINUTE_SECONDS      60
 #define HOUR_SECONDS        3600
@@ -57,7 +58,7 @@ int rtc_read_datetime(unsigned char* buf)
     
     /* RTC_AS3514's slave address is 0x46*/
     for (i=0;i<4;i++){
-        tmp[i] = i2c_readbyte(AS3514_I2C_ADDR, AS3514_RTC_0 + i);
+        tmp[i] = ascodec_read(AS3514_RTC_0 + i);
     }
     seconds = tmp[0] + (tmp[1]<<8) + (tmp[2]<<16) + (tmp[3]<<24);
     
@@ -162,7 +163,7 @@ int rtc_write_datetime(unsigned char* buf)
 
     /* Send data to RTC */
     for (i=0;i<4;i++){
-        pp_i2c_send(AS3514_I2C_ADDR, AS3514_RTC_0 + i, ((seconds >> (8 * i)) & 0xff));
+        ascodec_write(AS3514_RTC_0 + i, ((seconds >> (8 * i)) & 0xff));
     }
     return 1;
 }

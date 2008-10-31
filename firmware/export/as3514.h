@@ -79,8 +79,4 @@ extern void audiohw_set_sample_rate(int sampling_control);
 #define VOLUME_MIN -735
 #define VOLUME_MAX   60
 
-#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
-#define AS3514_I2C_ADDR 0x46
-#endif
-
 #endif /* _AS3514_H */

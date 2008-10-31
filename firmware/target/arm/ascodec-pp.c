@@ -7,7 +7,10 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Barry Wardell
+ * Driver for AS3514 audio codec
+ *
+ * Copyright (c) 2007 Daniel Ankers
+ * Copyright (c) 2007 Christian Gmeiner
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,38 +21,46 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "adc.h"
-#include "kernel.h"
-#include "ascodec.h"
-#include "as3514.h"
+#include "cpu.h"
+#include "system.h"
 
-/* Read 10-bit channel data */
-unsigned short adc_read(int channel)
+#include "audiohw.h"
+#include "i2s.h"
+
+/*
+ * Initialise the PP I2C and I2S.
+ */
+void audiohw_init(void)
 {
-    unsigned short data = 0;
+    /* normal outputs for CDI and I2S pin groups */
+    DEV_INIT2 &= ~0x300;
 
-    if ((unsigned)channel < NUM_ADC_CHANNELS)
-    {
-        ascodec_lock();
+    /*mini2?*/
+    DEV_INIT1 &=~0x3000000;
+    /*mini2?*/
 
-        /* Select channel */
-        if (ascodec_write(AS3514_ADC_0, (channel << 4)) >= 0)
-        {
-            unsigned char buf[2];
+    /* device reset */
+    DEV_RS |= DEV_I2S;
+    DEV_RS &=~DEV_I2S;
 
-            /* Read data */
-            if (ascodec_readbytes(AS3514_ADC_0, 2, buf) >= 0)
-            {
-                data = (((buf[0] & 0x3) << 8) | buf[1]);
-            }
-        }
+    /* I2S device reset */
+    DEV_RS |= DEV_I2S;
+    DEV_RS &=~DEV_I2S;
 
-        ascodec_unlock();
-    }
-    
-    return data;
+    /* I2S device enable */
+    DEV_EN |= DEV_I2S;
+
+    /* enable external dev clock clocks */
+    DEV_EN |= DEV_EXTCLOCKS;
+
+    /* external dev clock to 24MHz */
+    outl(inl(0x70000018) & ~0xc, 0x70000018);
+
+    i2s_reset();
+
+    audiohw_preinit();
 }
 
-void adc_init(void)
+void audiohw_postinit(void)
 {
 }

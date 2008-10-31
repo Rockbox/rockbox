@@ -29,7 +29,7 @@
 
 #include "audiohw.h"
 #include "i2s.h"
-#include "i2c-pp.h"
+#include "ascodec.h"
 
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB",   0,   1, -74,   6, -25},
@@ -71,7 +71,7 @@ static unsigned int source = SOURCE_DAC;
  */
 static void as3514_write(unsigned int reg, unsigned int value)
 {
-    if (pp_i2c_send(AS3514_I2C_ADDR, reg, value) != 2)
+    if (ascodec_write(reg, value) != 2)
     {
         DEBUGF("as3514 error reg=0x%02x", reg);
     }
@@ -135,35 +135,9 @@ int sound_val2phys(int setting, int value)
 /*
  * Initialise the PP I2C and I2S.
  */
-void audiohw_init(void)
+void audiohw_preinit(void)
 {
     unsigned int i;
-
-    /* normal outputs for CDI and I2S pin groups */
-    DEV_INIT2 &= ~0x300;
-
-    /*mini2?*/
-    DEV_INIT1 &=~0x3000000;
-    /*mini2?*/
-
-    /* device reset */
-    DEV_RS |= DEV_I2S;
-    DEV_RS &=~DEV_I2S;
-
-    /* I2S device reset */
-    DEV_RS |= DEV_I2S;
-    DEV_RS &=~DEV_I2S;
-
-    /* I2S device enable */
-    DEV_EN |= DEV_I2S;
-
-    /* enable external dev clock clocks */
-    DEV_EN |= DEV_EXTCLOCKS;
-
-    /* external dev clock to 24MHz */
-    outl(inl(0x70000018) & ~0xc, 0x70000018);
-
-    i2s_reset();
 
     /* Set ADC off, mixer on, DAC on, line out off, line in off, mic off */
 
@@ -199,12 +173,8 @@ void audiohw_init(void)
     /* read all reg values */
     for (i = 0; i < ARRAYLEN(as3514.regs); i++)
     {
-        as3514.regs[i] = i2c_readbyte(AS3514_I2C_ADDR, i);
+        as3514.regs[i] = ascodec_read(i);
     }
-}
-
-void audiohw_postinit(void)
-{
 }
 
 /* Silently enable / disable audio output */

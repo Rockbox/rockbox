@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include "system.h"
 #include "cpu.h"
-#include "i2c-pp.h"
+#include "ascodec.h"
 #include "tuner.h"
 #include "as3514.h"
 #include "power.h"
@@ -36,9 +36,9 @@ void power_off(void)
     char byte;
 
     /* Send shutdown command to PMU */
-    byte = i2c_readbyte(AS3514_I2C_ADDR, AS3514_SYSTEM);
+    byte = ascodec_read(AS3514_SYSTEM);
     byte &= ~0x1;   
-    pp_i2c_send(AS3514_I2C_ADDR, AS3514_SYSTEM, byte);
+    ascodec_write(AS3514_SYSTEM, byte);
 
     /* Stop interrupts on both cores */
     disable_interrupt(IRQ_FIQ_STATUS);

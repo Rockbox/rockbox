@@ -103,7 +103,7 @@
 #endif
 
 #if defined(SANSA_E200) || defined(PHILIPS_SA9200)
-#include "i2c-pp.h"
+#include "ascodec.h"
 #include "as3514.h"
 #endif
 
@@ -1228,7 +1228,9 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_VBAT:     %4d", adc_read(ADC_VBAT));
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "CHARGER: %02X/%02X", i2c_readbyte(AS3514_I2C_ADDR, AS3514_CHARGER), i2c_readbyte(AS3514_I2C_ADDR, AS3514_IRQ_ENRD0));
+        snprintf(buf, sizeof(buf), "CHARGER: %02X/%02X", 
+                                   ascodec_read(AS3514_CHARGER), 
+                                   ascodec_read(AS3514_IRQ_ENRD0));
         lcd_puts(0, line++, buf);
 #endif
 #endif

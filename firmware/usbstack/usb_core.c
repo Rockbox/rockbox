@@ -46,7 +46,7 @@
 /* TODO: Move target-specific stuff somewhere else (serial number reading) */
 
 #ifdef HAVE_AS3514
-#include "i2c-pp.h"
+#include "ascodec.h"
 #include "as3514.h"
 #endif
 
@@ -274,7 +274,7 @@ static void set_serial_descriptor(void)
     short* p = &usb_string_iSerial.wString[1];
     int i;
 
-    i2c_readbytes(AS3514_I2C_ADDR, AS3514_UID_0, 0x10, serial);
+    ascodec_readbytes(AS3514_UID_0, 0x10, serial);
     for (i = 0; i < 16; i++) {
         *p++ = hex[(serial[i] >> 4) & 0xF];
         *p++ = hex[(serial[i] >> 0) & 0xF];

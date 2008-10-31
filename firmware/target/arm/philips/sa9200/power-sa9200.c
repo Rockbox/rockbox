@@ -36,9 +36,9 @@ void power_off(void)
     char byte;
 
     /* Send shutdown command to PMU */
-    byte = i2c_readbyte(AS3514_I2C_ADDR, AS3514_SYSTEM);
+    byte = ascodec_read(AS3514_SYSTEM);
     byte &= ~0x1;   
-    pp_i2c_send(AS3514_I2C_ADDR, AS3514_SYSTEM, byte);
+    ascodec_write(AS3514_SYSTEM, byte);
 
     /* Stop interrupts on both cores */
     disable_interrupt(IRQ_FIQ_STATUS);

@@ -460,6 +460,7 @@ target/arm/lcd-as-memframe.S
 target/arm/ata-sd-pp.c
 target/arm/sandisk/sansa-e200/lcd-e200.c
 target/arm/adc-as3514.c
+target/arm/ascodec-pp.c
 target/arm/sandisk/backlight-c200_e200.c
 target/arm/usb-fw-pp502x.c
 target/arm/sandisk/sansa-e200/button-e200.c
@@ -478,6 +479,7 @@ target/arm/ata-sd-pp.c
 target/arm/sandisk/sansa-c200/lcd-c200.c
 target/arm/sandisk/sansa-c200/lcd-as-c200.S
 target/arm/adc-as3514.c
+target/arm/ascodec-pp.c
 target/arm/sandisk/backlight-c200_e200.c
 target/arm/usb-fw-pp502x.c
 target/arm/sandisk/sansa-c200/button-c200.c
@@ -495,6 +497,7 @@ target/arm/sandisk/audio-c200_e200.c
 target/arm/ata-sd-pp.c
 target/arm/philips/sa9200/lcd-sa9200.c
 target/arm/adc-as3514.c
+target/arm/ascodec-pp.c
 target/arm/philips/sa9200/backlight-sa9200.c
 target/arm/usb-fw-pp502x.c
 target/arm/philips/sa9200/button-sa9200.c
