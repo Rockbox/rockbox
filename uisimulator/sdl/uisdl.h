@@ -436,6 +436,19 @@
 #define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
 #define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 
+#elif defined(SANSA_CLIP)
+#define UI_TITLE                    "Sansa Clip"
+#define UI_WIDTH                    205 /* width of GUI window */
+#define UI_HEIGHT                   325 /* height of GUI window */
+#define UI_LCD_POSX                 38 /* x position of lcd */
+#define UI_LCD_POSY                 38 /* y position of lcd */
+#define UI_LCD_WIDTH                128
+#define UI_LCD_HEIGHT               64
+#define UI_LCD_BGCOLOR              0, 0, 0 /* bkgnd color of LCD (no backlight) */
+#define UI_LCD_BGCOLORLIGHT         192, 192, 192 /* bkgnd color of LCD (backlight) */
+#define UI_LCD_FGCOLOR              13, 226, 229 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
+
 #endif
 extern SDL_Surface *gui_surface;
 extern bool background;  /* True if the background image is enabled */

@@ -50,10 +50,10 @@ int button_read_device(void)
     /* C4B0 is unused */
 
     if (GPIOB_PIN(1))
-        result |= BUTTON_VOLUP;
+        result |= BUTTON_VOL_UP;
 
     if (GPIOB_PIN(2))
-        result |= BUTTON_PLAY;
+        result |= BUTTON_UP;
 
     GPIOC_PIN(4) = 0x00;
 
@@ -76,7 +76,7 @@ int button_read_device(void)
         result |= BUTTON_DOWN;
 
     if (GPIOB_PIN(1))
-        result |= BUTTON_VOLDOWN;
+        result |= BUTTON_VOL_DOWN;
 
     if (GPIOB_PIN(2))
         result |= BUTTON_HOME;

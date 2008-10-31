@@ -34,10 +34,10 @@ bool button_hold(void);
 /* Main unit's buttons */
 #define BUTTON_HOME         0x00000001
 
-#define BUTTON_VOLUP        0x00000002
-#define BUTTON_VOLDOWN      0x00000004
+#define BUTTON_VOL_UP       0x00000002
+#define BUTTON_VOL_DOWN     0x00000004
 
-#define BUTTON_PLAY         0x00000008
+#define BUTTON_UP           0x00000008
 #define BUTTON_DOWN         0x00000010
 #define BUTTON_LEFT         0x00000020
 #define BUTTON_RIGHT        0x00000040
@@ -48,7 +48,7 @@ bool button_hold(void);
 #define BUTTON_HOLD         0x00000200
 
 #define BUTTON_MAIN (BUTTON_HOME|BUTTON_VOLUP|BUTTON_VOLDOWN\
-                    |BUTTON_PLAY|BUTTON_DOWN|BUTTON_LEFT|BUTTON_RIGHT\
+                    |BUTTON_UP|BUTTON_DOWN|BUTTON_LEFT|BUTTON_RIGHT\
                     |BUTTON_SELECT|BUTTON_POWER|BUTTON_HOLD)
 
 #define BUTTON_REMOTE 0

@@ -29,7 +29,7 @@
 #define HAVE_LCD_BITMAP
 
 /* define this if you have a light associated with the buttons */
-#define HAVE_BUTTON_LIGHT
+//#define HAVE_BUTTON_LIGHT
 
 /* define this if you have access to the quickscreen */
 //#define HAVE_QUICKSCREEN
@@ -47,7 +47,7 @@
 #define LCD_PIXELFORMAT VERTICAL_PACKING
 
 /* define this if you have LCD enable function */
-#define HAVE_LCD_ENABLE
+//#define HAVE_LCD_ENABLE
 
 #ifndef BOOTLOADER
 
@@ -58,7 +58,7 @@
 #endif
 
 /* define this if you can flip your LCD */
-//#define HAVE_LCD_FLIP
+#define HAVE_LCD_FLIP
 
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
 
@@ -75,26 +75,21 @@
 #endif
 
 /* Define this if you have a software controlled poweroff */
-//#define HAVE_SW_POWEROFF
+#define HAVE_SW_POWEROFF
 
 #define HAVE_FAT16SUPPORT
 
 /* The number of bytes reserved for loadable codecs */
-#define CODEC_SIZE 0
-//#define CODEC_SIZE 0x100000
+#define CODEC_SIZE 0x100000
 
 /* The number of bytes reserved for loadable plugins */
-//#define PLUGIN_BUFFER_SIZE 0x80000
+#define PLUGIN_BUFFER_SIZE 0x80000
 
 #define AB_REPEAT_ENABLE 1
 
 /* FM Tuner */
 //#define CONFIG_TUNER LV24020LP
 //#define HAVE_TUNER_PWR_CTRL
-
-/* Define this for LCD backlight available */
-#define HAVE_BACKLIGHT
-#define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE

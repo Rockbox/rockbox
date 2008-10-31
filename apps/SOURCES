@@ -188,6 +188,8 @@ keymaps/keymap-e200.c
 keymaps/keymap-c200.c
 #elif CONFIG_KEYPAD == SANSA_M200_PAD
 keymaps/keymap-m200.c
+#elif CONFIG_KEYPAD == SANSA_CLIP_PAD
+keymaps/keymap-clip.c
 #elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
 keymaps/keymap-av300.c
 #elif CONFIG_KEYPAD == MROBE500_PAD

@@ -87,7 +87,8 @@ const struct button_mapping generic_directions[] =
     || (CONFIG_KEYPAD == SANSA_C200_PAD) \
     || (CONFIG_KEYPAD == GIGABEAT_S_PAD) \
     || (CONFIG_KEYPAD == MROBE100_PAD) \
-    || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
+    || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) \
+    || (CONFIG_KEYPAD == SANSA_CLIP_PAD)
     { PLA_UP,                BUTTON_UP,                  BUTTON_NONE},
     { PLA_DOWN,              BUTTON_DOWN,                BUTTON_NONE},
     { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
@@ -186,7 +187,8 @@ const struct button_mapping generic_left_right_fire[] =
     || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
     || (CONFIG_KEYPAD == GIGABEAT_S_PAD)    \
     || (CONFIG_KEYPAD == MROBE100_PAD)      \
-    || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
+    || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) \
+    || (CONFIG_KEYPAD == SANSA_CLIP_PAD)
     { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
     { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
@@ -359,7 +361,7 @@ const struct button_mapping generic_actions[] =
     {PLA_MENU,          BUTTON_DOWN,        BUTTON_NONE},
     {PLA_FIRE,          BUTTON_SELECT,      BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
-#elif CONFIG_KEYPAD == SANSA_C200_PAD
+#elif CONFIG_KEYPAD == SANSA_C200_PAD || CONFIG_KEYPAD == SANSA_CLIP_PAD
     {PLA_QUIT,          BUTTON_POWER,       BUTTON_NONE},
     {PLA_START,         BUTTON_UP,        BUTTON_NONE},
     {PLA_MENU,          BUTTON_DOWN,        BUTTON_NONE},
@@ -437,7 +439,8 @@ const struct button_mapping generic_increase_decrease[] =
     || (CONFIG_KEYPAD == ONDIO_PAD)         \
     || (CONFIG_KEYPAD == GIGABEAT_S_PAD)    \
     || (CONFIG_KEYPAD == MROBE100_PAD)      \
-    || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
+    || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) \
+    || (CONFIG_KEYPAD == SANSA_CLIP_PAD)
     {PLA_INC,              BUTTON_UP,                  BUTTON_NONE},
     {PLA_DEC,              BUTTON_DOWN,                BUTTON_NONE},
     {PLA_INC_REPEAT,       BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE},

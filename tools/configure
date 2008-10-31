@@ -1693,6 +1693,7 @@ fi
     bootoutput="bootloader-clip.sansa"
     appextra="recorder:gui"
     plugins=""
+    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="as3525"
