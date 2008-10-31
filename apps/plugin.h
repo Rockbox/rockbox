@@ -246,6 +246,13 @@ struct plugin_api {
 #endif  /* HAVE_LCD_BITMAP */
 
     /* backlight */
+    /* The backlight_* functions must be present in the API regardless whether
+     * HAVE_BACKLIGHT is defined or not. The reason is that the stock Ondio has
+     * no backlight but can be modded to have backlight (it's prepared on the
+     * PCB). This makes backlight an all-target feature API wise, and keeps API
+     * compatible between stock and modded Ondio.
+     * For OLED targets like the Sansa Clip, the backlight_* functions control
+     * the display enable, which has essentially the same effect. */
     void (*backlight_on)(void);
     void (*backlight_off)(void);
     void (*backlight_set_timeout)(int index);

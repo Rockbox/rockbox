@@ -147,7 +147,6 @@ static const struct plugin_api rockbox_api = {
     gui_scrollbar_draw,
 #endif
 
-#ifdef HAVE_BACKLIGHT
     backlight_on,
     backlight_off,
     backlight_set_timeout,
@@ -159,7 +158,6 @@ static const struct plugin_api rockbox_api = {
     backlight_set_timeout_plugged,
 #endif
     is_backlight_on,
-#endif /* HAVE_BACKLIGHT */
     splash,
     splashf,
 
