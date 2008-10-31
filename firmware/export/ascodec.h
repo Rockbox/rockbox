@@ -22,6 +22,10 @@
 #ifndef _ASCODEC_H
 #define _ASCODEC_H
 
+#include "config.h"
+
+#ifdef HAVE_AS3514
 #include "ascodec-target.h"
+#endif
 
 #endif
