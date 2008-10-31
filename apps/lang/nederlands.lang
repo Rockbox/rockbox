@@ -10274,17 +10274,17 @@
   <source>
     *: none
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200*: "Wiel Licht Vertraging"
-    c200,gigabeatf,mrobe100,sa9200: "Knoppen Licht Vertraging"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Knoppen Licht Vertraging"
   </dest>
   <voice>
     *: none
     e200*: "Wiel Licht Vertraging"
-    c200,gigabeatf,mrobe100,sa9200: "Knoppen Licht Vertraging"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Knoppen Licht Vertraging"
   </voice>
 </phrase>
 <phrase>

@@ -10303,17 +10303,17 @@
   <source>
     *: none
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200*: "Timp iluminare rotita"
-    c200,gigabeatf,mrobe100,sa9200: "Timp iluminare butoane"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Timp iluminare butoane"
   </dest>
   <voice>
     *: none
     e200*: "Timp iluminare rotita"
-    c200,gigabeatf,mrobe100,sa9200: "Timp iluminare butoane"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Timp iluminare butoane"
   </voice>
 </phrase>
 <phrase>

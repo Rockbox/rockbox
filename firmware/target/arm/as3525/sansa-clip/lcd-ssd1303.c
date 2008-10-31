@@ -149,6 +149,9 @@ void lcd_set_flip(bool yesno)
 
 void lcd_enable(bool enable)
 {
+    if(display_on == enable)
+        return;
+
     if( (display_on = enable) ) /* simple '=' is not a typo ! */
         lcd_write_command(LCD_SET_DISPLAY_ON);
     else
@@ -240,6 +243,9 @@ void lcd_init_device(void)
 void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
                    int bheight, int stride)
 {
+    if(!display_on)
+        return;
+
     /* Copy display bitmap to hardware */
     while (bheight--)
     {
@@ -258,6 +264,13 @@ void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
 void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
                          int x, int by, int width, int bheight, int stride)
 {
+    /* TODO */
+
+#if 0
+    if(!display_on)
+        return;
+#endif
+
     (void)values;
     (void)phases;
     (void)x;
@@ -273,6 +286,9 @@ void lcd_update(void) ICODE_ATTR;
 void lcd_update(void)
 {
     int y;
+
+    if(!display_on)
+        return;
 
     /* Copy display bitmap to hardware */
     for (y = 0; y < LCD_FBHEIGHT; y++)
@@ -290,6 +306,9 @@ void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
     int ymax;
+
+    if(!display_on)
+        return;
 
     /* The Y coordinates have to work on even 8 pixel rows */
     ymax = (y + height-1) >> 3;

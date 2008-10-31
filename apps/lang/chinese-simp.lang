@@ -10687,17 +10687,17 @@
   <source>
     *: none
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200*: "转盘背光自动关闭时滞"
-    c200,gigabeatf,mrobe100,sa9200: "按键背光自动关闭时滞"
+    clip,c200,gigabeatf,mrobe100,sa9200: "按键背光自动关闭时滞"
   </dest>
   <voice>
     *: none
     e200*: "转盘背光自动关闭时滞"
-    c200,gigabeatf,mrobe100,sa9200: "按键背光自动关闭时滞"
+    clip,c200,gigabeatf,mrobe100,sa9200: "按键背光自动关闭时滞"
   </voice>
 </phrase>
 <phrase>

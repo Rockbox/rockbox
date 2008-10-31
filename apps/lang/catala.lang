@@ -3828,17 +3828,17 @@
   <source>
     *: none
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200*: "Apagat de llum de roda"
-    c200,gigabeatf,mrobe100,sa9200: "Apagat de llum de botons"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Apagat de llum de botons"
   </dest>
   <voice>
     *: none
     e200*: "Apagat de llum de roda"
-    c200,gigabeatf,mrobe100,sa9200: "Apagat de llum de botons"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Apagat de llum de botons"
   </voice>
 </phrase>
 <phrase>

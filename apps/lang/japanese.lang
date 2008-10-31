@@ -3834,17 +3834,17 @@
   <source>
     *: none
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200*: "ホイールライトのタイムアウト"
-    c200,gigabeatf,mrobe100,sa9200: "ボタンライトのタイムアウト"
+    clip,c200,gigabeatf,mrobe100,sa9200: "ボタンライトのタイムアウト"
   </dest>
   <voice>
     *: none
     e200*: "ホイールライトのタイムアウト"
-    c200,gigabeatf,mrobe100,sa9200: "ボタンライトのタイムアウト"
+    clip,c200,gigabeatf,mrobe100,sa9200: "ボタンライトのタイムアウト"
   </voice>
 </phrase>
 <phrase>

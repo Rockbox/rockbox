@@ -3835,17 +3835,17 @@
   <source>
     *: none
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200*: "เวลาเปิดไฟล้อหมุน"
-    c200,gigabeatf,mrobe100,sa9200: ""
+    clip,c200,gigabeatf,mrobe100,sa9200: ""
   </dest>
   <voice>
     *: none
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100,sa9200: ""
+    clip,c200,gigabeatf,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>

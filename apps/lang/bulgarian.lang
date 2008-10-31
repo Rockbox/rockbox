@@ -10221,17 +10221,17 @@
   <source>
     *: none
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200*: "Изключване на осветяването на колелото"
-    c200,gigabeatf,mrobe100,sa9200: "Изключване на осветяването на бутоните"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Изключване на осветяването на бутоните"
   </dest>
   <voice>
     *: none
     e200*: ""
-    c200,gigabeatf,mrobe100,sa9200: ""
+    clip,c200,gigabeatf,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>

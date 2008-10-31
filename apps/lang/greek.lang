@@ -3838,17 +3838,17 @@
   <source>
     *: none
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200*: "Χρόνος σβησίματος τροχού"
-    c200,gigabeatf,mrobe100,sa9200: "Χρόνος σβησίματος πλήκτρων"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Χρόνος σβησίματος πλήκτρων"
   </dest>
   <voice>
     *: none
     e200*: "Χρόνος σβησίματος τροχού"
-    c200,gigabeatf,mrobe100,sa9200: "Χρόνος σβησίματος πλήκτρων"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Χρόνος σβησίματος πλήκτρων"
   </voice>
 </phrase>
 <phrase>

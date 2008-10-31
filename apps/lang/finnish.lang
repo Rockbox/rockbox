@@ -9974,17 +9974,17 @@
   <source>
     *: none
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200*: "Rullavalon aikakatkaisu"
-    c200,gigabeatf,mrobe100,sa9200: "Painikevalon aikakatkaisu"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Painikevalon aikakatkaisu"
   </dest>
   <voice>
     *: none
     e200*: "Rullavalon aikakatkaisu"
-    c200,gigabeatf,mrobe100,sa9200: "Painikevalon aikakatkaisu"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Painikevalon aikakatkaisu"
   </voice>
 </phrase>
 <phrase>

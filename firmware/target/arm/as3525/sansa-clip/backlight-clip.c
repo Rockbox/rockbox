@@ -18,26 +18,41 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef BACKLIGHT_TARGET_H
-#define BACKLIGHT_TARGET_H
 
-#include "stdbool.h"
-#include "lcd.h"
-#include "backlight.h"
+#include "backlight-target.h"
+#include "as3525.h"
 
-#define _backlight_init() true
+/* TODO : backlight brightness */
 
-static inline void _backlight_on(void)
+/* XXX : xpd is used for SD/MCI interface
+ * If interrupts are used to access this interface, they should be
+ * disabled in _buttonlight_on/off ()
+ */
+
+void _buttonlight_on(void)
 {
-    lcd_enable(true);
+    int saved_ccu_io;
+
+    saved_ccu_io = CCU_IO;  /* save XPD setting */
+
+    CCU_IO &= ~(3<<2);      /* setup xpd as GPIO */
+
+    GPIOD_DIR |= (1<<7);
+    GPIOD_PIN(7) = (1<<7);  /* set pin d7 high */
+
+    CCU_IO = saved_ccu_io;  /* restore the previous XPD setting */
 }
 
-static inline void _backlight_off(void)
+void _buttonlight_off(void)
 {
-    lcd_enable(false);
+    int saved_ccu_io;
+
+    saved_ccu_io = CCU_IO;  /* save XPD setting */
+
+    CCU_IO &= ~(3<<2);      /* setup xpd as GPIO */
+
+    GPIOD_DIR |= (1<<7);
+    GPIOD_PIN(7) = 0;       /* set pin d7 low */
+
+    CCU_IO = saved_ccu_io;  /* restore the previous XPD setting */
 }
-
-void _buttonlight_on(void);
-void _buttonlight_off(void);
-
-#endif

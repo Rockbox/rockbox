@@ -3841,17 +3841,17 @@
   <source>
     *: none
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200*: "Duração da Luz da Roda"
-    c200,gigabeatf,mrobe100,sa9200: "Duração da Luz do Botão"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Duração da Luz do Botão"
   </dest>
   <voice>
     *: none
     e200*: "Duração da Luz da Roda"
-    c200,gigabeatf,mrobe100,sa9200: "Duração da Luz do Botão"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Duração da Luz do Botão"
   </voice>
 </phrase>
 <phrase>

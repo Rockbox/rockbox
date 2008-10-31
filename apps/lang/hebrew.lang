@@ -3832,17 +3832,17 @@
   <source>
     *: none
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200*: "זמן תאורת הגלגל"
-    c200,gigabeatf,mrobe100,sa9200: "זמן תאורת כפתור"
+    clip,c200,gigabeatf,mrobe100,sa9200: "זמן תאורת כפתור"
   </dest>
   <voice>
     *: none
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </voice>
 </phrase>
 <phrase>

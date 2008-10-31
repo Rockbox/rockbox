@@ -10023,17 +10023,17 @@
   <source>
     *: none
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200*: "Slukketid for hjullys"
-    c200,gigabeatf,mrobe100,sa9200: "Slukketid for knapplys"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Slukketid for knapplys"
   </dest>
   <voice>
     *: none
     e200*: "Tid før lys på hjul slukker"
-    c200,gigabeatf,mrobe100,sa9200: "Tid før lys på knapper slukker"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Tid før lys på knapper slukker"
   </voice>
 </phrase>
 <phrase>

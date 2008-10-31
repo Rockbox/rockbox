@@ -29,7 +29,7 @@
 #define HAVE_LCD_BITMAP
 
 /* define this if you have a light associated with the buttons */
-//#define HAVE_BUTTON_LIGHT
+#define HAVE_BUTTON_LIGHT
 
 /* define this if you have access to the quickscreen */
 //#define HAVE_QUICKSCREEN
@@ -47,12 +47,11 @@
 #define LCD_PIXELFORMAT VERTICAL_PACKING
 
 /* define this if you have LCD enable function */
-//#define HAVE_LCD_ENABLE
+#define HAVE_LCD_ENABLE
 
 #ifndef BOOTLOADER
-
-/* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
-   should be defined as well. */
+/* Define this if your LCD can be put to sleep.
+ * HAVE_LCD_ENABLE should be defined as well. */
 //#define HAVE_LCD_SLEEP
 //#define HAVE_LCD_SLEEP_SETTING
 #endif
@@ -90,6 +89,10 @@
 /* FM Tuner */
 //#define CONFIG_TUNER LV24020LP
 //#define HAVE_TUNER_PWR_CTRL
+
+/* Define this for LCD backlight available */
+#define HAVE_BACKLIGHT
+//#define HAVE_BACKLIGHT_BRIGHTNESS /* TODO */
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE

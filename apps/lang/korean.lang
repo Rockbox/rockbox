@@ -10762,17 +10762,17 @@
   <source>
     *: ""
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100: "Button Light Timeout"
+    clip,c200,gigabeatf,mrobe100: "Button Light Timeout"
   </source>
   <dest>
     *: ""
     e200*: "휠버튼 조명 시간"
-    c200,gigabeatf,mrobe100: "버튼 조명 시간"
+    clip,c200,gigabeatf,mrobe100: "버튼 조명 시간"
   </dest>
   <voice>
     *: ""
     e200*: "휠버튼 조명 시간"
-    c200,gigabeatf,mrobe100: "버튼 조명 시간"
+    clip,c200,gigabeatf,mrobe100: "버튼 조명 시간"
   </voice>
 </phrase>
 <phrase>

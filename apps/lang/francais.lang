@@ -3880,17 +3880,17 @@
   <source>
     *: none
     e200*: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200*: "Durée de l'éclairage de la molette"
-    c200,gigabeatf,mrobe100,sa9200: "Durée de l'éclairage des touches"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Durée de l'éclairage des touches"
   </dest>
   <voice>
     *: none
     e200*: "Durée de l'éclairage de la molette"
-    c200,gigabeatf,mrobe100,sa9200: "Durée de l'éclairage des touches"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Durée de l'éclairage des touches"
   </voice>
 </phrase>
 <phrase>
