@@ -27,7 +27,7 @@
 #include "pl180.h"
 #include "panic.h"
 #include "stdbool.h"
-#include "ata.h"
+#include "sd.h"
 
 #define     NAND_AS3525 0
 #define     SD_AS3525   1
@@ -283,7 +283,7 @@ static void init_pl180_controller(const int drive)
     mci_set_clock_divider(drive, 200);
 }
 
-int ata_init(void)
+int sd_init(void)
 {
     /* reset peripherals */
 
@@ -324,7 +324,7 @@ int ata_init(void)
     return 0;
 }
 
-int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
+int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
 {
     (void)start;
     (void)count;
@@ -332,7 +332,7 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* bu
     return 0; /* TODO */
 }
 
-int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf)
+int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf)
 {
     (void)start;
     (void)count;
