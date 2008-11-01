@@ -1,5 +1,5 @@
 /*
- * This config file is for the Sandisk Sansa e200
+ * This config file is for the Sandisk Sansa Clip
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
@@ -87,7 +87,7 @@
 #define AB_REPEAT_ENABLE 1
 
 /* FM Tuner */
-//#define CONFIG_TUNER LV24020LP
+//#define CONFIG_TUNER
 //#define HAVE_TUNER_PWR_CTRL
 
 /* Define this for LCD backlight available */
@@ -115,10 +115,10 @@
 /** Non-simulator section **/
 #ifndef SIMULATOR
 
-/* Define this if you have a PortalPlayer PP5024 */
+/* Define this if you have a AMS AS3525 SoC */
 #define CONFIG_CPU AS3525
 
-/* Define this if you want to use the PP5024 i2c interface */
+/* Define this if you want to use the AS3525 i2c interface */
 #define CONFIG_I2C I2C_AS3525
 
 /* define this if the hardware can be powered off while charging */
