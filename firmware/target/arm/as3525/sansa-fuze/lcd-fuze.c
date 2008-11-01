@@ -25,6 +25,16 @@
 #include "cpu.h"
 #include "lcd.h"
 
+/* The controller is unknown, but some registers appear to be the same as the
+   HD66789R */
+
+#define R_ENTRY_MODE            0x03
+#define R_RAM_ADDR_SET          0x21
+#define R_WRITE_DATA_2_GRAM     0x22
+
+#define R_ENTRY_MODE_HORZ 0x7030
+
+
 static bool display_on = false; /* is the display turned on? */
 static bool display_flipped = false;
 static int xoffset = 20; /* needed for flip */
@@ -154,7 +164,7 @@ static void _display_on(void)
 
     lcd_write_reg(0x01, 277);
     lcd_write_reg(0x02, (7<<8));
-    lcd_write_reg(0x03, 0x30);
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
     lcd_write_reg(0x08, 0x01);
     lcd_write_reg(0x0b, (1<<10));
     lcd_write_reg(0x0c, 0);
@@ -186,120 +196,6 @@ static void _display_on(void)
 
     display_on = true;  /* must be done before calling lcd_update() */
     lcd_update();
-}
-
-/* (e.g. 0, 219) */
-static void lcd_window_x(int r0, int r1)
-{
-    int r2, r3, r4;
-
-    r3 = (LCD_WIDTH - 1);
-    r2 = (LCD_WIDTH - 1);
-
-    if (r0 < LCD_WIDTH)
-        r2 = r0;
-
-    if (r1 < LCD_WIDTH)
-        r3 = r1;
-
-#if 0
-    r1 = 0x1db12;
-
-    [r1] = 1; /* byte */
-#endif
-
-    r3 += xoffset;
-
-    r4 = r2;
-
-    r4 += xoffset;
-
-    r0 = (r3 << 8);
-
-    r0 |= r4;
-
-    r1 = (r0 << 16) >> 16;
-
-    lcd_write_reg(0x46, r1);
-
-    r1 = (r4 << 16) >> 16;
-
-    lcd_write_reg(0x20, r1);
-
-    lcd_write_reg(0x03, 0x30);
-
-#if 0
-    r0 := 0x1e0c4
-    r1 := 0x216a8
-
-    r0 := [r0]
-    r2 := [r1]
-
-    r0 := (r0 >> 2) << 2;
-
-    if (r0 != r2) {
-#endif
-        lcd_write_reg(0x00, 0x0001);
-        lcd_write_reg(0x11, 0x3704);
-        lcd_write_reg(0x14, 0x1a1b);
-        lcd_write_reg(0x10, 0x3860);
-        lcd_write_reg(0x13, 0x0070);
-        lcd_write_reg(0x07, 0x0017);
-        lcd_write_reg(0x01, 277);
-        lcd_write_reg(0x02, (7<<8));
-        lcd_write_reg(0x08, 0x0001);
-        lcd_write_reg(0x0b, (1<<10));
-        lcd_write_reg(0x0c, 0x0000);
-        lcd_write_reg(0x30, 0x0040);
-        lcd_write_reg(0x31, 0x0687);
-        lcd_write_reg(0x32, 0x0306);
-        lcd_write_reg(0x33, 260);
-        lcd_write_reg(0x34, 0x0585);
-        lcd_write_reg(0x35, 255+66);
-        lcd_write_reg(0x36, 0x687+128);
-        lcd_write_reg(0x37, 259);
-        lcd_write_reg(0x38, 0);
-        lcd_write_reg(0x39, 0);
-        lcd_write_reg(0x40, 0);
-        lcd_write_reg(0x41, 0);
-        lcd_write_reg(0x42, (LCD_WIDTH - 1));
-        lcd_write_reg(0x43, 0);
-        lcd_write_reg(0x44, (LCD_WIDTH - 1));
-        lcd_write_reg(0x45, 0);
-        lcd_write_reg(0x15, 0);
-        lcd_write_reg(0x73, 0);
-#if 0
-    }
-#endif
-}
-
-/*  - e.g. 0, 175 */
-static void lcd_window_y(int r0, int r1)
-{
-    int r2, r4;
-
-    r2 = (LCD_HEIGHT - 1);
-    r4 = (LCD_HEIGHT - 1);
-
-    if (r0 < LCD_HEIGHT)
-        r4 = r0;
-
-    if (r1 < LCD_HEIGHT)
-        r2 = r1;
-
-    r1 = (r2 << 16) >> 16;
-
-    lcd_write_reg(0x47, r1);
-
-    r1 = (r4 << 16) >> 16;
-
-    lcd_write_reg(0x48, r1);
-
-    /* ??Start address - (x<<8) | y0 */
-    lcd_write_reg(0x21, r1);
-
-    /* Start write to GRAM */    
-    lcd_write_cmd(0x22);
 }
 
 /* I'm guessing this function is lcd_enable, but it may not be... */
@@ -376,13 +272,6 @@ void lcd_init_device()
 
     GPIOD_DIR |= (1<<7);
 
-#if 0
-    if (byte[0x21b24] == 0) {
-        GPIOD_PIN(7) = (1<<7);
-        GPIOD_DIR |= (1<<7);
-    }
-#endif
-
     lcd_delay(1);
 
     GPIOA_PIN(5) = (1<<5);
@@ -392,6 +281,24 @@ void lcd_init_device()
     _display_on();
 }
 
+/* Set horizontal window addresses */
+static void lcd_window_x(int xmin, int xmax)
+{
+    xmin += xoffset;
+    xmax += xoffset;
+
+    lcd_write_reg(0x46, (xmax << 8) | xmin);
+    lcd_write_reg(0x20, xmin);
+}
+
+/* Set vertical window addresses */
+static void lcd_window_y(int ymin, int ymax)
+{
+    lcd_write_reg(0x47, ymax);
+    lcd_write_reg(0x48, ymin);
+    lcd_write_reg(0x21, ymin);
+}
+
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void)
@@ -399,12 +306,16 @@ void lcd_update(void)
     if (!display_on)
         return;
 
-    lcd_window_x(0, (LCD_WIDTH - 1));
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
 
-    lcd_window_y(0, (LCD_HEIGHT - 1));
+    lcd_window_x(0, LCD_WIDTH - 1);
+    lcd_window_y(0, LCD_HEIGHT - 1);
 
+    /* Start write to GRAM */    
+    lcd_write_cmd(R_WRITE_DATA_2_GRAM);
+
+    /* Write data */
     lcd_write_data((unsigned short *)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
-
 }
 
 /* Update a fraction of the display. */
@@ -424,7 +335,9 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (x >= xmax)
         return; /* nothing left to do */
 
-    ymax = y + height;
+    width = xmax - x + 1;     /* Fix width */
+
+    ymax = y + height - 1;
     if (ymax > LCD_HEIGHT)
         ymax = LCD_HEIGHT - 1; /* Clip bottom */
     if (y < 0)
@@ -432,9 +345,13 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (y >= ymax)
         return; /* nothing left to do */
 
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
 
     lcd_window_x(x, xmax);
     lcd_window_y(y, ymax);
+
+    /* Start write to GRAM */    
+    lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
     ptr = (unsigned short *)&lcd_framebuffer[y][x];
 
