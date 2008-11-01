@@ -137,16 +137,20 @@ static const struct button_mapping button_context_pitchscreen[]  = {
 }; /* button_context_pitchscreen */
 
 #ifdef HAVE_RECORDING
+static const struct button_mapping button_context_rectrigger[]  = {
+    { ACTION_STD_OK,                BUTTON_MENU|BUTTON_REL,     BUTTON_MENU },  
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_RECSCREEN)
+};
 static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_REC_PAUSE,             BUTTON_MENU|BUTTON_REL,     BUTTON_MENU },  
-    { ACTION_SETTINGS_INC,          BUTTON_RIGHT,               BUTTON_NONE },
+    { ACTION_SETTINGS_INC,          BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT },
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
-#endif
+#endif /* HAVE_RECORDING  */
 
 static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT,                           BUTTON_NONE },
@@ -212,8 +216,9 @@ const struct button_mapping* get_context_mapping( int context )
             return button_context_tree;
 #ifdef HAVE_RECORDING
         case CONTEXT_RECSCREEN:
+             return button_context_recscreen;
         case CONTEXT_SETTINGS_RECTRIGGER:
-            return button_context_recscreen;
+            return button_context_rectrigger;
 #endif
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
