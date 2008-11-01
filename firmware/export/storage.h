@@ -50,6 +50,7 @@ struct storage_info
 
 void storage_spindown(int seconds);
 
+#ifndef SIMULATOR
 static inline void storage_enable(bool on)
 {
 #if (CONFIG_STORAGE & STORAGE_ATA)
@@ -102,7 +103,6 @@ static inline int storage_soft_reset(void)
 }
 static inline int storage_init(void)
 {
-#ifndef SIMULATOR
 #if (CONFIG_STORAGE & STORAGE_ATA)
     return ata_init();
 #elif (CONFIG_STORAGE & STORAGE_SD)
@@ -113,9 +113,6 @@ static inline int storage_init(void)
     return mmc_init();
 #else
     #error No storage driver!
-#endif
-#else
-    return 0;
 #endif
 }
 static inline void storage_close(void)
@@ -174,7 +171,7 @@ static inline void storage_set_led_enabled(bool enabled)
     #error No storage driver!
 #endif
 }
-#endif
+#endif /*LED*/
 
 static inline long storage_last_disk_activity(void)
 {
@@ -245,5 +242,92 @@ static inline bool storage_present(IF_MV_NONVOID(int drive))
     #error No storage driver!
 #endif
 }
-#endif
+#endif /* HOTSWAP */
+#else /* SIMULATOR */
+static inline void storage_enable(bool on)
+{
+    (void)on;
+}
+static inline void storage_sleep(void)
+{
+}
+static inline void storage_sleepnow(void)
+{
+}
+static inline bool storage_disk_is_active(void)
+{
+    return 0;
+}
+static inline int storage_hard_reset(void)
+{
+    return 0;
+}
+static inline int storage_soft_reset(void)
+{
+    return 0;
+}
+static inline int storage_init(void)
+{
+    return 0;
+}
+static inline void storage_close(void)
+{
+}
+static inline int storage_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
+{
+    IF_MV((void)drive;)
+    (void)start;
+    (void)count;
+    (void)buf;
+    return 0;
+}
+static inline int storage_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf)
+{
+    IF_MV((void)drive;)
+    (void)start;
+    (void)count;
+    (void)buf;
+    return 0;
+}
+static inline void storage_spin(void)
+{
+}
+
+#if (CONFIG_LED == LED_REAL)
+static inline void storage_set_led_enabled(bool enabled)
+{
+    (void)enabled;
+}
+#endif /*LED*/
+
+static inline long storage_last_disk_activity(void)
+{
+    return 0;
+}
+
+static inline int storage_spinup_time(void)
+{
+    return 0;
+}
+
+static inline void storage_get_info(IF_MV2(int drive,) struct storage_info *info)
+{
+    IF_MV((void)drive;)
+    (void)info;
+}
+
+#ifdef HAVE_HOTSWAP
+static inline bool storage_removable(IF_MV_NONVOID(int drive))
+{
+    IF_MV((void)drive;)
+    return 0;
+}
+
+static inline bool storage_present(IF_MV_NONVOID(int drive))
+{
+    IF_MV((void)drive;)
+    return 0;
+}
+#endif /* HOTSWAP */
+#endif /* SIMULATOR */
 #endif
