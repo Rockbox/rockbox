@@ -201,6 +201,16 @@ void system_init(void)
     CGU_PERI |= CGU_GPIO_CLOCK_ENABLE;
 #endif
 
+    asm volatile(
+        "mov r0, #0               \n"
+        "mcr p15, 0, r0, c7, c7   \n" /* invalidate icache & dcache */
+        "mrc p15, 0, r0, c1, c0   \n" /* control register */
+        "orr r0, r0, #0x1000      \n" /* enable icache */
+        "orr r0, r0, #4           \n" /* enable dcache */
+        "mcr p15, 0, r0, c1, c0   \n"
+        : : : "r0" );
+
+
     sdram_init();
 }
 
