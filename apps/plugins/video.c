@@ -661,7 +661,7 @@ int PlayTick(int fd)
 #endif
             )
         {
-            rb->ata_sleep(); /* no point in leaving the disk run til timeout */
+            rb->storage_sleep(); /* no point in leaving the disk run til timeout */
             gPlay.bDiskSleep = true;
         }
 

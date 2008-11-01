@@ -153,7 +153,7 @@ static inline bool stream_can_seek(void)
 static inline void stream_keep_disk_active(void)
 {
 #ifdef HAVE_DISK_STORAGE
-    rb->ata_spin();
+    rb->storage_spin();
 #endif
     }
 

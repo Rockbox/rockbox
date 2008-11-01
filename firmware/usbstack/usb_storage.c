@@ -24,7 +24,7 @@
 #include "usb_drv.h"
 //#define LOGF_ENABLE
 #include "logf.h"
-#include "ata.h"
+#include "storage.h"
 #include "hotswap.h"
 #include "disk.h"
 /* Needed to get at the audio buffer */
@@ -36,7 +36,7 @@
 
 /* The SD card driver on Sansa c200 and e200 can cause write corruption,
  * often triggered by simultaneous USB activity. This can be largely avoided
- * by not overlapping ata_write_sector() with USB transfers. This does reduce
+ * by not overlapping storage_write_sector() with USB transfers. This does reduce
  * write performance, so we only do it for the affected DAPs
  */
 #if (CONFIG_STORAGE & STORAGE_SD)
@@ -147,10 +147,8 @@ struct inquiry_data {
 struct report_lun_data {
     unsigned int lun_list_length;
     unsigned int reserved1;
-    unsigned char lun0[8];
-#ifdef HAVE_HOTSWAP
-    unsigned char lun1[8];
-#endif
+    // TODO this should be cleaned up with the VOLUMES vs DRIVES mess
+    unsigned char luns[NUM_VOLUMES][8];
 } __attribute__ ((packed));
 
 struct sense_data {
@@ -263,7 +261,7 @@ static void send_command_result(void *data,int size);
 static void send_command_failed_result(void);
 static void send_block_data(void *data,int size);
 static void receive_block_data(void *data,int size);
-static void identify2inquiry(int lun);
+static void fill_inquiry(IF_MV_NONVOID(int lun));
 static void send_and_read_next(void);
 static bool ejected[NUM_VOLUMES];
 
@@ -289,7 +287,7 @@ static bool check_disk_present(IF_MV_NONVOID(int volume))
     return true;
 #else
     unsigned char sector[512];
-    return ata_read_sectors(IF_MV2(volume,)0,1,sector) == 0;
+    return storage_read_sectors(IF_MV2(volume,)0,1,sector) == 0;
 #endif
 }
 
@@ -460,7 +458,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                        cur_cmd.data[cur_cmd.data_select],
                        MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
 #else
-                int result = ata_write_sectors(IF_MV2(cur_cmd.lun,)
+                int result = storage_write_sectors(IF_MV2(cur_cmd.lun,)
                                          cur_cmd.sector,
                                          MIN(BUFFER_SIZE/SECTOR_SIZE,
                                              cur_cmd.count),
@@ -639,7 +637,7 @@ static void send_and_read_next(void)
                ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
                MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
 #else
-        cur_cmd.last_result = ata_read_sectors(IF_MV2(cur_cmd.lun,)
+        cur_cmd.last_result = storage_read_sectors(IF_MV2(cur_cmd.lun,)
                                            cur_cmd.sector,
                                            MIN(BUFFER_SIZE/SECTOR_SIZE,
                                                cur_cmd.count),
@@ -654,6 +652,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     /* USB Mass Storage assumes LBA capability.
        TODO: support 48-bit LBA */
 
+    struct storage_info info;
     unsigned int length = cbw->data_transfer_length;
     unsigned int block_size = 0;
     unsigned int block_count = 0;
@@ -664,25 +663,20 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     unsigned char lun = cbw->lun;
 #endif
     unsigned int block_size_mult = 1;
+    storage_get_info(IF_MV2(lun,)&info);
 #ifdef USB_USE_RAMDISK
     block_size = SECTOR_SIZE;
     block_count = RAMDISK_SIZE;
 #else
-#if (CONFIG_STORAGE & STORAGE_SD) || defined(HAVE_HOTSWAP)
-    tCardInfo* cinfo = card_get_info(lun);
-    if(cinfo->initialized && cinfo->numblocks > 0) {
-        block_size = cinfo->blocksize;
-        block_count = cinfo->numblocks;
-    }
-    else {
+    block_size=info.sector_size;
+    block_count=info.num_sectors;
+#endif
+
+#ifdef HAVE_HOTSWAP
+    if(storage_removable(IF_MV(lun)) && !storage_present(IF_MV(lun))) {
         ejected[lun] = true;
         try_release_ata();
     }
-#else
-    unsigned short* identify = ata_get_identify();
-    block_size = SECTOR_SIZE;
-    block_count = (identify[61] << 16 | identify[60]);
-#endif
 #endif
 
     if(ejected[lun])
@@ -719,19 +713,22 @@ static void handle_scsi(struct command_block_wrapper* cbw)
         case SCSI_REPORT_LUNS: {
             logf("scsi inquiry %d",lun);
             int allocation_length=0;
+            int i;
             allocation_length|=(cbw->command_block[6]<<24);
             allocation_length|=(cbw->command_block[7]<<16);
             allocation_length|=(cbw->command_block[8]<<8);
             allocation_length|=(cbw->command_block[9]);
             memset(tb.lun_data,0,sizeof(struct report_lun_data));
+            tb.lun_data->lun_list_length=htobe32(8*NUM_VOLUMES);
+            for(i=0;i<NUM_VOLUMES;i++)
+            {
 #ifdef HAVE_HOTSWAP
-            tb.lun_data->lun_list_length=htobe32(16);
-            tb.lun_data->lun1[1]=1;
-#else
-            tb.lun_data->lun_list_length=htobe32(8);
+                if(storage_removable(IF_MV(i)))
+                    tb.lun_data->luns[i][1]=1;
+                else
 #endif
-            tb.lun_data->lun0[1]=0;
-            
+                    tb.lun_data->luns[i][1]=0;
+            }
             send_command_result(tb.lun_data,
                                 MIN(sizeof(struct report_lun_data), length));
             break;
@@ -739,7 +736,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
         case SCSI_INQUIRY:
             logf("scsi inquiry %d",lun);
-            identify2inquiry(lun);
+            fill_inquiry(IF_MV(lun));
             length = MIN(length, cbw->command_block[4]);
             send_command_result(tb.inquiry,
                                 MIN(sizeof(struct inquiry_data), length));
@@ -975,7 +972,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                        ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
                        MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
 #else
-                cur_cmd.last_result = ata_read_sectors(IF_MV2(cur_cmd.lun,)
+                cur_cmd.last_result = storage_read_sectors(IF_MV2(cur_cmd.lun,)
                                              cur_cmd.sector,
                                              MIN(BUFFER_SIZE/SECTOR_SIZE,
                                                  cur_cmd.count),
@@ -1072,46 +1069,30 @@ static void send_csw(int status)
     }
 }
 
-/* convert ATA IDENTIFY to SCSI INQUIRY */
-static void identify2inquiry(int lun)
+static void copy_padded(char *dest, char *src, int len)
 {
-#ifdef HAVE_FLASH_STORAGE
-    if(lun==0) {
-        memcpy(&tb.inquiry->VendorId,"Rockbox ",8);
-        memcpy(&tb.inquiry->ProductId,"Internal Storage",16);
-        memcpy(&tb.inquiry->ProductRevisionLevel,"0.00",4);
-    }
-    else {
-        memcpy(&tb.inquiry->VendorId,"Rockbox ",8);
-        memcpy(&tb.inquiry->ProductId,"SD Card Slot    ",16);
-        memcpy(&tb.inquiry->ProductRevisionLevel,"0.00",4);
-    }
-#else
-    unsigned int i;
-    unsigned short* dest;
-    unsigned short* src;
-    unsigned short* identify = ata_get_identify();
-    (void)lun;
-    memset(tb.inquiry, 0, sizeof(struct inquiry_data));
-    
-#if 0
-    if (identify[82] & 4)
-        tb.inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
-#endif
+   int i=0;
+   while(src[i]!=0 && i<len)
+   {
+      dest[i]=src[i];
+      i++;
+   }
+   while(i<len)
+   {
+      dest[i]=' ';
+      i++;
+   }
+}
 
-    /* ATA only has a 'model' field, so we copy the 
-       first 8 bytes to 'vendor' and the rest to 'product' (they are
-       consecutive in the inquiry struct) */
-    src = (unsigned short*)&identify[27];
-    dest = (unsigned short*)&tb.inquiry->VendorId;
-    for (i=0;i<12;i++)
-        dest[i] = htobe16(src[i]);
-    
-    src = (unsigned short*)&identify[23];
-    dest = (unsigned short*)&tb.inquiry->ProductRevisionLevel;
-    for (i=0;i<2;i++)
-        dest[i] = htobe16(src[i]);
-#endif
+/* build SCSI INQUIRY */
+static void fill_inquiry(IF_MV_NONVOID(int lun))
+{
+    memset(tb.inquiry, 0, sizeof(struct inquiry_data));
+    struct storage_info info;
+    storage_get_info(IF_MV2(lun,)&info);
+    copy_padded(tb.inquiry->VendorId,info.vendor,sizeof(tb.inquiry->VendorId));
+    copy_padded(tb.inquiry->ProductId,info.product,sizeof(tb.inquiry->ProductId));
+    copy_padded(tb.inquiry->ProductRevisionLevel,info.revision,sizeof(tb.inquiry->ProductRevisionLevel));
 
     tb.inquiry->DeviceType = DIRECT_ACCESS_DEVICE;
     tb.inquiry->AdditionalLength = 0x1f;
@@ -1119,14 +1100,6 @@ static void identify2inquiry(int lun)
     tb.inquiry->Versions = 4; /* SPC-2 */
     tb.inquiry->Format   = 2; /* SPC-2/3 inquiry format */
 
-#if 0
-#ifdef HAVE_HOTSWAP
-    if(lun>0)
-        tb.inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
-#endif
-#endif
-    /* Mac OSX 10.5 doesn't like this driver if DEVICE_REMOVABLE is not set.
-       TODO : this can probably be solved by providing caching mode page */
 #ifdef TOSHIBA_GIGABEAT_S
     tb.inquiry->DeviceTypeModifier = 0;
 #else

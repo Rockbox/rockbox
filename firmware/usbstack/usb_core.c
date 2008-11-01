@@ -50,7 +50,7 @@
 #include "as3514.h"
 #endif
 
-#if !defined(HAVE_AS3514) && !defined(IPOD_ARCH)
+#if !defined(HAVE_AS3514) && !defined(IPOD_ARCH) && (CONFIG_STORAGE & STORAGE_ATA)
 #include "ata.h"
 #endif
 
@@ -281,7 +281,7 @@ static void set_serial_descriptor(void)
     }
     usb_string_iSerial.bLength=68;
 }
-#else 
+#elif (CONFIG_STORAGE & STORAGE_ATA)
 /* If we don't know the device serial number, use the one
  * from the disk */
 static void set_serial_descriptor(void)
@@ -300,6 +300,8 @@ static void set_serial_descriptor(void)
     }
     usb_string_iSerial.bLength=84;
 }
+#else
+#error No set_serial_descriptor() implementation for this target
 #endif
 
 void usb_core_init(void)

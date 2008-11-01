@@ -30,7 +30,7 @@
 #include "lcd-remote.h"
 #include "kernel.h"
 #include "thread.h"
-#include "ata.h"
+#include "storage.h"
 #include "usb.h"
 #include "disk.h"
 #include "font.h"
@@ -87,10 +87,10 @@ void shutdown(void)
     if (ide_powered())
     {
         /* Make sure ATA has been initialized. */
-        ata_init();
+        storage_init();
         
         /* And put the disk into sleep immediately. */
-        ata_sleepnow();
+        storage_sleepnow();
     }
 
     sleep(HZ*2);
@@ -192,7 +192,7 @@ void main(void)
     
     check_battery();
     
-    rc = ata_init();
+    rc = storage_init();
     if(rc)
     {
         printf("ATA error: %d", rc);

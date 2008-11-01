@@ -38,6 +38,7 @@
 #include "option_select.h"
 #include "talk.h"
 #include "version.h"
+#include "storage.h"
 
 #if CONFIG_CHARGING
 #include "power.h"
@@ -265,13 +266,13 @@ static const struct plugin_api rockbox_api = {
     fdprintf,
     read_line,
     settings_parseline,
-    ata_sleep,
-    ata_spin,
-    ata_spindown,
-#if USING_ATA_CALLBACK
-    register_ata_idle_func,
-    unregister_ata_idle_func,
-#endif /* USING_ATA_CALLBACK */
+    storage_sleep,
+    storage_spin,
+    storage_spindown,
+#if USING_STORAGE_CALLBACK
+    register_storage_idle_func,
+    unregister_storage_idle_func,
+#endif /* USING_STORAGE_CALLBACK */
     reload_directory,
     create_numbered_filename,
     file_exists,

@@ -3598,7 +3598,7 @@ int play_file(char* filename)
             if (free_space <= 0)
             {
                 filling = false;
-                rb->ata_sleep();
+                rb->storage_sleep();
             }
             else
             {

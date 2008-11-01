@@ -21,7 +21,7 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "thread.h"
-#include "ata.h"
+#include "storage.h"
 #include "ata-target.h"
 #include "disk.h"
 #include "font.h"
@@ -64,7 +64,7 @@ void main(void)
     printf("Rockbox boot loader");
     printf("Version %s", APPSVERSION);
     
-    ret = ata_init();
+    ret = storage_init();
     if(ret)
         printf("ATA error: %d", ret);
     

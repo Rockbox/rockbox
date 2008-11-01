@@ -48,6 +48,7 @@
 #include "filetypes.h"
 #include "audio.h"
 #include "appevents.h"
+#include "storage.h"
 
 #define FILE_SEARCH_INSTRUCTIONS ROCKBOX_DIR "/tagnavi.config"
 
@@ -1057,7 +1058,7 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
            otherwise show it after the normal 1/2 second delay */
         show_search_progress(
 #ifdef HAVE_DISK_STORAGE
-            ata_disk_is_active()
+            storage_disk_is_active()
 #else
             true
 #endif

@@ -31,7 +31,7 @@
 #include "kernel.h"
 #include "lcd.h"
 #include "font.h"
-#include "ata.h"
+#include "storage.h"
 #include "button.h"
 #include "disk.h"
 #include "crc32-mi4.h"
@@ -120,7 +120,7 @@ void* main(void)
     printf(MODEL_NAME);
     printf("");
 
-    i=ata_init();
+    i=storage_init();
     disk_init(IF_MV(0));
     num_partitions = disk_mount_all();
 
@@ -139,7 +139,7 @@ void* main(void)
     printf("reading: %x", (START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK)*512);
 #endif
 
-    ata_read_sectors(IF_MV2(0,) 
+    storage_read_sectors(IF_MV2(0,) 
                         pinfo->start + START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK,
                         1 , sector);
     crc32 = chksum_crc32 (sector, 512);
@@ -161,7 +161,7 @@ void* main(void)
         /* E200R bootloader detected - patch it */
         memcpy(&sector[HACK_OFFSET], changedBytes,
                 sizeof(changedBytes)/sizeof(*changedBytes));
-        ata_write_sectors(IF_MV2(0,) 
+        storage_write_sectors(IF_MV2(0,) 
                         pinfo->start + START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK,
                         1 , sector);
         printf("Firmware unlocked");

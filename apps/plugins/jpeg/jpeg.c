@@ -438,14 +438,14 @@ int show_menu(void) /* return 1 to quit */
 #if !defined(SIMULATOR) && defined(HAVE_DISK_STORAGE)
     /* change ata spindown time based on slideshow time setting */
     immediate_ata_off = false;
-    rb->ata_spindown(rb->global_settings->disk_spindown);
+    rb->storage_spindown(rb->global_settings->disk_spindown);
 
     if (slideshow_enabled)
     {
         if(jpeg_settings.ss_timeout < 10)
         {
             /* slideshow times < 10s keep disk spinning */
-            rb->ata_spindown(0);
+            rb->storage_spindown(0);
         }
         else if (!rb->mp3_is_playing())
         {
@@ -1057,7 +1057,7 @@ int load_and_show(char* filename)
     else if(immediate_ata_off)
     {
         /* running slideshow and time is long enough: power down disk */
-        rb->ata_sleep();
+        rb->storage_sleep();
     }
 #endif
 
@@ -1259,7 +1259,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
 #if !defined(SIMULATOR) && defined(HAVE_DISK_STORAGE)
     /* set back ata spindown time in case we changed it */
-    rb->ata_spindown(rb->global_settings->disk_spindown);
+    rb->storage_spindown(rb->global_settings->disk_spindown);
 #endif
 
     /* Turn on backlight timeout (revert to settings) */

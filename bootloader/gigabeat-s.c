@@ -25,7 +25,7 @@
 #include "string.h"
 #include "adc.h"
 #include "powermgmt.h"
-#include "ata.h"
+#include "storage.h"
 #include "dir.h"
 #include "disk.h"
 #include "common.h"
@@ -81,7 +81,7 @@ static bool pause_if_button_pressed(bool pre_usb)
         sleep(HZ/5);
 
         /* If the disk powers off, the firmware will lock at startup */
-        ata_spin();
+        storage_spin();
     }
 }
 
@@ -310,7 +310,7 @@ static void __attribute__((noreturn)) handle_firmware_load(void)
 
     /* Put drivers into a known state */
     button_close_device();
-    ata_close();
+    storage_close();
     system_prepare_fw_start();
 
     if (rc == EOK)
@@ -353,7 +353,7 @@ void main(void)
 
     check_battery();
 
-    rc = ata_init();
+    rc = storage_init();
     if(rc)
     {
         reset_screen();

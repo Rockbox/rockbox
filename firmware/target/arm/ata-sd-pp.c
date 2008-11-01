@@ -30,6 +30,8 @@
 #include "cpu.h"
 #include "panic.h"
 #include "usb.h"
+#include "sd.h"
+#include "storage.h"
 
 #define BLOCK_SIZE      512
 #define SECTOR_SIZE     512
@@ -128,15 +130,13 @@
 
 /** global, exported variables **/
 #ifdef HAVE_MULTIVOLUME
-#define NUM_VOLUMES 2
+#define NUM_DRIVES 2
 #else
-#define NUM_VOLUMES 1
+#define NUM_DRIVES 1
 #endif
 
 /* for compatibility */
-int ata_spinup_time = 0;
-
-long last_disk_activity = -1;
+static long last_disk_activity = -1;
 
 /** static, private data **/ 
 static bool initialized = false;
@@ -153,7 +153,7 @@ struct sd_card_status
     int retry_max;
 };
 
-static struct sd_card_status sd_status[NUM_VOLUMES] =
+static struct sd_card_status sd_status[NUM_DRIVES] =
 {
     { 0, 1  },
 #ifdef HAVE_MULTIVOLUME
@@ -786,12 +786,12 @@ static void sd_select_device(int card_no)
 
 /* API Functions */
 
-static void ata_led(bool onoff)
+static void sd_led(bool onoff)
 {
     led(onoff);
 }
 
-int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
+int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
 #ifndef HAVE_MULTIVOLUME
@@ -805,14 +805,14 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
 
     mutex_lock(&sd_mtx);
 
-    ata_led(true);
+    sd_led(true);
 
-ata_read_retry:
+sd_read_retry:
     if (drive != 0 && !card_detect_target())
     {
         /* no external sd-card inserted */
         ret = -EC_NOCARD;
-        goto ata_read_error;
+        goto sd_read_error;
     }
 
     sd_select_device(drive);
@@ -820,7 +820,7 @@ ata_read_retry:
     if (currcard->initialized < 0)
     {
         ret = currcard->initialized;
-        goto ata_read_error;
+        goto sd_read_error;
     }
 
     last_disk_activity = current_tick;
@@ -834,7 +834,7 @@ ata_read_retry:
         {
             ret = sd_select_bank(bank);
             if (ret < 0)
-                goto ata_read_error;
+                goto sd_read_error;
         }
     
         start -= bank * BLOCKS_PER_BANK;
@@ -842,7 +842,7 @@ ata_read_retry:
 
     ret = sd_wait_for_state(TRAN, EC_TRAN_READ_ENTRY);
     if (ret < 0)
-        goto ata_read_error;
+        goto sd_read_error;
 
     BLOCK_COUNT_REG = incount;
 
@@ -858,7 +858,7 @@ ata_read_retry:
         ret = sd_command(READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, NULL, 0x1c25);
     }
     if (ret < 0)
-        goto ata_read_error;
+        goto sd_read_error;
 
     /* TODO: Don't assume BLOCK_SIZE == SECTOR_SIZE */
 
@@ -874,38 +874,38 @@ ata_read_retry:
         }
 
         ret = -EC_FIFO_READ_FULL;
-        goto ata_read_error;
+        goto sd_read_error;
     }
 
     last_disk_activity = current_tick;
 
     ret = sd_command(STOP_TRANSMISSION, 0, NULL, 1);
     if (ret < 0)
-        goto ata_read_error;
+        goto sd_read_error;
 
     ret = sd_wait_for_state(TRAN, EC_TRAN_READ_EXIT);
     if (ret < 0)
-        goto ata_read_error;
+        goto sd_read_error;
 
     while (1)
     {
-        ata_led(false);
+        sd_led(false);
         mutex_unlock(&sd_mtx);
 
         return ret;
 
-ata_read_error:
+sd_read_error:
         if (sd_status[drive].retry < sd_status[drive].retry_max
             && ret != -EC_NOCARD)
         {
             sd_status[drive].retry++;
             currcard->initialized = 0;
-            goto ata_read_retry;
+            goto sd_read_retry;
         }
     }
 }
 
-int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
+int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
 /* Write support is not finished yet */
@@ -920,14 +920,14 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
 
     mutex_lock(&sd_mtx);
 
-    ata_led(true);
+    sd_led(true);
 
-ata_write_retry:
+sd_write_retry:
     if (drive != 0 && !card_detect_target())
     {
         /* no external sd-card inserted */
         ret = -EC_NOCARD;
-        goto ata_write_error;
+        goto sd_write_error;
     }
 
     sd_select_device(drive);
@@ -935,7 +935,7 @@ ata_write_retry:
     if (currcard->initialized < 0)
     {
         ret = currcard->initialized;
-        goto ata_write_error;
+        goto sd_write_error;
     }
 
     /* Only switch banks with non-SDHC cards */
@@ -947,7 +947,7 @@ ata_write_retry:
         {
             ret = sd_select_bank(bank);
             if (ret < 0)
-                goto ata_write_error;
+                goto sd_write_error;
         }
     
         start -= bank * BLOCKS_PER_BANK;
@@ -957,7 +957,7 @@ ata_write_retry:
 
     ret = sd_wait_for_state(TRAN, EC_TRAN_WRITE_ENTRY);
     if (ret < 0)
-        goto ata_write_error;
+        goto sd_write_error;
 
     BLOCK_COUNT_REG = count;
 
@@ -973,7 +973,7 @@ ata_write_retry:
         ret = sd_command(WRITE_MULTIPLE_BLOCK, start*BLOCK_SIZE, NULL, 0x1c2d);
     }
     if (ret < 0)
-        goto ata_write_error;
+        goto sd_write_error;
 
     buf_end = outbuf + count * currcard->block_size - 2*FIFO_LEN;
 
@@ -996,7 +996,7 @@ ata_write_retry:
         }
 
         ret = -EC_FIFO_WR_EMPTY;
-        goto ata_write_error;
+        goto sd_write_error;
     }
 
     last_disk_activity = current_tick;
@@ -1004,31 +1004,31 @@ ata_write_retry:
     if (!sd_poll_status(DATA_DONE, 0x80000))
     {
         ret = -EC_FIFO_WR_DONE;
-        goto ata_write_error;
+        goto sd_write_error;
     }
 
     ret = sd_command(STOP_TRANSMISSION, 0, NULL, 1);
     if (ret < 0)
-        goto ata_write_error;
+        goto sd_write_error;
 
     ret = sd_wait_for_state(TRAN, EC_TRAN_WRITE_EXIT);
     if (ret < 0)
-        goto ata_write_error;
+        goto sd_write_error;
 
     while (1)
     {
-        ata_led(false);
+        sd_led(false);
         mutex_unlock(&sd_mtx);
 
         return ret;
 
-ata_write_error:
+sd_write_error:
         if (sd_status[drive].retry < sd_status[drive].retry_max
             && ret != -EC_NOCARD)
         {
             sd_status[drive].retry++;
             currcard->initialized = 0;
-            goto ata_write_retry;
+            goto sd_write_retry;
         }
     }
 }
@@ -1088,7 +1088,7 @@ static void sd_thread(void)
 
                 if (!idle_notified)
                 {
-                    call_ata_idle_notifys(false);
+                    call_storage_idle_notifys(false);
                     idle_notified = true;
                 }
             }
@@ -1106,37 +1106,7 @@ static void sd_thread(void)
     }
 }
 
-
-void ata_spindown(int seconds)
-{
-    (void)seconds;
-}
-
-bool ata_disk_is_active(void)
-{
-    return 0;
-}
-
-void ata_sleep(void)
-{
-}
-
-void ata_spin(void)
-{
-}
-
-/* Hardware reset protocol as specified in chapter 9.1, ATA spec draft v5 */
-int ata_hard_reset(void)
-{
-    return 0;
-}
-
-int ata_soft_reset(void)
-{
-    return 0;
-}
-
-void ata_enable(bool on)
+void sd_enable(bool on)
 {
     if(on)
     {
@@ -1170,7 +1140,7 @@ void card_enable_monitoring_target(bool on)
 }
 #endif
 
-int ata_init(void)
+int sd_init(void)
 {
     int ret = 0;
 
@@ -1179,7 +1149,7 @@ int ata_init(void)
 
     mutex_lock(&sd_mtx);
 
-    ata_led(false);
+    sd_led(false);
 
     if (!initialized)
     {
@@ -1324,3 +1294,46 @@ void microsd_int(void)
 
 }
 #endif /* HAVE_HOTSWAP */
+
+long sd_last_disk_activity(void)
+{
+    return last_disk_activity;
+}
+
+void sd_get_info(IF_MV2(int drive,) struct storage_info *info)
+{
+#ifndef HAVE_MULTIVOLUME
+    const int drive=0;
+#endif
+    info->sector_size=card_info[drive].block_size;
+    info->num_sectors=card_info[drive].numblocks;
+    info->vendor="Rockbox";
+    if(drive==0)
+    {
+        info->product="Internal Storage";
+    }
+    else
+    {
+        info->product="SD Card Slot";
+    }
+    info->revision="0.00";
+}
+
+#ifdef HAVE_HOTSWAP
+bool sd_removable(IF_MV_NONVOID(int drive))
+{
+#ifndef HAVE_MULTIVOLUME
+    const int drive=0;
+#endif
+    return (drive==1);
+}
+
+bool sd_present(IF_MV_NONVOID(int drive))
+{
+#ifndef HAVE_MULTIVOLUME
+    const int drive=0;
+#endif
+    return (card_info[drive].initialized && card_info[drive].numblocks > 0);
+}
+#endif
+

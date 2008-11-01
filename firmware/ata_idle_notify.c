@@ -25,9 +25,9 @@
 #include "kernel.h"
 #include "string.h"
 
-void register_ata_idle_func(ata_idle_notify function)
+void register_storage_idle_func(storage_idle_notify function)
 {
-#if USING_ATA_CALLBACK
+#if USING_STORAGE_CALLBACK
     add_event(DISK_EVENT_SPINUP, true, function);
 #else
     function(); /* just call the function now */
@@ -37,8 +37,8 @@ void register_ata_idle_func(ata_idle_notify function)
 #endif
 }
 
-#if USING_ATA_CALLBACK
-void unregister_ata_idle_func(ata_idle_notify func, bool run)
+#if USING_STORAGE_CALLBACK
+void unregister_storage_idle_func(storage_idle_notify func, bool run)
 {
     remove_event(DISK_EVENT_SPINUP, func);
     
@@ -46,7 +46,7 @@ void unregister_ata_idle_func(ata_idle_notify func, bool run)
         func();
 }
 
-bool call_ata_idle_notifys(bool force)
+bool call_storage_idle_notifys(bool force)
 {
     static int lock_until = 0;
 

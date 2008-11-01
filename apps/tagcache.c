@@ -3094,7 +3094,7 @@ static void run_command_queue(bool force)
     if (force || command_queue_is_full())
         command_queue_sync_callback();
     else
-        register_ata_idle_func(command_queue_sync_callback);
+        register_storage_idle_func(command_queue_sync_callback);
 }
 
 static void queue_command(int cmd, long idx_id, int tag, long data)

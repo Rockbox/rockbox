@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 #include <stdio.h>
-#include "ata.h"
+#include "storage.h"
 #include "debug.h"
 #include "fat.h"
 #ifdef HAVE_HOTSWAP
@@ -80,7 +80,7 @@ struct partinfo* disk_init(IF_MV_NONVOID(int drive))
     struct partinfo* pinfo = part;
 #endif
 
-    ata_read_sectors(IF_MV2(drive,) 0,1, &sector);
+    storage_read_sectors(IF_MV2(drive,) 0,1, &sector);
     /* check that the boot sector is initialized */
     if ( (sector[510] != 0x55) ||
          (sector[511] != 0xaa)) {

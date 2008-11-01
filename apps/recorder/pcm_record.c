@@ -24,7 +24,7 @@
 #include "logf.h"
 #include "thread.h"
 #include <string.h>
-#include "ata.h"
+#include "storage.h"
 #include "usb.h"
 #include "buffer.h"
 #include "general.h"
@@ -162,7 +162,7 @@ static bool           pcm_buffer_empty; /* all pcm chunks processed?       */
 static int            low_watermark;   /* Low watermark to stop flush      */
 static int            high_watermark;  /* max chunk limit for data flush   */
 static unsigned long  spinup_time = 35*HZ/10;  /* Fudged spinup time       */
-static int            last_ata_spinup_time = -1;/* previous spin time used */
+static int            last_storage_spinup_time = -1;/* previous spin time used */
 #ifdef HAVE_PRIORITY_SCHEDULING
 static int            flood_watermark; /* boost thread priority when here  */
 #endif
@@ -731,7 +731,7 @@ static void pcmrec_end_file(void)
  */
 static void pcmrec_refresh_watermarks(void)
 {
-    logf("ata spinup: %d", ata_spinup_time);
+    logf("ata spinup: %d", storage_spinup_time());
 
     /* set the low mark for when flushing stops if automatic */
     low_watermark = (LOW_SECONDS*4*sample_rate + (enc_chunk_size-1))
@@ -755,7 +755,7 @@ static void pcmrec_refresh_watermarks(void)
 
     logf("flood at: %d", flood_watermark);
 #endif
-    spinup_time = last_ata_spinup_time = ata_spinup_time;
+    spinup_time = last_storage_spinup_time = storage_spinup_time();
 
     /* write at 8s + st remaining in enc_buffer - range 12s to
        20s total - default to 3.5s spinup. */
@@ -816,7 +816,7 @@ static void pcmrec_flush(unsigned flush_num)
         if (!is_recording)
             return;
 
-        if (ata_spinup_time != last_ata_spinup_time)
+        if (storage_spinup_time() != last_storage_spinup_time)
             pcmrec_refresh_watermarks();
 
         /* enough available? no? then leave */

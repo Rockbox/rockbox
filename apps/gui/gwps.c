@@ -39,7 +39,7 @@
 #include "audio.h"
 #include "usb.h"
 #include "status.h"
-#include "ata.h"
+#include "storage.h"
 #include "screens.h"
 #include "playlist.h"
 #ifdef HAVE_LCD_BITMAP
@@ -184,7 +184,7 @@ long gui_wps_show(void)
             if (wps_state.paused) {
                 settings_save();
 #if !defined(HAVE_RTC_RAM) && !defined(HAVE_SW_POWEROFF)
-                call_ata_idle_notifys(true);
+                call_storage_idle_notifys(true);
 #endif
             }
         }
@@ -322,7 +322,7 @@ long gui_wps_show(void)
                         audio_pause();
                     settings_save();
 #if !defined(HAVE_RTC_RAM) && !defined(HAVE_SW_POWEROFF)
-                    call_ata_idle_notifys(true);   /* make sure resume info is saved */
+                    call_storage_idle_notifys(true);   /* make sure resume info is saved */
 #endif
                 }
                 break;
@@ -701,7 +701,7 @@ long gui_wps_show(void)
         }
 
         if ( button )
-            ata_spin();
+            storage_spin();
     }
     return GO_TO_ROOT; /* unreachable - just to reduce compiler warnings */
 }

@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-#include "ata.h"
+#include "storage.h"
 #include <stdbool.h>
 #include <string.h>
 
@@ -42,8 +42,6 @@
 
 #define SECTOR_SIZE     (512)
 
-static unsigned short identify_info[SECTOR_SIZE];
-int ata_spinup_time = 0;
 long last_disk_activity = -1;
 
 #if CONFIG_FLASH == FLASH_IFP7XX
@@ -386,7 +384,7 @@ int flash_disk_read_sectors(unsigned long start,
     return done;
 }
 
-int ata_read_sectors(IF_MV2(int drive,)
+int nand_read_sectors(IF_MV2(int drive,)
                      unsigned long start,
                      int incount,
                      void* inbuf)
@@ -403,7 +401,7 @@ int ata_read_sectors(IF_MV2(int drive,)
     return 0;
 }
 
-int ata_write_sectors(IF_MV2(int drive,)
+int nand_write_sectors(IF_MV2(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
@@ -414,60 +412,7 @@ int ata_write_sectors(IF_MV2(int drive,)
     return -1;
 }
 
-/* schedule a single sector write, executed with the the next spinup 
-   (volume 0 only, used for config sector) */
-extern void ata_delayed_write(unsigned long sector, const void* buf)
-{
-    (void)sector;
-    (void)buf;
-}
-
-/* write the delayed sector to volume 0 */
-extern void ata_flush(void)
-{
-
-}
-
-void ata_spindown(int seconds)
-{
-    (void)seconds;
-}
-
-bool ata_disk_is_active(void)
-{
-  return 0;
-}
-
-void ata_sleep(void)
-{
-}
-
-void ata_spin(void)
-{
-}
-
-/* Hardware reset protocol as specified in chapter 9.1, ATA spec draft v5 */
-int ata_hard_reset(void)
-{
-  return 0;
-}
-
-int ata_soft_reset(void)
-{
-  return 0;
-}
-
-void ata_enable(bool on)
-{
-    (void)on;
-}
-
-unsigned short* ata_get_identify(void)
-{
-    return identify_info;
-}
-
-int ata_init(void)
+int nand_init(void)
 {
     int i, id, id2;
 
@@ -499,3 +444,29 @@ int ata_init(void)
 
     return 0;
 }
+
+long nand_last_disk_activity(void)
+{
+    return last_disk_activity;
+}
+
+void nand_get_info(struct storage_info *info)
+{
+    unsigned long blocks;
+    int i;
+
+    /* firmware version */
+    info->revision="0.00";
+
+    /* vendor field, need better name? */
+    info->vendor="Rockbox";
+    /* model field, need better name? */
+    info->product="TNFL";
+
+    /* blocks count */
+    info->num_sectors = 0;
+    info->sector_size=SECTOR_SIZE;
+
+    info->serial=0;
+}
+

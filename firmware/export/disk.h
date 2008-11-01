@@ -21,7 +21,7 @@
 #ifndef _DISK_H_
 #define _DISK_H_
 
-#include "ata.h" /* for volume definitions */
+#include "mv.h" /* for volume definitions */
 
 struct partinfo {
     unsigned long start; /* first sector (LBA) */

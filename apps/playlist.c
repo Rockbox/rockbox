@@ -1266,7 +1266,7 @@ static void playlist_thread(void)
                 if (playlist->control_fd >= 0)
                 {
                     if (playlist->num_cached > 0)
-                        register_ata_idle_func(playlist_flush_callback);
+                        register_storage_idle_func(playlist_flush_callback);
                 }
 
                 if (!dirty_pointers)

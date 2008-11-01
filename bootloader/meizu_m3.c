@@ -29,7 +29,7 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "thread.h"
-#include "ata.h"
+#include "storage.h"
 #include "fat.h"
 #include "disk.h"
 #include "font.h"

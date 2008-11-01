@@ -46,7 +46,7 @@
 #include "audio.h"
 #include "mp3_playback.h"
 #include "settings.h"
-#include "ata.h"
+#include "storage.h"
 #include "ata_idle_notify.h"
 #include "kernel.h"
 #include "power.h"
@@ -621,7 +621,7 @@ bool settings_parseline(char* line, char** name, char** value)
 static void system_flush(void)
 {
     tree_flush();
-    call_ata_idle_notifys(true); /*doesnt work on usb and shutdown from ata thread */
+    call_storage_idle_notifys(true); /*doesnt work on usb and shutdown from ata thread */
 }
 
 static void system_restore(void)
@@ -635,7 +635,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
     (void)callback;
     (void)parameter;
     bookmark_autobookmark();
-    call_ata_idle_notifys(true);
+    call_storage_idle_notifys(true);
     exit(0);
 #else
     long msg_id = -1;

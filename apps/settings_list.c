@@ -23,7 +23,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "system.h"
-#include "ata.h"
+#include "storage.h"
 #include "lang.h"
 #include "talk.h"
 #include "lcd.h"
@@ -714,7 +714,7 @@ const struct settings_list settings[] = {
     /* disk */
 #ifdef HAVE_DISK_STORAGE
     INT_SETTING(0, disk_spindown, LANG_SPINDOWN, 5, "disk spindown",
-                    UNIT_SEC, 3, 254, 1, NULL, NULL, ata_spindown),
+                    UNIT_SEC, 3, 254, 1, NULL, NULL, storage_spindown),
 #endif /* HAVE_DISK_STORAGE */
     /* browser */
     CHOICE_SETTING(0, dirfilter, LANG_FILTER, SHOW_SUPPORTED, "show files",

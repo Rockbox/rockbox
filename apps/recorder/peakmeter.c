@@ -26,7 +26,7 @@
 #include "thread.h"
 #include "kernel.h"
 #include "settings.h"
-#include "ata.h"
+#include "storage.h"
 #include "lcd.h"
 #include "scrollbar.h"
 #include "gwps.h"
@@ -1343,7 +1343,7 @@ int peak_meter_draw_get_btn(int action_context, int x[], int y[],
      * is active, it must not draw too much CPU power or a buffer overrun can
      * happen when saving a recording. As a compromise, poll only once per tick
      * when the disk is active, otherwise spin around as fast as possible. */
-    bool highperf = !ata_disk_is_active();
+    bool highperf = !storage_disk_is_active();
 #endif
     bool dopeek = true;
 

@@ -26,7 +26,7 @@
 #include <ctype.h>
 #include "buffering.h"
 
-#include "ata.h"
+#include "storage.h"
 #include "system.h"
 #include "thread.h"
 #include "file.h"
@@ -832,7 +832,7 @@ static bool fill_buffer(void)
     {
         /* only spin the disk down if the filling wasn't interrupted by an
            event arriving in the queue. */
-        ata_sleep();
+        storage_sleep();
         return false;
     }
 }
@@ -1408,7 +1408,7 @@ void buffering_thread(void)
          * for simplicity until its done right */
 #if MEM > 8
         /* If the disk is spinning, take advantage by filling the buffer */
-        else if (ata_disk_is_active() && queue_empty(&buffering_queue))
+        else if (storage_disk_is_active() && queue_empty(&buffering_queue))
         {
             if (num_handles > 0 && data_counters.useful <= high_watermark)
                 send_event(BUFFER_EVENT_BUFFER_LOW, 0);

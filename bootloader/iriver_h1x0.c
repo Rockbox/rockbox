@@ -31,7 +31,7 @@
 #include "scroll_engine.h"
 #include "kernel.h"
 #include "thread.h"
-#include "ata.h"
+#include "storage.h"
 #include "usb.h"
 #include "disk.h"
 #include "font.h"
@@ -148,10 +148,10 @@ void shutdown(void)
     if (ide_powered())
     {
         /* Make sure ATA has been initialized. */
-        ata_init();
+        storage_init();
         
         /* And put the disk into sleep immediately. */
-        ata_sleepnow();
+        storage_sleepnow();
     }
 
     sleep(HZ*2);
@@ -560,7 +560,7 @@ void main(void)
         }
 #endif
         ide_power_enable(true);
-        ata_enable(false);
+        storage_enable(false);
         sleep(HZ/20);
         usb_enable(true);
         cpu_idle_mode(true);
@@ -571,7 +571,7 @@ void main(void)
             remote_line = 0;
             check_battery();
             
-            ata_spin(); /* Prevent the drive from spinning down */
+            storage_spin(); /* Prevent the drive from spinning down */
             sleep(HZ);
 
             /* Backlight OFF */
@@ -585,7 +585,7 @@ void main(void)
         lcd_update();
     }
 
-    rc = ata_init();
+    rc = storage_init();
     if(rc)
     {
         reset_screen();

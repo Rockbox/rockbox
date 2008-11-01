@@ -30,7 +30,7 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "thread.h"
-#include "ata.h"
+#include "storage.h"
 #include "fat.h"
 #include "disk.h"
 #include "font.h"
@@ -206,7 +206,7 @@ void* main(void)
     printf("Version %s", version);
 
     printf("ATA");
-    rc = ata_init();
+    rc = storage_init();
     if(rc)
     {
         reset_screen();

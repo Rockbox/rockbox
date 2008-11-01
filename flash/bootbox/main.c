@@ -31,7 +31,7 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "thread.h"
-#include "ata.h"
+#include "storage.h"
 #include "disk.h"
 #include "font.h"
 #include "adc.h"
@@ -168,7 +168,7 @@ void main(void)
     }
 #endif
 
-    rc = ata_init();
+    rc = storage_init();
     if(rc)
     {
 #ifdef HAVE_LCD_BITMAP
@@ -179,7 +179,7 @@ void main(void)
         lcd_update();
         while(!(button_get(true) & BUTTON_REL));
 #endif
-        panicf("ata: %d", rc);
+        panicf("storage: %d", rc);
     }
 
     usb_start_monitoring();

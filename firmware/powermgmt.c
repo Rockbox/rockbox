@@ -29,7 +29,7 @@
 #include "adc.h"
 #include "string.h"
 #include "sprintf.h"
-#include "ata.h"
+#include "storage.h"
 #include "power.h"
 #include "button.h"
 #include "audio.h"
@@ -451,7 +451,7 @@ static void handle_auto_poweroff(void)
          !sleeptimer_active)))
     {
         if(TIME_AFTER(current_tick, last_event_tick    + timeout) &&
-           TIME_AFTER(current_tick, last_disk_activity + timeout))
+           TIME_AFTER(current_tick, storage_last_disk_activity() + timeout))
         {
             sys_poweroff();
         }
@@ -579,7 +579,7 @@ int pid_i = 0;                      /* PID integral term */
 
 static inline void charging_algorithm_small_step(void)
 {
-    if (ata_disk_is_active()) {
+    if (storage_disk_is_active()) {
         /* flag hdd use for charging calculation */
         disk_activity_last_cycle = true;
     }
@@ -589,7 +589,7 @@ static inline void charging_algorithm_small_step(void)
      * If we have a lot of pending writes or if the disk is spining,
      * fsync the debug log file.
      */
-    if((wrcount > 10) || ((wrcount > 0) && ata_disk_is_active())) {
+    if((wrcount > 10) || ((wrcount > 0) && storage_disk_is_active())) {
         fsync(fd);
         wrcount = 0;
     }
@@ -1014,7 +1014,7 @@ static void power_thread_sleep(int ticks)
          * the disk is spinning unless we are in USB mode (the disk will most
          * likely always be spinning in USB mode).
          */
-        if (!ata_disk_is_active() || usb_inserted()) {
+        if (!storage_disk_is_active() || usb_inserted()) {
             avgbat += battery_adc_voltage() - (avgbat / BATT_AVE_SAMPLES);
             /*
              * battery_millivolts is the millivolt-scaled filtered battery value.
@@ -1152,10 +1152,10 @@ void shutdown_hw(void)
 #ifdef HAVE_LCD_BITMAP
         glyph_cache_save();
 #endif
-        if(ata_disk_is_active())
-            ata_spindown(1);
+        if(storage_disk_is_active())
+            storage_spindown(1);
     }
-    while(ata_disk_is_active())
+    while(storage_disk_is_active())
         sleep(HZ/10);
 
 #if CONFIG_CODEC != SWCODEC
@@ -1166,7 +1166,7 @@ void shutdown_hw(void)
 
     /* If HD is still active we try to wait for spindown, otherwise the
        shutdown_timeout in power_thread_sleep will force a power off */
-    while(ata_disk_is_active())
+    while(storage_disk_is_active())
         sleep(HZ/10);
 #ifndef IAUDIO_X5
     lcd_set_contrast(0);

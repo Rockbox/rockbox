@@ -180,7 +180,7 @@ static void add_to_cache(unsigned long play_length)
         logf("SCROBBLER: %s", scrobbler_entry.path);
     } else {
         cache_pos++;
-        register_ata_idle_func(scrobbler_flush_callback);
+        register_storage_idle_func(scrobbler_flush_callback);
     }
 
 }

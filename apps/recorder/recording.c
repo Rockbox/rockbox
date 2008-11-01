@@ -65,7 +65,7 @@
 #include "errno.h"
 #include "talk.h"
 #include "sound.h"
-#include "ata.h"
+#include "storage.h"
 #include "splash.h"
 #include "screen_access.h"
 #include "action.h"
@@ -298,7 +298,7 @@ static bool read_peak_levels(int *peak_l, int *peak_r, int *balance)
     peak_valid_mem[peak_time % 3] = *peak_l;
     if (((peak_valid_mem[0] == peak_valid_mem[1]) &&
          (peak_valid_mem[1] == peak_valid_mem[2])) &&
-        ((*peak_l < 32767) || ata_disk_is_active()))
+        ((*peak_l < 32767) || storage_disk_is_active()))
             return false;
 
     if (*peak_r > *peak_l)
@@ -1034,7 +1034,7 @@ bool recording_screen(bool no_source)
     rec_status = RCSTAT_IN_RECSCREEN;
 
 #if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
-    ata_set_led_enabled(false);
+    storage_set_led_enabled(false);
 #endif
 
 #if CONFIG_CODEC == SWCODEC
@@ -1905,7 +1905,7 @@ rec_abort:
         reload_directory();
 
 #if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
-    ata_set_led_enabled(true);
+    storage_set_led_enabled(true);
 #endif
 
 #if CONFIG_TUNER

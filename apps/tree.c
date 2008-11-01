@@ -41,7 +41,7 @@
 #include "settings.h"
 #include "status.h"
 #include "debug.h"
-#include "ata.h"
+#include "storage.h"
 #include "rolo.h"
 #include "icons.h"
 #include "lang.h"
@@ -828,7 +828,7 @@ static int dirbrowse()
             return GO_TO_WPS;
         if (button)
         {
-            ata_spin();
+            storage_spin();
         }
 
 

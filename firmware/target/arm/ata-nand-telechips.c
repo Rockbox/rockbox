@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "ata.h"
+#include "nand.h"
 #include "ata-nand-target.h"
 #include "system.h"
 #include <string.h>
@@ -31,6 +31,7 @@
 #include "lcd.h"
 #include "font.h"
 #include "button.h"
+#include "storage.h"
 #include <sprintf.h>
 
 #define SECTOR_SIZE 512
@@ -42,9 +43,6 @@
 int ata_spinup_time = 0;
 
 long last_disk_activity = -1;
-
-/* as we aren't actually ata manually fill some fields */
-static unsigned short ata_identify[SECTOR_SIZE/2];
 
 /** static, private data **/
 static bool initialized = false;
@@ -662,7 +660,7 @@ static void read_write_cache_segment(int bank, int phys_segment)
 }
 
 
-int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
+int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
 #ifdef HAVE_MULTIVOLUME
@@ -702,7 +700,7 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     return 0;
 }
 
-int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
+int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
 #ifdef HAVE_MULTIVOLUME
@@ -716,83 +714,21 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
     return -1;
 }
 
-void ata_spindown(int seconds)
+void nand_get_info(struct storage_info *info)
 {
-    /* null */
-    (void)seconds;
-}
-
-bool ata_disk_is_active(void)
-{
-    /* null */
-    return 0;
-}
-
-void ata_sleep(void)
-{
-    /* null */
-}
-
-void ata_spin(void)
-{
-    /* null */
-}
-
-/* Hardware reset protocol as specified in chapter 9.1, ATA spec draft v5 */
-int ata_hard_reset(void)
-{
-    /* null */
-    return 0;
-}
-
-int ata_soft_reset(void)
-{
-    /* null */
-    return 0;
-}
-
-void ata_enable(bool on)
-{
-    /* null - flash controller is enabled/disabled as needed. */
-    (void)on;
-}
-
-static void fill_identify(void)
-{
-    char buf[80];
-    unsigned short *wbuf = (unsigned short *) buf;
-    unsigned long blocks;
-    int i;
-
-    memset(ata_identify, 0, sizeof(ata_identify));
-
     /* firmware version */
-    memset(buf, ' ', 8);
-    memcpy(buf, "0.00", 4);
+    info->revision="0.00";
 
-    for (i = 0; i < 4; i++)
-        ata_identify[23 + i] = betoh16(wbuf[i]);
-
-    /* model field, need better name? */
-    memset(buf, ' ', 80);
-    memcpy(buf, "TNFL", 4);
-
-    for (i = 0; i < 40; i++)
-        ata_identify[27 + i] = betoh16(wbuf[i]);
+    info->vendor="Rockbox";
+    info->product="Internal Storage";
 
     /* blocks count */
-    blocks = (pages_per_block * blocks_per_bank / SECTOR_SIZE)
-                 * page_size * total_banks;
-    ata_identify[60] = blocks & 0xffff;
-    ata_identify[61] = blocks >> 16;
-
-    /* TODO: discover where is s/n in TNFL */
-    for (i = 10; i < 20; i++) {
-        ata_identify[i] = 0;
-    }
+    info->num_sectors = (pages_per_block * blocks_per_bank / SECTOR_SIZE)
+                        * page_size * total_banks;
+    info->sector_size=SECTOR_SIZE;
 }
 
-int ata_init(void)
+int nand_init(void)
 {
     int i, bank, phys_segment;
     unsigned char spare_buf[16];
@@ -909,13 +845,12 @@ int ata_init(void)
     }
 #endif
     
-    fill_identify();
     initialized = true;
 
     return 0;
 }
 
-unsigned short* ata_get_identify(void)
+long nand_last_disk_activity(void)
 {
-    return ata_identify;
+    return last_disk_activity;
 }

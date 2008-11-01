@@ -32,6 +32,7 @@
 #include "string.h"
 #include "ata_idle_notify.h"
 #include "ata-target.h"
+#include "storage.h"
 
 #define SECTOR_SIZE     (512)
 
@@ -148,7 +149,7 @@ static void ata_lock_unlock(struct ata_lock *l)
 static struct mutex ata_mtx SHAREDBSS_ATTR;
 static int ata_device; /* device 0 (master) or 1 (slave) */
 
-int ata_spinup_time = 0;
+static int spinup_time = 0;
 #if (CONFIG_LED == LED_REAL)
 static bool ata_led_enabled = true;
 static bool ata_led_on = false;
@@ -166,7 +167,7 @@ static struct event_queue ata_queue;
 static bool initialized = false;
 
 static long last_user_activity = -1;
-long last_disk_activity = -1;
+static long last_disk_activity = -1;
 
 static unsigned long total_sectors;
 static int multisectors; /* number of supported multisectors */
@@ -407,7 +408,7 @@ int ata_read_sectors(IF_MV2(int drive,)
             }
 
             if (spinup) {
-                ata_spinup_time = current_tick - spinup_start;
+                spinup_time = current_tick - spinup_start;
                 spinup = false;
                 sleeping = false;
                 poweroff = false;
@@ -584,7 +585,7 @@ int ata_write_sectors(IF_MV2(int drive,)
         }
 
         if (spinup) {
-            ata_spinup_time = current_tick - spinup_start;
+            spinup_time = current_tick - spinup_start;
             spinup = false;
             sleeping = false;
             poweroff = false;
@@ -873,7 +874,7 @@ void ata_sleepnow(void)
 {
     if (!spinup && !sleeping && !ata_mtx.locked && initialized)
     {
-        call_ata_idle_notifys(false);
+        call_storage_idle_notifys(false);
         ata_perform_sleep();
     }
 }
@@ -908,7 +909,7 @@ static void ata_thread(void)
 #ifdef ALLOW_USB_SPINDOWN
                             if(!usb_mode)
 #endif
-                                call_ata_idle_notifys(false);
+                                call_storage_idle_notifys(false);
                             last_seen_mtx_unlock = 0;
                         }
                     }
@@ -921,7 +922,7 @@ static void ata_thread(void)
 #ifdef ALLOW_USB_SPINDOWN
                         if(!usb_mode)
 #endif
-                            call_ata_idle_notifys(true);
+                            call_storage_idle_notifys(true);
                         ata_perform_sleep();
                         last_sleep = current_tick;
                     }
@@ -974,7 +975,7 @@ static void ata_thread(void)
 #ifdef ALLOW_USB_SPINDOWN
                 if(!usb_mode)
 #endif
-                    call_ata_idle_notifys(false);
+                    call_storage_idle_notifys(false);
                 last_disk_activity = current_tick - sleep_timeout + (HZ/2);
                 break;
 
@@ -1391,3 +1392,43 @@ void ata_set_led_enabled(bool enabled)
         led(false);
 }
 #endif
+
+long ata_last_disk_activity(void)
+{
+    return last_disk_activity;
+}
+
+int ata_spinup_time(void)
+{
+    return spinup_time;
+}
+
+void ata_get_info(struct storage_info *info)
+{
+    unsigned short *src,*dest;
+    static char vendor[8];
+    static char product[16];
+    static char revision[4];
+    int i;
+    info->sector_size = SECTOR_SIZE;
+    info->num_sectors= ((unsigned long)identify_info[61] << 16 | \
+                 (unsigned long)identify_info[60]);
+
+    src = (unsigned short*)&identify_info[27];
+    dest = (unsigned short*)vendor;
+    for (i=0;i<4;i++)
+        dest[i] = htobe16(src[i]);
+    info->vendor=vendor;
+
+    src = (unsigned short*)&identify_info[31];
+    dest = (unsigned short*)product;
+    for (i=0;i<8;i++)
+        dest[i] = htobe16(src[i]);
+    info->product=product;
+
+    src = (unsigned short*)&identify_info[23];
+    dest = (unsigned short*)revision;
+    for (i=0;i<2;i++)
+        dest[i] = htobe16(src[i]);
+    info->revision=revision;
+}

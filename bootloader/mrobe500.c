@@ -26,7 +26,7 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "thread.h"
-#include "ata.h"
+#include "storage.h"
 #include "fat.h"
 #include "disk.h"
 #include "font.h"
@@ -229,13 +229,13 @@ void main(void)
         lcd_update();
 
         ide_power_enable(true);
-        ata_enable(false);
+        storage_enable(false);
         sleep(HZ/20);
         usb_enable(true);
 
         while (usb_detect() == USB_INSERTED)
         {
-            ata_spin(); /* Prevent the drive from spinning down */
+            storage_spin(); /* Prevent the drive from spinning down */
             sleep(HZ);
         }
 
@@ -248,7 +248,7 @@ void main(void)
     mrdebug();
 #endif
     printf("ATA");
-    rc = ata_init();
+    rc = storage_init();
     if(rc)
     {
         reset_screen();

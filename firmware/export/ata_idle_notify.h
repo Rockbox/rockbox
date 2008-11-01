@@ -26,15 +26,15 @@
 #include "events.h"
 
 /*
-        NOTE: ata_idle_notify usage notes..
+        NOTE: storage_idle_notify usage notes..
         
 1) The callbacks are called in the ata thread, not main/your thread.
 2) Asynchronous callbacks (like the buffer refill) should be avoided.
-    If you must use an async callback, remember to check ata_is_active() before
+    If you must use an async callback, remember to check storage_is_active() before
     accessing the disk, and do not call any functions between that check and the
     disk access which may cause a yield (lcd_update() does this!).
 3) Do not call any yielding functions in the callback.
-4) Do not call ata_sleep in the callbacks.
+4) Do not call storage_sleep in the callbacks.
 5) Don't Panic!
 
 */
@@ -43,21 +43,21 @@ enum {
     DISK_EVENT_SPINUP = (EVENT_CLASS_DISK|1),
 };
 
-#define USING_ATA_CALLBACK  !defined(SIMULATOR)             \
+#define USING_STORAGE_CALLBACK  !defined(SIMULATOR)             \
                             && ! ((CONFIG_STORAGE & STORAGE_NAND) \
                                && (CONFIG_NAND & NAND_IFP7XX)) \
                             && !defined(BOOTLOADER)
 
-typedef bool (*ata_idle_notify)(void);
+typedef bool (*storage_idle_notify)(void);
 
-extern void register_ata_idle_func(ata_idle_notify function);
-#if USING_ATA_CALLBACK
-extern void unregister_ata_idle_func(ata_idle_notify function, bool run);
-extern bool call_ata_idle_notifys(bool force);
+extern void register_storage_idle_func(storage_idle_notify function);
+#if USING_STORAGE_CALLBACK
+extern void unregister_storage_idle_func(storage_idle_notify function, bool run);
+extern bool call_storage_idle_notifys(bool force);
 #else
-#define unregister_ata_idle_func(f,r)
-#define call_ata_idle_notifys(f)
-#define ata_idle_notify_init(s)
+#define unregister_storage_idle_func(f,r)
+#define call_storage_idle_notifys(f)
+#define storage_idle_notify_init(s)
 #endif
 
 #endif /* __ATACALLBACK_H__ */

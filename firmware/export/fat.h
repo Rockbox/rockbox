@@ -23,7 +23,7 @@
 #define FAT_H
 
 #include <stdbool.h>
-#include "ata.h" /* for volume definitions */
+#include "mv.h" /* for volume definitions */
 #include "config.h"
 
 #define SECTOR_SIZE 512

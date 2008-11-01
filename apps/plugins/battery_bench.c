@@ -344,7 +344,7 @@ void thread(void)
             bat[buf_idx].flags = charge_state();
 #endif
             buf_idx++;
-            rb->register_ata_idle_func(flush_buffer);
+            rb->register_storage_idle_func(flush_buffer);
         }
         
         /* What to do when the measurement buffer is full:
@@ -386,7 +386,7 @@ void thread(void)
     }
 
     /* unregister flush callback and flush to disk */
-    rb->unregister_ata_idle_func(flush_buffer, true);
+    rb->unregister_storage_idle_func(flush_buffer, true);
     
     /* log end of bench and exit reason */
     fd = rb->open(BATTERY_LOG, O_RDWR | O_CREAT | O_APPEND);

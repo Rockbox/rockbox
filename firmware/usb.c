@@ -29,7 +29,7 @@
 #include "thread.h"
 #include "system.h"
 #include "debug.h"
-#include "ata.h"
+#include "storage.h"
 #include "fat.h"
 #include "disk.h"
 #include "panic.h"
@@ -86,7 +86,7 @@ static struct event_queue usb_queue;
 static int last_usb_status;
 static bool usb_monitor_enabled;
 #ifdef HAVE_USBSTACK
-static bool exclusive_ata_access;
+static bool exclusive_storage_access;
 #endif
 
 
@@ -105,9 +105,9 @@ static void usb_slave_mode(bool on)
     if(on)
     {
         DEBUGF("Entering USB slave mode\n");
-        ata_soft_reset();
-        ata_init();
-        ata_enable(false);
+        storage_soft_reset();
+        storage_init();
+        storage_enable(false);
         usb_enable(true);
     }
     else
@@ -119,9 +119,9 @@ static void usb_slave_mode(bool on)
         
         usb_enable(false);
 
-        rc = ata_init();
+        rc = storage_init();
         if(rc)
-            panicf("ata: %d",rc);
+            panicf("storage: %d",rc);
     
         rc = disk_mount_all();
         if (rc <= 0) /* no partition */
@@ -134,7 +134,7 @@ static void usb_slave_mode(bool on)
 static void try_reboot(void)
 {
 #ifdef HAVE_DISK_STORAGE
-    ata_sleepnow(); /* Immediately spindown the disk. */
+    storage_sleepnow(); /* Immediately spindown the disk. */
     sleep(HZ*2);
 #endif
 
@@ -262,7 +262,7 @@ static void usb_thread(void)
 #ifdef HAVE_PRIORITY_SCHEDULING
                         thread_set_priority(usb_thread_entry,PRIORITY_REALTIME);
 #endif
-                        exclusive_ata_access = true;
+                        exclusive_storage_access = true;
 
 #else
                         usb_slave_mode(true);
@@ -310,12 +310,12 @@ static void usb_thread(void)
 
                 usb_state = USB_EXTRACTED;
 #ifdef HAVE_USBSTACK
-                if(exclusive_ata_access)
+                if(exclusive_storage_access)
                 {
                     int rc = disk_mount_all();
                     if (rc <= 0) /* no partition */
                         panicf("mount: %d",rc);
-                    exclusive_ata_access = false;
+                    exclusive_storage_access = false;
 #endif
                     /* Tell all threads that we are back in business */
                     num_acks_to_expect =
@@ -455,7 +455,7 @@ void usb_init(void)
 {
     usb_state = USB_EXTRACTED;
 #ifdef HAVE_USBSTACK
-    exclusive_ata_access = false;
+    exclusive_storage_access = false;
 #endif
     usb_monitor_enabled = false;
     countdown = -1;
@@ -561,7 +561,7 @@ void usb_request_exclusive_ata(void)
      * currently the best one. We want to get rid of having to boost the cpu
      * for usb anyway */
     trigger_cpu_boost();
-    if(!exclusive_ata_access) {
+    if(!exclusive_storage_access) {
         queue_post(&usb_queue, USB_REQUEST_DISK, 0);
     }
 }
@@ -569,15 +569,15 @@ void usb_request_exclusive_ata(void)
 void usb_release_exclusive_ata(void)
 {
     cancel_cpu_boost();
-    if(exclusive_ata_access) {
+    if(exclusive_storage_access) {
         queue_post(&usb_queue, USB_RELEASE_DISK, 0);
-        exclusive_ata_access = false;
+        exclusive_storage_access = false;
     }
 }
 
 bool usb_exclusive_ata(void)
 {
-    return exclusive_ata_access;
+    return exclusive_storage_access;
 }
 #endif
 

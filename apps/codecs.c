@@ -43,7 +43,7 @@
 #include "buffering.h"
 #include "mp3_playback.h"
 #include "backlight.h"
-#include "ata.h"
+#include "storage.h"
 #include "talk.h"
 #include "mp3data.h"
 #include "powermgmt.h"

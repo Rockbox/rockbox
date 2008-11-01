@@ -29,7 +29,7 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "thread.h"
-#include "ata.h"
+#include "storage.h"
 #include "fat.h"
 #include "disk.h"
 #include "font.h"
@@ -75,7 +75,7 @@ void main(void)
                     (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
         lcd_update();
 
-        ata_enable(false);
+        storage_enable(false);
         sleep(HZ/20);
         usb_enable(true);
 
@@ -101,7 +101,7 @@ void main(void)
 
     sleep(50); /* ATA seems to error without this pause */
 
-    rc = ata_init();
+    rc = storage_init();
     if(rc)
     {
         reset_screen();

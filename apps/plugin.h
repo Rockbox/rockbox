@@ -379,13 +379,13 @@ struct plugin_api {
     int (*fdprintf)(int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
     int (*read_line)(int fd, char* buffer, int buffer_size);
     bool (*settings_parseline)(char* line, char** name, char** value);
-    void (*ata_sleep)(void);
-    void (*ata_spin)(void);
-    void (*ata_spindown)(int seconds);
-#if USING_ATA_CALLBACK
-    void (*register_ata_idle_func)(ata_idle_notify function);
-    void (*unregister_ata_idle_func)(ata_idle_notify function, bool run);
-#endif /* USING_ATA_CALLBACK */
+    void (*storage_sleep)(void);
+    void (*storage_spin)(void);
+    void (*storage_spindown)(int seconds);
+#if USING_STORAGE_CALLBACK
+    void (*register_storage_idle_func)(storage_idle_notify function);
+    void (*unregister_storage_idle_func)(storage_idle_notify function, bool run);
+#endif /* USING_STORAGE_CALLBACK */
     void (*reload_directory)(void);
     char *(*create_numbered_filename)(char *buffer, const char *path,
                                       const char *prefix, const char *suffix,

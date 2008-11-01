@@ -59,12 +59,15 @@
 #include "power.h"
 #include "usb.h"
 #include "rtc.h"
-#include "ata.h"
+#include "storage.h"
 #include "fat.h"
 #include "mas.h"
 #include "eeprom_24cxx.h"
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
 #include "hotswap.h"
+#endif
+#if (CONFIG_STORAGE & STORAGE_ATA)
+#include "ata.h"
 #endif
 #if CONFIG_TUNER
 #include "tuner.h"
@@ -1731,11 +1734,13 @@ static bool view_battery(void)
 
 #ifndef SIMULATOR
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
+
 #if (CONFIG_STORAGE & STORAGE_MMC)
 #define CARDTYPE "MMC"
-#else
+#elif (CONFIG_STORAGE & STORAGE_SD)
 #define CARDTYPE "microSD"
 #endif
+
 static int disk_callback(int btn, struct gui_synclist *lists)
 {
     tCardInfo *card;
@@ -1826,7 +1831,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     }
     return btn;
 }
-#else /* !(CONFIG_STORAGE & STORAGE_MMC) && !(CONFIG_STORAGE & STORAGE_SD) */
+#elif  (CONFIG_STORAGE & STORAGE_ATA) 
 static int disk_callback(int btn, struct gui_synclist *lists)
 {
     (void)lists;
@@ -1860,7 +1865,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     simplelist_addline(SIMPLELIST_ADD_LINE,
              "Free: %ld MB", free / 1024);
     simplelist_addline(SIMPLELIST_ADD_LINE,
-             "Spinup time: %d ms", ata_spinup_time * (1000/HZ));
+             "Spinup time: %d ms", storage_spinup_time() * (1000/HZ));
     i = identify_info[83] & (1<<3);
     simplelist_addline(SIMPLELIST_ADD_LINE,
              "Power mgmt: %s", i ? "enabled" : "unsupported");
@@ -1945,7 +1950,29 @@ static int disk_callback(int btn, struct gui_synclist *lists)
              "Cluster size: %d bytes", fat_get_cluster_size(IF_MV(0)));
     return btn;
 }
+#else /* No SD, MMC or ATA */
+static int disk_callback(int btn, struct gui_synclist *lists)
+{
+    (void)btn;
+    (void)lists;
+    struct storage_info info;
+    storage_get_info(IF_MV2(0,)&info);
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Vendor: %s", info.vendor);
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Model: %s", info.product);
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Firmware: %s", info.revision);
+    simplelist_addline(SIMPLELIST_ADD_LINE,
+             "Size: %ld MB", info.num_sectors*(info.sector_size/512)/2024);
+    unsigned long free;
+    fat_size( IF_MV2(0,) NULL, &free );
+    simplelist_addline(SIMPLELIST_ADD_LINE,
+             "Free: %ld MB", free / 1024);
+    simplelist_addline(SIMPLELIST_ADD_LINE,
+             "Cluster size: %d bytes", fat_get_cluster_size(IF_MV(0)));
+    return btn;
+}
+#endif
 
+#if  (CONFIG_STORAGE & STORAGE_ATA) 
 static bool dbg_identify_info(void)
 {
     int fd = creat("/identify_info.bin");
@@ -1960,7 +1987,7 @@ static bool dbg_identify_info(void)
     }
     return false;
 }
-#endif /* !(CONFIG_STORAGE & STORAGE_MMC) && !(CONFIG_STORAGE & STORAGE_SD) */
+#endif
 
 static bool dbg_disk_info(void)
 {
@@ -2504,7 +2531,7 @@ static const struct the_menu_item menuitems[] = {
 #endif
 #ifndef SIMULATOR
         { "View disk info", dbg_disk_info },
-#if !(CONFIG_STORAGE & STORAGE_MMC) && !(CONFIG_STORAGE & STORAGE_SD)
+#if (CONFIG_STORAGE & STORAGE_ATA)
         { "Dump ATA identify info", dbg_identify_info},
 #endif
 #endif

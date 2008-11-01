@@ -173,7 +173,7 @@ void load_settings(void){
             draw_message(display, MESSAGE_ERRLOAD, 1);
         display->update();
     }
-    rb->ata_sleep();
+    rb->storage_sleep();
     rb->sleep(HZ);
 }
 

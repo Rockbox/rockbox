@@ -29,7 +29,7 @@
 #include "metadata.h"
 #include "mpeg.h"
 #include "audio.h"
-#include "ata.h"
+#include "storage.h"
 #include "string.h"
 #include <kernel.h>
 #include "thread.h"
@@ -509,7 +509,7 @@ static void generate_postbuffer_events(void)
 static void recalculate_watermark(int bitrate)
 {
     int bytes_per_sec;
-    int time = ata_spinup_time;
+    int time = storage_spinup_time();
 
     /* A bitrate of 0 probably means empty VBR header. We play safe
        and set a high threshold */
@@ -1589,7 +1589,7 @@ static void mpeg_thread(void)
                     DEBUGF("0\n");
                     filling = false;
                     generate_postbuffer_events();
-                    ata_sleep();
+                    storage_sleep();
                     break;
                 }
 
@@ -1947,7 +1947,7 @@ static void mpeg_thread(void)
                                 rc = fsync(mpeg_file);
                                 if (rc < 0)
                                     panicf("rec fls: %d", rc);
-                                ata_sleep();
+                                storage_sleep();
                                 break;
 
                             case NEW_FILE:
@@ -1957,7 +1957,7 @@ static void mpeg_thread(void)
                                     panicf("rec cls: %d", rc);
                                 mpeg_file = -1;
                                 update_header();
-                                ata_sleep();
+                                storage_sleep();
 
                                 /* copy new filename */
                                 strcpy(delayed_filename, recording_filename);

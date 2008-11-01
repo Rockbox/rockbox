@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 #include <stdbool.h>
-#include "ata.h"
+#include "mmc.h"
 #include "ata_mmc.h"
 #include "ata_idle_notify.h"
 #include "kernel.h"
@@ -36,6 +36,7 @@
 #include "adc.h"
 #include "bitswap.h"
 #include "disk.h" /* for mount/unmount */
+#include "storage.h"
 
 #define BLOCK_SIZE  512   /* fixed */
 
@@ -84,8 +85,7 @@
 #define DT_STOP_TRAN                 0xfd
 
 /* for compatibility */
-int ata_spinup_time = 0;
-long last_disk_activity = -1;
+static long last_disk_activity = -1;
 
 /* private variables */
 
@@ -601,7 +601,7 @@ static int send_block_send(unsigned char start_token, long timeout,
     return rc;
 }
 
-int ata_read_sectors(IF_MV2(int drive,)
+int mmc_read_sectors(IF_MV2(int drive,)
                      unsigned long start,
                      int incount,
                      void* inbuf)
@@ -687,7 +687,7 @@ int ata_read_sectors(IF_MV2(int drive,)
     return rc;
 }
 
-int ata_write_sectors(IF_MV2(int drive,)
+int mmc_write_sectors(IF_MV2(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
@@ -755,23 +755,10 @@ int ata_write_sectors(IF_MV2(int drive,)
     return rc;
 }
 
-void ata_spindown(int seconds)
-{
-    (void)seconds;
-}
-
-bool ata_disk_is_active(void)
+bool mmc_disk_is_active(void)
 {
     /* this is correct unless early return from write gets implemented */
     return mmc_mutex.locked;
-}
-
-void ata_sleep(void)
-{
-}
-
-void ata_spin(void)
-{
 }
 
 static void mmc_thread(void)
@@ -810,7 +797,7 @@ static void mmc_thread(void)
                 {
                     if (!idle_notified)
                     {
-                        call_ata_idle_notifys(false);
+                        call_storage_idle_notifys(false);
                         idle_notified = true;
                     }
                 }
@@ -904,12 +891,7 @@ static void mmc_tick(void)
     }
 }
 
-int ata_soft_reset(void)
-{
-    return 0;
-}
-
-void ata_enable(bool on)
+void mmc_enable(bool on)
 {
     PBCR1 &= ~0x0CF0;      /* PB13, PB11 and PB10 become GPIO,
                             * if not modified below */
@@ -924,7 +906,7 @@ void ata_enable(bool on)
     card_info[1].initialized = false;
 }
 
-int ata_init(void)
+int mmc_init(void)
 {
     int rc = 0;
 
@@ -970,9 +952,51 @@ int ata_init(void)
         tick_add_task(mmc_tick);
         initialized = true;
     }
-    ata_enable(true);
+    mmc_enable(true);
 
     mutex_unlock(&mmc_mutex);
     return rc;
 }
+
+long mmc_last_disk_activity(void)
+{
+    return last_disk_activity;
+}
+
+void mmc_get_info(IF_MV2(int drive,) struct storage_info *info)
+{
+#ifndef HAVE_MULTIVOLUME
+    const int drive=0;
+#endif
+    info->sector_size=card_info[drive].blocksize;
+    info->num_sectors=card_info[drive].numblocks;
+    info->vendor="Rockbox";
+    if(drive==0)
+    {
+        info->product="Internal Storage";
+    }
+    else
+    {
+        info->product="MMC Card Slot";
+    }
+    info->revision="0.00";
+}
+
+#ifdef HAVE_HOTSWAP
+bool mmc_removable(IF_MV_NONVOID(int drive))
+{
+#ifndef HAVE_MULTIVOLUME
+    const int drive=0;
+#endif
+    return (drive==1);
+}
+
+bool mmc_present(IF_MV_NONVOID(int drive))
+{
+#ifndef HAVE_MULTIVOLUME
+    const int drive=0;
+#endif
+    return (card_info[drive].initialized && card_info[drive].numblocks > 0);
+}
+#endif
 

@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "config.h"
 
-#include "ata.h"
+#include "storage.h"
 #include "disk.h"
 #include "fat.h"
 #include "lcd.h"
@@ -289,7 +289,7 @@ static void init(void)
 #endif
     /* Must be done before any code uses the multi-screen APi */
     gui_syncstatusbar_init(&statusbars);
-    ata_init();
+    storage_init();
     settings_reset();
     settings_load(SETTINGS_ALL);
     gui_sync_wps_init();
@@ -427,7 +427,7 @@ static void init(void)
     }
 #endif
 
-    rc = ata_init();
+    rc = storage_init();
     if(rc)
     {
 #ifdef HAVE_LCD_BITMAP

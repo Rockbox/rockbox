@@ -23,43 +23,40 @@
 
 #include <stdbool.h>
 #include "config.h" /* for HAVE_MULTIVOLUME or not */
+#include "mv.h" /* for IF_MV() and friends */
 
-/* FixMe: These macros are a bit nasty and perhaps misplaced here.
-   We'll get rid of them once decided on how to proceed with multivolume. */
-#ifdef HAVE_MULTIVOLUME
-#define IF_MV(x) x /* optional volume/drive parameter */
-#define IF_MV2(x,y) x,y /* same, for a list of arguments */
-#define IF_MV_NONVOID(x) x /* for prototype with sole volume parameter */
-#define NUM_VOLUMES 2
-#else /* empty definitions if no multi-volume */
-#define IF_MV(x)
-#define IF_MV2(x,y)
-#define IF_MV_NONVOID(x) void
-#define NUM_VOLUMES 1
-#endif
+struct storage_info;
 
-extern void ata_enable(bool on);
-extern void ata_spindown(int seconds);
-extern void ata_sleep(void);
-extern void ata_sleepnow(void);
+void ata_enable(bool on);
+void ata_spindown(int seconds);
+void ata_sleep(void);
+void ata_sleepnow(void);
 /* NOTE: DO NOT use this to poll for disk activity.
          If you are waiting for the disk to become active before
          doing something use ata_idle_notify.h
  */
-extern bool ata_disk_is_active(void);
-extern int ata_hard_reset(void);
-extern int ata_soft_reset(void);
-extern int ata_init(void);
-extern void ata_close(void);
-extern int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf);
-extern int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
-extern void ata_spin(void);
+bool ata_disk_is_active(void);
+int ata_hard_reset(void);
+int ata_soft_reset(void);
+int ata_init(void);
+void ata_close(void);
+int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf);
+int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
+void ata_spin(void);
 #if (CONFIG_LED == LED_REAL)
-extern void ata_set_led_enabled(bool enabled);
+void ata_set_led_enabled(bool enabled);
 #endif
-extern unsigned short* ata_get_identify(void);
+unsigned short* ata_get_identify(void);
+void ata_get_info(IF_MV2(int drive,) struct storage_info *info);
+#ifdef HAVE_HOTSWAP
+bool ata_removable(IF_MV_NONVOID(int drive));
+bool ata_present(IF_MV_NONVOID(int drive));
+#endif
 
-extern long last_disk_activity;
-extern int ata_spinup_time; /* ticks */
+
+
+long ata_last_disk_activity(void);
+int ata_spinup_time(void); /* ticks */
+
 
 #endif

@@ -54,7 +54,7 @@ int main(void)
     
     backlight_init();
     
-    ata_init();
+    storage_init();
 
     int touch, btn;
     char datetime[30];

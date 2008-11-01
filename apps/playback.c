@@ -49,7 +49,7 @@
 #include "mp3_playback.h"
 #include "usb.h"
 #include "status.h"
-#include "ata.h"
+#include "storage.h"
 #include "screens.h"
 #include "playlist.h"
 #include "playback.h"

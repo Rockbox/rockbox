@@ -29,7 +29,7 @@
 #include "kernel.h"
 #include "lcd.h"
 #include "font.h"
-#include "ata.h"
+#include "storage.h"
 #include "button.h"
 #include "disk.h"
 #include "crc32-mi4.h"
@@ -250,14 +250,14 @@ void* main(void)
     printf("");
 
 
-    i=ata_init();
+    i=storage_init();
     disk_init(IF_MV(0));
 
     memset(zero,0,16*1024);
     printf("Zeroing flash");
     for(i=0;i<250816;i++)
     {
-       ata_write_sectors(IF_MV2(0,) i*32,32,zero);
+       storage_write_sectors(IF_MV2(0,) i*32,32,zero);
        if(i%64 == 0)
        {
            printf("%d kB left",(250816-i)/2);
@@ -265,15 +265,15 @@ void* main(void)
     }
 
     printf("Writing MBR");
-    ata_write_sectors(IF_MV2(0,) 0,1,mbr);
+    storage_write_sectors(IF_MV2(0,) 0,1,mbr);
     printf("Writing FAT bootsector");
-    ata_write_sectors(IF_MV2(0,) 1017,2,bootsector);
+    storage_write_sectors(IF_MV2(0,) 1017,2,bootsector);
     printf("Writing more FAT");
-    ata_write_sectors(IF_MV2(0,) 1023,1,fat);
+    storage_write_sectors(IF_MV2(0,) 1023,1,fat);
     printf("Writing more FAT");
-    ata_write_sectors(IF_MV2(0,) 1049,1,backupfat);
+    storage_write_sectors(IF_MV2(0,) 1049,1,backupfat);
     printf("Writing more FAT");
-    ata_write_sectors(IF_MV2(0,) 4920,1,backupfat);
+    storage_write_sectors(IF_MV2(0,) 4920,1,backupfat);
     if (button_hold())
         printf("Release Hold and");
 

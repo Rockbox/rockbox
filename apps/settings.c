@@ -38,6 +38,7 @@
 #include "rtc.h"
 #include "power.h"
 #include "ata_idle_notify.h"
+#include "storage.h"
 #include "screens.h"
 #include "ctype.h"
 #include "file.h"
@@ -582,11 +583,11 @@ void status_save(void)
 {
     update_runtime();
 #ifdef HAVE_RTC_RAM
-    /* this will be done in the ata_callback if
+    /* this will be done in the storage_callback if
        target doesnt have rtc ram */
     write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
 #else
-    register_ata_idle_func(flush_global_status_callback);
+    register_storage_idle_func(flush_global_status_callback);
 #endif
 }
 
@@ -594,11 +595,11 @@ int settings_save(void)
 {
     update_runtime();
 #ifdef HAVE_RTC_RAM
-    /* this will be done in the ata_callback if
+    /* this will be done in the storage_callback if
        target doesnt have rtc ram */
     write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
 #endif
-    register_ata_idle_func(flush_config_block_callback);
+    register_storage_idle_func(flush_config_block_callback);
     return 0;
 }
 
@@ -768,7 +769,7 @@ void settings_apply(bool read_disk)
     buttonlight_set_timeout(global_settings.buttonlight_timeout);
 #endif
 #ifdef HAVE_DISK_STORAGE
-    ata_spindown(global_settings.disk_spindown);
+    storage_spindown(global_settings.disk_spindown);
 #endif
 #if (CONFIG_CODEC == MAS3507D) && !defined(SIMULATOR)
     dac_line_in(global_settings.line_in);
