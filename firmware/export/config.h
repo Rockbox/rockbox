@@ -189,8 +189,9 @@
 /* else                   HW controlled LED (iRiver H1x0) */
 
 /* CONFIG_NAND */
-#define NAND_IFP7XX 1
-#define NAND_TCC    2
+#define NAND_IFP7XX  1
+#define NAND_TCC     2
+#define NAND_SAMSUNG 3
 
 /* CONFIG_RTC */
 #define RTC_M41ST84W 1 /* Archos Recorder */

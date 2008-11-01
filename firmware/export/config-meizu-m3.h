@@ -48,6 +48,10 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
+#define CONFIG_STORAGE STORAGE_NAND
+
+#define CONFIG_NAND NAND_SAMSUNG
+
 /* LCD dimensions */
 #define LCD_WIDTH  176
 #define LCD_HEIGHT 132
