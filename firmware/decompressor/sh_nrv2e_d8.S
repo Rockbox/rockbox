@@ -98,10 +98,9 @@ getoff_n2e:
     getnextb(cnt)
     jnextb0 off_n2e
 
-    mov     cnt, tmp
+    mov     #-4, tmp    ! T=1 on entry, so this does
+    addc    cnt, tmp    !   tmp = cnt - 3, T = (cnt >= 3)
     mov     #0, len     ! cnt and len share a reg!
-    add     #-3, tmp
-    cmp/pz  tmp
     bf      offprev_n2e ! cnt was 2
     mov.b   @src+, off  ! low 7+1 bits
     shll8   tmp
@@ -112,19 +111,18 @@ getoff_n2e:
     bt      eof_n2e
     shar    off
     bt      lenlast_n2e
-    bra     lenmore_n2e
-    mov     #1, len
+    bf      lenmore_n2e ! always taken if the preceding bt isn't
 
 offprev_n2e:
     jnextb1 lenlast_n2e
-    mov     #1, len
 lenmore_n2e:
+    mov     #1, len
     jnextb1 lenlast_n2e
 len_n2e:
     getnextb(len)
     jnextb0 len_n2e
     bra     gotlen_n2e
-    add     #6-2, len
+    mov     #6-2, tmp
 
 get1_n2e:               ! in: T bit set
     mov.b   @src+, bits ! SH1 sign-extends on load
@@ -135,19 +133,17 @@ get1_n2e:               ! in: T bit set
 
 lenlast_n2e:
     getnextb(len)       ! 0,1,2,3
-    add     #2, len
+    mov     #2, tmp
 gotlen_n2e:
-    cmp/gt  off, wrnk
-    movt    tmp          ! too far away, so minimum match length is 3
-    add     tmp, len
+    cmp/gt  off, wrnk   ! too far away, so minimum match length is 3
+    addc    tmp, len
 copy_n2e:
-    mov.b   @(off,dst), tmp
     add     #-1, len
+    mov.b   @(off,dst), tmp
+    tst     len, len
     mov.b   tmp, @dst
     add     #1, dst
-    tst     len, len
     bf      copy_n2e
-    bra     top_n2e
-    nop
+    bt      top_n2e     ! always taken if the preceding bf isn't
 
     .size ucl_nrv2e_decompress_8, .-ucl_nrv2e_decompress_8
