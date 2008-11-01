@@ -68,6 +68,10 @@
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS
 
+/* We're working on the assumption that the AS3525 has something
+   similar to the AS3514 for audio codec etc */
+#define HAVE_AS3514
+
 /* define this if you have a real-time clock */
 #ifndef BOOTLOADER
 #define CONFIG_RTC RTC_AS3525

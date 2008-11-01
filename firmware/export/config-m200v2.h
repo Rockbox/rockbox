@@ -74,6 +74,10 @@
 /* TLV320 has no tone controls, so we use the software ones */
 #define HAVE_SW_TONE_CONTROLS
 
+/* We're working on the assumption that the AS3525 has something
+   similar to the AS3514 for audio codec etc */
+#define HAVE_AS3514
+
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
@@ -92,9 +96,6 @@
 
 /* Define this if you have an AMS AS3525 */
 #define CONFIG_CPU AS3525
-
-/* Define this if you have ATA power-off control */
-#define HAVE_ATA_POWER_OFF
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      120000000
