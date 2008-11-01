@@ -105,6 +105,7 @@
 #define MEIZU_M6SP_PAD     33
 #define MEIZU_M3_PAD       34
 #define SANSA_CLIP_PAD     35
+#define SANSA_FUZE_PAD     36
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -150,6 +151,7 @@
 #define LCD_ONDAVX747 29 /* as used by the Onda VX747 */
 #define LCD_ONDAVX767 30 /* as used by the Onda VX767 */
 #define LCD_SSD1303   31 /* as used by the Sansa Clip */
+#define LCD_FUZE      32 /* as used by the Sansa Fuze */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -320,6 +322,8 @@
 #include "config-e200v2.h"
 #elif defined(SANSA_M200V2)
 #include "config-m200v2.h"
+#elif defined(SANSA_FUZE)
+#include "config-fuze.h"
 #else
 /* no known platform */
 #endif

@@ -696,6 +696,7 @@ cat <<EOF
                                                  55) Sansa Clip
                                                  56) Sansa e200v2
                                                  57) Sansa m200v2
+                                                 58) Sansa Fuze
 
  ==Tatung==               ==Olympus==            ==Logik==
  60) Elio TPJ-1022        70) M:Robe 500         80) DAX 1GB MP3/DAB
@@ -1739,6 +1740,27 @@ fi
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-m200v2"
+    ;;
+
+
+   58|fuze)
+    target_id=53
+    modelname="fuze"
+    target="-DSANSA_FUZE"
+    memory=2
+    arm9tdmicc
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=e2v2"
+    output="rockbox.sansa"
+    bootoutput="bootloader-fuze.sansa"
+    appextra="recorder:gui"
+    plugins="yes"
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="as3525"
+    t_model="sansa-fuze"
     ;;
 
 
