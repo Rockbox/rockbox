@@ -24,7 +24,7 @@
 #include "config.h" /* for HAVE_MULTIVOLUME */
 
 #include "as3525.h"
-#include "mmci.h"
+#include "pl180.h"
 #include "panic.h"
 #include "stdbool.h"
 #include "ata.h"
@@ -87,7 +87,7 @@ static void mci_set_clock_divider(const int drive, int divider)
     if(divider > 1)
     {
         /* use divide logic */
-        clock &= ~MCI_CLK_BYPASS;
+        clock &= ~MCI_CLOCK_BYPASS;
 
         /* convert divider to MMC_CLOCK logic */
         divider = (divider/2) - 1;
@@ -97,7 +97,7 @@ static void mci_set_clock_divider(const int drive, int divider)
     else
     {
         /* bypass dividing logic */
-        clock |= MCI_CLK_BYPASS;
+        clock |= MCI_CLOCK_BYPASS;
         divider = 0;
     }
 
@@ -110,20 +110,20 @@ static int send_cmd(const int drive, struct mmc_command *cmd)
 {
     int val, status;
 
-    while(MMC_STATUS(drive) & MCI_CMDACTIVE); /* useless */
+    while(MMC_STATUS(drive) & MCI_CMD_ACTIVE); /* useless */
 
-    if(MMC_COMMAND(drive) & MCI_CPSM_ENABLE) /* clears existing command */
+    if(MMC_COMMAND(drive) & MCI_COMMAND_ENABLE) /* clears existing command */
     {
         MMC_COMMAND(drive) = 0;
         mci_delay();
     }
 
-    val = cmd->cmd | MCI_CPSM_ENABLE;
+    val = cmd->cmd | MCI_COMMAND_ENABLE;
     if(cmd->flags & MMC_RESP)
     {
-        val |= MCI_CPSM_RESPONSE;
+        val |= MCI_COMMAND_RESPONSE;
         if(cmd->flags & MMC_LONG_RESP)
-            val |= MCI_CPSM_LONGRSP;
+            val |= MCI_COMMAND_LONG_RESPONSE;
     }
 
     MMC_CLEAR(drive) = 0x7ff;
@@ -131,7 +131,7 @@ static int send_cmd(const int drive, struct mmc_command *cmd)
     MMC_ARGUMENT(drive) = (cmd->flags & MMC_ARG) ? cmd->arg : 0;
     MMC_COMMAND(drive) = val;
 
-    while(MMC_STATUS(drive) & MCI_CMDACTIVE);
+    while(MMC_STATUS(drive) & MCI_CMD_ACTIVE);
 
     MMC_COMMAND(drive) = 0;
     MMC_ARGUMENT(drive) = ~0;
@@ -141,13 +141,13 @@ static int send_cmd(const int drive, struct mmc_command *cmd)
         status = MMC_STATUS(drive);
         if(cmd->flags & MMC_RESP)
         {
-            if(status & MCI_CMDTIMEOUT)
+            if(status & MCI_CMD_TIMEOUT)
             {
                 if(cmd->cmd == SEND_IF_COND)
                     break; /* SDHC test can fail */
                 panicf("Response timeout");
             }
-            else if(status & (MCI_CMDCRCFAIL|MCI_CMDRESPEND))
+            else if(status & (MCI_CMD_CRC_FAIL|MCI_CMD_RESP_END))
             {   /* resp received */
                 cmd->resp[0] = MMC_RESP0(drive);
                 if(cmd->flags & MMC_LONG_RESP)
@@ -160,7 +160,7 @@ static int send_cmd(const int drive, struct mmc_command *cmd)
             }
         }
         else
-            if(status & MCI_CMDSENT)
+            if(status & MCI_CMD_SENT)
                 break;
 
     } while(1);
@@ -183,7 +183,7 @@ static void sd_init_card(const int drive)
     cmd_idle.cmd = GO_IDLE_STATE;
     cmd_idle.arg = 0;
     cmd_idle.flags = MMC_NO_FLAGS;
-    if(send_cmd(drive, &cmd_idle) != MCI_CMDSENT)
+    if(send_cmd(drive, &cmd_idle) != MCI_CMD_SENT)
         panicf("goto idle failed!");
 #ifdef DEBUG
     else
@@ -209,7 +209,7 @@ static void sd_init_card(const int drive)
 
     sdhc = false;
     status = send_cmd(drive, &cmd_if_cond);
-    if(status & (MCI_CMDCRCFAIL|MCI_CMDRESPEND))
+    if(status & (MCI_CMD_CRC_FAIL|MCI_CMD_RESP_END))
     {
         if((cmd_if_cond.resp[0] & 0xFFF) == cmd_if_cond.arg)
             sdhc = true;
@@ -240,7 +240,7 @@ static void sd_init_card(const int drive)
 #endif
         /* app_cmd */
         status = send_cmd(drive, &cmd_app);
-        if( !(status & (MCI_CMDCRCFAIL|MCI_CMDRESPEND)) ||
+        if( !(status & (MCI_CMD_CRC_FAIL|MCI_CMD_RESP_END)) ||
             !(cmd_app.resp[0] & (1<<5)) )
         {
             panicf("app_cmd failed");
@@ -248,7 +248,7 @@ static void sd_init_card(const int drive)
 
         cmd_op_cond.arg = sdhc ? 0x40FF8000 : (8<<0x14); /* ocr */
         status = send_cmd(drive, &cmd_op_cond);
-        if(!(status & (MCI_CMDCRCFAIL|MCI_CMDRESPEND)))
+        if(!(status & (MCI_CMD_CRC_FAIL|MCI_CMD_RESP_END)))
             panicf("cmd_op_cond failed");
 
 #ifdef DEBUG
@@ -268,16 +268,16 @@ static void init_pl180_controller(const int drive)
 
     MMC_MASK0(drive) = MMC_MASK1(drive) = 0;  /* disable all interrupts */
 
-    MMC_POWER(drive) = MCI_PWR_UP | (10 /*voltage*/ << 2); /* use OF voltage */
+    MMC_POWER(drive) = MCI_POWER_UP|(10 /*voltage*/ << 2); /* use OF voltage */
     mci_delay();
 
-    MMC_POWER(drive) |= MCI_PWR_ON;
+    MMC_POWER(drive) |= MCI_POWER_ON;
     mci_delay();
 
     MMC_SELECT(drive) = 0;
 
-    MMC_CLOCK(drive) = MCI_CLK_ENABLE;
-    MMC_CLOCK(drive) &= ~MCI_CLK_PWRSAVE;
+    MMC_CLOCK(drive) = MCI_CLOCK_ENABLE;
+    MMC_CLOCK(drive) &= ~MCI_CLOCK_POWERSAVE;
 
     /* set MCLK divider */
     mci_set_clock_divider(drive, 200);
