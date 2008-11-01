@@ -43,7 +43,9 @@ void sd_spin(void);
 void sd_set_led_enabled(bool enabled);
 #endif
 
+#ifdef STORAGE_GET_INFO
 void sd_get_info(IF_MV2(int drive,) struct storage_info *info);
+#endif
 #ifdef HAVE_HOTSWAP
 bool sd_removable(IF_MV_NONVOID(int drive));
 bool sd_present(IF_MV_NONVOID(int drive));

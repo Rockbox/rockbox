@@ -963,6 +963,7 @@ long mmc_last_disk_activity(void)
     return last_disk_activity;
 }
 
+#ifdef STORAGE_GET_INFO
 void mmc_get_info(IF_MV2(int drive,) struct storage_info *info)
 {
 #ifndef HAVE_MULTIVOLUME
@@ -981,6 +982,7 @@ void mmc_get_info(IF_MV2(int drive,) struct storage_info *info)
     }
     info->revision="0.00";
 }
+#endif
 
 #ifdef HAVE_HOTSWAP
 bool mmc_removable(IF_MV_NONVOID(int drive))

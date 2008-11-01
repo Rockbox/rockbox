@@ -450,6 +450,7 @@ long nand_last_disk_activity(void)
     return last_disk_activity;
 }
 
+#ifdef STORAGE_GET_INFO
 void nand_get_info(struct storage_info *info)
 {
     unsigned long blocks;
@@ -469,4 +470,5 @@ void nand_get_info(struct storage_info *info)
 
     info->serial=0;
 }
+#endif
 

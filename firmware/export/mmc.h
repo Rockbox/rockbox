@@ -44,7 +44,9 @@ void mmc_spin(void);
 void mmc_set_led_enabled(bool enabled);
 #endif
 
+#ifdef STORAGE_GET_INFO
 void mmc_get_info(IF_MV2(int drive,) struct storage_info *info);
+#endif
 #ifdef HAVE_HOTSWAP
 bool mmc_removable(IF_MV_NONVOID(int drive));
 bool mmc_present(IF_MV_NONVOID(int drive));

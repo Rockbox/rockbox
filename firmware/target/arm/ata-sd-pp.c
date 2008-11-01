@@ -1300,6 +1300,7 @@ long sd_last_disk_activity(void)
     return last_disk_activity;
 }
 
+#ifdef STORAGE_GET_INFO
 void sd_get_info(IF_MV2(int drive,) struct storage_info *info)
 {
 #ifndef HAVE_MULTIVOLUME
@@ -1318,6 +1319,7 @@ void sd_get_info(IF_MV2(int drive,) struct storage_info *info)
     }
     info->revision="0.00";
 }
+#endif
 
 #ifdef HAVE_HOTSWAP
 bool sd_removable(IF_MV_NONVOID(int drive))

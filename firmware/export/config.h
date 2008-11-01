@@ -624,4 +624,8 @@
 #endif
 #endif /* HAVE_HEADPHONE_DETECTION */
 
+#if defined(HAVE_USBSTACK) || (CONFIG_STORAGE & STORAGE_NAND)
+#define STORAGE_GET_INFO
+#endif
+
 #endif /* __CONFIG_H__ */

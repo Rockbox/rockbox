@@ -1403,6 +1403,7 @@ int ata_spinup_time(void)
     return spinup_time;
 }
 
+#ifdef STORAGE_GET_INFO
 void ata_get_info(struct storage_info *info)
 {
     unsigned short *src,*dest;
@@ -1432,3 +1433,4 @@ void ata_get_info(struct storage_info *info)
         dest[i] = htobe16(src[i]);
     info->revision=revision;
 }
+#endif

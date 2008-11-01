@@ -197,6 +197,7 @@ static inline int storage_spinup_time(void)
 #endif
 }
 
+#ifdef STORAGE_GET_INFO
 static inline void storage_get_info(IF_MV2(int drive,) struct storage_info *info)
 {
 #if (CONFIG_STORAGE & STORAGE_ATA)
@@ -211,6 +212,7 @@ static inline void storage_get_info(IF_MV2(int drive,) struct storage_info *info
     #error No storage driver!
 #endif
 }
+#endif
 
 #ifdef HAVE_HOTSWAP
 static inline bool storage_removable(IF_MV_NONVOID(int drive))
@@ -310,11 +312,13 @@ static inline int storage_spinup_time(void)
     return 0;
 }
 
+#ifdef STORAGE_GET_INFO
 static inline void storage_get_info(IF_MV2(int drive,) struct storage_info *info)
 {
     IF_MV((void)drive;)
     (void)info;
 }
+#endif
 
 #ifdef HAVE_HOTSWAP
 static inline bool storage_removable(IF_MV_NONVOID(int drive))

@@ -714,6 +714,7 @@ int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
     return -1;
 }
 
+#ifdef STORAGE_GET_INFO
 void nand_get_info(struct storage_info *info)
 {
     /* firmware version */
@@ -727,6 +728,7 @@ void nand_get_info(struct storage_info *info)
                         * page_size * total_banks;
     info->sector_size=SECTOR_SIZE;
 }
+#endif
 
 int nand_init(void)
 {

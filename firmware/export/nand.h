@@ -43,7 +43,9 @@ void nand_spin(void);
 void nand_set_led_enabled(bool enabled);
 #endif
 
+#ifdef STORAGE_GET_INFO
 void nand_get_info(IF_MV2(int drive,) struct storage_info *info);
+#endif
 
 long nand_last_disk_activity(void);
 

@@ -47,7 +47,10 @@ void ata_spin(void);
 void ata_set_led_enabled(bool enabled);
 #endif
 unsigned short* ata_get_identify(void);
+
+#ifdef STORAGE_GET_INFO
 void ata_get_info(IF_MV2(int drive,) struct storage_info *info);
+#endif
 #ifdef HAVE_HOTSWAP
 bool ata_removable(IF_MV_NONVOID(int drive));
 bool ata_present(IF_MV_NONVOID(int drive));
