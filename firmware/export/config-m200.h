@@ -38,6 +38,10 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
+#define CONFIG_STORAGE STORAGE_NAND
+
+#define CONFIG_NAND NAND_TCC
+
 /* LCD dimensions */
 #define LCD_WIDTH  128
 #define LCD_HEIGHT 64
@@ -123,9 +127,5 @@
 #define IBSS_ATTR_MPC_SAMPLE_BUF
 #define ICODE_ATTR_ALAC
 #define IBSS_ATTR_SHORTEN_DECODED0
-
-#define CONFIG_STORAGE STORAGE_NAND
-
-#define CONFIG_NAND NAND_TCC
 
 #endif /* SIMULATOR */

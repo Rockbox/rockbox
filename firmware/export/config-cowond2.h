@@ -48,6 +48,10 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
+#define CONFIG_STORAGE STORAGE_NAND
+
+#define CONFIG_NAND NAND_TCC
+
 /* Some (2Gb?) D2s seem to be FAT16 formatted */
 #define HAVE_FAT16SUPPORT
 
@@ -145,8 +149,5 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
-#define CONFIG_STORAGE STORAGE_NAND
-
-#define CONFIG_NAND NAND_TCC
 
 #endif /* SIMULATOR */

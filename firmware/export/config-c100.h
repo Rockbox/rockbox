@@ -39,6 +39,10 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
+#define CONFIG_STORAGE STORAGE_NAND
+
+#define CONFIG_NAND NAND_TCC
+
 /* LCD dimensions */
 #define LCD_WIDTH  128
 #define LCD_HEIGHT 64
@@ -119,9 +123,5 @@
 #define BOOTFILE_EXT "c100"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/"
-
-#define CONFIG_STORAGE STORAGE_NAND
-
-#define CONFIG_NAND NAND_TCC
 
 #endif /* SIMULATOR */

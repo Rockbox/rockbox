@@ -102,6 +102,7 @@ static inline int storage_soft_reset(void)
 }
 static inline int storage_init(void)
 {
+#ifndef SIMULATOR
 #if (CONFIG_STORAGE & STORAGE_ATA)
     return ata_init();
 #elif (CONFIG_STORAGE & STORAGE_SD)
@@ -112,6 +113,15 @@ static inline int storage_init(void)
     return mmc_init();
 #else
     #error No storage driver!
+#endif
+#else
+    return 0;
+#endif
+}
+static inline void storage_close(void)
+{
+#if (CONFIG_STORAGE & STORAGE_ATA)
+    ata_close();
 #endif
 }
 static inline int storage_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
