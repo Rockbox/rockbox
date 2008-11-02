@@ -175,98 +175,29 @@ struct storage_info
     
     #endif /* NOT CONFIG_STORAGE_MULTI */
 #else /*NOT SIMULATOR */
-static inline void storage_enable(bool on)
-{
-    (void)on;
-}
-static inline void storage_sleep(void)
-{
-}
-static inline void storage_sleepnow(void)
-{
-}
-static inline bool storage_disk_is_active(void)
-{
-    return 0;
-}
-static inline int storage_hard_reset(void)
-{
-    return 0;
-}
-static inline int storage_soft_reset(void)
-{
-    return 0;
-}
-static inline int storage_init(void)
-{
-    return 0;
-}
-static inline void storage_close(void)
-{
-}
-static inline int storage_read_sectors(int drive, unsigned long start, int count, void* buf)
-{
-    (void)drive;
-    (void)start;
-    (void)count;
-    (void)buf;
-    return 0;
-}
-static inline int storage_write_sectors(int drive, unsigned long start, int count, const void* buf)
-{
-    (void)drive;
-    (void)start;
-    (void)count;
-    (void)buf;
-    return 0;
-}
-
-static inline void storage_spin(void)
-{
-}
-static inline void storage_spindown(int seconds)
-{
-    (void)seconds;
-}
- 
+void storage_enable(bool on);
+void storage_sleep(void);
+void storage_sleepnow(void);
+bool storage_disk_is_active(void);
+int storage_hard_reset(void);
+int storage_soft_reset(void);
+int storage_init(void);
+void storage_close(void);
+int storage_read_sectors(int drive, unsigned long start, int count, void* buf);
+int storage_write_sectors(int drive, unsigned long start, int count, const void* buf);
+void storage_spin(void);
+void storage_spindown(int seconds);
 #if (CONFIG_LED == LED_REAL)
-static inline void storage_set_led_enabled(bool enabled)
-{
-    (void)enabled;
-}
-#endif /*LED*/
-
-static inline long storage_last_disk_activity(void)
-{
-    return 0;
-}
-
-static inline int storage_spinup_time(void)
-{
-    return 0;
-}
-
-#ifdef STORAGE_GET_INFO
-static inline void storage_get_info(int drive, struct storage_info *info)
-{
-    (void)drive;
-    (void)info;
-}
+void storage_set_led_enabled(bool enabled);
 #endif
-
-#ifdef HAVE_HOTSWAP
-static inline bool storage_removable(int drive)
-{
-    (void)drive;
-    return 0;
-}
-
-static inline bool storage_present(int drive)
-{
-    (void)drive;
-    return 0;
-}
-#endif /* HOTSWAP */
-
+long storage_last_disk_activity(void);
+int storage_spinup_time(void);
+#ifdef STORAGE_GET_INFO
+void storage_get_info(int drive, struct storage_info *info);
+#endif
+#ifdef HOTSWAP
+bool storage_removable(int drive);
+bool storage_present(int drive);
+#endif
 #endif/*NOT SIMULATOR */
 #endif
