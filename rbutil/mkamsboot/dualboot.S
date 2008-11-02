@@ -110,13 +110,13 @@ uclcopy:
         cmp   r1, #0
         bne   boot_of
 #elif defined(SANSA_E200V2)
-        /* DOWN button */
+        /* LEFT button */
         ldr   r0, =GPIOC
         mov   r1, #0
         str   r1, [r0, #0x400]
-        ldr   r1, [r0, #0x100]   /* read pin C6 */
+        ldr   r1, [r0, #0x20]    /* read pin C3 */
 
-        cmp   r1, #0             /* C6 = #0 means button pressed */
+        cmp   r1, #0             /* C3 = #0 means button pressed */
         beq   boot_of
 #elif defined(SANSA_M200V2)
         /* SELECT button */
