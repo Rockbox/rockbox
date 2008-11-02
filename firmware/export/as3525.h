@@ -195,7 +195,7 @@ CE lines
 #define CGU_MEMSTICK     (*(volatile unsigned long *)(CGU_BASE + 0x34))
 #define CGU_DBOP         (*(volatile unsigned long *)(CGU_BASE + 0x38))
 
-
+#define CGU_VIC_CLOCK_ENABLE                 ( 1 << 23 ) /* vic */
 /* --- are disabled after reset --- */
 #define CGU_DMA_CLOCK_ENABLE                 ( 1 << 22 ) /* dma */
 #define CGU_USB_CLOCK_ENABLE                 ( 1 << 21 ) /* usb */
@@ -346,5 +346,46 @@ interface */
 #define MPMC_DYNAMIC_RASCAS_3     (*(volatile unsigned long*)(MPMC_BASE+0x164))
 
 #define MPMC_PERIPH_ID2           (*(volatile unsigned long*)(MPMC_BASE+0xFE8))
+
+/* VIC controller (PL190) registers */
+
+#define VIC_IRQ_STATUS      (*(volatile unsigned long*)(VIC_BASE+0x00))
+#define VIC_FIQ_STATUS      (*(volatile unsigned long*)(VIC_BASE+0x04))
+#define VIC_RAW_INTR        (*(volatile unsigned long*)(VIC_BASE+0x08))
+#define VIC_INT_SELECT      (*(volatile unsigned long*)(VIC_BASE+0x0C))
+#define VIC_INT_ENABLE      (*(volatile unsigned long*)(VIC_BASE+0x10))
+#define VIC_INT_EN_CLEAR    (*(volatile unsigned long*)(VIC_BASE+0x14))
+#define VIC_SOFT_INT        (*(volatile unsigned long*)(VIC_BASE+0x18))
+#define VIC_SOFT_INT_CLEAR  (*(volatile unsigned long*)(VIC_BASE+0x1C))
+#define VIC_PROTECTION      (*(volatile unsigned long*)(VIC_BASE+0x20))
+#define VIC_VECT_ADDR       (*(volatile unsigned long*)(VIC_BASE+0x30))
+#define VIC_DEF_VECT_ADDR   (*(volatile unsigned long*)(VIC_BASE+0x34))
+
+/* Interrupts */
+#define INTERRUPT_WATCHDOG      (1<<0)
+#define INTERRUPT_TIMER1        (1<<1)
+#define INTERRUPT_TIMER2        (1<<2)
+#define INTERRUPT_USB           (1<<3)
+#define INTERRUPT_DMAC          (1<<4)
+#define INTERRUPT_NAND          (1<<5)
+#define INTERRUPT_IDE           (1<<6)
+#define INTERRUPT_MCI0          (1<<1<<7)
+#define INTERRUPT_MCI1          (1<<8)
+#define INTERRUPT_AUDIO         (1<<9)
+#define INTERRUPT_SSP           (1<<10)
+#define INTERRUPT_I2C_MS        (1<<11)
+#define INTERRUPT_I2C_AUDIO     (1<<12)
+#define INTERRUPT_I2SIN         (1<<13)
+#define INTERRUPT_I2SOUT        (1<<14)
+#define INTERRUPT_UART          (1<<15)
+#define INTERRUPT_GPIOD         (1<<16)
+/* 17 reserved */
+#define INTERRUPT_CGU           (1<<18)
+#define INTERRUPT_MEMORY_STICK  (1<<19)
+#define INTERRUPT_DBOP          (1<<20)
+/* 21-28 reserved */
+#define INTERRUPT_GPIOA         (1<<29)
+#define INTERRUPT_GPIOB         (1<<30)
+#define INTERRUPT_GPIOC         (1<<31)
 
 #endif /*__AS3525_H__*/

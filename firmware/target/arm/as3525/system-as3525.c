@@ -87,10 +87,12 @@ static const char * const irqname[] =
 
 static void UIRQ(void)
 {
-/* TODO
-    unsigned int offset = INTOFFSET;
-    panicf("Unhandled IRQ %02X: %s", offset, irqname[offset]);
-*/
+    unsigned int irq_no = 0;
+    int status = VIC_IRQ_STATUS;
+    while((status >>= 1))
+        irq_no++;
+
+    panicf("Unhandled IRQ %02X: %s", irq_no, irqname[irq_no]);
 }
 
 void irq_handler(void)
@@ -102,16 +104,12 @@ void irq_handler(void)
     asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
                     "sub   sp, sp, #8           \n"); /* Reserve stack */
 
-    /* TODO */
-#if 0
-    int irq_no = INTOFFSET;   /* Read clears the corresponding IRQ status */
-#else
-    int irq_no = 69;
-#endif
-    if ((irq_no & (1<<31)) == 0)  /* Ensure invalid flag is not set */
-    {
-        irqvector[irq_no]();
-    }
+    unsigned int irq_no = 0;
+    int status = VIC_IRQ_STATUS;
+    while((status >>= 1))
+        irq_no++;
+
+    irqvector[irq_no]();
 
     asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
                     "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
@@ -228,6 +226,12 @@ void system_init(void)
     sdram_init();
 
     CGU_PERI |= (5<<2)|0x01; /* pclk = PLLA / 6 = 64 MHz */
+
+#if 0 /* we don't use interrupts at the moment */
+    /* enable VIC */
+    CGU_PERI |= CGU_VIC_CLOCK_ENABLE;
+    VIC_INT_SELECT = 0; /* only IRQ, no FIQ */
+#endif
 }
 
 void system_reboot(void)
