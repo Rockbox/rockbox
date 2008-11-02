@@ -78,9 +78,11 @@ struct partinfo* disk_init(IF_MV_NONVOID(int drive))
         return NULL; /* out of space in table */
 #else
     struct partinfo* pinfo = part;
+    int drive;
+    (void)drive;
 #endif
 
-    storage_read_sectors(IF_MV2(drive,) 0,1, &sector);
+    storage_read_sectors(drive, 0,1, &sector);
     /* check that the boot sector is initialized */
     if ( (sector[510] != 0x55) ||
          (sector[511] != 0xaa)) {

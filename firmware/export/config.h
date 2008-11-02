@@ -383,6 +383,11 @@
 #define CONFIG_TUNER_MULTI
 #endif
 
+#if (CONFIG_STORAGE & (CONFIG_STORAGE - 1)) != 0
+/* Multiple storage drivers */
+#define CONFIG_STORAGE_MULTI
+#endif
+
 #if defined(BOOTLOADER) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
 /* Bootloaders don't use CPU frequency adjustment */
 #undef HAVE_ADJUSTABLE_CPU_FREQ

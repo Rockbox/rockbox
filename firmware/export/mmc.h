@@ -39,6 +39,7 @@ void mmc_close(void);
 int mmc_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf);
 int mmc_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
 void mmc_spin(void);
+int mmc_spinup_time(void);
 
 #if (CONFIG_LED == LED_REAL)
 void mmc_set_led_enabled(bool enabled);

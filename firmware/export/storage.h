@@ -48,204 +48,133 @@ struct storage_info
     char *revision;
 };
 
-void storage_spindown(int seconds);
-
 #ifndef SIMULATOR
-static inline void storage_enable(bool on)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    ata_enable(on);
-#elif (CONFIG_STORAGE & STORAGE_SD)
-    sd_enable(on);
-#elif (CONFIG_STORAGE & STORAGE_MMC)
-    mmc_enable(on);
-#else
-    (void)on;
-#endif
-}
-static inline void storage_sleep(void)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    ata_sleep();
-#endif
-}
-static inline void storage_sleepnow(void)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    ata_sleepnow();
-#endif
-}
-static inline bool storage_disk_is_active(void)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    return ata_disk_is_active();
-#elif (CONFIG_STORAGE & STORAGE_MMC)
-    return mmc_disk_is_active();
-#else
-    return 0;
-#endif
-}
-static inline int storage_hard_reset(void)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    return ata_hard_reset();
-#else
-    return 0;
-#endif
-}
-static inline int storage_soft_reset(void)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    return ata_soft_reset();
-#else
-    return 0;
-#endif
-}
-static inline int storage_init(void)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    return ata_init();
-#elif (CONFIG_STORAGE & STORAGE_SD)
-    return sd_init();
-#elif (CONFIG_STORAGE & STORAGE_NAND)
-    return nand_init();
-#elif (CONFIG_STORAGE & STORAGE_MMC)
-    return mmc_init();
-#else
-    #error No storage driver!
-#endif
-}
-static inline void storage_close(void)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    ata_close();
-#endif
-}
-static inline int storage_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    return ata_read_sectors(IF_MV2(drive,) start, count, buf);
-#elif (CONFIG_STORAGE & STORAGE_SD)
-    return sd_read_sectors(IF_MV2(drive,) start, count, buf);
-#elif (CONFIG_STORAGE & STORAGE_NAND)
-    return nand_read_sectors(IF_MV2(drive,) start, count, buf);
-#elif (CONFIG_STORAGE & STORAGE_MMC)
-    return mmc_read_sectors(IF_MV2(drive,) start, count, buf);
-#else
-    #error No storage driver!
-#endif
-}
-static inline int storage_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    return ata_write_sectors(IF_MV2(drive,) start, count, buf);
-#elif (CONFIG_STORAGE & STORAGE_SD)
-    return sd_write_sectors(IF_MV2(drive,) start, count, buf);
-#elif (CONFIG_STORAGE & STORAGE_NAND)
-    return nand_write_sectors(IF_MV2(drive,) start, count, buf);
-#elif (CONFIG_STORAGE & STORAGE_MMC)
-    return mmc_write_sectors(IF_MV2(drive,) start, count, buf);
-#else
-    #error No storage driver!
-#endif
-}
-static inline void storage_spin(void)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    ata_spin();
-#endif
-}
-
-#if (CONFIG_LED == LED_REAL)
-static inline void storage_set_led_enabled(bool enabled)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    ata_set_led_enabled(enabled);
-#elif (CONFIG_STORAGE & STORAGE_SD)
-    sd_set_led_enabled(enabled);
-#elif (CONFIG_STORAGE & STORAGE_NAND)
-    nand_set_led_enabled(enabled);
-#elif (CONFIG_STORAGE & STORAGE_MMC)
-    mmc_set_led_enabled(enabled);
-#else
-    #error No storage driver!
-#endif
-}
-#endif /*LED*/
-
-static inline long storage_last_disk_activity(void)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    return ata_last_disk_activity();
-#elif (CONFIG_STORAGE & STORAGE_SD)
-    return sd_last_disk_activity();
-#elif (CONFIG_STORAGE & STORAGE_NAND)
-    return nand_last_disk_activity();
-#elif (CONFIG_STORAGE & STORAGE_MMC)
-    return mmc_last_disk_activity();
-#else
-    #error No storage driver!
-#endif
-}
-
-static inline int storage_spinup_time(void)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    return ata_spinup_time();
-#else
-    return 0;
-#endif
-}
-
-#ifdef STORAGE_GET_INFO
-static inline void storage_get_info(IF_MV2(int drive,) struct storage_info *info)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    return ata_get_info(IF_MV2(drive,) info);
-#elif (CONFIG_STORAGE & STORAGE_SD)
-    return sd_get_info(IF_MV2(drive,) info);
-#elif (CONFIG_STORAGE & STORAGE_NAND)
-    return nand_get_info(IF_MV2(drive,) info);
-#elif (CONFIG_STORAGE & STORAGE_MMC)
-    return mmc_get_info(IF_MV2(drive,) info);
-#else
-    #error No storage driver!
-#endif
-}
-#endif
-
-#ifdef HAVE_HOTSWAP
-static inline bool storage_removable(IF_MV_NONVOID(int drive))
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    return ata_removable(IF_MV(drive));
-#elif (CONFIG_STORAGE & STORAGE_SD)
-    return sd_removable(IF_MV(drive));
-#elif (CONFIG_STORAGE & STORAGE_NAND)
-    return nand_removable(IF_MV(drive));
-#elif (CONFIG_STORAGE & STORAGE_MMC)
-    return mmc_removable(IF_MV(drive));
-#else
-    #error No storage driver!
-#endif
-}
-
-static inline bool storage_present(IF_MV_NONVOID(int drive))
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    return ata_present(IF_MV(drive));
-#elif (CONFIG_STORAGE & STORAGE_SD)
-    return sd_present(IF_MV(drive));
-#elif (CONFIG_STORAGE & STORAGE_NAND)
-    return nand_present(IF_MV(drive));
-#elif (CONFIG_STORAGE & STORAGE_MMC)
-    return mmc_present(IF_MV(drive));
-#else
-    #error No storage driver!
-#endif
-}
-#endif /* HOTSWAP */
-#else /* SIMULATOR */
+    #ifndef CONFIG_STORAGE_MULTI
+    /* storage_spindown, storage_sleep and storage_spin are passed as
+     * pointers, which doesn't work with argument-macros.
+     */
+        #if (CONFIG_STORAGE & STORAGE_ATA)
+            #define storage_spindown ata_spindown
+            #define storage_sleep ata_sleep
+            #define storage_spin ata_spin
+    
+            #define storage_enable(on) ata_enable(on)
+            #define storage_sleepnow() ata_sleepnow()
+            #define storage_disk_is_active() ata_disk_is_active()
+            #define storage_hard_reset() ata_hard_reset()
+            #define storage_soft_reset() ata_soft_reset()
+            #define storage_init() ata_init()
+            #define storage_close() ata_close()
+            #define storage_read_sectors(drive, start, count, buf) ata_read_sectors(IF_MV2(drive,) start, count, buf)
+            #define storage_write_sectors(drive, start, count, buf) ata_write_sectors(IF_MV2(drive,) start, count, buf)
+            #define storage_last_disk_activity() ata_last_disk_activity()
+            #define storage_spinup_time() ata_spinup_time()
+            #define storage_get_identify() ata_get_identify()
+    
+            #if (CONFIG_LED == LED_REAL)
+                #define storage_set_led_enabled(enabled) ata_set_led_enabled(enabled)
+            #endif
+            #ifdef STORAGE_GET_INFO
+                #define storage_get_info(drive, info) ata_get_info(IF_MV2(drive,) info)
+            #endif
+            #ifdef HAVE_HOTSWAP
+                #define storage_removable(drive) ata_removable(IF_MV(drive))
+                #define storage_present(drive) ata_present(IF_MV(drive))
+            #endif
+        #elif (CONFIG_STORAGE & STORAGE_SD)
+            #define storage_spindown sd_spindown
+            #define storage_sleep sd_sleep
+            #define storage_spin sd_spin
+    
+            #define storage_enable(on) sd_enable(on)
+            #define storage_sleepnow() sd_sleepnow()
+            #define storage_disk_is_active() 0
+            #define storage_hard_reset() (void)0
+            #define storage_soft_reset() (void)0
+            #define storage_init() sd_init()
+            #define storage_close() sd_close()
+            #define storage_read_sectors(drive, start, count, buf) sd_read_sectors(IF_MV2(drive,) start, count, buf)
+            #define storage_write_sectors(drive, start, count, buf) sd_write_sectors(IF_MV2(drive,) start, count, buf)
+            #define storage_last_disk_activity() sd_last_disk_activity()
+            #define storage_spinup_time() 0
+            #define storage_get_identify() sd_get_identify()
+    
+            #if (CONFIG_LED == LED_REAL)
+                #define storage_set_led_enabled(enabled) sd_set_led_enabled(enabled)
+            #endif
+            #ifdef STORAGE_GET_INFO
+                #define storage_get_info(drive, info) sd_get_info(IF_MV2(drive,) info)
+            #endif
+            #ifdef HAVE_HOTSWAP
+                #define storage_removable(drive) sd_removable(IF_MV(drive))
+                #define storage_present(drive) sd_present(IF_MV(drive))
+            #endif
+         #elif (CONFIG_STORAGE & STORAGE_MMC)
+            #define storage_spindown mmc_spindown
+            #define storage_sleep mmc_sleep
+            #define storage_spin mmc_spin
+    
+            #define storage_enable(on) mmc_enable(on)
+            #define storage_sleepnow() mmc_sleepnow()
+            #define storage_disk_is_active() mmc_disk_is_active()
+            #define storage_hard_reset() (void)0
+            #define storage_soft_reset() (void)0
+            #define storage_init() mmc_init()
+            #define storage_close() mmc_close()
+            #define storage_read_sectors(drive, start, count, buf) mmc_read_sectors(IF_MV2(drive,) start, count, buf)
+            #define storage_write_sectors(drive, start, count, buf) mmc_write_sectors(IF_MV2(drive,) start, count, buf)
+            #define storage_last_disk_activity() mmc_last_disk_activity()
+            #define storage_spinup_time() 0
+            #define storage_get_identify() mmc_get_identify()
+           
+            #if (CONFIG_LED == LED_REAL)
+                #define storage_set_led_enabled(enabled) mmc_set_led_enabled(enabled)
+            #endif
+            #ifdef STORAGE_GET_INFO
+                #define storage_get_info(drive, info) mmc_get_info(IF_MV2(drive,) info)
+            #endif
+            #ifdef HAVE_HOTSWAP
+                #define storage_removable(drive) mmc_removable(IF_MV(drive))
+                #define storage_present(drive) mmc_present(IF_MV(drive))
+            #endif
+        #elif (CONFIG_STORAGE & STORAGE_NAND)
+            #define storage_spindown nand_spindown
+            #define storage_sleep nand_sleep
+            #define storage_spin nand_spin
+    
+            #define storage_enable(on) (void)0
+            #define storage_sleepnow() nand_sleepnow()
+            #define storage_disk_is_active() 0
+            #define storage_hard_reset() (void)0
+            #define storage_soft_reset() (void)0
+            #define storage_init() nand_init()
+            #define storage_close() nand_close()
+            #define storage_read_sectors(drive, start, count, buf) nand_read_sectors(IF_MV2(drive,) start, count, buf)
+            #define storage_write_sectors(drive, start, count, buf) nand_write_sectors(IF_MV2(drive,) start, count, buf)
+            #define storage_last_disk_activity() nand_last_disk_activity()
+            #define storage_spinup_time() 0
+            #define storage_get_identify() nand_get_identify()
+           
+            #if (CONFIG_LED == LED_REAL)
+                #define storage_set_led_enabled(enabled) nand_set_led_enabled(enabled)
+            #endif
+            #ifdef STORAGE_GET_INFO
+                #define storage_get_info(drive, info) nand_get_info(IF_MV2(drive,) info)
+            #endif
+            #ifdef HAVE_HOTSWAP
+                #define storage_removable(drive) nand_removable(IF_MV(drive))
+                #define storage_present(drive) nand_present(IF_MV(drive))
+            #endif
+        #else
+            //#error No storage driver!
+        #endif
+    #else /* NOT CONFIG_STORAGE_MULTI */
+    
+    /* TODO : implement multi-driver here */
+    #error Multi-driver storage not implemented yet
+    
+    #endif /* NOT CONFIG_STORAGE_MULTI */
+#else /*NOT SIMULATOR */
 static inline void storage_enable(bool on)
 {
     (void)on;
@@ -275,26 +204,31 @@ static inline int storage_init(void)
 static inline void storage_close(void)
 {
 }
-static inline int storage_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
+static inline int storage_read_sectors(int drive, unsigned long start, int count, void* buf)
 {
-    IF_MV((void)drive;)
+    (void)drive;
     (void)start;
     (void)count;
     (void)buf;
     return 0;
 }
-static inline int storage_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf)
+static inline int storage_write_sectors(int drive, unsigned long start, int count, const void* buf)
 {
-    IF_MV((void)drive;)
+    (void)drive;
     (void)start;
     (void)count;
     (void)buf;
     return 0;
 }
+
 static inline void storage_spin(void)
 {
 }
-
+static inline void storage_spindown(int seconds)
+{
+    (void)seconds;
+}
+ 
 #if (CONFIG_LED == LED_REAL)
 static inline void storage_set_led_enabled(bool enabled)
 {
@@ -313,25 +247,27 @@ static inline int storage_spinup_time(void)
 }
 
 #ifdef STORAGE_GET_INFO
-static inline void storage_get_info(IF_MV2(int drive,) struct storage_info *info)
+static inline void storage_get_info(int drive, struct storage_info *info)
 {
-    IF_MV((void)drive;)
+    (void)drive;
     (void)info;
 }
-#endif
++#endif /* NOT CONFIG_STORAGE_MULTI */
+ #endif
 
 #ifdef HAVE_HOTSWAP
-static inline bool storage_removable(IF_MV_NONVOID(int drive))
+static inline bool storage_removable(int drive)
 {
-    IF_MV((void)drive;)
+    (void)drive;
     return 0;
 }
 
-static inline bool storage_present(IF_MV_NONVOID(int drive))
+static inline bool storage_present(int drive)
 {
-    IF_MV((void)drive;)
+    (void)drive;
     return 0;
 }
 #endif /* HOTSWAP */
-#endif /* SIMULATOR */
+
+#endif/*NOT SIMULATOR */
 #endif

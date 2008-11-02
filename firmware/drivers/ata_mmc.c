@@ -1002,3 +1002,16 @@ bool mmc_present(IF_MV_NONVOID(int drive))
 }
 #endif
 
+
+void mmc_sleep(void)
+{
+}
+
+void mmc_spin(void)
+{
+}
+
+void mmc_spindown(int seconds)
+{
+    (void)seconds;
+}

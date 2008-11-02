@@ -108,7 +108,6 @@ drivers/serial.c
 
 
 /* Storage */
-storage.c
 #ifndef SIMULATOR
 #if (CONFIG_STORAGE & STORAGE_MMC)
 drivers/ata_mmc.c

@@ -1339,3 +1339,15 @@ bool sd_present(IF_MV_NONVOID(int drive))
 }
 #endif
 
+void sd_sleep(void)
+{
+}
+
+void sd_spin(void)
+{
+}
+
+void sd_spindown(int seconds)
+{
+    (void)seconds;
+}

@@ -287,7 +287,7 @@ static bool check_disk_present(IF_MV_NONVOID(int volume))
     return true;
 #else
     unsigned char sector[512];
-    return storage_read_sectors(IF_MV2(volume,)0,1,sector) == 0;
+    return storage_read_sectors(volume,0,1,sector) == 0;
 #endif
 }
 
@@ -458,7 +458,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                        cur_cmd.data[cur_cmd.data_select],
                        MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
 #else
-                int result = storage_write_sectors(IF_MV2(cur_cmd.lun,)
+                int result = storage_write_sectors(cur_cmd.lun,
                                          cur_cmd.sector,
                                          MIN(BUFFER_SIZE/SECTOR_SIZE,
                                              cur_cmd.count),
@@ -637,7 +637,7 @@ static void send_and_read_next(void)
                ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
                MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
 #else
-        cur_cmd.last_result = storage_read_sectors(IF_MV2(cur_cmd.lun,)
+        cur_cmd.last_result = storage_read_sectors(cur_cmd.lun,
                                            cur_cmd.sector,
                                            MIN(BUFFER_SIZE/SECTOR_SIZE,
                                                cur_cmd.count),
@@ -663,7 +663,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     unsigned char lun = cbw->lun;
 #endif
     unsigned int block_size_mult = 1;
-    storage_get_info(IF_MV2(lun,)&info);
+    storage_get_info(lun,&info);
 #ifdef USB_USE_RAMDISK
     block_size = SECTOR_SIZE;
     block_count = RAMDISK_SIZE;
@@ -673,7 +673,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 #endif
 
 #ifdef HAVE_HOTSWAP
-    if(storage_removable(IF_MV(lun)) && !storage_present(IF_MV(lun))) {
+    if(storage_removable(lun) && !storage_present(lun)) {
         ejected[lun] = true;
         try_release_ata();
     }
@@ -723,7 +723,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             for(i=0;i<NUM_VOLUMES;i++)
             {
 #ifdef HAVE_HOTSWAP
-                if(storage_removable(IF_MV(i)))
+                if(storage_removable(i))
                     tb.lun_data->luns[i][1]=1;
                 else
 #endif
@@ -972,7 +972,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                        ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
                        MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
 #else
-                cur_cmd.last_result = storage_read_sectors(IF_MV2(cur_cmd.lun,)
+                cur_cmd.last_result = storage_read_sectors(cur_cmd.lun,
                                              cur_cmd.sector,
                                              MIN(BUFFER_SIZE/SECTOR_SIZE,
                                                  cur_cmd.count),
@@ -1089,7 +1089,7 @@ static void fill_inquiry(IF_MV_NONVOID(int lun))
 {
     memset(tb.inquiry, 0, sizeof(struct inquiry_data));
     struct storage_info info;
-    storage_get_info(IF_MV2(lun,)&info);
+    storage_get_info(lun,&info);
     copy_padded(tb.inquiry->VendorId,info.vendor,sizeof(tb.inquiry->VendorId));
     copy_padded(tb.inquiry->ProductId,info.product,sizeof(tb.inquiry->ProductId));
     copy_padded(tb.inquiry->ProductRevisionLevel,info.revision,sizeof(tb.inquiry->ProductRevisionLevel));

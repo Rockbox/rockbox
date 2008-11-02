@@ -1956,7 +1956,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     (void)btn;
     (void)lists;
     struct storage_info info;
-    storage_get_info(IF_MV2(0,)&info);
+    storage_get_info(0,&info);
     simplelist_addline(SIMPLELIST_ADD_LINE, "Vendor: %s", info.vendor);
     simplelist_addline(SIMPLELIST_ADD_LINE, "Model: %s", info.product);
     simplelist_addline(SIMPLELIST_ADD_LINE, "Firmware: %s", info.revision);
