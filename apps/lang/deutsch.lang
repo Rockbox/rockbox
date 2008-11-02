@@ -520,7 +520,7 @@
     *: ", Zufallswiedergabe"
   </dest>
   <voice>
-    *: "Zufallswiedergabe"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4132,7 +4132,7 @@
     rtc: "24 Std. Uhr"
   </dest>
   <voice>
-    *:  none
+    *: none
     rtc:"24 Stunden Uhr"
   </voice>
 </phrase>
@@ -5165,7 +5165,7 @@
     radio: "Sender: %d,%02d MHz"
   </dest>
   <voice>
-    *:  none
+    *: none
     radio:""
   </voice>
 </phrase>
@@ -5675,7 +5675,7 @@
     radio: "Korea"
   </dest>
   <voice>
-    *:  none
+    *: none
     radio:"Korea"
   </voice>
 </phrase>
@@ -6751,10 +6751,10 @@
     *: "Saved %d tracks (%s)"
   </source>
   <dest>
-    *: "%d Tracks abgespeichert (%s)"
+    *: "%d Titel abgespeichert (%s)"
   </dest>
   <voice>
-    *: "Tracks abgespeichert"
+    *: "Titel abgespeichert"
   </voice>
 </phrase>
 <phrase>
@@ -6903,7 +6903,7 @@
     *: "HDD:"
   </dest>
   <voice>
-    *: ""
+    *: "Festplatte"
   </voice>
 </phrase>
 <phrase>
@@ -6943,16 +6943,19 @@
   user:
   <source>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
+    multivolume: "Festplatte"
     e200*,c200: "Micro-SD-Karte"
     ondio*: "Multimediakarte"
   </voice>
@@ -7189,10 +7192,10 @@
     *: "Inserted %d tracks (%s)"
   </source>
   <dest>
-    *: "%d Tracks eingefügt (%s)"
+    *: "%d Titel eingefügt (%s)"
   </dest>
   <voice>
-    *: "Tracks eingefügt"
+    *: "Titel eingefügt"
   </voice>
 </phrase>
 <phrase>
@@ -7203,10 +7206,10 @@
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: "%d Tracks in Warteschlange (%s)"
+    *: "%d Titel in Warteschlange (%s)"
   </dest>
   <voice>
-    *: "Tracks in Warteschlange"
+    *: "Titel in Warteschlange"
   </voice>
 </phrase>
 <phrase>
@@ -7318,7 +7321,7 @@
     *: "%s existiert nicht"
   </dest>
   <voice>
-    *: ""
+    *: "Verzeichnis existiert nicht"
   </voice>
 </phrase>
 <phrase>
@@ -8342,7 +8345,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "minus unendlich"
   </voice>
 </phrase>
 <phrase>
@@ -8417,6 +8420,8 @@
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
     h10,h10_5gb,e200*,c200: "PREV to abort"
+    gigabeats: "BACK to abort"
+    gigabeatf:"POWER to abort"
   </source>
   <dest>
     *: "OFF zum Abbrechen"
@@ -8424,6 +8429,8 @@
     ipod*: "PLAY/PAUSE zum Abbrechen"
     x5,m5: "Long PLAY zum Abbrechen"
     h10,h10_5gb,e200*,c200: "PREV zum Abbrechen"
+    gigabeats: "BACK zum Abbrechen"
+    gigabeatf:"POWER zum Abbrechen"
   </dest>
   <voice>
     *: ""
@@ -11976,5 +11983,70 @@
   <voice>
     *: none
     recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMART
+  desc: Display the expected AA size
+  user:
+  <source>
+    *: none
+    albumart: "Album Art:"
+  </source>
+  <dest>
+    *: none
+    albumart: "Covergröße:"
+  </dest>
+  <voice>
+    *: none
+    albumart: "Covergröße"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFTRIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Mono links + rechts"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Mono links und rechts"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user:
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "Suchergebnisse"
+  </dest>
+  <voice>
+    *: "Suchergebnisse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MONO_MODE
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono mode"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Monomodus"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Monomodus"
   </voice>
 </phrase>
