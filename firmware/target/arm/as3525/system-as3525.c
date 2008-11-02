@@ -201,7 +201,22 @@ void system_init(void)
     CGU_PERI |= CGU_GPIO_CLOCK_ENABLE;
 #endif
 
+    CGU_PROC = 0;           /* fclk 24 MHz */
+    CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
+
     asm volatile(
+        "mrc p15, 0, r0, c1, c0  \n"
+        "orr r0, r0, #0xC0000000 \n" /* asynchronous clocking */
+        "mcr p15, 0, r0, c1, c0  \n"
+        : : : "r0" );
+
+    CGU_PLLA = 0x4330;      /* PLLA 384 MHz */
+    CGU_PROC = (3<<2)|0x01; /* fclk = PLLA*5/8 = 240 MHz */
+
+    asm volatile(
+        "mrs r0, cpsr             \n"
+        "orr r0, r0, #0x80        \n" /* disable interrupts */
+        "msr cpsr, r0             \n"
         "mov r0, #0               \n"
         "mcr p15, 0, r0, c7, c7   \n" /* invalidate icache & dcache */
         "mrc p15, 0, r0, c1, c0   \n" /* control register */
@@ -210,8 +225,9 @@ void system_init(void)
         "mcr p15, 0, r0, c1, c0   \n"
         : : : "r0" );
 
-
     sdram_init();
+
+    CGU_PERI |= (5<<2)|0x01; /* pclk = PLLA / 6 = 64 MHz */
 }
 
 void system_reboot(void)
