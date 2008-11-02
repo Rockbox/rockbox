@@ -38,6 +38,9 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
+/* define this if the flash memory uses the SecureDigital Memory Card protocol */
+#define CONFIG_STORAGE STORAGE_SD
+
 /* LCD dimensions */
 #define LCD_WIDTH  128
 #define LCD_HEIGHT 64
