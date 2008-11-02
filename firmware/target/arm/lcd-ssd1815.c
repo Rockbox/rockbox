@@ -80,7 +80,6 @@ void lcd_write_command(int byte)
     /* While push fifo is not empty */
     while ((DBOP_STAT & (1<<10)) == 0)
                 ;
-
     DBOP_TIMPOL_23 = 0x6E06F;
 }
 
@@ -94,6 +93,10 @@ void lcd_write_data(const fb_data* p_bytes, int count)
         /* While push fifo is not empty */
         while ((DBOP_STAT & (1<<10)) == 0)
             ;
+        /* delay a bit. value arbitrary */    
+        int i = 0;
+        while(i < 15)
+           i++;
     }
 }
 
