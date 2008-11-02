@@ -252,8 +252,7 @@ static inline void storage_get_info(int drive, struct storage_info *info)
     (void)drive;
     (void)info;
 }
-+#endif /* NOT CONFIG_STORAGE_MULTI */
- #endif
+#endif
 
 #ifdef HAVE_HOTSWAP
 static inline bool storage_removable(int drive)

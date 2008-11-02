@@ -371,7 +371,7 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
     unsigned long sum;
     
     /* Read header to find out how long the mi4 file is. */
-    storage_read_sectors(IF_MV2(0,) pinfo->start + PPMI_SECTOR_OFFSET,
+    storage_read_sectors(0, pinfo->start + PPMI_SECTOR_OFFSET,
                             PPMI_SECTORS, &ppmi_header);
     
     /* The first four characters at 0x80000 (sector 1024) should be PPMI*/
@@ -381,7 +381,7 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
     printf("BL mi4 size: %x", ppmi_header.length);
     
     /* Read mi4 header of the OF */
-    storage_read_sectors(IF_MV2(0,) pinfo->start + PPMI_SECTOR_OFFSET + PPMI_SECTORS 
+    storage_read_sectors(0, pinfo->start + PPMI_SECTOR_OFFSET + PPMI_SECTORS 
                        + (ppmi_header.length/512), MI4_HEADER_SECTORS, &mi4header);
     
     /* We don't support encrypted mi4 files yet */
@@ -404,7 +404,7 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
     printf("Binary type: %.4s", mi4header.type);
 
     /* Load firmware */
-    storage_read_sectors(IF_MV2(0,) pinfo->start + PPMI_SECTOR_OFFSET + PPMI_SECTORS
+    storage_read_sectors(0, pinfo->start + PPMI_SECTOR_OFFSET + PPMI_SECTORS
                         + (ppmi_header.length/512) + MI4_HEADER_SECTORS,
                         (mi4header.mi4size-MI4_HEADER_SIZE)/512, buf);
 
@@ -423,9 +423,9 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
         
         printf("Disabling database rebuild");
         
-        storage_read_sectors(IF_MV2(0,) pinfo->start + 0x3c08, 1, block);
+        storage_read_sectors(0, pinfo->start + 0x3c08, 1, block);
         block[0xe1] = 0;
-        storage_write_sectors(IF_MV2(0,) pinfo->start + 0x3c08, 1, block);
+        storage_write_sectors(0, pinfo->start + 0x3c08, 1, block);
     }
 #else
     (void) disable_rebuild;
