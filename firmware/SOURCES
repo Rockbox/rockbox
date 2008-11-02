@@ -122,8 +122,6 @@ drivers/fat.c
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
 hotswap.c
 #endif
-#else /* SIMULATOR */
-storage-sim.c
 #endif /* SIMULATOR */
 
 /* EEPROM */

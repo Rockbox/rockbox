@@ -33,7 +33,7 @@
 #include "ata.h" /* for volume definitions */
 
 extern char having_new_lcd;
-static bool ata_spinning = false;
+static bool storage_spinning = false;
 
 #if CONFIG_CODEC != SWCODEC
 void audio_set_buffer_margin(int seconds)
@@ -53,7 +53,12 @@ bool fat_ismounted(int volume)
     return true;
 }
 
-int ata_write_sectors(IF_MV2(int drive,)
+int storage_init(void)
+{
+    return 1;
+}
+
+int storage_write_sectors(IF_MV2(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
@@ -75,7 +80,7 @@ int ata_write_sectors(IF_MV2(int drive,)
     return 1;
 }
 
-int ata_read_sectors(IF_MV2(int drive,)
+int storage_read_sectors(IF_MV2(int drive,)
                      unsigned long start,
                      int count,
                      void* buf)
@@ -98,34 +103,25 @@ int ata_read_sectors(IF_MV2(int drive,)
     return 1;
 }
 
-void ata_delayed_write(unsigned long sector, const void* buf)
+void storage_spin(void)
 {
-    ata_write_sectors(IF_MV2(0,) sector, 1, buf);
+    storage_spinning = true;
 }
 
-void ata_flush(void)
+void storage_sleep(void)
 {
+    DEBUGF("storage_sleep()\n");
 }
 
-void ata_spin(void)
+bool storage_disk_is_active(void)
 {
-    ata_spinning = true;
+    return storage_spinning;
 }
 
-void ata_sleep(void)
-{
-    DEBUGF("ata_sleep()\n");
-}
-
-bool ata_disk_is_active(void)
-{
-    return ata_spinning;
-}
-
-void ata_spindown(int s)
+void storage_spindown(int s)
 {
     (void)s;
-    ata_spinning = false;
+    storage_spinning = false;
 }
 
 void rtc_init(void)
