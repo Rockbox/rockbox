@@ -980,6 +980,10 @@ void button_event(int key, bool pressed)
     case SDLK_PAGEUP:
         new_btn = BUTTON_VOL_UP;
         break;
+    case SDLK_ESCAPE:
+    case SDLK_p:
+        new_btn = BUTTON_POWER;
+        break;
 #else
 #error No keymap defined!
 #endif /* CONFIG_KEYPAD */
