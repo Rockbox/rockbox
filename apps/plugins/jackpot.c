@@ -56,9 +56,9 @@ static unsigned long char_patterns[NB_SLOTS];
 #endif
 
 /* FIXME: would be nice to have better graphics ... */
-#include "jackpot_slots.h"
+#include "pluginbitmaps/jackpot_slots.h"
 #if NB_SCREENS==2
-#include "jackpot_slots_remote.h"
+#include "pluginbitmaps/jackpot_slots_remote.h"
 #endif
 
 const struct picture jackpot_pictures[]={

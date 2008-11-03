@@ -30,9 +30,9 @@
 
 /* External bitmaps */
 
-#include <rockboxlogo.h>
+#include "bitmaps/rockboxlogo.h"
 #ifdef HAVE_REMOTE_LCD
-#include <remote_rockboxlogo.h>
+#include "bitmaps/remote_rockboxlogo.h"
 #endif
 
 

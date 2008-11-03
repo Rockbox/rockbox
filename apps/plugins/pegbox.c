@@ -20,12 +20,12 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#include "pegbox_header.h"
-#include "pegbox_pieces.h"
+#include "pluginbitmaps/pegbox_header.h"
+#include "pluginbitmaps/pegbox_pieces.h"
 
 #if LCD_HEIGHT >= 80 /* enough space for a graphical menu */
-#include "pegbox_menu_top.h"
-#include "pegbox_menu_items.h"
+#include "pluginbitmaps/pegbox_menu_top.h"
+#include "pluginbitmaps/pegbox_menu_items.h"
 #define MENU_X      (LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2
 #define MENU_Y      BMPHEIGHT_pegbox_menu_top
 #define ITEM_WIDTH  BMPWIDTH_pegbox_menu_items

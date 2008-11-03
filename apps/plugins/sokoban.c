@@ -32,7 +32,7 @@ PLUGIN_HEADER
 #define SOKOBAN_SAVE_FILE    PLUGIN_GAMES_DIR "/sokoban.save"
 #define SOKOBAN_SAVE_FOLDER  "/games"
 
-#include "sokoban_tiles.h"
+#include "pluginbitmaps/sokoban_tiles.h"
 #define SOKOBAN_TILESIZE BMPWIDTH_sokoban_tiles
 /* SOKOBAN_TILESIZE is the number of pixels for each block.
  * Set dynamically so all targets can support levels

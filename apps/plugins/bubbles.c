@@ -99,10 +99,10 @@ PLUGIN_HEADER
 
 /* external bitmaps */
 #ifdef HAVE_LCD_COLOR 
-#include "bubbles_background.h"
+#include "pluginbitmaps/bubbles_background.h"
 #endif
-#include "bubbles_bubble.h"
-#include "bubbles_emblem.h"
+#include "pluginbitmaps/bubbles_bubble.h"
+#include "pluginbitmaps/bubbles_emblem.h"
 
 #define BUBBLE_WIDTH  BMPWIDTH_bubbles_bubble
 #define BUBBLE_HEIGHT BMPHEIGHT_bubbles_bubble

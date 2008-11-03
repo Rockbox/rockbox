@@ -377,9 +377,9 @@ static char helptext[] =
  * Misc constants, graphics and other defines
  */
 
-#include "card_back.h"
-#include "card_deck.h"
-#include "solitaire_suitsi.h"
+#include "pluginbitmaps/card_back.h"
+#include "pluginbitmaps/card_deck.h"
+#include "pluginbitmaps/solitaire_suitsi.h"
 
 #define CARD_GFX_WIDTH  BMPWIDTH_card_back
 #define CARD_GFX_HEIGHT BMPHEIGHT_card_back

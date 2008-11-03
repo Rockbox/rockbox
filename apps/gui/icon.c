@@ -30,9 +30,9 @@
 #include "bmp.h"
 #include "filetypes.h"
 
-#include <default_icons.h>
+#include "bitmaps/default_icons.h"
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
-#include <remote_default_icons.h>
+#include "bitmaps/remote_default_icons.h"
 #endif
 
 /* These are just the file names, the full path is snprint'ed when used */

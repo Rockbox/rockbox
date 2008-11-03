@@ -181,7 +181,7 @@ PLUGIN_HEADER
 #endif
 #endif
 
-#include "sliding_puzzle.h"
+#include "pluginbitmaps/sliding_puzzle.h"
 #define IMAGE_WIDTH BMPWIDTH_sliding_puzzle
 #define IMAGE_HEIGHT BMPHEIGHT_sliding_puzzle
 #define IMAGE_SIZE IMAGE_WIDTH

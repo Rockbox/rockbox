@@ -28,8 +28,8 @@
 #include "helper.h"
 #include "bmp.h"
 #include "picture.h"
-#include "pictureflow_logo.h"
-#include "pictureflow_emptyslide.h"
+#include "pluginbitmaps/pictureflow_logo.h"
+#include "pluginbitmaps/pictureflow_emptyslide.h"
 
 
 PLUGIN_HEADER

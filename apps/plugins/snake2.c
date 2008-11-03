@@ -38,11 +38,11 @@ PLUGIN_HEADER
 #define HEIGHT 16
 
 #if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) && (LCD_DEPTH >= 1)
-#include "snake2_header1.h"
-#include "snake2_header2.h"
-#include "snake2_left.h"
-#include "snake2_right.h"
-#include "snake2_bottom.h"
+#include "pluginbitmaps/snake2_header1.h"
+#include "pluginbitmaps/snake2_header2.h"
+#include "pluginbitmaps/snake2_left.h"
+#include "pluginbitmaps/snake2_right.h"
+#include "pluginbitmaps/snake2_bottom.h"
 #define BMPHEIGHT_snake2_header BMPHEIGHT_snake2_header1
 #define BMPWIDTH_snake2_header  BMPWIDTH_snake2_header1
 #endif

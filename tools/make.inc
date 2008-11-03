@@ -48,6 +48,8 @@ $(DEPFILE): $(SOURCES)
 	done | sed -e "s:[^[:space:]]*lang.h:$(OBJDIR)/lang.o:" \
 	-e "s:[^[:space:]]*sysfont.h:$(BUILDDIR)/sysfont.h:" \
 	-e "s:[^[:space:]]*max_language_size.h:$(BUILDDIR)/max_language_size.h:" \
+	-e "s: bitmaps/: $(BUILDDIR)/bitmaps/:g" \
+	-e "s: pluginbitmaps/: $(BUILDDIR)/pluginbitmaps/:g" \
 	> $(DEPFILE); \
 	echo "oo" > /dev/null )
 

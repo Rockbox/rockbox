@@ -253,8 +253,8 @@ static int cursor_pos, moves;
 
 #ifdef HAVE_LCD_BITMAP
 
-#include "flipit_cursor.h"
-#include "flipit_tokens.h"
+#include "pluginbitmaps/flipit_cursor.h"
+#include "pluginbitmaps/flipit_tokens.h"
 
 #define PANEL_HEIGHT 12
 #define TK_WIDTH    BMPWIDTH_flipit_cursor

@@ -20,8 +20,8 @@
  ****************************************************************************/            
 
 #include "plugin.h"
-#include "card_deck.h"
-#include "card_back.h"
+#include "pluginbitmaps/card_deck.h"
+#include "pluginbitmaps/card_back.h"
 
 PLUGIN_HEADER
 

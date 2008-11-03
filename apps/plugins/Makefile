@@ -8,8 +8,8 @@
 #
 
 INCLUDES = $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I$(FIRMDIR)/common \
- -I$(FIRMDIR)/drivers -I$(APPSDIR) -Ilib -I$(BUILDDIR) \
- -I$(BUILDDIR)/pluginbitmaps
+ -I$(FIRMDIR)/drivers -I$(APPSDIR) -Ilib -I$(BUILDDIR)
+
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET) $(EXTRA_DEFINES)	\
  -DTARGET_ID=$(TARGET_ID) -DMEM=${MEMORYSIZE} -DPLUGIN
 
@@ -25,19 +25,19 @@ endif
 BITMAPLIBS =
 LINKBITMAPS =
 ifneq ($(strip $(BMP2RB_MONO)),)
-  BITMAPLIBS += $(BUILDDIR)/libpluginbitmapsmono.a
+  BITMAPLIBS += pluginbitmapsmono
   LINKBITMAPS += -lpluginbitmapsmono
 endif
 ifneq ($(strip $(BMP2RB_NATIVE)),)
-  BITMAPLIBS += $(BUILDDIR)/libpluginbitmapsnative.a
+  BITMAPLIBS += pluginbitmapsnative
   LINKBITMAPS += -lpluginbitmapsnative
 endif
 ifneq ($(strip $(BMP2RB_REMOTEMONO)),)
-  BITMAPLIBS += $(BUILDDIR)/libpluginbitmapsremotemono.a
+  BITMAPLIBS += pluginbitmapsremotemono
   LINKBITMAPS += -lpluginbitmapsremotemono
 endif
 ifneq ($(strip $(BMP2RB_REMOTENATIVE)),)
-  BITMAPLIBS += $(BUILDDIR)/libpluginbitmapsremotenative.a
+  BITMAPLIBS += pluginbitmapsremotenative
   LINKBITMAPS += -lpluginbitmapsremotenative
 endif
 
@@ -60,11 +60,17 @@ DEFS := $(SRC:%.c=$(OBJDIR)/%.def)
 DIRS = .
 
 .PHONY: $(SUBDIRS)
-all: $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
-
-$(DEPFILE): $(BITMAPLIBS)
+all: build
 
 dep: $(DEPFILE)
+
+build: $(DEPFILE) $(BITMAPLIBS)
+	$(call PRINTS,MAKE rocks)$(MAKE) rocks
+	$(call PRINTS,MAKE subdirs)$(MAKE) subdirs
+
+rocks: $(ROCKS)
+
+subdirs: $(SUBDIRS)
 
 $(BUILDDIR)/credits.raw: $(DOCSDIR)/CREDITS
 	$(call PRINTS,create credits.raw)perl credits.pl < $< > $@
@@ -73,34 +79,32 @@ $(OBJDIR)/credits.o: credits.c $(BUILDDIR)/credits.raw
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(<F))$(CC) $(CFLAGS) -I$(OBJDIR) -c $< -o $@
 
-build-bitmapsmono:
+pluginbitmapsmono:
 	$(call PRINTS,MAKE in plugins/bitmaps/mono)$(MAKE) -C bitmaps/mono OBJDIR=$(OBJDIR)/bitmaps/mono
 
-build-bitmapsnative:
+pluginbitmapsnative:
 	$(call PRINTS,MAKE in plugins/bitmaps/native)$(MAKE) -C bitmaps/native OBJDIR=$(OBJDIR)/bitmaps/native
 
-build-bitmapsremotemono:
+pluginbitmapsremotemono:
 	$(call PRINTS,MAKE in plugins/bitmaps/remote_mono)$(MAKE) -C bitmaps/remote_mono OBJDIR=$(OBJDIR)/bitmaps/remote_mono
 
-build-bitmapsremotenative:
+pluginbitmapsremotenative:
 	$(call PRINTS,MAKE in plugins/bitmaps/remote_native)$(MAKE) -C bitmaps/remote_native OBJDIR=$(OBJDIR)/bitmaps/remote_native
 
-$(BITMAPLIBS): $(BUILDDIR)/libplugin%.a: build-%
-
 ifndef SIMVER
-$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(BUILDDIR)/libplugin.a $(BITMAPLIBS)
-	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $< -L$(BUILDDIR) $(CODECLIBS) -lplugin $(LINKBITMAPS) -lgcc \
-			-T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/$*.map
+$(OBJDIR)/%.rock: $(OBJDIR)/%.o $(LINKFILE)
+	$(SILENT)$(CC) $(CFLAGS) -o $(OBJDIR)/$*.elf $< -L$(BUILDDIR) \
+		$(CODECLIBS) -lplugin $(LINKBITMAPS) -lgcc \
+		-T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/$*.map
+	$(call PRINTS,LINK $(@F))$(OC) -O binary $(OBJDIR)/$*.elf $(OBJDIR)/$*.rock
 
-$(OBJDIR)/%.rock : $(OBJDIR)/%.elf
-	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
 else
 
 ifeq ($(SIMVER), x11)
 ###################################################
 # This is the X11 simulator version
 
-$(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a $(BITMAPLIBS)
+$(OBJDIR)/%.rock : $(OBJDIR)/%.o
 	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin $(LINKBITMAPS) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
@@ -115,7 +119,7 @@ ifeq ($(SIMVER), sdl)
 ###################################################
 # This is the SDL simulator version
 
-$(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a $(BITMAPLIBS)
+$(OBJDIR)/%.rock : $(OBJDIR)/%.o
 	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin $(LINKBITMAPS) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
@@ -131,7 +135,7 @@ else # end of sdl-simulator
 DLLTOOLFLAGS = --export-all
 DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
-$(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a $(BITMAPLIBS)
+$(OBJDIR)/%.rock : $(OBJDIR)/%.o
 	$(call PRINTS,DLL $(@F))$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
 	$(SILENT)$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(BUILDDIR)/libplugin.a $(BITMAPLIBS) \
                 $(patsubst -l%,$(BUILDDIR)/lib%.a,$(CODECLIBS)) -o $@
@@ -149,17 +153,17 @@ endif # end of simulator section
 
 include $(TOOLSDIR)/make.inc
 
-$(BUILDDIR)/libplugin.a:
+pluginlib:
 	$(SILENT)mkdir -p $(OBJDIR)/lib
 	$(call PRINTS,MAKE in plugin/lib)$(MAKE) -C lib OBJDIR=$(OBJDIR)/lib
 
 $(LINKFILE): $(LDS)
 	$(call PRINTS,build $(@F))cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
 
-$(SUBDIRS): $(BITMAPLIBS)
+$(SUBDIRS):
 	$(SILENT)mkdir -p $(OBJDIR)/$@
 	$(call PRINTS,MAKE in $@)$(MAKE) -C $@ OUTDIR=$(OBJDIR) OBJDIR=$(OBJDIR)/$@ \
-                               LINKBITMAPS="$(LINKBITMAPS)" BITMAPLIBS="$(BITMAPLIBS)"
+        LINKBITMAPS="$(LINKBITMAPS)"
 
 clean:
 	$(call PRINTS,cleaning plugins)rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock $(DEPFILE) $(ELFS) \

@@ -7,8 +7,8 @@
 # $Id$
 #
 
-INCLUDES= $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(BUILDDIR)	\
- -I$(BUILDDIR)/bitmaps -I$(OBJDIR)
+INCLUDES= $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. \
+	-I$(BUILDDIR) -I$(BUILDDIR)/bitmaps -I$(OBJDIR)
 
 DEPFILE = $(OBJDIR)/dep-apps
 
@@ -25,7 +25,6 @@ CODECS=build-codecs
 
 # This sets up the parameters for building and linking libspeex for core voice
 VOICE=libspeex-rockbox
-VOICELIB=$(BUILDDIR)/libspeex-rockbox.a
 LINKVOICE= -lspeex-rockbox
 
 endif
@@ -34,19 +33,19 @@ endif
 BITMAPLIBS =
 LINKBITMAPS =
 ifneq ($(strip $(BMP2RB_MONO)),)
-  BITMAPLIBS += $(BUILDDIR)/libbitmapsmono.a
+  BITMAPLIBS += bitmapsmono
   LINKBITMAPS += -lbitmapsmono
 endif
 ifneq ($(strip $(BMP2RB_NATIVE)),)
-  BITMAPLIBS += $(BUILDDIR)/libbitmapsnative.a
+  BITMAPLIBS += bitmapsnative
   LINKBITMAPS += -lbitmapsnative
 endif
 ifneq ($(strip $(BMP2RB_REMOTEMONO)),)
-  BITMAPLIBS += $(BUILDDIR)/libbitmapsremotemono.a
+  BITMAPLIBS += bitmapsremotemono
   LINKBITMAPS += -lbitmapsremotemono
 endif
 ifneq ($(strip $(BMP2RB_REMOTENATIVE)),)
-  BITMAPLIBS += $(BUILDDIR)/libbitmapsremotenative.a
+  BITMAPLIBS += bitmapsremotenative
   LINKBITMAPS += -lbitmapsremotenative
 endif
 
@@ -62,7 +61,8 @@ ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I%,$(subst :, ,$(APPEXTRA)))
 endif
 
-CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET) $(BUILDDATE) $(DEFINES) -DTARGET_ID=$(TARGET_ID)	\
+CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET) $(BUILDDATE) $(DEFINES) \
+ -DTARGET_ID=$(TARGET_ID)	\
  -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} \
  -DTARGET_NAME=\"$(MODELNAME)\"
 
@@ -79,7 +79,7 @@ LIBROCKBOX = $(BUILDDIR)/librockbox.a
 ifdef SIMVER
 # this is a sim build
 
-all: $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS)
+all: simbuild
 
 else
 # regular target build
@@ -91,38 +91,43 @@ else
 REALBIN = $(BUILDDIR)/$(BINARY)
 endif
 
-all: $(REALBIN) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
+all: build
+
 endif
 
-dep: $(DEPFILE)
+build: $(DEPFILE) $(BITMAPLIBS) build-codecs build-pluginlib
+	$(call PRINTS,MAKE in plugins)$(MAKE) -C plugins  OBJDIR=$(OBJDIR)/plugins
+	$(call PRINTS,MAKE in apps)$(MAKE) $(REALBIN) $(FLASHFILE) $(ARCHOSROM)
 
-features: $(OBJDIR)/features
-
-libspeex-rockbox:
-	$(SILENT)mkdir -p $(OBJDIR)/libspeex-rockbox
-	$(call PRINTS,MAKE in libspeex for rockbox core)$(MAKE) -C $(APPSDIR)/codecs/libspeex ROCKBOX_VOICE_CODEC=1 OBJDIR=$(OBJDIR)/libspeex-rockbox OUTPUT=$(BUILDDIR)/libspeex-rockbox.a
+simbuild: $(DEPFILE) $(BITMAPLIBS) build-codecs build-pluginlib
+	$(call PRINTS,MAKE in plugins)$(MAKE) -C plugins  OBJDIR=$(OBJDIR)/plugins
+	$(call PRINTS,MAKE in apps)$(MAKE) $(BUILDDIR)/$(BINARY)
 
 build-codecs:
 	$(SILENT)$(MAKE) -C codecs/lib OBJDIR=$(OBJDIR)/codecs/lib
 	$(SILENT)$(MAKE) -C codecs OBJDIR=$(OBJDIR)/codecs
 
-recorder/icons.h: $(BITMAPLIBS)
+build-pluginlib:
+	$(SILENT)$(MAKE) -C plugins/lib OBJDIR=$(OBJDIR)/plugins/lib
 
-$(BUILDDIR)/libbitmapsmono.a:
+bitmapsmono:
 	$(call PRINTS,MAKE in bitmaps/mono)$(MAKE) -C bitmaps/mono OBJDIR=$(OBJDIR)/bitmaps/mono
 
-$(BUILDDIR)/libbitmapsnative.a:
+bitmapsnative:
 	$(call PRINTS,MAKE in bitmaps/native)$(MAKE) -C bitmaps/native OBJDIR=$(OBJDIR)/bitmaps/native
 
-$(BUILDDIR)/libbitmapsremotemono.a:
+bitmapsremotemono:
 	$(call PRINTS,MAKE in bitmaps/remote_mono)$(MAKE) -C bitmaps/remote_mono OBJDIR=$(OBJDIR)/bitmaps/remote_mono
 
-$(BUILDDIR)/libbitmapsremotenative.a:
+bitmapsremotenative:
 	$(call PRINTS,MAKE in bitmaps/remote_native)$(MAKE) -C bitmaps/remote_native OBJDIR=$(OBJDIR)/bitmaps/remote_native
 
-rocks: build-codecs
-	$(SILENT)$(MAKE) -C plugins/lib OBJDIR=$(OBJDIR)/plugins/lib
+rocks: build-codecs build-pluginlib
 	$(SILENT)$(MAKE) -C plugins  OBJDIR=$(OBJDIR)/plugins
+
+libspeex-rockbox:
+	$(SILENT)mkdir -p $(OBJDIR)/libspeex-rockbox
+	$(call PRINTS,MAKE in libspeex for rockbox core)$(MAKE) -C $(APPSDIR)/codecs/libspeex ROCKBOX_VOICE_CODEC=1 OBJDIR=$(OBJDIR)/libspeex-rockbox OUTPUT=$(BUILDDIR)/libspeex-rockbox.a
 
 $(LINKFILE): $(LDS)
 	$(call PRINTS,Build $(@F))cat $< | $(CC) -DLOADADDRESS=$(LOADADDRESS) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
@@ -136,12 +141,12 @@ $(MAXOUTFILE):
 	$(SILENT)cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
 	$(SILENT)rm $(MAXINFILE)
 
-$(OBJDIR)/rombox.elf : $(BITMAPLIBS) $(OBJS) $(LINKROM) $(DEPFILE) $(LIBROCKBOX) $(VOICE)
+$(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(LIBROCKBOX) $(VOICE)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lgcc $(LINKVOICE) $(LINKBITMAPS) -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
 
 ifndef SIMVER
 
-$(OBJDIR)/rockbox.elf : $(BITMAPLIBS) $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX) $(VOICE) 
+$(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(LIBROCKBOX) $(VOICE) 
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS)  -L$(BUILDDIR)/firmware -L$(BUILDDIR) -lrockbox $(LINKVOICE) $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 $(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf
@@ -186,7 +191,7 @@ else
 #SIMULATOR_MAP=-Wl,-Map,$(OBJDIR)/rockbox.map
 endif
 
-$(BUILDDIR)/$(BINARY) : $(BITMAPLIBS) $(OBJS) $(DEPFILE) $(BUILDDIR)/libsim.a \
+$(BUILDDIR)/$(BINARY) : $(OBJS) $(BUILDDIR)/libsim.a \
 	$(BUILDDIR)/libcomsim.a $(LIBROCKBOX) $(VOICE) 
 	$(call PRINTS,LD $(BINARY))$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lsim -lcomsim $(LINKVOICE) $(LINKBITMAPS) $(LDOPTS) $(EXTRAOBJ) $(SIMULATOR_MAP)
 endif
@@ -196,15 +201,16 @@ $(BUILDDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
 
 $(BUILDDIR)/rombox.ucl: $(OBJDIR)/rombox.bin $(MAXOUTFILE)
 	$(call PRINTS,UCLPACK rombox)$(TOOLSDIR)/uclpack --none $< $@ >/dev/null 2>&1; \
-	perl $(TOOLSDIR)/romsizetest.pl `cat $(MAXOUTFILE)` $<; \
-	if test $$? -ne 0; then \
-	  echo "removing UCL file again, making it a fake one"; \
-	  echo "fake" > $@; \
-	fi
+		perl $(TOOLSDIR)/romsizetest.pl `cat $(MAXOUTFILE)` $<; \
+		if test $$? -ne 0; then \
+		  echo "removing UCL file again, making it a fake one"; \
+		  echo "fake" > $@; \
+		fi
 
 $(BUILDDIR)/rombox.iriver: $(OBJDIR)/rombox.bin
 	$(call PRINTS,Build ROM file)$(MKFIRMWARE) $< $@
 
+# make.inc contains the $(DEPFILE) generation
 include $(TOOLSDIR)/make.inc
 
 # apps/features.txt is a file that (is preprocessed and) lists named features
@@ -213,26 +219,28 @@ include $(TOOLSDIR)/make.inc
 # button.h is included for the HAS_BUTTON_HOLD define.
 #
 
+features: $(OBJDIR)/features
+
 $(OBJDIR)/features: features.txt
-	$(SILENT)mkdir -p `dirname $@`
+	$(SILENT)mkdir -p $(OBJDIR)
 	$(SILENT)cat $< | $(HOSTCC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
-	$(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -imacros "config.h" -imacros "button.h" - | \
-	grep -v "^\#" | grep -v "^$$" > $@; \
-	for f in `cat $(OBJDIR)/features`; do feat="$$feat:$$f" ; done ; \
-	echo "$$feat" >$(OBJDIR)/genlang-features
+		$(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -imacros "config.h" -imacros "button.h" - | \
+		grep -v "^\#" | grep -v "^$$" > $@; \
+		for f in `cat $(OBJDIR)/features`; do feat="$$feat:$$f" ; done ; \
+		echo "$$feat" >$(OBJDIR)/genlang-features
 
 $(OBJDIR)/lang.o: lang/$(LANGUAGE).lang $(OBJDIR)/features
 	$(SILENT)for f in `cat $(OBJDIR)/features`; do feat="$$feat:$$f" ; done; \
-	perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(MODELNAME)$$feat $<
+		perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(MODELNAME)$$feat $<
 	$(call PRINTS,CC lang.c)$(CC) $(CFLAGS) -c $(BUILDDIR)/lang.c -o $@
 
 clean:
 	$(call PRINTS,cleaning apps)-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) $(OBJDIR)/rockbox.asm	     \
-	$(OBJDIR)/rockbox.bin $(OBJDIR)/rockbox.elf $(OBJDIR)/*.map	     \
-	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(BUILDDIR)/lang.[ch]	     \
-	$(LINKFILE) $(BUILDDIR)/rockbox.ucl $(LINKROM)                       \
-	$(BUILDDIR)/rombox.ucl $(OBJDIR)/rombox.bin $(OBJDIR)/rombox.elf     \
-	$(MAXOUTFILE) $(DEPFILE)
+		$(OBJDIR)/rockbox.bin $(OBJDIR)/rockbox.elf $(OBJDIR)/*.map	     \
+		$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(BUILDDIR)/lang.[ch]	     \
+		$(LINKFILE) $(BUILDDIR)/rockbox.ucl $(LINKROM)                       \
+		$(BUILDDIR)/rombox.ucl $(OBJDIR)/rombox.bin $(OBJDIR)/rombox.elf     \
+		$(MAXOUTFILE) $(DEPFILE)
 	$(SILENT)$(MAKE) -C bitmaps/mono clean OBJDIR=$(OBJDIR)/bitmaps/mono
 	$(SILENT)$(MAKE) -C bitmaps/native clean OBJDIR=$(OBJDIR)/bitmaps/native
 	$(SILENT)$(MAKE) -C bitmaps/remote_mono clean OBJDIR=$(OBJDIR)/bitmaps/remote_mono
@@ -241,6 +249,7 @@ clean:
 	$(SILENT)$(MAKE) -C codecs clean OBJDIR=$(OBJDIR)/codecs
 	$(SILENT)rm -rf $(OBJDIR)/recorder $(OBJDIR)/player
 	$(SILENT)rm -rf $(BUILDDIR)/bitmaps
+	$(SILENT)rm -rf $(BUILDDIR)/pluginbitmaps
 ifdef SIMVER
 	$(SILENT)$(MAKE) -C $(SIMDIR) clean
 endif

@@ -31,7 +31,7 @@ PLUGIN_HEADER
 #ifdef HAVE_REMOTE_LCD
 #define REMOTE_WIDTH LCD_REMOTE_WIDTH
 #define REMOTE_HEIGHT LCD_REMOTE_HEIGHT
-#include "remote_rockboxlogo.h"
+#include "pluginbitmaps/remote_rockboxlogo.h"
 #define REMOTE_LOGO_WIDTH BMPWIDTH_remote_rockboxlogo
 #define REMOTE_LOGO_HEIGHT BMPHEIGHT_remote_rockboxlogo
 #define REMOTE_LOGO remote_rockboxlogo
@@ -39,7 +39,7 @@ extern const fb_remote_data remote_rockboxlogo[];
 #endif /* HAVE_REMOTE_LCD */
 
 #define LOGO rockboxlogo
-#include "rockboxlogo.h"
+#include "pluginbitmaps/rockboxlogo.h"
 #define LOGO_WIDTH BMPWIDTH_rockboxlogo
 #define LOGO_HEIGHT BMPHEIGHT_rockboxlogo
 extern const fb_data rockboxlogo[];

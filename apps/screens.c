@@ -61,11 +61,11 @@
 #include "viewport.h"
 
 #ifdef HAVE_LCD_BITMAP
-#include <bitmaps/usblogo.h>
+#include "bitmaps/usblogo.h"
 #endif
 
 #ifdef HAVE_REMOTE_LCD
-#include <bitmaps/remote_usblogo.h>
+#include "bitmaps/remote_usblogo.h"
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_MMC)

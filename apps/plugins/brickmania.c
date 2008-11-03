@@ -211,12 +211,12 @@ enum menu_items {
     BM_SEL_QUIT,
 };
 
-#include "brickmania_pads.h"
-#include "brickmania_bricks.h"
-#include "brickmania_powerups.h"
-#include "brickmania_ball.h"
-#include "brickmania_menu_items.h"
-#include "brickmania_gameover.h"
+#include "pluginbitmaps/brickmania_pads.h"
+#include "pluginbitmaps/brickmania_bricks.h"
+#include "pluginbitmaps/brickmania_powerups.h"
+#include "pluginbitmaps/brickmania_ball.h"
+#include "pluginbitmaps/brickmania_menu_items.h"
+#include "pluginbitmaps/brickmania_gameover.h"
 
 #define PAD_WIDTH        BMPWIDTH_brickmania_pads
 #define PAD_HEIGHT       (BMPHEIGHT_brickmania_pads/3)
@@ -234,13 +234,13 @@ enum menu_items {
 #define GAMEOVER_HEIGHT  BMPHEIGHT_brickmania_gameover
 
 #if LCD_DEPTH > 1 /* currently no background bmp for mono screens */
-#include "brickmania_menu_bg.h"
+#include "pluginbitmaps/brickmania_menu_bg.h"
 #define MENU_BGHEIGHT  BMPHEIGHT_brickmania_menu_bg
 #define MENU_BGWIDTH   BMPWIDTH_brickmania_menu_bg
 #endif
 
 #ifdef HAVE_LCD_COLOR /* currently no transparency for non-colour */
-#include "brickmania_break.h"
+#include "pluginbitmaps/brickmania_break.h"
 #endif
 
 #if (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)

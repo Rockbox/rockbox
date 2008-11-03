@@ -293,7 +293,7 @@ static int control;
 /* the current board */
 static char board[STAR_HEIGHT][STAR_WIDTH];
 
-#include "star_tiles.h"
+#include "pluginbitmaps/star_tiles.h"
 
 #define TILE_WIDTH    BMPWIDTH_star_tiles
 #define TILE_HEIGHT   (BMPHEIGHT_star_tiles/5)
