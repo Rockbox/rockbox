@@ -751,6 +751,12 @@ struct user_settings
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
     int touchpad_sensitivity;
 #endif
+#ifdef HAVE_QUICKSCREEN
+    /* these are split because settings_list cant handle arrays */
+    int qs_item_left;
+    int qs_item_right;
+    int qs_item_bottom;
+#endif
 };
 
 /** global variables **/

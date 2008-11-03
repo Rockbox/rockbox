@@ -152,8 +152,10 @@ struct custom_setting {
 #define F_PADTITLE   0x800 /* pad the title with spaces to force it to scroll */
 #define F_NO_WRAP     0x1000 /* used if the list should not wrap */
 
+#define F_BANFROMQS 0x80000000 /* ban the setting from the quickscreen items */
+
 struct settings_list {
-    uint32_t             flags;   /* ____ _SER TFFF NNN_ _ATW PTVC IFRB STTT */
+    uint32_t             flags;   /* B___ _SER TFFF NNN_ _ATW PTVC IFRB STTT */
     void                *setting;
     int                  lang_id; /* -1 for none */
     union storage_type   default_val;

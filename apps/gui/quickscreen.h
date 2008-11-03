@@ -50,7 +50,7 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter);
 extern bool quick_screen_f3(int button_enter);
 #endif
 extern bool quick_screen_quick(int button_enter);
-
+int quickscreen_set_option(void *data);
 
 #endif /*_GUI_QUICK_SCREEN_H_*/
 #endif /* HAVE_QUICKSCREEN */

@@ -49,6 +49,7 @@
 #if CONFIG_RTC
 #include "screens.h"
 #endif
+#include "quickscreen.h"
 
 /***********************************/
 /*    TAGCACHE MENU                */
@@ -486,7 +487,25 @@ MAKE_MENU(voice_settings_menu, ID2P(LANG_VOICE), 0, Icon_Voice,
 /*    VOICE MENU                   */
 /***********************************/
 
+#ifdef HAVE_QUICKSCREEN
 /***********************************/
+/* CUSTOMISABLE QUICKSCREEN CODE   */
+
+MENUITEM_FUNCTION(qs_left_item, MENU_FUNC_USEPARAM, ID2P(LANG_LEFT),
+                (menu_function)quickscreen_set_option, (intptr_t*)QUICKSCREEN_LEFT, NULL,
+                Icon_Menu_setting);
+MENUITEM_FUNCTION(qs_right_item, MENU_FUNC_USEPARAM, ID2P(LANG_RIGHT),
+                (menu_function)quickscreen_set_option, (intptr_t*)QUICKSCREEN_RIGHT, NULL,
+                Icon_Menu_setting);
+MENUITEM_FUNCTION(qs_bottom_item, MENU_FUNC_USEPARAM, ID2P(LANG_BOTTOM),
+                (menu_function)quickscreen_set_option, (intptr_t*)QUICKSCREEN_BOTTOM, NULL,
+                Icon_Menu_setting);
+
+MAKE_MENU(quickscreen_settings, ID2P(LANG_QS_ITEMS), NULL, Icon_Config,
+        &qs_left_item, &qs_right_item, &qs_bottom_item);
+/* CUSTOMISABLE QUICKSCREEN CODE   */
+/***********************************/
+#endif
 
 /***********************************/
 /*    SETTINGS MENU                */
@@ -500,6 +519,9 @@ MENUITEM_FUNCTION(browse_langs, 0, ID2P(LANG_LANGUAGE), language_browse,
 MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           Icon_General_settings_menu,
           &playlist_settings, &file_menu,
+#ifdef HAVE_QUICKSCREEN
+          &quickscreen_settings,
+#endif
 #ifdef HAVE_TAGCACHE
           &tagcache_menu,
 #endif

@@ -409,6 +409,45 @@ static int32_t jumpscroll_getlang(int value, int unit)
 }
 #endif /* HAVE_LCD_CHARCELLS */
 
+#ifdef HAVE_QUICKSCREEN
+int find_setting_by_name(char*name)
+{
+    int i = 0;
+    const struct settings_list *setting;
+    while (i<nb_settings)
+    {
+        setting = &settings[i];
+        if (setting->cfg_name && !strcmp(setting->cfg_name, name))
+        {
+            return i;
+        }
+        i++;
+    }
+    return -1;
+}
+void qs_load_from_cfg(void* var, char*value)
+{
+    *(int*)var = find_setting_by_name(value);
+}
+char* qs_write_to_cfg(void* setting, char*buf, int buf_len)
+{
+    const struct settings_list *var = &settings[*(int*)setting];
+    strncpy(buf, var->cfg_name, buf_len);
+    return buf;
+}
+bool qs_is_changed(void* setting, void* defaultval)
+{
+    int i = *(int*)setting;
+    if (i < 0 || i >= nb_settings)
+        return false;
+    const struct settings_list *var = &settings[i];
+    return var != find_setting(defaultval, NULL);
+}
+void qs_set_default(void* setting, void* defaultval)
+{
+    find_setting(defaultval, (int*)setting);
+}
+#endif
 const struct settings_list settings[] = {
     /* sound settings */
     SOUND_SETTING(F_NO_WRAP,volume, LANG_VOLUME, "volume", SOUND_VOLUME),
@@ -1371,6 +1410,20 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(0, touchpad_sensitivity, LANG_TOUCHPAD_SENSITIVITY, 0,
                    "touchpad sensitivity", "normal,high", touchpad_set_sensitivity, 2,
                    ID2P(LANG_NORMAL), ID2P(LANG_HIGH)),
+#endif
+#ifdef HAVE_QUICKSCREEN
+   CUSTOM_SETTING(0, qs_item_left, LANG_LEFT, 
+                  &global_settings.playlist_shuffle, "qs left",
+                  qs_load_from_cfg, qs_write_to_cfg,
+                  qs_is_changed, qs_set_default),
+   CUSTOM_SETTING(0, qs_item_right, LANG_RIGHT, 
+                  &global_settings.repeat_mode, "qs right",
+                  qs_load_from_cfg, qs_write_to_cfg,
+                  qs_is_changed, qs_set_default),
+   CUSTOM_SETTING(0, qs_item_bottom, LANG_BOTTOM, 
+                  &global_settings.dirfilter, "qs bottom",
+                  qs_load_from_cfg, qs_write_to_cfg,
+                  qs_is_changed, qs_set_default),
 #endif
 };
 
