@@ -300,6 +300,19 @@ static void set_serial_descriptor(void)
     }
     usb_string_iSerial.bLength=84;
 }
+#elif (CONFIG_STORAGE & STORAGE_RAMDISK)
+/* This "serial number" isn't unique, but it should never actually
+   appear in non-testing use */
+static void set_serial_descriptor(void)
+{
+    short* p = &usb_string_iSerial.wString[1];
+    int i;
+    for (i = 0; i < 16; i++) {
+        *p++ = hex[(2*i)&0xF];
+        *p++ = hex[(2*i+1)&0xF];
+    }
+    usb_string_iSerial.bLength=68;
+}
 #else
 #error No set_serial_descriptor() implementation for this target
 #endif

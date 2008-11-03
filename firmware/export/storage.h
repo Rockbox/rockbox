@@ -38,6 +38,9 @@
 #if (CONFIG_STORAGE & STORAGE_NAND)
 #include "nand.h"
 #endif
+#if (CONFIG_STORAGE & STORAGE_RAMDISK)
+#include "ramdisk.h"
+#endif
 
 struct storage_info
 {
@@ -164,6 +167,34 @@ struct storage_info
             #ifdef HAVE_HOTSWAP
                 #define storage_removable(drive) nand_removable(IF_MV(drive))
                 #define storage_present(drive) nand_present(IF_MV(drive))
+            #endif
+        #elif (CONFIG_STORAGE & STORAGE_RAMDISK)
+            #define storage_spindown ramdisk_spindown
+            #define storage_sleep ramdisk_sleep
+            #define storage_spin ramdisk_spin
+    
+            #define storage_enable(on) (void)0
+            #define storage_sleepnow() ramdisk_sleepnow()
+            #define storage_disk_is_active() 0
+            #define storage_hard_reset() (void)0
+            #define storage_soft_reset() (void)0
+            #define storage_init() ramdisk_init()
+            #define storage_close() ramdisk_close()
+            #define storage_read_sectors(drive, start, count, buf) ramdisk_read_sectors(IF_MV2(drive,) start, count, buf)
+            #define storage_write_sectors(drive, start, count, buf) ramdisk_write_sectors(IF_MV2(drive,) start, count, buf)
+            #define storage_last_disk_activity() ramdisk_last_disk_activity()
+            #define storage_spinup_time() 0
+            #define storage_get_identify() ramdisk_get_identify()
+           
+            #if (CONFIG_LED == LED_REAL)
+                #define storage_set_led_enabled(enabled) ramdisk_set_led_enabled(enabled)
+            #endif
+            #ifdef STORAGE_GET_INFO
+                #define storage_get_info(drive, info) ramdisk_get_info(IF_MV2(drive,) info)
+            #endif
+            #ifdef HAVE_HOTSWAP
+                #define storage_removable(drive) ramdisk_removable(IF_MV(drive))
+                #define storage_present(drive) ramdisk_present(IF_MV(drive))
             #endif
         #else
             //#error No storage driver!

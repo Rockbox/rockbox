@@ -29,10 +29,11 @@
 /* symbolic names for multiple choice configurations: */
 
 /* CONFIG_STORAGE (note these are combineable bit-flags) */
-#define STORAGE_ATA  0x01
-#define STORAGE_MMC  0x02
-#define STORAGE_SD   0x04
-#define STORAGE_NAND 0x08
+#define STORAGE_ATA     0x01
+#define STORAGE_MMC     0x02
+#define STORAGE_SD      0x04
+#define STORAGE_NAND    0x08
+#define STORAGE_RAMDISK 0x10
 
 /* CONFIG_TUNER (note these are combineable bit-flags) */
 #define S1A0903X01 0x01 /* Samsung */

@@ -117,6 +117,8 @@ drivers/ata_flash.c
 target/arm/ata-nand-telechips.c
 #elif (CONFIG_STORAGE & STORAGE_ATA)
 drivers/ata.c
+#elif (CONFIG_STORAGE & STORAGE_RAMDISK)
+drivers/ramdisk.c
 #endif /* CONFIG_STORAGE */
 drivers/fat.c
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
