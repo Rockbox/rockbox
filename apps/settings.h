@@ -288,7 +288,7 @@ struct system_status
                               obviously a better fix is to fix the screen... so remove this
                               when that happens */
 #endif
-    char last_screen;
+    signed char last_screen;
     int  viewer_icon_count;
 };
 
