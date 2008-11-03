@@ -568,7 +568,7 @@ const struct settings_list settings[] = {
                   0,1,2,3,4,5,6,7,8,9,10,15,30,45,60),
     SYSTEM_SETTING(NVRAM(4), runtime, 0),
     SYSTEM_SETTING(NVRAM(4), topruntime, 0),
-    INT_SETTING(0, max_files_in_playlist, 
+    INT_SETTING(F_BANFROMQS, max_files_in_playlist, 
                 LANG_MAX_FILES_IN_PLAYLIST,
 #if MEM > 1
                   10000,
@@ -577,7 +577,7 @@ const struct settings_list settings[] = {
 #endif
                   "max files in playlist", UNIT_INT, 1000, 32000, 1000,
                   NULL, NULL, NULL),
-                  INT_SETTING(0, max_files_in_dir, LANG_MAX_FILES_IN_DIR,
+    INT_SETTING(F_BANFROMQS, max_files_in_dir, LANG_MAX_FILES_IN_DIR,
 #if MEM > 1
                   1000,
 #else
@@ -1168,15 +1168,15 @@ const struct settings_list settings[] = {
                   "treble cutoff", SOUND_TREBLE_CUTOFF),
 #endif
 #ifdef HAVE_DIRCACHE
-    OFFON_SETTING(0,dircache,LANG_DIRCACHE_ENABLE,false,"dircache",NULL),
+    OFFON_SETTING(F_BANFROMQS,dircache,LANG_DIRCACHE_ENABLE,false,"dircache",NULL),
     SYSTEM_SETTING(NVRAM(4),dircache_size,0),
 #endif
 
 #ifdef HAVE_TAGCACHE
 #ifdef HAVE_TC_RAMCACHE
-    OFFON_SETTING(0,tagcache_ram,LANG_TAGCACHE_RAM,false,"tagcache_ram",NULL),
+    OFFON_SETTING(F_BANFROMQS,tagcache_ram,LANG_TAGCACHE_RAM,false,"tagcache_ram",NULL),
 #endif
-    OFFON_SETTING(0, tagcache_autoupdate, LANG_TAGCACHE_AUTOUPDATE, false,
+    OFFON_SETTING(F_BANFROMQS, tagcache_autoupdate, LANG_TAGCACHE_AUTOUPDATE, false,
                   "tagcache_autoupdate", NULL),
 #endif
     CHOICE_SETTING(0, default_codepage, LANG_DEFAULT_CODEPAGE, 0,

@@ -43,6 +43,9 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
         rb->fdprintf(fd, "\r\n");
     switch (setting->flags&F_T_MASK)
     {
+        case F_T_CUSTOM:
+            rb->strcpy(text, "No information available. Check the manual for valid values");
+            break;
         case F_T_INT:
         case F_T_UINT:
             if (setting->flags&F_RGB)
