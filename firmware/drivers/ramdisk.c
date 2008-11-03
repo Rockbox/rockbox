@@ -27,7 +27,7 @@
 #define SECTOR_SIZE 512
 #define NUM_SECTORS 16384
 
-extern unsigned char ramdisk[SECTOR_SIZE * NUM_SECTORS];
+unsigned char ramdisk[SECTOR_SIZE * NUM_SECTORS];
 
 long last_disk_activity = -1;
 
