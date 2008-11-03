@@ -148,6 +148,7 @@ sub correct_string {
             $string =~ s/alkaline/alkalein/ig;
             $string =~ s/byte(s?)/beit$1/ig;
             $string =~ s/clip(s?)/klipp$1/ig;
+            $string =~ s/\bcover/kawwer/ig;
             $string =~ s/cuesheet/kjuschiet/ig;
             $string =~ s/dither/didder/ig;
             $string =~ s/equalizer/iquileiser/ig;
