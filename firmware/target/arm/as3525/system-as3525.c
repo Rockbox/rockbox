@@ -209,6 +209,8 @@ void system_init(void)
         : : : "r0" );
 
     CGU_PLLA = 0x4330;      /* PLLA 384 MHz */
+    while(!(CGU_INTCTRL & (1<<0))); /* wait until PLLA is locked */
+
     CGU_PROC = (3<<2)|0x01; /* fclk = PLLA*5/8 = 240 MHz */
 
     asm volatile(
