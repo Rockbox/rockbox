@@ -11671,7 +11671,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Impostazioni Rapide"
+    *: "Menu Rapido"
   </voice>
 </phrase>
 <phrase>
@@ -11685,7 +11685,7 @@
     *: ""
   </dest>
   <voice>
-    *: "OK"
+    *: 	"OK"
   </voice>
 </phrase>
 <phrase>
@@ -12036,5 +12036,73 @@
   </dest>
   <voice>
     *: "Risultati Ricerca"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QS_ITEMS
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Quickscreen Items"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Elementi menu rapido"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Elementi menu rapido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Left"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Sinistro"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Sinistro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Right"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Destro"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Destro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Bottom"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Inferiore"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Inferiore"
   </voice>
 </phrase>
