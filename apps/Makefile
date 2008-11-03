@@ -16,10 +16,6 @@ LDS := $(FIRMDIR)/target/$(CPU)/$(MANUFACTURER)/app.lds
 
 ROMLDS := $(FIRMDIR)/rom.lds
 
-ifdef ENABLEDPLUGINS
-ROCKS=rocks
-endif
-
 ifdef SOFTWARECODECS
 CODECS=build-codecs
 
@@ -96,19 +92,27 @@ all: build
 endif
 
 build: $(DEPFILE) $(BITMAPLIBS) build-codecs build-pluginlib
+ifdef ENABLEDPLUGINS
 	$(call PRINTS,MAKE in plugins)$(MAKE) -C plugins  OBJDIR=$(OBJDIR)/plugins
+endif
 	$(call PRINTS,MAKE in apps)$(MAKE) $(REALBIN) $(FLASHFILE) $(ARCHOSROM)
 
 simbuild: $(DEPFILE) $(BITMAPLIBS) build-codecs build-pluginlib
+ifdef ENABLEDPLUGINS
 	$(call PRINTS,MAKE in plugins)$(MAKE) -C plugins  OBJDIR=$(OBJDIR)/plugins
+endif
 	$(call PRINTS,MAKE in apps)$(MAKE) $(BUILDDIR)/$(BINARY)
 
 build-codecs:
+ifdef SOFTWARECODECS
 	$(SILENT)$(MAKE) -C codecs/lib OBJDIR=$(OBJDIR)/codecs/lib
 	$(SILENT)$(MAKE) -C codecs OBJDIR=$(OBJDIR)/codecs
+endif
 
 build-pluginlib:
+ifdef ENABLEDPLUGINS
 	$(SILENT)$(MAKE) -C plugins/lib OBJDIR=$(OBJDIR)/plugins/lib
+endif
 
 bitmapsmono:
 	$(call PRINTS,MAKE in bitmaps/mono)$(MAKE) -C bitmaps/mono OBJDIR=$(OBJDIR)/bitmaps/mono
