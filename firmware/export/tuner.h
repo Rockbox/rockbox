@@ -86,7 +86,7 @@ extern int (*tuner_get)(int setting);
 
 /** Sanyo LV24020LP **/
 #if (CONFIG_TUNER & LV24020LP)
-/* Sansa e200 Series */
+/* Sansa c200, e200 */
 #include "lv24020lp.h"
 #endif
 
