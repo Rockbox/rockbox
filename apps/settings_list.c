@@ -410,7 +410,7 @@ static int32_t jumpscroll_getlang(int value, int unit)
 #endif /* HAVE_LCD_CHARCELLS */
 
 #ifdef HAVE_QUICKSCREEN
-int find_setting_by_name(char*name)
+static int find_setting_by_name(char*name)
 {
     int i = 0;
     const struct settings_list *setting;
@@ -425,17 +425,17 @@ int find_setting_by_name(char*name)
     }
     return -1;
 }
-void qs_load_from_cfg(void* var, char*value)
+static void qs_load_from_cfg(void* var, char*value)
 {
     *(int*)var = find_setting_by_name(value);
 }
-char* qs_write_to_cfg(void* setting, char*buf, int buf_len)
+static char* qs_write_to_cfg(void* setting, char*buf, int buf_len)
 {
     const struct settings_list *var = &settings[*(int*)setting];
     strncpy(buf, var->cfg_name, buf_len);
     return buf;
 }
-bool qs_is_changed(void* setting, void* defaultval)
+static bool qs_is_changed(void* setting, void* defaultval)
 {
     int i = *(int*)setting;
     if (i < 0 || i >= nb_settings)
@@ -443,7 +443,7 @@ bool qs_is_changed(void* setting, void* defaultval)
     const struct settings_list *var = &settings[i];
     return var != find_setting(defaultval, NULL);
 }
-void qs_set_default(void* setting, void* defaultval)
+static void qs_set_default(void* setting, void* defaultval)
 {
     find_setting(defaultval, (int*)setting);
 }

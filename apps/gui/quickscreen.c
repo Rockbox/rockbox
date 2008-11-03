@@ -411,7 +411,7 @@ static bool is_setting_quickscreenable(const struct settings_list *setting)
     }
 }
 
-const struct settings_list *find_setting_from_index(int index)
+static const struct settings_list *find_setting_from_index(int index)
 {
     int count = -1, i;
     const struct settings_list *setting = &settings[0];
