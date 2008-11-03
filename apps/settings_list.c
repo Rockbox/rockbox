@@ -165,6 +165,14 @@
                     {cb, formatter, get_talk_id, unit, count,       \
                     (const int[]){__VA_ARGS__}}}}}
 
+#define CUSTOM_SETTING(flags, var, lang_id, default, name,              \
+                       load_from_cfg, write_to_cfg,                     \
+                       is_change, set_default)                          \
+            {flags|F_CUSTOM_SETTING|F_T_CUSTOM|F_BANFROMQS,             \
+                &global_settings.var, lang_id,                          \
+                {.custom = (void*)default}, name, NULL,                 \
+            {.custom_setting = (struct custom_setting[]){               \
+        {load_from_cfg, write_to_cfg, is_change, set_default}}}}
 /* some sets of values which are used more than once, to save memory */
 static const char off_on[] = "off,on";
 static const char off_on_ask[] = "off,on,ask";

@@ -35,6 +35,7 @@ union storage_type {
     char *charptr;
     unsigned char *ucharptr;
     _isfunc_type func;
+    void* custom;
 };
 /* the variable type for the setting */
 #define F_T_INT      1
@@ -42,6 +43,7 @@ union storage_type {
 #define F_T_BOOL     3
 #define F_T_CHARPTR  4
 #define F_T_UCHARPTR 5
+#define F_T_CUSTOM   6 /* MUST use struct custom_setting below */
 #define F_T_MASK     0x7
 
 struct sound_setting {
@@ -104,6 +106,35 @@ struct table_setting {
 #define F_MAX_ISFUNC    0x200000 /* max(above) is function pointer to above type */
 #define F_DEF_ISFUNC    0x400000 /* default_val is function pointer to above type */
 
+/* The next stuff is used when none of the other types work.
+   Should really only be used if the value you want to store in global_settings
+   is very different to the string you want to use in the config. */
+#define F_CUSTOM_SETTING 0x8000
+struct custom_setting {
+    /* load the saved value from the .cfg
+        setting: pointer into global_settings
+        value: the text from the .cfg 
+     */
+    void (*load_from_cfg)(void* setting, char*value);
+    /* store the value into a .cfg
+        setting: pointer into global_settings
+        buf/buf_len: buffer and length to write the string into.
+       Returns the string.
+     */
+    char* (*write_to_cfg)(void* setting, char*buf, int buf_len);
+    /* Check if the setting has been changed from the default.
+        setting: pointer into global_settings
+        defaultval: the value given in the settings_list.c macro
+       Return true if the setting was changed
+     */
+    bool (*is_changed)(void* setting, void* defaultval);
+    /* Set the setting back to its default value.
+        setting: pointer into global_settings
+        defaultval: the value given in the settings_list.c macro
+     */
+    void (*set_default)(void* setting, void* defaultval);
+};
+
 #define F_THEMESETTING  0x0800000
 #define F_RECSETTING    0x1000000
 #define F_EQSETTING     0x2000000
@@ -137,6 +168,7 @@ struct settings_list {
         const struct int_setting *int_setting; /* use F_INT_SETTING */
         const struct choice_setting *choice_setting; /* F_CHOICE_SETTING */
         const struct table_setting *table_setting; /* F_TABLE_SETTING */
+        const struct custom_setting *custom_setting; /* F_CUSTOM_SETTING */
     };
 };
 const struct settings_list* get_settings_list(int*count);

@@ -282,6 +282,9 @@ bool settings_load_config(const char* file, bool apply)
             {
                 switch (settings[i].flags&F_T_MASK)
                 {
+                    case F_T_CUSTOM:
+                        settings[i].custom_setting->load_from_cfg(settings[i].setting, value);
+                        break;
                     case F_T_INT:
                     case F_T_UINT:
 #ifdef HAVE_LCD_COLOR
@@ -419,6 +422,10 @@ static bool is_changed(int setting_id)
     const struct settings_list *setting = &settings[setting_id];
     switch (setting->flags&F_T_MASK)
     {
+    case F_T_CUSTOM:
+        return setting->custom_setting->is_changed(setting->setting,
+                                            setting->default_val.custom);
+        break;
     case F_T_INT:
     case F_T_UINT:
         if (setting->flags&F_DEF_ISFUNC)
@@ -498,6 +505,10 @@ static bool settings_write_config(const char* filename, int options)
         }
         switch (settings[i].flags&F_T_MASK)
         {
+            case F_T_CUSTOM:
+                settings[i].custom_setting->write_to_cfg(settings[i].setting,
+                                                          value, MAX_PATH);
+                break;
             case F_T_INT:
             case F_T_UINT:
 #ifdef HAVE_LCD_COLOR
@@ -952,6 +963,10 @@ void reset_setting(const struct settings_list *setting, void *var)
 {
     switch (setting->flags&F_T_MASK)
     {
+    case F_T_CUSTOM:
+        setting->custom_setting->set_default(setting->setting,
+                                             setting->default_val.custom);
+        break;
     case F_T_INT:
     case F_T_UINT:
         if (setting->flags&F_DEF_ISFUNC)
