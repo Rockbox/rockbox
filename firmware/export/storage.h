@@ -64,7 +64,6 @@ struct storage_info
             #define storage_enable(on) ata_enable(on)
             #define storage_sleepnow() ata_sleepnow()
             #define storage_disk_is_active() ata_disk_is_active()
-            #define storage_hard_reset() ata_hard_reset()
             #define storage_soft_reset() ata_soft_reset()
             #define storage_init() ata_init()
             #define storage_close() ata_close()
@@ -92,7 +91,6 @@ struct storage_info
             #define storage_enable(on) sd_enable(on)
             #define storage_sleepnow() sd_sleepnow()
             #define storage_disk_is_active() 0
-            #define storage_hard_reset() (void)0
             #define storage_soft_reset() (void)0
             #define storage_init() sd_init()
             #define storage_close() sd_close()
@@ -120,7 +118,6 @@ struct storage_info
             #define storage_enable(on) mmc_enable(on)
             #define storage_sleepnow() mmc_sleepnow()
             #define storage_disk_is_active() mmc_disk_is_active()
-            #define storage_hard_reset() (void)0
             #define storage_soft_reset() (void)0
             #define storage_init() mmc_init()
             #define storage_close() mmc_close()
@@ -148,7 +145,6 @@ struct storage_info
             #define storage_enable(on) (void)0
             #define storage_sleepnow() nand_sleepnow()
             #define storage_disk_is_active() 0
-            #define storage_hard_reset() (void)0
             #define storage_soft_reset() (void)0
             #define storage_init() nand_init()
             #define storage_close() nand_close()
@@ -176,7 +172,6 @@ struct storage_info
             #define storage_enable(on) (void)0
             #define storage_sleepnow() ramdisk_sleepnow()
             #define storage_disk_is_active() 0
-            #define storage_hard_reset() (void)0
             #define storage_soft_reset() (void)0
             #define storage_init() ramdisk_init()
             #define storage_close() ramdisk_close()
@@ -210,7 +205,6 @@ void storage_enable(bool on);
 void storage_sleep(void);
 void storage_sleepnow(void);
 bool storage_disk_is_active(void);
-int storage_hard_reset(void);
 int storage_soft_reset(void);
 int storage_init(void);
 void storage_close(void);

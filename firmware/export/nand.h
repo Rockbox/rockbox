@@ -31,7 +31,6 @@ void nand_enable(bool on);
 void nand_spindown(int seconds);
 void nand_sleep(void);
 bool nand_disk_is_active(void);
-int nand_hard_reset(void);
 int nand_soft_reset(void);
 int nand_init(void);
 void nand_close(void);

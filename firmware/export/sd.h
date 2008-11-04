@@ -31,7 +31,6 @@ void sd_enable(bool on);
 void sd_spindown(int seconds);
 void sd_sleep(void);
 bool sd_disk_is_active(void);
-int sd_hard_reset(void);
 int sd_soft_reset(void);
 int sd_init(void);
 void sd_close(void);

@@ -31,7 +31,6 @@ void ramdisk_enable(bool on);
 void ramdisk_spindown(int seconds);
 void ramdisk_sleep(void);
 bool ramdisk_disk_is_active(void);
-int ramdisk_hard_reset(void);
 int ramdisk_soft_reset(void);
 int ramdisk_init(void);
 void ramdisk_close(void);

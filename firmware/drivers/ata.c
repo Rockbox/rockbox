@@ -988,7 +988,7 @@ static void ata_thread(void)
 }
 
 /* Hardware reset protocol as specified in chapter 9.1, ATA spec draft v5 */
-int ata_hard_reset(void)
+static int ata_hard_reset(void)
 {
     int ret;
 

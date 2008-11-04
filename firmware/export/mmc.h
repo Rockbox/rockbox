@@ -32,7 +32,6 @@ void mmc_spindown(int seconds);
 void mmc_sleep(void);
 void mmc_sleepnow(void);
 bool mmc_disk_is_active(void);
-int mmc_hard_reset(void);
 int mmc_soft_reset(void);
 int mmc_init(void);
 void mmc_close(void);

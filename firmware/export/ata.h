@@ -36,7 +36,6 @@ void ata_sleepnow(void);
          doing something use ata_idle_notify.h
  */
 bool ata_disk_is_active(void);
-int ata_hard_reset(void);
 int ata_soft_reset(void);
 int ata_init(void);
 void ata_close(void);
