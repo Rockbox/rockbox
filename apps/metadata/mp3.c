@@ -774,7 +774,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             framelen = bytes2int(0, header[3], header[4], header[5]);
         }
 
-        logf("framelen = %ld", framelen);
+        logf("framelen = %ld, flags = 0x%04x", framelen, flags);
         if(framelen == 0){
             if (header[0] == 0 && header[1] == 0 && header[2] == 0)
                 return;
@@ -821,7 +821,13 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 }
             }
         }
+        
+        if (framelen == 0)
+            continue;
 
+        if (framelen < 0)
+            return;
+        
         /* Keep track of the remaining frame size */
         totframelen = framelen;
 
