@@ -2595,7 +2595,8 @@ help:
 	@echo "mapzip      - creates rockbox-maps.zip with all .map files"
 	@echo "tools       - builds the tools only"
 	@echo "voicetools  - builds the voice tools only"
-	@echo "install     - installs your build (for simulator builds only)"
+	@echo "install     - installs your build (for simulator builds only, no fonts)"
+	@echo "fullinstall - installs your build (for simulator builds only, with fonts)"
 
 EOF
 
@@ -2604,8 +2605,14 @@ if [ "yes" = "$simulator" ]; then
  cat >> Makefile <<EOF
 
 install:
+	@echo "installing your build in your archos dir"
+	\$(SILENT)for f in \`cat \$(BUILDDIR)/apps/features\`; do feat="\$\$feat:\$\$f" ; done; \\
+	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\$\$feat\" -i \"\$(TARGET_ID)\" -s -r "\$(ROOTDIR)" -f 0 \$(TARGET) \$(BINARY)
+
+fullinstall:
 	@echo "installing a full setup in your archos dir"
-	@(\$(MAKE) fullzip && cd archos && unzip -oq ../rockbox-full.zip)
+	\$(SILENT)for f in \`cat \$(BUILDDIR)/apps/features\`; do feat="\$\$feat:\$\$f" ; done; \\
+	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\$\$feat\" -i \"\$(TARGET_ID)\" -s -r "\$(ROOTDIR)" -f 2 \$(TARGET) \$(BINARY)
 EOF
 
 fi

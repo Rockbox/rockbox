@@ -50,6 +50,7 @@ $ROOT="..";
 my $ziptool="zip -r9";
 my $output="rockbox.zip";
 my $verbose;
+my $sim;
 my $exe;
 my $target;
 my $archos;
@@ -93,6 +94,10 @@ while(1) {
 
     elsif($ARGV[0] eq "-v") {
         $verbose =1;
+        shift @ARGV;
+    }
+    elsif($ARGV[0] eq "-s") {
+        $sim =1;
         shift @ARGV;
     }
     else {
@@ -448,7 +453,13 @@ sub runone {
     if($verbose) {
         print "$ziptool $output .rockbox $target >/dev/null\n";
     }
-    system("$ziptool $output .rockbox $target >/dev/null");
+
+    if($sim) {
+        system("cp -r .rockbox archos/ >/dev/null");
+    }
+    else {
+        system("$ziptool $output .rockbox $target >/dev/null");
+    }
 
     # remove the .rockbox afterwards
     rmtree('.rockbox');
