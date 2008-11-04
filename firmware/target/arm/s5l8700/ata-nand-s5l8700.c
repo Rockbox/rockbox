@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "ata.h"
 #include "ata-target.h"
-#include "ata_idle_notify.h"
+#include "nand_idle_notify.h"
 #include "system.h"
 #include <string.h>
 #include "thread.h"
@@ -30,7 +30,7 @@
 #include "usb.h"
 
 /* for compatibility */
-int ata_spinup_time = 0;
+int nand_spinup_time = 0;
 
 long last_disk_activity = -1;
 
@@ -42,55 +42,49 @@ static long next_yield = 0;
 
 /* API Functions */
 
-void ata_led(bool onoff)
+void nand_led(bool onoff)
 {
     led(onoff);
 }
 
-int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
+int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
 
 }
 
-int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
+int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
 }
 
-void ata_spindown(int seconds)
+void nand_spindown(int seconds)
 {
     (void)seconds;
 }
 
-bool ata_disk_is_active(void)
+bool nand_disk_is_active(void)
 {
     return 0;
 }
 
-void ata_sleep(void)
+void nand_sleep(void)
 {
 }
 
-void ata_spin(void)
+void nand_spin(void)
 {
 }
 
-/* Hardware reset protocol as specified in chapter 9.1, ATA spec draft v5 */
-int ata_hard_reset(void)
-{
-    return 0;
-}
-
-int ata_soft_reset(void)
+int nand_soft_reset(void)
 {
     return 0;
 }
 
-void ata_enable(bool on)
+void nand_enable(bool on)
 {
 }
 
-int ata_init(void)
+int nand_init(void)
 {
 }

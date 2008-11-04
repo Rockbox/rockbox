@@ -367,7 +367,7 @@ static void nand_disable(void)
     __nand_disable();
 }
 
-int ata_init(void)
+int nand_init(void)
 {
     unsigned char cData[5];
     
@@ -403,7 +403,7 @@ void jz_nand_read(int block, int page, unsigned char *buf)
     nand_read_page(block, page, buf);
 }
 
-int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
+int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
 {
     (void)start;
     (void)count;
@@ -411,7 +411,7 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* bu
     return 0;
 }
 
-int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf)
+int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf)
 {
     (void)start;
     (void)count;
@@ -419,41 +419,35 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const v
     return 0;
 }
 
-void ata_spindown(int seconds)
+void nand_spindown(int seconds)
 {
     /* null */
     (void)seconds;
 }
 
-bool ata_disk_is_active(void)
+bool nand_disk_is_active(void)
 {
     /* null */
     return false;
 }
 
-void ata_sleep(void)
+void nand_sleep(void)
 {
     /* null */
 }
 
-void ata_spin(void)
+void nand_spin(void)
 {
     /* null */
 }
 
-int ata_hard_reset(void)
-{
-    /* null */
-    return 0;
-}
-
-int ata_soft_reset(void)
+int nand_soft_reset(void)
 {
     /* null */
     return 0;
 }
 
-void ata_enable(bool on)
+void nand_enable(bool on)
 {
     /* null - flash controller is enabled/disabled as needed. */
     (void)on;
