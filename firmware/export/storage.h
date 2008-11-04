@@ -73,9 +73,6 @@ struct storage_info
             #define storage_spinup_time() ata_spinup_time()
             #define storage_get_identify() ata_get_identify()
     
-            #if (CONFIG_LED == LED_REAL)
-                #define storage_set_led_enabled(enabled) ata_set_led_enabled(enabled)
-            #endif
             #ifdef STORAGE_GET_INFO
                 #define storage_get_info(drive, info) ata_get_info(IF_MV2(drive,) info)
             #endif
@@ -100,9 +97,6 @@ struct storage_info
             #define storage_spinup_time() 0
             #define storage_get_identify() sd_get_identify()
     
-            #if (CONFIG_LED == LED_REAL)
-                #define storage_set_led_enabled(enabled) sd_set_led_enabled(enabled)
-            #endif
             #ifdef STORAGE_GET_INFO
                 #define storage_get_info(drive, info) sd_get_info(IF_MV2(drive,) info)
             #endif
@@ -127,9 +121,6 @@ struct storage_info
             #define storage_spinup_time() 0
             #define storage_get_identify() mmc_get_identify()
            
-            #if (CONFIG_LED == LED_REAL)
-                #define storage_set_led_enabled(enabled) mmc_set_led_enabled(enabled)
-            #endif
             #ifdef STORAGE_GET_INFO
                 #define storage_get_info(drive, info) mmc_get_info(IF_MV2(drive,) info)
             #endif
@@ -154,9 +145,6 @@ struct storage_info
             #define storage_spinup_time() 0
             #define storage_get_identify() nand_get_identify()
            
-            #if (CONFIG_LED == LED_REAL)
-                #define storage_set_led_enabled(enabled) nand_set_led_enabled(enabled)
-            #endif
             #ifdef STORAGE_GET_INFO
                 #define storage_get_info(drive, info) nand_get_info(IF_MV2(drive,) info)
             #endif
@@ -181,9 +169,6 @@ struct storage_info
             #define storage_spinup_time() 0
             #define storage_get_identify() ramdisk_get_identify()
            
-            #if (CONFIG_LED == LED_REAL)
-                #define storage_set_led_enabled(enabled) ramdisk_set_led_enabled(enabled)
-            #endif
             #ifdef STORAGE_GET_INFO
                 #define storage_get_info(drive, info) ramdisk_get_info(IF_MV2(drive,) info)
             #endif
@@ -212,9 +197,6 @@ int storage_read_sectors(int drive, unsigned long start, int count, void* buf);
 int storage_write_sectors(int drive, unsigned long start, int count, const void* buf);
 void storage_spin(void);
 void storage_spindown(int seconds);
-#if (CONFIG_LED == LED_REAL)
-void storage_set_led_enabled(bool enabled);
-#endif
 long storage_last_disk_activity(void);
 int storage_spinup_time(void);
 #ifdef STORAGE_GET_INFO

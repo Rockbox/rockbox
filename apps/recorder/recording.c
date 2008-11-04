@@ -66,6 +66,10 @@
 #include "talk.h"
 #include "sound.h"
 #include "storage.h"
+#if (CONFIG_STORAGE & STORAGE_ATA) && (CONFIG_LED == LED_REAL) \
+   && !defined(SIMULATOR)
+#include "ata.h"
+#endif
 #include "splash.h"
 #include "screen_access.h"
 #include "action.h"
@@ -1033,8 +1037,9 @@ bool recording_screen(bool no_source)
     struct audio_recording_options rec_options;
     rec_status = RCSTAT_IN_RECSCREEN;
 
-#if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
-    storage_set_led_enabled(false);
+#if (CONFIG_STORAGE & STORAGE_ATA) && (CONFIG_LED == LED_REAL) \
+   && !defined(SIMULATOR)
+    ata_set_led_enabled(false);
 #endif
 
 #if CONFIG_CODEC == SWCODEC
@@ -1904,8 +1909,9 @@ rec_abort:
     if (rec_status & (RCSTAT_CREATED_DIRECTORY | RCSTAT_HAVE_RECORDED))
         reload_directory();
 
-#if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
-    storage_set_led_enabled(true);
+#if (CONFIG_STORAGE & STORAGE_ATA) && (CONFIG_LED == LED_REAL) \
+   && !defined(SIMULATOR)
+    ata_set_led_enabled(true);
 #endif
 
 #if CONFIG_TUNER

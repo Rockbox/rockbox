@@ -40,10 +40,6 @@ int mmc_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const v
 void mmc_spin(void);
 int mmc_spinup_time(void);
 
-#if (CONFIG_LED == LED_REAL)
-void mmc_set_led_enabled(bool enabled);
-#endif
-
 #ifdef STORAGE_GET_INFO
 void mmc_get_info(IF_MV2(int drive,) struct storage_info *info);
 #endif

@@ -39,10 +39,6 @@ int ramdisk_write_sectors(IF_MV2(int drive,) unsigned long start, int count, con
 void ramdisk_spin(void);
 void ramdisk_sleepnow(void);
 
-#if (CONFIG_LED == LED_REAL)
-void ramdisk_set_led_enabled(bool enabled);
-#endif
-
 #ifdef STORAGE_GET_INFO
 void ramdisk_get_info(IF_MV2(int drive,) struct storage_info *info);
 #endif

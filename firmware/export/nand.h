@@ -38,10 +38,6 @@ int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* b
 int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
 void nand_spin(void);
 
-#if (CONFIG_LED == LED_REAL)
-void nand_set_led_enabled(bool enabled);
-#endif
-
 #ifdef STORAGE_GET_INFO
 void nand_get_info(IF_MV2(int drive,) struct storage_info *info);
 #endif

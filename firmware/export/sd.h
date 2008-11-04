@@ -38,10 +38,6 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf
 int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
 void sd_spin(void);
 
-#if (CONFIG_LED == LED_REAL)
-void sd_set_led_enabled(bool enabled);
-#endif
-
 #ifdef STORAGE_GET_INFO
 void sd_get_info(IF_MV2(int drive,) struct storage_info *info);
 #endif
