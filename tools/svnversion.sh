@@ -16,7 +16,25 @@ svnversion_safe() {
     # LANG=C forces svnversion to not localize "exported".
     if OUTPUT=`LANG=C svnversion "$@"`; then
         if [ "$OUTPUT" = "exported" ]; then
-            echo "unknown"
+
+            # Not a SVN repository, maybe a git-svn one ?
+            if [ -z "$1" ]; then
+                GITDIR="./.git"
+            else
+                GITDIR="$1/.git"
+            fi
+
+            # First make sure it is a git repository
+            if [ -d "$GITDIR" ]; then
+                OUTPUT=`LANG=C git --git-dir="$GITDIR" svn info 2>/dev/null|grep '^Revision: '|cut -d\  -f2`
+                if [ -z "$OUTPUT" ]; then
+                    echo "unknown"
+                else
+                    echo "r$OUTPUT"
+                fi
+            else # not a git repository
+                echo "unknown"
+            fi
         else
             echo "r$OUTPUT"
         fi
