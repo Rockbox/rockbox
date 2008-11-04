@@ -62,12 +62,9 @@ static int bytebufferoffset IBSS_ATTR;
 
 static inline void skip_byte(void)
 {
-    if (bytebufferoffset) {
-        bytebufferoffset--;
-    } else {
-        bytebufferoffset = 3;
-        bytebuffer += 4;
-    }
+    bytebufferoffset--;
+    bytebuffer += bytebufferoffset & 4;
+    bytebufferoffset &= 3;
 }
 
 static inline int read_byte(void)
@@ -122,23 +119,17 @@ static inline void range_dec_normalize(void)
 /* or: totf is (code_value)1<<shift                                      */
 /* returns the culmulative frequency                         */
 static inline int range_decode_culfreq(int tot_f)
-{   int tmp;
-
+{
     range_dec_normalize();
-
     rc.help = rc.range / tot_f;
-    tmp = rc.low / rc.help;
-
-    return tmp;
+    return rc.low / rc.help;
 }
 
 static inline int range_decode_culshift(int shift)
 {
-    int tmp;
     range_dec_normalize();
-    rc.help = rc.range>>shift;
-    tmp = rc.low/rc.help;
-    return tmp;
+    rc.help = rc.range >> shift;
+    return rc.low / rc.help;
 }
 
 
@@ -146,9 +137,8 @@ static inline int range_decode_culshift(int shift)
 /* sy_f is the interval length (frequency of the symbol)     */
 /* lt_f is the lower end (frequency sum of < symbols)        */
 static inline void range_decode_update(int sy_f, int lt_f)
-{   int tmp;
-    tmp = rc.help * lt_f;
-    rc.low -= tmp;
+{
+    rc.low -= rc.help * lt_f;
     rc.range = rc.help * sy_f;
 }
 

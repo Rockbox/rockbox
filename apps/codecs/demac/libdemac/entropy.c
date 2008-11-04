@@ -141,10 +141,13 @@ static inline void update_rice(struct rice_t* rice, int x)
 
     if (rice->k == 0) {
         rice->k = 1;
-    } else if (rice->ksum < ((uint32_t)1 << (rice->k + 4))) {
-        rice->k--;
-    } else if (rice->ksum >= ((uint32_t)1 << (rice->k + 5))) {
-        rice->k++;
+    } else {
+        uint32_t lim = 1 << (rice->k + 4);
+        if (rice->ksum < lim) {
+            rice->k--;
+        } else if (rice->ksum >= 2 * lim) {
+            rice->k++;
+        }
     }
 }
 
@@ -178,7 +181,7 @@ static inline int entropy_decode3980(struct rice_t* rice)
         base_hi = range_decode_culfreq((pivot >> lo_bits) + 1);
         range_decode_update(1, base_hi);
 
-        base_lo = range_decode_culfreq(1 << lo_bits);
+        base_lo = range_decode_culshift(lo_bits);
         range_decode_update(1, base_lo);
 
         base = (base_hi << lo_bits) + base_lo;
