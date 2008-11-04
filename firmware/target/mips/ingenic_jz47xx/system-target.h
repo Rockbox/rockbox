@@ -102,5 +102,9 @@ void mdelay(unsigned int msec);
 void power_off(void);
 void system_reboot(void);
 
-#endif /* __SYSTEM_TARGET_H_ */
+#define DMA_LCD_CHANNEL    0
+#define DMA_NAND_CHANNEL   1
+#define DMA_USB_CHANNEL    2
+#define DMA_AIC_TX_CHANNEL 3
 
+#endif /* __SYSTEM_TARGET_H_ */

@@ -545,7 +545,7 @@
  */
 
 #define __read_32bit_c0_register(source, sel)				\
-({ int __res;								\
+({ unsigned int __res;								\
 	if (sel == 0)							\
 		__asm__ __volatile__(					\
 			"mfc0\t%0, " #source "\n\t"			\

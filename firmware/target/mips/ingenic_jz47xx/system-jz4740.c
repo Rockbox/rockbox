@@ -389,6 +389,7 @@ void udelay(unsigned int usec)
                           : "0" (i)
                           );
 }
+
 void mdelay(unsigned int msec)
 {
     unsigned int i;
@@ -437,7 +438,7 @@ void sti(void)
 
 #define SYNC_WB() __asm__ __volatile__ ("sync")
 
-#define __CACHE_OP(op, addr)                   \
+#define __CACHE_OP(op, addr)                 \
     __asm__ __volatile__(                    \
     "    .set    noreorder        \n"        \
     "    .set    mips32\n\t       \n"        \
@@ -632,6 +633,20 @@ static void tlb_call_refill(void)
        );
 }
 
+static void dma_init(void)
+{
+    __cpm_start_dmac();
+    
+    REG_DMAC_DCCSR(0) = 0;
+    REG_DMAC_DCCSR(1) = 0;
+    REG_DMAC_DCCSR(2) = 0;
+    REG_DMAC_DCCSR(3) = 0;
+    REG_DMAC_DCCSR(4) = 0;
+    REG_DMAC_DCCSR(5) = 0;
+    
+    REG_DMAC_DMACR = (DMAC_DMACR_PR_012345 | DMAC_DMACR_DMAE);
+}
+
 extern int main(void);
 extern void except_common_entry(void);
 
@@ -660,12 +675,14 @@ void system_main(void)
         dis_irq(i);
     
     tlb_init();
+    dma_init();
     
     detect_clock();
     
+    /* Enable interrupts at core level */
     sti();
     
-    main();
+    main(); /* Shouldn't return */
     
     while(1);
 }
@@ -686,7 +703,7 @@ void power_off(void)
     /* Put system into hibernate mode */
     __rtc_clear_alarm_flag();
     __rtc_clear_hib_stat_all();
-    //__rtc_set_scratch_pattern(0x12345678);
+    /* __rtc_set_scratch_pattern(0x12345678); */
     __rtc_enable_alarm_wakeup();
     __rtc_set_hrcr_val(0xfe0);
     __rtc_set_hwfcr_val((0xFFFF << 4));

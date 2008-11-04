@@ -193,6 +193,7 @@
 #define NAND_IFP7XX  1
 #define NAND_TCC     2
 #define NAND_SAMSUNG 3
+#define NAND_CC      4 /* ChinaChip */
 
 /* CONFIG_RTC */
 #define RTC_M41ST84W 1 /* Archos Recorder */
@@ -434,7 +435,7 @@
 
 #endif /* BOOTLOADER */
 
-#ifdef HAVE_USBSTACK
+#if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732)
 #define HAVE_WAKEUP_OBJECTS
 #endif
 

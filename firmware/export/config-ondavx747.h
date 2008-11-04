@@ -33,8 +33,15 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 35
 
-/* define this if you use an ATA controller */
-//#define CONFIG_STORAGE STORAGE_ATA
+#define HAVE_ATA_SD
+#define HAVE_HOTSWAP
+
+//#define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
+#define CONFIG_STORAGE STORAGE_NAND /* Multivolume currently handled at firmware/target/ level */
+
+#define CONFIG_NAND NAND_CC
+
+#define HAVE_MULTIVOLUME
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP

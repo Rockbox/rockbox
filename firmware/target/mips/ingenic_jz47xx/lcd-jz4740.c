@@ -59,27 +59,27 @@ void lcd_update_rect(int x, int y, int width, int height)
 {
     lcd_set_target(x, y, width, height);
     
-    REG_DMAC_DCCSR(0) = 0;
-    REG_DMAC_DRSR(0) = DMAC_DRSR_RS_SLCD; /* source = SLCD */
-    REG_DMAC_DSAR(0) = ((unsigned int)&lcd_framebuffer[y][x]) & 0x1FFFFFFF;
-    REG_DMAC_DTAR(0) = 0x130500B0; /* SLCD_FIFO */
-    REG_DMAC_DTCR(0) = width*height;
+    REG_DMAC_DCCSR(DMA_LCD_CHANNEL) = 0;
+    REG_DMAC_DRSR(DMA_LCD_CHANNEL) = DMAC_DRSR_RS_SLCD; /* source = SLCD */
+    REG_DMAC_DSAR(DMA_LCD_CHANNEL) = ((unsigned int)&lcd_framebuffer[y][x]) & 0x1FFFFFFF;
+    REG_DMAC_DTAR(DMA_LCD_CHANNEL) = 0x130500B0; /* SLCD_FIFO */
+    REG_DMAC_DTCR(DMA_LCD_CHANNEL) = width*height;
     
-    REG_DMAC_DCMD(0) = (DMAC_DCMD_SAI | DMAC_DCMD_RDIL_IGN | DMAC_DCMD_SWDH_32 /* (1 << 23) | (0 << 16) | (0 << 14) */
-                       | DMAC_DCMD_DWDH_16 | DMAC_DCMD_DS_16BIT);             /* | (2 << 12) | (3 << 8) */
-    REG_DMAC_DCCSR(0) = (DMAC_DCCSR_NDES | DMAC_DCCSR_EN);                     /* (1 << 31) | (1 << 0) */
+    REG_DMAC_DCMD(DMA_LCD_CHANNEL) = (DMAC_DCMD_SAI | DMAC_DCMD_RDIL_IGN | DMAC_DCMD_SWDH_32 /* (1 << 23) | (0 << 16) | (0 << 14) */
+                       | DMAC_DCMD_DWDH_16 | DMAC_DCMD_DS_16BIT);                            /* | (2 << 12) | (3 << 8) */
+    REG_DMAC_DCCSR(DMA_LCD_CHANNEL) = DMAC_DCCSR_NDES;                                       /* (1 << 31) */
     
     __dcache_writeback_all(); /* Size of framebuffer is way bigger than cache size */
     
     while(REG_SLCD_STATE & SLCD_STATE_BUSY);
     REG_SLCD_CTRL = SLCD_CTRL_DMA_EN;
     
-    REG_DMAC_DMACR = DMAC_DMACR_DMAE;
+    REG_DMAC_DCCSR(DMA_LCD_CHANNEL) |= DMAC_DCCSR_EN;
 
-    while( !(REG_DMAC_DCCSR(0) & DMAC_DCCSR_TT) )
+    while( !(REG_DMAC_DCCSR(DMA_LCD_CHANNEL) & DMAC_DCCSR_TT) )
         yield();
     
-    REG_DMAC_DMACR = 0;
+    REG_DMAC_DCCSR(DMA_LCD_CHANNEL) &= ~DMAC_DCCSR_EN;
     
     while(REG_SLCD_STATE & SLCD_STATE_BUSY);
     REG_SLCD_CTRL = 0;

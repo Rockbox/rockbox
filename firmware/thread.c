@@ -997,7 +997,7 @@ static void __attribute__((used)) _start_thread(void)
         "lw     $8,    4($9)  \n" /* Fetch thread function pointer ($8 = $t0, $9 = $t1) */
         "lw     $29,  40($9)  \n" /* Set initial sp(=$29) */
         "sw     $0,   48($9)  \n" /* Clear start address */
-        "jalr   $8            \n" /* Start the thread */
+        "jr     $8            \n" /* Start the thread */
         "nop                  \n"
         ".set at              \n"
         ".set reorder         \n"
