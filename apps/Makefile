@@ -148,9 +148,12 @@ $(MAXOUTFILE):
 $(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(LIBROCKBOX) $(VOICE)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lgcc $(LINKVOICE) $(LINKBITMAPS) -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
 
+objs: $(OBJS)
+
 ifndef SIMVER
 
-$(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(LIBROCKBOX) $(VOICE) 
+$(OBJDIR)/rockbox.elf : $(LINKFILE) $(LIBROCKBOX) $(VOICE) $(BITMAPLIBS)
+	$(call PRINTS,MAKE objs)$(MAKE) objs
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS)  -L$(BUILDDIR)/firmware -L$(BUILDDIR) -lrockbox $(LINKVOICE) $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 $(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf
@@ -168,7 +171,7 @@ $(OBJDIR)/rockbox.asm: $(OBJDIR)/rockbox.bin
 # because the image is too big and we need to create a compressed image
 # instead.
 #
-$(BUILDDIR)/$(BINARY) : $(OBJDIR)/rockbox.bin $(FLASHFILE) 
+$(BUILDDIR)/$(BINARY) : $(OBJDIR)/rockbox.bin $(FLASHFILE) $(BITMAPLIBS)
 	$(call PRINTS,Build firmware file)($(MKFIRMWARE) $< $@; \
 	stat=$$?; \
 	if test -n "$(FLASHFILE)"; then \
@@ -195,8 +198,9 @@ else
 #SIMULATOR_MAP=-Wl,-Map,$(OBJDIR)/rockbox.map
 endif
 
-$(BUILDDIR)/$(BINARY) : $(OBJS) $(BUILDDIR)/libsim.a \
-	$(BUILDDIR)/libcomsim.a $(LIBROCKBOX) $(VOICE) 
+$(BUILDDIR)/$(BINARY) : $(BUILDDIR)/libsim.a \
+	$(BUILDDIR)/libcomsim.a $(LIBROCKBOX) $(VOICE) $(BITMAPLIBS)
+	$(call PRINTS,MAKE objs)$(MAKE) objs
 	$(call PRINTS,LD $(BINARY))$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lsim -lcomsim $(LINKVOICE) $(LINKBITMAPS) $(LDOPTS) $(EXTRAOBJ) $(SIMULATOR_MAP)
 endif
 
