@@ -33,7 +33,7 @@
 .macro ARM_DIV_BODY dividend, divisor, result, curbit
 
     mov     \result, \dividend
-    mov     \curbit, #90          @ 3 * 30, (calculating branch dest)
+    mov     \curbit, #93          @ 3 * 31, (calculating branch dest)
     cmp     \divisor, \result, lsr #16
     movls   \result,\result, lsr #16
     subls   \curbit, \curbit, #48
@@ -44,9 +44,10 @@
     movls   \result,\result, lsr #4
     subls   \curbit, \curbit, #12
     cmp     \divisor, \result, lsr #2
+    movls   \result,\result, lsr #2
     subls   \curbit, \curbit, #6
-    @ calculation is only done down to shift=2, because the shift=1 step
-    @ would need 3 more cycles, but would only gain 1.5 cycles on average
+    cmp     \divisor, \result, lsr #1
+    subls   \curbit, \curbit, #3
     mov     \result, #0
     add     pc, pc, \curbit, lsl #2
     nop
