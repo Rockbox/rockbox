@@ -8803,7 +8803,7 @@
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -12037,5 +12037,138 @@
   </dest>
   <voice>
     *: "Zoekresultaten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QS_ITEMS
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_SETTING
+  desc: used in the settings context menu
+  user:
+  <source>
+    *: "Reset Setting"
+  </source>
+  <dest>
+    *: "Instelling herstellen"
+  </dest>
+  <voice>
+    *: "Instelling herstellen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Left Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Instellen als linker snelscherm item"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Instellen als linker snelscherm item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Right Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Instellen als rechter snelscherm item"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Instellen als rechter snelscherm item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Bottom Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Instellen als onderzijde snelscherm item"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Instellen als onderzijde snelscherm item"
   </voice>
 </phrase>
