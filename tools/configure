@@ -685,31 +685,26 @@ cat <<EOF
   4) Ondio SP             14) H10 20Gb           24) 4G Grayscale
   5) Ondio FM             15) H10 5/6Gb          25) Mini 1G
   6) AV300                                       26) Mini 2G
-                                                 27) 1G, 2G
- 
- ==iAudio==               ==Toshiba==            ==SanDisk==
- 30) X5/X5V/X5L           40) Gigabeat F         50) Sansa e200
- 31) M5/M5L               41) Gigabeat S         51) Sansa e200R
- 32) 7                                           52) Sansa c200
+                          ==Toshiba==            27) 1G, 2G
+                          40) Gigabeat F
+ ==iAudio==               41) Gigabeat S         ==SanDisk==
+ 30) X5/X5V/X5L                                  50) Sansa e200
+ 31) M5/M5L               ==Tatung==             51) Sansa e200R
+ 32) 7                    60) Elio TPJ-1022      52) Sansa c200
  33) Cowon D2                                    53) Sansa m200
- 34) M3/M3L                                      54) Sansa c100
-                                                 55) Sansa Clip
-                                                 56) Sansa e200v2
-                                                 57) Sansa m200v2
-                                                 58) Sansa Fuze
+ 34) M3/M3L               ==Olympus==            54) Sansa c100
+                          70) M:Robe 500         55) Sansa Clip
+ ==Creative==             71) M:Robe 100         56) Sansa e200v2
+ 90) Zen Vision:M 30GB                           57) Sansa m200v2
+ 91) Zen Vision:M 60GB    ==Philips==            58) Sansa Fuze
+ 92) Zen Vision           100) GoGear SA9200
+                          101) GoGear HDD1630    ==Logik==
+ ==Onda==                                        80) DAX 1GB MP3/DAB
+ 120) VX747               ==Meizu==
+ 121) VX767               110) M6SL
+                          111) M6SP
+                          112) M3
 
- ==Tatung==               ==Olympus==            ==Logik==
- 60) Elio TPJ-1022        70) M:Robe 500         80) DAX 1GB MP3/DAB
-                          71) M:Robe 100
- 
- ==Creative==             ==Philips==            ==Meizu==
- 90) Zen Vision:M 30GB    100) GoGear SA9200     110) M6SL
- 91) Zen Vision:M 60GB    101) GoGear HDD1630    111) M6SP
- 92) Zen Vision                                  112) M3
- 
- ==Onda==
- 120) VX747
- 121) VX767
 EOF
 
   buildfor=`input`;
