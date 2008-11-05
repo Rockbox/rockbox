@@ -1280,7 +1280,7 @@ const struct settings_list settings[] = {
                    ID2P(LANG_FM_JAPAN), ID2P(LANG_FM_KOREA)),
 #endif
 
-    OFFON_SETTING(0, audioscrobbler, LANG_AUDIOSCROBBLER, false,
+    OFFON_SETTING(F_BANFROMQS, audioscrobbler, LANG_AUDIOSCROBBLER, false,
                   "Last.fm Logging", NULL),
 #if CONFIG_TUNER
     TEXT_SETTING(0, fmr_file, "fmr", "",
@@ -1309,7 +1309,7 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,usb_charging,LANG_USB_CHARGING,false,"usb charging",NULL),
 #endif
 #endif
-    OFFON_SETTING(0,cuesheet,LANG_CUESHEET_ENABLE,false,"cuesheet support",
+    OFFON_SETTING(F_BANFROMQS,cuesheet,LANG_CUESHEET_ENABLE,false,"cuesheet support",
                   NULL),
     TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, skip_length,
                   LANG_SKIP_LENGTH, 0, "skip length",
@@ -1412,15 +1412,15 @@ const struct settings_list settings[] = {
                    ID2P(LANG_NORMAL), ID2P(LANG_HIGH)),
 #endif
 #ifdef HAVE_QUICKSCREEN
-   CUSTOM_SETTING(0, qs_item_left, LANG_LEFT, 
+   CUSTOM_SETTING(0, qs_item_left, LANG_LEFT_QS_ITEM, 
                   &global_settings.playlist_shuffle, "qs left",
                   qs_load_from_cfg, qs_write_to_cfg,
                   qs_is_changed, qs_set_default),
-   CUSTOM_SETTING(0, qs_item_right, LANG_RIGHT, 
+   CUSTOM_SETTING(0, qs_item_right, LANG_RIGHT_QS_ITEM, 
                   &global_settings.repeat_mode, "qs right",
                   qs_load_from_cfg, qs_write_to_cfg,
                   qs_is_changed, qs_set_default),
-   CUSTOM_SETTING(0, qs_item_bottom, LANG_BOTTOM, 
+   CUSTOM_SETTING(0, qs_item_bottom, LANG_BOTTOM_QS_ITEM, 
                   &global_settings.dirfilter, "qs bottom",
                   qs_load_from_cfg, qs_write_to_cfg,
                   qs_is_changed, qs_set_default),

@@ -322,7 +322,7 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
     cond_talk_ids_fq(VOICE_OK);
     return changed;
 }
-static bool is_setting_quickscreenable(const struct settings_list *setting);
+
 static inline const struct settings_list *get_setting(int gs_value,
                                         const struct settings_list *defaultval)
 {
@@ -394,7 +394,7 @@ bool quick_screen_f3(int button_enter)
 #endif /* BUTTON_F3 */
 
 /* stuff to make the quickscreen configurable */
-static bool is_setting_quickscreenable(const struct settings_list *setting)
+bool is_setting_quickscreenable(const struct settings_list *setting)
 {
     /* to keep things simple, only settings which have a lang_id set are ok */
     if (setting->lang_id < 0 || (setting->flags&F_BANFROMQS))
@@ -411,118 +411,28 @@ static bool is_setting_quickscreenable(const struct settings_list *setting)
     }
 }
 
-static const struct settings_list *find_setting_from_index(int index)
+void set_as_qs_item(const struct settings_list *setting,
+                    enum QUICKSCREEN_ITEM item)
 {
-    int count = -1, i;
-    const struct settings_list *setting = &settings[0];
+    int i;
     for(i=0;i<nb_settings;i++)
     {
-        setting = &settings[i];
-        if (is_setting_quickscreenable(setting))
-            count++;
-        if (count == index)
-            return setting;
+        if (&settings[i] == setting)
+            break;
     }
-    return NULL;
-}
-static char* quickscreen_setter_getname(int selected_item, void *data,
-                                        char *buffer, size_t buffer_len)
-{
-    (void)data;
-    const struct settings_list *setting = find_setting_from_index(selected_item);
-    snprintf(buffer, buffer_len, "%s  (%s)",
-             str(setting->lang_id), setting->cfg_name);
-    return buffer;
-}
-static int quickscreen_setter_speak_item(int selected_item, void * data)
-{
-    (void)data;
-    talk_id(find_setting_from_index(selected_item)->lang_id, true);
-    return 0;
-}
-static int quickscreen_setter_action_callback(int action, 
-                                              struct gui_synclist *lists)
-{
-    const struct settings_list *temp = lists->data;
-    switch (action)
-    {
-        case ACTION_STD_OK:
-            /* ok, quit */
-            return ACTION_STD_CANCEL;
-        case ACTION_STD_CONTEXT: /* real settings use this to reset to default */
-        {
-            int i=0, count=0;
-            reset_setting(temp, temp->setting);
-            for(i=0;i<nb_settings;i++)
-            {
-                if (is_setting_quickscreenable(&settings[i]))
-                    count++;
-                if (*(int*)temp->setting == i)
-                {
-                    gui_synclist_select_item(lists, count-1);
-                    break;
-                }
-            }
-            return ACTION_REDRAW;
-        }
-    }
-    return action;
-}
-int quickscreen_set_option(void *data)
-{
-    int valid_settings_count = 0;
-    int i, newval = 0, oldval, *setting = NULL;
-    struct simplelist_info info;
-    switch ((intptr_t)data)
+    switch (item)
     {
         case QUICKSCREEN_LEFT:
-            setting = &global_settings.qs_item_left;
+            global_settings.qs_item_left = i;
             break;
         case QUICKSCREEN_RIGHT:
-            setting = &global_settings.qs_item_right;
+            global_settings.qs_item_right = i;
             break;
         case QUICKSCREEN_BOTTOM:
-            setting = &global_settings.qs_item_bottom;
+            global_settings.qs_item_bottom = i;
+            break;
+        default: /* shut the copiler up */
             break;
     }
-    oldval = *setting;
-    for(i=0;i<nb_settings;i++)
-    {
-        if (is_setting_quickscreenable(&settings[i]))
-            valid_settings_count++;
-        if (oldval == i)
-            newval = valid_settings_count - 1;
-    }
-    
-    simplelist_info_init(&info, str(LANG_QS_ITEMS), 
-                    valid_settings_count,
-                    (void*)find_setting(setting, NULL)); /* find the qs item being changed */
-    info.get_name = quickscreen_setter_getname;
-    if(global_settings.talk_menu)
-        info.get_talk = quickscreen_setter_speak_item;
-    info.action_callback = quickscreen_setter_action_callback;
-    info.selection = newval;
-    simplelist_show_list(&info);
-    if (info.selection != oldval)
-    {
-        if (info.selection != -1)
-        {
-            const struct settings_list *temp = find_setting_from_index(info.selection);
-            int i = 0;
-            for(i=0;i<nb_settings;i++)
-            {
-                if (&settings[i] == temp)
-                    break;
-            }
-            *setting = i;
-            settings_save();
-        }
-        /* probably should splash LANG_CANCEL here but right now
-           we cant find out the selection when the cancel button was
-           pressed, (without hacks)so we cant know if the 
-           selection was changed, or just viewed */
-    }
-    return 0;
 }
-
 

@@ -483,12 +483,66 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         {
             redraw_lists = list_stop_handler();
         }
-        else if (action == ACTION_STD_CONTEXT &&
-                 menu == &root_menu_)
+        else if (action == ACTION_STD_CONTEXT)
         {
-            ret = GO_TO_ROOTITEM_CONTEXT;
-            done = true;
-        } 
+            if (menu == &root_menu_)
+            {
+                ret = GO_TO_ROOTITEM_CONTEXT;
+                done = true;
+            }
+            else if (!in_stringlist)
+            {
+                int type;
+                selected = get_menu_selection(gui_synclist_get_sel_pos(&lists), menu);
+                temp = menu->submenus[selected];
+                type = (temp->flags&MENU_TYPE_MASK);
+                if ((type == MT_SETTING_W_TEXT || type == MT_SETTING))
+                {
+#ifdef HAVE_QUICKSCREEN
+                    MENUITEM_STRINGLIST(quickscreen_able_option,
+                                        ID2P(LANG_ONPLAY_MENU_TITLE), NULL,
+                                        ID2P(LANG_RESET_SETTING),
+                                        ID2P(LANG_LEFT_QS_ITEM),
+                                        ID2P(LANG_BOTTOM_QS_ITEM),
+                                        ID2P(LANG_RIGHT_QS_ITEM));
+#endif
+                    MENUITEM_STRINGLIST(notquickscreen_able_option, 
+                                        ID2P(LANG_ONPLAY_MENU_TITLE), NULL,
+                                        ID2P(LANG_RESET_SETTING));
+                    const struct menu_item_ex *menu;
+                    int menu_selection = 0;
+                    const struct settings_list *setting = 
+                            find_setting(temp->variable, NULL);
+#ifdef HAVE_QUICKSCREEN
+                    if (is_setting_quickscreenable(setting))
+                        menu = &quickscreen_able_option;
+                    else
+#endif
+                        menu = &notquickscreen_able_option;
+                    switch (do_menu(menu, &menu_selection, NULL, false))
+                    {
+                        case GO_TO_PREVIOUS:
+                            break;
+                            case 0: /* reset setting */
+                                reset_setting(setting, setting->setting);
+                                break;
+#ifdef HAVE_QUICKSCREEN
+                            break;
+                        case 1: /* set as left QS item */
+                            set_as_qs_item(setting, QUICKSCREEN_LEFT);
+                            break;
+                        case 2: /* set as bottom QS item */
+                            set_as_qs_item(setting, QUICKSCREEN_BOTTOM);
+                            break;
+                        case 3: /* set as right QS item */
+                            set_as_qs_item(setting, QUICKSCREEN_RIGHT);
+                            break;
+#endif
+                    } /* swicth(do_menu()) */
+                    redraw_lists = true;
+                }
+            } /* else if (!in_stringlist) */
+        }
         else if (action == ACTION_STD_MENU)
         {
             if (menu != &root_menu_)

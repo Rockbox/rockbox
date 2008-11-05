@@ -34,6 +34,8 @@
 #include "statusbar.h"
 #include "misc.h"
 #include "splash.h"
+#include "menu.h"
+#include "quickscreen.h"
 
 #if defined (HAVE_SCROLLWHEEL)      || \
     (CONFIG_KEYPAD == IPOD_3G_PAD)  || \
@@ -540,7 +542,7 @@ bool option_screen(const struct settings_list *setting,
             if (var_type == F_T_BOOL && !use_temp_var)
                 *(bool*)setting->setting = (*variable==1);
             val_to_selection(setting, *variable, &nb_items,
-                             &selected, &function);
+                                &selected, &function);
             gui_synclist_select_item(&lists, selected);
             gui_synclist_draw(&lists);
             gui_synclist_speak_item(&lists);
