@@ -455,9 +455,6 @@ static char* messages[] =
   "The spectre of Sherlock Holmes wills you onwards.",
 };
 
-#define TRUE true
-#define FALSE false
-
 #define RFK_VERSION "v1.4142135.406"
 
 /* Button definitions stolen from maze.c */
@@ -531,7 +528,7 @@ const unsigned colors[NUM_COLORS] = {
 #define randy() (rb->rand() % (Y_MAX-Y_MIN+1))+Y_MIN /*I'm feeling randy()!*/
 #define randchar() rb->rand() % (126-'!'+1)+'!';
 #define randcolor() rb->rand() % NUM_COLORS
-#define randbold() (rb->rand() % 2 ? TRUE:FALSE)
+#define randbold() (rb->rand() % 2 ? true:false)
 
 /*Row constants for the animation*/
 #define ADV_ROW 1
@@ -540,14 +537,14 @@ const unsigned colors[NUM_COLORS] = {
 
 /*This struct contains all the information we need to display an object
   on the screen*/
-typedef struct
+struct screen_object
 {
   short x;
   short y;
   int color;
   bool bold;
   char character;
-} screen_object;
+};
 
 /*
  *Function definitions
@@ -572,15 +569,15 @@ static int validchar(char);
 static void play_animation(int);
 
 /*Global variables. Bite me, it's fun.*/
-screen_object robot;
-screen_object kitten;
+struct screen_object robot;
+struct screen_object kitten;
 
 #if X_MAX*Y_MAX < 200
 #define NUM_BOGUS 15
 #else
 #define NUM_BOGUS 20
 #endif
-screen_object bogus[NUM_BOGUS];
+struct screen_object bogus[NUM_BOGUS];
 unsigned short bogus_messages[NUM_BOGUS];
 bool used_messages[MESSAGES];
 
@@ -612,7 +609,7 @@ static void drawchar(int x, int y, char c)
   rb->lcd_putsxy(x*SYSFONT_WIDTH, y*SYSFONT_HEIGHT, str);
 }
 
-static void draw(screen_object o)
+static void draw(struct screen_object o)
 {
 #if LCD_DEPTH > 1
   unsigned oldforeground;
@@ -640,40 +637,40 @@ static void refresh(void)
  */
 static void play_game()
 {
-  int old_x = robot.x;
-  int old_y = robot.y;
-  int input = 0; /* Not sure what a reasonable initial value is */
+    int old_x = robot.x;
+    int old_y = robot.y;
+    int input = 0; /* Not sure what a reasonable initial value is */
 #ifdef __PLUGINLIB_ACTIONS_H__
-  const struct button_mapping *plugin_contexts[] = {generic_directions, generic_actions};
+    const struct button_mapping *plugin_contexts[] = {generic_directions, generic_actions};
 #endif
 
-  while (input != RFK_QUIT && exit_rfk == false)
+    while (input != RFK_QUIT && exit_rfk == false)
     {
-      process_input(input);
+        process_input(input);
       
-      /*Redraw robot, where applicable. We're your station, robot.*/
-      if (!(old_x == robot.x && old_y == robot.y))
-    {
-      /*Get rid of the old robot*/
-    drawchar(old_x, old_y, ' ');
-      screen[old_x][old_y] = EMPTY;
+        /*Redraw robot, where applicable. We're your station, robot.*/
+        if (!(old_x == robot.x && old_y == robot.y))
+        {
+            /*Get rid of the old robot*/
+            drawchar(old_x, old_y, ' ');
+            screen[old_x][old_y] = EMPTY;
       
-      /*Meet the new robot, same as the old robot.*/
-      draw(robot);
-      refresh();
-      screen[robot.x][robot.y] = ROBOT;
+            /*Meet the new robot, same as the old robot.*/
+            draw(robot);
+            refresh();
+            screen[robot.x][robot.y] = ROBOT;
       
-      old_x = robot.x;
-      old_y = robot.y;
-    }
+            old_x = robot.x;
+            old_y = robot.y;
+        }
 #ifdef __PLUGINLIB_ACTIONS_H__
-      input = pluginlib_getaction(rb, TIMEOUT_BLOCK, plugin_contexts, 2);
+        input = pluginlib_getaction(rb, TIMEOUT_BLOCK, plugin_contexts, 2);
 #else
-      input = rb->button_get(true);
+        input = rb->button_get(true);
 #endif
     } 
-  message("Bye!");
-  refresh();
+    message("Bye!");
+    refresh();
 }
 
 /*
@@ -761,8 +758,9 @@ static void pause()
 {
   int button;
   rb->lcd_update();
-  do
+  do {
     button = rb->button_get(true);
+  }
   while( ( button == BUTTON_NONE )
       || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
 }
@@ -782,12 +780,14 @@ static int validchar(char a)
 static void play_animation(int input)
 {
   int counter;
-  screen_object left;
-  screen_object right;
+  struct screen_object left;
+  struct screen_object right;
   /*The grand cinema scene.*/
   rb->lcd_puts_scroll(0, ADV_ROW, " ");
 
-  if (input == RFK_RIGHT || input == RFK_DOWN || input == RFK_RRIGHT || input == RFK_RDOWN) {
+  if (input == RFK_RIGHT || input == RFK_DOWN ||
+      input == RFK_RRIGHT || input == RFK_RDOWN)
+  {
     left = robot;
     right = kitten;
   }
@@ -871,7 +871,7 @@ static void instructions()
 static void initialize_arrays()
 {
   unsigned int counter, counter2;
-  screen_object empty;
+  struct screen_object empty;
 
   /*Initialize the empty object.*/
   empty.x = -1;
@@ -881,7 +881,7 @@ static void initialize_arrays()
 #else
   empty.color = 0;
 #endif
-  empty.bold = FALSE;
+  empty.bold = false;
   empty.character = ' ';
   
   for (counter = 0; counter <= X_MAX; counter++)
@@ -913,60 +913,58 @@ static void initialize_robot()
 
   robot.character = '#';
   robot.color = ROBOT_COLOR;
-  robot.bold = FALSE;
+  robot.bold = false;
   screen[robot.x][robot.y] = ROBOT;
 }
 
 /*initialize kitten, well, initializes kitten.*/
 static void initialize_kitten()
 {
-  /*Assign the kitten a unique position.*/
-  do
-    {
-      kitten.x = randx();
-      kitten.y = randy();
+    /*Assign the kitten a unique position.*/
+    do {
+        kitten.x = randx();
+        kitten.y = randy();
     } while (screen[kitten.x][kitten.y] != EMPTY);
   
-  /*Assign the kitten a character and a color.*/
-  do {
-    kitten.character = randchar();
-  } while (!(validchar(kitten.character))); 
-  screen[kitten.x][kitten.y] = KITTEN;
+    /*Assign the kitten a character and a color.*/
+    do {
+        kitten.character = randchar();
+    } while (!(validchar(kitten.character))); 
+    screen[kitten.x][kitten.y] = KITTEN;
 
-  kitten.color = colors[randcolor()];
-  kitten.bold = randbold();
+    kitten.color = colors[randcolor()];
+    kitten.bold = randbold();
 }
 
 /*initialize_bogus initializes all non-kitten objects to be used in this run.*/
 static void initialize_bogus()
 {
-  int counter, index;
-  for (counter = 0; counter < NUM_BOGUS; counter++)
+    int counter, index;
+    for (counter = 0; counter < NUM_BOGUS; counter++)
     {
-      /*Give it a color.*/
-      bogus[counter].color = colors[randcolor()];
-      bogus[counter].bold = randbold();
+        /*Give it a color.*/
+        bogus[counter].color = colors[randcolor()];
+        bogus[counter].bold = randbold();
       
-      /*Give it a character.*/
-      do {
-    bogus[counter].character = randchar();
-      } while (!(validchar(bogus[counter].character))); 
+        /*Give it a character.*/
+        do {
+            bogus[counter].character = randchar();
+        } while (!(validchar(bogus[counter].character))); 
       
-      /*Give it a position.*/
-      do
-    {
-      bogus[counter].x = randx();
-      bogus[counter].y = randy();
-    } while (screen[bogus[counter].x][bogus[counter].y] != EMPTY);
+        /*Give it a position.*/
+        do {
+            bogus[counter].x = randx();
+            bogus[counter].y = randy();
+        } while (screen[bogus[counter].x][bogus[counter].y] != EMPTY);
 
-      screen[bogus[counter].x][bogus[counter].y] = counter+2;
+        screen[bogus[counter].x][bogus[counter].y] = counter+2;
       
-      /*Find a message for this object.*/
-      do {
-        index = rb->rand() % MESSAGES;
-      } while (used_messages[index] != false);
-      bogus_messages[counter] = index;
-      used_messages[index] = true;
+        /*Find a message for this object.*/
+        do {
+            index = rb->rand() % MESSAGES;
+        } while (used_messages[index] != false);
+        bogus_messages[counter] = index;
+        used_messages[index] = true;
     }
 
 }
