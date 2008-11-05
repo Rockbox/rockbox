@@ -49,6 +49,14 @@ removing the rc parameter from each function (and the RNGC macro)).
 
 */
 
+#ifdef ROCKBOX
+#include "../lib/codeclib.h"
+/* for UDIV32() */
+#endif
+
+#ifndef UDIV32
+#define UDIV32(a, b)  (a / b)
+#endif
 
 /* BITSTREAM READING FUNCTIONS */
 
@@ -121,15 +129,15 @@ static inline void range_dec_normalize(void)
 static inline int range_decode_culfreq(int tot_f)
 {
     range_dec_normalize();
-    rc.help = rc.range / tot_f;
-    return rc.low / rc.help;
+    rc.help = UDIV32(rc.range, tot_f);
+    return UDIV32(rc.low, rc.help);
 }
 
 static inline int range_decode_culshift(int shift)
 {
     range_dec_normalize();
     rc.help = rc.range >> shift;
-    return rc.low / rc.help;
+    return UDIV32(rc.low, rc.help);
 }
 
 
