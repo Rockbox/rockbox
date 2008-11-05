@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: mdct_arm.S 18084 2008-07-17 17:43:49Z saratoga $
+ * $Id$
  *
  * Copyright (C) 2007 by Tomasz Malesinski
  *
