@@ -48,34 +48,28 @@ all: $(LINKCODEC) $(ROCKS)
 ifndef SIMVER
 $(BUILDDIR)/%.a : % $(CODECDEPS)
 
-$(OBJDIR)/mod.elf : $(OBJDIR)/mod.o $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/wav.elf : $(OBJDIR)/wav.o $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/sid.elf : $(OBJDIR)/sid.o $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/adx.elf : $(OBJDIR)/adx.o $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/nsf.elf : $(OBJDIR)/nsf.o $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/spc.elf : $(OBJDIR)/spc.o $(BUILDDIR)/libspc.a $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/aiff.elf : $(OBJDIR)/aiff.o $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/mpa.elf : $(OBJDIR)/mpa.o $(BUILDDIR)/libmad.a $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/a52.elf : $(OBJDIR)/a52.o $(BUILDDIR)/liba52.a $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/flac.elf : $(OBJDIR)/flac.o $(BUILDDIR)/libffmpegFLAC.a $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/vorbis.elf : $(OBJDIR)/vorbis.o $(BUILDDIR)/libTremor.a $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/speex.elf : $(OBJDIR)/speex.o $(BUILDDIR)/libspeex.a $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/mpc.elf : $(OBJDIR)/mpc.o $(BUILDDIR)/libmusepack.a $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/wavpack.elf : $(OBJDIR)/wavpack.o $(BUILDDIR)/libwavpack.a $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/alac.elf : $(OBJDIR)/alac.o $(BUILDDIR)/libalac.a $(BUILDDIR)/libm4a.a $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/aac.elf : $(OBJDIR)/aac.o $(BUILDDIR)/libfaad.a $(BUILDDIR)/libm4a.a $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/shorten.elf : $(OBJDIR)/shorten.o $(BUILDDIR)/libffmpegFLAC.a $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/ape.elf : $(OBJDIR)/ape.o $(BUILDDIR)/libdemac.a $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/wma.elf : $(OBJDIR)/wma.o $(BUILDDIR)/libwma.a $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/aiff_enc.elf: $(OBJDIR)/aiff_enc.o $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/mp3_enc.elf: $(OBJDIR)/mp3_enc.o $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/wav_enc.elf: $(OBJDIR)/wav_enc.o $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/wavpack_enc.elf: $(OBJDIR)/wavpack_enc.o $(BUILDDIR)/libwavpack.a $(OBJDIR)/codec_crt0.o $(CODECLIB)
-$(OBJDIR)/asap.elf : $(OBJDIR)/asap.o $(BUILDDIR)/libasap.a $(OBJDIR)/codec_crt0.o $(CODECLIB)
+# special dependencies
+$(OBJDIR)/spc.elf : $(BUILDDIR)/libspc.a
+$(OBJDIR)/mpa.elf : $(BUILDDIR)/libmad.a
+$(OBJDIR)/a52.elf : $(BUILDDIR)/liba52.a
+$(OBJDIR)/flac.elf : $(BUILDDIR)/libffmpegFLAC.a
+$(OBJDIR)/vorbis.elf : $(BUILDDIR)/libTremor.a
+$(OBJDIR)/speex.elf : $(BUILDDIR)/libspeex.a
+$(OBJDIR)/mpc.elf : $(BUILDDIR)/libmusepack.a
+$(OBJDIR)/wavpack.elf : $(BUILDDIR)/libwavpack.a
+$(OBJDIR)/alac.elf : $(BUILDDIR)/libalac.a $(BUILDDIR)/libm4a.a
+$(OBJDIR)/aac.elf : $(BUILDDIR)/libfaad.a $(BUILDDIR)/libm4a.a
+$(OBJDIR)/shorten.elf : $(BUILDDIR)/libffmpegFLAC.a
+$(OBJDIR)/ape.elf : $(BUILDDIR)/libdemac.a
+$(OBJDIR)/wma.elf : $(BUILDDIR)/libwma.a
+$(OBJDIR)/wavpack_enc.elf: $(BUILDDIR)/libwavpack.a
+$(OBJDIR)/asap.elf : $(BUILDDIR)/libasap.a
 
-$(OBJDIR)/%.elf: $(OBJDIR)/codec_crt0.o
-	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $^ -L$(BUILDDIR) -lcodec -lgcc \
-			-T$(LINKCODEC) -Wl,--gc-sections,-Map,$(OBJDIR)/$*.map 
+# standard dependencies
+$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(OBJDIR)/codec_crt0.o $(CODECLIB)
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $^ \
+		-L$(BUILDDIR) -lcodec -lgcc -T$(LINKCODEC) \
+		-Wl,--gc-sections,-Map,$(OBJDIR)/$*.map 
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
