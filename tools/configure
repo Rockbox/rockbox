@@ -2528,7 +2528,7 @@ tags:
 fontzip:
 	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\" -r "\$(ROOTDIR)" -f 1 -o rockbox-fonts.zip \$(TARGET) \$(BINARY)
 
-zip:
+zip: info
 	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
 	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\$\$feat\" -i \"\$(TARGET_ID)\"  -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 
