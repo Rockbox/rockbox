@@ -24,6 +24,7 @@
 #include "jz4740.h"
 #include "button.h"
 #include "button-target.h"
+#include "powermgmt.h"
 
 #define BTN_OFF      (1 << 29)
 #define BTN_VOL_DOWN (1 << 27)
@@ -49,14 +50,60 @@
 static short x_pos = -1, y_pos = -1, datacount = 0;
 static bool pen_down = false;
 static int cur_touch = 0;
+static unsigned short bat_val = 0;
 
 static enum touchscreen_mode current_mode = TOUCHSCREEN_POINT;
-static int touchscreen_buttons[3][3] =
+static const int touchscreen_buttons[3][3] =
 {
     {BUTTON_TOPLEFT,    BUTTON_TOPMIDDLE,    BUTTON_TOPRIGHT},
     {BUTTON_MIDLEFT,    BUTTON_CENTER,       BUTTON_MIDRIGHT},
     {BUTTON_BOTTOMLEFT, BUTTON_BOTTOMMIDDLE, BUTTON_BOTTOMRIGHT}
 };
+
+const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
+{
+    /* TODO */
+    3400
+};
+
+const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+{
+    /* TODO */
+    3300
+};
+
+/* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
+const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+{
+    /* TODO */
+    { 3300, 3680, 3740, 3760, 3780, 3810, 3870, 3930, 3970, 4070, 4160 },
+};
+
+/* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
+const unsigned short percent_to_volt_charge[11] =
+{
+    /* TODO */
+    3300, 3680, 3740, 3760, 3780, 3810, 3870, 3930, 3970, 4070, 4160
+};
+
+/* VBAT = (BDATA/4096) * 7.5V */
+#define BATTERY_SCALE_FACTOR 7500
+
+/* Returns battery voltage from ADC [millivolts] */
+unsigned int battery_adc_voltage(void)
+{
+    register unsigned short dummy;
+    dummy = REG_SADC_BATDAT;
+    dummy = REG_SADC_BATDAT;
+    
+    bat_val = 0;
+    REG_SADC_ENA |= SADC_ENA_PBATEN;
+    
+    while(bat_val == 0)
+        yield();
+    
+    return (bat_val*BATTERY_SCALE_FACTOR)>>12;
+}
 
 void button_init_device(void)
 {
@@ -72,8 +119,8 @@ void button_init_device(void)
     REG_SADC_SAMETIME = 350;
     REG_SADC_WAITTIME = 100;
     REG_SADC_STATE &= (~REG_SADC_STATE);
-    REG_SADC_CTRL &= (~(SADC_CTRL_PENDM | SADC_CTRL_PENUM | SADC_CTRL_TSRDYM));
-    REG_SADC_ENA = SADC_ENA_TSEN; //| SADC_ENA_PBATEN | SADC_ENA_SADCINEN);
+    REG_SADC_CTRL = (~(SADC_CTRL_PENDM | SADC_CTRL_PENUM | SADC_CTRL_TSRDYM | SADC_CTRL_PBATRDYM));
+    REG_SADC_ENA = (SADC_ENA_TSEN | SADC_ENA_PBATEN);
     
     __gpio_as_input(32*3 + 29);
     __gpio_as_input(32*3 + 27);
@@ -231,6 +278,7 @@ void SADC(void)
     }
     if(state & SADC_CTRL_PBATRDYM)
     {
+        bat_val = REG_SADC_BATDAT;
         /* Battery AD IRQ */
     }
     if(state & SADC_CTRL_SRDYM)

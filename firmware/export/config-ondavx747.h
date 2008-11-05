@@ -37,7 +37,7 @@
 #define HAVE_HOTSWAP
 
 //#define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
-#define CONFIG_STORAGE STORAGE_NAND /* Multivolume currently handled at firmware/target/ level */
+#define CONFIG_STORAGE STORAGE_RAMDISK /* Multivolume currently handled at firmware/target/ level */
 
 #define CONFIG_NAND NAND_CC
 
@@ -156,10 +156,10 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
-/*#define CONFIG_USBOTG	USBOTG_INGENIC
+#define CONFIG_USBOTG USBOTG_INGENIC
 #define HAVE_USBSTACK
 #define USB_VENDOR_ID 0x041e 
-#define USB_PRODUCT_ID 0x4133*/
+#define USB_PRODUCT_ID 0x4133
 
 #include <stdbool.h> /* HACKY */
 

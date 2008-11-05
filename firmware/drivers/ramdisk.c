@@ -84,7 +84,7 @@ void ramdisk_spindown(int seconds)
     (void)seconds;
 }
 #ifdef STORAGE_GET_INFO
-void ramdisk_get_info(struct storage_info *info)
+void ramdisk_get_info(IF_MV2(int drive,) struct storage_info *info)
 {
     /* firmware version */
     info->revision="0.00";
