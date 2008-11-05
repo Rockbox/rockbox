@@ -26,8 +26,8 @@
 /* DSP Based on Brad Martin's OpenSPC DSP emulator */
 /* tag reading from sexyspc by John Brawn (John_Brawn@yahoo.com) and others */
 #include "codeclib.h"
-#include "spc/spc_codec.h"
-#include "spc/spc_profiler.h"
+#include "libspc/spc_codec.h"
+#include "libspc/spc_profiler.h"
 
 CODEC_HEADER
 

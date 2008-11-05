@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "codeclib.h"
-#include "asap/asap.h"
+#include "libasap/asap.h"
 
 CODEC_HEADER
 

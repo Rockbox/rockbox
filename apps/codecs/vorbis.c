@@ -20,8 +20,8 @@
  ****************************************************************************/
 
 #include "codeclib.h"
-#include "Tremor/ivorbisfile.h"
-#include "Tremor/ogg.h"
+#include "libtremor/ivorbisfile.h"
+#include "libtremor/ogg.h"
 
 CODEC_HEADER
 

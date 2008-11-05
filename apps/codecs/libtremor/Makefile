@@ -30,7 +30,7 @@ include $(TOOLSDIR)/makesrc.inc
 SOURCES = $(SRC)
 OBJS2 := $(SRC:%.c=$(OBJDIR)/%.o)
 OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
-DEPFILE = $(OBJDIR)/dep-Tremor
+DEPFILE = $(OBJDIR)/dep-libtremor
 DIRS = 
 
 all: $(OUTPUT)
@@ -42,7 +42,7 @@ $(OUTPUT): $(OBJS)
 include $(TOOLSDIR)/make.inc
 
 clean:
-	$(call PRINTS,cleaning Tremor)rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
+	$(call PRINTS,cleaning libtremor)rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
 
 ifneq ($(MAKECMDGOALS),clean)
 -include $(DEPFILE)

@@ -18,7 +18,7 @@ ifdef APPEXTRA
 endif
 
 ifdef SOFTWARECODECS
-   CODECLIBS = -lmad -la52 -lffmpegFLAC -lTremor -lwavpack -lmusepack
+   CODECLIBS = -lmad -la52 -lffmpegFLAC -ltremor -lwavpack -lmusepack
 endif
 
 # Set up the bitmap libraries
