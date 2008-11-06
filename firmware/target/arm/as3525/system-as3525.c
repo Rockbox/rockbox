@@ -215,7 +215,7 @@ void system_init(void)
 
     asm volatile(
         "mrs r0, cpsr             \n"
-        "bic r0, r0, #0x80        \n" /* enable interrupts */
+        "orr r0, r0, #0x80        \n" /* disable interrupts */
         "msr cpsr, r0             \n"
         "mov r0, #0               \n"
         "mcr p15, 0, r0, c7, c7   \n" /* invalidate icache & dcache */
