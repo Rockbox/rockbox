@@ -38,8 +38,8 @@ void main(void)
     int i;
     unsigned char buf[8];
 
-    kernel_init();
     system_init();
+    kernel_init();
 
     lcd_init();
 

@@ -32,6 +32,9 @@ void INT_TIMER2(void)
 
 void tick_start(unsigned int interval_in_ms)
 {
+#ifdef BOOTLOADER
+    (void) interval_in_ms;
+#else
     int phi = 0;                            /* prescaler bits */
     int prescale = 1;
     int cycles = 64000 * interval_in_ms;    /* pclk is clocked at 64MHz */
@@ -54,4 +57,5 @@ void tick_start(unsigned int interval_in_ms)
     /* /!\ bit 4 (reserved) must not be modified
      * periodic mode, interrupt enabled, 16 bits counter */
     TIMER2_CONTROL = (TIMER2_CONTROL & (1<<4)) | 0xe0 | (phi<<2);
+#endif
 }
