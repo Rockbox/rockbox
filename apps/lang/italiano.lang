@@ -12040,69 +12040,134 @@
 </phrase>
 <phrase>
   id: LANG_QS_ITEMS
-  desc: used for the submenu name for the quickscreen items
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    quickscreen: "Quickscreen Items"
+    quickscreen: ""
   </source>
   <dest>
     *: none
-    quickscreen: "Elementi menu rapido"
+    quickscreen: ""
   </dest>
   <voice>
     *: none
-    quickscreen: "Elementi menu rapido"
+    quickscreen: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_LEFT
-  desc: used for the submenu name for the quickscreen items
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    quickscreen: "Left"
+    quickscreen: ""
   </source>
   <dest>
     *: none
-    quickscreen: "Sinistro"
+    quickscreen: ""
   </dest>
   <voice>
     *: none
-    quickscreen: "Sinistro"
+    quickscreen: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RIGHT
-  desc: used for the submenu name for the quickscreen items
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    quickscreen: "Right"
+    quickscreen: ""
   </source>
   <dest>
     *: none
-    quickscreen: "Destro"
+    quickscreen: ""
   </dest>
   <voice>
     *: none
-    quickscreen: "Destro"
+    quickscreen: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BOTTOM
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_SETTING
+  desc: used in the settings context menu
+  user:
+  <source>
+    *: "Reset Setting"
+  </source>
+  <dest>
+    *: "Ripristina Impostazione"
+  </dest>
+  <voice>
+    *: "Ripristina Impostazione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT_QS_ITEM
   desc: used for the submenu name for the quickscreen items
   user:
   <source>
     *: none
-    quickscreen: "Bottom"
+    quickscreen: "Set as Left Quickscreen Item"
   </source>
   <dest>
     *: none
-    quickscreen: "Inferiore"
+    quickscreen: "Imposta Come Sinistro Nel Menu Rapido"
   </dest>
   <voice>
     *: none
-    quickscreen: "Inferiore"
+    quickscreen: "Imposta Come Sinistro Nel Menu Rapido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Right Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Imposta Come Destro Nel Menu Rapido"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Imposta Come Destro Nel Menu Rapido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Bottom Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Imposta Come Inferiore Nel Menu Rapido"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Imposta Come Inferiore Nel Menu Rapido"
   </voice>
 </phrase>
