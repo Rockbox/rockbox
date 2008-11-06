@@ -33,7 +33,7 @@
 .macro ARM_DIV_BODY dividend, divisor, result, curbit
 
     mov     \result, \dividend
-    mov     \curbit, #93          @ 3 * 31, (calculating branch dest)
+    mov     \curbit, #90          @ 3 * 30, (calculating branch dest)
     cmp     \divisor, \result, lsr #16
     movls   \result,\result, lsr #16
     subls   \curbit, \curbit, #48
@@ -44,40 +44,35 @@
     movls   \result,\result, lsr #4
     subls   \curbit, \curbit, #12
     cmp     \divisor, \result, lsr #2
-    movls   \result,\result, lsr #2
     subls   \curbit, \curbit, #6
-    cmp     \divisor, \result, lsr #1
-    subls   \curbit, \curbit, #3
+    @ Calculation is only done down to shift=2, because the shift=1 step
+    @ would need 3 more cycles, but would only gain 1.5 cycles on average.
     mov     \result, #0
     add     pc, pc, \curbit, lsl #2
     nop
     .set    shift, 32
-    .rept   32
+    .rept   31
     .set    shift, shift - 1
-    cmp     \dividend, \divisor, lsl #shift
-    adc     \result, \result, \result
-    subcs   \dividend, \dividend, \divisor, lsl #shift
-    .endr
+    cmp     \divisor, \dividend, lsr #shift
+    orrls   \result, \result, #(1 << shift)
+    subls   \dividend, \dividend, \divisor, lsl #shift
+    .endr   @ shift==0 in the .rept would cause a warning  for lsr #0
+    cmp     \divisor, \dividend
+    orrls   \result, \result, #1
+    @subls  \dividend, \dividend, \divisor  @ correct remainder not needed
 .endm
 
 .macro ARM_DIV2_ORDER divisor, order
 
-    cmp     \divisor, #(1 << 16)
-    movhs   \divisor, \divisor, lsr #16
-    movhs   \order, #16
-    movlo   \order, #0
+    @ There's exactly one bit set in the divisor, so ffs() can be used
+    @ This is the ffs algorithm devised by D.Seal and posted to
+    @ comp.sys.arm on 16 Feb 1994.
+    adr     \order, L_ffs_table
+    orr     \divisor, \divisor, \divisor, lsl #4   @  = X * 0x11
+    orr     \divisor, \divisor, \divisor, lsl #6   @  = X * 0x451
+    rsb     \divisor, \divisor, \divisor, lsl #16  @  = X * 0x0450fbaf
 
-    cmp     \divisor, #(1 << 8)
-    movhs   \divisor, \divisor, lsr #8
-    addhs   \order, \order, #8
-
-    cmp     \divisor, #(1 << 4)
-    movhs   \divisor, \divisor, lsr #4
-    addhs   \order, \order, #4
-
-    cmp     \divisor, #(1 << 2)
-    addhi   \order, \order, #3
-    addls   \order, \order, \divisor, lsr #1
+    ldrb    \order, [\order, \divisor, lsr #26]
 .endm
 
 
@@ -113,3 +108,15 @@ udiv32_arm:
     ARM_DIV2_ORDER r1, r2
     mov     r0, r0, lsr r2
     bx      lr
+
+L_ffs_table:
+    @        0   1   2   3   4   5   6   7
+    @----------------------------------------------
+    .byte   32,  0,  1, 12,  2,  6,  0, 13  @  0- 7
+    .byte    3,  0,  7,  0,  0,  0,  0, 14  @  8-15
+    .byte   10,  4,  0,  0,  8,  0,  0, 25  @ 16-23
+    .byte    0,  0,  0,  0,  0, 21, 27, 15  @ 24-31
+    .byte   31, 11,  5,  0,  0,  0,  0,  0  @ 32-39
+    .byte    9,  0,  0, 24,  0,  0, 20, 26  @ 40-47
+    .byte   30,  0,  0,  0,  0, 23,  0, 19  @ 48-55
+    .byte   29,  0, 22, 18, 28, 17, 16,  0  @ 56-63
