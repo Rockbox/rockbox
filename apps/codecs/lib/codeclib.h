@@ -27,9 +27,9 @@
 extern struct codec_api *ci;
 extern long mem_ptr;
 extern long bufsize;
-extern unsigned char* mp3buf;     // The actual MP3 buffer from Rockbox
-extern unsigned char* mallocbuf;  // 512K from the start of MP3 buffer
-extern unsigned char* filebuf;    // The rest of the MP3 buffer
+extern unsigned char* mp3buf;     /* The actual MP3 buffer from Rockbox                 */
+extern unsigned char* mallocbuf;  /* The free space after the codec in the codec buffer */
+extern unsigned char* filebuf;    /* The rest of the MP3 buffer                         */
 
 /* Standard library functions that are used by the codecs follow here */
 
