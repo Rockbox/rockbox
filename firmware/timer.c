@@ -52,6 +52,14 @@ void TIMER1(void)
         pfn_timer();
     TER1 = 0xff; /* clear all events */
 }
+#elif CONFIG_CPU == AS3525
+void INT_TIMER1(void)
+{
+    if (pfn_timer != NULL)
+        pfn_timer();
+
+    TIMER1_INTCLR = 0; /* clear interrupt */
+}
 #elif defined(CPU_PP)
 void TIMER2(void)
 {
@@ -92,17 +100,23 @@ void TIMER1_ISR(void)
 
 static bool timer_set(long cycles, bool start)
 {
-#if (CONFIG_CPU == SH7034) || defined(CPU_COLDFIRE)
+#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || CONFIG_CPU == AS3525
     int phi = 0; /* bits for the prescaler */
     int prescale = 1;
 
+#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
+#define PRESCALE_STEP 1
+#else /* CONFIG_CPU == AS3525 */
+#define PRESCALE_STEP 4
+#endif
+
     while (cycles > 0x10000)
     {   /* work out the smallest prescaler that makes it fit */
-#if CONFIG_CPU == SH7034
+#if CONFIG_CPU == SH7034 || CONFIG_CPU == AS3525
         phi++;
 #endif
-        prescale *= 2;
-        cycles >>= 1;
+        prescale <<= PRESCALE_STEP;
+        cycles >>= PRESCALE_STEP;
     }
 #endif
 
@@ -154,6 +168,25 @@ static bool timer_set(long cycles, bool start)
     and_b(~0x01, &TSR4); /* clear an eventual interrupt */
 
     return true;
+#elif CONFIG_CPU == AS3525
+    /* XXX: 32 bits cycles could be used */
+    if (prescale > 256 || cycles > 0x10000)
+        return false;
+
+    if (start)
+    {
+        if (pfn_unregister != NULL)
+        {
+            pfn_unregister();
+            pfn_unregister = NULL;
+        }
+    }
+
+    TIMER1_LOAD = TIMER1_BGLOAD = cycles;
+    /* /!\ bit 4 (reserved) must not be modified
+     * periodic mode, interrupt enabled, 16 bits counter */
+    TIMER1_CONTROL = (TIMER1_CONTROL & (1<<4)) | 0xe0 | (phi<<2);
+    return true;
 #elif defined CPU_COLDFIRE
     if (prescale > 4096/CPUFREQ_MAX_MULT)
         return false;
@@ -165,7 +198,7 @@ static bool timer_set(long cycles, bool start)
     }
     else
         phi = 0x03;      /* prescale sysclk, timer enabled */
-        
+
     base_prescale = prescale;
     prescale *= (cpu_frequency / CPU_FREQ);
 
@@ -255,7 +288,7 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
 
     if (!timer_set(cycles, true))
         return false;
-        
+
     pfn_timer = timer_callback;
     pfn_unregister = unregister_callback;
     timer_prio = reg_prio;
@@ -282,6 +315,10 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     irq_set_int_handler(IRQ_TIMER1, TIMER1_ISR);
     irq_enable_int(IRQ_TIMER1);
     return true;
+#elif CONFIG_CPU == AS3525
+    CGU_PERI |= CGU_TIMER1_CLOCK_ENABLE;    /* enable peripheral */
+    VIC_INT_ENABLE |= INTERRUPT_TIMER1;
+    return true;
 #elif CONFIG_CPU == IMX31L
     /* TODO */
     return false;
@@ -295,7 +332,7 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     (void)cycles;
     /* TODO: Implement for PortalPlayer and iFP (if possible) */
     (void)int_prio;
-    (void)timer_callback; 
+    (void)timer_callback;
 }
 
 bool timer_set_period(long cycles)
@@ -318,6 +355,10 @@ void timer_unregister(void)
 #elif CONFIG_CPU == PNX0101
     TIMER1.ctrl &= ~0x80;  /* disable timer 1 */
     irq_disable_int(IRQ_TIMER1);
+#elif CONFIG_CPU == AS3525
+    TIMER1_CONTROL &= 0x10; /* disable timer 1 (don't modify bit 4) */
+    VIC_INT_EN_CLEAR |= INTERRUPT_TIMER1;  /* disable interrupt */
+    CGU_PERI &= ~CGU_TIMER1_CLOCK_ENABLE;   /* disable peripheral */
 #elif CONFIG_CPU == S3C2440 || CONFIG_CPU == DM320
     __TIMER_UNREGISTER();
 #endif

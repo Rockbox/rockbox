@@ -275,12 +275,13 @@ interface */
 
 
 
-#define TIMER_LOAD       (*(volatile unsigned long*)(TIMER_BASE + 0x00)) /* 32-bit width */
-#define TIMER_VALUE      (*(volatile unsigned long*)(TIMER_BASE + 0x04)) /* 32 bit width */
-#define TIMER_CONTROL    (*(volatile unsigned long*)(TIMER_BASE + 0x08)) /*  8 bit width */
-#define TIMER_INTCLR     (*(volatile unsigned long*)(TIMER_BASE + 0x0C)) /* clears ir by write access */
-#define TIMER_RIS        (*(volatile unsigned long*)(TIMER_BASE + 0x10)) /*  1 bit width */
-#define TIMER_MIS        (*(volatile unsigned long*)(TIMER_BASE + 0x14)) /*  1 bit width */
+#define TIMER1_LOAD      (*(volatile unsigned long*)(TIMER_BASE + 0x00)) /* 32-bit width */
+#define TIMER1_VALUE     (*(volatile unsigned long*)(TIMER_BASE + 0x04)) /* 32 bit width */
+#define TIMER1_CONTROL   (*(volatile unsigned long*)(TIMER_BASE + 0x08)) /*  8 bit width */
+#define TIMER1_INTCLR    (*(volatile unsigned long*)(TIMER_BASE + 0x0C)) /* clears ir by write access */
+#define TIMER1_RIS       (*(volatile unsigned long*)(TIMER_BASE + 0x10)) /*  1 bit width */
+#define TIMER1_MIS       (*(volatile unsigned long*)(TIMER_BASE + 0x14)) /*  1 bit width */
+#define TIMER1_BGLOAD    (*(volatile unsigned long*)(TIMER_BASE + 0x18)) /* 32-bit width */
 
 /**
 * Counter/Timer control register bits

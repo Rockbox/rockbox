@@ -215,7 +215,7 @@ void system_init(void)
 
     asm volatile(
         "mrs r0, cpsr             \n"
-        "orr r0, r0, #0x80        \n" /* disable interrupts */
+        "bic r0, r0, #0x80        \n" /* enable interrupts */
         "msr cpsr, r0             \n"
         "mov r0, #0               \n"
         "mcr p15, 0, r0, c7, c7   \n" /* invalidate icache & dcache */
@@ -229,11 +229,12 @@ void system_init(void)
 
     CGU_PERI |= (5<<2)|0x01; /* pclk = PLLA / 6 = 64 MHz */
 
-#if 0 /* we don't use interrupts at the moment */
+    /* enable timer interface for TIMER1 & TIMER2 */
+    CGU_PERI |= CGU_TIMERIF_CLOCK_ENABLE;
+
     /* enable VIC */
     CGU_PERI |= CGU_VIC_CLOCK_ENABLE;
     VIC_INT_SELECT = 0; /* only IRQ, no FIQ */
-#endif
 }
 
 void system_reboot(void)
