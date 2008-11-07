@@ -285,25 +285,10 @@ static void init_pl180_controller(const int drive)
 
 int sd_init(void)
 {
-    /* reset peripherals */
-
-    CCU_SRC =
-#ifdef HAVE_MULTIVOLUME
-        CCU_SRC_SDMCI_EN |
-#endif
-        CCU_SRC_NAF_EN | CCU_SRC_IDE_EN | CCU_SRC_IDE_AHB_EN | CCU_SRC_MST_EN;
-
-    CCU_SRL = CCU_SRL_MAGIC_NUMBER;
-    CCU_SRL = 0;
-
-    GPIOC_DIR &= ~(1<<1);
-    if(GPIOC_PIN(1))
-        CCU_SPARE1 |= 4;    /* sets bit 2 of undocumented register */
-    else
-        CCU_SPARE1 &= ~4;   /* or clear it */
-
-    CGU_IDE = (1<<7)|(1<<6);  /* enable, 24MHz clock */
-    CGU_MEMSTICK = (1<<8);    /* enable, 24MHz clock */
+    CGU_IDE =   (1<<7)  /* AHB interface enable */  |
+                (1<<6)  /* interface enable */      |
+                (2<<2)  /* clock didiver = 2+1 */   |
+                1       /* clock source = PLLA */;
 
     CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
 #ifdef HAVE_MULTIVOLUME
