@@ -57,6 +57,7 @@ SECTIONS
      _edata = .;
      *(.bss*);
      *(.ibss);
+     *(COMMON)
      *(.ncbss*);
      _end = .;
    } > DRAM

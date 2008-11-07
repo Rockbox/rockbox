@@ -64,6 +64,7 @@ SECTIONS
 	{
 		_edata = .;
 		*(.bss)
+        *(COMMON)
 		. = ALIGN(0x4);
 		_end = .;
 	} > DRAM
