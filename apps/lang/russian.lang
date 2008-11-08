@@ -8135,32 +8135,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUILDING_DATABASE
-  desc: splash database building progress
-  user:
-  <source>
-    *: "Building database... %d found (OFF to return)"
-    h100,h120,h300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PREV to return)"
-    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
-  </source>
-  <dest>
-    *: "Построение базы... %d найдено (ВЫКЛ. для отмены)"
-    h100,h120,h300: "Построение базы... %d найдено (СТОП для отмены)"
-    ipod*: "Построение базы... %d найдено (ПРЕД. для отмены)"
-    x5,m5,gigabeat*,mrobe100: ""
-    h10,h10_5gb,e200*,c200,sa9200: ""
-  </dest>
-  <voice>
-    *: "найдено записей в базе"
-    h100,h120,h300: ""
-    ipod*: ""
-    x5,m5,gigabeat*,mrobe100: ""
-    h10,h10_5gb,e200*,c200,sa9200: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SCANNING_DISK
   desc: when booting up and rebuilding the cache and calculating free space
   user:

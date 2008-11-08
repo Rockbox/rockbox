@@ -5657,20 +5657,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ID3_NO_INFO
-  desc: in tag viewer
-  user:
-  <source>
-    *: "<No Info>"
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_WEEKDAY_SUNDAY
   desc: Maximum 3-letter abbreviation for weekday
   user:

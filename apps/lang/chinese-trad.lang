@@ -10699,26 +10699,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUTTONLIGHT_TIMEOUT
-  desc: in settings_menu
-  user:
-  <source>
-    *: none
-    button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
-  </source>
-  <dest>
-    *: none
-    button_light: ""
-    e200*: "轉盤燈自動關時間"
-  </dest>
-  <voice>
-    *: none
-    button_light: ""
-    e200*: "Wheel Light Timeout"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ID3_ALBUMARTIST
   desc: in tag viewer
   user:

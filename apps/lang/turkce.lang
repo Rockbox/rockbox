@@ -1837,34 +1837,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SETTINGS_LOADED
-  desc: 
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_SAVED
-  desc: 
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESUME_CONFIRM_PLAYER
   desc: posible answers to resume question
   user:

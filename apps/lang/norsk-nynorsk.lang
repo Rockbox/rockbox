@@ -7288,10 +7288,10 @@
   </source>
   <dest>
     *: "AV for å avbryta"
+    player,h100,h120,h300: "STOPP for å avbryta"
     ipod*: "SPEL/PAUSE for å avbryta"
     x5,m5: "SPEL (lenge) for å avbryta"
     h10,h10_5gb,e200*,c200: "TILBAKE for å avbryta"
-    h100,h120,h300: ""
   </dest>
   <voice>
     *: ""
