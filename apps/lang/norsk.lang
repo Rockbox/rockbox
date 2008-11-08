@@ -10005,15 +10005,15 @@
   user:
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "Knapplysstyrke"
+    buttonlight_brightness: "Knapplysstyrke"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "Knapplysstyrke"
+    buttonlight_brightness: "Knapplysstyrke"
   </voice>
 </phrase>
 <phrase>
@@ -10022,18 +10022,18 @@
   user:
   <source>
     *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
+    button_light: "Slukketid for knapplys"
     e200*: "Slukketid for hjullys"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Slukketid for knapplys"
   </dest>
   <voice>
     *: none
+    button_light: "Tid før lys på knapper slukker"
     e200*: "Tid før lys på hjul slukker"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Tid før lys på knapper slukker"
   </voice>
 </phrase>
 <phrase>

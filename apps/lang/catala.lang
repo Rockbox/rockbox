@@ -3827,18 +3827,18 @@
   user:
   <source>
     *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
+    button_light: "Apagat de llum de botons"
     e200*: "Apagat de llum de roda"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Apagat de llum de botons"
   </dest>
   <voice>
     *: none
+    button_light: "Apagat de llum de botons"
     e200*: "Apagat de llum de roda"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Apagat de llum de botons"
   </voice>
 </phrase>
 <phrase>
@@ -3847,15 +3847,15 @@
   user:
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "Brillantor Llum Botons"
+    buttonlight_brightness: "Brillantor Llum Botons"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "Brillantor Llum Botons"
+    buttonlight_brightness: "Brillantor Llum Botons"
   </voice>
 </phrase>
 <phrase>

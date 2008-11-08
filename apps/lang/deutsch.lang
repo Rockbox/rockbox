@@ -3849,18 +3849,18 @@
   user:
   <source>
     *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
+    button_light: "Tastenbeleuchtungsdauer"
     e200*: "Scrollradbeleuchtungsdauer"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Tastenbeleuchtungsdauer"
   </dest>
   <voice>
     *: none
+    button_light: "Tastenbeleuchtungsdauer"
     e200*: "Scrollradbeleuchtungsdauer"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Tastenbeleuchtungsdauer"
   </voice>
 </phrase>
 <phrase>
@@ -3869,15 +3869,15 @@
   user:
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "Tastenbeleuchtung: Helligkeit"
+    buttonlight_brightness: "Tastenbeleuchtung: Helligkeit"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "Tastenbeleuchtung: Helligkeit"
+    buttonlight_brightness: "Tastenbeleuchtung: Helligkeit"
   </voice>
 </phrase>
 <phrase>

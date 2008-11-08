@@ -9973,18 +9973,18 @@
   user:
   <source>
     *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
+    button_light: "Painikevalon aikakatkaisu"
     e200*: "Rullavalon aikakatkaisu"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Painikevalon aikakatkaisu"
   </dest>
   <voice>
     *: none
+    button_light: "Painikevalon aikakatkaisu"
     e200*: "Rullavalon aikakatkaisu"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Painikevalon aikakatkaisu"
   </voice>
 </phrase>
 <phrase>
@@ -9993,15 +9993,15 @@
   user:
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "Painikevalon kirkkaus"
+    buttonlight_brightness: "Painikevalon kirkkaus"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "Painikevalon kirkkaus"
+    buttonlight_brightness: "Painikevalon kirkkaus"
   </voice>
 </phrase>
 <phrase>

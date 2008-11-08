@@ -3850,18 +3850,18 @@
   user:
   <source>
     *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
+    button_light: "Duração da Luz do Botão"
     e200*: "Duração da Luz da Roda"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Duração da Luz do Botão"
   </dest>
   <voice>
     *: none
+    button_light: "Duração da Luz do Botão"
     e200*: "Duração da Luz da Roda"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Duração da Luz do Botão"
   </voice>
 </phrase>
 <phrase>
@@ -3870,15 +3870,15 @@
   user:
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "Brilho da Luz do Botão"
+    buttonlight_brightness: "Brilho da Luz do Botão"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "Brilho da Luz do Botão"
+    buttonlight_brightness: "Brilho da Luz do Botão"
   </voice>
 </phrase>
 <phrase>

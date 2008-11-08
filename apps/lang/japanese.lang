@@ -3833,18 +3833,18 @@
   user:
   <source>
     *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
+    button_light: "ボタンライトのタイムアウト"
     e200*: "ホイールライトのタイムアウト"
-    clip,c200,gigabeatf,mrobe100,sa9200: "ボタンライトのタイムアウト"
   </dest>
   <voice>
     *: none
+    button_light: "ボタンライトのタイムアウト"
     e200*: "ホイールライトのタイムアウト"
-    clip,c200,gigabeatf,mrobe100,sa9200: "ボタンライトのタイムアウト"
   </voice>
 </phrase>
 <phrase>
@@ -3853,15 +3853,15 @@
   user:
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "ボタンライトの明るさ"
+    buttonlight_brightness: "ボタンライトの明るさ"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "ボタンライトの明るさ"
+    buttonlight_brightness: "ボタンライトの明るさ"
   </voice>
 </phrase>
 <phrase>

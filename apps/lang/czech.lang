@@ -3836,34 +3836,14 @@
   <source>
     *: none
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200*: "Časový limit osvětlení kolečka"
-    clip,c200,gigabeatf,mrobe100,sa9200: ""
   </dest>
   <voice>
     *: none
     e200*: "Časový limit osvětlení kolečka"
-    clip,c200,gigabeatf,mrobe100,sa9200: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUTTONLIGHT_BRIGHTNESS
-  desc: in settings_menu
-  user:
-  <source>
-    *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
-  </source>
-  <dest>
-    *: none
-    gigabeatf,mrobe100: ""
-  </dest>
-  <voice>
-    *: none
-    gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>

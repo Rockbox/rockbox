@@ -10296,15 +10296,15 @@
   user:
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "按鈕光度"
+    buttonlight_brightness: "按鈕光度"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </voice>
 </phrase>
 <phrase>
@@ -10704,18 +10704,18 @@
   user:
   <source>
     *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
+    button_light: ""
     e200*: "轉盤燈自動關時間"
-    clip,c200,gigabeatf,mrobe100,sa9200: ""
   </dest>
   <voice>
     *: none
+    button_light: ""
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>

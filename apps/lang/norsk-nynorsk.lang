@@ -9870,18 +9870,18 @@
   user:
   <source>
     *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
+    button_light: "Avbrotstid for knappelys"
     e200*: "Avbrotstid for hjullys"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Avbrotstid for knappelys"
   </dest>
   <voice>
     *: none
+    button_light: "Avbrotstid for knappelys"
     e200*: "Avbrotstid for hjullys"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Avbrotstid for knappelys"
   </voice>
 </phrase>
 <phrase>
@@ -10713,15 +10713,15 @@
   user:
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "Lysstyrke for knappar"
+    buttonlight_brightness: "Lysstyrke for knappar"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "Lysstyrke for knappar"
+    buttonlight_brightness: "Lysstyrke for knappar"
   </voice>
 </phrase>
 <phrase>

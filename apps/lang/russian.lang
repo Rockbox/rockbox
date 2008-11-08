@@ -10410,15 +10410,15 @@
   user:
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "Яркость Подсветки Клавиш"
+    buttonlight_brightness: "Яркость Подсветки Клавиш"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "Яркость Подсветки Клавиш"
+    buttonlight_brightness: "Яркость Подсветки Клавиш"
   </voice>
 </phrase>
 <phrase>
@@ -10948,18 +10948,18 @@
   user:
   <source>
     *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
+    button_light: "Таймаут подсветки клавиш"
     e200*: "Таймаут подсветки колёсика"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Таймаут подсветки клавиш"
   </dest>
   <voice>
     *: none
+    button_light: "Таймаут подсветки клавиш"
     e200*: "Таймаут подсветки колёсика"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Таймаут подсветки клавиш"
   </voice>
 </phrase>
 <phrase>

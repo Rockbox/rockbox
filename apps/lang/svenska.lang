@@ -3834,18 +3834,18 @@
   user:
   <source>
     *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
+    button_light: "Knappbelysning"
     e200*: "Hjulbelysning"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Knappbelysning"
   </dest>
   <voice>
     *: none
+    button_light: "Knappbelysning"
     e200*: "Hjulbelysning"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Knappbelysning"
   </voice>
 </phrase>
 <phrase>
@@ -3854,15 +3854,15 @@
   user:
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "Knappljusstyrka"
+    buttonlight_brightness: "Knappljusstyrka"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "Knappljusstyrka"
+    buttonlight_brightness: "Knappljusstyrka"
   </voice>
 </phrase>
 <phrase>

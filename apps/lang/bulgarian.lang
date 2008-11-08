@@ -8879,15 +8879,15 @@
   user: 
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "Яркост на осветяването на бутоните"
+    buttonlight_brightness: "Яркост на осветяването на бутоните"
   </dest>
   <voice>
     *: ""
-    gigabeatf,mrobe100: ""
+    buttonlight_brightness: ""
   </voice>
 </phrase>
 <phrase>
@@ -10220,18 +10220,18 @@
   user: 
   <source>
     *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
+    button_light: "Изключване на осветяването на бутоните"
     e200*: "Изключване на осветяването на колелото"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Изключване на осветяването на бутоните"
   </dest>
   <voice>
     *: none
+    button_light: ""
     e200*: ""
-    clip,c200,gigabeatf,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>

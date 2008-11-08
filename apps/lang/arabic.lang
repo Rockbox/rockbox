@@ -2485,15 +2485,15 @@
   user: 
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "قوة ضوء الزر"
+    buttonlight_brightness: "قوة ضوء الزر"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </voice>
 </phrase>
 <phrase>

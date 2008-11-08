@@ -9932,18 +9932,18 @@
   user:
   <source>
     *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
+    button_light: "Knap-lys sluk"
     e200*: "Hjul-lys sluk"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Knap-lys sluk"
   </dest>
   <voice>
     *: none
+    button_light: "Knap-lys sluk"
     e200*: "Hjul-lys sluk"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Knap-lys sluk"
   </voice>
 </phrase>
 <phrase>
@@ -10194,15 +10194,15 @@
   user:
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "Knap-lys styrke"
+    buttonlight_brightness: "Knap-lys styrke"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "Knap-lys styrke"
+    buttonlight_brightness: "Knap-lys styrke"
   </voice>
 </phrase>
 <phrase>

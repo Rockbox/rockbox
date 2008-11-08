@@ -10811,15 +10811,15 @@
   user:
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "Brillo de la luz de los botones"
+    buttonlight_brightness: "Brillo de la luz de los botones"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "Brillo de la luz de los botones"
+    buttonlight_brightness: "Brillo de la luz de los botones"
   </voice>
 </phrase>
 <phrase>
@@ -11180,18 +11180,18 @@
   user:
   <source>
     *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
+    button_light: "Tiempo de espera en la luz del botón"
     e200*: "Tiempo de espera en la luz de la rueda"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Tiempo de espera en la luz del botón"
   </dest>
   <voice>
     *: none
+    button_light: "Tiempo de espera en la luz del botón"
     e200*: "Tiempo de espera en la luz de la rueda"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Tiempo de espera en la luz del botón"
   </voice>
 </phrase>
 <phrase>

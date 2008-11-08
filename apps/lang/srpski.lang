@@ -3835,40 +3835,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUTTONLIGHT_TIMEOUT
-  desc: in settings_menu
-  user:
-  <source>
-    *: none
-    e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
-  </source>
-  <dest>
-    *: none
-    e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: ""
-  </dest>
-  <voice>
-    *: none
-    e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BUTTONLIGHT_BRIGHTNESS
   desc: in settings_menu
   user:
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "Јачина светла за тастере"
+    buttonlight_brightness: "Јачина светла за тастере"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "Јачина светла за тастере"
+    buttonlight_brightness: "Јачина светла за тастере"
   </voice>
 </phrase>
 <phrase>

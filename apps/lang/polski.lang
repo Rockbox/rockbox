@@ -3840,18 +3840,18 @@
   user: 
   <source>
     *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
+    button_light: "Wygaszanie klawiszy"
     e200*: "Wygaszanie koła sterującego"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Wygaszanie klawiszy"
   </dest>
   <voice>
     *: none
+    button_light: "Wygaszanie klawiszy"
     e200*: "Wygaszanie koła sterującego"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Wygaszanie klawiszy"
   </voice>
 </phrase>
 <phrase>
@@ -3860,15 +3860,15 @@
   user: 
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "Jasność podświetlenia przycisków"
+    buttonlight_brightness: "Jasność podświetlenia przycisków"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "Jasność podświetlenia przycisków"
+    buttonlight_brightness: "Jasność podświetlenia przycisków"
   </voice>
 </phrase>
 <phrase>

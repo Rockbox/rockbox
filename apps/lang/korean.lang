@@ -10760,19 +10760,19 @@
   desc: in settings_menu
   user:
   <source>
-    *: ""
+    *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100: "Button Light Timeout"
   </source>
   <dest>
-    *: ""
+    *: none
+    button_light: "버튼 조명 시간"
     e200*: "휠버튼 조명 시간"
-    clip,c200,gigabeatf,mrobe100: "버튼 조명 시간"
   </dest>
   <voice>
-    *: ""
+    *: none
+    button_light: "버튼 조명 시간"
     e200*: "휠버튼 조명 시간"
-    clip,c200,gigabeatf,mrobe100: "버튼 조명 시간"
   </voice>
 </phrase>
 <phrase>
@@ -10780,16 +10780,16 @@
   desc: in settings_menu
   user:
   <source>
-    *: ""
-    gigabeatf: "Button Light Brightness"
+    *: none
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
-    *: ""
-    gigabeatf: "버튼 조명 밝기"
+    *: none
+    buttonlight_brightness: "버튼 조명 밝기"
   </dest>
   <voice>
-    *: ""
-    gigabeatf: "버튼 조명 밝기"
+    *: none
+    buttonlight_brightness: "버튼 조명 밝기"
   </voice>
 </phrase>
 <phrase>

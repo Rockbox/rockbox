@@ -10143,15 +10143,15 @@
   user:
   <source>
     *: none
-    gigabeatf,mrobe100: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf,mrobe100: "Helderheid Licht Knoppen"
+    buttonlight_brightness: "Helderheid Licht Knoppen"
   </dest>
   <voice>
     *: none
-    gigabeatf,mrobe100: "Helderheid Licht Knoppen"
+    buttonlight_brightness: "Helderheid Licht Knoppen"
   </voice>
 </phrase>
 <phrase>
@@ -10275,18 +10275,18 @@
   user:
   <source>
     *: none
+    button_light: "Button Light Timeout"
     e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
+    button_light: "Knoppen Licht Vertraging"
     e200*: "Wiel Licht Vertraging"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Knoppen Licht Vertraging"
   </dest>
   <voice>
     *: none
+    button_light: "Knoppen Licht Vertraging"
     e200*: "Wiel Licht Vertraging"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Knoppen Licht Vertraging"
   </voice>
 </phrase>
 <phrase>

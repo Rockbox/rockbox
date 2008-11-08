@@ -28,6 +28,14 @@ backlight_fade
 battery_types
 #endif
 
+#if defined(HAVE_BUTTON_LIGHT)
+button_light
+#endif
+
+#if defined(HAVE_BUTTONLIGHT_BRIGHTNESS)
+buttonlight_brightness
+#endif
+
 #if defined(HAVE_DIRCACHE)
 dircache
 #endif
