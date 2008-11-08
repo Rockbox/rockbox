@@ -440,6 +440,9 @@ while(<LANG>) {
                         print STDERR "$input:$line:1: warning: voice before line lacks quotes ($voice)!\n";
                         $voice='""';
                     }
+                    if($dest eq '""' && $phrase{'desc'} !~ /deprecated/i && $idstr !~ /^VOICE/) {
+                        print STDERR "$input:$line:1: warning: empty dest before line in non-deprecated phrase!\n";
+                    }
 
                     # Use the ID name to figure out which id number range we
                     # should use for this phrase. Voice-only strings are
