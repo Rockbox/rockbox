@@ -46,12 +46,12 @@ void _backlight_on(void)
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
 #endif
-    as3525_codec_write(AS3514_DCDC15, backlight_brightness);
+    ascodec_write(AS3514_DCDC15, backlight_brightness);
 }
 
 void _backlight_off(void)
 {
-    as3525_codec_write(AS3514_DCDC15, 0x0);
+    ascodec_write(AS3514_DCDC15, 0x0);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
 #endif
