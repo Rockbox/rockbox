@@ -10225,11 +10225,11 @@
   user:
   <source>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "Edit mode: %s %s"
   </source>
   <dest>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "Edit mode: %s %s"
   </dest>
   <voice>
     *: none
@@ -10242,11 +10242,11 @@
   user:
   <source>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Cutoff"
   </source>
   <dest>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Cutoff"
   </dest>
   <voice>
     *: none

@@ -240,18 +240,19 @@ enum eq_type {
     HIGH_SHELF
 };
 
+/* Size of just the slider/srollbar */
+#define SCROLLBAR_SIZE 6
+
 /* Draw the UI for a whole EQ band */
 static int draw_eq_slider(struct screen * screen, int x, int y,
     int width, int cutoff, int q, int gain, bool selected,
-    enum eq_slider_mode mode, enum eq_type type)
+    enum eq_slider_mode mode, int band)
 {
     char buf[26];
-    const char separator[2] = " ";
     int steps, min_item, max_item;
     int abs_gain = abs(gain);
-    int current_x, total_height, separator_width, separator_height;
+    int x1, x2, y1, total_height;
     int w, h;
-    const int slider_height = 6;  
 
     switch(mode) {
     case Q:
@@ -273,159 +274,108 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
     }
 
     /* Start two pixels in, one for border, one for margin */
-    current_x = x + 2;
-
-    /* Figure out how large our separator string is */
-    screen->getstringsize(separator, &separator_width, &separator_height);
-
-    /* Total height includes margins, text, and line selector */
-    total_height = separator_height + slider_height + 2 + 3;
+    x1 = x + 2;
+    y1 = y + 2;
 
     /* Print out the band label */
-    if (type == LOW_SHELF) {
-        screen->putsxy(current_x, y + 2, "LS:");
+    if (band == 0) {
+        screen->putsxy(x1, y1, "LS: ");
         screen->getstringsize("LS:", &w, &h);
-    } else if (type == HIGH_SHELF) {
-        screen->putsxy(current_x, y + 2, "HS:");
+    } else if (band == 4) {
+        screen->putsxy(x1, y1, "HS: ");
         screen->getstringsize("HS:", &w, &h);
     } else {
-        screen->putsxy(current_x, y + 2, "PK:");
-        screen->getstringsize("PK:", &w, &h);
-    }
-    current_x += w;
-
-    /* Print separator */
-    screen->set_drawmode(DRMODE_SOLID);
-    screen->putsxy(current_x, y + 2, separator);
-    current_x += separator_width;
-#if NB_SCREENS > 1
-    if (screen->screen_type == SCREEN_REMOTE) {
-        if (mode == GAIN) {
-            screen->putsxy(current_x, y + 2, str(LANG_GAIN));
-            screen->getstringsize(str(LANG_GAIN), &w, &h);
-        } else if (mode == CUTOFF) {
-            screen->putsxy(current_x, y + 2, str(LANG_EQUALIZER_BAND_CUTOFF));
-            screen->getstringsize(str(LANG_EQUALIZER_BAND_CUTOFF), &w, &h);
-        } else {
-            screen->putsxy(current_x, y + 2, str(LANG_EQUALIZER_BAND_Q));
-            screen->getstringsize(str(LANG_EQUALIZER_BAND_Q), &w, &h);
-        }
-
-        /* Draw horizontal slider. Reuse scrollbar for this */
-        gui_scrollbar_draw(screen, x + 3, y + h + 3, width - 6, slider_height, steps,
-                           min_item, max_item, HORIZONTAL);
-    
-        /* Print out cutoff part */
-        snprintf(buf, sizeof(buf), "%sGain     %s%2d.%ddB",mode==GAIN?" > ":"   ", gain < 0 ? "-" : " ",
-                 abs_gain / EQ_USER_DIVISOR, abs_gain % EQ_USER_DIVISOR);
+        snprintf(buf, sizeof(buf),  "PK%d:", band);
+        screen->putsxy(x1, y1, buf);
         screen->getstringsize(buf, &w, &h);
-        y = 3*h;
-        screen->putsxy(0, y, buf);
-        /* Print out cutoff part */
-        snprintf(buf, sizeof(buf),  "%sCutoff   %5dHz",mode==CUTOFF?" > ":"   ", cutoff);
-        y += h;
-        screen->putsxy(0, y, buf);
-        snprintf(buf, sizeof(buf), "%sQ setting %d.%d Q",mode==Q?" > ":"   ", q / EQ_USER_DIVISOR,
-                 q % EQ_USER_DIVISOR);
-        y += h;
-        screen->putsxy(0, y, buf);
-        return y;
     }
-#endif
-    
-    /* Print out gain part of status line */
-    snprintf(buf, sizeof(buf), "%s%2d.%ddB", gain < 0 ? "-" : " ",
-        abs_gain / EQ_USER_DIVISOR, abs_gain % EQ_USER_DIVISOR);
 
+    screen->getstringsize("A", &w, &h);
+    x1 += 5*w; /* 4 chars for label + 1 space = 5 */
+
+    /* Print out gain part of status line (left justify after label) */
     if (mode == GAIN && selected)
         screen->set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
+    else
+        screen->set_drawmode(DRMODE_SOLID);
 
-    screen->putsxy(current_x, y + 2, buf);
+    snprintf(buf, sizeof(buf), "%s%2d.%d%s", gain < 0 ? "-" : " ",
+        abs_gain / EQ_USER_DIVISOR, abs_gain % EQ_USER_DIVISOR,
+        screen->lcdwidth >= 160 ? "dB" : "");
+    screen->putsxy(x1, y1, buf);
     screen->getstringsize(buf, &w, &h);
-    current_x += w;
+    x1 += w;
 
-    /* Print separator */
-    screen->set_drawmode(DRMODE_SOLID);
-    screen->putsxy(current_x, y + 2, separator);
-    current_x += separator_width;
-
-    /* Print out cutoff part of status line */
-    snprintf(buf, sizeof(buf),  "%5dHz", cutoff);
-
-    if (mode == CUTOFF && selected)
-        screen->set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
-
-    screen->putsxy(current_x, y + 2, buf);
-    screen->getstringsize(buf, &w, &h);
-    current_x += w;
-
-    /* Print separator */
-    screen->set_drawmode(DRMODE_SOLID);
-    screen->putsxy(current_x, y + 2, separator);
-    current_x += separator_width;
-
-    /* Print out Q part of status line */
-    snprintf(buf, sizeof(buf), "%d.%d Q", q / EQ_USER_DIVISOR,
-        q % EQ_USER_DIVISOR);
-
+    /* Print out Q part of status line (right justify) */
     if (mode == Q && selected)
         screen->set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
+    else
+        screen->set_drawmode(DRMODE_SOLID);
 
-    screen->putsxy(current_x, y + 2, buf);
+    snprintf(buf, sizeof(buf), "%d.%d%s", q / EQ_USER_DIVISOR,
+             q % EQ_USER_DIVISOR, screen->lcdwidth >= 160 ? " Q" : "");
     screen->getstringsize(buf, &w, &h);
-    current_x += w;
+    x2 = x + width - w - 2;
+    screen->putsxy(x2, y1, buf);
 
-    screen->set_drawmode(DRMODE_SOLID);
+    /* Print out cutoff part of status line (center between gain & Q) */
+    if (mode == CUTOFF && selected)
+        screen->set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
+    else
+        screen->set_drawmode(DRMODE_SOLID);
+    
+    snprintf(buf, sizeof(buf),  "%5d%s", cutoff,
+             screen->lcdwidth >= 160 ? "Hz" : "");
+    screen->getstringsize(buf, &w, &h);
+    x1 = x1 + (x2 - x1 - w)/2;
+    screen->putsxy(x1, y1, buf);
 
     /* Draw selection box */
+    total_height = 3 + h + 1 + SCROLLBAR_SIZE + 3;
+    screen->set_drawmode(DRMODE_SOLID);
     if (selected) {
         screen->drawrect(x, y, width, total_height);
     }
 
     /* Draw horizontal slider. Reuse scrollbar for this */
-    gui_scrollbar_draw(screen, x + 3, y + h + 3, width - 6, slider_height, steps,
-        min_item, max_item, HORIZONTAL);
+    gui_scrollbar_draw(screen, x + 3, y1 + h + 1, width - 6, SCROLLBAR_SIZE,
+                       steps, min_item, max_item, HORIZONTAL);
 
     return total_height;
 }
 
 /* Draw's all the EQ sliders. Returns the total height of the sliders drawn */
-static int draw_eq_sliders(int current_band, enum eq_slider_mode mode)
+static void draw_eq_sliders(struct screen * screen, int x, int y,
+                            int nb_eq_sliders, int start_item,
+                            int current_band, enum eq_slider_mode mode)
 {
     int i, gain, q, cutoff;
-    int height = 2; /* Two pixel margin */
-    int slider_width[NB_SCREENS];
+    int height = y;
     int *setting = &global_settings.eq_band0_cutoff;
-    enum eq_type type;
 
-    FOR_NB_SCREENS(i)
-        slider_width[i] = screens[i].getwidth() - 4; /* 2 pixel margin
-                                                                    each side */
+    start_item = MIN(start_item, 5-nb_eq_sliders);
     for (i=0; i<5; i++) {
         cutoff = *setting++;
         q = *setting++;
         gain = *setting++;
 
-        if (i == 0) {
-            type = LOW_SHELF;
-        } else if (i == 4) {
-            type = HIGH_SHELF;
-        } else {
-            type = PEAK;
-        }
-        height += draw_eq_slider(&(screens[SCREEN_MAIN]), 2, height,
-                      slider_width[SCREEN_MAIN], cutoff, q, gain, 
-                      i == current_band, mode, type);
-#if NB_SCREENS > 1
-        if (i == current_band)
-            draw_eq_slider(&(screens[SCREEN_REMOTE]), 2, 0,
-                      slider_width[SCREEN_REMOTE], cutoff, q, gain,1, mode, type);
-#endif
-        /* add a margin */
-        height += 2;
-    }
+        if (i == start_item + nb_eq_sliders)
+            break;
 
-    return height;
+        if (i >= start_item) {
+            height += draw_eq_slider(screen, x, height, screen->lcdwidth - x - 1,
+                                     cutoff, q, gain, i == current_band, mode,
+                                     i);
+            /* add a margin */
+            height++;
+        }
+    }
+    if (nb_eq_sliders != 5)
+        gui_scrollbar_draw(screen, 0, y, SCROLLBAR_SIZE - 1,
+                           screen->lcdheight - y, 5,
+                           start_item, start_item + nb_eq_sliders,
+                           VERTICAL);
+    return;
 }
 
 /* Provides a graphical means of editing the EQ settings */
@@ -436,16 +386,34 @@ bool eq_menu_graphical(void)
     bool has_changed = false;
     int button;
     int *setting;
-    int current_band, y, step, fast_step, min, max, voice_unit;
+    int current_band, x, y, step, fast_step, min, max, voice_unit;
     enum eq_slider_mode mode;
     enum eq_type current_type;
     char buf[24];
-    int i;
+    int i, w, h, height, start_item, nb_eq_sliders[NB_SCREENS];
+
 
     FOR_NB_SCREENS(i) {
         screens[i].setfont(FONT_SYSFIXED);
         screens[i].clear_display();
+
+        /* Figure out how many sliders can be drawn on the screen */
+        screens[i].getstringsize("A", &w, &h);
+
+        /* Total height includes margins (1), text, slider, and line selector (1) */
+        height = 3 + h + 1 + SCROLLBAR_SIZE + 3;
+        nb_eq_sliders[i] = screens[i].lcdheight / height;
+
+        /* Make sure the "Edit Mode" text fits too */
+        height = nb_eq_sliders[i]*height + h + 2;
+        if (height > screens[i].lcdheight)
+            nb_eq_sliders[i]--;
+
+        if (nb_eq_sliders[i] > 5)
+            nb_eq_sliders[i] = 5;
     }
+
+    y = h + 1;
     
     /* Start off editing gain on the first band */
     mode = GAIN;
@@ -453,63 +421,77 @@ bool eq_menu_graphical(void)
     current_band = 0;
     
     while (!exit_request) {
-        
-        FOR_NB_SCREENS(i) {
-            /* Clear the screen. The drawing routines expect this */
-            screens[i].clear_display();        
+        FOR_NB_SCREENS(i)
+        {
+            screens[i].clear_display();
+
+            /* Set pointer to the band data currently editable */
+            if (mode == GAIN) {
+                /* gain */
+                setting = &global_settings.eq_band0_gain;
+                setting += current_band * 3;
+
+                step = EQ_GAIN_STEP;
+                fast_step = EQ_GAIN_FAST_STEP;
+                min = EQ_GAIN_MIN;
+                max = EQ_GAIN_MAX;
+                voice_unit = UNIT_DB;
+            
+                snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
+                         str(LANG_SYSFONT_GAIN), "(dB)");
+
+                screens[i].putsxy(0, 0, buf);
+            } else if (mode == CUTOFF) {
+                /* cutoff */
+                setting = &global_settings.eq_band0_cutoff;
+                setting += current_band * 3;
+
+                step = EQ_CUTOFF_STEP;
+                fast_step = EQ_CUTOFF_FAST_STEP;
+                min = EQ_CUTOFF_MIN;
+                max = EQ_CUTOFF_MAX;
+                voice_unit = UNIT_HERTZ;
+
+                snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
+                         str(LANG_SYSFONT_EQUALIZER_BAND_CUTOFF), "(Hz)");
+
+                screens[i].putsxy(0, 0, buf);
+            } else {
+                /* Q */
+                setting = &global_settings.eq_band0_q;
+                setting += current_band * 3;
+
+                step = EQ_Q_STEP;
+                fast_step = EQ_Q_FAST_STEP;
+                min = EQ_Q_MIN;
+                max = EQ_Q_MAX;
+                voice_unit = UNIT_INT;
+
+                snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
+                         str(LANG_EQUALIZER_BAND_Q), "");
+
+                screens[i].putsxy(0, 0, buf);
+            }
+
+            /* Draw scrollbar if needed */
+            if (nb_eq_sliders[i] != 5)
+            {
+                if (current_band == 0) {
+                    start_item = 0;
+                } else if (current_band == 4) {
+                    start_item = 5 - nb_eq_sliders[i];
+                } else {
+                    start_item = current_band - 1;
+                }
+                x = SCROLLBAR_SIZE;
+            } else {
+                x = 1;
+                start_item = 0;
+            }
             /* Draw equalizer band details */
-            y = draw_eq_sliders(current_band, mode);
-        }
+            draw_eq_sliders(&screens[i], x, y, nb_eq_sliders[i], start_item,
+                            current_band, mode);
 
-        /* Set pointer to the band data currently editable */
-        if (mode == GAIN) {
-            /* gain */
-            setting = &global_settings.eq_band0_gain;
-            setting += current_band * 3;
-
-            step = EQ_GAIN_STEP;
-            fast_step = EQ_GAIN_FAST_STEP;
-            min = EQ_GAIN_MIN;
-            max = EQ_GAIN_MAX;
-            voice_unit = UNIT_DB;
-            
-            snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
-                str(LANG_SYSFONT_GAIN));
-            
-            screens[SCREEN_MAIN].putsxy(2, y, buf);
-        } else if (mode == CUTOFF) {
-            /* cutoff */
-            setting = &global_settings.eq_band0_cutoff;
-            setting += current_band * 3;
-
-            step = EQ_CUTOFF_STEP;
-            fast_step = EQ_CUTOFF_FAST_STEP;
-            min = EQ_CUTOFF_MIN;
-            max = EQ_CUTOFF_MAX;
-            voice_unit = UNIT_HERTZ;
-
-            snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
-                str(LANG_SYSFONT_EQUALIZER_BAND_CUTOFF));
-            
-            screens[SCREEN_MAIN].putsxy(2, y, buf);
-        } else {
-            /* Q */
-            setting = &global_settings.eq_band0_q;
-            setting += current_band * 3;
-
-            step = EQ_Q_STEP;
-            fast_step = EQ_Q_FAST_STEP;
-            min = EQ_Q_MIN;
-            max = EQ_Q_MAX;
-            voice_unit = UNIT_INT;
-            
-            snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
-                str(LANG_EQUALIZER_BAND_Q));
-            
-            screens[SCREEN_MAIN].putsxy(2, y, buf);
-        }
-
-        FOR_NB_SCREENS(i) {
             screens[i].update();
         }
         
