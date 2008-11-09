@@ -777,28 +777,9 @@ static inline void core_sleep(void)
         "msr    cpsr_c, r0      \n" /* Enable IRQ, restore FIQ */
         :  :  : "r0", "r1", "r2");
 }
-#elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
-static inline void core_sleep(void)
-{
-    /* Single core only for now. Use the generic ARMv5 wait for IRQ */
-    asm volatile (
-        "mov r0, #0                \n"
-        "mcr p15, 0, r0, c7, c0, 4 \n" /* Wait for interrupt */
-        : : : "r0"
-    );
-    enable_irq();
-}
-#elif CONFIG_CPU == IMX31L
-static inline void core_sleep(void)
-{
-    asm volatile (
-        "mov r0, #0                \n"
-        "mcr p15, 0, r0, c7, c0, 4 \n" /* Wait for interrupt */
-        : : : "r0"
-    );
-    enable_irq();
-}
-#elif CONFIG_CPU == DM320
+#elif defined(CPU_TCC780X) || defined(CPU_TCC77X) /* Single core only for now */ \
+|| CONFIG_CPU == IMX31L || CONFIG_CPU == DM320 || CONFIG_CPU == AS3525
+/* Use the generic ARMv4/v5 wait for IRQ */
 static inline void core_sleep(void)
 {
     asm volatile (
