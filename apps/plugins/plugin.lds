@@ -86,6 +86,10 @@ OUTPUT_FORMAT(elf32-sh)
 #define IRAMSIZE 0xc000*/
 #define IRAM DRAM
 #define IRAMSIZE 0
+#elif CONFIG_CPU==AS3525
+#define IRAMORIG 0x0
+#define IRAMSIZE 0x50000
+#define DRAMORIG 0x30000000
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
 #endif
