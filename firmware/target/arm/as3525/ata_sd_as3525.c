@@ -187,7 +187,6 @@ static int sd_init_card(const int drive)
 {
     unsigned int  c_size;
     unsigned long c_mult;
-
     int response;
     int max_tries = 100; /* max acmd41 attemps */
     bool sdhc;
@@ -372,11 +371,10 @@ static void init_pl180_controller(const int drive)
     MMC_CLOCK(drive) = MCI_CLOCK_ENABLE;
     MMC_CLOCK(drive) &= ~MCI_CLOCK_POWERSAVE;
 
+#else /* controller already initialized by bootloader */
+
     /* set MCLK divider */
     mci_set_clock_divider(drive, 200);
-#else
-    /* controller already initialized by bootloader */
-    (void)drive;
 #endif /* BOOTLOADER */
 }
 
@@ -384,6 +382,7 @@ int sd_init(void)
 {
     int ret;
 
+#ifdef BOOTLOADER /* No need to do twice the same thing */
     CGU_IDE =   (1<<7)  /* AHB interface enable */  |
                 (1<<6)  /* interface enable */      |
                 (2<<2)  /* clock didiver = 2+1 */   |
@@ -397,6 +396,7 @@ int sd_init(void)
     CCU_IO &= ~8;           /* bits 3:2 = 01, xpd is SD interface */
     CCU_IO |= 4;
 
+#endif
     init_pl180_controller(NAND_AS3525);
     ret = sd_init_card(NAND_AS3525);
     if(ret < 0)
