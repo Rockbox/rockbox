@@ -18,6 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h" /* for HAVE_MULTIVOLUME */
 #include "fat.h"
 #include "hotswap.h"
 #include "ata-sd-target.h"
@@ -64,43 +65,7 @@
 #define CMD_ERROR_2     0x2 /* SD did not respond to command (either it doesn't
                                understand the command or is not inserted) */
 
-/* SD States */
-#define IDLE            0
-#define READY           1
-#define IDENT           2
-#define STBY            3
-#define TRAN            4
-#define DATA            5
-#define RCV             6
-#define PRG             7
-#define DIS             8
-
 #define FIFO_LEN        16          /* FIFO is 16 words deep */
-
-/* SD Commands */
-#define GO_IDLE_STATE         0
-#define ALL_SEND_CID          2
-#define SEND_RELATIVE_ADDR    3
-#define SET_DSR               4
-#define SWITCH_FUNC           6
-#define SELECT_CARD           7
-#define DESELECT_CARD         7
-#define SEND_IF_COND          8
-#define SEND_CSD              9
-#define SEND_CID             10
-#define STOP_TRANSMISSION    12
-#define SEND_STATUS          13
-#define GO_INACTIVE_STATE    15
-#define SET_BLOCKLEN         16
-#define READ_SINGLE_BLOCK    17
-#define READ_MULTIPLE_BLOCK  18
-#define SEND_NUM_WR_BLOCKS   22
-#define WRITE_BLOCK          24
-#define WRITE_MULTIPLE_BLOCK 25
-#define ERASE_WR_BLK_START   32
-#define ERASE_WR_BLK_END     33
-#define ERASE                38
-#define APP_CMD              55
 
 #define EC_OK                    0
 #define EC_FAILED                1
@@ -124,17 +89,6 @@
 #define EC_COMMAND              19
 #define NUM_EC                  20
 
-/* Application Specific commands */
-#define SET_BUS_WIDTH   6
-#define SD_APP_OP_COND  41
-
-/** global, exported variables **/
-#ifdef HAVE_MULTIVOLUME
-#define NUM_DRIVES 2
-#else
-#define NUM_DRIVES 1
-#endif
-
 /* for compatibility */
 static long last_disk_activity = -1;
 
@@ -153,7 +107,7 @@ struct sd_card_status
     int retry_max;
 };
 
-static struct sd_card_status sd_status[NUM_DRIVES] =
+static struct sd_card_status sd_status[NUM_VOLUMES] =
 {
     { 0, 1  },
 #ifdef HAVE_MULTIVOLUME
