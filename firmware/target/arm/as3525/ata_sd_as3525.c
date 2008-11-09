@@ -370,12 +370,10 @@ static void init_pl180_controller(const int drive)
 
     MMC_CLOCK(drive) = MCI_CLOCK_ENABLE;
     MMC_CLOCK(drive) &= ~MCI_CLOCK_POWERSAVE;
-
-#else /* controller already initialized by bootloader */
+#endif /* BOOTLOADER */
 
     /* set MCLK divider */
     mci_set_clock_divider(drive, 200);
-#endif /* BOOTLOADER */
 }
 
 int sd_init(void)
