@@ -78,7 +78,7 @@ struct partinfo* disk_init(IF_MV_NONVOID(int drive))
         return NULL; /* out of space in table */
 #else
     struct partinfo* pinfo = part;
-    int drive;
+    const int drive = 0;
     (void)drive;
 #endif
 
