@@ -19,9 +19,9 @@
  *
  ****************************************************************************/
 
-void as3525_codec_init(void);
+void ascodec_init(void);
 
-int as3525_codec_write(int index, int value);
-int as3525_codec_read(int index);
+int ascodec_write(int index, int value);
+int ascodec_read(int index);
 
 

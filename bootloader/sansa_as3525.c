@@ -49,7 +49,7 @@ void main(void)
     lcd_init();
     show_logo();
 
-    as3525_codec_init();  /* Required for backlight on e200v2 */
+    ascodec_init();  /* Required for backlight on e200v2 */
     _backlight_on();
 
     delay = 0x3000000;

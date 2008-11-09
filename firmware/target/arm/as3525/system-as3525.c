@@ -255,9 +255,9 @@ int system_memory_guard(int newmode)
 void power_off(void)
 {
     int system;
-    system = as3525_codec_read(0x20);
+    system = ascodec_read(0x20);
     system &= ~1; /* clear bit 0 of system register */
-    as3525_codec_write(0x20, system);
+    ascodec_write(0x20, system);
 
     /* TODO : turn off peripherals properly ? */
 

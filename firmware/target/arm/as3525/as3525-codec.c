@@ -57,7 +57,7 @@
 
 
 /* initialises the internal i2c bus and prepares for transfers to the codec */
-void as3525_codec_init(void)
+void ascodec_init(void)
 {
     /* reset device */
     CCU_SRC = CCU_SRC_I2C_AUDIO_EN;
@@ -86,7 +86,7 @@ static int i2c_busy(void)
 
 
 /* returns 0 on success, <0 otherwise */
-int as3525_codec_write(int index, int value)
+int ascodec_write(int index, int value)
 {
     if (index == 0x21) {
         /* prevent setting of the LREG_CP_not bit */
@@ -112,7 +112,7 @@ int as3525_codec_write(int index, int value)
 
 
 /* returns value read on success, <0 otherwise */
-int as3525_codec_read(int index)
+int ascodec_read(int index)
 {
     /* check if still busy */
     if (i2c_busy()) {
