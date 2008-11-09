@@ -26,20 +26,48 @@
     .global    start
 start:
     /* Exception vectors */
-    b       newstart
-    b       undef_instr_handler
-    b       software_int_handler
-    b       prefetch_abort_handler
-    b       data_abort_handler
-    b       reserved_handler
-    b       irq_handler
-    b       fiq_handler
+    ldr     pc, [pc, #28]
+    ldr     pc, [pc, #28]
+    ldr     pc, [pc, #28]
+    ldr     pc, [pc, #28]
+    ldr     pc, [pc, #28]
+    ldr     pc, [pc, #28]
+    ldr     pc, [pc, #28]
+    ldr     pc, [pc, #28]
+
 #if CONFIG_CPU==S5L8700
     .word 0x43554644 /* DFUC */
+#else
+    .word 0xdeadbeef /* to keep the same PC offsets */
 #endif
+
+.word newstart
+.word undef_instr_handler
+.word software_int_handler
+.word prefetch_abort_handler
+.word data_abort_handler
+.word reserved_handler
+.word irq_handler
+.word fiq_handler
+
+vectors_end:
+
+    .text
+
 newstart:
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
-     
+
+#if CONFIG_CPU==AS3525 && !defined(BOOTLOADER) /* relocate vectors */
+    mov     r1, #0              @ destination
+    ldr     r2, =start          @ source
+    ldr     r3, =vectors_end    @ end
+
+1:  ldr     r0, [r2], #4
+    str     r0, [r1], #4
+    cmp     r3, r2
+    bne     1b
+#endif
+
     /* Initialise bss section to zero */
     ldr     r2, =_edata
     ldr     r3, =_end
@@ -76,9 +104,6 @@ newstart:
     msr     cpsr_c, #0xd3
     bl      main
 
-
-    .text
-/*    .global UIE*/
 
 /* All illegal exceptions call into UIE with exception address as first
  * parameter. This is calculated differently depending on which exception
