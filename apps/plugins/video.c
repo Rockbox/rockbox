@@ -178,7 +178,8 @@ static struct
     int granularity; /* common multiple of block and sector size */
     unsigned char* pBufStart; /* start of ring buffer */
     unsigned char* pBufEnd; /* end of ring buffer */
-    unsigned char* pOSD; /* OSD memory (112 bytes for 112*8 pixels) */
+    int osd_ypos;
+    int osd_height;
 
     int vidcount; /* how many video blocks are known in a row */
     unsigned char* pBufFill; /* write pointer for disk, owned by main task */
@@ -219,22 +220,29 @@ int Available(unsigned char* pSnapshot)
 /* debug function to draw buffer indicators */
 void DrawBuf(void)
 {
-    int fill, video, audio;
+    int ypos, fill, video, audio;
 
-    rb->memset(gBuf.pOSD, 0x10, LCD_WIDTH); /* draw line */
-    gBuf.pOSD[0] = gBuf.pOSD[LCD_WIDTH-1] = 0xFE; /* ends */
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
+    
+    ypos = gBuf.osd_ypos + gBuf.osd_height/2 - 3; /* center vertically */
+
+    rb->lcd_hline(1, LCD_WIDTH-2, ypos + 3);
+    rb->lcd_vline(0, ypos, ypos + 6);
+    rb->lcd_vline(LCD_WIDTH-1, ypos, ypos + 6);
 
     /* calculate new tick positions */
     fill = 1 + ((gBuf.pBufFill - gBuf.pBufStart) * (LCD_WIDTH-2)) / gBuf.bufsize;
     video = 1 + ((gBuf.pReadVideo - gBuf.pBufStart) * (LCD_WIDTH-2)) / gBuf.bufsize;
     audio = 1 + ((gBuf.pReadAudio - gBuf.pBufStart) * (LCD_WIDTH-2)) / gBuf.bufsize;
 
-    gBuf.pOSD[fill] |= 0x20; /* below the line, two pixels */
-    gBuf.pOSD[video] |= 0x08; /* one above */
-    gBuf.pOSD[audio] |= 0x04; /* two above */
+    rb->lcd_drawpixel(fill, ypos + 4);
+    rb->lcd_drawpixel(video, ypos + 2);
+    rb->lcd_drawpixel(audio, ypos + 1);
 
     if (gPlay.state == paused) /* we have to draw ourselves */
-        rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
+        rb->lcd_update_rect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
     else
         gPlay.bDirtyOSD = true; /* redraw it with next timer IRQ */
 }
@@ -243,33 +251,60 @@ void DrawBuf(void)
 /* helper function to draw a position indicator */
 void DrawPosition(int pos, int total)
 {
-    int w,h;
+    int w, h;
     int sec; /* estimated seconds */
+    int ypos;
 
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 
-    /* print the estimated position */   
+    /* print the estimated position */
     sec = pos / (gFileHdr.bps_average/8);
     if (sec < 100*60) /* fits into mm:ss format */
         rb->snprintf(gPrint, sizeof(gPrint), "%02d:%02dm", sec/60, sec%60);
     else /* a very long clip, hh:mm format */
         rb->snprintf(gPrint, sizeof(gPrint), "%02d:%02dh", sec/3600, (sec/60)%60);
-    rb->lcd_puts(0, 7, gPrint);
 
-    /* draw a slider over the rest of the line */
     rb->lcd_getstringsize(gPrint, &w, &h);
     w++;
-    rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],w, LCD_HEIGHT-7, LCD_WIDTH-w,
-                             7, total, 0, pos, HORIZONTAL);
+    ypos = gBuf.osd_ypos + (gBuf.osd_height - h) / 2;
+    rb->lcd_putsxy(0, ypos, gPrint);
+
+    /* draw a slider over the rest of the line */
+    rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN], w, ypos, LCD_WIDTH-w,
+                             h, total, 0, pos, HORIZONTAL);
 
     if (gPlay.state == paused) /* we have to draw ourselves */
-        rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
+        rb->lcd_update_rect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
     else /* let the display time do it */
     {
-        gPlay.nTimeOSD = 70;
+        gPlay.nTimeOSD = FPS;
         gPlay.bDirtyOSD = true; /* redraw it with next timer IRQ */
     }
 }
 
+/* Put text on OSD and activate it for 1 second */
+void osd_show_text(void)
+{
+    int h, ypos;
+
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
+
+    rb->lcd_getstringsize(gPrint, NULL, &h);
+    ypos = gBuf.osd_ypos + (gBuf.osd_height - h) / 2;
+    rb->lcd_putsxy(0, ypos, gPrint);
+
+    if (gPlay.state == paused) /* we have to draw ourselves */
+        rb->lcd_update_rect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
+    else /* let the display time do it */
+    {
+        gPlay.nTimeOSD = FPS; /* display it for 1 sec */
+        gPlay.bDirtyOSD = true; /* let the refresh copy it to LCD */
+    }
+}
 
 /* helper function to change the volume by a certain amount, +/- */
 void ChangeVolume(int delta)
@@ -284,15 +319,9 @@ void ChangeVolume(int delta)
     {
         rb->sound_set(SOUND_VOLUME, vol);
         rb->global_settings->volume = vol;
+        
         rb->snprintf(gPrint, sizeof(gPrint), "Vol: %d dB", vol);
-        rb->lcd_puts(0, 7, gPrint);
-        if (gPlay.state == paused) /* we have to draw ourselves */
-            rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
-        else /* let the display time do it */
-        {
-            gPlay.nTimeOSD = 50; /* display it for 50 frames */
-            gPlay.bDirtyOSD = true; /* let the refresh copy it to LCD */
-        }
+        osd_show_text();
     }
 }
 
@@ -313,15 +342,9 @@ void ChangeContrast(int delta)
     {
         rb->lcd_set_contrast(contrast);
         mycontrast = contrast;
+
         rb->snprintf(gPrint, sizeof(gPrint), "Contrast: %d", contrast);
-        rb->lcd_puts(0, 7, gPrint);
-        if (gPlay.state == paused) /* we have to draw ourselves */
-            rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
-        else /* let the display time do it */
-        {
-            gPlay.nTimeOSD = 50; /* display it for 50 frames */
-            gPlay.bDirtyOSD = true; /* let the refresh copy it to LCD */
-        }
+        osd_show_text();
     }
 }
 
@@ -356,21 +379,20 @@ void timer4_isr(void)
     int height; /* height to display */
 
     /* reduce height if we have OSD on */
-    height = gFileHdr.video_height/8;        
+    height = gFileHdr.video_height;
     if (gPlay.nTimeOSD > 0)
     {
         gPlay.nTimeOSD--;
-        height = MIN(LCD_HEIGHT/8-1, height); /* reserve bottom line */
+        height = MIN(gBuf.osd_ypos, height);
         if (gPlay.bDirtyOSD)
-        {   /* OSD to bottom line */
-            rb->lcd_blit_mono(gBuf.pOSD, 0, LCD_HEIGHT/8-1,
-                LCD_WIDTH, 1, LCD_WIDTH);
+        {
+            rb->lcd_update_rect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
             gPlay.bDirtyOSD = false;
         }
     }
 
     rb->lcd_blit_mono(gBuf.pReadVideo, 0, 0,
-        gFileHdr.video_width, height, gFileHdr.video_width);
+        gFileHdr.video_width, height/8, gFileHdr.video_width);
 
     available = Available(gBuf.pReadVideo);
 
@@ -776,7 +798,7 @@ int PlayTick(int fd)
         case VIDEO_DEBUG: /* debug key */
         case VIDEO_DEBUG | BUTTON_REPEAT:
             DrawBuf(); /* show buffer status */
-            gPlay.nTimeOSD = 30;
+            gPlay.nTimeOSD = FPS/2;
             gPlay.bDirtyOSD = true;
             break;
 #endif
@@ -874,10 +896,14 @@ int main(char* filename)
 
     /* init buffer */
     rb->memset(&gBuf, 0, sizeof(gBuf));
-    gBuf.pOSD = rb->lcd_framebuffer + LCD_WIDTH*7; /* last screen line */
     gBuf.pBufStart = rb->plugin_get_audio_buffer((size_t *)&gBuf.bufsize);
     /*gBuf.bufsize = 1700*1024; // test, like 2MB version!!!! */
     gBuf.pBufFill = gBuf.pBufStart; /* all empty */
+    
+    /* init OSD */
+    rb->lcd_getstringsize("X", NULL, &retval);
+    gBuf.osd_height = (retval + 7) & ~7;
+    gBuf.osd_ypos = LCD_HEIGHT - gBuf.osd_height;
 
     /* load file header */
     read_now = sizeof(gFileHdr);
