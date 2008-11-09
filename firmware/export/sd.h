@@ -49,43 +49,43 @@ bool sd_present(IF_MV_NONVOID(int drive));
 long sd_last_disk_activity(void);
 
 /* SD States */
-#define IDLE            0
-#define READY           1
-#define IDENT           2
-#define STBY            3
-#define TRAN            4
-#define DATA            5
-#define RCV             6
-#define PRG             7
-#define DIS             8
+#define SD_IDLE             0
+#define SD_READY            1
+#define SD_IDENT            2
+#define SD_STBY             3
+#define SD_TRAN             4
+#define SD_DATA             5
+#define SD_RCV              6
+#define SD_PRG              7
+#define SD_DIS              8
 
 /* SD Commands */
-#define GO_IDLE_STATE         0
-#define ALL_SEND_CID          2
-#define SEND_RELATIVE_ADDR    3
-#define SET_DSR               4
-#define SWITCH_FUNC           6
-#define SELECT_CARD           7
-#define DESELECT_CARD         7
-#define SEND_IF_COND          8
-#define SEND_CSD              9
-#define SEND_CID             10
-#define STOP_TRANSMISSION    12
-#define SEND_STATUS          13
-#define GO_INACTIVE_STATE    15
-#define SET_BLOCKLEN         16
-#define READ_SINGLE_BLOCK    17
-#define READ_MULTIPLE_BLOCK  18
-#define SEND_NUM_WR_BLOCKS   22
-#define WRITE_BLOCK          24
-#define WRITE_MULTIPLE_BLOCK 25
-#define ERASE_WR_BLK_START   32
-#define ERASE_WR_BLK_END     33
-#define ERASE                38
-#define APP_CMD              55
+#define SD_GO_IDLE_STATE         0
+#define SD_ALL_SEND_CID          2
+#define SD_SEND_RELATIVE_ADDR    3
+#define SD_SET_DSR               4
+#define SD_SWITCH_FUNC           6
+#define SD_SELECT_CARD           7
+#define SD_DESELECT_CARD         7
+#define SD_SEND_IF_COND          8
+#define SD_SEND_CSD              9
+#define SD_SEND_CID             10
+#define SD_STOP_TRANSMISSION    12
+#define SD_SEND_STATUS          13
+#define SD_GO_INACTIVE_STATE    15
+#define SD_SET_BLOCKLEN         16
+#define SD_READ_SINGLE_BLOCK    17
+#define SD_READ_MULTIPLE_BLOCK  18
+#define SD_SEND_NUM_WR_BLOCKS   22
+#define SD_WRITE_BLOCK          24
+#define SD_WRITE_MULTIPLE_BLOCK 25
+#define SD_ERASE_WR_BLK_START   32
+#define SD_ERASE_WR_BLK_END     33
+#define SD_ERASE                38
+#define SD_APP_CMD              55
 
 /* Application Specific commands */
-#define SET_BUS_WIDTH   6
-#define SD_APP_OP_COND  41
+#define SD_SET_BUS_WIDTH    6
+#define SD_APP_OP_COND      41
 
 #endif

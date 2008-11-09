@@ -181,7 +181,7 @@ static int sd_command(unsigned int cmd, unsigned long arg1,
         /* Error sending command */
         return -EC_COMMAND - (STATUS_REG & ERROR_BITS)*100;
 
-    if (cmd == GO_IDLE_STATE)
+    if (cmd == SD_GO_IDLE_STATE)
         return 0; /* no response here */
 
     words = (type == 2) ? 9 : 3;
@@ -226,7 +226,7 @@ static int sd_command(unsigned int cmd, unsigned long arg1,
          *                   [12:9] CURRENT_STATE
          *                      [8] READY_FOR_DATA
          *                    [7:6]
-         *                      [5] APP_CMD
+         *                      [5] SD_APP_CMD
          *                      [4]
          *                      [3] AKE_SEQ_ERROR
          *                      [2] Reserved
@@ -252,7 +252,7 @@ static int sd_wait_for_state(unsigned int state, int id)
 
     while (1)
     {
-        int ret = sd_command(SEND_STATUS, currcard->rca, &response, 1);
+        int ret = sd_command(SD_SEND_STATUS, currcard->rca, &response, 1);
         long us;
 
         if (ret < 0)
@@ -442,7 +442,7 @@ static int sd_select_bank(unsigned char bank)
 
     memset(card_data, 0, 512);
 
-    ret = sd_wait_for_state(TRAN, EC_TRAN_SEL_BANK);
+    ret = sd_wait_for_state(SD_TRAN, EC_TRAN_SEL_BANK);
     if (ret < 0)
         return ret;
 
@@ -453,7 +453,7 @@ static int sd_select_bank(unsigned char bank)
     if (ret < 0)
         return ret;
 
-    SD_STATE_REG = PRG;
+    SD_STATE_REG = SD_PRG;
 
     card_data[0] = bank;
 
@@ -569,11 +569,11 @@ static void sd_init_device(int card_no)
     DEV_RS |= DEV_ATA; /* Reset controller */
     DEV_RS &=~DEV_ATA; /* Clear Reset */
 
-    SD_STATE_REG = TRAN;
+    SD_STATE_REG = SD_TRAN;
 
     REG_5 = 0xf;
 
-    ret = sd_command(GO_IDLE_STATE, 0, NULL, 256);
+    ret = sd_command(SD_GO_IDLE_STATE, 0, NULL, 256);
     if (ret < 0)
         goto card_init_error;
 
@@ -581,19 +581,19 @@ static void sd_init_device(int card_no)
 
 #ifdef HAVE_HOTSWAP
     /* Check for SDHC:
-       - non-SDHC cards simply ignore SEND_IF_COND (CMD8) and we get error -219,
+       - non-SDHC cards simply ignore SD_SEND_IF_COND (CMD8) and we get error -219,
          which we can just ignore and assume we're dealing with standard SD.
        - SDHC cards echo back the argument into the response. This is how we
          tell if the card is SDHC.
      */
-    ret = sd_command(SEND_IF_COND,0x1aa, &response,7);
+    ret = sd_command(SD_SEND_IF_COND,0x1aa, &response,7);
     if ( (ret < 0) && (ret!=-219) )
             goto card_init_error;
 #endif
 
     while ((currcard->ocr & (1 << 31)) == 0) /* until card is powered up */
     {
-        ret = sd_command(APP_CMD, currcard->rca, NULL, 1);
+        ret = sd_command(SD_APP_CMD, currcard->rca, NULL, 1);
         if (ret < 0)
             goto card_init_error;
 
@@ -621,15 +621,15 @@ static void sd_init_device(int card_no)
         }
     }
 
-    ret = sd_command(ALL_SEND_CID, 0, currcard->cid, 2);
+    ret = sd_command(SD_ALL_SEND_CID, 0, currcard->cid, 2);
     if (ret < 0)
         goto card_init_error;
 
-    ret = sd_command(SEND_RELATIVE_ADDR, 0, &currcard->rca, 1);
+    ret = sd_command(SD_SEND_RELATIVE_ADDR, 0, &currcard->rca, 1);
     if (ret < 0)
         goto card_init_error;
 
-    ret = sd_command(SEND_CSD, currcard->rca, currcard->csd, 2);
+    ret = sd_command(SD_SEND_CSD, currcard->rca, currcard->csd, 2);
     if (ret < 0)
         goto card_init_error;
 
@@ -658,19 +658,19 @@ static void sd_init_device(int card_no)
     
     REG_1 = 0;
 
-    ret = sd_command(SELECT_CARD, currcard->rca, NULL, 129);
+    ret = sd_command(SD_SELECT_CARD, currcard->rca, NULL, 129);
     if (ret < 0)
         goto card_init_error;
 
-    ret = sd_command(APP_CMD, currcard->rca, NULL, 1);
+    ret = sd_command(SD_APP_CMD, currcard->rca, NULL, 1);
     if (ret < 0)
         goto card_init_error;
 
-    ret = sd_command(SET_BUS_WIDTH, currcard->rca | 2, NULL, 1); /* 4 bit */
+    ret = sd_command(SD_SET_BUS_WIDTH, currcard->rca | 2, NULL, 1); /* 4 bit */
     if (ret < 0)
         goto card_init_error;
 
-    ret = sd_command(SET_BLOCKLEN, currcard->block_size, NULL, 1);
+    ret = sd_command(SD_SET_BLOCKLEN, currcard->block_size, NULL, 1);
     if (ret < 0)
         goto card_init_error;
 
@@ -680,10 +680,10 @@ static void sd_init_device(int card_no)
     if( (currcard->numblocks >= BLOCKS_PER_BANK) &&
         ((currcard->ocr & (1<<30)) == 0) )
     {
-        SD_STATE_REG = TRAN;
+        SD_STATE_REG = SD_TRAN;
         BLOCK_COUNT_REG = 1;
 
-        ret = sd_command(SWITCH_FUNC, 0x80ffffef, NULL, 0x1c05);
+        ret = sd_command(SD_SWITCH_FUNC, 0x80ffffef, NULL, 0x1c05);
         if (ret < 0)
             goto card_init_error;
 
@@ -794,7 +794,7 @@ sd_read_retry:
         start -= bank * BLOCKS_PER_BANK;
     }
 
-    ret = sd_wait_for_state(TRAN, EC_TRAN_READ_ENTRY);
+    ret = sd_wait_for_state(SD_TRAN, EC_TRAN_READ_ENTRY);
     if (ret < 0)
         goto sd_read_error;
 
@@ -804,12 +804,12 @@ sd_read_retry:
     if(currcard->ocr & (1<<30) )
     {
         /* SDHC */
-        ret = sd_command(READ_MULTIPLE_BLOCK, start, NULL, 0x1c25);
+        ret = sd_command(SD_READ_MULTIPLE_BLOCK, start, NULL, 0x1c25);
     }
     else
 #endif
     {
-        ret = sd_command(READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, NULL, 0x1c25);
+        ret = sd_command(SD_READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, NULL, 0x1c25);
     }
     if (ret < 0)
         goto sd_read_error;
@@ -833,11 +833,11 @@ sd_read_retry:
 
     last_disk_activity = current_tick;
 
-    ret = sd_command(STOP_TRANSMISSION, 0, NULL, 1);
+    ret = sd_command(SD_STOP_TRANSMISSION, 0, NULL, 1);
     if (ret < 0)
         goto sd_read_error;
 
-    ret = sd_wait_for_state(TRAN, EC_TRAN_READ_EXIT);
+    ret = sd_wait_for_state(SD_TRAN, EC_TRAN_READ_EXIT);
     if (ret < 0)
         goto sd_read_error;
 
@@ -909,7 +909,7 @@ sd_write_retry:
 
     check_time[EC_WRITE_TIMEOUT] = USEC_TIMER;
 
-    ret = sd_wait_for_state(TRAN, EC_TRAN_WRITE_ENTRY);
+    ret = sd_wait_for_state(SD_TRAN, EC_TRAN_WRITE_ENTRY);
     if (ret < 0)
         goto sd_write_error;
 
@@ -919,12 +919,12 @@ sd_write_retry:
     if(currcard->ocr & (1<<30) )
     {
         /* SDHC */
-        ret = sd_command(WRITE_MULTIPLE_BLOCK, start, NULL, 0x1c2d);
+        ret = sd_command(SD_WRITE_MULTIPLE_BLOCK, start, NULL, 0x1c2d);
     }
     else
 #endif
     {
-        ret = sd_command(WRITE_MULTIPLE_BLOCK, start*BLOCK_SIZE, NULL, 0x1c2d);
+        ret = sd_command(SD_WRITE_MULTIPLE_BLOCK, start*BLOCK_SIZE, NULL, 0x1c2d);
     }
     if (ret < 0)
         goto sd_write_error;
@@ -935,8 +935,8 @@ sd_write_retry:
     {
         if (buf == buf_end)
         {
-            /* Set SD_STATE_REG to PRG for the last buffer fill */
-            SD_STATE_REG = PRG;
+            /* Set SD_STATE_REG to SD_PRG for the last buffer fill */
+            SD_STATE_REG = SD_PRG;
         }
 
         udelay(2); /* needed here (loop is too fast :-) */
@@ -961,11 +961,11 @@ sd_write_retry:
         goto sd_write_error;
     }
 
-    ret = sd_command(STOP_TRANSMISSION, 0, NULL, 1);
+    ret = sd_command(SD_STOP_TRANSMISSION, 0, NULL, 1);
     if (ret < 0)
         goto sd_write_error;
 
-    ret = sd_wait_for_state(TRAN, EC_TRAN_WRITE_EXIT);
+    ret = sd_wait_for_state(SD_TRAN, EC_TRAN_WRITE_EXIT);
     if (ret < 0)
         goto sd_write_error;
 

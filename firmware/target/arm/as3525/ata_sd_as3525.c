@@ -191,13 +191,13 @@ static int sd_init_card(const int drive)
     int max_tries = 100; /* max acmd41 attemps */
     bool sdhc;
 
-    if(!send_cmd(drive, GO_IDLE_STATE, 0, MMC_NO_FLAGS, NULL))
+    if(!send_cmd(drive, SD_GO_IDLE_STATE, 0, MMC_NO_FLAGS, NULL))
         return -1;
 
     mci_delay();
 
     sdhc = false;
-    if(send_cmd(drive, SEND_IF_COND, 0x1AA, MMC_RESP|MMC_ARG, &response))
+    if(send_cmd(drive, SD_SEND_IF_COND, 0x1AA, MMC_RESP|MMC_ARG, &response))
         if((response & 0xFFF) == 0x1AA)
             sdhc = true;
 
@@ -205,7 +205,7 @@ static int sd_init_card(const int drive)
         mci_delay();
 
         /* app_cmd */
-        if( !send_cmd(drive, APP_CMD, 0, MMC_RESP|MMC_ARG, &response) ||
+        if( !send_cmd(drive, SD_APP_CMD, 0, MMC_RESP|MMC_ARG, &response) ||
             !(response & (1<<5)) )
         {
             return -2;
@@ -222,17 +222,17 @@ static int sd_init_card(const int drive)
         return -4;
 
     /* send CID */
-    if(!send_cmd(drive, ALL_SEND_CID, 0, MMC_RESP|MMC_LONG_RESP|MMC_ARG,
+    if(!send_cmd(drive, SD_ALL_SEND_CID, 0, MMC_RESP|MMC_LONG_RESP|MMC_ARG,
                             card_info[drive].cid))
         return -5;
 
     /* send RCA */
-    if(!send_cmd(drive, SEND_RELATIVE_ADDR, 0, MMC_RESP|MMC_ARG,
+    if(!send_cmd(drive, SD_SEND_RELATIVE_ADDR, 0, MMC_RESP|MMC_ARG,
                 &card_info[drive].rca))
         return -6;
 
     /* send CSD */
-    if(!send_cmd(drive, SEND_CSD, card_info[drive].rca,
+    if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
                  MMC_RESP|MMC_LONG_RESP|MMC_ARG, card_info[drive].csd))
         return -7;
 
@@ -259,16 +259,16 @@ static int sd_init_card(const int drive)
     }
 #endif
 
-    if(!send_cmd(drive, SELECT_CARD, card_info[drive].rca, MMC_ARG, NULL))
+    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MMC_ARG, NULL))
         return -9;
 
-    if(!send_cmd(drive, APP_CMD, card_info[drive].rca, MMC_ARG, NULL))
+    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MMC_ARG, NULL))
         return -10;
 
-    if(!send_cmd(drive, SET_BUS_WIDTH, card_info[drive].rca | 2, MMC_ARG, NULL))
+    if(!send_cmd(drive, SD_SET_BUS_WIDTH, card_info[drive].rca | 2, MMC_ARG, NULL))
         return -11;
 
-    if(!send_cmd(drive, SET_BLOCKLEN, card_info[drive].block_size, MMC_ARG,
+    if(!send_cmd(drive, SD_SET_BLOCKLEN, card_info[drive].block_size, MMC_ARG,
                  NULL))
         return -12;
 
@@ -490,7 +490,7 @@ static int sd_wait_for_state(const int drive, unsigned int state)
     {
         long us;
 
-        if(!send_cmd(drive, SEND_STATUS, card_info[drive].rca,
+        if(!send_cmd(drive, SD_SEND_STATUS, card_info[drive].rca,
                     MMC_RESP|MMC_ARG, &response))
             return -1;
 
@@ -544,7 +544,7 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
 
     last_disk_activity = current_tick;
 
-    ret = sd_wait_for_state(drive, TRAN);
+    ret = sd_wait_for_state(drive, SD_TRAN);
     if (ret < 0)
         goto sd_read_error;
 
@@ -555,9 +555,9 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
         int transfer = (remaining >= 128) ? 127 : remaining; /* sectors */
 
         if(card_info[drive].ocr & (1<<30) ) /* SDHC */
-            ret = send_cmd(drive, READ_MULTIPLE_BLOCK, start, MMC_ARG, NULL);
+            ret = send_cmd(drive, SD_READ_MULTIPLE_BLOCK, start, MMC_ARG, NULL);
         else
-            ret = send_cmd(drive, READ_MULTIPLE_BLOCK, start * BLOCK_SIZE,
+            ret = send_cmd(drive, SD_READ_MULTIPLE_BLOCK, start * BLOCK_SIZE,
                     MMC_ARG, NULL);
 
         if (ret < 0)
@@ -596,13 +596,13 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
         start += transfer;
         last_disk_activity = current_tick;
 
-        if(!send_cmd(drive, STOP_TRANSMISSION, 0, MMC_NO_FLAGS, NULL))
+        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MMC_NO_FLAGS, NULL))
         {
             ret = -666;
             goto sd_read_error;
         }
 
-        ret = sd_wait_for_state(drive, TRAN);
+        ret = sd_wait_for_state(drive, SD_TRAN);
         if (ret < 0)
             goto sd_read_error;
 
