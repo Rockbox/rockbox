@@ -780,6 +780,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_CHANNEL_LEFTRIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Mono vänster + höger"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Mono vänster plus höger"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_CHANNEL_KARAOKE
   desc: in sound_settings
   user:
@@ -6907,16 +6924,19 @@
   user:
   <source>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
+    multivolume: "H D 1"
     e200*,c200: "mikro S D"
     ondio*: "M M C"
   </voice>
@@ -10114,11 +10134,11 @@
   user:
   <source>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "Edit mode: %s %s"
   </source>
   <dest>
     *: none
-    swcodec: "Läge: %s"
+    swcodec: "Läge: %s %s"
   </dest>
   <voice>
     *: none
@@ -10131,15 +10151,15 @@
   user:
   <source>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Cutoff"
   </source>
   <dest>
     *: none
-    swcodec: "Brytfrekvens"
+    swcodec: "Brytpunkt"
   </dest>
   <voice>
     *: none
-    swcodec: "Brytfrekvens"
+    swcodec: "Brytpunkt"
   </voice>
 </phrase>
 <phrase>
@@ -10152,11 +10172,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Förstärkning"
+    lcd_bitmap: "Först."
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Förstärkning"
+    lcd_bitmap: "Först."
   </voice>
 </phrase>
 <phrase>
@@ -11986,5 +12006,138 @@
   </dest>
   <voice>
     *: "Sökresultat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QS_ITEMS
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_SETTING
+  desc: used in the settings context menu
+  user:
+  <source>
+    *: "Reset Setting"
+  </source>
+  <dest>
+    *: "Återställ"
+  </dest>
+  <voice>
+    *: "Återställ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Left Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Sätt som vänster snabbmenyval"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Sätt som vänster snabbmenyval"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Right Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Sätt som höger snabbmenyval"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Sätt som höger snabbmenyval"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Bottom Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Sätt som nedre snabbmenyval"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Sätt som nedre snabbmenyval"
   </voice>
 </phrase>
