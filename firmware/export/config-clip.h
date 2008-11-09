@@ -6,7 +6,7 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 40
 #define MODEL_NAME   "Sandisk Sansa Clip"
-#define FIRMWARE_OFFSET_FILE_DATA 0
+#define FIRMWARE_OFFSET_FILE_DATA 8
 #define FIRMWARE_OFFSET_FILE_CRC 0
 
 #define HW_SAMPR_CAPS       (SAMPR_CAP_44)
@@ -84,7 +84,11 @@
 #define CODEC_SIZE 0x100000
 
 /* The number of bytes reserved for loadable plugins */
+#if 0 /* The plugin buffer doesn't fit in the 2MB memory */
 #define PLUGIN_BUFFER_SIZE 0x80000
+#else
+#define PLUGIN_BUFFER_SIZE 0
+#endif
 
 #define AB_REPEAT_ENABLE 1
 
@@ -137,8 +141,8 @@
 #define CONFIG_LCD LCD_SSD1303
 
 #ifndef BOOTLOADER
-#define HAVE_MULTIVOLUME
-#define HAVE_HOTSWAP
+
+#if 0 /* disabled since there is no USB driver */
 
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
@@ -148,6 +152,8 @@
 #define USB_VENDOR_ID 0x0781
 #define USB_PRODUCT_ID 0x7433
 #endif /* BOOTLOADER */
+
+#endif
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL

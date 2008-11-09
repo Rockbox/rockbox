@@ -23,6 +23,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "panic.h"
+#include "as3525-codec.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -123,6 +124,7 @@ void fiq_handler(void)
     );
 }
 
+#ifdef BOOTLOADER
 static void sdram_delay(void)
 {
     int delay = 1024; /* arbitrary */
@@ -192,9 +194,11 @@ static void sdram_init(void)
 
     MPMC_DYNAMIC_CONFIG_0 |= (1<<19); /* buffer enable */
 }
+#endif
 
 void system_init(void)
 {
+#ifdef BOOTLOADER
 #if 0 /* the GPIO clock is already enabled by the dualboot function */
     CGU_PERI |= CGU_GPIO_CLOCK_ENABLE;
 #endif
@@ -235,6 +239,7 @@ void system_init(void)
     /* enable VIC */
     CGU_PERI |= CGU_VIC_CLOCK_ENABLE;
     VIC_INT_SELECT = 0; /* only IRQ, no FIQ */
+#endif
 }
 
 void system_reboot(void)
@@ -245,4 +250,16 @@ int system_memory_guard(int newmode)
 {
     (void)newmode;
     return 0;
+}
+
+void power_off(void)
+{
+    int system;
+    system = as3525_codec_read(0x20);
+    system &= ~1; /* clear bit 0 of system register */
+    as3525_codec_write(0x20, system);
+
+    /* TODO : turn off peripherals properly ? */
+
+    while(1);
 }

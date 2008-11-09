@@ -31,43 +31,71 @@
 #include "as3525-codec.h"
 #include "common.h"
 #include "storage.h"
+#include "disk.h"
+#include "panic.h"
 
 int show_logo(void);
 void main(void)
 {
-    int i;
-    unsigned char buf[8];
+    unsigned char* loadbuffer;
+    int buffer_size;
+    void(*kernel_entry)(void);
+    int ret;
+    int delay;
 
     system_init();
     kernel_init();
 
     lcd_init();
-
     show_logo();
 
     as3525_codec_init();  /* Required for backlight on e200v2 */
-
     _backlight_on();
 
-    /* show player id to demonstrate communication with codec part */
-    for (i = 0; i < 8; i++) {
-        buf[i] = as3525_codec_read(0x38 + i);
+    delay = 0x3000000;
+    while(delay--); /* show splash screen */
+    reset_screen();
+
+    asm volatile(
+            "mrs r0, cpsr             \n"
+            "bic r0, r0, #0x80        \n" /* enable interrupts */
+            "msr cpsr, r0             \n"
+            : : : "r0" );
+
+    ret = storage_init();
+    if(ret < 0)
+        error(EATA,ret);
+
+    if(!disk_init(IF_MV(0)))
+        panicf("disk_init failed!");
+
+    ret = disk_mount_all();
+
+    if(ret <= 0)
+        error(EDISK, ret);
+
+    printf("Loading firmware");
+
+    loadbuffer = (unsigned char*)0x30000000; /* DRAM */
+    buffer_size = (int)(loadbuffer + (MEM * 0x100000));
+
+    ret = load_firmware(loadbuffer, BOOTFILE, buffer_size);
+    if(ret < 0)
+        error(EBOOTFILE, ret);
+
+    asm volatile(
+            "mrs r0, cpsr             \n"
+            "orr r0, r0, #0x80        \n" /* disable interrupts */
+            "msr cpsr, r0             \n"
+            : : : "r0" );
+
+    if (ret == EOK)
+    {
+        kernel_entry = (void*) loadbuffer;
+        printf("Executing");
+        kernel_entry();
+        printf("ERR: Failed to boot");
     }
-    printf("ID: %02X%02X%02X%02X%02X%02X%02X%02X", buf[7], buf[6], buf[5], buf[4], buf[3], buf[2], buf[1], buf[0]);
-
-    storage_init();
-
-#ifdef SANSA_CLIP
-    /* Use hardware scrolling */
-
-    lcd_write_command(0x26); /* scroll setup */
-    lcd_write_command(0x01); /* columns scrolled per step */
-    lcd_write_command(0x00); /* start page */
-    lcd_write_command(0x00); /* steps freqency */
-    lcd_write_command(0x07); /* end page (including) */
-
-    lcd_write_command(0x2F); /* start horizontal scrolling */
-#endif
 
     /* never returns */
     while(1) ;
