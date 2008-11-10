@@ -25,10 +25,6 @@
 
 /* TODO */
 
-void audiohw_enable_output(bool on)
-{
-}
-
 void audio_set_output_source(int source)
 {
 }
