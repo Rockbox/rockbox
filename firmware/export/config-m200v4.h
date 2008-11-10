@@ -1,12 +1,12 @@
 /*
- * This config file is for the Sansa M200 series
+ * This config file is for the Sansa M200 V4 series
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 42
 
-#define MODEL_NAME   "Sandisk Sansa m200 series"
+#define MODEL_NAME   "Sandisk Sansa m200 v4 series"
 
 /* Enable FAT16 support */
 #define HAVE_FAT16SUPPORT
