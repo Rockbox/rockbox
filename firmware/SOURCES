@@ -345,7 +345,6 @@ target/arm/as3525/audio-as3525.c
 target/arm/as3525/debug-as3525.c
 target/arm/as3525/i2s-as3525.c
 target/arm/as3525/i2c-as3525.c
-drivers/rtc/rtc_as3514.c
 target/arm/as3525/powermgmt-as3525.c
 #endif /* BOOTLOADER */
 #endif /* CONFIG_CPU == AS3525 */

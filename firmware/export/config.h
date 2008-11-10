@@ -201,7 +201,7 @@
 #define RTC_PCF50606 3 /* iriver H300 */
 #define RTC_S3C2440  4
 #define RTC_E8564    5 /* iriver H10 */
-#define RTC_AS3514   6 /* Sandisk Sansa e200 series */
+#define RTC_AS3514   6 /* Sandisk Sansa series */
 #define RTC_DS1339_DS3231   7 /* h1x0 RTC mod */
 #define RTC_IMX31L   8
 #define RTC_RX5X348AB 9
@@ -212,7 +212,6 @@
 #define RTC_S5L8700  14
 #define RTC_S35390A  15
 #define RTC_JZ47XX   16 /* Ingenic Jz47XX */
-#define RTC_AS3525   17
 
 /* USB On-the-go */
 #define USBOTG_ISP1362 1362 /* iriver H300 */

@@ -63,7 +63,7 @@
 
 /* define this if you have a real-time clock */
 #ifndef BOOTLOADER
-#define CONFIG_RTC RTC_AS3525
+#define CONFIG_RTC RTC_AS3514
 #endif
 
 /* define this if you have RTC RAM available for settings */
