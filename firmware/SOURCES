@@ -1062,13 +1062,13 @@ target/arm/as3525/as3525-codec.c
 #endif /* !SIMULATOR */
 #endif /* SANSA_E200V2 */
 
-#ifdef SANSA_M200V2
+#ifdef SANSA_M200V4
 #ifndef SIMULATOR
 target/arm/lcd-ssd1815.c
-target/arm/as3525/sansa-m200v2/button-m200v2.c
+target/arm/as3525/sansa-m200v4/button-m200v4.c
 target/arm/as3525/as3525-codec.c
 #endif /* !SIMULATOR */
-#endif /* SANSA_M200V2 */
+#endif /* SANSA_M200V4 */
 
 #ifdef SANSA_FUZE
 #ifndef SIMULATOR

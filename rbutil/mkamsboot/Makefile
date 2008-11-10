@@ -10,8 +10,8 @@ LIBUCL=../../tools/ucl/src/libucl.a
 #
 # If anyone reading this wants to improve this makefile, please do!
 
-BOOTIMAGES = bootimg_clip.o bootimg_e200v2.o bootimg_m200v2.o bootimg_fuze.o
-BOOTHEADERS = bootimg_clip.h bootimg_e200v2.h bootimg_m200v2.h bootimg_fuze.h
+BOOTIMAGES = bootimg_clip.o bootimg_e200v2.o bootimg_m200v4.o bootimg_fuze.o
+BOOTHEADERS = bootimg_clip.h bootimg_e200v2.h bootimg_m200v4.h bootimg_fuze.h
 
 CLIPFILES = dualboot-clip.o dualboot-clip.elf dualboot-clip.o \
             dualboot-clip.bin bootimg_clip.c bootimg_clip.h
@@ -19,8 +19,8 @@ CLIPFILES = dualboot-clip.o dualboot-clip.elf dualboot-clip.o \
 E200V2FILES = dualboot-e200v2.o dualboot-e200v2.elf dualboot-e200v2.o \
               dualboot-e200v2.bin bootimg_e200v2.c bootimg_e200v2.h
 
-M200V2FILES = dualboot-m200v2.o dualboot-m200v2.elf dualboot-m200v2.o \
-              dualboot-m200v2.bin bootimg_m200v2.c bootimg_m200v2.h
+M200V4FILES = dualboot-m200v4.o dualboot-m200v4.elf dualboot-m200v4.o \
+              dualboot-m200v4.bin bootimg_m200v4.c bootimg_m200v4.h
 
 FUZEFILES = dualboot-fuze.o dualboot-fuze.elf dualboot-fuze.o \
               dualboot-fuze.bin bootimg_fuze.c bootimg_fuze.h
@@ -93,22 +93,22 @@ bootimg_e200v2.c bootimg_e200v2.h: dualboot-e200v2.bin bin2c
 bootimg_e200v2.o: bootimg_e200v2.c
 	gcc -c -o bootimg_e200v2.o bootimg_e200v2.c
 
-# M200V2    
+# M200V4    
     
-dualboot-m200v2.o: dualboot.S
-	arm-elf-gcc -DSANSA_M200V2 -c -o dualboot-m200v2.o dualboot.S
+dualboot-m200v4.o: dualboot.S
+	arm-elf-gcc -DSANSA_M200V4 -c -o dualboot-m200v4.o dualboot.S
 
-dualboot-m200v2.elf: dualboot-m200v2.o
-	arm-elf-ld -e 0 -Ttext=0 -o dualboot-m200v2.elf dualboot-m200v2.o
+dualboot-m200v4.elf: dualboot-m200v4.o
+	arm-elf-ld -e 0 -Ttext=0 -o dualboot-m200v4.elf dualboot-m200v4.o
 
-dualboot-m200v2.bin: dualboot-m200v2.elf
-	arm-elf-objcopy -O binary dualboot-m200v2.elf dualboot-m200v2.bin
+dualboot-m200v4.bin: dualboot-m200v4.elf
+	arm-elf-objcopy -O binary dualboot-m200v4.elf dualboot-m200v4.bin
 
-bootimg_m200v2.c bootimg_m200v2.h: dualboot-m200v2.bin bin2c
-	./bin2c dualboot-m200v2.bin bootimg_m200v2
+bootimg_m200v4.c bootimg_m200v4.h: dualboot-m200v4.bin bin2c
+	./bin2c dualboot-m200v4.bin bootimg_m200v4
 
-bootimg_m200v2.o: bootimg_m200v2.c
-	gcc -c -o bootimg_m200v2.o bootimg_m200v2.c
+bootimg_m200v4.o: bootimg_m200v4.c
+	gcc -c -o bootimg_m200v4.o bootimg_m200v4.c
         
 # Rules for the ucl unpack function
 nrv2e_d8.o: nrv2e_d8.S
@@ -134,4 +134,4 @@ bin2c: bin2c.c
 clean:
 	rm -f mkamsboot mkamsboot.o nrv2e_d8.o nrv2e_d8.elf nrv2e_d8.bin *~ \
 	bin2c uclimg.c uclimg.h uclimg.o md5.o \
-	$(BOOTIMAGES) $(CLIPFILES) $(E200V2FILES) $(M200V2FILES) $(FUZEFILES)
+	$(BOOTIMAGES) $(CLIPFILES) $(E200V2FILES) $(M200V4FILES) $(FUZEFILES)

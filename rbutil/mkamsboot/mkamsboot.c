@@ -92,7 +92,7 @@ execution to the uncompressed firmware.
 #include "bootimg_clip.h"
 #include "bootimg_e200v2.h"
 #include "bootimg_fuze.h"
-#include "bootimg_m200v2.h"
+#include "bootimg_m200v4.h"
 
 /* Win32 compatibility */
 #ifndef O_BINARY
@@ -130,7 +130,7 @@ static const unsigned char* bootloaders[] =
     bootimg_clip,
     NULL,
     bootimg_e200v2,
-    bootimg_m200v2,
+    bootimg_m200v4,
     NULL
 };
 
@@ -140,7 +140,7 @@ static const int bootloader_sizes[] =
     sizeof(bootimg_clip),
     0,
     sizeof(bootimg_e200v2),
-    sizeof(bootimg_m200v2),
+    sizeof(bootimg_m200v4),
     0
 };
 
@@ -485,7 +485,8 @@ int main(int argc, char* argv[])
     }
     
 
-    /* TODO: Do some more sanity checks on the OF image. Some images (like m200v2) dont have a checksum at the end, only padding (0xdeadbeef). */
+    /* TODO: Do some more sanity checks on the OF image. Some images (like
+       m200v4) dont have a checksum at the end, only padding (0xdeadbeef). */
     checksum = get_uint32le(buf + len - 4); 
     if (checksum != 0xefbeadde && checksum != calc_checksum(buf, len - 4)) {
 

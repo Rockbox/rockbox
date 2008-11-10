@@ -323,8 +323,8 @@
 #include "config-clip.h"
 #elif defined(SANSA_E200V2)
 #include "config-e200v2.h"
-#elif defined(SANSA_M200V2)
-#include "config-m200v2.h"
+#elif defined(SANSA_M200V4)
+#include "config-m200v4.h"
 #elif defined(SANSA_FUZE)
 #include "config-fuze.h"
 #else
