@@ -70,10 +70,7 @@ void clickwheel_int(void)
 /* device buttons */
 void button_int(void)
 {
-    unsigned char state;
-
     int_btn = BUTTON_NONE;
-
 }
 
 /*
