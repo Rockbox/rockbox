@@ -28,7 +28,7 @@
 #include "config.h"
 #include "lcd.h"
 #include "backlight-target.h"
-#include "as3525-codec.h"
+#include "ascodec-target.h"
 #include "common.h"
 #include "storage.h"
 #include "disk.h"
