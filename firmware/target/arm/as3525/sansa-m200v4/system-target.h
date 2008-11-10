@@ -23,6 +23,8 @@
 
 #include "system-arm.h"
 
-#define CPUFREQ_MAX    250000000
+#define CPUFREQ_MAX     250000000
+#define CPUFREQ_DEFAULT 250000000
+#define CPUFREQ_NORMAL  250000000
 
 #endif /* SYSTEM_TARGET_H */

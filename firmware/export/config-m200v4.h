@@ -11,12 +11,22 @@
 /* Enable FAT16 support */
 #define HAVE_FAT16SUPPORT
 
+#if 0 /* disabled since there is no driver (yet) */
+
+#define HW_SAMPR_CAPS       (SAMPR_CAP_44)
+
 /* define this if you have recording possibility */
-//#define HAVE_RECORDING
+#define HAVE_RECORDING
+
+#define REC_SAMPR_CAPS      (SAMPR_CAP_22)
+#define REC_FREQ_DEFAULT    REC_FREQ_22 /* Default is not 44.1kHz */
+#define REC_SAMPR_DEFAULT   SAMPR_22
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
-//#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | SRC_CAP_SPDIF)
+#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_FMRADIO)
+
+#endif
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
@@ -66,10 +76,14 @@
 #define HAVE_SW_POWEROFF
 
 /* The number of bytes reserved for loadable codecs */
-#define CODEC_SIZE 0x38000
+#define CODEC_SIZE 0x100000
 
 /* The number of bytes reserved for loadable plugins */
-#define PLUGIN_BUFFER_SIZE 0x10000
+#if 0 /* The plugin buffer doesn't fit in the 2MB memory */
+#define PLUGIN_BUFFER_SIZE 0x80000
+#else
+#define PLUGIN_BUFFER_SIZE 0
+#endif
 
 #define AB_REPEAT_ENABLE 1
 
@@ -105,8 +119,14 @@
 /* Define this if you have an AMS AS3525 */
 #define CONFIG_CPU AS3525
 
+/* Define this if you want to use the AS3525 i2c interface */
+#define CONFIG_I2C I2C_AS3525
+
 /* Define this to the CPU frequency */
-#define CPU_FREQ      120000000
+#define CPU_FREQ      250000000
+
+/* Define this if you have adjustable CPU frequency */
+#define HAVE_ADJUSTABLE_CPU_FREQ
 
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
