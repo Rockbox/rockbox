@@ -78,7 +78,7 @@ uclcopy:
         str   r1, [r0]
 
         
-#ifndef SANSA_M200V2  /* this doesnt work for m200 */         
+#ifndef SANSA_M200V4  /* this doesnt work for m200 */         
         /* we check A3 unconditionally of the model because it seems to be */
         /* either hold, either usb on every model */
 
@@ -118,7 +118,7 @@ uclcopy:
 
         cmp   r1, #0             /* C3 = #0 means button pressed */
         beq   boot_of
-#elif defined(SANSA_M200V2)
+#elif defined(SANSA_M200V4)
         /* SELECT button */
 .set row, (1<<5) /* enable output on A5 */
         ldr   r0, =GPIOA
