@@ -336,7 +336,19 @@ target/arm/pnx0101/system-pnx0101.c
 target/arm/as3525/system-as3525.c
 target/arm/as3525/kernel-as3525.c
 target/arm/as3525/ata_sd_as3525.c
-#endif
+target/arm/as3525/power-as3525.c
+target/arm/as3525/usb-as3525.c
+#ifndef BOOTLOADER
+target/arm/as3525/adc-as3525.c
+target/arm/as3525/pcm-as3525.c
+target/arm/as3525/audio-as3525.c
+target/arm/as3525/debug-as3525.c
+target/arm/as3525/i2s-as3525.c
+target/arm/as3525/i2c-as3525.c
+drivers/rtc/rtc_as3514.c
+target/arm/as3525/powermgmt-as3525.c
+#endif /* BOOTLOADER */
+#endif /* CONFIG_CPU == AS3525 */
 
 #if defined(CPU_PP)
 target/arm/kernel-pp.c

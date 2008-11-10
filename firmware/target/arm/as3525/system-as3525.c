@@ -252,14 +252,12 @@ int system_memory_guard(int newmode)
     return 0;
 }
 
-void power_off(void)
+#ifndef BOOTLOADER
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+void set_cpu_frequency(long frequency)
 {
-    int system;
-    system = ascodec_read(0x20);
-    system &= ~1; /* clear bit 0 of system register */
-    ascodec_write(0x20, system);
-
-    /* TODO : turn off peripherals properly ? */
-
-    while(1);
+    /* TODO */
 }
+#endif /* HAVE_ADJUSTABLE_CPU_FREQ */
+#endif /* BOOTLOADER */

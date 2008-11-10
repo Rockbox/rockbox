@@ -616,6 +616,7 @@ sd_read_error:
     }
 }
 
+#ifndef BOOTLOADER
 void sd_sleep(void)
 {
 }
@@ -628,3 +629,62 @@ void sd_spindown(int seconds)
 {
     (void)seconds;
 }
+
+long sd_last_disk_activity(void)
+{
+    return last_disk_activity;
+}
+
+void sd_enable(bool on)
+{
+    if(on)
+    {
+        CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
+#ifdef HAVE_MULTIVOLUME
+        CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
+#endif
+        CGU_IDE |= (1<<7)  /* AHB interface enable */  |
+                   (1<<6)  /* interface enable */;
+    }
+    else
+    {
+        CGU_PERI &= ~CGU_NAF_CLOCK_ENABLE;
+#ifdef HAVE_MULTIVOLUME
+        CGU_PERI &= ~CGU_MCI_CLOCK_ENABLE;
+#endif
+        CGU_IDE &= ~((1<<7)|(1<<6));
+    }
+}
+
+/* move the sd-card info to mmc struct */
+tCardInfo *card_get_info_target(int card_no)
+{
+    int i, temp;
+    static tCardInfo card;
+    static const char mantissa[] = {  /* *10 */
+        0,  10, 12, 13, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80 };
+    static const int exponent[] = {  /* use varies */
+      1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000 };
+
+    card.initialized  = card_info[card_no].initialized;
+    card.ocr          = card_info[card_no].ocr;
+    for(i=0; i<4; i++)  card.csd[i] = card_info[card_no].csd[i];
+    for(i=0; i<4; i++)  card.cid[i] = card_info[card_no].cid[i];
+    card.numblocks    = card_info[card_no].numblocks;
+    card.blocksize    = card_info[card_no].block_size;
+    temp              = card_extract_bits(card.csd, 29, 3);
+    card.speed        = mantissa[card_extract_bits(card.csd, 25, 4)]
+                      * exponent[temp > 2 ? 7 : temp + 4];
+    card.nsac         = 100 * card_extract_bits(card.csd, 16, 8);
+    temp              = card_extract_bits(card.csd, 13, 3);
+    card.tsac         = mantissa[card_extract_bits(card.csd, 9, 4)]
+                      * exponent[temp] / 10;
+    card.cid[0]       = htobe32(card.cid[0]); /* ascii chars here */
+    card.cid[1]       = htobe32(card.cid[1]); /* ascii chars here */
+    temp = *((char*)card.cid+13); /* adjust year<=>month, 1997 <=> 2000 */
+    *((char*)card.cid+13) = (unsigned char)((temp >> 4) | (temp << 4)) + 3;
+
+    return &card;
+}
+
+#endif /* BOOTLOADER */

@@ -9,6 +9,8 @@
 #define FIRMWARE_OFFSET_FILE_DATA 8
 #define FIRMWARE_OFFSET_FILE_CRC 0
 
+#if 0 /* disabled since there is no driver (yet) */
+
 #define HW_SAMPR_CAPS       (SAMPR_CAP_44)
 
 /* define this if you have recording possibility */
@@ -22,6 +24,8 @@
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
 #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_FMRADIO)
+
+#endif
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
@@ -93,8 +97,10 @@
 #define AB_REPEAT_ENABLE 1
 
 /* FM Tuner */
+#if 0 /* disabled since there is no driver (yet) */
 #define CONFIG_TUNER SI4700 /* in fact SI4702 but let's hope it's compatible */
 //#define HAVE_TUNER_PWR_CTRL
+#endif
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
