@@ -66,9 +66,6 @@
 #define CONFIG_RTC RTC_AS3525
 #endif
 
-/* Hardware controlled charging */
-#define CONFIG_CHARGING CHARGING_SIMPLE
-
 /* define this if you have RTC RAM available for settings */
 //#define HAVE_RTC_RAM
 

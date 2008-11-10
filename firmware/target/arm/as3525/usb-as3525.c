@@ -35,7 +35,6 @@ void usb_init_device(void)
 
 int usb_detect(void)
 {
-    if (charger_inserted())
-        return USB_INSERTED;
+    /* TODO: Implement USB detection */
     return USB_EXTRACTED;
 }

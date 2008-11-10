@@ -37,6 +37,7 @@ void power_init(void)
 {
 }
 
+#if CONFIG_CHARGING
 bool charger_inserted(void)
 {
     if(ascodec_read(0x25) & (1<<5))
@@ -44,6 +45,7 @@ bool charger_inserted(void)
     else
         return false;
 }
+#endif
 
 void ide_power_enable(bool on)
 {
