@@ -519,8 +519,11 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     int remaining = incount;
     const unsigned long *fifo_base = MMC_FIFO(drive);
 
+#if defined(SANSA_E200V2)
+    start += 61440;
+#else
     start += 20480; /* skip SanDisk OF */
-
+#endif
     /* TODO: Add DMA support. */
 
     mutex_lock(&sd_mtx);
