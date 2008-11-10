@@ -38,6 +38,7 @@
  */
 
 #include "ascodec-target.h"
+#include "kernel.h"
 #include "as3525.h"
 
 #define I2C2_DATA       *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x00))
@@ -53,6 +54,7 @@
 #define I2C2_INT_CLR    *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x40))
 #define I2C2_SADDR      *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x44))
 
+static struct mutex as_mtx SHAREDBSS_ATTR;
 
 /* initialises the internal i2c bus and prepares for transfers to the codec */
 void ascodec_init(void)
@@ -84,7 +86,7 @@ static int i2c_busy(void)
 
 
 /* returns 0 on success, <0 otherwise */
-int ascodec_write(int index, int value)
+int ascodec_write(unsigned int index, unsigned int value)
 {
     if (index == 0x21) {
         /* prevent setting of the LREG_CP_not bit */
@@ -110,7 +112,7 @@ int ascodec_write(int index, int value)
 
 
 /* returns value read on success, <0 otherwise */
-int ascodec_read(int index)
+int ascodec_read(unsigned int index)
 {
     /* check if still busy */
     if (i2c_busy()) {
@@ -128,3 +130,32 @@ int ascodec_read(int index)
     return I2C2_DATA;
 }
 
+int ascodec_readbytes(int index, int len, unsigned char *data)
+{
+    int i;
+
+    ascodec_lock();
+
+    for(i=0; i<len; i++)
+    {
+        int temp = ascodec_read(index+i);
+        if(temp == -1)
+            break;
+        else
+            data[i] = temp;
+    }
+
+    ascodec_unlock();
+
+    return i;
+}
+
+void ascodec_lock(void)
+{
+    mutex_lock(&as_mtx);
+}
+
+void ascodec_unlock(void)
+{
+    mutex_unlock(&as_mtx);
+}

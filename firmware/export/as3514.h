@@ -22,6 +22,7 @@
 #ifndef _AS3514_H
 #define _AS3514_H
 
+#include "config.h"
 #include <stdbool.h>
 
 extern int tenthdb2master(int db);
@@ -79,5 +80,31 @@ extern void audiohw_set_sample_rate(int sampling_control);
 /* Headphone volume goes from -73.5 ... +6dB */
 #define VOLUME_MIN -735
 #define VOLUME_MAX   60
+
+/* ADC channels */
+#define NUM_ADC_CHANNELS 13
+
+#define ADC_BVDD         0  /* Battery voltage of 4V LiIo accumulator */
+#define ADC_RTCSUP       1  /* RTC backup battery voltage */
+#define ADC_UVDD         2  /* USB host voltage */
+#define ADC_CHG_IN       3  /* Charger input voltage */
+#define ADC_CVDD         4  /* Charger pump output voltage */
+#define ADC_BATTEMP      5  /* Battery charging temperature */
+#define ADC_MICSUP1      6  /* Voltage on MicSup1 for remote control
+                               or external voltage measurement */
+#define ADC_MICSUP2      7  /* Voltage on MicSup1 for remote control
+                               or external voltage measurement */
+#define ADC_VBE1         8  /* Measuring junction temperature @ 2uA */
+#define ADC_VBE2         9  /* Measuring junction temperature @ 1uA */
+#define ADC_I_MICSUP1    10 /* Current of MicSup1 for remote control detection */
+#define ADC_I_MICSUP2    11 /* Current of MicSup2 for remote control detection */
+#define ADC_VBAT         12 /* Single cell battery voltage */
+
+#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200) \
+    || CONFIG_CPU == AS3525
+#define AS3514_I2C_ADDR 0x46
+#else
+#error Unknown target!
+#endif
 
 #endif /* _AS3514_H */

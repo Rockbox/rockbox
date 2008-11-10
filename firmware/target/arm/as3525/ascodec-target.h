@@ -7,7 +7,10 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Barry Wardell
+ * Driver for AS3514 audio codec
+ *
+ * Copyright (c) 2007 Daniel Ankers
+ * Copyright (c) 2007 Christian Gmeiner
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,10 +21,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _ADC_TARGET_H_
-#define _ADC_TARGET_H_
 
-/* The ADC sources and channels are common to all targets with AS3514 */
+#ifndef _ASCODEC_TARGET_H
+#define _ASCODEC_TARGET_H
+
 #include "as3514.h"
 
-#endif
+int ascodec_write(unsigned int index, unsigned int value);
+
+int ascodec_read(unsigned int index);
+
+int ascodec_readbytes(int index, int len, unsigned char *data);
+
+void ascodec_lock(void);
+
+void ascodec_unlock(void);
+
+#endif /* !_ASCODEC_TARGET_H */

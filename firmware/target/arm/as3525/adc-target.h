@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright © 2008 Rafaël Carré
+ * Copyright (C) 2006 by Barry Wardell
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,16 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _ADC_TARGET_H_
+#define _ADC_TARGET_H_
 
-#include "adc.h"
+/* The ADC sources and channels are common to all targets with AS3514 */
+#include "as3514.h"
 
-/* TODO */
-
-unsigned short adc_read(int channel)
-{
-    return 0;
-}
-
-void adc_init(void)
-{
-}
+#endif
