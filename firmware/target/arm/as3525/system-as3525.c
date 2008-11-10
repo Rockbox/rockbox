@@ -23,7 +23,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "panic.h"
-#include "as3525-codec.h"
+#include "ascodec-target.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)

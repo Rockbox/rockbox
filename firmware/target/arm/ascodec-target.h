@@ -27,17 +27,15 @@
 
 #include "config.h"
 
-#ifdef CPU_PP
-/* TODO: This header is actually portalplayer specific, and should be
- * moved into an appropriate subdir  */
-
-#include "i2c-pp.h"
-
-#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
+#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200) || \
+    CONFIG_CPU==AS3525
 #define AS3514_I2C_ADDR 0x46
 #else
 #error Unknown target!
 #endif
+
+#ifdef CPU_PP
+#include "i2c-pp.h"
 
 static inline int ascodec_write(unsigned int reg, unsigned int value)
 {
@@ -63,7 +61,12 @@ static inline void ascodec_unlock(void)
 {
     i2c_unlock();
 }
+#elif CONFIG_CPU==AS3525
+void ascodec_init(void);
 
-#endif /* CPU_PP */
+int ascodec_write(int index, int value);
+
+int ascodec_read(int index);
+#endif
 
 #endif /* !_ASCODEC_TARGET_H */

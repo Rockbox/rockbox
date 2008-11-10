@@ -23,7 +23,7 @@
 #include "system.h"
 #include "lcd.h"
 #include "backlight.h"
-#include "as3525-codec.h"
+#include "ascodec-target.h"
 #include "as3514.h"
 
 static unsigned short backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;

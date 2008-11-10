@@ -52,6 +52,7 @@ extern void audiohw_set_sample_rate(int sampling_control);
 #define AS3514_AUDIOSET1  0x14
 #define AS3514_AUDIOSET2  0x15
 #define AS3514_AUDIOSET3  0x16
+#define AS3514_USB_UTIL   0x17  /* Only in AS3525 ? */
 #define AS3514_PLLMODE    0x1d
 
 #define AS3514_SYSTEM     0x20

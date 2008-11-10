@@ -20,13 +20,14 @@
  ****************************************************************************/
 
 #include "config.h"
-#include "as3525-codec.h"
+#include "ascodec-target.h"
+#include "as3514.h"
 #include <stdbool.h>
 
 void power_off(void)
 {
     /* clear bit 0 of system register */
-    ascodec_write(0x20, ascodec_read(0x20) & ~1);
+    ascodec_write(AS3514_SYSTEM, ascodec_read(AS3514_SYSTEM) & ~1);
 
     /* TODO : turn off peripherals properly ? */
 
@@ -40,7 +41,7 @@ void power_init(void)
 #if CONFIG_CHARGING
 bool charger_inserted(void)
 {
-    if(ascodec_read(0x25) & (1<<5))
+    if(ascodec_read(AS3514_IRQ_ENRD0) & (1<<5))
         return true;
     else
         return false;

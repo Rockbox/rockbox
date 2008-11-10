@@ -37,10 +37,8 @@
     interrupt bit 7 is raised and DACNT is not decremented after the transfer.
  */
 
-#include "as3525-codec.h"
+#include "ascodec-target.h"
 #include "as3525.h"
-
-#define AUDIO_I2C_ADDR  0x46
 
 #define I2C2_DATA       *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x00))
 #define I2C2_SLAD0      *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x04))
@@ -72,7 +70,7 @@ void ascodec_init(void)
     I2C2_CPSR1 = 0;     /* MSB */    
     
     /* set i2c slave address of codec part */
-    I2C2_SLAD0 = AUDIO_I2C_ADDR << 1;
+    I2C2_SLAD0 = AS3514_I2C_ADDR << 1;
 
     I2C2_CNTRL = 0x51;
 }
