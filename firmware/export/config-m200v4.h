@@ -52,7 +52,9 @@
 #define CONFIG_KEYPAD SANSA_M200_PAD
 
 /* define this if you have a real-time clock */
+#ifndef BOOTLOADER
 #define CONFIG_RTC RTC_AS3525
+#endif
 
 /* define this if you have RTC RAM available for settings */
 //#define HAVE_RTC_RAM
