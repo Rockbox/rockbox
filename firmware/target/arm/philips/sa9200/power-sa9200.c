@@ -24,6 +24,7 @@
 #include "cpu.h"
 #include "i2c-pp.h"
 #include "tuner.h"
+#include "ascodec.h"
 #include "as3514.h"
 #include "power.h"
 
