@@ -145,7 +145,8 @@ $(MAXOUTFILE):
 	$(SILENT)cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
 	$(SILENT)rm $(MAXINFILE)
 
-$(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(LIBROCKBOX) $(VOICE)
+$(OBJDIR)/rombox.elf : $(LINKROM) $(LIBROCKBOX) $(VOICE)
+	$(call PRINTS,MAKE objs)$(MAKE) objs
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lgcc $(LINKVOICE) $(LINKBITMAPS) -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
 
 objs: $(OBJS)
