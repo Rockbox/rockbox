@@ -695,7 +695,7 @@ cat <<EOF
  34) M3/M3L               ==Olympus==            54) Sansa c100
                           70) M:Robe 500         55) Sansa Clip
  ==Creative==             71) M:Robe 100         56) Sansa e200v2
- 90) Zen Vision:M 30GB                           57) Sansa m200v2
+ 90) Zen Vision:M 30GB                           57) Sansa m200v4
  91) Zen Vision:M 60GB    ==Philips==            58) Sansa Fuze
  92) Zen Vision           100) GoGear SA9200
                           101) GoGear HDD1630    ==Logik==
@@ -1718,7 +1718,7 @@ fi
     ;;
 
 
-   57|m200v2)
+   57|m200v4)
     target_id=52
     modelname="m200v2"
     target="-DSANSA_M200V2"
