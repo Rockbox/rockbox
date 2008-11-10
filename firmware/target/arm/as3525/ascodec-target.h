@@ -27,6 +27,8 @@
 
 #include "as3514.h"
 
+void ascodec_init(void);
+
 int ascodec_write(unsigned int index, unsigned int value);
 
 int ascodec_read(unsigned int index);
