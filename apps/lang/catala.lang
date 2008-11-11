@@ -3828,17 +3828,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Apagat de llum de botons"
-    e200*: "Apagat de llum de roda"
+    fuze,e200*: "Apagat de llum de roda"
   </dest>
   <voice>
     *: none
     button_light: "Apagat de llum de botons"
-    e200*: "Apagat de llum de roda"
+    fuze,e200*: "Apagat de llum de roda"
   </voice>
 </phrase>
 <phrase>

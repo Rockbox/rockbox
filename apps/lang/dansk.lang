@@ -9933,17 +9933,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Knap-lys sluk"
-    e200*: "Hjul-lys sluk"
+    fuze,e200*: "Hjul-lys sluk"
   </dest>
   <voice>
     *: none
     button_light: "Knap-lys sluk"
-    e200*: "Hjul-lys sluk"
+    fuze,e200*: "Hjul-lys sluk"
   </voice>
 </phrase>
 <phrase>

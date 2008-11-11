@@ -3832,17 +3832,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "זמן תאורת כפתור"
-    e200*: "זמן תאורת הגלגל"
+    fuze,e200*: "זמן תאורת הגלגל"
   </dest>
   <voice>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </voice>
 </phrase>
 <phrase>

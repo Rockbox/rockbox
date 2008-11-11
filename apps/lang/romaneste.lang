@@ -10303,17 +10303,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Timp iluminare butoane"
-    e200*: "Timp iluminare rotita"
+    fuze,e200*: "Timp iluminare rotita"
   </dest>
   <voice>
     *: none
     button_light: "Timp iluminare butoane"
-    e200*: "Timp iluminare rotita"
+    fuze,e200*: "Timp iluminare rotita"
   </voice>
 </phrase>
 <phrase>

@@ -10704,15 +10704,15 @@
   user:
   <source>
     *: none
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
-    e200*: "轉盤燈自動關時間"
+    fuze,e200*: "轉盤燈自動關時間"
   </dest>
   <voice>
     *: none
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </voice>
 </phrase>
 <phrase>

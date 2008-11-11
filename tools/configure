@@ -1751,7 +1751,7 @@ fi
     output="rockbox.sansa"
     bootoutput="bootloader-fuze.sansa"
     appextra="recorder:gui"
-    plugins="yes"
+    plugins=""
     swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"

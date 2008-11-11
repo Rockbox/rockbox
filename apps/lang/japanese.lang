@@ -3834,17 +3834,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "ボタンライトのタイムアウト"
-    e200*: "ホイールライトのタイムアウト"
+    fuze,e200*: "ホイールライトのタイムアウト"
   </dest>
   <voice>
     *: none
     button_light: "ボタンライトのタイムアウト"
-    e200*: "ホイールライトのタイムアウト"
+    fuze,e200*: "ホイールライトのタイムアウト"
   </voice>
 </phrase>
 <phrase>

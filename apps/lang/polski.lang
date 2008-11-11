@@ -3841,17 +3841,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Wygaszanie klawiszy"
-    e200*: "Wygaszanie koła sterującego"
+    fuze,e200*: "Wygaszanie koła sterującego"
   </dest>
   <voice>
     *: none
     button_light: "Wygaszanie klawiszy"
-    e200*: "Wygaszanie koła sterującego"
+    fuze,e200*: "Wygaszanie koła sterującego"
   </voice>
 </phrase>
 <phrase>

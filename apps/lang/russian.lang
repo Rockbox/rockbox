@@ -10945,17 +10945,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Таймаут подсветки клавиш"
-    e200*: "Таймаут подсветки колёсика"
+    fuze,e200*: "Таймаут подсветки колёсика"
   </dest>
   <voice>
     *: none
     button_light: "Таймаут подсветки клавиш"
-    e200*: "Таймаут подсветки колёсика"
+    fuze,e200*: "Таймаут подсветки колёсика"
   </voice>
 </phrase>
 <phrase>

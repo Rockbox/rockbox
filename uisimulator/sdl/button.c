@@ -950,7 +950,43 @@ void button_event(int key, bool pressed)
     case SDLK_SPACE:
         new_btn = BUTTON_SELECT;
         break;
-
+#elif CONFIG_KEYPAD == SANSA_FUZE_PAD
+    case SDLK_KP4:
+    case SDLK_LEFT:
+        new_btn = BUTTON_LEFT;
+        break;
+    case SDLK_KP6:
+    case SDLK_RIGHT:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case SDLK_KP8:
+    case SDLK_UP:
+        new_btn = BUTTON_SCROLL_BACK;
+        break;
+    case SDLK_KP2:
+    case SDLK_DOWN:
+        new_btn = BUTTON_SCROLL_FWD;
+        break;
+    case SDLK_PAGEUP:
+    case SDLK_KP9:
+        new_btn = BUTTON_UP;
+        break;
+    case SDLK_PAGEDOWN:
+    case SDLK_KP3:
+        new_btn = BUTTON_DOWN;
+        break;
+    case SDLK_KP_MINUS:
+        new_btn = BUTTON_POWER;
+        break;
+    case SDLK_KP_MULTIPLY:
+        new_btn = BUTTON_HOME;
+        break;
+    case SDLK_KP5:
+    case SDLK_SPACE:
+    case SDLK_KP_ENTER:
+    case SDLK_RETURN:
+        new_btn = BUTTON_SELECT;
+        break;
 #elif CONFIG_KEYPAD == SANSA_CLIP_PAD
     case SDLK_KP4:
     case SDLK_LEFT:

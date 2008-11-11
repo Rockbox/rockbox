@@ -436,6 +436,16 @@
 #define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
 #define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 
+#elif defined(SANSA_FUZE)
+#define UI_TITLE                    "Sansa Fuze"
+#define UI_WIDTH                    279 /* width of GUI window */
+#define UI_HEIGHT                   449 /* height of GUI window */
+/* high-colour */
+#define UI_LCD_POSX                 30 /* x position of lcd */
+#define UI_LCD_POSY                 31 /* y position of lcd */
+#define UI_LCD_WIDTH                LCD_WIDTH
+#define UI_LCD_HEIGHT               LCD_HEIGHT
+
 #elif defined(SANSA_CLIP)
 #define UI_TITLE                    "Sansa Clip"
 #define UI_WIDTH                    205 /* width of GUI window */

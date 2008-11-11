@@ -3826,18 +3826,18 @@
   user:
   <source>
     *: none
-    e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100: "Button Light Timeout"
+    button_light: "Button Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
-    e200*: "Kerék világításának hossza"
-    clip,c200,gigabeatf,mrobe100: "Gomb világításának hossza"
+    button_light: "Gomb világításának hossza"
+    fuze,e200*: "Kerék világításának hossza"
   </dest>
   <voice>
     *: none
-    e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100: "Button Light Timeout"
+    button_light: "Button Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </voice>
 </phrase>
 <phrase>

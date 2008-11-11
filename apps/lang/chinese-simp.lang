@@ -10687,17 +10687,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "按键背光自动关闭时滞"
-    e200*: "转盘背光自动关闭时滞"
+    fuze,e200*: "转盘背光自动关闭时滞"
   </dest>
   <voice>
     *: none
     button_light: "按键背光自动关闭时滞"
-    e200*: "转盘背光自动关闭时滞"
+    fuze,e200*: "转盘背光自动关闭时滞"
   </voice>
 </phrase>
 <phrase>

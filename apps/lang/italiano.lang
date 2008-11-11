@@ -3853,17 +3853,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Tempo di spegnimento illuminazione tasti"
-    e200*: "Tempo di spegnimento illuminazione rotella"
+    fuze,e200*: "Tempo di spegnimento illuminazione rotella"
   </dest>
   <voice>
     *: none
     button_light: "Tempo di spegnimento illuminazione tasti"
-    e200*: "Tempo di spegnimento illuminazione rotella"
+    fuze,e200*: "Tempo di spegnimento illuminazione rotella"
   </voice>
 </phrase>
 <phrase>

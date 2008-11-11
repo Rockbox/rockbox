@@ -3851,17 +3851,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Duração da Luz do Botão"
-    e200*: "Duração da Luz da Roda"
+    fuze,e200*: "Duração da Luz da Roda"
   </dest>
   <voice>
     *: none
     button_light: "Duração da Luz do Botão"
-    e200*: "Duração da Luz da Roda"
+    fuze,e200*: "Duração da Luz da Roda"
   </voice>
 </phrase>
 <phrase>

@@ -11181,17 +11181,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Tiempo de espera en la luz del botón"
-    e200*: "Tiempo de espera en la luz de la rueda"
+    fuze,e200*: "Tiempo de espera en la luz de la rueda"
   </dest>
   <voice>
     *: none
     button_light: "Tiempo de espera en la luz del botón"
-    e200*: "Tiempo de espera en la luz de la rueda"
+    fuze,e200*: "Tiempo de espera en la luz de la rueda"
   </voice>
 </phrase>
 <phrase>

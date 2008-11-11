@@ -3834,15 +3834,15 @@
   user:
   <source>
     *: none
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
-    e200*: "เวลาเปิดไฟล้อหมุน"
+    fuze,e200*: "เวลาเปิดไฟล้อหมุน"
   </dest>
   <voice>
     *: none
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </voice>
 </phrase>
 <phrase>

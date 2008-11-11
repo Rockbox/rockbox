@@ -37,12 +37,12 @@ void button_int(void);
 
 /* Sandisk Sansa Fuze button codes */
 
-/* TODO: These are just a copy of the E200 */
-
 /* Main unit's buttons */
-#define BUTTON_REC          0x00000001
+#define BUTTON_HOME         0x00000001
+
 #define BUTTON_DOWN         0x00000002
 #define BUTTON_RIGHT        0x00000004
+
 #define BUTTON_LEFT         0x00000008
 #define BUTTON_SELECT       0x00000010
 #define BUTTON_UP           0x00000020
@@ -51,7 +51,11 @@ void button_int(void);
 #define BUTTON_SCROLL_BACK  0x00000080
 #define BUTTON_SCROLL_FWD   0x00000100
 
-#define BUTTON_MAIN         0x00000fff
+#define BUTTON_HOLD         0x00000200
+
+#define BUTTON_MAIN         (BUTTON_HOME|BUTTON_DOWN|BUTTON_RIGHT|BUTTON_LEFT \
+                            |BUTTON_SELECT|BUTTON_UP|BUTTON_POWER \
+                            |BUTTON_SCROLLBACK|BUTTON_SCROLL_FWD|BUTTON_HOLD)
 
 /* No Remote control */
 #define BUTTON_REMOTE 0

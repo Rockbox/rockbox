@@ -10221,17 +10221,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Изключване на осветяването на бутоните"
-    e200*: "Изключване на осветяването на колелото"
+    fuze,e200*: "Изключване на осветяването на колелото"
   </dest>
   <voice>
     *: none
     button_light: ""
-    e200*: ""
+    fuze,e200*: ""
   </voice>
 </phrase>
 <phrase>

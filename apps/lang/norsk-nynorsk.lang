@@ -9871,17 +9871,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Avbrotstid for knappelys"
-    e200*: "Avbrotstid for hjullys"
+    fuze,e200*: "Avbrotstid for hjullys"
   </dest>
   <voice>
     *: none
     button_light: "Avbrotstid for knappelys"
-    e200*: "Avbrotstid for hjullys"
+    fuze,e200*: "Avbrotstid for hjullys"
   </voice>
 </phrase>
 <phrase>

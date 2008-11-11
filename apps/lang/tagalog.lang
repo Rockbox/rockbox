@@ -3841,17 +3841,17 @@
  <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
  </source>
  <dest>
     *: none
     button_light: "Pahintuin buttones sa ilaw"
-    e200*: "Pahintuin gulong sa ilaw"
+    fuze,e200*: "Pahintuin gulong sa ilaw"
  </dest>
  <voice>
     *: none
     button_light: ""
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
  </voice>
 </phrase>
 <phrase>

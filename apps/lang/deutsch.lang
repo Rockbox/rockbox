@@ -3850,17 +3850,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Tastenbeleuchtungsdauer"
-    e200*: "Scrollradbeleuchtungsdauer"
+    fuze,e200*: "Scrollradbeleuchtungsdauer"
   </dest>
   <voice>
     *: none
     button_light: "Tastenbeleuchtungsdauer"
-    e200*: "Scrollradbeleuchtungsdauer"
+    fuze,e200*: "Scrollradbeleuchtungsdauer"
   </voice>
 </phrase>
 <phrase>

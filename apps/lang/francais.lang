@@ -3880,17 +3880,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Durée de l'éclairage des touches"
-    e200*: "Durée de l'éclairage de la molette"
+    fuze,e200*: "Durée de l'éclairage de la molette"
   </dest>
   <voice>
     *: none
     button_light: "Durée de l'éclairage des touches"
-    e200*: "Durée de l'éclairage de la molette"
+    fuze,e200*: "Durée de l'éclairage de la molette"
   </voice>
 </phrase>
 <phrase>

@@ -10276,17 +10276,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Knoppen Licht Vertraging"
-    e200*: "Wiel Licht Vertraging"
+    fuze,e200*: "Wiel Licht Vertraging"
   </dest>
   <voice>
     *: none
     button_light: "Knoppen Licht Vertraging"
-    e200*: "Wiel Licht Vertraging"
+    fuze,e200*: "Wiel Licht Vertraging"
   </voice>
 </phrase>
 <phrase>

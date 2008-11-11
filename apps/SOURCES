@@ -212,4 +212,6 @@ keymaps/keymap-hdd1630.c
 keymaps/keymap-iaudio67.c
 #elif CONFIG_KEYPAD == LOGIK_DAX_PAD
 keymaps/keymap-logikdax.c
+#elif CONFIG_KEYPAD == SANSA_FUZE_PAD
+keymaps/keymap-fuze.c
 #endif

@@ -10023,17 +10023,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Slukketid for knapplys"
-    e200*: "Slukketid for hjullys"
+    fuze,e200*: "Slukketid for hjullys"
   </dest>
   <voice>
     *: none
     button_light: "Tid før lys på knapper slukker"
-    e200*: "Tid før lys på hjul slukker"
+    fuze,e200*: "Tid før lys på hjul slukker"
   </voice>
 </phrase>
 <phrase>

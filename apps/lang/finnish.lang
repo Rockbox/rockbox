@@ -9974,17 +9974,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Painikevalon aikakatkaisu"
-    e200*: "Rullavalon aikakatkaisu"
+    fuze,e200*: "Rullavalon aikakatkaisu"
   </dest>
   <voice>
     *: none
     button_light: "Painikevalon aikakatkaisu"
-    e200*: "Rullavalon aikakatkaisu"
+    fuze,e200*: "Rullavalon aikakatkaisu"
   </voice>
 </phrase>
 <phrase>

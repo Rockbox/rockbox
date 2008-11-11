@@ -3838,17 +3838,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    e200*: "Wheel Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Χρόνος σβησίματος πλήκτρων"
-    e200*: "Χρόνος σβησίματος τροχού"
+    fuze,e200*: "Χρόνος σβησίματος τροχού"
   </dest>
   <voice>
     *: none
     button_light: "Χρόνος σβησίματος πλήκτρων"
-    e200*: "Χρόνος σβησίματος τροχού"
+    fuze,e200*: "Χρόνος σβησίματος τροχού"
   </voice>
 </phrase>
 <phrase>
