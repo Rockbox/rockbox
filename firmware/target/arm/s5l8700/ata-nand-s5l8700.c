@@ -18,9 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "ata.h"
-#include "ata-target.h"
-#include "nand_idle_notify.h"
+#include "nand.h"
+#include "ata_idle_notify.h"
 #include "system.h"
 #include <string.h>
 #include "thread.h"

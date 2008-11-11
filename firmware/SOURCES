@@ -111,10 +111,12 @@ drivers/serial.c
 #ifndef SIMULATOR
 #if (CONFIG_STORAGE & STORAGE_MMC)
 drivers/ata_mmc.c
-#elif (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND & NAND_IFP7XX)
+#elif (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_IFP7XX)
 drivers/ata_flash.c
-#elif (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND & NAND_TCC)
+#elif (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_TCC)
 target/arm/ata-nand-telechips.c
+#elif (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_SAMSUNG)
+target/arm/s5l8700/ata-nand-s5l8700.c
 #elif (CONFIG_STORAGE & STORAGE_ATA)
 drivers/ata.c
 #elif (CONFIG_STORAGE & STORAGE_RAMDISK)
@@ -1139,7 +1141,6 @@ target/arm/tcc780x/cowond2/audio-cowond2.c
 
 #if CONFIG_CPU==S5L8700
 target/arm/s5l8700/system-s5l8700.c
-target/arm/s5l8700/ata-nand-s5l8700.c
 #endif
 
 #ifdef MEIZU_M6SL
