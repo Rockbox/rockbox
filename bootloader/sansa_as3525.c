@@ -28,6 +28,7 @@
 #include "config.h"
 #include "lcd.h"
 #include "backlight-target.h"
+#include "button-target.h"
 #include "ascodec-target.h"
 #include "common.h"
 #include "storage.h"
@@ -41,7 +42,6 @@ void main(void)
     int buffer_size;
     void(*kernel_entry)(void);
     int ret;
-    int delay;
 
     system_init();
     kernel_init();
@@ -52,9 +52,16 @@ void main(void)
     ascodec_init();  /* Required for backlight on e200v2 */
     _backlight_on();
 
-    delay = 0x3000000;
-    while(delay--); /* show splash screen */
-    reset_screen();
+#if 0 /* remove me when the bootloader can be considered finished */
+    int btn = button_read_device();
+
+    /* Enable bootloader messages if any button is pressed */
+    if (btn)
+#endif
+    {
+        lcd_clear_display();
+        verbose = true;
+    }
 
     asm volatile(
             "mrs r0, cpsr             \n"
