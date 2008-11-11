@@ -122,7 +122,7 @@ void usage(void)
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd, mn2g\n"
            "\t                   ip3g, ip4g, mini, iax5, iam5, iam3, h10, h10_5gb,\n"
            "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2,\n");
-    printf("\t                   9200, 1630, ldax, m200, clip, e2v2, m2v2, fuze)\n");
+    printf("\t                   9200, 1630, ldax, m200, clip, e2v2, m2v4, fuze)\n");
     printf("\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -289,7 +289,7 @@ int main (int argc, char** argv)
             modelnum = 40;
         else if (!strcmp(&argv[1][5], "e2v2"))
             modelnum = 41;
-        else if (!strcmp(&argv[1][5], "m2v2"))
+        else if (!strcmp(&argv[1][5], "m2v4"))
             modelnum = 42;
         else if (!strcmp(&argv[1][5], "fuze"))
             modelnum = 43;
