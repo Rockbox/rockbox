@@ -1726,7 +1726,7 @@ fi
     arm9tdmicc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"
-    tool="$rootdir/tools/scramble -add=m2v2"
+    tool="$rootdir/tools/scramble -add=m2v4"
     output="rockbox.sansa"
     bootoutput="bootloader-m200v4.sansa"
     appextra="recorder:gui"
