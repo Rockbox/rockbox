@@ -74,3 +74,49 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
 {
     return NULL;
 }
+
+
+/****************************************************************************
+ ** Recording DMA transfer
+ **/
+#ifdef HAVE_RECORDING
+void pcm_rec_lock(void)
+{
+}
+
+void pcm_rec_unlock(void)
+{
+}
+
+void pcm_record_more(void *start, size_t size)
+{
+    (void)start;
+    (void)size;
+}
+
+void pcm_rec_dma_stop(void)
+{
+}
+
+void pcm_rec_dma_start(void *addr, size_t size)
+{
+    (void)addr;
+    (void)size;
+}
+
+void pcm_rec_dma_close(void)
+{
+}
+
+
+void pcm_rec_dma_init(void)
+{
+}
+
+
+const void * pcm_rec_dma_get_peak_buffer(int *count)
+{
+    (void)count;
+}
+
+#endif /* HAVE_RECORDING */

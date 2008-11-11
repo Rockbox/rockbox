@@ -199,8 +199,9 @@ static void _display_on(void)
 }
 
 /* I'm guessing this function is lcd_enable, but it may not be... */
-void lcd_enable(int r0)
+void lcd_enable(bool on)
 {
+    int r0 = on;
 #if 0
     r4 = 0x1db12;
     [r4] = 1;
@@ -247,6 +248,36 @@ void lcd_enable(int r0)
 #if 0
     [r4] = 0;
 #endif
+}
+
+bool lcd_enabled(void)
+{
+    return display_on;
+}
+
+void lcd_sleep(void)
+{
+    /* TODO */
+}
+
+/*** update functions ***/
+
+/* Performance function to blit a YUV bitmap directly to the LCD
+ * src_x, src_y, width and height should be even
+ * x, y, width and height have to be within LCD bounds
+ */
+void lcd_blit_yuv(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    (void)src;
+    (void)src_x;
+    (void)src_y;
+    (void)stride;
+    (void)x;
+    (void)y;
+    (void)width;
+    (void)height;
 }
 
 void lcd_init_device()

@@ -7,7 +7,9 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2008 ??
+ * Tuner "middleware" for Silicon Labs SI4700 chip
+ *
+ * Copyright (C) 2008 ???
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,13 +20,28 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef SYSTEM_TARGET_H
-#define SYSTEM_TARGET_H
+#include "config.h"
+#include <stdbool.h>
+#include <string.h>
+#include <stdlib.h>
+#include "kernel.h"
+#include "tuner.h" /* tuner abstraction interface */
+#include "fmradio.h"
+#include "fmradio_i2c.h" /* physical interface driver */
 
-#include "system-arm.h"
+/* tuner abstraction layer: set something to the tuner */
+int si4700_set(int setting, int value)
+{
+    (void)setting;
+    (void)value;
 
-#define CPUFREQ_MAX    250000000
-#define CPUFREQ_DEFAULT 250000000
-#define CPUFREQ_NORMAL 250000000
+    return 1;
+}
 
-#endif /* SYSTEM_TARGET_H */
+/* tuner abstraction layer: read something from the tuner */
+int si4700_get(int setting)
+{
+    (void)setting;
+
+    return -1;
+}

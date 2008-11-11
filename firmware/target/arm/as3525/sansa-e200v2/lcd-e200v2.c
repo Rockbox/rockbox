@@ -338,6 +338,11 @@ bool lcd_enabled(void)
     return display_on;
 }
 
+void lcd_sleep(void)
+{
+    /* TODO */
+}
+
 /*** update functions ***/
 
 /* Performance function to blit a YUV bitmap directly to the LCD

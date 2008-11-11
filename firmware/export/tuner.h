@@ -102,6 +102,11 @@ extern int (*tuner_get)(int setting);
 #include "tea5767.h"
 #endif
 
+/* Silicon Labs 4700 */
+#if (CONFIG_TUNER & SI4700)
+#include "si4700.h"
+#endif
+
 #endif /* SIMULATOR */
 
 /* Additional messages that get enumerated after tuner driver headers */

@@ -167,14 +167,16 @@ static void sdram_init(void)
     MPMC_DYNAMIC_tRRD   = 2;
     MPMC_DYNAMIC_tMRD   = 2;
 
-#if defined(SANSA_CLIP) || defined(SANSA_M200V4) || defined(SANSA_FUZE)
-#   define MEMORY_MODEL 0x21
-    /* 16 bits external bus, low power SDRAM, 16 Mbits = 2 Mbytes */
-#elif defined(SANSA_E200V2)
-#   define MEMORY_MODEL 0x5
-    /* 16 bits external bus, high performance SDRAM, 64 Mbits = 8 Mbytes */
+#if defined(SANSA_CLIP) || defined(SANSA_M200V4)
+/* 16 bits external bus, low power SDRAM, 16 Mbits = 2 Mbytes */
+#define MEMORY_MODEL 0x21
+
+#elif defined(SANSA_E200V2) || defined(SANSA_FUZE)
+/* 16 bits external bus, high performance SDRAM, 64 Mbits = 8 Mbytes */
+#define MEMORY_MODEL 0x5
+    
 #else
-#   error "The external memory in your player is unknown"
+#error "The external memory in your player is unknown"
 #endif
 
     MPMC_DYNAMIC_RASCAS_0 = (2<<8)|2; /* CAS & RAS latency = 2 clock cycles */

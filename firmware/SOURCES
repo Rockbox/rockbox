@@ -179,6 +179,9 @@ drivers/tuner/s1a0903x01.c
 #if (CONFIG_TUNER & TEA5767)
 drivers/tuner/tea5767.c
 #endif /* (CONFIG_TUNER & TEA5767) */
+#if (CONFIG_TUNER & SI4700)
+drivers/tuner/si4700.c
+#endif /* (CONFIG_TUNER & SI4700) */
 #endif /*SIMULATOR */
 #endif /* CONFIG_TUNER */
 

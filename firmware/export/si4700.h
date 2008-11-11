@@ -5,9 +5,12 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
+ *
  * $Id$
  *
- * Copyright (C) 2008 ??
+ * Tuner header for the Silicon Labs SI4700
+ *
+ * Copyright (C) 2008 Dave Chapman
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,13 +21,16 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef SYSTEM_TARGET_H
-#define SYSTEM_TARGET_H
 
-#include "system-arm.h"
+#ifndef _SI4700_H_
+#define _SI4700_H_
 
-#define CPUFREQ_MAX    250000000
-#define CPUFREQ_DEFAULT 250000000
-#define CPUFREQ_NORMAL 250000000
+int si4700_set(int setting, int value);
+int si4700_get(int setting);
 
-#endif /* SYSTEM_TARGET_H */
+#ifndef CONFIG_TUNER_MULTI
+#define tuner_set si4700_set
+#define tuner_get si4700_get
+#endif
+
+#endif /* _SI4700_H_ */

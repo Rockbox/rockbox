@@ -1743,7 +1743,7 @@ fi
     target_id=53
     modelname="fuze"
     target="-DSANSA_FUZE"
-    memory=2
+    memory=8
     arm9tdmicc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"

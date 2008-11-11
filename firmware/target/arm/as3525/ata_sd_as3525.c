@@ -690,4 +690,28 @@ tCardInfo *card_get_info_target(int card_no)
     return &card;
 }
 
+bool card_detect_target(void)
+{
+#ifdef HAVE_HOTSWAP
+    /* TODO */
+    return false;
+#else
+    return false;
+#endif
+}
+
+#ifdef HAVE_HOTSWAP
+void card_enable_monitoring_target(bool on)
+{
+    if (on)
+    {
+        /* TODO */
+    }
+    else
+    {
+        /* TODO */
+    }
+}
+#endif
+
 #endif /* BOOTLOADER */
