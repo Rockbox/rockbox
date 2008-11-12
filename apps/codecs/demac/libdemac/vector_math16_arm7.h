@@ -217,19 +217,19 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "mov     r8,   r8   , asr #16   \n" \
         "mov     r9, " #f2 ", lsl #16   \n" \
         "mov     r9,   r9   , asr #16   \n" \
-        "mla     %[res], r8, r9, %[res] \n" \
+        "mla     %[res], r9, r8, %[res] \n" \
         "mov     r8, " #f1 ", asr #16   \n" \
         "mov     r9, " #f2 ", asr #16   \n" \
-        "mla     %[res], r8, r9, %[res] \n"
-        
+        "mla     %[res], r9, r8, %[res] \n"
+
 #define MLABLOCK2_U2(f1, f2)                \
         "mov     r8, " #f1 ", lsl #16   \n" \
         "mov     r8,   r8   , asr #16   \n" \
-        "mla     %[res], r8, r9, %[res] \n" \
+        "mla     %[res], r9, r8, %[res] \n" \
         "mov     r8, " #f1 ", asr #16   \n" \
         "mov     r9, " #f2 ", lsl #16   \n" \
         "mov     r9,   r9   , asr #16   \n" \
-        "mla     %[res], r8, r9, %[res] \n" \
+        "mla     %[res], r9, r8, %[res] \n" \
         "mov     r9, " #f2 ", asr #16   \n"
 
     asm volatile (
