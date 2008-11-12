@@ -219,8 +219,6 @@ void audiohw_close(void)
     /* 2. Disable all output buffers. */
     wmcodec_write(PWRMGMT2, 0x0);
 
-    sleep(HZ);
-
     /* 3. Switch off the power supplies. */
     wmcodec_write(PWRMGMT1, 0x0);
 }

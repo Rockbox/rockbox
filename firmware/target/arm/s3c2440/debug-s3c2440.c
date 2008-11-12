@@ -32,44 +32,7 @@
 
 bool __dbg_hw_info(void)
 {
-    char buf[50];
-    int line, button;
-
-    char reg=0, value=0;
-
-    lcd_clear_display();
-    lcd_setfont(FONT_SYSFIXED);
-
-    while(1)
-    {
-        line=0;
-        snprintf(buf, sizeof(buf), "reg: %08x value: %08x", reg, value);
-        lcd_puts(0, line++, buf);
-
-        button = button_get_w_tmo(HZ/10);
-    
-        if (button == BUTTON_UP)
-            reg++;
-        if (button == BUTTON_DOWN)
-            reg--;
-
-        if (button == BUTTON_VOL_UP)
-            value++;
-        if (button == BUTTON_VOL_DOWN)
-            value--;
-
-        if (button == BUTTON_A)
-        {
-//            LCD_SPI_start();
-//            LCD_SPI_setreg(reg, value);
-//            LCD_SPI_stop();
-        }
-
-        lcd_update();
-
-        if (button == (DEBUG_CANCEL|BUTTON_REL))
-            return false;
-    }
+    return false;
 }
 
 bool __dbg_ports(void)

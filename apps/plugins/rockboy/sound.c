@@ -116,6 +116,9 @@ struct snd snd IBSS_ATTR;
 static void gbSoundChannel1(int *r, int *l)
 {
     int vol = S1.envol;
+
+    int freq = 0;
+
     int value = 0;
 
     if(S1.on && (S1.len || !S1.cont))
@@ -169,7 +172,7 @@ static void gbSoundChannel1(int *r, int *l)
 
             if(S1.swlen<=0)
             {
-                int freq = (((int)(R_NR14&7) << 8) | R_NR13);
+                freq = (((int)(R_NR14&7) << 8) | R_NR13);
 
                 int updown = 1;
         
