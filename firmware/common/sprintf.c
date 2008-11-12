@@ -119,6 +119,7 @@ static int format(
 
         case 'x':
         case 'X':
+            pad='0';
             uval = va_arg (ap, int);
             do
             {
@@ -133,6 +134,7 @@ static int format(
             switch(ch) {
                 case 'x':
                 case 'X':
+                    pad='0';
                     ulval = va_arg (ap, long);
                     do
                     {
