@@ -64,7 +64,7 @@ fb_data *vdest;
 static void updatepatpix(void) ICODE_ATTR;
 static void updatepatpix(void)
 {
-    int i, j;
+    int i;
 #if ((CONFIG_CPU != SH7034) && !defined(CPU_COLDFIRE))
     int k, a, c;
 #endif
@@ -73,10 +73,12 @@ static void updatepatpix(void)
     if (!anydirty) return;
     for (i = 0; i < 1024; i++)
     {
+        int j;
         if (i == 384) i = 512;
         if (i == 896) break;
         if (!patdirty[i]) continue;
         patdirty[i] = 0;
+        
         for (j = 0; j < 8; j++)
         {
 #if CONFIG_CPU == SH7034
@@ -376,8 +378,8 @@ static void tilebuf(void)
     int base;
     byte *tilemap, *attrmap;
     int *tilebuf;
-    int *wrap;
-    static int wraptable[64] =
+    const int *wrap;
+    static const int wraptable[64] ICONST_ATTR =
     {
         0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,-32
@@ -778,11 +780,11 @@ static void spr_enum(void)
 static void spr_scan(void) ICODE_ATTR;
 static void spr_scan(void)
 {
-    int i, x;
-    byte pal, b, ns = NS;
-    byte *src, *dest, *bg, *pri;
+    int i;
+    byte ns = NS;
+    byte *src, *dest;
     struct vissprite *vs;
-    static byte bgdup[256];
+    static byte bgdup[256] IBSS_ATTR;
 
     if (!ns) return;
 
@@ -791,7 +793,8 @@ static void spr_scan(void)
 
     for (; ns; ns--, vs--)
     {
-        x = vs->x;
+        int x = vs->x;
+
         if (x > 159) continue;
         if (x < -7) continue;
         if (x < 0)
@@ -807,23 +810,25 @@ static void spr_scan(void)
             if (x > 152) i = 160 - x;
             else i = 8;
         }
-        pal = vs->pal;
+
+        byte pal = vs->pal;
+
         if (vs->pri)
         {
-            bg = bgdup + (dest - BUF);
+            byte *bg = bgdup + (dest - BUF);
             while (i--)
             {
-                b = src[i];
+                byte b = src[i];
                 if (b && !(bg[i]&3)) dest[i] = pal|b;
             }
         }
         else if (hw.cgb)
         {
-            bg = bgdup + (dest - BUF);
-            pri = PRI + (dest - BUF);
+            byte *bg = bgdup + (dest - BUF);
+            byte *pri = PRI + (dest - BUF);
             while (i--)
             {
-                b = src[i];
+                byte b = src[i];
                 if (b && (!pri[i] || !(bg[i]&3)))
                     dest[i] = pal|b;
             }

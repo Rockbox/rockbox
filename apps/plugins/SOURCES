@@ -143,6 +143,8 @@ iriverify.c
 iriver_flash.c
 #endif
 
+gigabeat_flash.c
+
 #endif /* iFP7xx */
 #if (LCD_WIDTH > 138) && (LCD_DEPTH > 1)
 /* Built for bitmap targets except H10 5/6gb, Archoses, iPod mini, mrobe100 and ifp*/

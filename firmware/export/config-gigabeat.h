@@ -10,6 +10,9 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 18
 
+/* Define RTC alarm */
+#define HAVE_RTC_ALARM
+
 /* define this if you use an ATA controller */
 #define CONFIG_STORAGE STORAGE_ATA
 

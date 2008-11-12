@@ -113,9 +113,14 @@ void system_reboot(void)
 
 static void set_page_tables(void)
 {
-    map_section(0, 0, 0x1000, CACHE_NONE); /* map every memory region to itself */
-    map_section(0x30000000, 0, 32, CACHE_ALL); /* map RAM to 0 and enable caching for it */
-    map_section((int)FRAME, (int)FRAME, 1, BUFFERED); /* enable buffered writing for the framebuffer */
+    /* map every memory region to itself */
+    map_section(0, 0, 0x1000, CACHE_NONE); 
+    
+    /* map RAM to 0 and enable caching for it */
+    map_section(0x30000000, 0, 32, CACHE_ALL); 
+    
+    /* enable buffered writing for the framebuffer */
+    map_section((int)FRAME, (int)FRAME, 1, BUFFERED); 
 }
 
 void memory_init(void) {
@@ -145,7 +150,7 @@ void s3c_regclr(volatile int *reg, unsigned int mask)
 void system_init(void)
 {
     INTMSK = 0xFFFFFFFF;
-     INTMOD =  0;
+    INTMOD = 0;
     SRCPND = 0xFFFFFFFF;
     INTPND = 0xFFFFFFFF;
     INTSUBMSK = 0xFFFFFFFF;

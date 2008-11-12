@@ -244,7 +244,7 @@ static void LCD_SPI_init(void)
 /* LCD init */
 void lcd_init_device(void)
 {
-#ifdef BOOTLOADER
+#if 0//def BOOTLOADER
     int i;
     /* When the Rockbox bootloader starts, we are changing framebuffer address,
        but we don't want what's shown on the LCD to change until we do an

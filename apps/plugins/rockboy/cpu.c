@@ -333,8 +333,6 @@ void cpu_timers(int cnt)
 
 static int cpu_idle(int max)
 {
-    int cnt, unit;
-
     if (!(cpu.halt && IME)) return 0;
 	if (R_IF & R_IE)
 	{
@@ -353,6 +351,7 @@ static int cpu_idle(int max)
         return max;
     }
 
+    int cnt, unit;
     /* Figure out when the next timer interrupt will happen */
     unit = ((-R_TAC) & 3) << 1;
     cnt = (511 - cpu.tim + (1<<unit)) >> unit;

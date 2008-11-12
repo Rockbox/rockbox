@@ -49,8 +49,8 @@ vectors:
 /* Add some strings to detect the bootloader in flash and give it a version
  * number.  (0x040A0028, 0x040A002C)
  */
-.string "ROCKBOX"
-.word   0x0001
+.string "ROCKBOX\0"
+.string "R 03.00\0"
 
 /*
  * Function: word_copy
@@ -97,6 +97,18 @@ start:
 
     /* Check if the code is running from flash. If not skip all these checks */
     cmp     r0, #0xA0000
+    bne     poweron
+
+    /* Did an RTC event wake the player up? */ 
+
+    mov     r2, #0x4A000000
+    ldr     r1, [r2]
+    ands    r1, r1, #0x40000000
+
+    /* Woke up with the alarm - store a flag in GSTATUS3 */
+    ldrne   r2, =0x560000b8
+    movne   r1, #0x01
+    strne   r1, [r2]
     bne     poweron
 
     /* Set GPG up to read power and menu status */
