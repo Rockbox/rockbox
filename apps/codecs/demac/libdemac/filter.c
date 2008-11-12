@@ -45,7 +45,7 @@ struct filter_t {
     int16_t* coeffs; /* ORDER entries */
 
     /* We store all the filter delays in a single buffer */
-    int16_t* historybuffer;  /* ORDER*2 + HISTORY_SIZE entries */
+    int16_t* history_end;
 
     int16_t* delay;
     int16_t* adaptcoeffs;
@@ -143,11 +143,11 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3980(struct filter_t* f,
         f->adaptcoeffs++;
 
         /* Have we filled the history buffer? */
-        if (f->delay == f->historybuffer + HISTORY_SIZE + (ORDER*2)) {
-            memmove(f->historybuffer, f->delay - (ORDER*2), 
+        if (f->delay == f->history_end) {
+            memmove(f->coeffs + ORDER, f->delay - (ORDER*2),
                     (ORDER*2) * sizeof(int16_t));
-            f->delay = f->historybuffer + ORDER*2;
-            f->adaptcoeffs = f->historybuffer + ORDER;
+            f->adaptcoeffs = f->coeffs + ORDER*2;
+            f->delay = f->coeffs + ORDER*3;
         }
     }
 }
@@ -188,11 +188,11 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3970(struct filter_t* f,
         f->adaptcoeffs++;
 
         /* Have we filled the history buffer? */
-        if (f->delay == f->historybuffer + HISTORY_SIZE + (ORDER*2)) {
-            memmove(f->historybuffer, f->delay - (ORDER*2), 
+        if (f->delay == f->history_end) {
+            memmove(f->coeffs + ORDER, f->delay - (ORDER*2),
                     (ORDER*2) * sizeof(int16_t));
-            f->delay = f->historybuffer + ORDER*2;
-            f->adaptcoeffs = f->historybuffer + ORDER;
+            f->adaptcoeffs = f->coeffs + ORDER*2;
+            f->delay = f->coeffs + ORDER*3;
         }
     }
 }
@@ -203,15 +203,14 @@ static struct filter_t filter1 IBSS_ATTR;
 static void do_init_filter(struct filter_t* f, int16_t* buf)
 {
     f->coeffs = buf;
-    f->historybuffer = buf + ORDER;
+    f->history_end = buf + ORDER*3 + HISTORY_SIZE;
 
-    /* Zero the output history buffer */
-    memset(f->historybuffer, 0 , (ORDER*2) * sizeof(int16_t));
-    f->delay = f->historybuffer + ORDER*2;
-    f->adaptcoeffs = f->historybuffer + ORDER;
+    /* Init pointers */
+    f->adaptcoeffs = f->coeffs + ORDER*2;
+    f->delay = f->coeffs + ORDER*3;
 
-    /* Zero the co-efficients  */
-    memset(f->coeffs, 0, ORDER * sizeof(int16_t));
+    /* Zero coefficients and history buffer */
+    memset(f->coeffs, 0, ORDER*3 * sizeof(int16_t));
 
     /* Zero the running average */
     f->avg = 0;
