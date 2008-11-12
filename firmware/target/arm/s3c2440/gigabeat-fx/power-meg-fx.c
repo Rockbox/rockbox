@@ -70,6 +70,11 @@ void power_off(void)
     _backlight_off();
     _buttonlight_off();
     sleep(HZ);
+    
+    /* Do this to allow the drive to properly reset when player restarts 
+     * immediately without running OF shutdown.
+     */
+    GPGCON&=~0x00300000; 
 
     /* Rockbox never properly shutdown the player.  When the sleep bit is set
      * the player actually wakes up in some type of "zombie" state 
