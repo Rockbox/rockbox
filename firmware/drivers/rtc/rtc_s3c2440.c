@@ -57,39 +57,32 @@ int rtc_write_datetime(unsigned char* buf)
 }
 
 #ifdef HAVE_RTC_ALARM
-/*  This alarm code works in that it at least triggers INT_RTC.  I am guessing
- *  that the OF bootloader for the Gigabeat detects the startup by alarm and shuts down.
- *  This code is available for use once the OF bootloader is no longer required.
+/* This alarm code works with a flashed bootloader.  This will not work with
+ * the OF bootloader.
  */
-
-/* check whether the unit has been started by the RTC alarm function
- * This code has not been written/checked for the gigabeat
- */
+ 
+/* Check whether the unit has been started by the RTC alarm function */
 bool rtc_check_alarm_started(bool release_alarm)
 {
-    static bool alarm_state, run_before;
-    bool rc;
-
-    if (run_before) {
-        rc = alarm_state;
-        alarm_state &= ~release_alarm;         
-    } else { 
-        /* This call resets AF, so we store the state for later recall */
-        rc = alarm_state = rtc_check_alarm_flag();
-        run_before = true;
+    if (GSTATUS3) 
+    {
+        GSTATUS3 &= ~release_alarm;  
+        return true;
+    } 
+    else 
+    { 
+        return false;
     }
-
-    return rc;
 }
 
-/*
- * I don't think this matters on the gigabeat, it seems designed to shut off the alarm in the
- * event one happens while the player is running.  This does not cause any problems on the
- * gigabeat as the interupt is recieved (if not masked) and ignored.
- */
+/* Check to see if the alarm has flaged since the last it was checked */
 bool rtc_check_alarm_flag(void) 
 {
-    return false;
+    bool ret=SRCPND & 0x40000000;
+    
+    SRCPND=RTC_MASK;
+    
+    return ret;
 }
 
 /* set alarm time registers to the given time (repeat once per day) */
@@ -114,12 +107,10 @@ bool rtc_enable_alarm(bool enable)
     if (enable)
     {
         RTCALM=0x46;
-        INTMSK&=~(1<<30);
     }
     else
     {
         RTCALM=0x00;
-        INTMSK|=(1<<30);
     }
 
     return false; /* all ok */
