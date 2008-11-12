@@ -44,10 +44,28 @@
 #include "rbunicode.h"
 #include "usb.h"
 #include "mmu-arm.h"
+#include "rtc.h"
 
 #include <stdarg.h>
 
 char version[] = APPSVERSION;
+
+void shutdown(void)
+{
+    /* We need to gracefully spin down the disk to prevent clicks. */
+    if (ide_powered())
+    {
+        /* Make sure ATA has been initialized. */
+        ata_init();
+        
+        /* And put the disk into sleep immediately. */
+        ata_sleepnow();
+    }
+    
+    _backlight_off();
+
+    power_off();
+}
 
 void main(void)
 {
@@ -56,14 +74,72 @@ void main(void)
     int rc;
     int(*kernel_entry)(void);
 
-    power_init();
     system_init();
     lcd_init();
     backlight_init();
+    button_init();
     font_init();
+    kernel_init(); /* Need the kernel to sleep */
+    adc_init();
 
     lcd_setfont(FONT_SYSFIXED);
+    
+    /* These checks should only run if the bootloader is flashed */
+    if(GSTATUS3&0x02)
+    {
+        GSTATUS3&=0xFFFFFFFD;
+        if(!(GPGDAT&BUTTON_POWER) && charger_inserted())
+        {
+            while(!(GPGDAT&BUTTON_POWER) && charger_inserted())
+            {
+                char msg[20];
+                if(charging_state())
+                {
+                    snprintf(msg,sizeof(msg),"Charging");
+                }
+                else
+                {
+                    snprintf(msg,sizeof(msg),"Charge Complete");
+                }
+                reset_screen();
+                lcd_putsxy( (LCD_WIDTH - (SYSFONT_WIDTH * strlen(msg))) / 2,
+                        (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
+                lcd_update();
+                
+#if defined(HAVE_RTC_ALARM)            
+                /* Check if the alarm went off while charging */
+                if(rtc_check_alarm_flag())
+                {
+                    GSTATUS3=1; /* Normally this is set in crt0.s */
+                    break;
+                }
+#endif
+            }
+            if(!(GPGDAT&BUTTON_POWER) 
+#if defined(HAVE_RTC_ALARM)
+                && !GSTATUS3
+#endif
+                )
+            {
+                shutdown();
+            }
+        }
 
+        if(button_hold())
+        {
+            const char msg[] = "HOLD is enabled";
+            reset_screen();
+            lcd_putsxy( (LCD_WIDTH - (SYSFONT_WIDTH * strlen(msg))) / 2,
+                        (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
+            lcd_update();
+            
+            sleep(2*HZ);
+            
+            shutdown();
+        }
+    }
+
+    power_init();
     usb_init();
 
     /* Enter USB mode without USB thread */
@@ -88,9 +164,7 @@ void main(void)
         lcd_update();
     }
     
-    kernel_init();
-    adc_init();
-    button_init();
+    reset_screen();
 
     /* Show debug messages if button is pressed */
     if(button_read_device())

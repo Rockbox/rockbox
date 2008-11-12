@@ -105,10 +105,13 @@ start:
     ldr     r1, [r2]
     ands    r1, r1, #0x40000000
 
-    /* Woke up with the alarm - store a flag in GSTATUS3 */
-    ldrne   r2, =0x560000b8
-    movne   r1, #0x01
-    strne   r1, [r2]
+    /* Store a flag in GSTATUS3 to indicate that the bootloader is flashed */
+    ldr     r2, =0x560000b8
+    mov     r1, #0x02
+    
+    /* Woke up with the alarm? - store a flag in GSTATUS3 */
+    orrne   r1, r1, #0x01
+    str     r1, [r2]
     bne     poweron
 
     /* Set GPG up to read power and menu status */
