@@ -86,13 +86,13 @@ execution to the uncompressed firmware.
 #include <ucl/ucl.h>
 
 /* Headers for ARM code binaries */
-#include "uclimg.h"
+#include "nrv2e_d8.h"
 #include "md5.h"
 
-#include "bootimg_clip.h"
-#include "bootimg_e200v2.h"
-#include "bootimg_fuze.h"
-#include "bootimg_m200v4.h"
+#include "dualboot_clip.h"
+#include "dualboot_e200v2.h"
+#include "dualboot_fuze.h"
+#include "dualboot_m200v4.h"
 
 /* Win32 compatibility */
 #ifndef O_BINARY
@@ -126,21 +126,21 @@ static const char* model_names[] =
 
 static const unsigned char* bootloaders[] = 
 {
-    bootimg_fuze,
-    bootimg_clip,
+    dualboot_fuze,
+    dualboot_clip,
     NULL,
-    bootimg_e200v2,
-    bootimg_m200v4,
+    dualboot_e200v2,
+    dualboot_m200v4,
     NULL
 };
 
 static const int bootloader_sizes[] = 
 {
-    sizeof(bootimg_fuze),
-    sizeof(bootimg_clip),
+    sizeof(dualboot_fuze),
+    sizeof(dualboot_clip),
     0,
-    sizeof(bootimg_e200v2),
-    sizeof(bootimg_m200v4),
+    sizeof(dualboot_e200v2),
+    sizeof(dualboot_m200v4),
     0
 };
 
@@ -540,9 +540,9 @@ int main(int argc, char* argv[])
     fprintf(stderr,"[INFO] Bootloader size:          %d bytes\n",(int)bootloader_size);
     fprintf(stderr,"[INFO] Packed bootloader size:   %d bytes\n",rb_packedsize);
     fprintf(stderr,"[INFO] Dual-boot function size:  %d bytes\n",bootloader_sizes[model]);
-    fprintf(stderr,"[INFO] UCL unpack function size: %d bytes\n",sizeof(uclimg));
+    fprintf(stderr,"[INFO] UCL unpack function size: %d bytes\n",sizeof(nrv2e_d8));
 
-    totalsize = bootloader_sizes[model] + sizeof(uclimg) + of_packedsize + 
+    totalsize = bootloader_sizes[model] + sizeof(nrv2e_d8) + of_packedsize + 
                 rb_packedsize;
 
     fprintf(stderr,"[INFO] Total size of new image:  %d bytes\n",totalsize);
@@ -566,8 +566,8 @@ int main(int argc, char* argv[])
     p = buf + 0x400 + firmware_size;
 
     /* 1 - UCL unpack function */
-    p -= sizeof(uclimg);
-    memcpy(p, uclimg, sizeof(uclimg));
+    p -= sizeof(nrv2e_d8);
+    memcpy(p, nrv2e_d8, sizeof(nrv2e_d8));
 
     /* 2 - Compressed copy of original firmware */
     p -= of_packedsize;
@@ -583,14 +583,14 @@ int main(int argc, char* argv[])
 
     /* UCL unpack function */
     put_uint32le(&buf[0x420], firmware_size - 1);
-    put_uint32le(&buf[0x424], sizeof(uclimg));
+    put_uint32le(&buf[0x424], sizeof(nrv2e_d8));
 
     /* Compressed original firmware image */
-    put_uint32le(&buf[0x428], firmware_size - sizeof(uclimg) - 1);
+    put_uint32le(&buf[0x428], firmware_size - sizeof(nrv2e_d8) - 1);
     put_uint32le(&buf[0x42c], of_packedsize);
 
     /* Compressed Rockbox image */
-    put_uint32le(&buf[0x430], firmware_size - sizeof(uclimg) - of_packedsize - 1);
+    put_uint32le(&buf[0x430], firmware_size - sizeof(nrv2e_d8) - of_packedsize - 1);
     put_uint32le(&buf[0x434], rb_packedsize);
 
 

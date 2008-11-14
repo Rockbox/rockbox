@@ -1,137 +1,83 @@
+CC=gcc
 
 # We use the UCL code available in the Rockbox tools/ directory
-
 CFLAGS=-I../../tools/ucl/include
 LIBUCL=../../tools/ucl/src/libucl.a
 
 # Edit the following variables (plus copy/paste another set of rules) when
 # adding a new target.  mkamsboot.c also needs to be edited to refer to these
 # new images.
-#
-# If anyone reading this wants to improve this makefile, please do!
 
-BOOTIMAGES = bootimg_clip.o bootimg_e200v2.o bootimg_m200v4.o bootimg_fuze.o
-BOOTHEADERS = bootimg_clip.h bootimg_e200v2.h bootimg_m200v4.h bootimg_fuze.h
+BOOTIMAGES = dualboot_clip.o dualboot_e200v2.o dualboot_m200v4.o dualboot_fuze.o
+BOOTHEADERS = dualboot_clip.h dualboot_e200v2.h dualboot_m200v4.h dualboot_fuze.h
 
-CLIPFILES = dualboot-clip.o dualboot-clip.elf dualboot-clip.o \
-            dualboot-clip.bin bootimg_clip.c bootimg_clip.h
+CLIPFILES = dualboot_clip.arm-o dualboot_clip.o dualboot_clip.c dualboot_clip.h
 
-E200V2FILES = dualboot-e200v2.o dualboot-e200v2.elf dualboot-e200v2.o \
-              dualboot-e200v2.bin bootimg_e200v2.c bootimg_e200v2.h
+E200V2FILES = dualboot_e200v2.arm-o dualboot_e200v2.o dualboot_e200v2.c \
+              dualboot_e200v2.h
 
-M200V4FILES = dualboot-m200v4.o dualboot-m200v4.elf dualboot-m200v4.o \
-              dualboot-m200v4.bin bootimg_m200v4.c bootimg_m200v4.h
+M200V4FILES = dualboot_m200v4.arm-o dualboot_m200v4.o dualboot_m200v4.arm-bin \
+              dualboot_m200v4.c dualboot_m200v4.h
 
-FUZEFILES = dualboot-fuze.o dualboot-fuze.elf dualboot-fuze.o \
-              dualboot-fuze.bin bootimg_fuze.c bootimg_fuze.h
+FUZEFILES = dualboot_fuze.arm-o dualboot_fuze.o dualboot_fuze.c dualboot_fuze.h
 
 all: mkamsboot
+
+# Dualboot bootloaders
+
+dualboot_clip.arm-o: dualboot.S
+	arm-elf-gcc -DSANSA_CLIP -c -o dualboot_clip.arm-o dualboot.S
+
+dualboot_fuze.arm-o: dualboot.S
+	arm-elf-gcc -DSANSA_FUZE -c -o dualboot_fuze.arm-o dualboot.S
+
+dualboot_e200v2.arm-o: dualboot.S
+	arm-elf-gcc -DSANSA_E200V2 -c -o dualboot_e200v2.arm-o dualboot.S
+
+dualboot_m200v4.arm-o: dualboot.S
+	arm-elf-gcc -DSANSA_M200V4 -c -o dualboot_m200v4.arm-o dualboot.S
+
+# Rules for the ucl unpack function
+nrv2e_d8.arm-o: nrv2e_d8.S
+	arm-elf-gcc -DPURE_THUMB -c -o nrv2e_d8.arm-o nrv2e_d8.S
+
+
 
 $(LIBUCL):
 	make -C ../../tools/ucl/src libucl.a
 
 md5.o: md5.c md5.h
-	gcc $(CFLAGS) -c -o md5.o -W -Wall md5.c
+	$(CC) $(CFLAGS) -c -o md5.o -W -Wall md5.c
 
-mkamsboot.o: mkamsboot.c $(BOOTHEADERS) uclimg.h md5.h
-	gcc $(CFLAGS) -c -o mkamsboot.o -W -Wall mkamsboot.c
+mkamsboot.o: mkamsboot.c $(BOOTHEADERS) nrv2e_d8.h md5.h
+	$(CC) $(CFLAGS) -c -o mkamsboot.o -W -Wall mkamsboot.c
 
-mkamsboot: mkamsboot.o $(BOOTIMAGES) uclimg.o md5.o $(LIBUCL)
-	gcc -o mkamsboot mkamsboot.o $(BOOTIMAGES) uclimg.o md5.o $(LIBUCL)
+mkamsboot: mkamsboot.o $(BOOTIMAGES) nrv2e_d8.o md5.o $(LIBUCL)
+	$(CC) -o mkamsboot mkamsboot.o $(BOOTIMAGES) nrv2e_d8.o md5.o $(LIBUCL)
 
-# Rules for our test ARM application - assemble, link, then extract
-# the binary code
+# Rules for the ARM code embedded in mkamsboot - assemble, link, then extract
+# the binary code and finally convert to .c/.h for linking with mkamsboot
 
-# CLIP
+%.arm-elf: %.arm-o
+	arm-elf-ld -e 0 -Ttext=0 -o $@ $<
 
-dualboot-clip.o: dualboot.S
-	arm-elf-gcc -DSANSA_CLIP -c -o dualboot-clip.o dualboot.S
+%.arm-bin: %.arm-elf
+	arm-elf-objcopy -O binary $< $@
 
-dualboot-clip.elf: dualboot-clip.o
-	arm-elf-ld -e 0 -Ttext=0 -o dualboot-clip.elf dualboot-clip.o
+%.c %.h: %.arm-bin bin2c
+	./bin2c $< $*
 
-dualboot-clip.bin: dualboot-clip.elf
-	arm-elf-objcopy -O binary dualboot-clip.elf dualboot-clip.bin
+# Generic host rule.
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-bootimg_clip.c bootimg_clip.h: dualboot-clip.bin bin2c
-	./bin2c dualboot-clip.bin bootimg_clip
-
-bootimg_clip.o: bootimg_clip.c
-	gcc -c -o bootimg_clip.o bootimg_clip.c
-
-# FUZE
-
-dualboot-fuze.o: dualboot.S
-	arm-elf-gcc -DSANSA_FUZE -c -o dualboot-fuze.o dualboot.S
-
-dualboot-fuze.elf: dualboot-fuze.o
-	arm-elf-ld -e 0 -Ttext=0 -o dualboot-fuze.elf dualboot-fuze.o
-
-dualboot-fuze.bin: dualboot-fuze.elf
-	arm-elf-objcopy -O binary dualboot-fuze.elf dualboot-fuze.bin
-
-bootimg_fuze.c bootimg_fuze.h: dualboot-fuze.bin bin2c
-	./bin2c dualboot-fuze.bin bootimg_fuze
-
-bootimg_fuze.o: bootimg_fuze.c
-	gcc -c -o bootimg_fuze.o bootimg_fuze.c
-
-# E200V2
-
-dualboot-e200v2.o: dualboot.S
-	arm-elf-gcc -DSANSA_E200V2 -c -o dualboot-e200v2.o dualboot.S
-
-dualboot-e200v2.elf: dualboot-e200v2.o
-	arm-elf-ld -e 0 -Ttext=0 -o dualboot-e200v2.elf dualboot-e200v2.o
-
-dualboot-e200v2.bin: dualboot-e200v2.elf
-	arm-elf-objcopy -O binary dualboot-e200v2.elf dualboot-e200v2.bin
-
-bootimg_e200v2.c bootimg_e200v2.h: dualboot-e200v2.bin bin2c
-	./bin2c dualboot-e200v2.bin bootimg_e200v2
-
-bootimg_e200v2.o: bootimg_e200v2.c
-	gcc -c -o bootimg_e200v2.o bootimg_e200v2.c
-
-# M200V4    
-    
-dualboot-m200v4.o: dualboot.S
-	arm-elf-gcc -DSANSA_M200V4 -c -o dualboot-m200v4.o dualboot.S
-
-dualboot-m200v4.elf: dualboot-m200v4.o
-	arm-elf-ld -e 0 -Ttext=0 -o dualboot-m200v4.elf dualboot-m200v4.o
-
-dualboot-m200v4.bin: dualboot-m200v4.elf
-	arm-elf-objcopy -O binary dualboot-m200v4.elf dualboot-m200v4.bin
-
-bootimg_m200v4.c bootimg_m200v4.h: dualboot-m200v4.bin bin2c
-	./bin2c dualboot-m200v4.bin bootimg_m200v4
-
-bootimg_m200v4.o: bootimg_m200v4.c
-	gcc -c -o bootimg_m200v4.o bootimg_m200v4.c
-        
-# Rules for the ucl unpack function
-nrv2e_d8.o: nrv2e_d8.S
-	arm-elf-gcc -DPURE_THUMB -c -o nrv2e_d8.o nrv2e_d8.S
-
-# NOTE: this function has no absolute references, so the link address (-e)
-# is irrelevant.  We just link at address 0, but it can run from anywhere.
-nrv2e_d8.elf: nrv2e_d8.o
-	arm-elf-ld -e 0 -Ttext=0 -o nrv2e_d8.elf nrv2e_d8.o
-
-nrv2e_d8.bin: nrv2e_d8.elf
-	arm-elf-objcopy -O binary nrv2e_d8.elf nrv2e_d8.bin
-
-uclimg.c uclimg.h: nrv2e_d8.bin bin2c
-	./bin2c nrv2e_d8.bin uclimg
-
-uclimg.o: uclimg.c
-	gcc -c -o uclimg.o uclimg.c
+# Cancel the implicit .S -> .o rule
+%.o: %.S
 
 bin2c: bin2c.c
-	gcc -o bin2c bin2c.c
+	$(CC) -o bin2c bin2c.c
 
 clean:
-	rm -f mkamsboot mkamsboot.o nrv2e_d8.o nrv2e_d8.elf nrv2e_d8.bin *~ \
-	bin2c uclimg.c uclimg.h uclimg.o md5.o \
+	rm -f mkamsboot mkamsboot.o nrv2e_d8.arm-o nrv2e_d8.arm-elf \
+	nrv2e_d8.arm-bin *~ bin2c nrv2e_d8.c nrv2e_d8.h nrv2e_d8.o md5.o \
 	$(BOOTIMAGES) $(CLIPFILES) $(E200V2FILES) $(M200V4FILES) $(FUZEFILES)
