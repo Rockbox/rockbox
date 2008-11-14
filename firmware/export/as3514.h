@@ -22,9 +22,6 @@
 #ifndef _AS3514_H
 #define _AS3514_H
 
-#include "config.h"
-#include <stdbool.h>
-
 extern int tenthdb2master(int db);
 
 extern void audiohw_set_master_vol(int vol_l, int vol_r);
