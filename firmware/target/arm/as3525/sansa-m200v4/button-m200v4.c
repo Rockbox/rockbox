@@ -30,17 +30,20 @@ void button_init_device(void)
     GPIOA_DIR |= ((1<<6) | (1<<5) | (1<<4)); /* A4-A6 row outputs */
 }
 
+/* short delay is needed between raising a colum pin, and reading the row pin. values is arbitraty */
+static inline void btn_delay(void) { int i = 5; while(i--) ; }
+
 int button_read_device(void)
 {
     int result = BUTTON_NONE;
-
+    
     /* direct GPIO connections */
     if (GPIOA_PIN(3))
         result |= BUTTON_MENU;
 
     /* This is a keypad using A4-A6 as columns and A0-A2 as rows */
     GPIOA_PIN(4) = (1<<4);
-
+    btn_delay();
     /* A4A0 is unused */
 
     if (GPIOA_PIN(1))
@@ -52,7 +55,8 @@ int button_read_device(void)
     GPIOA_PIN(4) = 0x00;  
     
     GPIOA_PIN(5) = (1<<5);
-
+    btn_delay();
+    
     if (GPIOA_PIN(0))
         result |= BUTTON_LEFT;
 
@@ -66,7 +70,8 @@ int button_read_device(void)
 
 
     GPIOA_PIN(6) = (1<<6);
-
+    btn_delay();
+    
     if (GPIOA_PIN(0))
         result |= BUTTON_REPEATAB;
 
@@ -75,6 +80,7 @@ int button_read_device(void)
 
     if (GPIOA_PIN(2))
         result |= BUTTON_HOLD;
+        
     GPIOA_PIN(6) = 0x00;
 
     return result;

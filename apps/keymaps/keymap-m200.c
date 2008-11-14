@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-/* Button Code Definitions for Sandisk c200 target */
+/* Button Code Definitions for Sandisk m200 target */
 
 #include "config.h"
 #include "action.h"
@@ -34,11 +34,11 @@
  * Insert LAST_ITEM_IN_LIST at the end of each mapping 
  */
 static const struct button_mapping button_context_standard[]  = {
-    { ACTION_STD_PREV,          BUTTON_VOLUP,                      BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,    BUTTON_VOLUP|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_STD_PREV,          BUTTON_PLAYPAUSE,                      BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,    BUTTON_PLAYPAUSE|BUTTON_REPEAT,        BUTTON_NONE },
 
-    { ACTION_STD_NEXT,          BUTTON_VOLDOWN,                    BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,    BUTTON_VOLDOWN|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_STD_NEXT,          BUTTON_REPEATAB,                    BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,    BUTTON_REPEATAB|BUTTON_REPEAT,      BUTTON_NONE },
 
     { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT },
     { ACTION_STD_OK,            BUTTON_RIGHT,                   BUTTON_NONE   },
@@ -53,8 +53,8 @@ static const struct button_mapping button_context_standard[]  = {
 
 
 static const struct button_mapping button_context_wps[]  = {
-    { ACTION_WPS_PLAY,          BUTTON_VOLUP|BUTTON_REL,           BUTTON_VOLUP },
-    { ACTION_WPS_STOP,          BUTTON_VOLUP|BUTTON_REPEAT,        BUTTON_VOLUP },
+    { ACTION_WPS_PLAY,          BUTTON_PLAYPAUSE|BUTTON_REL,           BUTTON_PLAYPAUSE },
+    { ACTION_WPS_STOP,          BUTTON_PLAYPAUSE|BUTTON_REPEAT,        BUTTON_PLAYPAUSE },
    
     { ACTION_WPS_SKIPPREV,      BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT },
     { ACTION_WPS_SEEKBACK,      BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
@@ -66,14 +66,20 @@ static const struct button_mapping button_context_wps[]  = {
     
     { ACTION_WPS_ABSETB_NEXTDIR,BUTTON_MENU|BUTTON_RIGHT,      BUTTON_MENU },
     { ACTION_WPS_ABSETA_PREVDIR,BUTTON_MENU|BUTTON_LEFT,       BUTTON_MENU },
-    { ACTION_WPS_ABRESET,       BUTTON_MENU|BUTTON_VOLUP,         BUTTON_MENU },
+    { ACTION_WPS_ABRESET,       BUTTON_MENU|BUTTON_PLAYPAUSE,         BUTTON_MENU },
+    
+    { ACTION_WPS_VOLUP,         BUTTON_VOLUP,                  BUTTON_NONE },
+    { ACTION_WPS_VOLUP,         BUTTON_VOLUP|BUTTON_REPEAT,    BUTTON_NONE },
+
+    { ACTION_WPS_VOLDOWN,       BUTTON_VOLDOWN,                BUTTON_NONE },
+    { ACTION_WPS_VOLDOWN,       BUTTON_VOLDOWN|BUTTON_REPEAT,  BUTTON_NONE },
     
     { ACTION_WPS_MENU,          BUTTON_MENU|BUTTON_REL,        BUTTON_MENU  },
     { ACTION_WPS_BROWSE,        BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT },    
-    { ACTION_WPS_PITCHSCREEN,   BUTTON_SELECT|BUTTON_VOLUP,        BUTTON_SELECT },
-    { ACTION_WPS_ID3SCREEN,     BUTTON_SELECT|BUTTON_VOLDOWN,      BUTTON_SELECT },
-    { ACTION_WPS_CONTEXT,       BUTTON_VOLDOWN|BUTTON_REL,         BUTTON_VOLDOWN   },
-    { ACTION_WPS_QUICKSCREEN,   BUTTON_VOLDOWN|BUTTON_REPEAT,      BUTTON_VOLDOWN   },
+    { ACTION_WPS_PITCHSCREEN,   BUTTON_SELECT|BUTTON_PLAYPAUSE,        BUTTON_SELECT },
+    { ACTION_WPS_ID3SCREEN,     BUTTON_SELECT|BUTTON_REPEATAB,      BUTTON_SELECT },
+    { ACTION_WPS_CONTEXT,       BUTTON_REPEATAB|BUTTON_REL,         BUTTON_REPEATAB   },
+    { ACTION_WPS_QUICKSCREEN,   BUTTON_REPEATAB|BUTTON_REPEAT,      BUTTON_REPEATAB   },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
@@ -82,11 +88,11 @@ static const struct button_mapping button_context_settings[] = {
     { ACTION_STD_CANCEL,        BUTTON_MENU,                   BUTTON_NONE },
     { ACTION_SETTINGS_RESET,    BUTTON_SELECT,                  BUTTON_NONE },
 
-    { ACTION_SETTINGS_INC,      BUTTON_VOLUP,                      BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT,BUTTON_VOLUP|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_SETTINGS_INC,      BUTTON_PLAYPAUSE,                      BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,BUTTON_PLAYPAUSE|BUTTON_REPEAT,        BUTTON_NONE },
 
-    { ACTION_SETTINGS_DEC,      BUTTON_VOLDOWN,                    BUTTON_NONE },
-    { ACTION_SETTINGS_DECREPEAT,BUTTON_VOLDOWN|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,      BUTTON_REPEATAB,                    BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,BUTTON_REPEATAB|BUTTON_REPEAT,      BUTTON_NONE },
    
     { ACTION_STD_PREV,          BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
@@ -132,7 +138,7 @@ static const struct button_mapping button_context_listtree_scroll_without_combo[
 }; /* button_context_listtree_scroll_without_combo */
 
 static const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
-    { ACTION_TREE_ROOT_INIT,    BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
+ //   { ACTION_TREE_ROOT_INIT,    BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
     
 //    { ACTION_TREE_PGLEFT,       BUTTON_REC|BUTTON_LEFT,         BUTTON_REC },
 //    { ACTION_TREE_PGLEFT,       BUTTON_REC|BUTTON_LEFT|BUTTON_REPEAT, BUTTON_NONE },
@@ -153,11 +159,11 @@ static const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_NONE,              BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_STD_CANCEL,        BUTTON_MENU|BUTTON_REL,        BUTTON_NONE },
     
-    { ACTION_QS_DOWNINV,        BUTTON_VOLUP|BUTTON_REL,           BUTTON_NONE },
-    { ACTION_QS_DOWNINV,        BUTTON_VOLUP|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_QS_DOWNINV,        BUTTON_PLAYPAUSE|BUTTON_REL,           BUTTON_NONE },
+    { ACTION_QS_DOWNINV,        BUTTON_PLAYPAUSE|BUTTON_REPEAT,        BUTTON_NONE },
 
-    { ACTION_QS_DOWN,           BUTTON_VOLDOWN|BUTTON_REL,         BUTTON_NONE },
-    { ACTION_QS_DOWN,           BUTTON_VOLDOWN|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_QS_DOWN,           BUTTON_REPEATAB|BUTTON_REL,         BUTTON_NONE },
+    { ACTION_QS_DOWN,           BUTTON_REPEATAB|BUTTON_REPEAT,      BUTTON_NONE },
     
     { ACTION_QS_LEFT,           BUTTON_LEFT|BUTTON_REL,         BUTTON_NONE },
     { ACTION_QS_LEFT,           BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
@@ -181,11 +187,11 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
 }; /* button_context_settings_right_is_inc */
 
 static const struct button_mapping button_context_pitchscreen[]  = {
-    { ACTION_PS_INC_SMALL,      BUTTON_VOLUP,                      BUTTON_NONE },
-    { ACTION_PS_INC_BIG,        BUTTON_VOLUP|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_PS_INC_SMALL,      BUTTON_PLAYPAUSE,                      BUTTON_NONE },
+    { ACTION_PS_INC_BIG,        BUTTON_PLAYPAUSE|BUTTON_REPEAT,        BUTTON_NONE },
 
-    { ACTION_PS_DEC_SMALL,      BUTTON_VOLDOWN,                    BUTTON_NONE },
-    { ACTION_PS_DEC_BIG,        BUTTON_VOLDOWN|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_PS_DEC_SMALL,      BUTTON_REPEATAB,                    BUTTON_NONE },
+    { ACTION_PS_DEC_BIG,        BUTTON_REPEATAB|BUTTON_REPEAT,      BUTTON_NONE },
     
     { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,         BUTTON_NONE },
@@ -219,13 +225,13 @@ static const struct button_mapping button_context_recscreen[]  = {
 /** FM Radio Screen **/
 #if CONFIG_TUNER
 static const struct button_mapping button_context_radio[]  = {
-    { ACTION_NONE,              BUTTON_VOLUP,                      BUTTON_NONE },
-    { ACTION_FM_MENU,           BUTTON_VOLDOWN,                    BUTTON_NONE },
+    { ACTION_NONE,              BUTTON_PLAYPAUSE,                      BUTTON_NONE },
+    { ACTION_FM_MENU,           BUTTON_REPEATAB,                    BUTTON_NONE },
     { ACTION_FM_PRESET,         BUTTON_SELECT,                  BUTTON_NONE },
-    { ACTION_FM_STOP,           BUTTON_VOLUP|BUTTON_REPEAT,        BUTTON_VOLUP   },
+    { ACTION_FM_STOP,           BUTTON_PLAYPAUSE|BUTTON_REPEAT,        BUTTON_PLAYPAUSE   },
     { ACTION_FM_MODE,           BUTTON_REC,                     BUTTON_NONE },
     { ACTION_FM_EXIT,           BUTTON_MENU|BUTTON_REL,        BUTTON_MENU },
-    { ACTION_FM_PLAY,           BUTTON_VOLUP|BUTTON_REL,           BUTTON_VOLUP   },
+    { ACTION_FM_PLAY,           BUTTON_PLAYPAUSE|BUTTON_REL,           BUTTON_PLAYPAUSE   },
     { ACTION_SETTINGS_INC,      BUTTON_VOL_UP,                  BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,BUTTON_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_SETTINGS_DEC,      BUTTON_VOL_DOWN,                BUTTON_NONE },
@@ -246,10 +252,10 @@ static const struct button_mapping button_context_keyboard[]  = {
 //    { ACTION_KBD_CURSOR_RIGHT, BUTTON_REC|BUTTON_RIGHT,              BUTTON_NONE },
 //    { ACTION_KBD_CURSOR_RIGHT, BUTTON_REC|BUTTON_RIGHT|BUTTON_REPEAT,BUTTON_NONE },
     
-    { ACTION_KBD_UP,           BUTTON_VOLUP,                       BUTTON_NONE },
-    { ACTION_KBD_UP,           BUTTON_VOLUP|BUTTON_REPEAT,         BUTTON_NONE },
-    { ACTION_KBD_DOWN,         BUTTON_VOLDOWN,                     BUTTON_NONE },
-    { ACTION_KBD_DOWN,         BUTTON_VOLDOWN|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_PLAYPAUSE,                       BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_PLAYPAUSE|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_REPEATAB,                     BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_REPEATAB|BUTTON_REPEAT,       BUTTON_NONE },
     
 //    { ACTION_KBD_BACKSPACE,    BUTTON_REC|BUTTON_VOLDOWN,          BUTTON_NONE },
 //    { ACTION_KBD_BACKSPACE,    BUTTON_REC|BUTTON_VOLDOWN|BUTTON_REPEAT,BUTTON_NONE },
