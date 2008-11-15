@@ -519,10 +519,12 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     int remaining = incount;
     const unsigned long *fifo_base = MMC_FIFO(drive);
 
-#if defined(SANSA_E200V2)
-    start += 61440;
+    /* skip SanDisk OF */
+    if (drive == NAND_AS3525)
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
+        start += 61440;
 #else
-    start += 20480; /* skip SanDisk OF */
+        start += 20480; 
 #endif
     /* TODO: Add DMA support. */
 
