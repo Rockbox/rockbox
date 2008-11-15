@@ -25,6 +25,7 @@
 #ifndef _LIBDEMAC_IRAM_H
 #define _LIBDEMAC_IRAM_H
 
+#ifdef ROCKBOX
 #include "config.h"
 
 /* On PP5002 code should go into IRAM. Otherwise put the insane
@@ -38,5 +39,12 @@
 #define ICODE_ATTR_DEMAC
 #define IBSS_ATTR_DEMAC_INSANEBUF IBSS_ATTR
 #endif
+
+#else
+
+#define IBSS_ATTR_DEMAC_INSANEBUF
+#define ICODE_ATTR_DEMAC
+
+#endif /* !ROCKBOX */
 
 #endif /* _LIBDEMAC_IRAM_H */
