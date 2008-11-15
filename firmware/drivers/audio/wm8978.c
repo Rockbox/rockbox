@@ -190,8 +190,8 @@ void audiohw_preinit(void)
     sleep(HZ/10);
 
     /* 2. Mute all analogue outputs */
-    wmc_set(WMC_LOUT1_HP_VOLUME_CTRL, WMC_MUTE);
-    wmc_set(WMC_ROUT1_HP_VOLUME_CTRL, WMC_MUTE);
+    wmc_set(WMC_LOUT1_HP_VOLUME_CTRL, WMC_MUTE | HW_VOL_ANA_MIN);
+    wmc_set(WMC_ROUT1_HP_VOLUME_CTRL, WMC_MUTE | HW_VOL_ANA_MIN);
     wmc_set(WMC_LOUT2_SPK_VOLUME_CTRL, WMC_MUTE);
     wmc_set(WMC_ROUT2_SPK_VOLUME_CTRL, WMC_MUTE);
     wmc_set(WMC_OUT3_MIXER_CTRL, WMC_MUTE);
@@ -230,12 +230,6 @@ void audiohw_postinit(void)
     /* Specific to HW clocking */
     wmc_write(WMC_CLOCK_GEN_CTRL, WMC_MCLKDIV_1_5 | WMC_BCLKDIV_8 | WMC_MS);
     wmc_write(WMC_ADDITIONAL_CTRL, WMC_SR_48KHZ); /* 44.1 */
-
-    /* Initialize to minimum volume */
-    wmc_write_masked(WMC_LEFT_DAC_DIGITAL_VOL, HW_VOL_DIG_MIN, WMC_DVOL);
-    wmc_write_masked(WMC_LOUT1_HP_VOLUME_CTRL, HW_VOL_ANA_MIN, WMC_AVOL);
-    wmc_write_masked(WMC_RIGHT_DAC_DIGITAL_VOL, HW_VOL_DIG_MIN, WMC_DVOL);
-    wmc_write_masked(WMC_ROUT1_HP_VOLUME_CTRL, HW_VOL_ANA_MIN, WMC_AVOL);
 
     /* ADC silenced */
     wmc_write_masked(WMC_LEFT_ADC_DIGITAL_VOL, 0x00, WMC_DVOL);
