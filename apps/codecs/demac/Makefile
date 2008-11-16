@@ -1,4 +1,4 @@
-# $Id:$
+# $Id$
 
 FILTERS = libdemac/filter_16_11.o libdemac/filter_64_11.o libdemac/filter_256_13.o libdemac/filter_32_10.o libdemac/filter_1280_15.o
 LIBOBJS = libdemac/parser.o libdemac/decoder.o libdemac/entropy.o libdemac/predictor.o libdemac/crc.o $(FILTERS)
@@ -37,7 +37,6 @@ libdemac/filter_64_11.o: libdemac/filter.c
 libdemac/filter_256_13.o: libdemac/filter.c
 libdemac/filter_1280_15.o: libdemac/filter.c
 libdemac/filter_32_10.o: libdemac/filter.c
-libdemac/entropy.o: libdemac/rangecoding.h
 
 clean:
 	rm -f $(OUTPUT) $(OBJS) *~ */*~
