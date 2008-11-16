@@ -1394,6 +1394,16 @@ static const char *get_token_value(struct gui_wps *gwps,
                                           token->value.i))
                 return "v";
             return NULL;
+        case WPS_TOKEN_VIEWMODE:
+            if (intval)
+            {
+                if (data->current_mode > limit)
+                    data->current_mode = 1;
+                *intval = data->current_mode;
+            }
+            snprintf(buf, buf_size, "%d", data->current_mode);
+            return buf;
+            
         default:
             return NULL;
     }

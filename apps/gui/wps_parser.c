@@ -162,6 +162,8 @@ static int parse_albumart_load(const char *wps_bufptr,
 static int parse_albumart_conditional(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 #endif /* HAVE_ALBUMART */
+static int parse_viewmode(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data);
 
 #ifdef CONFIG_RTC
 #define WPS_RTC_REFRESH WPS_REFRESH_DYNAMIC
@@ -281,6 +283,8 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_PLAYBACK_STATUS,          "mp",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_BUTTON_VOLUME,            "mv",  WPS_REFRESH_DYNAMIC, 
                                                              parse_timeout },
+    { WPS_TOKEN_VIEWMODE,                 "mo",  WPS_REFRESH_STATIC, 
+                                                             parse_viewmode },
 
 #ifdef HAVE_LCD_BITMAP
     { WPS_TOKEN_PEAKMETER,                "pm", WPS_REFRESH_PEAK_METER, NULL },
@@ -1142,6 +1146,15 @@ static int parse_albumart_conditional(const char *wps_bufptr,
 };
 #endif /* HAVE_ALBUMART */
 
+static int parse_viewmode(const char *wps_bufptr,
+                           struct wps_token *token,
+                           struct wps_data *wps_data)
+{
+    (void)wps_bufptr; (void)token;
+    wps_data->current_mode = 1;
+    /* are we going to add parameters? */
+    return 0;
+}
 /* Parse a generic token from the given string. Return the length read */
 static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
 {
@@ -1476,6 +1489,7 @@ void wps_data_init(struct wps_data *wps_data)
     wps_data->full_line_progressbar = false;
 #endif
     wps_data->button_time_volume = 0;
+    wps_data->current_mode = -1;
     wps_data->wps_loaded = false;
 }
 

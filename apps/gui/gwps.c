@@ -136,7 +136,7 @@ long gui_wps_show(void)
     bool update_track = false;
     int i;
     long last_left = 0, last_right = 0;
-    
+    bool isremote = false;
     wps_state_init();
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -234,7 +234,10 @@ long gui_wps_show(void)
 #else
         button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,HZ/5);
 #endif
-
+#if NB_SCREENS > 1
+        isremote = get_action_statuscode(NULL)&ACTION_REMOTE;
+#endif
+        
         /* Exit if audio has stopped playing. This can happen if using the
            sleep timer with the charger plugged or if starting a recording
            from F1 */
@@ -292,13 +295,23 @@ long gui_wps_show(void)
                 break;
 
             case ACTION_WPS_BROWSE:
+                if (gui_wps[isremote?1:0].data->current_mode > -1)
+                {
+                    /* will get set to 0 eventually again in wps_parser.c */
+                    gui_wps[isremote?1:0].data->current_mode = 
+                            gui_wps[isremote?1:0].data->current_mode+1;
+                    restore = true;
+                }
+                else
+                {
 #ifdef HAVE_LCD_CHARCELLS
-                status_set_record(false);
-                status_set_audio(false);
+                    status_set_record(false);
+                    status_set_audio(false);
 #endif
-                FOR_NB_SCREENS(i)
-                    gui_wps[i].display->stop_scroll();
-                return GO_TO_PREVIOUS_BROWSER;
+                    FOR_NB_SCREENS(i)
+                        gui_wps[i].display->stop_scroll();
+                    return GO_TO_PREVIOUS_BROWSER;
+                }
                 break;
 
                 /* play/pause */
