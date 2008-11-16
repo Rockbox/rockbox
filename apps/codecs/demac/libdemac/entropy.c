@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #include "parser.h"
 #include "entropy.h"
-#include "demac_iram.h"
+#include "demac_config.h"
 
 #define MODEL_ELEMENTS 64
 
@@ -115,20 +115,11 @@ each function (and the RNGC macro)).
 
 */
 
-#ifdef ROCKBOX
-#include "../lib/codeclib.h"
-/* for UDIV32() */
-#endif
-
-#ifndef UDIV32
-#define UDIV32(a, b)  (a / b)
-#endif
-
 /* BITSTREAM READING FUNCTIONS */
 
 /* We deal with the input data one byte at a time - to ensure
    functionality on CPUs of any endianness regardless of any requirements
-   for aligned reads. 
+   for aligned reads.
 */
 
 static unsigned char* bytebuffer IBSS_ATTR;

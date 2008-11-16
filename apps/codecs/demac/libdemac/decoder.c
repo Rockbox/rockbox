@@ -29,18 +29,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #include "predictor.h"
 #include "entropy.h"
 #include "filter.h"
-#include "demac_iram.h"
+#include "demac_config.h"
 
 /* Statically allocate the filter buffers */
 
-static int16_t filterbuf32[(32*3 + HISTORY_SIZE) * 2]     /* 2432 bytes */
+static int16_t filterbuf32[(32*3 + FILTER_HISTORY_SIZE) * 2]   /* 2432 bytes */
                IBSS_ATTR __attribute__((aligned(16)));
-static int16_t filterbuf256[(256*3 + HISTORY_SIZE) * 2]   /* 5120 bytes */
+static int16_t filterbuf256[(256*3 + FILTER_HISTORY_SIZE) * 2] /* 5120 bytes */
                IBSS_ATTR __attribute__((aligned(16)));
 
 /* This is only needed for "insane" files, and no current Rockbox targets
    can hope to decode them in realtime, although the Gigabeat S comes close. */
-static int16_t filterbuf1280[(1280*3 + HISTORY_SIZE) * 2] /* 17408 bytes */
+static int16_t filterbuf1280[(1280*3 + FILTER_HISTORY_SIZE) * 2] /* 17408 bytes */
                IBSS_ATTR_DEMAC_INSANEBUF __attribute__((aligned(16)));
 
 void init_frame_decoder(struct ape_ctx_t* ape_ctx,

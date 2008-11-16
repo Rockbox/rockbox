@@ -2,7 +2,7 @@
 
 libdemac - A Monkey's Audio decoder
 
-$Id:$
+$Id$
 
 Copyright (C) Dave Chapman 2007
 
@@ -26,9 +26,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #define _APE_FILTER_H
 
 #include <inttypes.h>
-
-/* The size of the history buffers */
-#define HISTORY_SIZE    512
 
 void init_filter_16_11(int16_t* buf);
 int apply_filter_16_11(int fileversion, int32_t* decoded0, int32_t* decoded1, int count);

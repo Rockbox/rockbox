@@ -26,20 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #define _APE_PARSER_H
 
 #include <inttypes.h>
-
-#ifdef ROCKBOX
-/* Include the Rockbox Codec API when building for Rockbox */
-#define APE_OUTPUT_DEPTH 29
-#ifndef ROCKBOX_PLUGIN
-#include "../lib/codeclib.h"
-#include <codecs.h>
-#endif
-#else
-#define APE_OUTPUT_DEPTH (ape_ctx->bps)
-#define IBSS_ATTR
-#define ICONST_ATTR
-#define ICODE_ATTR
-#endif
+#include "demac_config.h"
 
 /* The earliest and latest file formats supported by this library */
 #define APE_MIN_VERSION 3970
@@ -66,7 +53,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #define APE_FRAMECODE_STEREO_SILENCE  3
 #define APE_FRAMECODE_PSEUDO_STEREO   4
 
-#define HISTORY_SIZE 512
 #define PREDICTOR_ORDER 8
 /* Total size of all predictor histories - 50 * sizeof(int32_t) */
 #define PREDICTOR_SIZE 50
@@ -95,7 +81,7 @@ struct predictor_t
     int32_t XcoeffsA[4];
     int32_t YcoeffsB[5];
     int32_t XcoeffsB[5];
-    int32_t historybuffer[HISTORY_SIZE + PREDICTOR_SIZE];
+    int32_t historybuffer[PREDICTOR_HISTORY_SIZE + PREDICTOR_SIZE];
 };
 
 struct ape_ctx_t

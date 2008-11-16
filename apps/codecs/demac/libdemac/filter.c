@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #include "demac.h"
 #include "filter.h"
-#include "demac_iram.h"
+#include "demac_config.h"
 
 #ifdef CPU_COLDFIRE
 #include "vector_math16_cf.h"
@@ -203,7 +203,7 @@ static struct filter_t filter1 IBSS_ATTR;
 static void do_init_filter(struct filter_t* f, int16_t* buf)
 {
     f->coeffs = buf;
-    f->history_end = buf + ORDER*3 + HISTORY_SIZE;
+    f->history_end = buf + ORDER*3 + FILTER_HISTORY_SIZE;
 
     /* Init pointers */
     f->adaptcoeffs = f->coeffs + ORDER*2;
@@ -219,7 +219,7 @@ static void do_init_filter(struct filter_t* f, int16_t* buf)
 void INIT_FILTER(int16_t* buf)
 {
     do_init_filter(&filter0, buf);
-    do_init_filter(&filter1, buf + ORDER * 3 + HISTORY_SIZE);
+    do_init_filter(&filter1, buf + ORDER*3 + FILTER_HISTORY_SIZE);
 }
 
 int ICODE_ATTR_DEMAC APPLY_FILTER(int fileversion, int32_t* data0,

@@ -21,7 +21,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 */
-#include "demac_iram.h"
+#include "demac_config.h"
 
     .section    ICODE_SECTION_DEMAC_ARM,"ax",%progbits
 
@@ -32,8 +32,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 
 /* NOTE: The following need to be kept in sync with parser.h */
-
-#define HISTORY_SIZE   512
 
 #define YDELAYA        200
 #define YDELAYB        168
@@ -470,7 +468,8 @@ loop:
 
     add     r11, r12, #historybuffer    @ r11 := &p->historybuffer[0]
 
-    sub     r10, r14, #HISTORY_SIZE*4   @ r10 := p->buf - HISTORY_SIZE
+    sub     r10, r14, #PREDICTOR_HISTORY_SIZE*4   
+                                       @ r10 := p->buf - PREDICTOR_HISTORY_SIZE
 
     cmp     r10, r11
     bne     endofloop

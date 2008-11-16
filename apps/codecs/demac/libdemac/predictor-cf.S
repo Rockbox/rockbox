@@ -23,6 +23,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 */
+#include "demac_config.h"
 
     .text
 
@@ -32,8 +33,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
     .type   predictor_decode_stereo,@function
 
 /* NOTE: The following need to be kept in sync with parser.h */
-
-#define HISTORY_SIZE   512
 
 #define YDELAYA        200
 #define YDELAYB        168
@@ -483,7 +482,8 @@ predictor_decode_stereo:
     
     addq.l  #4, %a5                     | p->buf++
 
-    lea.l   (historybuffer+HISTORY_SIZE*4,%a6), %a3 | %a3 = &p->historybuffer[HISTORY_SIZE]
+    lea.l   (historybuffer+PREDICTOR_HISTORY_SIZE*4,%a6), %a3 
+                              | %a3 = &p->historybuffer[PREDICTOR_HISTORY_SIZE]
     
     cmp.l   %a3, %a5                    
     bne.s   .endofloop

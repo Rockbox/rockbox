@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #include "parser.h"
 #include "predictor.h"
-#include "demac_iram.h"
+#include "demac_config.h"
 
 /* Return 0 if x is zero, -1 if x is positive, 1 if x is negative */
 #define SIGN(x) (x) ? (((x) > 0) ? -1 : 1) : 0
@@ -196,7 +196,7 @@ int ICODE_ATTR_DEMAC predictor_decode_stereo(struct predictor_t* p,
         p->buf++;
 
         /* Have we filled the history buffer? */
-        if (p->buf == p->historybuffer + HISTORY_SIZE) {
+        if (p->buf == p->historybuffer + PREDICTOR_HISTORY_SIZE) {
             memmove(p->historybuffer, p->buf, 
                     PREDICTOR_SIZE * sizeof(int32_t));
             p->buf = p->historybuffer;
@@ -250,7 +250,7 @@ int ICODE_ATTR_DEMAC predictor_decode_mono(struct predictor_t* p,
         p->buf++;
 
         /* Have we filled the history buffer? */
-        if (p->buf == p->historybuffer + HISTORY_SIZE) {
+        if (p->buf == p->historybuffer + PREDICTOR_HISTORY_SIZE) {
             memmove(p->historybuffer, p->buf, 
                     PREDICTOR_SIZE * sizeof(int32_t));
             p->buf = p->historybuffer;
