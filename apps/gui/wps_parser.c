@@ -26,6 +26,7 @@
 #include "file.h"
 #include "misc.h"
 #include "plugin.h"
+#include "kernel.h"
 
 #ifdef __PCTOOL__
 #ifdef WPSEDITOR
