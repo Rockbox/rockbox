@@ -2,7 +2,7 @@
 
 demac - A Monkey's Audio decoder
 
-$Id:$
+$Id$
 
 Copyright (C) Dave Chapman 2007
 
@@ -57,7 +57,7 @@ int open_wav(struct ape_ctx_t* ape_ctx, char* filename)
     int filesize;
     int bytespersample;
 
-    fd=creat(filename,0644);
+    fd=open(filename, O_CREAT|O_WRONLY|O_TRUNC|O_BINARY, 0644);
     if (fd < 0)
         return fd;
 
