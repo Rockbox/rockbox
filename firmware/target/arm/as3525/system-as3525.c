@@ -241,7 +241,13 @@ void system_init(void)
     /* enable VIC */
     CGU_PERI |= CGU_VIC_CLOCK_ENABLE;
     VIC_INT_SELECT = 0; /* only IRQ, no FIQ */
-#endif
+
+#else
+    /* disable fast hardware power-off, to use power button normally */
+    ascodec_init();
+    ascodec_write(AS3514_CVDD_DCDC3, ascodec_read(AS3514_CVDD_DCDC3) & (1<<2));
+
+#endif /* BOOTLOADER */
 }
 
 void system_reboot(void)
