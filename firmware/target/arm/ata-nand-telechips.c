@@ -25,18 +25,11 @@
 #include "led.h"
 #include "panic.h"
 #include "nand_id.h"
-
-/* The NAND driver is currently work-in-progress and as such contains
-   some dead code and debug stuff, such as the next few lines. */
-#include "lcd.h"
-#include "font.h"
-#include "button.h"
 #include "storage.h"
-#include <sprintf.h>
+#include "buffer.h"
 
 #define SECTOR_SIZE 512
 
-/* #define USE_TCC_LPT */
 /* #define USE_ECC_CORRECTION */
 
 /* for compatibility */
@@ -50,31 +43,41 @@ static bool initialized = false;
 static struct mutex ata_mtx SHAREDBSS_ATTR;
 
 #if defined(COWON_D2) || defined(IAUDIO_7)
-#define SEGMENT_ID_BIGENDIAN
+#define FTL_V2
 #define BLOCKS_PER_SEGMENT  4
+#define MAX_WRITE_CACHES    8
 #else
+#define FTL_V1
 #define BLOCKS_PER_SEGMENT  1
+#define MAX_WRITE_CACHES    4
 #endif
-/* NB: blocks_per_segment should become a runtime check based on NAND id */
 
-/* Segment type identifiers - main data area */
-#define SEGMENT_MAIN_LPT   0x12
-#define SEGMENT_MAIN_DATA1 0x13
-#define SEGMENT_MAIN_CACHE 0x15
-#define SEGMENT_MAIN_DATA2 0x17
+/* Sector type identifiers - main data area */
+
+#define SECTYPE_MAIN_LPT           0x12
+#define SECTYPE_MAIN_DATA          0x13
+#define SECTYPE_MAIN_RANDOM_CACHE  0x15
+#define SECTYPE_MAIN_INPLACE_CACHE 0x17
 
 /* We don't touch the hidden area at all - these are for reference */
-#define SEGMENT_HIDDEN_LPT   0x22
-#define SEGMENT_HIDDEN_DATA1 0x23
-#define SEGMENT_HIDDEN_CACHE 0x25
-#define SEGMENT_HIDDEN_DATA2 0x27
+#define SECTYPE_HIDDEN_LPT           0x22
+#define SECTYPE_HIDDEN_DATA          0x23
+#define SECTYPE_HIDDEN_RANDOM_CACHE  0x25
+#define SECTYPE_HIDDEN_INPLACE_CACHE 0x27
 
-/* Offsets to spare area data */
+#ifdef FTL_V1
+#define SECTYPE_FIRMWARE 0x40
+#else
+#define SECTYPE_FIRMWARE 0xE0
+#endif
+
+/* Offsets to data within sector's spare area */
+
 #define OFF_CACHE_PAGE_LOBYTE 2
 #define OFF_CACHE_PAGE_HIBYTE 3
-#define OFF_SEGMENT_TYPE      4
+#define OFF_SECTOR_TYPE       4
 
-#ifdef SEGMENT_ID_BIGENDIAN
+#ifdef FTL_V2
 #define OFF_LOG_SEG_LOBYTE    7
 #define OFF_LOG_SEG_HIBYTE    6
 #else
@@ -114,28 +117,28 @@ struct lpt_entry
     short bank;
     short phys_segment;
 };
+#ifdef BOOTLOADER
 static struct lpt_entry lpt_lookup[MAX_SEGMENTS];
+#else
+/* buffer_alloc'd in nand_init() when the correct size has been determined */
+static struct lpt_entry* lpt_lookup = NULL;
+#endif
 
 /* Write Caches */
 
-#define MAX_WRITE_CACHES 8
-
 struct write_cache
 {
-    short bank;
-    short phys_segment;
     short log_segment;
+    short inplace_bank;
+    short inplace_phys_segment;
+    short inplace_pages_used;
+    short random_bank;
+    short random_phys_segment;
     short page_map[MAX_PAGES_PER_BLOCK * BLOCKS_PER_SEGMENT];
 };
 static struct write_cache write_caches[MAX_WRITE_CACHES];
 
 static int write_caches_in_use = 0;
-
-#ifdef USE_TCC_LPT
-/* Read buffer (used for reading LPT blocks only) */
-static unsigned char page_buf[MAX_PAGE_SIZE + MAX_SPARE_SIZE]
-       __attribute__ ((aligned (4)));
-#endif
 
 #ifdef USE_ECC_CORRECTION
 static unsigned int ecc_sectors_corrected = 0;
@@ -501,18 +504,30 @@ static bool nand_read_sector_of_logical_segment(int log_segment, int sector,
     
     while (!found && cache_num < write_caches_in_use)
     {
-        if (write_caches[cache_num].log_segment == log_segment
-            && write_caches[cache_num].page_map[page_in_segment] != -1)
+        if (write_caches[cache_num].log_segment == log_segment)
         {
-            found = true;
-            bank = write_caches[cache_num].bank;
-            phys_segment = write_caches[cache_num].phys_segment;
-            page_in_segment = write_caches[cache_num].page_map[page_in_segment];
+            if (write_caches[cache_num].page_map[page_in_segment] != -1)
+            {
+                /* data is located in random pages cache */
+                found = true;
+                
+                bank = write_caches[cache_num].random_bank;
+                phys_segment = write_caches[cache_num].random_phys_segment;
+                
+                page_in_segment =
+                    write_caches[cache_num].page_map[page_in_segment];
+            }
+            else if (write_caches[cache_num].inplace_pages_used != -1 &&
+                     write_caches[cache_num].inplace_pages_used > page_in_segment)
+            {
+                /* data is located in in-place pages cache */
+                found = true;
+                
+                bank = write_caches[cache_num].inplace_bank;
+                phys_segment = write_caches[cache_num].inplace_phys_segment;
+            }
         }
-        else
-        {
-            cache_num++;
-        }
+        cache_num++;
     }
 
     return nand_read_sector_of_phys_segment(bank, phys_segment,
@@ -523,15 +538,21 @@ static bool nand_read_sector_of_logical_segment(int log_segment, int sector,
 
 /* Miscellaneous helper functions */
 
-static inline char get_segment_type(char* spare_buf)
+static inline unsigned char get_sector_type(char* spare_buf)
 {
-    return spare_buf[OFF_SEGMENT_TYPE];
+    return spare_buf[OFF_SECTOR_TYPE];
 }
 
-static inline unsigned short get_log_segment_id(char* spare_buf)
+static inline unsigned short get_log_segment_id(int phys_seg, char* spare_buf)
 {
-    return (spare_buf[OFF_LOG_SEG_HIBYTE] << 8) |
-            spare_buf[OFF_LOG_SEG_LOBYTE];
+    (void)phys_seg;
+    
+    return ((spare_buf[OFF_LOG_SEG_HIBYTE] << 8) |
+             spare_buf[OFF_LOG_SEG_LOBYTE])
+#if defined(FTL_V1)
+            + 984 * (phys_seg / 1024)
+#endif
+            ;
 }
 
 static inline unsigned short get_cached_page_id(char* spare_buf)
@@ -540,123 +561,123 @@ static inline unsigned short get_cached_page_id(char* spare_buf)
             spare_buf[OFF_CACHE_PAGE_LOBYTE];
 }
 
-
-
-#ifdef USE_TCC_LPT
-
-/* Reading the LPT from NAND is not yet fully understood. This code is therefore
-   not enabled by default, as it gives much worse results than the bank-scanning
-   approach currently used.
-   
-   The LPT is stored in a number of physical segments marked with type 0x12.
-   These are spread non-contiguously across the NAND, and are not stored in
-   sequential order.
-   
-   The LPT data is stored in Sector 0 of the first <n> pages of each segment.
-   Each 32-bit value in sequence represents the physical location of a logical
-   segment. This is stored as (physical segment number * bank number).
-   
-   NOTE: The bank numbers stored appear to be in reverse order to that required
-   by the nand_chip_select() function. The reason for this anomoly is unknown.
-*/
-
-static void read_lpt_block(int bank, int phys_segment)
+static int find_write_cache(int log_segment)
 {
-    int page = 1;   /* table starts at page 1 of segment */
-    bool cont = true;
-    
-    struct lpt_entry* lpt_ptr = NULL;
+    int i;
 
-    while (cont && page < pages_per_block)
-    {
-        int i = 0;
-        unsigned int* int_buf = (int*)page_buf;
-        
-        nand_read_sector_of_phys_segment(bank, phys_segment,
-                                         page, 0, /* only sector 0 is used */
-                                         page_buf);
+    for (i = 0; i < write_caches_in_use; i++)
+        if (write_caches[i].log_segment == log_segment)
+            return i;
 
-        /* Find out which chunk of the LPT table this section contains.
-           Do this by reading the logical segment number of entry 0 */
-        if (lpt_ptr == NULL)
-        {
-            int first_bank = int_buf[0] / segments_per_bank;
-            int first_phys_segment = int_buf[0] % segments_per_bank;
-
-            /* Reverse the stored bank number */
-            if (total_banks > 1)
-                first_bank = (total_banks-1) - first_bank;
-
-            unsigned char spare_buf[16];
-
-            nand_read_raw(first_bank,
-                          phys_segment_to_page_addr(first_phys_segment, 0),
-                          SECTOR_SIZE, /* offset */
-                          16, spare_buf);
-
-            int first_log_segment = get_log_segment_id(spare_buf);
-
-            lpt_ptr = &lpt_lookup[first_log_segment];
-        }
-
-        while (cont && (i < SECTOR_SIZE/4))
-        {
-            if (int_buf[i] != 0xFFFFFFFF)
-            {
-                int bank = int_buf[i] / segments_per_bank;
-                int phys_segment = int_buf[i]  % segments_per_bank;
-
-                /* Reverse the stored bank number */
-                if (total_banks > 1)
-                    bank = (total_banks-1) - bank;
-
-                lpt_ptr->bank = bank;
-                lpt_ptr->phys_segment = phys_segment;
-
-                lpt_ptr++;
-                i++;
-            }
-            else cont = false;
-        }
-        page++;
-    }
+    return -1;
 }
 
-#endif /* USE_TCC_LPT */
 
-
-static void read_write_cache_segment(int bank, int phys_segment)
+static void read_random_writes_cache(int bank, int phys_segment)
 {
-    int page;
+    int page = 0;
+    short log_segment;
     unsigned char spare_buf[16];
-    
-    if (write_caches_in_use == MAX_WRITE_CACHES)
-        panicf("Max NAND write caches reached");
 
-    write_caches[write_caches_in_use].bank = bank;
-    write_caches[write_caches_in_use].phys_segment = phys_segment;
+    nand_read_raw(bank, phys_segment_to_page_addr(phys_segment, page),
+                  SECTOR_SIZE, /* offset to first sector's spare */
+                  16, spare_buf);
+
+    log_segment = get_log_segment_id(phys_segment, spare_buf);
     
+    if (log_segment == -1)
+        return;
+
+    /* Find which cache this is related to */
+    int cache_no = find_write_cache(log_segment);
+
+    if (cache_no == -1)
+    {
+        if (write_caches_in_use < MAX_WRITE_CACHES)
+        {
+            cache_no = write_caches_in_use;
+            write_caches_in_use++;
+        }
+        else
+        {
+            panicf("Max NAND write caches reached");
+        }
+    }
+
+    write_caches[cache_no].log_segment = log_segment;
+    write_caches[cache_no].random_bank = bank;
+    write_caches[cache_no].random_phys_segment = phys_segment;
+
+#ifndef FTL_V1
     /* Loop over each page in the phys segment (from page 1 onwards).
        Read spare for 1st sector, store location of page in array. */
     for (page = 1; page < pages_per_block * BLOCKS_PER_SEGMENT; page++)
     {
         unsigned short cached_page;
-        unsigned short log_segment;
         
         nand_read_raw(bank, phys_segment_to_page_addr(phys_segment, page),
                       SECTOR_SIZE, /* offset to first sector's spare */
                       16, spare_buf);
 
         cached_page = get_cached_page_id(spare_buf);
-        log_segment = get_log_segment_id(spare_buf);
-
+        
         if (cached_page != 0xFFFF)
+            write_caches[cache_no].page_map[cached_page] = page;
+    }
+#endif /* !FTL_V1 */
+}
+
+
+static void read_inplace_writes_cache(int bank, int phys_segment)
+{
+    int page = 0;
+    short log_segment;
+    unsigned char spare_buf[16];
+
+    nand_read_raw(bank, phys_segment_to_page_addr(phys_segment, page),
+                  SECTOR_SIZE, /* offset to first sector's spare */
+                  16, spare_buf);
+
+    log_segment = get_log_segment_id(phys_segment, spare_buf);
+    
+    if (log_segment == -1)
+        return;
+    
+    /* Find which cache this is related to */
+    int cache_no = find_write_cache(log_segment);
+
+    if (cache_no == -1)
+    {
+        if (write_caches_in_use < MAX_WRITE_CACHES)
         {
-            write_caches[write_caches_in_use].log_segment = log_segment;
-            write_caches[write_caches_in_use].page_map[cached_page] = page;
+            cache_no = write_caches_in_use;
+            write_caches_in_use++;
+        }
+        else
+        {
+            panicf("Max NAND write caches reached");
         }
     }
-    write_caches_in_use++;
+
+    write_caches[cache_no].log_segment = log_segment;
+    
+    /* Find how many pages have been written to the new segment */
+    while (log_segment != -1 &&
+           page < (pages_per_block * BLOCKS_PER_SEGMENT) - 1)
+    {
+        page++;
+        nand_read_raw(bank, phys_segment_to_page_addr(phys_segment, page),
+                      SECTOR_SIZE, 16, spare_buf);
+
+        log_segment = get_log_segment_id(phys_segment, spare_buf);
+    }
+    
+    if (page != 0)
+    {
+        write_caches[cache_no].inplace_bank = bank;
+        write_caches[cache_no].inplace_phys_segment = phys_segment;
+        write_caches[cache_no].inplace_pages_used = page;
+    }
 }
 
 
@@ -700,6 +721,7 @@ int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     return 0;
 }
 
+
 int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
@@ -714,6 +736,7 @@ int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
     return -1;
 }
 
+
 #ifdef STORAGE_GET_INFO
 void nand_get_info(struct storage_info *info)
 {
@@ -724,15 +747,15 @@ void nand_get_info(struct storage_info *info)
     info->product="Internal Storage";
 
     /* blocks count */
-    info->num_sectors = (pages_per_block * blocks_per_bank / SECTOR_SIZE)
-                        * page_size * total_banks;
-    info->sector_size=SECTOR_SIZE;
+    info->num_sectors = sectors_per_segment * segments_per_bank * total_banks;
+    info->sector_size = SECTOR_SIZE;
 }
 #endif
 
+
 int nand_init(void)
 {
-    int i, bank, phys_segment;
+    int bank, phys_segment, lptbuf_size;
     unsigned char spare_buf[16];
 
     if (initialized) return 0;
@@ -750,27 +773,19 @@ int nand_init(void)
     /* Get chip characteristics and number of banks */
     nand_get_chip_info();
 
-    for (i = 0; i < MAX_SEGMENTS; i++)
-    {
-        lpt_lookup[i].bank = -1;
-        lpt_lookup[i].phys_segment = -1;
-    }
+#ifndef BOOTLOADER
+    /* Use chip info to allocate the correct size LPT buffer */
+    lptbuf_size = sizeof(struct lpt_entry) * segments_per_bank * total_banks;
+    lpt_lookup = buffer_alloc(lptbuf_size);
+#else
+    /* Use a static array in the bootloader */
+    lptbuf_size = sizeof(lpt_lookup);
+#endif
 
+    memset(lpt_lookup, 0xff, lptbuf_size);
+    memset(write_caches, 0xff, sizeof(write_caches));
+    
     write_caches_in_use = 0;
-
-    for (i = 0; i < MAX_WRITE_CACHES; i++)
-    {
-        int page;
-        
-        write_caches[i].log_segment = -1;
-        write_caches[i].bank = -1;
-        write_caches[i].phys_segment = -1;
-        
-        for (page = 0; page < MAX_PAGES_PER_BLOCK * BLOCKS_PER_SEGMENT; page++)
-        {
-            write_caches[i].page_map[page] = -1;
-        }
-    }
 
     /* Scan banks to build up block translation table */
     for (bank = 0; bank < total_banks; bank++)
@@ -781,71 +796,65 @@ int nand_init(void)
             nand_read_raw(bank, phys_segment_to_page_addr(phys_segment, 0),
                           SECTOR_SIZE, /* offset */
                           16, spare_buf);
-
-            switch (get_segment_type(spare_buf))
+            
+            int type = get_sector_type(spare_buf);
+            
+            if (type == SECTYPE_MAIN_INPLACE_CACHE)
             {
-#ifdef USE_TCC_LPT
-                case SEGMENT_MAIN_LPT:
+                /* Check last sector of sequential write cache block */
+                nand_read_raw(bank,
+                              phys_segment_to_page_addr(phys_segment,
+                                (pages_per_block * BLOCKS_PER_SEGMENT) - 1),
+                              page_size + spare_size - 16,
+                              16, spare_buf);
+                
+                /* If last sector has been written, treat block as main data */
+                if (get_sector_type(spare_buf) != 0xff)
                 {
-                    /* Log->Phys Translation table (for Main data area) */
-                    read_lpt_block(bank, phys_segment);
-                    break;
+                    type = SECTYPE_MAIN_DATA;
                 }
-#else
-                case SEGMENT_MAIN_DATA2:
+            }
+
+            switch (type)
+            {
+                case SECTYPE_MAIN_DATA:
                 {
                     /* Main data area segment */
-                    unsigned short log_segment = get_log_segment_id(spare_buf);
+                    unsigned short log_segment =
+                        get_log_segment_id(phys_segment, spare_buf);
 
-                    if (log_segment < MAX_SEGMENTS)
+                    if (log_segment < segments_per_bank * total_banks)
                     {
-                        lpt_lookup[log_segment].bank = bank;
-                        lpt_lookup[log_segment].phys_segment = phys_segment;
+                        if (lpt_lookup[log_segment].bank == -1 ||
+                            lpt_lookup[log_segment].phys_segment == -1)
+                        {
+                            lpt_lookup[log_segment].bank = bank;
+                            lpt_lookup[log_segment].phys_segment = phys_segment;
+                        }
+                        else
+                        {
+                            //panicf("duplicate data segment 0x%x!", log_segment);
+                        }
                     }
                     break;
                 }
-#endif
-
-                case SEGMENT_MAIN_CACHE:
+                
+                case SECTYPE_MAIN_RANDOM_CACHE:
                 {
-                    /* Recently-written page data (for Main data area) */
-                    read_write_cache_segment(bank, phys_segment);
+                    /* Newly-written random page data (Main data area) */
+                    read_random_writes_cache(bank, phys_segment);
+                    break;
+                }
+                
+                case SECTYPE_MAIN_INPLACE_CACHE:
+                {
+                    /* Newly-written sequential page data (Main data area) */
+                    read_inplace_writes_cache(bank, phys_segment);
                     break;
                 }
             }
         }
     }
-
-#ifndef USE_TCC_LPT
-    /* Scan banks a second time as 0x13 segments appear to override 0x17 */
-    for (bank = 0; bank < total_banks; bank++)
-    {
-        for (phys_segment = 0; phys_segment < segments_per_bank; phys_segment++)
-        {
-            /* Read spare bytes from first sector of each segment */
-            nand_read_raw(bank, phys_segment_to_page_addr(phys_segment, 0),
-                          SECTOR_SIZE, /* offset */
-                          16, spare_buf);
-
-            switch (get_segment_type(spare_buf)) /* block type */
-            {
-                case SEGMENT_MAIN_DATA1:
-                {
-                    /* Main data area segment */
-                    unsigned short log_segment = get_log_segment_id(spare_buf);
-
-                    if (log_segment < MAX_SEGMENTS)
-                    {
-                        /* 0x13 seems to override 0x17, so store in our LPT */
-                        lpt_lookup[log_segment].bank = bank;
-                        lpt_lookup[log_segment].phys_segment = phys_segment;
-                    }
-                    break;
-                }
-            }
-        }
-    }
-#endif
     
     initialized = true;
 
