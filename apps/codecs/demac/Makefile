@@ -27,7 +27,7 @@ OUTPUT = demac$(EXT)
 all: $(OUTPUT)
 
 $(OUTPUT): $(OBJS)
-	$(CC) -o $(OUTPUT) $(OBJS)
+	$(CC) $(CFLAGS) -o $(OUTPUT) $(OBJS)
 
 .c.o :
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
