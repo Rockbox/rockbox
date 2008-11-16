@@ -33,6 +33,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #include "parser.h"
 
+#ifndef __WIN32__
+#define O_BINARY 0
+#endif
 
 static unsigned char wav_header[44]={
     'R','I','F','F',//  0 - ChunkID
