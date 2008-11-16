@@ -41,7 +41,7 @@ $(OBJDIR)/features: $(ROOTDIR)/apps/features.txt
 manual-pdf: features manual-prep rockbox.tex
 	$(MAKE) -C $(OBJDIR) buildmanual
 
-manual-html: manual-prep rockbox.tex
+manual-html: features manual-prep rockbox.tex
 	$(MAKE) -C $(OBJDIR) buildhtml
 
 manual-txt: manual-html
