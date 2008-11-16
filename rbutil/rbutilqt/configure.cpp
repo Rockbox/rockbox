@@ -507,6 +507,7 @@ void Config::autodetect()
     // disable tree during detection as "working" feedback.
     // TODO: replace the tree view with a splash screen during this time.
     ui.treeDevices->setEnabled(false);
+    this->setCursor(Qt::WaitCursor);
     QCoreApplication::processEvents();
 
     if(detector.detect())  //let it detect
@@ -538,6 +539,7 @@ void Config::autodetect()
                 }
             }
         }
+        this->unsetCursor();
 
         if(!detector.errdev().isEmpty()) {
             QString text;
@@ -579,6 +581,7 @@ void Config::autodetect()
     }
     else
     {
+        this->unsetCursor();
         QMessageBox::warning(this, tr("Autodetection"),
                 tr("Could not detect a device.\n"
                    "Select your device and Mountpoint manually."),
