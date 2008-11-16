@@ -127,32 +127,30 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "beq     20f                     \n"
 
     "10:                                 \n"
-        "ldrh    r4, [%[v2]], #2         \n"
-        "mov     r4, r4, lsl #16         \n"
+        "ldrh    r7, [%[v2]], #2         \n"
+        "mov     r7, r7, lsl #16         \n"
     "1:                                  \n"
         "ldmia   %[v1]!, {r0-r3}         \n"
-        "ldmia   %[v2]!, {r5-r8}         \n"
-        "smlabt  %[res], r0, r4, %[res]  \n"
-        "smlatb  %[res], r0, r5, %[res]  \n"
-        "smlabt  %[res], r1, r5, %[res]  \n"
-        "smlatb  %[res], r1, r6, %[res]  \n"
-        "smlabt  %[res], r2, r6, %[res]  \n"
-        "smlatb  %[res], r2, r7, %[res]  \n"
-        "smlabt  %[res], r3, r7, %[res]  \n"
-        "smlatb  %[res], r3, r8, %[res]  \n"
-        "mov     r4, r8                  \n"
+        "smlabt  %[res], r0, r7, %[res]  \n"
+        "ldmia   %[v2]!, {r4-r7}         \n"
+        "smlatb  %[res], r0, r4, %[res]  \n"
+        "smlabt  %[res], r1, r4, %[res]  \n"
+        "smlatb  %[res], r1, r5, %[res]  \n"
+        "smlabt  %[res], r2, r5, %[res]  \n"
+        "smlatb  %[res], r2, r6, %[res]  \n"
+        "smlabt  %[res], r3, r6, %[res]  \n"
+        "smlatb  %[res], r3, r7, %[res]  \n"
         "ldmia   %[v1]!, {r0-r3}         \n"
-        "ldmia   %[v2]!, {r5-r8}         \n"
-        "smlabt  %[res], r0, r4, %[res]  \n"
-        "smlatb  %[res], r0, r5, %[res]  \n"
-        "smlabt  %[res], r1, r5, %[res]  \n"
-        "smlatb  %[res], r1, r6, %[res]  \n"
-        "smlabt  %[res], r2, r6, %[res]  \n"
-        "smlatb  %[res], r2, r7, %[res]  \n"
-        "smlabt  %[res], r3, r7, %[res]  \n"
-        "smlatb  %[res], r3, r8, %[res]  \n"
+        "smlabt  %[res], r0, r7, %[res]  \n"
+        "ldmia   %[v2]!, {r4-r7}         \n"
+        "smlatb  %[res], r0, r4, %[res]  \n"
+        "smlabt  %[res], r1, r4, %[res]  \n"
+        "smlatb  %[res], r1, r5, %[res]  \n"
+        "smlabt  %[res], r2, r5, %[res]  \n"
+        "smlatb  %[res], r2, r6, %[res]  \n"
+        "smlabt  %[res], r3, r6, %[res]  \n"
+        "smlatb  %[res], r3, r7, %[res]  \n"
 #if ORDER > 16
-        "mov     r4, r8                  \n"
         "subs    %[cnt], %[cnt], #1  \n"
         "bne     1b                  \n"
 #endif
@@ -195,8 +193,8 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         [res]"+r"(res)
         : /* inputs */
         : /* clobbers */
-        "r0", "r1", "r2", "r3", "r4",
-        "r5", "r6", "r7", "r8"
+        "r0", "r1", "r2", "r3",
+        "r4", "r5", "r6", "r7"
     );
     return res;
 }
