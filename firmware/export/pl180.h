@@ -22,6 +22,8 @@
 /* ARM PrimeCell PL180 SD/MMC controller */
 
 /* MCIStatus bits */
+
+/* bits 10:0 can be cleared by a write in MCIClear */
 #define MCI_CMD_CRC_FAIL    (1<<0)
 #define MCI_DATA_CRC_FAIL   (1<<1)
 #define MCI_CMD_TIMEOUT     (1<<2)
@@ -33,7 +35,18 @@
 #define MCI_DATA_END        (1<<8)
 #define MCI_START_BIT_ERR   (1<<9)
 #define MCI_DATA_BLOCK_END  (1<<10)
-#define MCI_CMD_ACTIVE      (1<<11)
+/* bits 21:11 are only cleared by the hardware logic */
+#define MCI_CMD_ACTIVE          (1<<11)
+#define MCI_TX_ACTIVE           (1<<12)
+#define MCI_RX_ACTIVE           (1<<13)
+#define MCI_TX_FIFO_HALF_EMPTY  (1<<14)
+#define MCI_RX_FIFO_HALF_FULL   (1<<15)
+#define MCI_TX_FIFO_FULL        (1<<16)
+#define MCI_RX_FIFO_FULL        (1<<17)
+#define MCI_TX_FIFO_EMPTY       (1<<18)
+#define MCI_RX_FIFO_EMPTY       (1<<19)
+#define MCI_TX_DATA_AVAIL       (1<<20)
+#define MCI_RX_DATA_AVAIL       (1<<21)
 
 
 /* MCIPower bits */

@@ -28,7 +28,9 @@
 #include "hotswap.h"
 #include "system.h"
 #include "cpu.h"
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "as3525.h"
 #include "pl180.h"
 #include "panic.h"
@@ -41,36 +43,36 @@
 #endif
 
 /* command flags */
-#define MMC_NO_FLAGS    (0<<0)
-#define MMC_RESP        (1<<0)
-#define MMC_LONG_RESP   (1<<1)
-#define MMC_ARG         (1<<2)
+#define MCI_NO_FLAGS    (0<<0)
+#define MCI_RESP        (1<<0)
+#define MCI_LONG_RESP   (1<<1)
+#define MCI_ARG         (1<<2)
 
 /* ARM PL180 registers */
-#define MMC_POWER(i)       (*(volatile unsigned char *) (pl180_base[i]+0x00))
-#define MMC_CLOCK(i)       (*(volatile unsigned long *) (pl180_base[i]+0x04))
-#define MMC_ARGUMENT(i)    (*(volatile unsigned long *) (pl180_base[i]+0x08))
-#define MMC_COMMAND(i)     (*(volatile unsigned long *) (pl180_base[i]+0x0C))
-#define MMC_RESPCMD(i)     (*(volatile unsigned long *) (pl180_base[i]+0x10))
-#define MMC_RESP0(i)       (*(volatile unsigned long *) (pl180_base[i]+0x14))
-#define MMC_RESP1(i)       (*(volatile unsigned long *) (pl180_base[i]+0x18))
-#define MMC_RESP2(i)       (*(volatile unsigned long *) (pl180_base[i]+0x1C))
-#define MMC_RESP3(i)       (*(volatile unsigned long *) (pl180_base[i]+0x20))
-#define MMC_DATA_TIMER(i)  (*(volatile unsigned long *) (pl180_base[i]+0x24))
-#define MMC_DATA_LENGTH(i) (*(volatile unsigned short*) (pl180_base[i]+0x28))
-#define MMC_DATA_CTRL(i)   (*(volatile unsigned char *) (pl180_base[i]+0x2C))
-#define MMC_DATA_CNT(i)    (*(volatile unsigned short*) (pl180_base[i]+0x30))
-#define MMC_STATUS(i)      (*(volatile unsigned long *) (pl180_base[i]+0x34))
-#define MMC_CLEAR(i)       (*(volatile unsigned long *) (pl180_base[i]+0x38))
-#define MMC_MASK0(i)       (*(volatile unsigned long *) (pl180_base[i]+0x3C))
-#define MMC_MASK1(i)       (*(volatile unsigned long *) (pl180_base[i]+0x40))
-#define MMC_SELECT(i)      (*(volatile unsigned long *) (pl180_base[i]+0x44))
-#define MMC_FIFO_CNT(i)    (*(volatile unsigned long *) (pl180_base[i]+0x48))
+#define MCI_POWER(i)       (*(volatile unsigned char *) (pl180_base[i]+0x00))
+#define MCI_CLOCK(i)       (*(volatile unsigned long *) (pl180_base[i]+0x04))
+#define MCI_ARGUMENT(i)    (*(volatile unsigned long *) (pl180_base[i]+0x08))
+#define MCI_COMMAND(i)     (*(volatile unsigned long *) (pl180_base[i]+0x0C))
+#define MCI_RESPCMD(i)     (*(volatile unsigned long *) (pl180_base[i]+0x10))
+#define MCI_RESP0(i)       (*(volatile unsigned long *) (pl180_base[i]+0x14))
+#define MCI_RESP1(i)       (*(volatile unsigned long *) (pl180_base[i]+0x18))
+#define MCI_RESP2(i)       (*(volatile unsigned long *) (pl180_base[i]+0x1C))
+#define MCI_RESP3(i)       (*(volatile unsigned long *) (pl180_base[i]+0x20))
+#define MCI_DATA_TIMER(i)  (*(volatile unsigned long *) (pl180_base[i]+0x24))
+#define MCI_DATA_LENGTH(i) (*(volatile unsigned short*) (pl180_base[i]+0x28))
+#define MCI_DATA_CTRL(i)   (*(volatile unsigned char *) (pl180_base[i]+0x2C))
+#define MCI_DATA_CNT(i)    (*(volatile unsigned short*) (pl180_base[i]+0x30))
+#define MCI_STATUS(i)      (*(volatile unsigned long *) (pl180_base[i]+0x34))
+#define MCI_CLEAR(i)       (*(volatile unsigned long *) (pl180_base[i]+0x38))
+#define MCI_MASK0(i)       (*(volatile unsigned long *) (pl180_base[i]+0x3C))
+#define MCI_MASK1(i)       (*(volatile unsigned long *) (pl180_base[i]+0x40))
+#define MCI_SELECT(i)      (*(volatile unsigned long *) (pl180_base[i]+0x44))
+#define MCI_FIFO_CNT(i)    (*(volatile unsigned long *) (pl180_base[i]+0x48))
 
-#define MMC_FIFO(i)        ((unsigned long *) (pl180_base[i]+0x80))
+#define MCI_FIFO(i)        ((unsigned long *) (pl180_base[i]+0x80))
 /* volumes */
-#define     NAND_AS3525 0
-#define     SD_AS3525   1
+#define     NAND_AS3525 0   /* embedded SD card */
+#define     SD_AS3525   1   /* SD slot if present */
 
 static const int pl180_base[NUM_VOLUMES] = {
             NAND_FLASH_BASE
@@ -87,11 +89,10 @@ static tSDCardInfo card_info[NUM_VOLUMES];
 /* for compatibility */
 static long last_disk_activity = -1;
 
-#define MIN_YIELD_PERIOD 1000
+#define MIN_YIELD_PERIOD 5  /* ticks */
 static long next_yield = 0;
 
-/* Shoot for around 75% usage */
-static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x1c0)/sizeof(long)];
+static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x200)/sizeof(long)];
 static const char         sd_thread_name[] = "ata/sd";
 static struct mutex       sd_mtx SHAREDBSS_ATTR;
 static struct event_queue sd_queue;
@@ -100,14 +101,14 @@ static inline void mci_delay(void) { int i = 0xffff; while(i--) ; }
 
 static void mci_set_clock_divider(const int drive, int divider)
 {
-    int clock = MMC_CLOCK(drive);
+    int clock = MCI_CLOCK(drive);
 
     if(divider > 1)
     {
         /* use divide logic */
         clock &= ~MCI_CLOCK_BYPASS;
 
-        /* convert divider to MMC_CLOCK logic */
+        /* convert divider to MCI_CLOCK logic */
         divider = (divider/2) - 1;
         if(divider >= 256)
             divider = 255;
@@ -119,7 +120,7 @@ static void mci_set_clock_divider(const int drive, int divider)
         divider = 0;
     }
 
-    MMC_CLOCK(drive) = clock | divider;
+    MCI_CLOCK(drive) = clock | divider;
 
     mci_delay();
 }
@@ -129,51 +130,51 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
 {
     int val, status;
 
-    while(MMC_STATUS(drive) & MCI_CMD_ACTIVE);
+    while(MCI_STATUS(drive) & MCI_CMD_ACTIVE);
 
-    if(MMC_COMMAND(drive) & MCI_COMMAND_ENABLE) /* clears existing command */
+    if(MCI_COMMAND(drive) & MCI_COMMAND_ENABLE) /* clears existing command */
     {
-        MMC_COMMAND(drive) = 0;
+        MCI_COMMAND(drive) = 0;
         mci_delay();
     }
 
     val = cmd | MCI_COMMAND_ENABLE;
-    if(flags & MMC_RESP)
+    if(flags & MCI_RESP)
     {
         val |= MCI_COMMAND_RESPONSE;
-        if(flags & MMC_LONG_RESP)
+        if(flags & MCI_LONG_RESP)
             val |= MCI_COMMAND_LONG_RESPONSE;
     }
 
-    MMC_CLEAR(drive) = 0x7ff;
+    MCI_CLEAR(drive) = 0x7ff;
 
-    MMC_ARGUMENT(drive) = (flags & MMC_ARG) ? arg : 0;
-    MMC_COMMAND(drive) = val;
+    MCI_ARGUMENT(drive) = (flags & MCI_ARG) ? arg : 0;
+    MCI_COMMAND(drive) = val;
 
-    while(MMC_STATUS(drive) & MCI_CMD_ACTIVE);  /* wait for cmd completion */
+    while(MCI_STATUS(drive) & MCI_CMD_ACTIVE);  /* wait for cmd completion */
 
-    MMC_COMMAND(drive) = 0;
-    MMC_ARGUMENT(drive) = ~0;
+    MCI_COMMAND(drive) = 0;
+    MCI_ARGUMENT(drive) = ~0;
 
-    status = MMC_STATUS(drive);
-    MMC_CLEAR(drive) = 0x7ff;
+    status = MCI_STATUS(drive);
+    MCI_CLEAR(drive) = 0x7ff;
 
-    if(flags & MMC_RESP)
+    if(flags & MCI_RESP)
     {
         if(status & MCI_CMD_TIMEOUT)
             return false;
         else if(status & (MCI_CMD_CRC_FAIL /* FIXME? */ | MCI_CMD_RESP_END))
         {   /* resp received */
-            if(flags & MMC_LONG_RESP)
+            if(flags & MCI_LONG_RESP)
             {
                 /* store the response in little endian order for the words */
-                response[0] = MMC_RESP3(drive);
-                response[1] = MMC_RESP2(drive);
-                response[2] = MMC_RESP1(drive);
-                response[3] = MMC_RESP0(drive);
+                response[0] = MCI_RESP3(drive);
+                response[1] = MCI_RESP2(drive);
+                response[2] = MCI_RESP1(drive);
+                response[3] = MCI_RESP0(drive);
             }
             else
-                response[0] = MMC_RESP0(drive);
+                response[0] = MCI_RESP0(drive);
             return true;
         }
     }
@@ -191,13 +192,13 @@ static int sd_init_card(const int drive)
     int max_tries = 100; /* max acmd41 attemps */
     bool sdhc;
 
-    if(!send_cmd(drive, SD_GO_IDLE_STATE, 0, MMC_NO_FLAGS, NULL))
+    if(!send_cmd(drive, SD_GO_IDLE_STATE, 0, MCI_NO_FLAGS, NULL))
         return -1;
 
     mci_delay();
 
     sdhc = false;
-    if(send_cmd(drive, SD_SEND_IF_COND, 0x1AA, MMC_RESP|MMC_ARG, &response))
+    if(send_cmd(drive, SD_SEND_IF_COND, 0x1AA, MCI_RESP|MCI_ARG, &response))
         if((response & 0xFFF) == 0x1AA)
             sdhc = true;
 
@@ -205,7 +206,7 @@ static int sd_init_card(const int drive)
         mci_delay();
 
         /* app_cmd */
-        if( !send_cmd(drive, SD_APP_CMD, 0, MMC_RESP|MMC_ARG, &response) ||
+        if( !send_cmd(drive, SD_APP_CMD, 0, MCI_RESP|MCI_ARG, &response) ||
             !(response & (1<<5)) )
         {
             return -2;
@@ -213,7 +214,7 @@ static int sd_init_card(const int drive)
 
         /* acmd41 */
         if(!send_cmd(drive, SD_APP_OP_COND, (sdhc ? 0x40FF8000 : (1<<23)),
-                        MMC_RESP|MMC_ARG, &card_info[drive].ocr))
+                        MCI_RESP|MCI_ARG, &card_info[drive].ocr))
             return -3;
 
     } while(!(card_info[drive].ocr & (1<<31)) && max_tries--);
@@ -222,18 +223,18 @@ static int sd_init_card(const int drive)
         return -4;
 
     /* send CID */
-    if(!send_cmd(drive, SD_ALL_SEND_CID, 0, MMC_RESP|MMC_LONG_RESP|MMC_ARG,
+    if(!send_cmd(drive, SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP|MCI_ARG,
                             card_info[drive].cid))
         return -5;
 
     /* send RCA */
-    if(!send_cmd(drive, SD_SEND_RELATIVE_ADDR, 0, MMC_RESP|MMC_ARG,
+    if(!send_cmd(drive, SD_SEND_RELATIVE_ADDR, 0, MCI_RESP|MCI_ARG,
                 &card_info[drive].rca))
         return -6;
 
     /* send CSD */
     if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
-                 MMC_RESP|MMC_LONG_RESP|MMC_ARG, card_info[drive].csd))
+                 MCI_RESP|MCI_LONG_RESP|MCI_ARG, card_info[drive].csd))
         return -7;
 
     /* These calculations come from the Sandisk SD card product manual */
@@ -259,16 +260,16 @@ static int sd_init_card(const int drive)
     }
 #endif
 
-    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MMC_ARG, NULL))
+    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_ARG, NULL))
         return -9;
 
-    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MMC_ARG, NULL))
+    if(!send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_ARG, NULL))
         return -10;
 
-    if(!send_cmd(drive, SD_SET_BUS_WIDTH, card_info[drive].rca | 2, MMC_ARG, NULL))
+    if(!send_cmd(drive, SD_SET_BUS_WIDTH, card_info[drive].rca | 2, MCI_ARG, NULL))
         return -11;
 
-    if(!send_cmd(drive, SD_SET_BLOCKLEN, card_info[drive].block_size, MMC_ARG,
+    if(!send_cmd(drive, SD_SET_BLOCKLEN, card_info[drive].block_size, MCI_ARG,
                  NULL))
         return -12;
 
@@ -354,23 +355,21 @@ static void sd_thread(void)
 }
 static void init_pl180_controller(const int drive)
 {
-#ifdef BOOTLOADER
-    MMC_COMMAND(drive) = MMC_DATA_CTRL(drive) = 0;
-    MMC_CLEAR(drive) = 0x7ff;
+    MCI_COMMAND(drive) = MCI_DATA_CTRL(drive) = 0;
+    MCI_CLEAR(drive) = 0x7ff;
 
-    MMC_MASK0(drive) = MMC_MASK1(drive) = 0;  /* disable all interrupts */
+    MCI_MASK0(drive) = MCI_MASK1(drive) = 0;  /* disable all interrupts */
 
-    MMC_POWER(drive) = MCI_POWER_UP|(10 /*voltage*/ << 2); /* use OF voltage */
+    MCI_POWER(drive) = MCI_POWER_UP|(10 /*voltage*/ << 2); /* use OF voltage */
     mci_delay();
 
-    MMC_POWER(drive) |= MCI_POWER_ON;
+    MCI_POWER(drive) |= MCI_POWER_ON;
     mci_delay();
 
-    MMC_SELECT(drive) = 0;
+    MCI_SELECT(drive) = 0;
 
-    MMC_CLOCK(drive) = MCI_CLOCK_ENABLE;
-    MMC_CLOCK(drive) &= ~MCI_CLOCK_POWERSAVE;
-#endif /* BOOTLOADER */
+    MCI_CLOCK(drive) = MCI_CLOCK_ENABLE;
+    MCI_CLOCK(drive) &= ~MCI_CLOCK_POWERSAVE;
 
     /* set MCLK divider */
     mci_set_clock_divider(drive, 200);
@@ -380,7 +379,6 @@ int sd_init(void)
 {
     int ret;
 
-#ifdef BOOTLOADER /* No need to do twice the same thing */
     CGU_IDE =   (1<<7)  /* AHB interface enable */  |
                 (1<<6)  /* interface enable */      |
                 (2<<2)  /* clock didiver = 2+1 */   |
@@ -391,16 +389,15 @@ int sd_init(void)
     CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
 #endif
 
-    CCU_IO &= ~8;           /* bits 3:2 = 01, xpd is SD interface */
-    CCU_IO |= 4;
-
-#endif
     init_pl180_controller(NAND_AS3525);
     ret = sd_init_card(NAND_AS3525);
     if(ret < 0)
         return ret;
 
 #ifdef HAVE_MULTIVOLUME
+    CCU_IO &= ~8;           /* bits 3:2 = 01, xpd is SD interface */
+    CCU_IO |= 4;
+
     init_pl180_controller(SD_AS3525);
     ret = sd_init_card(SD_AS3525);
     if(ret < 0)
@@ -451,36 +448,39 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const vo
     (void)start;
     (void)count;
     (void)buf;
-    return 0; /* TODO */
+    return -1; /* TODO */
 }
 
-static bool sd_poll_status(const int drive, unsigned int trigger, long timeout)
+static int sd_poll_status(const int drive, unsigned int trigger, long timeout)
 {
     long t = current_tick;
+    //int my_next_yield =0;
+    int status;
 
-    while ((MMC_STATUS(drive) & trigger) == 0)
+    while (((status = MCI_STATUS(drive)) & trigger) == 0)
     {
         long time = current_tick;
 
-        if (TIME_AFTER(time, next_yield))
+/*
+        if (TIME_AFTER(time, my_next_yield))
         {
             long ty = current_tick;
             yield();
             timeout += current_tick - ty;
-            next_yield = ty + MIN_YIELD_PERIOD;
+            my_next_yield = ty + MIN_YIELD_PERIOD;
         }
-
+*/
         if (TIME_AFTER(time, t + timeout))
-            return false;
+            break;
     }
 
-    return true;
+    return status;
 }
 
 static int sd_wait_for_state(const int drive, unsigned int state)
 {
     unsigned int response = 0;
-    unsigned int timeout = 0x80000;
+    unsigned int timeout = 100; /* ticks */
 
     long t = current_tick;
 
@@ -489,7 +489,7 @@ static int sd_wait_for_state(const int drive, unsigned int state)
         long us;
 
         if(!send_cmd(drive, SD_SEND_STATUS, card_info[drive].rca,
-                    MMC_RESP|MMC_ARG, &response))
+                    MCI_RESP|MCI_ARG, &response))
             return -1;
 
         if (((response >> 9) & 0xf) == state)
@@ -517,14 +517,14 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     int ret;
     unsigned char *buf_end, *buf = inbuf;
     int remaining = incount;
-    const unsigned long *fifo_base = MMC_FIFO(drive);
+    const unsigned long *fifo_base = MCI_FIFO(drive);
 
     /* skip SanDisk OF */
     if (drive == NAND_AS3525)
 #if defined(SANSA_E200V2) || defined(SANSA_FUZE)
         start += 61440;
 #else
-        start += 20480; 
+        start += 20480;
 #endif
     /* TODO: Add DMA support. */
 
@@ -542,6 +542,7 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     if (card_info[drive].initialized < 0)
     {
         ret = card_info[drive].initialized;
+        panicf("card not initalised");
         goto sd_read_error;
     }
 
@@ -549,7 +550,13 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
 
     ret = sd_wait_for_state(drive, SD_TRAN);
     if (ret < 0)
+    {
+        panicf("wait for state failed");
         goto sd_read_error;
+    }
+
+    disable_irq();  /* FIXME: data transfer is too slow and error prone when
+                     * interrupts are enabled */
 
     while(remaining)
     {
@@ -558,20 +565,22 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
         int transfer = (remaining >= 128) ? 127 : remaining; /* sectors */
 
         if(card_info[drive].ocr & (1<<30) ) /* SDHC */
-            ret = send_cmd(drive, SD_READ_MULTIPLE_BLOCK, start, MMC_ARG, NULL);
+            ret = send_cmd(drive, SD_READ_MULTIPLE_BLOCK, start, MCI_ARG, NULL);
         else
             ret = send_cmd(drive, SD_READ_MULTIPLE_BLOCK, start * BLOCK_SIZE,
-                    MMC_ARG, NULL);
+                    MCI_ARG, NULL);
 
         if (ret < 0)
+        {
+            panicf("read multiple blocks failed");
             goto sd_read_error;
-
+        }
         /* TODO: Don't assume BLOCK_SIZE == SECTOR_SIZE */
 
 
-        MMC_DATA_TIMER(drive) = 0x1000000; /* FIXME: arbitrary */
-        MMC_DATA_LENGTH(drive) = transfer * card_info[drive].block_size;
-        MMC_DATA_CTRL(drive) =  (1<<0) /* enable */ |
+        MCI_DATA_TIMER(drive) = 0x1000000; /* FIXME: arbitrary */
+        MCI_DATA_LENGTH(drive) = transfer * card_info[drive].block_size;
+        MCI_DATA_CTRL(drive) =  (1<<0) /* enable */ |
                                 (1<<1) /* from card to controller */ |
                                 (9<<4) /* 2^9 = 512 */ ;
 
@@ -580,43 +589,68 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
         while(buf < buf_end)
         {
             /* Wait for the FIFO to be half full */
-            if (!sd_poll_status(drive, ((1<<15)), 100))
-            {
-                ret = -42;
-                goto sd_read_error;
-            }
+            const int trigger = MCI_RX_FIFO_HALF_FULL|MCI_RX_FIFO_FULL;
+            int controller_status = sd_poll_status(drive, trigger, 100);
 
-            asm volatile(
-                "ldmia %2,  {r0-r7} \n" /* load  8 * 4 bytes */
-                "stmia %1!, {r0-r7} \n" /* store 8 * 4 bytes */
-                :"=r"(buf)                /* output */
-                :"r"(buf), "r"(fifo_base) /* input */
-                :"r0","r1","r2","r3","r4","r5","r6","r7","r8" /* clobbers */
-            );
+            controller_status &= ~(MCI_RX_ACTIVE|MCI_RX_DATA_AVAIL|
+                    MCI_DATA_BLOCK_END|MCI_DATA_END);
+
+            if(!controller_status || (controller_status & ~trigger))
+                panicf("incorrect status 0x%x", controller_status & ~trigger);
+
+            if(((intptr_t)buf & 3) == 0)
+            {   /* aligned destination buffer */
+                asm volatile(
+                    "ldmia %2,  {r0-r7} \n" /* load  8 * 4 bytes */
+                    "stmia %1!, {r0-r7} \n" /* store 8 * 4 bytes */
+                    :"=r"(buf)                /* output */
+                    :"r"(buf), "r"(fifo_base) /* input */
+                    :"r0","r1","r2","r3","r4","r5","r6","r7" /* clobbers */
+                );
+            }
+            else
+            {   /* non aligned destination buffer */
+                int tmp[8];
+                asm volatile(
+                    "ldmia %1,  {r0-r7} \n" /* load  8 * 4 bytes */
+                    "stmia %0,  {r0-r7} \n" /* store 8 * 4 bytes */
+                    :/* no output */
+                    :"r"(tmp), "r"(fifo_base) /* input */
+                    :"r0","r1","r2","r3","r4","r5","r6","r7" /* clobbers */
+                );
+                memcpy(buf, tmp, 32);
+                buf = &buf[32];
+            }
         }
 
         remaining -= transfer;
         start += transfer;
         last_disk_activity = current_tick;
 
-        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MMC_NO_FLAGS, NULL))
+        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_NO_FLAGS, NULL))
         {
             ret = -666;
+            panicf("STOP TRANSMISSION failed");
             goto sd_read_error;
         }
 
         ret = sd_wait_for_state(drive, SD_TRAN);
         if (ret < 0)
+        {
+            panicf(" wait for state TRAN failed");
             goto sd_read_error;
-
+        }
     }
     while (1)
     {
         mutex_unlock(&sd_mtx);
 
+        enable_irq();
+
         return ret;
 
 sd_read_error:
+        panicf("read error : %d",ret);
         card_info[drive].initialized = 0;
     }
 }
