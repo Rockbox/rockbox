@@ -399,9 +399,7 @@ int sd_init(void)
     CCU_IO |= 4;
 
     init_pl180_controller(SD_AS3525);
-    ret = sd_init_card(SD_AS3525);
-    if(ret < 0)
-        return ret;
+    sd_init_card(SD_AS3525);
 #endif
 
     queue_init(&sd_queue, true);
