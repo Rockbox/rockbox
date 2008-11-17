@@ -1,12 +1,12 @@
 /*
- * This config file is for the Cowon iAudio D2
+ * This config file is for the Cowon D2
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 24
 
-#define MODEL_NAME   "Cowon iAudio D2"
+#define MODEL_NAME   "Cowon D2"
 
 /* Produce a dual-boot bootloader.bin for mktccboot */
 #define TCCBOOT
@@ -145,7 +145,7 @@
 
 #define CONFIG_LCD LCD_COWOND2
 
-#define BOOTFILE_EXT "iaudio"
+#define BOOTFILE_EXT "d2"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 

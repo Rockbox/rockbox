@@ -687,11 +687,11 @@ cat <<EOF
   6) AV300                                       26) Mini 2G
                           ==Toshiba==            27) 1G, 2G
                           40) Gigabeat F
- ==iAudio==               41) Gigabeat S         ==SanDisk==
+ ==Cowon/iAudio==         41) Gigabeat S         ==SanDisk==
  30) X5/X5V/X5L                                  50) Sansa e200
  31) M5/M5L               ==Tatung==             51) Sansa e200R
  32) 7                    60) Elio TPJ-1022      52) Sansa c200
- 33) Cowon D2                                    53) Sansa m200
+ 33) D2                                          53) Sansa m200
  34) M3/M3L               ==Olympus==            54) Sansa c100
                           70) M:Robe 500         55) Sansa Clip
  ==Creative==             71) M:Robe 100         56) Sansa e200v2
@@ -1327,7 +1327,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
-    output="rockbox.iaudio"
+    output="rockbox.d2"
     appextra="recorder:gui"
     plugins="yes"
     swcodec="yes"
