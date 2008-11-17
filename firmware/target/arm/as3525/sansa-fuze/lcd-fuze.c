@@ -131,7 +131,7 @@ static void flip_lcd(bool yesno)
 void lcd_set_flip(bool yesno)
 {
     display_flipped = yesno;
-    xoffset = yesno ? 20 : 0;   /* A guess */
+    xoffset = yesno ? 0 : 20;   /* TODO: Implement flipped mode */
 
     if (display_on)
         flip_lcd(yesno);
