@@ -77,7 +77,7 @@ void lcd_set_contrast(int val)
 static void delay_loop(void)
 {
     unsigned long x;
-    for (x = (unsigned)(FREQ>>23); x; x--);
+    for (x = (unsigned)(FREQ>>24); x; x--);
 }
 #define DELAY delay_loop()
 
