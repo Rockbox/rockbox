@@ -620,6 +620,8 @@ bool settings_parseline(char* line, char** name, char** value)
 
 static void system_flush(void)
 {
+    scrobbler_shutdown();
+    playlist_shutdown();
     tree_flush();
     call_storage_idle_notifys(true); /*doesnt work on usb and shutdown from ata thread */
 }
@@ -627,6 +629,7 @@ static void system_flush(void)
 static void system_restore(void)
 {
     tree_restore();
+    scrobbler_init();
 }
 
 static bool clean_shutdown(void (*callback)(void *), void *parameter)
@@ -915,7 +918,6 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
                 (mmc_remove_request() == SYS_HOTSWAP_EXTRACTED))
 #endif
             {
-                scrobbler_flush_cache();
                 system_flush();
 #ifdef BOOTFILE
 #if !defined(USB_NONE) && !defined(USB_IPODSTYLE)

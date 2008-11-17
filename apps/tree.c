@@ -1085,11 +1085,9 @@ static void ft_play_filename(char *dir, char *file)
 /* These two functions are called by the USB and shutdown handlers */
 void tree_flush(void)
 {
-    scrobbler_shutdown();
 #ifdef HAVE_TAGCACHE
     tagcache_shutdown();
 #endif
-    playlist_shutdown();
 
 #ifdef HAVE_TC_RAMCACHE
     tagcache_unload_ramcache();
@@ -1141,5 +1139,4 @@ void tree_restore(void)
 #ifdef HAVE_TAGCACHE
     tagcache_start_scan();
 #endif
-    scrobbler_init();
 }
