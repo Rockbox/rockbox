@@ -8,10 +8,14 @@
 # $Id$
 #
 
+use strict;
+
 use File::Copy; # For move() and copy()
 use File::Find; # For find()
 use File::Path; # For rmtree()
 use Cwd 'abs_path';
+use Getopt::Long qw(:config pass_through);	# pass_through so not
+                                                # confused by -DTYPE_STUFF
 
 sub glob_copy {
     my ($pattern, $destination) = @_;
@@ -37,7 +41,7 @@ sub glob_unlink {
 sub find_copyfile {
     my ($pattern, $destination) = @_;
     return sub {
-        $path = $_;
+        my $path = $_;
         if ($path =~ $pattern && filesize($path) > 0 && !($path =~ /\.rockbox/)) {
             copy($path, $destination);
             chmod(0755, $destination.'/'.$path);
@@ -45,7 +49,7 @@ sub find_copyfile {
     }
 }
 
-$ROOT="..";
+my $ROOT="..";
 
 my $ziptool="zip -r9";
 my $output="rockbox.zip";
@@ -55,58 +59,22 @@ my $exe;
 my $target;
 my $archos;
 my $incfonts;
+my $target_id; # passed in, not currently used
 
-while(1) {
-    if($ARGV[0] eq "-r") {
-        $ROOT=$ARGV[1];
-        shift @ARGV;
-        shift @ARGV;    
-    }
+# Get options
+GetOptions ( 'r|root=s'		=> \$ROOT,
+	     'z|ziptool=s'	=> \$ziptool,
+	     't|target=s'	=> \$archos,     # The target name as used in ARCHOS in the root makefile
+	     'i|id=s'		=> \$target_id,  # The target id name as used in TARGET_ID in the root makefile
+	     'o|output=s'	=> \$output,
+	     'f|fonts=s'	=> \$incfonts,   # 0 - no fonts, 1 - fonts only 2 - fonts and package
+	     'v|verbose'	=> \$verbose,
+	     's|sim'		=> \$sim );
 
-    elsif($ARGV[0] eq "-z") {
-        $ziptool=$ARGV[1];
-        shift @ARGV;
-        shift @ARGV;    
-    }
+($target, $exe) = @ARGV;
 
-    elsif($ARGV[0] eq "-t") {
-        # The target name as used in ARCHOS in the root makefile
-        $archos=$ARGV[1];
-        shift @ARGV;
-        shift @ARGV;    
-    }
-    elsif($ARGV[0] eq "-i") {
-        # The target id name as used in TARGET_ID in the root makefile
-        $target_id=$ARGV[1];
-        shift @ARGV;
-        shift @ARGV;    
-    }
-    elsif($ARGV[0] eq "-o") {
-        $output=$ARGV[1];
-        shift @ARGV;
-        shift @ARGV;    
-    }
-    elsif($ARGV[0] eq "-f") {
-        $incfonts=$ARGV[1]; # 0 - no fonts, 1 - fonts only 2 - fonts and package
-        shift @ARGV;
-        shift @ARGV;    
-    }
-
-    elsif($ARGV[0] eq "-v") {
-        $verbose =1;
-        shift @ARGV;
-    }
-    elsif($ARGV[0] eq "-s") {
-        $sim =1;
-        shift @ARGV;
-    }
-    else {
-        $target = $ARGV[0];
-        $exe = $ARGV[1];
-        last;
-    }
-}
-
+# Some basic sanity
+die "No firmware found @ $exe" if !-f $exe;
 
 my $firmdir="$ROOT/firmware";
 my $appsdir="$ROOT/apps";
@@ -149,7 +117,7 @@ STOP
     my ($bitmap, $depth, $swcodec, $icon_h, $icon_w);
     my ($remote_depth, $remote_icon_h, $remote_icon_w);
     my ($recording);
-    $icon_count = 1;
+    my $icon_count = 1;
     while(<TARGET>) {
         # print STDERR "DATA: $_";
         if($_ =~ /^Bitmap: (.*)/) {
@@ -216,7 +184,7 @@ sub buildzip {
     if($fonts) {
         mkdir ".rockbox/fonts", 0777;
         chdir(".rockbox/fonts");
-        $cmd = "$ROOT/tools/convbdf -f $ROOT/fonts/*bdf >/dev/null 2>&1";
+        my $cmd = "$ROOT/tools/convbdf -f $ROOT/fonts/*bdf >/dev/null 2>&1";
         print($cmd."\n") if $verbose;
         system($cmd);
         chdir("../../");
@@ -294,7 +262,7 @@ STOP
 
     open VIEWERS, "$ROOT/apps/plugins/viewers.config" or
         die "can't open viewers.config";
-    @viewers = <VIEWERS>;
+    my @viewers = <VIEWERS>;
     close VIEWERS;
 
     open VIEWERS, ">.rockbox/viewers.config" or
@@ -342,10 +310,10 @@ STOP
         }
     }
     close VIEWERS;
-                
+
     open CATEGORIES, "$ROOT/apps/plugins/CATEGORIES" or
         die "can't open CATEGORIES";
-    @rock_targetdirs = <CATEGORIES>;
+    my @rock_targetdirs = <CATEGORIES>;
     close CATEGORIES;
     foreach my $line (@rock_targetdirs) {
         if ($line =~ /([^,]*),(.*)/) {
@@ -353,7 +321,7 @@ STOP
             move(".rockbox/rocks/${plugin}.rock", ".rockbox/rocks/$dir/${plugin}.rock");
         }
     }
-    
+
     if ($bitmap) {
         mkdir ".rockbox/icons", 0777;
         copy("$viewer_bmpdir/viewers.${icon_w}x${icon_h}x$depth.bmp", ".rockbox/icons/viewers.bmp");
@@ -361,10 +329,10 @@ STOP
             copy("$viewer_bmpdir/remote_viewers.${remote_icon_w}x${remote_icon_h}x$remote_depth.bmp", ".rockbox/icons/remote_viewers.bmp");
         }
     }
-    
+
     copy("$ROOT/apps/tagnavi.config", ".rockbox/");
     copy("$ROOT/apps/plugins/disktidy.config", ".rockbox/rocks/apps/");
-      
+
     if($bitmap) {
         copy("$ROOT/apps/plugins/sokoban.levels", ".rockbox/rocks/games/sokoban.levels"); # sokoban levels
         copy("$ROOT/apps/plugins/snake2.levels", ".rockbox/rocks/games/snake2.levels"); # snake2 levels
