@@ -104,7 +104,6 @@
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
-//#define HAVE_BACKLIGHT_BRIGHTNESS /* TODO */
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE

@@ -22,37 +22,14 @@
 #include "backlight-target.h"
 #include "as3525.h"
 
-/* TODO : backlight brightness */
-
-/* XXX : xpd is used for SD/MCI interface
- * If interrupts are used to access this interface, they should be
- * disabled in _buttonlight_on/off ()
- */
-
 void _buttonlight_on(void)
 {
-    int saved_ccu_io;
-
-    saved_ccu_io = CCU_IO;  /* save XPD setting */
-
-    CCU_IO &= ~(3<<2);      /* setup xpd as GPIO */
-
     GPIOD_DIR |= (1<<7);
     GPIOD_PIN(7) = (1<<7);  /* set pin d7 high */
-
-    CCU_IO = saved_ccu_io;  /* restore the previous XPD setting */
 }
 
 void _buttonlight_off(void)
 {
-    int saved_ccu_io;
-
-    saved_ccu_io = CCU_IO;  /* save XPD setting */
-
-    CCU_IO &= ~(3<<2);      /* setup xpd as GPIO */
-
     GPIOD_DIR |= (1<<7);
     GPIOD_PIN(7) = 0;       /* set pin d7 low */
-
-    CCU_IO = saved_ccu_io;  /* restore the previous XPD setting */
 }
