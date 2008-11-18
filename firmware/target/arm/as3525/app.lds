@@ -38,20 +38,11 @@ SECTIONS
 {
     loadaddress = 0x30000000;
 
-    .vectors DRAMORIG :
-    {
-        _vectorstart = .;
-        *(.vectors*);
-        *(.init.text)
-        . = ALIGN(0x4);
-    } > DRAM
-
     .text :
     {
         _textstart = .;
         *(.text)
         *(.text*)
-        *(.icode)
         *(.glue_7)
         *(.glue_7t)
         . = ALIGN(0x4);
@@ -63,14 +54,12 @@ SECTIONS
         *(.rodata*)
         *(.rodata.str1.1)
         *(.rodata.str1.4)
-        *(.irodata*)
         . = ALIGN(0x4);
     } > DRAM
 
     .data :
     {
         *(.data*)
-        *(.idata*)
         . = ALIGN(0x4);
     } > DRAM
 
@@ -93,11 +82,39 @@ SECTIONS
     {
        _edata = .;
         *(.bss*)
-        *(.ibss*)
         *(COMMON)
         . = ALIGN(0x4);
        _end = .;
     } > DRAM
+
+    .vectors IRAMORIG:
+    {
+        _vectors_start = .;
+        *(.init.text)
+    } > IRAM AT > DRAM
+
+    _vectorscopy = LOADADDR(.vectors);
+
+    .ibss (NOLOAD) :
+    {
+        _iedata = .;
+        *(.qharray)
+        *(.ibss)
+        . = ALIGN(0x4);
+        _iend = .;
+    } > IRAM
+
+    .iram _iend :
+    {
+        _iramstart = .;
+        *(.icode)
+        *(.irodata)
+        *(.idata)
+        . = ALIGN(0x4);
+        _iramend = .;
+    } > IRAM AT> DRAM
+
+    _iramcopy = LOADADDR(.iram);
 
     .audiobuf (NOLOAD) :
     {

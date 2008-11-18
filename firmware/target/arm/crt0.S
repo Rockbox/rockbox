@@ -50,22 +50,43 @@ start:
 .word irq_handler
 .word fiq_handler
 
-vectors_end:
+_vectorsend:
 
     .text
 
 newstart:
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
 
-#if CONFIG_CPU==AS3525 && !defined(BOOTLOADER) /* relocate vectors */
+#if CONFIG_CPU==AS3525 && !defined(BOOTLOADER)
+
+    /* relocate vectors */
     mov     r1, #0              @ destination
-    ldr     r2, =start          @ source
-    ldr     r3, =vectors_end    @ end
+    ldr     r2, =_vectorscopy   @ source
+    ldr     r3, =_vectorsend    @ end
 
 1:  ldr     r0, [r2], #4
     str     r0, [r1], #4
-    cmp     r3, r2
+    cmp     r1, r3
     bne     1b
+
+    /* Zero out IBSS */
+    ldr     r2, =_iedata
+    ldr     r3, =_iend
+    mov     r4, #0
+1:
+    cmp     r3, r2
+    strhi   r4, [r2], #4
+    bhi     1b
+
+    /* Copy the IRAM */
+    ldr     r2, =_iramcopy
+    ldr     r3, =_iramstart
+    ldr     r4, =_iramend
+1:
+    cmp     r4, r3
+    ldrhi   r5, [r2], #4
+    strhi   r5, [r3], #4
+    bhi     1b
 #endif
 
     /* Initialise bss section to zero */
@@ -102,6 +123,7 @@ newstart:
 
     /* Switch back to supervisor mode */
     msr     cpsr_c, #0xd3
+
     bl      main
 
 
