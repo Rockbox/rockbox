@@ -30,6 +30,7 @@ svenska.lang
 tagalog.lang
 turkce.lang
 wallisertitsch.lang
+walon.lang
 #ifdef HAVE_LCD_BITMAP /* Not for the Player */
 arabic.lang
 chinese-simp.lang
