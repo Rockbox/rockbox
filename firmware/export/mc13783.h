@@ -1281,11 +1281,11 @@ uint32_t mc13783_set(unsigned address, uint32_t bits);
 uint32_t mc13783_clear(unsigned address, uint32_t bits);
 int mc13783_write(unsigned address, uint32_t data);
 uint32_t mc13783_write_masked(unsigned address, uint32_t data, uint32_t mask);
-int mc13783_write_multiple(unsigned start, const uint32_t *buffer, int count);
 int mc13783_write_regset(const unsigned char *regs, const uint32_t *data, int count);
 uint32_t mc13783_read(unsigned address);
-int mc13783_read_multiple(unsigned start, uint32_t *buffer, int count);
 int mc13783_read_regset(const unsigned char *regs, uint32_t *buffer, int count);
+
+#define MC13783_DATA_ERROR UINT32_MAX
 
 /* Statically-registered event enable/disable */
 enum mc13783_event_sets

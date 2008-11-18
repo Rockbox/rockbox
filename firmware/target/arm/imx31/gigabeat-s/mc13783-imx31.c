@@ -210,7 +210,7 @@ uint32_t mc13783_set(unsigned address, uint32_t bits)
 
     uint32_t data = mc13783_read(address);
 
-    if (data != (uint32_t)-1)
+    if (data != MC13783_DATA_ERROR)
         mc13783_write(address, data | bits);
 
     spi_unlock(&mc13783_spi);
@@ -224,7 +224,7 @@ uint32_t mc13783_clear(unsigned address, uint32_t bits)
 
     uint32_t data = mc13783_read(address);
 
-    if (data != (uint32_t)-1)
+    if (data != MC13783_DATA_ERROR)
         mc13783_write(address, data & ~bits);
 
     spi_unlock(&mc13783_spi);
@@ -251,29 +251,25 @@ int mc13783_write(unsigned address, uint32_t data)
     return 1 - xfer.count;
 }
 
-int mc13783_write_multiple(unsigned start, const uint32_t *data, int count)
+uint32_t mc13783_write_masked(unsigned address, uint32_t data, uint32_t mask)
 {
-    int i;
-    struct spi_transfer xfer;
-    uint32_t packets[MC13783_NUM_REGS];
+    uint32_t old;
 
-    if (start + count > MC13783_NUM_REGS)
-        return -1;
+    spi_lock(&mc13783_spi);
 
-    /* Prepare payload */
-    for (i = 0; i < count; i++, start++)
+    old = mc13783_read(address);
+
+    if (old != MC13783_DATA_ERROR)
     {
-        packets[i] = (1 << 31) | (start << 25) | (data[i] & 0xffffff);
+        data = (old & ~mask) | (data & mask);
+
+        if (mc13783_write(address, data) != 1)
+            old = MC13783_DATA_ERROR;
     }
 
-    xfer.txbuf = packets;
-    xfer.rxbuf = packets;
-    xfer.count = count;
-    
-    if (!spi_transfer(&mc13783_spi, &xfer))
-        return -1;
+    spi_unlock(&mc13783_spi);
 
-    return count - xfer.count;
+    return old;
 }
 
 int mc13783_write_regset(const unsigned char *regs, const uint32_t *data,
@@ -283,7 +279,7 @@ int mc13783_write_regset(const unsigned char *regs, const uint32_t *data,
     struct spi_transfer xfer;
     uint32_t packets[MC13783_NUM_REGS];
 
-    if (count > MC13783_NUM_REGS)
+    if ((unsigned)count > MC13783_NUM_REGS)
         return -1;
 
     for (i = 0; i < count; i++)
@@ -312,7 +308,7 @@ uint32_t mc13783_read(unsigned address)
     struct spi_transfer xfer;
 
     if (address >= MC13783_NUM_REGS)
-        return (uint32_t)-1;
+        return MC13783_DATA_ERROR;
 
     packet = address << 25;
 
@@ -321,31 +317,9 @@ uint32_t mc13783_read(unsigned address)
     xfer.count = 1;
 
     if (!spi_transfer(&mc13783_spi, &xfer))
-        return (uint32_t)-1;
+        return MC13783_DATA_ERROR;
 
     return packet;
-}
-
-int mc13783_read_multiple(unsigned start, uint32_t *buffer, int count)
-{
-    int i;
-    struct spi_transfer xfer;
-
-    if (start + count > MC13783_NUM_REGS)
-        return -1;
-
-    xfer.txbuf = buffer;
-    xfer.rxbuf = buffer;
-    xfer.count = count;
-
-    /* Prepare TX payload */
-    for (i = 0; i < count; i++, start++)
-        buffer[i] = start << 25;
-
-    if (!spi_transfer(&mc13783_spi, &xfer))
-        return -1;
-
-    return count - xfer.count;
 }
 
 int mc13783_read_regset(const unsigned char *regs, uint32_t *buffer,
@@ -354,7 +328,7 @@ int mc13783_read_regset(const unsigned char *regs, uint32_t *buffer,
     int i;
     struct spi_transfer xfer;
 
-    if (count > MC13783_NUM_REGS)
+    if ((unsigned)count > MC13783_NUM_REGS)
         return -1;
 
     for (i = 0; i < count; i++)
