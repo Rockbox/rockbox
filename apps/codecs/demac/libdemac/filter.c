@@ -28,27 +28,38 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #include "demac.h"
 #include "filter.h"
 #include "demac_config.h"
+     
+#if FILTER_BITS == 32
+
+#if defined(CPU_ARM) && (ARM_ARCH == 4)
+#include "vector_math32_armv4.h"
+#else
+#include "vector_math_generic.h"
+#endif
+
+#else /* FILTER_BITS == 16 */
 
 #ifdef CPU_COLDFIRE
 #include "vector_math16_cf.h"
-#elif ARM_ARCH >= 6
+#elif defined(CPU_ARM) && (ARM_ARCH >= 6)
 #include "vector_math16_armv6.h"
-#elif ARM_ARCH >= 5 /* Assume all our ARMv5 targets are ARMv5te(j) */
+#elif defined(CPU_ARM) && (ARM_ARCH >= 5)
+/* Assume all our ARMv5 targets are ARMv5te(j) */
 #include "vector_math16_armv5te.h"
-#elif defined CPU_ARM7TDMI
-#include "vector_math16_arm7.h"
 #else
-#include "vector_math16.h"
+#include "vector_math_generic.h"
 #endif
 
+#endif /* FILTER_BITS */
+
 struct filter_t {
-    int16_t* coeffs; /* ORDER entries */
+    filter_int* coeffs; /* ORDER entries */
 
     /* We store all the filter delays in a single buffer */
-    int16_t* history_end;
+    filter_int* history_end;
 
-    int16_t* delay;
-    int16_t* adaptcoeffs;
+    filter_int* delay;
+    filter_int* adaptcoeffs;
 
     int avg;
 };
@@ -89,7 +100,7 @@ struct filter_t {
 #if defined(CPU_ARM) && (ARM_ARCH >= 6)
 #define SATURATE(x) ({int __res; asm("ssat %0, #16, %1" : "=r"(__res) : "r"(x)); __res; })
 #else
-#define SATURATE(x) (int16_t)(((x) == (int16_t)(x)) ? (x) : ((x) >> 31) ^ 0x7FFF);
+#define SATURATE(x) (((x) == (int16_t)(x)) ? (x) : ((x) >> 31) ^ 0x7FFF);
 #endif
 
 /* Apply the filter with state f to count entries in data[] */
@@ -145,7 +156,7 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3980(struct filter_t* f,
         /* Have we filled the history buffer? */
         if (f->delay == f->history_end) {
             memmove(f->coeffs + ORDER, f->delay - (ORDER*2),
-                    (ORDER*2) * sizeof(int16_t));
+                    (ORDER*2) * sizeof(filter_int));
             f->adaptcoeffs = f->coeffs + ORDER*2;
             f->delay = f->coeffs + ORDER*3;
         }
@@ -190,7 +201,7 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3970(struct filter_t* f,
         /* Have we filled the history buffer? */
         if (f->delay == f->history_end) {
             memmove(f->coeffs + ORDER, f->delay - (ORDER*2),
-                    (ORDER*2) * sizeof(int16_t));
+                    (ORDER*2) * sizeof(filter_int));
             f->adaptcoeffs = f->coeffs + ORDER*2;
             f->delay = f->coeffs + ORDER*3;
         }
@@ -200,7 +211,7 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3970(struct filter_t* f,
 static struct filter_t filter0 IBSS_ATTR;
 static struct filter_t filter1 IBSS_ATTR;
 
-static void do_init_filter(struct filter_t* f, int16_t* buf)
+static void do_init_filter(struct filter_t* f, filter_int* buf)
 {
     f->coeffs = buf;
     f->history_end = buf + ORDER*3 + FILTER_HISTORY_SIZE;
@@ -210,13 +221,13 @@ static void do_init_filter(struct filter_t* f, int16_t* buf)
     f->delay = f->coeffs + ORDER*3;
 
     /* Zero coefficients and history buffer */
-    memset(f->coeffs, 0, ORDER*3 * sizeof(int16_t));
+    memset(f->coeffs, 0, ORDER*3 * sizeof(filter_int));
 
     /* Zero the running average */
     f->avg = 0;
 }
 
-void INIT_FILTER(int16_t* buf)
+void INIT_FILTER(filter_int* buf)
 {
     do_init_filter(&filter0, buf);
     do_init_filter(&filter1, buf + ORDER*3 + FILTER_HISTORY_SIZE);

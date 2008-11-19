@@ -2,7 +2,7 @@
 
 libdemac - A Monkey's Audio decoder
 
-$Id:$
+$Id$
 
 Copyright (C) Dave Chapman 2007
 
@@ -22,7 +22,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 */
 
-static inline void vector_add(int16_t* v1, int16_t* v2)
+#include "demac_config.h"
+
+static inline void vector_add(filter_int* v1, filter_int* v2)
 {
 #if ORDER > 32
     int order = (ORDER >> 5);
@@ -66,7 +68,7 @@ static inline void vector_add(int16_t* v1, int16_t* v2)
     }
 }
 
-static inline void vector_sub(int16_t* v1, int16_t* v2)
+static inline void vector_sub(filter_int* v1, filter_int* v2)
 {
 #if ORDER > 32
     int order = (ORDER >> 5);
@@ -110,7 +112,7 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
     }
 }
 
-static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
+static inline int32_t scalarproduct(filter_int* v1, filter_int* v2)
 {
     int res = 0;
 

@@ -39,11 +39,20 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #define APE_OUTPUT_DEPTH 29
 
-/* On PP5002 code should go into IRAM. Otherwise put the insane
- * filter buffer into IRAM as long as there is no better use. */
+/* On ARMv4, using 32 bit ints for the filters is faster. */
+#if defined(CPU_ARM) && (ARM_ARCH == 4)
+#define FILTER_BITS 32
+#endif
+
 #if CONFIG_CPU == PP5002
+/* Code in IRAM for speed, not enough IRAM for the insane filter buffer. */
 #define ICODE_SECTION_DEMAC_ARM   .icode
 #define ICODE_ATTR_DEMAC          ICODE_ATTR
+#define IBSS_ATTR_DEMAC_INSANEBUF
+#elif CONFIG_CPU == PP5020
+/* Not enough IRAM for the insane filter buffer. */
+#define ICODE_SECTION_DEMAC_ARM   .text
+#define ICODE_ATTR_DEMAC
 #define IBSS_ATTR_DEMAC_INSANEBUF
 #else
 #define ICODE_SECTION_DEMAC_ARM   .text
@@ -75,6 +84,20 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #ifndef PREDICTOR_HISTORY_SIZE
 #define PREDICTOR_HISTORY_SIZE 512
+#endif     
+
+#ifndef FILTER_BITS
+#define FILTER_BITS 16
+#endif
+
+
+#ifndef __ASSEMBLER__
+#include <inttypes.h>
+#if FILTER_BITS == 32
+typedef int32_t filter_int;
+#elif FILTER_BITS == 16
+typedef int16_t filter_int;
+#endif
 #endif
 
 #endif /* _DEMAC_CONFIG_H */
