@@ -107,9 +107,7 @@ enum mc13783_regs_enum
 #define MC13783_LOBATLI                 (0x1 << 13)
 #define MC13783_LOBATHI                 (0x1 << 14)
 #define MC13783_UDPI                    (0x1 << 15)
-#define MC13783_USB4V4I                 (0x1 << 16)
-#define MC13783_USB2V0I                 (0x1 << 17)
-#define MC13783_USB0V8I                 (0x1 << 18)
+#define MC13783_USBI                    (0x1 << 16)
 #define MC13783_IDFLOATI                (0x1 << 19)
 #define MC13783_SE1I                    (0x1 << 21)
 #define MC13783_CKDETI                  (0x1 << 22)
@@ -131,9 +129,7 @@ enum mc13783_regs_enum
 #define MC13783_LOBATLM                 (0x1 << 13)
 #define MC13783_LOBATHM                 (0x1 << 14)
 #define MC13783_UDPM                    (0x1 << 15)
-#define MC13783_USB4V4M                 (0x1 << 16)
-#define MC13783_USB2V0M                 (0x1 << 17)
-#define MC13783_USB0V8M                 (0x1 << 18)
+#define MC13783_USBM                    (0x1 << 16)
 #define MC13783_IDFLOATM                (0x1 << 19)
 #define MC13783_SE1M                    (0x1 << 21)
 #define MC13783_CKDETM                  (0x1 << 22)
@@ -1040,6 +1036,8 @@ enum mc13783_regs_enum
     #define MC13783_VCHRG_3_800V        (0x6 << 0)
     #define MC13783_VCHRG_4_500V        (0x7 << 0)
 #define MC13783_ICHRG                   (0xf << 3) /*  Min  Nom  Max */
+    #define MC13783_ICHRGw(x)           (((x) << 3) & MC13783_ICHRG)
+    #define MC13783_ICHRGr(x)           (((x) & MC13783_ICHRG) >> 3)
     #define MC13783_ICHRG_0MA           (0x0 << 3) /*    0    0    0 */
     #define MC13783_ICHRG_70MA          (0x1 << 3) /*   55   70   85 */
     #define MC13783_ICHRG_177MA         (0x2 << 3) /*  161  177  195 */
@@ -1057,6 +1055,8 @@ enum mc13783_regs_enum
     #define MC13783_ICHRG_1596MA        (0xe << 3) /* 1450 1596 1755 */
     #define MC13783_ICHRG_FULLY_ON      (0xf << 3) /* Disallow HW FET turn on */ 
 #define MC13783_ICHRGTR                 (0x7 << 7) /*  Min  Nom  Max */
+    #define MC13783_ICHRGTRw(x)         (((x) << 7) & MC13783_ICHRGTR)
+    #define MC13783_ICHRGTRr(x)         (((x) & MC13783_ICHRGTR) >> 7)
     #define MC13783_ICHRGTR_0MA         (0x0 << 7) /*    0    0    0 */
     #define MC13783_ICHRGTR_9MA         (0x1 << 7) /*    6    9   12 */
     #define MC13783_ICHRGTR_20MA        (0x2 << 7) /*   14   20   26 */
@@ -1290,8 +1290,8 @@ int mc13783_read_regset(const unsigned char *regs, uint32_t *buffer, int count);
 /* Statically-registered event enable/disable */
 enum mc13783_event_sets
 {
-    MC13783_EVENT_SET0 = 0,
-    MC13783_EVENT_SET1 = 1,
+    MC13783_EVENT_SET0 = 0, /* *STATUS0/MASK0/SENSE0 */
+    MC13783_EVENT_SET1 = 1, /* *STATUS1/MASK1/SENSE1 */
 };
 
 struct mc13783_event

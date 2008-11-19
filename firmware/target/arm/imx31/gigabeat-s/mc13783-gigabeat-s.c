@@ -62,7 +62,7 @@ static const struct mc13783_event mc13783_events[] =
     [MC13783_USB4V4_EVENT] = /* USB insertion */
     {
         .set  = MC13783_EVENT_SET0,
-        .mask = MC13783_USB4V4M,
+        .mask = MC13783_USBM,
         .callback = usb_connect_event,
     },
 };
