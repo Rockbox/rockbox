@@ -1026,6 +1026,30 @@
 #define RTC_DAYR                (*(REG32_PTR_T)(RTC_BASE_ADDR+0x20))
 #define RTC_DAYALARM            (*(REG32_PTR_T)(RTC_BASE_ADDR+0x24))
 
+/* Watchdog */
+#define WDOG_WCR                (*(REG16_PTR_T)(WDOG_BASE_ADDR+0x00))
+#define WDOG_WSR                (*(REG16_PTR_T)(WDOG_BASE_ADDR+0x02))
+#define WDOG_WRSR               (*(REG16_PTR_T)(WDOG_BASE_ADDR+0x04))
+
+#define WDOG_WCR_WT             (0xff << 8)
+#define WDOG_WCR_WTw(x)         (((x) << 8) & WDOG_WCR_WT)
+#define WDOG_WCR_WTr(x)         (((x) & WDOG_WCR_WT) >> 8)
+
+#define WDOG_WCR_WOE            (0x1 << 6)
+#define WDOG_WCR_WDA            (0x1 << 5)
+#define WDOG_WCR_SRS            (0x1 << 4)
+#define WDOG_WCR_WRE            (0x1 << 3)
+#define WDOG_WCR_WDE            (0x1 << 2)
+#define WDOG_WCR_WDBG           (0x1 << 1)
+#define WDOG_WCR_WDZST          (0x1 << 0)
+
+#define WDOG_WRSR_JRST          (0x1 << 5)
+#define WDOG_WRSR_PWR           (0x1 << 4)
+#define WDOG_WRSR_EXT           (0x1 << 3)
+#define WDOG_WRSR_CMON          (0x1 << 2)
+#define WDOG_WRSR_TOUT          (0x1 << 1)
+#define WDOG_WRSR_SFTW          (0x1 << 0)
+
 /* Keypad */
 #define KPP_KPCR                (*(REG16_PTR_T)(KPP_BASE_ADDR+0x0))
 #define KPP_KPSR                (*(REG16_PTR_T)(KPP_BASE_ADDR+0x2))
