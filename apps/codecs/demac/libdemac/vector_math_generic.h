@@ -116,8 +116,8 @@ static inline int32_t scalarproduct(filter_int* v1, filter_int* v2)
 {
     int res = 0;
 
-#if ORDER > 16
-    int order = (ORDER >> 4);
+#if ORDER > 32
+    int order = (ORDER >> 5);
     while (order--)
 #endif
     {
@@ -137,6 +137,24 @@ static inline int32_t scalarproduct(filter_int* v1, filter_int* v2)
         res += *v1++ * *v2++;
         res += *v1++ * *v2++;
         res += *v1++ * *v2++;
+#if ORDER > 16
+        res += *v1++ * *v2++;
+        res += *v1++ * *v2++;
+        res += *v1++ * *v2++;
+        res += *v1++ * *v2++;
+        res += *v1++ * *v2++;
+        res += *v1++ * *v2++;
+        res += *v1++ * *v2++;
+        res += *v1++ * *v2++;
+        res += *v1++ * *v2++;
+        res += *v1++ * *v2++;
+        res += *v1++ * *v2++;
+        res += *v1++ * *v2++;
+        res += *v1++ * *v2++;
+        res += *v1++ * *v2++;
+        res += *v1++ * *v2++;
+        res += *v1++ * *v2++;
+#endif
     }
     return res;
 }

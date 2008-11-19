@@ -67,7 +67,7 @@ static inline void vector_add(int16_t* v1, int16_t* v2)
         "move.l  %%d3, (%[v1])+      \n"
         "lea.l   (16, %[v2]), %[v2]  \n"
         "move.l  %%d4, %%d0          \n"
-        
+
         "movem.l (%[v1]), %%a0-%%a3  \n"
         "movem.l (%[v2]), %%d1-%%d4  \n"
         ADDHALFXREGS(%%a0, %%d1, %%d0)
@@ -175,7 +175,7 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
         "move.l  %%d3, (%[v1])+      \n"
         "lea.l   (16, %[v2]), %[v2]  \n"
         "move.l  %%d4, %%d0          \n"
-        
+
         "movem.l (%[v2]), %%d1-%%d4  \n"
         "movem.l (%[v1]), %%a0-%%a3  \n"
         SUBHALFXREGS(%%a0, %%d1, %%d0)
@@ -207,7 +207,6 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
         "move.l  %%d2, (%[v1])+      \n"
         SUBHALFREGS(%%a3, %%d4, %%d3)
         "move.l  %%d3, (%[v1])+      \n"
-
         "lea.l   (16, %[v2]), %[v2]  \n"
 
         "movem.l (%[v2]), %%d1-%%d4  \n"
@@ -248,22 +247,16 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
  * in signed integer mode - call above macro before use. */
 static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
 {
-    int res = 0;
+    int res;
 #if ORDER > 32
     int cnt = ORDER>>5;
 #endif
 
-#define MACBLOCK4                                        \
-        "mac.w   %%d0u, %%d1u, (%[v1])+, %%d2, %%acc0\n" \
-        "mac.w   %%d0l, %%d1l, (%[v2])+, %%d1, %%acc0\n" \
-        "mac.w   %%d2u, %%d1u, (%[v1])+, %%d0, %%acc0\n" \
-        "mac.w   %%d2l, %%d1l, (%[v2])+, %%d1, %%acc0\n"
-
-#define MACBLOCK4_U2                                     \
-        "mac.w   %%d0u, %%d1l, (%[v2])+, %%d1, %%acc0\n" \
-        "mac.w   %%d0l, %%d1u, (%[v1])+, %%d0, %%acc0\n" \
-        "mac.w   %%d0u, %%d1l, (%[v2])+, %%d1, %%acc0\n" \
-        "mac.w   %%d0l, %%d1u, (%[v1])+, %%d0, %%acc0\n"
+#if ORDER > 16
+#define MAC_BLOCKS "7"
+#else
+#define MAC_BLOCKS "3"
+#endif
 
     asm volatile (
         "move.l  %[v2], %%d0                         \n"
@@ -274,15 +267,13 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "move.l  (%[v1])+, %%d0                      \n"
         "move.w  (%[v2])+, %%d1                      \n"
     "1:                                              \n"
-#if ORDER > 16
-        MACBLOCK4_U2
-        MACBLOCK4_U2
-        MACBLOCK4_U2
-        MACBLOCK4_U2
-#endif
-        MACBLOCK4_U2
-        MACBLOCK4_U2
-        MACBLOCK4_U2
+        ".rept " MAC_BLOCKS                         "\n"
+        "mac.w   %%d0u, %%d1l, (%[v2])+, %%d1, %%acc0\n"
+        "mac.w   %%d0l, %%d1u, (%[v1])+, %%d0, %%acc0\n"
+        "mac.w   %%d0u, %%d1l, (%[v2])+, %%d1, %%acc0\n"
+        "mac.w   %%d0l, %%d1u, (%[v1])+, %%d0, %%acc0\n"
+        ".endr                                       \n"
+
         "mac.w   %%d0u, %%d1l, (%[v2])+, %%d1, %%acc0\n"
         "mac.w   %%d0l, %%d1u, (%[v1])+, %%d0, %%acc0\n"
         "mac.w   %%d0u, %%d1l, (%[v2])+, %%d1, %%acc0\n"
@@ -299,15 +290,13 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "move.l  (%[v1])+, %%d0                      \n"
         "move.l  (%[v2])+, %%d1                      \n"
     "1:                                              \n"
-#if ORDER > 16
-        MACBLOCK4
-        MACBLOCK4
-        MACBLOCK4
-        MACBLOCK4
-#endif
-        MACBLOCK4
-        MACBLOCK4
-        MACBLOCK4
+        ".rept " MAC_BLOCKS                         "\n"
+        "mac.w   %%d0u, %%d1u, (%[v1])+, %%d2, %%acc0\n"
+        "mac.w   %%d0l, %%d1l, (%[v2])+, %%d1, %%acc0\n"
+        "mac.w   %%d2u, %%d1u, (%[v1])+, %%d0, %%acc0\n"
+        "mac.w   %%d2l, %%d1l, (%[v2])+, %%d1, %%acc0\n"
+        ".endr                                       \n"
+
         "mac.w   %%d0u, %%d1u, (%[v1])+, %%d2, %%acc0\n"
         "mac.w   %%d0l, %%d1l, (%[v2])+, %%d1, %%acc0\n"
 #if ORDER > 32

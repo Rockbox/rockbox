@@ -117,21 +117,35 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
  * incorrect results (if ARM aligncheck is disabled). */
 static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
 {
-    int res = 0;
+    int res;
+#if ORDER > 32
+    int cnt = ORDER>>5;
+#endif
+
 #if ORDER > 16
-    int cnt = ORDER>>4;
+#define MLA_BLOCKS "3"
+#else
+#define MLA_BLOCKS "1"
 #endif
 
     asm volatile (
+#if ORDER > 32
+        "mov     %[res], #0              \n"
+#endif
         "tst     %[v2], #2               \n"
         "beq     20f                     \n"
 
     "10:                                 \n"
         "ldrh    r7, [%[v2]], #2         \n"
+#if ORDER > 32
         "mov     r7, r7, lsl #16         \n"
     "1:                                  \n"
         "ldmia   %[v1]!, {r0-r3}         \n"
         "smlabt  %[res], r0, r7, %[res]  \n"
+#else
+        "ldmia   %[v1]!, {r0-r3}         \n"
+        "smulbb  %[res], r0, r7          \n"
+#endif
         "ldmia   %[v2]!, {r4-r7}         \n"
         "smlatb  %[res], r0, r4, %[res]  \n"
         "smlabt  %[res], r1, r4, %[res]  \n"
@@ -140,6 +154,8 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "smlatb  %[res], r2, r6, %[res]  \n"
         "smlabt  %[res], r3, r6, %[res]  \n"
         "smlatb  %[res], r3, r7, %[res]  \n"
+        
+        ".rept " MLA_BLOCKS             "\n"
         "ldmia   %[v1]!, {r0-r3}         \n"
         "smlabt  %[res], r0, r7, %[res]  \n"
         "ldmia   %[v2]!, {r4-r7}         \n"
@@ -150,7 +166,8 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "smlatb  %[res], r2, r6, %[res]  \n"
         "smlabt  %[res], r3, r6, %[res]  \n"
         "smlatb  %[res], r3, r7, %[res]  \n"
-#if ORDER > 16
+        ".endr                           \n"
+#if ORDER > 32
         "subs    %[cnt], %[cnt], #1  \n"
         "bne     1b                  \n"
 #endif
@@ -160,7 +177,11 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
     "1:                                  \n"
         "ldmia   %[v1]!, {r0-r3}         \n"
         "ldmia   %[v2]!, {r4-r7}         \n"
+#if ORDER > 32
         "smlabb  %[res], r0, r4, %[res]  \n"
+#else
+        "smulbb  %[res], r0, r4          \n"
+#endif
         "smlatt  %[res], r0, r4, %[res]  \n"
         "smlabb  %[res], r1, r5, %[res]  \n"
         "smlatt  %[res], r1, r5, %[res]  \n"
@@ -168,6 +189,8 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "smlatt  %[res], r2, r6, %[res]  \n"
         "smlabb  %[res], r3, r7, %[res]  \n"
         "smlatt  %[res], r3, r7, %[res]  \n"
+
+        ".rept " MLA_BLOCKS             "\n"
         "ldmia   %[v1]!, {r0-r3}         \n"
         "ldmia   %[v2]!, {r4-r7}         \n"
         "smlabb  %[res], r0, r4, %[res]  \n"
@@ -178,19 +201,20 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "smlatt  %[res], r2, r6, %[res]  \n"
         "smlabb  %[res], r3, r7, %[res]  \n"
         "smlatt  %[res], r3, r7, %[res]  \n"
-#if ORDER > 16
+        ".endr                           \n"
+#if ORDER > 32
         "subs    %[cnt], %[cnt], #1      \n"
         "bne     1b                      \n"  
 #endif
 
     "99:                                 \n"
         : /* outputs */
-#if ORDER > 16
+#if ORDER > 32
         [cnt]"+r"(cnt),
 #endif
         [v1] "+r"(v1),
         [v2] "+r"(v2),
-        [res]"+r"(res)
+        [res]"=r"(res)
         : /* inputs */
         : /* clobbers */
         "r0", "r1", "r2", "r3",

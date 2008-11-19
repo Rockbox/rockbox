@@ -29,8 +29,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * incorrect results (if ARM aligncheck is disabled). */
 static inline void vector_add(int16_t* v1, int16_t* v2)
 {
+#if ORDER > 32
+    int cnt = ORDER>>5;
+#endif
+
 #if ORDER > 16
-    int cnt = ORDER>>4;
+#define ADD_SUB_BLOCKS "4"
+#else
+#define ADD_SUB_BLOCKS "2"
 #endif
 
     asm volatile (
@@ -42,6 +48,7 @@ static inline void vector_add(int16_t* v1, int16_t* v2)
         "ldr     r5, [%[v2]], #4     \n"
         "mov     r4, r4, lsl #16     \n"
     "1:                              \n"
+        ".rept " ADD_SUB_BLOCKS     "\n"
         "ldmia   %[v2]!, {r6-r7}     \n"
         "ldmia   %[v1],  {r0-r3}     \n"
         "mov     r5, r5, ror #16     \n"
@@ -56,21 +63,8 @@ static inline void vector_add(int16_t* v1, int16_t* v2)
         "pkhbt   r7, r7, r4, lsl #16 \n"
         "sadd16  r3, r3, r7          \n"
         "stmia   %[v1]!, {r0-r3}     \n"
-        "ldmia   %[v2]!, {r6-r7}     \n"
-        "ldmia   %[v1],  {r0-r3}     \n"
-        "mov     r5, r5, ror #16     \n"
-        "pkhtb   r4, r5, r4, asr #16 \n"
-        "sadd16  r0, r0, r4          \n"
-        "pkhbt   r5, r5, r6, lsl #16 \n"
-        "sadd16  r1, r1, r5          \n"
-        "ldmia   %[v2]!, {r4-r5}     \n"
-        "mov     r7, r7, ror #16     \n"
-        "pkhtb   r6, r7, r6, asr #16 \n"
-        "sadd16  r2, r2, r6          \n"
-        "pkhbt   r7, r7, r4, lsl #16 \n"
-        "sadd16  r3, r3, r7          \n"
-        "stmia   %[v1]!, {r0-r3}     \n"
-#if ORDER > 16
+        ".endr                       \n"
+#if ORDER > 32
         "subs    %[cnt], %[cnt], #1  \n"
         "bne     1b                  \n"
 #endif
@@ -78,6 +72,7 @@ static inline void vector_add(int16_t* v1, int16_t* v2)
 
     "20:                             \n"
     "1:                              \n"
+        ".rept " ADD_SUB_BLOCKS     "\n"
         "ldmia   %[v2]!, {r4-r7}     \n"
         "ldmia   %[v1],  {r0-r3}     \n"
         "sadd16  r0, r0, r4          \n"
@@ -85,21 +80,15 @@ static inline void vector_add(int16_t* v1, int16_t* v2)
         "sadd16  r2, r2, r6          \n"
         "sadd16  r3, r3, r7          \n"
         "stmia   %[v1]!, {r0-r3}     \n"
-        "ldmia   %[v2]!, {r4-r7}     \n"
-        "ldmia   %[v1],  {r0-r3}     \n"
-        "sadd16  r0, r0, r4          \n"
-        "sadd16  r1, r1, r5          \n"
-        "sadd16  r2, r2, r6          \n"
-        "sadd16  r3, r3, r7          \n"
-        "stmia   %[v1]!, {r0-r3}     \n"
-#if ORDER > 16
+        ".endr                       \n"
+#if ORDER > 32
         "subs    %[cnt], %[cnt], #1  \n"
         "bne     1b                  \n"
 #endif
 
     "99:                             \n"
         : /* outputs */
-#if ORDER > 16
+#if ORDER > 32
         [cnt]"+r"(cnt),
 #endif
         [v1] "+r"(v1),
@@ -116,8 +105,8 @@ static inline void vector_add(int16_t* v1, int16_t* v2)
  * incorrect results (if ARM aligncheck is disabled). */
 static inline void vector_sub(int16_t* v1, int16_t* v2)
 {
-#if ORDER > 16
-    int cnt = ORDER>>4;
+#if ORDER > 32
+    int cnt = ORDER>>5;
 #endif
 
     asm volatile (
@@ -129,6 +118,7 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
         "ldr     r5, [%[v2]], #4     \n"
         "mov     r4, r4, lsl #16     \n"
     "1:                              \n"
+        ".rept " ADD_SUB_BLOCKS     "\n"
         "ldmia   %[v2]!, {r6-r7}     \n"
         "ldmia   %[v1],  {r0-r3}     \n"
         "mov     r5, r5, ror #16     \n"
@@ -143,21 +133,8 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
         "pkhbt   r7, r7, r4, lsl #16 \n"
         "ssub16  r3, r3, r7          \n"
         "stmia   %[v1]!, {r0-r3}     \n"
-        "ldmia   %[v2]!, {r6-r7}     \n"
-        "ldmia   %[v1],  {r0-r3}     \n"
-        "mov     r5, r5, ror #16     \n"
-        "pkhtb   r4, r5, r4, asr #16 \n"
-        "ssub16  r0, r0, r4          \n"
-        "pkhbt   r5, r5, r6, lsl #16 \n"
-        "ssub16  r1, r1, r5          \n"
-        "ldmia   %[v2]!, {r4-r5}     \n"
-        "mov     r7, r7, ror #16     \n"
-        "pkhtb   r6, r7, r6, asr #16 \n"
-        "ssub16  r2, r2, r6          \n"
-        "pkhbt   r7, r7, r4, lsl #16 \n"
-        "ssub16  r3, r3, r7          \n"
-        "stmia   %[v1]!, {r0-r3}     \n"
-#if ORDER > 16
+        ".endr                       \n"
+#if ORDER > 32
         "subs    %[cnt], %[cnt], #1  \n"
         "bne     1b                  \n"
 #endif
@@ -165,6 +142,7 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
 
     "20:                             \n"
     "1:                              \n"
+        ".rept " ADD_SUB_BLOCKS     "\n"
         "ldmia   %[v2]!, {r4-r7}     \n"
         "ldmia   %[v1],  {r0-r3}     \n"
         "ssub16  r0, r0, r4          \n"
@@ -172,21 +150,15 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
         "ssub16  r2, r2, r6          \n"
         "ssub16  r3, r3, r7          \n"
         "stmia   %[v1]!, {r0-r3}     \n"
-        "ldmia   %[v2]!, {r4-r7}     \n"
-        "ldmia   %[v1],  {r0-r3}     \n"
-        "ssub16  r0, r0, r4          \n"
-        "ssub16  r1, r1, r5          \n"
-        "ssub16  r2, r2, r6          \n"
-        "ssub16  r3, r3, r7          \n"
-        "stmia   %[v1]!, {r0-r3}     \n"
-#if ORDER > 16
+        ".endr                       \n"
+#if ORDER > 32
         "subs    %[cnt], %[cnt], #1  \n"
         "bne     1b                  \n"
 #endif
 
     "99:                             \n"
         : /* outputs */
-#if ORDER > 16
+#if ORDER > 32
         [cnt]"+r"(cnt),
 #endif
         [v1] "+r"(v1),
@@ -203,12 +175,21 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
  * incorrect results (if ARM aligncheck is disabled). */
 static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
 {
-    int res = 0;
+    int res;
+#if ORDER > 32
+    int cnt = ORDER>>5;
+#endif
+
 #if ORDER > 16
-    int cnt = ORDER>>4;
+#define MLA_BLOCKS "3"
+#else
+#define MLA_BLOCKS "1"
 #endif
 
     asm volatile (
+#if ORDER > 32
+        "mov     %[res], #0              \n"
+#endif
         "tst     %[v2], #2               \n"
         "beq     20f                     \n"
 
@@ -216,11 +197,18 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "ldrh    r7, [%[v2]], #2         \n"
         "ldmia   %[v2]!, {r4-r5}         \n"
         "ldmia   %[v1]!, {r0-r1}         \n"
+#if ORDER > 32
         "mov     r7, r7, lsl #16         \n"
     "1:                                  \n"
         "pkhbt   r8, r4, r7              \n"
         "ldmia   %[v2]!, {r6-r7}         \n"
         "smladx  %[res], r0, r8, %[res]  \n"
+#else
+        "pkhbt   r8, r4, r7, lsl #16     \n"
+        "ldmia   %[v2]!, {r6-r7}         \n"
+        "smuadx  %[res], r0, r8          \n"
+#endif
+        ".rept " MLA_BLOCKS             "\n"
         "pkhbt   r8, r5, r4              \n"
         "ldmia   %[v1]!, {r2-r3}         \n"
         "smladx  %[res], r1, r8, %[res]  \n"
@@ -233,11 +221,13 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "pkhbt   r8, r4, r7              \n"
         "ldmia   %[v2]!, {r6-r7}         \n"
         "smladx  %[res], r0, r8, %[res]  \n"
+        ".endr                           \n"
+
         "pkhbt   r8, r5, r4              \n"
         "ldmia   %[v1]!, {r2-r3}         \n"
         "smladx  %[res], r1, r8, %[res]  \n"
         "pkhbt   r8, r6, r5              \n"
-#if ORDER > 16
+#if ORDER > 32
         "subs    %[cnt], %[cnt], #1      \n"
         "ldmneia %[v2]!, {r4-r5}         \n"
         "smladx  %[res], r2, r8, %[res]  \n"
@@ -257,7 +247,12 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "ldmia   %[v2]!, {r5-r7}         \n"
     "1:                                  \n"
         "ldmia   %[v1]!, {r2-r3}         \n"
+#if ORDER > 32
         "smlad   %[res], r0, r5, %[res]  \n"
+#else
+        "smuad   %[res], r0, r5          \n"
+#endif
+        ".rept " MLA_BLOCKS             "\n"
         "ldmia   %[v2]!, {r4-r5}         \n"
         "smlad   %[res], r1, r6, %[res]  \n"
         "ldmia   %[v1]!, {r0-r1}         \n"
@@ -266,9 +261,11 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "smlad   %[res], r3, r4, %[res]  \n"
         "ldmia   %[v1]!, {r2-r3}         \n"
         "smlad   %[res], r0, r5, %[res]  \n"
+        ".endr                           \n"
+
         "ldmia   %[v2]!, {r4-r5}         \n"
         "smlad   %[res], r1, r6, %[res]  \n"
-#if ORDER > 16
+#if ORDER > 32
         "subs    %[cnt], %[cnt], #1      \n"
         "ldmneia %[v1]!, {r0-r1}         \n"
         "smlad   %[res], r2, r7, %[res]  \n"
@@ -282,12 +279,12 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
 
     "99:                                 \n"
         : /* outputs */
-#if ORDER > 16
+#if ORDER > 32
         [cnt]"+r"(cnt),
 #endif
         [v1] "+r"(v1),
         [v2] "+r"(v2),
-        [res]"+r"(res)
+        [res]"=r"(res)
         : /* inputs */
         : /* clobbers */
         "r0", "r1", "r2", "r3", "r4",
