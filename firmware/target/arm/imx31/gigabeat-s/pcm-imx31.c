@@ -215,11 +215,13 @@ static void play_start_pcm(void)
     dma_play_data.state = 1;
 
     /* Fill the FIFO or start when data is used up */
+    SSI_SCR1 |= SSI_SCR_SSIEN; /* Enable SSI */
+
     while (1)
     {
         if (SSI_SFCSR_TFCNT0r(SSI_SFCSR1) > 6 || dma_play_data.size == 0)
         {
-            SSI_SCR1 |= (SSI_SCR_TE | SSI_SCR_SSIEN); /* Start transmitting */
+            SSI_SCR1 |= SSI_SCR_TE;  /* Start transmitting */
             return;
         }
 
