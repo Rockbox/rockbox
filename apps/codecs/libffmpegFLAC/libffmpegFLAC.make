@@ -14,4 +14,5 @@ FFMPEGFLACLIB_OBJ := $(call c2obj, $(FFMPEGFLACLIB_SRC))
 OTHER_SRC += $(FFMPEGFLACLIB_SRC)
 
 $(FFMPEGFLACLIB): $(FFMPEGFLACLIB_OBJ)
+	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1

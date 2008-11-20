@@ -15,4 +15,5 @@ OTHER_SRC += $(FAADLIB_SRC)
 OTHER_INC += -I$(APPSDIR)/codecs/libfaad
 
 $(FAADLIB): $(FAADLIB_OBJ)
+	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1

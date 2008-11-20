@@ -14,6 +14,7 @@ MUSEPACKLIB_OBJ := $(call c2obj, $(MUSEPACKLIB_SRC))
 OTHER_SRC += $(MUSEPACKLIB_SRC)
 
 $(MUSEPACKLIB): $(MUSEPACKLIB_OBJ)
+	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
 
 # libmusepack is faster on ARM-targets with -O1 than -O2

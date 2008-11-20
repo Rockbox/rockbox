@@ -14,6 +14,7 @@ M4ALIB_OBJ := $(call c2obj, $(M4ALIB_SRC))
 OTHER_SRC += $(M4ALIB_SRC)
 
 $(M4ALIB): $(M4ALIB_OBJ)
+	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
 
 M4AFLAGS = $(filter-out -O%,$(CODECFLAGS))

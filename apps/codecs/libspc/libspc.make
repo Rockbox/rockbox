@@ -14,6 +14,7 @@ SPCLIB_OBJ := $(call c2obj, $(SPCLIB_SRC))
 OTHER_SRC += $(SPCLIB_SRC)
 
 $(SPCLIB): $(SPCLIB_OBJ)
+	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
 
 SPCFLAGS = $(filter-out -O%,$(CODECFLAGS))

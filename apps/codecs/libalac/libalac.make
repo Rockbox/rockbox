@@ -14,6 +14,7 @@ ALACLIB_OBJ := $(call c2obj, $(ALACLIB_SRC))
 OTHER_SRC += $(ALACLIB_SRC)
 
 $(ALACLIB): $(ALACLIB_OBJ)
+	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
 
 ALACFLAGS = $(filter-out -O%,$(CODECFLAGS))

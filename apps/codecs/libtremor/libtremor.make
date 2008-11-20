@@ -14,6 +14,7 @@ TREMORLIB_OBJ := $(call c2obj, $(TREMORLIB_SRC))
 OTHER_SRC += $(TREMORLIB_SRC)
 
 $(TREMORLIB): $(TREMORLIB_OBJ)
+	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
 
 $(CODECDIR)/libtremor/%.o: $(ROOTDIR)/apps/codecs/libtremor/%.c

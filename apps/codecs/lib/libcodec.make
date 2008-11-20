@@ -13,6 +13,7 @@ CODECLIB_OBJ := $(call c2obj, $(CODECLIB_SRC))
 OTHER_SRC += $(CODECLIB_SRC)
 
 $(CODECLIB): $(CODECLIB_OBJ)
+	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
 
 CODECLIBFLAGS = $(CODECFLAGS) -ffunction-sections

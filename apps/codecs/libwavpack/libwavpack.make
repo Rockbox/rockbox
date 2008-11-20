@@ -14,4 +14,5 @@ WAVPACKLIB_OBJ := $(call c2obj, $(WAVPACKLIB_SRC))
 OTHER_SRC += $(WAVPACKLIB_SRC)
 
 $(WAVPACKLIB): $(WAVPACKLIB_OBJ)
+	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1

@@ -14,4 +14,5 @@ WMALIB_OBJ := $(call c2obj, $(WMALIB_SRC))
 OTHER_SRC += $(WMALIB_SRC)
 
 $(WMALIB): $(WMALIB_OBJ)
+	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1

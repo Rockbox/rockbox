@@ -31,6 +31,7 @@ SPEEXLIB_OBJ := $(call c2obj, $(SPEEXLIB_SRC))
 OTHER_SRC += $(SPEEXLIB_SRC)
 
 $(SPEEXLIB): $(SPEEXLIB_OBJ)
+	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
 
 # libspeex-voice

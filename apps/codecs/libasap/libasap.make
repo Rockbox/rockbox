@@ -14,6 +14,7 @@ ASAPLIB_OBJ := $(call c2obj, $(ASAPLIB_SRC))
 OTHER_SRC += $(ASAPLIB_SRC)
 
 $(ASAPLIB): $(ASAPLIB_OBJ)
+	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
 
 ASAPFLAGS = $(filter-out -O%,$(CODECFLAGS))

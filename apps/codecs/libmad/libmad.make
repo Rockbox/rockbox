@@ -21,6 +21,7 @@ MADLIB_OBJ := $(call c2obj, $(MADLIB_SRC))
 OTHER_SRC += $(MADLIB_SRC)
 
 $(MADLIB): $(MADLIB_OBJ)
+	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
 
 # libmad-mpeg

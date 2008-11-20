@@ -40,6 +40,7 @@ PLUGINFLAGS = -I$(APPSDIR)/plugins -DPLUGIN $(CFLAGS)
 $(ROCKS): $(PLUGINLIB) $(APPSDIR)/plugin.h $(PLUGINLINK_LDS) $(PLUGINBITMAPLIB)
 
 $(PLUGINLIB): $(PLUGINLIB_OBJ)
+	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
 
 $(PLUGINLINK_LDS): $(PLUGIN_LDS)
