@@ -25,6 +25,7 @@ UIBMP = $(BUILDDIR)/UI256.bmp
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 
 $(SIMLIB): $$(SIMOBJ) $(UIBMP)
+	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
 
 $(BUILDDIR)/$(BINARY): $$(OBJ) $(SIMLIB) $(VOICESPEEXLIB) $(FIRMLIB)
