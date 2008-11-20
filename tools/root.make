@@ -40,6 +40,7 @@ include $(ROOTDIR)/apps/bitmaps/bitmaps.make
 ifneq (,$(findstring bootloader,$(APPSDIR)))
   include $(APPSDIR)/bootloader.make
 else ifneq (,$(findstring bootbox,$(APPSDIR)))
+  BOOTBOXLDOPTS = -Wl,--gc-sections
   include $(APPSDIR)/bootbox.make
 else
   include $(APPSDIR)/apps.make
@@ -115,7 +116,7 @@ $(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(LINKRAM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
 		-L$(BUILDDIR)/apps/codecs $(VOICESPEEXLIB:lib%.a=-l%) \
-		-lgcc \
+		-lgcc $(BOOTBOXLDOPTS) \
 		-T$(LINKRAM) -Wl,-Map,$(BUILDDIR)/rockbox.map
 
 $(BUILDDIR)/rombox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(LINKROM)
