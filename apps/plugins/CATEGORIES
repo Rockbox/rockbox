@@ -43,7 +43,7 @@ md5sum,apps
 mem_mon,apps
 metronome,apps
 midi2wav,viewers
-midiplay,viewers
+midi,viewers
 minesweeper,games
 mosaique,demos
 mp3_encoder,apps
