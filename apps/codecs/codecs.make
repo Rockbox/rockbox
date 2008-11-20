@@ -98,6 +98,9 @@ $(CODECDIR)/%.codec: $(CODECDIR)/%.o
 		$(filter %.o, $^) \
 		$(filter %.a, $^) \
 		-lgcc $(CODECLDFLAGS)
-	$(call PRINTS,OC $(@F))$(OC) -O binary $(CODECDIR)/$*.elf $@
-
+ifdef SIMVER
+	$(SILENT)$(shell cp $(BUILDDIR)/$*.elf $@)
+else
+	$(SILENT)$(OC) -O binary $(CODECDIR)/$*.elf $@
+endif
 
