@@ -296,7 +296,7 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
     while(samples-- > 0)
     {
         /* Is voice being ramped? */
-        if(so->state == STATE_RAMPDOWN)
+        if(unlikely(so->state == STATE_RAMPDOWN))
         {
             if(so->decay != 0)  /* Ramp has been started */
             {
@@ -318,12 +318,12 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
 
         s2 = getSample((cp_temp >> FRACTSIZE)+1, wf);
 
-        if(mode_mask28)
+        if(likely(mode_mask28))
         {
             /* LOOP_REVERSE|LOOP_PINGPONG  = 24  */
-            if(mode_mask24 && so->loopState == STATE_LOOPING && (cp_temp < start_loop))
+            if(unlikely(mode_mask24 && so->loopState == STATE_LOOPING && (cp_temp < start_loop)))
             {
-                if(mode_mask_looprev)
+                if(unlikely(mode_mask_looprev))
                 {
                     cp_temp += diff_loop;
                     s2=getSample((cp_temp >> FRACTSIZE), wf);
@@ -334,10 +334,10 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
                 }
             }
 
-            if(cp_temp >= end_loop)
+            if(unlikely(cp_temp >= end_loop))
             {
                 so->loopState = STATE_LOOPING;
-                if(!mode_mask24)
+                if(unlikely(!mode_mask24))
                 {
                     cp_temp -= diff_loop;
                     s2=getSample((cp_temp >> FRACTSIZE), wf);
@@ -350,7 +350,7 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
         }
 
         /* Have we overrun? */
-        if(cp_temp >= num_samples)
+        if(unlikely(cp_temp >= num_samples))
         {
             cp_temp -= so->delta;
             s2 = getSample((cp_temp >> FRACTSIZE)+1, wf);
@@ -362,21 +362,21 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
 
         s1 +=((signed)((s2 - s1) * (cp_temp & ((1<<FRACTSIZE)-1)))>>FRACTSIZE);
 
-        if(so->curRate == 0)
+        if(unlikely(so->curRate == 0))
         {
             stopVoice(so);
 //          so->isUsed = false;
 
         }
 
-        if(so->ch != 9 && so->state != STATE_RAMPDOWN) /* Stupid ADSR code... and don't do ADSR for drums */
+        if(likely(so->ch != 9 && so->state != STATE_RAMPDOWN)) /* Stupid ADSR code... and don't do ADSR for drums */
         {
-            if(so->curOffset < so->targetOffset)
+            if(unlikely(so->curOffset < so->targetOffset))
             {
                 so->curOffset += (so->curRate);
-                if(so -> curOffset > so->targetOffset && so->curPoint != 2)
+                if(unlikely(so -> curOffset > so->targetOffset && so->curPoint != 2))
                 {
-                    if(so->curPoint != 5)
+                    if(unlikely(so->curPoint != 5))
                     {
                         setPoint(so, so->curPoint+1);
                     }
@@ -388,10 +388,9 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
             } else
             {
                 so->curOffset -= (so->curRate);
-                if(so -> curOffset < so->targetOffset && so->curPoint != 2)
+                if(unlikely(so -> curOffset < so->targetOffset && so->curPoint != 2))
                 {
-
-                    if(so->curPoint != 5)
+                    if(unlikely(so->curPoint != 5))
                     {
                         setPoint(so, so->curPoint+1);
                     }
@@ -404,7 +403,7 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
             }
         }
 
-        if(so->curOffset < 0)
+        if(unlikely(so->curOffset < 0))
         {
             so->curOffset = so->targetOffset;
             stopVoice(so);
@@ -417,7 +416,7 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
         s1 = s1 * volscale >> 14;
 
         /* need to set ramp beginning */
-        if(so->state == STATE_RAMPDOWN && so->decay == 0)
+        if(unlikely(so->state == STATE_RAMPDOWN && so->decay == 0))
         {
             so->decay = s1;
             if(so->decay == 0)
@@ -443,7 +442,7 @@ int32_t samp_buf[512] IBSS_ATTR;
 void synthSamples(int32_t *buf_ptr, unsigned int num_samples) ICODE_ATTR;
 void synthSamples(int32_t *buf_ptr, unsigned int num_samples)
 {
-    if (num_samples > 512)
+    if (unlikely(num_samples > 512))
         DEBUGF("num_samples is too big!\n");
     else
     {
@@ -463,6 +462,7 @@ void synthSamples(int32_t *buf_ptr, unsigned int num_samples)
 
         rb->memcpy(buf_ptr, samp_buf, num_samples*4);
     }
+
     /* TODO: Automatic Gain Control, anyone? */
     /* Or, should this be implemented on the DSP's output volume instead? */
 

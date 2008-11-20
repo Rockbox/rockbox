@@ -32,10 +32,3 @@
 #define ATTR_ALIGN(align)
 #endif
 
-#ifdef HAVE_BUILTIN_EXPECT
-#define likely(x) __builtin_expect ((x) != 0, 1)
-#define unlikely(x) __builtin_expect ((x) != 0, 0)
-#else
-#define likely(x) (x)
-#define unlikely(x) (x)
-#endif

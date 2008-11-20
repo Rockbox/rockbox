@@ -275,17 +275,5 @@ static inline ogg_int32_t VFLOAT_ADD(ogg_int32_t a,ogg_int32_t ap,
   return(a);
 }
 
-#ifdef __GNUC__
-#if __GNUC__ >= 3
-#define EXPECT(a, b) __builtin_expect((a), (b))
-#else
-#define EXPECT(a, b) (a)
 #endif
-#else
-#define EXPECT(a, b) (a)
-#endif
-
-#endif
-
-
 

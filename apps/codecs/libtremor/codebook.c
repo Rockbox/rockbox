@@ -154,9 +154,9 @@ STIN long decode_packed_entry_number(codebook *book,
   long lo,hi;
   long lok = oggpack_look(b,book->dec_firsttablen);
  
-  if (EXPECT(lok >= 0, 1)) {
+  if (likely(lok >= 0)) {
     long entry = book->dec_firsttable[lok];
-    if(EXPECT(entry&0x80000000UL, 0)){
+    if(unlikely(entry&0x80000000UL)){
       lo=(entry>>15)&0x7fff;
       hi=book->used_entries-(entry&0x7fff);
     }else{
@@ -218,7 +218,7 @@ static long decode_packed_block(codebook *book, oggpack_buffer *b,
       bitend = ((adr&3)+b->headend)*8;
       while (bufptr<bufend){
 	long entry, lo, hi;
-	if (EXPECT(cachesize<book->dec_maxlength, 0)) {
+	if (unlikely(cachesize<book->dec_maxlength)) {
 	  if (bit-cachesize+32>=bitend)
 	    break;
 	  bit-=cachesize;
@@ -230,13 +230,13 @@ static long decode_packed_block(codebook *book, oggpack_buffer *b,
 	}
 
 	entry=book->dec_firsttable[cache&((1<<book->dec_firsttablen)-1)];
-	if(EXPECT(entry&0x80000000UL, 0)){
+	if(unlikely(entry&0x80000000UL)){
 	  lo=(entry>>15)&0x7fff;
 	  hi=book->used_entries-(entry&0x7fff);
 	  {
 	    ogg_uint32_t testword=bitreverse((ogg_uint32_t)cache);
 	    
-            while(EXPECT(hi-lo>1, 1)){
+            while(likely(hi-lo>1)){
               long p=(hi-lo)>>1;
               if (book->codelist[lo+p]>testword)
                 hi-=p;

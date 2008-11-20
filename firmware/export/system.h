@@ -168,6 +168,15 @@ int get_cpu_boost_counter(void);
 #define TYPE_FROM_MEMBER(type, memberptr, membername) \
     ((type *)((intptr_t)(memberptr) - OFFSETOF(type, membername)))
 
+/* Use to give gcc hints on which branch is most likely taken */
+#if defined(__GNUC__) && __GNUC__ >= 3
+#define likely(x)   __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
+#else
+#define likely(x)   (x)
+#define unlikely(x) (x)
+#endif
+
 /* returns index of first set bit + 1 or 0 if no bits are set */
 int find_first_set_bit(uint32_t val);
 
