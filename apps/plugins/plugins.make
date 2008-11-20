@@ -74,7 +74,7 @@ $(BUILDDIR)/%.rock: $(BUILDDIR)/%.o $(PLUGINLINK_LDS)
 		$(filter %.a, $^) \
 		-lgcc $(PLUGINLDFLAGS)
 ifdef SIMVER
-	$(SILENT)$(shell cp $(BUILDDIR)/$*.elf $@)
+	$(SILENT)cp $(BUILDDIR)/$*.elf $@
 else
 	$(SILENT)$(OC) -O binary $(BUILDDIR)/$*.elf $@
 endif

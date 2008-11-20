@@ -99,8 +99,7 @@ $(CODECDIR)/%.codec: $(CODECDIR)/%.o
 		$(filter %.a, $^) \
 		-lgcc $(CODECLDFLAGS)
 ifdef SIMVER
-	$(SILENT)$(shell cp $(CODECDIR)/$*.elf $@)
+	$(SILENT)cp $(CODECDIR)/$*.elf $@
 else
 	$(SILENT)$(OC) -O binary $(CODECDIR)/$*.elf $@
 endif
-
