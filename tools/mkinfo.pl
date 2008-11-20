@@ -85,12 +85,12 @@ printf O ("Binary: %s\n", $ENV{'BINARY'});
 printf O ("Binary size: %s\n", filesize($ENV{'BINARY'}));
 
 if ($ENV{'APPSDIR'} =~ /\/apps$/) {
-  printf O ("Actual size: %s\n", filesize("apps/rockbox.bin"));
-  printf O ("RAM usage: %s\n", mapscan("apps/rockbox.map"));
+  printf O ("Actual size: %s\n", filesize("rockbox.bin"));
+  printf O ("RAM usage: %s\n", mapscan("rockbox.map"));
   printf O ("Features: %s\n", features("apps/features"));
 } elsif ($ENV{'APPSDIR'} =~ /\/bootloader$/) {
-  printf O ("Actual size: %s\n", filesize("bootloader/bootloader.bin"));
-  printf O ("RAM usage: %s\n", mapscan("bootloader/bootloader.map"));
+  printf O ("Actual size: %s\n", filesize("bootloader.bin"));
+  printf O ("RAM usage: %s\n", mapscan("bootloader.map"));
 }
 
 # Variables identifying tool and build environment details
