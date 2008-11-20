@@ -42,13 +42,18 @@ $(DOOMBUILDDIR)/sscanf.o: $(DOOMBUILDDIR)/sscanf.c
 $(DOOMBUILDDIR)/doom.rock: $(DOOM_OBJ)
 # for some reason, this doesn't match the implicit rule in plugins.make,
 # so we have to duplicate the link command here
+	$(call PRINTS,LD $(@F))
 	$(SILENT)$(CC) $(PLUGINFLAGS) -o $*.elf \
 		$(filter %.o, $^) \
 		$(filter %.a, $^) \
 		-lgcc $(PLUGINLDFLAGS)
-	$(call PRINTS,LD $(@F))$(OC) -O binary $*.elf $@
+ifdef SIMVER
+	$(SILENT)cp $*.elf $@
+else
+	$(SILENT)$(OC) -O binary $*.elf $@
+endif
 
 # new rule needed to use extra compile flags
-$(DOOMBUILDDIR)/%.o: $(DOOMSRCDIR)/%.c $(DOOMSRCDIR)/doom.make
+$(DOOMBUILDDIR)/%.o: $(DOOMSRCDIR)/%.c
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(DOOMCFLAGS) -c $< -o $@

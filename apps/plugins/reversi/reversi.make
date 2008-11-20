@@ -21,8 +21,13 @@ OTHER_SRC += $(REVERSI_SRC)
 $(REVERSIBUILDDIR)/reversi.rock: $(REVERSI_OBJ)
 # for some reason, this doesn't match the implicit rule in plugins.make,
 # so we have to duplicate the link command here
+	$(call PRINTS,LD $(@F))
 	$(SILENT)$(CC) $(PLUGINFLAGS) -o $*.elf \
 		$(filter %.o, $^) \
 		$(filter %.a, $^) \
 		-lgcc $(PLUGINLDFLAGS)
-	$(call PRINTS,LD $(@F))$(OC) -O binary $*.elf $@
+ifdef SIMVER
+	$(SILENT)cp $*.elf $@
+else
+	$(SILENT)$(OC) -O binary $*.elf $@
+endif
