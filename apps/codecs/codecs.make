@@ -51,7 +51,7 @@ $(CODECS): $(CODEC_CRT0) $(CODECLINK_LDS)
 $(CODECLINK_LDS): $(CODEC_LDS)
 	$(call PRINTS,PP $(@F))
 	$(shell mkdir -p $(dir $@))
-	$(call preprocess2file, $<, $@)
+	$(call preprocess2file, $<, $@, -DCODEC)
 
 # codec/library dependencies
 $(CODECDIR)/spc.codec : $(CODECDIR)/libspc.a
