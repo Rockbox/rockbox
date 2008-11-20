@@ -21,9 +21,9 @@
  ****************************************************************************/
 
 #include "plugin.h"
-#include "xlcd.h"
-#include "configfile.h"
-#include "helper.h"
+#include "lib/xlcd.h"
+#include "lib/configfile.h"
+#include "lib/helper.h"
 
 PLUGIN_HEADER
 

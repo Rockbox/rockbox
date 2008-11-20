@@ -23,7 +23,7 @@
 #ifndef _CLOCK_BITMAP_STRINGS_
 #define _CLOCK_BITMAP_STRINGS_
 #include "plugin.h"
-#include "picture.h"
+#include "lib/picture.h"
 
 void draw_string(struct screen* display, const struct picture* bitmaps,
                  char* str, int x, int y);

@@ -25,14 +25,14 @@
 ****************************************************************************/
 
 #include "plugin.h"
-#include "helper.h"
+#include "lib/helper.h"
 
 #ifdef HAVE_LCD_BITMAP
 
 #ifndef HAVE_LCD_COLOR
-#include "grey.h"
+#include "lib/grey.h"
 #endif
-#include "fixedpoint.h"
+#include "lib/fixedpoint.h"
 
 PLUGIN_HEADER
 

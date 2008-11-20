@@ -30,7 +30,9 @@
 #define _SPC_CODEC_H_
 
 /* rather than comment out asserts, just define NDEBUG */
+#ifndef NDEBUG
 #define NDEBUG
+#endif
 #include <assert.h>
 
 /** Basic configuration options **/

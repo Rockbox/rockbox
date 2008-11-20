@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "md5.h"
+#include "lib/md5.h"
 PLUGIN_HEADER
 
 #define KEYBOX_FILE PLUGIN_DIR "/apps/keybox.dat"

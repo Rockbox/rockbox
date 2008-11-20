@@ -33,11 +33,14 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
-#include "../codec.h"
+#include "codeclib.h"
 
 #include "m4a.h"
 
 #if defined(DEBUG) || defined(SIMULATOR)
+#ifdef DEBUGF
+#undef DEBUGF
+#endif
 #define DEBUGF qtmovie->stream->ci->debugf
 #else
 #define DEBUGF(...)

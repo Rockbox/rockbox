@@ -31,7 +31,7 @@
 # include "timer.h"
 # include "layer12.h"
 # include "layer3.h"
-# include "../lib/codeclib.h"
+# include "codeclib.h"
 
 static
 unsigned long const bitrate_table[5][15] = {

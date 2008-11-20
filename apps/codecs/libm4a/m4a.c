@@ -23,13 +23,6 @@
 #include <inttypes.h>
 #include "m4a.h"
 
-#if defined(DEBUG) || defined(SIMULATOR)
-extern struct codec_api* rb;
-#define DEBUGF  rb->debugf
-#else
-#define DEBUGF(...)
-#endif
-
 /* Implementation of the stream.h functions used by libalac */
 
 #define _Swap32(v) do { \

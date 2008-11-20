@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "rockboxlogo.h"
+#include "bitmaps/rockboxlogo.h"
 
 #if LCD_WIDTH <= 128
 #define BOOT_VERSION ("Boot " APPSVERSION)

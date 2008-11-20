@@ -22,10 +22,10 @@
 ****************************************************************************/
 
 #include "plugin.h"
-#include "helper.h" 
+#include "lib/helper.h" 
 
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
-#include "grey.h"
+#include "lib/grey.h"
 
 PLUGIN_HEADER
 

@@ -35,9 +35,9 @@
 /// \file huffsv46.c
 /// Implementations of huffman decoding for streamversions < 7.
 
-#include <musepack.h>
-#include <requant.h>
-#include <huffman.h>
+#include "musepack.h"
+#include "requant.h"
+#include "huffman.h"
 
 #ifdef MPC_SUPPORT_SV456
 

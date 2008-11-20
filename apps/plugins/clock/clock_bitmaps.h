@@ -21,7 +21,7 @@
 
 #ifndef _CLOCK_BITMAPS_
 #define _CLOCK_BITMAPS_
-#include "picture.h"
+#include "lib/picture.h"
 
 extern const struct picture logos[];
 extern const struct picture messages[];

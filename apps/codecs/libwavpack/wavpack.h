@@ -7,9 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 // wavpack.h
-
-#include "../codec.h"
-
+#ifdef CODEC
+#include "codeclib.h"
+#endif
 #include <inttypes.h>
 
 // This header file contains all the definitions required by WavPack.

@@ -101,7 +101,7 @@
  *****************************************************************************/
 #include "plugin.h"
 #include "mpegplayer.h"
-#include "helper.h"
+#include "lib/helper.h"
 #include "mpeg_settings.h"
 #include "mpeg2.h"
 #include "video_out.h"

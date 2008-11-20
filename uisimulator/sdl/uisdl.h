@@ -23,7 +23,7 @@
 #define __UISDL_H__
 
 #include <stdbool.h>
-#include "SDL.h"
+#include <SDL.h>
 
 /* colour definitions are R, G, B */
 

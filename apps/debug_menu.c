@@ -114,7 +114,7 @@
 #include "usb_core.h"
 #endif
 #ifdef USB_STORAGE
-#include "../firmware/usbstack/usb_storage.h"
+#include "usbstack/usb_storage.h"
 #endif
 
 /*---------------------------------------------------*/

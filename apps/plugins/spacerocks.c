@@ -20,9 +20,7 @@
  ****************************************************************************/
 
 #include "plugin.h"
-#include "math.h"
-#include "stdio.h"
-#include "helper.h"
+#include "lib/helper.h"
 
 PLUGIN_HEADER
 

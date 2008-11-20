@@ -43,7 +43,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #ifdef USE_GREY
-#include "../lib/grey.h"
+#include "lib/grey.h"
 #endif
 
 #include "zxbox_keyb.h"

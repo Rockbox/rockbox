@@ -31,7 +31,7 @@
  */
 
 #include "plugin.h"
-#include "helper.h"
+#include "lib/helper.h"
 
 PLUGIN_HEADER
 
@@ -54,7 +54,7 @@ PLUGIN_HEADER
 #   define MAZE_RDOWN    (BUTTON_PLAY | BUTTON_REPEAT)
 
 #else
-#   include "pluginlib_actions.h"
+#   include "lib/pluginlib_actions.h"
 #   define MAZE_NEW      PLA_START
 #   define MAZE_QUIT     PLA_QUIT
 #   define MAZE_SOLVE    PLA_FIRE

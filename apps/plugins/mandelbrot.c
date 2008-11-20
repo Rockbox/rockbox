@@ -23,8 +23,8 @@
 #include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP
-#include "grey.h"
-#include "xlcd.h"
+#include "lib/grey.h"
+#include "lib/xlcd.h"
 
 PLUGIN_HEADER
 

@@ -33,8 +33,7 @@ extern "C" {
 #endif
 
 #include "faad_config.h"
-#include "../codec.h"
-#include "../lib/codeclib.h"
+#include "codeclib.h"
 
 extern struct codec_api* ci;
 

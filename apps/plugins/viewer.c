@@ -21,8 +21,8 @@
  ****************************************************************************/
 #include "plugin.h"
 #include <ctype.h>
-#include "playback_control.h"
-#include "oldmenuapi.h"
+#include "lib/playback_control.h"
+#include "lib/oldmenuapi.h"
 
 PLUGIN_HEADER
 

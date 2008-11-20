@@ -1,0 +1,4 @@
+chessbox.c
+gnuchess.c
+opening.c
+chessbox_pgn.c

@@ -24,8 +24,8 @@
 #include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP
-#include "pluginlib_actions.h"
-#include "helper.h"
+#include "lib/pluginlib_actions.h"
+#include "lib/helper.h"
 PLUGIN_HEADER
 
 #define DEFAULT_WAIT_TIME 3

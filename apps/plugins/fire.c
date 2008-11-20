@@ -22,14 +22,14 @@
 ****************************************************************************/
 
 #include "plugin.h"
-#include "helper.h"
+#include "lib/helper.h"
 #ifdef HAVE_LCD_BITMAP
 
-#include "pluginlib_actions.h"
-#include "fixedpoint.h"
+#include "lib/pluginlib_actions.h"
+#include "lib/fixedpoint.h"
 
 #ifndef HAVE_LCD_COLOR
-#include "grey.h"
+#include "lib/grey.h"
 #endif
 
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)

@@ -27,6 +27,7 @@ $(OBJDIR)/compressed.elf : $(OBJS) $(LINKFILE)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/compressed.map
 
 $(LINKFILE): $(LDS)
+	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,Build LDS file)cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
 
 $(OBJDIR)/decompressor.o : decompressor.c $(OBJDIR)/uclimage.c

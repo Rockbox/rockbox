@@ -20,8 +20,8 @@
  ****************************************************************************/
 
 #include "plugin.h"
-#include "pluginlib_actions.h"
-#include "picture.h"
+#include "lib/pluginlib_actions.h"
+#include "lib/picture.h"
 
 PLUGIN_HEADER
 

@@ -22,7 +22,7 @@
 ****************************************************************************/
 
 #include "plugin.h"
-#include "playback_control.h"
+#include "lib/playback_control.h"
 
 #ifdef HAVE_LCD_BITMAP
 

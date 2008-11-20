@@ -1,7 +1,6 @@
-#include <os_types.h>
+#include "os_types.h"
 
-static unsigned char *mallocbuf;
-static size_t bufsize, tmp_ptr, mem_ptr;
+static size_t tmp_ptr;
 
 void ogg_malloc_init(void)
 {

@@ -21,7 +21,7 @@
 #include <math.h>
 #include "ogg.h"
 #include "ivorbiscodec.h"
-#include <codecs/lib/codeclib.h>
+#include "codeclib.h"
 #include "codec_internal.h"
 #include "codebook.h"
 #include "window.h"

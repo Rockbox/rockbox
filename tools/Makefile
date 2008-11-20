@@ -15,8 +15,8 @@ CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
  generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat database \
  lngdump telechips gigabeats creative hmac-sha1 mktccboot mknkboot rbspeexenc mkzenboot
 
-all:
-	@echo "Run make in your build directory!"
+all: scramble descramble sh2d rdf2binary mkboot mktccboot mknkboot mkzenboot \
+	convbdf codepages uclpack rbspeexenc voicefont
 
 scramble: scramble.o iriver.o mi4.o gigabeat.o gigabeats.o telechips.o iaudio_bl_flash.o creative.o hmac-sha1.o
 descramble: descramble.o iriver.o gigabeat.o

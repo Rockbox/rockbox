@@ -1,4 +1,4 @@
-#include "../codec.h"
+#include "codeclib.h"
 
 /* a52dec profiling */
 /* #undef A52DEC_GPROF */

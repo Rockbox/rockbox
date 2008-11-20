@@ -1,5 +1,5 @@
 #include "plugin.h"
-#include "helper.h"
+#include "lib/helper.h"
 #include "lib/configfile.h"
 #include "lib/oldmenuapi.h"
 

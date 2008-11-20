@@ -35,7 +35,7 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "../codec.h"
+#include "codeclib.h"
 #include "decomp.h"
 
 int16_t predictor_coef_table[32] IBSS_ATTR;

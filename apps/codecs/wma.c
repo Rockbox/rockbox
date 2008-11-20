@@ -464,7 +464,7 @@ enum codec_status codec_main(void)
     int wmares, res;
     uint8_t* audiobuf;
     int audiobufsize;
-    int packetlength;
+    int packetlength = 0;
     int errcount = 0;
 
     /* Generic codec initialisation */

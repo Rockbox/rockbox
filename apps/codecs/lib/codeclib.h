@@ -25,13 +25,22 @@
 #include <sys/types.h>
 
 extern struct codec_api *ci;
-extern long mem_ptr;
-extern long bufsize;
+extern size_t mem_ptr;
+extern size_t bufsize;
 extern unsigned char* mp3buf;     /* The actual MP3 buffer from Rockbox                 */
 extern unsigned char* mallocbuf;  /* The free space after the codec in the codec buffer */
 extern unsigned char* filebuf;    /* The rest of the MP3 buffer                         */
 
 /* Standard library functions that are used by the codecs follow here */
+
+/* Get these functions 'out of the way' of the standard functions. Not doing
+ * so confuses the cygwin linker, and maybe others. These functions need to
+ * be implemented elsewhere */
+#define malloc(x) codec_malloc(x)
+#define calloc(x,y) codec_calloc(x,y)
+#define realloc(x,y) codec_realloc(x,y)
+#define free(x) codec_free(x)
+#define alloca(x) __builtin_alloca(x)
 
 void* codec_malloc(size_t size);
 void* codec_calloc(size_t nmemb, size_t size);

@@ -24,8 +24,7 @@
 /* We don't want all this stuff if we're building encoder */
 #ifndef ROCKBOX_VOICE_ENCODER
 
-#include "../codec.h"
-#include "../lib/codeclib.h"
+#include "codeclib.h"
 #include "debug.h"
 
 #if !defined(ROCKBOX_VOICE_CODEC)
@@ -34,6 +33,7 @@
 #undef DEBUGF
 #define DEBUGF ci->debugf
 #endif
+
 
 #ifdef ROCKBOX_HAS_LOGF
 #undef LOGF
@@ -75,6 +75,9 @@ static inline void speex_free_scratch (void *ptr)
 #define OVERRIDE_SPEEX_FATAL 1
 static inline void _speex_fatal(const char *str, const char *file, int line)
 {
+    (void)str;
+    (void)file;
+    (void)line;
     DEBUGF("Fatal error: %s\n", str);
    //exit(1);
 }
@@ -82,24 +85,30 @@ static inline void _speex_fatal(const char *str, const char *file, int line)
 #define OVERRIDE_SPEEX_WARNING 1
 static inline void speex_warning(const char *str)
 {
+    (void)str;
     DEBUGF("warning: %s\n", str);
 }
 
 #define OVERRIDE_SPEEX_WARNING_INT 1
 static inline void speex_warning_int(const char *str, int val)
 {
+    (void)str;
+    (void)val;
     DEBUGF("warning: %s %d\n", str, val);
 }
 
 #define OVERRIDE_SPEEX_NOTIFY 1
 static inline void speex_notify(const char *str)
 {
+    (void)str;
     DEBUGF("notice: %s\n", str);
 }
 
 #define OVERRIDE_SPEEX_PUTC 1
 static inline void _speex_putc(int ch, void *file)
 {
+    (void)ch;
+    (void)file;
     //FILE *f = (FILE *)file;
     //printf("%c", ch);
 }

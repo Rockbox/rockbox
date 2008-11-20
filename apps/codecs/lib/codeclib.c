@@ -27,8 +27,8 @@
 #include "codeclib.h"
 #include "metadata.h"
 
-long mem_ptr;
-long bufsize;
+size_t mem_ptr;
+size_t bufsize;
 unsigned char* mp3buf;     // The actual MP3 buffer from Rockbox
 unsigned char* mallocbuf;  // 512K from the start of MP3 buffer
 unsigned char* filebuf;    // The rest of the MP3 buffer

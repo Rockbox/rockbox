@@ -20,10 +20,10 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "configfile.h"
-#include "helper.h"
-#include "pluginlib_actions.h"
-#include "playback_control.h"
+#include "lib/configfile.h"
+#include "lib/helper.h"
+#include "lib/pluginlib_actions.h"
+#include "lib/playback_control.h"
 
 /* Include standard plugin macro */
 PLUGIN_HEADER

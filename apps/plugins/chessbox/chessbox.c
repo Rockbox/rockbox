@@ -43,7 +43,7 @@ extern const fb_data chessbox_pieces[];
 PLUGIN_HEADER
 
 /* Tile size defined by the assigned bitmap */
-#include "chessbox_pieces.h"
+#include "pluginbitmaps/chessbox_pieces.h"
 #define TILE_WIDTH BMPWIDTH_chessbox_pieces
 #define TILE_HEIGHT (BMPHEIGHT_chessbox_pieces/26)
 

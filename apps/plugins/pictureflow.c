@@ -24,10 +24,10 @@
 ****************************************************************************/
 
 #include "plugin.h"
-#include "pluginlib_actions.h"
-#include "helper.h"
-#include "bmp.h"
-#include "picture.h"
+#include "lib/pluginlib_actions.h"
+#include "lib/helper.h"
+#include "lib/bmp.h"
+#include "lib/picture.h"
 #include "pluginbitmaps/pictureflow_logo.h"
 #include "pluginbitmaps/pictureflow_emptyslide.h"
 

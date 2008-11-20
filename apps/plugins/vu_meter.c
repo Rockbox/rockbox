@@ -18,7 +18,7 @@
  *
  **************************************************************************/
 #include "plugin.h"
-#include "fixedpoint.h"
+#include "lib/fixedpoint.h"
 
 #if defined(HAVE_LCD_BITMAP)
 

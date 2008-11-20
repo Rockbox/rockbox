@@ -22,8 +22,8 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "mpegplayer.h"
-#include "../../codecs/libmad/bit.h"
-#include "../../codecs/libmad/mad.h"
+#include "codecs/libmad/bit.h"
+#include "codecs/libmad/mad.h"
 
 /** Audio stream and thread **/
 struct pts_queue_slot;

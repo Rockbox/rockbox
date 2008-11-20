@@ -23,7 +23,7 @@
 #include "plugin.h"
 #include "mpegplayer.h"
 #include "mpeg2dec_config.h"
-#include "grey.h"
+#include "lib/grey.h"
 #include "video_out.h"
 #include "mpeg_settings.h"
 

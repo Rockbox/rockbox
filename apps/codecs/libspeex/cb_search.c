@@ -522,6 +522,9 @@ char *stack,
 spx_int32_t *seed
 )
 {
+    (void)nsf;
+    (void)stack;
+    (void)seed;
    int i,j;
    VARDECL(int *ind);
    VARDECL(int *signs);
@@ -609,6 +612,9 @@ char *stack,
 spx_int32_t *seed
 )
 {
+    (void)par;
+    (void)bits;
+    (void)stack;
    int i;
    /* FIXME: This is bad, but I don't think the function ever gets called anyway */
    for (i=0;i<nsf;i++)

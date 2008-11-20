@@ -34,6 +34,14 @@ PLUGIN_HEADER
 
 #include "pluginbitmaps/sokoban_tiles.h"
 #define SOKOBAN_TILESIZE BMPWIDTH_sokoban_tiles
+
+/* If tilesize is 0 (which it is during dependency generation) gcc will abort
+   (div by 0) and this plugin won't get any dependencies
+*/
+#if SOKOBAN_TILESIZE < 1
+#define SOKOBAN_TILESIZE 10
+#endif
+
 /* SOKOBAN_TILESIZE is the number of pixels for each block.
  * Set dynamically so all targets can support levels
  * that fill their entire screen, less the stat box.

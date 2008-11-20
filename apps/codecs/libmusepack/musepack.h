@@ -45,7 +45,9 @@ extern "C" {
 //#include <stdlib.h>
 #include <string.h>
 
-#include "../codec.h"
+#ifndef SIMULATOR
+#include "codecs.h"
+#endif
 #include "config_types.h"
 #include "decoder.h"
 #include "math.h"

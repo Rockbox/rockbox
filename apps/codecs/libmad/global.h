@@ -19,7 +19,7 @@
  * $Id$
  */
 
-#include "../codec.h"
+#include "codeclib.h"
 
 # ifndef LIBMAD_GLOBAL_H
 # define LIBMAD_GLOBAL_H

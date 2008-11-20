@@ -1,4 +1,4 @@
-#include "../codec.h" 
+#include "codeclib.h" 
 #ifdef CPU_ARM
 #define _ARM_ASSEM_
 #endif

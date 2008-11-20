@@ -29,7 +29,7 @@
 #include "plugin.h"
 #include "sh7034.h"
 #include "system.h"
-#include "helper.h"
+#include "lib/helper.h"
 
 #ifndef SIMULATOR /* not for simulator by now */
 #ifdef HAVE_LCD_BITMAP /* and definitely not for the Player, haha */

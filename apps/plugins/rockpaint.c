@@ -29,7 +29,6 @@
  */
 
 #include "plugin.h"
-#include "errno.h"
 #include "lib/bmp.h"
 #include "lib/rgb_hsv.h"
 

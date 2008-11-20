@@ -20,8 +20,8 @@
  ****************************************************************************/
 
 #include "plugin.h"
-#include "pluginlib_actions.h"
-#include "configfile.h"
+#include "lib/pluginlib_actions.h"
+#include "lib/configfile.h"
 
 #define MAX_DICES 12
 #define INITIAL_NB_DICES 1

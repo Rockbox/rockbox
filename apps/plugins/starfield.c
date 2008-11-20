@@ -18,7 +18,7 @@
 ****************************************************************************/
 
 #include "plugin.h"
-#include "helper.h"
+#include "lib/helper.h"
 
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
 

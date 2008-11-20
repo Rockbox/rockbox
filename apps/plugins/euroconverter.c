@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "configfile.h"
+#include "lib/configfile.h"
 
 #ifdef HAVE_LCD_CHARCELLS
 

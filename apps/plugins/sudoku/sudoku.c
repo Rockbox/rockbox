@@ -69,9 +69,9 @@ Example ".ss" file, and one with a saved state:
 #include "generator.h"
 
 /* The bitmaps */
-#include "sudoku_normal.h"
-#include "sudoku_inverse.h"
-#include "sudoku_start.h"
+#include "pluginbitmaps/sudoku_normal.h"
+#include "pluginbitmaps/sudoku_inverse.h"
+#include "pluginbitmaps/sudoku_start.h"
 
 #define BITMAP_HEIGHT (BMPHEIGHT_sudoku_normal/10)
 #define BITMAP_STRIDE BMPWIDTH_sudoku_normal

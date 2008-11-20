@@ -38,7 +38,7 @@
 #include "ltp.h"
 #include "stack_alloc.h"
 #include "filters.h"
-#include <speex/speex_bits.h>
+#include "speex/speex_bits.h"
 #include "math_approx.h"
 #include "os_support.h"
 
@@ -674,6 +674,9 @@ spx_word16_t last_pitch_gain,
 int cdbk_offset
 )
 {
+    (void)end;
+    (void)pitch_coef;
+    (void)stack;
    int i;
    int pitch;
    int gain_index;
@@ -826,6 +829,14 @@ spx_word16_t last_pitch_gain,
 int cdbk_offset
 )
 {
+    (void)end;
+    (void)par;
+    (void)bits;
+    (void)stack;
+    (void)count_lost;
+    (void)subframe_offset;
+    (void)last_pitch_gain;
+    (void)cdbk_offset;
    int i;
 #ifdef FIXED_POINT
    if (pitch_coef>63)

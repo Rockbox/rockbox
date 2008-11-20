@@ -147,8 +147,7 @@
 /* Define this if you have a Motorola SCF5249 */
 #define CONFIG_CPU DM320
 
-/* Define this if you want to use coldfire's i2c interface */
-//#define CONFIG_I2C I2C_S3C2440
+#define CONFIG_I2C I2C_DM320
 
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING

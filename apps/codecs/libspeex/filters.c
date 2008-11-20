@@ -353,6 +353,7 @@ void filter_mem16(const spx_word16_t *x, const spx_coef_t *num, const spx_coef_t
 #ifndef OVERRIDE_IIR_MEM16
 void iir_mem16(const spx_word16_t *x, const spx_coef_t *den, spx_word16_t *y, int N, int ord, spx_mem_t *mem, char *stack)
 {
+    (void)stack;
    int i,j;
    spx_word16_t yi,nyi;
 
@@ -497,6 +498,7 @@ void qmf_synth(const spx_word16_t *x1, const spx_word16_t *x2, const spx_word16_
       all odd x[i] are zero -- well, actually they are left out of the array now
       N and M are multiples of 4 */
 {
+    (void)stack;
    int i, j;
    int M2, N2;
    VARDECL(spx_word16_t *xx1);
@@ -681,6 +683,9 @@ spx_word16_t  comb_gain,    /*gain of comb filter*/
 char *stack
 )
 {
+    (void)ak;
+    (void)p;
+    (void)stack;
    int i; 
    VARDECL(spx_word16_t *iexc);
    spx_word16_t old_ener, new_ener;

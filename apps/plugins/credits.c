@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "helper.h"
+#include "lib/helper.h"
 
 PLUGIN_HEADER
 

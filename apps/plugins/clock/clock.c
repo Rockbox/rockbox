@@ -21,8 +21,8 @@
 
 #include "plugin.h"
 #include "time.h"
-#include "pluginlib_actions.h"
-#include "xlcd.h"
+#include "lib/pluginlib_actions.h"
+#include "lib/xlcd.h"
 
 #include "clock.h"
 #include "clock_counter.h"

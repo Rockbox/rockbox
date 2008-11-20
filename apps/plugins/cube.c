@@ -21,10 +21,10 @@
 *
 ***************************************************************************/
 #include "plugin.h"
-#include "grey.h"
-#include "playergfx.h"
-#include "xlcd.h"
-#include "fixedpoint.h"
+#include "lib/grey.h"
+#include "lib/playergfx.h"
+#include "lib/xlcd.h"
+#include "lib/fixedpoint.h"
 
 PLUGIN_HEADER
 

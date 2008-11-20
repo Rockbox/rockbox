@@ -29,7 +29,7 @@
  */
 
 #include "plugin.h"
-#include "pluginlib_actions.h"
+#include "lib/pluginlib_actions.h"
 
 /* This macros must always be included. Should be placed at the top by
    convention, although the actual position doesn't matter */
@@ -488,6 +488,14 @@ static char* messages[] =
 #define EMPTY -1
 #define ROBOT 0
 #define KITTEN 1
+
+/* if SYSFONT_WIDTH is 0 (which it is during dependency generation) gcc
+   will abort (div by 0) and this plugin won't get any dependencies
+*/
+#if SYSFONT_WIDTH < 1
+#define SYSFONT_WIDTH 10
+#define SYSFONT_HEIGHT 10
+#endif
 
 /*Screen dimensions.*/
 #define X_MIN 0

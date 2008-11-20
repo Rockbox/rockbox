@@ -22,11 +22,11 @@
 ****************************************************************************/
 
 #include "plugin.h"
-#include "helper.h"
+#include "lib/helper.h"
 
 #ifdef HAVE_LCD_BITMAP
-#include "xlcd.h"
-#include "configfile.h"
+#include "lib/xlcd.h"
+#include "lib/configfile.h"
 
 PLUGIN_HEADER
 

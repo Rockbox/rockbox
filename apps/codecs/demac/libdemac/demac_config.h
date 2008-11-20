@@ -33,7 +33,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #include "config.h"
 
 #ifndef __ASSEMBLER__
-#include "../lib/codeclib.h"
+#include "codeclib.h"
 #include <codecs.h>
 #endif
 

@@ -34,7 +34,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #ifndef BUILD_STANDALONE
-#include "../codec.h"
+#include "codeclib.h"
 #endif
  
 #include "bitstream.h"

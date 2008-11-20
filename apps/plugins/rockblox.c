@@ -21,9 +21,9 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "highscore.h"
-#include "playergfx.h"
-#include "helper.h"
+#include "lib/highscore.h"
+#include "lib/playergfx.h"
+#include "lib/helper.h"
 
 PLUGIN_HEADER
 

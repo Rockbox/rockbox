@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "oldmenuapi.h"
+#include "lib/oldmenuapi.h"
 
 PLUGIN_HEADER
 

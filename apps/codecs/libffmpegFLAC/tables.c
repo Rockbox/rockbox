@@ -1,7 +1,7 @@
 #ifdef BUILD_STANDALONE
 #define ICONST_ATTR
 #else
-#include "../codec.h"
+#include "codeclib.h"
 #endif
 #include <inttypes.h>
 

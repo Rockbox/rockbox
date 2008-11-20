@@ -2,7 +2,7 @@
 #define _CLOCK_MESSAGE_
 #include "clock.h"
 #include "plugin.h"
-#include "picture.h"
+#include "lib/picture.h"
 
 struct counter{
     int ticks_at_last_unpause;/* to count the time from last pause to now */

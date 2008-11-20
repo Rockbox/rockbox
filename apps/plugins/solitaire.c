@@ -20,11 +20,11 @@
  ****************************************************************************/
 
 #include "plugin.h"
-#include "playback_control.h"
-#include "configfile.h"
+#include "lib/playback_control.h"
+#include "lib/configfile.h"
 #include "button.h"
 #include "lcd.h"
-#include "oldmenuapi.h"
+#include "lib/oldmenuapi.h"
 
 #ifdef HAVE_LCD_BITMAP
 

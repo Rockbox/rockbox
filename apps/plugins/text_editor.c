@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "playback_control.h"
+#include "lib/playback_control.h"
 
 #if PLUGIN_BUFFER_SIZE > 0x45000
 #define MAX_CHARS    0x40000 /* 128 kiB */

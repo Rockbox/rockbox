@@ -33,8 +33,8 @@
 #include "config-speex.h"
 #endif
 
-#include <speex/speex_stereo.h>
-#include <speex/speex_callbacks.h>
+#include "speex/speex_stereo.h"
+#include "speex/speex_callbacks.h"
 #include "math_approx.h"
 #include "vq.h"
 #include <math.h>
@@ -278,6 +278,7 @@ void speex_decode_stereo_int(spx_int16_t *data, int frame_size, SpeexStereoState
 
 int speex_std_stereo_request_handler(SpeexBits *bits, void *state, void *data)
 {
+    (void)state;
    RealSpeexStereoState *stereo;
    spx_word16_t sign=1, dexp;
    int tmp;

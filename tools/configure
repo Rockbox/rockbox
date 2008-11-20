@@ -1325,8 +1325,6 @@ fi
     boottool="$rootdir/tools/scramble -tcc=crc"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.d2"
     appextra="recorder:gui"
     plugins="yes"
@@ -1414,8 +1412,6 @@ fi
     tool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.mrobe500"
     appextra="recorder:gui"
     plugins="yes"
@@ -1438,8 +1434,6 @@ fi
     tool="$rootdir/tools/scramble -mi4v2 -model=m100 -type=RBOS"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.mi4"
     appextra="recorder:gui"
     plugins="yes"
@@ -1487,8 +1481,6 @@ fi
     arm926ejscc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     tool="$rootdir/tools/scramble -creative=zvm"
     USE_ELF="yes"
     output="rockbox.zvm"
@@ -1512,8 +1504,6 @@ fi
     arm926ejscc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     tool="$rootdir/tools/scramble -creative=zvm60 -no-ciff"
     USE_ELF="yes"
     output="rockbox.zvm60"
@@ -1537,8 +1527,6 @@ fi
     arm926ejscc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     tool="$rootdir/tools/scramble -creative=zenvision -no-ciff"
     USE_ELF="yes"
     output="rockbox.zv"
@@ -2074,6 +2062,8 @@ fi
       debug="-DDEBUG"
       simulator="yes"
       extradefines="-DSIMULATOR"
+      archosrom=""
+      flash=""
       echo "Simulator build selected"
       ;;
     [Aa])
@@ -2397,18 +2387,6 @@ sed > Makefile \
 <<EOF
 ## Automatically generated. http://www.rockbox.org/
 
-ifndef V
-SILENT=@
-else
-VERBOSEOPT=-v
-endif
-
-# old 'make' versions don't have the built-in 'info' function
-info=old\$(shell echo >&2 "Consider upgrading to GNU make 3.81+ for optimum build performance.")
-ifeq (\$(call info),old)
-export info=echo "\$\$(1)";
-endif
-
 export ROOTDIR=@ROOTDIR@
 export FIRMDIR=@FIRMDIR@
 export APPSDIR=@APPSDIR@
@@ -2428,8 +2406,8 @@ export BUILDDIR=@PWD@
 export LANGUAGE=@LANGUAGE@
 export VOICELANGUAGE=@VOICELANGUAGE@
 export MEMORYSIZE=@MEMORY@
-export VERSION=\$(shell \$(ROOTDIR)/tools/svnversion.sh \$(ROOTDIR))
-export BUILDDATE=\$(shell date -u +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')
+export VERSION:=\$(shell \$(ROOTDIR)/tools/svnversion.sh \$(ROOTDIR))
+export BUILDDATE:=\$(shell date -u +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')
 export MKFIRMWARE=@TOOL@
 export BMP2RB_MONO=@BMP2RB_MONO@
 export BMP2RB_NATIVE=@BMP2RB_NATIVE@
@@ -2469,159 +2447,8 @@ export ENC_OPTS=@ENC_OPTS@
 export ENCODER=@ENCODER@
 export USE_ELF=@USE_ELF@
 
-# Do not print "Entering directory ..."
-MAKEFLAGS += --no-print-directory
-
-.PHONY: all clean tags zip tools manual bin build info langs
-
-all: info
-
-info: build
-	\$(SILENT)\$(TOOLSDIR)/mkinfo.pl \$(BUILDDIR)/rockbox-info.txt
-
-build: tools @LANGS@
-	@SIMUL1@
-	@SIMUL2@
-	\$(SILENT)\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
-	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@
-
-bin: tools @LANGS@
-	@SIMUL1@
-	@SIMUL2@
-	\$(SILENT)\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
-	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@ \$(BUILDDIR)/\$(BINARY)
-
-rocks: tools
-	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@ rocks
-
-veryclean: clean toolsclean
-
-toolsclean:
-	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) clean
-
-clean:
-	\$(SILENT)echo Cleaning build directory
-	\$(SILENT)rm -rf rockbox.zip rockbox.7z rockbox.tar rockbox.tar.gz \
-                  rockbox.tar.bz2 TAGS @APPS@ firmware comsim sim lang.[ch] \
-                  manual *.pdf *.a credits.raw @OUTPUT@ bitmaps pluginbitmaps \
-                  @ARCHOSROM@ @FLASHFILE@ UI256.bmp rockbox-full.zip \
-	          html txt rockbox-manual*.zip sysfont.h rockbox-info.txt \
-	          voicefontids *.wav *.mp3 *.voice max_language_size.h
-
-tools:
-	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) AR=\$(HOSTAR) @TOOLSET@
-
-voicetools:
-	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) AR=\$(HOSTAR) @VOICETOOLSET@
-
-tags:
-	\$(SILENT)rm -f TAGS
-	\$(SILENT)\$(MAKE) -C \$(FIRMDIR) tags
-	\$(SILENT)\$(MAKE) -C \$(APPSDIR) tags
-	\$(SILENT)\$(MAKE) -C \$(APPSDIR)/plugins tags
-	\$(SILENT)\$(MAKE) -C \$(APPSDIR)/plugins/lib tags
-
-fontzip:
-	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\" -r "\$(ROOTDIR)" -f 1 -o rockbox-fonts.zip \$(TARGET) \$(BINARY)
-
-zip: info
-	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
-	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\$\$feat\" -i \"\$(TARGET_ID)\"  -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
-
-mapzip: info
-	\$(SILENT)find . -name "*.map" | xargs zip rockbox-maps.zip
-
-fullzip: info
-	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done; \\
-	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\$\$feat\" -i \"\$(TARGET_ID)\"  -r "\$(ROOTDIR)" -f 2 -o rockbox-full.zip \$(TARGET) \$(BINARY)
-
-7zip: info
-	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done; \\
-	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\$\$feat\" -i \"\$(TARGET_ID)\"  -o "rockbox.7z" -z "7za a -mx=9" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
-
-tar: info
-	\$(SILENT)rm -f rockbox.tar
-	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done; \\
-	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\$\$feat\" -i \"\$(TARGET_ID)\"  -o "rockbox.tar" -z "tar -cf" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
-
-bzip2: tar
-	\$(SILENT)bzip2 -f9 rockbox.tar
-
-gzip: tar
-	\$(SILENT)gzip -f9 rockbox.tar
-
-langs: features
-	\$(SILENT)mkdir -p \$(BUILDDIR)/apps/lang
-	\$(SILENT)\$(MAKE) -C \$(APPSDIR)/lang OBJDIR=\$(BUILDDIR)/apps/lang
-
-manual: manual-pdf
-manual-pdf:
-	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual manual-pdf
-manual-html:
-	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual manual-html
-manual-zhtml: manual-zip
-manual-txt:
-	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual manual-txt
-manual-ztxt:
-	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual manual-txt-zip
-manual-zip:
-	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual manual-zip
-
-features: tools
-	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@ features
-
-help:
-	@echo "A few helpful make targets"
-	@echo ""
-	@echo "all         - builds a full Rockbox (default), including tools"
-	@echo "bin         - builds only the Rockbox.<target name> file"
-	@echo "rocks       - builds only plugins and codecs"
-	@echo "clean       - cleans a build directory (not tools)"
-	@echo "veryclean   - cleans the build and tools directories"
-	@echo "manual      - builds a manual"
-	@echo "manual-html - HTML manual"
-	@echo "manual-zip  - HTML manual (zipped)"
-	@echo "manual-txt  - txt manual"
-	@echo "fullzip     - creates a rockbox.zip of your build with fonts"
-	@echo "zip         - creates a rockbox.zip of your build (no fonts)"
-	@echo "gzip        - creates a rockbox.tar.gz of your build (no fonts)"
-	@echo "bzip2       - creates a rockbox.tar.bz2 of your build (no fonts)"
-	@echo "7zip        - creates a rockbox.7z of your build (no fonts)"
-	@echo "fontzip     - creates rockbox-fonts.zip"
-	@echo "mapzip      - creates rockbox-maps.zip with all .map files"
-	@echo "tools       - builds the tools only"
-	@echo "voicetools  - builds the voice tools only"
-	@echo "install     - installs your build (for simulator builds only, no fonts)"
-	@echo "fullinstall - installs your build (for simulator builds only, with fonts)"
+include \$(TOOLSDIR)/root.make
 
 EOF
-
-if [ "yes" = "$simulator" ]; then
-
- cat >> Makefile <<EOF
-
-install:
-	@echo "installing your build in your archos dir"
-	\$(SILENT)for f in \`cat \$(BUILDDIR)/apps/features\`; do feat="\$\$feat:\$\$f" ; done; \\
-	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\$\$feat\" -i \"\$(TARGET_ID)\" -s -r "\$(ROOTDIR)" -f 0 \$(TARGET) \$(BINARY)
-
-fullinstall:
-	@echo "installing a full setup in your archos dir"
-	\$(SILENT)for f in \`cat \$(BUILDDIR)/apps/features\`; do feat="\$\$feat:\$\$f" ; done; \\
-	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\$\$feat\" -i \"\$(TARGET_ID)\" -s -r "\$(ROOTDIR)" -f 2 \$(TARGET) \$(BINARY)
-EOF
-
-fi
-
-if [ "yes" = "$voice" ]; then
-
- cat >> Makefile <<EOF
-
-voice: voicetools features
-	\$(SILENT)for f in \`cat \$(BUILDDIR)/${apps}/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
-	for lang in \`echo \$(VOICELANGUAGE) |sed "s/,/ /g"\`; do \$(TOOLSDIR)/voice.pl -V -l=\$\$lang -t=\$(MODELNAME)\$\$feat -i=\$(TARGET_ID) -e="\$(ENCODER)" -E="\$(ENC_OPTS)" -s=\$(TTS_ENGINE) -S="\$(TTS_OPTS)"; done \\
-EOF
-
-fi
 
 echo "Created Makefile"

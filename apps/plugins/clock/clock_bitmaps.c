@@ -23,24 +23,24 @@
 #include "clock_bitmaps.h"
 
 /* bitmaps */
-#include "clock_binary.h"
-#include "clock_digits.h"
-#include "clock_smalldigits.h"
-#include "clock_segments.h"
-#include "clock_smallsegments.h"
+#include "pluginbitmaps/clock_binary.h"
+#include "pluginbitmaps/clock_digits.h"
+#include "pluginbitmaps/clock_smalldigits.h"
+#include "pluginbitmaps/clock_segments.h"
+#include "pluginbitmaps/clock_smallsegments.h"
 
-#include "clock_logo.h"
-#include "clock_messages.h"
+#include "pluginbitmaps/clock_logo.h"
+#include "pluginbitmaps/clock_messages.h"
 
 #if NB_SCREENS==2
-#include "clock_binary_remote.h"
-#include "clock_digits_remote.h"
-#include "clock_smalldigits_remote.h"
-#include "clock_segments_remote.h"
-#include "clock_smallsegments_remote.h"
+#include "pluginbitmaps/clock_binary_remote.h"
+#include "pluginbitmaps/clock_digits_remote.h"
+#include "pluginbitmaps/clock_smalldigits_remote.h"
+#include "pluginbitmaps/clock_segments_remote.h"
+#include "pluginbitmaps/clock_smallsegments_remote.h"
 
-#include "clock_logo_remote.h"
-#include "clock_messages_remote.h"
+#include "pluginbitmaps/clock_logo_remote.h"
+#include "pluginbitmaps/clock_messages_remote.h"
 
 #endif
 

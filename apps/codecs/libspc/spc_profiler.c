@@ -25,7 +25,7 @@
 
 #if defined(SPC_PROFILE) && defined(USEC_TIMER)
 
-#include "codec.h"
+#include "codeclib.h"
 #include "spc_codec.h"
 #define SPC_DEFINE_PROFILER_TIMERS
 #include "spc_profiler.h"

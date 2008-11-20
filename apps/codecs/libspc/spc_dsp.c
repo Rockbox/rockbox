@@ -23,8 +23,7 @@
  ****************************************************************************/
 
 /* The DSP portion (awe!) */
-#include "codec.h"
-#include "codecs.h"
+#include "codeclib.h"
 #include "spc_codec.h"
 #include "spc_profiler.h"
 

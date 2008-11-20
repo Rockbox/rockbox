@@ -26,8 +26,8 @@
  */
 
 #include "plugin.h"
-#include "highscore.h"
-#include "helper.h"
+#include "lib/highscore.h"
+#include "lib/helper.h"
 
 PLUGIN_HEADER
 

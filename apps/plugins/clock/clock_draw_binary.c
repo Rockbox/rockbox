@@ -21,7 +21,7 @@
 #include "clock_draw_binary.h"
 #include "clock_bitmap_strings.h"
 #include "clock_bitmaps.h"
-#include "picture.h"
+#include "lib/picture.h"
 
 const struct picture* binary_skin[]={binary,digits,segments};
 

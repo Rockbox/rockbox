@@ -20,8 +20,8 @@
  ****************************************************************************/
 
 #include "plugin.h"
-#include "configfile.h" /* Part of libplugin */
-#include "helper.h"
+#include "lib/configfile.h" /* Part of libplugin */
+#include "lib/helper.h"
 
 PLUGIN_HEADER
 

@@ -85,7 +85,7 @@ enum mpeg_malloc_reason_t
 
 #else
 
-#include "grey.h"
+#include "lib/grey.h"
 #define DRAW_BLACK            GREY_BLACK
 #define DRAW_DARKGRAY         GREY_DARKGRAY
 #define DRAW_LIGHTGRAY        GREY_LIGHTGRAY

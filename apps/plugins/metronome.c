@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "pluginlib_actions.h"
+#include "lib/pluginlib_actions.h"
 
 PLUGIN_HEADER
 

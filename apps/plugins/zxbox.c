@@ -21,7 +21,7 @@
 
 #if MEM <= 8 && !defined(SIMULATOR)
 
-#include "overlay.h"
+#include "lib/overlay.h"
 
 PLUGIN_HEADER
 

@@ -3,7 +3,7 @@
 #include "zxconfig.h"
 
 #ifdef USE_GREY
-#include "../lib/grey.h"
+#include "lib/grey.h"
 #endif
 
 #include "spscr_p.h"

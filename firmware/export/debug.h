@@ -28,6 +28,7 @@ extern void debugf(const char* fmt,...) ATTRIBUTE_PRINTF(1, 2);
 extern void ldebugf(const char* file, int line, const char *fmt, ...)
                     ATTRIBUTE_PRINTF(3, 4);
 
+#ifndef CODEC                    
 #ifdef __GNUC__
 
 /*  */
@@ -57,5 +58,5 @@ void breakpoint(void);
 
 #endif /* GCC */
 
-
+#endif /* CODEC */
 #endif

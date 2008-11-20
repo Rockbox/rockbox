@@ -19,7 +19,7 @@
  *
  **************************************************************************/
 #include "plugin.h"
-#include "playergfx.h"
+#include "lib/playergfx.h"
 
 PLUGIN_HEADER
 

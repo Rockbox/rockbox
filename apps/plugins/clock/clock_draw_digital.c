@@ -23,7 +23,7 @@
 #include "clock_draw_digital.h"
 #include "clock_bitmap_strings.h"
 #include "clock_bitmaps.h"
-#include "picture.h"
+#include "lib/picture.h"
 
 const struct picture* digits_skin[]={digits,segments};
 const struct picture* smalldigits_skin[]={smalldigits,smallsegments};

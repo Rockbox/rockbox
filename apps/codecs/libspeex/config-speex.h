@@ -1,5 +1,5 @@
 #ifndef ROCKBOX_VOICE_ENCODER
-#include "../codec.h" 
+#include "codeclib.h" 
 #include "autoconf.h"
 #else
 #define ICODE_ATTR

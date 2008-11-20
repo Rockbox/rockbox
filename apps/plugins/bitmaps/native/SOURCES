@@ -574,13 +574,13 @@ star_tiles.8x8.bmp
 #endif
 #elif LCD_DEPTH > 1 /* grey */
 #if LCD_WIDTH >= 160 && LCD_HEIGHT >= 98
-star_tiles.10x10.grey.bmp
+star_tiles.10x10x2.bmp
 #elif LCD_WIDTH >= 128 && LCD_HEIGHT >= 80
-star_tiles.8x8.grey.bmp
+star_tiles.8x8x2.bmp
 #endif
 #else /* monochrome */
 #if LCD_WIDTH >= 112 && LCD_HEIGHT >= 62
-star_tiles.6x7.mono.bmp
+star_tiles.6x7x1.bmp
 #endif
 #endif
 
@@ -669,14 +669,14 @@ matrix_normal.bmp
 /* pictureflow */
 #if defined(HAVE_LCD_COLOR) && defined(HAVE_ALBUMART) && defined(HAVE_TAGCACHE)
 #if (LCD_WIDTH < 200)
-    pictureflow_logo.100x18x16.bmp
+pictureflow_logo.100x18x16.bmp
 #else
-    pictureflow_logo.193x34x16.bmp
+pictureflow_logo.193x34x16.bmp
 #endif
 #if (LCD_HEIGHT < 100 )
-    pictureflow_emptyslide.50x50x16.bmp
+pictureflow_emptyslide.50x50x16.bmp
 #else
-    pictureflow_emptyslide.100x100x16.bmp
+pictureflow_emptyslide.100x100x16.bmp
 #endif
 #endif
 
@@ -689,53 +689,53 @@ matrix_normal.bmp
 
 #if defined HAVE_LCD_COLOR
 #if SMALLER_DIMENSION <= 80
-    sliding_puzzle.80x80x16.bmp
+sliding_puzzle.80x80x16.bmp
 #elif SMALLER_DIMENSION <= 108
-    sliding_puzzle.108x108x16.bmp
+sliding_puzzle.108x108x16.bmp
 #elif SMALLER_DIMENSION <= 128
-    sliding_puzzle.128x128x16.bmp
+sliding_puzzle.128x128x16.bmp
 #elif SMALLER_DIMENSION <= 132
-    sliding_puzzle.132x132x16.bmp
+sliding_puzzle.132x132x16.bmp
 #elif SMALLER_DIMENSION <= 176
-    sliding_puzzle.176x176x16.bmp
+sliding_puzzle.176x176x16.bmp
 #elif SMALLER_DIMENSION <= 240
-    sliding_puzzle.240x240x16.bmp
+sliding_puzzle.240x240x16.bmp
 #endif
 #elif (LCD_DEPTH > 1)
 #if SMALLER_DIMENSION <= 96
-    sliding_puzzle.96x96x2.bmp
+sliding_puzzle.96x96x2.bmp
 #elif SMALLER_DIMENSION <= 110
-    sliding_puzzle.108x108x2.bmp
+sliding_puzzle.108x108x2.bmp
 #elif SMALLER_DIMENSION <= 128
-    sliding_puzzle.128x128x2.bmp
+sliding_puzzle.128x128x2.bmp
 #endif
 #else /* mono targets, one size currently */
-    sliding_puzzle.80x64x1.bmp
+sliding_puzzle.80x64x1.bmp
 #endif
 
 /* Logo */
 #if LCD_DEPTH == 16
 #if (LCD_WIDTH >= 320)
-    rockboxlogo.220x68x16.bmp
+rockboxlogo.220x68x16.bmp
 #elif (LCD_WIDTH > 160)
-    rockboxlogo.128x40x16.bmp
+rockboxlogo.128x40x16.bmp
 #else
-    rockboxlogo.90x28x16.bmp
+rockboxlogo.90x28x16.bmp
 #endif
 
 #elif LCD_DEPTH == 2
 #if (LCD_WIDTH > 138)
-    rockboxlogo.138x46x2.bmp
+rockboxlogo.138x46x2.bmp
 #else
-    rockboxlogo.91x32x2.bmp
+rockboxlogo.91x32x2.bmp
 #endif
 
 #elif LCD_DEPTH == 1
 #if (LCD_WIDTH > 112)
     /* Such a screen isn't currently in any target */
-    rockboxlogo.112x30x1.bmp
+rockboxlogo.112x30x1.bmp
 #else
-    rockboxlogo.91x32x1.bmp
+rockboxlogo.91x32x1.bmp
 #endif
 #endif
 

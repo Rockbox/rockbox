@@ -47,7 +47,7 @@ further options:
 #include "reversi-strategy.h"
 #include "reversi-gui.h"
 
-#include "../lib/oldmenuapi.h"
+#include "lib/oldmenuapi.h"
 
 PLUGIN_HEADER
 

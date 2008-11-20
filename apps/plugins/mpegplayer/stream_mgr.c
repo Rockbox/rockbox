@@ -22,7 +22,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "mpegplayer.h"
-#include "grey.h"
+#include "lib/grey.h"
 #include "mpeg_settings.h"
 
 #ifndef HAVE_LCD_COLOR

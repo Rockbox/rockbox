@@ -19,8 +19,8 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "helper.h"
-#include "grey.h"
+#include "lib/helper.h"
+#include "lib/grey.h"
 
 #ifdef HAVE_LCD_BITMAP
 

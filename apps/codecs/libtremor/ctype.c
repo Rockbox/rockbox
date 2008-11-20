@@ -1,1 +1,1 @@
-#include "../../../firmware/common/ctype.c"
+#include "common/ctype.c"

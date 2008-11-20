@@ -20,7 +20,6 @@
  ****************************************************************************/
 
 #include "codeclib.h"
-#define ROCKBOX
 #include <codecs/demac/libdemac/demac.h>
 
 CODEC_HEADER

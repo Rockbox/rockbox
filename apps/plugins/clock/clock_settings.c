@@ -23,7 +23,7 @@
 #include "clock_bitmaps.h"
 #include "clock_draw.h"
 #include "clock_settings.h"
-#include "picture.h"
+#include "lib/picture.h"
 
 static int max_skin[]={
     [ANALOG]=2,

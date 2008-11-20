@@ -25,9 +25,9 @@
 
 #ifdef HAVE_LCD_BITMAP
 
-#include "xlcd.h"
-#include "pluginlib_actions.h"
-#include "fixedpoint.h"
+#include "lib/xlcd.h"
+#include "lib/pluginlib_actions.h"
+#include "lib/fixedpoint.h"
 
 PLUGIN_HEADER
 

@@ -35,9 +35,9 @@
 /// \file huffsv7.c
 /// Implementations of sv7 huffman decoding functions.
 
-#include <musepack.h>
-#include <huffman.h>
-#include <requant.h>
+#include "musepack.h"
+#include "huffman.h"
+#include "requant.h"
 
 const HuffmanTyp    mpc_table_HuffHdr  [10] ICONST_ATTR = 
 {{2147483648u,1,0},{1610612736u,3,1},{1577058304u,7,-4},{1568669696u,9,3},{1560281088u,9,4},{1543503872u,8,-5},{1476395008u,6,2},{1342177280u,5,-3},{1073741824u,4,-2},{0u,2,-1},};

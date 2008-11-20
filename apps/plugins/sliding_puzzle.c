@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "bmp.h"
+#include "lib/bmp.h"
 
 #ifdef HAVE_LCD_BITMAP
 PLUGIN_HEADER
