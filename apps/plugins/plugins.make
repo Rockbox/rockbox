@@ -44,6 +44,7 @@ $(PLUGINLIB): $(PLUGINLIB_OBJ)
 
 $(PLUGINLINK_LDS): $(PLUGIN_LDS)
 	$(call PRINTS,PP $(@F))
+	$(shell mkdir -p $(dir $@))
 	$(call preprocess2file,$<,$@,-DLOADADDRESS=$(LOADADDRESS))
 
 $(BUILDDIR)/credits.raw credits.raw: $(DOCSDIR)/CREDITS
