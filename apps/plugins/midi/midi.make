@@ -18,6 +18,8 @@ MIDI_OBJ := $(call c2obj, $(MIDI_SRC))
 # add source files to OTHER_SRC to get automatic dependencies
 OTHER_SRC += $(MIDI_SRC)
 
+MIDICFLAGS = $(PLUGINFLAGS) -O2
+
 $(MIDIBUILDDIR)/midi.rock: $(MIDI_OBJ)
 # for some reason, this doesn't match the implicit rule in plugins.make,
 # so we have to duplicate the link command here
@@ -31,3 +33,9 @@ ifdef SIMVER
 else
 	$(SILENT)$(OC) -O binary $*.elf $@
 endif
+
+# new rule needed to use extra compile flags
+$(MIDIBUILDDIR)/%.o: $(MIDISRCDIR)/%.c
+	$(SILENT)mkdir -p $(dir $@)
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(MIDICFLAGS) -c $< -o $@
+
