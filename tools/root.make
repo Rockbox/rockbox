@@ -112,8 +112,8 @@ $(LINKROM): $(ROMLDS)
 	$(call preprocess2file,$<,$@,-DLOADADDRESS=$(LOADADDRESS))
 
 $(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(LINKRAM)
-	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Wl,--gc-sections -Os -nostdlib -o $@ $(OBJ) \
-		-L$(BUILDDIR)/firmware -lfirmware\
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
+		-L$(BUILDDIR)/firmware -lfirmware \
 		-L$(BUILDDIR)/apps/codecs $(VOICESPEEXLIB:lib%.a=-l%) \
 		-lgcc \
 		-T$(LINKRAM) -Wl,-Map,$(BUILDDIR)/rockbox.map
