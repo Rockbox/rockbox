@@ -293,7 +293,7 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
     const unsigned int start_loop = wf->startLoop << FRACTSIZE;
     const int diff_loop = end_loop-start_loop;
 
-    while(samples-- > 0)
+    while(likely(samples-- > 0))
     {
         /* Is voice being ramped? */
         if(unlikely(so->state == STATE_RAMPDOWN))
