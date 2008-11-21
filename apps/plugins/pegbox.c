@@ -334,8 +334,14 @@ PLUGIN_HEADER
 
 
 /* get several sizes from the bitmaps */
+#ifdef BMPWIDTH_pegbox_pieces
 #define PIECE_WIDTH    BMPWIDTH_pegbox_pieces
 #define PIECE_HEIGHT   (BMPHEIGHT_pegbox_pieces/7)
+#else
+/* dummy numbers to avoid #error in dependency generation */
+#define PIECE_WIDTH  50
+#define PIECE_HEIGHT 10
+#endif
 #define BOARD_WIDTH    (12*PIECE_WIDTH)
 #define BOARD_HEIGHT   (8*PIECE_HEIGHT)
 
