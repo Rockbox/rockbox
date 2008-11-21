@@ -23,6 +23,7 @@
 #include "jz4740.h"
 #include "ata.h"
 #include "ata-sd-target.h"
+#include "sd.h"
 #include "system.h"
 #include "kernel.h"
 #include "panic.h"
@@ -36,10 +37,7 @@ static struct wakeup sd_wakeup;
 //#define DEBUG(x...) DEBUGF(x);
 #define DEBUG(x...) printf(x);
 
-#define MMC_CD_PIN    (29 + 1 * 32)  /* Pin to check card insertion */
-#define MMC_POWER_PIN (30 + 1 * 32)  /* Pin to enable/disable card power */
-//#define MMC_PW_PIN    (14 + 3 * 32)  /* Pin to check protect card */
-
+#ifdef MMC_POWER_PIN
 #define MMC_POWER_OFF()                   \
 do {                                      \
           __gpio_set_pin(MMC_POWER_PIN);  \
@@ -49,8 +47,11 @@ do {                                      \
 do {                                       \
           __gpio_clear_pin(MMC_POWER_PIN); \
 } while (0)
+#endif
 
+#ifdef MMC_CD_PIN
 #define MMC_INSERT_STATUS() __gpio_get_pin(MMC_CD_PIN)
+#endif
 
 #define MMC_RESET()         __msc_reset()
 
@@ -59,24 +60,6 @@ do {                               \
           REG_MSC_IMASK = 0xffff;  \
           REG_MSC_IREG = 0xffff;   \
 } while (0)
-
-static inline void mmc_init_gpio(void)
-{
-    __gpio_as_msc();
-#ifdef MMC_POWER_PIN
-    __gpio_as_output(MMC_POWER_PIN);
-    __gpio_disable_pull(MMC_POWER_PIN);
-    __gpio_set_pin(MMC_POWER_PIN);
-#endif
-#ifdef MMC_CD_PIN
-    __gpio_as_input(MMC_CD_PIN);
-    __gpio_disable_pull(MMC_CD_PIN);
-#endif
-#ifdef MMC_PW_PIN
-    __gpio_as_input(MMC_PW_PIN);
-    __gpio_disable_pull(MMC_PW_PIN);
-#endif
-}
 
 /* Error codes */
 enum mmc_result_t
@@ -509,7 +492,7 @@ static void jz_mmc_get_response(struct mmc_request *request)
                 buf[i] = (data >> 8) & 0xff;
                 buf[i + 1] = data & 0xff;
             }
-            DEBUG("request %d, response [", request->rtype);
+            DEBUG("request %d, response []", request->rtype);
             break;
         }
         case RESPONSE_NONE:
@@ -768,12 +751,14 @@ static int jz_mmc_exec_cmd(struct mmc_request *request)
         /* On reset, stop MMC clock */
         jz_mmc_stop_clock();
     }
+#if 0
     if (request->cmd == MMC_SEND_OP_COND)
     {
         DEBUG("Have a MMC card");
         /* always use 1bit for MMC */
         use_4bit = 0;
     }
+#endif
     if (request->cmd == SET_BUS_WIDTH)
     {
         if (request->arg == 0x2)
@@ -1070,13 +1055,16 @@ void MSC(void)
 static void jz_mmc_hardware_init(void)
 {
     mmc_init_gpio();     /* init GPIO */
+#ifdef MMC_POWER_ON
     MMC_POWER_ON();      /* turn on power of card */
+#endif
     MMC_RESET();         /* reset mmc/sd controller */
     MMC_IRQ_MASK();      /* mask all IRQs */
     jz_mmc_stop_clock(); /* stop MMC/SD clock */
+    __cpm_start_msc();
 #ifdef MMC_DMA_ENABLE
-    __cpm_start_dmac();
-    __dmac_enable_module();
+//    __cpm_start_dmac();
+//    __dmac_enable_module();
 //      REG_DMAC_DMACR = DMAC_DMACR_DME;
 #if MMC_DMA_INTERRUPT
     mmc_dma_rx_sem = OSSemCreate(0);
@@ -1105,7 +1093,7 @@ static void mmc_send_cmd(struct mmc_request *request, int cmd, unsigned int arg,
 }
 
 static bool inited = false;
-int sd_init(void)
+int _sd_init(void)
 {
     if(!inited)
     {
@@ -1150,7 +1138,7 @@ tCardInfo* card_get_info_target(int card_no)
 }
 
 /* TODO */
-int sd_read_sectors(unsigned long start, int count, void* buf)
+int _sd_read_sectors(unsigned long start, int count, void* buf)
 {
     (void)start;
     (void)count;
@@ -1159,7 +1147,7 @@ int sd_read_sectors(unsigned long start, int count, void* buf)
 }
 
 /* TODO */
-int sd_write_sectors(unsigned long start, int count, const void* buf)
+int _sd_write_sectors(unsigned long start, int count, const void* buf)
 {
     (void)start;
     (void)count;

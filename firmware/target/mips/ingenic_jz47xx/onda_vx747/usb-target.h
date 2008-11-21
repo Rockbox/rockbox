@@ -19,7 +19,30 @@
  *
  ****************************************************************************/
 
-#include <stdbool.h>
+#ifndef __USB_TARGET_H
+#define __USB_TARGET_H
+
+#include "config.h"
+
+#define __gpio_as_usb_detect()            \
+do {                                      \
+    REG_GPIO_PXFUNS(3) = 0x10000000;      \
+    REG_GPIO_PXSELS(3) = 0x10000000;      \
+    REG_GPIO_PXPES(3) = 0x10000000;       \
+} while (0)
+
+#define GPIO_UDC_DETE      (32 * 3 + 28)
+#define IRQ_GPIO_UDC_DETE  (IRQ_GPIO_0 + GPIO_UDC_DETE)
+
+static inline void usb_init_gpio(void)
+{
+    __gpio_as_usb_detect();
+    system_enable_irq(IRQ_UDC);
+    __gpio_as_input(GPIO_UDC_DETE);
+}
+
 int usb_detect(void);
 void usb_init_device(void);
 bool usb_drv_connected(void);
+
+#endif

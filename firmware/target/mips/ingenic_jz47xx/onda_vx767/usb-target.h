@@ -18,22 +18,31 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef ATA_SD_TARGET_H
-#define ATA_SD_TARGET_H
 
-#include "inttypes.h"
-#include "hotswap.h"
+#ifndef __USB_TARGET_H
+#define __USB_TARGET_H
 
-tCardInfo *card_get_info_target(int card_no);
-bool       card_detect_target(void);
+#include "config.h"
 
-#ifdef HAVE_HOTSWAP
-void       card_enable_monitoring_target(bool on);
-void       microsd_int(void); /* ??? */
-#endif
+#define __gpio_as_usb_detect()            \
+do {                                      \
+    REG_GPIO_PXFUNS(3) = 0x10000000;      \
+    REG_GPIO_PXSELS(3) = 0x10000000;      \
+    REG_GPIO_PXPES(3) = 0x10000000;       \
+} while (0)
 
-int sd_read_sectors(unsigned long start, int count, void* buf);
-int sd_write_sectors(unsigned long start, int count, const void* buf);
-int sd_init(void);
+#define GPIO_UDC_DETE      (32 * 3 + 28)
+#define IRQ_GPIO_UDC_DETE  (IRQ_GPIO_0 + GPIO_UDC_DETE)
+
+static inline void usb_init_gpio(void)
+{
+    __gpio_as_usb_detect();
+    system_enable_irq(IRQ_UDC);
+    __gpio_as_input(GPIO_UDC_DETE);
+}
+
+int usb_detect(void);
+void usb_init_device(void);
+bool usb_drv_connected(void);
 
 #endif

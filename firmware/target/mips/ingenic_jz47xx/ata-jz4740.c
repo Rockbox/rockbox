@@ -32,7 +32,7 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* bu
         case 0:
             return nand_read_sectors(start, count, buf);
         case 1:
-            return sd_read_sectors(start, count, buf);
+            return _sd_read_sectors(start, count, buf);
         default:
             panicf("ata_read_sectors: Drive %d unhandled!", drive);
             return -1;
@@ -46,7 +46,7 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const v
         case 0:
             return nand_write_sectors(start, count, buf);
         case 1:
-            return sd_write_sectors(start, count, buf);
+            return _sd_write_sectors(start, count, buf);
         default:
             panicf("ata_write_sectors: Drive %d unhandled!", drive);
             return -1;
@@ -55,7 +55,7 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const v
 
 int ata_init(void)
 {
-    if(sd_init() != 0)
+    if(_sd_init() != 0)
         return -1;
     if(nand_init() != 0)
         return -2;

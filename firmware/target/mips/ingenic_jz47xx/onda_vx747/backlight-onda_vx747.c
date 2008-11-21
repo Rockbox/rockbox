@@ -23,8 +23,7 @@
 #include "jz4740.h"
 #include "backlight-target.h"
 
-#define GPIO_PWM          (32*3)+31
-#define PWM_CHN            7
+#define PWM_CHN            7               /* PWM_CHN7 == GPIO(32*3 + 31) */
 #define __gpio_as_PWM_CHN  __gpio_as_pwm7
 
 static void set_backlight(int val)

@@ -25,6 +25,7 @@
 #include "usb_ch9.h"
 #include "usb_drv.h"
 #include "usb_core.h"
+#include "usb-target.h"
 #include "jz4740.h"
 #include "thread.h"
 
@@ -32,10 +33,6 @@
 
 #define EP1_INTR_BIT       2
 #define EP_FIFO_NOEMPTY    2
-
-#define GPIO_UDC_DETE_PIN  (32 * 3 + 6)
-#define GPIO_UDC_DETE      GPIO_UDC_DETE_PIN
-#define IRQ_GPIO_UDC_DETE  (IRQ_GPIO_0 + GPIO_UDC_DETE)
 
 #define IS_CACHE(x)        (x < 0xa0000000)
 
@@ -81,7 +78,7 @@ static inline void select_endpoint(int ep)
 }
 
 static void readFIFO(struct usb_endpoint *ep, unsigned int size)
-{
+{    
     unsigned int *d = (unsigned int *)ep->ptr;
     unsigned int s;
     s = (size + 3) >> 2;
@@ -90,7 +87,7 @@ static void readFIFO(struct usb_endpoint *ep, unsigned int size)
 }
 
 static void writeFIFO(struct usb_endpoint *ep, unsigned int size)
-{
+{    
     unsigned int *d = (unsigned int *)ep->ptr;
     unsigned char *c;
     int s, q;
@@ -359,7 +356,7 @@ bool usb_drv_connected(void)
 
 int usb_detect(void)
 {
-    if(__gpio_get_pin(GPIO_UDC_DETE) == 1)
+    if(usb_drv_connected())
         return USB_INSERTED;
     else
         return USB_EXTRACTED;
@@ -367,9 +364,7 @@ int usb_detect(void)
 
 void usb_init_device(void)
 {
-    system_enable_irq(IRQ_UDC);
-    __gpio_as_input(GPIO_UDC_DETE_PIN);
-    return;
+    usb_init_gpio();
 }
 
 void usb_enable(bool on)
@@ -442,6 +437,40 @@ void usb_drv_set_address(int address)
     REG_USB_REG_FADDR = address;
 }
 
+int usb_drv_send(int endpoint, void* ptr, int length)
+{
+    return 0;
+}
+
+int usb_drv_recv(int endpoint, void* ptr, int length)
+{
+    return 0;
+}
+
+void usb_drv_set_test_mode(int mode)
+{
+
+}
+
+int usb_drv_port_speed(void)
+{
+    return ((REG_USB_REG_POWER & USB_POWER_HSMODE) != 0) ? 1 : 0;
+}
+
+void usb_drv_cancel_all_transfers(void)
+{
+    int i;
+    for(i=0; i<5; i++)
+    {
+        endpoints[i].ptr = endpoints[i].buf;
+        endpoints[i].length = 0;
+    }
+}
+
+void usb_drv_release_endpoint(int ep)
+{
+    
+}
 
 #else
 

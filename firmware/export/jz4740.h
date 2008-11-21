@@ -383,7 +383,7 @@
 #define REG_TCU_TCNT4    REG16(TCU_TCNT4)
 #define REG_TCU_TCSR4    REG16(TCU_TCSR4)
 
-// n = 0,1,2,3,4,5
+// n = 0,1,2,3,4,5,6,7
 #define TCU_TDFR(n)    (TCU_BASE + (0x40 + (n)*0x10)) /* Timer Data Full Reg */
 #define TCU_TDHR(n)    (TCU_BASE + (0x44 + (n)*0x10)) /* Timer Data Half Reg */
 #define TCU_TCNT(n)    (TCU_BASE + (0x48 + (n)*0x10)) /* Timer Counter Reg */
@@ -2903,11 +2903,11 @@ do {                        \
 /*
  * MSC_CMD, MSC_CLK, MSC_D0 ~ MSC_D3
  */
-#define __gpio_as_msc()                \
-do {                        \
+#define __gpio_as_msc()                 \
+do {                                    \
     REG_GPIO_PXFUNS(3) = 0x00003f00;    \
     REG_GPIO_PXSELC(3) = 0x00003f00;    \
-    REG_GPIO_PXPES(3) = 0x00003f00;        \
+    REG_GPIO_PXPES(3) = 0x00003f00;     \
 } while (0)
 
 /*
@@ -3027,8 +3027,8 @@ do {                        \
     REG_GPIO_PXDIRS(p) = (1 << (o));        \
 } while (0)
 
-#define __gpio_port_as_input(p, o)        \
-do {                        \
+#define __gpio_port_as_input(p, o)          \
+do {                                        \
     REG_GPIO_PXFUNC(p) = (1 << (o));        \
     REG_GPIO_PXSELC(p) = (1 << (o));        \
     REG_GPIO_PXDIRC(p) = (1 << (o));        \
@@ -4168,9 +4168,9 @@ do {                 \
 #define __msc_rd_rxfifo()          ( REG_MSC_RXFIFO )
 #define __msc_wr_txfifo(v)          ( REG_MSC_TXFIFO = v )
 
-#define __msc_reset()                         \
-do {                                 \
-    REG_MSC_STRPCL = MSC_STRPCL_RESET;            \
+#define __msc_reset()                                     \
+do {                                                      \
+    REG_MSC_STRPCL = MSC_STRPCL_RESET;                    \
      while (REG_MSC_STAT & MSC_STAT_IS_RESETTING);        \
 } while (0)
 
