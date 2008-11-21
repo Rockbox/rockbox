@@ -298,8 +298,8 @@ void* main(void)
     }
 
     pinfo = disk_partinfo(1);
-    printf("Partition 1: 0x%02x %ld MB", 
-           pinfo->type, pinfo->size / 2048);
+    printf("Partition 1: 0x%02x %ld sectors", 
+           pinfo->type, pinfo->size);
 
     if (button_was_held || (btn==BUTTON_MENU)) {
         /* If either the hold switch was on, or the Menu button was held, then 
