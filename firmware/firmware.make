@@ -10,8 +10,8 @@
 INCLUDES += -I$(FIRMDIR) -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers
 
 FIRMLIB_SRC += $(call preprocess, $(FIRMDIR)/SOURCES)
-FIRMLIB_SRC += $(ROOTDIR)/sysfont.o
 FIRMLIB_OBJ := $(call c2obj, $(FIRMLIB_SRC))
+FIRMLIB_OBJ += $(BUILDDIR)/sysfont.o
 OTHER_SRC += $(FIRMLIB_SRC)
 
 FIRMLIB = $(BUILDDIR)/firmware/libfirmware.a

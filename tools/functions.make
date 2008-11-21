@@ -29,19 +29,17 @@ c2obj = $(subst .c,.o,$(subst .S,.o,$(subst $(ROOTDIR),$(BUILDDIR),$(1))))
 
 # calculate dependencies for a list of source files $(2) and output them
 # to a file $(1)
-
 mkdepfile = $(shell \
-	for each in $(2); do \
-	    obj=`echo $$each | sed -e 's/\.[cS]/.o/' -e 's:$(ROOTDIR):$(BUILDDIR):'`; \
-	       $(CC) $(PPCFLAGS) $(OTHER_INC) -MG -MM -include config.h -MT "$$obj" $$each 2>/dev/null; \
-	done | sed -e "s: lang.h: $(BUILDDIR)/lang.o:" \
+	$(CC) $(PPCFLAGS) $(OTHER_INC) -MG -MM -include config.h $(2) | \
+	$(TOOLSDIR)/addtargetdir.pl $(ROOTDIR) $(BUILDDIR) | \
+	sed -e "s: lang.h: $(BUILDDIR)/lang.o:" \
 	-e "s: sysfont.h: $(BUILDDIR)/sysfont.h:" \
 	-e "s: max_language_size.h: $(BUILDDIR)/max_language_size.h:" \
 	-e "s: bitmaps/: $(BUILDDIR)/bitmaps/:g" \
 	-e "s: pluginbitmaps/: $(BUILDDIR)/pluginbitmaps/:g" \
 	-e "s: lib/: $(APPSDIR)/plugins/lib/:g" \
 	-e "s: codeclib.h: $(APPSDIR)/codecs/lib/codeclib.h:g" \
-	> $(1); )
+	> $(1) )
 
 # function to create .bmp dependencies
 bmpdepfile = $(shell \

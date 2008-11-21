@@ -9,8 +9,7 @@
 
 LANGS := $(call preprocess, $(APPSDIR)/lang/SOURCES)
 LANGOBJ := $(LANGS:$(ROOTDIR)/%.lang=$(BUILDDIR)/%.lng)
-
-SRC += $(ROOTDIR)/lang.o # yes ROOTDIR. root.make will subst it to BUILDDIR.
+LANG_O = $(BUILDDIR)/lang.o
 
 CLEANOBJS += $(BUILDDIR)/max_language_size.h $(BUILDDIR)/lang.*
 
