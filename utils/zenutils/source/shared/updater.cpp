@@ -45,7 +45,7 @@ const char* zen::find_firmware_key(const byte* buffer, size_t len)
             }
         }
     }
-    return NULL;
+    return "";
 }
 
 dword zen::find_firmware_offset(byte* buffer, size_t len)
