@@ -20,7 +20,7 @@
 
 preprocess = $(shell $(CC) $(PPCFLAGS) $(2) -E -P -x c -include config.h $(1) | \
 		grep -v '^\#' | \
-		sed -e 's:^.\+:$(dir $(1))&:')
+		sed -e 's:^..*:$(dir $(1))&:')
 
 preprocess2file = $(shell $(CC) $(PPCFLAGS) $(3) -E -P -x c -include config.h $(1) | \
 		grep -v '^\#' | grep -v "^$$" > $(2))
