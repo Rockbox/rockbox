@@ -98,10 +98,12 @@ clean:
 
 .SECONDEXPANSION:
 
-ifndef SIMVER
-
 ifeq (,$(findstring bootloader,$(APPSDIR)))
 # not bootloader
+
+OBJ += $(LANG_O)
+
+ifndef SIMVER
 
 ## target build
 RAMLDS := $(FIRMDIR)/target/$(CPU)/$(MANUFACTURER)/app.lds
@@ -109,7 +111,6 @@ LINKRAM := $(BUILDDIR)/ram.link
 ROMLDS := $(FIRMDIR)/rom.lds
 LINKROM := $(BUILDDIR)/rom.link
 
-OBJ += $(LANG_O)
 
 $(LINKRAM): $(RAMLDS)
 	$(call PRINTS,PP $(@F))
@@ -180,8 +181,8 @@ $(MAXOUTFILE):
 $(BUILDDIR)/rombox.iriver: $(BUILDDIR)/rombox.bin
 	$(call PRINTS,Build ROM file)$(MKFIRMWARE) $< $@
 
-endif # !bootloader
 endif # !SIMVER
+endif # !bootloader
 
 
 voicetools:

@@ -22,6 +22,8 @@ OTHER_SRC += $(SIMSRC)
 SIMLIB = $(BUILDDIR)/uisimulator/libuisimulator.a
 UIBMP = $(BUILDDIR)/UI256.bmp
 
+OBJ += $(LANG_O)
+
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 
 $(SIMLIB): $$(SIMOBJ) $(UIBMP)
