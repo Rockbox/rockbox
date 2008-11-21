@@ -130,7 +130,7 @@ $(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(LINKRAM)
 $(BUILDDIR)/rombox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(LINKROM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		$(VOICESPEEXLIB) $(FIRMLIB) -lgcc -L$(BUILDDIR)/firmware \
-		-T$(LINKROM) -Wl,-Map,$(BUILDDIR)/rockbox.map
+		-T$(LINKROM) -Wl,-Map,$(BUILDDIR)/rombox.map
 
 $(BUILDDIR)/rockbox.bin : $(BUILDDIR)/rockbox.elf
 	$(call PRINTS,OC $(@F))$(OC) $(if $(filter yes, $(USE_ELF)), -S -x, -O binary) $< $@
