@@ -22,6 +22,8 @@ TOOLS = $(TOOLSDIR)/rdf2binary $(TOOLSDIR)/convbdf \
 	$(TOOLSDIR)/codepages $(TOOLSDIR)/scramble $(TOOLSDIR)/bmp2rb \
 	$(TOOLSDIR)/uclpack $(TOOLSDIR)/mktccboot $(TOOLSDIR)/mkboot
 
+RBINFO = $(BUILDDIR)/rockbox-info.txt
+
 # list suffixes to be understood by $*
 .SUFFIXES: .rock .codec .map .elf .c .S .o .bmp .a
 
@@ -65,8 +67,11 @@ OBJ := $(OBJ:.S=.o)
 OBJ += $(BMP:.bmp=.o)
 OBJ := $(subst $(ROOTDIR),$(BUILDDIR),$(OBJ))
 
-build: $(TOOLS) $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS) $(ARCHOSROM)
-	$(SILENT)$(TOOLSDIR)/mkinfo.pl $(BUILDDIR)/rockbox-info.txt
+build: $(TOOLS) $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS) $(ARCHOSROM) $(RBINFO)
+
+$(RBINFO): $(BUILDDIR)/$(BINARY)
+	$(SILENT)echo Creating $(@F)
+	$(SILENT)$(TOOLSDIR)/mkinfo.pl $@
 
 ifneq (clean,$(findstring clean,$(MAKECMDGOALS))) # don't build deps before cleaning
 $(DEPFILE) dep:
