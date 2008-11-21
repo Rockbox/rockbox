@@ -25,7 +25,7 @@ else
     CHESSBOX_INLDS := $(APPSDIR)/plugins/plugin.lds
     ROCKS += $(CHESSBOX_OBJDIR)/chessbox.rock
 endif
-    CHESSBOX_OVLFLAGS = -T$(CHESSBOX_OUTLDS) -Wl,--gc-sections -Wl,-Map,$*.map
+    CHESSBOX_OVLFLAGS = -T$(CHESSBOX_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
     CHESSBOX_OUTLDS = $(CHESSBOX_OBJDIR)/chessbox.lds
 else
     ### simulator
@@ -46,11 +46,11 @@ $(CHESSBOX_OUTLDS): $(CHESSBOX_INLDS) $(CHESSBOX_OBJ)
 $(CHESSBOX_OBJDIR)/chessbox.rock: $(CHESSBOX_OBJ) $(CHESSBOX_OUTLDS) $(PLUGINBITMAPLIB)
 
 $(CHESSBOX_OBJDIR)/chessbox.ovl: $(CHESSBOX_OBJ) $(CHESSBOX_OUTLDS) $(PLUGINBITMAPLIB)
-	$(SILENT)$(CC) $(PLUGINFLAGS) -o $(CHESSBOX_OBJDIR)/$*.elf \
+	$(SILENT)$(CC) $(PLUGINFLAGS) -o $(basename $@).elf \
 		$(filter %.o, $^) \
 		$(filter %.a, $^) \
 		-lgcc $(CHESSBOX_OVLFLAGS)
-	$(call PRINTS,LD $(@F))$(OC) -O binary $(CHESSBOX_OBJDIR)/$*.elf $@
+	$(call PRINTS,LD $(@F))$(OC) -O binary $(basename $@).elf $@
 
 # special pattern rule for compiling chessbox with extra flags
 $(CHESSBOX_OBJDIR)/%.o: $(CHESSBOX_SRCDIR)/%.c $(PLUGINBITMAPLIB) $(CHESSBOX_SRCDIR)/chessbox.make

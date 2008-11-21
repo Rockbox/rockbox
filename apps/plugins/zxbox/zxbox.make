@@ -36,7 +36,7 @@ ifdef SIMVER
  ZXBOX_LDFLAGS = $(SHARED_FLAG) # <-- from Makefile
 else
  ZXBOX_OUTLDS = $(ZXBOX_OBJDIR)/zxbox.lds
- ZXBOX_LDFLAGS = -T$(ZXBOX_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(BUILDDIR)/$*.map
+ ZXBOX_LDFLAGS = -T$(ZXBOX_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
 endif
 
 $(ZXBOX_OUTLDS): $(ZXBOX_INLDS) $(ZXBOX_OBJ)
@@ -45,11 +45,11 @@ $(ZXBOX_OUTLDS): $(ZXBOX_INLDS) $(ZXBOX_OBJ)
 $(ZXBOX_OBJDIR)/zxbox.rock: $(ZXBOX_OBJ) $(ZXBOX_OUTLDS) $(PLUGINBITMAPLIB)
 
 $(ZXBOX_OBJDIR)/zxbox.ovl: $(ZXBOX_OBJ) $(ZXBOX_OUTLDS) $(PLUGINBITMAPLIB) $(PLUGINLIB)
-	$(SILENT)$(CC) $(PLUGINFLAGS) -o $(ZXBOX_OBJDIR)/$*.elf \
+	$(SILENT)$(CC) $(PLUGINFLAGS) -o $(basename $@).elf \
 		$(filter %.o, $^) \
 		$(filter %.a, $^) \
 		-lgcc $(ZXBOX_LDFLAGS)
-	$(call PRINTS,LD $(@F))$(OC) -O binary $(ZXBOX_OBJDIR)/$*.elf $@
+	$(call PRINTS,LD $(@F))$(OC) -O binary $(basename $@).elf $@
 
 # special pattern rule for compiling zxbox with extra flags
 $(ZXBOX_OBJDIR)/%.o: $(ZXBOX_SRCDIR)/%.c $(PLUGINBITMAPLIB) $(ZXBOX_SRCDIR)/zxbox.make
