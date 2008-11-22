@@ -227,8 +227,9 @@ void audiohw_postinit(void)
     wmc_write(WMC_DAC_CONTROL, WMC_DACOSR_128 | WMC_AMUTE);
 
     /* Specific to HW clocking */
-    wmc_write(WMC_CLOCK_GEN_CTRL, WMC_MCLKDIV_1_5 | WMC_BCLKDIV_8 | WMC_MS);
-    wmc_write(WMC_ADDITIONAL_CTRL, WMC_SR_48KHZ); /* 44.1 */
+    wmc_write_masked(WMC_CLOCK_GEN_CTRL, WMC_BCLKDIV_4 | WMC_MS,
+                     WMC_BCLKDIV | WMC_MS | WMC_CLKSEL);
+    audiohw_set_frequency(HW_SAMPR_DEFAULT);
 
     /* ADC silenced */
     wmc_write_masked(WMC_LEFT_ADC_DIGITAL_VOL, 0x00, WMC_DVOL);
@@ -354,6 +355,131 @@ void audiohw_mute(bool mute)
     }
 }
 
+void audiohw_set_frequency(int sampling_control)
+{
+    /* For 16.9344MHz MCLK */
+    static const struct
+    {
+        uint32_t plln  : 8;
+        uint32_t pllk0 : 6;
+        uint32_t pllk1 : 9;
+        uint32_t pllk2 : 9;
+        unsigned char mclkdiv;
+        unsigned char filter;
+    } sctrl_table[HW_NUM_FREQ] =
+    {
+        [HW_FREQ_8] = /* PLL = 65.536MHz */
+        {
+            .plln    = WMC_PLLNw(7) | WMC_PLL_PRESCALE,
+            .pllk0   = WMC_PLLK_23_18w(12414886 >> 18),
+            .pllk1   = WMC_PLLK_17_9w(12414886 >> 9),
+            .pllk2   = WMC_PLLK_8_0w(12414886 >> 0),
+            .mclkdiv = WMC_MCLKDIV_8,   /*  2.0480 MHz */
+            .filter  = WMC_SR_8KHZ,
+        },
+        [HW_FREQ_11] = /* PLL = off */
+        {
+            .mclkdiv = WMC_MCLKDIV_6,   /*  2.8224 MHz */
+            .filter  = WMC_SR_12KHZ,
+        },
+        [HW_FREQ_12] = /* PLL = 73.728 MHz */
+        {
+            .plln    = WMC_PLLNw(8) | WMC_PLL_PRESCALE,
+            .pllk0   = WMC_PLLK_23_18w(11869595 >> 18),
+            .pllk1   = WMC_PLLK_17_9w(11869595 >> 9),
+            .pllk2   = WMC_PLLK_8_0w(11869595 >> 0),
+            .mclkdiv = WMC_MCLKDIV_6,   /*  3.0720 MHz */
+            .filter  = WMC_SR_12KHZ,
+        },
+        [HW_FREQ_16] = /* PLL = 65.536MHz */
+        {
+            .plln    = WMC_PLLNw(7) | WMC_PLL_PRESCALE,
+            .pllk0   = WMC_PLLK_23_18w(12414886 >> 18),
+            .pllk1   = WMC_PLLK_17_9w(12414886 >> 9),
+            .pllk2   = WMC_PLLK_8_0w(12414886 >> 0),
+            .mclkdiv = WMC_MCLKDIV_4,   /*  4.0960 MHz */
+            .filter  = WMC_SR_16KHZ,
+        },
+        [HW_FREQ_22] = /* PLL = off */
+        {
+            .mclkdiv = WMC_MCLKDIV_3,   /*  5.6448 MHz */
+            .filter  = WMC_SR_24KHZ,
+        },
+        [HW_FREQ_24] = /* PLL = 73.728 MHz */
+        {
+            .plln    = WMC_PLLNw(8) | WMC_PLL_PRESCALE,
+            .pllk0   = WMC_PLLK_23_18w(11869595 >> 18),
+            .pllk1   = WMC_PLLK_17_9w(11869595 >> 9),
+            .pllk2   = WMC_PLLK_8_0w(11869595 >> 0),
+            .mclkdiv = WMC_MCLKDIV_3,   /*  6.1440 MHz */
+            .filter  = WMC_SR_24KHZ,
+        },
+        [HW_FREQ_32] = /* PLL = 65.536MHz */
+        {
+            .plln    = WMC_PLLNw(7) | WMC_PLL_PRESCALE,
+            .pllk0   = WMC_PLLK_23_18w(12414886 >> 18),
+            .pllk1   = WMC_PLLK_17_9w(12414886 >> 9),
+            .pllk2   = WMC_PLLK_8_0w(12414886 >> 0),
+            .mclkdiv = WMC_MCLKDIV_2,   /*  8.1920 MHz */
+            .filter  = WMC_SR_32KHZ,
+        },
+        [HW_FREQ_44] = /* PLL = off */
+        {
+            .mclkdiv = WMC_MCLKDIV_1_5, /* 11.2896 MHz */
+            .filter  = WMC_SR_48KHZ,
+        },
+        [HW_FREQ_48] = /* PLL = 73.728 MHz */
+        {
+            .plln    = WMC_PLLNw(8) | WMC_PLL_PRESCALE,
+            .pllk0   = WMC_PLLK_23_18w(11869595 >> 18),
+            .pllk1   = WMC_PLLK_17_9w(11869595 >> 9),
+            .pllk2   = WMC_PLLK_8_0w(11869595 >> 0),
+            .mclkdiv = WMC_MCLKDIV_1_5, /* 12.2880 MHz */
+            .filter  = WMC_SR_48KHZ,
+        },
+    };
+
+    unsigned int plln;
+    unsigned int mclkdiv;
+
+    if ((unsigned)sampling_control >= ARRAYLEN(sctrl_table))
+        sampling_control = HW_FREQ_DEFAULT;
+
+
+    /* Setup filters. */
+    wmc_write(WMC_ADDITIONAL_CTRL,
+              sctrl_table[sampling_control].filter);
+
+    plln = sctrl_table[sampling_control].plln;
+    mclkdiv = sctrl_table[sampling_control].mclkdiv;
+
+    if (plln != 0)
+    {
+        /* Using PLL to generate SYSCLK */
+
+        /* Program PLL. */
+        wmc_write(WMC_PLL_N, plln);
+        wmc_write(WMC_PLLK_23_18, sctrl_table[sampling_control].pllk0);
+        wmc_write(WMC_PLLK_17_9, sctrl_table[sampling_control].pllk1);
+        wmc_write(WMC_PLLK_8_0, sctrl_table[sampling_control].pllk2);
+
+        /* Turn on PLL. */
+        wmc_set(WMC_POWER_MANAGEMENT1, WMC_PLLEN);
+
+        /* Switch to PLL and set divider. */
+        wmc_write_masked(WMC_CLOCK_GEN_CTRL, mclkdiv | WMC_CLKSEL,
+                         WMC_MCLKDIV | WMC_CLKSEL);
+    }
+    else
+    {
+        /* Switch away from PLL and set MCLKDIV. */
+        wmc_write_masked(WMC_CLOCK_GEN_CTRL, mclkdiv,
+                         WMC_MCLKDIV | WMC_CLKSEL);
+
+        /* Turn off PLL. */
+        wmc_clear(WMC_POWER_MANAGEMENT1, WMC_PLLEN);
+    }
+}
 
 #ifdef HAVE_RECORDING
 /* TODO */

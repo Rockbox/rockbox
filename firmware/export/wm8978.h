@@ -28,6 +28,7 @@
 
 int tenthdb2master(int db);
 void audiohw_set_headphone_vol(int vol_l, int vol_r);
+void audiohw_set_frequency(int sampling_control);
 
 #define WMC_I2C_ADDR 0x34
 

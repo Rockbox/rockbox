@@ -37,7 +37,8 @@ struct dma_data
     int state;
 };
 
-static unsigned long pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */
+static unsigned long pcm_freq; /* 44.1 is default */
+static int sr_ctrl;
 
 static struct dma_data dma_play_data =
 {
@@ -71,7 +72,7 @@ static void _pcm_apply_settings(void)
     if (pcm_freq != pcm_curr_sampr)
     {
         pcm_curr_sampr = pcm_freq;
-        // TODO: audiohw_set_frequency(sr_ctrl);
+        audiohw_set_frequency(sr_ctrl);
     }
 }
 
@@ -110,11 +111,17 @@ static void __attribute__((interrupt("IRQ"))) SSI1_HANDLER(void)
 
 void pcm_apply_settings(void)
 {
-    int oldstatus = disable_fiq_save();
+    pcm_play_lock();
+#ifdef HAVE_RECORDING
+    pcm_rec_lock();
+#endif
 
     _pcm_apply_settings();
 
-    restore_fiq(oldstatus);
+#ifdef HAVE_RECORDING
+    pcm_rec_unlock();
+#endif
+    pcm_play_unlock();
 }
 
 void pcm_play_dma_init(void)
@@ -189,11 +196,25 @@ void pcm_play_dma_init(void)
     SSI_SCR2 = 0;
     SSI_SRCR2 = 0;
     SSI_STCR2 = SSI_STCR_TXDIR;
-    SSI_STCCR2 = SSI_STRCCR_PMw(0);
 
-    /* Enable SSIs */
+    /* f(INT_BIT_CLK) =
+     * f(SYS_CLK) / [(DIV2 + 1)*(7*PSR + 1)*(PM + 1)*2] =
+     * 677737600 / [(1 + 1)*(7*0 + 1)*(0 + 1)*2] =
+     * 677737600 / 4 = 169344000 Hz
+     *
+     * 45.4.2.2 DIV2, PSR, and PM Bit Description states:
+     * Bits DIV2, PSR, and PM should not be all set to zero at the same
+     * time.
+     *
+     * The hardware seems to force a divide by 4 even if all bits are
+     * zero but comply by setting DIV2 and the others to zero.
+     */
+    SSI_STCCR2 = SSI_STRCCR_DIV2 | SSI_STRCCR_PMw(1-1);
+
+    /* Enable SSI2 (codec clock) */
     SSI_SCR2 |= SSI_SCR_SSIEN;
 
+    pcm_set_frequency(HW_SAMPR_DEFAULT);
     audiohw_init();
 }
 
@@ -280,8 +301,45 @@ void pcm_play_dma_pause(bool pause)
    hardware here but simply cache it. */
 void pcm_set_frequency(unsigned int frequency)
 {
-    /* TODO */
-    (void)frequency;
+    int index;
+
+    switch (frequency)
+    {
+    case SAMPR_48:
+        index = HW_FREQ_48;
+        break;
+    case SAMPR_44:
+        index = HW_FREQ_44;
+        break;
+    case SAMPR_32:
+        index = HW_FREQ_32;
+        break;
+    case SAMPR_24:
+        index = HW_FREQ_24;
+        break;
+    case SAMPR_22:
+        index = HW_FREQ_22;
+        break;
+    case SAMPR_16:
+        index = HW_FREQ_16;
+        break;
+    case SAMPR_12:
+        index = HW_FREQ_12;
+        break;
+    case SAMPR_11:
+        index = HW_FREQ_11;
+        break;
+    case SAMPR_8:
+        index = HW_FREQ_8;
+        break;
+    default:
+        /* Invalid = default */
+        frequency = HW_SAMPR_DEFAULT;
+        index = HW_FREQ_DEFAULT;
+    }
+
+    pcm_freq = frequency;
+    sr_ctrl = index;
 }
 
 /* Return the number of bytes waiting - full L-R sample pairs only */

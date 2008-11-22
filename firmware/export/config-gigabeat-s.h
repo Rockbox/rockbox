@@ -72,8 +72,10 @@
 /* Define this if you have the WM8978 audio codec */
 #define HAVE_WM8978
 
-#define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
-                       SAMPR_CAP_11)
+#define HW_SAMPR_CAPS (SAMPR_CAP_48 | SAMPR_CAP_44 | SAMPR_CAP_32 | \
+                       SAMPR_CAP_24 | SAMPR_CAP_22 | SAMPR_CAP_16 | \
+                       SAMPR_CAP_16 | SAMPR_CAP_12 | SAMPR_CAP_11 | \
+                       SAMPR_CAP_8)
 
 #ifndef BOOTLOADER
 /* Not for bootloader */
