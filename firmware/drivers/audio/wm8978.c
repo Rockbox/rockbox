@@ -229,7 +229,7 @@ void audiohw_postinit(void)
     /* Specific to HW clocking */
     wmc_write_masked(WMC_CLOCK_GEN_CTRL, WMC_BCLKDIV_4 | WMC_MS,
                      WMC_BCLKDIV | WMC_MS | WMC_CLKSEL);
-    audiohw_set_frequency(HW_SAMPR_DEFAULT);
+    audiohw_set_frequency(HW_FREQ_DEFAULT);
 
     /* ADC silenced */
     wmc_write_masked(WMC_LEFT_ADC_DIGITAL_VOL, 0x00, WMC_DVOL);
