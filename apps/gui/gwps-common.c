@@ -65,6 +65,14 @@
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP 500
 
+/* Timeout unit expressed in HZ. In WPS, all timeouts are given in seconds
+   (possibly with a decimal fraction) but stored as integer values.
+   E.g. 2.5 is stored as 25. This means 25 tenth of a second, i.e. 25 units.
+*/
+#define TIMEOUT_UNIT (HZ/10) /* I.e. 0.1 sec */
+#define DEFAULT_SUBLINE_TIME_MULTIPLIER 20 /* In TIMEOUT_UNIT's */
+
+
 /* draws the statusbar on the given wps-screen */
 #ifdef HAVE_LCD_BITMAP
 static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
@@ -1391,7 +1399,7 @@ static const char *get_token_value(struct gui_wps *gwps,
         case WPS_TOKEN_BUTTON_VOLUME:
             if (data->button_time_volume && 
                 TIME_BEFORE(current_tick, data->button_time_volume +
-                                          token->value.i))
+                                          token->value.i * TIMEOUT_UNIT))
                 return "v";
             return NULL;
         default:
@@ -1728,7 +1736,7 @@ static bool update_curr_subline(struct gui_wps *gwps, int line)
                     new_subline_refresh = true;
                     data->lines[line].subline_expire_time = (reset_subline ?
                         current_tick : data->lines[line].subline_expire_time) +
-                        BASE_SUBLINE_TIME*data->sublines[subline_idx].time_mult;
+                        TIMEOUT_UNIT*data->sublines[subline_idx].time_mult;
                     break;
                 }
             }

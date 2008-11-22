@@ -26,7 +26,6 @@
 #include "file.h"
 #include "misc.h"
 #include "plugin.h"
-#include "kernel.h"
 
 #ifdef __PCTOOL__
 #ifdef WPSEDITOR
@@ -811,7 +810,7 @@ static int parse_timeout(const char *wps_bufptr,
             case WPS_TOKEN_SUBLINE_TIMEOUT:
                 return -1;
             case WPS_TOKEN_BUTTON_VOLUME:
-                val = HZ;
+                val = 10;
                 break;
         }
     }

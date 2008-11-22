@@ -121,9 +121,6 @@ struct align_pos {
 
 #endif
 
-#define DEFAULT_SUBLINE_TIME_MULTIPLIER 20 /* (10ths of sec) */
-#define BASE_SUBLINE_TIME 10 /* base time that multiplier is applied to
-                                (1/HZ sec, or 100ths of sec) */
 #define SUBLINE_RESET -1
 
 enum wps_parse_error {
