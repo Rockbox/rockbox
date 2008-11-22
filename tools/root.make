@@ -92,7 +92,15 @@ veryclean: clean
 
 clean:
 	$(SILENT)echo Cleaning build directory
-	$(SILENT)rm -rf rockbox.zip rockbox.7z rockbox.tar rockbox.tar.gz                   rockbox.tar.bz2 TAGS apps firmware comsim sim lang.[ch]                   manual *.pdf *.a credits.raw rockbox.ipod bitmaps pluginbitmaps                     UI256.bmp rockbox-full.zip 	          html txt rockbox-manual*.zip sysfont.h rockbox-info.txt 	          voicefontids *.wav *.mp3 *.voice max_language_size.h $(CLEANOBJS) $(LINKRAM) $(LINKROM) rockbox.elf rockbox.map rockbox.bin $(DEPFILE) rombox.elf rombox.map rombox.bin $(BINARY) $(FLASHFILE) uisimulator bootloader flash $(BOOTLINK)
+	$(SILENT)rm -rf rockbox.zip rockbox.7z rockbox.tar rockbox.tar.gz \
+		rockbox.tar.bz2 TAGS apps firmware comsim sim lang.[ch] \
+		manual *.pdf *.a credits.raw rockbox.ipod bitmaps \
+		pluginbitmaps UI256.bmp rockbox-full.zip html txt \
+		rockbox-manual*.zip sysfont.h rockbox-info.txt voicefontids \
+		*.wav *.mp3 *.voice max_language_size.h $(CLEANOBJS) \
+		$(LINKRAM) $(LINKROM) rockbox.elf rockbox.map rockbox.bin \
+		$(DEPFILE) rombox.elf rombox.map rombox.bin rombox.ucl \
+		$(BINARY) $(FLASHFILE) uisimulator bootloader flash $(BOOTLINK)
 
 #### linking the binaries: ####
 
