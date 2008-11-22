@@ -361,9 +361,9 @@ void audiohw_set_frequency(int sampling_control)
     static const struct
     {
         uint32_t plln  : 8;
-        uint32_t pllk0 : 6;
-        uint32_t pllk1 : 9;
+        uint32_t pllk1 : 6;
         uint32_t pllk2 : 9;
+        uint32_t pllk3 : 9;
         unsigned char mclkdiv;
         unsigned char filter;
     } sctrl_table[HW_NUM_FREQ] =
@@ -371,9 +371,9 @@ void audiohw_set_frequency(int sampling_control)
         [HW_FREQ_8] = /* PLL = 65.536MHz */
         {
             .plln    = WMC_PLLNw(7) | WMC_PLL_PRESCALE,
-            .pllk0   = WMC_PLLK_23_18w(12414886 >> 18),
-            .pllk1   = WMC_PLLK_17_9w(12414886 >> 9),
-            .pllk2   = WMC_PLLK_8_0w(12414886 >> 0),
+            .pllk1   = WMC_PLLK_23_18w(12414886ul >> 18),
+            .pllk2   = WMC_PLLK_17_9w(12414886ul >> 9),
+            .pllk3   = WMC_PLLK_8_0w(12414886ul >> 0),
             .mclkdiv = WMC_MCLKDIV_8,   /*  2.0480 MHz */
             .filter  = WMC_SR_8KHZ,
         },
@@ -385,18 +385,18 @@ void audiohw_set_frequency(int sampling_control)
         [HW_FREQ_12] = /* PLL = 73.728 MHz */
         {
             .plln    = WMC_PLLNw(8) | WMC_PLL_PRESCALE,
-            .pllk0   = WMC_PLLK_23_18w(11869595 >> 18),
-            .pllk1   = WMC_PLLK_17_9w(11869595 >> 9),
-            .pllk2   = WMC_PLLK_8_0w(11869595 >> 0),
+            .pllk1   = WMC_PLLK_23_18w(11869595ul >> 18),
+            .pllk2   = WMC_PLLK_17_9w(11869595ul >> 9),
+            .pllk3   = WMC_PLLK_8_0w(11869595ul >> 0),
             .mclkdiv = WMC_MCLKDIV_6,   /*  3.0720 MHz */
             .filter  = WMC_SR_12KHZ,
         },
         [HW_FREQ_16] = /* PLL = 65.536MHz */
         {
             .plln    = WMC_PLLNw(7) | WMC_PLL_PRESCALE,
-            .pllk0   = WMC_PLLK_23_18w(12414886 >> 18),
-            .pllk1   = WMC_PLLK_17_9w(12414886 >> 9),
-            .pllk2   = WMC_PLLK_8_0w(12414886 >> 0),
+            .pllk1   = WMC_PLLK_23_18w(12414886ul >> 18),
+            .pllk2   = WMC_PLLK_17_9w(12414886ul >> 9),
+            .pllk3   = WMC_PLLK_8_0w(12414886ul >> 0),
             .mclkdiv = WMC_MCLKDIV_4,   /*  4.0960 MHz */
             .filter  = WMC_SR_16KHZ,
         },
@@ -408,18 +408,18 @@ void audiohw_set_frequency(int sampling_control)
         [HW_FREQ_24] = /* PLL = 73.728 MHz */
         {
             .plln    = WMC_PLLNw(8) | WMC_PLL_PRESCALE,
-            .pllk0   = WMC_PLLK_23_18w(11869595 >> 18),
-            .pllk1   = WMC_PLLK_17_9w(11869595 >> 9),
-            .pllk2   = WMC_PLLK_8_0w(11869595 >> 0),
+            .pllk1   = WMC_PLLK_23_18w(11869595ul >> 18),
+            .pllk2   = WMC_PLLK_17_9w(11869595ul >> 9),
+            .pllk3   = WMC_PLLK_8_0w(11869595ul >> 0),
             .mclkdiv = WMC_MCLKDIV_3,   /*  6.1440 MHz */
             .filter  = WMC_SR_24KHZ,
         },
         [HW_FREQ_32] = /* PLL = 65.536MHz */
         {
             .plln    = WMC_PLLNw(7) | WMC_PLL_PRESCALE,
-            .pllk0   = WMC_PLLK_23_18w(12414886 >> 18),
-            .pllk1   = WMC_PLLK_17_9w(12414886 >> 9),
-            .pllk2   = WMC_PLLK_8_0w(12414886 >> 0),
+            .pllk1   = WMC_PLLK_23_18w(12414886ul >> 18),
+            .pllk2   = WMC_PLLK_17_9w(12414886ul >> 9),
+            .pllk3   = WMC_PLLK_8_0w(12414886ul >> 0),
             .mclkdiv = WMC_MCLKDIV_2,   /*  8.1920 MHz */
             .filter  = WMC_SR_32KHZ,
         },
@@ -431,9 +431,9 @@ void audiohw_set_frequency(int sampling_control)
         [HW_FREQ_48] = /* PLL = 73.728 MHz */
         {
             .plln    = WMC_PLLNw(8) | WMC_PLL_PRESCALE,
-            .pllk0   = WMC_PLLK_23_18w(11869595 >> 18),
-            .pllk1   = WMC_PLLK_17_9w(11869595 >> 9),
-            .pllk2   = WMC_PLLK_8_0w(11869595 >> 0),
+            .pllk1   = WMC_PLLK_23_18w(11869595ul >> 18),
+            .pllk2   = WMC_PLLK_17_9w(11869595ul >> 9),
+            .pllk3   = WMC_PLLK_8_0w(11869595ul >> 0),
             .mclkdiv = WMC_MCLKDIV_1_5, /* 12.2880 MHz */
             .filter  = WMC_SR_48KHZ,
         },
@@ -459,9 +459,9 @@ void audiohw_set_frequency(int sampling_control)
 
         /* Program PLL. */
         wmc_write(WMC_PLL_N, plln);
-        wmc_write(WMC_PLLK_23_18, sctrl_table[sampling_control].pllk0);
-        wmc_write(WMC_PLLK_17_9, sctrl_table[sampling_control].pllk1);
-        wmc_write(WMC_PLLK_8_0, sctrl_table[sampling_control].pllk2);
+        wmc_write(WMC_PLL_K1, sctrl_table[sampling_control].pllk1);
+        wmc_write(WMC_PLL_K2, sctrl_table[sampling_control].pllk2);
+        wmc_write(WMC_PLL_K3, sctrl_table[sampling_control].pllk3);
 
         /* Turn on PLL. */
         wmc_set(WMC_POWER_MANAGEMENT1, WMC_PLLEN);
