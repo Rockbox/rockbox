@@ -19,10 +19,11 @@
  *
  ****************************************************************************/
 
+#include <stdbool.h>
 #include "config.h"
 #include "ascodec-target.h"
 #include "as3514.h"
-#include <stdbool.h>
+#include "power.h"
 
 void power_off(void)
 {
