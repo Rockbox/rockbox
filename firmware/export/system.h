@@ -170,11 +170,11 @@ int get_cpu_boost_counter(void);
 
 /* Use to give gcc hints on which branch is most likely taken */
 #if defined(__GNUC__) && __GNUC__ >= 3
-#define likely(x)   __builtin_expect(!!(x), 1)
-#define unlikely(x) __builtin_expect(!!(x), 0)
+#define LIKELY(x)   __builtin_expect(!!(x), 1)
+#define UNLIKELY(x) __builtin_expect(!!(x), 0)
 #else
-#define likely(x)   (x)
-#define unlikely(x) (x)
+#define LIKELY(x)   (x)
+#define UNLIKELY(x) (x)
 #endif
 
 /* returns index of first set bit + 1 or 0 if no bits are set */

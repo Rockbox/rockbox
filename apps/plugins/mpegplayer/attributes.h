@@ -32,3 +32,11 @@
 #define ATTR_ALIGN(align)
 #endif
 
+#if defined(LIKELY) && defined (UNLIKELY)
+#define likely(x) LIKELY(x)
+#define unlikely(x) UNLIKELY(x)
+#else
+#define likely(x) (x)
+#define unlikely(x) (x)
+#endif
+
