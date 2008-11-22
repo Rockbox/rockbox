@@ -15,12 +15,27 @@ use File::Basename;
 my $rbroot = $ARGV[0];
 my $builddir = $ARGV[1];
 
+my $target2;
+
 for (<STDIN>) {
     if (/^([^:]+): (\S+) (.*)/) {
         my ($target, $src, $rest) = ($1, $2, $3);
         my $dir = dirname $src;
         $dir =~ s/$rbroot//;
         print "$builddir$dir/$target: $src $rest\n";
+    }
+    elsif (/^([^:]+):  \\/) {
+        # target and source on different lines
+        $target2 = $1;
+    }
+    elsif ($target2) {
+        if (/^\s+([^ ]+) (.*)/) {
+            my ($src, $rest) = ($1, $2);
+            my $dir = dirname $src;
+            $dir =~ s/$rbroot//;
+            print "$builddir$dir/$target2: $src $rest\n";
+            $target2 = "";
+        }
     }
     else {
         print $_;
