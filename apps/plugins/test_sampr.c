@@ -21,122 +21,177 @@
 #include "plugin.h"
 #include "lib/oldmenuapi.h"
 
+/* This plugin generates a 1kHz tone + noise in order to quickly verify
+ * hardware samplerate setup is operating correctly.
+ *
+ * While switching to different frequencies, the pitch of the tone should
+ * remain constant whereas the upper harmonics of the noise should vary
+ * with sample rate.
+ */
+
 PLUGIN_HEADER
+PLUGIN_IRAM_DECLARE;
 
 const struct plugin_api *rb;
 
-enum
-{
-    TONE_SINE = 0,
-    TONE_TRIANGLE,
-    TONE_SAWTOOTH,
-    TONE_SQUARE,
-    NUM_WAVEFORMS
-};
+static int hw_freq IDATA_ATTR = HW_FREQ_DEFAULT;
+static unsigned long hw_sampr IDATA_ATTR = HW_SAMPR_DEFAULT;
 
-static int freq = HW_FREQ_DEFAULT;
-static int waveform = TONE_SINE;
+static int gen_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)] IBSS_ATTR;
+static bool gen_quit IBSS_ATTR;
+static struct thread_entry *gen_thread_p;
 
-/* A441 at 44100Hz. Pitch will change with changing samplerate.
-   Test different waveforms to detect any aliasing in signal which
-   indicates duplicated/dropped samples */
-static const int16_t A441[NUM_WAVEFORMS][100] =
+#define OUTPUT_CHUNK_COUNT (1 << 1)
+#define OUTPUT_CHUNK_MASK (OUTPUT_CHUNK_COUNT-1)
+#define OUTPUT_CHUNK_SAMPLES 1152
+#define OUTPUT_CHUNK_SIZE (OUTPUT_CHUNK_SAMPLES*sizeof(int16_t)*2)
+static uint16_t output_buf[OUTPUT_CHUNK_COUNT][OUTPUT_CHUNK_SAMPLES*2]
+        IBSS_ATTR __attribute__((aligned(4)));
+static int output_head IBSS_ATTR;
+static int output_tail IBSS_ATTR;
+static int output_step IBSS_ATTR;
+
+static uint32_t gen_phase_step IBSS_ATTR;
+static const uint32_t gen_frequency = 1000;
+
+/* fsin shamelessly stolen from signal_gen.c by Thom Johansen (preglow) */
+
+/* Good quality sine calculated by linearly interpolating
+ * a 128 sample sine table. First harmonic has amplitude of about -84 dB.
+ * phase has range from 0 to 0xffffffff, representing 0 and
+ * 2*pi respectively.
+ * Return value is a signed value from LONG_MIN to LONG_MAX, representing
+ * -1 and 1 respectively. 
+ */
+static int16_t ICODE_ATTR fsin(uint32_t phase)
 {
-    [TONE_SINE] =
+    /* 128 sixteen bit sine samples + guard point */
+    static const int16_t sinetab[129] ICONST_ATTR =
     {
-          0,   2057,   4106,   6139,   8148,
-      10125,  12062,  13951,  15785,  17557,
-      19259,  20886,  22430,  23886,  25247,
-      26509,  27666,  28713,  29648,  30465,
-      31163,  31737,  32186,  32508,  32702,
-      32767,  32702,  32508,  32186,  31737,
-      31163,  30465,  29648,  28713,  27666,
-      26509,  25247,  23886,  22430,  20886,
-      19259,  17557,  15785,  13951,  12062,
-      10125,   8148,   6139,   4106,   2057,
-          0,  -2057,  -4106,  -6139,  -8148,
-     -10125, -12062, -13951, -15785, -17557,
-     -19259, -20886, -22430, -23886, -25247,
-     -26509, -27666, -28713, -29648, -30465,
-     -31163, -31737, -32186, -32508, -32702,
-     -32767, -32702, -32508, -32186, -31737,
-     -31163, -30465, -29648, -28713, -27666,
-     -26509, -25247, -23886, -22430, -20886,
-     -19259, -17557, -15785, -13951, -12062,
-     -10125,  -8148,  -6139,  -4106,  -2057,
-    },
-    [TONE_TRIANGLE] =
+             0,   1607,   3211,   4807,   6392,   7961,   9511,  11038,
+         12539,  14009,  15446,  16845,  18204,  19519,  20787,  22004,
+         23169,  24278,  25329,  26318,  27244,  28105,  28897,  29621,
+         30272,  30851,  31356,  31785,  32137,  32412,  32609,  32727,
+         32767,  32727,  32609,  32412,  32137,  31785,  31356,  30851,
+         30272,  29621,  28897,  28105,  27244,  26318,  25329,  24278,
+         23169,  22004,  20787,  19519,  18204,  16845,  15446,  14009,
+         12539,  11038,   9511,   7961,   6392,   4807,   3211,   1607,
+             0,  -1607,  -3211,  -4807,  -6392,  -7961,  -9511, -11038,
+        -12539, -14009, -15446, -16845, -18204, -19519, -20787, -22004,
+        -23169, -24278, -25329, -26318, -27244, -28105, -28897, -29621,
+        -30272, -30851, -31356, -31785, -32137, -32412, -32609, -32727,
+        -32767, -32727, -32609, -32412, -32137, -31785, -31356, -30851,
+        -30272, -29621, -28897, -28105, -27244, -26318, -25329, -24278,
+        -23169, -22004, -20787, -19519, -18204, -16845, -15446, -14009,
+        -12539, -11038, -9511,   -7961,  -6392,  -4807,  -3211,  -1607,
+             0,
+    };
+
+    unsigned int pos = phase >> 25;
+    unsigned short frac = (phase & 0x01ffffff) >> 9;
+    short diff = sinetab[pos + 1] - sinetab[pos];
+    
+    return sinetab[pos] + (frac*diff >> 16);
+}
+
+/* ISR handler to get next block of data */
+static void get_more(unsigned char **start, size_t *size)
+{
+    /* Free previous buffer */
+    output_head += output_step;
+    output_step = 0;
+
+    *start = (unsigned char *)output_buf[output_head & OUTPUT_CHUNK_MASK];
+    *size  = OUTPUT_CHUNK_SIZE;
+
+    /* Keep repeating previous if source runs low */
+    if (output_head != output_tail)
+        output_step = 1;
+}
+
+static void ICODE_ATTR gen_thread_func(void)
+{
+    uint32_t gen_random = *rb->current_tick;
+    uint32_t gen_phase = 0;
+
+    while (!gen_quit)
     {
-          0,   1310,   2621,   3932,   5242,
-       6553,   7864,   9174,  10485,  11796,
-      13106,  14417,  15728,  17038,  18349,
-      19660,  20970,  22281,  23592,  24902,
-      26213,  27524,  28834,  30145,  31456,
-      32767,  31456,  30145,  28834,  27524,
-      26213,  24902,  23592,  22281,  20970,
-      19660,  18349,  17038,  15728,  14417,
-      13106,  11796,  10485,   9174,   7864,
-       6553,   5242,   3932,   2621,   1310,
-          0,  -1310,  -2621,  -3932,  -5242,
-      -6553,  -7864,  -9174, -10485, -11796,
-     -13106, -14417, -15728, -17038, -18349,
-     -19660, -20970, -22281, -23592, -24902,
-     -26213, -27524, -28834, -30145, -31456,
-     -32767, -31456, -30145, -28834, -27524,
-     -26213, -24902, -23592, -22281, -20970,
-     -19660, -18349, -17038, -15728, -14417,
-     -13106, -11796, -10485,  -9174,  -7864,
-      -6553,  -5242,  -3932,  -2621,  -1310,
-    },
-    [TONE_SAWTOOTH] =
-    {
-     -32767, -32111, -31456, -30800, -30145,
-     -29490, -28834, -28179, -27524, -26868,
-     -26213, -25558, -24902, -24247, -23592,
-     -22936, -22281, -21626, -20970, -20315,
-     -19660, -19004, -18349, -17694, -17038,
-     -16383, -15728, -15072, -14417, -13762,
-     -13106, -12451, -11796, -11140, -10485,
-      -9830,  -9174,  -8519,  -7864,  -7208,
-      -6553,  -5898,  -5242,  -4587,  -3932,
-      -3276,  -2621,  -1966,  -1310,   -655,
-          0,    655,   1310,   1966,   2621,
-       3276,   3932,   4587,   5242,   5898,
-       6553,   7208,   7864,   8519,   9174,
-       9830,  10485,  11140,  11796,  12451,
-      13106,  13762,  14417,  15072,  15728,
-      16383,  17038,  17694,  18349,  19004,
-      19660,  20315,  20970,  21626,  22281,
-      22936,  23592,  24247,  24902,  25558,
-      26213,  26868,  27524,  28179,  28834,
-      29490,  30145,  30800,  31456,  32111,
-    },
-    [TONE_SQUARE] =
-    {
-      32767,  32767,  32767,  32767,  32767,
-      32767,  32767,  32767,  32767,  32767,
-      32767,  32767,  32767,  32767,  32767,
-      32767,  32767,  32767,  32767,  32767,
-      32767,  32767,  32767,  32767,  32767,
-      32767,  32767,  32767,  32767,  32767,
-      32767,  32767,  32767,  32767,  32767,
-      32767,  32767,  32767,  32767,  32767,
-      32767,  32767,  32767,  32767,  32767,
-      32767,  32767,  32767,  32767,  32767,
-     -32767, -32767, -32767, -32767, -32767,
-     -32767, -32767, -32767, -32767, -32767,
-     -32767, -32767, -32767, -32767, -32767,
-     -32767, -32767, -32767, -32767, -32767,
-     -32767, -32767, -32767, -32767, -32767,
-     -32767, -32767, -32767, -32767, -32767,
-     -32767, -32767, -32767, -32767, -32767,
-     -32767, -32767, -32767, -32767, -32767,
-     -32767, -32767, -32767, -32767, -32767,
-     -32767, -32767, -32767, -32767, -32767,
+        int16_t *p = output_buf[output_tail & OUTPUT_CHUNK_MASK];
+        int i = OUTPUT_CHUNK_SAMPLES;
+
+        while (output_tail - output_head >= OUTPUT_CHUNK_COUNT)
+        {
+            rb->sleep(0);
+            if (gen_quit)
+                return;
+        }
+
+        while (--i >= 0)
+        {
+            int32_t val = fsin(gen_phase);
+            int32_t rnd = (int16_t)gen_random;
+
+            gen_random = gen_random*0x0019660dL + 0x3c6ef35fL;
+
+            val = (rnd + 2*val) / 3;
+
+            *p++ = val;
+            *p++ = val;
+
+            gen_phase += gen_phase_step;
+        }
+
+        output_tail++;
+
+        rb->yield();
     }
-};
+}
 
-void play_waveform(void)
+static void update_gen_step(void)
+{
+    gen_phase_step = 0x100000000ull*gen_frequency / hw_sampr;
+}
+
+static void output_clear(void)
+{
+    rb->pcm_play_lock();
+
+    rb->memset(output_buf, 0, sizeof (output_buf));
+    output_head = 0;
+    output_tail = 0;
+
+    rb->pcm_play_unlock();
+}
+
+/* Called to switch samplerate on the fly */
+static void set_frequency(int index)
+{
+    hw_freq = index;
+    hw_sampr = rb->hw_freq_sampr[index];
+
+    output_clear();
+    update_gen_step();
+
+    rb->pcm_set_frequency(hw_sampr);
+    rb->pcm_apply_settings();
+}
+
+#ifndef HAVE_VOLUME_IN_LIST
+static void set_volume(int value)
+{
+    rb->global_settings->volume = value;
+    rb->sound_set(SOUND_VOLUME, value);
+}
+
+static void format_volume(char *buf, size_t len, int value, const char *unit)
+{
+    rb->snprintf(buf, len, "%d %s", rb->sound_val2phys(SOUND_VOLUME, value),
+                 rb->sound_unit(SOUND_VOLUME));
+    (void)unit;
+}
+#endif /* HAVE_VOLUME_IN_LIST */
+
+static void play_tone(bool volume_set)
 {
     static struct opt_items names[HW_NUM_FREQ] =
     {
@@ -154,52 +209,9 @@ void play_waveform(void)
         HW_HAVE_8_( [HW_FREQ_8 ] = { "8kHz",      -1 },)
     };
 
-    /* 50 cycles of wavform */
-    static int32_t audio[5000];
-
-    void init_audio(int type)
-    {
-        int i;
-        /* Signal amplitudes to adjust for somewhat equal percieved
-           volume */
-        int amps[NUM_WAVEFORMS] =
-        {
-            [TONE_SINE]     = 8191,
-            [TONE_TRIANGLE] = 5119,
-            [TONE_SAWTOOTH] = 2047,
-            [TONE_SQUARE]   = 1535
-        };
-
-        /* Initialize one cycle of the waveform */
-        for (i = 0; i < 100; i++)
-        {
-            uint16_t val = amps[type]*A441[type][i]/32767;
-            audio[i] = (val << 16) | val;
-        }
-
-        /* Duplicate it 49 more times */
-        for (i = 1; i < 50; i++)
-        {
-            rb->memcpy(audio + i*100, audio, 100*sizeof(int32_t));
-        }
-    }
-
-    /* ISR handler to get next block of data */
-    void get_more(unsigned char **start, size_t *size)
-    {
-        *start = (unsigned char *)audio;
-        *size  = sizeof (audio);
-    }
-
-    /* Called to switch samplerate on the fly */
-    void set_frequency(int index)
-    {
-        rb->pcm_set_frequency(rb->hw_freq_sampr[index]);
-        rb->pcm_apply_settings();
-    }
+    int freq = hw_freq;
 
     rb->audio_stop();
-    rb->sound_set(SOUND_VOLUME, rb->sound_default(SOUND_VOLUME));
 
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
@@ -217,18 +229,40 @@ void play_waveform(void)
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
 
-    rb->pcm_apply_settings();
+    gen_quit = false;
+    output_clear();
+    update_gen_step();
 
-    init_audio(waveform);
+    gen_thread_p = rb->create_thread(gen_thread_func, gen_thread_stack,
+                                     sizeof(gen_thread_stack), 0,
+                                     "test_sampr generator"
+                                     IF_PRIO(, PRIORITY_PLAYBACK)
+                                     IF_COP(, CPU));
+
     rb->pcm_play_data(get_more, NULL, 0);
 
-    rb->set_option("Sample Rate", &freq, INT, names,
-                    HW_NUM_FREQ, set_frequency);
+#ifndef HAVE_VOLUME_IN_LIST
+    if (volume_set)
+    {
+        int volume = rb->global_settings->volume;
+
+        rb->set_int("Volume", NULL, -1, &volume,
+                    set_volume, 1, rb->sound_min(SOUND_VOLUME),
+                    rb->sound_max(SOUND_VOLUME), format_volume);
+    }
+    else
+#endif /* HAVE_VOLUME_IN_LIST */
+    {
+        rb->set_option("Sample Rate", &freq, INT, names,
+                       HW_NUM_FREQ, set_frequency);
+        (void)volume_set;
+    }
+
+    gen_quit = true;
+
+    rb->thread_wait(gen_thread_p);
 
     rb->pcm_play_stop();
-
-    while (rb->pcm_is_playing())
-        rb->yield();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
@@ -239,40 +273,41 @@ void play_waveform(void)
     rb->pcm_set_frequency(HW_FREQ_DEFAULT);
 }
 
-void set_waveform(void)
-{
-    static struct opt_items names[NUM_WAVEFORMS] =
-    {
-        [TONE_SINE]     = { "Sine",     -1 },
-        [TONE_TRIANGLE] = { "Triangle", -1 },
-        [TONE_SAWTOOTH] = { "Sawtooth", -1 },
-        [TONE_SQUARE]   = { "Square",   -1 },
-    };
-
-    rb->set_option("Waveform", &waveform, INT, names,
-                   NUM_WAVEFORMS, NULL);
-}
-
 /* Tests hardware sample rate switching */
 /* TODO: needs a volume control */
-enum plugin_status plugin_start(const struct plugin_api *api, const void *parameter)
+enum plugin_status plugin_start(const struct plugin_api *api,
+                                const void *parameter)
 {
+    enum
+    {
+        __TEST_SAMPR_MENUITEM_FIRST = -1,
+#ifndef HAVE_VOLUME_IN_LIST
+        MENU_VOL_SET,
+#endif /* HAVE_VOLUME_IN_LIST */
+        MENU_SAMPR_SET,
+        MENU_QUIT,
+    };
+
     static const struct menu_item items[] =
     {
-        { "Set Waveform",  NULL },
-        { "Play Waveform", NULL },
-        { "Quit",          NULL },
+#ifndef HAVE_VOLUME_IN_LIST
+        [MENU_VOL_SET] =
+            { "Set Volume",     NULL },
+#endif /* HAVE_VOLUME_IN_LIST */
+        [MENU_SAMPR_SET] =
+            { "Set Samplerate", NULL },
+        [MENU_QUIT] =
+            { "Quit",           NULL },
     };
 
     bool exit = false;
     int m;
-    bool talk_menu;
 
+    /* Disable all talking before initializing IRAM */
+    api->talk_disable(true);
+
+    PLUGIN_IRAM_INIT(api);
     rb = api;
-
-    /* Have to shut up voice menus or it will mess up our waveform playback */
-    talk_menu = rb->global_settings->talk_menu;
-    rb->global_settings->talk_menu = false;
 
     m = menu_init(rb, items, ARRAYLEN(items),
                       NULL, NULL, NULL, NULL);
@@ -283,13 +318,16 @@ enum plugin_status plugin_start(const struct plugin_api *api, const void *parame
 
         switch (result)
         {
-        case 0:
-            set_waveform();
+#ifndef HAVE_VOLUME_IN_LIST
+        case MENU_VOL_SET:
+            play_tone(true);
             break;
-        case 1:
-            play_waveform();
+#endif /* HAVE_VOLUME_IN_LIST */
+        case MENU_SAMPR_SET:
+            play_tone(false);
             break;
-        case 2:
+
+        case MENU_QUIT:
             exit = true;
             break;
         }
@@ -297,7 +335,7 @@ enum plugin_status plugin_start(const struct plugin_api *api, const void *parame
 
     menu_exit(m);
 
-    rb->global_settings->talk_menu = talk_menu;
+    rb->talk_disable(false);
 
     return PLUGIN_OK;
     (void)parameter;
