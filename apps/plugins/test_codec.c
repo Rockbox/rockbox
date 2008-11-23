@@ -111,6 +111,7 @@ static bool taginfo_ready = true;
 
 static volatile unsigned int elapsed;
 static volatile bool codec_playing;
+static volatile long endtick;
 struct wavinfo_t wavinfo;
 
 static unsigned char wav_header[44] =
@@ -508,6 +509,7 @@ static void codec_thread(void)
     res = rb->codec_load_file(codecname,&ci);
 
     /* Signal to the main thread that we are done */
+    endtick = *rb->current_tick;
     codec_playing = false;
 }
 
@@ -519,8 +521,8 @@ static enum plugin_status test_track(const char* filename)
     size_t n;
     int fd;
     enum plugin_status res = PLUGIN_ERROR;
-    unsigned long starttick;
-    unsigned long ticks;
+    long starttick;
+    long ticks;
     unsigned long speed;
     unsigned long duration;
     struct thread_entry* codecthread_id;
@@ -601,8 +603,7 @@ static enum plugin_status test_track(const char* filename)
         rb->snprintf(str,sizeof(str),"%d of %d",elapsed,(int)track.id3.length);
         log_text(str,false);
     }
-    /* Save the current time before we spin up the disk to access the log */
-    ticks = *rb->current_tick - starttick;
+    ticks = endtick - starttick;
 
     /* Be sure it is done */
     rb->thread_wait(codecthread_id);
