@@ -21,36 +21,53 @@
 
 #include "config.h"
 #include "adc.h"
+#include "adc-target.h"
 #include "powermgmt.h"
 
-/* TODO */
+/* TODO
+    Each as3525 target should probably define its own battery properties
+    (dangerous/shutoff battery level, discharge/charge curves) in a file
+    called powermgmt-<target>.c in its own sub-directory.
+    
+    For now, this file provides simple uncalibrated settings to get at least
+    a basic reading for all as3525 targets with a lithium battery.
+ */
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    0
+    /* TODO: this is just an initial guess */
+    3400
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    0
+    /* TODO: this is just an initial guess */
+    3300
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    /* TODO: simple uncalibrated curve, linear except for first 10% */
+    { 3300, 3390, 3480, 3570, 3660, 3750, 3840, 3930, 4020, 4110, 4200 }
 };
 
 #if CONFIG_CHARGING
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+    /* TODO: simple uncalibrated curve, linear except for first 10% */
+    3300, 3390, 3480, 3570, 3660, 3750, 3840, 3930, 4020, 4110, 4200
 };
 #endif /* CONFIG_CHARGING */
+
+/* ADC should read 0x3ff=5.12V */
+#define BATTERY_SCALE_FACTOR 5125       
+/* full-scale ADC readout (2^10) in millivolt */
 
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    return 1;
+    return (adc_read(ADC_RTCSUP) * BATTERY_SCALE_FACTOR) >> 10;
 }
+
