@@ -23,6 +23,8 @@
  ****************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "config.h"
 #include "common.h"
 #include "cpu.h"
 #include "file.h"
@@ -292,7 +294,7 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
     unsigned long sum;
     char filename[MAX_PATH];
 
-    snprintf(filename,sizeof(filename),"/.rockbox/%s",firmware);
+    snprintf(filename,sizeof(filename), BOOTDIR "/%s",firmware);
     fd = open(filename, O_RDONLY);
     if(fd < 0)
     {
@@ -610,14 +612,14 @@ void* main(void)
         printf("Loading Rockbox...");
         rc=load_mi4(loadbuffer, BOOTFILE, MAX_LOADSIZE);
         if (rc < EOK) {
-            printf("Can't load %s:", BOOTFILE);
+            printf("Can't load " BOOTFILE ": ");
             printf(strerror(rc));
 
 #ifdef OLD_BOOTFILE
             /* Try loading rockbox from old rockbox.e200/rockbox.h10 format */
             rc=load_firmware(loadbuffer, OLD_BOOTFILE, MAX_LOADSIZE);
             if (rc < EOK) {
-                printf("Can't load %s:", OLD_BOOTFILE);
+                printf("Can't load " OLD_BOOTFILE" : ");
                 error(EBOOTFILE, rc);
             }
 #endif

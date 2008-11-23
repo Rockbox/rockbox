@@ -348,7 +348,7 @@ void* main(void)
         rc=load_firmware(loadbuffer, BOOTFILE, MAX_LOADSIZE);
         if (rc < EOK) {
             printf("Error!");
-            printf("Can't load rockbox.ipod:");
+            printf("Can't load " BOOTFILE ": ");
             printf(strerror(rc));
         } else {
             printf("Rockbox loaded.");

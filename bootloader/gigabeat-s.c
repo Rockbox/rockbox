@@ -266,8 +266,8 @@ static void handle_untar(void)
             {
                 printf("Found rockbox binary. Moving...");
                 close(fd);
-                remove("/.rockbox/rockbox.gigabeat");
-                int ret = rename(buf, "/.rockbox/rockbox.gigabeat");
+                remove( BOOTDIR "/" BOOTFILE);
+                int ret = rename(buf, BOOTDIR "/" BOOTFILE);
                 printf("returned %d", ret);
                 sleep(HZ);
                 break;
@@ -299,7 +299,7 @@ static void handle_untar(void)
 /* Try to load the firmware and run it */
 static void __attribute__((noreturn)) handle_firmware_load(void)
 {
-    int rc = load_firmware(load_buf, "/.rockbox/rockbox.gigabeat",
+    int rc = load_firmware(load_buf, BOOTFILE,
                            load_buf_size);
 
     if(rc < 0)

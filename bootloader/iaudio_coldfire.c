@@ -216,7 +216,7 @@ void main(void)
 
     if (i < EOK) {
         printf("Error!");
-        printf("Can't load rockbox.iaudio:");
+        printf("Can't load " BOOTFILE ": ");
         printf(strerror(rc));
         sleep(HZ*3);
         power_off();

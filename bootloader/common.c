@@ -29,6 +29,7 @@
 #include "common.h"
 #include "power.h"
 #include "kernel.h"
+#include "config.h"
 
 /* TODO: Other bootloaders need to be adjusted to set this variable to true
    on a button press - currently only the ipod, H10 and Sansa versions do. */
@@ -141,7 +142,7 @@ int load_firmware(unsigned char* buf, char* firmware, int buffer_size)
     int i;
     char filename[MAX_PATH];
 
-    snprintf(filename,sizeof(filename),"/.rockbox/%s",firmware);
+    snprintf(filename,sizeof(filename), BOOTDIR "/%s",firmware);
     fd = open(filename, O_RDONLY);
     if(fd < 0)
     {
