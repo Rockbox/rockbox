@@ -21,7 +21,7 @@
 
 #define FRACTSIZE 12
 
-#define BUF_SIZE 8192 /* 32 kB output buffers */
+#define BUF_SIZE 16384 /* 64 kB output buffers */
 #define NBUF   2
 
 #ifndef SIMULATOR

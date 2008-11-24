@@ -262,14 +262,6 @@ void setPoint(struct SynthObject * so, int pt)
         so->curOffset = 0;
 }
 
-inline void stopVoice(struct SynthObject * so)
-{
-    if(so->state == STATE_RAMPDOWN)
-        return;
-    so->state = STATE_RAMPDOWN;
-    so->decay = 0;
-}
-
 static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned int samples)
 {
     struct GWaveform * wf;
@@ -293,10 +285,13 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
     const unsigned int start_loop = wf->startLoop << FRACTSIZE;
     const int diff_loop = end_loop-start_loop;
 
+    bool rampdown = (so->state == STATE_RAMPDOWN);
+    const bool ch_9 = (so->ch == 9);
+
     while(LIKELY(samples-- > 0))
     {
         /* Is voice being ramped? */
-        if(UNLIKELY(so->state == STATE_RAMPDOWN))
+        if(UNLIKELY(rampdown))
         {
             if(so->decay != 0)  /* Ramp has been started */
             {
@@ -305,10 +300,10 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
                 if(so->decay < 10 && so->decay > -10)
                     so->isUsed = false;
 
-                s1=so->decay;
-                s2 = s1*pan;
-                s1 = (s1<<7) -s2;
-                *(out++)+=((s1 << 9) & 0xFFFF0000) | ((s2 >> 7) &0xFFFF);
+                s1 = so->decay;
+                s2 = s1 * pan;
+                s1 = (s1 << 7) -s2;
+                *(out++) += ((s1 << 9) & 0xFFFF0000) | ((s2 >> 7) &0xFFFF);
                 continue;
             }
         } else  /* OK to advance voice */
@@ -354,7 +349,12 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
         {
             cp_temp -= so->delta;
             s2 = getSample((cp_temp >> FRACTSIZE)+1, wf);
-            stopVoice(so);
+
+            if (!rampdown) /* stop voice */
+            {
+                rampdown = true;
+                so->decay = 0;
+            }
         }
 
         /* Better, working, linear interpolation    */
@@ -364,12 +364,15 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
 
         if(UNLIKELY(so->curRate == 0))
         {
-            stopVoice(so);
+            if (!rampdown) /* stop voice */
+            {
+                rampdown = true;
+                so->decay = 0;
+            }
 //          so->isUsed = false;
-
         }
 
-        if(LIKELY(so->ch != 9 && so->state != STATE_RAMPDOWN)) /* Stupid ADSR code... and don't do ADSR for drums */
+        if(LIKELY(!ch_9 && !rampdown)) /* Stupid ADSR code... and don't do ADSR for drums */
         {
             if(UNLIKELY(so->curOffset < so->targetOffset))
             {
@@ -380,9 +383,10 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
                     {
                         setPoint(so, so->curPoint+1);
                     }
-                    else
+                    else if (!rampdown) /* stop voice */
                     {
-                        stopVoice(so);
+                        rampdown = true;
+                        so->decay = 0;
                     }
                 }
             } else
@@ -394,9 +398,10 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
                     {
                         setPoint(so, so->curPoint+1);
                     }
-                    else
+                    else if (!rampdown) /* stop voice */
                     {
-                        stopVoice(so);
+                        rampdown = true;
+                        so->decay = 0;
                     }
 
                 }
@@ -406,7 +411,11 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
         if(UNLIKELY(so->curOffset < 0))
         {
             so->curOffset = so->targetOffset;
-            stopVoice(so);
+            if (!rampdown)
+            {
+                rampdown = true;
+                so->decay = 0;
+            }
         }
 
         s1 = s1 * (so->curOffset >> 22) >> 8;
@@ -416,19 +425,22 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
         s1 = s1 * volscale >> 14;
 
         /* need to set ramp beginning */
-        if(UNLIKELY(so->state == STATE_RAMPDOWN && so->decay == 0))
+        if(UNLIKELY(rampdown && so->decay == 0))
         {
             so->decay = s1;
             if(so->decay == 0)
                 so->decay = 1;  /* stupid junk.. */
         }
 
-        s2 = s1*pan;
-        s1 = (s1<<7) - s2;
-        *(out++)+=((s1 << 9) & 0xFFFF0000) | ((s2 >> 7) &0xFFFF);
+        s2 = s1 * pan;
+        s1 = (s1 << 7) - s2;
+        *(out++) += ((s1 << 9) & 0xFFFF0000) | ((s2 >> 7) &0xFFFF);
     }
 
-    so->cp=cp_temp; /* store this again */
+    /* store these again */
+    if (rampdown)
+        so->state = STATE_RAMPDOWN;
+    so->cp = cp_temp;
     return;
 }
 
