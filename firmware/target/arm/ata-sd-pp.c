@@ -758,7 +758,7 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     /* TODO: Add DMA support. */
 
     mutex_lock(&sd_mtx);
-
+    sd_enable(true);
     sd_led(true);
 
 sd_read_retry:
@@ -844,6 +844,7 @@ sd_read_retry:
     while (1)
     {
         sd_led(false);
+        sd_enable(false);
         mutex_unlock(&sd_mtx);
 
         return ret;
@@ -873,7 +874,7 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
     int bank;
 
     mutex_lock(&sd_mtx);
-
+    sd_enable(true);
     sd_led(true);
 
 sd_write_retry:
@@ -972,6 +973,7 @@ sd_write_retry:
     while (1)
     {
         sd_led(false);
+        sd_enable(false);
         mutex_unlock(&sd_mtx);
 
         return ret;
