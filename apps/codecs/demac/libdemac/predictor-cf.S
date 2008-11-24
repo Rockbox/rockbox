@@ -486,10 +486,18 @@ predictor_decode_stereo:
                               | %a3 = &p->historybuffer[PREDICTOR_HISTORY_SIZE]
     
     cmp.l   %a3, %a5                    
-    bne.s   .endofloop
+    beq.s   .move_hist    | The history buffer is full, we need to do a memmove
                                               
-    | The history buffer is full, we need to do a memmove:
+    subq.l  #1, (8,%sp)                 | decrease loop count
+    bne.w   .loop
 
+.done:
+    move.l  %a5, (%a6)                  | Save value of p->buf
+    movem.l (3*4,%sp), %d2-%d7/%a2-%a6
+    lea.l   (14*4,%sp), %sp
+    rts
+    
+.move_hist:
     lea.l   (historybuffer,%a6), %a3    
 
     | dest = %a3 (p->historybuffer)
@@ -497,33 +505,19 @@ predictor_decode_stereo:
     | n = 200
     
     movem.l (%a5), %d0-%d7/%a0-%a1      | 40 bytes
-    lea.l   (40,%a5), %a5
     movem.l %d0-%d7/%a0-%a1, (%a3)
-    lea.l   (40,%a3), %a3
-    movem.l (%a5), %d0-%d7/%a0-%a1      | 40 bytes
-    lea.l   (40,%a5), %a5
-    movem.l %d0-%d7/%a0-%a1, (%a3)
-    lea.l   (40,%a3), %a3
-    movem.l (%a5), %d0-%d7/%a0-%a1      | 40 bytes
-    lea.l   (40,%a5), %a5
-    movem.l %d0-%d7/%a0-%a1, (%a3)
-    lea.l   (40,%a3), %a3
-    movem.l (%a5), %d0-%d7/%a0-%a1      | 40 bytes
-    lea.l   (40,%a5), %a5
-    movem.l %d0-%d7/%a0-%a1, (%a3)
-    lea.l   (40,%a3), %a3
-    movem.l (%a5), %d0-%d7/%a0-%a1      | 40 bytes
-    lea.l   (40,%a5), %a5
-    movem.l %d0-%d7/%a0-%a1, (%a3)
-    lea.l   (40,%a3), %a3
+    movem.l (40,%a5), %d0-%d7/%a0-%a1   | 40 bytes
+    movem.l %d0-%d7/%a0-%a1, (40,%a3)
+    movem.l (80,%a5), %d0-%d7/%a0-%a1   | 40 bytes
+    movem.l %d0-%d7/%a0-%a1, (80,%a3)
+    movem.l (120,%a5), %d0-%d7/%a0-%a1  | 40 bytes
+    movem.l %d0-%d7/%a0-%a1, (120,%a3)
+    movem.l (160,%a5), %d0-%d7/%a0-%a1  | 40 bytes
+    movem.l %d0-%d7/%a0-%a1, (160,%a3)
 
-    lea.l   (historybuffer,%a6), %a5    | p->buf = &p->historybuffer[0]
+    move.l  %a3, %a5                    | p->buf = &p->historybuffer[0]
 
-.endofloop:
     subq.l  #1, (8,%sp)                 | decrease loop count
     bne.w   .loop
 
-    move.l  %a5, (%a6)                  | Save value of p->buf
-    movem.l (3*4,%sp), %d2-%d7/%a2-%a6
-    lea.l   (14*4,%sp), %sp
-    rts
+    bra.s   .done

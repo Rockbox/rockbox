@@ -468,14 +468,24 @@ loop:
 
     add     r11, r12, #historybuffer    @ r11 := &p->historybuffer[0]
 
-    sub     r10, r14, #PREDICTOR_HISTORY_SIZE*4   
+    sub     r10, r14, #PREDICTOR_HISTORY_SIZE*4
                                        @ r10 := p->buf - PREDICTOR_HISTORY_SIZE
 
     cmp     r10, r11
-    bne     endofloop
+    beq     move_hist     @ The history buffer is full, we need to do a memmove
 
-    @ The history buffer is full, we need to do a memmove:
+    @ Check loop count
+    ldr     r0, [sp, #8]
+    subs    r0, r0, #1
+    strne   r0, [sp, #8]
+    bne     loop
 
+done:
+    str     r14, [r12]              @ Save value of p->buf
+    add     sp, sp, #12             @ Don't bother restoring r1-r3 
+    ldmia   sp!, {r4-r11, pc}
+
+move_hist:
     @ dest = r11 (p->historybuffer)
     @ src = r14 (p->buf)
     @ n = 200
@@ -493,15 +503,10 @@ loop:
 
     add     r14, r12, #historybuffer    @ p->buf = &p->historybuffer[0]
 
-
-endofloop:
-@ Check loop count
+    @ Check loop count
     ldr     r0, [sp, #8]
     subs    r0, r0, #1
     strne   r0, [sp, #8]
     bne     loop
-
-done:
-    str     r14, [r12]              @ Save value of p->buf
-    add     sp, sp, #12             @ Don't bother restoring r1-r3 
-    ldmia   sp!, {r4-r11, pc}
+    
+    b       done

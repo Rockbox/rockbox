@@ -283,13 +283,13 @@ static inline void update_rice(struct rice_t* rice, int x)
 {
     rice->ksum += ((x + 1) / 2) - ((rice->ksum + 16) >> 5);
 
-    if (rice->k == 0) {
+    if (UNLIKELY(rice->k == 0)) {
         rice->k = 1;
     } else {
         uint32_t lim = 1 << (rice->k + 4);
-        if (rice->ksum < lim) {
+        if (UNLIKELY(rice->ksum < lim)) {
             rice->k--;
-        } else if (rice->ksum >= 2 * lim) {
+        } else if (UNLIKELY(rice->ksum >= 2 * lim)) {
             rice->k++;
         }
     }
@@ -300,11 +300,12 @@ static inline int entropy_decode3980(struct rice_t* rice)
     int base, x, pivot, overflow;
 
     pivot = rice->ksum >> 5;
-    if (pivot == 0) pivot=1;
+    if (UNLIKELY(pivot == 0))
+        pivot=1;
 
     overflow = range_get_symbol_3980();
 
-    if (overflow == (MODEL_ELEMENTS-1)) {
+    if (UNLIKELY(overflow == (MODEL_ELEMENTS-1))) {
         overflow = range_decode_short() << 16;
         overflow |= range_decode_short();
     }
@@ -352,7 +353,7 @@ static inline int entropy_decode3970(struct rice_t* rice)
 
     int overflow = range_get_symbol_3970();
 
-    if (overflow == (MODEL_ELEMENTS - 1)) {
+    if (UNLIKELY(overflow == (MODEL_ELEMENTS - 1))) {
         tmpk = range_decode_bits(5);
         overflow = 0;
     } else {
@@ -435,13 +436,13 @@ int ICODE_ATTR_DEMAC entropy_decode(struct ape_ctx_t* ape_ctx,
         memset(decoded1, 0, blockstodecode * sizeof(int32_t));
     } else {
         if (ape_ctx->fileversion > 3970) {
-            while (blockstodecode--) {
+            while (LIKELY(blockstodecode--)) {
                 *(decoded0++) = entropy_decode3980(&riceY);
                 if (decoded1 != NULL)
                     *(decoded1++) = entropy_decode3980(&riceX);
             }
         } else {
-            while (blockstodecode--) {
+            while (LIKELY(blockstodecode--)) {
                 *(decoded0++) = entropy_decode3970(&riceY);
                 if (decoded1 != NULL)
                     *(decoded1++) = entropy_decode3970(&riceX);

@@ -70,6 +70,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #define ICODE_ATTR
 #define ICODE_ATTR_DEMAC
 
+/* Use to give gcc hints on which branch is most likely taken */
+#if defined(__GNUC__) && __GNUC__ >= 3
+#define LIKELY(x)   __builtin_expect(!!(x), 1)
+#define UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else
+#define LIKELY(x)   (x)
+#define UNLIKELY(x) (x)
+#endif
+
 #endif /* !ROCKBOX */
 
 /* Defaults */

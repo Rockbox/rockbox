@@ -100,7 +100,7 @@ struct filter_t {
 #if defined(CPU_ARM) && (ARM_ARCH >= 6)
 #define SATURATE(x) ({int __res; asm("ssat %0, #16, %1" : "=r"(__res) : "r"(x)); __res; })
 #else
-#define SATURATE(x) (((x) == (int16_t)(x)) ? (x) : ((x) >> 31) ^ 0x7FFF);
+#define SATURATE(x) (LIKELY((x) == (int16_t)(x)) ? (x) : ((x) >> 31) ^ 0x7FFF);
 #endif
 
 /* Apply the filter with state f to count entries in data[] */
@@ -109,20 +109,22 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3980(struct filter_t* f,
                                                   int32_t* data, int count)
 {
     int res;
-    int absres;
+    int absres; 
 
 #ifdef PREPARE_SCALARPRODUCT
     PREPARE_SCALARPRODUCT
 #endif
 
-    while(count--)
+    while(LIKELY(count--))
     {
         res = FP_TO_INT(scalarproduct(f->coeffs, f->delay - ORDER));
 
-        if (*data < 0)
-            vector_add(f->coeffs, f->adaptcoeffs - ORDER);
-        else if (*data > 0)
-            vector_sub(f->coeffs, f->adaptcoeffs - ORDER);
+        if (LIKELY(*data != 0)) {
+            if (*data < 0)
+                vector_add(f->coeffs, f->adaptcoeffs - ORDER);
+            else
+                vector_sub(f->coeffs, f->adaptcoeffs - ORDER);
+        }
 
         res += *data;
 
@@ -136,11 +138,11 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3980(struct filter_t* f,
         /* Update the adaption coefficients */
         absres = (res < 0 ? -res : res);
 
-        if (absres > (f->avg * 3))
+        if (UNLIKELY(absres > (f->avg * 3)))
             *f->adaptcoeffs = ((res >> 25) & 64) - 32;
         else if (absres > (f->avg * 4) / 3)
             *f->adaptcoeffs = ((res >> 26) & 32) - 16;
-        else if (absres > 0)
+        else if (LIKELY(absres > 0))
             *f->adaptcoeffs = ((res >> 27) & 16) - 8;
         else
             *f->adaptcoeffs = 0;
@@ -154,7 +156,7 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3980(struct filter_t* f,
         f->adaptcoeffs++;
 
         /* Have we filled the history buffer? */
-        if (f->delay == f->history_end) {
+        if (UNLIKELY(f->delay == f->history_end)) {
             memmove(f->coeffs + ORDER, f->delay - (ORDER*2),
                     (ORDER*2) * sizeof(filter_int));
             f->adaptcoeffs = f->coeffs + ORDER*2;
@@ -172,14 +174,16 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3970(struct filter_t* f,
     PREPARE_SCALARPRODUCT
 #endif
 
-    while(count--)
+    while(LIKELY(count--))
     {
         res = FP_TO_INT(scalarproduct(f->coeffs, f->delay - ORDER));
 
-        if (*data < 0)
-            vector_add(f->coeffs, f->adaptcoeffs - ORDER);
-        else if (*data > 0)
-            vector_sub(f->coeffs, f->adaptcoeffs - ORDER);
+        if (LIKELY(*data != 0)) {
+            if (*data < 0)
+                vector_add(f->coeffs, f->adaptcoeffs - ORDER);
+            else
+                vector_sub(f->coeffs, f->adaptcoeffs - ORDER);
+        }
 
         /* Convert res from (32-FRACBITS).FRACBITS fixed-point format to an
            integer (rounding to nearest) and add the input value to
@@ -199,7 +203,7 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3970(struct filter_t* f,
         f->adaptcoeffs++;
 
         /* Have we filled the history buffer? */
-        if (f->delay == f->history_end) {
+        if (UNLIKELY(f->delay == f->history_end)) {
             memmove(f->coeffs + ORDER, f->delay - (ORDER*2),
                     (ORDER*2) * sizeof(filter_int));
             f->adaptcoeffs = f->coeffs + ORDER*2;

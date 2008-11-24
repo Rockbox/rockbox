@@ -75,7 +75,7 @@ int ICODE_ATTR_DEMAC predictor_decode_stereo(struct predictor_t* p,
 {
     int32_t predictionA, predictionB; 
 
-    while (count--)
+    while (LIKELY(count--))
     {
         /* Predictor Y */
         p->buf[YDELAYA] = p->YlastA;
@@ -134,60 +134,66 @@ int ICODE_ATTR_DEMAC predictor_decode_stereo(struct predictor_t* p,
         p->XlastA = *decoded1 + ((predictionA + (predictionB >> 1)) >> 10); 
         p->XfilterA =  p->XlastA + ((p->XfilterA * 31) >> 5);
 
-        if (*decoded0 > 0) 
+        if (LIKELY(*decoded0 != 0))
         {
-            p->YcoeffsA[0] -= p->buf[YADAPTCOEFFSA];
-            p->YcoeffsA[1] -= p->buf[YADAPTCOEFFSA-1];
-            p->YcoeffsA[2] -= p->buf[YADAPTCOEFFSA-2];
-            p->YcoeffsA[3] -= p->buf[YADAPTCOEFFSA-3];
+            if (*decoded0 > 0)
+            {
+                p->YcoeffsA[0] -= p->buf[YADAPTCOEFFSA];
+                p->YcoeffsA[1] -= p->buf[YADAPTCOEFFSA-1];
+                p->YcoeffsA[2] -= p->buf[YADAPTCOEFFSA-2];
+                p->YcoeffsA[3] -= p->buf[YADAPTCOEFFSA-3];
 
-            p->YcoeffsB[0] -= p->buf[YADAPTCOEFFSB];
-            p->YcoeffsB[1] -= p->buf[YADAPTCOEFFSB-1];
-            p->YcoeffsB[2] -= p->buf[YADAPTCOEFFSB-2];
-            p->YcoeffsB[3] -= p->buf[YADAPTCOEFFSB-3];
-            p->YcoeffsB[4] -= p->buf[YADAPTCOEFFSB-4];
-        }
-        else if (*decoded0 < 0) 
-        {
-            p->YcoeffsA[0] += p->buf[YADAPTCOEFFSA];
-            p->YcoeffsA[1] += p->buf[YADAPTCOEFFSA-1];
-            p->YcoeffsA[2] += p->buf[YADAPTCOEFFSA-2];
-            p->YcoeffsA[3] += p->buf[YADAPTCOEFFSA-3];
+                p->YcoeffsB[0] -= p->buf[YADAPTCOEFFSB];
+                p->YcoeffsB[1] -= p->buf[YADAPTCOEFFSB-1];
+                p->YcoeffsB[2] -= p->buf[YADAPTCOEFFSB-2];
+                p->YcoeffsB[3] -= p->buf[YADAPTCOEFFSB-3];
+                p->YcoeffsB[4] -= p->buf[YADAPTCOEFFSB-4];
+            }
+            else
+            {
+                p->YcoeffsA[0] += p->buf[YADAPTCOEFFSA];
+                p->YcoeffsA[1] += p->buf[YADAPTCOEFFSA-1];
+                p->YcoeffsA[2] += p->buf[YADAPTCOEFFSA-2];
+                p->YcoeffsA[3] += p->buf[YADAPTCOEFFSA-3];
 
-            p->YcoeffsB[0] += p->buf[YADAPTCOEFFSB];
-            p->YcoeffsB[1] += p->buf[YADAPTCOEFFSB-1];
-            p->YcoeffsB[2] += p->buf[YADAPTCOEFFSB-2];
-            p->YcoeffsB[3] += p->buf[YADAPTCOEFFSB-3];
-            p->YcoeffsB[4] += p->buf[YADAPTCOEFFSB-4];
+                p->YcoeffsB[0] += p->buf[YADAPTCOEFFSB];
+                p->YcoeffsB[1] += p->buf[YADAPTCOEFFSB-1];
+                p->YcoeffsB[2] += p->buf[YADAPTCOEFFSB-2];
+                p->YcoeffsB[3] += p->buf[YADAPTCOEFFSB-3];
+                p->YcoeffsB[4] += p->buf[YADAPTCOEFFSB-4];
+            }
         }
 
         *(decoded0++) = p->YfilterA;
 
-        if (*decoded1 > 0) 
+        if (LIKELY(*decoded1 != 0))
         {
-            p->XcoeffsA[0] -= p->buf[XADAPTCOEFFSA];
-            p->XcoeffsA[1] -= p->buf[XADAPTCOEFFSA-1];
-            p->XcoeffsA[2] -= p->buf[XADAPTCOEFFSA-2];
-            p->XcoeffsA[3] -= p->buf[XADAPTCOEFFSA-3];
+            if (*decoded1 > 0)
+            {
+                p->XcoeffsA[0] -= p->buf[XADAPTCOEFFSA];
+                p->XcoeffsA[1] -= p->buf[XADAPTCOEFFSA-1];
+                p->XcoeffsA[2] -= p->buf[XADAPTCOEFFSA-2];
+                p->XcoeffsA[3] -= p->buf[XADAPTCOEFFSA-3];
 
-            p->XcoeffsB[0] -= p->buf[XADAPTCOEFFSB];
-            p->XcoeffsB[1] -= p->buf[XADAPTCOEFFSB-1];
-            p->XcoeffsB[2] -= p->buf[XADAPTCOEFFSB-2];
-            p->XcoeffsB[3] -= p->buf[XADAPTCOEFFSB-3];
-            p->XcoeffsB[4] -= p->buf[XADAPTCOEFFSB-4];
-        }
-        else if (*decoded1 < 0) 
-        {
-            p->XcoeffsA[0] += p->buf[XADAPTCOEFFSA];
-            p->XcoeffsA[1] += p->buf[XADAPTCOEFFSA-1];
-            p->XcoeffsA[2] += p->buf[XADAPTCOEFFSA-2];
-            p->XcoeffsA[3] += p->buf[XADAPTCOEFFSA-3];
+                p->XcoeffsB[0] -= p->buf[XADAPTCOEFFSB];
+                p->XcoeffsB[1] -= p->buf[XADAPTCOEFFSB-1];
+                p->XcoeffsB[2] -= p->buf[XADAPTCOEFFSB-2];
+                p->XcoeffsB[3] -= p->buf[XADAPTCOEFFSB-3];
+                p->XcoeffsB[4] -= p->buf[XADAPTCOEFFSB-4];
+            }
+            else
+            {
+                p->XcoeffsA[0] += p->buf[XADAPTCOEFFSA];
+                p->XcoeffsA[1] += p->buf[XADAPTCOEFFSA-1];
+                p->XcoeffsA[2] += p->buf[XADAPTCOEFFSA-2];
+                p->XcoeffsA[3] += p->buf[XADAPTCOEFFSA-3];
 
-            p->XcoeffsB[0] += p->buf[XADAPTCOEFFSB];
-            p->XcoeffsB[1] += p->buf[XADAPTCOEFFSB-1];
-            p->XcoeffsB[2] += p->buf[XADAPTCOEFFSB-2];
-            p->XcoeffsB[3] += p->buf[XADAPTCOEFFSB-3];
-            p->XcoeffsB[4] += p->buf[XADAPTCOEFFSB-4];
+                p->XcoeffsB[0] += p->buf[XADAPTCOEFFSB];
+                p->XcoeffsB[1] += p->buf[XADAPTCOEFFSB-1];
+                p->XcoeffsB[2] += p->buf[XADAPTCOEFFSB-2];
+                p->XcoeffsB[3] += p->buf[XADAPTCOEFFSB-3];
+                p->XcoeffsB[4] += p->buf[XADAPTCOEFFSB-4];
+            }
         }
 
         *(decoded1++) = p->XfilterA;
@@ -196,7 +202,7 @@ int ICODE_ATTR_DEMAC predictor_decode_stereo(struct predictor_t* p,
         p->buf++;
 
         /* Have we filled the history buffer? */
-        if (p->buf == p->historybuffer + PREDICTOR_HISTORY_SIZE) {
+        if (UNLIKELY(p->buf == p->historybuffer + PREDICTOR_HISTORY_SIZE)) {
             memmove(p->historybuffer, p->buf, 
                     PREDICTOR_SIZE * sizeof(int32_t));
             p->buf = p->historybuffer;
@@ -215,7 +221,7 @@ int ICODE_ATTR_DEMAC predictor_decode_mono(struct predictor_t* p,
 
     currentA = p->YlastA;
 
-    while (count--)
+    while (LIKELY(count--))
     {
         A = *decoded0;
 
@@ -232,25 +238,28 @@ int ICODE_ATTR_DEMAC predictor_decode_mono(struct predictor_t* p,
         p->buf[YADAPTCOEFFSA] = SIGN(p->buf[YDELAYA]);
         p->buf[YADAPTCOEFFSA-1] = SIGN(p->buf[YDELAYA-1]);
         
-        if (A > 0) 
+        if (LIKELY(A != 0))
         {
-            p->YcoeffsA[0] -= p->buf[YADAPTCOEFFSA];
-            p->YcoeffsA[1] -= p->buf[YADAPTCOEFFSA-1];
-            p->YcoeffsA[2] -= p->buf[YADAPTCOEFFSA-2];
-            p->YcoeffsA[3] -= p->buf[YADAPTCOEFFSA-3];
-        }
-        else if (A < 0) 
-        {
-            p->YcoeffsA[0] += p->buf[YADAPTCOEFFSA];
-            p->YcoeffsA[1] += p->buf[YADAPTCOEFFSA-1];
-            p->YcoeffsA[2] += p->buf[YADAPTCOEFFSA-2];
-            p->YcoeffsA[3] += p->buf[YADAPTCOEFFSA-3];
+            if (A > 0)
+            {
+                p->YcoeffsA[0] -= p->buf[YADAPTCOEFFSA];
+                p->YcoeffsA[1] -= p->buf[YADAPTCOEFFSA-1];
+                p->YcoeffsA[2] -= p->buf[YADAPTCOEFFSA-2];
+                p->YcoeffsA[3] -= p->buf[YADAPTCOEFFSA-3];
+            }
+            else
+            {
+                p->YcoeffsA[0] += p->buf[YADAPTCOEFFSA];
+                p->YcoeffsA[1] += p->buf[YADAPTCOEFFSA-1];
+                p->YcoeffsA[2] += p->buf[YADAPTCOEFFSA-2];
+                p->YcoeffsA[3] += p->buf[YADAPTCOEFFSA-3];
+            }
         }
 
         p->buf++;
 
         /* Have we filled the history buffer? */
-        if (p->buf == p->historybuffer + PREDICTOR_HISTORY_SIZE) {
+        if (UNLIKELY(p->buf == p->historybuffer + PREDICTOR_HISTORY_SIZE)) {
             memmove(p->historybuffer, p->buf, 
                     PREDICTOR_SIZE * sizeof(int32_t));
             p->buf = p->historybuffer;
