@@ -252,12 +252,12 @@ endif
 ifdef SIMVER
 
 install:
-	@echo "Installing your build in your archos dir"
+	@echo "Installing your build in your 'simdisk' dir"
 	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
 	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -t \"$(MODELNAME)$$feat\" -i \"$(TARGET_ID)\" -s -r "$(ROOTDIR)" -f 0 $(TARGET) $(BINARY)
 
 fullinstall:
-	@echo "Installing a full setup in your archos dir"
+	@echo "Installing a full setup in your 'simdisk' dir"
 	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
 	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -t \"$(MODELNAME)$$feat\" -i \"$(TARGET_ID)\" -s -r "$(ROOTDIR)" -f 2 $(TARGET) $(BINARY)
 

@@ -423,7 +423,7 @@ sub runone {
     }
 
     if($sim) {
-        system("cp -r .rockbox archos/ >/dev/null");
+        system("cp -r .rockbox simdisk/ >/dev/null");
     }
     else {
         system("$ziptool $output .rockbox $target >/dev/null");

@@ -2132,11 +2132,11 @@ if [ "yes" = "$simulator" ]; then
   # setup compiler and things for simulator
   simcc
 
-  if [ -d "archos" ]; then
-    echo "sub directory archos already present"
+  if [ -d "simdisk" ]; then
+    echo "Subdirectory 'simdisk' already present"
   else
-    mkdir archos
-    echo "created an archos subdirectory for simulating the hard disk"
+    mkdir simdisk
+    echo "Created a 'simdisk' subdirectory for simulating the hard disk"
   fi
 fi
 

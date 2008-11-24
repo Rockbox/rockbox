@@ -144,7 +144,7 @@ void dircache_rename(const char *oldpath, const char *newpath);
 #endif
 
 
-#define SIMULATOR_DEFAULT_ROOT "archos"
+#define SIMULATOR_DEFAULT_ROOT "simdisk"
 extern const char *sim_root_dir;
 
 static int num_openfiles = 0;
@@ -585,7 +585,7 @@ int sim_fsync(int fd)
 #include <dlfcn.h>
 #endif
 
-#define TEMP_CODEC_FILE "archos/_temp_codec%d.dll"
+#define TEMP_CODEC_FILE SIMULATOR_DEFAULT_ROOT "/_temp_codec%d.dll"
 
 void *sim_codec_load_ram(char* codecptr, int size, void **pd)
 {
@@ -657,7 +657,7 @@ void *sim_plugin_load(char *plugin, void **pd)
     char buf[MAX_PATH];
 #endif
 
-    snprintf(path, sizeof(path), "archos%s", plugin);
+    snprintf(path, sizeof(path), SIMULATOR_DEFAULT_ROOT "%s", plugin);
 
     *pd = NULL;
 
