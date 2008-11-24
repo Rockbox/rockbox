@@ -68,9 +68,58 @@ void clickwheel_int(void)
 #endif /* BOOTLOADER */
 
 /* device buttons */
+
+/* device buttons */
 void button_int(void)
 {
+    int dir_save_b = 0;
+    int afsel_save_b = 0;
+    int dir_save_c = 0;
+    int afsel_save_c = 0;
+
     int_btn = BUTTON_NONE;
+
+    /* Save the current direction and afsel */
+    dir_save_b = GPIOB_DIR;
+    afsel_save_b = GPIOB_AFSEL;
+    dir_save_c = GPIOC_DIR;
+    afsel_save_c = GPIOC_AFSEL;
+
+    GPIOB_DIR = 0;
+    GPIOB_AFSEL = 0;
+    GPIOC_DIR = 0;
+    GPIOC_AFSEL = 0;
+
+    /* These should not be needed with button event interupts */
+    /* they are necessary now to clear out lcd data */
+    GPIOC_PIN(0) |= 1;
+    GPIOC_PIN(1) |= 1;
+    GPIOC_PIN(2) |= 1;
+    GPIOC_PIN(3) |= 1;
+    GPIOC_PIN(4) |= 1;
+    GPIOC_PIN(5) |= 1;
+    GPIOC_PIN(6) |= 1;
+    GPIOC_PIN(7) |= 1;
+
+    /* direct GPIO connections */
+    if (GPIOB_PIN(4))
+        int_btn |= BUTTON_POWER;
+    if (!GPIOC_PIN(6))
+        int_btn |= BUTTON_DOWN;
+    if (!GPIOC_PIN(5))
+        int_btn |= BUTTON_RIGHT;
+    if (!GPIOC_PIN(4))
+        int_btn |= BUTTON_SELECT;
+    if (!GPIOC_PIN(3))
+        int_btn |= BUTTON_LEFT;
+    if (!GPIOC_PIN(2))
+        int_btn |= BUTTON_UP;
+
+    /* return to settings needed for lcd */
+    GPIOB_DIR = dir_save_b;
+    GPIOB_AFSEL = afsel_save_b;
+    GPIOC_DIR = dir_save_c;
+    GPIOC_AFSEL = afsel_save_c;
 }
 
 /*
