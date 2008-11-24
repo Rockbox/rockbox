@@ -690,12 +690,13 @@ int sound_val2phys(int setting, int value)
 
     switch(setting)
     {
+#ifdef HAVE_RECORDING
     case SOUND_LEFT_GAIN:
     case SOUND_RIGHT_GAIN:
     case SOUND_MIC_GAIN:
         result = (value - 23) * 15;
         break;
-
+#endif
     default:
         result = value;
         break;
