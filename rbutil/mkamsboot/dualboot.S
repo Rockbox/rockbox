@@ -109,7 +109,7 @@ uclcopy:
 
         cmp   r1, #0
         bne   boot_of
-#elif defined(SANSA_E200V2)
+#elif defined(SANSA_E200V2) || defined(SANSA_FUZE)
         /* LEFT button */
         ldr   r0, =GPIOC
         mov   r1, #0
@@ -132,8 +132,6 @@ uclcopy:
         /* check value read (0 means button pressed) */
         cmp   r2, #0
         beq   boot_of
-#elif defined(SANSA_FUZE)
-        /* no pinout known except A3 */
 #else
         #error No target-specific key check defined!
 #endif
