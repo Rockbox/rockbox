@@ -22,7 +22,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
-*/
+*/          
 
 /* This version fetches data as 32 bit words, and *requires* v1 to be
  * 32 bit aligned, otherwise it will result either in a data abort, or
@@ -44,9 +44,8 @@ static inline void vector_add(int16_t* v1, int16_t* v2)
         "beq     20f                 \n"
 
     "10:                             \n"
-        "ldrh    r4, [%[v2]], #2     \n"
-        "ldr     r5, [%[v2]], #4     \n"
-        "mov     r4, r4, lsl #16     \n"
+        "bic     %[v2], %[v2], #2    \n"
+        "ldmia   %[v2]!, {r4-r5}     \n"
     "1:                              \n"
         ".rept " ADD_SUB_BLOCKS     "\n"
         "ldmia   %[v2]!, {r6-r7}     \n"
@@ -114,9 +113,8 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
         "beq     20f                 \n"
 
     "10:                             \n"
-        "ldrh    r4, [%[v2]], #2     \n"
-        "ldr     r5, [%[v2]], #4     \n"
-        "mov     r4, r4, lsl #16     \n"
+        "bic     %[v2], %[v2], #2    \n"
+        "ldmia   %[v2]!, {r4-r5}     \n"
     "1:                              \n"
         ".rept " ADD_SUB_BLOCKS     "\n"
         "ldmia   %[v2]!, {r6-r7}     \n"
@@ -194,51 +192,48 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "beq     20f                     \n"
 
     "10:                                 \n"
-        "ldrh    r7, [%[v2]], #2         \n"
-        "ldmia   %[v2]!, {r4-r5}         \n"
+        "bic     %[v2], %[v2], #2        \n"
+        "ldmia   %[v2]!, {r5-r7}         \n"
         "ldmia   %[v1]!, {r0-r1}         \n"
-#if ORDER > 32
-        "mov     r7, r7, lsl #16         \n"
     "1:                                  \n"
-        "pkhbt   r8, r4, r7              \n"
-        "ldmia   %[v2]!, {r6-r7}         \n"
+        "pkhbt   r8, r6, r5              \n"
+        "ldmia   %[v2]!, {r4-r5}         \n"
+#if ORDER > 32
         "smladx  %[res], r0, r8, %[res]  \n"
 #else
-        "pkhbt   r8, r4, r7, lsl #16     \n"
-        "ldmia   %[v2]!, {r6-r7}         \n"
         "smuadx  %[res], r0, r8          \n"
 #endif
         ".rept " MLA_BLOCKS             "\n"
-        "pkhbt   r8, r5, r4              \n"
+        "pkhbt   r8, r7, r6              \n"
         "ldmia   %[v1]!, {r2-r3}         \n"
         "smladx  %[res], r1, r8, %[res]  \n"
-        "pkhbt   r8, r6, r5              \n"
-        "ldmia   %[v2]!, {r4-r5}         \n"
-        "smladx  %[res], r2, r8, %[res]  \n"
-        "pkhbt   r8, r7, r6              \n"
-        "ldmia   %[v1]!, {r0-r1}         \n"
-        "smladx  %[res], r3, r8, %[res]  \n"
         "pkhbt   r8, r4, r7              \n"
         "ldmia   %[v2]!, {r6-r7}         \n"
+        "smladx  %[res], r2, r8, %[res]  \n"
+        "pkhbt   r8, r5, r4              \n"
+        "ldmia   %[v1]!, {r0-r1}         \n"
+        "smladx  %[res], r3, r8, %[res]  \n"
+        "pkhbt   r8, r6, r5              \n"
+        "ldmia   %[v2]!, {r4-r5}         \n"
         "smladx  %[res], r0, r8, %[res]  \n"
         ".endr                           \n"
 
-        "pkhbt   r8, r5, r4              \n"
+        "pkhbt   r8, r7, r6              \n"
         "ldmia   %[v1]!, {r2-r3}         \n"
         "smladx  %[res], r1, r8, %[res]  \n"
-        "pkhbt   r8, r6, r5              \n"
+        "pkhbt   r8, r4, r7              \n"
 #if ORDER > 32
         "subs    %[cnt], %[cnt], #1      \n"
-        "ldmneia %[v2]!, {r4-r5}         \n"
+        "ldmneia %[v2]!, {r6-r7}         \n"
         "smladx  %[res], r2, r8, %[res]  \n"
-        "pkhbt   r8, r7, r6              \n"
+        "pkhbt   r8, r5, r4              \n"
         "ldmneia %[v1]!, {r0-r1}         \n"
         "smladx  %[res], r3, r8, %[res]  \n"
         "bne     1b                      \n"
 #else
-        "pkhbt   r7, r7, r6              \n"
+        "pkhbt   r5, r5, r4              \n"
         "smladx  %[res], r2, r8, %[res]  \n"
-        "smladx  %[res], r3, r7, %[res]  \n"
+        "smladx  %[res], r3, r5, %[res]  \n"
 #endif
         "b       99f                     \n"
 
