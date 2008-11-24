@@ -139,9 +139,9 @@ void* main(void)
     printf("reading: %x", (START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK)*512);
 #endif
 
-    storage_read_sectors(IF_MV2(0,) 
-                        pinfo->start + START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK,
-                        1 , sector);
+    storage_read_sectors(0,
+                         pinfo->start + START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK,
+                         1 , sector);
     crc32 = chksum_crc32 (sector, 512);
 
 #if 0 /* not needed in release builds */
@@ -161,7 +161,7 @@ void* main(void)
         /* E200R bootloader detected - patch it */
         memcpy(&sector[HACK_OFFSET], changedBytes,
                 sizeof(changedBytes)/sizeof(*changedBytes));
-        storage_write_sectors(IF_MV2(0,) 
+        storage_write_sectors(0,
                         pinfo->start + START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK,
                         1 , sector);
         printf("Firmware unlocked");
