@@ -18,7 +18,7 @@
 #define O_BINARY 0
 #endif
 
-#define CODEPAGE_DIR    "/.rockbox/codepages"
+#define CODEPAGE_DIR    ROCKBOX_DIR"/codepages"
 static int default_codepage = 0;
 static int loaded_cp_table = 0;
 

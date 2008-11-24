@@ -15,6 +15,8 @@ use_logf="#undef ROCKBOX_HAS_LOGF"
 
 scriptver=`echo '$Revision$' | sed -e 's:\\$::g' -e 's/Revision: //'`
 
+rbdir=".rockbox"
+
 #
 # Begin Function Definitions
 #
@@ -607,6 +609,13 @@ cat <<EOF
 
     --type=TYPE       Sets the build type. The shortcut is also valid.
                       Run without this option to see available types.
+
+    --rbdir=dir       Use alternative rockbox directory (default: ${rbdir}).
+                      This is useful for having multiple alternate builds on
+                      your device that you can load with ROLO. However as the
+                      bootloader looks for .rockbox you won't be able to boot
+                      into this build.
+
     --ccache          Enable ccache use (done by default these days)
     --no-ccache       Disable ccache use
     --help            Shows this message (must not be used with other options)
@@ -2272,11 +2281,17 @@ else
   defendian="ROCKBOX_LITTLE_ENDIAN"
 fi
 
+if [ "1" != `parse_args --rbdir` ]; then
+  rbdir=`parse_args --rbdir`;
+  echo "Using alternate rockbox dir: ${rbdir}"
+fi
+
 sed > autoconf.h \
  -e "s,@ENDIAN@,${defendian},g" \
  -e "s,^#undef ROCKBOX_HAS_LOGF,$use_logf,g" \
  -e "s,@config_rtc@,$config_rtc,g" \
  -e "s,@have_rtc_alarm@,$have_rtc_alarm,g" \
+ -e "s,@RBDIR@,${rbdir},g" \
 <<EOF
 /* This header was made by configure */
 #ifndef __BUILD_AUTOCONF_H
@@ -2291,6 +2306,9 @@ sed > autoconf.h \
 /* optional defines for RTC mod for h1x0 */
 @config_rtc@
 @have_rtc_alarm@
+
+/* root of Rockbox */
+#define ROCKBOX_DIR "/@RBDIR@"
 
 #endif /* __BUILD_AUTOCONF_H */
 EOF
@@ -2384,6 +2402,7 @@ sed > Makefile \
  -e "s,@VOICETOOLSET@,${voicetoolset},g" \
  -e "s,@LANGS@,${buildlangs},g" \
  -e "s,@USE_ELF@,${USE_ELF},g" \
+ -e "s,@RBDIR@,${rbdir},g" \
 <<EOF
 ## Automatically generated. http://www.rockbox.org/
 
@@ -2446,6 +2465,7 @@ export TTS_ENGINE=@TTS_ENGINE@
 export ENC_OPTS=@ENC_OPTS@
 export ENCODER=@ENCODER@
 export USE_ELF=@USE_ELF@
+export RBDIR=@RBDIR@
 
 include \$(TOOLSDIR)/root.make
 

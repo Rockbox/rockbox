@@ -27,8 +27,7 @@
 
 #define DIRCACHE_RESERVE  (1024*64)
 #define DIRCACHE_LIMIT    (1024*1024*6)
-/* FIXME: We should use ROCKBOX_DIR here but it's defined in apps/ */
-#define DIRCACHE_FILE     "/.rockbox/dircache.dat"
+#define DIRCACHE_FILE     ROCKBOX_DIR"/dircache.dat"
 
 #define DIRCACHE_APPFLAG_TAGCACHE  0x0001
 

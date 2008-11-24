@@ -443,7 +443,7 @@ static char *get_image_filename(const char *start, const char* bmpdir,
 {
     const char *end = strchr(start, '|');
 
-    if ( !end || (end - start) >= (buf_size - ROCKBOX_DIR_LEN - 2) )
+    if ( !end || (end - start) >= (buf_size - (int)ROCKBOX_DIR_LEN - 2) )
     {
         buf = "\0";
         return NULL;

@@ -57,9 +57,14 @@ struct opt_items {
 #define ROCKBOX_DIR "."
 #define ROCKBOX_DIR_LEN 1
 #else
-#define ROCKBOX_DIR "/.rockbox"
-#define ROCKBOX_DIR_LEN 9
+
+/* ROCKBOX_DIR is now defined in autoconf.h for flexible build types */
+#ifndef ROCKBOX_DIR
+#error ROCKBOX_DIR not defined (should be in autoconf.h)
 #endif
+#define ROCKBOX_DIR_LEN sizeof(ROCKBOX_DIR)
+#endif
+
 
 #define FONT_DIR    ROCKBOX_DIR "/fonts"
 #define LANG_DIR    ROCKBOX_DIR "/langs"

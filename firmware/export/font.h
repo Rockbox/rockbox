@@ -50,7 +50,7 @@
 #define FONT_HEADER_SIZE 36
 #endif
 
-#define GLYPH_CACHE_FILE "/.rockbox/.glyphcache"
+#define GLYPH_CACHE_FILE ROCKBOX_DIR"/.glyphcache"
 
 /*
  * Fonts are specified by number, and used for display
