@@ -28,12 +28,14 @@
 
 static volatile bool _lcd_on = false;
 static volatile bool lcd_poweroff = false;
+static struct mutex lcd_mtx;
 
 /* LCD init */
 void lcd_init_device(void)
 {
     lcd_init_controller();
     _lcd_on = true;
+    mutex_init(&lcd_mtx);
 }
 
 void lcd_enable(bool state)
@@ -57,6 +59,8 @@ bool lcd_enabled(void)
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
+    mutex_lock(&lcd_mtx);
+    
     lcd_set_target(x, y, width, height);
     
     REG_DMAC_DCCSR(DMA_LCD_CHANNEL) = 0;
@@ -83,6 +87,8 @@ void lcd_update_rect(int x, int y, int width, int height)
     
     while(REG_SLCD_STATE & SLCD_STATE_BUSY);
     REG_SLCD_CTRL = 0;
+    
+    mutex_unlock(&lcd_mtx);
 }
 
 /* Update the display.
