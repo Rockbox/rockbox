@@ -53,33 +53,43 @@ const struct sound_settings_info audiohw_settings[] = {
 
 /* Init values/shadows
  * Ignore bit 8 since that only specifies "both" for updating
- * gains */
-static unsigned char wm8731_regs[7] =
+ * gains - "RESET" (15h) not included */
+static unsigned char wm8731_regs[WM8731_NUM_REGS] =
 {
-    [LINVOL]     = LINVOL_LINMUTE,
-    [RINVOL]     = RINVOL_RINMUTE,
-    [LOUTVOL]    = ROUTVOL_RZCEN,
-    [ROUTVOL]    = ROUTVOL_RZCEN,
-    [AAPCTRL]    = AAPCTRL_MUTEMIC | AAPCTRL_DACSEL,
-    [DAPCTRL]    = DAPCTRL_DACMU,
-    [PDCTRL]     = PDCTRL_LINEINPD | PDCTRL_MICPD | PDCTRL_ADCPD |
-                   PDCTRL_OUTPD | PDCTRL_OSCPD | PDCTRL_CLKOUTPD,
+    [LINVOL]     = 0x97,
+    [RINVOL]     = 0x97,
+    [LOUTVOL]    = 0x79 | ROUTVOL_RZCEN,
+    [ROUTVOL]    = 0x79 | ROUTVOL_RZCEN,
+    [AAPCTRL]    = 0x0a,
+    [DAPCTRL]    = 0x08,
+    [PDCTRL]     = 0x9f,
+    [AINTFCE]    = 0x0a,
+    [SAMPCTRL]   = 0x00,
+    [ACTIVECTRL] = 0x00,
 };
 
 static void wm8731_write(int reg, unsigned val)
 {
+    if ((unsigned)reg >= WM8731_NUM_REGS)
+        return;
+
     wm8731_regs[reg] = (unsigned char)val;
     wmcodec_write(reg, val);
 }
 
-static void wm8731_write_and(int reg, unsigned bits)
-{
-    wm8731_write(reg, wm8731_regs[reg] & bits);
-}
-
-static void wm8731_write_or(int reg, unsigned bits)
+static void wm8731_set(int reg, unsigned bits)
 {
     wm8731_write(reg, wm8731_regs[reg] | bits);
+}
+
+static void wm8731_clear(int reg, unsigned bits)
+{
+    wm8731_write(reg, wm8731_regs[reg] & ~bits);
+}
+
+static void wm8731_write_masked(int reg, unsigned bits, unsigned mask)
+{
+    wm8731_write(reg, (wm8731_regs[reg] & ~mask) | (bits & mask));
 }
 
 /* convert tenth of dB volume (-730..60) to master volume register value */
@@ -125,17 +135,17 @@ void audiohw_mute(bool mute)
 {
     if (mute) {
         /* Set DACMU = 1 to soft-mute the audio DACs. */
-        wm8731_write_or(DAPCTRL, DAPCTRL_DACMU);
+        wm8731_set(DAPCTRL, DAPCTRL_DACMU);
     } else {
         /* Set DACMU = 0 to soft-un-mute the audio DACs. */
-        wm8731_write_and(DAPCTRL, ~DAPCTRL_DACMU);
+        wm8731_clear(DAPCTRL, DAPCTRL_DACMU);
     }
 }
 
 static void codec_set_active(int active)
 {
     /* set active to 0x0 or 0x1 */
-    wmcodec_write(ACTIVECTRL, active ? ACTIVECTRL_ACTIVE : 0);
+    wm8731_write(ACTIVECTRL, active ? ACTIVECTRL_ACTIVE : 0);
 }
 
 void audiohw_preinit(void)
@@ -150,23 +160,22 @@ void audiohw_preinit(void)
 
     /* 2) Set all required bits in the Power Down register (0Ch) to '0';
      *    EXCEPT the OUTPD bit, this should be set to '1' (Default). */
-    wm8731_write(PDCTRL, wm8731_regs[PDCTRL]);
+    wm8731_clear(PDCTRL, PDCTRL_DACPD | PDCTRL_POWEROFF);
 
     /* 3) Set required values in all other registers except 12h (Active). */
-    wmcodec_write(AINTFCE, AINTFCE_FORMAT_I2S | AINTFCE_IWL_16BIT |
-#ifdef CODEC_SLAVE
-                           0);
-#else
-                           AINTFCE_MS);
+    wm8731_write(AINTFCE,
+#ifndef CODEC_SLAVE
+                 AINTFCE_MS |
 #endif
-    wm8731_write(AAPCTRL, wm8731_regs[AAPCTRL]);
-    wm8731_write(DAPCTRL, wm8731_regs[DAPCTRL]);
-    wmcodec_write(SAMPCTRL, WM8731_USB24_44100HZ);
+                 AINTFCE_FORMAT_I2S | AINTFCE_IWL_16BIT);
+
+    wm8731_set(AAPCTRL, AAPCTRL_DACSEL);
+    wm8731_write(SAMPCTRL, WM8731_USB24_44100HZ);
 
     /* 5) The last write of the sequence should be setting OUTPD to '0'
      *    (active) in register 0Ch, enabling the DAC signal path, free
      *     of any significant power-up noise. */
-    wm8731_write_and(PDCTRL, ~PDCTRL_OUTPD);
+    wm8731_clear(PDCTRL, PDCTRL_OUTPD);
 }
 
 void audiohw_postinit(void)
@@ -180,7 +189,7 @@ void audiohw_postinit(void)
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
     /* We need to enable bit 4 of GPIOL for output for sound on H10 */
-    GPIOL_OUTPUT_VAL |= 0x10;
+    GPIO_SET_BITWISE(GPIOL_OUTPUT_VAL, 0x10);
 #endif
 }
 
@@ -191,8 +200,8 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
     /* 1111001 == 0dB */
     /* 0110000 == -73dB */
     /* 0101111 == mute (0x2f) */
-    wm8731_write(LOUTVOL, LOUTVOL_LZCEN | (vol_l & LOUTVOL_LHPVOL_MASK));
-    wm8731_write(ROUTVOL, ROUTVOL_RZCEN | (vol_r & ROUTVOL_RHPVOL_MASK));
+    wm8731_write_masked(LOUTVOL, vol_l, LOUTVOL_LHPVOL_MASK);
+    wm8731_write_masked(ROUTVOL, vol_r, ROUTVOL_RHPVOL_MASK);
 }
 
 /* Nice shutdown of WM8731 codec */
@@ -200,13 +209,14 @@ void audiohw_close(void)
 {
     /* POWER DOWN SEQUENCE */
     /* 1) Set the OUTPD bit to '1' (power down). */
-    wm8731_write_or(PDCTRL, PDCTRL_OUTPD);
+    wm8731_set(PDCTRL, PDCTRL_OUTPD);
     /* 2) Remove the WM8731 supplies. */
 }
 
 void audiohw_set_sample_rate(int sampling_control)
 {
     int rate = 0;
+
     switch(sampling_control)
     {
         case SAMPR_96:
@@ -228,44 +238,44 @@ void audiohw_set_sample_rate(int sampling_control)
             rate = WM8731_USB24_8000HZ;
             break;
     }
+
     codec_set_active(false);
-    wmcodec_write(SAMPCTRL, rate);
+    wm8731_write(SAMPCTRL, rate);
     codec_set_active(true);
 }
 
 #ifdef HAVE_RECORDING
 void audiohw_enable_recording(bool source_mic)
 {
-    codec_set_active(false);
-
-    wm8731_regs[PDCTRL] &= ~PDCTRL_ADCPD;
     /* NOTE: When switching to digital monitoring we will not want
      * the DAC disabled. */
-    wm8731_regs[PDCTRL] |= PDCTRL_DACPD;
-    wm8731_regs[AAPCTRL] &= ~AAPCTRL_DACSEL;
+
+    codec_set_active(false);
 
     if (source_mic) {
-        wm8731_write_or(LINVOL, LINVOL_LINMUTE);
-        wm8731_write_or(RINVOL, RINVOL_RINMUTE);
-        wm8731_regs[PDCTRL] &= ~PDCTRL_MICPD;
-        wm8731_regs[PDCTRL] |= PDCTRL_LINEINPD;
-        wm8731_regs[AAPCTRL] |= AAPCTRL_INSEL | AAPCTRL_SIDETONE;
-        wm8731_regs[AAPCTRL] &= ~(AAPCTRL_MUTEMIC | AAPCTRL_BYPASS);
+        wm8731_set(LINVOL, LINVOL_LINMUTE);
+        wm8731_set(RINVOL, RINVOL_RINMUTE);
+
+        wm8731_write_masked(PDCTRL, PDCTRL_LINEINPD | PDCTRL_DACPD,
+                            PDCTRL_LINEINPD | PDCTRL_MICPD |
+                            PDCTRL_ADCPD | PDCTRL_DACPD);
+        wm8731_write_masked(AAPCTRL, AAPCTRL_INSEL | AAPCTRL_SIDETONE,
+                            AAPCTRL_MUTEMIC | AAPCTRL_INSEL |
+                            AAPCTRL_BYPASS | AAPCTRL_DACSEL |
+                            AAPCTRL_SIDETONE);
     } else {
-        wm8731_regs[PDCTRL] |= PDCTRL_MICPD;
-        wm8731_regs[PDCTRL] &= ~PDCTRL_LINEINPD;
-        wm8731_regs[AAPCTRL] |= AAPCTRL_MUTEMIC | AAPCTRL_BYPASS;
-        wm8731_regs[AAPCTRL] &= ~(AAPCTRL_INSEL | AAPCTRL_SIDETONE);
+        wm8731_write_masked(PDCTRL, PDCTRL_MICPD | PDCTRL_DACPD,
+                            PDCTRL_LINEINPD | PDCTRL_MICPD |
+                            PDCTRL_ADCPD | PDCTRL_DACPD);
+        wm8731_write_masked(AAPCTRL, AAPCTRL_MUTEMIC | AAPCTRL_BYPASS,
+                            AAPCTRL_MUTEMIC | AAPCTRL_INSEL |
+                            AAPCTRL_BYPASS | AAPCTRL_DACSEL |
+                            AAPCTRL_SIDETONE);
+
+        wm8731_clear(LINVOL, LINVOL_LINMUTE);
+        wm8731_clear(RINVOL, RINVOL_RINMUTE);
     }
 
-    wm8731_write(PDCTRL, wm8731_regs[PDCTRL]);
-    wm8731_write(AAPCTRL, wm8731_regs[AAPCTRL]);
-
-    if (!source_mic) {
-        wm8731_write_and(LINVOL, ~LINVOL_LINMUTE);
-        wm8731_write_and(RINVOL, ~RINVOL_RINMUTE);
-    }
-    
     codec_set_active(true);
 }
 
@@ -273,23 +283,22 @@ void audiohw_disable_recording(void)
 {
     codec_set_active(false);
 
-    /* Mute inputs */
-    wm8731_write_or(LINVOL, LINVOL_LINMUTE);
-    wm8731_write_or(RINVOL, RINVOL_RINMUTE);
-    wm8731_write_or(AAPCTRL, AAPCTRL_MUTEMIC);
+    /* Mute line inputs */
+    wm8731_set(LINVOL, LINVOL_LINMUTE);
+    wm8731_set(RINVOL, RINVOL_RINMUTE);
+    wm8731_set(AAPCTRL, AAPCTRL_MUTEMIC);
 
     /* Turn off input analog audio paths */
-    wm8731_regs[AAPCTRL] &= ~(AAPCTRL_BYPASS | AAPCTRL_SIDETONE);
-    wm8731_write(AAPCTRL, wm8731_regs[AAPCTRL]);
+    wm8731_clear(AAPCTRL, AAPCTRL_BYPASS | AAPCTRL_SIDETONE);
 
     /* Set power config */
-    wm8731_regs[PDCTRL] &= ~PDCTRL_DACPD;
-    wm8731_regs[PDCTRL] |= PDCTRL_MICPD | PDCTRL_LINEINPD |
-                           PDCTRL_ADCPD;
-    wm8731_write(PDCTRL, wm8731_regs[PDCTRL]);
+    wm8731_write_masked(PDCTRL,
+                        PDCTRL_LINEINPD | PDCTRL_MICPD | PDCTRL_ADCPD,
+                        PDCTRL_LINEINPD | PDCTRL_MICPD | PDCTRL_DACPD |
+                        PDCTRL_ADCPD);
 
     /* Select DAC */
-    wm8731_write_or(AAPCTRL, AAPCTRL_DACSEL);
+    wm8731_set(AAPCTRL, AAPCTRL_DACSEL);
 
     codec_set_active(true);
 }
@@ -300,17 +309,15 @@ void audiohw_set_recvol(int left, int right, int type)
     {
     case AUDIO_GAIN_MIC:
         if (left > 0) {
-            wm8731_write_or(AAPCTRL, AAPCTRL_MIC_BOOST);
+            wm8731_set(AAPCTRL, AAPCTRL_MIC_BOOST);
         }
         else {
-            wm8731_write_and(AAPCTRL, ~AAPCTRL_MIC_BOOST);
+            wm8731_clear(AAPCTRL, AAPCTRL_MIC_BOOST);
         }
         break;
     case AUDIO_GAIN_LINEIN:
-        wm8731_regs[LINVOL] &= ~LINVOL_MASK;
-        wm8731_write(LINVOL, wm8731_regs[LINVOL] | (left & LINVOL_MASK));
-        wm8731_regs[RINVOL] &= ~RINVOL_MASK;
-        wm8731_write(RINVOL, wm8731_regs[RINVOL] | (right & RINVOL_MASK));
+        wm8731_write_masked(LINVOL, left, LINVOL_MASK);
+        wm8731_write_masked(RINVOL, right, RINVOL_MASK);
         break;
     default:
         return;
@@ -319,14 +326,13 @@ void audiohw_set_recvol(int left, int right, int type)
 
 void audiohw_set_monitor(bool enable)
 {
-    if(enable)
-    {
-        wm8731_write_and(PDCTRL, ~PDCTRL_LINEINPD);
-        wm8731_write_or(AAPCTRL, AAPCTRL_BYPASS);
+    if(enable) {
+        wm8731_clear(PDCTRL, PDCTRL_LINEINPD);
+        wm8731_set(AAPCTRL, AAPCTRL_BYPASS);
     }
     else {
-        wm8731_write_and(AAPCTRL, ~AAPCTRL_BYPASS);
-        wm8731_write_or(PDCTRL, PDCTRL_LINEINPD);
+        wm8731_clear(AAPCTRL, AAPCTRL_BYPASS);
+        wm8731_set(PDCTRL, PDCTRL_LINEINPD);
     }
 }
 #endif /* HAVE_RECORDING */

@@ -122,6 +122,8 @@ extern void audiohw_set_sample_rate(int sampling_control);
 #define RESET                   0x0f
 #define RESET_RESET             0x0
 
+#define WM8731_NUM_REGS         0x0a /* RESET not included */
+
 /* SAMPCTRL values for the supported samplerates (24MHz MCLK/USB): */
 #define WM8731_USB24_8000HZ     0x4d
 #define WM8731_USB24_32000HZ    0x59
