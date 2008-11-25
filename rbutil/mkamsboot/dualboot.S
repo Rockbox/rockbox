@@ -119,7 +119,7 @@ uclcopy:
         cmp   r1, #0             /* C3 = #0 means button pressed */
         beq   boot_of
 #elif defined(SANSA_M200V4)
-        /* SELECT button */
+        /* LEFT button */
 .set row, (1<<5) /* enable output on A5 */
         ldr   r0, =GPIOA
         mov   r1, #row
@@ -129,9 +129,9 @@ uclcopy:
 .set col, (1<<0) /* read keyscan column A0 */
         ldr   r2, [r0, #(4*col)]
 
-        /* check value read (0 means button pressed) */
+        /* check value read (1 means button pressed) */
         cmp   r2, #0
-        beq   boot_of
+        bne   boot_of
 #else
         #error No target-specific key check defined!
 #endif
