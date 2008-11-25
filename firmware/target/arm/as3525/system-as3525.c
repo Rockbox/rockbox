@@ -24,6 +24,7 @@
 #include "system.h"
 #include "panic.h"
 #include "ascodec-target.h"
+#include "dma-target.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -174,7 +175,7 @@ static void sdram_init(void)
 #elif defined(SANSA_E200V2) || defined(SANSA_FUZE)
 /* 16 bits external bus, high performance SDRAM, 64 Mbits = 8 Mbytes */
 #define MEMORY_MODEL 0x5
-    
+
 #else
 #error "The external memory in your player is unknown"
 #endif
@@ -220,9 +221,6 @@ void system_init(void)
     CGU_PROC = (3<<2)|0x01; /* fclk = PLLA*5/8 = 240 MHz */
 
     asm volatile(
-        "mrs r0, cpsr             \n"
-        "orr r0, r0, #0x80        \n" /* disable interrupts */
-        "msr cpsr, r0             \n"
         "mov r0, #0               \n"
         "mcr p15, 0, r0, c7, c7   \n" /* invalidate icache & dcache */
         "mrc p15, 0, r0, c1, c0   \n" /* control register */
@@ -239,15 +237,20 @@ void system_init(void)
     CGU_PERI |= CGU_TIMERIF_CLOCK_ENABLE;
 
     /* enable VIC */
+    VIC_INT_ENABLE = 0; /* disable all interrupt lines */
     CGU_PERI |= CGU_VIC_CLOCK_ENABLE;
     VIC_INT_SELECT = 0; /* only IRQ, no FIQ */
 
+    enable_irq();
 #else
-    /* disable fast hardware power-off, to use power button normally */
+    /* Disable fast hardware power-off, to use power button normally
+     * We don't need the power button in the bootloader. */
     ascodec_init();
     ascodec_write(AS3514_CVDD_DCDC3, ascodec_read(AS3514_CVDD_DCDC3) & (1<<2));
 
 #endif /* BOOTLOADER */
+
+    dma_init();
 }
 
 void system_reboot(void)

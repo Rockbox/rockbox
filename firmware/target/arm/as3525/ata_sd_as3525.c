@@ -32,7 +32,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "as3525.h"
-#include "pl180.h"
+#include "pl180.h"  /* SD controller */
+#include "pl081.h"  /* DMA controller */
+#include "dma-target.h" /* DMA request lines */
 #include "panic.h"
 #include "stdbool.h"
 #include "ata_idle_notify.h"
@@ -71,8 +73,8 @@
 
 #define MCI_FIFO(i)        ((unsigned long *) (pl180_base[i]+0x80))
 /* volumes */
-#define     NAND_AS3525 0   /* embedded SD card */
-#define     SD_AS3525   1   /* SD slot if present */
+#define     INTERNAL_AS3525 0   /* embedded SD card */
+#define     SD_SLOT_AS3525   1   /* SD slot if present */
 
 static const int pl180_base[NUM_VOLUMES] = {
             NAND_FLASH_BASE
@@ -81,6 +83,7 @@ static const int pl180_base[NUM_VOLUMES] = {
 #endif
 };
 
+/* TODO : BLOCK_SIZE != SECTOR_SIZE ? */
 #define BLOCK_SIZE      512
 #define SECTOR_SIZE     512
 
@@ -389,8 +392,8 @@ int sd_init(void)
     CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
 #endif
 
-    init_pl180_controller(NAND_AS3525);
-    ret = sd_init_card(NAND_AS3525);
+    init_pl180_controller(INTERNAL_AS3525);
+    ret = sd_init_card(INTERNAL_AS3525);
     if(ret < 0)
         return ret;
 
@@ -398,8 +401,8 @@ int sd_init(void)
     CCU_IO &= ~8;           /* bits 3:2 = 01, xpd is SD interface */
     CCU_IO |= 4;
 
-    init_pl180_controller(SD_AS3525);
-    sd_init_card(SD_AS3525);
+    init_pl180_controller(SD_SLOT_AS3525);
+    sd_init_card(SD_SLOT_AS3525);
 #endif
 
     queue_init(&sd_queue, true);
@@ -441,40 +444,6 @@ bool sd_present(IF_MV_NONVOID(int drive))
 }
 #endif
 
-int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf)
-{
-    (void)start;
-    (void)count;
-    (void)buf;
-    return -1; /* TODO */
-}
-
-static int sd_poll_status(const int drive, unsigned int trigger, long timeout)
-{
-    long t = current_tick;
-    //int my_next_yield =0;
-    int status;
-
-    while (((status = MCI_STATUS(drive)) & trigger) == 0)
-    {
-        long time = current_tick;
-
-/*
-        if (TIME_AFTER(time, my_next_yield))
-        {
-            long ty = current_tick;
-            yield();
-            timeout += current_tick - ty;
-            my_next_yield = ty + MIN_YIELD_PERIOD;
-        }
-*/
-        if (TIME_AFTER(time, t + timeout))
-            break;
-    }
-
-    return status;
-}
-
 static int sd_wait_for_state(const int drive, unsigned int state)
 {
     unsigned int response = 0;
@@ -484,7 +453,7 @@ static int sd_wait_for_state(const int drive, unsigned int state)
 
     while (1)
     {
-        long us;
+        long tick;
 
         if(!send_cmd(drive, SD_SEND_STATUS, card_info[drive].rca,
                     MCI_RESP|MCI_ARG, &response))
@@ -496,35 +465,30 @@ static int sd_wait_for_state(const int drive, unsigned int state)
         if(TIME_AFTER(current_tick, t + timeout))
             return -1;
 
-        us = current_tick;
-        if (TIME_AFTER(us, next_yield))
+        if (TIME_AFTER((tick = current_tick), next_yield))
         {
             yield();
-            timeout += current_tick - us;
-            next_yield = us + MIN_YIELD_PERIOD;
+            timeout += current_tick - tick;
+            next_yield = tick + MIN_YIELD_PERIOD;
         }
     }
 }
 
-int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
-                     void* inbuf)
+static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
+                               int count, void* buf, bool write)
 {
 #ifndef HAVE_MULTIVOLUME
     const int drive = 0;
 #endif
     int ret;
-    unsigned char *buf_end, *buf = inbuf;
-    int remaining = incount;
-    const unsigned long *fifo_base = MCI_FIFO(drive);
 
     /* skip SanDisk OF */
-    if (drive == NAND_AS3525)
+    if (drive == INTERNAL_AS3525)
 #if defined(SANSA_E200V2) || defined(SANSA_FUZE)
         start += 61440;
 #else
         start += 20480;
 #endif
-    /* TODO: Add DMA support. */
 
     mutex_lock(&sd_mtx);
 
@@ -533,15 +497,15 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     {
         /* no external sd-card inserted */
         ret = -88;
-        goto sd_read_error;
+        goto sd_transfer_error;
     }
 #endif
 
     if (card_info[drive].initialized < 0)
     {
         ret = card_info[drive].initialized;
-        panicf("card not initalised");
-        goto sd_read_error;
+        panicf("card not initialised");
+        goto sd_transfer_error;
     }
 
     last_disk_activity = current_tick;
@@ -550,107 +514,101 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     if (ret < 0)
     {
         panicf("wait for state failed");
-        goto sd_read_error;
+        goto sd_transfer_error;
     }
 
-    disable_irq();  /* FIXME: data transfer is too slow and error prone when
-                     * interrupts are enabled */
-
-    while(remaining)
+    while(count)
     {
         /* 128 * 512 = 2^16, and doesn't fit in the 16 bits of DATA_LENGTH
          * register, so we have to transfer maximum 127 sectors at a time. */
-        int transfer = (remaining >= 128) ? 127 : remaining; /* sectors */
+        unsigned int transfer = (count >= 128) ? 127 : count; /* sectors */
+        const int cmd =
+            write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
 
         if(card_info[drive].ocr & (1<<30) ) /* SDHC */
-            ret = send_cmd(drive, SD_READ_MULTIPLE_BLOCK, start, MCI_ARG, NULL);
+            ret = send_cmd(drive, cmd, start, MCI_ARG, NULL);
         else
-            ret = send_cmd(drive, SD_READ_MULTIPLE_BLOCK, start * BLOCK_SIZE,
+            ret = send_cmd(drive, cmd, start * BLOCK_SIZE,
                     MCI_ARG, NULL);
 
         if (ret < 0)
         {
-            panicf("read multiple blocks failed");
-            goto sd_read_error;
+            panicf("transfer multiple blocks failed");
+            goto sd_transfer_error;
         }
-        /* TODO: Don't assume BLOCK_SIZE == SECTOR_SIZE */
 
+        if(write)
+            dma_enable_channel(0, buf, MCI_FIFO(drive),
+                    (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
+                    DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8);
+        else
+            dma_enable_channel(0, MCI_FIFO(drive), buf,
+                    (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
+                    DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8);
 
         MCI_DATA_TIMER(drive) = 0x1000000; /* FIXME: arbitrary */
         MCI_DATA_LENGTH(drive) = transfer * card_info[drive].block_size;
-        MCI_DATA_CTRL(drive) =  (1<<0) /* enable */ |
-                                (1<<1) /* from card to controller */ |
+        MCI_DATA_CTRL(drive) =  (1<<0) /* enable */                     |
+                                (!write<<1) /* transfer direction */    |
+                                (1<<3) /* DMA */                        |
                                 (9<<4) /* 2^9 = 512 */ ;
 
-        buf_end = buf + transfer * card_info[drive].block_size;
+        while(!dma_finished)
+            yield();
 
-        while(buf < buf_end)
-        {
-            /* Wait for the FIFO to be half full */
-            const int trigger = MCI_RX_FIFO_HALF_FULL|MCI_RX_FIFO_FULL;
-            int controller_status = sd_poll_status(drive, trigger, 100);
-
-            controller_status &= ~(MCI_RX_ACTIVE|MCI_RX_DATA_AVAIL|
-                    MCI_DATA_BLOCK_END|MCI_DATA_END);
-
-            if(!controller_status || (controller_status & ~trigger))
-                panicf("incorrect status 0x%x", controller_status & ~trigger);
-
-            if(((intptr_t)buf & 3) == 0)
-            {   /* aligned destination buffer */
-                asm volatile(
-                    "ldmia %2,  {r0-r7} \n" /* load  8 * 4 bytes */
-                    "stmia %1!, {r0-r7} \n" /* store 8 * 4 bytes */
-                    :"=r"(buf)                /* output */
-                    :"r"(buf), "r"(fifo_base) /* input */
-                    :"r0","r1","r2","r3","r4","r5","r6","r7" /* clobbers */
-                );
-            }
-            else
-            {   /* non aligned destination buffer */
-                int tmp[8];
-                asm volatile(
-                    "ldmia %1,  {r0-r7} \n" /* load  8 * 4 bytes */
-                    "stmia %0,  {r0-r7} \n" /* store 8 * 4 bytes */
-                    :/* no output */
-                    :"r"(tmp), "r"(fifo_base) /* input */
-                    :"r0","r1","r2","r3","r4","r5","r6","r7" /* clobbers */
-                );
-                memcpy(buf, tmp, 32);
-                buf = &buf[32];
-            }
-        }
-
-        remaining -= transfer;
+        buf += transfer * SECTOR_SIZE;
         start += transfer;
+        count -= transfer;
         last_disk_activity = current_tick;
 
         if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_NO_FLAGS, NULL))
         {
             ret = -666;
             panicf("STOP TRANSMISSION failed");
-            goto sd_read_error;
+            goto sd_transfer_error;
         }
 
         ret = sd_wait_for_state(drive, SD_TRAN);
         if (ret < 0)
         {
             panicf(" wait for state TRAN failed");
-            goto sd_read_error;
+            goto sd_transfer_error;
         }
     }
+
     while (1)
     {
         mutex_unlock(&sd_mtx);
 
-        enable_irq();
-
         return ret;
 
-sd_read_error:
-        panicf("read error : %d",ret);
+sd_transfer_error:
+        panicf("transfer error : %d",ret);
         card_info[drive].initialized = 0;
     }
+}
+
+int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count,
+                     void* buf)
+{
+    return sd_transfer_sectors(IF_MV2(drive,) start, count, buf, false);
+}
+
+int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
+                     const void* buf)
+{
+
+#ifdef BOOTLOADER /* we don't need write support in bootloader */
+#ifdef HAVE_MULTIVOLUME
+    (void) drive;
+#endif
+    (void) start;
+    (void) count;
+    (void) buf;
+    return -1;
+#else
+    return sd_transfer_sectors(IF_MV2(drive,) start, count, (void*)buf, true);
+#endif
 }
 
 #ifndef BOOTLOADER

@@ -343,6 +343,7 @@ target/arm/as3525/kernel-as3525.c
 target/arm/as3525/ata_sd_as3525.c
 target/arm/as3525/power-as3525.c
 target/arm/as3525/usb-as3525.c
+target/arm/as3525/dma-pl081.c
 #ifndef BOOTLOADER
 target/arm/adc-as3514.c
 target/arm/as3525/pcm-as3525.c
