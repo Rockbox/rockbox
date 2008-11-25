@@ -654,7 +654,8 @@ static const struct button_mapping iriver_syncaction[] =
 #endif /* IRIVER_H100_PAD||IRIVER_H300_PAD */
 #endif /* #if CONFIG_KEYPAD == ONDIO_PAD */
 
-const struct button_mapping *plugin_contexts[]={
+const struct button_mapping *plugin_contexts[] =
+{
     generic_increase_decrease,
     generic_directions,
 #if CONFIG_KEYPAD == ONDIO_PAD
@@ -691,14 +692,16 @@ int bpm_step_counter = 0;
 #define MET_IS_PLAYING rb->mp3_is_playing()
 #define MET_PLAY_STOP rb->mp3_play_stop()
 
-void callback(unsigned char** start, size_t* size){
+void callback(unsigned char** start, size_t* size)
+{
     (void)start; /* unused parameter, avoid warning */
     *size = 0; /* end of data */
     sound_active = false;
     rb->led(0);
 }
 
-void play_tock(void){
+void play_tock(void)
+{
     sound_active = true;
     rb->led(1);
     rb->mp3_play_data(sound, sizeof(sound), callback);
@@ -711,7 +714,6 @@ void play_tock(void){
 #define MET_PLAY_STOP rb->audio_stop()
 
 
-int tock;
 bool need_to_play = false;
 
 short sndbuf[sizeof(sound)*2];
@@ -726,9 +728,9 @@ void prepare_tock(void)
     }
 }
 
-void play_tock(void) {
+void play_tock(void)
+{
     rb->pcm_play_data(NULL,(unsigned char *)sndbuf,sizeof(sndbuf));
-    tock++;
 }
 
 #endif /* CONFIG_CODEC != SWCODEC */
@@ -795,7 +797,8 @@ void draw_display(void)
 
 /* helper function to change the volume by a certain amount, +/-
    ripped from video.c */
-void change_volume(int delta){
+void change_volume(int delta)
+{
     int minvol = rb->sound_min(SOUND_VOLUME);
     int maxvol = rb->sound_max(SOUND_VOLUME);
     int vol = rb->global_settings->volume + delta;
@@ -810,8 +813,9 @@ void change_volume(int delta){
 }
 
 /*function to accelerate bpm change*/
-void change_bpm(int direction){
-        if((bpm_step_counter < 20)
+void change_bpm(int direction)
+{
+    if((bpm_step_counter < 20)
             || (bpm > 389)
             || (bpm < 10))
         bpm = bpm + direction;
@@ -887,7 +891,8 @@ void tap(void)
     reset_tap = false;
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter){
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+{
     int button;
     enum plugin_status status;
 
