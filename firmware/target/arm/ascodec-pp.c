@@ -66,6 +66,7 @@ void audiohw_init(void)
 
 void ascodec_supressor_on(bool on)
 {
+    /* CHECK: Good for c200 too? */
 #ifdef SANSA_E200
     if (on) {
         /* Set pop prevention */
@@ -74,5 +75,7 @@ void ascodec_supressor_on(bool on)
         /* Release pop prevention */
         GPIO_CLEAR_BITWISE(GPIOG_OUTPUT_VAL, 0x08);
     }
+#else
+    (void)on;
 #endif
 } 
