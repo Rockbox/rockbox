@@ -52,22 +52,17 @@ void main(void)
     ascodec_init();  /* Required for backlight on e200v2 */
     _backlight_on();
 
-#if 0 /* remove me when the bootloader can be considered finished */
+    button_init_device();
     int btn = button_read_device();
 
     /* Enable bootloader messages if any button is pressed */
     if (btn)
-#endif
     {
         lcd_clear_display();
         verbose = true;
     }
 
-    asm volatile(
-            "mrs r0, cpsr             \n"
-            "bic r0, r0, #0x80        \n" /* enable interrupts */
-            "msr cpsr, r0             \n"
-            : : : "r0" );
+    enable_irq();
 
     ret = storage_init();
     if(ret < 0)
@@ -90,11 +85,7 @@ void main(void)
     if(ret < 0)
         error(EBOOTFILE, ret);
 
-    asm volatile(
-            "mrs r0, cpsr             \n"
-            "orr r0, r0, #0x80        \n" /* disable interrupts */
-            "msr cpsr, r0             \n"
-            : : : "r0" );
+    disable_irq(); /* disable irq until we have copied the new vectors */
 
     if (ret == EOK)
     {
