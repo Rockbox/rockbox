@@ -78,6 +78,158 @@ extern void audiohw_set_sample_rate(int sampling_control);
 #define VOLUME_MIN -735
 #define VOLUME_MAX   60
 
+/*** Audio Registers ***/
+
+/* 00h (LINE_OUT_R) to 1Dh (PLLMODE) */
+#define AS3514_NUM_AUDIO_REGS   (0x1e)
+
+/* Common registers masks */
+#define AS3514_VOL_MASK         (0x1f << 0)
+
+/* LINE_OUT_R (0x00) */
+/* Only has volume control bits */
+
+/* LINE_OUT_L (0x01) */
+#define LINE_OUT_L_LO_SES_DM    (0x3 << 6)
+    #define LINE_OUT_L_LO_SES_DM_MUTE   (0x0 << 6)
+    #define LINE_OUT_L_LO_SES_DM_DF_MO  (0x1 << 6)
+    #define LINE_OUT_L_LO_SES_DM_SE_ST  (0x2 << 6)
+/* Use AS3514_VOL_MASK */
+
+/* HPH_OUT_R (0x02) */
+#define HPH_OUT_R_HP_OVC_TO     (0x3 << 6)
+    #define HPH_OUT_R_HP_OVC_TO_0MS     (0x3 << 6)
+    #define HPH_OUT_R_HP_OVC_TO_128MS   (0x1 << 6)
+    #define HPH_OUT_R_HP_OVC_TO_256MS   (0x0 << 6)
+    #define HPH_OUT_R_HP_OVC_TO_512MS   (0x2 << 6)
+/* Use AS3514_VOL_MASK */
+
+/* HPH_OUT_L (0x03) */
+#define HPH_OUT_L_HP_MUTE       (0x1 << 7)
+#define HPH_OUT_L_HP_ON         (0x1 << 6)
+#define HPH_OUT_L_HP_DET_ON     (0x1 << 5)
+/* Use AS3514_VOL_MASK */
+
+/* LSP_OUT_R (0x04) */
+#define LSP_OUT_R_SP_OVC_TO     (0x3 << 6)
+    #define LSP_OUT_R_SP_OVC_TO_256MS (0x0 << 6)
+    #define LSP_OUT_R_SP_OVC_TO_128MS (0x1 << 6)
+    #define LSP_OUT_R_SP_OVC_TO_512MS (0x2 << 6)
+    #define LSP_OUT_R_SP_OVC_TO_0MS   (0x3 << 6)
+/* Use AS3514_VOL_MASK */
+
+/* LSP_OUT_L (0x05) */
+#define LSP_OUT_L_SP_MUTE       (0x1 << 7)
+#define LSP_OUT_L_SP_ON         (0x1 << 6)
+/* Use AS3514_VOL_MASK */
+
+/* MIC1_R (0x06) */
+#define MIC1_R_M1_AGC_off       (0x1 << 7)
+#define MIC1_R_M1_GAIN          (0x3 << 5)
+    #define MIC1_R_M1_GAIN_28DB (0x0 << 5)
+    #define MIC1_R_M1_GAIN_34DB (0x1 << 5)
+    #define MIC1_R_M1_GAIN_40DB (0x2 << 5)
+/* Use AS3514_VOL_MASK */
+
+/* MIC1_L (0x07) */
+#define MIC1_L_M1_SUP_off       (0x1 << 7)
+#define MIC1_L_M1_MUTE_off      (0x1 << 6)
+/* Use AS3514_VOL_MASK */
+
+/* MIC2_R (0x08) */
+#define MIC2_R_M2_AGC_off       (0x1 << 7)
+#define MIC2_R_M2_GAIN          (0x3 << 5)
+    #define MIC2_R_M2_GAIN_28DB (0x0 << 5)
+    #define MIC2_R_M2_GAIN_34DB (0x1 << 5)
+    #define MIC2_R_M2_GAIN_40DB (0x2 << 5)
+/* Use AS3514_VOL_MASK */
+
+/* MIC2_L (0x09) */
+#define MIC2_L_M2_SUP_off       (0x1 << 7)
+#define MIC2_L_M2_MUTE_off      (0x1 << 6)
+/* Use AS3514_VOL_MASK */
+
+/* LINE_IN1_R (0Ah) */
+#define LINE_IN1_R_LI1R_MUTE_off    (0x1 << 5)
+/* Use AS3514_VOL_MASK */
+
+/* LINE_IN1_L (0Bh) */
+#define LINE_IN1_L_LI1_MODE      (0x3 << 6)
+    #define LINE_IN1_L_LI1_MODE_SE_ST   (0x0 << 6)
+    #define LINE_IN1_L_LI1_MODE_DF_MO   (0x1 << 6)
+    #define LINE_IN1_L_LI1_MODE_SE_MO   (0x2 << 6)
+#define LINE_IN1_L_LI1L_MUTE_off (0x1 << 5)
+/* Use AS3514_VOL_MASK */
+
+/* LINE_IN2_R (0Ch) */
+#define LINE_IN2_R_LI2R_MUTE_off (0x1 << 5)
+/* Use AS3514_VOL_MASK */
+
+/* LINE_IN2_L (0Dh) */
+#define LINE_IN2_L_LI2_MODE      (0x3 << 6)
+    #define LINE_IN2_L_LI2_MODE_SE_ST   (0x0 << 6)
+    #define LINE_IN2_L_LI2_MODE_DF_MO   (0x1 << 6)
+    #define LINE_IN2_L_LI2_MODE_SE_MO   (0x2 << 6)
+#define LINE_IN2_L_LI2L_MUTE_off (0x1 << 5)
+/* Use AS3514_VOL_MASK */
+
+/* DAC_R (0Eh) */
+/* Only has volume control bits */
+/* Use AS3514_VOL_MASK */
+
+/* DAC_L (0Fh) */
+#define DAC_L_DAC_MUTE_off      (0x1 << 6)
+/* Use AS3514_VOL_MASK */
+
+/* ADC_R (10h) */
+#define ADC_R_ADCMUX            (0x3 << 6)
+    #define ADC_R_ADCMUX_ST_MIC     (0x0 << 6)
+    #define ADC_R_ADCMUX_LINE_IN1   (0x1 << 6)
+    #define ADC_R_ADCMUX_LINE_IN2   (0x2 << 6)
+    #define ADC_R_ADCMUX_AUDIO_SUM  (0x3 << 6)
+/* Use AS3514_VOL_MASK */
+
+/* ADC_L (11h) */
+#define ADC_L_FS_2              (0x1 << 7)
+#define ADC_L_ADC_MUTE_off      (0x1 << 6)
+/* Use AS3514_VOL_MASK */
+
+/* AUDIOSET1 (14h)*/
+#define AUDIOSET1_ADC_on        (0x1 << 7)
+#define AUDIOSET1_SUM_on        (0x1 << 6)
+#define AUDIOSET1_DAC_on        (0x1 << 5)
+#define AUDIOSET1_LOUT_on       (0x1 << 4)
+#define AUDIOSET1_LIN2_on       (0x1 << 3)
+#define AUDIOSET1_LIN1_on       (0x1 << 2)
+#define AUDIOSET1_MIC2_on       (0x1 << 1)
+#define AUDIOSET1_MIC1_on       (0x1 << 0)
+
+/* AUDIOSET2 (15h) */
+#define AUDIOSET2_BIAS_off      (0x1 << 7)
+#define AUDIOSET2_DITH_off      (0x1 << 6)
+#define AUDIOSET2_AGC_off       (0x1 << 5)
+#define AUDIOSET2_IBR_DAC       (0x3 << 3)
+    #define AUDIOSET2_IBR_DAC_0     (0x0 << 3)
+    #define AUDIOSET2_IBR_DAC_25    (0x1 << 3)
+    #define AUDIOSET2_IBR_DAC_40    (0x2 << 3)
+    #define AUDIOSET2_IBR_DAC_50    (0x3 << 3)
+#define AUDIOSET2_LSP_LP        (0x1 << 2)
+#define AUDIOSET2_IBR_LSP       (0x3 << 0)
+    #define AUDIOSET2_IBR_LSP_0     (0x0 << 0)
+    #define AUDIOSET2_IBR_LSP_17    (0x1 << 0)
+    #define AUDIOSET2_IBR_LSP_34    (0x2 << 0)
+    #define AUDIOSET2_IBR_LSP_50    (0x3 << 0)
+
+/* AUDIOSET3 (16h) */
+#define AUDIOSET3_ZCU_off       (0x1 << 2)
+#define AUDIOSET3_IBR_HPH       (0x1 << 1)
+#define AUDIOSET3_HPCM_off      (0x1 << 0)
+
+/* PLLMODE (1Dh) */
+#define PLLMODE_LRCK             (0x3 << 1)
+    #define PLLMODE_LRCK_24_48      (0x0 << 1)
+    #define PLLMODE_LRCK_8_23       (0x2 << 1)
+
 /* ADC channels */
 #define NUM_ADC_CHANNELS 13
 

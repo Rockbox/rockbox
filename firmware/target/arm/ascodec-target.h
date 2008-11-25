@@ -59,6 +59,8 @@ static inline void ascodec_unlock(void)
     i2c_unlock();
 }
 
+extern void ascodec_supressor_on(bool on);
+
 #endif /* CPU_PP */
 
 #endif /* !_ASCODEC_TARGET_H */

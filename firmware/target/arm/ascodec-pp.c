@@ -39,10 +39,6 @@ void audiohw_init(void)
     DEV_INIT1 &=~0x3000000;
     /*mini2?*/
 
-    /* device reset */
-    DEV_RS |= DEV_I2S;
-    DEV_RS &=~DEV_I2S;
-
     /* I2S device reset */
     DEV_RS |= DEV_I2S;
     DEV_RS &=~DEV_I2S;
@@ -56,11 +52,27 @@ void audiohw_init(void)
     /* external dev clock to 24MHz */
     outl(inl(0x70000018) & ~0xc, 0x70000018);
 
+#ifdef SANSA_E200
+    /* Prevent pops on startup */
+    GPIOG_ENABLE |= 0x08;
+    GPIO_SET_BITWISE(GPIOG_OUTPUT_VAL, 0x08);
+    GPIOG_OUTPUT_EN |= 0x08;
+#endif
+
     i2s_reset();
 
     audiohw_preinit();
 }
 
-void audiohw_postinit(void)
+void ascodec_supressor_on(bool on)
 {
-}
+#ifdef SANSA_E200
+    if (on) {
+        /* Set pop prevention */
+        GPIO_SET_BITWISE(GPIOG_OUTPUT_VAL, 0x08);
+    } else {
+        /* Release pop prevention */
+        GPIO_CLEAR_BITWISE(GPIOG_OUTPUT_VAL, 0x08);
+    }
+#endif
+} 

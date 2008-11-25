@@ -374,7 +374,7 @@ void pcm_play_dma_init(void)
     audiohw_init();
 
 #if !defined(HAVE_WM8731) && !defined(HAVE_WM8751) && !defined(HAVE_WM8975) \
- && !defined(HAVE_WM8758)
+ && !defined(HAVE_WM8758) && !defined(HAVE_AS3514)
     /* Power on */
     audiohw_enable_output(true);
     /* Unmute the master channel (DAC should be at zero point now). */
