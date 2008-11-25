@@ -123,7 +123,7 @@ static bool display_on; /* used by lcd_enable */
 
 int lcd_default_contrast(void)
 {
-    return 0x1f;
+    return DEFAULT_CONTRAST_SETTING;
 }
 
 void lcd_set_contrast(int val)
@@ -143,8 +143,16 @@ void lcd_set_invert_display(bool yesno)
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-    (void)yesno;
-    /* TODO */
+    if (yesno)
+    {
+        lcd_write_command(LCD_SET_SEGMENT_REMAP);
+        lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION);
+    }
+    else
+    {
+        lcd_write_command(LCD_SET_SEGMENT_REMAP_INV);
+        lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION_INV);
+    }
 }
 
 void lcd_enable(bool enable)

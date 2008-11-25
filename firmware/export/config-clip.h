@@ -61,6 +61,13 @@
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP
 
+/* Define this if your LCD can set contrast */
+#define HAVE_LCD_CONTRAST
+
+#define MIN_CONTRAST_SETTING        0
+#define MAX_CONTRAST_SETTING        50
+#define DEFAULT_CONTRAST_SETTING    30
+
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
 
 #define CONFIG_KEYPAD SANSA_CLIP_PAD
