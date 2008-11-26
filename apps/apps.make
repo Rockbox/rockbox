@@ -16,10 +16,10 @@ SRC += $(call preprocess, $(APPSDIR)/SOURCES)
 # button.h is included for the HAS_BUTTON_HOLD define.
 #
 features $(BUILDDIR)/apps/features $(BUILDDIR)/apps/genlang-features: $(APPSDIR)/features.txt
-	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)mkdir -p $(BUILDDIR)/apps
 	$(call PRINTS,PP $(<F))
 	$(SILENT)$(CC) $(PPCFLAGS) \
                  -E -P -imacros "config.h" -imacros "button.h" -x c $< | \
-		grep -v "^\#" | grep -v "^$$" > $@; \
-		for f in `cat $@`; do feat="$$feat:$$f" ; done ; \
+		grep -v "^\#" | grep -v "^$$" > $(BUILDDIR)/apps/features; \
+		for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done ; \
 		echo "$$feat" >$(BUILDDIR)/apps/genlang-features
