@@ -38,7 +38,7 @@ static int current_brightness = DEFAULT_BRIGHTNESS_SETTING;
 
 void _backlight_fade_update_state(int brightness)
 {
-        current_brightness = brightness;
+    current_brightness = brightness;
 }
 
 /* returns true if fade is finished */
