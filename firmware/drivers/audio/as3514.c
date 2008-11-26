@@ -197,7 +197,7 @@ void audiohw_postinit(void)
     as3514_write(AS3514_AUDIOSET3, AUDIOSET3_HPCM_off);
 
 #ifdef CPU_PP
-    ascodec_supressor_on(false);
+    ascodec_suppressor_on(false);
 #endif
 
     audiohw_mute(false);
@@ -269,7 +269,7 @@ void audiohw_close(void)
     audiohw_mute(true);
 
 #ifdef CPU_PP
-    ascodec_supressor_on(true);
+    ascodec_suppressor_on(true);
 #endif
 
     /* turn on common */

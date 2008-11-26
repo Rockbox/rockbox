@@ -64,7 +64,7 @@ void audiohw_init(void)
     audiohw_preinit();
 }
 
-void ascodec_supressor_on(bool on)
+void ascodec_suppressor_on(bool on)
 {
     /* CHECK: Good for c200 too? */
 #ifdef SANSA_E200
