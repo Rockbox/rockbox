@@ -34,7 +34,7 @@ void tick_start(unsigned int interval_in_ms)
 {
     int phi = 0;                            /* prescaler bits */
     int prescale = 1;
-    int cycles = 1000 * interval_in_ms;      /* pclk is clocked at 64MHz */
+    int cycles = TIMER_FREQ / 1000 * interval_in_ms;
 
     while(cycles > 0x10000)
     {

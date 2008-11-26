@@ -7,7 +7,7 @@
 *                     \/            \/     \/    \/            \/
 * $Id$
 *
-* Copyright (C) 2008 ??
+* Copyright (C) 2008 Rafaël Carré
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -24,6 +24,8 @@
 bool __timer_set(long cycles, bool set);
 bool __timer_register(void);
 void __timer_unregister(void);
+
+#define TIMER_FREQ (24000000 / 16)
 
 #define __TIMER_SET(cycles, set) \
     __timer_set(cycles, set)
