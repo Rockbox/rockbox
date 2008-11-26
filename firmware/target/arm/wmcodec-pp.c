@@ -29,6 +29,7 @@
 #include "system.h"
 #include "audiohw.h"
 #include "i2c-pp.h"
+#include "i2s.h"
 #include "wmcodec.h"
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(MROBE_100)
@@ -43,7 +44,8 @@
 /*
  * Initialise the PP I2C and I2S.
  */
-void audiohw_init(void) {
+void audiohw_init(void)
+{
 #ifdef CPU_PP502x
     /* normal outputs for CDI and I2S pin groups */
     DEV_INIT2 &= ~0x300;
@@ -95,20 +97,12 @@ void audiohw_init(void) {
     outl(inl(0xcf000028) & ~0x8, 0xcf000028);
 #endif /* IPOD_1G2G/3G */
 #endif
-    
-#if defined(HAVE_WM8731) || defined(HAVE_WM8751) || defined(HAVE_WM8975) \
- || defined(HAVE_WM8758)
-    audiohw_preinit();
-#endif
-   
-}
 
-#if !defined(HAVE_WM8731) && !defined(HAVE_WM8751) && !defined(HAVE_WM8975) \
- && !defined(HAVE_WM8758)
-void audiohw_postinit(void)
-{
+    /* reset the I2S controller into known state */
+    i2s_reset();
+    
+    audiohw_preinit();
 }
-#endif
 
 void wmcodec_write(int reg, int data)
 {

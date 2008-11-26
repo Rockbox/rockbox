@@ -33,7 +33,6 @@
 
 #include "wmcodec.h"
 #include "audiohw.h"
-#include "i2s.h"
 #include "sound.h"
 
 const struct sound_settings_info audiohw_settings[] = {
@@ -150,8 +149,6 @@ static void codec_set_active(int active)
 
 void audiohw_preinit(void)
 {
-    i2s_reset();
-
     /* POWER UP SEQUENCE */
     /* 1) Switch on power supplies. By default the WM8731 is in Standby Mode,
      *    the DAC is digitally muted and the Audio Interface and Outputs are

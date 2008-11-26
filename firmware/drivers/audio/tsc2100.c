@@ -90,16 +90,7 @@ void audiohw_init(void)
 
 void audiohw_postinit(void)
 {
-}
-
-/* Silently enable / disable audio output */
-void audiohw_enable_output(bool enable)
-{
-    if (enable) {
-        audiohw_mute(0);
-    } else {
-        audiohw_mute(1);
-    }
+    audiohw_mute(0);
 }
 
 void audiohw_set_master_vol(int vol_l, int vol_r)

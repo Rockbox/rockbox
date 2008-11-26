@@ -108,17 +108,16 @@ void pcm_play_dma_init(void)
 
     /* Initialize default register values. */
     audiohw_init();
-
-    /* Power on */
-    audiohw_enable_output(true);
-    
-    /* Unmute the master channel (DAC should be at zero point now). */
-    audiohw_mute(false);
-
+   
     dma_play_data.size = 0;
 #if NUM_CORES > 1
     dma_play_data.core = 0; /* no core in control */
 #endif
+}
+
+void pcm_postinit(void)
+{
+    audiohw_postinit();
 }
 
 void pcm_apply_settings(void)

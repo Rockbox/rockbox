@@ -31,7 +31,6 @@
 
 #include "wmcodec.h"
 #include "audiohw.h"
-#include "i2s.h"
 
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -58,   6, -25},
@@ -95,8 +94,6 @@ void audiohw_mute(bool mute)
 
 void audiohw_preinit(void)
 {
-    i2s_reset();
-
     wmcodec_write(RESET, RESET_RESET);
 
     wmcodec_write(PWRMGMT1, PWRMGMT1_PLLEN | PWRMGMT1_BIASEN

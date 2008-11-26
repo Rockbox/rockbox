@@ -33,7 +33,6 @@
 
 #include "wmcodec.h"
 #include "audiohw.h"
-#include "i2s.h"
 
 #define IPOD_PCM_LEVEL 0x65       /* -6dB */
 
@@ -91,43 +90,38 @@ static void codec_set_active(int active)
 
 
 /* Silently enable / disable audio output */
-void audiohw_enable_output(bool enable)
+void audiohw_preinit(void)
 {
-    if (enable)
-    {
-        /* reset the I2S controller into known state */
-        i2s_reset();
+    wmcodec_write(RESET, 0x0);        /*Reset*/
 
-        wmcodec_write(RESET, 0x0);        /*Reset*/
+    codec_set_active(0x0);
 
-        codec_set_active(0x0);
+    /* DACSEL=1 */
+    wmcodec_write(0x4, 0x10);
 
-        /* DACSEL=1 */
-        wmcodec_write(0x4, 0x10);
+    /* set power register to POWEROFF=0 on OUTPD=0, DACPD=0 */
+    wmcodec_write(PDCTRL, 0x67);
 
-        /* set power register to POWEROFF=0 on OUTPD=0, DACPD=0 */
-        wmcodec_write(PDCTRL, 0x67);
+    /* BCLKINV=0(Dont invert BCLK) MS=1(Enable Master) LRSWAP=0 LRP=0 */
+    /* IWL=00(16 bit) FORMAT=10(I2S format) */
+    wmcodec_write(AINTFCE, 0x42);
 
-        /* BCLKINV=0(Dont invert BCLK) MS=1(Enable Master) LRSWAP=0 LRP=0 */
-        /* IWL=00(16 bit) FORMAT=10(I2S format) */
-        wmcodec_write(AINTFCE, 0x42);
+    audiohw_set_sample_rate(WM8721_USB24_44100HZ);
 
-        audiohw_set_sample_rate(WM8721_USB24_44100HZ);
+    /* set the volume to -6dB */
+    wmcodec_write(LOUTVOL, IPOD_PCM_LEVEL);
+    wmcodec_write(ROUTVOL, 0x100 | IPOD_PCM_LEVEL);
 
-        /* set the volume to -6dB */
-        wmcodec_write(LOUTVOL, IPOD_PCM_LEVEL);
-        wmcodec_write(ROUTVOL, 0x100 | IPOD_PCM_LEVEL);
+    /* ACTIVE=1 */
+    codec_set_active(1);
 
-        /* ACTIVE=1 */
-        codec_set_active(1);
+    /* 5. Set DACMU = 0 to soft-un-mute the audio DACs. */
+    wmcodec_write(DAPCTRL, 0x0);
+}
 
-        /* 5. Set DACMU = 0 to soft-un-mute the audio DACs. */
-        wmcodec_write(DAPCTRL, 0x0);
-
-        audiohw_mute(0);
-    } else {
-        audiohw_mute(1);
-    }
+void audiohw_postinit(void)
+{
+    audiohw_mute(0);    
 }
 
 void audiohw_set_master_vol(int vol_l, int vol_r)

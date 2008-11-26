@@ -27,7 +27,6 @@
  ****************************************************************************/
 #include "kernel.h"
 #include "wmcodec.h"
-#include "i2s.h"
 #include "audio.h"
 #include "audiohw.h"
 #include "system.h"

@@ -150,12 +150,13 @@ extern const struct sound_settings_info audiohw_settings[];
  */
 
 /**
- * Initialize audio codec to a well defined state.
+ * Initialize audio codec to a well defined state. Includes SoC-specific
+ * setup.
  */
 void audiohw_init(void);
 
 /**
- * Do initial audio codec setup.
+ * Do initial audio codec setup. Usually called from audiohw_init.
  */
 void audiohw_preinit(void);
 
@@ -206,12 +207,6 @@ void audiohw_set_balance(int val);
  * @param mute true or false.
  */
 void audiohw_mute(bool mute);
-
-/**
- * Silently en/disable audio output.
- * @param enable true or false.
- */
-void audiohw_enable_output(bool enable);
 
 #ifdef AUDIOHW_HAVE_TREBLE
 /**

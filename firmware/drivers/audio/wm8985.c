@@ -23,7 +23,6 @@
 
 #include "wmcodec.h"
 #include "audiohw.h"
-#include "i2s.h"
 
 /* Register addresses as per datasheet Rev.4.4 */
 #define RESET       0x00
@@ -127,57 +126,50 @@ int tenthdb2master(int db)
 }
 
 /* Silently enable / disable audio output */
-void audiohw_enable_output(bool enable)
+void audiohw_preinit(void)
 {
-    if (enable)
-    {
-        /* TODO: reset the I2S controller into known state */
-        //i2s_reset();
+    wmcodec_write(RESET,    0x1ff);    /* Reset */
 
-        wmcodec_write(RESET,    0x1ff);    /* Reset */
+    wmcodec_write(BIASCTL,  0x100); /* BIASCUT = 1 */
+    wmcodec_write(OUTCTRL,  0x6);   /* Thermal shutdown */
 
-        wmcodec_write(BIASCTL,  0x100); /* BIASCUT = 1 */
-        wmcodec_write(OUTCTRL,  0x6);   /* Thermal shutdown */
+    wmcodec_write(PWRMGMT1, 0x8);   /* BIASEN = 1 */
 
-        wmcodec_write(PWRMGMT1, 0x8);   /* BIASEN = 1 */
+    /* Volume zero, mute all outputs */
+    wmcodec_write(LOUT1VOL, 0x140);
+    wmcodec_write(ROUT1VOL, 0x140);
+    wmcodec_write(LOUT2VOL, 0x140);
+    wmcodec_write(ROUT2VOL, 0x140);
+    wmcodec_write(OUT3MIX,  0x40);
+    wmcodec_write(OUT4MIX,  0x40);
 
-        /* Volume zero, mute all outputs */
-        wmcodec_write(LOUT1VOL, 0x140);
-        wmcodec_write(ROUT1VOL, 0x140);
-        wmcodec_write(LOUT2VOL, 0x140);
-        wmcodec_write(ROUT2VOL, 0x140);
-        wmcodec_write(OUT3MIX,  0x40);
-        wmcodec_write(OUT4MIX,  0x40);
-        
-        /* DAC softmute, automute, 128OSR */
-        wmcodec_write(DACCTRL,  0x4c);
+    /* DAC softmute, automute, 128OSR */
+    wmcodec_write(DACCTRL,  0x4c);
 
-        wmcodec_write(OUT4ADC,  0x2);   /* POBCTRL = 1 */
+    wmcodec_write(OUT4ADC,  0x2);   /* POBCTRL = 1 */
 
-        /* Enable output, DAC and mixer */
-        wmcodec_write(PWRMGMT3, 0x6f);
-        wmcodec_write(PWRMGMT2, 0x180);
-        wmcodec_write(PWRMGMT1, 0xd);
-        wmcodec_write(LOUTMIX,  0x1);
-        wmcodec_write(ROUTMIX,  0x1);
+    /* Enable output, DAC and mixer */
+    wmcodec_write(PWRMGMT3, 0x6f);
+    wmcodec_write(PWRMGMT2, 0x180);
+    wmcodec_write(PWRMGMT1, 0xd);
+    wmcodec_write(LOUTMIX,  0x1);
+    wmcodec_write(ROUTMIX,  0x1);
 
-        /* Disable clock since we're acting as slave to the SoC */
-        wmcodec_write(CLKGEN,  0x0);
-        wmcodec_write(AINTFCE, 0x10);   /* 16-bit, I2S format */
+    /* Disable clock since we're acting as slave to the SoC */
+    wmcodec_write(CLKGEN,  0x0);
+    wmcodec_write(AINTFCE, 0x10);   /* 16-bit, I2S format */
 
-        wmcodec_write(LDACVOL, 0x1ff);  /* Full DAC digital vol */
-        wmcodec_write(RDACVOL, 0x1ff);
+    wmcodec_write(LDACVOL, 0x1ff);  /* Full DAC digital vol */
+    wmcodec_write(RDACVOL, 0x1ff);
 
-        wmcodec_write(OUT4ADC, 0x0);    /* POBCTRL = 0 */
+    wmcodec_write(OUT4ADC, 0x0);    /* POBCTRL = 0 */
+}
 
-        sleep(HZ/2);
+void audiohw_postinit(void)
+{
+    sleep(HZ/2);
 
-        audiohw_mute(0);
-    }
-    else
-    {
-        audiohw_mute(1);
-    }
+    audiohw_mute(0);
 }
 
 void audiohw_set_headphone_vol(int vol_l, int vol_r)
@@ -255,9 +247,6 @@ void audiohw_set_sample_rate(int sampling_control)
 void audiohw_enable_recording(bool source_mic)
 {
     (void)source_mic; /* We only have a line-in (I think) */
-
-    /* TODO: reset the I2S controller into known state */
-    //i2s_reset();
 
     wmcodec_write(RESET, 0x1ff);    /*Reset*/
 

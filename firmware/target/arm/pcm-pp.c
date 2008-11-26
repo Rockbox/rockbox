@@ -373,14 +373,6 @@ void pcm_play_dma_init(void)
     /* Initialize default register values. */
     audiohw_init();
 
-#if !defined(HAVE_WM8731) && !defined(HAVE_WM8751) && !defined(HAVE_WM8975) \
- && !defined(HAVE_WM8758) && !defined(HAVE_AS3514)
-    /* Power on */
-    audiohw_enable_output(true);
-    /* Unmute the master channel (DAC should be at zero point now). */
-    audiohw_mute(false);
-#endif
-
     dma_play_data.size = 0;
 #if NUM_CORES > 1
     dma_play_data.core = 0; /* no core in control */

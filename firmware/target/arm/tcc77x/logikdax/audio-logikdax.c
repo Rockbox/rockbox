@@ -26,11 +26,6 @@
 int audio_channels = 2;
 int audio_output_source = AUDIO_SRC_PLAYBACK;
 
-void audiohw_enable_output(bool on)
-{
-    (void)on;
-}
-
 void audio_set_output_source(int source)
 {
     (void)source;

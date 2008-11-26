@@ -193,17 +193,6 @@ static int audiohw_set_regs(void)
     return 0;
 }
 
-/* Silently enable / disable audio output */
-void audiohw_enable_output(bool enable)
-{
-    if (enable) {
-        uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_DAC | PON_HP);
-    } else {
-        uda1380_write_reg(REG_MUTE, MUTE_MASTER);
-        uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] & ~PON_DAC);
-    }
-}
-
 static void reset(void)
 {
 #ifdef IRIVER_H300_SERIES
@@ -278,8 +267,9 @@ void audiohw_postinit(void)
     /* Sleep a while so the power can stabilize (especially a long
        delay is needed for the line out connector). */
     sleep(HZ);
+
     /* Power on FSDAC and HP amp. */
-    audiohw_enable_output(true);
+    uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_DAC | PON_HP);
 
     /* UDA1380: Unmute the master channel
        (DAC should be at zero point now). */
