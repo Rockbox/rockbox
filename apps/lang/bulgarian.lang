@@ -4116,15 +4116,15 @@
   user: 
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "Постепенна подсведка при вкл"
+    backlight_fade*: "Постепенна подсведка при вкл"
   </dest>
   <voice>
     *: ""
-    backlight_fade: ""
+    backlight_fade*: ""
   </voice>
 </phrase>
 <phrase>
@@ -5284,15 +5284,15 @@
   user: 
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "Постепенно угасване на подсветката"
+    backlight_fade*: "Постепенно угасване на подсветката"
   </dest>
   <voice>
     *: ""
-    backlight_fade: ""
+    backlight_fade*: ""
   </voice>
 </phrase>
 <phrase>

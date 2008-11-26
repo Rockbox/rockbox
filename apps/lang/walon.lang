@@ -2703,15 +2703,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "Erî-clårté å cmince do fondou"
+    backlight_fade*: "Erî-clårté å cmince do fondou"
   </dest>
   <voice>
     *: none
-    backlight_fade: "erî-clårté å cmince do fondou"
+    backlight_fade*: "erî-clårté å cmince do fondou"
   </voice>
 </phrase>
 <phrase>
@@ -2720,15 +2720,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "Erî-clårté sol fondou do coron"
+    backlight_fade*: "Erî-clårté sol fondou do coron"
   </dest>
   <voice>
     *: none
-    backlight_fade: "erî-clårté sol fondou do coron"
+    backlight_fade*: "erî-clårté sol fondou do coron"
   </voice>
 </phrase>
 <phrase>

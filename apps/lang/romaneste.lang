@@ -4358,15 +4358,15 @@
   user: 
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "Filare iluminare aprindere"
+    backlight_fade*: "Filare iluminare aprindere"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </voice>
 </phrase>
 <phrase>
@@ -5543,15 +5543,15 @@
   user: 
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "Filare iluminare stingere"
+    backlight_fade*: "Filare iluminare stingere"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </voice>
 </phrase>
 <phrase>

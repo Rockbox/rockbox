@@ -2697,15 +2697,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "Beleuchtung einblenden"
+    backlight_fade*: "Beleuchtung einblenden"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Beleuchtung einblenden"
+    backlight_fade*: "Beleuchtung einblenden"
   </voice>
 </phrase>
 <phrase>
@@ -2714,15 +2714,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "Beleuchtung ausblenden"
+    backlight_fade*: "Beleuchtung ausblenden"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Beleuchtung ausblenden"
+    backlight_fade*: "Beleuchtung ausblenden"
   </voice>
 </phrase>
 <phrase>

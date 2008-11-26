@@ -2521,15 +2521,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "Ton inn skjermlys"
+    backlight_fade*: "Ton inn skjermlys"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Ton inn skjermlys"
+    backlight_fade*: "Ton inn skjermlys"
   </voice>
 </phrase>
 <phrase>
@@ -2538,15 +2538,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "Ton ut skjermlys"
+    backlight_fade*: "Ton ut skjermlys"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Ton ut skjermlys"
+    backlight_fade*: "Ton ut skjermlys"
   </voice>
 </phrase>
 <phrase>

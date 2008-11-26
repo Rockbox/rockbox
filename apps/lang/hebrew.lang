@@ -2679,15 +2679,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "הגברה הדרגתית של תאורת המסך"
+    backlight_fade*: "הגברה הדרגתית של תאורת המסך"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </voice>
 </phrase>
 <phrase>
@@ -2696,15 +2696,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "עמעום תאורת המסך"
+    backlight_fade*: "עמעום תאורת המסך"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </voice>
 </phrase>
 <phrase>

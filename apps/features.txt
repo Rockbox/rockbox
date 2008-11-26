@@ -20,8 +20,10 @@ albumart
 backlight_brightness
 #endif
 
-#if defined(HAVE_BACKLIGHT_PWM_FADING) || defined(USE_BACKLIGHT_SW_FADING)
-backlight_fade
+#if defined(HAVE_BACKLIGHT_PWM_FADING)
+backlight_fade_pwm
+#elif defined(USE_BACKLIGHT_SW_FADING)
+backlight_fade_sw
 #endif
 
 #if BATTERY_TYPES_COUNT > 1

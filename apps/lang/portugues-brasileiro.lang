@@ -2698,15 +2698,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "Aumentar Progressivamente Intensidade da Luz de Fundo"
+    backlight_fade*: "Aumentar Progressivamente Intensidade da Luz de Fundo"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Aumentar Progressivamente Intensidade da Luz de Fundo"
+    backlight_fade*: "Aumentar Progressivamente Intensidade da Luz de Fundo"
   </voice>
 </phrase>
 <phrase>
@@ -2715,15 +2715,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "Diminuir Progressivamente Intensidade da Luz de Fundo"
+    backlight_fade*: "Diminuir Progressivamente Intensidade da Luz de Fundo"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Diminuir Progressivamente Intensidade da Luz de Fundo"
+    backlight_fade*: "Diminuir Progressivamente Intensidade da Luz de Fundo"
   </voice>
 </phrase>
 <phrase>

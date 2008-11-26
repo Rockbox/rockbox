@@ -2674,15 +2674,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade:"Világítás beúsztatása"
+    backlight_fade*:"Világítás beúsztatása"
   </dest>
   <voice>
     *: none
-    backlight_fade:"Backlight fade in"
+    backlight_fade*:"Backlight fade in"
   </voice>
 </phrase>
 <phrase>
@@ -2691,15 +2691,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade:"Világítás kiúsztatása"
+    backlight_fade*:"Világítás kiúsztatása"
   </dest>
   <voice>
     *: none
-    backlight_fade:"Backlight fade out"
+    backlight_fade*:"Backlight fade out"
   </voice>
 </phrase>
 <phrase>

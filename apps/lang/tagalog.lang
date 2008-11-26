@@ -2688,15 +2688,15 @@
  user:
  <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
  </source>
  <dest>
     *: none
-    backlight_fade: "Magilaw sa likod pagpapalit"
+    backlight_fade*: "Magilaw sa likod pagpapalit"
  </dest>
  <voice>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
  </voice>
 </phrase>
 <phrase>
@@ -2705,15 +2705,15 @@
  user:
  <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
  </source>
  <dest>
     *: none
-    backlight_fade: "Magilaw sa likod pagpapalit"
+    backlight_fade*: "Magilaw sa likod pagpapalit"
  </dest>
  <voice>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
  </voice>
 </phrase>
 <phrase>

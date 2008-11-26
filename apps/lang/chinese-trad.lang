@@ -2961,15 +2961,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "背光淡入"
+    backlight_fade*: "背光淡入"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </voice>
 </phrase>
 <phrase>
@@ -2978,15 +2978,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "背光淡出"
+    backlight_fade*: "背光淡出"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </voice>
 </phrase>
 <phrase>

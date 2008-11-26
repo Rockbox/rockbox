@@ -2727,15 +2727,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "Allumage progressif du rétro-éclairage"
+    backlight_fade*: "Allumage progressif du rétro-éclairage"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Allumage progressif du rétro-éclairage"
+    backlight_fade*: "Allumage progressif du rétro-éclairage"
   </voice>
 </phrase>
 <phrase>
@@ -2744,15 +2744,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "Extinction progressive du rétro-éclairage"
+    backlight_fade*: "Extinction progressive du rétro-éclairage"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Extinction progressive du rétro-éclairage"
+    backlight_fade*: "Extinction progressive du rétro-éclairage"
   </voice>
 </phrase>
 <phrase>

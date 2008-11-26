@@ -2685,15 +2685,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "Σταδιακή ενεργοποίηση φωτισμού"
+    backlight_fade*: "Σταδιακή ενεργοποίηση φωτισμού"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Σταδιακή ενεργοποίηση φωτισμού"
+    backlight_fade*: "Σταδιακή ενεργοποίηση φωτισμού"
   </voice>
 </phrase>
 <phrase>
@@ -2702,15 +2702,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "Σταδιακή απενεργοποίηση φωτισμού"
+    backlight_fade*: "Σταδιακή απενεργοποίηση φωτισμού"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Σταδιακή απενεργοποίηση φωτισμού"
+    backlight_fade*: "Σταδιακή απενεργοποίηση φωτισμού"
   </voice>
 </phrase>
 <phrase>

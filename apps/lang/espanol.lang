@@ -6691,15 +6691,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "Fundido de entrada de iluminación"
+    backlight_fade*: "Fundido de entrada de iluminación"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Fundido de entrada de iluminación"
+    backlight_fade*: "Fundido de entrada de iluminación"
   </voice>
 </phrase>
 <phrase>
@@ -7075,15 +7075,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "Fundido de salida de iluminación"
+    backlight_fade*: "Fundido de salida de iluminación"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Fundido de salida de iluminación"
+    backlight_fade*: "Fundido de salida de iluminación"
   </voice>
 </phrase>
 <phrase>

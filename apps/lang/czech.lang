@@ -2683,15 +2683,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "Plynule zapínat podsvícení"
+    backlight_fade*: "Plynule zapínat podsvícení"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Plynule zapínat podsvícení"
+    backlight_fade*: "Plynule zapínat podsvícení"
   </voice>
 </phrase>
 <phrase>
@@ -2700,15 +2700,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "Plynule vypínat podsvícení"
+    backlight_fade*: "Plynule vypínat podsvícení"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Plynule vypínat podsvícení"
+    backlight_fade*: "Plynule vypínat podsvícení"
   </voice>
 </phrase>
 <phrase>

@@ -2911,15 +2911,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "Lysinntoning"
+    backlight_fade*: "Lysinntoning"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Lysinntoning"
+    backlight_fade*: "Lysinntoning"
   </voice>
 </phrase>
 <phrase>
@@ -2928,15 +2928,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "Lysuttoning"
+    backlight_fade*: "Lysuttoning"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Lysuttoning"
+    backlight_fade*: "Lysuttoning"
   </voice>
 </phrase>
 <phrase>

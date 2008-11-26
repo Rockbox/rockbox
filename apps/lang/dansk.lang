@@ -2517,15 +2517,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "Tænd lys langsomt"
+    backlight_fade*: "Tænd lys langsomt"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Tænd lys langsomt"
+    backlight_fade*: "Tænd lys langsomt"
   </voice>
 </phrase>
 <phrase>
@@ -2534,15 +2534,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "Dæmp lys"
+    backlight_fade*: "Dæmp lys"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Dæmp lys"
+    backlight_fade*: "Dæmp lys"
   </voice>
 </phrase>
 <phrase>

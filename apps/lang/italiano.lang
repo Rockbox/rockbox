@@ -2700,15 +2700,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "Accensione retroilluminazione"
+    backlight_fade*: "Accensione retroilluminazione"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Accensione retroilluminazione"
+    backlight_fade*: "Accensione retroilluminazione"
   </voice>
 </phrase>
 <phrase>
@@ -2717,15 +2717,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "Spegnimento retroilluminazione"
+    backlight_fade*: "Spegnimento retroilluminazione"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Spegnimento retroilluminazione"
+    backlight_fade*: "Spegnimento retroilluminazione"
   </voice>
 </phrase>
 <phrase>

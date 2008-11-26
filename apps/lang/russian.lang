@@ -2786,15 +2786,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade*: "Backlight Fade In"
   </source>
   <dest>
     *: none
-    backlight_fade: "Нарастание подсветки"
+    backlight_fade*: "Нарастание подсветки"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Нарастание подсветки"
+    backlight_fade*: "Нарастание подсветки"
   </voice>
 </phrase>
 <phrase>
@@ -2803,15 +2803,15 @@
   user:
   <source>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade*: "Backlight Fade Out"
   </source>
   <dest>
     *: none
-    backlight_fade: "Затухание подсветки"
+    backlight_fade*: "Затухание подсветки"
   </dest>
   <voice>
     *: none
-    backlight_fade: "Затухание подсветки"
+    backlight_fade*: "Затухание подсветки"
   </voice>
 </phrase>
 <phrase>
