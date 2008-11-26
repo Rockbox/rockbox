@@ -13,7 +13,6 @@ use Getopt::Long qw(:config pass_through);	# pass_through so not confused by -DT
 
 my $ROOT="..";
 my $verbose;
-my $firmdir="$ROOT/firmware";
 my $rbdir=".rockbox";
 my $wpslist;
 my $target;
@@ -26,6 +25,7 @@ GetOptions ( 'r|root=s'		=> \$ROOT,
 
 ($wpslist, $target) = @ARGV;
 
+my $firmdir="$ROOT/firmware";
 my $cppdef = $target;
 my @depthlist = ( 16, 8, 4, 2, 1 );
 
