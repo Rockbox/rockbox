@@ -424,7 +424,8 @@ struct user_settings
 #if defined(HAVE_BACKLIGHT_PWM_FADING)
     int backlight_fade_in;  /* backlight fade in timing: 0..3 */
     int backlight_fade_out; /* backlight fade in timing: 0..7 */
-#elif defined(USE_BACKLIGHT_SW_FADING)
+#elif defined(USE_BACKLIGHT_SW_FADING) \
+    || defined(USE_BACKLIGHT_CUSTOM_FADING_BOOL)
     bool backlight_fade_in;
     bool backlight_fade_out;
 #endif

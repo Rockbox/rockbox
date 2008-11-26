@@ -679,7 +679,8 @@ const struct settings_list settings[] = {
                   UNIT_MS, formatter_unit_0_is_off, getlang_unit_0_is_off,
                   backlight_set_fade_out, 10,
                   0,100,200,300,500,1000,2000,3000,5000,10000),
-#elif defined(USE_BACKLIGHT_SW_FADING)
+#elif defined(USE_BACKLIGHT_SW_FADING) \
+    || defined(USE_BACKLIGHT_CUSTOM_FADING_BOOL)
     OFFON_SETTING(0, backlight_fade_in, LANG_BACKLIGHT_FADE_IN,
                     true, "backlight fade in", backlight_set_fade_in),
     OFFON_SETTING(0, backlight_fade_out, LANG_BACKLIGHT_FADE_OUT,

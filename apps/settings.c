@@ -769,7 +769,8 @@ void settings_apply(bool read_disk)
     backlight_set_timeout_plugged(global_settings.backlight_timeout_plugged);
 #endif
 #if (defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)) \
-        || defined(USE_BACKLIGHT_SW_FADING)
+        || defined(USE_BACKLIGHT_SW_FADING) \
+        || defined(USE_BACKLIGHT_CUSTOM_FADING_BOOL)
     backlight_set_fade_in(global_settings.backlight_fade_in);
     backlight_set_fade_out(global_settings.backlight_fade_out);
 #endif

@@ -94,6 +94,9 @@
 
 #ifndef SIMULATOR
 
+/* Implementation-defined fading type with bool settings */
+#define USE_BACKLIGHT_CUSTOM_FADING_BOOL
+
 /* The LCD on a Gigabeat is 240x320 - it is portrait */
 #define HAVE_PORTRAIT_LCD
 

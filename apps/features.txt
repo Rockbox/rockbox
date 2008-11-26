@@ -24,6 +24,8 @@ backlight_brightness
 backlight_fade_pwm
 #elif defined(USE_BACKLIGHT_SW_FADING)
 backlight_fade_sw
+#elif defined(USE_BACKLIGHT_CUSTOM_FADING_BOOL)
+backlight_fade_custom_bool
 #endif
 
 #if BATTERY_TYPES_COUNT > 1

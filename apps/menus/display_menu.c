@@ -92,7 +92,8 @@ MENUITEM_SETTING(backlight_on_button_hold,
 #endif
 MENUITEM_SETTING(caption_backlight, &global_settings.caption_backlight, NULL);
 #if (defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)) || \
-        defined(USE_BACKLIGHT_SW_FADING)
+        defined(USE_BACKLIGHT_SW_FADING) || \
+        defined(USE_BACKLIGHT_CUSTOM_FADING_BOOL)
 MENUITEM_SETTING(backlight_fade_in, &global_settings.backlight_fade_in, NULL);
 MENUITEM_SETTING(backlight_fade_out, &global_settings.backlight_fade_out, NULL);
 #endif
@@ -132,7 +133,8 @@ MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
 # endif
             ,&caption_backlight
 #if (defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)) || \
-        defined(USE_BACKLIGHT_SW_FADING)
+        defined(USE_BACKLIGHT_SW_FADING) || \
+        defined(USE_BACKLIGHT_CUSTOM_FADING_BOOL)
             ,&backlight_fade_in, &backlight_fade_out
 #endif
             ,&bl_filter_first_keypress

@@ -38,7 +38,8 @@ int  backlight_get_current_timeout(void);
 void backlight_set_fade_in(int value);
 void backlight_set_fade_out(int value);
 #endif
-#ifdef USE_BACKLIGHT_SW_FADING
+#if defined(USE_BACKLIGHT_SW_FADING) \
+    || defined(USE_BACKLIGHT_CUSTOM_FADING_BOOL)
 void backlight_set_fade_in(bool value);
 void backlight_set_fade_out(bool value);
 #endif
