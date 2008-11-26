@@ -22,6 +22,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "panic.h"
+#include "timer-target.h"
 
 void INT_TIMER2(void)
 {
