@@ -270,7 +270,7 @@ int system_memory_guard(int newmode)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void set_cpu_frequency(long frequency)
 {
-    int divider = CPUFREQ_MAX / frequency;
+    int divider = frequency ? (CPUFREQ_MAX / frequency) : 16 /* minimal */ ;
 
     if(divider > 16)
         divider = 16;
