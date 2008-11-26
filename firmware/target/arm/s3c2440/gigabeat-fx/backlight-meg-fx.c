@@ -72,7 +72,7 @@ static unsigned short buttonlight_trigger_now;
 /* Assumes that the backlight has been initialized */
 void _backlight_set_brightness(int brightness)
 {
-    (void) brightness; // Actually handled in led_control_service()
+    (void) brightness; /* Actually handled in led_control_service() */
     backlight_control = BACKLIGHT_CONTROL_SET;
 }
 
