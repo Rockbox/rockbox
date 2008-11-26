@@ -91,7 +91,8 @@ MENUITEM_SETTING(backlight_on_button_hold,
                 &global_settings.backlight_on_button_hold, NULL);
 #endif
 MENUITEM_SETTING(caption_backlight, &global_settings.caption_backlight, NULL);
-#if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
+#if (defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)) || \
+        defined(USE_BACKLIGHT_SW_FADING)
 MENUITEM_SETTING(backlight_fade_in, &global_settings.backlight_fade_in, NULL);
 MENUITEM_SETTING(backlight_fade_out, &global_settings.backlight_fade_out, NULL);
 #endif
@@ -130,9 +131,10 @@ MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
             ,&backlight_on_button_hold
 # endif
             ,&caption_backlight
-# if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
+#if (defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)) || \
+        defined(USE_BACKLIGHT_SW_FADING)
             ,&backlight_fade_in, &backlight_fade_out
-# endif
+#endif
             ,&bl_filter_first_keypress
 # ifdef HAVE_LCD_SLEEP_SETTING
             ,&lcd_sleep_after_backlight_off

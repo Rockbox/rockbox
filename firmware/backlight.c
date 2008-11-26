@@ -8,6 +8,8 @@
  * $Id$
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing
+ * Additional work by Martin Ritter (2007) and Thomas Martitz (2008)
+ *                  for backlight thread fading
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -46,6 +48,9 @@
 #define BACKLIGHT_FULL_INIT
 #endif
 
+#ifdef USE_BACKLIGHT_SW_FADING
+#include "backlight-thread-fading.h"
+#endif
 #ifdef SIMULATOR
 /* TODO: find a better way to do it but we need a kernel thread somewhere to
    handle this */
@@ -134,6 +139,10 @@ static int backlight_timeout_plugged = 5*HZ;
 static int backlight_on_button_hold = 0;
 #endif
 
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+int backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
+#endif
+
 #ifdef HAVE_BUTTON_LIGHT
 static int buttonlight_timer;
 int _buttonlight_timeout = 5*HZ;
@@ -220,6 +229,12 @@ void backlight_lcd_sleep_countdown(bool start)
     }
 }
 #endif /* HAVE_LCD_SLEEP */
+
+#ifdef USE_BACKLIGHT_SW_FADING
+static int backlight_fading_type = (FADING_UP|FADING_DOWN);
+static int backlight_fading_state = NOT_FADING;
+#endif
+
 
 #if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
 /* backlight fading */
@@ -397,6 +412,66 @@ void backlight_set_fade_out(int value)
 }
 #endif /* defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR) */
 
+#ifdef USE_BACKLIGHT_SW_FADING
+
+void backlight_set_fade_out(bool value)
+{
+    if(value) /* on */
+        backlight_fading_type |= FADING_DOWN;
+    else
+        backlight_fading_type &= FADING_UP;
+}
+
+void backlight_set_fade_in(bool value)
+{
+    if(value) /* on */
+        backlight_fading_type |= FADING_UP;
+    else
+        backlight_fading_type &= FADING_DOWN;
+}
+
+static void backlight_set_up_fade_up(void)
+{
+    if (backlight_fading_type & FADING_UP)
+    {
+        if (backlight_fading_state == NOT_FADING)
+        {
+            /* make sure the backlight is at lowest level */
+            _backlight_on();
+        }
+        backlight_fading_state = FADING_UP;
+    }
+    else
+    {
+        backlight_fading_state = NOT_FADING;
+        _backlight_fade_update_state(backlight_brightness);
+        _backlight_on();
+        _backlight_set_brightness(backlight_brightness);
+    }
+}
+
+static void backlight_set_up_fade_down(void)
+{
+    if (backlight_fading_type & FADING_DOWN)
+    {
+        backlight_fading_state = FADING_DOWN;
+    }
+    else
+    {
+        backlight_fading_state = NOT_FADING;
+        _backlight_fade_update_state(MIN_BRIGHTNESS_SETTING-1);
+        _backlight_off();
+    /* h300/x5/d2 go to the last known brightness level at backight_on(),which
+     * should be the lowest level to keep fading up glitch free
+     * sansa e200/c200 make the backlight on only by setting the brightness,
+     * so this step would be noticeable */
+#if !defined(SANSA_E200) && !defined(SANSA_C200)
+        _backlight_set_brightness(MIN_BRIGHTNESS_SETTING);
+#endif
+    }
+}
+#endif /* USE_BACKLIGHT_SW_FADING */
+
 /* Update state of backlight according to timeout setting */
 static void backlight_update_state(void)
 {
@@ -424,15 +499,25 @@ static void backlight_update_state(void)
             backlight_timeout = backlight_timeout_normal;
 
     /* Backlight == OFF in the setting? */
-    if (backlight_timeout < 0)
+    if (UNLIKELY(backlight_timeout < 0))
     {
         backlight_timer = 0; /* Disable the timeout */
+#ifdef USE_BACKLIGHT_SW_FADING
+        backlight_set_up_fade_down();
+        /* necessary step to issue fading down when the setting is selected */
+        queue_post(&backlight_queue, SYS_TIMEOUT, 0);
+#else
         _backlight_off();
+#endif
     }
     else
     {
         backlight_timer = backlight_timeout;
+#if defined(USE_BACKLIGHT_SW_FADING)
+        backlight_set_up_fade_up();
+#else
         _backlight_on();
+#endif
     }
 }
 
@@ -478,7 +563,15 @@ void backlight_thread(void)
 
     while(1)
     {
-        queue_wait(&backlight_queue, &ev);
+#if defined(USE_BACKLIGHT_SW_FADING)
+        if (backlight_fading_state)
+            queue_wait_w_tmo(&backlight_queue, &ev, FADE_DELAY);
+        else
+#endif
+            queue_wait(&backlight_queue, &ev);
+/*
+#endif
+*/
         switch(ev.id)
         {   /* These events must always be processed */
 #ifdef _BACKLIGHT_FADE_BOOST
@@ -558,9 +651,12 @@ void backlight_thread(void)
 
             case BACKLIGHT_OFF:
                 backlight_timer = 0; /* Disable the timeout */
+#ifndef USE_BACKLIGHT_SW_FADING
                 _backlight_off();
+#else
+                backlight_set_up_fade_down();
+#endif /* USE_BACKLIGHT_SW_FADING */
                 break;
-
 #ifdef HAVE_LCD_SLEEP
             case LCD_SLEEP:
                 lcd_sleep();
@@ -589,6 +685,12 @@ void backlight_thread(void)
                 remote_backlight_update_state();
 #endif
                 break;
+#if defined(USE_BACKLIGHT_SW_FADING)
+            case SYS_TIMEOUT:
+                if ((_backlight_fade_step(backlight_fading_state)))
+                    backlight_fading_state = NOT_FADING;
+                break;
+#endif /* USE_BACKLIGHT_SW_FADING */
         }
     } /* end while */
 }
@@ -597,8 +699,7 @@ static void backlight_tick(void)
 {
     if(backlight_timer)
     {
-        backlight_timer--;
-        if(backlight_timer == 0)
+        if(--backlight_timer == 0)
         {
             backlight_off();
         }
@@ -606,20 +707,17 @@ static void backlight_tick(void)
 #ifdef HAVE_LCD_SLEEP
     else if(lcd_sleep_timer)
     {
-        lcd_sleep_timer--;
-        if(lcd_sleep_timer == 0)
+        if(--lcd_sleep_timer == 0)
         {
             /* Queue on bl thread or freeze! */
             queue_post(&backlight_queue, LCD_SLEEP, 0);
         }
     }
 #endif /* HAVE_LCD_SLEEP */
-
 #ifdef HAVE_REMOTE_LCD
     if(remote_backlight_timer)
     {
-        remote_backlight_timer--;
-        if(remote_backlight_timer == 0)
+        if(--remote_backlight_timer == 0)
         {
             remote_backlight_off();
         }
@@ -628,8 +726,7 @@ static void backlight_tick(void)
 #ifdef HAVE_BUTTON_LIGHT
     if (buttonlight_timer)
     {
-        buttonlight_timer--;
-        if (buttonlight_timer == 0)
+        if (--buttonlight_timer == 0)
         {
             buttonlight_off();
         }
@@ -832,6 +929,11 @@ void backlight_set_brightness(int val)
         val = MAX_BRIGHTNESS_SETTING;
 
     _backlight_set_brightness(val);
+    backlight_brightness = val;
+#ifdef USE_BACKLIGHT_SW_FADING
+    /* receive backlight brightness */
+    _backlight_fade_update_state(val);
+#endif
 }
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 

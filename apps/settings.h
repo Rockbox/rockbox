@@ -421,10 +421,14 @@ struct user_settings
     int backlight_timeout_plugged;
 #endif
 
-#ifdef HAVE_BACKLIGHT_PWM_FADING
+#if defined(HAVE_BACKLIGHT_PWM_FADING)
     int backlight_fade_in;  /* backlight fade in timing: 0..3 */
     int backlight_fade_out; /* backlight fade in timing: 0..7 */
+#elif defined(USE_BACKLIGHT_SW_FADING)
+    bool backlight_fade_in;
+    bool backlight_fade_out;
 #endif
+
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS 
     int brightness;
 #endif

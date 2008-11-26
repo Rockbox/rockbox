@@ -679,6 +679,11 @@ const struct settings_list settings[] = {
                   UNIT_MS, formatter_unit_0_is_off, getlang_unit_0_is_off,
                   backlight_set_fade_out, 10,
                   0,100,200,300,500,1000,2000,3000,5000,10000),
+#elif defined(USE_BACKLIGHT_SW_FADING)
+    OFFON_SETTING(0, backlight_fade_in, LANG_BACKLIGHT_FADE_IN,
+                    true, "backlight fade in", backlight_set_fade_in),
+    OFFON_SETTING(0, backlight_fade_out, LANG_BACKLIGHT_FADE_OUT,
+                    true, "backlight fade out", backlight_set_fade_out),
 #endif
     INT_SETTING(F_PADTITLE, scroll_speed, LANG_SCROLL_SPEED, 9,"scroll speed",
                 UNIT_INT, 0, 15, 1, NULL, NULL, lcd_scroll_speed),

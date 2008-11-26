@@ -20,7 +20,7 @@ albumart
 backlight_brightness
 #endif
 
-#if defined(HAVE_BACKLIGHT_PWM_FADING)
+#if defined(HAVE_BACKLIGHT_PWM_FADING) || defined(USE_BACKLIGHT_SW_FADING)
 backlight_fade
 #endif
 

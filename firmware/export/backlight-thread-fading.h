@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id:$
  *
- * Copyright (C) 2006 by Barry Wardell
+ * Copyright (C) 2007 by Will Robertson
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,14 +18,29 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef BACKLIGHT_TARGET_H
-#define BACKLIGHT_TARGET_H
 
-#define _backlight_init() true
-void _backlight_on(void);
-void _backlight_off(void);
-void _backlight_set_brightness(int brightness);
+#ifndef BACKLIGHT_THREAD_FADING_H
+#define BACKLIGHT_THREAD_FADING_H
 
-void _buttonlight_on(void);
-void _buttonlight_off(void);
-#endif
+#include "config.h"
+
+#ifdef USE_BACKLIGHT_SW_FADING
+
+/* delay supposed to be MAX_BRIGHTNESS_SETTING*2 rounded to the next multiple
+ * of 5, however not more than 40 */
+#define _FADE_DELAY (((MAX_BRIGHTNESS_SETTING*2+4)/5)*5)
+#define FADE_DELAY (HZ/(MIN(_FADE_DELAY, 40)))
+
+void _backlight_fade_update_state(int brightness);
+bool _backlight_fade_step(int direction);
+
+/* enum used for both, fading state and fading type selected through the settings */
+
+enum {
+    NOT_FADING = 0,
+    FADING_UP,
+    FADING_DOWN,
+};
+#endif /* USE_BACKLIGHT_SW_FADING */
+
+#endif /* _BACKLIGHT_THREAD_FADING_ */
