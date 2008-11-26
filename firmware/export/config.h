@@ -434,7 +434,7 @@
 
 #endif /* BOOTLOADER */
 
-#if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732)
+#if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) || (CONFIG_CPU == AS3525)
 #define HAVE_WAKEUP_OBJECTS
 #endif
 

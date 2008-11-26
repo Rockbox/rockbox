@@ -36,4 +36,4 @@ void dma_enable_channel(int channel, void *src, void *dst, int peri,
                         int flow_controller, bool src_inc, bool dst_inc,
                         size_t size, int nwords);
 
-extern volatile bool dma_finished;
+inline void dma_wait_transfer(int channel);

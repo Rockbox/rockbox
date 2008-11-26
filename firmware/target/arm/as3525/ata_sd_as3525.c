@@ -553,8 +553,7 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
                                 (1<<3) /* DMA */                        |
                                 (9<<4) /* 2^9 = 512 */ ;
 
-        while(!dma_finished)
-            yield();
+        dma_wait_transfer(0);
 
         buf += transfer * SECTOR_SIZE;
         start += transfer;

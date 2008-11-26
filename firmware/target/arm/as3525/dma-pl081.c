@@ -19,21 +19,30 @@
  *
  ****************************************************************************/
 
+#include <stdbool.h>
 #include "as3525.h"
 #include "pl081.h"
 #include "dma-target.h"
-#include <stdbool.h>
 #include "panic.h"
+#include "kernel.h"
 
-volatile bool dma_finished;
+static struct wakeup transfer_completion_signal[2]; /* 2 channels */
+
+inline void dma_wait_transfer(int channel)
+{
+    wakeup_wait(&transfer_completion_signal[channel], TIMEOUT_BLOCK);
+}
 
 void dma_init(void)
 {
     /* Enable DMA controller */
     CGU_PERI |= CGU_DMA_CLOCK_ENABLE;
-    DMAC_CONFIGURATION |= (1<<0);
+    DMAC_CONFIGURATION |= (1<<0);   /* TODO: disable controller when not used */
     DMAC_SYNC = 0;
     VIC_INT_ENABLE |= INTERRUPT_DMAC;
+
+    wakeup_init(&transfer_completion_signal[0]);
+    wakeup_init(&transfer_completion_signal[1]);
 }
 
 void dma_enable_channel(int channel, void *src, void *dst, int peri,
@@ -65,8 +74,6 @@ void dma_enable_channel(int channel, void *src, void *dst, int peri,
 
     DMAC_CH_CONTROL(channel) = control;
 
-    dma_finished = false;
-
     /* only needed if DMAC and Peripheral do not run at the same clock speed */
     DMAC_SYNC |= (1<<peri);
 
@@ -92,5 +99,5 @@ void INT_DMAC(void)
 
     DMAC_INT_TC_CLEAR |= (1<<channel); /* clear terminal count interrupt */
 
-    dma_finished = true; /* TODO : use struct wakeup ? */
+    wakeup_signal(&transfer_completion_signal[channel]);
 }
