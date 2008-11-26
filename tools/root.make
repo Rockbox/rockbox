@@ -29,7 +29,11 @@ RBINFO = $(BUILDDIR)/rockbox-info.txt
 
 .PHONY: all clean tags zip tools manual bin build info langs
 
+ifeq (,$(filter clean veryclean tags voice voicetools manual manual-pdf manual-html manual-zhtml manual-txt manual-ztxt manual-zip help fontzip ,$(MAKECMDGOALS)))
+# none of the above
 DEPFILE = $(BUILDDIR)/make.dep
+
+endif
 
 all: $(DEPFILE) build
 
@@ -73,13 +77,11 @@ $(RBINFO): $(BUILDDIR)/$(BINARY)
 	$(SILENT)echo Creating $(@F)
 	$(SILENT)$(TOOLSDIR)/mkinfo.pl $@
 
-ifneq (clean,$(findstring clean,$(MAKECMDGOALS))) # don't build deps before cleaning
 $(DEPFILE) dep:
 	$(call PRINTS,Generating dependencies)
 	@echo foo > /dev/null # there must be a "real" command in the rule
 	$(call mkdepfile,$(DEPFILE),$(SRC) $(OTHER_SRC))
 	$(call bmpdepfile,$(DEPFILE),$(BMP) $(PBMP))
-endif
 
 bin: $(DEPFILE) $(TOOLS) $(BUILDDIR)/$(BINARY)
 rocks: $(DEPFILE) $(TOOLS) $(ROCKS)
@@ -99,7 +101,7 @@ clean:
 		rockbox-manual*.zip sysfont.h rockbox-info.txt voicefontids \
 		*.wav *.mp3 *.voice max_language_size.h $(CLEANOBJS) \
 		$(LINKRAM) $(LINKROM) rockbox.elf rockbox.map rockbox.bin \
-		$(DEPFILE) rombox.elf rombox.map rombox.bin rombox.ucl \
+		make.dep rombox.elf rombox.map rombox.bin rombox.ucl \
 		$(BINARY) $(FLASHFILE) uisimulator bootloader flash $(BOOTLINK)
 
 #### linking the binaries: ####
