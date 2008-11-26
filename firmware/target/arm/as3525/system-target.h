@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2008 ??
+ * Copyright (C) 2008 Rafaël Carré
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,8 +23,8 @@
 
 #include "system-arm.h"
 
-#define CPUFREQ_MAX    250000000
-#define CPUFREQ_DEFAULT 250000000
-#define CPUFREQ_NORMAL 250000000
+#define CPUFREQ_MAX     240000000
+#define CPUFREQ_DEFAULT 24000000
+#define CPUFREQ_NORMAL  30000000
 
 #endif /* SYSTEM_TARGET_H */

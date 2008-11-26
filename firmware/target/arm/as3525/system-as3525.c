@@ -219,6 +219,11 @@ void system_init(void)
     while(!(CGU_INTCTRL & (1<<0))); /* wait until PLLA is locked */
 
     CGU_PROC = (3<<2)|0x01; /* fclk = PLLA*5/8 = 240 MHz */
+#ifndef BOOTLOADER
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    set_cpu_frequency(CPUFREQ_DEFAULT);
+#endif
+#endif
 
     asm volatile(
         "mov r0, #0               \n"
@@ -230,8 +235,6 @@ void system_init(void)
         : : : "r0" );
 
     sdram_init();
-
-    CGU_PERI |= (5<<2)|0x01; /* pclk = PLLA / 6 = 64 MHz */
 
     /* enable timer interface for TIMER1 & TIMER2 */
     CGU_PERI |= CGU_TIMERIF_CLOCK_ENABLE;
@@ -264,11 +267,19 @@ int system_memory_guard(int newmode)
 }
 
 #ifndef BOOTLOADER
-
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void set_cpu_frequency(long frequency)
 {
-    /* TODO */
+    int divider = CPUFREQ_MAX / frequency;
+
+    if(divider > 16)
+        divider = 16;
+    else if(divider < 1)
+        divider = 1;
+
+    cpu_frequency = CPUFREQ_MAX / divider;
+
+    CGU_PROC &= ~(0xf << 4) /* clear divider bits */ ^ ((divider-1) << 4);
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 #endif /* BOOTLOADER */
