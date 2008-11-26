@@ -68,10 +68,10 @@ void init_predictor_decoder(struct predictor_t* p)
 }
 
 #if !defined(CPU_ARM) && !defined(CPU_COLDFIRE)
-int ICODE_ATTR_DEMAC predictor_decode_stereo(struct predictor_t* p,
-                                             int32_t* decoded0,
-                                             int32_t* decoded1,
-                                             int count)
+void ICODE_ATTR_DEMAC predictor_decode_stereo(struct predictor_t* p,
+                                              int32_t* decoded0,
+                                              int32_t* decoded1,
+                                              int count)
 {
     int32_t predictionA, predictionB; 
 
@@ -208,14 +208,12 @@ int ICODE_ATTR_DEMAC predictor_decode_stereo(struct predictor_t* p,
             p->buf = p->historybuffer;
         }
     }
-
-    return 0;
 }
 #endif
 
-int ICODE_ATTR_DEMAC predictor_decode_mono(struct predictor_t* p,
-                                           int32_t* decoded0,
-                                           int count)
+void ICODE_ATTR_DEMAC predictor_decode_mono(struct predictor_t* p,
+                                            int32_t* decoded0,
+                                            int count)
 {
     int32_t predictionA, currentA, A;
 
@@ -270,6 +268,4 @@ int ICODE_ATTR_DEMAC predictor_decode_mono(struct predictor_t* p,
     }
 
     p->YlastA = currentA;
-
-    return 0;
 }

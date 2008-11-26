@@ -237,8 +237,8 @@ void INIT_FILTER(filter_int* buf)
     do_init_filter(&filter1, buf + ORDER*3 + FILTER_HISTORY_SIZE);
 }
 
-int ICODE_ATTR_DEMAC APPLY_FILTER(int fileversion, int32_t* data0,
-                                  int32_t* data1, int count)
+void ICODE_ATTR_DEMAC APPLY_FILTER(int fileversion, int32_t* data0,
+                                   int32_t* data1, int count)
 {
     if (fileversion >= 3980) {
         do_apply_filter_3980(&filter0, data0, count);
@@ -249,6 +249,4 @@ int ICODE_ATTR_DEMAC APPLY_FILTER(int fileversion, int32_t* data0,
         if (data1 != NULL)
             do_apply_filter_3970(&filter1, data1, count);
     }
-
-    return 0;
 }

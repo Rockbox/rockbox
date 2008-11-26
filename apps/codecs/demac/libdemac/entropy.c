@@ -419,11 +419,11 @@ void init_entropy_decoder(struct ape_ctx_t* ape_ctx,
     *firstbyte = bytebufferoffset;
 }
 
-int ICODE_ATTR_DEMAC entropy_decode(struct ape_ctx_t* ape_ctx,
-                                    unsigned char* inbuffer, int* firstbyte,
-                                    int* bytesconsumed,
-                                    int32_t* decoded0, int32_t* decoded1,
-                                    int blockstodecode)
+void ICODE_ATTR_DEMAC entropy_decode(struct ape_ctx_t* ape_ctx,
+                                     unsigned char* inbuffer, int* firstbyte,
+                                     int* bytesconsumed,
+                                     int32_t* decoded0, int32_t* decoded1,
+                                     int blockstodecode)
 {
     bytebuffer = inbuffer;
     bytebufferoffset = *firstbyte;
@@ -458,6 +458,4 @@ int ICODE_ATTR_DEMAC entropy_decode(struct ape_ctx_t* ape_ctx,
     /* Return the new state of the buffer */
     *bytesconsumed = bytebuffer - inbuffer;
     *firstbyte = bytebufferoffset;
-
-    return(0);
 }

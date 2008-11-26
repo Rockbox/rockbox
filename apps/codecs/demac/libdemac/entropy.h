@@ -2,7 +2,7 @@
 
 libdemac - A Monkey's Audio decoder
 
-$Id:$
+$Id$
 
 Copyright (C) Dave Chapman 2007
 
@@ -31,10 +31,10 @@ void init_entropy_decoder(struct ape_ctx_t* ape_ctx,
                           unsigned char* inbuffer, int* firstbyte,
                           int* bytesconsumed);
 
-int entropy_decode(struct ape_ctx_t* ape_ctx, 
-                   unsigned char* inbuffer, int* firstbyte, 
-                   int* bytesconsumed,
-                   int32_t* decoded0, int32_t* decoded1, 
-                   int blockstodecode);
+void entropy_decode(struct ape_ctx_t* ape_ctx,
+                    unsigned char* inbuffer, int* firstbyte,
+                    int* bytesconsumed,
+                    int32_t* decoded0, int32_t* decoded1,
+                    int blockstodecode);
 
 #endif

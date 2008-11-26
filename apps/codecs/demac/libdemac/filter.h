@@ -28,18 +28,23 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #include "demac_config.h"
 
 void init_filter_16_11(filter_int* buf);
-int apply_filter_16_11(int fileversion, int32_t* decoded0, int32_t* decoded1, int count);
+void apply_filter_16_11(int fileversion, int32_t* decoded0,
+                        int32_t* decoded1, int count);
 
 void init_filter_64_11(filter_int* buf);
-int apply_filter_64_11(int fileversion, int32_t* decoded0, int32_t* decoded1, int count);
+void apply_filter_64_11(int fileversion, int32_t* decoded0,
+                        int32_t* decoded1, int count);
 
 void init_filter_32_10(filter_int* buf);
-int apply_filter_32_10(int fileversion, int32_t* decoded0, int32_t* decoded1, int count);
+void apply_filter_32_10(int fileversion, int32_t* decoded0,
+                        int32_t* decoded1, int count);
 
 void init_filter_256_13(filter_int* buf);
-int apply_filter_256_13(int fileversion, int32_t* decoded0, int32_t* decoded1, int count);
+void apply_filter_256_13(int fileversion, int32_t* decoded0,
+                         int32_t* decoded1, int count);
 
 void init_filter_1280_15(filter_int* buf);
-int apply_filter_1280_15(int fileversion, int32_t* decoded0, int32_t* decoded1, int count);
+void apply_filter_1280_15(int fileversion, int32_t* decoded0,
+                          int32_t* decoded1, int count);
 
 #endif
