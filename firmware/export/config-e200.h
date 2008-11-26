@@ -131,7 +131,9 @@
 
 /* define this if the backlight thread is used for fade, not for sim, needs
  * HAVE_BACKLIGHT_BRIGHTNESS */
+#ifndef BOOTLOADER
 #define USE_BACKLIGHT_SW_FADING
+#endif
 
 /* Define this if you have a PortalPlayer PP5024 */
 #define CONFIG_CPU PP5024

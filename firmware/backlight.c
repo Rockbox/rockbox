@@ -48,6 +48,10 @@
 #define BACKLIGHT_FULL_INIT
 #endif
 
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+int backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
+#endif
+
 #ifdef USE_BACKLIGHT_SW_FADING
 #include "backlight-thread-fading.h"
 #endif
@@ -137,10 +141,6 @@ static int backlight_timeout_plugged = 5*HZ;
 #endif
 #ifdef HAS_BUTTON_HOLD
 static int backlight_on_button_hold = 0;
-#endif
-
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-int backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
 #endif
 
 #ifdef HAVE_BUTTON_LIGHT
@@ -928,8 +928,8 @@ void backlight_set_brightness(int val)
     else if (val > MAX_BRIGHTNESS_SETTING)
         val = MAX_BRIGHTNESS_SETTING;
 
-    _backlight_set_brightness(val);
     backlight_brightness = val;
+    _backlight_set_brightness(val);
 #ifdef USE_BACKLIGHT_SW_FADING
     /* receive backlight brightness */
     _backlight_fade_update_state(val);

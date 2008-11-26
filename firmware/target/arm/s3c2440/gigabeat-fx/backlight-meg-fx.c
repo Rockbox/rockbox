@@ -63,8 +63,6 @@ enum buttonlight_states
     BUTTONLIGHT_CONTROL_FADE,
 } buttonlight_control;
 
-
-static unsigned char backlight_brightness;
 static unsigned char buttonlight_brightness;
 static unsigned char backlight_target;
 static unsigned char buttonlight_target;
@@ -74,11 +72,6 @@ static unsigned short buttonlight_trigger_now;
 /* Assumes that the backlight has been initialized */
 void _backlight_set_brightness(int brightness)
 {
-    /* clamp the brightness value */
-    brightness = MAX(1, MIN(12, brightness));
-    /* stop the interrupt from messing us up */
-    backlight_control = BACKLIGHT_CONTROL_IDLE;
-    backlight_brightness = log_brightness[brightness - 1];
     backlight_control = BACKLIGHT_CONTROL_SET;
 }
 
@@ -160,7 +153,7 @@ static void led_control_service(void)
                 if(!(sc606regCONFval&0x03))
                     break;
                 sc606_changed=true;
-                sc606regAval=backlight_brightness;
+                sc606regAval=log_brightness[backlight_brightness - 1];
                 backlight_control = BACKLIGHT_CONTROL_IDLE;
                 break;
             case BACKLIGHT_CONTROL_FADE:

@@ -43,8 +43,6 @@ void backlight_set_fade_in(bool value);
 void backlight_set_fade_out(bool value);
 #endif
 
-extern int backlight_brightness;
-
 void backlight_set_timeout_plugged(int value);
 
 #ifdef HAS_BUTTON_HOLD
@@ -82,6 +80,7 @@ void sim_remote_backlight(int value);
 #endif
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
+extern int backlight_brightness;
 void backlight_set_brightness(int val);
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
