@@ -62,9 +62,7 @@ static unsigned long pcm_freq SHAREDDATA_ATTR = HW_SAMPR_DEFAULT; /* 44.1 is def
 
 void pcm_postinit(void)
 {
-#if defined(IAUDIO_7)
-    audiohw_postinit(); /* implemented not for all codecs */
-#endif
+    audiohw_postinit();
     pcm_apply_settings();
 }
 
@@ -113,11 +111,6 @@ void pcm_play_dma_init(void)
 #if NUM_CORES > 1
     dma_play_data.core = 0; /* no core in control */
 #endif
-}
-
-void pcm_postinit(void)
-{
-    audiohw_postinit();
 }
 
 void pcm_apply_settings(void)

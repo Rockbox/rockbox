@@ -109,10 +109,6 @@ void audiohw_preinit(void)
     GPIOL_OUTPUT_VAL |= 0x10; /* disable */
 #endif
 
-#ifdef CPU_PP502x
-    i2s_reset();
-#endif
-
     /*
      * 1. Switch on power supplies.
      *    By default the WM8751 is in Standby Mode, the DAC is
