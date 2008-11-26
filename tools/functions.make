@@ -39,7 +39,7 @@ mkdepfile = $(shell \
 	-e "s: pluginbitmaps/: $(BUILDDIR)/pluginbitmaps/:g" \
 	-e "s: lib/: $(APPSDIR)/plugins/lib/:g" \
 	-e "s: codeclib.h: $(APPSDIR)/codecs/lib/codeclib.h:g" \
-	> $(1) )
+	> $(1)_ && mv $(1)_ $(1) )
 
 # function to create .bmp dependencies
 bmpdepfile = $(shell \
