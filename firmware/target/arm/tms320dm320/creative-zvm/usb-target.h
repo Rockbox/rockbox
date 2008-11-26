@@ -63,8 +63,8 @@
 //#define INT_CONF_TARGET             2
 #define set_int_value(a,b,value)    a = value & 0xFFFF; \
                                     b = value >> 16;
-                                    
-                                    
+
+
 #define ZVM_SPECIFIC                asm volatile( \
                                                  "LDR     R12, =0x50FFC000\n" \
                                                  "LDRH    R12, [R12]\n"  \

@@ -55,10 +55,10 @@ void dma_start(const void* addr, size_t size)
 
 #define ATA_DEST        (ATA_IOBASE-CS1_START)
 void dma_ata_read(unsigned char* buf, int shortcount)
-{   
+{
     if(dma_in_progress)
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
-    
+
     while((unsigned long)buf & 0x1F)
     {
         unsigned short tmp;
@@ -67,10 +67,10 @@ void dma_ata_read(unsigned char* buf, int shortcount)
         *buf++ = tmp >> 8;
         shortcount--;
     }
-    
+
     if (!shortcount)
         return;
-    
+
     IO_SDRAM_SDDMASEL = 0x0820; /* 32-byte burst mode transfer */
     IO_EMIF_DMAMTCSEL = 1; /* Select CS1 */
     IO_EMIF_AHBADDH = ((unsigned long)buf >> 16) & 0x7FFF; /* Set variable address */
@@ -79,10 +79,10 @@ void dma_ata_read(unsigned char* buf, int shortcount)
     IO_EMIF_MTCADDL = ATA_DEST & 0xFFFF;
     IO_EMIF_DMASIZE = shortcount/2; /* 16-bits *2 = 1 word */
     IO_EMIF_DMACTL = 3; /* Select MTC->AHB and start transfer */
-    
+
     dma_in_progress = true;
     wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
-    
+
     if(shortcount % 2)
     {
         unsigned short tmp;
@@ -96,7 +96,7 @@ void dma_ata_write(unsigned char* buf, int wordcount)
 {
     if(dma_in_progress)
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
-    
+
     while((unsigned long)buf & 0x1F)
     {
         unsigned short tmp;
@@ -105,10 +105,10 @@ void dma_ata_write(unsigned char* buf, int wordcount)
         SET_16BITREG(ATA_DATA, tmp);
         wordcount--;
     }
-    
+
     if (!wordcount)
         return;
-    
+
     IO_SDRAM_SDDMASEL = 0x0830; /* 32-byte burst mode transfer */
     IO_EMIF_DMAMTCSEL = 1; /* Select CS1 */
     IO_EMIF_AHBADDH = ((unsigned long)buf >> 16) & ~(1 << 15); /* Set variable address */
@@ -117,7 +117,7 @@ void dma_ata_write(unsigned char* buf, int wordcount)
     IO_EMIF_MTCADDL = ATA_DEST & 0xFFFF;
     IO_EMIF_DMASIZE = (wordcount+1)/2;
     IO_EMIF_DMACTL = 1; /* Select AHB->MTC and start transfer */
-    
+
     dma_in_progress = true;
     wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 }

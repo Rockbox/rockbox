@@ -51,7 +51,7 @@ const unsigned short percent_to_volt_charge[11] =
 void read_battery_inputs(void)
 {
 }
-    
+
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {

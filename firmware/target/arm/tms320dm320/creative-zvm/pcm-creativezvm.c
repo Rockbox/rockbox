@@ -38,7 +38,7 @@ void pcm_play_dma_init(void)
     audiohw_init();
 
     audiohw_set_frequency(1);
-    
+
     /* init DSP */
     dsp_init();
 }
@@ -69,7 +69,7 @@ void pcm_set_frequency(unsigned int frequency)
             index = 2;
             break;
     }
-    
+
     audiohw_set_frequency(index);
 } /* pcm_set_frequency */
 
