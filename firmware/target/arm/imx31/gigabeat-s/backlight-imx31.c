@@ -85,9 +85,15 @@ bool _backlight_init(void)
     /* Set default LED register value */
     mc13783_write(MC13783_LED_CONTROL0, MC13783_LED_CONTROL0_BITS);
 
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
     /* Our PWM and I-Level is different than retailos (but same apparent
      * brightness), so init to our default. */
     _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+#else
+    /* Use default PWM */
+    backlight_pwm_bits = mc13783_read(MC13783_LED_CONTROL2) & MC13783_LEDMDDC;
+#endif
+
     return true;
 }
 
