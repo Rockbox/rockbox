@@ -67,21 +67,26 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 .macro LDR2OFS reg1, reg2, base, offset
 #if ARM_ARCH >= 5
     ldrd    \reg1, [\base, \offset]
-#else
+#else /* ARM_ARCH < 5 */
+#ifdef CPU_ARM7TDMI
     add     \reg1, \base, \offset
     ldmia   \reg1, {\reg1, \reg2}
+#else
+    ldr     \reg1, [\base, \offset]
+    ldr     \reg2, [\base, \offset+4]
 #endif
+#endif /* ARM_ARCH */
 .endm
 
 @ Macro for storing 2 registers, for various ARM versions.
 @ Registers must start with an even register, and must be consecutive.
 
-.macro STR2OFS reg1, reg2, base, offset, scratch
+.macro STR2OFS reg1, reg2, base, offset
 #if ARM_ARCH >= 5
     strd    \reg1, [\base, \offset]
 #else
-    add     \scratch, \base, \offset
-    stmia   \scratch, {\reg1, \reg2}
+    str     \reg1, [\base, \offset]
+    str     \reg2, [\base, \offset+4]
 #endif
 .endm
 
@@ -127,7 +132,7 @@ loop:
 
     subs    r10, r11, r10           @ r10 := r11 - r10
 
-    STR2OFS r10, r11, r14, #YDELAYA-4, r1  @ r1 -> scratch
+    STR2OFS r10, r11, r14, #YDELAYA-4
                                     @ p->buf[YDELAYA-1] = r10
                                     @ p->buf[YDELAYA] = r11
 
@@ -144,7 +149,7 @@ loop:
     mvngt   r11, #0
     movlt   r11, #1                 @ r11 := SIGN(r11) (see .c for SIGN macro)
 
-    STR2OFS r10, r11, r14, #YADAPTCOEFFSA-4, r1  @r1 -> scratch
+    STR2OFS r10, r11, r14, #YADAPTCOEFFSA-4
                                     @ p->buf[YADAPTCOEFFSA-1] := r10
                                     @ p->buf[YADAPTCOEFFSA] := r11
 
@@ -175,7 +180,7 @@ loop:
 
     subs    r10, r11, r10           @ r10 := r11 - r10
 
-    STR2OFS r10, r11, r14, #YDELAYB-4, r1  @ r1 -> scratch
+    STR2OFS r10, r11, r14, #YDELAYB-4
                                     @ p->buf[YDELAYB-1] = r10
                                     @ p->buf[YDELAYB] = r11
 
@@ -193,7 +198,7 @@ loop:
     mvngt   r11, #0
     movlt   r11, #1                 @ r11 := SIGN(r11) (see .c for SIGN macro)
 
-    STR2OFS r10, r11, r14, #YADAPTCOEFFSB-4, r2  @ r2 -> scratch
+    STR2OFS r10, r11, r14, #YADAPTCOEFFSB-4
                                     @ p->buf[YADAPTCOEFFSB-1] := r10
                                     @ p->buf[YADAPTCOEFFSB] := r11
 
@@ -313,7 +318,7 @@ loop:
 
     subs    r10, r11, r10           @ r10 := r11 - r10
 
-    STR2OFS r10, r11, r14, #XDELAYA-4, r1  @ r1 -> scratch
+    STR2OFS r10, r11, r14, #XDELAYA-4
                                     @ p->buf[XDELAYA-1] = r10
                                     @ p->buf[XDELAYA] = r11
 
@@ -330,7 +335,7 @@ loop:
     mvngt   r11, #0
     movlt   r11, #1                 @ r11 := SIGN(r11) (see .c for SIGN macro)
 
-    STR2OFS r10, r11, r14, #XADAPTCOEFFSA-4, r1  @ r1 -> scratch
+    STR2OFS r10, r11, r14, #XADAPTCOEFFSA-4
                                     @ p->buf[XADAPTCOEFFSA-1] := r10
                                     @ p->buf[XADAPTCOEFFSA] := r11
 
@@ -361,7 +366,7 @@ loop:
 
     subs    r10, r11, r10           @ r10 := r11 - r10
 
-    STR2OFS r10, r11, r14, #XDELAYB-4, r1  @ r1 -> scratch
+    STR2OFS r10, r11, r14, #XDELAYB-4
                                     @ p->buf[XDELAYB-1] = r10
                                     @ p->buf[XDELAYB] = r11
 
@@ -379,7 +384,7 @@ loop:
     mvngt   r11, #0
     movlt   r11, #1                 @ r11 := SIGN(r11) (see .c for SIGN macro)
 
-    STR2OFS r10, r11, r14, #XADAPTCOEFFSB-4, r2  @ r2 -> scratch
+    STR2OFS r10, r11, r14, #XADAPTCOEFFSB-4
                                     @ p->buf[XADAPTCOEFFSB-1] := r10
                                     @ p->buf[XADAPTCOEFFSB] := r11
 
