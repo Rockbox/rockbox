@@ -67,9 +67,20 @@ void UIE_VECTOR(void)
 }
 
 /* We use the AVIC */
-void __attribute__((naked)) irq_handler(void)
+void __attribute__((interrupt("IRQ"))) irq_handler(void)
 {
     const int offset = (int32_t)NIVECSR >> 16;
+
+    if (offset == -1)
+    {
+        /* This is called occasionally for some unknown reason even with the
+         * avic enabled but returning normally appears to cause no harm. The
+         * KPP and ATA seem to have a part in it (common but multiplexed pins
+         * that can interfere). It will be investigated more thoroughly but
+         * for now it is simply an occasional irritant. */
+        return;
+    }
+
     disable_interrupt(IRQ_FIQ_STATUS);
     panicf("Unhandled IRQ %d in irq_handler: %s", offset,
            offset >= 0 ? avic_int_names[offset] : "<Unknown>");
