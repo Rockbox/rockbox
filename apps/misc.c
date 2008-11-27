@@ -977,11 +977,19 @@ int show_logo( void )
     snprintf(version, sizeof(version), "Ver. %s", appsversion);
 
     lcd_clear_display();
+#ifdef SANSA_CLIP   /* display the logo in the blue area of the screen */
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_getstringsize((unsigned char *)"A", &font_w, &font_h);
+    lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
+               0, (unsigned char *)version);
+    lcd_bitmap(rockboxlogo, 0, 16, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
+#else
     lcd_bitmap(rockboxlogo, 0, 10, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
     lcd_setfont(FONT_SYSFIXED);
     lcd_getstringsize((unsigned char *)"A", &font_w, &font_h);
     lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
                LCD_HEIGHT-font_h, (unsigned char *)version);
+#endif
     lcd_setfont(FONT_UI);
 
 #else
