@@ -1068,6 +1068,7 @@ target/arm/pcm-telechips.c
 #ifdef SANSA_CLIP
 #ifndef SIMULATOR
 target/arm/as3525/sansa-clip/lcd-ssd1303.c
+target/arm/as3525/sansa-clip/lcd-as-clip.S
 target/arm/as3525/sansa-clip/button-clip.c
 target/arm/as3525/sansa-clip/backlight-clip.c
 target/arm/as3525/as3525-codec.c

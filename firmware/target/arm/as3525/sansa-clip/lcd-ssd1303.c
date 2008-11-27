@@ -88,6 +88,7 @@ void lcd_write_command(int byte)
     GPIOA_PIN(5) = 0;
 
     /* Write command */
+    /* Only bits 15:12 and 3:0 of DBOP_DOUT are meaningful */
     DBOP_DOUT = (byte << 8) | byte;
 
     /* While push fifo is not empty */
@@ -103,6 +104,7 @@ void lcd_write_data(const fb_data* p_bytes, int count)
     while (count--)
     {
         /* Write pixels */
+        /* Only bits 15:12 and 3:0 of DBOP_DOUT are meaningful */
         DBOP_DOUT = (*p_bytes << 8) | *p_bytes;
 
         p_bytes++; /* next packed pixels */
@@ -266,26 +268,30 @@ void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
     }
 }
 
+/* Helper function for lcd_grey_phase_blit(). */
+void lcd_grey_data(unsigned char *values, unsigned char *phases, int count);
 
 /* Performance function that works with an external buffer
    note that by and bheight are in 8-pixel units! */
 void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
                          int x, int by, int width, int bheight, int stride)
 {
-    /* TODO */
-
-#if 0
     if(!display_on)
         return;
-#endif
 
-    (void)values;
-    (void)phases;
-    (void)x;
-    (void)by;
-    (void)width;
-    (void)bheight;
-    (void)stride;
+    stride <<= 3; /* 8 pixels per block */
+    /* Copy display bitmap to hardware */
+    while (bheight--)
+    {
+        lcd_write_command (LCD_CNTL_PAGE | (by++ & 0xf));
+        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+2+xoffset)>>4) & 0xf));
+        lcd_write_command (LCD_CNTL_LOWCOL | ((x+2+xoffset) & 0xf));
+
+        lcd_grey_data(values, phases, width);
+
+        values += stride;
+        phases += stride;
+    }
 }
 
 /* Update the display.
