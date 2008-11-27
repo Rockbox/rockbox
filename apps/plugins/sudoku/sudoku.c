@@ -211,6 +211,12 @@ static const char default_game[9][9] =
 
 #endif /* Layout */
 
+#ifdef SUDOKU_BUTTON_CHANGEDIR
+int invertdir=0;
+#else
+#define invertdir 0
+#endif
+
 #define CFGFILE_VERSION 0     /* Current config file version */
 #define CFGFILE_MINVERSION 0  /* Minimum config file version to accept */
 
@@ -1450,36 +1456,52 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
                 /* move cursor left */
             case SUDOKU_BUTTON_LEFT:
             case (SUDOKU_BUTTON_LEFT | BUTTON_REPEAT):
-                if (state.x==0) {
+                if ( (state.x==0&&invertdir==0) || (state.y==0&&invertdir==1) ) {
 #ifndef SUDOKU_BUTTON_UP
-                    if (state.y==0) {
+                    if ( (state.y==0&&invertdir==0) || (state.x==0&&invertdir==1)) {
                         move_cursor(&state,8,8);
-                    } else { 
-                        move_cursor(&state,8,state.y-1);
+                    } else {
+                        if (invertdir==0) {
+                            move_cursor(&state,8,state.y-1);
+                        } else {
+                            move_cursor(&state,state.x-1,8);
+                        }
                     }
 #else
                     move_cursor(&state,8,state.y);
 #endif
-                } else { 
-                    move_cursor(&state,state.x-1,state.y);
+                } else {
+                    if (invertdir==0) {
+                        move_cursor(&state,state.x-1,state.y);
+                    } else {
+                        move_cursor(&state,state.x,state.y-1);
+                    }
                 }
                 break;
                 
                 /* move cursor right */
             case SUDOKU_BUTTON_RIGHT:
             case (SUDOKU_BUTTON_RIGHT | BUTTON_REPEAT):
-                if (state.x==8) {
+                if ( (state.x==8&&invertdir==0) || (state.y==8&&invertdir==1) ) {
 #ifndef SUDOKU_BUTTON_DOWN
-                    if (state.y==8) {
+                    if ( (state.y==8&&invertdir==0) || (state.x==8&&invertdir==1) ) {
                         move_cursor(&state,0,0);
-                    } else { 
-                        move_cursor(&state,0,state.y+1);
+                    } else {
+                        if (invertdir==0) {
+                            move_cursor(&state,0,state.y+1);
+                        } else {
+                            move_cursor(&state,state.x+1,0);
+                        }
                     }
 #else
                     move_cursor(&state,0,state.y);
 #endif
-                } else { 
-                    move_cursor(&state,state.x+1,state.y);
+                } else {
+                    if (invertdir==0) {
+                        move_cursor(&state,state.x+1,state.y);
+                    } else {
+                        move_cursor(&state,state.x,state.y+1);
+                    }
                 }
                 break;
 
@@ -1541,6 +1563,13 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
                     state.possiblevals[state.y][state.x]^=
                         (1 << (state.currentboard[state.y][state.x] - '0'));
                 }
+                break;
+#endif
+
+#ifdef SUDOKU_BUTTON_CHANGEDIR
+            case SUDOKU_BUTTON_CHANGEDIR:
+                /* Change scroll wheel direction */
+                invertdir=!invertdir;
                 break;
 #endif
             default:
