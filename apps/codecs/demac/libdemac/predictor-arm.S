@@ -61,6 +61,30 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #define historybuffer  100    /* int32_t historybuffer[] */
 
+@ Macro for loading 2 registers, for various ARM versions.
+@ Registers must start with an even register, and must be consecutive.
+
+.macro LDR2OFS reg1, reg2, base, offset
+#if ARM_ARCH >= 5
+    ldrd    \reg1, [\base, \offset]
+#else
+    add     \reg1, \base, \offset
+    ldmia   \reg1, {\reg1, \reg2}
+#endif
+.endm
+
+@ Macro for storing 2 registers, for various ARM versions.
+@ Registers must start with an even register, and must be consecutive.
+
+.macro STR2OFS reg1, reg2, base, offset, scratch
+#if ARM_ARCH >= 5
+    strd    \reg1, [\base, \offset]
+#else
+    add     \scratch, \base, \offset
+    stmia   \scratch, {\reg1, \reg2}
+#endif
+.endm
+
 @ Register usage:
 @
 @ r0-r11 - scratch
@@ -88,91 +112,90 @@ loop:
 
 @ Predictor Y, Filter A
 
-    ldr     r10, [r12, #YlastA]     @ r10 := p->YlastA
+    ldr     r11, [r12, #YlastA]     @ r11 := p->YlastA
 
-    add     r11, r14, #YDELAYA-12   @ r11 := &p->buf[YDELAYA-3]
-    ldmia   r11, { r2 - r4 }        @ r2 := p->buf[YDELAYA-3]
+    add     r2, r14, #YDELAYA-12    @ r2 := &p->buf[YDELAYA-3]
+    ldmia   r2, {r2, r3, r10}       @ r2 := p->buf[YDELAYA-3]
                                     @ r3 := p->buf[YDELAYA-2]
-                                    @ r4 := p->buf[YDELAYA-1]
+                                    @ r10 := p->buf[YDELAYA-1]
 
-    add     r11, r12, #YcoeffsA
-    ldmia   r11, {r6 - r9}          @ r6 := p->YcoeffsA[0]
+    add     r6, r12, #YcoeffsA
+    ldmia   r6, {r6 - r9}           @ r6 := p->YcoeffsA[0]
                                     @ r7 := p->YcoeffsA[1]
                                     @ r8 := p->YcoeffsA[2]
                                     @ r9 := p->YcoeffsA[3]
 
-    subs    r4, r10, r4             @ r4 := r10 - r4
+    subs    r10, r11, r10           @ r10 := r11 - r10
 
-    add     r11, r14, #YDELAYA-4    @ r11 := &p->buf[YDELAYA-1]
-    stmia   r11, { r4, r10 }        @ p->buf[YDELAYA-1] = r4
-                                    @ p->buf[YDELAYA] = r10
+    STR2OFS r10, r11, r14, #YDELAYA-4, r1  @ r1 -> scratch
+                                    @ p->buf[YDELAYA-1] = r10
+                                    @ p->buf[YDELAYA] = r11
 
-    mul     r0, r10, r6             @ r0 := p->buf[YDELAYA] * p->YcoeffsA[0]
-    mla     r0, r4, r7, r0          @ r0 += p->buf[YDELAYA-1] * p->YcoeffsA[1]
+    mul     r0, r11, r6             @ r0 := p->buf[YDELAYA] * p->YcoeffsA[0]
+    mla     r0, r10, r7, r0         @ r0 += p->buf[YDELAYA-1] * p->YcoeffsA[1]
     mla     r0, r3, r8, r0          @ r0 += p->buf[YDELAYA-2] * p->YcoeffsA[2]
     mla     r0, r2, r9, r0          @ r0 += p->buf[YDELAYA-3] * p->YcoeffsA[3]
 
     @ flags were set above, in the subs instruction
-    mvngt   r4, #0
-    movlt   r4, #1                  @ r4 := SIGN(r4) (see .c for SIGN macro)
-
-    cmp     r10, #0
     mvngt   r10, #0
     movlt   r10, #1                 @ r10 := SIGN(r10) (see .c for SIGN macro)
 
-    add     r1, r14, #YADAPTCOEFFSA-4
-    stmia   r1, {r4, r10}           @ p->buf[YADAPTCOEFFSA-1] := r4
-                                    @ p->buf[YADAPTCOEFFSA] := r10
+    cmp     r11, #0
+    mvngt   r11, #0
+    movlt   r11, #1                 @ r11 := SIGN(r11) (see .c for SIGN macro)
+
+    STR2OFS r10, r11, r14, #YADAPTCOEFFSA-4, r1  @r1 -> scratch
+                                    @ p->buf[YADAPTCOEFFSA-1] := r10
+                                    @ p->buf[YADAPTCOEFFSA] := r11
 
     @ NOTE: r0 now contains predictionA - don't overwrite.
 
 @ Predictor Y, Filter B
 
-    add     r11, r12, #YfilterB
-    ldmia   r11, {r6, r7}           @ r6 := p->YfilterB
+    LDR2OFS r6, r7, r12, #YfilterB  @ r6 := p->YfilterB
                                     @ r7 := p->XfilterA
 
-    add     r11, r14, #YDELAYB-16   @ r11 := &p->buf[YDELAYB-4]
-    ldmia   r11, { r2 - r5 }        @ r2 := p->buf[YDELAYB-4]
+    add     r2, r14, #YDELAYB-16    @ r2 := &p->buf[YDELAYB-4]
+    ldmia   r2, {r2 - r4, r10}      @ r2 := p->buf[YDELAYB-4]
                                     @ r3 := p->buf[YDELAYB-3]
                                     @ r4 := p->buf[YDELAYB-2]
-                                    @ r5 := p->buf[YDELAYB-1]
+                                    @ r10 := p->buf[YDELAYB-1]
 
     rsb     r6, r6, r6, lsl #5      @ r6 := r6 * 32 - r6 ( == r6*31)
-    sub     r10, r7, r6, asr #5     @ r10 (p->buf[YDELAYB]) := r7 - (r6 >> 5)
+    sub     r11, r7, r6, asr #5     @ r11 (p->buf[YDELAYB]) := r7 - (r6 >> 5)
 
     str     r7, [r12, #YfilterB]    @ p->YfilterB := r7 (p->XfilterA)
 
-    add     r1, r12, #YcoeffsB
-    ldmia   r1, {r6,r7,r8,r9,r11}   @ r6 := p->YcoeffsB[0]
-                                    @ r7 := p->YcoeffsB[1]
-                                    @ r8 := p->YcoeffsB[2]
-                                    @ r9 := p->YcoeffsB[3]
-                                    @ r11 := p->YcoeffsB[4]
+    add     r5, r12, #YcoeffsB
+    ldmia   r5, {r5 - r9}           @ r5 := p->YcoeffsB[0]
+                                    @ r6 := p->YcoeffsB[1]
+                                    @ r7 := p->YcoeffsB[2]
+                                    @ r8 := p->YcoeffsB[3]
+                                    @ r9 := p->YcoeffsB[4]
 
-    subs    r5, r10, r5             @ r5 := r10 - r5
+    subs    r10, r11, r10           @ r10 := r11 - r10
 
-    add     r1, r14, #YDELAYB-4     @ r1 := &p->buf[YDELAYB-1]
-    stmia   r1, { r5, r10 }         @ p->buf[YDELAYB-1] = r5
-                                    @ p->buf[YDELAYB] = r10
+    STR2OFS r10, r11, r14, #YDELAYB-4, r1  @ r1 -> scratch
+                                    @ p->buf[YDELAYB-1] = r10
+                                    @ p->buf[YDELAYB] = r11
 
-    mul     r1, r10, r6             @ r1 := p->buf[YDELAYB] * p->YcoeffsB[0]
-    mla     r1, r5, r7, r1          @ r1 += p->buf[YDELAYB-1] * p->YcoeffsB[1]
-    mla     r1, r4, r8, r1          @ r1 += p->buf[YDELAYB-2] * p->YcoeffsB[2]
-    mla     r1, r3, r9, r1          @ r1 += p->buf[YDELAYB-3] * p->YcoeffsB[3]
-    mla     r1, r2, r11, r1         @ r1 += p->buf[YDELAYB-4] * p->YcoeffsB[4]
+    mul     r1, r11, r5             @ r1 := p->buf[YDELAYB] * p->YcoeffsB[0]
+    mla     r1, r10, r6, r1         @ r1 += p->buf[YDELAYB-1] * p->YcoeffsB[1]
+    mla     r1, r4, r7, r1          @ r1 += p->buf[YDELAYB-2] * p->YcoeffsB[2]
+    mla     r1, r3, r8, r1          @ r1 += p->buf[YDELAYB-3] * p->YcoeffsB[3]
+    mla     r1, r2, r9, r1          @ r1 += p->buf[YDELAYB-4] * p->YcoeffsB[4]
 
     @ flags were set above, in the subs instruction
-    mvngt   r5, #0
-    movlt   r5, #1                 @ r5 := SIGN(r5) (see .c for SIGN macro)
-
-    cmp     r10, #0
     mvngt   r10, #0
-    movlt   r10, #1                @ r10 := SIGN(r10) (see .c for SIGN macro)
+    movlt   r10, #1                 @ r10 := SIGN(r10) (see .c for SIGN macro)
 
-    add     r2, r14, #YADAPTCOEFFSB-4
-    stmia   r2, {r5, r10}           @ p->buf[YADAPTCOEFFSB-1] := r5
-                                    @ p->buf[YADAPTCOEFFSB] := r10
+    cmp     r11, #0
+    mvngt   r11, #0
+    movlt   r11, #1                 @ r11 := SIGN(r11) (see .c for SIGN macro)
+
+    STR2OFS r10, r11, r14, #YADAPTCOEFFSB-4, r2  @ r2 -> scratch
+                                    @ p->buf[YADAPTCOEFFSB-1] := r10
+                                    @ p->buf[YADAPTCOEFFSB] := r11
 
     @ r0 still contains predictionA
     @ r1 contains predictionB
@@ -201,31 +224,31 @@ loop:
     cmp     r3, #0
     beq     3f
 
-    add     r1, r14, #YADAPTCOEFFSB-16
-    ldmia   r1, { r2, r3, r4 }      @ r2 := p->buf[YADAPTCOEFFSB-4]
+    add     r2, r14, #YADAPTCOEFFSB-16
+    ldmia   r2, {r2 - r4}           @ r2 := p->buf[YADAPTCOEFFSB-4]
                                     @ r3 := p->buf[YADAPTCOEFFSB-3]
                                     @ r4 := p->buf[YADAPTCOEFFSB-2]
     blt     1f
 
     @ *decoded0 > 0
 
-    sub     r6, r6, r10       @ r6 := p->YcoeffsB[0] - p->buf[YADAPTCOEFFSB]
-    sub     r7, r7, r5        @ r7 := p->YcoeffsB[1] - p->buf[YADAPTCOEFFSB-1]
-    sub     r11, r11, r2      @ r11 := p->YcoeffsB[4] - p->buf[YADAPTCOEFFSB-4]
-    sub     r9, r9, r3        @ r9 := p->YcoeffsB[3] - p->buf[YADAPTCOEFFSB-3]
-    sub     r8, r8, r4        @ r8 := p->YcoeffsB[2] - p->buf[YADAPTCOEFFSB-2]
+    sub     r5, r5, r11       @ r5 := p->YcoeffsB[0] - p->buf[YADAPTCOEFFSB]
+    sub     r6, r6, r10       @ r6 := p->YcoeffsB[1] - p->buf[YADAPTCOEFFSB-1]
+    sub     r9, r9, r2        @ r9 := p->YcoeffsB[4] - p->buf[YADAPTCOEFFSB-4]
+    sub     r8, r8, r3        @ r8 := p->YcoeffsB[3] - p->buf[YADAPTCOEFFSB-3]
+    sub     r7, r7, r4        @ r7 := p->YcoeffsB[2] - p->buf[YADAPTCOEFFSB-2]
 
     add     r0, r12, #YcoeffsB      
-    stmia   r0, {r6,r7,r8,r9,r11}   @ Save p->YcoeffsB[]
+    stmia   r0, {r5 - r9}           @ Save p->YcoeffsB[]
 
     add     r1, r12, #YcoeffsA
-    ldmia   r1, { r2-r5 }           @ r2 := p->YcoeffsA[0]
+    ldmia   r1, {r2 - r5}           @ r2 := p->YcoeffsA[0]
                                     @ r3 := p->YcoeffsA[1]
                                     @ r4 := p->YcoeffsA[2]
                                     @ r5 := p->YcoeffsA[3]
 
-    add     r0, r14, #YADAPTCOEFFSA-12
-    ldmia   r0, { r6-r9}            @ r6 := p->buf[YADAPTCOEFFSA-3]
+    add     r6, r14, #YADAPTCOEFFSA-12
+    ldmia   r6, {r6 - r9}           @ r6 := p->buf[YADAPTCOEFFSA-3]
                                     @ r7 := p->buf[YADAPTCOEFFSA-2]
                                     @ r8 := p->buf[YADAPTCOEFFSA-1]
                                     @ r9 := p->buf[YADAPTCOEFFSA]
@@ -240,23 +263,23 @@ loop:
 
 1:  @ *decoded0 < 0
 
-    add     r6, r6, r10       @ r6 := p->YcoeffsB[0] + p->buf[YADAPTCOEFFSB]
-    add     r7, r7, r5        @ r7 := p->YcoeffsB[1] + p->buf[YADAPTCOEFFSB-1]
-    add     r11, r11, r2      @ r11 := p->YcoeffsB[4] + p->buf[YADAPTCOEFFSB-4]
-    add     r9, r9, r3        @ r9 := p->YcoeffsB[3] + p->buf[YADAPTCOEFFSB-3]
-    add     r8, r8, r4        @ r8 := p->YcoeffsB[2] + p->buf[YADAPTCOEFFSB-2]
+    add     r5, r5, r11       @ r5 := p->YcoeffsB[0] + p->buf[YADAPTCOEFFSB]
+    add     r6, r6, r10       @ r6 := p->YcoeffsB[1] + p->buf[YADAPTCOEFFSB-1]
+    add     r9, r9, r2        @ r9 := p->YcoeffsB[4] + p->buf[YADAPTCOEFFSB-4]
+    add     r8, r8, r3        @ r9 := p->YcoeffsB[3] + p->buf[YADAPTCOEFFSB-3]
+    add     r7, r7, r4        @ r8 := p->YcoeffsB[2] + p->buf[YADAPTCOEFFSB-2]
 
     add     r0, r12, #YcoeffsB      
-    stmia   r0, {r6,r7,r8,r9,r11}   @ Save p->YcoeffsB[]
+    stmia   r0, {r5 - r9}           @ Save p->YcoeffsB[]
 
     add     r1, r12, #YcoeffsA
-    ldmia   r1, { r2-r5 }           @ r2 := p->YcoeffsA[0]
+    ldmia   r1, {r2 - r5}           @ r2 := p->YcoeffsA[0]
                                     @ r3 := p->YcoeffsA[1]
                                     @ r4 := p->YcoeffsA[2]
                                     @ r5 := p->YcoeffsA[3]
 
-    add     r0, r14, #YADAPTCOEFFSA-12
-    ldmia   r0, { r6-r9}            @ r6 := p->buf[YADAPTCOEFFSA-3]
+    add     r6, r14, #YADAPTCOEFFSA-12
+    ldmia   r6, {r6 - r9}           @ r6 := p->buf[YADAPTCOEFFSA-3]
                                     @ r7 := p->buf[YADAPTCOEFFSA-2]
                                     @ r8 := p->buf[YADAPTCOEFFSA-1]
                                     @ r9 := p->buf[YADAPTCOEFFSA]
@@ -267,7 +290,7 @@ loop:
     add     r2, r2, r9        @ r2 := p->YcoeffsA[0] + p->buf[YADAPTCOEFFSA]
     
 2:
-    stmia   r1, {r2-r5}       @ Save p->YcoeffsA
+    stmia   r1, {r2 - r5}     @ Save p->YcoeffsA
 
 3:
 
@@ -275,91 +298,90 @@ loop:
 
 @ Predictor X, Filter A
 
-    ldr     r10, [r12, #XlastA]     @ r10 := p->XlastA
+    ldr     r11, [r12, #XlastA]     @ r11 := p->XlastA
 
-    add     r11, r14, #XDELAYA-12   @ r11 := &p->buf[XDELAYA-3]
-    ldmia   r11, { r2 - r4 }        @ r2 := p->buf[XDELAYA-3]
+    add     r2, r14, #XDELAYA-12    @ r2 := &p->buf[XDELAYA-3]
+    ldmia   r2, {r2, r3, r10}       @ r2 := p->buf[XDELAYA-3]
                                     @ r3 := p->buf[XDELAYA-2]
-                                    @ r4 := p->buf[XDELAYA-1]
+                                    @ r10 := p->buf[XDELAYA-1]
 
-    add     r11, r12, #XcoeffsA
-    ldmia   r11, {r6 - r9}          @ r6 := p->XcoeffsA[0]
+    add     r6, r12, #XcoeffsA
+    ldmia   r6, {r6 - r9}           @ r6 := p->XcoeffsA[0]
                                     @ r7 := p->XcoeffsA[1]
                                     @ r8 := p->XcoeffsA[2]
                                     @ r9 := p->XcoeffsA[3]
 
-    subs    r4, r10, r4             @ r4 := r10 - r4
+    subs    r10, r11, r10           @ r10 := r11 - r10
 
-    add     r11, r14, #XDELAYA-4    @ r11 := &p->buf[XDELAYA-1]
-    stmia   r11, { r4, r10 }        @ p->buf[XDELAYA-1] = r4
-                                    @ p->buf[XDELAYA] = r10
+    STR2OFS r10, r11, r14, #XDELAYA-4, r1  @ r1 -> scratch
+                                    @ p->buf[XDELAYA-1] = r10
+                                    @ p->buf[XDELAYA] = r11
 
-    mul     r0, r10, r6             @ r0 := p->buf[XDELAYA] * p->XcoeffsA[0]
-    mla     r0, r4, r7, r0          @ r0 += p->buf[XDELAYA-1] * p->XcoeffsA[1]
+    mul     r0, r11, r6             @ r0 := p->buf[XDELAYA] * p->XcoeffsA[0]
+    mla     r0, r10, r7, r0         @ r0 += p->buf[XDELAYA-1] * p->XcoeffsA[1]
     mla     r0, r3, r8, r0          @ r0 += p->buf[XDELAYA-2] * p->XcoeffsA[2]
     mla     r0, r2, r9, r0          @ r0 += p->buf[XDELAYA-3] * p->XcoeffsA[3]
 
     @ flags were set above, in the subs instruction
-    mvngt   r4, #0
-    movlt   r4, #1                 @ r4 := SIGN(r4) (see .c for SIGN macro)
-
-    cmp     r10, #0
     mvngt   r10, #0
-    movlt   r10, #1                @ r10 := SIGN(r10) (see .c for SIGN macro)
+    movlt   r10, #1                 @ r10 := SIGN(r10) (see .c for SIGN macro)
 
-    add     r1, r14, #XADAPTCOEFFSA-4
-    stmia   r1, {r4, r10}           @ p->buf[XADAPTCOEFFSA-1] := r4
-                                    @ p->buf[XADAPTCOEFFSA] := r10
+    cmp     r11, #0
+    mvngt   r11, #0
+    movlt   r11, #1                 @ r11 := SIGN(r11) (see .c for SIGN macro)
+
+    STR2OFS r10, r11, r14, #XADAPTCOEFFSA-4, r1  @ r1 -> scratch
+                                    @ p->buf[XADAPTCOEFFSA-1] := r10
+                                    @ p->buf[XADAPTCOEFFSA] := r11
 
     @ NOTE: r0 now contains predictionA - don't overwrite.
 
 @ Predictor X, Filter B
 
-    add     r11, r12, #XfilterB
-    ldmia   r11, {r6, r7}           @ r6 := p->XfilterB
+    LDR2OFS r6, r7, r12, #XfilterB  @ r6 := p->XfilterB
                                     @ r7 := p->YfilterA
 
-    add     r11, r14, #XDELAYB-16   @ r11 := &p->buf[XDELAYB-4]
-    ldmia   r11, { r2 - r5 }        @ r2 := p->buf[XDELAYB-4]
+    add     r2, r14, #XDELAYB-16    @ r2 := &p->buf[XDELAYB-4]
+    ldmia   r2, {r2 - r4, r10}      @ r2 := p->buf[XDELAYB-4]
                                     @ r3 := p->buf[XDELAYB-3]
                                     @ r4 := p->buf[XDELAYB-2]
-                                    @ r5 := p->buf[XDELAYB-1]
+                                    @ r10 := p->buf[XDELAYB-1]
 
     rsb     r6, r6, r6, lsl #5      @ r6 := r2 * 32 - r6 ( == r6*31)
-    sub     r10, r7, r6, asr #5     @ r10 (p->buf[XDELAYB]) := r7 - (r6 >> 5)
+    sub     r11, r7, r6, asr #5     @ r11 (p->buf[XDELAYB]) := r7 - (r6 >> 5)
 
-    str     r7, [r12, #XfilterB]    @ p->XfilterB := r11 (p->YfilterA)
+    str     r7, [r12, #XfilterB]    @ p->XfilterB := r7 (p->YfilterA)
 
-    add     r1, r12, #XcoeffsB
-    ldmia   r1, {r6,r7,r8,r9,r11}   @ r6 := p->XcoeffsB[0]
-                                    @ r7 := p->XcoeffsB[1]
-                                    @ r8 := p->XcoeffsB[2]
-                                    @ r9 := p->XcoeffsB[3]
-                                    @ r11 := p->XcoeffsB[4]
+    add     r5, r12, #XcoeffsB
+    ldmia   r5, {r5 - r9}           @ r5 := p->XcoeffsB[0]
+                                    @ r6 := p->XcoeffsB[1]
+                                    @ r7 := p->XcoeffsB[2]
+                                    @ r8 := p->XcoeffsB[3]
+                                    @ r9 := p->XcoeffsB[4]
 
-    subs    r5, r10, r5             @ r5 := r10 - r5
+    subs    r10, r11, r10           @ r10 := r11 - r10
 
-    add     r1, r14, #XDELAYB-4     @ r1 := &p->buf[XDELAYB-1]
-    stmia   r1, { r5, r10 }         @ p->buf[XDELAYB-1] = r5
-                                    @ p->buf[XDELAYB] = r10
+    STR2OFS r10, r11, r14, #XDELAYB-4, r1  @ r1 -> scratch
+                                    @ p->buf[XDELAYB-1] = r10
+                                    @ p->buf[XDELAYB] = r11
 
-    mul     r1, r10, r6             @ r1 := p->buf[XDELAYB] * p->XcoeffsB[0]
-    mla     r1, r5, r7, r1          @ r1 += p->buf[XDELAYB-1] * p->XcoeffsB[1]
-    mla     r1, r4, r8, r1          @ r1 += p->buf[XDELAYB-2] * p->XcoeffsB[2]
-    mla     r1, r3, r9, r1          @ r1 += p->buf[XDELAYB-3] * p->XcoeffsB[3]
-    mla     r1, r2, r11, r1         @ r1 += p->buf[XDELAYB-4] * p->XcoeffsB[4]
+    mul     r1, r11, r5             @ r1 := p->buf[XDELAYB] * p->XcoeffsB[0]
+    mla     r1, r10, r6, r1         @ r1 += p->buf[XDELAYB-1] * p->XcoeffsB[1]
+    mla     r1, r4, r7, r1          @ r1 += p->buf[XDELAYB-2] * p->XcoeffsB[2]
+    mla     r1, r3, r8, r1          @ r1 += p->buf[XDELAYB-3] * p->XcoeffsB[3]
+    mla     r1, r2, r9, r1          @ r1 += p->buf[XDELAYB-4] * p->XcoeffsB[4]
 
     @ flags were set above, in the subs instruction
-    mvngt   r5, #0
-    movlt   r5, #1                 @ r5 := SIGN(r5) (see .c for SIGN macro)
-
-    cmp     r10, #0
     mvngt   r10, #0
-    movlt   r10, #1                @ r10 := SIGN(r10) (see .c for SIGN macro)
+    movlt   r10, #1                 @ r10 := SIGN(r10) (see .c for SIGN macro)
 
-    add     r2, r14, #XADAPTCOEFFSB-4
-    stmia   r2, {r5, r10}           @ p->buf[XADAPTCOEFFSB-1] := r5
-                                    @ p->buf[XADAPTCOEFFSB] := r10
+    cmp     r11, #0
+    mvngt   r11, #0
+    movlt   r11, #1                 @ r11 := SIGN(r11) (see .c for SIGN macro)
+
+    STR2OFS r10, r11, r14, #XADAPTCOEFFSB-4, r2  @ r2 -> scratch
+                                    @ p->buf[XADAPTCOEFFSB-1] := r10
+                                    @ p->buf[XADAPTCOEFFSB] := r11
 
     @ r0 still contains predictionA
     @ r1 contains predictionB
@@ -388,31 +410,31 @@ loop:
     cmp     r3, #0
     beq     3f
 
-    add     r1, r14, #XADAPTCOEFFSB-16
-    ldmia   r1, { r2, r3, r4 }      @ r2 := p->buf[XADAPTCOEFFSB-4]
+    add     r2, r14, #XADAPTCOEFFSB-16
+    ldmia   r2, {r2 - r4}           @ r2 := p->buf[XADAPTCOEFFSB-4]
                                     @ r3 := p->buf[XADAPTCOEFFSB-3]
                                     @ r4 := p->buf[XADAPTCOEFFSB-2]
     blt     1f
 
     @ *decoded1 > 0
 
-    sub     r6, r6, r10       @ r6 := p->XcoeffsB[0] - p->buf[XADAPTCOEFFSB]
-    sub     r7, r7, r5        @ r7 := p->XcoeffsB[1] - p->buf[XADAPTCOEFFSB-1]
-    sub     r11, r11, r2      @ r11 := p->XcoeffsB[4] - p->buf[XADAPTCOEFFSB-4]
-    sub     r9, r9, r3        @ r9 := p->XcoeffsB[3] - p->buf[XADAPTCOEFFSB-3]
-    sub     r8, r8, r4        @ r8 := p->XcoeffsB[2] - p->buf[XADAPTCOEFFSB-2]
+    sub     r5, r5, r11       @ r5 := p->XcoeffsB[0] - p->buf[XADAPTCOEFFSB]
+    sub     r6, r6, r10       @ r6 := p->XcoeffsB[1] - p->buf[XADAPTCOEFFSB-1]
+    sub     r9, r9, r2        @ r9 := p->XcoeffsB[4] - p->buf[XADAPTCOEFFSB-4]
+    sub     r8, r8, r3        @ r8 := p->XcoeffsB[3] - p->buf[XADAPTCOEFFSB-3]
+    sub     r7, r7, r4        @ r7 := p->XcoeffsB[2] - p->buf[XADAPTCOEFFSB-2]
 
     add     r0, r12, #XcoeffsB      
-    stmia   r0, {r6,r7,r8,r9,r11}   @ Save p->XcoeffsB[]
+    stmia   r0, {r5 - r9}           @ Save p->XcoeffsB[]
 
     add     r1, r12, #XcoeffsA
-    ldmia   r1, { r2-r5 }           @ r2 := p->XcoeffsA[0]
+    ldmia   r1, {r2 - r5}           @ r2 := p->XcoeffsA[0]
                                     @ r3 := p->XcoeffsA[1]
                                     @ r4 := p->XcoeffsA[2]
                                     @ r5 := p->XcoeffsA[3]
 
-    add     r0, r14, #XADAPTCOEFFSA-12
-    ldmia   r0, { r6-r9}            @ r6 := p->buf[XADAPTCOEFFSA-3]
+    add     r6, r14, #XADAPTCOEFFSA-12
+    ldmia   r6, {r6 - r9}           @ r6 := p->buf[XADAPTCOEFFSA-3]
                                     @ r7 := p->buf[XADAPTCOEFFSA-2]
                                     @ r8 := p->buf[XADAPTCOEFFSA-1]
                                     @ r9 := p->buf[XADAPTCOEFFSA]
@@ -427,23 +449,23 @@ loop:
 
 1:  @ *decoded1 < 0
 
-    add     r6, r6, r10       @ r6 := p->XcoeffsB[0] + p->buf[XADAPTCOEFFSB]
-    add     r7, r7, r5        @ r7 := p->XcoeffsB[1] + p->buf[XADAPTCOEFFSB-1]
-    add     r11, r11, r2      @ r11 := p->XcoeffsB[4] + p->buf[XADAPTCOEFFSB-4]
-    add     r9, r9, r3        @ r9 := p->XcoeffsB[3] + p->buf[XADAPTCOEFFSB-3]
-    add     r8, r8, r4        @ r8 := p->XcoeffsB[2] + p->buf[XADAPTCOEFFSB-2]
+    add     r5, r5, r11       @ r5 := p->XcoeffsB[0] + p->buf[XADAPTCOEFFSB]
+    add     r6, r6, r10       @ r6 := p->XcoeffsB[1] + p->buf[XADAPTCOEFFSB-1]
+    add     r9, r9, r2        @ r9 := p->XcoeffsB[4] + p->buf[XADAPTCOEFFSB-4]
+    add     r8, r8, r3        @ r8 := p->XcoeffsB[3] + p->buf[XADAPTCOEFFSB-3]
+    add     r7, r7, r4        @ r7 := p->XcoeffsB[2] + p->buf[XADAPTCOEFFSB-2]
 
     add     r0, r12, #XcoeffsB      
-    stmia   r0, {r6,r7,r8,r9,r11}   @ Save p->XcoeffsB[]
+    stmia   r0, {r5 - r9}           @ Save p->XcoeffsB[]
 
     add     r1, r12, #XcoeffsA
-    ldmia   r1, { r2-r5 }           @ r2 := p->XcoeffsA[0]
+    ldmia   r1, {r2 - r5}           @ r2 := p->XcoeffsA[0]
                                     @ r3 := p->XcoeffsA[1]
                                     @ r4 := p->XcoeffsA[2]
                                     @ r5 := p->XcoeffsA[3]
 
-    add     r0, r14, #XADAPTCOEFFSA-12
-    ldmia   r0, { r6-r9}            @ r6 := p->buf[XADAPTCOEFFSA-3]
+    add     r6, r14, #XADAPTCOEFFSA-12
+    ldmia   r6, {r6 - r9}           @ r6 := p->buf[XADAPTCOEFFSA-3]
                                     @ r7 := p->buf[XADAPTCOEFFSA-2]
                                     @ r8 := p->buf[XADAPTCOEFFSA-1]
                                     @ r9 := p->buf[XADAPTCOEFFSA]
@@ -454,7 +476,7 @@ loop:
     add     r2, r2, r9        @ r2 := p->XcoeffsA[0] + p->buf[XADAPTCOEFFSA]
     
 2:
-    stmia   r1, {r2-r5}             @ Save p->XcoeffsA
+    stmia   r1, {r2 - r5}           @ Save p->XcoeffsA
 
 3:
     
@@ -479,7 +501,7 @@ loop:
 done:
     str     r14, [r12]              @ Save value of p->buf
     add     sp, sp, #12             @ Don't bother restoring r1-r3 
-    ldmia   sp!, {r4-r11, pc}
+    ldmia   sp!, {r4 - r11, pc}
 
 move_hist:
     @ dest = r11 (p->historybuffer)
