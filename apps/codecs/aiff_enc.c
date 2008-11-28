@@ -199,26 +199,31 @@ STATICIRAM void enc_events_callback(enum enc_events event, void *data)
                                     ICODE_ATTR;
 STATICIRAM void enc_events_callback(enum enc_events event, void *data)
 {
-    if (event == ENC_WRITE_CHUNK)
+    switch (event)
     {
+    case ENC_WRITE_CHUNK:
         if (on_write_chunk((struct enc_file_event_data *)data))
             return;
-    }
-    else if (event == ENC_START_FILE)
-    {
+
+        break;
+
+    case ENC_START_FILE:
         if (on_start_file((struct enc_file_event_data *)data))
             return;
-    }
-    else if (event == ENC_END_FILE)
-    {
+
+        break;
+
+    case ENC_END_FILE:
         if (on_end_file((struct enc_file_event_data *)data))
             return;
-    }
-    else
-    {
+
+        break;
+
+    default:
         return;
     }
 
+    /* Something failed above. Signal error back to core. */
     ((struct enc_file_event_data *)data)->chunk->flags |= CHUNKF_ERROR;
 } /* enc_events_callback */
 
