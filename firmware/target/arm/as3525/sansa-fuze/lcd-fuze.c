@@ -390,6 +390,4 @@ void lcd_update_rect(int x, int y, int width, int height)
         ptr += LCD_WIDTH;
     }
     while (++y < ymax);
-
-    lcd_write_data((unsigned short *)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
 }
