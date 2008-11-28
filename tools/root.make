@@ -101,7 +101,7 @@ clean:
 		rockbox-manual*.zip sysfont.h rockbox-info.txt voicefontids \
 		*.wav *.mp3 *.voice max_language_size.h $(CLEANOBJS) \
 		$(LINKRAM) $(LINKROM) rockbox.elf rockbox.map rockbox.bin \
-		make.dep rombox.elf rombox.map rombox.bin rombox.ucl \
+		make.dep rombox.elf rombox.map rombox.bin rombox.ucl romstart.txt \
 		$(BINARY) $(FLASHFILE) uisimulator bootloader flash $(BOOTLINK)
 
 #### linking the binaries: ####
