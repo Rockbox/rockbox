@@ -3,6 +3,8 @@
 /* Bubbles */
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
 bubbles_bubble.112x64x1.bmp
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 64)
+bubbles_bubble.128x64x1.bmp
 #elif (LCD_WIDTH == 132) && (LCD_HEIGHT == 80)
 bubbles_bubble.132x80x16.bmp
 #elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 96)

@@ -83,7 +83,7 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
 
-#elif (CONFIG_KEYPAD == SANSA_C200_PAD)
+#elif (CONFIG_KEYPAD == SANSA_C200_PAD) || (CONFIG_KEYPAD == SANSA_CLIP_PAD)
 #define MPEG_START_TIME_SELECT      BUTTON_SELECT
 #define MPEG_START_TIME_SCROLL_UP   BUTTON_VOL_UP
 #define MPEG_START_TIME_SCROLL_DOWN BUTTON_VOL_DOWN
@@ -551,7 +551,7 @@ static uint32_t increment_time(uint32_t val, int32_t amount, uint32_t range)
     return val;
 }
 
-#ifdef HAVE_LCD_ENABLE
+#if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
 static void get_start_time_lcd_enable_hook(void)
 {
     rb->queue_post(rb->button_queue, LCD_ENABLE_EVENT_0, 0);

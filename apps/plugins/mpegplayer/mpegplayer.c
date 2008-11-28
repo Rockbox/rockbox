@@ -189,7 +189,7 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_RW         BUTTON_LEFT
 #define MPEG_FF         BUTTON_RIGHT
 
-#elif CONFIG_KEYPAD == SANSA_C200_PAD
+#elif CONFIG_KEYPAD == SANSA_C200_PAD || CONFIG_KEYPAD == SANSA_CLIP_PAD
 #define MPEG_MENU       BUTTON_SELECT
 #define MPEG_STOP       BUTTON_POWER
 #define MPEG_PAUSE      BUTTON_UP
@@ -598,7 +598,7 @@ static void draw_putsxy_oriented(int x, int y, const char *str)
 }
 #endif /* LCD_PORTRAIT */
 
-#ifdef HAVE_LCD_ENABLE
+#if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
 /* So we can refresh the overlay */
 static void wvs_lcd_enable_hook(void)
 {

@@ -167,9 +167,16 @@ PLUGIN_HEADER
 #define MAX_FPS       30
 
 /* 8x8 bubbles (Sansa C200) */
-#elif (LCD_HEIGHT == 80) && (LCD_WIDTH == 132)
+#elif ((LCD_HEIGHT == 80) && (LCD_WIDTH == 132))
 #define XOFS          45
 #define ROW_HEIGHT     6
+#define ROW_INDENT     4
+#define MAX_FPS       30
+
+/* 7x7 bubbles (Sansa Clip/m200) */
+#elif (LCD_HEIGHT == 64 && LCD_WIDTH == 128)
+#define XOFS          33
+#define ROW_HEIGHT     5
 #define ROW_INDENT     4
 #define MAX_FPS       30
 
@@ -2445,7 +2452,7 @@ static int bubbles(struct game_context* bb) {
             rb->lcd_puts(0, 6, " and show high scores");
             rb->lcd_puts(0, 7, "SCROLL to aim");
             rb->lcd_puts(0, 8, " and change level");
-#elif CONFIG_KEYPAD == SANSA_C200_PAD
+#elif CONFIG_KEYPAD == SANSA_C200_PAD || CONFIG_KEYPAD == SANSA_CLIP_PAD
             rb->lcd_puts(0, 2, "PLAY to start/pause");
             rb->lcd_puts(0, 3, "SUBMENU to save/resume");
             rb->lcd_puts(0, 4, "POWER to exit");

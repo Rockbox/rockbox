@@ -116,7 +116,7 @@ PLUGIN_HEADER
 #define SCROLL_BACK(x) ((x) & BUTTON_SCROLL_BACK)
 
 
-#elif CONFIG_KEYPAD == SANSA_C200_PAD
+#elif CONFIG_KEYPAD == SANSA_C200_PAD || CONFIG_KEYPAD == SANSA_CLIP_PAD
 
 #define QUIT     BUTTON_POWER
 #define LEFT     BUTTON_LEFT
@@ -386,8 +386,8 @@ enum menu_items {
 #define STRINGPOS_NAVI 44
 #define STRINGPOS_FLIP 44
 
-/* Archos */
-#elif (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
+/* Archos / Sansa Clip / Sansa m200 */
+#elif ((LCD_WIDTH == 112) | (LCD_WIDTH == 128)) && (LCD_HEIGHT == 64)
 /* The time (in ms) for one iteration through the game loop - decrease this
    to speed up the game - note that current_tick is (currently) only accurate
    to 10ms.

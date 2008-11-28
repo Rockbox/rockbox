@@ -69,6 +69,14 @@ static const struct plugin_api* rb;
 #define CELL_HEIGHT 6
 #define SMALL_BOARD
 
+#elif (LCD_HEIGHT==64) && (LCD_WIDTH==128)
+/* Sansa Clip and M200 - 128x64, 8 cells @ 9x9 with 9 border lines */
+
+/* Internal dimensions of a cell */
+#define CELL_WIDTH  6
+#define CELL_HEIGHT 6
+#define SMALL_BOARD
+
 #elif (LCD_HEIGHT==80) && (LCD_WIDTH==132)
 /* Sansa C200 - 132x80, 8 cells @ 9x9 with 9 border lines */
 

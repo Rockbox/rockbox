@@ -118,6 +118,8 @@ bubbles_emblem.160x128x2.bmp
 bubbles_emblem.138x110x2.bmp
 #elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 96)
 bubbles_emblem.128x96x2.bmp
+#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 64)
+bubbles_emblem.112x64x1.bmp /* use the same emblems than Archos */
 #elif (LCD_WIDTH >= 112) && (LCD_HEIGHT >= 64)
 bubbles_emblem.112x64x1.bmp
 #endif
@@ -586,7 +588,7 @@ star_tiles.6x7x1.bmp
 
 /* Sudoku */
 #if LCD_WIDTH >= LCD_HEIGHT
-#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64) && (LCD_DEPTH == 1)
+#if (LCD_WIDTH == 112 || LCD_WIDTH == 128) && (LCD_HEIGHT == 64) && (LCD_DEPTH == 1)
 sudoku_start.112x64x1.bmp
 sudoku_normal.112x64x1.bmp
 sudoku_inverse.112x64x1.bmp
