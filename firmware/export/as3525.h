@@ -378,7 +378,7 @@ interface */
 #define INTERRUPT_DMAC          (1<<4)
 #define INTERRUPT_NAND          (1<<5)
 #define INTERRUPT_IDE           (1<<6)
-#define INTERRUPT_MCI0          (1<<1<<7)
+#define INTERRUPT_MCI0          (1<<7)
 #define INTERRUPT_MCI1          (1<<8)
 #define INTERRUPT_AUDIO         (1<<9)
 #define INTERRUPT_SSP           (1<<10)
@@ -396,5 +396,14 @@ interface */
 #define INTERRUPT_GPIOA         (1<<29)
 #define INTERRUPT_GPIOB         (1<<30)
 #define INTERRUPT_GPIOC         (1<<31)
+
+/* I2SOUT registers */
+
+#define I2SOUT_CONTROL      (*(volatile unsigned char*)(I2SOUT_BASE+0x00))
+#define I2SOUT_MASK         (*(volatile unsigned char*)(I2SOUT_BASE+0x04))
+#define I2SOUT_RAW_STATUS   (*(volatile unsigned char*)(I2SOUT_BASE+0x08))
+#define I2SOUT_STATUS       (*(volatile unsigned char*)(I2SOUT_BASE+0x0C))
+#define I2SOUT_CLEAR        (*(volatile unsigned char*)(I2SOUT_BASE+0x10))
+#define I2SOUT_DATA         (volatile unsigned long*)(I2SOUT_BASE+0x14)
 
 #endif /*__AS3525_H__*/
