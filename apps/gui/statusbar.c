@@ -26,6 +26,7 @@
 #include "sprintf.h"
 #include "sound.h"
 #include "settings.h"
+#include "viewport.h"
 #if CONFIG_CODEC == SWCODEC
 #include "metadata.h"
 #endif
@@ -172,6 +173,12 @@ static void gui_statusbar_init(struct gui_statusbar * bar)
 void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 {
     struct screen * display = bar->display;
+    struct viewport vp;
+    viewport_set_defaults(&vp, display->screen_type);
+    vp.height = STATUSBAR_HEIGHT;
+    vp.x = STATUSBAR_X_POS;
+    vp.y = STATUSBAR_Y_POS;
+    display->set_viewport(&vp);
 
 #ifdef HAVE_LCD_CHARCELLS
     int val;
@@ -370,6 +377,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
     display->icon(ICON_PARAM, param);
     display->icon(ICON_USB, usb);
 #endif /* HAVE_LCD_CHARCELLS */
+    display->set_viewport(NULL);
 }
 
 #ifdef HAVE_LCD_BITMAP
