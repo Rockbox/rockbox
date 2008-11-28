@@ -2194,6 +2194,28 @@ static void bubbles_savescores(struct game_context* bb) {
 }
 
 /*****************************************************************************
+* bubbles_displaycores() displays the high scores
+******************************************************************************/
+static char * scores_get_name(int selected_item, void * data,
+                             char * buffer, size_t buffer_len)
+{
+    struct game_context* bb = (struct game_context*)data;
+    rb->snprintf(buffer, buffer_len, "#%02d:  %d,  Lvl %d",
+                  selected_item+1,
+                  bb->highscores[selected_item].score, 
+                  bb->highscores[selected_item].level);
+    return buffer;
+}
+static void bubbles_displayscores(struct game_context* bb) {
+    struct simplelist_info info;
+    rb->simplelist_info_init(&info, "High Scores", NUM_SCORES, (void*)bb);
+    info.hide_selection = true;
+    info.get_name = scores_get_name;
+    rb->simplelist_show_list(&info);
+}
+
+
+/*****************************************************************************
 * bubbles_loadgame() loads the saved game and returns load success.
 ******************************************************************************/
 static bool bubbles_loadgame(struct game_context* bb) {
@@ -2362,17 +2384,10 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
 * bubbles() is the main game subroutine, it returns the final game status.
 ******************************************************************************/
 static int bubbles(struct game_context* bb) {
-    int i;
-    int w, h;
-    int button;
     int buttonres;
     unsigned int startlevel = 0;
-    char *title = "Bubbles";
     bool startgame = false;
-    bool showscores = false;
     long timeout;
-    const struct button_mapping *plugin_contexts[]
-                     = {generic_actions,generic_directions};
 
     bubbles_setcolors();
 
@@ -2382,170 +2397,38 @@ static int bubbles(struct game_context* bb) {
     /********************
     *       menu        *
     ********************/
+    MENUITEM_STRINGLIST(menu,"Bubbles Menu",NULL,
+                        "Start New Game", "Resume Game",
+                        "Level", "Display High Scores", "Quit");
     while(!startgame){
-        char str[30];
-        rb->lcd_clear_display();
-
-        if(!showscores) {
-             /* welcome screen to display key bindings */
-            rb->lcd_getstringsize(title, &w, &h);
-            rb->lcd_putsxy((LCD_WIDTH-w)/2, 0, title);
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-            rb->lcd_puts(0, 2, "ON to start/pause");
-            rb->lcd_puts(0, 3, "MODE to save/resume");
-            rb->lcd_puts(0, 4, "OFF to exit");
-            rb->lcd_puts(0, 5, "SELECT to fire");
-            rb->lcd_puts(0, 6, " and show high scores");
-            rb->lcd_puts(0, 7, "LEFT/RIGHT to aim");
-            rb->lcd_puts(0, 8, "UP/DOWN to change level");
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-            rb->lcd_puts(0, 2, "PLAY to start/pause");
-            rb->lcd_puts(0, 3, "MENU to save/resume");
-            rb->lcd_puts(0, 4, "MENU+SELECT to exit");
-            rb->lcd_puts(0, 5, "SELECT to fire");
-            rb->lcd_puts(0, 6, " and show high scores");
-            rb->lcd_puts(0, 7, "SCROLL to aim");
-            rb->lcd_puts(0, 8, " and to change level");
-#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-            rb->lcd_puts(0, 2, "PLAY to start/pause");
-            rb->lcd_puts(0, 3, "REC to save/resume");
-            rb->lcd_puts(0, 4, "POWER to exit");
-            rb->lcd_puts(0, 5, "SELECT to fire");
-            rb->lcd_puts(0, 6, " and show high scores");
-            rb->lcd_puts(0, 7, "LEFT/RIGHT to aim");
-            rb->lcd_puts(0, 8, "UP/DOWN to change level");
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-            rb->lcd_puts(0, 2, "A to start/pause");
-            rb->lcd_puts(0, 3, "MENU to save/resume");
-            rb->lcd_puts(0, 4, "POWER to exit");
-            rb->lcd_puts(0, 5, "SELECT to fire");
-            rb->lcd_puts(0, 6, " and show high scores");
-            rb->lcd_puts(0, 7, "LEFT/RIGHT to aim");
-            rb->lcd_puts(0, 8, "UP/DOWN to change level");
-#elif CONFIG_KEYPAD == RECORDER_PAD
-            rb->lcd_puts_scroll(0, 2, "ON to start/pause, "
-                                "F1 to save/resume, "
-                                "OFF to exit, "
-                                "PLAY to fire and show high scores, "
-                                "LEFT/RIGHT to aim, "
-                                "UP/DOWN to change level.");
-#elif CONFIG_KEYPAD == ONDIO_PAD
-            rb->lcd_puts_scroll(0, 2, "MODE to start/pause, "
-                                "DOWN to save/resume, "
-                                "OFF to exit, "
-                                "UP to fire and show high scores, "
-                                "LEFT/RIGHT to aim and to change level.");
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-            rb->lcd_puts(0, 2, "PLAY to start/pause");
-            rb->lcd_puts(0, 3, "FF to save/resume");
-            rb->lcd_puts(0, 4, "POWER to exit");
-            rb->lcd_puts(0, 5, "REW/UP to fire");
-            rb->lcd_puts(0, 6, " and show high scores");
-            rb->lcd_puts(0, 7, "LEFT/RIGHT to aim");
-            rb->lcd_puts(0, 8, "UP/DOWN to change level");
-#elif CONFIG_KEYPAD == SANSA_E200_PAD
-            rb->lcd_puts(0, 2, "PLAY to start/pause");
-            rb->lcd_puts(0, 3, "SUBMENU to save/resume");
-            rb->lcd_puts(0, 4, "POWER to exit");
-            rb->lcd_puts(0, 5, "SELECT to fire");
-            rb->lcd_puts(0, 6, " and show high scores");
-            rb->lcd_puts(0, 7, "SCROLL to aim");
-            rb->lcd_puts(0, 8, " and change level");
-#elif CONFIG_KEYPAD == SANSA_C200_PAD || CONFIG_KEYPAD == SANSA_CLIP_PAD
-            rb->lcd_puts(0, 2, "PLAY to start/pause");
-            rb->lcd_puts(0, 3, "SUBMENU to save/resume");
-            rb->lcd_puts(0, 4, "POWER to exit");
-            rb->lcd_puts_scroll(0, 5, "SELECT to fire and show high scores, "
-                                "LEFT/RIGHT to aim and change level");
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-            rb->lcd_puts(0, 2, "PLAY to start/pause");
-            rb->lcd_puts(0, 3, "MENU to save/resume");
-            rb->lcd_puts(0, 4, "REC to exit");
-            rb->lcd_puts(0, 5, "MODE to fire");
-            rb->lcd_puts(0, 6, " and show high scores");
-            rb->lcd_puts(0, 7, "REW/FF to aim");
-            rb->lcd_puts(0, 8, "VOL UP/DN to chg. lvl");
-#endif
-#if LCD_WIDTH >= 138
-            rb->snprintf(str, 28, "Start on level %d of %d", startlevel+1,
-                         bb->highlevel+1);
-#else
-            rb->snprintf(str, 28, "Start on lvl %d/%d", startlevel+1,
-                         bb->highlevel+1);
-#endif
-            rb->lcd_puts(0, MIN(TEXT_LINES-3,10), str);
-            rb->lcd_puts(0, MIN(TEXT_LINES-2,12), "High Score:");
-            rb->snprintf(str, 30, "%d, Lvl %d",
-                         bb->highscores[0].score, bb->highscores[0].level);
-            rb->lcd_puts(2, MIN(TEXT_LINES-1,13), str);
-        } else {
-            /* show high scores */
-            rb->snprintf(str, 12, "High Scores");
-            rb->lcd_getstringsize(str, &w, &h);
-            rb->lcd_putsxy((LCD_WIDTH-w)/2, 0, str);
-
-            for(i=0; i<NUM_SCORES; i++) {
-                rb->snprintf(str, 30, "#%02d: %d, Lvl %d", i+1,
-                             bb->highscores[i].score, bb->highscores[i].level);
-                rb->lcd_puts(0, i+2, str);
-            }
-        }
-
-        rb->lcd_update();
-
-        /* handle menu button presses */
-        button = pluginlib_getaction(rb,TIMEOUT_BLOCK,plugin_contexts,2);
-        switch(button){
-            case BUBBLES_START:  /* start playing */
+        switch (rb->do_menu(&menu, NULL, NULL, false))
+        {
+            case 0: /* new game */
                 bb->level = startlevel;
                 startgame = true;
                 break;
-            case BUBBLES_QUIT:   /* quit program */
-                if(showscores) {
-                    showscores = false;
-                    break;
-                }
-                return BB_QUIT;
-
-            case BUBBLES_RESUME: /* resume game */
+            case 1: /* resume game */
                 if(!bubbles_loadgame(bb)) {
                     rb->splash(HZ*2, "Nothing to resume");
                 } else {
                     startgame = true;
                 }
                 break;
-
-            case BUBBLES_SELECT: /* toggle high scores */
-                showscores = !showscores;
+            case 2: /* choose level */
+                startlevel++;
+                rb->set_int("Choose start level", "", UNIT_INT, &startlevel, NULL, 1, 1, bb->highlevel+1, NULL);
+                startlevel--;
                 break;
-
-            case BUBBLES_LVLINC:     /* increase starting level */
-            case BUBBLES_LVLINC_REP:
-                if(startlevel >= bb->highlevel) {
-                    startlevel = 0;
-                } else {
-                    startlevel++;
-                }
+            case 3: /* High scores */
+                bubbles_displayscores(bb);
                 break;
-
-            case BUBBLES_LVLDEC:   /* decrease starting level */
-            case BUBBLES_LVLDEC_REP:
-                if(startlevel <= 0) {
-                    startlevel = bb->highlevel;
-                } else {
-                    startlevel--;
-                }
-                break;
-
-            default:
-                if(rb->default_event_handler_ex(button, bubbles_callback,
-                   (void*) bb) == SYS_USB_CONNECTED)
-                    return BB_USB;
-                break;
+            case 4: /* quit */
+                return BB_QUIT;
+            case MENU_ATTACHED_USB:
+                bubbles_callback(bb);
+                return BB_USB;
         }
     }
-
     /********************
     *       init        *
     ********************/
@@ -2620,7 +2503,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     while(!exit) {
         switch(bubbles(&bb)){
-            char str[19];
             case BB_WIN:
                 rb->splash(HZ*2, "You Win!");
                 /* record high level */
@@ -2631,8 +2513,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
                 /* record high score */
                 if((position = bubbles_recordscore(&bb))) {
-                    rb->snprintf(str, 19, "New high score #%d!", position);
-                    rb->splash(HZ*2, str);
+                    rb->splashf(HZ*2, "New high score #%d!", position);
                 }
                 break;
 
@@ -2650,8 +2531,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
                     /* record high score */
                     if((position = bubbles_recordscore(&bb))) {
-                        rb->snprintf(str, 19, "New high score #%d!", position);
-                        rb->splash(HZ*2, str);
+                        rb->splashf(HZ*2, "New high score #%d!", position);
                     }
                 }
                 break;
