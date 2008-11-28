@@ -298,9 +298,6 @@ void lcd_init_device()
     GPIOA_DIR |= (1<<7);
     GPIOA_PIN(7) = 0;
 
-    CCU_IO &= ~4;
-    CCU_IO &= ~8;
-
     lcd_delay(1);
 
     GPIOA_PIN(5) = (1<<5);
