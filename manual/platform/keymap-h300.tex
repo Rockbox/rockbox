@@ -1,0 +1,107 @@
+% $Id$
+
+\newcommand{\ButtonLeft}{\btnfnt{Left}}
+\newcommand{\ButtonRight}{\btnfnt{Right}}
+\newcommand{\ButtonUp}{\btnfnt{Up}}
+\newcommand{\ButtonDown}{\btnfnt{Down}}
+\newcommand{\ButtonSelect}{\btnfnt{Navi}}
+\newcommand{\ButtonMode}{\btnfnt{A-B}}
+\newcommand{\ButtonRec}{\btnfnt{Rec}}
+\newcommand{\ButtonOn}{\btnfnt{Play}}
+\newcommand{\ButtonOff}{\btnfnt{Stop}}
+\newcommand{\ButtonHold}{\btnfnt{Hold}}
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonUp}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonUp}
+\newcommand{\ActionStdNext}{\ButtonDown}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonDown}
+\newcommand{\ActionStdCancel}{\ButtonLeft{} or \ButtonOff}
+\newcommand{\ActionStdContext}{Long \ButtonSelect}
+\newcommand{\ActionStdQuickScreen}{Long \ButtonMode}
+\newcommand{\ActionQuickScreenExit}{\ButtonMode}
+\newcommand{\ActionStdMenu}{\ButtonMode}
+\newcommand{\ActionStdOk}{\ButtonSelect{} or \ButtonRight}
+\newcommand{\ActionStdUsbCharge}{\ButtonMode}
+\newcommand{\ActionStdRec}{Long \ButtonRec}
+
+%Button actions, wps context
+\newcommand{\ActionWpsPlay}{\ButtonOn}
+\newcommand{\ActionWpsSkipNext}{\ButtonRight}
+\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
+\newcommand{\ActionWpsAbSetBNextDir}{\ButtonOn{} + \ButtonRight}
+\newcommand{\ActionWpsAbSetAPrevDir}{\ButtonOn{} + \ButtonLeft}
+\newcommand{\ActionWpsStop}{\ButtonOff}
+\newcommand{\ActionWpsVolDown}{\ButtonDown}
+\newcommand{\ActionWpsVolUp}{\ButtonUp}
+\newcommand{\ActionWpsPitchScreen}{\ButtonOn{} + \ButtonUp/\ButtonDown}
+\newcommand{\ActionWpsQuickScreen}{Long \ButtonMode}
+\newcommand{\ActionWpsMenu}{\ButtonMode}
+\newcommand{\ActionWpsContext}{Long \ButtonSelect}
+\newcommand{\ActionWpsBrowse}{\ButtonSelect}
+\newcommand{\ActionWpsAbReset}{\ButtonOn{} + \ButtonSelect}
+\newcommand{\ActionWpsIdThreeScreen}{\ButtonOn{} + \ButtonMode}
+
+%Button actions, tree context
+\newcommand{\ActionTreeWps}{\ButtonOn}
+\newcommand{\ActionTreeStop}{\ButtonOff}
+\newcommand{\ActionTreeEnter}{\ButtonSelect{} or \ButtonRight}
+\newcommand{\ActionTreeParentDirectory}{\ButtonLeft}
+
+%Button actions, YesNo context
+\newcommand{\ActionYesNoAccept}{\ButtonSelect}
+
+%Button actions, Setting context
+\newcommand{\ActionSettingInc}{\ButtonUp}
+\newcommand{\ActionSettingDec}{\ButtonDown}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionKbdLeft}{\ButtonLeft}
+\newcommand{\ActionKbdRight}{\ButtonRight}
+\newcommand{\ActionKbdSelect}{\ButtonSelect}
+\newcommand{\ActionKbdCursorLeft}{\ButtonOn{} + \ButtonLeft}
+\newcommand{\ActionKbdCursorRight}{\ButtonOn{} + \ButtonRight}
+\newcommand{\ActionKbdPageFlip}{\ButtonMode}
+\newcommand{\ActionKbdDone}{\ButtonOn}
+\newcommand{\ActionKbdAbort}{\ButtonOff}
+\newcommand{\ActionKbdBackSpace}{\ButtonRec}
+\newcommand{\ActionKbdMorseInput}{\ButtonOn{} + \ButtonMode}
+\newcommand{\ActionKbdMorseSelect}{\ButtonSelect}
+\newcommand{\ActionKbdUp}{\ButtonUp}
+\newcommand{\ActionKbdDown}{\ButtonDown}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionPsToggleMode}{\ButtonMode}
+\newcommand{\ActionPsIncSmall}{\ButtonUp}
+\newcommand{\ActionPsIncBig}{Long \ButtonUp}
+\newcommand{\ActionPsDecSmall}{\ButtonDown}
+\newcommand{\ActionPsDecBig}{Long \ButtonDown}
+\newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
+\newcommand{\ActionPsNudgeRight}{\ButtonRight}
+\newcommand{\ActionPsReset}{\ButtonSelect}
+\newcommand{\ActionPsExit}{\ButtonOn{} or \ButtonOff}
+
+%Button actions, Recording screen context
+\newcommand{\ActionRecPause}{\ButtonOn}
+\newcommand{\ActionRecNewfile}{\ButtonRec}
+\newcommand{\ActionRecSettingsInc}{\ButtonRight}
+\newcommand{\ActionRecSettingsDec}{\ButtonLeft}
+\newcommand{\ActionRecPrev}{\ButtonUp}
+\newcommand{\ActionRecNext}{\ButtonDown}
+\newcommand{\ActionRecMenu}{\ButtonMode}
+\newcommand{\ActionRecExit}{\ButtonOff}
+
+%Button actions, FM radio context
+\newcommand{\ActionFMPreset}{\ButtonSelect}
+\newcommand{\ActionFMMenu}{Long \ButtonSelect}
+\newcommand{\ActionFMMode}{Long \ButtonOn}
+\newcommand{\ActionFMStop}{\ButtonOff}
+\newcommand{\ActionFMExit}{\ButtonMode}
+\newcommand{\ActionFMPlay}{\ButtonOn}
+\newcommand{\ActionFMSettingsInc}{\ActionSettingInc}
+\newcommand{\ActionFMSettingsDec}{\ActionSettingDec}
+\newcommand{\ActionFMPrev}{\ButtonLeft}
+\newcommand{\ActionFMNext}{\ButtonRight}
+

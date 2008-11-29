@@ -1,0 +1,108 @@
+% $Id$
+
+\newcommand{\ButtonLeft}{\btnfnt{Left}}
+\newcommand{\ButtonRight}{\btnfnt{Right}}
+\newcommand{\ButtonRec}{\btnfnt{Rec}}
+\newcommand{\ButtonUp}{\btnfnt{Play}}
+\newcommand{\ButtonDown}{\btnfnt{Submenu}}
+\newcommand{\ButtonSelect}{\btnfnt{Select}}
+\newcommand{\ButtonPower}{\btnfnt{Power}}
+\newcommand{\ButtonScrollBack}{\btnfnt{Scroll Backward}}
+\newcommand{\ButtonScrollFwd}{\btnfnt{Scroll Forward}}
+\newcommand{\ButtonHold}{\btnfnt{Hold}}
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonScrollBack}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonScrollBack}
+\newcommand{\ActionStdNext}{\ButtonScrollFwd}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonScrollFwd}
+\newcommand{\ActionStdCancel}{\ButtonLeft}
+\newcommand{\ActionStdContext}{Long \ButtonSelect}
+\newcommand{\ActionStdQuickScreen}{Long \ButtonDown}
+\newcommand{\ActionQuickScreenExit}{\ButtonPower}
+\newcommand{\ActionStdMenu}{\ButtonDown}
+\newcommand{\ActionStdOk}{\ButtonSelect{} or \ButtonRight}
+\newcommand{\ActionStdRec}{Long \ButtonRec}
+\newcommand{\ActionStdUsbCharge}{\ButtonSelect}
+
+%Button actions, wps context
+\newcommand{\ActionWpsPlay}{\ButtonUp}
+\newcommand{\ActionWpsSkipNext}{\ButtonRight}
+\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
+
+\newcommand{\ActionWpsStop}{\ButtonPower}
+\newcommand{\ActionWpsVolDown}{\ButtonScrollFwd}
+\newcommand{\ActionWpsVolUp}{\ButtonScrollBack}
+
+\newcommand{\ActionWpsQuickScreen}{Long \ButtonDown}
+\newcommand{\ActionWpsMenu}{\ButtonDown}
+\newcommand{\ActionWpsContext}{Long \ButtonSelect}
+\newcommand{\ActionWpsBrowse}{\ButtonSelect}
+\newcommand{\ActionWpsPitchScreen}{\ButtonSelect{} + \ButtonUp}
+\newcommand{\ActionWpsIdThreeScreen}{\ButtonSelect{} + \ButtonDown}
+
+\newcommand{\ActionWpsAbSetBNextDir}{\ButtonPower{} + \ButtonRight}
+\newcommand{\ActionWpsAbSetAPrevDir}{\ButtonPower{} + \ButtonLeft}
+\newcommand{\ActionWpsAbReset}{\ButtonPower{} + \ButtonUp}
+
+%Button actions, tree context
+\newcommand{\ActionTreeWps}{\ButtonUp}
+\newcommand{\ActionTreeStop}{\ButtonPower}
+\newcommand{\ActionTreeEnter}{\ButtonSelect{} or \ButtonRight}
+\newcommand{\ActionTreeParentDirectory}{\ButtonLeft}
+
+%Button actions, YesNo context
+\newcommand{\ActionYesNoAccept}{\ButtonSelect}
+
+%Button actions, Setting context
+\newcommand{\ActionSettingInc}{\ButtonScrollBack}
+\newcommand{\ActionSettingDec}{\ButtonScrollFwd}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionKbdLeft}{\ButtonLeft}
+\newcommand{\ActionKbdRight}{\ButtonRight}
+\newcommand{\ActionKbdSelect}{\ButtonSelect}
+\newcommand{\ActionKbdDone}{\ButtonUp}
+\newcommand{\ActionKbdAbort}{\ButtonPower}
+\newcommand{\ActionKbdUp}{\ButtonScrollBack}
+\newcommand{\ActionKbdDown}{\ButtonScrollFwd}
+\newcommand{\ActionKbdCursorLeft}{\ButtonRec{} + \ButtonLeft}
+\newcommand{\ActionKbdCursorRight}{\ButtonRec{} + \ButtonRight}
+\newcommand{\ActionKbdBackSpace}{\ButtonDown}
+\newcommand{\ActionKbdPageFlip}{\ButtonRec{} + \ButtonSelect}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionPsToggleMode}{\ButtonRec}
+\newcommand{\ActionPsIncSmall}{\ButtonScrollBack}
+\newcommand{\ActionPsIncBig}{Long \ButtonScrollBack}
+\newcommand{\ActionPsDecSmall}{\ButtonScrollFwd}
+\newcommand{\ActionPsDecBig}{Long \ButtonScrollFwd}
+\newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
+\newcommand{\ActionPsNudgeRight}{\ButtonRight}
+\newcommand{\ActionPsReset}{\ButtonSelect}
+\newcommand{\ActionPsExit}{\ButtonPower{} or \ButtonUp}
+
+%Button actions, Recording screen context
+\newcommand{\ActionRecPause}{\ButtonUp}
+\newcommand{\ActionRecExit}{\ButtonPower}
+\newcommand{\ActionRecNewfile}{\ButtonRec}
+\newcommand{\ActionRecMenu}{Long \ButtonSelect}
+\newcommand{\ActionRecSettingsInc}{\ButtonRight}
+\newcommand{\ActionRecSettingsDec}{\ButtonLeft}
+\newcommand{\ActionRecPrev}{\ButtonScrollBack}
+\newcommand{\ActionRecNext}{\ButtonScrollFwd}
+
+%Button actions, FM radio context
+\newcommand{\ActionFMPreset}{\ButtonSelect}
+\newcommand{\ActionFMMenu}{Long \ButtonSelect}
+\newcommand{\ActionFMMode}{Long \ButtonUp}
+\newcommand{\ActionFMStop}{\ButtonPower}
+\newcommand{\ActionFMExit}{\ButtonDown}
+\newcommand{\ActionFMPlay}{\ButtonUp}
+\newcommand{\ActionFMSettingsInc}{\ButtonUp}
+\newcommand{\ActionFMSettingsDec}{\ButtonDown}
+\newcommand{\ActionFMPrev}{\ActionRecSettingsInc}
+\newcommand{\ActionFMNext}{\ActionRecSettingsDec}
+

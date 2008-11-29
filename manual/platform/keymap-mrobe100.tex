@@ -1,0 +1,85 @@
+% $Id$
+
+\newcommand{\ButtonPower}{\btnfnt{Power}}
+\newcommand{\ButtonPlay}{\btnfnt{Play}}
+\newcommand{\ButtonMenu}{\btnfnt{Menu}}
+\newcommand{\ButtonLeft}{\btnfnt{Left}}
+\newcommand{\ButtonRight}{\btnfnt{Right}}
+\newcommand{\ButtonUp}{\btnfnt{Up}}
+\newcommand{\ButtonDown}{\btnfnt{Down}}
+\newcommand{\ButtonVolUp}{\btnfnt{Volume up}}
+\newcommand{\ButtonVolDown}{\btnfnt{Volume down}}
+\newcommand{\ButtonSelect}{\btnfnt{Select}}
+\newcommand{\ButtonDisplay}{\btnfnt{Display}}
+\newcommand{\ButtonHold}{\btnfnt{Hold}}
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonUp}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonUp}
+\newcommand{\ActionStdNext}{\ButtonDown}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonDown}
+\newcommand{\ActionStdCancel}{\ButtonLeft{} or \ButtonDisplay{} or \ButtonPower}
+\newcommand{\ActionStdContext}{Long \ButtonSelect}
+\newcommand{\ActionStdQuickScreen}{Long \ButtonMenu}
+\newcommand{\ActionQuickScreenExit}{\ButtonMenu}
+\newcommand{\ActionStdMenu}{\ButtonMenu}
+\newcommand{\ActionStdOk}{\ButtonSelect{} or \ButtonRight}
+\newcommand{\ActionStdUsbCharge}{\ButtonRight}
+
+%Button actions, wps context
+\newcommand{\ActionWpsPlay}{\ButtonPlay}
+\newcommand{\ActionWpsSkipNext}{\ButtonRight}
+\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
+\newcommand{\ActionWpsAbSetBNextDir}{\ButtonDisplay{} + \ButtonRight}
+\newcommand{\ActionWpsAbSetAPrevDir}{\ButtonDisplay{} + \ButtonLeft}
+\newcommand{\ActionWpsStop}{\ButtonPower{} or Long \ButtonPlay}
+\newcommand{\ActionWpsVolDown}{\ButtonDown}
+\newcommand{\ActionWpsVolUp}{\ButtonUp}
+\newcommand{\ActionWpsPitchScreen}{\ButtonDisplay{} + \ButtonUp/\ButtonDown}
+\newcommand{\ActionWpsQuickScreen}{Long \ButtonMenu}
+\newcommand{\ActionWpsMenu}{\ButtonMenu}
+\newcommand{\ActionWpsContext}{Long \ButtonSelect}
+\newcommand{\ActionWpsBrowse}{\ButtonSelect}
+\newcommand{\ActionWpsAbReset}{\ButtonDisplay{} + \ButtonSelect}
+\newcommand{\ActionWpsIdThreeScreen}{\ButtonDisplay{} + \ButtonMenu}
+
+%Button actions, tree context
+\newcommand{\ActionTreeWps}{\ButtonDisplay}
+\newcommand{\ActionTreeStop}{\ButtonPower{} or Long \ButtonPlay}
+\newcommand{\ActionTreeEnter}{\ButtonSelect{} or \ButtonRight}
+\newcommand{\ActionTreeParentDirectory}{\ButtonLeft}
+
+%Button actions, YesNo context
+\newcommand{\ActionYesNoAccept}{\ButtonSelect}
+
+%Button actions, Setting context
+\newcommand{\ActionSettingInc}{\ButtonUp}
+\newcommand{\ActionSettingDec}{\ButtonDown}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionKbdLeft}{\ButtonLeft}
+\newcommand{\ActionKbdRight}{\ButtonRight}
+\newcommand{\ActionKbdSelect}{\ButtonSelect}
+\newcommand{\ActionKbdCursorLeft}{\ButtonDisplay{} + \ButtonLeft}
+\newcommand{\ActionKbdCursorRight}{\ButtonDisplay{} + \ButtonRight}
+\newcommand{\ActionKbdPageFlip}{\ButtonDisplay{} + \ButtonMenu}
+\newcommand{\ActionKbdDone}{\ButtonDisplay}
+\newcommand{\ActionKbdAbort}{\ButtonPower}
+\newcommand{\ActionKbdBackSpace}{\ButtonMenu}
+\newcommand{\ActionKbdMorseInput}{\ButtonDisplay{} + \ButtonPower}
+\newcommand{\ActionKbdMorseSelect}{\ButtonSelect}
+\newcommand{\ActionKbdUp}{\ButtonUp}
+\newcommand{\ActionKbdDown}{\ButtonDown}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionPsToggleMode}{\ButtonMenu}
+\newcommand{\ActionPsIncSmall}{\ButtonUp}
+\newcommand{\ActionPsIncBig}{Long \ButtonUp}
+\newcommand{\ActionPsDecSmall}{\ButtonDown}
+\newcommand{\ActionPsDecBig}{Long \ButtonDown}
+\newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
+\newcommand{\ActionPsNudgeRight}{\ButtonRight}
+\newcommand{\ActionPsReset}{\ButtonDisplay}
+\newcommand{\ActionPsExit}{\ButtonPlay}

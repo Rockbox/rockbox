@@ -21,47 +21,5 @@
 \newcommand{\screenshotsize}{4cm}
 \newcommand{\disk}{hard disk}
 
-\newcommand{\ButtonLeft}{\btnfnt{Minus}}
-\newcommand{\ButtonRight}{\btnfnt{Plus}}
-\newcommand{\ButtonOn}{\btnfnt{On}}
-\newcommand{\ButtonMenu}{\btnfnt{Menu}}
-\newcommand{\ButtonPlay}{\btnfnt{Play}}
-\newcommand{\ButtonStop}{\btnfnt{Stop}}
-
-%Button actions, standard context
-\newcommand{\ActionStdPrev}{\ButtonLeft}
-\newcommand{\ActionStdPrevRepeat}{Long \ButtonLeft}
-\newcommand{\ActionStdNext}{\ButtonRight}
-\newcommand{\ActionStdNextRepeat}{Long \ButtonRight}
-\newcommand{\ActionStdCancel}{\ButtonStop}
-\newcommand{\ActionStdContext}{Long \ButtonPlay}
-\newcommand{\ActionStdMenu}{\ButtonMenu}
-\newcommand{\ActionStdOk}{\ButtonPlay}
-
-%Button actions, wps context
-\newcommand{\ActionWpsPlay}{\ButtonPlay}
-\newcommand{\ActionWpsSkipNext}{\ButtonRight}
-\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
-\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
-\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
-
-\newcommand{\ActionWpsStop}{\ButtonStop}
-\newcommand{\ActionWpsVolDown}{\ButtonMenu{} + \ButtonLeft}
-\newcommand{\ActionWpsVolUp}{\ButtonMenu{} + \ButtonRight}
-
-\newcommand{\ActionWpsMenu}{\ButtonMenu}
-\newcommand{\ActionWpsContext}{Long \ButtonPlay}
-\newcommand{\ActionWpsBrowse}{\ButtonOn}
-\newcommand{\ActionWpsIdThreeScreen}{\ButtonMenu{} + \ButtonOn}
-
-%Button actions, tree context
-\newcommand{\ActionTreeWps}{\ButtonOn}
-\newcommand{\ActionTreeEnter}{\ButtonPlay}
-\newcommand{\ActionTreeParentDirectory}{\ButtonStop}
-
-%Button actions, YesNo context
-\newcommand{\ActionYesNoAccept}{\ButtonPlay}
-
-%Button actions, Setting context
-\newcommand{\ActionSettingInc}{\ButtonRight}
-\newcommand{\ActionSettingDec}{\ButtonLeft}
+% link external keymap file
+\input{platform/keymap-player.tex}
