@@ -324,7 +324,7 @@ static const fb_data color[9] = {
     LCD_RGBPACK(255, 191, 0), LCD_RGBPACK(255, 0, 0),   LCD_RGBPACK(0, 0, 0)
 };
 #else /* greyscale */
-static const fb_data color[9] = {
+static const unsigned char color[9] = {
     255, 223, 191, 159, 128, 96, 64, 32, 0
 };
 #endif
