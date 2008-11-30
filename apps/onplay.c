@@ -533,8 +533,8 @@ static bool delete_handler(bool is_dir)
         file_to_delete
     };
 
-    struct text_message message={lines, 2};
-    struct text_message yes_message={yes_lines, 2};
+    const struct text_message message={lines, 2};
+    const struct text_message yes_message={yes_lines, 2};
 
     if(gui_syncyesno_run(&message, &yes_message, NULL)!=YESNO_YES)
         return false;
