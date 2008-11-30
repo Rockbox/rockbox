@@ -6394,11 +6394,11 @@
   user:
   <source>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "Edit mode: %s %s"
   </source>
   <dest>
     *: none
-    swcodec: "Mamatnugot paraan: %s"
+    swcodec: "Mamatnugot paraan: %s %s"
   </dest>
   <voice>
     *: none
@@ -6943,11 +6943,11 @@
   user:
   <source>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Cutoff"
   </source>
   <dest>
     *: none
-    swcodec: "Cutoff Dalas"
+    swcodec: "Cutoff"
   </dest>
   <voice>
     *: none
@@ -10131,16 +10131,19 @@
   user:
   <source>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
+    multivolume: "HD1:"
     e200*,c200: "MSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
+    multivolume: "H D Isa"
     e200*,c200: "micro S D"
     ondio*: "M M C"
   </voice>
@@ -12003,5 +12006,186 @@
   <voice>
     *: none
     albumart: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFTRIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Mono Kaliwa + Deretso"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Mono Left plus Right"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Left Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Ilagay Kaliwa Quickscreen Aytem"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Ilagay Kaliwa Quickscreen Aytem"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_SETTING
+  desc: used in the settings context menu
+  user:
+  <source>
+    *: "Reset Setting"
+  </source>
+  <dest>
+    *: "Muling Itakda Tagpuan"
+  </dest>
+  <voice>
+    *: "Muling Itakda Tagpuan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Bottom Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Ilagay Ilalim Quickscreen Aytem"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Ilagay Ilalim Quickscreen Aytem"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QS_ITEMS
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Right Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Ilagay Deretso Quickscreen Aytem"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Ilagay Deretso Quickscreen Aytem"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user:
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "Hanapin Resulta"
+  </dest>
+  <voice>
+    *: "Hanapin Resulta"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MONO_MODE
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono mode"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Paraan mono "
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Paraan mono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
   </voice>
 </phrase>
