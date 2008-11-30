@@ -8,6 +8,14 @@
 
 #define MODEL_NAME   "Cowon D2"
 
+#if 0
+#define HAVE_USBSTACK
+#define USE_ROCKBOX_USB
+#define USB_VENDOR_ID 0x0e21
+#define USB_PRODUCT_ID 0x0800
+#endif
+
+
 /* Produce a dual-boot bootloader.bin for mktccboot */
 #define TCCBOOT
 

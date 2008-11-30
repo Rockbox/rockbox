@@ -22,7 +22,7 @@
 #include "config.h"
 #include "usb.h"
 
-#include "usb-tcc7xx.h"
+#include "usb-tcc.h"
 
 #include "cpu.h"
 #include "system.h"

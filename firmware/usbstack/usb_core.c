@@ -314,7 +314,17 @@ static void set_serial_descriptor(void)
     usb_string_iSerial.bLength=68;
 }
 #else
-#error No set_serial_descriptor() implementation for this target
+#warning No proper set_serial_descriptor() implementation for this target
+static void set_serial_descriptor(void)
+{
+    short* p = &usb_string_iSerial.wString[1];
+    int i;
+    for (i = 0; i < 16; i++) {
+        *p++ = hex[(2*i)&0xF];
+        *p++ = hex[(2*i+1)&0xF];
+    }
+    usb_string_iSerial.bLength=68;
+}
 #endif
 
 void usb_core_init(void)

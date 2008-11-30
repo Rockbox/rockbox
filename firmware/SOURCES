@@ -1013,7 +1013,7 @@ target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/powermgmt-tcc77x.c
 target/arm/tcc77x/system-tcc77x.c
 target/arm/tcc77x/timer-tcc77x.c
-target/arm/tcc77x/usb-tcc77x.c
+target/arm/usb-tcc.c
 target/arm/tcc77x/logikdax/button-logikdax.c
 target/arm/tcc77x/logikdax/power-logikdax.c
 #ifndef BOOTLOADER
@@ -1034,7 +1034,7 @@ target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/powermgmt-tcc77x.c
 target/arm/tcc77x/system-tcc77x.c
 target/arm/tcc77x/timer-tcc77x.c
-target/arm/tcc77x/usb-tcc77x.c
+target/arm/usb-tcc.c
 target/arm/tcc77x/m200/button-m200.c
 target/arm/tcc77x/m200/power-m200.c
 #ifndef BOOTLOADER
@@ -1055,7 +1055,7 @@ target/arm/tcc77x/c100/lcd-S6B33B2.c
 target/arm/tcc77x/powermgmt-tcc77x.c
 target/arm/tcc77x/system-tcc77x.c
 target/arm/tcc77x/timer-tcc77x.c
-target/arm/tcc77x/usb-tcc77x.c
+target/arm/usb-tcc.c
 target/arm/tcc77x/c100/button-c100.c
 target/arm/tcc77x/c100/power-c100.c
 #ifndef BOOTLOADER
@@ -1110,7 +1110,7 @@ target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/timer-tcc77x.c
 target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/powermgmt-tcc77x.c
-target/arm/tcc77x/usb-tcc77x.c
+target/arm/usb-tcc.c
 target/arm/tcc77x/iaudio7/lcd-iaudio7.c
 target/arm/tcc77x/iaudio7/power-iaudio7.c
 target/arm/tcc77x/iaudio7/button-iaudio7.c
@@ -1135,8 +1135,8 @@ target/arm/tcc780x/cowond2/button-cowond2.c
 target/arm/tcc780x/cowond2/lcd-cowond2.c
 target/arm/tcc780x/cowond2/power-cowond2.c
 target/arm/tcc780x/cowond2/powermgmt-cowond2.c
-target/arm/tcc780x/cowond2/usb-cowond2.c
 target/arm/tcc780x/cowond2/backlight-cowond2.c
+target/arm/usb-tcc.c
 #ifndef BOOTLOADER
 target/arm/tcc780x/kernel-tcc780x.c
 target/arm/tcc780x/timer-tcc780x.c
