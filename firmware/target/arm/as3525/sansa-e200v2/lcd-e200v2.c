@@ -297,13 +297,10 @@ void lcd_init_device(void)
 
     GPIOA_PIN(3) = (1<<3);
 
-    GPIOA_PIN(4) = 0;  //c80b0040 := 0;
+    GPIOA_PIN(4) = 0;  /*c80b0040 := 0;*/
 
     GPIOA_DIR |= (1<<7);
     GPIOA_PIN(7) = 0;
-
-    CCU_IO &= ~(1<<2);
-    CCU_IO &= ~(1<<3);
 
     lcd_delay(1);
 
