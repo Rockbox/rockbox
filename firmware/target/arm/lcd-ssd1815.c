@@ -102,9 +102,7 @@ void lcd_write_data(const fb_data* p_bytes, int count)
 
 static inline void ams3525_dbop_init(void)
 {
-    int clkdiv = 4 - 1;
-
-    CGU_DBOP |= (1<<3) /* clk enable */ | clkdiv /* clkdiv: 3 bits */ ;
+    CGU_DBOP |= (1<<3) /* clk enable */ | (3 - 1) /* clkdiv: 3 bits */ ;
 
     GPIOB_AFSEL = 0x0f; /* DBOP on pin 3:0 */
     GPIOC_AFSEL = 0xff; /* DBOP on pins 7:0 */

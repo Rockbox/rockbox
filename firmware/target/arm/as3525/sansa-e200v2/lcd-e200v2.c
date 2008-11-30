@@ -94,7 +94,7 @@ static void lcd_delay(int x)
 /* DBOP initialisation, do what OF does */
 static void ams3525_dbop_init(void)
 {
-    CGU_DBOP = (1<<3) | (4-1);
+    CGU_DBOP = (1<<3) | (3-1);
 
     DBOP_TIMPOL_01 = 0xe167e167;
     DBOP_TIMPOL_23 = 0xe167006e;

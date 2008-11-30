@@ -215,15 +215,10 @@ void system_init(void)
         "mcr p15, 0, r0, c1, c0  \n"
         : : : "r0" );
 
-    CGU_PLLA = 0x4330;      /* PLLA 384 MHz */
+    CGU_PLLA = 0x261F;  /* PLLA 248 MHz */
     while(!(CGU_INTCTRL & (1<<0))); /* wait until PLLA is locked */
 
-    CGU_PROC = (3<<2)|0x01; /* fclk = PLLA*5/8 = 240 MHz */
-#ifndef BOOTLOADER
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    set_cpu_frequency(CPUFREQ_DEFAULT);
-#endif
-#endif
+    CGU_PROC = 1; /* fclk = PLLA = 248 MHz */
 
     asm volatile(
         "mov r0, #0               \n"
@@ -243,15 +238,16 @@ void system_init(void)
     VIC_INT_ENABLE = 0; /* disable all interrupt lines */
     CGU_PERI |= CGU_VIC_CLOCK_ENABLE;
     VIC_INT_SELECT = 0; /* only IRQ, no FIQ */
-
-    enable_irq();
 #else
     /* Disable fast hardware power-off, to use power button normally
      * We don't need the power button in the bootloader. */
     ascodec_init();
     ascodec_write(AS3514_CVDD_DCDC3, ascodec_read(AS3514_CVDD_DCDC3) & (1<<2));
-
 #endif /* BOOTLOADER */
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    set_cpu_frequency(CPUFREQ_DEFAULT);
+#endif
 
     dma_init();
 }
