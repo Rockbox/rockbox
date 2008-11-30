@@ -404,6 +404,8 @@ int sd_init(void)
     init_pl180_controller(SD_SLOT_AS3525);
     sd_init_card(SD_SLOT_AS3525);
 #endif
+    /* init mutex */
+    mutex_init(&sd_mtx);
 
     queue_init(&sd_queue, true);
     create_thread(sd_thread, sd_stack, sizeof(sd_stack), 0,
