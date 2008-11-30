@@ -134,7 +134,15 @@ int ICODE_ATTR_DEMAC decode_chunk(struct ape_ctx_t* ape_ctx,
             /* Mono - do nothing unless it's 8-bit audio */
             if (ape_ctx->bps == 8) {
                 /* TODO: Handle 8-bit streams */
+            } else {
+                /* Scale to output depth */
+                while (count--)
+                {
+                    left = *decoded0;
+                    *(decoded0++) = SCALE(left);
+                }    
             }
+
         }
     } else { /* Stereo */
         if (ape_ctx->frameflags & APE_FRAMECODE_STEREO_SILENCE) {
