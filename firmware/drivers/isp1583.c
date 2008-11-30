@@ -545,6 +545,21 @@ int usb_drv_send_nonblocking(int ep, void* ptr, int length)
     return usb_drv_send(ep, ptr, length);
 }
 
+static void usb_drv_wait(int ep, bool send)
+{
+    logf("usb_drv_wait(%d, %d)", ep, send);
+    if(send)
+    {
+        while (endpoints[ep].out_in_progress)
+            nop_f();
+    }
+    else
+    {
+        while (endpoints[ep].in_ack)
+            nop_f();
+    }
+}
+
 int usb_drv_send(int ep, void* ptr, int length)
 {
     logf("usb_drv_send_nb(%d, 0x%x, %d)", ep, &ptr, length);
@@ -576,21 +591,6 @@ void usb_drv_reset_endpoint(int ep, bool send)
     logf("reset endpoint(%d, %d)", ep, send);
     usb_setup_endpoint(ep_index(ep, (int)send), endpoints[ep].max_pkt_size[(int)send], endpoints[ep].type);
     usb_enable_endpoint(ep_index(ep, (int)send));
-}
-
-void usb_drv_wait(int ep, bool send)
-{
-    logf("usb_drv_wait(%d, %d)", ep, send);
-    if(send)
-    {
-        while (endpoints[ep].out_in_progress)
-            nop_f();
-    }
-    else
-    {
-        while (endpoints[ep].in_ack)
-            nop_f();
-    }
 }
 
 void usb_drv_cancel_all_transfers(void)

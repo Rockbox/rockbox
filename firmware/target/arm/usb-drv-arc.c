@@ -581,17 +581,6 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
     return prime_transfer(endpoint&0x7f, ptr, length, false, false);
 }
 
-void usb_drv_wait(int endpoint, bool send)
-{
-    int pipe = (endpoint&0x7f) * 2 + (send ? 1 : 0);
-    struct queue_head* qh = &qh_array[pipe];
-
-    while (qh->dtd.size_ioc_sts & QH_STATUS_ACTIVE) {
-        if (REG_USBSTS & USBSTS_RESET)
-            break;
-    }
-}
-
 int usb_drv_port_speed(void)
 {
     return (REG_PORTSC1 & 0x08000000) ? 1 : 0;
