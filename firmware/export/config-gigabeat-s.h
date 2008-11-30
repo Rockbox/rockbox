@@ -139,7 +139,6 @@
 #define CONFIG_USBOTG USBOTG_ARC
 
 /* enable these for the experimental usb stack */
-#define USE_HIGH_SPEED
 #define USE_ROCKBOX_USB
 #define HAVE_USBSTACK
 #define USB_STORAGE

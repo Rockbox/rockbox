@@ -424,7 +424,7 @@ void usb_drv_init(void)
     REG_PORTSC1 = (REG_PORTSC1 & ~PORTSCX_PHY_TYPE_SEL) | PORTSCX_PTS_ULPI;
 #endif
 
-#ifndef USE_HIGH_SPEED
+#ifdef USB_NO_HIGH_SPEED
     /* Force device to full speed */
     /* See 32.9.5.9.2 */
     REG_PORTSC1 |= PORTSCX_PORT_FORCE_FULL_SPEED;

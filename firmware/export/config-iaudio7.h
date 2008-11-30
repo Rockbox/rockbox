@@ -58,7 +58,6 @@
 
 #if 0 && !defined(SIMULATOR) /* Enable for USB driver test */
 #define HAVE_USBSTACK
-#define USE_HIGH_SPEED
 #define USB_VENDOR_ID   0x0e21
 #define USB_PRODUCT_ID  0x0750
 

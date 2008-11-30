@@ -17,7 +17,6 @@
 
 #if 0 /* Enable for USB driver test */
 #define HAVE_USBSTACK
-#define USE_HIGH_SPEED
 #define USB_VENDOR_ID 0x13d1
 #define USB_PRODUCT_ID 0x1002
 #endif
