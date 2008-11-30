@@ -11,7 +11,7 @@
 # (one for codec, one for mpegplayer)
 # so a little trickery is necessary
 
-MADFLAGS = $(CODECFLAGS) -UDEBUG -DNDEBUG -I$(APPSDIR)/codecs/libmad
+MADFLAGS = $(CODECFLAGS) -UDEBUG -DNDEBUG -O2 -I$(APPSDIR)/codecs/libmad
 MPEGMADFLAGS = $(MADFLAGS) -DMPEGPLAYER
 
 # libmad
