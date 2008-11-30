@@ -45,7 +45,7 @@ static uint32_t seektablebuf[MAX_SEEKPOINTS];
 
 #define INPUT_CHUNKSIZE     (32*1024)
 
-/* 4608*4 = 18432 bytes per channel */
+/* 1024*4 = 4096 bytes per channel */
 static int32_t decoded0[BLOCKS_PER_LOOP] IBSS_ATTR;
 static int32_t decoded1[BLOCKS_PER_LOOP] IBSS_ATTR;
 
