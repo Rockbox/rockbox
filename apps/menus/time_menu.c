@@ -209,7 +209,7 @@ static void draw_timedate(struct viewport *vp, struct screen *display)
 }
 
 struct viewport clock[NB_SCREENS], menu[NB_SCREENS];
-int time_menu_callback(int action,
+static int time_menu_callback(int action,
                        const struct menu_item_ex *this_item)
 {
     (void)this_item;
