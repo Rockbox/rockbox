@@ -59,32 +59,34 @@ lcd_grey_data:
     ldmia   r1, {r3-r4}         /* Fetch 8 pixel phases */
     ldmia   r0!, {r5-r6}        /* Fetch 8 pixel values */
 
-    mov     r7, #0xff
+    mov     r7, #0
+
+    /* set bits 15..12 */
     tst     r3, #0x80
-    biceq   r7, r7, #0x80
+    orrne   r7, r7, #0x8000
     tst     r3, #0x8000
-    biceq   r7, r7, #0x40
+    orrne   r7, r7, #0x4000
     tst     r3, #0x800000
-    biceq   r7, r7, #0x20
+    orrne   r7, r7, #0x2000
     tst     r3, #0x80000000
-    biceq   r7, r7, #0x10
+    orrne   r7, r7, #0x1000
     bic     r3, r3, r8
     add     r3, r3, r5
 
+    /* set bits 3..0 */
     tst     r4, #0x80
-    biceq   r7, r7, #0x08
+    orrne   r7, r7, #0x08
     tst     r4, #0x8000
-    biceq   r7, r7, #0x04
+    orrne   r7, r7, #0x04
     tst     r4, #0x800000
-    biceq   r7, r7, #0x02
+    orrne   r7, r7, #0x02
     tst     r4, #0x80000000
-    biceq   r7, r7, #0x01
+    orrne   r7, r7, #0x01
     bic     r4, r4, r8
     add     r4, r4, r6
 
     stmia   r1!, {r3-r4}
 
-    orr     r7, r7, r7, lsl #8  @ we set 15:13 to the MSb and 3:0 to the LSb
     strh    r7, [lr, #0x10]     @ DBOP_DOUT
 
 1:
