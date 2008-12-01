@@ -21,7 +21,8 @@
 
 \documentclass[a4paper,11pt]{scrreprt}
 \usepackage[utf8x]{inputenc}
-\usepackage{palatino}
+% This manual used to use Palatino as font. This caused issues with small caps
+% (textsc), so do not use that font as default one anymore.
 
 \usepackage{tabularx}
 \usepackage{multirow}
@@ -243,7 +244,11 @@
   \endtabularx
 }
 
-\newcommand{\setting}[1]{\textsc{#1}}
+% When creating HTML, use the soul package.
+% This produces much nicer HTML code (textsc results in each character being
+% put in a separate <span>).
+\ifpdfoutput{\newcommand{\caps}[1]{\textsc{#1}}}{\usepackage{soul}}
+\newcommand{\setting}[1]{\caps{#1}}
 
 \newcommand{\config}[1]{\texttt{#1}}
 
