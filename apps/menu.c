@@ -433,6 +433,9 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         redraw_lists = false;
         if (!hide_bars)
         {
+#ifdef HAVE_BUTTONBAR
+            gui_buttonbar_draw(&buttonbar);
+#endif
             gui_syncstatusbar_draw(&statusbars, true);
         }
         action = get_action(CONTEXT_MAINMENU,

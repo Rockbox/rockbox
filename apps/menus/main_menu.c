@@ -147,10 +147,6 @@ enum infoscreenorder
     INFO_ALBUMART,
 #endif
     INFO_VERSION,
-#if CONFIG_RTC
-    INFO_DATE,
-    INFO_TIME,
-#endif
     INFO_COUNT
 };
 
@@ -165,9 +161,6 @@ static char* info_getname(int selected_item, void *data,
                           char *buffer, size_t buffer_len)
 {
     struct info_data *info = (struct info_data*)data;
-#if CONFIG_RTC
-    struct tm *tm;
-#endif
     char s1[32];
 #ifdef HAVE_MULTIVOLUME
     char s2[32];
@@ -189,39 +182,7 @@ static char* info_getname(int selected_item, void *data,
             snprintf(buffer, buffer_len, "%s: %s", 
                      str(LANG_VERSION), appsversion);
             break;
-#if CONFIG_RTC
-        case INFO_TIME:
-            tm = get_time();
-            if (valid_time(tm))
-            {
-                snprintf(buffer, buffer_len, "%02d:%02d:%02d %s", 
-                    global_settings.timeformat == 0 ? tm->tm_hour :
-                         ((tm->tm_hour + 11) % 12) + 1,
-                         tm->tm_min, 
-                         tm->tm_sec, 
-                         global_settings.timeformat == 0 ? "" :
-                         tm->tm_hour>11 ? "P" : "A");
-            }
-            else
-            {
-                strncpy(buffer, "--:--:--", buffer_len);
-            }
-            break;
-        case INFO_DATE:
-            tm = get_time();
-            if (valid_time(tm))
-            {
-                snprintf(buffer, buffer_len, "%s %d %d", 
-                    str(LANG_MONTH_JANUARY + tm->tm_mon),
-                    tm->tm_mday,
-                    tm->tm_year+1900);
-            }
-            else
-            {
-                strncpy(buffer, str(LANG_UNKNOWN), buffer_len);
-            }
-            break;
-#endif
+
         case INFO_BUFFER: /* buffer */
         {
             long kib = (audiobufend - audiobuf) / 1024; /* to KiB */
@@ -305,41 +266,13 @@ static int info_speak_item(int selected_item, void * data)
 {
     struct info_data *info = (struct info_data*)data;
 
-#if CONFIG_RTC
-    struct tm *tm;
-#endif
-
     switch (selected_item)
     {
         case INFO_VERSION: /* version */
             talk_id(LANG_VERSION, false);
             talk_spell(appsversion, true);
             break;
-#if CONFIG_RTC
-        case INFO_TIME:
-            tm = get_time();
-            talk_id(VOICE_CURRENT_TIME, false);
-            if (valid_time(tm))
-            {
-                talk_time(tm, true);
-            }
-            else
-            {
-                talk_id(LANG_UNKNOWN, true);
-            }
-            break;
-        case INFO_DATE:
-            tm = get_time();
-            if (valid_time(tm))
-            {
-                talk_date(get_time(), true);
-            }
-            else
-            {
-                talk_id(LANG_UNKNOWN, true);
-            }
-            break;
-#endif
+
         case INFO_BUFFER: /* buffer */
         {
             talk_id(LANG_BUFFER_STAT, false);
@@ -447,18 +380,6 @@ static int info_action_callback(int action, struct gui_synclist *lists)
         gui_synclist_speak_item(lists);
         return ACTION_REDRAW;
     }
-#if CONFIG_RTC
-    else if (action == ACTION_NONE)
-    {
-        static int last_redraw = 0;
-        if (gui_synclist_item_is_onscreen(lists, 0, INFO_TIME)
-            && TIME_AFTER(current_tick, last_redraw + HZ*5))
-        {
-            last_redraw = current_tick;
-            return ACTION_REDRAW;
-        }
-    }
-#endif
     return action;
 }
 static bool show_info(void)
@@ -501,16 +422,24 @@ static void sleep_timer_set(int minutes)
     set_sleep_timer(minutes * 60);
 }
 
-static int sleep_timer(void)
+int sleep_timer(void)
 {
     int minutes = (get_sleep_timer() + 59) / 60; /* round up */
     return (int)set_int(str(LANG_SLEEP_TIMER), "", UNIT_MIN, &minutes,
                    &sleep_timer_set, -5, 300, 0, sleep_timer_formatter);
 }
 
+
+#if CONFIG_RTC
+int time_screen(void* ignored);
+MENUITEM_FUNCTION(timedate_item, MENU_FUNC_CHECK_RETVAL, ID2P(LANG_TIME_MENU), time_screen,
+                     NULL,  NULL, Icon_Menu_setting );
+#endif
+/* This item is in the time/date screen if there is a RTC */
 MENUITEM_FUNCTION(sleep_timer_call, 0, ID2P(LANG_SLEEP_TIMER), sleep_timer,
                     NULL, NULL, Icon_Menu_setting); /* make it look like a 
                                                                 setting to the user */
+
 MENUITEM_FUNCTION(show_credits_item, 0, ID2P(LANG_VERSION),
                    (menu_function)show_credits, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(show_runtime_item, 0, ID2P(LANG_RUNNING_TIME),
@@ -519,8 +448,14 @@ MENUITEM_FUNCTION(debug_menu_item, 0, ID2P(LANG_DEBUG),
                    (menu_function)debug_menu, NULL, NULL, Icon_NOICON);
 
 MAKE_MENU(info_menu, ID2P(LANG_SYSTEM), 0, Icon_Questionmark,
+#if CONFIG_RTC
+          &timedate_item,
+#endif
           &show_info_item, &show_credits_item, &show_runtime_item, 
-          &sleep_timer_call, &debug_menu_item);
+#if CONFIG_RTC == 0
+          &sleep_timer_call, 
+#endif
+          &debug_menu_item);
 /*      INFO MENU                  */
 /***********************************/
 

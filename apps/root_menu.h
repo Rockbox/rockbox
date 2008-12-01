@@ -49,6 +49,7 @@ enum {
        be the "start screen" after a boot up. The setting in settings_list.c
        will need editing if this is the case. */
     GO_TO_BROWSEPLUGINS,
+    GO_TO_TIMESCREEN,
 };
 
 extern const struct menu_item_ex root_menu_;

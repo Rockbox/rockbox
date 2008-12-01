@@ -310,6 +310,7 @@ static int plugins_menu(void* param)
     }
     return retval;
 }
+int time_screen(void* ignored);     
 
 /* These are all static const'd from apps/menus/ *.c
    so little hack so we can use them */

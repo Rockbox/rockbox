@@ -29,6 +29,9 @@ menus/recording_menu.c
 #endif
 menus/settings_menu.c
 menus/sound_menu.c
+#if CONFIG_RTC
+menus/time_menu.c
+#endif
 misc.c
 mp3data.c
 onplay.c
