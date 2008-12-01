@@ -406,7 +406,9 @@ int sd_init(void)
 #endif
     /* init mutex */
 
+#ifndef BOOTLOADER
     sd_enable(false);
+#endif
 
     mutex_init(&sd_mtx);
 
@@ -496,7 +498,9 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
 #endif
 
     mutex_lock(&sd_mtx);
+#ifndef BOOTLOADER
     sd_enable(true);
+#endif
 
 #ifdef HAVE_MULTIVOLUME
     if (drive != 0 && !card_detect_target())
@@ -583,7 +587,9 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
 
     while (1)
     {
+#ifndef BOOTLOADER
         sd_enable(false);
+#endif
         mutex_unlock(&sd_mtx);
 
         return ret;
