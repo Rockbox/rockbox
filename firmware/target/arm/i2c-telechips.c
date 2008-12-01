@@ -24,8 +24,13 @@
 #include "i2c.h"
 #include "i2c-target.h"
 
-/* arbitrary delay loop */
-#define DELAY  do { int _x; for(_x=0;_x<40;_x++);} while (0)
+/* Delay loop based on CPU frequency (FREQ>>22 is 7..45 for 32MHz..192MHz) */
+static inline void delay_loop(void)
+{
+    unsigned long x;
+    for (x = (unsigned)(FREQ>>22); x; x--);
+}
+#define DELAY delay_loop()
 
 static struct mutex i2c_mtx;
 
