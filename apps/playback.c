@@ -819,7 +819,6 @@ void audio_set_crossfade(int enable)
     {
         /* Store the track resume position */
         offset = curtrack_id3.offset;
-        splash(0, str(LANG_RESTARTING_PLAYBACK));
     }
 
     /* Blast it - audio buffer will have to be setup again next time
