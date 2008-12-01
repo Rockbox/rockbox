@@ -405,6 +405,9 @@ int sd_init(void)
     sd_init_card(SD_SLOT_AS3525);
 #endif
     /* init mutex */
+
+    sd_enable(false);
+
     mutex_init(&sd_mtx);
 
     queue_init(&sd_queue, true);
@@ -493,6 +496,7 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
 #endif
 
     mutex_lock(&sd_mtx);
+    sd_enable(true);
 
 #ifdef HAVE_MULTIVOLUME
     if (drive != 0 && !card_detect_target())
@@ -579,6 +583,7 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
 
     while (1)
     {
+        sd_enable(false);
         mutex_unlock(&sd_mtx);
 
         return ret;
