@@ -1641,7 +1641,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Transizione brani (Crossfade)"
+    swcodec: "Crossfade"
   </dest>
   <voice>
     *: none
@@ -2704,11 +2704,11 @@
   </source>
   <dest>
     *: none
-    backlight_fade*: "Accensione retroilluminazione"
+    backlight_fade*: "Dissolvenza all'accensione"
   </dest>
   <voice>
     *: none
-    backlight_fade*: "Accensione retroilluminazione"
+    backlight_fade*: "Dissolvenza all'accensione"
   </voice>
 </phrase>
 <phrase>
@@ -2721,11 +2721,11 @@
   </source>
   <dest>
     *: none
-    backlight_fade*: "Spegnimento retroilluminazione"
+    backlight_fade*: "Dissolvenza allo spegnimento"
   </dest>
   <voice>
     *: none
-    backlight_fade*: "Spegnimento retroilluminazione"
+    backlight_fade*: "Dissolvenza allo spegnimento"
   </voice>
 </phrase>
 <phrase>
@@ -8608,19 +8608,19 @@
 </phrase>
 <phrase>
   id: LANG_RESTARTING_PLAYBACK
-  desc: splash screen displayed when pcm buffer size is changed
+  desc: deprecated
   user:
   <source>
     *: none
-    swcodec: "Restarting playback..."
+    swcodec: ""
   </source>
   <dest>
     *: none
-    swcodec: "Ripresa esecuzione..."
+    swcodec: ""
   </dest>
   <voice>
     *: none
-    swcodec: "Ripresa esecuzione!"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
