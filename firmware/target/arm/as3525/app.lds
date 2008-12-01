@@ -40,6 +40,7 @@ SECTIONS
 
     .text :
     {
+        _loadaddress = .;
         _textstart = .;
         *(.text)
         *(.text*)
@@ -70,23 +71,6 @@ SECTIONS
 
     _initdata_end =.;
 
-    .stack (NOLOAD) :
-    {
-       *(.stack)
-       stackbegin = .;
-       . += 0x2000;
-       stackend = .;
-    } > DRAM
-
-    .bss (NOLOAD) :
-    {
-       _edata = .;
-        *(.bss*)
-        *(COMMON)
-        . = ALIGN(0x4);
-       _end = .;
-    } > DRAM
-
     .vectors IRAMORIG:
     {
         _vectors_start = .;
@@ -115,6 +99,23 @@ SECTIONS
     } > IRAM AT> DRAM
 
     _iramcopy = LOADADDR(.iram);
+
+    .stack (NOLOAD) :
+    {
+       *(.stack)
+       stackbegin = .;
+       . += 0x2000;
+       stackend = .;
+    } > DRAM
+
+    .bss (NOLOAD) :
+    {
+       _edata = .;
+        *(.bss*)
+        *(COMMON)
+        . = ALIGN(0x4);
+       _end = .;
+    } > DRAM
 
     .audiobuf (NOLOAD) :
     {
