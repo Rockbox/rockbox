@@ -88,15 +88,6 @@
   \end{description}
 } % \opt{dircache,HAVE_DISK_STORAGE}
 
-\opt{rtc}{
-  \subsection{Time and Date}
-  Time related menu options.
-    \begin{description}
-      \item [Set Time/Date: ] Set current time and date.
-      \item [Time Format: ] Choose 12 or 24 hour clock.
-    \end{description}
-}
-
 \subsection{Idle Poweroff}
 Rockbox can be configured to turn off power after the unit has been idle for a
 defined number of minutes. The \dap{} is idle when playback is stopped or
@@ -106,23 +97,6 @@ Settings are either \setting{Off} or \setting{1} to \setting{10}
 minutes in 1 minute steps. Then \setting{15,30,45} and \setting{60} minutes are
 available.
 
-\opt{alarm}{
-\subsection{Wake-Up Alarm}
-% TODO this isn't quite right for all targets, I think
-    This option turns the \dap{} off and then starts it up again at the
-    specified time. Use \ActionSettingInc{} and \ActionSettingDec{} to adjust
-    the minutes setting, \ActionAlarmHoursDec{} and \ActionAlarmHoursInc{} to
-    adjust the hours.
-    \ActionAlarmSet{} confirms the alarm and shuts the \dap{} down, and
-    \ActionAlarmCancel{} cancels setting an alarm. If the \dap{} is turned on
-    again before the alarm occurs, the alarm will be cancelled. Using this
-    option disables the \setting{Sleep Timer}.
-
-  \opt{recording,radio}{
-    \subsection{Alarm Wake up Screen}
-    This option controls what the \dap{} does when it is woken up by the alarm.
-  }
-}
 
 \subsection{Limits}
 This sub menu relates to limits in the Rockbox operating system.

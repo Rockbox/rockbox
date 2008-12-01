@@ -175,6 +175,36 @@ remaining, disk total space and disk free space.
 pages of information.}
 
 \begin{description}
+\opt{rtc}{
+  \item[Time and Date:]
+    Time related menu options. Pressing \ActionStdContext{} will voice the current time if voice support is enabled
+    \begin{description}
+      \item [Set Time/Date: ] Set current time and date.
+      \item[Sleep Timer:]
+        The \setting{Sleep Timer} powers off your \dap{} after playing for a given
+        time. It can be set from \setting{Off} to 5 hours in 5 minute steps.
+        The \setting{Sleep Timer} is reset on boot.
+        \opt{alarm}{Using this option disables the \setting{Wake up alarm}.}
+      \item [Time Format: ] Choose 12 or 24 hour clock.
+      \opt{alarm}{
+        \subsection{Wake-Up Alarm}
+        % TODO this isn't quite right for all targets, I think
+            This option turns the \dap{} off and then starts it up again at the
+            specified time. Use \ActionSettingInc{} and \ActionSettingDec{} to adjust
+            the minutes setting, \ActionAlarmHoursDec{} and \ActionAlarmHoursInc{} to
+            adjust the hours.
+            \ActionAlarmSet{} confirms the alarm and shuts the \dap{} down, and
+            \ActionAlarmCancel{} cancels setting an alarm. If the \dap{} is turned on
+            again before the alarm occurs, the alarm will be cancelled. Using this
+            option disables the \setting{Sleep Timer}.
+
+        \opt{recording,radio}{
+            \subsection{Alarm Wake up Screen}
+            This option controls what the \dap{} does when it is woken up by the alarm.
+        }
+      }
+    \end{description}
+}
 \item[Rockbox Info:]
   Displays some basic system information. This is, from top to bottom,
   the amount of memory Rockbox has available for storing music (the buffer).
@@ -190,12 +220,14 @@ pages of information.}
 
 \item[Version:]
   Software version and credits display.
-  
-\item[Sleep Timer:]
-  The \setting{Sleep Timer} powers off your \dap{} after playing for a given
-  time. It can be set from \setting{Off} to 5 hours in 5 minute steps.
-  The \setting{Sleep Timer} is reset on boot.
-  \opt{alarm}{Using this option disables the \setting{Wake up alarm}.}
+
+\nopt{rtc}{
+  \item[Sleep Timer:]
+    The \setting{Sleep Timer} powers off your \dap{} after playing for a given
+    time. It can be set from \setting{Off} to 5 hours in 5 minute steps.
+    The \setting{Sleep Timer} is reset on boot.
+    \opt{alarm}{Using this option disables the \setting{Wake up alarm}.}
+}
 
 \item[Debug (Keep Out!):]
   This sub menu is intended to be used \emph{only} by Rockbox developers.
