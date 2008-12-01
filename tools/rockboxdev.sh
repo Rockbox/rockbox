@@ -23,7 +23,7 @@ builddir="/tmp/rbdev-build"
 # This script needs to use GNU Make. On Linux systems, GNU Make is invoked
 # by running the "make" command, on most BSD systems, GNU Make is invoked
 # by running the "gmake" command. Set the "make" variable accordingly.
-if [ -f "`which gmake`" ]; then
+if [ -f "`which gmake 2>/dev/null`" ]; then
     make="gmake"
 else
     make="make"
