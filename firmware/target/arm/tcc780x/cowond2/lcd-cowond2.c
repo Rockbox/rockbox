@@ -77,7 +77,7 @@ void lcd_set_contrast(int val)
 static void delay_loop(void)
 {
     unsigned long x;
-    for (x = (unsigned)(FREQ>>24); x; x--);
+    for (x = (unsigned)(FREQ>>23); x; x--);
 }
 #define DELAY delay_loop()
 
@@ -108,8 +108,12 @@ static void ltv250qv_write(unsigned int command)
 
 static void lcd_write_reg(unsigned char reg, unsigned short val)
 {
+    int level = disable_irq_save();
+    
     ltv250qv_write(0x740000 | reg);
     ltv250qv_write(0x760000 | val);
+    
+    restore_irq(level);
 }
 
 
