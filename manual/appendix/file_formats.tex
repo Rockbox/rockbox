@@ -66,7 +66,7 @@
     \emph{Lossy codecs} \\
     \midrule
     MPEG audio & \fname{.mp1, .mpa, .mp2, .mp3} & \\
-    OGG/Vorbis & \fname{.ogg} & Some old ``floor 0'' files may crash Rockbox. \\
+    OGG/Vorbis & \fname{.ogg, .oga} & Some old ``floor 0'' files may crash Rockbox. \\
     Musepack & \fname{.mpc} & \\
     Advanced Audio Coding & \fname{.m4a, .m4b, .mp4} & \\
     Windows Media Audio & \fname{.wma, .wmv, .asf} & \\
@@ -84,10 +84,13 @@
     Wavpack & \fname{.wv} & \\
     Shorten & \fname{.shn} & Seeking not supported.\\
     \opt{h1xx,h300,x5,m5,m3}{
-      Monkey's Audio & \fname{.ape, .mac} & -c1000 and -c2000 decode fast enough to be useful. \\
+      Monkey's Audio & \fname{.ape, .mac} & -c1000 and -c2000 files decode fast enough to be useful. \\
     }
     \opt{gigabeat}{
-      Monkey's Audio & \fname{.ape, .mac} & -c1000 to -c3000 decode fast enough to be useful. \\
+      Monkey's Audio & \fname{.ape, .mac} & -c1000 to -c3000 files decode fast enough to be useful. \\
+    }
+    \nopt{h1xx,h300,x5,m5,m3,gigabeat}{%
+      Monkey's Audio & \fname{.ape, .mac} & Only -c1000 files decode fast enough to be useful. \\
     }
     \\
     \midrule
