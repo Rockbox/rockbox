@@ -69,16 +69,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 |                              int count)
 
 predictor_decode_stereo:
-    lea.l   (-14*4,%sp), %sp
-    movem.l %d2-%d7/%a2-%a6, (3*4,%sp)
+    lea.l   (-12*4,%sp), %sp
+    movem.l %d2-%d7/%a2-%a6, (4,%sp)
 
-    movem.l (14*4+8,%sp), %d0-%d2
-    movem.l %d0-%d2, (%sp)              | (%sp) = decoded0
-                                        | (4,%sp) = decoded1
-                                        | (8,%sp) = count
+    movem.l (12*4+8,%sp), %a3-%a5       | %a3 = decoded0
+                                        | %a4 = decoded1
+    move.l  %a5, (%sp)                  | (%sp) = count
 
     move.l  #0, %macsr                  | signed integer mode
-    move.l  (14*4+4,%sp), %a6           | %a6 = p
+    move.l  (12*4+4,%sp), %a6           | %a6 = p
     move.l  (%a6), %a5                  | %a5 = p->buf
     
 .loop:
@@ -98,15 +97,15 @@ predictor_decode_stereo:
 
     move.l  %d2, (YDELAYA-4,%a5)        | p->buf[YDELAYA-1]  = %d2
 
-    movem.l (YcoeffsA,%a6), %a0-%a3     | %a0  = p->YcoeffsA[0]
-                                        | %a1  = p->YcoeffsA[1]
-                                        | %a2  = p->YcoeffsA[2]
-                                        | %a3  = p->YcoeffsA[3]
+    movem.l (YcoeffsA,%a6), %d4-%d7     | %d4  = p->YcoeffsA[0]
+                                        | %d5  = p->YcoeffsA[1]
+                                        | %d6  = p->YcoeffsA[2]
+                                        | %d7  = p->YcoeffsA[3]
 
-    mac.l   %d3, %a0, %acc0             | %acc0  = p->buf[YDELAYA] * p->YcoeffsA[0]
-    mac.l   %d2, %a1, %acc0             | %acc0 += p->buf[YDELAYA-1] * p->YcoeffsA[1]
-    mac.l   %d1, %a2, %acc0             | %acc0 += p->buf[YDELAYA-2] * p->YcoeffsA[2]
-    mac.l   %d0, %a3, %acc0             | %acc0 += p->buf[YDELAYA-3] * p->YcoeffsA[3]
+    mac.l   %d3, %d4, %acc0             | %acc0  = p->buf[YDELAYA] * p->YcoeffsA[0]
+    mac.l   %d2, %d5, %acc0             | %acc0 += p->buf[YDELAYA-1] * p->YcoeffsA[1]
+    mac.l   %d1, %d6, %acc0             | %acc0 += p->buf[YDELAYA-2] * p->YcoeffsA[2]
+    mac.l   %d0, %d7, %acc0             | %acc0 += p->buf[YDELAYA-3] * p->YcoeffsA[3]
 
     move.l  %d3, (YDELAYA,%a5)          | p->buf[YDELAYA]  = %d3
 
@@ -151,17 +150,17 @@ predictor_decode_stereo:
 
     move.l  %d7, (YDELAYB-4,%a5)        | p->buf[YDELAYB-1]  = %d7
 
-    movem.l (YcoeffsB,%a6), %d2/%a0-%a3 | %d2  = p->YcoeffsB[0]
-                                        | %a0  = p->YcoeffsB[1]
-                                        | %a1  = p->YcoeffsB[2]
-                                        | %a2  = p->YcoeffsB[3]
-                                        | %a3  = p->YcoeffsB[4]
+    movem.l (YcoeffsB,%a6), %d1-%d2/%a0-%a2 | %d1  = p->YcoeffsB[0]
+                                        | %d2  = p->YcoeffsB[1]
+                                        | %a0  = p->YcoeffsB[2]
+                                        | %a1  = p->YcoeffsB[3]
+                                        | %a2  = p->YcoeffsB[4]
 
-    mac.l   %d3, %d2, %acc0             | %acc0  = p->buf[YDELAYB] * p->YcoeffsB[0]
-    mac.l   %d7, %a0, %acc0             | %acc0 += p->buf[YDELAYB-1] * p->YcoeffsB[1]
-    mac.l   %d6, %a1, %acc0             | %acc0 += p->buf[YDELAYB-2] * p->YcoeffsB[2]
-    mac.l   %d5, %a2, %acc0             | %acc0 += p->buf[YDELAYB-3] * p->YcoeffsB[3]
-    mac.l   %d4, %a3, %acc0             | %acc0 += p->buf[YDELAYB-4] * p->YcoeffsB[4]
+    mac.l   %d3, %d1, %acc0             | %acc0  = p->buf[YDELAYB] * p->YcoeffsB[0]
+    mac.l   %d7, %d2, %acc0             | %acc0 += p->buf[YDELAYB-1] * p->YcoeffsB[1]
+    mac.l   %d6, %a0, %acc0             | %acc0 += p->buf[YDELAYB-2] * p->YcoeffsB[2]
+    mac.l   %d5, %a1, %acc0             | %acc0 += p->buf[YDELAYB-3] * p->YcoeffsB[3]
+    mac.l   %d4, %a2, %acc0             | %acc0 += p->buf[YDELAYB-4] * p->YcoeffsB[4]
     
     move.l  %d3, (YDELAYB, %a5)         | p->buf[YDELAYB]  = %d3
     
@@ -180,40 +179,37 @@ predictor_decode_stereo:
 1:                                      | %d3 = SIGN(%d3)
     move.l  %d3, (YADAPTCOEFFSB, %a5)   | p->buf[YADAPTCOEFFSB]  = %d3
 
-    movclr.l %acc0, %d1
+    movclr.l %acc0, %d4
     
     | %d0 still contains predictionA
-    | %d1 contains predictionB
+    | %d4 contains predictionB
 
     | Finish Predictor Y
 
-    move.l  (%sp), %a4                  | %a4  = decoded0
-    asr.l   #1, %d1
-    add.l   %d1, %d0                    | %d0 += (%d1 >> 1)
-    move.l  (%a4), %d5                  | %d5  = *decoded0
-    move.l  %d5, %d1                    | %d1  = %d5
+    asr.l   #1, %d4
+    add.l   %d4, %d0                    | %d0 += (%d1 >> 1)
+    move.l  (%a3), %d5                  | %d5  = *decoded0
+    move.l  %d5, %d4                    | %d4  = %d5
     asr.l   #8, %d0
     asr.l   #2, %d0                     | %d0 >>= 10
-    add.l   %d0, %d1                    | %d1 += %d0
-    move.l  %d1, (YlastA,%a6)           | p->YlastA  = %d1
+    add.l   %d0, %d4                    | %d4 += %d0
+    move.l  %d4, (YlastA,%a6)           | p->YlastA  = %d4
     
     move.l  (YfilterA,%a6), %d6         | %d6  = p->YfilterA
     move.l  %d6, %d0
     lsl.l   #5, %d6
     sub.l   %d0, %d6                    | %d6 = 31 * %d6
     asr.l   #5, %d6                     | %d6 >>= 5
-    add.l   %d6, %d1
-    move.l  %d1, (YfilterA,%a6)         | p->YfilterA  = %d1
+    add.l   %d6, %d4
+    move.l  %d4, (YfilterA,%a6)         | p->YfilterA  = %d4
 
-    | %d1 contains p->YfilterA
-    | %a4 contains decoded0
+    | %d4 contains p->YfilterA
     | %d5 contains *decoded0
 
-    | %d2, %a0, %a1, %a2, %a3 contain p->YcoeffsB[0..4]
+    | %d1, %d2, %a0, %a1, %a2 contain p->YcoeffsB[0..4]
     | %d7, %d3 contain p->buf[YADAPTCOEFFSB-1] and p->buf[YADAPTCOEFFSB]
 
-    move.l  %d1, (%a4)+                 | *(decoded0++)  = %d1 (p->YfilterA)
-    move.l  %a4, (%sp)                  | save decoded0    
+    move.l  %d4, (%a3)+                 | *(decoded0++)  = %d1 (p->YfilterA)
     tst.l   %d5
     beq.s   3f
 
@@ -225,13 +221,13 @@ predictor_decode_stereo:
 
     | *decoded0 > 0
 
-    sub.l   %d3, %d2                    | %d2  = p->YcoeffsB[0] - p->buf[YADAPTCOEFFSB]
-    sub.l   %d7, %a0                    | %a0  = p->YcoeffsB[1] - p->buf[YADAPTCOEFFSB-1]
-    sub.l   %d6, %a1                    | %a1  = p->YcoeffsB[2] - p->buf[YADAPTCOEFFSB-2]
-    sub.l   %d5, %a2                    | %a2  = p->YcoeffsB[3] - p->buf[YADAPTCOEFFSB-3]
-    sub.l   %d4, %a3                    | %a3  = p->YcoeffsB[4] - p->buf[YADAPTCOEFFSB-4]
-    
-    movem.l %d2/%a0-%a3, (YcoeffsB,%a6) | Save p->YcoeffsB[]
+    sub.l   %d3, %d1                    | %d1  = p->YcoeffsB[0] - p->buf[YADAPTCOEFFSB]
+    sub.l   %d7, %d2                    | %d2  = p->YcoeffsB[1] - p->buf[YADAPTCOEFFSB-1]
+    sub.l   %d6, %a0                    | %a0  = p->YcoeffsB[2] - p->buf[YADAPTCOEFFSB-2]
+    sub.l   %d5, %a1                    | %a1  = p->YcoeffsB[3] - p->buf[YADAPTCOEFFSB-3]
+    sub.l   %d4, %a2                    | %a2  = p->YcoeffsB[4] - p->buf[YADAPTCOEFFSB-4]
+
+    movem.l %d1-%d2/%a0-%a2, (YcoeffsB,%a6) | Save p->YcoeffsB[]
     
     movem.l (YcoeffsA,%a6), %d4-%d7     | %d4  = p->YcoeffsA[0]
                                         | %d5  = p->YcoeffsA[1]
@@ -252,13 +248,13 @@ predictor_decode_stereo:
 
 1:  | *decoded0 < 0
 
-    add.l   %d3, %d2                    | %d2  = p->YcoeffsB[0] + p->buf[YADAPTCOEFFSB]
-    add.l   %d7, %a0                    | %a0  = p->YcoeffsB[1] + p->buf[YADAPTCOEFFSB-1]
-    add.l   %d6, %a1                    | %a1  = p->YcoeffsB[2] + p->buf[YADAPTCOEFFSB-2]
-    add.l   %d5, %a2                    | %a2  = p->YcoeffsB[3] + p->buf[YADAPTCOEFFSB-3]
-    add.l   %d4, %a3                    | %a3  = p->YcoeffsB[4] + p->buf[YADAPTCOEFFSB-4]
-    
-    movem.l %d2/%a0-%a3, (YcoeffsB,%a6) | Save p->YcoeffsB[]
+    add.l   %d3, %d1                    | %d1  = p->YcoeffsB[0] + p->buf[YADAPTCOEFFSB]
+    add.l   %d7, %d2                    | %d2  = p->YcoeffsB[1] + p->buf[YADAPTCOEFFSB-1]
+    add.l   %d6, %a0                    | %a0  = p->YcoeffsB[2] + p->buf[YADAPTCOEFFSB-2]
+    add.l   %d5, %a1                    | %a1  = p->YcoeffsB[3] + p->buf[YADAPTCOEFFSB-3]
+    add.l   %d4, %a2                    | %a2  = p->YcoeffsB[4] + p->buf[YADAPTCOEFFSB-4]
+
+    movem.l %d1-%d2/%a0-%a2, (YcoeffsB,%a6) | Save p->YcoeffsB[]
     
     movem.l (YcoeffsA,%a6), %d4-%d7     | %d4  = p->YcoeffsA[0]
                                         | %d5  = p->YcoeffsA[1]
@@ -295,15 +291,15 @@ predictor_decode_stereo:
 
     move.l  %d2, (XDELAYA-4,%a5)        | p->buf[XDELAYA-1]  = %d2
 
-    movem.l (XcoeffsA,%a6), %a0-%a3     | %a0  = p->XcoeffsA[0]
-                                        | %a1  = p->XcoeffsA[1]
-                                        | %a2  = p->XcoeffsA[2]
-                                        | %a3  = p->XcoeffsA[3]
+    movem.l (XcoeffsA,%a6), %d4-%d7     | %d4  = p->XcoeffsA[0]
+                                        | %d5  = p->XcoeffsA[1]
+                                        | %d6  = p->XcoeffsA[2]
+                                        | %d7  = p->XcoeffsA[3]
 
-    mac.l   %d3, %a0, %acc0             | %acc0  = p->buf[XDELAYA] * p->XcoeffsA[0]
-    mac.l   %d2, %a1, %acc0             | %acc0 += p->buf[XDELAYA-1] * p->XcoeffsA[1]
-    mac.l   %d1, %a2, %acc0             | %acc0 += p->buf[XDELAYA-2] * p->XcoeffsA[2]
-    mac.l   %d0, %a3, %acc0             | %acc0 += p->buf[XDELAYA-3] * p->XcoeffsA[3]
+    mac.l   %d3, %d4, %acc0             | %acc0  = p->buf[XDELAYA] * p->XcoeffsA[0]
+    mac.l   %d2, %d5, %acc0             | %acc0 += p->buf[XDELAYA-1] * p->XcoeffsA[1]
+    mac.l   %d1, %d6, %acc0             | %acc0 += p->buf[XDELAYA-2] * p->XcoeffsA[2]
+    mac.l   %d0, %d7, %acc0             | %acc0 += p->buf[XDELAYA-3] * p->XcoeffsA[3]
 
     move.l  %d3, (XDELAYA,%a5)          | p->buf[XDELAYA]  = %d3
     
@@ -348,17 +344,17 @@ predictor_decode_stereo:
 
     move.l  %d7, (XDELAYB-4,%a5)        | p->buf[XDELAYB-1]  = %d7
 
-    movem.l (XcoeffsB,%a6), %d2/%a0-%a3 | %d2  = p->XcoeffsB[0]
-                                        | %a0  = p->XcoeffsB[1]
-                                        | %a1  = p->XcoeffsB[2]
-                                        | %a2  = p->XcoeffsB[3]
-                                        | %a3  = p->XcoeffsB[4]
+    movem.l (XcoeffsB,%a6), %d1-%d2/%a0-%a2 | %d1  = p->XcoeffsB[0]
+                                        | %d2  = p->XcoeffsB[1]
+                                        | %a0  = p->XcoeffsB[2]
+                                        | %a1  = p->XcoeffsB[3]
+                                        | %a2  = p->XcoeffsB[4]
 
-    mac.l   %d3, %d2, %acc0             | %acc0  = p->buf[XDELAYB] * p->XcoeffsB[0]
-    mac.l   %d7, %a0, %acc0             | %acc0 += p->buf[XDELAYB-1] * p->XcoeffsB[1]
-    mac.l   %d6, %a1, %acc0             | %acc0 += p->buf[XDELAYB-2] * p->XcoeffsB[2]
-    mac.l   %d5, %a2, %acc0             | %acc0 += p->buf[XDELAYB-3] * p->XcoeffsB[3]
-    mac.l   %d4, %a3, %acc0             | %acc0 += p->buf[XDELAYB-4] * p->XcoeffsB[4]
+    mac.l   %d3, %d1, %acc0             | %acc0  = p->buf[XDELAYB] * p->XcoeffsB[0]
+    mac.l   %d7, %d2, %acc0             | %acc0 += p->buf[XDELAYB-1] * p->XcoeffsB[1]
+    mac.l   %d6, %a0, %acc0             | %acc0 += p->buf[XDELAYB-2] * p->XcoeffsB[2]
+    mac.l   %d5, %a1, %acc0             | %acc0 += p->buf[XDELAYB-3] * p->XcoeffsB[3]
+    mac.l   %d4, %a2, %acc0             | %acc0 += p->buf[XDELAYB-4] * p->XcoeffsB[4]
     
     move.l  %d3, (XDELAYB, %a5)         | p->buf[XDELAYB]  = %d3
     
@@ -378,40 +374,37 @@ predictor_decode_stereo:
 1:                                      | %d3 = SIGN(%d3)
     move.l  %d3, (XADAPTCOEFFSB, %a5)   | p->buf[XADAPTCOEFFSB]  = %d3
 
-    movclr.l %acc0, %d1
+    movclr.l %acc0, %d4
 
     | %d0 still contains predictionA
-    | %d1 contains predictionB
+    | %d4 contains predictionB
 
     | Finish Predictor X
 
-    move.l  (4,%sp), %a4                | %a4  = decoded1
-    asr.l   #1, %d1
-    add.l   %d1, %d0                    | %d0 += (%d1 >> 1)
+    asr.l   #1, %d4
+    add.l   %d4, %d0                    | %d0 += (%d1 >> 1)
     move.l  (%a4), %d5                  | %d5  = *decoded1
-    move.l  %d5, %d1                    | %d1 = %d5
+    move.l  %d5, %d4                    | %d4 = %d5
     asr.l   #8, %d0
     asr.l   #2, %d0                     | %d0 >>= 10
-    add.l   %d0, %d1                    | %d1 += %d0
-    move.l  %d1, (XlastA,%a6)           | p->XlastA  = %d1
+    add.l   %d0, %d4                    | %d4 += %d0
+    move.l  %d4, (XlastA,%a6)           | p->XlastA  = %d1
     
     move.l  (XfilterA,%a6), %d6         | %d6  = p->XfilterA
     move.l  %d6, %d0
     lsl.l   #5, %d6
     sub.l   %d0, %d6                    | %d6 = 31 * %d6
     asr.l   #5, %d6                     | %d6 >>= 5
-    add.l   %d6, %d1
-    move.l  %d1, (XfilterA,%a6)         | p->XfilterA  = %d6
+    add.l   %d6, %d4
+    move.l  %d4, (XfilterA,%a6)         | p->XfilterA  = %d6
 
-    | %d1 contains p->XfilterA
-    | %a4 contains decoded1
+    | %d4 contains p->XfilterA
     | %d5 contains *decoded1
 
-    | %d2, %a0, %a1, %a2, %a3 contain p->XcoeffsB[0..4]
+    | %d1, %d2, %a0, %a1, %a2 contain p->XcoeffsB[0..4]
     | %d7, %d3 contain p->buf[XADAPTCOEFFSB-1] and p->buf[XADAPTCOEFFSB]
 
-    move.l  %d1, (%a4)+                 | *(decoded1++)  = %d1 (p->XfilterA)
-    move.l  %a4, (4,%sp)                | save decoded1
+    move.l  %d4, (%a4)+                 | *(decoded1++)  = %d1 (p->XfilterA)
     tst.l   %d5
     beq.s   3f
     
@@ -423,13 +416,13 @@ predictor_decode_stereo:
     
     | *decoded1 > 0
 
-    sub.l   %d3, %d2                    | %d2  = p->XcoeffsB[0] - p->buf[XADAPTCOEFFSB]
-    sub.l   %d7, %a0                    | %a0  = p->XcoeffsB[1] - p->buf[XADAPTCOEFFSB-1]
-    sub.l   %d6, %a1                    | %a1  = p->XcoeffsB[2] - p->buf[XADAPTCOEFFSB-2]
-    sub.l   %d5, %a2                    | %a2  = p->XcoeffsB[3] - p->buf[XADAPTCOEFFSB-3]
-    sub.l   %d4, %a3                    | %a3  = p->XcoeffsB[4] - p->buf[XADAPTCOEFFSB-4]
+    sub.l   %d3, %d1                    | %d1  = p->XcoeffsB[0] - p->buf[XADAPTCOEFFSB]
+    sub.l   %d7, %d2                    | %d2  = p->XcoeffsB[1] - p->buf[XADAPTCOEFFSB-1]
+    sub.l   %d6, %a0                    | %a0  = p->XcoeffsB[2] - p->buf[XADAPTCOEFFSB-2]
+    sub.l   %d5, %a1                    | %a1  = p->XcoeffsB[3] - p->buf[XADAPTCOEFFSB-3]
+    sub.l   %d4, %a2                    | %a2  = p->XcoeffsB[4] - p->buf[XADAPTCOEFFSB-4]
     
-    movem.l %d2/%a0-%a3, (XcoeffsB,%a6) | Save p->XcoeffsB[]
+    movem.l %d1-%d2/%a0-%a2, (XcoeffsB,%a6) | Save p->XcoeffsB[]
     
     movem.l (XcoeffsA,%a6), %d4-%d7     | %d4  = p->XcoeffsA[0]
                                         | %d5  = p->XcoeffsA[1]
@@ -450,13 +443,13 @@ predictor_decode_stereo:
 
 1:  | *decoded1 < 0
 
-    add.l   %d3, %d2                    | %d2  = p->XcoeffsB[0] + p->buf[XADAPTCOEFFSB]
-    add.l   %d7, %a0                    | %a0  = p->XcoeffsB[1] + p->buf[XADAPTCOEFFSB-1]
-    add.l   %d6, %a1                    | %a1  = p->XcoeffsB[2] + p->buf[XADAPTCOEFFSB-2]
-    add.l   %d5, %a2                    | %a2  = p->XcoeffsB[3] + p->buf[XADAPTCOEFFSB-3]
-    add.l   %d4, %a3                    | %a3  = p->XcoeffsB[4] + p->buf[XADAPTCOEFFSB-4]
+    add.l   %d3, %d1                    | %d1  = p->XcoeffsB[0] + p->buf[XADAPTCOEFFSB]
+    add.l   %d7, %d2                    | %d2  = p->XcoeffsB[1] + p->buf[XADAPTCOEFFSB-1]
+    add.l   %d6, %a0                    | %a0  = p->XcoeffsB[2] + p->buf[XADAPTCOEFFSB-2]
+    add.l   %d5, %a1                    | %a1  = p->XcoeffsB[3] + p->buf[XADAPTCOEFFSB-3]
+    add.l   %d4, %a2                    | %a2  = p->XcoeffsB[4] + p->buf[XADAPTCOEFFSB-4]
     
-    movem.l %d2/%a0-%a3, (XcoeffsB,%a6) | Save p->XcoeffsB[]
+    movem.l %d1-%d2/%a0-%a2, (XcoeffsB,%a6) | Save p->XcoeffsB[]
     
     movem.l (XcoeffsA,%a6), %d4-%d7     | %d4  = p->XcoeffsA[0]
                                         | %d5  = p->XcoeffsA[1]
@@ -482,42 +475,42 @@ predictor_decode_stereo:
     
     addq.l  #4, %a5                     | p->buf++
 
-    lea.l   (historybuffer+PREDICTOR_HISTORY_SIZE*4,%a6), %a3 
-                              | %a3 = &p->historybuffer[PREDICTOR_HISTORY_SIZE]
+    lea.l   (historybuffer+PREDICTOR_HISTORY_SIZE*4,%a6), %a2
+                              | %a2 = &p->historybuffer[PREDICTOR_HISTORY_SIZE]
     
-    cmp.l   %a3, %a5                    
+    cmp.l   %a2, %a5
     beq.s   .move_hist    | The history buffer is full, we need to do a memmove
                                               
-    subq.l  #1, (8,%sp)                 | decrease loop count
+    subq.l  #1, (%sp)                   | decrease loop count
     bne.w   .loop
 
 .done:
     move.l  %a5, (%a6)                  | Save value of p->buf
-    movem.l (3*4,%sp), %d2-%d7/%a2-%a6
-    lea.l   (14*4,%sp), %sp
+    movem.l (4,%sp), %d2-%d7/%a2-%a6
+    lea.l   (12*4,%sp), %sp
     rts
     
 .move_hist:
-    lea.l   (historybuffer,%a6), %a3    
+    lea.l   (historybuffer,%a6), %a2
 
-    | dest = %a3 (p->historybuffer)
+    | dest = %a2 (p->historybuffer)
     | src = %a5 (p->buf)
     | n = 200
     
     movem.l (%a5), %d0-%d7/%a0-%a1      | 40 bytes
-    movem.l %d0-%d7/%a0-%a1, (%a3)
+    movem.l %d0-%d7/%a0-%a1, (%a2)
     movem.l (40,%a5), %d0-%d7/%a0-%a1   | 40 bytes
-    movem.l %d0-%d7/%a0-%a1, (40,%a3)
+    movem.l %d0-%d7/%a0-%a1, (40,%a2)
     movem.l (80,%a5), %d0-%d7/%a0-%a1   | 40 bytes
-    movem.l %d0-%d7/%a0-%a1, (80,%a3)
+    movem.l %d0-%d7/%a0-%a1, (80,%a2)
     movem.l (120,%a5), %d0-%d7/%a0-%a1  | 40 bytes
-    movem.l %d0-%d7/%a0-%a1, (120,%a3)
+    movem.l %d0-%d7/%a0-%a1, (120,%a2)
     movem.l (160,%a5), %d0-%d7/%a0-%a1  | 40 bytes
-    movem.l %d0-%d7/%a0-%a1, (160,%a3)
+    movem.l %d0-%d7/%a0-%a1, (160,%a2)
 
-    move.l  %a3, %a5                    | p->buf = &p->historybuffer[0]
+    move.l  %a2, %a5                    | p->buf = &p->historybuffer[0]
 
-    subq.l  #1, (8,%sp)                 | decrease loop count
+    subq.l  #1, (%sp)                   | decrease loop count
     bne.w   .loop
 
     bra.s   .done
