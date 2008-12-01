@@ -909,11 +909,17 @@ static bool clipboard_paste(void)
         }
         else
         {
-            strncpy(srcpath, clipboard_selection, sizeof srcpath);
-            strncpy(targetpath, target, sizeof targetpath);
+            strncpy(srcpath, clipboard_selection, sizeof(srcpath));
+            strncpy(targetpath, target, sizeof(targetpath));
     
             success = clipboard_pastedirectory(srcpath, sizeof(srcpath),
                              target, sizeof(targetpath), clipboard_is_copy);
+
+            if (success && !clipboard_is_copy)
+            {
+                strncpy(srcpath, clipboard_selection, sizeof(srcpath));
+                remove_dir(srcpath, sizeof(srcpath));
+            }
         }
     } else {
         success = clipboard_pastefile(clipboard_selection, target,
