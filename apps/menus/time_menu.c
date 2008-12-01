@@ -42,6 +42,7 @@
 #include "list.h"
 #include "alarm_menu.h"
 #include "screens.h"
+#include "radio.h"
 
 static int timedate_set(void)
 {
