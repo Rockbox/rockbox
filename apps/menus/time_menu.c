@@ -208,7 +208,8 @@ static void draw_timedate(struct viewport *vp, struct screen *display)
     display->update_viewport();
 }
 
-struct viewport clock[NB_SCREENS], menu[NB_SCREENS];
+static struct viewport clock[NB_SCREENS], menu[NB_SCREENS];
+static bool menu_was_pressed;
 static int time_menu_callback(int action,
                        const struct menu_item_ex *this_item)
 {
@@ -227,6 +228,12 @@ static int time_menu_callback(int action,
         case ACTION_STD_CONTEXT:
             talk_timedate();
             action = ACTION_NONE;
+            break;
+        /* need to tell do_menu() to return, but then get time_screen()
+           to return 0! ACTION_STD_MENU will return GO_TO_PREVIOUS from here
+           so check do_menu()'s return val and menu_was_pressed */
+        case ACTION_STD_MENU:
+            menu_was_pressed = true;
             break;
     }
     if (redraw)
@@ -252,7 +259,8 @@ MAKE_MENU(time_menu, ID2P(LANG_TIME_MENU), time_menu_callback, Icon_NOICON,
 int time_screen(void* ignored)
 {
     (void)ignored;
-    int i, nb_lines, font_h;
+    int i, nb_lines, font_h, ret;
+    menu_was_pressed = false;
 
     FOR_NB_SCREENS(i)
     {
@@ -291,5 +299,9 @@ int time_screen(void* ignored)
         draw_timedate(&clock[i], &screens[i]);
         screens[i].update();
     }
-    return do_menu(&time_menu, NULL, menu, false);
+    ret = do_menu(&time_menu, NULL, menu, false);
+    /* see comments above in the button callback */
+    if (!menu_was_pressed && ret == GO_TO_PREVIOUS)
+        return 0;
+    return ret;
 }
