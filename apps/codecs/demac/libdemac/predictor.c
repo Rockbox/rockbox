@@ -211,6 +211,7 @@ void ICODE_ATTR_DEMAC predictor_decode_stereo(struct predictor_t* p,
 }
 #endif
 
+#if !defined(CPU_COLDFIRE)
 void ICODE_ATTR_DEMAC predictor_decode_mono(struct predictor_t* p,
                                             int32_t* decoded0,
                                             int count)
@@ -269,3 +270,4 @@ void ICODE_ATTR_DEMAC predictor_decode_mono(struct predictor_t* p,
 
     p->YlastA = currentA;
 }
+#endif
