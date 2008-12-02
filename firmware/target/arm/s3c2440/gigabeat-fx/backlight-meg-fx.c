@@ -28,9 +28,12 @@
 #include "power.h"
 
 #define BUTTONLIGHT_MENU (SC606_LED_B1)
-#define BUTTONLIGHT_ALL  (SC606_LED_B1 | SC606_LED_B2 | SC606_LED_C1 | SC606_LED_C2)
+#define BUTTONLIGHT_ALL  (SC606_LED_B1 | SC606_LED_B2 | \
+                          SC606_LED_C1 | SC606_LED_C2)
 
-static const int log_brightness[12] = {0,1,2,3,5,7,10,15,22,31,44,63};
+/* Dummy value at index 0, 1-12 used. */
+static const unsigned char log_brightness[13] =
+    {0,0,1,2,3,5,7,10,15,22,31,44,63};
 
 #ifndef BOOTLOADER
 static void led_control_service(void);
@@ -75,7 +78,7 @@ void _backlight_set_brightness(int brightness)
 {
     /* stop the interrupt from messing us up */
     backlight_control = BACKLIGHT_CONTROL_IDLE;
-    _backlight_brightness = log_brightness[brightness - 1];
+    _backlight_brightness = log_brightness[brightness];
     backlight_control = BACKLIGHT_CONTROL_SET;
 }
 
@@ -394,25 +397,24 @@ void _buttonlight_off(void)
 
 void _buttonlight_set_brightness(int brightness)
 {
-    /* clamp the brightness value */
-    brightness = MAX(1, MIN(12, brightness));
     /* stop the interrupt from messing us up */
     buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
-    buttonlight_brightness = log_brightness[brightness - 1];
+    buttonlight_brightness = log_brightness[brightness];
     buttonlight_control = BUTTONLIGHT_CONTROL_SET;
 }
 
 bool _backlight_init(void)
 {
-    buttonlight_brightness = log_brightness[DEFAULT_BRIGHTNESS_SETTING-1];
-    _backlight_brightness = log_brightness[DEFAULT_BRIGHTNESS_SETTING-1];
+    unsigned char brightness = log_brightness[DEFAULT_BRIGHTNESS_SETTING];
+    buttonlight_brightness = brightness;
+    _backlight_brightness = brightness;
 
     buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
     backlight_control = BACKLIGHT_CONTROL_ON;
 
     /* Set the backlight up in a known state */
     sc606_init();
-    sc606_write(SC606_REG_A , _backlight_brightness);
+    sc606_write(SC606_REG_A , brightness);
     sc606_write(SC606_REG_B , 0);
     sc606_write(SC606_REG_C , 0);
     sc606_write(SC606_REG_CONF , 0x03);
