@@ -40,12 +40,6 @@
 #include "dsp.h"
 #include "thread.h"
 
-/* Define PCMBUF_MUTING if the codec requires muting to prevent pops */
-#if !defined(HAVE_UDA1380) && !defined(HAVE_TLV320) && !defined(HAVE_AS3514) \
-    && !defined(HAVE_WM8978)
-#define PCMBUF_MUTING
-#endif
-
 /* Clip sample to signed 16 bit range */
 static inline int32_t clip_sample_16(int32_t sample)
 {
@@ -493,21 +487,10 @@ unsigned char * pcmbuf_get_meminfo(size_t *length)
 
 void pcmbuf_pause(bool pause)
 {
-#ifdef PCMBUF_MUTING
-    if (pause)
-       pcm_mute(true);
-#endif
-
     if (pcm_is_playing())
         pcm_play_pause(!pause);
     else if (!pause)
         pcmbuf_play_start();
-
-#ifdef PCMBUF_MUTING
-    if (!pause)
-        pcm_mute(false);
-#endif
-    trigger_cpu_boost();
 }
 
 /* Force playback. */
