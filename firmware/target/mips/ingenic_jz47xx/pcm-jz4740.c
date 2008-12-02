@@ -52,11 +52,6 @@ void pcm_play_dma_init(void)
     audiohw_init();
 }
 
-void pcm_postinit(void)
-{
-    audiohw_postinit();
-}
-
 void pcm_apply_settings(void)
 {
     /* TODO */
