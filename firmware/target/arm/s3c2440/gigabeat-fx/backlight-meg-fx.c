@@ -63,6 +63,7 @@ enum buttonlight_states
     BUTTONLIGHT_CONTROL_FADE,
 } buttonlight_control;
 
+static unsigned char _backlight_brightness;
 static unsigned char buttonlight_brightness;
 static unsigned char backlight_target;
 static unsigned char buttonlight_target;
@@ -72,7 +73,9 @@ static unsigned short buttonlight_trigger_now;
 /* Assumes that the backlight has been initialized */
 void _backlight_set_brightness(int brightness)
 {
-    (void) brightness; /* Actually handled in led_control_service() */
+    /* stop the interrupt from messing us up */
+    backlight_control = BACKLIGHT_CONTROL_IDLE;
+    _backlight_brightness = log_brightness[brightness - 1];
     backlight_control = BACKLIGHT_CONTROL_SET;
 }
 
@@ -147,14 +150,14 @@ static void led_control_service(void)
                 sc606_changed=true;
                 sc606_CONF_changed=true;
                 sc606regCONFval |= 0x03;
-                sc606regAval=backlight_brightness;
+                sc606regAval=_backlight_brightness;
                 backlight_control = BACKLIGHT_CONTROL_IDLE;
                 break;
             case BACKLIGHT_CONTROL_SET:
                 if(!(sc606regCONFval&0x03))
                     break;
                 sc606_changed=true;
-                sc606regAval=log_brightness[backlight_brightness - 1];
+                sc606regAval = _backlight_brightness;
                 backlight_control = BACKLIGHT_CONTROL_IDLE;
                 break;
             case BACKLIGHT_CONTROL_FADE:
@@ -317,8 +320,8 @@ static void __backlight_dim(bool dim_now)
 {
     /* dont let the interrupt tick happen */
     backlight_control = BACKLIGHT_CONTROL_IDLE;
-    backlight_target = (dim_now == true) ? 0 : backlight_brightness;
-    if(backlight_target==0 && backlight_brightness==0)
+    backlight_target = (dim_now == true) ? 0 : _backlight_brightness;
+    if(backlight_target==0 && _backlight_brightness==0)
     {
         if(dim_now == false)
             backlight_control = BACKLIGHT_CONTROL_ON;
@@ -402,7 +405,7 @@ void _buttonlight_set_brightness(int brightness)
 bool _backlight_init(void)
 {
     buttonlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
-    backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
+    _backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
 
     buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
     backlight_control = BACKLIGHT_CONTROL_ON;
