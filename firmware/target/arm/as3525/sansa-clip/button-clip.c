@@ -41,9 +41,6 @@ int button_read_device(void)
     if (GPIOA_PIN(7))
         result |= BUTTON_POWER;
 
-    if (GPIOA_PIN(3))
-        result |= BUTTON_HOLD;
-
     /* This is a keypad using C4-C6 as columns and B0-B2 as rows */
     GPIOC_PIN(4) = (1<<4);
 
