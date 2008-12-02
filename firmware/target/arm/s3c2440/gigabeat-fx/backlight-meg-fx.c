@@ -404,15 +404,15 @@ void _buttonlight_set_brightness(int brightness)
 
 bool _backlight_init(void)
 {
-    buttonlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
-    _backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
+    buttonlight_brightness = log_brightness[DEFAULT_BRIGHTNESS_SETTING];
+    _backlight_brightness = log_brightness[DEFAULT_BRIGHTNESS_SETTING];
 
     buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
     backlight_control = BACKLIGHT_CONTROL_ON;
 
     /* Set the backlight up in a known state */
     sc606_init();
-    sc606_write(SC606_REG_A , DEFAULT_BRIGHTNESS_SETTING);
+    sc606_write(SC606_REG_A , _backlight_brightness);
     sc606_write(SC606_REG_B , 0);
     sc606_write(SC606_REG_C , 0);
     sc606_write(SC606_REG_CONF , 0x03);
