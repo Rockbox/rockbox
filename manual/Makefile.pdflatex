@@ -3,9 +3,9 @@ LATEX := pdflatex
 include LaTeX.Rules
 GRAPHIC_FILES:=`find . -name \*.jpg \*.jpeg`
 HTLATEX := htlatex
-HTOPTS1 := rockbox-html,early_
-HTOPTS2 := ""
-HTOPTS3 := "-dhtml/"
+HTOPTS1 := rockbox-html,charset=utf-8,early_
+HTOPTS2 := " -utf8 -cunihtf"
+HTOPTS3 := "-dhtml/ -cvalidate"
 
 .PHONY: all cleaner buildmanual output
 
