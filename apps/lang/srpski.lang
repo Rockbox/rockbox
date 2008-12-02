@@ -15,7 +15,7 @@
 # KIND, either express or implied.
 #
 # Serbian language file, translated by:
-# - Ivan Pesic
+# - Ivan Pešić
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -330,10 +330,10 @@
     *: "Files"
   </source>
   <dest>
-    *: "Датотеке"
+    *: "Фајлови"
   </dest>
   <voice>
-    *: "Датотеке"
+    *: "Фајлови"
   </voice>
 </phrase>
 <phrase>
@@ -419,11 +419,11 @@
   </source>
   <dest>
     *: none
-    radio: "УКТ радио"
+    radio: "FM радио"
   </dest>
   <voice>
     *: none
-    radio: "УКТ радио"
+    radio: "Еф Ем радио"
   </voice>
 </phrase>
 <phrase>
@@ -658,10 +658,10 @@
     *: "Bass"
   </source>
   <dest>
-    *: "Басови"
+    *: "Ниски"
   </dest>
   <voice>
-    *: "Басови"
+    *: "Ниски"
   </voice>
 </phrase>
 <phrase>
@@ -672,10 +672,10 @@
     *: "Treble"
   </source>
   <dest>
-    *: "Сопран"
+    *: "Високи"
   </dest>
   <voice>
-    *: "Сопран"
+    *: "Високи"
   </voice>
 </phrase>
 <phrase>
@@ -1311,7 +1311,7 @@
   </dest>
   <voice>
     *: none
-    masf: ""
+    masf: "Време опадања за AV"
   </voice>
 </phrase>
 <phrase>
@@ -2159,10 +2159,10 @@
     *: "File View"
   </source>
   <dest>
-    *: "Поглед на датотеке"
+    *: "Поглед на фајлове"
   </dest>
   <voice>
-    *: "Поглед на датотеке"
+    *: "Поглед на фајлове"
   </voice>
 </phrase>
 <phrase>
@@ -2201,10 +2201,10 @@
     *: "Sort Files"
   </source>
   <dest>
-    *: "Сортирање датотека"
+    *: "Сортирање фајлова"
   </dest>
   <voice>
-    *: "Сортирање датотека"
+    *: "Сортирање фајлова"
   </voice>
 </phrase>
 <phrase>
@@ -2271,10 +2271,10 @@
     *: "Show Files"
   </source>
   <dest>
-    *: "Приказ датотека"
+    *: "Приказ фајлова"
   </dest>
   <voice>
-    *: "Приказ датотека"
+    *: "Приказ фајлова"
   </voice>
 </phrase>
 <phrase>
@@ -2454,10 +2454,10 @@
     *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "Сакупи податке о трајању"
+    *: "Сакупи податке о слушању"
   </dest>
   <voice>
-    *: "Сакупи податке о трајању"
+    *: "Сакупи податке о слушању"
   </voice>
 </phrase>
 <phrase>
@@ -2510,10 +2510,10 @@
     *: "Committing database"
   </source>
   <dest>
-    *: "Упис у базу у току"
+    *: "Активирање базе"
   </dest>
   <voice>
-    *: "Упис у базу у току"
+    *: "Активирање базе"
   </voice>
 </phrase>
 <phrase>
@@ -2583,10 +2583,10 @@
     *: "Browse .wps files"
   </source>
   <dest>
-    *: "Прегледај .wps датотеке"
+    *: "Прегледај .wps фајлове"
   </dest>
   <voice>
-    *: "Прегледај while-playing-screen датотеке"
+    *: "Прегледај while-playing-screen фајлове"
   </voice>
 </phrase>
 <phrase>
@@ -2599,11 +2599,11 @@
   </source>
   <dest>
     *: none
-    remote: "Прегледај .rwps датотеке"
+    remote: "Прегледај .rwps фајлове"
   </dest>
   <voice>
     *: none
-    remote: "Прегледај remote while-playing-screen датотеке"
+    remote: "Прегледај remote while-playing-screen фајлове"
   </voice>
 </phrase>
 <phrase>
@@ -3089,7 +3089,7 @@
     *: "Пример за изабрану брзину скроловања"
   </dest>
   <voice>
-    *: ""
+    *: "Пример за изабрану брзину скроловања"
   </voice>
 </phrase>
 <phrase>
@@ -3835,6 +3835,29 @@
   </voice>
 </phrase>
 <phrase>
+<<<<<<< .mine
+  id: LANG_BUTTONLIGHT_TIMEOUT
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    e200*: "Wheel Light Timeout"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+  </source>
+  <dest>
+    *: none
+    e200*: "Тајмаут светла за точак"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Тајмаут светла за дугмиће"
+  </dest>
+  <voice>
+    *: none
+    e200*: "Тајмаут светла за точак"
+    clip,c200,gigabeatf,mrobe100,sa9200: "Тајмаут светла за дугмиће"
+  </voice>
+</phrase>
+<phrase>
+=======
+>>>>>>> .r19300
   id: LANG_BUTTONLIGHT_BRIGHTNESS
   desc: in settings_menu
   user:
@@ -4908,10 +4931,10 @@
     *: "Voice Filenames"
   </source>
   <dest>
-    *: "Гласовна имена датотека"
+    *: "Гласовна имена фајлова"
   </dest>
   <voice>
-    *: "Гласовна имена датотека"
+    *: "Гласовна имена фајлова"
   </voice>
 </phrase>
 <phrase>
@@ -4922,10 +4945,10 @@
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "Користи .talk клипове за датотеке"
+    *: "Користи .talk клипове за фајлове"
   </dest>
   <voice>
-    *: "Користи .talk клипове за датотеке"
+    *: "Користи .talk клипове за фајлове"
   </voice>
 </phrase>
 <phrase>
@@ -4992,10 +5015,10 @@
     *: "Browse .cfg Files"
   </source>
   <dest>
-    *: "Прегледај .cfg датотеке"
+    *: "Прегледај .cfg фајлове"
   </dest>
   <voice>
-    *: "Прегледај конфигурационе датотеке"
+    *: "Прегледај конфигурационе фајлове"
   </voice>
 </phrase>
 <phrase>
@@ -5048,10 +5071,10 @@
     *: "Save .cfg File"
   </source>
   <dest>
-    *: "Сними .cfg датотеку"
+    *: "Сними .cfg фајл"
   </dest>
   <voice>
-    *: "Сними конфигурациону датотеку"
+    *: "Сними конфигурациону фајл"
   </voice>
 </phrase>
 <phrase>
@@ -5123,11 +5146,11 @@
   </source>
   <dest>
     *: none
-    radio: "Мени УКТ радија"
+    radio: "Мени FM радија"
   </dest>
   <voice>
     *: none
-    radio: "Мени УКТ радија"
+    radio: "Мени Еф Ем радија"
   </voice>
 </phrase>
 <phrase>
@@ -5263,7 +5286,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: ""
+    radio_screen_button_bar: "Мени"
   </voice>
 </phrase>
 <phrase>
@@ -5280,7 +5303,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: ""
+    radio_screen_button_bar: "Излаз"
   </voice>
 </phrase>
 <phrase>
@@ -5297,7 +5320,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: ""
+    radio_screen_button_bar: "Акција"
   </voice>
 </phrase>
 <phrase>
@@ -5331,7 +5354,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: ""
+    radio_screen_button_bar: "Додај"
   </voice>
 </phrase>
 <phrase>
@@ -5348,7 +5371,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: ""
+    radio_screen_button_bar: "Снимај"
   </voice>
 </phrase>
 <phrase>
@@ -5382,7 +5405,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Екран је замрзнут!"
   </voice>
 </phrase>
 <phrase>
@@ -5942,11 +5965,11 @@
   </source>
   <dest>
     *: none
-    recording: "Опције за поделу датотеке"
+    recording: "Опције за поделу фајла"
   </dest>
   <voice>
     *: none
-    recording: "Опције за поделу датотеке"
+    recording: "Опције за поделу фајла"
   </voice>
 </phrase>
 <phrase>
@@ -5993,11 +6016,11 @@
   </source>
   <dest>
     *: none
-    recording: "Започни нову датотеку"
+    recording: "Започни нов фајл"
   </dest>
   <voice>
     *: none
-    recording: "Започни нову датотеку"
+    recording: "Започни нов фајл"
   </voice>
 </phrase>
 <phrase>
@@ -6044,11 +6067,11 @@
   </source>
   <dest>
     *: none
-    recording: "Величина појединачне датотеке"
+    recording: "Величина појединачног фајла"
   </dest>
   <voice>
     *: none
-    recording: "Величина појединачне датотеке"
+    recording: "Величина појединачног фајла"
   </voice>
 </phrase>
 <phrase>
@@ -6061,11 +6084,11 @@
   </source>
   <dest>
     *: none
-    recording: "Величина датотеке"
+    recording: "Величина фајла"
   </dest>
   <voice>
     *: none
-    recording: "Величина датотеке"
+    recording: "Величина фајла"
   </voice>
 </phrase>
 <phrase>
@@ -6299,11 +6322,11 @@
   </source>
   <dest>
     *: none
-    recording: "Нова датотека"
+    recording: "Нов фајл"
   </dest>
   <voice>
     *: none
-    recording: "Нова датотека"
+    recording: "Нов фајл"
   </voice>
 </phrase>
 <phrase>
@@ -6401,11 +6424,11 @@
   </source>
   <dest>
     *: none
-    recording: "Pred-snimanje"
+    recording: "Пред-снимање"
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Пред-снимање"
   </voice>
 </phrase>
 <phrase>
@@ -6571,11 +6594,11 @@
   </source>
   <dest>
     *: none
-    remote: "Remote Display OFF"
+    remote: "Удаљени екран ИСКЉ."
   </dest>
   <voice>
     *: none
-    remote: "Remote Display OFF"
+    remote: "Удаљени екран ИСКЉУЧЕН"
   </voice>
 </phrase>
 <phrase>
@@ -6846,7 +6869,7 @@
   </source>
   <dest>
     *: "Бафер:"
-    player: "Buf:"
+    player: "Баф:"
   </dest>
   <voice>
     *: "Величина бафера"
@@ -6921,16 +6944,19 @@
   user:
   <source>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
+    multivolume: "H D 1"
     e200*,c200: "мајкро Ес Де"
     ondio*: "M M C"
   </voice>
@@ -7727,10 +7753,10 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Датотека/директоријум постоји. Да препишем?"
+    *: "Фајл/директоријум постоји. Да препишем?"
   </dest>
   <voice>
-    *: "Датотека или директоријум постоји. Да препишем?"
+    *: "Фајл или директоријум постоји. Да препишем?"
   </voice>
 </phrase>
 <phrase>
@@ -7862,7 +7888,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: ""
+    lcd_non-mono: "Позадина учитана"
   </voice>
 </phrase>
 <phrase>
@@ -7879,7 +7905,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: ""
+    lcd_non-mono: "Учитавање позадине није успело"
   </voice>
 </phrase>
 <phrase>
@@ -7969,7 +7995,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: ""
+    pitchscreen: "Навише"
   </voice>
 </phrase>
 <phrase>
@@ -7986,7 +8012,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: ""
+    pitchscreen: "Наниже"
   </voice>
 </phrase>
 <phrase>
@@ -8003,7 +8029,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: ""
+    pitchscreen: "Полустепен горе"
   </voice>
 </phrase>
 <phrase>
@@ -8020,7 +8046,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: ""
+    pitchscreen: "Полустепен доле"
   </voice>
 </phrase>
 <phrase>
@@ -8065,7 +8091,7 @@
     *: "Креирам"
   </dest>
   <voice>
-    *: ""
+    *: "Креирам"
   </voice>
 </phrase>
 <phrase>
@@ -8090,10 +8116,10 @@
     *: "Error updating playlist control file"
   </source>
   <dest>
-    *: "Грешка код обнављања контр. дат. плејлисте"
+    *: "Грешка код обнављања контр. фајла плејлисте"
   </dest>
   <voice>
-    *: "Грешка код обнављања контр. дат. плејлисте"
+    *: "Грешка код обнављања контролног фајла плејлисте"
   </voice>
 </phrase>
 <phrase>
@@ -8104,10 +8130,10 @@
     *: "Error accessing playlist file"
   </source>
   <dest>
-    *: "Грешка при приступу датотеци плејлисте"
+    *: "Грешка при приступу фајла плејлисте"
   </dest>
   <voice>
-    *: "Грешка при приступу датотеци плејлисте"
+    *: "Грешка при приступу фајла плејлисте"
   </voice>
 </phrase>
 <phrase>
@@ -8118,10 +8144,10 @@
     *: "Error accessing playlist control file"
   </source>
   <dest>
-    *: "Грешка при приступу контр. дат. плејлисте"
+    *: "Грешка при приступу контр. фајлу плејлисте"
   </dest>
   <voice>
-    *: "Грешка при приступу контр. дат. плејлисте"
+    *: "Грешка при приступу контролном фајлу плејлисте"
   </voice>
 </phrase>
 <phrase>
@@ -8146,10 +8172,10 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "Контролна датотека плејлисте је неисправна"
+    *: "Контролни фајл плејлисте је неисправан"
   </dest>
   <voice>
-    *: "Контролна датотека плејлисте је неисправна"
+    *: "Контролни фајл плејлисте је неисправан"
   </voice>
 </phrase>
 <phrase>
@@ -8205,7 +8231,7 @@
     *: "Мод:"
   </dest>
   <voice>
-    *: ""
+    *: "Мод"
   </voice>
 </phrase>
 <phrase>
@@ -8250,7 +8276,7 @@
     *: "Тастери закључани"
   </dest>
   <voice>
-    *: ""
+    *: "Тастери закључани"
   </voice>
 </phrase>
 <phrase>
@@ -8264,7 +8290,7 @@
     *: "Тастери откључани"
   </dest>
   <voice>
-    *: ""
+    *: "Тастери откључани"
   </voice>
 </phrase>
 <phrase>
@@ -8277,11 +8303,11 @@
   </source>
   <dest>
     *: none
-    recording: "Vreme:"
+    recording: "Време:"
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Време"
   </voice>
 </phrase>
 <phrase>
@@ -8396,6 +8422,8 @@
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
     h10,h10_5gb,e200*,c200: "PREV to abort"
+    gigabeats: "BACK to abort"
+    gigabeatf:"POWER to abort"
   </source>
   <dest>
     *: "OFF to abort"
@@ -8403,6 +8431,8 @@
     ipod*: "PLAY/PAUSE за прекид"
     x5,m5: "Long PLAY за прекид"
     h10,h10_5gb,e200*,c200: "PREV за прекид"
+    gigabeats: "BACK за прекид"
+    gigabeatf:"POWER за прекид"
   </dest>
   <voice>
     *: ""
@@ -8416,10 +8446,10 @@
     *: "No files"
   </source>
   <dest>
-    *: "Нема датотека"
+    *: "Нема фајлова"
   </dest>
   <voice>
-    *: "Нема датотека"
+    *: "Нема фајлова"
   </voice>
 </phrase>
 <phrase>
@@ -8528,10 +8558,10 @@
     *: "Filetype array full"
   </source>
   <dest>
-    *: "Низ типова датотека је пун"
+    *: "Низ типова фајлова је пун"
   </dest>
   <voice>
-    *: "Низ типова датотека је пун"
+    *: "Низ типова фајлова је пун"
   </voice>
 </phrase>
 <phrase>
@@ -8556,10 +8586,10 @@
     *: "Invalid Filename!"
   </source>
   <dest>
-    *: "Неиправно име датотеке!"
+    *: "Неиправно име фајла!"
   </dest>
   <voice>
-    *: "Неиправно име датотеке"
+    *: "Неиправно име фајла"
   </voice>
 </phrase>
 <phrase>
@@ -9845,7 +9875,7 @@
     *: ""
   </dest>
   <voice>
-    *: "датотека"
+    *: "фајл"
   </voice>
 </phrase>
 <phrase>
@@ -10978,10 +11008,10 @@
     *: "Show Filename Extensions"
   </source>
   <dest>
-    *: "Прикажи екстензије датотека"
+    *: "Прикажи екстензије фајлова"
   </dest>
   <voice>
-    *: "Прикажи екстензије датотека"
+    *: "Прикажи екстензије фајлова"
   </voice>
 </phrase>
 <phrase>
@@ -11441,10 +11471,10 @@
     *: "Say File Type"
   </source>
   <dest>
-    *: "Реци тип датотеке"
+    *: "Реци тип фајла"
   </dest>
   <voice>
-    *: "Реци тип датотеке"
+    *: "Реци тип фајла"
   </voice>
 </phrase>
 <phrase>
@@ -11457,11 +11487,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Гранична фрекв. за басове"
+    ipodvideo: "Гранична фрекв. за ниске"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Гранична фрекв. за басове"
+    ipodvideo: "Гранична фреквенција за ниске"
   </voice>
 </phrase>
 <phrase>
@@ -11474,11 +11504,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Гранична фрекв. за сопран"
+    ipodvideo: "Гранична фрекв. за високе"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Гранична фрекв. за сопран"
+    ipodvideo: "Гранична фреквенција за високе"
   </voice>
 </phrase>
 <phrase>
@@ -11843,7 +11873,7 @@
   </source>
   <dest>
     *: none
-    recording: "Датотека:"
+    recording: "Фајл:"
   </dest>
   <voice>
     *: none
@@ -11958,5 +11988,203 @@
   <voice>
     *: none
     gigabeatf: "Високо"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMART
+  desc: Display the expected AA size
+  user:
+  <source>
+    *: none
+    albumart: "Album Art:"
+  </source>
+  <dest>
+    *: none
+    albumart: "Омот албума:"
+  </dest>
+  <voice>
+    *: none
+    albumart: "Омот албума:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFTRIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Моно Леви + Десни"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Моно Леви плус Десни"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Left Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Постави као леву ставку у Екрану пречица"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Постави као леву ставку у Екрану пречица"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_SETTING
+  desc: used in the settings context menu
+  user:
+  <source>
+    *: "Reset Setting"
+  </source>
+  <dest>
+    *: "Ресетуј подешавање"
+  </dest>
+  <voice>
+    *: "Ресетуј подешавање"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Bottom Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Постави као доњу ставку у Екрану пречица"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Постави као доњу ставку у Екрану пречица"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QS_ITEMS
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Right Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Постави као десну ставку у Екрану пречица"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Постави као десну ставку у Екрану пречица"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user:
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "Резултати претраге"
+  </dest>
+  <voice>
+    *: "Резултати претраге"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MONO_MODE
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono mode"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Моно мод"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Моно мод"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
   </voice>
 </phrase>

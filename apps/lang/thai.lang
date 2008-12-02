@@ -235,7 +235,7 @@
     *: "Channels"
   </source>
   <dest>
-    *: "ช่อง"
+    *: "ช่องสัญญาณ"
   </dest>
   <voice>
     *: "Channels"
@@ -400,7 +400,7 @@
   </source>
   <dest>
     *: none
-    recording: "การบันทึก"
+    recording: "บันทึกเสียง"
   </dest>
   <voice>
     *: none
@@ -684,7 +684,7 @@
     *: "Balance"
   </source>
   <dest>
-    *: "ความสมดุล"
+    *: "สมดุลซ้ายขวา"
   </dest>
   <voice>
     *: "Balance"
@@ -698,7 +698,7 @@
     *: "Channel Configuration"
   </source>
   <dest>
-    *: "ลักษณะช่องเสียง"
+    *: "ลักษณะช่องสัญญาณ"
   </dest>
   <voice>
     *: "Channel Configuration"
@@ -812,7 +812,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Crossfeed"
+    swcodec: "ผสมเสียงข้ามช่อง"
   </dest>
   <voice>
     *: none
@@ -829,7 +829,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "ขยายโดยตรง"
+    swcodec: "อัตราขยายโดยตรง"
   </dest>
   <voice>
     *: none
@@ -846,7 +846,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "ขยายจุดตัด"
+    swcodec: "อัตราขยายที่จุดตัด"
   </dest>
   <voice>
     *: none
@@ -863,7 +863,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "ลดความถี่สูง"
+    swcodec: "อัตราลดทอนความถี่สูง"
   </dest>
   <voice>
     *: none
@@ -880,7 +880,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "ตัดความถี่สูง"
+    swcodec: "จุดตัดความถี่สูง"
   </dest>
   <voice>
     *: none
@@ -948,7 +948,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "ลดเสียง"
+    swcodec: "ลดเสียงลง"
   </dest>
   <voice>
     *: none
@@ -1067,7 +1067,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Low Shelf Filter"
+    swcodec: "ขอบล่างตัวกรองความถี่ต่ำ"
   </dest>
   <voice>
     *: none
@@ -1084,7 +1084,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Peak Filter %d"
+    swcodec: "ตัวกรองความถี่ที่ %d"
   </dest>
   <voice>
     *: none
@@ -1101,7 +1101,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "High Shelf Filter"
+    swcodec: "ขอบบนตัวกรองความถี่สูง"
   </dest>
   <voice>
     *: none
@@ -1436,7 +1436,7 @@
     *: "Playback Settings"
   </source>
   <dest>
-    *: "การเล่น"
+    *: "ตั้งค่าการเล่น"
   </dest>
   <voice>
     *: "Playback"
@@ -1450,7 +1450,7 @@
     *: "Shuffle"
   </source>
   <dest>
-    *: "เล่นแบบสุ่ม"
+    *: "สุ่มเพลง"
   </dest>
   <voice>
     *: "Shuffle"
@@ -1593,7 +1593,7 @@
     *: "Fade on Stop/Pause"
   </source>
   <dest>
-    *: "ผ่อนเสียงตอนหยุดเล่น"
+    *: "หรี่เสียงตอนหยุดเล่น"
   </dest>
   <voice>
     *: "Fade On Stop and Pause"
@@ -1623,7 +1623,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Crossfade"
+    swcodec: "ครอสเฟด"
   </dest>
   <voice>
     *: none
@@ -1640,7 +1640,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "เปิดใช้ Crossfade"
+    swcodec: "เปิดใช้ครอสเฟด"
   </dest>
   <voice>
     *: none
@@ -1791,7 +1791,7 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Replaygain"
+    *: "การลดระดับเสียงอัตโนมัติ"
   </dest>
   <voice>
     *: "Replaygain"
@@ -1805,7 +1805,7 @@
     *: "Enable Replaygain"
   </source>
   <dest>
-    *: "เปิดใช้ Replaygain"
+    *: "เปิดใช้การลดระดับเสียงอัตโนมัติ"
   </dest>
   <voice>
     *: "Enable Replaygain"
@@ -1836,7 +1836,7 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "ชนิด Replaygain"
+    *: "ชนิดการลดระดับเสียง"
   </dest>
   <voice>
     *: "Replaygain Type"
@@ -2033,7 +2033,7 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "เปลี่ยนโฟลเดอร์อัตโนมัติ"
+    *: "เปลี่ยนไดเร็กทอรี่อัตโนมัติ"
   </dest>
   <voice>
     *: "Auto-Change Directory"
@@ -2142,7 +2142,7 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "ไม่ต้องเล่นเพลงที่ค้างตอนเปิดเครื่องเมื่อไม่ได้เสียบหูฟัง"
+    headphone_detection: "ไม่ต้องเล่นเพลงที่ค้างตอนเริ่มต้นถ้าไม่เสียบหูฟัง"
   </dest>
   <voice>
     *: none
@@ -2171,7 +2171,7 @@
     *: "Sort Case Sensitive"
   </source>
   <dest>
-    *: "เรียงลำดับคิดขนาดตัวอักษร"
+    *: "เรียงลำดับโดยนับชนิดตัวอักษรด้วย"
   </dest>
   <voice>
     *: "Sort Case Sensitive"
@@ -2185,7 +2185,7 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "เรียงลำดับโฟลเดอร์"
+    *: "เรียงลำดับไดเร็กทอรี่"
   </dest>
   <voice>
     *: "sort directories"
@@ -2311,7 +2311,7 @@
     *: "Follow Playlist"
   </source>
   <dest>
-    *: "รายการเพลง"
+    *: "รายการเพลงต่อไป"
   </dest>
   <voice>
     *: "Follow Playlist"
@@ -2339,7 +2339,7 @@
     *: "Current Directory Only"
   </source>
   <dest>
-    *: "โฟลเดอร์ปัจจุบันเท่านั้น"
+    *: "ไดเร็กทอรี่ปัจจุบันเท่านั้น"
   </dest>
   <voice>
     *: "Current Directory Only"
@@ -2391,7 +2391,7 @@
   </source>
   <dest>
     *: none
-    tc_ramcache: "อ่านไปที่เก็บในหน่วยความจำ"
+    tc_ramcache: "อ่านไปเก็บในหน่วยความจำ"
   </dest>
   <voice>
     *: none
@@ -2670,7 +2670,7 @@
     *: "Caption Backlight"
   </source>
   <dest>
-    *: "Caption Backlight"
+    *: "ไฟพื้นหลังคำบรรยาย"
   </dest>
   <voice>
     *: "Caption Backlight"
@@ -2901,7 +2901,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "ลบ Backdrop"
+    lcd_non-mono: "ลบพื้นหลัง"
   </dest>
   <voice>
     *: none
@@ -2935,7 +2935,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "สีพื้นหน้า"
+    lcd_non-mono: "สีตัวอักษร"
   </dest>
   <voice>
     *: none
@@ -3066,7 +3066,7 @@
     *: "Scrolling"
   </source>
   <dest>
-    *: "การเลื่อนบรรทัด"
+    *: "การเลื่อนตัวอักษร"
   </dest>
   <voice>
     *: "Scrolling"
@@ -3080,7 +3080,7 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "ตัวอย่างการตั้งค่าความเร็วในการเลื่อนบรรทัด"
+    *: "ตัวอย่างการตั้งค่าความเร็วในการเลื่อนตัวอักษร"
   </dest>
   <voice>
     *: ""
@@ -3094,7 +3094,7 @@
     *: "Scroll Speed"
   </source>
   <dest>
-    *: "ความเร็วในการเลื่อนบรรทัด"
+    *: "ความเร็วในการเลื่อนตัวอักษร"
   </dest>
   <voice>
     *: "Scroll Speed"
@@ -3108,7 +3108,7 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "หน่วงเวลาการเลื่อนบรรทัดเริ่มต้น"
+    *: "หน่วงเวลาการเลื่อนตัวอักษรเริ่มต้น"
   </dest>
   <voice>
     *: "Scroll Start Delay"
@@ -3122,7 +3122,7 @@
     *: "Scroll Step Size"
   </source>
   <dest>
-    *: "ขนาดการเลื่อนบรรทัด"
+    *: "ขนาดการเลื่อนตัวอักษร"
   </dest>
   <voice>
     *: "Scroll Step Size"
@@ -3136,7 +3136,7 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "ตัวอย่างการตั้งขนาดการเลื่อนบรรทัด"
+    *: "ตัวอย่างการตั้งขนาดการเลื่อนตัวอักษร"
   </dest>
   <voice>
     *: ""
@@ -3150,7 +3150,7 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "จำกัดการเลื่อนบรรทัดแบบสองทิศทาง"
+    *: "จำกัดการเลื่อนตัวอักษรแบบสองทิศทาง"
   </dest>
   <voice>
     *: "Bidirectional Scroll Limit"
@@ -3166,7 +3166,7 @@
   </source>
   <dest>
     *: none
-    remote: "Remote Scrolling Options"
+    remote: "ตัวเลือกการเลื่อนตัวอักษรทางไกล"
   </dest>
   <voice>
     *: none
@@ -3181,7 +3181,7 @@
     *: "Jump Scroll"
   </source>
   <dest>
-    *: "การเลื่อนบรรทัดแบบกระโดด"
+    *: "การเลื่อนตัวอักษรแบบกระโดด"
   </dest>
   <voice>
     *: "Jump Scroll"
@@ -3369,7 +3369,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "แสดงตัวปรับเสียง"
+    lcd_bitmap: "แสดงความดัง"
   </dest>
   <voice>
     *: none
@@ -3504,7 +3504,7 @@
     masd: none
   </source>
   <dest>
-    *: "Peak Release"
+    *: "เวลาระหว่างเลื่อน"
     masd: none
   </dest>
   <voice>
@@ -4010,7 +4010,7 @@
   </source>
   <dest>
     *: none
-    dircache: "อ่านโฟลเตอร์ล่วงหน้า"
+    dircache: "อ่านไดเร็กทอรี่ล่วงหน้า"
   </dest>
   <voice>
     *: none
@@ -4525,7 +4525,7 @@
     *: "Max Entries in File Browser"
   </source>
   <dest>
-    *: "ไฟล์สูงสุดในการแสดงโฟลเดอร์"
+    *: "จำนวนไฟล์สูงสุดในการแสดง"
   </dest>
   <voice>
     *: "Maximum files in directory browser"
@@ -4865,7 +4865,7 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "โฟลเดอร์เสียง"
+    *: "ไดเร็กทอรี่เสียง"
   </dest>
   <voice>
     *: "Voice Directories"
@@ -4879,7 +4879,7 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "ใช้คลิปโฟลเดอร์ .talk"
+    *: "ใช้คลิปไดเร็กทอรี่ .talk"
   </dest>
   <voice>
     *: "Use Directory .talk Clips"
@@ -5075,7 +5075,7 @@
     *: "Browse Themes"
   </source>
   <dest>
-    *: "เปิดดูหน้ากาก"
+    *: "เลือกหน้ากาก"
   </dest>
   <voice>
     *: "Browse Themes"
@@ -5771,7 +5771,7 @@
   </source>
   <dest>
     *: none
-    recording: "(ไม่มีค่าที่ตั้งไว้)"
+    recording: "(ไม่มีการตั้งค่า)"
   </dest>
   <voice>
     *: none
@@ -5944,7 +5944,7 @@
   </source>
   <dest>
     *: none
-    recording: "การวัดการแบ่ง"
+    recording: "แบ่งตาม"
   </dest>
   <voice>
     *: none
@@ -6080,7 +6080,7 @@
   </source>
   <dest>
     *: none
-    recording: "โฟลเดอร์"
+    recording: "ไดเร็กทอรี่"
   </dest>
   <voice>
     *: none
@@ -6114,7 +6114,7 @@
   </source>
   <dest>
     *: none
-    recording: "ตั้งเป็นโฟลเดอร์บันทึกเสียง"
+    recording: "ตั้งเป็นไดเร็กทอรี่บันทึกเสียง"
   </dest>
   <voice>
     *: none
@@ -6131,7 +6131,7 @@
   </source>
   <dest>
     *: none
-    recording: "ลบโฟลเดอร์บันทึกเสียง"
+    recording: "ลบไดเร็กทอรี่บันทึกเสียง"
   </dest>
   <voice>
     *: none
@@ -6148,7 +6148,7 @@
   </source>
   <dest>
     *: none
-    recording: "ไม่สามารถเขียนไปยังโฟลเดอร์บันทึกเสียง"
+    recording: "ไม่สามารถเขียนไปยังไดเร็กทอรี่บันทึกเสียง"
   </dest>
   <voice>
     *: none
@@ -6165,7 +6165,7 @@
   </source>
   <dest>
     *: none
-    recording: "Clipping Light"
+    recording: "ไฟแสดงการกระตุก"
   </dest>
   <voice>
     *: none
@@ -6233,7 +6233,7 @@
   </source>
   <dest>
     *: none
-    recording: "Trigger"
+    recording: "การกระตุ้น"
   </dest>
   <voice>
     *: none
@@ -6267,7 +6267,7 @@
   </source>
   <dest>
     *: none
-    recording: "Trigtype"
+    recording: "ชนิดการกระตุ้น"
   </dest>
   <voice>
     *: none
@@ -6318,7 +6318,7 @@
   </source>
   <dest>
     *: none
-    recording: "เริ่มก่อน"
+    recording: "เริ่มเมื่อสูงกว่า"
   </dest>
   <voice>
     *: none
@@ -6352,7 +6352,7 @@
   </source>
   <dest>
     *: none
-    recording: "หยุดหลังจาก"
+    recording: "หยุดเมื่อต่ำกว่า"
   </dest>
   <voice>
     *: none
@@ -6742,7 +6742,7 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "ใส่โฟลเตอร์ที่ซ้อนอยู่ด้วย"
+    *: "ใส่ไดเร็กทอรี่ที่ซ้อนอยู่ด้วย"
   </dest>
   <voice>
     *: "Recursively Insert Directories"
@@ -6756,7 +6756,7 @@
     *: "Recursively?"
   </source>
   <dest>
-    *: "ใส่โฟลเดอร์ที่ซ้อนอยู่?"
+    *: "ใส่ไดเร็กทอรี่ที่ซ้อนอยู่?"
   </dest>
   <voice>
     *: "Recursively?"
@@ -7225,7 +7225,7 @@
     *: "Reshuffle"
   </source>
   <dest>
-    *: "สุ่มใหม่"
+    *: "เรียงลำดับการสุ่มเพลงใหม่"
   </dest>
   <voice>
     *: "Reshuffle"
@@ -7239,7 +7239,7 @@
     *: "View Catalog"
   </source>
   <dest>
-    *: "ดูกลุ่ม"
+    *: "ดูกลุ่มรายการเพลง"
   </dest>
   <voice>
     *: "View Catalog"
@@ -7715,7 +7715,7 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "มีไฟล์/โฟลเดอร์ อยู่แล้ว ต้องการเขียนทับหรือไม่?"
+    *: "มีไฟล์/ไดเร็กทอรี่ อยู่แล้ว ต้องการเขียนทับหรือไม่?"
   </dest>
   <voice>
     *: "File or directory exists. Overwrite?"
@@ -7743,7 +7743,7 @@
     *: "Delete Directory"
   </source>
   <dest>
-    *: "ลบโฟลเดอร์"
+    *: "ลบไดเร็กทอรี่"
   </dest>
   <voice>
     *: "delete directory"
@@ -7829,7 +7829,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "ตั้งเป็น Backdrop"
+    lcd_non-mono: "ตั้งเป็นพื้นหลัง"
   </dest>
   <voice>
     *: none
@@ -7846,7 +7846,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "โหลด Backdrop แล้ว"
+    lcd_non-mono: "โหลดพื้นหลังแล้ว"
   </dest>
   <voice>
     *: none
@@ -7863,7 +7863,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "โหลด Backdrop ไม่ได้"
+    lcd_non-mono: "โหลดพื้นหลังไม่ได้"
   </dest>
   <voice>
     *: none
@@ -7892,7 +7892,7 @@
     *: "Create Directory"
   </source>
   <dest>
-    *: "สร้างโฟลเดอร์"
+    *: "สร้างไดเร็กทอรี่"
   </dest>
   <voice>
     *: "Create Directory"
@@ -8120,7 +8120,7 @@
     *: "Error accessing directory"
   </source>
   <dest>
-    *: "ไม่สามารถอ่านโฟลเดอร์"
+    *: "ไม่สามารถอ่านไดเร็กทอรี่ได้"
   </dest>
   <voice>
     *: "Error accessing directory"
@@ -8534,7 +8534,7 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "บัฟเฟอร์ของโฟลเดอร์เต็ม!"
+    *: "บัฟเฟอร์ของไดเร็กทอรี่เต็ม!"
   </dest>
   <voice>
     *: "Directory Buffer is Full!"
@@ -11246,7 +11246,7 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "ปรับแต่งย่านความถี่เสียงทุ้ม"
+    ipodvideo: "ความถี่ตัดเสียงทุ้ม"
   </dest>
   <voice>
     *: none
@@ -11368,7 +11368,7 @@
     *: "Theme Settings"
   </source>
   <dest>
-    *: "การตั้งรูปแบบหน้าตา"
+    *: "ตั้งค่าหน้ากาก"
   </dest>
   <voice>
     *: "Theme Settings"
@@ -11480,7 +11480,7 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "ปรับย่านความถี่เสียงแหลม"
+    ipodvideo: "ความถี่ตัดเสียงแหลม"
   </dest>
   <voice>
     *: none
@@ -11861,7 +11861,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "ปุ่มกด"
+    swcodec: "เสียงกดปุ่ม"
   </dest>
   <voice>
     *: none
@@ -11912,7 +11912,7 @@
   </source>
   <dest>
     *: none
-    recording: "ชื่อแฟ้ม:"
+    recording: "ชื่อไฟล์:"
   </dest>
   <voice>
     *: none
