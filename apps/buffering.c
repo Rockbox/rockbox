@@ -907,6 +907,11 @@ int bufopen(const char *file, size_t offset, enum data_type type)
 
         buf_widx += sizeof(struct mp3entry);  /* safe because the handle
                                                  can't wrap */
+
+        /* Inform the buffering thread that we added a handle */
+        LOGFQUEUE("buffering > Q_HANDLE_ADDED %d", h->id);
+        queue_post(&buffering_queue, Q_HANDLE_ADDED, h->id);
+
         return h->id;
     }
 
