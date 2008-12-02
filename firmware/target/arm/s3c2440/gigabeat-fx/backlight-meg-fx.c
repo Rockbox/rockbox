@@ -404,8 +404,8 @@ void _buttonlight_set_brightness(int brightness)
 
 bool _backlight_init(void)
 {
-    buttonlight_brightness = log_brightness[DEFAULT_BRIGHTNESS_SETTING];
-    _backlight_brightness = log_brightness[DEFAULT_BRIGHTNESS_SETTING];
+    buttonlight_brightness = log_brightness[DEFAULT_BRIGHTNESS_SETTING-1];
+    _backlight_brightness = log_brightness[DEFAULT_BRIGHTNESS_SETTING-1];
 
     buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
     backlight_control = BACKLIGHT_CONTROL_ON;
