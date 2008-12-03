@@ -322,6 +322,13 @@ static int get_irq_number(void)
     return irq;
 }
 
+static bool intr_mode = false;
+
+bool in_interrupt_mode(void)
+{
+    return intr_mode;
+}
+
 void intr_handler(void)
 {
     int irq = get_irq_number();
@@ -330,7 +337,11 @@ void intr_handler(void)
     
     ack_irq(irq);
     if(irq > 0)
+    {
+        intr_mode = true;
         irqvector[irq-1]();
+        intr_mode = false;
+    }
 }
 
 #define EXC(x,y) if(_cause == (x)) return (y);

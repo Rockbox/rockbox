@@ -67,7 +67,7 @@ static inline int disable_interrupt_save(int mask)
 	unsigned int oldstatus;
     
 	oldstatus = read_c0_status();
-	write_c0_status(oldstatus | mask);
+	write_c0_status(oldstatus & ~mask);
     
 	return oldstatus;
 }
@@ -101,6 +101,7 @@ void udelay(unsigned int usec);
 void mdelay(unsigned int msec);
 void power_off(void);
 void system_reboot(void);
+bool in_interrupt_mode(void);
 
 #define DMA_LCD_CHANNEL    0
 #define DMA_NAND_CHANNEL   1
