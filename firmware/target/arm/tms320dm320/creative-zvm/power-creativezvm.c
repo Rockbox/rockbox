@@ -35,6 +35,7 @@ void power_init(void)
     /* Charger detect */
 }
 
+#if CONFIG_CHARGING
 unsigned int power_input_status(void)
 {
     return POWER_INPUT_NONE;
@@ -45,6 +46,7 @@ bool charging_state(void)
 {
     return false;
 }
+#endif
 
 void power_off(void)
 {

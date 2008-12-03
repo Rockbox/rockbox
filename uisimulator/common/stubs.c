@@ -209,20 +209,6 @@ bool lcd_enabled(void)
 }
 #endif
 
-bool charging_state(void)
-{
-    return false;
-}
-
-unsigned int power_input_status(void)
-{
-#ifdef HAVE_BATTERY_SWITCH
-    return POWER_INPUT_BATTERY;
-#else
-    return POWER_INPUT_NONE;
-#endif
-}
-
 #ifdef HAVE_SPDIF_POWER
 void spdif_power_enable(bool on)
 {
@@ -246,19 +232,38 @@ bool usb_powered(void)
     return false;
 }
 
-#if CONFIG_CHARGING
-bool charger_inserted(void)
-{
-    return false;
-}
-
 bool usb_charging_enable(bool on)
 {
     (void)on;
     return false;
 }
 #endif
+
+#if CONFIG_CHARGING
+bool charger_inserted(void)
+{
+    return false;
+}
+
+bool power_input_present(void)
+{
+    return false;
+}
+
+unsigned int power_input_status(void)
+{
+#ifdef HAVE_BATTERY_SWITCH
+    return POWER_INPUT_BATTERY;
+#else
+    return POWER_INPUT_NONE;
 #endif
+}
+
+bool charging_state(void)
+{
+    return false;
+}
+#endif /* CONFIG_CHARGING */
 
 bool usb_inserted(void)
 {
