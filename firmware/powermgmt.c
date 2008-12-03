@@ -1123,6 +1123,7 @@ void powermgmt_init(void)
 
 void sys_poweroff(void)
 {
+#ifndef BOOTLOADER
     logf("sys_poweroff()");
     /* If the main thread fails to shut down the system, we will force a
        power off after an 20 second timeout - 28 seconds if recording */
@@ -1139,6 +1140,7 @@ void sys_poweroff(void)
     }
 
     queue_broadcast(SYS_POWEROFF, 0);
+#endif /* BOOTLOADER */
 }
 
 void cancel_shutdown(void)

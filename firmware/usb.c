@@ -487,6 +487,7 @@ void usb_init(void)
 
 void usb_wait_for_disconnect(struct event_queue *q)
 {
+#ifdef USB_FULL_INIT
     struct queue_event ev;
 
     /* Don't return until we get SYS_USB_DISCONNECTED */
@@ -499,10 +500,14 @@ void usb_wait_for_disconnect(struct event_queue *q)
             return;
         }
     }
+#else
+    (void)q;
+#endif /* USB_FULL_INIT */
 }
 
 int usb_wait_for_disconnect_w_tmo(struct event_queue *q, int ticks)
 {
+#ifdef USB_FULL_INIT
     struct queue_event ev;
 
     /* Don't return until we get SYS_USB_DISCONNECTED or SYS_TIMEOUT */
@@ -520,6 +525,10 @@ int usb_wait_for_disconnect_w_tmo(struct event_queue *q, int ticks)
                 break;
         }
     }
+#else
+    (void)q; (void)ticks;
+    return 0;
+#endif /* USB_FULL_INIT */
 }
 
 void usb_start_monitoring(void)

@@ -229,19 +229,11 @@ int load_raw_firmware(unsigned char* buf, char* firmware, int buffer_size)
 
 /* These functions are present in the firmware library, but we reimplement
    them here because the originals do a lot more than we want */
-void reset_poweroff_timer(void)
-{
-}
-
 int dbg_ports(void)
 {
    return 0;
 }
 
 void mpeg_stop(void)
-{
-}
-
-void sys_poweroff(void)
 {
 }

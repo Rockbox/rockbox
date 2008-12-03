@@ -628,16 +628,3 @@ void* main(void)
     
     return (void*)loadbuffer;
 }
-
-#if !defined(SANSA_E200) && !defined(SANSA_C200) && !defined(PHILIPS_SA9200)
-/* These functions are present in the firmware library, but we reimplement
-   them here because the originals do a lot more than we want */
-void usb_acknowledge(void)
-{
-}
-
-void usb_wait_for_disconnect(void)
-{
-}
-#endif
-
