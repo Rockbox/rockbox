@@ -642,6 +642,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                         return_value = temp->function->function();
                     if (!(menu->flags&MENU_EXITAFTERTHISMENU) || (temp->flags&MENU_EXITAFTERTHISMENU))
                     {
+                        init_default_menu_viewports(menu_vp, hide_bars);
                         init_menu_lists(menu, &lists, selected, true, vps);
                     }
                     if (temp->flags&MENU_FUNC_CHECK_RETVAL)
@@ -659,6 +660,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 {
                     if (do_setting_from_menu(temp, menu_vp))
                     {
+                        init_default_menu_viewports(menu_vp, hide_bars);
                         init_menu_lists(menu, &lists, selected, true,vps);
                         redraw_lists = false; /* above does the redraw */
                     }
