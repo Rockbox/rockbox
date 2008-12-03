@@ -36,6 +36,9 @@ int button_read_device(void)
 {
     int result = 0;
 
+    if(button_hold())
+        return result;
+
     /* direct GPIO connections */
 
     if (GPIOA_PIN(7))
