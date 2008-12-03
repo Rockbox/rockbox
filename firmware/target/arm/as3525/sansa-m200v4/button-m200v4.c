@@ -36,6 +36,8 @@ static inline void btn_delay(void) { int i = 5; while(i--) ; }
 int button_read_device(void)
 {
     int result = BUTTON_NONE;
+    if(button_hold())
+        return result;
     
     /* direct GPIO connections */
     if (GPIOA_PIN(3))
@@ -44,6 +46,7 @@ int button_read_device(void)
     /* This is a keypad using A4-A6 as columns and A0-A2 as rows */
     GPIOA_PIN(4) = (1<<4);
     btn_delay();
+   
     /* A4A0 is unused */
 
     if (GPIOA_PIN(1))
@@ -78,8 +81,7 @@ int button_read_device(void)
     if (GPIOA_PIN(1))
         result |= BUTTON_VOLUP;
 
-    if (GPIOA_PIN(2))
-        result |= BUTTON_HOLD;
+    /* hold button is read in button_hold() */
         
     GPIOA_PIN(6) = 0x00;
 
