@@ -391,7 +391,8 @@ void pcmbuf_play_stop(void)
 #endif
 }
 
-int pcmbuf_used_descs(void) {
+int pcmbuf_used_descs(void)
+{
     struct pcmbufdesc *pcmbuf_temp = pcmbuf_read;
     unsigned int i = 0;
     while (pcmbuf_temp) {
@@ -401,11 +402,13 @@ int pcmbuf_used_descs(void) {
     return i;
 }
 
-int pcmbuf_descs(void) {
+int pcmbuf_descs(void)
+{
     return PCMBUF_DESCS(pcmbuf_size);
 }
 
-static void pcmbuf_init_pcmbuffers(void) {
+static void pcmbuf_init_pcmbuffers(void)
+{
     struct pcmbufdesc *next = pcmbuf_write;
     next++;
     pcmbuf_write_end = pcmbuf_write;
