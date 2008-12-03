@@ -52,9 +52,11 @@ void power_init(void)
 {
 }
 
-bool charger_inserted(void)
+unsigned int power_input_status(void)
 {
-    return (GPIOF_INPUT_VAL & 0x08)?true:false;
+    /* No separate source for USB and charges from USB on its own */
+    return (GPIOF_INPUT_VAL & 0x08) ?
+        POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 }
 
 void ide_power_enable(bool on)

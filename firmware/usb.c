@@ -42,9 +42,6 @@
 #ifdef HAVE_USBSTACK
 #include "usb_core.h"
 #endif
-#ifdef IRIVER_H300_SERIES
-#include "pcf50606.h"        /* for pcf50606_usb_charging_... */
-#endif
 #include "logf.h"
 
 /* Conditions under which we want the entire driver */
@@ -588,40 +585,6 @@ bool usb_powered(void)
 {
     return usb_state == USB_POWERED;
 }
-
-#if CONFIG_CHARGING
-bool usb_charging_enable(bool on)
-{
-    bool rc = false;
-#ifdef IRIVER_H300_SERIES
-    int irqlevel;
-    logf("usb_charging_enable(%s)\n", on ? "on" : "off" );
-    irqlevel = disable_irq_save();
-    pcf50606_set_usb_charging(on);
-    rc = on;
-    restore_irq(irqlevel);
-#else
-    /* TODO: implement it for other targets... */
-    (void)on;
-#endif
-    return rc;
-}
-
-bool usb_charging_enabled(void)
-{
-    bool rc = false;
-#ifdef IRIVER_H300_SERIES
-    /* TODO: read the state of the GPOOD2 register...
-     * (this also means to set the irq level here) */
-    rc = pcf50606_usb_charging_enabled();
-#else
-    /* TODO: implement it for other targets... */
-#endif
-
-    logf("usb charging %s", rc ? "enabled" : "disabled" );
-    return rc;
-}
-#endif
 #endif
 
 #else

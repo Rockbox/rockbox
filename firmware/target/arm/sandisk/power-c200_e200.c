@@ -26,6 +26,7 @@
 #include "tuner.h"
 #include "as3514.h"
 #include "power.h"
+#include "usb.h"
 
 void power_init(void)
 {
@@ -53,15 +54,24 @@ void power_off(void)
     }
 }
 
-bool charger_inserted(void)
+unsigned int power_input_status(void)
 {
-#ifdef SANSA_E200
-    if(GPIOB_INPUT_VAL & 0x10)
-#else /* SANSA_C200 */
-    if(GPIOH_INPUT_VAL & 0x2)
+    unsigned int status = POWER_INPUT_NONE;
+
+#if defined(SANSA_E200)
+    #define _charger_present() (GPIOB_INPUT_VAL & 0x10)
+#elif defined(SANSA_C200)
+    #define _charger_present() (GPIOH_INPUT_VAL & 0x2)
+#else
+    #define _charger_present() 0
 #endif
-        return true;
-    return false;
+    
+    if (_charger_present())
+        status = POWER_INPUT_MAIN_CHARGER;
+
+    /* No separate source for USB */
+
+    return status;
 }
 
 void ide_power_enable(bool on)

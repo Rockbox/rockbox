@@ -32,16 +32,14 @@
 #include "system.h"
 #include "power.h"
 
-#ifndef SIMULATOR
-
 void power_init(void)
 {
     /* Charger detect */
 }
 
-bool charger_inserted(void)
-{     
-    return false;
+unsigned int power_input_status(void)
+{
+    return POWER_INPUT_NONE;
 }
 
 void ide_power_enable(bool on)
@@ -60,29 +58,6 @@ bool ide_powered(void)
 void power_off(void)
 {
 }
-
-#else
-
-bool charger_inserted(void)
-{
-    return false;
-}
-
-void charger_enable(bool on)
-{
-    (void)on;
-}
-
-void power_off(void)
-{
-}
-
-void ide_power_enable(bool on)
-{
-   (void)on;
-}
-
-#endif /* SIMULATOR */
 
 bool tuner_power(bool status)
 {

@@ -8321,7 +8321,7 @@
 </phrase>
 <phrase>
   id: LANG_USB_CHARGING
-  desc: in Battery menu
+  desc: in Battery menu, TODO: cleanup unless HAVE_USB_CHARGING_ENABLE defined
   user:
   <source>
     *: none

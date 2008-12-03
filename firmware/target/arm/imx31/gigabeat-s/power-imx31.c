@@ -27,8 +27,6 @@
 #include "avic-imx31.h"
 #include "mc13783.h"
 
-#ifndef SIMULATOR
-
 static bool charger_detect = false;
 
 /* This is called from the mc13783 interrupt thread */
@@ -38,9 +36,17 @@ void charger_detect_event(void)
         mc13783_read(MC13783_INTERRUPT_SENSE0) & MC13783_CHGDETS;
 }
 
-bool charger_inserted(void)
+unsigned int power_input_status(void)
 {
-    return charger_detect;
+    unsigned int status = POWER_INPUT_NONE;
+
+    if ((GPIO3_DR & (1 << 20)) != 0)
+        status |= POWER_INPUT_BATTERY;
+
+    if (charger_detect)
+        status |= POWER_INPUT_MAIN_CHARGER;
+
+    return status;
 }
 
 /* Returns true if the unit is charging the batteries. */
@@ -89,27 +95,4 @@ void power_init(void)
     /* Enable detect event */
     mc13783_enable_event(MC13783_CHGDET_EVENT);
 }
-
-#else /* SIMULATOR */
-
-bool charger_inserted(void)
-{
-    return false;
-}
-
-void charger_enable(bool on)
-{
-    (void)on;
-}
-
-void power_off(void)
-{
-}
-
-void ide_power_enable(bool on)
-{
-   (void)on;
-}
-
-#endif /* SIMULATOR */
 

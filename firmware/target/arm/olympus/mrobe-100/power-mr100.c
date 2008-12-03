@@ -41,9 +41,10 @@ void power_init(void)
     GPIOB_OUTPUT_EN  |=  0x80;
 }
 
-bool charger_inserted(void)
-{     
-    return (GPIOL_INPUT_VAL & 0x24) ? true : false ;
+unsigned int power_input_status(void)
+{
+    return (GPIOL_INPUT_VAL & 0x24) ?
+        POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 }
 
 void ide_power_enable(bool on)

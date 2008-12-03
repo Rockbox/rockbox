@@ -25,19 +25,17 @@
 #include "system.h"
 #include "power.h"
 #include "pcf50606.h"
+#include "usb.h"
+#include "logf.h"
 
 
 #if CONFIG_TUNER
-
 bool tuner_power(bool status)
 {
     (void)status;
     return true;
 }
-
 #endif /* #if CONFIG_TUNER */
-
-#ifndef SIMULATOR
 
 void power_init(void)
 {
@@ -56,17 +54,54 @@ void power_init(void)
 
 
 #if CONFIG_CHARGING
-bool charger_inserted(void)
-{     
-    return (GPIO1_READ & 0x00400000)?true:false;
+unsigned int power_input_status(void)
+{
+    unsigned int status = POWER_INPUT_NONE;
+
+    if (GPIO1_READ & 0x00400000)
+        status |= POWER_INPUT_MAIN_CHARGER;
+
+#ifdef HAVE_USB_POWER
+    if (usb_detect() == USB_INSERTED && pcf50606_usb_charging_enabled())
+        status |= POWER_INPUT_USB_CHARGER;
+    /* CHECK: Can the device be powered from USB w/o charging it? */
+#endif
+
+    return status;
 }
+
+#ifdef HAVE_USB_POWER
+bool usb_charging_enable(bool on)
+{
+    bool rc = false;
+    int irqlevel;
+    logf("usb_charging_enable(%s)\n", on ? "on" : "off" );
+    irqlevel = disable_irq_save();
+    pcf50606_set_usb_charging(on);
+    rc = on;
+    restore_irq(irqlevel);
+    return rc;
+}
+#endif /* HAVE_USB_POWER */
+
 #endif /* CONFIG_CHARGING */
 
 /* Returns true if the unit is charging the batteries. */
-bool charging_state(void) {
+bool charging_state(void)
+{
     return (GPIO_READ & 0x00800000)?true:false;
 }
 
+bool usb_charging_enabled(void)
+{
+    bool rc = false;
+    /* TODO: read the state of the GPOOD2 register...
+     * (this also means to set the irq level here) */
+    rc = pcf50606_usb_charging_enabled();
+
+    logf("usb charging %s", rc ? "enabled" : "disabled" );
+    return rc;
+}
 
 void ide_power_enable(bool on)
 {
@@ -90,5 +125,3 @@ void power_off(void)
     asm("halt");
     while(1);
 }
-
-#endif /* SIMULATOR */

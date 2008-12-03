@@ -935,6 +935,23 @@ static inline void charging_algorithm_close(void)
 }
 #endif /* CONFIG_CHARGING == CHARGING_CONTROL */
 
+#if CONFIG_CHARGING
+/* Shortcut function calls - compatibility, simplicity. */
+
+/* Returns true if any power input is capable of charging. */
+bool charger_inserted(void)
+{
+    return power_input_status() & POWER_INPUT_CHARGER;
+}
+
+/* Returns true if any power input is connected - charging-capable
+ * or not. */
+bool power_input_present(void)
+{
+    return power_input_status() & POWER_INPUT;
+}
+#endif /* CONFIG_CHARGING */
+
 /*
  * This function is called to do the relativly long sleep waits from within the
  * main power_thread loop while at the same time servicing any other periodic
@@ -957,12 +974,7 @@ static void power_thread_sleep(int ticks)
          * loop (including the subroutines), and end up back here where we
          * transition to the appropriate steady state charger on/off state.
          */
-        if(charger_inserted()
-#ifdef HAVE_USB_POWER /* USB powered or USB inserted both provide power */
-                || usb_powered()
-                || (usb_inserted() && usb_charging_enabled())
-#endif
-                ) {
+        if(power_input_status() & POWER_INPUT_CHARGER) {
             switch(charger_input_state) {
                 case NO_CHARGER:
                 case CHARGER_UNPLUGGED:

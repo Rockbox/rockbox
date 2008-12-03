@@ -28,8 +28,6 @@
 #include "backlight.h"
 #include "backlight-target.h"
 
-#ifndef SIMULATOR
-
 void power_init(void)
 {
     /* Initialize IDE power pin */
@@ -37,34 +35,17 @@ void power_init(void)
     /* Charger detect */
 }
 
-bool charger_inserted(void)
+unsigned int power_input_status(void)
 {
-    return false;
+    return POWER_INPUT_NONE;
 }
 
 /* Returns true if the unit is charging the batteries. */
-bool charging_state(void) {
+bool charging_state(void)
+{
     return false;
 }
 
 void power_off(void)
 {
 }
-
-#else /* SIMULATOR */
-
-bool charger_inserted(void)
-{
-    return false;
-}
-
-void charger_enable(bool on)
-{
-    (void)on;
-}
-
-void power_off(void)
-{
-}
-
-#endif /* SIMULATOR */

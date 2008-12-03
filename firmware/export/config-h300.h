@@ -112,6 +112,10 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
+/* define this if the unit can have USB charging disabled by user -
+ * if USB/MAIN power is discernable and hardware doesn't compel charging */
+#define HAVE_USB_CHARGING_ENABLE
+
 #ifndef SIMULATOR
 
 /* define this if the backlight thread is used for fade, not for sim, needs

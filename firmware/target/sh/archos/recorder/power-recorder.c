@@ -36,10 +36,11 @@ void power_init(void)
     charger_enable(false); /* Default to charger OFF */
 }
 
-bool charger_inserted(void)
+unsigned int power_input_status(void)
 {
     /* Recorder */
-    return adc_read(ADC_EXT_POWER) > 0x100;
+    return (adc_read(ADC_EXT_POWER) > 0x100) ?
+        POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 }
 
 void charger_enable(bool on)

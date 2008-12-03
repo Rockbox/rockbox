@@ -30,6 +30,8 @@
 #include "string.h"
 #include "lcd.h"
 
+#include "power.h"
+
 #include "ata.h" /* for volume definitions */
 
 extern char having_new_lcd;
@@ -212,9 +214,13 @@ bool charging_state(void)
     return false;
 }
 
-bool charger_inserted(void)
+unsigned int power_input_status(void)
 {
-    return false;
+#ifdef HAVE_BATTERY_SWITCH
+    return POWER_INPUT_BATTERY;
+#else
+    return POWER_INPUT_NONE;
+#endif
 }
 
 #ifdef HAVE_SPDIF_POWER
@@ -241,6 +247,11 @@ bool usb_powered(void)
 }
 
 #if CONFIG_CHARGING
+bool charger_inserted(void)
+{
+    return false;
+}
+
 bool usb_charging_enable(bool on)
 {
     (void)on;

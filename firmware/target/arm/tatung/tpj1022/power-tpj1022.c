@@ -41,9 +41,9 @@ void power_init(void)
 {
 }
 
-bool charger_inserted(void)
-{     
-    return false;
+unsigned int power_input_status(void)
+{
+    return POWER_INPUT_NONE;
 }
 
 void ide_power_enable(bool on)

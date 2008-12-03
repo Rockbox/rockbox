@@ -27,8 +27,6 @@
 #include "pcf50606.h"
 #include "lcd-remote-target.h"
 
-#ifndef SIMULATOR
-
 void power_init(void)
 {
     /* Charger detect */
@@ -38,9 +36,10 @@ void power_init(void)
     pcf50606_init();
 }
 
-bool charger_inserted(void)
-{     
-    return (GPIO1_READ & 0x01000000) != 0;
+unsigned int power_input_status(void)
+{
+    return (GPIO1_READ & 0x01000000) ?
+        POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 }
 
 void ide_power_enable(bool on)
@@ -66,8 +65,6 @@ void power_off(void)
     and_l(~0x00000008, &GPIO_OUT); /* Set KEEPACT low */
     asm("halt");
 }
-
-#endif /* SIMULATOR */
 
 bool tuner_power(bool status)
 {

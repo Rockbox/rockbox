@@ -488,11 +488,7 @@ static void backlight_update_state(void)
     else
 #endif
 #if CONFIG_CHARGING
-        if (charger_inserted()
-#ifdef HAVE_USB_POWER
-            || usb_powered()
-#endif
-            )
+        if (power_input_present())
             backlight_timeout = backlight_timeout_plugged;
         else
 #endif
@@ -532,11 +528,7 @@ static void remote_backlight_update_state(void)
     else
 #endif
 #if CONFIG_CHARGING
-        if (charger_inserted()
-#ifdef HAVE_USB_POWER
-            || usb_powered()
-#endif
-            )
+        if (power_input_present())
             remote_backlight_timeout = remote_backlight_timeout_plugged;
         else
 #endif

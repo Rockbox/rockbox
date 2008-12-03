@@ -25,8 +25,6 @@
 #include "system.h"
 #include "power.h"
 
-#ifndef SIMULATOR
-
 void power_init(void)
 {
 }
@@ -43,26 +41,3 @@ bool ide_powered(void)
 void power_off(void)
 {
 }
-
-#else /* SIMULATOR */
-
-bool charger_inserted(void)
-{
-    return false;
-}
-
-void charger_enable(bool on)
-{
-    (void)on;
-}
-
-void power_off(void)
-{
-}
-
-void ide_power_enable(bool on)
-{
-   (void)on;
-}
-
-#endif /* SIMULATOR */

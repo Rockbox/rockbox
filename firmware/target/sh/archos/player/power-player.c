@@ -31,10 +31,11 @@ void power_init(void)
 {
 }
 
-bool charger_inserted(void)
+unsigned int power_input_status(void)
 {
     /* Player */
-    return (PADR & 1) == 0;
+    return ((PADR & 1) == 0) ?
+        POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 }
 
 void ide_power_enable(bool on)

@@ -717,10 +717,8 @@ void sound_settings_apply(void)
     sound_set(SOUND_TREBLE_CUTOFF, global_settings.treble_cutoff);
 #endif
 
-#ifdef HAVE_USB_POWER
-#if CONFIG_CHARGING
+#ifdef HAVE_USB_CHARGING_ENABLE
     usb_charging_enable(global_settings.usb_charging);
-#endif
 #endif
 }
 

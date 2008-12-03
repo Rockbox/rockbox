@@ -144,8 +144,7 @@ MENUITEM_SETTING(battery_capacity, &global_settings.battery_capacity, NULL);
 #if BATTERY_TYPES_COUNT > 1
 MENUITEM_SETTING(battery_type, &global_settings.battery_type, NULL);
 #endif
-#ifdef HAVE_USB_POWER
-#if CONFIG_CHARGING
+#ifdef HAVE_USB_CHARGING_ENABLE
 static int usbcharging_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
@@ -158,8 +157,7 @@ static int usbcharging_callback(int action,const struct menu_item_ex *this_item)
     return action;
 }
 MENUITEM_SETTING(usb_charging, &global_settings.usb_charging, usbcharging_callback);
-#endif
-#endif
+#endif /* HAVE_USB_CHARGING_ENABLE */
 MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
 #if BATTERY_CAPACITY_INC > 0
             &battery_capacity,
@@ -167,10 +165,8 @@ MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
 #if BATTERY_TYPES_COUNT > 1
             &battery_type,
 #endif
-#ifdef HAVE_USB_POWER
-#if CONFIG_CHARGING
+#ifdef HAVE_USB_CHARGING_ENABLE
             &usb_charging,
-#endif
 #endif
          );
 /* Disk */

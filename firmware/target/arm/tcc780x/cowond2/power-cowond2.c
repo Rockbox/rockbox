@@ -26,8 +26,6 @@
 #include "button-target.h"
 #include "tuner.h"
 
-#ifndef SIMULATOR
-
 void power_init(void)
 {
     unsigned char data[3]; /* 0 = INT1, 1 = INT2, 2 = INT3 */
@@ -93,9 +91,10 @@ void EXT3(void)
 #endif
 
 #if CONFIG_CHARGING
-bool charger_inserted(void)
+unsigned int power_input_status(void)
 {
-    return (GPIOC & (1<<26)) ? false:true;
+    return ((GPIOC & (1<<26)) == 0) ?
+        POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 }
 #endif
 
@@ -147,26 +146,3 @@ bool tuner_power(bool status)
 }
 
 #endif /* CONFIG_TUNER */
-
-#else /* SIMULATOR */
-
-bool charger_inserted(void)
-{
-    return false;
-}
-
-void charger_enable(bool on)
-{
-    (void)on;
-}
-
-void power_off(void)
-{
-}
-
-void ide_power_enable(bool on)
-{
-   (void)on;
-}
-
-#endif /* SIMULATOR */

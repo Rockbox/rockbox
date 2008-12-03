@@ -27,8 +27,6 @@
 #include "power.h"
 #include "system.h"
 
-#ifndef SIMULATOR
-
 void power_init(void)
 {   
     /* Set KEEPACT */
@@ -47,9 +45,10 @@ void power_init(void)
 #endif
 }
 
-bool charger_inserted(void)
-{     
-    return (GPIO1_READ & 0x00000020) == 0;
+unsigned int power_input_status(void)
+{
+    return ((GPIO1_READ & 0x00000020) == 0) ?
+        POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 }
 
 void ide_power_enable(bool on)
@@ -76,8 +75,6 @@ void power_off(void)
     and_l(~0x00040000, &GPIO_OUT); /* Set KEEPACT low */
     asm("halt");
 }
-
-#endif /* SIMULATOR */
 
 bool tuner_power(bool status)
 {

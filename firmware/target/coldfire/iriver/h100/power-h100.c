@@ -26,18 +26,13 @@
 #include "power.h"
 #include "spdif.h"
 
-
 #if CONFIG_TUNER
-
 bool tuner_power(bool status)
 {
     (void)status;
     return true;
 }
-
 #endif /* #if CONFIG_TUNER */
-
-#ifndef SIMULATOR
 
 void power_init(void)
 {
@@ -56,14 +51,16 @@ void power_init(void)
 #endif
 }
 
-
-bool charger_inserted(void)
-{     
-    return (GPIO1_READ & 0x00400000)?true:false;
+unsigned int power_input_status(void)
+{
+    return (GPIO1_READ & 0x00400000) ?
+        POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 }
+
 /* Returns true if the unit is charging the batteries. */
-bool charging_state(void) {
-    return charger_inserted();
+bool charging_state(void)
+{
+    return (power_input_status() & POWER_INPUT_CHARGER) != 0;
 }
 
 #ifdef HAVE_SPDIF_POWER
@@ -119,5 +116,3 @@ void power_off(void)
     asm("halt");
     while(1);
 }
-
-#endif /* SIMULATOR */

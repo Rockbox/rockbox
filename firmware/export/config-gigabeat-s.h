@@ -134,6 +134,11 @@
 
 /* define this if the unit can be powered or charged via USB */
 //#define HAVE_USB_POWER /* Disable for now */
+//#define HAVE_USB_CHARGING_ENABLE
+
+/* define this if the unit has a battery switch or battery can be removed
+ * when running */
+#define HAVE_BATTERY_SWITCH
 
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC

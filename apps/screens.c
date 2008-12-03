@@ -906,11 +906,7 @@ bool view_runtime(void)
     while(1)
     {
 #if CONFIG_CHARGING
-        if (charger_inserted()
-#ifdef HAVE_USB_POWER
-            || usb_powered()
-#endif
-        )
+        if (charger_inserted())
         {
             global_status.runtime = 0;
         }

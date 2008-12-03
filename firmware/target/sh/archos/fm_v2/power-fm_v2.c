@@ -28,7 +28,6 @@
 #include "usb.h"
 
 #if CONFIG_TUNER
-
 bool tuner_power(bool status)
 {
     (void)status;
@@ -44,10 +43,20 @@ void power_init(void)
     or_b(0x20, &PBDRL);  /* hold power */
 }
 
-bool charger_inserted(void)
+unsigned int power_input_status(void)
 {
+    unsigned int status = POWER_INPUT_NONE;
+
     /* FM or V2 can also charge from the USB port */
-    return (adc_read(ADC_CHARGE_REGULATOR) < 0x1FF);
+    if (adc_read(ADC_CHARGE_REGULATOR) < 0x1FF)
+        status = POWER_INPUT_MAIN_CHARGER;
+
+#ifdef HAVE_USB_POWER
+    if (usb_detect() == USB_INSERTED)
+        status |= POWER_INPUT_USB_CHARGER;
+#endif
+
+    return status;
 }
 
 /* Returns true if the unit is charging the batteries. */

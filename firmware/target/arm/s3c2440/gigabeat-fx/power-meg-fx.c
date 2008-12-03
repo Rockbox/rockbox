@@ -27,8 +27,7 @@
 #include "pcf50606.h"
 #include "backlight.h"
 #include "backlight-target.h"
-
-#ifndef SIMULATOR
+#include "usb.h"
 
 void power_init(void)
 {
@@ -39,13 +38,28 @@ void power_init(void)
     /* Charger detect */
 }
 
-bool charger_inserted(void)
+unsigned int power_input_status(void)
 {
-    return (GPFDAT & (1 << 4)) ? false : true;
+    unsigned int status = POWER_INPUT_NONE;
+
+    /* Is the battery switch ON? */
+    if ((GPGDAT & (1 << 9)) == 0)
+        status |= POWER_INPUT_BATTERY;
+
+    /* Main or cradle power available? */
+    if ((GPFDAT & (1 << 4)) == 0)
+        status |= POWER_INPUT_MAIN_CHARGER;
+
+    /* Is the USB cable inserted? */
+    if (usb_detect() == USB_INSERTED)
+        status |= POWER_INPUT_USB_CHARGER;
+
+    return status;
 }
 
 /* Returns true if the unit is charging the batteries. */
-bool charging_state(void) {
+bool charging_state(void)
+{
     return (GPGDAT & (1 << 8)) ? false : true;
 }
 
@@ -87,27 +101,3 @@ void power_off(void)
 
     reboot_point();
 }
-
-#else /* SIMULATOR */
-
-bool charger_inserted(void)
-{
-    return false;
-}
-
-void charger_enable(bool on)
-{
-    (void)on;
-}
-
-void power_off(void)
-{
-}
-
-void ide_power_enable(bool on)
-{
-   (void)on;
-}
-
-#endif /* SIMULATOR */
-

@@ -18,7 +18,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #include <stdbool.h>
 #include "config.h"
 #include "ascodec-target.h"
@@ -40,14 +39,14 @@ void power_init(void)
 }
 
 #if CONFIG_CHARGING
-bool charger_inserted(void)
+unsigned int power_input_status(void)
 {
-    if(ascodec_read(AS3514_IRQ_ENRD0) & (1<<5))
-        return true;
-    else
-        return false;
+    return (ascodec_read(AS3514_IRQ_ENRD0) & (1<<5)) ?
+        POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
+
+    /* TODO: Handle USB and other sources properly */
 }
-#endif
+#endif /* CONFIG_CHARGING */
 
 void ide_power_enable(bool on)
 {

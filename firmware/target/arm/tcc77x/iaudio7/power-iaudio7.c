@@ -141,7 +141,8 @@ bool tuner_power(bool status)
 
 #endif /* CONFIG_TUNER */
 
-bool charger_inserted(void)
+unsigned int power_input_status(void)
 {
-    return (GPIOA & 0x1) ? true : false;
+    return (GPIOA & 0x1) ?
+        POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 }

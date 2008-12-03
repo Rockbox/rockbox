@@ -54,15 +54,9 @@ void power_off(void)
     }
 }
 
-bool charger_inserted(void)
+unsigned int power_input_status(void)
 {
-#ifdef SANSA_E200
-    if(GPIOB_INPUT_VAL & 0x10)
-#else /* SANSA_C200 */
-    if(GPIOH_INPUT_VAL & 0x2)
-#endif
-        return true;
-    return false;
+    return POWER_INPUT_NONE;
 }
 
 void ide_power_enable(bool on)

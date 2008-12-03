@@ -114,6 +114,10 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
+/* define this if the unit has a battery switch or battery can be removed
+ * when running */
+#define HAVE_BATTERY_SWITCH
+
 #ifndef SIMULATOR
 
 /* The LCD on a Gigabeat is 240x320 - it is portrait */

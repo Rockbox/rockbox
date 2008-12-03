@@ -43,18 +43,28 @@ void power_init(void)
 }
 
 #if CONFIG_CHARGING
-bool charger_inserted(void)
+unsigned int power_input_status(void)
 {
-#if defined(IPOD_VIDEO)
-    return (GPIOL_INPUT_VAL & 0x08)?false:true;
+    unsigned int status = POWER_INPUT_NONE;
+
+#if defined(IPOD_NANO) || defined(IPOD_VIDEO)
+    if ((GPIOL_INPUT_VAL & 0x08) == 0)
+        status = POWER_INPUT_MAIN_CHARGER;
+
+    if ((GPIOL_INPUT_VAL & 0x10) != 0)
+        status |= POWER_INPUT_USB_CHARGER;
+    /* */
 #elif defined(IPOD_4G) || defined(IPOD_COLOR) \
        || defined(IPOD_MINI) || defined(IPOD_MINI2G)
     /* C2 is firewire power */
-    return (GPIOC_INPUT_VAL & 0x04)?false:true; 
+    if ((GPIOC_INPUT_VAL & 0x04) == 0)
+        status = POWER_INPUT_MAIN_CHARGER;
+    /* */
 #else
     /* This needs filling in for other ipods. */
-    return false;
 #endif
+
+    return status;
 }
 
 /* Returns true if the unit is charging the batteries. */

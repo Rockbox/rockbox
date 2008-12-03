@@ -684,10 +684,8 @@ struct user_settings
     unsigned char kbd_file[MAX_FILENAME+1]; /* last keyboard */
 #endif
 
-#ifdef HAVE_USB_POWER
-#if CONFIG_CHARGING
+#ifdef HAVE_USB_CHARGING_ENABLE
     bool usb_charging;
-#endif
 #endif
 
     bool hold_lr_for_scroll_in_list; /* hold L/R scrolls the list left/right */

@@ -1310,10 +1310,8 @@ const struct settings_list settings[] = {
 #ifdef HAVE_LCD_BITMAP
     TEXT_SETTING(0,kbd_file,"kbd","",ROCKBOX_DIR "/",".kbd"),
 #endif
-#ifdef HAVE_USB_POWER
-#if CONFIG_CHARGING
+#ifdef HAVE_USB_CHARGING_ENABLE
     OFFON_SETTING(0,usb_charging,LANG_USB_CHARGING,false,"usb charging",NULL),
-#endif
 #endif
     OFFON_SETTING(F_BANFROMQS,cuesheet,LANG_CUESHEET_ENABLE,false,"cuesheet support",
                   NULL),
