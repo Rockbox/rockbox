@@ -56,11 +56,6 @@ static inline void disable_interrupt(void)
     clear_c0_status(ST0_IE);
 }
 
-static inline bool in_interrupt_mode(void)
-{
-    return (read_c0_status() & ST0_IE) ? true : false;
-}
-
 #define disable_irq() \
     disable_interrupt()
 
@@ -106,6 +101,7 @@ void udelay(unsigned int usec);
 void mdelay(unsigned int msec);
 void power_off(void);
 void system_reboot(void);
+bool in_interrupt_mode(void);
 
 #define DMA_LCD_CHANNEL    0
 #define DMA_NAND_CHANNEL   1
