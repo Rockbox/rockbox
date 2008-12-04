@@ -65,7 +65,6 @@ void sdl_gui_update(SDL_Surface *surface, IFSPLIT(SDL_Surface *real_surface,)
                     int x_start, int y_start, int width,
                     int height, int max_x, int max_y, int ui_x, int ui_y)
 {
-    printf("(%d, %d, %d, %d);\n", x_start, y_start, width, height);
     int xmax, ymax;
 
     ymax = y_start + height;
