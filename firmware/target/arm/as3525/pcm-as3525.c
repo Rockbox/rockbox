@@ -43,7 +43,7 @@ static int locked = 0;
 void pcm_play_lock(void)
 {
     if(++locked == 1)
-        VIC_INT_EN_CLEAR |= INTERRUPT_DMAC;
+        VIC_INT_EN_CLEAR = INTERRUPT_DMAC;
 }
 
 /* Unmask the DMA interrupt if enabled */
