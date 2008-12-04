@@ -104,8 +104,7 @@ void irq_handler(void)
      * Based on: linux/arch/arm/kernel/entry-armv.S and system-meg-fx.c
      */
 
-    asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
-                    "sub   sp, sp, #8           \n"); /* Reserve stack */
+    asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n" );/* Store context */
 
     unsigned int irq_no = 0;
     int status = VIC_IRQ_STATUS;
@@ -114,8 +113,7 @@ void irq_handler(void)
 
     irqvector[irq_no]();
 
-    asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
-                    "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
+    asm volatile(   "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
                     "subs  pc, lr, #4           \n"); /* Return from IRQ */
 }
 
