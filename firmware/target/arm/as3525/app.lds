@@ -29,6 +29,7 @@ STARTUP(target/arm/crt0.o)
 #define CODECORIG (IRAMORIG + IRAMSIZE - CODEC_SIZE)
 #else
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGINSIZE - CODECSIZE
+#define CODECORIG (ENDAUDIOADDR)
 #endif
 
 #define IRAMORIG 0x0
@@ -163,5 +164,5 @@ SECTIONS
     {
         _pluginbuf = .;
         pluginbuf = .;
-    } > DRAM
+    }
 }
