@@ -27,13 +27,14 @@
 #include "pcm.h"
 #include "jz4740.h"
 
+
 /****************************************************************************
  ** Playback DMA transfer
  **/
 
 void pcm_postinit(void)
 {
-    audiohw_postinit(); /* implemented not for all codecs */
+    audiohw_postinit();
     pcm_apply_settings();
 }
 
@@ -61,27 +62,53 @@ void pcm_set_frequency(unsigned int frequency)
 {
     (void) frequency;
     /* TODO */
+    
+    /*
+    __i2s_set_oss_sample_size(frequency);
+    i2s_codec_set_samplerate(frequency);
+    */
 }
 
 static void play_start_pcm(void)
 {
     pcm_apply_settings();
-
-    /* TODO */
+    
+    __aic_enable_transmit_dma();
+    __aic_enable_replay();
+    
+    REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
 }
 
 static void play_stop_pcm(void)
 {
-    /* TODO */
+    REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) = (REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) | DMAC_DCCSR_HLT) & ~DMAC_DCCSR_EN;
+    
+    __aic_disable_transmit_dma();
+    __aic_disable_replay();
 }
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    (void)addr;
-    (void)size;
-    /* TODO */
+    REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) = 0;
+    REG_DMAC_DSAR(DMA_AIC_TX_CHANNEL)  = PHYSADDR((unsigned long)addr);
+    REG_DMAC_DTAR(DMA_AIC_TX_CHANNEL)  = PHYSADDR((unsigned long)AIC_DR);
+    REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL)  = size;
+    REG_DMAC_DRSR(DMA_AIC_TX_CHANNEL)  = DMAC_DRSR_RS_AICOUT;
+    REG_DMAC_DCMD(DMA_AIC_TX_CHANNEL)  = ( DMAC_DCMD_SAI| DMAC_DCMD_DAI | DMAC_DCMD_SWDH_32 | DMAC_DCMD_DS_32BIT | DMAC_DCMD_DWDH_32
+                                         | DMAC_DCMD_TIE);
 
     play_start_pcm();
+}
+
+void DMA_CALLBACK(DMA_AIC_TX_CHANNEL)(void)
+{
+    if( REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_TT )
+        __aic_disable_transmit_dma();
+}
+
+size_t pcm_get_bytes_waiting(void)
+{
+    return REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL);
 }
 
 void pcm_play_dma_stop(void)
@@ -108,12 +135,6 @@ void pcm_play_dma_pause(bool pause)
     else
         play_start_pcm();
     
-}
-
-size_t pcm_get_bytes_waiting(void)
-{
-    /* TODO */
-    return 0;
 }
 
 #ifdef HAVE_RECORDING

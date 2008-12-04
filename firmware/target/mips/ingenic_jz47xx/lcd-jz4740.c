@@ -26,15 +26,14 @@
 #include "system.h"
 #include "kernel.h"
 
-static volatile bool _lcd_on = false;
-static volatile bool lcd_poweroff = false;
+static volatile bool lcd_is_on = false;
 static struct mutex lcd_mtx;
 
 /* LCD init */
 void lcd_init_device(void)
 {
     lcd_init_controller();
-    _lcd_on = true;
+    lcd_is_on = true;
     mutex_init(&lcd_mtx);
 }
 
@@ -48,16 +47,16 @@ void lcd_enable(bool state)
     else
         lcd_off();
     
-    _lcd_on = state;
+    lcd_is_on = state;
 }
 
 bool lcd_enabled(void)
 {
-    return _lcd_on;
+    return lcd_is_on;
 }
 
 /* Don't switch threads when in interrupt mode! */
-static void lcd_lock(void)
+static inline void lcd_lock(void)
 {
     if(LIKELY(!in_interrupt_mode()))
         mutex_lock(&lcd_mtx);
@@ -65,10 +64,19 @@ static void lcd_lock(void)
         while( !(REG_DMAC_DCCSR(DMA_LCD_CHANNEL) & DMAC_DCCSR_TT));
 }
 
-static void lcd_unlock(void)
+static inline void lcd_unlock(void)
 {
     if(LIKELY(!in_interrupt_mode()))
         mutex_unlock(&lcd_mtx);
+}
+
+static inline void lcd_wait(void)
+{
+    if(LIKELY(!in_interrupt_mode()))
+    {
+        while( !(REG_DMAC_DCCSR(DMA_LCD_CHANNEL) & DMAC_DCCSR_TT) )
+            yield();
+    }
     else
         while( !(REG_DMAC_DCCSR(DMA_LCD_CHANNEL) & DMAC_DCCSR_TT));
 }
@@ -98,13 +106,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     REG_SLCD_CTRL |= SLCD_CTRL_DMA_EN;
     REG_DMAC_DCCSR(DMA_LCD_CHANNEL) |= DMAC_DCCSR_EN;
 
-    if(LIKELY(!in_interrupt_mode()))
-    {
-        while( !(REG_DMAC_DCCSR(DMA_LCD_CHANNEL) & DMAC_DCCSR_TT) )
-            yield();
-    }
-    else
-        while( !(REG_DMAC_DCCSR(DMA_LCD_CHANNEL) & DMAC_DCCSR_TT));
+    lcd_wait();
     
     REG_DMAC_DCCSR(DMA_LCD_CHANNEL) &= ~DMAC_DCCSR_EN;
     
@@ -119,7 +121,7 @@ void lcd_update_rect(int x, int y, int width, int height)
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void)
 {
-    if (!_lcd_on)
+    if (!lcd_is_on)
         return;
     
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);

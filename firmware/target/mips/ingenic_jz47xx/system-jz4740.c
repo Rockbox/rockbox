@@ -372,7 +372,7 @@ static char* parse_exception(unsigned int cause)
 }
 
 void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
-{  
+{
     panicf("Exception occurred: %s [0x%08x] at 0x%08x (stack at 0x%08x)", parse_exception(cause), cause, epc, (unsigned int)stack_ptr);
 }
 

@@ -108,4 +108,7 @@ bool in_interrupt_mode(void);
 #define DMA_USB_CHANNEL    2
 #define DMA_AIC_TX_CHANNEL 3
 
+#define XDMA_CALLBACK(n) DMA ## n
+#define DMA_CALLBACK(n)  XDMA_CALLBACK(n)
+
 #endif /* __SYSTEM_TARGET_H_ */

@@ -2339,6 +2339,7 @@
 #define USB_REG_TESTMODE    (USB_BASE + 0x0f) /* USB test mode 8-bit */
 
 #define USB_REG_CSR0        (USB_BASE + 0x12) /* EP0 CSR 8-bit */
+#define USB_REG_COUNT0      (USB_BASE + 0x18) /* bytes in EP0 FIFO 16-bit */
 #define USB_REG_INMAXP      (USB_BASE + 0x10) /* EP1-2 IN Max Pkt Size 16-bit */
 #define USB_REG_INCSR       (USB_BASE + 0x12) /* EP1-2 IN CSR LSB 8/16bit */
 #define USB_REG_INCSRH      (USB_BASE + 0x13) /* EP1-2 IN CSR MSB 8-bit */
@@ -2375,6 +2376,7 @@
 #define REG_USB_REG_TESTMODE REG8(USB_REG_TESTMODE)
 
 #define REG_USB_REG_CSR0     REG8(USB_REG_CSR0)
+#define REG_USB_REG_COUNT0   REG16(USB_REG_COUNT0)
 #define REG_USB_REG_INMAXP   REG16(USB_REG_INMAXP)
 #define REG_USB_REG_INCSR    REG16(USB_REG_INCSR)
 #define REG_USB_REG_INCSRH   REG8(USB_REG_INCSRH)
@@ -2395,6 +2397,9 @@
 #define REG_USB_REG_ADDR2    REG32(USB_REG_ADDR2)
 #define REG_USB_REG_COUNT2   REG32(USB_REG_COUNT2)
 
+#define REG_USB_REG_EPINFO   REG16(USB_REG_EPINFO)
+#define REG_USB_REG_RAMINFO  REG8(USB_REG_RAMINFO)
+
 
 /* Power register bit masks */
 #define USB_POWER_SUSPENDM  0x01
@@ -2414,6 +2419,8 @@
 #define USB_INTR_OUTEP1     0x0002
 #define USB_INTR_OUTEP2     0x0004
 
+#define USB_INTR_EP(n)      (n*2)
+
 /* CSR0 bit masks */
 #define USB_CSR0_OUTPKTRDY    0x01
 #define USB_CSR0_INPKTRDY     0x02
@@ -2425,11 +2432,11 @@
 #define USB_CSR0_SVDSETUPEND  0x80
 
 /* Endpoint CSR register bits */
-#define USB_INCSRH_AUTOSET     0x80
-#define USB_INCSRH_ISO         0x40
-#define USB_INCSRH_MODE        0x20
-#define USB_INCSRH_DMAREQENAB  0x10
-#define USB_INCSRH_DMAREQMODE  0x04
+#define USB_INCSRH_AUTOSET     0x8000
+#define USB_INCSRH_ISO         0x4000
+#define USB_INCSRH_MODE        0x2000
+#define USB_INCSRH_DMAREQENAB  0x1000
+#define USB_INCSRH_DMAREQMODE  0x0400
 #define USB_INCSR_CDT          0x40
 #define USB_INCSR_SENTSTALL    0x20
 #define USB_INCSR_SENDSTALL    0x10
@@ -2437,11 +2444,11 @@
 #define USB_INCSR_UNDERRUN     0x04
 #define USB_INCSR_FFNOTEMPT    0x02
 #define USB_INCSR_INPKTRDY     0x01
-#define USB_OUTCSRH_AUTOCLR    0x80
-#define USB_OUTCSRH_ISO        0x40
-#define USB_OUTCSRH_DMAREQENAB 0x20
-#define USB_OUTCSRH_DNYT       0x10
-#define USB_OUTCSRH_DMAREQMODE 0x08
+#define USB_OUTCSRH_AUTOCLR    0x8000
+#define USB_OUTCSRH_ISO        0x4000
+#define USB_OUTCSRH_DMAREQENAB 0x2000
+#define USB_OUTCSRH_DNYT       0x1000
+#define USB_OUTCSRH_DMAREQMODE 0x0800
 #define USB_OUTCSR_CDT         0x80
 #define USB_OUTCSR_SENTSTALL   0x40
 #define USB_OUTCSR_SENDSTALL   0x20
@@ -2456,6 +2463,11 @@
 #define USB_TEST_J        0x02
 #define USB_TEST_K        0x04
 #define USB_TEST_PACKET   0x08
+#define USB_TEST_FORCE_HS 0x10
+#define USB_TEST_FORCE_FS 0x20
+#define USB_TEST_ALL      ( USB_TEST_SE0NAK | USB_TEST_J         \
+                          | USB_TEST_K | USB_TEST_PACKET         \
+                          | USB_TEST_FORCE_HS | USB_TEST_FORCE_FS)
 
 /* DMA control bits */
 #define USB_CNTL_ENA        0x01

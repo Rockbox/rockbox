@@ -25,6 +25,7 @@
 #include "button.h"
 #include "button-target.h"
 #include "powermgmt.h"
+#include "kernel.h"
 
 #define BTN_OFF      (1 << 29)
 #define BTN_VOL_DOWN (1 << 27)
@@ -36,21 +37,22 @@
 
 
 #define TS_AD_COUNT     5
-#define M_SADC_CFG_SNUM ((TS_AD_COUNT - 1) << SADC_CFG_SNUM_BIT)
+#define SADC_CFG_SNUM   ((TS_AD_COUNT - 1) << SADC_CFG_SNUM_BIT)
 
 #define SADC_CFG_INIT   (                                 \
                         (2 << SADC_CFG_CLKOUT_NUM_BIT) |  \
                         SADC_CFG_XYZ1Z2                |  \
-                        M_SADC_CFG_SNUM                |  \
+                        SADC_CFG_SNUM                  |  \
                         (2 << SADC_CFG_CLKDIV_BIT)     |  \
                         SADC_CFG_PBAT_HIGH             |  \
                         SADC_CFG_CMD_INT_PEN              \
                         )
 
-static short x_pos = -1, y_pos = -1, datacount = 0;
+static signed int x_pos, y_pos;
+static int datacount = 0, cur_touch = 0;
 static bool pen_down = false;
-static int cur_touch = 0;
-static unsigned short bat_val = 0;
+static volatile unsigned short bat_val = 0;
+static struct mutex battery_mtx;
 
 static enum touchscreen_mode current_mode = TOUCHSCREEN_POINT;
 static const int touchscreen_buttons[3][3] =
@@ -93,14 +95,20 @@ const unsigned short percent_to_volt_charge[11] =
 unsigned int battery_adc_voltage(void)
 {
     register unsigned short dummy;
+    
+    mutex_lock(&battery_mtx);
+    
     dummy = REG_SADC_BATDAT;
     dummy = REG_SADC_BATDAT;
     
     bat_val = 0;
     REG_SADC_ENA |= SADC_ENA_PBATEN;
     
+    /* Primitive wakeup event */
     while(bat_val == 0)
         yield();
+    
+    mutex_unlock(&battery_mtx);
     
     return (bat_val*BATTERY_SCALE_FACTOR)>>12;
 }
@@ -127,6 +135,8 @@ void button_init_device(void)
     __gpio_as_input(32*3 + 16);
     __gpio_as_input(32*3 + 1);
     __gpio_as_input(32*3 + 0);
+    
+    mutex_init(&battery_mtx);
 }
 
 static int touch_to_pixels(short x, short y)
@@ -162,6 +172,7 @@ int button_read_device(int *data)
 {
     int ret = 0, tmp;
 
+    /* Filter button events out if HOLD button is pressed at firmware/ level */
     if((~REG_GPIO_PXPIN(3)) & BTN_HOLD)
         return 0;
 
@@ -186,7 +197,7 @@ int button_read_device(int *data)
     else if(pen_down)
     {
         ret |= BUTTON_TOUCH;
-        if(data != NULL)
+        if(data != NULL && cur_touch != 0)
             *data = cur_touch;
     }
 
@@ -226,18 +237,16 @@ void SADC(void)
         REG_SADC_CTRL &= (~SADC_CTRL_PENDM );
         REG_SADC_CTRL |= SADC_CTRL_PENUM;
         pen_down = false;
-        x_pos = -1;
-        y_pos = -1;
+        datacount = 0;
         cur_touch = 0;
     }
     if(state & SADC_CTRL_TSRDYM)
     {
         unsigned int   dat;
         unsigned short xData, yData;
-        short          tsz1Data, tsz2Data;
+        signed short   tsz1Data, tsz2Data;
         
         dat = REG_SADC_TSDAT;
-        
         xData = (dat >>  0) & 0xFFF;
         yData = (dat >> 16) & 0xFFF;
         
@@ -245,34 +254,30 @@ void SADC(void)
         tsz1Data = (dat >>  0) & 0xFFF;
         tsz2Data = (dat >> 16) & 0xFFF;
         
-        if( !pen_down )
+        if(!pen_down)
             return;
         
         tsz1Data = tsz2Data - tsz1Data;
         
-        if((tsz1Data > 15) || (tsz1Data < -15))
+        if((tsz1Data > 100) || (tsz1Data < -100))
         {
-            if(x_pos == -1)
+            if(datacount == 0)
+            {
                 x_pos = xData;
-            else
-                x_pos = (x_pos + xData) / 2;
-            
-            if(y_pos == -1)
                 y_pos = yData;
+            }
             else
-                y_pos = (y_pos + yData) / 2;
+            {
+                x_pos += xData;
+                y_pos += yData;
+            }
         }
         
         datacount++;
         
-        if(datacount > TS_AD_COUNT - 1)
+        if(datacount >= TS_AD_COUNT)
         {
-            if(x_pos != -1)
-            {
-                cur_touch = touch_to_pixels(x_pos, y_pos);
-                x_pos = -1;
-                y_pos = -1;
-            }
+            cur_touch = touch_to_pixels(x_pos/datacount, y_pos/datacount);
             datacount = 0;
         }
     }

@@ -26,6 +26,7 @@
 #include "nand_id.h"
 #include "system.h"
 #include "panic.h"
+#include "kernel.h"
 
 /*
  * Standard NAND flash commands
@@ -104,6 +105,7 @@ struct nand_param
 
 static struct nand_info* chip_info = NULL;
 static struct nand_param internal_param;
+static struct mutex nand_mtx;
 
 static inline void jz_nand_wait_ready(void)
 {
@@ -132,6 +134,8 @@ static inline void jz_nand_read_buf8(void *buf, int count)
 
 static void jz_nand_write_dma(void *source, unsigned int len, int bw)
 {
+    mutex_lock(&nand_mtx);
+    
     if(((unsigned int)source < 0xa0000000) && len)
          dma_cache_wback_inv((unsigned long)source, len);
 
@@ -146,10 +150,14 @@ static void jz_nand_write_dma(void *source, unsigned int len, int bw)
     REG_DMAC_DCCSR(DMA_NAND_CHANNEL) = (DMAC_DCCSR_EN | DMAC_DCCSR_NDES);
     while( REG_DMAC_DTCR(DMA_NAND_CHANNEL) )
         yield();
+    
+    mutex_unlock(&nand_mtx);
 }
 
 static void jz_nand_read_dma(void *target, unsigned int len, int bw)
 {
+    mutex_lock(&nand_mtx);
+    
     if(((unsigned int)target < 0xa0000000) && len)
         dma_cache_wback_inv((unsigned long)target, len);
 
@@ -163,6 +171,8 @@ static void jz_nand_read_dma(void *target, unsigned int len, int bw)
     REG_DMAC_DCCSR(DMA_NAND_CHANNEL) = (DMAC_DCCSR_EN | DMAC_DCCSR_NDES);
     while( REG_DMAC_DTCR(DMA_NAND_CHANNEL) )
         yield();
+    
+    mutex_unlock(&nand_mtx);
 }
 
 static inline void jz_nand_read_buf(void *buf, int count, int bw)
@@ -432,6 +442,8 @@ static int jz_nand_init(void)
     internal_param.page_size = chip_info->page_size;
     internal_param.oob_size = chip_info->page_size/32;
     internal_param.page_per_block = chip_info->pages_per_block;
+    
+    mutex_init(&nand_mtx);
     
     return 0;
 }

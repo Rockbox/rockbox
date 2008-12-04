@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include "jz4740.h"
+#include "system.h"
 
 static unsigned short codec_volume;
 static unsigned short codec_base_gain;
@@ -28,6 +29,8 @@ static unsigned short codec_mic_gain;
 static bool HP_on_off_flag; 
 static int HP_register_value; 
 static int IS_WRITE_PCM;
+
+static void i2s_codec_set_samplerate(unsigned short rate);
 
 static void i2s_codec_clear(void)
 {
@@ -38,10 +41,10 @@ static void i2s_codec_clear(void)
 
 static void i2s_codec_init(void)
 {
+    __aic_enable();
+    
     __aic_select_i2s();
     __i2s_internal_codec();
-    
-    __aic_enable();
     
     __i2s_set_oss_sample_size(16);
     
@@ -55,14 +58,32 @@ static void i2s_codec_init(void)
     //REG_ICDC_CDCCR2 = (ICDC_CDCCR2_AINVOL(ICDC_CDCCR2_AINVOL_DB(0)) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_48) |
     REG_ICDC_CDCCR2 = (ICDC_CDCCR2_AINVOL(23) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_48) |
                        ICDC_CDCCR2_HPVOL(ICDC_CDCCR2_HPVOL_6));
+    
+    REG_ICDC_CDCCR1 &= 0xfffffffc;
+
+	mdelay(15);
+	REG_ICDC_CDCCR1 &= 0xffecffff;
+	REG_ICDC_CDCCR1 |= (ICDC_CDCCR1_EDAC | ICDC_CDCCR1_HPCG);
+	
+	mdelay(600);
+	REG_ICDC_CDCCR1 &= 0xfff7ecff;
+	
+	mdelay(2);
+    
+    /* CDCCR1.ELININ=0, CDCCR1.EMIC=0, CDCCR1.EADC=0, CDCCR1.SW1ON=0, CDCCR1.EDAC=1, CDCCR1.SW2ON=1, CDCCR1.HPMUTE=0 */
+    REG_ICDC_CDCCR1 = (REG_ICDC_CDCCR1 & ~((1 << 29) | (1 << 28) | (1 << 26) | (1 << 27) | (1 << 14))) | ((1 << 24) | (1 << 25));
+    
+    REG_ICDC_CDCCR2 = ((REG_ICDC_CDCCR2 & ~(0x3)) | 3);
+    
+    i2s_codec_set_samplerate(44100);
+    
     HP_on_off_flag = 0; /* HP is off */
 }
 
 static void i2s_codec_set_mic(unsigned short v) /* 0 <= v <= 100 */
 {
-    v = v & 0xff;
-    if(v < 0)
-        v = 0;
+    v &= 0xff;
+
     if(v > 100)
         v = 100; 
     codec_mic_gain = 31 * v/100;
@@ -72,9 +93,8 @@ static void i2s_codec_set_mic(unsigned short v) /* 0 <= v <= 100 */
 
 static void i2s_codec_set_bass(unsigned short v) /* 0 <= v <= 100 */
 {
-    v = v & 0xff;
-    if(v < 0)
-        v = 0;
+    v &= 0xff;
+
     if(v > 100)
         v = 100;
 
@@ -92,9 +112,8 @@ static void i2s_codec_set_bass(unsigned short v) /* 0 <= v <= 100 */
 
 static void i2s_codec_set_volume(unsigned short v) /* 0 <= v <= 100 */
 {
-    v = v & 0xff;
-    if(v < 0)
-        v = 0;
+    v &= 0xff;
+
     if(v > 100)
         v = 100;
 
@@ -114,6 +133,7 @@ static unsigned short i2s_codec_get_bass(void)
 {
     unsigned short val;
     int ret;
+    
     if(codec_base_gain == 0)
         val = 0;
     if(codec_base_gain == 1)
@@ -124,7 +144,9 @@ static unsigned short i2s_codec_get_bass(void)
         val = 75;
     
     ret = val << 8;
-    val = val | ret;
+    val |= ret;
+    
+    return val;
 }
 
 static unsigned short i2s_codec_get_mic(void)
@@ -133,7 +155,9 @@ static unsigned short i2s_codec_get_mic(void)
     int ret;
     val = 100 * codec_mic_gain / 31;
     ret = val << 8;
-    val = val | ret;
+    val |= ret;
+    
+    return val;
 }
 
 static unsigned short i2s_codec_get_volume(void)
@@ -151,7 +175,8 @@ static unsigned short i2s_codec_get_volume(void)
         val = 75;
     
     ret = val << 8;
-    val = val | ret;
+    val |= ret;
+    
     return val;
 }
 
@@ -271,10 +296,15 @@ void audiohw_mute(bool mute)
 
 void audiohw_preinit(void)
 {
-    i2s_reset();
+    i2s_codec_init();
 }
 
 void audiohw_postinit(void)
 {
     audiohw_mute(false);
+}
+
+void audiohw_init(void)
+{
+
 }
