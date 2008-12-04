@@ -77,14 +77,14 @@ void pcm_apply_settings(void)
 void pcm_play_lock(void)
 {
     if (++dma_play_lock.locked == 1)
-        s3c_regset(&INTMSK, DMA2_MASK);
+        s3c_regset32(&INTMSK, DMA2_MASK);
 }
 
 /* Unmask the DMA interrupt if enabled */
 void pcm_play_unlock(void)
 {
     if (--dma_play_lock.locked == 0)
-        s3c_regclr(&INTMSK, dma_play_lock.state);
+        s3c_regclr32(&INTMSK, dma_play_lock.state);
 }
 
 void pcm_play_dma_init(void)
@@ -94,7 +94,7 @@ void pcm_play_dma_init(void)
     /* There seem to be problems when changing the IIS interface configuration
      * when a clock is not present.
      */
-    s3c_regset(&CLKCON, 1<<17);
+    s3c_regset32(&CLKCON, 1<<17);
     /* slave, transmit mode, 16 bit samples - MCLK 384fs - use 16.9344Mhz -
        BCLK 32fs */
     IISMOD = (1<<9) | (1<<8) | (2<<6) | (1<<3) | (1<<2) | (1<<0);
@@ -102,7 +102,7 @@ void pcm_play_dma_init(void)
     /* RX,TX off,on */
     IISCON |= (1<<3) | (1<<2);
 
-    s3c_regclr(&CLKCON, 1<<17);
+    s3c_regclr32(&CLKCON, 1<<17);
 
     audiohw_init();
 
@@ -115,11 +115,11 @@ void pcm_play_dma_init(void)
     /* Do not service DMA requests, yet */
 
     /* clear any pending int and mask it */
-    s3c_regset(&INTMSK, DMA2_MASK);
+    s3c_regset32(&INTMSK, DMA2_MASK);
     SRCPND = DMA2_MASK;
 
     /* connect to FIQ */
-    s3c_regset(&INTMOD, DMA2_MASK);
+    s3c_regset32(&INTMOD, DMA2_MASK);
 }
 
 void pcm_postinit(void)
@@ -159,7 +159,7 @@ static void play_start_pcm(void)
 static void play_stop_pcm(void)
 {
     /* Mask DMA interrupt */
-    s3c_regset(&INTMSK, DMA2_MASK);
+    s3c_regset32(&INTMSK, DMA2_MASK);
 
     /* De-Activate the DMA channel */
     DMASKTRIG2 = 0x4;
@@ -187,7 +187,7 @@ static void play_stop_pcm(void)
 void pcm_play_dma_start(const void *addr, size_t size)
 {
     /* Enable the IIS clock */
-    s3c_regset(&CLKCON, 1<<17);
+    s3c_regset32(&CLKCON, 1<<17);
 
     /* stop any DMA in progress - idle IIS */
     play_stop_pcm();
@@ -218,7 +218,7 @@ void pcm_play_dma_stop(void)
     play_stop_pcm();
 
     /* Disconnect the IIS clock */
-    s3c_regclr(&CLKCON, 1<<17);
+    s3c_regclr32(&CLKCON, 1<<17);
 }
 
 void pcm_play_dma_pause(bool pause)

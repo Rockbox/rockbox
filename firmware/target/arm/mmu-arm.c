@@ -56,7 +56,7 @@ void __attribute__((naked)) map_section(unsigned int pa, unsigned int va, int mb
         :
     );
 
-    register int *ttb_base asm ("r3") = TTB_BASE;   /* force in r3 */
+    register unsigned long *ttb_base asm ("r3") = TTB_BASE;   /* force in r3 */
 
     asm volatile
     (

@@ -43,7 +43,7 @@ void i2c_write(int addr, const unsigned char *buf, int count)
     mutex_lock(&i2c_mtx);
 
     /* Turn on I2C clock */
-    s3c_regset(&CLKCON, 1 << 16);
+    s3c_regset32(&CLKCON, 1 << 16);
 
     /* Set mode to master transmitter and enable lines */
     IICSTAT = I2C_MODE_MASTER | I2C_MODE_TX | I2C_RXTX_ENB;
@@ -76,7 +76,7 @@ void i2c_write(int addr, const unsigned char *buf, int count)
     IICSTAT = 0;
 
     /* Turn off I2C clock */
-    s3c_regclr(&CLKCON, 1 << 16);
+    s3c_regclr32(&CLKCON, 1 << 16);
 
     mutex_unlock(&i2c_mtx);
 }
@@ -92,11 +92,11 @@ void i2c_init(void)
     INTPND = IIC_MASK;
 
     /* Enable i2c interrupt in controller */
-    s3c_regclr(&INTMOD, IIC_MASK);
-    s3c_regclr(&INTMSK, IIC_MASK);
+    s3c_regclr32(&INTMOD, IIC_MASK);
+    s3c_regclr32(&INTMSK, IIC_MASK);
 
     /* Turn on I2C clock */
-    s3c_regset(&CLKCON, 1 << 16);
+    s3c_regset32(&CLKCON, 1 << 16);
 
     /* Set GPE15 (IICSDA) and GPE14 (IICSCL) to IIC */
     GPECON = (GPECON & ~((3 << 30) | (3 << 28))) |
@@ -110,7 +110,7 @@ void i2c_init(void)
     IICLC = (0 << 0);
 
     /* Turn off I2C clock */
-    s3c_regclr(&CLKCON, 1 << 16);
+    s3c_regclr32(&CLKCON, 1 << 16);
 }
 
 void IIC(void)

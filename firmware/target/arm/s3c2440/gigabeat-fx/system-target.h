@@ -31,11 +31,12 @@
 /* Functions to set and clear regiser bits atomically */
 
 /* Set and clear register bits */
-void s3c_regmod(volatile int *reg, unsigned int set, unsigned int clr);
+void s3c_regmod32(volatile unsigned long *reg, unsigned long bits,
+                  unsigned long mask);
 /* Set register bits */
-void s3c_regset(volatile int *reg, unsigned int mask);
+void s3c_regset32(volatile unsigned long *reg, unsigned long bits);
 /* Clear register bits */
-void s3c_regclr(volatile int *reg, unsigned int mask);
+void s3c_regclr32(volatile unsigned long *reg, unsigned long bits);
 
 #define HAVE_INVALIDATE_ICACHE
 static inline void invalidate_icache(void)

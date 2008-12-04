@@ -35,7 +35,7 @@ void adc_init(void)
     int i;
 
     /* Turn on the ADC PCLK */
-    s3c_regset(&CLKCON, 1<<15);
+    s3c_regset32(&CLKCON, 1<<15);
 
     /* Set channel 0, normal mode, disable "start by read" */
     ADCCON &= ~(0x3F);

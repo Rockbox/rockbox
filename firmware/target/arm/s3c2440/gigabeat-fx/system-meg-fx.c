@@ -118,34 +118,35 @@ static void set_page_tables(void)
     map_section((int)FRAME, (int)FRAME, 1, BUFFERED); /* enable buffered writing for the framebuffer */
 }
 
-void memory_init(void) {
+void memory_init(void)
+{
     ttb_init();
     set_page_tables();
     enable_mmu();
 }
 
-void s3c_regmod(volatile int *reg, unsigned int set, unsigned int clr)
+void s3c_regmod32(volatile unsigned long *reg, unsigned long bits,
+                  unsigned long mask)
 {
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
-    unsigned int val = *reg;
-    *reg = (val | set) & ~clr;
+    *reg = (*reg & ~mask) | (bits & mask);
     restore_interrupt(oldstatus);
 }
 
-void s3c_regset(volatile int *reg, unsigned int mask)
+void s3c_regset32(volatile unsigned long *reg, unsigned long bits)
 {
-    s3c_regmod(reg, mask, 0);
+    s3c_regmod32(reg, bits, bits);
 }
 
-void s3c_regclr(volatile int *reg, unsigned int mask)
+void s3c_regclr32(volatile unsigned long *reg, unsigned long bits)
 {
-    s3c_regmod(reg, 0, mask);
+    s3c_regmod32(reg, 0, bits);
 }
 
 void system_init(void)
 {
     INTMSK = 0xFFFFFFFF;
-     INTMOD =  0;
+    INTMOD =  0;
     SRCPND = 0xFFFFFFFF;
     INTPND = 0xFFFFFFFF;
     INTSUBMSK = 0xFFFFFFFF;
