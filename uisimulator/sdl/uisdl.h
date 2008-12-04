@@ -459,6 +459,13 @@
 #define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
 #define UI_LCD_FGCOLORLIGHT         13, 226, 229 /* foreground color of LCD (backlight) */
 
+#define UI_LCD_SPLIT                /* The screen is split in 2 areas */
+#define UI_LCD_SPLIT_LINES          16 /* the top 16 lines have a different color */
+#define UI_LCD_SPLIT_BLACK_LINES    2  /* The 2 areas are separated by 2 empty lines */
+/* Colors for the top part of the screen */
+#define UI_LCD_SPLIT_FGCOLOR        0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_SPLIT_FGCOLORLIGHT   255, 230, 15 /* foreground color of LCD (backlight) */
+
 #endif
 extern SDL_Surface *gui_surface;
 extern bool background;  /* True if the background image is enabled */
