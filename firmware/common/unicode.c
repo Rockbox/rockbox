@@ -1,6 +1,24 @@
-/*   Some conversion functions for handling UTF-8
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
  *
- *   copyright Marcoen Hirschberg (2004,2005)
+ * Copyright (c) 2004,2005 by Marcoen Hirschberg
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+/*   Some conversion functions for handling UTF-8
  *
  *   I got all the info from:
  *   http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
@@ -27,11 +45,6 @@ static int loaded_cp_table = 0;
 #define MAX_CP_TABLE_SIZE  32768
 #define NUM_TABLES             5
 
-enum {
-    ISO_8859_1 = 0, ISO_8859_7, ISO_8859_8, WIN_1251,
-    ISO_8859_11, WIN_1256, ISO_8859_9, ISO_8859_2, WIN_1250,
-    SJIS, GB_2312, KSX_1001, BIG_5, UTF_8, NUM_CODEPAGES
-};
 static const char *filename[NUM_TABLES] =
 {
     CODEPAGE_DIR"/iso.cp",
@@ -40,9 +53,29 @@ static const char *filename[NUM_TABLES] =
     CODEPAGE_DIR"/949.cp",  /* KSX1001 */
     CODEPAGE_DIR"/950.cp"   /* BIG5    */
 };
+
 static const char cp_2_table[NUM_CODEPAGES] =
 {
     0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 0
+};
+
+static const char *name_codepages[NUM_CODEPAGES+1] =
+{
+    "ISO-8859-1",
+    "ISO-8859-7",
+    "ISO-8859-8",
+    "CP1251",
+    "ISO-8859-11",
+    "CP1256",
+    "ISO-8859-9",
+    "ISO-8859-2",
+    "CP1250",
+    "SJIS",
+    "GB-2312",
+    "KSX-1001",
+    "BIG5",
+    "UTF-8",
+    "unknown"
 };
 
 #else /* !HAVE_LCD_BITMAP, reduced support */
@@ -50,17 +83,26 @@ static const char cp_2_table[NUM_CODEPAGES] =
 #define MAX_CP_TABLE_SIZE  640
 #define NUM_TABLES           1
 
-enum {
-    ISO_8859_1 = 0, ISO_8859_7, WIN_1251, ISO_8859_9,
-    ISO_8859_2, WIN_1250, UTF_8, NUM_CODEPAGES
-};
 static const char *filename[NUM_TABLES] =
 {
     CODEPAGE_DIR"/isomini.cp",
 };
+
 static const char cp_2_table[NUM_CODEPAGES] =
 {
     0, 1, 1, 1, 1, 1, 0
+};
+
+static const char *name_codepages[NUM_CODEPAGES+1] =
+{
+    "ISO-8859-1",
+    "ISO-8859-7",
+    "CP1251",
+    "ISO-8859-9",
+    "ISO-8859-2",
+    "CP1250",
+    "UTF-8",
+    "unknown"
 };
 
 #endif
@@ -343,4 +385,11 @@ int utf8seek(const unsigned char* utf8, int offset)
             pos++;
     }
     return pos;
+}
+
+const char* get_codepage_name(int cp)
+{
+    if (cp < 0 || cp>= NUM_CODEPAGES)
+        return name_codepages[NUM_CODEPAGES];
+    return name_codepages[cp];
 }

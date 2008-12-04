@@ -620,6 +620,7 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     get_settings_list,
+    get_codepage_name,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

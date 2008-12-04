@@ -348,23 +348,7 @@ struct preferences {
         WIDE,
     } view_mode;
 
-    enum {
-        ISO_8859_1=0,
-        ISO_8859_7,
-        ISO_8859_8,
-        CP1251,
-        ISO_8859_11,
-        ISO_8859_6,
-        ISO_8859_9,
-        ISO_8859_2,
-        CP1250,
-        SJIS,
-        GB2312,
-        KSX1001,
-        BIG5,
-        UTF8,
-        ENCODINGS
-    } encoding; /* FIXME: What should default encoding be? */
+    enum codepages encoding;
 
 #ifdef HAVE_LCD_BITMAP
     enum {
@@ -433,16 +417,18 @@ unsigned char* get_ucs(const unsigned char* str, unsigned short* ch)
     unsigned char utf8_tmp[6];
     int count;
 
-    if (prefs.encoding == UTF8)
+    if (prefs.encoding == UTF_8)
         return (unsigned char*)rb->utf8decode(str, ch);
 
     count = BUFFER_OOB(str+2)? 1:2;
     rb->iso_decode(str, utf8_tmp, prefs.encoding, count);
     rb->utf8decode(utf8_tmp, ch);
 
+#ifdef HAVE_LCD_BITMAP
     if ((prefs.encoding == SJIS && *str > 0xA0 && *str < 0xE0) || prefs.encoding < SJIS)
         return (unsigned char*)str+1;
     else
+#endif
         return (unsigned char*)str+2;
 }
 
@@ -1330,22 +1316,14 @@ static int col_limit(int col)
 
 static bool encoding_setting(void)
 {
-    static const struct opt_items names[] = {
-        {"ISO-8859-1",  -1},
-        {"ISO-8859-7",  -1},
-        {"ISO-8859-8",  -1},
-        {"CP1251",      -1},
-        {"ISO-8859-11", -1},
-        {"ISO-8859-6",  -1},
-        {"ISO-8859-9",  -1},
-        {"ISO-8859-2",  -1},
-        {"CP1250",      -1},
-        {"SJIS",        -1},
-        {"GB-2312",     -1},
-        {"KSX-1001",    -1},
-        {"BIG5",        -1},
-        {"UTF-8",       -1},
-    };
+    static struct opt_items names[NUM_CODEPAGES];
+    int idx;
+
+    for (idx = 0; idx < NUM_CODEPAGES; idx++)
+    {
+        names[idx].string = rb->get_codepage_name(idx);
+        names[idx].voice_id = -1;
+    }
 
     return rb->set_option("Encoding", &prefs.encoding, INT, names,
                           sizeof(names) / sizeof(names[0]), NULL);

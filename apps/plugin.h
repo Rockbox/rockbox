@@ -131,7 +131,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 127
+#define PLUGIN_API_VERSION 128
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -783,7 +783,7 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     const struct settings_list* (*get_settings_list)(int*count);
-
+    const char* (*get_codepage_name)(int cp);
 };
 
 /* plugin header */
