@@ -32,9 +32,9 @@
 /* must be 16Kb (0x4000) aligned */
 #if 0
 #define MEM_END          0x00900000 + (MEM*0x00100000)
-#define TTB_BASE         ((unsigned int *)(MEM_END - TTB_SIZE)) /* End of memory */
+#define TTB_BASE         ((unsigned long *)(MEM_END - TTB_SIZE)) /* End of memory */
 #else
-#define TTB_BASE         ((unsigned int *)(0x04900000 - TTB_SIZE)) /* End of memory */
+#define TTB_BASE         ((unsigned long *)(0x04900000 - TTB_SIZE)) /* End of memory */
 #endif
 #define FRAME            ((short *) ((char*)TTB_BASE - LCD_BUFFER_SIZE))  /* Right before TTB */
 

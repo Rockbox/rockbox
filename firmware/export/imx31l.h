@@ -31,7 +31,7 @@
 #define TTB_BASE_ADDR (0x80100000 + 0x00100000 - TTB_SIZE)
 #define TTB_SIZE      (0x4000)
 #define IRAM_SIZE     (0x4000)
-#define TTB_BASE      ((unsigned int *)TTB_BASE_ADDR)
+#define TTB_BASE      ((unsigned long *)TTB_BASE_ADDR)
 #define FRAME         ((void*)0x03f00000)
 #define FRAME_SIZE    (240*320*2)
 
