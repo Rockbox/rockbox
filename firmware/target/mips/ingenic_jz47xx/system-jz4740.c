@@ -27,6 +27,7 @@
 #include "system-target.h"
 #include <string.h>
 #include "kernel.h"
+#include "system.h"
 
 #define NUM_DMA  6
 #define NUM_GPIO 128
@@ -322,26 +323,15 @@ static int get_irq_number(void)
     return irq;
 }
 
-static bool intr_mode = false;
-
-bool in_interrupt_mode(void)
-{
-    return intr_mode;
-}
-
 void intr_handler(void)
 {
-    int irq = get_irq_number();
-    if(irq < 0)
+    irq = get_irq_number(); /* irq is defined static at UIRQ() */
+    if(UNLIKELY(irq < 0))
         return;
     
     ack_irq(irq);
-    if(irq > 0)
-    {
-        intr_mode = true;
+    if(LIKELY(irq > 0))
         irqvector[irq-1]();
-        intr_mode = false;
-    }
 }
 
 #define EXC(x,y) if(_cause == (x)) return (y);
@@ -378,7 +368,6 @@ void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
 
 static const int FR2n[] = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
 static unsigned int iclk;
- 
 static void detect_clock(void)
 {
     unsigned int cfcr, pllout;
