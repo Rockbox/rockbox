@@ -2323,7 +2323,13 @@ static void audio_reset_buffer(void)
     filebuflen &= ~15;
 
     /* Subtract whatever the pcm buffer says it used plus the guard buffer */
-    filebuflen -= pcmbuf_init(filebuf + filebuflen) + GUARD_BUFSIZE;
+    const size_t pcmbuf_size = pcmbuf_init(filebuf + filebuflen) +GUARD_BUFSIZE;
+#ifdef DEBUG
+    if(pcmbuf_size > filebuflen)
+        panicf("Not enough memory for pcmbuf_init() : %d > %d",
+                (int)pcmbuf_size, (int)filebuflen);
+#endif
+    filebuflen -= pcmbuf_size;
 
     /* Make sure filebuflen is a longword multiple after adjustment - filebuf
        will already be line aligned */
