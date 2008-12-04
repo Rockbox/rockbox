@@ -393,14 +393,15 @@ static void init_pl180_controller(const int drive)
     MCI_COMMAND(drive) = MCI_DATA_CTRL(drive) = 0;
     MCI_CLEAR(drive) = 0x7ff;
 
-    MCI_MASK0(drive) = MCI_MASK1(drive) = MCI_DATA_CRC_FAIL | MCI_DATA_TIMEOUT |
-        MCI_RX_OVERRUN | MCI_TX_UNDERRUN | MCI_RX_FIFO_FULL | MCI_TX_FIFO_EMPTY;
+    MCI_MASK0(drive) = MCI_MASK1(drive) =
+        MCI_DATA_CRC_FAIL | MCI_DATA_TIMEOUT | MCI_RX_OVERRUN | MCI_TX_UNDERRUN;
 
-    VIC_INT_ENABLE |= INTERRUPT_NAND
 #ifdef HAVE_MULTIVOLUME
-        | INTERRUPT_MCI0
+    VIC_INT_ENABLE |=
+        (drive == INTERNAL_AS3525) ? INTERRUPT_NAND : INTERRUPT_MCI0;
+#else
+    VIC_INT_ENABLE |= INTERRUPT_NAND;
 #endif
-        ;
 
     MCI_POWER(drive) = MCI_POWER_UP|(10 /*voltage*/ << 2); /* use OF voltage */
     mci_delay();
