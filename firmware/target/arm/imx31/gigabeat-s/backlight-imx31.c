@@ -67,7 +67,7 @@ static const struct
 
 /* Bits always combined with ramping bits */
 #define MC13783_LED_CONTROL0_BITS \
-    (MC13783_LEDEN | MC13783_BOOSTEN | MC13783_ABMODE_MONCH_LEDMD1234 | \
+    (MC13783_BOOSTEN | MC13783_ABMODE_MONCH_LEDMD1234 | \
      MC13783_ABREF_400MV)
 
 static struct mutex backlight_mutex;    /* Block brightness change while
@@ -83,7 +83,8 @@ bool _backlight_init(void)
     mutex_init(&backlight_mutex);
 
     /* Set default LED register value */
-    mc13783_write(MC13783_LED_CONTROL0, MC13783_LED_CONTROL0_BITS);
+    mc13783_write(MC13783_LED_CONTROL0,
+                  MC13783_LED_CONTROL0_BITS | MC13783_LEDEN);
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     /* Our PWM and I-Level is different than retailos (but same apparent
@@ -125,8 +126,13 @@ void _backlight_on(void)
 
     mutex_lock(&backlight_mutex);
 
-    /* Set/clear LEDRAMPUP bit, clear LEDRAMPDOWN bit */
-    data[0] = MC13783_LED_CONTROL0_BITS;
+#ifdef HAVE_LCD_SLEEP
+    backlight_lcd_sleep_countdown(false); /* stop counter */
+#endif
+
+    /* Set/clear LEDRAMPUP bit, clear LEDRAMPDOWN bit,
+     * Ensure LED supply is on. */
+    data[0] = MC13783_LED_CONTROL0_BITS | MC13783_LEDEN;
 
     if (!backlight_on_status)
         data[0] |= led_ramp_mask & MC13783_LEDMDRAMPUP;
@@ -150,7 +156,7 @@ void _backlight_on(void)
 
 void _backlight_off(void)
 {
-    uint32_t ctrl0 = MC13783_LED_CONTROL0_BITS;
+    uint32_t ctrl0 = MC13783_LED_CONTROL0_BITS | MC13783_LEDEN;
 
     mutex_lock(&backlight_mutex);
 
@@ -168,6 +174,11 @@ void _backlight_off(void)
     /* Write final PWM setting */
     mc13783_write_masked(MC13783_LED_CONTROL2, MC13783_LEDMDDCw(0),
                          MC13783_LEDMDDC);
+
+#ifdef HAVE_LCD_SLEEP
+    /* Disable lcd after fade completes (when lcd_sleep timeout expires) */
+    backlight_lcd_sleep_countdown(true); /* start countdown */
+#endif
 
     mutex_unlock(&backlight_mutex);
 }
@@ -192,3 +203,15 @@ void _backlight_set_brightness(int brightness)
     mutex_unlock(&backlight_mutex);
 }
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
+
+#ifdef HAVE_LCD_SLEEP
+/* Turn off LED supply */
+void _backlight_lcd_sleep(void)
+{
+    mutex_lock(&backlight_mutex);
+
+    mc13783_clear(MC13783_LED_CONTROL0, MC13783_LEDEN);
+
+    mutex_unlock(&backlight_mutex);
+}
+#endif

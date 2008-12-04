@@ -81,9 +81,18 @@ bool ide_powered(void)
 
 void power_off(void)
 {
+    /* Cut backlight */
+    _backlight_off();
+
+    /* Let it fade */
+    sleep(5*HZ/4);
+
+    /* Set user off mode */
     mc13783_set(MC13783_POWER_CONTROL0, MC13783_USEROFFSPI);
 
+    /* Wait for power cut */
     disable_interrupt(IRQ_FIQ_STATUS);
+
     while (1);
 }
 

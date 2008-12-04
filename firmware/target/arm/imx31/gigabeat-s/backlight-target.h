@@ -32,4 +32,6 @@ void _backlight_on(void);
 void _backlight_off(void);
 void _backlight_set_brightness(int brightness);
 
+void _backlight_lcd_sleep(void);
+
 #endif /* BACKLIGHT_TARGET_H */

@@ -25,6 +25,7 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "lcd-target.h"
+#include "backlight-target.h"
 
 #define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
 
@@ -41,13 +42,6 @@ extern struct viewport* current_vp;
    allows a full-width rectangle to be copied more efficiently. */
 extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
                                  int width, int height);
-
-#if 0
-bool lcd_enabled()
-{
-    return lcd_on;
-}
-#endif
 
 /* LCD init */
 void lcd_init_device(void)
@@ -94,6 +88,14 @@ void lcd_update_rect(int x, int y, int width, int height)
     }
 }
 
+#ifdef HAVE_LCD_SLEEP
+void lcd_sleep(void)
+{
+    _backlight_lcd_sleep();
+}
+#endif /* HAVE_LCD_SLEEP */
+
+#if 0
 void lcd_enable(bool state)
 {
     (void)state;
@@ -103,6 +105,7 @@ bool lcd_enabled(void)
 {
     return true;
 }
+#endif
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */

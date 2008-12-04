@@ -76,9 +76,17 @@
                        SAMPR_CAP_24 | SAMPR_CAP_22 | SAMPR_CAP_16 | \
                        SAMPR_CAP_12 | SAMPR_CAP_11 | SAMPR_CAP_8)
 
+/* Define this if your LCD can be put to sleep. */
+#define HAVE_LCD_SLEEP
+/* We don't use a setting but a fixed delay after the backlight has
+ * turned off */
+#define LCD_SLEEP_TIMEOUT (2*HZ)
+
 #ifndef BOOTLOADER
-/* Not for bootloader */
+#if 0
+/* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE
+#endif
 
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
