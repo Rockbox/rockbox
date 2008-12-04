@@ -32,50 +32,52 @@ static int IS_WRITE_PCM;
 
 static void i2s_codec_set_samplerate(unsigned short rate);
 
-static void i2s_codec_clear(void)
+static void i2s_codec_reset(void)
 {
     REG_ICDC_CDCCR1 = (ICDC_CDCCR1_SW2ON | ICDC_CDCCR1_PDVR | ICDC_CDCCR1_PDVRA | ICDC_CDCCR1_VRCGL |
                        ICDC_CDCCR1_VRCGH | ICDC_CDCCR1_HPOV0 | ICDC_CDCCR1_PDHPM | ICDC_CDCCR1_PDHP |
                        ICDC_CDCCR1_SUSPD | ICDC_CDCCR1_RST);
+    udelay(10);
+    REG_ICDC_CDCCR1 = (ICDC_CDCCR1_SW2ON | ICDC_CDCCR1_PDVR | ICDC_CDCCR1_PDVRA | ICDC_CDCCR1_VRCGL |
+                       ICDC_CDCCR1_VRCGH | ICDC_CDCCR1_HPOV0 | ICDC_CDCCR1_PDHPM | ICDC_CDCCR1_PDHP );
 }
 
 static void i2s_codec_init(void)
 {
     __aic_enable();
     
-    __aic_select_i2s();
     __i2s_internal_codec();
+    __i2s_as_slave();
+    __i2s_select_i2s();
+    __aic_select_i2s(); 
     
-    __i2s_set_oss_sample_size(16);
+    __aic_disable_byteswap();
+    __aic_disable_unsignadj();
+    __aic_disable_mono2stereo();
     
-    REG_ICDC_CDCCR1 = (ICDC_CDCCR1_SW2ON | ICDC_CDCCR1_PDVR | ICDC_CDCCR1_PDVRA | ICDC_CDCCR1_VRCGL |
-                       ICDC_CDCCR1_VRCGH | ICDC_CDCCR1_HPOV0 | ICDC_CDCCR1_PDHPM | ICDC_CDCCR1_PDHP |
-                       ICDC_CDCCR1_SUSPD | ICDC_CDCCR1_RST); /* reset */
-    udelay(10);
-    REG_ICDC_CDCCR1 = (ICDC_CDCCR1_SW2ON | ICDC_CDCCR1_PDVR | ICDC_CDCCR1_PDVRA | ICDC_CDCCR1_VRCGL |
-                       ICDC_CDCCR1_VRCGH | ICDC_CDCCR1_HPOV0 | ICDC_CDCCR1_PDHPM | ICDC_CDCCR1_PDHP |
-                       ICDC_CDCCR1_SUSPD | ICDC_CDCCR1_RST);
-    //REG_ICDC_CDCCR2 = (ICDC_CDCCR2_AINVOL(ICDC_CDCCR2_AINVOL_DB(0)) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_48) |
-    REG_ICDC_CDCCR2 = (ICDC_CDCCR2_AINVOL(23) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_48) |
-                       ICDC_CDCCR2_HPVOL(ICDC_CDCCR2_HPVOL_6));
+    i2s_codec_reset();
     
-    REG_ICDC_CDCCR1 &= 0xfffffffc;
+    //REG_ICDC_CDCCR2 = (ICDC_CDCCR2_AINVOL(ICDC_CDCCR2_AINVOL_DB(0)) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_48)
+    REG_ICDC_CDCCR2 = ( ICDC_CDCCR2_AINVOL(23) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_48)
+                      | ICDC_CDCCR2_HPVOL(ICDC_CDCCR2_HPVOL_6));
+    
+    REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_SUSPD | ICDC_CDCCR1_RST);
 
-	mdelay(15);
-	REG_ICDC_CDCCR1 &= 0xffecffff;
-	REG_ICDC_CDCCR1 |= (ICDC_CDCCR1_EDAC | ICDC_CDCCR1_HPCG);
-	
-	mdelay(600);
-	REG_ICDC_CDCCR1 &= 0xfff7ecff;
-	
-	mdelay(2);
+    mdelay(15);
+    REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_PDVR | ICDC_CDCCR1_VRCGL | ICDC_CDCCR1_VRCGH);
+    REG_ICDC_CDCCR1 |= (ICDC_CDCCR1_EDAC | ICDC_CDCCR1_HPCG);
+    
+    mdelay(600);
+    REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_PDVRA | ICDC_CDCCR1_HPCG | ICDC_CDCCR1_PDHPM | ICDC_CDCCR1_PDHP);
+    
+    mdelay(2);
     
     /* CDCCR1.ELININ=0, CDCCR1.EMIC=0, CDCCR1.EADC=0, CDCCR1.SW1ON=0, CDCCR1.EDAC=1, CDCCR1.SW2ON=1, CDCCR1.HPMUTE=0 */
-    REG_ICDC_CDCCR1 = (REG_ICDC_CDCCR1 & ~((1 << 29) | (1 << 28) | (1 << 26) | (1 << 27) | (1 << 14))) | ((1 << 24) | (1 << 25));
+    REG_ICDC_CDCCR1 = (REG_ICDC_CDCCR1 & ~(ICDC_CDCCR1_ELININ | ICDC_CDCCR1_EMIC | ICDC_CDCCR1_EADC |
+                                           ICDC_CDCCR1_SW1ON | ICDC_CDCCR1_HPMUTE)) | (ICDC_CDCCR1_EDAC
+                                                                                    | ICDC_CDCCR1_SW2ON);
     
-    REG_ICDC_CDCCR2 = ((REG_ICDC_CDCCR2 & ~(0x3)) | 3);
-    
-    i2s_codec_set_samplerate(44100);
+    REG_ICDC_CDCCR2 |= 3;
     
     HP_on_off_flag = 0; /* HP is off */
 }
@@ -296,7 +298,6 @@ void audiohw_mute(bool mute)
 
 void audiohw_preinit(void)
 {
-    i2s_codec_init();
 }
 
 void audiohw_postinit(void)
@@ -306,5 +307,5 @@ void audiohw_postinit(void)
 
 void audiohw_init(void)
 {
-
+    i2s_codec_init();
 }

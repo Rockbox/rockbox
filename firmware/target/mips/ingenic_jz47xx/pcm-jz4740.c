@@ -35,6 +35,11 @@
 void pcm_postinit(void)
 {
     audiohw_postinit();
+    
+    /* playback sample:16 bits, burst:16 bytes */
+    __i2s_set_transmit_trigger(4);
+    __i2s_set_oss_sample_size(16);
+    
     pcm_apply_settings();
 }
 
@@ -53,11 +58,6 @@ void pcm_play_dma_init(void)
     audiohw_init();
 }
 
-void pcm_apply_settings(void)
-{
-    /* TODO */
-}
-
 void pcm_set_frequency(unsigned int frequency)
 {
     (void) frequency;
@@ -71,10 +71,8 @@ void pcm_set_frequency(unsigned int frequency)
 
 static void play_start_pcm(void)
 {
-    pcm_apply_settings();
-    
-    __aic_enable_transmit_dma();
-    __aic_enable_replay();
+    __i2s_enable_transmit_dma();
+    __i2s_enable_replay();
     
     REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
 }
@@ -83,18 +81,18 @@ static void play_stop_pcm(void)
 {
     REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) = (REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) | DMAC_DCCSR_HLT) & ~DMAC_DCCSR_EN;
     
-    __aic_disable_transmit_dma();
-    __aic_disable_replay();
+    __i2s_disable_transmit_dma();
+    __i2s_disable_replay();
 }
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) = 0;
+    REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) = DMAC_DCCSR_NDES;
     REG_DMAC_DSAR(DMA_AIC_TX_CHANNEL)  = PHYSADDR((unsigned long)addr);
     REG_DMAC_DTAR(DMA_AIC_TX_CHANNEL)  = PHYSADDR((unsigned long)AIC_DR);
     REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL)  = size;
     REG_DMAC_DRSR(DMA_AIC_TX_CHANNEL)  = DMAC_DRSR_RS_AICOUT;
-    REG_DMAC_DCMD(DMA_AIC_TX_CHANNEL)  = ( DMAC_DCMD_SAI| DMAC_DCMD_DAI | DMAC_DCMD_SWDH_32 | DMAC_DCMD_DS_32BIT | DMAC_DCMD_DWDH_32
+    REG_DMAC_DCMD(DMA_AIC_TX_CHANNEL)  = ( DMAC_DCMD_SAI| DMAC_DCMD_SWDH_32 | DMAC_DCMD_DS_32BIT | DMAC_DCMD_DWDH_32
                                          | DMAC_DCMD_TIE);
 
     play_start_pcm();
@@ -134,7 +132,6 @@ void pcm_play_dma_pause(bool pause)
         play_stop_pcm();
     else
         play_start_pcm();
-    
 }
 
 #ifdef HAVE_RECORDING

@@ -28,8 +28,11 @@
 #include "jz4740.h"
 #include "thread.h"
 
-//#define DEBUGF printf
+#if 1
+#define DEBUGF printf
+#else
 #define DEBUGF(...)
+#endif
 
 #define USB_EP0_IDLE      0
 #define USB_EP0_RX        1
@@ -86,7 +89,7 @@ static void readFIFO(struct usb_endpoint *ep, unsigned int size)
     
     register unsigned char *ptr = (unsigned char*)EP_PTR(ep);
     register unsigned int *ptr32 = (unsigned int*)ptr;
-    register unsigned int s = size / 4;
+    register unsigned int s = size >> 2;
     register unsigned int x;
     
     if(size > 0)
@@ -333,7 +336,7 @@ void usb_drv_stall(int endpoint, bool stall, bool in)
     
     select_endpoint(endpoint);
     
-    if(endpoint == 0)
+    if(endpoint == EP_CONTROL)
     {
         if(stall)
             REG_USB_REG_CSR0 |= USB_CSR0_SENDSTALL;
@@ -458,6 +461,8 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
 
 void usb_drv_set_test_mode(int mode)
 {
+    DEBUGF("usb_drv_set_test_mode(%d)", mode);
+    
     switch(mode)
     {
         case 0:
