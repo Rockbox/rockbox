@@ -8319,9 +8319,11 @@
     *: "Time"
   </voice>
 </phrase>
+/* TODO: cleanup LANG_USB_CHARGING unless HAVE_USB_CHARGING_ENABLE defined,
+ * the selector should probably be usb_charging_enable as well. */
 <phrase>
   id: LANG_USB_CHARGING
-  desc: in Battery menu, TODO: cleanup unless HAVE_USB_CHARGING_ENABLE defined
+  desc: in Battery menu
   user:
   <source>
     *: none
