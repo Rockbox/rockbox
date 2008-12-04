@@ -112,7 +112,6 @@ void storage_spin(void)
 
 void storage_sleep(void)
 {
-    DEBUGF("storage_sleep()\n");
 }
 
 bool storage_disk_is_active(void)
