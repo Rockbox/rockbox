@@ -1949,17 +1949,13 @@ static int audio_check_new_track(void)
     if (dir_skip)
     {
         dir_skip = false;
-        if (playlist_next_dir(ci.new_track))
-        {
-            ci.new_track = 0;
-            audio_rebuffer();
-            goto skip_done;
-        }
-        else
-        {
-            LOGFQUEUE("audio >|= codec Q_CODEC_REQUEST_FAILED");
-            return Q_CODEC_REQUEST_FAILED;
-        }
+        /* regardless of the return value we need to rebuffer.
+           if it fails the old playlist will resume, else the
+           next dir will start playing */
+        playlist_next_dir(ci.new_track);
+        ci.new_track = 0;
+        audio_rebuffer();
+        goto skip_done;
     }
 
     if (new_playlist)
