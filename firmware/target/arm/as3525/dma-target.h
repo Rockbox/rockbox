@@ -34,6 +34,6 @@
 void dma_init(void);
 void dma_enable_channel(int channel, void *src, void *dst, int peri,
                         int flow_controller, bool src_inc, bool dst_inc,
-                        size_t size, int nwords);
-
+                        size_t size, int nwords, void (*callback)(void));
+inline void dma_disable_channel(int channel);
 inline void dma_wait_transfer(int channel);

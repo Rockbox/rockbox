@@ -129,6 +129,37 @@ static void mci_set_clock_divider(const int drive, int divider)
     mci_delay();
 }
 
+static void sd_panic(IF_MV2(const int drive,) const int status)
+{
+    char error[32];
+    error[0] = '\0';
+
+#ifdef HAVE_MULTIVOLUME
+    snprintf(error, sizeof(error),
+            (drive == INTERNAL_AS3525) ? "Internal storage : " : "SD Slot : " );
+#endif
+
+    panicf("SD : %s%s%s%s%s%s%s", error,
+        (status & MCI_DATA_CRC_FAIL) ? "DATA CRC FAIL, " : "",
+        (status & MCI_DATA_TIMEOUT) ? "DATA TIMEOUT, " : "",
+        (status & MCI_RX_OVERRUN) ? "RX OVERRUN, " : "",
+        (status & MCI_TX_UNDERRUN) ? "TX UNDERRUN, " : "",
+        (status & MCI_RX_FIFO_FULL) ? "RXR FIFO FULL, " : "",
+        (status & MCI_TX_FIFO_EMPTY) ? "TX FIFO EMPTY" : "");
+}
+
+void INT_NAND(void)
+{
+    sd_panic(IF_MV2(INTERNAL_AS3525,) MCI_STATUS(INTERNAL_AS3525));
+}
+
+#ifdef HAVE_MULTIVOLUME
+void INT_MCI0(void)
+{
+    sd_panic(SD_SLOT_AS3525, MCI_STATUS(SD_SLOT_AS3525));
+}
+#endif
+
 static bool send_cmd(const int drive, const int cmd, const int arg,
                      const int flags, int *response)
 {
@@ -362,7 +393,14 @@ static void init_pl180_controller(const int drive)
     MCI_COMMAND(drive) = MCI_DATA_CTRL(drive) = 0;
     MCI_CLEAR(drive) = 0x7ff;
 
-    MCI_MASK0(drive) = MCI_MASK1(drive) = 0;  /* disable all interrupts */
+    MCI_MASK0(drive) = MCI_MASK1(drive) = MCI_DATA_CRC_FAIL | MCI_DATA_TIMEOUT |
+        MCI_RX_OVERRUN | MCI_TX_UNDERRUN | MCI_RX_FIFO_FULL | MCI_TX_FIFO_EMPTY;
+
+    VIC_INT_ENABLE |= INTERRUPT_NAND
+#ifdef HAVE_MULTIVOLUME
+        | INTERRUPT_MCI0
+#endif
+        ;
 
     MCI_POWER(drive) = MCI_POWER_UP|(10 /*voltage*/ << 2); /* use OF voltage */
     mci_delay();
@@ -378,7 +416,6 @@ static void init_pl180_controller(const int drive)
     /* set MCLK divider */
     mci_set_clock_divider(drive,
         CLK_DIV(AS3525_PCLK_FREQ, AS3525_SD_IDENT_FREQ));
-
 }
 
 int sd_init(void)
@@ -552,12 +589,12 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
 
         if(write)
             dma_enable_channel(0, buf, MCI_FIFO(drive),
-                    (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
-                    DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8);
+                (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
+                DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
         else
             dma_enable_channel(0, MCI_FIFO(drive), buf,
-                    (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
-                    DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8);
+                (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
+                DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
         MCI_DATA_TIMER(drive) = 0x1000000; /* FIXME: arbitrary */
         MCI_DATA_LENGTH(drive) = transfer * card_info[drive].block_size;

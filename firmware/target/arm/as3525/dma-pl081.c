@@ -27,6 +27,7 @@
 #include "kernel.h"
 
 static struct wakeup transfer_completion_signal[2]; /* 2 channels */
+static void (*dma_callback[2])(void); /* 2 channels */
 
 inline void dma_wait_transfer(int channel)
 {
@@ -45,10 +46,17 @@ void dma_init(void)
     wakeup_init(&transfer_completion_signal[1]);
 }
 
+inline void dma_disable_channel(int channel)
+{
+    DMAC_CH_CONFIGURATION(channel) &= ~(1<<0);
+}
+
 void dma_enable_channel(int channel, void *src, void *dst, int peri,
                         int flow_controller, bool src_inc, bool dst_inc,
-                        size_t size, int nwords)
+                        size_t size, int nwords, void (*callback)(void))
 {
+    dma_callback[channel] = callback;
+
     int control = 0;
 
     DMAC_CH_SRC_ADDR(channel) = (int)src;
@@ -92,12 +100,21 @@ void dma_enable_channel(int channel, void *src, void *dst, int peri,
 /* isr */
 void INT_DMAC(void)
 {
-    int channel = (DMAC_INT_STATUS & (1<<0)) ? 0 : 1;
+    unsigned int channel;
 
-    if(DMAC_INT_ERROR_STATUS & (1<<channel))
-        panicf("DMA error, channel %d", channel);
+    /* SD channel is serviced first */
+    for(channel = 0; channel < 2; channel++)
+        if(DMAC_INT_STATUS & (1<<channel))
+        {
+            if(DMAC_INT_ERROR_STATUS & (1<<channel))
+                panicf("DMA error, channel %d", channel);
 
-    DMAC_INT_TC_CLEAR |= (1<<channel); /* clear terminal count interrupt */
+            /* clear terminal count interrupt */
+            DMAC_INT_TC_CLEAR |= (1<<channel);
 
-    wakeup_signal(&transfer_completion_signal[channel]);
+            if(dma_callback[channel])
+                dma_callback[channel]();
+
+            wakeup_signal(&transfer_completion_signal[channel]);
+        }
 }
