@@ -73,14 +73,10 @@
 #define HAVE_SW_POWEROFF
 
 /* The number of bytes reserved for loadable codecs */
-#define CODEC_SIZE 0x100000
+#define CODEC_SIZE 0x48000 /* in IRAM */
 
 /* The number of bytes reserved for loadable plugins */
-#if 0 /* The plugin buffer doesn't fit in the 2MB memory */
-#define PLUGIN_BUFFER_SIZE 0x80000
-#else
-#define PLUGIN_BUFFER_SIZE 0
-#endif
+#define PLUGIN_BUFFER_SIZE 0x60000
 
 #define AB_REPEAT_ENABLE 1
 

@@ -6,6 +6,11 @@ OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/crt0.o)
 
+#if MEMORYSIZE <= 2
+/* we put the codec buffer in IRAM */
+#define LOWMEM
+#endif
+
 #define PLUGINSIZE PLUGIN_BUFFER_SIZE
 #define CODECSIZE CODEC_SIZE
 
@@ -16,8 +21,15 @@ STARTUP(target/arm/crt0.o)
 #endif
 
 #include "cpu.h"
+
 #define IRAMSIZE 0x50000
+
+#ifdef LOWMEM
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGINSIZE
+#define CODECORIG (IRAMORIG + IRAMSIZE - CODEC_SIZE)
+#else
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGINSIZE - CODECSIZE
+#endif
 
 #define IRAMORIG 0x0
 #define DRAMORIG 0x30000000 + STUBOFFSET
@@ -26,11 +38,20 @@ STARTUP(target/arm/crt0.o)
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
 
 /* Where the codec buffer ends, and the plugin buffer starts */
+#ifdef LOWMEM
+#define ENDADDR (ENDAUDIOADDR)
+#else
 #define ENDADDR (ENDAUDIOADDR + CODECSIZE)
+#endif
 
 MEMORY
 {
+#ifdef LOWMEM
+    IRAM : ORIGIN = IRAMORIG, LENGTH = (IRAMSIZE - CODEC_SIZE)
+    CODEC_IRAM : ORIGIN = CODECORIG, LENGTH = CODEC_SIZE
+#else
     IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
+#endif
     DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
 }
 
@@ -69,8 +90,6 @@ SECTIONS
         *(.eh_frame)
     }
 
-    _initdata_end =.;
-
     .vectors IRAMORIG:
     {
         _vectors_start = .;
@@ -78,6 +97,16 @@ SECTIONS
     } > IRAM AT > DRAM
 
     _vectorscopy = LOADADDR(.vectors);
+
+    .iram :
+    {
+        _iramstart = .;
+        *(.icode)
+        *(.irodata)
+        *(.idata)
+        . = ALIGN(0x4);
+        _iramend = .;
+    } > IRAM AT> DRAM
 
     .ibss (NOLOAD) :
     {
@@ -87,16 +116,6 @@ SECTIONS
         . = ALIGN(0x4);
         _iend = .;
     } > IRAM
-
-    .iram _iend :
-    {
-        _iramstart = .;
-        *(.icode)
-        *(.irodata)
-        *(.idata)
-        . = ALIGN(0x4);
-        _iramend = .;
-    } > IRAM AT> DRAM
 
     _iramcopy = LOADADDR(.iram);
 
@@ -130,15 +149,19 @@ SECTIONS
         _audiobufend = .;
     } > DRAM
 
-    .codec ENDAUDIOADDR  (NOLOAD) :
+    .codec CODECORIG (NOLOAD) :
     {
         codecbuf = .;
         _codecbuf = .;
-    }
+#ifdef LOWMEM
+    } > CODEC_IRAM
+#else
+    } > DRAM
+#endif
 
     .plugin ENDADDR (NOLOAD) :
     {
         _pluginbuf = .;
         pluginbuf = .;
-    }
+    } > DRAM
 }

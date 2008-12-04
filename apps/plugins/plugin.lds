@@ -37,6 +37,8 @@ OUTPUT_FORMAT(elf32-sh)
 #include "imx31l.h"
 /* Reserve 1mb for LCD buffer/TTB as in app.lds */
 #define DRAMSIZE (MEMORYSIZE * 0x100000 - 0x100000) - PLUGIN_BUFFER_SIZE - STUBOFFSET - CODEC_SIZE
+#elif CONFIG_CPU==AS3525 && MEMORYSIZE <= 2
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - STUBOFFSET
 #else
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - STUBOFFSET - CODEC_SIZE
 #endif
@@ -87,17 +89,29 @@ OUTPUT_FORMAT(elf32-sh)
 #define IRAM DRAM
 #define IRAMSIZE 0
 #elif CONFIG_CPU==AS3525
+#if MEMORYSIZE <= 2
+#define IRAMSIZE 0  /* simulates no IRAM since codec is already entirely in IRAM */
+#define CODEC_ORIGIN (0x50000 - CODEC_SIZE)
+#define PLUGIN_ORIGIN (DRAMORIG + DRAMSIZE)
+#else
 #define IRAMORIG 0x0
 #define IRAMSIZE 0x50000
+#endif
 #define DRAMORIG 0x30000000
+
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
 #endif
 
 #define PLUGIN_LENGTH PLUGIN_BUFFER_SIZE
 
+#ifndef CODEC_ORIGIN /* targets can specify another origin */
 #define CODEC_ORIGIN (DRAMORIG + (DRAMSIZE))
+#endif
+
+#ifndef PLUGIN_ORIGIN /* targets can specify another origin */
 #define PLUGIN_ORIGIN (CODEC_ORIGIN + CODEC_SIZE)
+#endif
 
 #ifdef CODEC
 #define THIS_LENGTH CODEC_SIZE
