@@ -29,7 +29,7 @@
 #include "thread.h"
 
 //#define DEBUGF printf
-#define DEBUGF
+#define DEBUGF(...)
 
 #define USB_EP0_IDLE      0
 #define USB_EP0_RX        1
