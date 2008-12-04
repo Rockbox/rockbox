@@ -70,8 +70,6 @@
 /* DBOP initialisation, do what OF does */
 static void ams3525_dbop_init(void)
 {
-    int clkdiv = 4 - 1;
-
     CGU_DBOP |= (1<<3) | CLK_DIV(AS3525_PCLK_FREQ, AS3525_DBOP_FREQ);
 
     GPIOB_AFSEL = 0x08; /* DBOP on pin 3 */
