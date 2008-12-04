@@ -35,6 +35,7 @@
 #include "pl180.h"  /* SD controller */
 #include "pl081.h"  /* DMA controller */
 #include "dma-target.h" /* DMA request lines */
+#include "clock-target.h"
 #include "panic.h"
 #include "stdbool.h"
 #include "ata_idle_notify.h"
@@ -375,7 +376,9 @@ static void init_pl180_controller(const int drive)
     MCI_CLOCK(drive) &= ~MCI_CLOCK_POWERSAVE;
 
     /* set MCLK divider */
-    mci_set_clock_divider(drive, 200);
+    mci_set_clock_divider(drive,
+        CLK_DIV(AS3525_PCLK_FREQ, AS3525_SD_IDENT_FREQ));
+
 }
 
 int sd_init(void)
@@ -384,7 +387,7 @@ int sd_init(void)
 
     CGU_IDE =   (1<<7)  /* AHB interface enable */  |
                 (1<<6)  /* interface enable */      |
-                (2<<2)  /* clock didiver = 2+1 */   |
+                ((CLK_DIV(AS3525_PLLA_FREQ, AS3525_IDE_FREQ) - 1) << 2) |
                 1       /* clock source = PLLA */;
 
     CGU_PERI |= CGU_NAF_CLOCK_ENABLE;

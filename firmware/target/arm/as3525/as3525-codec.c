@@ -38,6 +38,7 @@
  */
 
 #include "ascodec-target.h"
+#include "clock-target.h"
 #include "kernel.h"
 #include "as3525.h"
 
@@ -68,7 +69,7 @@ void ascodec_init(void)
     CGU_PERI |= CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE;
 
     /* prescaler for i2c clock */
-    I2C2_CPSR0 = 60;    /* 24 MHz / 400 kHz */
+    I2C2_CPSR0 = CLK_DIV(AS3525_PCLK_FREQ, AS3525_I2C_FREQ);
     I2C2_CPSR1 = 0;     /* MSB */    
     
     /* set i2c slave address of codec part */

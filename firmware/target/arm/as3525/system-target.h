@@ -23,8 +23,6 @@
 
 #include "system-arm.h"
 
-#define CPUFREQ_MAX     248000000
-#define CPUFREQ_DEFAULT 24800000
-#define CPUFREQ_NORMAL  31000000
+#include "clock-target.h" /* CPUFREQ_* are defined here */
 
 #endif /* SYSTEM_TARGET_H */

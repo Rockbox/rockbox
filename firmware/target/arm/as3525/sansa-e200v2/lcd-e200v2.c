@@ -31,6 +31,7 @@
 #include "system.h"
 #include "font.h"
 #include "bidi.h"
+#include "clock-target.h"
 
 static bool display_on = false; /* is the display turned on? */
 static bool display_flipped = false;
@@ -94,7 +95,7 @@ static void lcd_delay(int x)
 /* DBOP initialisation, do what OF does */
 static void ams3525_dbop_init(void)
 {
-    CGU_DBOP = (1<<3) | (3-1);
+    CGU_DBOP = (1<<3) | CLK_DIV(AS3525_PCLK_FREQ, AS3525_DBOP_FREQ);
 
     DBOP_TIMPOL_01 = 0xe167e167;
     DBOP_TIMPOL_23 = 0xe167006e;

@@ -71,6 +71,7 @@
 
 #if CONFIG_CPU == AS3525
 #include "as3525.h"
+#include "clock-target.h"
 
 void lcd_write_command(int byte)
 {
@@ -102,7 +103,7 @@ void lcd_write_data(const fb_data* p_bytes, int count)
 
 static inline void ams3525_dbop_init(void)
 {
-    CGU_DBOP |= (1<<3) /* clk enable */ | (3 - 1) /* clkdiv: 3 bits */ ;
+    CGU_DBOP |= (1<<3) | CLK_DIV(AS3525_PCLK_FREQ, AS3525_DBOP_FREQ);
 
     GPIOB_AFSEL = 0x0f; /* DBOP on pin 3:0 */
     GPIOC_AFSEL = 0xff; /* DBOP on pins 7:0 */

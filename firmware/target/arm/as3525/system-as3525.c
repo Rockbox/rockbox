@@ -25,6 +25,7 @@
 #include "panic.h"
 #include "ascodec-target.h"
 #include "dma-target.h"
+#include "clock-target.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -135,9 +136,6 @@ static void sdram_delay(void)
 /* Use the same initialization than OF */
 static void sdram_init(void)
 {
-    CGU_PERI &= ~(0xf<<2);  /* clear div0 (memclock) */
-    CGU_PERI |= (1<<2);     /* divider = 2 */
-
     CGU_PERI |= (1<<26)|(1<<27); /* extmem & extmem intf clocks */
 
     MPMC_CONTROL = 0x1; /* enable MPMC */
@@ -201,11 +199,8 @@ static void sdram_init(void)
 
 void system_init(void)
 {
-#ifdef BOOTLOADER
-#if 0 /* the GPIO clock is already enabled by the dualboot function */
-    CGU_PERI |= CGU_GPIO_CLOCK_ENABLE;
-#endif
 
+#ifdef BOOTLOADER   /* TODO: makes this work in the main build */
     CGU_PROC = 0;           /* fclk 24 MHz */
     CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
 
@@ -215,10 +210,13 @@ void system_init(void)
         "mcr p15, 0, r0, c1, c0  \n"
         : : : "r0" );
 
-    CGU_PLLA = 0x261F;  /* PLLA 248 MHz */
+    CGU_PLLA = AS3525_PLLA_SETTING;
     while(!(CGU_INTCTRL & (1<<0))); /* wait until PLLA is locked */
 
-    CGU_PROC = 1; /* fclk = PLLA = 248 MHz */
+    CGU_PROC = (AS3525_CPU_PREDIV << 2) | 1;
+
+    CGU_PERI |= ((CLK_DIV(AS3525_PLLA_FREQ, AS3525_PCLK_FREQ) - 1) << 2)
+                | 1; /* clk_in = PLLA */
 
     asm volatile(
         "mov r0, #0               \n"
@@ -230,26 +228,32 @@ void system_init(void)
         : : : "r0" );
 
     sdram_init();
+#endif  /* BOOTLOADER */
+
+#if 0 /* the GPIO clock is already enabled by the dualboot function */
+    CGU_PERI |= CGU_GPIO_CLOCK_ENABLE;
+#endif
 
     /* enable timer interface for TIMER1 & TIMER2 */
     CGU_PERI |= CGU_TIMERIF_CLOCK_ENABLE;
 
     /* enable VIC */
-    VIC_INT_ENABLE = 0; /* disable all interrupt lines */
+    VIC_INT_EN_CLEAR = 0xffffffff; /* disable all interrupt lines */
     CGU_PERI |= CGU_VIC_CLOCK_ENABLE;
     VIC_INT_SELECT = 0; /* only IRQ, no FIQ */
-#else
+
+    dma_init();
+
+#ifndef BOOTLOADER
     /* Disable fast hardware power-off, to use power button normally
      * We don't need the power button in the bootloader. */
     ascodec_init();
     ascodec_write(AS3514_CVDD_DCDC3, ascodec_read(AS3514_CVDD_DCDC3) & (1<<2));
-#endif /* BOOTLOADER */
+#endif /* !BOOTLOADER */
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     set_cpu_frequency(CPUFREQ_DEFAULT);
 #endif
-
-    dma_init();
 }
 
 void system_reboot(void)
