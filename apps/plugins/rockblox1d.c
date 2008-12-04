@@ -86,6 +86,10 @@ CONFIG_KEYPAD == SANSA_CLIP_PAD
 #define ONEDROCKBLOX_DOWN              BUTTON_MENU
 #define ONEDROCKBLOX_QUIT              BUTTON_POWER
 
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+#define ONEDROCKBLOX_DOWN              BUTTON_PLAY
+#define ONEDROCKBLOX_QUIT              BUTTON_BACK
+
 #else
 #error No keymap defined!
 #endif

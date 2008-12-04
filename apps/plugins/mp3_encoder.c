@@ -2462,6 +2462,11 @@ void get_mp3_filename(const char *wav_name)
 #define MP3ENC_NEXT BUTTON_RIGHT
 #define MP3ENC_DONE BUTTON_POWER
 #define MP3ENC_SELECT BUTTON_PLAY
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+#define MP3ENC_PREV BUTTON_UP
+#define MP3ENC_NEXT BUTTON_DOWN
+#define MP3ENC_DONE BUTTON_BACK
+#define MP3ENC_SELECT BUTTON_PLAY
 #else
 #error No keymap defined!
 #endif

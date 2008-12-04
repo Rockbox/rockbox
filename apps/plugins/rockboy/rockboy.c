@@ -220,6 +220,15 @@ static void setoptions (void)
         options.START=BUTTON_PLAY;
         options.SELECT=BUTTON_SELECT;
         options.MENU=BUTTON_MENU;
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+        options.UP=BUTTON_UP;
+        options.DOWN=BUTTON_DOWN;
+
+        options.A=BUTTON_CUSTOM;
+        options.B=BUTTON_SELECT;
+        options.START=BUTTON_BACK;
+        options.SELECT=BUTTON_PLAY;
+        options.MENU=BUTTON_MENU;
 #else
 #error No Keymap Defined!
 #endif

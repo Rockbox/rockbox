@@ -164,6 +164,15 @@ PLUGIN_HEADER
 #define DOWN BUTTON_PLAY
 #define PAUSE BUTTON_MENU
 
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+
+#define QUIT BUTTON_BACK
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+#define PAUSE BUTTON_SELECT
+
 #else
 #error No keymap defined!
 #endif

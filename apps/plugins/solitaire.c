@@ -322,6 +322,24 @@ static const struct plugin_api* rb;
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 #   define SOL_QUIT          BUTTON_POWER
 
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+#   define SOL_QUIT         BUTTON_BACK
+#   define SOL_UP           BUTTON_UP
+#   define SOL_DOWN         BUTTON_DOWN
+#   define SOL_LEFT         BUTTON_LEFT
+#   define SOL_RIGHT        BUTTON_RIGHT
+#   define SOL_MOVE_PRE     BUTTON_SELECT
+#   define SOL_MOVE         (BUTTON_SELECT | BUTTON_REL)
+#   define SOL_DRAW         BUTTON_MENU
+#   define SOL_REM2CUR      (BUTTON_LEFT | BUTTON_SELECT)
+#   define SOL_CUR2STACK    (BUTTON_SELECT | BUTTON_REPEAT)
+#   define SOL_REM2STACK    (BUTTON_RIGHT | BUTTON_SELECT)
+#   define HK_MOVE         "PLAY"
+#   define HK_DRAW         "MENU"
+#   define HK_REM2CUR      "PLAY+LEFT"
+#   define HK_CUR2STACK    "PLAY.."
+#   define HK_REM2STACK    "PLAY+RIGHT"
+
 #else
 #error No keymap defined!
 #endif

@@ -1494,7 +1494,7 @@ fi
     USE_ELF="yes"
     output="rockbox.zvm"
     appextra="recorder:gui"
-    plugins=""
+    plugins="yes"
     swcodec="yes"
     toolset=$ipodbitmaptools
     boottool="$rootdir/tools/scramble -creative=zvm -no-ciff"
@@ -1517,7 +1517,7 @@ fi
     USE_ELF="yes"
     output="rockbox.zvm60"
     appextra="recorder:gui"
-    plugins=""
+    plugins="yes"
     swcodec="yes"
     toolset=$ipodbitmaptools
     boottool="$rootdir/tools/scramble -creative=zvm60"

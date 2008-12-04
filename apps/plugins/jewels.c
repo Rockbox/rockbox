@@ -161,6 +161,14 @@ PLUGIN_HEADER
 #define JEWELS_SELECT BUTTON_MENU
 #define JEWELS_CANCEL BUTTON_POWER
 
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+#define JEWELS_UP     BUTTON_UP
+#define JEWELS_DOWN   BUTTON_DOWN
+#define JEWELS_LEFT   BUTTON_LEFT
+#define JEWELS_RIGHT  BUTTON_RIGHT
+#define JEWELS_SELECT BUTTON_SELECT
+#define JEWELS_CANCEL BUTTON_BACK
+
 #else
 #error No keymap defined!
 #endif
@@ -1604,7 +1612,7 @@ static int jewels_main(struct game_context* bj) {
                 rb->lcd_puts(0, 12, "REC to cancel");
 #elif CONFIG_KEYPAD == COWOND2_PAD
                 rb->lcd_puts(0, 11, "POWER to cancel");
-#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD || CREATIVEZVM_PAD
                 rb->lcd_puts(0, 2, "Swap pairs of jewels to");
                 rb->lcd_puts(0, 3, "form connected segments");
                 rb->lcd_puts(0, 4, "of three or more of the");

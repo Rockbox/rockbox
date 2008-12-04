@@ -1,4 +1,10 @@
 FIRMWARE = ../..
+
+export BUILDDATE=$(shell date -u +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')
+export CPU=arm
+export TARGET=-DIPOD_VIDEO
+export TARGET_INC=-I$(FIRMWARE)/target/arm/ipod/video -I$(FIRMWARE)/target/arm/ipod -I$(FIRMWARE)/target/arm
+
 DRIVERS = ../../drivers
 EXPORT = ../../export
 
@@ -7,10 +13,11 @@ INCLUDE = -I$(EXPORT)
 RINCLUDE =  -I$(FIRMWARE)/include 
 DEFINES =  -DTEST_FAT -DDEBUG -DCRT_DISPLAY -DDISK_WRITE -DHAVE_FAT16SUPPORT
 
-CFLAGS = -g -Wall $(DEFINES) -I. $(INCLUDE) $(RINCLUDE) -DLITTLE_ENDIAN
+CFLAGS = -g -Wall $(DEFINES) -I. $(INCLUDE) $(RINCLUDE) $(BUILDDATE) 
 SIMFLAGS = -g -Wall $(DEFINES) -I. $(INCLUDE)
 
 TARGET = fat
+
 
 $(TARGET): fat.o ata-sim.o main.o disk.o debug.o dir.o file.o ctype.o
 	gcc -g -o fat $+ -lfl

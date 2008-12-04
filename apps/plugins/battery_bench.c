@@ -160,6 +160,13 @@ PLUGIN_HEADER
 #define BATTERY_OFF_TXT "POWER"
 #define BATTERY_ON BUTTON_PLAY
 #define BATTERY_ON_TXT  "PLAY - start"
+
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+#define BATTERY_ON BUTTON_PLAY
+#define BATTERY_ON_TXT  "PLAY - start"
+#define BATTERY_OFF BUTTON_BACK
+#define BATTERY_OFF_TXT "BACK"
+
 #else
 #error No keymap defined!
 #endif

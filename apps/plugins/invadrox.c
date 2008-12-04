@@ -127,6 +127,13 @@ PLUGIN_HEADER
 #define RIGHT BUTTON_RIGHT
 #define FIRE BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+
+#define QUIT BUTTON_BACK
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define FIRE BUTTON_PLAY
+
 #else
     #error INVADROX: Unsupported keypad
 #endif

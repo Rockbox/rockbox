@@ -169,6 +169,15 @@ PLUGIN_HEADER
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define QUIT    BUTTON_POWER
 
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+
+#define QUIT BUTTON_BACK
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define SELECT BUTTON_SELECT
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+
 #else
 #error No keymap defined!
 #endif

@@ -104,6 +104,11 @@ extern const fb_data matrix_normal[];
 #define MATRIX_SLEEP_MORE BUTTON_VOLUP
 #define MATRIX_SLEEP_LESS BUTTON_VOLDOWN
 #define MATRIX_PAUSE BUTTON_PLAY
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+#define MATRIX_EXIT BUTTON_BACK
+#define MATRIX_SLEEP_MORE BUTTON_UP
+#define MATRIX_SLEEP_LESS BUTTON_DOWN
+#define MATRIX_PAUSE BUTTON_PLAY
 #else
 #error Unsupported keypad
 #endif

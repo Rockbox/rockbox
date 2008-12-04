@@ -157,6 +157,14 @@ PLUGIN_IRAM_DECLARE
 #define BTN_DOWN         BUTTON_PLAY
 #define BTN_PLAY         BUTTON_MENU
 
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+#define BTN_QUIT         BUTTON_BACK
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_LEFT         BUTTON_LEFT
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+#define BTN_PLAY         BUTTON_SELECT
+
 #else
 #error No keymap defined!
 #endif

@@ -114,6 +114,12 @@ Still To do:
 #define ACTION2 BUTTON_STOP
 #define ACTIONTEXT "PLAY"
 
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+#define QUIT BUTTON_BACK
+#define ACTION BUTTON_UP
+#define ACTION2 BUTTON_MENU
+#define ACTIONTEXT "UP"
+
 #else
 #error No keymap defined!
 #endif

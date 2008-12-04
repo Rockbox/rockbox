@@ -284,6 +284,17 @@
 #define CB_RESTART BUTTON_MINUS
 #define CB_MENU    (BUTTON_MENU|BUTTON_REL)
 
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+
+#define CB_SELECT  BUTTON_PLAY
+#define CB_UP      BUTTON_UP
+#define CB_DOWN    BUTTON_DOWN
+#define CB_LEFT    BUTTON_LEFT
+#define CB_RIGHT   BUTTON_RIGHT
+#define CB_PLAY    BUTTON_SELECT
+#define CB_LEVEL   BUTTON_CUSTOM
+#define CB_MENU    BUTTON_MENU
+
 
 #else
 #error No keymap defined!

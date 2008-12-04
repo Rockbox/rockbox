@@ -233,6 +233,18 @@
 #define JPEG_NEXT        (BUTTON_PLAY|BUTTON_VOLUP)
 #define JPEG_PREVIOUS    (BUTTON_PLAY|BUTTON_VOLDOWN)
 
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+
+#define JPEG_ZOOM_IN    BUTTON_PLAY
+#define JPEG_ZOOM_OUT   BUTTON_SELECT
+#define JPEG_UP         BUTTON_UP
+#define JPEG_DOWN       BUTTON_DOWN
+#define JPEG_LEFT       BUTTON_LEFT
+#define JPEG_RIGHT      BUTTON_RIGHT
+#define JPEG_MENU       BUTTON_MENU
+#define JPEG_NEXT       BUTTON_CUSTOM
+#define JPEG_PREVIOUS   BUTTON_BACK
+
 #else
 #error No keymap defined!
 #endif

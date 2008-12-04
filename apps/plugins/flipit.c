@@ -224,6 +224,18 @@ PLUGIN_HEADER
 
 #define FLIPIT_QUIT         BUTTON_POWER
 
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
+#define FLIPIT_UP           BUTTON_UP
+#define FLIPIT_DOWN         BUTTON_DOWN
+#define FLIPIT_QUIT         BUTTON_BACK
+#define FLIPIT_SHUFFLE      BUTTON_CUSTOM
+#define FLIPIT_SOLVE        BUTTON_SELECT
+#define FLIPIT_STEP_BY_STEP BUTTON_MENU
+#define FLIPIT_TOGGLE       BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

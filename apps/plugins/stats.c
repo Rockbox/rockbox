@@ -81,6 +81,9 @@ static bool abort;
 #elif CONFIG_KEYPAD == IAUDIO67_PAD
 #define STATS_STOP BUTTON_POWER
 
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+#define STATS_STOP BUTTON_BACK
+
 #else
 #error No keymap defined!
 #endif
