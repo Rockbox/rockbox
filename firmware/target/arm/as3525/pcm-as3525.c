@@ -66,6 +66,9 @@ static void play_start_pcm(void)
     dma_size -= size;
     dma_start_addr += size;
 
+    CGU_PERI |= CGU_I2SOUT_APB_CLOCK_ENABLE;
+    CGU_AUDIO |= (1<<11);
+
     dma_enable_channel(1, (void*)addr, (void*)I2SOUT_DATA, DMA_PERI_I2SOUT,
                 DMAC_FLOWCTRL_DMAC_MEM_TO_PERI, true, false, size >> 2, DMA_S1,
                 dma_callback);
@@ -98,6 +101,9 @@ void pcm_play_dma_stop(void)
 {
     dma_disable_channel(1);
     dma_size = 0;
+
+    CGU_PERI &= ~CGU_I2SOUT_APB_CLOCK_ENABLE;
+    CGU_AUDIO &= ~(1<<11);
 }
 
 void pcm_play_dma_pause(bool pause)
@@ -112,8 +118,8 @@ void pcm_play_dma_init(void)
 {
     CGU_PERI |= CGU_I2SOUT_APB_CLOCK_ENABLE;
 
-    /* enable I2SO_MCLK, clock source PLLA, minimal frequency */
-    CGU_AUDIO |= (1<<11) | (511<<2) | (1<<0);
+    /* clock source PLLA, minimal frequency */
+    CGU_AUDIO |= (511<<2) | (1<<0);
 
     I2SOUT_CONTROL |= (1<<6) ;  /* enable dma */
     I2SOUT_CONTROL |= (1<<3) ;  /* stereo */
