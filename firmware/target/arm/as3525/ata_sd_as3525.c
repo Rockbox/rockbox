@@ -568,6 +568,8 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
         goto sd_transfer_error;
     }
 
+    dma_retain();
+
     while(count)
     {
         /* 128 * 512 = 2^16, and doesn't fit in the 16 bits of DATA_LENGTH
@@ -628,6 +630,8 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
 
     while (1)
     {
+        dma_release();
+
 #ifndef BOOTLOADER
         sd_enable(false);
 #endif

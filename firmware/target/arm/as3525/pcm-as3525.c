@@ -94,6 +94,8 @@ void pcm_play_dma_start(const void *addr, size_t size)
     dma_size = size;
     dma_start_addr = (unsigned char*)addr;
 
+    dma_retain();
+
     play_start_pcm();
 }
 
@@ -101,6 +103,8 @@ void pcm_play_dma_stop(void)
 {
     dma_disable_channel(1);
     dma_size = 0;
+
+    dma_release();
 
     CGU_PERI &= ~CGU_I2SOUT_APB_CLOCK_ENABLE;
     CGU_AUDIO &= ~(1<<11);

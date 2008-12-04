@@ -37,3 +37,6 @@ void dma_enable_channel(int channel, void *src, void *dst, int peri,
                         size_t size, int nwords, void (*callback)(void));
 inline void dma_disable_channel(int channel);
 inline void dma_wait_transfer(int channel);
+
+void dma_retain(void);
+void dma_release(void);

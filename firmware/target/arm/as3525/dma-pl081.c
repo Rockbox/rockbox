@@ -26,6 +26,7 @@
 #include "panic.h"
 #include "kernel.h"
 
+static int dma_used = 0;
 static struct wakeup transfer_completion_signal[2]; /* 2 channels */
 static void (*dma_callback[2])(void); /* 2 channels */
 
@@ -34,11 +35,26 @@ inline void dma_wait_transfer(int channel)
     wakeup_wait(&transfer_completion_signal[channel], TIMEOUT_BLOCK);
 }
 
+void dma_retain(void)
+{
+    if(++dma_used == 1)
+    {
+        CGU_PERI |= CGU_DMA_CLOCK_ENABLE;
+        DMAC_CONFIGURATION |= (1<<0);
+    }
+}
+
+void dma_release(void)
+{
+    if(--dma_used == 0)
+    {
+        DMAC_CONFIGURATION &= ~(1<<0);
+        CGU_PERI &= ~CGU_DMA_CLOCK_ENABLE;
+    }
+}
+
 void dma_init(void)
 {
-    /* Enable DMA controller */
-    CGU_PERI |= CGU_DMA_CLOCK_ENABLE;
-    DMAC_CONFIGURATION |= (1<<0);   /* TODO: disable controller when not used */
     DMAC_SYNC = 0;
     VIC_INT_ENABLE |= INTERRUPT_DMAC;
 
