@@ -66,18 +66,6 @@ default_interrupt(INT_GPIOA);
 default_interrupt(INT_GPIOB);
 default_interrupt(INT_GPIOC);
 
-
-
-static void (* const irqvector[])(void) =
-{
-    INT_WATCHDOG, INT_TIMER1, INT_TIMER2, INT_USB, INT_DMAC, INT_NAND, INT_IDE, INT_MCI0,
-    INT_MCI1, INT_AUDIO, INT_SSP, INT_I2C_MS, INT_I2C_AUDIO, INT_I2SIN, INT_I2SOUT,
-    INT_UART, INT_GPIOD, RESERVED1 /* 17 */ ,INT_CGU, INT_MEMORY_STICK, INT_DBOP,
-    RESERVED2 /* 21 */, RESERVED3 /* 22 */, RESERVED4 /* 23 */, RESERVED5 /* 24 */,
-    RESERVED6 /* 25 */, RESERVED7 /* 26 */, RESERVED8 /* 27 */, RESERVED9 /* 28 */,
-    INT_GPIOA, INT_GPIOB, INT_GPIOC
-};
-
 static const char * const irqname[] =
 {
     "INT_WATCHDOG", "INT_TIMER1", "INT_TIMER2", "INT_USB", "INT_DMAC", "INT_NAND",
@@ -98,23 +86,54 @@ static void UIRQ(void)
     panicf("Unhandled IRQ %02X: %s", irq_no, irqname[irq_no]);
 }
 
+struct vec_int_src
+{
+    int source;
+    void (*isr) (void);
+};
+
+/* Vectored interrupts (16 available) */
+struct vec_int_src vec_int_srcs[] =
+{
+    { INT_SRC_TIMER1, INT_TIMER1 },
+    { INT_SRC_TIMER2, INT_TIMER2 },
+    { INT_SRC_DMAC, INT_DMAC },
+    { INT_SRC_NAND, INT_NAND },
+    { INT_SRC_MCI0, INT_MCI0 },
+    { INT_SRC_GPIOA, INT_GPIOA, },
+    { INT_SRC_GPIOB, INT_GPIOB, },
+};
+
+static void setup_vic(void)
+{
+    volatile unsigned long *vic_vect_addrs = VIC_VECT_ADDRS;
+    volatile unsigned long *vic_vect_cntls = VIC_VECT_CNTLS;
+    const unsigned int n = sizeof(vec_int_srcs)/sizeof(vec_int_srcs[0]);
+    unsigned int i;
+
+    CGU_PERI |= CGU_VIC_CLOCK_ENABLE; /* enable VIC */
+    VIC_INT_EN_CLEAR = 0xffffffff; /* disable all interrupt lines */
+    VIC_INT_SELECT = 0; /* only IRQ, no FIQ */
+
+    VIC_DEF_VECT_ADDR = (unsigned long)UIRQ;
+
+    for(i = 0; i < n; i++)
+    {
+        vic_vect_addrs[i] = (unsigned long)vec_int_srcs[i].isr;
+        vic_vect_cntls[i] = (1<<5) | vec_int_srcs[i].source;
+    }
+}
+
 void irq_handler(void)
 {
-    /*
-     * Based on: linux/arch/arm/kernel/entry-armv.S and system-meg-fx.c
-     */
-
-    asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n" );/* Store context */
-
-    unsigned int irq_no = 0;
-    int status = VIC_IRQ_STATUS;
-    while((status >>= 1))
-        irq_no++;
-
-    irqvector[irq_no]();
-
-    asm volatile(   "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
-                    "subs  pc, lr, #4           \n"); /* Return from IRQ */
+    asm volatile(   "stmfd  sp!, {r0-r5,ip,lr}      \n" /* Store context */
+                    "ldr    r5, =0xC6010030         \n" /* VIC_VECT_ADDR */
+                    "mov    lr, pc                  \n" /* Return from ISR */
+                    "ldr    pc, [r5]                \n" /* execute ISR */
+                    "str    r0, [r5]                \n" /* Ack interrupt */
+                    "ldmfd  sp!, {r0-r5,ip,lr}      \n" /* Restore context */
+                    "subs   pc, lr, #4              \n" /* Return from IRQ */
+            );
 }
 
 void fiq_handler(void)
@@ -235,10 +254,7 @@ void system_init(void)
     /* enable timer interface for TIMER1 & TIMER2 */
     CGU_PERI |= CGU_TIMERIF_CLOCK_ENABLE;
 
-    /* enable VIC */
-    VIC_INT_EN_CLEAR = 0xffffffff; /* disable all interrupt lines */
-    CGU_PERI |= CGU_VIC_CLOCK_ENABLE;
-    VIC_INT_SELECT = 0; /* only IRQ, no FIQ */
+    setup_vic();
 
     dma_init();
 

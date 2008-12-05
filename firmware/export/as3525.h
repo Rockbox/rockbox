@@ -369,8 +369,37 @@ interface */
 #define VIC_PROTECTION      (*(volatile unsigned long*)(VIC_BASE+0x20))
 #define VIC_VECT_ADDR       (*(volatile unsigned long*)(VIC_BASE+0x30))
 #define VIC_DEF_VECT_ADDR   (*(volatile unsigned long*)(VIC_BASE+0x34))
+#define VIC_VECT_ADDRS      ((volatile unsigned long*)(VIC_BASE+0x100))
+#define VIC_VECT_CNTLS      ((volatile unsigned long*)(VIC_BASE+0x200))
 
-/* Interrupts */
+/* Interrupt sources (for vectors setup) */
+#define INT_SRC_WATCHDOG      0
+#define INT_SRC_TIMER1        1
+#define INT_SRC_TIMER2        2
+#define INT_SRC_USB           3
+#define INT_SRC_DMAC          4
+#define INT_SRC_NAND          5
+#define INT_SRC_IDE           6
+#define INT_SRC_MCI0          7
+#define INT_SRC_MCI1          8
+#define INT_SRC_AUDIO         9
+#define INT_SRC_SSP           10
+#define INT_SRC_I2C_MS        11
+#define INT_SRC_I2C_AUDIO     12
+#define INT_SRC_I2SIN         13
+#define INT_SRC_I2SOUT        14
+#define INT_SRC_UART          15
+#define INT_SRC_GPIOD         16
+/* 17 reserved */
+#define INT_SRC_CGU           18
+#define INT_SRC_MEMORY_STICK  19
+#define INT_SRC_DBOP          20
+/* 21-28 reserved */
+#define INT_SRC_GPIOA         29
+#define INT_SRC_GPIOB         30
+#define INT_SRC_GPIOC         31
+
+/* Interrupt sources bitmask */
 #define INTERRUPT_WATCHDOG      (1<<0)
 #define INTERRUPT_TIMER1        (1<<1)
 #define INTERRUPT_TIMER2        (1<<2)
