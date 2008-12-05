@@ -357,7 +357,7 @@ void timer_unregister(void)
     irq_disable_int(IRQ_TIMER1);
 #elif CONFIG_CPU == AS3525
     TIMER1_CONTROL &= 0x10; /* disable timer 1 (don't modify bit 4) */
-    VIC_INT_EN_CLEAR |= INTERRUPT_TIMER1;  /* disable interrupt */
+    VIC_INT_EN_CLEAR = INTERRUPT_TIMER1;  /* disable interrupt */
     CGU_PERI &= ~CGU_TIMER1_CLOCK_ENABLE;   /* disable peripheral */
 #elif CONFIG_CPU == S3C2440 || CONFIG_CPU == DM320
     __TIMER_UNREGISTER();
