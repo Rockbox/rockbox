@@ -182,12 +182,10 @@ void lcd_init_device(void)
     ams3525_dbop_init();
 
     GPIOA_DIR |= 0x33; /* pins 5:4 and 1:0 out */
-    GPIOB_DIR |= 0x40; /* pin 6 out */
 
     GPIOA_PIN(1) = (1<<1);
     GPIOA_PIN(0) = (1<<0);
     GPIOA_PIN(4) = 0;
-    GPIOB_PIN(6) = (1<<6);
 
     /* Set display clock (divide ratio = 1) and oscillator frequency (1) */
     lcd_write_command(LCD_SET_DISPLAY_CLOCK_AND_OSC_FREQ);
