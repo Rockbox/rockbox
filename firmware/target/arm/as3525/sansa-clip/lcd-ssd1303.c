@@ -82,6 +82,8 @@ static void ams3525_dbop_init(void)
 
 void lcd_write_command(int byte)
 {
+    volatile int i = 0;
+    while(i<1) i++;
     /* unset D/C# (data or command) */
     GPIOA_PIN(5) = 0;
 
@@ -96,6 +98,8 @@ void lcd_write_command(int byte)
 
 void lcd_write_data(const fb_data* p_bytes, int count)
 {
+    volatile int i = 0;
+    while(i<1) i++;
     /* set D/C# (data or command) */
     GPIOA_PIN(5) = (1<<5);
 
