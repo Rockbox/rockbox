@@ -24,7 +24,7 @@
 #include "timer.h"
 #include "thread.h"
 
-void tick_start(unsigned int interval_in_ms)
+static inline void tick_set(unsigned int interval_in_ms)
 {
     /*
      * Based on default PCLK of 49.1568MHz - scaling chosen to give
@@ -49,6 +49,12 @@ void tick_start(unsigned int interval_in_ms)
     TCON |= 1 << 21;
     /* reset manual bit */
     TCON &= ~(1 << 21);
+}
+
+void tick_start(unsigned int interval_in_ms)
+{
+    tick_set(interval_in_ms);
+
     /* interval mode */
     TCON |= 1 << 22;
     /* start timer 4 */
@@ -57,6 +63,26 @@ void tick_start(unsigned int interval_in_ms)
     /* timer 4 unmask interrupts */
     INTMSK &= ~TIMER4_MASK;
 }
+
+#ifdef BOOTLOADER
+void delay(int ticks)
+{
+    volatile unsigned long counter;
+
+    INTMSK |= TIMER4_MASK;
+
+    tick_set(1000 * ticks / HZ);
+
+    /* autoreload Off */
+    TCON &= ~(1 << 22);
+    /* start timer 4 */
+    TCON |= (1 << 20);
+
+    do {
+        counter = TCNTO4;
+    } while(counter > 0);
+}
+#endif /* BOOTLOADER */
 
 void TIMER4(void)
 {

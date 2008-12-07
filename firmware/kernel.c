@@ -245,19 +245,8 @@ void timeout_register(struct timeout *tmo, timeout_cb_type callback,
 void sleep(int ticks)
 {
 #if CONFIG_CPU == S3C2440 && defined(BOOTLOADER)
-    volatile int counter;
-    TCON &= ~(1 << 20); // stop timer 4
-    // TODO: this constant depends on dividers settings inherited from
-    // firmware. Set them explicitly somwhere.
-    TCNTB4 = 12193 * ticks / HZ;
-    TCON |= 1 << 21; // set manual bit
-    TCON &= ~(1 << 21); // reset manual bit
-    TCON &= ~(1 << 22); //autoreload Off
-    TCON |= (1 << 20); // start timer 4
-    do {
-       counter = TCNTO4;
-    } while(counter > 0);
-
+    extern void delay(int ticks);
+    delay(ticks);
 #elif defined(CPU_PP) && defined(BOOTLOADER)
     unsigned stop = USEC_TIMER + ticks * (1000000/HZ);
     while (TIME_BEFORE(USEC_TIMER, stop))
