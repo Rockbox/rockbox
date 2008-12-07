@@ -2116,7 +2116,7 @@ fi
           manualdev="recorderv2fm"
           ;;
       h1??)
-          manualdev="h1xx"
+          manualdev="h100"
           ;;
       ipodmini2g)
           manualdev="ipodmini"

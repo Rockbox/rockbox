@@ -319,7 +319,7 @@ structure that Rockbox needs.}
 
 \opt{swcodec}{
   \subsubsection{Installing the bootloader}
-  \opt{h1xx,h300}{\input{getting_started/iriver_install.tex}}
+  \opt{h100,h300}{\input{getting_started/iriver_install.tex}}
   \opt{ipod}{\input{getting_started/ipod_install.tex}}
   \opt{m5,x5}{\input{getting_started/iaudio_install.tex}}
   \opt{h10,h10_5gb}{\input{getting_started/h10_install.tex}}
@@ -387,7 +387,7 @@ You can uninstall Rockbox automatically by using Rockbox Utility. If you
 installed Rockbox manually you can still use Rockbox Utility for uninstallation
 but will not be able to do this selectively.
 
-\opt{h1xx,h300}{\note{Rockbox Utility cannot uninstall the bootloader due to
+\opt{h100,h300}{\note{Rockbox Utility cannot uninstall the bootloader due to
 the fact that it requires a flashing procedure. To uninstall the bootloader
 completely follow the manual uninstallation instructions below.}}
 
@@ -439,7 +439,7 @@ completely follow the manual uninstallation instructions below.}}
   and insert the charger. The original firmware will automatically be flashed.
 }
 
-\opt{h1xx,h300}{
+\opt{h100,h300}{
   \note{
     If you want to remove the Rockbox bootloader, simply flash an unpatched
     \playerman{} firmware. Be aware that doing so will also remove the bootloader
@@ -447,7 +447,7 @@ completely follow the manual uninstallation instructions below.}}
     having disk errors) it is recommended to keep the bootloader. It also
     gives you the possibility of trying Rockbox anytime later by simply
     installing the distribution files.
-    \opt{h1xx}{
+    \opt{h100}{
       The Rockbox bootloader will automatically start the original firmware if
       the \fname{.rockbox} directory has been deleted.
     }%
