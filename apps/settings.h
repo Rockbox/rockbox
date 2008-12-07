@@ -248,6 +248,7 @@ enum optiontype { INT, BOOL };
 
 const struct settings_list* find_setting(const void* variable, int *id);
 bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len);
+bool cfg_to_string(int setting_id, char* buf, int buf_len);
 bool set_bool_options(const char* string, const bool* variable,
                       const char* yes_str, int yes_voice,
                       const char* no_str, int no_voice,

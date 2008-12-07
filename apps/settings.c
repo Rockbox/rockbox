@@ -416,6 +416,63 @@ bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
     return true;
 }
 
+bool cfg_to_string(int i/*setting_id*/, char* buf, int buf_len)
+{
+    switch (settings[i].flags&F_T_MASK)
+    {
+        case F_T_CUSTOM:
+            settings[i].custom_setting->write_to_cfg(settings[i].setting,
+                                                     buf, buf_len);
+            break;
+        case F_T_INT:
+        case F_T_UINT:
+#ifdef HAVE_LCD_COLOR
+            if (settings[i].flags&F_RGB)
+            {
+                int colour = *(int*)settings[i].setting;
+                snprintf(buf,buf_len,"%02x%02x%02x",
+                            (int)RGB_UNPACK_RED(colour),
+                            (int)RGB_UNPACK_GREEN(colour),
+                            (int)RGB_UNPACK_BLUE(colour));
+            }
+            else
+#endif
+            if (settings[i].cfg_vals == NULL)
+            {
+                snprintf(buf,buf_len,"%d",*(int*)settings[i].setting);
+            }
+            else
+            {
+                if (cfg_int_to_string(i, *(int*)settings[i].setting,
+                                    buf, buf_len) == false)
+                {
+                    snprintf(buf,buf_len,"%d",*(int*)settings[i].setting);
+                }
+                else
+                    return false;
+            }
+            break;
+        case F_T_BOOL:
+            cfg_int_to_string(i,
+                    *(bool*)settings[i].setting==false?0:1, buf, buf_len);
+            break;
+        case F_T_CHARPTR:
+        case F_T_UCHARPTR:
+            if (((char*)settings[i].setting)[0]
+                && settings[i].filename_setting->prefix)
+            {
+                snprintf(buf,buf_len,"%s%s%s",
+                    settings[i].filename_setting->prefix,
+                    (char*)settings[i].setting,
+                    settings[i].filename_setting->suffix);
+            }
+            else strncpy(buf,(char*)settings[i].setting,
+                         settings[i].filename_setting->max_len);
+            break;
+    } /* switch () */
+    return true;
+}
+
 
 static bool is_changed(int setting_id)
 {
@@ -503,56 +560,8 @@ static bool settings_write_config(const char* filename, int options)
                 break;
 #endif
         }
-        switch (settings[i].flags&F_T_MASK)
-        {
-            case F_T_CUSTOM:
-                settings[i].custom_setting->write_to_cfg(settings[i].setting,
-                                                          value, MAX_PATH);
-                break;
-            case F_T_INT:
-            case F_T_UINT:
-#ifdef HAVE_LCD_COLOR
-                if (settings[i].flags&F_RGB)
-                {
-                    int colour = *(int*)settings[i].setting;
-                    snprintf(value,MAX_PATH,"%02x%02x%02x",
-                                (int)RGB_UNPACK_RED(colour),
-                                (int)RGB_UNPACK_GREEN(colour),
-                                (int)RGB_UNPACK_BLUE(colour));
-                }
-                else 
-#endif
-                if (settings[i].cfg_vals == NULL)
-                {
-                    snprintf(value,MAX_PATH,"%d",*(int*)settings[i].setting);
-                }
-                else
-                {
-                    if (cfg_int_to_string(i, *(int*)settings[i].setting,
-                                        value, MAX_PATH) == false)
-                    {
-                        snprintf(value,MAX_PATH,"%d",*(int*)settings[i].setting);
-                    }
-                }
-                break;
-            case F_T_BOOL:
-                cfg_int_to_string(i,
-                        *(bool*)settings[i].setting==false?0:1, value, MAX_PATH);
-                break;
-            case F_T_CHARPTR:
-            case F_T_UCHARPTR:
-                if (((char*)settings[i].setting)[0]
-                    && settings[i].filename_setting->prefix)
-                {
-                    snprintf(value,MAX_PATH,"%s%s%s",
-                        settings[i].filename_setting->prefix,
-                        (char*)settings[i].setting,
-                        settings[i].filename_setting->suffix);
-                }
-                else strncpy(value,(char*)settings[i].setting,
-                                settings[i].filename_setting->max_len);
-                break;
-        } /* switch () */
+
+        cfg_to_string(i, value, MAX_PATH);
         fdprintf(fd,"%s: %s\r\n",settings[i].cfg_name,value);
     } /* for(...) */
     close(fd);
