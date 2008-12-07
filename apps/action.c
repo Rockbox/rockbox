@@ -130,7 +130,7 @@ static int get_action_worker(int context, int timeout,
     /* Produce keyclick */
     if (global_settings.keyclick && !(button & BUTTON_REL))
         if (!(button & BUTTON_REPEAT) || global_settings.keyclick_repeats)
-            pcmbuf_beep(5000, 2, 2500*global_settings.keyclick);
+            pcmbuf_beep(4000, 2, 2500*global_settings.keyclick);
 #endif
 
     if ((context != last_context) && ((last_button & BUTTON_REL) == 0))

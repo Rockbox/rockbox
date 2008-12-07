@@ -32,18 +32,18 @@ void tick_start(unsigned int interval_in_ms)
      * Timer input clock frequency =
      *      fPCLK / {prescaler value+1} / {divider value}
      * TIMER_FREQ = 49156800 / 2
-     * 13300 = TIMER_FREQ / 231 / 8
-     * 49156800 = 19*(11)*(7)*7*5*5*(3)*2*2*2*2*2*2
-     * 231 = 11*7*3
+     * 146300 = TIMER_FREQ / 21 / 8
+     * 49156800 = 19*11*(7)*7*5*5*(3)*2*2*2*2*2*2
+     * 21 = 7*3
      */
 
     /* stop timer 4 */
     TCON &= ~(1 << 20);
     /* Set the count for timer 4 */
-    TCNTB4 = (TIMER_FREQ / 231 / 8) * interval_in_ms / 1000;
+    TCNTB4 = (TIMER_FREQ / TIMER234_PRESCALE / 8) * interval_in_ms / 1000;
     /* Set the the prescaler value for timers 2,3, and 4 */
-    TCFG0 = (TCFG0 & ~0xff00) | ((231-1) << 8);
-    /* MUX4 = 1/16 */
+    TCFG0 = (TCFG0 & ~0xff00) | ((TIMER234_PRESCALE-1) << 8);
+    /* DMA mode off, MUX4 = 1/16 */
     TCFG1 = (TCFG1 & ~0xff0000) | 0x030000;
     /* set manual bit */
     TCON |= 1 << 21;

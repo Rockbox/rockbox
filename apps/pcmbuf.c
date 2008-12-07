@@ -954,14 +954,15 @@ bool pcmbuf_insert_buffer(char *buf, int count)
 }
 #endif
 
+#ifndef HAVE_HARDWARE_BEEP
 /* Generates a constant square wave sound with a given frequency
    in Hertz for a duration in milliseconds. */
 void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
 {
-    unsigned int count = 0;
-    unsigned int i;
-    unsigned int interval = NATIVE_FREQUENCY / frequency;
-    unsigned int samples = NATIVE_FREQUENCY / 1000 * duration;
+    int i;
+    unsigned int step = 0xffffffffu / NATIVE_FREQUENCY * frequency;
+    int32_t phase = 0;
+    int samples = NATIVE_FREQUENCY / 1000 * duration;
     int32_t sample;
     int16_t *bufstart;
     int16_t *bufptr;
@@ -986,21 +987,17 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
     bufptr = bufstart;
     for (i = 0; i < samples; ++i)
     {
+        int32_t amp = (phase >> 31) ^ (int32_t)amplitude;
         sample = mix ? *bufptr : 0;
-        *bufptr++ = clip_sample_16(sample + amplitude);
-        if (bufptr > pcmbuf_end)
+        *bufptr++ = clip_sample_16(sample + amp);
+        if (bufptr >= pcmbuf_end)
             bufptr = (int16_t *)audiobuffer;
         sample = mix ? *bufptr : 0;
-        *bufptr++ = clip_sample_16(sample + amplitude);
-        if (bufptr > pcmbuf_end)
+        *bufptr++ = clip_sample_16(sample + amp);
+        if (bufptr >= pcmbuf_end)
             bufptr = (int16_t *)audiobuffer;
 
-        /* Toggle square wave edge */
-        if (++count >= interval)
-        {
-            count = 0;
-            amplitude = -amplitude;
-        }
+        phase += step;
     }
 
     /* Kick off playback if required */
@@ -1009,7 +1006,7 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
         pcm_play_data(NULL, (unsigned char *)bufstart, samples * 4);
     }
 }
-
+#endif /* HAVE_HARDWARE_BEEP */
 
 /* Returns pcm buffer usage in percents (0 to 100). */
 int pcmbuf_usage(void)

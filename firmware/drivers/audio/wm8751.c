@@ -152,6 +152,17 @@ void audiohw_postinit(void)
     wmcodec_write(LEFTMIX1, LEFTMIX1_LD2LO | LEFTMIX1_LI2LO_DEFAULT);
     wmcodec_write(RIGHTMIX2, RIGHTMIX2_RD2RO | RIGHTMIX2_RI2RO_DEFAULT);
 
+#ifdef TOSHIBA_GIGABEAT_F
+#ifdef HAVE_HARDWARE_BEEP
+    /* Single-ended mono input */
+    wmcodec_write(MONOMIX1, 0);
+
+    /* Route mono input to both outputs at 0dB */
+    wmcodec_write(LEFTMIX2, LEFTMIX2_MI2LO | LEFTMIX2_MI2LOVOL(2));
+    wmcodec_write(RIGHTMIX1, RIGHTMIX1_MI2RO | RIGHTMIX1_MI2ROVOL(2));
+#endif
+#endif
+
     audiohw_mute(false);
 
 #ifdef MROBE_100

@@ -23,6 +23,7 @@
 
 /* timer is based on PCLK and minimum division is 2 */
 #define TIMER_FREQ (49156800/2)
+#define TIMER234_PRESCALE 21
 
 bool __timer_set(long cycles, bool set);
 bool __timer_register(void);

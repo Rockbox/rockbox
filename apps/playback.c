@@ -694,7 +694,7 @@ static void audio_skip(int direction)
     if (playlist_check(ci.new_track + wps_offset + direction))
     {
         if (global_settings.beep)
-            pcmbuf_beep(5000, 100, 2500*global_settings.beep);
+            pcmbuf_beep(2000, 100, 2500*global_settings.beep);
 
         LOGFQUEUE("audio > audio Q_AUDIO_SKIP %d", direction);
         queue_post(&audio_queue, Q_AUDIO_SKIP, direction);
@@ -706,7 +706,7 @@ static void audio_skip(int direction)
     {
         /* No more tracks. */
         if (global_settings.beep)
-            pcmbuf_beep(1000, 100, 1000*global_settings.beep);
+            pcmbuf_beep(1000, 100, 1500*global_settings.beep);
     }
 }
 
