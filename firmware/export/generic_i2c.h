@@ -47,7 +47,7 @@ struct i2c_interface
     void (*delay_thigh)(void);  /* SCL high period (tHIGH)     4.0us/0.6us */
 };
 
-extern void i2c_add_node(struct i2c_interface *iface);
+extern int i2c_add_node(struct i2c_interface *iface);
 extern int i2c_write_data(int bus_address, int address,
                           const unsigned char* buf, int count);
 extern int i2c_read_data(int bus_address, int address,
