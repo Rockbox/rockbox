@@ -56,6 +56,7 @@
 
 #include "gwps.h"
 #include "settings.h"
+#include "settings_list.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
@@ -136,6 +137,8 @@ static int parse_timeout(const char *wps_bufptr,
 static int parse_progressbar(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_dir_level(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data);
+static int parse_setting(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 
 #ifdef HAVE_LCD_BITMAP
@@ -341,6 +344,8 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_IMAGE_BACKDROP,           "X",   0,    parse_image_special },
 #endif
 #endif
+
+    { WPS_TOKEN_SETTING,                  "St",  WPS_REFRESH_DYNAMIC, parse_setting },
 
     { WPS_TOKEN_UNKNOWN,                  "",    0, NULL }
     /* the array MUST end with an empty string (first char is \0) */
@@ -724,6 +729,39 @@ static int parse_viewport(const char *wps_bufptr,
 
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr);
+}
+
+static int parse_setting(const char *wps_bufptr,
+                         struct wps_token *token,
+                         struct wps_data *wps_data)
+{
+    (void)wps_data;
+    const char *ptr = wps_bufptr;
+    const char *end;
+    int i;
+
+    /* Find the setting's cfg_name */
+    if (*ptr != '|')
+        return WPS_ERROR_INVALID_PARAM;
+    ptr++;
+    end = strchr(ptr,'|');
+    if (!end)
+        return WPS_ERROR_INVALID_PARAM;
+
+    /* Find the setting */
+    for (i=0; i<nb_settings; i++)
+        if (settings[i].cfg_name &&
+            !strncmp(settings[i].cfg_name,ptr,end-ptr) &&
+            /* prevent matches on cfg_name prefixes */
+            strlen(settings[i].cfg_name)==end-ptr) break;
+    if (i == nb_settings)
+        return WPS_ERROR_INVALID_PARAM;
+
+    /* Store the setting number */
+    token->value.i = i;
+
+    /* Skip the rest of the line */
+    return end-ptr+2;
 }
 
 

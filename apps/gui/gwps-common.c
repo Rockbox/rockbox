@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include "system.h"
 #include "settings.h"
+#include "settings_list.h"
 #include "rbunicode.h"
 #include "rtc.h"
 #include "audio.h"
@@ -1402,6 +1403,53 @@ static const char *get_token_value(struct gui_wps *gwps,
                                           token->value.i * TIMEOUT_UNIT))
                 return "v";
             return NULL;
+
+        case WPS_TOKEN_SETTING:
+        {
+            if (intval)
+            {
+                /* Handle contionals */
+                const struct settings_list *s = settings+token->value.i;
+                switch (s->flags&F_T_MASK)
+                {
+                    case F_T_INT:
+                    case F_T_UINT:
+                        if (s->flags&F_RGB)
+                            /* %?St|name|<#000000|#000001|...|#FFFFFF> */
+                            /* shouldn't overflow since colors are stored
+                             * on 16 bits ...
+                             * but this is pretty useless anyway */
+                            *intval = *(int*)s->setting + 1;
+                        else if (s->cfg_vals == NULL)
+                            /* %?St|name|<1st choice|2nd choice|...> */
+                            *intval = (*(int*)s->setting-s->int_setting->min)
+                                      /s->int_setting->step + 1;
+                        else
+                            /* %?St|name|<1st choice|2nd choice|...> */
+                            /* Not sure about this one. cfg_name/vals are
+                             * indexed from 0 right? */
+                            *intval = *(int*)s->setting + 1;
+                        break;
+                    case F_T_BOOL:
+                        /* %?St|name|<if true|if false> */
+                        *intval = *(bool*)s->setting?1:2;
+                        break;
+                    case F_T_CHARPTR:
+                        /* %?St|name|<if non empty string|if empty>
+                         * The string's emptyness discards the setting's
+                         * prefix and suffix */
+                        *intval = ((char*)s->setting)[0]?1:2;
+                        break;
+                    default:
+                        /* This shouldn't happen ... but you never know */
+                        *intval = -1;
+                        break;
+                }
+            }
+            cfg_to_string(token->value.i,buf,buf_size);
+            return buf;
+        }
+
         default:
             return NULL;
     }

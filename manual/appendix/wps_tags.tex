@@ -192,6 +192,15 @@ The example above will display the text ``Volume changing'' if the volume is
 being changed and 2.5 secs after the volume button has been released. After
 that, it will display the volume value.
 
+\section{Settings}
+\begin{table}
+  \begin{tagmap}{}{}
+    \config{\%St{\textbar}<setting name>{\textbar}} & Display the value of any Rockbox setting\\
+  \end{tagmap}
+\end{table}
+Example: Can be used as a simple tag \config{\%St{\textbar}skip length{\textbar}} or with conditionals
+\config{\%?St{\textbar}eq enabled{\textbar}{\textless}Equalizer is enabled{\textbar}Equalizer is disabled{\textgreater}}.
+
 \section{Images}
 \begin{table}
   \begin{tagmap}{}{}

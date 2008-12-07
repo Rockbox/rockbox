@@ -292,7 +292,10 @@ enum wps_token_type {
     WPS_VIEWPORT_ENABLE,
 
     /* buttons */
-    WPS_TOKEN_BUTTON_VOLUME
+    WPS_TOKEN_BUTTON_VOLUME,
+
+    /* Setting option */
+    WPS_TOKEN_SETTING,
 };
 
 struct wps_token {
