@@ -753,7 +753,8 @@ static int parse_setting(const char *wps_bufptr,
         if (settings[i].cfg_name &&
             !strncmp(settings[i].cfg_name,ptr,end-ptr) &&
             /* prevent matches on cfg_name prefixes */
-            strlen(settings[i].cfg_name)==end-ptr) break;
+            strlen(settings[i].cfg_name)==(size_t)(end-ptr))
+            break;
     if (i == nb_settings)
         return WPS_ERROR_INVALID_PARAM;
 
