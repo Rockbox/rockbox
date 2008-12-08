@@ -194,8 +194,8 @@ enum minesweeper_status {
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_BACK
-#   define MINESWP_TOGGLE   BUTTON_PLAY
-#   define MINESWP_DISCOVER BUTTON_SELECT
+#   define MINESWP_TOGGLE   BUTTON_SELECT
+#   define MINESWP_DISCOVER BUTTON_PLAY
 #   define MINESWP_INFO     BUTTON_MENU
 
 #else

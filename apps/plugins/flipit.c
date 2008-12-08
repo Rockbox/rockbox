@@ -232,9 +232,9 @@ PLUGIN_HEADER
 #define FLIPIT_DOWN         BUTTON_DOWN
 #define FLIPIT_QUIT         BUTTON_BACK
 #define FLIPIT_SHUFFLE      BUTTON_CUSTOM
-#define FLIPIT_SOLVE        BUTTON_SELECT
+#define FLIPIT_SOLVE        BUTTON_PLAY
 #define FLIPIT_STEP_BY_STEP BUTTON_MENU
-#define FLIPIT_TOGGLE       BUTTON_PLAY
+#define FLIPIT_TOGGLE       BUTTON_SELECT
 
 #else
 #error No keymap defined!

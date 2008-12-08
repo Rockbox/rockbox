@@ -132,7 +132,7 @@ PLUGIN_HEADER
 #define QUIT BUTTON_BACK
 #define LEFT BUTTON_LEFT
 #define RIGHT BUTTON_RIGHT
-#define FIRE BUTTON_PLAY
+#define FIRE BUTTON_SELECT
 
 #else
     #error INVADROX: Unsupported keypad

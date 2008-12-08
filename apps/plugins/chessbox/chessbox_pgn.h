@@ -295,7 +295,6 @@
 #define CB_LEVEL   BUTTON_CUSTOM
 #define CB_MENU    BUTTON_MENU
 
-
 #else
 #error No keymap defined!
 #endif

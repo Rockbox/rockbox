@@ -171,7 +171,7 @@ PLUGIN_HEADER
 #define RIGHT BUTTON_RIGHT
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
-#define PAUSE BUTTON_SELECT
+#define PAUSE BUTTON_PLAY
 
 #else
 #error No keymap defined!

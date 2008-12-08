@@ -163,7 +163,7 @@ PLUGIN_IRAM_DECLARE
 #define BTN_LEFT         BUTTON_LEFT
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
-#define BTN_PLAY         BUTTON_SELECT
+#define BTN_PLAY         BUTTON_PLAY
 
 #else
 #error No keymap defined!

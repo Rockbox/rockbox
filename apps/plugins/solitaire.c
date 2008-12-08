@@ -334,7 +334,7 @@ static const struct plugin_api* rb;
 #   define SOL_REM2CUR      (BUTTON_LEFT | BUTTON_SELECT)
 #   define SOL_CUR2STACK    (BUTTON_SELECT | BUTTON_REPEAT)
 #   define SOL_REM2STACK    (BUTTON_RIGHT | BUTTON_SELECT)
-#   define HK_MOVE         "PLAY"
+#   define HK_MOVE         "MIDDLE"
 #   define HK_DRAW         "MENU"
 #   define HK_REM2CUR      "PLAY+LEFT"
 #   define HK_CUR2STACK    "PLAY.."

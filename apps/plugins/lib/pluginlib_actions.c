@@ -281,8 +281,8 @@ const struct button_mapping generic_left_right_fire[] =
     { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_PLAY,                BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_NONE},
+    { PLA_FIRE,              BUTTON_SELECT,                BUTTON_NONE},
+    { PLA_FIRE_REPEAT,       BUTTON_SELECT|BUTTON_REPEAT,  BUTTON_NONE},
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif
@@ -427,8 +427,8 @@ const struct button_mapping generic_actions[] =
     {PLA_QUIT,          BUTTON_BACK,                   BUTTON_NONE},
     {PLA_START,         BUTTON_PLAY,                    BUTTON_NONE},
     {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_PLAY,                   BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_PLAY|BUTTON_REPEAT,     BUTTON_NONE},
+    {PLA_FIRE,          BUTTON_SELECT,                   BUTTON_NONE},
+    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,     BUTTON_NONE},
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif

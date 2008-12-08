@@ -225,9 +225,9 @@ static void setoptions (void)
         options.DOWN=BUTTON_DOWN;
 
         options.A=BUTTON_CUSTOM;
-        options.B=BUTTON_SELECT;
+        options.B=BUTTON_PLAY;
         options.START=BUTTON_BACK;
-        options.SELECT=BUTTON_PLAY;
+        options.SELECT=BUTTON_SELECT;
         options.MENU=BUTTON_MENU;
 #else
 #error No Keymap Defined!

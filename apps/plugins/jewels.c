@@ -1612,7 +1612,7 @@ static int jewels_main(struct game_context* bj) {
                 rb->lcd_puts(0, 12, "REC to cancel");
 #elif CONFIG_KEYPAD == COWOND2_PAD
                 rb->lcd_puts(0, 11, "POWER to cancel");
-#elif CONFIG_KEYPAD == GIGABEAT_S_PAD || CREATIVEZVM_PAD
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
                 rb->lcd_puts(0, 2, "Swap pairs of jewels to");
                 rb->lcd_puts(0, 3, "form connected segments");
                 rb->lcd_puts(0, 4, "of three or more of the");
@@ -1621,6 +1621,16 @@ static int jewels_main(struct game_context* bj) {
                 rb->lcd_puts(0, 8, "Directions to move");
                 rb->lcd_puts(0, 9, "SELECT to select");
                 rb->lcd_puts(0, 10, "Long SELECT to show menu");
+                rb->lcd_puts(0, 11, "BACK to cancel");
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
+                rb->lcd_puts(0, 3, "form connected segments");
+                rb->lcd_puts(0, 4, "of three or more of the");
+                rb->lcd_puts(0, 5, "same type.");
+                rb->lcd_puts(0, 7, "Controls:");
+                rb->lcd_puts(0, 8, "Directions to move");
+                rb->lcd_puts(0, 9, "MIDDLE to select");
+                rb->lcd_puts(0, 10, "Long MIDDLE to show menu");
                 rb->lcd_puts(0, 11, "BACK to cancel");
 #else
     #warning: missing help text.
