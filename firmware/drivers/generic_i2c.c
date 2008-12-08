@@ -27,8 +27,8 @@
 
 #define MAX_I2C_INTERFACES 5
 
-int i2c_num_ifs = 0;
-struct i2c_interface *i2c_if[MAX_I2C_INTERFACES];
+static int i2c_num_ifs = 0;
+static struct i2c_interface *i2c_if[MAX_I2C_INTERFACES];
 
 static void i2c_start(struct i2c_interface *iface)
 {
@@ -94,14 +94,12 @@ static unsigned char i2c_inb(struct i2c_interface *iface, bool ack)
 
     /* clock in each bit, MSB first */
     for ( i=0x80; i; i>>=1 ) {
-        iface->sda_input();
         iface->scl_hi();
         iface->delay_thigh();
         if (iface->sda())
             byte |= i;
         iface->scl_lo();
         iface->delay_hd_dat();
-        iface->sda_output();
     }
 
     i2c_ack(iface, ack);
@@ -109,7 +107,7 @@ static unsigned char i2c_inb(struct i2c_interface *iface, bool ack)
     return byte;
 }
 
-static void i2c_outb(struct i2c_interface *iface, unsigned char byte)
+static int i2c_outb(struct i2c_interface *iface, unsigned char byte)
 {
     int i;
 
@@ -129,6 +127,8 @@ static void i2c_outb(struct i2c_interface *iface, unsigned char byte)
    }
 
    iface->sda_hi();
+   
+   return i2c_getack(iface);
 }
 
 static struct i2c_interface *find_if(int address)
@@ -152,8 +152,7 @@ int i2c_write_data(int bus_address, int address,
         return -1;
 
     i2c_start(iface);
-    i2c_outb(iface, iface->address & 0xfe);
-    if (!i2c_getack(iface))
+    if (!i2c_outb(iface, iface->address & 0xfe))
     {
         ret = -2;
         goto end;
@@ -161,8 +160,7 @@ int i2c_write_data(int bus_address, int address,
 
     if (address != -1)
     {
-        i2c_outb(iface, address);
-        if (!i2c_getack(iface))
+        if (!i2c_outb(iface, address))
         {
             ret = -3;
             goto end;
@@ -171,8 +169,7 @@ int i2c_write_data(int bus_address, int address,
 
     for(i = 0;i < count;i++)
     {
-        i2c_outb(iface, buf[i]);
-        if (!i2c_getack(iface))
+        if (!i2c_outb(iface, buf[i]))
         {
             ret = -4;
             break;
@@ -196,14 +193,12 @@ int i2c_read_data(int bus_address, int address,
     if (address != -1)
     {
         i2c_start(iface);
-        i2c_outb(iface, iface->address & 0xfe);
-        if (!i2c_getack(iface))
+        if (!i2c_outb(iface, iface->address & 0xfe))
         {
             ret = -2;
             goto end;
         }
-        i2c_outb(iface, address);
-        if (!i2c_getack(iface))
+        if (!i2c_outb(iface, address))
         {
             ret = -3;
             goto end;
@@ -211,8 +206,7 @@ int i2c_read_data(int bus_address, int address,
     }
 
     i2c_start(iface);
-    i2c_outb(iface, iface->address | 1);
-    if (!i2c_getack(iface))
+    if (!i2c_outb(iface, iface->address | 1))
     {
         ret = -4;
         goto end;
