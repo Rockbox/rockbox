@@ -21,6 +21,10 @@
 #ifndef ATA_TARGET_H
 #define ATA_TARGET_H
 
+#ifdef BOOTLOADER
+#define ATA_DRIVER_CLOSE
+#endif
+
 /* Plain C read & write loops */
 #define PREFER_C_READING
 #define PREFER_C_WRITING

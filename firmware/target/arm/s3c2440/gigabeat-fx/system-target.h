@@ -28,6 +28,9 @@
 #define CPUFREQ_NORMAL  98784000
 #define CPUFREQ_MAX    296352000
 
+void system_prepare_fw_start(void);
+void tick_stop(void);
+
 /* Functions to set and clear regiser bits atomically */
 
 /* Set and clear register bits */

@@ -75,11 +75,14 @@ void main(void)
     int(*kernel_entry)(void);
 
     system_init();
+    kernel_init(); /* Need the kernel to sleep */
+
+    enable_interrupt(IRQ_FIQ_STATUS);
+
     lcd_init();
     backlight_init();
     button_init();
     font_init();
-    kernel_init(); /* Need the kernel to sleep */
     adc_init();
 
     lcd_setfont(FONT_SYSFIXED);
@@ -192,6 +195,9 @@ void main(void)
 
     printf("Loading firmware");
 
+    /* Flush out anything pending first */
+    invalidate_icache();
+
     loadbuffer = (unsigned char*) 0x31000000;
     buffer_size = (unsigned char*)0x31400000 - loadbuffer;
 
@@ -199,10 +205,22 @@ void main(void)
     if(rc < 0)
         error(EBOOTFILE, rc);
 
+    storage_close();
+    system_prepare_fw_start();
+
     if (rc == EOK)
     {
+        invalidate_icache();
         kernel_entry = (void*) loadbuffer;
         rc = kernel_entry();
     }
+
+#if 0
+    /* Halt */
+    while (1)
+        core_idle();
+#else
+    /* Return and restart */
+#endif
 }
 

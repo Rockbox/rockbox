@@ -143,6 +143,15 @@ void s3c_regclr32(volatile unsigned long *reg, unsigned long bits)
     s3c_regmod32(reg, 0, bits);
 }
 
+#ifdef BOOTLOADER
+void system_prepare_fw_start(void)
+{
+    tick_stop();
+    disable_interrupt(IRQ_FIQ_STATUS);
+    INTMSK = 0xFFFFFFFF;
+}
+#endif
+
 void system_init(void)
 {
     INTMSK = 0xFFFFFFFF;

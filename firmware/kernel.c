@@ -244,10 +244,7 @@ void timeout_register(struct timeout *tmo, timeout_cb_type callback,
  ****************************************************************************/
 void sleep(int ticks)
 {
-#if CONFIG_CPU == S3C2440 && defined(BOOTLOADER)
-    extern void delay(int ticks);
-    delay(ticks);
-#elif defined(CPU_PP) && defined(BOOTLOADER)
+#if defined(CPU_PP) && defined(BOOTLOADER)
     unsigned stop = USEC_TIMER + ticks * (1000000/HZ);
     while (TIME_BEFORE(USEC_TIMER, stop))
         switch_thread();
@@ -265,7 +262,7 @@ void sleep(int ticks)
 
 void yield(void)
 {
-#if ((CONFIG_CPU == S3C2440 || defined(ELIO_TPJ1022)) && defined(BOOTLOADER))
+#if ((defined(ELIO_TPJ1022)) && defined(BOOTLOADER))
     /* Some targets don't like yielding in the bootloader */
 #else
     switch_thread();
