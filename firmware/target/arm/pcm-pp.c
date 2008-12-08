@@ -112,7 +112,8 @@ void pcm_apply_settings(void)
     audiohw_set_frequency(sr_ctrl);
 #endif
 
-#if defined(HAVE_WM8731) || defined(HAVE_WM8721)
+#if defined(HAVE_WM8711) || defined(HAVE_WM8721) \
+    || defined(HAVE_WM8731)
     audiohw_set_sample_rate(pcm_freq);
 #endif
     pcm_curr_sampr = pcm_freq;

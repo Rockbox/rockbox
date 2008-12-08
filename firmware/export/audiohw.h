@@ -46,9 +46,8 @@
 #include "wm8985.h"
 #elif defined(HAVE_WM8758)
 #include "wm8758.h"
-#elif defined(HAVE_WM8721)
-#include "wm8721.h"
-#elif defined(HAVE_WM8731)
+#elif defined(HAVE_WM8711) || defined(HAVE_WM8721) || \
+      defined(HAVE_WM8731)
 #include "wm8731.h"
 #elif defined(HAVE_TLV320)
 #include "tlv320.h"
