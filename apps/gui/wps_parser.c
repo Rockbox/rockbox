@@ -731,6 +731,36 @@ static int parse_viewport(const char *wps_bufptr,
     return skip_end_of_line(wps_bufptr);
 }
 
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+static int parse_image_special(const char *wps_bufptr,
+                               struct wps_token *token,
+                               struct wps_data *wps_data)
+{
+    (void)wps_data; /* kill warning */
+    (void)token;
+    const char *pos = NULL;
+    const char *newline;
+
+    pos = strchr(wps_bufptr + 1, '|');
+    newline = strchr(wps_bufptr, '\n');
+
+    if (pos > newline)
+        return WPS_ERROR_INVALID_PARAM;
+#if LCD_DEPTH > 1
+    if (token->type == WPS_TOKEN_IMAGE_BACKDROP)
+    {
+        /* format: %X|filename.bmp| */
+        bmp_names[BACKDROP_BMP] = wps_bufptr + 1;
+    }
+#endif
+
+    /* Skip the rest of the line */
+    return skip_end_of_line(wps_bufptr);
+}
+#endif
+
+#endif /* HAVE_LCD_BITMAP */
+
 static int parse_setting(const char *wps_bufptr,
                          struct wps_token *token,
                          struct wps_data *wps_data)
@@ -765,36 +795,6 @@ static int parse_setting(const char *wps_bufptr,
     return end-ptr+2;
 }
 
-
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
-static int parse_image_special(const char *wps_bufptr,
-                               struct wps_token *token,
-                               struct wps_data *wps_data)
-{
-    (void)wps_data; /* kill warning */
-    (void)token;
-    const char *pos = NULL;
-    const char *newline;
-
-    pos = strchr(wps_bufptr + 1, '|');
-    newline = strchr(wps_bufptr, '\n');
-
-    if (pos > newline)
-        return WPS_ERROR_INVALID_PARAM;
-#if LCD_DEPTH > 1
-    if (token->type == WPS_TOKEN_IMAGE_BACKDROP)
-    {
-        /* format: %X|filename.bmp| */
-        bmp_names[BACKDROP_BMP] = wps_bufptr + 1;
-    }
-#endif
-
-    /* Skip the rest of the line */
-    return skip_end_of_line(wps_bufptr);
-}
-#endif
-
-#endif /* HAVE_LCD_BITMAP */
 
 static int parse_dir_level(const char *wps_bufptr,
                            struct wps_token *token,
