@@ -59,6 +59,16 @@ const struct tea5767_region_data tea5767_region_data[TUNER_NUM_REGIONS] =
 };
 #endif /* (CONFIG_TUNER & TEA5767) */
 
+#if (CONFIG_TUNER & SI4700)
+const struct si4700_region_data si4700_region_data[TUNER_NUM_REGIONS] =
+{
+    [REGION_EUROPE]    = { 0, 0, 2 }, /* 50uS, US/Europe band,  50kHz spacing */
+    [REGION_US_CANADA] = { 1, 0, 0 }, /* 75uS, US/Europe band, 200kHz spacing */
+    [REGION_JAPAN]     = { 0, 1, 1 }, /* 50uS, Japanese band,  100kHz spacing */
+    [REGION_KOREA]     = { 0, 0, 1 }, /* 50uS, US/Europe band, 100kHz spacing */
+};
+#endif /* (CONFIG_TUNER & SI4700) */
+
 #ifdef CONFIG_TUNER_MULTI
 int (*tuner_set)(int setting, int value);
 int (*tuner_get)(int setting);
@@ -94,6 +104,12 @@ void tuner_init(void)
         TUNER_TYPE_CASE(S1A0903X01,
                         s1a0903x01_set,
                         s1a0903x01_get)
+    #endif
+    #if (CONFIG_TUNER & SI4700)
+        TUNER_TYPE_CASE(SI4700,
+                        si4700_set,
+                        si4700_get,
+                        si4700_init())
     #endif
     }
 }

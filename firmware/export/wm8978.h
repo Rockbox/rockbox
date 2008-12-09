@@ -30,6 +30,9 @@ int tenthdb2master(int db);
 void audiohw_set_headphone_vol(int vol_l, int vol_r);
 void audiohw_set_frequency(int sampling_control);
 
+void wmc_set(unsigned int reg, unsigned int bits);
+void wmc_clear(unsigned int reg, unsigned int bits);
+
 #define WMC_I2C_ADDR 0x34
 
 /* Registers */

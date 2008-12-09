@@ -23,6 +23,7 @@
 
 #include <stdbool.h>
 #include <sys/types.h>
+#include "config.h"
 /* These must always be included with audio.h for this to compile under
    cetain conditions. Do it here or else spread the complication around to
    many files. */

@@ -144,12 +144,12 @@ static void wmc_write(unsigned int reg, unsigned int val)
     wmcodec_write(reg, val);
 }
 
-static void wmc_set(unsigned int reg, unsigned int bits)
+void wmc_set(unsigned int reg, unsigned int bits)
 {
     wmc_write(reg, wmc_regs[reg] | bits);
 }
 
-static void wmc_clear(unsigned int reg, unsigned int bits)
+void wmc_clear(unsigned int reg, unsigned int bits)
 {
     wmc_write(reg, wmc_regs[reg] & ~bits);
 }
@@ -225,6 +225,14 @@ void audiohw_postinit(void)
     /* 9. Set remaining registers */
     wmc_write(WMC_AUDIO_INTERFACE, WMC_WL_16 | WMC_FMT_I2S);
     wmc_write(WMC_DAC_CONTROL, WMC_DACOSR_128 | WMC_AMUTE);
+
+    wmc_set(WMC_INPUT_CTRL, WMC_R2_2INPPGA | WMC_L2_2INPPGA);
+    wmc_set(WMC_LEFT_INP_PGA_GAIN_CTRL, 0x3f);
+    wmc_set(WMC_RIGHT_INP_PGA_GAIN_CTRL, 0x3f);
+    wmc_set(WMC_LEFT_INP_PGA_GAIN_CTRL, 1<<8);
+    wmc_set(WMC_RIGHT_INP_PGA_GAIN_CTRL, 1<<8);
+    wmc_set(WMC_LEFT_ADC_BOOST_CTRL, (7<<3));
+    wmc_set(WMC_RIGHT_ADC_BOOST_CTRL, (7<<3));
 
     /* Specific to HW clocking */
     wmc_write_masked(WMC_CLOCK_GEN_CTRL, WMC_BCLKDIV_4 | WMC_MS,

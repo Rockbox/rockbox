@@ -69,8 +69,13 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
 
+/* Define this if you have a SI4700 fm radio tuner */
+#define CONFIG_TUNER SI4700
+
 /* Define this if you have the WM8978 audio codec */
 #define HAVE_WM8978
+
+#define INPUT_SRC_CAPS SRC_CAP_FMRADIO
 
 #define HW_SAMPR_CAPS (SAMPR_CAP_48 | SAMPR_CAP_44 | SAMPR_CAP_32 | \
                        SAMPR_CAP_24 | SAMPR_CAP_22 | SAMPR_CAP_16 | \
@@ -114,7 +119,7 @@
 
 /* Define the bitmask of modules used */
 #define SPI_MODULE_MASK (USE_CSPI2_MODULE)
-#define I2C_MODULE_MASK (USE_I2C1_MODULE)
+#define I2C_MODULE_MASK (USE_I2C1_MODULE | USE_I2C2_MODULE)
 #define GPIO_EVENT_MASK (USE_GPIO1_EVENTS)
 
 /* Define this if target has an additional number of threads specific to it */

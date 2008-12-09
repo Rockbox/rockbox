@@ -276,6 +276,22 @@ static const struct button_mapping button_context_keyboard[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
 
+static const struct button_mapping button_context_radio[]  = {
+    { ACTION_FM_MENU,            BUTTON_SELECT | BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_FM_PRESET,          BUTTON_SELECT | BUTTON_REL,     BUTTON_SELECT },
+    { ACTION_FM_STOP,            BUTTON_POWER,                   BUTTON_NONE },
+    { ACTION_FM_MODE,            BUTTON_MENU,                    BUTTON_NONE },
+    { ACTION_FM_EXIT,            BUTTON_BACK,                    BUTTON_NONE },
+    { ACTION_FM_PLAY,            BUTTON_PLAY,                    BUTTON_NONE },
+    { ACTION_SETTINGS_INC,       BUTTON_VOL_UP,                  BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_VOL_DOWN,                BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
+
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+};
+
 const struct button_mapping* get_context_mapping(int context)
 {
     switch (context)
@@ -319,6 +335,8 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_pitchscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
+        case CONTEXT_FM:
+            return button_context_radio;
     }
     return button_context_standard;
 }

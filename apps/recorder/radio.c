@@ -104,13 +104,17 @@
 #define FM_MODE
 #define FM_EXIT
 #define FM_PLAY
+
+#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
+#define FM_PRESET
+#define FM_MODE
 #endif
 
 #define RADIO_SCAN_MODE 0
 #define RADIO_PRESET_MODE 1
 
 static int curr_preset = -1;
-static int curr_freq;
+static int curr_freq; /* current frequency in Hz */
 static int radio_mode = RADIO_SCAN_MODE;
 static int search_dir = 0;
 
