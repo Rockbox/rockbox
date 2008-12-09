@@ -31,57 +31,70 @@
 #include "generic_i2c.h"
 #include "fmradio_i2c.h"
 
+#if     defined(SANSA_CLIP)
+#define I2C_GPIO(x) GPIOB_PIN(x)
+#define I2C_GPIO_DIR GPIOB_DIR
 #define I2C_SCL_PIN 4
 #define I2C_SDA_PIN 5
 
+#elif   defined(SANSA_M200V4)
+#define I2C_GPIO(x) GPIOD_PIN(x)
+#define I2C_GPIO_DIR GPIOD_DIR
+#define I2C_SCL_PIN 7
+#define I2C_SDA_PIN 6
+
+#elif
+#error no FM I2C GPIOPIN defines
+#endif
+
 static void fm_scl_hi(void)
 {
-    GPIOB_PIN(I2C_SCL_PIN) = 1 << I2C_SCL_PIN;
+    I2C_GPIO(I2C_SCL_PIN) = 1 << I2C_SCL_PIN;
 }
 
 static void fm_scl_lo(void)
 {
-    GPIOB_PIN(I2C_SCL_PIN) = 0;
+    I2C_GPIO(I2C_SCL_PIN) = 0;
 }
 
 static void fm_sda_hi(void)
 {
-    GPIOB_PIN(I2C_SDA_PIN) = 1 << I2C_SDA_PIN;
+    I2C_GPIO(I2C_SDA_PIN) = 1 << I2C_SDA_PIN;
 }
 
 static void fm_sda_lo(void)
 {
-    GPIOB_PIN(I2C_SDA_PIN) = 0;
+    I2C_GPIO(I2C_SDA_PIN) = 0;
 }
 
 static void fm_sda_input(void)
 {
-    GPIOB_DIR &= ~(1 << I2C_SDA_PIN);
+    I2C_GPIO_DIR &= ~(1 << I2C_SDA_PIN);
 }
 
 static void fm_sda_output(void)
 {
-    GPIOB_DIR |= 1 << I2C_SDA_PIN;
+    I2C_GPIO_DIR |= 1 << I2C_SDA_PIN;
 }
 
 static void fm_scl_input(void)
 {
-    GPIOB_DIR &= ~(1 << I2C_SCL_PIN);
+    I2C_GPIO_DIR &= ~(1 << I2C_SCL_PIN);
 }
 
 static void fm_scl_output(void)
 {
-    GPIOB_DIR |= 1 << I2C_SCL_PIN;
+    I2C_GPIO_DIR |= 1 << I2C_SCL_PIN;
 }
 
 static int fm_sda(void)
 {
-    return GPIOB_PIN(I2C_SDA_PIN);
+    return I2C_GPIO(I2C_SDA_PIN);
 }
 
 static int fm_scl(void)
 {
-    return GPIOB_PIN(I2C_SCL_PIN);
+    return I2C_GPIO(I2C_SCL_PIN);
 }
 
 /* simple and crude delay, used for all delays in the generic i2c driver */
@@ -96,7 +109,13 @@ static void fm_delay(void)
 
 /* interface towards the generic i2c driver */
 static struct i2c_interface fm_i2c_interface = {
+#if     defined(SANSA_CLIP)
     .address = 0x10 << 1,
+#elif   defined(SANSA_M200V4)
+    .address = 0xC0,
+#elif
+#error no fm i2c address defined
+#endif
     
     .scl_hi = fm_scl_hi,
     .scl_lo = fm_scl_lo,
