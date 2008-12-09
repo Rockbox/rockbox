@@ -27,10 +27,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
     .align      2
 
-    .global     predictor_decode_stereo
-    .type       predictor_decode_stereo,%function
-
-
 /* NOTE: The following need to be kept in sync with parser.h */
 
 #define YDELAYA        200
@@ -89,6 +85,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
     str     \reg2, [\base, \offset+4]
 #endif
 .endm
+
+    .global     predictor_decode_stereo
+    .type       predictor_decode_stereo,%function
 
 @ Register usage:
 @
@@ -221,8 +220,8 @@ loop:
     @ r2 contains decoded0
     @ r3 contains *decoded0
 
-    @ r6, r7, r8, r9, r11 contain p->YcoeffsB[0..4]
-    @ r5, r10 contain p->buf[YADAPTCOEFFSB-1] and p->buf[YADAPTCOEFFSB]
+    @ r5, r6, r7, r8, r9 contain p->YcoeffsB[0..4]
+    @ r10, r11 contain p->buf[YADAPTCOEFFSB-1] and p->buf[YADAPTCOEFFSB]
 
     str     r1, [r2], #4            @ *(decoded0++) := r1  (p->YfilterA)
     str     r2, [sp]                @ save decoded0
@@ -407,8 +406,8 @@ loop:
     @ r2 contains decoded1
     @ r3 contains *decoded1
 
-    @ r6, r7, r8, r9, r11 contain p->XcoeffsB[0..4]
-    @ r5, r10 contain p->buf[XADAPTCOEFFSB-1] and p->buf[XADAPTCOEFFSB]
+    @ r5, r6, r7, r8, r9 contain p->XcoeffsB[0..4]
+    @ r10, r11 contain p->buf[XADAPTCOEFFSB-1] and p->buf[XADAPTCOEFFSB]
 
     str     r1, [r2], #4            @ *(decoded1++) := r1  (p->XfilterA)
     str     r2, [sp, #4]            @ save decoded1
@@ -533,3 +532,163 @@ move_hist:
     bne     loop
     
     b       done
+    .size   predictor_decode_stereo, .-predictor_decode_stereo
+
+    .global     predictor_decode_mono
+    .type       predictor_decode_mono,%function
+
+@ Register usage:
+@
+@ r0-r11 - scratch
+@ r12 - struct predictor_t* p
+@ r14 - int32_t* p->buf
+
+@ void predictor_decode_mono(struct predictor_t* p,
+@                            int32_t* decoded0,
+@                            int count)
+
+predictor_decode_mono:
+    stmdb   sp!, {r1, r2, r4-r11, lr}
+
+    @ r1 (decoded0) is [sp]
+    @ r2 (count)    is [sp, #4]
+
+    mov     r12, r0         @ r12 := p
+    ldr     r14, [r0]       @ r14 := p->buf
+    
+loopm:
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@ PREDICTOR
+
+    ldr     r11, [r12, #YlastA]     @ r11 := p->YlastA
+
+    add     r2, r14, #YDELAYA-12    @ r2 := &p->buf[YDELAYA-3]
+    ldmia   r2, {r2, r3, r10}       @ r2 := p->buf[YDELAYA-3]
+                                    @ r3 := p->buf[YDELAYA-2]
+                                    @ r10 := p->buf[YDELAYA-1]
+
+    add     r5, r12, #YcoeffsA      @ r5 := &p->YcoeffsA[0]
+    ldmia   r5, {r6 - r9}           @ r6 := p->YcoeffsA[0]
+                                    @ r7 := p->YcoeffsA[1]
+                                    @ r8 := p->YcoeffsA[2]
+                                    @ r9 := p->YcoeffsA[3]
+
+    subs    r10, r11, r10           @ r10 := r11 - r10
+
+    STR2OFS r10, r11, r14, #YDELAYA-4
+                                    @ p->buf[YDELAYA-1] = r10
+                                    @ p->buf[YDELAYA] = r11
+
+    mul     r0, r11, r6             @ r0 := p->buf[YDELAYA] * p->YcoeffsA[0]
+    mla     r0, r10, r7, r0         @ r0 += p->buf[YDELAYA-1] * p->YcoeffsA[1]
+    mla     r0, r3, r8, r0          @ r0 += p->buf[YDELAYA-2] * p->YcoeffsA[2]
+    mla     r0, r2, r9, r0          @ r0 += p->buf[YDELAYA-3] * p->YcoeffsA[3]
+
+    @ flags were set above, in the subs instruction
+    mvngt   r10, #0
+    movlt   r10, #1                 @ r10 := SIGN(r10) (see .c for SIGN macro)
+
+    cmp     r11, #0
+    mvngt   r11, #0
+    movlt   r11, #1                 @ r11 := SIGN(r11) (see .c for SIGN macro)
+
+    STR2OFS r10, r11, r14, #YADAPTCOEFFSA-4
+                                    @ p->buf[YADAPTCOEFFSA-1] := r10
+                                    @ p->buf[YADAPTCOEFFSA] := r11
+
+    ldr     r2, [sp]                @ r2 := decoded0
+    ldr     r4, [r12, #YfilterA]    @ r4 := p->YfilterA
+    ldr     r3, [r2]                @ r3 := *decoded0
+    rsb     r4, r4, r4, lsl #5      @ r4 := r4 * 32 - r4 ( == r4*31)
+    add     r1, r3, r0, asr #10     @ r1 := r3 + (r0 >> 10)
+    str     r1, [r12, #YlastA]      @ p->YlastA := r1
+    add     r1, r1, r4, asr #5      @ r1 := r1 + (r4 >> 5)
+    str     r1, [r12, #YfilterA]    @ p->YfilterA := r1
+
+    @ r1 contains p->YfilterA
+    @ r2 contains decoded0
+    @ r3 contains *decoded0
+
+    @ r6, r7, r8, r9 contain p->YcoeffsA[0..3]
+    @ r10, r11 contain p->buf[YADAPTCOEFFSA-1] and p->buf[YADAPTCOEFFSA]
+
+    str     r1, [r2], #4            @ *(decoded0++) := r1  (p->YfilterA)
+    str     r2, [sp]                @ save decoded0
+    cmp     r3, #0
+    beq     3f
+
+    LDR2OFS r2, r3, r14, #YADAPTCOEFFSA-12
+                                    @ r2 := p->buf[YADAPTCOEFFSA-3]
+                                    @ r3 := p->buf[YADAPTCOEFFSA-2]
+    blt     1f
+
+    @ *decoded0 > 0
+
+    sub     r6, r6, r11     @ r6 := p->YcoeffsA[0] - p->buf[YADAPTCOEFFSA]
+    sub     r7, r7, r10     @ r7 := p->YcoeffsA[1] - p->buf[YADAPTCOEFFSA-1]
+    sub     r9, r9, r2      @ r9 := p->YcoeffsA[3] - p->buf[YADAPTCOEFFSA-3]
+    sub     r8, r8, r3      @ r8 := p->YcoeffsA[2] - p->buf[YADAPTCOEFFSA-2]
+
+    b       2f
+
+1:  @ *decoded0 < 0
+
+    add     r6, r6, r11     @ r6 := p->YcoeffsA[0] + p->buf[YADAPTCOEFFSA]
+    add     r7, r7, r10     @ r7 := p->YcoeffsA[1] + p->buf[YADAPTCOEFFSA-1]
+    add     r9, r9, r2      @ r9 := p->YcoeffsA[3] + p->buf[YADAPTCOEFFSA-3]
+    add     r8, r8, r3      @ r8 := p->YcoeffsA[2] + p->buf[YADAPTCOEFFSA-2]
+    
+2:
+    stmia   r5, {r6 - r9}           @ Save p->YcoeffsA
+
+3:
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@ COMMON
+
+    add     r14, r14, #4                @ p->buf++
+
+    add     r11, r12, #historybuffer    @ r11 := &p->historybuffer[0]
+
+    sub     r10, r14, #PREDICTOR_HISTORY_SIZE*4
+                                       @ r10 := p->buf - PREDICTOR_HISTORY_SIZE
+
+    ldr     r0, [sp, #4]
+    cmp     r10, r11
+    beq     move_histm    @ The history buffer is full, we need to do a memmove
+
+    @ Check loop count
+    subs    r0, r0, #1
+    strne   r0, [sp, #4]
+    bne     loopm
+
+donem:
+    str     r14, [r12]              @ Save value of p->buf
+    add     sp, sp, #8              @ Don't bother restoring r1, r2
+    ldmia   sp!, {r4 - r11, pc}
+
+move_histm:
+    @ dest = r11 (p->historybuffer)
+    @ src = r14 (p->buf)
+    @ n = 200
+
+    ldmia   r14!, {r0-r9}    @ 40 bytes
+    stmia   r11!, {r0-r9}
+    ldmia   r14!, {r0-r9}    @ 40 bytes
+    stmia   r11!, {r0-r9}
+    ldmia   r14!, {r0-r9}    @ 40 bytes
+    stmia   r11!, {r0-r9}
+    ldmia   r14!, {r0-r9}    @ 40 bytes
+    stmia   r11!, {r0-r9}
+    ldmia   r14!, {r0-r9}    @ 40 bytes
+    stmia   r11!, {r0-r9}
+
+    ldr     r0, [sp, #4]
+    add     r14, r12, #historybuffer    @ p->buf = &p->historybuffer[0]
+
+    @ Check loop count
+    subs    r0, r0, #1
+    strne   r0, [sp, #4]
+    bne     loopm
+    
+    b       donem
+    .size   predictor_decode_mono, .-predictor_decode_mono
