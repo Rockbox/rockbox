@@ -1182,9 +1182,9 @@ void shutdown_hw(void)
        shutdown_timeout in power_thread_sleep will force a power off */
     while(storage_disk_is_active())
         sleep(HZ/10);
-#ifndef IAUDIO_X5
+#ifndef HAVE_LCD_COLOR
     lcd_set_contrast(0);
-#endif /* IAUDIO_X5 */
+#endif
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_set_contrast(0);
 #endif
