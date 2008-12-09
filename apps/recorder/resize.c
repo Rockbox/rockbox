@@ -396,10 +396,10 @@ static inline bool scale_nearest(struct bitmap *bm,
     int ixls, xels, iyls, yelsi, oyls, yelso, p;
     struct img_part *cur_part;
 #ifndef HAVE_LCD_COLOR
-    fb_data *dest, *dest_t;
+    fb_data *dest = dest, *dest_t;
 #endif
 #ifdef HAVE_REMOTE_LCD
-    fb_remote_data *rdest, *rdest_t;
+    fb_remote_data *rdest = rdest, *rdest_t;
 #endif
 
     SDEBUGF("scale_nearest sw=%d sh=%d dw=%d dh=%d remote=%d\n", sw, sh, dw,
