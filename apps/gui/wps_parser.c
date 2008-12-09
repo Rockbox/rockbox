@@ -104,7 +104,7 @@ static const char *bmp_names[MAX_BITMAPS];
 
 #endif /* HAVE_LCD_BITMAP */
 
-#ifdef DEBUG
+#if defined(DEBUG) || defined(SIMULATOR)
 /* debugging function */
 extern void print_debug_info(struct wps_data *data, int fail, int line);
 #endif
@@ -1471,7 +1471,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
     /* We have finished with the last viewport, so increment count */
     data->num_viewports++;
 
-#ifdef DEBUG
+#if defined(DEBUG) || defined(SIMULATOR)
     print_debug_info(data, fail, line);
 #endif
 

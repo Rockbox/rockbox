@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-#ifdef DEBUG
+#if defined(DEBUG) || defined(SIMULATOR)
 
 #include <stdio.h>
 #include <string.h>
@@ -638,4 +638,4 @@ void print_debug_info(struct wps_data *data, enum wps_parse_error fail, int line
     }
 }
 
-#endif /* DEBUG */
+#endif /* DEBUG || SIMULATOR */
