@@ -813,6 +813,9 @@ void gui_sync_wps_init(void)
     FOR_NB_SCREENS(i)
     {
         wps_data_init(&wps_datas[i]);
+#ifdef HAVE_ALBUMART
+        wps_datas[i].wps_uses_albumart = 0;
+#endif
 #ifdef HAVE_REMOTE_LCD
         wps_datas[i].remote_wps = (i != 0);
 #endif

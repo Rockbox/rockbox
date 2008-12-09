@@ -47,13 +47,11 @@
 #define WPS_ALBUMART_CHECK          1      /* WPS contains AA conditional tag */
 #define WPS_ALBUMART_LOAD           2      /* WPS contains AA tag */
 
-#define WPS_ALBUMART_ALIGN_RIGHT    WPS_ALIGN_RIGHT    /* x align:   right */
-#define WPS_ALBUMART_ALIGN_CENTER   WPS_ALIGN_CENTER   /* x/y align: center */
-#define WPS_ALBUMART_ALIGN_LEFT     WPS_ALIGN_LEFT     /* x align:   left */
-#define WPS_ALBUMART_ALIGN_TOP      WPS_ALIGN_RIGHT    /* y align:   top */
-#define WPS_ALBUMART_ALIGN_BOTTOM   WPS_ALIGN_LEFT     /* y align:   bottom */
-#define WPS_ALBUMART_INCREASE       8                  /* increase if smaller */
-#define WPS_ALBUMART_DECREASE       16                 /* decrease if larger */
+#define WPS_ALBUMART_ALIGN_RIGHT    1    /* x align:   right */
+#define WPS_ALBUMART_ALIGN_CENTER   2    /* x/y align: center */
+#define WPS_ALBUMART_ALIGN_LEFT     4    /* x align:   left */
+#define WPS_ALBUMART_ALIGN_TOP      1    /* y align:   top */
+#define WPS_ALBUMART_ALIGN_BOTTOM   4    /* y align:   bottom */
 
 #endif /* HAVE_ALBUMART */
 
@@ -382,10 +380,8 @@ struct wps_data
     unsigned char wps_uses_albumart; /* WPS_ALBUMART_NONE, _CHECK, _LOAD */
     short albumart_x;
     short albumart_y;
-    unsigned short albumart_xalign; /* WPS_ALBUMART_ALIGN_LEFT, _CENTER, _RIGHT,
-                                       + .._INCREASE,  + .._DECREASE */
-    unsigned short albumart_yalign; /* WPS_ALBUMART_ALIGN_TOP, _CENTER, _BOTTOM,
-                                       + .._INCREASE,  + .._DECREASE */
+    unsigned char albumart_xalign; /* WPS_ALBUMART_ALIGN_LEFT, _CENTER, _RIGHT */
+    unsigned char albumart_yalign; /* WPS_ALBUMART_ALIGN_TOP, _CENTER, _BOTTOM */
     short albumart_max_width;
     short albumart_max_height;
 

@@ -40,6 +40,8 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear);
 bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
                            char *buf, int buflen);
 
+void get_albumart_size(struct bitmap *bmp);
+
 #endif /* HAVE_ALBUMART */
 
 #endif /* _ALBUMART_H_ */

@@ -969,23 +969,15 @@ static int parse_albumart_load(const char *wps_bufptr,
 {
     const char *_pos, *newline;
     bool parsing;
-    const short xalign_mask = WPS_ALBUMART_ALIGN_LEFT |
-                              WPS_ALBUMART_ALIGN_CENTER |
-                              WPS_ALBUMART_ALIGN_RIGHT;
-    const short yalign_mask = WPS_ALBUMART_ALIGN_TOP |
-                              WPS_ALBUMART_ALIGN_CENTER |
-                              WPS_ALBUMART_ALIGN_BOTTOM;
-
     (void)token; /* silence warning */
 
     /* reset albumart info in wps */
-    wps_data->wps_uses_albumart = WPS_ALBUMART_NONE;
     wps_data->albumart_max_width = -1;
     wps_data->albumart_max_height = -1;
     wps_data->albumart_xalign = WPS_ALBUMART_ALIGN_CENTER; /* default */
     wps_data->albumart_yalign = WPS_ALBUMART_ALIGN_CENTER; /* default */
 
-    /* format: %Cl|x|y|[[l|c|r][d|i|s]mwidth]|[[t|c|b][d|i|s]mheight]| */
+    /* format: %Cl|x|y|[[l|c|r]mwidth]|[[t|c|b]mheight]| */
 
     newline = strchr(wps_bufptr, '\n');
 
@@ -1020,35 +1012,24 @@ static int parse_albumart_load(const char *wps_bufptr,
             case 'l':
             case 'L':
             case '+':
-                wps_data->albumart_xalign =
-                    (wps_data->albumart_xalign & xalign_mask) |
-                    WPS_ALBUMART_ALIGN_LEFT;
+                wps_data->albumart_xalign = WPS_ALBUMART_ALIGN_LEFT;
                 break;
             case 'c':
             case 'C':
-                wps_data->albumart_xalign =
-                    (wps_data->albumart_xalign & xalign_mask) |
-                    WPS_ALBUMART_ALIGN_CENTER;
+                wps_data->albumart_xalign = WPS_ALBUMART_ALIGN_CENTER;
                 break;
             case 'r':
             case 'R':
             case '-':
-                wps_data->albumart_xalign =
-                    (wps_data->albumart_xalign & xalign_mask) |
-                    WPS_ALBUMART_ALIGN_RIGHT;
+                wps_data->albumart_xalign = WPS_ALBUMART_ALIGN_RIGHT;
                 break;
             case 'd':
             case 'D':
-                wps_data->albumart_xalign |= WPS_ALBUMART_DECREASE;
-                break;
             case 'i':
             case 'I':
-                wps_data->albumart_xalign |= WPS_ALBUMART_INCREASE;
-                break;
             case 's':
             case 'S':
-                wps_data->albumart_xalign |=
-                    (WPS_ALBUMART_DECREASE | WPS_ALBUMART_INCREASE);
+                /* simply ignored */
                 break;
             default:
                 parsing = false;
@@ -1080,35 +1061,24 @@ static int parse_albumart_load(const char *wps_bufptr,
             case 't':
             case 'T':
             case '-':
-                wps_data->albumart_yalign =
-                    (wps_data->albumart_yalign & yalign_mask) |
-                    WPS_ALBUMART_ALIGN_TOP;
+                wps_data->albumart_yalign = WPS_ALBUMART_ALIGN_TOP;
                 break;
             case 'c':
             case 'C':
-                wps_data->albumart_yalign =
-                    (wps_data->albumart_yalign & yalign_mask) |
-                    WPS_ALBUMART_ALIGN_CENTER;
+                wps_data->albumart_yalign = WPS_ALBUMART_ALIGN_CENTER;
                 break;
             case 'b':
             case 'B':
             case '+':
-                wps_data->albumart_yalign =
-                    (wps_data->albumart_yalign & yalign_mask) |
-                    WPS_ALBUMART_ALIGN_BOTTOM;
+                wps_data->albumart_yalign = WPS_ALBUMART_ALIGN_BOTTOM;
                 break;
             case 'd':
             case 'D':
-                wps_data->albumart_yalign |= WPS_ALBUMART_DECREASE;
-                break;
             case 'i':
             case 'I':
-                wps_data->albumart_yalign |= WPS_ALBUMART_INCREASE;
-                break;
             case 's':
             case 'S':
-                wps_data->albumart_yalign |=
-                    (WPS_ALBUMART_DECREASE | WPS_ALBUMART_INCREASE);
+                /* simply ignored */
                 break;
             default:
                 parsing = false;
@@ -1524,9 +1494,6 @@ static void wps_reset(struct wps_data *data)
     bool rwps = data->remote_wps; /* remember whether the data is for a RWPS */
 #endif
     memset(data, 0, sizeof(*data));
-#ifdef HAVE_ALBUMART
-    data->wps_uses_albumart = WPS_ALBUMART_NONE;
-#endif
     wps_data_init(data);
 #ifdef HAVE_REMOTE_LCD
     data->remote_wps = rwps;
@@ -1617,6 +1584,14 @@ bool wps_data_load(struct wps_data *wps_data,
                    const char *buf,
                    bool isfile)
 {
+#ifdef HAVE_ALBUMART
+    struct mp3entry *curtrack;
+    long offset;
+    int status;
+    int wps_uses_albumart = wps_data->wps_uses_albumart;
+    int albumart_max_height = wps_data->albumart_max_height;
+    int albumart_max_width = wps_data->albumart_max_width;
+#endif
     if (!wps_data || !buf)
         return false;
 
@@ -1730,6 +1705,21 @@ bool wps_data_load(struct wps_data *wps_data,
         if (!load_wps_bitmaps(wps_data, bmpdir)) {
             wps_reset(wps_data);
             return false;
+        }
+#endif
+#ifdef HAVE_ALBUMART
+        status = audio_status();
+        if (((!wps_uses_albumart && wps_data->wps_uses_albumart) ||
+            (wps_data->wps_uses_albumart &&
+            (albumart_max_height != wps_data->albumart_max_height ||
+            albumart_max_width != wps_data->albumart_max_width))) &&
+            status & AUDIO_STATUS_PLAY)
+        {
+            curtrack = audio_current_track();
+            offset = curtrack->offset;
+            audio_stop();
+            if (!(status & AUDIO_STATUS_PAUSE))
+                audio_play(offset);
         }
 #endif
         return true;

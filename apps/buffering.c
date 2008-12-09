@@ -52,6 +52,9 @@
 #include "bmp.h"
 #include "appevents.h"
 #include "metadata.h"
+#ifdef HAVE_ALBUMART
+#include "albumart.h"
+#endif
 
 #if MEM > 1
 #define GUARD_BUFSIZE   (32*1024)
@@ -852,8 +855,13 @@ static int load_bitmap(int fd)
     bmp->maskdata = NULL;
 #endif
 
-    int free = (int)MIN(buffer_len - BUF_USED, buffer_len - buf_widx);
-    rc = read_bmp_fd(fd, bmp, free, FORMAT_ANY|FORMAT_DITHER);
+    int free = (int)MIN(buffer_len - BUF_USED, buffer_len - buf_widx)
+                               - sizeof(struct bitmap);
+
+    get_albumart_size(bmp);
+
+    rc = read_bmp_fd(fd, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
+                     FORMAT_RESIZE|FORMAT_KEEP_ASPECT);
     return rc + (rc > 0 ? sizeof(struct bitmap) : 0);
 }
 #endif

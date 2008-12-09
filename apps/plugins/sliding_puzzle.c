@@ -249,10 +249,11 @@ static int num_font = FONT_UI;
 static int moves_font = FONT_UI;
 static int moves_y = 0;
 
+#ifdef HAVE_LCD_COLOR
+static unsigned char *img_buf;
+static size_t buf_len;
+#else
 static unsigned char img_buf[IMAGE_WIDTH*IMAGE_HEIGHT*sizeof(fb_data)]
-__attribute__ ((aligned(16)));
-#if LCD_DEPTH>1
-static unsigned char temp_img_buf[LCD_WIDTH*LCD_HEIGHT*sizeof(fb_data)]
 __attribute__ ((aligned(16)));
 #endif
 #ifdef HAVE_ALBUMART
@@ -330,37 +331,22 @@ static bool load_resize_bitmap(void)
         rb->memset(&main_bitmap,0,sizeof(struct bitmap));
         main_bitmap.data = img_buf;
 
-#if LCD_DEPTH>1
-        struct bitmap temp_bitmap;
-        rb->memset(&temp_bitmap,0,sizeof(struct bitmap));
-        temp_bitmap.data = temp_img_buf;
-
         main_bitmap.width = IMAGE_WIDTH;
         main_bitmap.height = IMAGE_HEIGHT;
 
-        rc = rb->read_bmp_file( filename, &temp_bitmap, sizeof(temp_img_buf),
-                                FORMAT_NATIVE );
-        if( rc > 0 )
-        {
-#ifdef HAVE_LCD_COLOR
-            smooth_resize_bitmap( &temp_bitmap, &main_bitmap );
-#else
-            simple_resize_bitmap( &temp_bitmap, &main_bitmap );
+#ifndef HAVE_LCD_COLOR
+        size_t buf_len = sizeof(img_buf);
 #endif
-            puzzle_bmp_ptr = (const fb_data *)img_buf;
-            rb->strcpy( img_buf_path, filename );
-            return true;
-        }
-#else
-        rc = rb->read_bmp_file( filename, &main_bitmap, sizeof(img_buf),
-                                FORMAT_NATIVE );
+
+        rc = rb->read_bmp_file( filename, &main_bitmap,
+                                buf_len,
+                                FORMAT_NATIVE|FORMAT_RESIZE );
         if( rc > 0 )
         {
             puzzle_bmp_ptr = (const fb_data *)img_buf;
             rb->strcpy( img_buf_path, filename );
             return true;
         }
-#endif
     }
 
     /* something must have failed. get_albumart_bmp_path could return
@@ -632,6 +618,13 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     initial_bmp_path=(const char *)parameter;
     picmode = PICMODE_INITIAL_PICTURE;
     img_buf_path[0] = '\0';
+#ifdef HAVE_LCD_COLOR
+    unsigned char *img_buf_end;
+    img_buf = (unsigned char *)(rb->plugin_get_buffer(&buf_len));
+    img_buf_end = img_buf + buf_len;
+    rb->align_buffer(PUN_PTR(void **,&img_buf), buf_len, 16);
+    buf_len = img_buf_end - img_buf;
+#endif
 
     /* If launched as a viewer, just go straight to the game without
        bothering with the splash or instructions page */

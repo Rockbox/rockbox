@@ -297,3 +297,12 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
         gwps->display->set_drawmode(DRMODE_SOLID);
     }
 }
+
+void get_albumart_size(struct bitmap *bmp)
+{
+    /* FIXME: What should we do with albumart on remote? */
+    struct wps_data *data = gui_wps[0].data;
+
+    bmp->width = data->albumart_max_width;
+    bmp->height = data->albumart_max_height;
+}
