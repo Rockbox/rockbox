@@ -1322,7 +1322,11 @@ const struct settings_list settings[] = {
                   getlang_unit_0_is_skip_track, NULL,
                   18, 0,1,2,3,5,7,10,15,20,30,45,60,90,120,180,300,600,900),
     CHOICE_SETTING(0, start_in_screen, LANG_START_SCREEN, 1, 
-                   "start in screen", "previous,root,files,db,wps,menu,"
+                   "start in screen", "previous,root,files,"
+#ifdef HAVE_TAGCACHE 
+                   "db,"
+#endif
+                   "wps,menu,"
 #ifdef HAVE_RECORDING
                    "recording,"
 #endif
@@ -1330,15 +1334,28 @@ const struct settings_list settings[] = {
                    "radio,"
 #endif
                    "bookmarks" ,NULL,
-#if defined(HAVE_RECORDING) && CONFIG_TUNER
+#if defined(HAVE_TAGCACHE)
+  #if defined(HAVE_RECORDING) && CONFIG_TUNER
                    9,
-#elif defined(HAVE_RECORDING) || CONFIG_TUNER /* only one of them */
+  #elif defined(HAVE_RECORDING) || CONFIG_TUNER /* only one of them */
                    8,
-#else 
+  #else
                    7,
+  #endif
+#else
+  #if defined(HAVE_RECORDING) && CONFIG_TUNER
+                   8,
+  #elif defined(HAVE_RECORDING) || CONFIG_TUNER /* only one of them */
+                   7,
+  #else
+                   6,
+  #endif
 #endif
                    ID2P(LANG_PREVIOUS_SCREEN), ID2P(LANG_MAIN_MENU),
-                   ID2P(LANG_DIR_BROWSER), ID2P(LANG_TAGCACHE),
+                   ID2P(LANG_DIR_BROWSER), 
+#ifdef HAVE_TAGCACHE
+                   ID2P(LANG_TAGCACHE),
+#endif
                    ID2P(LANG_RESUME_PLAYBACK), ID2P(LANG_SETTINGS),
 #ifdef HAVE_RECORDING
                    ID2P(LANG_RECORDING),
