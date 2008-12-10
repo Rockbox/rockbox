@@ -170,9 +170,8 @@ static inline int get_fb_width(struct bitmap *bm, bool remote)
 static inline int get_totalsize(struct bitmap *bm, bool remote)
 {
     int sz;
-#if defined(HAVE_REMOTE_LCD) && \
-    (LCD_REMOTE_DEPTH == 2) && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
-    if (remote)
+#ifdef HAVE_REMOTE_LCD
+    if (remote && sizeof(fb_data) != sizeof(fb_remote_data))
         sz = sizeof(fb_remote_data);
     else
 #endif /* LCD_REMOTE_DEPTH / LCD_REMOTE_PIXELFORMAT */
