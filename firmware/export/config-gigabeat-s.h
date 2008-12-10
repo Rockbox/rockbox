@@ -114,7 +114,7 @@
 
 #define CONFIG_CPU IMX31L
 
-/* Define this if you want to use coldfire's i2c interface */
+/* Define this if you want to use imx31l's i2c interface */
 #define CONFIG_I2C I2C_IMX31L
 
 /* Define the bitmask of modules used */
