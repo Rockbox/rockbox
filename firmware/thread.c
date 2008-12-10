@@ -3123,10 +3123,12 @@ void init_threads(void)
         thread->stack = stackbegin;
         thread->stack_size = (uintptr_t)stackend - (uintptr_t)stackbegin;
 #if NUM_CORES > 1  /* This code path will not be run on single core targets */
-        /* Initialize all locking for the slots */
         /* Wait for other processors to finish their inits since create_thread
          * isn't safe to call until the kernel inits are done. The first
-         * threads created in the system must of course be created by CPU. */
+         * threads created in the system must of course be created by CPU.
+         * Another possible approach is to initialize all cores and slots
+         * for each core by CPU, let the remainder proceed in parallel and
+         * signal CPU when all are finished. */
         core_thread_init(CPU);
     } 
     else
