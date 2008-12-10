@@ -144,14 +144,14 @@ static bool scale_h_area(struct bitmap *bm, struct dim *src,
             rgbval1.g += rgbval2.g * mul;
             rgbval1.b += rgbval2.b * mul;
             out_line[ox].r = (accum ? out_line[ox].r : 0) +
-                             (((uint64_t)rgbval1.r + ctx->round) *
-                             ctx->divmul >> 32);
+                             ((rgbval1.r + ctx->round) *
+                             (uint64_t)ctx->divmul >> 32);
             out_line[ox].g = (accum ? out_line[ox].g : 0) +
-                             (((uint64_t)rgbval1.g + ctx->round) *
-                             ctx->divmul >> 32);
+                             ((rgbval1.g + ctx->round) *
+                             (uint64_t)ctx->divmul >> 32);
             out_line[ox].b = (accum ? out_line[ox].b : 0) +
-                             (((uint64_t)rgbval1.b + ctx->round) *
-                             ctx->divmul >> 32);
+                             ((rgbval1.b + ctx->round) *
+                             (uint64_t)ctx->divmul >> 32);
             rgbval1.r = 0;
             rgbval1.g = 0;
             rgbval1.b = 0;
@@ -208,9 +208,9 @@ static bool scale_v_area(struct bitmap *bm, bool dither, struct dim *src,
             for (x = 0; x < 3 *(unsigned int)bm->width; x++)
             {
                 ((uint32_t*)crow1)[x] += mul * ((uint32_t*)crow2)[x];
-                ((uint32_t*)crow1)[x] = (uint64_t)(round +
+                ((uint32_t*)crow1)[x] = (round +
                                         ((uint32_t*)crow1)[x]) *
-                                        divmul >> 32;
+                                        (uint64_t)divmul >> 32;
             }
             pix = row;
             for (x = 0; x < (unsigned int)bm->width; x++)
@@ -289,14 +289,14 @@ static bool scale_h_linear(struct bitmap *bm, struct dim *src,
             rgbinc.b *= src->width - 1;
         }
         out_line[ox].r = (accum ? out_line[ox].r : 0) +
-                         (((uint64_t)rgbval.r + ctx->round) *
-                         ctx->divmul >> 32);
+                         ((rgbval.r + ctx->round) *
+                         (uint64_t)ctx->divmul >> 32);
         out_line[ox].g = (accum ? out_line[ox].g : 0) +
-                         (((uint64_t)rgbval.g + ctx->round) *
-                         ctx->divmul >> 32);
+                         ((rgbval.g + ctx->round) *
+                         (uint64_t)ctx->divmul >> 32);
         out_line[ox].b = (accum ? out_line[ox].b : 0) +
-                         (((uint64_t)rgbval.b + ctx->round) *
-                         ctx->divmul >> 32);
+                         ((rgbval.b + ctx->round) *
+                         (uint64_t)ctx->divmul >> 32);
         rgbval.r += rgbinc.r;
         rgbval.g += rgbinc.g;
         rgbval.b += rgbinc.b;
@@ -349,12 +349,12 @@ static bool scale_v_linear(struct bitmap *bm, bool dither, struct dim *src,
         pix = row;
         for (x = 0; x < (uint32_t)bm->width; x++)
         {
-            p.r = (uint64_t)(crow1[x].r * (bm->height - 1 - iye) +
-                  crow2[x].r * iye + round) * divmul >> 32;
-            p.g = (uint64_t)(crow1[x].g * (bm->height - 1 - iye) +
-                  crow2[x].g * iye + round) * divmul >> 32;
-            p.b = (uint64_t)(crow1[x].b * (bm->height - 1 - iye) +
-                  crow2[x].b * iye + round) * divmul >> 32;
+            p.r = (crow1[x].r * (bm->height - 1 - iye) +
+                  crow2[x].r * iye + round) * (uint64_t)divmul >> 32;
+            p.g = (crow1[x].g * (bm->height - 1 - iye) +
+                  crow2[x].g * iye + round) * (uint64_t)divmul >> 32;
+            p.b = (crow1[x].b * (bm->height - 1 - iye) +
+                  crow2[x].b * iye + round) * (uint64_t)divmul >> 32;
             if (dither)
                 delta = dither_mat(x & 0xf, oy & 0xf);
             p.r = PACKRED(p.r,delta);
