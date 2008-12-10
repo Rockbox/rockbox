@@ -115,7 +115,7 @@ static bool pcmbuf_flush;
 static int codec_thread_priority = PRIORITY_PLAYBACK;
 #endif
 
-extern uintptr_t codec_thread_id;
+extern unsigned int codec_thread_id;
 
 /* Helpful macros for use in conditionals this assumes some of the above
  * static variable names */

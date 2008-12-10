@@ -37,7 +37,7 @@
 
 /***************************************************************************/
 
-extern uintptr_t codec_thread_id;
+extern unsigned int codec_thread_id;
 
 /** General recording state **/
 static bool is_recording;              /* We are recording                 */

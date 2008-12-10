@@ -159,7 +159,7 @@ void mc13783_init(void)
 #ifdef PMIC_DRIVER_CLOSE
 void mc13783_close(void)
 {
-    unsigned int thread_id = mc13783_thread_p;
+    unsigned int thread_id = mc13783_thread_id;
 
     if (thread_id == 0)
         return;

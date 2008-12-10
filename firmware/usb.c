@@ -539,7 +539,7 @@ void usb_start_monitoring(void)
 #ifdef USB_DRIVER_CLOSE
 void usb_close(void)
 {
-    uintptr_t thread = usb_thread_entry;
+    unsigned int thread = usb_thread_entry;
     usb_thread_entry = 0;
 
     if (thread == 0)
