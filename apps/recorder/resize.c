@@ -58,21 +58,28 @@
 #define DEBUGF(...)
 #endif
 
-#ifdef HAVE_LCD_COLOR
-#define PACKRED(r, delta)  ((31 * r + (r >> 3) + delta) >> 8)
-#define PACKGREEN(g, delta) ((63 * g + (g >> 2) + delta) >> 8)
-#define PACKBLUE(b, delta)  ((31 * b + (b >> 3) + delta) >> 8)
+/* All of these scalers use variations of Bresenham's algorithm to convert from
+   their input to output coordinates. The color scalers have the error value
+   shifted so that it is a useful input to the scaling algorithm.
+*/
 
+#ifdef HAVE_LCD_COLOR
+/* dither + pack on channel of RGB565, R an B share a packing macro */
+#define PACKRB(v, delta)  ((31 * v + (v >> 3) + delta) >> 8)
+#define PACKG(g, delta) ((63 * g + (g >> 2) + delta) >> 8)
+
+/* read new img_part unconditionally, return false on failure */
 #define FILL_BUF_INIT(img_part, store_part, args) { \
-    part = store_part(args); \
-    if (part == NULL) \
+    img_part = store_part(args); \
+    if (img_part == NULL) \
         return false; \
 }
 
+/* read new img_part if current one is empty, return false on failure */
 #define FILL_BUF(img_part, store_part, args) { \
-    if (part->len == 0) \
-        part = store_part(args); \
-    if (part == NULL) \
+    if (img_part->len == 0) \
+        img_part = store_part(args); \
+    if (img_part == NULL) \
         return false; \
 }
 
@@ -92,10 +99,12 @@ struct scaler_context {
     void *args;
 };
 
+/* Set up rounding and scale factors for horizontal area scaler */
 static void scale_h_area_setup(struct bitmap *bm, struct dim *src,
                                struct scaler_context *ctx)
 {
     (void) bm;
+/* sum is output value * src->width */
     ctx->divmul = ((src->width - 1 + 0x80000000U) / src->width) << 1;
     ctx->round = (src->width + 1) >> 1;
 }
@@ -107,61 +116,69 @@ static bool scale_h_area(struct bitmap *bm, struct dim *src,
 {
     SDEBUGF("scale_h_area\n");
     unsigned int ix, ox, oxe, mul;
-    struct uint32_rgb rgbval1, rgbval2;
+    struct uint32_rgb rgbvalacc = { 0, 0, 0 }, 
+                      rgbvaltmp = { 0, 0, 0 };
     struct img_part *part;
     FILL_BUF_INIT(part,ctx->store_part,ctx->args);
     ox = 0;
     oxe = 0;
-    rgbval1.r = 0;
-    rgbval1.g = 0;
-    rgbval1.b = 0;
-    rgbval2.r = 0;
-    rgbval2.g = 0;
-    rgbval2.b = 0;
     mul = 0;
     for (ix = 0; ix < (unsigned int)src->width; ix++)
     {
         oxe += bm->width;
+        /* end of current area has been reached */
         if (oxe >= (unsigned int)src->width)
         {
+            /* yield if we haven't since last tick */
             if (ctx->last_tick != current_tick)
             {
                 yield();
                 ctx->last_tick = current_tick;
             }
+            /* "reset" error, which now represents partial coverage of next
+               pixel by the next area
+            */
             oxe -= src->width;
-            rgbval1.r = rgbval1.r * bm->width + rgbval2.r * mul;
-            rgbval1.g = rgbval1.g * bm->width + rgbval2.g * mul;
-            rgbval1.b = rgbval1.b * bm->width + rgbval2.b * mul;
+            /* add saved partial pixel from start of area */
+            rgbvalacc.r = rgbvalacc.r * bm->width + rgbvaltmp.r * mul;
+            rgbvalacc.g = rgbvalacc.g * bm->width + rgbvaltmp.g * mul;
+            rgbvalacc.b = rgbvalacc.b * bm->width + rgbvaltmp.b * mul;
+            /* fill buffer if needed */
             FILL_BUF(part,ctx->store_part,ctx->args);
-            rgbval2.r = part->buf->red;
-            rgbval2.g = part->buf->green;
-            rgbval2.b = part->buf->blue;
+            /* get new pixel , then add its partial coverage to this area */
+            rgbvaltmp.r = part->buf->red;
+            rgbvaltmp.g = part->buf->green;
+            rgbvaltmp.b = part->buf->blue;
             part->buf++;
             part->len--;
             mul = bm->width - oxe;
-            rgbval1.r += rgbval2.r * mul;
-            rgbval1.g += rgbval2.g * mul;
-            rgbval1.b += rgbval2.b * mul;
+            rgbvalacc.r += rgbvaltmp.r * mul;
+            rgbvalacc.g += rgbvaltmp.g * mul;
+            rgbvalacc.b += rgbvaltmp.b * mul;
+            /* round, divide, and either store or accumulate to output row */
             out_line[ox].r = (accum ? out_line[ox].r : 0) +
-                             ((rgbval1.r + ctx->round) *
+                             ((rgbvalacc.r + ctx->round) *
                              (uint64_t)ctx->divmul >> 32);
             out_line[ox].g = (accum ? out_line[ox].g : 0) +
-                             ((rgbval1.g + ctx->round) *
+                             ((rgbvalacc.g + ctx->round) *
                              (uint64_t)ctx->divmul >> 32);
             out_line[ox].b = (accum ? out_line[ox].b : 0) +
-                             ((rgbval1.b + ctx->round) *
+                             ((rgbvalacc.b + ctx->round) *
                              (uint64_t)ctx->divmul >> 32);
-            rgbval1.r = 0;
-            rgbval1.g = 0;
-            rgbval1.b = 0;
+            /* reset accumulator */
+            rgbvalacc.r = 0;
+            rgbvalacc.g = 0;
+            rgbvalacc.b = 0;
             mul = bm->width - mul;
             ox += 1;
+        /* inside an area */
         } else {
+            /* fill buffer if needed */
             FILL_BUF(part,ctx->store_part,ctx->args);
-            rgbval1.r += part->buf->red;
-            rgbval1.g += part->buf->green;
-            rgbval1.b += part->buf->blue;
+            /* add pixel value to accumulator */
+            rgbvalacc.r += part->buf->red;
+            rgbvalacc.g += part->buf->green;
+            rgbvalacc.b += part->buf->blue;
             part->buf++;
             part->len--;
         }
@@ -180,63 +197,80 @@ static bool scale_v_area(struct bitmap *bm, bool dither, struct dim *src,
     uint32_t mul, divmul, x, oy, iy, oye, round;
     int delta = 127, r, g, b;
     fb_data *row, *pix;
+
+    /* Set up rounding and scale factors */
     divmul = ((src->height - 1 + 0x80000000U) / src->height) << 1;
     round = (src->height + 1) >> 1;
     mul = 0;
     oy = 0;
     oye = 0;
-    struct uint32_rgb *crow1 = (struct uint32_rgb *)(ctx->buf),
-                      *crow2 = crow1 + bm->width;
+    struct uint32_rgb *rowacc = (struct uint32_rgb *)(ctx->buf),
+                      *rowtmp = rowacc + bm->width;
 
     SDEBUGF("scale_v_area\n");
+    /* zero the accumulator and temp rows */
     memset((void *)ctx->buf, 0, bm->width * 2 * sizeof(struct uint32_rgb));
-    row = (fb_data *)(bm->data) + bm->width *
-          (rset->rowstep == -1 ? bm->height - 1 : 0);
+    row = (fb_data *)(bm->data) + bm->width * rset->rowstart;
     for (iy = 0; iy < (unsigned int)src->height; iy++)
     {
         oye += bm->height;
+        /* end of current area has been reached */
         if (oye >= (unsigned int)src->height)
         {
+            /* "reset" error, which now represents partial coverage of the next
+               row by the next area
+            */
             oye -= src->height;
+            /* add stored partial row to accumulator */
             for (x = 0; x < 3 *(unsigned int)bm->width; x++)
-                ((uint32_t*)crow1)[x] = ((uint32_t*)crow1)[x] *
+                ((uint32_t*)rowacc)[x] = ((uint32_t*)rowacc)[x] *
                                         bm->height + mul *
-                                        ((uint32_t*)crow2)[x];
-            if(!h_scaler(bm, src, crow2, ctx, false))
-                goto fail;
+                                        ((uint32_t*)rowtmp)[x];
+            /* store new scaled row in temp row */
+            if(!h_scaler(bm, src, rowtmp, ctx, false))
+                return false;
+            /* add partial coverage by new row to this area, then round and
+               scale to final value
+            */
             mul = bm->height - oye;
             for (x = 0; x < 3 *(unsigned int)bm->width; x++)
             {
-                ((uint32_t*)crow1)[x] += mul * ((uint32_t*)crow2)[x];
-                ((uint32_t*)crow1)[x] = (round +
-                                        ((uint32_t*)crow1)[x]) *
+                ((uint32_t*)rowacc)[x] += mul * ((uint32_t*)rowtmp)[x];
+                ((uint32_t*)rowacc)[x] = (round +
+                                        ((uint32_t*)rowacc)[x]) *
                                         (uint64_t)divmul >> 32;
             }
+            /* convert to RGB565 in output bitmap */
             pix = row;
             for (x = 0; x < (unsigned int)bm->width; x++)
             {
                 if (dither)
                     delta = dither_mat(x & 0xf, oy & 0xf);
-                r = PACKRED(crow1[x].r,delta);
-                g = PACKGREEN(crow1[x].g,delta);
-                b = PACKBLUE(crow1[x].b,delta);
+                r = PACKRB(rowacc[x].r,delta);
+                g = PACKG(rowacc[x].g,delta);
+                b = PACKRB(rowacc[x].b,delta);
                 *pix++ = LCD_RGBPACK_LCD(r, g, b);
             }
-            memset((void *)crow1, 0, bm->width * sizeof(struct uint32_rgb));
+            /* clear accumulator row, store partial coverage for next row */
+            memset((void *)rowacc, 0, bm->width * sizeof(struct uint32_rgb));
             mul = oye;
             row += bm->width * rset->rowstep;
             oy += 1;
+        /* inside an area */
         } else {
-            if (!h_scaler(bm, src, crow1, ctx, true))
-                goto fail;
+            /* accumulate new scaled row to rowacc */
+            if (!h_scaler(bm, src, rowacc, ctx, true))
+                return false;
         }
     }
     return true;
-    fail:
-        return false;
 }
 
 #ifdef HAVE_UPSCALER
+/* Set up rounding and scale factors for the horizontal scaler. The divisor
+   is bm->width - 1, so that the first and last pixels in the row align
+   exactly between input and output
+*/
 static void scale_h_linear_setup(struct bitmap *bm, struct dim *src,
                                    struct scaler_context *ctx)
 {
@@ -251,20 +285,29 @@ static bool scale_h_linear(struct bitmap *bm, struct dim *src,
                              struct scaler_context *ctx, bool accum) 
 {
     unsigned int ix, ox, ixe;
+    /* type x = x is an ugly hack for hiding an unitialized data warning. The
+       values are conditionally initialized before use, but other values are
+       set such that this will occur before these are used.
+    */
     struct uint32_rgb rgbval=rgbval, rgbinc=rgbinc;
     struct img_part *part;
     SDEBUGF("scale_h_linear\n");
     FILL_BUF_INIT(part,ctx->store_part,ctx->args);
     ix = 0;
+    /* The error is set so that values are initialized on the first pass. */
     ixe = bm->width - 1;
     for (ox = 0; ox < (uint32_t)bm->width; ox++) {
         if (ixe >= ((uint32_t)bm->width - 1))
         {
+            /* yield once each tick */
             if (ctx->last_tick != current_tick)
             {
                 yield();
                 ctx->last_tick = current_tick;
             }
+            /* Store the new "current" pixel value in rgbval, and the color 
+               step value in rgbinc.
+            */
             ixe -= (bm->width - 1);
             rgbinc.r = -(part->buf->red);
             rgbinc.g = -(part->buf->green);
@@ -273,21 +316,28 @@ static bool scale_h_linear(struct bitmap *bm, struct dim *src,
             rgbval.g = (part->buf->green) * (bm->width - 1);
             rgbval.b = (part->buf->blue) * (bm->width - 1);
             ix += 1;
+            /* If this wasn't the last pixel, add the next one to rgbinc. */
             if (ix < (uint32_t)src->width) {
                 part->buf++;
                 part->len--;
+                /* Fetch new pixels if needed */
                 FILL_BUF(part,ctx->store_part,ctx->args);
                 rgbinc.r += part->buf->red;
                 rgbinc.g += part->buf->green;
                 rgbinc.b += part->buf->blue;
+                /* Add a partial step to rgbval, in this pixel isn't precisely
+                   aligned with the new source pixel
+                */
                 rgbval.r += rgbinc.r * ixe;
                 rgbval.g += rgbinc.g * ixe;
                 rgbval.b += rgbinc.b * ixe;
             }
+            /* Now multiple the color increment to its proper value */
             rgbinc.r *= src->width - 1;
             rgbinc.g *= src->width - 1;
             rgbinc.b *= src->width - 1;
         }
+        /* round and scale values, and accumulate or store to output */
         out_line[ox].r = (accum ? out_line[ox].r : 0) +
                          ((rgbval.r + ctx->round) *
                          (uint64_t)ctx->divmul >> 32);
@@ -317,24 +367,29 @@ static bool scale_v_linear(struct bitmap *bm, bool dither, struct dim *src,
     int delta = 127;
     struct uint32_rgb p;
     fb_data *row, *pix;
+    /* Set up scale and rounding factors, the divisor is bm->height - 1 */
     divmul = ((bm->height - 2 + 0x80000000U) / (bm->height - 1)) << 1;
     round = bm->height >> 1; 
     mul = 0;
     iy = 0;
     iye = bm->height - 1;
+    /* Set up our two temp buffers. The names are generic because they'll be
+       swapped each time a new input row is read
+    */
     struct uint32_rgb *crow1 = (struct uint32_rgb *)(ctx->buf),
                       *crow2 = crow1 + bm->width,
                       *t;
 
     SDEBUGF("scale_v_linear\n");
-    row = (fb_data *)(bm->data) + bm->width *
-          (rset->rowstep == -1 ? bm->height - 1 : 0);
+    row = (fb_data *)(bm->data) + bm->width * rset->rowstart;
+    /* get first scaled row in crow2 */
     if(!h_scaler(bm, src, crow2, ctx, false))
-        goto fail;
+        return false;
     for (oy = 0; oy < (uint32_t)bm->height; oy++)
     {
         if (iye >= (uint32_t)bm->height - 1)
         {
+            /* swap temp rows, then read another row into crow2 */
             t = crow2;
             crow2 = crow1;
             crow1 = t;
@@ -343,35 +398,43 @@ static bool scale_v_linear(struct bitmap *bm, bool dither, struct dim *src,
             if (iy < (uint32_t)src->height)
             {
                 if (!h_scaler(bm, src, crow2, ctx, false))
-                    goto fail;
+                    return false;
             }
         }
         pix = row;
         for (x = 0; x < (uint32_t)bm->width; x++)
         {
+            /* iye and bm-height - 1 - iye represent the contribution of each
+               row to the output. Calculate their weighted sum, then round and
+               scale it.
+            */
             p.r = (crow1[x].r * (bm->height - 1 - iye) +
                   crow2[x].r * iye + round) * (uint64_t)divmul >> 32;
             p.g = (crow1[x].g * (bm->height - 1 - iye) +
                   crow2[x].g * iye + round) * (uint64_t)divmul >> 32;
             p.b = (crow1[x].b * (bm->height - 1 - iye) +
                   crow2[x].b * iye + round) * (uint64_t)divmul >> 32;
+            /* dither and pack pixels to output */
             if (dither)
                 delta = dither_mat(x & 0xf, oy & 0xf);
-            p.r = PACKRED(p.r,delta);
-            p.g = PACKGREEN(p.g,delta);
-            p.b = PACKBLUE(p.b,delta);
+            p.r = PACKRB(p.r,delta);
+            p.g = PACKG(p.g,delta);
+            p.b = PACKRB(p.b,delta);
             *pix++ = LCD_RGBPACK_LCD(p.r, p.g, p.b);
         }
         row += bm->width * rset->rowstep;
         iye += src->height - 1;
     }
     return true;
-    fail:
-        return false;
 }
 #endif /* HAVE_UPSCALER */
 #endif /* HAVE_LCD_COLOR */
 
+/* docs for this are still TODO, but it's Bresenham's again, used to skip or
+   repeat input pixels, and with the *ls values being used for "long steps"
+   that skip all the way, or nearly all the way, to the next transition of
+   the associated value.
+*/
 #if LCD_DEPTH < 8 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH < 8)
 /* nearest-neighbor up/down/non-scaler */
 static inline bool scale_nearest(struct bitmap *bm,
