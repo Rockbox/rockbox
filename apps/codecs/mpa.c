@@ -200,7 +200,7 @@ static void set_elapsed(struct mp3entry* id3)
 static int mad_synth_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)/2] IBSS_ATTR;
 
 static const unsigned char * const mad_synth_thread_name = "mp3dec";
-static struct thread_entry *mad_synth_thread_p;
+static unsigned int mad_synth_thread_id = 0;
 
 
 static void mad_synth_thread(void)
@@ -249,14 +249,14 @@ static bool mad_synth_thread_create(void)
     ci->semaphore_init(&synth_done_sem, 1, 0);
     ci->semaphore_init(&synth_pending_sem, 1, 0);
        
-    mad_synth_thread_p = ci->create_thread(mad_synth_thread, 
+    mad_synth_thread_id = ci->create_thread(mad_synth_thread, 
                             mad_synth_thread_stack,
                             sizeof(mad_synth_thread_stack), 0,
                             mad_synth_thread_name 
                             IF_PRIO(, PRIORITY_PLAYBACK)
                             IF_COP(, COP));
     
-    if (mad_synth_thread_p == NULL)
+    if (mad_synth_thread_id == 0)
         return false;
 
     return true;
@@ -267,7 +267,7 @@ static void mad_synth_thread_quit(void)
     /*mop up COP thread*/
     die=1;
     ci->semaphore_release(&synth_pending_sem);
-    ci->thread_wait(mad_synth_thread_p);
+    ci->thread_wait(mad_synth_thread_id);
     invalidate_icache();
 }
 #else

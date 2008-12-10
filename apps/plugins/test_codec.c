@@ -525,7 +525,7 @@ static enum plugin_status test_track(const char* filename)
     long ticks;
     unsigned long speed;
     unsigned long duration;
-    struct thread_entry* codecthread_id;
+    unsigned int codecthread_id;
     const char* ch;
 
     /* Display filename (excluding any path)*/
@@ -590,7 +590,7 @@ static enum plugin_status test_track(const char* filename)
 
     if ((codecthread_id = rb->create_thread(codec_thread,
             codec_stack, codec_stack_size, 0, "testcodec"
-            IF_PRIO(,PRIORITY_PLAYBACK) IF_COP(, CPU))) == NULL)
+            IF_PRIO(,PRIORITY_PLAYBACK) IF_COP(, CPU))) == 0)
     {
         log_text("Cannot create codec thread!",true);
         goto exit;

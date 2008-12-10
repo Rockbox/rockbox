@@ -732,7 +732,7 @@ bool audio_thread_init(void)
     rb->queue_enable_queue_send(audio_str.hdr.q, &audio_str_queue_send,
                                 audio_str.thread);
 
-    if (audio_str.thread == NULL)
+    if (audio_str.thread == 0)
         return false;
 
     /* Wait for thread to initialize */
@@ -744,11 +744,11 @@ bool audio_thread_init(void)
 /* Stops the audio thread */
 void audio_thread_exit(void)
 {
-    if (audio_str.thread != NULL)
+    if (audio_str.thread != 0)
     {
         str_post_msg(&audio_str, STREAM_QUIT, 0);
         rb->thread_wait(audio_str.thread);
-        audio_str.thread = NULL;
+        audio_str.thread = 0;
     }
 
 #ifndef SIMULATOR

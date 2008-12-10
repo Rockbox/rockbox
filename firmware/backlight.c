@@ -130,7 +130,7 @@ static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue;
 #ifdef BACKLIGHT_DRIVER_CLOSE
-static struct thread_entry *backlight_thread_p = NULL;
+static unsigned int backlight_thread_id = 0;
 #endif
 
 static int backlight_timer SHAREDBSS_ATTR;
@@ -744,7 +744,7 @@ void backlight_init(void)
      * call the appropriate backlight_set_*() functions, only changing light
      * status if necessary. */
 #ifdef BACKLIGHT_DRIVER_CLOSE
-    backlight_thread_p =
+    backlight_thread_id =
 #endif
     create_thread(backlight_thread, backlight_stack,
                   sizeof(backlight_stack), 0, backlight_thread_name
@@ -756,13 +756,13 @@ void backlight_init(void)
 #ifdef BACKLIGHT_DRIVER_CLOSE
 void backlight_close(void)
 {
-    struct thread_entry *thread = backlight_thread_p;
+    unsigned int thread = backlight_thread_id;
 
     /* Wait for thread to exit */
-    if (thread == NULL)
+    if (thread == 0)
         return;
 
-    backlight_thread_p = NULL;
+    backlight_thread_id = 0;
 
     queue_post(&backlight_queue, BACKLIGHT_QUIT, 0);
     thread_wait(thread);

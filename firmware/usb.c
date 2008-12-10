@@ -78,7 +78,7 @@ static int usb_mmc_countdown = 0;
 #ifdef USB_FULL_INIT
 static long usb_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char usb_thread_name[] = "usb";
-static struct thread_entry *usb_thread_entry;
+static unsigned int usb_thread_entry = 0;
 #endif
 static struct event_queue usb_queue;
 static int last_usb_status;
@@ -539,10 +539,10 @@ void usb_start_monitoring(void)
 #ifdef USB_DRIVER_CLOSE
 void usb_close(void)
 {
-    struct thread_entry *thread = usb_thread_entry;
-    usb_thread_entry = NULL;
+    uintptr_t thread = usb_thread_entry;
+    usb_thread_entry = 0;
 
-    if (thread == NULL)
+    if (thread == 0)
         return;
 
     tick_remove_task(usb_tick);

@@ -69,7 +69,7 @@ static const unsigned char pmic_ints_regs[2] =
 
 #ifdef PMIC_DRIVER_CLOSE
 static bool pmic_close = false;
-static struct thread_entry *mc13783_thread_p = NULL;
+static unsigned int mc13783_thread_id = 0;
 #endif
 
 static void mc13783_interrupt_thread(void)
@@ -149,7 +149,7 @@ void mc13783_init(void)
     MC13783_GPIO_ISR = (1ul << MC13783_GPIO_LINE);
 
 #ifdef PMIC_DRIVER_CLOSE
-    mc13783_thread_p =
+    mc13783_thread_id =
 #endif
         create_thread(mc13783_interrupt_thread,
             mc13783_thread_stack, sizeof(mc13783_thread_stack), 0,
@@ -159,16 +159,16 @@ void mc13783_init(void)
 #ifdef PMIC_DRIVER_CLOSE
 void mc13783_close(void)
 {
-    struct thread_entry *thread = mc13783_thread_p;
+    unsigned int thread_id = mc13783_thread_p;
 
-    if (thread == NULL)
+    if (thread_id == 0)
         return;
 
-    mc13783_thread_p = NULL;
+    mc13783_thread_id = 0;
 
     pmic_close = true;
     wakeup_signal(&mc13783_wake);
-    thread_wait(thread);
+    thread_wait(thread_id);
 }
 #endif /* PMIC_DRIVER_CLOSE */
 

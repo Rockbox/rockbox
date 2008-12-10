@@ -218,7 +218,7 @@ struct mutex slide_cache_stack_lock;
 
 static int empty_slide_hid;
 
-struct thread_entry *thread_id;
+unsigned int thread_id;
 struct event_queue thread_q;
 
 static char tmp_path_name[MAX_PATH];
@@ -831,7 +831,7 @@ bool create_pf_thread(void)
                                IF_PRIO(, PRIORITY_BACKGROUND)
                                IF_COP(, CPU)
                                       )
-        ) == NULL) {
+        ) == 0) {
         return false;
     }
     thread_is_running = true;

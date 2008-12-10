@@ -45,7 +45,7 @@ struct stream_hdr
 struct stream
 {
     struct stream_hdr hdr;       /* Base stream data */
-    struct thread_entry *thread; /* Stream's thread */
+    unsigned int thread;         /* Stream's thread */
     uint8_t* curr_packet;        /* Current stream packet beginning */
     uint8_t* curr_packet_end;    /* Current stream packet end */
     struct list_item l;          /* List of streams - either reserve pool

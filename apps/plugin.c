@@ -146,7 +146,8 @@ static const struct plugin_api rockbox_api = {
     font_get_width,
     screen_clear_area,
     gui_scrollbar_draw,
-#endif
+#endif /* HAVE_LCD_BITMAP */
+    get_codepage_name,
 
     backlight_on,
     backlight_off,
@@ -482,6 +483,7 @@ static const struct plugin_api rockbox_api = {
     &statusbars,
     gui_syncstatusbar_draw,
     /* options */
+    get_settings_list,
     find_setting,
     option_screen,
     set_option,
@@ -619,8 +621,6 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    get_settings_list,
-    get_codepage_name,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

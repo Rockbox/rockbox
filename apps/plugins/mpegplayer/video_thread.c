@@ -1009,7 +1009,7 @@ bool video_thread_init(void)
     rb->queue_enable_queue_send(video_str.hdr.q, &video_str_queue_send,
                                 video_str.thread);
 
-    if (video_str.thread == NULL)
+    if (video_str.thread == 0)
         return false;
 
     /* Wait for thread to initialize */
@@ -1022,11 +1022,11 @@ bool video_thread_init(void)
 /* Terminates the video thread */
 void video_thread_exit(void)
 {
-    if (video_str.thread != NULL)
+    if (video_str.thread != 0)
     {
         str_post_msg(&video_str, STREAM_QUIT, 0);
         rb->thread_wait(video_str.thread);
         IF_COP(invalidate_icache());
-        video_str.thread = NULL;
+        video_str.thread = 0;
     }
 }

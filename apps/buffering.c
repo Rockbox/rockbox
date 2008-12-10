@@ -184,7 +184,7 @@ enum {
 static void buffering_thread(void);
 static long buffering_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)];
 static const char buffering_thread_name[] = "buffering";
-static struct thread_entry *buffering_thread_p;
+static unsigned int buffering_thread_id = 0;
 static struct event_queue buffering_queue;
 static struct queue_sender_list buffering_queue_sender_list;
 
@@ -1468,13 +1468,13 @@ void buffering_init(void)
     conf_watermark = BUFFERING_DEFAULT_WATERMARK;
 
     queue_init(&buffering_queue, true);
-    buffering_thread_p = create_thread( buffering_thread, buffering_stack,
+    buffering_thread_id = create_thread( buffering_thread, buffering_stack,
             sizeof(buffering_stack), CREATE_THREAD_FROZEN,
             buffering_thread_name IF_PRIO(, PRIORITY_BUFFERING)
             IF_COP(, CPU));
 
     queue_enable_queue_send(&buffering_queue, &buffering_queue_sender_list,
-                            buffering_thread_p);
+                            buffering_thread_id);
 }
 
 /* Initialise the buffering subsystem */
@@ -1501,7 +1501,7 @@ bool buffering_reset(char *buf, size_t buflen)
     high_watermark = 3*buflen / 4;
 #endif
 
-    thread_thaw(buffering_thread_p);
+    thread_thaw(buffering_thread_id);
 
     return true;
 }

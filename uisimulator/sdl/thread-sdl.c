@@ -93,6 +93,38 @@ void thread_sdl_shutdown(void)
     SDL_DestroyMutex(m);
 }
 
+static void new_thread_id(unsigned int slot_num,
+                          struct thread_entry *thread)
+{
+    unsigned int version =
+        (thread->id + (1u << THREAD_ID_VERSION_SHIFT))
+            & THREAD_ID_VERSION_MASK;
+
+    if (version == 0)
+        version = 1u << THREAD_ID_VERSION_SHIFT;
+
+    thread->id = version | (slot_num & THREAD_ID_SLOT_MASK);
+}
+
+static struct thread_entry * find_empty_thread_slot(void)
+{
+    struct thread_entry *thread = NULL;
+    int n;
+
+    for (n = 0; n < MAXTHREADS; n++)
+    {
+        int state = threads[n].state;
+
+        if (state == STATE_KILLED)
+        {
+            thread = &threads[n];
+            break;
+        }
+    }
+
+    return thread;
+}
+
 /* Do main thread creation in this file scope to avoid the need to double-
    return to a prior call-level which would be unaware of the fact setjmp
    was used */
@@ -119,6 +151,8 @@ static int thread_sdl_app_main(void *param)
 bool thread_sdl_init(void *param)
 {
     struct thread_entry *thread;
+    int n;
+
     memset(cores, 0, sizeof(cores));
     memset(threads, 0, sizeof(threads));
 
@@ -129,6 +163,10 @@ bool thread_sdl_init(void *param)
         fprintf(stderr, "Couldn't lock mutex\n");
         return false;
     }
+
+    /* Initialize all IDs */
+    for (n = 0; n < MAXTHREADS; n++)
+        threads[n].id = THREAD_ID_INIT(n);
 
     /* Slot 0 is reserved for the main thread - initialize it here and
        then create the SDL thread - it is possible to have a quick, early
@@ -179,23 +217,11 @@ void * thread_sdl_thread_unlock(void)
     return current;
 }
 
-static struct thread_entry * find_empty_thread_slot(void)
+struct thread_entry * thread_id_entry(unsigned int thread_id)
 {
-    struct thread_entry *thread = NULL;
-    int n;
-
-    for (n = 0; n < MAXTHREADS; n++)
-    {
-        int state = threads[n].state;
-
-        if (state == STATE_KILLED)
-        {
-            thread = &threads[n];
-            break;
-        }
-    }
-
-    return thread;
+    return (thread_id == THREAD_ID_CURRENT) ? 
+        cores[CURRENT_CORE].running :
+        &threads[thread_id & THREAD_ID_SLOT_MASK];
 }
 
 static void add_to_list_l(struct thread_entry **list,
@@ -239,9 +265,9 @@ static void remove_from_list_l(struct thread_entry **list,
     thread->l.next->l.prev = thread->l.prev;
 }
 
-struct thread_entry *thread_get_current(void)
+unsigned int thread_get_current(void)
 {
-    return cores[CURRENT_CORE].running;
+    return cores[CURRENT_CORE].running->id;
 }
 
 void switch_thread(void)
@@ -389,9 +415,11 @@ unsigned int thread_queue_wake(struct thread_entry **list)
     return result;
 }
 
-void thread_thaw(struct thread_entry *thread)
+void thread_thaw(unsigned int thread_id)
 {
-    if (thread->state == STATE_FROZEN)
+    struct thread_entry *thread = thread_id_entry(thread_id);
+
+    if (thread->id == thread_id && thread->state == STATE_FROZEN)
     {
         thread->state = STATE_RUNNING;
         SDL_SemPost(thread->context.s);
@@ -441,9 +469,9 @@ int runthread(void *data)
     return 0;
 }
 
-struct thread_entry* 
-    create_thread(void (*function)(void), void* stack, size_t stack_size,
-                  unsigned flags, const char *name)
+unsigned int create_thread(void (*function)(void),
+                           void* stack, size_t stack_size,
+                           unsigned flags, const char *name)
 {
     struct thread_entry *thread;
     SDL_Thread* t;
@@ -455,14 +483,14 @@ struct thread_entry*
     if (thread == NULL)
     {
         DEBUGF("Failed to find thread slot\n");
-        return NULL;
+        return 0;
     }
 
     s = SDL_CreateSemaphore(0);
     if (s == NULL)
     {
         DEBUGF("Failed to create semaphore\n");
-        return NULL;
+        return 0;
     }
 
     t = SDL_CreateThread(runthread, thread);
@@ -470,7 +498,7 @@ struct thread_entry*
     {
         DEBUGF("Failed to create SDL thread\n");
         SDL_DestroySemaphore(s);
-        return NULL;
+        return 0;
     }
 
     thread->stack = stack;
@@ -485,7 +513,7 @@ struct thread_entry*
     THREAD_SDL_DEBUGF("New Thread: %d (%s)\n",
                       thread - threads, THREAD_SDL_GET_NAME(thread));
 
-    return thread;
+    return thread->id;
 }
 
 void init_threads(void)
@@ -501,18 +529,22 @@ void init_threads(void)
             0, THREAD_SDL_GET_NAME(&threads[0]));
 }
 
-void remove_thread(struct thread_entry *thread)
+#ifndef ALLOW_REMOVE_THREAD
+static void remove_thread(unsigned int thread_id)
+#else
+void remove_thread(unsigned int thread_id)
+#endif
 {
     struct thread_entry *current = cores[CURRENT_CORE].running;
+    struct thread_entry *thread = thread_id_entry(thread_id);
+
     SDL_Thread *t;
     SDL_sem *s;
 
-    int oldlevel = disable_irq_save();
+    if (thread_id != THREAD_ID_CURRENT && thread->id != thread_id)
+        return;
 
-    if (thread == NULL)
-    {
-        thread = current;
-    }
+    int oldlevel = disable_irq_save();
 
     t = thread->context.t;
     s = thread->context.s;
@@ -540,6 +572,7 @@ void remove_thread(struct thread_entry *thread)
     THREAD_SDL_DEBUGF("Removing thread: %d (%s)\n",
         thread - threads, THREAD_SDL_GET_NAME(thread));
 
+    new_thread_id(thread->id, thread);
     thread->state = STATE_KILLED;
     thread_queue_wake(&thread->queue);
 
@@ -559,17 +592,16 @@ void remove_thread(struct thread_entry *thread)
 
 void thread_exit(void)
 {
-    remove_thread(NULL);
+    remove_thread(THREAD_ID_CURRENT);
 }
 
-void thread_wait(struct thread_entry *thread)
+void thread_wait(unsigned int thread_id)
 {
     struct thread_entry *current = cores[CURRENT_CORE].running;
+    struct thread_entry *thread = thread_id_entry(thread_id);
 
-    if (thread == NULL)
-        thread = current;
-
-    if (thread->state != STATE_KILLED)
+    if (thread_id == THREAD_ID_CURRENT ||
+        (thread->id == thread_id && thread->state != STATE_KILLED))
     {
         current->bqp = &thread->queue;
         block_thread(current);
@@ -581,11 +613,6 @@ int thread_stack_usage(const struct thread_entry *thread)
 {
     return 50;
     (void)thread;
-}
-
-unsigned thread_get_status(const struct thread_entry *thread)
-{
-    return thread->state;
 }
 
 /* Return name if one or ID if none */

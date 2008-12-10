@@ -27,7 +27,7 @@
  * coordination with assistance from the parser */
 struct stream_mgr
 {
-    struct thread_entry *thread; /* Playback control thread */
+    unsigned int thread;         /* Playback control thread */
     struct event_queue *q;       /* event queue for control thread */
     const char *filename;        /* Current filename */
     uint32_t resume_time;        /* The stream tick where playback was

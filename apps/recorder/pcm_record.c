@@ -37,7 +37,7 @@
 
 /***************************************************************************/
 
-extern struct thread_entry *codec_thread_p;
+extern uintptr_t codec_thread_id;
 
 /** General recording state **/
 static bool is_recording;              /* We are recording                 */
@@ -220,7 +220,7 @@ static struct event_queue       pcmrec_queue SHAREDBSS_ATTR;
 static struct queue_sender_list pcmrec_queue_send SHAREDBSS_ATTR;
 static long                pcmrec_stack[3*DEFAULT_STACK_SIZE/sizeof(long)];
 static const char          pcmrec_thread_name[] = "pcmrec";
-static struct thread_entry *pcmrec_thread_p;
+static unsigned int pcmrec_thread_id = 0;
 
 static void pcmrec_thread(void);
 
@@ -365,12 +365,12 @@ unsigned long pcm_rec_sample_rate(void)
 void pcm_rec_init(void)
 {
     queue_init(&pcmrec_queue, true);
-    pcmrec_thread_p =
+    pcmrec_thread_id =
         create_thread(pcmrec_thread, pcmrec_stack, sizeof(pcmrec_stack),
                       0, pcmrec_thread_name IF_PRIO(, PRIORITY_RECORDING)
 		              IF_COP(, CPU));
     queue_enable_queue_send(&pcmrec_queue, &pcmrec_queue_send,
-                            pcmrec_thread_p);
+                            pcmrec_thread_id);
 } /* pcm_rec_init */
 
 /** audio_* group **/
@@ -878,10 +878,10 @@ static void pcmrec_flush(unsigned flush_num)
                priority until finished */
             logf("pcmrec: boost (%s)",
                  num >= flood_watermark ? "num" : "time");
-            prio_pcmrec = thread_set_priority(NULL,
-                                thread_get_priority(NULL) - 4);
-            prio_codec  = thread_set_priority(codec_thread_p,
-                                thread_get_priority(codec_thread_p) - 4);
+            prio_pcmrec = thread_set_priority(THREAD_ID_CURRENT,
+                                thread_get_priority(THREAD_ID_CURRENT) - 4);
+            prio_codec  = thread_set_priority(codec_thread_id,
+                                thread_get_priority(codec_thread_id) - 4);
         }
 #endif
 
@@ -931,8 +931,8 @@ static void pcmrec_flush(unsigned flush_num)
     {
         /* return to original priorities */
         logf("pcmrec: unboost priority");
-        thread_set_priority(NULL, prio_pcmrec);
-        thread_set_priority(codec_thread_p, prio_codec);
+        thread_set_priority(THREAD_ID_CURRENT, prio_pcmrec);
+        thread_set_priority(codec_thread_id, prio_codec);
     }
 
     last_flush_tick = current_tick; /* save tick when we left */

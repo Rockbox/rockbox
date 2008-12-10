@@ -62,7 +62,7 @@ struct dbuf_range
  * playback events as well as buffering */
 struct disk_buf
 {
-    struct thread_entry *thread;
+    unsigned int thread;
     struct event_queue *q;
     uint8_t *start;   /* Start pointer */
     uint8_t *end;     /* End of buffer pointer less MPEG_GUARDBUF_SIZE. The

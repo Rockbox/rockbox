@@ -39,7 +39,7 @@ static unsigned long hw_sampr IDATA_ATTR = HW_SAMPR_DEFAULT;
 
 static int gen_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)] IBSS_ATTR;
 static bool gen_quit IBSS_ATTR;
-static struct thread_entry *gen_thread_p;
+static unsigned int gen_thread_id;
 
 #define OUTPUT_CHUNK_COUNT (1 << 1)
 #define OUTPUT_CHUNK_MASK (OUTPUT_CHUNK_COUNT-1)
@@ -233,11 +233,11 @@ static void play_tone(bool volume_set)
     output_clear();
     update_gen_step();
 
-    gen_thread_p = rb->create_thread(gen_thread_func, gen_thread_stack,
-                                     sizeof(gen_thread_stack), 0,
-                                     "test_sampr generator"
-                                     IF_PRIO(, PRIORITY_PLAYBACK)
-                                     IF_COP(, CPU));
+    gen_thread_id = rb->create_thread(gen_thread_func, gen_thread_stack,
+                                      sizeof(gen_thread_stack), 0,
+                                      "test_sampr generator"
+                                      IF_PRIO(, PRIORITY_PLAYBACK)
+                                      IF_COP(, CPU));
 
     rb->pcm_play_data(get_more, NULL, 0);
 
@@ -260,7 +260,7 @@ static void play_tone(bool volume_set)
 
     gen_quit = true;
 
-    rb->thread_wait(gen_thread_p);
+    rb->thread_wait(gen_thread_id);
 
     rb->pcm_play_stop();
 

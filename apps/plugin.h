@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 BjÃ¶rn Stenberg
+ * Copyright (C) 2002 Björn Stenberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -131,12 +131,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 128
+#define PLUGIN_API_VERSION 129
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 127
+#define PLUGIN_MIN_API_VERSION 129
 
 /* plugin return codes */
 enum plugin_status {
@@ -244,6 +244,7 @@ struct plugin_api {
                                int min_shown, int max_shown,
                                unsigned flags);
 #endif  /* HAVE_LCD_BITMAP */
+    const char* (*get_codepage_name)(int cp);
 
     /* backlight */
     /* The backlight_* functions must be present in the API regardless whether
@@ -408,13 +409,13 @@ struct plugin_api {
     long (*default_event_handler)(long event);
     long (*default_event_handler_ex)(long event, void (*callback)(void *), void *parameter);
     struct thread_entry* threads;
-    struct thread_entry* (*create_thread)(void (*function)(void), void* stack,
-                                          size_t stack_size, unsigned flags,
-                                          const char *name
-                                          IF_PRIO(, int priority)
-                                          IF_COP(, unsigned int core));
+    unsigned int (*create_thread)(void (*function)(void), void* stack,
+                                  size_t stack_size, unsigned flags,
+                                  const char *name
+                                  IF_PRIO(, int priority)
+                                  IF_COP(, unsigned int core));
     void (*thread_exit)(void);
-    void (*thread_wait)(struct thread_entry *thread);
+    void (*thread_wait)(unsigned int thread_id);
 #if CONFIG_CODEC == SWCODEC
     void (*mutex_init)(struct mutex *m);
     void (*mutex_lock)(struct mutex *m);
@@ -456,7 +457,7 @@ struct plugin_api {
 #if CONFIG_CODEC == SWCODEC
     void (*queue_enable_queue_send)(struct event_queue *q,
                                     struct queue_sender_list *send,
-                                    struct thread_entry *owner);
+                                    unsigned int thread_id);
     bool (*queue_empty)(const struct event_queue *q);
     void (*queue_wait)(struct event_queue *q, struct queue_event *ev);
     intptr_t (*queue_send)(struct event_queue *q, long id,
@@ -616,6 +617,7 @@ struct plugin_api {
     void (*gui_syncstatusbar_draw)(struct gui_syncstatusbar * bars, bool force_redraw);
     
     /* options */
+    const struct settings_list* (*get_settings_list)(int*count);
     const struct settings_list* (*find_setting)(const void* variable, int *id);
     bool (*option_screen)(const struct settings_list *setting,
                           struct viewport parent[NB_SCREENS],
@@ -771,7 +773,7 @@ struct plugin_api {
                                   char *buf, int buflen);
 #endif
 
-    void (*thread_thaw)(struct thread_entry *thread);
+    void (*thread_thaw)(unsigned int thread_id);
  
 #ifdef HAVE_SEMAPHORE_OBJECTS
     void (*semaphore_init)(struct semaphore *s, int max, int start);
@@ -782,8 +784,6 @@ struct plugin_api {
 	const char *appsversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    const struct settings_list* (*get_settings_list)(int*count);
-    const char* (*get_codepage_name)(int cp);
 };
 
 /* plugin header */

@@ -206,7 +206,7 @@ struct
 {
     bool foreground; /* set as long as we're owning the UI */
     bool exiting; /* signal to the thread that we want to exit */
-    struct thread_entry *thread; /* worker thread id */
+    unsigned int thread; /* worker thread id */
 } gTread;
 
 static const struct plugin_api* rb; /* here is the global API struct pointer */

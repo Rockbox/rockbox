@@ -299,7 +299,7 @@ static struct queue_sender_list codec_queue_sender_list;
 static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
 IBSS_ATTR;
 static const char codec_thread_name[] = "codec";
-struct thread_entry *codec_thread_p; /* For modifying thread priority later. */
+unsigned int codec_thread_id; /* For modifying thread priority later. */
 
 /* PCM buffer messaging */
 static struct event_queue pcmbuf_queue SHAREDBSS_ATTR;
@@ -2499,7 +2499,7 @@ static void audio_thread(void)
  */
 void audio_init(void)
 {
-    struct thread_entry *audio_thread_p;
+    unsigned int audio_thread_id;
 
     /* Can never do this twice */
     if (audio_is_initialized)
@@ -2543,22 +2543,22 @@ void audio_init(void)
        talk first */
     talk_init();
 
-    codec_thread_p = create_thread(
+    codec_thread_id = create_thread(
             codec_thread, codec_stack, sizeof(codec_stack),
             CREATE_THREAD_FROZEN,
             codec_thread_name IF_PRIO(, PRIORITY_PLAYBACK)
             IF_COP(, CPU));
 
     queue_enable_queue_send(&codec_queue, &codec_queue_sender_list,
-                            codec_thread_p);
+                            codec_thread_id);
 
-    audio_thread_p = create_thread(audio_thread, audio_stack,
+    audio_thread_id = create_thread(audio_thread, audio_stack,
                   sizeof(audio_stack), CREATE_THREAD_FROZEN,
                   audio_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE)
                   IF_COP(, CPU));
 
     queue_enable_queue_send(&audio_queue, &audio_queue_sender_list,
-                            audio_thread_p);
+                            audio_thread_id);
 
 #ifdef PLAYBACK_VOICE
     voice_thread_init();
@@ -2599,8 +2599,8 @@ void audio_init(void)
 #ifdef PLAYBACK_VOICE
     voice_thread_resume();
 #endif
-    thread_thaw(codec_thread_p);
-    thread_thaw(audio_thread_p);
+    thread_thaw(codec_thread_id);
+    thread_thaw(audio_thread_id);
 
 } /* audio_init */
 

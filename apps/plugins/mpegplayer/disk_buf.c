@@ -835,7 +835,7 @@ void disk_buf_reply_msg(intptr_t retval)
 
 bool disk_buf_init(void)
 {
-    disk_buf.thread = NULL;
+    disk_buf.thread = 0;
     list_initialize(&nf_list);
 
     rb->mutex_init(&disk_buf_mtx);
@@ -893,7 +893,7 @@ bool disk_buf_init(void)
     rb->queue_enable_queue_send(disk_buf.q, &disk_buf_queue_send,
                                 disk_buf.thread);
 
-    if (disk_buf.thread == NULL)
+    if (disk_buf.thread == 0)
         return false;
 
     /* Wait for thread to initialize */
@@ -904,10 +904,10 @@ bool disk_buf_init(void)
 
 void disk_buf_exit(void)
 {
-    if (disk_buf.thread != NULL)
+    if (disk_buf.thread != 0)
     {
         rb->queue_post(disk_buf.q, STREAM_QUIT, 0);
         rb->thread_wait(disk_buf.thread);
-        disk_buf.thread = NULL;
+        disk_buf.thread = 0;
     }
 }

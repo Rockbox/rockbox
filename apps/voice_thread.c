@@ -54,7 +54,7 @@
 #define VOICE_SAMPLE_DEPTH   16 /* Sample depth in bits */
 
 /* Voice thread variables */
-static struct thread_entry *voice_thread_p = NULL;
+static unsigned int voice_thread_id = 0;
 static long voice_stack[0x7c0/sizeof(long)] IBSS_ATTR_VOICE_STACK;
 static const char voice_thread_name[] = "voice";
 
@@ -434,25 +434,25 @@ void voice_thread_init(void)
     queue_init(&voice_queue, false);
     mutex_init(&voice_mutex);
 
-    voice_thread_p = create_thread(voice_thread, voice_stack,
+    voice_thread_id = create_thread(voice_thread, voice_stack,
             sizeof(voice_stack), CREATE_THREAD_FROZEN,
             voice_thread_name IF_PRIO(, PRIORITY_PLAYBACK) IF_COP(, CPU));
 
     queue_enable_queue_send(&voice_queue, &voice_queue_sender_list,
-                            voice_thread_p);
+                            voice_thread_id);
 } /* voice_thread_init */
 
 /* Unfreeze the voice thread */
 void voice_thread_resume(void)
 {
     logf("Thawing voice thread");
-    thread_thaw(voice_thread_p);
+    thread_thaw(voice_thread_id);
 }
 
 #ifdef HAVE_PRIORITY_SCHEDULING
 /* Set the voice thread priority */
 void voice_thread_set_priority(int priority)
 {
-    thread_set_priority(voice_thread_p, priority);
+    thread_set_priority(voice_thread_id, priority);
 }
 #endif

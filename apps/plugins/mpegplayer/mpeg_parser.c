@@ -1027,7 +1027,7 @@ intptr_t parser_send_video_msg(long id, intptr_t data)
 {
     intptr_t retval = 0;
 
-    if (video_str.thread != NULL && disk_buf.in_file >= 0)
+    if (video_str.thread != 0 && disk_buf.in_file >= 0)
     {
         /* Hook certain messages since they involve multiple operations
          * behind the scenes */

@@ -197,7 +197,7 @@ static int spc_emu_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)]
     CACHEALIGN_ATTR;
 
 static const unsigned char * const spc_emu_thread_name = "spc emu";
-static struct thread_entry *emu_thread_p;
+static unsigned int emu_thread_id = 0;
 
 enum
 {
@@ -352,11 +352,11 @@ static void spc_emu_thread(void)
 
 static bool spc_emu_start(void)
 {
-    emu_thread_p = ci->create_thread(spc_emu_thread, spc_emu_thread_stack,
+    emu_thread_id = ci->create_thread(spc_emu_thread, spc_emu_thread_stack,
                            sizeof(spc_emu_thread_stack), CREATE_THREAD_FROZEN,
                            spc_emu_thread_name IF_PRIO(, PRIORITY_PLAYBACK), COP);
 
-    if (emu_thread_p == NULL)
+    if (emu_thread_id == 0)
         return false;
 
     /* Initialize audio queue as full to prevent emu thread from trying to run the
@@ -368,7 +368,7 @@ static bool spc_emu_start(void)
     sample_queue.tail = 2;
 
     /* Start it running */
-    ci->thread_thaw(emu_thread_p);
+    ci->thread_thaw(emu_thread_id);
     return true;
 }
 
@@ -382,10 +382,10 @@ static inline int load_spc_buffer(uint8_t *buf, size_t size)
 
 static inline void spc_emu_quit(void)
 {
-    if (emu_thread_p != NULL) {
+    if (emu_thread_id != 0) {
         emu_thread_send_msg(SPC_EMU_QUIT, 0);
         /* Wait for emu thread to be killed */
-        ci->thread_wait(emu_thread_p);
+        ci->thread_wait(emu_thread_id);
         invalidate_icache();
     }
 }

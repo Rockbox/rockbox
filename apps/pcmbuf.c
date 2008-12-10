@@ -115,7 +115,7 @@ static bool pcmbuf_flush;
 static int codec_thread_priority = PRIORITY_PLAYBACK;
 #endif
 
-extern struct thread_entry *codec_thread_p;
+extern uintptr_t codec_thread_id;
 
 /* Helpful macros for use in conditionals this assumes some of the above
  * static variable names */
@@ -258,13 +258,13 @@ static void boost_codec_thread(bool boost)
         if (priority != codec_thread_priority)
         {
             codec_thread_priority = priority;
-            thread_set_priority(codec_thread_p, priority);
+            thread_set_priority(codec_thread_id, priority);
             voice_thread_set_priority(priority);
         }
     }
     else if (codec_thread_priority != PRIORITY_PLAYBACK)
     {
-        thread_set_priority(codec_thread_p, PRIORITY_PLAYBACK);
+        thread_set_priority(codec_thread_id, PRIORITY_PLAYBACK);
         voice_thread_set_priority(PRIORITY_PLAYBACK);
         codec_thread_priority = PRIORITY_PLAYBACK;
     }
@@ -276,7 +276,7 @@ static void pcmbuf_under_watermark(void)
     /* Only codec thread initiates boost - voice boosts the cpu when playing
        a clip */
 #ifndef SIMULATOR
-    if (thread_get_current() == codec_thread_p)
+    if (thread_get_current() == codec_thread_id)
 #endif /* SIMULATOR */
     {
 #ifdef HAVE_PRIORITY_SCHEDULING

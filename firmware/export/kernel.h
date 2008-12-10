@@ -261,7 +261,7 @@ extern void queue_post(struct event_queue *q, long id, intptr_t data);
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
 extern void queue_enable_queue_send(struct event_queue *q,
                                     struct queue_sender_list *send,
-                                    struct thread_entry *owner);
+                                    unsigned int owner_id);
 extern intptr_t queue_send(struct event_queue *q, long id, intptr_t data);
 extern void queue_reply(struct event_queue *q, intptr_t retval);
 extern bool queue_in_queue_send(struct event_queue *q);

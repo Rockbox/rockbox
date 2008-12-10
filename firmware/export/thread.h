@@ -58,9 +58,6 @@
 #define NUM_PRIORITIES           32
 #define PRIORITY_IDLE            32  /* Priority representative of no tasks */
 
-/* TODO: Only a minor tweak to create_thread would be needed to let
- * thread slots be caller allocated - no essential threading functionality
- * depends upon an array */
 #if CONFIG_CODEC == SWCODEC
 
 #ifdef HAVE_RECORDING
@@ -280,6 +277,7 @@ struct thread_entry
     int skip_count;            /* Number of times skipped if higher priority
                                   thread was running */
 #endif
+    uint16_t id;               /* Current slot id */
     unsigned short stack_size; /* Size of stack in bytes */
 #ifdef HAVE_PRIORITY_SCHEDULING
     unsigned char base_priority; /* Base priority (set explicitly during
@@ -297,6 +295,16 @@ struct thread_entry
     struct corelock slot_cl;   /* Corelock to lock thread slot */
 #endif
 };
+
+/*** Macros for internal use ***/
+/* Thread ID, 16 bits = |VVVVVVVV|SSSSSSSS| */
+#define THREAD_ID_VERSION_SHIFT      8
+#define THREAD_ID_VERSION_MASK  0xff00
+#define THREAD_ID_SLOT_MASK     0x00ff
+#define THREAD_ID_INIT(n)       ((1u << THREAD_ID_VERSION_SHIFT) | (n))
+
+/* Specify current thread in a function taking an ID. */
+#define THREAD_ID_CURRENT ((unsigned int)-1)
 
 #if NUM_CORES > 1
 /* Operations to be performed just before stopping a thread and starting
@@ -475,11 +483,11 @@ void init_threads(void);
 
 /* Allocate a thread in the scheduler */
 #define CREATE_THREAD_FROZEN   0x00000001 /* Thread is frozen at create time */
-struct thread_entry*
-    create_thread(void (*function)(void), void* stack, size_t stack_size,
-                  unsigned flags, const char *name
-                  IF_PRIO(, int priority)
-		          IF_COP(, unsigned int core));
+unsigned int create_thread(void (*function)(void),
+                           void* stack, size_t stack_size,
+                           unsigned flags, const char *name
+                           IF_PRIO(, int priority)
+                           IF_COP(, unsigned int core));
 
 /* Set and clear the CPU frequency boost flag for the calling thread */
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
@@ -489,17 +497,19 @@ void cancel_cpu_boost(void);
 #define trigger_cpu_boost()
 #define cancel_cpu_boost()
 #endif
+/* Return thread entry from id */
+struct thread_entry *thread_id_entry(unsigned int thread_id);
 /* Make a frozed thread runnable (when started with CREATE_THREAD_FROZEN).
  * Has no effect on a thread not frozen. */
-void thread_thaw(struct thread_entry *thread);
+void thread_thaw(unsigned int thread_id);
 /* Wait for a thread to exit */
-void thread_wait(struct thread_entry *thread);
+void thread_wait(unsigned int thread_id);
 /* Exit the current thread */
 void thread_exit(void);
 #if defined(DEBUG) || defined(ROCKBOX_HAS_LOGF)
 #define ALLOW_REMOVE_THREAD
 /* Remove a thread from the scheduler */
-void remove_thread(struct thread_entry *thread);
+void remove_thread(unsigned int thread_id);
 #endif
 
 /* Switch to next runnable thread */
@@ -526,13 +536,13 @@ unsigned int thread_queue_wake(struct thread_entry **list);
 unsigned int wakeup_thread(struct thread_entry **list);
 
 #ifdef HAVE_PRIORITY_SCHEDULING
-int thread_set_priority(struct thread_entry *thread, int priority);
-int thread_get_priority(struct thread_entry *thread);
+int thread_set_priority(unsigned int thread_id, int priority);
+int thread_get_priority(unsigned int thread_id);
 #endif /* HAVE_PRIORITY_SCHEDULING */
 #if NUM_CORES > 1
 unsigned int switch_core(unsigned int new_core);
 #endif
-struct thread_entry * thread_get_current(void);
+unsigned int thread_get_current(void);
 
 /* Debugging info - only! */
 int thread_stack_usage(const struct thread_entry *thread);

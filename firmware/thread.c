@@ -1691,8 +1691,8 @@ struct thread_entry *
     struct thread_entry *next;
     int bl_pr;
 
-    THREAD_ASSERT(thread_get_current() == bl_t,
-                  "UPPT->wrong thread", thread_get_current());
+    THREAD_ASSERT(cores[CURRENT_CORE].running == bl_t,
+                  "UPPT->wrong thread", cores[CURRENT_CORE].running);
 
     LOCK_THREAD(bl_t);
 
@@ -2031,7 +2031,7 @@ void switch_thread(void)
     }
 
 #ifdef RB_PROFILE
-    profile_thread_stopped(thread - threads);
+    profile_thread_stopped(thread->id & THREAD_ID_SLOT_MASK);
 #endif
 
     /* Begin task switching by saving our current context so that we can
@@ -2136,7 +2136,7 @@ void switch_thread(void)
     load_context(&thread->context);
 
 #ifdef RB_PROFILE
-    profile_thread_started(thread - threads);
+    profile_thread_started(thread->id & THREAD_ID_SLOT_MASK);
 #endif
 
 }
@@ -2316,6 +2316,24 @@ unsigned int thread_queue_wake(struct thread_entry **list)
 }
 
 /*---------------------------------------------------------------------------
+ * Assign the thread slot a new ID. Version is 1-255.
+ *---------------------------------------------------------------------------
+ */
+static void new_thread_id(unsigned int slot_num,
+                          struct thread_entry *thread)
+{
+    unsigned int version =
+        (thread->id + (1u << THREAD_ID_VERSION_SHIFT))
+                & THREAD_ID_VERSION_MASK;
+
+    /* If wrapped to 0, make it 1 */
+    if (version == 0)
+        version = 1u << THREAD_ID_VERSION_SHIFT;
+
+    thread->id = version | (slot_num & THREAD_ID_SLOT_MASK);
+}
+
+/*---------------------------------------------------------------------------
  * Find an empty thread slot or MAXTHREADS if none found. The slot returned
  * will be locked on multicore.
  *---------------------------------------------------------------------------
@@ -2349,6 +2367,17 @@ static struct thread_entry * find_empty_thread_slot(void)
     return thread;
 }
 
+/*---------------------------------------------------------------------------
+ * Return the thread_entry pointer for a thread_id. Return the current
+ * thread if the ID is 0 (alias for current).
+ *---------------------------------------------------------------------------
+ */
+struct thread_entry * thread_id_entry(unsigned int thread_id)
+{
+    return (thread_id == THREAD_ID_CURRENT) ?
+        cores[CURRENT_CORE].running :
+        &threads[thread_id & THREAD_ID_SLOT_MASK];
+}
 
 /*---------------------------------------------------------------------------
  * Place the current core in idle mode - woken up on interrupt or wake
@@ -2369,11 +2398,11 @@ void core_idle(void)
  * Return ID if context area could be allocated, else NULL.
  *---------------------------------------------------------------------------
  */
-struct thread_entry* 
-    create_thread(void (*function)(void), void* stack, size_t stack_size,
-                  unsigned flags, const char *name
-                  IF_PRIO(, int priority)
-                  IF_COP(, unsigned int core))
+unsigned int create_thread(void (*function)(void),
+                           void* stack, size_t stack_size,
+                           unsigned flags, const char *name
+                           IF_PRIO(, int priority)
+                           IF_COP(, unsigned int core))
 {
     unsigned int i;
     unsigned int stack_words;
@@ -2385,7 +2414,7 @@ struct thread_entry*
     thread = find_empty_thread_slot();
     if (thread == NULL)
     {
-        return NULL;
+        return 0;
     }
 
     oldlevel = disable_irq_save();
@@ -2443,15 +2472,15 @@ struct thread_entry*
     THREAD_STARTUP_INIT(core, thread, function);
 
     thread->state = state;
+    i = thread->id; /* Snapshot while locked */
 
     if (state == STATE_RUNNING)
         core_schedule_wakeup(thread);
 
     UNLOCK_THREAD(thread);
-
     restore_irq(oldlevel);
 
-    return thread;
+    return i;
 }
 
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
@@ -2489,18 +2518,17 @@ void cancel_cpu_boost(void)
  * Parameter is the ID as returned from create_thread().
  *---------------------------------------------------------------------------
  */
-void thread_wait(struct thread_entry *thread)
+void thread_wait(unsigned int thread_id)
 {
     struct thread_entry *current = cores[CURRENT_CORE].running;
-
-    if (thread == NULL)
-        thread = current;
+    struct thread_entry *thread = thread_id_entry(thread_id);
 
     /* Lock thread-as-waitable-object lock */
     corelock_lock(&thread->waiter_cl);
 
     /* Be sure it hasn't been killed yet */
-    if (thread->state != STATE_KILLED)
+    if (thread_id == THREAD_ID_CURRENT ||
+        (thread->id == thread_id && thread->state != STATE_KILLED))
     {
         IF_COP( current->obj_cl = &thread->waiter_cl; )
         current->bqp = &thread->queue;
@@ -2538,9 +2566,10 @@ void thread_exit(void)
     if (current->name == THREAD_DESTRUCT)
     {
         /* Thread being killed - become a waiter */
+        unsigned int id = current->id;
         UNLOCK_THREAD(current);
         corelock_unlock(&current->waiter_cl);
-        thread_wait(current);
+        thread_wait(id);
         THREAD_PANICF("thread_exit->WK:*R", current);
     }
 #endif
@@ -2568,7 +2597,13 @@ void thread_exit(void)
     }
 
     flush_icache();
+
+    /* At this point, this thread isn't using resources allocated for
+     * execution except the slot itself. */
 #endif
+
+    /* Update ID for this slot */
+    new_thread_id(current->id, current);
     current->name = NULL;
 
     /* Signal this thread */
@@ -2593,7 +2628,7 @@ void thread_exit(void)
  * leave various objects in an undefined state.
  *---------------------------------------------------------------------------
  */
-void remove_thread(struct thread_entry *thread)
+void remove_thread(unsigned int thread_id)
 {
 #if NUM_CORES > 1
     /* core is not constant here because of core switching */
@@ -2604,12 +2639,10 @@ void remove_thread(struct thread_entry *thread)
     const unsigned int core = CURRENT_CORE;
 #endif
     struct thread_entry *current = cores[core].running;
+    struct thread_entry *thread = thread_id_entry(thread_id);
 
     unsigned state;
     int oldlevel;
-
-    if (thread == NULL)
-        thread = current;
 
     if (thread == current)
         thread_exit(); /* Current thread - do normal exit */
@@ -2621,10 +2654,8 @@ void remove_thread(struct thread_entry *thread)
 
     state = thread->state;
 
-    if (state == STATE_KILLED)
-    {
+    if (thread->id != thread_id || state == STATE_KILLED)
         goto thread_killed;
-    }
 
 #if NUM_CORES > 1
     if (thread->name == THREAD_DESTRUCT)
@@ -2633,7 +2664,7 @@ void remove_thread(struct thread_entry *thread)
         UNLOCK_THREAD(thread);
         corelock_unlock(&thread->waiter_cl);
         restore_irq(oldlevel);
-        thread_wait(thread);
+        thread_wait(thread_id);
         return;
     }
 
@@ -2741,6 +2772,7 @@ IF_COP( retry_state: )
     /* Otherwise thread is frozen and hasn't run yet */
     }
 
+    new_thread_id(thread_id, thread);
     thread->state = STATE_KILLED;
 
     /* If thread was waiting on itself, it will have been removed above.
@@ -2773,16 +2805,14 @@ thread_killed: /* Thread was already killed */
  * needed inheritance changes also may happen.
  *---------------------------------------------------------------------------
  */
-int thread_set_priority(struct thread_entry *thread, int priority)
+int thread_set_priority(unsigned int thread_id, int priority)
 {
     int old_base_priority = -1;
+    struct thread_entry *thread = thread_id_entry(thread_id);
 
     /* A little safety measure */
     if (priority < HIGHEST_PRIORITY || priority > LOWEST_PRIORITY)
         return -1;
-
-    if (thread == NULL)
-        thread = cores[CURRENT_CORE].running;
 
     /* Thread could be on any list and therefore on an interrupt accessible
        one - disable interrupts */
@@ -2791,7 +2821,8 @@ int thread_set_priority(struct thread_entry *thread, int priority)
     LOCK_THREAD(thread);
 
     /* Make sure it's not killed */
-    if (thread->state != STATE_KILLED)
+    if (thread_id == THREAD_ID_CURRENT ||
+        (thread->id == thread_id && thread->state != STATE_KILLED))
     {
         int old_priority = thread->priority;
 
@@ -2908,13 +2939,19 @@ int thread_set_priority(struct thread_entry *thread, int priority)
  * Returns the current base priority for a thread.
  *---------------------------------------------------------------------------
  */
-int thread_get_priority(struct thread_entry *thread)
+int thread_get_priority(unsigned int thread_id)
 {
-    /* Simple, quick probe. */
-    if (thread == NULL)
-        thread = cores[CURRENT_CORE].running;
+    struct thread_entry *thread = thread_id_entry(thread_id);
+    int base_priority = thread->base_priority;
 
-    return thread->base_priority;
+    /* Simply check without locking slot. It may or may not be valid by the
+     * time the function returns anyway. If all tests pass, it is the
+     * correct value for when it was valid. */
+    if (thread_id != THREAD_ID_CURRENT &&
+        (thread->id != thread_id || thread->state == STATE_KILLED))
+        base_priority = -1;
+
+    return base_priority;
 }
 #endif /* HAVE_PRIORITY_SCHEDULING */
 
@@ -2924,12 +2961,16 @@ int thread_get_priority(struct thread_entry *thread)
  * virtue of the slot having a state of STATE_FROZEN.
  *---------------------------------------------------------------------------
  */
-void thread_thaw(struct thread_entry *thread)
+void thread_thaw(unsigned int thread_id)
 {
+    struct thread_entry *thread = thread_id_entry(thread_id);
     int oldlevel = disable_irq_save();
+
     LOCK_THREAD(thread);
 
-    if (thread->state == STATE_FROZEN)
+    /* If thread is the current one, it cannot be frozen, therefore
+     * there is no need to check that. */
+    if (thread->id == thread_id && thread->state == STATE_FROZEN)
         core_schedule_wakeup(thread);
 
     UNLOCK_THREAD(thread);
@@ -2940,9 +2981,9 @@ void thread_thaw(struct thread_entry *thread)
  * Return the ID of the currently executing thread.
  *---------------------------------------------------------------------------
  */
-struct thread_entry * thread_get_current(void)
+unsigned int thread_get_current(void)
 {
-    return cores[CURRENT_CORE].running;
+    return cores[CURRENT_CORE].running->id;
 }
 
 #if NUM_CORES > 1
@@ -2967,9 +3008,10 @@ unsigned int switch_core(unsigned int new_core)
     if (current->name == THREAD_DESTRUCT)
     {
         /* Thread being killed - deactivate and let process complete */
+        unsigned int id = current->id;
         UNLOCK_THREAD(current);
         restore_irq(oldlevel);
-        thread_wait(current);
+        thread_wait(id);
         /* Should never be reached */
         THREAD_PANICF("switch_core->D:*R", current);
     }
@@ -3034,6 +3076,19 @@ void init_threads(void)
     const unsigned int core = CURRENT_CORE;
     struct thread_entry *thread;
 
+    if (core == CPU)
+    {
+        /* Initialize core locks and IDs in all slots */
+        int n;
+        for (n = 0; n < MAXTHREADS; n++)
+        {
+            thread = &threads[n];
+            corelock_init(&thread->waiter_cl);
+            corelock_init(&thread->slot_cl);
+            thread->id = THREAD_ID_INIT(n);
+        }
+    }
+
     /* CPU will initialize first and then sleep */
     thread = find_empty_thread_slot();
 
@@ -3060,8 +3115,6 @@ void init_threads(void)
     thread->priority = PRIORITY_USER_INTERFACE;
     rtr_add_entry(core, PRIORITY_USER_INTERFACE);
 #endif
-    corelock_init(&thread->waiter_cl);
-    corelock_init(&thread->slot_cl);
 
     add_to_list_l(&cores[core].running, thread);
 
@@ -3070,6 +3123,7 @@ void init_threads(void)
         thread->stack = stackbegin;
         thread->stack_size = (uintptr_t)stackend - (uintptr_t)stackbegin;
 #if NUM_CORES > 1  /* This code path will not be run on single core targets */
+        /* Initialize all locking for the slots */
         /* Wait for other processors to finish their inits since create_thread
          * isn't safe to call until the kernel inits are done. The first
          * threads created in the system must of course be created by CPU. */

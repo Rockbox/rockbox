@@ -216,7 +216,7 @@ struct batt_info
 
 #define BUF_ELEMENTS    (sizeof(bat)/sizeof(struct batt_info))
 
-static struct thread_entry *thread_id;
+static unsigned int thread_id;
 static struct event_queue thread_q;
 static bool in_usb_mode;
 static unsigned int buf_idx;
@@ -537,7 +537,7 @@ int main(void)
     if ((thread_id = rb->create_thread(thread, thread_stack,
         sizeof(thread_stack), 0, "Battery Benchmark" 
         IF_PRIO(, PRIORITY_BACKGROUND)
-        IF_COP(, CPU))) == NULL)
+        IF_COP(, CPU))) == 0)
     {
         rb->splash(HZ, "Cannot create thread!");
         return PLUGIN_ERROR;

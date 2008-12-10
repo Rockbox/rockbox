@@ -352,11 +352,12 @@ static void queue_remove_sender_thread_cb(struct thread_entry *thread)
  * specified for priority inheritance to operate.
  *
  * Use of queue_wait(_w_tmo) by multiple threads on a queue using synchronous
- * messages results in an undefined order of message replies.
+ * messages results in an undefined order of message replies or possible default
+ * replies if two or more waits happen before a reply is done.
  */
 void queue_enable_queue_send(struct event_queue *q,
                              struct queue_sender_list *send,
-                             struct thread_entry *owner)
+                             unsigned int owner_id)
 {
     int oldlevel = disable_irq_save();
     corelock_lock(&q->cl);
@@ -367,9 +368,11 @@ void queue_enable_queue_send(struct event_queue *q,
 #ifdef HAVE_PRIORITY_SCHEDULING
         send->blocker.wakeup_protocol = wakeup_priority_protocol_release;
         send->blocker.priority = PRIORITY_IDLE;
-        send->blocker.thread = owner;
-        if(owner != NULL)
+        if(owner_id != 0)
+        {
+            send->blocker.thread = thread_id_entry(owner_id);
             q->blocker_p = &send->blocker;
+        }
 #endif
         q->send = send;
     }
@@ -377,7 +380,7 @@ void queue_enable_queue_send(struct event_queue *q,
     corelock_unlock(&q->cl);
     restore_irq(oldlevel);
 
-    (void)owner;
+    (void)owner_id;
 }
 
 /* Unblock a blocked thread at a given event index */
@@ -532,7 +535,7 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
 
 #ifdef HAVE_PRIORITY_SCHEDULING
     KERNEL_ASSERT(QUEUE_GET_THREAD(q) == NULL ||
-                  QUEUE_GET_THREAD(q) == thread_get_current(),
+                  QUEUE_GET_THREAD(q) == cores[CURRENT_CORE].running,
                   "queue_wait->wrong thread\n");
 #endif
 
@@ -579,7 +582,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     KERNEL_ASSERT(QUEUE_GET_THREAD(q) == NULL ||
-                  QUEUE_GET_THREAD(q) == thread_get_current(),
+                  QUEUE_GET_THREAD(q) == cores[CURRENT_CORE].running,
                   "queue_wait_w_tmo->wrong thread\n");
 #endif
 
@@ -914,10 +917,10 @@ void mutex_lock(struct mutex *m)
 void mutex_unlock(struct mutex *m)
 {
     /* unlocker not being the owner is an unlocking violation */
-    KERNEL_ASSERT(MUTEX_GET_THREAD(m) == thread_get_current(),
+    KERNEL_ASSERT(MUTEX_GET_THREAD(m) == cores[CURRENT_CORE].running,
                   "mutex_unlock->wrong thread (%s != %s)\n",
                   MUTEX_GET_THREAD(m)->name,
-                  thread_get_current()->name);
+                  cores[CURRENT_CORE].running->name);
 
     if(m->count > 0)
     {
@@ -990,7 +993,7 @@ void spinlock_lock(struct spinlock *l)
 void spinlock_unlock(struct spinlock *l)
 {
     /* unlocker not being the owner is an unlocking violation */
-    KERNEL_ASSERT(l->thread == thread_get_current(),
+    KERNEL_ASSERT(l->thread == cores[CURRENT_CORE].running,
                   "spinlock_unlock->wrong thread\n");
 
     if(l->count > 0)

@@ -908,7 +908,7 @@ static void stream_mgr_thread(void)
 /* Opens a new file */
 int stream_open(const char *filename)
 {
-    if (stream_mgr.thread != NULL)
+    if (stream_mgr.thread != 0)
         return stream_mgr_send_msg(STREAM_OPEN, (intptr_t)filename);
     return STREAM_ERROR;
 }
@@ -916,7 +916,7 @@ int stream_open(const char *filename)
 /* Plays the current file starting at time 'start' */
 int stream_play(void)
 {
-    if (stream_mgr.thread != NULL)
+    if (stream_mgr.thread != 0)
         return stream_mgr_send_msg(STREAM_PLAY, 0);
     return STREAM_ERROR;
 }
@@ -924,7 +924,7 @@ int stream_play(void)
 /* Pauses playback if playing */
 int stream_pause(void)
 {
-    if (stream_mgr.thread != NULL)
+    if (stream_mgr.thread != 0)
         return stream_mgr_send_msg(STREAM_PAUSE, false);
     return STREAM_ERROR;
 }
@@ -932,7 +932,7 @@ int stream_pause(void)
 /* Resumes playback if paused */
 int stream_resume(void)
 {
-    if (stream_mgr.thread != NULL)
+    if (stream_mgr.thread != 0)
         return stream_mgr_send_msg(STREAM_PAUSE, true);
     return STREAM_ERROR;
 }
@@ -940,7 +940,7 @@ int stream_resume(void)
 /* Stops playback if not stopped */
 int stream_stop(void)
 {
-    if (stream_mgr.thread != NULL)
+    if (stream_mgr.thread != 0)
         return stream_mgr_send_msg(STREAM_STOP, 0);
     return STREAM_ERROR;
 }
@@ -950,7 +950,7 @@ int stream_seek(uint32_t time, int whence)
 {
     int ret;
 
-    if (stream_mgr.thread == NULL)
+    if (stream_mgr.thread == 0)
         return STREAM_ERROR;
 
     stream_mgr_lock();
@@ -968,7 +968,7 @@ int stream_seek(uint32_t time, int whence)
 /* Closes the current file */
 int stream_close(void)
 {
-    if (stream_mgr.thread != NULL)
+    if (stream_mgr.thread != 0)
         return stream_mgr_send_msg(STREAM_CLOSE, 0);
     return STREAM_ERROR;
 }
@@ -1018,7 +1018,7 @@ int stream_init(void)
     rb->queue_enable_queue_send(stream_mgr.q, &stream_mgr_queue_send,
                                 stream_mgr.thread);
 
-    if (stream_mgr.thread == NULL)
+    if (stream_mgr.thread == 0)
     {
         rb->splash(HZ, "Could not create stream manager thread!");
         return STREAM_ERROR;
@@ -1073,11 +1073,11 @@ void stream_exit(void)
     disk_buf_exit();
     pcm_output_exit();
 
-    if (stream_mgr.thread != NULL)
+    if (stream_mgr.thread != 0)
     {
         stream_mgr_post_msg(STREAM_QUIT, 0);
         rb->thread_wait(stream_mgr.thread);
-        stream_mgr.thread = NULL;
+        stream_mgr.thread = 0;
     }
 
 #ifndef HAVE_LCD_COLOR

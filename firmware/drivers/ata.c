@@ -71,7 +71,7 @@
 #endif
 
 #ifdef ATA_DRIVER_CLOSE
-static struct thread_entry *ata_thread_p = NULL;
+static unsigned int ata_thread_id = 0;
 #endif
 
 #if defined(MAX_PHYS_SECTOR_SIZE) && MEM == 64
@@ -94,7 +94,8 @@ static void ata_lock_init(struct ata_lock *l)
 
 static void ata_lock_lock(struct ata_lock *l)
 {
-    struct thread_entry * const current = thread_get_current();
+    struct thread_entry * const current =
+        thread_id_entry(THREAD_ID_CURRENT);
 
     if (current == l->thread)
     {
@@ -1350,7 +1351,7 @@ int ata_init(void)
 
         last_disk_activity = current_tick;
 #ifdef ATA_DRIVER_CLOSE
-        ata_thread_p =
+        ata_thread_id =
 #endif
         create_thread(ata_thread, ata_stack,
                       sizeof(ata_stack), 0, ata_thread_name
@@ -1370,15 +1371,15 @@ int ata_init(void)
 #ifdef ATA_DRIVER_CLOSE
 void ata_close(void)
 {
-    struct thread_entry *thread = ata_thread_p;
+    unsigned int thread_id = ata_thread_id;
     
-    if (thread == NULL)
+    if (thread_id == 0)
         return;
 
-    ata_thread_p = NULL;
+    ata_thread_id = 0;
 
     queue_post(&ata_queue, Q_CLOSE, 0);
-    thread_wait(thread);
+    thread_wait(thread_id);
 }
 #endif /* ATA_DRIVER_CLOSE */
 
