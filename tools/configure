@@ -116,7 +116,7 @@ simcc () {
      echo "configure didn't find sdl-config, which indicates that you"
      echo "don't have SDL (properly) installed. Please correct and"
      echo "re-run configure!"
-     exit
+     exit 1
  fi
 
  # default share option, override below if needed
@@ -161,7 +161,7 @@ simcc () {
 
    *)
    echo "Unsupported system: $uname, fix configure and retry"
-   exit
+   exit 2
    ;;
  esac
 
@@ -472,7 +472,7 @@ voiceconfig () {
 
     if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI" ] && [ "$SAPI" = "$SWIFT" ]; then
         echo "You need Festival, eSpeak or Flite in your path, or SAPI available to build voice files"
-        exit
+        exit 3
     fi
 
     echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${SAPI}${SWIFT}(${DEFAULT_CHOICE})?"
@@ -531,7 +531,7 @@ voiceconfig () {
          else
             echo "You need LAME in the system path to build voice files for"
             echo "HWCODEC targets."
-            exit
+            exit 4
          fi
     fi
  
@@ -639,7 +639,7 @@ if test -r "configure"; then
    echo " ../tools/configure"
    echo ""
    echo "Much happiness will arise from this. Enjoy"
-   exit
+   exit 5
  fi
 fi
 
@@ -651,7 +651,7 @@ if { echo $pwd | grep " "; } then
   echo "system is unfortunately not clever enough to deal with this. Please"
   echo "run the script from a different path, rename the path or fix the build"
   echo "system!"
-  exit
+  exit 6
 fi
 
 if [ -z "$rootdir" ]; then
@@ -1940,7 +1940,7 @@ fi
     ;;
    *)
     echo "Please select a supported target platform!"
-    exit
+    exit 7
     ;;
 
   esac
@@ -2100,7 +2100,7 @@ fi
     *)
       if [ "$modelname" = "e200r" ]; then
           echo "Do not use the e200R target for regular builds.  Use e200 instead."
-          exit
+          exit 8
       fi
       debug=""
       echo "Normal build selected"
