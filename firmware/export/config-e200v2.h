@@ -96,8 +96,8 @@
 
 #define AB_REPEAT_ENABLE 1
 
-/* FM Tuner - suspected to be the SI4702, but use SI4700 for now */
-#define CONFIG_TUNER SI4700
+/* FM Tuner - suspected to be the SI4702 */
+//#define CONFIG_TUNER SI4700
 /* #define HAVE_TUNER_PWR_CTRL */
 
 /* Define this for LCD backlight available */
