@@ -75,7 +75,7 @@ void fiq_handler(void)
 /****************************************************************************
  ** Playback DMA transfer
  **/
-struct dma_data dma_play_data SHAREDBSS_ATTR =
+static struct dma_data dma_play_data SHAREDBSS_ATTR =
 {
     /* Initialize to a locked, stopped state */
     .p = NULL,
@@ -205,14 +205,17 @@ void fiq_playback(void)
         "ldr     r2, =pcm_callback_for_more \n"
         "ldr     r2, [r2]            \n" /* get callback address */
         "cmp     r2, #0              \n" /* check for null pointer */
-        "stmneia r11, { r8-r9 }      \n" /* save internal copies of variables back */
-        "movne   r0, r11             \n" /* r0 = &p */
-        "addne   r1, r11, #4         \n" /* r1 = &size */
-        "movne   lr, pc              \n" /* call pcm_callback_for_more */
-        "bxne    r2                  \n"
+        "beq     .stop               \n" /* callback removed, stop */
+        "stmia   r11, { r8-r9 }      \n" /* save internal copies of variables back */
+        "mov     r0, r11             \n" /* r0 = &p */
+        "add     r1, r11, #4         \n" /* r1 = &size */
+        "mov     lr, pc              \n" /* call pcm_callback_for_more */
+        "bx      r2                  \n"
         "ldmia   r11, { r8-r9 }      \n" /* reload p and size */
         "cmp     r9, #0              \n" /* did we actually get more data? */
         "bne     .check_fifo         \n"
+
+    ".stop:                          \n" /* call termination routines */
         "ldr     r12, =pcm_play_dma_stop \n"
         "mov     lr, pc              \n"
         "bx      r12                 \n"
@@ -298,6 +301,7 @@ void pcm_play_unlock(void)
 static void play_start_pcm(void)
 {
     fiq_function = fiq_playback;
+
     pcm_apply_settings();
 
     IISCONFIG &= ~IIS_TXFIFOEN;  /* Stop transmitting */
@@ -324,6 +328,12 @@ static void play_stop_pcm(void)
 {
     /* Disable TX interrupt */
     IIS_IRQTX_REG &= ~IIS_IRQTX;
+
+    /* Wait for FIFO to empty */
+#ifdef CPU_PP502x
+    while (IIS_TX_FREE_COUNT < 16);
+#endif
+
     dma_play_data.state = 0;
 }
 
@@ -369,6 +379,24 @@ size_t pcm_get_bytes_waiting(void)
 
 void pcm_play_dma_init(void)
 {
+    /* Set up banked registers for FIQ mode */
+
+    /* Use non-banked registers for scratch. */
+    register volatile void *iiscfg asm("r0") = &IISCONFIG;
+    register volatile void *dmapd asm("r1") = &dma_play_data;
+
+    asm volatile (
+        "mrs    r2, cpsr            \n" /* Save mode and interrupt status */
+        "msr    cpsr_c, #0xd1       \n" /* Switch to FIQ mode */
+        "mov    r8, #0              \n"
+        "mov    r9, #0              \n"
+        "mov    r10, %[iiscfg]      \n"
+        "mov    r11, %[dmapd]       \n"
+        "msr    cpsr_c, r2          \n"
+        :
+        : [iiscfg]"r"(iiscfg), [dmapd]"r"(dmapd)
+        : "r2");
+
     pcm_set_frequency(SAMPR_44);
 
     /* Initialize default register values. */
