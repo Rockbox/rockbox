@@ -1808,6 +1808,7 @@ void computer_allocate(void) {
                     }
                 }
             }
+            rb->yield();
         }
     }
     if(offensive) {
@@ -1837,6 +1838,7 @@ void computer_allocate(void) {
                                               i, j));
                         k++;
                     }
+                    rb->yield();
                 }
             }
         }
@@ -1903,6 +1905,7 @@ void computer_allocate(void) {
             }
             compres.bank += compres.cash;
             compres.cash = 0;
+            rb->yield();
         }
     } else {
         /* Work out what to place on each square to defend it.
@@ -1933,6 +1936,7 @@ void computer_allocate(void) {
                     draw_board();
                     rb->sleep(HZ);
                 }
+                rb->yield();
             }
         } else if((total_str_diff+20)*15 < compres.cash) {
             /* Enough money to pay their way by planes */
@@ -1966,6 +1970,7 @@ void computer_allocate(void) {
                         }
                     }
                 }
+                rb->yield();
             }
         } else {
             /* Tanks it is */
@@ -1999,6 +2004,7 @@ void computer_allocate(void) {
                         }
                     }
                 }
+                rb->yield();
             }
         }
         compres.bank += compres.cash;
@@ -2082,6 +2088,7 @@ void computer_war(void) {
                         }
                     }
                 }
+                rb->yield();
             }
         }
         if(compres.moves) {
@@ -2120,6 +2127,7 @@ void computer_war(void) {
                             compres.moves--;
                         }
                     }
+                    rb->yield();
                 }
             }
             while(compres.moves > 0) {
