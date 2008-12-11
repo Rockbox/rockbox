@@ -9,6 +9,7 @@
 
 #define HW_SAMPR_CAPS       (SAMPR_CAP_44)
 
+#if 0
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 
@@ -19,6 +20,7 @@
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
 #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_FMRADIO)
+#endif
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
