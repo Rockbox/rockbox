@@ -198,6 +198,9 @@ void audiohw_postinit(void)
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
     /* We need to enable bit 4 of GPIOL for output for sound on H10 */
     GPIO_SET_BITWISE(GPIOL_OUTPUT_VAL, 0x10);
+#elif defined(PHILIPS_HDD1630)
+    GPO32_ENABLE |= 0x2;
+    GPO32_VAL &= ~0x2;
 #endif
 }
 
