@@ -456,7 +456,7 @@ static inline bool scale_nearest(struct bitmap *bm,
     const int fb_width = get_fb_width(bm, false);
     long last_tick = current_tick;
     int ix, ox, lx, xe, iy, oy, ly, ye, yet, oyt;
-    int ixls, xels, iyls, yelsi, oyls, yelso, p;
+    int xelim, ixls, xels, yelim, iyls, yels, oyls, p;
     struct img_part *cur_part;
 #ifndef HAVE_LCD_COLOR
     fb_data *dest = dest, *dest_t;
@@ -470,12 +470,12 @@ static inline bool scale_nearest(struct bitmap *bm,
     ly = 0;
     iy = 0;
     ye = 0;
-    ixls = (sw > (dw - 1) && dw > 1) ? sw / (dw - 1) : 1;
-    xels = sw - ixls * (dw - 1) + (dw == 1 ? 1 : 0);
-    iyls = (sh > (dh - 1) && dh > 1) ? sh / (dh - 1) : 1;
-    oyls = dh > sh ? dh / sh : 1;
-    yelsi = iyls * (dh - 1) + (dh == 1 ? 1 : 0);
-    yelso = oyls * sh;
+    xelim = sw == dw - 1 ? dw : dw - 1;
+    ixls = xelim ? sw / xelim : 1;
+    xels = sw - ixls * (xelim ? xelim : 1);
+    yelim = sh == dh - 1 ? dh : dh - 1;
+    iyls = yelim ? sh / yelim : 1;
+    yels = iyls * (yelim ? yelim : 1);
     oyls *= rowstep;
     int delta = 127;
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING || \
@@ -563,7 +563,7 @@ static inline bool scale_nearest(struct bitmap *bm,
                         *dest_t = data;
                         dest_t += rowstep * fb_width;
                         yet += sh;
-                        oyt += 1;
+                        oyt += rowstep;
                     }
                 }
 #elif LCD_PIXELFORMAT == VERTICAL_PACKING
@@ -583,7 +583,7 @@ static inline bool scale_nearest(struct bitmap *bm,
                     if ((rowstep > 0 && shift == 6) || shift == 0)
                         dest_t += rowstep * fb_width;
                     yet += sh;
-                    oyt += 1;
+                    oyt += rowstep;
                 }
 #elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
                 bright = brightness(*(cur_part->buf));
@@ -601,7 +601,7 @@ static inline bool scale_nearest(struct bitmap *bm,
                     if ((rowstep > 0 && shift == 7) || shift == 0)
                         dest_t += rowstep * fb_width;
                     yet += sh;
-                    oyt += 1;
+                    oyt += rowstep;
                 }
 #endif /* LCD_PIXELFORMAT */
 #ifdef HAVE_REMOTE_LCD
@@ -625,7 +625,7 @@ static inline bool scale_nearest(struct bitmap *bm,
                     if ((rowstep > 0 && shift == 7) || shift == 0)
                         rdest_t += rowstep * fb_width;
                     yet += sh;
-                    oyt += 1;
+                    oyt += rowstep;
                 }
 #else
                 bright = brightness(*(cur_part->buf));
@@ -642,31 +642,25 @@ static inline bool scale_nearest(struct bitmap *bm,
                     if ((rowstep > 0 && shift == 7) || shift == 0)
                         rdest_t += rowstep * fb_width;
                     yet += sh;
-                    oyt += 1;
+                    oyt += rowstep;
                 }
 #endif
             }
 #endif
             xe += xels;
             ix += ixls;
-            while (xe >= dw)
+            while (xe > xelim)
             {
-                xe -= dw - 1;
+                xe -= xelim;
                 ix += 1;
             }
         }
-        oy += oyls;
-        ye += yelso;
-        while (ye < dh)
-        {
-            ye += sh;
-            oy += rowstep;
-        }
+        oy = oyt;
+        ye = yet - yels;
         iy += iyls;
-        ye -= yelsi;
-        while (ye >= dh)
+        while (ye > yelim)
         {
-            ye -= dh - 1;
+            ye -= yelim;
             iy += 1;
         }
     }
