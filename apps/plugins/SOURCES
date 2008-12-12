@@ -80,7 +80,7 @@ solitaire.c
 sokoban.c
 star.c
 starfield.c
-#if CONFIG_LCD == LCD_SSD1815
+#if (CONFIG_LCD == LCD_SSD1815) && (CONFIG_CODEC != SWCODEC)
 video.c
 #endif
 vu_meter.c

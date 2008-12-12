@@ -41,7 +41,7 @@ int button_read_device(void)
     
     /* direct GPIO connections */
     if (GPIOA_PIN(3))
-        result |= BUTTON_MENU;
+        result |= BUTTON_POWER;
 
     /* This is a keypad using A4-A6 as columns and A0-A2 as rows */
     GPIOA_PIN(4) = (1<<4);
@@ -50,10 +50,10 @@ int button_read_device(void)
     /* A4A0 is unused */
 
     if (GPIOA_PIN(1))
-        result |= BUTTON_VOLDOWN;
+        result |= BUTTON_VOL_DOWN;
 
     if (GPIOA_PIN(2))
-        result |= BUTTON_PLAYPAUSE;
+        result |= BUTTON_UP;
 
     GPIOA_PIN(4) = 0x00;  
     
@@ -76,10 +76,10 @@ int button_read_device(void)
     btn_delay();
     
     if (GPIOA_PIN(0))
-        result |= BUTTON_REPEATAB;
+        result |= BUTTON_DOWN;
 
     if (GPIOA_PIN(1))
-        result |= BUTTON_VOLUP;
+        result |= BUTTON_VOL_UP;
 
     /* hold button is read in button_hold() */
         
