@@ -28,8 +28,6 @@
 #include "audiohw.h"
 #include "dsp-target.h"
 
-static int pcm_fsel = HW_FREQ_DEFAULT;
-
 void pcm_play_dma_init(void)
 {
     IO_CLK_O1DIV = 3;

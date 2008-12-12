@@ -107,7 +107,7 @@ void audiohw_preinit(void)
     wmcodec_write(OUTCTRL, OUTCTRL_VROI);
     wmcodec_write(CLKCTRL, CLKCTRL_MS); /* WM8758 is clock master */
 
-    audiohw_set_sample_rate(HW_FREQ_44);
+    audiohw_set_frequency(HW_FREQ_44);
     
     wmcodec_write(LOUTMIX, LOUTMIX_DACL2LMIX);
     wmcodec_write(ROUTMIX, ROUTMIX_DACR2RMIX);

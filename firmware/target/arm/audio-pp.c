@@ -35,7 +35,7 @@ void audio_input_mux(int source, unsigned flags)
     (void)flags;
     /* Prevent pops from unneeded switching */
     static int last_source = AUDIO_SRC_PLAYBACK;
-#ifdef HAVE_FMRADIO_REC
+#ifdef HAVE_FMRADIO_REC 
     bool recording = flags & SRCF_RECORDING;
     static bool last_recording = false;
 #endif
@@ -43,7 +43,7 @@ void audio_input_mux(int source, unsigned flags)
 #if defined(IPOD_COLOR) || defined (IPOD_4G)
     /* The usual magic from IPL - I'm guessing this configures the headphone
        socket to be input or output. */
-    if (recording && source != AUDIO_SRC_PLAYBACK)
+    if ((flags & SRCF_RECORDING) && source != AUDIO_SRC_PLAYBACK)
     {
         /* input */
         GPIO_CLEAR_BITWISE(GPIOI_OUTPUT_VAL, 0x40);

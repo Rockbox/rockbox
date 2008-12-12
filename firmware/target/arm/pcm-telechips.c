@@ -58,8 +58,6 @@ struct dma_data dma_play_data SHAREDBSS_ATTR =
     .state = 0
 };
 
-static unsigned long pcm_sampr SHAREDDATA_ATTR = HW_SAMPR_DEFAULT; /* 44.1 is default */
-
 void pcm_postinit(void)
 {
     audiohw_postinit();

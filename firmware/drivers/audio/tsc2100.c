@@ -131,6 +131,6 @@ void audiohw_close(void)
 }
 
 void audiohw_set_frequency(int fsel)
-
+{
     (void)fsel;
 }

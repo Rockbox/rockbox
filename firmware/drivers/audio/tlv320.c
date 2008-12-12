@@ -157,10 +157,10 @@ void audiohw_set_frequency(int fsel)
     /* All rates available for 11.2896MHz besides 8.021 */
     static const unsigned char values_src[HW_NUM_FREQ] =
     {
-        [HW_FREQ_11] = (0x8 << 2) | SRC_CLKIN,
-        [HW_FREQ_22] = (0x8 << 2) | SRC_CLKIN,
-        [HW_FREQ_44] = (0x8 << 2),
-        [HW_FREQ_88] = (0xf << 2),
+        HW_HAVE_11_([HW_FREQ_11] = (0x8 << 2) | SRC_CLKIN,)
+        HW_HAVE_22_([HW_FREQ_22] = (0x8 << 2) | SRC_CLKIN,)
+        HW_HAVE_44_([HW_FREQ_44] = (0x8 << 2),)
+        HW_HAVE_88_([HW_FREQ_88] = (0xf << 2),)
     };
 
     unsigned value_dap, value_pc;
