@@ -35,28 +35,28 @@ unsigned short adc_scan(int channel)
 
     /* Start conversion */
     ADC_ADDR |= 0x80000000;
-    
+
     /* Wait for conversion to complete */
     while((ADC_STATUS & (0x40<<8*channel))==0);
-    
+
     /* Stop conversion */
     ADC_ADDR &=~ 0x80000000;
-    
+
     /* ADC_DATA_1 and ADC_DATA_2 are both four bytes, one byte per channel.
        For each channel, ADC_DATA_1 stores the 8-bit msb, ADC_DATA_2 stores the
        2-bit lsb (in bits 0 and 1). Each channel is 10 bits total. */
     adc_data_1 = ((ADC_DATA_1 >> (8*channel)) & 0xff);
     adc_data_2 = ((ADC_DATA_2 >> (8*channel+6)) & 0x3);
-    
+
     adcdata[channel] = (adc_data_1<<2 | adc_data_2);
-    
+
     /* ADC values read low if PLL is enabled */
     if(PLL_CONTROL & 0x80000000){
         adcdata[channel] += 0x14;
         if(adcdata[channel] > 0x400)
             adcdata[channel] = 0x400;
     }
-    
+
     return adcdata[channel];
 }
 
@@ -83,17 +83,18 @@ static void adc_tick(void)
 /* Figured out from how the OF does things */
 void adc_init(void)
 {
+
     ADC_INIT |= 1;
     ADC_INIT |= 0x40000000;
     udelay(100);
-    
+
     /* Reset ADC */
     DEV_RS2 |= 0x20;
     udelay(100);
-    
+
     DEV_RS2 &=~ 0x20;
     udelay(100);
-    
+
     /* Enable ADC */
     DEV_EN2 |= 0x20;
     udelay(100);
@@ -121,7 +122,8 @@ void adc_init(void)
     ADC_ADDR   |= 0x2000000;
     ADC_STATUS |= 0x2000;
 
-#if defined (IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(MROBE_100)
+#if defined (IRIVER_H10) || defined(IRIVER_H10_5GB) || \
+    defined(MROBE_100) || defined(PHILIPS_HDD1630)
     /* Enable channel 2 (H10:remote) */
     DEV_INIT1  &=~0x300;
     DEV_INIT1  |= 0x100;

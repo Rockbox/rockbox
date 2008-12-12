@@ -32,11 +32,12 @@
 #include "i2s.h"
 #include "wmcodec.h"
 
-#if defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(MROBE_100)
+#if defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || \
+    defined(MROBE_100) || defined(PHILIPS_HDD1630)
 /* The H10's audio codec uses an I2C address of 0x1b */
 #define I2C_AUDIO_ADDRESS 0x1b
 #else
-/* The iPod's audio codecs use an I2C address of 0x1a */ 
+/* The iPod's audio codecs use an I2C address of 0x1a */
 #define I2C_AUDIO_ADDRESS 0x1a
 #endif
 
@@ -100,7 +101,7 @@ void audiohw_init(void)
 
     /* reset the I2S controller into known state */
     i2s_reset();
-    
+
     audiohw_preinit();
 }
 

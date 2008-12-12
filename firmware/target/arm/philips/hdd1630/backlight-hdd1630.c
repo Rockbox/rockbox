@@ -34,10 +34,14 @@ void _backlight_set_brightness(int brightness)
 
 void _backlight_on(void)
 {
+    GPO32_VAL &= ~0x1000000;
+    GPO32_ENABLE &= ~0x1000000;
 }
 
 void _backlight_off(void)
 {
+    GPO32_VAL |= 0x1000000;
+    GPO32_ENABLE |= 0x1000000;
 }
 
 #ifdef HAVE_BUTTON_LIGHT

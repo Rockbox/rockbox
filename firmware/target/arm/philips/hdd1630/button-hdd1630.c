@@ -23,6 +23,21 @@
 #include "button.h"
 #include "backlight.h"
 
+/* Remember last buttons, to make single buzz sound */
+int btn_old;
+
+/*
+ * Generate a click sound from the player (not in headphones yet)
+ * TODO: integrate this with the "key click" option
+ */
+void button_click(void)
+{
+    GPO32_ENABLE |= 0x2000;
+    GPIOD_OUTPUT_VAL |= 0x8;
+    udelay(1000);
+    GPO32_VAL &= ~0x2000;
+}
+
 void button_init_device(void)
 {
     /* TODO...for now, hardware initialisation is done by the bootloader */
@@ -49,19 +64,33 @@ int button_read_device(void)
    /* device buttons */
     if (!hold_button)
     {
+        /* These are the correct button definitions
         if (!(GPIOA_INPUT_VAL & 0x01)) btn |= BUTTON_MENU;
         if (!(GPIOA_INPUT_VAL & 0x02)) btn |= BUTTON_VOL_UP;
         if (!(GPIOA_INPUT_VAL & 0x04)) btn |= BUTTON_VOL_DOWN;
         if (!(GPIOA_INPUT_VAL & 0x08)) btn |= BUTTON_VIEW;
-
         if (!(GPIOD_INPUT_VAL & 0x20)) btn |= BUTTON_PLAYLIST;
         if (!(GPIOD_INPUT_VAL & 0x40)) btn |= BUTTON_POWER;
+        */
+
+        /* This is a hack until the touchpad works */
+        if (!(GPIOA_INPUT_VAL & 0x01)) btn |= BUTTON_LEFT;   /* BUTTON_MENU */
+        if (!(GPIOA_INPUT_VAL & 0x02)) btn |= BUTTON_UP;     /* BUTTON_VOL_UP */
+        if (!(GPIOA_INPUT_VAL & 0x04)) btn |= BUTTON_DOWN;   /* BUTTON_VOL_DOWN */
+        if (!(GPIOA_INPUT_VAL & 0x08)) btn |= BUTTON_RIGHT;  /* BUTTON_VIEW */
+        if (!(GPIOD_INPUT_VAL & 0x20)) btn |= BUTTON_SELECT; /* BUTTON_PLAYLIST */
+        if (!(GPIOD_INPUT_VAL & 0x40)) btn |= BUTTON_POWER;
     }
+
+    if ((btn != btn_old) && (btn != BUTTON_NONE))
+        button_click();
+
+    btn_old = btn;
 
     return btn;
 }
 
 bool headphones_inserted(void)
 {
-    return true;
+    return (GPIOE_INPUT_VAL & 0x80) ? true : false;
 }

@@ -1,12 +1,12 @@
 /*
- * This config file is for the Philips GoGear HDD1630
+ * This config file is for the Philips GoGear HDD16x0/HDD63x0
  */
 
 #define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 31
-#define MODEL_NAME   "Philips GoGear HDD1630"
+#define MODEL_NAME   "Philips GoGear HDD16x0"
 
 /* define this if you use an ATA controller */
 #define CONFIG_STORAGE STORAGE_ATA
@@ -48,7 +48,7 @@
 #define LCD_WIDTH  128
 #define LCD_HEIGHT 128
 #define LCD_DEPTH  16   /* 65536 colours */
-#define LCD_PIXELFORMAT RGB565SWAPPED /* rgb565 byte-swapped */
+#define LCD_PIXELFORMAT RGB565  /* rgb565 byte-swapped */
 
 #ifndef BOOTLOADER
 /* Define this if your LCD can be enabled/disabled */
@@ -95,7 +95,7 @@
 /* WM8731 has no tone controls, so we use the software ones */
 #define HAVE_SW_TONE_CONTROLS
 
-#define AB_REPEAT_ENABLE 1
+/* TODO: #define AB_REPEAT_ENABLE 1 */
 
 /* FM Tuner */
 /* #define CONFIG_TUNER TEA5767 */
@@ -116,8 +116,6 @@
 
 /* define this if you have a light associated with the buttons */
 /* #define HAVE_BUTTON_LIGHT */
-
-#define AB_REPEAT_ENABLE 1
 
 #define BATTERY_CAPACITY_DEFAULT 1550 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 1500  /* min. capacity selectable */
@@ -162,7 +160,7 @@
 #define DEFAULT_CONTRAST_SETTING    14 /* Match boot contrast */
 
 /* We're able to shut off power to the HDD */
-/* #define HAVE_ATA_POWER_OFF */
+#define HAVE_ATA_POWER_OFF
 
 /* Offset ( in the firmware file's header ) to the file CRC and data. These are
    only used when loading the old format rockbox.e200 file */

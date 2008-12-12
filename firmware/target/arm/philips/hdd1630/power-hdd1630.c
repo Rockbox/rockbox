@@ -35,11 +35,30 @@ bool charger_enabled;
 
 void power_init(void)
 {
+    /* power off bit */
+    GPIOB_ENABLE |= 0x80;
+    GPIOB_OUTPUT_VAL |= 0x80;
+    GPIOB_OUTPUT_EN |= 0x80;
+
+    /* charger inserted bit */
+    GPIOE_ENABLE |= 0x20;
+    GPIOE_INPUT_VAL |= 0x20;
 }
 
 unsigned int power_input_status(void)
-{     
-    return POWER_INPUT_NONE;
+{
+    unsigned int status = POWER_INPUT_NONE;
+
+    /* AC charger */
+    if (GPIOE_INPUT_VAL & 0x20)
+        status |= POWER_INPUT_MAIN_CHARGER;
+
+    /* Do nothing with USB for now
+    if (GPIOE_INPUT_VAL & 0x4)
+        status |= POWER_INPUT_USB_CHARGER;
+    */
+
+    return status;
 }
 
 void ide_power_enable(bool on)
@@ -57,4 +76,8 @@ bool ide_powered(void)
 
 void power_off(void)
 {
+    /* power off bit */
+    GPIOB_ENABLE |= 0x80;
+    GPIOB_OUTPUT_VAL &= ~0x80;
+    GPIOB_OUTPUT_EN |= 0x80;
 }

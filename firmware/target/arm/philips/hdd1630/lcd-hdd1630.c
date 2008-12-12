@@ -84,6 +84,7 @@ void lcd_init_device(void)
     LCD2_BLOCK_CTRL = 0x10008080;
     LCD2_BLOCK_CONFIG = 0xF00000;
 
+    /* lcd power */
     GPIOJ_ENABLE     |= 0x4;
     GPIOJ_OUTPUT_VAL |= 0x4;
     GPIOJ_OUTPUT_EN  |= 0x4;
