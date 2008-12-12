@@ -213,6 +213,7 @@ static void pcm_play_data_start(unsigned char *start, size_t size)
     if (start && size)
     {
         logf(" pcm_play_dma_start");
+        pcm_apply_settings();
         pcm_play_dma_start(start, size);
         pcm_playing = true;
         pcm_paused = false;
@@ -234,8 +235,6 @@ void pcm_play_data(pcm_more_callback_type get_more,
 
     pcm_callback_for_more = get_more;
 
-    pcm_apply_settings();
-
     logf(" pcm_play_data_start");
     pcm_play_data_start(start, size);
 
@@ -256,21 +255,17 @@ void pcm_play_pause(bool play)
             pcm_play_dma_pause(true);
             pcm_paused = true;
         }
+        else if (pcm_get_bytes_waiting() > 0)
+        {
+            logf(" pcm_play_dma_pause");
+            pcm_apply_settings();
+            pcm_play_dma_pause(false);
+            pcm_paused = false;
+        }
         else
         {
-            pcm_apply_settings();
-
-            if (pcm_get_bytes_waiting() > 0)
-            {
-                logf(" pcm_play_dma_pause");
-                pcm_play_dma_pause(false);
-                pcm_paused = false;
-            }
-            else
-            {
-                logf(" pcm_play_dma_start: no data");
-                pcm_play_data_start(NULL, 0);
-            }
+            logf(" pcm_play_dma_start: no data");
+            pcm_play_data_start(NULL, 0);
         }
     }
     else

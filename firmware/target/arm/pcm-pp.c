@@ -272,8 +272,6 @@ static void play_start_pcm(void)
 {
     fiq_function = fiq_playback;
 
-    pcm_apply_settings();
-
     IISCONFIG &= ~IIS_TXFIFOEN;  /* Stop transmitting */
     dma_play_data.state = 1;
 
@@ -379,7 +377,6 @@ void pcm_play_dma_init(void)
 void pcm_postinit(void)
 {
     audiohw_postinit();
-    pcm_apply_settings();
 }
 
 const void * pcm_play_dma_get_peak_buffer(int *count)

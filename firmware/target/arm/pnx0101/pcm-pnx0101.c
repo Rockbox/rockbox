@@ -27,8 +27,6 @@
 short __attribute__((section(".dmabuf"))) dma_buf_left[DMA_BUF_SAMPLES];
 short __attribute__((section(".dmabuf"))) dma_buf_right[DMA_BUF_SAMPLES];
 
-static int pcm_sampr = HW_SAMPR_DEFAULT; /* 44.1 is default */
-
 unsigned short* p IBSS_ATTR;
 size_t p_size IBSS_ATTR;
 
@@ -42,8 +40,6 @@ void pcm_play_unlock(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    pcm_apply_settings();
-
     p = (unsigned short*)addr;
     p_size = size;
 }
@@ -54,8 +50,7 @@ void pcm_play_dma_stop(void)
 
 void pcm_play_dma_pause(bool pause)
 {
-    if (!pause)
-        pcm_apply_settings();
+    (void)pause;
 }
 
 static inline void fill_dma_buf(int offset)

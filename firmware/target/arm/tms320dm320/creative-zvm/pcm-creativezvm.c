@@ -46,7 +46,6 @@ void pcm_play_dma_init(void)
 void pcm_postinit(void)
 {
     audiohw_postinit();
-    pcm_apply_settings();
 
     /* wake DSP */
     dsp_wake();

@@ -39,8 +39,6 @@ void pcm_postinit(void)
     /* playback sample:16 bits, burst:16 bytes */
     __i2s_set_transmit_trigger(4);
     __i2s_set_oss_sample_size(16);
-    
-    pcm_apply_settings();
 }
 
 const void * pcm_play_dma_get_peak_buffer(int *count)

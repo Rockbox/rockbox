@@ -96,7 +96,6 @@ void pcm_play_dma_init(void)
 void pcm_postinit(void)
 {
     audiohw_postinit();
-    pcm_apply_settings();
 }
 
 void pcm_dma_apply_settings(void)
@@ -109,8 +108,6 @@ static void play_start_pcm(void)
 {
     /* clear pending DMA interrupt */
     SRCPND = DMA2_MASK;
-
-    pcm_apply_settings();
 
     /* Flush any pending writes */
     clean_dcache_range((void*)DISRC2, (DCON2 & 0xFFFFF) * 2);

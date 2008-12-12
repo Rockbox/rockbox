@@ -206,9 +206,6 @@ static void play_start_pcm(void)
     /* Stop transmission (if in progress) */
     SSI_SCR1 &= ~SSI_SCR_TE;
 
-    /* Apply new settings */
-    pcm_apply_settings();
-
     /* Enable interrupt on unlock */
     dma_play_data.state = 1;
 

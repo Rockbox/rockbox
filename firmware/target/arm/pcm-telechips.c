@@ -61,7 +61,6 @@ struct dma_data dma_play_data SHAREDBSS_ATTR =
 void pcm_postinit(void)
 {
     audiohw_postinit();
-    pcm_apply_settings();
 }
 
 const void * pcm_play_dma_get_peak_buffer(int *count)
@@ -115,8 +114,6 @@ void pcm_dma_apply_settings(void)
 
 static void play_start_pcm(void)
 {
-    pcm_apply_settings();
-
     DAMR &= ~(1<<14);   /* disable tx */
     dma_play_data.state = 1;
 
