@@ -43,15 +43,8 @@ const struct button_mapping *plugin_contexts[]
 
 #define NB_ACTION_CONTEXTS sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
 
-/* Key assignement */
-#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
- || (CONFIG_KEYPAD == IPOD_3G_PAD) \
- || (CONFIG_KEYPAD == IPOD_4G_PAD) \
- || (CONFIG_KEYPAD == SANSA_E200_PAD)
-#define SCROLLWHEEL
-#endif
 
-#ifdef SCROLLWHEEL
+#ifdef HAVE_SCROLLWHEEL
 #define PICTUREFLOW_NEXT_ALBUM          PLA_DOWN
 #define PICTUREFLOW_NEXT_ALBUM_REPEAT   PLA_DOWN_REPEAT
 #define PICTUREFLOW_PREV_ALBUM          PLA_UP
@@ -221,7 +214,7 @@ static int empty_slide_hid;
 unsigned int thread_id;
 struct event_queue thread_q;
 
-static char tmp_path_name[MAX_PATH];
+static char tmp_path_name[MAX_PATH+1];
 
 static long uniqbuf[UNIQBUF_SIZE];
 static struct tagcache_search tcs;
@@ -506,12 +499,13 @@ bool get_albumart_for_index_from_db(const int slide_index, char *buf, int buflen
     if ( rb->tagcache_get_next(&tcs) ) {
         struct mp3entry id3;
         char size[9];
+        int fd;
         rb->snprintf(size, sizeof(size), ".%dx%d", PREFERRED_IMG_WIDTH,
                      PREFERRED_IMG_HEIGHT);
-        rb->strncpy( (char*)&id3.path, tcs.result, MAX_PATH );
-        id3.album = get_album_name(slide_index);
-        /* xxx: Should set id3.artist / id3.albumartist to their real values */
-        id3.artist = id3.albumartist = NULL;
+
+        fd = rb->open(tcs.result, O_RDONLY);
+        rb->get_metadata(&id3, fd, tcs.result);
+        rb->close(fd);
         if ( rb->search_albumart_files(&id3, size, buf, buflen) )
             result = true;
         else if ( rb->search_albumart_files(&id3, "", buf, buflen) )
@@ -646,6 +640,9 @@ bool create_albumart_cache(bool force)
 
 
         rb->snprintf(tmp_path_name, sizeof(tmp_path_name), CACHE_PREFIX "/%d.pfraw", i);
+        /* delete existing cache, so it's a true rebuild */
+        if(rb->file_exists(tmp_path_name))
+            rb->remove(tmp_path_name);
         if (!create_bmp(&input_bmp, tmp_path_name, false)) {
             rb->splash(HZ, "Could not write bmp");
         }
@@ -1719,7 +1716,6 @@ void update_cover_in_animation(void)
     }
     else {
         cover_animation_keyframe = 0;
-        selected_track = 0;
         pf_state = pf_show_tracks;
     }
 }
@@ -2075,7 +2071,7 @@ int main(void)
 
         case PICTUREFLOW_NEXT_ALBUM:
         case PICTUREFLOW_NEXT_ALBUM_REPEAT:
-#ifdef SCROLLWHEEL
+#ifdef HAVE_SCROLLWHEEL
             if ( pf_state == pf_show_tracks )
                 select_next_track();
 #endif
@@ -2085,7 +2081,7 @@ int main(void)
 
         case PICTUREFLOW_PREV_ALBUM:
         case PICTUREFLOW_PREV_ALBUM_REPEAT:
-#ifdef SCROLLWHEEL
+#ifdef HAVE_SCROLLWHEEL
             if ( pf_state == pf_show_tracks )
                 select_prev_track();
 #endif
@@ -2093,7 +2089,7 @@ int main(void)
                 show_previous_slide();
             break;
 
-#ifndef SCROLLWHEEL
+#ifndef HAVE_SCROLLWHEEL
         case PICTUREFLOW_NEXT_TRACK:
         case PICTUREFLOW_NEXT_TRACK_REPEAT:
             if ( pf_state == pf_show_tracks )
@@ -2109,7 +2105,6 @@ int main(void)
 
         case PICTUREFLOW_SELECT_ALBUM:
             if ( pf_state == pf_idle ) {
-                reset_track_list();
                 pf_state = pf_cover_in;
             }
             if ( pf_state == pf_show_tracks )
