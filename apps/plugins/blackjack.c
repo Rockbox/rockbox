@@ -1413,7 +1413,7 @@ static int blackjack(struct game_context* bj) {
                 rb->lcd_update();
             }
         }
-        if(bj->split_status == 0 && 
+        if(!bj->end_hand && bj->split_status == 0 && 
            bj->player_cards[0][0].num == bj->player_cards[0][1].num) {
             split(bj);
             redraw_board(bj);
@@ -1424,7 +1424,7 @@ static int blackjack(struct game_context* bj) {
             }
         }
 
-        while(done < todo) {
+        while(!bj->end_hand && done < todo) {
             button = rb->button_get(true);
 
             switch(button) {
