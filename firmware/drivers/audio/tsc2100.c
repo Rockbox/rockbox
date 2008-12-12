@@ -130,7 +130,7 @@ void audiohw_close(void)
 
 }
 
-void audiohw_set_sample_rate(int sampling_control)
-{
-    (void)sampling_control;
+void audiohw_set_frequency(int fsel)
+
+    (void)fsel;
 }

@@ -46,7 +46,7 @@ static unsigned int gen_thread_id;
 #define OUTPUT_CHUNK_SAMPLES 1152
 #define OUTPUT_CHUNK_SIZE (OUTPUT_CHUNK_SAMPLES*sizeof(int16_t)*2)
 static uint16_t output_buf[OUTPUT_CHUNK_COUNT][OUTPUT_CHUNK_SAMPLES*2]
-        IBSS_ATTR __attribute__((aligned(4)));
+        __attribute__((aligned(4)));
 static int output_head IBSS_ATTR;
 static int output_tail IBSS_ATTR;
 static int output_step IBSS_ATTR;

@@ -138,8 +138,10 @@ void pcm_postinit(void)
     pcm_apply_settings();
 }
 
-void pcm_set_frequency(unsigned int frequency)
+void pcm_dma_apply_settings(void)
 {
+    unsigned long frequency = pcm_sampr;
+
     const int divider = (((AS3525_PLLA_FREQ/128) + (frequency/2)) / frequency) - 1;
     if(divider < 0 || divider > 511)
         panicf("unsupported frequency %d", frequency);
@@ -147,13 +149,6 @@ void pcm_set_frequency(unsigned int frequency)
     CGU_AUDIO &= ~(((511 ^ divider) << 2) /* I2SOUT */
             /*| ((511 ^ divider) << 14) */ /* I2SIN */
             );
-
-    pcm_curr_sampr = frequency;
-}
-
-void pcm_apply_settings(void)
-{
-    pcm_set_frequency(HW_SAMPR_DEFAULT);
 }
 
 size_t pcm_get_bytes_waiting(void)

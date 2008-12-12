@@ -152,21 +152,21 @@ void audiohw_postinit(void)
  * 44100: 1 = MCLK   MCLK    SCLK, LRCK: Audio Clk / 4 (default)
  * 88200: 2 = MCLK*2 MCLK    SCLK, LRCK: Audio Clk / 2
  */
-void audiohw_set_frequency(unsigned fsel)
+void audiohw_set_frequency(int fsel)
 {
     /* All rates available for 11.2896MHz besides 8.021 */
-    unsigned char values_src[3] =
+    static const unsigned char values_src[HW_NUM_FREQ] =
     {
-                                /* Fs:          */
-        (0x8 << 2) | SRC_CLKIN, /* 11025, 22050 */
-        (0x8 << 2),             /* 44100        */
-        (0xf << 2),             /* 88200        */
+        [HW_FREQ_11] = (0x8 << 2) | SRC_CLKIN,
+        [HW_FREQ_22] = (0x8 << 2) | SRC_CLKIN,
+        [HW_FREQ_44] = (0x8 << 2),
+        [HW_FREQ_88] = (0xf << 2),
     };
 
     unsigned value_dap, value_pc;
 
-    if (fsel >= ARRAYLEN(values_src))
-        fsel = 1;
+    if ((unsigned)fsel >= HW_NUM_FREQ)
+        fsel = HW_FREQ_DEFAULT;
 
     /* Temporarily turn off the DAC and ADC before switching sample
        rates or they don't choose their filters correctly */

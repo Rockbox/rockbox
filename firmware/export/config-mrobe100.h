@@ -58,6 +58,7 @@
 
 /* Wolfsom audio codec */
 #define HAVE_WM8751
+#define CODEC_SRCTRL_44100HZ     (0x40|(0x11 << 1)|1)
 
 #define AB_REPEAT_ENABLE 1
 

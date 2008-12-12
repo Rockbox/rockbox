@@ -229,8 +229,18 @@ void audiohw_close(void)
     wmcodec_write(PWRMGMT1, 0x0);
 }
 
-/* Note: Disable output before calling this function */
 void audiohw_set_frequency(int fsel)
 {
-    wmcodec_write(CLOCKING, fsel);
+    static const unsigned char srctrl_table[HW_NUM_FREQ] =
+    {
+        HW_HAVE_11_([HW_FREQ_11] = CODEC_SRCTRL_11025HZ,)
+        HW_HAVE_22_([HW_FREQ_22] = CODEC_SRCTRL_22050HZ,)
+        HW_HAVE_44_([HW_FREQ_44] = CODEC_SRCTRL_44100HZ,)
+        HW_HAVE_88_([HW_FREQ_88] = CODEC_SRCTRL_88200HZ,)
+    };
+
+    if ((unsigned)fsel >= HW_NUM_FREQ)
+        fsel = HW_FREQ_DEFAULT;
+
+    wmcodec_write(CLOCKING, srctrl_table[fsel]);
 }

@@ -107,7 +107,7 @@ void audiohw_preinit(void)
     wmcodec_write(OUTCTRL, OUTCTRL_VROI);
     wmcodec_write(CLKCTRL, CLKCTRL_MS); /* WM8758 is clock master */
 
-    audiohw_set_sample_rate(WM8758_44100HZ);
+    audiohw_set_sample_rate(HW_FREQ_44);
     
     wmcodec_write(LOUTMIX, LOUTMIX_DACL2LMIX);
     wmcodec_write(ROUTMIX, ROUTMIX_DACR2RMIX);
@@ -170,10 +170,10 @@ void audiohw_close(void)
 }
 
 /* Note: Disable output before calling this function */
-void audiohw_set_sample_rate(int sampling_control)
+void audiohw_set_frequency(int fsel)
 {
     /**** We force 44.1KHz for now. ****/
-    (void)sampling_control;
+    (void)fsel;
 
     /* setup PLL for MHZ=11.2896 */
     wmcodec_write(PLLN, PLLN_PLLPRESCALE | 0x7);

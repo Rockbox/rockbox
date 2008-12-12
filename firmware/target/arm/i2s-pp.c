@@ -25,28 +25,22 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #include "system.h"
 #include "cpu.h"
 #include "i2s.h"
 
-/* TODO: Add in PP5002 defs */
 #if CONFIG_CPU == PP5002
 void i2s_reset(void)
 {
     /* I2S device reset */
-    DEV_RS |= 0x80;
-    DEV_RS &= ~0x80;
+    DEV_RS |= DEV_I2S;
+    DEV_RS &= ~DEV_I2S;
 
     /* I2S controller enable */
-    IISCONFIG |= 1;
-
-    /* BIT.FORMAT [11:10] = I2S (default) */
-    /* BIT.SIZE [9:8] = 24bit */
-    /* FIFO.FORMAT = 24 bit LSB */
+    IISCONFIG |= IIS_ENABLE;
 
     /* reset DAC and ADC fifo */
-    IISFIFO_CFG |= 0x30000;
+    IISFIFO_CFG |= IIS_RXCLR | IIS_TXCLR;
 }
 #else /* PP502X */
 

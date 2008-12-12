@@ -28,6 +28,8 @@
 #include "audiohw.h"
 #include "dsp-target.h"
 
+static int pcm_fsel = HW_FREQ_DEFAULT;
+
 void pcm_play_dma_init(void)
 {
     IO_CLK_O1DIV = 3;
@@ -37,7 +39,7 @@ void pcm_play_dma_init(void)
 
     audiohw_init();
 
-    audiohw_set_frequency(1);
+    audiohw_set_frequency(HW_FREQ_DEFAULT);
 
     /* init DSP */
     dsp_init();
@@ -46,32 +48,11 @@ void pcm_play_dma_init(void)
 void pcm_postinit(void)
 {
     audiohw_postinit();
+    pcm_apply_settings();
+
     /* wake DSP */
     dsp_wake();
 }
-
-/* set frequency used by the audio hardware */
-void pcm_set_frequency(unsigned int frequency)
-{
-    int index;
-
-    switch(frequency)
-    {
-        case SAMPR_11:
-        case SAMPR_22:
-            index = 0;
-            break;
-        default:
-        case SAMPR_44:
-            index = 1;
-            break;
-        case SAMPR_88:
-            index = 2;
-            break;
-    }
-
-    audiohw_set_frequency(index);
-} /* pcm_set_frequency */
 
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
@@ -79,9 +60,9 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
     return 0;
 }
 
-void pcm_apply_settings(void)
+void pcm_dma_apply_settings(void)
 {
-
+    audiohw_set_frequency(pcm_fsel);
 }
 
 void pcm_play_dma_start(const void *addr, size_t size)

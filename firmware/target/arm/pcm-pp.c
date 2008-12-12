@@ -25,10 +25,7 @@
 #include "audio.h"
 #include "sound.h"
 #include "pcm.h"
-
-#ifdef HAVE_WM8751
-#define MROBE100_44100HZ     (0x40|(0x11 << 1)|1)
-#endif
+#include "pcm_sampr.h"
 
 /** DMA **/
 
@@ -87,36 +84,9 @@ static struct dma_data dma_play_data SHAREDBSS_ATTR =
     .state = 0
 };
 
-static unsigned long pcm_freq SHAREDDATA_ATTR = HW_SAMPR_DEFAULT; /* 44.1 is default */
-#ifdef HAVE_WM8751
-/* Samplerate control for audio codec */
-static int sr_ctrl = MROBE100_44100HZ;
-#endif
-
-void pcm_set_frequency(unsigned int frequency)
+void pcm_dma_apply_settings(void)
 {
-#if defined(HAVE_WM8731) || defined(HAVE_WM8721)
-    pcm_freq = frequency;
-#else
-    (void)frequency;
-    pcm_freq = HW_SAMPR_DEFAULT;
-#endif
-#ifdef HAVE_WM8751
-    sr_ctrl  = MROBE100_44100HZ;
-#endif
-}
-
-void pcm_apply_settings(void)
-{
-#ifdef HAVE_WM8751
-    audiohw_set_frequency(sr_ctrl);
-#endif
-
-#if defined(HAVE_WM8711) || defined(HAVE_WM8721) \
-    || defined(HAVE_WM8731)
-    audiohw_set_sample_rate(pcm_freq);
-#endif
-    pcm_curr_sampr = pcm_freq;
+    audiohw_set_frequency(pcm_fsel);
 }
 
 /* ASM optimised FIQ handler. Checks for the minimum allowed loop cycles by
@@ -330,9 +300,7 @@ static void play_stop_pcm(void)
     IIS_IRQTX_REG &= ~IIS_IRQTX;
 
     /* Wait for FIFO to empty */
-#ifdef CPU_PP502x
-    while (IIS_TX_FREE_COUNT < 16);
-#endif
+    while (!IIS_TX_IS_EMPTY);
 
     dma_play_data.state = 0;
 }
@@ -396,8 +364,6 @@ void pcm_play_dma_init(void)
         :
         : [iiscfg]"r"(iiscfg), [dmapd]"r"(dmapd)
         : "r2");
-
-    pcm_set_frequency(SAMPR_44);
 
     /* Initialize default register values. */
     audiohw_init();
@@ -620,24 +586,10 @@ void pcm_rec_dma_start(void *addr, size_t size)
 void pcm_rec_dma_close(void)
 {
     pcm_rec_dma_stop();
-
-#if defined(IPOD_COLOR) || defined (IPOD_4G)
-    /* The usual magic from IPL - I'm guessing this configures the headphone
-       socket to be input or output - in this case, output. */
-    GPIO_SET_BITWISE(GPIOI_OUTPUT_VAL, 0x40);
-    GPIO_SET_BITWISE(GPIOA_OUTPUT_VAL, 0x04);
-#endif
 } /* pcm_close_recording */
 
 void pcm_rec_dma_init(void)
 {
-#if defined(IPOD_COLOR) || defined (IPOD_4G)
-    /* The usual magic from IPL - I'm guessing this configures the headphone
-       socket to be input or output - in this case, input. */
-    GPIO_CLEAR_BITWISE(GPIOI_OUTPUT_VAL, 0x40);
-    GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_VAL, 0x04);
-#endif
-
     pcm_rec_dma_stop();
 } /* pcm_init */
 

@@ -290,9 +290,9 @@ void audiohw_close(void)
     sleep(HZ/4);
 }
 
-void audiohw_set_sample_rate(int sampling_control)
+void audiohw_set_frequency(int fsel)
 {
-    (void)sampling_control;
+    (void)fsel;
 }
 
 #if defined(HAVE_RECORDING)

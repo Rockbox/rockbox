@@ -26,7 +26,7 @@ extern int tenthdb2master(int db);
 
 extern void audiohw_set_master_vol(int vol_l, int vol_r);
 extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
-extern void audiohw_set_sample_rate(int sampling_control);
+extern void audiohw_set_frequency(int fsel);
 
 /* Register Descriptions */
 #define AS3514_LINE_OUT_R 0x00

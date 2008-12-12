@@ -34,7 +34,7 @@ extern int tenthdb2mixer(int db);
 extern void audiohw_set_master_vol(int vol_l, int vol_r);
 extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 extern void audiohw_set_mixer_vol(int channel1, int channel2);
-extern void audiohw_set_sample_rate(int sampling_control);
+extern void audiohw_set_frequency(int fsel);
 
 #define RESET                   0x00
 #define RESET_RESET             0x0

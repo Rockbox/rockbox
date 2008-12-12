@@ -27,7 +27,7 @@
 short __attribute__((section(".dmabuf"))) dma_buf_left[DMA_BUF_SAMPLES];
 short __attribute__((section(".dmabuf"))) dma_buf_right[DMA_BUF_SAMPLES];
 
-static int pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */
+static int pcm_sampr = HW_SAMPR_DEFAULT; /* 44.1 is default */
 
 unsigned short* p IBSS_ATTR;
 size_t p_size IBSS_ATTR;
@@ -147,8 +147,6 @@ void pcm_init(void)
 {
     int i;
 
-    pcm_set_frequency(HW_SAMPR_DEFAULT);
-
     memset(dma_buf_left, 0, sizeof(dma_buf_left));
     memset(dma_buf_right, 0, sizeof(dma_buf_right));
 
@@ -193,15 +191,8 @@ void pcm_postinit(void)
     pcm_apply_settings();
 }
 
-void pcm_set_frequency(unsigned int frequency)
+void pcm_dma_apply_settings(void)
 {
-    (void)frequency;
-    pcm_freq = HW_SAMPR_DEFAULT;
-}
-
-void pcm_apply_settings(void)
-{
-    pcm_curr_sampr = pcm_freq;
 }
 
 size_t pcm_get_bytes_waiting(void)

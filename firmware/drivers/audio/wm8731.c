@@ -224,35 +224,24 @@ void audiohw_close(void)
     /* 2) Remove the WM codec supplies. */
 }
 
-void audiohw_set_sample_rate(int sampling_control)
+void audiohw_set_frequency(int fsel)
 {
-    int rate;
-
-    switch(sampling_control)
+    /* For 24MHz MCLK */
+    static const unsigned char srctrl_table[HW_NUM_FREQ] =
     {
-        case SAMPR_96:
-            rate = WMC_USB24_96000HZ;
-            break;
-        case SAMPR_88:
-            rate = WMC_USB24_88200HZ;
-            break;
-        case SAMPR_48:
-            rate = WMC_USB24_48000HZ;
-            break;
-        default:
-        case SAMPR_44:
-            rate = WMC_USB24_44100HZ;
-            break;
-        case SAMPR_32:
-            rate = WMC_USB24_32000HZ;
-            break;
-        case SAMPR_8:
-            rate = WMC_USB24_8000HZ;
-            break;
-    }
+        [HW_FREQ_8]  = WMC_USB24_8000HZ,
+        [HW_FREQ_32] = WMC_USB24_32000HZ,
+        [HW_FREQ_44] = WMC_USB24_44100HZ,
+        [HW_FREQ_48] = WMC_USB24_48000HZ,
+        [HW_FREQ_88] = WMC_USB24_88200HZ,
+        [HW_FREQ_96] = WMC_USB24_96000HZ,
+    };
+
+    if ((unsigned)fsel >= HW_NUM_FREQ)
+        fsel = HW_FREQ_DEFAULT;
 
     codec_set_active(false);
-    wmc_write(SAMPCTRL, rate);
+    wmc_write(SAMPCTRL, srctrl_table[fsel]);
     codec_set_active(true);
 }
 

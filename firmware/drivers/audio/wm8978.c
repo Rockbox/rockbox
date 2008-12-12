@@ -363,9 +363,9 @@ void audiohw_mute(bool mute)
     }
 }
 
-void audiohw_set_frequency(int sampling_control)
+void audiohw_set_frequency(int fsel)
 {
-    /* For 16.9344MHz MCLK */
+    /* For 16.9344MHz MCLK, codec as master. */
     static const struct
     {
         uint32_t plln  : 8;
@@ -374,7 +374,7 @@ void audiohw_set_frequency(int sampling_control)
         uint32_t pllk3 : 9;
         unsigned char mclkdiv;
         unsigned char filter;
-    } sctrl_table[HW_NUM_FREQ] =
+    } srctrl_table[HW_NUM_FREQ] =
     {
         [HW_FREQ_8] = /* PLL = 65.536MHz */
         {
@@ -450,16 +450,14 @@ void audiohw_set_frequency(int sampling_control)
     unsigned int plln;
     unsigned int mclkdiv;
 
-    if ((unsigned)sampling_control >= ARRAYLEN(sctrl_table))
-        sampling_control = HW_FREQ_DEFAULT;
-
+    if ((unsigned)fsel >= HW_NUM_FREQ)
+        fsel = HW_FREQ_DEFAULT;
 
     /* Setup filters. */
-    wmc_write(WMC_ADDITIONAL_CTRL,
-              sctrl_table[sampling_control].filter);
+    wmc_write(WMC_ADDITIONAL_CTRL, srctrl_table[fsel].filter);
 
-    plln = sctrl_table[sampling_control].plln;
-    mclkdiv = sctrl_table[sampling_control].mclkdiv;
+    plln = srctrl_table[fsel].plln;
+    mclkdiv = srctrl_table[fsel].mclkdiv;
 
     if (plln != 0)
     {
@@ -467,9 +465,9 @@ void audiohw_set_frequency(int sampling_control)
 
         /* Program PLL. */
         wmc_write(WMC_PLL_N, plln);
-        wmc_write(WMC_PLL_K1, sctrl_table[sampling_control].pllk1);
-        wmc_write(WMC_PLL_K2, sctrl_table[sampling_control].pllk2);
-        wmc_write(WMC_PLL_K3, sctrl_table[sampling_control].pllk3);
+        wmc_write(WMC_PLL_K1, srctrl_table[fsel].pllk1);
+        wmc_write(WMC_PLL_K2, srctrl_table[fsel].pllk2);
+        wmc_write(WMC_PLL_K3, srctrl_table[fsel].pllk3);
 
         /* Turn on PLL. */
         wmc_set(WMC_POWER_MANAGEMENT1, WMC_PLLEN);

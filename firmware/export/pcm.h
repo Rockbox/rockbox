@@ -57,7 +57,7 @@ typedef int (*pcm_more_callback_type2)(int status);
 /* set the pcm frequency - use values in hw_sampr_list
  * use -1 for the default frequency
  */
-void pcm_set_frequency(unsigned int frequency);
+void pcm_set_frequency(unsigned int samplerate);
 /* apply settings to hardware immediately */
 void pcm_apply_settings(void);
 
@@ -87,6 +87,8 @@ bool pcm_is_playing(void);
     specific portion **/
 
 extern unsigned long pcm_curr_sampr;
+extern unsigned long pcm_sampr;
+extern int pcm_fsel;
 
 /* the registered callback function to ask for more mp3 data */
 extern volatile pcm_more_callback_type pcm_callback_for_more;
@@ -101,6 +103,8 @@ void pcm_play_dma_stop(void);
 void pcm_play_dma_pause(bool pause);
 void pcm_play_dma_stopped_callback(void);
 const void * pcm_play_dma_get_peak_buffer(int *count);
+
+void pcm_dma_apply_settings(void);
 
 #ifdef HAVE_RECORDING
 

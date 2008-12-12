@@ -24,6 +24,7 @@
 #include "logf.h"
 #include "audio.h"
 #include "sound.h"
+#include "general.h"
 
 /**
  * Aspects implemented in the target-specific portion:
@@ -42,10 +43,16 @@
  *      pcm_play_dma_pause
  *      pcm_play_dma_get_peak_buffer
  *   Data Read/Written within TSP -
- *      pcm_curr_sampr (RW)
+ *      pcm_sampr (R)
+ *      pcm_fsel (R)
+ *      pcm_curr_sampr (R)
  *      pcm_callback_for_more (R)
  *      pcm_playing (R)
  *      pcm_paused (R)
+ *
+ * ==Playback/Recording==
+ *   Semi-private -
+ *      pcm_dma_apply_settings
  *
  * ==Recording==
  *   Public -
@@ -76,6 +83,10 @@ volatile bool pcm_playing SHAREDBSS_ATTR = false;
 volatile bool pcm_paused SHAREDBSS_ATTR = false;
 /* samplerate of currently playing audio - undefined if stopped */
 unsigned long pcm_curr_sampr SHAREDBSS_ATTR = 0;
+/* samplerate waiting to be set */
+unsigned long pcm_sampr SHAREDBSS_ATTR = HW_SAMPR_DEFAULT;
+/* samplerate frequency selection index */
+int pcm_fsel SHAREDBSS_ATTR = HW_FREQ_DEFAULT;
 
 /**
  * Do peak calculation using distance squared from axis and save a lot
@@ -179,6 +190,8 @@ void pcm_init(void)
 
     pcm_play_dma_stopped_callback();
 
+    pcm_set_frequency(HW_SAMPR_DEFAULT);
+
     logf(" pcm_play_dma_init");
     pcm_play_dma_init();
 }
@@ -221,6 +234,8 @@ void pcm_play_data(pcm_more_callback_type get_more,
 
     pcm_callback_for_more = get_more;
 
+    pcm_apply_settings();
+
     logf(" pcm_play_data_start");
     pcm_play_data_start(start, size);
 
@@ -241,16 +256,21 @@ void pcm_play_pause(bool play)
             pcm_play_dma_pause(true);
             pcm_paused = true;
         }
-        else if (pcm_get_bytes_waiting() > 0)
-        {
-            logf(" pcm_play_dma_pause");
-            pcm_play_dma_pause(false);
-            pcm_paused = false;
-        }
         else
         {
-            logf(" pcm_play_dma_start: no data");
-            pcm_play_data_start(NULL, 0);
+            pcm_apply_settings();
+
+            if (pcm_get_bytes_waiting() > 0)
+            {
+                logf(" pcm_play_dma_pause");
+                pcm_play_dma_pause(false);
+                pcm_paused = false;
+            }
+            else
+            {
+                logf(" pcm_play_dma_start: no data");
+                pcm_play_data_start(NULL, 0);
+            }
         }
     }
     else
@@ -289,6 +309,35 @@ void pcm_play_dma_stopped_callback(void)
 }
 
 /**/
+
+/* set frequency next frequency used by the audio hardware -
+ * what pcm_apply_settings will set */
+void pcm_set_frequency(unsigned int samplerate)
+{
+    logf("pcm_set_frequency");
+
+    int index = round_value_to_list32(samplerate, hw_freq_sampr,
+                                      HW_NUM_FREQ, false);
+
+    if (samplerate != hw_freq_sampr[index])
+        index = HW_FREQ_DEFAULT; /* Invalid = default */
+
+    pcm_sampr = hw_freq_sampr[index];
+    pcm_fsel = index;
+}
+
+/* apply pcm settings to the hardware */
+void pcm_apply_settings(void)
+{
+    logf("pcm_apply_settings");
+
+    if (pcm_sampr != pcm_curr_sampr)
+    {
+        logf(" pcm_dma_apply_settings");
+        pcm_dma_apply_settings();
+        pcm_curr_sampr = pcm_sampr;
+    }
+}
 
 bool pcm_is_playing(void)
 {
@@ -411,6 +460,7 @@ void pcm_record_data(pcm_more_callback_type2 more_ready,
     pcm_callback_more_ready = more_ready;
 
     logf(" pcm_rec_dma_start");
+    pcm_apply_settings();
     pcm_rec_dma_start(start, size);
     pcm_recording = true;
 

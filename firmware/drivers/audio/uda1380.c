@@ -218,23 +218,38 @@ static void reset(void)
  *  11025: 0 = 6.25 to 12.5 MCLK/2 SCLK, LRCK: Audio Clk / 16
  *  22050: 1 = 12.5 to 25   MCLK/2 SCLK, LRCK: Audio Clk / 8
  *  44100: 2 = 25   to 50   MCLK   SCLK, LRCK: Audio Clk / 4 (default)
- *  88200: 3 = 50   to 100  MCLK   SCLK, LRCK: Audio Clk / 2 <= TODO: Needs WSPLL
+ *  88200: 3 = 50   to 100  MCLK   SCLK, LRCK: Audio Clk / 2
  */
-void audiohw_set_frequency(unsigned fsel)
+void audiohw_set_frequency(int fsel)
 {
-    static const unsigned short values_reg[4][2] =
+    static const unsigned short values_reg[HW_NUM_FREQ][2] =
     {
-                                                          /* Fs:   */
-        { 0,              WSPLL_625_125 | SYSCLK_512FS }, /* 11025 */
-        { 0,              WSPLL_125_25  | SYSCLK_256FS }, /* 22050 */
-        { MIX_CTL_SEL_NS, WSPLL_25_50   | SYSCLK_256FS }, /* 44100 */
-        { MIX_CTL_SEL_NS, WSPLL_50_100  | SYSCLK_256FS }, /* 88200 */
+        [HW_FREQ_11] =                    /* Fs:   */
+        {
+            0,
+            WSPLL_625_125 | SYSCLK_512FS
+        },
+        [HW_FREQ_22] =
+        {
+            0,
+            WSPLL_125_25 | SYSCLK_256FS
+        },
+        [HW_FREQ_44] =
+        {
+            MIX_CTL_SEL_NS,
+            WSPLL_25_50 | SYSCLK_256FS
+        },
+        [HW_FREQ_88] =
+        {
+            MIX_CTL_SEL_NS,
+            WSPLL_50_100 | SYSCLK_256FS
+        },
     };
 
     const unsigned short *ent;
 
-    if (fsel >= ARRAYLEN(values_reg))
-        fsel = 2;
+    if ((unsigned)fsel >= HW_NUM_FREQ)
+        fsel = HW_FREQ_DEFAULT;
 
     ent = values_reg[fsel];
 

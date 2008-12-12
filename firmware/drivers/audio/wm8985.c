@@ -235,12 +235,12 @@ void audiohw_close(void)
 }
 
 /* Note: Disable output before calling this function */
-void audiohw_set_sample_rate(int sampling_control)
+void audiohw_set_sample_rate(int fsel)
 {
     /* Currently the WM8985 acts as slave to the SoC I2S controller, so no
        setup is needed here. This seems to be in contrast to every other WM
        driver in Rockbox, so this may need to change in the future. */
-    (void)sampling_control;
+    (void)fsel;
 }
 
 #ifdef HAVE_RECORDING
@@ -261,7 +261,7 @@ void audiohw_enable_recording(bool source_mic)
 
     /* The iPod can handle multiple frequencies, but fix at 44.1KHz
        for now */
-    audiohw_set_sample_rate(WM8985_44100HZ);
+    audiohw_set_frequency(HW_FREQ_DEFAULT);
 
     wmcodec_write(INCTRL,0x44);  /* Connect L2 and R2 inputs */
 

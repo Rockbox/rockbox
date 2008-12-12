@@ -33,7 +33,6 @@
 #include "SDL.h"
 
 static int cvt_status = -1;
-static unsigned long pcm_frequency = SAMPR_44;
 
 static Uint8* pcm_data;
 static size_t pcm_data_size;
@@ -67,28 +66,26 @@ void pcm_play_unlock(void)
     SDL_UnlockAudio();
 }
 
-static void pcm_apply_settings_nolock(void)
+static void pcm_dma_apply_settings_nolock(void)
 {
-    cvt_status = SDL_BuildAudioCVT(&cvt, AUDIO_S16SYS, 2, pcm_frequency,
+    cvt_status = SDL_BuildAudioCVT(&cvt, AUDIO_S16SYS, 2, pcm_sampr,
                     obtained.format, obtained.channels, obtained.freq);
 
-    pcm_curr_sampr = pcm_frequency;
-
     if (cvt_status < 0) {
-        cvt.len_ratio = (double)obtained.freq / (double)pcm_curr_sampr;
+        cvt.len_ratio = (double)obtained.freq / (double)pcm_sampr;
     }
 }
 
-void pcm_apply_settings(void)
+void pcm_dma_apply_settings(void)
 {
     pcm_play_lock();
-    pcm_apply_settings_nolock();
+    pcm_dma_apply_settings_nolock();
     pcm_play_unlock();
 }
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    pcm_apply_settings_nolock();
+    pcm_dma_apply_settings_nolock();
 
     pcm_data = (Uint8 *) addr;
     pcm_data_size = size;
@@ -112,30 +109,6 @@ void pcm_play_dma_pause(bool pause)
 size_t pcm_get_bytes_waiting(void)
 {
     return pcm_data_size;
-}
-
-void pcm_set_frequency(unsigned int frequency)
-{
-    switch (frequency)
-    {
-    HW_HAVE_8_( case SAMPR_8:)
-    HW_HAVE_11_(case SAMPR_11:)
-    HW_HAVE_12_(case SAMPR_12:)
-    HW_HAVE_16_(case SAMPR_16:)
-    HW_HAVE_22_(case SAMPR_22:)
-    HW_HAVE_24_(case SAMPR_24:)
-    HW_HAVE_32_(case SAMPR_32:)
-    HW_HAVE_44_(case SAMPR_44:)
-    HW_HAVE_48_(case SAMPR_48:)
-    HW_HAVE_64_(case SAMPR_64:)
-    HW_HAVE_88_(case SAMPR_88:)
-    HW_HAVE_96_(case SAMPR_96:)
-        break;
-    default:
-        frequency = SAMPR_44;
-    }
-
-    pcm_frequency = frequency;
 }
 
 extern int sim_volume; /* in firmware/sound.c */
@@ -357,7 +330,7 @@ void pcm_play_dma_init(void)
 
     pcm_sample_bytes = obtained.channels * pcm_channel_bytes;
 
-    pcm_apply_settings_nolock();
+    pcm_dma_apply_settings_nolock();
 }
 
 void pcm_postinit(void)

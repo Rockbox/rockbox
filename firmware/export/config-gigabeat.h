@@ -105,6 +105,12 @@
 #define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
                        SAMPR_CAP_11)
 
+/* All exact rates for 16.9344MHz clock */
+#define CODEC_SRCTRL_11025HZ     (0x19 << 1)
+#define CODEC_SRCTRL_22050HZ     (0x1b << 1)
+#define CODEC_SRCTRL_44100HZ     (0x11 << 1)
+#define CODEC_SRCTRL_88200HZ     (0x1f << 1)
+
 #define HAVE_HEADPHONE_DETECTION
 
 #define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */

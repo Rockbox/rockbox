@@ -431,6 +431,9 @@
 #define IIS_TX_FREE_COUNT \
     ((IISFIFO_CFG & IIS_TX_FREE_MASK) >> 16)
 
+#define IIS_TX_IS_EMPTY \
+    ((IISFIFO_CFG & IIS_TX_FREE_MASK) >= (16 << 16))
+
 #define IIS_RXCLR (1 << 12)
 #define IIS_TXCLR (1 << 8)
 /* Number of slots */

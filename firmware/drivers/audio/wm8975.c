@@ -145,7 +145,7 @@ void audiohw_preinit(void)
 
     wm8975_write(DAPCTRL, wm8975_regs[DAPCTRL] );
 
-    audiohw_set_sample_rate(WM8975_44100HZ);
+    wmcodec_write(SAMPCTRL, WM8975_44100HZ);
 
     /* set the volume to -6dB */
     wmcodec_write(LOUT1VOL, LOUT1VOL_LO1ZC | IPOD_PCM_LEVEL);
@@ -224,9 +224,9 @@ void audiohw_close(void)
 }
 
 /* Note: Disable output before calling this function */
-void audiohw_set_sample_rate(int sampling_control)
+void audiohw_set_frequency(int fsel)
 {
-  wmcodec_write(SAMPCTRL, sampling_control);
+    (void)fsel;
 }
 
 #ifdef HAVE_RECORDING

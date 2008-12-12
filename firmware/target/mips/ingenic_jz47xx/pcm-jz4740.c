@@ -58,14 +58,13 @@ void pcm_play_dma_init(void)
     audiohw_init();
 }
 
-void pcm_set_frequency(unsigned int frequency)
+void pcm_dma_apply_settings(void)
 {
-    (void) frequency;
     /* TODO */
     
     /*
-    __i2s_set_oss_sample_size(frequency);
-    i2s_codec_set_samplerate(frequency);
+    __i2s_set_oss_sample_size(pcm_sampr);
+    i2s_codec_set_samplerate(pcm_sampr);
     */
 }
 

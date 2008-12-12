@@ -69,66 +69,43 @@ static void iis_play_reset_if_playback(bool if_playback)
 /** Sample rates **/
 #define FPARM_CLOCKSEL       0
 #define FPARM_CLSEL          1
-#define FPARM_FSEL           2
 #if CONFIG_CPU == MCF5249 && defined(HAVE_UDA1380)
-static const unsigned char pcm_freq_parms[HW_NUM_FREQ][3] =
+static const unsigned char pcm_freq_parms[HW_NUM_FREQ][2] =
 {
-    [HW_FREQ_88] = { 0x0c, 0x01, 0x03 },
-    [HW_FREQ_44] = { 0x06, 0x01, 0x02 },
-    [HW_FREQ_22] = { 0x04, 0x02, 0x01 },
-    [HW_FREQ_11] = { 0x02, 0x02, 0x00 },
+    [HW_FREQ_88] = { 0x0c, 0x01 },
+    [HW_FREQ_44] = { 0x06, 0x01 },
+    [HW_FREQ_22] = { 0x04, 0x02 },
+    [HW_FREQ_11] = { 0x02, 0x02 },
 };
 #endif
 
 #if (CONFIG_CPU == MCF5250 || CONFIG_CPU == MCF5249) && defined(HAVE_TLV320)
-static const unsigned char pcm_freq_parms[HW_NUM_FREQ][3] =
+static const unsigned char pcm_freq_parms[HW_NUM_FREQ][2] =
 {
-    [HW_FREQ_88] = { 0x0c, 0x01, 0x02 },
-    [HW_FREQ_44] = { 0x06, 0x01, 0x01 },
-    [HW_FREQ_22] = { 0x04, 0x01, 0x00 },
-    [HW_FREQ_11] = { 0x02, 0x02, 0x00 },
+    [HW_FREQ_88] = { 0x0c, 0x01 },
+    [HW_FREQ_44] = { 0x06, 0x01 },
+    [HW_FREQ_22] = { 0x04, 0x01 },
+    [HW_FREQ_11] = { 0x02, 0x02 },
 };
 #endif
 
-static unsigned long pcm_freq = 0; /* 44.1 is default */
-static const unsigned char *freq_ent = pcm_freq_parms[HW_FREQ_DEFAULT];
-
-/* set frequency used by the audio hardware */
-void pcm_set_frequency(unsigned int frequency)
-{
-    int index;
-
-    switch(frequency)
-    {
-        case SAMPR_11:
-            index = HW_FREQ_11;
-            break;
-        case SAMPR_22:
-            index = HW_FREQ_22;
-            break;
-        default:
-        case SAMPR_44:
-            index = HW_FREQ_44;
-            break;
-        case SAMPR_88:
-            index = HW_FREQ_88;
-            break;
-    }
-
-    /* remember table entry and rate */
-    freq_ent = pcm_freq_parms[index];
-    pcm_freq = hw_freq_sampr[index];
-} /* pcm_set_frequency */
+static const unsigned char *freq_ent;
 
 /* apply audio settings */
-static bool _pcm_apply_settings(bool clear_reset)
+static bool _pcm_dma_apply_settings(bool clear_reset)
 {
     bool did_reset = false;
-    unsigned long iis_play_defparm = IIS_PLAY_DEFPARM;
+    unsigned long iis_play_defparm;
+
+    int level = set_irq_level(DMA_IRQ_LEVEL);
+
+    /* remember table entry */
+    freq_ent = pcm_freq_parms[pcm_fsel];
  
-    if (pcm_freq != pcm_curr_sampr)
+    iis_play_defparm = IIS_PLAY_DEFPARM;
+
+    if (pcm_sampr != pcm_curr_sampr)
     {
-        pcm_curr_sampr = pcm_freq;
         /* Reprogramming bits 15-12 requires FIFO to be in a reset
            condition - Users Manual 17-8, Note 11 */
         or_l(IIS_FIFO_RESET, &IIS_PLAY);
@@ -136,8 +113,8 @@ static bool _pcm_apply_settings(bool clear_reset)
            or starting recording will sound absolutely awful once in
            awhile - audiohw_set_frequency then coldfire_set_pllcr_audio_bits
          */
-        SET_IIS_PLAY(iis_play_defparm | IIS_FIFO_RESET);
-        audiohw_set_frequency(freq_ent[FPARM_FSEL]);
+        SET_IIS_PLAY(IIS_PLAY_DEFPARM | IIS_FIFO_RESET);
+        audiohw_set_frequency(pcm_fsel);
         coldfire_set_pllcr_audio_bits(PLLCR_SET_AUDIO_BITS_DEFPARM);
         did_reset = true;
     }
@@ -147,26 +124,21 @@ static bool _pcm_apply_settings(bool clear_reset)
        be cleared. If the frequency didn't change, it was never altered and
        the reset flag can just be removed or no action taken. */
     if (clear_reset)
-        SET_IIS_PLAY(iis_play_defparm & ~IIS_FIFO_RESET);
+        SET_IIS_PLAY(IIS_PLAY_DEFPARM & ~IIS_FIFO_RESET);
+
+    restore_irq(level);
+
 #if 0
     logf("IISPLAY: %08X", IIS_PLAY);
 #endif
 
     return did_reset;
-} /* _pcm_apply_settings */
-
-/* apply audio setting with all DMA interrupts disabled */
-static void _pcm_apply_settings_irq_lock(bool clear_reset)
-{
-    int level = set_irq_level(DMA_IRQ_LEVEL);
-    _pcm_apply_settings(clear_reset);
-    restore_irq(level);
-}
+} /* _pcm_dma_apply_settings */
 
 /* This clears the reset bit to enable monitoring immediately if monitoring
    recording sources or always if playback is in progress - we might be 
    switching samplerates on the fly */
-void pcm_apply_settings(void)
+void pcm_dma_apply_settings(void)
 {
     int level = set_irq_level(DMA_IRQ_LEVEL);
     bool pbm = is_playback_monitoring();
@@ -174,14 +146,16 @@ void pcm_apply_settings(void)
 
     /* Clear reset if not playback monitoring or peripheral request is
        active and playback monitoring */
-    if (_pcm_apply_settings(!pbm || kick) && kick)
+    if (_pcm_dma_apply_settings(!pbm || kick) && kick)
         PDOR3 = 0; /* Kick FIFO out of reset by writing to it */
 
     restore_irq(level);
-} /* pcm_apply_settings */
+} /* pcm_dma_apply_settings */
 
 void pcm_play_dma_init(void)
 {
+    freq_ent = pcm_freq_parms[pcm_fsel];
+
     AUDIOGLOB =   (1 <<  8) /* IIS1 fifo auto sync  */
                 | (1 <<  7) /* PDIR2 fifo auto sync */
 #ifdef HAVE_SPDIF_OUT
@@ -200,7 +174,6 @@ void pcm_play_dma_init(void)
        other settings. */
     or_l(IIS_FIFO_RESET, &IIS_PLAY);
     SET_IIS_PLAY(IIS_PLAY_DEFPARM | IIS_FIFO_RESET);
-    pcm_set_frequency(HW_FREQ_DEFAULT);
     audio_set_output_source(AUDIO_SRC_PLAYBACK);
 
     /* Initialize default register values. */
@@ -208,7 +181,7 @@ void pcm_play_dma_init(void)
 
     audio_input_mux(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
 
-    audiohw_set_frequency(freq_ent[FPARM_FSEL]);
+    audiohw_set_frequency(pcm_fsel);
     coldfire_set_pllcr_audio_bits(PLLCR_SET_AUDIO_BITS_DEFPARM);
 
 #if defined(HAVE_SPDIF_REC) || defined(HAVE_SPDIF_OUT)
@@ -264,7 +237,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     BCR0 = (unsigned long)size;   /* Bytes to transfer   */
 
     /* Enable the FIFO and force one write to it */
-    _pcm_apply_settings_irq_lock(is_playback_monitoring());
+    _pcm_dma_apply_settings(is_playback_monitoring());
 
     DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA |
            DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE) | DMA_START;
@@ -299,7 +272,7 @@ void pcm_play_dma_pause(bool pause)
     {
         /* restart playback on current buffer */
         /* Enable the FIFO and force one write to it */
-        _pcm_apply_settings_irq_lock(is_playback_monitoring());
+        _pcm_dma_apply_settings(is_playback_monitoring());
         or_l(DMA_EEXT | DMA_START, &DCR0);
         dma_play_lock.state = (1 << 14);
     }
@@ -403,7 +376,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
     and_l(~PDIR2_FIFO_RESET, &DATAINCONTROL);
     /* Clear TX FIFO reset bit if the source is not set to monitor playback
        otherwise maintain independence between playback and recording. */
-    _pcm_apply_settings_irq_lock(!is_playback_monitoring());
+    _pcm_dma_apply_settings(!is_playback_monitoring());
 
     /* Start the DMA transfer.. */
 #ifdef HAVE_SPDIF_REC

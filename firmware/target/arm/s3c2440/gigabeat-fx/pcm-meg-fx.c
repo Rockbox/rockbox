@@ -26,12 +26,6 @@
 #include "sound.h"
 #include "file.h"
 
-/* All exact rates for 16.9344MHz clock */
-#define GIGABEAT_11025HZ     (0x19 << 1)
-#define GIGABEAT_22050HZ     (0x1b << 1)
-#define GIGABEAT_44100HZ     (0x11 << 1)
-#define GIGABEAT_88200HZ     (0x1f << 1)
-
 /* PCM interrupt routine lockout */
 static struct
 {
@@ -43,11 +37,6 @@ static struct
     .state  = 0,
 };
 
-/* Last samplerate set by pcm_set_frequency */
-static unsigned long pcm_freq = 0; /* 44.1 is default */
-/* Samplerate control for audio codec */
-static int sr_ctrl = 0;
-
 #define FIFO_COUNT ((IISFCON >> 6) & 0x3F)
 
 /* Setup for the DMA controller */
@@ -56,22 +45,6 @@ static int sr_ctrl = 0;
 /* DMA count has hit zero - no more data */
 /* Get more data from the callback and top off the FIFO */
 void fiq_handler(void) __attribute__((interrupt ("FIQ")));
-
-static void _pcm_apply_settings(void)
-{
-    if (pcm_freq != pcm_curr_sampr)
-    {
-        pcm_curr_sampr = pcm_freq;
-        audiohw_set_frequency(sr_ctrl);
-    }
-}
-
-void pcm_apply_settings(void)
-{
-    int status = disable_fiq_save();
-    _pcm_apply_settings();
-    restore_fiq(status);
-}
 
 /* Mask the DMA interrupt */
 void pcm_play_lock(void)
@@ -89,8 +62,6 @@ void pcm_play_unlock(void)
 
 void pcm_play_dma_init(void)
 {
-    pcm_set_frequency(SAMPR_44);
-
     /* There seem to be problems when changing the IIS interface configuration
      * when a clock is not present.
      */
@@ -128,13 +99,18 @@ void pcm_postinit(void)
     pcm_apply_settings();
 }
 
+void pcm_dma_apply_settings(void)
+{
+    audiohw_set_frequency(pcm_fsel);
+}
+
 /* Connect the DMA and start filling the FIFO */
 static void play_start_pcm(void)
 {
     /* clear pending DMA interrupt */
     SRCPND = DMA2_MASK;
 
-    _pcm_apply_settings();
+    pcm_apply_settings();
 
     /* Flush any pending writes */
     clean_dcache_range((void*)DISRC2, (DCON2 & 0xFFFFF) * 2);
@@ -270,29 +246,6 @@ void fiq_handler(void)
         /* Re-Activate the channel */
         DMASKTRIG2 = 0x2;
     }
-}
-
-void pcm_set_frequency(unsigned int frequency)
-{
-    switch(frequency)
-    {
-        case SAMPR_11:
-            sr_ctrl = GIGABEAT_11025HZ;
-            break;
-        case SAMPR_22:
-            sr_ctrl = GIGABEAT_22050HZ;
-            break;
-        default:
-            frequency = SAMPR_44;
-        case SAMPR_44:
-            sr_ctrl = GIGABEAT_44100HZ;
-            break;
-        case SAMPR_88:
-            sr_ctrl = GIGABEAT_88200HZ;
-            break;
-    }
-
-    pcm_freq = frequency;
 }
 
 size_t pcm_get_bytes_waiting(void)

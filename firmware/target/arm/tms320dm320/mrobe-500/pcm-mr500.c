@@ -41,14 +41,8 @@ void pcm_play_dma_init(void)
 
 }
 
-void pcm_apply_settings(void)
+void pcm_dma_apply_settings(void)
 {
-
-}
-
-void pcm_set_frequency(unsigned int frequency)
-{
-    (void) frequency;
 }
 
 void pcm_play_dma_start(const void *addr, size_t size)

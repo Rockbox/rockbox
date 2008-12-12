@@ -37,9 +37,6 @@ struct dma_data
     int state;
 };
 
-static unsigned long pcm_freq; /* 44.1 is default */
-static int sr_ctrl;
-
 static struct dma_data dma_play_data =
 {
     /* Initialize to a locked, stopped state */
@@ -64,15 +61,6 @@ void pcm_play_unlock(void)
     {
         /* Atomically enable transmit interrupt */
         imx31_regmod32(&SSI_SIER1, SSI_SIER_TIE, SSI_SIER_TIE);
-    }
-}
-
-static void _pcm_apply_settings(void)
-{
-    if (pcm_freq != pcm_curr_sampr)
-    {
-        pcm_curr_sampr = pcm_freq;
-        audiohw_set_frequency(sr_ctrl);
     }
 }
 
@@ -109,19 +97,9 @@ static void __attribute__((interrupt("IRQ"))) SSI1_HANDLER(void)
     pcm_play_dma_stopped_callback();
 }
 
-void pcm_apply_settings(void)
+void pcm_dma_apply_settings(void)
 {
-    pcm_play_lock();
-#ifdef HAVE_RECORDING
-    pcm_rec_lock();
-#endif
-
-    _pcm_apply_settings();
-
-#ifdef HAVE_RECORDING
-    pcm_rec_unlock();
-#endif
-    pcm_play_unlock();
+    audiohw_set_frequency(pcm_fsel);
 }
 
 void pcm_play_dma_init(void)
@@ -214,7 +192,6 @@ void pcm_play_dma_init(void)
     /* Enable SSI2 (codec clock) */
     SSI_SCR2 |= SSI_SCR_SSIEN;
 
-    pcm_set_frequency(HW_SAMPR_DEFAULT);
     audiohw_init();
 }
 
@@ -230,7 +207,7 @@ static void play_start_pcm(void)
     SSI_SCR1 &= ~SSI_SCR_TE;
 
     /* Apply new settings */
-    _pcm_apply_settings();
+    pcm_apply_settings();
 
     /* Enable interrupt on unlock */
     dma_play_data.state = 1;
@@ -294,52 +271,6 @@ void pcm_play_dma_pause(bool pause)
         dma_play_data.size &= ~3;
         play_start_pcm();
     }
-}
-
-/* Set the pcm frequency hardware will use when play is next started or
-   when pcm_apply_settings is called. Do not apply the setting to the
-   hardware here but simply cache it. */
-void pcm_set_frequency(unsigned int frequency)
-{
-    int index;
-
-    switch (frequency)
-    {
-    case SAMPR_48:
-        index = HW_FREQ_48;
-        break;
-    case SAMPR_44:
-        index = HW_FREQ_44;
-        break;
-    case SAMPR_32:
-        index = HW_FREQ_32;
-        break;
-    case SAMPR_24:
-        index = HW_FREQ_24;
-        break;
-    case SAMPR_22:
-        index = HW_FREQ_22;
-        break;
-    case SAMPR_16:
-        index = HW_FREQ_16;
-        break;
-    case SAMPR_12:
-        index = HW_FREQ_12;
-        break;
-    case SAMPR_11:
-        index = HW_FREQ_11;
-        break;
-    case SAMPR_8:
-        index = HW_FREQ_8;
-        break;
-    default:
-        /* Invalid = default */
-        frequency = HW_SAMPR_DEFAULT;
-        index = HW_FREQ_DEFAULT;
-    }
-
-    pcm_freq = frequency;
-    sr_ctrl = index;
 }
 
 /* Return the number of bytes waiting - full L-R sample pairs only */

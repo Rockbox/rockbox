@@ -36,6 +36,8 @@ extern void audiohw_set_mixer_vol(int channel1, int channel2);
 
 /**
  * Sets frequency settings for DAC and ADC relative to MCLK
+ * For Coldfire IIS dividers, 11.2896MHz, codec as slave with
+ * PLL enabled.
  *
  * Selection for frequency ranges:
  *  Fs:        range:       with:
@@ -44,7 +46,7 @@ extern void audiohw_set_mixer_vol(int channel1, int channel2);
  *  44100: 2 = 25   to 50   SCLK, LRCK: Audio Clk / 4 (default)
  *  88200: 3 = 50   to 100  SCLK, LRCK: Audio Clk / 2
  */
-extern void audiohw_set_frequency(unsigned fsel);
+extern void audiohw_set_frequency(int fsel);
 
 #define UDA1380_ADDR        0x30
 

@@ -40,6 +40,23 @@ void audio_input_mux(int source, unsigned flags)
     static bool last_recording = false;
 #endif
 
+#if defined(IPOD_COLOR) || defined (IPOD_4G)
+    /* The usual magic from IPL - I'm guessing this configures the headphone
+       socket to be input or output. */
+    if (recording && source != AUDIO_SRC_PLAYBACK)
+    {
+        /* input */
+        GPIO_CLEAR_BITWISE(GPIOI_OUTPUT_VAL, 0x40);
+        GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_VAL, 0x04);
+    }
+    else
+    {
+        /* output */
+        GPIO_SET_BITWISE(GPIOI_OUTPUT_VAL, 0x40);
+        GPIO_SET_BITWISE(GPIOA_OUTPUT_VAL, 0x04);
+    }
+#endif /* IPOD_COLOR || IPOD_4G */
+
     switch (source)
     {
         default:                        /* playback - no recording */
@@ -109,4 +126,3 @@ void audio_input_mux(int source, unsigned flags)
     last_source = source;
 } /* audio_input_mux */
 #endif /* INPUT_SRC_CAPS != 0 */
-

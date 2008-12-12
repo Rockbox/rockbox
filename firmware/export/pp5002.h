@@ -34,19 +34,64 @@
 #define LCD1_BUSY_MASK   0x8000
 
 /* I2S controller */
+
+/* FIFO slot bits 7-0 are not implemented and so use of packed samples
+ * appears to be impossible. */
 #define IISCONFIG        (*(volatile unsigned long *)(0xc0002500))
 #define IISFIFO_CFG      (*(volatile unsigned long *)(0xc000251c))
 #define IISFIFO_WR       (*(volatile unsigned long *)(0xc0002540))
 #define IISFIFO_RD       (*(volatile unsigned long *)(0xc0002580))
 
-/* IISCONFIG bits: */
+/**
+ * IISCONFIG bits:
+ * |   31   |   30   |   29   |   28   |   27   |   26   |   25   |   24   |
+ * |        |        |        |        |        |        |        |        |
+ * |   23   |   22   |   21   |   20   |   19   |   18   |   17   |   16   |
+ * |        |        |        |        |        |        |        |        |
+ * |   15   |   14   |   13   |   12   |   11   |   10   |    9   |    8   |
+ * |        |        |        |        |        |        |        |        |
+ * |    7   |    6   |    5   |    4   |    3   |    2   |    1   |    0   |
+ * |   rw   |   rw   |   rw   |   MS   |   rw   |TXFENB# |   rw   |   ENB  |
+ *
+ * # No effect observed on iPod 3g
+ */
+#define IIS_ENABLE        (1 << 0)
 #define IIS_TXFIFOEN      (1 << 2)
-#define IIS_TX_FREE_MASK  (0xf << 23)
-#define IIS_TX_FREE_COUNT ((IISFIFO_CFG & IIS_TX_FREE_MASK) >> 23)
+#define IIS_MASTER        (1 << 4)
 
-/* IISFIFO_CFG bits: */
-#define IIS_IRQTX_REG    IISFIFO_CFG
-#define IIS_IRQTX        (1 << 9)
+/**
+ * IISFIFO_CFG bits:
+ * |   31   |   30   |   29   |   28   |   27   |   26   |   25   |   24   |
+ * |        |            RXFull[3:0]$           |       TXFree[3:1]        >
+ * |   23   |   22   |   21   |   20   |   19   |   18   |   17   |   16   |
+ * >TXFre[0]|        |        |        |        |        | RXCLR  | TXCLR  |
+ * |   15   |   14   |   13   |   12   |   11   |   10   |    9   |    8   |
+ * |   rw   |   rw   |   rw   |   rw   |   rw   |   rw   | IRQTX  |   rw   |
+ * |    7*  |    6*  |    5*  |    4*  |    3   |    2   |    1   |    0   |
+ * |RXEMPTY | RXSAFE | RXDNGR | RXFULL | TXFULL | TXSAFE | TXDNGR |TXEMPTY |
+ *
+ * $Could be RXFree
+ * *Meaning isn't certain yet.
+ * More concerted recording work will reveal.
+ */
+#define IIS_IRQTX_REG     IISFIFO_CFG
+#define IIS_IRQRX_REG     IISFIFO_CFG
+
+#define IIS_RX_FULL_MASK  (0xf << 27)
+#define IIS_RX_FULL_COUNT ((IISFIFO_CFG & IIS_RX_FULL_MASK) >> 27)
+#define IIS_TX_FREE_MASK  (0xf << 23) /* 0xf = 16 or 15 free */
+#define IIS_TX_FREE_COUNT ((IISFIFO_CFG & IIS_TX_FREE_MASK) >> 23)
+#define IIS_TX_IS_EMPTY   ((IISFIFO_CFG & IIS_TXEMPTY) != 0)
+
+#define IIS_RXCLR         (1 << 17) /* Resets *could* be reversed */
+#define IIS_TXCLR         (1 << 16)
+#define IIS_IRQTX         (1 <<  9)
+#define IIS_TXFULL        (1 <<  3) /* All slots occupied */
+#define IIS_TXSAFE        (1 <<  2) /* FIFO >= 3/4 full */
+#define IIS_TXDANGER      (1 <<  1) /* FIFO <= 1/4 full */
+#define IIS_TXEMPTY       (1 <<  0) /* No samples in FIFO */
+
+#define IIS_RXEMPTY       (1 <<  4) /* FIFO is empty */
 
 #define IDE_BASE         0xc0003000
 
@@ -184,6 +229,7 @@
 #define DEV_RS           (*(volatile unsigned long *)(0xcf005030))
 
 #define DEV_I2C          (1<<8)
+#define DEV_I2S          (1<<7)
 #define DEV_USB          0x400000
 
 #define CLOCK_ENABLE     (*(volatile unsigned long *)(0xcf005008))

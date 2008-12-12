@@ -58,7 +58,7 @@ struct dma_data dma_play_data SHAREDBSS_ATTR =
     .state = 0
 };
 
-static unsigned long pcm_freq SHAREDDATA_ATTR = HW_SAMPR_DEFAULT; /* 44.1 is default */
+static unsigned long pcm_sampr SHAREDDATA_ATTR = HW_SAMPR_DEFAULT; /* 44.1 is default */
 
 void pcm_postinit(void)
 {
@@ -102,8 +102,6 @@ void pcm_play_dma_init(void)
     /* Set DAI interrupts as FIQs */
     IRQSEL = ~(DAI_RX_IRQ_MASK | DAI_TX_IRQ_MASK);
     
-    pcm_set_frequency(SAMPR_44);
-
     /* Initialize default register values. */
     audiohw_init();
    
@@ -113,15 +111,8 @@ void pcm_play_dma_init(void)
 #endif
 }
 
-void pcm_apply_settings(void)
+void pcm_dma_apply_settings(void)
 {
-    pcm_curr_sampr = pcm_freq;
-}
-
-void pcm_set_frequency(unsigned int frequency)
-{
-    (void) frequency;
-    pcm_freq = HW_SAMPR_DEFAULT;
 }
 
 static void play_start_pcm(void)
