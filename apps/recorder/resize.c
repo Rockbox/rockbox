@@ -455,8 +455,11 @@ static inline bool scale_nearest(struct bitmap *bm,
     const int rowstop = rset->rowstop;
     const int fb_width = get_fb_width(bm, false);
     long last_tick = current_tick;
-    int ix, ox, lx, xe, iy, oy, ly, ye, yet, oyt;
-    int xelim, ixls, xels, yelim, iyls, yels, oyls, p;
+    /* yet/oyt will always be initialized before use, since they are set in the
+       inside loop, and not used elsewhere until the end of the outside loop.
+    */
+    int ix, ox, lx, xe, iy, oy, ly, ye, yet = yet, oyt = oyt;
+    int xelim, ixls, xels, yelim, iyls, yels, p;
     struct img_part *cur_part;
 #ifndef HAVE_LCD_COLOR
     fb_data *dest = dest, *dest_t;
@@ -476,7 +479,6 @@ static inline bool scale_nearest(struct bitmap *bm,
     yelim = sh == dh - 1 ? dh : dh - 1;
     iyls = yelim ? sh / yelim : 1;
     yels = iyls * (yelim ? yelim : 1);
-    oyls *= rowstep;
     int delta = 127;
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING || \
     (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_PIXELFORMAT == HORIZONTAL_PACKING)
