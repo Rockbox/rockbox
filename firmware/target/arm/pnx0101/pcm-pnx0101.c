@@ -183,7 +183,6 @@ void pcm_init(void)
 void pcm_postinit(void)
 {
     audiohw_postinit();
-    pcm_apply_settings();
 }
 
 void pcm_dma_apply_settings(void)
