@@ -510,6 +510,8 @@ bool get_albumart_for_index_from_db(const int slide_index, char *buf, int buflen
                      PREFERRED_IMG_HEIGHT);
         rb->strncpy( (char*)&id3.path, tcs.result, MAX_PATH );
         id3.album = get_album_name(slide_index);
+        /* xxx: Should set id3.artist / id3.albumartist to their real values */
+        id3.artist = id3.albumartist = NULL;
         if ( rb->search_albumart_files(&id3, size, buf, buflen) )
             result = true;
         else if ( rb->search_albumart_files(&id3, "", buf, buflen) )
@@ -652,7 +654,8 @@ bool create_albumart_cache(bool force)
         if ( rb->button_get(false) == PICTUREFLOW_MENU ) return false;
     }
     if ( slides == 0 ) {
-        rb->splash(2*HZ, "No albums found");
+        /* Warn the user that we couldn't find any albumart */
+        rb->splash(2*HZ, "No album art found");
         return false;
     }
     config.avg_album_width /= slides;
