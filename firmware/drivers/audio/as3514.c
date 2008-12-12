@@ -197,9 +197,9 @@ void audiohw_postinit(void)
 /* Sansa Clip and Sansa m200v4 need HPCM enabled, otherwise they output
    the L-R signal on both L and R headphone outputs instead of normal stereo.
    TODO : If this turns out to apply to all ams3525 targets, consider
-   simplifying the precompiler condition to #if defined(AS3525).
+          simplifying the precompiler condition.
 */   
-#if !defined(SANSA_CLIP) && !defined(SANSA_M200V4)
+#if !defined(SANSA_CLIP) && !defined(SANSA_M200V4) && !defined(SANSA_E200V2)
     as3514_write(AS3514_AUDIOSET3, AUDIOSET3_HPCM_off);
 #endif
 
