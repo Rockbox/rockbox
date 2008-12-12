@@ -125,6 +125,9 @@ void audiohw_preinit(void)
     /* IWL=00(16 bit) FORMAT=10(I2S format) */
     wmcodec_write(AINTFCE, AINTFCE_MS | AINTFCE_WL_16 |
                   AINTFCE_FORMAT_I2S);
+
+    /* Set default samplerate */
+    audiohw_set_frequency(HW_FREQ_DEFAULT);
 }
 
 /* Enable DACs and audio output after a short delay */
