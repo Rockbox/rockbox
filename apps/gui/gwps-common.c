@@ -617,11 +617,11 @@ static bool draw_player_progress(struct gui_wps *gwps)
     for (i = 0; i < 7; i++, pos -= 5)
     {
         if (pos <= 0)
-            progress_pattern[i] = 0x1f;
+            progress_pattern[i] = 0x1fu;
         else if (pos >= 5)
-            progress_pattern[i] = 0x00;
+            progress_pattern[i] = 0x00u;
         else
-            progress_pattern[i] = 0x1f >> pos;
+            progress_pattern[i] = 0x1fu >> pos;
     }
 
     display->define_pattern(gwps->data->wps_progress_pat[0], progress_pattern);
@@ -688,20 +688,20 @@ static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
 
                 if (time_idx > 0)  /* not the first group, add colon in front */
                 {
-                    progress_pattern[1] |= 0x10;
-                    progress_pattern[3] |= 0x10;
+                    progress_pattern[1] |= 0x10u;
+                    progress_pattern[3] |= 0x10u;
                 }
                 time_idx++;
             }
 
             if (pos >= 5)
-                progress_pattern[5] = progress_pattern[6] = 0x1f;
+                progress_pattern[5] = progress_pattern[6] = 0x1fu;
         }
 
         if (pos > 0 && pos < 5)
         {
             softchar = true;
-            progress_pattern[5] = progress_pattern[6] = (~0x1f >> pos) & 0x1f;
+            progress_pattern[5] = progress_pattern[6] = (~0x1fu >> pos) & 0x1fu;
         }
 
         if (softchar && pat_idx < 8)

@@ -325,7 +325,7 @@ static void charging_display_info(bool animate)
                 ypos = (phase + i/5) % 9; /* "bounce" effect */
                 if (ypos > 4)
                     ypos = 8 - ypos;
-                buf[5 - ypos + 8 * (i/5)] |= 0x10 >> (i%5);
+                buf[5 - ypos + 8 * (i/5)] |= 0x10u >> (i%5);
             }
         }
         phase++;
