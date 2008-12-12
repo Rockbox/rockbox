@@ -159,7 +159,7 @@ int filesize(FILE* fd)
 int upload_app(usb_dev_handle* dh, int address, unsigned char* p, int len, bool stage2)
 {
     int err;
-    char buf[8];
+    char buf[9];
     unsigned char* tmp_buf;
 
     fprintf(stderr, "[INFO] GET_CPU_INFO: ");
@@ -207,7 +207,7 @@ int upload_app(usb_dev_handle* dh, int address, unsigned char* p, int len, bool 
 int read_data(usb_dev_handle* dh, int address, unsigned char *p, int len)
 {
     int err;
-    char buf[8];
+    char buf[9];
 
     fprintf(stderr, "[INFO] GET_CPU_INFO: ");
     GET_CPU_INFO(buf);
@@ -577,6 +577,8 @@ int nand_dump(usb_dev_handle *dh)
     {
         fprintf(stderr,"\n[ERR]  Error writing data\n");
         fprintf(stderr,"[ERR]  Bulk write error (%d, %s)\n", err, strerror(-err));
+        fclose(fd);
+        free(buffer);
         return -1;
     }
     
@@ -628,6 +630,8 @@ int rom_dump(usb_dev_handle *dh)
     {
         fprintf(stderr,"\n[ERR]  Error writing data\n");
         fprintf(stderr,"[ERR]  Bulk write error (%d, %s)\n", err, strerror(-err));
+        fclose(fd);
+        free(buffer);
         return -1;
     }
     
