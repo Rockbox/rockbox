@@ -514,6 +514,7 @@ bool set_time_screen(const char* title, struct tm *tm)
         FOR_NB_SCREENS(s)
         {
             viewport_set_defaults(&vp[s], s);
+            screens[s].set_viewport(&vp[s]);
             nb_lines = viewport_get_nb_lines(&vp[s]);
             
             /* minimum lines needed is 2 + title line */
