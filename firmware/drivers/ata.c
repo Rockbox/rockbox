@@ -1197,7 +1197,7 @@ static int set_features(void)
     }
 
     for (i=0; i < (int)(sizeof(features)/sizeof(features[0])); i++) {
-        if (identify_info[features[i].id_word] & (1 << features[i].id_bit)) {
+        if (identify_info[features[i].id_word] & (1u << features[i].id_bit)) {
             SET_REG(ATA_FEATURE, features[i].subcommand);
             SET_REG(ATA_NSECTOR, features[i].parameter);
             SET_REG(ATA_COMMAND, CMD_SET_FEATURES);
