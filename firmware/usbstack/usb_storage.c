@@ -418,6 +418,11 @@ void usb_storage_init_connection(void)
     usb_drv_recv(ep_out, tb.transfer_buffer, 1024);
 }
 
+void usb_storage_disconnect(void)
+{
+    /* Empty for now */
+}
+
 /* called by usb_core_transfer_complete() */
 void usb_storage_transfer_complete(int ep,int dir,int status,int length)
 {

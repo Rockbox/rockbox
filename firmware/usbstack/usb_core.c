@@ -187,7 +187,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .get_config_descriptor = usb_storage_get_config_descriptor,
         .init_connection = usb_storage_init_connection,
         .init = usb_storage_init,
-        .disconnect = NULL,
+        .disconnect = usb_storage_disconnect,
         .transfer_complete = usb_storage_transfer_complete,
         .control_request = usb_storage_control_request,
 #ifdef HAVE_HOTSWAP
