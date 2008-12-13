@@ -136,15 +136,15 @@
 </phrase>
 <phrase>
   id: LANG_RESTARTING_PLAYBACK
-  desc: splash screen displayed when pcm buffer size is changed
+  desc: deprecated
   user:
   <source>
     *: none
-    swcodec: "Restarting playback..."
+    swcodec: ""
   </source>
   <dest>
     *: none
-    swcodec: "Jatketaan toistoa..."
+    swcodec: ""
   </dest>
   <voice>
     *: none
@@ -2554,7 +2554,7 @@
   </source>
   <dest>
     *: none
-    recording: ""
+    recording: deprecated
   </dest>
   <voice>
     *: none
@@ -6693,7 +6693,7 @@
     *: ""
   </source>
   <dest>
-    *: ""
+    *: deprecated
   </dest>
   <voice>
     *: ""
@@ -7801,6 +7801,7 @@
 <phrase>
   id: LANG_CROSSFEED_CROSS_GAIN
   desc: in crossfeed settings
+  user:
   <source>
     *: none
     swcodec: "Cross Gain"
@@ -7817,6 +7818,7 @@
 <phrase>
   id: LANG_CROSSFEED_HF_ATTENUATION
   desc: in crossfeed settings
+  user:
   <source>
     *: none
     swcodec: "High-Frequency Attenuation"
@@ -7833,6 +7835,7 @@
 <phrase>
   id: LANG_CROSSFEED_HF_CUTOFF
   desc: in crossfeed settings
+  user:
   <source>
     *: none
     swcodec: "High-Frequency Cutoff"
@@ -7849,6 +7852,7 @@
 <phrase>
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
+  user:
   <source>
     *: "Database is not ready"
   </source>
@@ -8047,6 +8051,7 @@
 <phrase>
   id: LANG_SPLIT_MEASURE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Measure"
@@ -8063,6 +8068,7 @@
 <phrase>
   id: LANG_SPLIT_TYPE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "What to do when Splitting"
@@ -8079,6 +8085,7 @@
 <phrase>
   id: LANG_SPLIT_TIME
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Time"
@@ -8095,6 +8102,7 @@
 <phrase>
   id: LANG_SPLIT_SIZE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Filesize"
@@ -8799,14 +8807,10 @@
   <dest>
     *: none
     recording: ""
-    h100,h120,h300: ""
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
   </dest>
   <voice>
     *: none
-    recording: ""
-    h100,h120,h300: ""
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8863,6 +8867,7 @@
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
   desc: deprecated
+  user:
   <source>
     *: none
     recording: ""
@@ -9006,6 +9011,7 @@
 <phrase>
   id: LANG_RECORD_AGC_PRESET
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -9022,6 +9028,7 @@
 <phrase>
   id: LANG_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Safety (clip)"
@@ -9038,6 +9045,7 @@
 <phrase>
   id: LANG_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Live (slow)"
@@ -9054,6 +9062,7 @@
 <phrase>
   id: LANG_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -9070,6 +9079,7 @@
 <phrase>
   id: LANG_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Medium"
@@ -9086,6 +9096,7 @@
 <phrase>
   id: LANG_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Voice (fast)"
@@ -9102,6 +9113,7 @@
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -9118,6 +9130,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -9165,6 +9178,7 @@
 <phrase>
   id: LANG_FM_REGION
   desc: fm tuner region setting
+  user:
   <source>
     *: none
     radio: "Region"
@@ -9181,6 +9195,7 @@
 <phrase>
   id: LANG_FM_EUROPE
   desc: fm tuner region europe
+  user:
   <source>
     *: none
     radio: "Europe"
@@ -9197,6 +9212,7 @@
 <phrase>
   id: LANG_FM_US
   desc: fm region us / canada
+  user:
   <source>
     *: none
     radio: "US / Canada"
@@ -9213,6 +9229,7 @@
 <phrase>
   id: LANG_FM_JAPAN
   desc: fm region japan
+  user:
   <source>
     *: none
     radio: "Japan"
@@ -9229,6 +9246,7 @@
 <phrase>
   id: LANG_FM_KOREA
   desc: fm region korea
+  user:
   <source>
     *: none
     radio: "Korea"
@@ -9245,6 +9263,7 @@
 <phrase>
   id: LANG_RANDOM
   desc: random folder
+  user:
   <source>
     *: "Random"
   </source>
@@ -9439,6 +9458,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_TYPE
   desc: in recording trigger menu
+  user:
   <source>
     *: none
     recording: "Trigtype"
@@ -9455,6 +9475,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_STOP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "Stop"
@@ -9471,6 +9492,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_NEWFILESTP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "New file"
@@ -9532,6 +9554,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -9548,6 +9571,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -9564,6 +9588,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -9580,6 +9605,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -9596,6 +9622,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -9612,6 +9639,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
   desc: deprecated
+  user:
   <source>
     *: none
     agc: ""
@@ -11723,6 +11751,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
+  user:
   <source>
     *: none
     agc: "AGC max. gain"
@@ -11908,6 +11937,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_PRESET
   desc: automatic gain control in record settings and screen
+  user:
   <source>
     *: none
     agc: "AGC"
@@ -11924,6 +11954,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_CLIPTIME
   desc: in record settings
+  user:
   <source>
     *: none
     agc: "AGC clip time"
