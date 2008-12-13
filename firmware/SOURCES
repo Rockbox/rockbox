@@ -1095,7 +1095,7 @@ target/arm/as3525/powermgmt-as3525.c
 target/arm/lcd-ssd1815.c
 target/arm/as3525/sansa-m200v4/button-m200v4.c
 #ifndef BOOTLOADER
-target/arm/as3525/powermgmt-as3525.c
+target/arm/as3525/sansa-m200v4/powermgmt-m200v4.c
 drivers/generic_i2c.c
 target/arm/as3525/fmradio-i2c-as3525.c
 #endif /* !BOOTLOADER */
