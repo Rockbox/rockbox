@@ -16,6 +16,7 @@
 #
 # Catalan language file, translated by:
 # - Victor Zabalza
+# - Vicente Ibarra
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -969,6 +970,7 @@
   <voice>
     *: none
     swcodec: "Equalitzador senzill"
+  </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_ADVANCED
@@ -6917,16 +6919,19 @@
   user:
   <source>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
+    multivolume: "H D 1"
     e200*,c200: "micro S D"
     ondio*: "M M C"
   </voice>
@@ -8390,13 +8395,17 @@
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
     h10,h10_5gb,e200*,c200: "PREV to abort"
+    gigabeats: "BACK to abort"
+    gigabeatf: "POWER to abort"
   </source>
   <dest>
-    *: "OFF per cancelar"
-    player,h100,h120,h300: "STOP to cancelar"
-    ipod*: "PLAY/PAUSE to cancelar"
-    x5,m5: "Long PLAY to cancelar"
-    h10,h10_5gb,e200*,c200: "PREV to cancelar"
+    *: "OFF per a cancelar"
+    player,h100,h120,h300: "STOP per a cancelar"
+    ipod*: "PLAY/PAUSE per a cancelar"
+    x5,m5: "Long PLAY per a cancelar"
+    h10,h10_5gb,e200*,c200: "PREV per a cancelar"
+    gigabeats: "BACK per a cancelar"
+    gigabeatf: "POWER per a cancelar"
   </dest>
   <voice>
     *: ""
@@ -9825,7 +9834,7 @@
     *: ""
   </dest>
   <voice>
-    *: " "
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10118,7 +10127,7 @@
   user:
   <source>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "Edit mode: %s %s"
   </source>
   <dest>
     *: none
@@ -10135,7 +10144,7 @@
   user:
   <source>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Cutoff"
   </source>
   <dest>
     *: none
@@ -11952,5 +11961,203 @@
   <voice>
     *: none
     recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMART
+  desc: Display the expected AA size
+  user:
+  <source>
+    *: none
+    albumart: "Album Art:"
+  </source>
+  <dest>
+    *: none
+    albumart: "Caratula:"
+  </dest>
+  <voice>
+    *: none
+    albumart: "Caratula"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFTRIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Mono Left plus Right"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Left Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Selecciona com a element de accés rapid esquerra"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Selecciona com a element de accés rapid esquerra"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_SETTING
+  desc: used in the settings context menu
+  user:
+  <source>
+    *: "Reset Setting"
+  </source>
+  <dest>
+    *: "Preferencies originals"
+  </dest>
+  <voice>
+    *: "Preferencies originals"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Bottom Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Selecciona com a element de accés rapid inferior"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Selecciona com a element de accés rapid inferior"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QS_ITEMS
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Right Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Selecciona com a element de accés rapid dret"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Selecciona com a element de accés rapid dret"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user:
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "Busca resultats"
+  </dest>
+  <voice>
+    *: "Busca resultats"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MONO_MODE
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono mode"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Modo mono"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Modo mono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
   </voice>
 </phrase>
