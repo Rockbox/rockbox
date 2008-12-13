@@ -67,30 +67,30 @@ bool Autodetection::detect()
     detectUsb();
 
     // Try detection via rockbox.info / rbutil.log
-    QStringList mountpoints = getMountpoints();
+    QStringList mounts = mountpoints();
 
-    for(int i=0; i< mountpoints.size();i++)
+    for(int i=0; i< mounts.size();i++)
     {
         // do the file checking
-        QDir dir(mountpoints.at(i));
-        qDebug() << "paths to check for player specific files:" << mountpoints;
+        QDir dir(mounts.at(i));
+        qDebug() << "paths to check for player specific files:" << mounts;
         if(dir.exists())
         {
             // check logfile first.
-            if(QFile(mountpoints.at(i) + "/.rockbox/rbutil.log").exists()) {
-                QSettings log(mountpoints.at(i) + "/.rockbox/rbutil.log",
+            if(QFile(mounts.at(i) + "/.rockbox/rbutil.log").exists()) {
+                QSettings log(mounts.at(i) + "/.rockbox/rbutil.log",
                               QSettings::IniFormat, this);
                 if(!log.value("platform").toString().isEmpty()) {
                     if(m_device.isEmpty())
                         m_device = log.value("platform").toString();
-                    m_mountpoint = mountpoints.at(i);
+                    m_mountpoint = mounts.at(i);
                     qDebug() << "rbutil.log detected:" << m_device << m_mountpoint;
                     return true;
                 }
             }
 
             // check rockbox-info.txt afterwards.
-            QFile file(mountpoints.at(i) + "/.rockbox/rockbox-info.txt");
+            QFile file(mounts.at(i) + "/.rockbox/rockbox-info.txt");
             if(file.exists())
             {
                 file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -100,40 +100,40 @@ bool Autodetection::detect()
                     line.remove("Target: ");
                     if(m_device.isEmpty())
                         m_device = line.trimmed(); // trim whitespaces
-                    m_mountpoint = mountpoints.at(i);
+                    m_mountpoint = mounts.at(i);
                     qDebug() << "rockbox-info.txt detected:" << m_device << m_mountpoint;
                     return true;
                 }
             }
             // check for some specific files in root folder
-            QDir root(mountpoints.at(i));
+            QDir root(mounts.at(i));
             QStringList rootentries = root.entryList(QDir::Files);
             if(rootentries.contains("archos.mod", Qt::CaseInsensitive))
             {
                 // archos.mod in root folder -> Archos Player
                 m_device = "player";
-                m_mountpoint = mountpoints.at(i);
+                m_mountpoint = mounts.at(i);
                 return true;
             }
             if(rootentries.contains("ONDIOST.BIN", Qt::CaseInsensitive))
             {
                 // ONDIOST.BIN in root -> Ondio FM
                 m_device = "ondiofm";
-                m_mountpoint = mountpoints.at(i);
+                m_mountpoint = mounts.at(i);
                 return true;
             }
             if(rootentries.contains("ONDIOSP.BIN", Qt::CaseInsensitive))
             {
                 // ONDIOSP.BIN in root -> Ondio SP
                 m_device = "ondiosp";
-                m_mountpoint = mountpoints.at(i);
+                m_mountpoint = mounts.at(i);
                 return true;
             }
             if(rootentries.contains("ajbrec.ajz", Qt::CaseInsensitive))
             {
                 qDebug() << "ajbrec.ajz found. Trying detectAjbrec()";
-                if(detectAjbrec(mountpoints.at(i))) {
-                    m_mountpoint = mountpoints.at(i);
+                if(detectAjbrec(mounts.at(i))) {
+                    m_mountpoint = mounts.at(i);
                     qDebug() << m_device;
                     return true;
                 }
@@ -145,7 +145,7 @@ bool Autodetection::detect()
             {
                 // GBSYSTEM folder -> Gigabeat
                 m_device = "gigabeatf";
-                m_mountpoint = mountpoints.at(i);
+                m_mountpoint = mounts.at(i);
                 return true;
             }
 #if defined(Q_OS_WIN32)
@@ -154,7 +154,7 @@ bool Autodetection::detect()
             {
                 // iPod_Control folder -> Ipod found
                 // detecting of the Ipod type is done below using ipodpatcher
-                m_mountpoint = mountpoints.at(i);
+                m_mountpoint = mounts.at(i);
             }
 #endif
         }
@@ -205,7 +205,7 @@ bool Autodetection::detect()
 }
 
 
-QStringList Autodetection::getMountpoints()
+QStringList Autodetection::mountpoints()
 {
     QStringList tempList;
 #if defined(Q_OS_WIN32)
