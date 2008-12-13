@@ -138,19 +138,19 @@
 </phrase>
 <phrase>
   id: LANG_RESTARTING_PLAYBACK
-  desc: splash screen displayed when pcm buffer size is changed
+  desc: deprecated
   user:
   <source>
     *: none
-    swcodec: "Restarting playback..."
+    swcodec: ""
   </source>
   <dest>
     *: none
-    swcodec: "Afspelen herstarten"
+    swcodec: ""
   </dest>
   <voice>
     *: none
-    swcodec: "Afspelen herstarten..."
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8370,15 +8370,15 @@
   user:
   <source>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "Edit mode: %s %s"
   </source>
   <dest>
     *: none
-    swcodec: "Bewerk mode: %s"
+    swcodec: "Bewerk mode: %s %s"
   </dest>
   <voice>
     *: none
-    swcodec: "Bewerk mode %s"
+    swcodec: "Bewerk mode %s %s"
   </voice>
 </phrase>
 <phrase>
@@ -8387,15 +8387,15 @@
   user:
   <source>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Cutoff"
   </source>
   <dest>
     *: none
-    swcodec: "Afsnij frequentie"
+    swcodec: "Afsnij freq"
   </dest>
   <voice>
     *: none
-    swcodec: "Afsnij frequentie"
+    swcodec: "Afsnij freq"
   </voice>
 </phrase>
 <phrase>
