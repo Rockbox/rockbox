@@ -1,0 +1,49 @@
+#!/bin/sh
+
+if [ "wiki" == "$1" ]; then
+    echo "As of `LC_ALL=C date +'%d %b %Y'`, the current status of the translations is the following:"
+    echo "|   *Language*   |   *Missing strings*   |   *Changed desc*   |   *Changed source*   |"
+    FORMAT="|%s|   %d|   %d|   %d|\n"
+else
+    echo ".----------------------.-----------------.---------------.---------------."
+    echo "| Language             | Missing strings | Changed desc | Changed source |"
+    echo "|----------------------|-----------------|--------------|----------------|"
+    FORMAT="| %-20s | %15d | %12d | %14d |\n"
+fi
+
+GENLANG=`dirname $0`/genlang
+LANGDIR=`dirname $0`/../apps/lang
+ENGLISH="$LANGDIR"/english.lang
+
+(for LANGFILE in $LANGDIR/*.lang; do
+    LANGUAGE=`basename $LANGFILE .lang |sed -e "s/^\(.\)/\U\1/"`
+
+
+    $GENLANG -u -e=$ENGLISH $LANGFILE |grep "^###" |(
+        MISSING=0
+        CHANGE_DESC=0
+        CHANGE_SRC=0
+
+        while read LINE; do
+            case $LINE in
+                "### This phrase below was not present in the translated file")
+                    MISSING=`expr $MISSING + 1`
+                ;;
+                "### The 'desc' field differs from the english!")
+                    CHANGE_DESC=`expr $CHANGE_DESC + 1`
+                ;;
+                "### The <source> section differs from the english!")
+                    CHANGE_SRC=`expr $CHANGE_SRC + 1`
+                ;;
+                *)
+                    #echo $LINE
+                ;;
+            esac
+        done
+        printf "$FORMAT" "$LANGUAGE" "$MISSING" "$CHANGE_DESC" "$CHANGE_SRC"
+    )
+done) 2>/dev/null
+
+if [ "wiki" != "$1" ]; then
+    echo "'----------------------'-----------------'--------------'----------------'"
+fi
