@@ -478,6 +478,11 @@ void pcm_stop_recording(void)
     pcm_rec_unlock();
 } /* pcm_stop_recording */
 
+bool pcm_is_recording(void)
+{
+    return pcm_recording;
+}
+
 void pcm_rec_dma_stopped_callback(void)
 {
     pcm_recording = false;

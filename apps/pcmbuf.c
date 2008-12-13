@@ -955,25 +955,22 @@ bool pcmbuf_insert_buffer(char *buf, int count)
 #endif
 
 #ifndef HAVE_HARDWARE_BEEP
+#define MINIBUF_SAMPLES (NATIVE_FREQUENCY / 1000 * KEYCLICK_DURATION)
+#define MINIBUF_SIZE (MINIBUF_SAMPLES*4)
+
 /* Generates a constant square wave sound with a given frequency
    in Hertz for a duration in milliseconds. */
 void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
 {
-    unsigned int step;
-    int32_t phase;
+    unsigned int step = 0xffffffffu / NATIVE_FREQUENCY * frequency;
+    int32_t phase = 0;
     int16_t *bufptr, *bufstart, *bufend;
     int32_t sample;
-    int nsamples;
-    bool mix;
+    int nsamples = NATIVE_FREQUENCY / 1000 * duration;
+    bool mix = pcmbuf_read != NULL && pcmbuf_read->link != NULL;
     int i;
 
-    if (audio_buffer_state() == AUDIOBUF_STATE_TRASHED)
-        return; /* No voice or playback = no beeping. */
-
-    phase = 0;
-    step = 0xffffffffu / NATIVE_FREQUENCY * frequency;
-    nsamples = NATIVE_FREQUENCY / 1000 * duration;
-    mix = pcmbuf_read != NULL && pcmbuf_read->link != NULL;
+    bufend = SKIPBYTES((int16_t *)audiobuffer, pcmbuf_size);
 
     /* Find the insertion point and set bufstart to the start of it */
     if (mix)
@@ -987,21 +984,31 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
         /* Give 5ms clearance. */    
         bufstart += NATIVE_FREQUENCY * 4 / 200;
 
+        /* Wrapped above? */
+        if (bufstart >= bufend)
+            bufstart -= pcmbuf_size;
+
         /* NOTE: On some targets using hardware DMA, cache range flushing may
          * be required or the writes may not be picked up by the controller.
          * An incremental flush should be done periodically during the mixdown. */
     }
-    else
+    else if (nsamples <= MINIBUF_SAMPLES)
+    {
+        static int16_t minibuf[MINIBUF_SAMPLES*2];
+        /* Use mini buffer */
+        bufstart = minibuf;
+        bufend = SKIPBYTES(bufstart, MINIBUF_SIZE);
+    }
+    else if (audio_buffer_state() != AUDIOBUF_STATE_TRASHED)
     {
         /* Use audiobuffer */
         bufstart = (int16_t *)audiobuffer;
     }
-
-    bufend = (int16_t *)SKIPBYTES(audiobuffer, pcmbuf_size);
-
-    /* Wrapped above? */
-    if (bufstart >= bufend)
-        bufstart -= pcmbuf_size;
+    else
+    {
+        /* No place */
+        return;
+    }
 
     bufptr = bufstart;
 
@@ -1022,14 +1029,24 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
     }
 
     pcm_play_lock();
+#ifdef HAVE_RECORDING
+    pcm_rec_lock();
+#endif
 
-    /* Kick off playback if required */
-    if (!pcm_is_playing())
+    /* Kick off playback if required and it won't interfere */
+    if (!pcm_is_playing()
+#ifdef HAVE_RECORDING
+        && !pcm_is_recording()
+#endif
+        )
     {
         pcm_play_data(NULL, (unsigned char *)bufstart, nsamples * 4);
     }
 
     pcm_play_unlock();
+#ifdef HAVE_RECORDING
+    pcm_rec_unlock();
+#endif
 }
 #endif /* HAVE_HARDWARE_BEEP */
 

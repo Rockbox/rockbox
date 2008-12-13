@@ -126,6 +126,9 @@ void pcm_record_data(pcm_more_callback_type2 more_ready,
 /* Stop tranferring data into supplied buffer */
 void pcm_stop_recording(void);
 
+/* Is pcm currently recording? */
+bool pcm_is_recording(void);
+
 /* Continue transferring data in - call during interrupt handler */
 void pcm_record_more(void *start, size_t size);
 

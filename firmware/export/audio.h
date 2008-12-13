@@ -112,7 +112,6 @@ enum audio_buffer_state
     AUDIOBUF_STATE_VOICED_ONLY = 1, /* voice-only */
 };
 int audio_buffer_state(void);
-void audio_buffer_reset(void);
 #endif
 
 /* channel modes */

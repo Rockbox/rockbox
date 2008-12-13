@@ -177,6 +177,12 @@ enum {  ALARM_START_WPS = 0,
 #endif
 
 #endif /* HAVE_RTC_ALARM */
+
+/* Keyclick stuff */
+
+ /* Not really a setting but several files should stay synced */
+#define KEYCLICK_DURATION 2
+
 /** virtual pointer stuff.. move to another .h maybe? **/
 /* These define "virtual pointers", which could either be a literal string,
    or a mean a string ID if the pointer is in a certain range.
