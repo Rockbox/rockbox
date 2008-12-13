@@ -784,6 +784,13 @@ int plugin_load(const char* plugin, const void* parameter)
             splash(HZ*2, str(LANG_PLUGIN_ERROR));
             break;
     }
+
+#if CONFIG_CODEC == SWCODEC && !defined (HAVE_HARDWARE_BEEP)
+    /* Did the plugin trash the buffer? Restore it. */
+    if (audio_buffer_state() == AUDIOBUF_STATE_TRASHED)
+        audio_buffer_reset();
+#endif
+
     return PLUGIN_OK;
 }
 

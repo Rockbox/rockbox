@@ -885,6 +885,9 @@ void settings_apply(bool read_disk)
                      global_settings.lang_file);
             lang_load(buf);
             talk_init(); /* use voice of same language */
+#if CONFIG_CODEC == SWCODEC && !defined(HAVE_HARDWARE_BEEP)
+            audio_buffer_reset();
+#endif
         }
         /* load the icon set */
         icons_init();

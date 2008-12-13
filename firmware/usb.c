@@ -125,6 +125,17 @@ static void usb_slave_mode(bool on)
         if (rc <= 0) /* no partition */
             panicf("mount: %d",rc);
 
+#ifndef BOOTLOADER
+#if CONFIG_CPU == IMX31L || CONFIG_USBOTG == USBOTG_ISP1583 || \
+        defined(CPU_TCC77X) || defined(CPU_TCC780X)
+    /* These use a static transfer buffer */
+#elif defined(USB_STORAGE) && !defined (HAVE_HARDWARE_BEEP)
+    /* Storage can use the audio buffer, restore it if it did to get
+     * keyclicks back. */
+    if (audio_buffer_state() == BUFFER_STATE_TRASHED)
+        audio_buffer_reset();
+#endif /* USB_STORAGE */
+#endif /* BOOTLOADER */
     }
 }
 #endif

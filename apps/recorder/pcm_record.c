@@ -1167,6 +1167,10 @@ static void pcmrec_close(void)
     pcm_close_recording();
     reset_hardware();
     audio_remove_encoder();
+#ifndef HAVE_HARDWARE_BEEP
+    /* Restore keyclicks */
+    audio_buffer_reset();
+#endif
 } /* pcmrec_close */
 
 /* PCMREC_OPTIONS */

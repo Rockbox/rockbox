@@ -136,6 +136,7 @@ enum {
     Q_AUDIO_POSTINIT,
     Q_AUDIO_FILL_BUFFER,
     Q_AUDIO_FINISH_LOAD,
+    Q_AUDIO_RESTORE_BUFFER,
     Q_CODEC_REQUEST_COMPLETE,
     Q_CODEC_REQUEST_FAILED,
 
@@ -488,6 +489,12 @@ unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
 int audio_buffer_state(void)
 {
     return buffer_state;
+}
+
+void audio_buffer_reset(void)
+{
+    LOGFQUEUE("audio_queue >| Q_AUDIO_RESTORE_BUFFER");
+    queue_send(&audio_queue, Q_AUDIO_RESTORE_BUFFER, 0);
 }
 
 #ifdef HAVE_RECORDING
@@ -2387,6 +2394,12 @@ static void audio_thread(void)
             case Q_AUDIO_FINISH_LOAD:
                 LOGFQUEUE("audio < Q_AUDIO_FINISH_LOAD");
                 audio_finish_load_track();
+                break;
+
+            case Q_AUDIO_RESTORE_BUFFER:
+                LOGFQUEUE("audio < Q_AUDIO_RESTORE_BUFFER");
+                if (buffer_state != AUDIOBUF_STATE_INITIALIZED)
+                    audio_reset_buffer();
                 break;
 
             case Q_AUDIO_PLAY:

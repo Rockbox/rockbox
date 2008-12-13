@@ -509,6 +509,9 @@ int ft_enter(struct tree_context* c)
                              MAX_FILENAME);
                     talk_init(); /* use voice of same language */
                     splash(HZ, ID2P(LANG_LANGUAGE_LOADED));
+#if CONFIG_CODEC == SWCODEC && !defined(HAVE_HARDWARE_BEEP)
+                    audio_buffer_reset();
+#endif
                 }
                 break;
 
