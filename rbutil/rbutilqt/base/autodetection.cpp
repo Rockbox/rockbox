@@ -45,6 +45,12 @@
 #include <setupapi.h>
 #include <winioctl.h>
 #endif
+
+#if defined(Q_OS_OPENBSD)
+#include <sys/param.h>
+#include <sys/mount.h>
+#endif
+
 #include "detect.h"
 #include "utils.h"
 
@@ -209,7 +215,7 @@ QStringList Autodetection::getMountpoints()
         tempList << list.at(i).absolutePath();
     }
 
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
     int num;
     struct statfs *mntinf;
 
@@ -264,6 +270,19 @@ QString Autodetection::resolveMountPoint(QString device)
     while(num--) {
         if(QString(mntinf->f_mntfromname).startsWith(device)
            && QString(mntinf->f_fstypename).contains("vfat", Qt::CaseInsensitive))
+            return QString(mntinf->f_mntonname);
+        mntinf++;
+    }
+#endif
+
+#if defined(Q_OS_OPENBSD)
+    int num;
+    struct statfs *mntinf;
+
+    num = getmntinfo(&mntinf, MNT_WAIT);
+    while(num--) {
+        if(QString(mntinf->f_mntfromname).startsWith(device)
+           && QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive))
             return QString(mntinf->f_mntonname);
         mntinf++;
     }

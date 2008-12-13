@@ -41,7 +41,7 @@ void EncExesGui::showCfg(QString name)
     {
      
         // try to autodetect encoder
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
         QStringList path = QString(getenv("PATH")).split(":", QString::SkipEmptyParts);
 #elif defined(Q_OS_WIN)
         QStringList path = QString(getenv("PATH")).split(";", QString::SkipEmptyParts);
