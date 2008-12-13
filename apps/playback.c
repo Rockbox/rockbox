@@ -204,10 +204,7 @@ size_t filebuflen = 0;                      /* Size of buffer (A/C-) */
 /* FIXME: make buf_ridx (C/A-) */
 
 /* Possible arrangements of the buffer */
-#define BUFFER_STATE_TRASHED        -1          /* trashed; must be reset */
-#define BUFFER_STATE_INITIALIZED     0          /* voice+audio OR audio-only */
-#define BUFFER_STATE_VOICED_ONLY     1          /* voice-only */
-static int buffer_state = BUFFER_STATE_TRASHED; /* Buffer state */
+static int buffer_state = AUDIOBUF_STATE_TRASHED; /* Buffer state */
 
 /* Used to keep the WPS up-to-date during track transtition */
 static struct mp3entry prevtrack_id3;
@@ -419,11 +416,11 @@ bool audio_restore_playback(int type)
     switch (type)
     {
     case AUDIO_WANT_PLAYBACK:
-        if (buffer_state != BUFFER_STATE_INITIALIZED)
+        if (buffer_state != AUDIOBUF_STATE_INITIALIZED)
             audio_reset_buffer();
         return true;
     case AUDIO_WANT_VOICE:
-        if (buffer_state == BUFFER_STATE_TRASHED)
+        if (buffer_state == AUDIOBUF_STATE_TRASHED)
             audio_reset_buffer();
         return true;
     default:
@@ -439,32 +436,32 @@ unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
     {
         audio_hard_stop();
     }
-    /* else buffer_state will be BUFFER_STATE_TRASHED at this point */
+    /* else buffer_state will be AUDIOBUF_STATE_TRASHED at this point */
 
     if (buffer_size == NULL)
     {
         /* Special case for talk_init to use since it already knows it's
            trashed */
-        buffer_state = BUFFER_STATE_TRASHED;
+        buffer_state = AUDIOBUF_STATE_TRASHED;
         return NULL;
     }
 
-    if (talk_buf || buffer_state == BUFFER_STATE_TRASHED
+    if (talk_buf || buffer_state == AUDIOBUF_STATE_TRASHED
            || !talk_voice_required())
     {
         logf("get buffer: talk, audio");
         /* Ok to use everything from audiobuf to audiobufend - voice is loaded,
            the talk buffer is not needed because voice isn't being used, or
-           could be BUFFER_STATE_TRASHED already. If state is
-           BUFFER_STATE_VOICED_ONLY, no problem as long as memory isn't written
+           could be AUDIOBUF_STATE_TRASHED already. If state is
+           AUDIOBUF_STATE_VOICED_ONLY, no problem as long as memory isn't written
            without the caller knowing what's going on. Changing certain settings
            may move it to a worse condition but the memory in use by something
            else will remain undisturbed.
          */
-        if (buffer_state != BUFFER_STATE_TRASHED)
+        if (buffer_state != AUDIOBUF_STATE_TRASHED)
         {
             talk_buffer_steal();
-            buffer_state = BUFFER_STATE_TRASHED;
+            buffer_state = AUDIOBUF_STATE_TRASHED;
         }
 
         buf = audiobuf;
@@ -472,20 +469,25 @@ unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
     }
     else
     {
-        /* Safe to just return this if already BUFFER_STATE_VOICED_ONLY or
-           still BUFFER_STATE_INITIALIZED */
+        /* Safe to just return this if already AUDIOBUF_STATE_VOICED_ONLY or
+           still AUDIOBUF_STATE_INITIALIZED */
         /* Skip talk buffer and move pcm buffer to end to maximize available
            contiguous memory - no audio running means voice will not need the
            swap space */
         logf("get buffer: audio");
         buf = audiobuf + talk_get_bufsize();
         end = audiobufend - pcmbuf_init(audiobufend);
-        buffer_state = BUFFER_STATE_VOICED_ONLY;
+        buffer_state = AUDIOBUF_STATE_VOICED_ONLY;
     }
 
     *buffer_size = end - buf;
 
     return buf;
+}
+
+int audio_buffer_state(void)
+{
+    return buffer_state;
 }
 
 #ifdef HAVE_RECORDING
@@ -496,7 +498,7 @@ unsigned char *audio_get_recording_buffer(size_t *buffer_size)
     talk_buffer_steal();
 
     unsigned char *end = audiobufend;
-    buffer_state = BUFFER_STATE_TRASHED;
+    buffer_state = AUDIOBUF_STATE_TRASHED;
     *buffer_size = end - audiobuf;
 
     return (unsigned char *)audiobuf;
@@ -1894,8 +1896,8 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
 
     /* Must reset the buffer before use if trashed or voice only - voice
        file size shouldn't have changed so we can go straight from
-       BUFFER_STATE_VOICED_ONLY to BUFFER_STATE_INITIALIZED */
-    if (buffer_state != BUFFER_STATE_INITIALIZED)
+       AUDIOBUF_STATE_VOICED_ONLY to AUDIOBUF_STATE_INITIALIZED */
+    if (buffer_state != AUDIOBUF_STATE_INITIALIZED)
         audio_reset_buffer();
 
     logf("Starting buffer fill");
@@ -2338,7 +2340,7 @@ static void audio_reset_buffer(void)
     buffering_reset(filebuf, filebuflen);
 
     /* Clear any references to the file buffer */
-    buffer_state = BUFFER_STATE_INITIALIZED;
+    buffer_state = AUDIOBUF_STATE_INITIALIZED;
 
 #if defined(ROCKBOX_HAS_LOGF) && defined(LOGF_ENABLE)
     /* Make sure everything adds up - yes, some info is a bit redundant but

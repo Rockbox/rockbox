@@ -104,6 +104,16 @@ void audio_init_playback(void);
 unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size); 
 /* only implemented in playback.c, but called from firmware */
 
+#if CONFIG_CODEC == SWCODEC
+enum audio_buffer_state
+{
+    AUDIOBUF_STATE_TRASHED = -1,    /* trashed; must be reset */
+    AUDIOBUF_STATE_INITIALIZED = 0, /* voice+audio OR audio-only */
+    AUDIOBUF_STATE_VOICED_ONLY = 1, /* voice-only */
+};
+int audio_buffer_state(void);
+#endif
+
 /* channel modes */
 enum rec_channel_modes
 {

@@ -959,23 +959,37 @@ bool pcmbuf_insert_buffer(char *buf, int count)
    in Hertz for a duration in milliseconds. */
 void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
 {
-    int i;
-    unsigned int step = 0xffffffffu / NATIVE_FREQUENCY * frequency;
-    int32_t phase = 0;
-    int samples = NATIVE_FREQUENCY / 1000 * duration;
+    unsigned int step;
+    int32_t phase;
+    int16_t *bufptr, *bufstart, *bufend;
     int32_t sample;
-    int16_t *bufstart;
-    int16_t *bufptr;
-    int16_t *pcmbuf_end = (int16_t *)fadebuf;
-    bool mix = pcmbuf_read != NULL && pcmbuf_read->link != NULL;
+    int nsamples;
+    bool mix;
+    int i;
+
+    if (audio_buffer_state() == AUDIOBUF_STATE_TRASHED)
+        return; /* No voice or playback = no beeping. */
+
+    phase = 0;
+    step = 0xffffffffu / NATIVE_FREQUENCY * frequency;
+    nsamples = NATIVE_FREQUENCY / 1000 * duration;
+    mix = pcmbuf_read != NULL && pcmbuf_read->link != NULL;
 
     /* Find the insertion point and set bufstart to the start of it */
     if (mix)
     {
-        /* Get the next chunk */
-        char *pcmbuf_mix_buf = pcmbuf_read->link->addr;
-        /* Give 1/8s clearance. */
-        bufstart = (int16_t *)&pcmbuf_mix_buf[NATIVE_FREQUENCY * 4 / 8];
+        /* Get the currently playing chunk at the current position. */
+        bufstart = (int16_t *)pcm_play_dma_get_peak_buffer(&i);
+
+        if (!bufstart)
+            return; /* If above isn't implemented, no beepeth */
+
+        /* Give 5ms clearance. */    
+        bufstart += NATIVE_FREQUENCY * 4 / 200;
+
+        /* NOTE: On some targets using hardware DMA, cache range flushing may
+         * be required or the writes may not be picked up by the controller.
+         * An incremental flush should be done periodically during the mixdown. */
     }
     else
     {
@@ -983,28 +997,39 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
         bufstart = (int16_t *)audiobuffer;
     }
 
-    /* Mix square wave into buffer */
+    bufend = (int16_t *)SKIPBYTES(audiobuffer, pcmbuf_size);
+
+    /* Wrapped above? */
+    if (bufstart >= bufend)
+        bufstart -= pcmbuf_size;
+
     bufptr = bufstart;
-    for (i = 0; i < samples; ++i)
+
+    /* Mix square wave into buffer */
+    for (i = 0; i < nsamples; ++i)
     {
         int32_t amp = (phase >> 31) ^ (int32_t)amplitude;
         sample = mix ? *bufptr : 0;
         *bufptr++ = clip_sample_16(sample + amp);
-        if (bufptr >= pcmbuf_end)
+        if (bufptr >= bufend)
             bufptr = (int16_t *)audiobuffer;
         sample = mix ? *bufptr : 0;
         *bufptr++ = clip_sample_16(sample + amp);
-        if (bufptr >= pcmbuf_end)
+        if (bufptr >= bufend)
             bufptr = (int16_t *)audiobuffer;
 
         phase += step;
     }
 
+    pcm_play_lock();
+
     /* Kick off playback if required */
     if (!pcm_is_playing())
     {
-        pcm_play_data(NULL, (unsigned char *)bufstart, samples * 4);
+        pcm_play_data(NULL, (unsigned char *)bufstart, nsamples * 4);
     }
+
+    pcm_play_unlock();
 }
 #endif /* HAVE_HARDWARE_BEEP */
 
