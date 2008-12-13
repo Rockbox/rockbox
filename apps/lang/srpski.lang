@@ -3835,29 +3835,26 @@
   </voice>
 </phrase>
 <phrase>
-<<<<<<< .mine
   id: LANG_BUTTONLIGHT_TIMEOUT
   desc: in settings_menu
   user:
   <source>
     *: none
-    e200*: "Wheel Light Timeout"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
+    button_light: "Button Light Timeout"
+    fuze,e200*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
-    e200*: "Тајмаут светла за точак"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Тајмаут светла за дугмиће"
+    button_light: "Тајмаут светла за дугмиће"
+    fuze,e200*: "Тајмаут светла за точак"
   </dest>
   <voice>
     *: none
-    e200*: "Тајмаут светла за точак"
-    clip,c200,gigabeatf,mrobe100,sa9200: "Тајмаут светла за дугмиће"
+    button_light: "Тајмаут светла за дугмиће"
+    fuze,e200*: "Тајмаут светла за точак"
   </voice>
 </phrase>
 <phrase>
-=======
->>>>>>> .r19300
   id: LANG_BUTTONLIGHT_BRIGHTNESS
   desc: in settings_menu
   user:
