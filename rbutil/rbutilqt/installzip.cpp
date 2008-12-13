@@ -19,7 +19,7 @@
 
 #include "installzip.h"
 #include "rbunzip.h"
-
+#include "utils.h"
 
 ZipInstaller::ZipInstaller(QObject* parent): QObject(parent)
 {
@@ -148,6 +148,17 @@ void ZipInstaller::downloadDone(bool error)
             return;
         }
 
+        // check for free space. Make sure after installation will still be
+        // some room for operating (also includes calculation mistakes due to
+        // cluster sizes on the player).
+        if(filesystemFree(m_mountpoint) < (uz.totalSize() + 1000000)) {
+            m_dp->addItem(tr("Not enough disk space! Aborting."), LOGERROR);
+            m_dp->abort();
+            m_dp->setProgressMax(1);
+            m_dp->setProgressValue(1);
+            emit done(true);
+            return;
+        }
         ec = uz.extractArchive(m_mountpoint);
         // TODO: better handling of aborted unzip operation.
         if(ec != UnZip::Ok) {

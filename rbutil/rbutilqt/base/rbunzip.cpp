@@ -21,6 +21,7 @@
 #include <QtCore>
 
 
+//! @brief extract archive to destination
 UnZip::ErrorCode RbUnZip::extractArchive(const QString& dest)
 {
     QStringList files = this->fileList();
@@ -41,8 +42,25 @@ UnZip::ErrorCode RbUnZip::extractArchive(const QString& dest)
     return error;
 }
 
+
+//! @brief abort an extractArchive() operation.
 void RbUnZip::abortUnzip(void)
 {
     m_abortunzip = true;
+}
+
+
+//! @brief return total size of extracted files in archive.
+qulonglong RbUnZip::totalSize(void)
+{
+    QList<ZipEntry> l = this->entryList();
+    qulonglong total = 0;
+
+    int i = l.size();
+    while(i--)
+        total += l.at(i).uncompressedSize;
+
+    return total;
+
 }
 

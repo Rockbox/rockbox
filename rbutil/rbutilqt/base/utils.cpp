@@ -32,6 +32,9 @@
 #include <tchar.h>
 #include <winioctl.h>
 #endif
+#if defined(Q_OS_LINUX)
+#include <sys/statvfs.h>
+#endif
 
 // recursive function to delete a dir with files
 bool recRmdir( const QString &dirName )
@@ -78,7 +81,7 @@ QString resolvePathCase(QString path)
 
     for(int i = start; i < elems.size(); i++) {
         QStringList direlems
-	    = QDir(realpath).entryList(QDir::AllEntries|QDir::Hidden|QDir::System);
+            = QDir(realpath).entryList(QDir::AllEntries|QDir::Hidden|QDir::System);
         if(direlems.contains(elems.at(i), Qt::CaseInsensitive)) {
             // need to filter using QRegExp as QStringList::filter(QString)
             // matches any substring
@@ -97,5 +100,42 @@ QString resolvePathCase(QString path)
     }
     qDebug() << __func__ << path << "->" << realpath;
     return realpath;
+}
+
+
+//! @brief figure the free disk space on a filesystem
+//! @param path path on the filesystem to check
+//! @return size in bytes
+qulonglong filesystemFree(QString path)
+{
+    qlonglong size = 0;
+#if defined(Q_OS_LINUX)
+    // the usage of statfs() is deprecated by the LSB so use statvfs().
+    struct statvfs fs;
+    int ret;
+
+    ret = statvfs(qPrintable(path), &fs);
+
+    if(ret == 0)
+        size = fs.f_bsize * fs.f_bavail;
+#endif
+#if defined(Q_OS_MACX)
+    struct statfs fs;
+    int ret;
+
+    ret = statfs(qPrintable(path), &fs);
+
+    if(ret == 0)
+        size = fs.f_bsize * fs.f_bavail;
+#endif
+#if defined(Q_OS_WIN32)
+    BOOL ret;
+    ULARGE_INTEGER freeAvailBytes;
+
+    ret = GetDiskFreeSpaceExW((LPCTSTR)path.utf16(), &freeAvailBytes, NULL, NULL);
+    if(ret)
+        size = freeAvailBytes.QuadPart;
+#endif
+    return size;
 }
 

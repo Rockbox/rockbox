@@ -28,12 +28,13 @@
 
 class RbUnZip : public QObject, public UnZip
 {
-	Q_OBJECT
-	public:
+    Q_OBJECT
+    public:
         UnZip::ErrorCode extractArchive(const QString&);
+        qulonglong totalSize(void);
 
-	signals:
-		void unzipProgress(int, int);
+    signals:
+        void unzipProgress(int, int);
 
     public slots:
         void abortUnzip(void);

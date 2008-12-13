@@ -21,6 +21,8 @@
 #include "sysinfo.h"
 #include "ui_sysinfofrm.h"
 #include "detect.h"
+#include "utils.h"
+#include "autodetection.h"
 
 
 Sysinfo::Sysinfo(QWidget *parent) : QDialog(parent)
@@ -37,18 +39,33 @@ void Sysinfo::updateSysinfo(void)
 {
     QString info;
     info += tr("<b>OS</b><br/>") + Detect::osVersionString() + "<hr/>";
-    info += tr("<b>Username:</b><br/>%1<hr/>").arg(Detect::userName());
+    info += tr("<b>Username</b><br/>%1<hr/>").arg(Detect::userName());
 #if defined(Q_OS_WIN32)
-    info += tr("<b>Permissions:</b><br/>%1<hr/>").arg(Detect::userPermissionsString());
+    info += tr("<b>Permissions</b><br/>%1<hr/>").arg(Detect::userPermissionsString());
 #endif
-    info += tr("<b>Attached USB devices:</b><br/>");
+    info += tr("<b>Attached USB devices</b><br/>");
     QMap<uint32_t, QString> usbids = Detect::listUsbDevices();
     QList<uint32_t> usbkeys = usbids.keys();
-    for(int i = 0; i < usbkeys.size(); i++)
-        info += tr("VID: %1 PID: %2, %3<br/>")
+    for(int i = 0; i < usbkeys.size(); i++) {
+        info += tr("VID: %1 PID: %2, %3")
             .arg((usbkeys.at(i)&0xffff0000)>>16, 4, 16, QChar('0'))
             .arg(usbkeys.at(i)&0xffff, 4, 16, QChar('0'))
-	    .arg(usbids.value(usbkeys.at(i)));
+            .arg(usbids.value(usbkeys.at(i)));
+            if(i + 1 < usbkeys.size())
+                info += "<br/>";
+    }
+    info += "<hr/>";
+
+    info += "<b>" + tr("Filesystem") + "</b><br/>";
+    QStringList drives = Autodetection::mountpoints();
+    for(int i = 0; i < drives.size(); i++) {
+        info += tr("%1, %2 MiB available")
+            .arg(drives.at(i))
+            .arg(filesystemFree(drives.at(i)) / (1024*1024));
+            if(i + 1 < drives.size())
+                info += "<br/>";
+    }
+    info += "<hr/>";
 
     ui.textBrowser->setHtml(info);
 }
