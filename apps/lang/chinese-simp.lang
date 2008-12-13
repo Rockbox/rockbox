@@ -7399,7 +7399,7 @@
     x5,m5: "Long PLAY to abort"
     h10,h10_5gb,e200*,c200: "PREV to abort"
     gigabeats: "BACK to abort"
-    gigabeatf:"POWER to abort"
+    gigabeatf: "POWER to abort"
   </source>
   <dest>
     *: "按OFF键取消"
@@ -7408,7 +7408,7 @@
     x5,m5: "长按PLAY键取消"
     h10,h10_5gb,e200*,c200: "按PREV键取消"
     gigabeats: "按BACK键取消"
-    gigabeatf:"按POWER键取消"
+    gigabeatf: "按POWER键取消"
   </dest>
   <voice>
     *: ""

@@ -7399,7 +7399,7 @@
     x5,m5: "Long PLAY to abort"
     h10,h10_5gb,e200*,c200: "PREV to abort"
     gigabeats: "BACK to abort"
-    gigabeatf:"POWER to abort"
+    gigabeatf: "POWER to abort"
   </source>
   <dest>
     *: "OFF om af te breken"
@@ -7408,7 +7408,7 @@
     x5,m5: "Long PLAY om af te breken"
     h10,h10_5gb,e200*,c200: "PREV om af te breken"
     gigabeats: "BACK om af te breken"
-    gigabeatf:"POWER om af te breken"
+    gigabeatf: "POWER om af te breken"
   </dest>
   <voice>
     *: ""
