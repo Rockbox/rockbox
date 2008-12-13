@@ -1096,6 +1096,8 @@ int game_menu(int when)
                     return 3;
                 break;
         }
+
+        rb->yield();
     }
 }
 
@@ -1244,6 +1246,8 @@ int help(int when)
                     return 1;
                 break;
         }
+
+        rb->yield();
     }
     return 0;
 }

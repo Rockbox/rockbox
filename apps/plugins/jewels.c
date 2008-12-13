@@ -1468,6 +1468,8 @@ static int jewels_main(struct game_context* bj) {
         rb->lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT-8, str);
         rb->lcd_update();
 
+        rb->yield();
+
         switch(res) {
             case MRES_NEW:
                 startgame = true;
@@ -1510,6 +1512,7 @@ static int jewels_main(struct game_context* bj) {
                 while(true) {
                     button = rb->button_get(true);
                     if(button != BUTTON_NONE && !(button&BUTTON_REL)) break;
+                    rb->yield();
                 }
                 rb->lcd_clear_display();
                 continue;
@@ -1785,6 +1788,7 @@ static int jewels_main(struct game_context* bj) {
         }
 
         /* handle game button presses */
+        rb->yield();
         button = rb->button_get(true);
         switch(button){
             case JEWELS_LEFT:             /* move cursor left */

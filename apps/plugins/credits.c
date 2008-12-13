@@ -338,6 +338,8 @@ static void roll_credits(void)
                 rb->lcd_putsxy(0, font_h*(i+1), name);
             }
             rb->lcd_update();
+
+            rb->yield();
             
             /* wait for user action */
             action = rb->get_action(CONTEXT_LIST, TIMEOUT_BLOCK);

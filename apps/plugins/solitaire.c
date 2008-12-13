@@ -709,6 +709,8 @@ enum help solitaire_help( void )
         }
         if( button != BUTTON_NONE )
             lastbutton = button;
+
+        rb->yield();
     }
 }
 
@@ -1871,6 +1873,8 @@ int solitaire( int skipmenu )
         if(    cur_card == NOT_A_CARD
             && find_last_card( cur_col ) != NOT_A_CARD )
             cur_card = find_last_card( cur_col );
+
+        rb->yield();
     }
 }
 

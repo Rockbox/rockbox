@@ -315,7 +315,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
             rb->lcd_update();
             rb->sleep(sleep);
         }
-        button = rb->button_get(false);
+        button = rb->button_get(frozen);
         switch(button) {
             case MATRIX_PAUSE:
                 frozen = !frozen;
