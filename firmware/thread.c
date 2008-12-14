@@ -1454,7 +1454,7 @@ static inline void set_running_thread_priority(
 static int find_highest_priority_in_list_l(
     struct thread_entry * const thread)
 {
-    if (thread != NULL)
+    if (LIKELY(thread != NULL))
     {
         /* Go though list until the ending up at the initial thread */
         int highest_priority = thread->priority;
@@ -1538,7 +1538,7 @@ static struct thread_entry *
 
         next = bl->thread;
 
-        if (next == tstart)
+        if (UNLIKELY(next == tstart))
             break; /* Full-circle - deadlock! */
 
         UNLOCK_THREAD(current);
@@ -1549,7 +1549,7 @@ static struct thread_entry *
             LOCK_THREAD(next);
 
             /* Blocker could change - retest condition */
-            if (bl->thread == next)
+            if (LIKELY(bl->thread == next))
                 break;
 
             UNLOCK_THREAD(next);
@@ -1638,7 +1638,7 @@ struct thread_entry *
 
         next = bl->thread;
 
-        if (next == tstart)
+        if (UNLIKELY(next == tstart))
             break; /* Full-circle - deadlock! */
 
         UNLOCK_THREAD(thread);
@@ -1649,7 +1649,7 @@ struct thread_entry *
             LOCK_THREAD(next);
 
             /* Blocker could change - retest condition */
-            if (bl->thread == next)
+            if (LIKELY(bl->thread == next))
                 break;
 
             UNLOCK_THREAD(next);
@@ -1663,7 +1663,7 @@ struct thread_entry *
     UNLOCK_THREAD(bl_t);
 
 #if NUM_CORES > 1
-    if (thread != tstart)
+    if (UNLIKELY(thread != tstart))
     {
         /* Relock original if it changed */
         LOCK_THREAD(tstart);
@@ -1715,7 +1715,7 @@ struct thread_entry *
 
     next = *thread->bqp;
 
-    if (next == NULL)
+    if (LIKELY(next == NULL))
     {
         /* Expected shortcut - no more waiters */
         bl_pr = PRIORITY_IDLE;
@@ -1830,7 +1830,7 @@ void check_tmo_threads(void)
              * list. */
             remove_from_list_tmo(curr);
         }
-        else if (TIME_BEFORE(tick, curr->tmo_tick))
+        else if (LIKELY(TIME_BEFORE(tick, curr->tmo_tick)))
         {
             /* Timeout still pending - this will be the usual case */
             if (TIME_BEFORE(curr->tmo_tick, next_tmo_check))
@@ -1850,7 +1850,7 @@ void check_tmo_threads(void)
                 /* Lock the waiting thread's kernel object */
                 struct corelock *ocl = curr->obj_cl;
 
-                if (corelock_try_lock(ocl) == 0)
+                if (UNLIKELY(corelock_try_lock(ocl) == 0))
                 {
                     /* Need to retry in the correct order though the need is
                      * unlikely */
@@ -1858,7 +1858,7 @@ void check_tmo_threads(void)
                     corelock_lock(ocl);
                     LOCK_THREAD(curr);
 
-                    if (curr->state != STATE_BLOCKED_W_TMO)
+                    if (UNLIKELY(curr->state != STATE_BLOCKED_W_TMO))
                     {
                         /* Thread was woken or removed explicitely while slot
                          * was unlocked */
@@ -1915,7 +1915,7 @@ static inline void run_blocking_ops(
     struct thread_blk_ops *ops = &cores[core].blk_ops;
     const unsigned flags = ops->flags;
 
-    if (flags == TBOP_CLEAR)
+    if (LIKELY(flags == TBOP_CLEAR))
         return;
 
     switch (flags)
@@ -2015,7 +2015,7 @@ void switch_thread(void)
         cores[core].block_task = NULL;
 
 #if NUM_CORES > 1
-        if (thread == block)
+        if (UNLIKELY(thread == block))
         {
             /* This was the last thread running and another core woke us before
              * reaching here. Force next thread selection to give tmo threads or
@@ -2040,7 +2040,7 @@ void switch_thread(void)
     store_context(&thread->context);
 
     /* Check if the current thread stack is overflown */
-    if (thread->stack[0] != DEADBEEF)
+    if (UNLIKELY(thread->stack[0] != DEADBEEF))
         thread_stkov(thread);
 
 #if NUM_CORES > 1
@@ -2069,7 +2069,7 @@ void switch_thread(void)
 
         thread = cores[core].running;
 
-        if (thread == NULL)
+        if (UNLIKELY(thread == NULL))
         {
             /* Enter sleep mode to reduce power usage - woken up on interrupt
              * or wakeup request from another core - expected to enable
@@ -2106,7 +2106,7 @@ void switch_thread(void)
                  * ready. Of course, aging is only employed when higher and lower
                  * priority threads are runnable. The highest priority runnable
                  * thread(s) are never skipped. */
-                if (priority <= max ||
+                if (LIKELY(priority <= max) ||
                     IF_NO_SKIP_YIELD( thread->skip_count == -1 || )
                     (diff = priority - max, ++thread->skip_count > diff*diff))
                 {
@@ -2733,13 +2733,13 @@ IF_COP( retry_state: )
         {
             ocl = thread->obj_cl;
 
-            if (corelock_try_lock(ocl) == 0)
+            if (UNLIKELY(corelock_try_lock(ocl) == 0))
             {
                 UNLOCK_THREAD(thread);
                 corelock_lock(ocl);
                 LOCK_THREAD(thread);
 
-                if (thread->state != state)
+                if (UNLIKELY(thread->state != state))
                 {
                     /* Something woke the thread */
                     state = thread->state;
@@ -2873,7 +2873,7 @@ int thread_set_priority(unsigned int thread_id, int priority)
                         LOCK_THREAD(bl_t);
 
                         /* Double-check the owner - retry if it changed */
-                        if (bl->thread == bl_t)
+                        if (LIKELY(bl->thread == bl_t))
                             break;
 
                         UNLOCK_THREAD(bl_t);
@@ -2914,7 +2914,7 @@ int thread_set_priority(unsigned int thread_id, int priority)
 
                     next = bl->thread;
 
-                    if (next == tstart)
+                    if (UNLIKELY(next == tstart))
                         break; /* Full-circle */
 
                     UNLOCK_THREAD(thread);

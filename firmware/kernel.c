@@ -391,7 +391,7 @@ static inline void queue_do_unblock_sender(struct queue_sender_list *send,
     {
         struct thread_entry **spp = &send->senders[i];
 
-        if(*spp)
+        if(UNLIKELY(*spp))
         {
             queue_release_sender(spp, 0);
         }
@@ -665,13 +665,13 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
     q->events[wr].id   = id;
     q->events[wr].data = data;
     
-    if(q->send)
+    if(LIKELY(q->send))
     {
         struct queue_sender_list *send = q->send;
         struct thread_entry **spp = &send->senders[wr];
         struct thread_entry *current = cores[CURRENT_CORE].running;
 
-        if(*spp)
+        if(UNLIKELY(*spp))
         {
             /* overflow protect - unblock any thread waiting at this index */
             queue_release_sender(spp, 0);
@@ -735,7 +735,7 @@ void queue_reply(struct event_queue *q, intptr_t retval)
         int oldlevel = disable_irq_save();
         corelock_lock(&q->cl);
         /* Double-check locking */
-        IF_COP( if(q->send && q->send->curr_sender) )
+        IF_COP( if(LIKELY(q->send && q->send->curr_sender)) )
         {
             queue_release_sender(&q->send->curr_sender, retval);
         }
@@ -890,7 +890,7 @@ void mutex_lock(struct mutex *m)
     /* lock out other cores */
     corelock_lock(&m->cl);
 
-    if(m->locked == 0)
+    if(LIKELY(m->locked == 0))
     {
         /* lock is open */
         MUTEX_SET_THREAD(m, current);
@@ -933,7 +933,7 @@ void mutex_unlock(struct mutex *m)
     corelock_lock(&m->cl);
 
     /* transfer to next queued thread if any */
-    if(m->queue == NULL)
+    if(LIKELY(m->queue == NULL))
     {
         /* no threads waiting - open the lock */
         MUTEX_SET_THREAD(m, NULL);
@@ -1031,7 +1031,7 @@ void semaphore_wait(struct semaphore *s)
 
     corelock_lock(&s->cl);
 
-    if(--s->count >= 0)
+    if(LIKELY(--s->count >= 0))
     {
         /* wait satisfied */
         corelock_unlock(&s->cl);
@@ -1099,7 +1099,7 @@ int wakeup_wait(struct wakeup *w, int timeout)
 
     corelock_lock(&w->cl);
 
-    if(w->signalled == 0 && timeout != TIMEOUT_NOBLOCK)
+    if(LIKELY(w->signalled == 0 && timeout != TIMEOUT_NOBLOCK))
     {
         struct thread_entry * current = cores[CURRENT_CORE].running;
 
@@ -1118,7 +1118,7 @@ int wakeup_wait(struct wakeup *w, int timeout)
         corelock_lock(&w->cl);
     }
 
-    if(w->signalled == 0)
+    if(UNLIKELY(w->signalled == 0))
     {
         /* Timed-out or failed */
         ret = (timeout != TIMEOUT_BLOCK) ?
