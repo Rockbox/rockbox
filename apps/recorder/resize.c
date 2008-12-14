@@ -702,7 +702,7 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
                            0 : needed];
             if (len && buf)
 #endif
-                len = (unsigned int)align_buffer((void**)&buf, len,
+                len = (unsigned int)align_buffer(PUN_PTR(void**, &buf), len,
                                                  sizeof(uint32_t));
             if (needed > len)
             {
