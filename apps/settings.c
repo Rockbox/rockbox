@@ -820,7 +820,8 @@ void settings_apply(bool read_disk)
         if ( global_settings.font_file[0]) {
             snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
                      global_settings.font_file);
-            font_load(buf);
+            if (font_load(buf) == NULL)
+                font_reset();
         }
         else
             font_reset();
