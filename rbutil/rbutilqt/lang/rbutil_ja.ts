@@ -53,11 +53,6 @@
         <translation>ブートローダのインストールは、ほとんど完了していますが、以下のことを手動で行う&lt;b&gt;必要があります&lt;/b&gt;:</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="151"/>
-        <source>&lt;ol&gt;</source>
-        <translation>&lt;ol&gt;</translation>
-    </message>
-    <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="152"/>
         <source>&lt;li&gt;Safely remove your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;プレイヤーを安全に取り外します。&lt;/li&gt;</translation>
@@ -304,7 +299,7 @@ Permission for disc access denied!</source>
         <translation>iPodが検出されませんでした!</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="69"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="106"/>
         <source>Warning: This is a MacPod, Rockbox only runs on WinPods.
 See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation>注意: Macintosh 専用の iPod です。Rockbox は、Windows で使用できる iPod でしか動作しません。
@@ -326,14 +321,7 @@ http://www.rockbox.org/wiki/IpodConversionToFAT32 を参照して下さい</tran
         <translation>ファームウェアのバージョン(%1)が不明です</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="106"/>
-        <source>Warning: This is a MacPod. Rockbox only runs on WinPods.
-See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
-        <translation>注意: Macintosh 専用の iPod です。Rockbox は、Windows で使用できる iPod でしか動作しません。
-http://www.rockbox.org/wiki/IpodConversionToFAT32 を参照して下さい</translation>
-    </message>
-    <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="112"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="161"/>
         <source>Could not open Ipod in R/W mode</source>
         <translation>iPod に読み書きできるようにアクセスすることができませんでした</translation>
     </message>
@@ -348,24 +336,9 @@ http://www.rockbox.org/wiki/IpodConversionToFAT32 を参照して下さい</tran
         <translation>ブートローダの追加に失敗しました</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="161"/>
-        <source>Could not open Ipod in RW mode</source>
-        <translation>iPod に読み書きできるようにアクセスすることができませんでした</translation>
-    </message>
-    <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="167"/>
         <source>No bootloader detected.</source>
         <translation>ブートローダが検出されませんでした。</translation>
-    </message>
-    <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="173"/>
-        <source>Successfully removed Bootloader</source>
-        <translation>ブートローダの削除が成功しました</translation>
-    </message>
-    <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="180"/>
-        <source>Removing the bootloader failed.</source>
-        <translation>ブートローダの削除に失敗しました。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="219"/>
@@ -381,6 +354,16 @@ http://www.rockbox.org/wiki/IpodConversionToFAT32 を参照して下さい</tran
         <location filename="../base/bootloaderinstallipod.cpp" line="229"/>
         <source>No firmware partition on disk</source>
         <translation>ファームウェアが存在しません</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallipod.cpp" line="173"/>
+        <source>Successfully removed bootloader</source>
+        <translation type="unfinished">ブートローダの削除が成功しました</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallipod.cpp" line="180"/>
+        <source>Removing bootloader failed.</source>
+        <translation type="unfinished">ブートローダの削除に失敗しました。</translation>
     </message>
 </context>
 <context>
@@ -585,75 +568,75 @@ http://www.rockbox.org/wiki/SansaE200Install を参照して下さい
         <translation>デバイスを選択して下さい</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="546"/>
+        <location filename="../configure.cpp" line="548"/>
         <source>Sansa e200 in MTP mode found!
 You need to change your player to MSC mode for installation. </source>
         <translation>MTP モードの Sansa e200 が見つかりました。
 インストールするためには、MSC モードに変更する必要があります。 </translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="549"/>
+        <location filename="../configure.cpp" line="551"/>
         <source>H10 20GB in MTP mode found!
 You need to change your player to UMS mode for installation. </source>
         <translation>MTP モードの H10 20GB が見つかりました。
 インストールするためには、UMS モードに変更する必要があります。 </translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="550"/>
+        <location filename="../configure.cpp" line="552"/>
         <source>Unless you changed this installation will fail!</source>
         <translation>設定を変更しないと、インストールに失敗するでしょう!</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="552"/>
+        <location filename="../configure.cpp" line="554"/>
         <source>Fatal error</source>
         <translation>致命的なエラー</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="561"/>
+        <location filename="../configure.cpp" line="563"/>
         <source>Detected an unsupported %1 player variant. Sorry, Rockbox doesn&apos;t run on your player.</source>
         <translation>サポートされていないプレイヤー %1 が見つかりました。Rockbox は、このプレイヤーでは動かすことができません。</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="563"/>
+        <location filename="../configure.cpp" line="565"/>
         <source>Fatal error: incompatible player found</source>
         <translation>致命的なエラー： 互換性のないプレイヤーが見つかりました</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="582"/>
+        <location filename="../configure.cpp" line="585"/>
         <source>Autodetection</source>
         <translation>自動検出</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="576"/>
+        <location filename="../configure.cpp" line="578"/>
         <source>Could not detect a Mountpoint.
 Select your Mountpoint manually.</source>
         <translation>マウントポイントが検出できませんでした。
 マウントポイントを手動で選択して下さい。</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="584"/>
+        <location filename="../configure.cpp" line="587"/>
         <source>Could not detect a device.
 Select your device and Mountpoint manually.</source>
         <translation>デバイスが検出できませんでした。
 デバイスおよびマウントポイントを手動で選択して下さい。</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="593"/>
+        <location filename="../configure.cpp" line="596"/>
         <source>Really delete cache?</source>
         <translation>本当にキャッシュを削除していいですか?</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="596"/>
+        <location filename="../configure.cpp" line="599"/>
         <source>Do you really want to delete the cache? Make absolutely sure this setting is correct as it will remove &lt;b&gt;all&lt;/b&gt; files in this folder!</source>
         <translation>本当にキャッシュを削除しますか？ このフォルダに含まれる&lt;b&gt;すべての&lt;/b&gt;ファイルを削除しますので、絶対に正しい値に設定して下さい!</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="602"/>
+        <location filename="../configure.cpp" line="605"/>
         <source>Path wrong!</source>
         <translation>パスが間違っています!</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="603"/>
+        <location filename="../configure.cpp" line="606"/>
         <source>The cache path is invalid. Aborting.</source>
         <translation>キャッシュのパスが不正です。処理を中止します。</translation>
     </message>
@@ -977,59 +960,64 @@ Select your device and Mountpoint manually.</source>
         <translation>マウントポジションが間違っています!</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="126"/>
+        <location filename="../install.cpp" line="131"/>
         <source>Aborted!</source>
         <translation>処理を中止します!</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="134"/>
+        <location filename="../install.cpp" line="140"/>
         <source>Beginning Backup...</source>
         <translation>バックアップの開始...</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="149"/>
+        <location filename="../install.cpp" line="155"/>
         <source>Backup successful</source>
         <translation>バックアップが成功しました</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="153"/>
+        <location filename="../install.cpp" line="159"/>
         <source>Backup failed!</source>
         <translation>バックアップが失敗しました!</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="216"/>
+        <location filename="../install.cpp" line="222"/>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
         <translation>これは、最新版のRockboxです。最新版は、毎日更新されます。現在のバージョンは、r%1 (%2) です。</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="220"/>
+        <location filename="../install.cpp" line="226"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;注意:&lt;/b&gt; このオプションは、いつも最新のファイルをダウンロードします。 &lt;b&gt;これはお勧めのバージョンです。&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="223"/>
+        <location filename="../install.cpp" line="229"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy.</source>
         <translation>&lt;b&gt;注意:&lt;/b&gt; このオプションは、いつも最新のファイルをダウンロードします。</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="232"/>
+        <location filename="../install.cpp" line="238"/>
         <source>This is the last released version of Rockbox.</source>
         <translation>これは、最新のリリース版の Rockboxです。</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="238"/>
+        <location filename="../install.cpp" line="244"/>
         <source>&lt;b&gt;Note:&lt;/b&gt;The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;注意:&lt;/b&gt;最新のリリース版は、%1です。 &lt;b&gt;これはお勧めのバージョンです。&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="250"/>
+        <location filename="../install.cpp" line="256"/>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
         <translation>これらは毎日、現在の開発ソースコードから自動的に作成されます。 一般に最新の安定版より多くの機能を持っていますが、安定版より動作が安定していない可能性があります。 機能は頻繁に変わる可能性があります。</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="252"/>
+        <location filename="../install.cpp" line="258"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
         <translation>&lt;b&gt;注意:&lt;/b&gt; 保存されているバージョンは、 r%1 (%2) です。</translation>
+    </message>
+    <message>
+        <location filename="../install.cpp" line="127"/>
+        <source>Really continue?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1110,27 +1098,19 @@ Select your device and Mountpoint manually.</source>
         <translation>変更</translation>
     </message>
     <message>
-        <location filename="../installfrm.ui" line="207"/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Backup Location:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Backup Location:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="../installfrm.ui" line="225"/>
+        <location filename="../installfrm.ui" line="221"/>
         <source>Rockbox Utility stores copies of Rockbox it has downloaded on the local hard disk to save network traffic. If your local copy is no longer working, tick this box to download a fresh copy.</source>
         <translation>Rockbox ユーティリティは、ネットワークトラフィックを節約するために、ローカルのハードディスクにダウンロードしたRockboxのコピーを保存します。 ローカルにあるコピーがもはや動作していないならば、チェックボックスにチェックをして、最新のファイルをダウンロードしてください。</translation>
     </message>
     <message>
-        <location filename="../installfrm.ui" line="228"/>
+        <location filename="../installfrm.ui" line="224"/>
         <source>&amp;Don&apos;t use locally cached copy</source>
         <translation>ローカルキャッシュにコピーされたファイルを使用しません(&amp;D)</translation>
+    </message>
+    <message>
+        <location filename="../installfrm.ui" line="207"/>
+        <source>Backup Location</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1245,9 +1225,14 @@ p, li { white-space: pre-wrap; }
         <translation>処理中</translation>
     </message>
     <message>
-        <location filename="../progressloggerfrm.ui" line="56"/>
+        <location filename="../progressloggerfrm.ui" line="65"/>
         <source>&amp;Abort</source>
         <translation>中止(&amp;A)</translation>
+    </message>
+    <message>
+        <location filename="../progressloggerfrm.ui" line="32"/>
+        <source>progresswindow</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1266,67 +1251,46 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../detect.cpp" line="110"/>
+        <location filename="../base/detect.cpp" line="109"/>
         <source>Guest</source>
         <translation>ゲスト</translation>
     </message>
     <message>
-        <location filename="../detect.cpp" line="113"/>
+        <location filename="../base/detect.cpp" line="112"/>
         <source>Admin</source>
         <translation>管理者</translation>
     </message>
     <message>
-        <location filename="../detect.cpp" line="116"/>
+        <location filename="../base/detect.cpp" line="115"/>
         <source>User</source>
         <translation>ユーザ</translation>
     </message>
     <message>
-        <location filename="../detect.cpp" line="119"/>
+        <location filename="../base/detect.cpp" line="118"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../detect.cpp" line="226"/>
+        <location filename="../base/detect.cpp" line="225"/>
         <source>(no description available)</source>
         <translation>(利用可能な記述がありません)</translation>
     </message>
     <message>
-        <location filename="../detect.cpp" line="418"/>
-        <source>Permissions are not sufficient! 
- Run with admin rights. 
-
-</source>
-        <translation>権限が不足しています! 
- 管理者権限で実行して下さい。 
-
-</translation>
+        <location filename="../base/detect.cpp" line="418"/>
+        <source>&lt;li&gt;Permissions insufficient for bootloader installation.
+Administrator priviledges are necessary.&lt;/li&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../detect.cpp" line="431"/>
-        <source>Target mismatch detected. 
-
-Installed target: %1.
-New Target: %2.
-
-</source>
-        <translation>検出されたターゲットがミスマッチです。
-
-インストールされたターゲット: %1.
-新しいターゲット: %2.
-
-</translation>
+        <location filename="../base/detect.cpp" line="431"/>
+        <source>&lt;li&gt;Target mismatch detected.
+Installed target: %1, selected target: %2.&lt;/li&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../detect.cpp" line="439"/>
-        <source>
- Do you want to continue ?</source>
-        <translation>
-続行しますか ?</translation>
-    </message>
-    <message>
-        <location filename="../detect.cpp" line="440"/>
-        <source>Problems detected</source>
-        <translation>問題の検出</translation>
+        <location filename="../base/detect.cpp" line="436"/>
+        <source>Problem detected:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1400,7 +1364,7 @@ New Target: %2.
         <translation>Rockbox ユーティリティを新規、または、新しいバージョンをインストールします。プログラムのセットアップを許可したり、または、設定を見直すために、設定ダイアログが表示されます。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1147"/>
+        <location filename="../rbutilqt.cpp" line="1152"/>
         <source>Configuration error</source>
         <translation>設定エラー</translation>
     </message>
@@ -1440,142 +1404,142 @@ New Target: %2.
         <translation>&lt;a href=&apos;%1&apos;&gt;Manual の概要&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="838"/>
+        <location filename="../rbutilqt.cpp" line="843"/>
         <source>Confirm Installation</source>
         <translation>インストールの確認</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1036"/>
+        <location filename="../rbutilqt.cpp" line="1041"/>
         <source>Mount point is wrong!</source>
         <translation>マウントポイントが間違っています!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="505"/>
+        <location filename="../rbutilqt.cpp" line="509"/>
         <source>Aborted!</source>
         <translation>処理を中止します!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="513"/>
+        <location filename="../rbutilqt.cpp" line="518"/>
         <source>Installed Rockbox detected</source>
         <translation>インストールされたRockbox を検出しました</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="514"/>
+        <location filename="../rbutilqt.cpp" line="519"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
         <translation>Rockbox のインストールを検出しました。まずバックアップを行いますか? </translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="517"/>
+        <location filename="../rbutilqt.cpp" line="522"/>
         <source>Starting backup...</source>
         <translation>バックアップを開始します...</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="533"/>
+        <location filename="../rbutilqt.cpp" line="538"/>
         <source>Backup successful</source>
         <translation>バックアップが成功しました</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="537"/>
+        <location filename="../rbutilqt.cpp" line="542"/>
         <source>Backup failed!</source>
         <translation>バックアップが失敗しました!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="589"/>
+        <location filename="../rbutilqt.cpp" line="594"/>
         <source>Do you really want to install the Bootloader?</source>
         <translation>ブートローダのインストールを本当に行いますか?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="761"/>
+        <location filename="../rbutilqt.cpp" line="766"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>フォントパッケージのインストールを本当に行いますか?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="799"/>
+        <location filename="../rbutilqt.cpp" line="804"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="800"/>
+        <location filename="../rbutilqt.cpp" line="805"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
         <translation>そのアプリケーションは、新しい構築に対する情報をまだダウンロードしているところです。まもなくしましたら、もう一度行って下さい。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="805"/>
+        <location filename="../rbutilqt.cpp" line="810"/>
         <source>Do you really want to install the voice file?</source>
         <translation>ボイスファイルのインストールを本当に行いますか?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="834"/>
+        <location filename="../rbutilqt.cpp" line="839"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="834"/>
+        <location filename="../rbutilqt.cpp" line="839"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>デバイスには、Doom プラグインがありません。処理を中止します。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="839"/>
+        <location filename="../rbutilqt.cpp" line="844"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>ゲームのアドオンファイルのインストールを本当に行いますか?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="919"/>
+        <location filename="../rbutilqt.cpp" line="924"/>
         <source>Confirm Uninstallation</source>
         <translation>アンインストールの確認</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="920"/>
+        <location filename="../rbutilqt.cpp" line="925"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>ブートローダのアンインストールを本当に行いますか?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="977"/>
+        <location filename="../rbutilqt.cpp" line="982"/>
         <source>Confirm download</source>
         <translation>ダウンロードの確認</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="979"/>
+        <location filename="../rbutilqt.cpp" line="984"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>マニュアルのダウンロードを本当に行いますか? マニュアルは、プレイヤーのルートフォルダに保存されます。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1022"/>
+        <location filename="../rbutilqt.cpp" line="1027"/>
         <source>Confirm installation</source>
         <translation>インストールの確認</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1024"/>
+        <location filename="../rbutilqt.cpp" line="1029"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Rockbox ユーティリティをプレイヤーにインストールしてもいいですか? インストール後、プレイヤーのハードディスクから実行して下さい。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1032"/>
+        <location filename="../rbutilqt.cpp" line="1037"/>
         <source>Installing Rockbox Utility</source>
         <translation>Rockbox ユーティリティをインストールしています</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1046"/>
+        <location filename="../rbutilqt.cpp" line="1051"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Rockbox ユーティリティのインストール中にエラーが発生しました</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1050"/>
+        <location filename="../rbutilqt.cpp" line="1055"/>
         <source>Installing user configuration</source>
         <translation>ユーザ設定をインストールしています</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1052"/>
+        <location filename="../rbutilqt.cpp" line="1057"/>
         <source>Error installing user configuration</source>
         <translation>ユーザ設定のインストール中にエラーが発生しました</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1056"/>
+        <location filename="../rbutilqt.cpp" line="1061"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Rockbox ユーティリティのインストールが成功しました。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1149"/>
+        <location filename="../rbutilqt.cpp" line="1154"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>設定が正しくありません。設定ダイアログを表示し、選択された値が正しいか確認して下さい。</translation>
     </message>
@@ -1600,76 +1564,81 @@ New Target: %2.
         <translation>最小インストールを本当に実行しますか? 最新のリリース版ではなく、利用可能な最新ビルドをインストールします。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="623"/>
+        <location filename="../rbutilqt.cpp" line="628"/>
         <source>No install method known.</source>
         <translation>インストール方法が不明です。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="647"/>
+        <location filename="../rbutilqt.cpp" line="652"/>
         <source>Bootloader detected</source>
         <translation>ブートローダが検出されました</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="648"/>
+        <location filename="../rbutilqt.cpp" line="653"/>
         <source>Bootloader already installed. Do you want to reinstall the bootloader?</source>
         <translation>ブートローダは既にインストールされています。ブートローダをインストールしますか?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="662"/>
+        <location filename="../rbutilqt.cpp" line="667"/>
         <source>Create Bootloader backup</source>
         <translation>ブートローダのバックアップを作成します</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="667"/>
+        <location filename="../rbutilqt.cpp" line="672"/>
         <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
 Press &quot;No&quot; to skip this step.</source>
         <translation>オリジナルのブートローダファイルのバックアップファイルを作成することができます。&quot;はい&quot;ボタンを押して、バックアップファイルを保存するためのフォルダを選択して下さい。選択されたフォルダの下に &quot;%1&quot; フォルダを作成し、バックアップファイルを作成します。
 &quot;いいえ&quot;ボタンを押しますと、バックアップファイルを作成しません。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="669"/>
+        <location filename="../rbutilqt.cpp" line="674"/>
         <source>Browse backup folder</source>
         <translation>バックアップフォルダの表示</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="682"/>
+        <location filename="../rbutilqt.cpp" line="687"/>
         <source>Prerequisites</source>
         <translation>前提条件</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="692"/>
+        <location filename="../rbutilqt.cpp" line="697"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (hex file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
         <translation>ブートローダのインストールには、オリジナルのファームウェアを用意する必要があります(hex 形式)。法律上の問題のため、ファームウェアは、あなたがダウンロードする必要があります。&lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; および、どの様に、ファームウェアファイルを取得したらよいかに関した Wiki ページ&lt;a href=&apos;http://www.rockbox.org/twiki/bin/view/Main/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt;を参考にして下さい。&lt;br&gt;続行するために、OKボタンを押し、ファームウェアファイルを参照して下さい。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="701"/>
+        <location filename="../rbutilqt.cpp" line="706"/>
         <source>Select firmware file</source>
         <translation>ファームウェアを選択して下さい</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="703"/>
+        <location filename="../rbutilqt.cpp" line="708"/>
         <source>Error opening firmware file</source>
         <translation>ファームウェア読み込み時のエラー</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="721"/>
+        <location filename="../rbutilqt.cpp" line="726"/>
         <source>Backup error</source>
         <translation>バックアップエラー</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="722"/>
+        <location filename="../rbutilqt.cpp" line="727"/>
         <source>Could not create backup file. Continue?</source>
         <translation>バックアップファイルが作成されませんでした。続行しますか?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="751"/>
+        <location filename="../rbutilqt.cpp" line="756"/>
         <source>Manual steps required</source>
         <translation>手動で行う必要があります</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="948"/>
+        <location filename="../rbutilqt.cpp" line="953"/>
         <source>No uninstall method known.</source>
         <translation>アンインストール方法が不明です。</translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="506"/>
+        <source>Really continue?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2132,29 +2101,39 @@ Press &quot;No&quot; to skip this step.</source>
 <context>
     <name>Sysinfo</name>
     <message>
-        <location filename="../sysinfo.cpp" line="39"/>
+        <location filename="../sysinfo.cpp" line="41"/>
         <source>&lt;b&gt;OS&lt;/b&gt;&lt;br/&gt;</source>
         <translation>&lt;b&gt;OS&lt;/b&gt;&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../sysinfo.cpp" line="40"/>
-        <source>&lt;b&gt;Username:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
-        <translation>&lt;b&gt;ユーザ名:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</translation>
-    </message>
-    <message>
         <location filename="../sysinfo.cpp" line="42"/>
-        <source>&lt;b&gt;Permissions:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
-        <translation>&lt;b&gt;権限:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</translation>
+        <source>&lt;b&gt;Username&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="44"/>
-        <source>&lt;b&gt;Attached USB devices:&lt;/b&gt;&lt;br/&gt;</source>
-        <translation>&lt;b&gt;接続している USB デバイス:&lt;/b&gt;&lt;br/&gt;</translation>
+        <source>&lt;b&gt;Permissions&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../sysinfo.cpp" line="49"/>
-        <source>VID: %1 PID: %2, %3&lt;br/&gt;</source>
-        <translation>VID: %1 PID: %2, %3&lt;br/&gt;</translation>
+        <location filename="../sysinfo.cpp" line="46"/>
+        <source>&lt;b&gt;Attached USB devices&lt;/b&gt;&lt;br/&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../sysinfo.cpp" line="51"/>
+        <source>VID: %1 PID: %2, %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../sysinfo.cpp" line="59"/>
+        <source>Filesystem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../sysinfo.cpp" line="63"/>
+        <source>%1, %2 MiB available</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2571,27 +2550,27 @@ Please check your network and proxy settings.</source>
 <context>
     <name>Uninstaller</name>
     <message>
-        <location filename="../uninstall.cpp" line="46"/>
+        <location filename="../base/uninstall.cpp" line="46"/>
         <source>Starting Uninstallation</source>
         <translation>アンインストールを開始します</translation>
     </message>
     <message>
-        <location filename="../uninstall.cpp" line="38"/>
+        <location filename="../base/uninstall.cpp" line="38"/>
         <source>Finished Uninstallation</source>
         <translation>アンインストールが終了しました</translation>
     </message>
     <message>
-        <location filename="../uninstall.cpp" line="52"/>
+        <location filename="../base/uninstall.cpp" line="52"/>
         <source>Uninstalling </source>
         <translation>アンインストールを実行しています</translation>
     </message>
     <message>
-        <location filename="../uninstall.cpp" line="83"/>
+        <location filename="../base/uninstall.cpp" line="83"/>
         <source>Could not delete: </source>
         <translation>削除できませんでした:</translation>
     </message>
     <message>
-        <location filename="../uninstall.cpp" line="112"/>
+        <location filename="../base/uninstall.cpp" line="112"/>
         <source>Uninstallation finished</source>
         <translation>アンインストールが終了しました</translation>
     </message>
@@ -2770,24 +2749,29 @@ Please check your network and proxy settings.</source>
         <translation>圧縮ファイルを開くことに失敗しました: %1.</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="155"/>
+        <location filename="../installzip.cpp" line="166"/>
         <source>Extracting failed: %1.</source>
         <translation>解凍に失敗しました: %1.</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="168"/>
+        <location filename="../installzip.cpp" line="179"/>
         <source>Installing file.</source>
         <translation>ファイルをインストールしています。</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="179"/>
+        <location filename="../installzip.cpp" line="190"/>
         <source>Installing file failed.</source>
         <translation>ファイルｎインストールに失敗しました。</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="189"/>
+        <location filename="../installzip.cpp" line="200"/>
         <source>Creating installation log</source>
         <translation>インストール時のログを作成しています</translation>
+    </message>
+    <message>
+        <location filename="../installzip.cpp" line="155"/>
+        <source>Not enough disk space! Aborting.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
