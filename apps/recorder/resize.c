@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <general.h>
 #include "inttypes.h"
 #include "debug.h"
 #include "lcd.h"
@@ -699,7 +700,10 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
 #if MAX_SC_STACK_ALLOC
             uint8_t sc_buf[(needed <= len  || needed > MAX_SC_STACK_ALLOC) ?
                            0 : needed];
+            if (len && buf)
 #endif
+                len = (unsigned int)align_buffer((void**)&buf, len,
+                                                 sizeof(uint32_t));
             if (needed > len)
             {
 #if MAX_SC_STACK_ALLOC
