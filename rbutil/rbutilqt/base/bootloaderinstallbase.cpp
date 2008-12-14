@@ -148,7 +148,7 @@ QString BootloaderInstallBase::postinstallHints(QString model)
             "Installation <b>requires</b> you to perform the "
             "following steps manually:");
 
-    msg += tr("<ol>");
+    msg += "<ol>";
     msg += tr("<li>Safely remove your player.</li>");
     if(model == "h100" || model == "h120" || model == "h300") {
         hint = true;

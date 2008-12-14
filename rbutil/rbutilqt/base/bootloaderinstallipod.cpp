@@ -102,7 +102,7 @@ void BootloaderInstallIpod::installStage2(void)
     }
 
     if(ipod.macpod) {
-        emit logItem(tr("Warning: This is a MacPod. Rockbox only runs on WinPods.\n"
+        emit logItem(tr("Warning: This is a MacPod, Rockbox only runs on WinPods.\n"
                     "See http://www.rockbox.org/wiki/IpodConversionToFAT32"), LOGERROR);
         emit done(true);
         return;
@@ -158,7 +158,7 @@ bool BootloaderInstallIpod::uninstall(void)
     }
 
     if (ipod_reopen_rw(&ipod) < 0) {
-        emit logItem(tr("Could not open Ipod in RW mode"), LOGERROR);
+        emit logItem(tr("Could not open Ipod in R/W mode"), LOGERROR);
         emit done(true);
         return false;
     }
@@ -170,14 +170,14 @@ bool BootloaderInstallIpod::uninstall(void)
     }
 
     if (delete_bootloader(&ipod)==0) {
-        emit logItem(tr("Successfully removed Bootloader"), LOGOK);
+        emit logItem(tr("Successfully removed bootloader"), LOGOK);
         logInstall(LogRemove);
         emit done(false);
         ipod_close(&ipod);
         return true;
     }
     else {
-        emit logItem(tr("Removing the bootloader failed."), LOGERROR);
+        emit logItem(tr("Removing bootloader failed."), LOGERROR);
         emit done(true);
         ipod_close(&ipod);
         return false;
