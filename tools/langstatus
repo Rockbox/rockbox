@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "wiki" == "$1" ]; then
+if [ "wiki" = "$1" ]; then
     echo "As of `LC_ALL=C date +'%d %b %Y'`, the current status of the translations is the following:"
     echo "|   *Language*   |   *Missing strings*   |   *Changed desc*   |   *Changed source*   |"
     FORMAT="|%s|   %d|   %d|   %d|\n"
