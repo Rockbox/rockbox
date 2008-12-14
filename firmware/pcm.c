@@ -65,7 +65,7 @@
  *      pcm_rec_dma_stop
  *      pcm_rec_dma_get_peak_buffer
  *   Data Read/Written within TSP -
- *      pcm_rec_peak_addr (RW)
+ *      pcm_rec_peak_addr (R)
  *      pcm_callback_more_ready (R)
  *      pcm_recording (R)
  *
@@ -138,6 +138,8 @@ void pcm_calculate_peaks(int *left, int *right)
     static unsigned long frame_period   = 0;
 
     long tick = current_tick;
+    int count;
+    const void *addr;
 
     /* Throttled peak ahead based on calling period */
     long period = tick - last_peak_tick;
@@ -152,18 +154,18 @@ void pcm_calculate_peaks(int *left, int *right)
 
     last_peak_tick = tick;
 
+    addr = pcm_play_dma_get_peak_buffer(&count);
+
     if (pcm_playing && !pcm_paused)
     {
-        const void *addr;
-        int count, framecount;
-
-        addr = pcm_play_dma_get_peak_buffer(&count);
+        int framecount;
 
         framecount = frame_period*pcm_curr_sampr / HZ;
         count = MIN(framecount, count);
 
         if (count > 0)
             pcm_peak_peeker(addr, count, peaks);
+        /* else keep previous peak values */
     }
     else
     {
@@ -372,14 +374,11 @@ volatile bool pcm_recording SHAREDBSS_ATTR = false;
 void pcm_calculate_rec_peaks(int *left, int *right)
 {
     static int peaks[2];
+    int count;
+    const void *addr = pcm_rec_dma_get_peak_buffer(&count);
 
     if (pcm_recording)
     {
-        const void *addr;
-        int count;
-
-        addr = pcm_rec_dma_get_peak_buffer(&count);
-
         if (count > 0)
         {
             pcm_peak_peeker(addr, count, peaks);
@@ -387,6 +386,7 @@ void pcm_calculate_rec_peaks(int *left, int *right)
             if (addr == pcm_rec_peak_addr)
                 pcm_rec_peak_addr = (int32_t *)addr + count;
         }
+        /* else keep previous peak values */
     }
     else
     {

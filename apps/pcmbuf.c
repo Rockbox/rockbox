@@ -978,8 +978,9 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
         /* Get the currently playing chunk at the current position. */
         bufstart = (int16_t *)pcm_play_dma_get_peak_buffer(&i);
 
-        if (!bufstart)
-            return; /* If above isn't implemented, no beepeth */
+        /* If above isn't implemented or pcm is stopped, no beepeth. */
+        if (!bufstart || !pcm_is_playing())
+            return;
 
         /* Give 5ms clearance. */    
         bufstart += NATIVE_FREQUENCY * 4 / 200;
