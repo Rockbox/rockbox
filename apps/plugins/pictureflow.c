@@ -214,8 +214,6 @@ static int empty_slide_hid;
 unsigned int thread_id;
 struct event_queue thread_q;
 
-static char tmp_path_name[MAX_PATH+1];
-
 static long uniqbuf[UNIQBUF_SIZE];
 static struct tagcache_search tcs;
 
@@ -623,27 +621,27 @@ bool create_albumart_cache(bool force)
     struct bitmap input_bmp;
 
     config.avg_album_width = 0;
+    char pfraw_file[MAX_PATH];
+    char arlbumart_file[MAX_PATH];
     for (i=0; i < album_count; i++)
     {
+        rb->snprintf(pfraw_file, sizeof(pfraw_file), CACHE_PREFIX "/%d.pfraw", i);
+        /* delete existing cache, so it's a true rebuild */
+        if(rb->file_exists(pfraw_file))
+            rb->remove(pfraw_file);
         draw_progressbar(i);
-        if (!get_albumart_for_index_from_db(i, tmp_path_name, MAX_PATH))
+        if (!get_albumart_for_index_from_db(i, arlbumart_file, MAX_PATH))
             continue;
 
         input_bmp.data = (char *)input_bmp_buffer;
-        ret = rb->read_bmp_file(tmp_path_name, &input_bmp,
+        ret = rb->read_bmp_file(arlbumart_file, &input_bmp,
                                 sizeof(fb_data)*MAX_IMG_WIDTH*MAX_IMG_HEIGHT,
                                 FORMAT_NATIVE);
         if (ret <= 0) {
             rb->splash(HZ, "Could not read bmp");
             continue; /* skip missing/broken files */
         }
-
-
-        rb->snprintf(tmp_path_name, sizeof(tmp_path_name), CACHE_PREFIX "/%d.pfraw", i);
-        /* delete existing cache, so it's a true rebuild */
-        if(rb->file_exists(tmp_path_name))
-            rb->remove(tmp_path_name);
-        if (!create_bmp(&input_bmp, tmp_path_name, false)) {
+        if (!create_bmp(&input_bmp, pfraw_file, false)) {
             rb->splash(HZ, "Could not write bmp");
         }
         config.avg_album_width += input_bmp.width;
@@ -968,6 +966,7 @@ bool create_bmp(struct bitmap *input_bmp, char *target_path, bool resize)
 static inline bool load_and_prepare_surface(const int slide_index,
                                             const int cache_index)
 {
+    char tmp_path_name[MAX_PATH+1];
     rb->snprintf(tmp_path_name, sizeof(tmp_path_name), CACHE_PREFIX "/%d.pfraw",
                  slide_index);
 
