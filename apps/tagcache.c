@@ -155,10 +155,12 @@ struct tagcache_command_entry {
     int32_t data;
 };
 
+#ifndef __PCTOOL__
 static struct tagcache_command_entry command_queue[TAGCACHE_COMMAND_QUEUE_LENGTH];
 static volatile int command_queue_widx = 0;
 static volatile int command_queue_ridx = 0;
 static struct mutex command_queue_mutex;
+#endif
 
 /* Tag database structures. */
 
@@ -633,6 +635,8 @@ static bool get_index(int masterfd, int idxid,
     return true;
 }
 
+#ifndef __PCTOOL__
+
 static bool write_index(int masterfd, int idxid, struct index_entry *idx)
 {
     /* We need to exclude all memory only flags & tags when writing to disk. */
@@ -677,6 +681,8 @@ static bool write_index(int masterfd, int idxid, struct index_entry *idx)
     
     return true;
 }
+
+#endif /* !__PCTOOL__ */
 
 static bool open_files(struct tagcache_search *tcs, int tag)
 {
@@ -2993,6 +2999,8 @@ static void free_tempbuf(void)
     tempbuf_size = 0;
 }
 
+#ifndef __PCTOOL__
+
 static bool modify_numeric_entry(int masterfd, int idx_id, int tag, long data)
 {
     struct index_entry idx;
@@ -3040,6 +3048,7 @@ static bool command_queue_is_full(void)
     
     return (next == command_queue_ridx);
 }
+
 static bool command_queue_sync_callback(void)
 {
     
@@ -3152,6 +3161,7 @@ void tagcache_update_numeric(int idx_id, int tag, long data)
 {
     queue_command(CMD_UPDATE_NUMERIC, idx_id, tag, data);
 }
+#endif /* !__PCTOOL__ */
 
 long tagcache_get_serial(void)
 {
@@ -3186,6 +3196,8 @@ static bool write_tag(int fd, const char *tagstr, const char *datastr)
     
     return true;
 }
+
+#ifndef __PCTOOL__
 
 static bool read_tag(char *dest, long size, 
                      const char *src, const char *tagstr)
@@ -3326,7 +3338,6 @@ static int parse_changelog_line(int line_n, const char *buf, void *parameters)
     return write_index(masterfd, idx_id, &idx) ? 0 : -5;
 }
 
-#ifndef __PCTOOL__
 bool tagcache_import_changelog(void)
 {
     struct master_header myhdr;
@@ -3373,7 +3384,8 @@ bool tagcache_import_changelog(void)
     
     return true;
 }
-#endif
+
+#endif /* !__PCTOOL__ */
 
 bool tagcache_create_changelog(struct tagcache_search *tcs)
 {

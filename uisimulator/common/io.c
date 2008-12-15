@@ -252,19 +252,22 @@ static ssize_t io_trigger_and_wait(int cmd)
     return result;
 }
 
+#ifndef __PCTOOL__
 static const char *get_sim_rootdir()
 {
     if (sim_root_dir != NULL)
         return sim_root_dir;
     return SIMULATOR_DEFAULT_ROOT;
 }
+#endif
 
 MYDIR *sim_opendir(const char *name)
 {
-    char buffer[MAX_PATH]; /* sufficiently big */
     DIR_T *dir;
 
 #ifndef __PCTOOL__
+    char buffer[MAX_PATH]; /* sufficiently big */
+
     if(name[0] == '/')
     {
         snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
@@ -277,7 +280,8 @@ MYDIR *sim_opendir(const char *name)
     if(dir) {
         MYDIR *my = (MYDIR *)malloc(sizeof(MYDIR));
         my->dir = dir;
-        my->name = (char *)strdup(name);
+        my->name = (char *)malloc(strlen(name)+1);
+        strcpy(my->name, name);
 
         return my;
     }
@@ -357,12 +361,10 @@ int sim_open(const char *name, int o)
             name);
     return -1;
 #else
-    if (num_openfiles < MAX_OPEN_FILES)
-    {
-        ret = OPEN(buffer, opts, 0666);
-        if (ret >= 0) num_openfiles++;
-        return ret;
-    }
+    ret = OPEN(name, opts, 0666);
+    if (ret >= 0)
+        num_openfiles++;
+    return ret;
 #endif
 }
 

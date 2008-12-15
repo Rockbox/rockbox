@@ -12,7 +12,7 @@ LDFLAGS := -g
 .PHONY: rbspeexenc uclpack
 
 CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
- generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat database \
+ generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat \
  lngdump telechips gigabeats creative hmac-sha1 mktccboot mknkboot rbspeexenc mkzenboot
 
 all: scramble descramble sh2d rdf2binary mkboot mktccboot mknkboot mkzenboot \
@@ -65,15 +65,6 @@ lngdump: lngdump.c
 
 ipod_fw:	ipod_fw.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
-
-database: database.c ../apps/tagcache.c ../apps/metadata.c \
-../firmware/id3.c ../firmware/common/unicode.c \
-../firmware/common/crc32.c ../uisimulator/common/io.c \
-../firmware/mp3data.c ../firmware/logf.c ../firmware/replaygain.c \
-../firmware/common/structec.c
-	$(SILENT)$(CC) $(CFLAGS) -I../firmware/export -iquote ../firmware/include \
--D__PCTOOL__ -DHAVE_TAGCACHE -DROCKBOX_HAS_LOGF -DSIMULATOR \
--DCONFIG_CODEC=1 -ldl -I../apps $+ -o $@
 
 checkwps: checkwps.c ../apps/gui/wps_parser.c ../apps/gui/wps_debug.c ../firmware/common/ctype.c ../apps/misc.c ../apps/recorder/bmp.c
 	$(SILENT)$(CC) $(CFLAGS) -I ../apps/gui -I../firmware/export \

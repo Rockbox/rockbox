@@ -83,9 +83,8 @@ static const char *name_codepages[NUM_CODEPAGES+1] =
 #define MAX_CP_TABLE_SIZE  640
 #define NUM_TABLES           1
 
-static const char *filename[NUM_TABLES] =
-{
-    CODEPAGE_DIR"/isomini.cp",
+static const char *filename[NUM_TABLES] = {
+    CODEPAGE_DIR"/isomini.cp"
 };
 
 static const char cp_2_table[NUM_CODEPAGES] =

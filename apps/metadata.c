@@ -397,6 +397,7 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
     return true;
 }
 
+#ifndef __PCTOOL__
 #if CONFIG_CODEC == SWCODEC
 void strip_tags(int handle_id)
 {
@@ -434,6 +435,7 @@ void strip_tags(int handle_id)
     bufcuttail(handle_id, len);
 }
 #endif /* CONFIG_CODEC == SWCODEC */
+#endif /* ! __PCTOOL__ */
 
 void adjust_mp3entry(struct mp3entry *entry, void *dest, const void *orig)
 {
