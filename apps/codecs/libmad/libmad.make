@@ -27,7 +27,7 @@ $(MADLIB): $(MADLIB_OBJ)
 # libmad-mpeg
 MPEGMADLIB := $(CODECDIR)/libmad-mpeg.a
 MPEGMADLIB_SRC := $(call preprocess, $(APPSDIR)/codecs/libmad/SOURCES)
-MPEGMADLIB_OBJ := $(subst .c,.o,$(subst .S,.o,$(subst $(ROOTDIR)/apps/codecs/libmad,$(BUILDDIR)/apps/codecs/libmad-mpeg,$(MPEGMADLIB_SRC))))
+MPEGMADLIB_OBJ := $(addsuffix .o,$(basename $(subst $(ROOTDIR)/apps/codecs/libmad,$(BUILDDIR)/apps/codecs/libmad-mpeg,$(MPEGMADLIB_SRC))))
 
 $(MPEGMADLIB): $(MPEGMADLIB_OBJ)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1

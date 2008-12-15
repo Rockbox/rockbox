@@ -37,7 +37,7 @@ $(SPEEXLIB): $(SPEEXLIB_OBJ)
 # libspeex-voice
 VOICESPEEXLIB := $(CODECDIR)/libspeex-voice.a
 VOICESPEEXLIB_SRC := $(call preprocess, $(APPSDIR)/codecs/libspeex/SOURCES)
-VOICESPEEXLIB_OBJ := $(subst .c,.o,$(subst .S,.o,$(subst $(ROOTDIR)/apps/codecs/libspeex,$(BUILDDIR)/apps/codecs/libspeex-voice,$(VOICESPEEXLIB_SRC))))
+VOICESPEEXLIB_OBJ := $(addsuffix .o,$(basename $(subst $(ROOTDIR)/apps/codecs/libspeex,$(BUILDDIR)/apps/codecs/libspeex-voice,$(VOICESPEEXLIB_SRC))))
 
 $(VOICESPEEXLIB): $(VOICESPEEXLIB_OBJ)
 	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1

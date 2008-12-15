@@ -25,7 +25,7 @@ preprocess = $(shell $(CC) $(PPCFLAGS) $(2) -E -P -x c -include config.h $(1) | 
 preprocess2file = $(shell $(CC) $(PPCFLAGS) $(3) -E -P -x c -include config.h $(1) | \
 		grep -v '^\#' | grep -v "^$$" > $(2))
 
-c2obj = $(subst .c,.o,$(subst .S,.o,$(subst $(ROOTDIR),$(BUILDDIR),$(1))))
+c2obj = $(addsuffix .o,$(basename $(subst $(ROOTDIR),$(BUILDDIR),$(1))))
 
 # calculate dependencies for a list of source files $(2) and output them
 # to a file $(1)
