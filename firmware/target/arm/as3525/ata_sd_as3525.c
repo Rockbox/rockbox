@@ -84,6 +84,8 @@ static const int pl180_base[NUM_VOLUMES] = {
 #endif
 };
 
+static int sd_init_card(const int drive);
+static void init_pl180_controller(const int drive);
 /* TODO : BLOCK_SIZE != SECTOR_SIZE ? */
 #define BLOCK_SIZE      512
 #define SECTOR_SIZE     512
@@ -100,6 +102,7 @@ static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x200)/sizeof(long)];
 static const char         sd_thread_name[] = "ata/sd";
 static struct mutex       sd_mtx SHAREDBSS_ATTR;
 static struct event_queue sd_queue;
+static bool sd_enabled = false;
 
 static inline void mci_delay(void) { int i = 0xffff; while(i--) ; }
 
@@ -147,6 +150,33 @@ static void sd_panic(IF_MV2(const int drive,) const int status)
         (status & MCI_RX_FIFO_FULL) ? "RXR FIFO FULL, " : "",
         (status & MCI_TX_FIFO_EMPTY) ? "TX FIFO EMPTY" : "");
 }
+
+#ifdef HAVE_HOTSWAP
+#ifdef SANSA_FUZE
+static bool sd1_oneshot_callback(struct timeout *tmo)
+{
+    (void)tmo;
+
+    /* This is called only if the state was stable for 300ms - check state
+     * and post appropriate event. */
+    if (card_detect_target())
+    {
+        queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
+    }
+    else
+        queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
+
+    return false;
+}
+void INT_GPIOA(void)
+{
+    static struct timeout sd1_oneshot;
+    /* reset irq */
+    GPIOA_IC = (1<<2);
+    timeout_register(&sd1_oneshot, sd1_oneshot_callback, (3*HZ/10), 0);
+}
+#endif
+#endif
 
 void INT_NAND(void)
 {
@@ -348,7 +378,13 @@ static void sd_thread(void)
             card_info[1].initialized = 0;
 
             if (ev.id == SYS_HOTSWAP_INSERTED)
+            {
                 disk_mount(1);
+            }
+            else
+            {
+                init_pl180_controller(SD_SLOT_AS3525);
+            }
 
             queue_broadcast(SYS_FS_CHANGED, 0);
 
@@ -399,6 +435,18 @@ static void init_pl180_controller(const int drive)
 #ifdef HAVE_MULTIVOLUME
     VIC_INT_ENABLE |=
         (drive == INTERNAL_AS3525) ? INTERRUPT_NAND : INTERRUPT_MCI0;
+
+#ifdef SANSA_FUZE
+    /* setup isr for microsd monitoring */
+    VIC_INT_ENABLE |= (INTERRUPT_GPIOA);
+    /* clear previous irq */
+    GPIOA_IC |= (1<<2);
+    /* enable edge detecting */
+    GPIOA_IS &= ~(1<<2);
+    /* detect both raising and falling edges */
+    GPIOA_IBE |= (1<<2);
+#endif
+
 #else
     VIC_INT_ENABLE |= INTERRUPT_NAND;
 #endif
@@ -496,7 +544,6 @@ static int sd_wait_for_state(const int drive, unsigned int state)
 {
     unsigned int response = 0;
     unsigned int timeout = 100; /* ticks */
-
     long t = current_tick;
 
     while (1)
@@ -528,7 +575,7 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
 #ifndef HAVE_MULTIVOLUME
     const int drive = 0;
 #endif
-    int ret;
+    int ret = 0;
 
     /* skip SanDisk OF */
     if (drive == INTERNAL_AS3525)
@@ -552,19 +599,21 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
     }
 #endif
 
-    if (card_info[drive].initialized < 0)
+    if (card_info[drive].initialized <= 0)
     {
-        ret = card_info[drive].initialized;
-        panicf("card not initialised");
-        goto sd_transfer_error;
+        sd_init_card(drive);
+        if (!(card_info[drive].initialized))
+        {
+            panicf("card not initialised");
+            goto sd_transfer_error;
+        }
     }
 
     last_disk_activity = current_tick;
-
     ret = sd_wait_for_state(drive, SD_TRAN);
     if (ret < 0)
     {
-        panicf("wait for state failed");
+        panicf("wait for state failed on drive %d", drive);
         goto sd_transfer_error;
     }
 
@@ -689,6 +738,8 @@ long sd_last_disk_activity(void)
 
 void sd_enable(bool on)
 {
+    if (sd_enabled == on)
+        return; /* nothing to do */
     if(on)
     {
         CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
@@ -742,11 +793,12 @@ tCardInfo *card_get_info_target(int card_no)
 bool card_detect_target(void)
 {
 #ifdef HAVE_HOTSWAP
-    /* TODO */
-    return false;
-#else
-    return false;
+    /* TODO: add e200/c200 */
+#if defined(SANSA_FUZE)
+    return !(GPIOA_PIN(2));
 #endif
+#endif
+    return false;
 }
 
 #ifdef HAVE_HOTSWAP
@@ -754,11 +806,18 @@ void card_enable_monitoring_target(bool on)
 {
     if (on)
     {
-        /* TODO */
+    /* add e200v2/c200v2 here */
+#ifdef SANSA_FUZE
+        /* enable isr*/
+        GPIOA_IE |= (1<<2);
+#endif
     }
     else
     {
-        /* TODO */
+#ifdef SANSA_FUZE
+        /* edisable isr*/
+        GPIOA_IE &= ~(1<<2);
+#endif
     }
 }
 #endif
