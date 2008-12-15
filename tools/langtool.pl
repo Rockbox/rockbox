@@ -17,7 +17,7 @@
 
 sub usage {
     print <<MOO
-Usage langtool --options langfile
+Usage langtool [--inplace] --options langfile1 [langfile2 ...]
 
   For all actions, the modified langfile will be output on stdout. When doing
   stuff to english.lang, you should almost always apply the same change to all
@@ -52,6 +52,13 @@ Usage langtool --options langfile
     Change the target for the specified id from one value to another
     Example:
       langtool --changetarget --from e200 --to e200,c200 --id LANG_ON dansk.lang
+
+  --inplace
+
+    Perform file operations in-place, instead of outputting the result to
+    stdout. With this option set, you can specify multiple langfiles for
+    all commands.
+    Example: langtool --deprecate --id LANG_ASK --inplace *.lang
 MOO
 }
 
@@ -64,6 +71,7 @@ my $changesource = '';
 my $changeid = '';
 my $changetarget = '';
 my $changedesc = '';
+my $inplace = '';
 my $help = '';
 # Parameters
 my @ids = ();
@@ -78,6 +86,7 @@ GetOptions(
     'changetarget' => \$changetarget,
     'changedesc'   => \$changedesc,
     'help'         => \$help,
+    'inplace'      => \$inplace,
 
     'ids=s'        => \@ids,
     'from=s'       => \$from,
@@ -104,6 +113,8 @@ if (
         ($deprecate and $numids < 1)
         or # Do changesource, but either target or to not set
         ($changesource and ($s_target eq "" or $to eq ""))
+        or # More than one file passed, but inplace isn't set
+        ($numfiles > 1 and not $inplace)
    ) {
     usage();
     exit(1);
@@ -121,87 +132,101 @@ if ($changesource and not $to =~ /none|deprecated/) {
     $to = sprintf('"%s"', $to);
 }
 
-open(LANGFILE, $ARGV[0]);
-my $id = "";
-my $desc = "";
-my $location = "";
-my $target = "";
-my $string = "";
-my $open = 0;
+foreach my $file (@ARGV) {
+    print(STDERR "$file\n");
+    open(LANGFILE, $file) or die(sprintf("Couldn't open file for reading: %s", $file));
+    my $id = "";
+    my $desc = "";
+    my $location = "";
+    my $target = "";
+    my $string = "";
+    my $open = 0;
+    my $output = "";
 
-for (<LANGFILE>) {
-    my $line = $_;
+    for (<LANGFILE>) {
+        my $line = $_;
 
-    if ($line =~ /^\s*<(\/?)([^>]+)>\s*$/) {
-        my $tag = $2;
-        $open = $1 eq "/" ? 0 : 1;
-        if ($open) {
-            $location = $tag;
-            ($target, $string) = ("", "");
-        }
-        if ($open and $tag eq "phrase") {
-            $id = "";
-        }
-        if (not $open) {
-            $location = "";
-        }
-    }
-    elsif ($line =~ /^\s*([^:]*?)\s*:\s*(.*?)\s*$/) {
-        my ($key, $val) = ($1, $2);
-        if ($location =~ /source|dest|voice/) {
-            ($target, $string) = ($key, $val);
-        }
-        if ($key eq "id") {
-            $id = $val;
-        }
-        elsif ($key eq "desc") {
-            $desc = $val;
-        }
-    }
-
-    if ($deprecate) {
-        if ($id ne "" and grep(/$id/, @ids)) {
-            # Set desc
-            $line =~ s/\s*desc:.*/  desc: deprecated/;
-            # Set user
-            $line =~ s/\s*user:.*/  user:/;
-            # Print an empty target line after opening tag (target isn't set)
-            if ($location =~ /source|dest|voice/ and $target eq "") {
-                $line .= "    *: none\n";
+        ### Set up values when a tag starts or ends ###
+        if ($line =~ /^\s*<(\/?)([^>]+)>\s*$/) {
+            my $tag = $2;
+            $open = $1 eq "/" ? 0 : 1;
+            if ($open) {
+                $location = $tag;
+                ($target, $string) = ("", "");
             }
-            # Do not print target: string lines
-            elsif ($location =~ /source|dest|voice/ and $target ne "") {
-                $line = "";
+            if ($open and $tag eq "phrase") {
+                $id = "";
+            }
+            if (not $open) {
+                $location = "";
             }
         }
-        print($line);
-    }
-    elsif ($changetarget) {
-        # Change target if set and it's the same as $from
-        if ($id ne "" and grep(/$id/, @ids) and $location =~ /source|dest|voice/ and $target eq $from) {
-            $line =~ s/$from/$to/;
+        ### Set up values when a key: value pair is found ###
+        elsif ($line =~ /^\s*([^:]*?)\s*:\s*(.*?)\s*$/) {
+            my ($key, $val) = ($1, $2);
+            if ($location =~ /source|dest|voice/) {
+                ($target, $string) = ($key, $val);
+            }
+            if ($key eq "id") {
+                $id = $val;
+            }
+            elsif ($key eq "desc") {
+                $desc = $val;
+            }
         }
-        print($line);
-    }
-    elsif ($changesource) {
-        # Change string if $target is set and matches $s_target
-        if ($id ne "" and grep(/$id/, @ids) and $target eq $s_target and $location eq "source") {
-            $line =~ s/$string/$to/;
+
+        if ($deprecate) {
+            if ($id ne "" and grep(/$id/, @ids)) {
+                # Set desc
+                $line =~ s/\s*desc:.*/  desc: deprecated/;
+                # Set user
+                $line =~ s/\s*user:.*/  user:/;
+                # Print an empty target line after opening tag (target isn't set)
+                if ($location =~ /source|dest|voice/ and $target eq "") {
+                    $line .= "    *: none\n";
+                }
+                # Do not print target: string lines
+                elsif ($location =~ /source|dest|voice/ and $target ne "") {
+                    $line = "";
+                }
+            }
         }
-        print($line);
-    }
-    elsif ($changedesc) {
-        # Simply change the desc line if the id matches
-        if ($id ne "" and grep(/$id/, @ids)) {
-            $line =~ s/\s*desc:.*/  desc: $to/;
+        elsif ($changetarget) {
+            # Change target if set and it's the same as $from
+            if ($id ne "" and grep(/$id/, @ids) and $location =~ /source|dest|voice/ and $target eq $from) {
+                $line =~ s/$from/$to/;
+            }
         }
-        print($line);
+        elsif ($changesource) {
+            # Change string if $target is set and matches $s_target
+            if ($id ne "" and grep(/$id/, @ids) and $target eq $s_target and $location eq "source") {
+                $line =~ s/$string/$to/;
+            }
+        }
+        elsif ($changedesc) {
+            # Simply change the desc line if the id matches
+            if ($id ne "" and grep(/$id/, @ids)) {
+                $line =~ s/\s*desc:.*/  desc: $to/;
+            }
+        }
+        elsif ($changeid) {
+            $line =~ s/^\s*id:\s*$from.*$/  id: $to/;
+        }
+        else {
+            print("This should never happen.\n");
+            exit(3);
+        }
+        if ($inplace) {
+            $output .= $line;
+        }
+        else {
+            print($line);
+        }
     }
-    elsif ($changeid) {
-        $line =~ s/^\s*id:\s*$from.*$/  id: $to/;
-        print($line);
-    }
-    else {
-        print("wut wut\n");
+    close(LANGFILE);
+    if ($inplace) {
+        open(LANGFILE, ">", $file) or die(sprintf("Couldn't open file for writing: %s\n", $file));
+        print(LANGFILE $output);
+        close(LANGFILE);
     }
 }
