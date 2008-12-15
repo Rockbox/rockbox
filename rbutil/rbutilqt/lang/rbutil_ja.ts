@@ -358,12 +358,12 @@ http://www.rockbox.org/wiki/IpodConversionToFAT32 を参照して下さい</tran
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="173"/>
         <source>Successfully removed bootloader</source>
-        <translation type="unfinished">ブートローダの削除が成功しました</translation>
+        <translation>ブートローダを正常に削除しました</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="180"/>
         <source>Removing bootloader failed.</source>
-        <translation type="unfinished">ブートローダの削除に失敗しました。</translation>
+        <translation>ブートローダの削除に失敗しました。</translation>
     </message>
 </context>
 <context>
@@ -594,7 +594,7 @@ You need to change your player to UMS mode for installation. </source>
     <message>
         <location filename="../configure.cpp" line="563"/>
         <source>Detected an unsupported %1 player variant. Sorry, Rockbox doesn&apos;t run on your player.</source>
-        <translation>サポートされていないプレイヤー %1 が見つかりました。Rockbox は、このプレイヤーでは動かすことができません。</translation>
+        <translation>サポートされていないプレイヤー %1 が見つかりました。Rockbox は、このプレイヤーで動かすことができません。</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="565"/>
@@ -982,7 +982,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../install.cpp" line="222"/>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation>これは、最新版のRockboxです。最新版は、毎日更新されます。現在のバージョンは、r%1 (%2) です。</translation>
+        <translation>これは、最新版のRockboxです。最新版は毎日更新されます。現在のバージョンは、r%1 (%2) です。</translation>
     </message>
     <message>
         <location filename="../install.cpp" line="226"/>
@@ -997,7 +997,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../install.cpp" line="238"/>
         <source>This is the last released version of Rockbox.</source>
-        <translation>これは、最新のリリース版の Rockboxです。</translation>
+        <translation>これは、最新リリース版の Rockboxです。</translation>
     </message>
     <message>
         <location filename="../install.cpp" line="244"/>
@@ -1017,7 +1017,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../install.cpp" line="127"/>
         <source>Really continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>本当に続行しますか?</translation>
     </message>
 </context>
 <context>
@@ -1100,7 +1100,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../installfrm.ui" line="221"/>
         <source>Rockbox Utility stores copies of Rockbox it has downloaded on the local hard disk to save network traffic. If your local copy is no longer working, tick this box to download a fresh copy.</source>
-        <translation>Rockbox ユーティリティは、ネットワークトラフィックを節約するために、ローカルのハードディスクにダウンロードしたRockboxのコピーを保存します。 ローカルにあるコピーがもはや動作していないならば、チェックボックスにチェックをして、最新のファイルをダウンロードしてください。</translation>
+        <translation>Rockbox ユーティリティは、ネットワークトラフィックを節約するために、ローカルのハードディスクにダウンロードしたRockboxのコピーを保存します。 ローカルにあるコピーがもう動作していないのであれば、チェックボックスにチェックをして、最新のファイルをダウンロードしてください。</translation>
     </message>
     <message>
         <location filename="../installfrm.ui" line="224"/>
@@ -1110,7 +1110,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../installfrm.ui" line="207"/>
         <source>Backup Location</source>
-        <translation type="unfinished"></translation>
+        <translation>バックアップ先</translation>
     </message>
 </context>
 <context>
@@ -1232,7 +1232,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../progressloggerfrm.ui" line="32"/>
         <source>progresswindow</source>
-        <translation type="unfinished"></translation>
+        <translation>進捗画面</translation>
     </message>
 </context>
 <context>
@@ -1279,18 +1279,20 @@ Select your device and Mountpoint manually.</source>
         <location filename="../base/detect.cpp" line="418"/>
         <source>&lt;li&gt;Permissions insufficient for bootloader installation.
 Administrator priviledges are necessary.&lt;/li&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;li&gt;ブートローダをインストールするのに、アクセス権限が足りません。
+管理者権限が必要です。&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/detect.cpp" line="431"/>
         <source>&lt;li&gt;Target mismatch detected.
 Installed target: %1, selected target: %2.&lt;/li&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;li&gt;検出されたターゲットが一致しません。
+インストールされているターゲット: %1, 選択されたターゲット: %2.&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/detect.cpp" line="436"/>
         <source>Problem detected:</source>
-        <translation type="unfinished"></translation>
+        <translation>問題が検出されました:</translation>
     </message>
 </context>
 <context>
@@ -1426,7 +1428,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="519"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
-        <translation>Rockbox のインストールを検出しました。まずバックアップを行いますか? </translation>
+        <translation>Rockbox がインストールされていることを検出しました。まずバックアップを行いますか? </translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="522"/>
@@ -1461,7 +1463,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="805"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
-        <translation>そのアプリケーションは、新しい構築に対する情報をまだダウンロードしているところです。まもなくしましたら、もう一度行って下さい。</translation>
+        <translation>そのアプリケーションは、新規ビルドに対する情報をまだダウンロードしています。もう少ししましたら、再度行って下さい。</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="810"/>
@@ -1638,7 +1640,7 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../rbutilqt.cpp" line="506"/>
         <source>Really continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>本当に続行しますか?</translation>
     </message>
 </context>
 <context>
@@ -2108,32 +2110,32 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../sysinfo.cpp" line="42"/>
         <source>&lt;b&gt;Username&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;ユーザ名&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="44"/>
         <source>&lt;b&gt;Permissions&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;権限&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="46"/>
         <source>&lt;b&gt;Attached USB devices&lt;/b&gt;&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;接続された USB デバイス&lt;/b&gt;&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="51"/>
         <source>VID: %1 PID: %2, %3</source>
-        <translation type="unfinished"></translation>
+        <translation>VID: %1 PID: %2, %3</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="59"/>
         <source>Filesystem</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルシステム</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="63"/>
         <source>%1, %2 MiB available</source>
-        <translation type="unfinished"></translation>
+        <translation>%1, %2 MiB 利用可能</translation>
     </message>
 </context>
 <context>
@@ -2761,7 +2763,7 @@ Please check your network and proxy settings.</source>
     <message>
         <location filename="../installzip.cpp" line="190"/>
         <source>Installing file failed.</source>
-        <translation>ファイルｎインストールに失敗しました。</translation>
+        <translation>ファイルのインストールに失敗しました。</translation>
     </message>
     <message>
         <location filename="../installzip.cpp" line="200"/>
@@ -2771,7 +2773,7 @@ Please check your network and proxy settings.</source>
     <message>
         <location filename="../installzip.cpp" line="155"/>
         <source>Not enough disk space! Aborting.</source>
-        <translation type="unfinished"></translation>
+        <translation>ディスクの空き領域が足りません! 処理を中止します。</translation>
     </message>
 </context>
 <context>
