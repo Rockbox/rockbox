@@ -750,6 +750,7 @@ void sd_enable(bool on)
 #endif
         CGU_IDE |= (1<<7)  /* AHB interface enable */  |
                    (1<<6)  /* interface enable */;
+        sd_enabled = true;
     }
     else
     {
@@ -758,6 +759,7 @@ void sd_enable(bool on)
         CGU_PERI &= ~CGU_MCI_CLOCK_ENABLE;
 #endif
         CGU_IDE &= ~((1<<7)|(1<<6));
+        sd_enabled = false;
     }
 }
 
