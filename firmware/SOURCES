@@ -1087,6 +1087,8 @@ target/arm/as3525/sansa-e200v2/lcd-e200v2.c
 target/arm/as3525/sansa-e200v2/button-e200v2.c
 target/arm/as3525/backlight-e200v2-fuze.c
 #ifndef BOOTLOADER
+drivers/generic_i2c.c
+target/arm/as3525/fmradio-i2c-as3525.c
 target/arm/as3525/powermgmt-as3525.c
 #endif /* !BOOTLOADER */
 #endif /* !SIMULATOR */
@@ -1110,6 +1112,8 @@ target/arm/as3525/sansa-fuze/button-fuze.c
 target/arm/as3525/sansa-fuze/lcd-fuze.c
 target/arm/as3525/backlight-e200v2-fuze.c
 #ifndef BOOTLOADER
+drivers/generic_i2c.c
+target/arm/as3525/fmradio-i2c-as3525.c
 target/arm/as3525/powermgmt-as3525.c
 #endif /* !BOOTLOADER */
 #endif /* !SIMULATOR */

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Bertrik Sikken
+ * Copyright (C) 2008 by Bertrik Sikken
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -42,6 +42,12 @@
 #define I2C_GPIO_DIR GPIOD_DIR
 #define I2C_SCL_PIN 7
 #define I2C_SDA_PIN 6
+
+#elif   defined(SANSA_FUZE) || defined(SANSA_E200V2)
+#define I2C_GPIO(x) GPIOA_PIN(x)
+#define I2C_GPIO_DIR GPIOA_DIR
+#define I2C_SCL_PIN 6
+#define I2C_SDA_PIN 7
 
 #elif
 #error no FM I2C GPIOPIN defines
@@ -109,7 +115,7 @@ static void fm_delay(void)
 
 /* interface towards the generic i2c driver */
 static struct i2c_interface fm_i2c_interface = {
-#if     defined(SANSA_CLIP)
+#if     defined(SANSA_CLIP) || defined(SANSA_FUZE) || defined(SANSA_E200V2)
     .address = 0x10 << 1,
 #elif   defined(SANSA_M200V4)
     .address = 0xC0,
