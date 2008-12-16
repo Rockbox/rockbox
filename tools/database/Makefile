@@ -1,3 +1,4 @@
+SILENT = @
 INCLUDE = -I../../firmware/export \
 	-I../../apps -I../../uisimulator/sdl -I/usr/include/SDL
 FIRMINC = -I../../firmware/include -fno-builtin
@@ -22,16 +23,16 @@ VPATH = ../../apps ../../apps/metadata ../../firmware/common ../../firmware/ \
 all: database
 
 %.o : ../../uisimulator/common/%.c
-	@echo $(<F)
-	@$(CC) $(CFLAGS) -c -o $@ $<
+	@echo CC $(<F)
+	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $<
 
 %.o : %.c $<
-	@echo $(<F)
-	@$(CC) $(FIRMINC) $(CFLAGS) -c -o $@ $<
+	@echo CC $(<F)
+	$(SILENT)$(CC) $(FIRMINC) $(CFLAGS) -c -o $@ $<
 
 database: $(OBJ)
-	@echo Linking $@
-	@$(CC) -g -ldl -o $@ $+
+	@echo LD $@
+	$(SILENT)$(CC) -g -ldl -o $@ $+
 
 clean:
 	rm $(OBJ)
