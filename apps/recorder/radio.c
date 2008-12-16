@@ -295,34 +295,54 @@ static int find_preset(int freq)
     return -1;
 }
 
-/* Return the first preset encountered in the search direction with
+/* Return the closest preset encountered in the search direction with
    wraparound. */
 static int find_closest_preset(int freq, int direction)
 {
     int i;
+    int lowpreset = 0;
+    int highpreset = 0;
+    int closest = -1;
 
     if (direction == 0) /* direction == 0 isn't really used */
         return 0;
 
-    for (i = 0; i < MAX_PRESETS; i++)
+    for (i = 0; i < num_presets; i++)
     {
-        int preset_frequency = presets[i].frequency;
-
-        if (preset_frequency == freq)
+        int f = presets[i].frequency;
+        if (f == freq)
             return i; /* Exact match = stop */
-        /* Stop when the preset frequency exeeds freq so that we can
-           pick the correct one based on direction */
-        if (preset_frequency > freq)
-            break;
+        
+        /* remember the highest and lowest presets for wraparound */
+        if (f < presets[lowpreset].frequency)
+            lowpreset = i;
+        if (f > presets[highpreset].frequency)
+            highpreset = i;
+
+        /* find the closest preset in the given direction */
+        if (direction > 0 && f > freq)
+        {
+            if (closest < 0 || f < presets[closest].frequency)
+                closest = i;
+        }
+        else if (direction < 0 && f < freq)
+        {
+            if (closest < 0 || f > presets[closest].frequency)
+                closest = i;
+        }
     }
 
-    /* wrap around depending on direction */
-    if (i == 0 || i >= num_presets - 1)
-        i = direction < 0 ? num_presets - 1 : 0;
-    else if (direction < 0)
-        i--; /* use previous */
+    if (closest < 0)
+    {
+        /* no presets in the given direction */
+        /* wrap around depending on direction */
+        if (direction < 0)
+            closest = highpreset;
+        else
+            closest = lowpreset;
+    }
 
-    return i;
+    return closest;
 }
 
 static void remember_frequency(void)
@@ -762,6 +782,7 @@ int radio_screen(void)
                 FOR_NB_SCREENS(i)
                 {
                     screens[i].set_viewport(&vp[i]);
+                    screens[i].stop_scroll();
                     screens[i].clear_viewport();
                     screens[i].update_viewport();
                     screens[i].set_viewport(NULL);
@@ -1158,24 +1179,24 @@ static int radio_add_preset(void)
 
     if(num_presets < MAX_PRESETS)
     {
-        memset(buf, 0, MAX_FMPRESET_LEN);
+        buf[0] = '\0';
 
-        if (!kbd_input(buf, MAX_FMPRESET_LEN))
+        if (!kbd_input(buf, MAX_FMPRESET_LEN + 1))
         {
             struct fmstation * const fms = &presets[num_presets];
-            buf[MAX_FMPRESET_LEN] = '\0';
             strcpy(fms->name, buf);
             fms->frequency = curr_freq;
             num_presets++;
             presets_changed = true;
             presets_loaded = num_presets > 0;
+            return true;
         }
     }
     else
     {
         splash(HZ, ID2P(LANG_FM_NO_FREE_PRESETS));
     }
-    return true;
+    return false;
 }
 
 /* needed to know which preset we are edit/delete-ing */
@@ -1188,11 +1209,10 @@ static int radio_edit_preset(void)
     {
         struct fmstation * const fms = &presets[selected_preset];
 
-        strncpy(buf, fms->name, MAX_FMPRESET_LEN);
+        strcpy(buf, fms->name);
 
-        if (!kbd_input(buf, MAX_FMPRESET_LEN))
+        if (!kbd_input(buf, MAX_FMPRESET_LEN + 1))
         {
-            buf[MAX_FMPRESET_LEN] = '\0';
             strcpy(fms->name, buf);
             presets_changed = true;
         }
@@ -1213,6 +1233,8 @@ static int radio_delete_preset(void)
         memmove(fms, fms + 1, (uintptr_t)(fms + num_presets) -
                               (uintptr_t)fms);
 
+        if (curr_preset >= num_presets)
+            --curr_preset;
     }
 
      /* Don't ask to save when all presets are deleted. */
@@ -1222,6 +1244,7 @@ static int radio_delete_preset(void)
     {
         /* The preset list will be cleared, switch to Scan Mode. */
         radio_mode = RADIO_SCAN_MODE;
+        curr_preset = -1;
         presets_loaded = false;
     }
 
@@ -1295,6 +1318,7 @@ static int clear_preset_list(void)
     presets_loaded = false;
     /* The preset list will be cleared switch to Scan Mode. */
     radio_mode = RADIO_SCAN_MODE;
+    curr_preset = -1;
 
     presets_changed = false; /* Don't ask to save when clearing the list. */
 
@@ -1374,12 +1398,16 @@ static int handle_radio_presets(void)
     {
         gui_synclist_draw(&lists);
         gui_syncstatusbar_draw(&statusbars, true);
-        list_do_action(CONTEXT_STD, HZ,
+        list_do_action(CONTEXT_STD, TIMEOUT_BLOCK,
                        &lists, &action, LIST_WRAP_UNLESS_HELD);
         switch (action)
         {
             case ACTION_STD_MENU:
-                radio_add_preset();
+                if (radio_add_preset())
+                {
+                    gui_synclist_set_nb_items(&lists, num_presets);
+                    gui_synclist_select_item(&lists, num_presets - 1);
+        }
                 break;
             case ACTION_STD_CANCEL:
                 result = 1;
