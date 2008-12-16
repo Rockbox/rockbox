@@ -124,7 +124,7 @@
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 
 /* Hardware controlled charging */
-/* #define CONFIG_CHARGING CHARGING_SIMPLE */
+#define CONFIG_CHARGING CHARGING_SIMPLE
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
