@@ -24,6 +24,9 @@
 
 #include "cpu.h"
 #include "lcd.h"
+#include "file.h"
+#include "debug.h"
+#include "system.h"
 #include "clock-target.h"
 
 /* The controller is unknown, but some registers appear to be the same as the
@@ -35,18 +38,9 @@
 
 #define R_ENTRY_MODE_HORZ 0x7030
 
-
 static bool display_on = false; /* is the display turned on? */
 static bool display_flipped = false;
 static int xoffset = 20; /* needed for flip */
-
-/* TODO: Implement this function */
-static void lcd_delay(int x)
-{
-    /* This is just arbitrary - the OF does something more complex */
-    x *= 1024;
-    while (x--);
-}
 
 static void as3525_dbop_init(void)
 {
@@ -146,23 +140,14 @@ static void _display_on(void)
     lcd_write_reg(0x07, 0);
     lcd_write_reg(0x13, 0);
 
-    lcd_delay(10);
-
     lcd_write_reg(0x11, 0x3704);
     lcd_write_reg(0x14, 0x1a1b);
     lcd_write_reg(0x10, 0x3860);
     lcd_write_reg(0x13, 0x40);
 
-    lcd_delay(10);
-
     lcd_write_reg(0x13, 0x60);
 
-    lcd_delay(50);
-
     lcd_write_reg(0x13, 0x70);
-
-    lcd_delay(40);
-
     lcd_write_reg(0x01, 277);
     lcd_write_reg(0x02, (7<<8));
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
@@ -190,65 +175,42 @@ static void _display_on(void)
     lcd_write_reg(0x48, 0x0);
 
     lcd_write_reg(0x07, 0x11);
-
-    lcd_delay(40);
-
     lcd_write_reg(0x07, 0x17);
 
     display_on = true;  /* must be done before calling lcd_update() */
     lcd_update();
 }
 
-/* I'm guessing this function is lcd_enable, but it may not be... */
 void lcd_enable(bool on)
 {
-    int r0 = on;
-#if 0
-    r4 = 0x1db12;
-    [r4] = 1;
-#endif
-
-    if (r0 != 0) {
+    if (display_on == on)
+        return; /* nothing to do */
+    if(on)
+    {
+        int delay = 0x200000;
         lcd_write_reg(0, 1);
-
-        lcd_delay(10);
-
         lcd_write_reg(0x10, 0);
         lcd_write_reg(0x11, 0x3704);
         lcd_write_reg(0x14, 0x1a1b);
         lcd_write_reg(0x10, 0x3860);
         lcd_write_reg(0x13, 0x40);
-
-        lcd_delay(10);
-
         lcd_write_reg(0x13, 0x60);
-
-        lcd_delay(50);
-
         lcd_write_reg(0x13, 112);
-
-        lcd_delay(40);
-
         lcd_write_reg(0x07, 0x11);
-
-        lcd_delay(40);
-
         lcd_write_reg(0x07, 0x17);
-    } else {
-        lcd_write_reg(0x07, 0x22);
-
-        lcd_delay(40);
-
-        lcd_write_reg(0x07, 0);
-
-        lcd_delay(40);
-
-        lcd_write_reg(0x10, 1);
+        display_on = true;
+        /* a bit of delay before returning to
+         * avoid irritating flash on backlight on */
+        while(delay--);
+        
     }
-
-#if 0
-    [r4] = 0;
-#endif
+    else
+    {
+        lcd_write_reg(0x07, 0x22);
+        lcd_write_reg(0x07, 0);
+        lcd_write_reg(0x10, 1);
+        display_on = false;
+    }
 }
 
 bool lcd_enabled(void)
@@ -285,25 +247,12 @@ void lcd_init_device()
 {
     as3525_dbop_init();
 
-    GPIOA_DIR |= (1<<5);
+    GPIOA_DIR |= (1<<7|1<<5|1<<4|1<<3);
     GPIOA_PIN(5) = 0;
-
     GPIOA_PIN(3) = (1<<3);
-
-    GPIOA_DIR |= (1<<4) | (1<<3);
-
-    GPIOA_PIN(3) = (1<<3);
-
     GPIOA_PIN(4) = 0;
-
-    GPIOA_DIR |= (1<<7);
     GPIOA_PIN(7) = 0;
-
-    lcd_delay(1);
-
     GPIOA_PIN(5) = (1<<5);
-
-    lcd_delay(1);
 
     _display_on();
 }
@@ -324,6 +273,7 @@ static void lcd_window_y(int ymin, int ymax)
     lcd_write_reg(0x47, ymax);
     lcd_write_reg(0x48, ymin);
     lcd_write_reg(0x21, ymin);
+    lcd_write_cmd(0x22);
 }
 
 /* Update the display.
@@ -354,7 +304,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (!display_on)
         return;
 
-    xmax = x + width - 1;
+    xmax = x + width;
     if (xmax >= LCD_WIDTH)
         xmax = LCD_WIDTH - 1; /* Clip right */
     if (x < 0)
@@ -364,8 +314,8 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     width = xmax - x + 1;     /* Fix width */
 
-    ymax = y + height - 1;
-    if (ymax > LCD_HEIGHT)
+    ymax = y + height;
+    if (ymax >= LCD_HEIGHT)
         ymax = LCD_HEIGHT - 1; /* Clip bottom */
     if (y < 0)
         y = 0; /* Clip top */
@@ -387,5 +337,5 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_write_data(ptr, width);
         ptr += LCD_WIDTH;
     }
-    while (++y < ymax);
+    while (++y <= ymax);
 }
