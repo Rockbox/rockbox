@@ -29,11 +29,15 @@
 #include "logf.h"
 #include "system.h"
 #include "string.h"
+
+#include "pcm_sampr.h"
+
 #include "audio.h"
 
 #include "wmcodec.h"
 #include "audiohw.h"
 #include "sound.h"
+
 
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25},
@@ -229,12 +233,12 @@ void audiohw_set_frequency(int fsel)
     /* For 24MHz MCLK */
     static const unsigned char srctrl_table[HW_NUM_FREQ] =
     {
-        [HW_FREQ_8]  = WMC_USB24_8000HZ,
-        [HW_FREQ_32] = WMC_USB24_32000HZ,
-        [HW_FREQ_44] = WMC_USB24_44100HZ,
-        [HW_FREQ_48] = WMC_USB24_48000HZ,
-        [HW_FREQ_88] = WMC_USB24_88200HZ,
-        [HW_FREQ_96] = WMC_USB24_96000HZ,
+        HW_HAVE_8_([HW_FREQ_8]  = WMC_USB24_8000HZ,)
+        HW_HAVE_32_([HW_FREQ_32] = WMC_USB24_32000HZ,)
+        HW_HAVE_44_([HW_FREQ_44] = WMC_USB24_44100HZ,)
+        HW_HAVE_48_([HW_FREQ_48] = WMC_USB24_48000HZ,)
+        HW_HAVE_88_([HW_FREQ_88] = WMC_USB24_88200HZ,)
+        HW_HAVE_96_([HW_FREQ_96] = WMC_USB24_96000HZ,)
     };
 
     if ((unsigned)fsel >= HW_NUM_FREQ)
