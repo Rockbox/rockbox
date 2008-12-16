@@ -369,10 +369,10 @@ void lcd_update(void)
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
 
     /* Set start position and window */
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 
-                  ((y_offset + LCD_WIDTH-1) << 8) | y_offset);
-    lcd_write_reg(R_VERT_RAM_ADDR_POS, (LCD_HEIGHT-1) << 8);
-    lcd_write_reg(R_RAM_ADDR_SET, y_offset);
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (LCD_WIDTH-1) << 8);
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, 
+                  ((y_offset + LCD_HEIGHT-1) << 8) | y_offset);
+    lcd_write_reg(R_RAM_ADDR_SET, (y_offset) << 8);
 
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
@@ -408,9 +408,10 @@ void lcd_update_rect(int x, int y, int width, int height)
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
     /* Set start position and window */
     lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 
-                  ((y_offset + LCD_WIDTH-1) << 8) | y_offset);
-    lcd_write_reg(R_VERT_RAM_ADDR_POS, ((y + height - 1) << 8) | y);
-    lcd_write_reg(R_RAM_ADDR_SET, (x << 8) | (y + y_offset));
+                  ((x + width-1) << 8) | x);
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, 
+                  ((y_offset + y + height - 1) << 8) | (y_offset + y));
+    lcd_write_reg(R_RAM_ADDR_SET, ((y + y_offset) << 8) | x);
 
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
