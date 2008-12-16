@@ -162,8 +162,16 @@ void audiohw_preinit(void)
                  AUDIOSET2_IBR_DAC_0 | AUDIOSET2_LSP_LP |
                  AUDIOSET2_IBR_LSP_50);
 
+/* AMS Sansas based on the AS3525 need HPCM enabled, otherwise they output the
+   L-R signal on both L and R headphone outputs instead of normal stereo.
+   Turning it off saves a little power on targets that don't need it. */
+#if (CONFIG_CPU == AS3525)
     /* Set HPCM on, ZCU on */
     as3514_write(AS3514_AUDIOSET3, 0);
+#else
+    /* Set HPCM off, ZCU on */
+    as3514_write(AS3514_AUDIOSET3, AUDIOSET3_HPCM_off);
+#endif
 
     /* Mute and disable speaker */
     as3514_write(AS3514_LSP_OUT_R, LSP_OUT_R_SP_OVC_TO_256MS | 0x00);
@@ -193,15 +201,6 @@ void audiohw_postinit(void)
 {
     /* wait until outputs have stabilized */
     sleep(HZ/4);
-
-/* Sansa Clip and Sansa m200v4 need HPCM enabled, otherwise they output
-   the L-R signal on both L and R headphone outputs instead of normal stereo.
-   TODO : If this turns out to apply to all ams3525 targets, consider
-          simplifying the precompiler condition.
-*/   
-#if !defined(SANSA_CLIP) && !defined(SANSA_M200V4) && !defined(SANSA_E200V2)
-    as3514_write(AS3514_AUDIOSET3, AUDIOSET3_HPCM_off);
-#endif
 
 #ifdef CPU_PP
     ascodec_suppressor_on(false);
