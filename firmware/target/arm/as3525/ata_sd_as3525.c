@@ -154,7 +154,7 @@ static void sd_panic(IF_MV2(const int drive,) const int status)
 }
 
 #ifdef HAVE_HOTSWAP
-#ifdef SANSA_FUZE
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
 static bool sd1_oneshot_callback(struct timeout *tmo)
 {
     (void)tmo;
@@ -381,11 +381,9 @@ static void sd_thread(void)
 
             if (ev.id == SYS_HOTSWAP_INSERTED)
             {
-                disk_mount(1);
-            }
-            else
-            {
+                sd_enable(true);
                 init_pl180_controller(SD_SLOT_AS3525);
+                disk_mount(1);
             }
 
             queue_broadcast(SYS_FS_CHANGED, 0);
@@ -438,7 +436,7 @@ static void init_pl180_controller(const int drive)
     VIC_INT_ENABLE |=
         (drive == INTERNAL_AS3525) ? INTERRUPT_NAND : INTERRUPT_MCI0;
 
-#ifdef SANSA_FUZE
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
     /* setup isr for microsd monitoring */
     VIC_INT_ENABLE |= (INTERRUPT_GPIOA);
     /* clear previous irq */
@@ -798,7 +796,7 @@ bool card_detect_target(void)
 {
 #ifdef HAVE_HOTSWAP
     /* TODO: add e200/c200 */
-#if defined(SANSA_FUZE)
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
     return !(GPIOA_PIN(2));
 #endif
 #endif
@@ -811,14 +809,14 @@ void card_enable_monitoring_target(bool on)
     if (on)
     {
     /* add e200v2/c200v2 here */
-#ifdef SANSA_FUZE
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
         /* enable isr*/
         GPIOA_IE |= (1<<2);
 #endif
     }
     else
     {
-#ifdef SANSA_FUZE
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
         /* edisable isr*/
         GPIOA_IE &= ~(1<<2);
 #endif
