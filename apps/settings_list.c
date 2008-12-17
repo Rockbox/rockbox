@@ -478,7 +478,7 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, playlist_shuffle, LANG_SHUFFLE, false, "shuffle", NULL),
     SYSTEM_SETTING(NVRAM(4), resume_index, -1),
     SYSTEM_SETTING(NVRAM(4), resume_offset, -1),
-    CHOICE_SETTING(0, repeat_mode, LANG_REPEAT, REPEAT_ALL, "repeat",
+    CHOICE_SETTING(0, repeat_mode, LANG_REPEAT, REPEAT_OFF, "repeat",
                    "off,all,one,shuffle"
 #ifdef AB_REPEAT_ENABLE
                    ",ab"
@@ -505,7 +505,7 @@ const struct settings_list settings[] = {
                   MAX_CONTRAST_SETTING, 1, NULL, NULL }}}},
 #endif
 #ifdef HAVE_BACKLIGHT
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_timeout, LANG_BACKLIGHT, 5,
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_timeout, LANG_BACKLIGHT, 15,
                   "backlight timeout", off_on, UNIT_SEC, backlight_formatter,
                   backlight_getlang, backlight_set_timeout, 20,
                   -1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
@@ -1047,10 +1047,10 @@ const struct settings_list settings[] = {
 
 #if CONFIG_CODEC == SWCODEC
     /* replay gain */
-    OFFON_SETTING(F_SOUNDSETTING, replaygain, LANG_REPLAYGAIN_ENABLE, false,
+    OFFON_SETTING(F_SOUNDSETTING, replaygain, LANG_REPLAYGAIN_ENABLE, true,
                   "replaygain", NULL),
     CHOICE_SETTING(F_SOUNDSETTING, replaygain_type, LANG_REPLAYGAIN_MODE,
-                   REPLAYGAIN_ALBUM, "replaygain type",
+                   REPLAYGAIN_SHUFFLE, "replaygain type",
                    "track,album,track shuffle", NULL, 3, ID2P(LANG_TRACK_GAIN),
                    ID2P(LANG_ALBUM_GAIN), ID2P(LANG_SHUFFLE_GAIN)),
     OFFON_SETTING(F_SOUNDSETTING, replaygain_noclip, LANG_REPLAYGAIN_NOCLIP,
@@ -1212,12 +1212,12 @@ const struct settings_list settings[] = {
                    ID2P(LANG_CODEPAGE_UTF8)),
 #endif
     OFFON_SETTING(0, warnon_erase_dynplaylist, LANG_WARN_ERASEDYNPLAYLIST_MENU,
-                  false, "warn when erasing dynamic playlist",NULL),
+                  true, "warn when erasing dynamic playlist",NULL),
 
 #ifdef HAVE_BACKLIGHT
 #ifdef HAS_BUTTON_HOLD
     CHOICE_SETTING(0, backlight_on_button_hold, LANG_BACKLIGHT_ON_BUTTON_HOLD,
-                   0, "backlight on button hold", "normal,off,on",
+                   1, "backlight on button hold", "normal,off,on",
                    backlight_set_on_button_hold, 3,
                    ID2P(LANG_NORMAL), ID2P(LANG_OFF), ID2P(LANG_ON)),
 #endif
@@ -1239,7 +1239,7 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, hold_lr_for_scroll_in_list, -1, true,
                   "hold_lr_for_scroll_in_list",NULL),
 #ifdef HAVE_LCD_BITMAP
-    CHOICE_SETTING(0, show_path_in_browser, LANG_SHOW_PATH, SHOW_PATH_OFF,
+    CHOICE_SETTING(0, show_path_in_browser, LANG_SHOW_PATH, SHOW_PATH_CURRENT,
                    "show path in browser", "off,current directory,full path",
                    NULL, 3, ID2P(LANG_OFF), ID2P(LANG_SHOW_PATH_CURRENT),
                    ID2P(LANG_DISPLAY_FULL_PATH)),
