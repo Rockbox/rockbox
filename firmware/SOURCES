@@ -820,6 +820,9 @@ target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
 
 #ifdef MROBE_100
 #ifndef SIMULATOR
+#ifndef BOOTLOADER
+drivers/synaptics-mep.c
+#endif /* BOOTLOADER */
 drivers/sw_i2c.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
