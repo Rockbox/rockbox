@@ -47,8 +47,14 @@ void BootloaderInstallMi4::installStage2(void)
     QFile oldbl(fwfile);
     QString moved = QFileInfo(resolvePathCase(m_blfile)).absolutePath()
                         + "/OF.mi4";
-    qDebug() << "renaming" << fwfile << "->" << moved;
-    oldbl.rename(moved);
+    if(!QFileInfo(moved).exists()) {
+        qDebug() << "renaming" << fwfile << "->" << moved;
+        oldbl.rename(moved);
+    }
+    else {
+        qDebug() << "OF.mi4 already present, not renaming again.";
+        oldbl.remove();
+    }
 
     // place new bootloader
     m_tempfile.open();
@@ -59,7 +65,7 @@ void BootloaderInstallMi4::installStage2(void)
     emit logItem(tr("Bootloader successful installed"), LOGOK);
     logInstall(LogAdd);
 
-    emit done(true);
+    emit done(false);
 }
 
 
