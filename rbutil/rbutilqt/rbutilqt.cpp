@@ -432,7 +432,7 @@ bool RbUtilQt::smallInstallInner()
         return true;
     }
     // Bootloader
-    if(settings->curNeedsBootloader()) 
+    if(settings->curNeedsBootloader())
     {
         m_error = false;
         m_installed = false;
@@ -448,7 +448,7 @@ bool RbUtilQt::smallInstallInner()
         m_auto = false;
         if(m_error) return true;
         logger->undoAbort();
-    }    
+    }
 
     // Rockbox
     m_error = false;
@@ -520,7 +520,8 @@ bool RbUtilQt::installAuto()
            QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
             logger->addItem(tr("Starting backup..."),LOGINFO);
-            QString backupName = settings->mountpoint() + "/.backup/rockbox-backup-"+rbVersion+".zip";
+            QString backupName = settings->mountpoint()
+                + "/.backup/rockbox-backup-" + rbVersion + ".zip";
 
             //! create dir, if it doesnt exist
             QFileInfo backupFile(backupName);
@@ -529,7 +530,7 @@ bool RbUtilQt::installAuto()
                 QDir a;
                 a.mkpath(backupFile.path());
             }
-        
+
             //! create backup
             RbZip backup;
             connect(&backup,SIGNAL(zipProgress(int,int)),logger, SLOT(setProgress(int,int)));
@@ -542,10 +543,10 @@ bool RbUtilQt::installAuto()
                 logger->addItem(tr("Backup failed!"),LOGERROR);
                 logger->abort();
                 return false;
-            }      
+            }
         }
     }
-    
+
     //! install current build
     ZipInstaller* installer = new ZipInstaller(this);
     installer->setUrl(file);
@@ -652,8 +653,15 @@ void RbUtilQt::installBootloader()
         if(QMessageBox::question(this, tr("Bootloader detected"),
             tr("Bootloader already installed. Do you want to reinstall the bootloader?"),
             QMessageBox::Yes | QMessageBox::No) == QMessageBox::No) {
-                logger->close();
-                m_error = true;
+                if(m_auto) {
+                    // keep logger open for auto installs.
+                    // don't consider abort as error in auto-mode.
+                    installBootloaderPost(false);
+                }
+                else {
+                    logger->close();
+                    installBootloaderPost(true);
+                }
                 return;
         }
     }
@@ -798,14 +806,15 @@ void RbUtilQt::installFonts()
 void RbUtilQt::installVoice()
 {
     if(chkConfig(true)) return;
-    
+
     if(m_gotInfo == false)
     {
        QMessageBox::warning(this, tr("Warning"),
-       tr("The Application is still downloading Information about new Builds. Please try again shortly."));
-        return;    
+       tr("The Application is still downloading Information about new Builds."
+          " Please try again shortly."));
+        return;
     }
-    
+
     if(QMessageBox::question(this, tr("Confirm Installation"),
        tr("Do you really want to install the voice file?"),
        QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
@@ -815,11 +824,11 @@ void RbUtilQt::installVoice()
 
     // create zip installer
     installer = new ZipInstaller(this);
-    
+
     QString voiceurl = settings->voiceUrl();
-    
+
     voiceurl += settings->curVoiceName() + "-" +
-        versmap.value("arch_date") + "-english.zip"; 
+        versmap.value("arch_date") + "-english.zip";
     qDebug() << voiceurl;
 
     installer->setUrl(voiceurl);
@@ -836,7 +845,8 @@ void RbUtilQt::installDoomBtn()
 {
     if(chkConfig(true)) return;
     if(!hasDoom()){
-        QMessageBox::critical(this, tr("Error"), tr("Your device doesn't have a doom plugin. Aborting."));
+        QMessageBox::critical(this, tr("Error"),
+            tr("Your device doesn't have a doom plugin. Aborting."));
         return;
     }
 
@@ -891,7 +901,7 @@ void RbUtilQt::createTalkFiles(void)
     if(chkConfig(true)) return;
     InstallTalkWindow *installWindow = new InstallTalkWindow(this);
     installWindow->setSettings(settings);
-    
+
     connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(downloadInfo()));
     connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
     installWindow->show();
@@ -903,7 +913,7 @@ void RbUtilQt::createVoiceFile(void)
     if(chkConfig(true)) return;
     CreateVoiceWindow *installWindow = new CreateVoiceWindow(this);
     installWindow->setSettings(settings);
-    
+
     connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(downloadInfo()));
     connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
     installWindow->show();
@@ -990,7 +1000,7 @@ void RbUtilQt::downloadManual(void)
     buildInfo.close();
 
     QString manual = settings->curManual();
-   
+
     QString date = (info.value("dailies/date").toString());
 
     QString manualurl;
@@ -1047,13 +1057,15 @@ void RbUtilQt::installPortable(void)
     QFile::remove(settings->mountpoint() + "/RockboxUtility.exe");
     QFile::remove(settings->mountpoint() + "/RockboxUtility.ini");
     // copy currently running binary and currently used settings file
-    if(!QFile::copy(qApp->applicationFilePath(), settings->mountpoint() + "/RockboxUtility.exe")) {
+    if(!QFile::copy(qApp->applicationFilePath(), settings->mountpoint()
+            + "/RockboxUtility.exe")) {
         logger->addItem(tr("Error installing Rockbox Utility"), LOGERROR);
         logger->abort();
         return;
     }
     logger->addItem(tr("Installing user configuration"), LOGINFO);
-    if(!QFile::copy(settings->userSettingFilename(), settings->mountpoint() + "/RockboxUtility.ini")) {
+    if(!QFile::copy(settings->userSettingFilename(), settings->mountpoint()
+            + "/RockboxUtility.ini")) {
         logger->addItem(tr("Error installing user configuration"), LOGERROR);
         logger->abort();
         return;
@@ -1070,7 +1082,8 @@ void RbUtilQt::updateInfo()
 {
     qDebug() << "RbUtilQt::updateInfo()";
 
-    QSettings log(settings->mountpoint() + "/.rockbox/rbutil.log", QSettings::IniFormat, this);
+    QSettings log(settings->mountpoint() + "/.rockbox/rbutil.log",
+                    QSettings::IniFormat, this);
     QStringList groups = log.childGroups();
     QList<QTreeWidgetItem *> items;
     QTreeWidgetItem *w, *w2;
@@ -1134,9 +1147,7 @@ QUrl RbUtilQt::proxy()
     if(settings->proxyType() == "manual")
         return QUrl(settings->proxy());
     else if(settings->proxy() == "system")
-    {    
         return Detect::systemProxy();
-    }
     return QUrl("");
 }
 
