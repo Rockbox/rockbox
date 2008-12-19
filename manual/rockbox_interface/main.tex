@@ -502,8 +502,28 @@ With the \dap{} connected to the computer as an MSC/UMS device (like a
 USB Drive), music files can be put on the player via any standard file
 transfer method that you would use to copy files between drives (e.g. Drag 'n' Drop).
 The default directory structure that is assumed by some parts of Rockbox
-(album art searching, WPS missing-tag fallback) is: /ArtistName/AlbumName/*.ext.
-See \reference{ref:Supportedaudioformats} for a list of supported audio formats.
+\opt{albumart}{%
+    (album art searching, and missing-tag fallback in some WPSes) uses the
+    parent directory of a song as the Album name, and the parent directory of
+    that folder as the Artist name. While files may be organized however you
+    like, the \wikilink{AlbumArt} wiki page explains the requirement for Album
+    Art to work properly, and WPSes may display information incorrectly if your
+    files are not properly tagged, and you have your music organized in a way
+    different than they assume when attempting to guess the Artist and Album
+    names from your filetree.
+}%
+\nopt{albumart}{%
+    (missing-tag fallback in some WPSes) uses the parent directory of a song
+    as the Album name, and the parent directory of that folder as the Artist
+    name. While files may be organized however you like, WPSes may display
+    information incorrectly if your files are not properly tagged, and you have
+    your music organized in a way different than they assume when attempting to
+    guess the Artist and Album names from your filetree.
+}
+\opt{swcodec}{
+    See \reference{ref:Supportedaudioformats} for a list of supported audio
+    formats.
+}
 
 \subsection{The first contact}
 
