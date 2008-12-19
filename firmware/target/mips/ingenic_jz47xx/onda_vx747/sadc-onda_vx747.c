@@ -115,7 +115,7 @@ unsigned int battery_adc_voltage(void)
     bat_val = 0;
     REG_SADC_ENA |= SADC_ENA_PBATEN;
     
-    /* Primitive wakeup event */
+    /* primitive wakeup event */
     while(bat_val == 0)
         yield();
     
@@ -256,6 +256,7 @@ void SADC(void)
         REG_SADC_CTRL |= (SADC_CTRL_PENDM);
         pen_down = true;
     }
+    
     if(state & SADC_CTRL_PENUM)
     {
         /* Pen up IRQ */
@@ -265,6 +266,7 @@ void SADC(void)
         datacount = 0;
         cur_touch = 0;
     }
+    
     if(state & SADC_CTRL_TSRDYM)
     {
         unsigned int   dat;
@@ -306,13 +308,10 @@ void SADC(void)
             datacount = 0;
         }
     }
+    
     if(state & SADC_CTRL_PBATRDYM)
     {
         bat_val = REG_SADC_BATDAT;
         /* Battery AD IRQ */
-    }
-    if(state & SADC_CTRL_SRDYM)
-    {
-        /* SADC AD IRQ */
     }
 }

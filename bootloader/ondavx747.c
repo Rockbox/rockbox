@@ -29,13 +29,13 @@
 #include "lcd.h"
 #include "ata.h"
 #include "usb.h"
-#include "storage.h"
 #include "system.h"
 #include "button.h"
 #include "timefuncs.h"
 #include "rtc.h"
 #include "common.h"
 #include "mipsregs.h"
+#include "storage.h"
 
 #ifdef ONDA_VX747P
  #define ONDA_VX747
@@ -112,19 +112,14 @@ int main(void)
         KNOP(BUTTON_POWER, 3);
         lcd_set_foreground(LCD_WHITE);
         if(button_hold())
-        {
             printf("BUTTON_HOLD");
-            asm("break 0x7");
-        }
         if(btn & BUTTON_POWER)
-        {
             power_off();
-        }
 #ifdef ONDA_VX747
         if(btn & BUTTON_TOUCH)
         {
             lcd_set_foreground(LCD_RGBPACK(touch & 0xFF, (touch >> 8)&0xFF, (touch >> 16)&0xFF));
-            lcd_fillrect((touch>>16)-10, (touch&0xFFFF)-5, 10, 10);
+            lcd_fillrect((touch>>16)-5, (touch&0xFFFF)-5, 5, 5);
             lcd_update();
             lcd_set_foreground(LCD_WHITE);
         }
