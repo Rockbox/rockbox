@@ -81,9 +81,6 @@ GetOptions ( 'r|root=s'		=> \$ROOT,
 
 ($target, $exe) = @ARGV;
 
-# Some basic sanity
-die "No firmware found @ $exe" if !-f $exe;
-
 my $firmdir="$ROOT/firmware";
 my $appsdir="$ROOT/apps";
 my $viewer_bmpdir="$ROOT/apps/plugins/bitmaps/viewer_defaults";
