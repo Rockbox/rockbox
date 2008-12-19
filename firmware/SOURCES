@@ -535,6 +535,9 @@ target/arm/i2s-pp.c
 
 #ifdef PHILIPS_HDD1630
 #ifndef SIMULATOR
+#ifndef BOOTLOADER
+drivers/synaptics-mep.c
+#endif /* BOOTLOADER */
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c

@@ -32,6 +32,7 @@
 /* Driver for the Synaptics Touchpad based on the "Synaptics Modular Embedded
    Protocol: 3-Wire Interface Specification" documentation */
 
+#if defined(MROBE_100)
 #define ACK     (GPIOD_INPUT_VAL & 0x1)
 #define ACK_HI  GPIOD_OUTPUT_VAL |=  0x1
 #define ACK_LO  GPIOD_OUTPUT_VAL &= ~0x1
@@ -44,6 +45,21 @@
 #define DATA_HI GPIOD_OUTPUT_EN |= 0x4; GPIOD_OUTPUT_VAL |=  0x4
 #define DATA_LO GPIOD_OUTPUT_EN |= 0x4; GPIOD_OUTPUT_VAL &= ~0x4
 #define DATA_CL GPIOD_OUTPUT_EN &= ~0x4
+
+#elif defined(PHILIPS_HDD1630)
+#define ACK     (GPIOD_INPUT_VAL & 0x80)
+#define ACK_HI  GPIOD_OUTPUT_VAL |=  0x80
+#define ACK_LO  GPIOD_OUTPUT_VAL &= ~0x80
+
+#define CLK     ((GPIOA_INPUT_VAL & 0x20) >> 5)
+#define CLK_HI  GPIOA_OUTPUT_VAL |=  0x20
+#define CLK_LO  GPIOA_OUTPUT_VAL &= ~0x20
+
+#define DATA    ((GPIOA_INPUT_VAL & 0x10) >> 4)
+#define DATA_HI GPIOA_OUTPUT_EN |= 0x10; GPIOA_OUTPUT_VAL |=  0x10
+#define DATA_LO GPIOA_OUTPUT_EN |= 0x10; GPIOA_OUTPUT_VAL &= ~0x10
+#define DATA_CL GPIOA_OUTPUT_EN &= ~0x10
+#endif
 
 #define LO 0
 #define HI 1

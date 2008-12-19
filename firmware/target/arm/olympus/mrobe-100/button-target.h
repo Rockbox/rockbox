@@ -30,7 +30,10 @@
 bool button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
+
+#ifndef BOOTLOADER
 void button_int(void);
+#endif
 
 #define POWEROFF_BUTTON     BUTTON_POWER
 #define POWEROFF_COUNT      10

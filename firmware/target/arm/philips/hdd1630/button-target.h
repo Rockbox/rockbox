@@ -31,6 +31,10 @@ bool button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
 
+#ifndef BOOTLOADER
+void button_int(void);
+#endif
+
 /* Main unit's buttons */
 #define BUTTON_POWER        0x00000001
 #define BUTTON_PLAYLIST     0x00000002

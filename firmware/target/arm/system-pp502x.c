@@ -34,9 +34,6 @@ extern void TIMER1(void);
 extern void TIMER2(void);
 extern void ipod_mini_button_int(void); /* iPod Mini 1st gen only */
 extern void ipod_4g_button_int(void);   /* iPod 4th gen and higher only */
-#ifdef MROBE_100
-extern void button_int(void);
-#endif
 
 void irq(void)
 {
@@ -73,6 +70,11 @@ void irq(void)
 #elif defined(MROBE_100)
         else if (CPU_HI_INT_STAT & GPIO0_MASK) {
             if (GPIOD_INT_STAT & 0x2)
+                button_int();
+        }        
+#elif defined(PHILIPS_HDD1630)
+        else if (CPU_HI_INT_STAT & GPIO0_MASK) {
+            if (GPIOA_INT_STAT & 0x20)
                 button_int();
         }        
 #endif
