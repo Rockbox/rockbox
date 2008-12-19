@@ -1076,6 +1076,7 @@ static inline void core_sleep(void)
                  ".set   mips0              \n"
                  ::: "t0", "t1", "t2"
                  );
+    enable_irq();
 }
 
 
