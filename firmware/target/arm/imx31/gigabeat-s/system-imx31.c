@@ -115,6 +115,16 @@ void imx31_regmod32(volatile uint32_t *reg_p, uint32_t value, uint32_t mask)
     restore_interrupt(oldlevel);
 }
 
+void imx31_regset32(volatile uint32_t *reg_p, uint32_t mask)
+{
+    imx31_regmod32(reg_p, mask, mask);
+}
+
+void imx31_regclr32(volatile uint32_t *reg_p, uint32_t mask)
+{
+    imx31_regmod32(reg_p, 0, mask);
+}
+
 #ifdef BOOTLOADER
 void system_prepare_fw_start(void)
 {
