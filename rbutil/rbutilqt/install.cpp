@@ -33,10 +33,10 @@ Install::Install(RbSettings *sett,QWidget *parent) : QDialog(parent)
     connect(ui.radioArchived, SIGNAL(toggled(bool)), this, SLOT(setDetailsArchived(bool)));
     connect(ui.changeBackup,SIGNAL(pressed()),this,SLOT(changeBackupPath()));
     connect(ui.backup,SIGNAL(stateChanged(int)),this,SLOT(backupCheckboxChanged(int)));
-    
+
     //! check if rockbox is already installed
-    QString version = Detect::installedVersion(settings->mountpoint()); 
-     
+    QString version = Detect::installedVersion(settings->mountpoint());
+
     if(version != "")
     {
         ui.Backupgroup->show();
@@ -48,7 +48,7 @@ Install::Install(RbSettings *sett,QWidget *parent) : QDialog(parent)
     else
     {
         ui.Backupgroup->hide();
-    }    
+    }
     backupCheckboxChanged(Qt::Unchecked);
 }
 
@@ -167,16 +167,15 @@ void Install::accept()
     installer->setUrl(file);
     installer->setLogSection("Rockbox (Base)");
     if(!settings->cacheDisabled()
-        && !ui.radioCurrent->isChecked()
         && !ui.checkBoxCache->isChecked())
     {
         installer->setCache(true);
     }
     installer->setLogVersion(myversion);
     installer->setMountPoint(mountPoint);
-    
+
     connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
-    
+
     installer->install(logger);
 
 }
@@ -274,7 +273,15 @@ void Install::setVersionStrings(QMap<QString, QString> ver)
         qDebug() << "no information about archived version available!";
     }
 
-    if(!version.value("rel_rev").isEmpty()) {
+    // try to use the old selection first. If no selection has been made
+    // in the past, use a preselection based on released status.
+    if(settings->build() == "stable")
+        ui.radioStable->setChecked(true);
+    else if(settings->build() == "archived")
+        ui.radioArchived->setChecked(true);
+    else if(settings->build() == "current")
+        ui.radioCurrent->setChecked(true);
+    else if(!version.value("rel_rev").isEmpty()) {
         ui.radioStable->setChecked(true);
         ui.radioStable->setEnabled(true);
         QFont font;
@@ -289,6 +296,7 @@ void Install::setVersionStrings(QMap<QString, QString> ver)
         font.setBold(true);
         ui.radioCurrent->setFont(font);
     }
+
     qDebug() << "Install::setVersionStrings" << version;
 }
 

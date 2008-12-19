@@ -50,6 +50,7 @@ class RbSettings : public QObject
         QString bleedingUrl();
         QString lastRelease(QString platform);
         QString cachePath();
+        QString build(void);
         QString bootloaderUrl();
         QString bootloaderInfoUrl();
         QString fontUrl();

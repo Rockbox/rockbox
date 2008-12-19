@@ -124,6 +124,11 @@ QString RbSettings::cachePath()
     return userSettings->value("cachepath", QDir::tempPath()).toString();
 }
 
+QString RbSettings::build()
+{
+    return userSettings->value("build").toString();
+}
+
 QString RbSettings::bootloaderUrl()
 {
     return devices->value("bootloader_url").toString();
