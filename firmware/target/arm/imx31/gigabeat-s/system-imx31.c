@@ -89,14 +89,14 @@ void system_init(void)
     /* MCR WFI enables wait mode */
     CLKCTL_CCMR &= ~(3 << 14);
 
-    imx31_regmod32(&SDHC1_CLOCK_CONTROL, STOP_CLK, STOP_CLK);
-    imx31_regmod32(&SDHC2_CLOCK_CONTROL, STOP_CLK, STOP_CLK);
-    imx31_regmod32(&RNGA_CONTROL, RNGA_CONTROL_SLEEP, RNGA_CONTROL_SLEEP);
-    imx31_regmod32(&UCR1_1, 0, EUARTUCR1_UARTEN);
-    imx31_regmod32(&UCR1_2, 0, EUARTUCR1_UARTEN);
-    imx31_regmod32(&UCR1_3, 0, EUARTUCR1_UARTEN);
-    imx31_regmod32(&UCR1_4, 0, EUARTUCR1_UARTEN);
-    imx31_regmod32(&UCR1_5, 0, EUARTUCR1_UARTEN);
+    imx31_regset32(&SDHC1_CLOCK_CONTROL, STOP_CLK);
+    imx31_regset32(&SDHC2_CLOCK_CONTROL, STOP_CLK);
+    imx31_regset32(&RNGA_CONTROL, RNGA_CONTROL_SLEEP);
+    imx31_regclr32(&UCR1_1, EUARTUCR1_UARTEN);
+    imx31_regclr32(&UCR1_2, EUARTUCR1_UARTEN);
+    imx31_regclr32(&UCR1_3, EUARTUCR1_UARTEN);
+    imx31_regclr32(&UCR1_4, EUARTUCR1_UARTEN);
+    imx31_regclr32(&UCR1_5, EUARTUCR1_UARTEN);
 
     for (i = 0; i < ARRAYLEN(disable_clocks); i++)
         imx31_clkctl_module_clock_gating(disable_clocks[i], CGM_OFF);

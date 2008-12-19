@@ -63,7 +63,7 @@ void ide_power_enable(bool on)
     if (!on)
     {
         /* Bus must be isolated before power off */
-        imx31_regmod32(&GPIO2_DR, (1 << 16), (1 << 16));
+        imx31_regset32(&GPIO2_DR, (1 << 16));
     }
 
     /* HD power switch */
@@ -73,7 +73,7 @@ void ide_power_enable(bool on)
     {
         /* Bus switch may be turned on after powerup */
         sleep(HZ/10);
-        imx31_regmod32(&GPIO2_DR, 0, (1 << 16));
+        imx31_regclr32(&GPIO2_DR, (1 << 16));
     }
 }
 
@@ -91,7 +91,7 @@ bool tuner_power(bool status)
            we can diable the i2c module when not in use */
         i2c_enable_node(&si4700_i2c_node, true);
         /* enable the fm chip */
-        imx31_regmod32(&GPIO1_DR, (1 << 26), (1 << 26));
+        imx31_regset32(&GPIO1_DR, (1 << 26));
         /* enable CLK32KMCU clock */
         mc13783_set(MC13783_POWER_CONTROL0, MC13783_CLK32KMCUEN);
     }
@@ -101,7 +101,7 @@ bool tuner_power(bool status)
            we can diable the i2c module when not in use */
         i2c_enable_node(&si4700_i2c_node, false);
         /* disable the fm chip */
-        imx31_regmod32(&GPIO1_DR, 0, (1 << 26));
+        imx31_regclr32(&GPIO1_DR, (1 << 26));
         /* disable CLK32KMCU clock */
         mc13783_clear(MC13783_POWER_CONTROL0, MC13783_CLK32KMCUEN);
     }

@@ -51,7 +51,7 @@ void pcm_play_lock(void)
     if (++dma_play_data.locked == 1)
     {
         /* Atomically disable transmit interrupt */
-        imx31_regmod32(&SSI_SIER1, 0, SSI_SIER_TIE);
+        imx31_regclr32(&SSI_SIER1, SSI_SIER_TIE);
     }
 }
 
@@ -60,7 +60,7 @@ void pcm_play_unlock(void)
     if (--dma_play_data.locked == 0 && dma_play_data.state != 0)
     {
         /* Atomically enable transmit interrupt */
-        imx31_regmod32(&SSI_SIER1, SSI_SIER_TIE, SSI_SIER_TIE);
+        imx31_regset32(&SSI_SIER1, SSI_SIER_TIE);
     }
 }
 
