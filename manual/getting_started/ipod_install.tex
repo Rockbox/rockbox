@@ -1,6 +1,6 @@
 % $Id$ %
 
-\opt{ipodnano}{\warn{If your Nano has a stainless steel back and plastic front 
+\opt{ipodnano}{\warn{If your Nano has a stainless steel back and plastic front,  
 it is a 1st generation and is compatible with Rockbox.  If, on the other hand, 
 your Nano has a one-piece aluminum body it is a 2nd generation Nano and there 
 is currently no Rockbox port available.  Do not attempt to install the 
@@ -17,18 +17,27 @@ step once.
 \begin{enumerate}
 
 \item Make sure you are logged into your computer as Administrator, or a 
-user with Administrator privileges and connect your \dap{}.
+user with Administrator privileges and connect your \dap{}. If you have
+configured iTunes to open automatically when your \dap{} is attached
+(the default behaviour), then wait for it to open and then quit it. You
+also need to ensure the ``Enable use as disk'' option is enabled for
+your \dap{} in iTunes.
 
 \item Download ipodpatcher.exe from 
 \download{bootloader/ipod/ipodpatcher/win32/ipodpatcher.exe} 
 and run it.
 
 \item If all has gone well, you should see some information displayed about
-your ipod and a message asking you if you wish to install the Rockbox
+your \dap{} and a message asking you if you wish to install the Rockbox
 bootloader. Press i followed by ENTER, and ipodpatcher will now
 install the bootloader. After a short time you should see the message
 ``[INFO] Bootloader installed successfully.'' Press ENTER again to exit
 ipodpatcher.
+
+\item \note{If ipodpatcher fails to install the bootloader for you, please
+be certain that you do indeed have a supported iPod model. If you do, run
+ipodpatcher once more and try again. If you don't, then do not attempt to
+install again.}
 
 \item Make sure that you have correctly extracted a build of Rockbox so that
 you have a \fname{/.rockbox}, which contains all the files needed by Rockbox
@@ -44,20 +53,16 @@ package -- see \reference{sec:installing_fonts} for more information.
 \begin{enumerate}
 
 \item Attach your \dap{} to your Mac and wait for its icon to appear in 
-Finder. If you have configured itunes to open automatically when your
+Finder. If you have configured iTunes to open automatically when your
 \dap{} is attached (the default behaviour), then wait for it to open and
 then quit it. You also need to ensure the ``Enable use as disk'' option
-is enabled for your \dap{} in itunes.
-
-\item\label{subsec:macos_umount} Open up Disk Utility
-(in Applications $\rightarrow$ Utilities) and click 
-on the name of your \dap{} (e.g. DAVES IPOD) in the list on the left 
-pane. Then click on the ``unmount'' icon at the top. \warn{Do \emph{not}
-click on the ``eject'' icon.}
+is enabled for your \dap{} in iTunes.
 
 \item Download and open ipodpatcher.dmg from 
 \download{bootloader/ipod/ipodpatcher/macosx/ipodpatcher.dmg} 
-and then double-click on the ipodpatcher icon inside. 
+and then double-click on the ipodpatcher icon inside. You can also
+drag the ipodpatcher icon to a location on your hard drive and launch
+it from the Terminal.
 
 \item If all has gone well, you should see some 
 information displayed about your \dap{} and a message asking you if you 
@@ -66,10 +71,11 @@ ipodpatcher will now install the bootloader. After a short time you
 should see the message ``[INFO] Bootloader installed successfully.'' Press 
 ENTER again to exit ipodpatcher and then quit the Terminal application.
 
-\item \warn{If you received a ``Resource busy'' error from 
-ipodpatcher, then this means you did not complete step 
-\ref{subsec:macos_umount}. Go back to Disk Utility, unmount your
-\dap{} and then run ipodpatcher again.}
+\item \note{If ipodpatcher fails to install the bootloader for you, please
+be certain that you do indeed have a supported iPod model. If you do, run
+ipodpatcher once more and try again. If you don't, then do not attempt to
+install again.}
+
 
 \item Your \dap{} will now automatically reconnect itself to your Mac. 
 Wait for it to connect, and then eject and unplug it in the normal way. 
@@ -108,7 +114,7 @@ steps will assume you have saved it in your home directory.
 sufficient permission to perform raw disk access to your \dap{}.}
 
 \item If all has gone well, you should see some information displayed about
-your ipod and a message asking you if you wish to install the Rockbox
+your \dap{} and a message asking you if you wish to install the Rockbox
 bootloader. Press i followed by ENTER, and ipodpatcher will now install the
 bootloader. After a short time you should see the message ``[INFO] Bootloader
 installed successfully.'' Press ENTER again to exit ipodpatcher.
