@@ -316,6 +316,8 @@
 #include "config-meizu-m3.h"
 #elif defined(ONDA_VX747)
 #include "config-ondavx747.h"
+#elif defined(ONDA_VX747P)
+#include "config-ondavx747p.h"
 #elif defined(ONDA_VX767)
 #include "config-ondavx767.h"
 #elif defined(SANSA_CLIP)
@@ -632,6 +634,10 @@
 
 #if defined(HAVE_USBSTACK) || (CONFIG_STORAGE & STORAGE_NAND)
 #define STORAGE_GET_INFO
+#endif
+
+#ifdef CPU_MIPS
+#include <stdbool.h> /* MIPS GCC fix? */
 #endif
 
 #endif /* __CONFIG_H__ */

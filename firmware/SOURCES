@@ -1215,7 +1215,7 @@ target/mips/ingenic_jz47xx/usb-jz4740.c
 drivers/nand_id.c
 #endif
 
-#ifdef ONDA_VX747
+#if defined(ONDA_VX747) || defined(ONDA_VX747P)
 target/mips/ingenic_jz47xx/onda_vx747/backlight-onda_vx747.c
 target/mips/ingenic_jz47xx/onda_vx747/lcd-onda_vx747.c
 target/mips/ingenic_jz47xx/onda_vx747/sadc-onda_vx747.c

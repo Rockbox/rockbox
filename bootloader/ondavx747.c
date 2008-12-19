@@ -21,11 +21,15 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 #include "config.h"
 #include "jz4740.h"
 #include "backlight.h"
 #include "font.h"
 #include "lcd.h"
+#include "ata.h"
+#include "usb.h"
+#include "storage.h"
 #include "system.h"
 #include "button.h"
 #include "timefuncs.h"
@@ -33,14 +37,9 @@
 #include "common.h"
 #include "mipsregs.h"
 
-static void audiotest(void)
-{
-    __i2s_internal_codec();
-    __aic_enable();
-    __aic_reset();
-    __aic_select_i2s();
-    __aic_enable_loopback();
-}
+#ifdef ONDA_VX747P
+ #define ONDA_VX747
+#endif
 
 int main(void)
 {
@@ -54,12 +53,16 @@ int main(void)
     
     backlight_init();
     
+#if 0 /* Enable this when multi storage works */
     storage_init();
+#else
+    ata_init();
+#endif
 
     int touch, btn;
     char datetime[30];
     reset_screen();
-    printf("Rockbox bootloader v0.000001");
+    printf("Rockbox bootloader v0.0001");
     printf("REG_EMC_SACR0: 0x%x", REG_EMC_SACR0);
     printf("REG_EMC_SACR1: 0x%x", REG_EMC_SACR1);
     printf("REG_EMC_SACR2: 0x%x", REG_EMC_SACR2);
@@ -85,46 +88,20 @@ int main(void)
     if(read_c0_config1() & (1 << 6)) printf(" * CP2 available");
     printf("C0_STATUS: 0x%x", read_c0_status());
     
-#if 0
-    unsigned char testdata[4096];
-    char msg[30];
-    int j = 1;
-    while(1)
-    {
-        memset(testdata, 0, 4096);
-        reset_screen();
-        jz_nand_read(0, j, &testdata);
-        printf("Page %d", j);
-        int i;
-        for(i=0; i<768; i+=16)
-        {
-            snprintf(msg, 30, "%02x%02x%02x%02x%02x%02x%02x%02x %02x%02x%02x%02x%02x%02x%02x%02x",
-            testdata[i], testdata[i+1], testdata[i+2], testdata[i+3], testdata[i+4], testdata[i+5], testdata[i+6], testdata[i+7],
-            testdata[i+8], testdata[i+9], testdata[i+10], testdata[i+11], testdata[i+12], testdata[i+13], testdata[i+14], testdata[i+15]
-            );
-            printf(msg);
-        }
-        while(!((btn = button_read_device(&touch)) & (BUTTON_VOL_UP|BUTTON_VOL_DOWN)));
-        if(btn & BUTTON_VOL_UP)
-            j++;
-        if(btn & BUTTON_VOL_DOWN)
-            j--;
-        if(j<0)
-            j = 0;
-    }
-#endif
+    lcd_puts_scroll(0, 25, "This is a very very long scrolling line.... VERY LONG VERY LONG VERY LONG VERY LONG VERY LONG VERY LONG!!!!!");
+    
     while(1)
     {
 #ifdef ONDA_VX747
 #if 1
         btn = button_get(false);
         touch = button_get_data();
-#else
+#else /* button_get() has performance issues */
         btn = button_read_device(&touch);
 #endif
 #else
         btn = button_read_device();
-#endif
+#endif /* ONDA_VX747 */
 #define KNOP(x,y)     lcd_set_foreground(LCD_BLACK); \
                       if(btn & x) \
                         lcd_set_foreground(LCD_WHITE); \

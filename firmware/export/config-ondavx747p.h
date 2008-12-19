@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2008 by Maurus Cuelenaere
+ * Copyright (C) 2008 by Olivier Barbut
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,18 +20,18 @@
  ****************************************************************************/
 
 /*
- * This config file is for the Onda VX747
+ * This config file is for the Onda VX747+
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
 #define CONFIG_SDRAM_START 0x80004000
 
-#define ONDA_VX747 1
+#define ONDA_VX747P 1
 
-#define MODEL_NAME  "Onda VX747"
+#define MODEL_NAME  "Onda VX747+"
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 35
+#define MODEL_NUMBER 44
 
 //#define HAVE_ATA_SD
 //#define HAVE_HOTSWAP
@@ -152,7 +152,7 @@
 /* Define this if you have adjustable CPU frequency */
 /* #define HAVE_ADJUSTABLE_CPU_FREQ */
 
-#define BOOTFILE_EXT "vx747"
+#define BOOTFILE_EXT "vx747p"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 

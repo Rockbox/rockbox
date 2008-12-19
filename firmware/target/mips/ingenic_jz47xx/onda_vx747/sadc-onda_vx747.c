@@ -27,11 +27,22 @@
 #include "powermgmt.h"
 #include "kernel.h"
 
+#ifdef ONDA_VX747
 #define BTN_OFF      (1 << 29)
 #define BTN_VOL_DOWN (1 << 27)
 #define BTN_HOLD     (1 << 16)
 #define BTN_MENU     (1 << 1)
 #define BTN_VOL_UP   (1 << 0)
+#elif defined(ONDA_VX747P)
+#define BTN_OFF      (1 << 29)
+#define BTN_VOL_DOWN (1 << 27)
+#define BTN_HOLD     (1 << 22)  /* on REG_GPIO_PXPIN(2) */
+#define BTN_MENU     (1 << 20)
+#define BTN_VOL_UP   (1 << 19)
+#else
+#error No buttons defined!
+#endif
+
 #define BTN_MASK     (BTN_OFF | BTN_VOL_DOWN | \
                       BTN_MENU | BTN_VOL_UP)
 
@@ -130,11 +141,19 @@ void button_init_device(void)
     REG_SADC_CTRL = (~(SADC_CTRL_PENDM | SADC_CTRL_PENUM | SADC_CTRL_TSRDYM | SADC_CTRL_PBATRDYM));
     REG_SADC_ENA = (SADC_ENA_TSEN | SADC_ENA_PBATEN);
     
+#ifdef ONDA_VX747
     __gpio_as_input(32*3 + 29);
     __gpio_as_input(32*3 + 27);
     __gpio_as_input(32*3 + 16);
     __gpio_as_input(32*3 + 1);
     __gpio_as_input(32*3 + 0);
+#elif defined(ONDA_VX747P)
+    __gpio_as_input(32*3 + 29);
+    __gpio_as_input(32*3 + 27);
+    __gpio_as_input(32*3 + 20);
+    __gpio_as_input(32*3 + 19);
+    __gpio_as_input(32*2 + 22);
+#endif
     
     mutex_init(&battery_mtx);
 }
@@ -173,7 +192,13 @@ int button_read_device(int *data)
     int ret = 0, tmp;
 
     /* Filter button events out if HOLD button is pressed at firmware/ level */
-    if((~REG_GPIO_PXPIN(3)) & BTN_HOLD)
+    if(
+#ifdef ONDA_VX747
+    (~REG_GPIO_PXPIN(3)) & BTN_HOLD
+#elif defined(ONDA_VX747P)
+    (~REG_GPIO_PXPIN(2)) & BTN_HOLD
+#endif
+    )
         return 0;
 
     tmp = (~REG_GPIO_PXPIN(3)) & BTN_MASK;

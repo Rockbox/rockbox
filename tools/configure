@@ -711,7 +711,7 @@ cat <<EOF
  ==Onda==                                        80) DAX 1GB MP3/DAB
  120) VX747               ==Meizu==
  121) VX767               110) M6SL
-                          111) M6SP
+ 122) VX747+              111) M6SP
                           112) M3
 
 EOF
@@ -1938,6 +1938,29 @@ fi
     t_manufacturer="ingenic_jz47xx"
     t_model="onda_vx767"
     ;;
+    
+    122|ondavx747p)
+    target_id=54
+    modelname="ondavx747p"
+    target="-DONDA_VX747P"
+    memory=16 #FIXME
+    mipselcc
+    tool="cp"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.vx747p"
+    appextra="recorder:gui"
+    plugins="no" #FIXME
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    boottool="cp"
+    bootoutput="rockboot.vx747p"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="mips"
+    t_manufacturer="ingenic_jz47xx"
+    t_model="onda_vx747"
+    ;;
+
    *)
     echo "Please select a supported target platform!"
     exit 7

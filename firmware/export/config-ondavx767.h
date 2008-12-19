@@ -33,11 +33,13 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 36
 
-/* define this if you use an ATA controller */
-//#define CONFIG_STORAGE STORAGE_ATA
+//#define HAVE_ATA_SD
+//#define HAVE_HOTSWAP
 
-#define HAVE_ATA_SD
-#define HAVE_HOTSWAP
+//#define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
+#define CONFIG_STORAGE STORAGE_RAMDISK /* Multivolume currently handled at firmware/target/ level */
+
+#define CONFIG_NAND NAND_CC
 
 #define HAVE_MULTIVOLUME
 
@@ -152,11 +154,9 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
-/*#define CONFIG_USBOTG	USBOTG_INGENIC
+#define CONFIG_USBOTG	USBOTG_JZ4740
 #define HAVE_USBSTACK
 #define USB_VENDOR_ID 0x041e 
-#define USB_PRODUCT_ID 0x4133*/
-
-#include <stdbool.h> /* HACKY */
+#define USB_PRODUCT_ID 0x4133
 
 #endif
