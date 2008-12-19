@@ -169,7 +169,7 @@
         <item row="1" column="0" >
          <widget class="QToolButton" name="buttonSmall" >
           <property name="text" >
-           <string>Small Installation</string>
+           <string>Minimal Installation</string>
           </property>
           <property name="icon" >
            <iconset resource="rbutilqt.qrc" >:/icons/rbinstall_btn.png</iconset>
@@ -185,7 +185,7 @@
         <item row="1" column="1" >
          <widget class="QLabel" name="labelSmall" >
           <property name="text" >
-           <string>&lt;b>Small installation&lt;/b>&lt;br/>This installs bootloader and the current build of Rockbox. If you don't want the extras package, choose this option.</string>
+           <string>&lt;b>Minimal installation&lt;/b>&lt;br/>This installs bootloader and the current build of Rockbox. If you don't want the extras package, choose this option.</string>
           </property>
           <property name="wordWrap" >
            <bool>true</bool>
@@ -914,7 +914,7 @@
     <iconset resource="rbutilqt.qrc" >:/icons/rbinstall_btn.png</iconset>
    </property>
    <property name="text" >
-    <string>&amp;Small Installation</string>
+    <string>&amp;Minimal Installation</string>
    </property>
   </action>
   <action name="actionInstall_Bootloader" >

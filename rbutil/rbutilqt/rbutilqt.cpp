@@ -356,11 +356,13 @@ void RbUtilQt::completeInstall()
 {
     if(chkConfig(true)) return;
     if(QMessageBox::question(this, tr("Confirm Installation"),
-           tr("Do you really want to make a complete Installation? "
-              "This will install the latest build available, not the latest "
-              "released version."),
-              QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
-
+           tr("Do you really want to perform a complete installation?\n\n"
+              "This will install Rockbox %1. To install the most recent "
+              "development build available press \"Cancel\" and "
+              "use the \"Installation\" tab.")
+              .arg(settings->lastRelease(settings->curPlatform())),
+              QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
+        return;
     // create logger
     logger = new ProgressLoggerGui(this);
     logger->show();
@@ -410,10 +412,15 @@ void RbUtilQt::smallInstall()
 {
     if(chkConfig(true)) return;
     if(QMessageBox::question(this, tr("Confirm Installation"),
-           tr("Do you really want to make a small Installation? "
-              "This will install the latest build available, not the latest "
-              "released version."),
-              QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
+           tr("Do you really want to perform a minimal installation? "
+              "A minimal installation will contain only the absolutely "
+              "necessary parts to run Rockbox.\n\n"
+              "This will install Rockbox %1. To install the most recent "
+              "development build available press \"Cancel\" and "
+              "use the \"Installation\" tab.")
+              .arg(settings->lastRelease(settings->curPlatform())),
+              QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
+        return;
 
     // create logger
     logger = new ProgressLoggerGui(this);
@@ -481,21 +488,13 @@ void RbUtilQt::installBtn()
 
 bool RbUtilQt::installAuto()
 {
-    QString file = QString("%1%2/rockbox.zip")
-            .arg(settings->bleedingUrl(), settings->curPlatformName());
+    QString file = QString("%1/%2/rockbox-%3-%4.zip")
+            .arg(settings->releaseUrl(), settings->lastRelease(settings->curPlatform()),
+               settings->curPlatform(), settings->lastRelease(settings->curPlatform()));
 
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
     buildInfo.close();
-
-    if(settings->curReleased()) {
-        // only set the keys if needed -- querying will yield an empty string
-        // if not set.
-        versmap.insert("rel_rev", settings->lastRelease(settings->curPlatform()));
-        versmap.insert("rel_date", ""); // FIXME: provide the release timestamp
-    }
-
-    QString myversion = "r" + versmap.value("bleed_rev");
 
     // check installed Version and Target
     QString rbVersion = Detect::installedVersion(settings->mountpoint());
@@ -551,7 +550,7 @@ bool RbUtilQt::installAuto()
     ZipInstaller* installer = new ZipInstaller(this);
     installer->setUrl(file);
     installer->setLogSection("Rockbox (Base)");
-    installer->setLogVersion(myversion);
+    installer->setLogVersion(settings->lastRelease(settings->curPlatform()));
     if(!settings->cacheDisabled())
         installer->setCache(true);
     installer->setMountPoint(settings->mountpoint());
