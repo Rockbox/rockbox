@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="de">
+<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstallBase</name>
     <message>
@@ -379,32 +380,32 @@ Siehe http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
         <translation>Installiere Rockbox Bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="59"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="65"/>
         <source>Bootloader successful installed</source>
         <translation>Bootloader erfolgreich installiert</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="71"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="77"/>
         <source>Checking for Rockbox bootloader</source>
         <translation>Prüfe auf Rockbox-Bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="73"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="79"/>
         <source>No Rockbox bootloader found</source>
         <translation>Kein Rockbox-Bootloader gefunden</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="78"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="84"/>
         <source>Checking for original firmware file</source>
         <translation>Prüfe auf Firmwaredatei der Originalfirmware</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="83"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="89"/>
         <source>Error finding original firmware file</source>
         <translation>Fehler beim finden der Originalfirmware-Datei</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="94"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="100"/>
         <source>Rockbox bootloader successful removed</source>
         <translation>Rockbox Bootloader erfolgreich entfernt</translation>
     </message>
@@ -654,187 +655,187 @@ Das Gerät muss für die Installation in den UMS-Modus umgestellt werden.</trans
         <translation>Rockbox Utility konfigurieren</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="545"/>
+        <location filename="../configurefrm.ui" line="501"/>
         <source>&amp;Ok</source>
         <translation>&amp;Ok</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="556"/>
+        <location filename="../configurefrm.ui" line="512"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Abbrechen</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="128"/>
+        <location filename="../configurefrm.ui" line="108"/>
         <source>&amp;Proxy</source>
         <translation>&amp;Proxy</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="138"/>
+        <location filename="../configurefrm.ui" line="118"/>
         <source>&amp;No Proxy</source>
         <translation>&amp;kein Proxy</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="155"/>
+        <location filename="../configurefrm.ui" line="135"/>
         <source>&amp;Manual Proxy settings</source>
         <translation>&amp;Manuelle Proxyeinstellungen</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="162"/>
+        <location filename="../configurefrm.ui" line="142"/>
         <source>Proxy Values</source>
         <translation>Proxy-Einstellungen</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="168"/>
+        <location filename="../configurefrm.ui" line="148"/>
         <source>&amp;Host:</source>
         <translation>&amp;Host:</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="185"/>
+        <location filename="../configurefrm.ui" line="165"/>
         <source>&amp;Port:</source>
         <translation>&amp;Port:</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="208"/>
+        <location filename="../configurefrm.ui" line="188"/>
         <source>&amp;Username</source>
         <translation>&amp;Benutzername</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="253"/>
+        <location filename="../configurefrm.ui" line="225"/>
         <source>&amp;Language</source>
         <translation>&amp;Sprache</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="38"/>
+        <location filename="../configurefrm.ui" line="30"/>
         <source>&amp;Device</source>
         <translation>&amp;Gerät</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="48"/>
+        <location filename="../configurefrm.ui" line="40"/>
         <source>Select your device in the &amp;filesystem</source>
         <translation>Gerät im &amp;Dateisystem auswählen</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="324"/>
+        <location filename="../configurefrm.ui" line="288"/>
         <source>&amp;Browse</source>
         <translation>D&amp;urchsuchen</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="76"/>
+        <location filename="../configurefrm.ui" line="71"/>
         <source>&amp;Select your audio player</source>
         <translation>Gerät au&amp;swählen</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="87"/>
+        <location filename="../configurefrm.ui" line="82"/>
         <source>1</source>
         <translation>1</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="108"/>
+        <location filename="../configurefrm.ui" line="90"/>
         <source>&amp;Autodetect</source>
         <translation>&amp;automatische Erkennung</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="148"/>
+        <location filename="../configurefrm.ui" line="128"/>
         <source>Use S&amp;ystem values</source>
         <translation>S&amp;ystemwerte verwenden</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="218"/>
+        <location filename="../configurefrm.ui" line="198"/>
         <source>Pass&amp;word</source>
         <translation>Pass&amp;wort</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="275"/>
+        <location filename="../configurefrm.ui" line="239"/>
         <source>Cac&amp;he</source>
         <translation>Cac&amp;he</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="282"/>
+        <location filename="../configurefrm.ui" line="246"/>
         <source>Download cache settings</source>
         <translation>Downloadcache-Einstellungen</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="288"/>
+        <location filename="../configurefrm.ui" line="252"/>
         <source>Rockbox Utility uses a local download cache to save network traffic. You can change the path to the cache and use it as local repository by enabling Offline mode.</source>
         <translation>Rockbox Utility verwendet einen lokalen Download-Cache um die übertragene Datenmenge zu begrenzen. Der Pfad zum Cache kann geändert sowie im Offline-Modus als lokales Repository verwenden werden.</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="298"/>
+        <location filename="../configurefrm.ui" line="262"/>
         <source>Current cache size is %1</source>
         <translation>Aktuelle Cache-Größe ist %1</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="307"/>
+        <location filename="../configurefrm.ui" line="271"/>
         <source>P&amp;ath</source>
         <translation>P&amp;fad</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="339"/>
+        <location filename="../configurefrm.ui" line="303"/>
         <source>Disable local &amp;download cache</source>
         <translation>lokalen &amp;Download-Cache ausschalten</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="349"/>
+        <location filename="../configurefrm.ui" line="313"/>
         <source>O&amp;ffline mode</source>
         <translation>O&amp;ffline-Modus</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="384"/>
+        <location filename="../configurefrm.ui" line="348"/>
         <source>Clean cache &amp;now</source>
         <translation>C&amp;ache löschen</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="317"/>
+        <location filename="../configurefrm.ui" line="281"/>
         <source>Entering an invalid folder will reset the path to the systems temporary path.</source>
         <translation>Ein ungültiger Ordner setzt den Pfad auf den temporären Pfad des Systems zurück.</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="346"/>
+        <location filename="../configurefrm.ui" line="310"/>
         <source>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</source>
         <translation>Dies versucht alle Informationen aus dem Cache zu beziehen, selbst die Informationen über Updates. Diese Option nur benutzen um ohne Internetverbindung zu installieren. Hinweis: die gleiche Installation, die später durchgeführt werden soll, muss einmal mit Netzwerkverbindung durchführt werden, damit die notwendigen Dateien im Cache gespeichert sind.</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="404"/>
+        <location filename="../configurefrm.ui" line="360"/>
         <source>&amp;TTS &amp;&amp; Encoder</source>
         <translation>&amp;TTS &amp;&amp; Encoder</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="414"/>
+        <location filename="../configurefrm.ui" line="370"/>
         <source>TTS Engine</source>
         <translation>TTS-System</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="471"/>
+        <location filename="../configurefrm.ui" line="427"/>
         <source>Encoder Engine</source>
         <translation>Encoder-System</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="420"/>
+        <location filename="../configurefrm.ui" line="376"/>
         <source>&amp;Select TTS Engine</source>
         <translation>TT&amp;S-System auswählen</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="433"/>
+        <location filename="../configurefrm.ui" line="389"/>
         <source>Configure TTS Engine</source>
         <translation>TTS-System konfigurieren</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="477"/>
+        <location filename="../configurefrm.ui" line="433"/>
         <source>Configuration invalid!</source>
         <translation>Konfiguration ungültig!</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="457"/>
+        <location filename="../configurefrm.ui" line="413"/>
         <source>Configure &amp;TTS</source>
         <translation>&amp;TTS konfigurieren</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="494"/>
+        <location filename="../configurefrm.ui" line="450"/>
         <source>Configure &amp;Enc</source>
         <translation> &amp;Encoder konfigurieren</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="505"/>
+        <location filename="../configurefrm.ui" line="461"/>
         <source>encoder name</source>
         <translation>Encoder-Name</translation>
     </message>
@@ -1376,7 +1377,7 @@ Installiertes Gerät: %1, gewähltes Gerät: %2.&lt;/li&gt;</translation>
         <translation>&lt;a href=&apos;%1&apos;&gt;Anleitungen-Übersicht&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="843"/>
+        <location filename="../rbutilqt.cpp" line="852"/>
         <source>Confirm Installation</source>
         <translation>Installation bestätigen</translation>
     </message>
@@ -1386,77 +1387,77 @@ Installiertes Gerät: %1, gewähltes Gerät: %2.&lt;/li&gt;</translation>
         <translation>Bootloader wirklich installieren?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="766"/>
+        <location filename="../rbutilqt.cpp" line="773"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>Schriftarten-Paket wirklich installieren?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="810"/>
+        <location filename="../rbutilqt.cpp" line="818"/>
         <source>Do you really want to install the voice file?</source>
         <translation>Sprachdateien wirklich installieren?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="844"/>
+        <location filename="../rbutilqt.cpp" line="853"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>Zusatzdateien für Spiele wirklich installieren?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="924"/>
+        <location filename="../rbutilqt.cpp" line="933"/>
         <source>Confirm Uninstallation</source>
         <translation>Entfernen bestätigen</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="925"/>
+        <location filename="../rbutilqt.cpp" line="934"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>Bootloader wirklich entfernen?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="982"/>
+        <location filename="../rbutilqt.cpp" line="991"/>
         <source>Confirm download</source>
         <translation>Download bestätigen</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="984"/>
+        <location filename="../rbutilqt.cpp" line="993"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>Handbuch wirklich herunterladen? Das Handbuch wird im Wurzelordner des Geräts gespeichert.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1027"/>
+        <location filename="../rbutilqt.cpp" line="1036"/>
         <source>Confirm installation</source>
         <translation>Installation bestätigen</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1029"/>
+        <location filename="../rbutilqt.cpp" line="1038"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Rockbox Utility wirklich auf dem Gerät installieren? Nach der Installation kann es von dem Laufwerk des Geräts ausgeführt werden.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1037"/>
+        <location filename="../rbutilqt.cpp" line="1046"/>
         <source>Installing Rockbox Utility</source>
         <translation>Installiere Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1041"/>
+        <location filename="../rbutilqt.cpp" line="1050"/>
         <source>Mount point is wrong!</source>
         <translation>Falscher Einhängepunkt!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1051"/>
+        <location filename="../rbutilqt.cpp" line="1061"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Fehler beim installieren von Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1055"/>
+        <location filename="../rbutilqt.cpp" line="1065"/>
         <source>Installing user configuration</source>
         <translation>Installiere Benutzerkonfiguration</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1057"/>
+        <location filename="../rbutilqt.cpp" line="1068"/>
         <source>Error installing user configuration</source>
         <translation>Fehler beim installieren der Benutzerkonfiguration</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1061"/>
+        <location filename="../rbutilqt.cpp" line="1072"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Rockbox Utility erfolgreich installiert.</translation>
     </message>
@@ -1471,22 +1472,22 @@ Installiertes Gerät: %1, gewähltes Gerät: %2.&lt;/li&gt;</translation>
         <translation>Version</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1152"/>
+        <location filename="../rbutilqt.cpp" line="1162"/>
         <source>Configuration error</source>
         <translation>Konfigurationsfehler</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="839"/>
+        <location filename="../rbutilqt.cpp" line="847"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="839"/>
+        <location filename="../rbutilqt.cpp" line="848"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>Für das gewählte Gerät existiert kein Doom-Plugin. Abbruch.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1154"/>
+        <location filename="../rbutilqt.cpp" line="1164"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Die Konfiguration ist ungültig. Bitte im Konfigurationsdialog sicherstellen dass die Einstellungen korrekt sind.</translation>
     </message>
@@ -1496,17 +1497,17 @@ Installiertes Gerät: %1, gewähltes Gerät: %2.&lt;/li&gt;</translation>
         <translation>Dies ist eine neue Installation oder eine neue Version von Rockbox Utility. Der Konfigurationsdialog wird nun automatisch geöffnet umd das Programm zu konfigurieren oder die Einstellungen zu prüfen.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="509"/>
+        <location filename="../rbutilqt.cpp" line="508"/>
         <source>Aborted!</source>
         <translation>Abgebrochen!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="518"/>
+        <location filename="../rbutilqt.cpp" line="517"/>
         <source>Installed Rockbox detected</source>
         <translation>Installiertes Rockbox erkannt</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="519"/>
+        <location filename="../rbutilqt.cpp" line="518"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
         <translation>Installiertes Rockbox erkannt. Soll zunächst eine Sicherungskopie gemacht werden?</translation>
     </message>
@@ -1516,17 +1517,17 @@ Installiertes Gerät: %1, gewähltes Gerät: %2.&lt;/li&gt;</translation>
         <translation>Sicherung fehlgeschlagen!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="804"/>
+        <location filename="../rbutilqt.cpp" line="811"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="805"/>
+        <location filename="../rbutilqt.cpp" line="813"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
         <translation>Das Progamm läd noch Informationen über neue Builds. Bitte in Kürze nochmals versuchen.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="522"/>
+        <location filename="../rbutilqt.cpp" line="521"/>
         <source>Starting backup...</source>
         <translation>Erstelle Sicherungskopie ...</translation>
     </message>
@@ -1558,15 +1559,15 @@ Installiertes Gerät: %1, gewähltes Gerät: %2.&lt;/li&gt;</translation>
     <message>
         <location filename="../rbutilqt.cpp" line="361"/>
         <source>Do you really want to make a complete Installation? This will install the latest build available, not the latest released version.</source>
-        <translation>Wirklich eine vollständige Installation durchführen? Dies wird das letzte verfügbare Build installieren, nicht das letzte Release.</translation>
+        <translation type="obsolete">Wirklich eine vollständige Installation durchführen? Dies wird das letzte verfügbare Build installieren, nicht das letzte Release.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="415"/>
         <source>Do you really want to make a small Installation? This will install the latest build available, not the latest released version.</source>
-        <translation>Wirklich eine kleine Installation durchführen? Dies wird das letzte verfügbare Build installieren, nicht das letzte Release.</translation>
+        <translation type="obsolete">Wirklich eine kleine Installation durchführen? Dies wird das letzte verfügbare Build installieren, nicht das letzte Release.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="506"/>
+        <location filename="../rbutilqt.cpp" line="505"/>
         <source>Really continue?</source>
         <translation>Wirklich fortfahren?</translation>
     </message>
@@ -1586,61 +1587,77 @@ Installiertes Gerät: %1, gewähltes Gerät: %2.&lt;/li&gt;</translation>
         <translation>Bootloader ist bereits installiert. Soll der Bootloader neu installiert werden?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="667"/>
+        <location filename="../rbutilqt.cpp" line="674"/>
         <source>Create Bootloader backup</source>
         <translation>Erzeuge Sicherungskopie vom Bootloader</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="672"/>
+        <location filename="../rbutilqt.cpp" line="679"/>
         <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
 Press &quot;No&quot; to skip this step.</source>
         <translation>Es kann eine Sicherungskopie der originalen Bootloader-Datei erstellt werden. &quot;Ja&quot; um einen Zielordner auf dem Computer auszuwählen. Die Datei wird in einem neuen Unterordner &quot;%1&quot; im gewählten Ordner abgelegt.
 &quot;Nein&quot; um diesen Schritt zu überspringen.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="674"/>
+        <location filename="../rbutilqt.cpp" line="681"/>
         <source>Browse backup folder</source>
         <translation>Ordner für Sicherungskopie suchen</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="687"/>
+        <location filename="../rbutilqt.cpp" line="694"/>
         <source>Prerequisites</source>
         <translation>Voraussetzungen</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="697"/>
+        <location filename="../rbutilqt.cpp" line="704"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (hex file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
         <translation type="unfinished">Die Bootloader-Installation benötigt eine Firmware-Datei der originalen Firmware (Hex-Datei). Diese Datei muss aus rechtlichen Gründen separat heruntergeladen werden. Informationen wie diese Datei heruntergeladen werden kann sind im &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;Handbuch&lt;/a&gt; und der Wiki-Seite &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; aufgeführt.&lt;br/&gt;OK um fortfahren und die Datei auf dem Computer auszuwählen.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="706"/>
+        <location filename="../rbutilqt.cpp" line="713"/>
         <source>Select firmware file</source>
         <translation>Firmware-Datei auswählen</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="708"/>
+        <location filename="../rbutilqt.cpp" line="715"/>
         <source>Error opening firmware file</source>
         <translation>Fehler beim Öffnen der Firmware-Datei</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="726"/>
+        <location filename="../rbutilqt.cpp" line="733"/>
         <source>Backup error</source>
         <translation>Sicherungskopie-Fehler</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="727"/>
+        <location filename="../rbutilqt.cpp" line="734"/>
         <source>Could not create backup file. Continue?</source>
         <translation>Konnte Sicherungskopie-Datei nicht erzeugen. Fortfahren?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="756"/>
+        <location filename="../rbutilqt.cpp" line="763"/>
         <source>Manual steps required</source>
         <translation>Manuelle Schritte erforderlich</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="953"/>
+        <location filename="../rbutilqt.cpp" line="962"/>
         <source>No uninstall method known.</source>
         <translation>Keine Deinstallationsmethode bekannt.</translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="363"/>
+        <source>Do you really want to perform a complete installation?
+
+This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
+        <translation>Wirklich eine vollständige Installation durchführen?
+
+Dies installiert Rockbox %1. Um die letzte Entwicklerversion zu installieren &quot;Abbrechen&quot; wählen und den Reiter &quot;Installation&quot; verwenden.</translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="421"/>
+        <source>Do you really want to perform a minimal installation? A minimal installation will contain only the absolutely necessary parts to run Rockbox.
+
+This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
+        <translation>Wirklich eine Minimalinstallation durchführen? Eine Minimalinstallation enthält nur die Teile die zum Verwenden von Rockbox absolut notwendig sind.Dies installiert Rockbox %1. Um die letzte Entwicklerversion zu installieren &quot;Abbrechen&quot; wählen und den Reiter &quot;Installation&quot; verwenden.</translation>
     </message>
 </context>
 <context>
@@ -1863,7 +1880,7 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../rbutilqtfrm.ui" line="172"/>
         <source>Small Installation</source>
-        <translation>Kleine Installation</translation>
+        <translation type="obsolete">Kleine Installation</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="811"/>
@@ -1913,7 +1930,7 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../rbutilqtfrm.ui" line="188"/>
         <source>&lt;b&gt;Small installation&lt;/b&gt;&lt;br/&gt;This installs bootloader and the current build of Rockbox. If you don&apos;t want the extras package, choose this option.</source>
-        <translation type="unfinished">&lt;b&gt;Kleine Installationn&lt;/b&gt;&lt;br/&gt; Dies installiert den Bootloader und ein aktuellen Build von Rockbox. Diese Option benutzen wenn die Extra-Pakete nicht benötigt werden.</translation>
+        <translation type="obsolete">&lt;b&gt;Kleine Installationn&lt;/b&gt;&lt;br/&gt; Dies installiert den Bootloader und ein aktuellen Build von Rockbox. Diese Option benutzen wenn die Extra-Pakete nicht benötigt werden.</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="253"/>
@@ -1979,7 +1996,7 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../rbutilqtfrm.ui" line="917"/>
         <source>&amp;Small Installation</source>
-        <translation>&amp;Kleine Installation</translation>
+        <translation type="obsolete">&amp;Kleine Installation</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="925"/>
@@ -2045,6 +2062,21 @@ Press &quot;No&quot; to skip this step.</source>
         <location filename="../rbutilqtfrm.ui" line="97"/>
         <source>device / mountpoint unknown or invalid</source>
         <translation>Gerär / Einhängepunkt unbekannt oder ungültig</translation>
+    </message>
+    <message>
+        <location filename="../rbutilqtfrm.ui" line="172"/>
+        <source>Minimal Installation</source>
+        <translation>Minimale Installation</translation>
+    </message>
+    <message>
+        <location filename="../rbutilqtfrm.ui" line="188"/>
+        <source>&lt;b&gt;Minimal installation&lt;/b&gt;&lt;br/&gt;This installs bootloader and the current build of Rockbox. If you don&apos;t want the extras package, choose this option.</source>
+        <translation>&lt;b&gt;Minimale Installation&lt;/b&gt;&lt;br/&gt;Dies installiert Bootloader und die aktuelle Version von Rockbox. Diese Option verwenden wenn keine Zusatzpakete gewünscht werden.</translation>
+    </message>
+    <message>
+        <location filename="../rbutilqtfrm.ui" line="917"/>
+        <source>&amp;Minimal Installation</source>
+        <translation>&amp;Minimale Installation</translation>
     </message>
 </context>
 <context>
