@@ -276,7 +276,7 @@
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="240"/>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Άγνωστο</translation>
     </message>
 </context>
 <context>
@@ -377,32 +377,32 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="59"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="65"/>
         <source>Bootloader successful installed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="71"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="77"/>
         <source>Checking for Rockbox bootloader</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="73"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="79"/>
         <source>No Rockbox bootloader found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="78"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="84"/>
         <source>Checking for original firmware file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="83"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="89"/>
         <source>Error finding original firmware file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="94"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="100"/>
         <source>Rockbox bootloader successful removed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -647,122 +647,122 @@ Select your device and Mountpoint manually.</source>
         <translation>Παραμετροποίηση Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="38"/>
+        <location filename="../configurefrm.ui" line="30"/>
         <source>&amp;Device</source>
         <translation>&amp;Συσκευή</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="48"/>
+        <location filename="../configurefrm.ui" line="40"/>
         <source>Select your device in the &amp;filesystem</source>
         <translation>Επιλέξτε τη συσκευή σας στο &amp;σύστημα αρχείων</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="324"/>
+        <location filename="../configurefrm.ui" line="288"/>
         <source>&amp;Browse</source>
         <translation>Ανα&amp;ζήτηση</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="76"/>
+        <location filename="../configurefrm.ui" line="71"/>
         <source>&amp;Select your audio player</source>
         <translation>Επιλέξτε τη συσκευή ψηφιακού &amp;ήχου που έχετε</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="87"/>
+        <location filename="../configurefrm.ui" line="82"/>
         <source>1</source>
         <translation>1</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="108"/>
+        <location filename="../configurefrm.ui" line="90"/>
         <source>&amp;Autodetect</source>
         <translation>&amp;Αυτόματος εντοπισμός</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="128"/>
+        <location filename="../configurefrm.ui" line="108"/>
         <source>&amp;Proxy</source>
         <translation>&amp;Διαμεσολαβητής</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="138"/>
+        <location filename="../configurefrm.ui" line="118"/>
         <source>&amp;No Proxy</source>
         <translation>&amp;Χωρίς διαμεσολαβητή</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="148"/>
+        <location filename="../configurefrm.ui" line="128"/>
         <source>Use S&amp;ystem values</source>
         <translation>Χρήση επιλογών &amp;συστήματος</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="155"/>
+        <location filename="../configurefrm.ui" line="135"/>
         <source>&amp;Manual Proxy settings</source>
         <translation>Χειροκίνητη &amp;ρύθμιση διαμεσολαβητή</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="162"/>
+        <location filename="../configurefrm.ui" line="142"/>
         <source>Proxy Values</source>
         <translation>Τιμές διαμεσολαβητή</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="168"/>
+        <location filename="../configurefrm.ui" line="148"/>
         <source>&amp;Host:</source>
         <translation>&amp;Ξενιστής:</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="185"/>
+        <location filename="../configurefrm.ui" line="165"/>
         <source>&amp;Port:</source>
         <translation>&amp;Θύρα:</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="208"/>
+        <location filename="../configurefrm.ui" line="188"/>
         <source>&amp;Username</source>
         <translation>Ό&amp;νομα χρήστη</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="218"/>
+        <location filename="../configurefrm.ui" line="198"/>
         <source>Pass&amp;word</source>
         <translation>Κ&amp;ωδικός</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="253"/>
+        <location filename="../configurefrm.ui" line="225"/>
         <source>&amp;Language</source>
         <translation>&amp;Γλώσσα</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="275"/>
+        <location filename="../configurefrm.ui" line="239"/>
         <source>Cac&amp;he</source>
         <translation>&amp;Προσωρινή μνήμη</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="282"/>
+        <location filename="../configurefrm.ui" line="246"/>
         <source>Download cache settings</source>
         <translation>Ρυθμίσεις προσωρινής μνήμης λήψεων</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="288"/>
+        <location filename="../configurefrm.ui" line="252"/>
         <source>Rockbox Utility uses a local download cache to save network traffic. You can change the path to the cache and use it as local repository by enabling Offline mode.</source>
         <translation>Το Rockbox Utility χρησιμοποιεί μια τοπική προσωρινή μνήμη λήψεων για οικονομία των δικτυακών πόρων. Μπορείτε να αλλάξετε τη διαδρομή  σε αυτήν της προσωρινής μνήμης και να τη χρησιμοποιήσετε ως τοπικό αποθετήριο, ενεργοποιώντας την επιλογή Εργασία χωρίς σύνδεση.</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="298"/>
+        <location filename="../configurefrm.ui" line="262"/>
         <source>Current cache size is %1</source>
         <translation>Το μέγεθος της τρέχουσας προσωρινής μνήμης είναι %1</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="307"/>
+        <location filename="../configurefrm.ui" line="271"/>
         <source>P&amp;ath</source>
         <translation>&amp;Διαδρομή</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="317"/>
+        <location filename="../configurefrm.ui" line="281"/>
         <source>Entering an invalid folder will reset the path to the systems temporary path.</source>
         <translation>Χρησιμοποιώντας ένα μη έγκυρο φάκελο θα επαναφέρει τη διαδρομή στον προσωρινό φάκελο του συστήματος.</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="339"/>
+        <location filename="../configurefrm.ui" line="303"/>
         <source>Disable local &amp;download cache</source>
         <translation>&amp;Απενεργοποίηση της τοπικής προσωρινής μνήμης λήψεων</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="346"/>
+        <location filename="../configurefrm.ui" line="310"/>
         <source>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</source>
         <translation>Αυτή η επιλογή προσπαθεί να χρησιμοποιήσει όλες τις πληροφορίες από την προσωρινή μνήμη, ακόμα και αν πρόκειται για ενημερώσεις.
 Χρησιμοποιήστε αυτήν την επιλογή μόνο εάν θέλετε να κάνετε εγκατάσταση χωρίς σύνδεση δικτύου.
@@ -770,67 +770,67 @@ Select your device and Mountpoint manually.</source>
 έτσι ώστε η προσωρινή μνήμη να έχει λάβει τα απαραίτητα αρχεία.</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="349"/>
+        <location filename="../configurefrm.ui" line="313"/>
         <source>O&amp;ffline mode</source>
         <translation>&amp;Εργασία χωρίς σύνδεση</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="384"/>
+        <location filename="../configurefrm.ui" line="348"/>
         <source>Clean cache &amp;now</source>
         <translation>&amp;Καθαρισμός προσωρινής μνήμης</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="404"/>
+        <location filename="../configurefrm.ui" line="360"/>
         <source>&amp;TTS &amp;&amp; Encoder</source>
         <translation>&amp;Μηχανή TTS &amp;&amp; κωδικοποιητής</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="414"/>
+        <location filename="../configurefrm.ui" line="370"/>
         <source>TTS Engine</source>
         <translation>Μηχανή TTS</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="420"/>
+        <location filename="../configurefrm.ui" line="376"/>
         <source>&amp;Select TTS Engine</source>
         <translation>&amp;Επιλέξτε μηχανή TTS</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="433"/>
+        <location filename="../configurefrm.ui" line="389"/>
         <source>Configure TTS Engine</source>
         <translation>Παραμετροποίηση μηχανής TTS</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="477"/>
+        <location filename="../configurefrm.ui" line="433"/>
         <source>Configuration invalid!</source>
         <translation>Μη επιτρεπτές ρυθμίσεις!</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="457"/>
+        <location filename="../configurefrm.ui" line="413"/>
         <source>Configure &amp;TTS</source>
         <translation>Παραμετροποίηση &amp;TTS</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="471"/>
+        <location filename="../configurefrm.ui" line="427"/>
         <source>Encoder Engine</source>
         <translation>Μηχανή κωδικοποιητή</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="494"/>
+        <location filename="../configurefrm.ui" line="450"/>
         <source>Configure &amp;Enc</source>
         <translation>Παραμετροποίηση κ&amp;ωδικοποιητή</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="505"/>
+        <location filename="../configurefrm.ui" line="461"/>
         <source>encoder name</source>
         <translation>Όνομα κωδικοποιητή</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="545"/>
+        <location filename="../configurefrm.ui" line="501"/>
         <source>&amp;Ok</source>
         <translation>&amp;ΟΚ</translation>
     </message>
     <message>
-        <location filename="../configurefrm.ui" line="556"/>
+        <location filename="../configurefrm.ui" line="512"/>
         <source>&amp;Cancel</source>
         <translation>Ά&amp;κυρο</translation>
     </message>
@@ -976,37 +976,37 @@ Select your device and Mountpoint manually.</source>
         <translation>Αποτυχία αντίγραφου ασφαλείας!</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="222"/>
+        <location filename="../install.cpp" line="221"/>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
         <translation>Αυτή είναι η απόλυτα ενημερωμένη, μέχρι λεπτού έκδοση Rockbox.  Η τωρινή έκδοση θα ενημερώνεται κάθε φορά που γίνεται κάποια αλλαγή. Η  τελευταία έκδοση είναι r%1 (%2).</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="226"/>
+        <location filename="../install.cpp" line="225"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Σημείωση:&lt;/b&gt; Αυτή η επιλογή θα κάνει πάντα λήψη ενός νέου αντίγραφου. &lt;b&gt;Αυτή είναι η συνιστούσα έκδοση.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="229"/>
+        <location filename="../install.cpp" line="228"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy.</source>
         <translation>&lt;b&gt;Σημείωση:&lt;/b&gt; Αυτή η επιλογή θα κάνει πάντα λήψη ενός νέου αντίγραφου.</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="238"/>
+        <location filename="../install.cpp" line="237"/>
         <source>This is the last released version of Rockbox.</source>
         <translation>Αυτή είναι η τελευταία &lt;b&gt;επίσημη&lt;/b&gt; έκδοση του Rockbox.</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="244"/>
+        <location filename="../install.cpp" line="243"/>
         <source>&lt;b&gt;Note:&lt;/b&gt;The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Σημείωση:&lt;/b&gt;Η τελευταία &lt;b&gt;επίσημη&lt;/b&gt; έκδοση είναι %1. &lt;b&gt;Αυτή είναι η συνιστούσα &lt;b&gt;επίσημη&lt;/b&gt; έκδοση.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="256"/>
+        <location filename="../install.cpp" line="255"/>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
         <translation>Αυτές οι εκδόσεις δημιουργούνται καθημερινά από τον τρέχων πηγαίο κώδικα. Συνήθως εμπεριέχουν περισσότερα χαρακτηριστικά από ότι η τελευταία &lt;b&gt;επίσημη&lt;/b&gt; έκδοση αλλά ίσως είναι περισσότερο ασταθείς. Τα χαρακτηριστικά μπορεί να αλλάζουν τακτικά.</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="258"/>
+        <location filename="../install.cpp" line="257"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
         <translation>&lt;b&gt;Σημείωση:&lt;/b&gt; Η καθημερινή έκδοση είναι r%1 (%2).</translation>
     </message>
@@ -1360,7 +1360,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <translation>Αυτή είναι μια καινούργια εγκατάσταση του Rockbox Utility ή πρόκειται για μια νέα έκδοση. Το παράθυρο ρυθμίσεων θα εμφανισθεί τώρα για να σας επιτρέψει να παραμετροποιήσετε το πρόγραμμα ή να δείτε ξανά τις ρυθμίσεις σας. </translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1152"/>
+        <location filename="../rbutilqt.cpp" line="1162"/>
         <source>Configuration error</source>
         <translation>Σφάλμα ρυθμίσεων</translation>
     </message>
@@ -1400,32 +1400,32 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Περίληψη εγχειριδίου&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="843"/>
+        <location filename="../rbutilqt.cpp" line="852"/>
         <source>Confirm Installation</source>
         <translation>Επαλήθευση εγκατάστασης</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1041"/>
+        <location filename="../rbutilqt.cpp" line="1050"/>
         <source>Mount point is wrong!</source>
         <translation>Το σημείο προσάρτησης είναι λάθος!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="509"/>
+        <location filename="../rbutilqt.cpp" line="508"/>
         <source>Aborted!</source>
         <translation>Ματαιώθηκε!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="518"/>
+        <location filename="../rbutilqt.cpp" line="517"/>
         <source>Installed Rockbox detected</source>
         <translation>Εντοπίστηκε εγκατάσταη Rockbox</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="519"/>
+        <location filename="../rbutilqt.cpp" line="518"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
         <translation>Εντοπίστηκε εγκατάσταση του Rockbox. Θέλετε ένα αντίγραφο ασφαλείας πρώτα;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="522"/>
+        <location filename="../rbutilqt.cpp" line="521"/>
         <source>Starting backup...</source>
         <translation>Έναρξη αντίγραφου ασφαλείας...</translation>
     </message>
@@ -1445,97 +1445,97 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <translation>Θέλετε σίγουρα να εγκαταστήσετε το bootloader;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="766"/>
+        <location filename="../rbutilqt.cpp" line="773"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>Θέλετε σίγουρα να εγκαταστήσετε το πακέτο γραμματοσειρών;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="804"/>
+        <location filename="../rbutilqt.cpp" line="811"/>
         <source>Warning</source>
         <translation>Προσοχη</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="805"/>
+        <location filename="../rbutilqt.cpp" line="813"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
         <translation>Η εφαρμογή λαμβάνει ακόμα πληροφορίες για καινούργιες εκδόσεις. Παρακαλώ προσπαθήστε ξανά σύντομα.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="810"/>
+        <location filename="../rbutilqt.cpp" line="818"/>
         <source>Do you really want to install the voice file?</source>
         <translation>Θέλετε σίγουρα να εγκαταστήσετε το αρχείο φωνής;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="839"/>
+        <location filename="../rbutilqt.cpp" line="847"/>
         <source>Error</source>
         <translation>Σφάλμα</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="839"/>
+        <location filename="../rbutilqt.cpp" line="848"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>Η συσκευή σας δεν διαθέτει το plugin doom. Ματαίωση.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="844"/>
+        <location filename="../rbutilqt.cpp" line="853"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>Θέλετε σίγουρα να εγκαταστήσετε τα αρχεία πρόσθετων παιχνιδιών;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="924"/>
+        <location filename="../rbutilqt.cpp" line="933"/>
         <source>Confirm Uninstallation</source>
         <translation>Επαλήθευση απεγκατάστασης</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="925"/>
+        <location filename="../rbutilqt.cpp" line="934"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>Θέλετε σίγουρα να απεγκαταστήσετε το bootloader;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="982"/>
+        <location filename="../rbutilqt.cpp" line="991"/>
         <source>Confirm download</source>
         <translation>Επαλήθευση λήψης</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="984"/>
+        <location filename="../rbutilqt.cpp" line="993"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>Θέλετε σιγουρα να λάβετε το εγχειρίδιο; Το εγχειρίδιο θα αποθηκευθεί στον αρχικό φάκλεο της συσκευής σας.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1027"/>
+        <location filename="../rbutilqt.cpp" line="1036"/>
         <source>Confirm installation</source>
         <translation>Επαλήθευση εγκατάστασης</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1029"/>
+        <location filename="../rbutilqt.cpp" line="1038"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Θέλετε σίγουρα να εγκαταστήσετε το Rockbox Utility στη συσκευή σας; Μετά την εγκατάσταση θα μπορείτε να το τρέξετε από το σκληρό δίσκο της συσκευής σας.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1037"/>
+        <location filename="../rbutilqt.cpp" line="1046"/>
         <source>Installing Rockbox Utility</source>
         <translation>Εγκατάσταση Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1051"/>
+        <location filename="../rbutilqt.cpp" line="1061"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Σφάλμα εγκατάστασης Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1055"/>
+        <location filename="../rbutilqt.cpp" line="1065"/>
         <source>Installing user configuration</source>
         <translation>Εγκατάσταση ρυθμίσεων χρήστη</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1057"/>
+        <location filename="../rbutilqt.cpp" line="1068"/>
         <source>Error installing user configuration</source>
         <translation>Σφάλμα εγκατάστασης ρυθμίσεων χρήστη</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1061"/>
+        <location filename="../rbutilqt.cpp" line="1072"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Επιτυχία εγκατάστασης Rockbox Utility.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1154"/>
+        <location filename="../rbutilqt.cpp" line="1164"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Οι ρυθμίσεις σας δεν είναι έγκυρες. Παρακαλώ δείτε το παράθυρο ρυθμίσεων και σιγουρευτείτε ότι οι επιλεγμένες τιμές είναι σωστές.</translation>
     </message>
@@ -1550,17 +1550,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="361"/>
-        <source>Do you really want to make a complete Installation? This will install the latest build available, not the latest released version.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../rbutilqt.cpp" line="415"/>
-        <source>Do you really want to make a small Installation? This will install the latest build available, not the latest released version.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../rbutilqt.cpp" line="506"/>
+        <location filename="../rbutilqt.cpp" line="505"/>
         <source>Really continue?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1580,59 +1570,73 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="667"/>
+        <location filename="../rbutilqt.cpp" line="674"/>
         <source>Create Bootloader backup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="672"/>
+        <location filename="../rbutilqt.cpp" line="679"/>
         <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
 Press &quot;No&quot; to skip this step.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="674"/>
+        <location filename="../rbutilqt.cpp" line="681"/>
         <source>Browse backup folder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="687"/>
+        <location filename="../rbutilqt.cpp" line="694"/>
         <source>Prerequisites</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="697"/>
+        <location filename="../rbutilqt.cpp" line="704"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (hex file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="706"/>
+        <location filename="../rbutilqt.cpp" line="713"/>
         <source>Select firmware file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="708"/>
+        <location filename="../rbutilqt.cpp" line="715"/>
         <source>Error opening firmware file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="726"/>
+        <location filename="../rbutilqt.cpp" line="733"/>
         <source>Backup error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="727"/>
+        <location filename="../rbutilqt.cpp" line="734"/>
         <source>Could not create backup file. Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="756"/>
+        <location filename="../rbutilqt.cpp" line="763"/>
         <source>Manual steps required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="953"/>
+        <location filename="../rbutilqt.cpp" line="962"/>
         <source>No uninstall method known.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="363"/>
+        <source>Do you really want to perform a complete installation?
+
+This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="421"/>
+        <source>Do you really want to perform a minimal installation? A minimal installation will contain only the absolutely necessary parts to run Rockbox.
+
+This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1686,12 +1690,12 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../rbutilqtfrm.ui" line="172"/>
         <source>Small Installation</source>
-        <translation>Μικρή εγκατάσταση</translation>
+        <translation type="obsolete">Μικρή εγκατάσταση</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="188"/>
         <source>&lt;b&gt;Small installation&lt;/b&gt;&lt;br/&gt;This installs bootloader and the current build of Rockbox. If you don&apos;t want the extras package, choose this option.</source>
-        <translation>&lt;b&gt;Μικρή εγκατάσταση&lt;/b&gt;&lt;br/&gt;Εγκαθιστά το bootloader και μία τρέχουσα έκδοση του Rockbox. Εάν δεν θέλετε τα έξτρα, επιλέξτε αυτήν τη μέθοδο.</translation>
+        <translation type="obsolete">&lt;b&gt;Μικρή εγκατάσταση&lt;/b&gt;&lt;br/&gt;Εγκαθιστά το bootloader και μία τρέχουσα έκδοση του Rockbox. Εάν δεν θέλετε τα έξτρα, επιλέξτε αυτήν τη μέθοδο.</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="815"/>
@@ -1958,7 +1962,7 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../rbutilqtfrm.ui" line="917"/>
         <source>&amp;Small Installation</source>
-        <translation>&amp;Μικρή εγκατάσταση</translation>
+        <translation type="obsolete">&amp;Μικρή εγκατάσταση</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="925"/>
@@ -2039,6 +2043,21 @@ Press &quot;No&quot; to skip this step.</source>
         <location filename="../rbutilqtfrm.ui" line="1025"/>
         <source>&amp;System Info</source>
         <translation>Πληροφορίες &amp;συστήματος</translation>
+    </message>
+    <message>
+        <location filename="../rbutilqtfrm.ui" line="172"/>
+        <source>Minimal Installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqtfrm.ui" line="188"/>
+        <source>&lt;b&gt;Minimal installation&lt;/b&gt;&lt;br/&gt;This installs bootloader and the current build of Rockbox. If you don&apos;t want the extras package, choose this option.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqtfrm.ui" line="917"/>
+        <source>&amp;Minimal Installation</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="de">
-<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstallBase</name>
     <message>
@@ -961,37 +960,37 @@ Das Gerät muss für die Installation in den UMS-Modus umgestellt werden.</trans
         <translation>Falscher Einhängepunkt!</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="226"/>
+        <location filename="../install.cpp" line="225"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Hinweis:&lt;/b&gt; Dies lädt immer eine aktuelle Kopie herunter. &lt;b&gt;Dies ist die empfohlene Version.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="229"/>
+        <location filename="../install.cpp" line="228"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy.</source>
         <translation>&lt;b&gt;Hinweis:&lt;/b&gt; Dies lädt immer eine aktuelle Kopie herunter. </translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="238"/>
+        <location filename="../install.cpp" line="237"/>
         <source>This is the last released version of Rockbox.</source>
         <translation>Dies ist die letzte veröffentlichte Version von Rockbox.</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="244"/>
+        <location filename="../install.cpp" line="243"/>
         <source>&lt;b&gt;Note:&lt;/b&gt;The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Hinweis:&lt;/b&gt; Die letzte veröffentlichte Version ist %1. &lt;b&gt;Dies ist die empfohlene Version.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="222"/>
+        <location filename="../install.cpp" line="221"/>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
         <translation type="unfinished">Dies ist das aktuellste Rockbox build. Es wird bei jeder Änderung aktualisiert. Letzte Version ist r%1 (%2).</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="258"/>
+        <location filename="../install.cpp" line="257"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
         <translation>&lt;b&gt;Hinweis:&lt;/b&gt; Archivierte Version ist r%1 (%2).</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="256"/>
+        <location filename="../install.cpp" line="255"/>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
         <translation type="unfinished">Diese Builds werden jeden Tag automatisch aus dem aktuellen Source Code gebaut. Sie haben meist mehr Features als das letzte stabile Release, können aber weniger stabil sein. Features können sich regelmäßig ändern.</translation>
     </message>
