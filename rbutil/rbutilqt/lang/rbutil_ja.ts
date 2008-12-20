@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ja_JP">
+<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstallBase</name>
     <message>
@@ -70,7 +71,7 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="172"/>
         <source>&lt;li&gt;Unplug USB and power adaptors&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to turn the player off&lt;/li&gt;&lt;li&gt;Toggle the battery switch on the player&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to boot into Rockbox&lt;/li&gt;</source>
-        <translation>&lt;li&gt;USBおよび充電器から取り外して下さい&lt;/li&gt;&lt;li&gt;プレイヤーの電源を落として下さい&lt;/li&gt;&lt;li&gt;電源スイッチを切り替えて下さい&lt;/li&gt;&lt;li&gt;電源スイッチを入れ、Rockboxを機動して下さい&lt;/li&gt;</translation>
+        <translation>&lt;li&gt;USBおよび充電器から取り外して下さい&lt;/li&gt;&lt;li&gt;プレイヤーの電源を落として下さい&lt;/li&gt;&lt;li&gt;電源スイッチを切り替えて下さい&lt;/li&gt;&lt;li&gt;電源スイッチを入れ、Rockboxを起動して下さい&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="177"/>
@@ -98,7 +99,7 @@
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="88"/>
         <source>Bootloader successful installed</source>
-        <translation>ブートローダのインストールに成功しました</translation>
+        <translation>ブートローダのインストールが成功しました</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="98"/>
@@ -221,17 +222,17 @@
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="191"/>
         <source>Checking modified firmware file</source>
-        <translation>変更されたファームウェアファイルをチェックしています</translation>
+        <translation>変更されたファームウェアをチェックしています</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="193"/>
         <source>Error: modified file checksum wrong</source>
-        <translation>エラー: 変更されたファームウェアファイルのチェックサムの値が間違っています</translation>
+        <translation>エラー: 変更されたファームウェアのチェックサムの値が間違っています</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="201"/>
         <source>Success: modified firmware file created</source>
-        <translation>成功: 変更されたファームウェアファイルが作成されました</translation>
+        <translation>成功: 変更されたファームウェアが作成されました</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="232"/>
@@ -358,7 +359,7 @@ http://www.rockbox.org/wiki/IpodConversionToFAT32 を参照して下さい</tran
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="173"/>
         <source>Successfully removed bootloader</source>
-        <translation>ブートローダを正常に削除しました</translation>
+        <translation>ブートローダの削除が成功しました</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="180"/>
@@ -381,7 +382,7 @@ http://www.rockbox.org/wiki/IpodConversionToFAT32 を参照して下さい</tran
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="65"/>
         <source>Bootloader successful installed</source>
-        <translation>ブートローダのインストールに成功しました</translation>
+        <translation>ブートローダのインストールが成功しました</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="77"/>
@@ -396,7 +397,7 @@ http://www.rockbox.org/wiki/IpodConversionToFAT32 を参照して下さい</tran
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="84"/>
         <source>Checking for original firmware file</source>
-        <translation>オリジナルのファームウェアファイルをチェックしています</translation>
+        <translation>オリジナルのファームウェアをチェックしています</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmi4.cpp" line="89"/>
@@ -436,7 +437,7 @@ This is required to install the bootloader</source>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="70"/>
         <source>Downloading bootloader file</source>
-        <translation>ブートローダファイルをダウンロードしています</translation>
+        <translation>ブートローダをダウンロードしています</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="86"/>
@@ -460,7 +461,7 @@ You must reinstall the original Sansa firmware before running
 sansapatcher for the first time.
 See http://www.rockbox.org/wiki/SansaE200Install
 </source>
-        <translation>古い Rockbox がインストールされています。処理を中止します。
+        <translation>&lt;b&gt;古い Rockbox がインストールされていますので、処理を中止します。&lt;/b&gt;
 sansapatcher を最初に実行する前に、Sansa のオリジナル
 ファームウェアをインストールしなければいけません。
 http://www.rockbox.org/wiki/SansaE200Install を参照して下さい
@@ -545,7 +546,7 @@ http://www.rockbox.org/wiki/SansaE200Install を参照して下さい
     <message>
         <location filename="../configure.cpp" line="115"/>
         <source>You need to restart the application for the changed language to take effect.</source>
-        <translation>表示言語を変更するには、Rockbox ユーティリティを再起動する必要があります。</translation>
+        <translation>表示言語を変更するには、Rockbox Utilityを再起動する必要があります。</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="230"/>
@@ -628,7 +629,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../configure.cpp" line="599"/>
         <source>Do you really want to delete the cache? Make absolutely sure this setting is correct as it will remove &lt;b&gt;all&lt;/b&gt; files in this folder!</source>
-        <translation>本当にキャッシュを削除しますか？ このフォルダに含まれる&lt;b&gt;すべての&lt;/b&gt;ファイルを削除しますので、絶対に正しい値に設定して下さい!</translation>
+        <translation>本当にキャッシュを削除しますか?  このフォルダに含まれる&lt;b&gt;全ての&lt;/b&gt;ファイルを削除しますので、絶対に正しい値を設定して下さい!</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="605"/>
@@ -651,7 +652,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../configurefrm.ui" line="19"/>
         <source>Configure Rockbox Utility</source>
-        <translation>Rockbox ユーティリティの設定</translation>
+        <translation>Rockbox Utilityの設定</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="30"/>
@@ -746,7 +747,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../configurefrm.ui" line="252"/>
         <source>Rockbox Utility uses a local download cache to save network traffic. You can change the path to the cache and use it as local repository by enabling Offline mode.</source>
-        <translation>Rockbox ユーティリティは、ネットワークトラフィックを節約するためにローカルにあるダウンロードキャッシュを使用します。 オフラインモードを有効にすることにより、パスをキャッシュディレクトリに変えて、ローカルにあるリポジトリを使用します。</translation>
+        <translation>Rockbox Utilityは、ネットワークのトラフィックを節約するために、ダウンロードしたファイルをローカルにキャッシュします。 キャッシュの場所を変更することができます。オフラインモードが有効であれば、選択されたキャッシュフォルダを使用します。</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="262"/>
@@ -761,7 +762,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../configurefrm.ui" line="281"/>
         <source>Entering an invalid folder will reset the path to the systems temporary path.</source>
-        <translation>無効のフォルダーが入力すると、パスの値はシステムのテンポラリパスに設定されるでしょう。</translation>
+        <translation>無効なフォルダを入力しますと、パスの値はシステムのテンポラリパスに設定されます。</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="303"/>
@@ -771,7 +772,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../configurefrm.ui" line="310"/>
         <source>This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.</source>
-        <translation>これはキャッシュからのすべての情報、アップデートの情報さえ使用しようとするでしょう。 ネットワーク接続なしでインストールしたいなら、単にこのオプションを使用してください。 以下に注意してください。キャッシュを使用した場合に、最初のダウンロードで必須となるファイルのすべてが、再インストール時でも必要になるため、ネットワークアクセスが必要になります。</translation>
+        <translation>これはキャッシュから、全ての情報、アップデート情報さえ使用するでしょう。 ネットワークに接続しないでインストールしたいのであれば、このオプションを使用して下さい。 注意: 後で実行されるインストールに必要なファイル全てをキャッシュにダウンロードするために、最初は、ネットワークがつながる環境で実行する必要があります。</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="313"/>
@@ -997,7 +998,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../install.cpp" line="237"/>
         <source>This is the last released version of Rockbox.</source>
-        <translation>これは、最新リリース版の Rockboxです。</translation>
+        <translation>これは、最新のリリース版のRockboxです。</translation>
     </message>
     <message>
         <location filename="../install.cpp" line="243"/>
@@ -1030,7 +1031,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../installfrm.ui" line="35"/>
         <source>Please select the Rockbox version you want to install on your player:</source>
-        <translation>プレーヤーにインストールしたいRockboxのバージョンを選択してください:</translation>
+        <translation>プレイヤーにインストールしたいRockboxのバージョンを選択して下さい:</translation>
     </message>
     <message>
         <location filename="../installfrm.ui" line="45"/>
@@ -1100,7 +1101,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../installfrm.ui" line="221"/>
         <source>Rockbox Utility stores copies of Rockbox it has downloaded on the local hard disk to save network traffic. If your local copy is no longer working, tick this box to download a fresh copy.</source>
-        <translation>Rockbox ユーティリティは、ネットワークトラフィックを節約するために、ローカルのハードディスクにダウンロードしたRockboxのコピーを保存します。 ローカルにあるコピーがもう動作していないのであれば、チェックボックスにチェックをして、最新のファイルをダウンロードしてください。</translation>
+        <translation>Rockbox Utilityは、ネットワークのトラフィックを節約するために、ダウンロードしたファイルをローカルのハードディスクに保存します。 既に、ローカルに保存されているファイルで Rockboxを動かしていないのであれば、チェックボックスにチェックをして、最新のファイルをダウンロードして下さい。</translation>
     </message>
     <message>
         <location filename="../installfrm.ui" line="224"/>
@@ -1196,7 +1197,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../installtalkwindow.cpp" line="86"/>
         <source>The Folder to Talk is wrong!</source>
-        <translation>トークフォルダが間違っています!</translation>
+        <translation>トークファイルを置くフォルダが間違っています!</translation>
     </message>
     <message>
         <location filename="../installtalkwindow.cpp" line="126"/>
@@ -1292,7 +1293,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../base/detect.cpp" line="436"/>
         <source>Problem detected:</source>
-        <translation>問題が検出されました:</translation>
+        <translation>問題が見つかりました:</translation>
     </message>
 </context>
 <context>
@@ -1363,7 +1364,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="192"/>
         <source>This is a new installation of Rockbox Utility, or a new version. The configuration dialog will now open to allow you to setup the program,  or review your settings.</source>
-        <translation>Rockbox ユーティリティを新規、または、新しいバージョンをインストールします。プログラムのセットアップを許可したり、または、設定を見直すために、設定ダイアログが表示されます。</translation>
+        <translation>Rockbox Utilityを新規、または、新しいバージョンをインストールします。プログラムのセットアップを許可したり、または、設定を見直すために、設定ダイアログが表示されることがあります。</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1162"/>
@@ -1398,7 +1399,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="348"/>
         <source>Select a device for a link to the correct manual</source>
-        <translation>正しいマニュアルへのリンクにデバイスを選択してください</translation>
+        <translation>正しいマニュアルへのリンクを指定するため、デバイスを選択して下さい</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="350"/>
@@ -1463,7 +1464,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="813"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
-        <translation>そのアプリケーションは、新規ビルドに対する情報をまだダウンロードしています。もう少ししましたら、再度行って下さい。</translation>
+        <translation>そのアプリケーションは、新規ビルドに対する情報をまだダウンロードしています。もう少し経ちましたら、再度行って下さい。</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="818"/>
@@ -1483,7 +1484,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="853"/>
         <source>Do you really want to install the game addon files?</source>
-        <translation>ゲームのアドオンファイルのインストールを本当に行いますか?</translation>
+        <translation>ゲームのアドオンを本当にインストールしますか?</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="933"/>
@@ -1513,17 +1514,17 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="1038"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
-        <translation>Rockbox ユーティリティをプレイヤーにインストールしてもいいですか? インストール後、プレイヤーのハードディスクから実行して下さい。</translation>
+        <translation>Rockbox Utilityをプレイヤーにインストールしてもいいですか? インストール後、プレイヤーのハードディスクから実行して下さい。</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1046"/>
         <source>Installing Rockbox Utility</source>
-        <translation>Rockbox ユーティリティをインストールしています</translation>
+        <translation>Rockbox Utilityをインストールしています</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1061"/>
         <source>Error installing Rockbox Utility</source>
-        <translation>Rockbox ユーティリティのインストール中にエラーが発生しました</translation>
+        <translation>Rockbox Utilityのインストール中にエラーが発生しました</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1065"/>
@@ -1538,7 +1539,7 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <location filename="../rbutilqt.cpp" line="1072"/>
         <source>Successfully installed Rockbox Utility.</source>
-        <translation>Rockbox ユーティリティのインストールが成功しました。</translation>
+        <translation>Rockbox Utilityのインストールが成功しました。</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1164"/>
@@ -1647,14 +1648,18 @@ Press &quot;No&quot; to skip this step.</source>
         <source>Do you really want to perform a complete installation?
 
 This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>完全インストールを本当に行いますか?
+
+Rockbox %1 をインストールします。 最新の開発版をインストールするのであれば、&quot;キャンセル&quot;ボタンを押したのち、&quot;インストール&quot;タブを選択して下さい。</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="421"/>
         <source>Do you really want to perform a minimal installation? A minimal installation will contain only the absolutely necessary parts to run Rockbox.
 
 This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>最小インストールを本当に行いますか? 最小インストールは、Rockboxを実行するのに必要なものだけをインストールします。
+
+Rockbox %1 をインストールします。 最新の開発版をインストールするのであれば、&quot;キャンセル&quot;ボタンを押したのち、&quot;インストール&quot;タブを選択して下さい。</translation>
     </message>
 </context>
 <context>
@@ -1662,7 +1667,7 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <location filename="../rbutilqtfrm.ui" line="13"/>
         <source>Rockbox Utility</source>
-        <translation>Rockbox ユーティリティ</translation>
+        <translation>Rockbox Utility</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="78"/>
@@ -1702,7 +1707,7 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <location filename="../rbutilqtfrm.ui" line="159"/>
         <source>&lt;b&gt;Complete Installation&lt;/b&gt;&lt;br/&gt;This installs the bootloader, a current build and the extras package. This is the recommended method for new installations.</source>
-        <translation>&lt;b&gt;完全インストール&lt;/b&gt;&lt;br/&gt;ブートローダ・最新版のRockbox・追加パッケージをインストールします。 新規インストールする場合にお勧めです。</translation>
+        <translation>&lt;b&gt;完全インストール&lt;/b&gt;&lt;br/&gt;ブートローダ・最新版のRockbox・追加パッケージをインストールします。 新規にインストールする場合にお勧めです。</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="172"/>
@@ -1933,7 +1938,7 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <location filename="../rbutilqtfrm.ui" line="868"/>
         <source>Install Rockbox Utility on player</source>
-        <translation>Rockbox ユーティリティのインストール</translation>
+        <translation>Rockbox Utilityのインストール</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="873"/>
@@ -1953,7 +1958,7 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <location filename="../rbutilqtfrm.ui" line="886"/>
         <source>&amp;About</source>
-        <translation>Rockbox ユーティリティ について(&amp;A)</translation>
+        <translation>Rockbox Utilityについて(&amp;A)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="891"/>
@@ -2063,17 +2068,17 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <location filename="../rbutilqtfrm.ui" line="172"/>
         <source>Minimal Installation</source>
-        <translation type="unfinished"></translation>
+        <translation>最小インストール</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="188"/>
         <source>&lt;b&gt;Minimal installation&lt;/b&gt;&lt;br/&gt;This installs bootloader and the current build of Rockbox. If you don&apos;t want the extras package, choose this option.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;最小インストール&lt;/b&gt;&lt;br/&gt;ブートローダおよびRockbox の最新版をインストールします。 このオプションでは、追加パッケージはインストールされません。</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="917"/>
         <source>&amp;Minimal Installation</source>
-        <translation type="unfinished"></translation>
+        <translation>最小インストール(&amp;M)</translation>
     </message>
 </context>
 <context>
@@ -2565,7 +2570,7 @@ Please check your network and proxy settings.</source>
     <message>
         <location filename="../uninstallfrm.ui" line="78"/>
         <source>Installed Parts</source>
-        <translation>インストール部分</translation>
+        <translation>インストールしたもの</translation>
     </message>
     <message>
         <location filename="../uninstallfrm.ui" line="128"/>
@@ -2616,7 +2621,7 @@ Please check your network and proxy settings.</source>
     <message>
         <location filename="../voicefile.cpp" line="55"/>
         <source>failed to open rockbox-info.txt</source>
-        <translation>rockbox-info.txt を開くことに失敗しました</translation>
+        <translation>rockbox-info.txt が開けませんでした</translation>
     </message>
     <message>
         <location filename="../voicefile.cpp" line="116"/>
@@ -2641,7 +2646,7 @@ Please check your network and proxy settings.</source>
     <message>
         <location filename="../voicefile.cpp" line="137"/>
         <source>failed to open downloaded file</source>
-        <translation>ダウンロードしたファイルを開くことに失敗しました</translation>
+        <translation>ダウンロードしたファイルが開けませんでした</translation>
     </message>
     <message>
         <location filename="../voicefile.cpp" line="151"/>
@@ -2777,7 +2782,7 @@ Please check your network and proxy settings.</source>
     <message>
         <location filename="../installzip.cpp" line="143"/>
         <source>Opening archive failed: %1.</source>
-        <translation>圧縮ファイルを開くことに失敗しました: %1.</translation>
+        <translation>圧縮ファイルが開けませんでした: %1.</translation>
     </message>
     <message>
         <location filename="../installzip.cpp" line="166"/>
@@ -2810,12 +2815,12 @@ Please check your network and proxy settings.</source>
     <message>
         <location filename="../aboutbox.ui" line="13"/>
         <source>About Rockbox Utility</source>
-        <translation>Rockbox ユーティリティ について</translation>
+        <translation>Rockbox Utilityについて</translation>
     </message>
     <message>
         <location filename="../aboutbox.ui" line="34"/>
         <source>The Rockbox Utility</source>
-        <translation>Rockbox ユーティリティ</translation>
+        <translation>The Rockbox Utility</translation>
     </message>
     <message encoding="UTF-8">
         <location filename="../aboutbox.ui" line="56"/>
