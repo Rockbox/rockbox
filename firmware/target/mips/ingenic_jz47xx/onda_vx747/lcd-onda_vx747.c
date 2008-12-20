@@ -204,7 +204,7 @@ static void _set_lcd_clock(void)
     __cpm_stop_lcd();
     pll_div = ( REG_CPM_CPCCR & CPM_CPCCR_PCS ); /* clock source, 0:pllout/2 1: pllout */
     pll_div = pll_div ? 1 : 2 ;
-    val = ( __cpm_get_pllout()/pll_div ) / 336000000;
+    val = ( __cpm_get_pllout()/pll_div ) / __cpm_get_pclk();
     val--;
     if ( val > 0x1ff )
         val = 0x1ff; /* CPM_LPCDR is too large, set it to 0x1ff */
@@ -235,8 +235,8 @@ void lcd_set_target(short x, short y, short width, short height)
     SLCD_SEND_COMMAND(REG_RAM_VADDR_START, x); /* x_start */
     SLCD_SEND_COMMAND(REG_RAM_VADDR_END, x+width-1); /* x_end */
 #endif
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_SET, x); /* set cursor at x_start */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_SET, y); /* set cursor at y_start */
+    SLCD_SEND_COMMAND(REG_RAM_HADDR_SET, y); /* set cursor at x_start */
+    SLCD_SEND_COMMAND(REG_RAM_VADDR_SET, x); /* set cursor at y_start */
     SLCD_SET_COMMAND(REG_RW_GRAM); /* write data to GRAM */
 }
 

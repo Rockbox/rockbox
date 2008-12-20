@@ -25,9 +25,16 @@
 #include "lcd-target.h"
 #include "system.h"
 #include "kernel.h"
+#include "backlight-target.h"
+
+/*
+   Warning: code behaviour is unpredictable when threads get switched in IRQ mode!
+   So don't update the LCD in an interrupt handler!
+ */
 
 static volatile bool lcd_is_on = false;
 static struct mutex lcd_mtx;
+static struct wakeup lcd_wkup;
 
 /* LCD init */
 void lcd_init_device(void)
@@ -35,6 +42,8 @@ void lcd_init_device(void)
     lcd_init_controller();
     lcd_is_on = true;
     mutex_init(&lcd_mtx);
+    wakeup_init(&lcd_wkup);
+    system_enable_irq(DMA_IRQ(DMA_LCD_CHANNEL));
 }
 
 void lcd_enable(bool state)
@@ -55,73 +64,75 @@ bool lcd_enabled(void)
     return lcd_is_on;
 }
 
-/* Don't switch threads when in interrupt mode! */
-static inline void lcd_lock(void)
-{
-    if(LIKELY(!in_interrupt_mode()))
-        mutex_lock(&lcd_mtx);
-    else
-        while( !(REG_DMAC_DCCSR(DMA_LCD_CHANNEL) & DMAC_DCCSR_TT));
-}
-
-static inline void lcd_unlock(void)
-{
-    if(LIKELY(!in_interrupt_mode()))
-        mutex_unlock(&lcd_mtx);
-}
-
-static inline void lcd_wait(void)
-{
-    if(LIKELY(!in_interrupt_mode()))
-    {
-        while( !(REG_DMAC_DCCSR(DMA_LCD_CHANNEL) & DMAC_DCCSR_TT) )
-            yield();
-    }
-    else
-        while( !(REG_DMAC_DCCSR(DMA_LCD_CHANNEL) & DMAC_DCCSR_TT));
-}
-
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    lcd_lock();
+#if 1
+    /* This is an ugly HACK until partial LCD drawing works.. */
+    width = LCD_WIDTH;
+    height = LCD_HEIGHT;
+    x = 0;
+    y = 0;
+#endif
+
+    mutex_lock(&lcd_mtx);
     
     lcd_set_target(x, y, width, height);
     
-    REG_DMAC_DCCSR(DMA_LCD_CHANNEL) = 0;
+    dma_enable();
+    
+    REG_DMAC_DCCSR(DMA_LCD_CHANNEL) = DMAC_DCCSR_NDES;
     REG_DMAC_DRSR(DMA_LCD_CHANNEL)  = DMAC_DRSR_RS_SLCD; /* source = SLCD */
-    REG_DMAC_DSAR(DMA_LCD_CHANNEL)  = ((unsigned int)&lcd_framebuffer[y][x]) & 0x1FFFFFFF;
-    REG_DMAC_DTAR(DMA_LCD_CHANNEL)  = 0x130500B0; /* SLCD_FIFO */
+    REG_DMAC_DSAR(DMA_LCD_CHANNEL)  = PHYSADDR((unsigned long)&lcd_framebuffer[y][x]);
+    REG_DMAC_DTAR(DMA_LCD_CHANNEL)  = PHYSADDR(SLCD_FIFO);
     REG_DMAC_DTCR(DMA_LCD_CHANNEL)  = width*height;
     
     REG_DMAC_DCMD(DMA_LCD_CHANNEL)  = ( DMAC_DCMD_SAI     | DMAC_DCMD_RDIL_IGN | DMAC_DCMD_SWDH_32
                                       | DMAC_DCMD_DWDH_16 | DMAC_DCMD_DS_16BIT );
-    REG_DMAC_DCCSR(DMA_LCD_CHANNEL) = DMAC_DCCSR_NDES;
     
-    __dcache_writeback_all(); /* Size of framebuffer is way bigger than cache size;
-                                     we need to find a way to make the framebuffer uncached, so this statement can get removed. */
+    __dcache_writeback_all(); /* Size of framebuffer is way bigger than cache size.
+                                 We need to find a way to make the framebuffer uncached, so this statement can get removed. */
     
     while(REG_SLCD_STATE & SLCD_STATE_BUSY);
+    REG_SLCD_CTRL |= SLCD_CTRL_DMA_EN; /* Enable SLCD DMA support */
     
-    REG_SLCD_CTRL |= SLCD_CTRL_DMA_EN;
-    REG_DMAC_DCCSR(DMA_LCD_CHANNEL) |= DMAC_DCCSR_EN;
+    REG_DMAC_DCCSR(DMA_LCD_CHANNEL) |= DMAC_DCCSR_EN; /* Enable DMA channel */
+    REG_DMAC_DCMD(DMA_LCD_CHANNEL) |= DMAC_DCMD_TIE; /* Enable DMA interrupt */
 
-    lcd_wait();
+    wakeup_wait(&lcd_wkup, TIMEOUT_BLOCK);
     
-    REG_DMAC_DCCSR(DMA_LCD_CHANNEL) &= ~DMAC_DCCSR_EN;
+    REG_DMAC_DCCSR(DMA_LCD_CHANNEL) &= ~DMAC_DCCSR_EN; /* Disable DMA channel */
+    
+    dma_disable();
     
     while(REG_SLCD_STATE & SLCD_STATE_BUSY);
+    REG_SLCD_CTRL &= ~SLCD_CTRL_DMA_EN; /* Disable SLCD DMA support */
     
-    REG_SLCD_CTRL &= ~SLCD_CTRL_DMA_EN;
+    mutex_unlock(&lcd_mtx);
+}
+
+void DMA_CALLBACK(DMA_LCD_CHANNEL)(void)
+{
+    if (REG_DMAC_DCCSR(DMA_LCD_CHANNEL) & DMAC_DCCSR_HLT)
+        REG_DMAC_DCCSR(DMA_LCD_CHANNEL) &= ~DMAC_DCCSR_HLT;
+
+    if (REG_DMAC_DCCSR(DMA_LCD_CHANNEL) & DMAC_DCCSR_AR)
+        REG_DMAC_DCCSR(DMA_LCD_CHANNEL) &= ~DMAC_DCCSR_AR;
+
+    if (REG_DMAC_DCCSR(DMA_LCD_CHANNEL) & DMAC_DCCSR_CT)
+        REG_DMAC_DCCSR(DMA_LCD_CHANNEL) &= ~DMAC_DCCSR_CT;
+
+    if (REG_DMAC_DCCSR(DMA_LCD_CHANNEL) & DMAC_DCCSR_TT)
+        REG_DMAC_DCCSR(DMA_LCD_CHANNEL) &= ~DMAC_DCCSR_TT;
     
-    lcd_unlock();
+    wakeup_signal(&lcd_wkup);
 }
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void)
 {
-    if (!lcd_is_on)
+    if (!lcd_is_on || !backlight_enabled())
         return;
     
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);

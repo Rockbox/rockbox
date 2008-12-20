@@ -41,17 +41,12 @@ void pcm_postinit(void)
     __i2s_set_oss_sample_size(16);
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    /* TODO */
-    *count = 0;
-    return NULL;
-}
-
 void pcm_play_dma_init(void)
 {
     /* TODO */
 
+    system_enable_irq(DMA_IRQ(DMA_AIC_TX_CHANNEL));
+    
     /* Initialize default register values. */
     audiohw_init();
 }
@@ -59,11 +54,6 @@ void pcm_play_dma_init(void)
 void pcm_dma_apply_settings(void)
 {
     /* TODO */
-    
-    /*
-    __i2s_set_oss_sample_size(pcm_sampr);
-    i2s_codec_set_samplerate(pcm_sampr);
-    */
 }
 
 static void play_start_pcm(void)
@@ -72,11 +62,14 @@ static void play_start_pcm(void)
     __i2s_enable_replay();
     
     REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
+    REG_DMAC_DCMD(DMA_AIC_TX_CHANNEL)  |= DMAC_DCMD_TIE;
 }
 
 static void play_stop_pcm(void)
 {
     REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) = (REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) | DMAC_DCCSR_HLT) & ~DMAC_DCCSR_EN;
+    
+    dma_disable();
     
     __i2s_disable_transmit_dma();
     __i2s_disable_replay();
@@ -84,26 +77,44 @@ static void play_stop_pcm(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
+    dma_enable();
+    
     REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) = DMAC_DCCSR_NDES;
     REG_DMAC_DSAR(DMA_AIC_TX_CHANNEL)  = PHYSADDR((unsigned long)addr);
     REG_DMAC_DTAR(DMA_AIC_TX_CHANNEL)  = PHYSADDR((unsigned long)AIC_DR);
     REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL)  = size;
     REG_DMAC_DRSR(DMA_AIC_TX_CHANNEL)  = DMAC_DRSR_RS_AICOUT;
-    REG_DMAC_DCMD(DMA_AIC_TX_CHANNEL)  = ( DMAC_DCMD_SAI| DMAC_DCMD_SWDH_32 | DMAC_DCMD_DS_32BIT | DMAC_DCMD_DWDH_32
-                                         | DMAC_DCMD_TIE);
+    REG_DMAC_DCMD(DMA_AIC_TX_CHANNEL)  = (DMAC_DCMD_SAI| DMAC_DCMD_SWDH_32 | DMAC_DCMD_DS_32BIT | DMAC_DCMD_DWDH_32);
 
     play_start_pcm();
 }
 
 void DMA_CALLBACK(DMA_AIC_TX_CHANNEL)(void)
 {
-    if( REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_TT )
+    if (REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_AR)
+        REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) &= ~DMAC_DCCSR_AR;
+
+    if (REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_CT)
+        REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) &= ~DMAC_DCCSR_CT;
+
+    if (REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & (DMAC_DCCSR_TT | DMAC_DCCSR_HLT))
+    {
+        REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) &= ~(DMAC_DCCSR_TT | DMAC_DCCSR_HLT);
+        REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) &= ~DMAC_DCCSR_EN;
         __aic_disable_transmit_dma();
+    }
 }
 
 size_t pcm_get_bytes_waiting(void)
 {
     return REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL);
+}
+
+const void * pcm_play_dma_get_peak_buffer(int *count)
+{
+    /* TODO */
+    *count = REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL)>>2;
+    return NULL;
 }
 
 void pcm_play_dma_stop(void)

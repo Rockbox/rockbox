@@ -20,6 +20,8 @@
  ****************************************************************************/
 
 #include "config.h"
+#define LOGF_ENABLE
+#include "logf.h"
 #include "system.h"
 #include "usb_ch9.h"
 #include "usb_drv.h"
@@ -27,12 +29,6 @@
 #include "usb-target.h"
 #include "jz4740.h"
 #include "thread.h"
-
-#if 1
-#define DEBUGF printf
-#else
-#define DEBUGF(...)
-#endif
 
 #define USB_EP0_IDLE      0
 #define USB_EP0_RX        1
@@ -85,7 +81,7 @@ static inline void select_endpoint(int ep)
 
 static void readFIFO(struct usb_endpoint *ep, unsigned int size)
 {
-    DEBUGF("readFIFO(EP%d, %d)", EP_NUMBER(ep), size);
+    logf("readFIFO(EP%d, %d)", EP_NUMBER(ep), size);
     
     register unsigned char *ptr = (unsigned char*)EP_PTR(ep);
     register unsigned int *ptr32 = (unsigned int*)ptr;
@@ -121,7 +117,7 @@ static void readFIFO(struct usb_endpoint *ep, unsigned int size)
 
 static void writeFIFO(struct usb_endpoint *ep, unsigned int size)
 {
-    DEBUGF("writeFIFO(EP%d, %d)", EP_NUMBER(ep), size);
+    logf("writeFIFO(EP%d, %d)", EP_NUMBER(ep), size);
     
     register unsigned int *d = (unsigned int *)EP_PTR(ep);
     register unsigned char *c;
@@ -140,6 +136,8 @@ static void writeFIFO(struct usb_endpoint *ep, unsigned int size)
                 REG8(ep->fifo_addr) = *c++;
         }
     }
+    else
+        REG32(ep->fifo_addr) = 0;
 }
 
 static void EP0_send(void)
@@ -151,6 +149,8 @@ static void EP0_send(void)
         length = (ep->length <= ep->fifo_size ? ep->length : ep->fifo_size);
     else
         length = (EP_BUF_LEFT(ep) <= ep->fifo_size ? EP_BUF_LEFT(ep) : ep->fifo_size);
+    
+    select_endpoint(0);
     
     writeFIFO(ep, length);
     ep->sent += length;
@@ -243,7 +243,7 @@ static void setup_endpoint(struct usb_endpoint *ep)
 
 static void udc_reset(void)
 {
-    DEBUGF("udc_reset");
+    logf("udc_reset");
 
     register unsigned int i;
     
@@ -303,19 +303,19 @@ void UDC(void)
     if(intrUSB & USB_INTR_RESUME);
     if(intrDMA & USB_INTR_DMA_BULKIN)
     {
-        DEBUGF("DMA_BULKIN %d", ((REG_USB_REG_CNTL1 >> 4) & 0xF));
+        logf("DMA_BULKIN %d", ((REG_USB_REG_CNTL1 >> 4) & 0xF));
         usb_core_transfer_complete(((REG_USB_REG_CNTL1 >> 4) & 0xF) | USB_DIR_IN, USB_DIR_IN, 0, 0);
     }
     if(intrDMA & USB_INTR_DMA_BULKOUT)
     {
-        DEBUGF("DMA_BULKOUT %d", ((REG_USB_REG_CNTL2 >> 4) & 0xF));
+        logf("DMA_BULKOUT %d", ((REG_USB_REG_CNTL2 >> 4) & 0xF));
         usb_core_transfer_complete(((REG_USB_REG_CNTL2 >> 4) & 0xF) | USB_DIR_OUT, USB_DIR_OUT, 0, 0);
     }
 }
 
 bool usb_drv_stalled(int endpoint, bool in)
 {
-    DEBUGF("usb_drv_stalled(%d, %s)", endpoint, in?"IN":"OUT");
+    logf("usb_drv_stalled(%d, %s)", endpoint, in?"IN":"OUT");
     
     select_endpoint(endpoint);
     
@@ -332,7 +332,7 @@ bool usb_drv_stalled(int endpoint, bool in)
 
 void usb_drv_stall(int endpoint, bool stall, bool in)
 {
-    DEBUGF("usb_drv_stall(%d,%s,%s)", endpoint, stall?"y":"n", in?"IN":"OUT");
+    logf("usb_drv_stall(%d,%s,%s)", endpoint, stall?"y":"n", in?"IN":"OUT");
     
     select_endpoint(endpoint);
     
@@ -424,14 +424,14 @@ void usb_drv_exit(void)
 
 void usb_drv_set_address(int address)
 {
-    DEBUGF("set adr: 0x%x", address);
+    logf("set adr: %d", address);
     
     REG_USB_REG_FADDR = address;
 }
 
 int usb_drv_send(int endpoint, void* ptr, int length)
 {
-    DEBUGF("usb_drv_send(%d, 0x%x, %d)", endpoint, (int)ptr, length);
+    logf("usb_drv_send(%d, 0x%x, %d)", endpoint, (int)ptr, length);
 
     if(endpoint == EP_CONTROL && ptr == NULL && length == 0) /* ACK request */
         return 0;
@@ -451,7 +451,7 @@ int usb_drv_send(int endpoint, void* ptr, int length)
 
 int usb_drv_recv(int endpoint, void* ptr, int length)
 {
-    DEBUGF("usb_drv_recv(%d, 0x%x, %d)", endpoint, (int)ptr, length);
+    logf("usb_drv_recv(%d, 0x%x, %d)", endpoint, (int)ptr, length);
 
     if(endpoint == EP_CONTROL && ptr == NULL && length == 0) /* ACK request */
         return 0;
@@ -461,7 +461,7 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
 
 void usb_drv_set_test_mode(int mode)
 {
-    DEBUGF("usb_drv_set_test_mode(%d)", mode);
+    logf("usb_drv_set_test_mode(%d)", mode);
     
     switch(mode)
     {
@@ -490,7 +490,7 @@ int usb_drv_port_speed(void)
 
 void usb_drv_cancel_all_transfers(void)
 {
-    DEBUGF("usb_drv_cancel_all_transfers()");
+    logf("usb_drv_cancel_all_transfers()");
     
     unsigned int i;
     for(i=0; i<TOTAL_EP(); i++)
@@ -505,14 +505,14 @@ void usb_drv_cancel_all_transfers(void)
 
 void usb_drv_release_endpoint(int ep)
 {
-    //DEBUGF("usb_drv_release_endpoint(%d)", ep);
+    //logf("usb_drv_release_endpoint(%d)", ep);
     
     (void)ep;
 }
 
 int usb_drv_request_endpoint(int dir)
 {
-    DEBUGF("usb_drv_request_endpoint(%d)", dir);
+    logf("usb_drv_request_endpoint(%d)", dir);
     
     (void)dir;
     return -1;

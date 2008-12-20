@@ -3025,7 +3025,8 @@ do {                        \
 /*
  * n = 0 ~ 7
  */
-#define __gpio_as_pwm(n)    __gpio_as_pwm##n()
+#define ___gpio_as_pwm(n)    __gpio_as_pwm ## n()
+#define __gpio_as_pwm(n)  ___gpio_as_pwm(n)
 
 //-------------------------------------------
 // GPIO or Interrupt Mode

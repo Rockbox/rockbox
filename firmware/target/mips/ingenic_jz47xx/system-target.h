@@ -101,7 +101,8 @@ void udelay(unsigned int usec);
 void mdelay(unsigned int msec);
 void power_off(void);
 void system_reboot(void);
-bool in_interrupt_mode(void);
+void dma_enable(void);
+void dma_disable(void);
 
 #define DMA_LCD_CHANNEL    0
 #define DMA_NAND_CHANNEL   1
@@ -110,5 +111,7 @@ bool in_interrupt_mode(void);
 
 #define XDMA_CALLBACK(n) DMA ## n
 #define DMA_CALLBACK(n)  XDMA_CALLBACK(n)
+
+#define DMA_IRQ(n)      (IRQ_DMA_0 + n)
 
 #endif /* __SYSTEM_TARGET_H_ */

@@ -138,6 +138,8 @@ static void jz_nand_write_dma(void *source, unsigned int len, int bw)
     
     if(((unsigned int)source < 0xa0000000) && len)
          dma_cache_wback_inv((unsigned long)source, len);
+    
+    dma_enable();
 
     REG_DMAC_DCCSR(DMA_NAND_CHANNEL) = 0;
     REG_DMAC_DSAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)source);       
@@ -151,6 +153,8 @@ static void jz_nand_write_dma(void *source, unsigned int len, int bw)
     while( REG_DMAC_DTCR(DMA_NAND_CHANNEL) )
         yield();
     
+    dma_disable();
+    
     mutex_unlock(&nand_mtx);
 }
 
@@ -161,6 +165,8 @@ static void jz_nand_read_dma(void *target, unsigned int len, int bw)
     if(((unsigned int)target < 0xa0000000) && len)
         dma_cache_wback_inv((unsigned long)target, len);
 
+    dma_enable();
+    
     REG_DMAC_DCCSR(DMA_NAND_CHANNEL) = 0;
     REG_DMAC_DSAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)NAND_DATAPORT);       
     REG_DMAC_DTAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)target);       
@@ -171,6 +177,8 @@ static void jz_nand_read_dma(void *target, unsigned int len, int bw)
     REG_DMAC_DCCSR(DMA_NAND_CHANNEL) = (DMAC_DCCSR_EN | DMAC_DCCSR_NDES);
     while( REG_DMAC_DTCR(DMA_NAND_CHANNEL) )
         yield();
+    
+    dma_disable();
     
     mutex_unlock(&nand_mtx);
 }

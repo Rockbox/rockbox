@@ -24,8 +24,8 @@
 #include "mips.h"
 #include "mipsregs.h"
 #include "panic.h"
-#include "system-target.h"
-#include <string.h>
+#include "system.h"
+#include "string.h"
 #include "kernel.h"
 
 #define NUM_DMA  6
@@ -322,53 +322,45 @@ static int get_irq_number(void)
     return irq;
 }
 
-static bool intr_mode = false;
-
-bool in_interrupt_mode(void)
-{
-    return intr_mode;
-}
-
 void intr_handler(void)
 {
     int irq = get_irq_number();
-    if(irq < 0)
+    if(UNLIKELY(irq < 0))
         return;
     
     ack_irq(irq);
-    if(irq > 0)
-    {
-        intr_mode = true;
+    if(LIKELY(irq > 0))
         irqvector[irq-1]();
-        intr_mode = false;
-    }
 }
 
-#define EXC(x,y) if(_cause == (x)) return (y);
+#define EXC(x,y) case (x): return (y);
 static char* parse_exception(unsigned int cause)
 {
-    unsigned int _cause = cause & M_CauseExcCode;
-    EXC(EXC_INT, "Interrupt");
-    EXC(EXC_MOD, "TLB Modified");
-    EXC(EXC_TLBL, "TLB Exception (Load or Ifetch)");
-    EXC(EXC_ADEL, "Address Error (Load or Ifetch)");
-    EXC(EXC_ADES, "Address Error (Store)");
-    EXC(EXC_TLBS, "TLB Exception (Store)");
-    EXC(EXC_IBE, "Instruction Bus Error");
-    EXC(EXC_DBE, "Data Bus Error");
-    EXC(EXC_SYS, "Syscall");
-    EXC(EXC_BP, "Breakpoint");
-    EXC(EXC_RI, "Reserved Instruction");
-    EXC(EXC_CPU, "Coprocessor Unusable");
-    EXC(EXC_OV, "Overflow");
-    EXC(EXC_TR, "Trap Instruction");
-    EXC(EXC_FPE, "Floating Point Exception");
-    EXC(EXC_C2E, "COP2 Exception");
-    EXC(EXC_MDMX, "MDMX Exception");
-    EXC(EXC_WATCH, "Watch Exception");
-    EXC(EXC_MCHECK, "Machine Check Exception");
-    EXC(EXC_CacheErr, "Cache error caused re-entry to Debug Mode");
-    return NULL;
+    switch(cause & M_CauseExcCode)
+    {
+        EXC(EXC_INT, "Interrupt");
+        EXC(EXC_MOD, "TLB Modified");
+        EXC(EXC_TLBL, "TLB Exception (Load or Ifetch)");
+        EXC(EXC_ADEL, "Address Error (Load or Ifetch)");
+        EXC(EXC_ADES, "Address Error (Store)");
+        EXC(EXC_TLBS, "TLB Exception (Store)");
+        EXC(EXC_IBE, "Instruction Bus Error");
+        EXC(EXC_DBE, "Data Bus Error");
+        EXC(EXC_SYS, "Syscall");
+        EXC(EXC_BP, "Breakpoint");
+        EXC(EXC_RI, "Reserved Instruction");
+        EXC(EXC_CPU, "Coprocessor Unusable");
+        EXC(EXC_OV, "Overflow");
+        EXC(EXC_TR, "Trap Instruction");
+        EXC(EXC_FPE, "Floating Point Exception");
+        EXC(EXC_C2E, "COP2 Exception");
+        EXC(EXC_MDMX, "MDMX Exception");
+        EXC(EXC_WATCH, "Watch Exception");
+        EXC(EXC_MCHECK, "Machine Check Exception");
+        EXC(EXC_CacheErr, "Cache error caused re-entry to Debug Mode");
+        default:
+            return NULL;
+    }
 }
 
 void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
@@ -644,18 +636,31 @@ static void tlb_call_refill(void)
        );
 }
 
-static void dma_init(void)
+static int dma_count = 0;
+void dma_enable(void)
 {
-    __cpm_start_dmac();
-    
-    REG_DMAC_DCCSR(0) = 0;
-    REG_DMAC_DCCSR(1) = 0;
-    REG_DMAC_DCCSR(2) = 0;
-    REG_DMAC_DCCSR(3) = 0;
-    REG_DMAC_DCCSR(4) = 0;
-    REG_DMAC_DCCSR(5) = 0;
-    
-    REG_DMAC_DMACR = (DMAC_DMACR_PR_012345 | DMAC_DMACR_DMAE);
+    if(++dma_count == 1)
+    {
+        __cpm_start_dmac();
+        
+        REG_DMAC_DCCSR(0) = 0;
+        REG_DMAC_DCCSR(1) = 0;
+        REG_DMAC_DCCSR(2) = 0;
+        REG_DMAC_DCCSR(3) = 0;
+        REG_DMAC_DCCSR(4) = 0;
+        REG_DMAC_DCCSR(5) = 0;
+        
+        REG_DMAC_DMACR = (DMAC_DMACR_PR_012345 | DMAC_DMACR_DMAE);
+    }
+}
+
+void dma_disable(void)
+{
+    if(--dma_count == 0)
+    {
+        REG_DMAC_DMACR &= ~DMAC_DMACR_DMAE;
+        __cpm_stop_dmac();
+    }
 }
 
 extern int main(void);
@@ -686,7 +691,6 @@ void system_main(void)
         dis_irq(i);
     
     tlb_init();
-    dma_init();
     
     detect_clock();
     

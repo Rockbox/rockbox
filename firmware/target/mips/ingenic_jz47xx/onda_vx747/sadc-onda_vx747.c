@@ -47,7 +47,7 @@
                       BTN_MENU | BTN_VOL_UP)
 
 
-#define TS_AD_COUNT     5
+#define TS_AD_COUNT     3
 #define SADC_CFG_SNUM   ((TS_AD_COUNT - 1) << SADC_CFG_SNUM_BIT)
 
 #define SADC_CFG_INIT   (                                 \
