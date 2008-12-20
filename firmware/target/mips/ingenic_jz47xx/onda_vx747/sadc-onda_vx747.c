@@ -126,11 +126,11 @@ unsigned int battery_adc_voltage(void)
 
 void button_init_device(void)
 {
+    __cpm_start_sadc();
     REG_SADC_ENA = 0;
     REG_SADC_STATE &= (~REG_SADC_STATE);
     REG_SADC_CTRL = 0x1F;
     
-    __cpm_start_sadc();
     REG_SADC_CFG = SADC_CFG_INIT;
     
     system_enable_irq(IRQ_SADC);
@@ -184,7 +184,14 @@ static int touch_to_pixels(short x, short y)
 
 bool button_hold(void)
 {
-    return ((~REG_GPIO_PXPIN(3)) & BTN_HOLD ? true : false);
+    return (
+#ifdef ONDA_VX747
+            (~REG_GPIO_PXPIN(3)) & BTN_HOLD
+#elif defined(ONDA_VX747P)
+            (~REG_GPIO_PXPIN(2)) & BTN_HOLD
+#endif
+            ? true : false
+           );
 }
 
 int button_read_device(int *data)
@@ -192,13 +199,7 @@ int button_read_device(int *data)
     int ret = 0, tmp;
 
     /* Filter button events out if HOLD button is pressed at firmware/ level */
-    if(
-#ifdef ONDA_VX747
-    (~REG_GPIO_PXPIN(3)) & BTN_HOLD
-#elif defined(ONDA_VX747P)
-    (~REG_GPIO_PXPIN(2)) & BTN_HOLD
-#endif
-    )
+    if(button_hold())
         return 0;
 
     tmp = (~REG_GPIO_PXPIN(3)) & BTN_MASK;

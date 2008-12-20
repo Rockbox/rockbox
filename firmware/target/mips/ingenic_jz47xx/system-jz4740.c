@@ -694,6 +694,9 @@ void system_main(void)
     
     detect_clock();
     
+    /* Disable unneeded clocks, clocks are enabled when needed */
+    __cpm_stop_all();
+    
     /* Enable interrupts at core level */
     sti();
     

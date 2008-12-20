@@ -39,6 +39,7 @@ static struct wakeup lcd_wkup;
 /* LCD init */
 void lcd_init_device(void)
 {
+    __cpm_start_lcd();
     lcd_init_controller();
     __cpm_stop_lcd();
     lcd_is_on = true;

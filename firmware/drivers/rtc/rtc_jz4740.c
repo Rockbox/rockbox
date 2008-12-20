@@ -297,9 +297,11 @@ int rtc_ioctl(unsigned int cmd,struct rtc_time *val,unsigned int epo)
 
 void rtc_init(void)
 {
+    __cpm_start_rtc();
     REG_RTC_RCR = RTC_RCR_RTCE;
     udelay(70);
     while( !(REG_RTC_RCR & RTC_RCR_WRDY) );
     REG_RTC_RGR = (0x7fff | RTC_RGR_LOCK); 
     udelay(70);
+    __cpm_stop_rtc();
 }

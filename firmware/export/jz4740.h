@@ -3282,7 +3282,7 @@ do {                        \
 #define __cpm_sleep_mode() \
     (REG_CPM_LCR = (REG_CPM_LCR & ~CPM_LCR_LPM_MASK) | CPM_LCR_LPM_SLEEP)
 
-#define __cpm_stop_all()     (REG_CPM_CLKGR = 0x7fff)
+#define __cpm_stop_all()     (REG_CPM_CLKGR = 0xffff)
 #define __cpm_stop_uart1()    (REG_CPM_CLKGR |= CPM_CLKGR_UART1)
 #define __cpm_stop_uhc()    (REG_CPM_CLKGR |= CPM_CLKGR_UHC)
 #define __cpm_stop_ipu()    (REG_CPM_CLKGR |= CPM_CLKGR_IPU)
