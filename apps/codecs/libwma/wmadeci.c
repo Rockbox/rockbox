@@ -987,12 +987,12 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
 
     if (s->nb_channels == 2)
     {
-        s->ms_stereo = get_bits(&s->gb, 1);
+        s->ms_stereo = get_bits1(&s->gb);
     }
     v = 0;
     for (ch = 0; ch < s->nb_channels; ++ch)
     {
-        a = get_bits(&s->gb, 1);
+        a = get_bits1(&s->gb);
         s->channel_coded[ch] = a;
         v |= a;
     }
@@ -1048,7 +1048,7 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
                 n = s->exponent_high_sizes[bsize];
                 for(i=0;i<n;++i)
                 {
-                    a = get_bits(&s->gb, 1);
+                    a = get_bits1(&s->gb);
                     s->high_band_coded[ch][i] = a;
                     /* if noise coding, the coefficients are not transmitted */
                     if (a)
@@ -1090,7 +1090,7 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
     }
 
     /* exponents can be reused in short blocks. */
-    if ((s->block_len_bits == s->frame_len_bits) || get_bits(&s->gb, 1))
+    if ((s->block_len_bits == s->frame_len_bits) || get_bits1(&s->gb))
     {
         for(ch = 0; ch < s->nb_channels; ++ch)
         {
@@ -1160,7 +1160,7 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
                     run = run_table[code];
                     level = level_table[code];
                 }
-                sign = get_bits(&s->gb, 1);
+                sign = get_bits1(&s->gb);
                 if (!sign)
                     level = -level;
                 ptr += run;
@@ -1258,7 +1258,7 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
                         e2 = 0;
                         for(i = 0;i < n; ++i)
                         {
-                            /*v is noramlized later on so its fixed format is irrelevant*/
+                            /*v is normalized later on so its fixed format is irrelevant*/
                             v = exponents[i<<bsize>>esize]>>4;
                             e2 += fixmul32(v, v)>>3;
                         }
@@ -1484,7 +1484,7 @@ static int wma_decode_frame(WMADecodeContext *s, int32_t *samples)
 /* Initialise the superframe decoding */
 
 int wma_decode_superframe_init(WMADecodeContext* s,
-                                 uint8_t *buf,  /*input*/
+                                 const uint8_t *buf,  /*input*/
                                  int buf_size)
 {
     if (buf_size==0)
@@ -1500,7 +1500,7 @@ int wma_decode_superframe_init(WMADecodeContext* s,
     if (s->use_bit_reservoir)
     {
         /* read super frame header */
-        get_bits(&s->gb, 4); /* super frame index */
+        skip_bits(&s->gb, 4); /* super frame index */
         s->nb_frames = get_bits(&s->gb, 4);
 
         if (s->last_superframe_len == 0)
@@ -1523,7 +1523,7 @@ int wma_decode_superframe_init(WMADecodeContext* s,
 
 int wma_decode_superframe_frame(WMADecodeContext* s,
                                 int32_t* samples, /*output*/
-                                uint8_t *buf,  /*input*/
+                                const uint8_t *buf,  /*input*/
                                 int buf_size)
 {
     int pos, len;
