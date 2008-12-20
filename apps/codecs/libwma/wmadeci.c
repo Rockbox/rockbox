@@ -328,6 +328,9 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
     #endif
 
+    s->channel_coded[0]=0;
+    s->channel_coded[1]=0;
+
     s->sample_rate = wfx->rate;
     s->nb_channels = wfx->channels;
     s->bit_rate = wfx->bitrate;
@@ -1434,7 +1437,7 @@ static int wma_decode_frame(WMADecodeContext *s, int32_t *samples)
     /* read each block */
     s->block_num = 0;
     s->block_pos = 0;
-    
+
 
     for(;;)
     {
@@ -1483,7 +1486,7 @@ int wma_decode_superframe_init(WMADecodeContext* s,
         s->last_superframe_len = 0;
         return 0;
     }
-    
+
     s->current_frame = 0;
 
     init_get_bits(&s->gb, buf, buf_size*8);
