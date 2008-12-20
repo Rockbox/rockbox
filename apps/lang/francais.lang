@@ -6783,7 +6783,7 @@
     *: "%d pistes (%s) enreg."
   </dest>
   <voice>
-    *: ""
+    *: "pistes enregistrées"
   </voice>
 </phrase>
 <phrase>
@@ -6972,16 +6972,19 @@
   user:
   <source>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
+    multivolume: "DD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
+    multivolume: "D D 1"
     e200*,c200: "micro S D"
     ondio*: "M M C"
   </voice>
@@ -8633,15 +8636,15 @@
 </phrase>
 <phrase>
   id: LANG_RESTARTING_PLAYBACK
-  desc: splash screen displayed when pcm buffer size is changed
+  desc: deprecated
   user:
   <source>
     *: none
-    swcodec: "Restarting playback..."
+    swcodec: ""
   </source>
   <dest>
     *: none
-    swcodec: "Reprise de la lecture..."
+    swcodec: ""
   </dest>
   <voice>
     *: none
