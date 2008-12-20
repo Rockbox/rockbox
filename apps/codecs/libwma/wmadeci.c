@@ -328,8 +328,10 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
     #endif
 
+    /*clear stereo setting to avoid glitches when switching stereo->mono*/
     s->channel_coded[0]=0;
     s->channel_coded[1]=0;
+    s->ms_stereo=0;
 
     s->sample_rate = wfx->rate;
     s->nb_channels = wfx->channels;
