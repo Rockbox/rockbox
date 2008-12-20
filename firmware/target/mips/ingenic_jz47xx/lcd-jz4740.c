@@ -40,6 +40,7 @@ static struct wakeup lcd_wkup;
 void lcd_init_device(void)
 {
     lcd_init_controller();
+    __cpm_stop_lcd();
     lcd_is_on = true;
     mutex_init(&lcd_mtx);
     wakeup_init(&lcd_wkup);
@@ -77,13 +78,15 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     mutex_lock(&lcd_mtx);
     
+    __cpm_start_lcd();
+    
     lcd_set_target(x, y, width, height);
     
     dma_enable();
     
     REG_DMAC_DCCSR(DMA_LCD_CHANNEL) = DMAC_DCCSR_NDES;
-    REG_DMAC_DRSR(DMA_LCD_CHANNEL)  = DMAC_DRSR_RS_SLCD; /* source = SLCD */
     REG_DMAC_DSAR(DMA_LCD_CHANNEL)  = PHYSADDR((unsigned long)&lcd_framebuffer[y][x]);
+    REG_DMAC_DRSR(DMA_LCD_CHANNEL)  = DMAC_DRSR_RS_SLCD; /* source = SLCD */
     REG_DMAC_DTAR(DMA_LCD_CHANNEL)  = PHYSADDR(SLCD_FIFO);
     REG_DMAC_DTCR(DMA_LCD_CHANNEL)  = width*height;
     
@@ -107,6 +110,8 @@ void lcd_update_rect(int x, int y, int width, int height)
     
     while(REG_SLCD_STATE & SLCD_STATE_BUSY);
     REG_SLCD_CTRL &= ~SLCD_CTRL_DMA_EN; /* Disable SLCD DMA support */
+    
+    __cpm_stop_lcd();
     
     mutex_unlock(&lcd_mtx);
 }
