@@ -27,8 +27,11 @@
 
 void audio_set_output_source(int source)
 {
+    (void)source;
 }
 
 void audio_input_mux(int source, unsigned flags)
 {
+    (void)source;
+    (void)flags;
 }

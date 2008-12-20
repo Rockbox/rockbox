@@ -143,7 +143,7 @@ void pcm_dma_apply_settings(void)
 
     const int divider = (((AS3525_PLLA_FREQ/128) + (frequency/2)) / frequency) - 1;
     if(divider < 0 || divider > 511)
-        panicf("unsupported frequency %d", frequency);
+        panicf("unsupported frequency %ld", frequency);
 
     CGU_AUDIO &= ~(((511 ^ divider) << 2) /* I2SOUT */
             /*| ((511 ^ divider) << 14) */ /* I2SIN */
