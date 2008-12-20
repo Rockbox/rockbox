@@ -1283,10 +1283,8 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
                     {
                         /* use noise with specified power */
                         fixed32 tmp = fixdiv32(exp_power[j],exp_power[last_high_band]);
-                        mult1 = (fixed64)fixsqrt32(tmp);
-                        /* XXX: use a table */
                         /*mult1 is 48.16, pow_table is 48.16*/
-                        mult1 = mult1 * pow_table[s->high_band_values[ch][j]+20] >> PRECISION;
+                        mult1 = fixmul32(fixsqrt32(tmp),pow_table[s->high_band_values[ch][j]+20]) >> 16;
 
                         /*this step has a fairly high degree of error for some reason*/
                            mult1 = fixdiv64(mult1,fixmul32(s->max_exponent[ch],s->noise_mult));
