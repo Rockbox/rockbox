@@ -1195,13 +1195,13 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
     }
 
 
-    /* finally compute the MDCT coefficients */
+   /* finally compute the MDCT coefficients */
     for(ch = 0; ch < s->nb_channels; ++ch)
     {
         if (s->channel_coded[ch])
         {
             int16_t *coefs1;
-            fixed32 *exponents, *exp_ptr;
+            fixed32 *exponents;
             fixed32 *coefs, atemp;
             fixed64 mult;
             fixed64 mult1;
@@ -1215,7 +1215,6 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
             exponents = s->exponents[ch];
             esize = s->exponents_bsize[ch];
             coefs = (*(s->coefs))[ch];
-
             n=0;
 
           /*
@@ -1237,16 +1236,14 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
                 /* very low freqs : noise */
                 for(i = 0;i < s->coefs_start; ++i)
                 {
-                    *coefs++ = fixmul32( (fixmul32(s->noise_table[s->noise_index],(*exponents++))>>4),Fixed32From64(mult1)) >>2;
+                    *coefs++ = fixmul32( (fixmul32(s->noise_table[s->noise_index],exponents[i<<bsize>>esize])>>4),Fixed32From64(mult1)) >>2;
                     s->noise_index = (s->noise_index + 1) & (NOISE_TAB_SIZE - 1);
                 }
 
                 n1 = s->exponent_high_sizes[bsize];
 
                 /* compute power of high bands */
-                exp_ptr = exponents +
-                          s->high_band_start[bsize] -
-                          s->coefs_start;
+                exponents = s->exponents[ch] +(s->high_band_start[bsize]<<bsize);
                 last_high_band = 0; /* avoid warning */
                 for (j=0;j<n1;++j)
                 {
@@ -1259,16 +1256,17 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
                         for(i = 0;i < n; ++i)
                         {
                             /*v is noramlized later on so its fixed format is irrelevant*/
-                            v = exp_ptr[i]>>4;
+                            v = exponents[i<<bsize>>esize]>>4;
                             e2 += fixmul32(v, v)>>3;
                         }
                          exp_power[j] = e2/n; /*n is an int...*/
                         last_high_band = j;
                     }
-                    exp_ptr += n;
+                    exponents += n<<bsize;
                 }
 
                 /* main freqs and high freqs */
+                exponents = s->exponents[ch] + (s->coefs_start<<bsize);
                 for(j=-1;j<n1;++j)
                 {
                     if (j < 0)
@@ -1287,40 +1285,38 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
                         fixed32 tmp = fixdiv32(exp_power[j],exp_power[last_high_band]);
                         /*mult1 is 48.16, pow_table is 48.16*/
                         mult1 = fixmul32(fixsqrt32(tmp),pow_table[s->high_band_values[ch][j]+20]) >> 16;
-
                         /*this step has a fairly high degree of error for some reason*/
-                           mult1 = fixdiv64(mult1,fixmul32(s->max_exponent[ch],s->noise_mult));
-
+                          mult1 = fixdiv64(mult1,fixmul32(s->max_exponent[ch],s->noise_mult));
                          mult1 = mult1*mdct_norm>>PRECISION;
                         for(i = 0;i < n; ++i)
                         {
                             noise = s->noise_table[s->noise_index];
                             s->noise_index = (s->noise_index + 1) & (NOISE_TAB_SIZE - 1);
-                            *coefs++ = fixmul32((fixmul32(*exponents,noise)>>4),Fixed32From64(mult1)) >>2;
-                            ++exponents;
+                            *coefs++ = fixmul32((fixmul32(exponents[i<<bsize>>esize],noise)>>4),Fixed32From64(mult1)) >>2;
+
                         }
+                        exponents += n<<bsize;
                     }
                     else
                     {
                         /* coded values + small noise */
                         for(i = 0;i < n; ++i)
                         {
-                            // PJJ: check code path
                             noise = s->noise_table[s->noise_index];
                             s->noise_index = (s->noise_index + 1) & (NOISE_TAB_SIZE - 1);
 
                            /*don't forget to renormalize the noise*/
                            temp1 = (((int32_t)*coefs1++)<<16) + (noise>>4);
-                           temp2 = fixmul32(*exponents, mult>>18);
+                           temp2 = fixmul32(exponents[i<<bsize>>esize], mult>>18);
                            *coefs++ = fixmul32(temp1, temp2);
-                           ++exponents;
                         }
+                        exponents += n<<bsize;
                     }
                 }
 
                 /* very high freqs : noise */
                 n = s->block_len - s->coefs_end[bsize];
-                mult2 = fixmul32(mult>>16,exponents[-1]) ;  /*the work around for 32.32 vars are getting stupid*/
+                mult2 = fixmul32(mult>>16,exponents[((-1<<bsize))>>esize]) ;  /*the work around for 32.32 vars are getting stupid*/
                 for (i = 0; i < n; ++i)
                 {
                     /*renormalize the noise product and then reduce to 14.18 precison*/
