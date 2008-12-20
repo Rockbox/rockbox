@@ -1218,9 +1218,11 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
             n=0;
 
           /*
-          *  The calculation of coefs has a shift right by 2 built in.  This prepares samples
-          *  for the Tremor IMDCT which uses a slightly different fixed format then the ffmpeg one.
-          *  If the old ffmpeg imdct is used, each shift storing into coefs should be reduced by 1.
+          *  The calculation of coefs has a shift right by 2 built in.  This
+          *  prepares samples for the Tremor IMDCT which uses a slightly
+          *  different fixed format then the ffmpeg one. If the old ffmpeg
+          *  imdct is used, each shift storing into coefs should be reduced
+          *  by 1.
           *  See SVN logs for details.
           */
 
@@ -1230,13 +1232,14 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
                 /*TODO:  mult should be converted to 32 bit to speed up noise coding*/
 
                 mult = fixdiv64(pow_table[total_gain+20],Fixed32To64(s->max_exponent[ch]));
-                mult = mult* mdct_norm;        //what the hell?  This is actually fixed64*2^16!
+                mult = mult* mdct_norm;
                 mult1 = mult;
 
                 /* very low freqs : noise */
                 for(i = 0;i < s->coefs_start; ++i)
                 {
-                    *coefs++ = fixmul32( (fixmul32(s->noise_table[s->noise_index],exponents[i<<bsize>>esize])>>4),Fixed32From64(mult1)) >>2;
+                    *coefs++ = fixmul32( (fixmul32(s->noise_table[s->noise_index],
+                            exponents[i<<bsize>>esize])>>4),Fixed32From64(mult1)) >>2;
                     s->noise_index = (s->noise_index + 1) & (NOISE_TAB_SIZE - 1);
                 }
 
@@ -1283,16 +1286,20 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
                     {
                         /* use noise with specified power */
                         fixed32 tmp = fixdiv32(exp_power[j],exp_power[last_high_band]);
+
                         /*mult1 is 48.16, pow_table is 48.16*/
-                        mult1 = fixmul32(fixsqrt32(tmp),pow_table[s->high_band_values[ch][j]+20]) >> 16;
+                        mult1 = fixmul32(fixsqrt32(tmp),
+                                pow_table[s->high_band_values[ch][j]+20]) >> 16;
+
                         /*this step has a fairly high degree of error for some reason*/
-                          mult1 = fixdiv64(mult1,fixmul32(s->max_exponent[ch],s->noise_mult));
-                         mult1 = mult1*mdct_norm>>PRECISION;
+                        mult1 = fixdiv64(mult1,fixmul32(s->max_exponent[ch],s->noise_mult));
+                        mult1 = mult1*mdct_norm>>PRECISION;
                         for(i = 0;i < n; ++i)
                         {
                             noise = s->noise_table[s->noise_index];
                             s->noise_index = (s->noise_index + 1) & (NOISE_TAB_SIZE - 1);
-                            *coefs++ = fixmul32((fixmul32(exponents[i<<bsize>>esize],noise)>>4),Fixed32From64(mult1)) >>2;
+                            *coefs++ = fixmul32((fixmul32(exponents[i<<bsize>>esize],noise)>>4),
+                                    Fixed32From64(mult1)) >>2;
 
                         }
                         exponents += n<<bsize;
@@ -1316,7 +1323,7 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
 
                 /* very high freqs : noise */
                 n = s->block_len - s->coefs_end[bsize];
-                mult2 = fixmul32(mult>>16,exponents[((-1<<bsize))>>esize]) ;  /*the work around for 32.32 vars are getting stupid*/
+                mult2 = fixmul32(mult>>16,exponents[((-1<<bsize))>>esize]) ;
                 for (i = 0; i < n; ++i)
                 {
                     /*renormalize the noise product and then reduce to 14.18 precison*/
@@ -1329,7 +1336,8 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
             {
                 /*Noise coding not used, simply convert from exp to fixed representation*/
 
-                fixed32 mult3 = (fixed32)(fixdiv64(pow_table[total_gain+20],Fixed32To64(s->max_exponent[ch])));
+                fixed32 mult3 = (fixed32)(fixdiv64(pow_table[total_gain+20],
+                        Fixed32To64(s->max_exponent[ch])));
                 mult3 = fixmul32(mult3, mdct_norm);
 
                 /*zero the first 3 coefficients for WMA V1, does nothing otherwise*/
@@ -1338,11 +1346,13 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
 
                 n = nb_coefs[ch];
 
-                /* XXX: optimize more, unrolling this loop in asm might be a good idea */
+                /* XXX: optimize more, unrolling this loop in asm
+                                might be a good idea */
 
                 for(i = 0;i < n; ++i)
                 {
-                    atemp = (coefs1[i] * mult3)>>2;  /*ffmpeg imdct needs 15.17, while tremor 14.18*/
+                    /*ffmpeg imdct needs 15.17, while tremor 14.18*/
+                    atemp = (coefs1[i] * mult3)>>2;
                     *coefs++=fixmul32(atemp,exponents[i<<bsize>>esize]);
                 }
                 n = s->block_len - s->coefs_end[bsize];
