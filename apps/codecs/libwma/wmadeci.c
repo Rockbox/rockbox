@@ -1542,7 +1542,7 @@ int wma_decode_superframe_frame(WMADecodeContext* s,
             }
             q = s->last_superframe + s->last_superframe_len;
             len = s->bit_offset;
-            while (len > 0)
+            while (len > 7)
             {
                 *q++ = (get_bits)(&s->gb, 8);
                 len -= 8;
@@ -1597,7 +1597,7 @@ int wma_decode_superframe_frame(WMADecodeContext* s,
         len = buf_size - pos;
         if (len > MAX_CODED_SUPERFRAME_SIZE || len < 0)
         {
-            DEBUGF("superframe size too large error after decodeing\n");
+            DEBUGF("superframe size too large error after decoding\n");
             goto fail;
         }
         s->last_superframe_len = len;
