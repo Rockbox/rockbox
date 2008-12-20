@@ -328,6 +328,11 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
     #endif
 
+    /*clear stereo setting to avoid glitches when switching stereo->mono*/
+    s->channel_coded[0]=0;
+    s->channel_coded[1]=0;
+    s->ms_stereo=0;
+
     s->sample_rate = wfx->rate;
     s->nb_channels = wfx->channels;
     s->bit_rate = wfx->bitrate;
@@ -1280,10 +1285,8 @@ static int wma_decode_block(WMADecodeContext *s, int32_t *scratch_buffer)
                     {
                         /* use noise with specified power */
                         fixed32 tmp = fixdiv32(exp_power[j],exp_power[last_high_band]);
-                        mult1 = (fixed64)fixsqrt32(tmp);
-                        /* XXX: use a table */
                         /*mult1 is 48.16, pow_table is 48.16*/
-                        mult1 = mult1 * pow_table[s->high_band_values[ch][j]+20] >> PRECISION;
+                        mult1 = fixmul32(fixsqrt32(tmp),pow_table[s->high_band_values[ch][j]+20]) >> 16;
 
                         /*this step has a fairly high degree of error for some reason*/
                            mult1 = fixdiv64(mult1,fixmul32(s->max_exponent[ch],s->noise_mult));
@@ -1434,7 +1437,7 @@ static int wma_decode_frame(WMADecodeContext *s, int32_t *samples)
     /* read each block */
     s->block_num = 0;
     s->block_pos = 0;
-    
+
 
     for(;;)
     {
@@ -1483,7 +1486,7 @@ int wma_decode_superframe_init(WMADecodeContext* s,
         s->last_superframe_len = 0;
         return 0;
     }
-    
+
     s->current_frame = 0;
 
     init_get_bits(&s->gb, buf, buf_size*8);
