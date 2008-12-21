@@ -966,7 +966,8 @@ static int ratingitem_callback(int action,const struct menu_item_ex *this_item)
     switch (action)
     {
         case ACTION_REQUEST_MENUITEM:
-            if (!selected_file || !global_settings.runtimedb)
+            if (!selected_file || !global_settings.runtimedb ||
+                !tagcache_is_usable())
                 return ACTION_EXIT_MENUITEM;
             break;
     }
