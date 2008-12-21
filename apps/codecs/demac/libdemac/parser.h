@@ -50,7 +50,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 */
 
 #define APE_FRAMECODE_MONO_SILENCE    1
-#define APE_FRAMECODE_STEREO_SILENCE  3
+#define APE_FRAMECODE_LEFT_SILENCE    1 /* same as mono */
+#define APE_FRAMECODE_RIGHT_SILENCE   2
+#define APE_FRAMECODE_STEREO_SILENCE  3 /* combined */
 #define APE_FRAMECODE_PSEUDO_STEREO   4
 
 #define PREDICTOR_ORDER 8

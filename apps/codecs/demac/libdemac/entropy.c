@@ -430,10 +430,13 @@ void ICODE_ATTR_DEMAC entropy_decode(struct ape_ctx_t* ape_ctx,
 
     ape_ctx->blocksdecoded += blockstodecode;
 
-    if (ape_ctx->frameflags & APE_FRAMECODE_STEREO_SILENCE) {
+    if ((ape_ctx->frameflags & APE_FRAMECODE_LEFT_SILENCE)
+        && ((ape_ctx->frameflags & APE_FRAMECODE_RIGHT_SILENCE)
+            || (decoded1 == NULL))) {
         /* We are pure silence, just memset the output buffer. */
         memset(decoded0, 0, blockstodecode * sizeof(int32_t));
-        memset(decoded1, 0, blockstodecode * sizeof(int32_t));
+        if (decoded1 != NULL)
+            memset(decoded1, 0, blockstodecode * sizeof(int32_t));
     } else {
         if (ape_ctx->fileversion > 3970) {
             while (LIKELY(blockstodecode--)) {

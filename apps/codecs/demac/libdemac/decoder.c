@@ -89,14 +89,17 @@ int ICODE_ATTR_DEMAC decode_chunk(struct ape_ctx_t* ape_ctx,
 #else
     #define SCALE(x) (x)
 #endif
+         
+    if ((ape_ctx->channels==1) || ((ape_ctx->frameflags
+        & (APE_FRAMECODE_PSEUDO_STEREO|APE_FRAMECODE_STEREO_SILENCE))
+        == APE_FRAMECODE_PSEUDO_STEREO)) {
 
-    if ((ape_ctx->channels==1) || (ape_ctx->frameflags & APE_FRAMECODE_PSEUDO_STEREO)) {
-        if (ape_ctx->frameflags & APE_FRAMECODE_STEREO_SILENCE) { 
-            entropy_decode(ape_ctx, inbuffer, firstbyte, bytesconsumed, decoded0, decoded1, count);
+        entropy_decode(ape_ctx, inbuffer, firstbyte, bytesconsumed,
+                       decoded0, NULL, count);
+
+        if (ape_ctx->frameflags & APE_FRAMECODE_MONO_SILENCE) {
             /* We are pure silence, so we're done. */
             return 0;
-        } else {
-            entropy_decode(ape_ctx, inbuffer, firstbyte, bytesconsumed, decoded0, NULL, count);
         }
 
         switch (ape_ctx->compressiontype)
@@ -142,12 +145,14 @@ int ICODE_ATTR_DEMAC decode_chunk(struct ape_ctx_t* ape_ctx,
         }
 #endif
     } else { /* Stereo */
-        if (ape_ctx->frameflags & APE_FRAMECODE_STEREO_SILENCE) {
+        entropy_decode(ape_ctx, inbuffer, firstbyte, bytesconsumed,
+                       decoded0, decoded1, count);
+
+        if ((ape_ctx->frameflags & APE_FRAMECODE_STEREO_SILENCE)
+            == APE_FRAMECODE_STEREO_SILENCE) {
             /* We are pure silence, so we're done. */
             return 0;
         }
-    
-        entropy_decode(ape_ctx, inbuffer, firstbyte, bytesconsumed, decoded0, decoded1, count);
 
         /* Apply filters - compression type 1000 doesn't have any */
         switch (ape_ctx->compressiontype)
