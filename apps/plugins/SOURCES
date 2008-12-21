@@ -1,4 +1,3 @@
-test_codec.c
 /* plugins common to all models */
 battery_bench.c
 chessclock.c
@@ -153,7 +152,3 @@ superdom.c
 #endif /* m:robe 500 */
 
 md5sum.c
-
-#ifdef GIGABEAT_F
-gigabeat_flash.c
-#endif
