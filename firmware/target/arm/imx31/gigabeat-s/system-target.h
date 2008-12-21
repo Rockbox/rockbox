@@ -39,7 +39,6 @@ static inline void udelay(unsigned int usecs)
 }
 #endif
 
-/* Service the watchdog timer - serviced from the power thread every minute */
 void watchdog_init(unsigned int half_seconds);
 void watchdog_service(void);
 

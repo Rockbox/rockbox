@@ -925,9 +925,3 @@ void charging_algorithm_close(void)
     while (charger_close)
         sleep(HZ/10);
 }
-
-#ifdef BOOTLOADER
-void sys_poweroff(void)
-{
-}
-#endif /* BOOTLOADER */

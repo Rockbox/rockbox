@@ -1171,7 +1171,6 @@ void powermgmt_init(void)
 
 #endif /* SIMULATOR */
 
-#ifndef BOOTLOADER
 void sys_poweroff(void)
 {
 #ifndef BOOTLOADER
@@ -1193,7 +1192,6 @@ void sys_poweroff(void)
     queue_broadcast(SYS_POWEROFF, 0);
 #endif /* BOOTLOADER */
 }
-#endif
 
 void cancel_shutdown(void)
 {
