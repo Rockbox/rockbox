@@ -1311,7 +1311,7 @@
   </dest>
   <voice>
     *: none
-    masf: "Време опадања за AV"
+    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -1987,7 +1987,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: DEPRECATED 
+  desc: DEPRECATED
   user:
   <source>
     *: ""
@@ -2001,7 +2001,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: DEPRECATED 
+  desc: DEPRECATED
   user:
   <source>
     *: ""
@@ -2015,7 +2015,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: DEPRECATED 
+  desc: DEPRECATED
   user:
   <source>
     *: ""
@@ -3089,7 +3089,7 @@
     *: "Пример за изабрану брзину скроловања"
   </dest>
   <voice>
-    *: "Пример за изабрану брзину скроловања"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5283,7 +5283,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "Мени"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5300,7 +5300,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "Излаз"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5317,7 +5317,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "Акција"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5351,7 +5351,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "Додај"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5368,7 +5368,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "Снимај"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5402,7 +5402,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Екран је замрзнут!"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -6425,7 +6425,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Пред-снимање"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -7333,7 +7333,7 @@
     *: "Нема плејлисти"
   </dest>
   <voice>
-    *: ""
+    *: "Нема плејлисти"
   </voice>
 </phrase>
 <phrase>
@@ -7885,7 +7885,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Позадина учитана"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7902,7 +7902,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Учитавање позадине није успело"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7992,7 +7992,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Навише"
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -8009,7 +8009,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Наниже"
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -8026,7 +8026,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Полустепен горе"
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -8043,7 +8043,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Полустепен доле"
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -8088,7 +8088,7 @@
     *: "Креирам"
   </dest>
   <voice>
-    *: "Креирам"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8228,7 +8228,7 @@
     *: "Мод:"
   </dest>
   <voice>
-    *: "Мод"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8273,7 +8273,7 @@
     *: "Тастери закључани"
   </dest>
   <voice>
-    *: "Тастери закључани"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8287,7 +8287,7 @@
     *: "Тастери откључани"
   </dest>
   <voice>
-    *: "Тастери откључани"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8304,7 +8304,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Време"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -10040,7 +10040,7 @@
     *: ""
   </source>
   <dest>
-     *: ""
+    *: ""
   </dest>
   <voice>
     *: "cuesheet"
@@ -10151,11 +10151,11 @@
   user:
   <source>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "Edit mode: %s %s"
   </source>
   <dest>
     *: none
-    swcodec: "Mod izmene: %s"
+    swcodec: "Mod izmene: %s %s"
   </dest>
   <voice>
     *: none
@@ -10172,11 +10172,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Granicna frekvencija"
+    swcodec: "Granicna"
   </dest>
   <voice>
     *: none
-    swcodec: "Granicna frekvencija"
+    swcodec: "Granicna"
   </voice>
 </phrase>
 <phrase>
@@ -11446,7 +11446,7 @@
     multivolume: "Није присутна"
   </voice>
 </phrase>
-<phrase>  
+<phrase>
   id: LANG_TALK_BATTERY_LEVEL
   desc: Setting for spontaneous battery level announcement
   user:
@@ -11688,7 +11688,7 @@
 <phrase>
   id: LANG_STOP_RECORDING_AND_SHUTDOWN
   desc: in record timesplit options
-  user: 
+  user:
   <source>
     *: none
     recording: "Stop Recording And Shutdown"
