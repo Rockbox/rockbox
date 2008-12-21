@@ -105,7 +105,7 @@
   </dest>
   <voice>
     *: none
-    soft_shutdown: "Pulse OFF para apagar"
+    soft_shutdown: ""
   </voice>
 </phrase>
 <phrase>
@@ -476,7 +476,7 @@
   </dest>
   <voice>
     *: none
-    masf: "Tiempo de caída de AV"
+    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -1916,7 +1916,7 @@
     *: "Ejemplo de velocidad de desplazamiento"
   </dest>
   <voice>
-    *: "Ejemplo de velocidad de desplazamiento"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1958,7 +1958,7 @@
     *: "Texto ejemplo del tamaño del paso de desplazamiento"
   </dest>
   <voice>
-    *: "Texto ejemplo del tamaño del paso de desplazamiento"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2825,8 +2825,6 @@
   </dest>
   <voice>
     *: "Nivel y tiempo de batería"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "Nivel y tiempo de batería"
-    h10,ipodmini,ipodmini2g: "Nivel y tiempo de batería"
   </voice>
 </phrase>
 <phrase>
@@ -2867,7 +2865,7 @@
   </source>
   <dest>
     *: none
-    rtc: none
+    rtc: ""
   </dest>
   <voice>
     *: none
@@ -2888,7 +2886,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Acelerar"
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -2905,7 +2903,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Ralentizar"
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -3006,14 +3004,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "OFF para cancelar"
-    h100,h120,h300: "STOP para cancelar"
-    ipod*,e200*,c200,sa9200: "MENU para cancelar"
-    x5,m5: "RECORD para cancelar"
-    h10,h10_5gb: "PREV para cancelar"
-    gigabeatf: "A para cancelar"
-    mrobe100: "DISPLAY para cancelar"
-    gigabeats: "BACK para cancelar"
+    rtc,h100,h120,h300,ipod*,e200*,c200,x5,m5,h10,h10_5gb,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -3026,11 +3017,11 @@
   </source>
   <dest>
     *: none
-    recording: "Tiempo"
+    recording: "Tiempo:"
   </dest>
   <voice>
     *: none
-    recording: "Tiempo"	
+    recording: ""	
   </voice>
 </phrase>
 <phrase>
@@ -3047,7 +3038,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Pregrabación"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -3087,10 +3078,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Disco duro lleno. Pulse OFF para continuar"
-    h100,h120,h300: "Disco duro lleno. Pulse STOP para continuar"
-    m5,x5: "Disco duro lleno. Pulse POWER para continuar"
-    e200*,c200: "Disco duro lleno. Pulse UP para continuar"
+    recording,h100,h120,h300,m5,x5,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -3107,7 +3095,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Hora de alarma"
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
@@ -3181,10 +3169,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "PLAY para aceptar y OFF para cancelar"
-    ipod*: "SELECT para aceptar y MENU para cancelar"
-    h10,h10_5gb: "SELECT para aceptar y PREV para cancelar"
-    gigabeats: "SELECT para aceptar y POWER para cancelar"
+    alarm,ipod*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3215,7 +3200,7 @@
     *: "[Título]"
   </dest>
   <voice>
-    *: "Título"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3229,7 +3214,7 @@
     *: "[Artista]"
   </dest>
   <voice>
-    *: "Artista"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3243,7 +3228,7 @@
     *: "[Álbum]"
   </dest>
   <voice>
-    *: "Álbum"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3257,7 +3242,7 @@
     *: "[Nº pista]"
   </dest>
   <voice>
-    *: "Número de pista"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3271,7 +3256,7 @@
     *: "[Género]"
   </dest>
   <voice>
-    *: "Género"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3285,7 +3270,7 @@
     *: "[Año]"
   </dest>
   <voice>
-    *: "Año"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3299,7 +3284,7 @@
     *: "[Lista de reprod.]"
   </dest>
   <voice>
-    *: "Lista de reproducción"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3313,7 +3298,7 @@
     *: "[Tasa de bits]"
   </dest>
   <voice>
-    *: "Tasa de bits"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3327,7 +3312,7 @@
     *: "[Frecuencia]"
   </dest>
   <voice>
-    *: "Frecuencia"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3341,7 +3326,7 @@
     *: "[Ruta]"
   </dest>
   <voice>
-    *: "Ruta"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3355,7 +3340,7 @@
     *: "<Sin información>"
   </dest>
   <voice>
-    *: "Sin información"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3372,7 +3357,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Domingo"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3389,7 +3374,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Lunes"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3406,7 +3391,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Martes"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3423,7 +3408,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Miércoles"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3440,7 +3425,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Jueves"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3457,7 +3442,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Viernes"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3474,7 +3459,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Sábado"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4364,7 +4349,7 @@
     *: "B"
   </dest>
   <voice>
-    *: "Baits"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4994,7 +4979,7 @@
     *: "Creando"
   </dest>
   <voice>
-    *: "Creando"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5137,7 +5122,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Emisora"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -5239,7 +5224,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "Menú"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5256,7 +5241,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "Salir"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5273,7 +5258,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "Acción"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5290,7 +5275,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "Añadir"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5307,7 +5292,7 @@
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "Grabar"
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5421,6 +5406,8 @@
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
     h10,h10_5gb,e200*,c200: "PREV to abort"
+    gigabeats: "BACK to abort"
+    gigabeatf: "POWER to abort"
   </source>
   <dest>
     *: "OFF para cancelar"
@@ -5428,13 +5415,11 @@
     ipod*: "PLAY/PAUSE para cancelar"
     x5,m5: "Pulsación larga de PLAY para cancelar"
     h10,h10_5gb,e200*,c200: "PREV para cancelar"
+    gigabeats: "BACK para cancelar"
+    gigabeatf: "POWER para cancelar"
   </dest>
   <voice>
-    *: "OFF para Cancelar"
-    player,h100,h120,h300: "STOP para cancelar"
-    ipod*: "PLAY PAUSE para cancelar"
-    x5,m5: "Pulsación larga de PLAY para cancelar"
-    h10,h10_5gb,e200*,c200: "PREV para cancelar"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5546,7 +5531,7 @@
     *: "No se puede abrir %s"
   </dest>
   <voice>
-    *: "No se puede abrir"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5560,7 +5545,7 @@
     *: "Fallo al cargar %s"
   </dest>
   <voice>
-    *: "Fallo al cargar"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5574,7 +5559,7 @@
     *: "Modelo incompatible"
   </dest>
   <voice>
-    *: "Modelo incompatible"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5588,7 +5573,7 @@
     *: "Versión incompatible"
   </dest>
   <voice>
-    *: "Versión incompatible"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5602,7 +5587,7 @@
     *: "El plugin devolvió un error"
   </dest>
   <voice>
-    *: "El plugin devolvió un error"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6103,7 +6088,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Ganancia Izquierda"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -6120,7 +6105,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Ganancia Derecha"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -6154,7 +6139,7 @@
   </dest>
   <voice>
     *: none
-    recorder_pad: "Menú"
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -6171,7 +6156,7 @@
   </dest>
   <voice>
     *: none
-    recorder_pad: "Opción"
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -6188,7 +6173,7 @@
   </dest>
   <voice>
     *: none
-    recorder_pad: "L C D"
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -6214,7 +6199,7 @@
   user:
   <source>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Cutoff"
   </source>
   <dest>
     *: none
@@ -6231,15 +6216,15 @@
   user:
   <source>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "Edit mode: %s %s"
   </source>
   <dest>
     *: none
-    swcodec: "Modo de edición: %s"
+    swcodec: "Modo de edición: %s %s"
   </dest>
   <voice>
     *: none
-    swcodec: "Modo de edición"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -6391,7 +6376,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: "V B R"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6504,7 +6489,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Megaercios"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -6761,7 +6746,7 @@
     *: "[Unificación de volumen en el álbum]"
   </dest>
   <voice>
-    *: "Unificación de volumen en el álbum"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7088,19 +7073,19 @@
 </phrase>
 <phrase>
   id: LANG_RESTARTING_PLAYBACK
-  desc: splash screen displayed when pcm buffer size is changed
+  desc: deprecated
   user:
   <source>
     *: none
-    swcodec: "Restarting playback..."
+    swcodec: ""
   </source>
   <dest>
     *: none
-    swcodec: "Reiniciando reproducción..."
+    swcodec: ""
   </dest>
   <voice>
     *: none
-    swcodec: "Reiniciando reproducción . . ."
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -7227,7 +7212,7 @@
     *: "[Unificación de volumen en la pista]"
   </dest>
   <voice>
-    *: "Unificación de volumen en la pista"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7285,7 +7270,7 @@
   </source>
   <dest>
     *: none
-    remote: "(Vol- : Re-enable)"
+    remote: "(Vol- : Reactivar)"
   </dest>
   <voice>
     *: none
@@ -7320,7 +7305,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Escaneando"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -7337,7 +7322,7 @@
   </dest>
   <voice>
     *: none
-    radio: "¡Pantalla congelada!"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -7540,7 +7525,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Color inválido"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7568,7 +7553,7 @@
     *: "[Longitud]"
   </dest>
   <voice>
-    *: "Longitud"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7655,7 +7640,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Falló la carga de fondo de pantalla"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7897,7 +7882,7 @@
     *: "Buscando... %d encontrados (%s)"
   </dest>
   <voice>
-    *: "Buscando . . ."
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8016,18 +8001,21 @@
   user: 
   <source>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
-    e200*,c200: "m S D :"
-    ondio*: "M M C :"
+    multivolume: "H D 1"
+    e200*,c200: "m S D"
+    ondio*: "M M C"
   </voice>
 </phrase>
 <phrase>
@@ -8261,7 +8249,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Valores r g b"
+    lcd_color: ""
   </voice>
 </phrase>
 <phrase>
@@ -8380,7 +8368,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Modo de edición"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8506,7 +8494,7 @@
   </source>
   <dest>
     *: none
-    remote: none
+    remote: ""
   </dest>
   <voice>
     *: none
@@ -8637,7 +8625,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Fondo de pantalla cargado"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -9046,7 +9034,7 @@
     *: "[Álbum Artista]"
   </dest>
   <voice>
-    *: "Álbum artista"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9060,7 +9048,7 @@
     *: "[Comentario]"
   </dest>
   <voice>
-    *: "Comentario"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9228,11 +9216,7 @@
     h10,h10_5gb,e200*,c200,sa9200: "Construyendo base de datos... %d encontrados (PREV para volver)"
   </dest>
   <voice>
-    *: "Construyendo base de datos . . . (OFF para volver)"
-    h100,h120,h300: "Construyendo base de datos . . . (STOP para volver)"
-    ipod*: "Construyendo base de datos . . . (PREV para volver)"
-    x5,m5,gigabeat*,mrobe100: "Construyendo base de datos . . . (LEFT para volver)"
-    h10,h10_5gb,e200*,c200,sa9200: "Construyendo base de datos . . . (PREV para volver)"
+    *: "elementos encontrados para la base de datos"
   </voice>
 </phrase>
 <phrase>
@@ -9860,7 +9844,7 @@
   </source>
   <dest>
     *: none
-    rtc: none
+    rtc: ""
   </dest>
   <voice>
     *: none
@@ -9881,7 +9865,6 @@
   </dest>
   <voice>
     *: "Tamaño de búfer"
-    player: "Tamaño de búfer"
   </voice>
 </phrase>
 <phrase>
@@ -9966,10 +9949,7 @@
     player: "(PLAY/STOP)"
   </dest>
   <voice>
-    *: "PLAY = Sí­"
-    h100,h120,h300: "NAVI = Sí"
-    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Sí"
-    player: "Pléi, estóp"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9990,9 +9970,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "ON = Fijar"
-    h100,h120,h300: "NAVI = Fijar"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Fijar"
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200*,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -10008,8 +9986,7 @@
     player: none
   </dest>
   <voice>
-    *: "Otro = No"
-    player: none
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10171,7 +10148,7 @@
   </source>
   <dest>
     *: none
-    rtc: none
+    rtc: ""
   </dest>
   <voice>
     *: none
@@ -10319,7 +10296,7 @@
     *: "Botones desbloqueados"
   </dest>
   <voice>
-    *: "Botones desbloqueados"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10349,7 +10326,7 @@
   </source>
   <dest>
     *: none
-    rtc: none
+    rtc: ""
   </dest>
   <voice>
     *: none
@@ -10387,7 +10364,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Modo"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -10480,7 +10457,7 @@
     *: "Modo:"
   </dest>
   <voice>
-    *: "Modo"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10514,7 +10491,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Bajar un semitono"
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -10627,7 +10604,7 @@
     *: "[Trabajo]"
   </dest>
   <voice>
-    *: "Trabajo"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10654,11 +10631,11 @@
   </source>
   <dest>
     *: none
-    radio: "Korea"
+    radio: "Corea"
   </dest>
   <voice>
     *: none
-    radio: "Korea"
+    radio: "Corea"
   </voice>
 </phrase>
 <phrase>
@@ -10743,7 +10720,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Subir un semitono"
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -10850,7 +10827,7 @@
     *: "[NúmDisc]"
   </dest>
   <voice>
-    *: "Número del disco"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10878,7 +10855,7 @@
     *: "Cargando... %d%% hecho (%s)"
   </dest>
   <voice>
-    *: "Cargando . . ."
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10970,7 +10947,7 @@
   </source>
   <dest>
     *: none
-    rtc: none
+    rtc: ""
   </dest>
   <voice>
     *: none
@@ -11123,7 +11100,7 @@
     *: ", Mezclado"
   </dest>
   <voice>
-    *: " Mezclado"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11360,7 +11337,7 @@
     *: "Botones bloqueados"
   </dest>
   <voice>
-    *: "Botones bloqueados"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11995,5 +11972,203 @@
   <voice>
     *: none
     agc: "Tiempo de clip de C A G control automático de ganancia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMART
+  desc: Display the expected AA size
+  user:
+  <source>
+    *: none
+    albumart: "Album Art:"
+  </source>
+  <dest>
+    *: none
+    albumart: "Carátula:"
+  </dest>
+  <voice>
+    *: none
+    albumart: "Carátula"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFTRIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Mono izquierda + derecha"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Mono izquierda mas derecha"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Left Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Fijar como elemento izquierdo de la pantalla rápida"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Fijar como elemento izquierdo de la pantalla rápida"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_SETTING
+  desc: used in the settings context menu
+  user:
+  <source>
+    *: "Reset Setting"
+  </source>
+  <dest>
+    *: "Reiniciar la configuración"
+  </dest>
+  <voice>
+    *: "Reiniciar configuración"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Bottom Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Fijar como elemento inferior de la pantalla rápida"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Fijar como elemento inferior de la pantalla rápida"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QS_ITEMS
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Right Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Fijar como elemento derecho de la pantalla rápida"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Fijar como elemento derecho de la pantalla rápida"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user:
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "Resultado de la búsqueda"
+  </dest>
+  <voice>
+    *: "Resultado de la búsqueda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MONO_MODE
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono mode"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Modo mono"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Modo mono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
   </voice>
 </phrase>
