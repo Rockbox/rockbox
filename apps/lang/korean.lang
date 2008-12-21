@@ -4930,11 +4930,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: ""
+    lcd_color: "RGB"
   </dest>
   <voice>
     *: none
-    lcd_color: ""
+    lcd_color: "RGB"
   </voice>
 </phrase>
 <phrase>
@@ -4947,7 +4947,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: ""
+    lcd_color: "RGB Code: %02X%02X%02X"
   </dest>
   <voice>
     *: none
@@ -10568,20 +10568,6 @@
   </dest>
   <voice>
     *: "노멀"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SKIP_LENGTH
-  desc: playback settings menu
-  user:
-  <source>
-    *: "Skip Length"
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
