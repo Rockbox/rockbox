@@ -601,10 +601,10 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
 
     if (card_info[drive].initialized <= 0)
     {
-        sd_init_card(drive);
+        int ret = sd_init_card(drive);
         if (!(card_info[drive].initialized))
         {
-            panicf("card not initialised");
+            panicf("card not initialised %d",ret);
             goto sd_transfer_error;
         }
     }
