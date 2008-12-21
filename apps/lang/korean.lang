@@ -526,7 +526,7 @@
   </source>
   <dest>
     *: none
-    masf: ""
+    masf: "AV 감속 시간"
   </dest>
   <voice>
     *: none
@@ -1928,11 +1928,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "히브리어 (ISO-8859-8)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "히브리어"
   </voice>
 </phrase>
 <phrase>
@@ -1959,11 +1959,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "태국어 (ISO-8859-11)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "태국어"
   </voice>
 </phrase>
 <phrase>
@@ -1976,11 +1976,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "아랍어 (CP1256)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "아랍어"
   </voice>
 </phrase>
 <phrase>
@@ -2021,11 +2021,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "일본어 (SJIS)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "일본어"
   </voice>
 </phrase>
 <phrase>
@@ -2038,11 +2038,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "중국어 간체 (GB2312)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "중국어 간체"
   </voice>
 </phrase>
 <phrase>
@@ -2055,11 +2055,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "한국어 (KSX1001)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "한국어"
   </voice>
 </phrase>
 <phrase>
@@ -2072,11 +2072,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "중국어 번체 (BIG5)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "중국어 번체"
   </voice>
 </phrase>
 <phrase>
@@ -4930,11 +4930,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: ""
+    lcd_color: "RGB"
   </dest>
   <voice>
     *: none
-    lcd_color: ""
+    lcd_color: "RGB"
   </voice>
 </phrase>
 <phrase>
@@ -4947,7 +4947,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: ""
+    lcd_color: "RGB Code: %02X%02X%02X"
   </dest>
   <voice>
     *: none
@@ -9366,11 +9366,11 @@
   </source>
   <dest>
     *: none
-    recording: ""
+    recording: "MPEG Layer 3"
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "MPEG Layer 3"
   </voice>
 </phrase>
 <phrase>
@@ -9383,11 +9383,11 @@
   </source>
   <dest>
     *: none
-    recording: ""
+    recording: "PCM Wave"
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "PCM Wave"
   </voice>
 </phrase>
 <phrase>
@@ -9400,11 +9400,11 @@
   </source>
   <dest>
     *: none
-    recording_swcodec: ""
+    recording_swcodec: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: ""
+    recording_swcodec: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -9564,11 +9564,11 @@
   </source>
   <dest>
     *: none
-    recording: ""
+    recording: "AIFF"
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "AIFF"
   </voice>
 </phrase>
 <phrase>
@@ -10568,20 +10568,6 @@
   </dest>
   <voice>
     *: "노멀"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SKIP_LENGTH
-  desc: playback settings menu
-  user:
-  <source>
-    *: "Skip Length"
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11966,20 +11952,6 @@
   </dest>
   <voice>
     *: "알려지지 않은 종류만"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
-  desc: in codepage setting menu
-  user:
-  <source>
-    *: "Central European (CP1250)"
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
