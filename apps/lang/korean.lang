@@ -9400,11 +9400,11 @@
   </source>
   <dest>
     *: none
-    recording_swcodec: ""
+    recording_swcodec: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: ""
+    recording_swcodec: "WavPack"
   </voice>
 </phrase>
 <phrase>
