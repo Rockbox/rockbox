@@ -23,6 +23,7 @@
 #define FMRADIO_I2C_H
 
 void fmradio_i2c_init(void);
+void fmradio_i2c_enable(bool enable);
 int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count);
 int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count);
 

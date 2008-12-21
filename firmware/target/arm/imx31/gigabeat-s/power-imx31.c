@@ -28,9 +28,10 @@
 #include "backlight-target.h"
 #include "avic-imx31.h"
 #include "mc13783.h"
-#include "i2c-imx31.h"
+#if CONFIG_TUNER
+#include "fmradio_i2c.h"
+#endif
 
-extern struct i2c_node si4700_i2c_node;
 static unsigned int power_status = POWER_INPUT_NONE;
 
 /* Detect which power sources are present. */
@@ -99,11 +100,18 @@ bool ide_powered(void)
 #if CONFIG_TUNER
 bool tuner_power(bool status)
 {
+    static bool tuner_powered = false;
+
+    if (status == tuner_powered)
+        return status;
+
+    tuner_powered = status;
+
     if (status)
     {
         /* the si4700 is the only thing connected to i2c2 so
            we can diable the i2c module when not in use */
-        i2c_enable_node(&si4700_i2c_node, true);
+        fmradio_i2c_enable(true);
         /* enable the fm chip */
         imx31_regset32(&GPIO1_DR, (1 << 26));
         /* enable CLK32KMCU clock */
@@ -113,13 +121,14 @@ bool tuner_power(bool status)
     {
         /* the si4700 is the only thing connected to i2c2 so
            we can diable the i2c module when not in use */
-        i2c_enable_node(&si4700_i2c_node, false);
+        fmradio_i2c_enable(false);
         /* disable the fm chip */
         imx31_regclr32(&GPIO1_DR, (1 << 26));
         /* disable CLK32KMCU clock */
         mc13783_clear(MC13783_POWER_CONTROL0, MC13783_CLK32KMCUEN);
     }
-    return true;
+
+    return !status;
 }
 #endif /* #if CONFIG_TUNER */
 

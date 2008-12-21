@@ -24,7 +24,7 @@
 #include "i2c-imx31.h"
 #include "fmradio_i2c.h"
 
-struct i2c_node si4700_i2c_node =
+static struct i2c_node si4700_i2c_node =
 {
     .num  = I2C2_NUM,
     .ifdr = I2C_IFDR_DIV192, /* 66MHz/.4MHz = 165, closest = 192 = 343750Hz */
@@ -32,6 +32,11 @@ struct i2c_node si4700_i2c_node =
                               * updating */
     .addr = (0x20),
 };
+
+void fmradio_i2c_enable(bool enable)
+{
+    i2c_enable_node(&si4700_i2c_node, enable);
+}
 
 int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count)
 {
