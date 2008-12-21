@@ -39,6 +39,11 @@ static inline void udelay(unsigned int usecs)
 }
 #endif
 
+/* Service the watchdog timer - serviced from the power thread every minute */
+void watchdog_init(unsigned int half_seconds);
+void watchdog_service(void);
+
+/* Prepare for transition to firmware */
 void system_prepare_fw_start(void);
 void tick_stop(void);
 void kernel_device_init(void);

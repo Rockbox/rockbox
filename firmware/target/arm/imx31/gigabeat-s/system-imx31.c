@@ -32,6 +32,31 @@
 #include "clkctl-imx31.h"
 #include "mc13783.h"
 
+/* Initialize the watchdog timer */
+void watchdog_init(unsigned int half_seconds)
+{
+    uint16_t wcr = WDOG_WCR_WTw(half_seconds) | /* Timeout */
+                   WDOG_WCR_WOE |       /* WDOG output enabled */
+                   WDOG_WCR_WDA |       /* WDOG assertion - no effect */
+                   WDOG_WCR_SRS |       /* System reset - no effect */
+                   WDOG_WCR_WRE;        /* Generate a WDOG signal */
+
+    imx31_clkctl_module_clock_gating(CG_WDOG, CGM_ON_RUN_WAIT);
+
+    WDOG_WCR = wcr;
+    WDOG_WSR = 0x5555;
+    WDOG_WCR = wcr | WDOG_WCR_WDE; /* Enable timer - hardware does
+                                      not allow a disable now */
+    WDOG_WSR = 0xaaaa;
+}
+
+/* Service the watchdog timer */
+void watchdog_service(void)
+{
+    WDOG_WSR = 0x5555;
+    WDOG_WSR = 0xaaaa;
+}
+
 int system_memory_guard(int newmode)
 {
     (void)newmode;

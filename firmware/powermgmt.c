@@ -76,7 +76,7 @@ static int wrcount = 0;
 
 static int shutdown_timeout = 0;
 #if CONFIG_CHARGING >= CHARGING_MONITOR
-charge_state_type charge_state;     /* charging mode */
+charge_state_type charge_state = DISCHARGING;     /* charging mode */
 #endif
 
 static void send_battery_level_event(void);
@@ -204,8 +204,6 @@ void accessory_supply_set(bool enable)
 
 #else /* not SIMULATOR ******************************************************/
 
-static void power_thread_sleep(int ticks);
-
 /*
  * Average battery voltage and charger voltage, filtered via a digital
  * exponential filter (aka. exponential moving average, scaled):
@@ -240,6 +238,19 @@ static long last_event_tick;
 static int voltage_to_battery_level(int battery_millivolts);
 static void battery_status_update(void);
 static int runcurrent(void);
+
+#ifndef TARGET_POWERMGMT_FILTER_CHARGE_STATE
+static inline int powermgmt_filter_charge_state(void)
+{
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+    /* No adjustment of state */
+    return charge_state;
+#else
+    /* Always discharging */
+    return DISCHARGING;
+#endif
+}
+#endif /* TARGET_POWERMGMT_FILTER_CHARGE_STATE */
 
 void battery_read_info(int *voltage, int *level)
 {
@@ -285,6 +296,10 @@ int battery_time(void)
 /* Returns battery level in percent */
 int battery_level(void)
 {
+#ifdef HAVE_BATTERY_SWITCH
+    if ((power_input_status() & POWER_INPUT_BATTERY) == 0)
+        return -1;
+#endif
     return battery_percent;
 }
 
@@ -294,11 +309,13 @@ unsigned int battery_voltage(void)
     return battery_millivolts;
 }
 
+#ifndef TARGET_BATTERY_LEVEL_SAFE
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void)
 {
     return battery_millivolts > battery_level_dangerous[battery_type];
 }
+#endif
 
 void set_poweroff_timeout(int timeout)
 {
@@ -349,26 +366,24 @@ static int voltage_to_percent(int voltage, const short* table)
  * when battery capacity / type settings are changed */
 static int voltage_to_battery_level(int battery_millivolts)
 {
+    const int state = powermgmt_filter_charge_state();
     int level;
 
-#if CONFIG_CHARGING >= CHARGING_MONITOR
-    if (charge_state == DISCHARGING) {
+    if (state == DISCHARGING) {
         level = voltage_to_percent(battery_millivolts,
                     percent_to_volt_discharge[battery_type]);
     }
-    else if (charge_state == CHARGING) {
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+    else if (state == CHARGING) {
         /* battery level is defined to be < 100% until charging is finished */
         level = MIN(voltage_to_percent(battery_millivolts,
                     percent_to_volt_charge), 99);
     }
-    else { /* in topoff/trickle charge, battery is by definition 100% full */
+    else {
+        /* in topoff/trickle charge, battery is by definition 100% full */
         level = 100;
     }
-#else
-    /* always use the discharge table */
-    level = voltage_to_percent(battery_millivolts,
-                percent_to_volt_discharge[battery_type]);
-#endif /* CONFIG_CHARGING ... */
+#endif
 
     return level;
 }
@@ -381,7 +396,7 @@ static void battery_status_update(void)
     /* discharging: remaining running time */
     /* charging:    remaining charging time */
 #if CONFIG_CHARGING >= CHARGING_MONITOR
-    if (charge_state == CHARGING) {
+    if (powermgmt_filter_charge_state() == CHARGING) {
         powermgmt_est_runningtime_min = (100 - level) * battery_capacity * 60
                                       / 100 / (CURRENT_MAX_CHG - runcurrent());
     }
@@ -431,15 +446,10 @@ static void handle_auto_poweroff(void)
     }
 #endif
 
-#ifndef NO_LOW_BATTERY_SHUTDOWN
-    /* switch off unit if battery level is too low for reliable operation */
-    if(battery_millivolts < battery_level_shutoff[battery_type]) {
-        if(!shutdown_timeout) {
-            backlight_on();
-            sys_poweroff();
-        }
+    if( !shutdown_timeout && query_force_shutdown()) {
+        backlight_on();
+        sys_poweroff();
     }
-#endif
 
     if(timeout &&
 #if CONFIG_TUNER && !defined(BOOTLOADER)
@@ -545,6 +555,18 @@ static void power_thread_rtc_process(void)
     }
 }
 #endif
+
+#ifndef TARGET_QUERY_FORCE_SHUTDOWN
+bool query_force_shutdown(void)
+{
+#ifndef NO_LOW_BATTERY_SHUTDOWN
+    /* switch off unit if battery level is too low for reliable operation */
+    return battery_millivolts < battery_level_shutoff[battery_type];
+#else
+    return false;
+#endif
+}
+#endif /* TARGET_QUERY_FORCE_SHUTDOWN */
 
 /*
  * This power thread maintains a history of battery voltage
@@ -896,6 +918,18 @@ static inline void charging_algorithm_close(void)
     }
 #endif
 }
+#elif CONFIG_CHARGING == CHARGING_TARGET
+extern void charging_algorithm_big_step(void);
+extern void charging_algorithm_small_step(void);
+extern void charging_algorithm_close(void);
+
+void set_filtered_battery_voltage(int millivolts)
+{
+    avgbat = millivolts * BATT_AVE_SAMPLES;
+    battery_millivolts = millivolts;
+    battery_status_update();
+}
+
 #else
 #define BATT_AVE_SAMPLES   128  /* slw filter constant for all others */
 
@@ -961,12 +995,12 @@ bool power_input_present(void)
  * While we are waiting for the time to expire, we average the battery
  * voltages.
  */
-static void power_thread_sleep(int ticks)
+void power_thread_sleep(int ticks)
 {
-    int small_ticks;
+    long tick_return = current_tick + ticks;
 
-    while (ticks > 0) {
-
+    do
+    {
 #if CONFIG_CHARGING
         /*
          * Detect charger plugged/unplugged transitions.  On a plugged or
@@ -979,7 +1013,8 @@ static void power_thread_sleep(int ticks)
                 case NO_CHARGER:
                 case CHARGER_UNPLUGGED:
                     charger_input_state = CHARGER_PLUGGED;
-                    return;
+                    tick_return = current_tick;
+                    goto do_small_step; /* Algorithm should see transition */
                 case CHARGER_PLUGGED:
                     queue_broadcast(SYS_CHARGER_CONNECTED, 0);
                     last_sent_battery_level = 0;
@@ -1000,19 +1035,23 @@ static void power_thread_sleep(int ticks)
                 case CHARGER_PLUGGED:
                 case CHARGER:
                     charger_input_state = CHARGER_UNPLUGGED;
-                    return;
+                    tick_return = current_tick;
+                    goto do_small_step; /* Algorithm should see transition */
             }
         }
 #endif /* CONFIG_CHARGING */
 
-        small_ticks = MIN(HZ/2, ticks);
-        sleep(small_ticks);
-        ticks -= small_ticks;
+        ticks = tick_return - current_tick;
+
+        if (ticks > 0) {
+            ticks = MIN(HZ/2, ticks);
+            sleep(ticks);
+        }
 
         /* If the power off timeout expires, the main thread has failed
            to shut down the system, and we need to force a power off */
         if(shutdown_timeout) {
-            shutdown_timeout -= small_ticks;
+            shutdown_timeout -= MAX(ticks, 1);
             if(shutdown_timeout <= 0)
                 power_off();
         }
@@ -1024,9 +1063,13 @@ static void power_thread_sleep(int ticks)
         /*
          * Do a digital exponential filter.  We don't sample the battery if
          * the disk is spinning unless we are in USB mode (the disk will most
-         * likely always be spinning in USB mode).
+         * likely always be spinning in USB mode) or charging.
          */
-        if (!storage_disk_is_active() || usb_inserted()) {
+        if (!storage_disk_is_active() || usb_inserted()
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+                || charger_input_state == CHARGER
+#endif
+        ) {
             avgbat += battery_adc_voltage() - (avgbat / BATT_AVE_SAMPLES);
             /*
              * battery_millivolts is the millivolt-scaled filtered battery value.
@@ -1047,17 +1090,20 @@ static void power_thread_sleep(int ticks)
             /* update battery status every time an update is available */
             battery_status_update();
 
-#ifndef NO_LOW_BATTERY_SHUTDOWN
-            if (!shutdown_timeout &&
-                (battery_millivolts < battery_level_shutoff[battery_type]))
+            if (!shutdown_timeout && query_force_shutdown()) {
                 sys_poweroff();
-            else
-#endif
+            }
+            else {
                 avgbat += battery_millivolts - (avgbat / BATT_AVE_SAMPLES);
+            }
         }
 
+#if CONFIG_CHARGING
+    do_small_step:
+#endif
         charging_algorithm_small_step();
     }
+    while (TIME_BEFORE(current_tick, tick_return));
 }
 
 static void power_thread(void)
@@ -1074,7 +1120,7 @@ static void power_thread(void)
 #ifdef HAVE_DISK_STORAGE /* this adjustment is only needed for HD based */
         /* The battery voltage is usually a little lower directly after
            turning on, because the disk was used heavily. Raise it by 5% */
-#ifdef HAVE_CHARGING
+#if CONFIG_CHARGING
     if(!charger_inserted()) /* only if charger not connected */
 #endif
         avgbat += (percent_to_volt_discharge[battery_type][6] -
@@ -1094,6 +1140,10 @@ static void power_thread(void)
                            percent_to_volt_discharge[battery_type]);
         battery_percent += (battery_percent < 100);
     }
+
+#if CONFIG_CHARGING == CHARGING_TARGET
+    powermgmt_init_target();
+#endif
 
     while (1)
     {
@@ -1121,6 +1171,7 @@ void powermgmt_init(void)
 
 #endif /* SIMULATOR */
 
+#ifndef BOOTLOADER
 void sys_poweroff(void)
 {
 #ifndef BOOTLOADER
@@ -1142,6 +1193,7 @@ void sys_poweroff(void)
     queue_broadcast(SYS_POWEROFF, 0);
 #endif /* BOOTLOADER */
 }
+#endif
 
 void cancel_shutdown(void)
 {

@@ -28,6 +28,7 @@
 #include "button-target.h"
 #include "usb-target.h"
 #include "power-imx31.h"
+#include "powermgmt-target.h"
 
 /* Gigabeat S definitions for static MC13783 event registration */
 
@@ -45,6 +46,18 @@ static const struct mc13783_event mc13783_events[] =
         .mask = MC13783_ONOFD1M,
         .callback = button_power_event,
     },
+    [MC13783_SE1_EVENT] = /* Main charger detection */
+    {
+        .set  = MC13783_EVENT_SET0,
+        .mask = MC13783_SE1M,
+        .callback = charger_main_detect_event,
+    },
+    [MC13783_USB_EVENT] = /* USB insertion/USB charger detection */
+    {
+        .set  = MC13783_EVENT_SET0,
+        .mask = MC13783_USBM,
+        .callback = usb_connect_event,
+    },
 #ifdef HAVE_HEADPHONE_DETECTION
     [MC13783_ONOFD2_EVENT] = /* Headphone jack */
     {
@@ -53,18 +66,6 @@ static const struct mc13783_event mc13783_events[] =
         .callback = headphone_detect_event,
     },
 #endif
-    [MC13783_CHGDET_EVENT] = /* Charger detection */
-    {
-        .set  = MC13783_EVENT_SET0,
-        .mask = MC13783_CHGDETM,
-        .callback = charger_detect_event,
-    },
-    [MC13783_USB4V4_EVENT] = /* USB insertion */
-    {
-        .set  = MC13783_EVENT_SET0,
-        .mask = MC13783_USBM,
-        .callback = usb_connect_event,
-    },
 };
 
 const struct mc13783_event_list mc13783_event_list =

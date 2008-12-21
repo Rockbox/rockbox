@@ -28,6 +28,7 @@
 #include "usb_drv.h"
 #include "usb-target.h"
 #include "clkctl-imx31.h"
+#include "power-imx31.h"
 #include "mc13783.h"
 
 static int usb_status = USB_EXTRACTED;
@@ -53,8 +54,11 @@ static void enable_transceiver(bool enable)
 
 void usb_connect_event(void)
 {
-    uint32_t status = mc13783_read(MC13783_INTERRUPT_SENSE0);    
-    usb_status = (status & MC13783_USB4V4S) ? USB_INSERTED : USB_EXTRACTED;
+    uint32_t status = mc13783_read(MC13783_INTERRUPT_SENSE0);
+    usb_status = (status & MC13783_USB4V4S) ?
+        USB_INSERTED : USB_EXTRACTED;
+    /* Notify power that USB charging is potentially available */
+    charger_usb_detect_event(usb_status);
 }
 
 int usb_detect(void)
@@ -81,7 +85,7 @@ void usb_init_device(void)
     usb_connect_event();
 
     /* Enable PMIC event */
-    mc13783_enable_event(MC13783_USB4V4_EVENT);
+    mc13783_enable_event(MC13783_USB_EVENT);
 }
 
 void usb_enable(bool on)

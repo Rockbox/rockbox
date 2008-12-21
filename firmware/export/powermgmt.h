@@ -30,17 +30,26 @@
 #define CHARGE_END_LONGD  50     /* stop when N minutes have passed with
                                   * avg delta being < -0.02 V */
 
-#if CONFIG_CHARGING >= CHARGING_MONITOR
 typedef enum {       /* sorted by increasing charging current */
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+    CHARGE_STATE_DISABLED = -2, /* Disable charger use */
+    CHARGE_STATE_ERROR = -1, /* Some error occurred that should not allow
+                        further attempts without user intervention */
+#endif
     DISCHARGING = 0,
+#if CONFIG_CHARGING >= CHARGING_MONITOR
     TRICKLE,         /* Can occur for CONFIG_CHARGING >= CHARGING_MONITOR */
+                     /* For LiIon, the low-current precharge mode if battery
+                        was very low */
     TOPOFF,          /* Can occur for CONFIG_CHARGING == CHARGING_CONTROL */
-    CHARGING         /* Can occur for all CONFIG_CHARGING options */
+                     /* For LiIon, constant voltage phase */
+    CHARGING,        /* Can occur for all CONFIG_CHARGING options */
+                     /* For LiIon, the constant current phase */
+#endif
 } charge_state_type;
 
 /* tells what the charger is doing */
 extern charge_state_type charge_state;
-#endif /* CONFIG_CHARGING >= CHARGING_MONITOR */
 
 #ifdef CONFIG_CHARGING
 /*
@@ -48,10 +57,10 @@ extern charge_state_type charge_state;
  * one time through the power loop when the charger has been plugged in.
  */
 typedef enum {
-    NO_CHARGER,
-    CHARGER_UNPLUGGED,              /* transient state */
-    CHARGER_PLUGGED,                /* transient state */
-    CHARGER
+    NO_CHARGER = 0,     /* No charger is present */
+    CHARGER_UNPLUGGED,  /* Transitional state during CHARGER=>NO_CHARGER */
+    CHARGER_PLUGGED,    /* Transitional state during NO_CHARGER=>CHARGER */
+    CHARGER             /* Charger is present */
 } charger_input_state_type;
 
 /* tells the state of the charge input */
@@ -154,6 +163,11 @@ extern int trickle_sec;          /* trickle charge: How many seconds per minute 
 # define MAX_CHG_V       10250  /* anything over 10.25v gives CURRENT_MAX_CHG */
 #endif /* not ONDIO */
 
+#if CONFIG_CHARGING == CHARGING_TARGET
+/* Include target-specific definitions */
+#include "powermgmt-target.h"
+#endif
+
 extern unsigned short power_history[POWER_HISTORY_LEN];
 extern const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT];
 extern const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT];
@@ -165,6 +179,12 @@ extern const unsigned short percent_to_volt_charge[11];
 /* Start up power management thread */
 void powermgmt_init(void);
 
+/* Do target portion of init (for CHARGING_TARGET) - called on power thread */
+void powermgmt_init_target(void);
+
+/* Handle frequent tasks and call charging_algorithm_small_step */
+void power_thread_sleep(int ticks);
+
 #endif /* SIMULATOR */
 
 /* Returns battery statust */
@@ -173,11 +193,19 @@ int battery_time(void); /* minutes */
 unsigned int battery_adc_voltage(void); /* voltage from ADC in millivolts */
 unsigned int battery_voltage(void); /* filtered batt. voltage in millivolts */
 
+/* Set the filtered battery voltage (to adjust it before beginning a charge
+   cycle for instance where old, loaded readings will likely be invalid). */
+void set_filtered_battery_voltage(int millivolts);
+
 /* read unfiltered battery info */
 void battery_read_info(int *voltage, int *level);
 
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void);
+
+#ifdef TARGET_POWERMGMT_FILTER_CHARGE_STATE
+int powermgmt_filter_charge_state(void);
+#endif
 
 void set_poweroff_timeout(int timeout);
 void set_battery_capacity(int capacity); /* set local battery capacity value */
@@ -190,7 +218,11 @@ void reset_poweroff_timer(void);
 void cancel_shutdown(void);
 void shutdown_hw(void);
 void sys_poweroff(void);
+/* Returns true if the system should force shutdown for some reason -
+ * eg. low battery */
+bool query_force_shutdown(void);
 #ifdef HAVE_ACCESSORY_SUPPLY
 void accessory_supply_set(bool);
 #endif
-#endif
+
+#endif /* _POWERMGMT_H_ */

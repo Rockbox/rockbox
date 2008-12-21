@@ -31,8 +31,8 @@ enum mc13783_event_ids
 #ifdef HAVE_HEADPHONE_DETECTION
     MC13783_ONOFD2_EVENT,      /* Headphone jack */
 #endif
-    MC13783_CHGDET_EVENT,      /* Charger detection */
-    MC13783_USB4V4_EVENT,      /* USB insertion */
+    MC13783_SE1_EVENT,         /* Main charger detection */
+    MC13783_USB_EVENT,         /* USB insertion */
 };
 
 #endif /* MC13783_TARGET_H */

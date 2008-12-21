@@ -2,7 +2,6 @@
  * This config file is for toshiba Gigabeat S
  */
 
-#define NO_LOW_BATTERY_SHUTDOWN
 #define TARGET_TREE /* this target is using the target tree system */
 
 #define TOSHIBA_GIGABEAT_S 1
@@ -132,8 +131,10 @@
 #define BATTERY_CAPACITY_INC      25 /* capacity increment */
 #define BATTERY_TYPES_COUNT        1 /* only one type */
 
-/* Hardware controlled charging with monitoring */
-#define CONFIG_CHARGING CHARGING_MONITOR
+/* TODO: have a proper status displayed in the bootloader and have it
+ * work! */
+/* Charing implemented in a target-specific algorithm */
+#define CONFIG_CHARGING CHARGING_TARGET
 
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING
@@ -146,8 +147,9 @@
 #define CPU_FREQ 264000000 /* Set by retailOS loader */
 
 /* define this if the unit can be powered or charged via USB */
-//#define HAVE_USB_POWER /* Disable for now */
-//#define HAVE_USB_CHARGING_ENABLE
+#define HAVE_USB_POWER
+#define USBPOWER_BUTTON     BUTTON_MENU
+#define USBPOWER_BTN_IGNORE BUTTON_POWER
 
 /* define this if the unit has a battery switch or battery can be removed
  * when running */

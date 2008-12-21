@@ -117,6 +117,8 @@
 #define CHARGING_SIMPLE  1 /* Simple, hardware controlled charging */
 #define CHARGING_MONITOR 2 /* Hardware controlled charging with monitoring */
 #define CHARGING_CONTROL 3 /* Software controlled charging */
+#define CHARGING_TARGET  4 /* Anything the target implements that is not
+                              a generic implementation */
 
 /* CONFIG_LCD */
 #define LCD_SSD1815   1 /* as used by Archos Recorders and Ondios */

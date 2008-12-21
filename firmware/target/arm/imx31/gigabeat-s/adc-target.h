@@ -47,7 +47,14 @@
 #define ADC_READ_ERROR 0xFFFF
 
 void adc_done(void);
+/* Enable conversion of specified channel (if switchoff is possible) */
+bool adc_enable_channel(int channel, bool enable);
+
+/* Implemented in powermgmt-imx31.c */
 int battery_adc_charge_current(void);
-unsigned int battery_adc_temp(void);
+int battery_adc_temp(void);
+unsigned int application_supply_adc_voltage(void);
+unsigned int chrgraw_adc_voltage(void);
+unsigned int cccv_regulator_dissipation(void);
 
 #endif

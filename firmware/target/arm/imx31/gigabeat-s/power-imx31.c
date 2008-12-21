@@ -20,6 +20,8 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
+#include "usb.h"
+#include "usb_core.h"
 #include "power.h"
 #include "power-imx31.h"
 #include "backlight.h"
@@ -29,34 +31,46 @@
 #include "i2c-imx31.h"
 
 extern struct i2c_node si4700_i2c_node;
+static unsigned int power_status = POWER_INPUT_NONE;
 
-static bool charger_detect = false;
-
-/* This is called from the mc13783 interrupt thread */
-void charger_detect_event(void)
-{
-    charger_detect =
-        mc13783_read(MC13783_INTERRUPT_SENSE0) & MC13783_CHGDETS;
-}
-
+/* Detect which power sources are present. */
 unsigned int power_input_status(void)
 {
-    unsigned int status = POWER_INPUT_NONE;
+    unsigned int status = power_status;
 
-    if ((GPIO3_DR & (1 << 20)) != 0)
+    if (GPIO3_DR & (1 << 20))
         status |= POWER_INPUT_BATTERY;
 
-    if (charger_detect)
-        status |= POWER_INPUT_MAIN_CHARGER;
+    if (usb_allowed_current() < 500)
+    {
+        /* ACK that USB is connected but NOT chargeable */
+        status &= ~(POWER_INPUT_USB_CHARGER & POWER_INPUT_CHARGER);
+    }
 
     return status;
 }
 
-/* Returns true if the unit is charging the batteries. */
-bool charging_state(void)
+/* Detect changes in presence of the AC adaptor. */
+void charger_main_detect_event(void)
 {
-    return false;
+    if (mc13783_read(MC13783_INTERRUPT_SENSE0) & MC13783_SE1S)
+        power_status |= POWER_INPUT_MAIN_CHARGER;
+    else
+        power_status &= ~POWER_INPUT_MAIN_CHARGER;
 }
+
+/* Detect changes in USB bus power. Called from usb connect event handler. */
+void charger_usb_detect_event(int status)
+{
+    /* USB plugged does not imply charging is possible or even
+     * powering the device to maintain the battery. */
+    if (status == USB_INSERTED)
+        power_status |= POWER_INPUT_USB_CHARGER;
+    else
+        power_status &= ~POWER_INPUT_USB_CHARGER;
+}
+
+/* charging_state is implemented in powermgmt-imx31.c */
 
 void ide_power_enable(bool on)
 {
@@ -129,9 +143,8 @@ void power_off(void)
 void power_init(void)
 {
     /* Poll initial state */
-    charger_detect_event();
+    charger_main_detect_event();
 
     /* Enable detect event */
-    mc13783_enable_event(MC13783_CHGDET_EVENT);
+    mc13783_enable_event(MC13783_SE1_EVENT);
 }
-

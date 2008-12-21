@@ -84,6 +84,30 @@ unsigned short adc_read(int channel)
     return (channel & 4) ? MC13783_ADD2r(data) : MC13783_ADD1r(data);
 }
 
+bool adc_enable_channel(int channel, bool enable)
+{
+    uint32_t bit, mask;
+
+    switch (channel)
+    {
+    case ADC_CHARGER_CURRENT:
+        mask = MC13783_CHRGICON;
+        break;
+
+    case ADC_BATTERY_TEMP:
+        mask = MC13783_RTHEN;
+        break;
+
+    default:
+        return false;
+    }
+
+    bit = enable ? mask : 0;
+
+    return mc13783_write_masked(MC13783_ADC0, bit, mask)
+                != MC13783_DATA_ERROR;
+}
+
 /* Called by mc13783 interrupt thread when conversion is complete */
 void adc_done(void)
 {
@@ -98,9 +122,9 @@ void adc_init(void)
     /* Init so first reads get data */
     last_adc_read[0] = last_adc_read[1] = current_tick-1;
 
-    /* Enable increment-by-read, thermistor, charge current */
-    mc13783_write(MC13783_ADC0, MC13783_ADINC2 | MC13783_ADINC1 |
-                  MC13783_RTHEN | MC13783_CHRGICON);
+    /* Enable increment-by-read, turn off extra conversions. */
+    mc13783_write(MC13783_ADC0, MC13783_ADINC2 | MC13783_ADINC1);
+
     /* Enable ADC, set multi-channel mode */
     mc13783_write(MC13783_ADC1, MC13783_ADEN);
 

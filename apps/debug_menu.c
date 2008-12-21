@@ -1649,15 +1649,87 @@ static bool view_battery(void)
                          charger_inserted() ? "present" : "absent");
                 lcd_puts(0, 3, buf);
 #if defined TOSHIBA_GIGABEAT_S
+                int line = 4;
+                unsigned int st;
+
+                static const unsigned char * const chrgstate_strings[] =
+                {
+                    "Disabled",
+                    "Error",
+                    "Discharging",
+                    "Precharge",
+                    "Constant Voltage",
+                    "Constant Current",
+                    "<unknown>",
+                };
+
+                st = power_input_status() &
+                     (POWER_INPUT_CHARGER | POWER_INPUT_BATTERY);
+                snprintf(buf, 30, "%s%s",
+                         (st & POWER_INPUT_MAIN_CHARGER) ? " Main" : "",
+                         (st & POWER_INPUT_USB_CHARGER) ? " USB" : "");
+                lcd_puts(0, line++, buf);
+
+                snprintf(buf, 30, "IUSB Max: %d", usb_allowed_current());
+                lcd_puts(0, line++, buf);
+
+                y = ARRAYLEN(chrgstate_strings) - 1;
+
+                switch (charge_state)
+                {
+                case CHARGE_STATE_DISABLED: y--;
+                case CHARGE_STATE_ERROR:    y--;
+                case DISCHARGING:           y--;
+                case TRICKLE:               y--;
+                case TOPOFF:                y--;
+                case CHARGING:              y--;
+                default:;
+                }
+
+                snprintf(buf, 30, "State: %s", chrgstate_strings[y]);
+                lcd_puts(0, line++, buf);
+
+                snprintf(buf, 30, "Battery Switch: %s",
+                         (st & POWER_INPUT_BATTERY) ? "On" : "Off");
+                lcd_puts(0, line++, buf);
+
+                y = chrgraw_adc_voltage();
+                snprintf(buf, 30, "CHRGRAW: %d.%03d V",
+                         y / 1000, y % 1000);
+                lcd_puts(0, line++, buf);
+
+                y = application_supply_adc_voltage();
+                snprintf(buf, 30, "BP     : %d.%03d V",
+                         y / 1000, y % 1000);
+                lcd_puts(0, line++, buf);
+
                 y = battery_adc_charge_current();
-                x = y < 0 ? '-' : ' ';
-                y = abs(y);
-                snprintf(buf, 30, "I Charge:%c%d.%03d A", (char)x, y / 1000, y % 1000);
-                lcd_puts(0, 4, buf);
+                if (y < 0) x = '-', y = -y;
+                else       x = ' ';
+                snprintf(buf, 30, "CHRGISN:%c%d mA", x, y);
+                lcd_puts(0, line++, buf);
+
+                y = cccv_regulator_dissipation();
+                snprintf(buf, 30, "P CCCV : %d mW", y);
+                lcd_puts(0, line++, buf);
+
+                y = battery_charge_current();
+                if (y < 0) x = '-', y = -y;
+                else       x = ' ';
+                snprintf(buf, 30, "I Charge:%c%d mA", x, y);
+                lcd_puts(0, line++, buf);
 
                 y = battery_adc_temp();
-                snprintf(buf, 30, "T Battery: %dC (%dF)", y, (9*y + 160) / 5);
-                lcd_puts(0, 5, buf);
+
+                if (y != INT_MIN) {
+                    snprintf(buf, 30, "T Battery: %dC (%dF)", y,
+                             (9*y + 160) / 5);
+                } else {
+                    /* Conversion disabled */
+                    snprintf(buf, 30, "T Battery: ?");
+                }
+                    
+                lcd_puts(0, line++, buf);
 #endif /* defined TOSHIBA_GIGABEAT_S */
 #endif /* defined IPOD_NANO || defined IPOD_VIDEO */
 #endif /* CONFIG_CHARGING != CHARGING_CONTROL */
