@@ -91,14 +91,14 @@ int ICODE_ATTR_DEMAC decode_chunk(struct ape_ctx_t* ape_ctx,
 #endif
 
     if ((ape_ctx->channels==1) || (ape_ctx->frameflags & APE_FRAMECODE_PSEUDO_STEREO)) {
-        if (ape_ctx->frameflags & APE_FRAMECODE_STEREO_SILENCE) {
+        if (ape_ctx->frameflags & APE_FRAMECODE_STEREO_SILENCE) { 
             entropy_decode(ape_ctx, inbuffer, firstbyte, bytesconsumed, decoded0, decoded1, count);
             /* We are pure silence, so we're done. */
             return 0;
         } else {
             entropy_decode(ape_ctx, inbuffer, firstbyte, bytesconsumed, decoded0, NULL, count);
         }
-    
+
         switch (ape_ctx->compressiontype)
         {
             case 2000:
@@ -124,26 +124,23 @@ int ICODE_ATTR_DEMAC decode_chunk(struct ape_ctx_t* ape_ctx,
         predictor_decode_mono(&ape_ctx->predictor,decoded0,count);
 
         if (ape_ctx->channels==2) {
-            /* Pseudo-stereo - just copy left channel to right channel */
+            /* Pseudo-stereo - copy left channel to right channel */
             while (count--)
             {
                 left = *decoded0;
                 *(decoded1++) = *(decoded0++) = SCALE(left);
             }
-        } else {
-            /* Mono - do nothing unless it's 8-bit audio */
-            if (ape_ctx->bps == 8) {
-                /* TODO: Handle 8-bit streams */
-            } else {
-                /* Scale to output depth */
-                while (count--)
-                {
-                    left = *decoded0;
-                    *(decoded0++) = SCALE(left);
-                }    
-            }
-
         }
+#ifdef ROCKBOX
+         else {
+            /* Scale to output depth */
+            while (count--)
+            {
+                left = *decoded0;
+                *(decoded0++) = SCALE(left);
+            }
+        }
+#endif
     } else { /* Stereo */
         if (ape_ctx->frameflags & APE_FRAMECODE_STEREO_SILENCE) {
             /* We are pure silence, so we're done. */
@@ -177,18 +174,14 @@ int ICODE_ATTR_DEMAC decode_chunk(struct ape_ctx_t* ape_ctx,
         /* Now apply the predictor decoding */
         predictor_decode_stereo(&ape_ctx->predictor,decoded0,decoded1,count);
 
-        if (ape_ctx->bps == 8) {
-            /* TODO: Handle 8-bit streams */
-        } else {
-            /* Decorrelate and scale to output depth */
-            while (count--)
-            {
-                left = *decoded1 - (*decoded0 / 2);
-                right = left + *decoded0;
+        /* Decorrelate and scale to output depth */
+        while (count--)
+        {
+            left = *decoded1 - (*decoded0 / 2);
+            right = left + *decoded0;
 
-                *(decoded0++) = SCALE(left);
-                *(decoded1++) = SCALE(right);
-            }
+            *(decoded0++) = SCALE(left);
+            *(decoded1++) = SCALE(right);
         }
     }
     return 0;
