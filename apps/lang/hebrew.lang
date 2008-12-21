@@ -434,7 +434,7 @@
     *: "Playlists"
   </source>
   <dest>
-    *: "רשימות השמעה"
+    *: "רשימות שירים"
   </dest>
   <voice>
     *: "Playlists"
@@ -5971,7 +5971,7 @@
   </source>
   <dest>
     *: none
-    recording: "מה לעשות בפיצול"
+    recording: "מה לעשות בעת פיצול"
   </dest>
   <voice>
     *: none
@@ -6139,7 +6139,7 @@
   </source>
   <dest>
     *: none
-    recording: "נקה ספרית הקלטות"
+    recording: "נקה את ספרית ההקלטות"
   </dest>
   <voice>
     *: none
@@ -6156,7 +6156,7 @@
   </source>
   <dest>
     *: none
-    recording: "לא ניתן לכתוב לספרית ההקלטה!"
+    recording: "לא ניתן לכתוב לספרית ההקלטות!"
   </dest>
   <voice>
     *: none
@@ -6207,7 +6207,7 @@
   </source>
   <dest>
     *: none
-    remote: "שלט בלבד"
+    remote: "יחידת שלט בלבד"
   </dest>
   <voice>
     *: none
@@ -6740,7 +6740,7 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "הכנס את כל תת-הספריות"
+    *: "הכנס את כל תתי-הספריות"
   </dest>
   <voice>
     *: "Recursively Insert Directories"
@@ -6754,7 +6754,7 @@
     *: "Recursively?"
   </source>
   <dest>
-    *: "בצורה רקורסיבית?"
+    *: "את כל תתי-הספריות?"
   </dest>
   <voice>
     *: "Recursively?"
@@ -6768,7 +6768,7 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "הזהר לפני מחיקת רשימת השירים הנוכחית"
+    *: "הזהר לפני מחיקת רשימת השירים הדינאמית"
   </dest>
   <voice>
     *: "Warn When Erasing Dynamic Playlist"
@@ -6782,7 +6782,7 @@
     *: "Erase dynamic playlist?"
   </source>
   <dest>
-    *: "למחוק רשימת שירים נוכחית?"
+    *: "למחוק רשימת שירים דינאמית?"
   </dest>
   <voice>
     *: "Erase dynamic playlist?"
@@ -6845,9 +6845,9 @@
     h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "Battery: %d%% %dh %dm"
+    *: "סוללה: %d%% %dh %dm"
     player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
-    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "סולל: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
@@ -6875,7 +6875,7 @@
     *: "Free:"
   </source>
   <dest>
-    *: "מקום חופשי בכונן:"
+    *: "מקום פנוי:"
   </dest>
   <voice>
     *: "Free diskspace:"
@@ -6926,7 +6926,7 @@
     *: "Version"
   </source>
   <dest>
-    *: "גרסה"
+    *: "גירסה"
   </dest>
   <voice>
     *: "Version"
@@ -7346,7 +7346,7 @@
     *: "Context Menu"
   </source>
   <dest>
-    *: "תפריט"
+    *: "תפריט הקשר"
   </dest>
   <voice>
     *: "Context Menu"
@@ -7388,7 +7388,7 @@
     *: "Show Track Info"
   </source>
   <dest>
-    *: "ID3 הצג מידע"
+    *: "הצג מידע שיר"
   </dest>
   <voice>
     *: "Show Track Info"
@@ -7402,7 +7402,7 @@
     *: "[Title]"
   </source>
   <dest>
-    *: "[שם השיר]"
+    *: "[כותרת]"
   </dest>
   <voice>
     *: ""
@@ -7444,7 +7444,7 @@
     *: "[Tracknum]"
   </source>
   <dest>
-    *: "[מספר שיר]"
+    *: "[מספר רצועה]"
   </dest>
   <voice>
     *: ""
@@ -7598,7 +7598,7 @@
     *: "[Track Gain]"
   </source>
   <dest>
-    *: "[הגברה חוזרת שיר]"
+    *: "[הגברה שיר]"
   </dest>
   <voice>
     *: ""
@@ -7612,7 +7612,7 @@
     *: "[Album Gain]"
   </source>
   <dest>
-    *: "[הגברה חוזרת אלבום]"
+    *: "[הגברה אלבום]"
   </dest>
   <voice>
     *: ""
@@ -7626,7 +7626,7 @@
     *: "[Path]"
   </source>
   <dest>
-    *: "[כתובת]"
+    *: "[נתיב]"
   </dest>
   <voice>
     *: ""
@@ -7710,7 +7710,7 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "הקובץ\ספריה קיימים כבר. לכתוב עליהם?"
+    *: "הקובץ\ספריה כבר קיימים. לדרוס אותם?"
   </dest>
   <voice>
     *: "File or directory exists. Overwrite?"
@@ -7873,7 +7873,7 @@
     *: "Open With..."
   </source>
   <dest>
-    *: "...פתח באמצעות"
+    *: "פתיחה באמצעות..."
   </dest>
   <voice>
     *: "open with"
@@ -8014,7 +8014,7 @@
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "זיכרון רשימת השירים מלא"
+    *: "חוצץ רשימת השירים מלא"
   </dest>
   <voice>
     *: "Playlist Buffer Full"
@@ -8199,7 +8199,7 @@
     *: "Time"
   </source>
   <dest>
-    *: "הגדר תאריך וזמן"
+    *: "זמן"
   </dest>
   <voice>
     *: "Time"
@@ -8334,7 +8334,7 @@
   </source>
   <dest>
     *: none
-    ondio*: "אנא הסר כרטיס מולטימדיה"
+    ondio*: "אנא הסר כרטיס MMC"
   </dest>
   <voice>
     *: none
@@ -8349,7 +8349,7 @@
     *: "Boot changed"
   </source>
   <dest>
-    *: "קובץ המערכת שונה"
+    *: "קובץ האיתחול השתנה"
   </dest>
   <voice>
     *: "Boot changed"
@@ -8399,7 +8399,7 @@
     *: "No files"
   </source>
   <dest>
-    *: "קבצים אין"
+    *: "אין קבצים"
   </dest>
   <voice>
     *: "No files"
@@ -8427,7 +8427,7 @@
     *: "Can't open %s"
   </source>
   <dest>
-    *: "אינו נפתח %s"
+    *: "לא ניתן לפתוח את %s"
   </dest>
   <voice>
     *: ""
@@ -8441,7 +8441,7 @@
     *: "Failed reading %s"
   </source>
   <dest>
-    *: "נכשלה הקריאה %s"
+    *: "נכשלה הקריאה של %s"
   </dest>
   <voice>
     *: ""
@@ -8483,7 +8483,7 @@
     *: "Plugin returned error"
   </source>
   <dest>
-    *: "ההתקן החזיר שגיאה"
+    *: "התוסף החזיר שגיאה"
   </dest>
   <voice>
     *: ""
@@ -8525,7 +8525,7 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "זיכרון התיקיות מלא!"
+    *: "חוצץ התיקיות מלא!"
   </dest>
   <voice>
     *: "Directory Buffer is Full!"
@@ -8553,7 +8553,7 @@
     *: "Plugin name too long"
   </source>
   <dest>
-    *: "שם ההתקן ארוך מידיי"
+    *: "שם התוסף ארוך מידיי"
   </dest>
   <voice>
     *: "Plugin name too long"
@@ -8569,7 +8569,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "...מאתחל את ההשמעה"
+    swcodec: "...מאתחל את רשימת השירים"
   </dest>
   <voice>
     *: none
@@ -8584,7 +8584,7 @@
     *: "Please reboot to enable"
   </source>
   <dest>
-    *: "אנא אתחל את הנגן כדי להחיל את השינויים"
+    *: "אנא אתחל כדי להשתמש באפשרות זו"
   </dest>
   <voice>
     *: "Please reboot to enable"
@@ -8600,7 +8600,7 @@
   </source>
   <dest>
     *: none
-    charging: "סוללה: בטעינה"
+    charging: "סוללה: טעינה"
   </dest>
   <voice>
     *: none
@@ -8617,7 +8617,7 @@
   </source>
   <dest>
     *: none
-    recorder: "טעינת: כיבוי במקסימום"
+    recorder: "סוללה: כיבוי במקסימום"
   </dest>
   <voice>
     *: none
@@ -8634,7 +8634,7 @@
   </source>
   <dest>
     *: none
-    charging: "טעינת: טפטוף טעינה"
+    charging: "סוללה: טפטוף טעינה"
   </dest>
   <voice>
     *: none
@@ -10111,7 +10111,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "מצב עריכה: %s"
   </dest>
   <voice>
     *: none
@@ -10128,7 +10128,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "תדירות קיטעון"
   </dest>
   <voice>
     *: none
@@ -10145,7 +10145,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Gain"
+    lcd_bitmap: "הגבר"
   </dest>
   <voice>
     *: none
@@ -10366,7 +10366,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Mode:"
+    lcd_bitmap: "מצב:"
   </dest>
   <voice>
     *: none
@@ -10383,7 +10383,7 @@
   </source>
   <dest>
     *: none
-    recorder_pad: "Menu"
+    recorder_pad: "תפריט"
   </dest>
   <voice>
     *: none
@@ -10400,7 +10400,7 @@
   </source>
   <dest>
     *: none
-    recorder_pad: "Option"
+    recorder_pad: "אפשרות"
   </dest>
   <voice>
     *: none
@@ -10468,7 +10468,7 @@
   </source>
   <dest>
     *: none
-    recording: "Stereo"
+    recording: "סטריאו"
   </dest>
   <voice>
     *: none
@@ -10485,7 +10485,7 @@
   </source>
   <dest>
     *: none
-    recording: "Mono"
+    recording: "מונו"
   </dest>
   <voice>
     *: none
@@ -10502,7 +10502,7 @@
   </source>
   <dest>
     *: none
-    recording_hwcodec: "Quality"
+    recording_hwcodec: "איכות"
   </dest>
   <voice>
     *: none
@@ -10519,7 +10519,7 @@
   </source>
   <dest>
     *: none
-    recording: "Frequency"
+    recording: "תדירות"
   </dest>
   <voice>
     *: none
@@ -10536,7 +10536,7 @@
   </source>
   <dest>
     *: none
-    recording: "Source"
+    recording: "מקור"
   </dest>
   <voice>
     *: none
@@ -10553,7 +10553,7 @@
   </source>
   <dest>
     *: none
-    recording: "Int. Mic"
+    recording: "מיק. פנימי"
   </dest>
   <voice>
     *: none
@@ -10587,7 +10587,7 @@
   </source>
   <dest>
     *: none
-    recording: "Digital"
+    recording: "דיגיטלי"
   </dest>
   <voice>
     *: none
@@ -10604,7 +10604,7 @@
   </source>
   <dest>
     *: none
-    recording: "Channels"
+    recording: "ערוצים"
   </dest>
   <voice>
     *: none
@@ -10621,7 +10621,7 @@
   </source>
   <dest>
     *: none
-    recording: "Trigger"
+    recording: "הדק הפעלה"
   </dest>
   <voice>
     *: none
@@ -10706,7 +10706,7 @@
   </source>
   <dest>
     *: none
-    recording: "Gain Left"
+    recording: "הגבר שמאל"
   </dest>
   <voice>
     *: none
@@ -10723,7 +10723,7 @@
   </source>
   <dest>
     *: none
-    recording: "Gain Right"
+    recording: "הגבר ימין"
   </dest>
   <voice>
     *: none
@@ -10926,7 +10926,7 @@
     *: "Demos"
   </source>
   <dest>
-    *: "Demos"
+    *: "הדגמות"
   </dest>
   <voice>
     *: "Demos"
@@ -11182,7 +11182,7 @@
   </source>
   <dest>
     *: none
-    usbstack: "Device Driver"
+    usbstack: "מנהל התקן"
   </dest>
   <voice>
     *: none
@@ -11512,7 +11512,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Keyclick Repeats"
+    swcodec: "לחיצות חוזרות"
   </dest>
   <voice>
     *: none
@@ -11529,7 +11529,7 @@
   </source>
   <dest>
     *: none
-    accessory_supply: "Accessory Power Supply"
+    accessory_supply: "ספק כוח של התקן עזר"
   </dest>
   <voice>
     *: none
@@ -11749,7 +11749,7 @@
     *: "Skip Length"
   </source>
   <dest>
-    *: "Skip Length"
+    *: "דלג אורך"
   </dest>
   <voice>
     *: "Skip Length"
@@ -11763,7 +11763,7 @@
     *: "Skip Track"
   </source>
   <dest>
-    *: "דלג רצועה"
+    *: "דלג שיר"
   </dest>
   <voice>
     *: "Skip Track"
@@ -11909,7 +11909,7 @@
   </source>
   <dest>
     *: none
-    recording: "Split Time:"
+    recording: "זמן פיצול:"
   </dest>
   <voice>
     *: none
@@ -11931,5 +11931,203 @@
   <voice>
     *: none
     recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMART
+  desc: Display the expected AA size
+  user:
+  <source>
+    *: none
+    albumart: "Album Art:"
+  </source>
+  <dest>
+    *: none
+    albumart: "תמונת אלבום:"
+  </dest>
+  <voice>
+    *: none
+    albumart: "Album Art:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFTRIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "מונו ימין + שמאל"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Mono Left plus Right"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Left Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "קבע כפריט מסך מהיר שמאלי"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Set as Left Quickscreen Item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_SETTING
+  desc: used in the settings context menu
+  user:
+  <source>
+    *: "Reset Setting"
+  </source>
+  <dest>
+    *: "אפס הגדרות"
+  </dest>
+  <voice>
+    *: "Reset Setting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Bottom Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "קבע כפריט מסך מהיר תחתון"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Set as Bottom Quickscreen Item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QS_ITEMS
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Right Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "קבע כפריט מסך מהיר ימני"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Set as Right Quickscreen Item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user:
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "תוצאות חיפוש"
+  </dest>
+  <voice>
+    *: "Search Results"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MONO_MODE
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono mode"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "מצב מונו"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Mono mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
   </voice>
 </phrase>
