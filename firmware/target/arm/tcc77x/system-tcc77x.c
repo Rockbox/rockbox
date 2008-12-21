@@ -99,12 +99,12 @@ static void gpio_init(void)
     GPIOD_FUNC = 0;
     GPIOE_FUNC = 0;
     GPIOA = 0x30;
-    GPIOB = 0x80000;
+    GPIOB = 0x00c00;
     GPIOC = 0;
     GPIOD = 0x180;
-    GPIOE = 0;
+    GPIOE = 0x80;
     GPIOA_DIR = 0x84b0;
-    GPIOB_DIR = 0x80800;
+    GPIOB_DIR = 0x80c00;
     GPIOC_DIR = 0x2000000;
     GPIOD_DIR = 0x3e3;
     GPIOE_DIR = 0x88;

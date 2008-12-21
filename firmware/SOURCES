@@ -1129,14 +1129,14 @@ target/arm/as3525/powermgmt-as3525.c
 #ifndef SIMULATOR
 drivers/nand_id.c
 drivers/pcf50606.c
+target/arm/usb-tcc.c
 target/arm/tcc77x/system-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/timer-tcc77x.c
 target/arm/tcc77x/adc-tcc77x.c
-target/arm/tcc77x/powermgmt-tcc77x.c
-target/arm/usb-tcc.c
 target/arm/tcc77x/iaudio7/lcd-iaudio7.c
 target/arm/tcc77x/iaudio7/power-iaudio7.c
+target/arm/tcc77x/iaudio7/powermgmt-iaudio7.c
 target/arm/tcc77x/iaudio7/button-iaudio7.c
 target/arm/tcc77x/iaudio7/ata2501.c
 #ifndef BOOTLOADER
