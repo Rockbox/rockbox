@@ -4,7 +4,7 @@ FILTERS = libdemac/filter_16_11.o libdemac/filter_64_11.o libdemac/filter_256_13
 LIBOBJS = libdemac/parser.o libdemac/decoder.o libdemac/entropy.o libdemac/predictor.o libdemac/crc.o $(FILTERS)
 OBJS = demac.o wavwrite.o $(LIBOBJS)
 
-CFLAGS = -Wall -O3 -Ilibdemac
+CFLAGS = -Wall -g -O3 -Ilibdemac
 
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
 EXT = .exe

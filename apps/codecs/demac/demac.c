@@ -2,7 +2,7 @@
 
 demac - A Monkey's Audio decoder
 
-$Id:$
+$Id$
 
 Copyright (C) Dave Chapman 2007
 
@@ -180,17 +180,27 @@ int ape_decode(char* infile, char* outfile)
 
             /* Convert the output samples to WAV format and write to output file */
             p = wavbuffer;
-            if (ape_ctx.bps == 16) {
+            if (ape_ctx.bps == 8) {
+                for (i = 0 ; i < blockstodecode ; i++)
+                {
+                    /* 8 bit WAV uses unsigned samples */
+                    *(p++) = (decoded0[i] + 0x80) & 0xff;
+
+                    if (ape_ctx.channels == 2) {
+                        *(p++) = (decoded1[i] + 0x80) & 0xff;
+                    }
+                }
+            } else if (ape_ctx.bps == 16) {
                 for (i = 0 ; i < blockstodecode ; i++)
                 {
                     sample16 = decoded0[i];
                     *(p++) = sample16 & 0xff;
-                    *(p++) = (sample16&0xff00) >> 8;
+                    *(p++) = (sample16 >> 8) & 0xff;
 
                     if (ape_ctx.channels == 2) {
                         sample16 = decoded1[i];
                         *(p++) = sample16 & 0xff;
-                        *(p++) = (sample16&0xff00) >> 8;
+                        *(p++) = (sample16 >> 8) & 0xff;
                     }
                 }
             } else if (ape_ctx.bps == 24) {
@@ -198,14 +208,14 @@ int ape_decode(char* infile, char* outfile)
                 {
                     sample32 = decoded0[i];
                     *(p++) = sample32 & 0xff;
-                    *(p++) = (sample32&0xff00) >> 8;
-                    *(p++) = (sample32&0xff0000) >> 16;
+                    *(p++) = (sample32 >> 8) & 0xff;
+                    *(p++) = (sample32 >> 16) & 0xff;
 
                     if (ape_ctx.channels == 2) {
                         sample32 = decoded1[i];
                         *(p++) = sample32 & 0xff;
-                        *(p++) = (sample32&0xff00) >> 8;
-                        *(p++) = (sample32&0xff0000) >> 16;
+                        *(p++) = (sample32 >> 8) & 0xff;
+                        *(p++) = (sample32 >> 16) & 0xff;
                     }
                 }
             }
