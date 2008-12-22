@@ -138,9 +138,9 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3980(struct filter_t* f,
         /* Update the adaption coefficients */
         absres = (res < 0 ? -res : res);
 
-        if (UNLIKELY(absres > (f->avg * 3)))
+        if (UNLIKELY(absres > 3 * f->avg))
             *f->adaptcoeffs = ((res >> 25) & 64) - 32;
-        else if (absres > (f->avg * 4) / 3)
+        else if (3 * absres > 4 * f->avg)
             *f->adaptcoeffs = ((res >> 26) & 32) - 16;
         else if (LIKELY(absres > 0))
             *f->adaptcoeffs = ((res >> 27) & 16) - 8;
