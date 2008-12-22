@@ -74,10 +74,11 @@
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
-/* define this if you have a real-time clock */
+/* define this if you have a real-time clock. The HDD16x0 has a PCF8563 RTC,
+   but it's register compatible with the E8564. */
 #ifndef BOOTLOADER
-/* #define CONFIG_RTC RTC_E8564 */
-/* #define HAVE_RTC_ALARM */
+#define CONFIG_RTC RTC_E8564
+#define HAVE_RTC_ALARM
 #endif
 
 /* Define this if you have a software controlled poweroff */
