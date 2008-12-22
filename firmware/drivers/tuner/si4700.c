@@ -31,24 +31,84 @@
 
 #define I2C_ADR 0x20
 
-/* I2C writes start at register 02h so the first two bytes are
-   02h, next two 03h, etc. */
-static unsigned char write_bytes[8]; /* registers 02 - 05 */
+#define DEVICEID    0x0
+#define CHIPID      0x1
+#define POWERCFG    0x2
+#define CHANNEL     0x3
+#define SYSCONFIG1  0x4
+#define SYSCONFIG2  0x5
+#define SYSCONFIG3  0x6
+#define TEST1       0x7
+#define TEST2       0x8
+#define BOOTCONFIG  0x9
+#define STATUSRSSI  0xA
+#define READCHAN    0xB
+#define RDSA        0xC
+#define RDSB        0xD
+#define RDSC        0xE
+#define RDSD        0xF
+
+/* some models use the internal 32 kHz oscillator which needs special attention
+   during initialisation, power-up and power-down.
+*/
+#if defined(SANSA_CLIP) || defined(SANSA_E200V2) || defined(SANSA_FUZE)
+#define USE_INTERNAL_OSCILLATOR
+#endif
+
 static bool tuner_present = false;
+static unsigned short cache[16];
+
+/* reads <len> registers from radio at offset 0x0A into cache */
+static void si4700_read(int len)
+{
+    int i;
+    unsigned char buf[32];
+    unsigned char *ptr = buf;
+    unsigned short data;
+    
+    fmradio_i2c_read(I2C_ADR, buf, len * 2);
+    for (i = 0; i < len; i++) {
+        data = ptr[0] << 8 | ptr[1];
+        cache[(i + STATUSRSSI) & 0xF] = data;
+        ptr += 2;
+    }
+}
+
+/* writes <len> registers from cache to radio at offset 0x02 */
+static void si4700_write(int len)
+{
+    int i;
+    unsigned char buf[32];
+    unsigned char *ptr = buf;
+    unsigned short data;
+    
+    for (i = 0; i < len; i++) {
+        data = cache[(i + POWERCFG) & 0xF];
+        *ptr++ = (data >> 8) & 0xFF;
+        *ptr++ = data & 0xFF;
+    }
+    fmradio_i2c_write(I2C_ADR, buf, len * 2);
+}
+
 
 void si4700_init(void)
 {
-    unsigned char read_bytes[32];
     tuner_power(true);
-    fmradio_i2c_read(I2C_ADR, read_bytes, sizeof(read_bytes));
 
-    if ((read_bytes[12] << 8 | read_bytes[13]) == 0x1242)
+    /* read all registers */
+    si4700_read(16);
+    
+    /* check device id */
+    if (cache[DEVICEID] == 0x1242)
     {
         tuner_present = true;
-        /* fill in the initial values in write_bytes */
-        memcpy(&write_bytes[0], &read_bytes[16], sizeof(write_bytes));
-        /* -6dB volume, keep everything else as default */
-        write_bytes[7] = (write_bytes[7] & ~0xf) | 0xc;
+
+#ifdef USE_INTERNAL_OSCILLATOR
+        /* enable the internal oscillator */
+        cache[TEST1] |= (1 << 15);  /* XOSCEN */
+        si4700_write(6);
+        sleep(HZ/2);
+#endif    
     }
 
     tuner_power(false);
@@ -56,20 +116,19 @@ void si4700_init(void)
 
 static void si4700_tune(void)
 {
-    unsigned char read_bytes[1];
-
-    write_bytes[2] |= (1 << 7); /* Set TUNE high to start tuning */
-    fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
+    cache[CHANNEL] |= (1 << 15); /* Set TUNE high to start tuning */
+    si4700_write(2);
 
     do
     {
-        sleep(HZ/50);
-        fmradio_i2c_read(I2C_ADR, read_bytes, 1);
+        /* tuning should be done within 60 ms according to the datasheet */
+        sleep(HZ * 60 / 1000);
+        si4700_read(2);
     }
-    while (!(read_bytes[0] & (1 << 6))); /* STC high == Seek/Tune complete */
+    while (!(cache[STATUSRSSI] & (1 << 14))); /* STC high */
 
-    write_bytes[2] &= ~(1 << 7); /* Set TUNE low */
-    fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
+    cache[CHANNEL] &= ~(1 << 15); /* Set TUNE low */
+    si4700_write(2);
 }
 
 /* tuner abstraction layer: set something to the tuner */
@@ -80,13 +139,25 @@ int si4700_set(int setting, int value)
         case RADIO_SLEEP:
             if (value)
             {
-                write_bytes[1] = (1 | (1 << 6)); /* ENABLE high, DISABLE high */
+                /* power down */
+                cache[POWERCFG] = (1 | (1 << 6)); /* ENABLE high, DISABLE high */
+                si4700_write(1);
             }
             else
             {
-                write_bytes[1] = 1; /* ENABLE high, DISABLE low */
+                /* power up */
+                cache[POWERCFG] = 1; /* ENABLE high, DISABLE low */
+                si4700_write(1);
+                sleep(110 * HZ / 1000);
+                
+                /* update register cache */
+                si4700_read(16);               
+
+                /* -6dB volume, keep everything else as default */
+                cache[SYSCONFIG2] = (cache[SYSCONFIG2] & ~0xF) | 0xC;
+                si4700_write(5);
             }
-            break;
+            return 1;
 
         case RADIO_FREQUENCY:
         {
@@ -95,9 +166,9 @@ int si4700_set(int setting, int value)
                 200000, 100000, 50000
             };
             unsigned int chan;
-            unsigned int spacing = spacings[(write_bytes[7] >> 4) & 3] ;
+            unsigned int spacing = spacings[(cache[5] >> 4) & 3] ;
 
-            if (write_bytes[7] & (3 << 6)) /* check BAND */
+            if (cache[SYSCONFIG2] & (3 << 6)) /* check BAND */
             {
                 chan = (value - 76000000) / spacing;
             }
@@ -106,9 +177,7 @@ int si4700_set(int setting, int value)
                 chan = (value - 87500000) / spacing;
             }
 
-            write_bytes[2] = (write_bytes[2] & ~3) | ((chan & (3 << 8)) >> 8);
-            write_bytes[3] = (chan & 0xff);
-            fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
+            cache[CHANNEL] = (cache[CHANNEL] & ~0x3FF) | chan;
             si4700_tune();
             return 1;
         }
@@ -121,12 +190,12 @@ int si4700_set(int setting, int value)
             if (value)
             {
                 /* mute */
-                write_bytes[0] &= ~(1 << 6);
+                cache[POWERCFG] &= ~(1 << 14);
             }
             else
             {
                 /* unmute */
-                write_bytes[0] |= (1 << 6);
+                cache[POWERCFG] |= (1 << 14);
             }
             break;
 
@@ -135,20 +204,20 @@ int si4700_set(int setting, int value)
             const struct si4700_region_data *rd =
                 &si4700_region_data[value];
 
-            write_bytes[4] = ((write_bytes[4] & ~(1 << 3)) | (rd->deemphasis << 3));
-            write_bytes[7] = ((write_bytes[7] & ~(3 << 6)) | (rd->band << 6));
-            write_bytes[7] = ((write_bytes[7] & ~(3 << 4)) | (rd->spacing << 4));
+            cache[SYSCONFIG1] = (cache[SYSCONFIG1] & ~(1 << 11)) | (rd->deemphasis << 11);
+            cache[SYSCONFIG2] = (cache[SYSCONFIG2] & ~(3 << 6)) | (rd->band << 6);
+            cache[SYSCONFIG2] = (cache[SYSCONFIG2] & ~(3 << 4)) | (rd->spacing << 4);
             break;
         }
 
         case RADIO_FORCE_MONO:
             if (value)
             {
-                write_bytes[0] |= (1 << 5);
+                cache[POWERCFG] |= (1 << 13);
             }
             else
             {
-                write_bytes[0] &= ~(1 << 5);
+                cache[POWERCFG] &= ~(1 << 13);
             }
             break;
 
@@ -156,15 +225,13 @@ int si4700_set(int setting, int value)
             return -1;
     }
 
-    fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
+    si4700_write(5);
     return 1;
 }
 
 /* tuner abstraction layer: read something from the tuner */
 int si4700_get(int setting)
 {
-    /* I2C reads start with register 0xA */
-    unsigned char read_bytes[1];
     int val = -1; /* default for unsupported query */
 
     switch(setting)
@@ -178,8 +245,8 @@ int si4700_get(int setting)
             break;
 
         case RADIO_STEREO:
-            fmradio_i2c_read(I2C_ADR, read_bytes, sizeof(read_bytes));
-            val = (read_bytes[0] & 1); /* ST high == Stereo */
+            si4700_read(1);
+            val = (cache[STATUSRSSI] & (1 << 8)); /* ST high == Stereo */
             break;
     }
 
