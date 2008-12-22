@@ -43,6 +43,11 @@
 
 #define CONFIG_KEYPAD GIGABEAT_S_PAD
 
+/* Define keyboard features */
+#define KBD_CURSOR_KEYS /* allow non-line edit cursor movement */
+#define KBD_MODES       /* enable line edit */
+#define KBD_MORSE_INPUT /* enable morse code input */
+
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
