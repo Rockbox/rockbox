@@ -29,7 +29,7 @@
 
 struct si4700_region_data
 {
-    unsigned char deemphasis; /* 0: 50us, 1: 75us */
+    unsigned char deemphasis; /* 0: 75us, 1: 50us */
     unsigned char band; /* 0: us/europe, 1: japan */
     unsigned char spacing; /* 0: us/australia (200kHz), 1: europe/japan (100kHz), 2: (50kHz) */
 } __attribute__((packed));

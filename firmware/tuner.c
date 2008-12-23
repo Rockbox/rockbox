@@ -62,10 +62,10 @@ const struct tea5767_region_data tea5767_region_data[TUNER_NUM_REGIONS] =
 #if (CONFIG_TUNER & SI4700)
 const struct si4700_region_data si4700_region_data[TUNER_NUM_REGIONS] =
 {
-    [REGION_EUROPE]    = { 0, 0, 2 }, /* 50uS, US/Europe band,  50kHz spacing */
-    [REGION_US_CANADA] = { 1, 0, 0 }, /* 75uS, US/Europe band, 200kHz spacing */
-    [REGION_JAPAN]     = { 0, 1, 1 }, /* 50uS, Japanese band,  100kHz spacing */
-    [REGION_KOREA]     = { 0, 0, 1 }, /* 50uS, US/Europe band, 100kHz spacing */
+    [REGION_EUROPE]    = { 1, 0, 2 }, /* 50uS, US/Europe band,  50kHz spacing */
+    [REGION_US_CANADA] = { 0, 0, 0 }, /* 75uS, US/Europe band, 200kHz spacing */
+    [REGION_JAPAN]     = { 1, 1, 1 }, /* 50uS, Japanese band,  100kHz spacing */
+    [REGION_KOREA]     = { 1, 0, 1 }, /* 50uS, US/Europe band, 100kHz spacing */
 };
 #endif /* (CONFIG_TUNER & SI4700) */
 
