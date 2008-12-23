@@ -10114,11 +10114,11 @@
   user:
   <source>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "Edit mode: %s %s"
   </source>
   <dest>
     *: none
-    swcodec: "מצב עריכה: %s"
+    swcodec: "מצב עריכה: %s %s"
   </dest>
   <voice>
     *: none
@@ -10131,11 +10131,11 @@
   user:
   <source>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Cutoff"
   </source>
   <dest>
     *: none
-    swcodec: "תדירות קיטעון"
+    swcodec: "קיטעון"
   </dest>
   <voice>
     *: none
