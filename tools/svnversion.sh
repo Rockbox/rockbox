@@ -30,7 +30,7 @@ svnversion_safe() {
                 if [ -z "$OUTPUT" ]; then
                     echo "unknown"
                 else
-                    echo "r$OUTPUT"
+                    echo "r$OUTPUT-3.1"
                 fi
             else # not a git repository
                 echo "unknown"
