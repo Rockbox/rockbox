@@ -6926,16 +6926,19 @@
   user:
   <source>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
+    multivolume: "Έιτς Ντι 1"
     e200*,c200: "μάικρο Ες Ντι"
     ondio*: "Εμ Εμ Σι"
   </voice>
@@ -8401,6 +8404,8 @@
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
     h10,h10_5gb,e200*,c200: "PREV to abort"
+    gigabeats: "BACK to abort"
+    gigabeatf: "POWER to abort"
   </source>
   <dest>
     *: "OFF για ακύρωση"
@@ -8408,6 +8413,8 @@
     ipod*: "PLAY/PAUSE για ακύρωση"
     x5,m5: "Long PLAY για ακύρωση"
     h10,h10_5gb,e200*,c200: "PREV για ακύρωση"
+    gigabeats: "BACK για ακύρωση"
+    gigabeatf: "POWER για ακύρωση"
   </dest>
   <voice>
     *: ""
@@ -8583,15 +8590,15 @@
 </phrase>
 <phrase>
   id: LANG_RESTARTING_PLAYBACK
-  desc: splash screen displayed when pcm buffer size is changed
+  desc: deprecated
   user:
   <source>
     *: none
-    swcodec: "Restarting playback..."
+    swcodec: ""
   </source>
   <dest>
     *: none
-    swcodec: "Επανεκκίνηση αναπαραγωγής..."
+    swcodec: ""
   </dest>
   <voice>
     *: none
@@ -10129,11 +10136,11 @@
   user:
   <source>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "Edit mode: %s %s"
   </source>
   <dest>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "Τρόπος επεξεργασίας: %s %s"
   </dest>
   <voice>
     *: none
@@ -10146,11 +10153,11 @@
   user:
   <source>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Cutoff"
   </source>
   <dest>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Αποκοπή"
   </dest>
   <voice>
     *: none
@@ -11963,5 +11970,203 @@
   <voice>
     *: none
     gigabeatf: "Ψηλά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMART
+  desc: Display the expected AA size
+  user:
+  <source>
+    *: none
+    albumart: "Album Art:"
+  </source>
+  <dest>
+    *: none
+    albumart: "Εξώφυλλο άλμπουμ:"
+  </dest>
+  <voice>
+    *: none
+    albumart: "Εξώφυλλο άλμπουμ:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFTRIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Μονοφωνικό αριστερά + δεξιά"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Μονοφωνικό αριστερά συν δεξιά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Left Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Δεξί αντικείμενο στην οθόνη ταχείας πρόσβασης"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Δεξί αντικείμενο στην οθόνη ταχείας πρόσβασης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_SETTING
+  desc: used in the settings context menu
+  user:
+  <source>
+    *: "Reset Setting"
+  </source>
+  <dest>
+    *: "Επαναφορά ρύθμισης"
+  </dest>
+  <voice>
+    *: "Επαναφορά ρύθμισης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Bottom Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Κάτω αντικείμενο στην οθόνη ταχείας πρόσβασης"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Κάτω αντικείμενο στην οθόνη ταχείας πρόσβασης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QS_ITEMS
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Right Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Αριστερό αντικείμενο στην οθόνη ταχείας πρόσβασης"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Αριστερό αντικείμενο στην οθόνη ταχείας πρόσβασης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user:
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "Αποτελέσματα εύρεσης"
+  </dest>
+  <voice>
+    *: "Αποτελέσματα εύρεσης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MONO_MODE
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono mode"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Μονοφωνικός τρόπος"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Μονοφωνικός τρόπος"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
   </voice>
 </phrase>

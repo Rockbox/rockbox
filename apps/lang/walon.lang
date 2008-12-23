@@ -833,11 +833,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Crossfeed"
+    swcodec: "Ahessaedje mitan-croejhlé"
   </dest>
   <voice>
     *: none
-    swcodec: "Crossfeed"
+    swcodec: "ahessaedje mitan-croejhlé"
   </voice>
 </phrase>
 <phrase>
@@ -2276,10 +2276,10 @@
     *: "By Type"
   </source>
   <dest>
-    *: "Pa Sôre"
+    *: "Pal sôre"
   </dest>
   <voice>
-    *: "By Type"
+    *: "Pal sôre"
   </voice>
 </phrase>
 <phrase>
@@ -6758,7 +6758,7 @@
     *: "%d bokets (%s) schapés"
   </dest>
   <voice>
-    *: ""
+    *: "Bokets schapés"
   </voice>
 </phrase>
 <phrase>
@@ -6953,13 +6953,13 @@
   </source>
   <dest>
     *: none
-    multivolume: "HD1"
+    multivolume: "DP1"
     e200*,c200: "MSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
-    multivolume: "H D 1"
+    multivolume: "D P 1"
     e200*,c200: "micro S D"
     ondio*: "M M C"
   </voice>
@@ -9945,7 +9945,7 @@
     *: ""
   </source>
   <dest>
-    *: deprecated
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -10997,7 +10997,7 @@
     *: "[Work]"
   </source>
   <dest>
-    *: "[Work]"
+    *: "[Ouve]"
   </dest>
   <voice>
     *: ""
@@ -11753,7 +11753,7 @@
     *: "Foirt londjin"
   </dest>
   <voice>
-    *: "Very slow"
+    *: "Foirt londjin"
   </voice>
 </phrase>
 <phrase>

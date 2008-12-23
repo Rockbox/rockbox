@@ -12151,3 +12151,31 @@
     recording: "녹음 디렉토리로 설정"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SKIP_LENGTH
+  desc: playback settings menu
+  user:
+  <source>
+    *: "Skip Length"
+  </source>
+  <dest>
+    *: "스터디 모드"
+  </dest>
+  <voice>
+    *: "스터디 모드"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "중유럽 (CP1250)"
+  </dest>
+  <voice>
+    *: "중유럽"
+  </voice>
+</phrase>
