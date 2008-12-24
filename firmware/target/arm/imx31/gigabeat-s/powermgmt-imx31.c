@@ -168,7 +168,7 @@ int battery_adc_temp(void)
 /* All code has a preference for the main charger being connected over
  * USB. USB is considered in the algorithm only if it is the sole source. */
 static uint32_t int_sense0 = 0;      /* Interrupt Sense 0 bits */
-static unsigned int power_status = POWER_INPUT_NONE; /* Detect input changes */
+static unsigned int last_inputs = POWER_INPUT_NONE; /* Detect input changes */
 static int charger_total_timer = 0;  /* Total allowed charging time */
 static int icharger_ave = 0;         /* Filtered charging current */
 static bool charger_close = false;   /* Shutdown notification */
@@ -181,7 +181,7 @@ static int autorecharge_counter = 0 ; /* Battery < threshold debounce */
 static int chgcurr_timer = 0;        /* Countdown to CHGCURR error */
 #define AUTORECHARGE_COUNTDOWN (10*2) /* 10s debounce */
 #define WATCHDOG_TIMEOUT       (10*2) /* If not serviced, poweroff in 10s */
-#define CHGCURR_TIMEOUT        (2*2)  /* 2s debounce */
+#define CHGCURR_TIMEOUT        (4*2)  /* 4s debounce */
 
 /* Temperature monitoring */
 static enum
@@ -217,7 +217,7 @@ static bool charger_current_filter_step(void)
 /* Return true if the main charger is connected. */
 static bool main_charger_connected(void)
 {
-    return (power_status &
+    return (last_inputs &
             POWER_INPUT_MAIN_CHARGER &
             POWER_INPUT_CHARGER) != 0;
 }
@@ -233,16 +233,14 @@ static unsigned int auto_recharge_voltage(void)
         return BATT_USB_VAUTO_RECHARGE;
 }
 
-#ifndef NO_LOW_BATTERY_SHUTDOWN
 /* Return greater of supply (BP) or filtered battery voltage. */
-static unsigned int input_millivolts(void)
+unsigned int input_millivolts(void)
 {
     unsigned int app_millivolts = application_supply_adc_voltage();
     unsigned int bat_millivolts = battery_voltage();
 
     return MAX(app_millivolts, bat_millivolts);
 }
-#endif
 
 /* Get smoothed readings for initializing filtered data. */
 static int stat_battery_reading(int type)
@@ -292,7 +290,7 @@ static bool update_filtered_battery_voltage(void)
 
     if (millivolts != INT_MIN)
     {
-        set_filtered_battery_voltage(millivolts);
+        reset_battery_filter(millivolts);
         return true;
     }
 
@@ -357,13 +355,13 @@ static bool adjust_charger_current(void)
     int usb_select;
     uint32_t i;
 
-    usb_select = ((power_status & POWER_INPUT) == POWER_INPUT_USB)
+    usb_select = ((last_inputs & POWER_INPUT) == POWER_INPUT_USB)
                     ? 1 : 0;
 
     if (charge_state == DISCHARGING && usb_select == 1)
     {
         /* USB-only, DISCHARGING, = maintaining battery */
-        int select = (power_status & POWER_INPUT_CHARGER) ? 0 : 1;
+        int select = (last_inputs & POWER_INPUT_CHARGER) ? 0 : 1;
         charger_setting = charger_bits[CHARGING+1][select];
     }
     else
@@ -458,7 +456,7 @@ static bool charging_ok(void)
     if (ok)
     {
         /* Is the battery even connected? */
-        ok = (power_status & POWER_INPUT_BATTERY) != 0;
+        ok = (last_inputs & POWER_INPUT_BATTERY) != 0;
     }
 
     if (ok)
@@ -591,20 +589,6 @@ void powermgmt_init_target(void)
 #endif
 }
 
-/* Returns CHARGING or DISCHARGING since that's all we really do. */
-int powermgmt_filter_charge_state(void)
-{
-    switch(charge_state)
-    {
-    case TRICKLE:
-    case TOPOFF:
-    case CHARGING:
-        return CHARGING;
-    default:
-        return DISCHARGING;
-    }
-}
-
 /* Returns true if the unit is charging the batteries. */
 bool charging_state(void)
 {
@@ -623,24 +607,6 @@ bool charging_state(void)
 int battery_charge_current(void)
 {
     return icharger_ave / ICHARGER_AVE_SAMPLES;
-}
-
-bool query_force_shutdown(void)
-{
-#ifndef NO_LOW_BATTERY_SHUTDOWN
-    return input_millivolts() < battery_level_shutoff[0];
-#else
-    return false;
-#endif
-}
-
-bool battery_level_safe(void)
-{
-#ifndef NO_LOW_BATTERY_SHUTDOWN
-    return input_millivolts() > battery_level_dangerous[0];
-#else
-    return true;
-#endif
 }
 
 static void charger_plugged(void)
@@ -662,7 +628,7 @@ static void charger_unplugged(void)
     }
 
     /* Might need to reevaluate these bits in charger_none. */
-    power_status &= ~(POWER_INPUT | POWER_INPUT_CHARGER);
+    last_inputs &= ~(POWER_INPUT | POWER_INPUT_CHARGER);
     temp_state = TEMP_STATE_NORMAL;
     autorecharge_counter = 0;
     chgcurr_timer = 0;
@@ -672,15 +638,11 @@ static void charger_unplugged(void)
 
 static void charger_none(void)
 {
-    unsigned int pwr = power_input_status();
+    unsigned int pwr = power_thread_inputs;
 
-    if (power_status != pwr)
+    if (last_inputs != pwr)
     {
-        /* If battery switch state changed, reset filter. */
-        if ((power_status ^ pwr) & POWER_INPUT_BATTERY)
-            update_filtered_battery_voltage();
-
-        power_status = pwr;
+        last_inputs = pwr;
 
         if (charge_state == CHARGE_STATE_DISABLED)
             return;
@@ -696,7 +658,7 @@ static void charger_none(void)
         else
         {
             charger_unplugged();
-            power_status = pwr; /* Restore status */
+            last_inputs = pwr; /* Restore status */
         }
     }
     else if (charger_setting != 0)
@@ -716,17 +678,13 @@ static void charger_none(void)
 
 static void charger_control(void)
 {
-    unsigned int pwr = power_input_status();
+    unsigned int pwr = power_thread_inputs;
 
-    if (power_status != pwr)
+    if (last_inputs != pwr)
     {
-        unsigned int changed = power_status ^ pwr;
+        unsigned int changed = last_inputs ^ pwr;
 
-        power_status = pwr;
-
-        /* If battery switch state changed, reset filter. */
-        if (changed & POWER_INPUT_BATTERY)
-            update_filtered_battery_voltage();
+        last_inputs = pwr;
 
         if (charger_setting != 0)
             charger_setting = CHARGER_ADJUST;
@@ -771,12 +729,11 @@ static void charger_control(void)
     {
         /* Battery voltage may have dropped and a charge cycle should
          * start again. Debounced. */
-        if (autorecharge_counter < 0)
+        if (autorecharge_counter < 0 &&
+            battery_adc_voltage() < BATT_FULL_VOLTAGE)
         {
-            /* Try starting a cycle now regardless of battery level to
-             * allow user to ensure the battery is topped off. It
-             * will soon turn off if already full. */
-            autorecharge_counter = 0;
+            /* Try starting a cycle now if battery isn't already topped
+             * off to allow user to ensure the battery is full. */
         }
         else if (battery_voltage() > auto_recharge_voltage())
         {
@@ -790,6 +747,8 @@ static void charger_control(void)
             autorecharge_counter--;
             break;
         }
+
+        autorecharge_counter = 0;
 
         charging_set_thread_priority(true);
 
@@ -858,10 +817,12 @@ static void charger_control(void)
 }
 
 /* Main charging algorithm - called from powermgmt.c */
-void charging_algorithm_small_step(void)
+void charging_algorithm_step(void)
 {
+#ifdef IMX31_ALLOW_CHARGING
     if (service_wdt)
         watchdog_service();
+#endif
 
     /* Switch by input state */
     switch (charger_input_state)
@@ -907,12 +868,6 @@ void charging_algorithm_small_step(void)
             adjust_charger_current();
         }
     }
-}
-
-void charging_algorithm_big_step(void)
-{
-    /* Sleep for one minute */
-    power_thread_sleep(HZ*60);
 }
 
 /* Disable the charger and prepare for poweroff - called off-thread so we

@@ -21,11 +21,6 @@
 #ifndef _POWER_H_
 #define _POWER_H_
 
-#if CONFIG_CHARGING == CHARGING_CONTROL
-extern bool charger_enabled;
-void charger_enable(bool on);
-#endif
-
 #if CONFIG_CHARGING
 enum power_input_flags {
     /* No external power source? Default. */
@@ -82,9 +77,9 @@ bool power_input_present(void);
 void power_off(void);
 void ide_power_enable(bool on);
 
-# if CONFIG_CHARGING == CHARGING_MONITOR
+#if CONFIG_CHARGING >= CHARGING_MONITOR
 bool charging_state(void);
-# endif
+#endif
 
 #ifndef SIMULATOR
 
@@ -102,4 +97,4 @@ bool spdif_powered(void);
 bool tuner_power(bool status);
 #endif
 
-#endif
+#endif /* _POWER_H_ */

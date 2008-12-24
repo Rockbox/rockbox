@@ -29,10 +29,6 @@
 #include "logf.h"
 #include "usb.h"
 
-#if CONFIG_CHARGING == CHARGING_CONTROL
-bool charger_enabled;
-#endif
-
 void power_init(void)
 {
     /* power off bit */

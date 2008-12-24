@@ -19,9 +19,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #include "config.h"
+#include "system.h"
 #include "adc.h"
+#include "power.h"
 #include "powermgmt.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
@@ -57,4 +58,18 @@ unsigned int battery_adc_voltage(void)
 {
     return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10;
 }
+
+unsigned int input_millivolts(void)
+{
+
+    unsigned int batt_millivolts = battery_voltage();
+
+    if ((power_thread_inputs & POWER_INPUT_BATTERY) == 0) {
+        /* Just return a safe value if battery isn't connected */
+        return 4050;
+    }
+
+    return batt_millivolts;
+}
+
 

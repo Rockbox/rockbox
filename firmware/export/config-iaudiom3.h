@@ -102,6 +102,9 @@
 /* Hardware controlled charging? FIXME */
 #define CONFIG_CHARGING CHARGING_SIMPLE
 
+/* define current usage levels */
+#define CURRENT_REMOTE      8  /* additional current when remote connected */
+
 #ifndef SIMULATOR
 
 /* Define this if your LCD can set contrast */

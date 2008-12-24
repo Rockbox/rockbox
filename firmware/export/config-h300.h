@@ -112,6 +112,13 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
+/* define current usage levels */
+#define CURRENT_NORMAL     80  /* 16h playback on 1300mAh battery from IriverRuntime wiki page */
+#define CURRENT_BACKLIGHT  23  /* FIXME: This needs to be measured, copied from H100 */
+#define CURRENT_RECORD    110  /* additional current while recording */
+#define CURRENT_MAX_CHG   650  /* maximum charging current */
+#define CURRENT_REMOTE      8  /* additional current when remote connected */
+
 /* define this if the unit can have USB charging disabled by user -
  * if USB/MAIN power is discernable and hardware doesn't compel charging */
 #define HAVE_USB_CHARGING_ENABLE

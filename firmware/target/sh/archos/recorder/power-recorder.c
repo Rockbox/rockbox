@@ -25,9 +25,10 @@
 #include "kernel.h"
 #include "system.h"
 #include "power.h"
+#include "powermgmt-target.h"
 #include "usb.h"
 
-bool charger_enabled;
+static bool charger_on;
 
 void power_init(void)
 {
@@ -48,13 +49,18 @@ void charger_enable(bool on)
     if(on)
     {
         and_b(~0x20, &PBDRL);
-        charger_enabled = 1;
     } 
     else 
     {
         or_b(0x20, &PBDRL);
-        charger_enabled = 0;
     }
+
+    charger_on = on;
+}
+
+bool charger_enabled(void)
+{
+    return charger_on;
 }
 
 void ide_power_enable(bool on)

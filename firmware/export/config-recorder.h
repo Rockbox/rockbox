@@ -72,7 +72,7 @@
 #define NO_LOW_BATTERY_SHUTDOWN
 
 /* Software controlled charging */
-#define CONFIG_CHARGING CHARGING_CONTROL
+#define CONFIG_CHARGING CHARGING_TARGET
 
 #ifndef SIMULATOR
 

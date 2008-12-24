@@ -25,147 +25,101 @@
 
 #define POWER_HISTORY_LEN 2*60   /* 2 hours of samples, one per minute */
 
-#define CHARGE_END_SHORTD  6     /* stop when N minutes have passed with
-                                  * avg delta being < -0.05 V */
-#define CHARGE_END_LONGD  50     /* stop when N minutes have passed with
-                                  * avg delta being < -0.02 V */
-
-typedef enum {       /* sorted by increasing charging current */
+enum charge_state_type
+{
+    /* sorted by increasing charging current */
 #if CONFIG_CHARGING >= CHARGING_MONITOR
-    CHARGE_STATE_DISABLED = -2, /* Disable charger use */
-    CHARGE_STATE_ERROR = -1, /* Some error occurred that should not allow
-                        further attempts without user intervention */
+    CHARGE_STATE_DISABLED = -2, /* Disable charger use (safety measure) */
+    CHARGE_STATE_ERROR = -1,    /* Some error occurred that should not allow
+                                   turning on the charger again by software
+                                   without user intervention (ie. replug) */
 #endif
     DISCHARGING = 0,
 #if CONFIG_CHARGING >= CHARGING_MONITOR
-    TRICKLE,         /* Can occur for CONFIG_CHARGING >= CHARGING_MONITOR */
-                     /* For LiIon, the low-current precharge mode if battery
-                        was very low */
-    TOPOFF,          /* Can occur for CONFIG_CHARGING == CHARGING_CONTROL */
+    TRICKLE,         /* For NiCd, battery maintenence phase */
+                     /* For LiIon, low-current precharge phase */
+    TOPOFF,          /* For NiCd, waiting for dead zone */
                      /* For LiIon, constant voltage phase */
-    CHARGING,        /* Can occur for all CONFIG_CHARGING options */
-                     /* For LiIon, the constant current phase */
+    CHARGING,        /* For NiCd, main charge phase */
+                     /* For LiIon, constant current phase */
 #endif
-} charge_state_type;
+};
 
 /* tells what the charger is doing */
-extern charge_state_type charge_state;
+extern enum charge_state_type charge_state;
 
 #ifdef CONFIG_CHARGING
 /*
  * Flag that the charger has been plugged in/removed: this is set for exactly
  * one time through the power loop when the charger has been plugged in.
  */
-typedef enum {
+enum charger_input_state_type
+{
     NO_CHARGER = 0,     /* No charger is present */
     CHARGER_UNPLUGGED,  /* Transitional state during CHARGER=>NO_CHARGER */
     CHARGER_PLUGGED,    /* Transitional state during NO_CHARGER=>CHARGER */
     CHARGER             /* Charger is present */
-} charger_input_state_type;
+};
 
 /* tells the state of the charge input */
-extern charger_input_state_type charger_input_state;
-#endif
+extern enum charger_input_state_type charger_input_state;
 
-#ifndef SIMULATOR
+/* Power input status saved on the power thread each loop */
+extern unsigned int power_thread_inputs;
 
-#if CONFIG_CHARGING == CHARGING_CONTROL
-#define START_TOPOFF_CHG    85  /* Battery % to start at top-off */
-#define START_TRICKLE_CHG   95  /* Battery % to start at trickle */
-
-#define POWER_MESSAGE_LEN 32     /* power thread status message */
-#define CHARGE_MAX_TIME_1500 450 /* minutes: maximum charging time for 1500 mAh batteries */
-                                 /* actual max time depends also on BATTERY_CAPACITY! */
-#define CHARGE_MIN_TIME   10     /* minutes: minimum charging time */
-#define TOPOFF_MAX_TIME   90     /* After charging, go to top off charge. How long should top off charge be? */
-#define TOPOFF_VOLTAGE    5650   /* which voltage is best? (millivolts) */
-#define TRICKLE_MAX_TIME  12*60  /* After top off charge, go to trickle charge. How long should trickle charge be? */
-#define TRICKLE_VOLTAGE   5450   /* which voltage is best? (millivolts) */
-
-#define START_TOPOFF_SEC    25   /* initial trickle_sec for topoff */
-#define START_TRICKLE_SEC   15   /* initial trickle_sec for trickle */
-
-#define PID_DEADZONE        4    /* PID proportional deadzone */
-
-extern char power_message[POWER_MESSAGE_LEN];
-
-extern int long_delta;          /* long term delta battery voltage */
-extern int short_delta;         /* short term delta battery voltage */
-
-extern int powermgmt_last_cycle_startstop_min; /* how many minutes ago was the charging started or stopped? */
-extern int powermgmt_last_cycle_level;         /* which level had the batteries at this time? */
-
-extern int pid_p;                /* PID proportional term */
-extern int pid_i;                /* PID integral term */
-extern int trickle_sec;          /* trickle charge: How many seconds per minute are we charging actually? */
-
-#endif /* CONFIG_CHARGING == CHARGING_CONTROL */
-
-#if defined(ARCHOS_ONDIOSP) || defined(ARCHOS_ONDIOFM) /* Values for Ondio */
-# define CURRENT_NORMAL     95  /* average, nearly proportional to 1/U */
-# define CURRENT_USB         1  /* host powered in USB mode; avoid zero-div */
-# define CURRENT_BACKLIGHT   0  /* no backlight */
-#else            /* Values for HD based jukeboxes */
-#ifdef IRIVER_H100_SERIES
-# define CURRENT_NORMAL     80  /* 16h playback on 1300mAh battery */
-# define CURRENT_BACKLIGHT  23  /* from IriverBattery twiki page */
-# define CURRENT_SPDIF_OUT  10  /* optical SPDIF output on */
-# define CURRENT_RECORD    105  /* additional current while recording */
-#elif defined(IRIVER_H300_SERIES)
-# define CURRENT_NORMAL     80  /* 16h playback on 1300mAh battery from IriverRuntime wiki page */
-# define CURRENT_BACKLIGHT  23  /* FIXME: This needs to be measured, copied from H100 */
-# define CURRENT_RECORD    110  /* additional current while recording */
-#elif defined(IPOD_NANO)        /* iPOD Nano */
-# define CURRENT_NORMAL     32  /* MP3: ~9h playback out of 300mAh battery */
-# define CURRENT_BACKLIGHT  20  /* FIXME: this needs adjusting */
-#if defined(HAVE_RECORDING)
-# define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
-#endif
-#elif defined(IPOD_VIDEO)       /* iPOD Video */
-# define CURRENT_NORMAL     35  /* MP3: ~11h out of 400mAh battery (30GB) or ~17h out of 600mAh (60GB) */
-# define CURRENT_BACKLIGHT  20  /* FIXME: this needs adjusting */
-#if defined(HAVE_RECORDING)
-# define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
-#endif
-#elif defined(SANSA_E200)    /* Sandisk E200v1  */
-# define CURRENT_NORMAL     45  /* Mike's measurements in Jan 2008  */
-# define CURRENT_BACKLIGHT  40  /* Screen is about 20, blue LEDs are another 20, so 40 if both */
-# define CURRENT_RECORD     40  /* flash player, so this is just unboosted current*/
-#elif defined(SANSA_C200)    /* Sandisk C200v1 */
-# define CURRENT_NORMAL     45  /* Should be nearly identical to E200 */
-# define CURRENT_BACKLIGHT  40  /* Screen is about 20, blue LEDs are another 20, so 40 if both */
-# define CURRENT_RECORD     40  /* flash player, so this is just unboosted current*/
-#elif defined(IPOD_4G)       /* iPOD 4G */
-# define CURRENT_NORMAL     100  /* MP3: ~10.5h out of 1100mAh battery  */
-# define CURRENT_BACKLIGHT  20  /* FIXME: this needs adjusting */
-#if defined(HAVE_RECORDING)
-# define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
-#endif
-#else /* Not iriver H1x0, H3x0, nor Archos Ondio, nor iPod nano/Video/4G, nor Sansas */
-# define CURRENT_NORMAL    145  /* usual current in mA when using the AJB including some disk/backlight/... activity */
-# define CURRENT_BACKLIGHT  30  /* additional current when backlight always on */
-#if defined(HAVE_RECORDING)
-# define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
-#endif
-#endif /* Not Archos Ondio */
-#define CURRENT_USB        500  /* usual current in mA in USB mode */
-#ifdef HAVE_REMOTE_LCD
-# define CURRENT_REMOTE      8  /* add. current when H100-remote connected */
-#endif /* HAVE_REMOTE_LCD */
-
-# define CURRENT_MIN_CHG    70  /* minimum charge current */
-# define MIN_CHG_V        8500  /* at 8.5v charger voltage get CURRENT_MIN_CHG */
-# ifdef IRIVER_H300_SERIES
-#  define CURRENT_MAX_CHG  650  /* maximum charging current */
-# else
-#  define CURRENT_MAX_CHG  350  /* maximum charging current */
-# endif
-# define MAX_CHG_V       10250  /* anything over 10.25v gives CURRENT_MAX_CHG */
-#endif /* not ONDIO */
+#endif /* CONFIG_CHARGING */
 
 #if CONFIG_CHARGING == CHARGING_TARGET
 /* Include target-specific definitions */
 #include "powermgmt-target.h"
+#endif
+
+#ifndef SIMULATOR
+
+/* Generic current values that are really rather meaningless - config header
+ * should define proper numbers. */
+#ifndef CURRENT_NORMAL
+#define CURRENT_NORMAL    145  /* usual current in mA */
+#endif
+
+#ifndef CURRENT_BACKLIGHT
+#define CURRENT_BACKLIGHT  30  /* additional current when backlight always on */
+#endif
+
+#ifdef HAVE_RECORDING
+#ifndef CURRENT_RECORD
+#define CURRENT_RECORD     35  /* additional recording current */
+#endif
+#endif /* HAVE_RECORDING */
+
+#ifndef CURRENT_USB
+#define CURRENT_USB       500 /* usual current in mA in USB mode */
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+#define CURRENT_REMOTE      8  /* additional current when remote connected */
+#endif /* HAVE_REMOTE_LCD */
+
+#if CONFIG_CHARGING
+#ifndef CURRENT_MAX_CHG
+#define CURRENT_MAX_CHG   350  /* maximum charging current */
+#endif
+#endif /* CONFIG_CHARGING */
+
+#ifdef CHARGING_DEBUG_FILE
+#define POWERMGMT_DEBUG_STACK ((0x1000)/sizeof(long))
+#else
+#define POWERMGMT_DEBUG_STACK 0
+#endif
+
+#ifndef BATT_AVE_SAMPLES
+/* slw filter constant unless otherwise specified */
+#define BATT_AVE_SAMPLES 128
+#endif
+
+#ifndef POWER_THREAD_STEP_TICKS
+/* 2HZ sample rate unless otherwise specified */
+#define POWER_THREAD_STEP_TICKS (HZ/2)
 #endif
 
 extern unsigned short power_history[POWER_HISTORY_LEN];
@@ -179,12 +133,6 @@ extern const unsigned short percent_to_volt_charge[11];
 /* Start up power management thread */
 void powermgmt_init(void);
 
-/* Do target portion of init (for CHARGING_TARGET) - called on power thread */
-void powermgmt_init_target(void);
-
-/* Handle frequent tasks and call charging_algorithm_small_step */
-void power_thread_sleep(int ticks);
-
 #endif /* SIMULATOR */
 
 /* Returns battery statust */
@@ -193,9 +141,15 @@ int battery_time(void); /* minutes */
 unsigned int battery_adc_voltage(void); /* voltage from ADC in millivolts */
 unsigned int battery_voltage(void); /* filtered batt. voltage in millivolts */
 
+#ifdef HAVE_BATTERY_SWITCH
+unsigned int input_millivolts(void); /* voltage that device is running from */
+
 /* Set the filtered battery voltage (to adjust it before beginning a charge
-   cycle for instance where old, loaded readings will likely be invalid). */
-void set_filtered_battery_voltage(int millivolts);
+ * cycle for instance where old, loaded readings will likely be invalid).
+ * Also readjust when battery switch is opened or closed.
+ */
+void reset_battery_filter(int millivolts);
+#endif /* HAVE_BATTERY_SWITCH */
 
 /* read unfiltered battery info */
 void battery_read_info(int *voltage, int *level);
@@ -203,13 +157,10 @@ void battery_read_info(int *voltage, int *level);
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void);
 
-#ifdef TARGET_POWERMGMT_FILTER_CHARGE_STATE
-int powermgmt_filter_charge_state(void);
-#endif
-
 void set_poweroff_timeout(int timeout);
 void set_battery_capacity(int capacity); /* set local battery capacity value */
-void set_battery_type(int type);         /* set local battery type */
+int  get_battery_capacity(void); /* get local battery capacity value */
+void set_battery_type(int type); /* set local battery type */
 
 void set_sleep_timer(int seconds);
 int get_sleep_timer(void);

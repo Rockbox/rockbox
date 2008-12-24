@@ -20,18 +20,14 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "cpu.h"
+#include "system.h"
 #include "kernel.h"
 #include "thread.h"
-#include "system.h"
 #include "debug.h"
-#include "panic.h"
 #include "adc.h"
 #include "string.h"
-#include "sprintf.h"
 #include "storage.h"
 #include "power.h"
-#include "button.h"
 #include "audio.h"
 #include "mp3_playback.h"
 #include "usb.h"
@@ -57,166 +53,39 @@
 #include "lcd-remote-target.h"
 #endif
 
-/*
- * Define DEBUG_FILE to create a csv (spreadsheet) with battery information
- * in it (one sample per minute).  This is only for very low level debug.
- */
-#undef  DEBUG_FILE
-#if defined(DEBUG_FILE) && (CONFIG_CHARGING == CHARGING_CONTROL)
-#include "file.h"
-#define DEBUG_FILE_NAME   "/powermgmt.csv"
-#define DEBUG_MESSAGE_LEN 133
-static char debug_message[DEBUG_MESSAGE_LEN];
-#define DEBUG_STACK ((0x1000)/sizeof(long))
-static int fd = -1;          /* write debug information to this file */
-static int wrcount = 0;
-#else
-#define DEBUG_STACK 0
-#endif
-
-static int shutdown_timeout = 0;
-#if CONFIG_CHARGING >= CHARGING_MONITOR
-charge_state_type charge_state = DISCHARGING;     /* charging mode */
-#endif
-
-static void send_battery_level_event(void);
-static int last_sent_battery_level = 100;
+/** Shared by sim **/
+int last_sent_battery_level = 100;
+/* battery level (0-100%) */
+int battery_percent = -1;
+void send_battery_level_event(void);
 
 #if CONFIG_CHARGING
-charger_input_state_type charger_input_state IDATA_ATTR;
+/* State of the charger input as seen by the power thread */
+enum charger_input_state_type charger_input_state;
+/* Power inputs as seen by the power thread */
+unsigned int power_thread_inputs;
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+/* Charging state (mode) as seen by the power thread */
+enum charge_state_type charge_state = DISCHARGING;
 #endif
+#endif /* CONFIG_CHARGING */
 
-#ifdef SIMULATOR /***********************************************************/
-
-#define BATT_MINMVOLT   2500            /* minimum millivolts of battery */
-#define BATT_MAXMVOLT   4500            /* maximum millivolts of battery */
-#define BATT_MAXRUNTIME (10 * 60)       /* maximum runtime with full battery in minutes */
-
-static unsigned int battery_millivolts = (unsigned int)BATT_MAXMVOLT;
-static int battery_percent = 100;       /* battery capacity level in percent */
-static int powermgmt_est_runningtime_min = BATT_MAXRUNTIME; /* estimated remaining time in minutes */
-
-static void battery_status_update(void)
-{
-    static time_t last_change = 0;
-    static bool charging = false;
-    time_t now;
-
-    time(&now);
-    if (last_change < now)
-    {
-        last_change = now;
-
-        /* change the values: */
-        if (charging)
-        {
-            if (battery_millivolts >= BATT_MAXMVOLT)
-            {
-                /* Pretend the charger was disconnected */
-                charging = false;
-                queue_broadcast(SYS_CHARGER_DISCONNECTED, 0);
-                last_sent_battery_level = 100;
-            }
-        }
-        else
-        {
-            if (battery_millivolts <= BATT_MINMVOLT)
-            {
-                /* Pretend the charger was connected */
-                charging = true;
-                queue_broadcast(SYS_CHARGER_CONNECTED, 0);
-                last_sent_battery_level = 0;
-            }
-        }
-        if (charging)
-            battery_millivolts += (BATT_MAXMVOLT - BATT_MINMVOLT) / 50;
-        else
-            battery_millivolts -= (BATT_MAXMVOLT - BATT_MINMVOLT) / 100;
-
-        battery_percent = 100 * (battery_millivolts - BATT_MINMVOLT) /
-                            (BATT_MAXMVOLT - BATT_MINMVOLT);
-        powermgmt_est_runningtime_min = battery_percent * BATT_MAXRUNTIME / 100;
-    }
-    send_battery_level_event();
-}
-
-void battery_read_info(int *voltage, int *level)
-{
-    battery_status_update();
-
-    if (voltage)
-        *voltage = battery_millivolts;
-
-    if (level)
-        *level = battery_percent;
-}
-
-unsigned int battery_voltage(void)
-{
-    battery_status_update();
-    return battery_millivolts;
-}
-
-int battery_level(void)
-{
-    battery_status_update();
-    return battery_percent;
-}
-
-int battery_time(void)
-{
-    battery_status_update();
-    return powermgmt_est_runningtime_min;
-}
-
-bool battery_level_safe(void)
-{
-    return battery_level() >= 10;
-}
-
-void set_poweroff_timeout(int timeout)
-{
-    (void)timeout;
-}
-
-void set_battery_capacity(int capacity)
-{
-  (void)capacity;
-}
-
-#if BATTERY_TYPES_COUNT > 1
-void set_battery_type(int type)
-{
-    (void)type;
-}
-#endif
-
-void reset_poweroff_timer(void)
-{
-}
-
-#ifdef HAVE_ACCESSORY_SUPPLY
-void accessory_supply_set(bool enable)
-{
-    (void)enable;
-}
-#endif
-
-#else /* not SIMULATOR ******************************************************/
-
+#ifndef SIMULATOR
+static int shutdown_timeout = 0;
 /*
  * Average battery voltage and charger voltage, filtered via a digital
  * exponential filter (aka. exponential moving average, scaled):
  * avgbat = y[n] = (N-1)/N*y[n-1] + x[n]. battery_millivolts = y[n] / N.
  */
-static unsigned int avgbat;     /* average battery voltage (filtering) */
-static unsigned int battery_millivolts;/* filtered battery voltage, millivolts */
+static unsigned int avgbat;
+/* filtered battery voltage, millivolts */
+static unsigned int battery_millivolts;
+/* default value, mAh */
+static int battery_capacity = BATTERY_CAPACITY_DEFAULT;
 
-/* battery level (0-100%) of this minute, updated once per minute */
-static int battery_percent  = -1;
-static int battery_capacity = BATTERY_CAPACITY_DEFAULT; /* default value, mAh */
+
 #if BATTERY_TYPES_COUNT > 1
-static int battery_type     = 0;
+static int battery_type = 0;
 #else
 #define battery_type 0
 #endif
@@ -224,7 +93,7 @@ static int battery_type     = 0;
 /* Power history: power_history[0] is the newest sample */
 unsigned short power_history[POWER_HISTORY_LEN];
 
-static char power_stack[DEFAULT_STACK_SIZE/2 + DEBUG_STACK];
+static char power_stack[DEFAULT_STACK_SIZE/2 + POWERMGMT_DEBUG_STACK];
 static const char power_thread_name[] = "power";
 
 static int poweroff_timeout = 0;
@@ -238,19 +107,6 @@ static long last_event_tick;
 static int voltage_to_battery_level(int battery_millivolts);
 static void battery_status_update(void);
 static int runcurrent(void);
-
-#ifndef TARGET_POWERMGMT_FILTER_CHARGE_STATE
-static inline int powermgmt_filter_charge_state(void)
-{
-#if CONFIG_CHARGING >= CHARGING_MONITOR
-    /* No adjustment of state */
-    return charge_state;
-#else
-    /* Always discharging */
-    return DISCHARGING;
-#endif
-}
-#endif /* TARGET_POWERMGMT_FILTER_CHARGE_STATE */
 
 void battery_read_info(int *voltage, int *level)
 {
@@ -272,20 +128,30 @@ void reset_poweroff_timer(void)
 void set_battery_type(int type)
 {
     if (type != battery_type) {
+        if ((unsigned)type >= BATTERY_TYPES_COUNT)
+            type = 0;
+
         battery_type = type;
-        battery_status_update();     /* recalculate the battery status */
+        battery_status_update(); /* recalculate the battery status */
     }
 }
 #endif
 
 void set_battery_capacity(int capacity)
 {
+    if (capacity > BATTERY_CAPACITY_MAX)
+        capacity = BATTERY_CAPACITY_MAX;
+    if (capacity < BATTERY_CAPACITY_MIN)
+        capacity = BATTERY_CAPACITY_MIN;
+
     battery_capacity = capacity;
-    if (battery_capacity > BATTERY_CAPACITY_MAX)
-        battery_capacity = BATTERY_CAPACITY_MAX;
-    if (battery_capacity < BATTERY_CAPACITY_MIN)
-        battery_capacity = BATTERY_CAPACITY_MIN;
-    battery_status_update();     /* recalculate the battery status */
+
+    battery_status_update(); /* recalculate the battery status */
+}
+
+int get_battery_capacity(void)
+{
+    return battery_capacity;
 }
 
 int battery_time(void)
@@ -309,13 +175,19 @@ unsigned int battery_voltage(void)
     return battery_millivolts;
 }
 
-#ifndef TARGET_BATTERY_LEVEL_SAFE
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void)
 {
+#if defined(NO_LOW_BATTERY_SHUTDOWN)
+    return true;
+#elif defined(HAVE_BATTERY_SWITCH)
+    /* Cannot rely upon the battery reading to be valid and the
+     * device could be powered externally. */
+    return input_millivolts() > battery_level_dangerous[battery_type];
+#else
     return battery_millivolts > battery_level_dangerous[battery_type];
-}
 #endif
+}
 
 void set_poweroff_timeout(int timeout)
 {
@@ -324,7 +196,7 @@ void set_poweroff_timeout(int timeout)
 
 void set_sleep_timer(int seconds)
 {
-    if(seconds) {
+    if (seconds) {
         sleeptimer_active  = true;
         sleeptimer_endtick = current_tick + seconds * HZ;
     }
@@ -336,7 +208,7 @@ void set_sleep_timer(int seconds)
 
 int get_sleep_timer(void)
 {
-    if(sleeptimer_active)
+    if (sleeptimer_active)
         return (sleeptimer_endtick - current_tick) / HZ;
     else
         return 0;
@@ -345,45 +217,46 @@ int get_sleep_timer(void)
 /* look into the percent_to_volt_* table and get a realistic battery level */
 static int voltage_to_percent(int voltage, const short* table)
 {
-    if (voltage <= table[0])
+    if (voltage <= table[0]) {
         return 0;
-    else
-        if (voltage >= table[10])
-            return 100;
-        else {
-            /* search nearest value */
-            int i = 0;
-            while ((i < 10) && (table[i+1] < voltage))
-                i++;
-            /* interpolate linear between the smaller and greater value */
-            return (i * 10) /* Tens digit, 10% per entry */
-                + (((voltage - table[i]) * 10)
-                   / (table[i+1] - table[i])); /* Ones digit: interpolated */
-        }
+    }
+    else if (voltage >= table[10]) {
+        return 100;
+    }
+    else {
+        /* search nearest value */
+        int i = 0;
+
+        while (i < 10 && table[i+1] < voltage)
+            i++;
+
+        /* interpolate linear between the smaller and greater value */
+        /* Tens digit, 10% per entry,  ones digit: interpolated */
+        return i*10 + (voltage - table[i])*10 / (table[i+1] - table[i]);
+    }
 }
 
 /* update battery level and estimated runtime, called once per minute or
  * when battery capacity / type settings are changed */
 static int voltage_to_battery_level(int battery_millivolts)
 {
-    const int state = powermgmt_filter_charge_state();
     int level;
 
-    if (state == DISCHARGING) {
-        level = voltage_to_percent(battery_millivolts,
-                    percent_to_volt_discharge[battery_type]);
-    }
 #if CONFIG_CHARGING >= CHARGING_MONITOR
-    else if (state == CHARGING) {
+    if (charging_state()) {
         /* battery level is defined to be < 100% until charging is finished */
-        level = MIN(voltage_to_percent(battery_millivolts,
-                    percent_to_volt_charge), 99);
+        level = voltage_to_percent(battery_millivolts,
+                                   percent_to_volt_charge);
+        if (level > 99)
+            level = 99;
     }
-    else {
-        /* in topoff/trickle charge, battery is by definition 100% full */
-        level = 100;
+    else
+#endif /* CONFIG_CHARGING >= CHARGING_MONITOR */
+    {
+        /* DISCHARGING or error state */
+        level = voltage_to_percent(battery_millivolts,
+                                   percent_to_volt_discharge[battery_type]);
     }
-#endif
 
     return level;
 }
@@ -393,26 +266,25 @@ static void battery_status_update(void)
     int level = voltage_to_battery_level(battery_millivolts);
 
     /* calculate estimated remaining running time */
-    /* discharging: remaining running time */
-    /* charging:    remaining charging time */
 #if CONFIG_CHARGING >= CHARGING_MONITOR
-    if (powermgmt_filter_charge_state() == CHARGING) {
-        powermgmt_est_runningtime_min = (100 - level) * battery_capacity * 60
-                                      / 100 / (CURRENT_MAX_CHG - runcurrent());
+    if (charging_state()) {
+        /* charging: remaining charging time */
+        powermgmt_est_runningtime_min = (100 - level)*battery_capacity*60
+                / 100 / (CURRENT_MAX_CHG - runcurrent());
     }
     else
 #endif
-    {
-        if ((battery_millivolts + 20) > percent_to_volt_discharge[0][0])
-            powermgmt_est_runningtime_min = (level + battery_percent) * 60 *
-                                         battery_capacity / 200 / runcurrent();
-
-        else if (battery_millivolts <= battery_level_shutoff[0])
-            powermgmt_est_runningtime_min = 0;
-
-        else
-            powermgmt_est_runningtime_min = (battery_millivolts -
-                                             battery_level_shutoff[0]) / 2;
+    /* discharging: remaining running time */
+    if ((battery_millivolts + 20) > percent_to_volt_discharge[0][0]) {
+        powermgmt_est_runningtime_min = (level + battery_percent)*60
+                * battery_capacity / 200 / runcurrent();
+    }
+    else if (battery_millivolts <= battery_level_shutoff[0]) {
+        powermgmt_est_runningtime_min = 0;
+    }
+    else {
+        powermgmt_est_runningtime_min =
+            (battery_millivolts - battery_level_shutoff[0]) / 2;
     }
 
     battery_percent = level;
@@ -434,62 +306,55 @@ static void battery_status_update(void)
 static void handle_auto_poweroff(void)
 {
     long timeout = poweroff_timeout*60*HZ;
-    int  audio_stat = audio_status();
+    int audio_stat = audio_status();
+    long tick = current_tick;
 
 #if CONFIG_CHARGING
     /*
      * Inhibit shutdown as long as the charger is plugged in.  If it is
      * unplugged, wait for a timeout period and then shut down.
      */
-    if(charger_input_state == CHARGER || audio_stat == AUDIO_STATUS_PLAY) {
+    if (charger_input_state == CHARGER || audio_stat == AUDIO_STATUS_PLAY) {
         last_event_tick = current_tick;
     }
 #endif
 
-    if( !shutdown_timeout && query_force_shutdown()) {
+    if (!shutdown_timeout && query_force_shutdown()) {
         backlight_on();
         sys_poweroff();
     }
 
-    if(timeout &&
-#if CONFIG_TUNER && !defined(BOOTLOADER)
-       (!(get_radio_status() & FMRADIO_PLAYING)) &&
+    if (timeout &&
+#if CONFIG_TUNER
+        !(get_radio_status() & FMRADIO_PLAYING) &&
 #endif
-       !usb_inserted() &&
-       ((audio_stat == 0) ||
-        ((audio_stat == (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE)) &&
-         !sleeptimer_active)))
-    {
-        if(TIME_AFTER(current_tick, last_event_tick    + timeout) &&
-           TIME_AFTER(current_tick, storage_last_disk_activity() + timeout))
-        {
+        !usb_inserted() &&
+        (audio_stat == 0 ||
+         (audio_stat == (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE) &&
+          !sleeptimer_active))) {
+
+        if (TIME_AFTER(tick, last_event_tick + timeout) &&
+            TIME_AFTER(tick, storage_last_disk_activity() + timeout)) {
             sys_poweroff();
         }
     }
-    else
-    {
+    else if (sleeptimer_active) {
         /* Handle sleeptimer */
-        if(sleeptimer_active)
-        {
-            if(TIME_AFTER(current_tick, sleeptimer_endtick))
-            {
-                audio_stop();
-                if (usb_inserted()
+        if (TIME_AFTER(tick, sleeptimer_endtick)) {
+            audio_stop();
+
+            if (usb_inserted()
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
-                    || ((charger_input_state == CHARGER) ||
-                    (charger_input_state == CHARGER_PLUGGED))
+                || charger_input_state != NO_CHARGER
 #endif
-                   )
-                {
-                    DEBUGF("Sleep timer timeout. Stopping...\n");
-                    set_sleep_timer(0);
-                    backlight_off(); /* Nighty, nighty... */
-                }
-                else
-                {
-                    DEBUGF("Sleep timer timeout. Shutting off...\n");
-                    sys_poweroff();
-                }
+            ) {
+                DEBUGF("Sleep timer timeout. Stopping...\n");
+                set_sleep_timer(0);
+                backlight_off(); /* Nighty, nighty... */
+            }
+            else {
+                DEBUGF("Sleep timer timeout. Shutting off...\n");
+                sys_poweroff();
             }
         }
     }
@@ -504,25 +369,24 @@ static int runcurrent(void)
 
 #if MEM == 8 && !(defined(ARCHOS_ONDIOSP) || defined(ARCHOS_ONDIOFM))
     /* assuming 192 kbps, the running time is 22% longer with 8MB */
-    current = (CURRENT_NORMAL*100/122);
+    current = CURRENT_NORMAL*100 / 122;
 #else
     current = CURRENT_NORMAL;
 #endif /* MEM == 8 */
 
-    if(usb_inserted()
-#if defined(HAVE_USB_POWER)
-  #if (CURRENT_USB < CURRENT_NORMAL)
+    if (usb_inserted()
+#ifdef HAVE_USB_POWER
+    #if (CURRENT_USB < CURRENT_NORMAL)
        || usb_powered()
-  #else
+    #else
        && !usb_powered()
-  #endif
+    #endif
 #endif
-    )
-    {
+    ) {
         current = CURRENT_USB;
     }
 
-#if defined(HAVE_BACKLIGHT) && !defined(BOOTLOADER)
+#if defined(HAVE_BACKLIGHT)
     if (backlight_get_current_timeout() == 0) /* LED always on */
         current += CURRENT_BACKLIGHT;
 #endif
@@ -542,7 +406,7 @@ static int runcurrent(void)
         current += CURRENT_REMOTE;
 #endif
 
-    return(current);
+    return current;
 }
 
 
@@ -550,424 +414,76 @@ static int runcurrent(void)
 #ifdef HAVE_RTC_ALARM
 static void power_thread_rtc_process(void)
 {
-    if (rtc_check_alarm_flag()) {
+    if (rtc_check_alarm_flag())
         rtc_enable_alarm(false);
-    }
 }
 #endif
 
-#ifndef TARGET_QUERY_FORCE_SHUTDOWN
+/* switch off unit if battery level is too low for reliable operation */
 bool query_force_shutdown(void)
 {
-#ifndef NO_LOW_BATTERY_SHUTDOWN
-    /* switch off unit if battery level is too low for reliable operation */
-    return battery_millivolts < battery_level_shutoff[battery_type];
-#else
+#if defined(NO_LOW_BATTERY_SHUTDOWN)
     return false;
+#elif defined(HAVE_BATTERY_SWITCH)
+    /* Cannot rely upon the battery reading to be valid and the
+     * device could be powered externally. */
+    return input_millivolts() < battery_level_shutoff[battery_type];
+#else
+    return battery_millivolts < battery_level_shutoff[battery_type];
 #endif
 }
-#endif /* TARGET_QUERY_FORCE_SHUTDOWN */
 
+#ifdef HAVE_BATTERY_SWITCH
 /*
- * This power thread maintains a history of battery voltage
- * and implements a charging algorithm.
+ * Reset the battery voltage filter to a new value and update the
+ * status.
  */
-#if CONFIG_CHARGING == CHARGING_CONTROL
-#define BATT_AVE_SAMPLES    32  /* filter constant / @ 2Hz sample rate */
-
-/*
- * For a complete description of the charging algorithm read
- * docs/CHARGING_ALGORITHM.
- */
-int long_delta;                     /* long term delta battery voltage */
-int short_delta;                    /* short term delta battery voltage */
-bool disk_activity_last_cycle = false;  /* flag set to aid charger time
-                                         * calculation */
-char power_message[POWER_MESSAGE_LEN] = ""; /* message that's shown in
-                                           debug menu */
-                                        /* percentage at which charging
-                                           starts */
-int powermgmt_last_cycle_startstop_min = 0; /* how many minutes ago was the
-                                           charging started or
-                                           stopped? */
-int powermgmt_last_cycle_level = 0;     /* which level had the
-                                           batteries at this time? */
-int trickle_sec = 0;                    /* how many seconds should the
-                                           charger be enabled per
-                                           minute for trickle
-                                           charging? */
-int pid_p = 0;                      /* PID proportional term */
-int pid_i = 0;                      /* PID integral term */
-
-static inline void charging_algorithm_small_step(void)
-{
-    if (storage_disk_is_active()) {
-        /* flag hdd use for charging calculation */
-        disk_activity_last_cycle = true;
-    }
-
-#if defined(DEBUG_FILE)
-    /*
-     * If we have a lot of pending writes or if the disk is spining,
-     * fsync the debug log file.
-     */
-    if((wrcount > 10) || ((wrcount > 0) && storage_disk_is_active())) {
-        fsync(fd);
-        wrcount = 0;
-    }
-#endif /* defined(DEBUG_FILE) */
-}
-
-static inline void charging_algorithm_big_step(void)
-{
-    static unsigned int target_voltage = TRICKLE_VOLTAGE; /* desired topoff/trickle
-                                                           * voltage level */
-    static int charge_max_time_idle = 0; /* max. charging duration, calculated at
-                                          * beginning of charging */
-    static int charge_max_time_now = 0; /* max. charging duration including
-                                         * hdd activity */
-    static int minutes_disk_activity = 0; /* count minutes of hdd use during
-                                           * charging */
-    static int last_disk_activity = CHARGE_END_LONGD + 1; /* last hdd use x mins ago */
-    int i;
-
-    if (charger_input_state == CHARGER_PLUGGED) {
-        pid_p = 0;
-        pid_i = 0;
-        snprintf(power_message, POWER_MESSAGE_LEN, "Charger plugged in");
-        /*
-         * The charger was just plugged in.  If the battery level is
-         * nearly charged, just trickle.  If the battery is low, start
-         * a full charge cycle.  If the battery level is in between,
-         * top-off and then trickle.
-         */
-        if(battery_percent > START_TOPOFF_CHG) {
-            powermgmt_last_cycle_level = battery_percent;
-            powermgmt_last_cycle_startstop_min = 0;
-            if(battery_percent >= START_TRICKLE_CHG) {
-                charge_state = TRICKLE;
-                target_voltage = TRICKLE_VOLTAGE;
-            } else {
-                charge_state = TOPOFF;
-                target_voltage = TOPOFF_VOLTAGE;
-            }
-        } else {
-            /*
-             * Start the charger full strength
-             */
-            i = CHARGE_MAX_TIME_1500 * battery_capacity / 1500;
-            charge_max_time_idle =
-                i * (100 + 35 - battery_percent) / 100;
-            if (charge_max_time_idle > i) {
-                charge_max_time_idle = i;
-            }
-            charge_max_time_now = charge_max_time_idle;
-
-            snprintf(power_message, POWER_MESSAGE_LEN,
-                     "ChgAt %d%% max %dm", battery_level(),
-                     charge_max_time_now);
-
-            /* enable the charger after the max time calc is done,
-               because battery_level depends on if the charger is
-               on */
-            DEBUGF("power: charger inserted and battery"
-                   " not full, charging\n");
-            powermgmt_last_cycle_level = battery_percent;
-            powermgmt_last_cycle_startstop_min = 0;
-            trickle_sec  = 60;
-            long_delta   = short_delta = 999999;
-            charge_state = CHARGING;
-        }
-    }
-
-    if (charge_state == CHARGING) {
-        /* alter charge time max length with extra disk use */
-        if (disk_activity_last_cycle) {
-            minutes_disk_activity++;
-            charge_max_time_now = charge_max_time_idle +
-                                 (minutes_disk_activity * 2 / 5);
-            disk_activity_last_cycle = false;
-            last_disk_activity = 0;
-        } else {
-            last_disk_activity++;
-        }
-        /*
-         * Check the delta voltage over the last X minutes so we can do
-         * our end-of-charge logic based on the battery level change.
-         *(no longer use minimum time as logic for charge end has 50
-         * minutes minimum charge built in)
-         */
-        if (powermgmt_last_cycle_startstop_min > CHARGE_END_SHORTD) {
-            short_delta = power_history[0] -
-                          power_history[CHARGE_END_SHORTD - 1];
-        }
-
-        if (powermgmt_last_cycle_startstop_min > CHARGE_END_LONGD) {
-        /*
-         * Scan the history: the points where measurement is taken need to
-         * be fairly static. (check prior to short delta 'area')
-         * (also only check first and last 10 cycles - delta in middle OK)
-         */
-            long_delta = power_history[0] -
-                         power_history[CHARGE_END_LONGD - 1];
-
-            for(i = CHARGE_END_SHORTD; i < CHARGE_END_SHORTD + 10; i++) {
-                if(((power_history[i] - power_history[i+1]) >  50) ||
-                   ((power_history[i] - power_history[i+1]) < -50)) {
-                    long_delta = 777777;
-                    break;
-                }
-            }
-             for(i = CHARGE_END_LONGD - 11; i < CHARGE_END_LONGD - 1 ; i++) {
-                if(((power_history[i] - power_history[i+1]) >  50) ||
-                   ((power_history[i] - power_history[i+1]) < -50)) {
-                    long_delta = 888888;
-                    break;
-                }
-            }
-        }
-
-        snprintf(power_message, POWER_MESSAGE_LEN,
-                 "Chg %dm, max %dm", powermgmt_last_cycle_startstop_min,
-                 charge_max_time_now);
-        /*
-         * End of charge criteria (any qualify):
-         * 1) Charged a long time
-         * 2) DeltaV went negative for a short time ( & long delta static)
-         * 3) DeltaV was negative over a longer period (no disk use only)
-         * Note: short_delta and long_delta are millivolts
-         */
-        if ((powermgmt_last_cycle_startstop_min >= charge_max_time_now) ||
-            (short_delta <= -50 && long_delta < 50 ) || (long_delta  < -20 &&
-            last_disk_activity > CHARGE_END_LONGD)) {
-            if (powermgmt_last_cycle_startstop_min > charge_max_time_now) {
-                DEBUGF("power: powermgmt_last_cycle_startstop_min > charge_max_time_now, "
-                       "enough!\n");
-                /*
-                 *have charged too long and deltaV detection did not
-                 *work!
-                 */
-                 snprintf(power_message, POWER_MESSAGE_LEN,
-                         "Chg tmout %d min", charge_max_time_now);
-                /*
-                 * Switch to trickle charging.  We skip the top-off
-                 * since we've effectively done the top-off operation
-                 * already since we charged for the maximum full
-                 * charge time.
-                 */
-                powermgmt_last_cycle_level = battery_percent;
-                powermgmt_last_cycle_startstop_min = 0;
-                charge_state = TRICKLE;
-
-                /*
-                 * set trickle charge target to a relative voltage instead
-                 * of an arbitrary value - the fully charged voltage may
-                 * vary according to ambient temp, battery condition etc
-                 * trickle target is -0.15v from full voltage acheived
-                 * topup target is -0.05v from full voltage
-                 */
-                target_voltage = power_history[0] - 150;
-
-            } else {
-                if(short_delta <= -5) {
-                    DEBUGF("power: short-term negative"
-                           " delta, enough!\n");
-                    snprintf(power_message, POWER_MESSAGE_LEN,
-                             "end negd %d %dmin", short_delta,
-                             powermgmt_last_cycle_startstop_min);
-                    target_voltage = power_history[CHARGE_END_SHORTD - 1]
-                                     - 50;
-                } else {
-                    DEBUGF("power: long-term small "
-                           "positive delta, enough!\n");
-                    snprintf(power_message, POWER_MESSAGE_LEN,
-                             "end lowd %d %dmin", long_delta,
-                             powermgmt_last_cycle_startstop_min);
-                    target_voltage = power_history[CHARGE_END_LONGD - 1]
-                                     - 50;
-                }
-                /*
-                 * Switch to top-off charging.
-                 */
-                powermgmt_last_cycle_level = battery_percent;
-                powermgmt_last_cycle_startstop_min = 0;
-                charge_state = TOPOFF;
-            }
-        }
-    }
-    else if (charge_state != DISCHARGING)  /* top off or trickle */
-    {
-        /*
-         *Time to switch from topoff to trickle?
-         */
-        if ((charge_state == TOPOFF) &&
-            (powermgmt_last_cycle_startstop_min > TOPOFF_MAX_TIME))
-        {
-            powermgmt_last_cycle_level = battery_percent;
-            powermgmt_last_cycle_startstop_min = 0;
-            charge_state = TRICKLE;
-            target_voltage = target_voltage - 100;
-        }
-        /*
-         * Adjust trickle charge time (proportional and integral terms).
-         * Note: I considered setting the level higher if the USB is
-         * plugged in, but it doesn't appear to be necessary and will
-         * generate more heat [gvb].
-         */
-
-        pid_p = ((signed)target_voltage - (signed)battery_millivolts) / 5;
-        if((pid_p <= PID_DEADZONE) && (pid_p >= -PID_DEADZONE))
-            pid_p = 0;
-
-        if((unsigned) battery_millivolts < target_voltage) {
-            if(pid_i < 60) {
-                pid_i++;        /* limit so it doesn't "wind up" */
-            }
-        } else {
-            if(pid_i > 0) {
-                pid_i--;        /* limit so it doesn't "wind up" */
-            }
-        }
-
-        trickle_sec = pid_p + pid_i;
-
-        if(trickle_sec > 60) {
-            trickle_sec = 60;
-        }
-        if(trickle_sec < 0) {
-            trickle_sec = 0;
-        }
-
-    } else if (charge_state == DISCHARGING) {
-        trickle_sec = 0;
-        /*
-         * The charger is enabled here only in one case: if it was
-         * turned on at boot time (power_init).  Turn it off now.
-         */
-        if (charger_enabled)
-            charger_enable(false);
-    }
-
-    if (charger_input_state == CHARGER_UNPLUGGED) {
-        /*
-         * The charger was just unplugged.
-         */
-        DEBUGF("power: charger disconnected, disabling\n");
-
-        charger_enable(false);
-        powermgmt_last_cycle_level = battery_percent;
-        powermgmt_last_cycle_startstop_min = 0;
-        trickle_sec  = 0;
-        pid_p        = 0;
-        pid_i        = 0;
-        charge_state = DISCHARGING;
-        snprintf(power_message, POWER_MESSAGE_LEN, "Charger: discharge");
-    }
-
-    /* sleep for a minute */
-    if(trickle_sec > 0) {
-        charger_enable(true);
-        power_thread_sleep(HZ * trickle_sec);
-    }
-    if(trickle_sec < 60)
-        charger_enable(false);
-    power_thread_sleep(HZ * (60 - trickle_sec));
-
-#if defined(DEBUG_FILE)
-    if(usb_inserted()) {
-        if(fd >= 0) {
-            /* It is probably too late to close the file but we can try...*/
-            close(fd);
-            fd = -1;
-        }
-    } else {
-        if(fd < 0) {
-            fd = open(DEBUG_FILE_NAME, O_WRONLY | O_APPEND | O_CREAT);
-            if(fd >= 0) {
-                snprintf(debug_message, DEBUG_MESSAGE_LEN,
-                "cycle_min, bat_millivolts, bat_percent, chgr_state"
-                " ,charge_state, pid_p, pid_i, trickle_sec\n");
-                write(fd, debug_message, strlen(debug_message));
-                wrcount = 99;   /* force a flush */
-            }
-        }
-        if(fd >= 0) {
-            snprintf(debug_message, DEBUG_MESSAGE_LEN,
-                    "%d, %d, %d, %d, %d, %d, %d, %d\n",
-                powermgmt_last_cycle_startstop_min, battery_millivolts,
-                battery_percent, charger_input_state, charge_state,
-                pid_p, pid_i, trickle_sec);
-            write(fd, debug_message, strlen(debug_message));
-            wrcount++;
-        }
-    }
-#endif /* defined(DEBUG_FILE) */
-
-    powermgmt_last_cycle_startstop_min++;
-}
-
-/*
- * Prepare charging for poweroff
- */
-static inline void charging_algorithm_close(void)
-{
-#if defined(DEBUG_FILE)
-    if(fd >= 0) {
-        close(fd);
-        fd = -1;
-    }
-#endif
-}
-#elif CONFIG_CHARGING == CHARGING_TARGET
-extern void charging_algorithm_big_step(void);
-extern void charging_algorithm_small_step(void);
-extern void charging_algorithm_close(void);
-
-void set_filtered_battery_voltage(int millivolts)
+void reset_battery_filter(int millivolts)
 {
     avgbat = millivolts * BATT_AVE_SAMPLES;
     battery_millivolts = millivolts;
     battery_status_update();
 }
+#endif /* HAVE_BATTERY_SWITCH */
 
-#else
-#define BATT_AVE_SAMPLES   128  /* slw filter constant for all others */
-
-static inline void charging_algorithm_small_step(void)
+/** Generic charging algorithms for common charging types **/
+#if CONFIG_CHARGING == CHARGING_SIMPLE
+static inline void charging_algorithm_step(void)
 {
-#if CONFIG_CHARGING == CHARGING_MONITOR
-    switch (charger_input_state)
-    {
-        case CHARGER_UNPLUGGED:
-        case NO_CHARGER:
-            charge_state = DISCHARGING;
-            break;
-        case CHARGER_PLUGGED:
-        case CHARGER:
-            if (charging_state()) {
-                charge_state = CHARGING;
-            } else {
-                charge_state = DISCHARGING;
-            }
-            break;
-    }
-#endif /* CONFIG_CHARGING == CHARGING_MONITOR */
+    /* Nothing to do */
 }
 
-static inline void charging_algorithm_big_step(void)
-{
-    /* sleep for a minute */
-    power_thread_sleep(HZ * 60);
-}
-
-/*
- * Prepare charging for poweroff
- */
 static inline void charging_algorithm_close(void)
 {
     /* Nothing to do */
 }
-#endif /* CONFIG_CHARGING == CHARGING_CONTROL */
+#elif CONFIG_CHARGING == CHARGING_MONITOR
+/*
+ * Monitor CHARGING/DISCHARGING state.
+ */
+static inline void charging_algorithm_step(void)
+{
+    switch (charger_input_state)
+    {
+    case CHARGER_PLUGGED:
+    case CHARGER:
+        if (charging_state()) {
+            charge_state = CHARGING;
+            break;
+        }
+    /* Fallthrough */
+    case CHARGER_UNPLUGGED:
+    case NO_CHARGER:
+        charge_state = DISCHARGING;
+        break;
+    }
+}
+
+static inline void charging_algorithm_close(void)
+{
+    /* Nothing to do */
+}
+#endif /* CONFIG_CHARGING == * */
 
 #if CONFIG_CHARGING
 /* Shortcut function calls - compatibility, simplicity. */
@@ -975,201 +491,281 @@ static inline void charging_algorithm_close(void)
 /* Returns true if any power input is capable of charging. */
 bool charger_inserted(void)
 {
-    return power_input_status() & POWER_INPUT_CHARGER;
+    return power_thread_inputs & POWER_INPUT_CHARGER;
 }
 
 /* Returns true if any power input is connected - charging-capable
  * or not. */
 bool power_input_present(void)
 {
-    return power_input_status() & POWER_INPUT;
+    return power_thread_inputs & POWER_INPUT;
+}
+
+/*
+ * Detect charger inserted. Return true if the state is transistional.
+ */
+static inline bool detect_charger(unsigned int pwr)
+{
+    /*
+     * Detect charger plugged/unplugged transitions.  On a plugged or
+     * unplugged event, we return immediately, run once through the main
+     * loop (including the subroutines), and end up back here where we
+     * transition to the appropriate steady state charger on/off state.
+     */
+    if (pwr & POWER_INPUT_CHARGER) {
+        switch (charger_input_state)
+        {
+        case NO_CHARGER:
+        case CHARGER_UNPLUGGED:
+            charger_input_state = CHARGER_PLUGGED;
+            break;
+
+        case CHARGER_PLUGGED:
+            queue_broadcast(SYS_CHARGER_CONNECTED, 0);
+            last_sent_battery_level = 0;
+            charger_input_state = CHARGER;
+            break;
+
+        case CHARGER:
+            /* Steady state */
+            return false;
+        }
+    }
+    else {    /* charger not inserted */
+        switch (charger_input_state)
+        {
+        case NO_CHARGER:
+            /* Steady state */
+            return false;
+
+        case CHARGER_UNPLUGGED:
+            queue_broadcast(SYS_CHARGER_DISCONNECTED, 0);
+            last_sent_battery_level = 100;
+            charger_input_state = NO_CHARGER;
+            break;
+
+        case CHARGER_PLUGGED:
+        case CHARGER:
+            charger_input_state = CHARGER_UNPLUGGED;
+            break;
+        }
+    }
+
+    /* Transitional state */
+    return true;
 }
 #endif /* CONFIG_CHARGING */
 
 /*
- * This function is called to do the relativly long sleep waits from within the
- * main power_thread loop while at the same time servicing any other periodic
- * functions in the power thread which need to be called at a faster periodic
- * rate than the slow periodic rate of the main power_thread loop.
- *
- * While we are waiting for the time to expire, we average the battery
- * voltages.
+ * Monitor the presence of a charger and perform critical frequent steps
+ * such as running the battery voltage filter.
  */
-void power_thread_sleep(int ticks)
+static inline void power_thread_step(void)
 {
-    long tick_return = current_tick + ticks;
+    /* If the power off timeout expires, the main thread has failed
+       to shut down the system, and we need to force a power off */
+    if (shutdown_timeout) {
+        shutdown_timeout -= POWER_THREAD_STEP_TICKS;
 
-    do
-    {
-#if CONFIG_CHARGING
-        /*
-         * Detect charger plugged/unplugged transitions.  On a plugged or
-         * unplugged event, we return immediately, run once through the main
-         * loop (including the subroutines), and end up back here where we
-         * transition to the appropriate steady state charger on/off state.
-         */
-        if(power_input_status() & POWER_INPUT_CHARGER) {
-            switch(charger_input_state) {
-                case NO_CHARGER:
-                case CHARGER_UNPLUGGED:
-                    charger_input_state = CHARGER_PLUGGED;
-                    tick_return = current_tick;
-                    goto do_small_step; /* Algorithm should see transition */
-                case CHARGER_PLUGGED:
-                    queue_broadcast(SYS_CHARGER_CONNECTED, 0);
-                    last_sent_battery_level = 0;
-                    charger_input_state = CHARGER;
-                    break;
-                case CHARGER:
-                    break;
-            }
-        } else {    /* charger not inserted */
-            switch(charger_input_state) {
-                case NO_CHARGER:
-                    break;
-                case CHARGER_UNPLUGGED:
-                    queue_broadcast(SYS_CHARGER_DISCONNECTED, 0);
-                    last_sent_battery_level = 100;
-                    charger_input_state = NO_CHARGER;
-                    break;
-                case CHARGER_PLUGGED:
-                case CHARGER:
-                    charger_input_state = CHARGER_UNPLUGGED;
-                    tick_return = current_tick;
-                    goto do_small_step; /* Algorithm should see transition */
-            }
-        }
-#endif /* CONFIG_CHARGING */
-
-        ticks = tick_return - current_tick;
-
-        if (ticks > 0) {
-            ticks = MIN(HZ/2, ticks);
-            sleep(ticks);
-        }
-
-        /* If the power off timeout expires, the main thread has failed
-           to shut down the system, and we need to force a power off */
-        if(shutdown_timeout) {
-            shutdown_timeout -= MAX(ticks, 1);
-            if(shutdown_timeout <= 0)
-                power_off();
-        }
+        if (shutdown_timeout <= 0)
+            power_off();
+    }
 
 #ifdef HAVE_RTC_ALARM
-        power_thread_rtc_process();
+    power_thread_rtc_process();
 #endif
 
-        /*
-         * Do a digital exponential filter.  We don't sample the battery if
-         * the disk is spinning unless we are in USB mode (the disk will most
-         * likely always be spinning in USB mode) or charging.
-         */
-        if (!storage_disk_is_active() || usb_inserted()
+    /*
+     * Do a digital exponential filter.  We don't sample the battery if
+     * the disk is spinning unless we are in USB mode (the disk will most
+     * likely always be spinning in USB mode) or charging.
+     */
+    if (!storage_disk_is_active() || usb_inserted()
 #if CONFIG_CHARGING >= CHARGING_MONITOR
-                || charger_input_state == CHARGER
+            || charger_input_state == CHARGER
 #endif
-        ) {
-            avgbat += battery_adc_voltage() - (avgbat / BATT_AVE_SAMPLES);
-            /*
-             * battery_millivolts is the millivolt-scaled filtered battery value.
-             */
-            battery_millivolts = avgbat / BATT_AVE_SAMPLES;
+    ) {
+        avgbat += battery_adc_voltage() - avgbat / BATT_AVE_SAMPLES;
+        /*
+         * battery_millivolts is the millivolt-scaled filtered battery value.
+         */
+        battery_millivolts = avgbat / BATT_AVE_SAMPLES;
 
-            /* update battery status every time an update is available */
-            battery_status_update();
-        }
-        else if (battery_percent < 8) {
-            /* If battery is low, observe voltage during disk activity.
-             * Shut down if voltage drops below shutoff level and we are not
-             * using NiMH or Alkaline batteries.
-             */
-            battery_millivolts = (battery_adc_voltage() +
-                                  battery_millivolts + 1) / 2;
-
-            /* update battery status every time an update is available */
-            battery_status_update();
-
-            if (!shutdown_timeout && query_force_shutdown()) {
-                sys_poweroff();
-            }
-            else {
-                avgbat += battery_millivolts - (avgbat / BATT_AVE_SAMPLES);
-            }
-        }
-
-#if CONFIG_CHARGING
-    do_small_step:
-#endif
-        charging_algorithm_small_step();
+        /* update battery status every time an update is available */
+        battery_status_update();
     }
-    while (TIME_BEFORE(current_tick, tick_return));
-}
+    else if (battery_percent < 8) {
+        /*
+         * If battery is low, observe voltage during disk activity.
+         * Shut down if voltage drops below shutoff level and we are not
+         * using NiMH or Alkaline batteries.
+         */
+        battery_millivolts = (battery_adc_voltage() +
+                              battery_millivolts + 1) / 2;
+
+        /* update battery status every time an update is available */
+        battery_status_update();
+
+        if (!shutdown_timeout && query_force_shutdown()) {
+            sys_poweroff();
+        }
+        else {
+            avgbat += battery_millivolts - avgbat / BATT_AVE_SAMPLES;
+        }
+    }
+} /* power_thread_step */
 
 static void power_thread(void)
 {
+    long next_power_hist;
+
     /* Delay reading the first battery level */
 #ifdef MROBE_100
-    while(battery_adc_voltage()>4200)  /* gives false readings initially */
+    while (battery_adc_voltage() > 4200) /* gives false readings initially */
 #endif
-    sleep(HZ/100);
+    {
+        sleep(HZ/100);
+    }
+
+#if CONFIG_CHARGING
+    /* Initialize power input status before calling other routines. */
+    power_thread_inputs = power_input_status();
+#endif
 
     /* initialize the voltages for the exponential filter */
     avgbat = battery_adc_voltage() + 15;
 
 #ifdef HAVE_DISK_STORAGE /* this adjustment is only needed for HD based */
-        /* The battery voltage is usually a little lower directly after
-           turning on, because the disk was used heavily. Raise it by 5% */
+    /* The battery voltage is usually a little lower directly after
+       turning on, because the disk was used heavily. Raise it by 5% */
 #if CONFIG_CHARGING
-    if(!charger_inserted()) /* only if charger not connected */
+    if (!charger_inserted()) /* only if charger not connected */
 #endif
+    {
         avgbat += (percent_to_volt_discharge[battery_type][6] -
                    percent_to_volt_discharge[battery_type][5]) / 2;
+    }
 #endif /* HAVE_DISK_STORAGE */
 
     avgbat = avgbat * BATT_AVE_SAMPLES;
     battery_millivolts = avgbat / BATT_AVE_SAMPLES;
+    power_history[0] = battery_millivolts;
 
 #if CONFIG_CHARGING
-    if(charger_inserted()) {
-        battery_percent  = voltage_to_percent(battery_millivolts,
-                           percent_to_volt_charge);
-    } else
+    if (charger_inserted()) {
+        battery_percent = voltage_to_percent(battery_millivolts,
+                            percent_to_volt_charge);
+    }
+    else
 #endif
-    {   battery_percent  = voltage_to_percent(battery_millivolts,
-                           percent_to_volt_discharge[battery_type]);
-        battery_percent += (battery_percent < 100);
+    {
+        battery_percent = voltage_to_percent(battery_millivolts,
+                            percent_to_volt_discharge[battery_type]);
+        battery_percent += battery_percent < 100;
     }
 
 #if CONFIG_CHARGING == CHARGING_TARGET
     powermgmt_init_target();
 #endif
 
+    next_power_hist = current_tick + HZ*60;
+
     while (1)
     {
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+        unsigned int pwr = power_input_status();
+#ifdef HAVE_BATTERY_SWITCH
+        if ((pwr ^ power_thread_inputs) & POWER_INPUT_BATTERY) {
+            sleep(HZ/10);
+            reset_battery_filter(battery_adc_voltage());
+        }
+#endif
+        power_thread_inputs = pwr;
+
+        if (!detect_charger(pwr))
+#endif /* CONFIG_CHARGING */
+        {
+            /* Steady state */
+            sleep(POWER_THREAD_STEP_TICKS);
+
+            /* Do common power tasks */
+            power_thread_step();
+        }
+
+        /* Perform target tasks */
+        charging_algorithm_step();
+
+        if (TIME_BEFORE(current_tick, next_power_hist))
+            continue;
+
+        /* increment to ensure there is a record for every minute
+         * rather than go forward from the current tick */
+        next_power_hist += HZ*60;
+
         /* rotate the power history */
-        memmove(power_history + 1, power_history,
+        memmove(&power_history[1], &power_history[0],
                 sizeof(power_history) - sizeof(power_history[0]));
 
         /* insert new value at the start, in millivolts 8-) */
         power_history[0] = battery_millivolts;
 
-        charging_algorithm_big_step();
-
         handle_auto_poweroff();
     }
-}
+} /* power_thread */
 
 void powermgmt_init(void)
 {
     /* init history to 0 */
-    memset(power_history, 0x00, sizeof(power_history));
+    memset(power_history, 0, sizeof(power_history));
     create_thread(power_thread, power_stack, sizeof(power_stack), 0,
                   power_thread_name IF_PRIO(, PRIORITY_SYSTEM)
                   IF_COP(, CPU));
 }
 
-#endif /* SIMULATOR */
+/* Various hardware housekeeping tasks relating to shutting down the player */
+void shutdown_hw(void)
+{
+    charging_algorithm_close();
+    audio_stop();
+
+    if (battery_level_safe()) { /* do not save on critical battery */
+#ifdef HAVE_LCD_BITMAP
+        glyph_cache_save();
+#endif
+        if (storage_disk_is_active())
+            storage_spindown(1);
+    }
+
+    while (storage_disk_is_active())
+        sleep(HZ/10);
+
+#if CONFIG_CODEC == SWCODEC
+    audiohw_close();
+#else
+    mp3_shutdown();
+#endif
+
+    /* If HD is still active we try to wait for spindown, otherwise the
+       shutdown_timeout in power_thread_step will force a power off */
+    while (storage_disk_is_active())
+        sleep(HZ/10);
+
+#ifndef HAVE_LCD_COLOR
+    lcd_set_contrast(0);
+#endif
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_set_contrast(0);
+#endif
+#ifdef HAVE_LCD_SHUTDOWN
+    lcd_shutdown();
+#endif
+
+    /* Small delay to make sure all HW gets time to flush. Especially
+       eeprom chips are quite slow and might be still writing the last
+       byte. */
+    sleep(HZ/4);
+    power_off();
+}
 
 void sys_poweroff(void)
 {
@@ -1177,12 +773,11 @@ void sys_poweroff(void)
     logf("sys_poweroff()");
     /* If the main thread fails to shut down the system, we will force a
        power off after an 20 second timeout - 28 seconds if recording */
-    if (shutdown_timeout == 0)
-    {
-#if (defined(IAUDIO_X5) || defined(IAUDIO_M5)) && !defined (SIMULATOR)
+    if (shutdown_timeout == 0) {
+#if defined(IAUDIO_X5) || defined(IAUDIO_M5)
         pcf50606_reset_timeout(); /* Reset timer on first attempt only */
 #endif
-#if defined(HAVE_RECORDING) && !defined(BOOTLOADER)
+#ifdef HAVE_RECORDING
         if (audio_status() & AUDIO_STATUS_RECORD)
             shutdown_timeout += HZ*8;
 #endif
@@ -1195,9 +790,9 @@ void sys_poweroff(void)
 
 void cancel_shutdown(void)
 {
-    logf("sys_cancel_shutdown()");
+    logf("cancel_shutdown()");
 
-#if (defined(IAUDIO_X5) || defined(IAUDIO_M5)) && !defined (SIMULATOR)
+#if defined(IAUDIO_X5) || defined(IAUDIO_M5)
     /* TODO: Move some things to target/ tree */
     if (shutdown_timeout)
         pcf50606_reset_timeout();
@@ -1205,66 +800,23 @@ void cancel_shutdown(void)
 
     shutdown_timeout = 0;
 }
-
-/* Various hardware housekeeping tasks relating to shutting down the jukebox */
-void shutdown_hw(void)
-{
-#ifndef SIMULATOR
-    charging_algorithm_close();
-    audio_stop();
-    if (battery_level_safe()) { /* do not save on critical battery */
-#ifdef HAVE_LCD_BITMAP
-        glyph_cache_save();
-#endif
-        if(storage_disk_is_active())
-            storage_spindown(1);
-    }
-    while(storage_disk_is_active())
-        sleep(HZ/10);
-
-#if CONFIG_CODEC != SWCODEC
-    mp3_shutdown();
-#else
-    audiohw_close();
-#endif
-
-    /* If HD is still active we try to wait for spindown, otherwise the
-       shutdown_timeout in power_thread_sleep will force a power off */
-    while(storage_disk_is_active())
-        sleep(HZ/10);
-#ifndef HAVE_LCD_COLOR
-    lcd_set_contrast(0);
-#endif
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_set_contrast(0);
-#endif
-
-#ifdef HAVE_LCD_SHUTDOWN
-    lcd_shutdown();
-#endif
-
-    /* Small delay to make sure all HW gets time to flush. Especially
-       eeprom chips are quite slow and might be still writing the last
-       byte. */
-    sleep(HZ/4);
-    power_off();
-#endif /* #ifndef SIMULATOR */
-}
+#endif /* SIMULATOR */
 
 /* Send system battery level update events on reaching certain significant
-   levels.  This must be called after battery_percent has been updated. */
-static void send_battery_level_event(void)
+   levels. This must be called after battery_percent has been updated. */
+void send_battery_level_event(void)
 {
     static const int levels[] = { 5, 15, 30, 50, 0 };
     const int *level = levels;
+
     while (*level)
     {
-        if (battery_percent <= *level && last_sent_battery_level > *level)
-        { 
+        if (battery_percent <= *level && last_sent_battery_level > *level) {
             last_sent_battery_level = *level;
             queue_broadcast(SYS_BATTERY_UPDATE, last_sent_battery_level);
             break;
         }
+
         level++;
     }
 }

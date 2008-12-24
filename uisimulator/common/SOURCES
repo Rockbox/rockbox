@@ -7,3 +7,5 @@ lcd-playersim.c
 #endif
 sim_icons.c
 stubs.c
+powermgmt-sim.c
+

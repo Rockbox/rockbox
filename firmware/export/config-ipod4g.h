@@ -120,6 +120,13 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
+/* define current usage levels */
+#define CURRENT_NORMAL     100  /* MP3: ~10.5h out of 1100mAh battery  */
+#define CURRENT_BACKLIGHT  20  /* FIXME: this needs adjusting */
+#if defined(HAVE_RECORDING)
+#define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
+#endif
+
 #ifndef SIMULATOR
 
 /* Define this if you have a PortalPlayer PP5020 */

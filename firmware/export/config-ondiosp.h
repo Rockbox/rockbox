@@ -58,6 +58,11 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
+/* define current usage levels */
+#define CURRENT_NORMAL     95  /* average, nearly proportional to 1/U */
+#define CURRENT_USB         1  /* host powered in USB mode; avoid zero-div */
+#define CURRENT_BACKLIGHT   0  /* no backlight */
+
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */

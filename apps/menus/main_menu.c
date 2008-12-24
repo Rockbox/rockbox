@@ -27,6 +27,7 @@
 #include "lang.h"
 #include "action.h"
 #include "settings.h"
+#include "power.h"
 #include "powermgmt.h"
 #include "menu.h"
 #include "misc.h"
@@ -199,15 +200,14 @@ static char* info_getname(int selected_item, void *data,
             if (charge_state == CHARGING)
                 return (char *)str(LANG_BATTERY_CHARGE);
             else
-#if CONFIG_CHARGING == CHARGING_CONTROL
+#ifdef ARCHOS_RECORDER
             if (charge_state == TOPOFF)
                 return (char *)str(LANG_BATTERY_TOPOFF_CHARGE);
-            else
-#endif
-            if (charge_state == TRICKLE)
+            else if (charge_state == TRICKLE)
                 return (char *)str(LANG_BATTERY_TRICKLE_CHARGE);
             else
-#endif
+#endif /* ARCHOS_RECORDER */
+#endif /* CONFIG_CHARGING = */
             if (battery_level() >= 0)
                 snprintf(buffer, buffer_len, (char *)str(LANG_BATTERY_TIME),
                          battery_level(), battery_time() / 60, battery_time() % 60);
@@ -282,22 +282,21 @@ static int info_speak_item(int selected_item, void * data)
         }
         case INFO_BATTERY: /* battery */
 #if CONFIG_CHARGING == CHARGING_SIMPLE
-            if (charger_input_state == CHARGER)
+            if (charger_inserted())
                 talk_id(LANG_BATTERY_CHARGE, true);
             else
 #elif CONFIG_CHARGING >= CHARGING_MONITOR
             if (charge_state == CHARGING)
                 talk_id(LANG_BATTERY_CHARGE, true);
             else
-#if CONFIG_CHARGING == CHARGING_CONTROL
+#ifdef ARCHOS_RECORDER
             if (charge_state == TOPOFF)
                 talk_id(LANG_BATTERY_TOPOFF_CHARGE, true);
-            else
-#endif
-            if (charge_state == TRICKLE)
+            else if (charge_state == TRICKLE)
                 talk_id(LANG_BATTERY_TRICKLE_CHARGE, true);
             else
-#endif
+#endif /* ARCHOS_RECORDER */
+#endif /* CONFIG_CHARGING = */
             if (battery_level() >= 0)
             {
                 talk_id(LANG_BATTERY_TIME, false);

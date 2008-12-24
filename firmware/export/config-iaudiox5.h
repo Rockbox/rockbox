@@ -122,6 +122,9 @@
 /* Hardware controlled charging? FIXME */
 #define CONFIG_CHARGING CHARGING_SIMPLE
 
+/* define current usage levels */
+#define CURRENT_REMOTE      8  /* additional current when remote connected */
+
 #ifndef SIMULATOR
 
 /* define this if the backlight thread is used for fade, not for sim, needs

@@ -53,6 +53,7 @@
 #define BATT_VTRICKLE_CHARGE        2900 /* Must charge slowly */
 #define BATT_VSLOW_CHARGE           3500 /* Lower-current charge mode below
                                           * this level */
+#define BATT_FULL_VOLTAGE           4161 /* Battery already topped */
 #define BATT_VAUTO_RECHARGE         4100 /* When to begin another cycle */
 #define BATT_USB_VAUTO_RECHARGE     4000 /* When to cycle with USB only */
 #define BATT_USB_VSTOP              4140 /* When to "stop" when USB only */
@@ -92,23 +93,13 @@
 #define BATT_AVE_SAMPLES            32
 #define ICHARGER_AVE_SAMPLES        32
 
+void powermgmt_init_target(void);
+void charging_algorithm_step(void);
+void charging_algorithm_close(void);
+
 /* Provide filtered charge current */
 int battery_charge_current(void);
 
-#ifndef SIMULATOR
-/* Indicate various functions that require implementation at the target level.
- * This is because the battery could be low or the battery switch is off but
- * with the main charger attached which implies safe power for anything. The
- * true battery reading is always reported for voltage readings and not the
- * value at the application supply. */
-#define TARGET_QUERY_FORCE_SHUTDOWN
-
-/* For this the application supply is read out if the charger is attached or
- * the battery read if not (completely hardware selected at BP). */
-#define TARGET_BATTERY_LEVEL_SAFE
-
-/* The state should be adjusted to CHARGING or DISCHARGING */
-#define TARGET_POWERMGMT_FILTER_CHARGE_STATE
-#endif /* SIMULATOR */
+#define CURRENT_MAX_CHG battery_charge_current()
 
 #endif /* POWERMGMT_TARGET_H */

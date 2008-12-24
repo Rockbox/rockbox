@@ -75,7 +75,7 @@ static void charging_screen(void)
 
     do
     {
-#if CONFIG_CHARGING == CHARGING_CONTROL
+#ifdef ARCHOS_RECORDER
         if (charge_state == CHARGING)
             msg = "charging";
         else if (charge_state == TOPOFF)
@@ -84,7 +84,6 @@ static void charging_screen(void)
             msg = "trickle charge";
         else
             msg = "not charging";
-
 #else
         msg = "charging";
 #endif

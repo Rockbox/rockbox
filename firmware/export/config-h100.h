@@ -110,8 +110,15 @@
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 
 /* Hardware controlled charging */
-//#define CONFIG_CHARGING CHARGING_SIMPLE
+
 #define CONFIG_CHARGING CHARGING_MONITOR /* FIXME: remove that once monitoring is fixed properly */
+
+/* define current usage levels */
+#define CURRENT_NORMAL     80  /* 16h playback on 1300mAh battery */
+#define CURRENT_BACKLIGHT  23  /* from IriverBattery twiki page */
+#define CURRENT_SPDIF_OUT  10  /* optical SPDIF output on */
+#define CURRENT_RECORD    105  /* additional current while recording */
+#define CURRENT_REMOTE      8  /* additional current when remote connected */
 
 #ifndef SIMULATOR
 

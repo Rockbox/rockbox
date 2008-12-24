@@ -33,10 +33,6 @@
 #include "logf.h"
 #include "usb.h"
 
-#if CONFIG_CHARGING == CHARGING_CONTROL
-bool charger_enabled;
-#endif
-
 #if CONFIG_TUNER
 
 bool tuner_power(bool status)

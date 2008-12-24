@@ -1603,10 +1603,10 @@ static bool view_battery(void)
                 lcd_puts(0, 2, buf);
 #endif
 #if CONFIG_CHARGING
-#if CONFIG_CHARGING == CHARGING_CONTROL
+#if defined ARCHOS_RECORDER
                 snprintf(buf, 30, "Chgr: %s %s",
                          charger_inserted() ? "present" : "absent",
-                         charger_enabled ? "on" : "off");
+                         charger_enabled() ? "on" : "off");
                 lcd_puts(0, 3, buf);
                 snprintf(buf, 30, "short delta: %d", short_delta);
                 lcd_puts(0, 5, buf);
@@ -1616,13 +1616,11 @@ static bool view_battery(void)
                 snprintf(buf, 30, "USB Inserted: %s",
                          usb_inserted() ? "yes" : "no");
                 lcd_puts(0, 8, buf);
-#if defined IRIVER_H300_SERIES
+#elif defined IRIVER_H300_SERIES
                 snprintf(buf, 30, "USB Charging Enabled: %s",
                          usb_charging_enabled() ? "yes" : "no");
                 lcd_puts(0, 9, buf);
-#endif
-#else /* CONFIG_CHARGING != CHARGING_CONTROL */
-#if defined IPOD_NANO || defined IPOD_VIDEO
+#elif defined IPOD_NANO || defined IPOD_VIDEO
                 int usb_pwr  = (GPIOL_INPUT_VAL & 0x10)?true:false;
                 int ext_pwr  = (GPIOL_INPUT_VAL & 0x08)?false:true;
                 int dock     = (GPIOA_INPUT_VAL & 0x10)?true:false;
@@ -1644,12 +1642,8 @@ static bool view_battery(void)
                 snprintf(buf, 30, "Headphone: %s",
                          headphone ? "connected" : "disconnected");
                 lcd_puts(0, 7, buf);
-#else
-                snprintf(buf, 30, "Charger: %s",
-                         charger_inserted() ? "present" : "absent");
-                lcd_puts(0, 3, buf);
-#if defined TOSHIBA_GIGABEAT_S
-                int line = 4;
+#elif defined TOSHIBA_GIGABEAT_S
+                int line = 3;
                 unsigned int st;
 
                 static const unsigned char * const chrgstate_strings[] =
@@ -1662,6 +1656,10 @@ static bool view_battery(void)
                     "Constant Current",
                     "<unknown>",
                 };
+
+                snprintf(buf, 30, "Charger: %s",
+                         charger_inserted() ? "present" : "absent");
+                lcd_puts(0, line++, buf);
 
                 st = power_input_status() &
                      (POWER_INPUT_CHARGER | POWER_INPUT_BATTERY);
@@ -1730,9 +1728,11 @@ static bool view_battery(void)
                 }
                     
                 lcd_puts(0, line++, buf);
-#endif /* defined TOSHIBA_GIGABEAT_S */
-#endif /* defined IPOD_NANO || defined IPOD_VIDEO */
-#endif /* CONFIG_CHARGING != CHARGING_CONTROL */
+#else
+                snprintf(buf, 30, "Charger: %s",
+                         charger_inserted() ? "present" : "absent");
+                lcd_puts(0, 3, buf);
+#endif /* target type */
 #endif /* CONFIG_CHARGING */
                 break;
 
@@ -1750,7 +1750,7 @@ static bool view_battery(void)
 
             case 3: /* remaining time estimation: */
 
-#if CONFIG_CHARGING == CHARGING_CONTROL
+#ifdef ARCHOS_RECORDER
                 snprintf(buf, 30, "charge_state: %d", charge_state);
                 lcd_puts(0, 0, buf);
 
@@ -1765,7 +1765,7 @@ static bool view_battery(void)
 
                 snprintf(buf, 30, "Trickle sec: %d/60", trickle_sec);
                 lcd_puts(0, 4, buf);
-#endif /* CONFIG_CHARGING == CHARGING_CONTROL */
+#endif /* ARCHOS_RECORDER */
 
                 snprintf(buf, 30, "Last PwrHist: %d.%03dV",
                     power_history[0] / 1000,

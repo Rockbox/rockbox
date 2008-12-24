@@ -209,8 +209,7 @@ static void charging_display_info(bool animate)
         lcd_puts(0, 7, buf);
     }
 
-#if CONFIG_CHARGING == CHARGING_CONTROL
-
+#ifdef ARCHOS_RECORER
     snprintf(buf, 32, "Charge mode:");
     lcd_puts(0, 2, buf);
 
@@ -224,10 +223,9 @@ static void charging_display_info(bool animate)
         snprintf(buf, 32, "not charging");
 
     lcd_puts(0, 3, buf);
-    if (!charger_enabled)
+    if (!charger_enabled())
         animate = false;
-#endif /* CONFIG_CHARGING == CHARGING_CONTROL */
-
+#endif /* ARCHOS_RECORER */
 
     /* middle part */
     memset(charging_logo+3, 0x00, 32);
