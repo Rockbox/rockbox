@@ -93,6 +93,7 @@ execution to the uncompressed firmware.
 #include "dualboot_e200v2.h"
 #include "dualboot_fuze.h"
 #include "dualboot_m200v4.h"
+#include "dualboot_c200v2.h"
 
 /* Win32 compatibility */
 #ifndef O_BINARY
@@ -109,9 +110,9 @@ enum
     MODEL_FUZE = 0,
     MODEL_CLIP,
     MODEL_CLIPV2,
-    MODEL_E200,
-    MODEL_M200,
-    MODEL_C200
+    MODEL_E200V2,
+    MODEL_M200V4,
+    MODEL_C200V2,
 };
 
 static const char* model_names[] = 
@@ -119,9 +120,9 @@ static const char* model_names[] =
     "Fuze",
     "Clip",
     "Clip V2",
-    "E200",
-    "M200",
-    "C200"
+    "e200 v2",
+    "m200 v4",
+    "c200 v2"
 };
 
 static const unsigned char* bootloaders[] = 
@@ -131,7 +132,7 @@ static const unsigned char* bootloaders[] =
     NULL,
     dualboot_e200v2,
     dualboot_m200v4,
-    NULL
+    dualboot_c200v2,
 };
 
 static const int bootloader_sizes[] = 
@@ -141,7 +142,7 @@ static const int bootloader_sizes[] =
     0,
     sizeof(dualboot_e200v2),
     sizeof(dualboot_m200v4),
-    0
+    sizeof(dualboot_c200v2),
 };
 
 /* Model names used in the Rockbox header in ".sansa" files - these match the
@@ -152,8 +153,8 @@ static const char* rb_model_names[] =
     "clip",
     NULL,
     "e2v2",
-    "m2v2",
-    NULL
+    "m2v4",
+    "c2v2",
 };
 
 /* Model numbers used to initialise the checksum in the Rockbox header in
@@ -165,7 +166,7 @@ static const int rb_model_num[] =
     0,
     41,
     42,
-    0
+    44
 };
 
 struct md5sums {
@@ -180,19 +181,19 @@ struct md5sums {
 static struct md5sums sansasums[] = {
     /* NOTE: Different regional versions of the firmware normally only
              differ in the filename - the md5sums are identical */
-    { MODEL_E200, "3.01.11",   1, "e622ca8cb6df423f54b8b39628a1f0a3" },
-    { MODEL_E200, "3.01.14",   1, "2c1d0383fc3584b2cc83ba8cc2243af6" },
-    { MODEL_E200, "3.01.16",   1, "12563ad71b25a1034cf2092d1e0218c4" },
+    { MODEL_E200V2, "3.01.11",   1, "e622ca8cb6df423f54b8b39628a1f0a3" },
+    { MODEL_E200V2, "3.01.14",   1, "2c1d0383fc3584b2cc83ba8cc2243af6" },
+    { MODEL_E200V2, "3.01.16",   1, "12563ad71b25a1034cf2092d1e0218c4" },
 
     { MODEL_FUZE, "1.01.11",   1, "cac8ffa03c599330ac02c4d41de66166" },
     { MODEL_FUZE, "1.01.15",   1, "df0e2c1612727f722c19a3c764cff7f2" },
     { MODEL_FUZE, "1.01.22",   1, "5aff5486fe8dd64239cc71eac470af98" },
 
-    { MODEL_C200, "3.02.05",   1, "b6378ebd720b0ade3fad4dc7ab61c1a5" },
+    { MODEL_C200V2, "3.02.05",   1, "b6378ebd720b0ade3fad4dc7ab61c1a5" },
 
-    { MODEL_M200, "4.00.45",   1, "82e3194310d1514e3bbcd06e84c4add3" },
-    { MODEL_M200, "4.01.08-A", 1, "fc9dd6116001b3e6a150b898f1b091f0" },
-    { MODEL_M200, "4.01.08-E", 1, "d3fb7d8ec8624ee65bc99f8dab0e2369" },
+    { MODEL_M200V4, "4.00.45",   1, "82e3194310d1514e3bbcd06e84c4add3" },
+    { MODEL_M200V4, "4.01.08-A", 1, "fc9dd6116001b3e6a150b898f1b091f0" },
+    { MODEL_M200V4, "4.01.08-E", 1, "d3fb7d8ec8624ee65bc99f8dab0e2369" },
 
     { MODEL_CLIP, "1.01.17",   1, "12caad785d506219d73f538772afd99e" },
     { MODEL_CLIP, "1.01.18",   1, "d720b266bd5afa38a198986ef0508a45" },
@@ -267,11 +268,11 @@ static int get_model(int model_id)
         case 0x22:
             return MODEL_CLIP;
         case 0x23:
-            return MODEL_C200;
+            return MODEL_C200V2;
         case 0x24:
-            return MODEL_E200;
+            return MODEL_E200V2;
         case 0x25:
-            return MODEL_M200;
+            return MODEL_M200V4;
         case 0x27:
             return MODEL_CLIPV2;
     }

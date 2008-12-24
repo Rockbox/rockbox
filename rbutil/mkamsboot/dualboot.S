@@ -81,12 +81,16 @@ uclcopy:
 #ifndef SANSA_M200V4  /* this doesnt work for m200 */         
         /* we check A3 unconditionally of the model because it seems to be */
         /* either hold, either usb on every model */
+        /* TODO: make it USB on all AMS Sansas for consistency, USB is safer too */
 
         ldr   r0, =GPIOA
         mov   r1, #0
         str   r1, [r0, #0x400]
+#ifdef SANSA_C200V2
+        ldr   r1, [r0, #0x8]    /* USB is A1 on C200 */
+#else
         ldr   r1, [r0, #0x20]    /* read pin A3 */
-
+#endif
         cmp   r1, #0
         bne   boot_of
 #endif
@@ -117,6 +121,16 @@ uclcopy:
         ldr   r1, [r0, #0x20]    /* read pin C3 */
 
         cmp   r1, #0             /* C3 = #0 means button pressed */
+        beq   boot_of
+#elif defined(SANSA_C200V2)
+        /* check for RIGHT on C6, should maybe changed to LEFT as soon as it
+         * known in which pin that is in order for consistency  */
+        ldr   r0, =GPIOC
+        mov   r1, #0
+        str   r1, [r0, #0x400]      /* set pin to output */
+
+        ldr   r1, [r0, #256]        /* 1<<(6+2) */
+        cmp   r1, #0                /* C6 low means button pressed */
         beq   boot_of
 #elif defined(SANSA_M200V4)
         /* LEFT button */
