@@ -1100,6 +1100,19 @@ target/arm/as3525/powermgmt-as3525.c
 #endif /* !SIMULATOR */
 #endif /* SANSA_E200V2 */
 
+#ifdef SANSA_C200V2
+#ifndef SIMULATOR
+target/arm/as3525/sansa-c200v2/lcd-c200v2.c
+target/arm/as3525/sansa-c200v2/button-c200v2.c
+target/arm/as3525/sansa-c200v2/backlight-c200v2.c
+#ifndef BOOTLOADER
+drivers/generic_i2c.c
+target/arm/as3525/fmradio-i2c-as3525.c
+target/arm/as3525/powermgmt-as3525.c
+#endif /* !BOOTLOADER */
+#endif /* !SIMULATOR */
+#endif /* SANSA_E200V2 */
+
 #ifdef SANSA_M200V4
 #ifndef SIMULATOR
 target/arm/lcd-ssd1815.c

@@ -293,6 +293,8 @@ int main (int argc, char** argv)
             modelnum = 42;
         else if (!strcmp(&argv[1][5], "fuze"))
             modelnum = 43;
+        else if (!strcmp(&argv[1][5], "c2v2"))
+            modelnum = 44;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

@@ -183,7 +183,7 @@ static void sdram_init(void)
     MPMC_DYNAMIC_tRRD   = 2;
     MPMC_DYNAMIC_tMRD   = 2;
 
-#if defined(SANSA_CLIP) || defined(SANSA_M200V4)
+#if defined(SANSA_CLIP) || defined(SANSA_M200V4) || defined(SANSA_C200V2)
 /* 16 bits external bus, low power SDRAM, 16 Mbits = 2 Mbytes */
 #define MEMORY_MODEL 0x21
 

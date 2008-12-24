@@ -56,6 +56,8 @@
 #define AS3525_DBOP_FREQ        24000000
 #elif   defined(SANSA_E200V2)
 #define AS3525_DBOP_FREQ        8000000
+#elif   defined(SANSA_C200V2)
+#define AS3525_DBOP_FREQ        8000000
 #endif
 
 /* macro for not giving a target clock > at the one provided */

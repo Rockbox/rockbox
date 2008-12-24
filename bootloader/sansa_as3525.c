@@ -46,6 +46,10 @@ void main(void)
     system_init();
     kernel_init();
 
+#ifdef SANSA_C200V2
+    /* stop here */
+    while(1);
+#endif
     lcd_init();
     show_logo();
 

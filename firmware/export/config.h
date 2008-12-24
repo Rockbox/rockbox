@@ -330,6 +330,8 @@
 #include "config-m200v4.h"
 #elif defined(SANSA_FUZE)
 #include "config-fuze.h"
+#elif defined(SANSA_C200V2)
+#include "config-c200v2.h"
 #else
 /* no known platform */
 #endif

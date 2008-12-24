@@ -706,8 +706,9 @@ cat <<EOF
  ==Creative==             71) M:Robe 100         56) Sansa e200v2
  90) Zen Vision:M 30GB                           57) Sansa m200v4
  91) Zen Vision:M 60GB    ==Philips==            58) Sansa Fuze
- 92) Zen Vision           100) GoGear SA9200
-                          101) GoGear HDD1630    ==Logik==
+ 92) Zen Vision           100) GoGear SA9200     59) Sansa c200v2
+                          101) GoGear HDD1630
+                                                 ==Logik==
  ==Onda==                                        80) DAX 1GB MP3/DAB
  120) VX747               ==Meizu==
  121) VX767               110) M6SL
@@ -1756,6 +1757,29 @@ fi
     t_model="sansa-fuze"
     ;;
 
+
+   59|c200v2)
+    target_id=55
+    modelname="c200v2"
+    target="-DSANSA_C200V2"
+    memory=2 # as per OF diagnosis mode
+    arm9tdmicc
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=c2v2"
+    output="rockbox.sansa"
+    bootoutput="bootloader-c200v2.sansa"
+    appextra="recorder:gui"
+    plugins="yes"
+    swcodec="yes"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$scramblebitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="as3525"
+    t_model="sansa-c200v2"
+    ;;
 
    60|tpj1022)
     target_id=25
