@@ -374,6 +374,7 @@ static int runcurrent(void)
     current = CURRENT_NORMAL;
 #endif /* MEM == 8 */
 
+#ifndef BOOTLOADER
     if (usb_inserted()
 #ifdef HAVE_USB_POWER
     #if (CURRENT_USB < CURRENT_NORMAL)
@@ -405,6 +406,7 @@ static int runcurrent(void)
     if (remote_detect())
         current += CURRENT_REMOTE;
 #endif
+#endif /* BOOTLOADER */
 
     return current;
 }
@@ -447,7 +449,12 @@ void reset_battery_filter(int millivolts)
 #endif /* HAVE_BATTERY_SWITCH */
 
 /** Generic charging algorithms for common charging types **/
-#if CONFIG_CHARGING == CHARGING_SIMPLE
+#if CONFIG_CHARGING == 0 || CONFIG_CHARGING == CHARGING_SIMPLE
+static inline void powermgmt_init_target(void)
+{
+    /* Nothing to do */
+}
+
 static inline void charging_algorithm_step(void)
 {
     /* Nothing to do */
@@ -461,6 +468,11 @@ static inline void charging_algorithm_close(void)
 /*
  * Monitor CHARGING/DISCHARGING state.
  */
+static inline void powermgmt_init_target(void)
+{
+    /* Nothing to do */
+}
+
 static inline void charging_algorithm_step(void)
 {
     switch (charger_input_state)
@@ -664,9 +676,7 @@ static void power_thread(void)
         battery_percent += battery_percent < 100;
     }
 
-#if CONFIG_CHARGING == CHARGING_TARGET
     powermgmt_init_target();
-#endif
 
     next_power_hist = current_tick + HZ*60;
 

@@ -54,8 +54,10 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x8000
 
+#ifndef BOOTLOADER
 /* Define this if you have an FM Radio */
 #define CONFIG_TUNER S1A0903X01
+#endif
 
 #define AB_REPEAT_ENABLE 1
 
