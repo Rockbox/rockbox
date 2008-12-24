@@ -59,7 +59,7 @@ void button_int(void)
     dir_save_c = GPIOC_DIR;
     afsel_save_c = GPIOC_AFSEL;
 
-    GPIOA_DIR &= ~(1<<2);
+    GPIOA_DIR &= ~(1<<3);
     GPIOC_AFSEL &= ~(1<<6|1<<5|1<<4|1<<3);
     GPIOC_DIR |= (1<<6|1<<5|1<<4|1<<3);
 
