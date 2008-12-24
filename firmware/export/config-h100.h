@@ -110,8 +110,7 @@
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 
 /* Hardware controlled charging */
-
-#define CONFIG_CHARGING CHARGING_MONITOR /* FIXME: remove that once monitoring is fixed properly */
+#define CONFIG_CHARGING CHARGING_SIMPLE
 
 /* define current usage levels */
 #define CURRENT_NORMAL     80  /* 16h playback on 1300mAh battery */

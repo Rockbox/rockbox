@@ -57,12 +57,6 @@ unsigned int power_input_status(void)
         POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 }
 
-/* Returns true if the unit is charging the batteries. */
-bool charging_state(void)
-{
-    return (power_input_status() & POWER_INPUT_CHARGER) != 0;
-}
-
 #ifdef HAVE_SPDIF_POWER
 void spdif_power_enable(bool on)
 {

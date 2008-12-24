@@ -50,9 +50,15 @@ void power_init(void)
 
 unsigned int power_input_status(void)
 {
-    /* No separate source for USB and charges from USB on its own */
-    return (GPIOF_INPUT_VAL & 0x08) ?
-        POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
+    unsigned int status = POWER_INPUT_NONE;
+
+    if (GPIOF_INPUT_VAL & 0x08)
+        status = POWER_INPUT_MAIN_CHARGER;
+
+    if (GPIOL_INPUT_VAL & 0x04)
+        status |= POWER_INPUT_USB_CHARGER;
+
+    return status;
 }
 
 void ide_power_enable(bool on)

@@ -116,12 +116,18 @@
 /* CONFIG_CHARGING */
 
 /* Generic types */
-#define CHARGING_SIMPLE  1 /* Simple, hardware controlled charging */
-#define CHARGING_MONITOR 2 /* Hardware controlled charging with monitoring */
+#define CHARGING_SIMPLE  1 /* Simple, hardware controlled charging
+                            * (CPU cannot read charger state but may read
+                            *  when power is plugged-in). */
+#define CHARGING_MONITOR 2 /* Hardware controlled charging with monitoring
+                            * (CPU is able to read HW charging state and
+                            *  when power is plugged-in). */
 
 /* Mostly target-specific code in the /target tree */
-#define CHARGING_TARGET  3
-
+#define CHARGING_TARGET  3 /* Any algorithm - usually software controlled
+                            * charging or specific programming is required to
+                            * use the charging hardware. */
+                      
 /* CONFIG_LCD */
 #define LCD_SSD1815   1 /* as used by Archos Recorders and Ondios */
 #define LCD_SSD1801   2 /* as used by Archos Player/Studio */
