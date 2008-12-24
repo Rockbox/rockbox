@@ -53,36 +53,6 @@ const unsigned short percent_to_volt_charge[11] =
     3480, 3550, 3590, 3610, 3630, 3650, 3700, 3760, 3800, 3910, 3990
 };
 
-/**
- * Fixed-point natural log
- * taken from http://www.quinapalus.com/efunc.html
- *  "The code assumes integers are at least 32 bits long. The (positive)
- *   argument and the result of the function are both expressed as fixed-point
- *   values with 16 fractional bits, although intermediates are kept with 28
- *   bits of precision to avoid loss of accuracy during shifts."
- */
-static long flog(int x)
-{
-    long t,y;
-
-    y=0xa65af;
-    if(x<0x00008000) x<<=16,              y-=0xb1721;
-    if(x<0x00800000) x<<= 8,              y-=0x58b91;
-    if(x<0x08000000) x<<= 4,              y-=0x2c5c8;
-    if(x<0x20000000) x<<= 2,              y-=0x162e4;
-    if(x<0x40000000) x<<= 1,              y-=0x0b172;
-    t=x+(x>>1); if((t&0x80000000)==0) x=t,y-=0x067cd;
-    t=x+(x>>2); if((t&0x80000000)==0) x=t,y-=0x03920;
-    t=x+(x>>3); if((t&0x80000000)==0) x=t,y-=0x01e27;
-    t=x+(x>>4); if((t&0x80000000)==0) x=t,y-=0x00f85;
-    t=x+(x>>5); if((t&0x80000000)==0) x=t,y-=0x007e1;
-    t=x+(x>>6); if((t&0x80000000)==0) x=t,y-=0x003f8;
-    t=x+(x>>7); if((t&0x80000000)==0) x=t,y-=0x001fe;
-    x=0x80000000-x;
-    y-=x>>15;
-    return y;
-}
-
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
@@ -134,30 +104,62 @@ unsigned int cccv_regulator_dissipation(void)
 /* Returns battery temperature from ADC [deg-C] */
 int battery_adc_temp(void)
 {
-    unsigned int value = adc_read(ADC_BATTERY_TEMP);
     /* E[volts] = value * 2.3V / 1023
      * R[ohms] = E/I = E[volts] / 0.00002[A] (Thermistor bias current source)
      *
-     * Steinhart-Hart thermistor equation (sans "C*ln^2(R)" term because it
-     * has negligible effect):
+     * Steinhart-Hart thermistor equation:
      * [A + B*ln(R) + D*ln^3(R)] = 1 / T[°K]
      *
      * Coeffients that fit experimental data (one thermistor so far, one run):
      * A = 0.0013002631685462800
      * B = 0.0002000841932612330
      * D = 0.0000000640446750919
-     *
-     * Fixed-point output matches the floating-point version for each ADC
-     * value.
      */
+    static const unsigned short ntc_table[] =
+    {
+#if 0   /* These have degree deltas > 1  (except the final two) so leave them
+         * out. 70 deg C upper limit is quite sufficient. */
+           0, /* INF */   1, /* 171 */   2, /* 145 */   3, /* 130 */
+           4, /* 121 */   5, /* 114 */   6, /* 108 */   7, /* 104 */
+           8, /* 100 */   9, /*  96 */  10, /*  93 */  11, /*  91 */
+          12, /*  88 */  13, /*  86 */  14, /*  84 */  15, /*  82 */
+          16, /*  81 */  17, /*  79 */  18, /*  78 */  19, /*  76 */
+          20, /*  75 */  21, /*  74 */  22, /*  72 */  23, /*  71 */
+#endif
+          24, /*  70 */  25, /*  69 */  26, /*  68 */  27, /*  67 */
+          28, /*  66 */  30, /*  65 */  31, /*  64 */  32, /*  63 */
+          33, /*  62 */  35, /*  61 */  36, /*  60 */  38, /*  59 */
+          39, /*  58 */  41, /*  57 */  43, /*  56 */  45, /*  55 */
+          47, /*  54 */  49, /*  53 */  51, /*  52 */  53, /*  51 */
+          56, /*  50 */  58, /*  49 */  61, /*  48 */  63, /*  47 */
+          66, /*  46 */  69, /*  45 */  73, /*  44 */  76, /*  43 */
+          80, /*  42 */  83, /*  41 */  87, /*  40 */  92, /*  39 */
+          96, /*  38 */ 101, /*  37 */ 106, /*  36 */ 111, /*  35 */
+         116, /*  34 */ 122, /*  33 */ 128, /*  32 */ 135, /*  31 */
+         142, /*  30 */ 149, /*  29 */ 156, /*  28 */ 164, /*  27 */
+         173, /*  26 */ 182, /*  25 */ 192, /*  24 */ 202, /*  23 */
+         212, /*  22 */ 224, /*  21 */ 236, /*  20 */ 249, /*  19 */
+         262, /*  18 */ 277, /*  17 */ 292, /*  16 */ 308, /*  15 */
+         325, /*  14 */ 344, /*  13 */ 363, /*  12 */ 384, /*  11 */
+         406, /*  10 */ 429, /*   9 */ 454, /*   8 */ 480, /*   7 */
+         509, /*   6 */ 539, /*   5 */ 571, /*   4 */ 605, /*   3 */
+         641, /*   2 */ 680, /*   1 */ 722, /*   0 */ 766, /*  -1 */
+         813, /*  -2 */ 864, /*  -3 */ 918, /*  -4 */ 976, /*  -5 */
+    };
+
+    unsigned int value = adc_read(ADC_BATTERY_TEMP);
+
     if (value > 0)
     {
-        int R = 2070000 * value;
-        long long ln = flog(R) + 83196;
-        long long t0 = 425890304133ll;
-        long long t1 = 1000000*ln;
-        long long t3 = ln*ln*ln / 13418057;
-        return ((32754211579494400ll / (t0 + t1 + t3)) - 27315) / 100;
+        unsigned i;
+
+        for (i = 1; i < ARRAYLEN(ntc_table); i++)
+        {
+            if (ntc_table[i] > value)
+                break;
+        }
+
+        return 71 - i;
     }
 
     return INT_MIN;
