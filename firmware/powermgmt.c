@@ -682,7 +682,7 @@ static void power_thread(void)
 
     while (1)
     {
-#if CONFIG_CHARGING >= CHARGING_MONITOR
+#if CONFIG_CHARGING
         unsigned int pwr = power_input_status();
 #ifdef HAVE_BATTERY_SWITCH
         if ((pwr ^ power_thread_inputs) & POWER_INPUT_BATTERY) {
