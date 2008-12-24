@@ -100,6 +100,8 @@ void charging_algorithm_close(void);
 /* Provide filtered charge current */
 int battery_charge_current(void);
 
+#if 0
 #define CURRENT_MAX_CHG battery_charge_current()
+#endif
 
 #endif /* POWERMGMT_TARGET_H */
