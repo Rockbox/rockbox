@@ -49,6 +49,9 @@
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
+#ifdef IPOD_ACCESSORY_PROTOCOL
+#include "iap.h"
+#endif
 
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
 /** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
@@ -594,6 +597,12 @@ const struct settings_list settings[] = {
 #if CONFIG_CHARGING
     OFFON_SETTING(NVRAM(1), car_adapter_mode,
                   LANG_CAR_ADAPTER_MODE, false, "car adapter mode", NULL),
+#endif
+#ifdef IPOD_ACCESSORY_PROTOCOL
+    CHOICE_SETTING(0, serial_bitrate, LANG_SERIAL_BITRATE, 0, "serial bitrate",
+                   "auto,9600,19200,38400,57600", iap_bitrate_set, 5, ID2P(LANG_SERIAL_BITRATE_AUTO),
+		   ID2P(LANG_SERIAL_BITRATE_9600),ID2P(LANG_SERIAL_BITRATE_19200),
+		   ID2P(LANG_SERIAL_BITRATE_38400),ID2P(LANG_SERIAL_BITRATE_57600)),
 #endif
 #ifdef HAVE_ACCESSORY_SUPPLY
     OFFON_SETTING(0, accessory_supply, LANG_ACCESSORY_SUPPLY,

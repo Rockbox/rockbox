@@ -73,6 +73,10 @@
 #include "scrobbler.h"
 #include "icon.h"
 
+#ifdef IPOD_ACCESSORY_PROTOCOL
+#include "iap.h"
+#endif
+
 #if (CONFIG_CODEC == SWCODEC)
 #include "playback.h"
 #endif
@@ -582,6 +586,9 @@ static void init(void)
 
 #if CONFIG_CHARGING
     car_adapter_mode_init();
+#endif
+#ifdef IPOD_ACCESSORY_PROTOCOL
+    iap_setup(global_settings.serial_bitrate);
 #endif
 #ifdef HAVE_ACCESSORY_SUPPLY
     accessory_supply_set(global_settings.accessory_supply);

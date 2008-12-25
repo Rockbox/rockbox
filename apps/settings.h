@@ -488,6 +488,9 @@ struct user_settings
     bool peak_meter_clipcounter;    /* clipping count indicator */
 #endif
     bool car_adapter_mode; /* 0=off 1=on */
+#ifdef IPOD_ACCESSORY_PROTOCOL
+    int serial_bitrate; /* 0=auto 1=9600 2=19200 3=38400 4=57600 */
+#endif
 #ifdef HAVE_ACCESSORY_SUPPLY
     bool accessory_supply; /* 0=off 1=on, accessory power supply for iPod */
 #endif

@@ -18,7 +18,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include "button.h"
 #include "config.h"
 #include "cpu.h"
@@ -28,6 +30,7 @@
 #include "adc.h"
 #include "lcd.h"
 #include "serial.h"
+#include "iap.h"
 
 #if CONFIG_CPU == IMX31L
 #include "serial-imx31.h"
@@ -68,6 +71,35 @@ void serial_setup (void)
     SCR1 = 0x10; /* Enable the receiver, no interrupt */
 }
 
+int tx_rdy(void)
+{
+    /* a dummy */
+    return 1;
+}
+
+int rx_rdy(void) 
+{
+    if(SSR1 & SCI_RDRF)
+	return 1;
+    else
+        return 0;
+}
+
+void tx_writec(unsigned char c)
+{
+    /* a dummy */
+}
+
+unsigned char rx_readc(void)
+{
+    char tmp;
+    /* Read byte and clear the Rx Full bit */
+    tmp = RDR1;
+    and_b(~SCI_RDRF, &SSR1);
+    return tmp;
+}
+
+
 /* This function returns the received remote control code only if it is
    received without errors before or after the reception.
    It therefore returns the received code on the second call after the
@@ -87,11 +119,9 @@ int remote_control_rx(void)
         return BUTTON_NONE;
     }
 
-    if(SSR1 & SCI_RDRF) {
-        /* Read byte and clear the Rx Full bit */
-        btn = RDR1;
-        and_b(~SCI_RDRF, &SSR1);
-
+    if(rx_rdy()) {
+	btn = rx_readc();
+	
         if(last_was_error)
         {
             last_valid_button = BUTTON_NONE;
@@ -149,16 +179,6 @@ int remote_control_rx(void)
 #endif /* !HAVE_FMADC && !STORAGE_MMC */
 #elif defined(CPU_COLDFIRE) && defined(HAVE_SERIAL)
 
-void serial_tx(const unsigned char *buf)
-{
-    while(*buf) {
-        while(!(USR0 & 0x04))
-        {
-        };
-        UTB0 = *buf++;
-    }
-}
-
 void serial_setup (void) 
 {
     UCR0 = 0x30; /* Reset transmitter */
@@ -169,6 +189,25 @@ void serial_setup (void)
     UMR0 = 0x07; /* 1 stop bit */
 
     UCR0 = 0x04; /* Tx enable */
+}
+
+int tx_rdy(void)
+{
+    if(USR0 & 0x04)
+        return 1;
+    else
+	return 0;
+}
+
+int rx_rdy(void) 
+{
+    /* a dummy */
+    return 0;
+}
+
+void tx_writec(unsigned char c)
+{
+    UTB0 = c;
 }
 
 #elif (CONFIG_CPU == IMX31L)
@@ -207,15 +246,216 @@ int rx_rdy(void)
         return 0;
 }
 
-void tx_writec(char c)
+void tx_writec(unsigned char c)
 {
     UTXD1=(int) c;
 }
 
+#elif defined(IPOD_ACCESSORY_PROTOCOL)
+static int autobaud = 0;
+void serial_setup (void)
+{
+    int tmp;
+    
+#if (MODEL_NUMBER == 3) || (MODEL_NUMBER == 8)
+
+    /* Route the Tx/Rx pins.  4G Ipod??? */
+    outl(0x70000018, inl(0x70000018) & ~0xc00);
+#elif (MODEL_NUMBER == 4) || (MODEL_NUMBER == 5)
+
+    /* Route the Tx/Rx pins.  5G Ipod */
+    (*(volatile unsigned long *)(0x7000008C)) &= ~0x0C;
+    GPO32_ENABLE &= ~0x0C;
+#endif
+    
+    DEV_EN = DEV_EN | DEV_SER0;
+    CPU_HI_INT_DIS = SER0_MASK;
+
+    DEV_RS |= DEV_SER0;
+    sleep(1);
+    DEV_RS &= ~DEV_SER0;
+
+    SER0_LCR = 0x80; /* Divisor latch enable */
+    SER0_DLM = 0x00;
+    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+    SER0_IER = 0x01;
+
+    SER0_FCR = 0x07; /* Tx+Rx FIFO reset and FIFO enable */
+
+    CPU_INT_EN |= HI_MASK;
+    CPU_HI_INT_EN |= SER0_MASK;
+    tmp = SER0_RBR;
+
+    serial_bitrate(0);
+}
+
+void serial_bitrate(int rate)
+{
+    if(rate == 0)
+    {
+	autobaud = 2;
+	SER0_LCR = 0x80; /* Divisor latch enable */
+	SER0_DLL = 0x0D; /* 24000000/13/16 = 115384 baud */
+	SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+        return;
+    }
+
+    autobaud = 0;
+    SER0_LCR = 0x80; /* Divisor latch enable */
+    SER0_DLL = 24000000L / rate / 16;
+    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+}
+
+int tx_rdy(void)
+{
+    if((SER0_LSR & 0x20))
+        return 1;
+    else
+        return 0;
+}
+
+int rx_rdy(void) 
+{
+    if((SER0_LSR & 0x1))
+        return 1;
+    else
+        return 0;
+}
+
+void tx_writec(unsigned char c)
+{
+    SER0_THR =(int) c;
+}
+
+unsigned char rx_readc(void)
+{
+    return (SER0_RBR & 0xFF);
+}
+
+void SERIAL0(void)
+{
+    static int badbaud = 0;
+    static bool newpkt = true;
+    char temp;
+    
+    while(rx_rdy())
+    {
+	temp = rx_readc();
+	if (newpkt && autobaud > 0)
+	{
+	    if (autobaud == 1)
+	    {
+		switch (temp)
+		{
+		    case 0xFF:
+		    case 0x55:
+			break;
+		    case 0xFC:
+			SER0_LCR = 0x80; /* Divisor latch enable */
+			SER0_DLL = 0x4E; /* 24000000/78/16 = 19230 baud */
+			SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+			temp = 0xFF;
+			break;
+		    case 0xE0:
+			SER0_LCR = 0x80; /* Divisor latch enable */
+			SER0_DLL = 0x9C; /* 24000000/156/16 = 9615 baud */
+			SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+			temp = 0xFF;
+			break;
+		    default:
+			badbaud++;
+			if (badbaud >= 6) /* Switch baud detection mode */
+			{
+			    autobaud = 2;
+			    SER0_LCR = 0x80; /* Divisor latch enable */
+			    SER0_DLL = 0x0D; /* 24000000/13/16 = 115384 baud */
+			    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+			    badbaud = 0;
+			} else {
+			    SER0_LCR = 0x80; /* Divisor latch enable */
+			    SER0_DLL = 0x1A; /* 24000000/26/16 = 57692 baud */
+			    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+			}
+			continue;
+		}
+	    } else {
+		switch (temp)
+		{
+		    case 0xFF:
+		    case 0x55:
+			break;
+		    case 0xFE:
+			SER0_LCR = 0x80; /* Divisor latch enable */
+			SER0_DLL = 0x1A; /* 24000000/26/16 = 57692 baud */
+			SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+			temp = 0xFF;
+			break;
+		    case 0xFC:
+	    		SER0_LCR = 0x80; /* Divisor latch enable */
+			SER0_DLL = 0x27; /* 24000000/39/16 = 38461 baud */
+			SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+			temp = 0xFF;
+			break;
+		    case 0xE0:
+			SER0_LCR = 0x80; /* Divisor latch enable */
+			SER0_DLL = 0x4E; /* 24000000/78/16 = 19230 baud */
+			SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+			temp = 0xFF;
+			break;
+		    default:
+			badbaud++;
+			if (badbaud >= 6) /* Switch baud detection */
+			{
+			    autobaud = 1;
+			    SER0_LCR = 0x80; /* Divisor latch enable */
+			    SER0_DLL = 0x1A; /* 24000000/26/16 = 57692 baud */
+			    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+			    badbaud = 0;
+			} else {
+			    SER0_LCR = 0x80; /* Divisor latch enable */
+			    SER0_DLL = 0x0D; /* 24000000/13/16 = 115384 baud */
+			    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+			}
+			continue;
+		}
+	    }
+	}
+	bool pkt = iap_getc(temp);
+	if(newpkt == true && pkt == false)
+	    autobaud = 0; /* Found good baud */
+	newpkt = pkt;
+    }
+}
+
+#else /* Other targets */
+void serial_setup (void) 
+{
+    /* a dummy */
+}
+
+int tx_rdy(void)
+{
+    /* a dummy */
+    return 1;
+}
+
+int rx_rdy(void) 
+{
+    /* a dummy */
+    return 0;
+}
+
+void tx_writec(unsigned char c)
+{
+    /* a dummy */
+}
+
+#endif
+
 void dprintf(const char * str, ... )
 {
     char dprintfbuff[256];
-    unsigned char * ptr;
+    char * ptr;
 	
     va_list ap;
     va_start(ap, str);
@@ -224,7 +464,7 @@ void dprintf(const char * str, ... )
     vsnprintf(ptr,sizeof(dprintfbuff),str,ap);
     va_end(ap);
 
-    serial_tx(ptr);
+    serial_tx((unsigned char *)ptr);
 }
 
 void serial_tx(const unsigned char * buf)
@@ -241,10 +481,3 @@ void serial_tx(const unsigned char * buf)
         }
     }
 }
-
-#else /* Other targets */
-void serial_setup (void) 
-{
-    /* a dummy */
-}
-#endif

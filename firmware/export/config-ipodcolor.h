@@ -166,4 +166,6 @@
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
+#define IPOD_ACCESSORY_PROTOCOL
+
 #endif

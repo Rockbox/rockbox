@@ -82,6 +82,10 @@
 #include "pcm_record.h"
 #endif
 
+#ifdef IPOD_ACCESSORY_PROTOCOL
+#include "iap.h"
+#endif
+
 #define PLAYBACK_VOICE
 
 /* default point to start buffer refill */
@@ -646,6 +650,9 @@ bool audio_has_changed_track(void)
 {
     if (track_changed)
     {
+#ifdef IPOD_ACCESSORY_PROTOCOL
+	iap_track_changed();
+#endif
         track_changed = false;
         return true;
     }
@@ -691,7 +698,7 @@ void audio_resume(void)
     queue_send(&audio_queue, Q_AUDIO_PAUSE, false);
 }
 
-static void audio_skip(int direction)
+void audio_skip(int direction)
 {
     if (playlist_check(ci.new_track + wps_offset + direction))
     {

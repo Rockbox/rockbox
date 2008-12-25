@@ -181,3 +181,7 @@ usbstack
 #if defined(HAVE_ACCESSORY_SUPPLY)
 accessory_supply
 #endif
+
+#if defined(IPOD_ACCESSORY_PROTOCOL)
+serial_port
+#endif

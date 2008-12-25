@@ -32,6 +32,7 @@
 #ifndef BOOTLOADER
 extern void TIMER1(void);
 extern void TIMER2(void);
+extern void SERIAL0(void);
 extern void ipod_mini_button_int(void); /* iPod Mini 1st gen only */
 extern void ipod_4g_button_int(void);   /* iPod 4th gen and higher only */
 
@@ -77,6 +78,11 @@ void irq(void)
             if (GPIOA_INT_STAT & 0x20)
                 button_int();
         }        
+#endif
+#ifdef IPOD_ACCESSORY_PROTOCOL
+	else if (CPU_HI_INT_STAT & SER0_MASK) {
+	    SERIAL0();
+	}
 #endif
 #ifdef HAVE_USBSTACK
         else if (CPU_INT_STAT & USB_MASK) {

@@ -5,28 +5,27 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: iap.h 17400 2008-05-07 20:22:16Z xxxxxx $
  *
  * Copyright (C) 2002 by Alan Korr
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
  ****************************************************************************/
 
-#ifndef __SERIAL_H__
-#define __SERIAL_H__
+#ifndef __IAP_H__
+#define __IAP_H__
 
-extern void serial_setup(void);
-extern void serial_bitrate(int rate);
-extern int remote_control_rx(void);
-extern void serial_tx(const unsigned char *buf);
-extern void tx_writec(unsigned char c);
-extern int tx_rdy(void);
+extern int iap_getc(unsigned char x);
+extern void iap_write_pkt(unsigned char data, int len);
+extern void iap_setup(int ratenum);
+extern void iap_bitrate_set(int ratenum);
+extern void iap_periodic(void);
+extern void iap_handlepkt(void);
+extern void iap_track_changed(void);
 
 #endif

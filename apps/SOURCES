@@ -52,6 +52,9 @@ tagtree.c
 #endif
 filetree.c
 scrobbler.c
+#ifdef IPOD_ACCESSORY_PROTOCOL
+iap.c
+#endif
 
 screen_access.c
 #ifdef HAVE_BUTTONBAR

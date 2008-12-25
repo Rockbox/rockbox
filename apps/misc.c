@@ -61,6 +61,10 @@
 #include "playlist.h"
 #include "yesno.h"
 
+#ifdef IPOD_ACCESSORY_PROTOCOL
+#include "iap.h"
+#endif
+
 #if (CONFIG_STORAGE & STORAGE_MMC)
 #include "ata_mmc.h"
 #endif
@@ -958,6 +962,14 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
         case SYS_PHONE_UNPLUGGED:
             unplug_change(false);
             return SYS_PHONE_UNPLUGGED;
+#endif
+#ifdef IPOD_ACCESSORY_PROTOCOL
+	case SYS_IAP_PERIODIC:
+	    iap_periodic();
+	    return SYS_IAP_PERIODIC;
+	case SYS_IAP_HANDLEPKT:
+	    iap_handlepkt();
+	    return SYS_IAP_HANDLEPKT;
 #endif
     }
     return 0;

@@ -187,9 +187,62 @@ const struct button_mapping button_context_recscreen[]  = {
 }; /* button_context_recscreen */
 #endif
 
+#if BUTTON_REMOTE != 0
+/*****************************************************************************
+ *    Remote control mappings
+ *****************************************************************************/
+
+static const struct button_mapping remote_button_context_standard[]  = {
+    { ACTION_STD_PREV,      BUTTON_RC_LEFT,     BUTTON_NONE },
+    { ACTION_STD_NEXT,      BUTTON_RC_RIGHT,    BUTTON_NONE },
+    { ACTION_STD_CANCEL,    BUTTON_RC_STOP,     BUTTON_NONE },
+    { ACTION_STD_OK,        BUTTON_RC_PLAY,     BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+};
+
+static const struct button_mapping remote_button_context_wps[]  = {
+    { ACTION_WPS_VOLDOWN,   BUTTON_RC_VOL_DOWN,               BUTTON_NONE },
+    { ACTION_WPS_VOLDOWN,   BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_WPS_VOLUP,     BUTTON_RC_VOL_UP,                 BUTTON_NONE },
+    { ACTION_WPS_VOLUP,     BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+
+    { ACTION_WPS_PLAY,      BUTTON_RC_PLAY|BUTTON_REL,    BUTTON_RC_PLAY },
+    { ACTION_WPS_STOP,      BUTTON_RC_PLAY|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_WPS_SKIPNEXT,  BUTTON_RC_RIGHT|BUTTON_REL,   BUTTON_RC_RIGHT },
+    { ACTION_WPS_SEEKFWD,   BUTTON_RC_RIGHT|BUTTON_REPEAT,BUTTON_NONE },
+    { ACTION_WPS_STOPSEEK,  BUTTON_RC_RIGHT|BUTTON_REL,   BUTTON_RC_RIGHT|BUTTON_REPEAT },
+    { ACTION_WPS_SKIPPREV,  BUTTON_RC_LEFT|BUTTON_REL,    BUTTON_RC_LEFT },
+    { ACTION_WPS_SEEKBACK,  BUTTON_RC_LEFT|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_WPS_STOPSEEK,  BUTTON_RC_LEFT|BUTTON_REL,    BUTTON_RC_LEFT|BUTTON_REPEAT },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+};
+
+
+static const struct button_mapping* get_context_mapping_remote( int context )
+{
+    context ^= CONTEXT_REMOTE;
+    
+    switch (context)
+    {
+        case CONTEXT_WPS:
+            return remote_button_context_wps;
+
+        default:
+            return remote_button_context_standard;
+    }
+}
+#endif /* BUTTON_REMOTE != 0 */
+
 /* get_context_mapping returns a pointer to one of the above defined arrays depending on the context */
 const struct button_mapping* get_context_mapping(int context)
 {
+#if BUTTON_REMOTE != 0
+    if (context&CONTEXT_REMOTE)
+        return get_context_mapping_remote(context);
+#endif
+    
     switch (context)
     {
         case CONTEXT_STD:

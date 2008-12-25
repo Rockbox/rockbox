@@ -1195,6 +1195,14 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
 #endif
 
+#if defined(IPOD_ACCESSORY_PROTOCOL)
+extern unsigned char serbuf[];
+        snprintf(buf, sizeof(buf), "IAP PACKET: %02x %02x %02x %02x %02x %02x %02x %02x", 
+		 serbuf[0], serbuf[1], serbuf[2], serbuf[3], serbuf[4], serbuf[5],
+		 serbuf[6], serbuf[7]);
+	lcd_puts(0, line++, buf);
+#endif
+
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
         line++;
         snprintf(buf, sizeof(buf), "BATT: %03x UNK1: %03x",

@@ -316,7 +316,11 @@ int button_read_device(void)
     }
 
     /* The int_btn variable is set in the button interrupt handler */
+#ifdef IPOD_ACCESSORY_PROTOCOL
+    return int_btn | remote_control_rx();
+#else
     return int_btn;
+#endif
 }
 
 bool button_hold(void)
