@@ -88,6 +88,7 @@ int rx_rdy(void)
 void tx_writec(unsigned char c)
 {
     /* a dummy */
+    (void)c;
 }
 
 unsigned char rx_readc(void)
