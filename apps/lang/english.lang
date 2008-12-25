@@ -11811,7 +11811,6 @@
     gigabeatf: "High"
   </voice>
 </phrase>
-<<<<<<< .mine
 <phrase>
   id: LANG_SERIAL_BITRATE
   desc: in system settings menu
@@ -11914,7 +11913,6 @@
     serial_port: "57600"
   </voice>
 </phrase>
-=======
 <phrase>
   id: LANG_VERY_SLOW
   desc: in settings_menu
@@ -12013,9 +12011,6 @@
     *: "slash"
   </voice>
 </phrase>
-<<<<<<< .mine
->>>>>>> .r18116
-=======
 <phrase>
   id: LANG_GAIN_LEFT
   desc: in the recording screen
@@ -12217,9 +12212,6 @@
     *: "Search Results"
   </voice>
 </phrase>
-<<<<<<< .mine
->>>>>>> .r18870
-=======
 <phrase>
   id: LANG_QS_ITEMS
   desc: DEPRECATED
