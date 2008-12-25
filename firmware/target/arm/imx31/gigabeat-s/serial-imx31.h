@@ -26,7 +26,7 @@
 
 int tx_rdy(void);
 int rx_rdy(void);
-void tx_writec(const char c);
+void tx_writec(const unsigned char c);
 void dprintf(const char * str, ... );
 
 #endif /* SERIAL_IMX31_H */

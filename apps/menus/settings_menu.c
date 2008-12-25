@@ -58,7 +58,7 @@
 static void tagcache_rebuild_with_splash(void)
 {
     tagcache_rebuild();
-    splash(HZ*2, ID2P(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));   
+    splash(HZ*2, ID2P(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));
 }
 
 static void tagcache_update_with_splash(void)
@@ -72,17 +72,17 @@ MENUITEM_SETTING(tagcache_ram, &global_settings.tagcache_ram, NULL);
 #endif
 MENUITEM_SETTING(tagcache_autoupdate, &global_settings.tagcache_autoupdate, NULL);
 MENUITEM_FUNCTION(tc_init, 0, ID2P(LANG_TAGCACHE_FORCE_UPDATE),
-                    (int(*)(void))tagcache_rebuild_with_splash, 
+                    (int(*)(void))tagcache_rebuild_with_splash,
                     NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(tc_update, 0, ID2P(LANG_TAGCACHE_UPDATE),
-                    (int(*)(void))tagcache_update_with_splash, 
+                    (int(*)(void))tagcache_update_with_splash,
                     NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(runtimedb, &global_settings.runtimedb, NULL);
 MENUITEM_FUNCTION(tc_export, 0, ID2P(LANG_TAGCACHE_EXPORT),
-                    (int(*)(void))tagtree_export, NULL, 
+                    (int(*)(void))tagtree_export, NULL,
                     NULL, Icon_NOICON);
 MENUITEM_FUNCTION(tc_import, 0, ID2P(LANG_TAGCACHE_IMPORT),
-                    (int(*)(void))tagtree_import, NULL, 
+                    (int(*)(void))tagtree_import, NULL,
                     NULL, Icon_NOICON);
 MAKE_MENU(tagcache_menu, ID2P(LANG_TAGCACHE), 0, Icon_NOICON,
 #ifdef HAVE_TC_RAMCACHE
@@ -268,7 +268,7 @@ MENUITEM_SETTING(touchpad_sensitivity, &global_settings.touchpad_sensitivity, NU
 #endif
 
 
-MAKE_MENU(system_menu, ID2P(LANG_SYSTEM), 
+MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
           0, Icon_System_menu,
             &start_screen,
 #if (BATTERY_CAPACITY_INC > 0) || (BATTERY_TYPES_COUNT > 1)
@@ -285,7 +285,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #if CONFIG_CHARGING
             &car_adapter_mode,
 #endif
-#ifdef IPOD_ACCESSORY_PROTOCOL,
+#ifdef IPOD_ACCESSORY_PROTOCOL
 	    &serial_bitrate,
 #endif
 #ifdef HAVE_ACCESSORY_SUPPLY
@@ -322,7 +322,7 @@ static int bmark_callback(int action,const struct menu_item_ex *this_item)
             {
                 if(global_settings.usemrb == BOOKMARK_NO)
                     global_settings.usemrb = BOOKMARK_YES;
-        
+
             }
             break;
     }
@@ -361,7 +361,7 @@ static int talk_callback(int action,const struct menu_item_ex *this_item)
             if (this_item == &talk_dir_clip_item)
                 break;
             if (!oldval && global_settings.talk_file_clip)
-            {   
+            {
                 /* force reload if newly talking thumbnails,
                 because the clip presence is cached only if enabled */
                 reload_directory();
@@ -374,7 +374,7 @@ MENUITEM_SETTING(talk_filetype_item, &global_settings.talk_filetype, NULL);
 MENUITEM_SETTING(talk_battery_level_item,
                  &global_settings.talk_battery_level, NULL);
 MAKE_MENU(voice_settings_menu, ID2P(LANG_VOICE), 0, Icon_Voice,
-          &talk_menu_item, &talk_dir_item, &talk_dir_clip_item, 
+          &talk_menu_item, &talk_dir_item, &talk_dir_clip_item,
           &talk_file_item, &talk_file_clip_item, &talk_filetype_item,
           &talk_battery_level_item);
 /*    VOICE MENU                   */

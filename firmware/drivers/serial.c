@@ -52,11 +52,11 @@
 #define VOLUP 0xD0
 #define VOLDN 0xE0
 
-void serial_setup (void) 
+void serial_setup (void)
 {
     /* Set PB10 function to serial Rx */
     PBCR1 = (PBCR1 & 0xffcf) | 0x0020;
-    
+
     SMR1 = 0x00;
     SCR1 = 0;
     BRR1 = (FREQ/(32*9600))-1;
@@ -77,7 +77,7 @@ int tx_rdy(void)
     return 1;
 }
 
-int rx_rdy(void) 
+int rx_rdy(void)
 {
     if(SSR1 & SCI_RDRF)
 	return 1;
@@ -110,7 +110,7 @@ int remote_control_rx(void)
     static int last_was_error = false;
     int btn;
     int ret = BUTTON_NONE;
-    
+
     /* Errors? Just clear'em. The receiver stops if we don't */
     if(SSR1 & (SCI_ORER | SCI_FER | SCI_PER)) {
         and_b(~(SCI_ORER | SCI_FER | SCI_PER), &SSR1);
@@ -121,7 +121,7 @@ int remote_control_rx(void)
 
     if(rx_rdy()) {
 	btn = rx_readc();
-	
+
         if(last_was_error)
         {
             last_valid_button = BUTTON_NONE;
@@ -170,7 +170,7 @@ int remote_control_rx(void)
         ret = last_valid_button;
         last_valid_button = BUTTON_NONE;
     }
-    
+
     last_was_error = false;
 
     return ret;
@@ -179,7 +179,7 @@ int remote_control_rx(void)
 #endif /* !HAVE_FMADC && !STORAGE_MMC */
 #elif defined(CPU_COLDFIRE) && defined(HAVE_SERIAL)
 
-void serial_setup (void) 
+void serial_setup (void)
 {
     UCR0 = 0x30; /* Reset transmitter */
     UCSR0 = 0xdd; /* Timer mode */
@@ -199,7 +199,7 @@ int tx_rdy(void)
 	return 0;
 }
 
-int rx_rdy(void) 
+int rx_rdy(void)
 {
     /* a dummy */
     return 0;
@@ -236,9 +236,9 @@ int tx_rdy(void)
         return 0;
 }
 
-/*Not ready...After first Rx, UTS1 & UTS1_RXEMPTY 
+/*Not ready...After first Rx, UTS1 & UTS1_RXEMPTY
   keeps returning true*/
-int rx_rdy(void) 
+int rx_rdy(void)
 {
     if(!(UTS1 & EUARTUTS_RXEMPTY))
         return 1;
@@ -256,7 +256,7 @@ static int autobaud = 0;
 void serial_setup (void)
 {
     int tmp;
-    
+
 #if (MODEL_NUMBER == 3) || (MODEL_NUMBER == 8)
 
     /* Route the Tx/Rx pins.  4G Ipod??? */
@@ -267,7 +267,7 @@ void serial_setup (void)
     (*(volatile unsigned long *)(0x7000008C)) &= ~0x0C;
     GPO32_ENABLE &= ~0x0C;
 #endif
-    
+
     DEV_EN = DEV_EN | DEV_SER0;
     CPU_HI_INT_DIS = SER0_MASK;
 
@@ -314,7 +314,7 @@ int tx_rdy(void)
         return 0;
 }
 
-int rx_rdy(void) 
+int rx_rdy(void)
 {
     if((SER0_LSR & 0x1))
         return 1;
@@ -337,7 +337,7 @@ void SERIAL0(void)
     static int badbaud = 0;
     static bool newpkt = true;
     char temp;
-    
+
     while(rx_rdy())
     {
 	temp = rx_readc();
@@ -428,7 +428,7 @@ void SERIAL0(void)
 }
 
 #else /* Other targets */
-void serial_setup (void) 
+void serial_setup (void)
 {
     /* a dummy */
 }
@@ -439,14 +439,15 @@ int tx_rdy(void)
     return 1;
 }
 
-int rx_rdy(void) 
+int rx_rdy(void)
 {
     /* a dummy */
     return 0;
 }
 
-void tx_writec(unsigned char c)
+void tx_writec(const unsigned char c)
 {
+    (void)c;
     /* a dummy */
 }
 
@@ -456,7 +457,7 @@ void dprintf(const char * str, ... )
 {
     char dprintfbuff[256];
     char * ptr;
-	
+
     va_list ap;
     va_start(ap, str);
 
