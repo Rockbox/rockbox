@@ -131,12 +131,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 129
+#define PLUGIN_API_VERSION 130
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 129
+#define PLUGIN_MIN_API_VERSION 130
 
 /* plugin return codes */
 enum plugin_status {
@@ -225,7 +225,7 @@ struct plugin_api {
 #ifdef HAVE_LCD_INVERT
     void (*lcd_set_invert_display)(bool yesno);
 #endif /* HAVE_LCD_INVERT */
-    
+
 #if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
     void (*lcd_set_enable_hook)(void (*enable_hook)(void));
     struct event_queue *button_queue;
@@ -350,7 +350,7 @@ struct plugin_api {
     intptr_t (*button_get_data)(void);
 #endif
     void (*button_clear_queue)(void);
-    int (*button_queue_count)(void);   
+    int (*button_queue_count)(void);
 #ifdef HAS_BUTTON_HOLD
     bool (*button_hold)(void);
 #endif
@@ -615,7 +615,7 @@ struct plugin_api {
     /* scroll bar */
     struct gui_syncstatusbar *statusbars;
     void (*gui_syncstatusbar_draw)(struct gui_syncstatusbar * bars, bool force_redraw);
-    
+
     /* options */
     const struct settings_list* (*get_settings_list)(int*count);
     const struct settings_list* (*find_setting)(const void* variable, int *id);
@@ -630,8 +630,8 @@ struct plugin_api {
                              const char* no_str, int no_voice,
                              void (*function)(bool));
     bool (*set_int)(const unsigned char* string, const char* unit, int voice_unit,
-                    const int* variable, void (*function)(int), int step, 
-                    int min, int max, 
+                    const int* variable, void (*function)(int), int step,
+                    int min, int max,
                     void (*formatter)(char*, size_t, int, const char*) );
     bool (*set_bool)(const char* string, const bool* variable );
 
@@ -774,7 +774,7 @@ struct plugin_api {
 #endif
 
     void (*thread_thaw)(unsigned int thread_id);
- 
+
 #ifdef HAVE_SEMAPHORE_OBJECTS
     void (*semaphore_init)(struct semaphore *s, int max, int start);
     void (*semaphore_wait)(struct semaphore *s);
