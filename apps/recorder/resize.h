@@ -23,6 +23,7 @@
 
 #include "config.h"
 #include "lcd.h"
+#include "inttypes.h"
 
 /****************************************************************
  * resize_on_load()
@@ -45,16 +46,30 @@
 
 struct img_part {
     int len;
+#if !defined(HAVE_LCD_COLOR) && \
+        (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1))
+    uint8_t *buf;
+#else
     struct uint8_rgb* buf;
+#endif
 };
 
-int resize_on_load(struct bitmap *bm, bool dither,
-                   struct dim *src,
-                   struct rowset *tmp_row, bool remote,
 #ifdef HAVE_LCD_COLOR
-                   unsigned char *buf, unsigned int len,
+/* intermediate type used by the scaler for color output. greyscale version
+   uses uint32_t
+*/
+struct uint32_rgb {
+    uint32_t r;
+    uint32_t g;
+    uint32_t b;
+};
 #endif
+
+int recalc_dimension(struct dim *dst, struct dim *src);
+
+int resize_on_load(struct bitmap *bm, bool dither,
+                   struct dim *src, struct rowset *tmp_row,
+                   unsigned char *buf, unsigned int len,
                    struct img_part* (*store_part)(void *args),
-                   bool (*skip_lines)(void *args, unsigned int lines),
                    void *args);
 #endif /* _RESIZE_H_ */

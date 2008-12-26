@@ -75,13 +75,17 @@ struct viewport {
 #if (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED) \
  || (LCD_PIXELFORMAT == HORIZONTAL_INTERLEAVED)
 typedef unsigned short fb_data;
+#define FB_DATA_SZ 2
 #else
 typedef unsigned char fb_data;
+#define FB_DATA_SZ 1
 #endif
 #elif LCD_DEPTH <= 16
 typedef unsigned short fb_data;
+#define FB_DATA_SZ 2
 #else /* LCD_DEPTH > 16 */
 typedef unsigned long fb_data;
+#define FB_DATA_SZ 4
 #endif /* LCD_DEPTH */
 
 #else /* LCD_CHARCELLS */

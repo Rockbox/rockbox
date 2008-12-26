@@ -48,13 +48,17 @@ int remote_type(void);
 #if (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED) \
  || (LCD_REMOTE_PIXELFORMAT == HORIZONTAL_INTERLEAVED)
 typedef unsigned short fb_remote_data;
+#define FB_RDATA_SZ 2
 #else
 typedef unsigned char fb_remote_data;
+#define FB_RDATA_SZ 1
 #endif
 #elif LCD_DEPTH <= 16
 typedef unsigned short fb_remote_data;
+#define FB_RDATA_SZ 2
 #else
 typedef unsigned long fb_remote_data;
+#define FB_RDATA_SZ 4
 #endif
 
 /* common functions */

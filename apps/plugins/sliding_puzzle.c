@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "lib/bmp.h"
 
 #ifdef HAVE_LCD_BITMAP
 PLUGIN_HEADER
@@ -258,13 +257,9 @@ static int num_font = FONT_UI;
 static int moves_font = FONT_UI;
 static int moves_y = 0;
 
-#ifdef HAVE_LCD_COLOR
-static unsigned char *img_buf;
-static size_t buf_len;
-#else
-static unsigned char img_buf[IMAGE_WIDTH*IMAGE_HEIGHT*sizeof(fb_data)]
-__attribute__ ((aligned(16)));
-#endif
+static unsigned char img_buf
+    [BM_SCALED_SIZE(IMAGE_WIDTH,IMAGE_HEIGHT,FORMAT_NATIVE,0)]
+    __attribute__ ((aligned(16)));
 #ifdef HAVE_ALBUMART
 static char albumart_path[MAX_PATH+1];
 #endif
@@ -343,13 +338,9 @@ static bool load_resize_bitmap(void)
         main_bitmap.width = IMAGE_WIDTH;
         main_bitmap.height = IMAGE_HEIGHT;
 
-#ifndef HAVE_LCD_COLOR
-        size_t buf_len = sizeof(img_buf);
-#endif
-
         rc = rb->read_bmp_file( filename, &main_bitmap,
-                                buf_len,
-                                FORMAT_NATIVE|FORMAT_RESIZE );
+                                sizeof(img_buf),
+                                FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_DITHER);
         if( rc > 0 )
         {
             puzzle_bmp_ptr = (const fb_data *)img_buf;
@@ -574,7 +565,8 @@ static int puzzle_loop(void)
                 /* change picture */
                 picmode = (picmode+1)%PICMODE_LAST_XXX;
 
-                /* if load_resize_bitmap fails to load bitmap, try next picmode */
+                /* if load_resize_bitmap fails to load bitmap, try next picmode
+                */
                 do
                 {
                     load_success = load_resize_bitmap();
@@ -618,7 +610,8 @@ static int puzzle_loop(void)
     }
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api,
+                                const void* parameter)
 {
     int i, w, h;
 
@@ -627,13 +620,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     initial_bmp_path=(const char *)parameter;
     picmode = PICMODE_INITIAL_PICTURE;
     img_buf_path[0] = '\0';
-#ifdef HAVE_LCD_COLOR
-    unsigned char *img_buf_end;
-    img_buf = (unsigned char *)(rb->plugin_get_buffer(&buf_len));
-    img_buf_end = img_buf + buf_len;
-    rb->align_buffer(PUN_PTR(void **,&img_buf), buf_len, 16);
-    buf_len = img_buf_end - img_buf;
-#endif
 
     /* If launched as a viewer, just go straight to the game without
        bothering with the splash or instructions page */
