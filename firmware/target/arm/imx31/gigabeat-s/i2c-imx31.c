@@ -85,7 +85,7 @@ static void i2c_interrupt(enum i2c_module_number i2c)
     struct i2c_map * const base = desc->base;
     uint16_t i2sr = base->i2sr;
 
-    base->i2sr = i2sr & ~I2C_I2SR_IIF; /* Clear IIF */
+    base->i2sr = 0; /* Clear IIF */
 
     if (desc->addr_count >= 0)
     {
@@ -116,14 +116,17 @@ static void i2c_interrupt(enum i2c_module_number i2c)
 
     if (base->i2cr & I2C_I2CR_MTX)
     {
-i2c_transmit:
         /* Transmitting data */
-        if ((i2sr & I2C_I2SR_RXAK) == 0 && desc->data_count > 0)
+        if ((i2sr & I2C_I2SR_RXAK) == 0)
         {
-            /* More bytes to send, got ACK from previous byte */
-            base->i2dr = *desc->data++;
-            desc->data_count--;
-            return;
+i2c_transmit:
+            if (desc->data_count > 0)
+            {
+                /* More bytes to send, got ACK from previous byte */
+                base->i2dr = *desc->data++;
+                desc->data_count--;
+                return;
+            }
         }
         /* else done or no ACK received */
     }
@@ -184,6 +187,9 @@ static int i2c_transfer(struct i2c_node * const node,
     int count = desc->data_count;
     uint16_t i2cr;
 
+    /* Make sure bus is idle. */
+    while (base->i2sr & I2C_I2SR_IBB);
+
     /* Set speed */
     base->ifdr = node->ifdr;
 
@@ -203,17 +209,24 @@ static int i2c_transfer(struct i2c_node * const node,
     base->i2cr = i2cr;
 
     /* Generate START */
-    base->i2cr |= I2C_I2CR_MSTA;
+    base->i2cr = i2cr | I2C_I2CR_MSTA;
 
     /* Address slave (first byte sent) and begin session. */
     base->i2dr = desc->addr;
 
     /* Wait for transfer to complete */
-    count = (wakeup_wait(&desc->w, HZ) != OBJ_WAIT_SUCCEEDED) ?
-                -1 : (count - desc->data_count);
-    
-    /* Disable module - generate STOP if timeout */
-    base->i2cr = 0;
+    if (wakeup_wait(&desc->w, HZ) == OBJ_WAIT_SUCCEEDED)
+    {
+        count -= desc->data_count;
+    }
+    else
+    {
+        /* Generate STOP if timeout */
+        base->i2cr &= ~(I2C_I2CR_MSTA | I2C_I2CR_IIEN);
+        count = -1;
+    }
+
+    desc->addr_count = 0;
 
     return count;
 }
@@ -241,8 +254,6 @@ int i2c_read(struct i2c_node *node, int reg,
     desc->data_count = data_count;
 
     data_count = i2c_transfer(node, desc);
-
-    desc->addr_count = 0; /* To eliminate zeroing elsewhere */
 
     mutex_unlock(&desc->m);
 
@@ -281,20 +292,6 @@ void i2c_init(void)
         desc->base->i2cr = 0;
         imx31_clkctl_module_clock_gating(desc->cg, CGM_OFF);
     }
-
-#if 0
-    /* Pad config set up by OF bootloader doesn't agree with manual but
-     * TX works at the moment - probably would't do this here either */
-    uint32_t reg = SW_PAD_CTL_CSI_PIXCLK_I2C_CLK_I2C_DAT;
-    reg &= ~0xfffff;
-    reg |= (1 << 19) | (3 << 17) | (1 << 15) | (1 << 14) |
-           (1 << 13) | (0 << 11);
-
-    reg |= (1 << 9) | (3 << 7) | (1 << 5) | (1 << 4) |
-           (1 << 3) | (0 << 1);
-
-    SW_PAD_CTL_CSI_PIXCLK_I2C_CLK_I2C_DAT = reg;
-#endif
 }
 
 void i2c_enable_node(struct i2c_node *node, bool enable)
@@ -317,6 +314,8 @@ void i2c_enable_node(struct i2c_node *node, bool enable)
         if (desc->enable > 0 && --desc->enable == 0)
         {
             /* Last enable */
+            while (desc->base->i2sr & I2C_I2SR_IBB); /* Wait for STOP */
+            desc->base->i2cr &= ~I2C_I2CR_IEN;
             avic_disable_int(desc->ints);
             imx31_clkctl_module_clock_gating(desc->cg, CGM_OFF);
         }
