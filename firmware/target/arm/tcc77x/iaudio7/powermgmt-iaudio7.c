@@ -30,13 +30,13 @@ unsigned short current_voltage = 5150;
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     /* FIXME: calibrate value */
-    3380
+    4400
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     /* FIXME: calibrate value */
-    3300
+    4600
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
