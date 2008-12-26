@@ -24,6 +24,7 @@
 #include "config.h"
 #include "lcd.h"
 #include "inttypes.h"
+#include "resize.h"
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
@@ -202,10 +203,12 @@ extern const unsigned short vi_pattern[4];
 int read_bmp_file(const char* filename,
                   struct bitmap *bm,
                   int maxsize,
-                  int format);
+                  int format,
+                  const struct custom_format *cformat);
 
 int read_bmp_fd(int fd,
                 struct bitmap *bm,
                 int maxsize,
-                int format);
+                int format,
+                const struct custom_format *cformat);
 #endif

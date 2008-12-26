@@ -636,7 +636,7 @@ bool create_albumart_cache(bool force)
         input_bmp.data = (char *)input_bmp_buffer;
         ret = rb->read_bmp_file(arlbumart_file, &input_bmp,
                                 sizeof(fb_data)*MAX_IMG_WIDTH*MAX_IMG_HEIGHT,
-                                FORMAT_NATIVE);
+                                FORMAT_NATIVE, NULL);
         if (ret <= 0) {
             rb->splash(HZ, "Could not read bmp");
             continue; /* skip missing/broken files */

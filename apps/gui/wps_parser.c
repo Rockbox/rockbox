@@ -416,7 +416,7 @@ static bool load_bitmap(struct wps_data *wps_data,
 
     int ret = read_bmp_file(filename, bm,
                             wps_data->img_buf_free,
-                            format);
+                            format,NULL);
 
     if (ret > 0)
     {

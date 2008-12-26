@@ -106,6 +106,7 @@ void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
                               int stride, int x, int y, int width, int height);
 void grey_ub_gray_bitmap(const unsigned char *src, int x, int y, int width,
                          int height);
+extern const struct custom_format format_grey;
 
 /* Text */
 void grey_putsxyofs(int x, int y, int ofs, const unsigned char *str);

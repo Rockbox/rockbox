@@ -861,7 +861,7 @@ static int load_bitmap(int fd)
     get_albumart_size(bmp);
 
     rc = read_bmp_fd(fd, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
-                     FORMAT_RESIZE|FORMAT_KEEP_ASPECT);
+                     FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
     return rc + (rc > 0 ? sizeof(struct bitmap) : 0);
 }
 #endif

@@ -340,7 +340,8 @@ static bool load_resize_bitmap(void)
 
         rc = rb->read_bmp_file( filename, &main_bitmap,
                                 sizeof(img_buf),
-                                FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_DITHER);
+                                FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_DITHER,
+                                NULL);
         if( rc > 0 )
         {
             puzzle_bmp_ptr = (const fb_data *)img_buf;

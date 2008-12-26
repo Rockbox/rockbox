@@ -52,7 +52,7 @@ static bool load_backdrop(const char* filename, fb_data* backdrop_buffer)
     /* load the image */
     bm.data=(char*)backdrop_buffer;
     ret = read_bmp_file(filename, &bm, sizeof(main_backdrop),
-                        FORMAT_NATIVE | FORMAT_DITHER);
+                        FORMAT_NATIVE | FORMAT_DITHER, NULL);
 
     if ((ret > 0) && (bm.width == LCD_WIDTH) && (bm.height == LCD_HEIGHT))
     {
@@ -114,7 +114,7 @@ static bool load_remote_backdrop(const char* filename, fb_remote_data* backdrop_
     /* load the image */
     bm.data=(char*)backdrop_buffer;
     ret = read_bmp_file(filename, &bm, sizeof(main_backdrop),
-                        FORMAT_NATIVE | FORMAT_DITHER | FORMAT_REMOTE);
+                        FORMAT_NATIVE | FORMAT_DITHER | FORMAT_REMOTE, NULL);
 
     if ((ret > 0) && (bm.width == LCD_REMOTE_WIDTH) && (bm.height == LCD_REMOTE_HEIGHT))
     {

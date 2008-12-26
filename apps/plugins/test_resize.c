@@ -78,7 +78,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     output_bmp.data = (char*)output_bmp_data;
 
     int ret = rb->read_bmp_file("/test.bmp", &input_bmp, sizeof(input_bmp_data),
-                                FORMAT_NATIVE);
+                                FORMAT_NATIVE, NULL);
 
     if (ret < 0) {
         rb->splash(HZ, "Could not load /test.bmp");

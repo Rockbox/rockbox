@@ -669,3 +669,22 @@ void grey_ub_gray_bitmap(const unsigned char *src, int x, int y, int width,
 {
     grey_ub_gray_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
+
+static void output_row_grey(uint32_t row, void * row_in, struct scaler_context *ctx)
+{
+    int col;
+    uint32_t *qp = (uint32_t*)row_in;
+    uint8_t *dest = (uint8_t*)ctx->bm->data + ctx->bm->width * row;
+    for (col = 0; col < ctx->bm->width; col++)
+        *dest++ = ((*qp++) + ctx->round) * (uint64_t)ctx->divisor >> 32;
+}
+
+static unsigned int get_size_grey(struct bitmap *bm)
+{
+    return bm->width * bm->height;
+}
+
+const struct custom_format format_grey = {
+    .output_row = output_row_grey,
+    .get_size = get_size_grey
+};

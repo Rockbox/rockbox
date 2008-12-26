@@ -2967,7 +2967,7 @@ static int load_bitmap( const char *file )
 
     bm.data = (char*)save_buffer;
     ret = rb->read_bmp_file( file, &bm, ROWS*COLS*sizeof( fb_data ),
-                             FORMAT_NATIVE );
+                             FORMAT_NATIVE, NULL );
 
     if((bm.width > COLS ) || ( bm.height > ROWS ))
         return -1;

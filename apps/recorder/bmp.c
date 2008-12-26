@@ -147,7 +147,8 @@ const unsigned short vi_pattern[4] = {
 int read_bmp_file(const char* filename,
                   struct bitmap *bm,
                   int maxsize,
-                  int format)
+                  int format,
+                  const struct custom_format *cformat)
 {
     int fd, ret;
     fd = open(filename, O_RDONLY);
@@ -161,7 +162,7 @@ int read_bmp_file(const char* filename,
     BDEBUGF("read_bmp_file: '%s' remote: %d resize: %d keep_aspect: %d\n",
            filename, !!(format & FORMAT_REMOTE), !!(format & FORMAT_RESIZE),
            !!(format & FORMAT_KEEP_ASPECT));
-    ret = read_bmp_fd(fd, bm, maxsize, format);
+    ret = read_bmp_fd(fd, bm, maxsize, format, cformat);
     close(fd);
     return ret;
 }
@@ -349,7 +350,8 @@ static inline int rgbcmp(struct uint8_rgb rgb1, struct uint8_rgb rgb2)
 int read_bmp_fd(int fd,
                 struct bitmap *bm,
                 int maxsize,
-                int format)
+                int format,
+                const struct custom_format *cformat)
 {
     struct bmp_header bmph;
     int padded_width;
@@ -473,7 +475,10 @@ int read_bmp_fd(int fd,
         rset.rowstop = -1;
     }
 
-    totalsize = BM_SIZE(bm->width,bm->height,format,remote);
+    if (cformat)
+        totalsize = cformat->get_size(bm);
+    else
+        totalsize = BM_SIZE(bm->width,bm->height,format,remote);
 
     /* Check if this fits the buffer */
     if (totalsize > maxsize) {
@@ -565,10 +570,15 @@ int read_bmp_fd(int fd,
     };
 
 #if LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
-    if (resize)
-        return resize_on_load(bm, dither, &src_dim, &rset,
-                               bitmap + totalsize, maxsize - totalsize,
-                               store_part_bmp, &ba);
+    if (resize || cformat)
+    {
+        if (resize_on_load(bm, dither, &src_dim, &rset,
+                           bitmap + totalsize, maxsize - totalsize,
+                           cformat, store_part_bmp, &ba))
+            return totalsize;
+        else
+            return 0;
+    }
 
     int fb_width = BM_WIDTH(bm->width,bm->format,remote);
 #endif /* LCD_DEPTH */

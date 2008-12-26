@@ -20,7 +20,6 @@
  ****************************************************************************/
 #ifndef _RESIZE_H_
 #define _RESIZE_H_
-
 #include "config.h"
 #include "lcd.h"
 #include "inttypes.h"
@@ -65,11 +64,35 @@ struct uint32_rgb {
 };
 #endif
 
+/* struct which contains various parameters shared between vertical scaler,
+   horizontal scaler, and row output
+*/
+struct scaler_context {
+    uint32_t divisor;
+    uint32_t round;
+    struct bitmap *bm;
+    struct dim *src;
+    unsigned char *buf;
+    bool dither;
+    int len;
+    void *args;
+    struct img_part* (*store_part)(void *);
+    void (*output_row)(uint32_t,void*,struct scaler_context*);
+    bool (*h_scaler)(void*,struct scaler_context*, bool);
+};
+
+struct custom_format {
+    void (*output_row)(uint32_t,void*,struct scaler_context*);
+    unsigned int (*get_size)(struct bitmap *bm);
+};
+
+struct rowset;
 int recalc_dimension(struct dim *dst, struct dim *src);
 
 int resize_on_load(struct bitmap *bm, bool dither,
                    struct dim *src, struct rowset *tmp_row,
                    unsigned char *buf, unsigned int len,
+                   const struct custom_format *cformat,
                    struct img_part* (*store_part)(void *args),
                    void *args);
 #endif /* _RESIZE_H_ */

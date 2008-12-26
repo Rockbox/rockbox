@@ -114,23 +114,6 @@ int recalc_dimension(struct dim *dst, struct dim *src)
         return false; \
 }
 
-/* struct which containers various parameters shared between vertical scaler,
-   horizontal scaler, and row output
-*/
-struct scaler_context {
-    uint32_t divisor;
-    uint32_t round;
-    struct bitmap *bm;
-    struct dim *src;
-    unsigned char *buf;
-    bool dither;
-    int len;
-    void *args;
-    struct img_part* (*store_part)(void *);
-    void (*output_row)(uint32_t,void*,struct scaler_context*);
-    bool (*h_scaler)(void*,struct scaler_context*, bool);
-};
-
 /* Set up rounding and scale factors for horizontal area scaler */
 static inline void scale_h_area_setup(struct scaler_context *ctx)
 {
@@ -610,6 +593,7 @@ void output_row_native(uint32_t row, void * row_in, struct scaler_context *ctx)
 
 int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
                    struct rowset *rset, unsigned char *buf, unsigned int len,
+                   const struct custom_format *format,
                    struct img_part* (*store_part)(void *args),
                    void *args)
 {
@@ -669,7 +653,10 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     ctx.bm = bm;
     ctx.src = src;
     ctx.dither = dither;
-    ctx.output_row = output_row_native;
+    if (format)
+        ctx.output_row = format->output_row;
+    else
+        ctx.output_row = output_row_native;
 #ifdef HAVE_UPSCALER
     if (sw > dw)
     {
@@ -693,5 +680,5 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     cpu_boost(false);
     if (!ret)
         return 0;
-    return BM_SIZE(bm->width,bm->height,bm->format,0);
+    return 1;
 }
