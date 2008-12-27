@@ -227,12 +227,15 @@ void audiohw_postinit(void)
     wmc_write(WMC_DAC_CONTROL, WMC_DACOSR_128 | WMC_AMUTE);
 
     wmc_set(WMC_INPUT_CTRL, WMC_R2_2INPPGA | WMC_L2_2INPPGA);
-    wmc_set(WMC_LEFT_INP_PGA_GAIN_CTRL, 0x3f);
-    wmc_set(WMC_RIGHT_INP_PGA_GAIN_CTRL, 0x3f);
-    wmc_set(WMC_LEFT_INP_PGA_GAIN_CTRL, 1<<8);
-    wmc_set(WMC_RIGHT_INP_PGA_GAIN_CTRL, 1<<8);
-    wmc_set(WMC_LEFT_ADC_BOOST_CTRL, (7<<3));
-    wmc_set(WMC_RIGHT_ADC_BOOST_CTRL, (7<<3));
+    /* set PGA volumes to 0dB and enable zero cross */
+    wmc_set(WMC_LEFT_INP_PGA_GAIN_CTRL, 0x10 | 1 << 7);
+    wmc_set(WMC_RIGHT_INP_PGA_GAIN_CTRL, 0x10 | 1 << 7);
+    /* write to  INPPGAUPDATE to actually change voulme */
+    wmc_set(WMC_LEFT_INP_PGA_GAIN_CTRL, 1 << 8);
+    wmc_set(WMC_RIGHT_INP_PGA_GAIN_CTRL, 1 << 8);
+    /* set boost gain to 0dB */
+    wmc_set(WMC_LEFT_ADC_BOOST_CTRL, (5 << 4));
+    wmc_set(WMC_RIGHT_ADC_BOOST_CTRL, (5 << 4));
 
     /* Specific to HW clocking */
     wmc_write_masked(WMC_CLOCK_GEN_CTRL, WMC_BCLKDIV_4 | WMC_MS,
