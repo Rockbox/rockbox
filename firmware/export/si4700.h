@@ -36,9 +36,15 @@ struct si4700_region_data
 
 extern const struct si4700_region_data si4700_region_data[TUNER_NUM_REGIONS];
 
+struct si4700_dbg_info
+{
+    uint16_t regs[16];  /* Read registers */
+};
+
 void si4700_init(void);
 int si4700_set(int setting, int value);
 int si4700_get(int setting);
+void si4700_dbg_info(struct si4700_dbg_info *nfo);
 
 #ifndef CONFIG_TUNER_MULTI
 #define tuner_set si4700_set

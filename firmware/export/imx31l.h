@@ -202,26 +202,33 @@
 #define SW_MUX_CTL_GPIO1_0_GPIO1_1_GPIO1_2_GPIO1_3                      IOMUXC_(0x14C)
 #define SW_MUX_CTL_CAPTURE_COMPARE_WATCHDOG_RST_PWMO                    IOMUXC_(0x150)
 
-#define SW_MUX_OUT_EN_GPIO_DR   0x0
-#define SW_MUX_OUT_FUNCTIONAL   0x1
-#define SW_MUX_OUT_ALTERNATE_1  0x2
-#define SW_MUX_OUT_ALTERNATE_2  0x3
-#define SW_MUX_OUT_ALTERNATE_3  0x4
-#define SW_MUX_OUT_ALTERNATE_4  0x5
-#define SW_MUX_OUT_ALTERNATE_5  0x6
-#define SW_MUX_OUT_ALTERNATE_6  0x7
+#define SW_MUX_OUT              (0x7 << 4)
+#define SW_MUX_OUT_GPIO_DR      (0x0 << 4)
+#define SW_MUX_OUT_FUNCTIONAL   (0x1 << 4)
+#define SW_MUX_OUT_ALT1         (0x2 << 4)
+#define SW_MUX_OUT_ALT2         (0x3 << 4)
+#define SW_MUX_OUT_ALT3         (0x4 << 4)
+#define SW_MUX_OUT_ALT4         (0x5 << 4)
+#define SW_MUX_OUT_ALT5         (0x6 << 4)
+#define SW_MUX_OUT_ALT6         (0x7 << 4)
 
-#define SW_MUX_IN_NO_INPUTS     0x0
-#define SW_MUX_IN_GPIO_PSR_ISR  0x1
-#define SW_MUX_IN_FUNCTIONAL    0x2
-#define SW_MUX_IN_ALTERNATE_1   0x3
-#define SW_MUX_IN_ALTERNATE_2   0x4
+#define SW_MUX_IN               (0xf << 0)
+#define SW_MUX_IN_NO_INPUTS     (0x0 << 0)
+#define SW_MUX_IN_GPIO_PSR_ISR  (0x1 << 0)
+#define SW_MUX_IN_FUNCTIONAL    (0x2 << 0)
+#define SW_MUX_IN_ALT1          (0x4 << 0)
+#define SW_MUX_IN_ALT2          (0x8 << 0)
 
+/* Masks for each signal field */
+#define SW_MUX_CTL_SIG1         (0x7f <<  0)
+#define SW_MUX_CTL_SIG2         (0x7f <<  8)
+#define SW_MUX_CTL_SIG3         (0x7f << 16)
+#define SW_MUX_CTL_SIG4         (0x7f << 24)
 /* Shift above flags into one of the four fields in each register */
-#define SW_MUX_CTL_FLD_0(x)     ((x) << 0)
-#define SW_MUX_CTL_FLD_1(x)     ((x) << 8)
-#define SW_MUX_CTL_FLD_2(x)     ((x) << 16)
-#define SW_MUX_CTL_FLD_3(x)     ((x) << 24)
+#define SW_MUX_CTL_SIG1w(x)     (((x) <<  0) & SW_MUX_CTL_SIG1)
+#define SW_MUX_CTL_SIG2w(x)     (((x) <<  8) & SW_MUX_CTL_SIG2)
+#define SW_MUX_CTL_SIG3w(x)     (((x) << 16) & SW_MUX_CTL_SIG3)
+#define SW_MUX_CTL_SIG4w(x)     (((x) << 24) & SW_MUX_CTL_SIG4)
 
 /* SW_PAD_CTL */
 #define SW_PAD_CTL_TTM_PAD__X__X                            IOMUXC_(0x154)
@@ -336,36 +343,39 @@
 #define SW_PAD_CTL_CAPTURE_COMPARE_WATCHDOG_RST             IOMUXC_(0x308)
 
 /* SW_PAD_CTL flags */
-#define SW_PAD_CTL_LOOPBACK                         (1 << 9)
-#define SW_PAD_CTL_DISABLE_PULL_UP_DOWN_AND_KEEPER  (0 << 7)
-#if 0 /* Same as 0 */
-#define SW_PAD_CTL_DISABLE_PULL_UP_DOWN_AND_KEEPER  (1 << 7)
-#endif
-#define SW_PAD_CTL_ENABLE_KEEPER                    (2 << 7)
-#define SW_PAD_CTL_ENABLE_PULL_UP_OR_PULL_DOWN      (3 << 7)
-#define SW_PAD_CTL_100K_PULL_DOWN                   (0 << 5)
-#define SW_PAD_CTL_100K_PULL_UP                     (1 << 5)
+#define SW_PAD_CTL_LOOPBACK             (0x1 << 9) /* Route output to input */
+/* Pullup, pulldown and keeper enable */
+#define SW_PAD_CTL_PUE_PKE              (0x3 << 7)
+#define SW_PAD_CTL_PUE_PKE_DISABLE      (0x0 << 7)
+#define SW_PAD_CTL_PUE_PKE_DISABLE_2    (0x1 << 7) /* Same as 0x0 */
+#define SW_PAD_CTL_PUE_PKE_KEEPER       (0x2 << 7)
+#define SW_PAD_CTL_PUE_PKE_PULLUPDOWN   (0x3 << 7) /* Enb. Pull up or down */
+/* Pullup/down resistance */
+#define SW_PAD_CTL_PUS                  (0x3 << 5)
+#define SW_PAD_CTL_PUS_DOWN_100K        (0x0 << 5)
+#define SW_PAD_CTL_PUS_UP_100K          (0x1 << 5)
 #if 0 /* Completeness */
-#define SW_PAD_CTL_47K_PULL_UP                      (2 << 5) /* Not in IMX31/L */
-#define SW_PAD_CTL_22K_PULL_UP                      (3 << 5) /* Not in IMX31/L */
+#define SW_PAD_CTL_PUS_UP_47K           (0x2 << 5) /* Not in IMX31/L */
+#define SW_PAD_CTL_PUS_UP_22K           (0x3 << 5) /* Not in IMX31/L */
 #endif
-#define SW_PAD_CTL_IPP_HYS_STD                      (0 << 4)
-#define SW_PAD_CTL_IPP_HYS_SCHIMDT                  (1 << 4)
-#define SW_PAD_CTL_IPP_ODE_CMOS                     (0 << 3)
-#define SW_PAD_CTL_IPP_ODE_OPEN                     (1 << 3)
-#define SW_PAD_CTL_IPP_DSE_STD                      (0 << 1)
-#define SW_PAD_CTL_IPP_DSE_HIGH                     (1 << 1)
-#define SW_PAD_CTL_IPP_DSE_MAX                      (2 << 1)
-#if 0 /* Same as 2 */
-#define SW_PAD_CTL_IPP_DSE_MAX                      (3 << 1)
-#endif
-#define SW_PAD_CTL_IPP_SRE_SLOW                     (0 << 0)
-#define SW_PAD_CTL_IPP_SRE_FAST                     (1 << 0)
+#define SW_PAD_CTL_HYS                  (0x1 << 4) /* Schmitt trigger input */
+#define SW_PAD_CTL_ODE                  (0x1 << 3) /* Open drain output 0=CMOS pushpull*/
+#define SW_PAD_CTL_DSE                  (0x3 << 1)
+#define SW_PAD_CTL_DSE_STD              (0x0 << 1) /* Drive strength */
+#define SW_PAD_CTL_DSE_HIGH             (0x1 << 1)
+#define SW_PAD_CTL_DSE_MAX              (0x2 << 1)
+#define SW_PAD_CTL_DSE_MAX_2            (0x3 << 1) /* Same as 0x2 */
+#define SW_PAD_CTL_SRE                  (0x1 << 0) /* Slew rate, 1=fast */
+
+/* Masks for each IO field */
+#define SW_PAD_CTL_IO1                  (0x3ff << 0)
+#define SW_PAD_CTL_IO2                  (0x3ff << 10)
+#define SW_PAD_CTL_IO3                  (0x3ff << 20)
 
 /* Shift above flags into one of the three fields in each register */
-#define SW_PAD_CTL_FLD_0(x)                         ((x) << 0)
-#define SW_PAD_CTL_FLD_1(x)                         ((x) << 10)
-#define SW_PAD_CTL_FLD_2(x)                         ((x) << 20)
+#define SW_PAD_CTL_IO1w(x)              (((x) <<  0) & SW_PAD_CTL_IO1)
+#define SW_PAD_CTL_IO2w(x)              (((x) << 10) & SW_PAD_CTL_IO2)
+#define SW_PAD_CTL_IO3w(x)              (((x) << 20) & SW_PAD_CTL_IO3)
 
 /* RNGA */
 #define RNGA_CONTROL            (*(REG32_PTR_T)(RNGA_BASE_ADDR+0x00))

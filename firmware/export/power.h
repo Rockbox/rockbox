@@ -95,6 +95,7 @@ bool spdif_powered(void);
 
 #if CONFIG_TUNER
 bool tuner_power(bool status);
+bool tuner_powered(void);
 #endif
 
 #endif /* _POWER_H_ */

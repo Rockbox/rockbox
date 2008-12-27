@@ -98,37 +98,24 @@ bool ide_powered(void)
 }
 
 #if CONFIG_TUNER
+static bool tuner_on = false;
+
 bool tuner_power(bool status)
 {
-    static bool tuner_powered = false;
-
-    if (status == tuner_powered)
-        return status;
-
-    tuner_powered = status;
-
-    if (status)
+    if (status != tuner_on)
     {
-        /* the si4700 is the only thing connected to i2c2 so
-           we can diable the i2c module when not in use */
-        fmradio_i2c_enable(true);
-        /* enable the fm chip */
-        imx31_regset32(&GPIO1_DR, (1 << 26));
-        /* enable CLK32KMCU clock */
-        mc13783_set(MC13783_POWER_CONTROL0, MC13783_CLK32KMCUEN);
-    }
-    else
-    {
-        /* the si4700 is the only thing connected to i2c2 so
-           we can diable the i2c module when not in use */
-        fmradio_i2c_enable(false);
-        /* disable the fm chip */
-        imx31_regclr32(&GPIO1_DR, (1 << 26));
-        /* disable CLK32KMCU clock */
-        mc13783_clear(MC13783_POWER_CONTROL0, MC13783_CLK32KMCUEN);
+        tuner_on = status;
+        /* Handle power and pin setup */
+        fmradio_i2c_enable(status);
+        status = !status;
     }
 
-    return !status;
+    return status;
+}
+
+bool tuner_powered(void)
+{
+    return tuner_on;
 }
 #endif /* #if CONFIG_TUNER */
 
@@ -151,6 +138,10 @@ void power_off(void)
 
 void power_init(void)
 {
+#if CONFIG_TUNER
+    fmradio_i2c_init();
+#endif
+
     /* Poll initial state */
     charger_main_detect_event();
 

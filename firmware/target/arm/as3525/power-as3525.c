@@ -54,9 +54,21 @@ void ide_power_enable(bool on)
 }
 
 #if CONFIG_TUNER
+static bool tuner_on = false;
+
 bool tuner_power(bool status)
 {
-    (void)status;
-    return false;
+    if (status != tuner_on)
+    {
+        tuner_on = status;
+        status = !status;
+    }
+
+    return status;    
+}
+
+bool tuner_powered(void)
+{
+    return tuner_on; /* No debug info */
 }
 #endif

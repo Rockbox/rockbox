@@ -2293,12 +2293,12 @@ static int radio_callback(int btn, struct gui_synclist *lists)
                         "if_set: %d Hz", lv24020lp_get(LV24020LP_IF_SET) );
     simplelist_addline(SIMPLELIST_ADD_LINE,
                         "sd_set: %d Hz", lv24020lp_get(LV24020LP_SD_SET) );
-#endif
+#endif /* LV24020LP */
 #if (CONFIG_TUNER & S1A0903X01)
     simplelist_addline(SIMPLELIST_ADD_LINE,
                         "Samsung regs: %08X", s1a0903x01_get(RADIO_ALL));
     /* This one doesn't return dynamic data atm */
-#endif
+#endif /* S1A0903X01 */
 #if (CONFIG_TUNER & TEA5767)
     struct tea5767_dbg_info nfo;
     tea5767_dbg_info(&nfo);
@@ -2313,7 +2313,29 @@ static int radio_callback(int btn, struct gui_synclist *lists)
              (unsigned)nfo.write_regs[0], (unsigned)nfo.write_regs[1],
              (unsigned)nfo.write_regs[2], (unsigned)nfo.write_regs[3],
              (unsigned)nfo.write_regs[4]);
-#endif
+#endif /* TEA5767 */
+#if (CONFIG_TUNER & SI4700)
+    struct si4700_dbg_info nfo;
+    si4700_dbg_info(&nfo);
+    simplelist_addline(SIMPLELIST_ADD_LINE, "SI4700 regs:");
+    /* Registers */
+    simplelist_addline(SIMPLELIST_ADD_LINE,
+             "   %04X %04X %04X %04X",
+             (unsigned)nfo.regs[0], (unsigned)nfo.regs[1],
+             (unsigned)nfo.regs[2], (unsigned)nfo.regs[3]);
+    simplelist_addline(SIMPLELIST_ADD_LINE,
+             "   %04X %04X %04X %04X",
+             (unsigned)nfo.regs[4], (unsigned)nfo.regs[5],
+             (unsigned)nfo.regs[6], (unsigned)nfo.regs[7]);
+    simplelist_addline(SIMPLELIST_ADD_LINE,
+             "   %04X %04X %04X %04X",
+             (unsigned)nfo.regs[8], (unsigned)nfo.regs[9],
+             (unsigned)nfo.regs[10], (unsigned)nfo.regs[11]);
+    simplelist_addline(SIMPLELIST_ADD_LINE,
+             "   %04X %04X %04X %04X",
+             (unsigned)nfo.regs[12], (unsigned)nfo.regs[13],
+             (unsigned)nfo.regs[14], (unsigned)nfo.regs[15]);
+#endif /* SI4700 */
     return ACTION_REDRAW;
 }
 static bool dbg_fm_radio(void)
