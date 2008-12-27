@@ -68,7 +68,7 @@ typedef unsigned char pix_t;
 typedef fb_data pix_t;
 #endif
 
-#define WRNDUP(w, size) (((w)+(size)-1)/(size)*(size))
+#define WRNDUP(w, size) (((w)+(size)-1) & (~(size - 1)))
 #ifdef HAVE_SCROLLWHEEL
 #define PICTUREFLOW_NEXT_ALBUM          PLA_DOWN
 #define PICTUREFLOW_NEXT_ALBUM_REPEAT   PLA_DOWN_REPEAT
@@ -187,7 +187,8 @@ const struct picture logos[]={
     {pictureflow_logo, BMPWIDTH_pictureflow_logo, BMPHEIGHT_pictureflow_logo},
 };
 
-enum show_album_name_values { album_name_hide = 0, album_name_bottom , album_name_top };
+enum show_album_name_values { album_name_hide = 0, album_name_bottom ,
+    album_name_top };
 
 struct config_data {
     long avg_album_width;
@@ -222,7 +223,8 @@ static int  slide_cache_in_use;
 
 /* use long for aligning */
 unsigned long thread_stack[THREAD_STACK_SIZE / sizeof(long)];
-static int slide_cache_stack[SLIDE_CACHE_SIZE]; /* queue (as array) for scheduling load_surface */
+/* queue (as array) for scheduling load_surface */
+static int slide_cache_stack[SLIDE_CACHE_SIZE];
 static int slide_cache_stack_index;
 struct mutex slide_cache_stack_lock;
 
@@ -244,6 +246,7 @@ static int track_count;
 static int track_index;
 static int selected_track;
 static int selected_track_pulse;
+void reset_track_list(void);
 
 #define INPUT_SIZE BM_SIZE(DISPLAY_SIZE, DISPLAY_SIZE, FORMAT_NATIVE, 0)
 #define SC_BUF_SIZE BM_SCALED_SIZE(DISPLAY_SIZE, 0, FORMAT_NATIVE, 0)
@@ -266,6 +269,8 @@ static int prev_center_index = -1;
 
 static int start_index_track_list = 0;
 static int track_list_visible_entries = 0;
+static int track_list_y;
+static int track_list_h;
 static int track_scroll_index = 0;
 static int track_scroll_dir = 1;
 
@@ -390,7 +395,8 @@ int create_album_index(void)
         if ( album_count > 0 )
             album[album_count].name_idx = album[album_count-1].name_idx + old_l;
 
-        if ( (album[album_count].name_idx + l) > MAX_ALBUMS*AVG_ALBUM_NAME_LENGTH )
+        if ( (album[album_count].name_idx + l) >
+            MAX_ALBUMS*AVG_ALBUM_NAME_LENGTH )
             /* not enough memory */
             return ERROR_BUFFER_FULL;
 
@@ -451,8 +457,8 @@ int create_track_index(const int slide_index)
         track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber) - 1;
         if (track_num >= 0)
         {
-            rb->snprintf(temp_titles[track_num],sizeof(temp_titles[track_num]), "%d:  %s",
-                         track_num+1, tcs.result);
+            rb->snprintf(temp_titles[track_num],sizeof(temp_titles[track_num]),
+                         "%d:  %s", track_num+1, tcs.result);
             temp_seeks[track_num] = tcs.result_seek;
         }
         else
@@ -500,7 +506,8 @@ int create_track_index(const int slide_index)
   The algorithm looks for the first track of the given album uses
   find_albumart to find the filename.
  */
-bool get_albumart_for_index_from_db(const int slide_index, char *buf, int buflen)
+bool get_albumart_for_index_from_db(const int slide_index, char *buf,
+                                    int buflen)
 {
     if ( slide_index == -1 )
     {
@@ -595,9 +602,13 @@ bool create_albumart_cache(bool force)
     config.avg_album_width = 0;
     char pfraw_file[MAX_PATH];
     char albumart_file[MAX_PATH];
+    unsigned int format = FORMAT_NATIVE;
+    if (config.resize)
+        format |= FORMAT_RESIZE|FORMAT_KEEP_ASPECT;
     for (i=0; i < album_count; i++)
     {
-        rb->snprintf(pfraw_file, sizeof(pfraw_file), CACHE_PREFIX "/%d.pfraw", i);
+        rb->snprintf(pfraw_file, sizeof(pfraw_file), CACHE_PREFIX "/%d.pfraw",
+                     i);
         /* delete existing cache, so it's a true rebuild */
         if(rb->file_exists(pfraw_file))
             rb->remove(pfraw_file);
@@ -609,9 +620,7 @@ bool create_albumart_cache(bool force)
         input_bmp.width = DISPLAY_SIZE;
         input_bmp.height = DISPLAY_SIZE;
         ret = rb->read_bmp_file(albumart_file, &input_bmp,
-                                plugin_buf_size,
-                                FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
-                                FPLUGIN);
+                                plugin_buf_size, format, FPLUGIN);
         if (ret <= 0) {
             rb->splash(HZ, "Could not read bmp");
             continue; /* skip missing/broken files */
@@ -684,25 +693,36 @@ void slide_stack_push(const int slide_index)
         if ( tmp == center_index ) {
             /* the center_index is on top of the stack so do not touch that */
             if ( slide_cache_stack_index  > 0 ) {
-                /* but maybe it is possible to swap the given slide_index to the second place */
-                tmp = slide_cache_stack[ slide_cache_stack_index -1 ];
-                slide_cache_stack[ slide_cache_stack_index - 1  ] = slide_cache_stack[ i  ];
-                slide_cache_stack[ i ] = tmp;
+                /* 
+                   but maybe it is possible to swap the given slide_index to
+                   the second place
+                */
+                tmp = slide_cache_stack[slide_cache_stack_index - 1];
+                slide_cache_stack[slide_cache_stack_index - 1] = 
+                    slide_cache_stack[i];
+                slide_cache_stack[i] = tmp;
             }
         }
         else {
-            /* if the center_index is not on top (i.e. already loaded) bring the slide_index to the top */
-            slide_cache_stack[ slide_cache_stack_index  ] = slide_cache_stack[ i  ];
-            slide_cache_stack[ i ] = tmp;
+            /* 
+               if the center_index is not on top (i.e. already loaded) bring
+               the slide_index to the top
+            */
+            slide_cache_stack[slide_cache_stack_index] = slide_cache_stack[i];
+            slide_cache_stack[i] = tmp;
         }
     }
     else {
         /* slide_index is not on the stack */
         if ( slide_cache_stack_index >= SLIDE_CACHE_SIZE-1 ) {
-            /* if we exceeded the stack size, clear the first half of the stack */
+            /*
+               if we exceeded the stack size, clear the first half of the
+               stack
+            */
             slide_cache_stack_index = SLIDE_CACHE_SIZE/2;
             for (i = 0; i <= slide_cache_stack_index ; i++)
-                slide_cache_stack[ i ] = slide_cache_stack[ i + slide_cache_stack_index  ];
+                slide_cache_stack[i] = slide_cache_stack[i +
+                    slide_cache_stack_index];
         }
         if ( slide_cache_stack[ slide_cache_stack_index ] == center_index ) {
             /* if the center_index is on top leave it there */
@@ -796,7 +816,8 @@ void end_pf_thread(void)
  */
 bool create_pf_thread(void)
 {
-    rb->queue_init(&thread_q, true);    /* put the thread's queue in the bcast list */
+    /* put the thread's queue in the bcast list */
+    rb->queue_init(&thread_q, true);
     if ((thread_id = rb->create_thread(
                            thread,
                            thread_stack,
@@ -1013,7 +1034,8 @@ static inline struct bitmap *surface(const int slide_index)
         return 0;
 
     int i;
-    for (i = 0; i < slide_cache_in_use; i++) { /* maybe do the inverse mapping => implies dynamic allocation? */
+    for (i = 0; i < slide_cache_in_use; i++) {
+        /* maybe do the inverse mapping => implies dynamic allocation? */
         if ( cache[i].index == slide_index ) {
             /* We have already loaded our slide, so touch it and return it. */
             cache[i].touched = *rb->current_tick;
@@ -1073,10 +1095,8 @@ void recalc_table(void)
 
     itilt = 70 * IANGLE_MAX / 360;      /* approx. 70 degrees tilted */
 
-    offsetX = config.avg_album_width / 2 * (PFREAL_ONE - fcos(itilt));
-    offsetY = config.avg_album_width / 2 * fsin(itilt);
-    offsetX += config.avg_album_width * PFREAL_ONE * 3 / 4;
-    offsetY += config.avg_album_width * PFREAL_ONE / 4;
+    offsetX = DISPLAY_SIZE / 2 * (fsin(itilt) + PFREAL_ONE);
+    offsetY = DISPLAY_SIZE / 2 * (fsin(itilt) + PFREAL_ONE / 2);
     offsetX += config.extra_spacing_for_center_slide << PFREAL_SHIFT;
 }
 
@@ -1546,22 +1566,39 @@ int create_empty_slide(bool force)
     return true;
 }
 
+/**
+    Shows the album name setting menu
+*/
+int album_name_menu(void)
+{
+    int selection = config.show_album_name;
+
+    MENUITEM_STRINGLIST(album_name_menu,"Show album title",NULL,
+            "Hide album title", "Show at the bottom", "Show at the top");
+    rb->do_menu(&album_name_menu, &selection, NULL, false);
+
+    config.show_album_name = selection;
+    return GO_TO_PREVIOUS;
+}
 
 /**
   Shows the settings menu
  */
-int settings_menu(void) {
+int settings_menu(void)
+{
     int selection = 0;
+    bool old_val;
 
     MENUITEM_STRINGLIST(settings_menu, "PictureFlow Settings", NULL, "Show FPS",
                         "Spacing", "Center margin", "Number of slides", "Zoom",
-                        "Rebuild cache");
+                        "Show album title", "Resize Covers", "Rebuild cache");
 
     do {
         selection=rb->do_menu(&settings_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
                 rb->set_bool("Show FPS", &(config.show_fps));
+                reset_track_list();
                 break;
 
             case 1:
@@ -1575,7 +1612,7 @@ int settings_menu(void) {
             case 2:
                 rb->set_int("Center margin", "", 1,
                             &(config.extra_spacing_for_center_slide),
-                            NULL, 1, -50, 50, NULL );
+                            NULL, 1, -70, 70, NULL );
                 recalc_table();
                 reset_slides();
                 break;
@@ -1594,6 +1631,18 @@ int settings_menu(void) {
                 reset_slides();
                 break;
             case 5:
+                album_name_menu();
+                reset_track_list();
+                recalc_table();
+                reset_slides();
+                break;
+            case 6:
+                old_val = config.resize;
+                rb->set_bool("Resize Covers", &(config.resize));
+                if (old_val == config.resize) /* changed? */
+                    break;
+                /* fallthrough if changed, since cache needs to be rebuilt */
+            case 7:
                 rb->remove(CACHE_PREFIX "/ready");
                 rb->remove(EMPTY_SLIDE);
                 rb->splash(HZ, "Cache will be rebuilt on next restart");
@@ -1645,14 +1694,14 @@ int main_menu(void)
  */
 void set_default_config(void)
 {
-    config.spacing_between_slides = 40;
-    config.extra_spacing_for_center_slide = 0;
-    config.show_slides = 3;
+    config.spacing_between_slides = (LCD_WIDTH - DISPLAY_SIZE) / 8;
+    config.extra_spacing_for_center_slide = (LCD_WIDTH - DISPLAY_SIZE) / 16;
+    config.show_slides = 4;
     config.avg_album_width = 0;
     config.zoom = 100;
     config.show_fps = false;
     config.resize = true;
-    config.show_album_name = album_name_bottom;
+    config.show_album_name = album_name_top;
 }
 
 /**
@@ -1751,21 +1800,46 @@ static inline void draw_gradient(int y, int h)
 }
 
 
+static void track_list_yh(int char_height)
+{
+    switch (config.show_album_name)
+    {
+        case album_name_hide:
+            track_list_y = (config.show_fps ? char_height : 0);
+            track_list_h = LCD_HEIGHT - track_list_y;
+            break;
+        case album_name_bottom:
+            track_list_y = (config.show_fps ? char_height : 0);
+            track_list_h = LCD_HEIGHT - track_list_y - char_height * 2;
+            break;
+        default: /* case album_name_top */
+            track_list_y = char_height * 2;
+            track_list_h = LCD_HEIGHT - track_list_y -
+                           (config.show_fps ? char_height : 0);
+            break;
+    }
+}
+
 /**
     Reset the track list after a album change
  */
 void reset_track_list(void)
 {
-    int albumtxt_w, albumtxt_h;
-    const char* albumtxt = get_album_name(center_index);
-    MYLCD(getstringsize)(albumtxt, &albumtxt_w, &albumtxt_h);
-    const int height =
-            LCD_HEIGHT-albumtxt_h-10 - (config.show_fps?(albumtxt_h + 5):0);
-    track_list_visible_entries = fmin( height/albumtxt_h , track_count );
+    int albumtxt_h = rb->screens[SCREEN_MAIN]->getcharheight();
+    track_list_yh(albumtxt_h);
+    track_list_visible_entries = fmin( track_list_h/albumtxt_h , track_count );
     start_index_track_list = 0;
     track_scroll_index = 0;
     track_scroll_dir = 1;
     selected_track = 0;
+
+    /* let the tracklist start more centered
+     * if the screen isn't filled with tracks */
+    if (track_count*albumtxt_h < track_list_h)
+    {
+        track_list_h = track_count * albumtxt_h;
+        track_list_y = LCD_HEIGHT / 2  - (track_list_h / 2);
+    }
 }
 
 /**
@@ -1778,23 +1852,15 @@ void show_track_list(void)
         create_track_index(center_slide.slide_index);
         reset_track_list();
     }
-    static int titletxt_w, titletxt_h, titletxt_y, titletxt_x, i, color;
-    MYLCD(getstringsize)("W", NULL, &titletxt_h);
-    if (track_list_visible_entries >= track_count)
-    {
-        int albumtxt_h;
-        const char* albumtxt = get_album_name(center_index);
-        MYLCD(getstringsize)(albumtxt, NULL, &albumtxt_h);
-        titletxt_y = ((LCD_HEIGHT-albumtxt_h-10)-(track_count*albumtxt_h))/2;
-    }
-    else if (config.show_fps)
-        titletxt_y = titletxt_h + 5;
-    else
-        titletxt_y = 0;
+    static int titletxt_w, titletxt_x, color, titletxt_h;
+    titletxt_h = rb->screens[SCREEN_MAIN]->getcharheight();
 
+    int titletxt_y = track_list_y;
     int track_i;
-    for (i=0; i < track_list_visible_entries; i++) {
-        track_i = i+start_index_track_list;
+    track_i = start_index_track_list;
+    for (;track_i < track_list_visible_entries+start_index_track_list;
+         track_i++)
+    {
         MYLCD(getstringsize)(get_track_name(track_i), &titletxt_w, NULL);
         titletxt_x = (LCD_WIDTH-titletxt_w)/2;
         if ( track_i == selected_track ) {
@@ -1844,6 +1910,9 @@ void select_prev_track(void)
  */
 void draw_album_text(void)
 {
+    if (0 == config.show_album_name)
+        return;
+
     int albumtxt_w, albumtxt_h;
     int albumtxt_y = 0;
 
@@ -1874,7 +1943,11 @@ void draw_album_text(void)
         albumtxt_dir = -1;
         prev_center_index = center_index;
     }
-    albumtxt_y = LCD_HEIGHT-albumtxt_h-10;
+
+    if (config.show_album_name == album_name_top)
+        albumtxt_y = albumtxt_h / 2;
+    else
+        albumtxt_y = LCD_HEIGHT - albumtxt_h - albumtxt_h/2;
 
     if (albumtxt_w > LCD_WIDTH ) {
         MYLCD(putsxy)(albumtxt_x, albumtxt_y , albumtxt);
@@ -1976,6 +2049,7 @@ int main(void)
     long current_update;
     long update_interval = 100;
     int fps = 0;
+    int fpstxt_y;
 
     bool instant_update;
     old_drawmode = rb->lcd_get_drawmode();
@@ -2022,14 +2096,20 @@ int main(void)
             frames = 0;
         }
         /* Draw FPS */
-        if (config.show_fps) {
+        if (config.show_fps)
+        {
 #ifdef USEGSLIB
             MYLCD(set_foreground)(G_BRIGHT(255));
 #else
             MYLCD(set_foreground)(G_PIX(255,0,0));
 #endif
             rb->snprintf(fpstxt, sizeof(fpstxt), "FPS: %d", fps);
-            MYLCD(putsxy)(0, 0, fpstxt);
+            if (config.show_album_name == album_name_top)
+                fpstxt_y = LCD_HEIGHT -
+                           rb->screens[SCREEN_MAIN]->getcharheight();
+            else
+                fpstxt_y = 0;
+            MYLCD(putsxy)(0, fpstxt_y, fpstxt);
         }
         draw_album_text();
 
@@ -2119,7 +2199,8 @@ int main(void)
 
 /*************************** Plugin entry point ****************************/
 
-enum plugin_status plugin_start(const struct plugin_api *api, const void *parameter)
+enum plugin_status plugin_start(const struct plugin_api *api,
+                                const void *parameter)
 {
     int ret;
 
