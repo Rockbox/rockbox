@@ -26,11 +26,9 @@
 #include "plugin.h"
 #include "lib/pluginlib_actions.h"
 #include "lib/helper.h"
-#include "lib/bmp.h"
 #include "lib/picture.h"
 #include "pluginbitmaps/pictureflow_logo.h"
-#include "pluginbitmaps/pictureflow_emptyslide.h"
-
+#include "lib/grey.h"
 
 PLUGIN_HEADER
 
@@ -43,7 +41,34 @@ const struct button_mapping *plugin_contexts[]
 
 #define NB_ACTION_CONTEXTS sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
 
+#if LCD_DEPTH < 8
+#define USEGSLIB
+GREY_INFO_STRUCT
+#define FPLUGIN &format_grey
+#define LCD_BUF _grey_info.buffer
+#define MYLCD(fn) grey_ ## fn
+#define G_PIX(r,g,b) \
+    (77 * (unsigned)(r) + 150 * (unsigned)(g) + 29 * (unsigned)(b)) / 256
+#define N_PIX(r,g,b) LCD_BRIGHTNESS(G_PIX(r,g,b))
+#define G_BRIGHT(y) (y)
+#define N_BRIGHT(y) LCD_BRIGHTNESS(y)
+#define BUFFER_WIDTH _grey_info.width
+#define BUFFER_HEIGHT _grey_info.height
+typedef unsigned char pix_t;
+#else
+#define FPLUGIN NULL
+#define LCD_BUF rb->lcd_framebuffer
+#define MYLCD(fn) rb->lcd_ ## fn
+#define G_PIX LCD_RGBPACK
+#define N_PIX LCD_RGBPACK
+#define G_BRIGHT(y) LCD_RGBPACK(y,y,y)
+#define N_BRIGHT(y) LCD_RGBPACK(y,y,y)
+#define BUFFER_WIDTH LCD_WIDTH
+#define BUFFER_HEIGHT LCD_HEIGHT
+typedef fb_data pix_t;
+#endif
 
+#define WRNDUP(w, size) (((w)+(size)-1)/(size)*(size))
 #ifdef HAVE_SCROLLWHEEL
 #define PICTUREFLOW_NEXT_ALBUM          PLA_DOWN
 #define PICTUREFLOW_NEXT_ALBUM_REPEAT   PLA_DOWN_REPEAT
@@ -76,20 +101,11 @@ const struct button_mapping *plugin_contexts[]
 #define IANGLE_MAX 1024
 #define IANGLE_MASK 1023
 
-/* maximum size of an slide */
-#define MAX_IMG_WIDTH LCD_WIDTH
-#define MAX_IMG_HEIGHT LCD_HEIGHT
-
-#if (LCD_HEIGHT < 100)
-#define PREFERRED_IMG_WIDTH 50
-#define PREFERRED_IMG_HEIGHT 50
-#else
-#define PREFERRED_IMG_WIDTH 100
-#define PREFERRED_IMG_HEIGHT 100
-#endif
-
-#define BUFFER_WIDTH LCD_WIDTH
-#define BUFFER_HEIGHT LCD_HEIGHT
+#define DISPLAY_SIZE (LCD_HEIGHT/2)
+#define REFLECT_TOP (DISPLAY_SIZE * 4 / 3)
+#define REFLECT_HEIGHT ((DISPLAY_SIZE * 2) - REFLECT_TOP)
+#define REFLECT_SC ((0x10000U * 3 + (REFLECT_HEIGHT * 5 - 1)) / \
+    (REFLECT_HEIGHT * 5))
 
 #define SLIDE_CACHE_SIZE 100
 
@@ -115,6 +131,7 @@ const struct button_mapping *plugin_contexts[]
 #define UNIQBUF_SIZE (64*1024)
 
 #define EMPTY_SLIDE CACHE_PREFIX "/emptyslide.pfraw"
+#define EMPTY_SLIDE_BMP PLUGIN_DEMOS_DIR "/pictureflow_emptyslide.bmp"
 #define CONFIG_FILE CACHE_PREFIX "/pictureflow.config"
 
 /* Error return values */
@@ -185,8 +202,8 @@ struct config_data {
 
 /** below we allocate the memory we want to use **/
 
-static fb_data *buffer; /* for now it always points to the lcd framebuffer */
-static PFreal rays[BUFFER_WIDTH];
+static pix_t *buffer; /* for now it always points to the lcd framebuffer */
+static PFreal rays[LCD_WIDTH];
 static struct slide_data center_slide;
 static struct slide_data left_slides[MAX_SLIDES_COUNT];
 static struct slide_data right_slides[MAX_SLIDES_COUNT];
@@ -228,10 +245,12 @@ static int track_index;
 static int selected_track;
 static int selected_track_pulse;
 
-static fb_data *input_bmp_buffer;
-static fb_data *output_bmp_buffer;
-static int input_hid;
-static int output_hid;
+#define INPUT_SIZE BM_SIZE(DISPLAY_SIZE, DISPLAY_SIZE, FORMAT_NATIVE, 0)
+#define SC_BUF_SIZE BM_SCALED_SIZE(DISPLAY_SIZE, 0, FORMAT_NATIVE, 0)
+#define OUTPUT_SIZE BM_SIZE(DISPLAY_SIZE * 2, DISPLAY_SIZE, FORMAT_NATIVE, 0)
+
+void * plugin_buf;
+size_t plugin_buf_size;
 static struct config_data config;
 
 static int old_drawmode;
@@ -278,7 +297,8 @@ static int pf_state;
 
 /** code */
 
-bool create_bmp(struct bitmap* input_bmp, char *target_path, bool resize);
+bool create_bmp(struct bitmap* input_bmp, void *buf, size_t buf_size,
+                char *target_path);
 int load_surface(int);
 
 static inline PFreal fmul(PFreal a, PFreal b)
@@ -496,17 +516,12 @@ bool get_albumart_for_index_from_db(const int slide_index, char *buf, int buflen
 
     if ( rb->tagcache_get_next(&tcs) ) {
         struct mp3entry id3;
-        char size[9];
         int fd;
-        rb->snprintf(size, sizeof(size), ".%dx%d", PREFERRED_IMG_WIDTH,
-                     PREFERRED_IMG_HEIGHT);
 
         fd = rb->open(tcs.result, O_RDONLY);
         rb->get_metadata(&id3, fd, tcs.result);
         rb->close(fd);
-        if ( rb->search_albumart_files(&id3, size, buf, buflen) )
-            result = true;
-        else if ( rb->search_albumart_files(&id3, "", buf, buflen) )
+        if ( rb->search_albumart_files(&id3, "", buf, buflen) )
             result = true;
         else
             result = false;
@@ -526,8 +541,8 @@ void draw_splashscreen(void)
 {
     struct screen* display = rb->screens[0];
 
-    rb->lcd_set_background(LCD_RGBPACK(0,0,0));
-    rb->lcd_set_foreground(LCD_RGBPACK(255,255,255));
+    rb->lcd_set_background(N_BRIGHT(0));
+    rb->lcd_set_foreground(N_BRIGHT(255));
     rb->lcd_clear_display();
 
     const struct picture* logo = &(logos[display->screen_type]);
@@ -554,57 +569,14 @@ void draw_progressbar(int step)
     rb->lcd_putsxy((LCD_WIDTH - txt_w)/2, y, "Preparing album artwork");
     y += (txt_h + 5);
 
-    rb->lcd_set_foreground(LCD_RGBPACK(100,100,100));
+    rb->lcd_set_foreground(N_BRIGHT(100));
     rb->lcd_drawrect(x, y, w+2, bar_height);
-    rb->lcd_set_foreground(LCD_RGBPACK(165, 231, 82));
+    rb->lcd_set_foreground(N_PIX(165, 231, 82));
 
     rb->lcd_fillrect(x+1, y+1, step * w / album_count, bar_height-2);
-    rb->lcd_set_foreground(LCD_RGBPACK(255,255,255));
+    rb->lcd_set_foreground(N_BRIGHT(255));
     rb->lcd_update();
     rb->yield();
-}
-
-/**
-  Allocate temporary buffers
- */
-bool allocate_buffers(void)
-{
-    int input_size = MAX_IMG_WIDTH * MAX_IMG_HEIGHT * sizeof( fb_data );
-    int output_size = MAX_IMG_WIDTH * MAX_IMG_HEIGHT * sizeof( fb_data ) * 2;
-
-    input_hid = rb->bufalloc(NULL, input_size, TYPE_BITMAP);
-
-    if (input_hid < 0)
-        return false;
-
-    if (rb->bufgetdata(input_hid, 0, (void *)&input_bmp_buffer) < input_size) {
-        rb->bufclose(input_hid);
-        return false;
-    }
-
-    output_hid = rb->bufalloc(NULL, output_size, TYPE_BITMAP);
-
-    if (output_hid < 0) {
-        rb->bufclose(input_hid);
-        return false;
-    }
-
-    if (rb->bufgetdata(output_hid, 0, (void *)&output_bmp_buffer) < output_size) {
-        rb->bufclose(output_hid);
-        return false;
-    }
-    return true;
-}
-
-
-/**
-  Free the temporary buffers
- */
-bool free_buffers(void)
-{
-    rb->bufclose(input_hid);
-    rb->bufclose(output_hid);
-    return true;
 }
 
 /**
@@ -622,7 +594,7 @@ bool create_albumart_cache(bool force)
 
     config.avg_album_width = 0;
     char pfraw_file[MAX_PATH];
-    char arlbumart_file[MAX_PATH];
+    char albumart_file[MAX_PATH];
     for (i=0; i < album_count; i++)
     {
         rb->snprintf(pfraw_file, sizeof(pfraw_file), CACHE_PREFIX "/%d.pfraw", i);
@@ -630,18 +602,23 @@ bool create_albumart_cache(bool force)
         if(rb->file_exists(pfraw_file))
             rb->remove(pfraw_file);
         draw_progressbar(i);
-        if (!get_albumart_for_index_from_db(i, arlbumart_file, MAX_PATH))
+        if (!get_albumart_for_index_from_db(i, albumart_file, MAX_PATH))
             continue;
 
-        input_bmp.data = (char *)input_bmp_buffer;
-        ret = rb->read_bmp_file(arlbumart_file, &input_bmp,
-                                sizeof(fb_data)*MAX_IMG_WIDTH*MAX_IMG_HEIGHT,
-                                FORMAT_NATIVE, NULL);
+        input_bmp.data = plugin_buf;
+        input_bmp.width = DISPLAY_SIZE;
+        input_bmp.height = DISPLAY_SIZE;
+        ret = rb->read_bmp_file(albumart_file, &input_bmp,
+                                plugin_buf_size,
+                                FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
+                                FPLUGIN);
         if (ret <= 0) {
             rb->splash(HZ, "Could not read bmp");
             continue; /* skip missing/broken files */
         }
-        if (!create_bmp(&input_bmp, pfraw_file, false)) {
+        if (!create_bmp(&input_bmp, plugin_buf + WRNDUP(ret, 4),
+                        plugin_buf_size - WRNDUP(ret, 4), pfraw_file))
+        {
             rb->splash(HZ, "Could not write bmp");
         }
         config.avg_album_width += input_bmp.width;
@@ -850,8 +827,8 @@ bool save_pfraw(char* filename, struct bitmap *bm)
     int y;
     for( y = 0; y < bm->height; y++ )
     {
-        fb_data *d = (fb_data*)( bm->data ) + (y*bm->width);
-        rb->write( fh, d, sizeof( fb_data ) * bm->width );
+        pix_t *d = (pix_t*)( bm->data ) + (y*bm->width);
+        rb->write( fh, d, sizeof( pix_t ) * bm->width );
     }
     rb->close( fh );
     return true;
@@ -870,7 +847,8 @@ int read_pfraw(char* filename)
         return empty_slide_hid;
     }
 
-    int size =  sizeof(struct bitmap) + sizeof( fb_data ) * bmph.width * bmph.height;
+    int size =  sizeof(struct bitmap) + sizeof( pix_t ) * 
+                bmph.width * bmph.height;
 
     int hid = rb->bufalloc(NULL, size, TYPE_BITMAP);
     if (hid < 0) {
@@ -892,8 +870,8 @@ int read_pfraw(char* filename)
     int y;
     for( y = 0; y < bm->height; y++ )
     {
-        fb_data *d = (fb_data*)( bm->data ) + (y*bm->width);
-        rb->read( fh, d , sizeof( fb_data ) * bm->width );
+        pix_t *d = (pix_t*)( bm->data ) + (y*bm->width);
+        rb->read( fh, d , sizeof( pix_t ) * bm->width );
     }
     rb->close( fh );
     return hid;
@@ -904,39 +882,26 @@ int read_pfraw(char* filename)
   Create the slide with its reflection for the given slide_index and filename
   and store it as pfraw in CACHE_PREFIX/[slide_index].pfraw
  */
-bool create_bmp(struct bitmap *input_bmp, char *target_path, bool resize)
+bool create_bmp(struct bitmap *input_bmp, void * buffer, size_t buffer_len,
+                char *target_path)
 {
     struct bitmap output_bmp;
 
     output_bmp.format = input_bmp->format;
-    output_bmp.data = (char *)output_bmp_buffer;
+    output_bmp.data = (char *)buffer;
 
-    if ( resize ) {
-        /* resize image */
-        output_bmp.width = config.avg_album_width;
-        output_bmp.height = config.avg_album_width;
-        smooth_resize_bitmap(input_bmp, &output_bmp);
+    output_bmp.width = 2 * DISPLAY_SIZE;
+    output_bmp.height = input_bmp->width;
 
-        /* Resized bitmap is now in the output buffer,
-           copy it back to the input buffer */
-        rb->memcpy(input_bmp_buffer, output_bmp_buffer,
-                   config.avg_album_width * config.avg_album_width * sizeof(fb_data));
-        input_bmp->data = (char *)input_bmp_buffer;
-        input_bmp->width = output_bmp.width;
-        input_bmp->height = output_bmp.height;
-    }
-
-    output_bmp.width = input_bmp->width * 2;
-    output_bmp.height = input_bmp->height;
-
-    fb_data *src = (fb_data *)input_bmp->data;
-    fb_data *dst = (fb_data *)output_bmp.data;
-
+    pix_t *src = (pix_t *)input_bmp->data;
+    pix_t *dst = (pix_t *)output_bmp.data;
+    if (sizeof(pix_t) * output_bmp.width * output_bmp.height > buffer_len)
+        return 0;
     /* transpose the image, this is to speed-up the rendering
        because we process one column at a time
        (and much better and faster to work row-wise, i.e in one scanline) */
-    int hofs = input_bmp->width / 3;
-    rb->memset(dst, 0, sizeof(fb_data) * output_bmp.width * output_bmp.height);
+    int hofs = REFLECT_TOP - input_bmp->height;
+    rb->memset(dst, 0, sizeof(pix_t) * output_bmp.width * output_bmp.height);
     int x, y;
     for (x = 0; x < input_bmp->width; x++)
         for (y = 0; y < input_bmp->height; y++)
@@ -944,16 +909,20 @@ bool create_bmp(struct bitmap *input_bmp, char *target_path, bool resize)
                     src[y * input_bmp->width + x];
 
     /* create the reflection */
-    int ht = input_bmp->height - hofs;
-    int hte = ht;
-    for (x = 0; x < input_bmp->width; x++) {
-        for (y = 0; y < ht; y++) {
-            fb_data color = src[x + input_bmp->width * (input_bmp->height - y - 1)];
-            int r = RGB_UNPACK_RED(color) * (hte - y) / hte * 3 / 5;
-            int g = RGB_UNPACK_GREEN(color) * (hte - y) / hte * 3 / 5;
-            int b = RGB_UNPACK_BLUE(color) * (hte - y) / hte * 3 / 5;
-            dst[output_bmp.height + hofs + y + output_bmp.width * x] =
-                    LCD_RGBPACK(r, g, b);
+    for (y = 0; y < REFLECT_HEIGHT; y++) {
+        uint32_t sc = (REFLECT_HEIGHT - y) * REFLECT_SC;
+        for (x = 0; x < input_bmp->width; x++) {
+            pix_t color = src[x + input_bmp->width * 
+                              (input_bmp->height - y - 1)];
+#ifdef USEGSLIB
+            pix_t out = color * sc >> 16;
+#else
+            int r = RGB_UNPACK_RED(color) * sc >> 16;
+            int g = RGB_UNPACK_GREEN(color) * sc >> 16;
+            int b = RGB_UNPACK_BLUE(color) * sc >> 16;
+            pix_t out = LCD_RGBPACK(r, g, b);
+#endif
+            dst[input_bmp->height + hofs + y + output_bmp.width * x] = out;
         }
     }
     return save_pfraw(target_path, &output_bmp);
@@ -1093,8 +1062,8 @@ void reset_slides(void)
  */
 void recalc_table(void)
 {
-    int w = (BUFFER_WIDTH + 1) / 2;
-    int h = (BUFFER_HEIGHT + 1) / 2;
+    int w = (LCD_WIDTH + 1) / 2;
+    int h = (LCD_HEIGHT + 1) / 2;
     int i;
     for (i = 0; i < w; i++) {
         PFreal gg = (PFREAL_HALF + i * PFREAL_ONE) / (2 * h);
@@ -1106,7 +1075,7 @@ void recalc_table(void)
 
     offsetX = config.avg_album_width / 2 * (PFREAL_ONE - fcos(itilt));
     offsetY = config.avg_album_width / 2 * fsin(itilt);
-    offsetX += config.avg_album_width * PFREAL_ONE;
+    offsetX += config.avg_album_width * PFREAL_ONE * 3 / 4;
     offsetY += config.avg_album_width * PFREAL_ONE / 4;
     offsetX += config.extra_spacing_for_center_slide << PFREAL_SHIFT;
 }
@@ -1117,22 +1086,24 @@ void recalc_table(void)
    to an uint, multiply and compress the result back to a ushort.
  */
 #if (LCD_PIXELFORMAT == RGB565SWAPPED)
-static inline fb_data fade_color(fb_data c, unsigned int a)
+static inline pix_t fade_color(pix_t c, unsigned int a)
 {
     c = swap16(c);
     unsigned int p = ((((c|(c<<16)) & 0x07e0f81f) * a) >> 5) & 0x07e0f81f;
-    return swap16( (fb_data) (p | ( p >> 16 )) );
+    return swap16( (pix_t) (p | ( p >> 16 )) );
 }
-#else
-static inline fb_data fade_color(fb_data c, unsigned int a)
+#elif LCD_PIXELFORMAT == RGB565
+static inline pix_t fade_color(pix_t c, unsigned int a)
 {
     unsigned int p = ((((c|(c<<16)) & 0x07e0f81f) * a) >> 5) & 0x07e0f81f;
     return (p | ( p >> 16 ));
 }
+#else
+static inline pix_t fade_color(pix_t c, unsigned int a)
+{
+    return (unsigned int)c * a >> 8;
+}
 #endif
-
-
-
 
 /**
   Render a single slide
@@ -1145,7 +1116,7 @@ void render_slide(struct slide_data *slide, struct rect *result_rect,
     if (!bmp) {
         return;
     }
-    fb_data *src = (fb_data *)bmp->data;
+    pix_t *src = (pix_t *)bmp->data;
 
     const int sw = bmp->height;
     const int sh = bmp->width;
@@ -1172,7 +1143,11 @@ void render_slide(struct slide_data *slide, struct rect *result_rect,
     PFreal ys = slide->cy - bmp->width * sdy / 4;
     PFreal dist = distance * PFREAL_ONE;
 
-    const int alpha4 = alpha >> 3;
+#ifdef USEGSLIB
+    const int alphasc = alpha;
+#else
+    const int alphasc = alpha >> 3;
+#endif
 
     int xi = fmax((PFreal) 0,
                   ((w * PFREAL_ONE / 2) +
@@ -1189,9 +1164,10 @@ void render_slide(struct slide_data *slide, struct rect *result_rect,
         PFreal fk = rays[x];
         if (sdy) {
             fk = fk - fdiv(sdx, sdy);
-            hity = -fdiv(( rays[x] * distance
-                         - slide->cx
-                         + slide->cy * sdx / sdy), fk);
+            if (fk)
+                hity = -fdiv(( rays[x] * distance
+                       - slide->cx
+                       + slide->cy * sdx / sdy), fk);
         }
 
         dist = distance * PFREAL_ONE + hity;
@@ -1216,8 +1192,8 @@ void render_slide(struct slide_data *slide, struct rect *result_rect,
 
         int y1 = (h >> 1);
         int y2 = y1 + 1;
-        fb_data *pixel1 = &buffer[y1 * BUFFER_WIDTH + x];
-        fb_data *pixel2 = &buffer[y2 * BUFFER_WIDTH + x];
+        pix_t *pixel1 = &buffer[y1 * BUFFER_WIDTH + x];
+        pix_t *pixel2 = &buffer[y2 * BUFFER_WIDTH + x];
         const int pixelstep = pixel2 - pixel1;
 
         int center = (sh >> 1);
@@ -1225,7 +1201,7 @@ void render_slide(struct slide_data *slide, struct rect *result_rect,
         int p1 = center * PFREAL_ONE - (dy >> 2);
         int p2 = center * PFREAL_ONE + (dy >> 2);
 
-        const fb_data *ptr = &src[column * bmp->width];
+        const pix_t *ptr = &src[column * bmp->width];
 
         if (alpha == 256)
             while ((y1 >= 0) && (y2 < h) && (p1 >= 0)) {
@@ -1239,8 +1215,8 @@ void render_slide(struct slide_data *slide, struct rect *result_rect,
                 pixel2 += pixelstep;
         } else
             while ((y1 >= 0) && (y2 < h) && (p1 >= 0)) {
-                *pixel1 = fade_color(ptr[p1 >> PFREAL_SHIFT], alpha4);
-                *pixel2 = fade_color(ptr[p2 >> PFREAL_SHIFT], alpha4);
+                *pixel1 = fade_color(ptr[p1 >> PFREAL_SHIFT], alphasc);
+                *pixel2 = fade_color(ptr[p2 >> PFREAL_SHIFT], alphasc);
                 p1 -= dy;
                 p2 += dy;
                 y1--;
@@ -1332,8 +1308,9 @@ static inline bool is_empty_rect(struct rect *r)
 */
 void render_all_slides(void)
 {
-    rb->lcd_set_background(LCD_RGBPACK(0,0,0));
-    rb->lcd_clear_display(); /* TODO: Optimizes this by e.g. invalidating rects */
+    MYLCD(set_background)(G_BRIGHT(0));
+    /* TODO: Optimizes this by e.g. invalidating rects */
+    MYLCD(clear_display)();
 
     int nleft = config.show_slides;
     int nright = config.show_slides;
@@ -1342,7 +1319,7 @@ void render_all_slides(void)
     r.left = LCD_WIDTH; r.top = 0; r.bottom = 0; r.right = 0;
     render_slide(&center_slide, &r, 256, -1, -1);
 #ifdef DEBUG_DRAW
-    rb->lcd_drawrect(r.left, r.top, r.right - r.left, r.bottom - r.top);
+    MYLCD(drawrect)(r.left, r.top, r.right - r.left, r.bottom - r.top);
 #endif
     int c1 = r.left;
     int c2 = r.right;
@@ -1356,7 +1333,8 @@ void render_all_slides(void)
             render_slide(&left_slides[index], &r, alpha, 0, c1 - 1);
             if (!is_empty_rect(&r)) {
 #ifdef DEBUG_DRAW
-                rb->lcd_drawrect(r.left, r.top, r.right - r.left, r.bottom - r.top);
+                MYLCD->(drawrect)(r.left, r.top, r.right - r.left,
+                                  r.bottom - r.top);
 #endif
                 c1 = r.left;
             }
@@ -1366,16 +1344,17 @@ void render_all_slides(void)
             alpha -= extra_fade;
             if (alpha < 0 ) alpha = 0;
             render_slide(&right_slides[index], &r, alpha, c2 + 1,
-                         BUFFER_WIDTH);
+                         LCD_WIDTH);
             if (!is_empty_rect(&r)) {
 #ifdef DEBUG_DRAW
-                rb->lcd_drawrect(r.left, r.top, r.right - r.left, r.bottom - r.top);
+                MYLCD(drawrect)(r.left, r.top, r.right - r.left,
+                                r.bottom - r.top);
 #endif
                 c2 = r.right;
             }
         }
     } else {
-        if ( step < 0 ) c1 = BUFFER_WIDTH;
+        if ( step < 0 ) c1 = LCD_WIDTH;
         /* the first and last slide must fade in/fade out */
         for (index = 0; index < nleft; index++) {
             int alpha = 256;
@@ -1389,7 +1368,8 @@ void render_all_slides(void)
 
             if (!is_empty_rect(&r)) {
 #ifdef DEBUG_DRAW
-                rb->lcd_drawrect(r.left, r.top, r.right - r.left, r.bottom - r.top);
+                MYLCD(drawrect)(r.left, r.top, r.right - r.left,
+                                r.bottom - r.top);
 #endif
                 c1 = r.left;
             }
@@ -1404,10 +1384,11 @@ void render_all_slides(void)
             if (index == nright - 3)
                 alpha = (step > 0) ? 256 : 128 + fade / 2;
             render_slide(&right_slides[index], &r, alpha, c2 + 1,
-                         BUFFER_WIDTH);
+                         LCD_WIDTH);
             if (!is_empty_rect(&r)) {
 #ifdef DEBUG_DRAW
-                rb->lcd_drawrect(r.left, r.top, r.right - r.left, r.bottom - r.top);
+                MYLCD(drawrect)(r.left, r.top, r.right - r.left,
+                                r.bottom - r.top);
 #endif
                 c2 = r.right;
             }
@@ -1531,6 +1512,9 @@ void cleanup(void *parameter)
     }
     if ( empty_slide_hid != - 1)
         rb->bufclose(empty_slide_hid);
+#ifdef USEGSLIB
+    grey_release();
+#endif
     rb->lcd_set_drawmode(old_drawmode);
 }
 
@@ -1542,11 +1526,18 @@ int create_empty_slide(bool force)
 {
     if ( force || ! rb->file_exists( EMPTY_SLIDE ) )  {
         struct bitmap input_bmp;
-        input_bmp.width = BMPWIDTH_pictureflow_emptyslide;
-        input_bmp.height = BMPHEIGHT_pictureflow_emptyslide;
+        int ret;
+        input_bmp.width = DISPLAY_SIZE;
+        input_bmp.height = DISPLAY_SIZE;
         input_bmp.format = FORMAT_NATIVE;
-        input_bmp.data = (char*) &pictureflow_emptyslide;
-        if ( ! create_bmp(&input_bmp, EMPTY_SLIDE, true) ) return false;
+        input_bmp.data = (char*)plugin_buf;
+        ret = rb->read_bmp_file(EMPTY_SLIDE_BMP, &input_bmp,
+                                plugin_buf_size,
+                                FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
+                                FPLUGIN);
+        if ( ! create_bmp(&input_bmp, plugin_buf + WRNDUP(ret, 4),
+                          plugin_buf_size - WRNDUP(ret, 4), EMPTY_SLIDE) )
+            return false;
     }
 
     empty_slide_hid = read_pfraw( EMPTY_SLIDE );
@@ -1623,11 +1614,10 @@ int main_menu(void)
     int selection = 0;
     int result;
 
-    rb->lcd_set_foreground(LCD_RGBPACK(255,255,255));
+    rb->lcd_set_foreground(N_BRIGHT(255));
 
     MENUITEM_STRINGLIST(main_menu,"PictureFlow Main Menu",NULL,
                         "Settings", "Return", "Quit");
-
     while (1)  {
         switch (rb->do_menu(&main_menu,&selection, NULL, false)) {
             case 0:
@@ -1750,9 +1740,9 @@ static inline void draw_gradient(int y, int h)
     selected_track_pulse = (selected_track_pulse+1) % 10;
     int c2 = selected_track_pulse - 5;
     for (r=0; r<h; r++) {
-        rb->lcd_set_foreground(LCD_RGBPACK(c2+80-(c >> 9), c2+100-(c >> 9),
+        MYLCD(set_foreground)(G_PIX(c2+80-(c >> 9), c2+100-(c >> 9),
                                            c2+250-(c >> 8)));
-        rb->lcd_hline(0, LCD_WIDTH, r+y);
+        MYLCD(hline)(0, LCD_WIDTH, r+y);
         if ( r > h/2 )
             c-=inc;
         else
@@ -1768,7 +1758,7 @@ void reset_track_list(void)
 {
     int albumtxt_w, albumtxt_h;
     const char* albumtxt = get_album_name(center_index);
-    rb->lcd_getstringsize(albumtxt, &albumtxt_w, &albumtxt_h);
+    MYLCD(getstringsize)(albumtxt, &albumtxt_w, &albumtxt_h);
     const int height =
             LCD_HEIGHT-albumtxt_h-10 - (config.show_fps?(albumtxt_h + 5):0);
     track_list_visible_entries = fmin( height/albumtxt_h , track_count );
@@ -1783,18 +1773,18 @@ void reset_track_list(void)
  */
 void show_track_list(void)
 {
-    rb->lcd_clear_display();
+    MYLCD(clear_display)();
     if ( center_slide.slide_index != track_index ) {
         create_track_index(center_slide.slide_index);
         reset_track_list();
     }
     static int titletxt_w, titletxt_h, titletxt_y, titletxt_x, i, color;
-    rb->lcd_getstringsize("W", NULL, &titletxt_h);
+    MYLCD(getstringsize)("W", NULL, &titletxt_h);
     if (track_list_visible_entries >= track_count)
     {
         int albumtxt_h;
         const char* albumtxt = get_album_name(center_index);
-        rb->lcd_getstringsize(albumtxt, NULL, &albumtxt_h);
+        MYLCD(getstringsize)(albumtxt, NULL, &albumtxt_h);
         titletxt_y = ((LCD_HEIGHT-albumtxt_h-10)-(track_count*albumtxt_h))/2;
     }
     else if (config.show_fps)
@@ -1805,11 +1795,11 @@ void show_track_list(void)
     int track_i;
     for (i=0; i < track_list_visible_entries; i++) {
         track_i = i+start_index_track_list;
-        rb->lcd_getstringsize(get_track_name(track_i), &titletxt_w, NULL);
+        MYLCD(getstringsize)(get_track_name(track_i), &titletxt_w, NULL);
         titletxt_x = (LCD_WIDTH-titletxt_w)/2;
         if ( track_i == selected_track ) {
             draw_gradient(titletxt_y, titletxt_h);
-            rb->lcd_set_foreground(LCD_RGBPACK(255,255,255));
+            MYLCD(set_foreground)(G_BRIGHT(255));
             if (titletxt_w > LCD_WIDTH ) {
                 if ( titletxt_w + track_scroll_index <= LCD_WIDTH )
                     track_scroll_dir = 1;
@@ -1817,12 +1807,12 @@ void show_track_list(void)
                 track_scroll_index += track_scroll_dir*2;
                 titletxt_x = track_scroll_index;
             }
-            rb->lcd_putsxy(titletxt_x,titletxt_y,get_track_name(track_i));
+            MYLCD(putsxy)(titletxt_x,titletxt_y,get_track_name(track_i));
         }
         else {
             color = 250 - (abs(selected_track - track_i) * 200 / track_count);
-            rb->lcd_set_foreground(LCD_RGBPACK(color,color,color));
-            rb->lcd_putsxy(titletxt_x,titletxt_y,get_track_name(track_i));
+            MYLCD(set_foreground)(G_BRIGHT(color));
+            MYLCD(putsxy)(titletxt_x,titletxt_y,get_track_name(track_i));
         }
         titletxt_y += titletxt_h;
     }
@@ -1877,8 +1867,8 @@ void draw_album_text(void)
         albumtxt = get_album_name(center_index);
     }
 
-    rb->lcd_set_foreground(LCD_RGBPACK(c,c,c));
-    rb->lcd_getstringsize(albumtxt, &albumtxt_w, &albumtxt_h);
+    MYLCD(set_foreground)(G_BRIGHT(c));
+    MYLCD(getstringsize)(albumtxt, &albumtxt_w, &albumtxt_h);
     if (center_index != prev_center_index) {
         albumtxt_x = 0;
         albumtxt_dir = -1;
@@ -1887,7 +1877,7 @@ void draw_album_text(void)
     albumtxt_y = LCD_HEIGHT-albumtxt_h-10;
 
     if (albumtxt_w > LCD_WIDTH ) {
-        rb->lcd_putsxy(albumtxt_x, albumtxt_y , albumtxt);
+        MYLCD(putsxy)(albumtxt_x, albumtxt_y , albumtxt);
         if ( pf_state == pf_idle || pf_state == pf_show_tracks ) {
             if ( albumtxt_w + albumtxt_x <= LCD_WIDTH ) albumtxt_dir = 1;
             else if ( albumtxt_x >= 0 ) albumtxt_dir = -1;
@@ -1895,7 +1885,7 @@ void draw_album_text(void)
         }
     }
     else {
-        rb->lcd_putsxy((LCD_WIDTH - albumtxt_w) /2, albumtxt_y , albumtxt);
+        MYLCD(putsxy)((LCD_WIDTH - albumtxt_w) /2, albumtxt_y , albumtxt);
     }
 
 
@@ -1923,11 +1913,6 @@ int main(void)
         return PLUGIN_ERROR;
     }
 
-    if (!allocate_buffers()) {
-        rb->splash(HZ, "Could not allocate temporary buffers");
-        return PLUGIN_ERROR;
-    }
-
     ret = create_album_index();
     if (ret == ERROR_BUFFER_FULL) {
         rb->splash(HZ, "Not enough memory for album names");
@@ -1947,11 +1932,6 @@ int main(void)
         return PLUGIN_ERROR;
     }
 
-    if (!free_buffers()) {
-        rb->splash(HZ, "Could not free temporary buffers");
-        return PLUGIN_ERROR;
-    }
-
     if (!create_pf_thread()) {
         rb->splash(HZ, "Cannot create thread!");
         return PLUGIN_ERROR;
@@ -1968,7 +1948,12 @@ int main(void)
     }
     slide_cache_stack_index = min_slide_cache-1;
     slide_cache_in_use = 0;
-    buffer = rb->lcd_framebuffer;
+#ifdef USEGSLIB
+    if (!grey_init(rb, plugin_buf, plugin_buf_size, GREY_BUFFERED|GREY_ON_COP,
+                   LCD_WIDTH, LCD_HEIGHT, NULL))
+        rb->splash(HZ, "Greylib init failed!");
+#endif
+    buffer = LCD_BUF;
 
     pf_state = pf_idle;
 
@@ -1994,7 +1979,10 @@ int main(void)
 
     bool instant_update;
     old_drawmode = rb->lcd_get_drawmode();
-    rb->lcd_set_drawmode(DRMODE_FG);
+#ifdef USEGSLIB
+    grey_show(true);
+#endif
+    MYLCD(set_drawmode)(DRMODE_FG);
     while (true) {
         current_update = *rb->current_tick;
         frames++;
@@ -2033,19 +2021,21 @@ int main(void)
             last_update = current_update;
             frames = 0;
         }
-
         /* Draw FPS */
         if (config.show_fps) {
-            rb->lcd_set_foreground(LCD_RGBPACK(255, 0, 0));
+#ifdef USEGSLIB
+            MYLCD(set_foreground)(G_BRIGHT(255));
+#else
+            MYLCD(set_foreground)(G_PIX(255,0,0));
+#endif
             rb->snprintf(fpstxt, sizeof(fpstxt), "FPS: %d", fps);
-            rb->lcd_putsxy(0, 0, fpstxt);
+            MYLCD(putsxy)(0, 0, fpstxt);
         }
-
         draw_album_text();
 
 
         /* Copy offscreen buffer to LCD and give time to other threads */
-        rb->lcd_update();
+        MYLCD(update)();
         rb->yield();
 
         /*/ Handle buttons */
@@ -2058,10 +2048,16 @@ int main(void)
 
         case PICTUREFLOW_MENU:
             if ( pf_state == pf_idle || pf_state == pf_scrolling ) {
+#ifdef USEGSLIB
+    grey_show(false);
+#endif
                 ret = main_menu();
                 if ( ret == -1 ) return PLUGIN_OK;
                 if ( ret != 0 ) return i;
-                rb->lcd_set_drawmode(DRMODE_FG);
+#ifdef USEGSLIB
+    grey_show(true);
+#endif
+                MYLCD(set_drawmode)(DRMODE_FG);
             }
             else {
                 pf_state = pf_cover_out;
@@ -2137,6 +2133,9 @@ enum plugin_status plugin_start(const struct plugin_api *api, const void *parame
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
+    plugin_buf = rb->plugin_get_buffer(&plugin_buf_size);
+    plugin_buf_size = rb->align_buffer(PUN_PTR(void**,&plugin_buf),
+                                       plugin_buf_size, 4);
     ret = main();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);

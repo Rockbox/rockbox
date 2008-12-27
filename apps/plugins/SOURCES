@@ -129,10 +129,9 @@ splitedit.c
 
 #if LCD_DEPTH > 1                  /* non-mono bitmap targets */
 matrix.c
-#endif
-
-#if defined(HAVE_LCD_COLOR) && defined(HAVE_ALBUMART) && defined(HAVE_TAGCACHE)
+#if defined(HAVE_ALBUMART) && defined(HAVE_TAGCACHE)
 pictureflow.c
+#endif
 #endif
 
 /* Platform-specific plugins */

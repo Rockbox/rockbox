@@ -345,6 +345,10 @@ STOP
         copy("$ROOT/apps/plugins/snake2.levels", "$rbdir/rocks/games/snake2.levels"); # snake2 levels
     }
 
+    if(-e "$rbdir/rocks/demos/pictureflow.rock") {
+        copy("$ROOT/apps/plugins/bitmaps/native/pictureflow_emptyslide.100x100x16.bmp", "$rbdir/rocks/demos/pictureflow_emptyslide.bmp");
+    }
+
     if($image) {
         # image is blank when this is a simulator
         if( filesize("rockbox.ucl") > 1000 ) {
