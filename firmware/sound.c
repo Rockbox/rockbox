@@ -41,6 +41,8 @@
  * find a nice way to handle 1.5db steps -> see wm8751 ifdef in sound_set_bass/treble
 */
 
+#define ONE_DB 10
+
 #if !defined(VOLUME_MIN) && !defined(VOLUME_MAX)
 #warning define for VOLUME_MIN and VOLUME_MAX is missing
 #define VOLUME_MIN -700
@@ -283,17 +285,15 @@ static void set_prescaled_volume(void)
 
     l = r = current_volume + prescale;
 
+    /* Balance the channels scaled by the current volume and min volume. */
+    /* Subtract a dB from VOLUME_MIN to get it to a mute level */
     if (current_balance > 0)
     {
-        l -= current_balance;
-        if (l < VOLUME_MIN)
-            l = VOLUME_MIN;
+        l -= ((l - (VOLUME_MIN - ONE_DB)) * current_balance) / VOLUME_RANGE;
     }
-    if (current_balance < 0)
+    else if (current_balance < 0)
     {
-        r += current_balance;
-        if (r < VOLUME_MIN)
-            r = VOLUME_MIN;
+        r += ((r - (VOLUME_MIN - ONE_DB)) * current_balance) / VOLUME_RANGE;
     }
 
 #if CONFIG_CODEC == MAS3507D
