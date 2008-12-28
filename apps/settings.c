@@ -725,10 +725,6 @@ void sound_settings_apply(void)
     sound_set(SOUND_BASS_CUTOFF, global_settings.bass_cutoff);
     sound_set(SOUND_TREBLE_CUTOFF, global_settings.treble_cutoff);
 #endif
-
-#ifdef HAVE_USB_CHARGING_ENABLE
-    usb_charging_enable(global_settings.usb_charging);
-#endif
 }
 
 void settings_apply(bool read_disk)
@@ -956,6 +952,10 @@ void settings_apply(bool read_disk)
 
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
     touchpad_set_sensitivity(global_settings.touchpad_sensitivity);
+#endif
+
+#ifdef HAVE_USB_CHARGING_ENABLE
+    usb_charging_enable(global_settings.usb_charging);
 #endif
 
     /* This should stay last */
