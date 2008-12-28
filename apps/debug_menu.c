@@ -2320,19 +2320,19 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     simplelist_addline(SIMPLELIST_ADD_LINE, "SI4700 regs:");
     /* Registers */
     simplelist_addline(SIMPLELIST_ADD_LINE,
-             "   %04X %04X %04X %04X",
+             "%04X %04X %04X %04X",
              (unsigned)nfo.regs[0], (unsigned)nfo.regs[1],
              (unsigned)nfo.regs[2], (unsigned)nfo.regs[3]);
     simplelist_addline(SIMPLELIST_ADD_LINE,
-             "   %04X %04X %04X %04X",
+             "%04X %04X %04X %04X",
              (unsigned)nfo.regs[4], (unsigned)nfo.regs[5],
              (unsigned)nfo.regs[6], (unsigned)nfo.regs[7]);
     simplelist_addline(SIMPLELIST_ADD_LINE,
-             "   %04X %04X %04X %04X",
+             "%04X %04X %04X %04X",
              (unsigned)nfo.regs[8], (unsigned)nfo.regs[9],
              (unsigned)nfo.regs[10], (unsigned)nfo.regs[11]);
     simplelist_addline(SIMPLELIST_ADD_LINE,
-             "   %04X %04X %04X %04X",
+             "%04X %04X %04X %04X",
              (unsigned)nfo.regs[12], (unsigned)nfo.regs[13],
              (unsigned)nfo.regs[14], (unsigned)nfo.regs[15]);
 #endif /* SI4700 */
