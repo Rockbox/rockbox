@@ -534,20 +534,18 @@ void grey_gray_bitmap(const unsigned char *src, int x, int y, int width,
 void grey_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 {
     int ch;
+    unsigned short *ucs;
     struct font* pf = _grey_info.rb->font_get(_grey_info.curfont);
+    
+    ucs = _grey_info.rb->bidi_l2v(str, 1);
 
-    while ((ch = *str++) != '\0' && x < _grey_info.width)
+    while ((ch = *ucs++) != 0 && x < _grey_info.width)
     {
         int width;
         const unsigned char *bits;
 
-        /* check input range */
-        if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
-            ch = pf->defaultchar;
-        ch -= pf->firstchar;
-
         /* get proportional width and glyph bits */
-        width = pf->width ? pf->width[ch] : pf->maxwidth;
+        width = _grey_info.rb->font_get_width(pf, ch);
 
         if (ofs > width)
         {
@@ -555,8 +553,7 @@ void grey_putsxyofs(int x, int y, int ofs, const unsigned char *str)
             continue;
         }
 
-        bits = pf->bits + (pf->offset ?
-               pf->offset[ch] : (((pf->height + 7) >> 3) * pf->maxwidth * ch));
+        bits = _grey_info.rb->font_get_bits(pf, ch);
 
         grey_mono_bitmap_part(bits, ofs, 0, width, x, y, width - ofs, pf->height);
         
