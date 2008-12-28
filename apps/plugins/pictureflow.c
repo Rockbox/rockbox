@@ -1896,6 +1896,8 @@ void draw_album_text(void)
 int main(void)
 {
     int ret;
+    
+    rb->lcd_setfont(FONT_UI);
     draw_splashscreen();
 
     if ( ! rb->dir_exists( CACHE_PREFIX ) ) {
@@ -1951,6 +1953,7 @@ int main(void)
     if (!grey_init(rb, plugin_buf, plugin_buf_size, GREY_BUFFERED|GREY_ON_COP,
                    LCD_WIDTH, LCD_HEIGHT, NULL))
         rb->splash(HZ, "Greylib init failed!");
+    grey_setfont(FONT_UI);
 #endif
     buffer = LCD_BUF;
 
