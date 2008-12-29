@@ -21,6 +21,7 @@
 
 #include "usb.h"
 #include "power.h"
+#include "as3525.h"
 #include <stdbool.h>
 
 void usb_enable(bool on)
@@ -35,6 +36,14 @@ void usb_init_device(void)
 
 int usb_detect(void)
 {
+#if defined(SANSA_CLIP)
+    return !GPIOA_PIN(6);
+#elif defined(SANSA_FUZE) || defined(SANSA_E200V2)
+    return !GPIOA_PIN(3);
+#elif defined(SANSA_C200V2)
+    return !GPIOA_PIN(1);
+#else
     /* TODO: Implement USB detection */
     return USB_EXTRACTED;
+#endif
 }
