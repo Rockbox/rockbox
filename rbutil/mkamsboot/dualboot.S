@@ -88,6 +88,8 @@ uclcopy:
         str   r1, [r0, #0x400]
 #ifdef SANSA_C200V2
         ldr   r1, [r0, #0x8]    /* USB is A1 on C200 */
+#elif defined(SANSA_CLIP)
+        ldr   r1, [r0, #0x100]    /* USB is A6 on Clip */
 #else
         ldr   r1, [r0, #0x20]    /* read pin A3 */
 #endif
