@@ -1156,7 +1156,7 @@ void putbits(uint32_t val, uint32_t nbit)
 /*  of the Huffman tables as defined in the IS (Table B.7), and will not   */
 /*  work with any arbitrary tables.                                        */
 /***************************************************************************/
-int choose_table( short *ix, uint32_t begin, uint32_t end, int *bits )
+static int choose_table( short *ix, uint32_t begin, uint32_t end, int *bits )
 {
   uint32_t i;
   int    max, table0, table1;
@@ -1301,7 +1301,7 @@ int count_bigv(short *ix, uint32_t start, uint32_t end, int table0,
 /* Function: Calculation of rzero, count1, address3                      */
 /* (Partitions ix into big values, quadruples and zeros).                */
 /*************************************************************************/
-int calc_runlen( short *ix, side_info_t *si )
+static int calc_runlen( short *ix, side_info_t *si )
 {
   int  p, i, sum = 0;
 
@@ -1347,7 +1347,7 @@ int calc_runlen( short *ix, side_info_t *si )
 /*************************************************************************/
 /*   Function: Quantization of the vector xr ( -> ix)                    */
 /*************************************************************************/
-int quantize_int(int *xr, short *ix, side_info_t *si)
+static int quantize_int(int *xr, short *ix, side_info_t *si)
 {
   unsigned int i, idx, s, frac_pow[] = { 0x10000, 0xd745, 0xb505, 0x9838 };
 
@@ -1379,7 +1379,7 @@ int quantize_int(int *xr, short *ix, side_info_t *si)
 /*************************************************************************/
 /* subdivides the bigvalue region which will use separate Huffman tables */
 /*************************************************************************/
-void subdivide(side_info_t *si)
+static void subdivide(side_info_t *si)
 {
   int scfb, count0, count1;
   
@@ -1407,7 +1407,7 @@ void subdivide(side_info_t *si)
 /*******************************************************************/
 /* Count the number of bits necessary to code the bigvalues region */
 /*******************************************************************/
-int bigv_bitcount(short *ix, side_info_t *gi)
+static int bigv_bitcount(short *ix, side_info_t *gi)
 {
   int b1=0, b2=0, b3=0;
 
@@ -1428,7 +1428,7 @@ int bigv_bitcount(short *ix, side_info_t *gi)
   return b1+b2+b3;
 }
 
-int quantize_and_count_bits(int *xr, short *ix, side_info_t *si)
+static int quantize_and_count_bits(int *xr, short *ix, side_info_t *si)
 {
   int bits = 10000;
 
@@ -1445,7 +1445,7 @@ int quantize_and_count_bits(int *xr, short *ix, side_info_t *si)
 /************************************************************************/
 /* The code selects the best quantStep for a particular set of scalefacs*/
 /************************************************************************/ 
-int inner_loop(int *xr, int max_bits, side_info_t *si)
+static int inner_loop(int *xr, int max_bits, side_info_t *si)
 {
   int bits;
 
@@ -1469,7 +1469,7 @@ int inner_loop(int *xr, int max_bits, side_info_t *si)
   return bits;
 }
 
-void iteration_loop(int *xr, side_info_t *si, int gr_cnt)
+static void iteration_loop(int *xr, side_info_t *si, int gr_cnt)
 {
   int remain, tar_bits, max_bits = cfg.mean_bits;
 
@@ -1971,10 +1971,10 @@ static int find_samplerate_index(long freq, int *mp3_type)
     return i;    
 }
 
-bool init_mp3_encoder_engine(int sample_rate,
-                             int num_channels,
-                             int rec_mono_mode,
-                             struct encoder_config *enc_cfg)
+static bool init_mp3_encoder_engine(int sample_rate,
+                                    int num_channels,
+                                    int rec_mono_mode,
+                                    struct encoder_config *enc_cfg)
 {
     const bool stereo = num_channels > 1;
     uint32_t avg_byte_per_frame;
@@ -2157,7 +2157,7 @@ static inline void byte_swap_frame32(uint32_t *dst, uint32_t *src,
 } /* byte_swap_frame32 */
 #endif /* ROCKBOX_LITTLE_ENDIAN */
 
-void set_scale_facs(int *mdct_freq)
+static void set_scale_facs(int *mdct_freq)
 {
   unsigned int i, is, ie, k, s;
   int max_freq_val, avrg_freq_val;

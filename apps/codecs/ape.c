@@ -57,11 +57,11 @@ static int32_t decoded1[BLOCKS_PER_LOOP] IBSS_ATTR;
    skip in that frame.
 */
 
-bool ape_calc_seekpos(struct ape_ctx_t* ape_ctx,
-                      uint32_t new_sample,
-                      uint32_t* newframe,
-                      uint32_t* filepos,
-                      uint32_t* samplestoskip)
+static bool ape_calc_seekpos(struct ape_ctx_t* ape_ctx,
+                             uint32_t new_sample,
+                             uint32_t* newframe,
+                             uint32_t* filepos,
+                             uint32_t* samplestoskip)
 {
     uint32_t n;
 
@@ -82,9 +82,9 @@ bool ape_calc_seekpos(struct ape_ctx_t* ape_ctx,
 /* The resume offset is a value in bytes - we need to
    turn it into a frame number and samplestoskip value */
 
-void ape_resume(struct ape_ctx_t* ape_ctx, size_t resume_offset, 
-                uint32_t* currentframe, uint32_t* samplesdone, 
-                uint32_t* samplestoskip, int* firstbyte)
+static void ape_resume(struct ape_ctx_t* ape_ctx, size_t resume_offset, 
+                       uint32_t* currentframe, uint32_t* samplesdone, 
+                       uint32_t* samplestoskip, int* firstbyte)
 {
     off_t newfilepos;
     int64_t framesize;

@@ -264,27 +264,27 @@ void mixer_playsample(int channel, int instrument)
     modplayer.modchannel[channel].instrument = instrument;
 }
 
-inline void mixer_stopsample(int channel)
+static inline void mixer_stopsample(int channel)
 {
     mixer.channel[channel].channelactive = false;
 }
 
-inline void mixer_continuesample(int channel)
+static inline void mixer_continuesample(int channel)
 {
     mixer.channel[channel].channelactive = true;
 }
 
-inline void mixer_setvolume(int channel, int volume)
+static inline void mixer_setvolume(int channel, int volume)
 {
     mixer.channel[channel].volume = volume;
 }
 
-inline void mixer_setpanning(int channel, int panning)
+static inline void mixer_setpanning(int channel, int panning)
 {
     mixer.channel[channel].panning = panning;
 }
 
-inline void mixer_setamigaperiod(int channel, int amigaperiod)
+static inline void mixer_setamigaperiod(int channel, int amigaperiod)
 {
     /* Just to make sure we don't devide by zero
      * amigaperiod shouldn't 0 anyway - if it is the case
@@ -1090,7 +1090,7 @@ void playeffect(int currenttick)
     }
 }
 
-inline int clip(int i)
+static inline int clip(int i)
 {
     if (i > 32767) return(32767);
     else if (i < -32768) return(-32768);

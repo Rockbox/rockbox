@@ -56,7 +56,7 @@ unsigned char mad_main_data[MAD_BUFFER_MDLEN] IBSS_ATTR;
 int mpeg_latency[3] = { 0, 481, 529 };
 int mpeg_framesize[3] = {384, 1152, 1152};
 
-void init_mad(void)
+static void init_mad(void)
 {
     ci->memset(&stream, 0, sizeof(struct mad_stream));
     ci->memset(&frame, 0, sizeof(struct mad_frame));
@@ -85,7 +85,7 @@ void init_mad(void)
     
 }
 
-int get_file_pos(int newtime)
+static int get_file_pos(int newtime)
 {
     int pos = -1;
     struct mp3entry *id3 = ci->id3;

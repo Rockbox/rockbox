@@ -4294,7 +4294,7 @@ jammed:
 
 /****************** rockbox interface ******************/
 
-void set_codec_track(int t, int d) {
+static void set_codec_track(int t, int d) {
     int track,fade,def=0;
     SetTrack(t);
 

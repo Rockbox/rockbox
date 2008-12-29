@@ -180,7 +180,7 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
 }
 
 /* Synchronize to next frame in stream - adapted from libFLAC 1.1.3b2 */
-bool frame_sync(FLACContext* fc) {
+static bool frame_sync(FLACContext* fc) {
     unsigned int x = 0;
     bool cached = false;
 
@@ -232,7 +232,7 @@ bool frame_sync(FLACContext* fc) {
 }
 
 /* Seek to sample - adapted from libFLAC 1.1.3b2+ */
-bool flac_seek(FLACContext* fc, uint32_t target_sample) {
+static bool flac_seek(FLACContext* fc, uint32_t target_sample) {
     off_t orig_pos = ci->curpos;
     off_t pos = -1;
     unsigned long lower_bound, upper_bound;
@@ -385,7 +385,7 @@ bool flac_seek(FLACContext* fc, uint32_t target_sample) {
 }
 
 /* Seek to file offset */
-bool flac_seek_offset(FLACContext* fc, uint32_t offset) {
+static bool flac_seek_offset(FLACContext* fc, uint32_t offset) {
     unsigned unparseable_count;
     bool got_a_frame = false;
 

@@ -27,14 +27,14 @@ CODEC_HEADER
 mpc_decoder decoder IBSS_ATTR;
 
 /* Our implementations of the mpc_reader callback functions. */
-mpc_int32_t read_impl(void *data, void *ptr, mpc_int32_t size)
+static mpc_int32_t read_impl(void *data, void *ptr, mpc_int32_t size)
 {
     struct codec_api *ci = (struct codec_api *)data;
 
     return ((mpc_int32_t)(ci->read_filebuf(ptr, size)));
 }
 
-mpc_bool_t seek_impl(void *data, mpc_int32_t offset)
+static mpc_bool_t seek_impl(void *data, mpc_int32_t offset)
 {  
     struct codec_api *ci = (struct codec_api *)data;
 
@@ -43,21 +43,21 @@ mpc_bool_t seek_impl(void *data, mpc_int32_t offset)
     return ci->seek_buffer(offset);
 }
 
-mpc_int32_t tell_impl(void *data)
+static mpc_int32_t tell_impl(void *data)
 {
     struct codec_api *ci = (struct codec_api *)data;
 
     return ci->curpos;
 }
 
-mpc_int32_t get_size_impl(void *data)
+static mpc_int32_t get_size_impl(void *data)
 {
     struct codec_api *ci = (struct codec_api *)data;
     
     return ci->filesize;
 }
 
-mpc_bool_t canseek_impl(void *data)
+static mpc_bool_t canseek_impl(void *data)
 {
     (void)data;
     

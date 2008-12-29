@@ -83,7 +83,7 @@ static void read_chunk_ftyp(qtmovie_t *qtmovie, size_t chunk_len)
     }
 }
 
-uint32_t mp4ff_read_mp4_descr_length(stream_t* stream)
+static uint32_t mp4ff_read_mp4_descr_length(stream_t* stream)
 {
     uint8_t b;
     uint8_t numBytes = 0;

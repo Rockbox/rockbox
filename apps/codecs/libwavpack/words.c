@@ -253,7 +253,7 @@ int read_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd)
 // currently implemented) this is calculated from the slow_level values and the
 // bitrate accumulators. Note that the bitrate accumulators can be changing.
 
-void update_error_limit (struct words_data *w, uint32_t flags)
+static void update_error_limit (struct words_data *w, uint32_t flags)
 {
     int bitrate_0 = (w->bitrate_acc [0] += w->bitrate_delta [0]) >> 16;
 

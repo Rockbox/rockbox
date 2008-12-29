@@ -51,7 +51,7 @@ static void gen_rand_vector(real_t *spec, int16_t scale_factor, uint16_t size,
 
 /* fixed point square root approximation */
 /* !!!! ONLY WORKS FOR EVEN %REAL_BITS% !!!! */
-real_t fp_sqrt(real_t value)
+static real_t fp_sqrt(real_t value)
 {
     real_t root = 0;
 

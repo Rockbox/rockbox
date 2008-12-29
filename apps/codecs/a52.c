@@ -43,7 +43,7 @@ static inline void output_audio(sample_t *samples)
     ci->pcmbuf_insert(&samples[0], &samples[256], 256);
 }
 
-void a52_decode_data(uint8_t *start, uint8_t *end)
+static void a52_decode_data(uint8_t *start, uint8_t *end)
 {
     static uint8_t *bufptr = buf;
     static uint8_t *bufpos = buf + 7;
