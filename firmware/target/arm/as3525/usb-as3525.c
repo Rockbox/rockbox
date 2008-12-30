@@ -41,13 +41,17 @@ void usb_enable(bool on)
 
 void usb_init_device(void)
 {
+#ifdef USB_DETECT_PIN
     GPIOA_DIR &= ~(1 << USB_DETECT_PIN); /* set as input */
+#endif
 }
 
 int usb_detect(void)
 {
+#ifdef USB_DETECT_PIN
     if (GPIOA_PIN( USB_DETECT_PIN ))
         return USB_INSERTED;
     else
+#endif
         return USB_EXTRACTED;
 }
