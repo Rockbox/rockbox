@@ -303,6 +303,12 @@ interface */
 #define TIMER_PRESCALE_16   0x04
 #define TIMER_PRESCALE_256 0x08
 
+
+/* Watchdog registers */
+#define WDT_LOAD        (*(volatile unsigned long*)(WDT_BASE))
+#define WDT_CONTROL     (*(volatile unsigned long*)(WDT_BASE+8))
+
+
 /* GPIO registers */
 
 #define GPIOA_DIR       (*(volatile unsigned char*)(GPIOA_BASE+0x400))

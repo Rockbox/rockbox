@@ -272,6 +272,11 @@ void system_init(void)
 
 void system_reboot(void)
 {
+    /* use watchdog to reset */
+    CGU_PERI |= (CGU_WDOCNT_CLOCK_ENABLE | CGU_WDOIF_CLOCK_ENABLE);
+    WDT_LOAD = 1; /* set counter to 1 */
+    WDT_CONTROL = 3; /* enable watchdog counter & reset */
+    while(1);
 }
 
 int system_memory_guard(int newmode)
