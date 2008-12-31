@@ -99,4 +99,6 @@ struct gui_syncstatusbar
 extern void gui_syncstatusbar_init(struct gui_syncstatusbar * bars);
 extern void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars, bool force_redraw);
 extern int  gui_statusbar_height(void);
+void gui_statusbar_changed(bool enabled);
+
 #endif /*_GUI_STATUSBAR_H_*/

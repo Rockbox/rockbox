@@ -556,7 +556,6 @@ static int keybox(void)
 
     while (!done)
     {
-        rb->gui_syncstatusbar_draw(rb->statusbars, true);
         rb->gui_synclist_draw(&kb_list);
         button = rb->get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
         if (rb->gui_synclist_do_button(&kb_list, &button, LIST_WRAP_ON))

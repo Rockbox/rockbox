@@ -278,7 +278,6 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
      *  - an action taken while pressing the enter button,
      *    then release the enter button*/
     bool can_quit = false;
-    gui_syncstatusbar_draw(&statusbars, true);
     FOR_NB_SCREENS(i)
     {
         screens[i].set_viewport(NULL);
@@ -315,8 +314,6 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
             
         if(button==ACTION_STD_CANCEL)
             break;
-            
-        gui_syncstatusbar_draw(&statusbars, false);
     }
     /* Notify that we're exiting this screen */
     cond_talk_ids_fq(VOICE_OK);

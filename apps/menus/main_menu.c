@@ -117,7 +117,8 @@ static bool show_credits(void)
     {
         /* show the rockbox logo and version untill a button is pressed */
         show_logo();
-        get_action(CONTEXT_STD, TIMEOUT_BLOCK);
+        while (IS_SYSEVENT(get_action(CONTEXT_STD, TIMEOUT_BLOCK)))
+            ;
     }
     return false;
 }

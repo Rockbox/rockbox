@@ -98,7 +98,6 @@ int menu_show(int m)
     int key;
 
     rb->gui_synclist_draw(&(menus[m].synclist));
-    rb->gui_syncstatusbar_draw(rb->statusbars, true);
     while (!exit) {
         key = rb->get_action(CONTEXT_MAINMENU,HZ/2);
         /*
@@ -126,7 +125,6 @@ int menu_show(int m)
                     return MENU_ATTACHED_USB;
                 break;
         }
-        rb->gui_syncstatusbar_draw(rb->statusbars, false);
     }
     return MENU_SELECTED_EXIT;
 }
@@ -149,7 +147,6 @@ bool menu_run(int m)
                 if (menus[m].items[selected].function &&
                     menus[m].items[selected].function())
                     return  true;
-                rb->gui_syncstatusbar_draw(rb->statusbars, true);
             }
         }
     }

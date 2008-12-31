@@ -52,6 +52,7 @@
 #ifdef IPOD_ACCESSORY_PROTOCOL
 #include "iap.h"
 #endif
+#include "statusbar.h"
 
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
 /** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
@@ -545,7 +546,7 @@ const struct settings_list settings[] = {
                     ID2P(LANG_INVERT_CURSOR_BAR)),
  #endif
     OFFON_SETTING(F_THEMESETTING|F_TEMPVAR, statusbar,
-                  LANG_STATUS_BAR, true,"statusbar", NULL),
+                  LANG_STATUS_BAR, true,"statusbar", gui_statusbar_changed),
     OFFON_SETTING(0,scrollbar, LANG_SCROLL_BAR, true,"scrollbar", NULL),
 #if CONFIG_KEYPAD == RECORDER_PAD
     OFFON_SETTING(0,buttonbar, LANG_BUTTON_BAR ,true,"buttonbar", NULL),

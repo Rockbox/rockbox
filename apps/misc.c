@@ -33,6 +33,7 @@
 #endif
 #else
 #include "sprintf.h"
+#include "appevents.h"
 #include "lang.h"
 #include "string.h"
 #include "dir.h"
@@ -60,6 +61,7 @@
 #include "sound.h"
 #include "playlist.h"
 #include "yesno.h"
+#include "viewport.h"
 
 #ifdef IPOD_ACCESSORY_PROTOCOL
 #include "iap.h"
@@ -904,6 +906,9 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
 {
     switch(event)
     {
+        case SYS_FOURHERTZ:
+            send_event(GUI_EVENT_FOURHERTZ, NULL);
+            break;
         case SYS_BATTERY_UPDATE:
             if(global_settings.talk_battery_level)
             {

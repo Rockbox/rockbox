@@ -473,7 +473,6 @@ static int update_dir(void)
 #endif
     gui_synclist_draw(&tree_lists);
     gui_synclist_speak_item(&tree_lists);
-    gui_syncstatusbar_draw(&statusbars, true);
     return tc.filesindir;
 }
 
@@ -600,7 +599,7 @@ static int dirbrowse()
 {
     int numentries=0;
     char buf[MAX_PATH];
-    unsigned button, oldbutton;
+    int button, oldbutton;
     bool reload_root = false;
     int lastfilter = *tc.dirfilter;
     bool lastsortcase = global_settings.sort_case;
@@ -796,10 +795,6 @@ static int dirbrowse()
                 }
                 break;
             }
-
-            case ACTION_NONE:
-                gui_syncstatusbar_draw(&statusbars, false);
-                break;
 
 #ifdef HAVE_HOTSWAP
             case SYS_FS_CHANGED:

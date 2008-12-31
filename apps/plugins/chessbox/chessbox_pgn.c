@@ -640,7 +640,6 @@ struct pgn_game_node* pgn_show_game_list(const struct plugin_api* api,
     rb->gui_synclist_select_item(&games_list, 0);
 
     while (true) {
-        rb->gui_syncstatusbar_draw(rb->statusbars, true);
         rb->gui_synclist_draw(&games_list);
         curr_selection = rb->gui_synclist_get_sel_pos(&games_list);
         button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);

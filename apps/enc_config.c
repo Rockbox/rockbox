@@ -295,7 +295,6 @@ static int enc_menuitem_callback(int action,
             encoder_config_to_global(data->cfg);
         }
 
-        gui_syncstatusbar_draw(&statusbars, true);
     }
     return action;
 }

@@ -33,6 +33,9 @@
 #include "viewport.h"
 #include "statusbar.h"
 #include "screen_access.h"
+#include "appevents.h"
+
+static bool statusbar_enabled = true;
 
 int viewport_get_nb_lines(struct viewport *vp)
 {
@@ -50,7 +53,7 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
     vp->x = 0;
     vp->width = screens[screen].lcdwidth;
 
-    vp->y = gui_statusbar_height();
+    vp->y = statusbar_enabled?gui_statusbar_height():0;
     vp->height = screens[screen].lcdheight - vp->y;
 #ifdef HAVE_LCD_BITMAP
     vp->drawmode = DRMODE_SOLID;
@@ -81,4 +84,32 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
         vp->bg_pattern = LCD_REMOTE_DEFAULT_BG;
     }
 #endif
+}
+
+
+void viewportmanager_set_statusbar(bool enabled)
+{
+    if (enabled && global_settings.statusbar)
+    {
+        add_event(GUI_EVENT_FOURHERTZ, false, viewportmanager_draw_statusbars);
+        gui_syncstatusbar_draw(&statusbars, true);
+    }
+    else
+    {
+        remove_event(GUI_EVENT_FOURHERTZ, viewportmanager_draw_statusbars);
+    }
+    statusbar_enabled = enabled;
+}
+
+void viewportmanager_draw_statusbars(void* data)
+{
+    (void)data;
+    if (statusbar_enabled)
+        gui_syncstatusbar_draw(&statusbars, false);
+}
+
+void viewportmanager_statusbar_changed(void* data)
+{
+    (void)data;
+    viewportmanager_set_statusbar(statusbar_enabled);
 }

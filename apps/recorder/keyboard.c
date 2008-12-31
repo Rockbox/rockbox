@@ -743,7 +743,6 @@ int kbd_input(char* text, int buflen)
             sc->set_drawmode(DRMODE_SOLID);
         }
 
-        gui_syncstatusbar_draw(&statusbars, true);
         FOR_NB_SCREENS(l)
             screens[l].update();
 
@@ -1190,7 +1189,6 @@ int kbd_input(char* text, int buflen)
 #endif /* !defined (KBD_MODES) || defined (KBD_CURSOR_KEYS) */
 
             case BUTTON_NONE:
-                gui_syncstatusbar_draw(&statusbars, false);
 #ifdef KBD_MORSE_INPUT
                 if (morse_reading)
                 {

@@ -273,7 +273,7 @@ bool settings_load_config(const char* file, bool apply)
     while (read_line(fd, line, sizeof line) > 0)
     {
         if (!settings_parseline(line, &name, &value))
-            continue;
+            continue;    
         for(i=0; i<nb_settings; i++)
         {
             if (settings[i].cfg_name == NULL)
@@ -316,6 +316,8 @@ bool settings_load_config(const char* file, bool apply)
                         int temp;
                         if (cfg_string_to_int(i,&temp,value))
                             *(bool*)settings[i].setting = (temp==0?false:true);
+                        if (settings[i].bool_setting->option_callback)
+                            settings[i].bool_setting->option_callback(temp==0?false:true);
                         break;
                     }
                     case F_T_CHARPTR:

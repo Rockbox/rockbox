@@ -46,6 +46,7 @@
 #include "buttonbar.h"
 #include "action.h"
 #include "yesno.h"
+#include "viewport.h"
 
 #include "tree.h"
 #if CONFIG_TUNER
@@ -117,7 +118,6 @@ static int browser(void* param)
                 /* Now display progress until it's ready or the user exits */
                 while(!tagcache_is_usable())
                 {
-                    gui_syncstatusbar_draw(&statusbars, false);
                     struct tagcache_stat *stat = tagcache_get_stat();                
     
                     /* Allow user to exit */
@@ -262,6 +262,8 @@ static int wpsscrn(void* param)
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     show_remote_main_backdrop();
 #endif
+    /* always re-enable the statusbar after the WPS */
+    viewportmanager_set_statusbar(true);
     return ret_val;
 }
 #if CONFIG_TUNER

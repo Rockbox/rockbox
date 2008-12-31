@@ -286,7 +286,6 @@ int gui_syncpitchscreen_run(void)
         FOR_NB_SCREENS(i)
             pitchscreen_draw(&screens[i], max_lines[i],
                               pitch_viewports[i], pitch);
-        gui_syncstatusbar_draw(&statusbars, true);
         button = get_action(CONTEXT_PITCHSCREEN,HZ);
         switch (button) {
             case ACTION_PS_INC_SMALL:

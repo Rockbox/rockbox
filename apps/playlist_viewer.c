@@ -746,10 +746,6 @@ bool playlist_viewer_ex(const char* filename)
                 gui_synclist_draw(&playlist_lists);
                 break;
 
-            case ACTION_NONE:
-                gui_syncstatusbar_draw(&statusbars, false);
-                break;
-
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                 {
@@ -834,7 +830,6 @@ bool search_playlist(void)
     gui_synclist_draw(&playlist_lists);
     while (!exit)
     {
-        gui_syncstatusbar_draw(&statusbars, false);
         button = get_action(CONTEXT_LIST, HZ/4);
         if (gui_synclist_do_button(&playlist_lists, &button, LIST_WRAP_UNLESS_HELD))
             continue;

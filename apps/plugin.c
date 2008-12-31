@@ -621,6 +621,7 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    viewportmanager_set_statusbar,
 };
 
 int plugin_load(const char* plugin, const void* parameter)
@@ -731,8 +732,11 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif
 
     invalidate_icache();
+    viewportmanager_set_statusbar(false);
 
     rc = hdr->entry_point(&rockbox_api, parameter);
+    
+    viewportmanager_set_statusbar(true);
 
     button_clear_queue();
 

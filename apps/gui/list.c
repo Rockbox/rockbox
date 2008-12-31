@@ -61,7 +61,7 @@ static int force_list_reinit = false;
 
 static void gui_list_select_at_offset(struct gui_synclist * gui_list,
                                       int offset);
-void list_draw(struct screen *display, struct viewport *parent, struct gui_synclist *list);
+void list_draw(struct screen *display, struct gui_synclist *list);
 
 #ifdef HAVE_LCD_BITMAP
 static struct viewport parent[NB_SCREENS];
@@ -106,12 +106,13 @@ void list_init_viewports(struct gui_synclist *list)
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-bool list_display_title(struct gui_synclist *list, struct viewport *vp)
+bool list_display_title(struct gui_synclist *list, enum screen_type screen)
 {
-    return list->title != NULL && viewport_get_nb_lines(vp)>2;
+    return list->title != NULL &&
+        viewport_get_nb_lines(list->parent[screen])>2;
 }
 #else
-#define list_display_title(l,v) false
+#define list_display_title(l, i) false
 #endif
 
 /*
@@ -180,10 +181,11 @@ void gui_synclist_hide_selection_marker(struct gui_synclist * lists, bool hide)
 
 
 #ifdef HAVE_LCD_BITMAP
-int list_title_height(struct gui_synclist *list, struct viewport *vp);
-
-int gui_list_get_item_offset(struct gui_synclist * gui_list, int item_width,
-                             int text_pos, struct screen * display, struct viewport *vp)
+int gui_list_get_item_offset(struct gui_synclist * gui_list,
+                            int item_width,
+                            int text_pos,
+                            struct screen * display,
+                            struct viewport *vp)
 {
     int item_offset;
 
@@ -241,7 +243,7 @@ void gui_synclist_draw(struct gui_synclist *gui_list)
     last_list = gui_list;
     FOR_NB_SCREENS(i)
     {
-        list_draw(&screens[i], gui_list->parent[i], gui_list);
+        list_draw(&screens[i], gui_list);
     }
 }
 
@@ -253,8 +255,8 @@ static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
     int difference = gui_list->selected_item - gui_list->start_item[screen];
     struct viewport vp = *gui_list->parent[screen];
 #ifdef HAVE_LCD_BITMAP
-    if (list_display_title(gui_list, gui_list->parent[screen]))
-        vp.height -= list_title_height(gui_list,gui_list->parent[screen]);
+    if (list_display_title(gui_list, screen))
+        vp.height -= font_get(gui_list->parent[screen]->font)->height;
 #endif
     nb_lines = viewport_get_nb_lines(&vp);
     
@@ -273,7 +275,10 @@ static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
         if (global_settings.scroll_paginated)
         {
             if (gui_list->start_item[screen] > gui_list->selected_item)
-                gui_list->start_item[screen] = (gui_list->selected_item/nb_lines)*nb_lines;
+            {
+                gui_list->start_item[screen] = (gui_list->selected_item/nb_lines)
+                        *nb_lines;
+            }
             if (gui_list->nb_items <= nb_lines)
                 gui_list->start_item[screen] = 0;
         }
@@ -293,7 +298,7 @@ static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
             if (bottom < 0)
                 bottom = 0;
             gui_list->start_item[screen] = MIN(bottom, gui_list->start_item[screen] + 
-                                                       2*gui_list->selected_size);
+                    2*gui_list->selected_size);
         }
         else if (global_settings.scroll_paginated)
         {
@@ -351,8 +356,8 @@ static void gui_list_select_at_offset(struct gui_synclist * gui_list,
         {
             struct viewport vp = *gui_list->parent[i];
 #ifdef HAVE_LCD_BITMAP
-            if (list_display_title(gui_list, gui_list->parent[i]))
-                vp.height -= list_title_height(gui_list,gui_list->parent[i]);
+            if (list_display_title(gui_list, i))
+                vp.height -= font_get(gui_list->parent[i]->font)->height;
 #endif
             nb_lines = viewport_get_nb_lines(&vp);
             if (offset > 0)
@@ -578,11 +583,11 @@ void gui_synclist_speak_item(struct gui_synclist * lists)
 extern intptr_t get_action_data(void);
 #if  defined(HAVE_TOUCHSCREEN)
 /* this needs to be fixed if we ever get more than 1 touchscreen on a target */
-unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list, struct viewport *parent);
+unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list);
 #endif
 
 bool gui_synclist_do_button(struct gui_synclist * lists,
-                            unsigned *actionptr, enum list_wrap wrap)
+                            int *actionptr, enum list_wrap wrap)
 {
     int action = *actionptr;
 #ifdef HAVE_LCD_BITMAP
@@ -621,7 +626,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
     
 #if defined(HAVE_TOUCHSCREEN)
     if (action == ACTION_TOUCHSCREEN)
-        action = *actionptr = gui_synclist_do_touchscreen(lists, &parent[SCREEN_MAIN]);
+        action = *actionptr = gui_synclist_do_touchscreen(lists);
 #endif
 
     switch (wrap)
@@ -791,8 +796,8 @@ bool gui_synclist_item_is_onscreen(struct gui_synclist *lists,
 {
     struct viewport vp = *lists->parent[screen];
 #ifdef HAVE_LCD_BITMAP
-    if (list_display_title(lists, lists->parent[screen]))
-        vp.height -= list_title_height(lists, lists->parent[screen]);
+    if (list_display_title(lists, screen))
+        vp.height -= font_get(lists->parent[screen]->font)->height;
 #endif
     return item <= (lists->start_item[screen] + viewport_get_nb_lines(&vp));
 }
@@ -888,7 +893,6 @@ bool simplelist_show_list(struct simplelist_info *info)
 
     while(1)
     {
-        gui_syncstatusbar_draw(&statusbars, true);
         list_do_action(CONTEXT_STD, info->timeout,
                        &lists, &action, wrap);
 
@@ -900,14 +904,16 @@ bool simplelist_show_list(struct simplelist_info *info)
         {
             bool stdok = action==ACTION_STD_OK;
             action = info->action_callback(action, &lists);
-            if (stdok && action == ACTION_STD_CANCEL) /* callback asked us to exit */
+            if (stdok && action == ACTION_STD_CANCEL)
             {
+                /* callback asked us to exit */
                 info->selection = gui_synclist_get_sel_pos(&lists);
                 break;
             }
                 
             if (info->get_name == NULL)
-                gui_synclist_set_nb_items(&lists, simplelist_line_count*info->selection_size);
+                gui_synclist_set_nb_items(&lists,
+                        simplelist_line_count*info->selection_size);
         }
         if (action == ACTION_STD_CANCEL)
         {
@@ -918,7 +924,10 @@ bool simplelist_show_list(struct simplelist_info *info)
                  (old_line_count != simplelist_line_count))
         {
             if (info->get_name == NULL)
-                gui_synclist_set_nb_items(&lists, simplelist_line_count*info->selection_size);
+            {
+                gui_synclist_set_nb_items(&lists,
+                        simplelist_line_count*info->selection_size);
+            }
             gui_synclist_draw(&lists);
             old_line_count = simplelist_line_count;
         }

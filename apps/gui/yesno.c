@@ -131,7 +131,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
                                  const struct text_message * no_message)
 {
     int i;
-    unsigned button;
+    int button;
     int result=-1;
     bool result_displayed;
     struct gui_yesno yn[NB_SCREENS];

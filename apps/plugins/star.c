@@ -1008,9 +1008,6 @@ static int star_menu(void)
     FOR_NB_SCREENS(selection)
     {
         rb->viewport_set_defaults(&vp[selection], selection);
-        /* we are hiding the statusbar so fix the height also */
-        vp[selection].y = 0; 
-        vp[selection].height = rb->screens[selection]->lcdheight;
 #if LCD_DEPTH > 1
         if (rb->screens[selection]->depth > 1)
         {
@@ -1112,7 +1109,6 @@ static int star_menu(void)
         level--;
         star_run_game(level);
     }
-
     return PLUGIN_OK;
 }
 

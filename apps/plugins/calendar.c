@@ -674,7 +674,6 @@ static bool view_events(int selected, struct shown *shown)
      
     while (!exit)
     {
-        rb->gui_syncstatusbar_draw(rb->statusbars, true);
         button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
         rb->gui_synclist_do_button(&gui_memos,&button,LIST_WRAP_UNLESS_HELD);
 

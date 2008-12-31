@@ -198,7 +198,6 @@ bool bookmark_autobookmark(void)
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     show_remote_main_backdrop();
 #endif
-    gui_syncstatusbar_draw(&statusbars, false);
     if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
     {
         if (global_settings.autocreatebookmark == BOOKMARK_RECENT_ONLY_ASK)
@@ -680,11 +679,9 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
         gui_synclist_set_voice_callback(&list, bookmark_list_voice_cb);
     gui_synclist_set_title(&list, str(LANG_BOOKMARK_SELECT_BOOKMARK), 
         Icon_Bookmark);
-    gui_syncstatusbar_draw(&statusbars, true);
 
     while (!exit)
     {
-        gui_syncstatusbar_draw(&statusbars, false);
         
         if (refresh)
         {

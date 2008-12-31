@@ -489,7 +489,6 @@ int radio_screen(void)
     /* always display status bar in radio screen for now */
     global_status.statusbar_forced = statusbar?0:1;
     global_settings.statusbar = true;
-    gui_syncstatusbar_draw(&statusbars,true);
     FOR_NB_SCREENS(i)
     {
         viewport_set_defaults(&vp[i], i);
@@ -986,8 +985,6 @@ int radio_screen(void)
                 gui_buttonbar_draw(&buttonbar);
 #endif
             }
-            /* Only force the redraw if update_screen is true */
-            gui_syncstatusbar_draw(&statusbars,true);
         }
 
         update_screen = false;
@@ -1027,7 +1024,6 @@ int radio_screen(void)
     if(audio_status() & AUDIO_STATUS_ERROR)
     {
         splash(0, str(LANG_DISK_FULL));
-        gui_syncstatusbar_draw(&statusbars,true);
         FOR_NB_SCREENS(i)
         {
             screens[i].set_viewport(&vp[i]);
@@ -1397,7 +1393,6 @@ static int handle_radio_presets(void)
     while (result == 0)
     {
         gui_synclist_draw(&lists);
-        gui_syncstatusbar_draw(&statusbars, true);
         list_do_action(CONTEXT_STD, TIMEOUT_BLOCK,
                        &lists, &action, LIST_WRAP_UNLESS_HELD);
         switch (action)

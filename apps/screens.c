@@ -138,7 +138,6 @@ void usb_screen(void)
         screens[i].update();
     }
 
-    gui_syncstatusbar_draw(&statusbars, true);
 #ifdef SIMULATOR
     while (button_get(true) & BUTTON_REL);
 #else
@@ -355,7 +354,6 @@ int charging_screen(void)
     remote_backlight_set_timeout(global_settings.remote_backlight_timeout);
 #endif
     backlight_set_timeout_plugged(global_settings.backlight_timeout_plugged);
-    gui_syncstatusbar_draw(&statusbars, true);
 
 #ifdef HAVE_LCD_CHARCELLS
     logo_lock_patterns(true);
@@ -584,7 +582,6 @@ bool set_time_screen(const char* title, struct tm *tm)
             screens[s].update_viewport();
             screens[s].set_viewport(NULL);
         }
-        gui_syncstatusbar_draw(&statusbars, true);
 
         /* set the most common numbers */
         min = 0;
@@ -841,9 +838,7 @@ bool browse_id3(void)
     gui_synclist_init(&id3_lists, &id3_get_info, &info, true, 2, NULL);
     gui_synclist_set_nb_items(&id3_lists, info.count*2);
     gui_synclist_draw(&id3_lists);
-    gui_syncstatusbar_draw(&statusbars, true);
     while (true) {
-        gui_syncstatusbar_draw(&statusbars, false);
         key = get_action(CONTEXT_LIST,HZ/2);
         if(key!=ACTION_NONE && key!=ACTION_UNKNOWN
         && !gui_synclist_do_button(&id3_lists, &key,LIST_WRAP_UNLESS_HELD))
@@ -916,7 +911,6 @@ bool view_runtime(void)
         }
         lasttime = current_tick;
         gui_synclist_draw(&lists);
-        gui_syncstatusbar_draw(&statusbars, true);
         list_do_action(CONTEXT_STD, HZ,
                     &lists, &action, LIST_WRAP_UNLESS_HELD);
         if(action == ACTION_STD_CANCEL)

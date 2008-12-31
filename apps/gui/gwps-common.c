@@ -61,6 +61,7 @@
 #include "playback.h"
 #endif
 #include "backdrop.h"
+#include "viewport.h"
 
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
@@ -78,17 +79,17 @@
 #ifdef HAVE_LCD_BITMAP
 static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
 {
+    (void)force;
     bool draw = global_settings.statusbar;
 
     if (wps->data->wps_sb_tag)
         draw = wps->data->show_sb_on_wps;
 
-    if (draw)
-        gui_statusbar_draw(wps->statusbar, force);
+    if (!draw)
+        viewportmanager_set_statusbar(false);
 }
 #else
-#define gui_wps_statusbar_draw(wps, force) \
-    gui_statusbar_draw((wps)->statusbar, (force))
+#define gui_wps_statusbar_draw(wps, force)
 #endif
 #include "pcmbuf.h"
 
@@ -335,9 +336,6 @@ bool gui_wps_display(void)
     if (!wps_state.id3 && !(audio_status() & AUDIO_STATUS_PLAY))
     {
         global_status.resume_index = -1;
-#ifdef HAVE_LCD_BITMAP
-        gui_syncstatusbar_draw(&statusbars, true);
-#endif
         splash(HZ, ID2P(LANG_END_PLAYLIST));
         return true;
     }

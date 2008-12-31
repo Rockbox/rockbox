@@ -295,10 +295,6 @@ static int display_playlists(char* playlist, bool view)
                 }
                 break;
 
-            case ACTION_NONE:
-                gui_syncstatusbar_draw(&statusbars, false);
-                break;
-
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                 {

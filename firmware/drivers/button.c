@@ -368,7 +368,6 @@ long button_get_w_tmo(int ticks)
         ev.id = BUTTON_NONE;
     else
         button_data = ev.data;
-
     return ev.id;
 }
 

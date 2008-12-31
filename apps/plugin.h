@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2002 Bjï¿½rn Stenberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -132,7 +132,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 131
+#define PLUGIN_API_VERSION 132
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -334,7 +334,7 @@ struct plugin_api {
     void (*gui_synclist_del_item)(struct gui_synclist * lists);
     void (*gui_synclist_limit_scroll)(struct gui_synclist * lists, bool scroll);
     bool (*gui_synclist_do_button)(struct gui_synclist * lists,
-                                         unsigned *action, enum list_wrap wrap);
+                                   int *action, enum list_wrap wrap);
     void (*gui_synclist_set_title)(struct gui_synclist *lists, char* title, int icon);
     enum yesno_res (*gui_syncyesno_run)(const struct text_message * main_message,
                                         const struct text_message * yes_message,
@@ -785,6 +785,7 @@ struct plugin_api {
 	const char *appsversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    void (*viewportmanager_set_statusbar)(bool enabled);
 };
 
 /* plugin header */

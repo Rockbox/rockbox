@@ -283,29 +283,6 @@ static int talk_menu_item(int selected_item, void *data)
         }
         return 0;
 }
-/* this is used to reload the default menu viewports when the
-   theme changes. nothing happens if the menu is using a supplied parent vp */
-static void init_default_menu_viewports(struct viewport parent[NB_SCREENS], bool hide_bars)
-{
-    int i;
-    FOR_NB_SCREENS(i)
-    {
-        viewport_set_defaults(&parent[i], i);
-        /* viewport_set_defaults() fixes the vp for the bars, so resize */
-        if (hide_bars)
-        {
-            if (global_settings.statusbar)
-            {
-                parent[i].y -= STATUSBAR_HEIGHT;
-                parent[i].height += STATUSBAR_HEIGHT;
-            }
-        }
-    }
-#ifdef HAVE_BUTTONBAR
-    if (!hide_bars && global_settings.buttonbar)
-        parent[0].height -= BUTTONBAR_HEIGHT;
-#endif
-}
 
 bool do_setting_from_menu(const struct menu_item_ex *temp,
                           struct viewport parent[NB_SCREENS])
@@ -383,8 +360,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     int menu_stack_selected_item[MAX_MENUS];
     int stack_top = 0;
     bool in_stringlist, done = false;
-    
-    struct viewport *vps, menu_vp[NB_SCREENS]; /* menu_vp will hopefully be phased out */
+    struct viewport *vps = NULL;
 #ifdef HAVE_BUTTONBAR
     struct gui_buttonbar buttonbar;
     gui_buttonbar_init(&buttonbar);
@@ -396,27 +372,12 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     if (start_menu == NULL)
         menu = &main_menu_;
     else menu = start_menu;
-    
-    init_default_menu_viewports(menu_vp, hide_bars);
-    
-    if (parent)
-    {
-        vps = parent;
-        /* if hide_bars == true we assume the viewport is correctly sized */
-    }
-    else
-    {
-        vps = menu_vp;
-    }
-    FOR_NB_SCREENS(i)
-    {
-        screens[i].set_viewport(&vps[i]);
-        screens[i].clear_viewport();
-        screens[i].set_viewport(NULL);
-    }
-    init_menu_lists(menu, &lists, selected, true, vps);
+
+    /* if hide_bars is true, assume parent has been fixed before passed into
+     * this function, e.g. with viewport_set_defaults(parent, screen, true) */
+    init_menu_lists(menu, &lists, selected, true, parent);
+    vps = *(lists.parent);
     in_stringlist = ((menu->flags&MENU_TYPE_MASK) == MT_RETURN_ID);
-    
     /* load the callback, and only reload it if menu changes */
     get_menu_callback(menu, &menu_callback);
     
@@ -436,7 +397,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 #ifdef HAVE_BUTTONBAR
             gui_buttonbar_draw(&buttonbar);
 #endif
-            gui_syncstatusbar_draw(&statusbars, true);
         }
         action = get_action(CONTEXT_MAINMENU,
                             list_do_action_timeout(&lists, HZ));
@@ -496,7 +456,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             else if (!in_stringlist)
             {
                 int type;
-                selected = get_menu_selection(gui_synclist_get_sel_pos(&lists), menu);
+                selected = get_menu_selection(gui_synclist_get_sel_pos(&lists),menu);
                 temp = menu->submenus[selected];
                 type = (temp->flags&MENU_TYPE_MASK);
                 if ((type == MT_SETTING_W_TEXT || type == MT_SETTING))
@@ -640,9 +600,9 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                                     temp->function->param);
                     else 
                         return_value = temp->function->function();
-                    if (!(menu->flags&MENU_EXITAFTERTHISMENU) || (temp->flags&MENU_EXITAFTERTHISMENU))
+                    if (!(menu->flags&MENU_EXITAFTERTHISMENU) ||
+                            (temp->flags&MENU_EXITAFTERTHISMENU))
                     {
-                        init_default_menu_viewports(menu_vp, hide_bars);
                         init_menu_lists(menu, &lists, selected, true, vps);
                     }
                     if (temp->flags&MENU_FUNC_CHECK_RETVAL)
@@ -658,9 +618,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 case MT_SETTING:
                 case MT_SETTING_W_TEXT:
                 {
-                    if (do_setting_from_menu(temp, menu_vp))
+                    if (do_setting_from_menu(temp, vps))
                     {
-                        init_default_menu_viewports(menu_vp, hide_bars);
                         init_menu_lists(menu, &lists, selected, true,vps);
                         redraw_lists = false; /* above does the redraw */
                     }

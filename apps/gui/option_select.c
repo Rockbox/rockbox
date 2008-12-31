@@ -508,7 +508,6 @@ bool option_screen(const struct settings_list *setting,
     gui_synclist_draw(&lists);
     /* talk the item */
     gui_synclist_speak_item(&lists);
-    gui_syncstatusbar_draw(&statusbars, false);
     while (!done)
     {
         if (list_do_action(CONTEXT_LIST, TIMEOUT_BLOCK,
@@ -562,7 +561,6 @@ bool option_screen(const struct settings_list *setting,
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
             return true;
-        gui_syncstatusbar_draw(&statusbars, false);
         /* callback */
         if ( function )
             function(*variable);

@@ -443,8 +443,6 @@ int zx_kbd_input(char* text/*, int buflen*/)
                 rb->screens[l]->set_drawmode(DRMODE_SOLID);
             }
         
-
-/*        gui_syncstatusbar_draw(&statusbars, true);*/
         FOR_NB_SCREENS(l)
         rb->screens[l]->update();
 
@@ -554,10 +552,6 @@ int zx_kbd_input(char* text/*, int buflen*/)
             }
                 break;
 
-            case BUTTON_NONE:
-                /*gui_syncstatusbar_draw(&statusbars, false);*/
-
-                break;
 
             default:
                 if(rb->default_event_handler(button) == SYS_USB_CONNECTED)

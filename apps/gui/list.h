@@ -179,7 +179,7 @@ extern bool gui_synclist_item_is_onscreen(struct gui_synclist *lists,
  * NOTE: *action may be changed regardless of return value
  */
 extern bool gui_synclist_do_button(struct gui_synclist * lists,
-                                       unsigned *action,
+                                       int *action,
                                        enum list_wrap);
 
 /* If the list has a pending postponed scheduled announcement, that

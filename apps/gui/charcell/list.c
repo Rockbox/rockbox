@@ -40,10 +40,8 @@
 #include "misc.h"
 #include "talk.h"
 
-void list_draw(struct screen *display, struct viewport *parent,
-               struct gui_synclist *gui_list)
+void list_draw(struct screen *display, struct gui_synclist *gui_list)
 {
-    (void)parent;
     int text_pos;
     bool draw_icons = (gui_list->callback_get_item_icon != NULL &&
                        global_settings.show_icons);

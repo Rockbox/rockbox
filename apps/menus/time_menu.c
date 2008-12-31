@@ -295,9 +295,7 @@ int time_screen(void* ignored)
         if (global_settings.buttonbar)
             menu[i].height -= BUTTONBAR_HEIGHT;
 #endif
-        screens[i].clear_display();
         draw_timedate(&clock[i], &screens[i]);
-        screens[i].update();
     }
     ret = do_menu(&time_menu, NULL, menu, false);
     /* see comments above in the button callback */

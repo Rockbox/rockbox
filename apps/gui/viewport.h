@@ -40,3 +40,9 @@ int viewport_get_nb_lines(struct viewport *vp);
 int viewport_load_config(const char *config, struct viewport *vp);
 
 void viewport_set_defaults(struct viewport *vp, enum screen_type screen);
+
+void viewportmanager_set_statusbar(bool enabled);
+/* callbacks for GUI_EVENT_* events */
+void viewportmanager_draw_statusbars(void*data);
+void viewportmanager_statusbar_changed(void* data);
+

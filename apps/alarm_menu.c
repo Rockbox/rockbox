@@ -193,7 +193,6 @@ bool alarm_screen(void)
             break;
 
         case ACTION_NONE:
-            gui_syncstatusbar_draw(&statusbars, false);
             hour_wrapped = false;
             break;
 

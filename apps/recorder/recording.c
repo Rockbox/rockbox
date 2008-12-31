@@ -1038,7 +1038,6 @@ bool recording_screen(bool no_source)
     bool statusbar = global_settings.statusbar;
     global_status.statusbar_forced = statusbar?0:1;
     global_settings.statusbar = true;
-    gui_syncstatusbar_draw(&statusbars,true);
 #endif
 
     static const unsigned char *byte_units[] = {
@@ -1102,7 +1101,7 @@ bool recording_screen(bool no_source)
         /* top vp, 4 lines, force sys font if total screen < 6 lines
            NOTE: one could limit the list to 1 line and get away with 5 lines */
         v = &vp_top[i];
-        viewport_set_defaults(v, i); /*already takes care of statusbar*/
+        viewport_set_defaults(v, i);
         if (viewport_get_nb_lines(v) < 4)
         {
             /* compact needs 4 lines total */
@@ -1864,7 +1863,6 @@ bool recording_screen(bool no_source)
             /* draw peakmeter again (check if this can be removed) */
             FOR_NB_ACTIVE_SCREENS(i)
             {
-                screens[i].set_viewport(NULL);
                 gui_statusbar_draw(&(statusbars.statusbars[i]), true);
                 screens[i].set_viewport(&vp_top[i]);
                 peak_meter_screen(&screens[i], pm_x[i], pm_y[i], pm_h[i]);
@@ -1882,7 +1880,6 @@ bool recording_screen(bool no_source)
     if (audio_stat & AUDIO_STATUS_ERROR)
     {
         splash(0, str(LANG_DISK_FULL));
-        gui_syncstatusbar_draw(&statusbars, true);
 
         FOR_NB_SCREENS(i)
             screens[i].update();

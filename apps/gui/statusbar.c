@@ -43,6 +43,7 @@
 #include "recording.h"
 #include "pcm_record.h"
 #endif
+#include "appevents.h"
 
 /* FIXME: should be removed from icon.h to avoid redefinition,
    but still needed for compatibility with old system */
@@ -817,3 +818,8 @@ int gui_statusbar_height(void)
     return global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
 }
 
+void gui_statusbar_changed(bool enabled)
+{
+    (void)enabled;
+    send_event(GUI_EVENT_STATUSBAR_TOGGLE, NULL);
+}

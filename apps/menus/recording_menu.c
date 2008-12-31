@@ -537,7 +537,6 @@ int rectrigger(void)
         if (changed)
         {
             gui_synclist_draw(&lists);
-            gui_syncstatusbar_draw(&statusbars, true);
             peak_meter_trigger(global_settings.rec_trigger_mode!=TRIG_OFF);
             settings_apply_trigger();
             changed = false;
