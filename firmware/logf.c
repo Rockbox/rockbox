@@ -145,12 +145,12 @@ void _logf(const char *format, ...)
     while(len > MAX_LOGF_ENTRY)
     {
         ptr = logfbuffer[logfindex];
-        strncpy(ptr, buf + tlen, MAX_LOGF_ENTRY);
+        strncpy(ptr, buf + tlen, MAX_LOGF_ENTRY-1);
         ptr[MAX_LOGF_ENTRY] = LOGF_TERMINATE_CONTINUE_LINE;
         logfindex++;
         check_logfindex();
-        len -= MAX_LOGF_ENTRY;
-        tlen += MAX_LOGF_ENTRY;
+        len -= MAX_LOGF_ENTRY-1;
+        tlen += MAX_LOGF_ENTRY-1;
         multiline = true;
     }
     ptr = logfbuffer[logfindex];
