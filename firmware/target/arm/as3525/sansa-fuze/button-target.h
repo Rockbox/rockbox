@@ -27,13 +27,9 @@
 
 #define HAS_BUTTON_HOLD
 
-bool button_hold(void);
 void button_init_device(void);
+bool button_hold(void);
 int button_read_device(void);
-#ifndef BOOTLOADER
-void clickwheel_int(void);
-#endif
-void button_int(void);
 
 /* Sandisk Sansa Fuze button codes */
 
@@ -51,11 +47,12 @@ void button_int(void);
 #define BUTTON_SCROLL_BACK  0x00000080
 #define BUTTON_SCROLL_FWD   0x00000100
 
-#define BUTTON_HOLD         0x00000200
+#define BUTTON_HOLD         0x00000400
 
 #define BUTTON_MAIN         (BUTTON_HOME|BUTTON_DOWN|BUTTON_RIGHT|BUTTON_LEFT \
                             |BUTTON_SELECT|BUTTON_UP|BUTTON_POWER \
-                            |BUTTON_SCROLLBACK|BUTTON_SCROLL_FWD|BUTTON_HOLD)
+                            |BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD| \
+                            |BUTTON_HOLD)
 
 /* No Remote control */
 #define BUTTON_REMOTE 0
