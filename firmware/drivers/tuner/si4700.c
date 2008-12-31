@@ -47,7 +47,6 @@ extern int si4700_st(void);
 #endif
 
 #define SEEK_THRESHOLD 0x16
-#define TUNER_VOLUME   0xC
 
 #define I2C_ADR 0x20
 
@@ -332,10 +331,9 @@ static void si4700_sleep(int snooze)
                             SYSCONFIG1_GPIO1 | SYSCONFIG1_GPIO2 |
                             SYSCONFIG1_GPIO3);
 #endif
-        /* -6dB volume, seek threshold 12 */
         si4700_write_masked(SYSCONFIG2,
                             SYSCONFIG2_SKEETHw(SEEK_THRESHOLD) |
-                            SYSCONFIG2_VOLUMEw(TUNER_VOLUME),
+                            SYSCONFIG2_VOLUMEw(0xF),
                             SYSCONFIG2_VOLUME | SYSCONFIG2_SEEKTH);
     }
 }

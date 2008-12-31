@@ -28,18 +28,11 @@
 //#define LOGF_ENABLE
 #include "logf.h"
 
-/* #define to help adjust lower volume limit */
-#define HW_VOL_MIN                0
-#define HW_VOL_MUTE               0
-#define HW_VOL_MAX               96
-#define HW_VOL_ANA_MIN            0
-#define HW_VOL_ANA_MAX           63
-#define HW_VOL_DIG_MAX          255
-#define HW_VOL_DIG_THRESHOLD    (HW_VOL_MAX - HW_VOL_ANA_MAX)
-#define HW_VOL_DIG_MIN          (HW_VOL_DIG_MAX - 2*HW_VOL_DIG_THRESHOLD)
-
 /* TODO: Define/refine an API for special hardware steps outside the
  * main codec driver such as special GPIO handling. */
+/* NOTE: Much of the volume code is very interdependent and calibrated for
+ * the Gigabeat S. If you change anything for another device that uses this
+ * file it may break things. */
 extern void audiohw_enable_headphone_jack(bool enable);
 
 const struct sound_settings_info audiohw_settings[] =
@@ -51,10 +44,14 @@ const struct sound_settings_info audiohw_settings[] =
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
     [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
 #ifdef HAVE_RECORDING
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0},
+    /* Digital: -119.0dB to +8.0dB in 0.5dB increments
+     * Analog:  Relegated to volume control
+     * Circumstances unfortunately do not allow a great deal of positive
+     * gain. */
+    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-238,  16,   0},
+    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-238,  16,   0},
 #if 0
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16},
+    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-238,  16,   0},
 #endif
 #endif
 #if 0
@@ -107,8 +104,8 @@ static uint16_t wmc_regs[WMC_NUM_REGISTERS] =
     [WMC_3D_CONTROL]              = 0x000,
     [WMC_BEEP_CONTROL]            = 0x000,
     [WMC_INPUT_CTRL]              = 0x033,
-    [WMC_LEFT_INP_PGA_GAIN_CTRL]  = 0x010,
-    [WMC_RIGHT_INP_PGA_GAIN_CTRL] = 0x010,
+    [WMC_LEFT_INP_PGA_GAIN_CTRL]  = 0x010 | WMC_VU | WMC_ZC,
+    [WMC_RIGHT_INP_PGA_GAIN_CTRL] = 0x010 | WMC_VU | WMC_ZC,
     [WMC_LEFT_ADC_BOOST_CTRL]     = 0x100,
     [WMC_RIGHT_ADC_BOOST_CTRL]    = 0x100,
     [WMC_OUTPUT_CTRL]             = 0x002,
@@ -129,7 +126,7 @@ struct
     bool ahw_mute;
 } wmc_vol =
 {
-    HW_VOL_MUTE, HW_VOL_MUTE, false
+    0, 0, false
 };
 
 static void wmc_write(unsigned int reg, unsigned int val)
@@ -180,6 +177,27 @@ int tenthdb2master(int db)
     }
 }
 
+int sound_val2phys(int setting, int value)
+{
+    int result;
+
+    switch (setting)
+    {
+#ifdef HAVE_RECORDING
+    case SOUND_LEFT_GAIN:
+    case SOUND_RIGHT_GAIN:
+    case SOUND_MIC_GAIN:
+        result = value * 5;
+        break;
+#endif
+
+    default:
+        result = value;
+    }
+
+    return result;
+}
+
 void audiohw_preinit(void)
 {
     /* 1. Turn on external power supplies. Wait for supply voltage to settle. */
@@ -190,13 +208,12 @@ void audiohw_preinit(void)
     sleep(HZ/10);
 
     /* 2. Mute all analogue outputs */
-    wmc_set(WMC_LOUT1_HP_VOLUME_CTRL, WMC_MUTE | HW_VOL_ANA_MIN);
-    wmc_set(WMC_ROUT1_HP_VOLUME_CTRL, WMC_MUTE | HW_VOL_ANA_MIN);
+    wmc_set(WMC_LOUT1_HP_VOLUME_CTRL, WMC_MUTE);
+    wmc_set(WMC_ROUT1_HP_VOLUME_CTRL, WMC_MUTE);
     wmc_set(WMC_LOUT2_SPK_VOLUME_CTRL, WMC_MUTE);
     wmc_set(WMC_ROUT2_SPK_VOLUME_CTRL, WMC_MUTE);
     wmc_set(WMC_OUT3_MIXER_CTRL, WMC_MUTE);
     wmc_set(WMC_OUT4_MONO_MIXER_CTRL, WMC_MUTE);
-    wmc_set(WMC_INPUT_CTRL, 0x000);
 
     /* 3. Set L/RMIXEN = 1 and DACENL/R = 1 in register R3. */
     wmc_write(WMC_POWER_MANAGEMENT3,
@@ -226,103 +243,105 @@ void audiohw_postinit(void)
     wmc_write(WMC_AUDIO_INTERFACE, WMC_WL_16 | WMC_FMT_I2S);
     wmc_write(WMC_DAC_CONTROL, WMC_DACOSR_128 | WMC_AMUTE);
 
-    wmc_set(WMC_INPUT_CTRL, WMC_R2_2INPPGA | WMC_L2_2INPPGA);
-    /* set PGA volumes to 0dB and enable zero cross */
-    wmc_set(WMC_LEFT_INP_PGA_GAIN_CTRL, 0x10 | 1 << 7);
-    wmc_set(WMC_RIGHT_INP_PGA_GAIN_CTRL, 0x10 | 1 << 7);
-    /* write to  INPPGAUPDATE to actually change voulme */
-    wmc_set(WMC_LEFT_INP_PGA_GAIN_CTRL, 1 << 8);
-    wmc_set(WMC_RIGHT_INP_PGA_GAIN_CTRL, 1 << 8);
-    /* set boost gain to 0dB */
-    wmc_set(WMC_LEFT_ADC_BOOST_CTRL, (5 << 4));
-    wmc_set(WMC_RIGHT_ADC_BOOST_CTRL, (5 << 4));
+    /* No ADC, no HP filter, no popping */
+    wmc_clear(WMC_ADC_CONTROL, WMC_HPFEN);
+
+    wmc_clear(WMC_LEFT_ADC_BOOST_CTRL, WMC_PGABOOSTL);
+    wmc_clear(WMC_RIGHT_ADC_BOOST_CTRL, WMC_PGABOOSTR);
 
     /* Specific to HW clocking */
     wmc_write_masked(WMC_CLOCK_GEN_CTRL, WMC_BCLKDIV_4 | WMC_MS,
                      WMC_BCLKDIV | WMC_MS | WMC_CLKSEL);
     audiohw_set_frequency(HW_FREQ_DEFAULT);
 
-    /* ADC silenced */
-    wmc_write_masked(WMC_LEFT_ADC_DIGITAL_VOL, 0x00, WMC_DVOL);
-    wmc_write_masked(WMC_RIGHT_ADC_DIGITAL_VOL, 0x00, WMC_DVOL);
-
     audiohw_enable_headphone_jack(true);
+}
+
+static void get_headphone_levels(int val, int *dac_p, int *hp_p,
+                                 int *mix_p, int *boost_p)
+{
+    int dac, hp, mix, boost;
+
+    if (val >= 33)
+    {
+        dac = 255;
+        hp = val - 33;
+        mix = 7;
+        boost = 5;
+    }
+    else if (val >= 21)
+    {
+        dac = 189 + val / 3 * 6;
+        hp = val % 3;
+        mix = 7;
+        boost = (val - 18) / 3;
+    }
+    else
+    {
+        dac = 189 + val / 3 * 6;
+        hp = val % 3;
+        mix = val / 3;
+        boost = 1;
+    }
+
+    *dac_p = dac;
+    *hp_p = hp;
+    *mix_p = mix;
+    *boost_p = boost;
 }
 
 void audiohw_set_headphone_vol(int vol_l, int vol_r)
 {
     int prev_l = wmc_vol.vol_l;
     int prev_r = wmc_vol.vol_r;
-    int dac_l, dac_r;
+    int dac_l, dac_r, hp_l, hp_r;
+    int mix_l, mix_r, boost_l, boost_r;
 
     wmc_vol.vol_l = vol_l;
     wmc_vol.vol_r = vol_r;
 
-    /* When analogue volume falls below -57dB (0x00) start attenuating the
-     * DAC volume */
-    if (vol_l >= HW_VOL_DIG_THRESHOLD)
-    {
-        if (vol_l > HW_VOL_MAX)
-            vol_l = HW_VOL_MAX;
+    /* Mixers are synced to provide full volume range on both the analogue
+     * and digital pathways */
+    get_headphone_levels(vol_l, &dac_l, &hp_l, &mix_l, &boost_l);
+    get_headphone_levels(vol_r, &dac_r, &hp_r, &mix_r, &boost_r);
 
-        dac_l = HW_VOL_DIG_MAX;
-        vol_l -= HW_VOL_DIG_THRESHOLD;
-    }
-    else
-    {
-        if (vol_l < HW_VOL_MIN)
-            vol_l = HW_VOL_MIN;
-
-        dac_l = 2*vol_l + HW_VOL_DIG_MIN;
-        vol_l = HW_VOL_ANA_MIN;
-    }
-
-    if (vol_r >= HW_VOL_DIG_THRESHOLD)
-    {
-        if (vol_r > HW_VOL_MAX)
-            vol_r = HW_VOL_MAX;
-
-        dac_r = HW_VOL_DIG_MAX;
-        vol_r -= HW_VOL_DIG_THRESHOLD;
-    }
-    else
-    {
-        if (vol_r < HW_VOL_MIN)
-            vol_r = HW_VOL_MIN;
-
-        dac_r = 2*vol_r + HW_VOL_DIG_MIN;
-        vol_r = HW_VOL_ANA_MIN;
-    }
-
-    /* Have to write both channels always to have the latching work */
+    wmc_write_masked(WMC_LEFT_MIXER_CTRL, WMC_BYPLMIXVOLw(mix_l),
+                     WMC_BYPLMIXVOL);
+    wmc_write_masked(WMC_LEFT_ADC_BOOST_CTRL,
+                     WMC_L2_2BOOSTVOLw(boost_l), WMC_L2_2BOOSTVOL);
     wmc_write_masked(WMC_LEFT_DAC_DIGITAL_VOL, dac_l, WMC_DVOL);
-    wmc_write_masked(WMC_LOUT1_HP_VOLUME_CTRL, vol_l, WMC_AVOL);
-    wmc_write_masked(WMC_RIGHT_DAC_DIGITAL_VOL, dac_r, WMC_DVOL);
-    wmc_write_masked(WMC_ROUT1_HP_VOLUME_CTRL, vol_r, WMC_AVOL);
+    wmc_write_masked(WMC_LOUT1_HP_VOLUME_CTRL, hp_l, WMC_AVOL);
 
-    if (wmc_vol.vol_l > HW_VOL_MUTE)
+    wmc_write_masked(WMC_RIGHT_MIXER_CTRL, WMC_BYPRMIXVOLw(mix_r),
+                     WMC_BYPRMIXVOL);
+    wmc_write_masked(WMC_RIGHT_ADC_BOOST_CTRL,
+                     WMC_R2_2BOOSTVOLw(boost_r), WMC_R2_2BOOSTVOL);
+    wmc_write_masked(WMC_RIGHT_DAC_DIGITAL_VOL, dac_r, WMC_DVOL);
+    wmc_write_masked(WMC_ROUT1_HP_VOLUME_CTRL, hp_r, WMC_AVOL);
+
+    if (vol_l > 0)
     {
         /* Not muted and going up from mute level? */
-        if (prev_l <= HW_VOL_MUTE && !wmc_vol.ahw_mute)
+        if (prev_l <= 0 && !wmc_vol.ahw_mute)
             wmc_clear(WMC_LOUT1_HP_VOLUME_CTRL, WMC_MUTE);
     }
     else
     {
         /* Going to mute level? */
-        if (prev_l > HW_VOL_MUTE)
+        if (prev_l > 0)
             wmc_set(WMC_LOUT1_HP_VOLUME_CTRL, WMC_MUTE);
     }
 
-    if (wmc_vol.vol_r > HW_VOL_MUTE)
+    if (vol_r > 0)
     {
         /* Not muted and going up from mute level? */
-        if (prev_r <= HW_VOL_MIN && !wmc_vol.ahw_mute)
+        if (prev_r <= 0 && !wmc_vol.ahw_mute)
             wmc_clear(WMC_ROUT1_HP_VOLUME_CTRL, WMC_MUTE);
     }
     else
     {
         /* Going to mute level? */
-        if (prev_r > HW_VOL_MUTE)
+        if (prev_r > 0)
             wmc_set(WMC_ROUT1_HP_VOLUME_CTRL, WMC_MUTE);
     }
 }
@@ -358,10 +377,10 @@ void audiohw_mute(bool mute)
     else
     {
         /* Unmute outputs not at mute level */
-        if (wmc_vol.vol_l > HW_VOL_MUTE)
+        if (wmc_vol.vol_l > 0)
             wmc_clear(WMC_LOUT1_HP_VOLUME_CTRL, WMC_MUTE);
 
-        if (wmc_vol.vol_r > HW_VOL_MUTE)
+        if (wmc_vol.vol_r > 0)
             wmc_clear(WMC_ROUT1_HP_VOLUME_CTRL, WMC_MUTE);
     }
 }
@@ -491,9 +510,72 @@ void audiohw_set_frequency(int fsel)
 }
 
 #ifdef HAVE_RECORDING
-/* TODO */
+void audiohw_set_recsrc(int source, bool recording)
+{
+    switch (source)
+    {
+    case AUDIO_SRC_PLAYBACK:
+        /* Disable all audio paths but DAC */
+        /* Disable ADCs */
+        wmc_clear(WMC_ADC_CONTROL, WMC_HPFEN);
+        wmc_clear(WMC_POWER_MANAGEMENT2, WMC_ADCENL | WMC_ADCENR);
+        /* Disable bypass */
+        wmc_clear(WMC_LEFT_MIXER_CTRL, WMC_BYPL2LMIX);
+        wmc_clear(WMC_RIGHT_MIXER_CTRL, WMC_BYPR2RMIX);
+        /* Disable IP BOOSTMIX and PGA */
+        wmc_clear(WMC_POWER_MANAGEMENT2, WMC_INPPGAENL | WMC_INPPGAENR |
+                  WMC_BOOSTENL | WMC_BOOSTENR);
+        wmc_clear(WMC_INPUT_CTRL, WMC_L2_2INPPGA | WMC_R2_2INPPGA);
+        wmc_clear(WMC_LEFT_ADC_BOOST_CTRL, WMC_PGABOOSTL);
+        wmc_clear(WMC_RIGHT_ADC_BOOST_CTRL, WMC_PGABOOSTR);
+        break;
+
+    case AUDIO_SRC_FMRADIO:
+        if (recording)
+        {
+            /* Disable bypass */
+            wmc_clear(WMC_LEFT_MIXER_CTRL, WMC_BYPL2LMIX);
+            wmc_clear(WMC_RIGHT_MIXER_CTRL, WMC_BYPR2RMIX);
+            /* Enable ADCs, IP BOOSTMIX and PGA, route L/R2 through PGA */
+            wmc_set(WMC_POWER_MANAGEMENT2, WMC_ADCENL | WMC_ADCENR |
+                    WMC_BOOSTENL | WMC_BOOSTENR | WMC_INPPGAENL |
+                    WMC_INPPGAENR);
+            wmc_set(WMC_ADC_CONTROL, WMC_ADCOSR | WMC_HPFEN);
+            /* PGA at 0dB with +20dB boost */
+            wmc_write_masked(WMC_LEFT_INP_PGA_GAIN_CTRL, 0x10, WMC_AVOL);
+            wmc_write_masked(WMC_RIGHT_INP_PGA_GAIN_CTRL, 0x10, WMC_AVOL);
+            wmc_set(WMC_LEFT_ADC_BOOST_CTRL, WMC_PGABOOSTL);
+            wmc_set(WMC_RIGHT_ADC_BOOST_CTRL, WMC_PGABOOSTR);
+            /* Connect L/R2 inputs to PGA */
+            wmc_set(WMC_INPUT_CTRL, WMC_L2_2INPPGA | WMC_R2_2INPPGA);
+        }
+        else
+        {
+            /* Disable PGA and ADC, enable IP BOOSTMIX, route L/R2 directly to
+             * IP BOOSTMIX */
+            wmc_clear(WMC_ADC_CONTROL, WMC_HPFEN);
+            wmc_write_masked(WMC_POWER_MANAGEMENT2, WMC_BOOSTENL | WMC_BOOSTENR,
+                WMC_BOOSTENL | WMC_BOOSTENR | WMC_INPPGAENL |
+                WMC_INPPGAENR | WMC_ADCENL | WMC_ADCENR);
+            wmc_clear(WMC_INPUT_CTRL, WMC_L2_2INPPGA | WMC_R2_2INPPGA);
+            wmc_clear(WMC_LEFT_ADC_BOOST_CTRL, WMC_PGABOOSTL);
+            wmc_clear(WMC_RIGHT_ADC_BOOST_CTRL, WMC_PGABOOSTR);
+            /* Enable bypass to L/R mixers */
+            wmc_set(WMC_LEFT_MIXER_CTRL, WMC_BYPL2LMIX);
+            wmc_set(WMC_RIGHT_MIXER_CTRL, WMC_BYPR2RMIX);
+        }
+        break;
+    }
+}
+
 void audiohw_set_recvol(int left, int right, int type)
 {
-    (void)left; (void)right; (void)type;
+    switch (type)
+    {
+    case AUDIO_GAIN_LINEIN:
+        wmc_write_masked(WMC_LEFT_ADC_DIGITAL_VOL, left + 239, WMC_DVOL);
+        wmc_write_masked(WMC_RIGHT_ADC_DIGITAL_VOL, right + 239, WMC_DVOL);
+        return;
+    }
 }
-#endif
+#endif /* HAVE_RECORDING */

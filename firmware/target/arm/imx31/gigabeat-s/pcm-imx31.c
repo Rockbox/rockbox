@@ -111,17 +111,12 @@ void pcm_play_dma_init(void)
     SSI_SCR2 &= ~SSI_SCR_SSIEN;
     SSI_SCR1 &= ~SSI_SCR_SSIEN;
 
-    SSI_SIER1 = SSI_SIER_TFE0;
-    SSI_SIER2 = 0;
-
     /* Set up audio mux */
 
     /* Port 1 (internally connected to SSI1)
      * All clocking is output sourced from port 4 */
     AUDMUX_PTCR1 = AUDMUX_PTCR_TFS_DIR | AUDMUX_PTCR_TFSEL_PORT4 |
                    AUDMUX_PTCR_TCLKDIR | AUDMUX_PTCR_TCSEL_PORT4 |
-                   AUDMUX_PTCR_RFSDIR  | AUDMUX_PTCR_RFSSEL_PORT4 |
-                   AUDMUX_PTCR_RCLKDIR | AUDMUX_PTCR_RCSEL_PORT4 |
                    AUDMUX_PTCR_SYN;
  
     /* Receive data from port 4 */
@@ -133,18 +128,22 @@ void pcm_play_dma_init(void)
     /* Receive data from port 1 */
     AUDMUX_PDCR4 = AUDMUX_PDCR_RXDSEL_PORT1;
 
-    /* Port 2 (internally connected to SSI2) routes clocking to port 5 to
+    /* PORT2 (internally connected to SSI2) routes clocking to PORT5 to
      * provide MCLK to the codec */
-    /* All port 2 clocks are inputs taken from SSI2 */
-    AUDMUX_PTCR2 = 0;
-    AUDMUX_PDCR2 = 0;
-    /* Port 5 outputs TCLK sourced from port 2 */
+    /* TX clocks are inputs taken from SSI2 */
+    /* RX clocks are outputs taken from PORT4 */
+    AUDMUX_PTCR2 = AUDMUX_PTCR_RFS_DIR | AUDMUX_PTCR_RFSSEL_PORT4 |
+                   AUDMUX_PTCR_RCLKDIR | AUDMUX_PTCR_RCSEL_PORT4;
+    /* RX data taken from PORT4 */
+    AUDMUX_PDCR2 = AUDMUX_PDCR_RXDSEL_PORT4;
+
+    /* PORT5 outputs TCLK sourced from PORT2 (SSI2) */
     AUDMUX_PTCR5 = AUDMUX_PTCR_TCLKDIR | AUDMUX_PTCR_TCSEL_PORT2;
     AUDMUX_PDCR5 = 0;
 
     /* Setup SSIs */
 
-    /* SSI1 - interface for all I2S data */
+    /* SSI1 - SoC software interface for all I2S data out */
     SSI_SCR1 = SSI_SCR_SYN | SSI_SCR_I2S_MODE_SLAVE;
     SSI_STCR1 = SSI_STCR_TXBIT0 | SSI_STCR_TSCKP | SSI_STCR_TFSI |
                 SSI_STCR_TEFS | SSI_STCR_TFEN0;
@@ -153,26 +152,11 @@ void pcm_play_dma_init(void)
     SSI_STCCR1 = SSI_STRCCR_WL16 | SSI_STRCCR_DCw(2-1) |
                  SSI_STRCCR_PMw(4-1);
 
+    /* Transmit low watermark - 2 samples in FIFO */
+    SSI_SFCSR1 = SSI_SFCSR_TFWM1w(1) | SSI_SFCSR_TFWM0w(2);
     SSI_STMSK1 = 0;
 
-    /* Receive */
-    SSI_SRCR1 = SSI_SRCR_RXBIT0 | SSI_SRCR_RSCKP | SSI_SRCR_RFSI |
-                SSI_SRCR_REFS | SSI_SRCR_RFEN0;
-
-    /* 16 bits per word, 2 words per frame */
-    SSI_SRCCR1 = SSI_STRCCR_WL16 | SSI_STRCCR_DCw(2-1) |
-                 SSI_STRCCR_PMw(4-1);
-
-    /* Receive high watermark - 6 samples in FIFO
-     * Transmit low watermark - 2 samples in FIFO */
-    SSI_SFCSR1 = SSI_SFCSR_RFWM1w(8) | SSI_SFCSR_TFWM1w(1) |
-                 SSI_SFCSR_RFWM0w(6) | SSI_SFCSR_TFWM0w(2);
-
-    SSI_SRMSK1 = 0;
-
-    /* SSI2 - provides MCLK only */
-    SSI_SCR2 = 0;
-    SSI_SRCR2 = 0;
+    /* SSI2 - provides MCLK to codec. Receives data from codec. */
     SSI_STCR2 = SSI_STCR_TXDIR;
 
     /* f(INT_BIT_CLK) =
@@ -188,6 +172,20 @@ void pcm_play_dma_init(void)
      * zero but comply by setting DIV2 and the others to zero.
      */
     SSI_STCCR2 = SSI_STRCCR_DIV2 | SSI_STRCCR_PMw(1-1);
+
+    /* SSI2 - receive - asynchronous clocks */
+    SSI_SCR2 = SSI_SCR_I2S_MODE_SLAVE;
+
+    SSI_SRCR2 = SSI_SRCR_RXBIT0 | SSI_SRCR_RSCKP | SSI_SRCR_RFSI |
+                SSI_SRCR_REFS;
+
+    /* 16 bits per word, 2 words per frame */
+    SSI_SRCCR2 = SSI_STRCCR_WL16 | SSI_STRCCR_DCw(2-1) |
+                 SSI_STRCCR_PMw(4-1);
+
+    /* Receive high watermark - 6 samples in FIFO */
+    SSI_SFCSR2 = SSI_SFCSR_RFWM1w(8) | SSI_SFCSR_RFWM0w(6);
+    SSI_SRMSK2 = 0;
 
     /* Enable SSI2 (codec clock) */
     SSI_SCR2 |= SSI_SCR_SSIEN;
@@ -210,7 +208,8 @@ static void play_start_pcm(void)
     dma_play_data.state = 1;
 
     /* Fill the FIFO or start when data is used up */
-    SSI_SCR1 |= SSI_SCR_SSIEN; /* Enable SSI */
+    SSI_SCR1 |= SSI_SCR_SSIEN;   /* Enable SSI */
+    SSI_STCR1 |= SSI_STCR_TFEN0; /* Enable TX FIFO */
 
     while (1)
     {
@@ -235,6 +234,7 @@ static void play_stop_pcm(void)
     while (SSI_SFCSR_TFCNT0r(SSI_SFCSR1) > 0);
 
     /* Disable transmission */
+    SSI_STCR1 &= ~SSI_STCR_TFEN0;
     SSI_SCR1 &= ~(SSI_SCR_TE | SSI_SCR_SSIEN);
 
     /* Do not enable interrupt on unlock */
@@ -285,4 +285,113 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
     return (void *)((addr + 2) & ~3);
 }
 
-/* Any recording functionality should be implemented similarly */
+#ifdef HAVE_RECORDING
+static struct dma_data dma_rec_data =
+{
+    /* Initialize to a locked, stopped state */
+    .p = NULL,
+    .size = 0,
+    .locked = 0,
+    .state = 0
+};
+
+static void __attribute__((interrupt("IRQ"))) SSI2_HANDLER(void)
+{
+    register pcm_more_callback_type2 more_ready;
+
+    while (dma_rec_data.size > 0)
+    {
+        if (SSI_SFCSR_RFCNT0r(SSI_SFCSR2) < 2)
+            return;
+
+        *dma_rec_data.p++ = SSI_SRX0_2;
+        *dma_rec_data.p++ = SSI_SRX0_2;
+        dma_rec_data.size -= 4;
+    }
+
+    more_ready = pcm_callback_more_ready;
+
+    if (more_ready == NULL || more_ready(0) < 0) {
+        /* Finished recording */
+        pcm_rec_dma_stop();
+        pcm_rec_dma_stopped_callback();
+    }
+}
+
+void pcm_rec_lock(void)
+{
+    if (++dma_rec_data.locked == 1)
+    {
+        /* Atomically disable receive interrupt */
+        imx31_regclr32(&SSI_SIER2, SSI_SIER_RIE);
+    }
+}
+
+void pcm_rec_unlock(void)
+{
+    if (--dma_rec_data.locked == 0 && dma_rec_data.state != 0)
+    {
+        /* Atomically enable receive interrupt */
+        imx31_regset32(&SSI_SIER2, SSI_SIER_RIE);
+    }
+}
+
+void pcm_record_more(void *start, size_t size)
+{
+    pcm_rec_peak_addr = start; /* Start peaking at dest */
+    dma_rec_data.p    = start; /* Start of RX buffer    */
+    dma_rec_data.size = size;  /* Bytes to transfer     */
+}
+
+void pcm_rec_dma_stop(void)
+{
+    /* Stop receiving data */
+    SSI_SCR2 &= ~SSI_SCR_RE;      /* Disable RX */
+    SSI_SRCR2 &= ~SSI_SRCR_RFEN0; /* Disable RX FIFO */
+
+    dma_rec_data.state = 0;
+
+    avic_disable_int(SSI2);
+}
+
+void pcm_rec_dma_start(void *addr, size_t size)
+{
+    pcm_rec_dma_stop();
+
+    pcm_rec_peak_addr = addr;
+    dma_rec_data.p    = addr;
+    dma_rec_data.size = size;
+
+    dma_rec_data.state = 1;
+
+    avic_enable_int(SSI2, IRQ, 9, SSI2_HANDLER);
+
+    SSI_SRCR2 |= SSI_SRCR_RFEN0; /* Enable RX FIFO */
+
+    /* Ensure clear FIFO */
+    while (SSI_SFCSR2 & SSI_SFCSR_RFCNT0)
+        SSI_SRX0_2;
+
+    /* Enable receive */
+    SSI_SCR2 |= SSI_SCR_RE;
+}
+
+void pcm_rec_dma_close(void)
+{
+    pcm_rec_dma_stop();
+}
+
+void pcm_rec_dma_init(void)
+{
+    pcm_rec_dma_stop();
+}
+
+const void * pcm_rec_dma_get_peak_buffer(int *count)
+{
+    unsigned long addr = (uint32_t)pcm_rec_peak_addr;
+    unsigned long end = (uint32_t)dma_rec_data.p;
+    *count = (end >> 2) - (addr >> 2);
+    return (void *)(addr & ~3);
+}
+
+#endif /* HAVE_RECORDING */

@@ -18,39 +18,55 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "wm8978.h"
+#include "config.h"
+#include "system.h"
+#include "audiohw.h"
 #include "audio.h"
 
+/* Set the audio source for IIS TX */
 void audio_set_output_source(int source)
 {
-    (void)source; /* TODO */
+    switch (source)
+    {
+    default:
+    case AUDIO_SRC_PLAYBACK:
+        /* Receive data from PORT1 (SSI1) */
+        AUDMUX_PDCR4 = AUDMUX_PDCR_RXDSEL_PORT1;
+        /* wmc_clear(WMC_COMPANDING_CTRL, WMC_LOOPBACK); */
+        break;
+
+    case AUDIO_SRC_FMRADIO:
+        /* External source - receive data from self (loopback to TX) */
+        AUDMUX_PDCR4 = AUDMUX_PDCR_RXDSEL_PORT4;
+        /* wmc_set(WMC_COMPANDING_CTRL, WMC_LOOPBACK); */
+        break;
+    }
 }
 
 void audio_input_mux(int source, unsigned int flags)
 {
-    (void)flags;
+    /* Prevent pops from unneeded switching */
+    static int last_source = AUDIO_SRC_PLAYBACK;
+    bool recording = flags & SRCF_RECORDING;
+    static bool last_recording = false;
+
     switch (source)
     {
-        case AUDIO_SRC_PLAYBACK:
-            /* deselect bypass patths and set volume to -15dB */
-            wmc_clear(WMC_LEFT_MIXER_CTRL, (WMC_BYPL2LMIX) | (7<<2));
-            wmc_clear(WMC_RIGHT_MIXER_CTRL, (WMC_BYPR2RMIX) | (7<<2));
-            /* disable L2/R2 inputs and boost stage */
-            wmc_clear(WMC_POWER_MANAGEMENT2,
-                      WMC_INPPGAENR | WMC_INPPGAENL | WMC_BOOSTENL | WMC_BOOSTENR);
-            break;
-
-        case AUDIO_SRC_FMRADIO:
-            /* enable L2/R2 inputs and boost stage */
-            wmc_set(WMC_POWER_MANAGEMENT2,
-                    WMC_INPPGAENR | WMC_INPPGAENL | WMC_BOOSTENL | WMC_BOOSTENR);
-            /* select bypass patths and set volume to 0dB */
-            wmc_set(WMC_LEFT_MIXER_CTRL, (WMC_BYPL2LMIX) | (5<<2));
-            wmc_set(WMC_RIGHT_MIXER_CTRL, (WMC_BYPR2RMIX) | (5<<2));
-            break;
-
         default:
             source = AUDIO_SRC_PLAYBACK;
+            /* Fallthrough */
+        case AUDIO_SRC_PLAYBACK: /* playback - no recording */
+            if (source != last_source)
+                audiohw_set_recsrc(AUDIO_SRC_PLAYBACK, false);
+            break;
+
+        case AUDIO_SRC_FMRADIO: /* recording and playback */
+            if (source != last_source || recording != last_recording)
+                audiohw_set_recsrc(AUDIO_SRC_FMRADIO, recording);
+            break;
     }
+
+    last_source = source;
+    last_recording = recording;
 }
 

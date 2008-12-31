@@ -777,7 +777,7 @@
 #define AUDMUX_PTCR_TCSEL_PORT6     (0x5 << 22)
 #define AUDMUX_PTCR_TCSEL_PORT7     (0x6 << 22)
 
-#define AUDMUX_PTCR_RFSDIR          (1 << 21)
+#define AUDMUX_PTCR_RFS_DIR         (1 << 21)
 
 #define AUDMUX_PTCR_RFSSEL          (0xf << 17)
 #define AUDMUX_PTCR_RFSSEL_TXFS     (0x0 << 17)
@@ -922,7 +922,7 @@
 #define SSI_SIER_TLS            (0x1 << 5)
 #define SSI_SIER_RLS            (0x1 << 4)
 #define SSI_SIER_RFF1           (0x1 << 3)
-#define SSI_SIER_RFF2           (0x1 << 2)
+#define SSI_SIER_RFF0           (0x1 << 2)
 #define SSI_SIER_TFE1           (0x1 << 1)
 #define SSI_SIER_TFE0           (0x1 << 0)
 

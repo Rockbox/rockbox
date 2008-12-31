@@ -79,11 +79,24 @@
 /* Define this if you have the WM8978 audio codec */
 #define HAVE_WM8978
 
+/* Define bitmask of input sources - recordable bitmask can be defined
+   explicitly if different */
 #define INPUT_SRC_CAPS SRC_CAP_FMRADIO
 
+/* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS (SAMPR_CAP_48 | SAMPR_CAP_44 | SAMPR_CAP_32 | \
                        SAMPR_CAP_24 | SAMPR_CAP_22 | SAMPR_CAP_16 | \
                        SAMPR_CAP_12 | SAMPR_CAP_11 | SAMPR_CAP_8)
+
+/* define the bitmask of recording sample rates */
+#define REC_SAMPR_CAPS HW_SAMPR_CAPS /* Same as playback */
+
+/* define default recording levels */
+#define DEFAULT_REC_LEFT_GAIN 0
+#define DEFAULT_REC_RIGHT_GAIN 0
+
+/* Define this if you have recording capability */
+#define HAVE_RECORDING
 
 /* Define this if your LCD can be put to sleep. */
 #define HAVE_LCD_SLEEP

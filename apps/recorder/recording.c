@@ -274,12 +274,14 @@ static short agc_maxgain;
 
 static void set_gain(void)
 {
+#ifdef HAVE_MIC_REC
     if(global_settings.rec_source == AUDIO_SRC_MIC)
     {
         audio_set_recording_gain(global_settings.rec_mic_gain,
                                  0, AUDIO_GAIN_MIC);
     }
     else
+#endif /* MIC */
     {
         /* AUDIO_SRC_LINEIN, AUDIO_SRC_FMRADIO, AUDIO_SRC_SPDIF */
         audio_set_recording_gain(global_settings.rec_left_gain,
@@ -332,15 +334,19 @@ static bool agc_gain_is_max(bool left, bool right)
 
     switch (global_settings.rec_source)
     {
+#if defined(HAVE_LINE_REC) || defined(HAVE_FMRADIO_REC)
     HAVE_LINE_REC_(case AUDIO_SRC_LINEIN:)
     HAVE_FMRADIO_REC_(case AUDIO_SRC_FMRADIO:)
         gain_current_l = global_settings.rec_left_gain;
         gain_current_r = global_settings.rec_right_gain;
         break;
+#endif /* LINE, FMRADIO */
+#if defined(HAVE_MIC_REC)
     case AUDIO_SRC_MIC:
     default:
         gain_current_l = global_settings.rec_mic_gain;
         gain_current_r = global_settings.rec_mic_gain;
+#endif /* MIC */
     }
 
     return ((left && (gain_current_l >= agc_maxgain)) ||
@@ -353,13 +359,17 @@ static void change_recording_gain(bool increment, bool left, bool right)
 
     switch (global_settings.rec_source)
     {
+#if defined(HAVE_LINE_REC) || defined(HAVE_FMRADIO_REC)
     HAVE_LINE_REC_(case AUDIO_SRC_LINEIN:)
     HAVE_FMRADIO_REC_(case AUDIO_SRC_FMRADIO:)
         if (left) global_settings.rec_left_gain += factor;
         if (right) global_settings.rec_right_gain += factor;
         break;
+#endif /* LINE, FMRADIO */
+#if defined(HAVE_MIC_REC)
     case AUDIO_SRC_MIC:
          global_settings.rec_mic_gain += factor;
+#endif
     }
 }
 
@@ -858,6 +868,7 @@ static char * reclist_get_name(int selected_item, void * data,
                               buf2, sizeof(buf2)));
             break;
         case ITEM_GAIN:
+#ifdef HAVE_MIC_REC
             if(global_settings.rec_source == AUDIO_SRC_MIC)
             {
                 /* Draw MIC recording gain */
@@ -867,6 +878,7 @@ static char * reclist_get_name(int selected_item, void * data,
                                   buf2, sizeof(buf2)));
             }
             else
+#endif /* MIC */
             {
                 int avg_gain = (global_settings.rec_left_gain +
                                 global_settings.rec_right_gain) / 2;
@@ -902,6 +914,7 @@ static char * reclist_get_name(int selected_item, void * data,
                          str(LANG_RECORDING_AGC_MAXGAIN),
                              fmt_gain(SOUND_LEFT_GAIN,
                                       agc_maxgain, buf2, sizeof(buf2)));
+#ifdef HAVE_MIC_REC
             else if (global_settings.rec_source == AUDIO_SRC_MIC)
                 snprintf(buffer, buffer_len, "%s: %s (%s)",
                          str(LANG_RECORDING_AGC_MAXGAIN),
@@ -911,6 +924,7 @@ static char * reclist_get_name(int selected_item, void * data,
                                   agc_maxgain - global_settings.rec_mic_gain,
                                   buf3, sizeof(buf3)));
             else
+#endif /* MIC */
                 snprintf(buffer, buffer_len, "%s: %s (%s)",
                          str(LANG_RECORDING_AGC_MAXGAIN),
                          fmt_gain(SOUND_LEFT_GAIN,
@@ -1180,15 +1194,18 @@ bool recording_screen(bool no_source)
 #endif
 
 #ifdef HAVE_AGC
+#ifdef HAVE_MIC_REC
             if (global_settings.rec_source == AUDIO_SRC_MIC) {
                 agc_preset = global_settings.rec_agc_preset_mic;
                 agc_maxgain = global_settings.rec_agc_maxgain_mic;
             }
-            else {
+            else
+#endif /* MIC */
+            {
                 agc_preset = global_settings.rec_agc_preset_line;
                 agc_maxgain = global_settings.rec_agc_maxgain_line;
             }
-#endif
+#endif /* HAVE_AGC */
 
             set_gain();
             update_countdown = 0; /* Update immediately */
@@ -1209,7 +1226,7 @@ bool recording_screen(bool no_source)
             }
             else
 #endif
-            if((global_settings.rec_source == AUDIO_SRC_MIC) ||
+            if(HAVE_MIC_REC_((global_settings.rec_source == AUDIO_SRC_MIC) || )
                (global_settings.rec_channels == 1))
             {
                 listid_to_enum[0] = ITEM_VOLUME_M;
@@ -1335,6 +1352,7 @@ bool recording_screen(bool no_source)
                         setvol();
                         break;
                     case ITEM_GAIN:
+#ifdef HAVE_MIC_REC
                         if(global_settings.rec_source == AUDIO_SRC_MIC)
                         {
                             if(global_settings.rec_mic_gain <
@@ -1342,6 +1360,7 @@ bool recording_screen(bool no_source)
                                 global_settings.rec_mic_gain++;
                         }
                         else
+#endif /* MIC */
                         {
                             if(global_settings.rec_left_gain <
                                sound_max(SOUND_LEFT_GAIN))
@@ -1365,15 +1384,19 @@ bool recording_screen(bool no_source)
                     case ITEM_AGC_MODE:
                         agc_preset = MIN(agc_preset + 1, AGC_MODE_SIZE);
                         agc_enable = (agc_preset != 0);
+#ifdef HAVE_MIC_REC
                         if (global_settings.rec_source == AUDIO_SRC_MIC) {
                             global_settings.rec_agc_preset_mic = agc_preset;
                             agc_maxgain = global_settings.rec_agc_maxgain_mic;
-                        } else {
+                        } else
+#endif /* MIC */
+                        {
                             global_settings.rec_agc_preset_line = agc_preset;
                             agc_maxgain = global_settings.rec_agc_maxgain_line;
                         }
                         break;
                     case ITEM_AGC_MAXDB:
+#ifdef HAVE_MIC_REC
                         if (global_settings.rec_source == AUDIO_SRC_MIC)
                         {
                             agc_maxgain = MIN(agc_maxgain + 1,
@@ -1381,6 +1404,7 @@ bool recording_screen(bool no_source)
                             global_settings.rec_agc_maxgain_mic = agc_maxgain;
                         }
                         else
+#endif /* MIC */
                         {
                             agc_maxgain = MIN(agc_maxgain + 1,
                                               sound_max(SOUND_LEFT_GAIN));
@@ -1401,6 +1425,7 @@ bool recording_screen(bool no_source)
                         setvol();
                         break;
                     case ITEM_GAIN:
+#ifdef HAVE_MIC_REC
                         if(global_settings.rec_source == AUDIO_SRC_MIC)
                         {
                             if(global_settings.rec_mic_gain >
@@ -1408,6 +1433,7 @@ bool recording_screen(bool no_source)
                                 global_settings.rec_mic_gain--;
                         }
                         else
+#endif /* MIC */
                         {
                             if(global_settings.rec_left_gain >
                                sound_min(SOUND_LEFT_GAIN))
@@ -1431,22 +1457,26 @@ bool recording_screen(bool no_source)
                     case ITEM_AGC_MODE:
                         agc_preset = MAX(agc_preset - 1, 0);
                         agc_enable = (agc_preset != 0);
+#ifdef HAVE_MIC_REC
                         if (global_settings.rec_source == AUDIO_SRC_MIC) {
                             global_settings.rec_agc_preset_mic = agc_preset;
                             agc_maxgain = global_settings.rec_agc_maxgain_mic;
-                        } else {
+                        } else
+#endif /* MIC */
+                        {
                             global_settings.rec_agc_preset_line = agc_preset;
                             agc_maxgain = global_settings.rec_agc_maxgain_line;
                         }
                         break;
                     case ITEM_AGC_MAXDB:
+#ifdef HAVE_MIC_REC
                         if (global_settings.rec_source == AUDIO_SRC_MIC)
                         {
                             agc_maxgain = MAX(agc_maxgain - 1,
                                               sound_min(SOUND_MIC_GAIN));
                             global_settings.rec_agc_maxgain_mic = agc_maxgain;
-                        }
-                        else
+                        } else
+#endif /* MIC */
                         {
                             agc_maxgain = MAX(agc_maxgain - 1,
                                               sound_min(SOUND_LEFT_GAIN));
@@ -1796,12 +1826,14 @@ bool recording_screen(bool no_source)
             }
 
 #ifdef HAVE_AGC
+#ifdef HAVE_MIC_REC
             if (global_settings.rec_source == AUDIO_SRC_MIC)
             {
                 if(agc_maxgain < (global_settings.rec_mic_gain))
                     change_recording_gain(false, true, true);
             }
             else
+#endif /* MIC */
             {
                 if(agc_maxgain < (global_settings.rec_left_gain))
                     change_recording_gain(false, true, false);

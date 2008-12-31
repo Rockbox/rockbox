@@ -29,6 +29,7 @@
 int tenthdb2master(int db);
 void audiohw_set_headphone_vol(int vol_l, int vol_r);
 void audiohw_set_frequency(int fsel);
+void audiohw_set_recsrc(int source, bool recording);
 
 void wmc_set(unsigned int reg, unsigned int bits);
 void wmc_clear(unsigned int reg, unsigned int bits);
@@ -108,8 +109,8 @@ void wmc_clear(unsigned int reg, unsigned int bits);
 
 /* Volums masks and macros for analogue volumes */
 #define WMC_AVOL                        0x3f
-#define WMC_AVOLr(x)                    ((x) & WMC_AVOLUME_MASK)
-#define WMC_AVOLw(x)                    ((x) & WMC_AVOLUME_MASK)
+#define WMC_AVOLr(x)                    ((x) & WMC_AVOL)
+#define WMC_AVOLw(x)                    ((x) & WMC_AVOL)
 
 /* WMC_SOFTWARE_RESET (0x00) */
 #define WMC_RESET
@@ -457,8 +458,8 @@ void wmc_clear(unsigned int reg, unsigned int bits);
 #define WMC_PGABOOSTL                    (1 << 8)
     /* 000=disabled, 001=-12dB, 010=-9dB...111=+6dB */
 #define WMC_L2_2BOOSTVOL                 (7 << 4)
-    #define WMC_L2_2BOOSTVOLr(x)         ((x) & WMC_L2_2_BOOSTVOL) >> 4)
-    #define WMC_L2_2BOOSTVOLw(x)         ((x) << 4) & WMC_L2_2_BOOSTVOL)
+    #define WMC_L2_2BOOSTVOLr(x)         (((x) & WMC_L2_2BOOSTVOL) >> 4)
+    #define WMC_L2_2BOOSTVOLw(x)         (((x) << 4) & WMC_L2_2BOOSTVOL)
     /* 000=disabled, 001=-12dB, 010=-9dB...111=+6dB */
 #define WMC_AUXL2BOOSTVOL                (7 << 0)
     #define WMC_AUXL2BOOSTVOLr(x)        ((x) & WMC_AUXL2BOOSTVOL)
@@ -467,9 +468,9 @@ void wmc_clear(unsigned int reg, unsigned int bits);
 /* WMC_RIGHT_ADC_BOOST_CTRL (0x30) */
 #define WMC_PGABOOSTR                    (1 << 8)
     /* 000=disabled, 001=-12dB, 010=-9dB...111=+6dB */
-#define WMC_R2_2_BOOSTVOL                (7 << 4)
-    #define WMC_R2_2BOOSTVOLr(x)         ((x) & WMC_R2_2_BOOSTVOL) >> 4)
-    #define WMC_R2_2BOOSTVOLw(x)         ((x) << 4) & WMC_R2_2_BOOSTVOL)
+#define WMC_R2_2BOOSTVOL                (7 << 4)
+    #define WMC_R2_2BOOSTVOLr(x)         (((x) & WMC_R2_2BOOSTVOL) >> 4)
+    #define WMC_R2_2BOOSTVOLw(x)         (((x) << 4) & WMC_R2_2BOOSTVOL)
     /* 000=disabled, 001=-12dB, 010=-9dB...111=+6dB */
 #define WMC_AUXR2BOOSTVOL                (7 << 0)
     #define WMC_AUXR2BOOSTVOLr(x)        ((x) & WMC_AUXR2BOOSTVOL)
@@ -487,26 +488,26 @@ void wmc_clear(unsigned int reg, unsigned int bits);
 /* WMC_LEFT_MIXER_CTRL (0x32) */
     /* 000=-15dB, 001=-12dB...101=0dB, 110=+3dB, 111=+6dB */
 #define WMC_AUXLMIXVOL                   (7 << 6)
-    #define WMC_AUXLMIXVOLr(x)           ((x) & WMC_AUXLMIXVOL) >> 6)
-    #define WMC_AUXLMIXVOLw(x)           ((x) << 6) & WMC_AUXLMIXVOL)
+    #define WMC_AUXLMIXVOLr(x)           (((x) & WMC_AUXLMIXVOL) >> 6)
+    #define WMC_AUXLMIXVOLw(x)           (((x) << 6) & WMC_AUXLMIXVOL)
 #define WMC_AUXL2LMIX                    (1 << 5)
     /* 000=-15dB, 001=-12dB...101=0dB, 110=+3dB, 111=+6dB */
 #define WMC_BYPLMIXVOL                   (7 << 2)
-    #define WMC_BYPLMIXVOLr(x)           ((x) & WMC_BYPLMIXVOL) >> 2)
-    #define WMC_BYPLMIXVOLw(x)           ((x) << 2) & WMC_BYPLMIXVOL)
+    #define WMC_BYPLMIXVOLr(x)           (((x) & WMC_BYPLMIXVOL) >> 2)
+    #define WMC_BYPLMIXVOLw(x)           (((x) << 2) & WMC_BYPLMIXVOL)
 #define WMC_BYPL2LMIX                    (1 << 1)
 #define WMC_DACL2LMIX                    (1 << 0)
 
 /* WMC_RIGHT_MIXER_CTRL (0x33) */
     /* 000=-15dB, 001=-12dB...101=0dB, 110=+3dB, 111=+6dB */
 #define WMC_AUXRMIXVOL                   (7 << 6)
-    #define WMC_AUXRMIXVOLr(x)           ((x) & WMC_AUXRMIXVOL) >> 6)
-    #define WMC_AUXRMIXVOLw(x)           ((x) << 6) & WMC_AUXRMIXVOL)
+    #define WMC_AUXRMIXVOLr(x)           (((x) & WMC_AUXRMIXVOL) >> 6)
+    #define WMC_AUXRMIXVOLw(x)           (((x) << 6) & WMC_AUXRMIXVOL)
 #define WMC_AUXR2RMIX                    (1 << 5)
     /* 000=-15dB, 001=-12dB...101=0dB, 110=+3dB, 111=+6dB */
 #define WMC_BYPRMIXVOL                   (7 << 2)
-    #define WMC_BYPRMIXVOLr(x)           ((x) & WMC_BYPRMIXVOL) >> 2)
-    #define WMC_BYPRMIXVOLw(x)           ((x) << 2) & WMC_BYPRMIXVOL)
+    #define WMC_BYPRMIXVOLr(x)           (((x) & WMC_BYPRMIXVOL) >> 2)
+    #define WMC_BYPRMIXVOLw(x)           (((x) << 2) & WMC_BYPRMIXVOL)
 #define WMC_BYPR2RMIX                    (1 << 1)
 #define WMC_DACR2RMIX                    (1 << 0)
 
@@ -518,14 +519,12 @@ void wmc_clear(unsigned int reg, unsigned int bits);
     /* Uses WMC_AVOL* macros */
 
 /* WMC_OUT3_MIXER_CTRL (0x38) */
-#define WMC_OUT3MUTE                     (1 << 6)
 #define WMC_OUT42OUT3                    (1 << 3)
 #define WMC_BYPL2OUT3                    (1 << 2)
 #define WMC_LMIX2OUT3                    (1 << 1)
 #define WMC_LDAC2OUT3                    (1 << 0)
 
 /* WMC_OUT4_MONO_MIXER_CTRL (0x39) */
-#define WMC_OUT4MUTE                     (1 << 6)
 #define WMC_HALFSIG                      (1 << 5)
 #define WMC_LMIX2OUT4                    (1 << 4)
 #define WMC_LDAC2OUT4                    (1 << 3)

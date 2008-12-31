@@ -629,7 +629,7 @@ void sound_set(int setting, int value)
 #if (!defined(HAVE_AS3514) && !defined(HAVE_WM8975) \
   && !defined(HAVE_WM8758) && !defined(HAVE_TSC2100) \
   && !defined (HAVE_WM8711) && !defined (HAVE_WM8721) \
-  && !defined (HAVE_WM8731)) \
+  && !defined (HAVE_WM8731) && !defined (HAVE_WM8978)) \
   || defined(SIMULATOR)
 int sound_val2phys(int setting, int value)
 {
@@ -705,6 +705,24 @@ int sound_val2phys(int setting, int value)
     default:
         result = value;
         break;
+    }
+
+    return result;
+#elif defined(HAVE_WM8978)
+    int result;
+
+    switch (setting)
+    {
+#ifdef HAVE_RECORDING
+    case SOUND_LEFT_GAIN:
+    case SOUND_RIGHT_GAIN:
+    case SOUND_MIC_GAIN:
+        result = value * 5;
+        break;
+#endif
+
+    default:
+        result = value;
     }
 
     return result;

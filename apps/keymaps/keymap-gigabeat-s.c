@@ -251,6 +251,23 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */
 
+/** Recording Screen **/
+static const struct button_mapping button_context_recscreen[]  = {
+    { ACTION_REC_PAUSE,          BUTTON_PLAY|BUTTON_REL,     BUTTON_PLAY },
+    { ACTION_STD_CANCEL,         BUTTON_BACK|BUTTON_REL,     BUTTON_BACK },
+    { ACTION_REC_NEWFILE,        BUTTON_NEXT|BUTTON_REL,     BUTTON_NEXT },
+    { ACTION_STD_MENU,           BUTTON_MENU|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_SETTINGS_INC,       BUTTON_RIGHT,               BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_LEFT,                BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_STD_PREV,           BUTTON_UP,                  BUTTON_NONE },
+    { ACTION_STD_PREV,           BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_STD_NEXT,           BUTTON_DOWN,                BUTTON_NONE },
+    { ACTION_STD_NEXT,           BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+}; /* button_context_recscreen */
+
 static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT,                             BUTTON_NONE },
     { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,               BUTTON_NONE },
@@ -333,6 +350,10 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_quickscreen;
         case CONTEXT_PITCHSCREEN:
             return button_context_pitchscreen;
+        case CONTEXT_RECSCREEN:
+            return button_context_recscreen;
+        case CONTEXT_SETTINGS_RECTRIGGER:
+            return button_context_settings_right_is_inc;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
         case CONTEXT_FM:
