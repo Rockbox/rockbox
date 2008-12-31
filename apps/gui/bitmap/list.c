@@ -296,9 +296,10 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
     int button = action_get_touchscreen_press(&x, &y);
     int line;
     struct screen *display = &screens[SCREEN_MAIN];
+    int screen = display->screen_type;
     if (button == BUTTON_NONE)
         return ACTION_NONE;
-    if (x<list_text[SCREEN_MAIN].x)
+    if (x<list_text[screen].x)
     {
         /* Top left corner is hopefully GO_TO_ROOT */
         if (y<list_text[SCREEN_MAIN].y)
