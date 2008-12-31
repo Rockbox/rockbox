@@ -260,28 +260,29 @@
   #define CPM_LCR_LPM_SLEEP    (0x1 << CPM_LCR_LPM_BIT)
 
 /* Clock Gate Register */
-#define CPM_CLKGR_UART1        (1 << 15)
+#define CPM_CLKGR_UART1      (1 << 15)
 #define CPM_CLKGR_UHC        (1 << 14)
 #define CPM_CLKGR_IPU        (1 << 13)
-#define CPM_CLKGR_DMAC        (1 << 12)
+#define CPM_CLKGR_DMAC       (1 << 12)
 #define CPM_CLKGR_UDC        (1 << 11)
 #define CPM_CLKGR_LCD        (1 << 10)
 #define CPM_CLKGR_CIM        (1 << 9)
-#define CPM_CLKGR_SADC        (1 << 8)
+#define CPM_CLKGR_SADC       (1 << 8)
 #define CPM_CLKGR_MSC        (1 << 7)
-#define CPM_CLKGR_AIC1        (1 << 6)
-#define CPM_CLKGR_AIC2        (1 << 5)
+#define CPM_CLKGR_AIC1       (1 << 6)
+#define CPM_CLKGR_AIC2       (1 << 5)
 #define CPM_CLKGR_SSI        (1 << 4)
 #define CPM_CLKGR_I2C        (1 << 3)
 #define CPM_CLKGR_RTC        (1 << 2)
 #define CPM_CLKGR_TCU        (1 << 1)
-#define CPM_CLKGR_UART0        (1 << 0)
+#define CPM_CLKGR_UART0      (1 << 0)
 
 /* Sleep Control Register */
-#define CPM_SCR_O1ST_BIT    8
-#define CPM_SCR_O1ST_MASK    (0xff << CPM_SCR_O1ST_BIT)
+#define CPM_SCR_O1ST_BIT          8
+#define CPM_SCR_O1ST_MASK         (0xff << CPM_SCR_O1ST_BIT)
+#define CPM_SCR_USBHOST_SUSPEND   (1 << 7)
 #define CPM_SCR_USBPHY_ENABLE    (1 << 6)
-#define CPM_SCR_OSC_ENABLE    (1 << 4)
+#define CPM_SCR_OSC_ENABLE        (1 << 4)
 
 /* Hibernate Control Register */
 #define CPM_HCR_PD        (1 << 0)
@@ -2419,7 +2420,7 @@
 #define USB_INTR_OUTEP1     0x0002
 #define USB_INTR_OUTEP2     0x0004
 
-#define USB_INTR_EP(n)      (n*2)
+#define USB_INTR_EP(n)      ((n)==0 ? 1 : ((n)*2))
 
 /* CSR0 bit masks */
 #define USB_CSR0_OUTPKTRDY    0x01
@@ -3282,56 +3283,59 @@ do {                        \
 #define __cpm_sleep_mode() \
     (REG_CPM_LCR = (REG_CPM_LCR & ~CPM_LCR_LPM_MASK) | CPM_LCR_LPM_SLEEP)
 
-#define __cpm_stop_all()     (REG_CPM_CLKGR = 0xffff)
-#define __cpm_stop_uart1()    (REG_CPM_CLKGR |= CPM_CLKGR_UART1)
-#define __cpm_stop_uhc()    (REG_CPM_CLKGR |= CPM_CLKGR_UHC)
-#define __cpm_stop_ipu()    (REG_CPM_CLKGR |= CPM_CLKGR_IPU)
+#define __cpm_stop_all()     (REG_CPM_CLKGR  = 0xffff)
+#define __cpm_stop_uart1()   (REG_CPM_CLKGR |= CPM_CLKGR_UART1)
+#define __cpm_stop_uhc()     (REG_CPM_CLKGR |= CPM_CLKGR_UHC)
+#define __cpm_stop_ipu()     (REG_CPM_CLKGR |= CPM_CLKGR_IPU)
 #define __cpm_stop_dmac()    (REG_CPM_CLKGR |= CPM_CLKGR_DMAC)
-#define __cpm_stop_udc()    (REG_CPM_CLKGR |= CPM_CLKGR_UDC)
-#define __cpm_stop_lcd()    (REG_CPM_CLKGR |= CPM_CLKGR_LCD)
-#define __cpm_stop_cim()    (REG_CPM_CLKGR |= CPM_CLKGR_CIM)
+#define __cpm_stop_udc()     (REG_CPM_CLKGR |= CPM_CLKGR_UDC)
+#define __cpm_stop_lcd()     (REG_CPM_CLKGR |= CPM_CLKGR_LCD)
+#define __cpm_stop_cim()     (REG_CPM_CLKGR |= CPM_CLKGR_CIM)
 #define __cpm_stop_sadc()    (REG_CPM_CLKGR |= CPM_CLKGR_SADC)
-#define __cpm_stop_msc()    (REG_CPM_CLKGR |= CPM_CLKGR_MSC)
+#define __cpm_stop_msc()     (REG_CPM_CLKGR |= CPM_CLKGR_MSC)
 #define __cpm_stop_aic1()    (REG_CPM_CLKGR |= CPM_CLKGR_AIC1)
 #define __cpm_stop_aic2()    (REG_CPM_CLKGR |= CPM_CLKGR_AIC2)
-#define __cpm_stop_ssi()    (REG_CPM_CLKGR |= CPM_CLKGR_SSI)
-#define __cpm_stop_i2c()    (REG_CPM_CLKGR |= CPM_CLKGR_I2C)
-#define __cpm_stop_rtc()    (REG_CPM_CLKGR |= CPM_CLKGR_RTC)
-#define __cpm_stop_tcu()    (REG_CPM_CLKGR |= CPM_CLKGR_TCU)
-#define __cpm_stop_uart0()    (REG_CPM_CLKGR |= CPM_CLKGR_UART0)
+#define __cpm_stop_ssi()     (REG_CPM_CLKGR |= CPM_CLKGR_SSI)
+#define __cpm_stop_i2c()     (REG_CPM_CLKGR |= CPM_CLKGR_I2C)
+#define __cpm_stop_rtc()     (REG_CPM_CLKGR |= CPM_CLKGR_RTC)
+#define __cpm_stop_tcu()     (REG_CPM_CLKGR |= CPM_CLKGR_TCU)
+#define __cpm_stop_uart0()   (REG_CPM_CLKGR |= CPM_CLKGR_UART0)
 
-#define __cpm_start_all()     (REG_CPM_CLKGR = 0x0)
-#define __cpm_start_uart1()    (REG_CPM_CLKGR &= ~CPM_CLKGR_UART1)
+#define __cpm_start_all()    (REG_CPM_CLKGR  = 0x0)
+#define __cpm_start_uart1()  (REG_CPM_CLKGR &= ~CPM_CLKGR_UART1)
 #define __cpm_start_uhc()    (REG_CPM_CLKGR &= ~CPM_CLKGR_UHC)
 #define __cpm_start_ipu()    (REG_CPM_CLKGR &= ~CPM_CLKGR_IPU)
-#define __cpm_start_dmac()    (REG_CPM_CLKGR &= ~CPM_CLKGR_DMAC)
+#define __cpm_start_dmac()   (REG_CPM_CLKGR &= ~CPM_CLKGR_DMAC)
 #define __cpm_start_udc()    (REG_CPM_CLKGR &= ~CPM_CLKGR_UDC)
 #define __cpm_start_lcd()    (REG_CPM_CLKGR &= ~CPM_CLKGR_LCD)
 #define __cpm_start_cim()    (REG_CPM_CLKGR &= ~CPM_CLKGR_CIM)
-#define __cpm_start_sadc()    (REG_CPM_CLKGR &= ~CPM_CLKGR_SADC)
+#define __cpm_start_sadc()   (REG_CPM_CLKGR &= ~CPM_CLKGR_SADC)
 #define __cpm_start_msc()    (REG_CPM_CLKGR &= ~CPM_CLKGR_MSC)
-#define __cpm_start_aic1()    (REG_CPM_CLKGR &= ~CPM_CLKGR_AIC1)
-#define __cpm_start_aic2()    (REG_CPM_CLKGR &= ~CPM_CLKGR_AIC2)
+#define __cpm_start_aic1()   (REG_CPM_CLKGR &= ~CPM_CLKGR_AIC1)
+#define __cpm_start_aic2()   (REG_CPM_CLKGR &= ~CPM_CLKGR_AIC2)
 #define __cpm_start_ssi()    (REG_CPM_CLKGR &= ~CPM_CLKGR_SSI)
 #define __cpm_start_i2c()    (REG_CPM_CLKGR &= ~CPM_CLKGR_I2C)
 #define __cpm_start_rtc()    (REG_CPM_CLKGR &= ~CPM_CLKGR_RTC)
 #define __cpm_start_tcu()    (REG_CPM_CLKGR &= ~CPM_CLKGR_TCU)
-#define __cpm_start_uart0()    (REG_CPM_CLKGR &= ~CPM_CLKGR_UART0)
+#define __cpm_start_uart0()  (REG_CPM_CLKGR &= ~CPM_CLKGR_UART0)
 
 #define __cpm_get_o1st() \
     ((REG_CPM_SCR & CPM_SCR_O1ST_MASK) >> CPM_SCR_O1ST_BIT)
 #define __cpm_set_o1st(v) \
     (REG_CPM_SCR = (REG_CPM_SCR & ~CPM_SCR_O1ST_MASK) | ((v) << (CPM_SCR_O1ST_BIT)))
 #define __cpm_suspend_usbphy()        (REG_CPM_SCR |= CPM_SCR_USBPHY_SUSPEND)
+#define __cpm_suspend_usbhost()        (REG_CPM_SCR |= CPM_SCR_USBHOST_SUSPEND)
 #define __cpm_enable_osc_in_sleep()    (REG_CPM_SCR |= CPM_SCR_OSC_ENABLE)
 
+
+#define CFG_EXTAL       12000000
 
 #ifdef CFG_EXTAL
 #define JZ_EXTAL        CFG_EXTAL
 #else
 #define JZ_EXTAL        3686400
 #endif
-#define JZ_EXTAL2        32768 /* RTC clock */
+#define JZ_EXTAL2       32768 /* RTC clock */
 
 /* PLL output frequency */
 static __inline__ unsigned int __cpm_get_pllout(void)

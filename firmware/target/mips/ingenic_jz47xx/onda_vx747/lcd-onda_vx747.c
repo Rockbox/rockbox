@@ -203,7 +203,7 @@ static void _set_lcd_clock(void)
     
     __cpm_stop_lcd();
     pll_div = ( REG_CPM_CPCCR & CPM_CPCCR_PCS ); /* clock source, 0:pllout/2 1: pllout */
-    pll_div = pll_div ? 1 : 2 ;
+    pll_div = pll_div ? 1 : 2;
     val = ( __cpm_get_pllout()/pll_div ) / __cpm_get_pclk();
     val--;
     if ( val > 0x1ff )

@@ -663,6 +663,168 @@ void dma_disable(void)
     }
 }
 
+static inline void pll_convert(unsigned int pllin, unsigned int *pll_cfcr, unsigned int *pll_plcr1)
+{
+    register unsigned int cfcr, plcr1;
+    int div[5] = {1, 3, 3, 3, 3}; /* divisors of I:S:P:L:M */
+    int nf;
+
+    cfcr = CPM_CPCCR_CLKOEN               |
+           (div[0] << CPM_CPCCR_CDIV_BIT) | 
+           (div[1] << CPM_CPCCR_HDIV_BIT) | 
+           (div[2] << CPM_CPCCR_PDIV_BIT) |
+           (div[3] << CPM_CPCCR_MDIV_BIT) |
+           (div[4] << CPM_CPCCR_LDIV_BIT);
+
+    //nf = pllin * 2 / CFG_EXTAL;
+    nf = pllin * 2 / 375299969;
+    plcr1 = ((nf - 2) << CPM_CPPCR_PLLM_BIT) | /* FD */
+            (0 << CPM_CPPCR_PLLN_BIT)        | /* RD=0, NR=2 */
+            (0 << CPM_CPPCR_PLLOD_BIT)       | /* OD=0, NO=1 */
+            (0xa << CPM_CPPCR_PLLST_BIT)     | /* PLL stable time */
+            CPM_CPPCR_PLLEN;                   /* enable PLL */
+    
+    /* init PLL */
+    *pll_cfcr = cfcr;
+    *pll_plcr1 = plcr1;
+}
+
+static inline void sdram_convert(unsigned int pllin, unsigned int *sdram_freq)
+{
+    register unsigned int ns, tmp;
+ 
+    ns = 1000000000 / pllin;
+    tmp = 15625 / ns;
+
+    /* Set refresh registers */
+    tmp = tmp / 64 + 1;
+    
+    if(tmp > 0xff)
+        tmp = 0xff;
+    
+    *sdram_freq = tmp;
+}
+
+static inline void set_cpu_freq(unsigned int pllin, unsigned int div)
+{
+    unsigned int sdram_freq;
+    unsigned int pll_cfcr, pll_plcr1;
+    int div_preq[] = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
+    
+    if(pllin < 25000000 || pllin > 420000000)
+        panicf("PLL should be >25000000 and <420000000 !");
+    
+    unsigned long t = read_c0_status();
+    write_c0_status(t & ~1);
+    
+    pll_convert(pllin, &pll_cfcr, &pll_plcr1);
+
+    sdram_convert(pllin / div_preq[div], &sdram_freq);
+    
+    REG_CPM_CPCCR &= ~CPM_CPCCR_CE;
+    
+    REG_CPM_CPCCR = pll_cfcr;
+    REG_CPM_CPPCR = pll_plcr1;
+    
+    REG_EMC_RTCOR = sdram_freq;
+    REG_EMC_RTCNT = sdram_freq;
+    
+    REG_CPM_CPCCR |= CPM_CPCCR_CE;
+    
+    detect_clock();
+    
+    write_c0_status(t);
+}
+
+static void OF_init_clocks(void)
+{
+    unsigned int prog_entry = ((unsigned int)OF_init_clocks >> 5) << 5;
+    unsigned int i, prog_size = 1024;
+
+    for(i = prog_entry; i < prog_entry + prog_size; i += 32)
+        __asm__ __volatile__("cache 0x1c, 0x00(%0) \n"
+                             :
+                             : "r" (i)
+                            );
+    
+    /* disable PLL clock */
+    REG_CPM_CPPCR &= ~CPM_CPPCR_PLLEN;
+    REG_CPM_CPCCR |= CPM_CPCCR_CE;
+    
+    unsigned long old_clocks = REG_CPM_CLKGR;
+    /*
+    REG_CPM_CLKGR = ~( CPM_CLKGR_UART0 | CPM_CLKGR_TCU  |
+                       CPM_CLKGR_RTC   | CPM_CLKGR_SADC |
+                       CPM_CLKGR_LCD   );
+    */
+    
+    unsigned long old_scr = REG_CPM_SCR;
+    REG_CPM_SCR &= ~CPM_SCR_OSC_ENABLE;  /* O1SE: 12M oscillator is disabled in Sleep mode */
+    
+    REG_EMC_DMCR |= (EMC_DMCR_RMODE | EMC_DMCR_RFSH);     /* self refresh + refresh is performed */
+    REG_EMC_DMCR = (REG_EMC_DMCR & ~EMC_DMCR_RMODE) | 1;  /* -> RMODE = auto refresh
+                                                             -> CAS mode = 2 cycles */
+    __asm__ __volatile__("wait \n");
+    
+    REG_CPM_CLKGR = old_clocks;
+    REG_CPM_SCR = old_scr;
+    
+    for(i=0; i<90; i++);
+    
+    set_cpu_freq(336000000, 1);
+    
+    for(i=0; i<60; i++);
+}
+
+static void my_init_clocks(void)
+{
+    unsigned long t = read_c0_status();
+    write_c0_status(t & ~1);
+    
+    unsigned int prog_entry = ((unsigned int)my_init_clocks / 32 - 1) * 32;
+    unsigned int i, prog_size = 1024;
+
+    for(i = prog_entry; i < prog_entry + prog_size; i += 32)
+        __asm__ __volatile__("cache 0x1c, 0x00(%0) \n"
+                             :
+                             : "r" (i)
+                            );
+    
+    unsigned int sdram_freq, plcr1, cfcr;
+    
+    sdram_convert(336000000/3, &sdram_freq);
+    
+    cfcr = CPM_CPCCR_CLKOEN          |
+           (6 << CPM_CPCCR_UDIV_BIT) |
+           CPM_CPCCR_UCS             |
+           CPM_CPCCR_PCS             |
+           (0 << CPM_CPCCR_CDIV_BIT) |
+           (2 << CPM_CPCCR_HDIV_BIT) |
+           (2 << CPM_CPCCR_PDIV_BIT) |
+           (2 << CPM_CPCCR_MDIV_BIT) |
+           (2 << CPM_CPCCR_LDIV_BIT);
+    
+    plcr1 = (54 << CPM_CPPCR_PLLM_BIT)   | /* FD */
+            (0 << CPM_CPPCR_PLLN_BIT)    | /* RD=0, NR=2 */
+            (0 << CPM_CPPCR_PLLOD_BIT)   | /* OD=0, NO=1 */
+            (0x20 << CPM_CPPCR_PLLST_BIT)| /* PLL stable time */
+            CPM_CPPCR_PLLEN;               /* enable PLL */
+    
+    REG_CPM_CPCCR &= ~CPM_CPCCR_CE;
+    
+    REG_CPM_CPCCR = cfcr;
+    REG_CPM_CPPCR = plcr1;
+    
+    REG_EMC_RTCOR = sdram_freq;
+    REG_EMC_RTCNT = sdram_freq;
+    
+    REG_CPM_CPCCR |= CPM_CPCCR_CE;
+    
+    REG_CPM_LPCDR = (REG_CPM_LPCDR & ~CPM_LPCDR_PIXDIV_MASK) | (11 << CPM_LPCDR_PIXDIV_BIT);
+    
+    write_c0_status(t);
+}
+
 extern int main(void);
 extern void except_common_entry(void);
 
@@ -696,6 +858,15 @@ void system_main(void)
     
     /* Disable unneeded clocks, clocks are enabled when needed */
     __cpm_stop_all();
+    __cpm_suspend_usbhost();
+    
+#if 0
+    my_init_clocks();
+    /*__cpm_stop_udc();
+    REG_CPM_CPCCR |= CPM_CPCCR_UCS;
+    REG_CPM_CPCCR = (REG_CPM_CPCCR & ~CPM_CPCCR_UDIV_MASK) | (3 << CPM_CPCCR_UDIV_BIT);
+    __cpm_start_udc();*/
+#endif
     
     /* Enable interrupts at core level */
     sti();
