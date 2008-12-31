@@ -1,3 +1,39 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2008 by Maurus Cuelenaere
+ * Copyright (C) 2006-2007 by Ingenic Semiconductor Inc.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+/*
+ *  linux/include/asm-mips/mach-jz4740/jz4740.h
+ *
+ *  JZ4740 common definition.
+ *
+ *  Copyright (C) 2006 - 2007 Ingenic Semiconductor Inc.
+ *
+ *  Author: <lhhuang@ingenic.cn>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
 /*
  * Include file for Ingenic Semiconductor's JZ4740 CPU.
  */
@@ -6,50 +42,50 @@
 
 #ifndef __ASSEMBLY__
 
-#define REG8(addr)    (*(volatile unsigned char *)(addr))
+#define REG8(addr)     (*(volatile unsigned char  *)(addr))
 #define REG16(addr)    (*(volatile unsigned short *)(addr))
-#define REG32(addr)    (*(volatile unsigned int *)(addr))
+#define REG32(addr)    (*(volatile unsigned int   *)(addr))
 
 #endif /* !ASSEMBLY */
 
-//----------------------------------------------------------------------
-// Boot ROM Specification
-//
+/*************************************************************************
+ *  Boot ROM Specification
+ */
 
 /* NOR Boot config */
 #define JZ4740_NORBOOT_8BIT    0x00000000    /* 8-bit data bus flash */
-#define JZ4740_NORBOOT_16BIT    0x10101010    /* 16-bit data bus flash */
-#define JZ4740_NORBOOT_32BIT    0x20202020    /* 32-bit data bus flash */
+#define JZ4740_NORBOOT_16BIT   0x10101010    /* 16-bit data bus flash */
+#define JZ4740_NORBOOT_32BIT   0x20202020    /* 32-bit data bus flash */
 
 /* NAND Boot config */
 #define JZ4740_NANDBOOT_B8R3    0xffffffff    /* 8-bit bus & 3 row cycles */
 #define JZ4740_NANDBOOT_B8R2    0xf0f0f0f0    /* 8-bit bus & 2 row cycles */
-#define JZ4740_NANDBOOT_B16R3    0x0f0f0f0f    /* 16-bit bus & 3 row cycles */
-#define JZ4740_NANDBOOT_B16R2    0x00000000    /* 16-bit bus & 2 row cycles */
+#define JZ4740_NANDBOOT_B16R3   0x0f0f0f0f    /* 16-bit bus & 3 row cycles */
+#define JZ4740_NANDBOOT_B16R2   0x00000000    /* 16-bit bus & 2 row cycles */
 
 
-//----------------------------------------------------------------------
-// Register Definitions
-//
+/*************************************************************************
+ *  Register Definitions
+ */
 #define    CPM_BASE    0xB0000000
-#define    INTC_BASE    0xB0001000
+#define    INTC_BASE   0xB0001000
 #define    TCU_BASE    0xB0002000
 #define    WDT_BASE    0xB0002000
 #define    RTC_BASE    0xB0003000
-#define    GPIO_BASE    0xB0010000
+#define    GPIO_BASE   0xB0010000
 #define    AIC_BASE    0xB0020000
-#define    ICDC_BASE    0xB0020000
+#define    ICDC_BASE   0xB0020000
 #define    MSC_BASE    0xB0021000
-#define    UART0_BASE    0xB0030000
+#define    UART0_BASE  0xB0030000
 #define    I2C_BASE    0xB0042000
 #define    SSI_BASE    0xB0043000
-#define    SADC_BASE    0xB0070000
+#define    SADC_BASE   0xB0070000
 #define    EMC_BASE    0xB3010000
-#define    DMAC_BASE    0xB3020000
+#define    DMAC_BASE   0xB3020000
 #define    UHC_BASE    0xB3030000
 #define    UDC_BASE    0xB3040000
 #define    LCD_BASE    0xB3050000
-#define    SLCD_BASE    0xB3050000
+#define    SLCD_BASE   0xB3050000
 #define    CIM_BASE    0xB3060000
 #define    ETH_BASE    0xB3100000
 
@@ -59,43 +95,43 @@
  *************************************************************************/
 #define INTC_ISR    (INTC_BASE + 0x00)
 #define INTC_IMR    (INTC_BASE + 0x04)
-#define INTC_IMSR    (INTC_BASE + 0x08)
-#define INTC_IMCR    (INTC_BASE + 0x0c)
+#define INTC_IMSR   (INTC_BASE + 0x08)
+#define INTC_IMCR   (INTC_BASE + 0x0c)
 #define INTC_IPR    (INTC_BASE + 0x10)
 
 #define REG_INTC_ISR    REG32(INTC_ISR)
 #define REG_INTC_IMR    REG32(INTC_IMR)
-#define REG_INTC_IMSR    REG32(INTC_IMSR)
-#define REG_INTC_IMCR    REG32(INTC_IMCR)
+#define REG_INTC_IMSR   REG32(INTC_IMSR)
+#define REG_INTC_IMCR   REG32(INTC_IMCR)
 #define REG_INTC_IPR    REG32(INTC_IPR)
 
 // 1st-level interrupts
 #define IRQ_I2C        1
-#define IRQ_EMC   2
+#define IRQ_EMC        2
 #define IRQ_UHC        3
-#define IRQ_UART0    9
-#define IRQ_SADC    12
+#define IRQ_UART0      9
+#define IRQ_SADC       12
 #define IRQ_MSC        14
 #define IRQ_RTC        15
 #define IRQ_SSI        16
 #define IRQ_CIM        17
 #define IRQ_AIC        18
 #define IRQ_ETH        19
-#define IRQ_DMAC    20
-#define IRQ_TCU2    21
-#define IRQ_TCU1    22
-#define IRQ_TCU0    23
-#define IRQ_UDC     24
-#define IRQ_GPIO3    25
-#define IRQ_GPIO2    26
-#define IRQ_GPIO1    27
-#define IRQ_GPIO0    28
+#define IRQ_DMAC       20
+#define IRQ_TCU2       21
+#define IRQ_TCU1       22
+#define IRQ_TCU0       23
+#define IRQ_UDC        24
+#define IRQ_GPIO3      25
+#define IRQ_GPIO2      26
+#define IRQ_GPIO1      27
+#define IRQ_GPIO0      28
 #define IRQ_IPU        29
 #define IRQ_LCD        30
 
 // 2nd-level interrupts
-#define IRQ_DMA_0    32  /* 32 to 37 for DMAC channel 0 to 5 */
-#define IRQ_GPIO_0    48  /* 48 to 175 for GPIO pin 0 to 127 */
+#define IRQ_DMA_0      32  /* 32 to 37 for DMAC channel 0 to 5 */
+#define IRQ_GPIO_0     48  /* 48 to 175 for GPIO pin 0 to 127 */
 
 
 /*************************************************************************
@@ -103,15 +139,15 @@
  *************************************************************************/
 #define RTC_RCR        (RTC_BASE + 0x00) /* RTC Control Register */
 #define RTC_RSR        (RTC_BASE + 0x04) /* RTC Second Register */
-#define RTC_RSAR    (RTC_BASE + 0x08) /* RTC Second Alarm Register */
+#define RTC_RSAR       (RTC_BASE + 0x08) /* RTC Second Alarm Register */
 #define RTC_RGR        (RTC_BASE + 0x0c) /* RTC Regulator Register */
 
 #define RTC_HCR        (RTC_BASE + 0x20) /* Hibernate Control Register */
-#define RTC_HWFCR    (RTC_BASE + 0x24) /* Hibernate Wakeup Filter Counter Reg */
-#define RTC_HRCR    (RTC_BASE + 0x28) /* Hibernate Reset Counter Register */
-#define RTC_HWCR    (RTC_BASE + 0x2c) /* Hibernate Wakeup Control Register */
-#define RTC_HWRSR    (RTC_BASE + 0x30) /* Hibernate Wakeup Status Register */
-#define RTC_HSPR    (RTC_BASE + 0x34) /* Hibernate Scratch Pattern Register */
+#define RTC_HWFCR      (RTC_BASE + 0x24) /* Hibernate Wakeup Filter Counter Reg */
+#define RTC_HRCR       (RTC_BASE + 0x28) /* Hibernate Reset Counter Register */
+#define RTC_HWCR       (RTC_BASE + 0x2c) /* Hibernate Wakeup Control Register */
+#define RTC_HWRSR      (RTC_BASE + 0x30) /* Hibernate Wakeup Status Register */
+#define RTC_HSPR       (RTC_BASE + 0x34) /* Hibernate Scratch Pattern Register */
 
 #define REG_RTC_RCR    REG32(RTC_RCR)
 #define REG_RTC_RSR    REG32(RTC_RSR)
@@ -1447,14 +1483,14 @@
   #define SSI_CR1_RTRG_120      (15<< SSI_CR1_RTRG_BIT)
 #define SSI_CR1_FLEN_BIT    4
 #define SSI_CR1_FLEN_MASK    (0xf << SSI_CR1_FLEN_BIT)
-  #define SSI_CR1_FLEN_2BIT      (0x0 << SSI_CR1_FLEN_BIT)
-  #define SSI_CR1_FLEN_3BIT      (0x1 << SSI_CR1_FLEN_BIT)
-  #define SSI_CR1_FLEN_4BIT      (0x2 << SSI_CR1_FLEN_BIT)
-  #define SSI_CR1_FLEN_5BIT      (0x3 << SSI_CR1_FLEN_BIT)
-  #define SSI_CR1_FLEN_6BIT      (0x4 << SSI_CR1_FLEN_BIT)
-  #define SSI_CR1_FLEN_7BIT      (0x5 << SSI_CR1_FLEN_BIT)
-  #define SSI_CR1_FLEN_8BIT      (0x6 << SSI_CR1_FLEN_BIT)
-  #define SSI_CR1_FLEN_9BIT      (0x7 << SSI_CR1_FLEN_BIT)
+  #define SSI_CR1_FLEN_2BIT       (0x0 << SSI_CR1_FLEN_BIT)
+  #define SSI_CR1_FLEN_3BIT       (0x1 << SSI_CR1_FLEN_BIT)
+  #define SSI_CR1_FLEN_4BIT       (0x2 << SSI_CR1_FLEN_BIT)
+  #define SSI_CR1_FLEN_5BIT       (0x3 << SSI_CR1_FLEN_BIT)
+  #define SSI_CR1_FLEN_6BIT       (0x4 << SSI_CR1_FLEN_BIT)
+  #define SSI_CR1_FLEN_7BIT       (0x5 << SSI_CR1_FLEN_BIT)
+  #define SSI_CR1_FLEN_8BIT       (0x6 << SSI_CR1_FLEN_BIT)
+  #define SSI_CR1_FLEN_9BIT       (0x7 << SSI_CR1_FLEN_BIT)
   #define SSI_CR1_FLEN_10BIT      (0x8 << SSI_CR1_FLEN_BIT)
   #define SSI_CR1_FLEN_11BIT      (0x9 << SSI_CR1_FLEN_BIT)
   #define SSI_CR1_FLEN_12BIT      (0xA << SSI_CR1_FLEN_BIT)
@@ -4944,5 +4980,176 @@ do{                                 \
 
 
 #endif /* !__ASSEMBLY__ */
+
+
+#ifndef _IPU_H_
+#define _IPU_H_
+
+// IPU_REG_BASE
+#define IPU_P_BASE  0x13080000
+#define IPU__OFFSET 0x13080000
+#define IPU__SIZE   0x00001000
+
+struct ipu_module
+{
+    unsigned int reg_ctrl;             // 0x0
+    unsigned int reg_status;           // 0x4
+    unsigned int reg_d_fmt;            // 0x8
+    unsigned int reg_y_addr;           // 0xc
+    unsigned int reg_u_addr;           // 0x10
+    unsigned int reg_v_addr;           // 0x14
+    unsigned int reg_in_fm_gs;         // 0x18
+    unsigned int reg_y_stride;         // 0x1c
+    unsigned int reg_uv_stride;        // 0x20
+    unsigned int reg_out_addr;         // 0x24
+    unsigned int reg_out_gs;           // 0x28
+    unsigned int reg_out_stride;       // 0x2c
+    unsigned int rsz_coef_index;       // 0x30
+    unsigned int reg_csc_c0_coef;      // 0x34
+    unsigned int reg_csc_c1_coef;      // 0x38
+    unsigned int reg_csc_c2_coef;      // 0x3c
+    unsigned int reg_csc_c3_coef;      // 0x40
+    unsigned int reg_csc_c4_coef;      // 0x44
+    unsigned int hrsz_coef_lut[20];    // 0x48
+    unsigned int vrsz_coef_lut[20];    // 0x98
+};
+
+typedef struct
+{
+    unsigned int coef;
+    unsigned short int in_n;
+    unsigned short int out_n;
+} rsz_lut;
+
+struct Ration2m
+{
+    float ratio;
+    int n, m;
+};
+
+
+// Register offset
+#define  REG_CTRL           0x0
+#define  REG_STATUS         0x4
+#define  REG_D_FMT          0x8
+#define  REG_Y_ADDR         0xc
+#define  REG_U_ADDR         0x10
+#define  REG_V_ADDR         0x14
+#define  REG_IN_FM_GS       0x18
+#define  REG_Y_STRIDE       0x1c
+#define  REG_UV_STRIDE      0x20
+#define  REG_OUT_ADDR       0x24
+#define  REG_OUT_GS         0x28
+#define  REG_OUT_STRIDE     0x2c
+#define  REG_RSZ_COEF_INDEX 0x30
+#define  REG_CSC_C0_COEF    0x34
+#define  REG_CSC_C1_COEF    0x38
+#define  REG_CSC_C2_COEF    0x3c
+#define  REG_CSC_C3_COEF    0x40
+#define  REG_CSC_C4_COEF    0x44
+#define  HRSZ_LUT_BASE      0x48
+#define  VRSZ_LUT_BASE      0x98
+
+// REG_CTRL field define
+#define IPU_EN             (1 << 0)
+#define RSZ_EN             (1 << 1)
+#define FM_IRQ_EN          (1 << 2)
+#define IPU_RESET          (1 << 3)
+#define H_UP_SCALE         (1 << 8)
+#define V_UP_SCALE         (1 << 9)
+#define H_SCALE_SHIFT      (8)
+#define V_SCALE_SHIFT      (9)
+
+// REG_STATUS field define
+#define OUT_END         (1 << 0)
+
+// REG_D_FMT field define
+#define INFMT_YUV420    (0 << 0)
+#define INFMT_YUV422    (1 << 0)
+#define INFMT_YUV444    (2 << 0)
+#define INFMT_YUV411    (3 << 0)
+#define INFMT_YCbCr420  (4 << 0)
+#define INFMT_YCbCr422  (5 << 0)
+#define INFMT_YCbCr444  (6 << 0)
+#define INFMT_YCbCr411  (7 << 0)
+
+#define OUTFMT_RGB555   (0 << 16)
+#define OUTFMT_RGB565   (1 << 16)
+#define OUTFMT_RGB888   (2 << 16)
+
+// REG_IN_FM_GS field define
+#define IN_FM_W(val)    ((val) << 16)
+#define IN_FM_H(val)    ((val) << 0)
+
+// REG_IN_FM_GS field define
+#define OUT_FM_W(val)    ((val) << 16)
+#define OUT_FM_H(val)    ((val) << 0)
+
+// REG_UV_STRIDE field define
+#define U_STRIDE(val)    ((val) << 16)
+#define V_STRIDE(val)    ((val) << 0)
+
+
+#define VE_IDX_SFT       0
+#define HE_IDX_SFT       16
+
+// RSZ_LUT_FIELD
+#define OUT_N_SFT        0
+#define OUT_N_MSK        0x1
+#define IN_N_SFT         1
+#define IN_N_MSK         0x1
+#define W_COEF_SFT       2
+#define W_COEF_MSK       0xFF
+
+// function about REG_CTRL
+#define stop_ipu(IPU_V_BASE) \
+    REG32(IPU_V_BASE + REG_CTRL) &= ~IPU_EN;
+
+#define run_ipu(IPU_V_BASE) \
+    REG32(IPU_V_BASE + REG_CTRL) |= IPU_EN;
+
+#define reset_ipu(IPU_V_BASE) \
+    REG32(IPU_V_BASE + REG_CTRL) |= IPU_RESET;
+
+#define disable_irq(IPU_V_BASE) \
+    REG32(IPU_V_BASE + REG_CTRL) &= ~FM_IRQ_EN;
+
+#define disable_rsize(IPU_V_BASE) \
+    REG32(IPU_V_BASE + REG_CTRL) &= ~RSZ_EN;
+
+#define enable_rsize(IPU_V_BASE) \
+    REG32(IPU_V_BASE + REG_CTRL) |= RSZ_EN;
+
+#define ipu_is_enable(IPU_V_BASE) \
+    (REG32(IPU_V_BASE + REG_CTRL) & IPU_EN)
+
+// function about REG_STATUS
+#define clear_end_flag(IPU_V_BASE) \
+    REG32(IPU_V_BASE +  REG_STATUS) &= ~OUT_END;
+
+#define polling_end_flag(IPU_V_BASE) \
+    (REG32(IPU_V_BASE +  REG_STATUS) & OUT_END)
+
+/* parameter
+   R = 1.164 * (Y - 16) + 1.596 * (cr - 128)                      {C0, C1}
+   G = 1.164 * (Y - 16) - 0.392 * (cb -128) - 0.813 * (cr - 128)  {C0, C2, C3}
+   B = 1.164 * (Y - 16) + 2.017 * (cb - 128)                      {C0, C4}
+*/
+
+#if 1
+#define YUV_CSC_C0 0x4A8        /* 1.164 * 1024 */
+#define YUV_CSC_C1 0x662        /* 1.596 * 1024 */
+#define YUV_CSC_C2 0x191        /* 0.392 * 1024 */
+#define YUV_CSC_C3 0x341        /* 0.813 * 1024 */
+#define YUV_CSC_C4 0x811        /* 2.017 * 1024 */
+#else
+#define YUV_CSC_C0 0x400
+#define YUV_CSC_C1 0x59C
+#define YUV_CSC_C2 0x161
+#define YUV_CSC_C3 0x2DC
+#define YUV_CSC_C4 0x718
+#endif
+
+#endif /* _IPU_H_ */
 
 #endif /* __JZ4740_H__ */
