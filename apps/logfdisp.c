@@ -62,8 +62,8 @@ bool logfdisplay(void)
 #endif
              :LCD_WIDTH)/w;
 
-    if (columns > MAX_LOGF_ENTRY)
-        columns = MAX_LOGF_ENTRY;
+    if (columns > MAX_LOGF_ENTRY+1)
+        columns = MAX_LOGF_ENTRY+1;
             
     if(!lines)
         return false;
@@ -83,7 +83,12 @@ bool logfdisplay(void)
             }
         
             memcpy(buffer, logfbuffer[index], columns);
-            buffer[columns]=0;
+            if (logfbuffer[index][MAX_LOGF_ENTRY] == LOGF_TERMINATE_CONTINUE_LINE)
+                buffer[columns-1] = '>';
+            else if (logfbuffer[index][MAX_LOGF_ENTRY] == LOGF_TERMINATE_MULTI_LINE)
+                buffer[columns-1] = '\0';
+            buffer[columns] = '\0';
+        
             lcd_puts(0, i, buffer);
         }
         lcd_update();
@@ -113,24 +118,61 @@ bool logfdump(void)
     
     fd = open(ROCKBOX_DIR "/logf.txt", O_CREAT|O_WRONLY|O_TRUNC);
     if(-1 != fd) {
-        unsigned char buffer[MAX_LOGF_ENTRY +1];
+        unsigned char buffer[MAX_LOGF_ONE_LINE_SIZE +1];
+        unsigned char *ptr;
         int index = logfindex-1;
         int stop = logfindex;
+        int tindex;
+        bool dumpwrap = false;
+        bool multiline;
 
-
-        while(index != stop) {
+        while(!dumpwrap || (index >= stop)) {
             if(index < 0) {
                 if(logfwrap)
+                {
                     index = MAX_LOGF_LINES-1;
+                    dumpwrap = true;
+                }
                 else
                     break; /* done */
             }
+
+            multiline = false;
+            if (logfbuffer[index][MAX_LOGF_ENTRY] == LOGF_TERMINATE_MULTI_LINE)
+            {
+                multiline = true;
+                do {
+                    index--;
+                    if(index < 0) {
+                        if(logfwrap)
+                        {
+                            index = MAX_LOGF_LINES-1;
+                            dumpwrap = true;
+                        }
+                        else
+                            goto end_loop;
+                    }
+                } while(logfbuffer[index][MAX_LOGF_ENTRY] == LOGF_TERMINATE_CONTINUE_LINE);
+                index++;
+                if (index >= MAX_LOGF_LINES)
+                    index = 0;
+            }
+
+            tindex = index-1;
+            ptr = buffer;
+            do {
+                tindex++;
+                memcpy(ptr, logfbuffer[tindex], MAX_LOGF_ENTRY);
+                ptr += MAX_LOGF_ENTRY;
+                if (tindex >= MAX_LOGF_LINES)
+                    tindex = 0;
+            } while(logfbuffer[tindex][MAX_LOGF_ENTRY] == LOGF_TERMINATE_CONTINUE_LINE);
+            *ptr = '\0';
         
-            memcpy(buffer, logfbuffer[index], MAX_LOGF_ENTRY);
-            buffer[MAX_LOGF_ENTRY]=0;
             fdprintf(fd, "%s\n", buffer);
             index--;
         }
+end_loop:
         close(fd);
     }
     return false;

@@ -20,10 +20,23 @@
  ****************************************************************************/
 
 /*
- * logf() logs MAX_LOGF_ENTRY (21) bytes per entry in a circular buffer. Each
+ * logf() logs MAX_LOGF_ENTRY (29) bytes per entry in a circular buffer. Each
  * logged string is space- padded for easier and faster output on screen. Just
  * output MAX_LOGF_ENTRY characters on each line. MAX_LOGF_ENTRY bytes fit
  * nicely on the iRiver remote LCD (128 pixels with an 8x6 pixels font).
+ *
+ * When the length of log exceeds MAX_LOGF_ENTRY bytes, dividing into the
+ * string of length is MAX_LOGF_ENTRY-1 bytes.
+ *
+ * logfbuffer[*]:
+ *
+ *    |<-   MAX_LOGF_ENTRY bytes   ->|1|
+ *    | log data area                |T|
+ *
+ *  T : log terminate flag
+ *   == LOGF_TERMINATE_ONE_LINE(0x00)      : log data end (one line)
+ *   == LOGF_TERMINATE_CONTINUE_LINE(0x01) : log data continues
+ *   == LOGF_TERMINATE_MULTI_LINE(0x02)    : log data end (multi line)
  */
 
 #include <string.h>
@@ -43,7 +56,7 @@
 #ifdef ROCKBOX_HAS_LOGF
 
 #ifndef __PCTOOL__
-unsigned char logfbuffer[MAX_LOGF_LINES][MAX_LOGF_ENTRY];
+unsigned char logfbuffer[MAX_LOGF_LINES][MAX_LOGF_ENTRY+1];
 int logfindex;
 bool logfwrap;
 #endif
@@ -84,6 +97,15 @@ static void displayremote(void)
 #define displayremote()
 #endif
 
+static void check_logfindex(void)
+{
+    if(logfindex >= MAX_LOGF_LINES) {
+        /* wrap */
+        logfwrap = true;
+        logfindex = 0;
+    }
+}
+
 #ifdef __PCTOOL__
 void _logf(const char *format, ...)
 {
@@ -98,17 +120,17 @@ void _logf(const char *format, ...)
 void _logf(const char *format, ...)
 {
     int len;
+    int tlen;
+    unsigned char buf[MAX_LOGF_ONE_LINE_SIZE];
     unsigned char *ptr;
     va_list ap;
-    va_start(ap, format);
+    bool multiline = false;
 
-    if(logfindex >= MAX_LOGF_LINES) {
-        /* wrap */
-        logfwrap = true;
-        logfindex = 0;
-    }
-    ptr = logfbuffer[logfindex];
-    len = vsnprintf(ptr, MAX_LOGF_ENTRY, format, ap);
+    va_start(ap, format);
+    vsnprintf(buf, MAX_LOGF_ONE_LINE_SIZE, format, ap);
+    va_end(ap);
+
+    len = strlen(buf);
 #ifdef HAVE_SERIAL
     serial_tx(ptr);
     serial_tx("\r\n");
@@ -118,10 +140,26 @@ void _logf(const char *format, ...)
     usb_serial_send("\r\n",2);
 #endif
 
-    va_end(ap);
+    tlen = 0;
+    check_logfindex();
+    while(len > MAX_LOGF_ENTRY)
+    {
+        ptr = logfbuffer[logfindex];
+        strncpy(ptr, buf + tlen, MAX_LOGF_ENTRY);
+        ptr[MAX_LOGF_ENTRY] = LOGF_TERMINATE_CONTINUE_LINE;
+        logfindex++;
+        check_logfindex();
+        len -= MAX_LOGF_ENTRY;
+        tlen += MAX_LOGF_ENTRY;
+        multiline = true;
+    }
+    ptr = logfbuffer[logfindex];
+    strcpy(ptr, buf + tlen);
+
     if(len < MAX_LOGF_ENTRY)
         /* pad with spaces up to the MAX_LOGF_ENTRY byte border */
         memset(ptr+len, ' ', MAX_LOGF_ENTRY-len);
+    ptr[MAX_LOGF_ENTRY] = (multiline)?LOGF_TERMINATE_MULTI_LINE:LOGF_TERMINATE_ONE_LINE;
 
     logfindex++; /* leave it where we write the next time */
 

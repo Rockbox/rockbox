@@ -29,10 +29,14 @@
 
 #ifndef __PCTOOL__
 #define MAX_LOGF_LINES 1000
-#define MAX_LOGF_ENTRY 30
-#define MAX_LOGF_DATASIZE (MAX_LOGF_ENTRY*MAX_LOGF_LINES)
+#define MAX_LOGF_ENTRY 29
+#define MAX_LOGF_ONE_LINE_SIZE 200
 
-extern unsigned char logfbuffer[MAX_LOGF_LINES][MAX_LOGF_ENTRY];
+#define LOGF_TERMINATE_ONE_LINE      0x00
+#define LOGF_TERMINATE_CONTINUE_LINE 0x01
+#define LOGF_TERMINATE_MULTI_LINE    0x02
+
+extern unsigned char logfbuffer[MAX_LOGF_LINES][MAX_LOGF_ENTRY+1];
 extern int logfindex;
 extern bool logfwrap;
 #endif /* __PCTOOL__ */
