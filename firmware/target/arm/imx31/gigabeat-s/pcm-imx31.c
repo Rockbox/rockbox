@@ -111,6 +111,9 @@ void pcm_play_dma_init(void)
     SSI_SCR2 &= ~SSI_SCR_SSIEN;
     SSI_SCR1 &= ~SSI_SCR_SSIEN;
 
+    SSI_SIER1 = SSI_SIER_TFE0; /* TX0 can issue an interrupt */
+    SSI_SIER2 = SSI_SIER_RFF0; /* RX0 can issue an interrupt */
+
     /* Set up audio mux */
 
     /* Port 1 (internally connected to SSI1)
