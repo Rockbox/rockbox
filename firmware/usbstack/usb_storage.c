@@ -716,7 +716,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             break;
 
         case SCSI_REPORT_LUNS: {
-            logf("scsi inquiry %d",lun);
+            logf("scsi report luns %d",lun);
             int allocation_length=0;
             int i;
             allocation_length|=(cbw->command_block[6]<<24);
