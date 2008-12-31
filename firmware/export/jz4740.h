@@ -5102,32 +5102,32 @@ struct Ration2m
 #define W_COEF_MSK       0xFF
 
 // function about REG_CTRL
-#define stop_ipu(IPU_V_BASE) \
+#define IPU_STOP_IPU(IPU_V_BASE) \
     REG32(IPU_V_BASE + REG_CTRL) &= ~IPU_EN;
 
-#define run_ipu(IPU_V_BASE) \
+#define IPU_RUN_IPU(IPU_V_BASE) \
     REG32(IPU_V_BASE + REG_CTRL) |= IPU_EN;
 
-#define reset_ipu(IPU_V_BASE) \
+#define IPU_RESET_IPU(IPU_V_BASE) \
     REG32(IPU_V_BASE + REG_CTRL) |= IPU_RESET;
 
-#define disable_irq(IPU_V_BASE) \
+#define IPU_DISABLE_IRQ(IPU_V_BASE) \
     REG32(IPU_V_BASE + REG_CTRL) &= ~FM_IRQ_EN;
 
-#define disable_rsize(IPU_V_BASE) \
+#define IPU_DISABLE_RSIZE(IPU_V_BASE) \
     REG32(IPU_V_BASE + REG_CTRL) &= ~RSZ_EN;
 
-#define enable_rsize(IPU_V_BASE) \
+#define IPU_ENABLE_RSIZE(IPU_V_BASE) \
     REG32(IPU_V_BASE + REG_CTRL) |= RSZ_EN;
 
-#define ipu_is_enable(IPU_V_BASE) \
+#define IPU_IS_ENABLED(IPU_V_BASE) \
     (REG32(IPU_V_BASE + REG_CTRL) & IPU_EN)
 
 // function about REG_STATUS
-#define clear_end_flag(IPU_V_BASE) \
+#define IPU_CLEAR_END_FLAG(IPU_V_BASE) \
     REG32(IPU_V_BASE +  REG_STATUS) &= ~OUT_END;
 
-#define polling_end_flag(IPU_V_BASE) \
+#define IPU_POLLING_END_FLAG(IPU_V_BASE) \
     (REG32(IPU_V_BASE +  REG_STATUS) & OUT_END)
 
 /* parameter
