@@ -132,12 +132,12 @@ void _logf(const char *format, ...)
 
     len = strlen(buf);
 #ifdef HAVE_SERIAL
-    serial_tx(ptr);
+    serial_tx(buf);
     serial_tx("\r\n");
 #endif
 #ifdef USB_SERIAL
-    usb_serial_send(ptr,len);
-    usb_serial_send("\r\n",2);
+    usb_serial_send(buf, len);
+    usb_serial_send("\r\n", 2);
 #endif
 
     tlen = 0;
