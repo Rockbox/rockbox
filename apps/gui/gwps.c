@@ -700,7 +700,7 @@ long gui_wps_show(void)
             return GO_TO_PREVIOUS;
         }
 
-        if ( button )
+        if ( !IS_SYSEVENT(button) )
             storage_spin();
     }
     return GO_TO_ROOT; /* unreachable - just to reduce compiler warnings */
