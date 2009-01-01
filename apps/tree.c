@@ -821,7 +821,7 @@ static int dirbrowse()
         }
         if (start_wps)
             return GO_TO_WPS;
-        if (button)
+        if (button && !IS_SYSEVENT(button))
         {
             storage_spin();
         }
