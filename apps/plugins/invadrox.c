@@ -44,8 +44,7 @@ PLUGIN_HEADER
 
 /* #define DEBUG */
 #ifdef DEBUG
-#include <stdio.h>
-#define DBG(format, arg...) { printf("%s: " format, __FUNCTION__, ## arg); }
+#define DBG(format, arg...) { DEBUGF("%s: " format, __FUNCTION__, ## arg); }
 #else
 #define DBG(format, arg...) {}
 #endif
@@ -1789,7 +1788,7 @@ void game_loop(void)
                             PLAYFIELD_Y + 1 - SCORENUM_Y - FONT_HEIGHT);
 
         /* Wait until next frame */
-        DBG("%d (%d)\n", end - *rb->current_tick, (CYCLETIME * HZ) / 1000);
+        DBG("%ld (%d)\n", end - *rb->current_tick, (CYCLETIME * HZ) / 1000);
         if (end > *rb->current_tick) {
             rb->sleep(end - *rb->current_tick);
         } else {
