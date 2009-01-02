@@ -130,9 +130,9 @@
 #define HAVE_USB_POWER
 
 /* define current usage levels */
-#define CURRENT_NORMAL     45  /* Should be nearly identical to E200 */
+#define CURRENT_NORMAL     30  /* Should be nearly identical to E200 */
 #define CURRENT_BACKLIGHT  40  /* Screen is about 20, blue LEDs are another 20, so 40 if both */
-#define CURRENT_RECORD     40  /* flash player, so this is just unboosted current*/
+#define CURRENT_RECORD     30  /* flash player, so this is just unboosted current*/
 
 /** Non-simulator section **/
 #ifndef SIMULATOR

@@ -124,9 +124,9 @@
 #define CONFIG_CHARGING CHARGING_SIMPLE
 
 /* define current usage levels */
-#define CURRENT_NORMAL     45  /* Mike's measurements in Jan 2008  */
+#define CURRENT_NORMAL     30  /* Toni's measurements in Nov 2008  */
 #define CURRENT_BACKLIGHT  40  /* Screen is about 20, blue LEDs are another 20, so 40 if both */
-#define CURRENT_RECORD     40  /* flash player, so this is just unboosted current*/
+#define CURRENT_RECORD     30  /* flash player, so this is just unboosted current*/
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
