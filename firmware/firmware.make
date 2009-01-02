@@ -11,7 +11,9 @@ INCLUDES += -I$(FIRMDIR) -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I$(FIRMDIR)/c
 
 FIRMLIB_SRC += $(call preprocess, $(FIRMDIR)/SOURCES)
 FIRMLIB_OBJ := $(call c2obj, $(FIRMLIB_SRC))
-FIRMLIB_OBJ += $(BUILDDIR)/sysfont.o
+ifeq (,$(findstring -DARCHOS_PLAYER,$(TARGET)))
+    FIRMLIB_OBJ += $(BUILDDIR)/sysfont.o
+endif
 OTHER_SRC += $(FIRMLIB_SRC)
 
 FIRMLIB = $(BUILDDIR)/firmware/libfirmware.a
