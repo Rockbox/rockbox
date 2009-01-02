@@ -118,6 +118,7 @@ enum {
 #if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
     SOUND_TREBLE_CUTOFF,
 #endif
+    SOUND_LAST_SETTING, /* Keep this last */
 };
 
 enum Channel {

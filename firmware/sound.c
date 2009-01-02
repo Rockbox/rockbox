@@ -24,6 +24,7 @@
 #include "config.h"
 #include "sound.h"
 #include "logf.h"
+#include "system.h"
 #ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"
@@ -31,7 +32,6 @@
 #include "pnx0101.h"
 #endif
 #include "dac.h"
-#include "system.h"
 #if CONFIG_CODEC == SWCODEC
 #include "pcm.h"
 #endif
@@ -124,83 +124,37 @@ int sound_default(int setting)
     return audiohw_settings[setting].defaultval;
 }
 
+static sound_set_type *sound_set_fns[] =
+{
+    [0 ... SOUND_LAST_SETTING-1] = NULL,
+    [SOUND_VOLUME]        = sound_set_volume,
+    [SOUND_BASS]          = sound_set_bass,
+    [SOUND_TREBLE]        = sound_set_treble,
+    [SOUND_BALANCE]       = sound_set_balance,
+    [SOUND_CHANNELS]      = sound_set_channels,
+    [SOUND_STEREO_WIDTH]  = sound_set_stereo_width,
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+    [SOUND_LOUDNESS]      = sound_set_loudness,
+    [SOUND_AVC]           = sound_set_avc,
+    [SOUND_MDB_STRENGTH]  = sound_set_mdb_strength,
+    [SOUND_MDB_HARMONICS] = sound_set_mdb_harmonics,
+    [SOUND_MDB_CENTER]    = sound_set_mdb_center,
+    [SOUND_MDB_SHAPE]     = sound_set_mdb_shape,
+    [SOUND_MDB_ENABLE]    = sound_set_mdb_enable,
+    [SOUND_SUPERBASS]     = sound_set_superbass,
+#endif
+#if defined(AUDIOHW_HAVE_BASS_CUTOFF)
+    [SOUND_BASS_CUTOFF]   = sound_set_bass_cutoff,
+#endif
+#if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
+    [SOUND_TREBLE_CUTOFF] = sound_set_treble_cutoff,
+#endif
+};
+
 sound_set_type* sound_get_fn(int setting)
 {
-    sound_set_type* result = NULL;
-
-    switch (setting) {
-        case SOUND_VOLUME:
-            result = sound_set_volume;
-            break;
-
-        case SOUND_BASS:
-            result = sound_set_bass;
-            break;
-
-        case SOUND_TREBLE:
-            result = sound_set_treble;
-            break;
-
-        case SOUND_BALANCE:
-            result = sound_set_balance;
-            break;
-
-        case SOUND_CHANNELS:
-            result = sound_set_channels;
-            break;
-
-        case SOUND_STEREO_WIDTH:
-            result = sound_set_stereo_width;
-            break;
-
-#if defined(AUDIOHW_HAVE_BASS_CUTOFF)
-        case SOUND_BASS_CUTOFF:
-            result = sound_set_bass_cutoff;
-            break;
-#endif
-
-#if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
-        case SOUND_TREBLE_CUTOFF:
-            result = sound_set_treble_cutoff;
-            break;
-#endif
-
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-        case SOUND_LOUDNESS:
-            result = sound_set_loudness;
-            break;
-
-        case SOUND_AVC:
-            result = sound_set_avc;
-            break;
-
-        case SOUND_MDB_STRENGTH:
-            result = sound_set_mdb_strength;
-            break;
-
-        case SOUND_MDB_HARMONICS:
-            result = sound_set_mdb_harmonics;
-            break;
-
-        case SOUND_MDB_CENTER:
-            result = sound_set_mdb_center;
-            break;
-
-        case SOUND_MDB_SHAPE:
-            result = sound_set_mdb_shape;
-            break;
-
-        case SOUND_MDB_ENABLE:
-            result = sound_set_mdb_enable;
-            break;
-
-        case SOUND_SUPERBASS:
-            result = sound_set_superbass;
-            break;
-#endif
-    }
-
-    return result;
+    return ((unsigned)setting >= ARRAYLEN(sound_set_fns)?
+                NULL : sound_set_fns[setting]);
 }
 
 #if CONFIG_CODEC == SWCODEC
@@ -459,18 +413,20 @@ void sound_set_avc(int value)
     if(!audio_is_initialized)
         return;
     int tmp;
+
+    static const uint16_t avc_vals[] =
+    {
+        (0x1 << 8) | (0x8 << 12), /* 20ms */
+        (0x2 << 8) | (0x8 << 12), /* 2s */
+        (0x4 << 8) | (0x8 << 12), /* 4s */
+        (0x8 << 8) | (0x8 << 12), /* 8s */
+    };
     switch (value) {
-        case 1: /* 20ms */
-            tmp = (0x1 << 8) | (0x8 << 12);
-            break;
-        case 2: /* 2s */
-            tmp = (0x2 << 8) | (0x8 << 12);
-            break;
-        case 3: /* 4s */
-            tmp = (0x4 << 8) | (0x8 << 12);
-            break;
-        case 4: /* 8s */
-            tmp = (0x8 << 8) | (0x8 << 12);
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            tmp = avc_vals[value -1];
             break;
         case -1: /* turn off and then turn on again to decay quickly */
             tmp = mas_codec_readreg(MAS_REG_KAVC);
