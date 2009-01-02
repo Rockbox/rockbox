@@ -62,6 +62,7 @@
 #include "quickscreen.h"
 #include "pitchscreen.h"
 #include "appevents.h"
+#include "viewport.h"
 
 /* currently only on wps_state is needed */
 struct wps_state wps_state;

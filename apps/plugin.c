@@ -210,6 +210,7 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_bitmap,
 #endif
     viewport_set_defaults,
+    viewportmanager_set_statusbar,
     
     /* list */
     gui_synclist_init,
@@ -621,7 +622,6 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    viewportmanager_set_statusbar,
 };
 
 int plugin_load(const char* plugin, const void* parameter)
