@@ -72,14 +72,8 @@ void list_init_viewports(struct gui_synclist *list)
     FOR_NB_SCREENS(i)
     {
         vp = &parent[i];
-        if (!list)
+        if (!list || list->parent[i] == vp)
             viewport_set_defaults(vp, i);
-        else if (list->parent[i] == vp)
-        {
-            viewport_set_defaults(vp, i);
-            list->parent[i]->y = gui_statusbar_height();
-            list->parent[i]->height = screens[i].lcdheight - list->parent[i]->y;
-        }
     }
 #ifdef HAVE_BUTTONBAR
     if (list && (list->parent[0] == &parent[0]) && global_settings.buttonbar)
