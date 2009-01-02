@@ -105,6 +105,9 @@ static inline int get_next_context(const struct button_mapping *items, int i)
                   TIMEOUT_BLOCK   to wait for a button press
    Any number >0   to wait that many ticks for a press
 
+   This function will likely return SYS_FOURHERTZ which should be passed to the
+   default_event_handler(). If this doesnt happen parts of the GUI may not be
+   redrawn correctly
  */
 static int get_action_worker(int context, int timeout,
                              const struct button_mapping* (*get_context_map)(int) )

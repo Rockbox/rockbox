@@ -210,6 +210,8 @@ long gui_wps_show(void)
                 if (button != ACTION_NONE) {
                     break;
                 }
+                else if (button == SYS_FOURHERTZ)
+                    default_event_handler(button);
                 peak_meter_peek();
                 sleep(0);   /* Sleep until end of current tick. */
 
@@ -267,18 +269,21 @@ long gui_wps_show(void)
         switch(button)
         {
             case ACTION_WPS_CONTEXT:
+            {
+                bool bars;
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
                 show_remote_main_backdrop();
 #endif
+                bars = viewportmanager_set_statusbar(true);
                 /* if music is stopped in the context menu we want to exit the wps */
                 if (onplay(wps_state.id3->path, 
                            FILE_ATTR_AUDIO, CONTEXT_WPS) == ONPLAY_MAINMENU 
                     || !audio_status())
                     return GO_TO_ROOT;
-
+                viewportmanager_set_statusbar(bars);
                 /* track might have changed */
                 update_track = true;
 
@@ -289,7 +294,8 @@ long gui_wps_show(void)
                 show_remote_wps_backdrop();
 #endif
                 restore = true;
-                break;
+            }
+            break;
 
             case ACTION_WPS_BROWSE:
 #ifdef HAVE_LCD_CHARCELLS
@@ -531,6 +537,8 @@ long gui_wps_show(void)
 
 #ifdef HAVE_QUICKSCREEN
             case ACTION_WPS_QUICKSCREEN:
+            {
+                bool bars = viewportmanager_set_statusbar(true);
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
@@ -539,6 +547,7 @@ long gui_wps_show(void)
 #endif
                 if (quick_screen_quick(button))
                     return SYS_USB_CONNECTED;
+                viewportmanager_set_statusbar(bars);
 #if LCD_DEPTH > 1
                 show_wps_backdrop();
 #endif
@@ -546,12 +555,15 @@ long gui_wps_show(void)
                 show_remote_wps_backdrop();
 #endif
                 restore = true;
-                break;
+            }
+            break;
 #endif /* HAVE_QUICKSCREEN */
 
                 /* screen settings */
 #ifdef BUTTON_F3
             case ACTION_F3:
+            {
+                bool bars = viewportmanager_set_statusbar(true);
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
@@ -561,12 +573,16 @@ long gui_wps_show(void)
                 if (quick_screen_f3(BUTTON_F3))
                     return SYS_USB_CONNECTED;
                 restore = true;
-                break;
+                viewportmanager_set_statusbar(bars);
+            }
+            break;
 #endif /* BUTTON_F3 */
 
                 /* pitch screen */
 #ifdef HAVE_PITCHSCREEN
             case ACTION_WPS_PITCHSCREEN:
+            {
+                bool bars = viewportmanager_set_statusbar(true);
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
@@ -582,7 +598,9 @@ long gui_wps_show(void)
                 show_remote_wps_backdrop();
 #endif
                 restore = true;
-                break;
+                viewportmanager_set_statusbar(bars);
+            }
+            break;
 #endif /* HAVE_PITCHSCREEN */
 
 #ifdef AB_REPEAT_ENABLE
@@ -605,6 +623,8 @@ long gui_wps_show(void)
                 break;
 
             case ACTION_WPS_ID3SCREEN:
+            {
+                bool bars = viewportmanager_set_statusbar(true);
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
@@ -619,7 +639,9 @@ long gui_wps_show(void)
                 show_remote_wps_backdrop();
 #endif
                 restore = true;
-                break;
+                viewportmanager_set_statusbar(bars);
+            }
+            break;
 
             case ACTION_REDRAW: /* yes are locked, just redraw */
                 restore = true;
@@ -634,6 +656,7 @@ long gui_wps_show(void)
                 break;
 #endif
             case SYS_POWEROFF:
+                viewportmanager_set_statusbar(true);
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif

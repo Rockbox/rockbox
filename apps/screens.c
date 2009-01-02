@@ -679,6 +679,9 @@ bool shutdown_screen(void)
              * is terminated by TIME_BEFORE */
             case ACTION_NONE:
                 break;
+            case SYS_FOURHERTZ:
+                default_event_handler(button);
+                break;
 
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)

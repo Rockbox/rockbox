@@ -86,9 +86,10 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 #endif
 }
 
-
-void viewportmanager_set_statusbar(bool enabled)
+/* returns true if it was enabled BEFORE this call */
+bool viewportmanager_set_statusbar(bool enabled)
 {
+    bool old = statusbar_enabled;
     if (enabled && global_settings.statusbar)
     {
         add_event(GUI_EVENT_FOURHERTZ, false, viewportmanager_draw_statusbars);
@@ -99,6 +100,7 @@ void viewportmanager_set_statusbar(bool enabled)
         remove_event(GUI_EVENT_FOURHERTZ, viewportmanager_draw_statusbars);
     }
     statusbar_enabled = enabled;
+    return old;
 }
 
 void viewportmanager_draw_statusbars(void* data)
