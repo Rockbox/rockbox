@@ -121,7 +121,7 @@ const char appsversion[]=APPSVERSION;
 
 static void init(void);
 
-void fourhertz_tick_task(void)
+static void fourhertz_tick_task(void)
 {
     static long last_fire = 0;
     if (TIME_AFTER(current_tick, last_fire+HZ/4))

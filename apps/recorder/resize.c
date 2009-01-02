@@ -500,7 +500,8 @@ static inline bool scale_v_linear(struct rowset *rset,
 }
 #endif /* HAVE_UPSCALER */
 
-void output_row_native(uint32_t row, void * row_in, struct scaler_context *ctx)
+static void output_row_native(uint32_t row, void * row_in,
+                              struct scaler_context *ctx)
 {
     int col;
     int fb_width = BM_WIDTH(ctx->bm->width,FORMAT_NATIVE,0);

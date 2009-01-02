@@ -26,6 +26,7 @@
 
 #include "audiohw.h"
 #include "i2s.h"
+#include "ascodec-target.h"
 
 /*
  * Initialise the PP I2C and I2S.

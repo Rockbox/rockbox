@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 */
 
 #include <inttypes.h>
+#include "demac.h"
 
 static const uint32_t crctab32[] =
 {
