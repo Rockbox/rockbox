@@ -373,6 +373,7 @@ static void roll_credits(void)
 
 enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
+    long finish;
     (void)parameter;
     rb = api;
 
@@ -385,9 +386,12 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 #endif
 
     /* Show the logo for about 3 secs allowing the user to stop */
-    if(!rb->action_userabort(3*HZ))
-        roll_credits();
-
+    finish = *rb->current_tick + 3*HZ;
+    while (*rb->current_tick < finish)
+        if(rb->action_userabort(finish - *rb->current_tick))
+            break;
+    roll_credits();
+      
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
