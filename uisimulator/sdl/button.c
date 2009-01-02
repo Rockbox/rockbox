@@ -1049,6 +1049,47 @@ void button_event(int key, bool pressed)
     case SDLK_KP9:
         new_btn = BUTTON_VOLUP;
         break;
+
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+    case SDLK_KP4:
+    case SDLK_LEFT:
+        new_btn = BUTTON_LEFT;
+        break;
+    case SDLK_KP6:
+    case SDLK_RIGHT:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case SDLK_KP8:
+    case SDLK_UP:
+        new_btn = BUTTON_UP;
+        break;
+    case SDLK_KP2:
+    case SDLK_DOWN:
+        new_btn = BUTTON_DOWN;
+        break;
+    case SDLK_KP5:
+    case SDLK_SPACE:
+        new_btn = BUTTON_SELECT;
+        break;
+    case SDLK_KP7:
+    case SDLK_ESCAPE:
+        new_btn = BUTTON_POWER;
+        break;
+    case SDLK_KP1:
+        new_btn = BUTTON_PLAYLIST;
+        break;
+    case SDLK_KP9:
+        new_btn = BUTTON_VOL_UP;
+        break;
+    case SDLK_KP3:
+        new_btn = BUTTON_VOL_DOWN;
+        break;
+    case SDLK_KP_MINUS:
+        new_btn = BUTTON_MENU;
+        break;
+    case SDLK_KP_PLUS:
+        new_btn = BUTTON_VIEW;
+        break;
 #else
 #error No keymap defined!
 #endif /* CONFIG_KEYPAD */

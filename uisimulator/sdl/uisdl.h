@@ -466,6 +466,16 @@
 #define UI_LCD_SPLIT_FGCOLOR        0, 0, 0 /* foreground color of LCD (no backlight) */
 #define UI_LCD_SPLIT_FGCOLORLIGHT   255, 230, 15 /* foreground color of LCD (backlight) */
 
+#elif defined(PHILIPS_HDD1630)
+#define UI_TITLE                    "Philips GoGear HDD1630"
+#define UI_WIDTH                    407 /* width of GUI window */
+#define UI_HEIGHT                   391 /* height of GUI window */
+/* high-colour */
+#define UI_LCD_POSX                 143 /* x position of lcd */
+#define UI_LCD_POSY                 27   /* y position of lcd */
+#define UI_LCD_WIDTH                LCD_WIDTH 
+#define UI_LCD_HEIGHT               LCD_HEIGHT
+
 #endif
 extern SDL_Surface *gui_surface;
 extern bool background;  /* True if the background image is enabled */
