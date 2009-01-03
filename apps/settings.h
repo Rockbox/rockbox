@@ -665,7 +665,6 @@ struct user_settings
     int jump_scroll_delay; /* Delay between jump scroll screens */
 #endif
 
-#ifdef HAVE_BACKLIGHT
     int  backlight_timeout;  /* backlight off timeout:  0-18 0=never,
                                1=always,
                                then according to timeout_values[] */
@@ -693,7 +692,6 @@ struct user_settings
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS 
     int brightness;
 #endif
-#endif /* HAVE_BACKLIGHT */
 
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */

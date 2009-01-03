@@ -1052,8 +1052,11 @@ const struct settings_list settings[] = {
                    "folder navigation", "off,on,random",NULL ,3,
                    ID2P(LANG_SET_BOOL_NO), ID2P(LANG_SET_BOOL_YES),
                    ID2P(LANG_RANDOM)),
+
+#ifdef HAVE_TAGCACHE
     OFFON_SETTING(0, runtimedb, LANG_RUNTIMEDB_ACTIVE, false,
                   "gather runtime data", NULL),
+#endif
 
 #if CONFIG_CODEC == SWCODEC
     /* replay gain */
