@@ -11,8 +11,8 @@ ROCKBOY_SRCDIR = $(APPSDIR)/plugins/rockboy
 ROCKBOY_OBJDIR = $(BUILDDIR)/apps/plugins/rockboy
 
 ROCKBOY_SRC := $(call preprocess, $(ROCKBOY_SRCDIR)/SOURCES)
+ROCKBOY_SRC += $(ROOTDIR)/firmware/common/sscanf.c
 ROCKBOY_OBJ := $(call c2obj, $(ROCKBOY_SRC))
-ROCKBOY_OBJ += $(ROCKBOY_OBJDIR)/sscanf.o
 
 OTHER_SRC += $(ROCKBOY_SRC)
 
@@ -33,12 +33,6 @@ else
     ROCKS += $(ROCKBOY_OBJDIR)/rockboy.rock
     ROCKBOY_OVLFLAGS = $(SHARED_FLAG) # <-- from Makefile
 endif
-
-$(ROCKBOY_OBJDIR)/sscanf.c: $(FIRMDIR)/common/sscanf.c
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CP $<)cp $< $@
-
-$(ROCKBOY_OBJDIR)/sscanf.o: $(ROCKBOY_OBJDIR)/sscanf.c
 
 $(ROCKBOY_OUTLDS): $(ROCKBOY_INLDS) $(ROCKBOY_OBJ)
 	$(call PRINTS,PP $(<F))$(call preprocess2file,$<,$@)

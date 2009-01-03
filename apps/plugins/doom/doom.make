@@ -13,6 +13,7 @@ DOOMBUILDDIR := $(BUILDDIR)/apps/plugins/doom
 ROCKS += $(DOOMBUILDDIR)/doom.rock
 
 DOOM_SRC := $(call preprocess, $(DOOMSRCDIR)/SOURCES)
+DOOM_SRC += $(ROOTDIR)/firmware/common/sscanf.c
 DOOM_OBJ := $(call c2obj, $(DOOM_SRC))
 
 # add source files to OTHER_SRC to get automatic dependencies
@@ -31,12 +32,6 @@ endif
 else
     DOOMCFLAGS += -O2
 endif
-
-$(DOOMBUILDDIR)/sscanf.c: $(FIRMDIR)/common/sscanf.c
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CP $<)cp $< $@
-
-$(DOOMBUILDDIR)/sscanf.o: $(DOOMBUILDDIR)/sscanf.c
 
 $(DOOMBUILDDIR)/doom.rock: $(DOOM_OBJ)
 # for some reason, this doesn't match the implicit rule in plugins.make,
