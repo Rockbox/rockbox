@@ -7034,16 +7034,16 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: start the credits.rock plugin which shows who made Rockbox
   user:
   <source>
-    *: "Version"
+    *: "Credits"
   </source>
   <dest>
-    *: "Version"
+    *: "Credits"
   </dest>
   <voice>
-    *: "Version"
+    *: "Credits"
   </voice>
 </phrase>
 <phrase>
