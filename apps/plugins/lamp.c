@@ -208,10 +208,13 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     rb->lcd_clear_display();
     rb->lcd_update();
     /* wait */
-    while(rb->button_get(false) == BUTTON_NONE)
+    do
     {
+        button = rb->button_get(false);
+        if (button && !IS_SYSEVENT(button))
+            break;
         rb->yield();
-    }
+    } while (1);
 
 #endif /*HAVE_LCD_COLOR */
 
