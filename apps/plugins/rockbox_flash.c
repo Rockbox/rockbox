@@ -516,7 +516,7 @@ static int WaitForButton(void)
     do
     {
         button = rb->button_get(true);
-    } while (button & BUTTON_REL);
+    } while (IS_SYSEVENT(button) || (button & BUTTON_REL));
     
     return button;
 }

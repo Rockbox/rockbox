@@ -341,7 +341,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         if(!display->has_disk_led && bar->info.led)
             gui_statusbar_led(display);
 #endif
-        display->update_rect(0, 0, display->getwidth(), STATUSBAR_HEIGHT);
+        display->update_viewport();
         bar->lastinfo = bar->info;
     }
 #endif /* HAVE_LCD_BITMAP */

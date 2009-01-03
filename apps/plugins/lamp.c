@@ -110,6 +110,7 @@ static int colorset[NUM_COLORSETS][3] = { { 255, 255, 255 } ,    /* white */
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
+    long button;
     (void)parameter;
     rb = api;
 
@@ -167,7 +168,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         rb->lcd_clear_display();
         rb->lcd_update();
 
-        switch(rb->button_get(true))
+        switch((button = rb->button_get(true)))
         {
             case LAMP_RIGHT:
 #ifdef LAMP_NEXT
@@ -196,9 +197,10 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
             case (LAMP_PREV|BUTTON_REL):
 #endif /* LAMP_PREV */
                 /* eat these... */
-                break;
+                break;    
             default:
-                quit = true;
+                if (!IS_SYSEVENT(button))
+                    quit = true;
         }
     } while (!quit);
 

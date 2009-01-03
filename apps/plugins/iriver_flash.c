@@ -230,7 +230,7 @@ int wait_for_button(void)
     do
     {
         button = rb->button_get(true);
-    } while (button & BUTTON_REL);
+    } while (IS_SYSEVENT(button) || (button & BUTTON_REL));
     
     return button;
 }

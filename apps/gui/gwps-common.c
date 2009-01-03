@@ -85,8 +85,7 @@ static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
     if (wps->data->wps_sb_tag)
         draw = wps->data->show_sb_on_wps;
 
-    if (!draw)
-        viewportmanager_set_statusbar(false);
+    viewportmanager_set_statusbar(draw);
 }
 #else
 #define gui_wps_statusbar_draw(wps, force)

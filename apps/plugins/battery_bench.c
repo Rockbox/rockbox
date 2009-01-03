@@ -224,6 +224,7 @@ static unsigned int buf_idx;
 
 bool exit_tsr(bool reenter)
 {
+    long button;
     (void)reenter;
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Batt.Bench is currently running.");
@@ -233,15 +234,21 @@ bool exit_tsr(bool reenter)
 #endif
     rb->lcd_update();
 
-    if (rb->button_get(true) == BATTERY_OFF)
+    while (1)
     {
-        rb->queue_post(&thread_q, EV_EXIT, 0);
-        rb->thread_wait(thread_id);
-        /* remove the thread's queue from the broadcast list */
-        rb->queue_delete(&thread_q);
-        return true;
+        button = rb->button_get(true);
+        if (IS_SYSEVENT(button))
+            continue;
+        if (button == BATTERY_OFF)
+        {
+            rb->queue_post(&thread_q, EV_EXIT, 0);
+            rb->thread_wait(thread_id);
+            /* remove the thread's queue from the broadcast list */
+            rb->queue_delete(&thread_q);
+            return true;
+        }
+        else return false;
     }
-    else return false;
 }
 
 #define BIT_CHARGER     0x1
