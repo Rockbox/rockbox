@@ -14,7 +14,6 @@ ROCKS += $(DOOMBUILDDIR)/doom.rock
 
 DOOM_SRC := $(call preprocess, $(DOOMSRCDIR)/SOURCES)
 DOOM_OBJ := $(call c2obj, $(DOOM_SRC))
-DOOM_OBJ += $(DOOMBUILDDIR)/sscanf.o
 
 # add source files to OTHER_SRC to get automatic dependencies
 OTHER_SRC += $(DOOM_SRC)
