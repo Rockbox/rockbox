@@ -316,14 +316,14 @@ struct user_settings
     int stereo_width; /* 0-255% */
 
 #if CONFIG_CODEC != SWCODEC
-    int loudness;   /* loudness eq:          0-100 0=off   100=max           */
-    int avc;        /* auto volume correct:  0=off, 1=20ms, 2=2s 3=4s 4=8s   */
-    int mdb_strength; /* 0-127dB */
-    int mdb_harmonics; /* 0-100% */
-    int mdb_center; /* 20-300Hz */
-    int mdb_shape; /* 50-300Hz */
-    bool mdb_enable; /* true/false */
-    bool superbass; /* true/false */
+    int  loudness;      /* loudness eq:          0-100 0=off   100=max         */
+    int  avc;           /* auto volume correct:  0=off, 1=20ms, 2=2s 3=4s 4=8s */
+    int  mdb_strength;  /* 0-127dB */
+    int  mdb_harmonics; /* 0-100% */
+    int  mdb_center;    /* 20-300Hz */
+    int  mdb_shape;     /* 50-300Hz */
+    bool mdb_enable;    /* true/false */
+    bool superbass;     /* true/false */
 #endif
 
 #ifdef HAVE_WM8758
@@ -332,16 +332,83 @@ struct user_settings
 #endif
 
 #if CONFIG_CODEC == SWCODEC
-    int crossfade;     /* Enable crossfade (0=off,1=shuffle,2=trackskip,3=shuff&trackskip,4=always) */
+    /* Crossfade */
+    int crossfade;     /* Enable crossfade (0=off, 1=shuffle, 2=trackskip,
+                                            3=shuff&trackskip, 4=always) */
     int crossfade_fade_in_delay;      /* Fade in delay (0-15s)             */
     int crossfade_fade_out_delay;     /* Fade out delay (0-15s)            */
     int crossfade_fade_in_duration;   /* Fade in duration (0-15s)          */
     int crossfade_fade_out_duration;  /* Fade out duration (0-15s)         */
     int crossfade_fade_out_mixmode;   /* Fade out mode (0=crossfade,1=mix) */
-#endif
+
+    /* Replaygain */
+    bool replaygain;        /* enable replaygain */
+    bool replaygain_noclip; /* scale to prevent clips */
+    int  replaygain_type;   /* 0=track gain, 1=album gain, 2=track gain if
+                               shuffle is on, album gain otherwise */
+    int  replaygain_preamp; /* scale replaygained tracks by this */
+
+    /* Crossfeed */
+    bool crossfeed;                             /* enable crossfeed */
+    unsigned int crossfeed_direct_gain;         /* dB x 10 */
+    unsigned int crossfeed_cross_gain;          /* dB x 10 */
+    unsigned int crossfeed_hf_attenuation;      /* dB x 10 */
+    unsigned int crossfeed_hf_cutoff;           /* Frequency in Hz */
+
+    /* EQ */
+    bool eq_enabled;            /* Enable equalizer */
+    unsigned int eq_precut;     /* dB */
+
+    /* Order is important here, must be cutoff, q, then gain for each band.
+       See dsp_set_eq_coefs in dsp.c for why. */
+
+    /* Band 0 settings */
+    int eq_band0_cutoff;        /* Hz */
+    int eq_band0_q;
+    int eq_band0_gain;          /* +/- dB */
+
+    /* Band 1 settings */
+    int eq_band1_cutoff;        /* Hz */
+    int eq_band1_q;
+    int eq_band1_gain;          /* +/- dB */
+
+    /* Band 2 settings */
+    int eq_band2_cutoff;        /* Hz */
+    int eq_band2_q;
+    int eq_band2_gain;          /* +/- dB */
+
+    /* Band 3 settings */
+    int eq_band3_cutoff;        /* Hz */
+    int eq_band3_q;
+    int eq_band3_gain;          /* +/- dB */
+
+    /* Band 4 settings */
+    int eq_band4_cutoff;        /* Hz */
+    int eq_band4_q;
+    int eq_band4_gain;          /* +/- dB */
+
+    /* Misc. swcodec */
+    int  beep;              /* system beep volume when changing tracks etc. */
+    int  keyclick;          /* keyclick volume */
+    int  keyclick_repeats;  /* keyclick on repeats */
+    bool dithering_enabled;
+#endif /* CONFIG_CODEC == SWCODEC */
+
 #ifdef HAVE_RECORDING
 #if CONFIG_CODEC == SWCODEC
     int rec_format;    /* record format index */
+    int rec_mono_mode; /* how to create mono: L, R, L+R */
+
+    /* Encoder Settings Start - keep these together */
+    struct mp3_enc_config     mp3_enc_config;
+#if 0 /* These currently contain no members but their places in line
+         should be held */
+    struct aiff_enc_config    aiff_enc_config;
+    struct wav_enc_config     wav_enc_config;
+    struct wavpack_enc_config wavpack_enc_config;
+#endif
+    /* Encoder Settings End */
+
 #else
     int rec_quality;   /* 0-7 */
 #endif  /* CONFIG_CODEC == SWCODEC */
@@ -353,12 +420,11 @@ struct user_settings
                           4 = 24kHz
                           5 = 16kHz */
     int rec_channels;  /* 0=Stereo, 1=Mono */
-#if CONFIG_CODEC == SWCODEC
-    int rec_mono_mode; /* how to create mono: L, R, L+R */
-#endif
+
     int rec_mic_gain;   /* depends on target */
     int rec_left_gain;  /* depends on target */
-    int rec_right_gain; /* depands on target */
+    int rec_right_gain; /* depends on target */
+    bool peak_meter_clipcounter; /* clipping count indicator */
     bool rec_editable; /* true means that the bit reservoir is off */
 
     /* note: timesplit setting is not saved */
@@ -412,71 +478,63 @@ struct user_settings
     int rec_agc_cliptime;     /* 0.2, 0.4, 0.6, 0.8, 1s */
 #endif
 #endif /* HAVE_RECORDING */
-    /* device settings */
-
-#ifdef HAVE_LCD_CONTRAST
-    int contrast;   /* lcd contrast */
-#endif
-    bool invert;    /* invert display */
-    int cursor_style; /* style of the selection cursor */
-    bool flip_display; /* turn display (and button layout) by 180 degrees */
-    int poweroff;   /* power off timer */
-    int backlight_timeout;  /* backlight off timeout:  0-18 0=never,
-                               1=always,
-                               then according to timeout_values[] */
-#if CONFIG_CHARGING
-    int backlight_timeout_plugged;
-#endif
-
-#if defined(HAVE_BACKLIGHT_PWM_FADING)
-    int backlight_fade_in;  /* backlight fade in timing: 0..3 */
-    int backlight_fade_out; /* backlight fade in timing: 0..7 */
-#elif defined(USE_BACKLIGHT_SW_FADING) \
-    || defined(USE_BACKLIGHT_CUSTOM_FADING_BOOL)
-    bool backlight_fade_in;
-    bool backlight_fade_out;
-#endif
-
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS 
-    int brightness;
-#endif
-    int battery_capacity; /* in mAh */
-#if BATTERY_TYPES_COUNT > 1
-    int battery_type;  /* for units which can take multiple types (Ondio). */
-#endif
-#ifdef HAVE_SPDIF_POWER
-    bool spdif_enable; /* S/PDIF power on/off */
-#endif
 
 #if CONFIG_TUNER
+    int fm_region;
+    bool fm_force_mono;  /* Forces Mono mode if true */
     unsigned char fmr_file[MAX_FILENAME+1]; /* last fmr preset */
 #endif
-#ifdef HAVE_LCD_BITMAP
-    unsigned char font_file[MAX_FILENAME+1]; /* last font */
-#endif
-    unsigned char wps_file[MAX_FILENAME+1];  /* last wps */
-    unsigned char lang_file[MAX_FILENAME+1]; /* last language */
 
     /* misc options */
+#ifndef HAVE_SCROLLWHEEL
+    int list_accel_start_delay; /* ms before we start increaseing step size */
+    int list_accel_wait; /* ms between increases */
+#endif
 
-    int repeat_mode;   /* 0=off 1=repeat all 2=repeat one 3=shuffle 4=ab */
-    int dirfilter;     /* 0=display all, 1=only supported, 2=only music,
-                          3=dirs+playlists, 4=ID3 database */
-    bool sort_case;    /* dir sort order: 0=case insensitive, 1=sensitive */
-    int show_filename_ext; /* show filename extensions in file browser?
-                              0 = no, 1 = yes, 2 = only unknown 0 */
-    int volume_type;   /* how volume is displayed: 0=graphic, 1=percent */
-    int battery_display; /* how battery is displayed: 0=graphic, 1=percent */
+#ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
+    int touchpad_sensitivity;
+#endif
+
+#ifdef HAVE_HEADPHONE_DETECTION
+    int  unplug_mode; /* pause on headphone unplug */
+    int  unplug_rw; /* time in s to rewind when pausing */
+    bool unplug_autoresume; /* disable auto-resume if no phones */
+#endif
+
+#ifdef HAVE_QUICKSCREEN
+    /* these are split because settings_list cant handle arrays */
+    int qs_item_left;
+    int qs_item_right;
+    int qs_item_bottom;
+#endif
+
+#if CONFIG_RTC
     int timeformat;    /* time format: 0=24 hour clock, 1=12 hour clock */
-    bool playlist_shuffle;
-    bool play_selected; /* Plays selected file even in shuffle mode */
-    int ff_rewind_min_step; /* FF/Rewind minimum step size */
-    int ff_rewind_accel; /* FF/Rewind acceleration (in seconds per doubling) */
+#endif
 
 #ifdef HAVE_DISK_STORAGE
     int disk_spindown; /* time until disk spindown, in seconds (0=off) */
-    int buffer_margin; /* MP3 buffer watermark margin, in seconds */
+    int buffer_margin; /* audio buffer watermark margin, in seconds */
 #endif
+
+    int dirfilter;     /* 0=display all, 1=only supported, 2=only music,
+                          3=dirs+playlists, 4=ID3 database */
+    int show_filename_ext; /* show filename extensions in file browser?
+                              0 = no, 1 = yes, 2 = only unknown 0 */
+    int default_codepage;   /* set default codepage for tag conversion */
+    bool hold_lr_for_scroll_in_list; /* hold L/R scrolls the list left/right */
+    bool play_selected; /* Plays selected file even in shuffle mode */
+    bool party_mode;    /* party mode - unstoppable music */
+    bool audioscrobbler; /* Audioscrobbler logging  */
+    bool cuesheet;
+    bool car_adapter_mode; /* 0=off 1=on */
+    int start_in_screen;
+#if defined(HAVE_RTC_ALARM) && \
+    (defined(HAVE_RECORDING) || CONFIG_TUNER)
+    int alarm_wake_up_screen;
+#endif
+    int ff_rewind_min_step; /* FF/Rewind minimum step size */
+    int ff_rewind_accel; /* FF/Rewind acceleration (in seconds per doubling) */
 
     int peak_meter_release;   /* units per read out */
     int peak_meter_hold;      /* hold time for peak meter in 1/100 s */
@@ -484,75 +542,68 @@ struct user_settings
     bool peak_meter_dbfs;     /* show linear or dbfs values */
     int peak_meter_min; /* range minimum */
     int peak_meter_max; /* range maximum */
-#ifdef HAVE_RECORDING
-    bool peak_meter_clipcounter;    /* clipping count indicator */
-#endif
-    bool car_adapter_mode; /* 0=off 1=on */
-#ifdef IPOD_ACCESSORY_PROTOCOL
-    int serial_bitrate; /* 0=auto 1=9600 2=19200 3=38400 4=57600 */
-#endif
-#ifdef HAVE_ACCESSORY_SUPPLY
-    bool accessory_supply; /* 0=off 1=on, accessory power supply for iPod */
-#endif
 
-    /* show status bar */
+    unsigned char wps_file[MAX_FILENAME+1];  /* last wps */
+    unsigned char lang_file[MAX_FILENAME+1]; /* last language */
+    unsigned char playlist_catalog_dir[MAX_FILENAME+1];
+    int skip_length; /* skip length */
+    int max_files_in_dir; /* Max entries in directory (file browser) */
+    int max_files_in_playlist; /* Max entries in playlist */
+    int volume_type;   /* how volume is displayed: 0=graphic, 1=percent */
+    int battery_display; /* how battery is displayed: 0=graphic, 1=percent */
+    bool show_icons;   /* 0=hide 1=show */
     bool statusbar;    /* 0=hide, 1=show */
 
 #if CONFIG_KEYPAD == RECORDER_PAD
-    /* show button bar */
     bool buttonbar;    /* 0=hide, 1=show */
 #endif
 
-    /* show scroll bar */
     bool scrollbar;    /* 0=hide, 1=show */
-
     /* goto current song when exiting WPS */
     bool browse_current; /* 1=goto current song,
                             0=goto previous location */
-
-
-    int scroll_speed;  /* long texts scrolling speed: 1-30 */
-    int bidir_limit;   /* bidir scroll length limit */
-    int scroll_delay;  /* delay (in 1/10s) before starting scroll */
-    int scroll_step;   /* pixels to advance per update */
-#ifdef HAVE_REMOTE_LCD
-    int remote_scroll_speed;  /* long texts scrolling speed: 1-30 */
-    int remote_scroll_delay;  /* delay (in 1/10s) before starting scroll */
-    int remote_scroll_step;   /* pixels to advance per update */
-    int remote_bidir_limit;   /* bidir scroll length limit */
-#endif
-
-#ifdef HAVE_LCD_BITMAP
-    bool offset_out_of_view;
-    int screen_scroll_step;
-#endif
+    bool scroll_paginated; /* 0=dont 1=do */
+    int  scroll_speed;     /* long texts scrolling speed: 1-30 */
+    int  bidir_limit;      /* bidir scroll length limit */
+    int  scroll_delay;     /* delay (in 1/10s) before starting scroll */
+    int  scroll_step;      /* pixels to advance per update */
 
     /* auto bookmark settings */
     int autoloadbookmark;   /* auto load option: 0=off, 1=ask, 2=on */
     int autocreatebookmark; /* auto create option: 0=off, 1=ask, 2=on */
-    int usemrb;                 /* use MRB list: 0=No, 1=Yes*/
-#ifdef HAVE_LCD_CHARCELLS
-    int jump_scroll;   /* Fast jump when scrolling */
-    int jump_scroll_delay; /* Delay between jump scroll screens */
+    int usemrb;             /* use MRB list: 0=No, 1=Yes*/
+
+#ifdef HAVE_DIRCACHE
+    bool dircache;          /* enable directory cache */
 #endif
+#ifdef HAVE_TAGCACHE
+#ifdef HAVE_TC_RAMCACHE
+    bool tagcache_ram;        /* load tagcache to ram? */
+#endif
+    bool tagcache_autoupdate; /* automatically keep tagcache in sync? */
+    bool runtimedb;           /* runtime database active? */
+#endif /* HAVE_TAGCACHE */
+
+#if LCD_DEPTH > 1
+    unsigned char backdrop_file[MAX_FILENAME+1];  /* backdrop bitmap file */
+#endif
+
+#ifdef HAVE_LCD_COLOR
+    int bg_color; /* background color native format */
+    int fg_color; /* foreground color native format */
+    int lss_color; /* background color for the selector or start color for the gradient */
+    int lse_color; /* end color for the selector gradient */
+    int lst_color; /* color of the text for the selector */
+    unsigned char colors_file[MAX_FILENAME+1];
+#endif
+
+    /* playlist/playback settings */
+    int  repeat_mode; /* 0=off 1=repeat all 2=repeat one 3=shuffle 4=ab */
+    int  next_folder; /* move to next folder */
+    int  recursive_dir_insert; /* should directories be inserted recursively */
     bool fade_on_stop; /* fade on pause/unpause/stop */
-    bool caption_backlight; /* turn on backlight at end and start of track */
-
-#if CONFIG_TUNER
-    int fm_freq_step;    /* Frequency step for manual tuning, in kHz */
-    bool fm_force_mono;  /* Forces Mono mode if true */
-    bool fm_full_range;  /* Enables full 10MHz-160MHz range if true, else
-                            only 88MHz-108MHz */
-#endif
-
-    int max_files_in_dir; /* Max entries in directory (file browser) */
-    int max_files_in_playlist; /* Max entries in playlist */
-    bool show_icons;   /* 0=hide 1=show */
-    int recursive_dir_insert; /* should directories be inserted recursively */
-
-#if CONFIG_CODEC == MAS3507D
-    bool line_in;       /* false=off, true=active */
-#endif
+    bool playlist_shuffle;
+    bool warnon_erase_dynplaylist; /* warn when erasing dynamic playlist */
 
     /* playlist viewer settings */
     bool playlist_viewer_icons; /* display icons on viewer */
@@ -569,19 +620,98 @@ struct user_settings
     bool talk_battery_level;
 
     /* file browser sorting */
-    int sort_file; /* 0=alpha, 1=date, 2=date (new first), 3=type */
-    int sort_dir; /* 0=alpha, 1=date (old first), 2=date (new first) */
+    bool sort_case; /* dir sort order: 0=case insensitive, 1=sensitive */
+    int sort_file;  /* 0=alpha, 1=date, 2=date (new first), 3=type */
+    int sort_dir;   /* 0=alpha, 1=date (old first), 2=date (new first) */
+
+    /* power settings */
+    int poweroff;   /* idle power off timer */
+    int battery_capacity; /* in mAh */
+
+#if BATTERY_TYPES_COUNT > 1
+    int battery_type;  /* for units which can take multiple types (Ondio). */
+#endif
+#ifdef HAVE_SPDIF_POWER
+    bool spdif_enable; /* S/PDIF power on/off */
+#endif
+#ifdef HAVE_USB_CHARGING_ENABLE
+    bool usb_charging;
+#endif
+
+    /* device settings */
+#ifdef HAVE_LCD_CONTRAST
+    int contrast;   /* lcd contrast */
+#endif
+
+#ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_LCD_INVERT
+    bool invert;    /* invert display */
+#endif
+#ifdef HAVE_LCD_FLIP
+    bool flip_display; /* turn display (and button layout) by 180 degrees */
+#endif
+    int  cursor_style; /* style of the selection cursor */
+    int  screen_scroll_step;
+    int  show_path_in_browser; /* 0=off, 1=current directory, 2=full path */
+    bool offset_out_of_view;
+    unsigned char icon_file[MAX_FILENAME+1];
+    unsigned char viewers_icon_file[MAX_FILENAME+1];
+    unsigned char font_file[MAX_FILENAME+1]; /* last font */
+    unsigned char kbd_file[MAX_FILENAME+1];  /* last keyboard */
+#endif /* HAVE_LCD_BITMAP */
+
+#ifdef HAVE_LCD_CHARCELLS
+    int jump_scroll;   /* Fast jump when scrolling */
+    int jump_scroll_delay; /* Delay between jump scroll screens */
+#endif
+
+#ifdef HAVE_BACKLIGHT
+    int  backlight_timeout;  /* backlight off timeout:  0-18 0=never,
+                               1=always,
+                               then according to timeout_values[] */
+    bool caption_backlight; /* turn on backlight at end and start of track */
+    bool bl_filter_first_keypress;   /* filter first keypress when dark? */
+#if CONFIG_CHARGING
+    int backlight_timeout_plugged;
+#endif
+#ifdef HAS_BUTTON_HOLD
+    int backlight_on_button_hold; /* what to do with backlight when hold
+                                     switch is on */
+#endif
+#ifdef HAVE_LCD_SLEEP_SETTING
+    int lcd_sleep_after_backlight_off; /* when to put lcd to sleep after backlight
+                                          has turned off */
+#endif
+#if defined(HAVE_BACKLIGHT_PWM_FADING)
+    int backlight_fade_in;  /* backlight fade in timing: 0..3 */
+    int backlight_fade_out; /* backlight fade in timing: 0..7 */
+#elif defined(USE_BACKLIGHT_SW_FADING) \
+    || defined(USE_BACKLIGHT_CUSTOM_FADING_BOOL)
+    bool backlight_fade_in;
+    bool backlight_fade_out;
+#endif
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS 
+    int brightness;
+#endif
+#endif /* HAVE_BACKLIGHT */
 
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
-    int remote_contrast;   /* lcd contrast:          0-63 0=low 63=high            */
-    bool remote_invert;    /* invert display */
-    bool remote_flip_display; /* turn display (and button layout) by 180 degrees */
-    int remote_backlight_timeout;  /* backlight off timeout:  0-18 0=never,
-                               1=always,
-                               then according to timeout_values[] */
-    int remote_backlight_timeout_plugged;
+    int  remote_contrast;          /* lcd contrast:       0-63 0=low 63=high */
+    int  remote_backlight_timeout; /* backlight off timeout:  0-18 0=never,
+                                   1=always, then according to timeout_values[] */
+    int  remote_backlight_timeout_plugged;
+    int  remote_scroll_speed;      /* long texts scrolling speed: 1-30 */
+    int  remote_scroll_delay;      /* delay (in 1/10s) before starting scroll */
+    int  remote_scroll_step;       /* pixels to advance per update */
+    int  remote_bidir_limit;       /* bidir scroll length limit */
+    bool remote_invert;            /* invert display */
+    bool remote_flip_display;      /* turn display (and button layout) by 180 degrees */
     bool remote_caption_backlight; /* turn on backlight at end and start of track */
+    bool remote_bl_filter_first_keypress; /* filter first remote keypress when remote dark? */
+    unsigned char remote_icon_file[MAX_FILENAME+1];
+    unsigned char remote_viewers_icon_file[MAX_FILENAME+1];
+    unsigned char rwps_file[MAX_FILENAME+1];  /* last remote-wps */
 #ifdef HAS_REMOTE_BUTTON_HOLD
     int remote_backlight_on_button_hold; /* what to do with remote backlight when hold
                                             switch is on */
@@ -592,189 +722,27 @@ struct user_settings
 #endif
 #endif /* HAVE_REMOTE_LCD */
 
-    int next_folder; /* move to next folder */
-    bool runtimedb;   /* runtime database active? */
-
-#if CONFIG_CODEC == SWCODEC
-    bool replaygain;        /* enable replaygain */
-    bool replaygain_noclip; /* scale to prevent clips */
-    int  replaygain_type;   /* 0=track gain, 1=album gain, 2=track gain if
-                               shuffle is on, album gain otherwise */
-    int  replaygain_preamp; /* scale replaygained tracks by this */
-    int  beep;              /* system beep volume when changing tracks etc. */
-
-    /* Crossfeed settings */
-    bool crossfeed;                             /* enable crossfeed */
-    unsigned int crossfeed_direct_gain;         /* dB x 10 */
-    unsigned int crossfeed_cross_gain;          /* dB x 10 */
-    unsigned int crossfeed_hf_attenuation;      /* dB x 10 */
-    unsigned int crossfeed_hf_cutoff;           /* Frequency in Hz */
-#endif
-#ifdef HAVE_DIRCACHE
-    bool dircache;          /* enable directory cache */
-#endif
-#ifdef HAVE_TAGCACHE
-#ifdef HAVE_TC_RAMCACHE
-    bool tagcache_ram;        /* load tagcache to ram? */
-#endif
-    bool tagcache_autoupdate; /* automatically keep tagcache in sync? */
-#endif
-    int default_codepage;   /* set default codepage for tag conversion */
-#ifdef HAVE_REMOTE_LCD
-    unsigned char rwps_file[MAX_FILENAME+1];  /* last remote-wps */
+#if CONFIG_CODEC == MAS3507D
+    bool line_in;       /* false=off, true=active */
 #endif
 
-#if CONFIG_CODEC == SWCODEC
-    bool eq_enabled;            /* Enable equalizer */
-    unsigned int eq_precut;     /* dB */
-
-    /* Order is important here, must be cutoff, q, then gain for each band.
-       See dsp_eq_update_data in dsp.c for why. */
-
-    /* Band 0 settings */
-    int eq_band0_cutoff;        /* Hz */
-    int eq_band0_q;
-    int eq_band0_gain;          /* +/- dB */
-
-    /* Band 1 settings */
-    int eq_band1_cutoff;        /* Hz */
-    int eq_band1_q;
-    int eq_band1_gain;          /* +/- dB */
-
-    /* Band 2 settings */
-    int eq_band2_cutoff;        /* Hz */
-    int eq_band2_q;
-    int eq_band2_gain;          /* +/- dB */
-
-    /* Band 3 settings */
-    int eq_band3_cutoff;        /* Hz */
-    int eq_band3_q;
-    int eq_band3_gain;          /* +/- dB */
-
-    /* Band 4 settings */
-    int eq_band4_cutoff;        /* Hz */
-    int eq_band4_q;
-    int eq_band4_gain;          /* +/- dB */
-
-    bool dithering_enabled;
-#endif
-
-
-#if LCD_DEPTH > 1
-    unsigned char backdrop_file[MAX_FILENAME+1];  /* backdrop bitmap file */
-#endif
-
-    bool warnon_erase_dynplaylist; /* warn when erasing dynamic playlist */
-    bool scroll_paginated;   /* 0=dont 1=do */
-#ifdef HAVE_LCD_COLOR
-    int bg_color; /* background color native format */
-    int fg_color; /* foreground color native format */
-    int lss_color; /* background color for the selector or start color for the gradient */
-    int lse_color; /* end color for the selector gradient */
-    int lst_color; /* color of the text for the selector */
-#endif
-    bool party_mode;    /* party mode - unstoppable music */
-
-#ifdef HAVE_BACKLIGHT
-    bool bl_filter_first_keypress;   /* filter first keypress when dark? */
-#ifdef HAVE_REMOTE_LCD
-    bool remote_bl_filter_first_keypress; /* filter first remote keypress when remote dark? */
-#endif
-#ifdef HAS_BUTTON_HOLD
-    int backlight_on_button_hold; /* what to do with backlight when hold
-                                     switch is on */
-#endif
-#ifdef HAVE_LCD_SLEEP_SETTING
-    int lcd_sleep_after_backlight_off; /* when to put lcd to sleep after backlight
-                                          has turned off */
-#endif
-#endif /* HAVE_BACKLIGHT */
-
-#ifdef HAVE_LCD_BITMAP
-    unsigned char kbd_file[MAX_FILENAME+1]; /* last keyboard */
-#endif
-
-#ifdef HAVE_USB_CHARGING_ENABLE
-    bool usb_charging;
-#endif
-
-    bool hold_lr_for_scroll_in_list; /* hold L/R scrolls the list left/right */
-#ifdef HAVE_LCD_BITMAP
-    int show_path_in_browser; /* 0=off, 1=current directory, 2=full path */
-#endif
-
-#ifdef HAVE_HEADPHONE_DETECTION
-    int unplug_mode; /* pause on headphone unplug */
-    int unplug_rw; /* time in s to rewind when pausing */
-    bool unplug_autoresume; /* disable auto-resume if no phones */
-#endif
-#if CONFIG_TUNER
-    int fm_region;
-#endif
-    bool audioscrobbler; /* Audioscrobbler logging  */
-
-    /* If values are just added to the end, no need to bump plugin API
-       version. */
-    /* new stuff to be added at the end */
-
-#if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
-    /* Encoder Settings Start - keep these together */
-    struct mp3_enc_config     mp3_enc_config;
-#if 0 /* These currently contain no members but their places in line
-         should be held */
-    struct aiff_enc_config    aiff_enc_config;
-    struct wav_enc_config     wav_enc_config;
-    struct wavpack_enc_config wavpack_enc_config;
-#endif
-    /* Encoder Settings End */
-#endif /* CONFIG_CODEC == SWCODEC */
-    bool cuesheet;
-    int start_in_screen;
-#if defined(HAVE_RTC_ALARM) && \
-    (defined(HAVE_RECORDING) || CONFIG_TUNER)
-    int alarm_wake_up_screen;
-#endif
-    /* customizable icons */
-#ifdef HAVE_LCD_BITMAP
-    unsigned char icon_file[MAX_FILENAME+1];
-    unsigned char viewers_icon_file[MAX_FILENAME+1];
-#endif
-#ifdef HAVE_REMOTE_LCD
-    unsigned char remote_icon_file[MAX_FILENAME+1];
-    unsigned char remote_viewers_icon_file[MAX_FILENAME+1];
-#endif
-#ifdef HAVE_LCD_COLOR
-    unsigned char colors_file[MAX_FILENAME+1];
-#endif
 #ifdef HAVE_BUTTON_LIGHT
     int buttonlight_timeout;
 #endif
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
     int buttonlight_brightness;
 #endif
-#ifndef HAVE_SCROLLWHEEL
-    int list_accel_start_delay; /* ms before we start increaseing step size */
-    int list_accel_wait; /* ms between increases */
+
+#ifdef IPOD_ACCESSORY_PROTOCOL
+    int serial_bitrate; /* 0=auto 1=9600 2=19200 3=38400 4=57600 */
 #endif
-#ifdef HAVE_USBSTACK
-    int usb_stack_mode;	/* device or host */
-    unsigned char usb_stack_device_driver[32]; /* usb device driver to load */
+#ifdef HAVE_ACCESSORY_SUPPLY
+    bool accessory_supply; /* 0=off 1=on, accessory power supply for iPod */
 #endif
-#if CONFIG_CODEC == SWCODEC
-    int keyclick; /* keyclick volume */
-    int keyclick_repeats; /* keyclick on repeats */
-#endif
-    unsigned char playlist_catalog_dir[MAX_FILENAME+1];
-    int skip_length; /* skip length */
-#ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
-    int touchpad_sensitivity;
-#endif
-#ifdef HAVE_QUICKSCREEN
-    /* these are split because settings_list cant handle arrays */
-    int qs_item_left;
-    int qs_item_right;
-    int qs_item_bottom;
-#endif
+
+    /* If values are just added to the end, no need to bump plugin API
+       version. */
+    /* new stuff to be added at the end */
 };
 
 /** global variables **/

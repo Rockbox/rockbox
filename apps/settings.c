@@ -800,9 +800,13 @@ void settings_apply(bool read_disk)
 #endif
 
 #ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_LCD_INVERT
     lcd_set_invert_display(global_settings.invert);
+#endif
+#ifdef HAVE_LCD_FLIP
     lcd_set_flip(global_settings.flip_display);
     button_set_flip(global_settings.flip_display);
+#endif
     lcd_update(); /* refresh after flipping the screen */
     settings_apply_pm_range();
     peak_meter_init_times(
