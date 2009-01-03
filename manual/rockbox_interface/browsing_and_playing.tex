@@ -187,10 +187,13 @@ can be easily changed by making a text file with the required layout.  More
      SANSA_C200_PAD,MROBE100_PAD}{
   \begin{table}
     \begin{btnmap}{}{}
-      \ActionKbdLeft{}~/ \ActionKbdRight{}~/ \ActionKbdUp{}~/ \ActionKbdDown
+      \ActionKbdLeft~/ \ActionKbdRight~/ \ActionKbdUp~/ \ActionKbdDown
       & Move about the virtual keyboard (moves the solid cursor) \\
       %
-      \ActionKbdCursorLeft{} or \ActionKbdCursorRight
+      \ActionKbdPageFlip
+      & Flip to the next page of characters (if there is more than one) \\
+      %
+      \ActionKbdCursorLeft or \ActionKbdCursorRight
       & Move the line cursor within the text line \\
       %
       \ActionKbdSelect
