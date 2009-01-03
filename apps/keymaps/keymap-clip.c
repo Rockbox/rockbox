@@ -165,20 +165,12 @@ static const struct button_mapping button_context_quickscreen[]  = {
 }; /* button_context_quickscreen */
 
 static const struct button_mapping button_context_settings_right_is_inc[]  = {
-    { ACTION_SETTINGS_INC,       BUTTON_RIGHT,               BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT, BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_SETTINGS_DEC,       BUTTON_LEFT,                 BUTTON_NONE },
-    { ACTION_SETTINGS_DECREPEAT, BUTTON_LEFT|BUTTON_REPEAT,BUTTON_NONE },
+    { ACTION_SETTINGS_INC,      BUTTON_RIGHT,               BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,      BUTTON_LEFT,                BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
 
-    { ACTION_STD_PREV,           BUTTON_UP|BUTTON_REL,            BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,     BUTTON_UP|BUTTON_REPEAT,         BUTTON_NONE },
-    { ACTION_STD_NEXT,           BUTTON_DOWN|BUTTON_REL,          BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,     BUTTON_DOWN|BUTTON_REPEAT,       BUTTON_NONE },
-    { ACTION_NONE,               BUTTON_SELECT,                   BUTTON_NONE },
-    { ACTION_STD_OK,             BUTTON_SELECT|BUTTON_REL,        BUTTON_NONE },
-    { ACTION_NONE,               BUTTON_LEFT|BUTTON_REL,          BUTTON_LEFT },
-    { ACTION_NONE,               BUTTON_POWER,                    BUTTON_NONE },
-    { ACTION_STD_CANCEL,         BUTTON_POWER|BUTTON_REL,         BUTTON_NONE },
+    { ACTION_STD_CANCEL,        BUTTON_POWER,               BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_settings_right_is_inc */
