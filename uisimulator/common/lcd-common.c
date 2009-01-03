@@ -40,10 +40,6 @@ int lcd_default_contrast(void)
     return 28;
 }
 
-void lcd_sleep(void)
-{
-}
-
 #ifdef HAVE_REMOTE_LCD
 void lcd_remote_set_contrast(int val)
 {

@@ -208,6 +208,12 @@ bool lcd_enabled(void)
 }
 #endif
 
+#ifdef HAVE_LCD_SLEEP
+void lcd_sleep(void)
+{
+}
+#endif
+
 #ifdef HAVE_SPDIF_POWER
 void spdif_power_enable(bool on)
 {
