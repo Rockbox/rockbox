@@ -350,12 +350,14 @@ target/arm/as3525/usb-as3525.c
 target/arm/as3525/dma-pl081.c
 target/arm/as3525/ascodec-as3525.c
 #ifndef BOOTLOADER
+drivers/generic_i2c.c
 target/arm/adc-as3514.c
-target/arm/as3525/pcm-as3525.c
 target/arm/as3525/audio-as3525.c
 target/arm/as3525/debug-as3525.c
-target/arm/as3525/i2s-as3525.c
+target/arm/as3525/fmradio-i2c-as3525.c
 target/arm/as3525/i2c-as3525.c
+target/arm/as3525/i2s-as3525.c
+target/arm/as3525/pcm-as3525.c
 #endif /* BOOTLOADER */
 #endif /* CONFIG_CPU == AS3525 */
 
@@ -1080,8 +1082,6 @@ target/arm/as3525/sansa-clip/lcd-as-clip.S
 target/arm/as3525/sansa-clip/button-clip.c
 target/arm/as3525/sansa-clip/backlight-clip.c
 #ifndef BOOTLOADER
-drivers/generic_i2c.c
-target/arm/as3525/fmradio-i2c-as3525.c
 target/arm/as3525/sansa-clip/powermgmt-clip.c
 #endif /* !BOOTLOADER */
 #endif /* !SIMULATOR */
@@ -1093,8 +1093,6 @@ target/arm/as3525/sansa-e200v2/lcd-e200v2.c
 target/arm/as3525/sansa-e200v2/button-e200v2.c
 target/arm/as3525/backlight-e200v2-fuze.c
 #ifndef BOOTLOADER
-drivers/generic_i2c.c
-target/arm/as3525/fmradio-i2c-as3525.c
 target/arm/as3525/powermgmt-as3525.c
 #endif /* !BOOTLOADER */
 #endif /* !SIMULATOR */
@@ -1106,8 +1104,6 @@ target/arm/as3525/sansa-c200v2/lcd-c200v2.c
 target/arm/as3525/sansa-c200v2/button-c200v2.c
 target/arm/as3525/sansa-c200v2/backlight-c200v2.c
 #ifndef BOOTLOADER
-drivers/generic_i2c.c
-target/arm/as3525/fmradio-i2c-as3525.c
 target/arm/as3525/powermgmt-as3525.c
 #endif /* !BOOTLOADER */
 #endif /* !SIMULATOR */
@@ -1119,8 +1115,6 @@ target/arm/lcd-ssd1815.c
 target/arm/as3525/sansa-m200v4/button-m200v4.c
 #ifndef BOOTLOADER
 target/arm/as3525/sansa-m200v4/powermgmt-m200v4.c
-drivers/generic_i2c.c
-target/arm/as3525/fmradio-i2c-as3525.c
 #endif /* !BOOTLOADER */
 #endif /* !SIMULATOR */
 #endif /* SANSA_M200V4 */
@@ -1131,8 +1125,6 @@ target/arm/as3525/sansa-fuze/button-fuze.c
 target/arm/as3525/sansa-fuze/lcd-fuze.c
 target/arm/as3525/backlight-e200v2-fuze.c
 #ifndef BOOTLOADER
-drivers/generic_i2c.c
-target/arm/as3525/fmradio-i2c-as3525.c
 target/arm/as3525/powermgmt-as3525.c
 #endif /* !BOOTLOADER */
 #endif /* !SIMULATOR */
