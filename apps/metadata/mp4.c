@@ -503,6 +503,11 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                     read_mp4_tag_string(fd, size, &buffer, &buffer_left,
                         &id3->mb_track_id);
                 }
+                else if ((strcasecmp(tag_name, "album artist") == 0))
+                {
+                    read_mp4_tag_string(fd, size, &buffer, &buffer_left, 
+                        &id3->albumartist);
+                }   
                 else
                 {
                     char* any;
