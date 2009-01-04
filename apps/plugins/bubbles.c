@@ -59,8 +59,11 @@ PLUGIN_HEADER
 #define MAX_SHOTTIME 1000
 
 /* keyboard layouts */
-#if CONFIG_KEYPAD != SANSA_E200_PAD
-/* sansa uses the wheel instead of left/right */
+/* FIXME: shouldn't the below be #ifdef HAVE_SCROLLWHEEL rather? */
+
+#if (CONFIG_KEYPAD != SANSA_E200_PAD) && \
+      (CONFIG_KEYPAD != SANSA_FUZE_PAD)
+/* sansas use the wheel instead of left/right if available */
 #define BUBBLES_LEFT        PLA_LEFT
 #define BUBBLES_LEFT_REP    PLA_LEFT_REPEAT
 #define BUBBLES_RIGHT       PLA_RIGHT

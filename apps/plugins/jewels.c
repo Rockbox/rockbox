@@ -97,7 +97,8 @@ PLUGIN_HEADER
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_POWER
 
-#elif CONFIG_KEYPAD == SANSA_E200_PAD
+#elif CONFIG_KEYPAD == SANSA_E200_PAD || \
+      (CONFIG_KEYPAD == SANSA_FUZE_PAD)
 #define JEWELS_SCROLLWHEEL
 #define JEWELS_UP     BUTTON_UP
 #define JEWELS_DOWN   BUTTON_DOWN
@@ -1585,6 +1586,7 @@ static int jewels_main(struct game_context* bj) {
 #elif CONFIG_KEYPAD == SANSA_E200_PAD \
    || CONFIG_KEYPAD == SANSA_C200_PAD \
    || CONFIG_KEYPAD == SANSA_CLIP_PAD \
+   || CONFIG_KEYPAD == SANSA_FUZE_PAD \
    || CONFIG_KEYPAD == SANSA_M200_PAD
                 rb->lcd_puts(0, 2, "Swap pairs of jewels to");
                 rb->lcd_puts(0, 3, "form connected segments");

@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
+/* FIXME: Why only for charcell? */
 #ifdef HAVE_LCD_CHARCELLS
 
 /* NIM game for the player

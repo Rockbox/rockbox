@@ -201,6 +201,28 @@ static const struct plugin_api* rb;
 #   define HK_CUR2STACK      "DOUBLE SELECT"
 #   define HK_REM2STACK      "RIGHT"
 
+#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
+#   define SOL_QUIT          BUTTON_POWER
+#   define SOL_UP            BUTTON_UP
+#   define SOL_DOWN          BUTTON_DOWN
+#   define SOL_LEFT          BUTTON_SCROLL_BACK
+#   define SOL_RIGHT         BUTTON_SCROLL_FWD
+#   define SOL_MOVE          (BUTTON_SELECT|BUTTON_REL)
+#   define SOL_DRAW          (BUTTON_SELECT|BUTTON_UP)
+#   define SOL_REM2CUR       BUTTON_LEFT
+/* FIXME:
+#   define SOL_CUR2STACK_PRE BUTTON_HOME
+#   define SOL_CUR2STACK     (BUTTON_HOME | BUTTON_RIGHT) */
+#   define SOL_CUR2STACK_PRE (BUTTON_RIGHT | BUTTON_REPEAT)
+#   define SOL_CUR2STACK     BUTTON_RIGHT
+#   define SOL_REM2STACK     (BUTTON_LEFT|BUTTON_REPEAT)
+#   define SOL_REM2STACK_PRE BUTTON_LEFT
+#   define HK_MOVE           "SELECT"
+#   define HK_DRAW           "REC"
+#   define HK_REM2CUR        "LEFT"
+#   define HK_CUR2STACK      "DOUBLE SELECT"
+#   define HK_REM2STACK      "RIGHT"
+
 #elif (CONFIG_KEYPAD == SANSA_C200_PAD)
 #   define SOL_QUIT          BUTTON_POWER
 #   define SOL_UP            BUTTON_UP

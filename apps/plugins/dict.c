@@ -104,6 +104,7 @@ long reverse (long N) {
 }
 #endif
 
+/* TODO: Clean up, most use BUTTON_POWER, could be the #else case */
 /* Button definitions */
 #if CONFIG_KEYPAD == PLAYER_PAD
 #define LP_QUIT BUTTON_STOP
@@ -118,9 +119,12 @@ long reverse (long N) {
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 #define LP_QUIT BUTTON_POWER
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-(CONFIG_KEYPAD == SANSA_C200_PAD) || \
-(CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
-(CONFIG_KEYPAD == SANSA_M200_PAD) 
+      (CONFIG_KEYPAD == SANSA_C200_PAD) || \
+      (CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
+      (CONFIG_KEYPAD == SANSA_M200_PAD)
+#define LP_QUIT BUTTON_POWER
+#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
+/* TODO: #define LP_QUIT BUTTOM_HOME */
 #define LP_QUIT BUTTON_POWER
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define LP_QUIT BUTTON_POWER
@@ -143,6 +147,7 @@ long reverse (long N) {
 #endif
 
 /* data files */
+/* FIXME: use "PLUGIN_APPS_DIR" */
 #define DICT_INDEX ROCKBOX_DIR "/rocks/apps/dict.index"
 #define DICT_DESC ROCKBOX_DIR "/rocks/apps/dict.desc"
 

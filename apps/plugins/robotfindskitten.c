@@ -483,6 +483,18 @@ static char* messages[] =
 #   define RFK_RUP      (BUTTON_MENU | BUTTON_REPEAT)
 #   define RFK_RDOWN    (BUTTON_PLAY | BUTTON_REPEAT)
 
+#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
+#   undef __PLUGINLIB_ACTIONS_H__
+#   define RFK_QUIT     (BUTTON_SELECT | BUTTON_REPEAT)
+#   define RFK_RIGHT    BUTTON_RIGHT
+#   define RFK_LEFT     BUTTON_LEFT
+#   define RFK_UP       BUTTON_UP
+#   define RFK_DOWN     BUTTON_DOWN
+#   define RFK_RRIGHT   (BUTTON_RIGHT | BUTTON_REPEAT)
+#   define RFK_RLEFT    (BUTTON_LEFT | BUTTON_REPEAT)
+#   define RFK_RUP      (BUTTON_UP | BUTTON_REPEAT)
+#   define RFK_RDOWN    (BUTTON_DOWN | BUTTON_REPEAT)
+
 #else
 #   define RFK_QUIT     PLA_QUIT
 #   define RFK_RIGHT    PLA_RIGHT

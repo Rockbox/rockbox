@@ -21,6 +21,7 @@
 #include "plugin.h"
 #include "lib/configfile.h"
 
+/* FIXME: Only for LCD_CHARCELL ?? */
 #ifdef HAVE_LCD_CHARCELLS
 
 /* Euro converter for the player */

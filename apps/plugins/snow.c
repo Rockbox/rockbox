@@ -35,6 +35,7 @@ PLUGIN_HEADER
 #define MYLCD(fn) pgfx_ ## fn
 #endif
 
+/* FIXME: Could use pluginlib actions, or at least cleaned up */
 /* variable button definitions */
 #if CONFIG_KEYPAD == PLAYER_PAD
 #define SNOW_QUIT BUTTON_STOP
@@ -53,6 +54,8 @@ PLUGIN_HEADER
 (CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
 (CONFIG_KEYPAD == SANSA_M200_PAD)
 #define SNOW_QUIT BUTTON_POWER
+#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
+#define SNOW_QUIT BUTTON_DOWN
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define SNOW_QUIT BUTTON_POWER
 #elif CONFIG_KEYPAD == MROBE500_PAD

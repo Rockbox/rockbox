@@ -193,6 +193,19 @@ void I_ShutdownGraphics(void)
 #define DOOMBUTTON_ESC     BUTTON_POWER
 #define DOOMBUTTON_ENTER   BUTTON_SELECT
 #define DOOMBUTTON_WEAPON  DOOMBUTTON_SCROLLWHEEL_CW
+#elif CONFIG_KEYPAD == SANSA_FUZE_PAD
+#define DOOMBUTTON_SCROLLWHEEL
+#define DOOMBUTTON_SCROLLWHEEL_CC   BUTTON_SCROLL_BACK
+#define DOOMBUTTON_SCROLLWHEEL_CW   BUTTON_SCROLL_FWD
+#define DOOMBUTTON_UP      BUTTON_UP
+#define DOOMBUTTON_DOWN    BUTTON_DOWN
+#define DOOMBUTTON_LEFT    BUTTON_LEFT
+#define DOOMBUTTON_RIGHT   BUTTON_RIGHT
+#define DOOMBUTTON_SHOOT   BUTTON_SELECT
+#define DOOMBUTTON_OPEN    BUTTON_HOME
+#define DOOMBUTTON_ESC     BUTTON_POWER
+#define DOOMBUTTON_ENTER   BUTTON_SELECT
+#define DOOMBUTTON_WEAPON  DOOMBUTTON_SCROLLWHEEL_CW
 #elif CONFIG_KEYPAD == SANSA_C200_PAD
 #define DOOMBUTTON_UP      BUTTON_UP
 #define DOOMBUTTON_DOWN    BUTTON_DOWN
@@ -628,11 +641,11 @@ void I_FinishUpdate (void)
     /* ASM screen update (drops ~230 tics) */
     asm volatile (
         "clr.w   (%[LCD])                    \n" /* Setup the LCD controller */
-        "move.w  #(33<<1), (%[LCD])          \n" 
+        "move.w  #(33<<1), (%[LCD])          \n"
         "clr.w   (%[LCD2])                   \n"
         "clr.w   (%[LCD2])                   \n"
         "clr.w   (%[LCD])                    \n" /* End LCD controller setup */
-        "move.w  #(34<<1), (%[LCD])          \n" 
+        "move.w  #(34<<1), (%[LCD])          \n"
         "clr.l   %%d1                        \n"
     ".loop:                                  \n"
         "move.l  (%[scrp])+, %%d0            \n"
@@ -686,7 +699,7 @@ void I_FinishUpdate (void)
     if(rotate_screen)
     {
         int y;
-        
+
         for (y = 1; y <= SCREENHEIGHT; y++)
         {
             fb_data *dst = rb->lcd_framebuffer + LCD_WIDTH - y;

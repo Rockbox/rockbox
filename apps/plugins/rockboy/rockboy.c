@@ -163,7 +163,17 @@ static void setoptions (void)
         options.START=BUTTON_SCROLL_BACK;
         options.SELECT=BUTTON_SCROLL_FWD;
         options.MENU=BUTTON_POWER;
-        
+
+#elif CONFIG_KEYPAD == SANSA_FUZE_PAD
+        options.UP=BUTTON_UP;
+        options.DOWN=BUTTON_DOWN;
+
+        options.A=BUTTON_SELECT;
+        options.B=BUTTON_HOME;
+        options.START=BUTTON_SCROLL_BACK;
+        options.SELECT=BUTTON_SCROLL_FWD;
+        options.MENU=BUTTON_POWER;
+
 #elif CONFIG_KEYPAD == SANSA_C200_PAD
         options.UP=BUTTON_UP;
         options.DOWN=BUTTON_DOWN;

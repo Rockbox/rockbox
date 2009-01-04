@@ -27,6 +27,7 @@ static int files, dirs, musicfiles, largestdir;
 static int lasttick;
 static bool abort;
 
+/* FIXME: Could use plugin lib actions or be cleaned up */
 #if CONFIG_KEYPAD == PLAYER_PAD 
 #define STATS_STOP BUTTON_STOP
 
@@ -60,6 +61,11 @@ static bool abort;
 (CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
 (CONFIG_KEYPAD == SANSA_M200_PAD)
 #define STATS_STOP BUTTON_POWER
+
+#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
+/* FIXME:
+#define STATS_STOP BUTTON_HOME */
+#define STATS_STOP BUTTON_DOWN
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define STATS_STOP BUTTON_POWER

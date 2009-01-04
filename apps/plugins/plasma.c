@@ -55,6 +55,7 @@ static size_t        gbuf_size = 0;
 static unsigned char sp1, sp2, sp3, sp4; /* Speed of plasma */
 static int plasma_frequency;
 
+/* FIXME: Could use plugin lib actions */
 /* Key assignement, all bitmapped models */
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
     (CONFIG_KEYPAD == IPOD_1G2G_PAD)
@@ -67,10 +68,12 @@ static int plasma_frequency;
 #define PLASMA_INCREASE_FREQUENCY BUTTON_UP
 #define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
 
+/* FIXME: Clip/fuze should use HOME instead of POWER */
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-(CONFIG_KEYPAD == SANSA_C200_PAD) || \
-(CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
-(CONFIG_KEYPAD == SANSA_M200_PAD)
+      (CONFIG_KEYPAD == SANSA_C200_PAD) || \
+      (CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
+      (CONFIG_KEYPAD == SANSA_M200_PAD) || \
+      (CONFIG_KEYPAD == SANSA_FUZE_PAD)
 #define PLASMA_QUIT BUTTON_POWER
 #define PLASMA_INCREASE_FREQUENCY BUTTON_UP
 #define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
@@ -145,13 +148,15 @@ static int plasma_frequency;
 #define PLASMA_RC_QUIT            BUTTON_RC_STOP
 #endif
 
+/* FIXME: cleanup */
 #ifdef HAVE_LCD_COLOR
 #if CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #define PLASMA_REGEN_COLORS BUTTON_PLAY
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define PLASMA_REGEN_COLORS BUTTON_PLAY
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-(CONFIG_KEYPAD == SANSA_C200_PAD)
+(CONFIG_KEYPAD == SANSA_C200_PAD) || \
+(CONFIG_KEYPAD == SANSA_FUZE_PAD)
 #define PLASMA_REGEN_COLORS BUTTON_SELECT
 #elif CONFIG_KEYPAD == IPOD_4G_PAD
 #define PLASMA_REGEN_COLORS BUTTON_SELECT

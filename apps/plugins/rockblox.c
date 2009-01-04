@@ -41,6 +41,7 @@ PLUGIN_HEADER
 #define ROCKBLOX_RESTART       (BUTTON_SELECT | BUTTON_PLAY)
 #define ROCKBLOX_DROP          (BUTTON_SELECT | BUTTON_REL)
 
+/* FIXME: use HAVE_SCROLLWHEEL */
 #define SCROLL_WHEEL
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
@@ -114,6 +115,7 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
 
+/* FIXME: No #define SCROLL_WHEEL here? */
 #define ROCKBLOX_OFF           BUTTON_POWER
 #define ROCKBLOX_ROTATE_RIGHT  BUTTON_SCROLL_BACK
 #define ROCKBLOX_ROTATE_LEFT   BUTTON_SCROLL_FWD
@@ -122,6 +124,21 @@ PLUGIN_HEADER
 #define ROCKBLOX_RIGHT         BUTTON_RIGHT
 #define ROCKBLOX_DROP          BUTTON_SELECT
 #define ROCKBLOX_RESTART       BUTTON_REC
+
+#elif CONFIG_KEYPAD == SANSA_FUZE_PAD
+
+/* FIXME: No #define SCROLL_WHEEL here? */
+#define ROCKBLOX_OFF           BUTTON_POWER
+#define ROCKBLOX_ROTATE_RIGHT  BUTTON_SCROLL_BACK
+#define ROCKBLOX_ROTATE_LEFT   BUTTON_SCROLL_FWD
+#define ROCKBLOX_DOWN          BUTTON_DOWN
+#define ROCKBLOX_LEFT          BUTTON_LEFT
+#define ROCKBLOX_RIGHT         BUTTON_RIGHT
+#define ROCKBLOX_DROP          BUTTON_SELECT
+/* FIXME:
+#define ROCKBLOX_RESTART       BUTTON_HOME */
+#define ROCKBLOX_RESTART       BUTTON_SELECT|BUTTON_DOWN
+
 
 #elif CONFIG_KEYPAD == SANSA_C200_PAD
 
@@ -543,8 +560,8 @@ extern const fb_data rockblox_background[];
    %    %  % %%% - L has 4 orientations
    %% %%%  % %
 
-   %     %%s
-   % %   %  %%% - J has 4 orientations
+    %     %%
+    % %   %  %%% - J has 4 orientations
    %% %%% %    %
 
    %       % %%%
