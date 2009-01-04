@@ -881,11 +881,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Attenuazione delle altefrequenze"
+    swcodec: "Attenuazione delle alte frequenze"
   </dest>
   <voice>
     *: none
-    swcodec: "Attenuazione delle altefrequenze"
+    swcodec: "Attenuazione delle alte frequenze"
   </voice>
 </phrase>
 <phrase>
@@ -902,7 +902,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Taglio delle altefrequenze"
+    swcodec: "Taglio delle alte frequenze"
   </voice>
 </phrase>
 <phrase>
@@ -966,7 +966,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Pretaglio"
+    swcodec: "Pre-taglio"
   </dest>
   <voice>
     *: none
@@ -2438,7 +2438,7 @@
     *: "Initialize Now"
   </source>
   <dest>
-    *: "Inizializa ora"
+    *: "Inizializza ora"
   </dest>
   <voice>
     *: "Inizializza ora"
@@ -6963,16 +6963,16 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: start the credits.rock plugin which shows who made Rockbox
   user:
   <source>
-    *: "Version"
+    *: "Credits"
   </source>
   <dest>
-    *: "Versione"
+    *: "Crediti"
   </dest>
   <voice>
-    *: "Versione"
+    *: "Crediti"
   </voice>
 </phrase>
 <phrase>
@@ -8247,9 +8247,11 @@
     *: "Tempo"
   </voice>
 </phrase>
+/* TODO: cleanup LANG_USB_CHARGING unless HAVE_USB_CHARGING_ENABLE defined,
+ * the selector should probably be usb_charging_enable as well. */
 <phrase>
   id: LANG_USB_CHARGING
-  desc: in Battery menu, TODO: cleanup unless HAVE_USB_CHARGING_ENABLE defined
+  desc: in Battery menu
   user:
   <source>
     *: none
