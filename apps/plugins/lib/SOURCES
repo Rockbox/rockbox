@@ -4,6 +4,10 @@ fixedpoint.c
 playback_control.c
 rgb_hsv.c
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
+#if LCD_DEPTH == 1
+core_bmp.c
+core_resize.c
+#endif
 grey_core.c
 grey_draw.c
 grey_parm.c

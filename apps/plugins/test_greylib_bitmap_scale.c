@@ -22,6 +22,12 @@
 #include "plugin.h"
 #include "lib/grey.h"
 
+#if LCD_DEPTH == 1
+#define BMP_LOAD read_bmp_file
+#else
+#define BMP_LOAD rb->read_bmp_file
+#endif
+
 PLUGIN_HEADER
 GREY_INFO_STRUCT
 static unsigned char grey_bm_buf[LCD_WIDTH * LCD_HEIGHT + 
@@ -29,6 +35,8 @@ static unsigned char grey_bm_buf[LCD_WIDTH * LCD_HEIGHT +
 static unsigned char grey_display_buf[2*LCD_WIDTH * LCD_HEIGHT];
 
 static const struct plugin_api* rb; /* global api struct pointer */
+
+MEM_FUNCTION_WRAPPERS(rb)
 
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
@@ -47,9 +55,14 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     rb->strcpy(filename, parameter);
 
-    ret = rb->read_bmp_file(filename, &grey_bm, sizeof(grey_bm_buf),
-                            FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
-                            &format_grey);
+#if LCD_DEPTH == 1
+    bmp_init(rb);
+    resize_init(rb);
+#endif
+
+    ret = BMP_LOAD(filename, &grey_bm, sizeof(grey_bm_buf),
+                   FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
+                   &format_grey);
     
     if(ret < 1)
     {

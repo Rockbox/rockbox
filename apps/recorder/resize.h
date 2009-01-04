@@ -45,8 +45,7 @@
 
 struct img_part {
     int len;
-#if !defined(HAVE_LCD_COLOR) && \
-        (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1))
+#if !defined(HAVE_LCD_COLOR)    
     uint8_t *buf;
 #else
     struct uint8_rgb* buf;
@@ -95,4 +94,10 @@ int resize_on_load(struct bitmap *bm, bool dither,
                    const struct custom_format *cformat,
                    struct img_part* (*store_part)(void *args),
                    void *args);
+
+#ifdef PLUGIN
+struct plugin_api;
+void resize_init(const struct plugin_api *api);
+#endif
+
 #endif /* _RESIZE_H_ */

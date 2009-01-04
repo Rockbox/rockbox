@@ -87,6 +87,8 @@ int save_bmp_file( char* filename, struct bitmap *bm, const struct plugin_api* r
 }
 #endif
 
+#include "../../recorder/bmp.c"
+
 /**
    Very simple image scale from src to dst (nearest neighbour).
    Source and destination dimensions are read from the struct bitmap.

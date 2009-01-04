@@ -36,7 +36,9 @@
 #include <string.h>
 #include <general.h>
 #include "inttypes.h"
+#ifndef PLUGIN
 #include "debug.h"
+#endif
 #include "lcd.h"
 #include "file.h"
 #ifdef HAVE_REMOTE_LCD
@@ -50,13 +52,24 @@
 #ifndef __PCTOOL__
 #include "config.h"
 #include "system.h"
-#include "bmp.h"
+#include <bmp.h>
 #include "resize.h"
-#include "resize.h"
-#include "debug.h"
 #else
 #undef DEBUGF
 #define DEBUGF(...)
+#endif
+
+#ifndef PLUGIN
+#define API(x) x
+#else
+#define API(x) rb->x
+
+static const struct plugin_api *rb;
+
+void resize_init(const struct plugin_api *api)
+{
+    rb = api;
+}
 #endif
 
 /* calculate the maximum dimensions which will preserve the aspect ration of
@@ -141,7 +154,7 @@ static bool scale_h_area(void *out_line_ptr,
     oxe = 0;
     mul = 0;
     /* give other tasks a chance to run */
-    yield();
+    API(yield)();
     for (ix = 0; ix < (unsigned int)ctx->src->width; ix++)
     {
         oxe += ctx->bm->width;
@@ -244,11 +257,11 @@ static inline bool scale_v_area(struct rowset *rset, struct scaler_context *ctx)
 #ifdef HAVE_LCD_COLOR
     uint32_t *rowacc = (uint32_t *) ctx->buf,
              *rowtmp = rowacc + 3 * ctx->bm->width;
-    memset((void *)ctx->buf, 0, ctx->bm->width * 2 * sizeof(struct uint32_rgb));
+    API(memset)((void *)ctx->buf, 0, ctx->bm->width * 2 * sizeof(struct uint32_rgb));
 #else
     uint32_t *rowacc = (uint32_t *) ctx->buf,
              *rowtmp = rowacc + ctx->bm->width;
-    memset((void *)ctx->buf, 0, ctx->bm->width * 2 * sizeof(uint32_t));
+    API(memset)((void *)ctx->buf, 0, ctx->bm->width * 2 * sizeof(uint32_t));
 #endif
     SDEBUGF("scale_v_area\n");
     /* zero the accumulator and temp rows */
@@ -285,9 +298,9 @@ static inline bool scale_v_area(struct rowset *rset, struct scaler_context *ctx)
             ctx->output_row(oy, (void*)rowacc, ctx);
             /* clear accumulator row, store partial coverage for next row */
 #ifdef HAVE_LCD_COLOR
-            memset((void *)rowacc, 0, ctx->bm->width * sizeof(uint32_t) * 3);
+            API(memset)((void *)rowacc, 0, ctx->bm->width * sizeof(uint32_t) * 3);
 #else
-            memset((void *)rowacc, 0, ctx->bm->width * sizeof(uint32_t));
+            API(memset)((void *)rowacc, 0, ctx->bm->width * sizeof(uint32_t));
 #endif
             mul = oye;
             oy += rset->rowstep;
@@ -333,7 +346,7 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
     /* The error is set so that values are initialized on the first pass. */
     ixe = ctx->bm->width - 1;
     /* give other tasks a chance to run */
-    yield();
+    API(yield)();
     for (ox = 0; ox < (uint32_t)ctx->bm->width; ox++)
     {
 #ifdef HAVE_LCD_COLOR
@@ -500,8 +513,8 @@ static inline bool scale_v_linear(struct rowset *rset,
 }
 #endif /* HAVE_UPSCALER */
 
-static void output_row_native(uint32_t row, void * row_in,
-                              struct scaler_context *ctx)
+#ifndef PLUGIN
+void output_row_native(uint32_t row, void * row_in, struct scaler_context *ctx)
 {
     int col;
     int fb_width = BM_WIDTH(ctx->bm->width,FORMAT_NATIVE,0);
@@ -511,7 +524,7 @@ static void output_row_native(uint32_t row, void * row_in,
 #else
     uint32_t *qp = (uint32_t*)row_in;
 #endif
-    SDEBUGF("output_row: y: %d in: %p\n",row, row_in);
+    SDEBUGF("output_row: y: %lu in: %p\n",row, row_in);
 #if LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
                 /* greyscale iPods */
@@ -591,6 +604,7 @@ static void output_row_native(uint32_t row, void * row_in,
                 }
 #endif /* LCD_DEPTH */
 }
+#endif
 
 int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
                    struct rowset *rset, unsigned char *buf, unsigned int len,
@@ -615,8 +629,10 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     uint8_t sc_buf[(needed <= len  || needed > MAX_SC_STACK_ALLOC) ?
                    0 : needed];
 #endif
-    len = (unsigned int)align_buffer(PUN_PTR(void**, &buf), len,
+#if CONFIG_CODEC == SWCODEC
+    len = (unsigned int)API(align_buffer)(PUN_PTR(void**, &buf), len,
                                          sizeof(uint32_t));
+#endif
     if (needed > len)
     {
 #if MAX_SC_STACK_ALLOC
@@ -642,7 +658,9 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     }
 
     struct scaler_context ctx;
-    cpu_boost(true);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    API(cpu_boost)(true);
+#endif
     ctx.store_part = store_part;
     ctx.args = args;
 #if MAX_SC_STACK_ALLOC
@@ -654,10 +672,11 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     ctx.bm = bm;
     ctx.src = src;
     ctx.dither = dither;
+#ifndef PLUGIN
+    ctx.output_row = output_row_native;
     if (format)
+#endif
         ctx.output_row = format->output_row;
-    else
-        ctx.output_row = output_row_native;
 #ifdef HAVE_UPSCALER
     if (sw > dw)
     {
@@ -678,7 +697,9 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     else
         ret = scale_v_linear(rset, &ctx);
 #endif
-    cpu_boost(false);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    API(cpu_boost)(false);
+#endif
     if (!ret)
         return 0;
     return 1;
