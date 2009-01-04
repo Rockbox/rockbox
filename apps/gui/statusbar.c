@@ -174,12 +174,6 @@ static void gui_statusbar_init(struct gui_statusbar * bar)
 void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 {
     struct screen * display = bar->display;
-    struct viewport vp;
-    viewport_set_defaults(&vp, display->screen_type);
-    vp.height = STATUSBAR_HEIGHT;
-    vp.x = STATUSBAR_X_POS;
-    vp.y = STATUSBAR_Y_POS;
-    display->set_viewport(&vp);
 
 #ifdef HAVE_LCD_CHARCELLS
     int val;
@@ -267,6 +261,12 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #endif
         memcmp(&(bar->info), &(bar->lastinfo), sizeof(struct status_info)))
     {
+        struct viewport vp;
+        viewport_set_defaults(&vp, display->screen_type);
+        vp.height = STATUSBAR_HEIGHT;
+        vp.x = STATUSBAR_X_POS;
+        vp.y = STATUSBAR_Y_POS;
+        display->set_viewport(&vp);
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         display->fillrect(0, 0, display->getwidth(), STATUSBAR_HEIGHT);
         display->set_drawmode(DRMODE_SOLID);
@@ -342,6 +342,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
             gui_statusbar_led(display);
 #endif
         display->update_viewport();
+        display->set_viewport(NULL);
         bar->lastinfo = bar->info;
     }
 #endif /* HAVE_LCD_BITMAP */
@@ -378,7 +379,6 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
     display->icon(ICON_PARAM, param);
     display->icon(ICON_USB, usb);
 #endif /* HAVE_LCD_CHARCELLS */
-    display->set_viewport(NULL);
 }
 
 #ifdef HAVE_LCD_BITMAP
