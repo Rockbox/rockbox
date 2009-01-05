@@ -61,9 +61,9 @@
 #if CONFIG_CODEC == SWCODEC
 
 #ifdef HAVE_RECORDING
-#define BASETHREADS  18
-#else
 #define BASETHREADS  17
+#else
+#define BASETHREADS  16
 #endif
 
 #else
