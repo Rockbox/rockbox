@@ -132,12 +132,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 134
+#define PLUGIN_API_VERSION 135
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 134
+#define PLUGIN_MIN_API_VERSION 135
 
 /* plugin return codes */
 enum plugin_status {
@@ -410,7 +410,6 @@ struct plugin_api {
     volatile long* current_tick;
     long (*default_event_handler)(long event);
     long (*default_event_handler_ex)(long event, void (*callback)(void *), void *parameter);
-    struct thread_entry* threads;
     unsigned int (*create_thread)(void (*function)(void), void* stack,
                                   size_t stack_size, unsigned flags,
                                   const char *name
@@ -419,6 +418,10 @@ struct plugin_api {
     void (*thread_exit)(void);
     void (*thread_wait)(unsigned int thread_id);
 #if CONFIG_CODEC == SWCODEC
+    void (*thread_thaw)(unsigned int thread_id);
+#ifdef HAVE_PRIORITY_SCHEDULING
+    int (*thread_set_priority)(unsigned int thread_id, int priority);
+#endif
     void (*mutex_init)(struct mutex *m);
     void (*mutex_lock)(struct mutex *m);
     void (*mutex_unlock)(struct mutex *m);
@@ -693,6 +696,8 @@ struct plugin_api {
     struct system_status *global_status;
     void (*talk_disable)(bool disable);
 #if CONFIG_CODEC == SWCODEC
+    void (*codec_thread_do_callback)(void (*fn)(void),
+                                     unsigned int *audio_thread_id);
     int (*codec_load_file)(const char* codec, struct codec_api *api);
     const char *(*get_codec_filename)(int cod_spec);
     bool (*get_metadata)(struct mp3entry* id3, int fd, const char* trackname);
@@ -774,8 +779,6 @@ struct plugin_api {
     bool (*search_albumart_files)(const struct mp3entry *id3, const char *size_string,
                                   char *buf, int buflen);
 #endif
-
-    void (*thread_thaw)(unsigned int thread_id);
 
 #ifdef HAVE_SEMAPHORE_OBJECTS
     void (*semaphore_init)(struct semaphore *s, int max, int start);

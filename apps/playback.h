@@ -42,6 +42,8 @@ enum
     AUDIO_WANT_VOICE,
 };
 bool audio_restore_playback(int type); /* Restores the audio buffer to handle the requested playback */
+void codec_thread_do_callback(void (*fn)(void),
+                              unsigned int *codec_thread_id);
 
 #ifdef HAVE_ALBUMART
 int audio_current_aa_hid(void);

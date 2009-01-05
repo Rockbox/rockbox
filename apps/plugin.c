@@ -71,8 +71,6 @@ static char current_plugin[MAX_PATH];
 
 char *plugin_get_current_filename(void);
 
-extern struct thread_entry threads[MAXTHREADS];
-
 static const struct plugin_api rockbox_api = {
 
     /* lcd */
@@ -293,11 +291,14 @@ static const struct plugin_api rockbox_api = {
     &current_tick,
     default_event_handler,
     default_event_handler_ex,
-    threads,
     create_thread,
     thread_exit,
     thread_wait,
 #if (CONFIG_CODEC == SWCODEC)
+    thread_thaw,
+#ifdef HAVE_PRIORITY_SCHEDULING
+    thread_set_priority,
+#endif
     mutex_init,
     mutex_lock,
     mutex_unlock,
@@ -544,6 +545,7 @@ static const struct plugin_api rockbox_api = {
     &global_status,
     talk_disable,
 #if CONFIG_CODEC == SWCODEC
+    codec_thread_do_callback,
     codec_load_file,
     get_codec_filename,
     get_metadata,
@@ -610,8 +612,6 @@ static const struct plugin_api rockbox_api = {
     find_albumart,
     search_albumart_files,
 #endif
-
-    thread_thaw,
 
 #ifdef HAVE_SEMAPHORE_OBJECTS
     semaphore_init,

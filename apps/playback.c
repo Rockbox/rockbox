@@ -150,6 +150,8 @@ enum {
     Q_ENCODER_LOAD_DISK,
     Q_ENCODER_RECORD,
 #endif
+
+    Q_CODEC_DO_CALLBACK,
 };
 
 enum filling_state {
@@ -1303,6 +1305,13 @@ static void codec_thread(void)
                 status = codec_load_buf(CUR_TI->codec_hid, &ci);
                 break;
 
+            case Q_CODEC_DO_CALLBACK:
+                LOGFQUEUE("codec < Q_CODEC_DO_CALLBACK");
+                queue_reply(&codec_queue, 1);
+                if ((void*)ev.data != NULL)
+                    ((void (*)(void))ev.data)();
+                break;
+
 #ifdef AUDIO_HAVE_RECORDING
             case Q_ENCODER_LOAD_DISK:
                 LOGFQUEUE("codec < Q_ENCODER_LOAD_DISK");
@@ -1419,6 +1428,18 @@ static void codec_thread(void)
     }
 }
 
+/* Borrow the codec thread and return the ID */
+void codec_thread_do_callback(void (*fn)(void), unsigned int *id)
+{
+    /* Set id before telling thread to call something; it may be
+     * needed before this function returns. */
+    if (id != NULL)
+        *id = codec_thread_id;
+
+    /* Codec thread will signal just before entering callback */
+    LOGFQUEUE("codec >| Q_CODEC_DO_CALLBACK");
+    queue_send(&codec_queue, Q_CODEC_DO_CALLBACK, (intptr_t)fn);
+}
 
 /* --- Buffering callbacks --- */
 

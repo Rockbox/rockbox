@@ -513,9 +513,6 @@ static void codec_thread(void)
     codec_playing = false;
 }
 
-static uintptr_t* codec_stack;
-static size_t codec_stack_size;
-
 static enum plugin_status test_track(const char* filename)
 {
     size_t n;
@@ -525,7 +522,6 @@ static enum plugin_status test_track(const char* filename)
     long ticks;
     unsigned long speed;
     unsigned long duration;
-    unsigned int codecthread_id;
     const char* ch;
 
     /* Display filename (excluding any path)*/
@@ -588,13 +584,7 @@ static enum plugin_status test_track(const char* filename)
 
     codec_playing = true;
 
-    if ((codecthread_id = rb->create_thread(codec_thread,
-            codec_stack, codec_stack_size, 0, "testcodec"
-            IF_PRIO(,PRIORITY_PLAYBACK) IF_COP(, CPU))) == 0)
-    {
-        log_text("Cannot create codec thread!",true);
-        goto exit;
-    }
+    rb->codec_thread_do_callback(codec_thread, NULL);
 
     /* Wait for codec thread to die */
     while (codec_playing)
@@ -606,7 +596,7 @@ static enum plugin_status test_track(const char* filename)
     ticks = endtick - starttick;
 
     /* Be sure it is done */
-    rb->thread_wait(codecthread_id);
+    rb->codec_thread_do_callback(NULL, NULL);
 
     log_text(str,true);
     
@@ -656,11 +646,9 @@ exit:
 /* plugin entry point */
 enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
-    uintptr_t* codec_stack_copy;
     int result, selection = 0;
     enum plugin_status res = PLUGIN_OK;
     int scandir;
-    int i;
     struct dirent *entry;
     DIR* dir;
     char* ch;
@@ -676,43 +664,8 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     }
 
     codec_mallocbuf = rb->plugin_get_audio_buffer(&audiosize);
-
-#ifdef SIMULATOR
-    /* The simulator thread implementation doesn't have stack buffers */
-    (void)i;
-    codec_stack_size = 0;
-#else
-    /* Borrow the codec thread's stack (in IRAM on most targets) */
-    codec_stack = NULL;
-    for (i = 0; i < MAXTHREADS; i++)
-    {
-        if (rb->strcmp(rb->threads[i].name,"codec")==0)
-        {
-            /* Wait to ensure the codec thread has blocked */
-            while (rb->threads[i].state!=STATE_BLOCKED)
-                rb->yield();
-
-            codec_stack = rb->threads[i].stack;
-            codec_stack_size = rb->threads[i].stack_size;
-            break;
-        }
-    }
-
-    if (codec_stack == NULL)
-    {
-        rb->splash(HZ*2, "No codec thread!");
-        return PLUGIN_ERROR;
-    }
-#endif
-
-    codec_stack_copy = codec_mallocbuf + CODEC_SIZE;
-    audiobuf = SKIPBYTES(codec_stack_copy, codec_stack_size);
-    audiosize -= CODEC_SIZE + codec_stack_size;
-
-#ifndef SIMULATOR
-    /* Backup the codec thread's stack */
-    rb->memcpy(codec_stack_copy,codec_stack,codec_stack_size);    
-#endif
+    audiobuf = SKIPBYTES(codec_mallocbuf, CODEC_SIZE);
+    audiosize -= CODEC_SIZE;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
@@ -802,11 +755,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
 exit:
     log_close();
-
-#ifndef SIMULATOR
-    /* Restore the codec thread's stack */
-    rb->memcpy(codec_stack, codec_stack_copy, codec_stack_size);    
-#endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);

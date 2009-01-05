@@ -38,14 +38,7 @@ struct audio_thread_data
     struct dsp_config *dsp; /* The DSP we're using */
 };
 
-/* The audio stack is stolen from the core codec thread (but not in uisim) */
-/* Used for stealing codec thread's stack */
-static uint32_t* audio_stack;
-static size_t audio_stack_size; /* Keep gcc happy and init */
-#define AUDIO_STACKSIZE (9*1024)
-#ifndef SIMULATOR
-static uint32_t codec_stack_copy[AUDIO_STACKSIZE / sizeof(uint32_t)];
-#endif
+/* The audio thread is stolen from the core codec thread */
 static struct event_queue audio_str_queue SHAREDBSS_ATTR;
 static struct queue_sender_list audio_str_queue_send SHAREDBSS_ATTR;
 struct stream audio_str IBSS_ATTR;
@@ -473,6 +466,11 @@ static void audio_thread_msg(struct audio_thread_data *td)
 static void audio_thread(void)
 {
     struct audio_thread_data td;
+#ifdef HAVE_PRIORITY_SCHEDULING
+    /* Up the priority since the core DSP over-yields internally */
+    int old_priority = rb->thread_set_priority(THREAD_ID_CURRENT,
+                                               PRIORITY_PLAYBACK-4);
+#endif
 
     rb->memset(&td, 0, sizeof (td));
     td.status = STREAM_STOPPED;
@@ -512,7 +510,13 @@ static void audio_thread(void)
             case TSTATE_RENDER_WAIT:     goto render_wait;
             case TSTATE_RENDER_WAIT_END: goto render_wait_end;
             /* Anything else is interpreted as an exit */
-            default:                     return;
+            default:
+            {
+#ifdef HAVE_PRIORITY_SCHEDULING
+                rb->thread_set_priority(THREAD_ID_CURRENT, old_priority);
+#endif
+                return;
+                }
             }
         }
 
@@ -677,43 +681,6 @@ static void audio_thread(void)
 /* Initializes the audio thread resources and starts the thread */
 bool audio_thread_init(void)
 {
-    int i;
-#ifdef SIMULATOR
-    /* The simulator thread implementation doesn't have stack buffers, and
-       these parameters are ignored. */
-    (void)i;  /* Keep gcc happy */
-    audio_stack = NULL;
-    audio_stack_size = 0;
-#else
-    /* Borrow the codec thread's stack (in IRAM on most targets) */
-    audio_stack = NULL;
-    for (i = 0; i < MAXTHREADS; i++)
-    {
-        if (rb->strcmp(rb->threads[i].name, "codec") == 0)
-        {
-            /* Wait to ensure the codec thread has blocked */
-            while (rb->threads[i].state != STATE_BLOCKED)
-                rb->yield();
-
-            /* Now we can steal the stack */
-            audio_stack = rb->threads[i].stack;
-            audio_stack_size = rb->threads[i].stack_size;
-
-            /* Backup the codec thread's stack */
-            rb->memcpy(codec_stack_copy, audio_stack, audio_stack_size);
-            break;
-        }
-    }
-
-    if (audio_stack == NULL)
-    {
-        /* This shouldn't happen, but deal with it anyway by using
-           the copy instead */
-        audio_stack = codec_stack_copy;
-        audio_stack_size = AUDIO_STACKSIZE;
-    }
-#endif
-
     /* Initialise the encoded audio buffer and its descriptors */
     audio_queue.start = mpeg_malloc(AUDIOBUF_ALLOC_SIZE,
                                     MPEG_ALLOC_AUDIOBUF);
@@ -724,16 +691,11 @@ bool audio_thread_init(void)
     audio_str.hdr.q = &audio_str_queue;
     rb->queue_init(audio_str.hdr.q, false);
 
-    /* One-up on the priority since the core DSP over-yields internally */
-    audio_str.thread = rb->create_thread(
-        audio_thread, audio_stack, audio_stack_size, 0,
-        "mpgaudio" IF_PRIO(,PRIORITY_PLAYBACK-4) IF_COP(, CPU));
+    /* We steal the codec thread for audio */
+    rb->codec_thread_do_callback(audio_thread, &audio_str.thread);
 
     rb->queue_enable_queue_send(audio_str.hdr.q, &audio_str_queue_send,
                                 audio_str.thread);
-
-    if (audio_str.thread == 0)
-        return false;
 
     /* Wait for thread to initialize */
     str_send_msg(&audio_str, STREAM_NULL, 0);
@@ -747,12 +709,7 @@ void audio_thread_exit(void)
     if (audio_str.thread != 0)
     {
         str_post_msg(&audio_str, STREAM_QUIT, 0);
-        rb->thread_wait(audio_str.thread);
+        rb->codec_thread_do_callback(NULL, NULL);
         audio_str.thread = 0;
     }
-
-#ifndef SIMULATOR
-    /* Restore the codec thread's stack */
-    rb->memcpy(audio_stack, codec_stack_copy, audio_stack_size);    
-#endif
 }
