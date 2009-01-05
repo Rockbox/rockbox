@@ -92,12 +92,12 @@ bool viewportmanager_set_statusbar(bool enabled)
     bool old = statusbar_enabled;
     if (enabled && global_settings.statusbar)
     {
-        add_event(GUI_EVENT_FOURHERTZ, false, viewportmanager_draw_statusbars);
+        add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_draw_statusbars);
         gui_syncstatusbar_draw(&statusbars, true);
     }
     else
     {
-        remove_event(GUI_EVENT_FOURHERTZ, viewportmanager_draw_statusbars);
+        remove_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_draw_statusbars);
     }
     statusbar_enabled = enabled;
     return old;

@@ -906,9 +906,6 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
 {
     switch(event)
     {
-        case SYS_FOURHERTZ:
-            send_event(GUI_EVENT_FOURHERTZ, NULL);
-            break;
         case SYS_BATTERY_UPDATE:
             if(global_settings.talk_battery_level)
             {

@@ -120,16 +120,6 @@
 const char appsversion[]=APPSVERSION;
 
 static void init(void);
-
-static void fourhertz_tick_task(void)
-{
-    static long last_fire = 0;
-    if (TIME_AFTER(current_tick, last_fire+HZ/4))
-    {
-        queue_post(&button_queue, SYS_FOURHERTZ, 0);
-        last_fire = current_tick;
-    }
-}
         
 #ifdef SIMULATOR
 void app_main(void)
@@ -148,7 +138,6 @@ static void app_main(void)
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(TOUCHSCREEN_BUTTON);
 #endif
-    tick_add_task(fourhertz_tick_task);
     viewportmanager_set_statusbar(true);
     add_event(GUI_EVENT_STATUSBAR_TOGGLE, false, 
               viewportmanager_statusbar_changed);

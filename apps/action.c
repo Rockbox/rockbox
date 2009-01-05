@@ -25,6 +25,7 @@
 #include "config.h"
 #include "lang.h"
 
+#include "appevents.h"
 #include "button.h"
 #include "action.h"
 #include "kernel.h"
@@ -104,10 +105,6 @@ static inline int get_next_context(const struct button_mapping *items, int i)
    Timeout can be TIMEOUT_NOBLOCK to return immediatly
                   TIMEOUT_BLOCK   to wait for a button press
    Any number >0   to wait that many ticks for a press
-
-   This function will likely return SYS_FOURHERTZ which should be passed to the
-   default_event_handler(). If this doesnt happen parts of the GUI may not be
-   redrawn correctly
  */
 static int get_action_worker(int context, int timeout,
                              const struct button_mapping* (*get_context_map)(int) )
@@ -117,6 +114,9 @@ static int get_action_worker(int context, int timeout,
     int i=0;
     int ret = ACTION_UNKNOWN;
     static int last_context = CONTEXT_STD;
+    
+    
+    send_event(GUI_EVENT_ACTIONUPDATE, NULL);
 
     if (timeout == TIMEOUT_NOBLOCK)
         button = button_get(false);

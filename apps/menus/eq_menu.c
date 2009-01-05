@@ -49,6 +49,7 @@
 #include "gui/scrollbar.h"
 #include "eq_menu.h"
 #include "menu_common.h"
+#include "viewport.h"
 
 /*
  * Utility functions
@@ -391,6 +392,7 @@ bool eq_menu_graphical(void)
     enum eq_type current_type;
     char buf[24];
     int i, w, h, height, start_item, nb_eq_sliders[NB_SCREENS];
+    bool barsenabled = viewportmanager_set_statusbar(false);
 
 
     FOR_NB_SCREENS(i) {
@@ -553,12 +555,6 @@ bool eq_menu_graphical(void)
             exit_request = true;
             result = false;
             break;
-        case SYS_FOURHERTZ:
-            /* eat this for the time being. this whole screen needs to be converted
-             * to viewports, so when that happens this message can be handled 
-             * properly.
-             */
-            break;
         default:
             if(default_event_handler(button) == SYS_USB_CONNECTED) {
                 exit_request = true;
@@ -580,7 +576,7 @@ bool eq_menu_graphical(void)
         screens[i].clear_display();
         screens[i].set_viewport(NULL);
     }
-
+    viewportmanager_set_statusbar(barsenabled);
     return result;
 }
 

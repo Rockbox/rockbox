@@ -211,8 +211,6 @@ long gui_wps_show(void)
                 if (button != ACTION_NONE) {
                     break;
                 }
-                else if (button == SYS_FOURHERTZ)
-                    default_event_handler(button);
                 peak_meter_peek();
                 sleep(0);   /* Sleep until end of current tick. */
 

@@ -272,6 +272,7 @@ static bool dbg_audio_thread(void)
         lcd_update();
     }
     viewportmanager_set_statusbar(true);
+    lcd_setfont(FONT_UI);
     return false;
 }
 #endif /* !SIMULATOR */
@@ -399,6 +400,7 @@ static bool dbg_buffering_thread(void)
 
     tick_remove_task(dbg_audio_task);
     viewportmanager_set_statusbar(true);
+    lcd_setfont(FONT_UI);
 
     return false;
 }
@@ -693,6 +695,7 @@ static bool dbg_hw_info(void)
     return __dbg_hw_info();
 #endif /* CONFIG_CPU */
     viewportmanager_set_statusbar(true);
+    lcd_setfont(FONT_UI);
     return false;
 }
 #else /* !HAVE_LCD_BITMAP */
@@ -988,6 +991,7 @@ static bool dbg_spdif(void)
 #endif
 
     viewportmanager_set_statusbar(true);
+    lcd_setfont(FONT_UI);
     return false;
 }
 #endif /* CPU_COLDFIRE */
@@ -1072,6 +1076,7 @@ bool dbg_ports(void)
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
         {
             viewportmanager_set_statusbar(true);
+            lcd_setfont(FONT_UI);
             return false;
         }
     }
@@ -1159,6 +1164,7 @@ bool dbg_ports(void)
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
         {
             viewportmanager_set_statusbar(true);
+            lcd_setfont(FONT_UI);
             return false;
         }
     }
@@ -1270,6 +1276,7 @@ extern unsigned char serbuf[];
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
         {
             viewportmanager_set_statusbar(true);
+            lcd_setfont(FONT_UI);
             return false;
         }
     }
@@ -1313,10 +1320,12 @@ extern unsigned char serbuf[];
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
         {
             viewportmanager_set_statusbar(true);
+            lcd_setfont(FONT_UI);
             return false;
         }
     }
     viewportmanager_set_statusbar(true);
+    lcd_setfont(FONT_UI);
 #else
     return __dbg_ports();
 #endif /* CPU */
@@ -1397,6 +1406,7 @@ bool dbg_ports(void)
         }
     }
     viewportmanager_set_statusbar(true);
+    lcd_setfont(FONT_UI);
     return false;
 }
 #endif /* !HAVE_LCD_BITMAP */
@@ -1449,11 +1459,13 @@ static bool dbg_pcf(void)
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
         {
             viewportmanager_set_statusbar(true);
+            lcd_setfont(FONT_UI);
             return false;
         }
     }
 
     viewportmanager_set_statusbar(true);
+    lcd_setfont(FONT_UI);
     return false;
 }
 #endif
@@ -1502,10 +1514,12 @@ static bool dbg_cpufreq(void)
 
             case ACTION_STD_CANCEL:
                 viewportmanager_set_statusbar(true);
+                lcd_setfont(FONT_UI);
                 return false;
         }
     }
     viewportmanager_set_statusbar(true);
+    lcd_setfont(FONT_UI);
     return false;
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
@@ -1840,10 +1854,12 @@ static bool view_battery(void)
 
             case ACTION_STD_CANCEL:
                 viewportmanager_set_statusbar(true);
+                lcd_setfont(FONT_UI);
                 return false;
         }
     }
     viewportmanager_set_statusbar(true);
+    lcd_setfont(FONT_UI);
     return false;
 }
 
@@ -2505,8 +2521,8 @@ static bool cpu_boost_log(void)
         }
     }
     get_action(CONTEXT_STD,TIMEOUT_BLOCK);
-    lcd_setfont(FONT_UI);
     viewportmanager_set_statusbar(true);
+    lcd_setfont(FONT_UI);
     return false;
 }
 #endif
@@ -2556,6 +2572,7 @@ static bool dbg_scrollwheel(void)
         lcd_update();
     }
     viewportmanager_set_statusbar(true);
+    lcd_setfont(FONT_UI);
     return false;
 }
 #endif

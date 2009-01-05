@@ -643,9 +643,6 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
 
     switch (action)
     {
-        case SYS_FOURHERTZ:
-            default_event_handler(action);
-            return true;
         case ACTION_REDRAW:
             gui_synclist_draw(lists);
             return true;
