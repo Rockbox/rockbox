@@ -1,4 +1,4 @@
-#             __________               __   ___.
+﻿#             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 #   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
@@ -7034,16 +7034,16 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: start the credits.rock plugin which shows who made Rockbox
+  desc: in the Rockbox Info screen
   user:
   <source>
-    *: "Credits"
+    *: "Version"
   </source>
   <dest>
-    *: "Credits"
+    *: "Version"
   </dest>
   <voice>
-    *: "Credits"
+    *: "Version"
   </voice>
 </phrase>
 <phrase>
@@ -12343,5 +12343,19 @@
   <voice>
     *: none
     quickscreen: "Set as Bottom Quickscreen Item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user:
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Credits"
+  </dest>
+  <voice>
+    *: "Credits"
   </voice>
 </phrase>
