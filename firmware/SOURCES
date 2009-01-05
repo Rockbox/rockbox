@@ -768,9 +768,10 @@ target/arm/imx31/gigabeat-s/system-imx31.c
 target/arm/imx31/gigabeat-s/usb-imx31.c
 target/arm/imx31/gigabeat-s/wmcodec-imx31.c
 #ifndef BOOTLOADER
-target/arm/imx31/gigabeat-s/pcm-imx31.c
 target/arm/imx31/gigabeat-s/audio-gigabeat-s.c
 target/arm/imx31/gigabeat-s/fmradio-i2c-gigabeat-s.c
+target/arm/imx31/gigabeat-s/pcm-imx31.c
+target/arm/imx31/gigabeat-s/timer-imx31.c
 #endif
 #endif /* SIMULATOR */
 #endif /* GIGABEAT_S */

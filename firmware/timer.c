@@ -35,6 +35,15 @@ static int base_prescale;
 static long SHAREDBSS_ATTR cycles_new = 0;
 #endif
 
+#ifndef __TIMER_SET
+/* Define these if not defined by target to make the #else cases compile
+ * even if the target doesn't have them implemented. */
+#define __TIMER_SET(cycles, set) false
+#define __TIMER_REGISTER(reg_prio, unregister_callback, cycles, \
+                         int_prio, timer_callback) false
+#define __TIMER_UNREGISTER(...)
+#endif
+
 /* interrupt handler */
 #if CONFIG_CPU == SH7034
 void IMIA4(void) __attribute__((interrupt_handler));
@@ -245,10 +254,6 @@ static bool timer_set(long cycles, bool start)
         cycles_new = cycles;
 
     return true;
-#elif (CONFIG_CPU == IMX31L)
-    /* TODO */
-    (void)cycles; (void)start;
-    return false;
 #else
     return __TIMER_SET(cycles, start);
 #endif /* CONFIG_CPU */
@@ -319,9 +324,6 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     CGU_PERI |= CGU_TIMER1_CLOCK_ENABLE;    /* enable peripheral */
     VIC_INT_ENABLE |= INTERRUPT_TIMER1;
     return true;
-#elif CONFIG_CPU == IMX31L
-    /* TODO */
-    return false;
 #else
     return __TIMER_REGISTER(reg_prio, unregister_callback, cycles,
                             int_prio, timer_callback);
@@ -359,7 +361,7 @@ void timer_unregister(void)
     TIMER1_CONTROL &= 0x10; /* disable timer 1 (don't modify bit 4) */
     VIC_INT_EN_CLEAR = INTERRUPT_TIMER1;  /* disable interrupt */
     CGU_PERI &= ~CGU_TIMER1_CLOCK_ENABLE;   /* disable peripheral */
-#elif CONFIG_CPU == S3C2440 || CONFIG_CPU == DM320
+#else
     __TIMER_UNREGISTER();
 #endif
     pfn_timer = NULL;
