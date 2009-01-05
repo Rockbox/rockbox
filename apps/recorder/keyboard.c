@@ -37,6 +37,7 @@
 #include "pcmbuf.h"
 #include "lang.h"
 #include "keyboard.h"
+#include "viewport.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -287,8 +288,7 @@ int kbd_input(char* text, int buflen)
     int l; /* screen loop variable */
     int text_w = 0;
     int editpos;                /* Edit position on all screens */
-    const int statusbar_size = global_settings.statusbar
-                                    ? STATUSBAR_HEIGHT : 0;
+    const int statusbar_size = 0;
     unsigned short ch;
     unsigned char *utf8;
     bool cur_blink = true;      /* Cursor on/off flag */
@@ -298,7 +298,7 @@ int kbd_input(char* text, int buflen)
     int morse_tick = 0;
     char buf[2];
 #endif
-
+    bool oldbars = viewportmanager_set_statusbar(false);
     FOR_NB_SCREENS(l)
     {
         struct keyboard_parameters *pm = &param[l];
@@ -773,6 +773,7 @@ int kbd_input(char* text, int buflen)
 #ifdef HAVE_BUTTONBAR
                 global_settings.buttonbar=buttonbar_config;
 #endif
+                viewportmanager_set_statusbar(oldbars);
                 return -1;
                 break;
 
@@ -1241,6 +1242,7 @@ int kbd_input(char* text, int buflen)
 
     FOR_NB_SCREENS(l)
         screens[l].setfont(FONT_UI);
+    viewportmanager_set_statusbar(oldbars);
 
     return 0;
 }
