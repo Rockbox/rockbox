@@ -35,6 +35,7 @@
 #include "action.h"
 #include "icon.h"
 #include "color_picker.h"
+#include "viewport.h"
 
 /* structure for color info */
 struct rgb_pick
@@ -145,6 +146,10 @@ static void draw_screen(struct screen *display, char *title,
     int       slider_left, slider_width;
     bool      display_three_rows;
     int       max_label_width;
+    struct viewport vp;
+    
+    viewport_set_defaults(&vp, display->screen_type);
+    display->set_viewport(&vp);
 
     display->clear_display();
 
@@ -158,7 +163,7 @@ static void draw_screen(struct screen *display, char *title,
        enough to display the selected slider - calculate total height
        of display with three sliders present */
     display_three_rows =
-        display->getheight() >=
+        vp.height >=
             MARGIN_TOP                 +
             display->getcharheight()*4 + /* Title + 3 sliders */
             TITLE_MARGIN_BOTTOM        +
@@ -179,13 +184,13 @@ static void draw_screen(struct screen *display, char *title,
     /* Draw title string */
     set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
     display->getstringsize(title, &x, &y);
-    display->putsxy((display->getwidth() - x) / 2, MARGIN_TOP, title);
+    display->putsxy((vp.width - x) / 2, MARGIN_TOP, title);
 
     /* Get slider positions and top starting position */
     text_top     = MARGIN_TOP + y + TITLE_MARGIN_BOTTOM + SELECTOR_TB_MARGIN;
     slider_left  = MARGIN_LEFT + SELECTOR_WIDTH + SELECTOR_LR_MARGIN +
                    max_label_width + SLIDER_MARGIN_LEFT;
-    slider_width = display->getwidth() - slider_left - SLIDER_MARGIN_RIGHT -
+    slider_width = vp.width - slider_left - SLIDER_MARGIN_RIGHT -
                    display->getcharwidth()*2 - SELECTOR_LR_MARGIN -
                    SELECTOR_WIDTH - MARGIN_RIGHT;
 
@@ -209,7 +214,7 @@ static void draw_screen(struct screen *display, char *title,
                 /* Draw solid bar selection bar */
                 display->fillrect(0,
                                   text_top - SELECTOR_TB_MARGIN,
-                                  display->getwidth(),
+                                  vp.width,
                                   display->getcharheight() +
                                   SELECTOR_TB_MARGIN*2);
 
@@ -226,7 +231,7 @@ static void draw_screen(struct screen *display, char *title,
                                       SELECTOR_HEIGHT) / 2;
                 screen_put_iconxy(display, MARGIN_LEFT, top, Icon_Cursor);
                 screen_put_iconxy(display, 
-                                  display->getwidth() - MARGIN_RIGHT -
+                                  vp.width - MARGIN_RIGHT -
                                           get_icon_width(display->screen_type),
                                           top, Icon_Cursor);
             }
@@ -280,9 +285,9 @@ static void draw_screen(struct screen *display, char *title,
         /* Display color swatch on color screens only */
         int left   = MARGIN_LEFT + SELECTOR_WIDTH + SELECTOR_LR_MARGIN;
         int top    = text_top + SWATCH_TOP_MARGIN;
-        int width  = display->getwidth() - left - SELECTOR_LR_MARGIN -
+        int width  = vp.width - left - SELECTOR_LR_MARGIN -
                      SELECTOR_WIDTH - MARGIN_RIGHT;
-        int height = display->getheight() - top - MARGIN_BOTTOM;
+        int height = vp.height - top - MARGIN_BOTTOM;
 
         /* Only draw if room */
         if (height >= display->getcharheight() + 2)
@@ -315,15 +320,16 @@ static void draw_screen(struct screen *display, char *title,
         if (i + y <= display->getheight() - MARGIN_BOTTOM)
         {
             set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
-            x = (display->getwidth() - x) / 2;
-            y = (i + display->getheight() - MARGIN_BOTTOM - y) / 2;
+            x = (vp.width - x) / 2;
+            y = (i + vp.height - MARGIN_BOTTOM - y) / 2;
             display->putsxy(x, y, buf);
         }
     }
 
     display->setfont(FONT_UI);
 
-    display->update();
+    display->update_viewport();
+    display->set_viewport(NULL);
     /* Be sure screen mode is reset */
     set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
 }

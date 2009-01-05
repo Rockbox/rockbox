@@ -394,6 +394,7 @@ bool eq_menu_graphical(void)
 
 
     FOR_NB_SCREENS(i) {
+        screens[i].set_viewport(NULL);
         screens[i].setfont(FONT_SYSFIXED);
         screens[i].clear_display();
 
@@ -552,7 +553,12 @@ bool eq_menu_graphical(void)
             exit_request = true;
             result = false;
             break;
-
+        case SYS_FOURHERTZ:
+            /* eat this for the time being. this whole screen needs to be converted
+             * to viewports, so when that happens this message can be handled 
+             * properly.
+             */
+            break;
         default:
             if(default_event_handler(button) == SYS_USB_CONNECTED) {
                 exit_request = true;
@@ -572,6 +578,7 @@ bool eq_menu_graphical(void)
     FOR_NB_SCREENS(i) {
         screens[i].setfont(FONT_UI);
         screens[i].clear_display();
+        screens[i].set_viewport(NULL);
     }
 
     return result;
