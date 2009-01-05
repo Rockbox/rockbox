@@ -142,7 +142,6 @@
 #define JPEG_LEFT               BUTTON_LEFT
 #define JPEG_RIGHT              BUTTON_RIGHT
 #define JPEG_MENU               BUTTON_POWER
-#define JPEG_SLIDE_SHOW         BUTTON_RECd
 #define JPEG_NEXT               BUTTON_SCROLL_FWD
 #define JPEG_NEXT_REPEAT        (BUTTON_SCROLL_FWD|BUTTON_REPEAT)
 #define JPEG_PREVIOUS           BUTTON_SCROLL_BACK
