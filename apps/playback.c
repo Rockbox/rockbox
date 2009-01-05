@@ -1309,7 +1309,11 @@ static void codec_thread(void)
                 LOGFQUEUE("codec < Q_CODEC_DO_CALLBACK");
                 queue_reply(&codec_queue, 1);
                 if ((void*)ev.data != NULL)
+                {
+                    invalidate_icache();
                     ((void (*)(void))ev.data)();
+                    flush_icache();
+                }
                 break;
 
 #ifdef AUDIO_HAVE_RECORDING
