@@ -1406,7 +1406,6 @@ bool dbg_ports(void)
         }
     }
     viewportmanager_set_statusbar(true);
-    lcd_setfont(FONT_UI);
     return false;
 }
 #endif /* !HAVE_LCD_BITMAP */
