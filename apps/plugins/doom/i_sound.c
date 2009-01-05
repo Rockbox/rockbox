@@ -48,7 +48,7 @@
 //  mixing buffer, and the samplerate of the raw data.
 
 // Needed for calling the actual sound output.
-#define SAMPLECOUNT     512
+#define SAMPLECOUNT     128
 
 #define NUM_CHANNELS    24
 // It is 2 for 16bit, and 2 for two channels.
@@ -98,6 +98,13 @@ channel_info_t channelinfo[NUM_CHANNELS] IBSS_ATTR;
 int *vol_lookup; // Volume lookups.
 
 int   *steptable; // Pitch to stepping lookup. (Not setup properly right now)
+
+static inline int32_t clip_sample16(int32_t sample)
+{
+    if ((int16_t)sample != sample)
+        sample = 0x7fff ^ (sample >> 31);
+    return sample;
+}
 
 //
 // This function loads the sound data from the WAD lump for single sound.
@@ -371,7 +378,7 @@ void I_UpdateSound( void )
    signed short*  leftend;
 
    // Step in mixbuffer, left and right, thus two.
-   int    step;
+   const int step = 2;
 
    // Mixing channel index.
    int    chan;
@@ -380,7 +387,6 @@ void I_UpdateSound( void )
    //  are in global mixbuffer, alternating.
    leftout = mixbuffer;
    rightout = mixbuffer +1;
-   step = 2;
 
    // Determine end, for left channel only
    //  (right channel is implicit).
@@ -431,20 +437,10 @@ void I_UpdateSound( void )
       // else if (dl < -128) *leftout = -128;
       // else *leftout = dl;
 
-      if (dl > 0x7fff)
-         *leftout = 0x7fff;
-      else if (dl < -0x8000)
-         *leftout = -0x8000;
-      else
-         *leftout = (signed short)dl;
+      *leftout = clip_sample16(dl);
 
       // Same for right hardware channel.
-      if (dr > 0x7fff)
-         *rightout = 0x7fff;
-      else if (dr < -0x8000)
-         *rightout = -0x8000;
-      else
-         *rightout = (signed short)dr;
+      *rightout = clip_sample16(dr);
 
       // Increment current pointers in mixbuffer.
       leftout += step;
