@@ -9,8 +9,8 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="354.32999"
-   height="538.58002"
+   width="1198.7092"
+   height="1028.7402"
    id="svg2"
    sodipodi:version="0.32"
    inkscape:version="0.46"
@@ -126,7 +126,7 @@
        fx="8384.2773"
        fy="379.11795"
        r="1317.4406"
-       gradientTransform="matrix(3.3277682e-2,0,0,2.4125603e-3,-16.425532,-8982.3594)"
+       gradientTransform="matrix(3.5811425e-2,0,0,2.5962512e-3,130.30107,-8881.2243)"
        gradientUnits="userSpaceOnUse" />
     <linearGradient
        inkscape:collect="always"
@@ -147,7 +147,7 @@
        x2="10675.917"
        y2="2393.1189"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(3.3277681e-2,0,0,3.3277681e-2,-17.344199,-6.2339178)" />
+       gradientTransform="matrix(3.5811425e-2,0,0,3.5811425e-2,129.38246,94.010055)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient8184"
@@ -157,7 +157,7 @@
        x2="10683.052"
        y2="5013.1768"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(3.3277681e-2,0,0,3.3277681e-2,-17.344199,-6.2339178)" />
+       gradientTransform="matrix(3.5811425e-2,0,0,3.5811425e-2,129.38246,94.010055)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient8184"
@@ -167,7 +167,7 @@
        x2="10683.052"
        y2="7621.0166"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(3.3277681e-2,0,0,3.3277681e-2,-17.344199,-6.2339178)" />
+       gradientTransform="matrix(3.5811425e-2,0,0,3.5811425e-2,129.38246,94.010055)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient8184"
@@ -177,7 +177,7 @@
        x2="10699.162"
        y2="9204.0811"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(3.3277681e-2,0,0,3.3277681e-2,-17.344199,-6.2339178)" />
+       gradientTransform="matrix(3.5811425e-2,0,0,3.5811425e-2,129.38246,94.010055)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient8184"
@@ -187,7 +187,7 @@
        x2="10694.743"
        y2="10783.504"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(3.3277681e-2,0,0,3.3277681e-2,-17.344199,-6.2339178)" />
+       gradientTransform="matrix(3.5811425e-2,0,0,3.5811425e-2,129.38246,94.010055)" />
     <radialGradient
        inkscape:collect="always"
        xlink:href="#id0"
@@ -219,11 +219,11 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.91629465"
-     inkscape:cx="172.57345"
-     inkscape:cy="271.10642"
+     inkscape:zoom="0.45814733"
+     inkscape:cx="620.3932"
+     inkscape:cy="506.24072"
      inkscape:document-units="px"
-     inkscape:current-layer="layer18"
+     inkscape:current-layer="layer1"
      showguides="true"
      inkscape:guide-bbox="true"
      width="744.09449px"
@@ -248,42 +248,43 @@
      inkscape:groupmode="layer"
      id="layer17"
      inkscape:label="Sidebits"
-     style="display:inline">
+     style="display:inline"
+     transform="translate(-2.3597173,-3.1587999)">
     <path
-       style="fill:url(#linearGradient3297);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.16638842;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 336.18561,63.03523 C 336.18561,63.03523 337.84918,63.985903 337.84918,67.135056 C 337.84918,70.284042 337.90866,81.03845 337.90866,81.03845 C 337.90866,81.03845 337.96799,83.177593 336.24493,83.771667 C 336.12612,83.712342 336.12612,63.09472 336.18561,63.03523 z"
+       style="fill:url(#linearGradient3297);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.17905714;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 509.82979,168.55331 C 509.82979,168.55331 511.62004,169.57636 511.62004,172.96529 C 511.62004,176.35402 511.68405,187.92728 511.68405,187.92728 C 511.68405,187.92728 511.74787,190.2293 509.89364,190.86858 C 509.76576,190.80475 509.76576,168.61731 509.82979,168.55331 z"
        id="path2320"
        sodipodi:nodetypes="csccc"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898" />
     <path
-       style="fill:url(#linearGradient6234);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.16638842;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 336.49771,289.427 C 336.49771,289.427 338.68247,289.34302 338.68247,296.4854 C 338.68247,303.62768 338.59843,306.23251 338.59843,306.23251 C 338.59843,306.23251 339.01851,310.51797 336.58176,310.68607 C 336.32961,310.68607 336.41366,289.5951 336.49771,289.427 z"
+       style="fill:url(#linearGradient6234);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.17905714;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 510.16567,412.1824 C 510.16567,412.1824 512.51677,412.09204 512.51677,419.77824 C 512.51677,427.46435 512.42632,430.26749 512.42632,430.26749 C 512.42632,430.26749 512.87839,434.87922 510.25609,435.06014 C 509.98474,435.06014 510.0752,412.36332 510.16567,412.1824 z"
        id="path5257"
        sodipodi:nodetypes="csccc"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898" />
     <path
-       style="opacity:1;fill:url(#linearGradient4276);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.16638842;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       d="M 336.18561,116.09439 C 336.18561,116.09439 338.08697,116.98574 337.90866,121.20421 C 337.73036,125.42287 337.01732,154.29946 337.01732,154.29946 C 337.01732,154.29946 337.19562,176.69947 337.61155,180.91812 C 338.02747,185.13675 338.14629,200.52574 338.14629,200.52574 C 338.14629,200.52574 337.60293,205.91976 336.35258,204.98184 C 336.11495,204.8037 336.12612,116.09439 336.18561,116.09439 z"
+       style="opacity:1;fill:url(#linearGradient4276);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.17905714;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
+       d="M 509.82979,225.65234 C 509.82979,225.65234 511.87591,226.61155 511.68405,231.15122 C 511.49216,235.6911 510.72484,266.76634 510.72484,266.76634 C 510.72484,266.76634 510.91669,290.87188 511.3643,295.41172 C 511.81189,299.95156 511.93977,316.51225 511.93977,316.51225 C 511.93977,316.51225 511.35503,322.31698 510.00947,321.30767 C 509.75376,321.11595 509.76576,225.65234 509.82979,225.65234 z"
        id="path3299"
        sodipodi:nodetypes="cccccsc"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898" />
     <path
-       style="opacity:1;fill:url(#linearGradient5255);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.16638842;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       d="M 336.30443,237.06708 C 336.30443,237.06708 337.90866,237.48302 338.02747,241.40455 C 338.14629,245.32591 338.14629,255.07032 338.14629,255.07032 C 338.14629,255.07032 337.7948,257.68472 336.4269,257.68472 C 336.30809,257.68472 336.24493,237.1859 336.30443,237.06708 z"
+       style="opacity:1;fill:url(#linearGradient5255);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.17905714;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
+       d="M 509.95767,355.83584 C 509.95767,355.83584 511.68405,356.28344 511.81189,360.50358 C 511.93977,364.72349 511.93977,375.20984 511.93977,375.20984 C 511.93977,375.20984 511.56149,378.02328 510.08946,378.02328 C 509.96161,378.02328 509.89364,355.9637 509.95767,355.83584 z"
        id="path4278"
        sodipodi:nodetypes="cscsc"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898" />
     <path
-       style="opacity:1;fill:url(#linearGradient7213);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.16638842;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       d="M 336.58176,341.86051 C 336.58176,341.86051 338.26224,342.36463 338.43034,346.22986 C 338.59843,350.09524 338.51439,360.0945 338.51439,360.0945 C 338.51439,360.0945 338.51439,363.37155 336.58176,363.37155 C 336.32961,363.37155 336.66565,341.94455 336.58176,341.86051 z"
+       style="opacity:1;fill:url(#linearGradient7213);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.17905714;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
+       d="M 510.25609,468.60819 C 510.25609,468.60819 512.06454,469.15069 512.24544,473.31021 C 512.42632,477.4699 512.33588,488.23049 512.33588,488.23049 C 512.33588,488.23049 512.33588,491.75705 510.25609,491.75705 C 509.98474,491.75705 510.34638,468.69864 510.25609,468.60819 z"
        id="path6236"
        sodipodi:nodetypes="cscsc"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
@@ -294,11 +295,11 @@
      inkscape:label="Player"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-0.9187591,8987.8277)"
+     transform="translate(-3.2784764,8984.6689)"
      style="opacity:1;display:inline">
     <g
        id="g2219"
-       transform="matrix(0.7225806,0,0,0.7392282,-83.766695,-9093.5095)"
+       transform="matrix(0.7775974,0,0,0.7955127,57.832601,-9000.8373)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898">
@@ -454,7 +455,7 @@
     </g>
     <path
        style="fill:url(#radialGradient5349);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 218.75986,-8978.2831 C 218.75986,-8978.2831 218.72429,-8981.1138 225.56962,-8981.0835 C 234.17516,-8981.0469 260.57275,-8981.1187 260.57275,-8981.1187 C 260.57275,-8981.1187 261.07624,-8982.16 261.99023,-8982.2318 C 263.6664,-8982.3626 264.09079,-8984.6018 266.1588,-8984.6065 C 267.9836,-8984.6114 268.16987,-8982.6625 269.73105,-8982.4153 C 271.67467,-8982.109 271.84229,-8981.3931 271.84229,-8981.3931 L 301.93703,-8981.3228 C 301.93703,-8981.3228 306.40845,-8980.8954 306.40845,-8978.8717 C 306.40845,-8978.7551 218.45619,-8978.2831 218.75986,-8978.2831 z"
+       d="M 383.39334,-8876.8376 C 383.39334,-8876.8376 383.35509,-8879.884 390.72161,-8879.8512 C 399.98236,-8879.812 428.38988,-8879.8892 428.38988,-8879.8892 C 428.38988,-8879.8892 428.93168,-8881.0098 429.91527,-8881.0871 C 431.71905,-8881.2279 432.17577,-8883.6375 434.40122,-8883.6426 C 436.36499,-8883.6478 436.56541,-8881.5506 438.24545,-8881.2846 C 440.33706,-8880.9549 440.51745,-8880.1844 440.51745,-8880.1844 L 472.90359,-8880.1088 C 472.90359,-8880.1088 477.71547,-8879.6488 477.71547,-8877.4711 C 477.71547,-8877.3455 383.06657,-8876.8376 383.39334,-8876.8376 z"
        id="path4370"
        sodipodi:nodetypes="cscsssccsc"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
@@ -465,10 +466,11 @@
      inkscape:groupmode="layer"
      id="layer19"
      inkscape:label="Gigabeat logo"
-     style="display:inline">
+     style="display:inline"
+     transform="translate(-2.3597173,-3.1587999)">
     <path
        style="fill:#646464;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 233.64691,518.3452 L 233.64227,505.6089 L 246.38129,505.6089 L 246.38129,507.37676 C 246.38129,507.37676 241.9617,507.53274 241.9617,512.16045 C 241.9617,516.78817 246.43344,516.73619 246.43344,516.73619 L 246.43344,518.34808 L 233.64691,518.3452 z"
+       d="M 399.48386,658.53034 L 399.47885,644.82428 L 413.18781,644.82428 L 413.18781,646.72676 C 413.18781,646.72676 408.43173,646.89459 408.43173,651.87466 C 408.43173,656.85475 413.24394,656.7988 413.24394,656.7988 L 413.24394,658.53343 L 399.48386,658.53034 z"
        id="path4569"
        sodipodi:nodetypes="ccccsccc"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
@@ -486,7 +488,7 @@
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"
-       transform="matrix(3.3277682e-2,0,0,3.3277682e-2,-17.344197,-6.2339159)" />
+       transform="matrix(3.5811425e-2,0,0,3.5811425e-2,129.38241,94.01005)" />
     <path
        sodipodi:type="arc"
        style="opacity:1;fill:#646464;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:21.96199989;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -499,12 +501,12 @@
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"
-       transform="matrix(3.3277682e-2,0,0,3.3277682e-2,-17.344197,-6.2339159)" />
+       transform="matrix(3.5811425e-2,0,0,3.5811425e-2,129.38241,94.01005)" />
     <flowRoot
        xml:space="preserve"
        id="flowRoot4575"
        style="font-size:40px;font-style:normal;font-weight:normal;fill:#646464;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
-       transform="matrix(4.0766186e-2,0,0,3.3277682e-2,-79.868659,-7.3654469)"
+       transform="matrix(4.3870101e-2,0,0,3.5811425e-2,62.097381,92.792354)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"><flowRegion
@@ -521,15 +523,15 @@
      inkscape:groupmode="layer"
      id="layer15"
      inkscape:label="Rockbox blue"
-     transform="translate(-0.9187591,8987.8277)"
+     transform="translate(-3.2784764,8984.6689)"
      style="opacity:1;display:inline">
     <rect
        style="fill:#000000;fill-opacity:1"
        id="rect5787"
-       width="197.40909"
-       height="262.50562"
-       x="81.185471"
-       y="-8925.8887"
+       width="212.4397"
+       height="282.49261"
+       x="235.34415"
+       y="-8820.4531"
        ry="0"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
@@ -539,12 +541,12 @@
      inkscape:groupmode="layer"
      id="layer13"
      inkscape:label="Rockbox logo"
-     transform="translate(-0.9187591,8987.8277)"
+     transform="translate(-3.2784764,8984.6689)"
      style="display:inline">
     <g
        style="fill-rule:evenodd"
        id="g2432"
-       transform="matrix(3.2062445e-2,0,0,3.6034453e-2,-447.48254,-9035.4163)"
+       transform="matrix(3.4503659e-2,0,0,3.8778098e-2,-333.57635,-8938.321)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898">
@@ -1022,17 +1024,18 @@
      inkscape:groupmode="layer"
      id="layer18"
      inkscape:label="Button descriptions"
-     style="display:inline">
+     style="display:inline"
+     transform="translate(-2.3597173,-3.1587999)">
     <flowRoot
        xml:space="preserve"
        id="flowRoot2551"
        style="font-size:40px;font-style:normal;font-weight:normal;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:Bitstream Vera Sans"
-       transform="matrix(0.7225806,0,0,0.7392282,-4829.3552,769.78318)"
-       inkscape:transform-center-x="-30.151736"
+       transform="matrix(0.7775974,0,0,0.7955127,-5049.0123,929.11267)"
+       inkscape:transform-center-x="-32.446919"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"
-       inkscape:transform-center-y="9.4229899e-05"><flowRegion
+       inkscape:transform-center-y="3.9855801e-05"><flowRegion
          id="flowRegion2553"><rect
            id="rect2555"
            width="2921.2874"
@@ -1043,7 +1046,7 @@
        xml:space="preserve"
        id="flowRoot2559"
        style="font-size:40px;font-style:normal;font-weight:normal;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:Bitstream Vera Sans"
-       transform="matrix(0.7225806,0,0,0.7392282,-8353.5317,-1389.1049)"
+       transform="matrix(0.7775974,0,0,0.7955127,-8841.5178,-1394.152)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"><flowRegion
@@ -1057,7 +1060,7 @@
        xml:space="preserve"
        id="flowRoot2567"
        style="font-size:40px;font-style:normal;font-weight:normal;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:Bitstream Vera Sans"
-       transform="matrix(0.7225806,0,0,0.7392282,-8351.1135,-1339.1595)"
+       transform="matrix(0.7775974,0,0,0.7955127,-8838.9156,-1340.4037)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"><flowRegion
@@ -1071,7 +1074,7 @@
        xml:space="preserve"
        id="flowRoot2575"
        style="font-size:40px;font-style:normal;font-weight:normal;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:Bitstream Vera Sans"
-       transform="matrix(0.7225806,0,0,0.7392282,-8351.0557,-1270.9783)"
+       transform="matrix(0.7775974,0,0,0.7955127,-8838.8535,-1267.0313)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"><flowRegion
@@ -1085,7 +1088,7 @@
        xml:space="preserve"
        id="flowRoot2583"
        style="font-size:40px;font-style:normal;font-weight:normal;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:Bitstream Vera Sans"
-       transform="matrix(0.7225806,0,0,0.7392282,-8353.5317,-1215.1677)"
+       transform="matrix(0.7775974,0,0,0.7955127,-8841.5178,-1206.9713)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"><flowRegion
@@ -1099,7 +1102,7 @@
        xml:space="preserve"
        id="flowRoot2591"
        style="font-size:40px;font-style:normal;font-weight:normal;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:Bitstream Vera Sans"
-       transform="matrix(0.7225806,0,0,0.7392282,-8353.5317,-1162.2232)"
+       transform="matrix(0.7775974,0,0,0.7955127,-8841.5178,-1149.9956)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"><flowRegion
@@ -1113,7 +1116,7 @@
        xml:space="preserve"
        id="flowRoot2599"
        style="font-size:40px;font-style:normal;font-weight:normal;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:Bitstream Vera Sans"
-       transform="matrix(0.7225806,0,0,0.7392282,-8353.5317,-1110.38)"
+       transform="matrix(0.7775974,0,0,0.7955127,-8841.5178,-1094.2051)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"><flowRegion
@@ -1127,7 +1130,7 @@
        xml:space="preserve"
        id="flowRoot2613"
        style="font-size:40px;font-style:normal;font-weight:normal;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:Bitstream Vera Sans"
-       transform="matrix(0.7225806,0,0,0.7392282,-8839.7197,-1200.3855)"
+       transform="matrix(0.7775974,0,0,0.7955127,-9364.7246,-1191.0636)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"><flowRegion
@@ -1141,7 +1144,7 @@
        xml:space="preserve"
        id="flowRoot2621"
        style="font-size:40px;font-style:normal;font-weight:normal;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:Bitstream Vera Sans"
-       transform="matrix(0.7225806,0,0,0.7392282,-8843.117,-1258.1116)"
+       transform="matrix(0.7775974,0,0,0.7955127,-9368.3792,-1253.185)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"><flowRegion
@@ -1155,7 +1158,7 @@
        xml:space="preserve"
        id="flowRoot2631"
        style="font-size:40px;font-style:normal;font-weight:normal;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:Bitstream Vera Sans"
-       transform="matrix(0.7225806,0,0,0.7392282,-8831.8898,-1036.4978)"
+       transform="matrix(0.7775974,0,0,0.7955127,-9356.2975,-1014.6976)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"><flowRegion
@@ -1169,7 +1172,7 @@
        xml:space="preserve"
        id="flowRoot2639"
        style="font-size:40px;font-style:normal;font-weight:normal;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:Bitstream Vera Sans"
-       transform="matrix(0.7225806,0,0,0.7392282,-8823.3878,-1142.2219)"
+       transform="matrix(0.7775974,0,0,0.7955127,-9347.1477,-1128.4714)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"><flowRegion
@@ -1183,7 +1186,7 @@
        xml:space="preserve"
        id="flowRoot2647"
        style="font-size:40px;font-style:normal;font-weight:normal;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:Bitstream Vera Sans"
-       transform="matrix(0.7225806,0,0,0.7392282,-8353.5317,-1016.9201)"
+       transform="matrix(0.7775974,0,0,0.7955127,-8841.5178,-993.62918)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"><flowRegion
@@ -1197,7 +1200,7 @@
        xml:space="preserve"
        id="flowRoot2655"
        style="font-size:40px;font-style:normal;font-weight:normal;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:Bitstream Vera Sans"
-       transform="matrix(0.7225806,0,0,0.7392282,-8848.8291,-1091.0247)"
+       transform="matrix(0.7775974,0,0,0.7955127,-9374.5271,-1073.3761)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"><flowRegion
@@ -1211,7 +1214,7 @@
        xml:space="preserve"
        id="flowRoot2663"
        style="font-size:40px;font-style:normal;font-weight:normal;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:Bitstream Vera Sans"
-       transform="matrix(0.7225806,0,0,0.7392282,-8353.5317,-956.32821)"
+       transform="matrix(0.7775974,0,0,0.7955127,-8841.5178,-928.42387)"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898"><flowRegion
@@ -1222,51 +1225,51 @@
            x="12056.171"
            y="1953.9673" /></flowRegion><flowPara
          id="flowPara2669">Down</flowPara></flowRoot>    <path
-       style="opacity:1;fill:none;fill-rule:evenodd;stroke:#aaaaaa;stroke-width:1.89682794;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
-       d="M -44.993104,205.94321 L 232.01826,331.8335"
+       style="opacity:1;fill:none;fill-rule:evenodd;stroke:#aaaaaa;stroke-width:2.04125118;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
+       d="M 99.628355,322.34223 L 397.7312,457.81772"
        id="path4527"
        sodipodi:nodetypes="cc"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#aaaaaa;stroke-width:1.89682794;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M -44.993104,264.0964 L 113.25201,331.15936"
+       style="fill:none;fill-rule:evenodd;stroke:#aaaaaa;stroke-width:2.04125118;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 99.628355,384.92319 L 269.92216,457.09227"
        id="path4533"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#aaaaaa;stroke-width:1.89682794;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M -44.993104,322.92367 L 176.78552,389.98654"
+       style="fill:none;fill-rule:evenodd;stroke:#aaaaaa;stroke-width:2.04125118;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 99.628355,448.22952 L 338.29308,520.3985"
        id="path4535"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#aaaaaa;stroke-width:1.89682794;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M -44.993104,372.33848 L 178.55019,442.93102"
+       style="fill:none;fill-rule:evenodd;stroke:#aaaaaa;stroke-width:2.04125118;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 99.628355,501.40672 L 340.19209,577.37417"
        id="path4537"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#aaaaaa;stroke-width:1.89682794;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M -44.993104,429.98915 L 120.31136,444.10768"
+       style="fill:none;fill-rule:evenodd;stroke:#aaaaaa;stroke-width:2.04125118;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 99.628355,563.44689 L 277.51901,578.6404"
        id="path4539"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#aaaaaa;stroke-width:1.89682794;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 234.43603,442.34284 L 345.6195,447.6372"
+       style="fill:none;fill-rule:evenodd;stroke:#aaaaaa;stroke-width:2.04125118;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 400.33306,576.74119 L 519.98197,582.43866"
        id="path4541"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
        inkscape:export-ydpi="1.9466898" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#aaaaaa;stroke-width:1.89682794;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 175.60885,506.46437 L 344.44299,508.81754"
+       style="fill:none;fill-rule:evenodd;stroke:#aaaaaa;stroke-width:2.04125118;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 337.0268,645.74489 L 518.71587,648.27723"
        id="path4543"
        inkscape:export-filename="/var/files/gigabeat/path5354.png"
        inkscape:export-xdpi="1.9466898"
@@ -1279,5 +1282,5 @@
      sodipodi:nodetypes="cscc"
      inkscape:export-xdpi="1.9466898"
      inkscape:export-ydpi="1.9466898"
-     transform="matrix(3.3277682e-2,0,0,3.3277682e-2,-17.344197,-6.2339159)" />
+     transform="matrix(3.5811425e-2,0,0,3.5811425e-2,127.02269,90.85125)" />
 </svg>
