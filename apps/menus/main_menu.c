@@ -440,7 +440,7 @@ MENUITEM_FUNCTION(sleep_timer_call, 0, ID2P(LANG_SLEEP_TIMER), sleep_timer,
                     NULL, NULL, Icon_Menu_setting); /* make it look like a 
                                                                 setting to the user */
 
-MENUITEM_FUNCTION(show_credits_item, 0, ID2P(LANG_VERSION),
+MENUITEM_FUNCTION(show_credits_item, 0, ID2P(LANG_CREDITS),
                    (menu_function)show_credits, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(show_runtime_item, 0, ID2P(LANG_RUNNING_TIME),
                    (menu_function)view_runtime, NULL, NULL, Icon_NOICON);

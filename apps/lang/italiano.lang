@@ -6963,16 +6963,16 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: start the credits.rock plugin which shows who made Rockbox
+  desc: in the Rockbox Info screen
   user:
   <source>
-    *: "Credits"
+    *: "Version"
   </source>
   <dest>
-    *: "Crediti"
+    *: "Versione"
   </dest>
   <voice>
-    *: "Crediti"
+    *: "Versione"
   </voice>
 </phrase>
 <phrase>
@@ -12272,5 +12272,19 @@
   <voice>
     *: none
     quickscreen: "Imposta Come Inferiore Nel Menu Rapido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user:
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Crediti"
+  </dest>
+  <voice>
+    *: "Crediti"
   </voice>
 </phrase>
