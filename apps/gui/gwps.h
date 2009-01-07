@@ -469,7 +469,6 @@ struct wps_state
     bool wps_time_countup;
     struct mp3entry* id3;
     struct mp3entry* nid3;
-    char current_track_path[MAX_PATH];
 };
 
 
@@ -491,7 +490,6 @@ struct gui_wps
     struct screen *display;
     struct wps_data *data;
     struct wps_state *state;
-    struct gui_statusbar *statusbar;
 };
 
 /* gui_wps end */
@@ -503,7 +501,6 @@ extern struct wps_state wps_state;
 extern struct gui_wps gui_wps[NB_SCREENS];
 
 void gui_sync_wps_init(void);
-void gui_sync_wps_screen_init(void);
 
 #ifdef HAVE_ALBUMART
 /* gives back if WPS contains an albumart tag */

@@ -64,23 +64,13 @@
 #include "appevents.h"
 #include "viewport.h"
 
-/* currently only on wps_state is needed */
+/* currently only one wps_state is needed */
 struct wps_state wps_state;
 struct gui_wps gui_wps[NB_SCREENS];
 static struct wps_data wps_datas[NB_SCREENS];
 
-/* change the path to the current played track */
-static void wps_state_update_ctp(const char *path);
 /* initial setup of wps_data  */
 static void wps_state_init(void);
-/* initial setup of a wps */
-static void gui_wps_init(struct gui_wps *gui_wps);
-/* connects a wps with a format-description of the displayed content */
-static void gui_wps_set_data(struct gui_wps *gui_wps, struct wps_data *data);
-/* connects a wps with a screen */
-static void gui_wps_set_disp(struct gui_wps *gui_wps, struct screen *display);
-/* connects a wps with a statusbar*/
-static void gui_wps_set_statusbar(struct gui_wps *gui_wps, struct gui_statusbar *statusbar);
 
 static void prev_track(unsigned skip_thresh)
 {
@@ -167,7 +157,6 @@ long gui_wps_show(void)
                 return 0;
             FOR_NB_SCREENS(i)
                 gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_ALL);
-            wps_state_update_ctp(wps_state.id3->path);
         }
 
         restore = true;
@@ -738,71 +727,10 @@ static void wps_state_init(void)
     wps_state.paused = false;
     wps_state.id3 = NULL;
     wps_state.nid3 = NULL;
-    wps_state.current_track_path[0] = '\0';
 }
 
-#if 0
-/* these are obviously not used? */
-
-void wps_state_update_ff_rew(bool ff_rew)
-{
-    wps_state.ff_rewind = ff_rew;
-}
-
-void wps_state_update_paused(bool paused)
-{
-    wps_state.paused = paused;
-}
-void wps_state_update_id3_nid3(struct mp3entry *id3, struct mp3entry *nid3)
-{
-    wps_state.id3 = id3;
-    wps_state.nid3 = nid3;
-}
-#endif
-
-static void wps_state_update_ctp(const char *path)
-{
-    strncpy(wps_state.current_track_path, path,
-           sizeof(wps_state.current_track_path));
-    wps_state.current_track_path[sizeof(wps_state.current_track_path)-1] = '\0';
-}
 /* wps_state end*/
 
-/* initial setup of a wps */
-static void gui_wps_init(struct gui_wps *gui_wps)
-{
-    gui_wps->data = NULL;
-    gui_wps->display = NULL;
-    gui_wps->statusbar = NULL;
-    /* Currently no seperate wps_state needed/possible
-       so use the only aviable ( "global" ) one */
-    gui_wps->state = &wps_state;
-}
-
-/* connects a wps with a format-description of the displayed content */
-static void gui_wps_set_data(struct gui_wps *gui_wps, struct wps_data *data)
-{
-    gui_wps->data = data;
-}
-
-/* connects a wps with a screen */
-static void gui_wps_set_disp(struct gui_wps *gui_wps, struct screen *display)
-{
-    gui_wps->display = display;
-}
-
-static void gui_wps_set_statusbar(struct gui_wps *gui_wps, struct gui_statusbar *statusbar)
-{
-    gui_wps->statusbar = statusbar;
-}
-/* gui_wps end */
-
-void gui_sync_wps_screen_init(void)
-{
-    int i;
-    FOR_NB_SCREENS(i)
-        gui_wps_set_disp(&gui_wps[i], &screens[i]);
-}
 #ifdef HAVE_LCD_BITMAP
 static void statusbar_toggle_handler(void *data)
 {
@@ -841,9 +769,11 @@ void gui_sync_wps_init(void)
 #ifdef HAVE_REMOTE_LCD
         wps_datas[i].remote_wps = (i != 0);
 #endif
-        gui_wps_init(&gui_wps[i]);
-        gui_wps_set_data(&gui_wps[i], &wps_datas[i]);
-        gui_wps_set_statusbar(&gui_wps[i], &statusbars.statusbars[i]);
+        gui_wps[i].data = &wps_datas[i];
+        gui_wps[i].display = &screens[i];
+        /* Currently no seperate wps_state needed/possible
+           so use the only aviable ( "global" ) one */
+        gui_wps[i].state = &wps_state;
     }
 #ifdef HAVE_LCD_BITMAP
     add_event(GUI_EVENT_STATUSBAR_TOGGLE, false, statusbar_toggle_handler);

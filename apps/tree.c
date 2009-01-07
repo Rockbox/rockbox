@@ -285,8 +285,6 @@ bool check_rockboxdir(void)
 /* do this really late in the init sequence */
 void tree_gui_init(void)
 {
-    gui_sync_wps_screen_init();
-
     check_rockboxdir();
 
     strcpy(tc.currdir, "/");

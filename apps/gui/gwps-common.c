@@ -451,13 +451,6 @@ bool update(struct gui_wps *gwps)
         else{
             gui_wps_refresh(gwps, 0, WPS_REFRESH_ALL);
         }
-
-        if (gwps->state->id3)
-        {
-            strncpy(gwps->state->current_track_path, gwps->state->id3->path,
-                   sizeof(gwps->state->current_track_path));
-            gwps->state->current_track_path[sizeof(gwps->state->current_track_path)-1] = '\0';
-        }
     }
 
     if (gwps->state->id3)
