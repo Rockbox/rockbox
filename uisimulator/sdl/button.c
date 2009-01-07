@@ -1031,23 +1031,23 @@ void button_event(int key, bool pressed)
         break;
     case SDLK_KP8:
     case SDLK_UP:
-        new_btn = BUTTON_PLAYPAUSE;
+        new_btn = BUTTON_UP;
         break;
     case SDLK_KP2:
     case SDLK_DOWN:
-        new_btn = BUTTON_REPEATAB;
+        new_btn = BUTTON_DOWN;
         break;
     case SDLK_PLUS:
-        new_btn = BUTTON_MENU;
+        new_btn = BUTTON_POWER;
         break;
     case SDLK_KP5:
         new_btn = BUTTON_SELECT;
         break;
     case SDLK_KP7:
-        new_btn = BUTTON_VOLDOWN;
+        new_btn = BUTTON_VOL_DOWN;
         break;
     case SDLK_KP9:
-        new_btn = BUTTON_VOLUP;
+        new_btn = BUTTON_VOL_UP;
         break;
 
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD

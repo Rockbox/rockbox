@@ -476,6 +476,22 @@
 #define UI_LCD_WIDTH                LCD_WIDTH 
 #define UI_LCD_HEIGHT               LCD_HEIGHT
 
+#elif defined(SANSA_M200V4)
+#define UI_TITLE                    "sansa m200v4"
+#define UI_WIDTH                    350 /* width of GUI window */
+#define UI_HEIGHT                   168 /* height of GUI window */
+#define UI_LCD_BGCOLOR              94, 104, 84 /* bkgnd color of LCD (no backlight) */
+#define UI_LCD_BGCOLORLIGHT         60, 160, 230 /* bkgnd color of LCD (backlight) */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
+#define UI_LCD_POSX                 42 /* x position of lcd */
+#define UI_LCD_POSY                 55 /* y position of lcd */
+#define UI_LCD_WIDTH                LCD_WIDTH /* * 1.5 */
+#define UI_LCD_HEIGHT               LCD_HEIGHT  /* * 1.5 */
+
+
+#else
+#error no UI defines
 #endif
 extern SDL_Surface *gui_surface;
 extern bool background;  /* True if the background image is enabled */
