@@ -1305,7 +1305,7 @@ void delete_save_file( void )
 int save_write( int fd, const void *buf, size_t count, int *checksum )
 {
     size_t i;
-    if( rb->PREFIX(write)( fd, buf, count ) < (ssize_t)count )
+    if( rb->write( fd, buf, count ) < (ssize_t)count )
         return 1;
     for( i = 0; i < count; i++ )
         *checksum += (int)(((const char *)buf)[i]);
@@ -1318,7 +1318,7 @@ int save_write( int fd, const void *buf, size_t count, int *checksum )
 int save_read( int fd, void *buf, size_t count, int *checksum )
 {
     size_t i;
-    if( rb->PREFIX(read)( fd, buf, count ) < (ssize_t)count )
+    if( rb->read( fd, buf, count ) < (ssize_t)count )
         return 1;
     for( i = 0; i < count; i++ )
         *checksum -= (int)(((const char *)buf)[i]);
@@ -1341,7 +1341,7 @@ int save_game( void )
         || save_write( fd, &cards_per_draw, sizeof( int ), &checksum )
         || save_write( fd, cols, COL_NUM * sizeof( int ), &checksum )
         || save_write( fd, stacks, SUITS * sizeof( int ), &checksum )
-        || ( rb->PREFIX(write)( fd, &checksum, sizeof( int ) ) < (ssize_t)(sizeof( int ) ) ) )
+        || ( rb->write( fd, &checksum, sizeof( int ) ) < (ssize_t)(sizeof( int ) ) ) )
     {
         rb->close( fd );
         rb->splash( 2*HZ, "Error while saving game. Aborting." );
@@ -1357,9 +1357,9 @@ int load_game( void )
     int checksum;
     if( fd < 0 )
         return -1;
-    if(    ( rb->PREFIX(lseek)( fd, -sizeof( int ), SEEK_END ) == -((ssize_t)sizeof( int ))-1 )
-        || ( rb->PREFIX(read)( fd, &checksum, sizeof( int ) ) < ((ssize_t)sizeof( int )) )
-        || ( rb->PREFIX(lseek)( fd, 0, SEEK_SET ) == -1 )
+    if(    ( rb->lseek( fd, -sizeof( int ), SEEK_END ) == -((ssize_t)sizeof( int ))-1 )
+        || ( rb->read( fd, &checksum, sizeof( int ) ) < ((ssize_t)sizeof( int )) )
+        || ( rb->lseek( fd, 0, SEEK_SET ) == -1 )
         || save_read( fd, &cur_card, sizeof( int ), &checksum )
         || save_read( fd, &cur_col, sizeof( int ), &checksum )
         || save_read( fd, &sel_card, sizeof( int ), &checksum )

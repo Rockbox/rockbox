@@ -141,7 +141,7 @@ int get_eol_string(char* fn)
         return 0;
     else if  (!fn[0])
         return 0;
-    fd = rb->PREFIX(open(fn,O_RDONLY));
+    fd = rb->open(fn,O_RDONLY);
     if (fd<0)
         return 0;
     eol[0] = '\0';

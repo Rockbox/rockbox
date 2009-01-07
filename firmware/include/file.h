@@ -48,7 +48,7 @@
 #define O_TRUNC  0x10
 #endif
 
-#ifdef SIMULATOR
+#if defined(SIMULATOR) && !defined(PLUGIN) && !defined(CODEC)
 #define open(x,y) sim_open(x,y)
 #define creat(x) sim_creat(x)
 #define remove(x) sim_remove(x)

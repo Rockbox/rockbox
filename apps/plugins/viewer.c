@@ -1310,7 +1310,7 @@ static void viewer_save_settings(void)/* same name as global, but not the same f
             b.top_ptr_pos = 0; /* this is only kept for legassy reasons */
             rb->memset(&b.filename[0],0,MAX_PATH);
             rb->strcpy(b.filename,file_name);
-            rb->PREFIX(lseek)(settings_fd,sizeof(signed int),SEEK_SET);
+            rb->lseek(settings_fd,sizeof(signed int),SEEK_SET);
             rb->write (settings_fd, &b, sizeof(struct bookmarked_file_info));
             rb->close(settings_fd);
         }

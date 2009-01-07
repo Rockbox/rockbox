@@ -34,7 +34,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "config.h"
-#include "kernel.h"
 #include "system.h"
 #include "metadata.h"
 #include "audio.h"
@@ -68,12 +67,6 @@
 #define LOGF(...)
 #endif
 
-#endif
-
-#ifdef SIMULATOR
-#define PREFIX(_x_) sim_ ## _x_
-#else
-#define PREFIX(_x_) _x_
 #endif
 
 /* magic for normal codecs */
@@ -160,7 +153,7 @@ struct codec_api {
     void (*configure)(int setting, intptr_t value);
 
     /* kernel/ system */
-    void (*PREFIX(sleep))(int ticks);
+    void (*sleep)(int ticks);
     void (*yield)(void);
 
 #if NUM_CORES > 1
@@ -227,10 +220,10 @@ struct codec_api {
     size_t          (*enc_unget_pcm_data)(size_t size);
 
     /* file */
-    int (*PREFIX(open))(const char* pathname, int flags);
+    int (*open)(const char* pathname, int flags);
     int (*close)(int fd);
     ssize_t (*read)(int fd, void* buf, size_t count);
-    off_t (*PREFIX(lseek))(int fd, off_t offset, int whence);
+    off_t (*lseek)(int fd, off_t offset, int whence);
     ssize_t (*write)(int fd, const void* buf, size_t count);
     int (*round_value_to_list32)(unsigned long value,
                                  const unsigned long list[],

@@ -60,25 +60,11 @@ void dynamic_recompile (struct dynarec_block *newblock);
 #define isalpha(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && ((c) <= 'Z')))
 #define isalnum(c) (isdigit(c) || (isalpha(c)))
 
-#ifdef SIMULATOR
-#undef open
-#define open(a,b)       rb->sim_open((a),(b))
-#undef lseek
-#define lseek(a,b,c)    rb->sim_lseek((a),(b),(c))
-#undef close
-#define close(a)        rb->sim_close((a))
-#undef read
-#define read(a,b,c)     rb->sim_read((a),(b),(c))
-#undef write
-#define write(a,b,c)    rb->sim_write((a),(b),(c))
-#else /* !SIMULATOR */
 #define open(a,b)       rb->open((a),(b))
 #define lseek(a,b,c)    rb->lseek((a),(b),(c))
 #define close(a)        rb->close((a))
 #define read(a,b,c)     rb->read((a),(b),(c))
 #define write(a,b,c)    rb->write((a),(b),(c))
-#endif /* !SIMULATOR */
-
 #define strcat(a,b)     rb->strcat((a),(b))
 #define memset(a,b,c)   rb->memset((a),(b),(c))
 #define strcpy(a,b)     rb->strcpy((a),(b))

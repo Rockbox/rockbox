@@ -56,6 +56,12 @@
 #include "logf.h"
 
 #ifdef SIMULATOR
+#define PREFIX(_x_) sim_ ## _x_
+#else
+#define PREFIX
+#endif
+
+#ifdef SIMULATOR
 #if CONFIG_CODEC == SWCODEC
 unsigned char codecbuf[CODEC_SIZE];
 #endif

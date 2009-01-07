@@ -213,7 +213,7 @@ static inline void call_tick_tasks(void)
 }
 #endif
 
-#ifdef SIMULATOR
+#if defined(SIMULATOR) && !defined(PLUGIN) && !defined(CODEC)
 #define sleep(x) sim_sleep(x)
 #endif
 

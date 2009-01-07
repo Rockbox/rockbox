@@ -52,6 +52,12 @@
 #endif
 
 #ifdef SIMULATOR
+#define PREFIX(_x_) sim_ ## _x_
+#else
+#define PREFIX
+#endif
+
+#ifdef SIMULATOR
 static unsigned char pluginbuf[PLUGIN_BUFFER_SIZE];
 void *sim_plugin_load(char *plugin, void **pd);
 void sim_plugin_close(void *pd);

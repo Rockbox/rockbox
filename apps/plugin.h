@@ -123,12 +123,6 @@ void* plugin_get_buffer(size_t *buffer_size);
 
 #endif
 
-#ifdef SIMULATOR
-#define PREFIX(_x_) sim_ ## _x_
-#else
-#define PREFIX(_x_) _x_
-#endif
-
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
@@ -369,16 +363,16 @@ struct plugin_api {
 #endif /* HAVE_BUTTON_LIGHT */
 
     /* file */
-    int (*PREFIX(open))(const char* pathname, int flags);
-    int (*PREFIX(close))(int fd);
-    ssize_t (*PREFIX(read))(int fd, void* buf, size_t count);
-    off_t (*PREFIX(lseek))(int fd, off_t offset, int whence);
-    int (*PREFIX(creat))(const char *pathname);
-    ssize_t (*PREFIX(write))(int fd, const void* buf, size_t count);
-    int (*PREFIX(remove))(const char* pathname);
-    int (*PREFIX(rename))(const char* path, const char* newname);
-    int (*PREFIX(ftruncate))(int fd, off_t length);
-    off_t (*PREFIX(filesize))(int fd);
+    int (*open)(const char* pathname, int flags);
+    int (*close)(int fd);
+    ssize_t (*read)(int fd, void* buf, size_t count);
+    off_t (*lseek)(int fd, off_t offset, int whence);
+    int (*creat)(const char *pathname);
+    ssize_t (*write)(int fd, const void* buf, size_t count);
+    int (*remove)(const char* pathname);
+    int (*rename)(const char* path, const char* newname);
+    int (*ftruncate)(int fd, off_t length);
+    off_t (*filesize)(int fd);
     int (*fdprintf)(int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
     int (*read_line)(int fd, char* buffer, int buffer_size);
     bool (*settings_parseline)(char* line, char** name, char** value);
@@ -405,7 +399,7 @@ struct plugin_api {
     bool (*dir_exists)(const char *path);
 
     /* kernel/ system */
-    void (*PREFIX(sleep))(int ticks);
+    void (*sleep)(int ticks);
     void (*yield)(void);
     volatile long* current_tick;
     long (*default_event_handler)(long event);
@@ -577,7 +571,7 @@ struct plugin_api {
     int (*playlist_amount)(void);
     int (*playlist_resume)(void);
     int (*playlist_start)(int start_index, int offset);
-    void (*PREFIX(audio_play))(long offset);
+    void (*audio_play)(long offset);
     void (*audio_stop)(void);
     void (*audio_pause)(void);
     void (*audio_resume)(void);

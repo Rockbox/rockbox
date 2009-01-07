@@ -21,7 +21,6 @@
 
 #include "config.h"
 #include "codecs.h"
-#include "system.h"
 #include <sys/types.h>
 
 extern struct codec_api *ci;

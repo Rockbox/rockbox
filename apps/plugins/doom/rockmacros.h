@@ -41,28 +41,12 @@ char *my_strtok( char * s, const char * delim );
 #define vsnprintf(...)     rb->vsnprintf(__VA_ARGS__)
 #define read_line(a,b,c)   rb->read_line((a),(b),(c))
 
-#ifdef SIMULATOR
-#undef open
-#undef close
-#undef lseek
-#undef filesize
-#undef read
-#undef write
-#define open(a,b)          rb->sim_open((a),(b))
-#define close(a)           rb->sim_close((a))
-#define lseek(a,b,c)       rb->sim_lseek((a),(b),(c))
-#define filesize(a)        rb->sim_filesize((a))
-#define read(a,b,c)        rb->sim_read((a),(b),(c))
-#define write(a,b,c)       rb->sim_write((a),(b),(c))
-#else /* !SIMULATOR */
 #define open(a,b)          my_open((a),(b))
 #define close(a)           my_close((a))
 #define lseek(a,b,c)       rb->lseek((a),(b),(c))
 #define filesize(a)        rb->filesize((a))
 #define read(a,b,c)        rb->read((a),(b),(c))
 #define write(a,b,c)       rb->write((a),(b),(c))
-#endif /* !SIMULATOR */
-
 #define strtok(a,b)        my_strtok((a),(b))
 #define strcat(a,b)        rb->strcat((a),(b))
 #define memset(a,b,c)      rb->memset((a),(b),(c))
