@@ -10,5 +10,6 @@
         <file>lang/rbutil_gr.qm</file>
         <file>lang/rbutil_he.qm</file>
         <file>lang/rbutil_ja.qm</file>
+        <file>lang/rbutil_pt.qm</file>
         </qresource>
 </RCC>

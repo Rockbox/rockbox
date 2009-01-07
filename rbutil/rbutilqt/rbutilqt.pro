@@ -187,11 +187,13 @@ TRANSLATIONS += lang/rbutil_de.ts \
  lang/rbutil_fr.ts \
  lang/rbutil_gr.ts \
  lang/rbutil_he.ts \
+ lang/rbutil_ja.ts \
  lang/rbutil_nl.ts \
+ lang/rbutil_pt.ts \
  lang/rbutil_tr.ts \
  lang/rbutil_zh_CN.ts \
  lang/rbutil_zh_TW.ts \
- lang/rbutil_ja.ts
+
 
 QT += network
 DEFINES += RBUTIL _LARGEFILE64_SOURCE
