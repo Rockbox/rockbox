@@ -233,7 +233,6 @@ static bool dbg_audio_thread(void)
     struct audio_debug d;
 
     lcd_setfont(FONT_SYSFIXED);
-    viewportmanager_set_statusbar(false);
 
     while(1)
     {
@@ -271,7 +270,6 @@ static bool dbg_audio_thread(void)
 
         lcd_update();
     }
-    viewportmanager_set_statusbar(true);
     lcd_setfont(FONT_UI);
     return false;
 }
@@ -308,7 +306,6 @@ static bool dbg_buffering_thread(void)
     tick_add_task(dbg_audio_task);
 
     lcd_setfont(FONT_SYSFIXED);
-    viewportmanager_set_statusbar(false);
     while(!done)
     {
         button = get_action(CONTEXT_STD,HZ/5);
@@ -399,7 +396,6 @@ static bool dbg_buffering_thread(void)
     }
 
     tick_remove_task(dbg_audio_task);
-    viewportmanager_set_statusbar(true);
     lcd_setfont(FONT_UI);
 
     return false;
@@ -533,7 +529,6 @@ static bool dbg_hw_info(void)
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
-    viewportmanager_set_statusbar(false);
 
     lcd_puts(0, 0, "[Hardware info]");
 
@@ -572,7 +567,6 @@ static bool dbg_hw_info(void)
     int got_id; /* flag if we managed to get the flash IDs */
     int oldmode;  /* saved memory guard mode */
     int line = 0;
-    viewportmanager_set_statusbar(false);
 
     oldmode = system_memory_guard(MEMGUARD_NONE);  /* disable memory guard */
 
@@ -635,7 +629,6 @@ static bool dbg_hw_info(void)
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
-    viewportmanager_set_statusbar(false);
 
     lcd_puts(0, line++, "[Hardware info]");
 
@@ -694,7 +687,6 @@ static bool dbg_hw_info(void)
     /* Define this function in your target tree */
     return __dbg_hw_info();
 #endif /* CONFIG_CPU */
-    viewportmanager_set_statusbar(true);
     lcd_setfont(FONT_UI);
     return false;
 }
@@ -837,7 +829,6 @@ static bool dbg_spdif(void)
 
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
-    viewportmanager_set_statusbar(false);
 
 #ifdef HAVE_SPDIF_POWER
     spdif_power_enable(true); /* We need SPDIF power for both sending & receiving */
@@ -990,7 +981,6 @@ static bool dbg_spdif(void)
     spdif_power_enable(global_settings.spdif_enable);
 #endif
 
-    viewportmanager_set_statusbar(true);
     lcd_setfont(FONT_UI);
     return false;
 }
@@ -1049,7 +1039,6 @@ bool dbg_ports(void)
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
-    viewportmanager_set_statusbar(false);
 
     while(1)
     {
@@ -1075,7 +1064,6 @@ bool dbg_ports(void)
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
         {
-            viewportmanager_set_statusbar(true);
             lcd_setfont(FONT_UI);
             return false;
         }
@@ -1096,7 +1084,6 @@ bool dbg_ports(void)
 
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
-    viewportmanager_set_statusbar(false);
 
     while(1)
     {
@@ -1163,7 +1150,6 @@ bool dbg_ports(void)
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
         {
-            viewportmanager_set_statusbar(true);
             lcd_setfont(FONT_UI);
             return false;
         }
@@ -1176,7 +1162,6 @@ bool dbg_ports(void)
 
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
-    viewportmanager_set_statusbar(false);
 
     while(1)
     {
@@ -1275,7 +1260,6 @@ extern unsigned char serbuf[];
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
         {
-            viewportmanager_set_statusbar(true);
             lcd_setfont(FONT_UI);
             return false;
         }
@@ -1287,7 +1271,6 @@ extern unsigned char serbuf[];
 
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
-    viewportmanager_set_statusbar(false);
 
     while(1)
     {
@@ -1319,12 +1302,10 @@ extern unsigned char serbuf[];
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
         {
-            viewportmanager_set_statusbar(true);
             lcd_setfont(FONT_UI);
             return false;
         }
     }
-    viewportmanager_set_statusbar(true);
     lcd_setfont(FONT_UI);
 #else
     return __dbg_ports();
@@ -1340,7 +1321,6 @@ bool dbg_ports(void)
     int currval = 0;
 
     lcd_clear_display();
-    viewportmanager_set_statusbar(false);
 
     while(1)
     {
@@ -1405,7 +1385,6 @@ bool dbg_ports(void)
             break;
         }
     }
-    viewportmanager_set_statusbar(true);
     return false;
 }
 #endif /* !HAVE_LCD_BITMAP */
@@ -1421,7 +1400,6 @@ static bool dbg_pcf(void)
     lcd_setfont(FONT_SYSFIXED);
 #endif
     lcd_clear_display();
-    viewportmanager_set_statusbar(false);
 
     while(1)
     {
@@ -1457,13 +1435,11 @@ static bool dbg_pcf(void)
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
         {
-            viewportmanager_set_statusbar(true);
             lcd_setfont(FONT_UI);
             return false;
         }
     }
 
-    viewportmanager_set_statusbar(true);
     lcd_setfont(FONT_UI);
     return false;
 }
@@ -1480,7 +1456,6 @@ static bool dbg_cpufreq(void)
     lcd_setfont(FONT_SYSFIXED);
 #endif
     lcd_clear_display();
-    viewportmanager_set_statusbar(false);
 
     while(1)
     {
@@ -1512,12 +1487,10 @@ static bool dbg_cpufreq(void)
                 break;
 
             case ACTION_STD_CANCEL:
-                viewportmanager_set_statusbar(true);
                 lcd_setfont(FONT_UI);
                 return false;
         }
     }
-    viewportmanager_set_statusbar(true);
     lcd_setfont(FONT_UI);
     return false;
 }
@@ -1611,7 +1584,6 @@ static bool view_battery(void)
     char buf[32];
 
     lcd_setfont(FONT_SYSFIXED);
-    viewportmanager_set_statusbar(false);
 
     while(1)
     {
@@ -1852,12 +1824,10 @@ static bool view_battery(void)
                 break;
 
             case ACTION_STD_CANCEL:
-                viewportmanager_set_statusbar(true);
                 lcd_setfont(FONT_UI);
                 return false;
         }
     }
-    viewportmanager_set_statusbar(true);
     lcd_setfont(FONT_UI);
     return false;
 }
@@ -2487,7 +2457,6 @@ static bool cpu_boost_log(void)
     bool done;
     lcd_setfont(FONT_SYSFIXED);
     str = cpu_boost_log_getlog_first();
-    viewportmanager_set_statusbar(false);
     while (i < count)
     {
         lcd_clear_display();
@@ -2520,7 +2489,6 @@ static bool cpu_boost_log(void)
         }
     }
     get_action(CONTEXT_STD,TIMEOUT_BLOCK);
-    viewportmanager_set_statusbar(true);
     lcd_setfont(FONT_UI);
     return false;
 }
@@ -2540,7 +2508,6 @@ static bool dbg_scrollwheel(void)
     unsigned int speed;
 
     lcd_setfont(FONT_SYSFIXED);
-    viewportmanager_set_statusbar(false);
 
     while (1)
     {
@@ -2570,7 +2537,6 @@ static bool dbg_scrollwheel(void)
 
         lcd_update();
     }
-    viewportmanager_set_statusbar(true);
     lcd_setfont(FONT_UI);
     return false;
 }
@@ -2746,8 +2712,10 @@ static int menu_action_callback(int btn, struct gui_synclist *lists)
 {
     if (btn == ACTION_STD_OK)
     {
+        bool oldbars = viewportmanager_set_statusbar(false);
         menuitems[gui_synclist_get_sel_pos(lists)].function();
         btn = ACTION_REDRAW;
+        viewportmanager_set_statusbar(oldbars);
     }
     return btn;
 }
@@ -2764,6 +2732,5 @@ bool debug_menu(void)
     simplelist_info_init(&info, "Debug Menu", ARRAYLEN(menuitems), NULL);
     info.action_callback = menu_action_callback;
     info.get_name = dbg_menu_getname;
-
     return simplelist_show_list(&info);
 }

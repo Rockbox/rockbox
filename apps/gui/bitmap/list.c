@@ -280,6 +280,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     }
     display->set_viewport(parent);
     display->update_viewport();
+    display->set_viewport(NULL);
 }
 
 
