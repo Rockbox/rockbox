@@ -32,7 +32,7 @@
 #include <tchar.h>
 #include <winioctl.h>
 #endif
-#if defined(Q_OS_LINUX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
 #include <sys/statvfs.h>
 #endif
 
@@ -109,21 +109,12 @@ QString resolvePathCase(QString path)
 qulonglong filesystemFree(QString path)
 {
     qlonglong size = 0;
-#if defined(Q_OS_LINUX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX) 
     // the usage of statfs() is deprecated by the LSB so use statvfs().
     struct statvfs fs;
     int ret;
 
     ret = statvfs(qPrintable(path), &fs);
-
-    if(ret == 0)
-        size = fs.f_bsize * fs.f_bavail;
-#endif
-#if defined(Q_OS_MACX)
-    struct statfs fs;
-    int ret;
-
-    ret = statfs(qPrintable(path), &fs);
 
     if(ret == 0)
         size = fs.f_bsize * fs.f_bavail;
