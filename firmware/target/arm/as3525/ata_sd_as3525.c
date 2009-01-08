@@ -72,6 +72,9 @@
 #define MCI_SELECT(i)      (*(volatile unsigned long *) (pl180_base[i]+0x44))
 #define MCI_FIFO_CNT(i)    (*(volatile unsigned long *) (pl180_base[i]+0x48))
 
+#define MCI_ERROR \
+    (MCI_DATA_CRC_FAIL | MCI_DATA_TIMEOUT | MCI_RX_OVERRUN | MCI_TX_UNDERRUN)
+
 #define MCI_FIFO(i)        ((unsigned long *) (pl180_base[i]+0x80))
 /* volumes */
 #define     INTERNAL_AS3525 0   /* embedded SD card */
@@ -106,6 +109,9 @@ static struct event_queue sd_queue;
 static bool sd_enabled = false;
 #endif
 
+static struct wakeup transfer_completion_signal;
+bool retry;
+
 static inline void mci_delay(void) { int i = 0xffff; while(i--) ; }
 
 static void mci_set_clock_divider(const int drive, int divider)
@@ -134,25 +140,6 @@ static void mci_set_clock_divider(const int drive, int divider)
     mci_delay();
 }
 
-static void sd_panic(IF_MV2(const int drive,) const int status)
-{
-    char error[32];
-    error[0] = '\0';
-
-#ifdef HAVE_MULTIVOLUME
-    snprintf(error, sizeof(error),
-            (drive == INTERNAL_AS3525) ? "Internal storage : " : "SD Slot : " );
-#endif
-
-    panicf("SD : %s%s%s%s%s%s%s", error,
-        (status & MCI_DATA_CRC_FAIL) ? "DATA CRC FAIL, " : "",
-        (status & MCI_DATA_TIMEOUT) ? "DATA TIMEOUT, " : "",
-        (status & MCI_RX_OVERRUN) ? "RX OVERRUN, " : "",
-        (status & MCI_TX_UNDERRUN) ? "TX UNDERRUN, " : "",
-        (status & MCI_RX_FIFO_FULL) ? "RXR FIFO FULL, " : "",
-        (status & MCI_TX_FIFO_EMPTY) ? "TX FIFO EMPTY" : "");
-}
-
 #ifdef HAVE_HOTSWAP
 #if defined(SANSA_E200V2) || defined(SANSA_FUZE)
 static bool sd1_oneshot_callback(struct timeout *tmo)
@@ -170,6 +157,7 @@ static bool sd1_oneshot_callback(struct timeout *tmo)
 
     return false;
 }
+
 void INT_GPIOA(void)
 {
     static struct timeout sd1_oneshot;
@@ -182,13 +170,25 @@ void INT_GPIOA(void)
 
 void INT_NAND(void)
 {
-    sd_panic(IF_MV2(INTERNAL_AS3525,) MCI_STATUS(INTERNAL_AS3525));
+    const int status = MCI_STATUS(INTERNAL_AS3525);
+
+    if(status & MCI_ERROR)
+        retry = true;
+
+    wakeup_signal(&transfer_completion_signal);
+    MCI_CLEAR(INTERNAL_AS3525) = status;
 }
 
 #ifdef HAVE_MULTIVOLUME
 void INT_MCI0(void)
 {
-    sd_panic(SD_SLOT_AS3525, MCI_STATUS(SD_SLOT_AS3525));
+    const int status = MCI_STATUS(SD_SLOT_AS3525);
+
+    if(status & MCI_ERROR)
+        retry = true;
+
+    wakeup_signal(&transfer_completion_signal);
+    MCI_CLEAR(SD_SLOT_AS3525) = status;
 }
 #endif
 
@@ -424,13 +424,13 @@ static void sd_thread(void)
         }
     }
 }
+
 static void init_pl180_controller(const int drive)
 {
     MCI_COMMAND(drive) = MCI_DATA_CTRL(drive) = 0;
     MCI_CLEAR(drive) = 0x7ff;
 
-    MCI_MASK0(drive) = MCI_MASK1(drive) =
-        MCI_DATA_CRC_FAIL | MCI_DATA_TIMEOUT | MCI_RX_OVERRUN | MCI_TX_UNDERRUN;
+    MCI_MASK0(drive) = MCI_MASK1(drive) = MCI_ERROR | MCI_DATA_END;
 
 #ifdef HAVE_MULTIVOLUME
     VIC_INT_ENABLE |=
@@ -480,6 +480,8 @@ int sd_init(void)
 #ifdef HAVE_MULTIVOLUME
     CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
 #endif
+
+    wakeup_init(&transfer_completion_signal);
 
     init_pl180_controller(INTERNAL_AS3525);
     ret = sd_init_card(INTERNAL_AS3525);
@@ -655,11 +657,15 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
                                 (1<<3) /* DMA */                        |
                                 (9<<4) /* 2^9 = 512 */ ;
 
-        dma_wait_transfer(0);
+        retry = false;
+        wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
+        if(!retry)
+        {
+            buf += transfer * SECTOR_SIZE;
+            start += transfer;
+            count -= transfer;
+        }
 
-        buf += transfer * SECTOR_SIZE;
-        start += transfer;
-        count -= transfer;
         last_disk_activity = current_tick;
 
         if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_NO_FLAGS, NULL))

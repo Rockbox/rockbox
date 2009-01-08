@@ -24,16 +24,9 @@
 #include "pl081.h"
 #include "dma-target.h"
 #include "panic.h"
-#include "kernel.h"
 
 static int dma_used = 0;
-static struct wakeup transfer_completion_signal[2]; /* 2 channels */
 static void (*dma_callback[2])(void); /* 2 channels */
-
-inline void dma_wait_transfer(int channel)
-{
-    wakeup_wait(&transfer_completion_signal[channel], TIMEOUT_BLOCK);
-}
 
 void dma_retain(void)
 {
@@ -57,9 +50,6 @@ void dma_init(void)
 {
     DMAC_SYNC = 0;
     VIC_INT_ENABLE |= INTERRUPT_DMAC;
-
-    wakeup_init(&transfer_completion_signal[0]);
-    wakeup_init(&transfer_completion_signal[1]);
 }
 
 inline void dma_disable_channel(int channel)
@@ -130,7 +120,5 @@ void INT_DMAC(void)
 
             if(dma_callback[channel])
                 dma_callback[channel]();
-
-            wakeup_signal(&transfer_completion_signal[channel]);
         }
 }
