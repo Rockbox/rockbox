@@ -81,6 +81,7 @@ void BootloaderInstallBase::downloadBlFinish(bool error)
     else
         emit logItem(tr("Download finished."), LOGOK);
 
+    QCoreApplication::processEvents();
     m_blversion = m_http.timestamp();
     emit downloadDone();
 }
@@ -133,6 +134,8 @@ int BootloaderInstallBase::logInstall(LogMode mode)
         s.remove("Bootloader/" + section);
     }
     s.sync();
+
+    emit logItem(tr("Installation log created"), LOGOK);
 
     return result;
 }

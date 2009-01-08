@@ -118,6 +118,7 @@ bool BootloaderInstallHex::install(void)
 void BootloaderInstallHex::installStage2(void)
 {
     emit logItem(tr("Adding bootloader to firmware file"), LOGINFO);
+    QCoreApplication::processEvents();
 
     // local temp file
     QTemporaryFile tempbin;

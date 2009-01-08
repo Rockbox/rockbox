@@ -42,6 +42,7 @@ bool BootloaderInstallFile::install(void)
 void BootloaderInstallFile::installStage2(void)
 {
     emit logItem(tr("Installing Rockbox bootloader"), LOGINFO);
+    QCoreApplication::processEvents();
 
     // if an old bootloader is present (Gigabeat) move it out of the way.
     QString fwfile(resolvePathCase(m_blfile));

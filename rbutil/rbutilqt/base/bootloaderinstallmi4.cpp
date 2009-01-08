@@ -41,6 +41,7 @@ bool BootloaderInstallMi4::install(void)
 void BootloaderInstallMi4::installStage2(void)
 {
     emit logItem(tr("Installing Rockbox bootloader"), LOGINFO);
+    QCoreApplication::processEvents();
 
     // move old bootloader out of the way
     QString fwfile(resolvePathCase(m_blfile));

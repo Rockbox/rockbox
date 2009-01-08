@@ -82,6 +82,8 @@ void BootloaderInstallIpod::installStage2(void)
 {
     struct ipod_t ipod;
 
+    emit logItem(tr("Installing Rockbox bootloader"), LOGINFO);
+    QCoreApplication::processEvents();
     if(!ipodInitialize(&ipod)) {
         emit done(true);
         return;
@@ -137,6 +139,8 @@ void BootloaderInstallIpod::installStage2(void)
 bool BootloaderInstallIpod::uninstall(void)
 {
     struct ipod_t ipod;
+    emit logItem(tr("Uninstalling bootloader"), LOGINFO);
+    QCoreApplication::processEvents();
 
     if(!ipodInitialize(&ipod)) {
         emit done(true);

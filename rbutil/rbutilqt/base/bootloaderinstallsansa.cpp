@@ -82,6 +82,9 @@ void BootloaderInstallSansa::installStage2(void)
     struct sansa_t sansa;
     sansa_scan(&sansa);
 
+    emit logItem(tr("Installing Rockbox bootloader"), LOGINFO);
+    QCoreApplication::processEvents();
+
     if(sansa_open(&sansa, 0) < 0) {
         emit logItem(tr("could not open Sansa"), LOGERROR);
         emit done(true);
@@ -145,6 +148,9 @@ void BootloaderInstallSansa::installStage2(void)
 bool BootloaderInstallSansa::uninstall(void)
 {
     struct sansa_t sansa;
+
+    emit logItem(tr("Uninstalling bootloader"), LOGINFO);
+    QCoreApplication::processEvents();
 
     if(sansa_scan(&sansa) != 1) {
         emit logItem(tr("Can't find Sansa"), LOGERROR);
