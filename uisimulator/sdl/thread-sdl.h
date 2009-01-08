@@ -27,6 +27,7 @@
 extern SDL_Thread *gui_thread;   /* The "main" thread */
 void thread_sdl_thread_lock(void *me);
 void * thread_sdl_thread_unlock(void);
+void thread_sdl_exception_wait(void);
 bool thread_sdl_init(void *param); /* Init the sim threading API - thread created calls app_main */
 void thread_sdl_shutdown(void); /* Shut down all kernel threads gracefully */
 void thread_sdl_lock(void); /* Sync with SDL threads */

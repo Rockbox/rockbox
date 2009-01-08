@@ -64,14 +64,17 @@ extern long start_tick;
 void thread_sdl_shutdown(void)
 {
     int i;
-    /* Take control */
-    SDL_LockMutex(m);
 
     /* Tell all threads jump back to their start routines, unlock and exit
        gracefully - we'll check each one in turn for it's status. Threads
        _could_ terminate via remove_thread or multiple threads could exit
        on each unlock but that is safe. */
+
+    /* Do this before trying to acquire lock */
     threads_exit = true;
+
+    /* Take control */
+    SDL_LockMutex(m);
 
     for (i = 0; i < MAXTHREADS; i++)
     {
@@ -198,6 +201,16 @@ bool thread_sdl_init(void *param)
 
     SDL_UnlockMutex(m);
     return true;
+}
+
+void thread_sdl_exception_wait(void)
+{
+    while (1)
+    {
+        SDL_Delay(HZ/10);
+        if (threads_exit)
+            thread_exit();
+    }
 }
 
 /* A way to yield and leave the threading system for extended periods */

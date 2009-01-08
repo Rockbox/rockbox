@@ -342,12 +342,12 @@ void touchpad_set_sensitivity(int level)
 
 void system_exception_wait(void)
 {
-    while(1);
+    thread_sdl_exception_wait();
 }
 
 void system_reboot(void)
 {
-    while(1);
+    thread_sdl_exception_wait();
 }
 
 /* assure an unused place to direct virtual pointers to */
