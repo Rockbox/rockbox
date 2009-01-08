@@ -186,6 +186,11 @@ void system_reboot(void)
     );
 }
 
+void system_exception_wait(void)
+{
+    while (1);
+}
+
 void system_init(void)
 {
     /* taken from linux/arch/arm/mach-itdm320-20/irq.c */

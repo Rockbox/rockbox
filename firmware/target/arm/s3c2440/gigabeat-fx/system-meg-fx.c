@@ -114,7 +114,7 @@ void system_reboot(void)
 void system_exception_wait(void)
 {
     INTMSK = 0xFFFFFFFF;
-    while (GPGDAT & (1 << 0)) == 0); /* Wait for power button */
+    while ((GPGDAT & (1 << 0)) == 0); /* Wait for power button */
 }
 
 static void set_page_tables(void)
