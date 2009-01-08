@@ -48,8 +48,9 @@ start:
 
        The following two values are filled in by mktccboot.
      */
-    .word  0              /* Saved entrypoint of original firmware*/
-    .word  0              /* Location in RAM of the start of our bootloader */
+of_entrypoint:	.word  0   /* Saved entrypoint of original firmware*/
+bl_entrypoint:	.word  0   /* Location in RAM of the start of our bootloader */
+	
 #else
 //    ldr    pc, =start_loc    /* jump to the main entry point  */
     b       start_loc
@@ -95,7 +96,7 @@ start_loc:
     #error No bootup key detection implemented for this target
 #endif
 
-    ldrne  pc, [pc, #-28]     /* Jump to OF if HOLD button not pressed */
+    ldrne  pc, of_entrypoint   /* Jump to OF if HOLD button not pressed */
 #endif /* TCCBOOT */
 
 /* We are now definitely executing the bootloader, so we relocate to the
@@ -103,7 +104,7 @@ start_loc:
 */
 
 #ifdef TCCBOOT
-    ldr    r0, [pc, #-28]     /* mktccboot fills in the load address */
+    ldr    r0, bl_entrypoint
 #else
     mov    r0, #0x20000000    /* Otherwise, load address is the start of DRAM */
 #endif
