@@ -58,6 +58,11 @@ void system_reboot(void)
 {
 }
 
+void system_exception_wait(void)
+{
+    while (1);
+}
+
 /* TODO - these should live in the target-specific directories and
    once we understand what all the GPIO pins do, move the init to the
    specific driver for that hardware.   For now, we just perform the 

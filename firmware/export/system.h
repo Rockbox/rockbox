@@ -27,6 +27,9 @@
 #include "kernel.h"
 
 extern void system_reboot (void);
+/* Called from any UIE handler and panicf - wait for a key and return
+ * to reboot system. */
+extern void system_exception_wait(void);
 extern void system_init(void);
 
 extern long cpu_frequency;

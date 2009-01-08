@@ -283,10 +283,6 @@ extern void UIE4(void); /* needed for calculating the UIE number */
 void UIE (unsigned int pc) __attribute__((section(".text")));
 void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 {
-#if CONFIG_LED == LED_REAL
-    bool state = false;
-    int i = 0;
-#endif
     unsigned int n;
     char str[32];
 
@@ -305,35 +301,13 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
     lcd_puts(0,1,str);
     lcd_update ();
 
-    while (1)
-    {
-#if CONFIG_LED == LED_REAL
-        if (--i <= 0)
-        {
-            state = !state;
-            led(state);
-            i = 240000;
-        }
-#endif
+     /* try to restart firmware if ON is pressed */
+    system_exception_wait();
 
-        /* try to restart firmware if ON is pressed */
-#if CONFIG_KEYPAD == PLAYER_PAD
-        if (!(PADRL & 0x20))
-#elif CONFIG_KEYPAD == RECORDER_PAD
-#ifdef HAVE_FMADC
-        if (!(PCDR & 0x0008))
-#else
-        if (!(PBDRH & 0x01))
-#endif
-#elif CONFIG_KEYPAD == ONDIO_PAD
-        if (!(PCDR & 0x0008))
-#endif
-        {
-            /* enable the watchguard timer, but don't service it */
-            RSTCSR_W = 0x5a40; /* Reset enabled, power-on reset */
-            TCSR_W = 0xa560; /* Watchdog timer mode, timer enabled, sysclk/2 */
-        }
-    }
+    /* enable the watchguard timer, but don't service it */
+    RSTCSR_W = 0x5a40; /* Reset enabled, power-on reset */
+    TCSR_W = 0xa560; /* Watchdog timer mode, timer enabled, sysclk/2 */
+    while (1);
 }
 
 void system_init(void)
@@ -376,6 +350,42 @@ void system_reboot (void)
 
     asm volatile ("jmp @%0; mov.l @%1,r15" : :
                   "r"(*(int*)0),"r"(4));
+}
+
+void system_exception_wait(void)
+{
+#if (CONFIG_LED == LED_REAL)
+    bool state = false;
+    int i = 0;
+#endif
+
+    while (1)
+    {
+#if (CONFIG_LED == LED_REAL)
+        if (--i <= 0)
+        {
+            state = !state;
+            led(state);
+            i = 240000;
+        }
+#endif
+
+#if CONFIG_KEYPAD == PLAYER_PAD
+        /* Player */
+        if (!(PADRL & 0x20))
+#elif CONFIG_KEYPAD == RECORDER_PAD
+        /* Recorder */
+#ifdef HAVE_FMADC
+        if (!(PCDR & 0x0008))
+#else
+        if (!(PBDRH & 0x01))
+#endif
+#elif CONFIG_KEYPAD == ONDIO_PAD
+        /* Ondio */
+        if (!(PCDR & 0x0008))
+#endif /* CONFIG_KEYPAD */
+            return;
+    }
 }
 
 /* Utilise the user break controller to catch invalid memory accesses. */

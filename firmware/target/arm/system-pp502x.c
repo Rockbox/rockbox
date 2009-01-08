@@ -455,6 +455,17 @@ void system_reboot(void)
     while (1);
 }
 
+void system_exception_wait(void)
+{
+    /* FIXME: we just need the right buttons */
+    CPU_INT_DIS = -1;
+    COP_INT_DIS = -1;
+
+    /* Halt */
+    PROC_CTL(CURRENT_CORE) = 0x40000000;
+    while (1);
+}
+
 int system_memory_guard(int newmode)
 {
     (void)newmode;

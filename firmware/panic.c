@@ -32,6 +32,7 @@
 #include "system.h"
 
 static char panic_buf[128];
+#define LINECHARS (LCD_WIDTH/SYSFONT_WIDTH)
 
 /*
  * "Dude. This is pretty fucked-up, right here." 
@@ -41,17 +42,12 @@ void panicf( const char *fmt, ...)
     va_list ap;
 
 #ifndef SIMULATOR
-#if (CONFIG_LED == LED_REAL)
-    bool state = false;
-    int i = 0;
-#endif
-
     /* Disable interrupts */
 #ifdef CPU_ARM
-    disable_fiq();
-#endif
-
+    disable_interrupt(IRQ_FIQ_STATUS);
+#else
     set_irq_level(DISABLE_INTERRUPTS);
+#endif
 #endif /* SIMULATOR */
 
     va_start( ap, fmt );
@@ -69,12 +65,11 @@ void panicf( const char *fmt, ...)
     {
         /* wrap panic line */
         int i, y=1, len = strlen(panic_buf);
-#define STEP (LCD_WIDTH/SYSFONT_WIDTH)
-        for (i=0; i<len; i+=STEP) {
-            unsigned char c = panic_buf[i+STEP];
-            panic_buf[i+STEP] = 0;
+        for (i=0; i<len; i+=LINECHARS) {
+            unsigned char c = panic_buf[i+LINECHARS];
+            panic_buf[i+LINECHARS] = 0;
             lcd_puts(0, y++, (unsigned char *)panic_buf+i);
-            panic_buf[i+STEP] = c;
+            panic_buf[i+LINECHARS] = c;
         }
     }
 #else
@@ -89,52 +84,7 @@ void panicf( const char *fmt, ...)
     ide_power_enable(false);
 #endif
 
-    while (1)
-    {
-#ifndef SIMULATOR
-#if (CONFIG_LED == LED_REAL)
-        if (--i <= 0)
-        {
-            state = !state;
-            led(state);
-            i = 240000;
-        }
-#endif
-
-        /* try to restart firmware if ON is pressed */
-#if defined (CPU_PP)
-        /* For now, just sleep the core */
-        sleep_core(CURRENT_CORE);
-        #define system_reboot() nop
-#elif defined (TOSHIBA_GIGABEAT_F)
-        if ((GPGDAT & (1 << 0)) != 0)
-#elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-        if ((GPIO1_READ & 0x22) == 0) /* check for ON button and !hold */
-#elif defined(IAUDIO_X5) || defined(IAUDIO_M5)
-        if ((GPIO_READ & 0x0c000000) == 0x08000000) /* check for ON button and !hold */
-#elif defined(IAUDIO_M3)
-        if ((GPIO1_READ & 0x202) == 0x200) /* check for ON button and !hold */
-#elif defined(COWON_D2)
-        if (GPIOA & 0x10) /* check for power button */
-#elif CONFIG_CPU == SH7034
-#if CONFIG_KEYPAD == PLAYER_PAD
-        if (!(PADRL & 0x20))
-#elif CONFIG_KEYPAD == RECORDER_PAD
-#ifdef HAVE_FMADC
-        if (!(PCDR & 0x0008))
-#else
-        if (!(PBDRH & 0x01))
-#endif
-#elif CONFIG_KEYPAD == ONDIO_PAD
-        if (!(PCDR & 0x0008))
-#endif /* CONFIG_KEYPAD */
-#elif defined(CREATIVE_ZVx)
-        if(false)
-#elif defined(ONDA_VX747)
-        /* check for power button without including any .h file */
-        if( (~(*(volatile unsigned int *)(0xB0010300))) & (1 << 29) )
-#endif /* CPU */
-            system_reboot();
-#endif /* !SIMULATOR */
-    }
+    system_exception_wait(); /* if this returns, try to reboot */
+    system_reboot();
+    while (1);       /* halt */
 }

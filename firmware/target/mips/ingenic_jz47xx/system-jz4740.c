@@ -887,6 +887,16 @@ void system_reboot(void)
     while (1);
 }
 
+void system_exception_wait(void)
+{
+    /* check for power button without including any .h file */
+    while (1)
+    {
+        if( (~(*(volatile unsigned int *)(0xB0010300))) & (1 << 29) )
+            break;
+    }
+}
+
 void power_off(void)
 {
     /* Put system into hibernate mode */

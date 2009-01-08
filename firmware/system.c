@@ -18,16 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdio.h>
 #include "config.h"
-#include <stdbool.h>
-#include "lcd.h"
-#include "font.h"
 #include "system.h"
+#include <stdio.h>
 #include "kernel.h"
 #include "thread.h"
-#include "timer.h"
-#include "inttypes.h"
 #include "string.h"
 
 #ifndef SIMULATOR
@@ -225,55 +220,4 @@ bool detect_original_firmware(void)
 {
     return !(detect_flashed_ramimage() || detect_flashed_romimage());
 }
-
-#if defined(CPU_ARM)
-
-static const char* const uiename[] = {
-    "Undefined instruction",
-    "Prefetch abort",
-    "Data abort",
-    "Divide by zero"
-};
-
-/* Unexpected Interrupt or Exception handler. Currently only deals with
-   exceptions, but will deal with interrupts later.
- */
-void UIE(unsigned int pc, unsigned int num) __attribute__((noreturn));
-void UIE(unsigned int pc, unsigned int num)
-{
-    char str[32];
-
-    lcd_clear_display();
-#ifdef HAVE_LCD_BITMAP
-    lcd_setfont(FONT_SYSFIXED);
-#endif
-    lcd_puts(0, 0, uiename[num]);
-    snprintf(str, sizeof(str), "at %08x" IF_COP(" (%d)"), pc
-             IF_COP(, CURRENT_CORE));
-    lcd_puts(0, 1, str);
-    lcd_update();
-
-    while (1)
-    {
-        /* TODO: perhaps add button handling in here when we get a polling
-           driver some day.
-         */
-        core_idle();
-    }
-}
-
-#ifndef STUB
-/* Needs to be here or gcc won't find it */
-void __div0(void) __attribute__((naked));
-void __div0(void)
-{
-    asm volatile (
-        "ldr    r0, [sp] \r\n"
-        "mov    r1, #3   \r\n"
-        "b      UIE      \r\n"
-    );
-}
-#endif
-
-#endif /* CPU_ARM */
 

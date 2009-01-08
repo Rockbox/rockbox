@@ -305,6 +305,11 @@ void system_reboot(void)
     while (1);
 }
 
+void system_exception_wait(void)
+{
+    while (1);
+}
+
 int system_memory_guard(int newmode)
 {
     (void)newmode;

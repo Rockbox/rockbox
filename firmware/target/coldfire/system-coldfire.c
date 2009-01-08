@@ -177,16 +177,11 @@ static void system_display_exception_info(unsigned long format,
     lcd_puts(0, 1, str);
     lcd_update();
 
-    /* set cpu frequency to 11mhz (to prevent overheating) */
-    DCR   = (DCR & ~0x01ff) | 1;
-    PLLCR = EXCP_PLLCR;
+    system_exception_wait();
 
-    while (1)
-    {
-        if ((EXCP_BUTTON_GPIO_READ & EXCP_BUTTON_MASK) == EXCP_BUTTON_VALUE)
-            SYPCR = 0xc0;
-           /* Start watchdog timer with 512 cycles timeout. Don't service it. */
-    }
+    /* Start watchdog timer with 512 cycles timeout. Don't service it. */
+    SYPCR = 0xc0;
+    while (1);
 
     /* We need a reset method that works in all cases. Calling system_reboot()
        doesn't work when we're called from the debug interrupt, because then
@@ -292,6 +287,14 @@ void system_reboot (void)
     asm(" move.l 0,%sp");
     asm(" move.l 4,%a0");
     asm(" jmp (%a0)");
+}
+
+void system_exception_wait(void)
+{
+    /* set cpu frequency to 11mhz (to prevent overheating) */
+    DCR = (DCR & ~0x01ff) | 1;
+    PLLCR = EXCP_PLLCR;
+    while ((EXCP_BUTTON_GPIO_READ & EXCP_BUTTON_MASK) != EXCP_BUTTON_VALUE);
 }
 
 /* Utilise the breakpoint hardware to catch invalid memory accesses. */

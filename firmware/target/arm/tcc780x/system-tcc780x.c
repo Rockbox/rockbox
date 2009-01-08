@@ -287,6 +287,11 @@ void system_reboot(void)
     while (1);
 }
 
+void system_exception_wait(void)
+{
+    while ((GPIOA & 0x10) == 0); /* check for power button */
+}
+
 int system_memory_guard(int newmode)
 {
     (void)newmode;

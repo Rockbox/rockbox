@@ -340,6 +340,16 @@ void touchpad_set_sensitivity(int level)
 }
 #endif
 
+void system_exception_wait(void)
+{
+    while(1);
+}
+
+void system_reboot(void)
+{
+    while(1);
+}
+
 /* assure an unused place to direct virtual pointers to */
 #define VIRT_SIZE 0xFFFF /* more than enough for our string ID range */
 unsigned char vp_dummy[VIRT_SIZE];

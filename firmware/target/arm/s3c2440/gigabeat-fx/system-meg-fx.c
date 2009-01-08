@@ -111,6 +111,12 @@ void system_reboot(void)
         ;
 }
 
+void system_exception_wait(void)
+{
+    INTMSK = 0xFFFFFFFF;
+    while (GPGDAT & (1 << 0)) == 0); /* Wait for power button */
+}
+
 static void set_page_tables(void)
 {
     map_section(0, 0, 0x1000, CACHE_NONE); /* map every memory region to itself */

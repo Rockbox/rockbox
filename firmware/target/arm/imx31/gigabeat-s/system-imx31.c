@@ -65,6 +65,16 @@ int system_memory_guard(int newmode)
 
 void system_reboot(void)
 {
+    /* Multi-context so no SPI available (WDT?)  */
+    while (1);
+}
+
+void system_exception_wait(void)
+{
+    /* Called in many contexts so button reading may be a chore */
+    avic_disable_int(ALL);
+    core_idle();
+    while (1);
 }
 
 void system_init(void)
