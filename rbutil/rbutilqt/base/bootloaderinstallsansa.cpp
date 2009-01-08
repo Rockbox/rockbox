@@ -219,15 +219,19 @@ BootloaderInstallBase::BootloaderType BootloaderInstallSansa::installed(void)
         return BootloaderUnknown;
     }
     if (sansa_read_partinfo(&sansa,0) < 0) {
+        sansa_close(&sansa);
         return BootloaderUnknown;
     }
     if(is_sansa(&sansa) < 0) {
+        sansa_close(&sansa);
         return BootloaderUnknown;
     }
     if((num = sansa_list_images(&sansa)) == 2) {
+        sansa_close(&sansa);
         return BootloaderRockbox;
     }
     else if(num == 1) {
+        sansa_close(&sansa);
         return BootloaderOther;
     }
     return BootloaderUnknown;
