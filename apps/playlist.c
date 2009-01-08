@@ -2343,6 +2343,7 @@ int playlist_resume(void)
         /* Terminate on EOF */
         if(nread <= 0)
         {
+            playlist->first_index = 0;
             break;
         }
     }
