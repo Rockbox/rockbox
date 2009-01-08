@@ -8,17 +8,17 @@ set -e
 
 # this is where this script will store downloaded files and check for already
 # downloaded files
-dlwhere="/tmp/rbdev-dl"
+dlwhere="${RBDEV_DOWNLOAD:-/tmp/rbdev-dl}"
 
 # will append the target string to the prefix dir mentioned here
 # Note that the user running this script must be able to do make install in
 # this given prefix directory. Also make sure that this given root dir
 # exists.
-prefix="/usr/local"
+prefix="${RBDEV_PREFIX:-/usr/local}"
 
 # This directory is used to extract all files and to build everything in. It
 # must not exist before this script is invoked (as a security measure).
-builddir="/tmp/rbdev-build"
+builddir="${RBDEV_BUILD:-/tmp/rbdev-build}"
 
 # This script needs to use GNU Make. On Linux systems, GNU Make is invoked
 # by running the "make" command, on most BSD systems, GNU Make is invoked
@@ -117,9 +117,9 @@ else
   echo "$dlwhere has been created to store downloads in"
 fi
 
-echo "Download directory: $dlwhere (edit script to change dir)"
-echo "Install prefix: $prefix/[target] (edit script to change dir)"
-echo "Build dir: $builddir (edit script to change dir)"
+echo "Download directory: $dlwhere (set RBDEV_DOWNLOAD to change dir)"
+echo "Install prefix: $prefix/[target] (set RBDEV_PREFIX to change dir)"
+echo "Build dir: $builddir (set RBDEV_BUILD to change dir)"
 
 ###########################################################################
 # Verify that we can write in the prefix dir, as otherwise we will hardly
