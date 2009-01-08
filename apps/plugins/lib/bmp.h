@@ -24,7 +24,7 @@
 #include "lcd.h"
 #include "plugin.h"
 
-#if LCD_DEPTH > 1
+#if LCD_DEPTH > 1 /* save is only available for color, resize for >1bpp */
 #ifdef HAVE_LCD_COLOR
 /**
  * Save bitmap to file
@@ -45,6 +45,11 @@ void simple_resize_bitmap(struct bitmap *src, struct bitmap *dst);
 void smooth_resize_bitmap(struct bitmap *src,  struct bitmap *dst);
 
 #else
+/*
+   BMP loader is built with scaling support in pluginlib on 1bpp targets, as
+   these do not provide scaling support in the core BMP loader. bmp_init is
+   needed to copy the plugin API pointer for the pluginlib loader's use.
+*/
 void bmp_init(const struct plugin_api *api);
 #endif
 

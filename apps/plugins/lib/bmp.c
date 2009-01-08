@@ -27,7 +27,7 @@
 #include "lcd.h"
 #include "system.h"
 
-#if LCD_DEPTH > 1
+#if LCD_DEPTH > 1  /* save is only available for color, resize for >1bpp */
 #ifdef HAVE_LCD_COLOR
 #define LE16(x) (htole16(x))&0xff, ((htole16(x))>>8)&0xff
 #define LE32(x) (htole32(x))&0xff, ((htole32(x))>>8)&0xff, ((htole32(x))>>16)&0xff, ((htole32(x))>>24)&0xff
@@ -122,13 +122,15 @@ void simple_resize_bitmap(struct bitmap *src, struct bitmap *dst)
     }
 }
 
-#else
+#else /* LCD_DEPTH == 1 */
 #include "wrappers.h"
 
 static const struct plugin_api *rb;
 
+/* import the core bmp loader */
 #include "../../recorder/bmp.c"
 
+/* initialize rb for use by the bmp loader */
 void bmp_init(const struct plugin_api *api)
 {
     rb = api;

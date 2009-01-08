@@ -24,8 +24,6 @@
 #ifndef _LIB_RESIZE_H_
 #define _LIB_RESIZE_H_
 
-#if LCD_DEPTH == 1
 void resize_init(const struct plugin_api *api);
-#endif
 
 #endif

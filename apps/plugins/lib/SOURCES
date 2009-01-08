@@ -4,6 +4,10 @@ fixedpoint.c
 playback_control.c
 rgb_hsv.c
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
+/*
+   The scaler is not provided in core on mono targets, but is built in
+   pluginlib for use with greylib overlay output
+*/
 #if LCD_DEPTH == 1
 resize.c
 #endif
