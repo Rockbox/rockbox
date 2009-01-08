@@ -54,17 +54,6 @@ static struct as3514_info
     uint8_t regs[AS3514_NUM_AUDIO_REGS]; /* 8-bit registers */
 } as3514;
 
-/* In order to keep track of source for combining volume ranges */
-enum
-{
-    SOURCE_DAC = 0,
-    SOURCE_MIC1,
-    SOURCE_LINE_IN1,
-    SOURCE_LINE_IN1_ANALOG
-};
-
-static unsigned int source = SOURCE_DAC;
-
 /*
  * little helper method to set register values.
  * With the help of as3514.regs, we minimize i2c
@@ -213,19 +202,10 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
 {
     unsigned int hph_r, hph_l;
     unsigned int mix_l, mix_r;
-    unsigned int mix_reg_r, mix_reg_l;
 
     /* keep track of current setting */
     as3514.vol_l = vol_l;
     as3514.vol_r = vol_r;
-
-    if (source == SOURCE_LINE_IN1_ANALOG) {
-        mix_reg_r = AS3514_LINE_IN1_R;
-        mix_reg_l = AS3514_LINE_IN1_L;
-    } else {
-        mix_reg_r = AS3514_DAC_R;
-        mix_reg_l = AS3514_DAC_L;
-    }
 
     /* We combine the mixer channel volume range with the headphone volume
        range - keep first stage as loud as possible */
@@ -245,8 +225,12 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
         hph_l = vol_l - 0x16;
     }
 
-    as3514_write_masked(mix_reg_r, mix_r, AS3514_VOL_MASK);
-    as3514_write_masked(mix_reg_l, mix_l, AS3514_VOL_MASK);
+    as3514_write_masked(AS3514_DAC_R, mix_r, AS3514_VOL_MASK);
+    as3514_write_masked(AS3514_DAC_L, mix_l, AS3514_VOL_MASK);
+#ifdef HAVE_RECORDING
+    as3514_write_masked(AS3514_LINE_IN1_R, mix_r, AS3514_VOL_MASK);
+    as3514_write_masked(AS3514_LINE_IN1_L, mix_l, AS3514_VOL_MASK);
+#endif
     as3514_write_masked(AS3514_HPH_OUT_R, hph_r, AS3514_VOL_MASK);
     as3514_write_masked(AS3514_HPH_OUT_L, hph_l, AS3514_VOL_MASK);
 }
@@ -298,11 +282,6 @@ void audiohw_set_frequency(int fsel)
 void audiohw_enable_recording(bool source_mic)
 {
     if (source_mic) {
-        source = SOURCE_MIC1;
-
-        /* Sync mixer volumes before switching inputs */
-        audiohw_set_master_vol(as3514.vol_l, as3514.vol_r);
-
         /* ADCmux = Stereo Microphone */
         as3514_write_masked(AS3514_ADC_R, ADC_R_ADCMUX_ST_MIC,
                             ADC_R_ADCMUX);
@@ -313,10 +292,6 @@ void audiohw_enable_recording(bool source_mic)
         /* M1_AGC_off */
         as3514_clear(AS3514_MIC1_R, MIC1_R_M1_AGC_off);
     } else {
-        source = SOURCE_LINE_IN1;
-
-        audiohw_set_master_vol(as3514.vol_l, as3514.vol_r);
-
         /* ADCmux = Line_IN1 */
         as3514_write_masked(AS3514_ADC_R, ADC_R_ADCMUX_LINE_IN1,
                             ADC_R_ADCMUX);
@@ -334,8 +309,6 @@ void audiohw_enable_recording(bool source_mic)
 
 void audiohw_disable_recording(void)
 {
-    source = SOURCE_DAC;
-
     /* ADC_Mute_on */
     as3514_clear(AS3514_ADC_L, ADC_L_ADC_MUTE_off);
 
@@ -343,8 +316,6 @@ void audiohw_disable_recording(void)
     as3514_clear(AS3514_AUDIOSET1,
                  AUDIOSET1_ADC_on | AUDIOSET1_LIN1_on |
                  AUDIOSET1_MIC1_on);
-
-    audiohw_set_master_vol(as3514.vol_l, as3514.vol_r);
 }
 
 /**
@@ -403,8 +374,6 @@ void audiohw_set_recvol(int left, int right, int type)
 void audiohw_set_monitor(bool enable)
 {
     if (enable) {
-        source = SOURCE_LINE_IN1_ANALOG;
-
         as3514_set(AS3514_AUDIOSET1, AUDIOSET1_LIN1_on);
         as3514_set(AS3514_LINE_IN1_R, LINE_IN1_R_LI1R_MUTE_off);
         as3514_set(AS3514_LINE_IN1_L, LINE_IN1_L_LI1L_MUTE_off);
@@ -414,8 +383,5 @@ void audiohw_set_monitor(bool enable)
         as3514_clear(AS3514_LINE_IN1_R, LINE_IN1_R_LI1R_MUTE_off);
         as3514_clear(AS3514_LINE_IN1_L, LINE_IN1_L_LI1L_MUTE_off);
     }
-
-    /* Sync mixer volume */
-    audiohw_set_master_vol(as3514.vol_l, as3514.vol_r);
 }
 #endif /* HAVE_RECORDING */
