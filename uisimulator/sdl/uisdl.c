@@ -47,7 +47,7 @@ extern void new_key(int key);
 void button_event(int key, bool pressed);
 
 SDL_Surface *gui_surface;
-bool background = false;        /* Don't use backgrounds by default */
+bool background = true;                   /* use backgrounds by default */
 
 bool lcd_display_redraw = true;         /* Used for player simulator */
 char having_new_lcd = true;               /* Used for player simulator */
@@ -196,10 +196,10 @@ int main(int argc, char *argv[])
                 debug_wps = true;
                 printf("WPS debug mode enabled.\n");
             } 
-            else if (!strcmp("--background", argv[x]))
+            else if (!strcmp("--nobackground", argv[x]))
             {
-                background = true;
-                printf("Using background image.\n");
+                background = false;
+                printf("Disabling background image.\n");
             } 
             else if (!strcmp("--old_lcd", argv[x]))
             {
@@ -235,7 +235,7 @@ int main(int argc, char *argv[])
                 printf("Arguments:\n");
                 printf("  --debugaudio \t Write raw PCM data to audiodebug.raw\n");
                 printf("  --debugwps \t Print advanced WPS debug info\n");
-                printf("  --background \t Use background image of hardware\n");
+                printf("  --nobackground \t Disable the background image\n");
                 printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
                 printf("  --zoom [VAL]\t Window zoom (will disable backgrounds)\n");
                 printf("  --alarm \t Simulate a wake-up on alarm\n");
