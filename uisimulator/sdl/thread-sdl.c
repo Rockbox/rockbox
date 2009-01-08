@@ -57,7 +57,7 @@ struct thread_entry threads[MAXTHREADS];
  * way to get them back in there so they may exit */
 static jmp_buf thread_jmpbufs[MAXTHREADS];
 static SDL_mutex *m;
-static bool threads_exit = false;
+static volatile bool threads_exit = false;
 
 extern long start_tick;
 
