@@ -450,7 +450,7 @@ static void init_ci(void)
     /* --- "Core" functions --- */
 
     /* kernel/ system */
-    ci.PREFIX(sleep) = rb->PREFIX(sleep);
+    ci.sleep = rb->sleep;
     ci.yield = rb->yield;
 
     /* strings and memory */
