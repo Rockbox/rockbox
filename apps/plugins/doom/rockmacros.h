@@ -33,16 +33,22 @@ extern bool doomexit;
 /* libc functions */
 int printf(const char *fmt, ...);
 int fileexists(const char * fname);
-int my_open(const char *file, int flags);
-int my_close(int id);
 char *my_strtok( char * s, const char * delim );
 #define alloca             __builtin_alloca
 #define fdprintf(...)       rb->fdprintf(__VA_ARGS__)
 #define vsnprintf(...)     rb->vsnprintf(__VA_ARGS__)
 #define read_line(a,b,c)   rb->read_line((a),(b),(c))
 
+#ifdef SIMULATOR
+#define open(a,b)          rb->open((a),(b))
+#define close(a)           rb->close((a))
+#else
+int my_open(const char *file, int flags);
+int my_close(int id);
 #define open(a,b)          my_open((a),(b))
 #define close(a)           my_close((a))
+#endif
+
 #define lseek(a,b,c)       rb->lseek((a),(b),(c))
 #define filesize(a)        rb->filesize((a))
 #define read(a,b,c)        rb->read((a),(b),(c))
