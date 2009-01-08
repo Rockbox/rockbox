@@ -24,6 +24,7 @@
 #include "lcd.h"
 #include "plugin.h"
 
+#if LCD_DEPTH > 1
 #ifdef HAVE_LCD_COLOR
 /**
  * Save bitmap to file
@@ -42,5 +43,9 @@ void simple_resize_bitmap(struct bitmap *src, struct bitmap *dst);
    Source and destination dimensions are read from the struct bitmap.
  */
 void smooth_resize_bitmap(struct bitmap *src,  struct bitmap *dst);
+
+#else
+void bmp_init(const struct plugin_api *api);
+#endif
 
 #endif

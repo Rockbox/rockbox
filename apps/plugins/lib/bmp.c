@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2006 by Antoine Cellerier <dionoea -at- videolan -dot- org>
+ * Copyright (C) 2009 by Andrew Mahone
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,6 +27,7 @@
 #include "lcd.h"
 #include "system.h"
 
+#if LCD_DEPTH > 1
 #ifdef HAVE_LCD_COLOR
 #define LE16(x) (htole16(x))&0xff, ((htole16(x))>>8)&0xff
 #define LE32(x) (htole32(x))&0xff, ((htole32(x))>>8)&0xff, ((htole32(x))>>16)&0xff, ((htole32(x))>>24)&0xff
@@ -119,3 +121,16 @@ void simple_resize_bitmap(struct bitmap *src, struct bitmap *dst)
         yr += yrstep;
     }
 }
+
+#else
+#include "wrappers.h"
+
+static const struct plugin_api *rb;
+
+#include "../../recorder/bmp.c"
+
+void bmp_init(const struct plugin_api *api)
+{
+    rb = api;
+}
+#endif

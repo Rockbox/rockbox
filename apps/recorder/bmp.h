@@ -52,8 +52,7 @@ struct rowset {
     short rowstop;
 };
 
-#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1) || \
-    defined(PLUGIN)
+#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
 extern const unsigned char dither_table[16];
 #define DITHERY(y) (dither_table[(y) & 15] & 0xAA)
 #define DITHERX(x) (dither_table[(x) & 15])
@@ -212,9 +211,5 @@ int read_bmp_fd(int fd,
                 int maxsize,
                 int format,
                 const struct custom_format *cformat);
-#ifdef PLUGIN
-struct plugin_api;
-void bmp_init(const struct plugin_api * api);
-#endif
 
 #endif

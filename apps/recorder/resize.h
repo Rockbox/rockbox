@@ -95,9 +95,4 @@ int resize_on_load(struct bitmap *bm, bool dither,
                    struct img_part* (*store_part)(void *args),
                    void *args);
 
-#ifdef PLUGIN
-struct plugin_api;
-void resize_init(const struct plugin_api *api);
-#endif
-
 #endif /* _RESIZE_H_ */

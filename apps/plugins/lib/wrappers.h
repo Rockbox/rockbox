@@ -7,7 +7,12 @@
 *                     \/            \/     \/    \/            \/
 * $Id$
 *
-* This is a wrapper for the core bmp.c
+* Copyright (C) 2009 by Andrew Mahone
+*
+* This header redefines some core functions as calls via the plugin_api, to
+* allow easy compilation of core source files in the pluginlib with different
+* features from the version built for the core, or when a core object file is
+* not built for a particular target.
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -19,6 +24,21 @@
 *
 ****************************************************************************/
 
-#include <plugin.h>
-#include "../../recorder/bmp.c"
+#ifndef _LIB_WRAPPERS_H_
+#define _LIB_WRAPPERS_H_
+
+#define open rb->open
+#define close rb->close
+#define read rb->read
+#define lseek rb->lseek
+#define memset rb->memset
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#define cpu_boost rb->cpu_boost
+#endif
+#define yield rb->yield
+#if CONFIG_CODEC == SWCODEC
+#define align_buffer rb->align_buffer
+#endif
+
+#endif
 

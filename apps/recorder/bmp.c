@@ -72,19 +72,6 @@
 #pragma pack (push, 2)
 #endif
 
-#ifndef PLUGIN
-#define API(x) x
-#else
-#define API(x) rb->x
-
-static const struct plugin_api *rb;
-
-void bmp_init(const struct plugin_api * api)
-{
-    rb = api;
-}
-#endif
-
 /* BMP header structure */
 struct bmp_header {
     uint16_t type;          /* signature - 'BM' */
@@ -137,22 +124,19 @@ static const struct uint8_rgb bitfields[3][3] = {
     },
 };
 
-#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1) || \
-    defined(PLUGIN)
+#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
 /* the full 16x16 Bayer dither matrix may be calculated quickly with this table
 */
 const unsigned char dither_table[16] =
     {   0,192, 48,240, 12,204, 60,252,  3,195, 51,243, 15,207, 63,255 };
 #endif
 
-#ifndef PLUGIN
 #if ((LCD_DEPTH == 2) && (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)) \
  || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH == 2) \
      && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED))
 const unsigned short vi_pattern[4] = {
     0x0101, 0x0100, 0x0001, 0x0000
 };
-#endif
 #endif
 
 /******************************************************************************
@@ -168,7 +152,7 @@ int read_bmp_file(const char* filename,
                   const struct custom_format *cformat)
 {
     int fd, ret;
-    fd = API(open)(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY);
 
     /* Exit if file opening failed */
     if (fd < 0) {
@@ -180,7 +164,7 @@ int read_bmp_file(const char* filename,
            filename, !!(format & FORMAT_REMOTE), !!(format & FORMAT_RESIZE),
            !!(format & FORMAT_KEEP_ASPECT));
     ret = read_bmp_fd(fd, bm, maxsize, format, cformat);
-    API(close)(fd);
+    close(fd);
     return ret;
 }
 
@@ -237,7 +221,7 @@ static unsigned int read_part_line(struct bmp_args *ba)
 #endif
     ibuf = ((unsigned char *)buf) + (BM_MAX_WIDTH << 2) - len;
     BDEBUGF("read_part_line: cols=%d len=%d\n",cols,len);
-    ret = API(read)(fd, ibuf, len);
+    ret = read(fd, ibuf, len);
     if (ret != len)
     {
         DEBUGF("read_part_line: error reading image, read returned %d "
@@ -324,7 +308,7 @@ static unsigned int read_part_line(struct bmp_args *ba)
         if (pad > 0)
         {
             BDEBUGF("seeking %d bytes to next line\n",pad);
-            API(lseek)(fd, pad, SEEK_CUR);
+            lseek(fd, pad, SEEK_CUR);
         }
 #if LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1) || \
     defined(PLUGIN)
@@ -422,7 +406,7 @@ int read_bmp_fd(int fd,
 #endif /*(LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)*/
 
     /* read fileheader */
-    ret = API(read)(fd, &bmph, sizeof(struct bmp_header));
+    ret = read(fd, &bmph, sizeof(struct bmp_header));
     if (ret < 0) {
         return ret * 10 - 2;
     }
@@ -531,7 +515,7 @@ int read_bmp_fd(int fd,
         int i;
         union rgb_union pal;
         for (i = 0; i < numcolors; i++) {
-            if (API(read)(fd, &pal, sizeof(pal)) != (int)sizeof(pal))
+            if (read(fd, &pal, sizeof(pal)) != (int)sizeof(pal))
             {
                 DEBUGF("read_bmp_fd: Can't read color palette\n");
                 return -7;
@@ -589,9 +573,9 @@ int read_bmp_fd(int fd,
     }
 
     /* Search to the beginning of the image data */
-    API(lseek)(fd, (off_t)letoh32(bmph.off_bits), SEEK_SET);
+    lseek(fd, (off_t)letoh32(bmph.off_bits), SEEK_SET);
 
-    API(memset)(bitmap, 0, totalsize);
+    memset(bitmap, 0, totalsize);
 
     struct bmp_args ba = {
         .fd = fd, .padded_width = padded_width, .read_width = read_width,

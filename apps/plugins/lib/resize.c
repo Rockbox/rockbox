@@ -7,7 +7,9 @@
 *                     \/            \/     \/    \/            \/
 * $Id$
 *
-* This is a wrapper for the core bmp.c
+* Copyright (C) 2009 by Andrew Mahone
+*
+* This is a wrapper for the core resize.c
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -20,5 +22,13 @@
 ****************************************************************************/
 
 #include <plugin.h>
+#include "wrappers.h"
+
+static const struct plugin_api *rb;
+
 #include "../../recorder/resize.c"
 
+void resize_init(const struct plugin_api *api)
+{
+    rb = api;
+}

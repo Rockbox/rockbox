@@ -59,19 +59,6 @@
 #define DEBUGF(...)
 #endif
 
-#ifndef PLUGIN
-#define API(x) x
-#else
-#define API(x) rb->x
-
-static const struct plugin_api *rb;
-
-void resize_init(const struct plugin_api *api)
-{
-    rb = api;
-}
-#endif
-
 /* calculate the maximum dimensions which will preserve the aspect ration of
    src while fitting in the constraints passed in dst, and store result in dst,
    returning 0 if rounding and 1 if not rounding.
@@ -154,7 +141,7 @@ static bool scale_h_area(void *out_line_ptr,
     oxe = 0;
     mul = 0;
     /* give other tasks a chance to run */
-    API(yield)();
+    yield();
     for (ix = 0; ix < (unsigned int)ctx->src->width; ix++)
     {
         oxe += ctx->bm->width;
@@ -257,11 +244,11 @@ static inline bool scale_v_area(struct rowset *rset, struct scaler_context *ctx)
 #ifdef HAVE_LCD_COLOR
     uint32_t *rowacc = (uint32_t *) ctx->buf,
              *rowtmp = rowacc + 3 * ctx->bm->width;
-    API(memset)((void *)ctx->buf, 0, ctx->bm->width * 2 * sizeof(struct uint32_rgb));
+    memset((void *)ctx->buf, 0, ctx->bm->width * 2 * sizeof(struct uint32_rgb));
 #else
     uint32_t *rowacc = (uint32_t *) ctx->buf,
              *rowtmp = rowacc + ctx->bm->width;
-    API(memset)((void *)ctx->buf, 0, ctx->bm->width * 2 * sizeof(uint32_t));
+    memset((void *)ctx->buf, 0, ctx->bm->width * 2 * sizeof(uint32_t));
 #endif
     SDEBUGF("scale_v_area\n");
     /* zero the accumulator and temp rows */
@@ -298,9 +285,9 @@ static inline bool scale_v_area(struct rowset *rset, struct scaler_context *ctx)
             ctx->output_row(oy, (void*)rowacc, ctx);
             /* clear accumulator row, store partial coverage for next row */
 #ifdef HAVE_LCD_COLOR
-            API(memset)((void *)rowacc, 0, ctx->bm->width * sizeof(uint32_t) * 3);
+            memset((void *)rowacc, 0, ctx->bm->width * sizeof(uint32_t) * 3);
 #else
-            API(memset)((void *)rowacc, 0, ctx->bm->width * sizeof(uint32_t));
+            memset((void *)rowacc, 0, ctx->bm->width * sizeof(uint32_t));
 #endif
             mul = oye;
             oy += rset->rowstep;
@@ -346,7 +333,7 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
     /* The error is set so that values are initialized on the first pass. */
     ixe = ctx->bm->width - 1;
     /* give other tasks a chance to run */
-    API(yield)();
+    yield();
     for (ox = 0; ox < (uint32_t)ctx->bm->width; ox++)
     {
 #ifdef HAVE_LCD_COLOR
@@ -630,7 +617,7 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
                    0 : needed];
 #endif
 #if CONFIG_CODEC == SWCODEC
-    len = (unsigned int)API(align_buffer)(PUN_PTR(void**, &buf), len,
+    len = (unsigned int)align_buffer(PUN_PTR(void**, &buf), len,
                                          sizeof(uint32_t));
 #endif
     if (needed > len)
@@ -659,7 +646,7 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
 
     struct scaler_context ctx;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    API(cpu_boost)(true);
+    cpu_boost(true);
 #endif
     ctx.store_part = store_part;
     ctx.args = args;
@@ -698,7 +685,7 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
         ret = scale_v_linear(rset, &ctx);
 #endif
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    API(cpu_boost)(false);
+    cpu_boost(false);
 #endif
     if (!ret)
         return 0;
