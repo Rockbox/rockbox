@@ -19,7 +19,7 @@
 #
 #    Fitchî e walon ki rote avou tolminme kéne éndjolreye
 #
-#    Stéphane QUERTINMONT <stefane AT walon.org> - Nôvimbe 2008
+#    Stéphane QUERTINMONT <stefane AT walon.org> - Djanvî 2009
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -977,7 +977,7 @@
   </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_GAIN
+  id: LANG_EQUALIZER_GAIN
   desc: in the equalizer settings menu
   user:
   <source>
@@ -1812,7 +1812,7 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "ReplayGain"
+    *: "Replaygain"
   </dest>
   <voice>
     *: "Replaygain"
@@ -2006,7 +2006,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: DEPRECATED
+  desc: DEPRECATED 
   user:
   <source>
     *: ""
@@ -2020,7 +2020,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: DEPRECATED
+  desc: DEPRECATED 
   user:
   <source>
     *: ""
@@ -2034,7 +2034,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: DEPRECATED
+  desc: DEPRECATED 
   user:
   <source>
     *: ""
@@ -6966,16 +6966,16 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user:
   <source>
     *: "Version"
   </source>
   <dest>
-    *: "Modêye"
+    *: "Kiminålté"
   </dest>
   <voice>
-    *: "Modêye"
+    *: "Kiminålté"
   </voice>
 </phrase>
 <phrase>
@@ -8080,7 +8080,6 @@
   </dest>
   <voice>
     *: "Coron del djivêye di boket"
-    player: "Coron del djivêye"
   </voice>
 </phrase>
 <phrase>
@@ -8435,7 +8434,7 @@
     x5,m5: "Long PLAY po-z abandner"
     h10,h10_5gb,e200*,c200: "PREV po-z abandner"
     gigabeats: "BACK po-z abandner"
-    gigabeatf: "POWER po-z abandner"
+    gigabeatf:"POWER po-z abandner"
   </dest>
   <voice>
     *: ""
@@ -11694,7 +11693,7 @@
 <phrase>
   id: LANG_STOP_RECORDING_AND_SHUTDOWN
   desc: in record timesplit options
-  user: 
+  user:
   <source>
     *: none
     recording: "Stop Recording And Shutdown"
@@ -11740,6 +11739,108 @@
   <voice>
     *: none
     gigabeatf: "Hôte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "Debit séreye"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "Debit séreye"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "Oto"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "Otomatike"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "57600"
   </voice>
 </phrase>
 <phrase>
@@ -12172,5 +12273,19 @@
   <voice>
     *: none
     quickscreen: "Metou come cayet rascourti di dzo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user:
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Credits"
+  </dest>
+  <voice>
+    *: "Credits"
   </voice>
 </phrase>
