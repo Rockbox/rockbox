@@ -2061,13 +2061,13 @@ case $modelname in
      ;;
 esac
 if [ "1" != `parse_args --type` ]; then
-  option=`parse_args --type`;
+  btype=`parse_args --type`;
 else
   echo "Build (N)ormal, (A)dvanced, (S)imulator, (B)ootloader, $gdbstub(M)anual: (Defaults to N)"
-  option=`input`;
+  btype=`input`;
 fi
 
-  case $option in
+  case $btype in
     [Ii])
       appsdir='\$(ROOTDIR)/bootloader'
       apps="bootloader"
@@ -2150,6 +2150,7 @@ fi
           exit 8
       fi
       debug=""
+      btype="N" # set it explicitly since RET only gets here as well
       echo "Normal build selected"
       ;;
 
@@ -2388,6 +2389,16 @@ if test "$apps" = "apps"; then
   buildlangs="langs"
 fi
 
+#### Fix the cmdline ###
+if test -n "$ccache"; then
+  cmdline="--ccache"
+fi
+
+cmdline="$cmdline --target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype"
+
+
+### end of cmdline
+
 sed > Makefile \
  -e "s,@ROOTDIR@,${rootdir},g" \
  -e "s,@DEBUG@,${debug},g" \
@@ -2450,6 +2461,7 @@ sed > Makefile \
  -e "s,@LANGS@,${buildlangs},g" \
  -e "s,@USE_ELF@,${USE_ELF},g" \
  -e "s,@RBDIR@,${rbdir},g" \
+ -e "s,@CMDLINE@,$cmdline,g" \
 <<EOF
 ## Automatically generated. http://www.rockbox.org/
 
@@ -2513,6 +2525,8 @@ export ENC_OPTS=@ENC_OPTS@
 export ENCODER=@ENCODER@
 export USE_ELF=@USE_ELF@
 export RBDIR=@RBDIR@
+
+CONFIGURE_OPTIONS=@CMDLINE@
 
 include \$(TOOLSDIR)/root.make
 

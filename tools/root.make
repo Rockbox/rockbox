@@ -291,6 +291,7 @@ help:
 	@echo "voicetools  - builds the voice tools only"
 	@echo "install     - installs your build (for simulator builds only, no fonts)"
 	@echo "fullinstall - installs your build (for simulator builds only, with fonts)"
+	@echo "reconf      - rerun configure with the same selection"
 
 ### general compile rules:
 
@@ -311,3 +312,6 @@ $(BUILDDIR)/%.o: $(ROOTDIR)/%.S
 %.o: %.S
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(CFLAGS) -c $< -o $@
+
+reconf:
+	$(SILENT)$(TOOLSDIR)/configure $(CONFIGURE_OPTIONS)
