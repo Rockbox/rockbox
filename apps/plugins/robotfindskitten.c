@@ -125,7 +125,7 @@ static char* messages[] =
   "A helicopter has crashed here.",
   "Carlos Tarango stands here, doing his best impression of Pat Smear.",
   "A patch of mushrooms grows here.",
-  "It's a song by Kraftwerk, all about robots."
+  "It's a song by Kraftwerk, all about robots.",
   "A patch of grape jelly grows here.",
   "A spindle, and a grindle, and a bucka-wacka-woom!",
   "A geyser sprays water high into the air.",
@@ -239,7 +239,7 @@ static char* messages[] =
   "Here's Pete Peterson. His batteries seem to have long gone dead.",
   "\"Blup, blup, blup\", says the mud pot.",
   "More grist for the mill.",
-  "Cory Doctorow's hot air balloon is tethered here."
+  "Cory Doctorow's hot air balloon is tethered here.",
   "Grind 'em up, spit 'em out, they're twigs.",
   "The boom box cranks out an old Ethel Merman tune.",
   "It's \"Finding kitten\", published by O'Reilly and Associates.",
