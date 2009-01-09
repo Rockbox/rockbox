@@ -245,14 +245,16 @@ static void talk_qs_option(struct settings_list *opt, bool enqueue)
 static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
 {
     int item;
+    bool invert = false;
     switch(button)
     {
         case ACTION_QS_LEFT:
             item = QUICKSCREEN_LEFT;
             break;
 
-        case ACTION_QS_DOWN:
         case ACTION_QS_DOWNINV:
+            invert = true;      /* fallthrough */
+        case ACTION_QS_DOWN:
             item = QUICKSCREEN_BOTTOM;
             break;
 
@@ -263,7 +265,7 @@ static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
         default:
             return false;
     }
-    option_select_next_val((struct settings_list *)qs->items[item], false, true);
+    option_select_next_val((struct settings_list *)qs->items[item], invert, true);
     talk_qs_option((struct settings_list *)qs->items[item], false);
     return true;
 }
