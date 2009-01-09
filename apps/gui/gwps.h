@@ -469,6 +469,9 @@ struct wps_state
     bool wps_time_countup;
     struct mp3entry* id3;
     struct mp3entry* nid3;
+    char current_track_path[MAX_PATH]; /* used by root_menu.c to browse to the
+                                          current track at the time the audio is
+                                          stopped (so *id3 is invalid) */
 };
 
 

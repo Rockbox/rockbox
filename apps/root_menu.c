@@ -96,9 +96,9 @@ static int browser(void* param)
             filter = global_settings.dirfilter;
             if (global_settings.browse_current && 
                     last_screen == GO_TO_WPS &&
-                    wps_state.id3)
+                    wps_state.current_track_path[0])
             {
-                strcpy(folder, wps_state.id3->path);
+                strcpy(folder, wps_state.current_track_path);
             }
 #ifdef HAVE_HOTSWAP /* quick hack to stop crashing if you try entering 
                      the browser from the menu when you were in the card
