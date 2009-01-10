@@ -313,5 +313,5 @@ $(BUILDDIR)/%.o: $(ROOTDIR)/%.S
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(CFLAGS) -c $< -o $@
 
-reconf:
+Makefile: $(TOOLSDIR)/configure
 	$(SILENT)$(TOOLSDIR)/configure $(CONFIGURE_OPTIONS)
