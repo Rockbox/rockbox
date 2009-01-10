@@ -156,7 +156,7 @@ cpu:
     mov    r1, #WAKE
     str    r1, [r0]
 
-#ifdef SANSA_C200
+#if defined(SANSA_C200) || defined(PHILIPS_HDD1630)
     /* Magic for loading the c200 OF */
     ldr    r0, =0xb00d10ad
     mov    r1, #0x700

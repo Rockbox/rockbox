@@ -570,6 +570,17 @@ void* main(void)
         }
 #endif
 
+#if defined(PHILIPS_HDD1630)
+        printf("Trying /System/OF.ebn");
+        rc=load_mi4(loadbuffer, "/System/OF.ebn", MAX_LOADSIZE);
+        if (rc < EOK) {
+            printf("Can't load /System/OF.ebn");
+            printf(strerror(rc));
+        } else {
+            return (void*)loadbuffer;
+        }
+#endif
+
         printf("Trying /System/OF.mi4");
         rc=load_mi4(loadbuffer, "/System/OF.mi4", MAX_LOADSIZE);
         if (rc < EOK) {
