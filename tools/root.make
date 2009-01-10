@@ -314,4 +314,7 @@ $(BUILDDIR)/%.o: $(ROOTDIR)/%.S
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(CFLAGS) -c $< -o $@
 
 Makefile: $(TOOLSDIR)/configure
+	$(SILENT)echo "*** tools/configure is newer than Makefile. You should run 'make reconf'."
+
+reconf:
 	$(SILENT)$(TOOLSDIR)/configure $(CONFIGURE_OPTIONS)
