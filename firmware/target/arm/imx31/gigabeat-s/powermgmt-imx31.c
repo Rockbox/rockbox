@@ -705,10 +705,16 @@ static void charger_control(void)
             else if (pwr & POWER_INPUT_USB_CHARGER
                         & POWER_INPUT_CHARGER)
             {
+                /* USB power only */
                 if (changed & POWER_INPUT_USB_CHARGER)
                 {
                     /* USB charger plugged - try charge */
                     autorecharge_counter = -1;
+                }
+                else if (changed & POWER_INPUT_MAIN_CHARGER)
+                {
+                    /* Main charger pulled - go to battery maintenence. */
+                    charger_setting = CHARGER_ADJUST;
                 }
             }
         }
