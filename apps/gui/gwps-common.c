@@ -85,7 +85,20 @@ static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
     if (wps->data->wps_sb_tag)
         draw = wps->data->show_sb_on_wps;
 
+#if NB_SCREENS > 1
+    /* multi screen targets could show the bars on one screen but not both
+     * so the viewportmanager can't be used in its current form...
+     * Also, the WPS is a special screen so doing this is reasonable.
+     */
+    if (draw)
+    {
+        struct gui_statusbar *bar;
+        bar = &statusbars.statusbars[wps->data->remote_wps?SCREEN_REMOTE:SCREEN_MAIN];
+        gui_statusbar_draw(bar, force);
+    }
+#else
     viewportmanager_set_statusbar(draw);
+#endif    
 }
 #else
 #define gui_wps_statusbar_draw(wps, force)

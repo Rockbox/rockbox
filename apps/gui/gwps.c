@@ -128,6 +128,7 @@ long gui_wps_show(void)
     int i;
     long last_left = 0, last_right = 0;
     
+    viewportmanager_set_statusbar(false);
     wps_state_init();
 
 #ifdef HAVE_LCD_CHARCELLS
