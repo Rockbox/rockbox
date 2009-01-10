@@ -329,14 +329,14 @@ static bool dbg_buffering_thread(void)
 
         bufused = bufsize - pcmbuf_free();
 
-        snprintf(buf, sizeof(buf), "pcm: %7ld/%7ld", (long) bufused, (long) bufsize);
+        snprintf(buf, sizeof(buf), "pcm: %6ld/%ld", (long) bufused, (long) bufsize);
         lcd_puts(0, line++, buf);
 
         gui_scrollbar_draw(&screens[SCREEN_MAIN],0, line*8, LCD_WIDTH, 6,
                            bufsize, 0, bufused, HORIZONTAL);
         line++;
 
-        snprintf(buf, sizeof(buf), "alloc: %8ld/%8ld", audio_filebufused(),
+        snprintf(buf, sizeof(buf), "alloc: %6ld/%ld", audio_filebufused(),
                  (long) filebuflen);
         lcd_puts(0, line++, buf);
 
@@ -345,7 +345,7 @@ static bool dbg_buffering_thread(void)
                            filebuflen, 0, audio_filebufused(), HORIZONTAL);
         line++;
 
-        snprintf(buf, sizeof(buf), "real:  %8ld/%8ld", (long)d.buffered_data,
+        snprintf(buf, sizeof(buf), "real:  %6ld/%ld", (long)d.buffered_data,
                  (long)filebuflen);
         lcd_puts(0, line++, buf);
 
@@ -354,7 +354,7 @@ static bool dbg_buffering_thread(void)
         line++;
 #endif
 
-        snprintf(buf, sizeof(buf), "usefl: %8ld/%8ld", (long)(d.useful_data),
+        snprintf(buf, sizeof(buf), "usefl: %6ld/%ld", (long)(d.useful_data),
                                                        (long)filebuflen);
         lcd_puts(0, line++, buf);
 
@@ -383,7 +383,7 @@ static bool dbg_buffering_thread(void)
         {
             int boostquota = boost_ticks * 1000 / ticks; /* in 0.1 % */
             int avgclock   = freq_sum * 10 / ticks;      /* in 100 kHz */
-            snprintf(buf, sizeof(buf), "boost ratio: %3d.%d%% (%2d.%dMHz)",
+            snprintf(buf, sizeof(buf), "boost:%3d.%d%% (%d.%dMHz)",
                      boostquota/10, boostquota%10, avgclock/10, avgclock%10);
             lcd_puts(0, line++, buf);
         }

@@ -21,18 +21,12 @@
 #ifndef PCMBUF_H
 #define PCMBUF_H
 
-#if MEM > 1
 #define PCMBUF_TARGET_CHUNK 32768 /* This is the target fill size of chunks
                                      on the pcm buffer */
 #define PCMBUF_MINAVG_CHUNK 24576 /* This is the minimum average size of
                                      chunks on the pcm buffer (or we run out
                                      of buffer descriptors, which is
                                      non-fatal) */
-#else
-#define PCMBUF_TARGET_CHUNK 16384
-#define PCMBUF_MINAVG_CHUNK 12288
-#endif
-
 #define PCMBUF_MIN_CHUNK     4096 /* We try to never feed a chunk smaller than
                                      this to the DMA */
 #define PCMBUF_MIX_CHUNK     8192 /* This is the maximum size of one packet

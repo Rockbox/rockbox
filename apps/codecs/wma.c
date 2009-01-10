@@ -468,8 +468,6 @@ enum codec_status codec_main(void)
     int errcount = 0;
 
     /* Generic codec initialisation */
-    ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
-
     ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
 
 next_track:

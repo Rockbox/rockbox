@@ -38,9 +38,6 @@ enum codec_status codec_main(void)
     char* module;
     int bytesPerSample =2;
     
-    /* Generic codec initialisation */
-    ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
-    
 next_track:
     if (codec_init()) {
         DEBUGF("codec init failed\n");

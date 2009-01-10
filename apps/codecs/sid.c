@@ -1215,9 +1215,6 @@ enum codec_status codec_main(void)
     int nSamplesPerCall = 882;  /* This is PAL SID single speed (44100/50Hz) */
     int nSamplesToRender = 0;
 
-    /* Generic codec initialisation */
-    ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
-
 next_track:
     if (codec_init()) {
         return CODEC_ERROR;

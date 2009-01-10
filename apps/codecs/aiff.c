@@ -66,7 +66,6 @@ enum codec_status codec_main(void)
 
     /* Generic codec initialisation */
     ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
-    ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
   
 next_track:
     if (codec_init()) {

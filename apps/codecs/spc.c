@@ -559,8 +559,6 @@ enum codec_status codec_main(void)
 
         /* Read the entire file */
         DEBUGF("SPC: request initial buffer\n");
-        ci->configure(CODEC_SET_FILEBUF_WATERMARK, ci->filesize);
-
         ci->seek_buffer(0);
         size_t buffersize;
         uint8_t* buffer = ci->request_buffer(&buffersize, ci->filesize);

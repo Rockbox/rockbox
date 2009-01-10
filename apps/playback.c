@@ -88,8 +88,6 @@
 
 #define PLAYBACK_VOICE
 
-/* default point to start buffer refill */
-#define AUDIO_DEFAULT_WATERMARK      (1024*512)
 /* amount of guess-space to allow for codecs that must hunt and peck
  * for their correct seeek target, 32k seems a good size */
 #define AUDIO_REBUFFER_GUESS_SIZE    (1024*32)
@@ -162,20 +160,12 @@ enum filling_state {
     STATE_FINISHED, /* all remaining tracks are fully buffered */
 };
 
-#if MEM > 1
 #define MAX_TRACK       128
-#else
-#define MAX_TRACK       32
-#endif
 
 #define MAX_TRACK_MASK  (MAX_TRACK-1)
 
 /* As defined in plugins/lib/xxx2wav.h */
-#if MEM > 1
 #define GUARD_BUFSIZE  (32*1024)
-#else
-#define GUARD_BUFSIZE  (8*1024)
-#endif
 
 /* As defined in plugin.lds */
 #if defined(CPU_PP)
@@ -277,11 +267,13 @@ static bool track_load_started = false;
  */
 static bool codec_requested_stop = false;
 
+#ifdef HAVE_DISK_STORAGE
 static size_t buffer_margin  = 0; /* Buffer margin aka anti-skip buffer (A/C-) */
+#endif
 
 /* Multiple threads */
-/* Set the watermark to trigger buffer fill (A/C) FIXME */
-static void set_filebuf_watermark(int seconds, size_t max);
+/* Set the watermark to trigger buffer fill (A/C) */
+static void set_filebuf_watermark(void);
 
 /* Audio thread */
 static struct event_queue       audio_queue SHAREDBSS_ATTR;
@@ -797,7 +789,7 @@ void audio_set_buffer_margin(int setting)
     static const int lookup[] = {5, 15, 30, 60, 120, 180, 300, 600};
     buffer_margin = lookup[setting];
     logf("buffer margin: %ld", (long)buffer_margin);
-    set_filebuf_watermark(buffer_margin, 0);
+    set_filebuf_watermark();
 }
 #endif
 
@@ -843,16 +835,35 @@ void audio_set_crossfade(int enable)
 
 /* --- Routines called from multiple threads --- */
 
-static void set_filebuf_watermark(int seconds, size_t max)
+static void set_filebuf_watermark(void)
 {
-    size_t bytes;
-
     if (!filebuf)
         return;     /* Audio buffers not yet set up */
 
-    bytes = seconds?MAX(curtrack_id3.bitrate * seconds * (1000/8), max):max;
-    bytes = MIN(bytes, filebuflen / 2);
+#ifdef HAVE_FLASH_STORAGE
+    int seconds = 1;
+#else
+    int seconds;
+    int spinup = ata_spinup_time();
+    if (spinup)
+        seconds = (spinup / HZ) + 1;
+    else
+        seconds = 3;
+#endif
+
+    /* bitrate of last track in buffer dictates watermark */
+    struct mp3entry* id3 = NULL;
+    if (tracks[track_widx].taginfo_ready)
+        id3 = bufgetid3(tracks[track_widx].id3_hid);
+    else
+        id3 = bufgetid3(tracks[track_widx-1].id3_hid);
+    if (!id3) {
+        logf("fwmark: No id3 for last track (r%d/w%d), aborting!", track_ridx, track_widx);
+        return;
+    }
+    size_t bytes = id3->bitrate * (1000/8) * seconds;
     buf_set_watermark(bytes);
+    logf("fwmark: %d", bytes);
 }
 
 const char *get_codec_filename(int cod_spec)
@@ -1106,10 +1117,6 @@ static bool codec_seek_buffer_callback(size_t newpos)
 static void codec_configure_callback(int setting, intptr_t value)
 {
     switch (setting) {
-    case CODEC_SET_FILEBUF_WATERMARK:
-        set_filebuf_watermark(buffer_margin, value);
-        break;
-
     default:
         if (!dsp_configure(ci.dsp, setting, value))
             { logf("Illegal key:%d", setting); }
@@ -1709,7 +1716,7 @@ static bool audio_load_track(size_t offset, bool start_play)
     /* Set default values */
     if (start_play)
     {
-        buf_set_watermark(AUDIO_DEFAULT_WATERMARK);
+        buf_set_watermark(filebuflen/2);
         dsp_configure(ci.dsp, DSP_RESET, 0);
         track_changed = true;
         playlist_update_resume_info(audio_current_track());
@@ -2223,10 +2230,6 @@ static void audio_play_start(size_t offset)
     /* Officially playing */
     queue_reply(&audio_queue, 1);
 
-#ifdef HAVE_DISK_STORAGE
-    set_filebuf_watermark(buffer_margin, 0);
-#endif
-
     audio_fill_file_buffer(true, offset);
 
     add_event(BUFFER_EVENT_BUFFER_LOW, false, buffering_low_buffer_callback);
@@ -2358,11 +2361,13 @@ static void audio_reset_buffer(void)
 
     /* Subtract whatever the pcm buffer says it used plus the guard buffer */
     const size_t pcmbuf_size = pcmbuf_init(filebuf + filebuflen) +GUARD_BUFSIZE;
+
 #ifdef DEBUG
     if(pcmbuf_size > filebuflen)
         panicf("Not enough memory for pcmbuf_init() : %d > %d",
                 (int)pcmbuf_size, (int)filebuflen);
 #endif
+
     filebuflen -= pcmbuf_size;
 
     /* Make sure filebuflen is a longword multiple after adjustment - filebuf
@@ -2414,6 +2419,7 @@ static void audio_thread(void)
             case Q_AUDIO_FILL_BUFFER:
                 LOGFQUEUE("audio < Q_AUDIO_FILL_BUFFER %d", (int)ev.data);
                 audio_fill_file_buffer((bool)ev.data, 0);
+                set_filebuf_watermark();
                 break;
 
             case Q_AUDIO_FINISH_LOAD:

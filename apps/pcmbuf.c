@@ -48,8 +48,12 @@ static inline int32_t clip_sample_16(int32_t sample)
     return sample;
 }
 
+#if MEMORYSIZE > 2
 /* Keep watermark high for iPods at least (2s) */
 #define PCMBUF_WATERMARK     (NATIVE_FREQUENCY * 4 * 2)
+#else
+#define PCMBUF_WATERMARK     (NATIVE_FREQUENCY * 1) /* 0.25 seconds */
+#endif
 
 /* Structure we can use to queue pcm chunks in memory to be played
  * by the driver code. */
@@ -125,7 +129,7 @@ extern unsigned int codec_thread_id;
     (pcmbuf_unplayed_bytes < NATIVE_FREQUENCY * quarter_secs)
 
 static bool prepare_insert(size_t length);
-static void pcmbuf_under_watermark(void);
+static void pcmbuf_under_watermark(bool under);
 static bool pcmbuf_flush_fillpos(void);
 
 #define CALL_IF_EXISTS(function, args...) if (function) function(args)
@@ -194,7 +198,7 @@ static void pcmbuf_set_watermark_bytes(void)
     pcmbuf_watermark = (crossfade_enabled && pcmbuf_size) ?
         /* If crossfading, try to keep the buffer full other than 1 second */
         (pcmbuf_size - (NATIVE_FREQUENCY * 4 * 1)) :
-        /* Otherwise, just keep it above 2 second */
+        /* Otherwise, just use the default */
         PCMBUF_WATERMARK;
 }
 
@@ -271,7 +275,7 @@ static void boost_codec_thread(bool boost)
 }
 #endif /* HAVE_PRIORITY_SCHEDULING */
 
-static void pcmbuf_under_watermark(void)
+static void pcmbuf_under_watermark(bool under)
 {
     /* Only codec thread initiates boost - voice boosts the cpu when playing
        a clip */
@@ -279,13 +283,21 @@ static void pcmbuf_under_watermark(void)
     if (thread_get_current() == codec_thread_id)
 #endif /* SIMULATOR */
     {
+        if (under)
+        {
 #ifdef HAVE_PRIORITY_SCHEDULING
-        /* If buffer is critically low, override UI priority, else
-           set back to the original priority. */
-        boost_codec_thread(LOW_DATA(2) && pcm_is_playing());
+            /* If buffer is critically low, override UI priority, else
+               set back to the original priority. */
+            boost_codec_thread(LOW_DATA(2) && pcm_is_playing());
 #endif
-        /* Fill audio buffer by boosting cpu */
-        trigger_cpu_boost();
+            /* Fill audio buffer by boosting cpu */
+            trigger_cpu_boost();
+        }
+        else
+        {
+            boost_codec_thread(false);
+            cancel_cpu_boost();
+        }
     }
 
     /* Disable crossfade if < .5s of audio */
@@ -318,8 +330,13 @@ bool pcmbuf_is_lowdata(void)
             crossfade_init || crossfade_active)
         return false;
 
+#if MEMORYSIZE > 2
     /* 1 seconds of buffer is low data */
     return LOW_DATA(4);
+#else
+    /* under watermark is low data */
+    return (pcmbuf_unplayed_bytes < pcmbuf_watermark);
+#endif
 }
 
 /* Amount of bytes left in the buffer. */
@@ -421,20 +438,18 @@ static void pcmbuf_init_pcmbuffers(void)
 
 static size_t pcmbuf_get_next_required_pcmbuf_size(void)
 {
-#if MEM > 1
     size_t seconds = 1;
 
     if (crossfade_enabled_pending)
         seconds += global_settings.crossfade_fade_out_delay
                    + global_settings.crossfade_fade_out_duration;
 
+#if MEMORYSIZE > 2
     /* Buffer has to be at least 2s long. */
     seconds += 2;
-    logf("pcmbuf len: %ld", seconds);
-    return seconds * (NATIVE_FREQUENCY*4);
-#else
-    return NATIVE_FREQUENCY*2;
 #endif
+    logf("pcmbuf len: %ld", seconds);
+    return seconds * (NATIVE_FREQUENCY*4); /* 2 channels + 2 bytes/sample */
 }
 
 static char *pcmbuf_calc_audiobuffer_ptr(size_t bufsize)
@@ -817,8 +832,7 @@ static bool prepare_insert(size_t length)
     if (low_latency_mode)
     {
         /* 1/4s latency. */
-        if (pcmbuf_unplayed_bytes > NATIVE_FREQUENCY * 4 / 2
-            && pcm_is_playing())
+        if (!LOW_DATA(1) && pcm_is_playing())
             return false;
     }
 
@@ -830,11 +844,11 @@ static bool prepare_insert(size_t length)
     {
         trigger_cpu_boost();
 
-        /* Pre-buffer 1s. */
-#if MEM <= 1
-        if (!LOW_DATA(1))
-#else
+        /* Pre-buffer up to watermark */
+#if MEMORYSIZE > 2
         if (!LOW_DATA(4))
+#else
+        if (pcmbuf_unplayed_bytes > pcmbuf_watermark)
 #endif
         {
             logf("pcm starting");
@@ -842,8 +856,8 @@ static bool prepare_insert(size_t length)
                 pcmbuf_play_start();
         }
     }
-    else if (pcmbuf_unplayed_bytes <= pcmbuf_watermark)
-        pcmbuf_under_watermark();
+    else
+        pcmbuf_under_watermark(pcmbuf_unplayed_bytes <= pcmbuf_watermark);
 
     return true;
 }
@@ -1119,11 +1133,8 @@ void pcmbuf_write_voice_complete(int count)
 
 void pcmbuf_crossfade_enable(bool on_off)
 {
-#if MEM > 1
     /* Next setting to be used, not applied now */
     crossfade_enabled_pending = on_off;
-#endif
-    (void)on_off;
 }
 
 void pcmbuf_crossfade_enable_finished(void)

@@ -147,8 +147,6 @@ enum codec_status codec_main(void)
     size_t resume_offset;
 
     /* Generic codec initialisation */
-    ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
-
     ci->configure(DSP_SET_SAMPLE_DEPTH, APE_OUTPUT_DEPTH-1);
 
     next_track:

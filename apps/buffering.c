@@ -56,11 +56,7 @@
 #include "albumart.h"
 #endif
 
-#if MEM > 1
 #define GUARD_BUFSIZE   (32*1024)
-#else
-#define GUARD_BUFSIZE  (8*1024)
-#endif
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/
@@ -88,11 +84,9 @@
 #endif
 
 /* default point to start buffer refill */
-#define BUFFERING_DEFAULT_WATERMARK      (1024*512)
+#define BUFFERING_DEFAULT_WATERMARK      (1024*128)
 /* amount of data to read in one read() call */
 #define BUFFERING_DEFAULT_FILECHUNK      (1024*32)
-/* point at which the file buffer will fight for CPU time */
-#define BUFFERING_CRITICAL_LEVEL         (1024*128)
 
 #define BUF_HANDLE_MASK                  0x7FFFFFFF
 
@@ -173,7 +167,6 @@ enum {
     Q_BASE_HANDLE,       /* Set the reference handle for buf_useful_data */
 
     /* Configuration: */
-    Q_SET_WATERMARK,
     Q_START_FILL,        /* Request that the buffering thread initiate a buffer
                             fill at its earliest convenience */
     Q_HANDLE_ADDED,      /* Inform the buffering thread that a handle was added,
@@ -555,7 +548,7 @@ static void update_data_counters(void)
 static inline bool buffer_is_low(void)
 {
     update_data_counters();
-    return data_counters.useful < BUFFERING_CRITICAL_LEVEL;
+    return data_counters.useful < (conf_watermark / 2);
 }
 
 /* Buffer data for the given handle.
@@ -1313,8 +1306,7 @@ size_t buf_used(void)
 
 void buf_set_watermark(size_t bytes)
 {
-    LOGFQUEUE("buffering > Q_SET_WATERMARK %ld", (long)bytes);
-    queue_post(&buffering_queue, Q_SET_WATERMARK, bytes);
+    conf_watermark = bytes;
 }
 
 static void shrink_buffer_inner(struct memory_handle *h)
@@ -1384,17 +1376,6 @@ void buffering_thread(void)
             case Q_BASE_HANDLE:
                 LOGFQUEUE("buffering < Q_BASE_HANDLE %d", (int)ev.data);
                 base_handle_id = (int)ev.data;
-                break;
-
-            case Q_SET_WATERMARK:
-                LOGFQUEUE("buffering < Q_SET_WATERMARK");
-                conf_watermark = (size_t)ev.data;
-                if (conf_watermark < BUFFERING_DEFAULT_FILECHUNK)
-                {
-                    logf("wmark<chunk %ld<%d",
-                         (long)conf_watermark, BUFFERING_DEFAULT_FILECHUNK);
-                    conf_watermark = BUFFERING_DEFAULT_FILECHUNK;
-                }
                 break;
 
 #ifndef SIMULATOR

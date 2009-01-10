@@ -1229,9 +1229,6 @@ enum codec_status codec_main(void)
 
     int bytesdone;
 
-    ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
-
-
 next_track:
     if (codec_init()) {
         return CODEC_ERROR;

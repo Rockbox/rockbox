@@ -47,8 +47,6 @@ enum codec_status codec_main(void)
     size_t bytesleft;
 
     /* Generic codec initialisation */
-    ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
-
     ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
     ci->configure(DSP_SET_SAMPLE_DEPTH, SHN_OUTPUT_DEPTH-1);
     
