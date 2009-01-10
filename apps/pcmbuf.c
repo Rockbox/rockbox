@@ -295,7 +295,9 @@ static void pcmbuf_under_watermark(bool under)
         }
         else
         {
+#ifdef HAVE_PRIORITY_SCHEDULING
             boost_codec_thread(false);
+#endif
             cancel_cpu_boost();
         }
     }

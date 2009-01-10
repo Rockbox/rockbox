@@ -220,6 +220,11 @@ int ata_init(void)
     return 1;
 }
 
+int ata_spinup_time(void)
+{
+    return HZ;
+}
+
 static ssize_t io_trigger_and_wait(int cmd)
 {
     void *mythread = NULL;
