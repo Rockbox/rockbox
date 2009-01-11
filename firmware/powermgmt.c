@@ -435,7 +435,7 @@ bool query_force_shutdown(void)
 #endif
 }
 
-#ifdef HAVE_BATTERY_SWITCH
+#if defined(HAVE_BATTERY_SWITCH) || defined(HAVE_RESET_BATTERY_FILTER)
 /*
  * Reset the battery voltage filter to a new value and update the
  * status.

@@ -485,17 +485,18 @@ target/sh/archos/ondio/fmradio_i2c-ondio.c
 
 #ifdef SANSA_E200
 #ifndef SIMULATOR
-target/arm/lcd-as-memframe.S
-target/arm/ata-sd-pp.c
-target/arm/sandisk/sansa-e200/lcd-e200.c
 target/arm/adc-as3514.c
 target/arm/ascodec-pp.c
-target/arm/sandisk/backlight-c200_e200.c
-target/arm/usb-fw-pp502x.c
-target/arm/sandisk/sansa-e200/button-e200.c
-target/arm/sandisk/power-c200_e200.c
-target/arm/sandisk/sansa-e200/powermgmt-e200.c
+target/arm/ata-sd-pp.c
+target/arm/lcd-as-memframe.S
+target/arm/powermgmt-ascodec.c
 target/arm/i2s-pp.c
+target/arm/usb-fw-pp502x.c
+target/arm/sandisk/backlight-c200_e200.c
+target/arm/sandisk/power-c200_e200.c
+target/arm/sandisk/sansa-e200/lcd-e200.c
+target/arm/sandisk/sansa-e200/button-e200.c
+target/arm/sandisk/sansa-e200/powermgmt-e200.c
 #ifndef BOOTLOADER
 target/arm/sandisk/audio-c200_e200.c
 #endif /* BOOTLOADER */
@@ -504,17 +505,18 @@ target/arm/sandisk/audio-c200_e200.c
 
 #ifdef SANSA_C200
 #ifndef SIMULATOR
-target/arm/ata-sd-pp.c
-target/arm/sandisk/sansa-c200/lcd-c200.c
-target/arm/sandisk/sansa-c200/lcd-as-c200.S
 target/arm/adc-as3514.c
 target/arm/ascodec-pp.c
-target/arm/sandisk/backlight-c200_e200.c
-target/arm/usb-fw-pp502x.c
-target/arm/sandisk/sansa-c200/button-c200.c
-target/arm/sandisk/power-c200_e200.c
-target/arm/sandisk/sansa-c200/powermgmt-c200.c
+target/arm/ata-sd-pp.c
 target/arm/i2s-pp.c
+target/arm/powermgmt-ascodec.c
+target/arm/usb-fw-pp502x.c
+target/arm/sandisk/backlight-c200_e200.c
+target/arm/sandisk/power-c200_e200.c
+target/arm/sandisk/sansa-c200/lcd-c200.c
+target/arm/sandisk/sansa-c200/lcd-as-c200.S
+target/arm/sandisk/sansa-c200/button-c200.c
+target/arm/sandisk/sansa-c200/powermgmt-c200.c
 #ifndef BOOTLOADER
 target/arm/sandisk/audio-c200_e200.c
 #endif /* BOOTLOADER */

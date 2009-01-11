@@ -38,8 +38,8 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
  
+    /* NOTE: why is the top voltage 4237? That's just too high. */
     { 3286, 3679, 3734, 3764, 3788, 3824, 3886, 3950, 4014, 4098, 4237 },
-    
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
@@ -48,14 +48,3 @@ const unsigned short percent_to_volt_charge[11] =
     /* Sansa c200 has a 530 mAh LiPo battery */
     3300, 3390, 3480, 3570, 3660, 3750, 3840, 3930, 4020, 4110, 4200
 };
-
-/* ADC should read 0x3ff=5.12V */
-#define BATTERY_SCALE_FACTOR 5125       
-/* full-scale ADC readout (2^10) in millivolt */
-
-/* Returns battery voltage from ADC [millivolts] */
-unsigned int battery_adc_voltage(void)
-{
-    return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10;
-}
-

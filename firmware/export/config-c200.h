@@ -123,8 +123,9 @@
 #define BATTERY_CAPACITY_INC 0          /* capacity increment */
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
-/* Hardware controlled charging? FIXME */
-#define CONFIG_CHARGING CHARGING_SIMPLE
+/* Charging implemented in a target-specific algorithm */
+#define CONFIG_CHARGING CHARGING_TARGET
+#define HAVE_POWEROFF_WHILE_CHARGING
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER

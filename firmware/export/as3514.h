@@ -249,8 +249,37 @@ extern void audiohw_set_frequency(int fsel);
 #define ADC_I_MICSUP2    11 /* Current of MicSup2 for remote control detection */
 #define ADC_VBAT         12 /* Single cell battery voltage */
 
-#define ADC_UNREG_POWER  ADC_BVDD   /* For compatibility */
+/* AS3514_CHARGER */
+#define TMPSUP_OFF      (0x1 << 7)
+#define CHG_I           (0x7 << 4)
+#define CHG_I_400MA     (0x7 << 4)
+#define CHG_I_350MA     (0x6 << 4)
+#define CHG_I_300MA     (0x5 << 4)
+#define CHG_I_250MA     (0x4 << 4)
+#define CHG_I_200MA     (0x3 << 4)
+#define CHG_I_150MA     (0x2 << 4)
+#define CHG_I_100MA     (0x1 << 4)
+#define CHG_I_50MA      (0x0 << 4)
+#define CHG_V           (0x7 << 1)
+#define CHG_V_4_25V     (0x7 << 1)
+#define CHG_V_4_20V     (0x6 << 1)
+#define CHG_V_4_15V     (0x5 << 1)
+#define CHG_V_4_10V     (0x4 << 1)
+#define CHG_V_4_05V     (0x3 << 1)
+#define CHG_V_4_00V     (0x2 << 1)
+#define CHG_V_3_95V     (0x1 << 1)
+#define CHG_V_3_90V     (0x0 << 1)
+#define CHG_OFF         (0x1 << 0)
 
+/* AS3514_IRQ_ENRD0 */
+#define CHG_TMPHIGH     (0x1 << 7)
+#define CHG_ENDOFCH     (0x1 << 6)
+#define CHG_STATUS      (0x1 << 5)
+#define CHG_CHANGED     (0x1 << 4)
+#define USB_STATUS      (0x1 << 3)
+#define USB_CHANGED     (0x1 << 2)
+#define RVDD_WASLOW     (0x1 << 1)
+#define BVDD_ISLOW      (0x1 << 0)
 
 #define AS3514_I2C_ADDR 0x46
 

@@ -106,7 +106,7 @@
 #include "debug-target.h"
 #endif
 
-#if defined(SANSA_E200) || defined(PHILIPS_SA9200)
+#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
 #include "ascodec.h"
 #include "as3514.h"
 #endif
@@ -1251,10 +1251,6 @@ extern unsigned char serbuf[];
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_VBAT:     %4d", adc_read(ADC_VBAT));
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "CHARGER: %02X/%02X", 
-                                   ascodec_read(AS3514_CHARGER), 
-                                   ascodec_read(AS3514_IRQ_ENRD0));
-        lcd_puts(0, line++, buf);
 #endif
 #endif
         lcd_update();
@@ -1757,6 +1753,32 @@ static bool view_battery(void)
                 }
                     
                 lcd_puts(0, line++, buf);
+#elif defined(SANSA_E200) || defined(SANSA_C200)
+                const int first = CHARGE_STATE_DISABLED;
+                static const char * const chrgstate_strings[] =
+                {
+                    [CHARGE_STATE_DISABLED-first] = "Disabled",
+                    [CHARGE_STATE_ERROR-first]    = "Error",
+                    [DISCHARGING-first]           = "Discharging",
+                    [CHARGING-first]              = "Charging",
+                };
+                const char *str = NULL;
+
+                snprintf(buf, 30, "Charger: %s",
+                         charger_inserted() ? "present" : "absent");
+                lcd_puts(0, 3, buf);
+
+                y = charge_state - first;
+                if ((unsigned)y < ARRAYLEN(chrgstate_strings))
+                    str = chrgstate_strings[y];
+
+                snprintf(buf, sizeof(buf), "State: %s",
+                         str ? str : "<unknown>");
+                lcd_puts(0, 4, buf);
+
+                snprintf(buf, sizeof(buf), "CHARGER: %02X", 
+                         ascodec_read(AS3514_CHARGER));
+                lcd_puts(0, 5, buf);
 #else
                 snprintf(buf, 30, "Charger: %s",
                          charger_inserted() ? "present" : "absent");

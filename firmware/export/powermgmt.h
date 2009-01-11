@@ -27,7 +27,7 @@
 
 enum charge_state_type
 {
-    /* sorted by increasing charging current */
+    /* sorted by increasing charging current (do not change!) */
 #if CONFIG_CHARGING >= CHARGING_MONITOR
     CHARGE_STATE_DISABLED = -2, /* Disable charger use (safety measure) */
     CHARGE_STATE_ERROR = -1,    /* Some error occurred that should not allow
@@ -143,13 +143,16 @@ unsigned int battery_voltage(void); /* filtered batt. voltage in millivolts */
 
 #ifdef HAVE_BATTERY_SWITCH
 unsigned int input_millivolts(void); /* voltage that device is running from */
+#endif /* HAVE_BATTERY_SWITCH */
 
+#if defined(HAVE_BATTERY_SWITCH) || defined(HAVE_RESET_BATTERY_FILTER)
 /* Set the filtered battery voltage (to adjust it before beginning a charge
  * cycle for instance where old, loaded readings will likely be invalid).
  * Also readjust when battery switch is opened or closed.
  */
 void reset_battery_filter(int millivolts);
-#endif /* HAVE_BATTERY_SWITCH */
+#endif /* HAVE_BATTERY_SWITCH || HAVE_RESET_BATTERY_FILTER */
+
 
 /* read unfiltered battery info */
 void battery_read_info(int *voltage, int *level);
