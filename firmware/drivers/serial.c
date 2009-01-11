@@ -80,7 +80,7 @@ int tx_rdy(void)
 int rx_rdy(void)
 {
     if(SSR1 & SCI_RDRF)
-	return 1;
+        return 1;
     else
         return 0;
 }
@@ -121,7 +121,7 @@ int remote_control_rx(void)
     }
 
     if(rx_rdy()) {
-	btn = rx_readc();
+        btn = rx_readc();
 
         if(last_was_error)
         {
@@ -197,7 +197,7 @@ int tx_rdy(void)
     if(USR0 & 0x04)
         return 1;
     else
-	return 0;
+        return 0;
 }
 
 int rx_rdy(void)
@@ -294,10 +294,10 @@ void serial_bitrate(int rate)
 {
     if(rate == 0)
     {
-	autobaud = 2;
-	SER0_LCR = 0x80; /* Divisor latch enable */
-	SER0_DLL = 0x0D; /* 24000000/13/16 = 115384 baud */
-	SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+        autobaud = 2;
+        SER0_LCR = 0x80; /* Divisor latch enable */
+        SER0_DLL = 0x0D; /* 24000000/13/16 = 115384 baud */
+        SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
         return;
     }
 
@@ -341,90 +341,90 @@ void SERIAL0(void)
 
     while(rx_rdy())
     {
-	temp = rx_readc();
-	if (newpkt && autobaud > 0)
-	{
-	    if (autobaud == 1)
-	    {
-		switch (temp)
-		{
-		    case 0xFF:
-		    case 0x55:
-			break;
-		    case 0xFC:
-			SER0_LCR = 0x80; /* Divisor latch enable */
-			SER0_DLL = 0x4E; /* 24000000/78/16 = 19230 baud */
-			SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
-			temp = 0xFF;
-			break;
-		    case 0xE0:
-			SER0_LCR = 0x80; /* Divisor latch enable */
-			SER0_DLL = 0x9C; /* 24000000/156/16 = 9615 baud */
-			SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
-			temp = 0xFF;
-			break;
-		    default:
-			badbaud++;
-			if (badbaud >= 6) /* Switch baud detection mode */
-			{
-			    autobaud = 2;
-			    SER0_LCR = 0x80; /* Divisor latch enable */
-			    SER0_DLL = 0x0D; /* 24000000/13/16 = 115384 baud */
-			    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
-			    badbaud = 0;
-			} else {
-			    SER0_LCR = 0x80; /* Divisor latch enable */
-			    SER0_DLL = 0x1A; /* 24000000/26/16 = 57692 baud */
-			    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
-			}
-			continue;
-		}
-	    } else {
-		switch (temp)
-		{
-		    case 0xFF:
-		    case 0x55:
-			break;
-		    case 0xFE:
-			SER0_LCR = 0x80; /* Divisor latch enable */
-			SER0_DLL = 0x1A; /* 24000000/26/16 = 57692 baud */
-			SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
-			temp = 0xFF;
-			break;
-		    case 0xFC:
-	    		SER0_LCR = 0x80; /* Divisor latch enable */
-			SER0_DLL = 0x27; /* 24000000/39/16 = 38461 baud */
-			SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
-			temp = 0xFF;
-			break;
-		    case 0xE0:
-			SER0_LCR = 0x80; /* Divisor latch enable */
-			SER0_DLL = 0x4E; /* 24000000/78/16 = 19230 baud */
-			SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
-			temp = 0xFF;
-			break;
-		    default:
-			badbaud++;
-			if (badbaud >= 6) /* Switch baud detection */
-			{
-			    autobaud = 1;
-			    SER0_LCR = 0x80; /* Divisor latch enable */
-			    SER0_DLL = 0x1A; /* 24000000/26/16 = 57692 baud */
-			    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
-			    badbaud = 0;
-			} else {
-			    SER0_LCR = 0x80; /* Divisor latch enable */
-			    SER0_DLL = 0x0D; /* 24000000/13/16 = 115384 baud */
-			    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
-			}
-			continue;
-		}
-	    }
-	}
-	bool pkt = iap_getc(temp);
-	if(newpkt == true && pkt == false)
-	    autobaud = 0; /* Found good baud */
-	newpkt = pkt;
+        temp = rx_readc();
+        if (newpkt && autobaud > 0)
+        {
+            if (autobaud == 1)
+            {
+                switch (temp)
+                {
+                    case 0xFF:
+                    case 0x55:
+                        break;
+                    case 0xFC:
+                        SER0_LCR = 0x80; /* Divisor latch enable */
+                        SER0_DLL = 0x4E; /* 24000000/78/16 = 19230 baud */
+                        SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                        temp = 0xFF;
+                        break;
+                    case 0xE0:
+                        SER0_LCR = 0x80; /* Divisor latch enable */
+                        SER0_DLL = 0x9C; /* 24000000/156/16 = 9615 baud */
+                        SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                        temp = 0xFF;
+                        break;
+                    default:
+                        badbaud++;
+                        if (badbaud >= 6) /* Switch baud detection mode */
+                        {
+                            autobaud = 2;
+                            SER0_LCR = 0x80; /* Divisor latch enable */
+                            SER0_DLL = 0x0D; /* 24000000/13/16 = 115384 baud */
+                            SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                            badbaud = 0;
+                        } else {
+                            SER0_LCR = 0x80; /* Divisor latch enable */
+                            SER0_DLL = 0x1A; /* 24000000/26/16 = 57692 baud */
+                            SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                        }
+                        continue;
+                }
+            } else {
+                switch (temp)
+                {
+                    case 0xFF:
+                    case 0x55:
+                        break;
+                    case 0xFE:
+                        SER0_LCR = 0x80; /* Divisor latch enable */
+                        SER0_DLL = 0x1A; /* 24000000/26/16 = 57692 baud */
+                        SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                        temp = 0xFF;
+                        break;
+                    case 0xFC:
+                            SER0_LCR = 0x80; /* Divisor latch enable */
+                        SER0_DLL = 0x27; /* 24000000/39/16 = 38461 baud */
+                        SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                        temp = 0xFF;
+                        break;
+                    case 0xE0:
+                        SER0_LCR = 0x80; /* Divisor latch enable */
+                        SER0_DLL = 0x4E; /* 24000000/78/16 = 19230 baud */
+                        SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                        temp = 0xFF;
+                        break;
+                    default:
+                        badbaud++;
+                        if (badbaud >= 6) /* Switch baud detection */
+                        {
+                            autobaud = 1;
+                            SER0_LCR = 0x80; /* Divisor latch enable */
+                            SER0_DLL = 0x1A; /* 24000000/26/16 = 57692 baud */
+                            SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                            badbaud = 0;
+                        } else {
+                            SER0_LCR = 0x80; /* Divisor latch enable */
+                            SER0_DLL = 0x0D; /* 24000000/13/16 = 115384 baud */
+                            SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                        }
+                        continue;
+                }
+            }
+        }
+        bool pkt = iap_getc(temp);
+        if(newpkt == true && pkt == false)
+            autobaud = 0; /* Found good baud */
+        newpkt = pkt;
     }
 }
 
