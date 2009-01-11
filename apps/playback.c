@@ -848,7 +848,7 @@ static void set_filebuf_watermark(void)
     if (spinup)
         seconds = (spinup / HZ) + 1;
     else
-        seconds = 3;
+        seconds = 5;
 #endif
 
     /* bitrate of last track in buffer dictates watermark */
