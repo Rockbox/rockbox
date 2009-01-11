@@ -688,10 +688,6 @@ long gui_wps_show(void)
         }
 
         if (exit) {
-            if (wps_state.id3)
-                strcpy(wps_state.current_track_path, wps_state.id3->path);
-            else
-                wps_state.current_track_path[0] = '\0';
 #ifdef HAVE_LCD_CHARCELLS
             status_set_record(false);
             status_set_audio(false);

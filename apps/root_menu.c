@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "config.h"
+#include "appevents.h"
 #include "menu.h"
 #include "root_menu.h"
 #include "lang.h"
@@ -75,6 +76,12 @@ struct root_items {
 static int last_screen = GO_TO_ROOT; /* unfortunatly needed so we can resume
                                         or goto current track based on previous
                                         screen */
+static char current_track_path[MAX_PATH];
+static void rootmenu_track_changed_callback(void* param)
+{
+    struct mp3entry *id3 = (struct mp3entry *)param;
+    strncpy(current_track_path, id3->path, MAX_PATH);
+}
 static int browser(void* param)
 {
     int ret_val;
@@ -96,9 +103,9 @@ static int browser(void* param)
             filter = global_settings.dirfilter;
             if (global_settings.browse_current && 
                     last_screen == GO_TO_WPS &&
-                    wps_state.current_track_path[0])
+                    current_track_path[0])
             {
-                strcpy(folder, wps_state.current_track_path);
+                strcpy(folder, current_track_path);
             }
 #ifdef HAVE_HOTSWAP /* quick hack to stop crashing if you try entering 
                      the browser from the menu when you were in the card
@@ -506,7 +513,7 @@ void root_menu(void)
     if (global_settings.start_in_screen == 0)
         next_screen = (int)global_status.last_screen;
     else next_screen = global_settings.start_in_screen - 2;
-    
+    add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, rootmenu_track_changed_callback);
 #ifdef HAVE_RTC_ALARM
     if ( rtc_check_alarm_started(true) ) 
     {
