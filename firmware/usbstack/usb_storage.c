@@ -97,6 +97,8 @@
 #define ASC_WRITE_ERROR             0x0C
 #define ASC_READ_ERROR              0x11
 #define ASC_NOT_READY               0x04
+#define ASC_INVALID_COMMAND         0x20
+
 #define ASCQ_BECOMING_READY         0x01
 
 #define SCSI_FORMAT_CAPACITY_FORMATTED_MEDIA 0x02000000
@@ -1024,8 +1026,10 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
         default:
             logf("scsi unknown cmd %x",cbw->command_block[0x0]);
-            usb_drv_stall(ep_in, true,true);
             send_csw(UMS_STATUS_FAIL);
+            cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
+            cur_sense_data.asc=ASC_INVALID_COMMAND;
+            cur_sense_data.ascq=0;
             break;
     }
 }
