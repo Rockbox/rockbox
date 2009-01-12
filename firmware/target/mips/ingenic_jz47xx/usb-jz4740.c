@@ -20,7 +20,6 @@
  ****************************************************************************/
 
 #include "config.h"
-#define LOGF_ENABLE
 #include "logf.h"
 #include "system.h"
 #include "usb_ch9.h"
@@ -72,13 +71,12 @@ struct usb_endpoint
 static unsigned char ep0_rx_buf[64];
 static unsigned char ep0state = USB_EP0_IDLE;
 static struct usb_endpoint endpoints[] =
-{
-  /*    buf       length sent       type     use_dma   fifo_addr  fifo_size */
-    {&ep0_rx_buf,    0,  {0},   ep_control,   false, USB_FIFO_EP0, 64 },
-    {NULL,           0,  {0},   ep_control,   false, USB_FIFO_EP0, 64 },
-    {NULL,           0,  {0},   ep_bulk,      false, USB_FIFO_EP1, 512},
-    {NULL,           0,  {0},   ep_bulk,      false, USB_FIFO_EP1, 512},
-    {NULL,           0,  {0},   ep_interrupt, false, USB_FIFO_EP2, 64 }
+{/*    buf        length sent     type      use_dma  fifo_addr  fifo_size */
+    {&ep0_rx_buf,    0,  {0},  ep_control,   false, USB_FIFO_EP0,  64 },
+    {NULL,           0,  {0},  ep_control,   false, USB_FIFO_EP0,  64 },
+    {NULL,           0,  {0},  ep_bulk,      false, USB_FIFO_EP1,  512},
+    {NULL,           0,  {0},  ep_bulk,      false, USB_FIFO_EP1,  512},
+    {NULL,           0,  {0},  ep_interrupt, false, USB_FIFO_EP2,  64 }
 };
 
 static inline void select_endpoint(int ep)
@@ -97,7 +95,7 @@ static void readFIFO(struct usb_endpoint *ep, unsigned int size)
     
     if(size > 0)
     {
-        if( ((int)ptr & 3) == 0 )
+        if( ((unsigned int)ptr & 3) == 0 )
         {
             while(s--)
                 *ptr32++ = REG32(ep->fifo_addr);
@@ -109,10 +107,10 @@ static void readFIFO(struct usb_endpoint *ep, unsigned int size)
             while(s--)
             {
                 x = REG32(ep->fifo_addr);
-                *ptr++ = (x >> 0)  & 0xff;
-                *ptr++ = (x >> 8)  & 0xff;
-                *ptr++ = (x >> 16) & 0xff;
-                *ptr++ = (x >> 24) & 0xff;
+                *ptr++ = (x >> 0)  & 0xFF;
+                *ptr++ = (x >> 8)  & 0xFF;
+                *ptr++ = (x >> 16) & 0xFF;
+                *ptr++ = (x >> 24) & 0xFF;
             }
         }
         
@@ -124,11 +122,11 @@ static void readFIFO(struct usb_endpoint *ep, unsigned int size)
 
 static void writeFIFO(struct usb_endpoint *ep, unsigned int size)
 {
-    //logf("writeFIFO(EP%d, %d)", EP_NUMBER2(ep), size);
+    logf("writeFIFO(EP%d, %d)", EP_NUMBER2(ep), size);
     
     register unsigned int *d = (unsigned int *)EP_PTR(ep);
     register unsigned char *c;
-    register int s;
+    register unsigned int s;
 
     if(size > 0)
     {
@@ -143,13 +141,11 @@ static void writeFIFO(struct usb_endpoint *ep, unsigned int size)
                 REG8(ep->fifo_addr) = *c++;
         }
     }
-    else
-        REG32(ep->fifo_addr) = 0;
 }
 
 static void flushFIFO(struct usb_endpoint *ep)
 {
-    //logf("flushFIFO(%d)", EP_NUMBER(ep));
+    logf("flushFIFO(%d)", EP_NUMBER(ep));
 
     switch (ep->type)
     {
@@ -202,7 +198,7 @@ static void EP0_handler(void)
 {
     logf("EP0_handler");
     
-    register unsigned char csr0;
+    unsigned char csr0;
 
     /* Read CSR0 */
     select_endpoint(0);
@@ -211,7 +207,7 @@ static void EP0_handler(void)
     /* Check for SentStall:
         This bit is set when a STALL handshake is transmitted. The CPU should clear this bit.
      */
-    if (csr0 & USB_CSR0_SENTSTALL)
+    if(csr0 & USB_CSR0_SENTSTALL)
     {
         REG_USB_REG_CSR0 = csr0 & ~USB_CSR0_SENTSTALL;
         ep0state = USB_EP0_IDLE;
@@ -223,7 +219,7 @@ static void EP0_handler(void)
         An interrupt will be generated and the FIFO flushed at this time.
         The bit is cleared by the CPU writing a 1 to the ServicedSetupEnd bit.
      */
-    if (csr0 & USB_CSR0_SETUPEND)
+    if(csr0 & USB_CSR0_SETUPEND)
     {
         REG_USB_REG_CSR0 = csr0 | USB_CSR0_SVDSETUPEND;
         ep0state = USB_EP0_IDLE;
@@ -231,7 +227,7 @@ static void EP0_handler(void)
     }
     
     /* Call relevant routines for endpoint 0 state */
-    if (ep0state == USB_EP0_IDLE)
+    if(ep0state == USB_EP0_IDLE)
     {
         if(csr0 & USB_CSR0_OUTPKTRDY)   /* There is data in the fifo */
         {
@@ -240,29 +236,34 @@ static void EP0_handler(void)
             usb_core_control_request((struct usb_ctrlrequest*)endpoints[0].buf);
         }
     }
-    else if (ep0state == USB_EP0_TX)
+    else if(ep0state == USB_EP0_TX)
         EP0_send();
 }
 
 static void EPIN_handler(unsigned int endpoint)
-{
-    logf("EPIN_handler(%d)", endpoint);
-    
+{   
     struct usb_endpoint* ep = &endpoints[endpoint*2+1];
     unsigned int length, csr;
     
     select_endpoint(endpoint);
     csr = REG_USB_REG_INCSR;
+    logf("EPIN_handler(%d): 0x%x", endpoint, csr);
     
     if(ep->buf == NULL || ep->length == 0)
-    {
-        REG_USB_REG_INCSR = csr | USB_INCSR_INPKTRDY;
         return;
-    }
     
     if(csr & USB_INCSR_SENTSTALL)
     {
         REG_USB_REG_INCSR = csr & ~USB_INCSR_SENTSTALL;
+        return;
+    }
+    
+    if(ep->use_dma == true)
+        return;
+    
+    if(csr & USB_INCSR_FFNOTEMPT)
+    {
+        logf("FIFO is not empty!");
         return;
     }
     
@@ -272,9 +273,9 @@ static void EPIN_handler(unsigned int endpoint)
         length = (EP_BUF_LEFT(ep) <= ep->fifo_size ? EP_BUF_LEFT(ep) : ep->fifo_size);
     
     writeFIFO(ep, length);
+    REG_USB_REG_INCSR = csr | USB_INCSR_INPKTRDY;
     ep->sent += length;
     
-    REG_USB_REG_INCSR = csr | USB_INCSR_INPKTRDY;
     if(ep->sent >= ep->length)
     {
         usb_core_transfer_complete(endpoint, USB_DIR_IN, 0, ep->sent);
@@ -286,19 +287,15 @@ static void EPIN_handler(unsigned int endpoint)
 
 static void EPOUT_handler(unsigned int endpoint)
 {
-    logf("EPOUT_handler(%d)", endpoint);
-    
     struct usb_endpoint* ep = &endpoints[endpoint*2];
     unsigned int size, csr;
 
     select_endpoint(endpoint);
     csr = REG_USB_REG_OUTCSR;
+    logf("EPOUT_handler(%d): 0x%x", endpoint, csr);
     
     if(ep->buf == NULL || ep->length == 0)
-    {
-        REG_USB_REG_OUTCSR = csr & ~USB_OUTCSR_OUTPKTRDY;
         return;
-    }
     
     if(csr & USB_OUTCSR_SENTSTALL)
     {
@@ -318,6 +315,7 @@ static void EPOUT_handler(unsigned int endpoint)
     if(size < ep->fifo_size || ep->received >= ep->length)
     {
         usb_core_transfer_complete(endpoint, USB_DIR_OUT, 0, ep->received);
+        logf("receive transfer_complete");
         ep->received = 0;
         ep->length = 0;
         ep->buf = NULL;
@@ -346,9 +344,8 @@ static void setup_endpoint(struct usb_endpoint *ep)
         csr = (USB_INCSR_FF | USB_INCSR_CDT | USB_INCSRH_MODE);
         if(ep->use_dma)
             csr |= (USB_INCSRH_DMAREQENAB | USB_INCSRH_AUTOSET);
-        else
-            REG_USB_REG_INTRINE |= USB_INTR_EP(EP_NUMBER2(ep));
         
+        REG_USB_REG_INTRINE |= USB_INTR_EP(EP_NUMBER2(ep));
         REG_USB_REG_INCSR = csr;
     }
     else
@@ -361,13 +358,10 @@ static void setup_endpoint(struct usb_endpoint *ep)
         
         if(ep->use_dma)
             csr |= (USB_OUTCSRH_DMAREQENAB | USB_OUTCSRH_AUTOCLR | USB_OUTCSRH_DMAREQMODE);
-        else
-            REG_USB_REG_INTROUTE |= USB_INTR_EP(EP_NUMBER2(ep));
         
-        csr = REG_USB_REG_OUTCSR;
+        REG_USB_REG_INTROUTE |= USB_INTR_EP(EP_NUMBER2(ep));
+        REG_USB_REG_OUTCSR = csr;
     }
-    
-    //flushFIFO(ep);
 }
 
 static void udc_reset(void)
@@ -385,7 +379,7 @@ static void udc_reset(void)
 
     logf("udc_reset()");
 
-    register unsigned int i;
+    unsigned int i;
     
     /* EP0 init */
     ep0state = USB_EP0_IDLE;
@@ -402,11 +396,8 @@ static void udc_reset(void)
     /* Reset address */
     REG_USB_REG_FADDR = 0;
     
-    /* High speed and softconnect */
-    REG_USB_REG_POWER = (USB_POWER_SOFTCONN | USB_POWER_HSENAB);
-    
-    /* Enable SUSPEND */
-    /* REG_USB_REG_POWER |= USB_POWER_SUSPENDM; */
+    /* High speed, softconnect and suspend/resume */
+    REG_USB_REG_POWER = (USB_POWER_SOFTCONN | USB_POWER_HSENAB | USB_POWER_SUSPENDM);
     
     /* Reset EP0 */
     select_endpoint(0);
@@ -426,12 +417,12 @@ static void udc_reset(void)
 void UDC(void)
 {
     /* Read interrupt registers */
-    register unsigned char    intrUSB = REG_USB_REG_INTRUSB & 0x07; /* Mask SOF */
-    register unsigned short   intrIn  = REG_USB_REG_INTRIN;
-    register unsigned short   intrOut = REG_USB_REG_INTROUT;
-    register unsigned char    intrDMA = REG_USB_REG_INTR;
+    unsigned char    intrUSB = REG_USB_REG_INTRUSB & 0x07; /* Mask SOF */
+    unsigned short   intrIn  = REG_USB_REG_INTRIN;
+    unsigned short   intrOut = REG_USB_REG_INTROUT;
+    unsigned char    intrDMA = REG_USB_REG_INTR;
 
-    if(intrUSB == 0 && intrIn == 0 && intrOut == 0 && intrDMA == 0)
+    if(UNLIKELY(intrUSB == 0 && intrIn == 0 && intrOut == 0 && intrDMA == 0))
         return;
 
     /* EPIN & EPOUT are all handled in DMA */
@@ -447,12 +438,27 @@ void UDC(void)
         EPOUT_handler(2);
     if(intrUSB & USB_INTR_RESET)
         udc_reset();
-    //if(intrUSB & USB_INTR_SUSPEND);
-    //if(intrUSB & USB_INTR_RESUME);
+    if(intrUSB & USB_INTR_SUSPEND)
+    {
+        logf("USB suspend");
+    }
+    if(intrUSB & USB_INTR_RESUME)
+    {
+        logf("USB resume");
+    }
+#if 0
     if(intrDMA & USB_INTR_DMA_BULKIN)
     {
         logf("DMA_BULKIN %d", ((REG_USB_REG_CNTL1 >> 4) & 0xF));
-        usb_core_transfer_complete(1 | USB_DIR_IN, USB_DIR_IN, 0, 0);
+        unsigned int size = (unsigned int)endpoints[3].buf - REG_USB_REG_ADDR2;
+        if(size < endpoints[3].length)
+        {
+            select_endpoint(1);
+            writeFIFO(endpoints[3], endpoints[3].length - size);
+            REG_USB_REG_INCSR |= USB_INCSR_INPKTRDY;
+        }
+        
+        usb_core_transfer_complete(1, USB_DIR_IN, 0, endpoints[3].length);
     }
     if(intrDMA & USB_INTR_DMA_BULKOUT)
     {
@@ -461,8 +467,9 @@ void UDC(void)
         select_endpoint(1);
         REG_USB_REG_OUTCSR &= ~(USB_OUTCSRH_DMAREQENAB | USB_OUTCSR_OUTPKTRDY);
         
-        usb_core_transfer_complete(1 | USB_DIR_OUT, USB_DIR_OUT, 0, 0);
+        usb_core_transfer_complete(1, USB_DIR_OUT, 0, 0);
     }
+#endif
 }
 
 bool usb_drv_stalled(int endpoint, bool in)
@@ -606,26 +613,25 @@ int usb_drv_send(int endpoint, void* ptr, int length)
         restore_irq(flags);
         return 0;
     }
-    else if(endpoint == 1)
+    else
     {
+        flags = disable_irq_save();
+        endpoints[endpoint*2+1].buf = ptr;
+        endpoints[endpoint*2+1].sent = 0;
+        endpoints[endpoint*2+1].length = length;
 #if 0
         select_endpoint(endpoint);
         
         REG_USB_REG_ADDR2 = ((unsigned long)ptr) & 0x7fffffff;
         REG_USB_REG_COUNT2 = length;
-        REG_USB_REG_CNTL2 = 1;
+        REG_USB_REG_CNTL2 = (USB_CNTL_INTR_EN | USB_CNTL_MODE_1 | USB_CNTL_DIR_IN | USB_CNTL_ENA);
 #else
-        flags = disable_irq_save();
-        endpoints[3].buf = ptr;
-        endpoints[3].sent = 0;
-        endpoints[3].length = length;
-        EPIN_handler(1);
-        restore_irq(flags);
+
+        EPIN_handler(endpoint);
 #endif
+        restore_irq(flags);
         return 0;
     }
-    else
-        return -1;
 }
 
 int usb_drv_send_nonblocking(int endpoint, void* ptr, int length)
@@ -642,18 +648,15 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
 
     if(endpoint == EP_CONTROL && ptr == NULL && length == 0)
         return 0; /* ACK request, handled by the USB controller */
-    else if(endpoint == 1)
+    else
     {
-        logf("EP1 handled: %d", length);
         flags = disable_irq_save();
-        endpoints[2].buf = ptr;
-        endpoints[2].received = 0;
-        endpoints[2].length = length;
+        endpoints[endpoint*2].buf = ptr;
+        endpoints[endpoint*2].received = 0;
+        endpoints[endpoint*2].length = length;
         restore_irq(flags);
         return 0;
     }
-    else
-        return -1;
 }
 
 void usb_drv_set_test_mode(int mode)
@@ -682,7 +685,7 @@ void usb_drv_set_test_mode(int mode)
 
 int usb_drv_port_speed(void)
 {
-    return ((REG_USB_REG_POWER & USB_POWER_HSMODE) != 0) ? 1 : 0;
+    return (REG_USB_REG_POWER & USB_POWER_HSMODE) ? 1 : 0;
 }
 
 void usb_drv_cancel_all_transfers(void)
@@ -710,14 +713,13 @@ void usb_drv_cancel_all_transfers(void)
 
 void usb_drv_release_endpoint(int ep)
 {
-    //logf("usb_drv_release_endpoint(%d)", ep);
-    
     (void)ep;
+    logf("usb_drv_release_endpoint(%d, %s)", (ep & 0x7F), (ep >> 7) ? "IN" : "OUT");
 }
 
 int usb_drv_request_endpoint(int dir)
 {
-    logf("usb_drv_request_endpoint(%s)", dir == USB_DIR_IN ? "IN" : "OUT");
+    logf("usb_drv_request_endpoint(%s)", (dir == USB_DIR_IN) ? "IN" : "OUT");
     
     /* There are only 3+2 endpoints, so hardcode this ... */
     /* Currently only BULK endpoints ... */
