@@ -90,7 +90,11 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 bool viewportmanager_set_statusbar(bool enabled)
 {
     bool old = statusbar_enabled;
-    if (enabled && global_settings.statusbar)
+    if (enabled 
+#ifdef HAVE_LCD_BITMAP    
+                && global_settings.statusbar
+#endif    
+       )
     {
         add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_draw_statusbars);
         gui_syncstatusbar_draw(&statusbars, true);

@@ -101,7 +101,7 @@ static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
 #endif    
 }
 #else
-#define gui_wps_statusbar_draw(wps, force)
+#define gui_wps_statusbar_draw(wps, force) viewportmanager_set_statusbar(true)
 #endif
 #include "pcmbuf.h"
 
