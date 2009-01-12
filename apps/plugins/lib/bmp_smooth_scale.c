@@ -70,7 +70,7 @@
  * (C) Daniel M. Duley.
  */
 
-#include "bmp.h"
+#include "pluginlib_bmp.h"
 #include "lcd.h"
 
 void smooth_resize_bitmap(struct bitmap *src_bmp,  struct bitmap *dest_bmp)

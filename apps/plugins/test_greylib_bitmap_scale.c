@@ -21,8 +21,8 @@
 
 #include "plugin.h"
 #include "lib/grey.h"
-#include "lib/resize.h"
-#include "lib/bmp.h"
+#include "lib/pluginlib_resize.h"
+#include "lib/pluginlib_bmp.h"
 
 #if LCD_DEPTH == 1
 #define BMP_LOAD read_bmp_file

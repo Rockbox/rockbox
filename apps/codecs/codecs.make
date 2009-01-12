@@ -16,6 +16,7 @@ CODECS := $(subst $(ROOTDIR),$(BUILDDIR),$(CODECS))
 
 # the codec helper library
 include $(APPSDIR)/codecs/lib/libcodec.make
+OTHER_INC += -I$(APPSDIR)/codecs/lib
 
 # the codec libraries
 include $(APPSDIR)/codecs/demac/libdemac.make

@@ -29,7 +29,7 @@
  */
 
 #include "plugin.h"
-#include "lib/bmp.h"
+#include "lib/pluginlib_bmp.h"
 #include "lib/rgb_hsv.h"
 
 PLUGIN_HEADER

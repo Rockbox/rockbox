@@ -32,7 +32,7 @@ $(foreach dir,$(PLUGINSUBDIRS),$(eval include $(dir)/$(notdir $(dir)).make))
 PLUGIN_LDS := $(APPSDIR)/plugins/plugin.lds
 PLUGINLINK_LDS := $(BUILDDIR)/apps/plugins/plugin.link
 
-OTHER_INC += -I$(APPSDIR)/plugins
+OTHER_INC += -I$(APPSDIR)/plugins -I$(APPSDIR)/plugins/lib
 
 # special compile flags for plugins:
 PLUGINFLAGS = -I$(APPSDIR)/plugins -DPLUGIN $(CFLAGS) 

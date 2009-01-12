@@ -26,7 +26,7 @@
 
 #include "plugin.h"
 #include "lib/pluginlib_actions.h"
-#include "lib/bmp.h"
+#include "lib/pluginlib_bmp.h"
 
 PLUGIN_HEADER
 

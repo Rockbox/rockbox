@@ -9,7 +9,7 @@ rgb_hsv.c
    pluginlib for use with greylib overlay output
 */
 #if LCD_DEPTH == 1
-resize.c
+pluginlib_resize.c
 #endif
 grey_core.c
 grey_draw.c
@@ -37,7 +37,7 @@ picture.c
 xlcd_core.c
 xlcd_draw.c
 xlcd_scroll.c
-bmp.c
+pluginlib_bmp.c
 #ifdef HAVE_LCD_COLOR
 bmp_smooth_scale.c
 #endif

@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "plugin.h"
-#include "lib/bmp.h"
+#include "lib/pluginlib_bmp.h"
 
 #if defined(HAVE_LCD_COLOR)
 

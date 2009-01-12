@@ -31,7 +31,7 @@
 #include <codecs.h>
 #include "asm_arm.h"
 #include "asm_mcf5249.h"
-#include "misc.h"
+#include "codeclib_misc.h"
 
 #ifndef ICONST_ATTR_TREMOR_WINDOW
 #define ICONST_ATTR_TREMOR_WINDOW ICONST_ATTR

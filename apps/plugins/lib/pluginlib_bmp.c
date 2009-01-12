@@ -20,7 +20,7 @@
  *
  ****************************************************************************/
 
-#include "bmp.h"
+#include "pluginlib_bmp.h"
 
 #include "lcd.h"
 #include "file.h"
