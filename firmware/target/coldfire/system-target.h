@@ -215,11 +215,11 @@ extern void cf_set_cpu_frequency(long frequency);
 /* 11.2896 MHz */
 #define CPUFREQ_DEFAULT_MULT 1
 #define CPUFREQ_DEFAULT      (CPUFREQ_DEFAULT_MULT * CPU_FREQ)
-/* 45.1584 MHz */
-#define CPUFREQ_NORMAL_MULT  4
+/* 22.5792 MHz */
+#define CPUFREQ_NORMAL_MULT  2
 #define CPUFREQ_NORMAL       (CPUFREQ_NORMAL_MULT * CPU_FREQ)
-/* 124.1856 MHz */
-#define CPUFREQ_MAX_MULT     11
+/* 112.896 MHz */
+#define CPUFREQ_MAX_MULT     10
 #define CPUFREQ_MAX          (CPUFREQ_MAX_MULT * CPU_FREQ)
 
 #endif /* SYSTEM_TARGET_H */

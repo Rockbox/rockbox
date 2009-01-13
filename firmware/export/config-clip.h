@@ -75,6 +75,9 @@
 
 #define CONFIG_KEYPAD SANSA_CLIP_PAD
 
+/* define this if the target has volume keys which can be used in the lists */
+#define HAVE_VOLUME_IN_LIST
+
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 /* There is no hardware tone control */

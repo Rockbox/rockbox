@@ -109,11 +109,17 @@ static const struct button_mapping button_context_list[]  = {
     { ACTION_LISTTREE_PGUP,   BUTTON_HOME|BUTTON_LEFT,   BUTTON_HOME },
     { ACTION_LISTTREE_PGDOWN, BUTTON_HOME|BUTTON_RIGHT, BUTTON_HOME },
 
+#ifdef HAVE_VOLUME_IN_LIST
+    { ACTION_LIST_VOLUP,        BUTTON_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_LIST_VOLUP,        BUTTON_VOL_UP,                  BUTTON_NONE },
+
+    { ACTION_LIST_VOLDOWN,      BUTTON_VOL_DOWN,                BUTTON_NONE },
+    { ACTION_LIST_VOLDOWN,      BUTTON_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
+#endif
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
 
 static const struct button_mapping button_context_tree[]  = {
-    { ACTION_TREE_WPS,    BUTTON_UP|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_TREE_STOP,   BUTTON_POWER|BUTTON_REL,      BUTTON_POWER },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),

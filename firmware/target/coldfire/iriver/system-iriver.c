@@ -50,20 +50,13 @@
  */
 
 #if MEM < 32
-#define MAX_REFRESH_TIMER     59
-#define NORMAL_REFRESH_TIMER  21
+#define MAX_REFRESH_TIMER     54
+#define NORMAL_REFRESH_TIMER  10
 #define DEFAULT_REFRESH_TIMER 4
 #else
-#define MAX_REFRESH_TIMER     29
-#define NORMAL_REFRESH_TIMER  10
+#define MAX_REFRESH_TIMER     26
+#define NORMAL_REFRESH_TIMER  4
 #define DEFAULT_REFRESH_TIMER 1
-#endif
-
-#ifdef IRIVER_H300_SERIES
-#define RECALC_DELAYS(f) \
-        pcf50606_i2c_recalc_delay(f)
-#else
-#define RECALC_DELAYS(f)
 #endif
 
 #ifdef HAVE_SERIAL
@@ -73,6 +66,21 @@
 #define BAUDRATE_DIV_MAX (CPUFREQ_MAX/(BAUD_RATE*32*2))
 #endif
 
+static bool pll_initialized = false;
+
+static void init_pll(void)
+{
+    /* Refresh timer for bypass frequency */
+    PLLCR &= ~1;  /* Bypass mode */
+    PLLCR = 0x0189e025 | (PLLCR & 0x70400000); /* set 112 MHz */
+
+    /* Wait until the PLL has locked. This may take up to 10ms! */
+    while(!(PLLCR & 0x80000000)) {};
+
+    pll_initialized = true;
+}
+
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void set_cpu_frequency (long) __attribute__ ((section (".icode")));
 void set_cpu_frequency(long frequency)
@@ -81,84 +89,78 @@ void cf_set_cpu_frequency (long) __attribute__ ((section (".icode")));
 void cf_set_cpu_frequency(long frequency)
 #endif    
 {
+    if (!pll_initialized)
+        init_pll();
+
     switch(frequency)
     {
-    case CPUFREQ_MAX:
-        DCR = (0x8200 | DEFAULT_REFRESH_TIMER);
-              /* Refresh timer for bypass frequency */
-        PLLCR &= ~1;  /* Bypass mode */
-        timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
-        RECALC_DELAYS(CPUFREQ_MAX);
-        PLLCR = 0x018ae025 | (PLLCR & 0x70400000);
-        CSCR0 = 0x00001180; /* Flash: 4 wait states */
-        CSCR1 = 0x00001580; /* LCD: 5 wait states */
+        case CPUFREQ_MAX:
+            CSCR0 = 0x00001180; /* Flash: 4 wait states */
+            CSCR1 = 0x00001580; /* LCD: 5 wait states */
 #if CONFIG_USBOTG == USBOTG_ISP1362
-        CSCR3 = 0x00002180; /* USBOTG: 8 wait states */
+            CSCR3 = 0x00002180; /* USBOTG: 8 wait states */
 #endif
-        while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
-                                            This may take up to 10ms! */
-        timers_adjust_prescale(CPUFREQ_MAX_MULT, true);
-        DCR = (0x8200 | MAX_REFRESH_TIMER);          /* Refresh timer */
-        cpu_frequency = CPUFREQ_MAX;
-        IDECONFIG1 = 0x10100000 | (1 << 13) | (3 << 10);
-        /* SRE active on write (H300 USBOTG) | BUFEN2 enable | CS2Post | CS2Pre */
-        IDECONFIG2 = 0x40000 | (1 << 8); /* TA enable + CS2wait */
-
-#ifdef HAVE_SERIAL
-        UBG10 = BAUDRATE_DIV_MAX >> 8;
-        UBG20 = BAUDRATE_DIV_MAX & 0xff;
+#if CONFIG_RTC == RTC_PCF50606
+            pcf50606_i2c_recalc_delay(CPUFREQ_MAX);
 #endif
-        break;
+            timers_adjust_prescale(CPUFREQ_MAX_MULT, true);
+            DCR = (0x8200 | MAX_REFRESH_TIMER);          /* Refresh timer */
+            IDECONFIG1 = 0x10100000 | (1 << 13) | (3 << 10);
+            /* SRE active on write (H300 USBOTG) | BUFEN2 enable | CS2Post | CS2Pre */
+            IDECONFIG2 = 0x40000 | (1 << 8); /* TA enable 2 + CS2wait */
 
-    case CPUFREQ_NORMAL:
-        DCR = (DCR & ~0x01ff) | DEFAULT_REFRESH_TIMER;
-              /* Refresh timer for bypass frequency */
-        PLLCR &= ~1;  /* Bypass mode */
-        timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
-        RECALC_DELAYS(CPUFREQ_NORMAL);
-        PLLCR = 0x0589e021 | (PLLCR & 0x70400000);
-        CSCR0 = 0x00000580; /* Flash: 1 wait state */
-        CSCR1 = 0x00000180; /* LCD: 0 wait states */
+            PLLCR = (PLLCR & ~0x07000000) | (1 << 24); /* set CPUDIV */
+            DCR = (0x8200 | MAX_REFRESH_TIMER); /* DRAM refresh timer */
+            cpu_frequency = CPUFREQ_MAX;
+            break;
+
+        case CPUFREQ_NORMAL:
+            PLLCR = (PLLCR & ~0x07000000) | (5 << 24); /* set CPUDIV */
+            DCR = (0x8000 | NORMAL_REFRESH_TIMER); /* DRAM refresh timer */
+            cpu_frequency = CPUFREQ_MAX;
+
+            CSCR0 = 0x00000580; /* Flash: 1 wait state */
+            CSCR1 = 0x00000180; /* LCD: 0 wait states */
 #if CONFIG_USBOTG == USBOTG_ISP1362
-        CSCR3 = 0x00000580; /* USBOTG: 1 wait state */
+            CSCR3 = 0x00000580; /* USBOTG: 1 wait state */
 #endif
-        while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
-                                            This may take up to 10ms! */
-        timers_adjust_prescale(CPUFREQ_NORMAL_MULT, true);
-        DCR = (0x8000 | NORMAL_REFRESH_TIMER);       /* Refresh timer */
-        cpu_frequency = CPUFREQ_NORMAL;
-        IDECONFIG1 = 0x10100000 | (1 << 13) | (1 << 10);
-        /* SRE active on write (H300 USBOTG) | BUFEN2 enable | CS2Post | CS2Pre */
-        IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
+#if CONFIG_RTC == RTC_PCF50606
+            pcf50606_i2c_recalc_delay(CPUFREQ_NORMAL);
+#endif
+            timers_adjust_prescale(CPUFREQ_NORMAL_MULT, true);
 
-#ifdef HAVE_SERIAL
-        UBG10 = BAUDRATE_DIV_NORMAL >> 8;
-        UBG20 = BAUDRATE_DIV_NORMAL & 0xff;
+            IDECONFIG1 = 0x10100000 | (1 << 13) | (1 << 10);
+            /* SRE active on write (H300 USBOTG) | BUFEN2 enable | CS2Post | CS2Pre */
+            IDECONFIG2 = 0x40000; /* TA enable 2 */
+            break;
+            
+        default:
+            DCR = (DCR & ~0x01ff) | DEFAULT_REFRESH_TIMER;
+            /* Refresh timer for bypass frequency */
+            PLLCR &= ~1;  /* Bypass mode */
+            timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, true);
+#if CONFIG_RTC == RTC_PCF50606
+            pcf50606_i2c_recalc_delay(CPUFREQ_DEFAULT_MULT);
 #endif
-        break;
-    default:
-        DCR = (DCR & ~0x01ff) | DEFAULT_REFRESH_TIMER;
-              /* Refresh timer for bypass frequency */
-        PLLCR &= ~1;  /* Bypass mode */
-        timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, true);
-        RECALC_DELAYS(CPUFREQ_DEFAULT);
-        /* Power down PLL, but keep CRSEL and CLSEL */
-        PLLCR = 0x00800200 | (PLLCR & 0x70400000);
-        CSCR0 = 0x00000180; /* Flash: 0 wait states */
-        CSCR1 = 0x00000180; /* LCD: 0 wait states */
+            /* Power down PLL, but keep CRSEL and CLSEL */
+            PLLCR = 0x00800200 | (PLLCR & 0x70400000);
+            CSCR0 = 0x00000180; /* Flash: 0 wait states */
+            CSCR1 = 0x00000180; /* LCD: 0 wait states */
 #if CONFIG_USBOTG == USBOTG_ISP1362
-        CSCR3 = 0x00000180; /* USBOTG: 0 wait states */
+            CSCR3 = 0x00000180; /* USBOTG: 0 wait states */
 #endif
-        DCR = (0x8000 | DEFAULT_REFRESH_TIMER);       /* Refresh timer */
-        cpu_frequency = CPUFREQ_DEFAULT;
-        IDECONFIG1 = 0x10100000 | (1 << 13) | (1 << 10);
-        /* SRE active on write (H300 USBOTG) | BUFEN2 enable | CS2Post | CS2Pre */
-        IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
+            DCR = (0x8000 | DEFAULT_REFRESH_TIMER);       /* Refresh timer */
+            cpu_frequency = CPUFREQ_DEFAULT;
+            IDECONFIG1 = 0x10100000 | (1 << 13) | (1 << 10);
+            /* SRE active on write (H300 USBOTG) | BUFEN2 enable | CS2Post | CS2Pre */
+            IDECONFIG2 = 0x40000; /* TA enable 2 */
 
-#ifdef HAVE_SERIAL
-        UBG10 = BAUDRATE_DIV_DEFAULT >> 8;
-        UBG20 = BAUDRATE_DIV_DEFAULT & 0xff;
-#endif
-        break;
+            pll_initialized = false;
+            break;
     }
+
+#ifdef HAVE_SERIAL
+    UBG10 = BAUDRATE_DIV_NORMAL >> 8;
+    UBG20 = BAUDRATE_DIV_NORMAL & 0xff;
+#endif
 }
