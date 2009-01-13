@@ -303,7 +303,7 @@ void set_cpu_frequency(long frequency)
 
     cpu_frequency = CPUFREQ_MAX / divider;
 
-    CGU_PROC &= ~(0xf << 4) /* clear divider bits */ ^ ((divider-1) << 4);
+    CGU_PROC = (CGU_PROC & 0x0f) | ((divider-1) << 4);
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 #endif /* BOOTLOADER */
