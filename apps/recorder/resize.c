@@ -66,24 +66,30 @@
 */
 int recalc_dimension(struct dim *dst, struct dim *src)
 {
+    /* This only looks backwards. The input image size is being pre-scaled by
+     * the inverse of the pixel aspect ratio, so that once the size it scaled
+     * to meet the output constraints, the scaled image will have appropriate
+     * proportions.
+     */
+    int sw = src->width * LCD_PIXEL_ASPECT_HEIGHT;
+    int sh = src->height * LCD_PIXEL_ASPECT_WIDTH;
     int tmp;
     if (dst->width <= 0)
         dst->width = LCD_WIDTH;
     if (dst->height <= 0)
         dst->height = LCD_HEIGHT;
 #ifndef HAVE_UPSCALER
-    if (dst->width > src->width || dst->height > src->height)
+    if (dst->width > sw || dst->height > sh)
     {
-        dst->width = src->width;
-        dst->height = src->height;
+        dst->width = sw;
+        dst->height = sh;
     }
-    if (src->width == dst->width && src->height == dst->height)
+    if (sw == dst->width && sh == dst->height)
         return 1;
 #endif
-    tmp = (src->width * dst->height + (src->height >> 1)) / src->height;
+    tmp = (sw * dst->height + (sh >> 1)) / sh;
     if (tmp > dst->width)
-        dst->height = (src->height * dst->width + (src->width >> 1))
-                      / src->width;
+        dst->height = (sh * dst->width + (sw >> 1)) / sw;
     else
         dst->width = tmp;
     return src->width == dst->width && src->height == dst->height;

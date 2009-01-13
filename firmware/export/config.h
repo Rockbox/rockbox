@@ -379,6 +379,16 @@
 #endif
 #endif
 
+/* Pixel aspect ratio is defined in terms of a multiplier for pixel width and
+ * height, and is set to 1:1 if the target does not set a value
+ */
+#ifndef LCD_PIXEL_ASPECT_HEIGHT
+#define LCD_PIXEL_ASPECT_HEIGHT 1
+#endif
+#ifndef LCD_PIXEL_ASPECT_WIDTH
+#define LCD_PIXEL_ASPECT_WIDTH 1
+#endif
+
 /* define this in the target config.h to use a different size */
 #ifndef CONFIG_DEFAULT_ICON_HEIGHT
 #define CONFIG_DEFAULT_ICON_HEIGHT 8

@@ -24,6 +24,9 @@
 #define LCD_HEIGHT 64
 #define LCD_DEPTH  1
 
+#define LCD_PIXEL_ASPECT_WIDTH 4
+#define LCD_PIXEL_ASPECT_HEIGHT 5
+
 #define LCD_PIXELFORMAT VERTICAL_PACKING
 
 /* define this if you have an Ondio style 6-key keyboard */
