@@ -39,15 +39,6 @@ bool action_userabort(int timeout)
     \return
     \description
 
-size_t align_buffer(void **start, size_t size, size_t align)
-    \group kernel/ system
-    \conditions (CONFIG_CODEC == SWCODEC)
-    \param start
-    \param size
-    \param align
-    \return
-    \description
-
 const char *appsversion
     \return version of the plugin API
     \description

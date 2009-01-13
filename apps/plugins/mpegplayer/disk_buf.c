@@ -22,6 +22,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "mpegplayer.h"
+#include <system.h>
 
 static struct mutex disk_buf_mtx SHAREDBSS_ATTR;
 static struct event_queue disk_buf_queue SHAREDBSS_ATTR;
@@ -859,7 +860,7 @@ bool disk_buf_init(void)
         return false;
 
 #ifdef PROC_NEEDS_CACHEALIGN
-    disk_buf.size = CACHEALIGN_BUFFER(&disk_buf.start, disk_buf.size);
+    CACHEALIGN_BUFFER(disk_buf.start, disk_buf.size);
     disk_buf.start = UNCACHED_ADDR(disk_buf.start);
 #endif
     disk_buf.size -= DISK_GUARDBUF_SIZE;

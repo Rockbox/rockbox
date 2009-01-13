@@ -31,6 +31,7 @@
  *
  ****************************************************************************/
 
+#include <system.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -616,10 +617,7 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     uint8_t sc_buf[(needed <= len  || needed > MAX_SC_STACK_ALLOC) ?
                    0 : needed];
 #endif
-#if CONFIG_CODEC == SWCODEC
-    len = (unsigned int)align_buffer(PUN_PTR(void**, &buf), len,
-                                         sizeof(uint32_t));
-#endif
+    ALIGN_BUFFER(buf, len, sizeof(uint32_t));
     if (needed > len)
     {
 #if MAX_SC_STACK_ALLOC

@@ -36,9 +36,6 @@
 #define cpu_boost rb->cpu_boost
 #endif
 #define yield rb->yield
-#if CONFIG_CODEC == SWCODEC
-#define align_buffer rb->align_buffer
-#endif
 
 #endif
 

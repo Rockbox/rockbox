@@ -308,7 +308,6 @@ static const struct plugin_api rockbox_api = {
     mutex_init,
     mutex_lock,
     mutex_unlock,
-    align_buffer,
 #endif
 
     reset_poweroff_timer,

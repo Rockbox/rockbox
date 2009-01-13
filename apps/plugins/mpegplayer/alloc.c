@@ -27,6 +27,7 @@
 
 #include "plugin.h"
 #include "mpegplayer.h"
+#include <system.h>
 
 /* Main allocator */
 static off_t mem_ptr;
@@ -132,8 +133,8 @@ bool mpeg_alloc_init(unsigned char *buf, size_t mallocsize)
     mem_ptr = 0;
     /* Cache-align buffer or 4-byte align */
     mallocbuf = buf;
-    bufsize = align_buffer(PUN_PTR(void **, &mallocbuf),
-                           mallocsize, CACHEALIGN_UP(4));
+    bufsize = mallocsize;
+    ALIGN_BUFFER(mallocbuf, bufsize, CACHEALIGN_UP(4));
 
     /* Separate allocator for video */
     mpeg2_mem_ptr = 0;

@@ -78,23 +78,3 @@ int make_list_from_caps32(unsigned long src_mask,
 
     return count;
 } /* make_list_from_caps32 */
-
-/* Align a buffer and size to a size boundary while remaining within
- * the original boundaries */
-size_t align_buffer(void **start, size_t size, size_t align)
-{
-    void *newstart = *start;
-    void *newend = newstart + size;
-
-    /* Align the end down and the start up */
-    newend = (void *)ALIGN_DOWN((intptr_t)newend, align);
-    newstart = (void *)ALIGN_UP((intptr_t)newstart, align);
-
-    /* Hmmm - too small for this */
-    if (newend <= newstart)
-        return 0;
-
-    /* Return adjusted pointer and size */
-    *start = newstart;
-    return newend - newstart;
-}

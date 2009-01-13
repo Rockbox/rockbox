@@ -126,12 +126,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 135
+#define PLUGIN_API_VERSION 136
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 135
+#define PLUGIN_MIN_API_VERSION 136
 
 /* plugin return codes */
 enum plugin_status {
@@ -419,7 +419,6 @@ struct plugin_api {
     void (*mutex_init)(struct mutex *m);
     void (*mutex_lock)(struct mutex *m);
     void (*mutex_unlock)(struct mutex *m);
-    size_t (*align_buffer)(void **start, size_t size, size_t align);
 #endif
 
     void (*reset_poweroff_timer)(void);
@@ -883,14 +882,6 @@ enum plugin_status plugin_start(const struct plugin_api* rockbox, const void* pa
 #endif /* CACHE_FUNCTIONS_AS_CALL */
 
 #endif /* CACHE_FUNCTION_WRAPPERS */
-
-#ifndef ALIGN_BUFFER_WRAPPER
-#define ALIGN_BUFFER_WRAPPER(api) \
-        size_t align_buffer(void **start, size_t size, size_t align) \
-        { \
-            return (api)->align_buffer(start, size, align); \
-        }
-#endif /* ALIGN_BUFFER_WRAPPER */
 
 #endif /* __PCTOOL__ */
 #endif

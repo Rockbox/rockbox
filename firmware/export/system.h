@@ -110,6 +110,17 @@ int get_cpu_boost_counter(void);
 #define ALIGN_DOWN(n, a)     ((n)/(a)*(a))
 #define ALIGN_UP(n, a)       ALIGN_DOWN((n)+((a)-1),a)
 
+/* align start and end of buffer to nearest integer multiple of a */
+#define ALIGN_BUFFER(ptr,len,align) \
+{\
+    uintptr_t tmp_ptr1 = (uintptr_t)ptr; \
+    uintptr_t tmp_ptr2 = tmp_ptr1 + len;\
+    tmp_ptr1 = ALIGN_UP(tmp_ptr1,align); \
+    tmp_ptr2 = ALIGN_DOWN(tmp_ptr2,align); \
+    len = tmp_ptr2 - tmp_ptr1; \
+    ptr = (typeof(ptr))tmp_ptr1; \
+}
+
 /* live endianness conversion */
 #ifdef ROCKBOX_LITTLE_ENDIAN
 #define letoh16(x) (x)
@@ -275,7 +286,7 @@ static inline uint32_t swap_odd_even32(uint32_t value)
     __attribute__((aligned(CACHEALIGN_UP(x))))
 /* Aligns a buffer pointer and size to proper boundaries */
 #define CACHEALIGN_BUFFER(start, size) \
-    ({ align_buffer(PUN_PTR(void **, (start)), (size), CACHEALIGN_SIZE); })
+    ALIGN_BUFFER((start), (size), CACHEALIGN_SIZE)
 
 #else /* ndef PROC_NEEDS_CACHEALIGN */
 
@@ -286,8 +297,7 @@ static inline uint32_t swap_odd_even32(uint32_t value)
 #define CACHEALIGN_UP(x) (x)
 #define CACHEALIGN_DOWN(x) (x)
 /* Make no adjustments */
-#define CACHEALIGN_BUFFER(start, size) \
-    ({ (void)(start); (size); })
+#define CACHEALIGN_BUFFER(start, size)
 
 #endif /* PROC_NEEDS_CACHEALIGN */
 

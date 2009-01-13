@@ -37,6 +37,4 @@ int make_list_from_caps32(unsigned long src_mask,
                           unsigned long caps_mask,
                           unsigned long *caps_list);
 
-size_t align_buffer(void **start, size_t size, size_t align);
-
 #endif /* GENERAL_H */

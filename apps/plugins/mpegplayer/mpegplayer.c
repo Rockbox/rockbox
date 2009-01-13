@@ -283,7 +283,6 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 const struct plugin_api* rb;
 
 CACHE_FUNCTION_WRAPPERS(rb);
-ALIGN_BUFFER_WRAPPER(rb);
 
 /* One thing we can do here for targets with remotes is having a display
  * always on the remote instead of always forcing a popup on the main display */

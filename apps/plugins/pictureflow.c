@@ -2144,8 +2144,7 @@ enum plugin_status plugin_start(const struct plugin_api *api,
     rb->cpu_boost(true);
 #endif
     plugin_buf = rb->plugin_get_buffer(&plugin_buf_size);
-    plugin_buf_size = rb->align_buffer(PUN_PTR(void**,&plugin_buf),
-                                       plugin_buf_size, 4);
+    ALIGN_BUFFER(plugin_buf, plugin_buf_size, 4);
     ret = main();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
