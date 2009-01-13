@@ -34,7 +34,6 @@ PLUGIN_HEADER
 GREY_INFO_STRUCT
 static unsigned char grey_bm_buf[LCD_WIDTH * LCD_HEIGHT + 
                    BM_SCALED_SIZE(LCD_WIDTH,0,FORMAT_NATIVE,0)];
-static unsigned char grey_display_buf[2*LCD_WIDTH * LCD_HEIGHT];
 
 static const struct plugin_api* rb; /* global api struct pointer */
 
@@ -43,6 +42,8 @@ MEM_FUNCTION_WRAPPERS(rb)
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
+    void * plugin_buf;
+    size_t plugin_buf_len;
     static char filename[MAX_PATH];
     struct bitmap grey_bm = {
         .width = LCD_WIDTH,
@@ -72,9 +73,9 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         return PLUGIN_ERROR;
     }
 
-    long buf_taken;
-    if(!grey_init(rb, &grey_display_buf[0], sizeof(grey_display_buf), 0,
-                  LCD_WIDTH, LCD_HEIGHT, &buf_taken))
+    plugin_buf = rb->plugin_get_buffer(&plugin_buf_len);
+    if(!grey_init(rb, plugin_buf, plugin_buf_len, 0, LCD_WIDTH, LCD_HEIGHT,
+                  NULL))
     {
         rb->splash(HZ*2,"grey init failed");
         return PLUGIN_ERROR;
