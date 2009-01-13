@@ -256,10 +256,12 @@ static void usb_thread(void)
                 }
 #endif /* HAVE_USB_POWER */
 #ifdef HAVE_USBSTACK
+#ifdef HAVE_USB_POWER
                 /* Set the state to USB_POWERED for now. If permission to connect
                  * by threads and storage is granted it will be changed to
                  * USB_CONNECTED. */
                 usb_state = USB_POWERED;
+#endif
                 usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, true);
                 usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, false);
 
