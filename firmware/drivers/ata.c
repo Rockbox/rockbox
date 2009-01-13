@@ -61,8 +61,9 @@
 #define CMD_SET_FEATURES           0xEF
 #define CMD_SECURITY_FREEZE_LOCK   0xF5
 
-#define Q_SLEEP 0
-#define Q_CLOSE 1
+/* Should all be < 0x100 (which are reserved for control messages) */
+#define Q_SLEEP    0
+#define Q_CLOSE    1
 
 #define READ_TIMEOUT 5*HZ
 
@@ -143,7 +144,7 @@ static void ata_lock_unlock(struct ata_lock *l)
 #define mutex_unlock    ata_lock_unlock
 #endif /* MAX_PHYS_SECTOR_SIZE */
 
-#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB) && !defined(BOOTLOADER)
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
 #define ALLOW_USB_SPINDOWN
 #endif
 
@@ -164,7 +165,7 @@ static bool lba48 = false; /* set for 48 bit addressing */
 #endif
 static long ata_stack[(DEFAULT_STACK_SIZE*3)/sizeof(long)];
 static const char ata_thread_name[] = "ata";
-static struct event_queue ata_queue;
+static struct event_queue ata_queue SHAREDBSS_ATTR;
 static bool initialized = false;
 
 static long last_user_activity = -1;
@@ -910,7 +911,9 @@ static void ata_thread(void)
 #ifdef ALLOW_USB_SPINDOWN
                             if(!usb_mode)
 #endif
+                            {
                                 call_storage_idle_notifys(false);
+                            }
                             last_seen_mtx_unlock = 0;
                         }
                     }
@@ -923,7 +926,9 @@ static void ata_thread(void)
 #ifdef ALLOW_USB_SPINDOWN
                         if(!usb_mode)
 #endif
+                        {
                             call_storage_idle_notifys(true);
+                        }
                         ata_perform_sleep();
                         last_sleep = current_tick;
                     }
@@ -935,14 +940,21 @@ static void ata_thread(void)
                 {
                     mutex_lock(&ata_mtx);
                     ide_power_enable(false);
-                    mutex_unlock(&ata_mtx);
                     poweroff = true;
+                    mutex_unlock(&ata_mtx);
                 }
 #endif
                 break;
 
 #ifndef USB_NONE
             case SYS_USB_CONNECTED:
+                /* Tell the USB thread that we are safe */
+                DEBUGF("ata_thread got SYS_USB_CONNECTED\n");
+#ifdef ALLOW_USB_SPINDOWN
+                usb_mode = true;
+                usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                /* There is no need to force ATA power on */
+#else
                 if (poweroff) {
                     mutex_lock(&ata_mtx);
                     ata_led(true);
@@ -951,14 +963,8 @@ static void ata_thread(void)
                     mutex_unlock(&ata_mtx);
                 }
 
-                /* Tell the USB thread that we are safe */
-                DEBUGF("ata_thread got SYS_USB_CONNECTED\n");
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
-
-#ifdef ALLOW_USB_SPINDOWN
-                usb_mode = true;
-#else
                 /* Wait until the USB cable is extracted again */
+                usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&ata_queue);
 #endif
                 break;
@@ -971,12 +977,15 @@ static void ata_thread(void)
                 usb_mode = false;
                 break;
 #endif
-#endif
+#endif /* USB_NONE */
+
             case Q_SLEEP:
 #ifdef ALLOW_USB_SPINDOWN
                 if(!usb_mode)
 #endif
+                {
                     call_storage_idle_notifys(false);
+                }
                 last_disk_activity = current_tick - sleep_timeout + (HZ/2);
                 break;
 

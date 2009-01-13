@@ -293,6 +293,7 @@ static bool check_disk_present(IF_MV_NONVOID(int volume))
 #endif
 }
 
+#if 0
 static void try_release_ata(void)
 {
     /* Check if there is a connected drive left. If not, 
@@ -310,6 +311,7 @@ static void try_release_ata(void)
         usb_release_exclusive_ata();
     }
 }
+#endif
 
 #ifdef HAVE_HOTSWAP
 void usb_storage_notify_hotswap(int volume,bool inserted)
@@ -320,9 +322,7 @@ void usb_storage_notify_hotswap(int volume,bool inserted)
     }
     else {
         ejected[volume] = true;
-        try_release_ata();
     }
-
 }
 #endif
 
@@ -334,7 +334,6 @@ void usb_storage_reconnect(void)
         for(i=0;i<NUM_VOLUMES;i++)
             ejected[i] = !check_disk_present(IF_MV(i));
         logf("%s", __func__);
-        usb_request_exclusive_ata();
     }
 }
 
@@ -682,7 +681,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 #ifdef HAVE_HOTSWAP
     if(storage_removable(lun) && !storage_present(lun)) {
         ejected[lun] = true;
-        try_release_ata();
     }
 #endif
 
@@ -699,7 +697,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     switch (cbw->command_block[0]) {
         case SCSI_TEST_UNIT_READY:
             logf("scsi test_unit_ready %d",lun);
-            if(!usb_exclusive_ata()) {
+            if(!usb_exclusive_storage()) {
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
@@ -885,7 +883,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                     {
                         logf("scsi eject");
                         ejected[lun]=true;
-                        try_release_ata();
                     }
                 }
             }

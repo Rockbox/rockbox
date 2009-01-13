@@ -33,7 +33,7 @@ struct usb_class_driver {
 	/* Driver api starts here */
 
 	/* Set this to true if the driver needs exclusive disk access (e.g. usb storage) */
-    bool needs_exclusive_ata;
+    bool needs_exclusive_storage;
 
     /* Let the driver request endpoints it need. Returns zero on success */
     int (*request_endpoints)(struct usb_class_driver *);

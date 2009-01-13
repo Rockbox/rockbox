@@ -54,6 +54,9 @@
 #include "ata.h"
 #endif
 
+#ifndef USB_MAX_CURRENT
+#define USB_MAX_CURRENT 500
+#endif
 
 /*-------------------------------------------------------------------------*/
 /* USB protocol descriptors: */
@@ -94,7 +97,7 @@ static struct usb_config_descriptor __attribute__((aligned(2)))
     .bConfigurationValue = 1,
     .iConfiguration      = 0,
     .bmAttributes        = USB_CONFIG_ATT_ONE | USB_CONFIG_ATT_SELFPOWER,
-    .bMaxPower           = 250, /* 500mA in 2mA units */
+    .bMaxPower           = (USB_MAX_CURRENT+1) / 2, /* In 2mA units */
 };
 
 
@@ -179,7 +182,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 #ifdef USB_STORAGE
     [USB_DRIVER_MASS_STORAGE] = {
         .enabled = false,
-        .needs_exclusive_ata = true,
+        .needs_exclusive_storage = true,
         .first_interface = 0,
         .last_interface = 0,
         .request_endpoints = usb_storage_request_endpoints,
@@ -198,7 +201,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 #ifdef USB_SERIAL
     [USB_DRIVER_SERIAL] = {
         .enabled = false,
-        .needs_exclusive_ata = false,
+        .needs_exclusive_storage = false,
         .first_interface = 0,
         .last_interface = 0,
         .request_endpoints = usb_serial_request_endpoints,
@@ -217,7 +220,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 #ifdef USB_CHARGING_ONLY
     [USB_DRIVER_CHARGING_ONLY] = {
         .enabled = false,
-        .needs_exclusive_ata = false,
+        .needs_exclusive_storage = false,
         .first_interface = 0,
         .last_interface = 0,
         .request_endpoints = usb_charging_only_request_endpoints,
@@ -353,13 +356,17 @@ void usb_core_exit(void)
     int i;
     for(i=0;i<USB_NUM_DRIVERS;i++) {
         if(drivers[i].enabled && drivers[i].disconnect != NULL)
+        {
             drivers[i].disconnect ();
+            drivers[i].enabled = false;
+        }
     }
 
     if (initialized) {
         usb_drv_exit();
     }
     initialized = false;
+    usb_state = DEFAULT;
     logf("usb_core_exit() finished");
 }
 
@@ -390,6 +397,20 @@ void usb_core_enable_driver(int driver,bool enabled)
 bool usb_core_driver_enabled(int driver)
 {
     return drivers[driver].enabled;
+}
+
+bool usb_core_any_exclusive_storage(void)
+{
+    int i;
+    for(i=0;i<USB_NUM_DRIVERS;i++) {
+        if(drivers[i].enabled &&
+           drivers[i].needs_exclusive_storage)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 #ifdef HAVE_HOTSWAP
@@ -484,14 +505,6 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
         usb_core_set_serial_function_id();
 
         allocate_interfaces_and_endpoints();
-
-        for(i=0;i<USB_NUM_DRIVERS;i++) {
-            if(drivers[i].enabled &&
-               drivers[i].needs_exclusive_ata) {
-                usb_request_exclusive_ata();
-                break;
-            }
-        }
     }
 
     switch(req->bRequestType & 0x1f) {
@@ -788,7 +801,7 @@ unsigned short usb_allowed_current()
 {
     if (usb_state == CONFIGURED)
     {
-        return 500;
+        return MAX(USB_MAX_CURRENT, 100);
     }
     else
     {

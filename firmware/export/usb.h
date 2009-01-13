@@ -24,19 +24,32 @@
 #include "kernel.h"
 #include "button.h"
 
+#if defined(IPOD_COLOR) || defined(IPOD_4G) \
+ || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
+#define USB_FIREWIRE_HANDLING
+#endif
+
 /* Messages from usb_tick and thread states */
 enum {
-    USB_INSERTED,
-    USB_EXTRACTED,
-    USB_REENABLE,
-    USB_POWERED,
-    USB_TRANSFER_COMPLETION,
-    USB_REQUEST_DISK,
-    USB_RELEASE_DISK,
-    USB_REQUEST_REBOOT,
-    USB_QUIT,
+    USB_INSERTED,            /* Event+State */
+    USB_EXTRACTED,           /* Event+State */
+#ifdef HAVE_USB_POWER
+    USB_POWERED,             /* State */
+#endif
+#ifdef HAVE_LCD_BITMAP
+    USB_SCREENDUMP,          /* State */
+#endif
+#if (CONFIG_STORAGE & STORAGE_MMC)
+    USB_REENABLE,            /* Event */
+#endif
+#ifdef HAVE_USBSTACK
+    USB_TRANSFER_COMPLETION, /* Event */
+#endif
+#ifdef USB_FIREWIRE_HANDLING
+    USB_REQUEST_REBOOT,      /* Event */
+#endif
+    USB_QUIT,                /* Event */
 };
-
 
 #ifdef HAVE_USB_POWER
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -111,13 +124,10 @@ bool usb_charging_enabled(void);
 #ifdef HAVE_USBSTACK
 void usb_signal_transfer_completion(struct usb_transfer_completion_event_data* event_data);
 bool usb_driver_enabled(int driver);
-bool usb_exclusive_ata(void); /* ata is available for usb */
-void usb_request_exclusive_ata(void);
-void usb_release_exclusive_ata(void);
+bool usb_exclusive_storage(void); /* storage is available for usb */
 #endif
 
-#if defined(IPOD_COLOR) || defined(IPOD_4G) \
- || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
+#ifdef USB_FIREWIRE_HANDLING
 bool firewire_detect(void);
 #endif
 

@@ -2575,7 +2575,7 @@ static bool logf_usb_serial(void)
 }
 #endif
 
-#if defined(HAVE_USBSTACK) && defined(USB_STORAGE)
+#if 0 && defined(HAVE_USBSTACK) && defined(USB_STORAGE)
 static bool usb_reconnect(void)
 {
     splash(HZ, "Reconnect mass storage");
@@ -2720,7 +2720,7 @@ static const struct the_menu_item menuitems[] = {
 #if defined(HAVE_USBSTACK) && defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL)
         {"logf over usb",logf_usb_serial },
 #endif
-#if defined(HAVE_USBSTACK) && defined(USB_STORAGE)
+#if 0 && defined(HAVE_USBSTACK) && defined(USB_STORAGE)
         {"reconnect usb storage",usb_reconnect},
 #endif
 #ifdef CPU_BOOST_LOGGING
