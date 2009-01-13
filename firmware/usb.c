@@ -301,11 +301,13 @@ static void usb_thread(void)
                 }
 #endif /* HAVE_LCD_BITMAP */
 #ifndef HAVE_USBSTACK /* Stack must undo this if POWERED state was transitional */
+#ifdef HAVE_USB_POWER
                 if(usb_state == USB_POWERED)
                 {
                     usb_state = USB_EXTRACTED;
                     break;
                 }
+#endif /* HAVE_USB_POWER */
 #endif /* HAVE_USBSTACK */
                 if(usb_state == USB_INSERTED)
                 {
