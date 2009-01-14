@@ -76,12 +76,12 @@ static int usb_mmc_countdown = 0;
 static long usb_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char usb_thread_name[] = "usb";
 static unsigned int usb_thread_entry = 0;
-#endif /* USB_FULL_INIT */
-static struct event_queue usb_queue;
 #ifndef USB_STATUS_BY_EVENT
 #define NUM_POLL_READINGS (HZ/5)
 static int countdown;
 #endif /* USB_STATUS_BY_EVENT */
+#endif /* USB_FULL_INIT */
+static struct event_queue usb_queue;
 static bool usb_monitor_enabled;
 static int last_usb_status;
 #ifdef HAVE_USBSTACK
