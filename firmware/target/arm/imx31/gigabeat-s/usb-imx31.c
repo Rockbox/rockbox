@@ -59,6 +59,7 @@ void usb_connect_event(void)
         USB_INSERTED : USB_EXTRACTED;
     /* Notify power that USB charging is potentially available */
     charger_usb_detect_event(usb_status);
+    usb_status_event(usb_status);
 }
 
 int usb_detect(void)

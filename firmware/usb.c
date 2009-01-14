@@ -64,9 +64,6 @@ void screen_dump(void);   /* Nasty again. Defined in apps/ too */
 
 #if !defined(SIMULATOR) && !defined(USB_NONE)
 
-#define NUM_POLL_READINGS (HZ/5)
-static int countdown;
-
 static int usb_state;
 
 #if (CONFIG_STORAGE & STORAGE_MMC) && defined(USB_FULL_INIT)
@@ -81,8 +78,12 @@ static const char usb_thread_name[] = "usb";
 static unsigned int usb_thread_entry = 0;
 #endif /* USB_FULL_INIT */
 static struct event_queue usb_queue;
-static int last_usb_status;
+#ifndef USB_STATUS_BY_EVENT
+#define NUM_POLL_READINGS (HZ/5)
+static int countdown;
+#endif /* USB_STATUS_BY_EVENT */
 static bool usb_monitor_enabled;
+static int last_usb_status;
 #ifdef HAVE_USBSTACK
 static bool exclusive_storage_access;
 #endif
@@ -269,15 +270,17 @@ static void usb_thread(void)
                  * access requirements. */
                 exclusive_storage_access = usb_core_any_exclusive_storage();
 
-                if (exclusive_storage_access)
-#endif /* HAVE_USBSTACK */
+                if(!exclusive_storage_access)
                 {
-                    /* Tell all threads that they have to back off the storage.
-                       We subtract one for our own thread. */
-                    num_acks_to_expect = queue_broadcast(SYS_USB_CONNECTED, 0) - 1;
-                    DEBUGF("USB inserted. Waiting for ack from %d threads...\n",
-                           num_acks_for_connect);
+                    usb_enable(true);
+                    break;
                 }
+#endif /* HAVE_USBSTACK */
+                /* Tell all threads that they have to back off the storage.
+                   We subtract one for our own thread. */
+                num_acks_to_expect = queue_broadcast(SYS_USB_CONNECTED, 0) - 1;
+                DEBUGF("USB inserted. Waiting for ack from %d threads...\n",
+                       num_acks_for_connect);
                 break;
 
             case SYS_USB_CONNECTED_ACK:
@@ -322,10 +325,14 @@ static void usb_thread(void)
                 usb_state = USB_EXTRACTED;
 #ifdef HAVE_USBSTACK
                 if (!exclusive_storage_access)
+                {
+                    usb_enable(false);
                     break;
+                }
 
                 exclusive_storage_access = false;
 #endif /* HAVE_USBSTACK */
+
                 /* Tell all threads that we are back in business */
                 num_acks_to_expect =
                     queue_broadcast(SYS_USB_DISCONNECTED, 0) - 1;
@@ -382,6 +389,24 @@ static void usb_thread(void)
     }
 }
 
+#ifdef USB_STATUS_BY_EVENT
+void usb_status_event(int current_status)
+{
+    /* Status should be USB_INSERTED or USB_EXTRACTED.
+     * Caller isn't expected to filter for changes in status. */
+    if (usb_monitor_enabled && last_usb_status != current_status)
+    {
+        last_usb_status = current_status;
+        queue_post(&usb_queue, current_status, 0);
+    }
+}
+
+void usb_start_monitoring(void)
+{
+    usb_monitor_enabled = true;
+    usb_status_event(usb_detect());
+}
+#else /* !USB_STATUS_BY_EVENT */
 static void usb_tick(void)
 {
     int current_status;
@@ -441,6 +466,12 @@ static void usb_tick(void)
     }
 #endif
 }
+
+void usb_start_monitoring(void)
+{
+    usb_monitor_enabled = true;
+}
+#endif /* USB_STATUS_BY_EVENT */
 #endif /* USB_FULL_INIT */
 
 void usb_acknowledge(long id)
@@ -450,12 +481,14 @@ void usb_acknowledge(long id)
 
 void usb_init(void)
 {
+    /* We assume that the USB cable is extracted */
     usb_state = USB_EXTRACTED;
+    last_usb_status = USB_EXTRACTED;
+    usb_monitor_enabled = false;
+
 #ifdef HAVE_USBSTACK
     exclusive_storage_access = false;
 #endif
-    usb_monitor_enabled = false;
-    countdown = -1;
 
 #ifdef USB_FIREWIRE_HANDLING
     firewire_countdown = -1;
@@ -465,19 +498,17 @@ void usb_init(void)
     usb_init_device();
 #ifdef USB_FULL_INIT
     usb_enable(false);
-#endif
 
-    /* We assume that the USB cable is extracted */
-    last_usb_status = USB_EXTRACTED;
-
-#ifdef USB_FULL_INIT
     queue_init(&usb_queue, true);
     
     usb_thread_entry = create_thread(usb_thread, usb_stack,
                        sizeof(usb_stack), 0, usb_thread_name
                        IF_PRIO(, PRIORITY_SYSTEM) IF_COP(, CPU));
 
+#ifndef USB_STATUS_BY_EVENT
+    countdown = -1;
     tick_add_task(usb_tick);
+#endif
 #endif /* USB_FULL_INIT */
 }
 
@@ -525,11 +556,6 @@ int usb_wait_for_disconnect_w_tmo(struct event_queue *q, int ticks)
 #endif /* USB_FULL_INIT */
 }
 
-void usb_start_monitoring(void)
-{
-    usb_monitor_enabled = true;
-}
-
 #ifdef USB_DRIVER_CLOSE
 void usb_close(void)
 {
@@ -539,7 +565,9 @@ void usb_close(void)
     if (thread == 0)
         return;
 
+#ifndef USB_STATUS_BY_EVENT
     tick_remove_task(usb_tick);
+#endif
     usb_monitor_enabled = false;
 
     queue_post(&usb_queue, USB_QUIT, 0);

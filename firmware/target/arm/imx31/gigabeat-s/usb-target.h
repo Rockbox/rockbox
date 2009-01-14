@@ -25,6 +25,9 @@
 #define USB_DRIVER_CLOSE
 #endif
 
+/* Connect by events, not by tick polling */
+#define USB_STATUS_BY_EVENT
+
 void usb_connect_event(void);
 void usb_init_device(void);
 int usb_detect(void);

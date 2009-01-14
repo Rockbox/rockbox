@@ -114,6 +114,8 @@ void usb_wait_for_disconnect(struct event_queue *q);
 int usb_wait_for_disconnect_w_tmo(struct event_queue *q, int ticks);
 bool usb_inserted(void); /* return the official value, what's been reported to the threads */
 int usb_detect(void); /* return the raw hardware value - nothing/pc/charger */
+/* For tick-less USB monitoring (USB_STATUS_BY_EVENT) */
+void usb_status_event(int current_status);
 #ifdef HAVE_USB_POWER
 bool usb_powered(void);
 #ifdef CONFIG_CHARGING
