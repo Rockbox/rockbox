@@ -1067,20 +1067,22 @@ void recalc_table(void)
 #if (LCD_PIXELFORMAT == RGB565SWAPPED)
 static inline pix_t fade_color(pix_t c, unsigned int a)
 {
+    unsigned int result;
     c = swap16(c);
-    unsigned int result=0;
-    result |= (((c & 0x1f) * a) >> 8) & 0x1f;
-    result |= (((c & 0x7e0) * a) >> 8) & 0x7e0;
-    result |= (((c & 0xf800) * a) >> 8) & 0xf800;
+    a = (a + 2) & 0x1fc;
+    result = ((c & 0xf81f) * a) & 0xf81f00;
+    result |= ((c & 0x7e0) * a) & 0x7e000;
+    result >>= 8;
     return swap16(result);
 }
 #elif LCD_PIXELFORMAT == RGB565
 static inline pix_t fade_color(pix_t c, unsigned int a)
 {
-    unsigned int result=0;
-    result |= (((c & 0x1f) * a) >> 8) & 0x1f;
-    result |= (((c & 0x7e0) * a) >> 8) & 0x7e0;
-    result |= (((c & 0xf800) * a) >> 8) & 0xf800;
+    unsigned int result;
+    a = (a + 2) & 0x1fc;
+    result = ((c & 0xf81f) * a) & 0xf81f00;
+    result |= ((c & 0x7e0) * a) & 0x7e000;
+    result >>= 8;
     return result;
 }
 #else
