@@ -633,6 +633,7 @@ static int dirbrowse()
         return GO_TO_PREVIOUS;  /* No files found for rockbox_browser() */
     }
     
+    gui_synclist_draw(&tree_lists);
     while(1) {
         struct entry *dircache = tc.dircache;
         bool restore = false;
