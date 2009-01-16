@@ -1123,7 +1123,7 @@ void render_slide(struct slide_data *slide, const int alpha)
     }
 
     int x;
-    for (x = fmax(xi, 0); x <= w; x++) {
+    for (x = fmax(xi, 0); x < w; x++) {
         PFreal hity = 0;
         PFreal fk = rays[x];
         if (sdy) {
