@@ -29,10 +29,6 @@
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
 
-/* here is a global api struct pointer. while not strictly necessary,
-   it's nice not to have to pass the api pointer in all function calls
-   in the plugin */
-const struct plugin_api* rb;
 int shut,cleanshut;
 char *errormsg;
 
@@ -324,13 +320,9 @@ static int gnuboy_main(const char *rom)
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
-    PLUGIN_IRAM_INIT(api)
-
-    /* if you are using a global api pointer, don't forget to copy it!
-       otherwise you will get lovely "I04: IllInstr" errors... :-) */
-    rb = api;
+    PLUGIN_IRAM_INIT(rb)
 
     rb->lcd_setfont(0);
 

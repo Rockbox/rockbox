@@ -176,9 +176,7 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define CELL_WIDTH  (LCD_WIDTH / 7)
 #define CELL_HEIGHT (LCD_HEIGHT / 7)
 
-static const struct plugin_api* rb;
-
-MEM_FUNCTION_WRAPPERS(rb)
+MEM_FUNCTION_WRAPPERS
 
 static bool leap_year;
 /* days_in_month[][0] is for December */
@@ -788,7 +786,7 @@ static void prev_day(struct shown *shown, int step)
         draw_calendar(shown);
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     struct today today;
     struct shown shown;
@@ -796,8 +794,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     int button;
     
     (void)(parameter);
-
-    rb = api;
 
     calendar_init(&today, &shown);
     load_memo(&shown);

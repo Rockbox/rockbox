@@ -298,7 +298,6 @@ PLUGIN_HEADER
 #endif
 #endif
 
-static const struct plugin_api* rb;
 static int spots[20];
 static int toggle[20];
 static int cursor_pos, moves;
@@ -645,12 +644,11 @@ static bool flipit_loop(void)
 }
 
 /* called function from outside */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int i, rc;
 
     (void)parameter;
-    rb = api;
 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_background(LCD_WHITE);

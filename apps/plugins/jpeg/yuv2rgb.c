@@ -28,9 +28,6 @@
 #include "plugin.h"
 #include "yuv2rgb.h"
 
-/* Needed for memset and rb->lcd_framebuffer */
-extern const struct plugin_api* rb;
-
 /*
  * Conversion of full 0-255 range YCrCb to RGB:
  *   |R|   |1.000000 -0.000001  1.402000| |Y'|

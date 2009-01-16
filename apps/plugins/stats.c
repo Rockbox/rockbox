@@ -22,7 +22,6 @@
 
 PLUGIN_HEADER
 
-static const struct plugin_api* rb;
 static int files, dirs, musicfiles, largestdir;
 static int lasttick;
 static bool abort;
@@ -200,13 +199,12 @@ void traversedir(char* location, char* name)
         largestdir = files_in_dir;
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int button;
 
     (void)parameter;
 
-    rb = api;
     files = 0;
     dirs = 0;
     musicfiles = 0;

@@ -98,9 +98,6 @@ unsigned char SCALE_BMP[][13] =
 #define SE_SAVE 4
 #define SE_COUNT 5
 
-/* the global api pointer */
-static const struct plugin_api* rb;
-
 /* contains the file name of the song that is to be split */
 static char path_mp3[MAX_PATH];
 
@@ -1250,12 +1247,11 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
     return retval;
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     struct mp3entry* mp3;
 
     (void)parameter;
-    rb = api;
     rb->lcd_clear_display();
     rb->lcd_update();
     mp3 = rb->audio_current_track();

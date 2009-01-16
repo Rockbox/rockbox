@@ -194,8 +194,6 @@ PLUGIN_HEADER
 #endif
 #endif
 
-static const struct plugin_api* rb;
-
 struct pong {
     int ballx; /* current X*RES position of the ball */
     int bally; /* current Y*RES position of the ball */
@@ -491,7 +489,7 @@ void showscore(struct pong *p)
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     struct pong pong;
     int game = 1;
@@ -515,8 +513,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
        this to avoid the compiler warning about it */
     (void)parameter;
   
-    rb = api; /* use the "standard" rb pointer */
-
     /* Clear screen */
     rb->lcd_clear_display();
 

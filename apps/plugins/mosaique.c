@@ -157,7 +157,7 @@ PLUGIN_HEADER
 #endif
 #endif
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int button;
     int timer = 10;
@@ -165,11 +165,10 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     int y=0;
     int sx = 3;
     int sy = 3;
-    const struct plugin_api* rb = api;
     (void)parameter;
 
 #ifdef HAVE_LCD_CHARCELLS
-    if (!pgfx_init(rb, 4, 2))
+    if (!pgfx_init(4, 2))
     {
         rb->splash(HZ*2, "Old LCD :(");
         return PLUGIN_OK;

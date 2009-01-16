@@ -41,8 +41,6 @@ PLUGIN_IRAM_DECLARE
 
 PLUGIN_HEADER
 
-static const struct plugin_api* rb;
-
 /* Screen logging */
 static int line;
 static int max_line;
@@ -286,7 +284,7 @@ static void time_greyscale(void)
     int fps, load;
 
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
-    if (!grey_init(rb, gbuf, gbuf_size, GREY_ON_COP,
+    if (!grey_init(gbuf, gbuf_size, GREY_ON_COP,
                    LCD_WIDTH, LCD_HEIGHT, NULL))
     {
         log_text("greylib: out of memory.");
@@ -334,7 +332,7 @@ static void time_greyscale(void)
 #endif
 
 /* plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
 #ifndef SIMULATOR
     char str[32];
@@ -342,15 +340,14 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 #endif
 
     /* standard stuff */
-    PLUGIN_IRAM_INIT(api)
+    PLUGIN_IRAM_INIT(rb)
     (void)parameter;
-    rb = api;
     
     log_init();
 #ifndef SIMULATOR
     cpu_freq = *rb->cpu_frequency; /* remember CPU frequency */
 #endif
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     log_text("Main LCD Update");
     time_main_update();
@@ -375,7 +372,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
                      (cpu_freq + 500000) / 1000000);
     log_text(str);
 #endif
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 
     /* wait until user closes plugin */
     while (rb->button_get(true) != FPS_QUIT);

@@ -43,8 +43,6 @@
 
 PLUGIN_HEADER
 
-static const struct plugin_api* rb; /* global api struct pointer */
-
 #ifndef HAVE_LCD_COLOR
 GREY_INFO_STRUCT
         static unsigned char draw_buffer[FIRE_WIDTH];
@@ -267,7 +265,7 @@ void cleanup(void *parameter)
     grey_release();
 #endif
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 }
 
 
@@ -280,7 +278,7 @@ int init_grey(void)
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
-    if (!grey_init(rb, gbuf, gbuf_size, GREY_ON_COP,
+    if (!grey_init(gbuf, gbuf_size, GREY_ON_COP,
                    FIRE_WIDTH, LCD_HEIGHT, NULL)){
         rb->splash(HZ, "not enough memory");
         return PLUGIN_ERROR;
@@ -312,7 +310,7 @@ int main(void)
         fire_draw(&fire);
         rb->yield();
 
-        action = pluginlib_getaction(rb, 0, plugin_contexts, PLA_ARRAY_COUNT);
+        action = pluginlib_getaction(0, plugin_contexts, PLA_ARRAY_COUNT);
 
         switch(action){
             case FIRE_QUIT:
@@ -346,17 +344,16 @@ int main(void)
 
 /*************************** Plugin entry point ****************************/
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int ret;
 
-    rb = api; //copy to global api pointer
     (void)parameter;
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     ret = main();
 

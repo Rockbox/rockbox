@@ -41,8 +41,6 @@ PLUGIN_HEADER
 static fb_data buffer[PPM_MAXSIZE];
 static fb_data lcd_buf[LCD_WIDTH * LCD_HEIGHT];
 
-static const struct plugin_api* rb; /* global api struct pointer */
-
 int ppm_read_magic_number(int fd)
 {
     char i1, i2;
@@ -270,7 +268,7 @@ int read_ppm(int fd,
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     static char filename[MAX_PATH];
     int fd;
@@ -284,8 +282,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     struct bitmap small_bitmap, orig_bitmap;
     
     if(!parameter) return PLUGIN_ERROR;
-
-    rb = api;
 
     rb->strcpy(filename, parameter);
     

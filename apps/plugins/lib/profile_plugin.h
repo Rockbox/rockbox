@@ -26,8 +26,6 @@
 
 #include "plugin.h"
 
-void profile_init(const struct plugin_api* pa);
-
 void __cyg_profile_func_enter(void *this_fn, void *call_site)
     NO_PROF_ATTR ICODE_ATTR;
 void __cyg_profile_func_exit(void *this_fn, void *call_site)

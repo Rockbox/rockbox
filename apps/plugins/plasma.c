@@ -38,7 +38,6 @@ PLUGIN_HEADER
 
 /******************************* Globals ***********************************/
 
-static const struct plugin_api* rb; /* global api struct pointer */
 static unsigned char wave_array[256];  /* Pre calculated wave array */
 #ifdef HAVE_LCD_COLOR
 static fb_data colours[256]; /* Smooth transition of shades */
@@ -245,7 +244,7 @@ void cleanup(void *parameter)
     grey_release();
 #endif
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 }
 
 /*
@@ -274,7 +273,7 @@ int main(void)
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
-    grey_init(rb, gbuf, gbuf_size, GREY_ON_COP, LCD_WIDTH, LCD_HEIGHT, NULL);
+    grey_init(gbuf, gbuf_size, GREY_ON_COP, LCD_WIDTH, LCD_HEIGHT, NULL);
     /* switch on greyscale overlay */
     grey_show(true);
 #endif
@@ -365,17 +364,16 @@ int main(void)
 
 /*************************** Plugin entry point ****************************/
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int ret;
 
-    rb = api; /* copy to global api pointer */
     (void)parameter;
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     ret = main();
 

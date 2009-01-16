@@ -56,8 +56,6 @@ struct flash_info
     char name[32];
 };
 
-static const struct plugin_api* rb; /* here is a global api struct pointer */
-
 #ifdef IRIVER_H100_SERIES
 #define SEC_SIZE 4096
 #define BOOTLOADER_ERASEGUARD  (BOOTLOADER_ENTRYPOINT / SEC_SIZE)
@@ -804,12 +802,10 @@ void DoUserDialog(char* filename)
 
 /***************** Plugin Entry Point *****************/
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int oldmode;
 
-    rb = api; /* copy to global api pointer */
-    
     /* now go ahead and have fun! */
     oldmode = rb->system_memory_guard(MEMGUARD_NONE); /*disable memory guard */
     DoUserDialog((char*) parameter);

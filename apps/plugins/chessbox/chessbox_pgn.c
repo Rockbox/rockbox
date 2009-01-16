@@ -26,8 +26,6 @@
 #define LOG_FILE  PLUGIN_GAMES_DIR  "/chessbox.log"
 int loghandler;
 
-const struct plugin_api* rb;
-
 short kn_offs[8][2] = {{2,1},{2,-1},{-2,1},{-2,-1},{1,2},{1,-2},{-1,2},{-1,-2}};
 short rk_offs[4][2] = {{1,0},{-1,0},{0,1},{0,-1}};
 short bp_offs[4][2] = {{1,1},{-1,1},{1,-1},{-1,-1}};
@@ -559,7 +557,7 @@ void write_pgn_token(int fhandler, char *buffer, size_t *line_length){
 }
 
 /* ---- api functions ---- */
-struct pgn_game_node* pgn_list_games(const struct plugin_api* api,const char* filename){
+struct pgn_game_node* pgn_list_games(const char* filename){
     int fhandler;
     char line_buffer[128];
     struct pgn_game_node size_node, *first_game = NULL;
@@ -567,7 +565,6 @@ struct pgn_game_node* pgn_list_games(const struct plugin_api* api,const char* fi
     unsigned short game_count = 1;
     int line_count = 0;
     bool header_start = true, game_start = false;
-    rb = api;
 
     if ( (fhandler = rb->open(filename, O_RDONLY)) == 0 ) return NULL;
 
@@ -617,15 +614,12 @@ struct pgn_game_node* pgn_list_games(const struct plugin_api* api,const char* fi
     return first_game;
 }
 
-struct pgn_game_node* pgn_show_game_list(const struct plugin_api* api,
-                                         struct pgn_game_node* first_game){
+struct pgn_game_node* pgn_show_game_list(struct pgn_game_node* first_game){
     int curr_selection = 0;
     int button;
     struct gui_synclist games_list;
     int i;
     struct pgn_game_node *temp_node = first_game;
-
-    rb=api;
 
     for (i=0;temp_node != NULL;i++){
         temp_node = temp_node->next_node;
@@ -661,7 +655,7 @@ struct pgn_game_node* pgn_show_game_list(const struct plugin_api* api,
     }
 }
 
-void pgn_parse_game(const struct plugin_api* api, const char* filename,
+void pgn_parse_game(const char* filename,
                     struct pgn_game_node* selected_game){
     struct pgn_ply_node size_ply, *first_ply = NULL;
     struct pgn_ply_node *temp_ply = NULL, *curr_node = NULL;
@@ -670,7 +664,6 @@ void pgn_parse_game(const struct plugin_api* api, const char* filename,
     char token_buffer[10];
     unsigned short pos;
     unsigned short curr_player = white;
-    rb = api;
 
     fhandler = rb->open(filename, O_RDONLY);
 
@@ -731,12 +724,10 @@ void pgn_parse_game(const struct plugin_api* api, const char* filename,
     rb->close(fhandler);
 }
 
-struct pgn_game_node* pgn_init_game(const struct plugin_api* api){
+struct pgn_game_node* pgn_init_game(void){
     struct pgn_game_node game_size, *game;
     struct pgn_ply_node ply_size, *ply;
     struct tm *current_time;
-
-    rb = api;
 
     if (bufptr == NULL){
         pl_malloc_init();
@@ -769,11 +760,9 @@ struct pgn_game_node* pgn_init_game(const struct plugin_api* api){
     return game;
 }
 
-void pgn_append_ply(const struct plugin_api* api, struct pgn_game_node* game,
+void pgn_append_ply(struct pgn_game_node* game,
                     unsigned short ply_player, char *move_buffer, bool is_mate){
     struct pgn_ply_node ply_size, *ply, *temp;
-
-    rb = api;
 
     ply = (struct pgn_ply_node *)pl_malloc(sizeof ply_size);
     ply->player = ply_player;
@@ -803,10 +792,8 @@ void pgn_append_ply(const struct plugin_api* api, struct pgn_game_node* game,
     temp->prev_node = ply;
 }
 
-void pgn_set_result(const struct plugin_api* api, struct pgn_game_node* game,
+void pgn_set_result(struct pgn_game_node* game,
                     bool is_mate){
-
-    rb = api;
 
     struct pgn_ply_node *ply;
     for(ply=game->first_ply;ply->next_node != NULL;ply=ply->next_node);
@@ -817,14 +804,12 @@ void pgn_set_result(const struct plugin_api* api, struct pgn_game_node* game,
     }
 }
 
-void pgn_store_game(const struct plugin_api* api, struct pgn_game_node* game){
+void pgn_store_game(struct pgn_game_node* game){
     int fhandler;
     struct pgn_ply_node *ply;
     unsigned ply_count;
     size_t line_length=0;
     char buffer[10];
-
-    rb = api;
 
     GNUChess_Initialize();
 

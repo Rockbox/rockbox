@@ -26,8 +26,6 @@ PLUGIN_HEADER
 
 /******************************* Globals ***********************************/
 
-static const struct plugin_api* rb; /* global api struct pointer */
-
 /* Key assignement */
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
     (CONFIG_KEYPAD == IPOD_3G_PAD) || \
@@ -187,8 +185,6 @@ static const struct plugin_api* rb; /* global api struct pointer */
 #define MAX_INIT_STAR_Y LCD_CENTER_Y*Z_MAX_DIST
 
 #define MSG_DISP_TIME 30
-
-static const struct plugin_api* rb; /* global api struct pointer */
 
 /*
  * Each star's stuffs
@@ -442,7 +438,7 @@ int plugin_main(void)
             case(STARFIELD_QUIT):
             case(SYS_USB_CONNECTED):
                 /* Turn on backlight timeout (revert to settings) */
-                backlight_use_settings(rb); /* backlight control in lib/helper.c*/
+                backlight_use_settings(); /* backlight control in lib/helper.c*/
                 return PLUGIN_OK;
                 break;
         }
@@ -451,14 +447,13 @@ int plugin_main(void)
 
 /*************************** Plugin entry point ****************************/
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int ret;
 
-    rb = api; /* copy to global api pointer */
     (void)parameter;
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     ret = plugin_main();
 

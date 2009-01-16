@@ -328,8 +328,6 @@ static char board[STAR_HEIGHT][STAR_WIDTH];
 static int char_width = -1;
 static int char_height = -1;
 
-static const struct plugin_api* rb;
-
 /* this arrays contains a group of levels loaded into memory */
 static unsigned char* levels =
 "****************\n"
@@ -1116,10 +1114,9 @@ static int star_menu(void)
 /**
  * Main entry point
  */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
-    rb = api;
 
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);

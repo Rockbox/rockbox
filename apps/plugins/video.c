@@ -143,7 +143,6 @@ typedef struct /* the little header for all audio blocks */
 
 /****************** globals ******************/
 
-static const struct plugin_api* rb; /* here is a global api struct pointer */
 static char gPrint[32]; /* a global printf buffer, saves stack */
 
 
@@ -587,7 +586,7 @@ void Cleanup(void *fd)
         rb->mp3_play_stop(); /* stop audio ISR */
 
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 
     /* restore normal contrast */
     rb->lcd_set_contrast(rb->global_settings->contrast);
@@ -956,7 +955,7 @@ int main(char* filename)
     {
         gPlay.bHasVideo = true;
         /* Turn off backlight timeout */
-        backlight_force_on(rb); /* backlight control in lib/helper.c */
+        backlight_force_on(); /* backlight control in lib/helper.c */
     }
 
     /* prepare audio playback, if contained */
@@ -1014,10 +1013,8 @@ int main(char* filename)
 
 /***************** Plugin Entry Point *****************/
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
-    rb = api; /* copy to global api pointer */
-    
     if (parameter == NULL)
     {
         rb->splash(HZ*2, "Play .rvf file!");

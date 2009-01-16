@@ -64,8 +64,7 @@ union hash
     uint32_t words[4];
 };
 
-static const struct plugin_api* rb;
-MEM_FUNCTION_WRAPPERS(rb);
+MEM_FUNCTION_WRAPPERS;
 static char buffer[sizeof(struct pw_entry)*MAX_ENTRIES];
 static int bytes_read = 0; /* bytes read into the buffer */
 static struct gui_synclist kb_list;
@@ -637,11 +636,9 @@ static int main_menu(void)
     return 0;
 }
 
-enum plugin_status plugin_start(const struct plugin_api *api,
-                                const void *parameter)
+enum plugin_status plugin_start(const void *parameter)
 {
     (void)parameter;
-    rb = api;
     int ret;
 
     rb->gui_synclist_init(&kb_list, &kb_list_cb, NULL, false, 1, NULL);
@@ -651,8 +648,6 @@ enum plugin_status plugin_start(const struct plugin_api *api,
     rb->gui_synclist_set_nb_items(&kb_list, 0);
     rb->gui_synclist_limit_scroll(&kb_list, false);
     rb->gui_synclist_select_item(&kb_list, 0);
-
-    md5_init(api);
 
     init_ll();
     ret = main_menu();

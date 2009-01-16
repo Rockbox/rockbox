@@ -59,8 +59,6 @@
 
 PLUGIN_HEADER
 
-static const struct plugin_api* rb;
-
 ssize_t buf_size;
 static char *filename;
 static int num_entries;
@@ -178,14 +176,12 @@ static int write_file(void)
     return 0;
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     char *buf;
     int rc;
 
     filename = (char *)parameter;
-
-    rb = api;
 
     buf = rb->plugin_get_audio_buffer((size_t *)&buf_size); /* start munching memory */
 

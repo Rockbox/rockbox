@@ -21,8 +21,7 @@
 #include "plugin.h"
 
 PLUGIN_HEADER
-static const struct plugin_api* rb;
-MEM_FUNCTION_WRAPPERS(rb)
+MEM_FUNCTION_WRAPPERS
 
 /* function return values */
 enum tidy_return
@@ -479,13 +478,12 @@ int tidy_lcd_menu(void)
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     enum tidy_return status;
     int ret;
     (void)parameter;
 
-    rb = api;
     tidy_type_count = 0;
     tidy_load_file(DEFAULT_FILES);
     tidy_load_file(CUSTOM_FILES);

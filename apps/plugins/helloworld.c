@@ -26,21 +26,12 @@
    convention, although the actual position doesn't matter */
 PLUGIN_HEADER
 
-/* here is a global api struct pointer. while not strictly necessary,
-   it's nice not to have to pass the api pointer in all function calls
-   in the plugin */
-static const struct plugin_api* rb;
-
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     /* if you don't use the parameter, you can do like
        this to avoid the compiler warning about it */
     (void)parameter;
-
-    /* if you are using a global api pointer, don't forget to copy it!
-       otherwise you will get lovely "I04: IllInstr" errors... :-) */
-    rb = api;
 
     /* now go ahead and have fun! */
     rb->splash(HZ*2, "Hello world!");

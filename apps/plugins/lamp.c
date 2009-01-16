@@ -99,8 +99,6 @@ PLUGIN_HEADER
 # endif
 #endif
 
-static const struct plugin_api* rb; /* global api struct pointer */
-
 #ifdef HAVE_LCD_COLOR
 /* RGB color sets */
 #define NUM_COLORSETS   2
@@ -109,11 +107,10 @@ static int colorset[NUM_COLORSETS][3] = { { 255, 255, 255 } ,    /* white */
 #endif /* HAVE_LCD_COLOR */
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     long button;
     (void)parameter;
-    rb = api;
 
 #ifdef HAVE_LCD_COLOR
     int cs = 0;
@@ -151,9 +148,9 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 #endif /* MROBE_100 */
 #endif /* HAVE_LCD_INVERT */
 
-    backlight_force_on(rb);
+    backlight_force_on();
 #ifdef HAVE_BUTTON_LIGHT
-    buttonlight_force_on(rb);
+    buttonlight_force_on();
 #endif /* HAVE_BUTTON_LIGHT */
 
 #ifdef HAVE_LCD_COLOR
@@ -220,9 +217,9 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 #endif /*HAVE_LCD_COLOR */
 
     /* restore */
-    backlight_use_settings(rb);
+    backlight_use_settings();
 #ifdef HAVE_BUTTON_LIGHT
-    buttonlight_use_settings(rb);
+    buttonlight_use_settings();
 #endif /* HAVE_BUTTON_LIGHT */
 
 #ifdef HAVE_LCD_INVERT

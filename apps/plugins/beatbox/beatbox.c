@@ -180,8 +180,6 @@ const unsigned char * drumNames[]={
 long gmbuf[BUF_SIZE*NBUF];
 
 int quit=0;
-const struct plugin_api * rb;
-
 
 #define STATE_STOPPED 0
 #define STATE_PAUSED 1
@@ -234,13 +232,11 @@ int editState=EDITSTATE_PATTERN;
 int playState=STATE_STOPPED, stepFlag=0;
 
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int retval = 0;
 
-    PLUGIN_IRAM_INIT(api)
-
-    rb = api;
+    PLUGIN_IRAM_INIT(rb)
 
     rb->lcd_setfont(0);
 

@@ -30,8 +30,6 @@
 
 #include "mpeg2dec_config.h"
 
-extern const struct plugin_api* rb;
-
 #include "mpeg2.h"
 #include "attributes.h"
 #include "mpeg2_internal.h"

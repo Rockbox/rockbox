@@ -62,8 +62,6 @@ static unsigned char str[12];   /*String use to display the first line*/
 static unsigned long hsmile,hcry,h1,h2; /*Handle for the new pattern*/
 
 static bool end;    /*If true game is finished*/
-static const struct plugin_api* rb;
-
 
 /*Display that the action it's impossible*/
 static void impossible(void)
@@ -141,7 +139,7 @@ static void nim_exit(void *parameter)
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int y,z,button;
     int x,v,min;
@@ -151,10 +149,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     /* if you don't use the parameter, you can do like
        this to avoid the compiler warning about it */
     (void)parameter;
-
-    /* if you are using a global api pointer, don't forget to copy it!
-       otherwise you will get lovely "I04: IllInstr" errors... :-) */
-    rb = api;
 
     /*Get the pattern handle*/
     h1=rb->lcd_get_locked_pattern();

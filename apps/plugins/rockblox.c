@@ -570,9 +570,6 @@ extern const fb_data rockblox_background[];
  */
 
 
-/* must have variable */
-static const struct plugin_api *rb;
-
 static bool gameover = false;
 /* c=current f=figure o=orientation n=next */
 static int lines = 0, level = 0, score = 0, cx, cy, cf, co, nf;
@@ -1072,13 +1069,13 @@ static int rockblox_loop (void)
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold ()) {
             /* Turn on backlight timeout (revert to settings) */
-            backlight_use_settings(rb); /* backlight control in lib/helper.c */
+            backlight_use_settings(); /* backlight control in lib/helper.c */
             rb->splash(0, "Paused");
             while (rb->button_hold ())
                 rb->sleep(HZ/10);
 
             /* Turn off backlight timeout */
-            backlight_force_on(rb); /* backlight control in lib/helper.c */
+            backlight_force_on(); /* backlight control in lib/helper.c */
 
             /* get rid of the splash text */
             rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
@@ -1223,17 +1220,15 @@ static int rockblox_loop (void)
     return PLUGIN_OK;
 }
 
-enum plugin_status plugin_start (const struct plugin_api *api, const void *parameter)
+enum plugin_status plugin_start (const void *parameter)
 {
     int ret;
 
     (void) parameter;
-    rb = api;
 
     rb->srand (*rb->current_tick);
 
     /* Load HighScore if any */
-    highscore_init(rb);
     highscore_load(HIGH_SCORE,Highest,MAX_HIGH_SCORES);
 
 #if LCD_DEPTH > 1
@@ -1243,14 +1238,14 @@ enum plugin_status plugin_start (const struct plugin_api *api, const void *param
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont (FONT_SYSFIXED);
 #else
-    if (!pgfx_init(rb, 4, 2))
+    if (!pgfx_init(4, 2))
     {
         rb->splash(HZ*2, "Old LCD :(");
         return PLUGIN_OK;
     }
 #endif
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     init_rockblox ();
     ret = rockblox_loop ();
@@ -1262,7 +1257,7 @@ enum plugin_status plugin_start (const struct plugin_api *api, const void *param
 #endif
     /* Save user's HighScore */
     highscore_save(HIGH_SCORE,Highest,MAX_HIGH_SCORES);
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 
     return ret;
 }

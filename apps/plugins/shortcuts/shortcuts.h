@@ -34,8 +34,6 @@
 
 #define SHORTCUTS_FILENAME "/shortcuts.link"
 
-extern const struct plugin_api* rb;
-
 typedef struct sc_entry_s
 {
     char path[MAX_PATH+1];

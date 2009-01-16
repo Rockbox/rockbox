@@ -79,7 +79,6 @@ PLUGIN_HEADER
 #define PATTERN_ACORN      3
 #define PATTERN_GLIDER_GUN 4 /* not yet implemented */
 
-static const struct plugin_api* rb;
 const struct button_mapping *plugin_contexts[]
 = {generic_directions, generic_actions};
 
@@ -395,7 +394,7 @@ static void next_generation(char *pgrid, char *pnext_grid){
 /**********************************/
 /* this is the plugin entry point */
 /**********************************/
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int button = 0;
     int quit = 0;
@@ -406,9 +405,8 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     char *ptemp;
 
     (void)parameter;
-    rb = api;
 
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #ifdef HAVE_LCD_COLOR
@@ -427,7 +425,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     show_grid(pgrid);
 
     while(!quit) {
-        button = pluginlib_getaction(rb, TIMEOUT_BLOCK, plugin_contexts, 2);
+        button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts, 2);
         switch(button) {
         case ROCKLIFE_NEXT:
         case ROCKLIFE_NEXT_REP:
@@ -452,7 +450,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
                 /* show new generation */
                 rb->yield();
                 show_grid(pgrid);
-                button = pluginlib_getaction(rb, 0, plugin_contexts, 2);
+                button = pluginlib_getaction(0, plugin_contexts, 2);
                 switch(button) {
                 case ROCKLIFE_PLAY_PAUSE:
                 case ROCKLIFE_QUIT:
@@ -489,7 +487,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         rb->yield();
     }
 
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
     return PLUGIN_OK;
 }
 

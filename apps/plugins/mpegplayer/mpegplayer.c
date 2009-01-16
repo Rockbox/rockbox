@@ -280,9 +280,7 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #endif
 #endif
 
-const struct plugin_api* rb;
-
-CACHE_FUNCTION_WRAPPERS(rb);
+CACHE_FUNCTION_WRAPPERS;
 
 /* One thing we can do here for targets with remotes is having a display
  * always on the remote instead of always forcing a popup on the main display */
@@ -622,7 +620,7 @@ static void wvs_backlight_on_video_mode(bool video_on)
     if (video_on) {
         /* Turn off backlight timeout */
         /* backlight control in lib/helper.c */
-        backlight_force_on(rb);
+        backlight_force_on();
 #if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
         rb->lcd_set_enable_hook(NULL);
 #endif
@@ -631,7 +629,7 @@ static void wvs_backlight_on_video_mode(bool video_on)
         rb->lcd_set_enable_hook(wvs_lcd_enable_hook);
 #endif
         /* Revert to user's backlight settings */
-        backlight_use_settings(rb);
+        backlight_use_settings();
     }
 }
 
@@ -1625,7 +1623,7 @@ static void button_loop(void)
     rb->lcd_setfont(FONT_UI);
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int status = PLUGIN_ERROR; /* assume failure */
     int result;
@@ -1634,17 +1632,15 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     if (parameter == NULL) {
         /* No file = GTFO */
-        api->splash(HZ*2, "No File");
+        rb->splash(HZ*2, "No File");
         return PLUGIN_ERROR;
     }
 
     /* Disable all talking before initializing IRAM */
-    api->talk_disable(true);
+    rb->talk_disable(true);
 
     /* Initialize IRAM - stops audio and voice as well */
-    PLUGIN_IRAM_INIT(api)
-
-    rb = api;
+    PLUGIN_IRAM_INIT(rb)
 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_backdrop(NULL);

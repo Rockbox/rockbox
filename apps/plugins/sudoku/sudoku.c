@@ -78,12 +78,6 @@ Example ".ss" file, and one with a saved state:
 
 PLUGIN_HEADER
 
-/* here is a global api struct pointer. while not strictly necessary,
-   it's nice not to have to pass the api pointer in all function calls
-   in the plugin */
-
-const struct plugin_api* rb;
-
 /* Default game - used to initialise sudoku.ss if it doesn't exist. */
 static const char default_game[9][9] =
 {
@@ -1191,14 +1185,14 @@ bool sudoku_menu(struct sudoku_state_t* state)
         [SM_QUIT]     = { "Quit", NULL },
     };
     
-    m = menu_init(rb,items, sizeof(items) / sizeof(*items),
+    m = menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     result=menu_show(m);
 
     switch (result) {
         case SM_AUDIO_PLAYBACK:
-            playback_control(rb, NULL);
+            playback_control(NULL);
             break;
 
 #ifdef HAVE_LCD_COLOR
@@ -1263,7 +1257,7 @@ int sudoku_edit_menu(struct sudoku_state_t* state)
         { "Quit", NULL },
     };
     
-    m = menu_init(rb,items, sizeof(items) / sizeof(*items),
+    m = menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     result=menu_show(m);
@@ -1314,7 +1308,7 @@ void move_cursor(struct sudoku_state_t* state, int newx, int newy)
 }
 
 /* plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     bool exit;
     int button;
@@ -1323,13 +1317,8 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     int rc = PLUGIN_OK;
     long ticks;
     struct sudoku_state_t state;
-
-    /* plugin init */
-    rb = api;
-    /* end of plugin init */
     
 #if defined(HAVE_LCD_COLOR) || defined(SUDOKU_BUTTON_POSSIBLE)
-    configfile_init(rb);
     configfile_load(cfg_filename, disk_config,
                     sizeof(disk_config) / sizeof(disk_config[0]),
                     CFGFILE_MINVERSION);

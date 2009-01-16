@@ -30,17 +30,14 @@ PLUGIN_HEADER
 #define TOUCHSCREEN_TOGGLE BUTTON_RC_MODE
 #endif
 
-static const struct plugin_api* rb;
-
 /* plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int button = 0;
     enum touchscreen_mode mode = TOUCHSCREEN_BUTTON;
 
     /* standard stuff */
     (void)parameter;
-    rb = api;
     
     rb->touchscreen_set_mode(mode);
 

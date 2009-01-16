@@ -450,19 +450,19 @@ void cb_start_viewer(char* filename){
     bool exit_viewer = false;
     struct cb_command command;
 
-    first_game = pgn_list_games(rb, filename);
+    first_game = pgn_list_games(filename);
     if (first_game == NULL){
         rb->splash ( HZ*2 , "No games found !" );
         return;
     }
 
     do {
-        selected_game = pgn_show_game_list(rb, first_game);
+        selected_game = pgn_show_game_list(first_game);
         if (selected_game == NULL){
             break;
         }
 
-        pgn_parse_game(rb, filename, selected_game);
+        pgn_parse_game(filename, selected_game);
         if (selected_game->first_ply != NULL) {
 
             /* init board */
@@ -769,7 +769,7 @@ void cb_play_game(void) {
     GNUChess_Initialize();
 
     /* init PGN history data structures */
-    game = pgn_init_game(rb);
+    game = pgn_init_game();
     
     /* restore saved position, if saved */
     cb_restoreposition();
@@ -783,9 +783,9 @@ void cb_play_game(void) {
         if ( mate ) {
             rb->splash ( HZ*3 , "Checkmate!" );
             rb->button_get(true);
-            pgn_store_game(rb, game);
+            pgn_store_game(game);
             GNUChess_Initialize();
-            game = pgn_init_game(rb);
+            game = pgn_init_game();
             cb_drawboard();
         }
         command = cb_getcommand ();
@@ -798,7 +798,7 @@ void cb_play_game(void) {
                     cb_drawboard();
 
                     /* Add the ply to the PGN history (in algebraic notation) */
-                    pgn_append_ply(rb, game, opponent, move_buffer, mate);
+                    pgn_append_ply(game, opponent, move_buffer, mate);
 
                     rb->splash ( 0 , "Thinking..." );
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -812,9 +812,9 @@ void cb_play_game(void) {
                      * for the result of the game which is only calculated in SelectMove
                      */
                     if (move_buffer[0] != '\0'){
-                        pgn_append_ply(rb, game, computer, move_buffer, mate);
+                        pgn_append_ply(game, computer, move_buffer, mate);
                     } else {
-                        pgn_set_result(rb, game, mate);
+                        pgn_set_result(game, mate);
                     }
 
                     if ( wt_command == COMMAND_QUIT ) {
@@ -827,7 +827,7 @@ void cb_play_game(void) {
 #ifdef COMMAND_RESTART
             case COMMAND_RESTART:
                 GNUChess_Initialize();
-                game = pgn_init_game(rb);
+                game = pgn_init_game();
                 cb_drawboard();
                 break;
 #endif
@@ -845,7 +845,7 @@ void cb_play_game(void) {
                 GNUChess_Initialize();
 
                 /* init PGN history data structures */
-                game = pgn_init_game(rb);
+                game = pgn_init_game();
 
                 /* restore saved position, if saved */
                 cb_restoreposition();
@@ -874,9 +874,9 @@ void cb_play_game(void) {
                  * for the result of the game which is only calculated in SelectMove
                  */
                 if (move_buffer[0] != '\0'){
-                    pgn_append_ply(rb, game, computer, move_buffer, mate);
+                    pgn_append_ply(game, computer, move_buffer, mate);
                 } else {
-                    pgn_set_result(rb, game, mate);
+                    pgn_set_result(game, mate);
                 }
 
                 if ( wt_command == COMMAND_QUIT ) {
@@ -904,11 +904,10 @@ void cb_play_game(void) {
 /*****************************************************************************
 * plugin entry point.
 ******************************************************************************/
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter) {
+enum plugin_status plugin_start(const void* parameter) {
     
     /* plugin init */
 
-    rb = api;
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif

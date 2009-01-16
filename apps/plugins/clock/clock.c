@@ -56,8 +56,6 @@ const struct button_mapping* plugin_contexts[]={
 #define ACTION_SKIN_PREV PLA_DEC
 #define ACTION_SKIN_PREV_REPEAT PLA_DEC_REPEAT
 
-extern const struct plugin_api* rb;
-
 /**************************
  * Cleanup on plugin return
  *************************/
@@ -111,7 +109,7 @@ void format_date(char* buffer, struct time* time, enum date_format format){
 /**********************************************************************
  * Plugin starts here
  **********************************************************************/
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter){
+enum plugin_status plugin_start(const void* parameter){
     int button;
     int last_second = -1;
     bool redraw=true;
@@ -120,7 +118,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     struct counter counter;
     bool exit_clock = false;
     (void)parameter;
-    rb = api;
 
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
@@ -129,7 +126,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     load_settings();
 
     /* init xlcd functions */
-    xlcd_init(rb);
     counter_init(&counter);
     clock_draw_set_colors();
 
@@ -142,7 +138,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         /*************************
          * Scan for button presses
          ************************/
-        button =  pluginlib_getaction(rb, HZ/10, plugin_contexts, PLA_ARRAY_COUNT);
+        button =  pluginlib_getaction(HZ/10, plugin_contexts, PLA_ARRAY_COUNT);
         redraw=true;/* we'll set it to false afterwards if there was no action */
         switch (button){
             case ACTION_COUNTER_TOGGLE: /* start/stop counter */

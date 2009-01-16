@@ -620,18 +620,13 @@ bool exit_rfk;
  offset function and using that everywhere. So not right now. */
 int screen[X_MAX + 1][Y_MAX + 1];
 
-/* here is a global api struct pointer. while not strictly necessary,
-   it's nice not to have to pass the api pointer in all function calls
-   in the plugin */
-static const struct plugin_api* rb;
-
 /******************************************************************************
  *
  * Begin meaty routines that do the dirty work.
  *
  *****************************************************************************/
 
-MEM_FUNCTION_WRAPPERS(rb) 
+MEM_FUNCTION_WRAPPERS 
 
 static void drawchar(int x, int y, char c)
 {
@@ -695,7 +690,7 @@ static void play_game()
             old_y = robot.y;
         }
 #ifdef __PLUGINLIB_ACTIONS_H__
-        input = pluginlib_getaction(rb, TIMEOUT_BLOCK, plugin_contexts, 2);
+        input = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts, 2);
 #else
         input = rb->button_get(true);
 #endif
@@ -1037,10 +1032,9 @@ static void initialize_screen()
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
   (void)parameter;
-  rb = api;
 
   exit_rfk = false;
 

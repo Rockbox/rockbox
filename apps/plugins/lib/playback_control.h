@@ -27,11 +27,9 @@
    So, make sure you use the same viewport for the rb->do_menu() call
    that you use in the playback_control_init() call
 */
-void playback_control_init(const struct plugin_api* newapi,
-                           struct viewport parent[NB_SCREENS]);
+void playback_control_init(struct viewport parent[NB_SCREENS]);
 
 /* Use this if your menu still uses the old menu api */
-bool playback_control(const struct plugin_api* api,
-                      struct viewport parent[NB_SCREENS]);
+bool playback_control(struct viewport parent[NB_SCREENS]);
 
 #endif /* __PLAYBACK_CONTROL_H__ */

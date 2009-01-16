@@ -30,8 +30,6 @@
 
 PLUGIN_HEADER
 
-static const struct plugin_api* rb;
-
 const struct button_mapping *plugin_contexts[]
 = {generic_actions, generic_directions};
 
@@ -64,11 +62,10 @@ static fb_data output_bmp_data[MAX_OUTPUT_WIDTH*MAX_OUTPUT_HEIGHT];
 
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 
-    rb = api;
     b = rb->lcd_framebuffer;
 
     rb->lcd_set_background(LCD_RGBPACK(0,0,0));
@@ -113,7 +110,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
                        output_bmp.height);
 
         rb->lcd_update();
-        button = pluginlib_getaction(rb, HZ,
+        button = pluginlib_getaction(HZ,
                                      plugin_contexts, NB_ACTION_CONTEXTS);
         switch (button) {
             case BUTTON_QUIT:

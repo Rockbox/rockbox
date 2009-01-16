@@ -297,9 +297,7 @@ static int speed = 6; /* CYCLETIME = (11-speed)*10 ms */
 static int difficulty = 75; /* Percentage of screen that needs to be filled
                              * in order to win the game */
 
-static const struct plugin_api *rb;
-
-MEM_FUNCTION_WRAPPERS(rb);
+MEM_FUNCTION_WRAPPERS;
 
 static bool quit = false;
 
@@ -1014,12 +1012,11 @@ static int xobox_loop (void)
 }
 
 /* plugin main procedure */
-enum plugin_status plugin_start (const struct plugin_api *api, const void *parameter)
+enum plugin_status plugin_start (const void *parameter)
 {
     int ret = PLUGIN_OK;
 
     (void) parameter;
-    rb = api;
 
     rb->lcd_setfont (FONT_SYSFIXED);
 #if LCD_DEPTH>=2
@@ -1027,7 +1024,7 @@ enum plugin_status plugin_start (const struct plugin_api *api, const void *param
 #endif
 
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     quit = false;
 
@@ -1038,7 +1035,7 @@ enum plugin_status plugin_start (const struct plugin_api *api, const void *param
     }
 
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
     rb->lcd_setfont (FONT_UI);
 
     return ret;

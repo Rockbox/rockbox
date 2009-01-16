@@ -26,6 +26,6 @@
 /*
  * Print a checkbox
  */
-void checkbox(const struct plugin_api *api, int x, int y, int width, int height, bool checked);
+void checkbox(int x, int y, int width, int height, bool checked);
 
 #endif

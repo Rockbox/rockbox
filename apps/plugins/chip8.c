@@ -26,8 +26,6 @@
 
 PLUGIN_HEADER
 
-static const struct plugin_api* rb; /* here is a global api struct pointer */
-
 #define EXTERN static
 #define STATIC static
 #define memset rb->memset
@@ -1423,11 +1421,9 @@ bool chip8_run(const char* file)
 
 /***************** Plugin Entry Point *****************/
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     const char* filename;
-
-    rb = api; /* copy to global api pointer */
 
     if (parameter == NULL)
     {

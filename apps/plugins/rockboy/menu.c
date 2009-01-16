@@ -106,7 +106,7 @@ int do_user_menu(void) {
 
     pcm_init();
 
-    m = menu_init(rb,items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
+    m = menu_init(items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
 
     while(!done)
     {
@@ -314,7 +314,7 @@ static void do_slot_menu(bool is_load) {
     for (i = 0; i < num_items; i++)
         slot_info(buf[i], 20, i);
 
-    m = menu_init(rb,items, num_items, NULL, NULL, NULL, NULL);
+    m = menu_init(items, num_items, NULL, NULL, NULL, NULL);
 
     while(!done)
     {
@@ -391,7 +391,7 @@ static void do_opt_menu(void)
 #endif
     };
 
-    m = menu_init(rb,items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
+    m = menu_init(items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
 
     options.dirty=1; /* Assume that the settings have been changed */
 

@@ -524,12 +524,12 @@ static const struct button_mapping* get_context_map(int context)
     else return NULL;
 }
 
-int pluginlib_getaction(const struct plugin_api *api,int timeout,
+int pluginlib_getaction(int timeout,
                         const struct button_mapping *plugin_contexts[],
                         int count)
 {
     plugin_context_order = (struct button_mapping **)plugin_contexts;
     plugin_context_count = count;
     last_context = 0;
-    return api->get_custom_action(CONTEXT_CUSTOM,timeout,get_context_map);
+    return rb->get_custom_action(CONTEXT_CUSTOM,timeout,get_context_map);
 }

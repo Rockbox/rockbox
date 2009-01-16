@@ -51,7 +51,7 @@ void grey_set_position(int x, int y)
     if (_grey_info.flags & _GREY_RUNNING)
     {
 #ifdef SIMULATOR
-        _grey_info.rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
+        rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
                                               _grey_info.width,
                                               _grey_info.height);
         grey_deferred_lcd_update();
@@ -114,5 +114,5 @@ void grey_setfont(int newfont)
 /* Get width and height of a text when printed with the current font */
 int  grey_getstringsize(const unsigned char *str, int *w, int *h)
 {
-    return _grey_info.rb->font_getstringsize(str, w, h, _grey_info.curfont);
+    return rb->font_getstringsize(str, w, h, _grey_info.curfont);
 }

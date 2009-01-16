@@ -24,9 +24,7 @@
 
 PLUGIN_HEADER
 
-static const struct plugin_api *rb;
-
-MEM_FUNCTION_WRAPPERS(rb);
+MEM_FUNCTION_WRAPPERS;
 
 #define BUFFERSIZE 16384
 
@@ -183,7 +181,7 @@ static void hash_check( int out, const char *path )
     rb->close( list );
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     const char *arg = (const char *)parameter; /* input file name, if any */
     int out = -1; /* output file descriptor */
@@ -191,8 +189,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     void (*action)( int, const char * ) = NULL;
 
-    md5_init( api );
-    rb = api;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost( true );
 #endif
@@ -225,7 +221,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
             dir = rb->opendir( arg );
             if( dir )
             {
-                api->closedir( dir );
+                rb->closedir( dir );
 
                 /* Hash the directory's content recursively */
                 action = hash_dir;

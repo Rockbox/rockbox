@@ -32,8 +32,6 @@
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE;
 
-const struct plugin_api *rb;
-
 static int hw_freq IDATA_ATTR = HW_FREQ_DEFAULT;
 static unsigned long hw_sampr IDATA_ATTR = HW_SAMPR_DEFAULT;
 
@@ -275,8 +273,7 @@ static void play_tone(bool volume_set)
 
 /* Tests hardware sample rate switching */
 /* TODO: needs a volume control */
-enum plugin_status plugin_start(const struct plugin_api *api,
-                                const void *parameter)
+enum plugin_status plugin_start(const void *parameter)
 {
     enum
     {
@@ -304,12 +301,11 @@ enum plugin_status plugin_start(const struct plugin_api *api,
     int m;
 
     /* Disable all talking before initializing IRAM */
-    api->talk_disable(true);
+    rb->talk_disable(true);
 
-    PLUGIN_IRAM_INIT(api);
-    rb = api;
+    PLUGIN_IRAM_INIT(rb);
 
-    m = menu_init(rb, items, ARRAYLEN(items),
+    m = menu_init(items, ARRAYLEN(items),
                       NULL, NULL, NULL, NULL);
 
     while (!exit)

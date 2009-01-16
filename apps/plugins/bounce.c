@@ -180,8 +180,6 @@ PLUGIN_HEADER
 #endif
 #endif
 
-static const struct plugin_api* rb;
-
 #define LETTER_WIDTH  11
 #define LETTER_HEIGHT 16
 
@@ -593,14 +591,12 @@ static int loopit(void)
 }
 
 
-enum plugin_status plugin_start(const struct plugin_api* api,
-                                const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int w, h;
     char *off = "[Off] to stop";
 
     (void)(parameter);
-    rb = api;
 
     rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_clear_display();

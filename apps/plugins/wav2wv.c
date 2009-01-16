@@ -29,8 +29,6 @@ PLUGIN_HEADER
 
 #define SAMPLES_PER_BLOCK 22050
 
-static const struct plugin_api* rb;
-
 void *memset(void *s, int c, size_t n) {
   return(rb->memset(s,c,n));
 }
@@ -287,19 +285,8 @@ static int wav2wv(const char *infile)
     return error;
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void *parameter)
+enum plugin_status plugin_start(const void *parameter)
 {
-#ifdef RB_PROFILE
-    /* This doesn't start profiling or anything, it just gives the
-     * profiling functions that are compiled in someplace to call,
-     * this is needed here to let this compile with profiling support
-     * since it calls code from a codec that is compiled with profiling
-     * support */
-    profile_init(api);
-#endif
-
-    rb = api;
-
     if (!parameter)
         return PLUGIN_ERROR;
 

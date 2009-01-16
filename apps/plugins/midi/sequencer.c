@@ -23,7 +23,6 @@
 #include "guspat.h"
 #include "synth.h"
 
-extern struct plugin_api * rb;
 extern int playingTime IBSS_ATTR;
 extern int samplesThisSecond IBSS_ATTR;
 

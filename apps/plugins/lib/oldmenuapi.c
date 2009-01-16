@@ -29,8 +29,6 @@
 #include "plugin.h"
 #include "oldmenuapi.h"
 
-const struct plugin_api *rb = NULL;
-
 struct menu {
     struct menu_item* items;
     int (*callback)(int, int);
@@ -67,12 +65,11 @@ static int menu_find_free(void)
     return(i);
 }
 
-int menu_init(const struct plugin_api *api, const struct menu_item* mitems, 
+int menu_init(const struct menu_item* mitems,
               int count, int (*callback)(int, int),
               const char *button1, const char *button2, const char *button3)
 {
     int menu=menu_find_free();
-    rb = api;
     if(menu==-1)/* Out of menus */
         return -1;
     menus[menu].items = (struct menu_item*)mitems; /* de-const */

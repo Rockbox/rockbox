@@ -723,6 +723,7 @@ int plugin_load(const char* plugin, const void* parameter)
         memset(pluginbuf + readsize, 0, plugin_size - readsize);
 #endif
 
+    *(hdr->api) = &rockbox_api;
     plugin_loaded = true;
     
 
@@ -740,7 +741,7 @@ int plugin_load(const char* plugin, const void* parameter)
     invalidate_icache();
     oldbars = viewportmanager_set_statusbar(false);
 
-    rc = hdr->entry_point(&rockbox_api, parameter);
+    rc = hdr->entry_point(parameter);
     
     viewportmanager_set_statusbar(true);
 

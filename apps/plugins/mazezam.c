@@ -28,13 +28,11 @@
 /* Include standard plugin macro */
 PLUGIN_HEADER
 
-static const struct plugin_api* rb;
-
 /* The plugin actions of interest. */
 const struct button_mapping *plugin_contexts[]
 = {generic_directions, generic_actions};
 
-MEM_FUNCTION_WRAPPERS(rb);
+MEM_FUNCTION_WRAPPERS;
 
 /* Use the standard plugin buttons rather than a hard-to-maintain list of
  * MazezaM specific buttons. */
@@ -252,7 +250,7 @@ static void store_lcd_settings(void)
 ******************************************************************************/
 static void restore_lcd_settings(void) {
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 
     /* Restore the old settings */
 #if LCD_DEPTH > 1
@@ -267,7 +265,7 @@ static void restore_lcd_settings(void) {
 ******************************************************************************/
 static void plugin_lcd_settings(void) {
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     /* Set the new settings */
 #ifdef HAVE_LCD_COLOR
@@ -546,7 +544,7 @@ static void level_loop(struct level_info* li, short* shift, short *x, short *y)
     while (state >= STATE_IN_LEVEL) {
         draw_level(li, shift, *x, *y);
         rb->lcd_update();
-        button = pluginlib_getaction(rb, TIMEOUT_BLOCK, plugin_contexts, 2);
+        button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts, 2);
         blocked = false;
 
         switch (button) {
@@ -643,7 +641,7 @@ static void in_game_menu(void)
             break;
 
         case 2: /* Audio playback */
-            playback_control(rb, NULL);
+            playback_control(NULL);
             state = STATE_IN_LEVEL;
             break;
 
@@ -918,17 +916,12 @@ static void main_menu(void)
 /*****************************************************************************
 * Plugin entry point 
 ******************************************************************************/
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     enum plugin_status plugin_state;
 
     /* Usual plugin stuff */
     (void)parameter;
-    rb = api;
-
-
-    /* initialise the config file module */
-    configfile_init(rb);
 
     store_lcd_settings();
 

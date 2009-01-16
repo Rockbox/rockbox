@@ -205,8 +205,6 @@ PLUGIN_HEADER
 #endif
 #endif
 
-static const struct plugin_api* rb;
-
 static int stopwatch = 0;
 static long start_at = 0;
 static int prev_total = 0;
@@ -331,7 +329,7 @@ void save_stopwatch(void)
     rb->close(fd);
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     char buf[32];
     int button;
@@ -341,7 +339,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     int lines;
 
     (void)parameter;
-    rb = api;
 
 #ifdef HAVE_LCD_BITMAP
     int h;

@@ -46,7 +46,6 @@ struct dices
 #define PRINT_BUFFER_LENGTH MAX_DICES*4
 PLUGIN_HEADER
 
-static const struct plugin_api* rb;
 static struct dices dice;
 static int sides_index;
 
@@ -74,15 +73,13 @@ void dice_print(struct dices* dice, struct screen* display);
 bool dice_menu(struct dices* dice);
 
 /* plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter) {
+enum plugin_status plugin_start(const void* parameter) {
     (void)parameter;
-    rb = api;
     int i, action;
 
     dice_init(&dice);
     rb->srand(*rb->current_tick);
     
-    configfile_init(rb);
     configfile_load(CFG_FILE, config, 2, 0);
     dice.nb_sides = nb_sides_values[sides_index];
     if(!dice_menu(&dice))
@@ -95,7 +92,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     FOR_NB_SCREENS(i)
         dice_print( &dice, rb->screens[i] );
     while(true) {
-        action = pluginlib_getaction(rb, TIMEOUT_BLOCK,
+        action = pluginlib_getaction(TIMEOUT_BLOCK,
                                      plugin_contexts, 1);
         switch(action) {
             case DICE_ROLL:

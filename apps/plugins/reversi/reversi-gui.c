@@ -51,11 +51,6 @@ further options:
 
 PLUGIN_HEADER
 
-/* The global api struct pointer. While not strictly necessary,
-   it's nice not to have to pass the api pointer in all function
-   calls in the plugin */
-static const struct plugin_api* rb;
-
 /* Thickness of the grid lines */
 #define LINE_THCK 1
 
@@ -391,7 +386,7 @@ static bool reversi_gui_menu(void) {
         { "Quit", NULL },
     };
 
-    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
+    m = menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     result = menu_show(m);
@@ -553,17 +548,13 @@ static void reversi_gui_move_cursor(int new_row, int new_col) {
 
 
 /* plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api *api, const void *parameter) {
+enum plugin_status plugin_start(const void *parameter) {
     bool exit, draw_screen;
     int button;
     int lastbutton = BUTTON_NONE;
     int row, col;
     int w_cnt, b_cnt;
     char msg_buf[30];
-
-    /* plugin init */
-    rb = api;
-    /* end of plugin init */
 
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
@@ -574,7 +565,6 @@ enum plugin_status plugin_start(const struct plugin_api *api, const void *parame
     /* Avoid compiler warnings */
     (void)parameter;
 
-    game.rb = rb;
     rb->srand(*rb->current_tick); /* Some AIs use rand() */
     white_strategy = &strategy_human;
     black_strategy = &strategy_human;

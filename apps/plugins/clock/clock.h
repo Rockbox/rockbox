@@ -22,7 +22,6 @@
 #ifndef _CLOCK_
 #define _CLOCK_
 #include "clock_settings.h"
-extern const struct plugin_api* rb;
 
 struct time{
     int year, day, month;

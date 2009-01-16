@@ -23,8 +23,6 @@
 
 PLUGIN_HEADER
 
-static const struct plugin_api* rb;
-
 #ifdef HAVE_LCD_BITMAP
 
 #ifdef HAVE_LCD_COLOR
@@ -147,13 +145,11 @@ static struct viewport rvp1 =
 #endif
 
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
     char buf[80];
     int i,y;
-
-    rb = api;
 
     rb->screens[SCREEN_MAIN]->set_viewport(&vp0);
     rb->screens[SCREEN_MAIN]->clear_viewport();
@@ -262,11 +258,9 @@ static struct viewport vp2 =
 };
 
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
-
-    rb = api;
 
     rb->screens[SCREEN_MAIN]->set_viewport(&vp0);
     rb->screens[SCREEN_MAIN]->clear_viewport();

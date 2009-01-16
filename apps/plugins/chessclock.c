@@ -247,11 +247,7 @@ PLUGIN_HEADER
 #define FIRST_LINE 0
 #endif
 
-/* here is a global api struct pointer. while not strictly necessary,
-   it's nice not to have to pass the api pointer in all function calls
-   in the plugin */
-static const struct plugin_api* rb;
-MEM_FUNCTION_WRAPPERS(rb);
+MEM_FUNCTION_WRAPPERS;
 #define MAX_PLAYERS 10
 
 static struct {
@@ -283,14 +279,13 @@ static bool pause;
 #define MAX_TIME 7200
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int i;
     bool done;
     int nr;
     
     (void)parameter;
-    rb=api;
     rb->memset(&settings, 0, sizeof(settings));
     
     /* now go ahead and have fun! */

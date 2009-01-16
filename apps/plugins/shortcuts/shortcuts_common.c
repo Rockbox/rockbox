@@ -21,7 +21,7 @@
  ****************************************************************************/
 
 #include "shortcuts.h"
-MEM_FUNCTION_WRAPPERS(rb);
+MEM_FUNCTION_WRAPPERS;
 
 #define SHORTCUTS_FILENAME "/shortcuts.link"
 

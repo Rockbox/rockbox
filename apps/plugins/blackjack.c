@@ -360,10 +360,7 @@ extern const fb_data card_back[];
 
 #define NEXT_CARD bj->player_cards[done][bj->num_player_cards[done]]
 
-/* global rockbox api */
-static const struct plugin_api* rb;
-
-MEM_FUNCTION_WRAPPERS(rb);
+MEM_FUNCTION_WRAPPERS;
 
 /* dealer and player card positions */
 unsigned int dealer_x, dealer_y, player_x, player_y;
@@ -1587,7 +1584,7 @@ static int blackjack(struct game_context* bj) {
 /*****************************************************************************
 * plugin entry point.
 ******************************************************************************/
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     struct game_context bj;
     bool exit = false;
@@ -1595,7 +1592,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     char str[19];
 
     (void)parameter;
-    rb = api;
 
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);

@@ -452,8 +452,7 @@ static struct BufferedBoards {
 } buffered_boards;
 
 
-static const struct plugin_api* rb;
-MEM_FUNCTION_WRAPPERS(rb);
+MEM_FUNCTION_WRAPPERS;
 
 static char buf[ROWS*(COLS + 1)]; /* Enough for a whole board or a filename */
 
@@ -1257,7 +1256,7 @@ static int sokoban_menu(void)
                 break;
 
             case 2: /* Audio playback control */
-                playback_control(rb, NULL);
+                playback_control(NULL);
                 menu_quit = false;
                 break;
 
@@ -1613,12 +1612,11 @@ static bool sokoban_loop(void)
 }
 
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int w, h;
 
     (void)(parameter);
-    rb = api;
 
     rb->lcd_setfont(SOKOBAN_FONT);
 

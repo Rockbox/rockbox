@@ -35,12 +35,10 @@ GREY_INFO_STRUCT
 static unsigned char grey_bm_buf[LCD_WIDTH * LCD_HEIGHT + 
                    BM_SCALED_SIZE(LCD_WIDTH,0,FORMAT_NATIVE,0)];
 
-static const struct plugin_api* rb; /* global api struct pointer */
-
-MEM_FUNCTION_WRAPPERS(rb)
+MEM_FUNCTION_WRAPPERS
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     void * plugin_buf;
     size_t plugin_buf_len;
@@ -54,14 +52,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     if(!parameter) return PLUGIN_ERROR;
 
-    rb = api;
-
     rb->strcpy(filename, parameter);
-
-#if LCD_DEPTH == 1
-    bmp_init(rb);
-    resize_init(rb);
-#endif
 
     ret = BMP_LOAD(filename, &grey_bm, sizeof(grey_bm_buf),
                    FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
@@ -74,7 +65,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     }
 
     plugin_buf = rb->plugin_get_buffer(&plugin_buf_len);
-    if(!grey_init(rb, plugin_buf, plugin_buf_len, 0, LCD_WIDTH, LCD_HEIGHT,
+    if(!grey_init(plugin_buf, plugin_buf_len, 0, LCD_WIDTH, LCD_HEIGHT,
                   NULL))
     {
         rb->splash(HZ*2,"grey init failed");

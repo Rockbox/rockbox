@@ -143,8 +143,6 @@ static unsigned char *abbrev_str[12] = {
 
 static unsigned long heuro,hhome; /*Handles for the new patterns*/
 
-static const struct plugin_api* rb;
-
 static char *currency_str[12] = {
    "France",
    "Germany",
@@ -405,7 +403,7 @@ static void euro_exit(void *parameter)
 
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     bool end, pos;
     longlong_t e,h,old_e,old_h;
@@ -414,10 +412,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     /* if you don't use the parameter, you can do like
        this to avoid the compiler warning about it */
     (void)parameter;
-
-    /* if you are using a global api pointer, don't forget to copy it!
-       otherwise you will get lovely "I04: IllInstr" errors... :-) */
-    rb = api;
 
     /*Get the pattern handle*/
     heuro=rb->lcd_get_locked_pattern();
@@ -433,8 +427,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     cur_pos=3;
     inc=100000;
 
-    configfile_init(rb);
-    
     load_config();
 
     /*Empty the event queue*/

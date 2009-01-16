@@ -28,7 +28,6 @@
 
 /*** globals ***/
 
-static const struct plugin_api *pgfx_rb = NULL; /* global api struct pointer */
 static int char_width;
 static int char_height;
 static int pixel_height;
@@ -40,14 +39,13 @@ static int drawmode = DRMODE_SOLID;
 /*** Special functions ***/
 
 /* library init */
-bool pgfx_init(const struct plugin_api* newrb, int cwidth, int cheight)
+bool pgfx_init(int cwidth, int cheight)
 {
     int i;
 
     if (((unsigned) cwidth * (unsigned) cheight) > 8 || (unsigned) cheight > 2)
         return false;
 
-    pgfx_rb = newrb;
     char_width = cwidth;
     char_height = cheight;
     pixel_height = 7 * char_height;
@@ -55,7 +53,7 @@ bool pgfx_init(const struct plugin_api* newrb, int cwidth, int cheight)
 
     for (i = 0; i < cwidth * cheight; i++)
     {
-        if ((gfx_chars[i] = pgfx_rb->lcd_get_locked_pattern()) == 0)
+        if ((gfx_chars[i] = rb->lcd_get_locked_pattern()) == 0)
         {
             pgfx_release();
             return false;
@@ -72,7 +70,7 @@ void pgfx_release(void)
     
     for (i = 0; i < 8; i++)
         if (gfx_chars[i])
-            pgfx_rb->lcd_unlock_pattern(gfx_chars[i]);
+            rb->lcd_unlock_pattern(gfx_chars[i]);
 }
 
 /* place the display */
@@ -84,12 +82,12 @@ void pgfx_display(int cx, int cy)
 
     for (i = 0; i < width; i++)
         for (j = 0; j < height; j++)
-            pgfx_rb->lcd_putc(cx + i, cy + j, gfx_chars[char_height * i + j]);
+            rb->lcd_putc(cx + i, cy + j, gfx_chars[char_height * i + j]);
 }
 
 void pgfx_display_block(int cx, int cy, int x, int y)
 {
-    pgfx_rb->lcd_putc(cx, cy, gfx_chars[char_height * x + y]);
+    rb->lcd_putc(cx, cy, gfx_chars[char_height * x + y]);
 }
 
 
@@ -100,9 +98,9 @@ void pgfx_update(void)
     int i;
 
     for (i = 0; i < char_width * char_height; i++)
-        pgfx_rb->lcd_define_pattern(gfx_chars[i], gfx_buffer + 7 * i);
+        rb->lcd_define_pattern(gfx_chars[i], gfx_buffer + 7 * i);
     
-    pgfx_rb->lcd_update();
+    rb->lcd_update();
 }
 
 /*** Parameter handling ***/
@@ -203,7 +201,7 @@ void pgfx_clear_display(void)
 {
     unsigned bits = (drawmode & DRMODE_INVERSEVID) ? 0x1F : 0;
 
-    pgfx_rb->memset(gfx_buffer, bits, char_width * pixel_height);
+    rb->memset(gfx_buffer, bits, char_width * pixel_height);
 }
 
 /* Set a single pixel */

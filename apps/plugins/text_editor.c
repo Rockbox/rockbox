@@ -28,7 +28,6 @@
 #endif
 #define MAX_LINE_LEN 2048
 PLUGIN_HEADER
-static const struct plugin_api* rb;
 
 static char buffer[MAX_CHARS];
 static char eol[3];
@@ -264,7 +263,7 @@ int do_item_menu(int cur_sel, char* copy_buffer)
             ret = MENU_RET_SAVE;
         break;
         case 6: /* playback menu */
-            playback_control(rb, NULL);
+            playback_control(NULL);
             ret = MENU_RET_UPDATE;
         break;
         default:
@@ -308,7 +307,7 @@ int hex_to_rgb(const char* hex, int* color)
 #endif /* HAVE_LCD_COLOR */
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int fd;
     static char temp_line[MAX_LINE_LEN];
@@ -323,8 +322,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 #ifdef HAVE_LCD_COLOR
     bool edit_colors_file = false;
 #endif
-
-    rb = api;
 
     copy_buffer[0]='\0';
     prev_show_statusbar = rb->global_settings->statusbar;
@@ -481,7 +478,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
                         case 0:
                         break;
                         case 1:
-                            playback_control(rb, NULL);
+                            playback_control(NULL);
                         break;
                         case 2: //save to disk
                             save_changes(1);

@@ -85,9 +85,6 @@ static const struct button_mapping *plugin_contexts[]
 #define BORDER_S(y) ((y) == MAZE_HEIGHT-1)
 #define BORDER_W(x) ((x) == 0)
 
-/* the API */
-static const struct plugin_api* rb;
-
 // we can and should change this to make square boxes
 #if ( LCD_WIDTH == 112 )
 #define MAZE_WIDTH  16
@@ -493,17 +490,16 @@ static void maze_move_player_left(struct maze* maze)
 /**********************************/
 /* this is the plugin entry point */
 /**********************************/
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int button, lastbutton = BUTTON_NONE;
     int quit = 0;
     int i;
     struct maze maze;
     (void)parameter;
-    rb = api;
 
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     /* Seed the RNG */
     rb->srand(*rb->current_tick);
@@ -531,7 +527,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     while(!quit) {
 #ifdef __PLUGINLIB_ACTIONS_H__
-        button = pluginlib_getaction(rb, TIMEOUT_BLOCK, plugin_contexts, 2);
+        button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts, 2);
 #else
         button = rb->button_get(true);
 #endif
@@ -591,6 +587,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     }
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
     return ((quit == 1) ? PLUGIN_OK : PLUGIN_USB_CONNECTED);
 }

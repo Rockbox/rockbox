@@ -28,7 +28,6 @@ PLUGIN_HEADER
 void *audio_bufferbase;
 void *audio_bufferpointer;
 size_t audio_buffer_free;
-const struct plugin_api* rb;
 int w, h, y;
 
 void *my_malloc(size_t size)
@@ -58,13 +57,10 @@ void setmallocpos(void *pointer)
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     unsigned char *result,buf[500];
     int parsefd,hits;
-    /* if you are using a global api pointer, don't forget to copy it!
-       otherwise you will get lovely "I04: IllInstr" errors... :-) */
-    rb = api;
 
     audio_bufferbase=audio_bufferpointer=0;
     audio_buffer_free=0;

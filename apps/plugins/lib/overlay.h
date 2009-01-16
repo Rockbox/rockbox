@@ -28,7 +28,7 @@
 #include "plugin.h"
 
 /* load and run a plugin linked as an overlay. */
-enum plugin_status run_overlay(const struct plugin_api* api, const void* parameter,
+enum plugin_status run_overlay(const void* parameter,
                                unsigned char *filename, unsigned char *name);
 
 #endif /* !SIMULATOR */

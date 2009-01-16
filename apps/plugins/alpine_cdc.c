@@ -136,7 +136,7 @@ void sound_normal(void); /* return to user settings */
 
 void thread(void); /* the thread running it all */
 int main(const void* parameter); /* main loop */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter); /* entry */
+enum plugin_status plugin_start(const void* parameter); /* entry */
 
 
 /****************** data types ******************/
@@ -208,8 +208,6 @@ struct
     bool exiting; /* signal to the thread that we want to exit */
     unsigned int thread; /* worker thread id */
 } gTread;
-
-static const struct plugin_api* rb; /* here is the global API struct pointer */
 
 
 /****************** implementation ******************/
@@ -1191,10 +1189,8 @@ int main(const void* parameter)
 /***************** Plugin Entry Point *****************/
 
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
-    rb = api; /* copy to global api pointer */
-
     /* now go ahead and have fun! */
     return (main(parameter)==0) ? PLUGIN_OK : PLUGIN_ERROR;
 }

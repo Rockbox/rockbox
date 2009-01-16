@@ -211,18 +211,16 @@ int32_t gmbuf[BUF_SIZE*NBUF];
 static unsigned int samples_in_buf;
 
 int quit=0;
-const struct plugin_api * rb;
 
 static int midimain(const void * filename);
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int retval = 0;
 
 
-    PLUGIN_IRAM_INIT(api)
+    PLUGIN_IRAM_INIT(rb)
 
-    rb = api;
     if(parameter == NULL)
     {
         rb->splash(HZ*2, " Play .MID file ");

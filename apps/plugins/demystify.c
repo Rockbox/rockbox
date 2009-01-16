@@ -67,8 +67,6 @@ struct line_color
 
 /******************************* Globals ***********************************/
 
-static const struct plugin_api* rb; /* global api struct pointer */
-
 /*
  * Compute a new random step to make the point bounce the borders of the screen
  */
@@ -258,9 +256,9 @@ void cleanup(void *parameter)
 {
     (void)parameter;
 
-    backlight_use_settings(rb);
+    backlight_use_settings();
 #ifdef HAVE_REMOTE_LCD
-    remote_backlight_use_settings(rb);
+    remote_backlight_use_settings();
 #endif
 }
 
@@ -384,7 +382,7 @@ int plugin_main(void)
             rb->yield();
         else
             rb->sleep(sleep_time);
-        action = pluginlib_getaction(rb, TIMEOUT_NOBLOCK,
+        action = pluginlib_getaction(TIMEOUT_NOBLOCK,
                                      plugin_contexts, NB_ACTION_CONTEXTS);
         switch(action)
         {
@@ -426,18 +424,17 @@ int plugin_main(void)
 
 /*************************** Plugin entry point ****************************/
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int ret;
 
-    rb = api; /* copy to global api pointer */
     (void)parameter;
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 #ifdef HAVE_REMOTE_LCD
-    remote_backlight_force_on(rb); /* remote backlight control in lib/helper.c */
+    remote_backlight_force_on(); /* remote backlight control in lib/helper.c */
 #endif
     ret = plugin_main();
 

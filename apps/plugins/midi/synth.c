@@ -23,8 +23,6 @@
 #include "midiutil.h"
 #include "synth.h"
 
-extern struct plugin_api * rb;
-
 void readTextBlock(int file, char * buf)
 {
     char c = 0;

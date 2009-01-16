@@ -308,11 +308,11 @@ void mpeg_backlight_update_brightness(int value)
     if (value >= 0)
     {
         value += MIN_BRIGHTNESS_SETTING;
-        backlight_brightness_set(rb, value);
+        backlight_brightness_set(value);
     }
     else
     {
-        backlight_brightness_use_setting(rb);
+        backlight_brightness_use_setting();
     }
 }
 
@@ -820,7 +820,7 @@ static int show_start_menu(uint32_t duration)
     format_menu_item(&items[MPEG_START_RESUME], sizeof (resume_str),
                      "Resume at: %s", hms_str);
 
-    menu_id = menu_init(rb, items, ARRAYLEN(items),
+    menu_id = menu_init(items, ARRAYLEN(items),
                         mpeg_menu_sysevent_callback, NULL, NULL, NULL);
 
     rb->button_clear_queue();
@@ -925,7 +925,7 @@ static void display_options(void)
 #endif
     };
 
-    menu_id = menu_init(rb, items, ARRAYLEN(items),
+    menu_id = menu_init(items, ARRAYLEN(items),
                         mpeg_menu_sysevent_callback, NULL, NULL, NULL);
 
     rb->button_clear_queue();
@@ -1007,7 +1007,7 @@ static void audio_options(void)
             { "Dithering", NULL },
     };
 
-    menu_id = menu_init(rb, items, ARRAYLEN(items),
+    menu_id = menu_init(items, ARRAYLEN(items),
                         mpeg_menu_sysevent_callback, NULL, NULL, NULL);
 
     rb->button_clear_queue();
@@ -1115,7 +1115,7 @@ int mpeg_menu(unsigned flags)
     if (flags & MPEG_MENU_HIDE_QUIT_ITEM)
         item_count--;
 
-    menu_id = menu_init(rb, items, item_count,
+    menu_id = menu_init(items, item_count,
                         mpeg_menu_sysevent_callback, NULL, NULL, NULL);
 
     rb->button_clear_queue();
@@ -1188,8 +1188,6 @@ void init_settings(const char* filename)
     settings.crossfeed = false;
     settings.equalizer = false;
     settings.dithering = false;
-
-    configfile_init(rb);
 
     if (configfile_load(SETTINGS_FILENAME, config,
                         sizeof(config)/sizeof(*config),

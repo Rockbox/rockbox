@@ -462,9 +462,6 @@ static int player3_dir = EAST;
    control a worm */
 static int players = 1;
 
-/* the rockbox plugin api */
-static const struct plugin_api* rb;
-
 #define SETTINGS_VERSION 1
 #define SETTINGS_MIN_VERSION 1
 #define SETTINGS_FILENAME "wormlet.cfg"
@@ -2468,7 +2465,7 @@ bool launch_wormlet(void)
     rb->lcd_clear_display();
 
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     /* start the game */
     while (game_result == 1)
@@ -2478,7 +2475,7 @@ bool launch_wormlet(void)
     {
         case 2:
             /* Turn on backlight timeout (revert to settings) */
-            backlight_use_settings(rb); /* backlight control in lib/helper.c */
+            backlight_use_settings(); /* backlight control in lib/helper.c */
             return false;
             break;
     }
@@ -2490,17 +2487,15 @@ bool launch_wormlet(void)
 /**
  * Main entry point
  */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int result;
     int menu_quit = 0;
     int new_setting;
 
     (void)(parameter);
-    rb = api;
 
     default_settings();
-    configfile_init(rb);
     if (configfile_load(SETTINGS_FILENAME, config,
                         sizeof(config)/sizeof(*config),
                         SETTINGS_MIN_VERSION ) < 0)

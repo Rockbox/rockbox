@@ -126,12 +126,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 136
+#define PLUGIN_API_VERSION 137
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 136
+#define PLUGIN_MIN_API_VERSION 137
 
 /* plugin return codes */
 enum plugin_status {
@@ -791,7 +791,8 @@ struct plugin_header {
     unsigned short api_version;
     unsigned char *load_addr;
     unsigned char *end_addr;
-    enum plugin_status(*entry_point)(const struct plugin_api*, const void*);
+    enum plugin_status(*entry_point)(const void*);
+    const struct plugin_api **api;
 };
 
 #ifdef PLUGIN
@@ -799,16 +800,18 @@ struct plugin_header {
 extern unsigned char plugin_start_addr[];
 extern unsigned char plugin_end_addr[];
 #define PLUGIN_HEADER \
+        const struct plugin_api *rb __attribute__ ((section (".data"))); \
         const struct plugin_header __header \
         __attribute__ ((section (".header")))= { \
         PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
-        plugin_start_addr, plugin_end_addr, plugin_start };
+        plugin_start_addr, plugin_end_addr, plugin_start, &rb };
 #else /* SIMULATOR */
 #define PLUGIN_HEADER \
+        const struct plugin_api *rb __attribute__ ((section (".data"))); \
         const struct plugin_header __header \
         __attribute__((visibility("default"))) = { \
         PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
-        NULL, NULL, plugin_start };
+        NULL, NULL, plugin_start, &rb };
 #endif /* SIMULATOR */
 
 #ifdef PLUGIN_USE_IRAM
@@ -842,46 +845,44 @@ void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
 void plugin_tsr(bool (*exit_callback)(bool reenter));
 
 /* defined by the plugin */
-enum plugin_status plugin_start(const struct plugin_api* rockbox, const void* parameter)
+extern const struct plugin_api *rb;
+enum plugin_status plugin_start(const void* parameter)
     NO_PROF_ATTR;
 
 /* Use this macro in plugins where gcc tries to optimize by calling
  * these functions directly */
-#define MEM_FUNCTION_WRAPPERS(api) \
+#define MEM_FUNCTION_WRAPPERS \
         void *memcpy(void *dest, const void *src, size_t n) \
         { \
-            return (api)->memcpy(dest, src, n); \
+            return rb->memcpy(dest, src, n); \
         } \
         void *memset(void *dest, int c, size_t n) \
         { \
-            return (api)->memset(dest, c, n); \
+            return rb->memset(dest, c, n); \
         } \
         void *memmove(void *dest, const void *src, size_t n) \
         { \
-            return (api)->memmove(dest, src, n); \
+            return rb->memmove(dest, src, n); \
         } \
         int memcmp(const void *s1, const void *s2, size_t n) \
         { \
-            return (api)->memcmp(s1, s2, n); \
+            return rb->memcmp(s1, s2, n); \
         }
 
-#ifndef CACHE_FUNCTION_WRAPPERS
-
+#undef CACHE_FUNCTION_WRAPPERS
 #ifdef CACHE_FUNCTIONS_AS_CALL
-#define CACHE_FUNCTION_WRAPPERS(api) \
+#define CACHE_FUNCTION_WRAPPERS \
         void flush_icache(void) \
         { \
-            (api)->flush_icache(); \
+            rb->flush_icache(); \
         } \
         void invalidate_icache(void) \
         { \
-            (api)->invalidate_icache(); \
+            rb->invalidate_icache(); \
         }
 #else
-#define CACHE_FUNCTION_WRAPPERS(api)
+#define CACHE_FUNCTION_WRAPPERS
 #endif /* CACHE_FUNCTIONS_AS_CALL */
-
-#endif /* CACHE_FUNCTION_WRAPPERS */
 
 #endif /* __PCTOOL__ */
 #endif

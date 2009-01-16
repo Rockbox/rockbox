@@ -27,8 +27,6 @@
 #include "plugin.h"
 #include "hardware.h"
 
-extern const struct plugin_api* rb;
-
 /* The main data for Pacman  */
 
 unsigned char ram_[20*1024] IBSS_ATTR;          // ROM (16K) and RAM (4K)

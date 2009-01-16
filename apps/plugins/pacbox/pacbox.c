@@ -34,8 +34,6 @@
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
 
-const struct plugin_api* rb;
-
 struct pacman_settings {
     int difficulty;
     int numlives;
@@ -181,7 +179,7 @@ static bool pacbox_menu(void)
         { "Quit", NULL },
     };
     
-    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
+    m = menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     rb->button_clear_queue();
@@ -363,12 +361,11 @@ static int gameProc( void )
     return 0;
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 
-    PLUGIN_IRAM_INIT(api)
-    rb = api;
+    PLUGIN_IRAM_INIT(rb)
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
@@ -385,8 +382,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     settings.bonus = 0;      /* 10000 points */
     settings.ghostnames = 0; /* Normal names */
     settings.showfps = 0;    /* Do not show FPS */
-
-    configfile_init(rb);
 
     if (configfile_load(SETTINGS_FILENAME, config,
                         sizeof(config)/sizeof(*config),

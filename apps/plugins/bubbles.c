@@ -203,9 +203,6 @@ PLUGIN_HEADER
 /* collision distance squared */
 #define MIN_DISTANCE ((BUBBLE_WIDTH*8)/10)*((BUBBLE_HEIGHT*8)/10)
 
-/* global rockbox api */
-static const struct plugin_api* rb;
-
 /* levels */
 char level[NUM_LEVELS][BB_LEVEL_HEIGHT][BB_WIDTH] = {
     {{ 6,  6,  4,  4,  2,  2,  3,  3},
@@ -2317,7 +2314,7 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
 
     if (timeout < 0)
         timeout = 0;
-    button = pluginlib_getaction(rb,timeout,plugin_contexts,2);
+    button = pluginlib_getaction(timeout,plugin_contexts,2);
 #if defined(HAS_BUTTON_HOLD) && !defined(HAVE_REMOTE_LCD_AS_MAIN)
     /* FIXME: Should probably check remote hold here */
     if (rb->button_hold())
@@ -2352,7 +2349,7 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
         case BUBBLES_START:  /* pause the game */
             start = *rb->current_tick;
             rb->splash(0, "Paused");
-            while(pluginlib_getaction(rb,TIMEOUT_BLOCK,plugin_contexts,2)
+            while(pluginlib_getaction(TIMEOUT_BLOCK,plugin_contexts,2)
                  != (BUBBLES_START));
             bb->startedshot += *rb->current_tick-start;
             bubbles_drawboard(bb);
@@ -2480,18 +2477,14 @@ static int bubbles(struct game_context* bb) {
 /*****************************************************************************
 * plugin entry point.
 ******************************************************************************/
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter) {
+enum plugin_status plugin_start(const void* parameter) {
     struct game_context bb;
     bool exit = false;
     int position;
 
     /* plugin init */
     (void)parameter;
-    rb = api;
     /* end of plugin init */
-
-    /* more init */
-    xlcd_init(rb);
 
     /* load files */
     rb->splash(0, "Loading...");

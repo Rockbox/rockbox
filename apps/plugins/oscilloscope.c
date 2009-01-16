@@ -295,8 +295,6 @@ enum { OSC_HORIZ, OSC_VERT, MAX_OSC };
 
 /* global variables */
 
-const struct plugin_api* rb;     /* global api struct pointer */
-
 /* settings */
 struct osc_config {
     int delay;     /* in ticks */
@@ -693,10 +691,10 @@ void cleanup(void *parameter)
     rb->lcd_set_background(LCD_DEFAULT_BG);
 #endif
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int button, vol;
     int lastbutton = BUTTON_NONE;
@@ -705,10 +703,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     bool tell_speed;
 
     (void)parameter;
-    rb = api;
-
-    xlcd_init(rb);
-    configfile_init(rb);
 
     configfile_load(cfg_filename, disk_config,
                     sizeof(disk_config) / sizeof(disk_config[0]),
@@ -724,7 +718,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 #endif
 
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     rb->lcd_getstringsize("A", NULL, &font_height);
 

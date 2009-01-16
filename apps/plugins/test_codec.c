@@ -34,9 +34,7 @@ PLUGIN_HEADER
 #define TESTCODEC_EXITBUTTON BUTTON_SELECT
 #endif
 
-static const struct plugin_api* rb;
-
-CACHE_FUNCTION_WRAPPERS(rb)
+CACHE_FUNCTION_WRAPPERS
 
 /* Log functions copied from test_disk.c */
 static int line = 0;
@@ -644,7 +642,7 @@ exit:
 }
 
 /* plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int result, selection = 0;
     enum plugin_status res = PLUGIN_OK;
@@ -654,8 +652,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     char* ch;
     char dirpath[MAX_PATH];
     char filename[MAX_PATH];
-
-    rb = api;
 
     if (parameter == NULL)
     {

@@ -36,7 +36,6 @@ PLUGIN_HEADER
 #endif
 #define TEST_TIME 10 /* in seconds */
 
-static const struct plugin_api* rb;
 static unsigned char* audiobuf;
 static ssize_t audiobuflen;
 
@@ -405,7 +404,7 @@ static bool test_speed(void)
 
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     static const struct menu_item items[] = {
         { "Disk speed",     test_speed  },
@@ -416,7 +415,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     DIR *dir;
 
     (void)parameter;
-    rb = api;
 
     if ((dir = rb->opendir(testbasedir)) == NULL)
     {
@@ -440,15 +438,15 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     rb->srand(*rb->current_tick);
 
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
-    m = menu_init(rb, items, sizeof(items) / sizeof(*items), NULL,
+    m = menu_init(items, sizeof(items) / sizeof(*items), NULL,
                       NULL, NULL, NULL);
     menu_run(m);
     menu_exit(m);
 
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
     
     rb->rmdir(testbasedir);
 

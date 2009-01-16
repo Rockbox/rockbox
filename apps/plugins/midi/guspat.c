@@ -22,8 +22,6 @@
 #include "guspat.h"
 #include "midiutil.h"
 
-extern struct plugin_api * rb;
-
 /* This came from one of the Gravis documents */
 const uint32_t gustable[]=
 {

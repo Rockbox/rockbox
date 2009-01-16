@@ -20,7 +20,6 @@
  ****************************************************************************/
 #include "plugin.h"
 PLUGIN_HEADER
-static const struct plugin_api* rb; 
 
 extern const fb_data superdom_boarditems[];
 char buf[255];
@@ -2241,12 +2240,10 @@ int average_strength(bool colour) {
     return totalpower/100;
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int tempmenu;
     bool statusbar_setting;
-
-    rb = api;
 
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);

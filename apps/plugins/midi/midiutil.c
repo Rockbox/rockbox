@@ -21,8 +21,6 @@
 #include "plugin.h"
 #include "midiutil.h"
 
-extern struct plugin_api * rb;
-
 int chVol[16] IBSS_ATTR;       /* Channel volume                */
 int chPan[16] IBSS_ATTR;       /* Channel panning               */
 int chPat[16] IBSS_ATTR;                  /* Channel patch                 */

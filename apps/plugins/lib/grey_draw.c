@@ -63,7 +63,7 @@ void grey_clear_display(void)
     int value = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
                  _grey_info.fg_brightness : _grey_info.bg_brightness;
 
-    _grey_info.rb->memset(_grey_info.buffer, value,
+    rb->memset(_grey_info.buffer, value,
                           _GREY_MULUQ(_grey_info.width, _grey_info.height));
 }
 
@@ -196,7 +196,7 @@ void grey_hline(int x1, int x2, int y)
     dst   = &_grey_info.buffer[_GREY_MULUQ(_grey_info.width, y) + x1];
 
     if (fillopt)
-        _grey_info.rb->memset(dst, value, x2 - x1 + 1);
+        rb->memset(dst, value, x2 - x1 + 1);
     else
     {
         unsigned char *dst_end = dst + x2 - x1;
@@ -381,7 +381,7 @@ void grey_fillrect(int x, int y, int width, int height)
     do
     {
         if (fillopt)
-            _grey_info.rb->memset(dst, value, width);
+            rb->memset(dst, value, width);
         else
         {
             unsigned char *dst_row = dst;
@@ -516,7 +516,7 @@ void grey_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
 
     do
     {
-        _grey_info.rb->memcpy(dst, src, width);
+        rb->memcpy(dst, src, width);
         dst += _grey_info.width;
         src += stride;
     }
@@ -535,9 +535,9 @@ void grey_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 {
     int ch;
     unsigned short *ucs;
-    struct font* pf = _grey_info.rb->font_get(_grey_info.curfont);
+    struct font* pf = rb->font_get(_grey_info.curfont);
     
-    ucs = _grey_info.rb->bidi_l2v(str, 1);
+    ucs = rb->bidi_l2v(str, 1);
 
     while ((ch = *ucs++) != 0 && x < _grey_info.width)
     {
@@ -545,7 +545,7 @@ void grey_putsxyofs(int x, int y, int ofs, const unsigned char *str)
         const unsigned char *bits;
 
         /* get proportional width and glyph bits */
-        width = _grey_info.rb->font_get_width(pf, ch);
+        width = rb->font_get_width(pf, ch);
 
         if (ofs > width)
         {
@@ -553,7 +553,7 @@ void grey_putsxyofs(int x, int y, int ofs, const unsigned char *str)
             continue;
         }
 
-        bits = _grey_info.rb->font_get_bits(pf, ch);
+        bits = rb->font_get_bits(pf, ch);
 
         grey_mono_bitmap_part(bits, ofs, 0, width, x, y, width - ofs, pf->height);
         
@@ -577,10 +577,10 @@ void grey_ub_clear_display(void)
                                   _grey_info.fg_brightness :
                                   _grey_info.bg_brightness];
 
-    _grey_info.rb->memset(_grey_info.values, value,
+    rb->memset(_grey_info.values, value,
                           _GREY_MULUQ(_grey_info.width, _grey_info.height));
 #ifdef SIMULATOR
-    _grey_info.rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
+    rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
                                           _grey_info.width, _grey_info.height);
 #endif
 }
@@ -655,7 +655,7 @@ void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
     }
     while (++yc < ye);
 #ifdef SIMULATOR
-    _grey_info.rb->sim_lcd_ex_update_rect(_grey_info.x + x, _grey_info.y + y,
+    rb->sim_lcd_ex_update_rect(_grey_info.x + x, _grey_info.y + y,
                                           width, height);
 #endif
 }

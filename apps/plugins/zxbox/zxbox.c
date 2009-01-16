@@ -24,8 +24,6 @@
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
 
-const struct plugin_api* rb;
-
 #include "spkey_p.h"
 
 spkeyboard kb_mkey;
@@ -61,11 +59,10 @@ static size_t         gbuf_size = 0;
 long video_frames IBSS_ATTR = 0 ;
 long start_time IBSS_ATTR = 0;
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
-    PLUGIN_IRAM_INIT(api)
+    PLUGIN_IRAM_INIT(rb)
 
-    rb = api;
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
@@ -78,10 +75,10 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 #ifdef USE_BUFFERED_GREY
-    grey_init(rb, gbuf, gbuf_size, GREY_BUFFERED|GREY_ON_COP, LCD_WIDTH,
+    grey_init(gbuf, gbuf_size, GREY_BUFFERED|GREY_ON_COP, LCD_WIDTH,
               LCD_HEIGHT, NULL);
 #else
-    grey_init(rb, gbuf, gbuf_size, GREY_ON_COP, LCD_WIDTH, LCD_HEIGHT, NULL);
+    grey_init(gbuf, gbuf_size, GREY_ON_COP, LCD_WIDTH, LCD_HEIGHT, NULL);
 #endif /* USE_BUFFERED_GREY */
     /* switch on greyscale overlay */
     grey_show(true);

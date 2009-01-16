@@ -155,7 +155,7 @@ void xlcd_filltriangle(int x1, int y1,
                        int x3, int y3)
 {
     /* default is main screen */
-    xlcd_filltriangle_screen(_xlcd_rb->screens[SCREEN_MAIN],
+    xlcd_filltriangle_screen(rb->screens[SCREEN_MAIN],
                              x1, y1, x2, y2, x3, y3);
 }
 
@@ -276,7 +276,7 @@ void xlcd_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
 
     src    += stride * src_y + src_x; /* move starting point */
     src_end = src + stride * height;
-    dst     = _xlcd_rb->lcd_framebuffer + LCD_WIDTH * y + x;
+    dst     = rb->lcd_framebuffer + LCD_WIDTH * y + x;
 
     do
     {
@@ -336,7 +336,7 @@ void xlcd_color_bitmap_part(const unsigned char *src, int src_x, int src_y,
 
     src    += 3 * (stride * src_y + src_x); /* move starting point */
     src_end = src + 3 * stride * height;
-    dst     = _xlcd_rb->lcd_framebuffer + LCD_WIDTH * y + x;
+    dst     = rb->lcd_framebuffer + LCD_WIDTH * y + x;
 
     do
     {

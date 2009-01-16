@@ -345,8 +345,7 @@ PLUGIN_HEADER
 static struct ts_raster calc_raster = { X_0_POS, Y_1_POS, BUTTON_COLS*REC_WIDTH, BUTTON_ROWS*REC_HEIGHT, REC_WIDTH, REC_HEIGHT };
 #endif
 
-static const struct plugin_api* rb;
-MEM_FUNCTION_WRAPPERS(rb);
+MEM_FUNCTION_WRAPPERS;
 
 enum {
     basicButtons,
@@ -1628,10 +1627,9 @@ int handleButton(int button){
 /* -----------------------------------------------------------------------
 Main();
 ----------------------------------------------------------------------- */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
-    rb = api;
 
     /* now go ahead and have fun! */
 

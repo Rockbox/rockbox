@@ -187,7 +187,6 @@ PLUGIN_HEADER
 static int board[BOARD_WIDTH][BOARD_HEIGHT],snakelength;
 static unsigned int score,hiscore=0,level=1;
 static short dir,frames,apple,dead=0;
-static const struct plugin_api* rb;
 
 void die (void)
 {
@@ -445,10 +444,9 @@ void game_init(void) {
     }
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     (void)(parameter);
-    rb = api;
 
     game_init(); 
     rb->lcd_clear_display();

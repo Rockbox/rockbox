@@ -21,8 +21,6 @@
 #include "plugin.h"
 #include "midiutil.h"
 
-extern struct plugin_api * rb;
-
 struct Track * readTrack(int file);
 int readID(int file);
 

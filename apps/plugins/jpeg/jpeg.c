@@ -76,9 +76,7 @@ GREY_INFO_STRUCT
 
 /******************************* Globals ***********************************/
 
-const struct plugin_api* rb;  /* Exported to other .c files in this plugin */
-
-MEM_FUNCTION_WRAPPERS(rb);
+MEM_FUNCTION_WRAPPERS;
 
 static int slideshow_enabled = false;   /* run slideshow */
 static int running_slideshow = false;   /* loading image because of slideshw */
@@ -334,7 +332,7 @@ static void display_options(void)
         { "Dithering", set_option_dithering },
     };
 
-    int m = menu_init(rb, items, ARRAYLEN(items),
+    int m = menu_init(items, ARRAYLEN(items),
                           NULL, NULL, NULL, NULL);
     menu_run(m);
     menu_exit(m);
@@ -394,7 +392,7 @@ int show_menu(void) /* return 1 to quit */
         { "Enable", -1 },
     };
 
-    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
+    m = menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
     result=menu_show(m);
 
@@ -418,7 +416,7 @@ int show_menu(void) /* return 1 to quit */
         case MIID_SHOW_PLAYBACK_MENU:
             if (plug_buf)
             {
-                playback_control(rb, NULL);
+                playback_control(NULL);
             }
             else
             {
@@ -1183,10 +1181,8 @@ int load_and_show(char* filename)
 
 /******************** Plugin entry point *********************/
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
-    rb = api;
-
     int condition;
 #ifdef USEGSLIB
     long greysize; /* helper */
@@ -1219,7 +1215,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 #endif
 
 #ifdef USEGSLIB
-    if (!grey_init(rb, buf, buf_size, GREY_ON_COP,
+    if (!grey_init(buf, buf_size, GREY_ON_COP,
                    LCD_WIDTH, LCD_HEIGHT, &greysize))
     {
         rb->splash(HZ, "grey buf error");
@@ -1227,13 +1223,10 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     }
     buf += greysize;
     buf_size -= greysize;
-#else
-    xlcd_init(rb);
 #endif
 
     /* should be ok to just load settings since the plugin itself has
        just been loaded from disk and the drive should be spinning */
-    configfile_init(rb);
     configfile_load(JPEG_CONFIGFILE, jpeg_config,
                     ARRAYLEN(jpeg_config), JPEG_SETTINGS_MINVERSION);
     old_settings = jpeg_settings;
@@ -1241,7 +1234,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     buf_images = buf; buf_images_size = buf_size;
 
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     do
     {
@@ -1263,7 +1256,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 #endif
 
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 
 #ifdef USEGSLIB
     grey_release(); /* deinitialize */

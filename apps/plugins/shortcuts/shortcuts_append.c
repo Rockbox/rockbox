@@ -51,9 +51,8 @@ bool append_entry_to_file(sc_file_t *file, char *path, bool is_dir)
 }
 
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* void_parameter)
+enum plugin_status plugin_start(const void* void_parameter)
 {
-    rb = api;
     bool found;
     bool its_a_dir;
     

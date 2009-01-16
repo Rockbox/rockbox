@@ -611,8 +611,6 @@ unsigned char fire_sprite[FIRE_HEIGHT] = {
 #define CYCLETIME 40
 
 
-static const struct plugin_api* rb;
-
 /* Physical x is at PLAYFIELD_X + LIVES_X + x * ALIEN_SPEED
  * Physical y is at y * ALIEN_HEIGHT
  */
@@ -1600,7 +1598,6 @@ void init_invadrox(void)
     rb->lcd_set_background(LCD_BLACK);
     rb->lcd_set_foreground(LCD_BLACK);
 
-    highscore_init(rb);
     if (highscore_load(HISCOREFILE, &hiscore, 1) < 0) {
         /* Init hiscore to 0 */
         rb->strncpy(hiscore.name, "Invader", sizeof(hiscore.name));
@@ -1801,13 +1798,11 @@ void game_loop(void)
 
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, UNUSED const void* parameter)
+enum plugin_status plugin_start(UNUSED const void* parameter)
 {
-    rb = api;
-
     rb->lcd_setfont(FONT_SYSFIXED);
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     /* now go ahead and have fun! */
     game_loop();
@@ -1825,7 +1820,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, UNUSED const void*
     /* Restore user's original backlight setting */
     rb->lcd_setfont(FONT_UI);
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 
     return PLUGIN_OK;
 }

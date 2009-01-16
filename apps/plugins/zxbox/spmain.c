@@ -98,7 +98,6 @@ int spcf_read_conf_file(const char *filename)
     settings.frameskip = 0;
 
 
-    configfile_init(rb);
     if (configfile_load(filename, config,
                         sizeof(config)/sizeof(*config),
                         SETTINGS_MIN_VERSION
@@ -143,7 +142,7 @@ static void set_keys(void){
         { "Map Fire/Jump key", NULL },
        };
 
-    m = menu_init(rb,items, sizeof(items) / sizeof(*items),
+    m = menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     rb->button_clear_queue();
@@ -203,7 +202,7 @@ static void select_keymap(void){
         { "7658S", NULL },
        };
 
-    m = menu_init(rb,items, sizeof(items) / sizeof(*items),
+    m = menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     rb->button_clear_queue();
@@ -268,7 +267,7 @@ static void options_menu(void){
        };
         
 
-    m = menu_init(rb,items, sizeof(items) / sizeof(*items),
+    m = menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     rb->button_clear_queue();
@@ -362,7 +361,7 @@ static bool zxbox_menu(void)
         { "Quit", NULL },
     };
 
-    m = menu_init(rb,items, sizeof(items) / sizeof(*items),
+    m = menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     rb->button_clear_queue();

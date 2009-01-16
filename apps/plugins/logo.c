@@ -195,12 +195,11 @@ const unsigned char rockbox16x7[] = {
 #endif
 #endif
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter) {
+enum plugin_status plugin_start(const void* parameter) {
     int button;
     int timer = 10;
     int x = (DISPLAY_WIDTH / 2) - (LOGO_WIDTH / 2);
     int y = (DISPLAY_HEIGHT / 2) - (LOGO_HEIGHT / 2);
-    const struct plugin_api* rb = api;
     int dx;
     int dy;
 #ifdef HAVE_LCD_CHARCELLS
@@ -211,7 +210,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     (void)parameter;
 
 #ifdef HAVE_LCD_CHARCELLS
-    if (!pgfx_init(rb, 4, 2)) {
+    if (!pgfx_init(4, 2)) {
         rb->splash(HZ*2, "Old LCD :(");
         return PLUGIN_OK;
     }

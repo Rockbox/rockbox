@@ -35,8 +35,6 @@
 #include "sudoku.h"
 #include "templates.h"
 
-extern const struct plugin_api* rb;
-
 #define assert(x)
 
 /* Common state encoding in a 32-bit integer:

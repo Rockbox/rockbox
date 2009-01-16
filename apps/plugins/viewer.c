@@ -418,7 +418,6 @@ static unsigned char *screen_top_ptr;
 static unsigned char *next_screen_ptr;
 static unsigned char *next_screen_to_draw_ptr;
 static unsigned char *next_line_ptr;
-static const struct plugin_api* rb;
 #ifdef HAVE_LCD_BITMAP
 static struct font *pf;
 #endif
@@ -1451,7 +1450,7 @@ static bool viewer_options_menu(void)
         {"Scroll Mode",       scroll_mode_setting},
         {"Auto-Scroll Speed", autoscroll_speed_setting },
     };
-    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
+    m = menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     result = menu_run(m);
@@ -1475,7 +1474,7 @@ static void viewer_menu(void)
         {"Return", NULL },
     };
 
-    m = menu_init(rb, items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
+    m = menu_init(items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
     result=menu_show(m);
     switch (result)
     {
@@ -1488,7 +1487,7 @@ static void viewer_menu(void)
             done = viewer_options_menu();
             break;
         case 2: /* playback control */
-            playback_control(rb, NULL);
+            playback_control(NULL);
             break;
         case 3: /* return */
             break;
@@ -1497,14 +1496,13 @@ static void viewer_menu(void)
     viewer_draw(col);
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* file)
+enum plugin_status plugin_start(const void* file)
 {
     int button, i, ok;
     int lastbutton = BUTTON_NONE;
     bool autoscroll = false;
     long old_tick;
 
-    rb = api;
     old_tick = *rb->current_tick;
 
     /* get the plugin buffer */

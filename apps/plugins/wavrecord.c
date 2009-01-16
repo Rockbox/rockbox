@@ -3172,10 +3172,6 @@ enum {
 
 void rec_tick(void) __attribute__((interrupt_handler));
 
-/* variables */
-
-static const struct plugin_api *rb;
-
 /* settings */
 struct rec_config {
     int samplerate;     /* index */
@@ -3749,7 +3745,7 @@ static int recording_menu(void)
 }
 
 /* plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
 	ssize_t buf_size;
 	int align;
@@ -3757,7 +3753,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 	const char *recbasedir;
 
     (void)parameter;
-    rb = api;
     
     plug_buf = rb->plugin_get_buffer(&buf_size);
     if (buf_size < 6700)  /* needed for i2c transfer */
@@ -3784,7 +3779,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     aud_size -= align;
     aud_size &= ~3;
     
-    configfile_init(rb);
     configfile_load(cfg_filename, disk_config,
                     sizeof(disk_config) / sizeof(disk_config[0]),
                     CFGFILE_MINVERSION);

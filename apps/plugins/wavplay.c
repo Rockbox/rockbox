@@ -3137,8 +3137,6 @@ void dma_end_isr(void)      __attribute__((interrupt_handler));
 
 /* variables */
 
-static const struct plugin_api *rb;
-
 static unsigned char *aud_buf;
 static ssize_t aud_size;
 static unsigned char *plug_buf;
@@ -3649,12 +3647,10 @@ int play_file(char* filename)
 }
 
 /* plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
 	ssize_t buf_size;
 
-    rb = api;
-    
     if (!parameter)
     {
         rb->splash(HZ, "Play WAV file!");

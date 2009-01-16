@@ -22,8 +22,6 @@
 
 PLUGIN_HEADER
 
-static const struct plugin_api* rb;
-
 /* temp byte buffer */
 uint8_t samples[10 * 1024]; /* read 10KB at the time */
 
@@ -354,12 +352,11 @@ void show_help(void)
     rb->lcd_update();
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void *parameter)
+enum plugin_status plugin_start(const void *parameter)
 {
     unsigned int quit = 0;
     unsigned int action = 0;
     unsigned int dodisplay = 1;
-    rb = api;
     int retval;
 
     if (!parameter)

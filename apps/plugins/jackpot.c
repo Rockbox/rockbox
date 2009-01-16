@@ -71,8 +71,6 @@ const struct picture jackpot_pictures[]={
 #define SLEEP_TIME (HZ/200)
 #endif /* HAVE_LCD_CHARCELLS */
 
-static const struct plugin_api* rb;
-
 struct jackpot
 {
     /* A slot can display "NB_PICTURES" pictures
@@ -293,9 +291,8 @@ void jackpot_play_turn(struct jackpot* game)
         jackpot_print_turn_result(game, gain, rb->screens[d]);
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
-    rb = api;
     int action, i;
     struct jackpot game;
     (void)parameter;
@@ -313,7 +310,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     rb->button_clear_queue();
     while (true)
     {
-        action = pluginlib_getaction(rb, TIMEOUT_BLOCK,
+        action = pluginlib_getaction(TIMEOUT_BLOCK,
                                      plugin_contexts, 1);
         switch ( action )
         {

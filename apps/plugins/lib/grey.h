@@ -52,7 +52,7 @@
 #define GREY_ON_COP    0x0004  /* Run ISR on COP (PP targets) */
 
 /* Library initialisation and release */
-bool grey_init(const struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
+bool grey_init(unsigned char *gbuf, long gbuf_size,
                unsigned features, int width, int height, long *buf_taken);
 void grey_release(void);
 
@@ -172,7 +172,6 @@ struct _grey_info
     int bheight;    /* 4-pixel or 8-pixel units */
 #endif
     unsigned long flags;         /* various flags, see #defines */
-    const struct plugin_api *rb; /* plugin API pointer */
     unsigned char *values;       /* start of greyscale pixel values */
     unsigned char *phases;       /* start of greyscale pixel phases */
     unsigned char *buffer;       /* start of chunky pixel buffer (for buffered mode) */

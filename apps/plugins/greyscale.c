@@ -104,7 +104,6 @@ PLUGIN_HEADER
 /******************************* Globals ***********************************/
 
 GREY_INFO_STRUCT
-static const struct plugin_api* rb; /* global api struct pointer */
 static char pbuf[32];         /* global printf buffer */
 static unsigned char *gbuf;
 static size_t gbuf_size = 0;
@@ -117,7 +116,7 @@ void cleanup(void *parameter)
 
     grey_release(); /* switch off overlay and deinitialize */
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 }
 
 /* this is only a demo of what the framework can do */
@@ -202,7 +201,7 @@ int main(void)
     };
 
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     rb->lcd_setfont(FONT_SYSFIXED);   /* select default font */
 
@@ -212,7 +211,7 @@ int main(void)
     /* initialize the greyscale buffer:
        Archos: 112 pixels wide, 7 rows (56 pixels) high.
        H1x0: 160 pixels wide, 30 rows (120 pixels) high. */
-    if (!grey_init(rb, gbuf, gbuf_size, GREY_BUFFERED|GREY_ON_COP,
+    if (!grey_init(gbuf, gbuf_size, GREY_BUFFERED|GREY_ON_COP,
                    LCD_WIDTH, GFX_HEIGHT, NULL))
     {
         rb->splash(HZ, "Not enough memory.");
@@ -363,9 +362,8 @@ int main(void)
 
 /*************************** Plugin entry point ****************************/
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
-    rb = api; /* copy to global api pointer */
     (void)parameter;
 
     return main();

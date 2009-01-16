@@ -113,7 +113,6 @@ PLUGIN_HEADER
 #define NEED_BOOST
 #endif
 
-static const struct plugin_api* rb;
 static unsigned char bitbuffer[2][BUF_HEIGHT][BUF_WIDTH];
 static int curbuf = 0;
 static int scan_rate = DEFAULT_SCAN_RATE;
@@ -216,10 +215,9 @@ int plugin_main(void)
 
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
-    rb = api;
     return plugin_main();
 }
 

@@ -152,8 +152,6 @@ PLUGIN_HEADER
 #  define NEXT_Y (int)((LCD_HEIGHT * 0.8)/2-NEXT_H/2)
 #endif
 
-static const struct plugin_api* rb; /* global api struct pointer */
-
 void draw_brick(int pos, int length) {
     int i = pos;
     rb->lcd_set_drawmode(DRMODE_BG|DRMODE_INVERSEVID);
@@ -165,7 +163,7 @@ void draw_brick(int pos, int length) {
     }
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int i;
     int f_width, f_height;
@@ -184,7 +182,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     unsigned long int score = 34126;
     char score_buf[10];
     
-    rb = api;
     (void)parameter;
 
 #if LCD_DEPTH > 1

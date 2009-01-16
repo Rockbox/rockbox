@@ -81,7 +81,6 @@ PLUGIN_HEADER
 #endif
 
 static short particles[NUM_PARTICLES][2];
-static const struct plugin_api* rb;
 
 #ifdef HAVE_LCD_BITMAP
 #if LCD_WIDTH >= 160
@@ -196,14 +195,13 @@ static void snow_init(void)
 #endif
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int button;
     (void)(parameter);
-    rb = api;
 
 #ifdef HAVE_LCD_CHARCELLS
-    if (!pgfx_init(rb, 4, 2))
+    if (!pgfx_init(4, 2))
     {
         rb->splash(HZ*2, "Old LCD :(");
         return PLUGIN_OK;

@@ -22,7 +22,6 @@
 
 PLUGIN_HEADER
 
-static const struct plugin_api* rb;
 #define FILENAME "/settings_dumper.txt"
 static int setting_count = 0;
 
@@ -117,14 +116,13 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
 
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api,
+enum plugin_status plugin_start(
                                 const void* parameter)
 {
     const struct settings_list *list;
     int setting_count, i;
     int fd;
     (void)parameter;
-    rb = api;
     
     fd = rb->open(FILENAME, O_CREAT|O_TRUNC|O_WRONLY);
     if (fd < 0)

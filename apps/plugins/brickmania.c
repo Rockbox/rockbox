@@ -209,8 +209,6 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #endif
 
 
-static const struct plugin_api* rb;
-
 enum menu_items {
     BM_START,
     BM_SEL_START,
@@ -1289,7 +1287,6 @@ int game_loop(void)
 
     rb->srand( *rb->current_tick );
 
-    configfile_init(rb);
     configfile_load(HIGH_SCORE,config,1,0);
 
     switch(game_menu(0)) {
@@ -2090,17 +2087,16 @@ int game_loop(void)
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
-    rb = api;
 
     rb->lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     /* now go ahead and have fun! */
     while (game_loop()!=1);
@@ -2110,7 +2106,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     /* Restore user's original backlight setting */
     rb->lcd_setfont(FONT_UI);
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 
     return PLUGIN_OK;
 }

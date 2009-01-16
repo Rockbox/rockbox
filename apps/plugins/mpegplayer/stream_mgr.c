@@ -998,7 +998,7 @@ int stream_init(void)
     long greysize;
 
     /* Greylib init handles all necessary cache alignment */
-    if (!grey_init(rb, mem, memsize, GREY_BUFFERED|GREY_ON_COP,
+    if (!grey_init(mem, memsize, GREY_BUFFERED|GREY_ON_COP,
                    LCD_WIDTH, LCD_HEIGHT, &greysize))
     {
         rb->splash(HZ, "greylib init failed!");

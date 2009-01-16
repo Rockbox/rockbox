@@ -142,8 +142,6 @@ Still To do:
 #endif
 #endif
 
-static const struct plugin_api* rb;
-
 #define NUMBER_OF_BLOCKS 8
 #define NUMBER_OF_PARTICLES 3
 #define MAX_TERRAIN_NODES 15
@@ -996,10 +994,9 @@ void chopper_load(bool newgame)
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
-    rb = api;
     int ret;
 
     rb->lcd_setfont(FONT_SYSFIXED);
@@ -1012,12 +1009,10 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 #endif
 
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     rb->srand( *rb->current_tick );
 
-    xlcd_init(rb);
-    configfile_init(rb);
     configfile_load(CFG_FILE, config, 1, 0);
 
     chopper_load(true);
@@ -1027,7 +1022,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     rb->lcd_setfont(FONT_UI);
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 
     return ret;
 }

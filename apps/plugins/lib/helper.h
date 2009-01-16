@@ -26,24 +26,23 @@
 /**
  * Backlight on/off operations
  */
-void backlight_force_on(const struct plugin_api* rb);
-void backlight_use_settings(const struct plugin_api* rb);
+void backlight_force_on(void);
+void backlight_use_settings(void);
 #ifdef HAVE_REMOTE_LCD
-void remote_backlight_force_on(const struct plugin_api* rb);
-void remote_backlight_use_settings(const struct plugin_api* rb);
+void remote_backlight_force_on(void);
+void remote_backlight_use_settings(void);
 #endif
 #ifdef HAVE_BUTTON_LIGHT
-void buttonlight_force_on(const struct plugin_api* rb);
-void buttonlight_use_settings(const struct plugin_api* rb);
+void buttonlight_force_on(void);
+void buttonlight_use_settings(void);
 #endif
 
 /**
  * Backlight brightness adjustment settings
  */
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-void backlight_brightness_set(const struct plugin_api *rb,
-                              int brightness);
-void backlight_brightness_use_setting(const struct plugin_api *rb);
+void backlight_brightness_set(int brightness);
+void backlight_brightness_use_setting(void);
 #endif
 
 

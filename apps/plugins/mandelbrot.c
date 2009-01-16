@@ -323,8 +323,6 @@ PLUGIN_HEADER
 #define MYXLCD(fn) xlcd_ ## fn
 #endif
 
-static const struct plugin_api* rb;
-
 /* Fixed point format s5.26: sign, 5 bits integer part, 26 bits fractional part */
 static long x_min;
 static long x_max;
@@ -711,13 +709,12 @@ void cleanup(void *parameter)
 #define REDRAW_PARTIAL 1
 #define REDRAW_FULL    2
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int button;
     int lastbutton = BUTTON_NONE;
     int redraw = REDRAW_FULL;
 
-    rb = api;
     (void)parameter;
 
 #ifdef USEGSLIB
@@ -725,15 +722,13 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
     /* initialize the greyscale buffer.*/
-    if (!grey_init(rb, gbuf, gbuf_size, GREY_ON_COP,
+    if (!grey_init(gbuf, gbuf_size, GREY_ON_COP,
                    LCD_WIDTH, LCD_HEIGHT, NULL))
     {
         rb->splash(HZ, "Couldn't init greyscale display");
         return 0;
     }
     grey_show(true); /* switch on greyscale overlay */
-#else
-    xlcd_init(rb);
 #endif
 
 #if LCD_DEPTH > 1

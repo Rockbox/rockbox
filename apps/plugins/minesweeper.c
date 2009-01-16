@@ -243,12 +243,6 @@ enum minesweeper_status {
 #endif
 #endif
 
-/* here is a global api struct pointer. while not strictly necessary,
- * it's nice not to have to pass the api pointer in all function calls
- * in the plugin
- */
-static const struct plugin_api *rb;
-
 extern const fb_data minesweeper_tiles[];
 
 #ifdef HAVE_LCD_COLOR
@@ -795,12 +789,11 @@ enum minesweeper_status minesweeper( void )
 }
 
 /* plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     bool exit = false;
 
     (void)parameter;
-    rb = api;
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif

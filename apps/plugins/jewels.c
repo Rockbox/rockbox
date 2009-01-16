@@ -359,9 +359,6 @@ struct jewels_menu {
          {"Exit Jewels", MRES_EXIT}}}
 };
 
-/* global rockbox api */
-static const struct plugin_api* rb;
-
 /* external bitmaps */
 extern const fb_data jewels[];
 
@@ -1767,7 +1764,7 @@ static int jewels_main(struct game_context* bj) {
                     continue;
 
                 case MRES_PLAYBACK:
-                    playback_control(rb, NULL);
+                    playback_control(NULL);
                     rb->lcd_setfont(FONT_SYSFIXED);
                     inmenu = false;
                     selected = false;
@@ -1940,7 +1937,7 @@ static int jewels_main(struct game_context* bj) {
 /*****************************************************************************
 * plugin entry point.
 ******************************************************************************/
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter) {
+enum plugin_status plugin_start(const void* parameter) {
     struct game_context bj;
     bool exit = false;
     int position;
@@ -1948,7 +1945,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     /* plugin init */
     (void)parameter;
-    rb = api;
     /* end of plugin init */
 
     /* load high scores */

@@ -399,7 +399,6 @@ static int apple;
 static int level = 4, speed = 5,dead = 0, quit = 0;
 static int sillydir = 0, num_levels = 0;
 static int level_from_file = 0;
-static const struct plugin_api* rb;
 static int headx, heady, tailx, taily, applecountdown = 5;
 static int game_type = 0;
 static int num_apples_to_get=1;
@@ -1443,10 +1442,9 @@ void game_init(void)
 
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     (void)(parameter);
-    rb = api;
 
     /* Lets use the default font */
     rb->lcd_setfont(FONT_SYSFIXED);

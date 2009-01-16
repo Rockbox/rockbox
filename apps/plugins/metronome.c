@@ -667,9 +667,7 @@ const struct button_mapping *plugin_contexts[] =
 };
 #define PLA_ARRAY_COUNT sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
 
-static const struct plugin_api* rb;
-
-MEM_FUNCTION_WRAPPERS(rb);
+MEM_FUNCTION_WRAPPERS;
 
 static int bpm      = 120;
 static int period   = 0;
@@ -891,13 +889,12 @@ void tap(void)
     reset_tap = false;
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int button;
     enum plugin_status status;
 
     (void)parameter;
-    rb = api;
 
     if (MET_IS_PLAYING)
         MET_PLAY_STOP; /* stop audio IS */
@@ -923,14 +920,14 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     while (true){
         reset_tap = true;
 #if CONFIG_CODEC == SWCODEC
-        button = pluginlib_getaction(rb,1,plugin_contexts,PLA_ARRAY_COUNT);
+        button = pluginlib_getaction(1,plugin_contexts,PLA_ARRAY_COUNT);
         if (need_to_play)
         {
             need_to_play = false;
             play_tock();
         }
 #else
-        button = pluginlib_getaction(rb,TIMEOUT_BLOCK,
+        button = pluginlib_getaction(TIMEOUT_BLOCK,
                                      plugin_contexts,PLA_ARRAY_COUNT);
 #endif /* SWCODEC */
         switch (button) {

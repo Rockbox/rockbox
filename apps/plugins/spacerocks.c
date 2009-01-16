@@ -25,7 +25,6 @@
 PLUGIN_HEADER
 
 /******************************* Globals ***********************************/
-static const struct plugin_api* rb; /* global api struct pointer */
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define AST_PAUSE BUTTON_ON
@@ -2074,11 +2073,10 @@ enum plugin_status start_game(void)
     }
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     enum plugin_status retval;
     (void)(parameter);
-    rb = api;
     
     game_state = ATTRACT_MODE;
     
@@ -2088,12 +2086,12 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     /* universal font */
     rb->lcd_setfont(FONT_SYSFIXED);
     /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
     iohiscore();
     retval = start_game();  
     iohiscore();
     rb->lcd_setfont(FONT_UI);
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
     return retval;
 }

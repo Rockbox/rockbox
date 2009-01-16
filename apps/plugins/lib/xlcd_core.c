@@ -27,17 +27,5 @@
 #ifdef HAVE_LCD_BITMAP
 #include "xlcd.h"
 
-/*** globals ***/
-
-const struct plugin_api *_xlcd_rb = NULL; /* global api struct pointer */
-
-/*** functions ***/
-
-/* library init */
-void xlcd_init(const struct plugin_api* newrb)
-{
-    _xlcd_rb = newrb;
-}
-
 #endif /* HAVE_LCD_BITMAP */
 

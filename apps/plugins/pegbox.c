@@ -32,8 +32,6 @@
 #define ITEM_HEIGHT (BMPHEIGHT_pegbox_menu_items/9)
 #endif
 
-static const struct plugin_api* rb;
-
 PLUGIN_HEADER
 
 /* final game return status */
@@ -1436,12 +1434,11 @@ static int pegbox(struct game_context* pb) {
 /*****************************************************************************
 * plugin entry point.
 ******************************************************************************/
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter) {
+enum plugin_status plugin_start(const void* parameter) {
     bool exit = false;
     struct game_context pb;
 
     (void)parameter;
-    rb = api;
 
     rb->lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1

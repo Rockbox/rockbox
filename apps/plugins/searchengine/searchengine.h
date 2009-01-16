@@ -40,8 +40,6 @@ rb->lcd_update()
 rb->lcd_update()
 #endif
 
-extern const struct plugin_api* rb;
-
 void *my_malloc(size_t size);
 void setmallocpos(void *pointer);
 

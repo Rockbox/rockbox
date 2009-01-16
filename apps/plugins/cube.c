@@ -413,8 +413,6 @@ static long matrice[3][3];
 static const int nb_points = 8;
 static long z_off = 600;
 
-static const struct plugin_api* rb;
-
 static void cube_rotate(int xa, int ya, int za)
 {
     int i;
@@ -568,7 +566,7 @@ void cleanup(void *parameter)
 #endif
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     char buffer[30];
     int t_disp = 0;
@@ -587,14 +585,11 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     bool exit = false;
 
     (void)(parameter);
-    rb = api;
 
 #ifdef HAVE_LCD_BITMAP
-#if LCD_DEPTH > 1
-    xlcd_init(rb);
-#elif defined(USE_GSLIB)
+#if defined(USE_GSLIB)
     gbuf = (unsigned char *)rb->plugin_get_buffer(&gbuf_size);
-    if (!grey_init(rb, gbuf, gbuf_size, GREY_BUFFERED, 
+    if (!grey_init(gbuf, gbuf_size, GREY_BUFFERED,
                    LCD_WIDTH, LCD_HEIGHT, NULL))
     {
         rb->splash(HZ, "Couldn't init greyscale display");
@@ -614,7 +609,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 #endif
     rb->lcd_setfont(FONT_SYSFIXED);
 #else /* LCD_CHARCELLS */
-    if (!pgfx_init(rb, 4, 2))
+    if (!pgfx_init(4, 2))
     {
         rb->splash(HZ*2, "Old LCD :(");
         return PLUGIN_OK;

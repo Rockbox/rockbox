@@ -23,9 +23,6 @@
 #ifndef MPEGPLAYER_H
 #define MPEGPLAYER_H
 
-/* Global API pointer */
-extern const struct plugin_api* rb;
-
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
 #define trigger_cpu_boost rb->trigger_cpu_boost
 #define cancel_cpu_boost  rb->cancel_cpu_boost

@@ -21,13 +21,6 @@
 #include "plugin.h"
 #include "highscore.h"
 
-static const struct plugin_api *rb;
-
-void highscore_init(const struct plugin_api* newrb)
-{
-    rb = newrb;
-}
-
 int highscore_save(char *filename, struct highscore *scores, int num_scores)
 {
     int i;

@@ -17,9 +17,7 @@
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
 
-static const struct plugin_api* rb;
-
-MEM_FUNCTION_WRAPPERS(rb);
+MEM_FUNCTION_WRAPPERS;
 
 #define SAMP_PER_FRAME       1152
 #define SAMPL2                576
@@ -2496,7 +2494,7 @@ void get_mp3_filename(const char *wav_name)
 #endif
 #endif
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int   rat, srat, nrat; /* for rate selection */
     int   cont = 1, butt;
@@ -2512,13 +2510,12 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     if (parameter == NULL)
         return PLUGIN_ERROR;
 
-    PLUGIN_IRAM_INIT(api)
+    PLUGIN_IRAM_INIT(rb)
 
 #ifdef CPU_COLDFIRE
     coldfire_set_macsr(0); /* integer mode */
 #endif
 
-    rb = api;
     rb->lcd_setfont(FONT_SYSFIXED);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ

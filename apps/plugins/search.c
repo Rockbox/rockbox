@@ -24,8 +24,6 @@
 
 PLUGIN_HEADER
 
-static const struct plugin_api* rb;
-
 #define BUFFER_SIZE 16384
 
 static int fd;
@@ -146,13 +144,11 @@ static bool search_init(const char* file){
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     int ok;
     const char *filename = parameter;
     char *p;
-
-    rb = api;
 
     DEBUGF("%s - %s\n", (char *)parameter, &filename[rb->strlen(filename)-4]);
     /* Check the extension. We only allow .m3u files. */

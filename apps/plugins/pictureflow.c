@@ -34,8 +34,6 @@ PLUGIN_HEADER
 
 /******************************* Globals ***********************************/
 
-static const struct plugin_api *rb;   /* global api struct pointer */
-
 const struct button_mapping *plugin_contexts[]
 = {generic_actions, generic_directions};
 
@@ -1451,7 +1449,7 @@ void cleanup(void *parameter)
 {
     (void) parameter;
     /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
 
     int i;
     for (i = 0; i < slide_cache_in_use; i++) {
@@ -1952,7 +1950,7 @@ int main(void)
     slide_cache_stack_index = min_slide_cache-1;
     slide_cache_in_use = 0;
 #ifdef USEGSLIB
-    if (!grey_init(rb, plugin_buf, plugin_buf_size, GREY_BUFFERED|GREY_ON_COP,
+    if (!grey_init(plugin_buf, plugin_buf_size, GREY_BUFFERED|GREY_ON_COP,
                    LCD_WIDTH, LCD_HEIGHT, NULL))
         rb->splash(HZ, "Greylib init failed!");
     grey_setfont(FONT_UI);
@@ -2050,7 +2048,7 @@ int main(void)
         rb->yield();
 
         /*/ Handle buttons */
-        button = pluginlib_getaction(rb, instant_update ? 0 : HZ/16,
+        button = pluginlib_getaction(instant_update ? 0 : HZ/16,
                                      plugin_contexts, NB_ACTION_CONTEXTS);
 
         switch (button) {
@@ -2130,18 +2128,16 @@ int main(void)
 
 /*************************** Plugin entry point ****************************/
 
-enum plugin_status plugin_start(const struct plugin_api *api,
-                                const void *parameter)
+enum plugin_status plugin_start(const void *parameter)
 {
     int ret;
 
-    rb = api;                   /* copy to global api pointer */
     (void) parameter;
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
     /* Turn off backlight timeout */
-    backlight_force_on(rb);     /* backlight control in lib/helper.c */
+    backlight_force_on();     /* backlight control in lib/helper.c */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif

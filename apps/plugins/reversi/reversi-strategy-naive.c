@@ -32,7 +32,7 @@ static move_t naive_move_func(const reversi_board_t *game, int player) {
     int row = 0;
     int col = 0;
     if(!num_moves) return MOVE_INVALID;
-    r = game->rb->rand()%num_moves;
+    r = rb->rand()%num_moves;
     while(true) {
         if(reversi_is_valid_move(game, row, col, player)) {
             r--;

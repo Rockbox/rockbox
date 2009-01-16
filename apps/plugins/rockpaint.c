@@ -295,9 +295,7 @@ extern int errno;
 int errno;
 #endif
 
-static const struct plugin_api* rb;
-
-MEM_FUNCTION_WRAPPERS(rb);
+MEM_FUNCTION_WRAPPERS;
 
 static int drawcolor=0; /* Current color (in palette) */
 static int bgdrawcolor=9; /* Current background color (in palette) */
@@ -3009,14 +3007,11 @@ static int save_bitmap( char *file )
     bm.height = ROWS;
     bm.width = COLS;
     bm.format = FORMAT_NATIVE;
-    return save_bmp_file( file, &bm, rb );
+    return save_bmp_file( file, &bm );
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
-    /** must have stuff **/
-    rb = api;
-
     rb->lcd_set_foreground(COLOR_WHITE);
     rb->lcd_set_backdrop(NULL);
     rb->lcd_fillrect(0,0,LCD_WIDTH,LCD_HEIGHT);

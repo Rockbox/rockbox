@@ -22,8 +22,6 @@
 
 PLUGIN_HEADER
 
-static const struct plugin_api* rb;
-
 static char   *audiobuf;
 static ssize_t audiobuflen;
 unsigned char xingbuf[1500];
@@ -263,9 +261,8 @@ static bool vbr_fix(const char *selected_file)
     return false;
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void *parameter)
+enum plugin_status plugin_start(const void *parameter)
 {
-    rb = api;
 
     if (!parameter)
         return PLUGIN_ERROR;

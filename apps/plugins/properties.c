@@ -22,9 +22,7 @@
 
 PLUGIN_HEADER
 
-static const struct plugin_api* rb;
-
-MEM_FUNCTION_WRAPPERS(rb);
+MEM_FUNCTION_WRAPPERS;
 
 bool its_a_dir = false;
 
@@ -254,9 +252,8 @@ char * get_props(int selected_item, void* data, char *buffer, size_t buffer_len)
     return buffer;
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
-    rb = api;
     struct gui_synclist properties_lists;
     int button;
     bool prev_show_statusbar;

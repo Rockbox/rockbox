@@ -27,19 +27,19 @@
 /*
  * Print a checkbox
  */
-void checkbox(const struct plugin_api *api, int x, int y, int width, int height, bool checked)
+void checkbox(int x, int y, int width, int height, bool checked)
 {
     /* draw box */
-    api->lcd_drawrect(x, y, width, height);
+    rb->lcd_drawrect(x, y, width, height);
 
     /* clear inner area */
-    api->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    api->lcd_fillrect(x + 1, y + 1, width - 2, height - 2);
-    api->lcd_set_drawmode(DRMODE_SOLID);
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(x + 1, y + 1, width - 2, height - 2);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 
     if (checked){
-        api->lcd_drawline(x + 2, y + 2, x + width - 2 - 1 , y + height - 2 - 1);
-        api->lcd_drawline(x + 2, y + height - 2 - 1, x + width - 2 - 1, y + 2);
+        rb->lcd_drawline(x + 2, y + 2, x + width - 2 - 1 , y + height - 2 - 1);
+        rb->lcd_drawline(x + 2, y + height - 2 - 1, x + width - 2 - 1, y + 2);
     }
 }
 

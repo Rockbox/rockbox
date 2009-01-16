@@ -23,7 +23,6 @@
 
 PLUGIN_HEADER
 
-static const struct plugin_api* rb;
 static bool abort;
 static int fd;
 static int dirs_count;
@@ -327,7 +326,7 @@ int edit_list(void)
                     { "Remove Folder", NULL },
                     { "Remove Folder Tree", NULL },
                 };
-                m = menu_init(rb, items, sizeof(items) / sizeof(*items),
+                m = menu_init(items, sizeof(items) / sizeof(*items),
                                   NULL, NULL, NULL, NULL);
 
                 switch (menu_show(m))
@@ -362,7 +361,7 @@ int edit_list(void)
                     { "Save and Exit", NULL },
                     { "Ignore Changes and Exit", NULL },
                 };
-                m = menu_init(rb, items, sizeof(items) / sizeof(*items),
+                m = menu_init(items, sizeof(items) / sizeof(*items),
                                   NULL, NULL, NULL, NULL);
 
                 switch (menu_show(m))
@@ -484,7 +483,7 @@ int main_menu(void)
         { "Import List From Textfile", NULL },
         { "Quit", NULL },
     };
-    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
+    m = menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
     switch (menu_show(m))
@@ -550,11 +549,10 @@ int main_menu(void)
     return exit?1:0;
 }
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 
-    rb = api;
     abort = false;
     
     while (!main_menu())

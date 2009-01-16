@@ -101,7 +101,6 @@ int my_close(int id)
    return 0;
 }
 #endif
-const struct plugin_api* rb;
 #define MAXARGVS  100
 
 bool noprintf=0;  // Variable disables printf lcd updates to protect grayscale lib/direct lcd updates
@@ -496,7 +495,7 @@ int Oset_keys()
       { "Game Automap", NULL },
    };
 
-   m = menu_init(rb, items, sizeof(items) / sizeof(*items),
+   m = menu_init(items, sizeof(items) / sizeof(*items),
                 NULL, NULL, NULL, NULL);
 
     while(!menuquit)
@@ -560,7 +559,7 @@ static bool Doptions()
 #endif
     };
 
-    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
+    m = menu_init(items, sizeof(items) / sizeof(*items),
         NULL, NULL, NULL, NULL);
 
     while(!menuquit)
@@ -583,7 +582,7 @@ int menuchoice(struct menu_item *menu, int items)
 {
    int m, result;
    
-   m = menu_init(rb, menu, items,NULL, NULL, NULL, NULL);
+   m = menu_init(menu, items,NULL, NULL, NULL, NULL);
 
    result= menu_show(m);
    menu_exit(m);
@@ -633,7 +632,7 @@ int doom_menu()
     while (rb->button_get(false) != BUTTON_NONE) 
         rb->yield();
 
-   m = menu_init(rb, items, sizeof(items) / sizeof(*items),
+   m = menu_init(items, sizeof(items) / sizeof(*items),
                 NULL, NULL, NULL, NULL);
 
    while(!menuquit)
@@ -677,11 +676,10 @@ int doom_menu()
 
 extern int systemvol;
 /* this is the plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
-   PLUGIN_IRAM_INIT(api)
+   PLUGIN_IRAM_INIT(rb)
 
-   rb = api;
    (void)parameter;
 
    doomexit=0;
@@ -741,7 +739,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
    systemvol= rb->global_settings->volume-rb->global_settings->volume%((rb->sound_max(SOUND_VOLUME)-rb->sound_min(SOUND_VOLUME))/15);
    general_translucency = default_translucency;                    // phares
 
-   backlight_force_on(rb);
+   backlight_force_on();
 #ifdef RB_PROFILE
    rb->profile_thread();
 #endif
@@ -755,7 +753,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 #ifdef RB_PROFILE
    rb->profstop();
 #endif
-   backlight_use_settings(rb);
+   backlight_use_settings();
 
    M_SaveDefaults ();
 

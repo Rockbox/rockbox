@@ -29,8 +29,6 @@
 
 #include "jpeg_decoder.h"
 
-extern const struct plugin_api* rb;
-
 /* for portability of below JPEG code */
 #define MEMSET(p,v,c) rb->memset(p,v,c)
 #define MEMCPY(d,s,c) rb->memcpy(d,s,c)

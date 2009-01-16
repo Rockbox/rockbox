@@ -27,13 +27,6 @@
 #include "plugin.h"
 #include "md5.h"
 
-static const struct plugin_api *rb;
-
-void md5_init( const struct plugin_api *api )
-{
-    rb = api;
-}
-
 #ifdef ROCKBOX_BIG_ENDIAN
 static inline uint32_t GetDWLE( const void * _p )
 {

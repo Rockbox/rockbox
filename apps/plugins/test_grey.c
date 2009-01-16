@@ -108,7 +108,6 @@ static const unsigned char dither_matrix[16][16] = {
 static unsigned char input_levels[STEPS+1];
 static unsigned char lcd_levels[STEPS+1];
 
-static const struct plugin_api* rb;
 static unsigned char *gbuf;
 static size_t gbuf_size = 0;
 
@@ -139,7 +138,7 @@ static void fill_rastered(int bx, int by, int bw, int bh, int step)
 }
 
 /* plugin entry point */
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     bool done = false;
     int cur_step = 1;
@@ -148,11 +147,10 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     /* standard stuff */
     (void)parameter;
-    rb = api;
     
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
-    if (!grey_init(rb, gbuf, gbuf_size,
+    if (!grey_init(gbuf, gbuf_size,
                    GREY_BUFFERED|GREY_RAWMAPPED|GREY_ON_COP,
                    LCD_WIDTH, LCD_HEIGHT, NULL))
     {
@@ -162,7 +160,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     for (i = 0; i <= STEPS; i++)
         input_levels[i] = lcd_levels[i] = (255 * i + (STEPS/2)) / STEPS;
 
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    backlight_force_on(); /* backlight control in lib/helper.c */
 
     grey_set_background(0); /* set background to black */
     grey_clear_display();
@@ -240,6 +238,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     }
 
     grey_release();
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
+    backlight_use_settings(); /* backlight control in lib/helper.c */
     return PLUGIN_OK;
 }

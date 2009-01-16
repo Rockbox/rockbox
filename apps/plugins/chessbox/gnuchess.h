@@ -43,9 +43,6 @@ extern short GameCnt,Game50,castld[2],kingmoved[2],OperatorTime;
 extern struct TimeControlRec TimeControl;
 extern struct GameRec GameList[240];
 
-/* ---- RockBox integration ---- */
-extern const struct plugin_api* rb;
-
 /* ---- The beginning of a GNUChess v2 APIfication ---- */
 void SetTimeControl(void);
 void GNUChess_Initialize(void);

@@ -30,7 +30,6 @@
 
 PLUGIN_HEADER
 
-static const struct plugin_api* rb;
 #define min(a,b) (a<b?a:b)
 
 /**
@@ -795,7 +794,7 @@ int solitaire_menu(bool in_game)
     items[i++].desc = "Quit";
 
     create_draw_option_string();
-    m = menu_init(rb, items, i, NULL, NULL, NULL, NULL);
+    m = menu_init(items, i, NULL, NULL, NULL, NULL);
     while (result < 0)
     {
         switch (menu_show(m))
@@ -831,7 +830,7 @@ int solitaire_menu(bool in_game)
                 break;
 
             case 3:
-                 playback_control(rb, NULL);
+                 playback_control(NULL);
                  break;
 
             case 4:
@@ -1904,17 +1903,15 @@ int solitaire( int skipmenu )
  * Plugin entry point
  */
 
-enum plugin_status plugin_start( const struct plugin_api* api, const void* parameter )
+enum plugin_status plugin_start(const void* parameter )
 {
     int result;
 
     /* plugin init */
     (void)parameter;
-    rb = api;
 
     rb->splash( HZ, "Welcome to Solitaire!" );
 
-    configfile_init(rb);
     configfile_load(CONFIG_FILENAME, config,
                     sizeof(config) / sizeof(config[0]), CFGFILE_VERSION);
     rb->memcpy(&sol, &sol_disk, sizeof(sol));   /* copy to running config */
