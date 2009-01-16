@@ -59,7 +59,6 @@ PLUGIN_HEADER
 #define MAX_SHOTTIME 1000
 
 /* keyboard layouts */
-/* FIXME: shouldn't the below be #ifdef HAVE_SCROLLWHEEL rather? */
 
 #if (CONFIG_KEYPAD != SANSA_E200_PAD) && \
       (CONFIG_KEYPAD != SANSA_FUZE_PAD)

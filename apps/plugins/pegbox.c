@@ -39,7 +39,6 @@ PLUGIN_HEADER
 #define PB_USB  2
 #define PB_QUIT 1
 
-/* FIXME: USE PLUGIN_GAMES_DIR */
 #define DATA_FILE   PLUGIN_DIR "/games/pegbox.data"
 #define SAVE_FILE   PLUGIN_DIR "/games/pegbox.save"
 

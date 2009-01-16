@@ -23,7 +23,6 @@
 PLUGIN_HEADER
 
 
-/* FIXME: use "PLUGIN_APPS_DIR" */
 #define KEYBOX_FILE PLUGIN_DIR "/apps/keybox.dat"
 #define BLOCK_SIZE 8
 #define MAX_ENTRIES 12*BLOCK_SIZE /* keep this a multiple of BLOCK_SIZE */

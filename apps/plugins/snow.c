@@ -35,7 +35,6 @@ PLUGIN_HEADER
 #define MYLCD(fn) pgfx_ ## fn
 #endif
 
-/* FIXME: Could use pluginlib actions, or at least cleaned up */
 /* variable button definitions */
 #if CONFIG_KEYPAD == PLAYER_PAD
 #define SNOW_QUIT BUTTON_STOP

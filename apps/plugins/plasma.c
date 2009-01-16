@@ -54,7 +54,6 @@ static size_t        gbuf_size = 0;
 static unsigned char sp1, sp2, sp3, sp4; /* Speed of plasma */
 static int plasma_frequency;
 
-/* FIXME: Could use plugin lib actions */
 /* Key assignement, all bitmapped models */
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
     (CONFIG_KEYPAD == IPOD_1G2G_PAD)
@@ -67,7 +66,6 @@ static int plasma_frequency;
 #define PLASMA_INCREASE_FREQUENCY BUTTON_UP
 #define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
 
-/* FIXME: Clip/fuze should use HOME instead of POWER */
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
       (CONFIG_KEYPAD == SANSA_C200_PAD) || \
       (CONFIG_KEYPAD == SANSA_CLIP_PAD) || \

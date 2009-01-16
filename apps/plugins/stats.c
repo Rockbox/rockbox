@@ -26,7 +26,6 @@ static int files, dirs, musicfiles, largestdir;
 static int lasttick;
 static bool abort;
 
-/* FIXME: Could use plugin lib actions or be cleaned up */
 #if CONFIG_KEYPAD == PLAYER_PAD 
 #define STATS_STOP BUTTON_STOP
 

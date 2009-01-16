@@ -42,7 +42,6 @@ PLUGIN_HEADER
 #define GFX_HEIGHT 6
 #endif
 
-/* FIXME: could use plugin lib actions */
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define MOSAIQUE_QUIT BUTTON_OFF

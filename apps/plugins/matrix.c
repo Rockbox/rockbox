@@ -49,7 +49,6 @@ extern const fb_data matrix_normal[];
 #define LEFTMARGIN (LCD_WIDTH-(COLS*COL_W))/2
 #define TOPMARGIN  (LCD_HEIGHT-(ROWS*COL_H))/2
 
-/* FIXME: could use plugin lib actions */
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)

@@ -2427,7 +2427,6 @@ void get_mp3_filename(const char *wav_name)
 #define MP3ENC_NEXT BUTTON_DOWN
 #define MP3ENC_DONE BUTTON_POWER
 #define MP3ENC_SELECT BUTTON_SELECT
-/* FIXME: e200 could use scrollwheel */
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
 (CONFIG_KEYPAD == SANSA_C200_PAD) || \
 (CONFIG_KEYPAD == SANSA_CLIP_PAD) || \

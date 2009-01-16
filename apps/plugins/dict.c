@@ -102,7 +102,6 @@ long reverse (long N) {
 }
 #endif
 
-/* TODO: Clean up, most use BUTTON_POWER, could be the #else case */
 /* Button definitions */
 #if CONFIG_KEYPAD == PLAYER_PAD
 #define LP_QUIT BUTTON_STOP
@@ -145,7 +144,6 @@ long reverse (long N) {
 #endif
 
 /* data files */
-/* FIXME: use "PLUGIN_APPS_DIR" */
 #define DICT_INDEX ROCKBOX_DIR "/rocks/apps/dict.index"
 #define DICT_DESC ROCKBOX_DIR "/rocks/apps/dict.desc"
 

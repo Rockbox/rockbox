@@ -24,7 +24,6 @@
 
 PLUGIN_HEADER
 
-/* FIXME: Could use plugin lib action */
 
 #ifdef HAVE_LCD_BITMAP
 
