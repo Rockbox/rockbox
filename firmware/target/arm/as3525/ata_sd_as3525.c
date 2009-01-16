@@ -110,7 +110,7 @@ static bool sd_enabled = false;
 #endif
 
 static struct wakeup transfer_completion_signal;
-bool retry;
+static volatile bool retry;
 
 static inline void mci_delay(void) { int i = 0xffff; while(i--) ; }
 
@@ -270,6 +270,9 @@ static int sd_init_card(const int drive)
             sdhc = true;
 
     do {
+        /* some MicroSD cards seems to need more delays, so play safe */
+        mci_delay();
+        mci_delay();
         mci_delay();
 
         /* app_cmd */
@@ -286,7 +289,7 @@ static int sd_init_card(const int drive)
 
     } while(!(card_info[drive].ocr & (1<<31)) && max_tries--);
 
-    if(!max_tries)
+    if(max_tries < 0)
         return -4;
 
     /* send CID */
@@ -371,19 +374,20 @@ static void sd_thread(void)
 
             /* We now have exclusive control of fat cache and ata */
 
-            disk_unmount(1);     /* release "by force", ensure file
+            disk_unmount(SD_SLOT_AS3525);     /* release "by force", ensure file
                                     descriptors aren't leaked and any busy
                                     ones are invalid if mounting */
 
             /* Force card init for new card, re-init for re-inserted one or
              * clear if the last attempt to init failed with an error. */
-            card_info[1].initialized = 0;
+            card_info[SD_SLOT_AS3525].initialized = 0;
 
             if (ev.id == SYS_HOTSWAP_INSERTED)
             {
                 sd_enable(true);
                 init_pl180_controller(SD_SLOT_AS3525);
-                disk_mount(1);
+                sd_init_card(SD_SLOT_AS3525);
+                disk_mount(SD_SLOT_AS3525);
             }
 
             queue_broadcast(SYS_FS_CHANGED, 0);
@@ -391,6 +395,7 @@ static void sd_thread(void)
             /* Access is now safe */
             mutex_unlock(&sd_mtx);
             fat_unlock();
+            sd_enable(false);
             break;
 #endif
         case SYS_TIMEOUT:
@@ -445,6 +450,7 @@ static void init_pl180_controller(const int drive)
     GPIOA_IS &= ~(1<<2);
     /* detect both raising and falling edges */
     GPIOA_IBE |= (1<<2);
+
 #endif
 
 #else
@@ -470,43 +476,40 @@ static void init_pl180_controller(const int drive)
 int sd_init(void)
 {
     int ret;
-
-    CGU_IDE =   (1<<7)  /* AHB interface enable */  |
+    CGU_IDE = (1<<7)  /* AHB interface enable */   |
                 (1<<6)  /* interface enable */      |
                 ((CLK_DIV(AS3525_PLLA_FREQ, AS3525_IDE_FREQ) - 1) << 2) |
                 1       /* clock source = PLLA */;
 
+
     CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
 #ifdef HAVE_MULTIVOLUME
     CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
+    CCU_IO &= ~(1<<3);           /* bits 3:2 = 01, xpd is SD interface */
+    CCU_IO |= (1<<2);
 #endif
-
+    
     wakeup_init(&transfer_completion_signal);
 
     init_pl180_controller(INTERNAL_AS3525);
     ret = sd_init_card(INTERNAL_AS3525);
     if(ret < 0)
         return ret;
-
 #ifdef HAVE_MULTIVOLUME
-    CCU_IO &= ~8;           /* bits 3:2 = 01, xpd is SD interface */
-    CCU_IO |= 4;
-
     init_pl180_controller(SD_SLOT_AS3525);
-    sd_init_card(SD_SLOT_AS3525);
 #endif
+
     /* init mutex */
-
-#ifndef BOOTLOADER
-    sd_enable(false);
-#endif
-
     mutex_init(&sd_mtx);
 
     queue_init(&sd_queue, true);
     create_thread(sd_thread, sd_stack, sizeof(sd_stack), 0,
             sd_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
 
+#ifndef BOOTLOADER
+    sd_enabled = true;
+    sd_enable(false);
+#endif
     return 0;
 }
 
@@ -592,21 +595,12 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
     sd_enable(true);
 #endif
 
-#ifdef HAVE_MULTIVOLUME
-    if (drive != 0 && !card_detect_target())
-    {
-        /* no external sd-card inserted */
-        ret = -88;
-        goto sd_transfer_error;
-    }
-#endif
-
     if (card_info[drive].initialized <= 0)
     {
-        sd_init_card(drive);
+        ret = sd_init_card(drive);
         if (!(card_info[drive].initialized))
         {
-            panicf("card not initialised");
+            panicf("card not initialised (%d)", ret);
             goto sd_transfer_error;
         }
     }
@@ -623,6 +617,8 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
 
     while(count)
     {
+        /* Interrupt handler might set this to true during transfer */
+        retry = false;
         /* 128 * 512 = 2^16, and doesn't fit in the 16 bits of DATA_LENGTH
          * register, so we have to transfer maximum 127 sectors at a time. */
         unsigned int transfer = (count >= 128) ? 127 : count; /* sectors */
@@ -636,10 +632,7 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
                     MCI_ARG, NULL);
 
         if (ret < 0)
-        {
-            panicf("transfer multiple blocks failed");
-            goto sd_transfer_error;
-        }
+            panicf("transfer multiple blocks failed (%d)", ret);
 
         if(write)
             dma_enable_channel(0, buf, MCI_FIFO(drive),
@@ -657,7 +650,7 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
                                 (1<<3) /* DMA */                        |
                                 (9<<4) /* 2^9 = 512 */ ;
 
-        retry = false;
+
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
         if(!retry)
         {
@@ -678,26 +671,23 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
         ret = sd_wait_for_state(drive, SD_TRAN);
         if (ret < 0)
         {
-            panicf(" wait for state TRAN failed");
+            panicf(" wait for state TRAN failed (%d)", ret);
             goto sd_transfer_error;
         }
     }
 
-    while (1)
-    {
-        dma_release();
+    dma_release();
 
 #ifndef BOOTLOADER
-        sd_enable(false);
+    sd_enable(false);
 #endif
-        mutex_unlock(&sd_mtx);
-
-        return ret;
+    mutex_unlock(&sd_mtx);
+    return 0;
 
 sd_transfer_error:
-        panicf("transfer error : %d",ret);
-        card_info[drive].initialized = 0;
-    }
+    panicf("transfer error : %d",ret);
+    card_info[drive].initialized = 0;
+    return ret;
 }
 
 int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count,
