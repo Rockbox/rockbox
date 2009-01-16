@@ -24,11 +24,4 @@
 #include <plugin.h>
 #include "wrappers.h"
 
-static const struct plugin_api *rb;
-
 #include "../../recorder/resize.c"
-
-void resize_init(const struct plugin_api *api)
-{
-    rb = api;
-}
