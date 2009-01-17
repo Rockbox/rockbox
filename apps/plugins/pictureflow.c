@@ -66,7 +66,6 @@ typedef unsigned char pix_t;
 typedef fb_data pix_t;
 #endif
 
-#define WRNDUP(w, size) (((w)+(size)-1) & (~(size - 1)))
 #ifdef HAVE_SCROLLWHEEL
 #define PICTUREFLOW_NEXT_ALBUM          PLA_DOWN
 #define PICTUREFLOW_NEXT_ALBUM_REPEAT   PLA_DOWN_REPEAT
@@ -99,9 +98,11 @@ typedef fb_data pix_t;
 #define IANGLE_MAX 1024
 #define IANGLE_MASK 1023
 
-#define DISPLAY_SIZE (LCD_HEIGHT/2)
-#define REFLECT_TOP (DISPLAY_SIZE * 4 / 3)
+#define REFLECT_TOP (LCD_HEIGHT * 2 / 3)
 #define REFLECT_HEIGHT (LCD_HEIGHT - REFLECT_TOP)
+#define DISPLAY_HEIGHT REFLECT_TOP
+#define DISPLAY_WIDTH (LCD_HEIGHT * LCD_PIXEL_ASPECT_HEIGHT / \
+    LCD_PIXEL_ASPECT_WIDTH / 2)
 #define REFLECT_SC ((0x10000U * 3 + (REFLECT_HEIGHT * 5 - 1)) / \
     (REFLECT_HEIGHT * 5))
 #define DISPLAY_OFFS ((LCD_HEIGHT / 2) - REFLECT_HEIGHT)
@@ -247,10 +248,6 @@ static int track_index;
 static int selected_track;
 static int selected_track_pulse;
 void reset_track_list(void);
-
-#define INPUT_SIZE BM_SIZE(DISPLAY_SIZE, DISPLAY_SIZE, FORMAT_NATIVE, 0)
-#define SC_BUF_SIZE BM_SCALED_SIZE(DISPLAY_SIZE, 0, FORMAT_NATIVE, 0)
-#define OUTPUT_SIZE BM_SIZE(DISPLAY_SIZE * 2, DISPLAY_SIZE, FORMAT_NATIVE, 0)
 
 void * plugin_buf;
 size_t plugin_buf_size;
@@ -626,8 +623,8 @@ bool create_albumart_cache(bool force)
             continue;
 
         input_bmp.data = plugin_buf;
-        input_bmp.width = DISPLAY_SIZE;
-        input_bmp.height = LCD_HEIGHT - REFLECT_HEIGHT;
+        input_bmp.width = DISPLAY_WIDTH;
+        input_bmp.height = DISPLAY_HEIGHT;
         ret = rb->read_bmp_file(albumart_file, &input_bmp,
                                 plugin_buf_size, format, FPLUGIN);
         if (ret <= 0) {
@@ -1052,8 +1049,8 @@ void recalc_table(void)
 
     itilt = 70 * IANGLE_MAX / 360;      /* approx. 70 degrees tilted */
 
-    offsetX = DISPLAY_SIZE / 2 * (fsin(itilt) + PFREAL_ONE);
-    offsetY = DISPLAY_SIZE / 2 * (fsin(itilt) + PFREAL_ONE / 2);
+    offsetX = DISPLAY_WIDTH / 2 * (fsin(itilt) + PFREAL_ONE);
+    offsetY = DISPLAY_WIDTH / 2 * (fsin(itilt) + PFREAL_ONE / 2);
     offsetX += config.extra_spacing_for_center_slide << PFREAL_SHIFT;
 }
 
@@ -1472,8 +1469,8 @@ int create_empty_slide(bool force)
     if ( force || ! rb->file_exists( EMPTY_SLIDE ) )  {
         struct bitmap input_bmp;
         int ret;
-        input_bmp.width = DISPLAY_SIZE;
-        input_bmp.height = LCD_HEIGHT - REFLECT_HEIGHT;
+        input_bmp.width = DISPLAY_WIDTH;
+        input_bmp.height = DISPLAY_HEIGHT;
         input_bmp.format = FORMAT_NATIVE;
         input_bmp.data = (char*)plugin_buf;
         ret = rb->read_bmp_file(EMPTY_SLIDE_BMP, &input_bmp,
@@ -1618,8 +1615,8 @@ int main_menu(void)
  */
 void set_default_config(void)
 {
-    config.spacing_between_slides = (LCD_WIDTH - DISPLAY_SIZE) / 8;
-    config.extra_spacing_for_center_slide = (LCD_WIDTH - DISPLAY_SIZE) / 16;
+    config.spacing_between_slides = (LCD_WIDTH - DISPLAY_WIDTH) / 8;
+    config.extra_spacing_for_center_slide = (LCD_WIDTH - DISPLAY_WIDTH) / 16;
     config.show_slides = 4;
     config.avg_album_width = 0;
     config.zoom = 100;
