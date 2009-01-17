@@ -164,7 +164,7 @@ static longlong_t inc;
 
 /* Persistent settings */
 static struct configdata config[] = {
-   { TYPE_ENUM, 0, 12, &country, "country", currency_str, NULL }
+   { TYPE_ENUM, 0, 12, { .int_p = &country }, "country", currency_str }
 };
 
 
