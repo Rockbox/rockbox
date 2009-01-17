@@ -59,15 +59,21 @@ int configfile_save(const char *filename, struct configdata *cfg,
                 /* pre-allocate 10 bytes for INT */
                 rb->fdprintf(fd, "%s: %10d\n",
                                 cfg[i].name,
-                                *cfg[i].val);
+                                *cfg[i].int_p);
+                break;
+
+            case TYPE_BOOL:
+                rb->fdprintf(fd, "%s: 10%d\n",
+                                cfg[i].name,
+                                (int)*cfg[i].bool_p);
                 break;
 
             case TYPE_ENUM:
                 rb->fdprintf(fd, "%s: %s\n",
                                 cfg[i].name,
-                                cfg[i].values[*cfg[i].val]);
+                                cfg[i].values[*cfg[i].int_p]);
                 break;
-                
+
             case TYPE_STRING:
                 rb->fdprintf(fd, "%s: %s\n",
                                 cfg[i].name,
@@ -116,17 +122,22 @@ int configfile_load(const char *filename, struct configdata *cfg,
                         tmp = rb->atoi(val);
                         /* Only set it if it's within range */
                         if(tmp >= cfg[i].min && tmp <= cfg[i].max)
-                            *cfg[i].val = tmp;
+                            *cfg[i].int_p = tmp;
                         break;
-                        
+
+                    case TYPE_BOOL:
+                        tmp = rb->atoi(val);
+                        *cfg[i].bool_p = (bool)tmp;
+                        break;
+
                     case TYPE_ENUM:
                         for(j = 0;j < cfg[i].max;j++) {
                             if(!rb->strcmp(cfg[i].values[j], val)) {
-                                *cfg[i].val = j;
+                                *cfg[i].int_p = j;
                             }
                         }
                         break;
-                        
+
                     case TYPE_STRING:
                         rb->strncpy(cfg[i].string, val, cfg[i].max);
                         break;

@@ -813,7 +813,7 @@ int highscore;
 #define MAX_POINTS 200000 /* i dont think it needs to be more */
 static struct configdata config[] =
 {
-   {TYPE_INT, 0, MAX_POINTS, &highscore, "highscore", NULL, NULL}
+   {TYPE_INT, 0, MAX_POINTS, { .int_p = &highscore }, "highscore", NULL}
 };
 
 void int_game(int new_game)

@@ -178,25 +178,27 @@ struct mpeg_settings settings;
 
 static struct configdata config[] =
 {
-    {TYPE_INT, 0, 2, &settings.showfps, "Show FPS", NULL, NULL},
-    {TYPE_INT, 0, 2, &settings.limitfps, "Limit FPS", NULL, NULL},
-    {TYPE_INT, 0, 2, &settings.skipframes, "Skip frames", NULL, NULL},
-    {TYPE_INT, 0, INT_MAX, &settings.resume_count, "Resume count",
-     NULL, NULL},
-    {TYPE_INT, 0, MPEG_RESUME_NUM_OPTIONS, &settings.resume_options,
-     "Resume options", NULL, NULL},
+    {TYPE_INT, 0, 2, { .int_p = &settings.showfps }, "Show FPS", NULL},
+    {TYPE_INT, 0, 2, { .int_p = &settings.limitfps }, "Limit FPS", NULL},
+    {TYPE_INT, 0, 2, { .int_p = &settings.skipframes }, "Skip frames", NULL},
+    {TYPE_INT, 0, INT_MAX, { .int_p = &settings.resume_count }, "Resume count",
+     NULL},
+    {TYPE_INT, 0, MPEG_RESUME_NUM_OPTIONS,
+     { .int_p = &settings.resume_options }, "Resume options", NULL},
 #if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
-    {TYPE_INT, 0, INT_MAX, &settings.displayoptions, "Display options",
-     NULL, NULL},
+    {TYPE_INT, 0, INT_MAX, { .int_p = &settings.displayoptions },
+     "Display options", NULL},
 #endif
-    {TYPE_INT, 0, 2, &settings.tone_controls, "Tone controls", NULL, NULL},
-    {TYPE_INT, 0, 2, &settings.channel_modes, "Channel modes", NULL, NULL},
-    {TYPE_INT, 0, 2, &settings.crossfeed, "Crossfeed", NULL, NULL},
-    {TYPE_INT, 0, 2, &settings.equalizer, "Equalizer", NULL, NULL},
-    {TYPE_INT, 0, 2, &settings.dithering, "Dithering", NULL, NULL},
+    {TYPE_INT, 0, 2, { .int_p = &settings.tone_controls }, "Tone controls",
+     NULL},
+    {TYPE_INT, 0, 2, { .int_p = &settings.channel_modes }, "Channel modes",
+     NULL},
+    {TYPE_INT, 0, 2, { .int_p = &settings.crossfeed }, "Crossfeed", NULL},
+    {TYPE_INT, 0, 2, { .int_p = &settings.equalizer }, "Equalizer", NULL},
+    {TYPE_INT, 0, 2, { .int_p = &settings.dithering }, "Dithering", NULL},
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    {TYPE_INT, -1, INT_MAX, &settings.backlight_brightness,
-     "Backlight brightness", NULL, NULL},
+    {TYPE_INT, -1, INT_MAX, { .int_p = &settings.backlight_brightness },
+     "Backlight brightness", NULL},
 #endif
 };
 

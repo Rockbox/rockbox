@@ -468,15 +468,14 @@ static int players = 1;
 
 static struct configdata config[] =
 {
-   {TYPE_INT, 0, 1024, &highscore, "highscore", NULL, NULL},
-   {TYPE_INT, 0, 15, &arghs_per_food, "arghs per food", NULL, NULL},
-   {TYPE_INT, 0, 15, &argh_size, "argh size", NULL, NULL},
-   {TYPE_INT, 0, 15, &food_size, "food size", NULL, NULL},
-   {TYPE_INT, 0, 3, &players, "players", NULL, NULL},
-   {TYPE_INT, 0, 3, &worm_count, "worms", NULL, NULL},
-   {TYPE_INT, 0, 20, &speed, "speed", NULL, NULL},
-   {TYPE_INT, 0, 15, &worm_food, "Worm Growth Per Food", NULL, NULL}//,
-   //{TYPE_INT, 0, 3, &use_remote, "use remote", NULL, NULL}
+   {TYPE_INT, 0, 1024, { .int_p = &highscore }, "highscore", NULL},
+   {TYPE_INT, 0, 15, { .int_p = &arghs_per_food }, "arghs per food", NULL},
+   {TYPE_INT, 0, 15, { .int_p = &argh_size }, "argh size", NULL},
+   {TYPE_INT, 0, 15, { .int_p = &food_size }, "food size", NULL},
+   {TYPE_INT, 0, 3, { .int_p = &players }, "players", NULL},
+   {TYPE_INT, 0, 3, { .int_p = &worm_count }, "worms", NULL},
+   {TYPE_INT, 0, 20, { .int_p = &speed }, "speed", NULL},
+   {TYPE_INT, 0, 15, { .int_p = &worm_food }, "Worm Growth Per Food", NULL}
 };
 
 #ifdef DEBUG_WORMLET

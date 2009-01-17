@@ -75,13 +75,17 @@ static char* showfps_options[] = {"No", "Yes"};*/
 
 static struct configdata config[] =
 {
-   {TYPE_ENUM, 0, 2, &settings.invert_colors, "Invert Colors", noyes_options, NULL},
-   {TYPE_ENUM, 0, 2, &settings.kempston, "Map keys to kempston", noyes_options, NULL},
-   {TYPE_ENUM, 0, 2, &settings.showfps, "Show Speed", noyes_options, NULL},
-   {TYPE_ENUM, 0, 2, &settings.sound, "Sound", noyes_options, NULL},
-   {TYPE_INT, 0, 9, &settings.frameskip, "Frameskip", NULL, NULL},
-   {TYPE_INT, 1, 10, &settings.volume, "Volume", NULL, NULL},
-   {TYPE_STRING, 0, 5, NULL,"Key Mapping", NULL, (char*)&settings.keymap},
+   {TYPE_ENUM, 0, 2, { .int_p = &settings.invert_colors }, "Invert Colors",
+    noyes_options},
+   {TYPE_ENUM, 0, 2, { .int_p = &settings.kempston }, "Map keys to kempston",
+    noyes_options},
+   {TYPE_ENUM, 0, 2, { .int_p = &settings.showfps }, "Show Speed",
+    noyes_options},
+   {TYPE_ENUM, 0, 2, { .int_p = &settings.sound }, "Sound", noyes_options},
+   {TYPE_INT, 0, 9, { .int_p = &settings.frameskip }, "Frameskip", NULL},
+   {TYPE_INT, 1, 10, { .int_p = &settings.volume }, "Volume", NULL},
+   {TYPE_STRING, 0, 5, { .string =  (char*)&settings.keymap }, "Key Mapping",
+    NULL},
 };
 int spcf_read_conf_file(const char *filename)
 {

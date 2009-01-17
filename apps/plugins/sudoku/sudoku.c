@@ -245,10 +245,12 @@ static char *mark_str[2] = { "hide", "show" };
 
 struct configdata disk_config[] = {
 #ifdef HAVE_LCD_COLOR
-   { TYPE_ENUM, 0, 2, &sudcfg_disk.number_display, "numbers", number_str, NULL },
+   { TYPE_ENUM, 0, 2, { .int_p = &sudcfg_disk.number_display }, "numbers",
+     number_str },
 #endif
 #ifdef SUDOKU_BUTTON_POSSIBLE
-   { TYPE_ENUM, 0, 2, &sudcfg_disk.show_markings, "markings", mark_str, NULL },
+   { TYPE_ENUM, 0, 2, { .int_p = &sudcfg_disk.show_markings }, "markings",
+     mark_str },
 #endif
 };
 #endif

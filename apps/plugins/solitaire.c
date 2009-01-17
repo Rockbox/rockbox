@@ -749,7 +749,7 @@ struct sol_config sol_disk = {0};
 struct sol_config sol;
 
 static struct configdata config[] = {
-   { TYPE_INT, 0, 1, &sol_disk.draw_type, "draw_type", NULL, NULL },
+   { TYPE_INT, 0, 1, { .int_p = &sol_disk.draw_type }, "draw_type", NULL }
 };
 
 char draw_option_string[32];

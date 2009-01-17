@@ -57,11 +57,15 @@ static char* showfps_options[] = {"No", "Yes"};
 
 static struct configdata config[] =
 {
-   {TYPE_ENUM, 0, 2, &settings.difficulty, "Difficulty", difficulty_options, NULL},
-   {TYPE_ENUM, 0, 4, &settings.numlives, "Pacmen Per Game", numlives_options, NULL},
-   {TYPE_ENUM, 0, 4, &settings.bonus, "Bonus", bonus_options, NULL},
-   {TYPE_ENUM, 0, 2, &settings.ghostnames, "Ghost Names", ghostnames_options , NULL},
-   {TYPE_ENUM, 0, 2, &settings.showfps, "Show FPS", showfps_options, NULL},
+   {TYPE_ENUM, 0, 2, { .int_p = &settings.difficulty }, "Difficulty",
+    difficulty_options},
+   {TYPE_ENUM, 0, 4, { .int_p = &settings.numlives }, "Pacmen Per Game",
+    numlives_options},
+   {TYPE_ENUM, 0, 4, { .int_p = &settings.bonus }, "Bonus", bonus_options},
+   {TYPE_ENUM, 0, 2, { .int_p = &settings.ghostnames }, "Ghost Names",
+    ghostnames_options},
+   {TYPE_ENUM, 0, 2, { .int_p = &settings.showfps }, "Show FPS",
+    showfps_options},
 };
 
 static bool loadFile( const char * name, unsigned char * buf, int len )

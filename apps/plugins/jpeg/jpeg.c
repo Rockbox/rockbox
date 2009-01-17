@@ -122,13 +122,13 @@ static struct jpeg_settings old_settings;
 static struct configdata jpeg_config[] =
 {
 #ifdef HAVE_LCD_COLOR
-   { TYPE_ENUM, 0, COLOUR_NUM_MODES, &jpeg_settings.colour_mode,
-     "Colour Mode", (char *[]){ "Colour", "Grayscale" }, NULL },
-   { TYPE_ENUM, 0, DITHER_NUM_MODES, &jpeg_settings.dither_mode,
-     "Dither Mode", (char *[]){ "None", "Ordered", "Diffusion" }, NULL },
+   { TYPE_ENUM, 0, COLOUR_NUM_MODES, { .int_p = &jpeg_settings.colour_mode },
+     "Colour Mode", (char *[]){ "Colour", "Grayscale" } },
+   { TYPE_ENUM, 0, DITHER_NUM_MODES, { .int_p = &jpeg_settings.dither_mode },
+     "Dither Mode", (char *[]){ "None", "Ordered", "Diffusion" } },
 #endif
-   { TYPE_INT, SS_MIN_TIMEOUT, SS_MAX_TIMEOUT, &jpeg_settings.ss_timeout,
-     "Slideshow Time", NULL, NULL},
+   { TYPE_INT, SS_MIN_TIMEOUT, SS_MAX_TIMEOUT,
+     { .int_p = &jpeg_settings.ss_timeout }, "Slideshow Time", NULL },
 };
 
 #if LCD_DEPTH > 1

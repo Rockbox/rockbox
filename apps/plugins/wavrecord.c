@@ -3191,9 +3191,12 @@ static char *source_str[WAV_NUM_SRC] = { "line in", "mic",
                                          HAVE_SPDIF_REC_("spdif",) };
 
 struct configdata disk_config[] = {
-   { TYPE_ENUM, 0, 9, &reccfg_disk.samplerate, "sample rate", samplerate_str, NULL },
-   { TYPE_ENUM, 0, 2, &reccfg_disk.channels, "channels", channel_str, NULL },
-   { TYPE_ENUM, 0, WAV_NUM_SRC, &reccfg_disk.source, "source", source_str, NULL },
+   { TYPE_ENUM, 0, 9, { .int_p = &reccfg_disk.samplerate }, "sample rate",
+     samplerate_str },
+   { TYPE_ENUM, 0, 2, { .int_p = &reccfg_disk.channels }, "channels",
+     channel_str },
+   { TYPE_ENUM, 0, WAV_NUM_SRC, { .int_p = &reccfg_disk.source }, "source",
+     source_str },
 };
 
 static char recfilename[MAX_PATH];

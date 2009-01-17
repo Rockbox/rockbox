@@ -63,8 +63,8 @@ static int nb_sides_values[] = { 3, 4, 6, 8, 10, 12, 20, 100 };
 static char *sides_conf[] = {"3", "4", "6", "8", "10", "12", "20", "100" };
 static struct configdata config[] =
 {
-    {TYPE_INT, 0, MAX_DICES, &dice.nb_dices, "dice count", NULL, NULL},
-    {TYPE_ENUM, 0, 8, &sides_index, "side count", sides_conf, NULL}
+    {TYPE_INT, 0, MAX_DICES, { .int_p = &dice.nb_dices}, "dice count", NULL},
+    {TYPE_ENUM, 0, 8, { .int_p = &sides_index }, "side count", sides_conf}
 };
 
 void dice_init(struct dices* dice);

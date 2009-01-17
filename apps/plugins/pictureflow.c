@@ -203,22 +203,25 @@ static int slide_spacing = (LCD_WIDTH - DISPLAY_WIDTH) / 8;
 static int center_margin = (LCD_WIDTH - DISPLAY_WIDTH) / 16;
 static int num_slides = 4;
 static int zoom = 100;
-static int show_fps = false;
-static int resize = true;
+static bool show_fps = false;
+static bool resize = true;
 static int cache_version = 0;
 static int show_album_name = album_name_top;
 
 static struct configdata config[] =
 {
-    { TYPE_INT, 0, MAX_SPACING, &slide_spacing, "slide spacing", NULL, NULL },
-    { TYPE_INT, 0, MAX_MARGIN, &center_margin, "center margin", NULL, NULL },
-    { TYPE_INT, 0, MAX_SLIDES_COUNT, &num_slides, "slides count", NULL, NULL },
-    { TYPE_INT, 0, 300, &zoom, "zoom", NULL, NULL },
-    { TYPE_INT, 0, 1, &show_fps, "show fps", NULL, NULL },
-    { TYPE_INT, 0, 1, &resize, "resize", NULL, NULL },
-    { TYPE_INT, 0, 100, &cache_version, "cache version", NULL, NULL },
-    { TYPE_ENUM, 0, 2, &show_album_name, "show album name",
-      show_album_name_conf, NULL }
+    { TYPE_INT, 0, MAX_SPACING, { .int_p = &slide_spacing }, "slide spacing",
+      NULL },
+    { TYPE_INT, 0, MAX_MARGIN, { .int_p = &center_margin }, "center margin",
+      NULL },
+    { TYPE_INT, 0, MAX_SLIDES_COUNT, { .int_p = &num_slides }, "slides count",
+      NULL },
+    { TYPE_INT, 0, 300, { .int_p = &zoom }, "zoom", NULL },
+    { TYPE_BOOL, 0, 1, { .bool_p = &show_fps }, "show fps", NULL },
+    { TYPE_BOOL, 0, 1, { .bool_p = &resize }, "resize", NULL },
+    { TYPE_INT, 0, 100, { .int_p = &cache_version }, "cache version", NULL },
+    { TYPE_ENUM, 0, 2, { .int_p = &show_album_name }, "show album name",
+      show_album_name_conf }
 };
 
 #define CONFIG_NUM_ITEMS (sizeof(config) / sizeof(struct configdata))
@@ -1555,7 +1558,6 @@ int settings_menu(void)
 {
     int selection = 0;
     bool old_val;
-    bool new_val;
 
     MENUITEM_STRINGLIST(settings_menu, "PictureFlow Settings", NULL, "Show FPS",
                         "Spacing", "Center margin", "Number of slides", "Zoom",
@@ -1565,9 +1567,7 @@ int settings_menu(void)
         selection=rb->do_menu(&settings_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
-                new_val = show_fps;
-                rb->set_bool("Show FPS", &new_val);
-                show_fps = new_val;
+                rb->set_bool("Show FPS", &show_fps);
                 reset_track_list();
                 break;
 
@@ -1607,10 +1607,9 @@ int settings_menu(void)
                 reset_slides();
                 break;
             case 6:
-                old_val = new_val = resize;
-                rb->set_bool("Resize Covers", &new_val);
-                resize = new_val;
-                if (old_val == new_val) /* changed? */
+                old_val = resize;
+                rb->set_bool("Resize Covers", &resize);
+                if (old_val == resize) /* changed? */
                     break;
                 /* fallthrough if changed, since cache needs to be rebuilt */
             case 7:

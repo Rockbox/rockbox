@@ -312,10 +312,12 @@ static char *advance_str[2]     = { "scroll", "wrap" };
 static char *orientation_str[2] = { "horizontal", "vertical" };
 
 struct configdata disk_config[] = {
-   { TYPE_INT,  1, 99, &osc_disk.delay, "delay", NULL, NULL },
-   { TYPE_ENUM, 0, MAX_DRAW, &osc_disk.draw, "draw", draw_str, NULL },
-   { TYPE_ENUM, 0, MAX_ADV, &osc_disk.advance, "advance", advance_str, NULL },
-   { TYPE_ENUM, 0, MAX_OSC, &osc_disk.orientation, "orientation", orientation_str, NULL }
+   { TYPE_INT,  1, 99, { .int_p = &osc_disk.delay }, "delay", NULL },
+   { TYPE_ENUM, 0, MAX_DRAW, { .int_p = &osc_disk.draw }, "draw", draw_str },
+   { TYPE_ENUM, 0, MAX_ADV, { .int_p = &osc_disk.advance }, "advance",
+     advance_str },
+   { TYPE_ENUM, 0, MAX_OSC, { .int_p = &osc_disk.orientation }, "orientation",
+     orientation_str }
 };
 
 

@@ -181,7 +181,7 @@ static int score;
 #define MAX_POINTS 50000
 static struct configdata config[] =
 {
-   {TYPE_INT, 0, MAX_POINTS, &highscore, "highscore", NULL, NULL}
+   {TYPE_INT, 0, MAX_POINTS, { .int_p = &highscore }, "highscore", NULL}
 };
 
 struct CBlock

@@ -24,6 +24,7 @@
 #define TYPE_INT    1
 #define TYPE_ENUM   2
 #define TYPE_STRING 3
+#define TYPE_BOOL 4
 
 struct configdata
 {
@@ -31,12 +32,14 @@ struct configdata
     int min;       /* Min value for integers, should be 0 for enums */
     int max;       /* Max value for enums and integers,
                       buffer size for strings  */
-    int *val;      /* Pointer to integer/enum value,
-                      NULL if the item is a string */
+    union
+    {
+        int *int_p;
+        bool *bool_p;
+        char *string;
+    };             /* Pointer to value, a union of the possible types */
     char *name;    /* Pointer to the name of the item */
     char **values; /* List of strings for enums, NULL if not enum */
-    char *string;  /* Pointer to a string buffer if the item is a string,
-                      NULL otherwise */
 };
 
 /* configfile_save - Given configdata entries this function will

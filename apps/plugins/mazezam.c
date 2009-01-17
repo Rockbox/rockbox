@@ -807,8 +807,8 @@ static void game_loop(struct resume_data *r)
 static void resume_load_data (struct resume_data *r, struct resume_data *old)
 {
     struct configdata config[] = {
-        {TYPE_INT,0,MAZEZAM_NUM_LEVELS-1,&(r->level),
-         MAZEZAM_CONFIG_LEVELS_NAME,NULL,NULL}
+        {TYPE_INT,0,MAZEZAM_NUM_LEVELS-1, { .int_p = &(r->level) },
+         MAZEZAM_CONFIG_LEVELS_NAME,NULL}
     };
 
     if (configfile_load(MAZEZAM_CONFIG_FILENAME,config,
@@ -827,8 +827,8 @@ static void resume_load_data (struct resume_data *r, struct resume_data *old)
 static void resume_save_data (struct resume_data *r, struct resume_data *old)
 {
     struct configdata config[] = {
-        {TYPE_INT,0,MAZEZAM_NUM_LEVELS-1,&(r->level),
-         MAZEZAM_CONFIG_LEVELS_NAME,NULL,NULL}
+        {TYPE_INT,0,MAZEZAM_NUM_LEVELS-1, {.int_p = &(r->level) },
+         MAZEZAM_CONFIG_LEVELS_NAME,NULL}
     };
 
     /* To reduce disk usage, only write the file if the resume data has
