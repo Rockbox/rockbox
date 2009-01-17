@@ -1928,9 +1928,9 @@ int main(void)
     if (!create_empty_slide(cache_version != CACHE_VERSION)) {
         rb->splash(HZ, "Could not load the empty slide");
         return PLUGIN_ERROR;
-        cache_version = CACHE_VERSION;
-        configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
     }
+    cache_version = CACHE_VERSION;
+    configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
 
     if (!create_pf_thread()) {
         rb->splash(HZ, "Cannot create thread!");
