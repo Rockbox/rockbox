@@ -620,7 +620,7 @@ void draw_progressbar(int step)
  */
 bool create_albumart_cache(void)
 {
-    int fh,ret;
+    int ret;
 
     int i, slides = 0;
     struct bitmap input_bmp;
@@ -666,7 +666,6 @@ bool create_albumart_cache(void)
     }
     cache_version = CACHE_VERSION;
     configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
-    rb->close(fh);
     return true;
 }
 
