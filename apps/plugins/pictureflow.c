@@ -43,7 +43,6 @@ const struct button_mapping *plugin_contexts[]
 #if LCD_DEPTH < 8
 #define USEGSLIB
 GREY_INFO_STRUCT
-#define FPLUGIN &format_grey
 #define LCD_BUF _grey_info.buffer
 #define MYLCD(fn) grey_ ## fn
 #define G_PIX(r,g,b) \
@@ -55,7 +54,6 @@ GREY_INFO_STRUCT
 #define BUFFER_HEIGHT _grey_info.height
 typedef unsigned char pix_t;
 #else
-#define FPLUGIN NULL
 #define LCD_BUF rb->lcd_framebuffer
 #define MYLCD(fn) rb->lcd_ ## fn
 #define G_PIX LCD_RGBPACK
@@ -136,7 +134,7 @@ typedef fb_data pix_t;
 #define ERROR_BUFFER_FULL   -2
 
 /* current version for cover cache */
-#define CACHE_VERSION 1
+#define CACHE_VERSION 2
 #define CONFIG_VERSION 1
 #define CONFIG_FILE "pictureflow.cfg"
 
@@ -396,6 +394,43 @@ static inline PFreal fcos(int iangle)
     return fsin(iangle + (IANGLE_MAX >> 2));
 }
 
+static void output_row_transposed(uint32_t row, void * row_in,
+                                       struct scaler_context *ctx)
+{
+    pix_t *dest = (pix_t*)ctx->bm->data + row;
+    pix_t *end = dest + ctx->bm->height * ctx->bm->width;
+#ifdef USEGSLIB
+    uint32_t *qp = (uint32_t*)row_in;
+    for (; dest < end; dest += ctx->bm->height)
+        *dest = ((*qp++) + ctx->round) * (uint64_t)ctx->divisor >> 32;
+#else
+    struct uint32_rgb *qp = (struct uint32_rgb*)row_in;
+    uint32_t rb_mul = ((uint64_t)ctx->divisor * 31 + 127) / 255,
+             rb_rnd = ((uint64_t)ctx->round * 31 + 127) / 255,
+             g_mul = ((uint64_t)ctx->divisor * 63 + 127) / 255,
+             g_rnd = ((uint64_t)ctx->round * 63 + 127) / 255;
+    unsigned int r, g, b;
+    for (; dest < end; dest += ctx->bm->height)
+    {
+        r = (qp->r + rb_rnd) * (uint64_t)rb_mul >> 32;
+        g = (qp->g + g_rnd) * (uint64_t)g_mul >> 32;
+        b = (qp->b + rb_rnd) * (uint64_t)rb_mul >> 32;
+        qp++;
+        *dest = LCD_RGBPACK_LCD(r,g,b);
+    }
+#endif
+}
+
+static unsigned int get_size(struct bitmap *bm)
+{
+    return bm->width * bm->height * sizeof(pix_t);
+}
+
+const struct custom_format format_transposed = {
+    .output_row = output_row_transposed,
+    .get_size = get_size
+};
+
 /* Create the lookup table with the scaling values for the reflections */
 void init_reflect_table(void)
 {
@@ -647,7 +682,7 @@ bool create_albumart_cache(void)
         input_bmp.width = DISPLAY_WIDTH;
         input_bmp.height = DISPLAY_HEIGHT;
         ret = rb->read_bmp_file(albumart_file, &input_bmp,
-                                plugin_buf_size, format, FPLUGIN);
+                                plugin_buf_size, format, &format_transposed);
         if (ret <= 0) {
             rb->splash(HZ, "Could not read bmp");
             continue; /* skip missing/broken files */
@@ -664,8 +699,6 @@ bool create_albumart_cache(void)
         rb->splash(2*HZ, "No album art found");
         return false;
     }
-    cache_version = CACHE_VERSION;
-    configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
     return true;
 }
 
@@ -1167,20 +1200,20 @@ void render_slide(struct slide_data *slide, const int alpha)
         int dy = dist / h;
         int p1 = (bmp->height - 1 - (DISPLAY_OFFS)) * PFREAL_ONE;
         int p2 = p1 + dy;
-        const pix_t *ptr = &src[column];
+        const pix_t *ptr = &src[column * bmp->height];
 
         if (alpha == 256)
         {
             while ((y1 >= 0) && (p1 >= 0))
             {
-                *pixel1 = ptr[bmp->width * (p1 >> PFREAL_SHIFT)];
+                *pixel1 = ptr[p1 >> PFREAL_SHIFT];
                 p1 -= dy;
                 y1--;
                 pixel1 -= pixelstep;
             }
             while ((p2 < sh * PFREAL_ONE) && (y2 < h))
             {
-                *pixel2 = ptr[bmp->width * (p2 >> PFREAL_SHIFT)];
+                *pixel2 = ptr[p2 >> PFREAL_SHIFT];
                 p2 += dy;
                 y2++;
                 pixel2 += pixelstep;
@@ -1190,7 +1223,7 @@ void render_slide(struct slide_data *slide, const int alpha)
             {
                 int ty = (p2 >> PFREAL_SHIFT) - sh;
                 int lalpha = reflect_table[ty];
-                *pixel2 = fade_color(ptr[bmp->width * (sh - 1 - ty)],lalpha);
+                *pixel2 = fade_color(ptr[sh - 1 - ty],lalpha);
                 p2 += dy;
                 y2++;
                 pixel2 += pixelstep;
@@ -1199,16 +1232,14 @@ void render_slide(struct slide_data *slide, const int alpha)
         else
             while ((y1 >= 0) && (p1 >= 0))
             {
-                *pixel1 = fade_color(ptr[bmp->width *
-                                     (p1 >> PFREAL_SHIFT)],alpha);
+                *pixel1 = fade_color(ptr[p1 >> PFREAL_SHIFT],alpha);
                 p1 -= dy;
                 y1--;
                 pixel1 -= pixelstep;
             }
             while ((p2 < sh * PFREAL_ONE) && (y2 < h))
             {
-                *pixel2 = fade_color(ptr[bmp->width *
-                                     (p2 >> PFREAL_SHIFT)],alpha);
+                *pixel2 = fade_color(ptr[p2 >> PFREAL_SHIFT],alpha);
                 p2 += dy;
                 y2++;
                 pixel2 += pixelstep;
@@ -1218,7 +1249,7 @@ void render_slide(struct slide_data *slide, const int alpha)
             {
                 int ty = (p2 >> PFREAL_SHIFT) - sh;
                 int lalpha = (reflect_table[ty] * alpha + 128) >> 8;
-                *pixel2 = fade_color(ptr[bmp->width * (sh - 1 - ty)],lalpha);
+                *pixel2 = fade_color(ptr[sh - 1 - ty],lalpha);
                 p2 += dy;
                 y2++;
                 pixel2 += pixelstep;
@@ -1491,7 +1522,7 @@ int create_empty_slide(bool force)
         ret = rb->read_bmp_file(EMPTY_SLIDE_BMP, &input_bmp,
                                 plugin_buf_size,
                                 FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
-                                FPLUGIN);
+                                &format_transposed);
         if (!save_pfraw(EMPTY_SLIDE, &input_bmp))
             return false;
     }
@@ -1890,9 +1921,11 @@ int main(void)
         return PLUGIN_ERROR;
     }
 
-    if (!create_empty_slide(false)) {
+    if (!create_empty_slide(cache_version != CACHE_VERSION)) {
         rb->splash(HZ, "Could not load the empty slide");
         return PLUGIN_ERROR;
+        cache_version = CACHE_VERSION;
+        configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
     }
 
     if (!create_pf_thread()) {
