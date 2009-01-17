@@ -26,6 +26,7 @@
 #include "plugin.h"
 #include "lib/pluginlib_actions.h"
 #include "lib/helper.h"
+#include "lib/configfile.h"
 #include "lib/picture.h"
 #include "pluginbitmaps/pictureflow_logo.h"
 #include "lib/grey.h"
@@ -111,9 +112,6 @@ typedef fb_data pix_t;
 
 #define MAX_SLIDES_COUNT 10
 
-#define SPACING_BETWEEN_SLIDE 40
-#define EXTRA_SPACING_FOR_CENTER_SLIDE 0
-
 #define THREAD_STACK_SIZE DEFAULT_STACK_SIZE + 0x200
 #define CACHE_PREFIX PLUGIN_DEMOS_DIR "/pictureflow"
 
@@ -132,12 +130,15 @@ typedef fb_data pix_t;
 
 #define EMPTY_SLIDE CACHE_PREFIX "/emptyslide.pfraw"
 #define EMPTY_SLIDE_BMP PLUGIN_DEMOS_DIR "/pictureflow_emptyslide.bmp"
-#define CONFIG_FILE CACHE_PREFIX "/pictureflow.config"
 
 /* Error return values */
 #define ERROR_NO_ALBUMS     -1
 #define ERROR_BUFFER_FULL   -2
 
+/* current version for cover cache */
+#define CACHE_VERSION 1
+#define CONFIG_VERSION 1
+#define CONFIG_FILE "pictureflow.cfg"
 
 /** structs we use */
 
@@ -189,17 +190,40 @@ const struct picture logos[]={
 
 enum show_album_name_values { album_name_hide = 0, album_name_bottom ,
     album_name_top };
-
-struct config_data {
-    long avg_album_width;
-    int spacing_between_slides;
-    int extra_spacing_for_center_slide;
-    int show_slides;
-    int zoom;
-    bool show_fps;
-    bool resize;
-    enum show_album_name_values show_album_name;
+static char* show_album_name_conf[] =
+{
+    "hide",
+    "bottom",
+    "top"
 };
+
+#define MAX_SPACING 40
+#define MAX_MARGIN 80
+
+/* config values and their defaults */
+static int slide_spacing = (LCD_WIDTH - DISPLAY_WIDTH) / 8;
+static int center_margin = (LCD_WIDTH - DISPLAY_WIDTH) / 16;
+static int num_slides = 4;
+static int zoom = 100;
+static bool show_fps = false;
+static bool resize = true;
+static int cache_version = 0;
+static enum show_album_name_values show_album_name = album_name_top;
+
+static struct configdata config[] =
+{
+    { TYPE_INT, 0, MAX_SPACING, &slide_spacing, "slide spacing", NULL, NULL },
+    { TYPE_INT, 0, MAX_MARGIN, &center_margin, "center margin", NULL, NULL },
+    { TYPE_INT, 0, MAX_SLIDES_COUNT, &num_slides, "slides count", NULL, NULL },
+    { TYPE_INT, 0, 300, &zoom, "zoom", NULL, NULL },
+    { TYPE_INT, 0, 1, (int *)&show_fps, "show fps", NULL, NULL },
+    { TYPE_INT, 0, 1, (int *)&resize, "resize", NULL, NULL },
+    { TYPE_INT, 0, 100, &cache_version, "cache version", NULL, NULL },
+    { TYPE_ENUM, 0, 2, (int *)&show_album_name, "show album name",
+      show_album_name_conf, NULL }
+};
+
+#define CONFIG_NUM_ITEMS (sizeof(config) / sizeof(struct configdata))
 
 /** below we allocate the memory we want to use **/
 
@@ -251,7 +275,6 @@ void reset_track_list(void);
 
 void * plugin_buf;
 size_t plugin_buf_size;
-static struct config_data config;
 
 static int old_drawmode;
 
@@ -595,21 +618,19 @@ void draw_progressbar(int step)
 /**
  Precomupte the album art images and store them in CACHE_PREFIX.
  */
-bool create_albumart_cache(bool force)
+bool create_albumart_cache(void)
 {
-    number_of_slides  = album_count;
     int fh,ret;
-
-    if ( ! force && rb->file_exists( CACHE_PREFIX "/ready" ) ) return true;
 
     int i, slides = 0;
     struct bitmap input_bmp;
 
-    config.avg_album_width = 0;
     char pfraw_file[MAX_PATH];
     char albumart_file[MAX_PATH];
     unsigned int format = FORMAT_NATIVE;
-    if (config.resize)
+    cache_version = 0;
+    configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
+    if (resize)
         format |= FORMAT_RESIZE|FORMAT_KEEP_ASPECT;
     for (i=0; i < album_count; i++)
     {
@@ -635,7 +656,6 @@ bool create_albumart_cache(bool force)
         {
             rb->splash(HZ, "Could not write bmp");
         }
-        config.avg_album_width += input_bmp.width;
         slides++;
         if ( rb->button_get(false) == PICTUREFLOW_MENU ) return false;
     }
@@ -644,12 +664,8 @@ bool create_albumart_cache(bool force)
         rb->splash(2*HZ, "No album art found");
         return false;
     }
-    config.avg_album_width /= slides;
-    if ( config.avg_album_width == 0 ) {
-        rb->splash(HZ, "album size is 0");
-        return false;
-    }
-    fh = rb->creat( CACHE_PREFIX "/ready"  );
+    cache_version = CACHE_VERSION;
+    configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
     rb->close(fh);
     return true;
 }
@@ -1012,19 +1028,19 @@ void reset_slides(void)
     center_slide.slide_index = center_index;
 
     int i;
-    for (i = 0; i < config.show_slides; i++) {
+    for (i = 0; i < num_slides; i++) {
         struct slide_data *si = &left_slides[i];
         si->angle = itilt;
-        si->cx = -(offsetX + config.spacing_between_slides * i * PFREAL_ONE);
+        si->cx = -(offsetX + slide_spacing * i * PFREAL_ONE);
         si->cy = offsetY;
         si->slide_index = center_index - 1 - i;
         si->distance = 0;
     }
 
-    for (i = 0; i < config.show_slides; i++) {
+    for (i = 0; i < num_slides; i++) {
         struct slide_data *si = &right_slides[i];
         si->angle = -itilt;
-        si->cx = offsetX + config.spacing_between_slides * i * PFREAL_ONE;
+        si->cx = offsetX + slide_spacing * i * PFREAL_ONE;
         si->cy = offsetY;
         si->slide_index = center_index + 1 + i;
         si->distance = 0;
@@ -1051,7 +1067,7 @@ void recalc_table(void)
 
     offsetX = DISPLAY_WIDTH / 2 * (fsin(itilt) + PFREAL_ONE);
     offsetY = DISPLAY_WIDTH / 2 * (fsin(itilt) + PFREAL_ONE / 2);
-    offsetX += config.extra_spacing_for_center_slide << PFREAL_SHIFT;
+    offsetX += center_margin << PFREAL_SHIFT;
 }
 
 
@@ -1105,7 +1121,7 @@ void render_slide(struct slide_data *slide, const int alpha)
     const int w = LCD_WIDTH;
 
 
-    int distance = (h + slide->distance) * 100 / config.zoom;
+    int distance = (h + slide->distance) * 100 / zoom;
     PFreal dist = distance * PFREAL_ONE;
     if (distance < 100 ) distance = 100; /* clamp distances */
     PFreal sdx = fcos(slide->angle);
@@ -1294,8 +1310,8 @@ void render_all_slides(void)
     /* TODO: Optimizes this by e.g. invalidating rects */
     MYLCD(clear_display)();
 
-    int nleft = config.show_slides;
-    int nright = config.show_slides;
+    int nleft = num_slides;
+    int nright = num_slides;
 
     int index;
     if (step == 0) {
@@ -1381,9 +1397,9 @@ void update_scroll_animation(void)
         center_index = index;
         slide_frame = index << 16;
         center_slide.slide_index = center_index;
-        for (i = 0; i < config.show_slides; i++)
+        for (i = 0; i < num_slides; i++)
             left_slides[i].slide_index = center_index - 1 - i;
-        for (i = 0; i < config.show_slides; i++)
+        for (i = 0; i < num_slides; i++)
             right_slides[i].slide_index = center_index + 1 + i;
     }
 
@@ -1399,21 +1415,21 @@ void update_scroll_animation(void)
         return;
     }
 
-    for (i = 0; i < config.show_slides; i++) {
+    for (i = 0; i < num_slides; i++) {
         struct slide_data *si = &left_slides[i];
         si->angle = itilt;
         si->cx =
-            -(offsetX + config.spacing_between_slides * i * PFREAL_ONE + step
-                        * config.spacing_between_slides * ftick);
+            -(offsetX + slide_spacing * i * PFREAL_ONE + step
+                        * slide_spacing * ftick);
         si->cy = offsetY;
     }
 
-    for (i = 0; i < config.show_slides; i++) {
+    for (i = 0; i < num_slides; i++) {
         struct slide_data *si = &right_slides[i];
         si->angle = -itilt;
         si->cx =
-            offsetX + config.spacing_between_slides * i * PFREAL_ONE - step
-                      * config.spacing_between_slides * ftick;
+            offsetX + slide_spacing * i * PFREAL_ONE - step
+                      * slide_spacing * ftick;
         si->cy = offsetY;
     }
 
@@ -1492,13 +1508,13 @@ int create_empty_slide(bool force)
 */
 int album_name_menu(void)
 {
-    int selection = config.show_album_name;
+    int selection = show_album_name;
 
     MENUITEM_STRINGLIST(album_name_menu,"Show album title",NULL,
             "Hide album title", "Show at the bottom", "Show at the top");
     rb->do_menu(&album_name_menu, &selection, NULL, false);
 
-    config.show_album_name = selection;
+    show_album_name = selection;
     return GO_TO_PREVIOUS;
 }
 
@@ -1518,13 +1534,13 @@ int settings_menu(void)
         selection=rb->do_menu(&settings_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
-                rb->set_bool("Show FPS", &(config.show_fps));
+                rb->set_bool("Show FPS", &(show_fps));
                 reset_track_list();
                 break;
 
             case 1:
                 rb->set_int("Spacing between slides", "", 1,
-                            &(config.spacing_between_slides),
+                            &slide_spacing,
                             NULL, 1, 0, 100, NULL );
                 recalc_table();
                 reset_slides();
@@ -1532,21 +1548,21 @@ int settings_menu(void)
 
             case 2:
                 rb->set_int("Center margin", "", 1,
-                            &(config.extra_spacing_for_center_slide),
+                            &center_margin,
                             NULL, 1, 0, 80, NULL );
                 recalc_table();
                 reset_slides();
                 break;
 
             case 3:
-                rb->set_int("Number of slides", "", 1, &(config.show_slides),
+                rb->set_int("Number of slides", "", 1, &num_slides,
                             NULL, 1, 1, MAX_SLIDES_COUNT, NULL );
                 recalc_table();
                 reset_slides();
                 break;
 
             case 4:
-                rb->set_int("Zoom", "", 1, &(config.zoom),
+                rb->set_int("Zoom", "", 1, &zoom,
                             NULL, 1, 10, 300, NULL );
                 recalc_table();
                 reset_slides();
@@ -1558,13 +1574,13 @@ int settings_menu(void)
                 reset_slides();
                 break;
             case 6:
-                old_val = config.resize;
-                rb->set_bool("Resize Covers", &(config.resize));
-                if (old_val == config.resize) /* changed? */
+                old_val = resize;
+                rb->set_bool("Resize Covers", &resize);
+                if (old_val == resize) /* changed? */
                     break;
                 /* fallthrough if changed, since cache needs to be rebuilt */
             case 7:
-                rb->remove(CACHE_PREFIX "/ready");
+                cache_version = 0;
                 rb->remove(EMPTY_SLIDE);
                 rb->splash(HZ, "Cache will be rebuilt on next restart");
                 break;
@@ -1573,6 +1589,7 @@ int settings_menu(void)
                 return PLUGIN_USB_CONNECTED;
         }
     } while ( selection >= 0 );
+    configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
     return 0;
 }
 
@@ -1608,55 +1625,6 @@ int main_menu(void)
                 return 0;
         }
     }
-}
-
-/**
-  Fill the config struct with some defaults
- */
-void set_default_config(void)
-{
-    config.spacing_between_slides = (LCD_WIDTH - DISPLAY_WIDTH) / 8;
-    config.extra_spacing_for_center_slide = (LCD_WIDTH - DISPLAY_WIDTH) / 16;
-    config.show_slides = 4;
-    config.avg_album_width = 0;
-    config.zoom = 100;
-    config.show_fps = false;
-    config.resize = true;
-    config.show_album_name = album_name_top;
-}
-
-/**
-  Read the config file.
-  For now, the size has to match.
-  Later a version number might be appropiate.
- */
-bool read_pfconfig(void)
-{
-    set_default_config();
-    /* defaults */
-    int fh = rb->open( CONFIG_FILE, O_RDONLY );
-    if ( fh < 0 ) { /* no config yet */
-        return true;
-    }
-    int ret = rb->read(fh, &config, sizeof(struct config_data));
-    rb->close(fh);
-    if ( ret != sizeof(struct config_data) ) {
-        set_default_config();
-        rb->splash(2*HZ, "Config invalid. Using defaults");
-    }
-    return true;
-}
-
-/**
-  Write the config file
- */
-bool write_pfconfig(void)
-{
-    int fh = rb->creat( CONFIG_FILE );
-    if( fh < 0 ) return false;
-    rb->write( fh, &config, sizeof( struct config_data ) );
-    rb->close( fh );
-    return true;
 }
 
 /**
@@ -1723,20 +1691,20 @@ static inline void draw_gradient(int y, int h)
 
 static void track_list_yh(int char_height)
 {
-    switch (config.show_album_name)
+    switch (show_album_name)
     {
         case album_name_hide:
-            track_list_y = (config.show_fps ? char_height : 0);
+            track_list_y = (show_fps ? char_height : 0);
             track_list_h = LCD_HEIGHT - track_list_y;
             break;
         case album_name_bottom:
-            track_list_y = (config.show_fps ? char_height : 0);
+            track_list_y = (show_fps ? char_height : 0);
             track_list_h = LCD_HEIGHT - track_list_y - char_height * 2;
             break;
         default: /* case album_name_top */
             track_list_y = char_height * 2;
             track_list_h = LCD_HEIGHT - track_list_y -
-                           (config.show_fps ? char_height : 0);
+                           (show_fps ? char_height : 0);
             break;
     }
 }
@@ -1831,7 +1799,7 @@ void select_prev_track(void)
  */
 void draw_album_text(void)
 {
-    if (0 == config.show_album_name)
+    if (0 == show_album_name)
         return;
 
     int albumtxt_w, albumtxt_h;
@@ -1865,7 +1833,7 @@ void draw_album_text(void)
         prev_center_index = center_index;
     }
 
-    if (config.show_album_name == album_name_top)
+    if (show_album_name == album_name_top)
         albumtxt_y = albumtxt_h / 2;
     else
         albumtxt_y = LCD_HEIGHT - albumtxt_h - albumtxt_h/2;
@@ -1904,10 +1872,7 @@ int main(void)
         }
     }
 
-    if (!read_pfconfig()) {
-        rb->splash(HZ, "Error in config. Please delete " CONFIG_FILE);
-        return PLUGIN_ERROR;
-    }
+    configfile_load(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
 
     init_reflect_table();
 
@@ -1919,8 +1884,9 @@ int main(void)
         rb->splash(HZ, "No albums found. Please enable database");
         return PLUGIN_ERROR;
     }
-
-    if (!create_albumart_cache(config.avg_album_width == 0)) {
+    
+    number_of_slides  = album_count;
+    if ((cache_version != CACHE_VERSION) && !create_albumart_cache()) {
         rb->splash(HZ, "Could not create album art cache");
         return PLUGIN_ERROR;
     }
@@ -2022,7 +1988,7 @@ int main(void)
             frames = 0;
         }
         /* Draw FPS */
-        if (config.show_fps)
+        if (show_fps)
         {
 #ifdef USEGSLIB
             MYLCD(set_foreground)(G_BRIGHT(255));
@@ -2030,7 +1996,7 @@ int main(void)
             MYLCD(set_foreground)(G_PIX(255,0,0));
 #endif
             rb->snprintf(fpstxt, sizeof(fpstxt), "FPS: %d", fps);
-            if (config.show_album_name == album_name_top)
+            if (show_album_name == album_name_top)
                 fpstxt_y = LCD_HEIGHT -
                            rb->screens[SCREEN_MAIN]->getcharheight();
             else
@@ -2145,7 +2111,9 @@ enum plugin_status plugin_start(const void *parameter)
     rb->cpu_boost(false);
 #endif
     if ( ret == PLUGIN_OK ) {
-        if (!write_pfconfig()) {
+        if (configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS,
+                            CONFIG_VERSION))
+        {
             rb->splash(HZ, "Error writing config.");
             ret = PLUGIN_ERROR;
         }
