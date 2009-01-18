@@ -397,6 +397,9 @@ static inline PFreal fcos(int iangle)
     return fsin(iangle + (IANGLE_MAX >> 2));
 }
 
+#define RB_DIV ((31ULL << 32) / 255 + 1)
+#define G_DIV ((63ULL << 32) / 255 + 1)
+
 static void output_row_transposed(uint32_t row, void * row_in,
                                        struct scaler_context *ctx)
 {
@@ -408,11 +411,11 @@ static void output_row_transposed(uint32_t row, void * row_in,
         *dest = ((*qp++) + ctx->round) * (uint64_t)ctx->divisor >> 32;
 #else
     struct uint32_rgb *qp = (struct uint32_rgb*)row_in;
-    uint32_t rb_mul = ((uint64_t)ctx->divisor * 31 + 127) / 255,
-             rb_rnd = ((uint64_t)ctx->round * 31 + 127) / 255,
-             g_mul = ((uint64_t)ctx->divisor * 63 + 127) / 255,
-             g_rnd = ((uint64_t)ctx->round * 63 + 127) / 255;
-    unsigned int r, g, b;
+    uint32_t rb_mul = ctx->divisor * (uint64_t)RB_DIV >> 32,
+             rb_rnd = ctx->round * (uint64_t)RB_DIV >> 32,
+             g_mul = ctx->divisor * (uint64_t)G_DIV >> 32,
+             g_rnd = ctx->round * (uint64_t)G_DIV >> 32;
+             int r, g, b;
     for (; dest < end; dest += ctx->bm->height)
     {
         r = (qp->r + rb_rnd) * (uint64_t)rb_mul >> 32;
