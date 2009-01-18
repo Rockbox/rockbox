@@ -134,6 +134,12 @@
 /** Non-simulator section **/
 #ifndef SIMULATOR
 
+/* define this if the backlight thread is used for fade, not for sim, needs
+ * HAVE_BACKLIGHT_BRIGHTNESS */
+#ifndef BOOTLOADER
+#define USE_BACKLIGHT_SW_FADING
+#endif
+
 /* Define this if you have an AMS AS3525*/
 #define CONFIG_CPU AS3525
 
@@ -200,8 +206,3 @@
 #define DEFAULT_REC_MIC_GAIN    23
 #define DEFAULT_REC_LEFT_GAIN   23
 #define DEFAULT_REC_RIGHT_GAIN  23
-
-#ifdef E200R_INSTALLER
-#define IRAMORIG 0x40004000
-#endif
-

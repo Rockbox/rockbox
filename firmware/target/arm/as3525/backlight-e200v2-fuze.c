@@ -28,10 +28,7 @@
 
 void _backlight_set_brightness(int brightness)
 {
-    if (brightness > 0)
-        _backlight_on();
-    else
-        _backlight_off();
+    ascodec_write(AS3514_DCDC15, brightness);
 }
 
 void _backlight_on(void)
@@ -42,7 +39,9 @@ void _backlight_on(void)
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
 #endif
+#ifndef USE_BACKLIGHT_SW_FADING
     ascodec_write(AS3514_DCDC15, backlight_brightness);
+#endif
 }
 
 void _backlight_off(void)

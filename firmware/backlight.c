@@ -463,9 +463,9 @@ static void backlight_set_up_fade_down(void)
         _backlight_off();
     /* h300/x5/d2 go to the last known brightness level at backight_on(),which
      * should be the lowest level to keep fading up glitch free
-     * sansa e200/c200 make the backlight on only by setting the brightness,
-     * so this step would be noticeable */
-#if !defined(SANSA_E200) && !defined(SANSA_C200)
+     * targets which set brightness over AS3514 I2C make the backlight on only
+     * by setting the brightness, so this step would be noticeable */
+#if !defined(HAVE_AS3514)
         _backlight_set_brightness(MIN_BRIGHTNESS_SETTING);
 #endif
     }
