@@ -57,12 +57,12 @@ void _backlight_off(void)
 
 void _buttonlight_on(void)
 {
-    GPIOD_PIN(7) = (1<<7);
     GPIOD_DIR |= (1<<7);
+    GPIOD_PIN(7) = (1<<7);
 }
 
 void _buttonlight_off(void)
 {
     GPIOD_PIN(7) = 0;
-    GPIOD_DIR |= (1<<7);
+    GPIOD_DIR &= ~(1<<7);
 }

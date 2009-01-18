@@ -108,6 +108,7 @@ static void get_wheel(void)
                  * the rockbox menus */
                 if (queue_empty(&button_queue) && ++counter >= 4)
                 {
+                    buttonlight_on();
                     backlight_on();
                     /* 1<<24 is rather arbitary, seems to work well */
                     queue_post(&button_queue, btn, 1<<24);

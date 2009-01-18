@@ -273,6 +273,7 @@ interface */
 #define UART_LNSTATUS_REG   (*(volatile unsigned long*)(UART0_BASE + 0x14)) /* Line status register */
 
 
+#define SD_MCI_POWER		(*(volatile unsigned long*)(SD_MCI_BASE + 0x0))
 
 
 #define TIMER1_LOAD      (*(volatile unsigned long*)(TIMER_BASE + 0x00)) /* 32-bit width */

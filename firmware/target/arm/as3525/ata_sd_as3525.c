@@ -476,10 +476,10 @@ static void init_pl180_controller(const int drive)
 int sd_init(void)
 {
     int ret;
-    CGU_IDE = (1<<7)  /* AHB interface enable */   |
+    CGU_IDE =   (1<<7)  /* AHB interface enable */  |
                 (1<<6)  /* interface enable */      |
                 ((CLK_DIV(AS3525_PLLA_FREQ, AS3525_IDE_FREQ) - 1) << 2) |
-                1       /* clock source = PLLA */;
+                1;       /* clock source = PLLA */
 
 
     CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
@@ -741,6 +741,10 @@ void sd_enable(bool on)
         CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
 #ifdef HAVE_MULTIVOLUME
         CGU_PERI |= CGU_MCI_CLOCK_ENABLE;
+        /* Needed for buttonlight and MicroSD to work at the same time */
+        /* Turn ROD control on, as the OF does */
+        SD_MCI_POWER |= (1<<7);
+        CCU_IO |= (1<<2);
 #endif
         CGU_IDE |= (1<<7)  /* AHB interface enable */  |
                    (1<<6)  /* interface enable */;
@@ -751,6 +755,10 @@ void sd_enable(bool on)
         CGU_PERI &= ~CGU_NAF_CLOCK_ENABLE;
 #ifdef HAVE_MULTIVOLUME
         CGU_PERI &= ~CGU_MCI_CLOCK_ENABLE;
+        /* Needed for buttonlight and MicroSD to work at the same time */
+        /* Turn ROD control off, as the OF does */
+        SD_MCI_POWER &= ~(1<<7);
+        CCU_IO &= ~(1<<2);
 #endif
         CGU_IDE &= ~((1<<7)|(1<<6));
         sd_enabled = false;
