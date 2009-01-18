@@ -37,9 +37,9 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
- 
-    /* NOTE: why is the top voltage 4237? That's just too high. */
-    { 3286, 3679, 3734, 3764, 3788, 3824, 3886, 3950, 4014, 4098, 4237 },
+
+    /* Taken from BertrikSikken's bench on 2008-09-22 */
+    { 3400, 3689, 3744, 3773, 3798, 3831, 3886, 3947, 4005, 4102, 4220 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
