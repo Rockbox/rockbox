@@ -27,13 +27,13 @@
 
         [ answer to questions ]
 
-        [ Makefile created, archos subdirectory created ]
+        [ Makefile created, simdisk subdirectory created ]
 
         $ make
         $ make install
         $ ./rockboxui
 
-    Note that the simulator uses a local subdirectory named 'archos' as "root
+    Note that the simulator uses a local subdirectory named 'simdisk' as "root
     directory" for the simulated box. Copy a bunch of mp3 files into that
     directory, create subdirectories and do all sorts of things you want to be
     able to browse when you fire up the simulator.
@@ -41,7 +41,7 @@
 3. Run Uisimulator
 
   To create a simulated disk drive for the simulator to see, create a
-  subdirectory named 'archos' and populate it with a bunch of test
+  subdirectory named 'simdisk' and populate it with a bunch of test
   files/directories.
 
   Run 'rockboxui'.
