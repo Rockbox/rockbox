@@ -63,7 +63,7 @@ int configfile_save(const char *filename, struct configdata *cfg,
                 break;
 
             case TYPE_BOOL:
-                rb->fdprintf(fd, "%s: 10%d\n",
+                rb->fdprintf(fd, "%s: %10d\n",
                                 cfg[i].name,
                                 (int)*cfg[i].bool_p);
                 break;
