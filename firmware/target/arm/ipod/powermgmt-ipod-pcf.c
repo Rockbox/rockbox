@@ -59,6 +59,9 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 #elif defined IPOD_VIDEO
     /* iPOD Video 30GB Li-Ion 400mAh, first approach based upon measurements */
     { 3450, 3670, 3710, 3750, 3790, 3830, 3870, 3930, 4010, 4100, 4180 },
+#elif defined IPOD_COLOR
+    /* iPOD Color 60GB Li-Ion, first approach based upon measurements */
+    { 3500, 3676, 3729, 3755, 3778, 3805, 3847, 3919, 3961, 4071, 4109 },
 #else
     /* FIXME: calibrate value for other 3G+ ipods */
     /* Table is "inherited" from iriver H100. */
@@ -106,6 +109,6 @@ void accessory_supply_set(bool enable)
         /* Accessory voltage supply */
         pcf50605_write(PCF5060X_D2REGC1, 0x18); /* OFF */
     }
-    
+
 }
 #endif
