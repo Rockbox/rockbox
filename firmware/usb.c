@@ -34,11 +34,11 @@
 #include "disk.h"
 #include "panic.h"
 #include "lcd.h"
+#include "usb-target.h"
 #include "usb.h"
 #include "button.h"
 #include "sprintf.h"
 #include "string.h"
-#include "usb-target.h"
 #ifdef HAVE_USBSTACK
 #include "usb_core.h"
 #endif
@@ -129,11 +129,13 @@ static inline void usb_slave_mode(bool on)
 #ifdef HAVE_PRIORITY_SCHEDULING
         thread_set_priority(THREAD_ID_CURRENT, PRIORITY_REALTIME);
 #endif
-        usb_enable(true);
+        usb_attach();
     }
     else /* usb_state == USB_INSERTED (only!) */
     {
+#ifndef USB_DETECT_BY_DRV
         usb_enable(false);
+#endif
 #ifdef HAVE_PRIORITY_SCHEDULING
         thread_set_priority(THREAD_ID_CURRENT, PRIORITY_SYSTEM);
 #endif
@@ -234,6 +236,26 @@ static void usb_thread(void)
                     (struct usb_transfer_completion_event_data*)ev.data);
                 break;
 #endif
+#ifdef USB_DETECT_BY_DRV
+            /* In this case, these events the handle cable insertion USB
+             * driver determines INSERTED/EXTRACTED state. */
+            case USB_POWERED:
+                /* Set the state to USB_POWERED for now and enable the driver
+                 * to detect a bus reset only. If a bus reset is detected,
+                 * USB_INSERTED will be received. */
+                usb_state = USB_POWERED;
+                usb_enable(true);
+                break;
+
+            case USB_UNPOWERED:
+                usb_enable(false);
+                /* This part shouldn't be obligatory for anything that can
+                 * reliably detect removal of the data lines. USB_EXTRACTED
+                 * could be posted on that event while bus power remains
+                 * available. */
+                queue_post(&usb_queue, USB_EXTRACTED, 0);
+                break;
+#endif /* USB_DETECT_BY_DRV */
             case USB_INSERTED:
 #ifdef HAVE_LCD_BITMAP
                 if(do_screendump_instead_of_usb)
@@ -244,14 +266,14 @@ static void usb_thread(void)
                 }
 #endif
 #ifdef HAVE_USB_POWER
-                if (usb_power_button())
+                if(usb_power_button())
                 {
                     /* Only charging is desired */
                     usb_state = USB_POWERED;
 #ifdef HAVE_USBSTACK
                     usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, false);
                     usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, true);
-                    usb_enable(true);
+                    usb_attach();
 #endif
                     break;
                 }
@@ -272,7 +294,7 @@ static void usb_thread(void)
 
                 if(!exclusive_storage_access)
                 {
-                    usb_enable(true);
+                    usb_attach();
                     break;
                 }
 #endif /* HAVE_USBSTACK */
@@ -304,7 +326,7 @@ static void usb_thread(void)
                     usb_state = USB_EXTRACTED;
                     break; /* Connected for screendump only */
                 }
-#endif /* HAVE_LCD_BITMAP */
+#endif
 #ifndef HAVE_USBSTACK /* Stack must undo this if POWERED state was transitional */
 #ifdef HAVE_USB_POWER
                 if(usb_state == USB_POWERED)
@@ -312,7 +334,7 @@ static void usb_thread(void)
                     usb_state = USB_EXTRACTED;
                     break;
                 }
-#endif /* HAVE_USB_POWER */
+#endif
 #endif /* HAVE_USBSTACK */
                 if(usb_state == USB_INSERTED)
                 {
@@ -324,9 +346,11 @@ static void usb_thread(void)
 
                 usb_state = USB_EXTRACTED;
 #ifdef HAVE_USBSTACK
-                if (!exclusive_storage_access)
+                if(!exclusive_storage_access)
                 {
+#ifndef USB_DETECT_BY_DRV /* Disabled handling USB_UNPOWERED */
                     usb_enable(false);
+#endif
                     break;
                 }
 
@@ -392,19 +416,34 @@ static void usb_thread(void)
 #ifdef USB_STATUS_BY_EVENT
 void usb_status_event(int current_status)
 {
-    /* Status should be USB_INSERTED or USB_EXTRACTED.
+    /* Status should be USB_POWERED, USB_UNPOWERED, USB_INSERTED or
+     * USB_EXTRACTED.
      * Caller isn't expected to filter for changes in status. */
-    if (usb_monitor_enabled && last_usb_status != current_status)
+    if(usb_monitor_enabled)
     {
-        last_usb_status = current_status;
-        queue_post(&usb_queue, current_status, 0);
+        int oldstatus = disable_irq_save(); /* Dual-use function */
+
+        if(last_usb_status != current_status)
+        {
+            last_usb_status = current_status;
+            queue_post(&usb_queue, current_status, 0);
+        }
+
+        restore_irq(oldstatus);
     }
 }
 
 void usb_start_monitoring(void)
 {
+    int status = usb_detect();
+#ifdef USB_DETECT_BY_DRV
+    /* USB detection begins by USB_POWERED, not USB_INSERTED. If it is
+     * USB_EXTRACTED, then nothing changes and post will be skipped. */
+    if(USB_INSERTED == status)
+        status = USB_POWERED;
+#endif
     usb_monitor_enabled = true;
-    usb_status_event(usb_detect());
+    usb_status_event(status);
 }
 #else /* !USB_STATUS_BY_EVENT */
 static void usb_tick(void)

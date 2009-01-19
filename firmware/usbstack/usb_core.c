@@ -175,7 +175,7 @@ static struct
     completion_handler_t completion_handler[2];
     control_handler_t control_handler[2];
     struct usb_transfer_completion_event_data completion_event;
-} ep_data[NUM_ENDPOINTS];
+} ep_data[USB_NUM_ENDPOINTS];
 
 static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 {
@@ -240,7 +240,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 
 static void usb_core_control_request_handler(struct usb_ctrlrequest* req);
 
-static unsigned char response_data[256] USBDEVBSS_ATTR;
+static unsigned char response_data[256] USB_DEVBSS_ATTR;
 
 
 static short hex[16] = {'0','1','2','3','4','5','6','7',
@@ -476,7 +476,7 @@ static void allocate_interfaces_and_endpoints(void)
 
     memset(ep_data,0,sizeof(ep_data));
 
-    for (i = 0; i < NUM_ENDPOINTS; i++) {
+    for (i = 0; i < USB_NUM_ENDPOINTS; i++) {
         usb_drv_release_endpoint(i | USB_DIR_OUT);
         usb_drv_release_endpoint(i | USB_DIR_IN);
     }

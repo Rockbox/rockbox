@@ -33,8 +33,11 @@
 enum {
     USB_INSERTED,            /* Event+State */
     USB_EXTRACTED,           /* Event+State */
-#ifdef HAVE_USB_POWER
-    USB_POWERED,             /* State */
+#if defined(HAVE_USB_POWER) || defined(USB_DETECT_BY_DRV)
+    USB_POWERED,             /* Event+State */
+#endif
+#ifdef USB_DETECT_BY_DRV
+    USB_UNPOWERED,           /* Event */
 #endif
 #ifdef HAVE_LCD_BITMAP
     USB_SCREENDUMP,          /* State */
@@ -107,6 +110,7 @@ struct usb_transfer_completion_event_data
 
 void usb_init(void);
 void usb_enable(bool on);
+void usb_attach(void);
 void usb_start_monitoring(void);
 void usb_close(void);
 void usb_acknowledge(long id);

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by BjÃ¶rn Stenberg
+ * Copyright (C) 2007 by Björn Stenberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -35,14 +35,6 @@
 
 /* endpoints */
 #define EP_CONTROL 0
-#if CONFIG_CPU == IMX31L
-#define NUM_ENDPOINTS 8
-#define USBDEVBSS_ATTR  DEVBSS_ATTR
-#else
-#define USBDEVBSS_ATTR  IBSS_ATTR
-#define NUM_ENDPOINTS 3
-#endif
-
 extern int usb_max_pkt_size;
 
 struct usb_class_driver;

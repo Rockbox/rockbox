@@ -23,4 +23,11 @@
 
 void usb_init_device(void);
 
+#ifndef BOOTLOADER
+#if defined(SANSA_C200) || defined(SANSA_E200)
+#define USB_STATUS_BY_EVENT /* No USB tick */
+void usb_connect_event(bool inserted);
+#endif
+#endif /* BOOTLOADER */
+
 #endif

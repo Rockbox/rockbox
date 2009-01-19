@@ -176,10 +176,12 @@
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
 
-/* enable these for the experimental usb stack */
+/* enable these for the usb stack */
 #define USE_ROCKBOX_USB
 #define HAVE_USBSTACK
 #define USB_STORAGE
+/* usb stack and driver settings */
+#define USB_PORTSCX_PHY_TYPE PORTSCX_PTS_ULPI
 #define USB_VENDOR_ID 0x0930
 #define USB_PRODUCT_ID 0x0010
 
@@ -201,7 +203,7 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
-#define HAVE_SERIAL
+//#define HAVE_SERIAL
 #define HAVE_VOLUME_IN_LIST
 
 /*Remove Comments from UART_INT to enable the UART interrupts,*/

@@ -95,7 +95,6 @@ static void handle_usb(void)
     if (!usb_plugged() || !pause_if_button_pressed(true))
     {
         /* Bang on the controller */
-        usb_init_device();
         return;
     }
 

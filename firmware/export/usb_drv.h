@@ -24,9 +24,13 @@
 #include "kernel.h"
 
 void usb_drv_startup(void);
+void usb_drv_usb_detect_event(void); /* Target implemented */
+void usb_drv_int_enable(bool enable); /* Target implemented */
+void usb_drv_reset(void);
 void usb_drv_init(void);
 void usb_drv_exit(void);
-void usb_drv_int(void);
+void usb_drv_attach(void);
+void usb_drv_int(void); /* Call from target INT handler */
 void usb_drv_stall(int endpoint, bool stall,bool in);
 bool usb_drv_stalled(int endpoint,bool in);
 int usb_drv_send(int endpoint, void* ptr, int length);

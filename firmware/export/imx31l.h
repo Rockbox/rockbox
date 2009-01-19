@@ -36,7 +36,11 @@
 #define FRAME_SIZE    (240*320*2)
 
 #define DEVBSS_ATTR   __attribute__((section(".devbss"),nocommon))
-#define QHARRAY_ATTR  __attribute__((section(".qharray"),nocommon))
+/* USBOTG */
+#define USB_QHARRAY_ATTR    __attribute__((section(".qharray"),nocommon,aligned(2048)))
+#define USB_NUM_ENDPOINTS   8
+#define USB_DEVBSS_ATTR     DEVBSS_ATTR
+#define USB_BASE            OTG_BASE_ADDR
 
 /*
  * AIPS 1
@@ -1579,7 +1583,5 @@
 #define SDRAM_COMPARE_CONST2    0xAAAAAAAA
 #define UART_FIFO_CTRL          0x881
 #define TIMEOUT                 1000
-
-#define USB_BASE                OTG_BASE_ADDR
 
 #endif /* __IMX31L_H__ */

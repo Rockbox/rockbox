@@ -9,7 +9,7 @@
  *
  * Driver for ARC USBOTG Device Controller
  *
- * Copyright (C) 2007 by BjÃ¶rn Stenberg
+ * Copyright (C) 2007 by Björn Stenberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -32,11 +32,6 @@
 
 //#define LOGF_ENABLE
 #include "logf.h"
-
-#if CONFIG_CPU == IMX31L
-#include "avic-imx31.h"
-static void __attribute__((interrupt("IRQ"))) USB_OTG_HANDLER(void);
-#endif
 
 /* USB device mode registers (Little Endian) */
 
@@ -326,8 +321,8 @@ struct transfer_descriptor {
     unsigned int reserved;
 } __attribute__ ((packed));
 
-static struct transfer_descriptor td_array[NUM_ENDPOINTS*2]
-    USBDEVBSS_ATTR __attribute__((aligned(32)));
+static struct transfer_descriptor td_array[USB_NUM_ENDPOINTS*2]
+    USB_DEVBSS_ATTR __attribute__((aligned(32)));
 
 /* manual: 32.13.1 Endpoint Queue Head (dQH) */
 struct queue_head {
@@ -342,17 +337,10 @@ struct queue_head {
     unsigned int wait;              /* for softwate use, indicates if the transfer is blocking */
 } __attribute__((packed));
 
-#if CONFIG_CPU == IMX31L
-static struct queue_head qh_array[NUM_ENDPOINTS*2]
-    QHARRAY_ATTR __attribute__((aligned (2048)));
-#else
-/* This still needs to be 2048 byte aligned, but QHARRAY_ATTR should take
-   care of that */
-static struct queue_head qh_array[NUM_ENDPOINTS*2]
-    QHARRAY_ATTR __attribute__((aligned (4)));
-#endif
+static struct queue_head qh_array[USB_NUM_ENDPOINTS*2]
+    USB_QHARRAY_ATTR;
 
-static struct wakeup transfer_completion_signal[NUM_ENDPOINTS*2]
+static struct wakeup transfer_completion_signal[USB_NUM_ENDPOINTS*2]
     SHAREDBSS_ATTR;
 
 static const unsigned int pipe2mask[] = {
@@ -363,7 +351,7 @@ static const unsigned int pipe2mask[] = {
     0x10, 0x100000,
 };
 
-static char ep_allocation[NUM_ENDPOINTS];
+static char ep_allocation[USB_NUM_ENDPOINTS];
 
 /*-------------------------------------------------------------------------*/
 static void transfer_completed(void);
@@ -378,51 +366,45 @@ static void init_control_queue_heads(void);
 static void init_bulk_queue_heads(void);
 static void init_endpoints(void);
 /*-------------------------------------------------------------------------*/
-
-bool usb_drv_powered(void)
+static void usb_drv_stop(void)
 {
-    return (REG_OTGSC & OTGSC_B_SESSION_VALID) ? true : false;
+    /* disable interrupts */
+    REG_USBINTR = 0;
+    /* stop usb controller (disconnect) */
+    REG_USBCMD &= ~USBCMD_RUN;
+}
+
+void usb_drv_reset(void)
+{
+    int oldlevel = disable_irq_save();
+    REG_USBCMD &= ~USBCMD_RUN;
+    restore_irq(oldlevel);
+
+#ifdef USB_PORTSCX_PHY_TYPE
+    /* If a PHY type is specified, set it now */
+    REG_PORTSC1 = (REG_PORTSC1 & ~PORTSCX_PHY_TYPE_SEL) | USB_PORTSCX_PHY_TYPE;
+#endif
+    sleep(HZ/20);
+    REG_USBCMD |= USBCMD_CTRL_RESET;
+    while (REG_USBCMD & USBCMD_CTRL_RESET);
 }
 
 /* One-time driver startup init */
 void usb_drv_startup(void)
 {
-#if CONFIG_CPU == IMX31L && defined(BOOTLOADER)
-    /* This is the bootloader - activate the OTG controller or cold
-     * connect later could/will fail */
-    REG_USBCMD &= ~USBCMD_RUN;
-
-    sleep(HZ/20);
-    REG_USBCMD |= USBCMD_CTRL_RESET;
-    while (REG_USBCMD & USBCMD_CTRL_RESET);
-
-    /* Set to ULPI */
-    REG_PORTSC1 = (REG_PORTSC1 & ~PORTSCX_PHY_TYPE_SEL) | PORTSCX_PTS_ULPI;
-    sleep(HZ/10);
-#endif
-
     /* Initialize all the signal objects once */
     int i;
-    for(i=0;i<NUM_ENDPOINTS*2;i++) {
+    for(i=0;i<USB_NUM_ENDPOINTS*2;i++) {
         wakeup_init(&transfer_completion_signal[i]);
     }
 }
 
 /* manual: 32.14.1 Device Controller Initialization */
-void usb_drv_init(void)
+static void _usb_drv_init(bool attach)
 {
-    REG_USBCMD &= ~USBCMD_RUN;
-    sleep(HZ/20);
-    REG_USBCMD |= USBCMD_CTRL_RESET;
-    while (REG_USBCMD & USBCMD_CTRL_RESET);
-
+    usb_drv_reset();
 
     REG_USBMODE = USBMODE_CTRL_MODE_DEVICE;
-
-#if CONFIG_CPU == IMX31L
-    /* Set to ULPI */
-    REG_PORTSC1 = (REG_PORTSC1 & ~PORTSCX_PHY_TYPE_SEL) | PORTSCX_PTS_ULPI;
-#endif
 
 #ifdef USB_NO_HIGH_SPEED
     /* Force device to full speed */
@@ -436,24 +418,26 @@ void usb_drv_init(void)
     REG_ENDPOINTLISTADDR = (unsigned int)qh_array;
     REG_DEVICEADDR = 0;
 
-    /* enable USB interrupts */
-    REG_USBINTR =
-        USBINTR_INT_EN |
-        USBINTR_ERR_INT_EN |
-        USBINTR_PTC_DETECT_EN |
-        USBINTR_RESET_EN |
-        USBINTR_SYS_ERR_EN;
-
-#if CONFIG_CPU == IMX31L
-    avic_enable_int(USB_OTG, IRQ, 7, USB_OTG_HANDLER);
-#else
-    /* enable USB IRQ in CPU */
-    CPU_INT_EN = USB_MASK;
+#ifdef USB_DETECT_BY_DRV
+    if (!attach) {
+        /* enable RESET interrupt */
+        REG_USBINTR = USBINTR_RESET_EN;
+    }
+    else
 #endif
+    {
+        /* enable USB interrupts */
+        REG_USBINTR =
+            USBINTR_INT_EN |
+            USBINTR_ERR_INT_EN |
+            USBINTR_PTC_DETECT_EN |
+            USBINTR_RESET_EN;
+    }
+
+    usb_drv_int_enable(true);
 
     /* go go go */
     REG_USBCMD |= USBCMD_RUN;
-
 
     logf("usb_drv_init() finished");
     logf("usb id %x", REG_ID);
@@ -461,44 +445,49 @@ void usb_drv_init(void)
     logf("usb dccparams %x", REG_DCCPARAMS);
 
     /* now a bus reset will occur. see bus_reset() */
+    (void)attach;
 }
+
+/** With USB_DETECT_BY_DRV, attach is distinct from init, otherwise eqivalent. **/
+
+/* USB_DETECT_BY_DRV - enable bus reset detection only
+ * else fully enable driver */
+void usb_drv_init(void)
+{
+    _usb_drv_init(false);
+}
+
+#ifdef USB_DETECT_BY_DRV
+/* fully enable driver */
+void usb_drv_attach(void)
+{
+    sleep(HZ/10);
+    _usb_drv_init(true);
+}
+#endif /* USB_DETECT_BY_DRV */
 
 void usb_drv_exit(void)
 {
-    /* disable interrupts */
-    REG_USBINTR = 0;
-
-    /* stop usb controller */
-    REG_USBCMD &= ~USBCMD_RUN;
+    usb_drv_stop();
 
     /* TODO : is one of these needed to save power ?
     REG_PORTSC1 |= PORTSCX_PHY_LOW_POWER_SPD;
     REG_USBCMD |= USBCMD_CTRL_RESET;
     */
 
-#if CONFIG_CPU == IMX31L
-    avic_disable_int(USB_OTG);
-#else
-    CPU_INT_DIS = USB_MASK;
-#endif
-
-    cancel_cpu_boost();
+    usb_drv_int_enable(false);
 }
 
-#if CONFIG_CPU == IMX31L
-static void __attribute__((interrupt("IRQ"))) USB_OTG_HANDLER(void)
-#else
 void usb_drv_int(void)
-#endif
 {
-    unsigned int status = REG_USBSTS;
+    unsigned int usbintr = REG_USBINTR; /* Only watch enabled ints */
+    unsigned int status = REG_USBSTS & usbintr;
 
 #if 0
     if (status & USBSTS_INT) logf("int: usb ioc");
     if (status & USBSTS_ERR) logf("int: usb err");
     if (status & USBSTS_PORT_CHANGE) logf("int: portchange");
     if (status & USBSTS_RESET) logf("int: reset");
-    if (status & USBSTS_SYS_ERR) logf("int: syserr");
 #endif
 
     /* usb transaction interrupt */
@@ -523,8 +512,18 @@ void usb_drv_int(void)
     /* reset interrupt */
     if (status & USBSTS_RESET) {
         REG_USBSTS = USBSTS_RESET;
-        bus_reset();
-        usb_core_bus_reset(); /* tell mom */
+#ifdef USB_DETECT_BY_DRV
+        if (UNLIKELY(usbintr == USBINTR_RESET_EN)) {
+            /* USB detected - detach and inform */
+            usb_drv_stop();
+            usb_drv_usb_detect_event();
+        }
+        else
+#endif
+        {
+            bus_reset();
+            usb_core_bus_reset(); /* tell mom */
+        }
     }
 
     /* port change */
@@ -588,7 +587,14 @@ int usb_drv_port_speed(void)
 
 bool usb_drv_connected(void)
 {
-    return ((REG_PORTSC1 & PORTSCX_CURRENT_CONNECT_STATUS) !=0);
+    return (REG_PORTSC1 &
+        (PORTSCX_PORT_SUSPEND | PORTSCX_CURRENT_CONNECT_STATUS))
+            == PORTSCX_CURRENT_CONNECT_STATUS;
+}
+
+bool usb_drv_powered(void)
+{
+    return (REG_OTGSC & OTGSC_B_SESSION_VALID) ? true : false;
 }
 
 void usb_drv_set_address(int address)
@@ -628,10 +634,7 @@ void usb_drv_set_test_mode(int mode)
             REG_PORTSC1 |= PORTSCX_PTC_FORCE_EN;
             break;
     }
-    REG_USBCMD &= ~USBCMD_RUN;
-    sleep(HZ/20);
-    REG_USBCMD |= USBCMD_CTRL_RESET;
-    while (REG_USBCMD & USBCMD_CTRL_RESET);
+    usb_drv_reset();
     REG_USBCMD |= USBCMD_RUN;
 }
 
@@ -735,7 +738,7 @@ void usb_drv_cancel_all_transfers(void)
     while (REG_ENDPTFLUSH);
 
     memset(td_array, 0, sizeof td_array);
-    for(i=0;i<NUM_ENDPOINTS*2;i++) {
+    for(i=0;i<USB_NUM_ENDPOINTS*2;i++) {
         if(qh_array[i].wait) {
             qh_array[i].wait=0;
             qh_array[i].status=DTD_STATUS_HALTED;
@@ -750,7 +753,7 @@ int usb_drv_request_endpoint(int dir)
 
     bit=(dir & USB_DIR_IN)? 2:1;
 
-    for (i=1; i < NUM_ENDPOINTS; i++) {
+    for (i=1; i < USB_NUM_ENDPOINTS; i++) {
         if((ep_allocation[i] & bit)!=0)
             continue;
         ep_allocation[i] |= bit;
@@ -819,7 +822,7 @@ static void transfer_completed(void)
     unsigned int mask = REG_ENDPTCOMPLETE;
     REG_ENDPTCOMPLETE = mask;
 
-    for (ep=0; ep<NUM_ENDPOINTS; ep++) {
+    for (ep=0; ep<USB_NUM_ENDPOINTS; ep++) {
         int dir;
         for (dir=0; dir<2; dir++) {
             int pipe = ep * 2 + dir;
@@ -869,13 +872,8 @@ static void bus_reset(void)
             logf("usb: double reset");
             return;
         }
-#if CONFIG_CPU == IMX31L
-        int x;
-        for (x = 0; x < 30000; x++)
-            asm volatile ("");
-#else
+
         udelay(100);
-#endif
     }
     if (REG_ENDPTPRIME) {
         logf("usb: short reset timeout");
@@ -917,7 +915,7 @@ static void init_bulk_queue_heads(void)
     /* TODO: this should take ep_allocation into account */
 
     /*** bulk ***/
-    for(i=1;i<NUM_ENDPOINTS;i++) {
+    for(i=1;i<USB_NUM_ENDPOINTS;i++) {
         qh_array[i*2].max_pkt_length = rx_packetsize << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL;
         qh_array[i*2].dtd.next_td_ptr = QH_NEXT_TERMINATE;
         qh_array[i*2+1].max_pkt_length = tx_packetsize << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL;
@@ -930,7 +928,7 @@ static void init_endpoints(void)
     int i;
     /* TODO: this should take ep_allocation into account */
     /* bulk */
-    for(i=1;i<NUM_ENDPOINTS;i++) {
+    for(i=1;i<USB_NUM_ENDPOINTS;i++) {
         REG_ENDPTCTRL(i) =
             EPCTRL_RX_DATA_TOGGLE_RST | EPCTRL_RX_ENABLE |
             EPCTRL_TX_DATA_TOGGLE_RST | EPCTRL_TX_ENABLE |

@@ -25,13 +25,13 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
+#include "usb-target.h"
 #include "usb.h"
 #include "button.h"
 #include "ata.h"
 #include "string.h"
 #include "usb_core.h"
 #include "usb_drv.h"
-#include "usb-target.h"
 
 void usb_init_device(void)
 {
@@ -94,6 +94,31 @@ void usb_enable(bool on)
     }
 }
 
+void usb_attach(void)
+{
+#ifdef USB_DETECT_BY_DRV
+    usb_drv_attach();
+#else
+    usb_enable(true);
+#endif
+}
+
+#ifdef USB_DETECT_BY_DRV
+/* Cannot tell charger pin from USB pin */
+static int usb_status = USB_EXTRACTED;
+
+void usb_connect_event(bool inserted)
+{
+    usb_status = inserted ? USB_INSERTED : USB_EXTRACTED;
+    usb_status_event(inserted ? USB_POWERED : USB_UNPOWERED);
+}
+
+/* Called during the bus reset interrupt when in detect mode */
+void usb_drv_usb_detect_event(void)
+{
+    usb_status_event(USB_INSERTED);
+}
+#else /* !USB_DETECT_BY_DRV */
 static bool usb_pin_detect(void)
 {
     bool retval = false;
@@ -110,12 +135,12 @@ static bool usb_pin_detect(void)
         retval = true;
 
 #elif defined(SANSA_C200)
-    /* GPIO H bit 1 is usb detect */
+    /* GPIO H bit 1 is usb/charger detect */
     if (GPIOH_INPUT_VAL & 0x02)
         retval = true;
 
 #elif defined(SANSA_E200)
-    /* GPIO B bit 4 is usb detect */
+    /* GPIO B bit 4 is usb/charger detect */
     if (GPIOB_INPUT_VAL & 0x10)
         retval = true;
 
@@ -137,16 +162,32 @@ static bool usb_pin_detect(void)
 
     return retval;
 }
+#endif /* USB_DETECT_BY_DRV */
 
-/* detect host or charger (INSERTED or POWERED) */
+void usb_drv_int_enable(bool enable)
+{
+    /* enable/disable USB IRQ in CPU */
+    if(enable) {
+        CPU_INT_EN = USB_MASK;
+    }
+    else {
+        CPU_INT_DIS = USB_MASK;
+    }
+}
+
+/* detect host or charger (INSERTED or EXTRACTED) */
 int usb_detect(void)
 {
+#ifdef USB_DETECT_BY_DRV
+    return usb_status;
+#else
     if(usb_pin_detect()) {
         return USB_INSERTED;
     }
     else {
         return USB_EXTRACTED;
     }
+#endif
 }
 
 #if defined(IPOD_COLOR) || defined(IPOD_4G) \

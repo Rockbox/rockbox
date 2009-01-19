@@ -401,7 +401,7 @@ void usb_storage_init_connection(void)
 #if CONFIG_CPU == IMX31L || CONFIG_USBOTG == USBOTG_ISP1583 || \
         defined(CPU_TCC77X) || defined(CPU_TCC780X)
     static unsigned char _transfer_buffer[BUFFER_SIZE*2]
-        USBDEVBSS_ATTR __attribute__((aligned(32)));
+        USB_DEVBSS_ATTR __attribute__((aligned(32)));
     tb.transfer_buffer = (void *)_transfer_buffer;
 #else
     /* TODO : check if bufsize is at least 32K ? */

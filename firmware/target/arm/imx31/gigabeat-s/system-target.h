@@ -31,6 +31,14 @@
 #define CPUFREQ_MAX CPU_FREQ
 #endif
 
+/* For USB driver - no accuracy assurance */
+static inline void udelay(unsigned int usecs)
+{
+    unsigned int x;
+    for (x = 0; x < 300*usecs; x++)
+        asm volatile ("");
+}
+
 #if 0
 static inline void udelay(unsigned int usecs)
 {

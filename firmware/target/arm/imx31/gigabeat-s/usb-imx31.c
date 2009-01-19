@@ -29,6 +29,7 @@
 #include "usb-target.h"
 #include "clkctl-imx31.h"
 #include "power-imx31.h"
+#include "avic-imx31.h"
 #include "mc13783.h"
 
 static int usb_status = USB_EXTRACTED;
@@ -75,11 +76,7 @@ bool usb_plugged(void)
 
 void usb_init_device(void)
 {
-    imx31_clkctl_module_clock_gating(CG_USBOTG, CGM_ON_ALL);
-
-    enable_transceiver(true);
-
-    /* Module will be turned off later after firmware init */
+    /* Do one-time inits */
     usb_drv_startup();
 
     /* Initially poll */
@@ -91,19 +88,37 @@ void usb_init_device(void)
 
 void usb_enable(bool on)
 {
+    /* Module clock should be on since since this could be called with
+     * OFF initially and writing module registers would hardlock otherwise. */
+    imx31_clkctl_module_clock_gating(CG_USBOTG, CGM_ON_ALL);
+    enable_transceiver(true);
+
     if (on)
     {
-        imx31_clkctl_module_clock_gating(CG_USBOTG, CGM_ON_ALL);
-        enable_transceiver(true);
         usb_core_init();
     }
     else
     {
-        /* Module clock should be on since this could be called first */
-        imx31_clkctl_module_clock_gating(CG_USBOTG, CGM_ON_ALL);
-        enable_transceiver(true);
         usb_core_exit();
         enable_transceiver(false);
         imx31_clkctl_module_clock_gating(CG_USBOTG, CGM_OFF);
     }
+}
+
+void usb_attach(void)
+{
+    usb_enable(true);
+}
+
+static void __attribute__((interrupt("IRQ"))) USB_OTG_HANDLER(void)
+{
+    usb_drv_int(); /* Call driver handler */
+}
+
+void usb_drv_int_enable(bool enable)
+{
+    if (enable)
+        avic_enable_int(USB_OTG, IRQ, 7, USB_OTG_HANDLER);
+    else    
+        avic_disable_int(USB_OTG);
 }
