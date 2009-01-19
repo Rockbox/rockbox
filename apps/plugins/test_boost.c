@@ -23,11 +23,9 @@
 
 PLUGIN_HEADER
 
-enum plugin_status plugin_start(const struct plugin_api* api,
-                                const void* parameter)
+enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
-    const struct plugin_api* rb = api;
     bool done = false;
     bool boost = false;
     int count = 0;
