@@ -56,6 +56,11 @@ void usb_enable(bool on)
          usb_core_exit();
 }
 
+void usb_attach(void)
+{
+    usb_enable(true);
+}
+
 void IRAM_ATTR GIO7(void)
 {
 #ifdef DEBUG

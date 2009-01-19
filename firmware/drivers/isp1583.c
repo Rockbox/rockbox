@@ -55,7 +55,7 @@ struct usb_endpoint
 };
 
 static unsigned char setup_pkt_buf[8];
-static struct usb_endpoint endpoints[NUM_ENDPOINTS];
+static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS];
 
 static bool high_speed_mode = false;
 
@@ -366,7 +366,7 @@ static void setup_endpoints(void)
     usb_setup_endpoint(ep_index(0, DIR_TX), 64, 0);
     
     int i;
-    for(i = 1; i < NUM_ENDPOINTS-1; i++)
+    for(i = 1; i < USB_NUM_ENDPOINTS-1; i++)
     {
         usb_setup_endpoint(ep_index(i, DIR_RX), (high_speed_mode ? 512 : 64), 2); /* 2 = TYPE_BULK */
         usb_setup_endpoint(ep_index(i, DIR_TX), (high_speed_mode ? 512 : 64), 2);
@@ -375,7 +375,7 @@ static void setup_endpoints(void)
     usb_enable_endpoint(ep_index(0, DIR_RX));
     usb_enable_endpoint(ep_index(0, DIR_TX));
     
-    for (i = 1; i < NUM_ENDPOINTS-1; i++)
+    for (i = 1; i < USB_NUM_ENDPOINTS-1; i++)
     {
         usb_enable_endpoint(ep_index(i, DIR_RX));
         usb_enable_endpoint(ep_index(i, DIR_TX));
@@ -598,7 +598,7 @@ void usb_drv_cancel_all_transfers(void)
     logf("usb_drv_cancel_all_tranfers()");
     int i;
 
-    for(i=0;i<NUM_ENDPOINTS-1;i++)
+    for(i=0;i<USB_NUM_ENDPOINTS-1;i++)
         endpoints[i].halt[0] = endpoints[i].halt[1] = 1;
 }
 
@@ -608,7 +608,7 @@ int usb_drv_request_endpoint(int dir)
 
     bit=(dir & USB_DIR_IN)? 2:1;
 
-    for (i=1; i < NUM_ENDPOINTS; i++) {
+    for (i=1; i < USB_NUM_ENDPOINTS; i++) {
         if((endpoints[i].allocation & bit)!=0)
             continue;
         endpoints[i].allocation |= bit;
@@ -738,7 +738,7 @@ void usb_drv_set_address(int address)
 
 int dbg_usb_num_items(void)
 {
-    return 2+NUM_ENDPOINTS*2;
+    return 2+USB_NUM_ENDPOINTS*2;
 }
 
 char* dbg_usb_item(int selected_item, void *data, char *buffer, size_t buffer_len)

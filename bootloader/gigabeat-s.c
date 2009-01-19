@@ -93,10 +93,7 @@ static void handle_usb(void)
     /* Check if plugged and pause to look at messages. If the cable was pulled
      * while waiting, proceed as if it never was plugged. */
     if (!usb_plugged() || !pause_if_button_pressed(true))
-    {
-        /* Bang on the controller */
         return;
-    }
 
     /** Enter USB mode **/
 
