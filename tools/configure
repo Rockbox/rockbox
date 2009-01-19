@@ -2484,7 +2484,7 @@ export BUILDDIR=@PWD@
 export LANGUAGE=@LANGUAGE@
 export VOICELANGUAGE=@VOICELANGUAGE@
 export MEMORYSIZE=@MEMORY@
-export VERSION:=\$(shell \$(ROOTDIR)/tools/svnversion.sh \$(ROOTDIR))
+export VERSION:=\$(shell \$(ROOTDIR)/tools/version.sh \$(ROOTDIR))
 export BUILDDATE:=\$(shell date -u +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')
 export MKFIRMWARE=@TOOL@
 export BMP2RB_MONO=@BMP2RB_MONO@
