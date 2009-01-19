@@ -272,6 +272,7 @@
 
 /* OTGSC Register Bit Masks */
 #define OTGSC_B_SESSION_VALID                  (0x00000800)
+#define OTGSC_A_VBUS_VALID                     (0x00000200)
 
 #define QH_MULT_POS                            (30)
 #define QH_ZLT_SEL                             (0x20000000)
@@ -516,7 +517,10 @@ void usb_drv_int(void)
         if (UNLIKELY(usbintr == USBINTR_RESET_EN)) {
             /* USB detected - detach and inform */
             usb_drv_stop();
-            usb_drv_usb_detect_event();
+            /* A false reset may occur upon unplugging, be sure VBUS is above
+             * the 4V4 threshold. */
+            if (usb_drv_powered())
+                usb_drv_usb_detect_event();
         }
         else
 #endif
@@ -594,7 +598,8 @@ bool usb_drv_connected(void)
 
 bool usb_drv_powered(void)
 {
-    return (REG_OTGSC & OTGSC_B_SESSION_VALID) ? true : false;
+    /* true = bus 4V4 ok */
+    return (REG_OTGSC & OTGSC_A_VBUS_VALID) ? true : false;
 }
 
 void usb_drv_set_address(int address)
