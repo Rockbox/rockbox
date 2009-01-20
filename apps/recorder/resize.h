@@ -58,7 +58,7 @@
          : [t] "=r" (t) : [a] "r" (x), [b] "r" (y)); \
     t; \
 })
-#elif defined(CPU_SH)
+#elif (CONFIG_CPU == SH7034)
 #define SC_SHIFT 24
 #endif
 
