@@ -43,6 +43,51 @@
 #define MAX_SC_STACK_ALLOC 0
 #define HAVE_UPSCALER 1
 
+#if defined(CPU_COLDFIRE)
+#define SC_NUM 0x80000000U
+#define SC_MUL_INIT \
+    unsigned long macsr_st = coldfire_get_macsr(); \
+    coldfire_set_macsr(0);
+#define SC_MUL_END coldfire_set_macsr(macsr_st);
+#define SC_MUL(x, y) \
+({ \
+    unsigned long t; \
+    asm ("mac.l    %[a], %[b], %%acc0\n\t" \
+         "move.l %%accext01, %[t]\n\t" \
+         "move.l #0, %%acc0\n\t" \
+         : [t] "=r" (t) : [a] "r" (x), [b] "r" (y)); \
+    t; \
+})
+#elif defined(CPU_SH)
+#define SC_SHIFT 24
+#endif
+
+#ifndef SC_SHIFT
+#define SC_SHIFT 32
+#endif
+
+#if SC_SHIFT == 24
+#define SC_NUM 0x1000000U
+#define SC_FIX 0
+
+#ifndef SC_MUL
+#define SC_MUL(x, y) ((x) * (y) >> 24)
+#define SC_MUL_INIT
+#define SC_MUL_END
+#endif
+
+#else /* SC_SHIFT == 32 */
+#define SC_NUM 0x80000000U
+#define SC_FIX 1
+
+#ifndef SC_MUL
+#define SC_MUL(x, y) ((x) * (uint64_t)(y) >> 32)
+#define SC_MUL_INIT
+#define SC_MUL_END
+#endif
+
+#endif
+
 struct img_part {
     int len;
 #if !defined(HAVE_LCD_COLOR)    

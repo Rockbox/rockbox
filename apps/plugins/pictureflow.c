@@ -397,8 +397,8 @@ static inline PFreal fcos(int iangle)
     return fsin(iangle + (IANGLE_MAX >> 2));
 }
 
-#define RB_DIV ((31ULL << 32) / 255 + 1)
-#define G_DIV ((63ULL << 32) / 255 + 1)
+#define DIV255(val) ((((((val)>>8)+(val))>>8)+(val))>>8)
+#define SCALE_VAL(val,out) DIV255((val) * (out) + 127)
 
 static void output_row_transposed(uint32_t row, void * row_in,
                                        struct scaler_context *ctx)
@@ -408,19 +408,19 @@ static void output_row_transposed(uint32_t row, void * row_in,
 #ifdef USEGSLIB
     uint32_t *qp = (uint32_t*)row_in;
     for (; dest < end; dest += ctx->bm->height)
-        *dest = ((*qp++) + ctx->round) * (uint64_t)ctx->divisor >> 32;
+        *dest = SC_MUL((*qp++) + ctx->round), ctx->divisor);
 #else
     struct uint32_rgb *qp = (struct uint32_rgb*)row_in;
-    uint32_t rb_mul = ctx->divisor * (uint64_t)RB_DIV >> 32,
-             rb_rnd = ctx->round * (uint64_t)RB_DIV >> 32,
-             g_mul = ctx->divisor * (uint64_t)G_DIV >> 32,
-             g_rnd = ctx->round * (uint64_t)G_DIV >> 32;
-             int r, g, b;
+    uint32_t rb_mul = SCALE_VAL(ctx->divisor, 31),
+             rb_rnd = SCALE_VAL(ctx->round, 31),
+             g_mul = SCALE_VAL(ctx->divisor, 63),
+             g_rnd = SCALE_VAL(ctx->round, 63);
+    int r, g, b;
     for (; dest < end; dest += ctx->bm->height)
     {
-        r = (qp->r + rb_rnd) * (uint64_t)rb_mul >> 32;
-        g = (qp->g + g_rnd) * (uint64_t)g_mul >> 32;
-        b = (qp->b + rb_rnd) * (uint64_t)rb_mul >> 32;
+        r = SC_MUL(qp->r + rb_rnd, rb_mul);
+        g = SC_MUL(qp->g + g_rnd, g_mul);
+        b = SC_MUL(qp->b + rb_rnd, rb_mul);
         qp++;
         *dest = LCD_RGBPACK_LCD(r,g,b);
     }

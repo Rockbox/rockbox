@@ -244,7 +244,7 @@ static inline bool scale_v_area(struct rowset *rset, struct scaler_context *ctx)
     /* Set up rounding and scale factors */
     ctx->divisor *= ctx->src->height;
     ctx->round = ctx->divisor >> 1;
-    ctx->divisor = ((ctx->divisor - 1 + 0x80000000U) / ctx->divisor) << 1;
+    ctx->divisor = (((ctx->divisor >> 1) + SC_NUM) / ctx->divisor) << SC_FIX;
     mul = 0;
     oy = rset->rowstart;
     oye = 0;
@@ -442,7 +442,7 @@ static inline bool scale_v_linear(struct rowset *rset,
     /* Set up scale and rounding factors, the divisor is bm->height - 1 */
     ctx->divisor *= (ctx->bm->height - 1);
     ctx->round = ctx->divisor >> 1;
-    ctx->divisor = ((ctx->divisor - 1 + 0x80000000U) / ctx->divisor) << 1;
+    ctx->divisor = (((ctx->divisor >> 1) + SC_NUM) / ctx->divisor) << SC_FIX;
     /* Set up our two temp buffers. The names are generic because they'll be
        swapped each time a new input row is read
     */
@@ -531,8 +531,7 @@ void output_row_native(uint32_t row, void * row_in, struct scaler_context *ctx)
                 for (col = 0; col < ctx->bm->width; col++) {
                     if (ctx->dither)
                         delta = DITHERXDY(col,dy);
-                    bright = ((*qp++) + ctx->round) *
-                             (uint64_t)ctx->divisor >> 32;
+                    bright = SC_MUL((*qp++) + ctx->round,ctx->divisor);
                     bright = (3 * bright + (bright >> 6) + delta) >> 8;
                     data |= (~bright & 3) << shift;
                     shift -= 2;
@@ -555,8 +554,7 @@ void output_row_native(uint32_t row, void * row_in, struct scaler_context *ctx)
                 for (col = 0; col < ctx->bm->width; col++) {
                     if (ctx->dither)
                         delta = DITHERXDY(col,dy);
-                    bright = ((*qp++) + ctx->round) *
-                             (uint64_t)ctx->divisor >> 32;
+                    bright = SC_MUL((*qp++) + ctx->round, ctx->divisor);
                     bright = (3 * bright + (bright >> 6) + delta) >> 8;
                     *dest++ |= (~bright & 3) << shift;
                 }
@@ -571,8 +569,7 @@ void output_row_native(uint32_t row, void * row_in, struct scaler_context *ctx)
                 for (col = 0; col < ctx->bm->width; col++) {
                     if (ctx->dither)
                         delta = DITHERXDY(col,dy);
-                    bright = ((*qp++) + ctx->round) *
-                             (uint64_t)ctx->divisor >> 32;
+                    bright = SC_MUL((*qp++) + ctx->round, ctx->divisor);
                     bright = (3 * bright + (bright >> 6) + delta) >> 8;
                     *dest++ |= vi_pattern[bright] << shift;
                 }
@@ -588,9 +585,9 @@ void output_row_native(uint32_t row, void * row_in, struct scaler_context *ctx)
                     if (ctx->dither)
                         delta = DITHERXDY(col,dy);
                     q0 = *qp++;
-                    r = (q0.r + ctx->round) * (uint64_t)ctx->divisor >> 32;
-                    g = (q0.g + ctx->round) * (uint64_t)ctx->divisor >> 32;
-                    b = (q0.b + ctx->round) * (uint64_t)ctx->divisor >> 32;
+                    r = SC_MUL(q0.r + ctx->round, ctx->divisor);
+                    g = SC_MUL(q0.g + ctx->round, ctx->divisor);
+                    b = SC_MUL(q0.b + ctx->round, ctx->divisor);
                     r = (31 * r + (r >> 3) + delta) >> 8;
                     g = (63 * g + (g >> 2) + delta) >> 8;
                     b = (31 * b + (b >> 3) + delta) >> 8;
@@ -680,6 +677,7 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
         scale_h_linear_setup(&ctx);
     }
 #endif
+    SC_MUL_INIT;
 #ifdef HAVE_UPSCALER
     if (sh > dh)
 #endif
@@ -688,6 +686,7 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     else
         ret = scale_v_linear(rset, &ctx);
 #endif
+    SC_MUL_END;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     cpu_boost(false);
 #endif
