@@ -27,7 +27,7 @@
 extern void TIMER1(void);
 extern void TIMER2(void);
 
-void irq(void)
+void __attribute__((interrupt("IRQ"))) irq_handler(void)
 {
     if(CURRENT_CORE == CPU)
     {
