@@ -28,17 +28,6 @@
 extern int tenthdb2master(int db);
 
 /*** definitions ***/
-
-/**
- * Sets internal sample rate for DAC and ADC relative to MCLK
- * Selection for frequency:
- * Fs:        tlv:   with:
- * 11025: 0 = MCLK/2 MCLK/2  SCLK, LRCK: Audio Clk / 16
- * 22050: 0 = MCLK/2 MCLK    SCLK, LRCK: Audio Clk / 8
- * 44100: 1 = MCLK   MCLK    SCLK, LRCK: Audio Clk / 4 (default)
- * 88200: 2 = MCLK*2 MCLK    SCLK, LRCK: Audio Clk / 2
- */
-extern void audiohw_set_frequency(int fsel);
 extern void audiohw_set_headphone_vol(int vol_l, int vol_r);
 
 #define HEADPHONE_MUTE 0x30 /* 0110000 = -73db */

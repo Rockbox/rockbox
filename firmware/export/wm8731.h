@@ -31,7 +31,6 @@
 extern int tenthdb2master(int db);
 
 extern void audiohw_set_master_vol(int vol_l, int vol_r);
-extern void audiohw_set_frequency(int fsel);
 
 /* Common register bits */
 #ifdef HAVE_WM8731

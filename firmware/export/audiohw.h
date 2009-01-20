@@ -248,6 +248,8 @@ void audiohw_set_bass_cutoff(int val);
 void audiohw_set_treble_cutoff(int val);
 #endif
 
+void audiohw_set_frequency(int fsel);
+
 #ifdef HAVE_RECORDING
 
 /**

@@ -28,7 +28,6 @@
 
 int tenthdb2master(int db);
 void audiohw_set_headphone_vol(int vol_l, int vol_r);
-void audiohw_set_frequency(int fsel);
 void audiohw_set_recsrc(int source, bool recording);
 
 void wmc_set(unsigned int reg, unsigned int bits);
