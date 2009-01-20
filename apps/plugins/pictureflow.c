@@ -408,7 +408,7 @@ static void output_row_transposed(uint32_t row, void * row_in,
 #ifdef USEGSLIB
     uint32_t *qp = (uint32_t*)row_in;
     for (; dest < end; dest += ctx->bm->height)
-        *dest = SC_MUL((*qp++) + ctx->round), ctx->divisor);
+        *dest = SC_MUL((*qp++) + ctx->round, ctx->divisor);
 #else
     struct uint32_rgb *qp = (struct uint32_rgb*)row_in;
     uint32_t rb_mul = SCALE_VAL(ctx->divisor, 31),
