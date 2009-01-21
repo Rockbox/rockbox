@@ -397,8 +397,12 @@ static inline PFreal fcos(int iangle)
     return fsin(iangle + (IANGLE_MAX >> 2));
 }
 
-#define DIV255(val) ((((((val)>>8)+(val))>>8)+(val))>>8)
-#define SCALE_VAL(val,out) DIV255((val) * (out) + 127)
+static inline uint32_t div255(uint32_t val)
+{
+    return ((((val >> 8) + val) >> 8) + val) >> 8;
+}
+
+#define SCALE_VAL(val,out) div255((val) * (out) + 127)
 
 static void output_row_transposed(uint32_t row, void * row_in,
                                        struct scaler_context *ctx)
