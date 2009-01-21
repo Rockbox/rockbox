@@ -62,10 +62,10 @@
 #endif
 
 /* define this if you can flip your LCD */
-/* #define HAVE_LCD_FLIP */
+#define HAVE_LCD_FLIP
 
 /* define this if you can invert the colours on your LCD */
-/* #define HAVE_LCD_INVERT */
+#define HAVE_LCD_INVERT
 
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
 
@@ -157,8 +157,8 @@
 #define HAVE_LCD_CONTRAST
 
 #define MIN_CONTRAST_SETTING        0
-#define MAX_CONTRAST_SETTING        30
-#define DEFAULT_CONTRAST_SETTING    14 /* Match boot contrast */
+#define MAX_CONTRAST_SETTING        127
+#define DEFAULT_CONTRAST_SETTING    63 /* Match boot contrast */
 
 /* We're able to shut off power to the HDD */
 #define HAVE_ATA_POWER_OFF

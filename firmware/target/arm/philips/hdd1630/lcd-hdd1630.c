@@ -24,6 +24,57 @@
 #include "kernel.h"
 #include "system.h"
 
+/* The LCD registers appear to match controllers from Leadis Technology,
+   either the LDS176 (132x132 4k) or the LDS186 (128x160 65k).
+   These defines are from the LDS176 (I couldn't find the LDS186 datasheet. */
+#define NOP     0x00
+#define SWRESET 0x01
+#define BSTROFF 0x02
+#define BSTRON  0x03
+#define RDDID   0x04
+#define RDDST   0x09
+#define SLPIN   0x10
+#define SLPOUT  0x11
+#define PTLON   0x12
+#define NORON   0x13
+#define INVOFF  0x20
+#define INVON   0x21
+#define APOFF   0x22
+#define APON    0x23
+#define WRCNTR  0x25
+#define DISPOFF 0x28
+#define DISPON  0x29
+#define CASET   0x2a
+#define RASET   0x2b
+#define RAMWR   0x2c
+#define RAMRD   0x2e
+#define RGBSET  0x2d
+#define PTLAR   0x30
+#define SCRLAR  0x33
+#define TEOFF   0x34
+#define TEON    0x35
+#define MADCTR  0x36
+#define VSCSAD  0x37
+#define IDMOFF  0x38
+#define IDMON   0x39
+#define COLMOD  0x3a
+#define RDID1   0xda
+#define RDID2   0xdb
+#define RDID3   0xdc
+#define CLKINT  0xb0
+#define CLKEXT  0xb1
+#define FRMSEL  0xb4
+#define FRM8SEL 0xb5
+#define TMPRNG  0xb6
+#define TMPHIS  0xb7
+#define TMPREAD 0xb8
+#define DISCTR  0xba
+#define EPVOL   0xbb
+#define EPWRIN  0xd1
+#define EPWROUT 0xd0
+#define RDEV    0xd4
+#define RDRR    0xd5
+
 /* Display status */
 static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
 
@@ -89,50 +140,50 @@ void lcd_init_device(void)
     GPIOJ_OUTPUT_VAL |= 0x4;
     GPIOJ_OUTPUT_EN  |= 0x4;
     
-    lcd_send_cmd(0x1);
+    lcd_send_cmd(SWRESET);
     udelay(10000);
     
-    lcd_send_cmd(0x25);
+    lcd_send_cmd(WRCNTR);
     lcd_send_data(0x3f);
     
-    lcd_send_cmd(0x11);
+    lcd_send_cmd(SLPOUT);
     udelay(120000);
     
-    lcd_send_cmd(0x20);
-    lcd_send_cmd(0x38);
-    lcd_send_cmd(0x13);
+    lcd_send_cmd(INVOFF);
+    lcd_send_cmd(IDMOFF);
+    lcd_send_cmd(NORON);
     
-    lcd_send_cmd(0xb4);
+    lcd_send_cmd(FRMSEL);
     lcd_send_data(0x2);
     lcd_send_data(0x6);
     lcd_send_data(0x8);
     lcd_send_data(0xd);
 
-    lcd_send_cmd(0xb5);
+    lcd_send_cmd(FRM8SEL);
     lcd_send_data(0x2);
     lcd_send_data(0x6);
     lcd_send_data(0x8);
     lcd_send_data(0xd);
 
-    lcd_send_cmd(0xb6);
+    lcd_send_cmd(TMPRNG);
     lcd_send_data(0x19);
     lcd_send_data(0x23);
     lcd_send_data(0x2d);
 
-    lcd_send_cmd(0xb7);
+    lcd_send_cmd(TMPHIS);
     lcd_send_data(0x5);
 
-    lcd_send_cmd(0xba);
+    lcd_send_cmd(DISCTR);
     lcd_send_data(0x7);
     lcd_send_data(0x18);
 
-    lcd_send_cmd(0x36);
+    lcd_send_cmd(MADCTR);
     lcd_send_data(0);
 
-    lcd_send_cmd(0x3a);
+    lcd_send_cmd(COLMOD);
     lcd_send_data(0x5);
     
-    lcd_send_cmd(0x2d);
+    lcd_send_cmd(RGBSET);
     lcd_send_data(0x1);
     lcd_send_data(0x2);
     lcd_send_data(0x3);
@@ -182,7 +233,7 @@ void lcd_init_device(void)
     lcd_send_data(0x2f);
     lcd_send_data(0x30);
 
-    lcd_send_cmd(0x29);
+    lcd_send_cmd(DISPON);
 #endif
 }
 
@@ -194,18 +245,27 @@ int lcd_default_contrast(void)
 
 void lcd_set_contrast(int val)
 {
-    (void)val;
+    lcd_send_cmd(WRCNTR);
+    lcd_send_data(val);
 }
 
 void lcd_set_invert_display(bool yesno)
 {
-    (void)yesno;
+    if (yesno) 
+        lcd_send_cmd(INVON);
+    else
+        lcd_send_cmd(INVOFF);
 }
 
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-    (void)yesno;
+    lcd_send_cmd(MADCTR);
+
+    if (!yesno)
+        lcd_send_data(0); /* normal */
+    else
+        lcd_send_data((1<<7) | (1<<6)); /* y-mirror, x-mirror */
 }
 
 void lcd_yuv_set_options(unsigned options)
@@ -250,15 +310,15 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     addr = &lcd_framebuffer[y][x];
 
-    lcd_send_cmd(0x2a);
+    lcd_send_cmd(CASET);
     lcd_send_data(x);
     lcd_send_data(x + width - 1);
 
-    lcd_send_cmd(0x2b);
+    lcd_send_cmd(RASET);
     lcd_send_data(y);
     lcd_send_data(y + height - 1);
 
-    lcd_send_cmd(0x2c);
+    lcd_send_cmd(RAMWR);
     do {
         int w = width;
         do {
