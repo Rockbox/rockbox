@@ -37,7 +37,7 @@
 //#define HAVE_HOTSWAP
 
 //#define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
-#define CONFIG_STORAGE STORAGE_RAMDISK /* Multivolume currently handled at firmware/target/ level */
+#define CONFIG_STORAGE STORAGE_NAND /* Multivolume currently handled at firmware/target/ level */
 
 #define CONFIG_NAND NAND_CC
 
@@ -144,7 +144,7 @@
 #define __BACKLIGHT_INIT
 
 /* Offset ( in the firmware file's header ) to the file CRC */
-#define FIRMWARE_OFFSET_FILE_CRC 0
+#define FIRMWARE_OFFSET_FILE_CRC  0
 
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
@@ -153,12 +153,18 @@
 /* #define HAVE_ADJUSTABLE_CPU_FREQ */
 
 #define BOOTFILE_EXT "vx747"
-#define BOOTFILE "rockbox." BOOTFILE_EXT
-#define BOOTDIR "/.rockbox"
+#define BOOTFILE     "rockbox." BOOTFILE_EXT
+#define BOOTDIR      "/.rockbox"
 
-#define CONFIG_USBOTG USBOTG_JZ4740
+#define CONFIG_USBOTG     USBOTG_JZ4740
 #define HAVE_USBSTACK
-#define USB_VENDOR_ID 0x07C4
-#define USB_PRODUCT_ID 0xA4A5
+#define USE_ROCKBOX_USB
+#define USB_VENDOR_ID     0x07C4
+#define USB_PRODUCT_ID    0xA4A5
+#define USB_NUM_ENDPOINTS 3
+/* This needs to be 2048 byte aligned, but USB_QHARRAY_ATTR should take care
+ * of that */
+#define USB_QHARRAY_ATTR   __attribute__((section(".qharray"),nocommon,aligned(4)))
+#define USB_DEVBSS_ATTR    IBSS_ATTR
 
 #endif

@@ -39,13 +39,28 @@ int _sd_write_sectors(unsigned long start, int count, const void* buf);
 int _sd_init(void);
 
 #define MMC_CD_PIN    (29 + 1 * 32)  /* Pin to check card insertion */
-//#define MMC_POWER_PIN (30 + 1 * 32)  /* Pin to enable/disable card power */
-//#define MMC_PW_PIN    (14 + 3 * 32)  /* Pin to check protect card */
+//#define MMC_POWER_PIN (22 + 2 * 32)  /* Pin to enable/disable card power */
+
+#ifdef MMC_POWER_PIN
+#define MMC_POWER_OFF()                   \
+do {                                      \
+          __gpio_clear_pin(MMC_POWER_PIN);  \
+} while (0)
+
+#define MMC_POWER_ON()                     \
+do {                                       \
+          __gpio_set_pin(MMC_POWER_PIN); \
+} while (0)
+#endif
 
 static inline void mmc_init_gpio(void)
 {
     __gpio_as_msc();
     __gpio_as_input(MMC_CD_PIN);
+#ifdef MMC_POWER_PIN
+    __gpio_as_func0(MMC_POWER_PIN);
+    __gpio_as_output(MMC_POWER_PIN);
+#endif
     __gpio_enable_pull(32*3+29);
     __gpio_enable_pull(32*3+10);
     __gpio_enable_pull(32*3+11);

@@ -23,31 +23,20 @@
 #include "jz4740.h"
 #include "ata.h"
 #include "ata-sd-target.h"
+#include "logf.h"
 #include "sd.h"
 #include "system.h"
 #include "kernel.h"
 #include "panic.h"
 #include "debug.h"
+#include "storage.h"
 
 static struct wakeup sd_wakeup;
 
 //#define MMC_DMA_ENABLE
 #define MMC_DMA_INTERRUPT 0
 
-//#define DEBUG(x...) DEBUGF(x);
-#define DEBUG(x...) printf(x);
-
-#ifdef MMC_POWER_PIN
-#define MMC_POWER_OFF()                   \
-do {                                      \
-          __gpio_set_pin(MMC_POWER_PIN);  \
-} while (0)
-
-#define MMC_POWER_ON()                     \
-do {                                       \
-          __gpio_clear_pin(MMC_POWER_PIN); \
-} while (0)
-#endif
+#define DEBUG(x...) logf(x);
 
 #ifdef MMC_CD_PIN
 #define MMC_INSERT_STATUS() __gpio_get_pin(MMC_CD_PIN)
@@ -1088,7 +1077,7 @@ static void mmc_send_cmd(struct mmc_request *request, int cmd, unsigned int arg,
     request->block_len = block_len;
     request->buffer = buffer;
     request->cnt = nob * block_len;
-    printf("mmc_send_cmd: command = %d",cmd);
+    logf("mmc_send_cmd: command = %d",cmd);
     jz_mmc_exec_cmd(request);
 }
 
@@ -1154,3 +1143,20 @@ int _sd_write_sectors(unsigned long start, int count, const void* buf)
     (void)buf;
     return -1;
 }
+
+#ifdef STORAGE_GET_INFO
+void sd_get_info(IF_MV2(int drive,) struct storage_info *info)
+{
+    (void)drive;
+    /* firmware version */
+    info->revision="0.00";
+
+    info->vendor="Rockbox";
+    info->product="SD Storage";
+
+    /* blocks count */
+    /* TODO: proper amount of sectors! */
+    info->num_sectors = 0;
+    info->sector_size = 512;
+}
+#endif

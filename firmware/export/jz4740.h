@@ -2105,57 +2105,57 @@
  *************************************************************************/
 
 #define SLCD_CFG    (SLCD_BASE + 0xA0)  /* SLCD Configure Register */
-#define SLCD_CTRL    (SLCD_BASE + 0xA4)  /* SLCD Control Register */
-#define SLCD_STATE    (SLCD_BASE + 0xA8)  /* SLCD Status Register */
-#define SLCD_DATA    (SLCD_BASE + 0xAC)  /* SLCD Data Register */
-#define SLCD_FIFO    (SLCD_BASE + 0xB0)  /* SLCD FIFO Register */
+#define SLCD_CTRL   (SLCD_BASE + 0xA4)  /* SLCD Control Register */
+#define SLCD_STATE  (SLCD_BASE + 0xA8)  /* SLCD Status Register */
+#define SLCD_DATA   (SLCD_BASE + 0xAC)  /* SLCD Data Register */
+#define SLCD_FIFO   (SLCD_BASE + 0xB0)  /* SLCD FIFO Register */
 
 #define REG_SLCD_CFG    REG32(SLCD_CFG)
-#define REG_SLCD_CTRL    REG8(SLCD_CTRL)
-#define REG_SLCD_STATE    REG8(SLCD_STATE)
-#define REG_SLCD_DATA    REG32(SLCD_DATA)
-#define REG_SLCD_FIFO    REG32(SLCD_FIFO)
+#define REG_SLCD_CTRL   REG8(SLCD_CTRL)
+#define REG_SLCD_STATE  REG8(SLCD_STATE)
+#define REG_SLCD_DATA   REG32(SLCD_DATA)
+#define REG_SLCD_FIFO   REG32(SLCD_FIFO)
 
 /* SLCD Configure Register */
-#define SLCD_CFG_BURST_BIT    14
-#define SLCD_CFG_BURST_MASK    (0x3 << SLCD_CFG_BURST_BIT)
-  #define SLCD_CFG_BURST_4_WORD    (0 << SLCD_CFG_BURST_BIT)
-  #define SLCD_CFG_BURST_8_WORD    (1 << SLCD_CFG_BURST_BIT)
-#define SLCD_CFG_DWIDTH_BIT    10
-#define SLCD_CFG_DWIDTH_MASK    (0x7 << SLCD_CFG_DWIDTH_BIT)
-  #define SLCD_CFG_DWIDTH_18    (0 << SLCD_CFG_DWIDTH_BIT)
-  #define SLCD_CFG_DWIDTH_16    (1 << SLCD_CFG_DWIDTH_BIT)
-  #define SLCD_CFG_DWIDTH_8_x3    (2 << SLCD_CFG_DWIDTH_BIT)
-  #define SLCD_CFG_DWIDTH_8_x2    (3 << SLCD_CFG_DWIDTH_BIT)
-  #define SLCD_CFG_DWIDTH_8_x1    (4 << SLCD_CFG_DWIDTH_BIT)
-  #define SLCD_CFG_DWIDTH_9_x2    (7 << SLCD_CFG_DWIDTH_BIT)
-#define SLCD_CFG_CWIDTH_BIT    8
-#define SLCD_CFG_CWIDTH_MASK    (0x3 << SLCD_CFG_CWIDTH_BIT)
-  #define SLCD_CFG_CWIDTH_16BIT    (0 << SLCD_CFG_CWIDTH_BIT)
-  #define SLCD_CFG_CWIDTH_8BIT    (1 << SLCD_CFG_CWIDTH_BIT)
-  #define SLCD_CFG_CWIDTH_18BIT    (2 << SLCD_CFG_CWIDTH_BIT)
-#define SLCD_CFG_CS_ACTIVE_LOW    (0 << 4)
-#define SLCD_CFG_CS_ACTIVE_HIGH    (1 << 4)
-#define SLCD_CFG_RS_CMD_LOW    (0 << 3)
-#define SLCD_CFG_RS_CMD_HIGH    (1 << 3)
-#define SLCD_CFG_CLK_ACTIVE_FALLING    (0 << 1)
+#define SLCD_CFG_BURST_BIT            14
+#define SLCD_CFG_BURST_MASK           (0x3 << SLCD_CFG_BURST_BIT)
+  #define SLCD_CFG_BURST_4_WORD       (0 << SLCD_CFG_BURST_BIT)
+  #define SLCD_CFG_BURST_8_WORD       (1 << SLCD_CFG_BURST_BIT)
+#define SLCD_CFG_DWIDTH_BIT           10
+#define SLCD_CFG_DWIDTH_MASK          (0x7 << SLCD_CFG_DWIDTH_BIT)
+  #define SLCD_CFG_DWIDTH_18          (0 << SLCD_CFG_DWIDTH_BIT)
+  #define SLCD_CFG_DWIDTH_16          (1 << SLCD_CFG_DWIDTH_BIT)
+  #define SLCD_CFG_DWIDTH_8_x3        (2 << SLCD_CFG_DWIDTH_BIT)
+  #define SLCD_CFG_DWIDTH_8_x2        (3 << SLCD_CFG_DWIDTH_BIT)
+  #define SLCD_CFG_DWIDTH_8_x1        (4 << SLCD_CFG_DWIDTH_BIT)
+  #define SLCD_CFG_DWIDTH_9_x2        (7 << SLCD_CFG_DWIDTH_BIT)
+#define SLCD_CFG_CWIDTH_BIT           8
+#define SLCD_CFG_CWIDTH_MASK          (0x3 << SLCD_CFG_CWIDTH_BIT)
+  #define SLCD_CFG_CWIDTH_16BIT       (0 << SLCD_CFG_CWIDTH_BIT)
+  #define SLCD_CFG_CWIDTH_8BIT        (1 << SLCD_CFG_CWIDTH_BIT)
+  #define SLCD_CFG_CWIDTH_18BIT       (2 << SLCD_CFG_CWIDTH_BIT)
+#define SLCD_CFG_CS_ACTIVE_LOW        (0 << 4)
+#define SLCD_CFG_CS_ACTIVE_HIGH       (1 << 4)
+#define SLCD_CFG_RS_CMD_LOW           (0 << 3)
+#define SLCD_CFG_RS_CMD_HIGH          (1 << 3)
+#define SLCD_CFG_CLK_ACTIVE_FALLING   (0 << 1)
 #define SLCD_CFG_CLK_ACTIVE_RISING    (1 << 1)
-#define SLCD_CFG_TYPE_PARALLEL    (0 << 0)
-#define SLCD_CFG_TYPE_SERIAL    (1 << 0)
+#define SLCD_CFG_TYPE_PARALLEL        (0 << 0)
+#define SLCD_CFG_TYPE_SERIAL          (1 << 0)
 
 /* SLCD Control Register */
-#define SLCD_CTRL_DMA_EN    (1 << 0)
+#define SLCD_CTRL_DMA_EN     (1 << 0)
 
 /* SLCD Status Register */
-#define SLCD_STATE_BUSY        (1 << 0)
+#define SLCD_STATE_BUSY      (1 << 0)
 
 /* SLCD Data Register */
 #define SLCD_DATA_RS_DATA    (0 << 31)
-#define SLCD_DATA_RS_COMMAND    (1 << 31)
+#define SLCD_DATA_RS_COMMAND (1 << 31)
 
 /* SLCD FIFO Register */
 #define SLCD_FIFO_RS_DATA    (0 << 31)
-#define SLCD_FIFO_RS_COMMAND    (1 << 31)
+#define SLCD_FIFO_RS_COMMAND (1 << 31)
 
 
 /*************************************************************************

@@ -408,6 +408,7 @@ common/memmove.c
 common/memset.c
 common/memset16.c
 common/strlen.c
+target/mips/mmu-mips.c
 #if CONFIG_CPU==JZ4732
 target/mips/ingenic_jz47xx/crt0.S
 #endif /* CONFIG_CPU == JZ4732 */

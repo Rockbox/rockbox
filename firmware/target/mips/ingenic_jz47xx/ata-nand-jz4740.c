@@ -22,11 +22,14 @@
 #include "config.h"
 #include "jz4740.h"
 #include "ata.h"
-#include "ata-nand-target.h"
+//#include "ata-nand-target.h" /* TODO */
 #include "nand_id.h"
 #include "system.h"
 #include "panic.h"
 #include "kernel.h"
+#include "storage.h"
+#include "buffer.h"
+#include "string.h"
 
 /*
  * Standard NAND flash commands
@@ -65,8 +68,8 @@ struct nand_param
     unsigned int bus_width;        /* data bus width: 8-bit/16-bit */
     unsigned int row_cycle;        /* row address cycles: 2/3 */
     unsigned int page_size;        /* page size in bytes: 512/2048 */
-    unsigned int oob_size;        /* oob size in bytes: 16/64 */
-    unsigned int page_per_block;    /* pages per block: 32/64/128 */
+    unsigned int oob_size;         /* oob size in bytes: 16/64 */
+    unsigned int page_per_block;   /* pages per block: 32/64/128 */
 };
 
 /*
@@ -106,6 +109,8 @@ struct nand_param
 static struct nand_info* chip_info = NULL;
 static struct nand_param internal_param;
 static struct mutex nand_mtx;
+static struct wakeup nand_wkup;
+static unsigned char temp_page[4096]; /* Max page size */
 
 static inline void jz_nand_wait_ready(void)
 {
@@ -141,7 +146,7 @@ static void jz_nand_write_dma(void *source, unsigned int len, int bw)
     
     dma_enable();
 
-    REG_DMAC_DCCSR(DMA_NAND_CHANNEL) = 0;
+    REG_DMAC_DCCSR(DMA_NAND_CHANNEL) = DMAC_DCCSR_NDES;
     REG_DMAC_DSAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)source);       
     REG_DMAC_DTAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)NAND_DATAPORT);       
     REG_DMAC_DTCR(DMA_NAND_CHANNEL) = len / 16;                        
@@ -149,9 +154,14 @@ static void jz_nand_write_dma(void *source, unsigned int len, int bw)
     REG_DMAC_DCMD(DMA_NAND_CHANNEL) = (DMAC_DCMD_SAI| DMAC_DCMD_DAI | DMAC_DCMD_SWDH_32 | DMAC_DCMD_DS_16BYTE |
                                        (bw == 8 ? DMAC_DCMD_DWDH_8 : DMAC_DCMD_DWDH_16));
     
-    REG_DMAC_DCCSR(DMA_NAND_CHANNEL) = (DMAC_DCCSR_EN | DMAC_DCCSR_NDES);
+    REG_DMAC_DCCSR(DMA_NAND_CHANNEL) |= DMAC_DCCSR_EN; /* Enable DMA channel */
+#if 1
     while( REG_DMAC_DTCR(DMA_NAND_CHANNEL) )
         yield();
+#else
+    REG_DMAC_DCMD(DMA_NAND_CHANNEL) |= DMAC_DCMD_TIE;  /* Enable DMA interrupt */
+    wakeup_wait(&nand_wkup, TIMEOUT_BLOCK);
+#endif
     
     dma_disable();
     
@@ -167,20 +177,42 @@ static void jz_nand_read_dma(void *target, unsigned int len, int bw)
 
     dma_enable();
     
-    REG_DMAC_DCCSR(DMA_NAND_CHANNEL) = 0;
+    REG_DMAC_DCCSR(DMA_NAND_CHANNEL) = DMAC_DCCSR_NDES;
     REG_DMAC_DSAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)NAND_DATAPORT);       
     REG_DMAC_DTAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)target);       
     REG_DMAC_DTCR(DMA_NAND_CHANNEL) = len / 4;                        
     REG_DMAC_DRSR(DMA_NAND_CHANNEL) = DMAC_DRSR_RS_AUTO;                
     REG_DMAC_DCMD(DMA_NAND_CHANNEL) = (DMAC_DCMD_SAI| DMAC_DCMD_DAI | DMAC_DCMD_DWDH_32 | DMAC_DCMD_DS_32BIT |
                                        (bw == 8 ? DMAC_DCMD_SWDH_8 : DMAC_DCMD_SWDH_16));
-    REG_DMAC_DCCSR(DMA_NAND_CHANNEL) = (DMAC_DCCSR_EN | DMAC_DCCSR_NDES);
+    REG_DMAC_DCCSR(DMA_NAND_CHANNEL) |= DMAC_DCCSR_EN; /* Enable DMA channel */
+#if 1
     while( REG_DMAC_DTCR(DMA_NAND_CHANNEL) )
         yield();
+#else
+    REG_DMAC_DCMD(DMA_NAND_CHANNEL) |= DMAC_DCMD_TIE;  /* Enable DMA interrupt */
+    wakeup_wait(&nand_wkup, TIMEOUT_BLOCK);
+#endif
     
     dma_disable();
     
     mutex_unlock(&nand_mtx);
+}
+
+void DMA_CALLBACK(DMA_NAND_CHANNEL)(void)
+{
+    if (REG_DMAC_DCCSR(DMA_NAND_CHANNEL) & DMAC_DCCSR_HLT)
+        REG_DMAC_DCCSR(DMA_NAND_CHANNEL) &= ~DMAC_DCCSR_HLT;
+
+    if (REG_DMAC_DCCSR(DMA_NAND_CHANNEL) & DMAC_DCCSR_AR)
+        REG_DMAC_DCCSR(DMA_NAND_CHANNEL) &= ~DMAC_DCCSR_AR;
+
+    if (REG_DMAC_DCCSR(DMA_NAND_CHANNEL) & DMAC_DCCSR_CT)
+        REG_DMAC_DCCSR(DMA_NAND_CHANNEL) &= ~DMAC_DCCSR_CT;
+
+    if (REG_DMAC_DCCSR(DMA_NAND_CHANNEL) & DMAC_DCCSR_TT)
+        REG_DMAC_DCCSR(DMA_NAND_CHANNEL) &= ~DMAC_DCCSR_TT;
+    
+    wakeup_signal(&nand_wkup);
 }
 
 static inline void jz_nand_read_buf(void *buf, int count, int bw)
@@ -368,6 +400,7 @@ static int jz_nand_read_page(int block, int page, unsigned char *dst)
             {
                 /* Uncorrectable error occurred */
                 panicf("Uncorrectable ECC error at NAND page 0x%x block 0x%x", page, block);
+                return -1;
             }
             else
             {
@@ -451,14 +484,7 @@ static int jz_nand_init(void)
     internal_param.oob_size = chip_info->page_size/32;
     internal_param.page_per_block = chip_info->pages_per_block;
     
-    mutex_init(&nand_mtx);
-    
     return 0;
-}
-
-void jz_nand_read(int block, int page, unsigned char *buf)
-{
-    jz_nand_read_page(block, page, buf);
 }
 
 static bool inited = false;
@@ -469,23 +495,41 @@ int nand_init(void)
     if(!inited)
     {
         res = jz_nand_init();
+        mutex_init(&nand_mtx);
+        wakeup_init(&nand_wkup);
+        
         inited = true;
     }
-    
+
     return res;
 }
 
-/* TODO */
-int nand_read_sectors(unsigned long start, int count, void* buf)
+int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
 {
-    (void)start;
-    (void)count;
-    (void)buf;
-    return -1;
+    int i, ret = 0;
+    
+    start *= 512;
+    count *= 512;
+    
+    if(count <= chip_info->page_size)
+    {
+        ret = jz_nand_read_page(start % (chip_info->page_size * chip_info->pages_per_block), start % chip_info->page_size, temp_page);
+        memcpy(buf, temp_page, count);
+        return ret;
+    }
+    else
+    {
+        for(i=0; i<count && ret == 0; i+=chip_info->page_size)
+        {
+            ret = jz_nand_read_page((start+i) % (chip_info->page_size * chip_info->pages_per_block), (start+i) % chip_info->page_size, temp_page);
+            memcpy(buf+i, temp_page, (count-i < chip_info->page_size ? count-i : chip_info->page_size));
+        }
+        return ret;
+    }
 }
 
 /* TODO */
-int nand_write_sectors(unsigned long start, int count, const void* buf)
+int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf)
 {
     (void)start;
     (void)count;
@@ -526,3 +570,20 @@ void nand_enable(bool on)
     /* null - flash controller is enabled/disabled as needed. */
     (void)on;
 }
+
+#ifdef STORAGE_GET_INFO
+void nand_get_info(IF_MV2(int drive,) struct storage_info *info)
+{
+    (void)drive;
+    /* firmware version */
+    info->revision="0.00";
+
+    info->vendor="Rockbox";
+    info->product="NAND Storage";
+
+    /* blocks count */
+    /* TODO: proper amount of sectors! */
+    info->num_sectors = (chip_info->page_size / 512) * chip_info->pages_per_block * chip_info->blocks_per_bank;
+    info->sector_size = 512;
+}
+#endif

@@ -103,7 +103,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     REG_DMAC_DCCSR(DMA_LCD_CHANNEL) |= DMAC_DCCSR_EN; /* Enable DMA channel */
     REG_DMAC_DCMD(DMA_LCD_CHANNEL) |= DMAC_DCMD_TIE; /* Enable DMA interrupt */
 
-    wakeup_wait(&lcd_wkup, TIMEOUT_BLOCK);
+    wakeup_wait(&lcd_wkup, TIMEOUT_BLOCK); /* Sleeping in lcd_update() should be safe */
     
     REG_DMAC_DCCSR(DMA_LCD_CHANNEL) &= ~DMAC_DCCSR_EN; /* Disable DMA channel */
     
