@@ -403,6 +403,10 @@ void usb_storage_init_connection(void)
     static unsigned char _transfer_buffer[BUFFER_SIZE*2]
         USB_DEVBSS_ATTR __attribute__((aligned(32)));
     tb.transfer_buffer = (void *)_transfer_buffer;
+#ifdef USB_USE_RAMDISK
+    static unsigned char _ramdisk_buffer[RAMDISK_SIZE*SECTOR_SIZE];
+    ramdisk_buffer = _ramdisk_buffer;
+#endif
 #else
     /* TODO : check if bufsize is at least 32K ? */
     size_t bufsize;
@@ -412,9 +416,9 @@ void usb_storage_init_connection(void)
     tb.transfer_buffer =
         (void *)UNCACHED_ADDR((unsigned int)(audio_buffer + 31) & 0xffffffe0);
     invalidate_icache();
-#endif
 #ifdef USB_USE_RAMDISK
     ramdisk_buffer = tb.transfer_buffer + BUFFER_SIZE*2;
+#endif
 #endif
     usb_drv_recv(ep_out, tb.transfer_buffer, 1024);
 }
