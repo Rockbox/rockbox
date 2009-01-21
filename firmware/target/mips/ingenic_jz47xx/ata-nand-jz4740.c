@@ -31,6 +31,8 @@
 #include "buffer.h"
 #include "string.h"
 
+//#define USE_DMA
+
 /*
  * Standard NAND flash commands
  */
@@ -108,8 +110,10 @@ struct nand_param
 
 static struct nand_info* chip_info = NULL;
 static struct nand_param internal_param;
+#ifdef USE_DMA
 static struct mutex nand_mtx;
 static struct wakeup nand_wkup;
+#endif
 static unsigned char temp_page[4096]; /* Max page size */
 
 static inline void jz_nand_wait_ready(void)
@@ -118,6 +122,8 @@ static inline void jz_nand_wait_ready(void)
     while ((REG_GPIO_PXPIN(2) & 0x40000000) && timeout--);
     while (!(REG_GPIO_PXPIN(2) & 0x40000000));
 }
+
+#ifndef USE_DMA
 
 static inline void jz_nand_read_buf16(void *buf, int count)
 {
@@ -136,6 +142,8 @@ static inline void jz_nand_read_buf8(void *buf, int count)
     for (i = 0; i < count; i++)
         *p++ = __nand_data8();
 }
+
+#else
 
 static void jz_nand_write_dma(void *source, unsigned int len, int bw)
 {
@@ -162,6 +170,8 @@ static void jz_nand_write_dma(void *source, unsigned int len, int bw)
     REG_DMAC_DCMD(DMA_NAND_CHANNEL) |= DMAC_DCMD_TIE;  /* Enable DMA interrupt */
     wakeup_wait(&nand_wkup, TIMEOUT_BLOCK);
 #endif
+
+    REG_DMAC_DCCSR(DMA_NAND_CHANNEL) &= ~DMAC_DCCSR_EN; /* Disable DMA channel */
     
     dma_disable();
     
@@ -177,7 +187,7 @@ static void jz_nand_read_dma(void *target, unsigned int len, int bw)
 
     dma_enable();
     
-    REG_DMAC_DCCSR(DMA_NAND_CHANNEL) = DMAC_DCCSR_NDES;
+    REG_DMAC_DCCSR(DMA_NAND_CHANNEL) = DMAC_DCCSR_NDES ;
     REG_DMAC_DSAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)NAND_DATAPORT);       
     REG_DMAC_DTAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)target);       
     REG_DMAC_DTCR(DMA_NAND_CHANNEL) = len / 4;                        
@@ -192,6 +202,8 @@ static void jz_nand_read_dma(void *target, unsigned int len, int bw)
     REG_DMAC_DCMD(DMA_NAND_CHANNEL) |= DMAC_DCMD_TIE;  /* Enable DMA interrupt */
     wakeup_wait(&nand_wkup, TIMEOUT_BLOCK);
 #endif
+
+    //REG_DMAC_DCCSR(DMA_NAND_CHANNEL) &= ~DMAC_DCCSR_EN; /* Disable DMA channel */
     
     dma_disable();
     
@@ -215,12 +227,21 @@ void DMA_CALLBACK(DMA_NAND_CHANNEL)(void)
     wakeup_signal(&nand_wkup);
 }
 
+#endif
+
 static inline void jz_nand_read_buf(void *buf, int count, int bw)
 {
+#ifdef USE_DMA
     if (bw == 8)
         jz_nand_read_dma(buf, count, 8);
     else
         jz_nand_read_dma(buf, count, 16);
+#else
+    if (bw == 8)
+        jz_nand_read_buf8(buf, count);
+    else
+        jz_nand_read_buf16(buf, count);
+#endif
 }
 
 /*
@@ -495,8 +516,11 @@ int nand_init(void)
     if(!inited)
     {
         res = jz_nand_init();
+#ifdef USE_DMA
         mutex_init(&nand_mtx);
         wakeup_init(&nand_wkup);
+        system_enable_irq(DMA_IRQ(DMA_NAND_CHANNEL));
+#endif
         
         inited = true;
     }
