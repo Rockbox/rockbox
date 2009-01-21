@@ -56,17 +56,49 @@ volatile long current_tick SHAREDDATA_ATTR = 0;
 
 /* List of tick tasks - final element always NULL for termination */
 void (*tick_funcs[MAX_NUM_TICK_TASKS+1])(void);
-static int num_tick_funcs = 0;
 
 extern struct core_entry cores[NUM_CORES];
 
 /* This array holds all queues that are initiated. It is used for broadcast. */
 static struct
 {
-    int count;
-    struct event_queue *queues[MAX_NUM_QUEUES];
+    struct event_queue *queues[MAX_NUM_QUEUES+1];
     IF_COP( struct corelock cl; )
 } all_queues SHAREDBSS_ATTR;
+
+/****************************************************************************
+ * Common utilities
+ ****************************************************************************/
+
+/* Find a pointer in a pointer array. Returns the addess of the element if
+ * found or the address of the terminating NULL otherwise. */
+static void ** find_array_ptr(void **arr, void *ptr)
+{
+    void *curr;
+    for(curr = *arr; curr != NULL && curr != ptr; curr = *(++arr));
+    return arr;
+}
+
+/* Remove a pointer from a pointer array if it exists. Compacts it so that
+ * no gaps exist. Returns 0 on success and -1 if the element wasn't found. */
+static int remove_array_ptr(void **arr, void *ptr)
+{
+    void *curr;
+    arr = find_array_ptr(arr, ptr);
+
+    if(*arr == NULL)
+        return -1;
+
+    /* Found. Slide up following items. */
+    do
+    {
+        void **arr1 = arr + 1;
+        *arr++ = curr = *arr1;
+    }
+    while(curr != NULL);
+
+    return 0;
+}
 
 /****************************************************************************
  * Standard kernel stuff
@@ -98,43 +130,29 @@ void kernel_init(void)
 int tick_add_task(void (*f)(void))
 {
     int oldlevel = disable_irq_save();
+    void **arr = (void **)tick_funcs;
+    void **p = find_array_ptr(arr, f);
 
     /* Add a task if there is room */
-    if(num_tick_funcs < MAX_NUM_TICK_TASKS)
+    if(p - arr < MAX_NUM_TICK_TASKS)
     {
-        tick_funcs[num_tick_funcs++] = f;
-        restore_irq(oldlevel);
-        return 0;
+        *p = f; /* If already in list, no problem. */
+    }
+    else
+    {
+        panicf("Error! tick_add_task(): out of tasks");
     }
 
     restore_irq(oldlevel);
-    panicf("Error! tick_add_task(): out of tasks");
-    return -1;
+    return 0;
 }
 
 int tick_remove_task(void (*f)(void))
 {
-    int i;
     int oldlevel = disable_irq_save();
-
-    /* Remove a task if it is there */
-    for(i = 0;i < num_tick_funcs;i++)
-    {
-        if(tick_funcs[i] == f)
-        {
-            /* Compact function list - propagates NULL-terminator as well */
-            for(; i < num_tick_funcs; i++)
-                tick_funcs[i] = tick_funcs[i+1];
-
-            num_tick_funcs--;
-
-            restore_irq(oldlevel);
-            return 0;
-        }
-    }
-    
+    int rc = remove_array_ptr((void **)tick_funcs, f);
     restore_irq(oldlevel);
-    return -1;
+    return rc;
 }
 
 /****************************************************************************
@@ -143,28 +161,35 @@ int tick_remove_task(void (*f)(void))
  * time and be cancelled without further software intervention.
  ****************************************************************************/
 #ifdef INCLUDE_TIMEOUT_API
-static struct timeout *tmo_list = NULL; /* list of active timeout events */
+/* list of active timeout events */
+static struct timeout *tmo_list[MAX_NUM_TIMEOUTS+1];
 
 /* timeout tick task - calls event handlers when they expire
- * Event handlers may alter ticks, callback and data during operation.
+ * Event handlers may alter expiration, callback and data during operation.
  */
 static void timeout_tick(void)
 {
     unsigned long tick = current_tick;
-    struct timeout *curr, *next;
+    struct timeout **p = tmo_list;
+    struct timeout *curr;
 
-    for (curr = tmo_list; curr != NULL; curr = next)
+    for(curr = *p; curr != NULL; curr = *(++p))
     {
-        next = (struct timeout *)curr->next;
+        int ticks;
 
-        if (TIME_BEFORE(tick, curr->expires))
+        if(TIME_BEFORE(tick, curr->expires))
             continue;
 
         /* this event has expired - call callback */
-        if (curr->callback(curr))
-            *(long *)&curr->expires = tick + curr->ticks; /* reload */
+        ticks = curr->callback(curr);
+        if(ticks > 0)
+        {
+            curr->expires = tick + ticks; /* reload */
+        }
         else
+        {
             timeout_cancel(curr); /* cancel */
+        }
     }
 }
 
@@ -172,30 +197,12 @@ static void timeout_tick(void)
 void timeout_cancel(struct timeout *tmo)
 {
     int oldlevel = disable_irq_save();
+    void **arr = (void **)tmo_list;
+    int rc = remove_array_ptr(arr, tmo);
 
-    if (tmo_list != NULL)
+    if(rc >= 0 && *arr == NULL)
     {
-        struct timeout *curr = tmo_list;
-        struct timeout *prev = NULL;
-
-        while (curr != tmo && curr != NULL)
-        {
-            prev = curr;
-            curr = (struct timeout *)curr->next;
-        }
-
-        if (curr != NULL)
-        {
-            /* in list */
-            if (prev == NULL)
-                tmo_list = (struct timeout *)curr->next;
-            else
-                *(const struct timeout **)&prev->next = curr->next;
-
-            if (tmo_list == NULL)
-                tick_remove_task(timeout_tick); /* last one - remove task */
-        }
-        /* not in list or tmo == NULL */
+        tick_remove_task(timeout_tick); /* Last one - remove task */
     }
 
     restore_irq(oldlevel);
@@ -207,32 +214,35 @@ void timeout_register(struct timeout *tmo, timeout_cb_type callback,
                       int ticks, intptr_t data)
 {
     int oldlevel;
-    struct timeout *curr;
+    void **arr, **p;
 
-    if (tmo == NULL)
+    if(tmo == NULL)
         return;
 
     oldlevel = disable_irq_save();
 
-    /* see if this one is already registered */
-    curr = tmo_list;
-    while (curr != tmo && curr != NULL)
-        curr = (struct timeout *)curr->next;
+    /* See if this one is already registered */
+    arr = (void **)tmo_list;
+    p = find_array_ptr(arr, tmo);
 
-    if (curr == NULL)
+    if(p - arr < MAX_NUM_TIMEOUTS)
     {
-        /* not found - add it */
-        if (tmo_list == NULL)
-            tick_add_task(timeout_tick); /* first one - add task */
+        /* Vacancy */
+        if(*p == NULL)
+        {
+            /* Not present */
+            if(*arr == NULL)
+            {
+                tick_add_task(timeout_tick); /* First one - add task */
+            }
 
-        *(struct timeout **)&tmo->next = tmo_list;
-        tmo_list = tmo;
+            *p = tmo;
+        }
+
+        tmo->callback = callback;
+        tmo->data = data;
+        tmo->expires = current_tick + ticks;
     }
-
-    tmo->callback = callback;
-    tmo->ticks = ticks;
-    tmo->data = data;
-    *(long *)&tmo->expires = current_tick + ticks;
 
     restore_irq(oldlevel);
 }
@@ -460,13 +470,20 @@ void queue_init(struct event_queue *q, bool register_queue)
 
     if(register_queue)
     {
-        if(all_queues.count >= MAX_NUM_QUEUES)
+        void **queues = (void **)all_queues.queues;
+        void **p = find_array_ptr(queues, q);
+
+        if(p - queues >= MAX_NUM_QUEUES)
         {
             panicf("queue_init->out of queues");
         }
-        /* Add it to the all_queues array */
-        all_queues.queues[all_queues.count++] = q;
-        corelock_unlock(&all_queues.cl);
+
+        if(*p == NULL)
+        {
+            /* Add it to the all_queues array */
+            *p = q;
+            corelock_unlock(&all_queues.cl);
+        }
     }
 
     restore_irq(oldlevel);
@@ -475,29 +492,12 @@ void queue_init(struct event_queue *q, bool register_queue)
 /* Queue must not be available for use during this call */
 void queue_delete(struct event_queue *q)
 {
-    int oldlevel;
-    int i;
-
-    oldlevel = disable_irq_save();
+    int oldlevel = disable_irq_save();
     corelock_lock(&all_queues.cl);
     corelock_lock(&q->cl);
 
-    /* Find the queue to be deleted */
-    for(i = 0;i < all_queues.count;i++)
-    {
-        if(all_queues.queues[i] == q)
-        {
-            /* Move the following queues up in the list */
-            all_queues.count--;
-
-            for(;i < all_queues.count;i++)
-            {
-                all_queues.queues[i] = all_queues.queues[i+1];
-            }
-
-            break;
-        }
-    }
+    /* Remove the queue if registered */
+    remove_array_ptr((void **)all_queues.queues, q);
 
     corelock_unlock(&all_queues.cl);
 
@@ -834,16 +834,17 @@ int queue_count(const struct event_queue *q)
 
 int queue_broadcast(long id, intptr_t data)
 {
-    int i;
+    struct event_queue **p = all_queues.queues;
+    struct event_queue *q;
 
 #if NUM_CORES > 1
     int oldlevel = disable_irq_save();
     corelock_lock(&all_queues.cl);
 #endif
-    
-    for(i = 0;i < all_queues.count;i++)
+
+    for(q = *p; q != NULL; q = *(++p))
     {
-        queue_post(all_queues.queues[i], id, data);
+        queue_post(q, id, data);
     }
 
 #if NUM_CORES > 1
@@ -851,7 +852,7 @@ int queue_broadcast(long id, intptr_t data)
     restore_irq(oldlevel);
 #endif
    
-    return i;
+    return p - all_queues.queues;
 }
 
 /****************************************************************************

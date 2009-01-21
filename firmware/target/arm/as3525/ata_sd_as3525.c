@@ -142,7 +142,7 @@ static void mci_set_clock_divider(const int drive, int divider)
 
 #ifdef HAVE_HOTSWAP
 #if defined(SANSA_E200V2) || defined(SANSA_FUZE)
-static bool sd1_oneshot_callback(struct timeout *tmo)
+static int sd1_oneshot_callback(struct timeout *tmo)
 {
     (void)tmo;
 
@@ -155,7 +155,7 @@ static bool sd1_oneshot_callback(struct timeout *tmo)
     else
         queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
 
-    return false;
+    return 0;
 }
 
 void INT_GPIOA(void)

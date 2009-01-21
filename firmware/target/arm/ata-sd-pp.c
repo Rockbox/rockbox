@@ -1215,7 +1215,7 @@ bool card_detect_target(void)
 }
 
 #ifdef HAVE_HOTSWAP
-static bool sd1_oneshot_callback(struct timeout *tmo)
+static int sd1_oneshot_callback(struct timeout *tmo)
 {
     (void)tmo;
 
@@ -1226,7 +1226,7 @@ static bool sd1_oneshot_callback(struct timeout *tmo)
     else
         queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
 
-    return false;
+    return 0;
 }
 
 /* called on insertion/removal interrupt */

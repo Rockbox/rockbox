@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by BjÃ¶rn Stenberg
+ * Copyright (C) 2002 by Björn Stenberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -204,12 +204,15 @@ extern volatile long current_tick;
 static inline void call_tick_tasks(void)
 {
     extern void (*tick_funcs[MAX_NUM_TICK_TASKS+1])(void);
-    int i;
+    void (**p)(void) = tick_funcs;
+    void (*fn)(void);
 
     current_tick++;
 
-    for (i = 0; tick_funcs[i] != NULL; i++)
-        tick_funcs[i]();
+    for(fn = *p; fn != NULL; fn = *(++p))
+    {
+        fn();
+    }
 }
 #endif
 
@@ -229,18 +232,16 @@ struct timeout;
 
 /* timeout callback type
  * tmo - pointer to struct timeout associated with event
+ * return next interval or <= 0 to stop event
  */
-typedef bool (* timeout_cb_type)(struct timeout *tmo);
+#define MAX_NUM_TIMEOUTS 8
+typedef int (* timeout_cb_type)(struct timeout *tmo);
 
 struct timeout
 {
-    /* for use by callback/internal - read/write */
     timeout_cb_type callback;/* callback - returning false cancels */
-    int             ticks;   /* timeout period in ticks */
     intptr_t        data;    /* data passed to callback */
-    /* internal use - read-only */
-    const struct timeout * const next; /* next timeout in list */
-    const long expires; /* expiration tick */
+    long            expires; /* expiration tick */
 };
 
 void timeout_register(struct timeout *tmo, timeout_cb_type callback,

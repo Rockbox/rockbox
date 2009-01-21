@@ -85,13 +85,13 @@ static int button_read(void);
 static struct timeout hp_detect_timeout; /* Debouncer for headphone plug/unplug */
 /* This callback can be used for many different functions if needed -
    just check to which object tmo points */
-static bool btn_detect_callback(struct timeout *tmo)
+static int btn_detect_callback(struct timeout *tmo)
 {
     /* Try to post only transistions */
     const long id = tmo->data ? SYS_PHONE_PLUGGED : SYS_PHONE_UNPLUGGED;
     queue_remove_from_head(&button_queue, id);
     queue_post(&button_queue, id, 0);
-    return false;
+    return 0;
 }
 #endif
 
