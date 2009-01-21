@@ -26,6 +26,7 @@
 #include "ascodec-target.h"
 #include "dma-target.h"
 #include "clock-target.h"
+#include "fmradio_i2c.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -263,6 +264,10 @@ void system_init(void)
      * We don't need the power button in the bootloader. */
     ascodec_init();
     ascodec_write(AS3514_CVDD_DCDC3, ascodec_read(AS3514_CVDD_DCDC3) & (1<<2));
+
+#ifdef CONFIG_TUNER
+    fmradio_i2c_init();
+#endif
 #endif /* !BOOTLOADER */
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
