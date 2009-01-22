@@ -97,7 +97,7 @@ drivers/lcd-remote-2bit-vi.c
 #endif /* HAVE_REMOTE_LCD */
 
 #ifdef USE_BACKLIGHT_SW_FADING
-backlight-thread-fading.c
+backlight-sw-fading.c
 #endif /* USE_BACKLIGHT_SW_FADING */
 
 /* Misc. */

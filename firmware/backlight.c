@@ -53,7 +53,7 @@ int backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
 #endif
 
 #ifdef USE_BACKLIGHT_SW_FADING
-#include "backlight-thread-fading.h"
+#include "backlight-sw-fading.h"
 #endif
 #ifdef SIMULATOR
 /* TODO: find a better way to do it but we need a kernel thread somewhere to

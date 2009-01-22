@@ -25,7 +25,7 @@
 #include "config.h"
 #include "system.h"
 #include "backlight.h"
-#include "backlight-thread-fading.h"
+#include "backlight-sw-fading.h"
 
 /* To adapt a target do:
  * - make sure _backlight_on doesn't set the brightness to something other than
