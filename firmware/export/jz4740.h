@@ -1762,14 +1762,16 @@
 #define EMC_SACR_MASK_MASK    (0xff << EMC_SACR_MASK_BIT)
 
 /* NAND Flash Control/Status Register */
-#define EMC_NFCSR_NFCE4        (1 << 7) /* NAND Flash Enable */
+#define EMC_NFCSR_NFCE4       (1 << 7) /* NAND Flash Enable */
 #define EMC_NFCSR_NFE4        (1 << 6) /* NAND Flash FCE# Assertion Enable */
-#define EMC_NFCSR_NFCE3        (1 << 5)
+#define EMC_NFCSR_NFCE3       (1 << 5)
 #define EMC_NFCSR_NFE3        (1 << 4)
-#define EMC_NFCSR_NFCE2        (1 << 3)
+#define EMC_NFCSR_NFCE2       (1 << 3)
 #define EMC_NFCSR_NFE2        (1 << 2)
-#define EMC_NFCSR_NFCE1        (1 << 1)
+#define EMC_NFCSR_NFCE1       (1 << 1)
 #define EMC_NFCSR_NFE1        (1 << 0)
+#define EMC_NFCSR_NFE(n)      (1 << (((n)-1)*2))
+#define EMC_NFCSR_NFCE(n)     (1 << (((n)*2)-1))
 
 /* NAND Flash ECC Control Register */
 #define EMC_NFECR_PRDY        (1 << 4) /* Parity Ready */

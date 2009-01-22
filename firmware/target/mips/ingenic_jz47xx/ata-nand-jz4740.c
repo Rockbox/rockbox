@@ -30,8 +30,10 @@
 #include "storage.h"
 #include "buffer.h"
 #include "string.h"
+#include "logf.h"
 
 //#define USE_DMA
+//#define USE_ECC
 
 /*
  * Standard NAND flash commands
@@ -51,9 +53,9 @@
 #define NAND_CMD_RESET         0xff
 
 /* Extended commands for large page devices */
-#define NAND_CMD_READSTART    0x30
-#define NAND_CMD_RNDOUTSTART  0xE0
-#define NAND_CMD_CACHEDPROG   0x15
+#define NAND_CMD_READSTART     0x30
+#define NAND_CMD_RNDOUTSTART   0xE0
+#define NAND_CMD_CACHEDPROG    0x15
 
 /* Status bits */
 #define NAND_STATUS_FAIL       0x01
@@ -69,8 +71,8 @@ struct nand_param
 {
     unsigned int bus_width;        /* data bus width: 8-bit/16-bit */
     unsigned int row_cycle;        /* row address cycles: 2/3 */
-    unsigned int page_size;        /* page size in bytes: 512/2048 */
-    unsigned int oob_size;         /* oob size in bytes: 16/64 */
+    unsigned int page_size;        /* page size in bytes: 512/2048/4096 */
+    unsigned int oob_size;         /* oob size in bytes: 16/64/128 */
     unsigned int page_per_block;   /* pages per block: 32/64/128 */
 };
 
@@ -83,9 +85,9 @@ struct nand_param
  *
  */
 
-#define NAND_DATAPORT        0xb8000000
-#define NAND_ADDRPORT        0xb8010000
-#define NAND_COMMPORT        0xb8008000
+#define NAND_DATAPORT        0xB8000000
+#define NAND_ADDRPORT        0xB8010000
+#define NAND_COMMPORT        0xB8008000
 
 #define ECC_BLOCK        512
 #define ECC_POS          6
@@ -93,8 +95,8 @@ struct nand_param
 
 #define __nand_cmd(n)      (REG8(NAND_COMMPORT) = (n))
 #define __nand_addr(n)     (REG8(NAND_ADDRPORT) = (n))
-#define __nand_data8()     REG8(NAND_DATAPORT)
-#define __nand_data16()    REG16(NAND_DATAPORT)
+#define __nand_data8()     (REG8(NAND_DATAPORT))
+#define __nand_data16()    (REG16(NAND_DATAPORT))
 
 #define __nand_enable()        (REG_EMC_NFCSR |= EMC_NFCSR_NFE1 | EMC_NFCSR_NFCE1)
 #define __nand_disable()       (REG_EMC_NFCSR &= ~(EMC_NFCSR_NFCE1))
@@ -118,17 +120,16 @@ static unsigned char temp_page[4096]; /* Max page size */
 
 static inline void jz_nand_wait_ready(void)
 {
-    unsigned int timeout = 1000;
+    register unsigned int timeout = 1000;
     while ((REG_GPIO_PXPIN(2) & 0x40000000) && timeout--);
     while (!(REG_GPIO_PXPIN(2) & 0x40000000));
 }
 
 #ifndef USE_DMA
-
 static inline void jz_nand_read_buf16(void *buf, int count)
 {
-    int i;
-    unsigned short *p = (unsigned short *)buf;
+    register int i;
+    register unsigned short *p = (unsigned short *)buf;
 
     for (i = 0; i < count; i += 2)
         *p++ = __nand_data16();
@@ -136,15 +137,13 @@ static inline void jz_nand_read_buf16(void *buf, int count)
 
 static inline void jz_nand_read_buf8(void *buf, int count)
 {
-    int i;
-    unsigned char *p = (unsigned char *)buf;
+    register int i;
+    register unsigned char *p = (unsigned char *)buf;
 
     for (i = 0; i < count; i++)
         *p++ = __nand_data8();
 }
-
 #else
-
 static void jz_nand_write_dma(void *source, unsigned int len, int bw)
 {
     mutex_lock(&nand_mtx);
@@ -226,8 +225,7 @@ void DMA_CALLBACK(DMA_NAND_CHANNEL)(void)
     
     wakeup_signal(&nand_wkup);
 }
-
-#endif
+#endif /* USE_DMA */
 
 static inline void jz_nand_read_buf(void *buf, int count, int bw)
 {
@@ -244,6 +242,7 @@ static inline void jz_nand_read_buf(void *buf, int count, int bw)
 #endif
 }
 
+#ifdef USE_ECC
 /*
  * Correct 1~9-bit errors in 512-bytes data 
  */
@@ -258,7 +257,8 @@ static void jz_rs_correct(unsigned char *dat, int idx, int mask)
     i = (j == 0) ? (i - 1) : i;
     j = (j == 0) ? 7 : (j - 1);
 
-    if (i > 512) return;
+    if (i > 512)
+        return;
 
     if (i == 512)
         d = dat[i - 1];
@@ -275,11 +275,12 @@ static void jz_rs_correct(unsigned char *dat, int idx, int mask)
     if (i < 512)
         dat[i] = (d >> 8) & 0xff;
 }
+#endif
 
 /*
  * Read oob
  */
-static int jz_nand_read_oob(int page_addr, unsigned char *buf, int size)
+static int jz_nand_read_oob(unsigned long page_addr, unsigned char *buf, int size)
 {
     struct nand_param *nandp = &internal_param;
     int page_size, row_cycle, bus_width;
@@ -335,22 +336,20 @@ static int jz_nand_read_oob(int page_addr, unsigned char *buf, int size)
  *    page - page number within a block: 0, 1, 2, ...
  *    dst - pointer to target buffer
  */
-static int jz_nand_read_page(int block, int page, unsigned char *dst)
+static int jz_nand_read_page(unsigned long page_addr, unsigned char *dst)
 {
     struct nand_param *nandp = &internal_param;
     int page_size, oob_size, page_per_block;
     int row_cycle, bus_width, ecc_count;
-    int page_addr, i, j;
+    int i, j;
     unsigned char *data_buf;
-    unsigned char oob_buf[128];
+    unsigned char oob_buf[nandp->oob_size];
 
     page_size = nandp->page_size;
     oob_size = nandp->oob_size;
     page_per_block = nandp->page_per_block;
     row_cycle = nandp->row_cycle;
     bus_width = nandp->bus_width;
-
-    page_addr = page + block * page_per_block;
 
     /*
      * Read oob data
@@ -372,7 +371,7 @@ static int jz_nand_read_page(int block, int page, unsigned char *dst)
     /* Send page address */
     __nand_addr(page_addr & 0xff);
     __nand_addr((page_addr >> 8) & 0xff);
-    if (row_cycle == 3)
+    if (row_cycle >= 3)
         __nand_addr((page_addr >> 16) & 0xff);
 
     /* Send READSTART command for 2048 ps NAND */
@@ -389,16 +388,19 @@ static int jz_nand_read_page(int block, int page, unsigned char *dst)
 
     for (i = 0; i < ecc_count; i++)
     {
+#ifdef USE_ECC
         volatile unsigned char *paraddr = (volatile unsigned char *)EMC_NFPAR0;
         unsigned int stat;
 
         /* Enable RS decoding */
         REG_EMC_NFINTS = 0x0;
         __nand_ecc_rs_decoding();
+#endif
 
         /* Read data */
         jz_nand_read_buf((void *)data_buf, ECC_BLOCK, bus_width);
 
+#ifdef USE_ECC
         /* Set PAR values */
         for (j = 0; j < PAR_SIZE; j++)
             *paraddr++ = oob_buf[ECC_POS + i*PAR_SIZE + j];
@@ -420,7 +422,7 @@ static int jz_nand_read_page(int block, int page, unsigned char *dst)
             if (stat & EMC_NFINTS_UNCOR)
             {
                 /* Uncorrectable error occurred */
-                panicf("Uncorrectable ECC error at NAND page 0x%x block 0x%x", page, block);
+                panicf("Uncorrectable ECC error at NAND page address 0x%lx", page_addr);
                 return -1;
             }
             else
@@ -452,6 +454,7 @@ static int jz_nand_read_page(int block, int page, unsigned char *dst)
                 }
             }
         }
+#endif
 
         data_buf += ECC_BLOCK;
     }
@@ -502,7 +505,7 @@ static int jz_nand_init(void)
     internal_param.bus_width = 8;
     internal_param.row_cycle = chip_info->row_cycles;
     internal_param.page_size = chip_info->page_size;
-    internal_param.oob_size = chip_info->page_size/32;
+    internal_param.oob_size = chip_info->spare_size;
     internal_param.page_per_block = chip_info->pages_per_block;
     
     return 0;
@@ -532,21 +535,24 @@ int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* b
 {
     int i, ret = 0;
     
+    logf("nand_read_sectors(%ld, %d, 0x%x)", start, count, (int)buf);
+    
     start *= 512;
     count *= 512;
     
     if(count <= chip_info->page_size)
     {
-        ret = jz_nand_read_page(start % (chip_info->page_size * chip_info->pages_per_block), start % chip_info->page_size, temp_page);
-        memcpy(buf, temp_page, count);
+        ret = jz_nand_read_page(start/chip_info->page_size, temp_page);
+        memcpy(buf, temp_page+(start%chip_info->page_size), count);
         return ret;
     }
     else
     {
-        for(i=0; i<count && ret == 0; i+=chip_info->page_size)
+        for(i=0; i<count && ret==0; i+=chip_info->page_size)
         {
-            ret = jz_nand_read_page((start+i) % (chip_info->page_size * chip_info->pages_per_block), (start+i) % chip_info->page_size, temp_page);
-            memcpy(buf+i, temp_page, (count-i < chip_info->page_size ? count-i : chip_info->page_size));
+            ret = jz_nand_read_page((start+i)/chip_info->page_size, temp_page);
+            memcpy(buf+i, temp_page+((start+i)%chip_info->page_size),
+                   (count-i < chip_info->page_size ? count-i : chip_info->page_size));
         }
         return ret;
     }
@@ -607,7 +613,7 @@ void nand_get_info(IF_MV2(int drive,) struct storage_info *info)
 
     /* blocks count */
     /* TODO: proper amount of sectors! */
-    info->num_sectors = (chip_info->page_size / 512) * chip_info->pages_per_block * chip_info->blocks_per_bank;
+    info->num_sectors = ((chip_info->page_size+chip_info->spare_size) / 512) * chip_info->pages_per_block * chip_info->blocks_per_bank;
     info->sector_size = 512;
 }
 #endif

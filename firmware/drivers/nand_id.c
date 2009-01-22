@@ -24,35 +24,38 @@
 
 struct nand_manufacturer
 {
-    unsigned char     id;
-    struct nand_info* info;
+    unsigned char        id;
+    struct nand_info*  info;
     unsigned short    total;
 };
 
-/* { pages_per_block, blocks_per_bank, page_size, spare_size, col_cycles, row_cycles } */
-
 static const struct nand_info samsung[] =
 {
-    /* K9F4G08UOM */
-    {0xDC, 0x10,  64, 4096, 2048,  64, 2, 3},
-    /* K9K8G08UOM */
-    {0xD3, 0x51,  64, 8192, 2048,  64, 2, 3},
-    /* K9LAG08UOM */
-    {0xD5, 0x55, 128, 8192, 2048,  64, 2, 3},
-    /* K9LBG08UOM, K9HBG08U1M, K9MCG08U5M */
-    {0xD7, 0x55, 128, 8192, 4096, 128, 2, 3}
+/*  { id1,  id2, pages_per_block, blocks_per_bank, page_size, spare_size, col_cycles, row_cycles } */
+
+                                              /* K9F4G08UOM */
+    {0xDC, 0x10,              64,            4096,      2048,         64,          2,          3 },
+                                              /* K9K8G08UOM */
+    {0xD3, 0x51,              64,            8192,      2048,         64,          2,          3 },
+                                              /* K9LAG08UOM */
+    {0xD5, 0x55,             128,            8192,      2048,         64,          2,          3 },
+                                 /* K9LBG08UOM, K9HBG08U1M, K9MCG08U5M */
+    {0xD7, 0x55,             128,            8192,      4096,        128,          2,          3 },
 };
 
-#define M(id, x) {id, (struct nand_info*)x, (sizeof(x)/sizeof(struct nand_info))}
+#define NI(id, x) {id, (struct nand_info*)x, (sizeof(x)/sizeof(struct nand_info))}
 static const struct nand_manufacturer all[] =
 {
-    M(0xEC, samsung),
+    NI(0xEC, samsung),
 };
+
+// --------------------------------------------------------------------------------------------------
 
 struct nand_info* nand_identify(unsigned char data[5])
  {
     unsigned int i;
     int found = -1;
+    
     for(i = 0; i < (sizeof(all)/sizeof(struct nand_manufacturer)); i++)
     {
         if(data[0] == all[i].id)
@@ -61,6 +64,7 @@ struct nand_info* nand_identify(unsigned char data[5])
             break;
         }
     }
+    
     if(found < 0)
         return NULL;
     
