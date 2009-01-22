@@ -439,6 +439,8 @@
 #if CONFIG_CPU == IMX31L
 /* Priority in bootloader is wanted */
 #define HAVE_PRIORITY_SCHEDULING
+#define USB_STATUS_BY_EVENT
+#define USB_DETECT_BY_DRV
 #endif
 
 #else /* !BOOTLOADER */
@@ -452,13 +454,18 @@
 
 #define HAVE_SEMAPHORE_OBJECTS
 
-#ifdef TOSHIBA_GIGABEAT_F
-#define HAVE_WAKEUP_OBJECTS
+#if defined(HAVE_USBSTACK) && CONFIG_USBOTG == USBOTG_ARC
+#define USB_STATUS_BY_EVENT
+#define USB_DETECT_BY_DRV
+#if CONFIG_CPU != IMX31L
+#define INCLUDE_TIMEOUT_API
 #endif
+#endif /* HAVE_USBSTACK */
 
 #endif /* BOOTLOADER */
 
-#if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) || (CONFIG_CPU == AS3525)
+#if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) \
+    || (CONFIG_CPU == AS3525) || (CONFIG_CPU == S3C2440) 
 #define HAVE_WAKEUP_OBJECTS
 #endif
 

@@ -141,6 +141,10 @@ static void app_main(void)
     viewportmanager_set_statusbar(true);
     add_event(GUI_EVENT_STATUSBAR_TOGGLE, false, 
               viewportmanager_statusbar_changed);
+#ifdef HAVE_USBSTACK
+    /* All threads should be created and public queues registered by now */
+    usb_start_monitoring();
+#endif
     root_menu();
 }
 
@@ -454,8 +458,8 @@ static void init(void)
     eeprom_settings_init();
 #endif
 
-    usb_start_monitoring();
 #ifndef HAVE_USBSTACK
+    usb_start_monitoring();
     while (usb_detect() == USB_INSERTED)
     {
 #ifdef HAVE_EEPROM_SETTINGS

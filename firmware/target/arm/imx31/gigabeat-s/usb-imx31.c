@@ -53,25 +53,24 @@ static void enable_transceiver(bool enable)
     }
 }
 
+/* Read the immediate state of the cable from the PMIC */
+bool usb_plugged(void)
+{
+    return mc13783_read(MC13783_INTERRUPT_SENSE0) & MC13783_USB4V4S;
+}
+
 void usb_connect_event(void)
 {
-    uint32_t status = mc13783_read(MC13783_INTERRUPT_SENSE0);
-    usb_status = (status & MC13783_USB4V4S) ?
-        USB_INSERTED : USB_EXTRACTED;
+    int status = usb_plugged() ? USB_INSERTED : USB_EXTRACTED;
+    usb_status = status;
     /* Notify power that USB charging is potentially available */
-    charger_usb_detect_event(usb_status);
-    usb_status_event(usb_status);
+    charger_usb_detect_event(status);
+    usb_status_event((status == USB_INSERTED) ? USB_POWERED : USB_UNPOWERED);
 }
 
 int usb_detect(void)
 {
     return usb_status;
-}
-
-/* Read the immediate state of the cable from the PMIC */
-bool usb_plugged(void)
-{
-    return mc13783_read(MC13783_INTERRUPT_SENSE0) & MC13783_USB4V4S;
 }
 
 void usb_init_device(void)
@@ -107,7 +106,7 @@ void usb_enable(bool on)
 
 void usb_attach(void)
 {
-    usb_enable(true);
+    usb_drv_attach();
 }
 
 static void __attribute__((interrupt("IRQ"))) USB_OTG_HANDLER(void)
@@ -121,4 +120,10 @@ void usb_drv_int_enable(bool enable)
         avic_enable_int(USB_OTG, IRQ, 7, USB_OTG_HANDLER);
     else    
         avic_disable_int(USB_OTG);
+}
+
+/* Called during the bus reset interrupt when in detect mode */
+void usb_drv_usb_detect_event(void)
+{
+    usb_status_event(USB_INSERTED);
 }

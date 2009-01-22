@@ -419,13 +419,11 @@ static void _usb_drv_init(bool attach)
     REG_ENDPOINTLISTADDR = (unsigned int)qh_array;
     REG_DEVICEADDR = 0;
 
-#ifdef USB_DETECT_BY_DRV
     if (!attach) {
         /* enable RESET interrupt */
         REG_USBINTR = USBINTR_RESET_EN;
     }
     else
-#endif
     {
         /* enable USB interrupts */
         REG_USBINTR =
@@ -449,23 +447,17 @@ static void _usb_drv_init(bool attach)
     (void)attach;
 }
 
-/** With USB_DETECT_BY_DRV, attach is distinct from init, otherwise eqivalent. **/
-
-/* USB_DETECT_BY_DRV - enable bus reset detection only
- * else fully enable driver */
 void usb_drv_init(void)
 {
     _usb_drv_init(false);
 }
 
-#ifdef USB_DETECT_BY_DRV
 /* fully enable driver */
 void usb_drv_attach(void)
 {
     sleep(HZ/10);
     _usb_drv_init(true);
 }
-#endif /* USB_DETECT_BY_DRV */
 
 void usb_drv_exit(void)
 {
@@ -513,7 +505,7 @@ void usb_drv_int(void)
     /* reset interrupt */
     if (status & USBSTS_RESET) {
         REG_USBSTS = USBSTS_RESET;
-#ifdef USB_DETECT_BY_DRV
+
         if (UNLIKELY(usbintr == USBINTR_RESET_EN)) {
             /* USB detected - detach and inform */
             usb_drv_stop();
@@ -523,7 +515,6 @@ void usb_drv_int(void)
                 usb_drv_usb_detect_event();
         }
         else
-#endif
         {
             bus_reset();
             usb_core_bus_reset(); /* tell mom */

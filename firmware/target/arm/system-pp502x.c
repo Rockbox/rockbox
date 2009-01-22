@@ -25,9 +25,8 @@
 #include "as3514.h"
 #include "ata-sd-target.h"
 #include "button-target.h"
-#ifdef HAVE_USBSTACK
+#include "usb-target.h"
 #include "usb_drv.h"
-#endif
 
 #ifndef BOOTLOADER
 extern void TIMER1(void);
@@ -42,51 +41,108 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
     {
         if (CPU_INT_STAT & TIMER1_MASK) {
             TIMER1();
-        } else if (CPU_INT_STAT & TIMER2_MASK)
+        }
+        else if (CPU_INT_STAT & TIMER2_MASK) {
             TIMER2();
-#if defined(IPOD_MINI) /* Mini 1st gen only, mini 2nd gen uses iPod 4G code */
-        else if (CPU_HI_INT_STAT & GPIO0_MASK)
-            ipod_mini_button_int();
-#elif CONFIG_KEYPAD == IPOD_4G_PAD /* except Mini 1st gen, handled above */
-        else if (CPU_HI_INT_STAT & I2C_MASK)
-            ipod_4g_button_int();
-#elif defined(SANSA_E200)
-#ifdef HAVE_HOTSWAP
-        else if (CPU_HI_INT_STAT & GPIO0_MASK) {
-            if (GPIOA_INT_STAT & 0x80)
-                microsd_int();
+        }
+#ifdef HAVE_USBSTACK
+        /* Rather high priority - place near front */
+        else if (CPU_INT_STAT & USB_MASK) {
+            usb_drv_int();
         }
 #endif
+#if defined(IPOD_MINI) /* Mini 1st gen only, mini 2nd gen uses iPod 4G code */
+        else if (CPU_HI_INT_STAT & GPIO0_MASK) {
+            if ((GPIOA_INT_STAT & 0x3f) || (GPIOB_INT_STAT & 0x30))
+                ipod_mini_button_int();
+            if (GPIOC_INT_STAT & 0x02)
+                firewire_insert_int();
+            if (GPIOD_INT_STAT & 0x08)
+                usb_insert_int();
+        }
+/* end IPOD_MINI */
+#elif CONFIG_KEYPAD == IPOD_4G_PAD /* except Mini 1st gen, handled above */
+        else if (CPU_HI_INT_STAT & I2C_MASK) {
+            ipod_4g_button_int();
+        }
+#if defined(IPOD_COLOR) || defined(IPOD_MINI2G) || defined(IPOD_4G)
+        else if (CPU_HI_INT_STAT & GPIO0_MASK) {
+            if (GPIOC_INT_STAT & 0x02)
+                firewire_insert_int();
+            if (GPIOD_INT_STAT & 0x08)
+                usb_insert_int();
+        }
+#elif defined(IPOD_NANO) || defined(IPOD_VIDEO)
+        else if (CPU_HI_INT_STAT & GPIO2_MASK) {
+            if (GPIOL_INT_STAT & 0x10)
+                usb_insert_int();
+        }
+#endif
+/* end CONFIG_KEYPAD == IPOD_4G_PAD */
+#elif defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+        else if (CPU_HI_INT_STAT & GPIO2_MASK) {
+            if (GPIOL_INT_STAT & 0x04)
+                usb_insert_int();
+        }
+/* end IRIVER_H10 || IRIVER_H10_5GB */
+#elif defined(SANSA_E200)
+        else if (CPU_HI_INT_STAT & GPIO0_MASK) {
+#ifdef HAVE_HOTSWAP
+            if (GPIOA_INT_STAT & 0x80)
+                microsd_int();
+#endif
+            if (GPIOB_INT_STAT & 0x10)
+                usb_insert_int();
+        }
         else if (CPU_HI_INT_STAT & GPIO1_MASK) {
             if (GPIOF_INT_STAT & 0xff)
                 button_int();
             if (GPIOH_INT_STAT & 0xc0)
                 clickwheel_int();
         }
-#elif defined(SANSA_C200) && defined(HAVE_HOTSWAP)
+/* end SANSA_E200 */
+#elif defined(SANSA_C200)
+        else if (CPU_HI_INT_STAT & GPIO1_MASK) {
+            if (GPIOH_INT_STAT & 0x02)
+                usb_insert_int();
+        }
+#ifdef HAVE_HOTSWAP
         else if (CPU_HI_INT_STAT & GPIO2_MASK) {
             if (GPIOL_INT_STAT & 0x08)
                 microsd_int();
         }
+#endif
+/* end SANSA_C200 */
 #elif defined(MROBE_100)
         else if (CPU_HI_INT_STAT & GPIO0_MASK) {
-            if (GPIOD_INT_STAT & 0x2)
+            if (GPIOD_INT_STAT & 0x02)
                 button_int();
-        }        
+        }
+        else if (CPU_HI_INT_STAT & GPIO2_MASK) {
+            if (GPIOL_INT_STAT & 0x04)
+                usb_insert_int();
+        }
+/* end MROBE_100 */
+#elif defined(PHILIPS_SA9200)
+        else if (CPU_HI_INT_STAT & GPIO1_MASK) {
+            if (GPIOF_INT_STAT & 0x80)
+                usb_insert_int();
+        }
+/* end PHILIPS_SA9200 */
 #elif defined(PHILIPS_HDD1630)
         else if (CPU_HI_INT_STAT & GPIO0_MASK) {
             if (GPIOA_INT_STAT & 0x20)
                 button_int();
-        }        
+        }
+        else if (CPU_HI_INT_STAT & GPIO1_MASK) {
+            if (GPIOE_INT_STAT & 0x04)
+                usb_insert_int();
+        }
+/* end PHILIPS_HDD1630 */
 #endif
 #ifdef IPOD_ACCESSORY_PROTOCOL
-	else if (CPU_HI_INT_STAT & SER0_MASK) {
-	    SERIAL0();
-	}
-#endif
-#ifdef HAVE_USBSTACK
-        else if (CPU_INT_STAT & USB_MASK) {
-            usb_drv_int();
+        else if (CPU_HI_INT_STAT & SER0_MASK) {
+            SERIAL0();
         }
 #endif
     } else {
@@ -437,8 +493,12 @@ void system_init(void)
 #endif /* BOOTLOADER */
 }
 
-void system_reboot(void)
+void ICODE_ATTR system_reboot(void)
 {
+    disable_interrupt(IRQ_FIQ_STATUS);
+    CPU_INT_DIS = -1;
+    COP_INT_DIS = -1;
+
     /* Reboot */
 #if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
     CACHE_CTL &= ~CACHE_CTL_VECT_REMAP;

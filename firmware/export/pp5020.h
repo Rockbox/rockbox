@@ -218,6 +218,7 @@
 #define CACHE_OP_INVALIDATE  0x0004
 
 /* GPIO Ports */
+#define GPIO_BASE_ADDR   0x6000d000
 #define GPIOA_ENABLE     (*(volatile unsigned long *)(0x6000d000))
 #define GPIOB_ENABLE     (*(volatile unsigned long *)(0x6000d004))
 #define GPIOC_ENABLE     (*(volatile unsigned long *)(0x6000d008))
@@ -322,10 +323,41 @@
  * define the value of those bits. */
 
 #define GPIO_SET_BITWISE(port, mask) \
-        do { *(&port + (0x800/sizeof(long))) = (mask << 8) | mask; } while(0)
+        do { *(&(port) + (0x800/sizeof(long))) = ((mask) << 8) | (mask); } while(0)
 
 #define GPIO_CLEAR_BITWISE(port, mask) \
-        do { *(&port + (0x800/sizeof(long))) = mask << 8; } while(0)
+        do { *(&(port) + (0x800/sizeof(long))) = (mask) << 8; } while(0)
+
+#define GPIO_WRITE_BITWISE(port, val, mask) \
+        do { *(&(port) + (0x800/sizeof(long))) = ((mask) << 8) | (val); } while(0)
+
+/* GPIO Module 0 */
+#define GPIOA  0
+#define GPIOB  1
+#define GPIOC  2
+#define GPIOD  3
+/* GPIO Module 1 */
+#define GPIOE  4
+#define GPIOF  5
+#define GPIOG  6
+#define GPIOH  7
+/* GPIO Module 2 */
+#define GPIOI  8
+#define GPIOJ  9
+#define GPIOK 10
+#define GPIOL 11
+
+#define GPIO_MODULE_NUM(gpio)   ((gpio)>>2)
+#define GPIO_MAP_ADDR(gpio)     (GPIO_BASE_ADDR+(GPIO_MODULE_NUM(gpio)<<7)+(((gpio)&3)<<2))
+#define GPIO_ENABLE(gpio)       (*(volatile unsigned long *)(GPIO_MAP_ADDR(gpio)+0x00))
+#define GPIO_OUTPUT_EN(gpio)    (*(volatile unsigned long *)(GPIO_MAP_ADDR(gpio)+0x10))
+#define GPIO_OUTPUT_VAL(gpio)   (*(volatile unsigned long *)(GPIO_MAP_ADDR(gpio)+0x20))
+#define GPIO_INPUT_VAL(gpio)    (*(volatile unsigned long *)(GPIO_MAP_ADDR(gpio)+0x30))
+#define GPIO_INT_STAT(gpio)     (*(volatile unsigned long *)(GPIO_MAP_ADDR(gpio)+0x40))
+#define GPIO_INT_EN(gpio)       (*(volatile unsigned long *)(GPIO_MAP_ADDR(gpio)+0x50))
+#define GPIO_INT_LEV(gpio)      (*(volatile unsigned long *)(GPIO_MAP_ADDR(gpio)+0x60))
+#define GPIO_INT_CLR(gpio)      (*(volatile unsigned long *)(GPIO_MAP_ADDR(gpio)+0x70))
+#define GPIO_HI_INT_MASK(gpio)  (1ul << GPIO_MODULE_NUM(gpio))
 
 /* Device initialization */
 #define PP_VER1          (*(volatile unsigned long *)(0x70000000))

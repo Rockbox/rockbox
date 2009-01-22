@@ -22,12 +22,7 @@
 #define USB_TARGET_H
 
 void usb_init_device(void);
-
-#ifndef BOOTLOADER
-#if defined(SANSA_C200) || defined(SANSA_E200)
-#define USB_STATUS_BY_EVENT /* No USB tick */
-void usb_connect_event(bool inserted);
-#endif
-#endif /* BOOTLOADER */
+void usb_insert_int(void);
+void firewire_insert_int(void);
 
 #endif

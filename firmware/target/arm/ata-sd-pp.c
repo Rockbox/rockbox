@@ -1247,7 +1247,6 @@ void microsd_int(void)
     GPIO_SET_BITWISE(GPIOL_INT_EN, 0x08);
 #endif
     timeout_register(&sd1_oneshot, sd1_oneshot_callback, (3*HZ/10), 0);
-
 }
 #endif /* HAVE_HOTSWAP */
 

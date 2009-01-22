@@ -31,8 +31,8 @@
 
 /* Messages from usb_tick and thread states */
 enum {
+    USB_EXTRACTED = 0,       /* Event+State */
     USB_INSERTED,            /* Event+State */
-    USB_EXTRACTED,           /* Event+State */
 #if defined(HAVE_USB_POWER) || defined(USB_DETECT_BY_DRV)
     USB_POWERED,             /* Event+State */
 #endif
@@ -135,6 +135,7 @@ bool usb_exclusive_storage(void); /* storage is available for usb */
 
 #ifdef USB_FIREWIRE_HANDLING
 bool firewire_detect(void);
+void usb_firewire_connect_event(void);
 #endif
 
 #endif

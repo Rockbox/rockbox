@@ -134,10 +134,6 @@ static inline void charger_plugged(void)
 {
     batt_threshold = BATT_FULL_VOLTAGE; /* Start with topped value. */
     battery_voltage_sync();
-#if defined(USB_STATUS_BY_EVENT) && defined(USB_DETECT_BY_DRV)
-    /* Charger pin detect is USB pin detect */
-    usb_connect_event(true);
-#endif
 }
 
 static inline void charger_control(void)
@@ -192,10 +188,6 @@ static inline void charger_unplugged(void)
     disable_charger();
     if (charge_state >= CHARGE_STATE_ERROR)
         charge_state = DISCHARGING; /* Reset error */
-#if defined(USB_STATUS_BY_EVENT) && defined(USB_DETECT_BY_DRV)
-    /* Charger pin detect is USB pin detect */
-    usb_connect_event(false);
-#endif
 }
 
 /* Main charging algorithm - called from powermgmt.c */

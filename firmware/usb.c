@@ -416,9 +416,11 @@ static void usb_thread(void)
 #ifdef USB_STATUS_BY_EVENT
 void usb_status_event(int current_status)
 {
-    /* Status should be USB_POWERED, USB_UNPOWERED, USB_INSERTED or
-     * USB_EXTRACTED.
-     * Caller isn't expected to filter for changes in status. */
+    /* Caller isn't expected to filter for changes in status.
+     * current_status:
+     *   USB_DETECT_BY_DRV: USB_POWERED, USB_UNPOWERED, USB_INSERTED (driver)
+     *                else: USB_INSERTED, USB_EXTRACTED
+     */
     if(usb_monitor_enabled)
     {
         int oldstatus = disable_irq_save(); /* Dual-use function */
@@ -435,16 +437,30 @@ void usb_status_event(int current_status)
 
 void usb_start_monitoring(void)
 {
+    int oldstatus = disable_irq_save(); /* Sync to event */
     int status = usb_detect();
-#ifdef USB_DETECT_BY_DRV
-    /* USB detection begins by USB_POWERED, not USB_INSERTED. If it is
-     * USB_EXTRACTED, then nothing changes and post will be skipped. */
-    if(USB_INSERTED == status)
-        status = USB_POWERED;
-#endif
+
     usb_monitor_enabled = true;
+
+#ifdef USB_DETECT_BY_DRV
+    status = (status == USB_INSERTED) ? USB_POWERED : USB_UNPOWERED;
+#endif
     usb_status_event(status);
+
+#ifdef USB_FIREWIRE_HANDLING
+    if (firewire_detect())
+        usb_firewire_connect_event();
+#endif
+
+    restore_irq(oldstatus);
 }
+
+#ifdef USB_FIREWIRE_HANDLING
+void usb_firewire_connect_event(void)
+{
+    queue_post(&usb_queue, USB_REQUEST_REBOOT, 0);
+}
+#endif /* USB_FIREWIRE_HANDLING */
 #else /* !USB_STATUS_BY_EVENT */
 static void usb_tick(void)
 {
@@ -522,7 +538,11 @@ void usb_init(void)
 {
     /* We assume that the USB cable is extracted */
     usb_state = USB_EXTRACTED;
+#ifdef USB_DETECT_BY_DRV
+    last_usb_status = USB_UNPOWERED;
+#else
     last_usb_status = USB_EXTRACTED;
+#endif
     usb_monitor_enabled = false;
 
 #ifdef HAVE_USBSTACK
