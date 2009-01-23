@@ -32,9 +32,6 @@
 
 /* Most code in here is taken from the Linux BSP provided by Freescale
  * Copyright 2004-2006 Freescale Semiconductor, Inc. All Rights Reserved. */
-#ifdef HAVE_HEADPHONE_DETECTION
-static bool headphones_detect = false;
-#endif
 static uint32_t int_btn     = BUTTON_NONE;
 static bool hold_button     = false;
 #ifdef BOOTLOADER
@@ -123,6 +120,16 @@ bool button_hold(void)
     return _button_hold();
 }
 
+#ifdef HAVE_HEADPHONE_DETECTION
+/* Headphone driver pushes the data here */
+void button_headphone_set(int button)
+{
+    int oldstatus = disable_irq_save();
+    int_btn = (int_btn & ~BUTTON_REMOTE) | button;
+    restore_irq(oldstatus);
+}
+#endif
+
 int button_read_device(void)
 {
     /* Simple poll of GPIO status */
@@ -168,21 +175,6 @@ void button_power_event(void)
     restore_irq(oldlevel);
 }
 
-#ifdef HAVE_HEADPHONE_DETECTION
-/* This is called from the mc13783 interrupt thread */
-void headphone_detect_event(void)
-{
-    /* FIXME: Not really the correct method */
-    headphones_detect =
-        (mc13783_read(MC13783_INTERRUPT_SENSE1) & MC13783_ONOFD2S) == 0;
-}
-
-bool headphones_inserted(void)
-{
-    return headphones_detect;
-}
-#endif /* HAVE_HEADPHONE_DETECTION */
-
 void button_init_device(void)
 {
 #ifdef BOOTLOADER
@@ -223,8 +215,7 @@ void button_init_device(void)
     mc13783_enable_event(MC13783_ONOFD1_EVENT);
 
 #ifdef HAVE_HEADPHONE_DETECTION
-    headphone_detect_event();
-    mc13783_enable_event(MC13783_ONOFD2_EVENT);
+    headphone_init();
 #endif
 }
 

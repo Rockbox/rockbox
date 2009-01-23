@@ -140,7 +140,7 @@
 #define GPIO_EVENT_MASK (USE_GPIO1_EVENTS)
 
 /* Define this if target has an additional number of threads specific to it */
-#define TARGET_EXTRA_THREADS 1
+#define TARGET_EXTRA_THREADS 2
 
 /* Type of mobile power - check this out */
 #define BATTERY_CAPACITY_DEFAULT 700 /* default battery capacity */

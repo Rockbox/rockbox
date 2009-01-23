@@ -37,6 +37,8 @@ int button_read_device(void);
 void button_power_event(void);
 void headphone_detect_event(void);
 bool headphones_inserted(void);
+void headphone_init(void);
+void button_headphone_set(int button);
 
 /* Toshiba Gigabeat S-specific button codes */
 
@@ -55,9 +57,17 @@ bool headphones_inserted(void);
 #define BUTTON_NEXT         (1 << 11)
 #define BUTTON_POWER        (1 << 12) /* Read from PMIC */
 
-#define BUTTON_MAIN         (0x1fff)
+#define BUTTON_MAIN         (0x00001fff)
 
-#define BUTTON_REMOTE       0
+/* Remote control buttons */
+#define BUTTON_RC_VOL_UP    (1 << 13)
+#define BUTTON_RC_VOL_DOWN  (1 << 14)
+#define BUTTON_RC_FF        (1 << 15)
+#define BUTTON_RC_REW       (1 << 16)
+#define BUTTON_RC_PLAY      (1 << 17)
+#define BUTTON_RC_DSP       (1 << 18)
+
+#define BUTTON_REMOTE       (0x0007e000)
 
 #define POWEROFF_BUTTON     BUTTON_POWER
 #define POWEROFF_COUNT      10
