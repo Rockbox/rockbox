@@ -1,0 +1,38 @@
+%x|a|bg-176x220.bmp|0|0|
+%xl|A|playmode.bmp|82|0|5|
+%xl|B|repeat.bmp|205|0|4|
+%xl|C|Shf.bmp|192|0|
+%xl|D|Pow.bmp|5|157|
+%xl|E|battery.bmp|0|209|5|
+%xl|F|DancePuff.bmp|140|90|4|
+%xl|G|DancePuff.bmp|9|90|4|
+%xl|H|HoldM.bmp|45|0|
+%xl|I|HoldR.bmp|56|0|
+%xl|J|rating.bmp|42|90|11|
+%xl|K|codec.bmp|78|90|22|
+%wd
+%al   %pv
+
+%ac%s%?in<%in. |>%?it<%it|%fn>
+%ac%s%?ia<%ia|%d2>
+%ac%s%?id<%id|%d1>
+%ac%s%t2%?ig<%ig|> %?iy<(%iy)|>
+
+
+%t0.2%xdGc%xdFa%ac%pc/%pt;%t0.2%xdGd%xdFb%ac%pc/%pt;%t0.2%xdGc%xdFa%ac%pc/%pt;%t0.2%xdGd%xdFb%ac%pc/%pt;%t0.2%xdGa%xdFc%ac%pc/%pt;%t0.2%xdGb%xdFd%ac%pc/%pt;%t0.2%xdGa%xdFc%ac%pc/%pt;%t0.2%xdGb%xdFd%ac%pc/%pt
+%pb
+
+%ac%sNext Song:
+%ac%s%?In<%In. |>%?It<%It|%Fn>
+%ac%s%?Ia<%Ia|%D2>
+%ac%s%?Id<%Id|%D1>
+
+%?bt<     %bt>%ar%?pp<[%pp/%pe]>
+
+
+
+
+%?mh<%xdH|>%?mr<%xdI|>%?mp<%xdAa|%xdAb|%xdAc|%xdAd|%xdAe>%?mm<|%xdBa|%xdBb|%xdBc|%xdBd>%?ps<%xdC|>
+%?bp<%xdD|%?bl<%xdEa|%xdEb|%xdEc|%xdEd|%xdEe>>
+%?rr<%xdJa|%xdJb|%xdJc|%xdJd|%xdJe|%xdJf|%xdJg|%xdJh|%xdJi|%xdJj|%xdJk>#escape line ending to not break drawing but break long line
+%?fc<%xdKa|%xdKb|%xdKc|%xdKd|%xdKe|%xdKf|%xdKg|%xdKh|%xdKi|%xdKj|%xdKk|%xdKl|%xdKm|%xdKn|%xdKo|%xdKp|%xdKq|%xdKr|%xdKs|%xdKt|%xdKu|%xdKv>
