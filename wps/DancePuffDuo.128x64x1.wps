@@ -1,4 +1,4 @@
-%x|a|bg.bmp|0|0|
+%x|a|bg-r.bmp|0|0|
 %xl|A|playmode.bmp|59|0|5|
 %xl|B|repeat.bmp|114|0|4|
 %xl|C|Shf.bmp|101|0|
