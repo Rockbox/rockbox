@@ -2,8 +2,10 @@
 # this file is used by automated scripts or humans that wants to know the full
 # name of individual committers in the svn commit log
 adam Adam Boot
+adiamas Robert Hak
 agashlin Adam Gashlin
 aliask Will Robertson
+alkorr Alan Korr
 amiconn Jens Arnold
 andy Andy
 bagder Daniel Stenberg
@@ -11,29 +13,40 @@ barrywardell Barry Wardell
 benbasha Ben Basha
 bertrik Bertrik Sikken
 bger Hristo Kovachev
+bjst Björn Stenberg
 bluebrother Dominik Riebeling
+bobthc Arnaud de Bonald
 breaker Uwe Freese
 bryant Dave Bryant
 buschel Andree Buschmann
+calpefrosch Stefan Meyer
 christi Christi Scarborough
 christian Christian Gmeiner
 dan Dan Everton
 dan_a Daniel Ankers
+dast Daniel Stenberg
 dave Dave Chapman
 dionoea Antoine Cellerier
 domonoky Dominik Wenger
+edx_fa Felix Arends
 eigma Catalin Patulea
+elinenbe Eric Linenberg
+flanz Christian Flaz
 funman Rafaël Carré
+g003y Jerome Kuptz
 gevaerts Frank Gevaerts
 gotthardt Steve Gotthardt
+groovingandi Andreas Stemmer
 gwhite Greg White
 hardeeps Hardeep Sidhu
 hbacke Henrik Backe
 hcl Michiel Van Der Kolk
+hessuh Heikki Hannikainen
 hohensoh Jörg Hohensohn
 james83 James Espinoza
 jdgordon Jonathan Gordon
 jethead71 Mike Sevakis
+jheiner Justin Heiner
 jyp Jean-Philippe Bernardy
 kevin Kevin Ferrare
 kjer Kjell Ericson
@@ -44,17 +57,22 @@ learman Magnus Holmgren
 len0x Anton Oleynikov
 lenzone10 Alessio Lenzi
 linus Linus Nielsen Feltzing
+linusnielsen Linus Nielsen Feltzing
+linuxstb Dave Chapman
 llorean Paul Louden
 lostlogic Brandon Low
 lowlight Mark Arigo
+malle Markus Braun
 marcguay Marc Guay
 markun Marcoen Hirschberg
 matsl Mats Lidell
 mcuelenaere Maurus Cuelenaere
 medifebbo Michael DiFebbo
 midgey34 Tom Ross
+midk Zakk Roberts
 midkay Zakk Roberts
 miipekk Miika Pekkarinen
+mister_wavey Stuart Martin
 mmmm Martin Scarratt
 moos Mustapha Senhaji
 nicolasp Nicolas Pennequin
@@ -74,10 +92,12 @@ rmenes Robert Menes
 rob Rob Purchase
 robert Robert Keevil
 roolku Robert Kukla
+root Björn Stenberg
 saratoga Michael Giacomelli
 scorche Austin Appel
 sdoyon Stéphane Doyon
 stevenm Stepan Moskovchenko
+thebreaker Uwe Freese
 theli Anton Romanov
 tomal Tomasz Malesinski
 tomas Tomas Salfischberger
