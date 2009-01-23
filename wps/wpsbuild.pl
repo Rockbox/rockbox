@@ -191,7 +191,7 @@ sub copywps
     if($wpslist =~ /(.*)WPSLIST/) {
         $dir = $1;
 #        system("cp $dir/$wps .rockbox/wps/");
-        # print "$req_t_wps $req_g_wps\n";
+        #print "$req_t_wps $req_g_wps\n";
 
         if (-e "$dir/$req_t_wps" ) {
           system("cp $dir/$req_t_wps $rbdir/wps/$wps");
@@ -302,7 +302,7 @@ MOO
 ($main_height, $main_width, $main_depth) = getlcdsizes();
 ($remote_height, $remote_width, $remote_depth) = getlcdsizes(1);
 
-#print "LCD: ${main_height}x${main_width}x${main_depth}\n";
+#print "LCD: ${main_width}x${main_height}x${main_depth}\n";
 $has_remote = 1 if ($remote_height && $remote_width && $remote_depth);
 
 my $isrwps;
@@ -366,9 +366,9 @@ while(<WPS>) {
             }
             $wpslist =~ /(.*)WPSLIST/;
             my $wpsdir = $1;
-        # If this WPS installable on this platform, one of the following
-        # two files will be present
-        foreach my $d (@depthlist) {
+            # If this WPS installable on this platform, one of the following
+            # two files will be present
+            foreach my $d (@depthlist) {
                 next if ($d > $rdepth);
 
                 $req_g = $rwidth . "x" . $rheight . "x" . $d;
@@ -385,8 +385,8 @@ while(<WPS>) {
             }
             $req_t_wps = $wps_prefix . ".txt" . ".wps";
 
-            #print "LCD: $wps wants $height x $width\n";
-            #print "LCD: is $rheight x $rwidth\n";
+            #print "LCD: $wps wants $width x $height\n";
+            #print "LCD: is $rwidth x $rheight\n";
 
             #print "gwps: $wpsdir/$req_g_wps" . "\n";
             if (-e "$wpsdir/$req_g_wps" || -e "$wpsdir/$req_t_wps" ) {
@@ -396,6 +396,20 @@ while(<WPS>) {
                 #
                 #print "Size requirement is fine!\n";
                 mkdirs() if (-e "$wpsdir/$req_g_wps");
+                # Do the copying before building the .cfg - buildcfg()
+                # mangles some filenames
+                if ($backdrop) {
+                    copybackdrop();
+                }
+                if ($iconset) {
+                    copythemeicon();
+                }
+                if ($viewericon) {
+                    copythemeviewericon();
+                }
+                if ($font) {
+                    copythemefont();
+                }
                 if(!$isrwps) {
                     # We only make .cfg files for <wps> sections:
                     buildcfg();
@@ -413,7 +427,7 @@ while(<WPS>) {
             # name of the rwps. Use $isrwps to figure out what type it is.
             $wps = $wps_prefix = $1;
             $wps_prefix =~ s/\.(r|)wps//;
-            # print $wps_prefix . "\n";
+            #print $wps_prefix . "\n";
         }
         elsif($l =~ /^RWPS: *(.*)/i) {
             $rwps = $1;
@@ -438,17 +452,15 @@ while(<WPS>) {
         }
         elsif($l =~ /^Font: *(.*)/i) {
             $font = $1;
-            copythemefont();
+        }
+        elsif($l =~ /^Font\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
+            $font = $1;
         }
         elsif($l =~ /^Foreground Color: *(.*)/i) {
             $fgcolor = $1;
         }
         elsif($l =~ /^Background Color: *(.*)/i) {
             $bgcolor = $1;
-        }
-        elsif($l =~ /^Font\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $font = $1;
-            copythemefont();
         }
         elsif($l =~ /^Statusbar: *(.*)/i) {
             $statusbar = $1;
@@ -458,11 +470,9 @@ while(<WPS>) {
         }
         elsif($l =~ /^Backdrop: *(.*)/i) {
             $backdrop = $1;
-            copybackdrop();
         }
         elsif($l =~ /^Backdrop\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $backdrop = $1;
-            copybackdrop();
         }
         elsif($l =~ /^line selector start color: *(.*)/i) {
             $lineselectstart = $1;
@@ -478,19 +488,15 @@ while(<WPS>) {
         }
         elsif($l =~ /^iconset: *(.*)/i) {
             $iconset = $1;
-            copythemeicon();
         }
         elsif($l =~ /^iconset\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $iconset = $1;
-            copythemeicon();
         }
         elsif($l =~ /^viewers iconset: *(.*)/i) {
             $viewericon = $1;
-            copythemeviewericon();
         }
         elsif($l =~ /^viewers iconset\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $viewericon = $1;
-            copythemeviewericon();
         }
         elsif($l =~ /^line selector text color: *(.*)/i) {
             $lineselecttextcolor = $1;
