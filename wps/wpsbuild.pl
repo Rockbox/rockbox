@@ -438,6 +438,7 @@ while(<WPS>) {
         }
         elsif($l =~ /^Font: *(.*)/i) {
             $font = $1;
+            copythemefont();
         }
         elsif($l =~ /^Foreground Color: *(.*)/i) {
             $fgcolor = $1;
