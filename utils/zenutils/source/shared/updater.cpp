@@ -53,10 +53,11 @@ dword zen::find_firmware_offset(byte* buffer, size_t len)
     for (dword i = 0; i < static_cast<dword>(len); i += 4)
     {
         dword size = *(dword*)&buffer[i];
-        if (buffer[i + sizeof(dword)] != 0
-            && buffer[i + sizeof(dword) + 1] != 0
-            && buffer[i + sizeof(dword) + 2] != 0
-            && buffer[i + sizeof(dword) + 3] != 0)
+        if (size != 0
+            && buffer[i + 4]     != 0
+            && buffer[i + 4 + 1] != 0
+            && buffer[i + 4 + 2] != 0
+            && buffer[i + 4 + 3] != 0)
         {
             return i;
         }
