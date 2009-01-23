@@ -40,7 +40,7 @@ static int int_btn = BUTTON_NONE;
 void button_click(void)
 {
     GPO32_ENABLE |= 0x2000;
-    GPIOD_OUTPUT_VAL |= 0x8;
+    GPO32_VAL |= 0x2000;
     udelay(1000);
     GPO32_VAL &= ~0x2000;
 }

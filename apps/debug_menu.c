@@ -1223,6 +1223,11 @@ extern unsigned char serbuf[];
         snprintf(buf, sizeof(buf), "REM:  %03x PAD: %03x",
                                  adc_read(ADC_REMOTE), adc_read(ADC_SCROLLPAD));
         lcd_puts(0, line++, buf);
+#elif defined(PHILIPS_HDD1630)
+        line++;
+        snprintf(buf, sizeof(buf), "BATT: %03x UNK1: %03x",
+                                adc_read(ADC_BATTERY), adc_read(ADC_UNKNOWN_1));
+        lcd_puts(0, line++, buf);
 #elif defined(SANSA_E200) || defined(PHILIPS_SA9200)
         snprintf(buf, sizeof(buf), "ADC_BVDD:     %4d", adc_read(ADC_BVDD));
         lcd_puts(0, line++, buf);
