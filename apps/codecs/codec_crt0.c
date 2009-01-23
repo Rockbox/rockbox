@@ -22,7 +22,7 @@
 #include "config.h"
 #include "codeclib.h"
 
-struct codec_api *ci;
+struct codec_api *ci __attribute__ ((section (".data")));
 
 extern unsigned char iramcopy[];
 extern unsigned char iramstart[];
@@ -36,16 +36,15 @@ extern enum codec_status codec_main(void);
 
 CACHE_FUNCTION_WRAPPERS(ci);
 
-enum codec_status codec_start(struct codec_api *api)
+enum codec_status codec_start(void)
 {
 #ifndef SIMULATOR
 #ifdef USE_IRAM
-    api->memcpy(iramstart, iramcopy, iramend - iramstart);
-    api->memset(iedata, 0, iend - iedata);
+    ci->memcpy(iramstart, iramcopy, iramend - iramstart);
+    ci->memset(iedata, 0, iend - iedata);
 #endif
-    api->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
+    ci->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
 #endif
-    ci = api;
 #if NUM_CORES > 1
     /* writeback cleared iedata and bss areas */
     flush_icache();

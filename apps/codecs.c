@@ -229,8 +229,9 @@ static int codec_load_ram(int size, struct codec_api *api)
         return CODEC_ERROR;
     }
 
+    *(hdr->api) = api;
     invalidate_icache();
-    status = hdr->entry_point(api);
+    status = hdr->entry_point();
 
     sim_codec_close(pd);
 

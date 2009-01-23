@@ -75,12 +75,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 29
+#define CODEC_API_VERSION 30
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 29
+#define CODEC_MIN_API_VERSION 30
 
 /* codec return codes */
 enum codec_status {
@@ -243,7 +243,8 @@ struct codec_header {
     unsigned short api_version;
     unsigned char *load_addr;
     unsigned char *end_addr;
-    enum codec_status(*entry_point)(struct codec_api*);
+    enum codec_status(*entry_point)(void);
+    struct codec_api **api;
 };
 
 extern unsigned char codecbuf[];
@@ -259,13 +260,13 @@ extern unsigned char plugin_end_addr[];
         const struct codec_header __header \
         __attribute__ ((section (".header")))= { \
         CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        plugin_start_addr, plugin_end_addr, codec_start };
+        plugin_start_addr, plugin_end_addr, codec_start, &ci };
 /* encoders */
 #define CODEC_ENC_HEADER \
         const struct codec_header __header \
         __attribute__ ((section (".header")))= { \
         CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        plugin_start_addr, plugin_end_addr, codec_start };
+        plugin_start_addr, plugin_end_addr, codec_start, &ci };
 
 #else /* def SIMULATOR */
 /* decoders */
@@ -273,12 +274,12 @@ extern unsigned char plugin_end_addr[];
         const struct codec_header __header \
         __attribute__((visibility("default"))) = { \
         CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        NULL, NULL, codec_start };
+        NULL, NULL, codec_start, &ci };
 /* encoders */
 #define CODEC_ENC_HEADER \
         const struct codec_header __header = { \
         CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        NULL, NULL, codec_start };
+        NULL, NULL, codec_start, &ci };
 #endif /* SIMULATOR */
 #endif /* CODEC */
 
@@ -291,7 +292,7 @@ int codec_load_buf(unsigned int hid, struct codec_api *api);
 int codec_load_file(const char* codec, struct codec_api *api);
 
 /* defined by the codec */
-enum codec_status codec_start(struct codec_api* rockbox);
+enum codec_status codec_start(void);
 enum codec_status codec_main(void);
 
 #ifndef CACHE_FUNCTION_WRAPPERS
