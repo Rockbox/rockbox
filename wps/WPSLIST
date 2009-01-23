@@ -46,6 +46,7 @@ Name: rockbox_default.wps
 RWPS: rockbox_default.rwps
 Author: Rockbox team
 Font: 08-Schumacher-Clean.fnt
+Font.11x2x1:
 Statusbar: on
 Foreground Color: 000000
 Background Color: B6C6E5
