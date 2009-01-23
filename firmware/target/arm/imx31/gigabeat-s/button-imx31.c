@@ -150,8 +150,14 @@ int button_read_device(void)
      * first key down event. */
     KPP_KPSR |= KPP_KPSR_KDIE;
 
-    /* If hold, ignore any pressed button */
+#ifdef HAVE_HEADPHONE_DETECTION
+    /* If hold, ignore any pressed button. Remote has its own hold
+     * switch, so return state regardless. */
+    return hold_button ? (int_btn & BUTTON_REMOTE) : int_btn;
+#else
+    /* If hold, ignore any pressed button.  */
     return hold_button ? BUTTON_NONE : int_btn;
+#endif
 }
 
 /* This is called from the mc13783 interrupt thread */
