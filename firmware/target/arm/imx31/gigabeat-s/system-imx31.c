@@ -32,6 +32,8 @@
 #include "clkctl-imx31.h"
 #include "mc13783.h"
 
+/** Watchdog timer routines **/
+
 /* Initialize the watchdog timer */
 void watchdog_init(unsigned int half_seconds)
 {
@@ -55,6 +57,33 @@ void watchdog_service(void)
 {
     WDOG_WSR = 0x5555;
     WDOG_WSR = 0xaaaa;
+}
+
+/** GPT timer routines - basis for udelay **/
+
+/* Start the general-purpose timer (1MHz) */
+void gpt_start(void)
+{
+    imx31_clkctl_module_clock_gating(CG_GPT, CGM_ON_RUN_WAIT);
+    unsigned int ipg_mhz = imx31_clkctl_get_ipg_clk() / 1000000;
+
+    GPTCR &= ~GPTCR_EN; /* Disable counter */
+    GPTCR |= GPTCR_SWR; /* Reset module */
+    while (GPTCR & GPTCR_SWR);
+    /* No output
+     * No capture
+     * Enable in run mode only (doesn't tick while in WFI)
+     * Freerun mode (count to 0xFFFFFFFF and roll-over to 0x00000000)
+     */
+    GPTCR = GPTCR_FRR | GPTCR_CLKSRC_IPG_CLK;
+    GPTPR = ipg_mhz - 1;
+    GPTCR |= GPTCR_EN;
+}
+
+/* Stop the general-purpose timer */
+void gpt_stop(void)
+{
+    GPTCR &= ~GPTCR_EN;
 }
 
 int system_memory_guard(int newmode)
@@ -84,7 +113,6 @@ void system_init(void)
         /* CGR0 */
         CG_SD_MMC1,
         CG_SD_MMC2,
-        CG_GPT,
         CG_IIM,
         CG_SDMA,
         CG_CSPI3,
@@ -140,6 +168,7 @@ void system_init(void)
         imx31_clkctl_module_clock_gating(disable_clocks[i], CGM_OFF);
 
     avic_init();
+    gpt_start();
     gpio_init();
 }
 

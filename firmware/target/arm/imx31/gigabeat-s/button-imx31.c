@@ -68,8 +68,6 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
 
     for (col = 0; col < 3; col++) /* Col */
     {
-        int i;
-
         /* 2. Write 1s to KPDR[10:8] setting column data to 1s */
         KPP_KPDR |= (0x7 << 8);
 
@@ -78,8 +76,7 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
         KPP_KPCR &= ~(0x7 << 8);
 
         /* Give the columns time to discharge */
-        for (i = 0; i < 128; i++) /* TODO: find minimum safe delay */
-            asm volatile ("");
+        udelay(2);
 
         /* 4. Configure columns as open-drain */
         KPP_KPCR |= (0x7 << 8);
@@ -94,8 +91,7 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
 
         /* Delay added to avoid propagating the 0 from column to row
          * when scanning. */
-        for (i = 0; i < 128; i++) /* TODO: find minimum safe delay */
-            asm volatile ("");
+        udelay(2);
 
         /* Read row input */
         button |= (~KPP_KPDR & kms[col].mask) << kms[col].shift;

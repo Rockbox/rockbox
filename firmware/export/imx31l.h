@@ -514,6 +514,92 @@
 
 #define EPITSR_OCIF                     (1 << 0)
 
+/* GPT */
+#define GPTCR                   (*(REG32_PTR_T)(GPT1_BASE_ADDR+0x00))
+#define GPTPR                   (*(REG32_PTR_T)(GPT1_BASE_ADDR+0x04))
+#define GPTSR                   (*(REG32_PTR_T)(GPT1_BASE_ADDR+0x08))
+#define GPTIR                   (*(REG32_PTR_T)(GPT1_BASE_ADDR+0x0C))
+#define GPTOCR1                 (*(REG32_PTR_T)(GPT1_BASE_ADDR+0x10))
+#define GPTOCR2                 (*(REG32_PTR_T)(GPT1_BASE_ADDR+0x14))
+#define GPTOCR3                 (*(REG32_PTR_T)(GPT1_BASE_ADDR+0x18))
+#define GPTICR1                 (*(REG32_PTR_T)(GPT1_BASE_ADDR+0x1C))
+#define GPTICR2                 (*(REG32_PTR_T)(GPT1_BASE_ADDR+0x20))
+#define GPTCNT                  (*(REG32_PTR_T)(GPT1_BASE_ADDR+0x24))
+
+/* GPTCR */
+#define GPTCR_FO3               (0x1 << 31)
+#define GPTCR_FO2               (0x1 << 30)
+#define GPTCR_FO1               (0x1 << 29)
+
+#define GPTCR_OM3               (0x7 << 26)
+#define GPTCR_OM3_DISCONNECTED  (0x0 << 26)
+#define GPTCR_OM3_TOGGLE        (0x1 << 26)
+#define GPTCR_OM3_CLEAR         (0x2 << 26)
+#define GPTCR_OM3_SET           (0x3 << 26)
+#define GPTCR_OM3_SINGLE_COUNT  (0x4 << 26)
+    /* 0x5-0x7 same as 0x4 */
+
+#define GPTCR_OM2               (0x7 << 23)
+#define GPTCR_OM2_DISCONNECTED  (0x0 << 23)
+#define GPTCR_OM2_TOGGLE        (0x1 << 23)
+#define GPTCR_OM2_CLEAR         (0x2 << 23)
+#define GPTCR_OM2_SET           (0x3 << 23)
+#define GPTCR_OM2_SINGLE_COUNT  (0x4 << 23)
+
+    /* 0x5-0x7 same as 0x4 */
+#define GPTCR_OM1               (0x7 << 20)
+#define GPTCR_OM1_DISCONNECTED  (0x0 << 20)
+#define GPTCR_OM1_TOGGLE        (0x1 << 20)
+#define GPTCR_OM1_CLEAR         (0x2 << 20)
+#define GPTCR_OM1_SET           (0x3 << 20)
+#define GPTCR_OM1_SINGLE_COUNT  (0x4 << 20)
+
+    /* 0x5-0x7 same as 0x4 */
+#define GPTCR_IM2               (0x3 << 18)
+#define GPTCR_IM2_DISABLED      (0x0 << 18)
+#define GPTCR_IM2_RISING        (0x1 << 18)
+#define GPTCR_IM2_FALLING       (0x2 << 18)
+#define GPTCR_IM2_BOTH          (0x3 << 18)
+
+#define GPTCR_IM1               (0x3 << 16)
+#define GPTCR_IM1_DISABLED      (0x0 << 16)
+#define GPTCR_IM1_RISING        (0x1 << 16)
+#define GPTCR_IM1_FALLING       (0x2 << 16)
+#define GPTCR_IM1_BOTH          (0x3 << 16)
+
+#define GPTCR_SWR               (0x1 << 15)
+#define GPTCR_FRR               (0x1 << 9)
+
+#define GPTCR_CLKSRC            (0x7 << 6)
+#define GPTCR_CLKSRC_NONE               (0x0 << 6)
+#define GPTCR_CLKSRC_IPG_CLK            (0x1 << 6)
+#define GPTCR_CLKSRC_IPG_CLK_HIGHFREQ   (0x2 << 6)
+#define GPTCR_CLKSRC_IPG_CLK_32K        (0x4 << 6)
+/* Other values not defined */
+
+#define GPTCR_STOPEN            (0x1 << 5)
+#define GPTCR_DOZEN             (0x1 << 4)
+#define GPTCR_WAITEN            (0x1 << 3)
+#define GPTCR_DBGEN             (0x1 << 2)
+#define GPTCR_ENMODE            (0x1 << 1)
+#define GPTCR_EN                (0x1 << 0)
+
+/* GPTSR */
+#define GPTSR_ROV               (0x1 << 5)
+#define GPTSR_IF2               (0x1 << 4)
+#define GPTSR_IF1               (0x1 << 3)
+#define GPTSR_OF3               (0x1 << 2)
+#define GPTSR_OF2               (0x1 << 1)
+#define GPTSR_OF1               (0x1 << 0)
+
+/* GPTIR */
+#define GPTIR_ROV               (0x1 << 5)
+#define GPTIR_IF2IE             (0x1 << 4)
+#define GPTIR_IF1IE             (0x1 << 3)
+#define GPTIR_OF3IE             (0x1 << 2)
+#define GPTIR_OF2IE             (0x1 << 1)
+#define GPTIR_OF1IE             (0x1 << 0)
+
 /* GPIO */
 #define GPIO1_DR                (*(REG32_PTR_T)(GPIO1_BASE_ADDR+0x00))
 #define GPIO1_GDIR              (*(REG32_PTR_T)(GPIO1_BASE_ADDR+0x04))

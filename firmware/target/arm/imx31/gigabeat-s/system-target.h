@@ -31,24 +31,17 @@
 #define CPUFREQ_MAX CPU_FREQ
 #endif
 
-/* For USB driver - no accuracy assurance */
 static inline void udelay(unsigned int usecs)
 {
-    unsigned int x;
-    for (x = 0; x < 300*usecs; x++)
-        asm volatile ("");
+    unsigned stop = GPTCNT + usecs;
+    while (TIME_BEFORE(GPTCNT, stop));
 }
-
-#if 0
-static inline void udelay(unsigned int usecs)
-{
-    volatile signed int stop = EPITCNT1 - usecs;
-    while ((signed int)EPITCNT1 > stop);
-}
-#endif
 
 void watchdog_init(unsigned int half_seconds);
 void watchdog_service(void);
+
+void gpt_start(void);
+void gpt_stop(void);
 
 /* Prepare for transition to firmware */
 void system_prepare_fw_start(void);
