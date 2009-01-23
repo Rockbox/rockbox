@@ -186,6 +186,7 @@ Name: iCatcher.wps
 RWPS: iCatcher.rwps
 Author: Ioannis Koutoulakis
 Font.112x64x1: 08-Rockfont.fnt
+Font.128x64x1: 08-Rockfont.fnt
 Font.128x128x16: 09-Nedore.fnt
 Font.132x80x16: 09-Nedore.fnt
 Font.138x110x2: 08-Nedore.fnt
@@ -239,6 +240,7 @@ Name: Rockboxed.wps
 RWPS: rockbox_default.rwps
 Author: Roan Horning
 Font.112x64x1: 08-Schumacher-Clean.fnt
+Font.128x64x1: 08-Schumacher-Clean.fnt
 Font.128x128x16: 12-Nimbus.fnt
 Font.132x80x16: 10-Nimbus.fnt
 Font.138x110x2: 12-Nimbus.fnt
@@ -281,6 +283,7 @@ Font.160x128x1: 12-Adobe-Helvetica.fnt
 Font.138x110x2: 12-Adobe-Helvetica.fnt
 Font.128x128x16: 12-Adobe-Helvetica.fnt
 Font.132x80x16: 11-Sazanami-Mincho.fnt
+Font.128x64x1: 08-Rockfont.fnt
 Font.112x64x1: 08-Rockfont.fnt
 
 #misc settings that should be ignored on grayscale targets
