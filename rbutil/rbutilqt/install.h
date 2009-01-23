@@ -38,8 +38,8 @@ class Install : public QDialog
 
     public slots:
         void accept(void);
-        
-    private:    
+
+    private:
         Ui::InstallFrm ui;
         ProgressLoggerGui* logger;
         RbSettings* settings;
@@ -50,8 +50,10 @@ class Install : public QDialog
         ZipInstaller* installer;
         QMap<QString, QString> version;
         QString m_backupName;
+        void resizeEvent(QResizeEvent*);
 
         void changeBackupPath(QString);
+        void updateBackupLocation(void);
 
     private slots:
         void setCached(bool);

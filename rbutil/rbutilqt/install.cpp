@@ -31,8 +31,8 @@ Install::Install(RbSettings *sett,QWidget *parent) : QDialog(parent)
     connect(ui.radioStable, SIGNAL(toggled(bool)), this, SLOT(setDetailsStable(bool)));
     connect(ui.radioCurrent, SIGNAL(toggled(bool)), this, SLOT(setDetailsCurrent(bool)));
     connect(ui.radioArchived, SIGNAL(toggled(bool)), this, SLOT(setDetailsArchived(bool)));
-    connect(ui.changeBackup,SIGNAL(pressed()),this,SLOT(changeBackupPath()));
-    connect(ui.backup,SIGNAL(stateChanged(int)),this,SLOT(backupCheckboxChanged(int)));
+    connect(ui.changeBackup, SIGNAL(pressed()), this, SLOT(changeBackupPath()));
+    connect(ui.backup, SIGNAL(stateChanged(int)), this, SLOT(backupCheckboxChanged(int)));
 
     //! check if rockbox is already installed
     QString version = Detect::installedVersion(settings->mountpoint());
@@ -43,7 +43,8 @@ Install::Install(RbSettings *sett,QWidget *parent) : QDialog(parent)
         m_backupName = settings->mountpoint();
         if(!m_backupName.endsWith("/")) m_backupName += "/";
         m_backupName += ".backup/rockbox-backup-"+version+".zip";
-        ui.backupLocation->setText(QDir::toNativeSeparators(fontMetrics().elidedText(m_backupName,Qt::ElideMiddle,200)));
+        // for some reason the label doesn't return its final size yet.
+        // Delay filling ui.backupLocation until the checkbox is changed.
     }
     else
     {
@@ -52,17 +53,35 @@ Install::Install(RbSettings *sett,QWidget *parent) : QDialog(parent)
     backupCheckboxChanged(Qt::Unchecked);
 }
 
+
+void Install::resizeEvent(QResizeEvent *e)
+{
+    (void)e;
+
+    // recalculate width of elided text.
+    updateBackupLocation();
+}
+
+
+void Install::updateBackupLocation(void)
+{
+    ui.backupLocation->setText(QDir::toNativeSeparators(
+        fontMetrics().elidedText(tr("Backup to %1").arg(m_backupName),
+        Qt::ElideMiddle, ui.backupLocation->size().width())));
+}
+
+
 void Install::backupCheckboxChanged(int state)
 {
     if(state == Qt::Checked)
     {
-        ui.backupLabel->show();
         ui.backupLocation->show();
         ui.changeBackup->show();
+        // update backup location display.
+        updateBackupLocation();
     }
     else
     {
-        ui.backupLabel->hide();
         ui.backupLocation->hide();
         ui.changeBackup->hide();
     }
@@ -182,11 +201,12 @@ void Install::accept()
 
 void Install::changeBackupPath()
 {
-    QString backupString = QFileDialog::getSaveFileName(this,"Select Backup Filename",m_backupName, "*.zip");
+    QString backupString = QFileDialog::getSaveFileName(this,
+        tr("Select Backup Filename"), m_backupName, "*.zip");
     // only update if a filename was entered, ignore if cancelled
     if(!backupString.isEmpty()) {
-        ui.backupLocation->setText(QDir::toNativeSeparators(fontMetrics().elidedText(backupString,Qt::ElideMiddle,200)));
         m_backupName = backupString;
+        updateBackupLocation();
     }
 }
 
