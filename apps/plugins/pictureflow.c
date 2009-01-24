@@ -1989,8 +1989,9 @@ int main(void)
     old_drawmode = rb->lcd_get_drawmode();
 #ifdef USEGSLIB
     grey_show(true);
+    grey_set_drawmode(DRMODE_FG);
 #endif
-    MYLCD(set_drawmode)(DRMODE_FG);
+    rb->lcd_set_drawmode(DRMODE_FG);
     while (true) {
         current_update = *rb->current_tick;
         frames++;
