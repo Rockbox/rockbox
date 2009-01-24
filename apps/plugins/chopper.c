@@ -123,6 +123,12 @@ Still To do:
 #define ACTION2 BUTTON_MENU
 #define ACTIONTEXT "UP"
 
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+#define QUIT BUTTON_POWER
+#define ACTION BUTTON_MENU
+#define ACTION2 BUTTON_SELECT
+#define ACTIONTEXT "MENU"
+
 #else
 #error No keymap defined!
 #endif

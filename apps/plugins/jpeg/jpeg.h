@@ -274,6 +274,17 @@
 #define JPEG_NEXT       BUTTON_SELECT
 #define JPEG_PREVIOUS   BUTTON_BACK
 
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+#define JPEG_ZOOM_IN    BUTTON_VOL_UP
+#define JPEG_ZOOM_OUT   BUTTON_VOL_DOWN
+#define JPEG_UP         BUTTON_UP
+#define JPEG_DOWN       BUTTON_DOWN
+#define JPEG_LEFT       BUTTON_LEFT
+#define JPEG_RIGHT      BUTTON_RIGHT
+#define JPEG_MENU       BUTTON_MENU
+#define JPEG_NEXT       BUTTON_VIEW
+#define JPEG_PREVIOUS   BUTTON_PLAYLIST
+
 #else
 #error No keymap defined!
 #endif

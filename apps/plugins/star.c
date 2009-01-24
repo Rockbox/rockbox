@@ -249,6 +249,19 @@ PLUGIN_HEADER
 #define STAR_LEVEL_REPEAT   (BUTTON_CUSTOM | BUTTON_RIGHT)
 #define STAR_MENU_RUN       BUTTON_MENU
 
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+
+#define STAR_QUIT           BUTTON_POWER
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
+#define STAR_UP             BUTTON_UP
+#define STAR_DOWN           BUTTON_DOWN
+#define STAR_TOGGLE_CONTROL BUTTON_SELECT
+#define STAR_LEVEL_UP       BUTTON_VOL_UP
+#define STAR_LEVEL_DOWN     BUTTON_VOL_DOWN
+#define STAR_LEVEL_REPEAT   BUTTON_VIEW
+#define STAR_MENU_RUN       BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

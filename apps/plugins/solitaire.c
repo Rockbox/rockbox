@@ -380,6 +380,24 @@ PLUGIN_HEADER
 #   define HK_CUR2STACK    "PLAY.."
 #   define HK_REM2STACK    "PLAY+RIGHT"
 
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+#   define SOL_QUIT         BUTTON_POWER
+#   define SOL_UP           BUTTON_UP
+#   define SOL_DOWN         BUTTON_DOWN
+#   define SOL_LEFT         BUTTON_LEFT
+#   define SOL_RIGHT        BUTTON_RIGHT
+#   define SOL_MOVE_PRE     BUTTON_SELECT
+#   define SOL_MOVE         (BUTTON_SELECT | BUTTON_REL)
+#   define SOL_DRAW         BUTTON_MENU
+#   define SOL_REM2CUR      (BUTTON_LEFT | BUTTON_VIEW)
+#   define SOL_CUR2STACK    (BUTTON_SELECT | BUTTON_REPEAT)
+#   define SOL_REM2STACK    (BUTTON_RIGHT | BUTTON_VIEW)
+#   define HK_MOVE         "SELECT"
+#   define HK_DRAW         "MENU"
+#   define HK_REM2CUR      "VIEW+LEFT"
+#   define HK_CUR2STACK    "SELECT.."
+#   define HK_REM2STACK    "VIEW+RIGHT"
+
 #else
 #error No keymap defined!
 #endif

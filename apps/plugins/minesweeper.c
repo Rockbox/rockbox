@@ -212,6 +212,16 @@ enum minesweeper_status {
 #   define MINESWP_DISCOVER BUTTON_PLAY
 #   define MINESWP_INFO     BUTTON_MENU
 
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+#   define MINESWP_LEFT     BUTTON_LEFT
+#   define MINESWP_RIGHT    BUTTON_RIGHT
+#   define MINESWP_UP       BUTTON_UP
+#   define MINESWP_DOWN     BUTTON_DOWN
+#   define MINESWP_QUIT     BUTTON_POWER
+#   define MINESWP_TOGGLE   BUTTON_VIEW
+#   define MINESWP_DISCOVER BUTTON_SELECT
+#   define MINESWP_INFO     BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

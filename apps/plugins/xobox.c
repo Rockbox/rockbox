@@ -182,6 +182,15 @@ PLUGIN_HEADER
 #define DOWN BUTTON_DOWN
 #define PAUSE BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+
+#define QUIT BUTTON_POWER
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+#define PAUSE BUTTON_VIEW
+
 #else
 #error No keymap defined!
 #endif

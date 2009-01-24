@@ -169,6 +169,13 @@ PLUGIN_HEADER
 #define BATTERY_OFF BUTTON_BACK
 #define BATTERY_OFF_TXT "BACK"
 
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+
+#define BATTERY_ON  BUTTON_MENU
+#define BATTERY_OFF BUTTON_POWER
+#define BATTERY_ON_TXT  "MENU - start"
+#define BATTERY_OFF_TXT "POWER"
+
 #else
 #error No keymap defined!
 #endif

@@ -90,6 +90,9 @@ static bool abort;
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
 #define STATS_STOP BUTTON_BACK
 
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+#define STATS_STOP BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

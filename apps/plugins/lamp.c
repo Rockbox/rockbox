@@ -79,6 +79,10 @@ PLUGIN_HEADER
 #   define LAMP_LEFT       BUTTON_LEFT
 #   define LAMP_RIGHT      BUTTON_RIGHT
 
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+#   define LAMP_LEFT       BUTTON_LEFT
+#   define LAMP_RIGHT      BUTTON_RIGHT
+
 #else
 #   error Missing key definitions for this keypad
 #endif

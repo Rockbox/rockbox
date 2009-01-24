@@ -88,6 +88,7 @@ const struct button_mapping generic_directions[] =
     || (CONFIG_KEYPAD == GIGABEAT_S_PAD) \
     || (CONFIG_KEYPAD == MROBE100_PAD) \
     || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) \
+    || (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) \
     || (CONFIG_KEYPAD == SANSA_CLIP_PAD) \
     || (CONFIG_KEYPAD == CREATIVEZVM_PAD) \
     || (CONFIG_KEYPAD == SANSA_M200_PAD)
@@ -191,6 +192,7 @@ const struct button_mapping generic_left_right_fire[] =
     || (CONFIG_KEYPAD == GIGABEAT_S_PAD)    \
     || (CONFIG_KEYPAD == MROBE100_PAD)      \
     || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) \
+    || (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) \
     || (CONFIG_KEYPAD == SANSA_CLIP_PAD) \
     || (CONFIG_KEYPAD == SANSA_M200_PAD)
     { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
@@ -431,6 +433,12 @@ const struct button_mapping generic_actions[] =
     {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
     {PLA_FIRE,          BUTTON_SELECT,                   BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,     BUTTON_NONE},
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+    {PLA_QUIT,          BUTTON_POWER,       BUTTON_NONE},
+    {PLA_START,         BUTTON_VIEW,        BUTTON_NONE},
+    {PLA_MENU,          BUTTON_MENU,        BUTTON_NONE},
+    {PLA_FIRE,          BUTTON_SELECT,      BUTTON_NONE},
+    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif
@@ -456,6 +464,7 @@ const struct button_mapping generic_increase_decrease[] =
     || (CONFIG_KEYPAD == GIGABEAT_S_PAD)    \
     || (CONFIG_KEYPAD == MROBE100_PAD)      \
     || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) \
+    || (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) \
     || (CONFIG_KEYPAD == SANSA_CLIP_PAD) \
     || (CONFIG_KEYPAD == CREATIVEZVM_PAD) \
     || (CONFIG_KEYPAD == SANSA_M200_PAD) 

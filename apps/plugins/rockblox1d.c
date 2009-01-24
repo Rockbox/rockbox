@@ -94,6 +94,10 @@ PLUGIN_HEADER
 #define ONEDROCKBLOX_DOWN              BUTTON_SELECT
 #define ONEDROCKBLOX_QUIT              BUTTON_BACK
 
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+#define ONEDROCKBLOX_DOWN              BUTTON_SELECT
+#define ONEDROCKBLOX_QUIT              BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

@@ -139,6 +139,8 @@ long reverse (long N) {
 #define LP_QUIT BUTTON_POWER
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
 #define LP_QUIT BUTTON_BACK
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+#define LP_QUIT BUTTON_POWER
 #else
 #define LP_QUIT BUTTON_OFF
 #endif
