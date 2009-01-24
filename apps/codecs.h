@@ -75,7 +75,7 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 30
+#define CODEC_API_VERSION 31
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -232,8 +232,10 @@ struct codec_api {
 #endif
 
     /* new stuff at the end, sort into place next time
-       the API gets incompatible */     
-
+       the API gets incompatible */
+#ifdef CPU_ARM
+    void (*__div0)(void);
+#endif
 };
 
 /* codec header */

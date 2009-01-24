@@ -51,3 +51,10 @@ enum codec_status codec_start(void)
 #endif
     return codec_main();
 }
+
+#ifdef CPU_ARM
+void __attribute__((naked)) __div0(void)
+{
+    asm volatile("bx %0" : : "r"(ci->__div0));
+}
+#endif

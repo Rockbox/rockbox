@@ -24,6 +24,7 @@
 #define nop \
   asm volatile ("nop")
 
+void __div0(void);
 
 /* This gets too complicated otherwise with all the ARM variation and would
    have conflicts with another system-target.h elsewhere so include a

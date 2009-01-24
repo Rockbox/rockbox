@@ -1,3 +1,7 @@
+#ifdef CPU_ARM
+/* For now, only ARM uses this for __div0 */
+gcc-support.c
+#endif
 oldmenuapi.c
 configfile.c
 fixedpoint.c

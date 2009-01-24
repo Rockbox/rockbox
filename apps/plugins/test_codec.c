@@ -494,6 +494,9 @@ static void init_ci(void)
     ci.semaphore_release = rb->semaphore_release;
 #endif
 
+#ifdef CPU_ARM
+    ci.__div0 = rb->__div0;
+#endif
 }
 
 static void codec_thread(void)
