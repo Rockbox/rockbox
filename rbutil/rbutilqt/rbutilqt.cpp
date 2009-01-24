@@ -144,6 +144,8 @@ void RbUtilQt::updateTabs(int count)
 
 void RbUtilQt::downloadInfo()
 {
+    // make sure the version map is repopulated correctly later.
+    versmap.clear();
     // try to get the current build information
     daily = new HttpGet(this);
     connect(daily, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
