@@ -121,6 +121,18 @@ int get_cpu_boost_counter(void);
     ptr = (typeof(ptr))tmp_ptr1; \
 }
 
+/* newer? SDL includes endian.h, So we ignore it */
+#ifdef SIMULATOR
+#undef letoh16
+#undef letoh32
+#undef htole16
+#undef htole32
+#undef betoh16
+#undef betoh32
+#undef htobe16
+#undef htobe32
+#endif
+
 /* live endianness conversion */
 #ifdef ROCKBOX_LITTLE_ENDIAN
 #define letoh16(x) (x)
