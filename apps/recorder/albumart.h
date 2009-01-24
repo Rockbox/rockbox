@@ -22,7 +22,7 @@
 #ifndef _ALBUMART_H_
 #define _ALBUMART_H_
 
-#ifdef HAVE_ALBUMART
+#if defined(HAVE_ALBUMART) || defined(PLUGIN)
 
 #include <stdbool.h>
 #include "metadata.h"

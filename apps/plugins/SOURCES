@@ -52,6 +52,10 @@ text_editor.c
 wavview.c
 robotfindskitten.c
 
+#if defined(HAVE_TAGCACHE) && (CONFIG_CODEC == SWCODEC)
+pictureflow.c
+#endif
+
 #ifdef HAVE_LCD_COLOR
 ppmviewer.c
 #endif
@@ -129,9 +133,6 @@ splitedit.c
 
 #if LCD_DEPTH > 1                  /* non-mono bitmap targets */
 matrix.c
-#if defined(HAVE_ALBUMART) && defined(HAVE_TAGCACHE)
-pictureflow.c
-#endif
 #endif
 
 /* Platform-specific plugins */

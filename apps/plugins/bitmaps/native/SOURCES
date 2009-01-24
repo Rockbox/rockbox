@@ -669,7 +669,7 @@ matrix_normal.bmp
 #endif
 
 /* pictureflow */
-#if defined(HAVE_ALBUMART) && defined(HAVE_TAGCACHE)
+#if defined(HAVE_LCD_BITMAP) && defined(HAVE_TAGCACHE)
 #if (LCD_WIDTH < 200)
 pictureflow_logo.100x18x16.bmp
 #else

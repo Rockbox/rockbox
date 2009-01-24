@@ -24,12 +24,14 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include <albumart.h>
 #include "lib/pluginlib_actions.h"
 #include "lib/helper.h"
 #include "lib/configfile.h"
 #include "lib/picture.h"
 #include "pluginbitmaps/pictureflow_logo.h"
 #include "lib/grey.h"
+#include "lib/feature_wrappers.h"
 
 PLUGIN_HEADER
 
@@ -41,15 +43,19 @@ const struct button_mapping *plugin_contexts[]
 #define NB_ACTION_CONTEXTS sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
 
 #if LCD_DEPTH < 8
+#if LCD_DEPTH > 1
+#define N_BRIGHT(y) LCD_BRIGHTNESS(y)
+#else
+#define N_BRIGHT(y) ((y > 127) ? 0 : 1)
+#endif
 #define USEGSLIB
 GREY_INFO_STRUCT
 #define LCD_BUF _grey_info.buffer
 #define MYLCD(fn) grey_ ## fn
 #define G_PIX(r,g,b) \
     (77 * (unsigned)(r) + 150 * (unsigned)(g) + 29 * (unsigned)(b)) / 256
-#define N_PIX(r,g,b) LCD_BRIGHTNESS(G_PIX(r,g,b))
+#define N_PIX(r,g,b) N_BRIGHT(G_PIX(r,g,b))
 #define G_BRIGHT(y) (y)
-#define N_BRIGHT(y) LCD_BRIGHTNESS(y)
 #define BUFFER_WIDTH _grey_info.width
 #define BUFFER_HEIGHT _grey_info.height
 typedef unsigned char pix_t;
@@ -602,7 +608,7 @@ bool get_albumart_for_index_from_db(const int slide_index, char *buf,
         fd = rb->open(tcs.result, O_RDONLY);
         rb->get_metadata(&id3, fd, tcs.result);
         rb->close(fd);
-        if ( rb->search_albumart_files(&id3, "", buf, buflen) )
+        if ( search_albumart_files(&id3, "", buf, buflen) )
             result = true;
         else
             result = false;
@@ -622,8 +628,10 @@ void draw_splashscreen(void)
 {
     struct screen* display = rb->screens[0];
 
+#if LCD_DEPTH > 1
     rb->lcd_set_background(N_BRIGHT(0));
     rb->lcd_set_foreground(N_BRIGHT(255));
+#endif
     rb->lcd_clear_display();
 
     const struct picture* logo = &(logos[display->screen_type]);
@@ -650,12 +658,18 @@ void draw_progressbar(int step)
     rb->lcd_putsxy((LCD_WIDTH - txt_w)/2, y, "Preparing album artwork");
     y += (txt_h + 5);
 
+#if LCD_DEPTH > 1
     rb->lcd_set_foreground(N_BRIGHT(100));
+#endif
     rb->lcd_drawrect(x, y, w+2, bar_height);
+#if LCD_DEPTH > 1
     rb->lcd_set_foreground(N_PIX(165, 231, 82));
+#endif
 
     rb->lcd_fillrect(x+1, y+1, step * w / album_count, bar_height-2);
+#if LCD_DEPTH > 1
     rb->lcd_set_foreground(N_BRIGHT(255));
+#endif
     rb->lcd_update();
     rb->yield();
 }
@@ -691,7 +705,7 @@ bool create_albumart_cache(void)
         input_bmp.data = plugin_buf;
         input_bmp.width = DISPLAY_WIDTH;
         input_bmp.height = DISPLAY_HEIGHT;
-        ret = rb->read_bmp_file(albumart_file, &input_bmp,
+        ret = scaled_read_bmp_file(albumart_file, &input_bmp,
                                 plugin_buf_size, format, &format_transposed);
         if (ret <= 0) {
             rb->splash(HZ, "Could not read bmp");
@@ -948,7 +962,9 @@ int read_pfraw(char* filename)
 
     bm->width = bmph.width;
     bm->height = bmph.height;
+#if LCD_DEPTH > 1
     bm->format = FORMAT_NATIVE;
+#endif
     bm->data = ((unsigned char *)bm + sizeof(struct bitmap));
 
     int y;
@@ -1527,9 +1543,11 @@ int create_empty_slide(bool force)
         int ret;
         input_bmp.width = DISPLAY_WIDTH;
         input_bmp.height = DISPLAY_HEIGHT;
+#if LCD_DEPTH > 1
         input_bmp.format = FORMAT_NATIVE;
+#endif
         input_bmp.data = (char*)plugin_buf;
-        ret = rb->read_bmp_file(EMPTY_SLIDE_BMP, &input_bmp,
+        ret = scaled_read_bmp_file(EMPTY_SLIDE_BMP, &input_bmp,
                                 plugin_buf_size,
                                 FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
                                 &format_transposed);
@@ -1641,7 +1659,9 @@ int main_menu(void)
     int selection = 0;
     int result;
 
+#if LCD_DEPTH > 1
     rb->lcd_set_foreground(N_BRIGHT(255));
+#endif
 
     MENUITEM_STRINGLIST(main_menu,"PictureFlow Main Menu",NULL,
                         "Settings", "Return", "Quit");
