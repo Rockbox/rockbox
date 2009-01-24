@@ -204,6 +204,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     return true;
 }
 
+#ifdef HAVE_ALBUMART
 /* Look for albumart bitmap in the same dir as the track and in its parent dir.
  * Stores the found filename in the buf parameter.
  * Returns true if a bitmap was found, false otherwise */
@@ -306,3 +307,4 @@ void get_albumart_size(struct bitmap *bmp)
     bmp->width = data->albumart_max_width;
     bmp->height = data->albumart_max_height;
 }
+#endif /* HAVE_ALBUMART */

@@ -630,6 +630,7 @@ static const struct plugin_api rockbox_api = {
 #ifdef CPU_ARM
     __div0,
 #endif
+    strip_extension
 };
 
 int plugin_load(const char* plugin, const void* parameter)

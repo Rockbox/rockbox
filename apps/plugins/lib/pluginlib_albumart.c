@@ -9,10 +9,7 @@
 *
 * Copyright (C) 2009 by Andrew Mahone
 *
-* This header redefines some core functions as calls via the plugin_api, to
-* allow easy compilation of core source files in the pluginlib with different
-* features from the version built for the core, or when a core object file is
-* not built for a particular target.
+* This is a wrapper for the core albumart.c
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -24,31 +21,7 @@
 *
 ****************************************************************************/
 
-#ifndef _LIB_WRAPPERS_H_
-#define _LIB_WRAPPERS_H_
+#include <plugin.h>
+#include "wrappers.h"
 
-#define DEBUG_H
-#define __SPRINTF_H__
-
-#define open rb->open
-#define close rb->close
-#define read rb->read
-#define lseek rb->lseek
-#define memset rb->memset
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-#define cpu_boost rb->cpu_boost
-#endif
-#define yield rb->yield
-#define file_exists rb->file_exists
-#define snprintf rb->snprintf
-#define strcat rb->strcat
-#define strchr rb->strchr
-#define strcmp rb->strcmp
-#define strcpy rb->strcpy
-#define strip_extension rb->strip_extension
-#define strlen rb->strlen
-#define strncpy rb->strncpy
-#define strrchr rb->strrchr
-
-#endif
-
+#include "../../recorder/albumart.c"
