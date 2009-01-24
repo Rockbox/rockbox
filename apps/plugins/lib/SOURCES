@@ -45,13 +45,13 @@ pluginlib_bmp.c
 #ifdef HAVE_LCD_COLOR
 bmp_smooth_scale.c
 #endif
+#ifndef HAVE_ALBUMART
+pluginlib_albumart.c
+#endif
 #endif
 pluginlib_actions.c
 helper.c
 #ifdef HAVE_TOUCHSCREEN
 touchscreen.c
-#endif
-#ifndef HAVE_ALBUMART
-pluginlib_albumart.c
 #endif
 md5.c
