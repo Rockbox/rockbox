@@ -257,7 +257,6 @@ PLUGIN_HEADER
 #define FIRST_LINE 0
 #endif
 
-MEM_FUNCTION_WRAPPERS;
 #define MAX_PLAYERS 10
 
 static struct {

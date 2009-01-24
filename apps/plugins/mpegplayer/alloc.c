@@ -153,21 +153,6 @@ bool mpeg_alloc_init(unsigned char *buf, size_t mallocsize)
     return true;
 }
 
-/* gcc may want to use memcpy before rb is initialised, so here's a trivial
-   implementation */
-
-void *memcpy(void *dest, const void *src, size_t n)
-{
-    size_t i;
-    char* d=(char*)dest;
-    char* s=(char*)src;
-
-    for (i=0;i<n;i++)
-        d[i]=s[i];
-
-    return dest;
-}
-
 /* allocate non-dedicated buffer space which mpeg2_mem_reset will free */
 void * mpeg2_malloc(unsigned size, mpeg2_alloc_t reason)
 {
@@ -245,15 +230,5 @@ void codec_free(void* ptr)
     mem_ptr = (void *)ptr - (void *)mallocbuf;
 #endif
     (void)ptr;
-}
-
-void *memmove(void *dest, const void *src, size_t n)
-{
-    return rb->memmove(dest,src,n);
-}
-
-void *memset(void *s, int c, size_t n)
-{
-    return rb->memset(s,c,n);
 }
 

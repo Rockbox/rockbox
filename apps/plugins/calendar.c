@@ -186,8 +186,6 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define CELL_WIDTH  (LCD_WIDTH / 7)
 #define CELL_HEIGHT (LCD_HEIGHT / 7)
 
-MEM_FUNCTION_WRAPPERS
-
 static bool leap_year;
 /* days_in_month[][0] is for December */
 static const int days_in_month[2][13] = {

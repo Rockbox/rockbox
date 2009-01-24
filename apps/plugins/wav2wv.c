@@ -29,14 +29,6 @@ PLUGIN_HEADER
 
 #define SAMPLES_PER_BLOCK 22050
 
-void *memset(void *s, int c, size_t n) {
-  return(rb->memset(s,c,n));
-}
-
-void *memcpy(void *dest, const void *src, size_t n) {
-  return(rb->memcpy(dest,src,n));
-}
-
 static char *audiobuf;
 static ssize_t audiobuflen;
 

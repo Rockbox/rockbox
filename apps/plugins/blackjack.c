@@ -390,8 +390,6 @@ extern const fb_data card_back[];
 
 #define NEXT_CARD bj->player_cards[done][bj->num_player_cards[done]]
 
-MEM_FUNCTION_WRAPPERS;
-
 /* dealer and player card positions */
 unsigned int dealer_x, dealer_y, player_x, player_y;
 

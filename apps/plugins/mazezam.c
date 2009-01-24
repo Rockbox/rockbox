@@ -32,8 +32,6 @@ PLUGIN_HEADER
 const struct button_mapping *plugin_contexts[]
 = {generic_directions, generic_actions};
 
-MEM_FUNCTION_WRAPPERS;
-
 /* Use the standard plugin buttons rather than a hard-to-maintain list of
  * MazezaM specific buttons. */
 #define MAZEZAM_UP                  PLA_UP

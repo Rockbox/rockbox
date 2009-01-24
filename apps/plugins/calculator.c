@@ -355,8 +355,6 @@ PLUGIN_HEADER
 static struct ts_raster calc_raster = { X_0_POS, Y_1_POS, BUTTON_COLS*REC_WIDTH, BUTTON_ROWS*REC_HEIGHT, REC_WIDTH, REC_HEIGHT };
 #endif
 
-MEM_FUNCTION_WRAPPERS;
-
 enum {
     basicButtons,
     sciButtons

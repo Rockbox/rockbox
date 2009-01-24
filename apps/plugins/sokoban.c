@@ -467,8 +467,6 @@ static struct BufferedBoards {
 } buffered_boards;
 
 
-MEM_FUNCTION_WRAPPERS;
-
 static char buf[ROWS*(COLS + 1)]; /* Enough for a whole board or a filename */
 
 

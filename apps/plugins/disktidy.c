@@ -21,7 +21,6 @@
 #include "plugin.h"
 
 PLUGIN_HEADER
-MEM_FUNCTION_WRAPPERS
 
 /* function return values */
 enum tidy_return

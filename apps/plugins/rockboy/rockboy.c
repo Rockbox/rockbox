@@ -58,13 +58,6 @@ void *my_malloc(size_t size)
     return alloc;
 }
 
-/* Using #define isn't enough with GCC 4.0.1 */
-
-void* memcpy(void* dst, const void* src, size_t size)
-{
-    return rb->memcpy(dst, src, size);
-}
-
 static void setoptions (void)
 {
    int fd;

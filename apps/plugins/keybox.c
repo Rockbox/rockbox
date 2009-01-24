@@ -63,7 +63,6 @@ union hash
     uint32_t words[4];
 };
 
-MEM_FUNCTION_WRAPPERS;
 static char buffer[sizeof(struct pw_entry)*MAX_ENTRIES];
 static int bytes_read = 0; /* bytes read into the buffer */
 static struct gui_synclist kb_list;

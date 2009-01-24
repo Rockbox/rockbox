@@ -35,8 +35,6 @@ GREY_INFO_STRUCT
 static unsigned char grey_bm_buf[LCD_WIDTH * LCD_HEIGHT + 
                    BM_SCALED_SIZE(LCD_WIDTH,0,FORMAT_NATIVE,0)];
 
-MEM_FUNCTION_WRAPPERS
-
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {

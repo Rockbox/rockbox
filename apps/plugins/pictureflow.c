@@ -35,8 +35,6 @@
 
 PLUGIN_HEADER
 
-MEM_FUNCTION_WRAPPERS
-
 /******************************* Globals ***********************************/
 
 const struct button_mapping *plugin_contexts[]

@@ -17,8 +17,6 @@
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
 
-MEM_FUNCTION_WRAPPERS;
-
 #define SAMP_PER_FRAME       1152
 #define SAMPL2                576
 #define SBLIMIT                32

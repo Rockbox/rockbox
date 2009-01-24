@@ -86,12 +86,6 @@ const char *level_string[] = { "Level 1: 60 moves / 5 min" ,
 /* "While thinking" command */
 int wt_command = COMMAND_NOP;
 
-/* GCC wants this to be present for some targets */
-void* memcpy(void* dst, const void* src, size_t size)
-{
-    return rb->memcpy(dst, src, size);
-}
-
 /* ---- Get the board column and row (e2 f.e.) for a physical x y ---- */
 void xy2cr ( short x, short y, short *c, short *r ) {
     if (computer == black ) {

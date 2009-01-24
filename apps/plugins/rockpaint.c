@@ -306,8 +306,6 @@ extern int errno;
 int errno;
 #endif
 
-MEM_FUNCTION_WRAPPERS;
-
 static int drawcolor=0; /* Current color (in palette) */
 static int bgdrawcolor=9; /* Current background color (in palette) */
 bool isbg = false; /* gruik ugly hack alert */

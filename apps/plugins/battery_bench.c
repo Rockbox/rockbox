@@ -196,7 +196,6 @@ PLUGIN_HEADER
 #endif
 
 /****************************** Plugin Entry Point ****************************/
-MEM_FUNCTION_WRAPPERS;
 int main(void);
 bool exit_tsr(bool);
 void thread(void);

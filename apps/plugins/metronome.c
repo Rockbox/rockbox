@@ -667,8 +667,6 @@ const struct button_mapping *plugin_contexts[] =
 };
 #define PLA_ARRAY_COUNT sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
 
-MEM_FUNCTION_WRAPPERS;
-
 static int bpm      = 120;
 static int period   = 0;
 static int minitick = 0;

@@ -853,26 +853,6 @@ extern const struct plugin_api *rb;
 enum plugin_status plugin_start(const void* parameter)
     NO_PROF_ATTR;
 
-/* Use this macro in plugins where gcc tries to optimize by calling
- * these functions directly */
-#define MEM_FUNCTION_WRAPPERS \
-        void *memcpy(void *dest, const void *src, size_t n) \
-        { \
-            return rb->memcpy(dest, src, n); \
-        } \
-        void *memset(void *dest, int c, size_t n) \
-        { \
-            return rb->memset(dest, c, n); \
-        } \
-        void *memmove(void *dest, const void *src, size_t n) \
-        { \
-            return rb->memmove(dest, src, n); \
-        } \
-        int memcmp(const void *s1, const void *s2, size_t n) \
-        { \
-            return rb->memcmp(s1, s2, n); \
-        }
-
 #undef CACHE_FUNCTION_WRAPPERS
 #ifdef CACHE_FUNCTIONS_AS_CALL
 #define CACHE_FUNCTION_WRAPPERS \

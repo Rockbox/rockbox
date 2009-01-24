@@ -306,8 +306,6 @@ static int speed = 6; /* CYCLETIME = (11-speed)*10 ms */
 static int difficulty = 75; /* Percentage of screen that needs to be filled
                              * in order to win the game */
 
-MEM_FUNCTION_WRAPPERS;
-
 static bool quit = false;
 
 static unsigned int board[BOARD_H][BOARD_W];

@@ -22,8 +22,6 @@
 
 PLUGIN_HEADER
 
-MEM_FUNCTION_WRAPPERS;
-
 bool its_a_dir = false;
 
 char str_filename[MAX_PATH];

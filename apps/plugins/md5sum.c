@@ -24,8 +24,6 @@
 
 PLUGIN_HEADER
 
-MEM_FUNCTION_WRAPPERS;
-
 #define BUFFERSIZE 16384
 
 static int count = 0;

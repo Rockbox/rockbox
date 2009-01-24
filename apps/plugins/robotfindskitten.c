@@ -626,8 +626,6 @@ int screen[X_MAX + 1][Y_MAX + 1];
  *
  *****************************************************************************/
 
-MEM_FUNCTION_WRAPPERS 
-
 static void drawchar(int x, int y, char c)
 {
   char str[2];

@@ -76,8 +76,6 @@ GREY_INFO_STRUCT
 
 /******************************* Globals ***********************************/
 
-MEM_FUNCTION_WRAPPERS;
-
 static int slideshow_enabled = false;   /* run slideshow */
 static int running_slideshow = false;   /* loading image because of slideshw */
 #ifndef SIMULATOR
