@@ -295,7 +295,7 @@ void Install::setVersionStrings(QMap<QString, QString> ver)
 
     // try to use the old selection first. If no selection has been made
     // in the past, use a preselection based on released status.
-    if(settings->build() == "stable")
+    if(settings->build() == "stable" && !version.value("rel_rev").isEmpty())
         ui.radioStable->setChecked(true);
     else if(settings->build() == "archived")
         ui.radioArchived->setChecked(true);
