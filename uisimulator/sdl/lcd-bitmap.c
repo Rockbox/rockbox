@@ -119,6 +119,10 @@ void sim_backlight(int value)
                     &lcd_backlight_color_zero, &lcd_backlight_color_split,
                     &lcd_backlight_color_zero,
                     (1<<LCD_DEPTH), lcd_ex_shades);
+#elif defined MROBE_100
+            /* quick fix, a proper fix needs to compare brightnesses */
+            sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero, 
+                    &lcd_backlight_color_max, (1<<LCD_DEPTH), lcd_ex_shades);
 #else
             sdl_set_gradient(lcd_surface, &lcd_backlight_color_max,
                     &lcd_backlight_color_zero, (1<<LCD_DEPTH), lcd_ex_shades);
@@ -128,6 +132,10 @@ void sim_backlight(int value)
             sdl_set_gradient(lcd_real_surface, &lcd_color_max, &lcd_color_zero,
                     &lcd_color_split, &lcd_color_zero, (1<<LCD_DEPTH),
                     lcd_ex_shades);
+#elif defined MROBE_100
+            /* quick fix, a proper fix needs to compare brightnesses */
+            sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max,
+                    (1<<LCD_DEPTH), lcd_ex_shades);
 #else
             sdl_set_gradient(lcd_surface, &lcd_color_max, &lcd_color_zero,
                     (1<<LCD_DEPTH), lcd_ex_shades);
@@ -164,11 +172,11 @@ void sim_lcd_init(void)
 #ifdef HAVE_BACKLIGHT
 #ifdef UI_LCD_SPLIT
     sdl_set_gradient(lcd_real_surface, &lcd_backlight_color_zero,
-            &lcd_color_max, &lcd_backlight_color_zero,
-            &lcd_color_split, 0, (1<<LCD_DEPTH));
+            &lcd_backlight_color_max, &lcd_backlight_color_zero,
+            &lcd_backlight_color_split, 0, (1<<LCD_DEPTH));
 #else
-    sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero, &lcd_color_max, 0,
-            (1<<LCD_DEPTH));
+    sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero,
+            &lcd_backlight_color_max, 0, (1<<LCD_DEPTH));
 #endif
 #else
     sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max, 0,
@@ -186,11 +194,15 @@ void sim_lcd_ex_init(int shades, unsigned long (*getpixel)(int, int))
 #ifdef HAVE_BACKLIGHT
         if (lcd_backlight_val > 0) {
 #ifdef UI_LCD_SPLIT
-            sdl_set_gradient(lcd_real_surface, &lcd_color_max,
-                    &lcd_backlight_color_zero, &lcd_color_split,
+            sdl_set_gradient(lcd_real_surface, &lcd_backlight_color_max,
+                    &lcd_backlight_color_zero, &lcd_backlight_color_split,
                     &lcd_backlight_color_zero, (1<<LCD_DEPTH), shades);
+#elif defined MROBE_100 
+            /* quick fix, a proper fix needs to compare brightnesses */
+            sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero,
+                    &lcd_backlight_color_max, (1<<LCD_DEPTH), shades);
 #else
-            sdl_set_gradient(lcd_surface, &lcd_color_max,
+            sdl_set_gradient(lcd_surface, &lcd_backlight_color_max,
                     &lcd_backlight_color_zero, (1<<LCD_DEPTH), shades);
 #endif
         }
@@ -200,6 +212,10 @@ void sim_lcd_ex_init(int shades, unsigned long (*getpixel)(int, int))
 #ifdef UI_LCD_SPLIT
             sdl_set_gradient(lcd_real_surface, &lcd_color_max, &lcd_color_zero,
                     &lcd_color_split, &lcd_color_zero, (1<<LCD_DEPTH), shades);
+#elif defined MROBE_100
+            /* quick fix, a proper fix needs to compare brightnesses */
+            sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max,
+                    (1<<LCD_DEPTH), shades);
 #else
             sdl_set_gradient(lcd_surface, &lcd_color_max, &lcd_color_zero,
                     (1<<LCD_DEPTH), shades);
