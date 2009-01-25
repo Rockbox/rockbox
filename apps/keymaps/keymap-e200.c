@@ -45,7 +45,6 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_OK,          BUTTON_SELECT|BUTTON_REL,          BUTTON_SELECT },
     { ACTION_STD_OK,          BUTTON_RIGHT,                      BUTTON_NONE },
     { ACTION_STD_CANCEL,      BUTTON_LEFT,                       BUTTON_NONE },
-    { ACTION_STD_CANCEL,      BUTTON_POWER,                      BUTTON_NONE },
 
     { ACTION_STD_QUICKSCREEN, BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_DOWN },
     { ACTION_STD_CONTEXT,     BUTTON_SELECT|BUTTON_REPEAT,       BUTTON_SELECT },
@@ -90,16 +89,16 @@ static const struct button_mapping button_context_wps[]  = {
 }; /* button_context_wps */
 
 static const struct button_mapping button_context_settings[] = {
-    { ACTION_STD_CANCEL,        BUTTON_POWER,                     BUTTON_NONE },
-    { ACTION_SETTINGS_INC,      BUTTON_SCROLL_FWD,               BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT,BUTTON_SCROLL_FWD|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_SETTINGS_DEC,      BUTTON_SCROLL_BACK,                 BUTTON_NONE },
-    { ACTION_SETTINGS_DECREPEAT,BUTTON_SCROLL_BACK|BUTTON_REPEAT,   BUTTON_NONE },
-   
-    { ACTION_STD_PREV,          BUTTON_LEFT,                      BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
-    { ACTION_STD_NEXT,          BUTTON_RIGHT,                     BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_STD_CANCEL,        BUTTON_LEFT,                      BUTTON_NONE },
+    { ACTION_SETTINGS_INC,      BUTTON_SCROLL_FWD,                BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,BUTTON_SCROLL_FWD|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,      BUTTON_SCROLL_BACK,               BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,BUTTON_SCROLL_BACK|BUTTON_REPEAT, BUTTON_NONE },
+
+    { ACTION_STD_PREV,          BUTTON_UP|BUTTON_REL,             BUTTON_UP   },
+    { ACTION_STD_PREVREPEAT,    BUTTON_UP|BUTTON_REPEAT,          BUTTON_UP   },
+    { ACTION_STD_NEXT,          BUTTON_DOWN|BUTTON_REL,           BUTTON_DOWN },
+    { ACTION_STD_NEXTREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,        BUTTON_DOWN },
     { ACTION_SETTINGS_RESET,    BUTTON_SELECT,                    BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
@@ -167,18 +166,17 @@ static const struct button_mapping button_context_quickscreen[]  = {
 static const struct button_mapping button_context_settings_right_is_inc[]  = {
     { ACTION_SETTINGS_INC,       BUTTON_SCROLL_FWD,               BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT, BUTTON_SCROLL_FWD|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_SETTINGS_DEC,       BUTTON_SCROLL_BACK,                 BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_SCROLL_BACK,              BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT, BUTTON_SCROLL_BACK|BUTTON_REPEAT,BUTTON_NONE },
 
-    { ACTION_STD_PREV,           BUTTON_UP|BUTTON_REL,            BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,     BUTTON_UP|BUTTON_REPEAT,         BUTTON_NONE },
-    { ACTION_STD_NEXT,           BUTTON_DOWN|BUTTON_REL,          BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,     BUTTON_DOWN|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_STD_PREV,           BUTTON_UP|BUTTON_REL,            BUTTON_UP   },
+    { ACTION_STD_PREVREPEAT,     BUTTON_UP|BUTTON_REPEAT,         BUTTON_UP   },
+    { ACTION_STD_NEXT,           BUTTON_DOWN|BUTTON_REL,          BUTTON_DOWN },
+    { ACTION_STD_NEXTREPEAT,     BUTTON_DOWN|BUTTON_REPEAT,       BUTTON_DOWN },
     { ACTION_NONE,               BUTTON_SELECT,                   BUTTON_NONE },
     { ACTION_STD_OK,             BUTTON_SELECT|BUTTON_REL,        BUTTON_NONE },
-    { ACTION_NONE,               BUTTON_LEFT|BUTTON_REL,          BUTTON_LEFT },
-    { ACTION_NONE,               BUTTON_POWER,                    BUTTON_NONE },
-    { ACTION_STD_CANCEL,         BUTTON_POWER|BUTTON_REL,         BUTTON_NONE },
+    { ACTION_STD_CANCEL,         BUTTON_LEFT|BUTTON_REL,          BUTTON_LEFT },
+    { ACTION_STD_OK,             BUTTON_RIGHT,                    BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_settings_right_is_inc */
@@ -193,8 +191,8 @@ static const struct button_mapping button_context_settings_time[] = {
 }; /* button_context_settings_time */
 
 static const struct button_mapping button_context_pitchscreen[]  = {
-    { ACTION_PS_INC_SMALL,      BUTTON_SCROLL_FWD,                 BUTTON_NONE },
-    { ACTION_PS_INC_BIG,        BUTTON_SCROLL_FWD|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_PS_INC_SMALL,      BUTTON_SCROLL_FWD,                BUTTON_NONE },
+    { ACTION_PS_INC_BIG,        BUTTON_SCROLL_FWD|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_PS_DEC_SMALL,      BUTTON_SCROLL_BACK,               BUTTON_NONE },
     { ACTION_PS_DEC_BIG,        BUTTON_SCROLL_BACK|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT,               BUTTON_NONE },
@@ -212,7 +210,7 @@ static const struct button_mapping button_context_pitchscreen[]  = {
 /** Recording Screen **/
 static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_REC_PAUSE,          BUTTON_UP|BUTTON_REL,             BUTTON_UP },
-    { ACTION_STD_CANCEL,         BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
+    { ACTION_STD_CANCEL,         BUTTON_DOWN,                      BUTTON_NONE },
     { ACTION_REC_NEWFILE,        BUTTON_REC|BUTTON_REL,            BUTTON_REC },
     { ACTION_STD_MENU,           BUTTON_SELECT|BUTTON_REPEAT,      BUTTON_SELECT},
     { ACTION_SETTINGS_INC,       BUTTON_RIGHT,                     BUTTON_NONE },
@@ -223,7 +221,7 @@ static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_STD_PREV,           BUTTON_SCROLL_BACK|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_STD_NEXT,           BUTTON_SCROLL_FWD,                BUTTON_NONE },
     { ACTION_STD_NEXT,           BUTTON_SCROLL_FWD|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_NONE,               BUTTON_DOWN|BUTTON_REL,           BUTTON_DOWN },
+    { ACTION_STD_CANCEL,         BUTTON_POWER,                     BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
 

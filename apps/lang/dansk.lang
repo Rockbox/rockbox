@@ -3889,9 +3889,9 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200*,c200,sa9200: "MENU = Revert"
+    ipod*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
-    h10,h10_5gb: "PREV = Revert"
+    h10,h10_5gb,e200*: "PREV = Revert"
     gigabeatf: "A = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
@@ -3900,9 +3900,9 @@
     *: none
     rtc: "SLUK = Fortryd"
     h100,h120,h300: "STOP = Fortryd"
-    ipod*,e200*,c200,sa9200: "MENU = Fortryd"
+    ipod*,c200,sa9200: "MENU = Fortryd"
     x5,m5: "OPTAG = Fortryd"
-    h10,h10_5gb: "FORRIGE = Fortryd"
+    h10,h10_5gb,e200*: "FORRIGE = Fortryd"
     gigabeatf: "TÆND/SLUK = Fortryd"
     mrobe100: "VIS = Fortryd"
     gigabeats: "TILBAGE = Fortryd"

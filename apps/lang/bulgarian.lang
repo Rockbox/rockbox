@@ -1350,9 +1350,9 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200*,c200,sa9200: "MENU = Revert"
+    ipod*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
-    h10,h10_5gb: "PREV = Revert"
+    h10,h10_5gb,e200*: "PREV = Revert"
     gigabeatf: "A = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
@@ -1361,9 +1361,9 @@
     *: none
     rtc: "OFF за отказ"
     h100,h120,h300: "STOP за отказ"
-    ipod*,e200*,c200,sa9200: "MENU за отказ"
+    ipod*,c200,sa9200: "MENU за отказ"
     x5,m5: "RECORD за отказ"
-    h10,h10_5gb: "PREV за отказ"
+    h10,h10_5gb,e200*: "PREV за отказ"
     gigabeatf: "A за отказ"
     mrobe100: "DISPLAY за отказ"
     gigabeats: "BACK за отказ"

@@ -4599,9 +4599,9 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200*,c200,sa9200: "MENU = Revert"
+    ipod*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
-    h10,h10_5gb: "PREV = Revert"
+    h10,h10_5gb,e200*: "PREV = Revert"
     gigabeatf: "A = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
@@ -4610,9 +4610,9 @@
     *: none
     rtc: "[끔]: 원상태 복구"
     h100,h120,h300: "[정지]: 원상태 복구"
-    ipod*,e200*,c200,sa9200: "[메뉴]: 원상태 복구"
+    ipod*,c200,sa9200: "[메뉴]: 원상태 복구"
     x5,m5: "[녹음]: 원상태 복구"
-    h10,h10_5gb: "[이전]: 원상태 복구"
+    h10,h10_5gb,e200*: "[이전]: 원상태 복구"
     gigabeatf: "[전원]: 원상태 복구"
     mrobe100: "[화면]: 원상태 복구"
     gigabeats: "[뒤]: 원상태 복구"

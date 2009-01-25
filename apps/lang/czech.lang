@@ -4128,9 +4128,9 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200*,c200,sa9200: "MENU = Revert"
+    ipod*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
-    h10,h10_5gb: "PREV = Revert"
+    h10,h10_5gb,e200*: "PREV = Revert"
     gigabeatf: "A = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
@@ -4139,9 +4139,9 @@
     *: none
     rtc: "OFF = Vrátit zpět"
     h100,h120,h300: "STOP = Vrátit zpět"
-    ipod*,e200*,c200,sa9200: "MENU = Vrátit zpět"
+    ipod*,c200,sa9200: "MENU = Vrátit zpět"
     x5,m5: "RECORD = Vrátit zpět"
-    h10,h10_5gb: "PREV = Vrátit zpět"
+    h10,h10_5gb,e200*: "PREV = Vrátit zpět"
     gigabeatf: "A = Vrátit zpět"
     mrobe100: "DISPLAY = Vrátit zpět"
     gigabeats: "BACK = Vrátit zpět"

@@ -4895,17 +4895,17 @@
   <source>
     *: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200*,c200: "MENU = Revert"
+    ipod*,c200: "MENU = Revert"
     x5: "RECORD = Revert"
-    h10,h10_5gb: "PREV = Revert"
+    h10,h10_5gb,e200*: "PREV = Revert"
     gigabeatf: "POWER = Revert"
   </source>
   <dest>
     *: "OFF tagasi pöördumiseks"
     h100,h120,h300: "STOP tagasi pöördumiseks"
-    ipod*,e200*,c200: "MENU tagasi pöördumiseks"
+    ipod*,c200: "MENU tagasi pöördumiseks"
     x5: "RECORD tagasi pöördumiseks"
-    h10,h10_5gb: "PREV tagasi pöördumiseks"
+    h10,h10_5gb,e200*: "PREV tagasi pöördumiseks"
     gigabeatf: "POWER tagasi pöördumiseks"
   </dest>
   <voice>
