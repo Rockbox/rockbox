@@ -27,7 +27,6 @@ Install::Install(RbSettings *sett,QWidget *parent) : QDialog(parent)
     settings = sett;
     ui.setupUi(this);
 
-    connect(ui.radioCurrent, SIGNAL(toggled(bool)), this, SLOT(setCached(bool)));
     connect(ui.radioStable, SIGNAL(toggled(bool)), this, SLOT(setDetailsStable(bool)));
     connect(ui.radioCurrent, SIGNAL(toggled(bool)), this, SLOT(setDetailsCurrent(bool)));
     connect(ui.radioArchived, SIGNAL(toggled(bool)), this, SLOT(setDetailsArchived(bool)));
@@ -85,12 +84,6 @@ void Install::backupCheckboxChanged(int state)
         ui.backupLocation->hide();
         ui.changeBackup->hide();
     }
-}
-
-
-void Install::setCached(bool cache)
-{
-    ui.checkBoxCache->setEnabled(!cache);
 }
 
 
@@ -240,12 +233,7 @@ void Install::setDetailsCurrent(bool show)
                 "a change is made. Latest version is r%1 (%2).")
                 .arg(version.value("bleed_rev"), version.value("bleed_date")));
         if(version.value("rel_rev").isEmpty())
-            ui.labelNote->setText(tr("<b>Note:</b> This option will always "
-                "download a fresh copy. "
-                "<b>This is the recommended version.</b>"));
-        else
-            ui.labelNote->setText(tr("<b>Note:</b> This option will always "
-                "download a fresh copy."));
+            ui.labelNote->setText(tr("<b>This is the recommended version.</b>"));
     }
 }
 

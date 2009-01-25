@@ -56,7 +56,6 @@ class Install : public QDialog
         void updateBackupLocation(void);
 
     private slots:
-        void setCached(bool);
         void setDetailsCurrent(bool);
         void setDetailsStable(bool);
         void setDetailsArchived(bool);
