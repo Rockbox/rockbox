@@ -20,8 +20,6 @@
 #include "plugin.h"
 #include "lib/fixedpoint.h"
 
-#if defined(HAVE_LCD_BITMAP)
-
 PLUGIN_HEADER
 
 /* variable button definitions */
@@ -822,4 +820,3 @@ enum plugin_status plugin_start(const void* parameter) {
             lastbutton = button;
     }
 }
-#endif /* #ifdef HAVE_LCD_BITMAP */

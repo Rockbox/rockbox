@@ -1,10 +1,8 @@
 /* plugins common to all models */
-battery_bench.c
 chessclock.c
 credits.c
 cube.c
 dict.c
-firmware_flash.c
 jackpot.c
 keybox.c
 logo.c
@@ -12,7 +10,6 @@ mosaique.c
 properties.c
 random_folder_advance_config.c
 rockblox.c
-rockbox_flash.c
 search.c
 settings_dumper.c
 snow.c
@@ -24,6 +21,13 @@ viewer.c
 #ifdef HAVE_BACKLIGHT
 lamp.c
 #endif /* HAVE_BACKLIGHT */
+#ifndef SIMULATOR
+battery_bench.c
+firmware_flash.c
+#endif /* SIMULATOR */
+#if (CONFIG_CPU == SH7034)
+rockbox_flash.c
+#endif /* CONFIG_CPU */
 
 #ifndef OLYMPUS_MROBE_500
 
@@ -84,7 +88,8 @@ solitaire.c
 sokoban.c
 star.c
 starfield.c
-#if (CONFIG_LCD == LCD_SSD1815) && (CONFIG_CODEC != SWCODEC)
+#if (CONFIG_LCD == LCD_SSD1815) && (CONFIG_CODEC != SWCODEC) && \
+    !defined(SIMULATOR)
 video.c
 #endif
 vu_meter.c
@@ -128,7 +133,9 @@ wav2wv.c
     /* not for Ondio, has no remote control pin */
 alpine_cdc.c
 #endif
+#if defined(HAVE_LCD_BITMAP) && !defined(SIMULATOR)
 splitedit.c
+#endif
 #endif /* CONFIG_CODEC */
 
 #if LCD_DEPTH > 1                  /* non-mono bitmap targets */
@@ -139,7 +146,7 @@ matrix.c
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
 iriverify.c
 #endif
-#if defined(IRIVER_H100_SERIES)
+#if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
 iriver_flash.c
 #endif
 

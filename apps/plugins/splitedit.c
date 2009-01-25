@@ -21,9 +21,6 @@
 
 #include "plugin.h"
 
-#ifndef SIMULATOR
-#ifdef HAVE_LCD_BITMAP
-
 PLUGIN_HEADER
 
 /* variable button definitions */
@@ -1271,5 +1268,3 @@ enum plugin_status plugin_start(const void* parameter)
     }
     return splitedit_exit_code;
 }
-#endif
-#endif

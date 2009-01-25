@@ -31,7 +31,6 @@
 #include "system.h"
 #include "lib/helper.h"
 
-#ifndef SIMULATOR /* not for simulator by now */
 #ifdef HAVE_LCD_BITMAP /* and definitely not for the Player, haha */
 
 PLUGIN_HEADER
@@ -1026,5 +1025,4 @@ enum plugin_status plugin_start(const void* parameter)
 }
 
 #endif /* #ifdef HAVE_LCD_BITMAP */
-#endif /* #ifndef SIMULATOR */
 

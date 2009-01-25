@@ -21,9 +21,6 @@
  ****************************************************************************/
 #include "plugin.h"
 
-/* Only build for (correct) target */
-#ifdef HAVE_LCD_BITMAP 
-
 PLUGIN_HEADER
 
 #define EXTERN static
@@ -1456,4 +1453,3 @@ enum plugin_status plugin_start(const void* parameter)
     else
         return PLUGIN_ERROR;
 }
-#endif /* #ifdef HAVE_LCD_BITMAP */

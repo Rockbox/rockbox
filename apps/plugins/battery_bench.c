@@ -19,7 +19,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef SIMULATOR /* not for the simulator */
 
 #include "version.h"
 #include "plugin.h"
@@ -560,5 +559,3 @@ int main(void)
     
     return PLUGIN_OK;
 }
-
-#endif /* SIMULATOR */

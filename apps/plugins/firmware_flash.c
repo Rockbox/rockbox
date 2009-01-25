@@ -23,8 +23,6 @@
 ****************************************************************************/
 #include "plugin.h"
 
-#ifndef SIMULATOR /* only for target */
-
 /* define DUMMY if you only want to "play" with the UI, does no harm */
 /* #define DUMMY */
 
@@ -1085,4 +1083,3 @@ enum plugin_status plugin_start(const void* parameter)
 }
 
 #endif /* ifdef PLATFORM_ID */
-#endif /* #ifndef SIMULATOR */

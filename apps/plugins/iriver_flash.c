@@ -24,8 +24,6 @@
 
 /* All CFI flash routines are copied and ported from firmware_flash.c */
 
-#ifndef SIMULATOR /* only for target */
-
 unsigned char *audiobuf;
 ssize_t audiobuf_size;
 
@@ -815,4 +813,3 @@ enum plugin_status plugin_start(const void* parameter)
 }
 
 #endif /* ifdef PLATFORM_ID */
-#endif /* #ifndef SIMULATOR */
