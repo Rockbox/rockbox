@@ -194,13 +194,13 @@ foreach my $file (@ARGV) {
         elsif ($changetarget) {
             # Change target if set and it's the same as $from
             if ($id ne "" and grep(/$id/, @ids) and $location =~ /source|dest|voice/ and $target eq $from) {
-                $line =~ s/$from/$to/;
+                $line =~ s/\Q$from/$to/;
             }
         }
         elsif ($changesource) {
             # Change string if $target is set and matches $s_target
             if ($id ne "" and grep(/$id/, @ids) and $target eq $s_target and $location eq "source") {
-                $line =~ s/$string/$to/;
+                $line =~ s/\Q$string/$to/;
             }
         }
         elsif ($changedesc) {
