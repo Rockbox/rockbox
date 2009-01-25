@@ -315,7 +315,7 @@ void RbUtilQt::updateSettings()
 
 void RbUtilQt::updateDevice()
 {
-    if(!settings->curNeedsBootloader() ) {
+    if(settings->curBootloaderMethod() == "none" ) {
         ui.buttonBootloader->setEnabled(false);
         ui.buttonRemoveBootloader->setEnabled(false);
         ui.labelBootloader->setEnabled(false);
@@ -333,7 +333,7 @@ void RbUtilQt::updateDevice()
             ui.buttonRemoveBootloader->setEnabled(true);
         }
     }
- 
+
     // displayed device info
     QString mountpoint = settings->mountpoint();
     QString brand = settings->curBrand();
@@ -457,7 +457,7 @@ bool RbUtilQt::smallInstallInner()
         return true;
     }
     // Bootloader
-    if(settings->curNeedsBootloader())
+    if(settings->curBootloaderMethod() != "none")
     {
         m_error = false;
         m_installed = false;

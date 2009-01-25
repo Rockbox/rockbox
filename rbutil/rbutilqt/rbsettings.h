@@ -79,7 +79,7 @@ class RbSettings : public QObject
         int encoderComplexity(QString enc);
         double encoderVolume(QString enc);
         bool encoderNarrowband(QString enc);
-        
+
         QStringList allPlatforms();
         QString name(QString plattform);
         QString brand(QString plattform);
@@ -88,8 +88,7 @@ class RbSettings : public QObject
         QMap<int, QString> usbIdMap();
         QMap<int, QString> usbIdErrorMap();
         QMap<int, QString> usbIdIncompatMap();
-        
-        bool curNeedsBootloader();
+
         QString curBrand();
         QString curName();
         QString curPlatform();
@@ -135,21 +134,21 @@ class RbSettings : public QObject
         void setEncoderNarrowband(QString enc,bool nb);
 
     private:
-        
+
         //! helper function to get an entry in the current platform section
         QVariant deviceSettingCurGet(QString entry,QString def="");
         //! helper function to get an entry out of a group in the userSettings
         QVariant userSettingsGroupGet(QString group,QString entry,QVariant def="");
         //! helper function to set an entry in a group in the userSettings
         void userSettingsGroupSet(QString group,QString entry,QVariant value);
-        
-        
+
+
         //! private copy constructors to prvent copying
         RbSettings&  operator= (const RbSettings& other)
             { (void)other; return *this; }
         RbSettings(const RbSettings& other) :QObject()
             { (void)other; }
-    
+
         //! pointers to our setting objects
         QSettings *devices;
         QSettings *userSettings;

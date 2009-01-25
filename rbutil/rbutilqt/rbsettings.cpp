@@ -81,21 +81,10 @@ QString RbSettings::curVersion()
 {
     return userSettings->value("rbutil_version").toString();
 }
- 
+
 bool RbSettings::cacheOffline()
 {
     return userSettings->value("offline").toBool();
-}
-
-bool RbSettings::curNeedsBootloader()
-{
-    QString result = deviceSettingCurGet("needsbootloader", "").toString(); 
-    if( result == "no")
-    {
-        return false;
-    }
-    else
-        return true;
 }
 
 QString RbSettings::mountpoint()
@@ -228,7 +217,7 @@ QString RbSettings::curManual()
 
 QString RbSettings::curBootloaderMethod()
 {
-    return deviceSettingCurGet("bootloadermethod").toString();
+    return deviceSettingCurGet("bootloadermethod", "none").toString();
 }
 
 QString RbSettings::curBootloaderName()
