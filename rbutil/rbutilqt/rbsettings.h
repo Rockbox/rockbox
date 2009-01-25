@@ -48,7 +48,6 @@ class RbSettings : public QObject
         QString mountpoint();
         QString manualUrl();
         QString bleedingUrl();
-        QString lastRelease(QString platform);
         QString cachePath();
         QString build(void);
         QString bootloaderUrl();
@@ -96,7 +95,6 @@ class RbSettings : public QObject
         QString curPlatform();
         QString curPlatformName();
         QString curManual();
-        bool curReleased();
         QString curBootloaderMethod();
         QString curBootloaderName();
         QString curVoiceName();

@@ -113,12 +113,6 @@ QString RbSettings::bleedingUrl()
     return devices->value("bleeding_url").toString();
 }
 
-QString RbSettings::lastRelease(QString platform)
-{
-    (void)platform;
-    return deviceSettingCurGet("last_release").toString();
-}
-
 QString RbSettings::cachePath()
 {
     return userSettings->value("cachepath", QDir::tempPath()).toString();
@@ -230,15 +224,6 @@ QString RbSettings::curManual()
 {
     return deviceSettingCurGet("manualname","rockbox-" +
             devices->value("platform").toString()).toString();
-}
-
-bool RbSettings::curReleased()
-{
-    QString released = deviceSettingCurGet("released").toString();
-    if(released == "yes")
-        return true;
-    else 
-        return false;
 }
 
 QString RbSettings::curBootloaderMethod()

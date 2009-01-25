@@ -79,6 +79,9 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     ui.treeInfo->setHeaderLabels(QStringList() << tr("File") << tr("Version"));
     ui.treeInfo->expandAll();
     ui.treeInfo->setColumnCount(2);
+    // disable quick install until version info is available
+    ui.buttonSmall->setEnabled(false);
+    ui.buttonComplete->setEnabled(false);
 
     connect(ui.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(updateTabs(int)));
     connect(ui.actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
@@ -177,6 +180,19 @@ void RbUtilQt::downloadDone(bool error)
     versmap.insert("arch_rev", info.value("dailies/rev").toString());
     versmap.insert("arch_date", info.value("dailies/date").toString());
 
+    info.beginGroup("release");
+    versmap.insert("rel_rev", info.value(settings->curPlatform()).toString());
+    info.endGroup();
+
+    if(versmap.value("rel_rev").isEmpty()) {
+        ui.buttonSmall->setEnabled(false);
+        ui.buttonComplete->setEnabled(false);
+    }
+    else {
+        ui.buttonSmall->setEnabled(true);
+        ui.buttonComplete->setEnabled(true);
+    }
+
     bleeding = new HttpGet(this);
     connect(bleeding, SIGNAL(done(bool)), this, SLOT(downloadBleedingDone(bool)));
     connect(bleeding, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadDone(int, bool)));
@@ -215,7 +231,7 @@ void RbUtilQt::downloadBleedingDone(bool error)
     versmap.insert("bleed_rev", info.value("bleeding/rev").toString());
     versmap.insert("bleed_date", info.value("bleeding/timestamp").toString());
     qDebug() << "versmap =" << versmap;
-    
+
     m_gotInfo = true;
 }
 
@@ -362,7 +378,7 @@ void RbUtilQt::completeInstall()
               "This will install Rockbox %1. To install the most recent "
               "development build available press \"Cancel\" and "
               "use the \"Installation\" tab.")
-              .arg(settings->lastRelease(settings->curPlatform())),
+              .arg(versmap.value("rel_rev")),
               QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
         return;
     // create logger
@@ -420,7 +436,7 @@ void RbUtilQt::smallInstall()
               "This will install Rockbox %1. To install the most recent "
               "development build available press \"Cancel\" and "
               "use the \"Installation\" tab.")
-              .arg(settings->lastRelease(settings->curPlatform())),
+              .arg(versmap.value("rel_rev")),
               QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
         return;
 
@@ -491,9 +507,8 @@ void RbUtilQt::installBtn()
 bool RbUtilQt::installAuto()
 {
     QString file = QString("%1/%2/rockbox-%3-%4.zip")
-            .arg(settings->releaseUrl(), settings->lastRelease(settings->curPlatform()),
-               settings->curPlatform(), settings->lastRelease(settings->curPlatform()));
-
+            .arg(settings->releaseUrl(), versmap.value(settings->curPlatform()),
+               settings->curPlatform(), versmap.value(settings->curPlatform()));
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
     buildInfo.close();
@@ -552,7 +567,7 @@ bool RbUtilQt::installAuto()
     ZipInstaller* installer = new ZipInstaller(this);
     installer->setUrl(file);
     installer->setLogSection("Rockbox (Base)");
-    installer->setLogVersion(settings->lastRelease(settings->curPlatform()));
+    installer->setLogVersion(versmap.value("rel_rev"));
     if(!settings->cacheDisabled())
         installer->setCache(true);
     installer->setMountPoint(settings->mountpoint());
@@ -571,13 +586,6 @@ void RbUtilQt::install()
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
     buildInfo.close();
-
-    if(settings->curReleased()) {
-        // only set the keys if needed -- querying will yield an empty string
-        // if not set.
-        versmap.insert("rel_rev", settings->lastRelease(settings->curPlatform()));
-        versmap.insert("rel_date", ""); // FIXME: provide the release timestamp
-    }
     installWindow->setVersionStrings(versmap);
 
     installWindow->show();

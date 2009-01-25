@@ -292,6 +292,9 @@ void Install::setVersionStrings(QMap<QString, QString> ver)
         ui.radioArchived->setEnabled(false);
         qDebug() << "no information about archived version available!";
     }
+    if(version.value("rel_rev").isEmpty()) {
+        ui.radioStable->setEnabled(false);
+    }
 
     // try to use the old selection first. If no selection has been made
     // in the past, use a preselection based on released status.
