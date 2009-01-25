@@ -47,7 +47,7 @@
 #define SC_NUM 0x80000000U
 #define SC_MUL_INIT \
     unsigned long macsr_st = coldfire_get_macsr(); \
-    coldfire_set_macsr(0);
+    coldfire_set_macsr(EMAC_UNSIGNED);
 #define SC_MUL_END coldfire_set_macsr(macsr_st);
 #define SC_MUL(x, y) \
 ({ \

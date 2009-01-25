@@ -54,6 +54,7 @@
 
 #define EMAC_ROUND      0x10
 #define EMAC_FRACTIONAL 0x20
+#define EMAC_UNSIGNED   0x40
 #define EMAC_SATURATE   0x80
 
 static inline void coldfire_set_macsr(unsigned long flags)
