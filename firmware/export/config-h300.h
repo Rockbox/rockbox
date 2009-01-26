@@ -68,6 +68,8 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
+/* Which backlight fading type? */
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_HW_REG
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
@@ -124,12 +126,6 @@
 #define HAVE_USB_CHARGING_ENABLE
 
 #ifndef SIMULATOR
-
-/* define this if the backlight thread is used for fade, not for sim, needs
- * HAVE_BACKLIGHT_BRIGHTNESS */
-#ifndef BOOTLOADER
-#define USE_BACKLIGHT_SW_FADING
-#endif
 
 /* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE

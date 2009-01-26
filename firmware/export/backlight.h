@@ -34,12 +34,10 @@ void backlight_close(void);
 
 int  backlight_get_current_timeout(void);
 
-#if defined(HAVE_BACKLIGHT_PWM_FADING)
+#if defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
 void backlight_set_fade_in(int value);
 void backlight_set_fade_out(int value);
-#endif
-#if defined(USE_BACKLIGHT_SW_FADING) \
-    || defined(USE_BACKLIGHT_CUSTOM_FADING_BOOL)
+#elif defined(HAVE_BACKLIGHT_FADING_BOOL_SETTING)
 void backlight_set_fade_in(bool value);
 void backlight_set_fade_out(bool value);
 #endif

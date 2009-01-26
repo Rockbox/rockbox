@@ -671,15 +671,14 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, remote_caption_backlight, LANG_CAPTION_BACKLIGHT,
                   false, "remote caption backlight", NULL),
 #endif
-#endif /* HAVE_BACKLIGHT */
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     INT_SETTING(F_NO_WRAP, brightness, LANG_BRIGHTNESS,
                 DEFAULT_BRIGHTNESS_SETTING, "brightness",UNIT_INT,
                 MIN_BRIGHTNESS_SETTING, MAX_BRIGHTNESS_SETTING, 1,
                 NULL, NULL, backlight_set_brightness),
 #endif
-#if defined(HAVE_BACKLIGHT_PWM_FADING)  && !defined(SIMULATOR)
     /* backlight fading */
+#if defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
     TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_fade_in,
                   LANG_BACKLIGHT_FADE_IN, 300, "backlight fade in", "off",
                   UNIT_MS, formatter_unit_0_is_off, getlang_unit_0_is_off,
@@ -689,13 +688,13 @@ const struct settings_list settings[] = {
                   UNIT_MS, formatter_unit_0_is_off, getlang_unit_0_is_off,
                   backlight_set_fade_out, 10,
                   0,100,200,300,500,1000,2000,3000,5000,10000),
-#elif defined(USE_BACKLIGHT_SW_FADING) \
-    || defined(USE_BACKLIGHT_CUSTOM_FADING_BOOL)
+#elif defined(HAVE_BACKLIGHT_FADING_BOOL_SETTING)
     OFFON_SETTING(0, backlight_fade_in, LANG_BACKLIGHT_FADE_IN,
                     true, "backlight fade in", backlight_set_fade_in),
     OFFON_SETTING(0, backlight_fade_out, LANG_BACKLIGHT_FADE_OUT,
                     true, "backlight fade out", backlight_set_fade_out),
 #endif
+#endif /* HAVE_BACKLIGHT */
     INT_SETTING(F_PADTITLE, scroll_speed, LANG_SCROLL_SPEED, 9,"scroll speed",
                 UNIT_INT, 0, 15, 1, NULL, NULL, lcd_scroll_speed),
     INT_SETTING(F_PADTITLE, scroll_delay, LANG_SCROLL_DELAY, 1000,

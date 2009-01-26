@@ -28,7 +28,7 @@
       beginning so that the display can be read to see song information. The
       amount of time is determined by the value of the backlight timeout
       setting, but is no less than 5 seconds.
-      \opt{backlight_fade_pwm}{
+      \opt{backlight_fade_int}{
         \item[Backlight Fade In:]
         The amount of time that the backlight will take to fade from off to on
         after a button is pressed. If set to \setting{Off} the backlight will
@@ -41,14 +41,14 @@
         fade out. Other valid values: \setting{500ms}, \setting{1s},
         \setting{2s}, \setting{3s}, \setting{4s}, \setting{5s} or \setting{10s}.
       }
-      \opt{backlight_fade_sw}{
+      \opt{backlight_fade_bool}{
         \item[Backlight Fade In:]
         This options turns on smooth backlight fading when the backlight is
-        activated. The fading time is dependent on the brightness level you
+        turning on. The fading time may dependent on the brightness level you
         have chosen. If it is turned off, the backlight will turn on immediately.
         \item[Backlight Fade Out:]
         This options turns on smooth backlight fading when the backlight is
-        deactivated. The fading time is dependent on the brightness level you
+        turning off. The fading time may dependent on the brightness level you
         have chosen. If it is turned off, the backlight will turn off immediately.
       }
       \item[First Keypress Enables Backlight Only:]

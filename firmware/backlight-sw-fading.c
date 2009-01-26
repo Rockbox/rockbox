@@ -30,7 +30,7 @@
 /* To adapt a target do:
  * - make sure _backlight_on doesn't set the brightness to something other than
  *  the previous value (lowest brightness in most cases)
- * - #define USE_BACKLIGHT_SW_FADING in config-<target>.h
+ * add proper #defines for software fading
  */
 
 /* can be MIN_BRIGHTNESS_SETTING-1 */

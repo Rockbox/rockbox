@@ -117,14 +117,13 @@
 #define MAX_BRIGHTNESS_SETTING          24
 #define DEFAULT_BRIGHTNESS_SETTING      12
 
+/* Implementation-defined fading type with bool settings */
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_TARGET
 
 #define HAVE_HEADPHONE_DETECTION
 #endif /* BOOTLOADER */
 
 #ifndef SIMULATOR
-
-/* Implementation-defined fading type with bool settings */
-#define USE_BACKLIGHT_CUSTOM_FADING_BOOL
 
 /* The LCD on a Gigabeat is 240x320 - it is portrait */
 #define HAVE_PORTRAIT_LCD

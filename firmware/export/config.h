@@ -113,6 +113,24 @@
 #define H300_REMOTE 2
 #define X5_REMOTE   3
 
+/* CONFIG_BACKLIGHT_FADING */
+/* No fading capabilities at all (yet) */
+#define BACKLIGHT_NO_FADING         0x0
+/* Backlight fading is controlled using a hardware PWM mechanism */
+#define BACKLIGHT_FADING_PWM        0x1
+/* Backlight is controlled using a software implementation
+ * BACKLIGHT_FADING_SW_SETTING means that backlight is turned on by only setting
+ * the brightness (i.e. no real difference between backlight_on and
+ * backlight_set_brightness)
+ * BACKLIGHT_FADING_SW_SETTING means that backlight brightness is restored
+ * "in hardware", from a hardware register upon backlight_on
+ * Both types need to have minor adjustments in the software fading code */
+#define BACKLIGHT_FADING_SW_SETTING 0x2
+#define BACKLIGHT_FADING_SW_HW_REG  0x4
+/* Backlight fading is done in a target specific way
+ * for example in hardware, but not controllable*/
+#define BACKLIGHT_FADING_TARGET     0x8
+
 /* CONFIG_CHARGING */
 
 /* Generic types */
@@ -348,7 +366,12 @@
 #include "config_caps.h"
 
 /* now set any CONFIG_ defines correctly if they are not used,
-   No need to do this on CONFIG_'s which are compulsary (e.g CONFIG_CODEC ) */
+   No need to do this on CONFIG_'s which are compulsory (e.g CONFIG_CODEC ) */
+
+#if !defined(CONFIG_BACKLIGHT_FADING)
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_NO_FADING
+#endif
+
 #ifndef CONFIG_TUNER
 #define CONFIG_TUNER 0
 #endif
@@ -412,6 +435,32 @@
 /* Multiple storage drivers */
 #define CONFIG_STORAGE_MULTI
 #endif
+
+/* deactive fading in bootloader/sim */
+#if defined(BOOTLOADER) || defined(SIMULATOR)
+#undef CONFIG_BACKLIGHT_FADING
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_NO_FADING
+#endif
+
+/* determine which setting/manual text to use,
+ * possibly overridden in target config */
+#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_PWM)
+
+#ifndef HAVE_BACKLIGHT_FADING_INT_SETTING
+#define HAVE_BACKLIGHT_FADING_INT_SETTING
+#endif
+
+#elif  (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
+    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG) \
+    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_TARGET)
+
+/* BACKLIGHT_FADING_TARGET may the setting to use */
+#if !defined(HAVE_BACKLIGHT_FADING_BOOL_SETTING) \
+    && !defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
+#define HAVE_BACKLIGHT_FADING_BOOL_SETTING
+#endif
+
+#endif /* CONFIG_BACKLIGHT_FADING */
 
 #if defined(BOOTLOADER) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
 /* Bootloaders don't use CPU frequency adjustment */

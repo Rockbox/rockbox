@@ -101,6 +101,9 @@
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
+/* Which backlight fading type? */
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
+
 /* define this if the unit uses a scrollwheel for navigation */
 #define HAVE_SCROLLWHEEL
 /* define from which rotation speed [degree/sec] on the acceleration starts */
@@ -134,12 +137,6 @@
 
 /** Non-simulator section **/
 #ifndef SIMULATOR
-
-/* define this if the backlight thread is used for fade, not for sim, needs
- * HAVE_BACKLIGHT_BRIGHTNESS */
-#ifndef BOOTLOADER
-#define USE_BACKLIGHT_SW_FADING
-#endif
 
 /* Define this if you have a PortalPlayer PP5024 */
 #define CONFIG_CPU PP5024

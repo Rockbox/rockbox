@@ -69,7 +69,7 @@
 #define HAVE_BACKLIGHT
 
 /* We can fade the backlight by using PWM */
-#define HAVE_BACKLIGHT_PWM_FADING
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_PWM
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF

@@ -90,6 +90,8 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
+/* Which backlight fading type? */
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_HW_REG
 
 /* define this if you have a disk storage, i.e. something
    that needs spinups and can cause skips when shaked */
@@ -126,12 +128,6 @@
 #define CURRENT_REMOTE      8  /* additional current when remote connected */
 
 #ifndef SIMULATOR
-
-/* define this if the backlight thread is used for fade, not for sim, needs
- * HAVE_BACKLIGHT_BRIGHTNESS */
-#ifndef BOOTLOADER
-#define USE_BACKLIGHT_SW_FADING
-#endif
 
 /* Define this if your LCD can set contrast */
 #define HAVE_LCD_CONTRAST

@@ -108,9 +108,10 @@
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
-
 /* Enable LCD brightness control */
 #define HAVE_BACKLIGHT_BRIGHTNESS
+/* Which backlight fading type? */
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_HW_REG
 
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING      1
@@ -129,13 +130,6 @@
 #define CONFIG_CHARGING CHARGING_SIMPLE
 
 #ifndef SIMULATOR
-
-/* define this if the backlight thread is used for fade, not for sim, needs
- * HAVE_BACKLIGHT_BRIGHTNESS */
-#ifndef BOOTLOADER
-#define USE_BACKLIGHT_SW_FADING
-#endif
-
 /* Define this if you have a TCC7801 */
 #define CONFIG_CPU TCC7801
 

@@ -90,6 +90,9 @@
 #define MAX_BRIGHTNESS_SETTING     12
 #define DEFAULT_BRIGHTNESS_SETTING  6
 
+/* Which backlight fading type? */
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
+
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 

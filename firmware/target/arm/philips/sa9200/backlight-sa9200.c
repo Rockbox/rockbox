@@ -39,15 +39,16 @@ void _backlight_on(void)
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
 #endif
-#ifndef USE_BACKLIGHT_SW_FADING
-    /* that part ain't useful when fading */
+#if (CONFIG_BACKLIGHT_FADING != BACKLIGHT_FADING_SW_SETTING) /* in bootloader/sim */
+    /* if we set the brightness to the settings value, then fading up
+     * is glitchy */
     _backlight_set_brightness(backlight_brightness);
 #endif
 }
 
 void _backlight_off(void)
 {
-    ascodec_write(AS3514_DCDC15, 0x0);
+    _backlight_set_brightness(0);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
 #endif

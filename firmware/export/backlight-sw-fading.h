@@ -22,10 +22,6 @@
 #ifndef BACKLIGHT_THREAD_FADING_H
 #define BACKLIGHT_THREAD_FADING_H
 
-#include "config.h"
-
-#ifdef USE_BACKLIGHT_SW_FADING
-
 /* delay supposed to be MAX_BRIGHTNESS_SETTING*2 rounded to the next multiple
  * of 5, however not more than 40 */
 #define _FADE_DELAY (((MAX_BRIGHTNESS_SETTING*2+4)/5)*5)
@@ -41,6 +37,5 @@ enum {
     FADING_UP,
     FADING_DOWN,
 };
-#endif /* USE_BACKLIGHT_SW_FADING */
 
 #endif /* _BACKLIGHT_THREAD_FADING_ */

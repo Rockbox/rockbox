@@ -52,7 +52,8 @@
 int backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
 #endif
 
-#ifdef USE_BACKLIGHT_SW_FADING
+#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
+    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
 #include "backlight-sw-fading.h"
 #endif
 #ifdef SIMULATOR
@@ -230,14 +231,15 @@ void backlight_lcd_sleep_countdown(bool start)
 }
 #endif /* HAVE_LCD_SLEEP */
 
-#ifdef USE_BACKLIGHT_SW_FADING
+#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
+    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
 static int backlight_fading_type = (FADING_UP|FADING_DOWN);
 static int backlight_fading_state = NOT_FADING;
 #endif
 
 
-#if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
 /* backlight fading */
+#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_PWM)
 #define BL_PWM_INTERVAL 5  /* Cycle interval in ms */
 #define BL_PWM_BITS     8
 #define BL_PWM_COUNT    (1<<BL_PWM_BITS)
@@ -410,9 +412,9 @@ void backlight_set_fade_out(int value)
     else
         bl_fade_out_step = 0;
 }
-#endif /* defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR) */
 
-#ifdef USE_BACKLIGHT_SW_FADING
+#elif  (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
+    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
 
 void backlight_set_fade_out(bool value)
 {
@@ -430,7 +432,7 @@ void backlight_set_fade_in(bool value)
         backlight_fading_type &= FADING_DOWN;
 }
 
-static void backlight_set_up_fade_up(void)
+static void backlight_setup_fade_up(void)
 {
     if (backlight_fading_type & FADING_UP)
     {
@@ -450,7 +452,7 @@ static void backlight_set_up_fade_up(void)
     }
 }
 
-static void backlight_set_up_fade_down(void)
+static void backlight_setup_fade_down(void)
 {
     if (backlight_fading_type & FADING_DOWN)
     {
@@ -461,16 +463,14 @@ static void backlight_set_up_fade_down(void)
         backlight_fading_state = NOT_FADING;
         _backlight_fade_update_state(MIN_BRIGHTNESS_SETTING-1);
         _backlight_off();
-    /* h300/x5/d2 go to the last known brightness level at backight_on(),which
-     * should be the lowest level to keep fading up glitch free
-     * targets which set brightness over AS3514 I2C make the backlight on only
-     * by setting the brightness, so this step would be noticeable */
-#if !defined(HAVE_AS3514)
+#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
+        /* write the lowest brightness level to the hardware so that
+         * fading up is glitch free */
         _backlight_set_brightness(MIN_BRIGHTNESS_SETTING);
 #endif
     }
 }
-#endif /* USE_BACKLIGHT_SW_FADING */
+#endif /* CONFIG_BACKLIGHT_FADING */
 
 /* Update state of backlight according to timeout setting */
 static void backlight_update_state(void)
@@ -498,8 +498,9 @@ static void backlight_update_state(void)
     if (UNLIKELY(backlight_timeout < 0))
     {
         backlight_timer = 0; /* Disable the timeout */
-#ifdef USE_BACKLIGHT_SW_FADING
-        backlight_set_up_fade_down();
+#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
+    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
+        backlight_setup_fade_down();
         /* necessary step to issue fading down when the setting is selected */
         queue_post(&backlight_queue, SYS_TIMEOUT, 0);
 #else
@@ -509,8 +510,9 @@ static void backlight_update_state(void)
     else
     {
         backlight_timer = backlight_timeout;
-#if defined(USE_BACKLIGHT_SW_FADING)
-        backlight_set_up_fade_up();
+#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
+    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
+        backlight_setup_fade_up();
 #else
         _backlight_on();
 #endif
@@ -555,15 +557,13 @@ void backlight_thread(void)
 
     while(1)
     {
-#if defined(USE_BACKLIGHT_SW_FADING)
+#if  (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
+    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
         if (backlight_fading_state)
             queue_wait_w_tmo(&backlight_queue, &ev, FADE_DELAY);
         else
 #endif
             queue_wait(&backlight_queue, &ev);
-/*
-#endif
-*/
         switch(ev.id)
         {   /* These events must always be processed */
 #ifdef _BACKLIGHT_FADE_BOOST
@@ -643,11 +643,12 @@ void backlight_thread(void)
 
             case BACKLIGHT_OFF:
                 backlight_timer = 0; /* Disable the timeout */
-#ifndef USE_BACKLIGHT_SW_FADING
+#if  (CONFIG_BACKLIGHT_FADING != BACKLIGHT_FADING_SW_SETTING) \
+    && (CONFIG_BACKLIGHT_FADING != BACKLIGHT_FADING_SW_HW_REG)
                 _backlight_off();
 #else
-                backlight_set_up_fade_down();
-#endif /* USE_BACKLIGHT_SW_FADING */
+                backlight_setup_fade_down();
+#endif /* CONFIG_BACKLIGHT_FADING */
                 break;
 #ifdef HAVE_LCD_SLEEP
             case LCD_SLEEP:
@@ -677,12 +678,13 @@ void backlight_thread(void)
                 remote_backlight_update_state();
 #endif
                 break;
-#if defined(USE_BACKLIGHT_SW_FADING)
+#if  (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
+    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
             case SYS_TIMEOUT:
                 if ((_backlight_fade_step(backlight_fading_state)))
-                    backlight_fading_state = NOT_FADING;
+                    backlight_fading_state = NOT_FADING; /* finished fading */
                 break;
-#endif /* USE_BACKLIGHT_SW_FADING */
+#endif /* CONFIG_BACKLIGHT_FADING */
         }
     } /* end while */
 }
@@ -733,11 +735,11 @@ void backlight_init(void)
 #ifndef SIMULATOR
     if (_backlight_init())
     {
-# ifdef HAVE_BACKLIGHT_PWM_FADING
+#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_PWM)
         /* If backlight is already on, don't fade in. */
         bl_dim_target = BL_PWM_COUNT;
         bl_dim_fraction = (BL_PWM_COUNT<<16);
-# endif
+#endif
     }
 #endif
     /* Leave all lights as set by the bootloader here. The settings load will
@@ -922,7 +924,8 @@ void backlight_set_brightness(int val)
 
     backlight_brightness = val;
     _backlight_set_brightness(val);
-#ifdef USE_BACKLIGHT_SW_FADING
+#if  (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
+    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
     /* receive backlight brightness */
     _backlight_fade_update_state(val);
 #endif

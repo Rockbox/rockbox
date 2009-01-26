@@ -96,9 +96,10 @@ drivers/lcd-remote-2bit-vi.c
 #endif /* LCD_REMOTE_DEPTH */
 #endif /* HAVE_REMOTE_LCD */
 
-#ifdef USE_BACKLIGHT_SW_FADING
+#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
+    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
 backlight-sw-fading.c
-#endif /* USE_BACKLIGHT_SW_FADING */
+#endif /* CONFIG_BACKLIGHT_FADING */
 
 /* Misc. */
 drivers/led.c

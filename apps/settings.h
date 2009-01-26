@@ -681,11 +681,10 @@ struct user_settings
     int lcd_sleep_after_backlight_off; /* when to put lcd to sleep after backlight
                                           has turned off */
 #endif
-#if defined(HAVE_BACKLIGHT_PWM_FADING)
+#if defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
     int backlight_fade_in;  /* backlight fade in timing: 0..3 */
     int backlight_fade_out; /* backlight fade in timing: 0..7 */
-#elif defined(USE_BACKLIGHT_SW_FADING) \
-    || defined(USE_BACKLIGHT_CUSTOM_FADING_BOOL)
+#elif defined(HAVE_BACKLIGHT_FADING_BOOL_SETTING)
     bool backlight_fade_in;
     bool backlight_fade_out;
 #endif

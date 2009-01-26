@@ -106,6 +106,14 @@
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
+/* Main LCD backlight brightness range and defaults */
+#define MIN_BRIGHTNESS_SETTING      1
+#define MAX_BRIGHTNESS_SETTING     12
+#define DEFAULT_BRIGHTNESS_SETTING  6
+
+/* Which backlight fading type? */
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
+
 /* define this if the unit uses a scrollwheel for navigation */
 #define HAVE_SCROLLWHEEL
 /* define from which rotation speed [degree/sec] on the acceleration starts */
@@ -133,12 +141,6 @@
 
 /** Non-simulator section **/
 #ifndef SIMULATOR
-
-/* define this if the backlight thread is used for fade, not for sim, needs
- * HAVE_BACKLIGHT_BRIGHTNESS */
-#ifndef BOOTLOADER
-#define USE_BACKLIGHT_SW_FADING
-#endif
 
 /* Define this if you have an AMS AS3525*/
 #define CONFIG_CPU AS3525
@@ -194,13 +196,6 @@
 #define INCLUDE_TIMEOUT_API
 
 #endif /* SIMULATOR */
-
-/** Port-specific settings **/
-
-/* Main LCD backlight brightness range and defaults */
-#define MIN_BRIGHTNESS_SETTING      1
-#define MAX_BRIGHTNESS_SETTING     12
-#define DEFAULT_BRIGHTNESS_SETTING  6
 
 /* Default recording levels */
 #define DEFAULT_REC_MIC_GAIN    23

@@ -70,7 +70,7 @@
 #define HAVE_BACKLIGHT
 
 /* We can fade the backlight by using PWM */
-#define HAVE_BACKLIGHT_PWM_FADING
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_PWM
 
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING      1
