@@ -145,6 +145,7 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
 {
     char line[MAX_PATH];
     char *s;
+    bool utf8 = false;
 
     DEBUGF("cue parse\n");
     int fd = open_utf8(file,O_RDONLY);
@@ -153,6 +154,8 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
         /* couln't open the file */
         return false;
     }
+    if(lseek(fd, 0, SEEK_CUR) > 0)
+        utf8 = true;
 
     /* Initialization */
     memset(cue, 0, sizeof(struct cuesheet));
@@ -206,9 +209,18 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
                     break;
             }
 
-            if (dest) {
-                dest = iso_decode(string, dest, -1, MIN(strlen(string), MAX_NAME));
-                *dest = '\0';
+            if (dest) 
+            {
+                if (!utf8)
+                {
+                    dest = iso_decode(string, dest, -1, MIN(strlen(string), MAX_NAME));
+                    *dest = '\0';
+                }
+                else
+                {
+                    strncpy(dest, string, MAX_NAME*3);
+                    dest[MAX_NAME*3] = '\0';
+                }
             }    
         }
     }
@@ -219,10 +231,10 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
     for (i = 0; i < cue->track_count; i++)
     {
         if (*(cue->tracks[i].performer) == '\0')
-            strncpy(cue->tracks[i].performer, cue->performer, MAX_NAME);
+            strncpy(cue->tracks[i].performer, cue->performer, MAX_NAME*3);
 
         if (*(cue->tracks[i].songwriter) == '\0')
-            strncpy(cue->tracks[i].songwriter, cue->songwriter, MAX_NAME);
+            strncpy(cue->tracks[i].songwriter, cue->songwriter, MAX_NAME*3);
     }
 
     return true;
