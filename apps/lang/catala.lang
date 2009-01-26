@@ -8292,14 +8292,14 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Disc ple. Prem OFF per continuar"
     h100,h120,h300: "Disc ple. Prem STOP per continuar"
     m5,x5: "Disc ple. Prem POWER per continuar"
-    e200*,c200: "Disc ple. Prem UP per continuar"
+    e200*,c200: "Disc ple. Prem PREV per continuar"
   </dest>
   <voice>
     *: none

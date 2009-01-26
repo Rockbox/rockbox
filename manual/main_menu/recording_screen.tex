@@ -15,10 +15,13 @@ affect the recorded sound. If enabled in the peak meter settings, a counter in
 front of the peak meters shows the number of times the clip indicator was
 activated during recording. The counter is reset to zero when starting a new
 recording.
+
 \opt{swcodec}{
+\opt{disk_storage}{
 \note{When you start a recording, the hard disk will spin up. This will cause
 the peak meters to freeze in the process. This is expected behaviour, and
-nothing to worry about. The recording continues during the spin up.}}
+nothing to worry about. The recording continues during the spin up.}}}
+
 \opt{MASCODEC}{The frequency, channels and quality}
 \opt{swcodec}{The frequency and channels} settings are shown on the last line.
 
@@ -38,7 +41,7 @@ The controls for this screen are:
                     & While recording: Stop recording.\\
     %
     \opt{IRIVER_H10_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,%
-         SANSA_E200_PAD,IPOD_4G_PAD}{
+         SANSA_E200_PAD,IPOD_4G_PAD,SANSA_C200_PAD}{
       \ActionRecNewfile & Starts recording.\\
                         & While recording: close the current file and open
                           a new one.\\

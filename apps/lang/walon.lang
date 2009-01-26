@@ -8321,14 +8321,14 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Li plake est pline. Tchôkîz OFF et tcheryî pus lon."
     h100,h120,h300: "Li plake est pline. Tchôkîz STOP et tcheryî pus lon."
     m5,x5: "Li plake est pline. Tchôkîz POWER et tcheryî pus lon."
-    e200*,c200: "Li plake est pline. Tchôkîz UP et tcheryî pus lon."
+    e200*,c200: "Li plake est pline. Tchôkîz PREV et tcheryî pus lon."
   </dest>
   <voice>
     *: none

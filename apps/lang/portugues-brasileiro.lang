@@ -8316,14 +8316,14 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "O disco está cheio. Pressione OFF para continuar."
     h100,h120,h300: "O disco está cheio. Pressione STOP para continuar."
     m5,x5: "O disco está cheio. Pressione POWER para continuar."
-    e200*,c200: "O disco está cheio. Pressione UP para continuar."
+    e200*,c200: "O disco está cheio. Pressione PREV para continuar."
   </dest>
   <voice>
     *: none

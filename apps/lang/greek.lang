@@ -8301,14 +8301,14 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Ο δίσκος είναι γεμάτος. Πατήστε OFF για συνέχεια."
     h100,h120,h300: "Ο δίσκος είναι γεμάτος. Πατήστε STOP για συνέχεια."
     m5,x5: "Ο δίσκος είναι γεμάτος. Πατήστε POWER για συνέχεια.."
-    e200*,c200: "Ο δίσκος είναι γεμάτος. Πατήστε UP για συνέχεια."
+    e200*,c200: "Ο δίσκος είναι γεμάτος. Πατήστε PREV για συνέχεια."
   </dest>
   <voice>
     *: none

@@ -8316,14 +8316,14 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Диск је пун. Притисните OFF за наставак."
     h100,h120,h300: "Диск је пун. Притисните STOP за наставак."
     m5,x5: "Диск је пун. Притисните POWER за наставак."
-    e200*,c200: "Диск је пун. Притисните UP за наставак."
+    e200*,c200: "Диск је пун. Притисните PREV за наставак."
   </dest>
   <voice>
     *: none
