@@ -51,7 +51,7 @@ void _backlight_on(void);
 void _backlight_off(void);
 
 /* Mini G1, G2, Video, Nano */
-#elif (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_PWM) 
+#elif (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_PWM) || defined(BOOTLOADER)
 
 #define _backlight_init() true
 void _backlight_hw_on(void);
