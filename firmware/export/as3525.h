@@ -322,6 +322,8 @@ interface */
 #define GPIOA_IC        (*(volatile unsigned char*)(GPIOA_BASE+0x41C))
 #define GPIOA_AFSEL     (*(volatile unsigned char*)(GPIOA_BASE+0x420))
 #define GPIOA_PIN(a)    (*(volatile unsigned char*)(GPIOA_BASE+(1<<((a)+2))))
+#define GPIOA_DATA      (*(volatile unsigned char*)(GPIOA_BASE+(0xff<<2)))
+
 
 #define GPIOB_DIR       (*(volatile unsigned char*)(GPIOB_BASE+0x400))
 #define GPIOB_IS        (*(volatile unsigned char*)(GPIOB_BASE+0x404))
@@ -333,6 +335,7 @@ interface */
 #define GPIOB_IC        (*(volatile unsigned char*)(GPIOB_BASE+0x41C))
 #define GPIOB_AFSEL     (*(volatile unsigned char*)(GPIOB_BASE+0x420))
 #define GPIOB_PIN(a)    (*(volatile unsigned char*)(GPIOB_BASE+(1<<((a)+2))))
+#define GPIOB_DATA      (*(volatile unsigned char*)(GPIOB_BASE+(0xff<<2)))
 
 #define GPIOC_DIR       (*(volatile unsigned char*)(GPIOC_BASE+0x400))
 #define GPIOC_IS        (*(volatile unsigned char*)(GPIOC_BASE+0x404))
@@ -344,6 +347,7 @@ interface */
 #define GPIOC_IC        (*(volatile unsigned char*)(GPIOC_BASE+0x41C))
 #define GPIOC_AFSEL     (*(volatile unsigned char*)(GPIOC_BASE+0x420))
 #define GPIOC_PIN(a)    (*(volatile unsigned char*)(GPIOC_BASE+(1<<((a)+2))))
+#define GPIOC_DATA      (*(volatile unsigned char*)(GPIOC_BASE+(0xff<<2)))
 
 #define GPIOD_DIR       (*(volatile unsigned char*)(GPIOD_BASE+0x400))
 #define GPIOD_IS        (*(volatile unsigned char*)(GPIOD_BASE+0x404))
@@ -355,6 +359,7 @@ interface */
 #define GPIOD_IC        (*(volatile unsigned char*)(GPIOD_BASE+0x41C))
 #define GPIOD_AFSEL     (*(volatile unsigned char*)(GPIOD_BASE+0x420))
 #define GPIOD_PIN(a)    (*(volatile unsigned char*)(GPIOD_BASE+(1<<((a)+2))))
+#define GPIOD_DATA      (*(volatile unsigned char*)(GPIOD_BASE+(0xff<<2)))
 
 /* ARM PL172 Memory Controller registers */
 
