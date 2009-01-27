@@ -26,7 +26,7 @@
 #include "font.h"
 #include "system.h"
 #include "sprintf.h"
-
+#include "string.h"
 
 #define _DEBUG_PRINTF(a,varargs...) \
     snprintf(buf, sizeof(buf), (a), ##varargs); lcd_puts(0,line++,buf)
@@ -42,7 +42,6 @@ bool __dbg_ports(void)
 {
     char buf[50];
     int line, i;
-    char counter = 0;
 
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
