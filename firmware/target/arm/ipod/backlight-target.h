@@ -50,8 +50,7 @@ bool _backlight_init(void);
 void _backlight_on(void);
 void _backlight_off(void);
 
-/* Mini G1, G2, Video, Nano */
-#elif (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_PWM) || defined(BOOTLOADER)
+#elif defined(IPOD_MINI) || defined(IPOD_MINI2G)
 
 #define _backlight_init() true
 void _backlight_hw_on(void);
@@ -67,7 +66,7 @@ void _backlight_hw_off(void);
 #define _backlight_off_normal() _backlight_hw_off()
 #endif
 
-#else /* G1, G2, G3 */
+#elif defined(IPOD_1G2G) || defined(IPOD_3G)
 
 #define _backlight_init() true
 void _backlight_on(void);
