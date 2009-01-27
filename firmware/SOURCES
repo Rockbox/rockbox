@@ -344,6 +344,7 @@ target/arm/pnx0101/system-pnx0101.c
 #endif
 
 #if CONFIG_CPU == AS3525
+target/arm/as3525/debug-as3525.c
 target/arm/as3525/system-as3525.c
 target/arm/as3525/kernel-as3525.c
 target/arm/as3525/ata_sd_as3525.c

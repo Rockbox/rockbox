@@ -42,8 +42,8 @@ static bool hold_button_old = false;
 #else
 #define hold_button false
 #endif /* !BOOTLOADER */
-static int      int_btn         = BUTTON_NONE;
-static short    dbop_din        = BUTTON_NONE;
+static int  int_btn         = BUTTON_NONE;
+short      _dbop_din        = BUTTON_NONE;
 
 void button_init_device(void)
 {
@@ -76,7 +76,7 @@ static void get_wheel(void)
         { 2, 0, 3, 1 }, /* Clockwise rotation */
         { 1, 3, 0, 2 }, /* Counter-clockwise  */ 
     };
-    wheel_value = dbop_din & (1<<13|1<<14);
+    wheel_value = _dbop_din & (1<<13|1<<14);
     wheel_value >>= 13;
     /* did the wheel value change? */    
     if (!hold_button)
@@ -130,7 +130,7 @@ static void get_wheel(void)
 /* get hold button state */
 static void get_hold(void)
 {
-    hold_button = dbop_din & (1<<12);
+    hold_button = _dbop_din & (1<<12);
 }
 #endif
 
@@ -141,7 +141,7 @@ bool button_hold(void)
 
 static void get_power(void)
 {
-    if (dbop_din & (1<<8))
+    if (_dbop_din & (1<<8))
         int_btn |= BUTTON_POWER;
 }
 
@@ -172,7 +172,7 @@ static void get_button_from_dbob(void)
         temp = DBOP_STAT;
     } while ((temp & (1<<16)) == 0); /* wait for valid data */
 
-    dbop_din = DBOP_DIN; /* now read */
+    _dbop_din = DBOP_DIN; /* now read */
 
     DBOP_TIMPOL_01 = 0x6e167;
     DBOP_TIMPOL_23 = 0xa167e06f;
