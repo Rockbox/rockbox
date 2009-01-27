@@ -857,7 +857,7 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/tatung/tpj1022/adc-tpj1022.c
+target/arm/adc-pp5020.c
 target/arm/tatung/tpj1022/backlight-tpj1022.c
 target/arm/tatung/tpj1022/button-tpj1022.c
 target/arm/tatung/tpj1022/lcd-tpj1022.c

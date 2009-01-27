@@ -21,15 +21,6 @@
 #ifndef _ADC_TARGET_H_
 #define _ADC_TARGET_H_
 
-#define ADC_ENABLE_ADDR     (*(volatile unsigned long*)(0x70000010))
-#define ADC_ENABLE          0x1100
-
-#define ADC_ADDR            (*(volatile unsigned long*)(0x7000ad00))
-#define ADC_STATUS          (*(volatile unsigned long*)(0x7000ad04))
-#define ADC_DATA_1          (*(volatile unsigned long*)(0x7000ad20))
-#define ADC_DATA_2          (*(volatile unsigned long*)(0x7000ad24))
-#define ADC_INIT            (*(volatile unsigned long*)(0x7000ad2c))
-
 #define NUM_ADC_CHANNELS 4
 
 #define ADC_BATTERY     0
