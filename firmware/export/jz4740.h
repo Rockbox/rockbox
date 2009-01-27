@@ -3381,13 +3381,17 @@ static __inline__ unsigned int __cpm_get_pllout(void)
     unsigned long m, n, no, pllout;
     unsigned long cppcr = REG_CPM_CPPCR;
     unsigned long od[4] = {1, 2, 2, 4};
-    if ((cppcr & CPM_CPPCR_PLLEN) && !(cppcr & CPM_CPPCR_PLLBP)) {
+    
+    if ((cppcr & CPM_CPPCR_PLLEN) && !(cppcr & CPM_CPPCR_PLLBP))
+    {
         m = __cpm_get_pllm() + 2;
         n = __cpm_get_plln() + 2;
         no = od[__cpm_get_pllod()];
         pllout = ((JZ_EXTAL) / (n * no)) * m;
-    } else
+    }
+    else
         pllout = JZ_EXTAL;
+    
     return pllout;
 }
 
@@ -3447,23 +3451,19 @@ static __inline__ unsigned int __cpm_get_pixclk(void)
 /* I2S clock */
 static __inline__ unsigned int __cpm_get_i2sclk(void)
 {
-    if (REG_CPM_CPCCR & CPM_CPCCR_I2CS) {
+    if (REG_CPM_CPCCR & CPM_CPCCR_I2CS)
         return __cpm_get_pllout2() / (__cpm_get_i2sdiv() + 1);
-    }
-    else {
+    else
         return JZ_EXTAL;
-    }
 }
 
 /* USB clock */
 static __inline__ unsigned int __cpm_get_usbclk(void)
 {
-    if (REG_CPM_CPCCR & CPM_CPCCR_UCS) {
+    if (REG_CPM_CPCCR & CPM_CPCCR_UCS)
         return __cpm_get_pllout2() / (__cpm_get_udiv() + 1);
-    }
-    else {
+    else
         return JZ_EXTAL;
-    }
 }
 
 /* MSC clock */
@@ -3492,12 +3492,10 @@ static inline void __cpm_select_msc_clk(int sd)
     unsigned int pllout2 = __cpm_get_pllout2();
     unsigned int div = 0;
 
-    if (sd) {
+    if (sd)
         div = pllout2 / 24000000;
-    }
-    else {
+    else
         div = pllout2 / 16000000;
-    }
 
     REG_CPM_MSCCDR = div - 1;
 }
@@ -3510,12 +3508,11 @@ static inline void __cpm_select_msc_hs_clk(int sd)
     unsigned int pllout2 = __cpm_get_pllout2();
     unsigned int div = 0;
 
-    if (sd) {
+    if (sd)
         div = pllout2 / 48000000;
-    }
-    else {
+    else
         div = pllout2 / 16000000;
-    }
+
     REG_CPM_MSCCDR = div - 1;
 }
 

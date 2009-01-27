@@ -1220,6 +1220,7 @@ target/mips/ingenic_jz47xx/ata-nand-jz4740.c
 target/mips/ingenic_jz47xx/ata-sd-jz4740.c
 target/mips/ingenic_jz47xx/codec-jz4740.c
 target/mips/ingenic_jz47xx/kernel-jz4740.c
+target/mips/ingenic_jz47xx/i2c-jz4740.c
 target/mips/ingenic_jz47xx/lcd-jz4740.c
 target/mips/ingenic_jz47xx/pcm-jz4740.c
 target/mips/ingenic_jz47xx/system-jz4740.c
@@ -1231,6 +1232,7 @@ drivers/nand_id.c
 target/mips/ingenic_jz47xx/onda_vx747/backlight-onda_vx747.c
 target/mips/ingenic_jz47xx/onda_vx747/lcd-onda_vx747.c
 target/mips/ingenic_jz47xx/onda_vx747/sadc-onda_vx747.c
+target/mips/ingenic_jz47xx/onda_vx747/power-onda_vx747.c
 #endif
 
 #ifdef ONDA_VX767

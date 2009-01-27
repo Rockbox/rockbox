@@ -69,14 +69,6 @@ bool lcd_enabled(void)
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
-#if 1
-    /* This is an ugly HACK until partial LCD drawing works.. */
-    width = LCD_WIDTH;
-    height = LCD_HEIGHT;
-    x = 0;
-    y = 0;
-#endif
-
     mutex_lock(&lcd_mtx);
     
     __cpm_start_lcd();

@@ -28,7 +28,6 @@ static unsigned short codec_base_gain;
 static unsigned short codec_mic_gain;
 static bool HP_on_off_flag; 
 static int HP_register_value; 
-static int IS_WRITE_PCM;
 
 static void i2s_codec_set_samplerate(unsigned short rate);
 
@@ -44,6 +43,9 @@ static void i2s_codec_reset(void)
 
 static void i2s_codec_init(void)
 {
+    __cpm_start_aic1();
+    __cpm_start_aic2();
+    
     __aic_enable();
     
     __i2s_internal_codec();
@@ -185,7 +187,6 @@ static unsigned short i2s_codec_get_volume(void)
 static void i2s_codec_set_samplerate(unsigned short rate)
 {
     unsigned short speed = 0;
-    unsigned short val = 0;
     
     switch (rate)
     {

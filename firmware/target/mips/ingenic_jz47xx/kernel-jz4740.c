@@ -39,7 +39,8 @@ void tick_start(unsigned int interval_in_ms)
     __tcu_select_extalclk(0);
     __tcu_select_clk_div4(0);
     
-    latch = (JZ_EXTAL / 4 + (interval_in_ms>>1)) / interval_in_ms;
+    /* 12Mhz / 4 = 3Mhz */
+    latch = interval_in_ms*1000 * 3;
 
     REG_TCU_TCNT(0) = 0;
     REG_TCU_TDFR(0) = latch;

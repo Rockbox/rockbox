@@ -240,6 +240,34 @@ void lcd_set_target(short x, short y, short width, short height)
     SLCD_SET_COMMAND(REG_RW_GRAM); /* write data to GRAM */
 }
 
+void lcd_set_flip(bool yesno)
+{
+    int i;
+    
+    __cpm_start_lcd();
+#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
+    if(yesno)
+    {
+        SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_HWM));
+    }
+    else
+    {
+        SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_HID | ENTRY_MODE_HWM));
+    }
+#else
+    if(yesno)
+    {
+        SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_HID | ENTRY_MODE_AM));
+    }
+    else
+    {
+        SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_AM));
+    }
+#endif
+    DELAY;
+    __cpm_stop_lcd();
+}
+
 void lcd_on(void)
 {
     _display_on();

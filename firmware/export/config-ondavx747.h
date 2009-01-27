@@ -121,7 +121,7 @@
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
 /* Hardware controlled charging with monitoring */
-//#define CONFIG_CHARGING CHARGING_MONITOR
+#define CONFIG_CHARGING CHARGING_MONITOR
 
 #ifndef SIMULATOR
 

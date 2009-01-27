@@ -38,9 +38,7 @@ static struct wakeup sd_wakeup;
 
 #define DEBUG(x...) logf(x);
 
-#ifdef MMC_CD_PIN
 #define MMC_INSERT_STATUS() __gpio_get_pin(MMC_CD_PIN)
-#endif
 
 #define MMC_RESET()         __msc_reset()
 
@@ -367,7 +365,7 @@ struct mmc_request
 
 static int use_4bit;        /* Use 4-bit data bus */
 static int num_6;
-static int sd2_0;
+static int sd2_0 = 1;
 
 /* Stop the MMC clock and wait while it happens */
 static inline int jz_mmc_stop_clock(void)
@@ -766,7 +764,7 @@ static int jz_mmc_exec_cmd(struct mmc_request *request)
     jz_mmc_stop_clock();
 
     /* mask all interrupts */
-    //REG_MSC_IMASK = 0xffff;
+    REG_MSC_IMASK = 0xffff;
     /* clear status */
     REG_MSC_IREG = 0xffff;
     /*open interrupt */
@@ -812,7 +810,6 @@ static int jz_mmc_exec_cmd(struct mmc_request *request)
         case 6:
             if (num_6 < 2)
             {
-
 #if defined(MMC_DMA_ENABLE)
                 cmdat |=
                     MSC_CMDAT_DATA_EN | MSC_CMDAT_READ |
@@ -992,10 +989,7 @@ static int jz_mmc_exec_cmd(struct mmc_request *request)
 ********************************************************************************************************************/
 static int jz_mmc_chkcard(void)
 {
-    if (MMC_INSERT_STATUS() == 0)
-        return 1;    /* insert entirely */
-    else
-        return 0;    /* not insert entirely */
+    return (MMC_INSERT_STATUS() == 0 ? 1 : 0);
 }
 
 #if MMC_DMA_INTERRUPT
@@ -1044,13 +1038,13 @@ void MSC(void)
 static void jz_mmc_hardware_init(void)
 {
     mmc_init_gpio();     /* init GPIO */
+    __cpm_start_msc();   /* enable mmc clock */
 #ifdef MMC_POWER_ON
     MMC_POWER_ON();      /* turn on power of card */
 #endif
     MMC_RESET();         /* reset mmc/sd controller */
     MMC_IRQ_MASK();      /* mask all IRQs */
     jz_mmc_stop_clock(); /* stop MMC/SD clock */
-    __cpm_start_msc();
 #ifdef MMC_DMA_ENABLE
 //    __cpm_start_dmac();
 //    __dmac_enable_module();
@@ -1101,7 +1095,7 @@ int _sd_init(void)
 
 bool card_detect_target(void)
 {
-    return jz_mmc_chkcard() == 1;
+    return (jz_mmc_chkcard() == 1);
 }
 
 #ifdef HAVE_HOTSWAP

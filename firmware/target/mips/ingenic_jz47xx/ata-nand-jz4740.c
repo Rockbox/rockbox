@@ -85,21 +85,20 @@ struct nand_param
  *
  */
 
-#define NAND_DATAPORT        0xB8000000
-#define NAND_ADDRPORT        0xB8010000
-#define NAND_COMMPORT        0xB8008000
+static volatile unsigned long nand_address;
+#define NAND_DATAPORT      (nand_address)
+#define NAND_ADDRPORT      (nand_address+0x10000)
+#define NAND_COMMPORT      (nand_address+0x08000)
 
-#define ECC_BLOCK        512
-#define ECC_POS          6
-#define PAR_SIZE         9
+#define ECC_BLOCK          512
+#define ECC_POS            6
+#define PAR_SIZE           9
 
 #define __nand_cmd(n)      (REG8(NAND_COMMPORT) = (n))
 #define __nand_addr(n)     (REG8(NAND_ADDRPORT) = (n))
 #define __nand_data8()     (REG8(NAND_DATAPORT))
 #define __nand_data16()    (REG16(NAND_DATAPORT))
 
-#define __nand_enable()        (REG_EMC_NFCSR |= EMC_NFCSR_NFE1 | EMC_NFCSR_NFCE1)
-#define __nand_disable()       (REG_EMC_NFCSR &= ~(EMC_NFCSR_NFCE1))
 #define __nand_ecc_rs_encoding() \
     (REG_EMC_NFECR = EMC_NFECR_ECCE | EMC_NFECR_ERST | EMC_NFECR_RS | EMC_NFECR_RS_ENCODING)
 #define __nand_ecc_rs_decoding() \
@@ -111,6 +110,9 @@ struct nand_param
 /*--------------------------------------------------------------*/
 
 static struct nand_info* chip_info = NULL;
+static struct nand_info* banks[4];
+static unsigned int nr_banks = 1;
+static unsigned long bank_size;
 static struct nand_param internal_param;
 #ifdef USE_DMA
 static struct mutex nand_mtx;
@@ -344,6 +346,9 @@ static int jz_nand_read_page(unsigned long page_addr, unsigned char *dst)
     int i, j;
     unsigned char *data_buf;
     unsigned char oob_buf[nandp->oob_size];
+    
+    if(nand_address == 0)
+        return -1;
 
     page_size = nandp->page_size;
     oob_size = nandp->oob_size;
@@ -463,44 +468,112 @@ static int jz_nand_read_page(unsigned long page_addr, unsigned char *dst)
 }
 
 /*
- * Enable NAND controller
- */
-static void jz_nand_enable(void)
-{
-    __nand_enable();
-
-    REG_EMC_SMCR1 = 0x04444400;
-}
-
-/*
  * Disable NAND controller
  */
 static void jz_nand_disable(void)
 {
-    __nand_disable();
+    REG_EMC_NFCSR &= ~(EMC_NFCSR_NFCE1 | EMC_NFCSR_NFCE2 |
+                       EMC_NFCSR_NFCE3 | EMC_NFCSR_NFCE4 |
+                       EMC_NFCSR_NFE1 | EMC_NFCSR_NFE2   |
+                       EMC_NFCSR_NFE3 | EMC_NFCSR_NFE4   );
+}
+
+/*
+ * Enable NAND controller
+ */
+static void jz_nand_enable(void)
+{    
+#if 0
+    /* OF RE */
+    REG_GPIO_PXFUNS(1) = 0x1E018000; // __gpio_as_func0() start
+    REG_GPIO_PXSELC(1) = 0x1E018000; // __gpio_as_func0() end
+    
+    REG_GPIO_PXFUNS(2) = 0x3000<<16; // __gpio_as_func0() start
+    REG_GPIO_PXSELC(2) = 0x3000<<16; // __gpio_as_func0() end
+    
+    REG_GPIO_PXFUNC(2) = 0x4000<<16; // __gpio_port_as_input() start
+    REG_GPIO_PXSELC(2) = 0x4000<<16;
+    REG_GPIO_PXDIRC(2) = 0x4000<<16; // __gpio_port_as_input() end
+    REG_GPIO_PXPES(2) = 0x4000<<16; // __gpio_disable_pull()
+    
+    REG_GPIO_PXFUNS(1) = 0x40<<16; // __gpio_as_func0() start
+    REG_GPIO_PXSELC(1) = 0x40<<16; // __gpio_as_func0() end
+    
+    REG_EMC_SMCR1 = (REG_EMC_SMCR1 & 0xFF) | 0x4621200;
+    REG_EMC_SMCR2 = (REG_EMC_SMCR2 & 0xFF) | 0x4621200;
+    REG_EMC_SMCR3 = (REG_EMC_SMCR3 & 0xFF) | 0x4621200;
+    REG_EMC_SMCR4 = (REG_EMC_SMCR4 & 0xFF) | 0x4621200;
+    
+    REG_EMC_SMCR1 = REG_EMC_SMCR2 = REG_EMC_SMCR3 = REG_EMC_SMCR4 = 0x6621200;
+#else
+    REG_EMC_SMCR1 = REG_EMC_SMCR2 = REG_EMC_SMCR3 = REG_EMC_SMCR4 = 0x04444400;
+#endif
+}
+
+static void jz_nand_select(int bank)
+{
+    REG_EMC_NFCSR |= (EMC_NFCSR_NFE(bank+1) | EMC_NFCSR_NFCE(bank+1));
+
+    switch(bank)
+    {
+        case 0:
+            nand_address = 0xB8000000;
+            break;
+        case 1:
+            nand_address = 0xB4000000;
+            break;
+        case 2:
+            nand_address = 0xAC000000;
+            break;
+        case 3:
+            nand_address = 0xA8000000;
+            break;
+    }
+}
+
+static void jz_nand_deselect(int bank)
+{
+    REG_EMC_NFCSR &= ~(EMC_NFCSR_NFE(bank+1) | EMC_NFCSR_NFCE(bank+1));
+    nand_address = 0;
 }
 
 static int jz_nand_init(void)
 {
     unsigned char cData[5];
+    int i;
     
     jz_nand_enable();
     
-    __nand_cmd(NAND_CMD_READID);
-    __nand_addr(NAND_CMD_READ0);
-    cData[0] = __nand_data8();
-    cData[1] = __nand_data8();
-    cData[2] = __nand_data8();
-    cData[3] = __nand_data8();
-    cData[4] = __nand_data8();
-    
-    chip_info = nand_identify(cData);
-    if(chip_info == NULL)
+    for(i=0; i<4; i++)
     {
-        panicf("Unknown NAND flash chip: 0x%x 0x%x 0x%x 0x%x 0x%x", cData[0],
-                                      cData[1], cData[2], cData[3], cData[4]);
-        return -1; /* panicf() doesn't return though */
+        jz_nand_select(i);
+        
+        __nand_cmd(NAND_CMD_READID);
+        __nand_addr(NAND_CMD_READ0);
+        cData[0] = __nand_data8();
+        cData[1] = __nand_data8();
+        cData[2] = __nand_data8();
+        cData[3] = __nand_data8();
+        cData[4] = __nand_data8();
+        
+        jz_nand_deselect(i);
+        
+        logf("NAND chip %d: 0x%x 0x%x 0x%x 0x%x 0x%x", i+1, cData[0], cData[1],
+                                                  cData[2], cData[3], cData[4]);
+        
+        banks[i] = nand_identify(cData);
+        
+        if(banks[i] != NULL)
+            nr_banks++;
+        
+        if(i == 0 && banks[i] == NULL)
+        {
+            panicf("Unknown NAND flash chip: 0x%x 0x%x 0x%x 0x%x 0x%x", cData[0],
+                                          cData[1], cData[2], cData[3], cData[4]);
+            return -1; /* panicf() doesn't return though */
+        }
     }
+    chip_info = banks[0];
     
     internal_param.bus_width = 8;
     internal_param.row_cycle = chip_info->row_cycles;
@@ -508,13 +581,17 @@ static int jz_nand_init(void)
     internal_param.oob_size = chip_info->spare_size;
     internal_param.page_per_block = chip_info->pages_per_block;
     
+    bank_size = chip_info->page_size * chip_info->blocks_per_bank / 512 * chip_info->pages_per_block;
+    
+    jz_nand_disable();
+    
     return 0;
 }
 
-static bool inited = false;
 int nand_init(void)
 {
     int res = 0;
+    static bool inited = false;
     
     if(!inited)
     {
@@ -533,29 +610,37 @@ int nand_init(void)
 
 int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
 {
-    int i, ret = 0;
+    int i, ret = 0, chip_size = chip_info->page_size;
     
     logf("nand_read_sectors(%ld, %d, 0x%x)", start, count, (int)buf);
     
     start *= 512;
     count *= 512;
     
-    if(count <= chip_info->page_size)
+    if(count <= chip_size)
     {
-        ret = jz_nand_read_page(start/chip_info->page_size, temp_page);
-        memcpy(buf, temp_page+(start%chip_info->page_size), count);
-        return ret;
+        jz_nand_select(start / 512 / bank_size);
+        
+        ret = jz_nand_read_page(start/chip_size, temp_page);
+        memcpy(buf, temp_page+(start%chip_size), count);
+        
+        jz_nand_deselect(start / 512 / bank_size);
     }
     else
     {
-        for(i=0; i<count && ret==0; i+=chip_info->page_size)
+        for(i=0; i<count && ret==0; i+=chip_size)
         {
-            ret = jz_nand_read_page((start+i)/chip_info->page_size, temp_page);
-            memcpy(buf+i, temp_page+((start+i)%chip_info->page_size),
-                   (count-i < chip_info->page_size ? count-i : chip_info->page_size));
+            jz_nand_select((start/512+i) / bank_size);
+            
+            ret = jz_nand_read_page((start+i)/chip_size, temp_page);
+            memcpy(buf+i, temp_page+((start+i)%chip_size),
+                   (count-i < chip_size ? count-i : chip_size));
+            
+            jz_nand_deselect((start/512+i) / bank_size);
         }
-        return ret;
     }
+    
+    return ret;
 }
 
 /* TODO */
@@ -605,6 +690,7 @@ void nand_enable(bool on)
 void nand_get_info(IF_MV2(int drive,) struct storage_info *info)
 {
     (void)drive;
+    
     /* firmware version */
     info->revision="0.00";
 
@@ -612,8 +698,7 @@ void nand_get_info(IF_MV2(int drive,) struct storage_info *info)
     info->product="NAND Storage";
 
     /* blocks count */
-    /* TODO: proper amount of sectors! */
-    info->num_sectors = ((chip_info->page_size+chip_info->spare_size) / 512) * chip_info->pages_per_block * chip_info->blocks_per_bank;
+    info->num_sectors = bank_size * nr_banks;
     info->sector_size = 512;
 }
 #endif
