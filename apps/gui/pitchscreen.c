@@ -24,17 +24,12 @@
 #include <stdio.h>
 #include "config.h"
 #include "sprintf.h"
-#include "settings.h"
 #include "action.h"
-#include "system.h"
-#include "font.h"
-#include "misc.h"
 #include "dsp.h"
 #include "sound.h"
 #include "pcmbuf.h"
 #include "lang.h"
 #include "icons.h"
-#include "screen_access.h"
 #include "screens.h"
 #include "statusbar.h"
 #include "viewport.h"
@@ -66,13 +61,14 @@ enum
 static void pitchscreen_fix_viewports(struct viewport *parent,
         struct viewport pitch_viewports[PITCH_ITEM_COUNT])
 {
-    short n, height;
+    int i, height;
     height = font_get(parent->font)->height;
-    for (n = 0; n < PITCH_ITEM_COUNT; n++)
+    for (i = 0; i < PITCH_ITEM_COUNT; i++)
     {
-        pitch_viewports[n] = *parent;
-        pitch_viewports[n].height = height;
+        pitch_viewports[i] = *parent;
+        pitch_viewports[i].height = height;
     }
+
     pitch_viewports[PITCH_TOP].y += ICON_BORDER;
 
     pitch_viewports[PITCH_MID].x += ICON_BORDER;
@@ -80,6 +76,7 @@ static void pitchscreen_fix_viewports(struct viewport *parent,
     pitch_viewports[PITCH_MID].height = height * 2;
     pitch_viewports[PITCH_MID].y += parent->height / 2 -
             pitch_viewports[PITCH_MID].height / 2;
+
     pitch_viewports[PITCH_BOTTOM].y += parent->height - height - ICON_BORDER;
 }
 
@@ -108,7 +105,7 @@ static void pitchscreen_draw (struct screen *display, int max_lines,
 {
     unsigned char* ptr;
     unsigned char buf[32];
-    int w, h;
+    int width_val, w, h;
     bool show_lang_pitch;
 
      /* Hide "Pitch up/Pitch down" for a small screen */
@@ -126,6 +123,7 @@ static void pitchscreen_draw (struct screen *display, int max_lines,
         /* draw text */
         display->putsxy((pitch_viewports[PITCH_TOP].width / 2) -
                 (w / 2), 0, ptr);
+        display->update_viewport();
 
         /* DOWN: Pitch Down */
         display->set_viewport(&pitch_viewports[PITCH_BOTTOM]);
@@ -139,6 +137,7 @@ static void pitchscreen_draw (struct screen *display, int max_lines,
         /* draw text */
         display->putsxy((pitch_viewports[PITCH_BOTTOM].width / 2) -
                 (w / 2), 0, ptr);
+        display->update_viewport();
     }
     display->set_viewport(&pitch_viewports[PITCH_MID]);
 
@@ -150,35 +149,33 @@ static void pitchscreen_draw (struct screen *display, int max_lines,
         display->putsxy((pitch_viewports[PITCH_MID].width / 2) - (w / 2),
                 0, buf);
 
-    /* we don't need max_lines any more, reuse it*/
-    max_lines = w;
     /* "XXX.X%" */
     snprintf((char *)buf, sizeof(buf), "%d.%d%%",
             pitch / 10, pitch % 10 );
-    display->getstringsize(buf,&w,&h);
+    display->getstringsize(buf,&width_val,&h);
     display->putsxy((pitch_viewports[PITCH_MID].width / 2) - (w / 2),
             (show_lang_pitch? h : h/2), buf);
 
     /* What's wider? LANG_PITCH or the value?
      * Only interesting if LANG_PITCH is actually drawn */
-    max_lines = (show_lang_pitch ? ((max_lines > w) ? max_lines : w) : w);
+    if (show_lang_pitch && width_val > w)
+        w = width_val;
 
     /* Let's treat '+' and '-' as equally wide
      * This saves a getstringsize call
      * Also, it wouldn't look nice if -2% shows up, but +2% not */
-    display->getstringsize("+2%",&w,&h);
-    max_lines += 2*w;
+    display->getstringsize("+2%",&width_val,&h);
+    w += width_val*2;
     /* hide +2%/-2% for a narrow screens */
-    if (max_lines < pitch_viewports[PITCH_MID].width)
+    if (w <= pitch_viewports[PITCH_MID].width)
     {
         /* RIGHT: +2% */
-        display->putsxy(pitch_viewports[PITCH_MID].width - w, h /2, "+2%");
+        display->putsxy(pitch_viewports[PITCH_MID].width - width_val, h /2, "+2%");
         /* LEFT: -2% */
         display->putsxy(0, h / 2, "-2%");
     }
-    /* Lastly, a fullscreen update */
+    display->update_viewport();
     display->set_viewport(NULL);
-    display->update();
 }
 
 static int pitch_increase(int pitch, int delta, bool allow_cutoff)
@@ -255,16 +252,15 @@ static int pitch_increase_semitone(int pitch, bool up)
 
 int gui_syncpitchscreen_run(void)
 {
-    int button;
+    int button, i;
     int pitch = sound_get_pitch();
     int new_pitch, delta = 0;
     bool nudged = false;
     bool exit = false;
-    short i;
-    struct viewport parent[NB_SCREENS]; /* should maybe 
-                                           be a parameter of this function */
-    short max_lines[NB_SCREENS];
+    /* should maybe be passed per parameter later, not needed for now */
+    struct viewport parent[NB_SCREENS];
     struct viewport pitch_viewports[NB_SCREENS][PITCH_ITEM_COUNT];
+    int max_lines[NB_SCREENS];
 
     /* initialize pitchscreen vps */
     FOR_NB_SCREENS(i)
@@ -276,11 +272,12 @@ int gui_syncpitchscreen_run(void)
 
         /* also, draw the icons now, it's only needed once */
         pitchscreen_draw_icons(&screens[i], &parent[i]);
+        screens[i].update();
     }
 #if CONFIG_CODEC == SWCODEC
     pcmbuf_set_low_latency(true);
 #endif
-    i = 0;
+
     while (!exit)
     {
         FOR_NB_SCREENS(i)
