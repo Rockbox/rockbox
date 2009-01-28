@@ -366,11 +366,6 @@ static int info_speak_item(int selected_item, void * data)
 
 static int info_action_callback(int action, struct gui_synclist *lists)
 {
-#if CONFIG_CHARGING
-    if (action == ACTION_NONE)
-        return ACTION_REDRAW;
-    else
-#endif
     if (action == ACTION_STD_CANCEL)
         return action;
     else if ((action == ACTION_STD_OK)
@@ -411,9 +406,6 @@ static bool show_info(void)
     if(global_settings.talk_menu)
          info.get_talk = info_speak_item;
     info.action_callback = info_action_callback;
-#if CONFIG_CHARGING
-    info.timeout = HZ;
-#endif
     return simplelist_show_list(&info);
 }
 MENUITEM_FUNCTION(show_info_item, 0, ID2P(LANG_ROCKBOX_INFO),
