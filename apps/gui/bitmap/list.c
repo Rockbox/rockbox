@@ -70,18 +70,17 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
     if (!list_display_title(list, screen))
         return false;
     title_text[screen] = *(list->parent[screen]);
-    title_text[screen].height
-            = font_get(title_text[screen].font)->height;
+    title_text[screen].height = font_get(title_text[screen].font)->height;
+
     if (list->title_icon != Icon_NOICON && global_settings.show_icons)
     {
-        struct viewport title_icon = *(list->parent[screen]);
-        title_icon = title_text[screen];
+        struct viewport title_icon = title_text[screen];
         title_icon.width = get_icon_width(screen)
                           + ICON_PADDING*2;
         title_icon.x += ICON_PADDING;
 
-        title_text[screen].width -= title_icon.width + title_icon.x;
-        title_text[screen].x += title_icon.width + title_icon.x;
+        title_text[screen].width -= title_icon.width;
+        title_text[screen].x += title_icon.width;
 
         display->set_viewport(&title_icon);
         screen_put_icon(display, 0, 0, list->title_icon);
