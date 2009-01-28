@@ -194,18 +194,24 @@ static char* info_getname(int selected_item, void *data,
         break;
         case INFO_BATTERY: /* battery */
 #if CONFIG_CHARGING == CHARGING_SIMPLE
-            if (charger_input_state == CHARGER)
+            /* Only know if plugged */
+            if (charger_inserted())
                 return (char *)str(LANG_BATTERY_CHARGE);
             else
 #elif CONFIG_CHARGING >= CHARGING_MONITOR
+#ifdef ARCHOS_RECORDER
+            /* Report the particular algorithm state */
             if (charge_state == CHARGING)
                 return (char *)str(LANG_BATTERY_CHARGE);
-            else
-#ifdef ARCHOS_RECORDER
-            if (charge_state == TOPOFF)
+            else if (charge_state == TOPOFF)
                 return (char *)str(LANG_BATTERY_TOPOFF_CHARGE);
             else if (charge_state == TRICKLE)
                 return (char *)str(LANG_BATTERY_TRICKLE_CHARGE);
+            else
+#else /* !ARCHOS_RECORDER */
+            /* Go by what power management reports */
+            if (charging_state())
+                return (char *)str(LANG_BATTERY_CHARGE);
             else
 #endif /* ARCHOS_RECORDER */
 #endif /* CONFIG_CHARGING = */
@@ -283,18 +289,24 @@ static int info_speak_item(int selected_item, void * data)
         }
         case INFO_BATTERY: /* battery */
 #if CONFIG_CHARGING == CHARGING_SIMPLE
+            /* Only know if plugged */
             if (charger_inserted())
                 talk_id(LANG_BATTERY_CHARGE, true);
             else
 #elif CONFIG_CHARGING >= CHARGING_MONITOR
+#ifdef ARCHOS_RECORDER
+            /* Report the particular algorithm state */
             if (charge_state == CHARGING)
                 talk_id(LANG_BATTERY_CHARGE, true);
-            else
-#ifdef ARCHOS_RECORDER
-            if (charge_state == TOPOFF)
+            else if (charge_state == TOPOFF)
                 talk_id(LANG_BATTERY_TOPOFF_CHARGE, true);
             else if (charge_state == TRICKLE)
                 talk_id(LANG_BATTERY_TRICKLE_CHARGE, true);
+            else
+#else /* !ARCHOS_RECORDER */
+            /* Go by what power management reports */
+            if (charging_state())
+                talk_id(LANG_BATTERY_CHARGE, true);
             else
 #endif /* ARCHOS_RECORDER */
 #endif /* CONFIG_CHARGING = */
@@ -354,6 +366,11 @@ static int info_speak_item(int selected_item, void * data)
 
 static int info_action_callback(int action, struct gui_synclist *lists)
 {
+#if CONFIG_CHARGING
+    if (action == ACTION_NONE)
+        return ACTION_REDRAW;
+    else
+#endif
     if (action == ACTION_STD_CANCEL)
         return action;
     else if ((action == ACTION_STD_OK)
@@ -394,6 +411,9 @@ static bool show_info(void)
     if(global_settings.talk_menu)
          info.get_talk = info_speak_item;
     info.action_callback = info_action_callback;
+#if CONFIG_CHARGING
+    info.timeout = HZ;
+#endif
     return simplelist_show_list(&info);
 }
 MENUITEM_FUNCTION(show_info_item, 0, ID2P(LANG_ROCKBOX_INFO),
