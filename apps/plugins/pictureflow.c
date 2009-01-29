@@ -1180,8 +1180,8 @@ void render_slide(struct slide_data *slide, const int alpha)
 
 
     int distance = (h + slide->distance) * 100 / zoom;
-    PFreal dist = distance * PFREAL_ONE;
     if (distance < 100 ) distance = 100; /* clamp distances */
+    PFreal dist = distance * PFREAL_ONE;
     PFreal sdx = fcos(slide->angle);
     PFreal sdy = fsin(slide->angle);
     PFreal xs = slide->cx - sw * fdiv(sdx, dist) / 2;
