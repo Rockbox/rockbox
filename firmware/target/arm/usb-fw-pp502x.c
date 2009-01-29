@@ -177,6 +177,11 @@ void usb_attach(void)
     usb_drv_attach();
 }
 
+static bool usb_pin_state(void)
+{
+    return (USB_GPIO_INPUT_VAL & USB_GPIO_MASK) == USB_GPIO_VAL;
+}
+
 #ifdef USB_STATUS_BY_EVENT
 /* Cannot always tell power pin from USB pin */
 static int usb_status = USB_EXTRACTED;
@@ -197,10 +202,13 @@ void usb_insert_int(void)
     timeout_register(&usb_oneshot, usb_timeout_event, HZ/5, val);
 }
 
-/* Called during the bus reset interrupt when in detect mode */
+/* Called during the bus reset interrupt when in detect mode - filter for
+ * invalid bus reset when unplugging by checking the pin state. */
 void usb_drv_usb_detect_event(void)
 {
-    usb_status_event(USB_INSERTED);
+    if(usb_pin_state()) {
+        usb_status_event(USB_INSERTED);
+    }
 }
 #endif /* USB_STATUS_BY_EVENT */
 
@@ -221,8 +229,7 @@ int usb_detect(void)
 #ifdef USB_STATUS_BY_EVENT
     return usb_status;
 #else
-    return ((USB_GPIO_INPUT_VAL & USB_GPIO_MASK) == USB_GPIO_VAL) ?
-                USB_INSERTED : USB_EXTRACTED;
+    return usb_pin_state() ? USB_INSERTED : USB_EXTRACTED;
 #endif
 }
 

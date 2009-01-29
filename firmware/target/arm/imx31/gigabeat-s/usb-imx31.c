@@ -125,5 +125,6 @@ void usb_drv_int_enable(bool enable)
 /* Called during the bus reset interrupt when in detect mode */
 void usb_drv_usb_detect_event(void)
 {
-    usb_status_event(USB_INSERTED);
+    if (usb_drv_powered())
+        usb_status_event(USB_INSERTED);
 }

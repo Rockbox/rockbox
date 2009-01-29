@@ -509,10 +509,7 @@ void usb_drv_int(void)
         if (UNLIKELY(usbintr == USBINTR_RESET_EN)) {
             /* USB detected - detach and inform */
             usb_drv_stop();
-            /* A false reset may occur upon unplugging, be sure VBUS is above
-             * the 4V4 threshold. */
-            if (usb_drv_powered())
-                usb_drv_usb_detect_event();
+            usb_drv_usb_detect_event();
         }
         else
         {
