@@ -4,10 +4,14 @@
 follow the instructions at 
 \url{http://www.rockbox.org/twiki/bin/view/Main/SansaE200RInstallation}.}}
 
+\warn{If your \daps{} original firmware starts with a version number of 03.XX.XX, then do \emph{not} proceed with these install instructions.
+If your \daps{} original firmware starts with 01.XX.XX, then you can
+install Rockbox.}
+
 In order to make your \playertype{} load and execute the Rockbox firmware you
 have just installed, you will need to install the Rockbox
 bootloader. Unless bugs are found in the bootloader code, or
-significant new feature are added, you will only have to perform this
+significant new features are added, you will only have to perform this
 step once.
 
 These steps use the sansapatcher tool. Source code is available in the Rockbox
@@ -42,12 +46,6 @@ sansapatcher.
 \item Attach your \dap{} to your Mac and wait for its icon to appear in 
 Finder.
 
-\item\label{subsec:macos_umount} Open up Disk Utility
-(in Applications $\rightarrow$ Utilities) and click 
-on the name of your \dap{} (e.g. Sansa \opt{e200}{e280}\opt{c200}{c250})
-in the list on the left pane. Then click on the ``unmount'' icon at the top.
-\warn{Do \emph{not} click on the ``eject'' icon.}
-
 \item Download and open sansa.dmg from 
 \download{bootloader/sandisk-sansa/sansapatcher/macosx/sansapatcher.dmg} 
 and then double-click on the sansapatcher icon inside. 
@@ -55,14 +53,8 @@ and then double-click on the sansapatcher icon inside.
 \item If all has gone well, you should see some
 information displayed about your \dap{} and a message asking you if you 
 wish to install the Rockbox bootloader. Press i followed by ENTER, and 
-sansapatcher will now install the bootloader. After a short time you 
-should see the message ``[INFO] Bootloader installed successfully.'' Press 
-ENTER again to exit sansapatcher and then quit the Terminal application.
-
-\item \warn{If you received a ``Resource busy'' error from 
-sansapatcher, then this means you did not complete step 
-\ref{subsec:macos_umount}. Go back to Disk Utility, unmount your
-\dap{} and then run sansapatcher again.}
+sansapatcher will now unmount your \dap{} and install the bootloader. 
+After a short time you should see the message ``[INFO] Bootloader installed successfully.'' Press ENTER again to exit sansapatcher and then quit the Terminal application.
 
 \item Your \dap{} will now automatically reconnect itself to your Mac. 
 Wait for it to connect, and then eject and unplug it in the normal way. 
