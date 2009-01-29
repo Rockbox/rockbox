@@ -332,8 +332,10 @@ static void init_times(struct stream *str)
         }
     }
 
-    /* End must be greater than start */
-    if (str->start_pts >= str->end_pts)
+    /* End must be greater than start. If the start PTS is found, the end PTS
+     * must be valid too. If the start PTS was invalid, then the end will never
+     * be scanned above. */
+    if (str->start_pts >= str->end_pts || str->end_pts == INVALID_TIMESTAMP)
     {
         str->start_pts = INVALID_TIMESTAMP;
         str->end_pts = INVALID_TIMESTAMP;
@@ -1116,8 +1118,8 @@ int parser_init_stream(void)
     
     if (parse_demux(&video_str, STREAM_PM_RANDOM_ACCESS) == STREAM_OK)
     {
-        /* Found a video packet - assume transport stream */
-        str_parser.format = STREAM_FMT_MPEG_TS;
+        /* Found a video packet - assume program stream */
+        str_parser.format = STREAM_FMT_MPEG_PS;
         str_parser.next_data = parse_demux;
     }
     else
@@ -1133,7 +1135,7 @@ int parser_init_stream(void)
         return STREAM_UNSUPPORTED;
     }
 
-    if (str_parser.format == STREAM_FMT_MPEG_TS)
+    if (str_parser.format == STREAM_FMT_MPEG_PS)
     {
         /* Initalize start_pts and end_pts with the length (in 45kHz units) of
          * the movie. INVALID_TIMESTAMP if the time could not be determined */
