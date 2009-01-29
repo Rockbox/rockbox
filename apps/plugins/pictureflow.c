@@ -106,8 +106,8 @@ typedef fb_data pix_t;
 #define REFLECT_TOP (LCD_HEIGHT * 2 / 3)
 #define REFLECT_HEIGHT (LCD_HEIGHT - REFLECT_TOP)
 #define DISPLAY_HEIGHT REFLECT_TOP
-#define DISPLAY_WIDTH (LCD_HEIGHT * LCD_PIXEL_ASPECT_HEIGHT / \
-    LCD_PIXEL_ASPECT_WIDTH / 2)
+#define DISPLAY_WIDTH MAX((LCD_HEIGHT * LCD_PIXEL_ASPECT_HEIGHT / \
+    LCD_PIXEL_ASPECT_WIDTH / 2), (LCD_WIDTH * 2 / 5))
 #define REFLECT_SC ((0x10000U * 3 + (REFLECT_HEIGHT * 5 - 1)) / \
     (REFLECT_HEIGHT * 5))
 #define DISPLAY_OFFS ((LCD_HEIGHT / 2) - REFLECT_HEIGHT)
@@ -205,14 +205,14 @@ static char* show_album_name_conf[] =
 #define MAX_MARGIN 80
 
 /* config values and their defaults */
-static int slide_spacing = (LCD_WIDTH - DISPLAY_WIDTH) / 8;
-static int center_margin = (LCD_WIDTH - DISPLAY_WIDTH) / 16;
+static int slide_spacing = DISPLAY_WIDTH / 4;
+static int center_margin = (LCD_WIDTH - DISPLAY_WIDTH) / 12;
 static int num_slides = 4;
 static int zoom = 100;
 static bool show_fps = false;
 static bool resize = true;
 static int cache_version = 0;
-static int show_album_name = album_name_top;
+static int show_album_name = (LCD_HEIGHT > 100) ? album_name_top : album_name_bottom;
 
 static struct configdata config[] =
 {
