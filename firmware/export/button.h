@@ -68,11 +68,11 @@ int button_apply_acceleration(const unsigned int data);
 #define BUTTON_TOUCHSCREEN 0x08000000
 
 #ifdef HAVE_TOUCHSCREEN
-#if !defined(BUTTON_TOPLEFT) || !defined(BUTTON_TOPMIDDLE) \
+#if (!defined(BUTTON_TOPLEFT) || !defined(BUTTON_TOPMIDDLE) \
  || !defined(BUTTON_TOPRIGHT) || !defined(BUTTON_MIDLEFT) \
  || !defined(BUTTON_CENTER) || !defined(BUTTON_MIDRIGHT) \
  || !defined(BUTTON_BOTTOMLEFT) || !defined(BUTTON_BOTTOMMIDDLE) \
- || !defined(BUTTON_BOTTOMRIGHT)
+ || !defined(BUTTON_BOTTOMRIGHT)) && !defined(__PCTOOL__)
 #error Touchscreen button mode BUTTON_* defines not set up correctly
 #endif
 enum touchscreen_mode {

@@ -23,20 +23,22 @@
 #define _CHECKWPS_H_
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <fcntl.h>
 
 /* subset of global_settings needed to build checkwps. */
 struct user_settings {
     bool statusbar;
-#ifdef HAVE_LCD_COLOR
     int bg_color; /* background color native format */
     int fg_color; /* foreground color native format */
-#endif
 };
 
 extern struct user_settings global_settings;
 
+#define FONT_SYSFIXED 0
+#define FONT_UI 1
+#define SYSFONT_HEIGHT 8
 
-
+#define MIN(x,y) ((x) > (y) ? (y) : (x))
 
 #endif

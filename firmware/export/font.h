@@ -62,11 +62,13 @@
  * must be available at system startup.
  * Fonts are specified in firmware/font.c.
  */
+#ifndef __PCTOOL__
 enum {
     FONT_SYSFIXED, /* system fixed pitch font*/
     FONT_UI,       /* system porportional font*/
     MAXFONTS
 };
+#endif
 
 /*
  * .fnt loadable font file format definition

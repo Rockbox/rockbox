@@ -25,13 +25,15 @@
 #include "config.h"
 #include "gwps.h"
 #include "checkwps.h"
-
-#define MIN(x,y) ((x) > (y) ? (y) : (x))
+#include "resize.h"
 
 bool debug_wps = true;
 int wps_verbose_level = 0;
 
 int errno;
+
+const struct settings_list *settings;
+const int nb_settings = 0;
 
 /* static endianness conversion */
 #define SWAP_16(x) ((typeof(x))(unsigned short)(((unsigned short)(x) >> 8) | \
@@ -52,6 +54,20 @@ unsigned short letoh16(unsigned short x)
         return x;
     } else {
         return SWAP_16(x);
+    }
+}
+
+unsigned short letoh32(unsigned short x)
+{
+    unsigned short n = 0x1234;
+    unsigned char* ch = (unsigned char*)&n;
+
+    if (*ch == 0x34)
+    {
+        /* Little-endian */
+        return x;
+    } else {
+        return SWAP_32(x);
     }
 }
 
@@ -107,6 +123,38 @@ bool load_wps_backdrop(const char* filename)
 bool load_remote_wps_backdrop(const char* filename)
 {
     return true;
+}
+
+int recalc_dimension(struct dim *dst, struct dim *src)
+{
+    return 0;
+}
+
+int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
+                   struct rowset *rset, unsigned char *buf, unsigned int len,
+                   const struct custom_format *format,
+                   struct img_part* (*store_part)(void *args),
+                   void *args)
+{
+    return 0;
+}
+
+int audio_status(void)
+{
+    return 0;
+}
+
+struct mp3entry* audio_current_track(void)
+{
+    return NULL;
+}
+
+void audio_stop(void)
+{
+}
+
+void audio_play(long offset)
+{
 }
 
 static char pluginbuf[PLUGIN_BUFFER_SIZE];

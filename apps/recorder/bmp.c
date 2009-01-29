@@ -47,6 +47,7 @@
 #endif
 #include "lcd.h"
 #include "file.h"
+#include "bmp.h"
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
@@ -58,9 +59,9 @@
 #ifndef __PCTOOL__
 #include "config.h"
 #include "system.h"
-#include "bmp.h"
 #include "resize.h"
 #else
+#include "checkwps.h"
 #undef DEBUGF
 #define DEBUGF(...)
 #endif

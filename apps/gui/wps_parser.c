@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "gwps.h"
 #include "file.h"
 #include "misc.h"
 #include "plugin.h"
@@ -32,30 +31,24 @@
 #include "proxy.h"
 #include "settings.h"
 #include "sysfont.h"
-#include "gwps.h"
-#include "font.h"
-#include "bmp.h" 
-#include "backdrop.h" 
-#include "ctype.h" 
 #else
 #include "checkwps.h"
-#define SYSFONT_HEIGHT 8
+#include "audio.h"
 #define DEBUGF printf
 #endif /*WPSEDITOR*/
-#define FONT_SYSFIXED 0
-#define FONT_UI 1
 #else
 #include "debug.h"
 #endif /*__PCTOOL__*/
 
-#ifndef __PCTOOL__
 #include <ctype.h>
 #include <stdbool.h>
 #include <string.h>
 #include "font.h"
 
 #include "gwps.h"
+#ifndef __PCTOOL__
 #include "settings.h"
+#endif
 #include "settings_list.h"
 
 #ifdef HAVE_LCD_BITMAP
@@ -63,8 +56,6 @@
 #endif
 
 #include "backdrop.h"
-
-#endif
 
 #define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
 #define RWPS_DEFAULTCFG WPS_DIR "/rockbox_default.rwps"

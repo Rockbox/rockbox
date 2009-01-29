@@ -27,9 +27,10 @@ COMMON=$(ROOT)/apps/gui/wps_parser.c \
 INCLUDE=-I $(ROOT)/apps/gui \
         -I $(ROOT)/firmware/export \
         -I $(ROOT)/apps \
+        -I $(ROOT)/apps/recorder \
         -I .
 
-CFLAGS = -g -D__PCTOOL__ -DDEBUG -DROCKBOX_DIR_LEN=9 -DWPS_DIR=\".\" 
+CFLAGS = -g -D__PCTOOL__ -DDEBUG -DROCKBOX_DIR_LEN=9 -DWPS_DIR=\".\"
 
 all:
 	@echo To build, run the buildall.sh script
