@@ -23,6 +23,7 @@
 
 #include <stdbool.h>
 #include <inttypes.h>
+#include "config.h"
 
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
