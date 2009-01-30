@@ -337,11 +337,9 @@ static inline PFreal fmul(PFreal a, PFreal b)
     return (a*b) >> PFREAL_SHIFT;
 }
 
-/* ARMv5+ have a clz instruction. So do most modern desktop processors, and the
- * simulator doesn't need to be as concerned about savings for inlining a calls
- * to a clz function.
+/* ARMv5+ has a clz instruction equivalent to our function.
  */
-#if defined(SIMULATOR) || (defined(CPU_ARM) && (ARM_ARCH > 4))
+#if (defined(CPU_ARM) && (ARM_ARCH > 4))
 static inline int clz(uint32_t v)
 {
     return __builtin_clz(v);
@@ -349,12 +347,14 @@ static inline int clz(uint32_t v)
 
 /* Otherwise, use our clz, which can be inlined */
 #else
+static const char clz_lut[16] = { 4, 3, 2, 2, 1, 1, 1, 1,
+                                  0, 0, 0, 0, 0, 0, 0, 0 }; 
 /* This clz is based on the log2(n) implementation at
- * http://graphics.stanford.edu/~seander/bithacks.html#IntegerLog
+ * http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogLookup
  */
 static inline int clz(uint32_t v)
 {
-    uint32_t r = 31;
+    int r = 28;
     if (v >= 0x10000)
     {
         v >>= 16;
@@ -370,14 +370,7 @@ static inline int clz(uint32_t v)
         v >>= 4;
         r -= 4;
     }
-    if (v & 0xc)
-    {
-        v >>= 2;
-        r -= 2;
-    }
-    if (v & 2)
-        r -= 1;
-    return r;
+    return r + clz_lut[v];
 }
 #endif
 
@@ -387,10 +380,7 @@ static inline int clz(uint32_t v)
 static inline int allowed_shift(int32_t val)
 {
     uint32_t uval = val ^ (val >> 31);
-    if (!uval)
-        return 31;
-    else
-        return clz(uval) - 1;
+    return clz(uval) - 1;
 }
 
 /* Calculate num/den, with the result shifted left by PFREAL_SHIFT, by shifting
