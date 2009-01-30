@@ -337,16 +337,72 @@ static inline PFreal fmul(PFreal a, PFreal b)
     return (a*b) >> PFREAL_SHIFT;
 }
 
-/* There are some precision issues when not using (long long) which in turn
-   takes very long to compute... I guess the best solution would be to optimize
-   the computations so it only requires a single long */
+/* ARMv5+ have a clz instruction. So do most modern desktop processors, and the
+ * simulator doesn't need to be as concerned about savings for inlining a calls
+ * to a clz function.
+ */
+#if defined(SIMULATOR) || (defined(CPU_ARM) && (ARM_ARCH > 4))
+static inline int clz(uint32_t v)
+{
+    return __builtin_clz(v);
+}
+
+/* Otherwise, use our clz, which can be inlined */
+#else
+/* This clz is based on the log2(n) implementation at
+ * http://graphics.stanford.edu/~seander/bithacks.html#IntegerLog
+ */
+static inline int clz(uint32_t v)
+{
+    uint32_t r = 31;
+    if (v > 0x8000)
+    {
+        v >>= 16;
+        r -= 16;
+    }
+    if (v & 0xff00)
+    {
+        v >>= 8;
+        r -= 8;
+    }
+    if (v & 0xf0)
+    {
+        v >>= 4;
+        r -= 4;
+    }
+    if (v & 0xc)
+    {
+        v >>= 2;
+        r -= 2;
+    }
+    if (v & 2)
+        r -= 1;
+    return r;
+}
+#endif
+
+/* Return the maximum possible left shift for a signed int32, without
+ * overflow
+ */
+static inline int allowed_shift(int32_t val)
+{
+    uint32_t uval = val ^ (val >> 31);
+    if (!uval)
+        return 31;
+    else
+        return clz(uval) - 1;
+}
+
+/* Calculate num/den, with the result shifted left by PFREAL_SHIFT, by shifting
+ * num and den before dividing.
+ */
 static inline PFreal fdiv(PFreal num, PFreal den)
 {
-    long long p = (long long) (num) << (PFREAL_SHIFT * 2);
-    long long q = p / (long long) den;
-    long long r = q >> PFREAL_SHIFT;
-
-    return r;
+    int shift = allowed_shift(num);
+    shift = MIN(PFREAL_SHIFT, shift);
+    num <<= shift;
+    den >>= PFREAL_SHIFT - shift;
+    return num / den;
 }
 
 #define fmin(a,b) (((a) < (b)) ? (a) : (b))
@@ -578,7 +634,6 @@ int create_track_index(const int slide_index)
     else
         return (track_count > 0) ? 0 : -1;
 }
-
 
 /**
   Determine filename of the album art for the given slide_index and
