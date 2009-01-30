@@ -355,7 +355,7 @@ static inline int clz(uint32_t v)
 static inline int clz(uint32_t v)
 {
     uint32_t r = 31;
-    if (v > 0x8000)
+    if (v >= 0x10000)
     {
         v >>= 16;
         r -= 16;
