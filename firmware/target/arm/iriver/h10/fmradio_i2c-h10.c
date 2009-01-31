@@ -23,6 +23,7 @@
 #include "cpu.h"
 #include "logf.h"
 #include "system.h"
+#include "fmradio_i2c.h"
 
 /* cute little functions, atomic read-modify-write */
 
@@ -161,7 +162,7 @@ static unsigned char fmradio_i2c_inb(void)
    return byte;
 }
 
-int fmradio_i2c_write(int address, const unsigned char* buf, int count)
+int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count)
 {
     int i,x=0;
 
@@ -188,7 +189,7 @@ int fmradio_i2c_write(int address, const unsigned char* buf, int count)
     return x;
 }
 
-int fmradio_i2c_read(int address, unsigned char* buf, int count)
+int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 {
     int i,x=0;
     

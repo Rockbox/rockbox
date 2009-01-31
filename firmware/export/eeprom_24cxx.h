@@ -31,7 +31,6 @@
 #endif
 
 void eeprom_24cxx_init(void);
-int eeprom_24cxx_read_byte(unsigned int address, char *c);
 int eeprom_24cxx_read(unsigned char address, void *dest, int length);
 int eeprom_24cxx_write(unsigned char address, const void *src, int length);
 

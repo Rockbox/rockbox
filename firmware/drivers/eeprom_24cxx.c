@@ -40,7 +40,7 @@ void eeprom_24cxx_init(void)
     memset(cached_bitfield, 0, sizeof cached_bitfield);
 }
 
-int eeprom_24cxx_read_byte(unsigned int address, char *c)
+static int eeprom_24cxx_read_byte(unsigned int address, char *c)
 {
     int ret;
     char byte;
@@ -86,7 +86,7 @@ int eeprom_24cxx_read_byte(unsigned int address, char *c)
     return 0;
 }
 
-int eeprom_24cxx_write_byte(unsigned int address, char c)
+static int eeprom_24cxx_write_byte(unsigned int address, char c)
 {
     int ret;
     int count = 0;
