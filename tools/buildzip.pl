@@ -24,7 +24,7 @@ my $verbose;
 my $sim;
 my $exe;
 my $target;
-my $archos;
+my $modelname;
 my $incfonts;
 my $target_id; # passed in, not currently used
 my $rbdir=".rockbox"; # can be changed for special builds
@@ -70,7 +70,7 @@ sub find_copyfile {
 # Get options
 GetOptions ( 'r|root=s'		=> \$ROOT,
 	     'z|ziptool=s'	=> \$ziptool,
-	     't|target=s'	=> \$archos,     # The target name as used in ARCHOS in the root makefile
+	     'm|modelname=s' => \$modelname,  # The model name as used in ARCHOS in the root makefile
 	     'i|id=s'		=> \$target_id,  # The target id name as used in TARGET_ID in the root makefile
 	     'o|output=s'	=> \$output,
 	     'f|fonts=s'	=> \$incfonts,   # 0 - no fonts, 1 - fonts only 2 - fonts and package
@@ -389,7 +389,7 @@ STOP
     if(-d "$ROOT/wps") {
 	my $wps_build_cmd="perl $ROOT/wps/wpsbuild.pl ";
 	$wps_build_cmd=$wps_build_cmd."-v " if $verbose;
-	$wps_build_cmd=$wps_build_cmd." --rbdir=$rbdir -r $ROOT $ROOT/wps/WPSLIST $target";
+	$wps_build_cmd=$wps_build_cmd." --rbdir=$rbdir -r $ROOT -m $modelname $ROOT/wps/WPSLIST $target";
 	print "wpsbuild: $wps_build_cmd\n" if $verbose;
         system("$wps_build_cmd");
 	print "wps_build_cmd: done\n" if $verbose;

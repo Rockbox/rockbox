@@ -1,0 +1,35 @@
+# cabbie 2.0 default rwps for Iriver Players by Johannes Voggenthaler (Zinc Alloy)
+# derived from cabbie 2.0 default rwps (C) 2007, Marc Guay
+# modified for the Sansa Clip, 2009, Bertrik Sikken, Thomas Martitz
+
+%wd
+
+# progressbar viewport
+%V|0|0|128|16|1|
+%pb|pb-128x64x1.bmp|2|1|124|4|
+%x|a|pbbackground-128x64x1.bmp|1|0|
+%pp of %pe%ar%pc
+
+# tag info viewport
+%V|0|18|128|25|1|
+%ac%s%?it<%it|%fn>
+%ac%s%?ia<%ia|%?d2<%d2|(root)>>
+%ac%s%?id<%id|%?d1<%d1|(root)>>
+%x|b|bar-128x64x1.bmp|2|32|
+
+# playtime info and status bar
+%V|2|43|124|21|1|
+%xl|A|lock-128x64x1.bmp|1|12|2|
+%xl|B|battery-128x64x1.bmp|23|12|9|
+%xl|C|volume-128x64x1.bmp|46|12|9|
+%xl|D|shuffle-128x64x1.bmp|67|13|
+%xl|E|repeat-128x64x1.bmp|93|12|4|
+%xl|F|playmode-128x64x1.bmp|113|12|5|
+
+# status bar
+%?mh<%xdAa|%xdAb>
+%?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi>>
+%?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi>
+%?ps<%xdD>
+%?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
+%?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>

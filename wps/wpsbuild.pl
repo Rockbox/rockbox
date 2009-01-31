@@ -16,9 +16,11 @@ my $verbose;
 my $rbdir=".rockbox";
 my $wpslist;
 my $target;
+my $modelname;
 
 # Get options
 GetOptions ( 'r|root=s'		=> \$ROOT,
+	     'm|modelname=s'	=> \$modelname,
 	     'v|verbose'	=> \$verbose,
 	     'rbdir=s'          => \$rbdir, # If we want to put in a different directory
     );
@@ -372,6 +374,10 @@ while(<WPS>) {
                 next if ($d > $rdepth);
 
                 $req_g = $rwidth . "x" . $rheight . "x" . $d;
+
+                # check for model specific wps
+                $req_g_wps = $wps_prefix . "." . $req_g . "." . $modelname . ".wps";
+                last if (-e "$wpsdir/$req_g_wps");
 
                 $req_g_wps = $wps_prefix . "." . $req_g . ".wps";
                 last if (-e "$wpsdir/$req_g_wps");
