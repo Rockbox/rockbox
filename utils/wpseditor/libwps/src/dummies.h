@@ -40,7 +40,6 @@ extern struct wps_state wps_state;
 extern struct gui_wps gui_wps[NB_SCREENS];
 extern struct wps_data wps_datas[NB_SCREENS];
 extern struct cuesheet *curr_cue;
-extern struct cuesheet *temp_cue;
 extern struct system_status global_status;
 extern struct gui_syncstatusbar statusbars;
 extern struct playlist_info current_playlist;

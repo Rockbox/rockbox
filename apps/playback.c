@@ -1768,23 +1768,6 @@ static void audio_finish_load_track(void)
     size_t offset = 0;
     bool start_play = start_play_g;
 
-#if 0
-    if (cuesheet_is_enabled() && tracks[track_widx].id3.cuesheet_type == 1)
-    {
-        char cuepath[MAX_PATH];
-
-        struct cuesheet *cue = start_play ? curr_cue : temp_cue;
-
-        if (look_for_cuesheet_file(trackname, cuepath) &&
-            parse_cuesheet(cuepath, cue))
-        {
-            strcpy((cue)->audio_filename, trackname);
-            if (start_play)
-                cue_spoof_id3(curr_cue, &tracks[track_widx].id3);
-        }
-    }
-#endif
-
     track_load_started = false;
 
     if (tracks[track_widx].id3_hid < 0) {

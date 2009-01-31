@@ -437,23 +437,15 @@ bool update(struct gui_wps *gwps)
             && strcmp(gwps->state->id3->path, curr_cue->audio_filename))
         {
             /* the current cuesheet isn't the right one any more */
+            /* We need to parse the new cuesheet */
 
-            if (!strcmp(gwps->state->id3->path, temp_cue->audio_filename)) {
-                /* We have the new cuesheet in memory (temp_cue),
-                   let's make it the current one ! */
-                memcpy(curr_cue, temp_cue, sizeof(struct cuesheet));
-            }
-            else {
-                /* We need to parse the new cuesheet */
+            char cuepath[MAX_PATH];
 
-                char cuepath[MAX_PATH];
-
-                if (look_for_cuesheet_file(gwps->state->id3->path, cuepath) &&
-                    parse_cuesheet(cuepath, curr_cue))
-                {
-                    gwps->state->id3->cuesheet_type = 1;
-                    strcpy(curr_cue->audio_filename, gwps->state->id3->path);
-                }
+            if (look_for_cuesheet_file(gwps->state->id3->path, cuepath) &&
+                parse_cuesheet(cuepath, curr_cue))
+            {
+                gwps->state->id3->cuesheet_type = 1;
+                strcpy(curr_cue->audio_filename, gwps->state->id3->path);
             }
 
             cue_spoof_id3(curr_cue, gwps->state->id3);

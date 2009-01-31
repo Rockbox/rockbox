@@ -30,7 +30,6 @@ struct wps_state wps_state;
 struct gui_wps gui_wps[NB_SCREENS];
 struct wps_data wps_datas[NB_SCREENS];
 struct cuesheet *curr_cue;
-struct cuesheet *temp_cue;
 struct system_status global_status;
 struct gui_syncstatusbar statusbars;
 struct playlist_info current_playlist;

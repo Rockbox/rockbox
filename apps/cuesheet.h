@@ -53,7 +53,6 @@ struct cuesheet {
 };
 
 extern struct cuesheet *curr_cue;
-extern struct cuesheet *temp_cue;
 
 /* returns true if cuesheet support is initialised */
 bool cuesheet_is_enabled(void);

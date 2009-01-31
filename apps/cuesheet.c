@@ -45,7 +45,6 @@
 #define CUE_DIR ROCKBOX_DIR "/cue"
 
 struct cuesheet *curr_cue;
-struct cuesheet *temp_cue;
 
 #if CONFIG_CODEC != SWCODEC
 /* special trickery because the hwcodec playback engine is in firmware/ */
@@ -59,13 +58,11 @@ void cuesheet_init(void)
 {
     if (global_settings.cuesheet) {
         curr_cue = (struct cuesheet *)buffer_alloc(sizeof(struct cuesheet));
-        temp_cue = (struct cuesheet *)buffer_alloc(sizeof(struct cuesheet));
 #if CONFIG_CODEC != SWCODEC
         audio_set_cuesheet_callback(cuesheet_handler);
 #endif
     } else {
         curr_cue = NULL;
-        temp_cue = NULL;
     }
 }
 
