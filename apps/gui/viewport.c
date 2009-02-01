@@ -59,7 +59,7 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
     vp->x = 0;
     vp->width = screens[screen].lcdwidth;
 
-    vp->y = showing_bars(screen)?gui_statusbar_height():0;
+    vp->y = showing_bars(screen)?STATUSBAR_HEIGHT:0;
     vp->height = screens[screen].lcdheight - vp->y;
 #ifdef HAVE_LCD_BITMAP
     vp->drawmode = DRMODE_SOLID;
