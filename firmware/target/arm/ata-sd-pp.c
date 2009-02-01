@@ -38,32 +38,90 @@
 #define SECTOR_SIZE     512
 #define BLOCKS_PER_BANK 0x7a7800
 
-#define STATUS_REG      (*(volatile unsigned int *)(0x70008204))
-#define REG_1           (*(volatile unsigned int *)(0x70008208))
-#define UNKNOWN         (*(volatile unsigned int *)(0x70008210))
-#define BLOCK_SIZE_REG  (*(volatile unsigned int *)(0x7000821c))
-#define BLOCK_COUNT_REG (*(volatile unsigned int *)(0x70008220))
-#define REG_5           (*(volatile unsigned int *)(0x70008224))
-#define CMD_REG0        (*(volatile unsigned int *)(0x70008228))
-#define CMD_REG1        (*(volatile unsigned int *)(0x7000822c))
-#define CMD_REG2        (*(volatile unsigned int *)(0x70008230))
-#define RESPONSE_REG    (*(volatile unsigned int *)(0x70008234))
-#define SD_STATE_REG    (*(volatile unsigned int *)(0x70008238))
-#define REG_11          (*(volatile unsigned int *)(0x70008240))
-#define REG_12          (*(volatile unsigned int *)(0x70008244))
-#define DATA_REG        (*(volatile unsigned int *)(0x70008280))
+/* Comparing documentations of various MMC/SD controllers revealed, */
+/* that this controller seems to be a mix of PXA27x, PXA255 and */
+/* some PP specific stuff. The register and bit definitions are */
+/* taken from the 'PXA27x Developers Manual', as it appears to be */
+/* the closest match. Known differences and obscurities are commented.*/
 
-/* STATUS_REG bits */
-#define DATA_DONE       (1 << 12)
-#define CMD_DONE        (1 << 13)
-#define ERROR_BITS      (0x3f)
-#define READY_FOR_DATA  (1 << 8)
-#define FIFO_FULL       (1 << 7)
-#define FIFO_EMPTY      (1 << 6)
+#define MMC_STRPCL      (*(volatile unsigned int *)(0x70008200))
+#define MMC_STAT        (*(volatile unsigned int *)(0x70008204))
+#define MMC_CLKRT       (*(volatile unsigned int *)(0x70008208))
+#define MMC_SPI         (*(volatile unsigned int *)(0x7000820c))
+#define MMC_CMDAT       (*(volatile unsigned int *)(0x70008210))
+#define MMC_RESTO       (*(volatile unsigned int *)(0x70008214))
+#define MMC_RDTO        (*(volatile unsigned int *)(0x70008218))
+#define MMC_BLKLEN      (*(volatile unsigned int *)(0x7000821c))
+#define MMC_NUMBLK      (*(volatile unsigned int *)(0x70008220))
+#define MMC_I_MASK      (*(volatile unsigned int *)(0x70008224))
+#define MMC_CMD         (*(volatile unsigned int *)(0x70008228))
+#define MMC_ARGH        (*(volatile unsigned int *)(0x7000822c))
+#define MMC_ARGL        (*(volatile unsigned int *)(0x70008230))
+#define MMC_RES         (*(volatile unsigned int *)(0x70008234))
 
-#define CMD_OK          0x0 /* Command was successful */
-#define CMD_ERROR_2     0x2 /* SD did not respond to command (either it doesn't
-                               understand the command or is not inserted) */
+/* PXA255/27x have separate RX/TX FIFOs with 32x8 bit */
+/* PP502x has a combined Data FIFO with 16x16 bit */
+#define MMC_DATA_FIFO   (*(volatile unsigned int *)(0x70008280))
+
+/* PP specific registers, no other controller seem to have such. */
+#define MMC_SD_STATE    (*(volatile unsigned int *)(0x70008238))
+#define MMC_INIT_1      (*(volatile unsigned int *)(0x70008240))
+#define MMC_INIT_2      (*(volatile unsigned int *)(0x70008244))
+
+/* MMC_STAT bits */
+#define STAT_SDIO_SUSPEND_ACK (1 << 16)
+#define STAT_SDIO_INT         (1 << 15)
+#define STAT_RD_STALLED       (1 << 14)
+#define STAT_END_CMD_RES      (1 << 13)
+#define STAT_PRG_DONE         (1 << 12)
+#define STAT_DATA_TRAN_DONE   (1 << 11)
+#define STAT_SPI_WR_ERR       (1 << 10)
+#define STAT_FLASH_ERR        (1 << 9)
+#define STAT_CLK_EN           (1 << 8)
+#define STAT_RECV_FIFO_FULL   (1 << 7)  /* taken from PXA255 */
+#define STAT_XMIT_FIFO_EMPTY  (1 << 6)  /* taken from PXA255 */
+#define STAT_RES_CRC_ERR      (1 << 5)
+#define STAT_DAT_ERR_TOKEN    (1 << 4)
+#define STAT_CRC_RD_ERR       (1 << 3)
+#define STAT_CRC_WR_ERR       (1 << 2)
+#define STAT_TIME_OUT_RES     (1 << 1)
+#define STAT_TIME_OUT_READ    (1)
+#define STAT_ERROR_BITS       (0x3f)
+ 
+/* MMC_CMDAT bits */
+/* Some of the bits used by the OF don't make much sense with these */
+/* definitions. So they're probably different between PXA and PP502x */
+/* Bits 0-5 appear to match though. */
+#define CMDAT_SDIO_RESUME  (1 << 13)
+#define CMDAT_SDIO_SUSPEND (1 << 12)
+#define CMDAT_SDIO_INT_EN  (1 << 11)
+#define CMDAT_STOP_TRAN    (1 << 10)
+#define CMDAT_SD_4DAT      (1 << 8)
+#define CMDAT_DMA_EN       (1 << 7)
+#define CMDAT_INIT         (1 << 6)
+#define CMDAT_BUSY         (1 << 5)
+#define CMDAT_STRM_BLK     (1 << 4)
+#define CMDAT_WR_RD        (1 << 3)
+#define CMDAT_DATA_EN      (1 << 2)
+#define CMDAT_RES_TYPE3    (3)
+#define CMDAT_RES_TYPE2    (2)
+#define CMDAT_RES_TYPE1    (1)
+ 
+/* MMC_I_MASK bits */
+/* PP502x apparently only has bits 0-3 */
+#define I_MASK_SDIO_SUSPEND_ACK  (1 << 12)
+#define I_MASK_SDIO_INT          (1 << 11)
+#define I_MASK_RD_STALLED        (1 << 10)
+#define I_MASK_RES_ERR           (1 << 9)
+#define I_MASK_DAT_ERR           (1 << 8)
+#define I_MASK_TINT              (1 << 7)
+#define I_MASK_TXFIFO_WR_REQ     (1 << 6)
+#define I_MASK_RXFIFO_RD_REQ     (1 << 5)
+#define I_MASK_CLK_IS_OFF        (1 << 4)
+#define I_MASK_STOP_CMD          (1 << 3)
+#define I_MASK_END_CMD_RES       (1 << 2)
+#define I_MASK_PRG_DONE          (1 << 1)
+#define I_MASK_DATA_TRAN_DONE    (1 << 0)
 
 #define FIFO_LEN        16          /* FIFO is 16 words deep */
 
@@ -144,7 +202,7 @@ static bool sd_poll_status(unsigned int trigger, long timeout)
 {
     long t = USEC_TIMER;
 
-    while ((STATUS_REG & trigger) == 0)
+    while ((MMC_STAT & trigger) == 0)
     {
         long time = USEC_TIMER;
 
@@ -164,36 +222,36 @@ static bool sd_poll_status(unsigned int trigger, long timeout)
 }
 
 static int sd_command(unsigned int cmd, unsigned long arg1,
-                      unsigned int *response, unsigned int type)
+                      unsigned int *response, unsigned int cmdat)
 {
-    int i, words; /* Number of 16 bit words to read from RESPONSE_REG */
+    int i, words; /* Number of 16 bit words to read from MMC_RES */
     unsigned int data[9];
 
-    CMD_REG0 = cmd;
-    CMD_REG1 = (unsigned int)((arg1 & 0xffff0000) >> 16);
-    CMD_REG2 = (unsigned int)((arg1 & 0xffff));
-    UNKNOWN  = type;
+    MMC_CMD = cmd;
+    MMC_ARGH = (unsigned int)((arg1 & 0xffff0000) >> 16);
+    MMC_ARGL = (unsigned int)((arg1 & 0xffff));
+    MMC_CMDAT  = cmdat;
 
-    if (!sd_poll_status(CMD_DONE, 100000))
+    if (!sd_poll_status(STAT_END_CMD_RES, 100000))
         return -EC_COMMAND;
 
-    if ((STATUS_REG & ERROR_BITS) != CMD_OK)
+    if ((MMC_STAT & STAT_ERROR_BITS) != 0)
         /* Error sending command */
-        return -EC_COMMAND - (STATUS_REG & ERROR_BITS)*100;
+        return -EC_COMMAND - (MMC_STAT & STAT_ERROR_BITS)*100;
 
     if (cmd == SD_GO_IDLE_STATE)
         return 0; /* no response here */
 
-    words = (type == 2) ? 9 : 3;
+    words = (cmdat == CMDAT_RES_TYPE2) ? 9 : 3;
 
-    for (i = 0; i < words; i++) /* RESPONSE_REG is read MSB first */
-        data[i] = RESPONSE_REG; /* Read most significant 16-bit word */
+    for (i = 0; i < words; i++) /* MMC_RES is read MSB first */
+        data[i] = MMC_RES; /* Read most significant 16-bit word */
 
     if (response == NULL)
     {
         /* response discarded */
     }
-    else if (type == 2)
+    else if (cmdat == CMDAT_RES_TYPE2)
     {
         /* Response type 2 has the following structure:
          * [135:135] Start Bit - '0'
@@ -252,7 +310,7 @@ static int sd_wait_for_state(unsigned int state, int id)
 
     while (1)
     {
-        int ret = sd_command(SD_SEND_STATUS, currcard->rca, &response, 1);
+        int ret = sd_command(SD_SEND_STATUS, currcard->rca, &response, CMDAT_RES_TYPE1);
         long us;
 
         if (ret < 0)
@@ -260,7 +318,7 @@ static int sd_wait_for_state(unsigned int state, int id)
 
         if (((response >> 9) & 0xf) == state)
         {
-            SD_STATE_REG = state;
+            MMC_SD_STATE = state;
             return 0;
         }
 
@@ -297,7 +355,7 @@ static inline void copy_read_sectors_fast(unsigned char **buf)
             "orr    r8, r8, r9, lsl #16         \r\n"
             "stmia  %[buf]!, { r2, r4, r6, r8 } \r\n"
             : [buf]"+&r"(*buf)
-            : [data]"r"(&DATA_REG)
+            : [data]"r"(&MMC_DATA_FIFO)
             : "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9"
         );
         break;
@@ -335,7 +393,7 @@ static inline void copy_read_sectors_fast(unsigned char **buf)
             "stmia  %[buf]!, { r2, r4, r6, r8 } \r\n"
             "strb   r10, [%[buf]], #1           \r\n"
             : [buf]"+&r"(*buf)
-            : [data]"r"(&DATA_REG)
+            : [data]"r"(&MMC_DATA_FIFO)
             : "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10"
         );
         break;
@@ -355,7 +413,7 @@ static inline void copy_read_sectors_fast(unsigned char **buf)
             "stmia  %[buf]!, { r2, r3, r5, r7 } \r\n"
             "strh   r10, [%[buf]], #2           \r\n"
             : [buf]"+&r"(*buf)
-            : [data]"r"(&DATA_REG)
+            : [data]"r"(&MMC_DATA_FIFO)
             : "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10"
         );
         break;
@@ -393,7 +451,7 @@ static inline void copy_read_sectors_fast(unsigned char **buf)
             "mov    r10, r10, lsr #16           \r\n"
             "strb   r10, [%[buf]], #1           \r\n"
             : [buf]"+&r"(*buf)
-            : [data]"r"(&DATA_REG)
+            : [data]"r"(&MMC_DATA_FIFO)
             : "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10"
         );
         break;
@@ -416,7 +474,7 @@ static inline void copy_read_sectors_slow(unsigned char** buf)
         "bgt    1b                          \r\n"
         : [cnt]"+&r"(cnt), [buf]"+&r"(*buf),
           [t]"=&r"(t)
-        : [data]"r"(&DATA_REG)
+        : [data]"r"(&MMC_DATA_FIFO)
     );
 }
 
@@ -430,7 +488,7 @@ static inline void copy_write_sectors(const unsigned char** buf)
     {
         t  = *(*buf)++;
         t |= *(*buf)++ << 8;
-        DATA_REG = t;
+        MMC_DATA_FIFO = t;
     } while (--cnt > 0); /* tail loop is faster */
 }
 
@@ -446,14 +504,15 @@ static int sd_select_bank(unsigned char bank)
     if (ret < 0)
         return ret;
 
-    BLOCK_SIZE_REG = 512;
-    BLOCK_COUNT_REG = 1;
+    MMC_BLKLEN = 512;
+    MMC_NUMBLK = 1;
 
-    ret = sd_command(35, 0, NULL, 0x1c0d); /* CMD35 is vendor specific */
+    ret = sd_command(35, 0, NULL, /* CMD35 is vendor specific */
+                     0x1c00 | CMDAT_WR_RD | CMDAT_DATA_EN | CMDAT_RES_TYPE1);
     if (ret < 0)
         return ret;
 
-    SD_STATE_REG = SD_PRG;
+    MMC_SD_STATE = SD_PRG;
 
     card_data[0] = bank;
 
@@ -462,7 +521,7 @@ static int sd_select_bank(unsigned char bank)
     for (i = 0; i < BLOCK_SIZE/2; i += FIFO_LEN)
     {
         /* Wait for the FIFO to empty */
-        if (sd_poll_status(FIFO_EMPTY, 10000))
+        if (sd_poll_status(STAT_XMIT_FIFO_EMPTY, 10000))
         {
             copy_write_sectors(&write_buf); /* Copy one chunk of 16 words */
             continue;
@@ -471,7 +530,7 @@ static int sd_select_bank(unsigned char bank)
         return -EC_FIFO_SEL_BANK_EMPTY;
     }
 
-    if (!sd_poll_status(DATA_DONE, 10000))
+    if (!sd_poll_status(STAT_PRG_DONE, 10000))
         return -EC_FIFO_SEL_BANK_DONE;
 
     currcard->current_bank = bank;
@@ -549,7 +608,7 @@ static void sd_init_device(int card_no)
     int ret;
 
 /* Enable and initialise controller */
-    REG_1 = 6;
+    MMC_CLKRT = 6;  /* switch to lowest clock rate */
 
 /* Initialise card data as blank */
     memset(currcard, 0, sizeof(*currcard));
@@ -558,22 +617,22 @@ static void sd_init_device(int card_no)
     sd_card_mux(card_no);
 
 /* Init NAND */
-    REG_11 |=  (1 << 15);
-    REG_12 |=  (1 << 15);
-    REG_12 &= ~(3 << 12);
-    REG_12 |=  (1 << 13);
-    REG_11 &= ~(3 << 12);
-    REG_11 |=  (1 << 13);
+    MMC_INIT_1 |=  (1 << 15);
+    MMC_INIT_2 |=  (1 << 15);
+    MMC_INIT_2 &= ~(3 << 12);
+    MMC_INIT_2 |=  (1 << 13);
+    MMC_INIT_1 &= ~(3 << 12);
+    MMC_INIT_1 |=  (1 << 13);
 
     DEV_EN |= DEV_ATA; /* Enable controller */
     DEV_RS |= DEV_ATA; /* Reset controller */
     DEV_RS &=~DEV_ATA; /* Clear Reset */
 
-    SD_STATE_REG = SD_TRAN;
+    MMC_SD_STATE = SD_TRAN;
 
-    REG_5 = 0xf;
+    MMC_I_MASK = 0xf;  /* disable interrupts */
 
-    ret = sd_command(SD_GO_IDLE_STATE, 0, NULL, 256);
+    ret = sd_command(SD_GO_IDLE_STATE, 0, NULL, 0x100);
     if (ret < 0)
         goto card_init_error;
 
@@ -586,14 +645,15 @@ static void sd_init_device(int card_no)
        - SDHC cards echo back the argument into the response. This is how we
          tell if the card is SDHC.
      */
-    ret = sd_command(SD_SEND_IF_COND,0x1aa, &response,7);
+    ret = sd_command(SD_SEND_IF_COND,0x1aa, &response,
+                     CMDAT_DATA_EN | CMDAT_RES_TYPE3);
     if ( (ret < 0) && (ret!=-219) )
             goto card_init_error;
 #endif
 
     while ((currcard->ocr & (1 << 31)) == 0) /* until card is powered up */
     {
-        ret = sd_command(SD_APP_CMD, currcard->rca, NULL, 1);
+        ret = sd_command(SD_APP_CMD, currcard->rca, NULL, CMDAT_RES_TYPE1);
         if (ret < 0)
             goto card_init_error;
 
@@ -602,13 +662,14 @@ static void sd_init_device(int card_no)
         {
             /* SDHC */
             ret = sd_command(SD_APP_OP_COND, (1<<30)|0x100000,
-                             &currcard->ocr, 3);
+                             &currcard->ocr, CMDAT_RES_TYPE3);
         }
         else
 #endif /* HAVE_HOTSWAP */
         {
             /* SD Standard */
-            ret = sd_command(SD_APP_OP_COND, 0x100000, &currcard->ocr, 3);
+            ret = sd_command(SD_APP_OP_COND, 0x100000, &currcard->ocr,
+                             CMDAT_RES_TYPE3);
         }
 
         if (ret < 0)
@@ -621,15 +682,15 @@ static void sd_init_device(int card_no)
         }
     }
 
-    ret = sd_command(SD_ALL_SEND_CID, 0, currcard->cid, 2);
+    ret = sd_command(SD_ALL_SEND_CID, 0, currcard->cid, CMDAT_RES_TYPE2);
     if (ret < 0)
         goto card_init_error;
 
-    ret = sd_command(SD_SEND_RELATIVE_ADDR, 0, &currcard->rca, 1);
+    ret = sd_command(SD_SEND_RELATIVE_ADDR, 0, &currcard->rca, CMDAT_RES_TYPE1);
     if (ret < 0)
         goto card_init_error;
 
-    ret = sd_command(SD_SEND_CSD, currcard->rca, currcard->csd, 2);
+    ret = sd_command(SD_SEND_CSD, currcard->rca, currcard->csd, CMDAT_RES_TYPE2);
     if (ret < 0)
         goto card_init_error;
 
@@ -656,34 +717,38 @@ static void sd_init_device(int card_no)
     }
 #endif /* HAVE_HOTSWAP */
     
-    REG_1 = 0;
+    MMC_CLKRT = 0;  /* switch to highest clock rate */
 
-    ret = sd_command(SD_SELECT_CARD, currcard->rca, NULL, 129);
+    ret = sd_command(SD_SELECT_CARD, currcard->rca, NULL,
+                     0x80 | CMDAT_RES_TYPE1);
     if (ret < 0)
         goto card_init_error;
 
-    ret = sd_command(SD_APP_CMD, currcard->rca, NULL, 1);
+    ret = sd_command(SD_APP_CMD, currcard->rca, NULL, CMDAT_RES_TYPE1);
     if (ret < 0)
         goto card_init_error;
 
-    ret = sd_command(SD_SET_BUS_WIDTH, currcard->rca | 2, NULL, 1); /* 4 bit */
+    ret = sd_command(SD_SET_BUS_WIDTH, currcard->rca | 2, NULL,
+                     CMDAT_RES_TYPE1); /* 4 bit */
     if (ret < 0)
         goto card_init_error;
 
-    ret = sd_command(SD_SET_BLOCKLEN, currcard->block_size, NULL, 1);
+    ret = sd_command(SD_SET_BLOCKLEN, currcard->block_size, NULL,
+                     CMDAT_RES_TYPE1);
     if (ret < 0)
         goto card_init_error;
 
-    BLOCK_SIZE_REG = currcard->block_size;
+    MMC_BLKLEN = currcard->block_size;
 
     /* If this card is >4GB & not SDHC, then we need to enable bank switching */
     if( (currcard->numblocks >= BLOCKS_PER_BANK) &&
         ((currcard->ocr & (1<<30)) == 0) )
     {
-        SD_STATE_REG = SD_TRAN;
-        BLOCK_COUNT_REG = 1;
+        MMC_SD_STATE = SD_TRAN;
+        MMC_NUMBLK = 1;
 
-        ret = sd_command(SD_SWITCH_FUNC, 0x80ffffef, NULL, 0x1c05);
+        ret = sd_command(SD_SWITCH_FUNC, 0x80ffffef, NULL,
+                         0x1c00 | CMDAT_DATA_EN | CMDAT_RES_TYPE1);
         if (ret < 0)
             goto card_init_error;
 
@@ -694,7 +759,7 @@ static void sd_init_device(int card_no)
         for (i = 0; i < BLOCK_SIZE/2; i += FIFO_LEN)
         {
             /* Wait for the FIFO to be full */
-            if (sd_poll_status(FIFO_FULL, 100000))
+            if (sd_poll_status(STAT_RECV_FIFO_FULL, 100000))
             {
                 copy_read_sectors_slow(&dataptr);
                 continue;
@@ -798,18 +863,20 @@ sd_read_retry:
     if (ret < 0)
         goto sd_read_error;
 
-    BLOCK_COUNT_REG = incount;
+    MMC_NUMBLK = incount;
 
 #ifdef HAVE_HOTSWAP
     if(currcard->ocr & (1<<30) )
     {
         /* SDHC */
-        ret = sd_command(SD_READ_MULTIPLE_BLOCK, start, NULL, 0x1c25);
+        ret = sd_command(SD_READ_MULTIPLE_BLOCK, start, NULL,
+                         0x1c00 | CMDAT_BUSY | CMDAT_DATA_EN | CMDAT_RES_TYPE1);
     }
     else
 #endif
     {
-        ret = sd_command(SD_READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, NULL, 0x1c25);
+        ret = sd_command(SD_READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, NULL,
+                         0x1c00 | CMDAT_BUSY | CMDAT_DATA_EN | CMDAT_RES_TYPE1);
     }
     if (ret < 0)
         goto sd_read_error;
@@ -820,7 +887,7 @@ sd_read_retry:
     for (buf = inbuf; buf < buf_end;)
     {
         /* Wait for the FIFO to be full */
-        if (sd_poll_status(FIFO_FULL, 0x80000))
+        if (sd_poll_status(STAT_RECV_FIFO_FULL, 0x80000))
         {
             copy_read_sectors_fast(&buf); /* Copy one chunk of 16 words */
             /* TODO: Switch bank if necessary */
@@ -833,7 +900,7 @@ sd_read_retry:
 
     last_disk_activity = current_tick;
 
-    ret = sd_command(SD_STOP_TRANSMISSION, 0, NULL, 1);
+    ret = sd_command(SD_STOP_TRANSMISSION, 0, NULL, CMDAT_RES_TYPE1);
     if (ret < 0)
         goto sd_read_error;
 
@@ -914,18 +981,22 @@ sd_write_retry:
     if (ret < 0)
         goto sd_write_error;
 
-    BLOCK_COUNT_REG = count;
+    MMC_NUMBLK = count;
 
 #ifdef HAVE_HOTSWAP
     if(currcard->ocr & (1<<30) )
     {
         /* SDHC */
-        ret = sd_command(SD_WRITE_MULTIPLE_BLOCK, start, NULL, 0x1c2d);
+        ret = sd_command(SD_WRITE_MULTIPLE_BLOCK, start, NULL,
+                         0x1c00 | CMDAT_BUSY | CMDAT_WR_RD |
+                         CMDAT_DATA_EN | CMDAT_RES_TYPE1);
     }
     else
 #endif
     {
-        ret = sd_command(SD_WRITE_MULTIPLE_BLOCK, start*BLOCK_SIZE, NULL, 0x1c2d);
+        ret = sd_command(SD_WRITE_MULTIPLE_BLOCK, start*BLOCK_SIZE, NULL,
+                         0x1c00 | CMDAT_BUSY | CMDAT_WR_RD |
+                         CMDAT_DATA_EN | CMDAT_RES_TYPE1);
     }
     if (ret < 0)
         goto sd_write_error;
@@ -936,14 +1007,14 @@ sd_write_retry:
     {
         if (buf == buf_end)
         {
-            /* Set SD_STATE_REG to SD_PRG for the last buffer fill */
-            SD_STATE_REG = SD_PRG;
+            /* Set MMC_SD_STATE to SD_PRG for the last buffer fill */
+            MMC_SD_STATE = SD_PRG;
         }
 
         udelay(2); /* needed here (loop is too fast :-) */
 
         /* Wait for the FIFO to empty */
-        if (sd_poll_status(FIFO_EMPTY, 0x80000))
+        if (sd_poll_status(STAT_XMIT_FIFO_EMPTY, 0x80000))
         {
             copy_write_sectors(&buf); /* Copy one chunk of 16 words */
             /* TODO: Switch bank if necessary */
@@ -956,13 +1027,13 @@ sd_write_retry:
 
     last_disk_activity = current_tick;
 
-    if (!sd_poll_status(DATA_DONE, 0x80000))
+    if (!sd_poll_status(STAT_PRG_DONE, 0x80000))
     {
         ret = -EC_FIFO_WR_DONE;
         goto sd_write_error;
     }
 
-    ret = sd_command(SD_STOP_TRANSMISSION, 0, NULL, 1);
+    ret = sd_command(SD_STOP_TRANSMISSION, 0, NULL, CMDAT_RES_TYPE1);
     if (ret < 0)
         goto sd_write_error;
 
