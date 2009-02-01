@@ -392,7 +392,7 @@ bool eq_menu_graphical(void)
     enum eq_type current_type;
     char buf[24];
     int i, w, h, height, start_item, nb_eq_sliders[NB_SCREENS];
-    bool barsenabled = viewportmanager_set_statusbar(false);
+    char barsenabled = viewportmanager_set_statusbar(0);
 
 
     FOR_NB_SCREENS(i) {

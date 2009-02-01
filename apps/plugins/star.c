@@ -1030,7 +1030,7 @@ static int star_menu(void)
     }
     while(!menu_quit)
     {
-        switch(rb->do_menu(&menu, &selection, vp, true))
+        switch(rb->do_menu(&menu, &selection, vp, false))
         {
             case 0:
                 menu_quit = true;

@@ -115,8 +115,24 @@ static void next_track(void)
 
     audio_next();
 }
-
-
+static char fix_wps_bars(void)
+{
+#ifdef HAVE_LCD_BITMAP
+    int i;  
+    char wpsbars = 0;
+    FOR_NB_SCREENS(i)
+    {
+        bool draw = global_settings.statusbar;
+        if (gui_wps[i].data->wps_sb_tag)
+            draw = gui_wps[i].data->show_sb_on_wps;
+        if (draw)
+            wpsbars |=  VP_IGNORE_SB_SETTING(i)|(1<<i);
+    } 
+    return wpsbars;
+#else
+    return 1;    
+#endif
+}
 long gui_wps_show(void)
 {
     long button = 0;
@@ -127,8 +143,8 @@ long gui_wps_show(void)
     bool update_track = false;
     int i;
     long last_left = 0, last_right = 0;
+    char wpsbars = 0, oldbars = 0;
     
-    viewportmanager_set_statusbar(false);
     wps_state_init();
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -149,6 +165,7 @@ long gui_wps_show(void)
     ab_reset_markers();
 #endif
 
+    oldbars = viewportmanager_set_statusbar(0);
     if(audio_status() & AUDIO_STATUS_PLAY)
     {
         wps_state.id3 = audio_current_track();
@@ -156,12 +173,13 @@ long gui_wps_show(void)
         if (wps_state.id3) {
             if (gui_wps_display())
                 return 0;
-            FOR_NB_SCREENS(i)
-                gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_ALL);
         }
 
         restore = true;
     }
+    wpsbars = fix_wps_bars();
+    viewportmanager_set_statusbar(wpsbars);
+    
     while ( 1 )
     {
         bool audio_paused = (audio_status() & AUDIO_STATUS_PAUSE)?true:false;
@@ -259,20 +277,19 @@ long gui_wps_show(void)
         {
             case ACTION_WPS_CONTEXT:
             {
-                bool bars;
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
                 show_remote_main_backdrop();
 #endif
-                bars = viewportmanager_set_statusbar(true);
+                viewportmanager_set_statusbar(oldbars);
                 /* if music is stopped in the context menu we want to exit the wps */
                 if (onplay(wps_state.id3->path, 
                            FILE_ATTR_AUDIO, CONTEXT_WPS) == ONPLAY_MAINMENU 
                     || !audio_status())
                     return GO_TO_ROOT;
-                viewportmanager_set_statusbar(bars);
+                viewportmanager_set_statusbar(wpsbars);
                 /* track might have changed */
                 update_track = true;
 
@@ -527,7 +544,7 @@ long gui_wps_show(void)
 #ifdef HAVE_QUICKSCREEN
             case ACTION_WPS_QUICKSCREEN:
             {
-                bool bars = viewportmanager_set_statusbar(true);
+                viewportmanager_set_statusbar(oldbars);
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
@@ -536,7 +553,8 @@ long gui_wps_show(void)
 #endif
                 if (quick_screen_quick(button))
                     return SYS_USB_CONNECTED;
-                viewportmanager_set_statusbar(bars);
+                wpsbars = fix_wps_bars();
+                viewportmanager_set_statusbar(wpsbars);
 #if LCD_DEPTH > 1
                 show_wps_backdrop();
 #endif
@@ -552,7 +570,7 @@ long gui_wps_show(void)
 #ifdef BUTTON_F3
             case ACTION_F3:
             {
-                bool bars = viewportmanager_set_statusbar(true);
+                viewportmanager_set_statusbar(oldbars);
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
@@ -562,7 +580,8 @@ long gui_wps_show(void)
                 if (quick_screen_f3(BUTTON_F3))
                     return SYS_USB_CONNECTED;
                 restore = true;
-                viewportmanager_set_statusbar(bars);
+                wpsbars = fix_wps_bars();
+                viewportmanager_set_statusbar(wpsbars);
             }
             break;
 #endif /* BUTTON_F3 */
@@ -571,7 +590,7 @@ long gui_wps_show(void)
 #ifdef HAVE_PITCHSCREEN
             case ACTION_WPS_PITCHSCREEN:
             {
-                bool bars = viewportmanager_set_statusbar(true);
+                viewportmanager_set_statusbar(oldbars);
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
@@ -587,7 +606,7 @@ long gui_wps_show(void)
                 show_remote_wps_backdrop();
 #endif
                 restore = true;
-                viewportmanager_set_statusbar(bars);
+                viewportmanager_set_statusbar(wpsbars);
             }
             break;
 #endif /* HAVE_PITCHSCREEN */
@@ -613,7 +632,7 @@ long gui_wps_show(void)
 
             case ACTION_WPS_ID3SCREEN:
             {
-                bool bars = viewportmanager_set_statusbar(true);
+                viewportmanager_set_statusbar(oldbars);
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
@@ -628,7 +647,7 @@ long gui_wps_show(void)
                 show_remote_wps_backdrop();
 #endif
                 restore = true;
-                viewportmanager_set_statusbar(bars);
+                viewportmanager_set_statusbar(wpsbars);
             }
             break;
 
@@ -645,7 +664,7 @@ long gui_wps_show(void)
                 break;
 #endif
             case SYS_POWEROFF:
-                viewportmanager_set_statusbar(true);
+                viewportmanager_set_statusbar(oldbars);
 #if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
@@ -681,13 +700,10 @@ long gui_wps_show(void)
             if (gui_wps_display()) {
                 exit = true;
             }
-            else if (wps_state.id3){
-                FOR_NB_SCREENS(i)
-                    gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
-            }
         }
 
         if (exit) {
+            viewportmanager_set_statusbar(oldbars);
 #ifdef HAVE_LCD_CHARCELLS
             status_set_record(false);
             status_set_audio(false);

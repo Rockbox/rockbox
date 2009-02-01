@@ -62,6 +62,7 @@
 #endif
 #include "backdrop.h"
 #include "viewport.h"
+#include "pcmbuf.h"
 
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
@@ -74,36 +75,6 @@
 #define TIMEOUT_UNIT (HZ/10) /* I.e. 0.1 sec */
 #define DEFAULT_SUBLINE_TIME_MULTIPLIER 20 /* In TIMEOUT_UNIT's */
 
-
-/* draws the statusbar on the given wps-screen */
-#ifdef HAVE_LCD_BITMAP
-static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
-{
-    (void)force;
-    bool draw = global_settings.statusbar;
-
-    if (wps->data->wps_sb_tag)
-        draw = wps->data->show_sb_on_wps;
-
-#if NB_SCREENS > 1
-    /* multi screen targets could show the bars on one screen but not both
-     * so the viewportmanager can't be used in its current form...
-     * Also, the WPS is a special screen so doing this is reasonable.
-     */
-    if (draw)
-    {
-        struct gui_statusbar *bar;
-        bar = &statusbars.statusbars[wps->data->remote_wps?SCREEN_REMOTE:SCREEN_MAIN];
-        gui_statusbar_draw(bar, force);
-    }
-#else
-    viewportmanager_set_statusbar(draw);
-#endif    
-}
-#else
-#define gui_wps_statusbar_draw(wps, force) viewportmanager_set_statusbar(true)
-#endif
-#include "pcmbuf.h"
 
 /* fades the volume */
 bool wps_fading_out = false;
@@ -170,7 +141,6 @@ void fade(bool fade_in, bool updatewps)
 */
 bool update_onvol_change(struct gui_wps * gwps)
 {
-    gui_wps_statusbar_draw(gwps, false);
     gui_wps_refresh(gwps, 0, WPS_REFRESH_NON_STATIC);
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -366,7 +336,6 @@ bool gui_wps_display(void)
             }
 #endif
 #endif
-
             gui_wps[i].display->clear_display();
             if (!gui_wps[i].data->wps_loaded) {
                 if ( !gui_wps[i].data->num_tokens ) {
@@ -480,8 +449,6 @@ bool update(struct gui_wps *gwps)
         else
             gui_wps_refresh(gwps, 0, WPS_REFRESH_NON_STATIC);
     }
-
-    gui_wps_statusbar_draw(gwps, false);
 
     return retcode;
 }
@@ -1978,7 +1945,6 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     bool update_line, new_subline_refresh;
 
 #ifdef HAVE_LCD_BITMAP
-    gui_wps_statusbar_draw(gwps, true);
 
     /* to find out wether the peak meter is enabled we
        assume it wasn't until we find a line that contains
@@ -2195,7 +2161,8 @@ bool gui_wps_refresh(struct gui_wps *gwps,
             remote_backlight_on();
     }
 #endif
-
+    /* force a bars update if they are being displayed */
+    viewportmanager_draw_statusbars(NULL);
     return true;
 }
 

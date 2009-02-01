@@ -94,6 +94,7 @@ int menu_show(int m)
     bool exit = false;
     int key;
 
+    char bars = rb->viewportmanager_set_statusbar(VP_ALLSCREENS);
     rb->gui_synclist_draw(&(menus[m].synclist));
     while (!exit) {
         key = rb->get_action(CONTEXT_MAINMENU,HZ/2);
@@ -123,6 +124,7 @@ int menu_show(int m)
                 break;
         }
     }
+    rb->viewportmanager_set_statusbar(bars);
     return MENU_SELECTED_EXIT;
 }
 

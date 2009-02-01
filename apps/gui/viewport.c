@@ -35,7 +35,7 @@
 #include "screen_access.h"
 #include "appevents.h"
 
-static bool statusbar_enabled = true;
+static char statusbar_enabled = VP_ALLSCREENS;
 
 int viewport_get_nb_lines(struct viewport *vp)
 {
@@ -47,13 +47,19 @@ int viewport_get_nb_lines(struct viewport *vp)
 #endif
 }
 
+static bool showing_bars(enum screen_type screen)
+{
+    if (statusbar_enabled&(1<<screen))
+        return global_settings.statusbar || (statusbar_enabled&(1<<(screen+4)));
+    return false;
+}    
 
 void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 {
     vp->x = 0;
     vp->width = screens[screen].lcdwidth;
 
-    vp->y = statusbar_enabled?gui_statusbar_height():0;
+    vp->y = showing_bars(screen)?gui_statusbar_height():0;
     vp->height = screens[screen].lcdheight - vp->y;
 #ifdef HAVE_LCD_BITMAP
     vp->drawmode = DRMODE_SOLID;
@@ -87,17 +93,18 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 }
 
 /* returns true if it was enabled BEFORE this call */
-bool viewportmanager_set_statusbar(bool enabled)
+char viewportmanager_set_statusbar(char enabled)
 {
-    bool old = statusbar_enabled;
-    if (enabled 
-#ifdef HAVE_LCD_BITMAP    
-                && global_settings.statusbar
-#endif    
-       )
+    char old = statusbar_enabled;
+    if (enabled)
     {
+        int i;
+        FOR_NB_SCREENS(i)
+        {
+            if (showing_bars(i))
+                gui_statusbar_draw(&statusbars.statusbars[i], true);
+        }
         add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_draw_statusbars);
-        gui_syncstatusbar_draw(&statusbars, true);
     }
     else
     {
@@ -110,8 +117,12 @@ bool viewportmanager_set_statusbar(bool enabled)
 void viewportmanager_draw_statusbars(void* data)
 {
     (void)data;
-    if (statusbar_enabled)
-        gui_syncstatusbar_draw(&statusbars, false);
+    int i;
+    FOR_NB_SCREENS(i)
+    {
+        if (showing_bars(i))
+            gui_statusbar_draw(&statusbars.statusbars[i], false);
+    }
 }
 
 void viewportmanager_statusbar_changed(void* data)

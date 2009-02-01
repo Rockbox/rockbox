@@ -270,7 +270,7 @@ static int wpsscrn(void* param)
     show_remote_main_backdrop();
 #endif
     /* always re-enable the statusbar after the WPS */
-    viewportmanager_set_statusbar(true);
+    viewportmanager_set_statusbar(VP_ALLSCREENS);
     return ret_val;
 }
 #if CONFIG_TUNER

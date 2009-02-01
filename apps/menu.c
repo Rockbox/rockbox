@@ -355,7 +355,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     const struct menu_item_ex *temp, *menu;
     int ret = 0, i;
     bool redraw_lists;
-    bool oldbars = viewportmanager_set_statusbar(!hide_bars);
+    char oldbars = viewportmanager_set_statusbar(hide_bars?0:VP_ALLSCREENS);
     
     const struct menu_item_ex *menu_stack[MAX_MENUS];
     int menu_stack_selected_item[MAX_MENUS];

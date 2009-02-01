@@ -41,7 +41,18 @@ int viewport_load_config(const char *config, struct viewport *vp);
 
 void viewport_set_defaults(struct viewport *vp, enum screen_type screen);
 
-bool viewportmanager_set_statusbar(bool enabled);
+/* viewportmanager_set_statusbar() is used to specify which screens the statusbar
+ * should be displayed on.
+ * *usually* enabled will be VP_ALLSCREENS which means display the bar if the setting
+ * is enabled. (and it will be on both screens)
+ * For the WPS (and other possible exceptions) use VP_IGNORE_SB_SETTING() to
+ * FORCE the statusbar on for the given screen (i.e it will show regardless of the setting
+ */
+#define VP_SB_ONSCREEN(screen) (1<<screen) /* turn the SB on "screen" only */
+#define VP_ALLSCREENS (VP_SB_ONSCREEN(0)|VP_SB_ONSCREEN(1)) /* SB on for both screens */
+#define VP_IGNORE_SB_SETTING(screen) (1<<(4+screen))
+char viewportmanager_set_statusbar(char enabled);
+
 /* callbacks for GUI_EVENT_* events */
 void viewportmanager_draw_statusbars(void*data);
 void viewportmanager_statusbar_changed(void* data);
