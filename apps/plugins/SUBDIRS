@@ -25,8 +25,8 @@ zxbox
 #endif
 #endif
 
-/* For all the colour targets, iriver H1x0 and iAudio M5 */
-#if defined(HAVE_LCD_COLOR) && !defined (SANSA_C200)\
+/* For all big enough colour screens, iriver H1x0 and iAudio M5 */
+#if defined(HAVE_LCD_COLOR) && LCD_HEIGHT > 80\
  || defined(IRIVER_H100_SERIES) || defined(IAUDIO_M5)
 pacbox
 #endif
