@@ -636,7 +636,7 @@ static const struct plugin_api rockbox_api = {
 int plugin_load(const char* plugin, const void* parameter)
 {
     int rc;
-    char oldbars;
+    int oldbars;
     struct plugin_header *hdr;
 #ifdef SIMULATOR
     void *pd;
@@ -743,7 +743,7 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif
 
     invalidate_icache();
-    oldbars = viewportmanager_set_statusbar(0);
+    oldbars = viewportmanager_set_statusbar(VP_SB_HIDE_ALL);
 
     rc = hdr->entry_point(parameter);
     

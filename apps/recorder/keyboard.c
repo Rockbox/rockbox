@@ -298,7 +298,7 @@ int kbd_input(char* text, int buflen)
     int morse_tick = 0;
     char buf[2];
 #endif
-    char oldbars = viewportmanager_set_statusbar(0);
+    char oldbars = viewportmanager_set_statusbar(VP_SB_HIDE_ALL);
     FOR_NB_SCREENS(l)
     {
         struct keyboard_parameters *pm = &param[l];

@@ -115,24 +115,25 @@ static void next_track(void)
 
     audio_next();
 }
-static char fix_wps_bars(void)
+static int fix_wps_bars(void)
 {
 #ifdef HAVE_LCD_BITMAP
     int i;  
-    char wpsbars = 0;
+    int wpsbars = VP_SB_HIDE_ALL;
     FOR_NB_SCREENS(i)
     {
         bool draw = global_settings.statusbar;
         if (gui_wps[i].data->wps_sb_tag)
             draw = gui_wps[i].data->show_sb_on_wps;
         if (draw)
-            wpsbars |=  VP_IGNORE_SB_SETTING(i)|(1<<i);
+            wpsbars |= (VP_SB_ONSCREEN(i) | VP_SB_IGNORE_SETTING(i));
     } 
     return wpsbars;
 #else
-    return 1;    
+    return VP_SB_ALLSCREENS;
 #endif
 }
+
 long gui_wps_show(void)
 {
     long button = 0;
@@ -143,7 +144,7 @@ long gui_wps_show(void)
     bool update_track = false;
     int i;
     long last_left = 0, last_right = 0;
-    char wpsbars = 0, oldbars = 0;
+    int wpsbars, oldbars;
     
     wps_state_init();
 
@@ -165,7 +166,7 @@ long gui_wps_show(void)
     ab_reset_markers();
 #endif
 
-    oldbars = viewportmanager_set_statusbar(0);
+    oldbars = viewportmanager_set_statusbar(VP_SB_HIDE_ALL);
     if(audio_status() & AUDIO_STATUS_PLAY)
     {
         wps_state.id3 = audio_current_track();

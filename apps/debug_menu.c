@@ -2739,7 +2739,7 @@ static int menu_action_callback(int btn, struct gui_synclist *lists)
 {
     if (btn == ACTION_STD_OK)
     {
-        char oldbars = viewportmanager_set_statusbar(0);
+        int oldbars = viewportmanager_set_statusbar(VP_SB_HIDE_ALL);
         menuitems[gui_synclist_get_sel_pos(lists)].function();
         btn = ACTION_REDRAW;
         viewportmanager_set_statusbar(oldbars);

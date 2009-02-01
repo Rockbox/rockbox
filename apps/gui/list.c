@@ -845,7 +845,7 @@ bool simplelist_show_list(struct simplelist_info *info)
 {
     struct gui_synclist lists;
     int action, old_line_count = simplelist_line_count;
-    char oldbars = viewportmanager_set_statusbar(VP_ALLSCREENS);
+    int oldbars = viewportmanager_set_statusbar(VP_SB_ALLSCREENS);
     char* (*getname)(int item, void * data, char *buffer, size_t buffer_len);
     int wrap = LIST_WRAP_UNLESS_HELD;
     if (info->get_name)
