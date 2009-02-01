@@ -346,6 +346,12 @@ static const struct button_mapping button_context_yesnoscreen[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_settings_yesnoscreen */
 
+static const struct button_mapping remote_button_context_yesnoscreen[]  = {
+    { ACTION_YESNO_ACCEPT,          BUTTON_RC_PLAY,              BUTTON_NONE },
+    LAST_ITEM_IN_LIST
+}; /* remote_button_context_settings_yesnoscreen */
+
+
 static const struct button_mapping* get_context_mapping_remote( int context )
 {
     context ^= CONTEXT_REMOTE;
@@ -379,6 +385,9 @@ static const struct button_mapping* get_context_mapping_remote( int context )
 
         case CONTEXT_WPS:
             return remote_button_context_wps;
+
+        case CONTEXT_YESNOSCREEN:
+            return remote_button_context_yesnoscreen;
     }
 }
 
