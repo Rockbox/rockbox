@@ -29,10 +29,14 @@
 /* Describes single events for each GPIO1 pin */
 static const struct gpio_event gpio1_events[] =
 {
+    /* mc13783 keeps the PRIINT high (no low pulse) if other unmasked
+     * interrupts become active when clearing them or if a source being
+     * cleared becomes active at that time. Edge-detection will not get
+     * a rising edge in that case so use high-level sense. */
     [MC13783_EVENT_ID-GPIO1_EVENT_FIRST] =
     {
         .mask     = 1 << MC13783_GPIO_LINE,
-        .sense    = GPIO_SENSE_RISING,
+        .sense    = GPIO_SENSE_HIGH_LEVEL,
         .callback = mc13783_event,
     }
 };

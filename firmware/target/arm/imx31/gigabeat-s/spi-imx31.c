@@ -220,6 +220,15 @@ static bool spi_set_context(struct spi_node *node,
     return true;
 }
 
+static void spi_reset(struct cspi_map * const base)
+{
+    /* Reset */
+    base->conreg &= ~CSPI_CONREG_EN;
+    base->conreg |= CSPI_CONREG_EN;
+    base->intreg = 0;
+    base->statreg = CSPI_STATREG_TC | CSPI_STATREG_BO;
+}
+
 /* Initialize each of the used SPI descriptors */
 void spi_init(void)
 {
@@ -259,13 +268,9 @@ void spi_enable_module(struct spi_node *node)
 
         /* Enable clock-gating register */
         imx31_clkctl_module_clock_gating(desc->cg, CGM_ON_ALL);
-        
         /* Reset */
-        base->conreg &= ~CSPI_CONREG_EN;
-        base->conreg |= CSPI_CONREG_EN;
-        base->intreg = 0;
-        base->statreg = CSPI_STATREG_TC | CSPI_STATREG_BO;
-
+        spi_reset(base);
+        desc->last = NULL;
         /* Enable interrupt at controller level */
         avic_enable_int(desc->ints, IRQ, 6, desc->handler);
     }
@@ -333,8 +338,9 @@ int spi_transfer(struct spi_node *node, struct spi_transfer *trans)
 
         if (wakeup_wait(&desc->w, HZ) != OBJ_WAIT_SUCCEEDED)
         {
-            base->intreg = 0;
-            base->conreg &= ~CSPI_CONREG_XCH;
+            base->intreg = 0;  /* Stop SPI ints */
+            spi_reset(base);   /* Reset module (esp. to empty FIFOs) */
+            desc->last = NULL; /* Force reconfigure */
             retval = false;
         }
     }

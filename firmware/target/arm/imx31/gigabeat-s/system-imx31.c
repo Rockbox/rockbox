@@ -172,24 +172,46 @@ void system_init(void)
     gpio_init();
 }
 
-void imx31_regmod32(volatile uint32_t *reg_p, uint32_t value, uint32_t mask)
+void  __attribute__((naked)) imx31_regmod32(volatile uint32_t *reg_p,
+                                            uint32_t value,
+                                            uint32_t mask)
 {
-    value &= mask;
-    mask = ~mask;
-
-    int oldlevel = disable_interrupt_save(IRQ_FIQ_STATUS);
-    *reg_p = (*reg_p & mask) | value;
-    restore_interrupt(oldlevel);
+    asm volatile("and    r1, r1, r2 \n"
+                 "mrs    ip, cpsr   \n"
+                 "cpsid  if         \n"
+                 "ldr    r3, [r0]   \n"
+                 "bic    r3, r3, r2 \n" 
+                 "orr    r3, r3, r1 \n"
+                 "str    r3, [r0]   \n"
+                 "msr    cpsr_c, ip \n"
+                 "bx     lr         \n");
+    (void)reg_p; (void)value; (void)mask;
 }
 
-void imx31_regset32(volatile uint32_t *reg_p, uint32_t mask)
+void __attribute__((naked)) imx31_regset32(volatile uint32_t *reg_p,
+                                           uint32_t mask)
 {
-    imx31_regmod32(reg_p, mask, mask);
+    asm volatile("mrs    r3, cpsr   \n"
+                 "cpsid  if         \n"
+                 "ldr    r2, [r0]   \n"
+                 "orr    r2, r2, r1 \n"
+                 "str    r2, [r0]   \n"
+                 "msr    cpsr_c, r3 \n"
+                 "bx     lr         \n");
+    (void)reg_p; (void)mask;
 }
 
-void imx31_regclr32(volatile uint32_t *reg_p, uint32_t mask)
+void __attribute__((naked)) imx31_regclr32(volatile uint32_t *reg_p,
+                                           uint32_t mask)
 {
-    imx31_regmod32(reg_p, 0, mask);
+    asm volatile("mrs    r3, cpsr   \n"
+                 "cpsid  if         \n"
+                 "ldr    r2, [r0]   \n"
+                 "bic    r2, r2, r1 \n"
+                 "str    r2, [r0]   \n"
+                 "msr    cpsr_c, r3 \n"
+                 "bx     lr         \n");
+    (void)reg_p; (void)mask;
 }
 
 #ifdef BOOTLOADER

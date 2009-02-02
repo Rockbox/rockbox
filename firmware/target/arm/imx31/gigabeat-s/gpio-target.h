@@ -24,6 +24,7 @@
 #define GPIO_TARGET_H
 
 /* MC13783 GPIO pin info for this target */
+#define MC13783_GPIO_IMR    GPIO1_IMR
 #define MC13783_GPIO_NUM    GPIO1_NUM   
 #define MC13783_GPIO_ISR    GPIO1_ISR
 #define MC13783_GPIO_LINE   31

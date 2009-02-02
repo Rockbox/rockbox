@@ -98,6 +98,12 @@ static void mc13783_interrupt_thread(void)
 
         mc13783_write_regset(pmic_ints_regs, pending, 2);
 
+        /* Whatever is going to be serviced in this loop has been
+         * acknowledged. Reenable interrupt and if anything was still
+         * pending or became pending again, another signal will be
+         * generated. */
+        imx31_regset32(&MC13783_GPIO_IMR, 1ul << MC13783_GPIO_LINE);
+
         event = mc13783_event_list.events;
         event_last = event + mc13783_event_list.count;
 
@@ -129,6 +135,8 @@ static void mc13783_interrupt_thread(void)
 /* GPIO interrupt handler for mc13783 */
 void mc13783_event(void)
 {
+    /* Mask the interrupt (unmasked when PMIC thread services it). */
+    imx31_regclr32(&MC13783_GPIO_IMR, 1ul << MC13783_GPIO_LINE);
     MC13783_GPIO_ISR = (1ul << MC13783_GPIO_LINE);
     wakeup_signal(&mc13783_wake);
 }
