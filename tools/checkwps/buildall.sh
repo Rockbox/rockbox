@@ -1,8 +1,10 @@
 #!/bin/sh
-cat targets.txt | (
+rootdir=`dirname $0`
+
+cat $rootdir/targets.txt | (
     while read target model
     do
-        rm -f checkwps.$model
-        make MODEL=$model TARGET=$target checkwps
+        rm -f $rootdir/checkwps.$model
+        make -s -C $rootdir MODEL=$model TARGET=$target checkwps
     done
 )

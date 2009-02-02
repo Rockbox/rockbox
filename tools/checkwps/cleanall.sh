@@ -1,7 +1,9 @@
 #!/bin/sh
-cat targets.txt | (
+rootdir=`dirname $0`
+
+cat $rootdir/targets.txt | (
     while read target model
     do
-        rm -f checkwps.$model
+        rm -f $rootdir/checkwps.$model
     done
 )
