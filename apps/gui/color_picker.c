@@ -250,7 +250,7 @@ static void draw_screen(struct screen *display, char *title,
         /* Draw label */
         buf[0] = str(LANG_COLOR_RGB_LABELS)[i];
         buf[1] = '\0';
-        display->putsxy(slider_left - display->getcharwidth() -
+        display->putsxy(slider_left - max_label_width -
                         SLIDER_MARGIN_LEFT, text_top, buf);
 
         /* Draw color value */
