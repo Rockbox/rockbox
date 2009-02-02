@@ -459,7 +459,6 @@ int radio_screen(void)
     bool update_screen = true;
     bool screen_freeze = false;
     bool keep_playing = false;
-    bool statusbar = global_settings.statusbar;
     bool talk = false;
 #ifdef FM_RECORD_DBLPRE
     int lastbutton = BUTTON_NONE;
@@ -477,6 +476,7 @@ int radio_screen(void)
     int button_timeout = current_tick + (2*HZ);
 #endif
     struct viewport vp[NB_SCREENS];
+    int oldbars = 0, fmbars = VP_SB_ALLSCREENS;
 #ifdef HAVE_BUTTONBAR
     struct gui_buttonbar buttonbar;
     gui_buttonbar_init(&buttonbar);
@@ -487,8 +487,9 @@ int radio_screen(void)
     in_screen = true;
 
     /* always display status bar in radio screen for now */
-    global_status.statusbar_forced = statusbar?0:1;
-    global_settings.statusbar = true;
+    FOR_NB_SCREENS(i)
+        fmbars |= VP_SB_IGNORE_SETTING(i);
+    oldbars = viewportmanager_set_statusbar(fmbars);
     FOR_NB_SCREENS(i)
     {
         viewport_set_defaults(&vp[i], i);
@@ -744,8 +745,10 @@ int radio_screen(void)
                 break;
 
             case ACTION_FM_MENU:
+                viewportmanager_set_statusbar(oldbars);
                 radio_menu();
                 curr_preset = find_preset(curr_freq);
+                viewportmanager_set_statusbar(fmbars);
                 FOR_NB_SCREENS(i)
                 {
                     screens[i].set_viewport(&vp[i]);
@@ -777,7 +780,9 @@ int radio_screen(void)
 
                     break;
                 }
+                viewportmanager_set_statusbar(oldbars);
                 handle_radio_presets();
+                viewportmanager_set_statusbar(fmbars);
                 FOR_NB_SCREENS(i)
                 {
                     screens[i].set_viewport(&vp[i]);
@@ -1073,9 +1078,7 @@ int radio_screen(void)
     cpu_idle_mode(false);
 #endif
 
-    /* restore status bar settings */
-    global_settings.statusbar = statusbar;
-    global_status.statusbar_forced = 0;
+    viewportmanager_set_statusbar(oldbars);
     in_screen = false;
 #if CONFIG_CODEC != SWCODEC
     return have_recorded;

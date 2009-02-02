@@ -294,11 +294,6 @@ struct system_status
 #if CONFIG_TUNER
     int last_frequency;  /* Last frequency for resuming, in FREQ_STEP units,
                             relative to MIN_FREQ */
-    int statusbar_forced; /* fix the bug where the statusbar would stay shown
-                              if powered off inside the fm screen...
-                              for some reason the screen doesnt use global_settings.statusbar
-                              obviously a better fix is to fix the screen... so remove this
-                              when that happens */
 #endif
     signed char last_screen;
     int  viewer_icon_count;

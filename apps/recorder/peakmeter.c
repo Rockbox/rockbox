@@ -1329,7 +1329,8 @@ void peak_meter_draw_trig(int xpos[], int ypos[],
 #endif
 
 int peak_meter_draw_get_btn(int action_context, int x[], int y[],
-                            int height[], int nb_screens)
+                            int height[], int nb_screens,
+                            struct viewport vps[])
 {
     int button = BUTTON_NONE;
     long next_refresh = current_tick;
@@ -1362,6 +1363,7 @@ int peak_meter_draw_get_btn(int action_context, int x[], int y[],
         if (TIME_AFTER(current_tick, next_refresh)) {
             for(i = 0; i < nb_screens; i++)
             {
+                screens[i].set_viewport(&vps[i]);                                
                 peak_meter_screen(&screens[i], x[i], y[i], height[i]);
                 screens[i].update_viewport_rect(x[i], y[i],
                                                 screens[i].getwidth() - x[i],

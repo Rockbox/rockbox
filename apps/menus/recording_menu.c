@@ -458,7 +458,7 @@ static void trigger_speak_item(const struct settings_list **settings,
 }
 int rectrigger(void)
 {
-    struct viewport vp[NB_SCREENS];
+    struct viewport vp[NB_SCREENS], triggervp[NB_SCREENS];
     struct gui_synclist lists;
     int i, action = ACTION_REDRAW;
     bool done = false, changed = true;
@@ -488,12 +488,15 @@ int rectrigger(void)
         screens[i].update();
         viewport_set_defaults(&vp[i], i);
         vp[i].height -= SYSFONT_HEIGHT*2;
+        triggervp[i] = vp[i];
+        triggervp[i].y = vp[i].y + vp[i].height;
+        triggervp[i].height = SYSFONT_HEIGHT*2;
         trig_xpos[i] = 0;
-        trig_ypos[i] =  vp[i].y + vp[i].height;
+        trig_ypos[i] =  0;
         pm_x[i] = 0;
-        pm_y[i] = screens[i].getheight() - SYSFONT_HEIGHT;
+        pm_y[i] = SYSFONT_HEIGHT;
         pm_h[i] = SYSFONT_HEIGHT;
-        trig_width[i] = screens[i].getwidth();
+        trig_width[i] = triggervp[i].width;
     }
     /* TODO: what to do if there is < 4 lines on the screen? */
 
@@ -542,9 +545,11 @@ int rectrigger(void)
             changed = false;
         }
         
+        FOR_NB_SCREENS(i)
+            screens[i].set_viewport(&triggervp[i]);
         peak_meter_draw_trig(trig_xpos, trig_ypos, trig_width, NB_SCREENS);
         action = peak_meter_draw_get_btn(CONTEXT_SETTINGS_RECTRIGGER,
-                                         pm_x, pm_y, pm_h, NB_SCREENS);
+                                         pm_x, pm_y, pm_h, NB_SCREENS, triggervp);
         FOR_NB_SCREENS(i)
             screens[i].update();
         i = gui_synclist_get_sel_pos(&lists);

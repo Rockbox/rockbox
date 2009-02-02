@@ -813,11 +813,6 @@ void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
     }
 }
 
-int gui_statusbar_height(void)
-{
-    return global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
-}
-
 void gui_statusbar_changed(bool enabled)
 {
     (void)enabled;

@@ -1021,6 +1021,7 @@ bool recording_screen(bool no_source)
     int peak_l, peak_r;
     int balance = 0;
 #endif
+    int oldbars, recbars = VP_SB_ALLSCREENS;
     int i;
     int pm_x[NB_SCREENS];           /* peakmeter (and trigger bar) x pos */
     int pm_y[NB_SCREENS];           /* peakmeter y pos */
@@ -1032,12 +1033,6 @@ bool recording_screen(bool no_source)
     struct gui_synclist lists;      /* the list in the bottom vp */
 #ifdef HAVE_FMRADIO_REC
     int prev_rec_source = global_settings.rec_source; /* detect source change */
-#endif
-
-#if CONFIG_TUNER
-    bool statusbar = global_settings.statusbar;
-    global_status.statusbar_forced = statusbar?0:1;
-    global_settings.statusbar = true;
 #endif
 
     static const unsigned char *byte_units[] = {
@@ -1095,6 +1090,9 @@ bool recording_screen(bool no_source)
 #endif
 
     /* viewport init and calculations that only needs to be done once */
+    FOR_NB_SCREENS(i)
+        recbars |= VP_SB_IGNORE_SETTING(i);
+    oldbars = viewportmanager_set_statusbar(recbars);
     FOR_NB_SCREENS(i)
     {
         struct viewport *v;
@@ -1169,8 +1167,6 @@ bool recording_screen(bool no_source)
                 if(compact_view[i])
                     pm_h[i] /= 2;
                 trig_width[i] = vp_top[i].width - pm_x[i];
-                screens[i].clear_display();
-                screens[i].update();
             }
 
 #if CONFIG_CODEC == SWCODEC
@@ -1307,15 +1303,10 @@ bool recording_screen(bool no_source)
         }
 #endif /* CONFIG_LED */
 
-        /* first set current vp - stays like this for drawing that follows */
-        FOR_NB_SCREENS(i)
-            screens[i].set_viewport(&vp_top[i]);
-
         /* Wait for a button a while (HZ/10) drawing the peak meter */
         button = peak_meter_draw_get_btn(CONTEXT_RECSCREEN,
                                          pm_x, pm_y, pm_h,
-                                         screen_update);
-
+                                         screen_update, vp_top);
         if (last_audio_stat != audio_stat)
         {
             if (audio_stat & AUDIO_STATUS_RECORD)
@@ -1336,9 +1327,6 @@ bool recording_screen(bool no_source)
         /* let list handle the button */
         gui_synclist_do_button(&lists, &button, LIST_WRAP_UNLESS_HELD);
 
-        /* list code changes active viewport - change it back */
-        FOR_NB_SCREENS(i)
-            screens[i].set_viewport(&vp_top[i]);
 
         switch(button)
         {
@@ -1599,6 +1587,7 @@ bool recording_screen(bool no_source)
                     /* led is restored at begin of loop / end of function */
                     led(false);
 #endif
+                    viewportmanager_set_statusbar(oldbars);
                     if (recording_menu(no_source))
                     {
                         done = 1;
@@ -1612,6 +1601,7 @@ bool recording_screen(bool no_source)
                         done = -1;
                         /* the init is now done at the beginning of the loop */
                     }
+                    viewportmanager_set_statusbar(recbars);
                 }
                 break;
 
@@ -1623,6 +1613,7 @@ bool recording_screen(bool no_source)
                     /* led is restored at begin of loop / end of function */
                     led(false);
 #endif
+                    viewportmanager_set_statusbar(oldbars);
                     if (f2_rec_screen())
                     {
                         rec_status |= RCSTAT_HAVE_RECORDED;
@@ -1630,6 +1621,7 @@ bool recording_screen(bool no_source)
                     }
                     else
                         update_countdown = 0; /* Update immediately */
+                    viewportmanager_set_statusbar(recbars);
                 }
                 break;
 
@@ -1645,6 +1637,7 @@ bool recording_screen(bool no_source)
                     /* led is restored at begin of loop / end of function */
                     led(false);
 #endif
+                    viewportmanager_set_statusbar(oldbars);
                     if (f3_rec_screen())
                     {
                         rec_status |= RCSTAT_HAVE_RECORDED;
@@ -1652,6 +1645,7 @@ bool recording_screen(bool no_source)
                     }
                     else
                         update_countdown = 0; /* Update immediately */
+                    viewportmanager_set_statusbar(recbars);
                 }
                 break;
 #endif /*  CONFIG_KEYPAD == RECORDER_PAD */
@@ -1692,10 +1686,12 @@ bool recording_screen(bool no_source)
             unsigned int dseconds, dhours, dminutes;
             unsigned long num_recorded_bytes, dsize, dmb;
 
-            /* we assume vp_top is the current viewport! */
-            FOR_NB_ACTIVE_SCREENS(i)
+            
+            FOR_NB_SCREENS(i)
+            {
+                screens[i].set_viewport(&vp_top[i]);
                 screens[i].clear_viewport();
-
+            }    
             update_countdown = 5;
             last_seconds = seconds;
 
@@ -1863,7 +1859,6 @@ bool recording_screen(bool no_source)
             /* draw peakmeter again (check if this can be removed) */
             FOR_NB_ACTIVE_SCREENS(i)
             {
-                gui_statusbar_draw(&(statusbars.statusbars[i]), true);
                 screens[i].set_viewport(&vp_top[i]);
                 peak_meter_screen(&screens[i], pm_x[i], pm_y[i], pm_h[i]);
                 screens[i].update();
@@ -1930,6 +1925,7 @@ rec_abort:
     rec_status &= ~RCSTAT_IN_RECSCREEN;
     sound_settings_apply();
 
+    viewportmanager_set_statusbar(oldbars);
     FOR_NB_SCREENS(i)
         screens[i].setfont(FONT_UI);
 
@@ -1941,11 +1937,6 @@ rec_abort:
 #if (CONFIG_STORAGE & STORAGE_ATA) && (CONFIG_LED == LED_REAL) \
    && !defined(SIMULATOR)
     ata_set_led_enabled(true);
-#endif
-
-#if CONFIG_TUNER
-    global_settings.statusbar = statusbar;
-    global_status.statusbar_forced = 0;
 #endif
 
     settings_save();
