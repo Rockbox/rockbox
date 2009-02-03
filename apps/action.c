@@ -63,8 +63,6 @@ static inline int do_button_check(const struct button_mapping *items,
 {
     int i = 0;
     int ret = ACTION_UNKNOWN;
-    if (items == NULL)
-        return ACTION_UNKNOWN;
 
     while (items[i].button_code != BUTTON_NONE)
     {
@@ -192,7 +190,7 @@ static int get_action_worker(int context, int timeout,
 #endif /* HAS_BUTTON_HOLD */
 
     /*   logf("%x,%x",last_button,button); */
-    do
+    while (1)
     {
         /*     logf("context = %x",context); */
 #if (BUTTON_REMOTE != 0)
@@ -204,19 +202,25 @@ static int get_action_worker(int context, int timeout,
         else
             items = get_context_mapping(context);
 
-        ret = do_button_check(items,button,last_button,&i);
-
-        if ((context ==(int)CONTEXT_STOPSEARCHING) ||
-             items == NULL )
+        if (items == NULL)
             break;
 
-        if (ret == ACTION_UNKNOWN )
+        ret = do_button_check(items,button,last_button,&i);
+
+        if (ret == ACTION_UNKNOWN)
         {
             context = get_next_context(items,i);
-            i = 0;
+
+            if (context != (int)CONTEXT_STOPSEARCHING)
+            {
+                i = 0;
+                continue;
+            }
         }
-        else break;
-    } while (1);
+
+        /* Action was found or STOPSEARCHING was specified */
+        break;
+    }
     /* DEBUGF("ret = %x\n",ret); */
 #ifndef HAS_BUTTON_HOLD
     if (screen_has_lock && (ret == ACTION_STD_KEYLOCK))

@@ -39,7 +39,8 @@ const struct button_mapping remote_directions[] =
     { PLA_RIGHT_REPEAT,      BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE},
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H10_PAD) || \
-      (CONFIG_KEYPAD == GIGABEAT_PAD)
+      (CONFIG_KEYPAD == GIGABEAT_PAD) || \
+      (CONFIG_KEYPAD == GIGABEAT_S_PAD)
     { PLA_UP,                BUTTON_RC_FF,                     BUTTON_NONE},
     { PLA_DOWN,              BUTTON_RC_REW,                    BUTTON_NONE},
     { PLA_LEFT,              BUTTON_RC_VOL_DOWN,               BUTTON_NONE},

@@ -55,8 +55,13 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
     };
 
     int col;
-    /* Power button is handled separately on PMIC */
+    /* Power button is handled separately on PMIC, remote read in headphone
+     * jack driver. */
+#ifdef HAVE_HEADPHONE_DETECTION
+    int button = int_btn & (BUTTON_POWER | BUTTON_REMOTE);
+#else
     int button = int_btn & BUTTON_POWER;
+#endif
 
     int oldlevel = disable_irq_save();
 
@@ -110,9 +115,9 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
     else
         KPP_KPSR |= KPP_KPSR_KDIE;
 
-    restore_irq(oldlevel);
-
     int_btn = button;
+
+    restore_irq(oldlevel);
 }
 
 bool button_hold(void)
