@@ -481,15 +481,47 @@ static inline void copy_read_sectors_slow(unsigned char** buf)
 /* Writes have to be kept slow for now */
 static inline void copy_write_sectors(const unsigned char** buf)
 {
-    int cnt = FIFO_LEN;
+    int cnt = FIFO_LEN - 1;
     unsigned t;
+    long time;
 
-    do
+    time = USEC_TIMER + 3;
+    if  (((intptr_t)*buf & 3) == 0)
     {
+        asm volatile (
+            "ldmia  %[buf]!, { r3, r5, r7, r9 } \r\n"
+            "mov    r4, r3, lsr #16             \r\n" 
+            "mov    r6, r5, lsr #16             \r\n" 
+            "mov    r8, r7, lsr #16             \r\n" 
+            "mov    r10, r9, lsr #16            \r\n" 
+            "stmia  %[data], { r3-r10 }         \r\n"
+            "ldmia  %[buf]!, { r3, r5, r7, r9 } \r\n"
+            "mov    r4, r3, lsr #16             \r\n" 
+            "mov    r6, r5, lsr #16             \r\n" 
+            "mov    r8, r7, lsr #16             \r\n" 
+            "mov    %[t], r9, lsr #16           \r\n" 
+            "stmia  %[data], { r3-r9 }          \r\n"
+            : [buf]"+&r"(*buf), [t]"=&r"(t) 
+            : [data]"r"(&MMC_DATA_FIFO)
+            : "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10"
+        );
+    }
+    else
+    {
+        do
+        {
+            t  = *(*buf)++;
+            t |= *(*buf)++ << 8;
+            MMC_DATA_FIFO = t;
+        } while (--cnt > 0); /* tail loop is faster */
         t  = *(*buf)++;
         t |= *(*buf)++ << 8;
-        MMC_DATA_FIFO = t;
-    } while (--cnt > 0); /* tail loop is faster */
+    }
+    /* Don't write the last word before at least 3 usec have elapsed since FIFO_EMPTY */
+    /* This prevents the 'two bytes inserted' bug. */
+
+    while (!TIME_AFTER(USEC_TIMER, time));
+    MMC_DATA_FIFO = t;
 }
 
 static int sd_select_bank(unsigned char bank)
@@ -988,15 +1020,13 @@ sd_write_retry:
     {
         /* SDHC */
         ret = sd_command(SD_WRITE_MULTIPLE_BLOCK, start, NULL,
-                         0x1c00 | CMDAT_BUSY | CMDAT_WR_RD |
-                         CMDAT_DATA_EN | CMDAT_RES_TYPE1);
+                         CMDAT_WR_RD | CMDAT_DATA_EN | CMDAT_RES_TYPE1);
     }
     else
 #endif
     {
         ret = sd_command(SD_WRITE_MULTIPLE_BLOCK, start*BLOCK_SIZE, NULL,
-                         0x1c00 | CMDAT_BUSY | CMDAT_WR_RD |
-                         CMDAT_DATA_EN | CMDAT_RES_TYPE1);
+                         CMDAT_WR_RD | CMDAT_DATA_EN | CMDAT_RES_TYPE1);
     }
     if (ret < 0)
         goto sd_write_error;
@@ -1011,18 +1041,15 @@ sd_write_retry:
             MMC_SD_STATE = SD_PRG;
         }
 
-        udelay(2); /* needed here (loop is too fast :-) */
+        copy_write_sectors(&buf); /* Copy one chunk of 16 words */
+        /* TODO: Switch bank if necessary */
 
         /* Wait for the FIFO to empty */
-        if (sd_poll_status(STAT_XMIT_FIFO_EMPTY, 0x80000))
+        if (!sd_poll_status(STAT_XMIT_FIFO_EMPTY, 0x80000))
         {
-            copy_write_sectors(&buf); /* Copy one chunk of 16 words */
-            /* TODO: Switch bank if necessary */
-            continue;
+            ret = -EC_FIFO_WR_EMPTY;
+            goto sd_write_error;
         }
-
-        ret = -EC_FIFO_WR_EMPTY;
-        goto sd_write_error;
     }
 
     last_disk_activity = current_tick;
