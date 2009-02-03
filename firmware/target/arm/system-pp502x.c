@@ -35,6 +35,10 @@ extern void SERIAL0(void);
 extern void ipod_mini_button_int(void); /* iPod Mini 1st gen only */
 extern void ipod_4g_button_int(void);   /* iPod 4th gen and higher only */
 
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
+static struct corelock cpufreq_cl SHAREDBSS_ATTR;
+#endif
+
 void __attribute__((interrupt("IRQ"))) irq_handler(void)
 {
     if(CURRENT_CORE == CPU)
@@ -236,7 +240,7 @@ static void pp_set_cpu_frequency(long frequency)
 #endif
 {      
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
-    spinlock_lock(&boostctrl_spin);
+    corelock_lock(&cpufreq_cl);
 #endif
 
     switch (frequency)
@@ -347,7 +351,7 @@ static void pp_set_cpu_frequency(long frequency)
     }
     
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
-    spinlock_unlock(&boostctrl_spin);
+    corelock_unlock(&cpufreq_cl);
 #endif
 }
 #endif /* !BOOTLOADER || SANSA_E200 || SANSA_C200 */
@@ -475,6 +479,7 @@ void system_init(void)
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #if NUM_CORES > 1
+        corelock_init(&cpufreq_cl);
         cpu_boost_init();
 #endif
 #else

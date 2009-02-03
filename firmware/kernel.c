@@ -962,57 +962,6 @@ void mutex_unlock(struct mutex *m)
 }
 
 /****************************************************************************
- * Simpl-er mutex functions ;)
- ****************************************************************************/
-#if NUM_CORES > 1
-void spinlock_init(struct spinlock *l)
-{
-    corelock_init(&l->cl);
-    l->thread = NULL;
-    l->count = 0;
-}
-
-void spinlock_lock(struct spinlock *l)
-{
-    const unsigned int core = CURRENT_CORE;
-    struct thread_entry *current = cores[core].running;
-
-    if(l->thread == current)
-    {
-        /* current core already owns it */
-        l->count++;
-        return;
-    }
-
-    /* lock against other processor cores */
-    corelock_lock(&l->cl);
-
-    /* take ownership */
-    l->thread = current;
-}
-
-void spinlock_unlock(struct spinlock *l)
-{
-    /* unlocker not being the owner is an unlocking violation */
-    KERNEL_ASSERT(l->thread == cores[CURRENT_CORE].running,
-                  "spinlock_unlock->wrong thread\n");
-
-    if(l->count > 0)
-    {
-        /* this core still owns lock */
-        l->count--;
-        return;
-    }
-
-    /* clear owner */
-    l->thread = NULL;
-
-    /* release lock */
-    corelock_unlock(&l->cl);
-}
-#endif /* NUM_CORES > 1 */
-
-/****************************************************************************
  * Simple semaphore functions ;)
  ****************************************************************************/
 #ifdef HAVE_SEMAPHORE_OBJECTS

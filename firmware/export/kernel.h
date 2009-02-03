@@ -159,15 +159,6 @@ struct mutex
     unsigned char locked;               /* locked semaphore */
 };
 
-#if NUM_CORES > 1
-struct spinlock
-{
-    struct thread_entry *thread;        /* lock owner */
-    int count;                          /* lock owner recursion count */
-    struct corelock cl;                 /* multiprocessor sync */
-};
-#endif
-
 #ifdef HAVE_SEMAPHORE_OBJECTS
 struct semaphore
 {
@@ -283,11 +274,6 @@ extern void mutex_unlock(struct mutex *m);
 /* Temporary function to disable mutex preempting a thread on unlock */
 static inline void mutex_set_preempt(struct mutex *m, bool preempt)
     { m->no_preempt = !preempt; }
-#endif
-#if NUM_CORES > 1
-extern void spinlock_init(struct spinlock *l);
-extern void spinlock_lock(struct spinlock *l);
-extern void spinlock_unlock(struct spinlock *l);
 #endif
 #ifdef HAVE_SEMAPHORE_OBJECTS
 extern void semaphore_init(struct semaphore *s, int max, int start);
