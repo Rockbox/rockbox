@@ -22,7 +22,8 @@
 #ifndef __MMU_MIPS_INCLUDE_H
 #define __MMU_MIPS_INCLUDE_H
 
-void map_address(unsigned long virtual, unsigned long physical, unsigned long length);
+void map_address(unsigned long virtual, unsigned long physical,
+                 unsigned long length, unsigned int cache_flags);
 void tlb_init(void);
 
 #endif /* __MMU_MIPS_INCLUDE_H */

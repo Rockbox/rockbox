@@ -3366,14 +3366,14 @@ do {                        \
 #define __cpm_enable_osc_in_sleep()    (REG_CPM_SCR |= CPM_SCR_OSC_ENABLE)
 
 
-#define CFG_EXTAL       12000000
+#define CFG_EXTAL       (12000000)
 
 #ifdef CFG_EXTAL
 #define JZ_EXTAL        CFG_EXTAL
 #else
-#define JZ_EXTAL        3686400
+#define JZ_EXTAL        (3686400)
 #endif
-#define JZ_EXTAL2       32768 /* RTC clock */
+#define JZ_EXTAL2       (32768) /* RTC clock */
 
 /* PLL output frequency */
 static __inline__ unsigned int __cpm_get_pllout(void)

@@ -369,15 +369,10 @@ void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
     panicf("Exception occurred: %s [0x%08x] at 0x%08x (stack at 0x%08x)", parse_exception(cause), cause, epc, (unsigned int)stack_ptr);
 }
 
-static const int FR2n[] = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
 static unsigned int iclk;
- 
 static void detect_clock(void)
 {
-    unsigned int cfcr, pllout;
-    cfcr = REG_CPM_CPCCR;
-    pllout = (__cpm_get_pllm() + 2)* JZ_EXTAL / (__cpm_get_plln() + 2);
-    iclk = pllout / FR2n[__cpm_get_cdiv()];
+    iclk = __cpm_get_cclk();
 }
 
 void udelay(unsigned int usec)
@@ -639,6 +634,9 @@ static inline void set_cpu_freq(unsigned int pllin, unsigned int div)
 
 static void OF_init_clocks(void)
 {
+    unsigned long t = read_c0_status();
+    write_c0_status(t & ~1);
+    
     unsigned int prog_entry = ((unsigned int)OF_init_clocks >> 5) << 5;
     unsigned int i, prog_size = 1024;
 
@@ -675,6 +673,8 @@ static void OF_init_clocks(void)
     set_cpu_freq(336000000, 1);
     
     for(i=0; i<60; i++);
+    
+    write_c0_status(t);
 }
 
 static void my_init_clocks(void)
@@ -700,10 +700,10 @@ static void my_init_clocks(void)
            CPM_CPCCR_UCS             |
            CPM_CPCCR_PCS             |
            (0 << CPM_CPCCR_CDIV_BIT) |
-           (2 << CPM_CPCCR_HDIV_BIT) |
-           (2 << CPM_CPCCR_PDIV_BIT) |
-           (2 << CPM_CPCCR_MDIV_BIT) |
-           (2 << CPM_CPCCR_LDIV_BIT);
+           (1 << CPM_CPCCR_HDIV_BIT) |
+           (1 << CPM_CPCCR_PDIV_BIT) |
+           (1 << CPM_CPCCR_MDIV_BIT) |
+           (1 << CPM_CPCCR_LDIV_BIT);
     
     plcr1 = (54 << CPM_CPPCR_PLLM_BIT)   | /* FD */
             (0 << CPM_CPPCR_PLLN_BIT)    | /* RD=0, NR=2 */
@@ -763,6 +763,7 @@ void system_main(void)
     
 #if 0
     my_init_clocks();
+    //OF_init_clocks();
     /*__cpm_stop_udc();
     REG_CPM_CPCCR |= CPM_CPCCR_UCS;
     REG_CPM_CPCCR = (REG_CPM_CPCCR & ~CPM_CPCCR_UDIV_MASK) | (3 << CPM_CPCCR_UDIV_BIT);

@@ -30,6 +30,7 @@
 #include "storage.h"
 #include "buffer.h"
 #include "string.h"
+//#define LOGF_ENABLE
 #include "logf.h"
 
 //#define USE_DMA
@@ -114,8 +115,9 @@ static struct nand_info* banks[4];
 static unsigned int nr_banks = 1;
 static unsigned long bank_size;
 static struct nand_param internal_param;
-#ifdef USE_DMA
 static struct mutex nand_mtx;
+#ifdef USE_DMA
+static struct mutex nand_dma_mtx;
 static struct wakeup nand_wkup;
 #endif
 static unsigned char temp_page[4096]; /* Max page size */
@@ -148,7 +150,7 @@ static inline void jz_nand_read_buf8(void *buf, int count)
 #else
 static void jz_nand_write_dma(void *source, unsigned int len, int bw)
 {
-    mutex_lock(&nand_mtx);
+    mutex_lock(&nand_dma_mtx);
     
     if(((unsigned int)source < 0xa0000000) && len)
          dma_cache_wback_inv((unsigned long)source, len);
@@ -176,12 +178,12 @@ static void jz_nand_write_dma(void *source, unsigned int len, int bw)
     
     dma_disable();
     
-    mutex_unlock(&nand_mtx);
+    mutex_unlock(&nand_dma_mtx);
 }
 
 static void jz_nand_read_dma(void *target, unsigned int len, int bw)
 {
-    mutex_lock(&nand_mtx);
+    mutex_lock(&nand_dma_mtx);
     
     if(((unsigned int)target < 0xa0000000) && len)
         dma_cache_wback_inv((unsigned long)target, len);
@@ -208,7 +210,7 @@ static void jz_nand_read_dma(void *target, unsigned int len, int bw)
     
     dma_disable();
     
-    mutex_unlock(&nand_mtx);
+    mutex_unlock(&nand_dma_mtx);
 }
 
 void DMA_CALLBACK(DMA_NAND_CHANNEL)(void)
@@ -427,7 +429,7 @@ static int jz_nand_read_page(unsigned long page_addr, unsigned char *dst)
             if (stat & EMC_NFINTS_UNCOR)
             {
                 /* Uncorrectable error occurred */
-                panicf("Uncorrectable ECC error at NAND page address 0x%lx", page_addr);
+                logf("Uncorrectable ECC error at NAND page address 0x%lx", page_addr);
                 return -1;
             }
             else
@@ -596,8 +598,9 @@ int nand_init(void)
     if(!inited)
     {
         res = jz_nand_init();
-#ifdef USE_DMA
         mutex_init(&nand_mtx);
+#ifdef USE_DMA
+        mutex_init(&nand_dma_mtx);
         wakeup_init(&nand_wkup);
         system_enable_irq(DMA_IRQ(DMA_NAND_CHANNEL));
 #endif
@@ -608,37 +611,57 @@ int nand_init(void)
     return res;
 }
 
+static inline int read_sector(unsigned long start, unsigned int count,
+                               void* buf, unsigned int chip_size)
+{
+    register int ret;
+    
+    if(UNLIKELY(start % chip_size == 0 && count == chip_size))
+        ret = jz_nand_read_page(start / chip_size, buf);
+    else
+    {
+        ret = jz_nand_read_page(start / chip_size, temp_page);
+        memcpy(buf, temp_page + (start % chip_size), count);
+    }
+    
+    return ret;
+}
+
 int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
 {
-    int i, ret = 0, chip_size = chip_info->page_size;
+    int ret = 0;
+    unsigned int i, _count, chip_size = chip_info->page_size;
+    unsigned long _start;
     
-    logf("nand_read_sectors(%ld, %d, 0x%x)", start, count, (int)buf);
+    logf("start");
+    mutex_lock(&nand_mtx);
+      
+    _start = start << 9;
+    _count = count << 9;
     
-    start *= 512;
-    count *= 512;
-    
-    if(count <= chip_size)
+    if(_count <= chip_size)
     {
-        jz_nand_select(start / 512 / bank_size);
-        
-        ret = jz_nand_read_page(start/chip_size, temp_page);
-        memcpy(buf, temp_page+(start%chip_size), count);
-        
-        jz_nand_deselect(start / 512 / bank_size);
+        jz_nand_select(start / bank_size);
+        ret = read_sector(_start, _count, buf, chip_size);
+        jz_nand_deselect(start / bank_size);
     }
     else
     {
-        for(i=0; i<count && ret==0; i+=chip_size)
+        for(i=0; i<_count && ret==0; i+=chip_size)
         {
-            jz_nand_select((start/512+i) / bank_size);
+            jz_nand_select((start+(i>>9)) / bank_size);
             
-            ret = jz_nand_read_page((start+i)/chip_size, temp_page);
-            memcpy(buf+i, temp_page+((start+i)%chip_size),
-                   (count-i < chip_size ? count-i : chip_size));
+            ret = read_sector(_start+i, (_count-i < chip_size ?
+                                         _count-i : chip_size),
+                               buf+i, chip_size);
             
-            jz_nand_deselect((start/512+i) / bank_size);
+            jz_nand_deselect((start+(i>>9)) / bank_size);
         }
     }
+    
+    mutex_unlock(&nand_mtx);
+    
+    logf("nand_read_sectors(%ld, %d, 0x%x): %d", start, count, (int)buf, ret);
     
     return ret;
 }

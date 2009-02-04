@@ -24,7 +24,8 @@
 #include "jz4740.h"
 
 /* TQ7051 chip */
-#define USB_CHARGER_GPIO (32*1+30) /* STAT port */
+#define UNK_GPIO (32*1+30) /* STAT port */
+#define USB_CHARGER_GPIO (32*3+28)
 
 /* Detect which power sources are present. */
 unsigned int power_input_status(void)
