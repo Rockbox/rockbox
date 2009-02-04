@@ -152,8 +152,8 @@
     sw  val, (offset + 0x18)(dst);    \
     sw  val, (offset + 0x1c)(dst);
 
-#define FILL    32
-#define F_FILL  FILL32
+#define FILL    64
+#define F_FILL  FILL64
 
 
 #ifdef ROCKBOX_BIG_ENDIAN
