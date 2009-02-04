@@ -133,6 +133,16 @@ simcc () {
    output="rockboxui.exe" # use this as output binary name
    ;;
 
+   MINGW*)
+   echo "MinGW host detected"
+
+   # sdl version
+   GCCOPTS="$GCCOPTS `sdl-config --cflags`"
+   LDOPTS="`sdl-config --libs` -mconsole"
+
+   output="rockboxui.exe" # use this as output binary name
+   ;;
+
    Linux)
    echo "Linux host detected"
    if [ "0" != `sdl-config --libs |grep -c mwindows` ]; then

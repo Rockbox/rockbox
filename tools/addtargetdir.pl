@@ -21,7 +21,7 @@ for (<STDIN>) {
     if (/^([^:]+): (\S+) (.*)/) {
         my ($target, $src, $rest) = ($1, $2, $3);
         my $dir = dirname $src;
-        $dir =~ s/$rbroot//;
+        $dir =~ s/^.*$rbroot//;
         print "$builddir$dir/$target: $src $rest\n";
     }
     elsif (/^([^:]+):  \\/) {
@@ -32,7 +32,7 @@ for (<STDIN>) {
         if (/^\s+([^ ]+) (.*)/) {
             my ($src, $rest) = ($1, $2);
             my $dir = dirname $src;
-            $dir =~ s/$rbroot//;
+            $dir =~ s/^.*$rbroot//;
             print "$builddir$dir/$target2: $src $rest\n";
             $target2 = "";
         }

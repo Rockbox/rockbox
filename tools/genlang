@@ -540,6 +540,10 @@ if($prefix) {
     open(CFILE, ">$prefix.c") ||
         die "Error: couldn't create file $prefix.c\n";        
 
+   # get header file name
+   $headername = "$prefix.h";
+   $headername =~ s/(.*\/)*//;
+
     print HFILE <<MOO
 /* This file was automatically generated using genlang */
 /*
@@ -564,7 +568,7 @@ MOO
 /* This file was automaticly generated using genlang, the strings come
    from "$input" */
    
-#include "$prefix.h"
+#include "$headername"
 
 unsigned char *language_strings[LANG_LAST_INDEX_IN_ARRAY];
 const unsigned char language_builtin[] =
