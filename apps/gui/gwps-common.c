@@ -387,6 +387,7 @@ bool gui_wps_display(void)
     FOR_NB_SCREENS(i)
     {
         gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_ALL);
+#ifdef HAVE_LCD_BITMAP        
         /* temporary work around so the statusbar doesnt disappear when the WPS
          * is first entered. This should be removed when the 
          * WPS-statusbar handling is fixed up a bit more */
@@ -395,6 +396,7 @@ bool gui_wps_display(void)
             draw = gui_wps[i].data->show_sb_on_wps;
         if (draw)
             gui_statusbar_draw(&statusbars.statusbars[i], true);
+#endif            
     }
     return false;
 }
