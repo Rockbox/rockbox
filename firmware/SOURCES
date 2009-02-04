@@ -400,15 +400,13 @@ target/arm/crt0.S
 
 #elif defined(CPU_MIPS)
 #undef mips
-/*target/mips/memcpy.S
-target/mips/memset.S
-common/memset16.c
-target/mips/strlen.S*/
-common/memcpy.c
+/*target/mips/strlen.S*/
 common/memmove.c
-common/memset.c
 common/memset16.c
 common/strlen.c
+target/mips/ffs-mips.S
+target/mips/memcpy-mips.S
+target/mips/memset-mips.S
 target/mips/mmu-mips.c
 #if CONFIG_CPU==JZ4732
 target/mips/ingenic_jz47xx/crt0.S

@@ -99,14 +99,15 @@ static void add_wired_entry(unsigned long entrylo0, unsigned long entrylo1,
     restore_irq(old_irq);
 }
 
-void map_address(unsigned long virtual, unsigned long physical, unsigned long length)
+void map_address(unsigned long virtual, unsigned long physical,
+                 unsigned long length, unsigned int cache_flags)
 {
     unsigned long entry0  = (physical & PFN_MASK) << PFN_SHIFT;
     unsigned long entry1  = ((physical+length) & PFN_MASK) << PFN_SHIFT;
     unsigned long entryhi = virtual & ~VPN2_SHIFT;
     
-    entry0 |= (M_EntryLoG | M_EntryLoV | (K_CacheAttrC << S_EntryLoC) );
-    entry1 |= (M_EntryLoG | M_EntryLoV | (K_CacheAttrC << S_EntryLoC) );
+    entry0 |= (M_EntryLoG | M_EntryLoV | (cache_flags << S_EntryLoC) );
+    entry1 |= (M_EntryLoG | M_EntryLoV | (cache_flags << S_EntryLoC) );
     
     add_wired_entry(entry0, entry1, entryhi, DEFAULT_PAGE_MASK);
 }
@@ -119,7 +120,7 @@ void tlb_init(void)
     
     local_flush_tlb_all();
 /*
-    map_address(0x80000000, 0x80000000, 0x4000);
-    map_address(0x80004000, 0x80004000, MEM * 0x100000);
+    map_address(0x80000000, 0x80000000, 0x4000, K_CacheAttrC);
+    map_address(0x80004000, 0x80004000, MEM * 0x100000, K_CacheAttrC);
 */
 }
