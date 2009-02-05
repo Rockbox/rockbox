@@ -37,7 +37,7 @@ bool usb_drv_connected(void)
 
 int usb_detect(void)
 {
-    if(button_usb_connected())
+    if(usb_drv_connected())
         return USB_INSERTED;
     else
         return USB_EXTRACTED;

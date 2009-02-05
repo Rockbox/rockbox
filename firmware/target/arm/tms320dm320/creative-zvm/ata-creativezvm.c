@@ -203,7 +203,7 @@ static unsigned long cfs_start;
 static unsigned long *sectors;
 
 #define CFS_START              ( ((hdr->partitions[1].start*hdr->sector_size) & ~0xFFFF) + 0x10000 )
-#define CFS_CLUSTER2CLUSTER(x) ( CFS_START+((x)-1)*64 )
+#define CFS_CLUSTER2CLUSTER(x) ( (CFS_START/512)+((x)-1)*64 )
 
 /* Limited version of UCS -> ASCII */
 static char* ucs2letostring(unsigned char* s)
@@ -211,7 +211,7 @@ static char* ucs2letostring(unsigned char* s)
     static char res[256];
     int i;
 
-    for(i=0; (s[i] == 0 && s[i+1] == 0); i++)
+    for(i=0; (s[i] == 0 && s[i+1] == 0 && i<256); i++)
         res[i] = s[i*2];
 
     return (char*)&res;
@@ -236,111 +236,134 @@ static void cfs_init(void)
     _ata_read_sectors(0, 1, &sector);
     hdr = (struct main_header*)&sector;
 
-    //printf("CFS is at 0x%x", CFS_START);
+    logf("CFS is at 0x%x [0x%x]", CFS_START, CFS_START/512);
 
     /* Read CFS header */
     _ata_read_sectors(CFS_START/512, 64, &sector2);
     cfs = (struct cfs_header*)&sector2;
 
-    //printf("First inode = %d", cfs->first_inode);
+    logf("First inode = 0x%x", cfs->first_inode);
 
     /* Read root inode */
     _ata_read_sectors(CFS_CLUSTER2CLUSTER(cfs->first_inode), 64, &sector2);
     root_inode = (struct cfs_inode*)&sector2;
+    
+    logf("Root inode = 0x%x", root_inode);
+    
+    logf("0x%x 0x%x", CFS_CLUSTER2CLUSTER(root_inode->first_class_chain[0]), root_inode->first_class_chain[0]);
 
     /* Read root inode's first sector */
     _ata_read_sectors(CFS_CLUSTER2CLUSTER(root_inode->first_class_chain[0]), 64, &sector2);
     root_direntry = (struct cfs_direntry*)&sector2;
     root_direntry_items = (struct cfs_direntry_item*)(&sector2+sizeof(struct cfs_direntry));
 
+    logf("0x%x", root_direntry->identifier);
+
+    logf("%d", root_direntry->items);
+
     /* Search VFAT inode */
     for(i=0; i < root_direntry->items; i++)
     {
-        //printf(" * [%s] at 0x%x\n", ucs2letostring(&root_direntry_items[i].string[0]), root_direntry_items[i].inode_number);
-        if(strcmp(ucs2letostring(&root_direntry_items[i].string[0]), "VFAT") == 0)
-            vfat_inode_nr = root_direntry_items[i].inode_number;
+        if(root_direntry_items[i].inode_number != 0)
+        {
+            //logf(" * [%s] at 0x%x", ucs2letostring(&root_direntry_items[i].string[0]), root_direntry_items[i].inode_number);
+            if(strcmp(ucs2letostring(&root_direntry_items[i].string[0]), "VFAT") == 0)
+                vfat_inode_nr = root_direntry_items[i].inode_number;
+        }
     }
-
-    /* Read VFAT inode */
-    _ata_read_sectors(CFS_CLUSTER2CLUSTER(vfat_inode_nr), 64, &sector2);
-    vfat_inode = (struct cfs_inode*)&sector2;
-
-    /* Read VFAT inode's first sector */
-    _ata_read_sectors(CFS_CLUSTER2CLUSTER(vfat_inode->first_class_chain[0]), 64, &sector2);
-    vfat_direntry = (struct cfs_direntry*)&sector2;
-    vfat_direntry_items = (struct cfs_direntry_item*)(&sector2+sizeof(struct cfs_direntry));
-
-    /* Search for VFAT's subinodes */
-    for(i=0; i < vfat_direntry->items; i++)
+    
+    logf("VFAT inode = 0x%x", vfat_inode_nr);
+    
+    if(vfat_inode_nr != 0)
     {
-        //printf(" * [%s] at 0x%x\n", ucs2letostring(&vfat_direntry_items[i].string[0]), vfat_direntry_items[i].inode_number);
-        if(i > 0)
-            vfat_inodes_nr[i-1] = vfat_direntry_items[i].inode_number;
-    }
+        /* Read VFAT inode */
+        _ata_read_sectors(CFS_CLUSTER2CLUSTER(vfat_inode_nr), 64, &sector2);
+        vfat_inode = (struct cfs_inode*)&sector2;
 
-    /* Determine size of VFAT file */
-    _ata_read_sectors(CFS_CLUSTER2CLUSTER(vfat_inodes_nr[1]), 1, &sector);
-    inode = (struct cfs_inode*)&sector;
-    sectors = (unsigned long*)buffer_alloc(VFAT_SECTOR_SIZE(inode->filesize));
+        /* Read VFAT inode's first sector */
+        _ata_read_sectors(CFS_CLUSTER2CLUSTER(vfat_inode->first_class_chain[0]), 64, &sector2);
+        vfat_direntry = (struct cfs_direntry*)&sector2;
+        vfat_direntry_items = (struct cfs_direntry_item*)(&sector2+sizeof(struct cfs_direntry));
 
-    //printf("VFAT file size: 0x%x", inode->filesize);
+        /* Search for VFAT's subinodes */
+        for(i=0; i < vfat_direntry->items; i++)
+        {
+            logf(" * [%s] at 0x%x\n", ucs2letostring(&vfat_direntry_items[i].string[0]), vfat_direntry_items[i].inode_number);
+            if(i > 0)
+                vfat_inodes_nr[i-1] = vfat_direntry_items[i].inode_number;
+        }
 
-    /* Clear data sectors */
-    memset(&sectors, 0, VFAT_SECTOR_SIZE(inode->filesize)*sizeof(unsigned long));
-
-    /* Read all data sectors' addresses in memory */
-    vfat_sector_count = 0;
-    for(i=0; vfat_inodes_nr[i] != 0; i++)
-    {
-        _ata_read_sectors(CFS_CLUSTER2CLUSTER(vfat_inodes_nr[i]), 1, &sector);
+        /* Determine size of VFAT file */
+        _ata_read_sectors(CFS_CLUSTER2CLUSTER(vfat_inodes_nr[1]), 1, &sector);
         inode = (struct cfs_inode*)&sector;
+#ifndef BOOTLOADER
+        sectors = (unsigned long*)buffer_alloc(VFAT_SECTOR_SIZE(inode->filesize));
+#else
+        static unsigned long _sector[VFAT_SECTOR_SIZE(1024*1024*1024)]; /* 1GB guess */
+        sectors = _sector;
+#endif
 
-        /* Read second & third class chain */
-        _ata_read_sectors(CFS_CLUSTER2CLUSTER(inode->second_class_chain_first_cluster), 64, &vfat_data[0]);
-        _ata_read_sectors(CFS_CLUSTER2CLUSTER(inode->second_class_chain_second_cluster), 64, &vfat_data[1]);
+        logf("VFAT file size: 0x%x", inode->filesize);
 
-        /* First class chain */
-        for(j=0; j<12; j++)
+        /* Clear data sectors */
+        memset(&sectors, 0, VFAT_SECTOR_SIZE(inode->filesize)*sizeof(unsigned long));
+
+        /* Read all data sectors' addresses in memory */
+        vfat_sector_count = 0;
+        for(i=0; vfat_inodes_nr[i] != 0; i++)
         {
-            if( (inode->first_class_chain[j] & 0xFFFF) != 0xFFFF &&
-                 inode->first_class_chain[j] != 0
-              )
-                sectors[vfat_sector_count++] = inode->first_class_chain[j];
-        }
+            _ata_read_sectors(CFS_CLUSTER2CLUSTER(vfat_inodes_nr[i]), 1, &sector);
+            inode = (struct cfs_inode*)&sector;
 
-        /* Second class chain */
-        for(j=0; j<0x8000/4; j++)
-        {
-            if( (vfat_data[0][j] & 0xFFFF) != 0xFFFF &&
-                vfat_data[0][j] != 0
-              )
-                sectors[vfat_sector_count++] = vfat_data[0][j];
-        }
+            /* Read second & third class chain */
+            _ata_read_sectors(CFS_CLUSTER2CLUSTER(inode->second_class_chain_first_cluster), 64, &vfat_data[0]);
+            _ata_read_sectors(CFS_CLUSTER2CLUSTER(inode->second_class_chain_second_cluster), 64, &vfat_data[1]);
 
-        /* Third class chain */
-        for(j=0; j<0x8000/4; j++)
-        {
-            if( (vfat_data[1][j] & 0xFFFF) != 0xFFFF &&
-                vfat_data[1][j] != 0
-              )
+            /* First class chain */
+            for(j=0; j<12; j++)
             {
-                memset(&vfat_data[0], 0, 0x8000*sizeof(unsigned int));
+                if( (inode->first_class_chain[j] & 0xFFFF) != 0xFFFF &&
+                     inode->first_class_chain[j] != 0
+                  )
+                    sectors[vfat_sector_count++] = inode->first_class_chain[j];
+            }
 
-                /* Read third class subchain(s) */
-                _ata_read_sectors(CFS_CLUSTER2CLUSTER(vfat_data[1][j]), 64, &vfat_data[0]);
+            /* Second class chain */
+            for(j=0; j<0x8000/4; j++)
+            {
+                if( (vfat_data[0][j] & 0xFFFF) != 0xFFFF &&
+                    vfat_data[0][j] != 0
+                  )
+                    sectors[vfat_sector_count++] = vfat_data[0][j];
+            }
 
-                for(k=0; k<0x8000/4; k++)
+            /* Third class chain */
+            for(j=0; j<0x8000/4; j++)
+            {
+                if( (vfat_data[1][j] & 0xFFFF) != 0xFFFF &&
+                    vfat_data[1][j] != 0
+                  )
                 {
-                    if( (vfat_data[0][k] & 0xFFFF) != 0xFFFF &&
-                        vfat_data[0][k] != 0
-                      )
-                        sectors[vfat_sector_count++] = vfat_data[0][k];
+                    memset(&vfat_data[0], 0, 0x8000*sizeof(unsigned int));
+
+                    /* Read third class subchain(s) */
+                    _ata_read_sectors(CFS_CLUSTER2CLUSTER(vfat_data[1][j]), 64, &vfat_data[0]);
+
+                    for(k=0; k<0x8000/4; k++)
+                    {
+                        if( (vfat_data[0][k] & 0xFFFF) != 0xFFFF &&
+                            vfat_data[0][k] != 0
+                          )
+                            sectors[vfat_sector_count++] = vfat_data[0][k];
+                    }
                 }
             }
         }
-    }
 
-    //printf("Sector count: %d 0x%x", vfat_sector_count, vfat_sector_count);
+        logf("Sector count: %d 0x%x", vfat_sector_count, vfat_sector_count);
+    }
+    else
+        logf("Cannot find virtual FAT filesystem!"); //TODO: panicf
 
     cfs_inited = true;
 }
@@ -386,6 +409,7 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const v
     if(!cfs_inited)
         cfs_init();
 
+#if 0 /* Disabled for now */
     /* Check if count is lesser than or equal to 1 native CFS sector */
     if(count <= 64)
         return _ata_write_sectors(IF_MV2(drive,) map_sector(start), count, buf);
@@ -406,7 +430,15 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const v
 
         return ret;
     }
+#else
+    (void)start;
+    (void)count;
+    (void)buf;
+    return 0;
+#endif
 }
+
+#ifdef BOOTLOADER
 
 /*
  ---------------------------------------------------------------------------
@@ -487,3 +519,5 @@ int load_minifs_file(char* filename, unsigned char* location)
 
     return files[found].size;
 }
+
+#endif

@@ -52,10 +52,10 @@
 #define ISP1583_GEN_UNLCKDEV        (*((volatile unsigned short*)(ISP1583_IOBASE+0x7C)))
 #define ISP1583_GEN_TSTMOD          (*((volatile unsigned char*)(ISP1583_IOBASE+0x84)))
 
-#define set_int_value(a,b,value)    a = value;
+#define set_int_value(a,b,value)    (a) = (value);
 #endif
 
-#define ISP1583_UNLOCK_CODE         (unsigned short)0xAA37
+#define ISP1583_UNLOCK_CODE         ((unsigned short)0xAA37)
 
 /* Initialization registers' bits */
 

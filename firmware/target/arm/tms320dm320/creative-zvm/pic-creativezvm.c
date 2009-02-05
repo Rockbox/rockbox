@@ -27,6 +27,7 @@
 #include "button-target.h"
 #include "i2c-dm320.h"
 #include "sprintf.h"
+#include "logf.h"
 
 #ifdef BUTTON_DEBUG
 #include "lcd-target.h"
@@ -36,22 +37,22 @@
 
 #ifndef ZEN_VISION
 /* Creative Zen Vision:M */
-#define BTN_LEFT                        0x5F00
-#define BTN_RIGHT                       0x4F00
-#define BTN_BACK                        0xBF00
-#define BTN_CUSTOM                      0x8F00
-#define BTN_PLAY                        0x2F00
-#define BTN_POWER                       0x0F00
-#define BTN_MENU                        0x9F00
-#define BTN_HOLD                        0x9F06
-#define BTN_UNHOLD                      0xAF06
+#define BTN_LEFT                        0xAF00
+#define BTN_RIGHT                       0xA700
+#define BTN_BACK                        0xDF00
+#define BTN_CUSTOM                      0xC700
+#define BTN_PLAY                        0x9700
+#define BTN_POWER                       0x8700
+#define BTN_MENU                        0xCF00
+#define BTN_HOLD                        0xCF07
+#define BTN_UNHOLD                      0xD707
 
 #define BTN_REL                         1
 
-#define BTN_TOUCHPAD_PRESS              0x1F00
+#define BTN_TOUCHPAD_PRESS              0x8F00
 #define BTN_TOUCHPAD_SCROLL_DOWN        0x0F03
-#define BTN_TOUCHPAD_CORNER_DOWN        0xAF00
-#define BTN_TOUCHPAD_CORNER_UP          0x3F00
+#define BTN_TOUCHPAD_CORNER_DOWN        0xD700
+#define BTN_TOUCHPAD_CORNER_UP          0x9F00
 #define BTN_TOUCHPAD_SCROLL_UP          0x0F04
 
 #define HEADPHONE_PLUGIN_A              0x5707
@@ -63,8 +64,8 @@
 #define DOCK_UNPLUG                     0xDF06
 #define DOCK_USB_INSERT                 0x2F06
 #define DOCK_USB_UNPLUG                 0x3F06
-#define DOCK_POWER_INSERT               0x2707
-#define DOCK_POWER_UNPLUG               0x2F07
+#define DOCK_POWER_INSERT               0x1707
+#define DOCK_POWER_UNPLUG               0x1F07
 
 #else
 /* Creative Zen Vision */
@@ -272,6 +273,8 @@ void GIO0(void)
     lcd_update();
     sw = !sw;
 #endif
+    logf("PIC: 0x%x", (unsigned int)((msg[3] << 24) |
+                            (msg[2] << 16) | (msg[1] << 8) | msg[0]));
 }
 
 static void send_command_to_pic(const unsigned char in, unsigned char* out,
@@ -335,7 +338,8 @@ bool button_usb_connected(void)
 {
     return (bool)(nonbtn & NONBUTTON_USB);
 }
-    
+
+#ifndef BOOTLOADER
 int pic_dbg_num_items(void)
 {
     return 13;
@@ -376,3 +380,4 @@ char* pic_dbg_item(int selected_item, void *data, char *buffer, size_t buffer_le
     }
     return NULL;
 }
+#endif

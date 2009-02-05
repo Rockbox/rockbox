@@ -43,8 +43,6 @@
 #define PHY_IO_BASE2     0x00060000
 #define DM320_REG2(addr) (*(volatile unsigned int *)(PHY_IO_BASE2 + (addr)))
 
-/* USBOTG */
-#define USB_NUM_ENDPOINTS  3
 /* This needs to be 2048 byte aligned, but USB_QHARRAY_ATTR should take care
  * of that */
 #define USB_QHARRAY_ATTR   __attribute__((section(".qharray"),nocommon,aligned(4)))

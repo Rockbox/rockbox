@@ -27,7 +27,7 @@
 #include "isp1583.h"
 #include "thread.h"
 #include "logf.h"
-#include <stdio.h>
+#include "stdio.h"
 
 #define DIR_RX                      0
 #define DIR_TX                      1
@@ -200,7 +200,9 @@ static int usb_receive(int n)
     len = usb_get_packet(endpoints[n].in_buf + endpoints[n].in_ptr,
                          endpoints[n].in_max_len - endpoints[n].in_ptr);
     endpoints[n].in_ptr += len;
-    if (endpoints[n].in_ptr >= endpoints[n].in_min_len) {
+    
+    if (endpoints[n].in_ptr >= endpoints[n].in_min_len)
+    {
         endpoints[n].in_min_len = -1;
         if (endpoints[n].in_done)
             (*(endpoints[n].in_done))(n, endpoints[n].in_buf,
@@ -229,10 +231,10 @@ static int usb_send(int n)
     if (endpoints[n].halt[DIR_TX]
         || !endpoints[n].enabled[DIR_TX]
         || !endpoints[n].out_in_progress)
-        {
+    {
         logf("NOT SEND TO EP!");
         return -1;
-        }
+    }
 
     if (endpoints[n].out_ptr < 0)
     {
@@ -246,9 +248,9 @@ static int usb_send(int n)
     
     if (usb_out_buffer_full(n))
     {
-    logf("BUFFER FULL!");
+        logf("BUFFER FULL!");
         return -1;
-        }
+    }
     
     usb_select_endpoint(ep_index(n, DIR_TX));
     max_pkt_size = endpoints[n].max_pkt_size[DIR_TX];
@@ -261,7 +263,8 @@ static int usb_send(int n)
     
     p = endpoints[n].out_buf + endpoints[n].out_ptr;
     i = 0;
-    while (len - i >= 2) {
+    while (len - i >= 2)
+    {
         ISP1583_DFLOW_DATA = p[i] | (p[i + 1] << 8);
         i += 2;
     }
@@ -308,7 +311,11 @@ static void usb_unstall_endpoint(int idx)
 static void usb_status_ack(int ep, int dir)
 {
     logf("usb_status_ack(%d)", dir);
-    usb_select_endpoint(ep_index(ep, dir));
+    if(ep == EP_CONTROL)
+        usb_select_setup_endpoint();
+    else
+        usb_select_endpoint(ep_index(ep, dir));
+    
     ISP1583_DFLOW_CTRLFUN |= DFLOW_CTRLFUN_STATUS;
 }
 
@@ -326,7 +333,10 @@ static void usb_handle_setup_rx(void)
     len = usb_get_packet(setup_pkt_buf, 8);
 
     if (len == 8)
+    {
+        ISP1583_DFLOW_CTRLFUN |= DFLOW_CTRLFUN_STATUS; /* Acknowledge packet */
         usb_core_control_request((struct usb_ctrlrequest*)setup_pkt_buf);
+    }
     else
     {
         usb_drv_stall(0, true, false);
@@ -388,9 +398,7 @@ void usb_helper(void)
 {
     if(ISP1583_GEN_INT_READ & ISP1583_INIT_INTEN_READ)
     {
-    #ifdef DEBUG
-        logf("Helper detected interrupt... [%d]", current_tick);
-    #endif
+        logf("Helper detected interrupt... [%d]", (int)current_tick);
         usb_drv_int();
     }
     return;
@@ -412,14 +420,6 @@ void usb_drv_init(void)
     
     /* Disable all OTG functions */
     ISP1583_INIT_OTG = 0;
-
-#if 0
-    #ifdef USE_HIGH_SPEED
-    /* Force device to high speed */
-    ISP1583_GEN_TSTMOD = GEN_TSTMOD_FORCEHS;
-    high_speed_mode = true;
-    #endif
-#endif
 
     #ifdef DEBUG
     logf("BUS_CONF/DA0:%d MODE0/DA1: %d MODE1: %d", (bool)(ISP1583_INIT_MODE & INIT_MODE_TEST0), (bool)(ISP1583_INIT_MODE & INIT_MODE_TEST1), (bool)(ISP1583_INIT_MODE & INIT_MODE_TEST2));
@@ -454,7 +454,7 @@ void usb_drv_init(void)
     
     ZVM_SPECIFIC;
     
-    tick_add_task(usb_helper);
+    //tick_add_task(usb_helper);
     
     logf("usb_init_device() finished");
 }
@@ -482,7 +482,7 @@ void usb_drv_exit(void)
     ISP1583_INIT_MODE = INIT_MODE_GOSUSP;
     ISP1583_INIT_MODE = 0;
     
-    tick_remove_task(usb_helper);
+    //tick_remove_task(usb_helper);
     
     ZVM_SPECIFIC;
 }
@@ -504,7 +504,7 @@ bool usb_drv_stalled(int endpoint, bool in)
 static void out_callback(int ep, unsigned char *buf, int len)
 {
     (void)buf;
-    logf("out_callback(%d, 0x%x, %d)", ep, &buf, len);
+    logf("out_callback(%d, 0x%x, %d)", ep, (int)buf, len);
     usb_status_ack(ep, DIR_RX);
     usb_core_transfer_complete(ep, true, 0, len); /* 0=>status succeeded, haven't worked out status failed yet... */
 }
@@ -512,14 +512,14 @@ static void out_callback(int ep, unsigned char *buf, int len)
 static void in_callback(int ep, unsigned char *buf, int len)
 {
     (void)buf;
-    logf("in_callback(%d, 0x%x, %d)", ep, &buf, len);
+    logf("in_callback(%d, 0x%x, %d)", ep, (int)buf, len);
     usb_status_ack(ep, DIR_TX);
     usb_core_transfer_complete(ep, false, 0, len);
 }
 
 int usb_drv_recv(int ep, void* ptr, int length)
 {
-    logf("usb_drv_recv(%d, 0x%x, %d)", ep, &ptr, length);
+    logf("usb_drv_recv(%d, 0x%x, %d)", ep, (int)ptr, length);
     if(ep == 0 && length == 0 && ptr == NULL)
     {
         usb_status_ack(ep, DIR_TX);
@@ -562,7 +562,7 @@ static void usb_drv_wait(int ep, bool send)
 
 int usb_drv_send(int ep, void* ptr, int length)
 {
-    logf("usb_drv_send_nb(%d, 0x%x, %d)", ep, &ptr, length);
+    logf("usb_drv_send_nb(%d, 0x%x, %d)", ep, (int)ptr, length);
     if(ep == 0 && length == 0 && ptr == NULL)
     {
         usb_status_ack(ep, DIR_RX);
@@ -624,8 +624,6 @@ void usb_drv_release_endpoint(int ep)
     endpoints[ep & 0x7f].allocation &= mask;
 }
 
-
-
 static void bus_reset(void)
 {
     /* Enable CLKAON & GLINTENA */
@@ -656,13 +654,11 @@ void IRAM_ATTR usb_drv_int(void)
     
     if(!ints)
         return;
-        
+    
     /* Unlock the device's registers */
     ISP1583_GEN_UNLCKDEV = ISP1583_UNLOCK_CODE;
     
-    #if 0
-    logf(" handling int [0x%x & 0x%x = 0x%x]", ISP1583_GEN_INT_READ, ISP1583_INIT_INTEN_READ, ints);
-    #endif
+    //logf(" handling int [0x%lx & 0x%lx = 0x%x]", ISP1583_GEN_INT_READ, ISP1583_INIT_INTEN_READ, (int)ints);
 
     if(ints & INT_IEBRST) /* Bus reset */
     {
@@ -732,10 +728,35 @@ void usb_drv_set_address(int address)
     ISP1583_INIT_ADDRESS = (address & 0x7F) | INIT_ADDRESS_DEVEN;
     
     ZVM_SPECIFIC;
-    
-    usb_status_ack(0, DIR_TX);
 }
 
+void usb_drv_set_test_mode(int mode)
+{
+    logf("usb_drv_set_test_mode(%d)", mode);
+    switch(mode){
+        case 0:
+            ISP1583_GEN_TSTMOD = 0;
+            /* Power cycle... */
+            break;
+        case 1:
+            ISP1583_GEN_TSTMOD = GEN_TSTMOD_JSTATE;
+            break;
+        case 2:
+            ISP1583_GEN_TSTMOD = GEN_TSTMOD_KSTATE;
+            break;
+        case 3:
+            ISP1583_GEN_TSTMOD = GEN_TSTMOD_SE0_NAK;
+            break;
+        case 4:
+            //REG_PORTSC1 |= PORTSCX_PTC_PACKET;
+            break;
+        case 5:
+            //REG_PORTSC1 |= PORTSCX_PTC_FORCE_EN;
+            break;
+    }
+}
+
+#ifndef BOOTLOADER
 int dbg_usb_num_items(void)
 {
     return 2+USB_NUM_ENDPOINTS*2;
@@ -782,29 +803,4 @@ char* dbg_usb_item(int selected_item, void *data, char *buffer, size_t buffer_le
     return NULL;
     (void)data;
 }
-
-void usb_drv_set_test_mode(int mode)
-{
-    logf("usb_drv_set_test_mode(%d)", mode);
-    switch(mode){
-        case 0:
-            ISP1583_GEN_TSTMOD = 0;
-            /* Power cycle... */
-            break;
-        case 1:
-            ISP1583_GEN_TSTMOD = GEN_TSTMOD_JSTATE;
-            break;
-        case 2:
-            ISP1583_GEN_TSTMOD = GEN_TSTMOD_KSTATE;
-            break;
-        case 3:
-            ISP1583_GEN_TSTMOD = GEN_TSTMOD_SE0_NAK;
-            break;
-        case 4:
-            //REG_PORTSC1 |= PORTSCX_PTC_PACKET;
-            break;
-        case 5:
-            //REG_PORTSC1 |= PORTSCX_PTC_FORCE_EN;
-            break;
-    }
-}
+#endif

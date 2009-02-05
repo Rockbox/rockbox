@@ -28,6 +28,7 @@
 #include "backlight.h"
 #include "button.h"
 #include "common.h"
+#include "usb.h"
 
 
 static void load_fw(unsigned char* ptr, unsigned int len)
@@ -57,6 +58,7 @@ void main(void)
     lcd_init();
     font_init();
     button_init();
+    usb_init();
 
     lcd_enable(true);
     lcd_setfont(FONT_SYSFIXED);
@@ -67,7 +69,7 @@ void main(void)
     ret = storage_init();
     if(ret)
         printf("ATA error: %d", ret);
-    
+      
     /* If no button is held, start the OF */
     if(button_read_device() == 0)
     {
@@ -109,6 +111,8 @@ void main(void)
             printf("FAILED!");
         }
     }
+    
+    storage_sleepnow();
     
     while(1);
 }

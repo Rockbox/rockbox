@@ -65,11 +65,11 @@
                                     b = value >> 16;
 
 
-#define ZVM_SPECIFIC                asm volatile( \
+/*#define ZVM_SPECIFIC                asm volatile( \
                                                  "LDR     R12, =0x50FFC000\n" \
                                                  "LDRH    R12, [R12]\n"  \
-                                                 : : : "r12")
-//#define ZVM_SPECIFIC
+                                                 : : : "r12");*/
+#define ZVM_SPECIFIC
 
 #define USE_IRAM
 

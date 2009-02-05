@@ -146,7 +146,7 @@ int i2c_read(unsigned short address, unsigned char* buf, int count)
 
 void i2c_init(void)
 {
-#if 0 //TODO: mimic OF I2C clock settings; currently this is done by the bootloader
+#ifdef CREATIVE_ZVx //TODO: mimic OF I2C clock settings; currently this is done by the bootloader
     IO_CLK_MOD2 &= ~CLK_MOD2_I2C; // turn I²C clock off (just to be sure)
     IO_CLK_LPCTL1 &= ~1; // set Powerdown mode to off
     IO_CLK_SEL0 &= ~0x800; // set I²C clock to PLLA
