@@ -31,6 +31,7 @@
 #include "ata.h"
 #include "string.h"
 #include "buffer.h"
+#include "logf.h"
 
 #undef ata_read_sectors
 #undef ata_write_sectors
@@ -363,7 +364,7 @@ static void cfs_init(void)
         logf("Sector count: %d 0x%x", vfat_sector_count, vfat_sector_count);
     }
     else
-        logf("Cannot find virtual FAT filesystem!"); //TODO: panicf
+        panicf("Cannot find virtual FAT filesystem!");
 
     cfs_inited = true;
 }
