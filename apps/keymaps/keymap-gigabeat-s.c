@@ -194,7 +194,7 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
 }; /* button_context_settingsgraphical */
 
 static const struct button_mapping button_context_yesno[]  = {
-    { ACTION_YESNO_ACCEPT, BUTTON_SELECT|BUTTON_REL, BUTTON_SELECT },
+    { ACTION_YESNO_ACCEPT, BUTTON_SELECT, BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings_yesno */
@@ -414,7 +414,7 @@ static const struct button_mapping remote_button_context_bmark[]  = {
 }; /* remote_button_context_bmark */
 
 static const struct button_mapping remote_button_context_yesno[]  = {
-    { ACTION_YESNO_ACCEPT, BUTTON_RC_PLAY|BUTTON_REL, BUTTON_RC_PLAY },
+    { ACTION_YESNO_ACCEPT, BUTTON_RC_PLAY, BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings_yesno */
