@@ -194,7 +194,8 @@ PLUGIN_HEADER
 
 static int board[BOARD_WIDTH][BOARD_HEIGHT],snakelength;
 static unsigned int score,hiscore=0,level=1;
-static short dir,frames,apple,dead=0;
+static int dir,dead=0;
+static bool apple;
 
 void die (void)
 {
@@ -224,7 +225,7 @@ void colission (short x, short y)
         case -1:
             snakelength+=2;
             score+=level;
-            apple=0;
+            apple=false;
             break;
         default:
             die();
@@ -356,19 +357,15 @@ void game (void) {
         frame();
         if (dead)
             return;
-	frames++;
-        if (frames==10) {
-            frames=0;
-            if (!apple) {
-                do {
-                    x=rb->rand() % BOARD_WIDTH;
-                    y=rb->rand() % BOARD_HEIGHT;
-                } while (board[x][y]);
-                apple=1;
-                board[x][y]=-1;
-                rb->lcd_fillrect((x*4)+1,y*4,2,4);
-                rb->lcd_fillrect(x*4,(y*4)+1,4,2);
-            }
+        if (!apple) {
+            do {
+                x=rb->rand() % BOARD_WIDTH;
+                y=rb->rand() % BOARD_HEIGHT;
+            } while (board[x][y]);
+            apple=true;
+            board[x][y]=-1;
+            rb->lcd_fillrect((x*4)+1,y*4,2,4);
+            rb->lcd_fillrect(x*4,(y*4)+1,4,2);
         }
 
         rb->sleep(HZ/level);
@@ -423,7 +420,7 @@ void game_init(void) {
         }
     }
     dead=0;
-    apple=0;
+    apple=false;
     snakelength=4;
     score=0;
     board[11][7]=1;   
