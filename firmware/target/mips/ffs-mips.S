@@ -40,15 +40,11 @@
     .type   find_first_set_bit, %function
     
 find_first_set_bit:
-    beqz    a0, no_bits_set          # If val == 0 branch to no_bits_set
+    negu    t0, a0                   # t0 = a0 & -a0
+    and     t0, t0, a0               #
     
-    clz     v0, a0                   # Get lead 0's count
+    clz     v0, t0                   # Get lead 0's count
     li      t0, 31                   # t0 = 31
     sub     v0, t0, v0               # Return value = t0 - v0
-    jr      ra                       # Return
-    nop
-    
-no_bits_set:
-    li      v0, 32                   # Return value = 32
-    jr      ra                       # Return
+    jr      ra
     nop
