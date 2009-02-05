@@ -70,7 +70,7 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
     /* center the icons VP first */
     vp_icons[screen] = *parent;
     vp_icons[screen].width = CENTER_ICONAREA_WIDTH; /* abosulte smallest allowed */
-    vp_icons[screen].x = (parent->width-parent->x-CENTER_ICONAREA_WIDTH)/2;
+    vp_icons[screen].x = parent->x + (parent->width / 2 - CENTER_ICONAREA_WIDTH / 2);
 
     vps[screen][QUICKSCREEN_BOTTOM] = *parent;
     if (nb_lines <= MIN_LINES) /* make the bottom item use 1 line */

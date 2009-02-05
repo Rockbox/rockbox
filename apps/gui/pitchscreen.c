@@ -68,7 +68,6 @@ static void pitchscreen_fix_viewports(struct viewport *parent,
         pitch_viewports[i] = *parent;
         pitch_viewports[i].height = height;
     }
-
     pitch_viewports[PITCH_TOP].y += ICON_BORDER;
 
     pitch_viewports[PITCH_MID].x += ICON_BORDER;
@@ -98,6 +97,7 @@ static void pitchscreen_draw_icons (struct screen *display,
     display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
             2,
             parent->height /2 - 4, 7, 8);
+    display->update_viewport();
 }
 
 static void pitchscreen_draw (struct screen *display, int max_lines,
@@ -153,7 +153,7 @@ static void pitchscreen_draw (struct screen *display, int max_lines,
     snprintf((char *)buf, sizeof(buf), "%d.%d%%",
             pitch / 10, pitch % 10 );
     display->getstringsize(buf,&width_val,&h);
-    display->putsxy((pitch_viewports[PITCH_MID].width / 2) - (w / 2),
+    display->putsxy((pitch_viewports[PITCH_MID].width / 2) - (width_val / 2),
             (show_lang_pitch? h : h/2), buf);
 
     /* What's wider? LANG_PITCH or the value?
@@ -272,7 +272,6 @@ int gui_syncpitchscreen_run(void)
 
         /* also, draw the icons now, it's only needed once */
         pitchscreen_draw_icons(&screens[i], &parent[i]);
-        screens[i].update();
     }
 #if CONFIG_CODEC == SWCODEC
     pcmbuf_set_low_latency(true);
