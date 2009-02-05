@@ -202,6 +202,8 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 #define AUDIOSET1_LIN1_on       (0x1 << 2)
 #define AUDIOSET1_MIC2_on       (0x1 << 1)
 #define AUDIOSET1_MIC1_on       (0x1 << 0)
+#define AUDIOSET1_INPUT_MASK    AUDIOSET1_MIC1_on | AUDIOSET1_MIC2_on | \
+                                AUDIOSET1_LIN1_on | AUDIOSET1_LIN2_on
 
 /* AUDIOSET2 (15h) */
 #define AUDIOSET2_BIAS_off      (0x1 << 7)

@@ -31,6 +31,14 @@
 #include "i2s.h"
 #include "ascodec.h"
 
+/* AMS Sansas based on the AS3525 use the LINE2 input for the analog radio
+   signal instead of LINE1 */
+#if CONFIG_CPU == AS3525
+#define LINE_INPUT 2
+#else
+#define LINE_INPUT 1
+#endif
+
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB",   0,   1, -74,   6, -25},
     /* HAVE_SW_TONE_CONTROLS */
@@ -227,9 +235,13 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
 
     as3514_write_masked(AS3514_DAC_R, mix_r, AS3514_VOL_MASK);
     as3514_write_masked(AS3514_DAC_L, mix_l, AS3514_VOL_MASK);
-#ifdef HAVE_RECORDING
-    as3514_write_masked(AS3514_LINE_IN1_R, mix_r, AS3514_VOL_MASK);
-    as3514_write_masked(AS3514_LINE_IN1_L, mix_l, AS3514_VOL_MASK);
+#if defined(HAVE_RECORDING) || defined(HAVE_FMRADIO_IN)
+    as3514_write_masked((LINE_INPUT == 1) ? AS3514_LINE_IN1_R : 
+                                            AS3514_LINE_IN2_R,
+                        mix_r, AS3514_VOL_MASK);
+    as3514_write_masked((LINE_INPUT == 1) ? AS3514_LINE_IN1_L : 
+                                            AS3514_LINE_IN2_L,
+                        mix_l, AS3514_VOL_MASK);
 #endif
     as3514_write_masked(AS3514_HPH_OUT_R, hph_r, AS3514_VOL_MASK);
     as3514_write_masked(AS3514_HPH_OUT_L, hph_l, AS3514_VOL_MASK);
@@ -237,10 +249,8 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
 
 void audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
-    as3514_write_masked(AS3514_LINE_OUT_R, vol_r,
-                        AS3514_VOL_MASK);
-    as3514_write_masked(AS3514_LINE_OUT_L, vol_l,
-                        AS3514_VOL_MASK);
+    as3514_write_masked(AS3514_LINE_OUT_R, vol_r, AS3514_VOL_MASK);
+    as3514_write_masked(AS3514_LINE_OUT_L, vol_l, AS3514_VOL_MASK);
 }
 
 void audiohw_mute(bool mute)
@@ -286,19 +296,24 @@ void audiohw_enable_recording(bool source_mic)
         as3514_write_masked(AS3514_ADC_R, ADC_R_ADCMUX_ST_MIC,
                             ADC_R_ADCMUX);
 
-        /* MIC1_on, LIN1_off */
-        as3514_write_masked(AS3514_AUDIOSET1, AUDIOSET1_MIC1_on,
-                            AUDIOSET1_MIC1_on | AUDIOSET1_LIN1_on);
+        /* MIC1_on, others off */
+        as3514_write_masked(AS3514_AUDIOSET1, AUDIOSET1_MIC1_on, 
+                            AUDIOSET1_INPUT_MASK);
+
         /* M1_AGC_off */
         as3514_clear(AS3514_MIC1_R, MIC1_R_M1_AGC_off);
     } else {
-        /* ADCmux = Line_IN1 */
-        as3514_write_masked(AS3514_ADC_R, ADC_R_ADCMUX_LINE_IN1,
+        /* ADCmux = Line_IN1 or Line_IN2 */
+        as3514_write_masked(AS3514_ADC_R,
+                            (LINE_INPUT == 1) ? ADC_R_ADCMUX_LINE_IN1 :
+                                                ADC_R_ADCMUX_LINE_IN2,
                             ADC_R_ADCMUX);
 
-        /* MIC1_off, LIN1_on */
-        as3514_write_masked(AS3514_AUDIOSET1, AUDIOSET1_LIN1_on,
-                            AUDIOSET1_MIC1_on | AUDIOSET1_LIN1_on);
+        /* LIN1_or LIN2 on, rest off */
+        as3514_write_masked(AS3514_AUDIOSET1,
+                            (LINE_INPUT == 1) ? AUDIOSET1_LIN1_on :
+                                                AUDIOSET1_LIN2_on,
+                            AUDIOSET1_INPUT_MASK);
     }
 
     /* ADC_Mute_off */
@@ -312,10 +327,8 @@ void audiohw_disable_recording(void)
     /* ADC_Mute_on */
     as3514_clear(AS3514_ADC_L, ADC_L_ADC_MUTE_off);
 
-    /* ADC_off, LIN1_off, MIC_off */
-    as3514_clear(AS3514_AUDIOSET1,
-                 AUDIOSET1_ADC_on | AUDIOSET1_LIN1_on |
-                 AUDIOSET1_MIC1_on);
+    /* ADC_off, all input sources off */
+    as3514_clear(AS3514_AUDIOSET1, AUDIOSET1_ADC_on | AUDIOSET1_INPUT_MASK);
 }
 
 /**
@@ -366,22 +379,35 @@ void audiohw_set_recvol(int left, int right, int type)
     as3514_write_masked(AS3514_ADC_R, right, AS3514_VOL_MASK);
     as3514_write_masked(AS3514_ADC_L, left, AS3514_VOL_MASK);
 }
+#endif /* HAVE_RECORDING */
 
+#if defined(HAVE_RECORDING) || defined(HAVE_FMRADIO_IN)
 /**
- * Enable line in 1 analog monitoring
+ * Enable line in analog monitoring
  *
  */
 void audiohw_set_monitor(bool enable)
 {
     if (enable) {
-        as3514_set(AS3514_AUDIOSET1, AUDIOSET1_LIN1_on);
-        as3514_set(AS3514_LINE_IN1_R, LINE_IN1_R_LI1R_MUTE_off);
-        as3514_set(AS3514_LINE_IN1_L, LINE_IN1_L_LI1L_MUTE_off);
+        /* select either LIN1 or LIN2 */
+        as3514_write_masked(AS3514_AUDIOSET1,
+                            (LINE_INPUT == 1) ? 
+                            AUDIOSET1_LIN1_on : AUDIOSET1_LIN2_on,
+                            AUDIOSET1_LIN1_on | AUDIOSET1_LIN2_on);
+        as3514_set((LINE_INPUT == 1) ? AS3514_LINE_IN1_R : AS3514_LINE_IN2_R,
+                   LINE_IN1_R_LI1R_MUTE_off);
+        as3514_set((LINE_INPUT == 1) ? AS3514_LINE_IN1_L : AS3514_LINE_IN2_L,
+                   LINE_IN1_L_LI1L_MUTE_off);
     }
     else {
-        as3514_clear(AS3514_AUDIOSET1, AUDIOSET1_LIN1_on);
+        /* turn off both LIN1 and LIN2 */
         as3514_clear(AS3514_LINE_IN1_R, LINE_IN1_R_LI1R_MUTE_off);
         as3514_clear(AS3514_LINE_IN1_L, LINE_IN1_L_LI1L_MUTE_off);
+        as3514_clear(AS3514_LINE_IN2_R, LINE_IN2_R_LI2R_MUTE_off);
+        as3514_clear(AS3514_LINE_IN2_L, LINE_IN2_L_LI2L_MUTE_off);
+        as3514_clear(AS3514_AUDIOSET1, AUDIOSET1_LIN1_on | AUDIOSET1_LIN2_on);
     }
 }
-#endif /* HAVE_RECORDING */
+#endif /* HAVE_RECORDING || HAVE_FMRADIO_IN */
+
+

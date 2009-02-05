@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright © 2008 Rafaël Carré
+ * Copyright (C) 2009 by Bertrik Sikken
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,20 +18,51 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 #include "system.h"
 #include "cpu.h"
 #include "audio.h"
+#include "audiohw.h"
 #include "sound.h"
 
-/* TODO */
+int audio_channels = 2;
+int audio_output_source = AUDIO_SRC_PLAYBACK;
 
 void audio_set_output_source(int source)
 {
-    (void)source;
-}
+    if ((unsigned)source >= AUDIO_NUM_SOURCES)
+        source = AUDIO_SRC_PLAYBACK;
+
+    audio_output_source = source;
+} /* audio_set_output_source */
 
 void audio_input_mux(int source, unsigned flags)
 {
-    (void)source;
+    static int last_source = AUDIO_SRC_PLAYBACK;
+
     (void)flags;
-}
+
+    switch (source)
+    {
+        default:                        /* playback - no recording */
+            source = AUDIO_SRC_PLAYBACK;
+        case AUDIO_SRC_PLAYBACK:
+            audio_channels = 2;
+            if (source != last_source)
+            {
+                audiohw_set_monitor(false);
+            }
+            break;
+
+        case AUDIO_SRC_FMRADIO:         /* recording and playback */
+            audio_channels = 2;
+            if (source == last_source)
+                break;
+
+            audiohw_set_monitor(true);
+            break;
+    } /* end switch */
+
+    last_source = source;
+} /* audio_input_mux */
+
