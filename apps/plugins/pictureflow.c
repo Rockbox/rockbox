@@ -346,11 +346,50 @@ static inline int clz(uint32_t v)
 }
 
 /* Otherwise, use our clz, which can be inlined */
+#elif defined(CPU_COLDFIRE)
+/* This clz is based on the log2(n) implementation at
+ * http://graphics.stanford.edu/~seander/bithacks.html#IntegerLog
+ * A clz benchmark plugin showed this to be about 14% faster on coldfire
+ * than the LUT-based version.
+ */
+static inline int clz(uint32_t v)
+{
+    int r = 32;
+    if (v >= 0x10000)
+    {
+        v >>= 16;
+        r -= 16;
+    }
+    if (v & 0xff00)
+    {
+        v >>= 8;
+        r -= 8;
+    }
+    if (v & 0xf0)
+    {
+        v >>= 4;
+        r -= 4;
+    }
+    if (v & 0xc)
+    {
+        v >>= 2;
+        r -= 2;
+    }
+    if (v & 2)
+    {
+        v >>= 1;
+        r -= 1;
+    }
+    r -= v;
+    return r;
+}
 #else
 static const char clz_lut[16] = { 4, 3, 2, 2, 1, 1, 1, 1,
                                   0, 0, 0, 0, 0, 0, 0, 0 }; 
 /* This clz is based on the log2(n) implementation at
  * http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogLookup
+ * It is not any faster than the one above, but trades 16B in the lookup table
+ * for a savings of 12B per each inlined call.
  */
 static inline int clz(uint32_t v)
 {
