@@ -111,6 +111,9 @@ typedef fb_data pix_t;
 #define REFLECT_SC ((0x10000U * 3 + (REFLECT_HEIGHT * 5 - 1)) / \
     (REFLECT_HEIGHT * 5))
 #define DISPLAY_OFFS ((LCD_HEIGHT / 2) - REFLECT_HEIGHT)
+#define CAM_DIST MAX(MIN(LCD_HEIGHT,LCD_WIDTH),120)
+#define CAM_DIST_R (CAM_DIST << PFREAL_SHIFT)
+#define DISPLAY_LEFT_R (PFREAL_HALF - LCD_WIDTH * PFREAL_ONE / 2)
 
 #define SLIDE_CACHE_SIZE 100
 
@@ -235,7 +238,6 @@ static struct configdata config[] =
 /** below we allocate the memory we want to use **/
 
 static pix_t *buffer; /* for now it always points to the lcd framebuffer */
-static PFreal rays[LCD_WIDTH];
 static uint16_t reflect_table[REFLECT_HEIGHT];
 static struct slide_data center_slide;
 static struct slide_data left_slides[MAX_SLIDES_COUNT];
@@ -335,6 +337,16 @@ int load_surface(int);
 static inline PFreal fmul(PFreal a, PFreal b)
 {
     return (a*b) >> PFREAL_SHIFT;
+}
+
+/**
+ * This version preshifts each operand, which is useful when we know how many
+ * of the least significant bits will be empty, or are worried about overflow
+ * in a particular calculation
+ */
+static inline PFreal fmuln(PFreal a, PFreal b, int ps1, int ps2)
+{
+    return ((a >> ps1) * (b >> ps2)) >> (PFREAL_SHIFT - ps1 - ps2);
 }
 
 /* ARMv5+ has a clz instruction equivalent to our function.
@@ -1193,23 +1205,28 @@ void reset_slides(void)
 /**
  Updates look-up table and other stuff necessary for the rendering.
  Call this when the viewport size or slide dimension is changed.
+ *
+ * To calculate the offset that will provide the proper margin, we use the same
+ * projection used to render the slides. Assuming zo == 0, the solution for xc,
+ * the slide center, is:
+ *                         xp * xs * sin(r)
+ * xc = xp - xs * cos(r) + ────────────────
+ *                                z
+ * TODO: support moving the side slides toward or away from the camera
  */
-void recalc_table(void)
+void recalc_offsets(void)
 {
-    int w = (LCD_WIDTH + 1) / 2;
-    int h = (LCD_HEIGHT + 1) / 2;
-    int i;
-    for (i = 0; i < w; i++) {
-        PFreal gg = (PFREAL_HALF + i * PFREAL_ONE) / (2 * h);
-        rays[w - i - 1] = -gg;
-        rays[w + i] = gg;
-    }
+    PFreal xs = PFREAL_HALF - DISPLAY_WIDTH * PFREAL_HALF;
+    PFreal xp = DISPLAY_WIDTH * PFREAL_HALF - PFREAL_HALF + center_margin *
+        PFREAL_ONE;
+    PFreal cosr, sinr;
 
     itilt = 70 * IANGLE_MAX / 360;      /* approx. 70 degrees tilted */
-
-    offsetX = DISPLAY_WIDTH / 2 * (fsin(itilt) + PFREAL_ONE);
+    cosr = fcos(-itilt);
+    sinr = fsin(-itilt);
+    offsetX = xp - fmul(xs, cosr) + fmuln(xp,
+        fmuln(xs, sinr, PFREAL_SHIFT - 2, 0), PFREAL_SHIFT - 2, 0)/CAM_DIST;
     offsetY = DISPLAY_WIDTH / 2 * (fsin(itilt) + PFREAL_ONE / 2);
-    offsetX += center_margin << PFREAL_SHIFT;
 }
 
 
@@ -1246,68 +1263,83 @@ static inline pix_t fade_color(pix_t c, unsigned int a)
 #endif
 
 /**
-  Render a single slide
-*/
+ * Render a single slide
+ * Where xc is the slide's horizontal offset from center, xs is the horizontal
+ * on the slide from its center, zo is the slide's depth offset from the plane
+ * of the display, r is the angle at which the slide is tilted, and xp is the
+ * point on the display corresponding to xs on the slide, the projection
+ * formulas are:
+ *
+ *      z * (xc + xs * cos(r))
+ * xp = ──────────────────────
+ *       z + zo + xs * sin(r)
+ *
+ *      z * (xc - xp) - xp * zo
+ * xs = ────────────────────────
+ *      xp * sin(r) - z * cos(r)
+ *
+ * We use the xp projection once, to find the left edge of the slide on the
+ * display. From there, we use the xs reverse projection to find the horizontal
+ * offset from the slide center of each column on the screen, until we reach
+ * the right edge of the slide, or the screen. The reverse projection can be
+ * optimized by saving the numerator and denominator of the fraction, which can
+ * then be incremented by (z + zo) and sin(r) respectively.
+ */
 void render_slide(struct slide_data *slide, const int alpha)
 {
     struct bitmap *bmp = surface(slide->slide_index);
     if (!bmp) {
         return;
     }
+    if (slide->angle > 255 || slide->angle < -255)
+        return;
     pix_t *src = (pix_t *)bmp->data;
 
     const int sw = bmp->width;
     const int sh = bmp->height;
+    const PFreal slide_left = -sw * PFREAL_HALF + PFREAL_HALF;
 
     const int h = LCD_HEIGHT;
     const int w = LCD_WIDTH;
 
 
-    int distance = (h + slide->distance) * 100 / zoom;
-    if (distance < 100 ) distance = 100; /* clamp distances */
-    PFreal dist = distance * PFREAL_ONE;
-    PFreal sdx = fcos(slide->angle);
-    PFreal sdy = fsin(slide->angle);
-    PFreal xs = slide->cx - sw * fdiv(sdx, dist) / 2;
+    PFreal zo = (CAM_DIST_R + PFREAL_ONE * slide->distance) * 100 / zoom -
+        CAM_DIST_R;
+    PFreal cosr = fcos(slide->angle);
+    PFreal sinr = fsin(slide->angle);
+    PFreal xs = slide_left, xsnum, xsnumi, xsden, xsdeni;
+    PFreal xp = fdiv(CAM_DIST * (slide->cx + fmul(xs, cosr)),
+        (CAM_DIST_R + zo + fmul(xs,sinr)));
 
-    int xi = fmax(0, xs) >> PFREAL_SHIFT;
+    /* Since we're finding the screen position of the left edge of the slide,
+     * we round up.
+     */
+    int xi = (fmax(DISPLAY_LEFT_R, xp) - DISPLAY_LEFT_R + PFREAL_ONE - 1)
+        >> PFREAL_SHIFT;
+    xp = DISPLAY_LEFT_R + xi * PFREAL_ONE;
     if (xi >= w) {
         return;
     }
-
+    xsnum = CAM_DIST * (slide->cx - xp) - fmuln(xp, zo, PFREAL_SHIFT - 2, 0);
+    xsden = fmuln(xp, sinr, PFREAL_SHIFT - 2, 0) - CAM_DIST * cosr;
+    xs = fdiv(xsnum, xsden);
+    
+    xsnumi = -CAM_DIST_R - zo;
+    xsdeni = sinr;
     int x;
-    for (x = fmax(xi, 0); x < w; x++) {
-        PFreal hity = 0;
-        PFreal fk = rays[x];
-        if (sdy) {
-            fk = fk - fdiv(sdx, sdy);
-            if (fk)
-                hity = -fdiv(( rays[x] * distance
-                       - slide->cx
-                       + slide->cy * sdx / sdy), fk);
-        }
-
-        dist = distance * PFREAL_ONE + hity;
-        if (dist < 0)
-            continue;
-
-        PFreal hitx = fmul(dist, rays[x]);
-
-        PFreal hitdist = fdiv(hitx - slide->cx, sdx);
-
-        const int column = (sw >> 1) + (hitdist >> PFREAL_SHIFT);
+    int dy = PFREAL_ONE;
+    for (x = xi; x < w; x++) {
+        int column = (xs - slide_left) / PFREAL_ONE;
         if (column >= sw)
             break;
-        if (column < 0)
-            continue;
-
+        if (zo || slide->angle)
+            dy = (CAM_DIST_R + zo + fmul(xs, sinr)) / CAM_DIST;
         int y1 = (LCD_HEIGHT / 2) - 1;
         int y2 = y1 + 1;
         pix_t *pixel1 = &buffer[y1 * BUFFER_WIDTH + x];
-        pix_t *pixel2 = &buffer[y2 * BUFFER_WIDTH + x];
-        const int pixelstep = pixel2 - pixel1;
+        pix_t *pixel2 = pixel1 + BUFFER_WIDTH;
+        const int pixelstep = BUFFER_WIDTH;
 
-        int dy = dist / h;
         int p1 = (bmp->height - 1 - (DISPLAY_OFFS)) * PFREAL_ONE;
         int p2 = p1 + dy;
         const pix_t *ptr = &src[column * bmp->height];
@@ -1340,6 +1372,7 @@ void render_slide(struct slide_data *slide, const int alpha)
             }
         }
         else
+        {
             while ((y1 >= 0) && (p1 >= 0))
             {
                 *pixel1 = fade_color(ptr[p1 >> PFREAL_SHIFT],alpha);
@@ -1364,6 +1397,15 @@ void render_slide(struct slide_data *slide, const int alpha)
                 y2++;
                 pixel2 += pixelstep;
             }
+        }
+        if (zo || slide->angle)
+        {
+            xsnum += xsnumi;
+            xsden += xsdeni;
+            xs = fdiv(xsnum, xsden);
+        } else
+            xs += PFREAL_ONE;
+        
     }
     /* let the music play... */
     rb->yield();
@@ -1684,7 +1726,7 @@ int settings_menu(void)
                 rb->set_int("Spacing between slides", "", 1,
                             &slide_spacing,
                             NULL, 1, 0, 100, NULL );
-                recalc_table();
+                recalc_offsets();
                 reset_slides();
                 break;
 
@@ -1692,27 +1734,27 @@ int settings_menu(void)
                 rb->set_int("Center margin", "", 1,
                             &center_margin,
                             NULL, 1, 0, 80, NULL );
-                recalc_table();
+                recalc_offsets();
                 reset_slides();
                 break;
 
             case 3:
                 rb->set_int("Number of slides", "", 1, &num_slides,
                             NULL, 1, 1, MAX_SLIDES_COUNT, NULL );
-                recalc_table();
+                recalc_offsets();
                 reset_slides();
                 break;
 
             case 4:
                 rb->set_int("Zoom", "", 1, &zoom,
                             NULL, 1, 10, 300, NULL );
-                recalc_table();
+                recalc_offsets();
                 reset_slides();
                 break;
             case 5:
                 album_name_menu();
                 reset_track_list();
-                recalc_table();
+                recalc_offsets();
                 reset_slides();
                 break;
             case 6:
@@ -2076,7 +2118,7 @@ int main(void)
     target = 0;
     fade = 256;
 
-    recalc_table();
+    recalc_offsets();
     reset_slides();
 
     char fpstxt[10];
