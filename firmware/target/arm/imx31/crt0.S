@@ -57,7 +57,6 @@ start:
 newstart:
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
 
-#ifdef BOOTLOADER
     adr     r2, remap_start    /* Load PC-relative labels */
     adr     r3, remap_end
     ldr     r5, =TTB_BASE_ADDR /* TTB pointer */
@@ -127,13 +126,6 @@ remap_start:
     /*** End of L2 operations ***/
 
     /* TTB Initialisation */
-    mov     r2, r5
-    add     r3, r5, #TTB_SIZE
-    mov     r1, #0
-1:
-    str     r1, [r2], #4
-    cmp     r2, r3
-    blo     1b
 
     /* Set TTB base address */
     mcr     p15, 0, r5, c2, c0, 0
@@ -157,32 +149,29 @@ remap_start:
     add     r1, r1, #(1 << 20)  /* Next MB */
     cmp     r2, r3
     blo     1b
-    sub     r1, r1, #TTB_SIZE/4*(1 << 20) /* Back up */
+
+    bic     r1, r1, #0x0ff00000 /* Back up */
 
     /* Map 0x80000000 -> 0x0, cached */
     mov     r2, r5               /* TTB pointer */
-    add     r3, r5, #63*4        /* End position */
+    add     r3, r5, #64*4        /* End position */
     orr     r1, r1, #0x80000000  /* Physical address */
     orr     r1, r1, #((1 << 3) | /* cache flag */ \
                       (1 << 2))  /* buffer flag */
 1:
     str     r1, [r2], #4
     add     r1, r1, #(1 << 20)
-    and     r4, r1, #0x0ff00000
-    cmp     r4, #0x00100000      /* Skip framebuffer */
-    addeq   r1, r1, #(1 << 20)
     cmp     r2, r3
     blo     1b
 
-    /* Map device section 0x80100000 to 0x03f00000 - buffered, not cached */
+    /* Map device section 0x83f00000 to 0x03f00000 - buffered, not cached */
     bic     r1, r1, #0x0ff00000
-    orr     r1, r1, #0x00100000
+    orr     r1, r1, #0x03f00000
     bic     r1, r1, #(1 << 3)
     add     r2, r5, #63*4
     str     r1, [r2]
-
+    
     /* Enable MMU */
-
     mov     r0, #0
     mcr     p15, 0, r0, c8, c7, 0 /* Invalidate TLB */
     mcr     p15, 0, r0, c7, c7, 0 /* Invalidate icache and dcache */
@@ -229,8 +218,6 @@ remap_start:
 L_post_remap:
     .word remap_end
 remap_end:
-
-#endif /* BOOTLOADER */
 
 #ifdef BOOTLOADER
     /* Copy bootloader exception handler code to address 0 */

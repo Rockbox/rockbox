@@ -27,6 +27,7 @@
 #include "lcd-target.h"
 #include "backlight-target.h"
 
+#define MAIN_LCD_IDMAC_CHANNEL 14
 #define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
 
 static volatile bool lcd_on = true;
@@ -46,6 +47,15 @@ extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
 /* LCD init */
 void lcd_init_device(void)
 {
+    /* Move the framebuffer */
+#ifdef BOOTLOADER
+    /* Only do this once to avoid flicker */
+    memset(FRAME, 0x00, FRAME_SIZE);
+#endif
+    IPU_IDMAC_CHA_EN &= ~(1ul << MAIN_LCD_IDMAC_CHANNEL);
+    IPU_IMA_ADDR = ((0x1 << 16) | (MAIN_LCD_IDMAC_CHANNEL << 4)) + (1 << 3);
+    IPU_IMA_DATA = FRAME_PHYS_ADDR;
+    IPU_IDMAC_CHA_EN |= (1ul << MAIN_LCD_IDMAC_CHANNEL);
 }
 
 /* Update a fraction of the display. */

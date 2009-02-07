@@ -334,13 +334,16 @@ void main(void)
     /* Flush and invalidate all caches (because vectors were written) */
     invalidate_icache();
 
-    lcd_clear_display();
-    printf("Gigabeat S Rockbox Bootloader");
-    printf("Version %s", version);
     system_init();
     kernel_init();
 
     enable_interrupt(IRQ_FIQ_STATUS);
+
+    lcd_init_device();
+    lcd_clear_display();
+
+    printf("Gigabeat S Rockbox Bootloader");
+    printf("Version %s", version);
 
     /* Initialize KPP so we can poll the button states */
     button_init_device();

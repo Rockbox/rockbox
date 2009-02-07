@@ -28,12 +28,14 @@
 #define REG32_PTR_T volatile unsigned long *
 
 /* Place in the section with the framebuffer */
-#define TTB_BASE_ADDR (0x80100000 + 0x00100000 - TTB_SIZE)
+#define TTB_BASE_ADDR (CSD0_BASE_ADDR + (MEM*0x100000) - TTB_SIZE)
 #define TTB_SIZE      (0x4000)
 #define IRAM_SIZE     (0x4000)
 #define TTB_BASE      ((unsigned long *)TTB_BASE_ADDR)
-#define FRAME         ((void*)0x03f00000)
 #define FRAME_SIZE    (240*320*2)
+/* Rockbox framebuffer address, not retail OS */
+#define FRAME_PHYS_ADDR (TTB_BASE_ADDR - FRAME_SIZE)
+#define FRAME         ((void *)(FRAME_PHYS_ADDR-CSD0_BASE_ADDR))
 
 #define DEVBSS_ATTR   __attribute__((section(".devbss"),nocommon))
 /* USBOTG */
@@ -411,6 +413,11 @@
 #define IPU_BRK_CTRL_2          (*(REG32_PTR_T)(IPU_CTRL_BASE_ADDR+0x54))
 #define IPU_BRK_STAT            (*(REG32_PTR_T)(IPU_CTRL_BASE_ADDR+0x58))
 #define IPU_DIAGB_CTRL          (*(REG32_PTR_T)(IPU_CTRL_BASE_ADDR+0x60))
+#define IPU_IDMAC_CONF          (*(REG32_PTR_T)(IPU_CTRL_BASE_ADDR+0xA4))
+#define IPU_IDMAC_CHA_EN        (*(REG32_PTR_T)(IPU_CTRL_BASE_ADDR+0xA8))
+#define IPU_IDMAC_CHA_PRI       (*(REG32_PTR_T)(IPU_CTRL_BASE_ADDR+0xAC))
+#define IPU_IDMAC_CHA_BUSY      (*(REG32_PTR_T)(IPU_CTRL_BASE_ADDR+0xB0))
+
 
 
 /* ATA */
