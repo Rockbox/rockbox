@@ -31,18 +31,19 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <inttypes.h>
 #include "libmtp.h"
 
 LIBMTP_mtpdevice_t *device;
 
-static int progress(u_int64_t const sent, u_int64_t const total,
+static int progress(uint64_t const sent, uint64_t const total,
                     void const *const data)
 {
     int percent = (sent * 100) / total;
 #ifdef __WIN32__
     printf("Progress: %I64u of %I64u (%d%%)\r", sent, total, percent);
 #else
-    printf("Progress: %llu of %llu (%d%%)\r", sent, total, percent);
+    printf("Progress: %"PRIu64" of %"PRIu64" (%d%%)\r", sent, total, percent);
 #endif
     fflush(stdout);
     return 0;
@@ -64,7 +65,6 @@ int sendfile_function(char *from_path)
 #endif
     LIBMTP_file_t *genfile;
     int ret;
-    uint32_t parent_id = 0;
 
 #ifdef __USE_LARGEFILE64
     if (stat64(from_path, &sb) == -1)
@@ -90,8 +90,15 @@ int sendfile_function(char *from_path)
     genfile->filetype = LIBMTP_FILETYPE_FIRMWARE;
 
     printf("Sending file...\n");
+
+#ifdef OLDMTP
     ret = LIBMTP_Send_File_From_File(device, from_path, genfile, progress,
-                                     NULL, parent_id);
+                                     NULL, 0);
+#else
+    ret = LIBMTP_Send_File_From_File(device, from_path, genfile, progress,
+                                     NULL);
+#endif
+
     printf("\n");
     if (ret != 0)
     {
