@@ -59,6 +59,8 @@ int main(void)
     ata_init();
 #endif
 
+    usb_start_monitoring();
+
     int touch, btn;
     char datetime[30];
     reset_screen();
