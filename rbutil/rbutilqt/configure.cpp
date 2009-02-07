@@ -210,7 +210,7 @@ void Config::setUserSettings()
     // cache tab
     if(!QFileInfo(settings->cachePath()).isDir())
         settings->setCachePath(QDir::tempPath());
-    ui.cachePath->setText(settings->cachePath());
+    ui.cachePath->setText(QDir::toNativeSeparators(settings->cachePath()));
     ui.cacheDisable->setChecked(settings->cacheDisabled());
     ui.cacheOfflineMode->setChecked(settings->cacheOffline());
     updateCacheInfo(settings->cachePath());
