@@ -388,7 +388,7 @@ static void init(void)
 #ifdef DEBUG
     debug_init();
 #else
-#if !defined(HAVE_FMADC) && !(CONFIG_STORAGE & STORAGE_MMC)
+#ifdef HAVE_SERIAL
     serial_setup();
 #endif
 #endif

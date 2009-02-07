@@ -120,3 +120,5 @@
 #define MIN_CONTRAST_SETTING        5
 #define MAX_CONTRAST_SETTING        63
 
+#define HAVE_SERIAL
+

@@ -41,9 +41,6 @@
 /* FIX: this doesn't work on iRiver or iPod yet */
 /* iFP7xx has no remote */
 
-#if !defined(HAVE_FMADC) /* Recorder FM/V2 has no remote control pin */ \
- && !(CONFIG_STORAGE & STORAGE_MMC)   /* MMC takes serial port 1, so don't mess with it */
-
 /* Received byte identifiers */
 #define PLAY  0xC1
 #define STOP  0xC2
@@ -177,8 +174,7 @@ int remote_control_rx(void)
     return ret;
 }
 
-#endif /* !HAVE_FMADC && !STORAGE_MMC */
-#elif defined(CPU_COLDFIRE) && defined(HAVE_SERIAL)
+#elif defined(CPU_COLDFIRE)
 
 void serial_setup (void)
 {
@@ -426,30 +422,6 @@ void SERIAL0(void)
             autobaud = 0; /* Found good baud */
         newpkt = pkt;
     }
-}
-
-#else /* Other targets */
-void serial_setup (void)
-{
-    /* a dummy */
-}
-
-int tx_rdy(void)
-{
-    /* a dummy */
-    return 1;
-}
-
-int rx_rdy(void)
-{
-    /* a dummy */
-    return 0;
-}
-
-void tx_writec(const unsigned char c)
-{
-    (void)c;
-    /* a dummy */
 }
 
 #endif

@@ -108,7 +108,9 @@ drivers/button.c
 #ifdef HAVE_DAC3550A
 drivers/dac.c
 #endif
+#ifdef HAVE_SERIAL
 drivers/serial.c
+#endif
 #endif /* SIMULATOR */
 
 
