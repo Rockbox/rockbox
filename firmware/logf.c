@@ -97,15 +97,6 @@ static void displayremote(void)
 #define displayremote()
 #endif
 
-static void check_logfindex(void)
-{
-    if(logfindex >= MAX_LOGF_LINES) {
-        /* wrap */
-        logfwrap = true;
-        logfindex = 0;
-    }
-}
-
 #ifdef __PCTOOL__
 void _logf(const char *format, ...)
 {
@@ -117,6 +108,15 @@ void _logf(const char *format, ...)
     printf("DEBUG: %s\n", buf);
 }
 #else
+static void check_logfindex(void)
+{
+    if(logfindex >= MAX_LOGF_LINES) {
+        /* wrap */
+        logfwrap = true;
+        logfindex = 0;
+    }
+}
+
 void _logf(const char *format, ...)
 {
     int len;
