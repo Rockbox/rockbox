@@ -46,3 +46,6 @@ char *strerror(int error);
 void error(int errortype, int error);
 int load_firmware(unsigned char* buf, char* firmware, int buffer_size);
 int load_raw_firmware(unsigned char* buf, char* firmware, int buffer_size);
+#ifdef ROCKBOX_HAS_LOGF
+void display_logf(void);
+#endif

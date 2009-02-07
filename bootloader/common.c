@@ -30,6 +30,10 @@
 #include "power.h"
 #include "kernel.h"
 #include "config.h"
+#include "logf.h"
+#include "button.h"
+#include "string.h"
+#include "usb.h"
 
 /* TODO: Other bootloaders need to be adjusted to set this variable to true
    on a button press - currently only the ipod, H10 and Sansa versions do. */
@@ -238,3 +242,83 @@ int dbg_ports(void)
 void mpeg_stop(void)
 {
 }
+
+#ifdef ROCKBOX_HAS_LOGF /* Logf display helper for the bootloader */
+
+#define LINES   (LCD_HEIGHT/SYSFONT_HEIGHT)
+#define COLUMNS ((LCD_WIDTH/SYSFONT_WIDTH) > MAX_LOGF_ENTRY ? \
+                            MAX_LOGF_ENTRY : (LCD_WIDTH/SYSFONT_WIDTH))
+
+#ifdef ONDA_VX747
+#define LOGF_UP     BUTTON_VOL_UP
+#define LOGF_DOWN   BUTTON_VOL_DOWN
+#define LOGF_CLEAR  BUTTON_MENU
+#else
+#warning No keymap defined for this target
+#endif
+
+void display_logf(void) /* Doesn't return! */
+{
+    int i, index, button, user_index=0;
+#ifdef HAVE_TOUCHSCREEN
+    int touch, prev_y=0;
+#endif
+    char buffer[COLUMNS+1];
+    
+    while(1)
+    {
+        index = logfindex + user_index;
+        
+        lcd_clear_display();
+        for(i = LINES-1; i>=0; i--)
+        {
+            if(--index < 0)
+            {
+                if(logfwrap)
+                    index = MAX_LOGF_LINES-1;
+                else
+                    break; /* done */
+            }
+            
+            memcpy(buffer, logfbuffer[index], COLUMNS);
+            
+            if (logfbuffer[index][MAX_LOGF_ENTRY] == LOGF_TERMINATE_CONTINUE_LINE)
+                buffer[MAX_LOGF_ENTRY-1] = '>';
+            else if (logfbuffer[index][MAX_LOGF_ENTRY] == LOGF_TERMINATE_MULTI_LINE)
+                buffer[MAX_LOGF_ENTRY-1] = '\0';
+            
+            buffer[COLUMNS] = '\0';
+            
+            lcd_puts(0, i, buffer);
+        }
+        
+        button = button_get(false);
+        if(button == SYS_USB_CONNECTED)
+            usb_acknowledge(SYS_USB_CONNECTED_ACK);
+        else if(button == SYS_USB_DISCONNECTED)
+            usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
+        else if(button & LOGF_UP)
+            user_index++;
+        else if(button & LOGF_DOWN)
+            user_index--;
+        else if(button & LOGF_CLEAR)
+            user_index = 0;
+#ifdef HAVE_TOUCHSCREEN
+        else if(button & BUTTON_TOUCH)
+        {
+            touch = button_get_data();
+            
+            if(button & BUTTON_REL)
+                prev_y = 0;
+            
+            if(prev_y != 0)
+                user_index += (prev_y - (touch & 0xFFFF)) / SYSFONT_HEIGHT;
+            prev_y = touch & 0xFFFF;
+        }
+#endif
+        
+        lcd_update();
+        sleep(HZ/16);
+    }
+}
+#endif
