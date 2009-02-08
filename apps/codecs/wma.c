@@ -288,6 +288,9 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
             payload_datalen = length - bytesread - padding_length;
         }
 
+        if (replicated_length==1)
+            datap++;
+
         if (stream_id == wfx->audiostream)
         {
             if (*audiobuf == NULL) {
