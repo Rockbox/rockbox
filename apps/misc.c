@@ -605,8 +605,7 @@ bool settings_parseline(char* line, char** name, char** value)
 {
     char* ptr;
 
-    while ( isspace(*line) )
-        line++;
+    line = skip_whitespace(line);
 
     if ( *line == '#' )
         return false;
@@ -618,8 +617,7 @@ bool settings_parseline(char* line, char** name, char** value)
     *name = line;
     *ptr = 0;
     ptr++;
-    while (isspace(*ptr))
-        ptr++;
+    ptr = skip_whitespace(ptr);
     *value = ptr;
     return true;
 }
@@ -1119,6 +1117,16 @@ char* strrsplt(char* str, int c)
     {
         s = str;
     }
+    
+    return s;
+}
+
+char* skip_whitespace(char* const str)
+{
+    char *s = str;
+
+    while (isspace(*s)) 
+        s++;
     
     return s;
 }

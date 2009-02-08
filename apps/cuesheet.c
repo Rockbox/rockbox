@@ -108,15 +108,6 @@ bool look_for_cuesheet_file(const char *trackpath, char *found_cue_path)
     return true;
 }
 
-static char *skip_whitespace(char* buf)
-{
-    char *r = buf;
-    while (*r && isspace(*r))
-        r++;
-    return r;
-}
-
-
 static char *get_string(const char *line)
 {
     char *start, *end;

@@ -29,6 +29,7 @@
 #include "metadata_common.h"
 #include "metadata_parsers.h"
 #include "replaygain.h"
+#include "misc.h"
 
 /* Skip an ID3v2 tag if it can be found. We assume the tag is located at the
  * start of the file, which should be true in all cases where we need to skip it.
@@ -173,16 +174,6 @@ long get_slong(void* buf)
     return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 }
 
-static char* skip_space(char* str)
-{
-    while (isspace(*str)) 
-    {
-        str++;
-    }
-    
-    return str;
-}
-
 unsigned long get_itunes_int32(char* value, int count)
 {
     static const char hexdigits[] = "0123456789ABCDEF";
@@ -191,7 +182,7 @@ unsigned long get_itunes_int32(char* value, int count)
     
     while (count-- > 0)
     {
-        value = skip_space(value);
+        value = skip_whitespace(value);
         
         while (*value && !isspace(*value))
         {
@@ -199,7 +190,7 @@ unsigned long get_itunes_int32(char* value, int count)
         }
     }
     
-    value = skip_space(value);
+    value = skip_whitespace(value);
     
     while (*value && ((c = strchr(hexdigits, toupper(*value))) != NULL))
     {
