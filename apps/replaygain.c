@@ -224,7 +224,10 @@ static long fp_atof(const char* s, int precision)
     long sign = 1;
     bool point = false;
 
-    s = skip_whitespace(s);
+    while ((*s != '\0') && isspace(*s))
+    { 	 
+        s++; 	 
+    }
 
     if (*s == '-')
     {
