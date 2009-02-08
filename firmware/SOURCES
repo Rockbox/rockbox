@@ -756,7 +756,6 @@ target/arm/imx31/gigabeat-s/avic-imx31.c
 target/arm/imx31/gigabeat-s/backlight-imx31.c
 target/arm/imx31/gigabeat-s/button-imx31.c
 target/arm/imx31/gigabeat-s/clkctl-imx31.c
-target/arm/imx31/gigabeat-s/dma_start.c
 target/arm/imx31/gigabeat-s/gpio-gigabeat-s.c
 target/arm/imx31/gigabeat-s/gpio-imx31.c
 target/arm/imx31/gigabeat-s/kernel-imx31.c
@@ -773,6 +772,7 @@ target/arm/imx31/gigabeat-s/system-imx31.c
 target/arm/imx31/gigabeat-s/usb-imx31.c
 target/arm/imx31/gigabeat-s/wmcodec-imx31.c
 #ifndef BOOTLOADER
+target/arm/imx31/sdma-imx31.c
 target/arm/imx31/gigabeat-s/audio-gigabeat-s.c
 target/arm/imx31/gigabeat-s/fmradio-i2c-gigabeat-s.c
 target/arm/imx31/gigabeat-s/headphone-gigabeat-s.c

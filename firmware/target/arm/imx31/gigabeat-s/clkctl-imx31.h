@@ -105,6 +105,9 @@ unsigned int imx31_clkctl_get_pll(enum IMX31_PLLS pll);
 /* Return ipg_clk in HZ */
 unsigned int imx31_clkctl_get_ipg_clk(void);
 
+/* Return ahb_clk in HZ */
+unsigned int imx31_clkctl_get_ahb_clk(void);
+
 /* Return the ATA frequency in HZ */
 unsigned int imx31_clkctl_get_ata_clk(void);
 

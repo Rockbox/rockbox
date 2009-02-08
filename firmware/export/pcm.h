@@ -90,6 +90,10 @@ extern unsigned long pcm_curr_sampr;
 extern unsigned long pcm_sampr;
 extern int pcm_fsel;
 
+#ifdef HAVE_PCM_DMA_ADDRESS
+void * pcm_dma_addr(void *addr);
+#endif
+
 /* the registered callback function to ask for more mp3 data */
 extern volatile pcm_more_callback_type pcm_callback_for_more;
 extern volatile bool                   pcm_playing;

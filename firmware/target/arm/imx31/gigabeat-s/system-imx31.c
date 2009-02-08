@@ -32,6 +32,28 @@
 #include "clkctl-imx31.h"
 #include "mc13783.h"
 
+static unsigned long product_rev;
+static unsigned long system_rev;
+
+/** IC revision info routines **/
+unsigned int iim_system_rev(void)
+{
+    return system_rev & IIM_SREV_SREV;
+}
+
+unsigned int iim_prod_rev(void)
+{
+    return product_rev;
+}
+
+static void iim_init(void)
+{
+    /* Initialize the IC revision info (required by SDMA) */
+    imx31_clkctl_module_clock_gating(CG_IIM, CGM_ON_ALL);
+    product_rev = IIM_PREV;
+    system_rev = IIM_SREV;
+}
+
 /** Watchdog timer routines **/
 
 /* Initialize the watchdog timer */
@@ -154,6 +176,8 @@ void system_init(void)
 
     /* MCR WFI enables wait mode */
     CLKCTL_CCMR &= ~(3 << 14);
+
+    iim_init();
 
     imx31_regset32(&SDHC1_CLOCK_CONTROL, STOP_CLK);
     imx31_regset32(&SDHC2_CLOCK_CONTROL, STOP_CLK);

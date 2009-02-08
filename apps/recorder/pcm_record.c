@@ -1148,8 +1148,8 @@ static void pcmrec_init(void)
 
     buffer = audio_get_recording_buffer(&rec_buffer_size);
 
-    /* Line align pcm_buffer 2^4=16 bytes */
-    pcm_buffer = (unsigned char *)ALIGN_UP_P2((uintptr_t)buffer, 4);
+    /* Line align pcm_buffer 2^5=32 bytes */
+    pcm_buffer = (unsigned char *)ALIGN_UP_P2((uintptr_t)buffer, 5);
     enc_buffer = pcm_buffer + ALIGN_UP_P2(PCM_NUM_CHUNKS*PCM_CHUNK_SIZE +
                                           PCM_MAX_FEED_SIZE, 2);
     /* Adjust available buffer for possible align advancement */

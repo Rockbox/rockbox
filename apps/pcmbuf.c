@@ -1001,6 +1001,11 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
         /* Give 5ms clearance. */    
         bufstart += NATIVE_FREQUENCY * 4 / 200;
 
+#ifdef HAVE_PCM_DMA_ADDRESS
+        /* Returned peak addresses are DMA addresses */
+        bufend = pcm_dma_addr(bufend);
+#endif
+
         /* Wrapped above? */
         if (bufstart >= bufend)
             bufstart -= pcmbuf_size;

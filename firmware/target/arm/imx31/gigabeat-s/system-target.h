@@ -43,6 +43,8 @@ void watchdog_service(void);
 void gpt_start(void);
 void gpt_stop(void);
 
+unsigned int iim_system_rev(void);
+
 /* Prepare for transition to firmware */
 void system_prepare_fw_start(void);
 void tick_stop(void);

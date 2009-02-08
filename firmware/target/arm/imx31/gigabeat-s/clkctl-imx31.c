@@ -24,6 +24,11 @@
 #include "cpu.h"
 #include "clkctl-imx31.h"
 
+unsigned int imx31_get_src_pll(void)
+{
+    return (CLKCTL_PMCR0 & 0xC0000000) == 0 ? PLL_SERIAL : PLL_MCU;
+}
+
 void imx31_clkctl_module_clock_gating(enum IMX31_CG_LIST cg,
                                       enum IMX31_CG_MODES mode)
 {
@@ -72,13 +77,22 @@ unsigned int imx31_clkctl_get_pll(enum IMX31_PLLS pll)
 
 unsigned int imx31_clkctl_get_ipg_clk(void)
 {
-    unsigned int pll = imx31_clkctl_get_pll((CLKCTL_PMCR0 & 0xC0000000) == 0 ?
-                               PLL_SERIAL : PLL_MCU);
+    unsigned int pllnum = imx31_get_src_pll();
+    unsigned int pll = imx31_clkctl_get_pll(pllnum);
     uint32_t reg = CLKCTL_PDR0;
     unsigned int max_pdf = ((reg >> 3) & 0x7) + 1;
     unsigned int ipg_pdf = ((reg >> 6) & 0x3) + 1;
 
     return pll / (max_pdf * ipg_pdf);
+}
+
+unsigned int imx31_clkctl_get_ahb_clk(void)
+{
+    unsigned int pllnum = imx31_get_src_pll();
+    unsigned int pll = imx31_clkctl_get_pll(pllnum);
+    unsigned int max_pdf = ((CLKCTL_PDR0 >> 3) & 0x7) + 1;
+
+    return pll / max_pdf;
 }
 
 unsigned int imx31_clkctl_get_ata_clk(void)

@@ -24,6 +24,7 @@
 #include "spi-imx31.h"
 #include "mc13783.h"
 #include "clkctl-imx31.h"
+#include "sdma-imx31.h"
 #include "kernel.h"
 #include "thread.h"
 
@@ -64,6 +65,9 @@ void tick_start(unsigned int interval_in_ms)
 
 void kernel_device_init(void)
 {
+#ifndef BOOTLOADER
+    sdma_init();
+#endif
     spi_init();
     mc13783_init();
 }

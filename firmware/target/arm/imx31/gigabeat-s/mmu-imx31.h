@@ -23,5 +23,7 @@
 
 void memory_init(void);
 void set_page_tables(void);
+unsigned long addr_virt_to_phys(unsigned long addr);
+unsigned long addr_phys_to_virt(unsigned long addr);
 
 #endif /* MMU_IMX31_H */

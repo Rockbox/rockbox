@@ -118,6 +118,22 @@
 #define WDOG1_BASE_ADDR         WDOG_BASE_ADDR
 #define CRM_MCU_BASE_ADDR       CCM_BASE_ADDR
 
+/* IIM */
+#define IIM_PREV                (*(REG32_PTR_T)(IIM_BASE_ADDR + 0x20))
+    #define IIM_PREV_SIG        (0x1f << 3)
+    #define IIM_PREV_SIG_IMX31  (0x01 << 3) /* i.MX31 */
+#define IIM_SREV                (*(REG32_PTR_T)(IIM_BASE_ADDR + 0x24))
+    #define IIM_SREV_SREV       (0xff << 0)
+    #define IIM_SREV_1_0        0x00 /* i.MX31/L 1.0, L38W */
+    #define IIM_SREV_1_1        0x10 /* i.MX31   1.1, 2L38W */
+    #define IIM_SREV_1_1L       0x11 /* i.MX31L  1.1, 2L38W */
+    #define IIM_SREV_1_15       0x12 /* i.MX31   1.15, 2L38W/3L38W */
+    #define IIM_SREV_1_15L      0x13 /* i.MX31L  1.15, 2L38W/3L38W */
+    #define IIM_SREV_1_2        0x14 /* i.MX31   1.2, 3L38W, M45G */
+    #define IIM_SREV_1_2L       0x15 /* i.MX31L  1.2, 3L38W, M45G */
+    #define IIM_SREV_2_0_1      0x28 /* i.MX31   2.0/2.0.1, M91E */
+    #define IIM_SREV_2_0_1L     0x29 /* i.MX31L  2.0/2.0.1, M91E */
+
 /* IOMUXC */
 #define IOMUXC_(o)              (*(REG32_PTR_T)(IOMUXC_BASE_ADDR+(o)))
 
@@ -1617,6 +1633,141 @@
 #define EUARTUTS_TXFULL     (1 << 4)    // TxFIFO full
 #define EUARTUTS_RXFULL     (1 << 3)    // RxFIFO full
 #define EUARTUTS_SOFTRST    (1 << 0)    // Software reset
+
+/* SDMA */
+#define SDMA_MC0PTR         (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x000))
+#define SDMA_INTR           (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x004))
+#define SDMA_STOP_STAT      (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x008))
+#define SDMA_HSTART         (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x00C))
+#define SDMA_EVTOVR         (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x010))
+#define SDMA_DSPOVR         (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x014))
+#define SDMA_HOSTOVR        (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x018))
+#define SDMA_EVTPEND        (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x01C))
+#define SDMA_DSPENBL        (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x020))
+#define SDMA_RESET          (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x024))
+#define SDMA_EVTERR         (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x028))
+#define SDMA_INTRMSK        (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x02C))
+#define SDMA_PSW            (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x030))
+#define SDMA_EVTERRDBG      (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x034))
+#define SDMA_CONFIG         (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x038))
+#define SDMA_ONCE_ENB       (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x040))
+#define SDMA_ONCE_DATA      (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x044))
+#define SDMA_ONCE_INSTR     (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x048))
+#define SDMA_ONCE_STAT      (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x04C))
+#define SDMA_ONCE_CMD       (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x050))
+#define SDMA_EVT_MIRROR     (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x054))
+#define SDMA_ILLINSTADDR    (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x058))
+#define SDMA_CHN0ADDR       (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x05C))
+#define SDMA_ONCE_RTB       (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x060))
+#define SDMA_XTRIG_CONF1    (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x070))
+#define SDMA_XTRIG_CONF2    (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x074))
+
+/* SDMA_CHNENBL: 0x080 - 0x0FC */
+#define SDMA_CHNENBL(n)     (((REG32_PTR_T)(SDMA_BASE_ADDR + 0x080))[n]) /* 0..31 */
+
+/* SDMA_CHNPRI: 0x100 - 0x17C */
+#define SDMA_CHNPRI(n)      (((REG32_PTR_T)(SDMA_BASE_ADDR + 0x100))[n]) /* 0..31 */
+
+#define SDMA_ONCE_COUNT     (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x200))
+#define SDMA_ONCE_ECTL      (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x204))
+#define SDMA_ONCE_EAA       (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x208))
+#define SDMA_ONCE_EAB       (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x20C))
+#define SDMA_ONCE_EAM       (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x210))
+#define SDMA_ONCE_ED        (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x214))
+#define SDMA_ONCE_EDM       (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x218))
+#define SDMA_ONCE_PCMATCH   (*(REG32_PTR_T)(SDMA_BASE_ADDR + 0x21C))
+
+/* SDMA_RESET */
+#define SDMA_RESET_RESCHED  (0x1 << 1)
+#define SDMA_RESET_RESET    (0x1 << 0)
+
+/* SDMA_PSW */
+#define SDMA_PSW_NCP        (0x7 << 13)
+#define SDMA_PSW_NCR        (0x1f << 8)
+#define SDMA_PSW_CCP        (0x7 << 5)
+#define SDMA_PSW_CCR        (0x1f << 0)
+
+/* SDMA_CONFIG */
+#define SDMA_CONFIG_DSPDMA  (0x1 << 12)
+#define SDMA_CONFIG_RTDOBS  (0x1 << 11)
+#define SDMA_CONFIG_ACR     (0x1 << 4)
+#define SDMA_CONFIG_CSM     (0x3 << 0)
+    #define SDMA_CONFIG_CSM_STATIC            (0x0 << 0)
+    #define SDMA_CONFIG_CSM_DYNAMIC_LOW_POWER (0x1 << 0)
+    #define SDMA_CONFIG_CSM_DYNAMIC_NO_LOOP   (0x2 << 0)
+    #define SDMA_CONFIG_CSM_DYNAMIC           (0x3 << 0)
+
+/* SDMA_ONCE_ENB */
+#define SDMA_ONCE_ENB_ENB   (0x1 << 0)
+
+/* SDMA_ONCE_STAT */
+#define SDMA_ONCE_STAT_PST  (0xf << 12)
+    #define SDMA_ONCE_STAT_PST_PROGRAM                  (0x0 << 12)
+    #define SDMA_ONCE_STAT_PST_DATA                     (0x1 << 12)
+    #define SDMA_ONCE_STAT_PST_CHANGE_OF_FLOW           (0x2 << 12)
+    #define SDMA_ONCE_STAT_PST_CHANGE_OF_FLOW_IN_LOOP   (0x3 << 12)
+    #define SDMA_ONCE_STAT_PST_DEBUG                    (0x4 << 12)
+    #define SDMA_ONCE_STAT_PST_FUNCTIONAL_UNIT          (0x5 << 12)
+    #define SDMA_ONCE_STAT_PST_SLEEP                    (0x6 << 12)
+    #define SDMA_ONCE_STAT_PST_SAVE                     (0x7 << 12)
+    #define SDMA_ONCE_STAT_PST_PROGRAM_IN_SLEEP         (0x8 << 12)
+    #define SDMA_ONCE_STAT_PST_DATA_IN_SLEEP            (0x9 << 12)
+    #define SDMA_ONCE_STAT_PST_CHANGE_OF_FLOW_IN_SLEEP  (0xa << 12)
+    #define SDMA_ONCE_STAT_PST_CHANGE_OF_FLOW_IN_LOOP_IN_SLEEP (0xb << 12)
+    #define SDMA_ONCE_STAT_PST_DEBUG_IN_SLEEP           (0xc << 12)
+    #define SDMA_ONCE_STAT_PST_FUNCTIONAL_UNIT_IN_SLEEP (0xd << 12)
+    #define SDMA_ONCE_STAT_PST_SLEEP_AFTER_RESET        (0xe << 12)
+    #define SDMA_ONCE_STAT_PST_RESTORE                  (0xf << 12)
+#define SDMA_ONCE_STAT_RCV  (0x1 << 11)
+#define SDMA_ONCE_STAT_EDR  (0x1 << 10)
+#define SDMA_ONCE_STAT_ODR  (0x1 << 9)
+#define SDMA_ONCE_STAT_SWB  (0x1 << 8)
+#define SDMA_ONCE_STAT_MST  (0x1 << 7)
+#define SDMA_ONCE_STAT_ECDR (0x7 << 0)
+    #define SDMA_ONCE_STAT_ECDR_MATCHED_ADDRA_COND (0x1 << 0)
+    #define SDMA_ONCE_STAT_ECDR_MATCHED_ADDRB_COND (0x1 << 1)
+    #define SDMA_ONCE_STAT_ECDR_MATCHED_DATA_COND  (0x1 << 2)
+
+/* SDMA_ONCE_CMD */
+#define SDMA_ONCE_CMD_RSTATUS       0x0
+#define SDMA_ONCE_CMD_DMOV          0x1
+#define SDMA_ONCE_CMD_EXEC_ONCE     0x2
+#define SDMA_ONCE_CMD_RUN_CORE      0x3
+#define SDMA_ONCE_CMD_EXEC_CORE     0x4
+#define SDMA_ONCE_CMD_DEBUG_RQST    0x5
+#define SDMA_ONCE_CMD_RBUFFER       0x6
+/* 7-15 reserved */
+
+/* SDMA_CHN0ADDR */
+#define SDMA_CHN0ADDR_SMSZ          (0x1 << 14)
+/* 13:0 = 0x0050 by default (std. boot code) */
+
+/* SDMA_EVT_MIRROR */
+#define SDMA_EVT_MIRROR_EVENTS(n)   (0x1 << (n))
+
+/* SDMA_XTRIG_CONF1 */
+#define SDMA_XTRIG_CONF1_CNF3       (0x1 << 30)
+#define SDMA_XTRIG_CONF1_NUM3       (0x1f << 24)
+#define SDMA_XTRIG_CONF1_CNF2       (0x1 << 22)
+#define SDMA_XTRIG_CONF1_NUM2       (0x1f << 16)
+#define SDMA_XTRIG_CONF1_CNF1       (0x1 << 14)
+#define SDMA_XTRIG_CONF1_NUM1       (0x1f << 8)
+#define SDMA_XTRIG_CONF1_CNF0       (0x1 << 6)
+#define SDMA_XTRIG_CONF1_NUM0       (0x1f << 0)
+
+/* SDMA_XTRIG_CONF2 */
+#define SDMA_XTRIG_CONF2_CNF7       (0x1 << 30)
+#define SDMA_XTRIG_CONF2_NUM7       (0x1f << 24)
+#define SDMA_XTRIG_CONF2_CNF6       (0x1 << 22)
+#define SDMA_XTRIG_CONF2_NUM6       (0x1f << 16)
+#define SDMA_XTRIG_CONF2_CNF5       (0x1 << 14)
+#define SDMA_XTRIG_CONF2_NUM5       (0x1f << 8)
+#define SDMA_XTRIG_CONF2_CNF4       (0x1 << 6)
+#define SDMA_XTRIG_CONF2_NUM4       (0x1f << 0)
+
+/* SDMA_CHNENBL(n) */
+#define SDMA_CHNENBL_ENBL(n)        (0x1 << (n))
+
 
 #define L2CC_ENABLED
 

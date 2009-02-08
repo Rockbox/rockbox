@@ -53,6 +53,7 @@
  * ==Playback/Recording==
  *   Semi-private -
  *      pcm_dma_apply_settings
+ *      pcm_dma_addr
  *
  * ==Recording==
  *   Public -
@@ -65,7 +66,7 @@
  *      pcm_rec_dma_stop
  *      pcm_rec_dma_get_peak_buffer
  *   Data Read/Written within TSP -
- *      pcm_rec_peak_addr (R)
+ *      pcm_rec_peak_addr (R/W)
  *      pcm_callback_more_ready (R)
  *      pcm_recording (R)
  *

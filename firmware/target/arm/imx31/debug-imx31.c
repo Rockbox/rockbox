@@ -46,6 +46,10 @@ bool __dbg_hw_info(void)
     while (1)
     {
         line = 0;
+        snprintf(buf, sizeof (buf), "Sys Rev Code: 0x%02X",
+                 iim_system_rev());
+        lcd_puts(0, line++, buf); line++;
+
         mpctl = CLKCTL_MPCTL;
         spctl = CLKCTL_SPCTL;
         upctl = CLKCTL_UPCTL;
