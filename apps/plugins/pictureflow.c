@@ -114,6 +114,7 @@ typedef fb_data pix_t;
 #define CAM_DIST MAX(MIN(LCD_HEIGHT,LCD_WIDTH),120)
 #define CAM_DIST_R (CAM_DIST << PFREAL_SHIFT)
 #define DISPLAY_LEFT_R (PFREAL_HALF - LCD_WIDTH * PFREAL_HALF)
+#define MAXSLIDE_LEFT_R (PFREAL_HALF - DISPLAY_WIDTH * PFREAL_HALF)
 
 #define SLIDE_CACHE_SIZE 100
 
@@ -448,6 +449,7 @@ static inline PFreal fdiv(PFreal num, PFreal den)
 
 #define fmin(a,b) (((a) < (b)) ? (a) : (b))
 #define fmax(a,b) (((a) > (b)) ? (a) : (b))
+#define fabs(a) (a < 0 ? -a : a)
 #define fbound(min,val,max) (fmax((min),fmin((max),(val))))
 
 
@@ -1217,7 +1219,7 @@ void reset_slides(void)
 void recalc_offsets(void)
 {
     PFreal xs = PFREAL_HALF - DISPLAY_WIDTH * PFREAL_HALF;
-    PFreal zo = CAM_DIST_R * 100 / zoom - CAM_DIST_R;
+    PFreal zo;
     PFreal xp = (DISPLAY_WIDTH * PFREAL_HALF - PFREAL_HALF + center_margin *
         PFREAL_ONE) * zoom / 100;
     PFreal cosr, sinr;
@@ -1225,6 +1227,8 @@ void recalc_offsets(void)
     itilt = 70 * IANGLE_MAX / 360;      /* approx. 70 degrees tilted */
     cosr = fcos(-itilt);
     sinr = fsin(-itilt);
+    zo = CAM_DIST_R * 100 / zoom - CAM_DIST_R +
+        fmuln(MAXSLIDE_LEFT_R, sinr, PFREAL_SHIFT - 2, 0);
     offsetX = xp - fmul(xs, cosr) + fmuln(xp,
         zo + fmuln(xs, sinr, PFREAL_SHIFT - 2, 0), PFREAL_SHIFT - 2, 0)
         / CAM_DIST;
@@ -1305,10 +1309,10 @@ void render_slide(struct slide_data *slide, const int alpha)
     const int w = LCD_WIDTH;
 
 
-    PFreal zo = PFREAL_ONE * slide->distance + CAM_DIST_R * 100 / zoom
-        - CAM_DIST_R;
     PFreal cosr = fcos(slide->angle);
     PFreal sinr = fsin(slide->angle);
+    PFreal zo = PFREAL_ONE * slide->distance + CAM_DIST_R * 100 / zoom
+        - CAM_DIST_R - fmuln(MAXSLIDE_LEFT_R, fabs(sinr), PFREAL_SHIFT - 2, 0);
     PFreal xs = slide_left, xsnum, xsnumi, xsden, xsdeni;
     PFreal xp = fdiv(CAM_DIST * (slide->cx + fmul(xs, cosr)),
         (CAM_DIST_R + zo + fmul(xs,sinr)));
