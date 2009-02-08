@@ -113,7 +113,7 @@ typedef fb_data pix_t;
 #define DISPLAY_OFFS ((LCD_HEIGHT / 2) - REFLECT_HEIGHT)
 #define CAM_DIST MAX(MIN(LCD_HEIGHT,LCD_WIDTH),120)
 #define CAM_DIST_R (CAM_DIST << PFREAL_SHIFT)
-#define DISPLAY_LEFT_R (PFREAL_HALF - LCD_WIDTH * PFREAL_ONE / 2)
+#define DISPLAY_LEFT_R (PFREAL_HALF - LCD_WIDTH * PFREAL_HALF)
 
 #define SLIDE_CACHE_SIZE 100
 
@@ -1207,25 +1207,27 @@ void reset_slides(void)
  Call this when the viewport size or slide dimension is changed.
  *
  * To calculate the offset that will provide the proper margin, we use the same
- * projection used to render the slides. Assuming zo == 0, the solution for xc,
- * the slide center, is:
- *                         xp * xs * sin(r)
- * xc = xp - xs * cos(r) + ────────────────
- *                                z
+ * projection used to render the slides. The solution for xc, the slide center,
+ * is:
+ *                         xp * (zo + xs * sin(r))
+ * xc = xp - xs * cos(r) + ───────────────────────
+ *                                    z
  * TODO: support moving the side slides toward or away from the camera
  */
 void recalc_offsets(void)
 {
     PFreal xs = PFREAL_HALF - DISPLAY_WIDTH * PFREAL_HALF;
-    PFreal xp = DISPLAY_WIDTH * PFREAL_HALF - PFREAL_HALF + center_margin *
-        PFREAL_ONE;
+    PFreal zo = CAM_DIST_R * 100 / zoom - CAM_DIST_R;
+    PFreal xp = (DISPLAY_WIDTH * PFREAL_HALF - PFREAL_HALF + center_margin *
+        PFREAL_ONE) * zoom / 100;
     PFreal cosr, sinr;
 
     itilt = 70 * IANGLE_MAX / 360;      /* approx. 70 degrees tilted */
     cosr = fcos(-itilt);
     sinr = fsin(-itilt);
     offsetX = xp - fmul(xs, cosr) + fmuln(xp,
-        fmuln(xs, sinr, PFREAL_SHIFT - 2, 0), PFREAL_SHIFT - 2, 0)/CAM_DIST;
+        zo + fmuln(xs, sinr, PFREAL_SHIFT - 2, 0), PFREAL_SHIFT - 2, 0)
+        / CAM_DIST;
     offsetY = DISPLAY_WIDTH / 2 * (fsin(itilt) + PFREAL_ONE / 2);
 }
 
@@ -1303,8 +1305,8 @@ void render_slide(struct slide_data *slide, const int alpha)
     const int w = LCD_WIDTH;
 
 
-    PFreal zo = (CAM_DIST_R + PFREAL_ONE * slide->distance) * 100 / zoom -
-        CAM_DIST_R;
+    PFreal zo = PFREAL_ONE * slide->distance + CAM_DIST_R * 100 / zoom
+        - CAM_DIST_R;
     PFreal cosr = fcos(slide->angle);
     PFreal sinr = fsin(slide->angle);
     PFreal xs = slide_left, xsnum, xsnumi, xsden, xsdeni;
