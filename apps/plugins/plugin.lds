@@ -11,7 +11,9 @@ OUTPUT_FORMAT(elf32-sh)
 #elif defined(CPU_MIPS)
 OUTPUT_FORMAT(elf32-littlemips)
 #else
-#error Unknown CPU architecture
+/* We cannot have an #error here since we don't have any of these defines
+   define when we build simulators!
+   #error Unknown CPU architecture */
 #endif
 
 #ifdef DEBUG
