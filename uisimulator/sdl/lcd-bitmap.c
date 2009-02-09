@@ -138,7 +138,9 @@ void sim_backlight(int value)
     sdl_gui_update(lcd_surface, 0, 0, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
                    SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
                    background ? UI_LCD_POSX : 0, background? UI_LCD_POSY : 0);
-#endif /* LCD_DEPTH <= 8 */
+#else /* LCD_DEPTH > 8 */
+    (void)value; /* not yet simulated */
+#endif /* LCD_DEPTH */
 }
 #endif /* HAVE_BACKLIGHT */
 
