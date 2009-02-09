@@ -54,10 +54,10 @@ static void play_dma_callback(void)
     size_t        size;
     pcm_more_callback_type get_more = pcm_callback_for_more;
 
-    if (dma_play_data.locked)
+    if (dma_play_data.locked != 0)
     {
         /* Callback is locked out */
-        dma_play_data.callback_pending = 1;
+        dma_play_data.callback_pending = dma_play_data.state;
         return;
     }
 
@@ -92,22 +92,16 @@ void pcm_play_unlock(void)
 {
     if (--dma_play_data.locked == 0 && dma_play_data.state != 0)
     {
-        bool pending = false;
         int oldstatus = disable_irq_save();
-
-        if (dma_play_data.callback_pending)
-        {
-            pending = true;
-            dma_play_data.callback_pending = 0;
-        }
-
+        int pending = dma_play_data.callback_pending;
+        dma_play_data.callback_pending = 0;
         SSI_SIER1 |= SSI_SIER_TDMAE;
         restore_irq(oldstatus);
 
         /* Should an interrupt be forced instead? The upper pcm layer can
          * call producer's callback in thread context so technically this is
          * acceptable. */
-        if (pending)
+        if (pending != 0)
             play_dma_callback();
     }
 }
@@ -258,6 +252,7 @@ static void play_stop_pcm(void)
     SSI_STCR1 &= ~SSI_STCR_TFEN0;
     SSI_SCR1 &= ~(SSI_SCR_TE | SSI_SCR_SSIEN);
 
+    /* Set state before pending to prevent race with interrupt */
     /* Do not enable DMA requests on unlock */
     dma_play_data.state = 0;
     dma_play_data.callback_pending = 0;
@@ -370,6 +365,7 @@ static struct dma_data dma_rec_data =
 {
     /* Initialize to a locked, stopped state */
     .locked = 0,
+    .callback_pending = 0,
     .state = 0
 };
 
@@ -378,9 +374,9 @@ static void rec_dma_callback(void)
     pcm_more_callback_type2 more_ready;
     int status = 0;
 
-    if (dma_rec_data.locked)
+    if (dma_rec_data.locked != 0)
     {
-        dma_rec_data.callback_pending = 1;
+        dma_rec_data.callback_pending = dma_rec_data.state;
         return; /* Callback is locked out */
     }
 
@@ -410,22 +406,16 @@ void pcm_rec_unlock(void)
 {
     if (--dma_rec_data.locked == 0 && dma_rec_data.state != 0)
     {
-        bool pending = false;
         int oldstatus = disable_irq_save();
-
-        if (dma_rec_data.callback_pending)
-        {
-            pending = true;
-            dma_rec_data.callback_pending = 0;
-        }
-
+        int pending = dma_rec_data.callback_pending;
+        dma_rec_data.callback_pending = 0;
         SSI_SIER2 |= SSI_SIER_RDMAE;
         restore_irq(oldstatus);
 
         /* Should an interrupt be forced instead? The upper pcm layer can
          * call consumer's callback in thread context so technically this is
          * acceptable. */
-        if (pending)
+        if (pending != 0)
             rec_dma_callback();
     }
 }
@@ -457,6 +447,8 @@ void pcm_rec_dma_stop(void)
     SSI_SCR2 &= ~SSI_SCR_RE;      /* Disable RX */
     SSI_SRCR2 &= ~SSI_SRCR_RFEN0; /* Disable RX FIFO */
 
+    /* Set state before pending to prevent race with interrupt */
+    /* Do not enable DMA requests on unlock */
     dma_rec_data.state = 0;
     dma_rec_data.callback_pending = 0;
 }
