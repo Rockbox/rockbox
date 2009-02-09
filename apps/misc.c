@@ -504,8 +504,8 @@ void screen_dump(void)
             {
                 unsigned data = *src++;
 
-                *dst++ = (data >> 2) & 0x30 | (data >> 4) & 0x03;
-                *dst++ = (data << 2) & 0x30 | data & 0x03;
+                *dst++ = ((data >> 2) & 0x30) | ((data >> 4) & 0x03);
+                *dst++ = ((data << 2) & 0x30) | (data & 0x03);
             }
             while (dst < dst_end);
 
