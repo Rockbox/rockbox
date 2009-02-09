@@ -51,6 +51,12 @@
 
 #define LCD_PIXELFORMAT HORIZONTAL_PACKING
 
+/* Display colours, for screenshots and sim (0xRRGGBB) */
+#define LCD_DARKCOLOR       0x000000
+#define LCD_BRIGHTCOLOR     0x648764
+#define LCD_BL_DARKCOLOR    0x000000
+#define LCD_BL_BRIGHTCOLOR  0xdfd8ff
+
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP
 

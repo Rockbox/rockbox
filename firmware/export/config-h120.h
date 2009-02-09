@@ -39,12 +39,24 @@
 
 #define LCD_PIXELFORMAT VERTICAL_PACKING
 
+/* Display colours, for screenshots and sim (0xRRGGBB) */
+#define LCD_DARKCOLOR       0x000000
+#define LCD_BRIGHTCOLOR     0x7e917e
+#define LCD_BL_DARKCOLOR    0x000000
+#define LCD_BL_BRIGHTCOLOR  0xadd8e6
+
 /* remote LCD */
 #define LCD_REMOTE_WIDTH  128
 #define LCD_REMOTE_HEIGHT 64
 #define LCD_REMOTE_DEPTH  1
 
 #define LCD_REMOTE_PIXELFORMAT VERTICAL_PACKING
+
+/* Remote display colours, for screenshots and sim (0xRRGGBB) */
+#define LCD_REMOTE_DARKCOLOR       0x000000
+#define LCD_REMOTE_BRIGHTCOLOR     0x5a915a
+#define LCD_REMOTE_BL_DARKCOLOR    0x000000
+#define LCD_REMOTE_BL_BRIGHTCOLOR  0x82b4fa
 
 #define CONFIG_KEYPAD IRIVER_H100_PAD
 

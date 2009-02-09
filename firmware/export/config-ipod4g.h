@@ -52,6 +52,12 @@
 #define LCD_DEPTH  2   /* 4 colours - 2bpp */
 #define LCD_PIXELFORMAT HORIZONTAL_PACKING
 
+/* Display colours, for screenshots and sim (0xRRGGBB) */
+#define LCD_DARKCOLOR       0x000000
+#define LCD_BRIGHTCOLOR     0x5a915a
+#define LCD_BL_DARKCOLOR    0x000000
+#define LCD_BL_BRIGHTCOLOR  0xadd8e6
+
 #define HAVE_LCD_CONTRAST
 
 /* LCD contrast */

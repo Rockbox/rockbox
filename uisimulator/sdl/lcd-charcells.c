@@ -35,10 +35,19 @@
 extern int sim_creat(const char *name);
 
 SDL_Surface* lcd_surface;
-SDL_Color lcd_color_zero = {UI_LCD_BGCOLOR, 0};
-SDL_Color lcd_backlight_color_zero = {UI_LCD_BGCOLORLIGHT, 0};
-SDL_Color lcd_color_max  = {UI_LCD_FGCOLOR, 0};
-SDL_Color lcd_backlight_color_max = {UI_LCD_FGCOLORLIGHT, 0};
+
+SDL_Color lcd_bl_color_dark    = {RED_CMP(LCD_BL_DARKCOLOR),
+                                  GREEN_CMP(LCD_BL_DARKCOLOR),
+                                  BLUE_CMP(LCD_BL_DARKCOLOR), 0};
+SDL_Color lcd_bl_color_bright  = {RED_CMP(LCD_BL_BRIGHTCOLOR),
+                                  GREEN_CMP(LCD_BL_BRIGHTCOLOR),
+                                  BLUE_CMP(LCD_BL_BRIGHTCOLOR), 0};
+SDL_Color lcd_color_dark    = {RED_CMP(LCD_DARKCOLOR),
+                               GREEN_CMP(LCD_DARKCOLOR),
+                               BLUE_CMP(LCD_DARKCOLOR), 0};
+SDL_Color lcd_color_bright  = {RED_CMP(LCD_BRIGHTCOLOR),
+                               GREEN_CMP(LCD_BRIGHTCOLOR),
+                               BLUE_CMP(LCD_BRIGHTCOLOR), 0};
 
 
 static unsigned long get_lcd_pixel(int x, int y)
@@ -78,12 +87,11 @@ void lcd_update(void)
 void sim_backlight(int value)
 {
     if (value > 0) {
-        sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero, 
-                                      &lcd_backlight_color_max,
-                         0, (1<<LCD_DEPTH));
+        sdl_set_gradient(lcd_surface, &lcd_bl_color_bright,
+                         &lcd_bl_color_dark, 0, (1<<LCD_DEPTH));
     } else {
-        sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max,
-                         0, (1<<LCD_DEPTH));
+        sdl_set_gradient(lcd_surface, &lcd_color_bright,
+                         &lcd_color_dark, 0, (1<<LCD_DEPTH));
     }
 
     sim_lcd_update_rect(0, 0, SIM_LCD_WIDTH, SIM_LCD_HEIGHT);
@@ -98,8 +106,8 @@ void sim_lcd_init(void)
                                        SIM_LCD_HEIGHT * display_zoom,
                                        8, 0, 0, 0, 0);
 
-    sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero, &lcd_color_max,
-                     0, (1<<LCD_DEPTH));
+    sdl_set_gradient(lcd_surface, &lcd_bl_color_bright,
+                     &lcd_bl_color_dark, 0, (1<<LCD_DEPTH));
 }
 
 #define BMP_COMPRESSION 0 /* BI_RGB */
@@ -133,8 +141,8 @@ static const unsigned char bmpheader[] =
     LE32_CONST(BMP_NUMCOLORS),  /* Number of used colours */
     LE32_CONST(BMP_NUMCOLORS),  /* Number of important colours */
 
-    0x90, 0xee, 0x90, 0x00,     /* Colour #0 */
-    0x00, 0x00, 0x00, 0x00      /* Colour #1 */
+    BMP_COLOR(LCD_BL_BRIGHTCOLOR),
+    BMP_COLOR(LCD_BL_DARKCOLOR)
 };
 
 void screen_dump(void)

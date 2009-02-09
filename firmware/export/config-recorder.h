@@ -39,6 +39,12 @@
 
 #define LCD_PIXELFORMAT VERTICAL_PACKING
 
+/* Display colours, for screenshots and sim (0xRRGGBB) */
+#define LCD_DARKCOLOR       0x000000
+#define LCD_BRIGHTCOLOR     0x5a915a
+#define LCD_BL_DARKCOLOR    0x000000
+#define LCD_BL_BRIGHTCOLOR  0x7ee57e
+
 /* define this if you have the Recorder's 10-key keyboard */
 #define CONFIG_KEYPAD RECORDER_PAD
 

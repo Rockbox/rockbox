@@ -52,12 +52,24 @@
 
 #define LCD_PIXELFORMAT VERTICAL_PACKING
 
+/* Display colours, for screenshots and sim (0xRRGGBB) */
+#define LCD_DARKCOLOR       0x000000
+#define LCD_BRIGHTCOLOR     0x648764
+#define LCD_BL_DARKCOLOR    0x000000
+#define LCD_BL_BRIGHTCOLOR  0xdfd8ff
+
 /* remote LCD */
 #define LCD_REMOTE_WIDTH  128
 #define LCD_REMOTE_HEIGHT 96
 #define LCD_REMOTE_DEPTH  2
 
 #define LCD_REMOTE_PIXELFORMAT VERTICAL_INTERLEAVED
+
+/* Remote display colours, for screenshots and sim (0xRRGGBB) */
+#define LCD_REMOTE_DARKCOLOR       0x000000
+#define LCD_REMOTE_BRIGHTCOLOR     0x5a915a
+#define LCD_REMOTE_BL_DARKCOLOR    0x000000
+#define LCD_REMOTE_BL_BRIGHTCOLOR  0x82b4fa
 
 #define CONFIG_KEYPAD IAUDIO_X5M5_PAD
 

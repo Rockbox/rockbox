@@ -412,6 +412,28 @@
 #define LCD_PIXEL_ASPECT_WIDTH 1
 #endif
 
+/* Used for split displays (Sansa Clip). Set to 0 otherwise */
+#ifndef LCD_SPLIT_LINES
+#define LCD_SPLIT_LINES 0
+#endif
+
+/* Simulator LCD dimensions. Set to standard dimensions if undefined */
+#ifndef SIM_LCD_WIDTH
+#define SIM_LCD_WIDTH LCD_WIDTH
+#endif
+#ifndef SIM_LCD_HEIGHT
+#define SIM_LCD_HEIGHT (LCD_HEIGHT + LCD_SPLIT_LINES)
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+#ifndef SIM_REMOTE_WIDTH
+#define SIM_REMOTE_WIDTH LCD_REMOTE_WIDTH
+#endif
+#ifndef SIM_REMOTE_HEIGHT
+#define SIM_REMOTE_HEIGHT LCD_REMOTE_HEIGHT
+#endif
+#endif /* HAVE_REMOTE_LCD */
+
 /* define this in the target config.h to use a different size */
 #ifndef CONFIG_DEFAULT_ICON_HEIGHT
 #define CONFIG_DEFAULT_ICON_HEIGHT 8

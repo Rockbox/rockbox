@@ -344,19 +344,20 @@ int fast_readline(int fd, char *buf, int buf_size, void *parameters,
 #if LCD_DEPTH == 16 
 #define BMP_COMPRESSION 3 /* BI_BITFIELDS */
 #define BMP_NUMCOLORS 3
-#else
+#else /* LCD_DEPTH != 16 */
 #define BMP_COMPRESSION 0 /* BI_RGB */
 #if LCD_DEPTH <= 8
-#define BMP_NUMCOLORS (1 << LCD_DEPTH)
+#ifdef HAVE_LCD_SPLIT
+#define BMP_NUMCOLORS (2 << LCD_DEPTH)
 #else
+#define BMP_NUMCOLORS (1 << LCD_DEPTH)
+#endif
+#else /* LCD_DEPTH > 8 */
 #define BMP_NUMCOLORS 0
-#endif
-#endif
+#endif /* LCD_DEPTH > 8 */
+#endif /* LCD_DEPTH != 16 */
 
-#if LCD_DEPTH == 1
-#define BMP_BPP 1
-#define BMP_LINESIZE ((LCD_WIDTH/8 + 3) & ~3)
-#elif LCD_DEPTH <= 4
+#if LCD_DEPTH <= 4
 #define BMP_BPP 4
 #define BMP_LINESIZE ((LCD_WIDTH/2 + 3) & ~3)
 #elif LCD_DEPTH <= 8
@@ -386,7 +387,7 @@ static const unsigned char bmpheader[] =
 
     0x28, 0x00, 0x00, 0x00,     /* Size of (2nd) header */
     LE32_CONST(LCD_WIDTH),      /* Width in pixels */
-    LE32_CONST(LCD_HEIGHT),     /* Height in pixels */
+    LE32_CONST(LCD_HEIGHT+LCD_SPLIT_LINES),  /* Height in pixels */
     0x01, 0x00,                 /* Number of planes (always 1) */
     LE16_CONST(BMP_BPP),        /* Bits per pixel 1/4/8/16/24 */
     LE32_CONST(BMP_COMPRESSION),/* Compression mode */
@@ -397,22 +398,26 @@ static const unsigned char bmpheader[] =
     LE32_CONST(BMP_NUMCOLORS),  /* Number of important colours */
 
 #if LCD_DEPTH == 1
-#ifdef MROBE_100
-    2, 2, 94,  0x00,            /* Colour #0 */
-    3, 6, 241, 0x00             /* Colour #1 */
-#else
-    0x90, 0xee, 0x90, 0x00,     /* Colour #0 */
-    0x00, 0x00, 0x00, 0x00      /* Colour #1 */
+#ifdef HAVE_NEGATIVE_LCD
+    BMP_COLOR(LCD_BL_DARKCOLOR),
+    BMP_COLOR(LCD_BL_BRIGHTCOLOR),
+#ifdef HAVE_LCD_SPLIT
+    BMP_COLOR(LCD_BL_DARKCOLOR_2),
+    BMP_COLOR(LCD_BL_BRIGHTCOLOR_2),
 #endif
+#else /* positive display */
+    BMP_COLOR(LCD_BL_BRIGHTCOLOR),
+    BMP_COLOR(LCD_BL_DARKCOLOR),
+#endif /* positive display */
 #elif LCD_DEPTH == 2
-    0xe6, 0xd8, 0xad, 0x00,     /* Colour #0 */
-    0x99, 0x90, 0x73, 0x00,     /* Colour #1 */
-    0x4c, 0x48, 0x39, 0x00,     /* Colour #2 */
-    0x00, 0x00, 0x00, 0x00      /* Colour #3 */
+    BMP_COLOR(LCD_BL_BRIGHTCOLOR),
+    BMP_COLOR_MIX(LCD_BL_BRIGHTCOLOR, LCD_BL_DARKCOLOR, 1, 3),
+    BMP_COLOR_MIX(LCD_BL_BRIGHTCOLOR, LCD_BL_DARKCOLOR, 2, 3),
+    BMP_COLOR(LCD_BL_DARKCOLOR),
 #elif LCD_DEPTH == 16
     0x00, 0xf8, 0x00, 0x00,     /* red bitfield mask */
     0xe0, 0x07, 0x00, 0x00,     /* green bitfield mask */
-    0x1f, 0x00, 0x00, 0x00      /* blue bitfield mask */
+    0x1f, 0x00, 0x00, 0x00,     /* blue bitfield mask */
 #endif
 };
 
@@ -461,30 +466,33 @@ void screen_dump(void)
         for (by = LCD_FBHEIGHT - 1; by >= 0; by--)
         {
             unsigned char *src = &lcd_framebuffer[by][0];
-            unsigned char *dst = &line_block[0][0];
+            unsigned char *dst = &line_block[7][0];
 
             memset(line_block, 0, sizeof(line_block));
-            for (bx = LCD_WIDTH/8; bx > 0; bx--)
+
+#ifdef HAVE_LCD_SPLIT
+            if (by == (LCD_SPLIT_POS/8 - 1))
+                write(fh, line_block, LCD_SPLIT_LINES * sizeof(line_block[0]));
+#endif
+            for (bx = LCD_WIDTH/2; bx > 0; bx--)
             {
-                unsigned dst_mask = 0x80;
-                int ix;
+                unsigned char *dst_blk = dst++;
+                unsigned src_byte0 = *src++ << 4;
+                unsigned src_byte1 = *src++;
+                int iy;
 
-                for (ix = 8; ix > 0; ix--)
+                for (iy = 8; iy > 0; iy--)
                 {
-                    unsigned char *dst_blk = dst;
-                    unsigned src_byte = *src++;
-                    int iy;
-
-                    for (iy = 8; iy > 0; iy--)
-                    {
-                        if (src_byte & 0x80)
-                            *dst_blk |= dst_mask;
-                        src_byte <<= 1;
-                        dst_blk += BMP_LINESIZE;
-                    }
-                    dst_mask >>= 1;
+                    *dst_blk = (src_byte0 & 0x10) 
+                             | (src_byte1 & 0x01)
+#ifdef HAVE_LCD_SPLIT
+                             | (by < (LCD_SPLIT_POS/8) ? 0x22 : 0)
+#endif
+                              ;
+                    src_byte0 >>= 1;
+                    src_byte1 >>= 1;
+                    dst_blk -= BMP_LINESIZE;
                 }
-                dst++;
             }
 
             write(fh, line_block, sizeof(line_block));

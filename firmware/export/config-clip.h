@@ -45,7 +45,24 @@
 #define LCD_WIDTH  128
 #define LCD_HEIGHT 64
 #define LCD_DEPTH  1
+
 #define LCD_PIXELFORMAT VERTICAL_PACKING
+#define HAVE_NEGATIVE_LCD /* bright on dark */
+#define HAVE_LCD_SPLIT    /* split display */
+
+/* Display colours, for screenshots and sim (0xRRGGBB) */
+#define LCD_DARKCOLOR        0x000000
+#define LCD_BRIGHTCOLOR      0x000000
+#define LCD_BL_DARKCOLOR     0x000000
+#define LCD_BL_BRIGHTCOLOR   0x0de2e5
+
+#define LCD_DARKCOLOR_2       0x000000
+#define LCD_BRIGHTCOLOR_2     0x000000
+#define LCD_BL_DARKCOLOR_2    0x000000
+#define LCD_BL_BRIGHTCOLOR_2  0xffe60f
+
+#define LCD_SPLIT_POS    16
+#define LCD_SPLIT_LINES  2
 
 /* define this if you have LCD enable function */
 #define HAVE_LCD_ENABLE

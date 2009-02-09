@@ -27,7 +27,15 @@
 #define LCD_WIDTH  160
 #define LCD_HEIGHT 128
 #define LCD_DEPTH  1
-#define LCD_PIXELFORMAT VERTICAL_PACKING 
+
+#define LCD_PIXELFORMAT VERTICAL_PACKING
+#define HAVE_NEGATIVE_LCD /* bright on dark */
+
+/* Display colours, for screenshots and sim (0xRRGGBB) */
+#define LCD_DARKCOLOR       0x000000
+#define LCD_BRIGHTCOLOR     0x323232
+#define LCD_BL_DARKCOLOR    0x5e0202
+#define LCD_BL_BRIGHTCOLOR  0xf10603
 
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP

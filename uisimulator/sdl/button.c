@@ -1295,7 +1295,7 @@ void mouse_tick_task(void)
             x -= UI_LCD_POSX;
             y -= UI_LCD_POSY;
             
-            if(x<0 || y<0 || x>UI_LCD_WIDTH || y>UI_LCD_HEIGHT)
+            if(x<0 || y<0 || x>SIM_LCD_WIDTH || y>SIM_LCD_HEIGHT)
                 return;
         }
         

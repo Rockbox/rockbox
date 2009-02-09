@@ -126,12 +126,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 141
+#define PLUGIN_API_VERSION 142
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 141
+#define PLUGIN_MIN_API_VERSION 142
 
 /* plugin return codes */
 enum plugin_status {
@@ -474,7 +474,7 @@ struct plugin_api {
 #ifdef SIMULATOR
     /* special simulator hooks */
 #if defined(HAVE_LCD_BITMAP) && LCD_DEPTH < 8
-    void (*sim_lcd_ex_init)(int shades, unsigned long (*getpixel)(int, int));
+    void (*sim_lcd_ex_init)(unsigned long (*getpixel)(int, int));
     void (*sim_lcd_ex_update_rect)(int x, int y, int width, int height);
 #endif
 #endif

@@ -130,15 +130,11 @@ bool gui_startup(void)
         height = UI_HEIGHT;
     } else {
 #ifdef HAVE_REMOTE_LCD
-        width = UI_LCD_WIDTH > UI_REMOTE_WIDTH ? UI_LCD_WIDTH : UI_REMOTE_WIDTH;
-        height = UI_LCD_HEIGHT + UI_REMOTE_HEIGHT;
+        width = SIM_LCD_WIDTH > SIM_REMOTE_WIDTH ? SIM_LCD_WIDTH : SIM_REMOTE_WIDTH;
+        height = SIM_LCD_HEIGHT + SIM_REMOTE_HEIGHT;
 #else
-        width = UI_LCD_WIDTH;
-        height = UI_LCD_HEIGHT
-#ifdef UI_LCD_SPLIT
-            + UI_LCD_SPLIT_BLACK_LINES
-#endif
-            ;
+        width = SIM_LCD_WIDTH;
+        height = SIM_LCD_HEIGHT;
 #endif
     }
    

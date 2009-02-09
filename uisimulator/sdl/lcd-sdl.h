@@ -25,13 +25,6 @@
 #include "lcd.h"
 #include "SDL.h"
 
-#include "uisdl.h"
-#ifdef UI_LCD_SPLIT
-#define IFSPLIT(x,y) x,y
-#else
-#define IFSPLIT(x,y)
-#endif
-
 /* Default display zoom level */
 extern int display_zoom;
 
@@ -39,13 +32,11 @@ void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
                      int height, int max_x, int max_y,
                      unsigned long (*getpixel)(int, int));
 
-void sdl_gui_update(SDL_Surface *surface, IFSPLIT(SDL_Surface *real_surface,)
-                    int x_start, int y_start, int width,
+void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
                     int height, int max_x, int max_y, int ui_x, int ui_y);
 
 void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end,
-                      IFSPLIT( SDL_Color *split_start ,)
-                      IFSPLIT( SDL_Color *split_end ,) int first, int steps);
+                      int first, int steps);
 
 #endif /* #ifndef __LCDSDL_H__ */
 

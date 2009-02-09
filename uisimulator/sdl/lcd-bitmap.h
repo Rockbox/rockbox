@@ -27,7 +27,7 @@
 
 void sim_lcd_init(void);
 #if LCD_DEPTH < 8
-void sim_lcd_ex_init(int shades, unsigned long (*getpixel)(int, int));
+void sim_lcd_ex_init(unsigned long (*getpixel)(int, int));
 void sim_lcd_ex_update_rect(int x, int y, int width, int height);
 #endif
 

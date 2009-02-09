@@ -55,6 +55,12 @@
 
 #define LCD_PIXELFORMAT VERTICAL_PACKING
 
+/* Display colours, for screenshots and sim (0xRRGGBB) */
+#define LCD_DARKCOLOR       0x000000
+#define LCD_BRIGHTCOLOR     0x5a915a
+#define LCD_BL_DARKCOLOR    0x000000
+#define LCD_BL_BRIGHTCOLOR  0x82b4fa
+
 /* define this to indicate your device's keypad */
 #define CONFIG_KEYPAD LOGIK_DAX_PAD
 

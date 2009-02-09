@@ -355,6 +355,7 @@ static inline void _deferred_update(void)
  * coordinates! */
 static unsigned long _grey_get_pixel(int x, int y)
 {
+    long val;
     int xg = x - _grey_info.x;
     int yg = y - _grey_info.y;
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
@@ -364,7 +365,11 @@ static unsigned long _grey_get_pixel(int x, int y)
             + (xg << _GREY_BSHIFT) + (~yg & _GREY_BMASK);
 #endif
 
-    return _grey_info.values[idx] + (1 << LCD_DEPTH);
+    val = _grey_info.values[idx];
+#ifdef HAVE_LCD_SPLIT
+    val -= val >> 7;
+#endif
+    return val;
 }
 
 #else /* !SIMULATOR */
@@ -634,9 +639,9 @@ void grey_show(bool enable)
     {
         _grey_info.flags |= _GREY_RUNNING;
 #ifdef SIMULATOR
-        rb->sim_lcd_ex_init(129, _grey_get_pixel);
+        rb->sim_lcd_ex_init(_grey_get_pixel);
         rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
-                                              _grey_info.width, _grey_info.height);
+                                   _grey_info.width, _grey_info.height);
 #else /* !SIMULATOR */
 #ifdef NEED_BOOST
         rb->cpu_boost(true);
@@ -655,7 +660,7 @@ void grey_show(bool enable)
     else if (!enable && (_grey_info.flags & _GREY_RUNNING))
     {
 #ifdef SIMULATOR
-        rb->sim_lcd_ex_init(0, NULL);
+        rb->sim_lcd_ex_init(NULL);
 #else /* !SIMULATOR */
         rb->timer_unregister();
 #if NUM_CORES > 1  /* Make sure the ISR has finished before calling lcd_update() */
@@ -702,9 +707,14 @@ void grey_deferred_lcd_update(void)
 
 /*** Screenshot ***/
 
-#define BMP_FIXEDCOLORS (1 << LCD_DEPTH)
-#define BMP_VARCOLORS   129
-#define BMP_NUMCOLORS   (BMP_FIXEDCOLORS + BMP_VARCOLORS)
+#ifdef HAVE_LCD_SPLIT
+#define GRADIENT_MAX    127
+#define BMP_NUMCOLORS   256
+#else
+#define GRADIENT_MAX    128
+#define BMP_NUMCOLORS   129
+#endif
+
 #define BMP_BPP         8
 #define BMP_LINESIZE    ((LCD_WIDTH + 3) & ~3)
 #define BMP_HEADERSIZE  (54 + 4 * BMP_NUMCOLORS)
@@ -723,7 +733,7 @@ static const unsigned char bmpheader[] =
 
     0x28, 0x00, 0x00, 0x00,     /* Size of (2nd) header */
     LE32_CONST(LCD_WIDTH),      /* Width in pixels */
-    LE32_CONST(LCD_HEIGHT),     /* Height in pixels */
+    LE32_CONST(LCD_HEIGHT+LCD_SPLIT_LINES),  /* Height in pixels */
     0x01, 0x00,                 /* Number of planes (always 1) */
     LE16_CONST(BMP_BPP),        /* Bits per pixel 1/4/8/16/24 */
     0x00, 0x00, 0x00, 0x00,     /* Compression mode, 0 = none */
@@ -732,36 +742,11 @@ static const unsigned char bmpheader[] =
     0xc4, 0x0e, 0x00, 0x00,     /* Vertical resolution (pixels/meter) */
     LE32_CONST(BMP_NUMCOLORS),  /* Number of used colours */
     LE32_CONST(BMP_NUMCOLORS),  /* Number of important colours */
-
-    /* Fixed colours */
-#if LCD_DEPTH == 1
-    0x90, 0xee, 0x90, 0x00,     /* Colour #0 */
-    0x00, 0x00, 0x00, 0x00      /* Colour #1 */
-#elif LCD_DEPTH == 2
-    0xe6, 0xd8, 0xad, 0x00,     /* Colour #0 */
-    0x99, 0x90, 0x73, 0x00,     /* Colour #1 */
-    0x4c, 0x48, 0x39, 0x00,     /* Colour #2 */
-    0x00, 0x00, 0x00, 0x00      /* Colour #3 */
-#endif
 };
 
-#if LCD_DEPTH == 1
-#ifdef MROBE_100
-#define BMP_RED   241
-#define BMP_GREEN 6
-#define BMP_BLUE  3
-#define BMP_RED_BASE   94
-#define BMP_GREEN_BASE 2
-#define BMP_BLUE_BASE  2
-#else
-#define BMP_RED   0x90
-#define BMP_GREEN 0xee
-#define BMP_BLUE  0x90
-#endif
-#elif LCD_DEPTH == 2
-#define BMP_RED   0xad
-#define BMP_GREEN 0xd8
-#define BMP_BLUE  0xe6
+#if LCD_DEPTH == 2
+/* Only defined for positive, non-split LCD for now */
+static const unsigned char colorindex[4] = {128, 85, 43, 0};
 #endif
 
 /* Hook function for core screen_dump() to save the current display
@@ -772,6 +757,7 @@ static void grey_screendump_hook(int fd)
     int x, y, gx, gy;
 #if LCD_PIXELFORMAT == VERTICAL_PACKING
 #if LCD_DEPTH == 1
+    unsigned val;
     unsigned mask;
 #elif LCD_DEPTH == 2
     int shift;
@@ -782,36 +768,56 @@ static void grey_screendump_hook(int fd)
 #endif /* LCD_PIXELFORMAT */
     fb_data *lcdptr;
     unsigned char *clut_entry;
-    unsigned char linebuf[MAX(4*BMP_VARCOLORS,BMP_LINESIZE)];
+    unsigned char linebuf[MAX(4*BMP_NUMCOLORS,BMP_LINESIZE)];
 
     rb->write(fd, bmpheader, sizeof(bmpheader));  /* write header */
 
     /* build clut */
-    rb->memset(linebuf, 0, 4*BMP_VARCOLORS);
+    rb->memset(linebuf, 0, 4*BMP_NUMCOLORS);
     clut_entry = linebuf;
 
-    for (i = 0; i <= 128; i++)
+    for (i = 0; i <= GRADIENT_MAX; i++)
     {
-#ifdef MROBE_100        
-        *clut_entry++ = (_GREY_MULUQ(BMP_BLUE-BMP_BLUE_BASE,   i) >> 7) + 
-                         BMP_BLUE_BASE;
-        *clut_entry++ = (_GREY_MULUQ(BMP_GREEN-BMP_GREEN_BASE, i) >> 7) + 
-                         BMP_GREEN_BASE;
-        *clut_entry++ = (_GREY_MULUQ(BMP_RED-BMP_RED_BASE,     i) >> 7) + 
-                         BMP_RED_BASE;
-#else        
-        *clut_entry++ = _GREY_MULUQ(BMP_BLUE,  i) >> 7;
-        *clut_entry++ = _GREY_MULUQ(BMP_GREEN, i) >> 7;
-        *clut_entry++ = _GREY_MULUQ(BMP_RED,   i) >> 7;
-#endif
+        *clut_entry++ = (_GREY_MULUQ(BLUE_CMP(LCD_BL_BRIGHTCOLOR)
+                                     -BLUE_CMP(LCD_BL_DARKCOLOR), i) >> 7)
+                        + BLUE_CMP(LCD_BL_DARKCOLOR);
+        *clut_entry++ = (_GREY_MULUQ(GREEN_CMP(LCD_BL_BRIGHTCOLOR)
+                                     -GREEN_CMP(LCD_BL_DARKCOLOR), i) >> 7)
+                        + GREEN_CMP(LCD_BL_DARKCOLOR);
+        *clut_entry++ = (_GREY_MULUQ(RED_CMP(LCD_BL_BRIGHTCOLOR)
+                                     -RED_CMP(LCD_BL_DARKCOLOR), i) >> 7)
+                        + RED_CMP(LCD_BL_DARKCOLOR);
         clut_entry++;
     }
-    rb->write(fd, linebuf, 4*BMP_VARCOLORS);
+#ifdef HAVE_LCD_SPLIT
+    for (i = 0; i <= GRADIENT_MAX; i++)
+    {
+        *clut_entry++ = (_GREY_MULUQ(BLUE_CMP(LCD_BL_BRIGHTCOLOR_2)
+                                     -BLUE_CMP(LCD_BL_DARKCOLOR_2), i) >> 7)
+                        + BLUE_CMP(LCD_BL_DARKCOLOR_2);
+        *clut_entry++ = (_GREY_MULUQ(GREEN_CMP(LCD_BL_BRIGHTCOLOR_2)
+                                     -GREEN_CMP(LCD_BL_DARKCOLOR_2), i) >> 7)
+                        + GREEN_CMP(LCD_BL_DARKCOLOR_2);
+        *clut_entry++ = (_GREY_MULUQ(RED_CMP(LCD_BL_BRIGHTCOLOR_2)
+                                     -RED_CMP(LCD_BL_DARKCOLOR_2), i) >> 7)
+                        + RED_CMP(LCD_BL_DARKCOLOR_2);
+        clut_entry++;
+    }
+#endif
+    rb->write(fd, linebuf, 4*BMP_NUMCOLORS);
 
     /* BMP image goes bottom -> top */
     for (y = LCD_HEIGHT - 1; y >= 0; y--)
     {
         rb->memset(linebuf, 0, BMP_LINESIZE);
+
+#if defined(HAVE_LCD_SPLIT) && (LCD_SPLIT_LINES == 2)
+        if (y == LCD_SPLIT_POS - 1)
+        {
+            rb->write(fd, linebuf, BMP_LINESIZE);
+            rb->write(fd, linebuf, BMP_LINESIZE);
+        }
+#endif
 
         gy = y - _grey_info.y;
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
@@ -828,15 +834,15 @@ static void grey_screendump_hook(int fd)
                 unsigned char *src = _grey_info.values
                                    + _GREY_MULUQ(_grey_info.width, gy) + gx;
                 for (i = 0; i < 4; i++)
-                    linebuf[x + i] = BMP_FIXEDCOLORS + *src++;
+                    linebuf[x + i] = *src++;
             }
             else
             {
                 unsigned data = *lcdptr;
-                linebuf[x]     = (data >> 6) & 3;
-                linebuf[x + 1] = (data >> 4) & 3;
-                linebuf[x + 2] = (data >> 2) & 3;
-                linebuf[x + 3] = data & 3;
+                linebuf[x]     = colorindex[(data >> 6) & 3];
+                linebuf[x + 1] = colorindex[(data >> 4) & 3];
+                linebuf[x + 2] = colorindex[(data >> 2) & 3];
+                linebuf[x + 3] = colorindex[data & 3];
             }
             lcdptr++;
         }
@@ -853,16 +859,27 @@ static void grey_screendump_hook(int fd)
             if (((unsigned)gy < (unsigned)_grey_info.height)
                 && ((unsigned)gx < (unsigned)_grey_info.width))
             {
-                linebuf[x] = BMP_FIXEDCOLORS
-                           + _grey_info.values[_GREY_MULUQ(_grey_info.width,
-                                                           gy & ~_GREY_BMASK)
-                                               + (gx << _GREY_BSHIFT)
-                                               + (~gy & _GREY_BMASK)];
+                val = _grey_info.values[_GREY_MULUQ(_grey_info.width,
+                                                    gy & ~_GREY_BMASK)
+                                        + (gx << _GREY_BSHIFT)
+                                        + (~gy & _GREY_BMASK)];
+#ifdef HAVE_LCD_SPLIT
+                val -= val >> 7;
+#endif
             }
             else
             {
-                linebuf[x] = (*lcdptr & mask) ? 1 : 0;
+#ifdef HAVE_NEGATIVE_LCD
+                val = (*lcdptr & mask) ? GRADIENT_MAX : 0;
+#else
+                val = (*lcdptr & mask) ? 0 : GRADIENT_MAX;
+#endif
             }
+#ifdef HAVE_LCD_SPLIT
+            if (y < LCD_SPLIT_POS)
+                val |= 0x80;
+#endif
+            linebuf[x] = val;
             lcdptr++;
         }
 #elif LCD_DEPTH == 2
@@ -876,15 +893,14 @@ static void grey_screendump_hook(int fd)
             if (((unsigned)gy < (unsigned)_grey_info.height)
                 && ((unsigned)gx < (unsigned)_grey_info.width))
             {
-                linebuf[x] = BMP_FIXEDCOLORS
-                           + _grey_info.values[_GREY_MULUQ(_grey_info.width,
+                linebuf[x] = _grey_info.values[_GREY_MULUQ(_grey_info.width,
                                                            gy & ~_GREY_BMASK)
                                                + (gx << _GREY_BSHIFT)
                                                + (~gy & _GREY_BMASK)];
             }
             else
             {
-                linebuf[x] = (*lcdptr >> shift) & 3;
+                linebuf[x] = colorindex[(*lcdptr >> shift) & 3];
             }
             lcdptr++;
         }
@@ -901,8 +917,7 @@ static void grey_screendump_hook(int fd)
             if (((unsigned)gy < (unsigned)_grey_info.height)
                 && ((unsigned)gx < (unsigned)_grey_info.width))
             {
-                linebuf[x] = BMP_FIXEDCOLORS
-                           + _grey_info.values[_GREY_MULUQ(_grey_info.width,
+                linebuf[x] = _grey_info.values[_GREY_MULUQ(_grey_info.width,
                                                            gy & ~_GREY_BMASK)
                                                + (gx << _GREY_BSHIFT)
                                                + (~gy & _GREY_BMASK)];
@@ -910,7 +925,7 @@ static void grey_screendump_hook(int fd)
             else
             {
                 data = (*lcdptr >> shift) & 0x0101;
-                linebuf[x] = ((data >> 7) | data) & 3;
+                linebuf[x] = colorindex[((data >> 7) | data) & 3];
             }
             lcdptr++;
         }

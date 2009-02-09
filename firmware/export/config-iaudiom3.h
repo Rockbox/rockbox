@@ -52,6 +52,12 @@
 
 #define LCD_PIXELFORMAT VERTICAL_INTERLEAVED
 
+/* Display colours, for screenshots and sim (0xRRGGBB) */
+#define LCD_DARKCOLOR       0x000000
+#define LCD_BRIGHTCOLOR     0x7e917e
+#define LCD_BL_DARKCOLOR    0x000000
+#define LCD_BL_BRIGHTCOLOR  0x82b4fa
+
 /* define this if only the remote has an LCD */
 #define HAVE_REMOTE_LCD_AS_MAIN
 

@@ -61,6 +61,12 @@
 
 #define LCD_REMOTE_PIXELFORMAT VERTICAL_INTERLEAVED
 
+/* Remote display colours, for screenshots and sim (0xRRGGBB) */
+#define LCD_REMOTE_DARKCOLOR       0x000000
+#define LCD_REMOTE_BRIGHTCOLOR     0x5a915a
+#define LCD_REMOTE_BL_DARKCOLOR    0x000000
+#define LCD_REMOTE_BL_BRIGHTCOLOR  0x82b4fa
+
 #ifndef BOOTLOADER
 /* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE

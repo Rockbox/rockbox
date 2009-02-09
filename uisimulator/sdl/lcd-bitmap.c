@@ -22,45 +22,74 @@
 #include "debug.h"
 #include "uisdl.h"
 #include "lcd-sdl.h"
+#include "misc.h"
 
 SDL_Surface* lcd_surface;
-#ifdef UI_LCD_SPLIT
-SDL_Surface* lcd_real_surface; /* the surface which represents the real screen */
-#endif
-int lcd_backlight_val;
 
 #if LCD_DEPTH <= 8
 #ifdef HAVE_BACKLIGHT
-SDL_Color lcd_backlight_color_zero = {UI_LCD_BGCOLORLIGHT, 0};
-SDL_Color lcd_backlight_color_max  = {UI_LCD_FGCOLORLIGHT, 0};
-#ifdef UI_LCD_SPLIT
-SDL_Color lcd_backlight_color_split= {UI_LCD_SPLIT_FGCOLORLIGHT, 0};
+SDL_Color lcd_bl_color_dark    = {RED_CMP(LCD_BL_DARKCOLOR),
+                                  GREEN_CMP(LCD_BL_DARKCOLOR),
+                                  BLUE_CMP(LCD_BL_DARKCOLOR), 0};
+SDL_Color lcd_bl_color_bright  = {RED_CMP(LCD_BL_BRIGHTCOLOR),
+                                  GREEN_CMP(LCD_BL_BRIGHTCOLOR),
+                                  BLUE_CMP(LCD_BL_BRIGHTCOLOR), 0};
+#ifdef HAVE_LCD_SPLIT
+SDL_Color lcd_bl_color2_dark   = {RED_CMP(LCD_BL_DARKCOLOR_2),
+                                  GREEN_CMP(LCD_BL_DARKCOLOR_2),
+                                  BLUE_CMP(LCD_BL_DARKCOLOR_2), 0};
+SDL_Color lcd_bl_color2_bright = {RED_CMP(LCD_BL_BRIGHTCOLOR_2),
+                                  GREEN_CMP(LCD_BL_BRIGHTCOLOR_2),
+                                  BLUE_CMP(LCD_BL_BRIGHTCOLOR_2), 0};
 #endif
-#endif
-SDL_Color lcd_color_zero = {UI_LCD_BGCOLOR, 0};
-SDL_Color lcd_color_max  = {UI_LCD_FGCOLOR, 0};
-#ifdef UI_LCD_SPLIT
-SDL_Color lcd_color_split= {UI_LCD_SPLIT_FGCOLOR, 0};
-#endif
+#endif /* HAVE_BACKLIGHT */
+SDL_Color lcd_color_dark    = {RED_CMP(LCD_DARKCOLOR),
+                               GREEN_CMP(LCD_DARKCOLOR),
+                               BLUE_CMP(LCD_DARKCOLOR), 0};
+SDL_Color lcd_color_bright  = {RED_CMP(LCD_BRIGHTCOLOR),
+                               GREEN_CMP(LCD_BRIGHTCOLOR),
+                               BLUE_CMP(LCD_BRIGHTCOLOR), 0};
+#ifdef HAVE_LCD_SPLIT
+SDL_Color lcd_color2_dark   = {RED_CMP(LCD_DARKCOLOR_2),
+                               GREEN_CMP(LCD_DARKCOLOR_2),
+                               BLUE_CMP(LCD_DARKCOLOR_2), 0};
+SDL_Color lcd_color2_bright = {RED_CMP(LCD_BRIGHTCOLOR_2),
+                               GREEN_CMP(LCD_BRIGHTCOLOR_2),
+                               BLUE_CMP(LCD_BRIGHTCOLOR_2), 0};
 #endif
 
+#ifdef HAVE_LCD_SPLIT
+#define GRADIENT_MAX    127
+#else
+#define GRADIENT_MAX    128
+#endif
+#endif /* LCD_DEPTH <= 8 */
+
 #if LCD_DEPTH < 8
-int lcd_ex_shades = 0;
 unsigned long (*lcd_ex_getpixel)(int, int) = NULL;
+#endif /* LCD_DEPTH < 8 */
+
+#if LCD_DEPTH == 2
+/* Only defined for positive, non-split LCD for now */
+static const unsigned char colorindex[4] = {128, 85, 43, 0};
 #endif
 
 static unsigned long get_lcd_pixel(int x, int y)
 {
 #if LCD_DEPTH == 1
-    return ((lcd_framebuffer[y/8][x] >> (y & 7)) & 1);
+#ifdef HAVE_NEGATIVE_LCD
+    return (lcd_framebuffer[y/8][x] & (1 << (y & 7))) ? GRADIENT_MAX : 0;
+#else
+    return (lcd_framebuffer[y/8][x] & (1 << (y & 7))) ? 0 : GRADIENT_MAX;
+#endif
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-    return ((lcd_framebuffer[y][x/4] >> (2 * (~x & 3))) & 3);
+    return colorindex[(lcd_framebuffer[y][x/4] >> (2 * (~x & 3))) & 3];
 #elif LCD_PIXELFORMAT == VERTICAL_PACKING
-    return ((lcd_framebuffer[y/4][x] >> (2 * (y & 3))) & 3);
+    return colorindex[(lcd_framebuffer[y/4][x] >> (2 * (y & 3))) & 3];
 #elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
     unsigned bits = (lcd_framebuffer[y/8][x] >> (y & 7)) & 0x0101;
-    return (bits | (bits >> 7)) & 3;
+    return colorindex[(bits | (bits >> 7)) & 3];
 #endif
 #elif LCD_DEPTH == 16
 #if LCD_PIXELFORMAT == RGB565SWAPPED
@@ -80,148 +109,77 @@ void lcd_update(void)
 
 void lcd_update_rect(int x_start, int y_start, int width, int height)
 {
-    sdl_update_rect(lcd_surface, x_start, y_start, width, height, LCD_WIDTH,
-                    LCD_HEIGHT, get_lcd_pixel);
-    sdl_gui_update(lcd_surface, IFSPLIT(lcd_real_surface,) x_start, y_start,
-                   width, height, LCD_WIDTH, LCD_HEIGHT,
+    sdl_update_rect(lcd_surface, x_start, y_start, width, height,
+                    LCD_WIDTH, LCD_HEIGHT, get_lcd_pixel);
+    sdl_gui_update(lcd_surface, x_start, y_start, width,
+                   height + LCD_SPLIT_LINES, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
                    background ? UI_LCD_POSX : 0, background? UI_LCD_POSY : 0);
 }
 
 #ifdef HAVE_BACKLIGHT
 void sim_backlight(int value)
 {
-    lcd_backlight_val = value;
-
 #if LCD_DEPTH <= 8
     if (value > 0) {
-#ifdef UI_LCD_SPLIT
-        sdl_set_gradient(lcd_real_surface, &lcd_backlight_color_zero,
-                &lcd_backlight_color_max, &lcd_backlight_color_zero,
-                &lcd_backlight_color_split, 0, (1<<LCD_DEPTH));
-#else
-        sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero,
-                &lcd_backlight_color_max, 0, (1<<LCD_DEPTH));
+        sdl_set_gradient(lcd_surface, &lcd_bl_color_dark,
+                         &lcd_bl_color_bright, 0, GRADIENT_MAX+1);
+#ifdef HAVE_LCD_SPLIT
+        sdl_set_gradient(lcd_surface, &lcd_bl_color2_dark,
+                         &lcd_bl_color2_bright, GRADIENT_MAX+1, GRADIENT_MAX+1);
 #endif
     } else {
-#ifdef UI_LCD_SPLIT
-        sdl_set_gradient(lcd_real_surface, &lcd_color_zero, &lcd_color_max,
-                &lcd_color_zero, &lcd_color_split, 0, (1<<LCD_DEPTH));
-#else
-        sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max, 0,
-                (1<<LCD_DEPTH));
+        sdl_set_gradient(lcd_surface, &lcd_color_dark,
+                         &lcd_color_bright, 0, GRADIENT_MAX+1);
+#ifdef HAVE_LCD_SPLIT
+        sdl_set_gradient(lcd_surface, &lcd_color2_dark,
+                         &lcd_color2_bright, GRADIENT_MAX+1, GRADIENT_MAX+1);
 #endif
     }
-#if LCD_DEPTH < 8
-    if (lcd_ex_shades) {
-        if (value > 0) {
-#ifdef UI_LCD_SPLIT
-            sdl_set_gradient(lcd_real_surface, &lcd_backlight_color_max,
-                    &lcd_backlight_color_zero, &lcd_backlight_color_split,
-                    &lcd_backlight_color_zero,
-                    (1<<LCD_DEPTH), lcd_ex_shades);
-#elif defined MROBE_100
-            /* quick fix, a proper fix needs to compare brightnesses */
-            sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero, 
-                    &lcd_backlight_color_max, (1<<LCD_DEPTH), lcd_ex_shades);
-#else
-            sdl_set_gradient(lcd_surface, &lcd_backlight_color_max,
-                    &lcd_backlight_color_zero, (1<<LCD_DEPTH), lcd_ex_shades);
-#endif
-        } else {
-#ifdef UI_LCD_SPLIT
-            sdl_set_gradient(lcd_real_surface, &lcd_color_max, &lcd_color_zero,
-                    &lcd_color_split, &lcd_color_zero, (1<<LCD_DEPTH),
-                    lcd_ex_shades);
-#elif defined MROBE_100
-            /* quick fix, a proper fix needs to compare brightnesses */
-            sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max,
-                    (1<<LCD_DEPTH), lcd_ex_shades);
-#else
-            sdl_set_gradient(lcd_surface, &lcd_color_max, &lcd_color_zero,
-                    (1<<LCD_DEPTH), lcd_ex_shades);
-#endif
-        }
-    }
-#endif
-
-    sdl_gui_update(lcd_surface, IFSPLIT(lcd_real_surface,) 0, 0, LCD_WIDTH,
-                   LCD_HEIGHT, LCD_WIDTH, LCD_HEIGHT,
+    sdl_gui_update(lcd_surface, 0, 0, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
+                   SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
                    background ? UI_LCD_POSX : 0, background? UI_LCD_POSY : 0);
-
-#endif
+#endif /* LCD_DEPTH <= 8 */
 }
-#endif
+#endif /* HAVE_BACKLIGHT */
 
 /* initialise simulator lcd driver */
 void sim_lcd_init(void)
 {
 #if LCD_DEPTH == 16
-    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, LCD_WIDTH * display_zoom,
-        LCD_HEIGHT * display_zoom, LCD_DEPTH, 0, 0, 0, 0);
+    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
+                                       SIM_LCD_WIDTH * display_zoom,
+                                       SIM_LCD_HEIGHT * display_zoom,
+                                       LCD_DEPTH, 0, 0, 0, 0);
 #else
-    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, LCD_WIDTH * display_zoom,
-        LCD_HEIGHT * display_zoom, 8, 0, 0, 0, 0);
-#ifdef UI_LCD_SPLIT
-    lcd_real_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-        LCD_WIDTH * display_zoom,
-        (LCD_HEIGHT+UI_LCD_SPLIT_BLACK_LINES) * display_zoom, 8, 0, 0, 0, 0);
-#endif
+    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, 
+                                       SIM_LCD_WIDTH * display_zoom,
+                                       SIM_LCD_HEIGHT * display_zoom,
+                                       8, 0, 0, 0, 0);
 #endif
 
 #if LCD_DEPTH <= 8
 #ifdef HAVE_BACKLIGHT
-#ifdef UI_LCD_SPLIT
-    sdl_set_gradient(lcd_real_surface, &lcd_backlight_color_zero,
-            &lcd_backlight_color_max, &lcd_backlight_color_zero,
-            &lcd_backlight_color_split, 0, (1<<LCD_DEPTH));
-#else
-    sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero,
-            &lcd_backlight_color_max, 0, (1<<LCD_DEPTH));
+    sdl_set_gradient(lcd_surface, &lcd_bl_color_dark,
+                     &lcd_bl_color_bright, 0, GRADIENT_MAX+1);
+#ifdef HAVE_LCD_SPLIT
+    sdl_set_gradient(lcd_surface, &lcd_bl_color2_dark,
+                     &lcd_bl_color2_bright, GRADIENT_MAX+1, GRADIENT_MAX+1);
 #endif
-#else
-    sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max, 0,
-                (1<<LCD_DEPTH));
+#else /* !HAVE_BACKLIGHT */
+    sdl_set_gradient(lcd_surface, &lcd_color_dark,
+                     &lcd_color_bright, 0, GRADIENT_MAX+1);
+#ifdef HAVE_LCD_SPLIT
+    sdl_set_gradient(lcd_surface, &lcd_color2_dark,
+                     &lcd_color2_bright, GRADIENT_MAX+1, GRADIENT_MAX+1);
 #endif
-#endif
+#endif /* !HAVE_BACKLIGHT */
+#endif /* LCD_DEPTH < 8 */
 }
 
 #if LCD_DEPTH < 8
-void sim_lcd_ex_init(int shades, unsigned long (*getpixel)(int, int))
+void sim_lcd_ex_init(unsigned long (*getpixel)(int, int))
 {
-    lcd_ex_shades = shades;
     lcd_ex_getpixel = getpixel;
-    if (shades) {
-#ifdef HAVE_BACKLIGHT
-        if (lcd_backlight_val > 0) {
-#ifdef UI_LCD_SPLIT
-            sdl_set_gradient(lcd_real_surface, &lcd_backlight_color_max,
-                    &lcd_backlight_color_zero, &lcd_backlight_color_split,
-                    &lcd_backlight_color_zero, (1<<LCD_DEPTH), shades);
-#elif defined MROBE_100 
-            /* quick fix, a proper fix needs to compare brightnesses */
-            sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero,
-                    &lcd_backlight_color_max, (1<<LCD_DEPTH), shades);
-#else
-            sdl_set_gradient(lcd_surface, &lcd_backlight_color_max,
-                    &lcd_backlight_color_zero, (1<<LCD_DEPTH), shades);
-#endif
-        }
-        else
-#endif
-        {
-#ifdef UI_LCD_SPLIT
-            sdl_set_gradient(lcd_real_surface, &lcd_color_max, &lcd_color_zero,
-                    &lcd_color_split, &lcd_color_zero, (1<<LCD_DEPTH), shades);
-#elif defined MROBE_100
-            /* quick fix, a proper fix needs to compare brightnesses */
-            sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max,
-                    (1<<LCD_DEPTH), shades);
-#else
-            sdl_set_gradient(lcd_surface, &lcd_color_max, &lcd_color_zero,
-                    (1<<LCD_DEPTH), shades);
-#endif
-        }
-    }
 }
 
 void sim_lcd_ex_update_rect(int x_start, int y_start, int width, int height)
@@ -229,10 +187,10 @@ void sim_lcd_ex_update_rect(int x_start, int y_start, int width, int height)
     if (lcd_ex_getpixel) {
         sdl_update_rect(lcd_surface, x_start, y_start, width, height,
                         LCD_WIDTH, LCD_HEIGHT, lcd_ex_getpixel);
-        sdl_gui_update(lcd_surface, IFSPLIT(lcd_real_surface,) x_start, y_start,
-                       width, height, LCD_WIDTH, LCD_HEIGHT,
+        sdl_gui_update(lcd_surface, x_start, y_start, width, 
+                       height + LCD_SPLIT_LINES, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
                        background ? UI_LCD_POSX : 0,
-                       background? UI_LCD_POSY : 0);
+                       background ? UI_LCD_POSY : 0);
     }
 }
 #endif

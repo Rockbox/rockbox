@@ -61,7 +61,7 @@
 static unsigned char pluginbuf[PLUGIN_BUFFER_SIZE];
 void *sim_plugin_load(char *plugin, void **pd);
 void sim_plugin_close(void *pd);
-void sim_lcd_ex_init(int shades, unsigned long (*getpixel)(int, int));
+void sim_lcd_ex_init(unsigned long (*getpixel)(int, int));
 void sim_lcd_ex_update_rect(int x, int y, int width, int height);
 #else
 #define sim_plugin_close(x)

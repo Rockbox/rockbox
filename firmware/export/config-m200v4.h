@@ -58,6 +58,12 @@
 
 #define LCD_PIXELFORMAT VERTICAL_PACKING
 
+/* Display colours, for screenshots and sim (0xRRGGBB) */
+#define LCD_BARKCOLOR       0x000000
+#define LCD_BRIGHTCOLOR     0x5e6854
+#define LCD_BL_DARKCOLOR    0x000000
+#define LCD_BL_BRIGHTCOLOR  0x3ca0e6
+
 /* define this to indicate your device's keypad */
 #define CONFIG_KEYPAD SANSA_M200_PAD
 

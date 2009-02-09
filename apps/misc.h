@@ -93,6 +93,18 @@ void screen_dump(void);
 void screen_dump_set_hook(void (*hook)(int fh));
 #endif
 
+/* Make BMP colour map entries from R, G, B triples, without and with blending.
+ * Not within HAVE_LCD_BITMAP because it is also used for the Player sim */
+#define RED_CMP(c)   (((c) >> 16) & 0xff)
+#define GREEN_CMP(c) (((c) >> 8) & 0xff)
+#define BLUE_CMP(c)  ((c) & 0xff)
+
+#define BMP_COLOR(c)  BLUE_CMP(c), GREEN_CMP(c), RED_CMP(c), 0
+#define BMP_COLOR_MIX(c1, c2, num, den) \
+        (BLUE_CMP(c2)  - BLUE_CMP(c1))  * (num) / (den) + BLUE_CMP(c1),  \
+        (GREEN_CMP(c2) - GREEN_CMP(c1)) * (num) / (den) + GREEN_CMP(c1), \
+        (RED_CMP(c2)   - RED_CMP(c1))   * (num) / (den) + RED_CMP(c1),   0
+
 bool settings_parseline(char* line, char** name, char** value);
 long default_event_handler_ex(long event, void (*callback)(void *), void *parameter);
 long default_event_handler(long event);

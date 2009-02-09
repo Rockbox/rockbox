@@ -15,6 +15,12 @@
 #define SIM_LCD_WIDTH  132 /* pixels */
 #define SIM_LCD_HEIGHT  64 /* pixels */
 
+/* Display colours, for screenshots and sim (0xRRGGBB) */
+#define LCD_DARKCOLOR       0x000000
+#define LCD_BRIGHTCOLOR     0x5a915a
+#define LCD_BL_DARKCOLOR    0x000000
+#define LCD_BL_BRIGHTCOLOR  0x7ee57e
+
 /* define this if you have the Player's keyboard */
 #define CONFIG_KEYPAD PLAYER_PAD
 
