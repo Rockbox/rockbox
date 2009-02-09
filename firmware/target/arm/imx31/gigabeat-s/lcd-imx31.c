@@ -30,8 +30,8 @@
 #define MAIN_LCD_IDMAC_CHANNEL 14
 #define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
 
-static volatile bool lcd_on = true;
-volatile bool lcd_poweroff = false;
+static bool lcd_on = true;
+static bool lcd_powered = true;
 static unsigned lcd_yuv_options = 0;
 /*
 ** This is imported from lcd-16bit.c
@@ -98,24 +98,41 @@ void lcd_update_rect(int x, int y, int width, int height)
     }
 }
 
-#ifdef HAVE_LCD_SLEEP
 void lcd_sleep(void)
 {
-    _backlight_lcd_sleep();
+    if (lcd_powered)
+    {
+        lcd_enable(false);
+        lcd_powered = false;
+        IPU_IDMAC_CHA_EN &= ~(1ul << MAIN_LCD_IDMAC_CHANNEL);
+        _backlight_lcd_sleep();
+    }
 }
-#endif /* HAVE_LCD_SLEEP */
 
-#if 0
 void lcd_enable(bool state)
 {
-    (void)state;
+    if (state == lcd_on)
+        return;
+
+    if (state)
+    {
+        IPU_IDMAC_CHA_EN |= 1ul << MAIN_LCD_IDMAC_CHANNEL;
+        sleep(HZ/50);
+        lcd_powered = true;
+        lcd_on = true;
+        lcd_update();
+        lcd_call_enable_hook();
+    }
+    else
+    {
+        lcd_on = false;
+    }
 }
 
 bool lcd_enabled(void)
 {
-    return true;
+    return lcd_on;
 }
-#endif
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */

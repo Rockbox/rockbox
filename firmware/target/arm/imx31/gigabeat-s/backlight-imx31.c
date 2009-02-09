@@ -23,6 +23,7 @@
 #include "backlight.h"
 #include "mc13783.h"
 #include "backlight-target.h"
+#include "lcd.h"
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 /* Table that uses combinations of current level and pwm fraction to get
@@ -128,6 +129,9 @@ void _backlight_on(void)
 
 #ifdef HAVE_LCD_SLEEP
     backlight_lcd_sleep_countdown(false); /* stop counter */
+#endif
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(true);
 #endif
 
     /* Set/clear LEDRAMPUP bit, clear LEDRAMPDOWN bit,

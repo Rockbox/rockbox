@@ -104,11 +104,10 @@
  * turned off */
 #define LCD_SLEEP_TIMEOUT (2*HZ)
 
-#ifndef BOOTLOADER
-#if 0
 /* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE
-#endif
+
+#ifndef BOOTLOADER
 
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
