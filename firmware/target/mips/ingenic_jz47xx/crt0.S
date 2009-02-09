@@ -52,6 +52,17 @@
 #ifdef BOOTLOADER
     .word 0 /* Unknown */
     .word 0 /* Filesize */
+
+    /* Relocate bootloader */
+    la     t0, (_loadaddress-0x400000)
+    la     t1, _loadaddress
+    la     t2, _bootend
+_relocate_loop:
+    lw     t3, 0(t0)
+    sw     t3, 0(t1)
+    addiu  t1, 4
+    bne    t1, t2, _relocate_loop
+    addiu  t0, 4
 #endif
     
 _start:
@@ -119,7 +130,6 @@ _init_bss_loop:
     bne    t0, t1, _init_bss_loop
     addiu  t0, 4
     
-#ifndef BOOTLOADER
     /*
       ----------------------------------------------------
        clear IBSS section
@@ -146,7 +156,6 @@ _init_iram_loop:
     addiu  t1, 4
     bne    t1, t2, _init_iram_loop
     addiu  t0, 4
-#endif
 
     /*
       ----------------------------------------------------
@@ -167,23 +176,35 @@ _init_stack_loop:
     nop
 
     
-    .section .vectors, "ax", %progbits
-    .extern real_exception_handler
-    .global except_common_entry
-    .type   except_common_entry,@function
-except_common_entry:
+    /*
+     * 0x0   - Simple TLB refill handler
+     * 0x100 - Cache error handler
+     * 0x180 - Exception/Interrupt handler
+     * 0x200 - Special Exception Interrupt handler (when IV is set in CP0_CAUSE)
+     */
+
+    
+    .section .vectors.1, "ax", %progbits
+    la k0, tlb_refill_handler
+    jr k0
+    nop
+    
+    .section .vectors.2, "ax", %progbits
     la     k0, real_exception_handler
     jr     k0
     nop
-    nop
-    nop
-    .fill 0x20
     
-    .extern _int
-    .extern _exception
-    .global real_exception_handler
-    .type   real_exception_handler,@function
-    .set noreorder
+    .section .vectors.3, "ax", %progbits
+    la     k0, real_exception_handler
+    jr     k0
+    nop
+    
+    .section .vectors.4, "ax", %progbits
+    la     k0, real_exception_handler
+    jr     k0
+    nop
+
+    .section .vectors, "ax", %progbits
 real_exception_handler:
     addiu   sp, -0x80
     sw      ra, 0(sp)
@@ -241,8 +262,6 @@ real_exception_handler:
     j       _exception
     nop
     
-    .global _int
-    .type    _int,@function
 _int:
     jal     intr_handler
     nop
@@ -298,9 +317,6 @@ _int:
     eret                   # Exception Return
     nop
     
-    .extern _exception_handler
-    .global _exception
-    .type   _exception,@function
 _exception:
     add     a0, sp, $0
     mfc0    a1, C0_CAUSE       # C0_CAUSE of last exception

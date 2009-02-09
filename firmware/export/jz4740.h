@@ -3365,15 +3365,13 @@ do {                        \
 #define __cpm_suspend_usbhost()        (REG_CPM_SCR |= CPM_SCR_USBHOST_SUSPEND)
 #define __cpm_enable_osc_in_sleep()    (REG_CPM_SCR |= CPM_SCR_OSC_ENABLE)
 
-
-#define CFG_EXTAL       (12000000)
-
 #ifdef CFG_EXTAL
 #define JZ_EXTAL        CFG_EXTAL
 #else
-#define JZ_EXTAL        (3686400)
+#define JZ_EXTAL        3686400
+#warning Default EXTCLK is used!
 #endif
-#define JZ_EXTAL2       (32768) /* RTC clock */
+#define JZ_EXTAL2       32768 /* RTC clock */
 
 /* PLL output frequency */
 static __inline__ unsigned int __cpm_get_pllout(void)
@@ -3487,7 +3485,7 @@ static __inline__ unsigned int __cpm_get_rtcclk(void)
 /*
  * Output 24MHz for SD and 16MHz for MMC.
  */
-static inline void __cpm_select_msc_clk(int sd)
+static __inline__ void __cpm_select_msc_clk(int sd)
 {
     unsigned int pllout2 = __cpm_get_pllout2();
     unsigned int div = 0;
@@ -3503,7 +3501,7 @@ static inline void __cpm_select_msc_clk(int sd)
 /*
  * Output 48MHz for SD and 16MHz for MMC.
  */
-static inline void __cpm_select_msc_hs_clk(int sd)
+static __inline__ void __cpm_select_msc_hs_clk(int sd)
 {
     unsigned int pllout2 = __cpm_get_pllout2();
     unsigned int div = 0;

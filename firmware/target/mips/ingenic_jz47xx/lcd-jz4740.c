@@ -69,6 +69,7 @@ bool lcd_enabled(void)
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
+x=0;y=0;width=LCD_WIDTH;height=LCD_HEIGHT;
     mutex_lock(&lcd_mtx);
     
     __cpm_start_lcd();
@@ -134,4 +135,18 @@ void lcd_update(void)
         return;
     
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+}
+
+void lcd_blit_yuv(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    (void)src;
+    (void)src_x;
+    (void)src_y;
+    (void)stride;
+    (void)x;
+    (void)y;
+    (void)width;
+    (void)height;
 }

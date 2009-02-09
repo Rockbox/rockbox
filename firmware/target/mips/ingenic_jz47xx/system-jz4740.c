@@ -397,7 +397,7 @@ void mdelay(unsigned int msec)
 }
 
 /* Core-level interrupt masking */
-void cli(void)
+void clear_interrupts(void)
 {
     register unsigned int t;
     t = read_c0_status();
@@ -410,7 +410,7 @@ unsigned int mips_get_sr(void)
     return read_c0_status();
 }
 
-void sti(void)
+void store_interrupts(void)
 {
     register unsigned int t;
     t = read_c0_status();
@@ -525,13 +525,6 @@ void tlb_refill_handler(void)
     panicf("TLB refill handler at 0x%08lx! [0x%x]", read_c0_epc(), read_c0_badvaddr());
 }
 
-static void tlb_call_refill(void)
-{
-    asm("la $8, tlb_refill_handler \n"
-        "jr $8                     \n"
-       );
-}
-
 static int dma_count = 0;
 void dma_enable(void)
 {
@@ -559,191 +552,178 @@ void dma_disable(void)
     }
 }
 
-static inline void pll_convert(unsigned int pllin, unsigned int *pll_cfcr, unsigned int *pll_plcr1)
+/* PLL output clock = EXTAL * NF / (NR * NO)
+ *
+ * NF = FD + 2, NR = RD + 2
+ * NO = 1 (if OD = 0), NO = 2 (if OD = 1 or 2), NO = 4 (if OD = 3)
+ */
+static void pll_init(void) ICODE_ATTR;
+static void pll_init(void)
 {
     register unsigned int cfcr, plcr1;
+    int n2FR[33] = {
+        0, 0, 1, 2, 3, 0, 4, 0, 5, 0, 0, 0, 6, 0, 0, 0,
+        7, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0,
+        9
+    };
     int div[5] = {1, 3, 3, 3, 3}; /* divisors of I:S:P:L:M */
-    int nf;
+    int nf, pllout2;
 
-    cfcr = CPM_CPCCR_CLKOEN               |
-           (div[0] << CPM_CPCCR_CDIV_BIT) | 
-           (div[1] << CPM_CPCCR_HDIV_BIT) | 
-           (div[2] << CPM_CPCCR_PDIV_BIT) |
-           (div[3] << CPM_CPCCR_MDIV_BIT) |
-           (div[4] << CPM_CPCCR_LDIV_BIT);
+    cfcr = CPM_CPCCR_CLKOEN |
+        CPM_CPCCR_PCS |
+        (n2FR[div[0]] << CPM_CPCCR_CDIV_BIT) | 
+        (n2FR[div[1]] << CPM_CPCCR_HDIV_BIT) | 
+        (n2FR[div[2]] << CPM_CPCCR_PDIV_BIT) |
+        (n2FR[div[3]] << CPM_CPCCR_MDIV_BIT) |
+        (n2FR[div[4]] << CPM_CPCCR_LDIV_BIT) |
+        CPM_CPCCR_CE; /* Perform clock divisions immediately */
 
-    //nf = pllin * 2 / CFG_EXTAL;
-    nf = pllin * 2 / 375299969;
+    pllout2 = (cfcr & CPM_CPCCR_PCS) ? CPU_FREQ : (CPU_FREQ / 2);
+
+    /* Init USB Host clock, pllout2 must be n*48MHz */
+    REG_CPM_UHCCDR = pllout2 / 48000000 - 1;
+
+    nf = CPU_FREQ * 2 / CFG_EXTAL;
     plcr1 = ((nf - 2) << CPM_CPPCR_PLLM_BIT) | /* FD */
-            (0 << CPM_CPPCR_PLLN_BIT)        | /* RD=0, NR=2 */
-            (0 << CPM_CPPCR_PLLOD_BIT)       | /* OD=0, NO=1 */
-            (0xa << CPM_CPPCR_PLLST_BIT)     | /* PLL stable time */
-            CPM_CPPCR_PLLEN;                   /* enable PLL */
-    
+        (0 << CPM_CPPCR_PLLN_BIT) |    /* RD=0, NR=2 */
+        (0 << CPM_CPPCR_PLLOD_BIT) |    /* OD=0, NO=1 */
+        (0x20 << CPM_CPPCR_PLLST_BIT) | /* PLL stable time */
+        CPM_CPPCR_PLLEN;                /* enable PLL */          
+
     /* init PLL */
-    *pll_cfcr = cfcr;
-    *pll_plcr1 = plcr1;
-}
-
-static inline void sdram_convert(unsigned int pllin, unsigned int *sdram_freq)
-{
-    register unsigned int ns, tmp;
- 
-    ns = 1000000000 / pllin;
-    tmp = 15625 / ns;
-
-    /* Set refresh registers */
-    tmp = tmp / 64 + 1;
-    
-    if(tmp > 0xff)
-        tmp = 0xff;
-    
-    *sdram_freq = tmp;
-}
-
-static inline void set_cpu_freq(unsigned int pllin, unsigned int div)
-{
-    unsigned int sdram_freq;
-    unsigned int pll_cfcr, pll_plcr1;
-    int div_preq[] = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
-    
-    if(pllin < 25000000 || pllin > 420000000)
-        panicf("PLL should be >25000000 and <420000000 !");
-    
-    unsigned long t = read_c0_status();
-    write_c0_status(t & ~1);
-    
-    pll_convert(pllin, &pll_cfcr, &pll_plcr1);
-
-    sdram_convert(pllin / div_preq[div], &sdram_freq);
-    
-    REG_CPM_CPCCR &= ~CPM_CPCCR_CE;
-    
-    REG_CPM_CPCCR = pll_cfcr;
-    REG_CPM_CPPCR = pll_plcr1;
-    
-    REG_EMC_RTCOR = sdram_freq;
-    REG_EMC_RTCNT = sdram_freq;
-    
-    REG_CPM_CPCCR |= CPM_CPCCR_CE;
-    
-    detect_clock();
-    
-    write_c0_status(t);
-}
-
-static void OF_init_clocks(void)
-{
-    unsigned long t = read_c0_status();
-    write_c0_status(t & ~1);
-    
-    unsigned int prog_entry = ((unsigned int)OF_init_clocks >> 5) << 5;
-    unsigned int i, prog_size = 1024;
-
-    for(i = prog_entry; i < prog_entry + prog_size; i += 32)
-        __asm__ __volatile__("cache 0x1c, 0x00(%0) \n"
-                             :
-                             : "r" (i)
-                            );
-    
-    /* disable PLL clock */
-    REG_CPM_CPPCR &= ~CPM_CPPCR_PLLEN;
-    REG_CPM_CPCCR |= CPM_CPCCR_CE;
-    
-    unsigned long old_clocks = REG_CPM_CLKGR;
-    /*
-    REG_CPM_CLKGR = ~( CPM_CLKGR_UART0 | CPM_CLKGR_TCU  |
-                       CPM_CLKGR_RTC   | CPM_CLKGR_SADC |
-                       CPM_CLKGR_LCD   );
-    */
-    
-    unsigned long old_scr = REG_CPM_SCR;
-    REG_CPM_SCR &= ~CPM_SCR_OSC_ENABLE;  /* O1SE: 12M oscillator is disabled in Sleep mode */
-    
-    REG_EMC_DMCR |= (EMC_DMCR_RMODE | EMC_DMCR_RFSH);     /* self refresh + refresh is performed */
-    REG_EMC_DMCR = (REG_EMC_DMCR & ~EMC_DMCR_RMODE) | 1;  /* -> RMODE = auto refresh
-                                                             -> CAS mode = 2 cycles */
-    __asm__ __volatile__("wait \n");
-    
-    REG_CPM_CLKGR = old_clocks;
-    REG_CPM_SCR = old_scr;
-    
-    for(i=0; i<90; i++);
-    
-    set_cpu_freq(336000000, 1);
-    
-    for(i=0; i<60; i++);
-    
-    write_c0_status(t);
-}
-
-static void my_init_clocks(void)
-{
-    unsigned long t = read_c0_status();
-    write_c0_status(t & ~1);
-    
-    unsigned int prog_entry = ((unsigned int)my_init_clocks / 32 - 1) * 32;
-    unsigned int i, prog_size = 1024;
-
-    for(i = prog_entry; i < prog_entry + prog_size; i += 32)
-        __asm__ __volatile__("cache 0x1c, 0x00(%0) \n"
-                             :
-                             : "r" (i)
-                            );
-    
-    unsigned int sdram_freq, plcr1, cfcr;
-    
-    sdram_convert(336000000/3, &sdram_freq);
-    
-    cfcr = CPM_CPCCR_CLKOEN          |
-           (6 << CPM_CPCCR_UDIV_BIT) |
-           CPM_CPCCR_UCS             |
-           CPM_CPCCR_PCS             |
-           (0 << CPM_CPCCR_CDIV_BIT) |
-           (1 << CPM_CPCCR_HDIV_BIT) |
-           (1 << CPM_CPCCR_PDIV_BIT) |
-           (1 << CPM_CPCCR_MDIV_BIT) |
-           (1 << CPM_CPCCR_LDIV_BIT);
-    
-    plcr1 = (54 << CPM_CPPCR_PLLM_BIT)   | /* FD */
-            (0 << CPM_CPPCR_PLLN_BIT)    | /* RD=0, NR=2 */
-            (0 << CPM_CPPCR_PLLOD_BIT)   | /* OD=0, NO=1 */
-            (0x20 << CPM_CPPCR_PLLST_BIT)| /* PLL stable time */
-            CPM_CPPCR_PLLEN;               /* enable PLL */
-    
-    REG_CPM_CPCCR &= ~CPM_CPCCR_CE;
-    
     REG_CPM_CPCCR = cfcr;
     REG_CPM_CPPCR = plcr1;
-    
-    REG_EMC_RTCOR = sdram_freq;
-    REG_EMC_RTCNT = sdram_freq;
-    
-    REG_CPM_CPCCR |= CPM_CPCCR_CE;
-    
-    REG_CPM_LPCDR = (REG_CPM_LPCDR & ~CPM_LPCDR_PIXDIV_MASK) | (11 << CPM_LPCDR_PIXDIV_BIT);
-    
-    write_c0_status(t);
+}
+
+// SDRAM paramters
+#define CFG_SDRAM_BW16      0    /* Data bus width: 0-32bit, 1-16bit */
+#define CFG_SDRAM_BANK4     1    /* Banks each chip: 0-2bank, 1-4bank */
+#define CFG_SDRAM_ROW       12   /* Row address: 11 to 13 */
+#define CFG_SDRAM_COL       8    /* Column address: 8 to 12 */
+#define CFG_SDRAM_CASL      2    /* CAS latency: 2 or 3 */
+
+// SDRAM Timings, unit: ns
+#define CFG_SDRAM_TRAS      45    /* RAS# Active Time */
+#define CFG_SDRAM_RCD       20    /* RAS# to CAS# Delay */
+#define CFG_SDRAM_TPC       20    /* RAS# Precharge Time */
+#define CFG_SDRAM_TRWL      7     /* Write Latency Time */
+#define CFG_SDRAM_TREF      7812  /* Refresh period: 8192 refresh cycles/64ms */
+
+/*
+ * Init SDRAM memory.
+ */
+static void sdram_init(void) ICODE_ATTR;
+static void sdram_init(void)
+{
+    register unsigned int dmcr0, dmcr, sdmode, tmp, cpu_clk, mem_clk, ns;
+
+    unsigned int cas_latency_sdmr[2] = {
+        EMC_SDMR_CAS_2,
+        EMC_SDMR_CAS_3,
+    };
+
+    unsigned int cas_latency_dmcr[2] = {
+        1 << EMC_DMCR_TCL_BIT,  /* CAS latency is 2 */
+        2 << EMC_DMCR_TCL_BIT   /* CAS latency is 3 */
+    };
+
+    int div[] = { 1, 2, 3, 4, 6, 8, 12, 16, 24, 32 };
+
+    cpu_clk = CPU_FREQ;
+    mem_clk = cpu_clk * div[__cpm_get_cdiv()] / div[__cpm_get_mdiv()];
+
+    //REG_EMC_BCR = 0;      /* Disable bus release */
+    REG_EMC_RTCSR = 0;          /* Disable clock for counting */
+    REG_EMC_RTCOR = 0;
+    REG_EMC_RTCNT = 0;
+
+    /* Fault DMCR value for mode register setting */
+#define SDRAM_ROW0    11
+#define SDRAM_COL0     8
+#define SDRAM_BANK40   0
+
+    dmcr0 = ((SDRAM_ROW0 - 11) << EMC_DMCR_RA_BIT) |
+        ((SDRAM_COL0 - 8) << EMC_DMCR_CA_BIT) |
+        (SDRAM_BANK40 << EMC_DMCR_BA_BIT) |
+        (CFG_SDRAM_BW16 << EMC_DMCR_BW_BIT) |
+        EMC_DMCR_EPIN | cas_latency_dmcr[((CFG_SDRAM_CASL == 3) ? 1 : 0)];
+
+    /* Basic DMCR value */
+    dmcr = ((CFG_SDRAM_ROW - 11) << EMC_DMCR_RA_BIT) |
+        ((CFG_SDRAM_COL - 8) << EMC_DMCR_CA_BIT) |
+        (CFG_SDRAM_BANK4 << EMC_DMCR_BA_BIT) |
+        (CFG_SDRAM_BW16 << EMC_DMCR_BW_BIT) |
+        EMC_DMCR_EPIN | cas_latency_dmcr[((CFG_SDRAM_CASL == 3) ? 1 : 0)];
+
+    /* SDRAM timimg */
+    ns = 1000000000 / mem_clk;
+    tmp = CFG_SDRAM_TRAS / ns;
+    if (tmp < 4)
+        tmp = 4;
+    if (tmp > 11)
+        tmp = 11;
+    dmcr |= ((tmp - 4) << EMC_DMCR_TRAS_BIT);
+    tmp = CFG_SDRAM_RCD / ns;
+    if (tmp > 3)
+        tmp = 3;
+    dmcr |= (tmp << EMC_DMCR_RCD_BIT);
+    tmp = CFG_SDRAM_TPC / ns;
+    if (tmp > 7)
+        tmp = 7;
+    dmcr |= (tmp << EMC_DMCR_TPC_BIT);
+    tmp = CFG_SDRAM_TRWL / ns;
+    if (tmp > 3)
+        tmp = 3;
+    dmcr |= (tmp << EMC_DMCR_TRWL_BIT);
+    tmp = (CFG_SDRAM_TRAS + CFG_SDRAM_TPC) / ns;
+    if (tmp > 14)
+        tmp = 14;
+    dmcr |= (((tmp + 1) >> 1) << EMC_DMCR_TRC_BIT);
+
+    /* SDRAM mode value */
+    sdmode = EMC_SDMR_BT_SEQ |
+        EMC_SDMR_OM_NORMAL |
+        EMC_SDMR_BL_4 | cas_latency_sdmr[((CFG_SDRAM_CASL == 3) ? 1 : 0)];
+
+    /* Stage 1. Precharge all banks by writing SDMR with DMCR.MRSET=0 */
+    REG_EMC_DMCR = dmcr;
+    REG8(EMC_SDMR0 | sdmode) = 0;
+
+    /* Wait for precharge, > 200us */
+    tmp = (cpu_clk / 1000000) * 1000;
+    while (tmp--);
+
+    /* Stage 2. Enable auto-refresh */
+    REG_EMC_DMCR = dmcr | EMC_DMCR_RFSH;
+
+    tmp = CFG_SDRAM_TREF / ns;
+    tmp = tmp / 64 + 1;
+    if (tmp > 0xff)
+        tmp = 0xff;
+    REG_EMC_RTCOR = tmp;
+    REG_EMC_RTCNT = 0;
+    REG_EMC_RTCSR = EMC_RTCSR_CKS_64;   /* Divisor is 64, CKO/64 */
+
+    /* Wait for number of auto-refresh cycles */
+    tmp = (cpu_clk / 1000000) * 1000;
+    while (tmp--);
+
+    /* Stage 3. Mode Register Set */
+    REG_EMC_DMCR = dmcr0 | EMC_DMCR_RFSH | EMC_DMCR_MRSET;
+    REG8(EMC_SDMR0 | sdmode) = 0;
+
+    /* Set back to basic DMCR value */
+    REG_EMC_DMCR = dmcr | EMC_DMCR_RFSH | EMC_DMCR_MRSET;
+
+    /* everything is ok now */
 }
 
 extern int main(void);
-extern void except_common_entry(void);
-
+void system_main(void) ICODE_ATTR;
 void system_main(void)
 {
     int i;
-    
-    /*
-     * 0x0   - Simple TLB refill handler
-     * 0x100 - Cache error handler
-     * 0x180 - Exception/Interrupt handler
-     * 0x200 - Special Exception Interrupt handler (when IV is set in CP0_CAUSE)
-     */
-    memcpy((void *)A_K0BASE, (void *)&tlb_call_refill, 0x20);
-    memcpy((void *)(A_K0BASE + 0x100), (void *)&except_common_entry, 0x20);
-    memcpy((void *)(A_K0BASE + 0x180), (void *)&except_common_entry, 0x20);
-    memcpy((void *)(A_K0BASE + 0x200), (void *)&except_common_entry, 0x20);
-    
+       
     __dcache_writeback_all();
     __icache_invalidate_all();
     
@@ -755,27 +735,22 @@ void system_main(void)
     
     tlb_init();
     
+    //pll_init();
+    //sdram_init();
+    
     detect_clock();
     
     /* Disable unneeded clocks, clocks are enabled when needed */
     __cpm_stop_all();
     __cpm_suspend_usbhost();
     
-#if 0
-    my_init_clocks();
-    //OF_init_clocks();
-    /*__cpm_stop_udc();
-    REG_CPM_CPCCR |= CPM_CPCCR_UCS;
-    REG_CPM_CPCCR = (REG_CPM_CPCCR & ~CPM_CPCCR_UDIV_MASK) | (3 << CPM_CPCCR_UDIV_BIT);
-    __cpm_start_udc();*/
-#endif
-    
     /* Enable interrupts at core level */
-    sti();
+    store_interrupts();
     
     main(); /* Shouldn't return */
     
-    while(1);
+    while(1)
+        core_idle();
 }
 
 void system_reboot(void)
@@ -811,4 +786,14 @@ void power_off(void)
     __rtc_power_down();
     
     while(1);
+}
+
+void system_init(void)
+{
+}
+
+int system_memory_guard(int newmode)
+{
+    (void)newmode;
+    return 0;
 }

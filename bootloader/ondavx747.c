@@ -19,135 +19,144 @@
  *
  ****************************************************************************/
 
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
 #include "config.h"
 #include "jz4740.h"
 #include "backlight.h"
 #include "font.h"
 #include "lcd.h"
-#include "ata.h"
 #include "usb.h"
 #include "system.h"
 #include "button.h"
-#include "timefuncs.h"
-#include "rtc.h"
 #include "common.h"
-#include "mipsregs.h"
 #include "storage.h"
+#include "disk.h"
+#include "string.h"
+#include "rockboxlogo.h"
 
-#ifdef ONDA_VX747P
- #define ONDA_VX747
-#endif
+static void show_splash(int timeout, const char *msg)
+{
+    reset_screen();
+    lcd_putsxy( (LCD_WIDTH - (SYSFONT_WIDTH * strlen(msg))) / 2,
+                (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
+    lcd_update();
+
+    sleep(timeout);
+}
+
+extern int line;
+static void show_logo(void)
+{
+    lcd_bitmap(rockboxlogo, 0, 0, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
+    line += BMPHEIGHT_rockboxlogo/SYSFONT_HEIGHT + 1;
+}
+
+static void usb_mode(void)
+{
+    int button;
+    
+    /* Init backlight */
+    backlight_init();
+    
+    /* Init USB */
+    usb_init();
+    usb_start_monitoring();
+
+    /* Wait for threads to connect */
+    show_splash(HZ/2, "Waiting for USB");
+
+    while (1)
+    {
+        button = button_get_w_tmo(HZ/2);
+
+        if (button == SYS_USB_CONNECTED)
+            break; /* Hit */
+    }
+
+    if (button == SYS_USB_CONNECTED)
+    {
+        /* Got the message - wait for disconnect */
+        show_splash(0, "Bootloader USB mode");
+
+        usb_acknowledge(SYS_USB_CONNECTED_ACK);
+
+        while (1)
+        {
+            button = button_get(true);
+            if (button == SYS_USB_DISCONNECTED)
+            {
+                usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
+                break;
+            }
+        }
+    }
+
+    reset_screen();
+}
+
+static void boot_of(void)
+{
+    /* Init backlight */
+    backlight_init();
+}
 
 int main(void)
 {
+    int rc;
+    void (*kernel_entry)(void);
+    
     kernel_init();
     lcd_init();
     font_init();
     lcd_setfont(FONT_SYSFIXED);
     button_init();
-    rtc_init();
-    usb_init();
-    
-    backlight_init();
-    
-#if 0 /* Enable this when multi storage works */
     storage_init();
-#else
-    ata_init();
-#endif
 
-    usb_start_monitoring();
-
-    int touch, btn;
-    char datetime[30];
     reset_screen();
-    printf("Rockbox bootloader v0.0001");
-    printf("REG_EMC_SACR0: 0x%x", REG_EMC_SACR0);
-    printf("REG_EMC_SACR1: 0x%x", REG_EMC_SACR1);
-    printf("REG_EMC_SACR2: 0x%x", REG_EMC_SACR2);
-    printf("REG_EMC_SACR3: 0x%x", REG_EMC_SACR3);
-    printf("REG_EMC_SACR4: 0x%x", REG_EMC_SACR4);
-    printf("REG_EMC_DMAR0: 0x%x", REG_EMC_DMAR0);
-    unsigned int cpu_id = read_c0_prid();
-    printf("CPU_ID: 0x%x", cpu_id);
-    printf(" * Company ID: 0x%x", (cpu_id >> 16) & 7);
-    printf(" * Processor ID: 0x%x", (cpu_id >> 8) & 7);
-    printf(" * Revision ID: 0x%x", cpu_id & 7);
-    unsigned int config_data = read_c0_config();
-    printf("C0_CONFIG: 0x%x", config_data);
-    printf(" * Architecture type: 0x%x", (config_data >> 13) & 3);
-    printf(" * Architecture revision: 0x%x", (config_data >> 10) & 7);
-    printf(" * MMU type: 0x%x", (config_data >> 7) & 7);
-    printf("C0_CONFIG1: 0x%x", read_c0_config1());
-    if(read_c0_config1() & (1 << 0)) printf(" * FP available");
-    if(read_c0_config1() & (1 << 1)) printf(" * EJTAG available");
-    if(read_c0_config1() & (1 << 2)) printf(" * MIPS-16 available");
-    if(read_c0_config1() & (1 << 4)) printf(" * Performace counters available");
-    if(read_c0_config1() & (1 << 5)) printf(" * MDMX available");
-    if(read_c0_config1() & (1 << 6)) printf(" * CP2 available");
-    printf("C0_STATUS: 0x%x", read_c0_status());
     
-    lcd_puts_scroll(0, 25, "This is a very very long scrolling line.... VERY LONG VERY LONG VERY LONG VERY LONG VERY LONG VERY LONG!!!!!");
-    
-    while(1)
-    {
-#ifdef ONDA_VX747
-#if 1
-        btn = button_get(false);
-        touch = button_get_data();
-#else /* button_get() has performance issues */
-        btn = button_read_device(&touch);
-#endif
+#ifdef HAVE_TOUCHSCREEN
+    rc = button_read_device(NULL);
 #else
-        btn = button_read_device();
-#endif /* ONDA_VX747 */
-#define KNOP(x,y)     lcd_set_foreground(LCD_BLACK); \
-                      if(btn & x) \
-                        lcd_set_foreground(LCD_WHITE); \
-                      lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(#x), SYSFONT_HEIGHT*y, #x);
-        KNOP(BUTTON_VOL_UP, 0);
-        KNOP(BUTTON_VOL_DOWN, 1);
-        KNOP(BUTTON_MENU, 2);
-        KNOP(BUTTON_POWER, 3);
-        lcd_set_foreground(LCD_WHITE);
-        if(button_hold())
-            printf("BUTTON_HOLD");
-        if(btn & BUTTON_POWER)
-            power_off();
-#ifdef ONDA_VX747
-        if(btn & BUTTON_TOUCH)
-        {
-            lcd_set_foreground(LCD_RGBPACK(touch & 0xFF, (touch >> 8)&0xFF, (touch >> 16)&0xFF));
-            lcd_fillrect((touch>>16)-5, (touch&0xFFFF)-5, 5, 5);
-            lcd_update();
-            lcd_set_foreground(LCD_WHITE);
-        }
+    rc = button_read_device();
 #endif
-        snprintf(datetime, 30, "%02d/%02d/%04d %02d:%02d:%02d", get_time()->tm_mday, get_time()->tm_mon, get_time()->tm_year,
-                                     get_time()->tm_hour, get_time()->tm_min, get_time()->tm_sec);
-        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT, datetime);
-        snprintf(datetime, 30, "%d", current_tick);
-        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*2, datetime);
-        snprintf(datetime, 30, "X: %03d Y: %03d", touch>>16, touch & 0xFFFF);
-        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*3, datetime);
-        snprintf(datetime, 30, "PIN3: 0x%08x", REG_GPIO_PXPIN(3));
-        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*4, datetime);
-        snprintf(datetime, 30, "PIN2: 0x%08x", REG_GPIO_PXPIN(2));
-        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*5, datetime);
-        snprintf(datetime, 30, "PIN1: 0x%08x", REG_GPIO_PXPIN(1));
-        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*6, datetime);
-        snprintf(datetime, 30, "PIN0: 0x%08x", REG_GPIO_PXPIN(0));
-        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*7, datetime);
-        snprintf(datetime, 30, "BadVAddr: 0x%08x", read_c0_badvaddr());
-        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*8, datetime);
-        snprintf(datetime, 30, "ICSR: 0x%08x", REG_INTC_ISR);
-        lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*strlen(datetime), LCD_HEIGHT-SYSFONT_HEIGHT*9, datetime);
-        lcd_update();
-        yield();
+    
+    if(rc & BUTTON_VOL_UP)
+        usb_mode();
+    else if(button_hold())
+        boot_of();
+    else if(rc)
+        verbose = true;
+    
+    if(verbose)
+        backlight_init();
+
+    show_logo();
+    printf(MODEL_NAME" Rockbox Bootloader");
+    printf("Version "APPSVERSION);
+    
+    rc = storage_init();
+    if(rc)
+        error(EATA, rc);
+
+    rc = disk_mount_all();
+    if (rc <= 0)
+        error(EDISK,rc);
+    
+    printf("Loading firmware");
+    rc = load_firmware((unsigned char *)CONFIG_SDRAM_START, BOOTFILE, 0x400000);
+    if(rc < 0)
+        printf("Error: %s", strerror(rc));
+
+    if (rc == EOK)
+    {
+        printf("Starting Rockbox...");
+        disable_interrupt();
+        kernel_entry = (void*) CONFIG_SDRAM_START;
+        kernel_entry();
     }
+    
+    /* Halt */
+    while (1)
+        core_idle();
     
     return 0;
 }

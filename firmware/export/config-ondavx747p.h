@@ -132,7 +132,8 @@
 #define HAVE_POWEROFF_WHILE_CHARGING
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ 3686400
+#define CPU_FREQ 336000000    /* CPU clock: 336 MHz */
+#define CFG_EXTAL 12000000    /* EXT clock: 12 Mhz */
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE

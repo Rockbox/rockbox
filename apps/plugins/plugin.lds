@@ -6,8 +6,12 @@
 OUTPUT_FORMAT(elf32-m68k)
 #elif defined(CPU_ARM)
 OUTPUT_FORMAT(elf32-littlearm)
-#else
+#elif defined(CPU_SH)
 OUTPUT_FORMAT(elf32-sh)
+#elif defined(CPU_MIPS)
+OUTPUT_FORMAT(elf32-littlemips)
+#else
+#error Unknown CPU architecture
 #endif
 
 #ifdef DEBUG
@@ -99,6 +103,10 @@ OUTPUT_FORMAT(elf32-sh)
 #endif
 #define DRAMORIG 0x30000000
 
+#elif CONFIG_CPU == JZ4732
+#define DRAMORIG 0x80004000 + STUBOFFSET
+#define IRAMORIG 0x80000000
+#define IRAMSIZE 0x4000
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
 #endif
@@ -182,6 +190,9 @@ SECTIONS
     /DISCARD/ :
     {
         *(.eh_frame)
+#ifdef CPU_MIPS
+        *(.rel.dyn)
+#endif
     }
 
 #if defined(IRAMSIZE) && IRAMSIZE != 0

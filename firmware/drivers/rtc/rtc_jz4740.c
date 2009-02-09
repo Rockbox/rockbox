@@ -154,6 +154,11 @@ int rtc_read_datetime(unsigned char* buf)
     return 1;
 }
 
+int rtc_write_datetime(unsigned char* buf)
+{
+    (void)buf;
+}
+
 #if 0
 void get_rtc_alm_time(struct rtc_time *alm_tm)
 { 

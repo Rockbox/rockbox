@@ -238,3 +238,7 @@ W_timeout:
     __i2c_send_stop();
     return -1;
 }
+
+void i2c_init(void)
+{
+}

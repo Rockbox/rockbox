@@ -13,29 +13,6 @@
 #ifndef _ASM_MIPSREGS_H
 #define _ASM_MIPSREGS_H
 
-//#include <linux/config.h>
-//#include <linux/linkage.h>
-
-/*
- * The following macros are especially useful for __asm__
- * inline assembler.
- */
-#ifndef __STR
-#define __STR(x) #x
-#endif
-#ifndef STR
-#define STR(x) __STR(x)
-#endif
-
-/*
- *  Configure language
- */
-#ifdef __ASSEMBLY__
-#define _ULCAST_
-#else
-#define _ULCAST_ (unsigned long)
-#endif
-
 /*
  * Coprocessor 0 register names
  */

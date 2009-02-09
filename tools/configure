@@ -298,7 +298,7 @@ arm1136jfscc () {
 
 mipselcc () {
  prefixtools mipsel-elf-
- GCCOPTS="$CCOPTS -march=mips32 -mno-mips16 -mno-abicalls -mlong-calls"
+ GCCOPTS="$CCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-abicalls -mlong-calls"
  GCCOPTIMIZE="-fomit-frame-pointer"
  GCCOPTS="$GCCOPTS -fno-pic -fno-builtin -fno-exceptions -ffunction-sections -msoft-float -G 0"
  endian="little"
@@ -1933,14 +1933,14 @@ fi
     target_id=44
     modelname="ondavx747"
     target="-DONDA_VX747"
-    memory=16 #FIXME
+    memory=16
     mipselcc
-    tool="cp"
+    tool="$rootdir/tools/scramble -add=x747"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.vx747"
     appextra="recorder:gui"
-    plugins="no" #FIXME
+    plugins="" #FIXME
     swcodec="yes"
     toolset=$genericbitmaptools
     boottool="cp"
@@ -1962,7 +1962,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.vx767"
     appextra="recorder:gui"
-    plugins="no" #FIXME
+    plugins="" #FIXME
     swcodec="yes"
     toolset=$genericbitmaptools
     boottool="cp"
@@ -1984,7 +1984,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.vx747p"
     appextra="recorder:gui"
-    plugins="no" #FIXME
+    plugins="" #FIXME
     swcodec="yes"
     toolset=$genericbitmaptools
     boottool="cp"

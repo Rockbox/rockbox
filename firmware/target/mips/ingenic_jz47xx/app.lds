@@ -6,11 +6,26 @@ OUTPUT_ARCH(MIPS)
 ENTRY(_start)
 STARTUP(target/mips/ingenic_jz47xx/crt0.o)
 
-#define DRAMSIZE ((MEMORYSIZE-4) * 0x100000)
+#ifdef DEBUG
+#define STUBOFFSET 0x10000
+#else
+#define STUBOFFSET 0
+#endif
 
-#define DRAMORIG 0x80404000
-#define IRAMORIG 0x80000000
-#define IRAMSIZE 16K
+#define PLUGINSIZE    PLUGIN_BUFFER_SIZE
+#define CODECSIZE     CODEC_SIZE
+
+#define DRAMSIZE      ((MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGINSIZE - CODECSIZE)
+
+#define DRAMORIG      0x80004000
+#define IRAMORIG      0x80000000
+#define IRAMSIZE      (16K-0x220)
+
+/* End of the audio buffer, where the codec buffer starts */
+#define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
+
+/* Where the codec buffer ends, and the plugin buffer starts */
+#define ENDADDR       (ENDAUDIOADDR + CODECSIZE)
 
 MEMORY
 {
@@ -24,7 +39,7 @@ SECTIONS
 
     .text :
     {
-        _loadaddress = .;
+        loadaddress = .;
         *(.init.text);
         *(.text*);
     } > DRAM
@@ -50,6 +65,16 @@ SECTIONS
     
     . = ALIGN(4);
     
+    .stack (NOLOAD):
+    {
+         *(.stack);
+         stackbegin = .;
+         . += 0x2000;
+         stackend = .;
+    } > DRAM
+    
+    . = ALIGN(4);
+    
     .iram IRAMORIG:
     {
         _iramstart = .;
@@ -65,13 +90,14 @@ SECTIONS
         *(.icode);
         *(.irodata);
         *(.idata);
-        KEEP(*(.vectors*))
+        KEEP(*(.vectors))
+        *(.vectors);
         _iramend = .;
     } > IRAM AT> DRAM
     _iramcopy = LOADADDR(.iram);
     
     . = ALIGN(4);
-    
+
     .bss (NOLOAD):
     {
          _edata = .;
@@ -82,22 +108,37 @@ SECTIONS
          _end = .;
     } > DRAM
     
-    _bootend = .;
+    . = ALIGN(4);
     
     .ibss (NOLOAD) :
     {
         _iedata = .;
-        *(.ibss*)
+        *(.ibss*);
         _iend = .;
     } > IRAM
     
-    . = ALIGN(4);
-    
-    .stack (NOLOAD):
+    .audiobuf ALIGN(4) :
     {
-         *(.stack)
-         stackbegin = .;
-         . += 0x2000;
-         stackend = .;
-    } > IRAM
+        audiobuffer = .;
+    } > DRAM
+
+    .audiobufend ENDAUDIOADDR:
+    {
+        audiobufend = .;
+    } > DRAM
+
+    .codec ENDAUDIOADDR:
+    {
+        codecbuf = .;
+    }
+
+    .plugin ENDADDR:
+    {
+        pluginbuf = .;
+    }
+    
+    /DISCARD/ :
+    {
+        *(.eh_frame);
+    }
 }

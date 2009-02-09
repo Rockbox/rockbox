@@ -87,6 +87,7 @@ static inline void restore_interrupt(int status)
 #define	swap32(x) (((x) & 0xff) << 24 | ((x) & 0xff00) << 8 | ((x) & 0xff0000) >> 8 | ((x) >> 24) & 0xff)
 
 #define UNCACHED_ADDRESS(addr)    ((unsigned int)(addr) | 0xA0000000)
+#define UNCACHED_ADDR(x)          UNCACHED_ADDRESS((x))
 #define PHYSADDR(x)               ((x) & 0x1fffffff)
 
 void __dcache_writeback_all(void);
@@ -95,8 +96,8 @@ void __icache_invalidate_all(void);
 void __flush_dcache_line(unsigned long addr);
 void dma_cache_wback_inv(unsigned long addr, unsigned long size);
 void system_enable_irq(unsigned int irq);
-void sti(void);
-void cli(void);
+void store_interrupts(void);
+void clear_interrupts(void);
 void udelay(unsigned int usec);
 void mdelay(unsigned int msec);
 void power_off(void);

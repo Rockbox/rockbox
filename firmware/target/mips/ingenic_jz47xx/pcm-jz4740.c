@@ -142,6 +142,10 @@ void pcm_play_dma_pause(bool pause)
         play_start_pcm();
 }
 
+void audiohw_close(void)
+{
+}
+
 #ifdef HAVE_RECORDING
 /* TODO */
 void pcm_rec_dma_init(void)

@@ -31,13 +31,13 @@
 #define MODEL_NAME  "Onda VX747"
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 35
+#define MODEL_NUMBER 45
 
 //#define HAVE_ATA_SD
 //#define HAVE_HOTSWAP
 
 //#define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
-#define CONFIG_STORAGE STORAGE_NAND /* Multivolume currently handled at firmware/target/ level */
+#define CONFIG_STORAGE STORAGE_SD /* Multivolume currently handled at firmware/target/ level */
 
 #define CONFIG_NAND NAND_CC
 
@@ -115,10 +115,10 @@
     SAMPR_CAP_11)*/
 
 #define BATTERY_CAPACITY_DEFAULT 1250 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN 500        /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 2500        /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 100         /* capacity increment */
-#define BATTERY_TYPES_COUNT  1          /* only one type */
+#define BATTERY_CAPACITY_MIN 500      /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 2500     /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 100      /* capacity increment */
+#define BATTERY_TYPES_COUNT  1        /* only one type */
 
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR
@@ -132,7 +132,8 @@
 #define HAVE_POWEROFF_WHILE_CHARGING
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ 3686400
+#define CPU_FREQ 336000000    /* CPU clock: 336 MHz */
+#define CFG_EXTAL 12000000    /* EXT clock: 12 Mhz */
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
@@ -151,6 +152,7 @@
 
 /* Define this if you have adjustable CPU frequency */
 /* #define HAVE_ADJUSTABLE_CPU_FREQ */
+#define CPUFREQ_NORMAL 336000000    /* CPU clock: 336 MHz */
 
 #define BOOTFILE_EXT "vx747"
 #define BOOTFILE     "rockbox." BOOTFILE_EXT
