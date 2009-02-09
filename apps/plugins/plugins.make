@@ -33,8 +33,10 @@ PLUGINSUBDIRS := $(call preprocess, $(APPSDIR)/plugins/SUBDIRS)
 $(foreach dir,$(PLUGINSUBDIRS),$(eval include $(dir)/$(notdir $(dir)).make))
 
 ### build data / rules
+ifndef SIMVER
 PLUGIN_LDS := $(APPSDIR)/plugins/plugin.lds
 PLUGINLINK_LDS := $(BUILDDIR)/apps/plugins/plugin.link
+endif
 
 OTHER_INC += -I$(APPSDIR)/plugins -I$(APPSDIR)/plugins/lib
 

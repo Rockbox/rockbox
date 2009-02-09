@@ -38,8 +38,11 @@ include $(APPSDIR)/codecs/libwma/libwma.make
 CODECFLAGS = $(CFLAGS) -I$(APPSDIR)/codecs -I$(APPSDIR)/codecs/lib \
 	-DCODEC
 
-CODEC_LDS := $(APPSDIR)/plugins/plugin.lds # codecs and plugins use same file
-CODECLINK_LDS := $(CODECDIR)/codec.link
+ifndef SIMVER
+  CODEC_LDS := $(APPSDIR)/plugins/plugin.lds # codecs and plugins use same file
+  CODECLINK_LDS := $(CODECDIR)/codec.link
+endif
+
 CODEC_CRT0 := $(CODECDIR)/codec_crt0.o
 
 CODECLIBS := $(DEMACLIB) $(A52LIB) $(ALACLIB) $(ASAPLIB) \

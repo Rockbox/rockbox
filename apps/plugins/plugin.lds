@@ -10,9 +10,8 @@ OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_FORMAT(elf32-sh)
 #elif defined(CPU_MIPS)
 OUTPUT_FORMAT(elf32-littlemips)
-#elif !defined(SIMULATOR)
-/* We cannot have an #error here when building simulators since we don't have
-   any CPU defined then! */
+#else
+/* We can have an #error here we don't use this file when build sims! */
 #error Unknown CPU architecture
 #endif
 
