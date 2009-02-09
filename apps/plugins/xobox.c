@@ -506,9 +506,8 @@ static void refresh_board (void)
 
 #if LCD_DEPTH>=2
     rb->lcd_set_background (LCD_BLACK);
-#else
-    rb->lcd_clear_display ();
 #endif
+    rb->lcd_clear_display ();
     for (j = 0; j < BOARD_H; j++)
     {
         unsigned last_color = board[j][0];
