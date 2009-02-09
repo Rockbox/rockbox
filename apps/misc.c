@@ -425,21 +425,23 @@ static void (*screen_dump_hook)(int fh) = NULL;
 
 void screen_dump(void)
 {
-    int fh;
+    int fd, y;
     char filename[MAX_PATH];
-    int bx, by;
+
+    fb_data *src;
 #if LCD_DEPTH == 1
-    static unsigned char line_block[8][BMP_LINESIZE];
-#elif LCD_DEPTH == 2
-#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-    static unsigned char line_block[BMP_LINESIZE];
-#elif LCD_PIXELFORMAT == VERTICAL_PACKING
-    static unsigned char line_block[4][BMP_LINESIZE];
-#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
-    static unsigned char line_block[8][BMP_LINESIZE];
+    unsigned mask;
+    unsigned val;
+#elif (LCD_DEPTH == 2) && (LCD_PIXELFORMAT != HORIZONTAL_PACKING)
+    int shift;
+    unsigned val;
 #endif
-#elif LCD_DEPTH == 16
-    static unsigned short line_block[BMP_LINESIZE/2];
+#if LCD_DEPTH <= 8
+    unsigned char *dst, *dst_end;
+    unsigned char linebuf[BMP_LINESIZE];
+#elif LCD_DEPTH <= 16
+    unsigned short *dst, *dst_end;
+    unsigned short linebuf[BMP_LINESIZE/2];
 #endif
 
 #if CONFIG_RTC
@@ -449,132 +451,97 @@ void screen_dump(void)
                              IF_CNFN_NUM_(, NULL));
 #endif
 
-    fh = creat(filename);
-    if (fh < 0)
+    fd = creat(filename);
+    if (fd < 0)
         return;
 
     if (screen_dump_hook)
     {
-        screen_dump_hook(fh);
+        screen_dump_hook(fd);
     }
     else
     {
-        write(fh, bmpheader, sizeof(bmpheader));
+        write(fd, bmpheader, sizeof(bmpheader));
 
         /* BMP image goes bottom up */
+        for (y = LCD_HEIGHT - 1; y >= 0; y--)
+        {                                  
+            memset(linebuf, 0, BMP_LINESIZE);
+
+#if defined(HAVE_LCD_SPLIT) && (LCD_SPLIT_LINES == 2)
+            if (y == LCD_SPLIT_POS - 1)
+            {
+                write(fd, linebuf, BMP_LINESIZE);
+                write(fd, linebuf, BMP_LINESIZE);
+            }
+#endif     
+            dst = linebuf;
+
 #if LCD_DEPTH == 1
-        for (by = LCD_FBHEIGHT - 1; by >= 0; by--)
-        {
-            unsigned char *src = &lcd_framebuffer[by][0];
-            unsigned char *dst = &line_block[7][0];
+            dst_end = dst + LCD_WIDTH/2;
+            src = lcd_framebuffer[y >> 3];
+            mask = 1 << (y & 7);
 
-            memset(line_block, 0, sizeof(line_block));
-
-#ifdef HAVE_LCD_SPLIT
-            if (by == (LCD_SPLIT_POS/8 - 1))
-                write(fh, line_block, LCD_SPLIT_LINES * sizeof(line_block[0]));
-#endif
-            for (bx = LCD_WIDTH/2; bx > 0; bx--)
+            do
             {
-                unsigned char *dst_blk = dst++;
-                unsigned src_byte0 = *src++ << 4;
-                unsigned src_byte1 = *src++;
-                int iy;
-
-                for (iy = 8; iy > 0; iy--)
-                {
-                    *dst_blk = (src_byte0 & 0x10) 
-                             | (src_byte1 & 0x01)
+                val  = (*src++ & mask) ? 0x10 : 0;
+                val |= (*src++ & mask) ? 0x01 : 0;
 #ifdef HAVE_LCD_SPLIT
-                             | (by < (LCD_SPLIT_POS/8) ? 0x22 : 0)
+                if (y < LCD_SPLIT_POS)
+                    val |= 0x22;
 #endif
-                              ;
-                    src_byte0 >>= 1;
-                    src_byte1 >>= 1;
-                    dst_blk -= BMP_LINESIZE;
-                }
+                *dst++ = val;
             }
+            while (dst < dst_end);
 
-            write(fh, line_block, sizeof(line_block));
-        }
 #elif LCD_DEPTH == 2
+            dst_end = dst + LCD_WIDTH/2;
+
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-        for (by = LCD_FBHEIGHT - 1; by >= 0; by--)
-        {
-            unsigned char *src = &lcd_framebuffer[by][0];
-            unsigned char *dst = line_block;
+            src = lcd_framebuffer[y];
 
-            memset(line_block, 0, sizeof(line_block));
-            for (bx = LCD_FBWIDTH; bx > 0; bx--)
+            do
             {
-                unsigned src_byte = *src++;
+                unsigned data = *src++;
 
-                *dst++ = ((src_byte >> 2) & 0x30) | ((src_byte >> 4) & 0x03);
-                *dst++ = ((src_byte << 2) & 0x30) | (src_byte & 0x03);
+                *dst++ = (data >> 2) & 0x30 | (data >> 4) & 0x03;
+                *dst++ = (data << 2) & 0x30 | data & 0x03;
             }
+            while (dst < dst_end);
 
-            write(fh, line_block, sizeof(line_block));
-        }
 #elif LCD_PIXELFORMAT == VERTICAL_PACKING
-        for (by = LCD_FBHEIGHT - 1; by >= 0; by--)
-        {
-            unsigned char *src = &lcd_framebuffer[by][0];
-            unsigned char *dst = &line_block[3][0];
+            src = lcd_framebuffer[y >> 2];
+            shift = 2 * (y & 3);
 
-            memset(line_block, 0, sizeof(line_block));
-            for (bx = LCD_WIDTH/2; bx > 0; bx--)
+            do
             {
-                unsigned char *dst_blk = dst++;
-                unsigned src_byte0 = *src++ << 4;
-                unsigned src_byte1 = *src++;
-                int iy;
-
-                for (iy = 4; iy > 0; iy--)
-                {
-                    *dst_blk = (src_byte0 & 0x30) | (src_byte1 & 0x03);
-                    src_byte0 >>= 2;
-                    src_byte1 >>= 2;
-                    dst_blk -= BMP_LINESIZE;
-                }
+                val  = ((*src++ >> shift) & 3) << 4;
+                val |= ((*src++ >> shift) & 3);
+                *dst++ = val;
             }
+            while (dst < dst_end);
 
-            write(fh, line_block, sizeof(line_block));
-        }
 #elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
-        for (by = LCD_FBHEIGHT - 1; by >= 0; by--)
-        {
-            const fb_data *src = &lcd_framebuffer[by][0];
-            unsigned char *dst = &line_block[7][0];
+            src = lcd_framebuffer[y >> 3];
+            shift = y & 7;
 
-            memset(line_block, 0, sizeof(line_block));
-            for (bx = LCD_WIDTH/2; bx > 0; bx--)
+            do
             {
-                unsigned char *dst_blk = dst++;
-                unsigned src_data0 = *src++ << 4;
-                unsigned src_data1 = *src++;
-                int iy;
+                unsigned data = (*src++ >> shift) & 0x0101;
 
-                for (iy = 8; iy > 0; iy--)
-                {
-                    *dst_blk = (src_data0 & 0x10) | (src_data1 & 0x01)
-                             | ((src_data0 & 0x1000) | (src_data1 & 0x0100)) >> 7;
-                    src_data0 >>= 1;
-                    src_data1 >>= 1;
-                    dst_blk -= BMP_LINESIZE;
-                }
+                val  = (((data >> 7) | data) & 3) << 4;
+                data = (*src++ >> shift) & 0x0101;
+                val |= ((data >> 7) | data) & 3;
+                *dst++ = val;
             }
+            while (dst < dst_end);
 
-            write(fh, line_block, sizeof(line_block));
-        }
 #endif
 #elif LCD_DEPTH == 16
-        for (by = LCD_HEIGHT - 1; by >= 0; by--)
-        {
-            unsigned short *src = &lcd_framebuffer[by][0];
-            unsigned short *dst = line_block;
-
-            memset(line_block, 0, sizeof(line_block));
-            for (bx = LCD_WIDTH; bx > 0; bx--)
+            dst_end = dst + LCD_WIDTH;
+            src = lcd_framebuffer[y];
+            
+            do
             {
 #if (LCD_PIXELFORMAT == RGB565SWAPPED)
                 /* iPod LCD data is big endian although the CPU is not */
@@ -583,13 +550,13 @@ void screen_dump(void)
                 *dst++ = htole16(*src++);
 #endif
             }
+            while (dst < dst_end);
 
-            write(fh, line_block, sizeof(line_block));
-        }
 #endif /* LCD_DEPTH */
+            write(fd, linebuf, BMP_LINESIZE);
+        }
     }
-
-    close(fh);
+    close(fd);
 }
 
 void screen_dump_set_hook(void (*hook)(int fh))

@@ -708,10 +708,10 @@ void grey_deferred_lcd_update(void)
 /*** Screenshot ***/
 
 #ifdef HAVE_LCD_SPLIT
-#define GRADIENT_MAX    127
+#define NUM_SHADES      128
 #define BMP_NUMCOLORS   256
 #else
-#define GRADIENT_MAX    128
+#define NUM_SHADES      129
 #define BMP_NUMCOLORS   129
 #endif
 
@@ -754,7 +754,7 @@ static const unsigned char colorindex[4] = {128, 85, 43, 0};
 static void grey_screendump_hook(int fd)
 {
     int i;
-    int x, y, gx, gy;
+    int y, gx, gy;
 #if LCD_PIXELFORMAT == VERTICAL_PACKING
 #if LCD_DEPTH == 1
     unsigned val;
@@ -766,45 +766,50 @@ static void grey_screendump_hook(int fd)
     unsigned data;
     int shift;
 #endif /* LCD_PIXELFORMAT */
-    fb_data *lcdptr;
-    unsigned char *clut_entry;
-    unsigned char linebuf[MAX(4*BMP_NUMCOLORS,BMP_LINESIZE)];
+    fb_data *src;
+    unsigned char *gsrc;
+    unsigned char *dst, *dst_end;
+    unsigned char linebuf[MAX(4*NUM_SHADES,BMP_LINESIZE)];
 
     rb->write(fd, bmpheader, sizeof(bmpheader));  /* write header */
 
     /* build clut */
-    rb->memset(linebuf, 0, 4*BMP_NUMCOLORS);
-    clut_entry = linebuf;
+    rb->memset(linebuf, 0, 4*NUM_SHADES);
+    dst = linebuf;
 
-    for (i = 0; i <= GRADIENT_MAX; i++)
+    for (i = 0; i < NUM_SHADES; i++)
     {
-        *clut_entry++ = (_GREY_MULUQ(BLUE_CMP(LCD_BL_BRIGHTCOLOR)
-                                     -BLUE_CMP(LCD_BL_DARKCOLOR), i) >> 7)
-                        + BLUE_CMP(LCD_BL_DARKCOLOR);
-        *clut_entry++ = (_GREY_MULUQ(GREEN_CMP(LCD_BL_BRIGHTCOLOR)
-                                     -GREEN_CMP(LCD_BL_DARKCOLOR), i) >> 7)
-                        + GREEN_CMP(LCD_BL_DARKCOLOR);
-        *clut_entry++ = (_GREY_MULUQ(RED_CMP(LCD_BL_BRIGHTCOLOR)
-                                     -RED_CMP(LCD_BL_DARKCOLOR), i) >> 7)
-                        + RED_CMP(LCD_BL_DARKCOLOR);
-        clut_entry++;
+        *dst++ = (_GREY_MULUQ(BLUE_CMP(LCD_BL_BRIGHTCOLOR)
+                              -BLUE_CMP(LCD_BL_DARKCOLOR), i) >> 7)
+                 + BLUE_CMP(LCD_BL_DARKCOLOR);
+        *dst++ = (_GREY_MULUQ(GREEN_CMP(LCD_BL_BRIGHTCOLOR)
+                              -GREEN_CMP(LCD_BL_DARKCOLOR), i) >> 7)
+                 + GREEN_CMP(LCD_BL_DARKCOLOR);
+        *dst++ = (_GREY_MULUQ(RED_CMP(LCD_BL_BRIGHTCOLOR)
+                              -RED_CMP(LCD_BL_DARKCOLOR), i) >> 7)
+                 + RED_CMP(LCD_BL_DARKCOLOR);
+        dst++;
     }
+    rb->write(fd, linebuf, 4*NUM_SHADES);
+
 #ifdef HAVE_LCD_SPLIT
-    for (i = 0; i <= GRADIENT_MAX; i++)
+    dst = linebuf;
+
+    for (i = 0; i <= NUM_SHADES; i++)
     {
-        *clut_entry++ = (_GREY_MULUQ(BLUE_CMP(LCD_BL_BRIGHTCOLOR_2)
-                                     -BLUE_CMP(LCD_BL_DARKCOLOR_2), i) >> 7)
-                        + BLUE_CMP(LCD_BL_DARKCOLOR_2);
-        *clut_entry++ = (_GREY_MULUQ(GREEN_CMP(LCD_BL_BRIGHTCOLOR_2)
-                                     -GREEN_CMP(LCD_BL_DARKCOLOR_2), i) >> 7)
-                        + GREEN_CMP(LCD_BL_DARKCOLOR_2);
-        *clut_entry++ = (_GREY_MULUQ(RED_CMP(LCD_BL_BRIGHTCOLOR_2)
-                                     -RED_CMP(LCD_BL_DARKCOLOR_2), i) >> 7)
-                        + RED_CMP(LCD_BL_DARKCOLOR_2);
-        clut_entry++;
+        *dst++ = (_GREY_MULUQ(BLUE_CMP(LCD_BL_BRIGHTCOLOR_2)
+                              -BLUE_CMP(LCD_BL_DARKCOLOR_2), i) >> 7)
+                 + BLUE_CMP(LCD_BL_DARKCOLOR_2);
+        *dst++ = (_GREY_MULUQ(GREEN_CMP(LCD_BL_BRIGHTCOLOR_2)
+                              -GREEN_CMP(LCD_BL_DARKCOLOR_2), i) >> 7)
+                 + GREEN_CMP(LCD_BL_DARKCOLOR_2);
+        *dst++ = (_GREY_MULUQ(RED_CMP(LCD_BL_BRIGHTCOLOR_2)
+                              -RED_CMP(LCD_BL_DARKCOLOR_2), i) >> 7)
+                 + RED_CMP(LCD_BL_DARKCOLOR_2);
+        dst++;
     }
+    rb->write(fd, linebuf, 4*NUM_SHADES);
 #endif
-    rb->write(fd, linebuf, 4*BMP_NUMCOLORS);
 
     /* BMP image goes bottom -> top */
     for (y = LCD_HEIGHT - 1; y >= 0; y--)
@@ -819,116 +824,122 @@ static void grey_screendump_hook(int fd)
         }
 #endif
 
+        dst = linebuf;
+        dst_end = dst + LCD_WIDTH;
         gy = y - _grey_info.y;
+        gx = -_grey_info.x;
+
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+        gsrc = _grey_info.values + _GREY_MULUQ(_grey_info.width, gy);
+
 #if LCD_DEPTH == 2
-        lcdptr = rb->lcd_framebuffer + _GREY_MULUQ(LCD_FBWIDTH, y);
-
-        for (x = 0; x < LCD_WIDTH; x += 4)
+        src = rb->lcd_framebuffer + _GREY_MULUQ(LCD_FBWIDTH, y);
+        
+        do
         {
-            gx = x - _grey_info.x;
-
             if (((unsigned)gy < (unsigned)_grey_info.height)
                 && ((unsigned)gx < (unsigned)_grey_info.width))
             {
-                unsigned char *src = _grey_info.values
-                                   + _GREY_MULUQ(_grey_info.width, gy) + gx;
-                for (i = 0; i < 4; i++)
-                    linebuf[x + i] = *src++;
+                *dst++ = *gsrc++;
+                *dst++ = *gsrc++;
+                *dst++ = *gsrc++;
+                *dst++ = *gsrc++;
             }
             else
             {
-                unsigned data = *lcdptr;
-                linebuf[x]     = colorindex[(data >> 6) & 3];
-                linebuf[x + 1] = colorindex[(data >> 4) & 3];
-                linebuf[x + 2] = colorindex[(data >> 2) & 3];
-                linebuf[x + 3] = colorindex[data & 3];
+                unsigned data = *src;
+                *dst++ = colorindex[(data >> 6) & 3];
+                *dst++ = colorindex[(data >> 4) & 3];
+                *dst++ = colorindex[(data >> 2) & 3];
+                *dst++ = colorindex[data & 3];
             }
-            lcdptr++;
+            gx++, src++;
         }
+        while (dst < dst_end);
+
 #endif /* LCD_DEPTH */
 #elif LCD_PIXELFORMAT == VERTICAL_PACKING
+        gsrc = _grey_info.values  + (~gy & _GREY_BMASK)
+             + _GREY_MULUQ(_grey_info.width, gy & ~_GREY_BMASK);
+
 #if LCD_DEPTH == 1
         mask = 1 << (y & 7);
-        lcdptr = rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 3);
+        src = rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 3);
 
-        for (x = 0; x < LCD_WIDTH; x++)
+        do
         {
-            gx = x - _grey_info.x;
-
             if (((unsigned)gy < (unsigned)_grey_info.height)
                 && ((unsigned)gx < (unsigned)_grey_info.width))
             {
-                val = _grey_info.values[_GREY_MULUQ(_grey_info.width,
-                                                    gy & ~_GREY_BMASK)
-                                        + (gx << _GREY_BSHIFT)
-                                        + (~gy & _GREY_BMASK)];
+                val = *gsrc;
 #ifdef HAVE_LCD_SPLIT
                 val -= val >> 7;
 #endif
+                gsrc += _GREY_BSIZE;
             }
             else
             {
 #ifdef HAVE_NEGATIVE_LCD
-                val = (*lcdptr & mask) ? GRADIENT_MAX : 0;
+                val = (*src & mask) ? (NUM_SHADES-1) : 0;
 #else
-                val = (*lcdptr & mask) ? 0 : GRADIENT_MAX;
+                val = (*src & mask) ? 0 : (NUM_SHADES-1);
 #endif
             }
 #ifdef HAVE_LCD_SPLIT
             if (y < LCD_SPLIT_POS)
                 val |= 0x80;
 #endif
-            linebuf[x] = val;
-            lcdptr++;
+            *dst++ = val;
+            gx++, src++;
         }
+        while (dst < dst_end);
+
 #elif LCD_DEPTH == 2
         shift = 2 * (y & 3);
-        lcdptr = rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 2);
-
-        for (x = 0; x < LCD_WIDTH; x++)
+        src = rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 2);
+        
+        do
         {
-            gx = x - _grey_info.x;
-
             if (((unsigned)gy < (unsigned)_grey_info.height)
                 && ((unsigned)gx < (unsigned)_grey_info.width))
             {
-                linebuf[x] = _grey_info.values[_GREY_MULUQ(_grey_info.width,
-                                                           gy & ~_GREY_BMASK)
-                                               + (gx << _GREY_BSHIFT)
-                                               + (~gy & _GREY_BMASK)];
+                *dst++ = *gsrc;
+                gsrc += _GREY_BSIZE;
             }
             else
             {
-                linebuf[x] = colorindex[(*lcdptr >> shift) & 3];
+                *dst++ = colorindex[(*src >> shift) & 3];
             }
-            lcdptr++;
+            gx++, src++;
         }
+        while (dst < dst_end);
+
 #endif /* LCD_DEPTH */
 #elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
+        gsrc = _grey_info.values  + (~gy & _GREY_BMASK)
+             + _GREY_MULUQ(_grey_info.width, gy & ~_GREY_BMASK);
+
 #if LCD_DEPTH == 2
         shift = y & 7;
-        lcdptr = rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 3);
-
-        for (x = 0; x < LCD_WIDTH; x++)
+        src = rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 3);
+        
+        do
         {
-            gx = x - _grey_info.x;
-
             if (((unsigned)gy < (unsigned)_grey_info.height)
                 && ((unsigned)gx < (unsigned)_grey_info.width))
             {
-                linebuf[x] = _grey_info.values[_GREY_MULUQ(_grey_info.width,
-                                                           gy & ~_GREY_BMASK)
-                                               + (gx << _GREY_BSHIFT)
-                                               + (~gy & _GREY_BMASK)];
+                *dst++ = *gsrc;
+                gsrc += _GREY_BSIZE;
             }
             else
             {
-                data = (*lcdptr >> shift) & 0x0101;
-                linebuf[x] = colorindex[((data >> 7) | data) & 3];
+                data = (*src >> shift) & 0x0101;
+                *dst++ = colorindex[((data >> 7) | data) & 3];
             }
-            lcdptr++;
+            gx++, src++;
         }
+        while (dst < dst_end);
+
 #endif /* LCD_DEPTH */
 #endif /* LCD_PIXELFORMAT */
 

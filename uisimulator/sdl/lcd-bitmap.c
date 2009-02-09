@@ -59,9 +59,9 @@ SDL_Color lcd_color2_bright = {RED_CMP(LCD_BRIGHTCOLOR_2),
 #endif
 
 #ifdef HAVE_LCD_SPLIT
-#define GRADIENT_MAX    127
+#define NUM_SHADES    128
 #else
-#define GRADIENT_MAX    128
+#define NUM_SHADES    129
 #endif
 #endif /* LCD_DEPTH <= 8 */
 
@@ -78,9 +78,9 @@ static unsigned long get_lcd_pixel(int x, int y)
 {
 #if LCD_DEPTH == 1
 #ifdef HAVE_NEGATIVE_LCD
-    return (lcd_framebuffer[y/8][x] & (1 << (y & 7))) ? GRADIENT_MAX : 0;
+    return (lcd_framebuffer[y/8][x] & (1 << (y & 7))) ? (NUM_SHADES-1) : 0;
 #else
-    return (lcd_framebuffer[y/8][x] & (1 << (y & 7))) ? 0 : GRADIENT_MAX;
+    return (lcd_framebuffer[y/8][x] & (1 << (y & 7))) ? 0 : (NUM_SHADES-1);
 #endif
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
@@ -122,17 +122,17 @@ void sim_backlight(int value)
 #if LCD_DEPTH <= 8
     if (value > 0) {
         sdl_set_gradient(lcd_surface, &lcd_bl_color_dark,
-                         &lcd_bl_color_bright, 0, GRADIENT_MAX+1);
+                         &lcd_bl_color_bright, 0, NUM_SHADES);
 #ifdef HAVE_LCD_SPLIT
         sdl_set_gradient(lcd_surface, &lcd_bl_color2_dark,
-                         &lcd_bl_color2_bright, GRADIENT_MAX+1, GRADIENT_MAX+1);
+                         &lcd_bl_color2_bright, NUM_SHADES, NUM_SHADES);
 #endif
     } else {
         sdl_set_gradient(lcd_surface, &lcd_color_dark,
-                         &lcd_color_bright, 0, GRADIENT_MAX+1);
+                         &lcd_color_bright, 0, NUM_SHADES);
 #ifdef HAVE_LCD_SPLIT
         sdl_set_gradient(lcd_surface, &lcd_color2_dark,
-                         &lcd_color2_bright, GRADIENT_MAX+1, GRADIENT_MAX+1);
+                         &lcd_color2_bright, NUM_SHADES, NUM_SHADES);
 #endif
     }
     sdl_gui_update(lcd_surface, 0, 0, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
@@ -162,17 +162,17 @@ void sim_lcd_init(void)
 #if LCD_DEPTH <= 8
 #ifdef HAVE_BACKLIGHT
     sdl_set_gradient(lcd_surface, &lcd_bl_color_dark,
-                     &lcd_bl_color_bright, 0, GRADIENT_MAX+1);
+                     &lcd_bl_color_bright, 0, NUM_SHADES);
 #ifdef HAVE_LCD_SPLIT
     sdl_set_gradient(lcd_surface, &lcd_bl_color2_dark,
-                     &lcd_bl_color2_bright, GRADIENT_MAX+1, GRADIENT_MAX+1);
+                     &lcd_bl_color2_bright, NUM_SHADES, NUM_SHADES);
 #endif
 #else /* !HAVE_BACKLIGHT */
     sdl_set_gradient(lcd_surface, &lcd_color_dark,
-                     &lcd_color_bright, 0, GRADIENT_MAX+1);
+                     &lcd_color_bright, 0, NUM_SHADES);
 #ifdef HAVE_LCD_SPLIT
     sdl_set_gradient(lcd_surface, &lcd_color2_dark,
-                     &lcd_color2_bright, GRADIENT_MAX+1, GRADIENT_MAX+1);
+                     &lcd_color2_bright, NUM_SHADES, NUM_SHADES);
 #endif
 #endif /* !HAVE_BACKLIGHT */
 #endif /* LCD_DEPTH < 8 */
