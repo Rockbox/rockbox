@@ -63,7 +63,16 @@ SDL_Color lcd_color2_bright = {RED_CMP(LCD_BRIGHTCOLOR_2),
 #else
 #define NUM_SHADES    129
 #endif
-#endif /* LCD_DEPTH <= 8 */
+
+#else /* LCD_DEPTH > 8 */
+
+#ifdef HAVE_TRANSFLECTIVE_LCD
+#define BACKLIGHT_OFF_ALPHA 85 /* 1/3 brightness */
+#else
+#define BACKLIGHT_OFF_ALPHA 0  /* pitch black */
+#endif
+
+#endif /* LCD_DEPTH */
 
 #if LCD_DEPTH < 8
 unsigned long (*lcd_ex_getpixel)(int, int) = NULL;
@@ -135,12 +144,17 @@ void sim_backlight(int value)
                          &lcd_color2_bright, NUM_SHADES, NUM_SHADES);
 #endif
     }
+#else /* LCD_DEPTH > 8 */
+    if (value > 0) {
+        SDL_SetAlpha(lcd_surface, 0, SDL_ALPHA_OPAQUE); /* full on */
+    } else {
+        SDL_SetAlpha(lcd_surface, SDL_SRCALPHA, BACKLIGHT_OFF_ALPHA);
+    }
+#endif /* LCD_DEPTH */
+
     sdl_gui_update(lcd_surface, 0, 0, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
                    SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
                    background ? UI_LCD_POSX : 0, background? UI_LCD_POSY : 0);
-#else /* LCD_DEPTH > 8 */
-    (void)value; /* not yet simulated */
-#endif /* LCD_DEPTH */
 }
 #endif /* HAVE_BACKLIGHT */
 
@@ -153,7 +167,7 @@ void sim_lcd_init(void)
                                        SIM_LCD_HEIGHT * display_zoom,
                                        LCD_DEPTH, 0, 0, 0, 0);
 #else
-    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, 
+    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
                                        SIM_LCD_WIDTH * display_zoom,
                                        SIM_LCD_HEIGHT * display_zoom,
                                        8, 0, 0, 0, 0);

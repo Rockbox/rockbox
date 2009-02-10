@@ -90,6 +90,9 @@ void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
     SDL_Rect dest= {(ui_x + x_start) * display_zoom, (ui_y + y_start) * display_zoom,
                     xmax * display_zoom, ymax * display_zoom};
 
+    if (surface->flags & SDL_SRCALPHA) /* alpha needs a black background */
+        SDL_FillRect(gui_surface, &dest, 0);
+
     SDL_BlitSurface(surface, &src, gui_surface, &dest);
 
     SDL_Flip(gui_surface);
