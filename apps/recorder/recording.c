@@ -77,6 +77,7 @@
 #include "sound_menu.h"
 #include "viewport.h"
 #include "list.h"
+#include "general.h"
 
 #ifdef HAVE_RECORDING
 /* This array holds the record timer interval lengths, in seconds */

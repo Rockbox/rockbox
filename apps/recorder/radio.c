@@ -34,6 +34,7 @@
 #include "mp3_playback.h"
 #include "ctype.h"
 #include "file.h"
+#include "general.h"
 #include "errno.h"
 #include "string.h"
 #include "system.h"

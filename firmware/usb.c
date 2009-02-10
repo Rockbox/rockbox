@@ -42,7 +42,8 @@
 #ifdef HAVE_USBSTACK
 #include "usb_core.h"
 #endif
-#include "logf.h"
+#include "logf.h"  
+#include "screendump.h"
 
 /* Conditions under which we want the entire driver */
 #if !defined(BOOTLOADER) || (CONFIG_CPU == SH7034) || \
@@ -55,11 +56,6 @@
 
 #ifdef HAVE_LCD_BITMAP
 bool do_screendump_instead_of_usb = false;
-#if defined(USB_FULL_INIT) && defined(BOOTLOADER)
-static void screen_dump(void) {}
-#else
-void screen_dump(void);   /* Nasty again. Defined in apps/ too */
-#endif
 #endif
 
 #if !defined(SIMULATOR) && !defined(USB_NONE)
@@ -262,6 +258,9 @@ static void usb_thread(void)
                 {
                     usb_state = USB_SCREENDUMP;
                     screen_dump();
+#ifdef HAVE_REMOTE_LCD
+                    remote_screen_dump();
+#endif
                     break;
                 }
 #endif

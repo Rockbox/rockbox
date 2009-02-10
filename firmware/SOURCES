@@ -2,6 +2,7 @@ ata_idle_notify.c
 events.c
 backlight.c
 buffer.c
+general.c
 powermgmt.c
 system.c
 usb.c
@@ -73,6 +74,9 @@ font_cache.c
 font.c
 hangul.c
 lru.c
+#ifndef BOOTLOADER
+screendump.c
+#endif
 #if LCD_DEPTH == 1
 drivers/lcd-1bit-vert.c
 #elif LCD_DEPTH == 2
@@ -201,7 +205,6 @@ sound.c
 #if CONFIG_CODEC == SWCODEC
 
 #ifndef BOOTLOADER
-general.c
 pcm_sampr.c
 pcm.c
 #ifdef HAVE_RECORDING

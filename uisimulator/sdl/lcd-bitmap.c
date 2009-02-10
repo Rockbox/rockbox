@@ -22,7 +22,7 @@
 #include "debug.h"
 #include "uisdl.h"
 #include "lcd-sdl.h"
-#include "misc.h"
+#include "screendump.h"
 
 SDL_Surface* lcd_surface;
 
@@ -166,14 +166,12 @@ void sim_lcd_init(void)
                                        SIM_LCD_WIDTH * display_zoom,
                                        SIM_LCD_HEIGHT * display_zoom,
                                        LCD_DEPTH, 0, 0, 0, 0);
-#else
+#elif LCD_DEPTH <= 8
     lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
                                        SIM_LCD_WIDTH * display_zoom,
                                        SIM_LCD_HEIGHT * display_zoom,
                                        8, 0, 0, 0, 0);
-#endif
 
-#if LCD_DEPTH <= 8
 #ifdef HAVE_BACKLIGHT
     sdl_set_gradient(lcd_surface, &lcd_bl_color_dark,
                      &lcd_bl_color_bright, 0, NUM_SHADES);
@@ -189,7 +187,7 @@ void sim_lcd_init(void)
                      &lcd_color2_bright, NUM_SHADES, NUM_SHADES);
 #endif
 #endif /* !HAVE_BACKLIGHT */
-#endif /* LCD_DEPTH < 8 */
+#endif /* LCD_DEPTH */
 }
 
 #if LCD_DEPTH < 8

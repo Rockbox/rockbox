@@ -22,7 +22,7 @@
 #include "uisdl.h"
 #include "lcd-sdl.h"
 #include "lcd-remote-bitmap.h"
-#include "misc.h"
+#include "screendump.h"
 
 SDL_Surface *remote_surface;
 
@@ -39,7 +39,7 @@ SDL_Color remote_color_bright  = {RED_CMP(LCD_REMOTE_BRIGHTCOLOR),
                                   GREEN_CMP(LCD_REMOTE_BRIGHTCOLOR),
                                   BLUE_CMP(LCD_REMOTE_BRIGHTCOLOR), 0};
 
-#define GRADIENT_MAX    128
+#define NUM_SHADES  129
 
 #if LCD_REMOTE_DEPTH == 2
 /* Only defined for positive, non-split LCD for now */
@@ -49,7 +49,7 @@ static const unsigned char colorindex[4] = {128, 85, 43, 0};
 static unsigned long get_lcd_remote_pixel(int x, int y)
 {
 #if LCD_REMOTE_DEPTH == 1
-    return lcd_remote_framebuffer[y/8][x] & (1 << (y & 7)) ? 0 : GRADIENT_MAX;
+    return lcd_remote_framebuffer[y/8][x] & (1 << (y & 7)) ? 0 : (NUM_SHADES-1);
 #elif LCD_REMOTE_DEPTH == 2
 #if LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED
     unsigned bits = (lcd_remote_framebuffer[y/8][x] >> (y & 7)) & 0x0101;
@@ -76,10 +76,10 @@ void sim_remote_backlight(int value)
 {
     if (value > 0) {
         sdl_set_gradient(remote_surface, &remote_bl_color_dark,
-                         &remote_bl_color_bright, 0, GRADIENT_MAX+1);
+                         &remote_bl_color_bright, 0, NUM_SHADES);
     } else {
         sdl_set_gradient(remote_surface, &remote_color_dark,
-                         &remote_color_bright, 0, GRADIENT_MAX+1);
+                         &remote_color_bright, 0, NUM_SHADES);
     }
 
     sdl_gui_update(remote_surface, 0, 0, LCD_REMOTE_WIDTH, LCD_REMOTE_HEIGHT,
@@ -97,6 +97,6 @@ void sim_lcd_remote_init(void)
                                           8, 0, 0, 0, 0);
 
     sdl_set_gradient(remote_surface, &remote_bl_color_dark,
-                     &remote_bl_color_bright, 0, GRADIENT_MAX+1);
+                     &remote_bl_color_bright, 0, NUM_SHADES);
 }
 

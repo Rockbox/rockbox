@@ -77,6 +77,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "timer.h"
 #include "playlist.h"
 #ifdef HAVE_LCD_BITMAP
+#include "screendump.h"
 #include "scrollbar.h"
 #include "../recorder/bmp.h"
 #endif

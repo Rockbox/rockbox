@@ -718,11 +718,8 @@ void grey_deferred_lcd_update(void)
 #define BMP_BPP         8
 #define BMP_LINESIZE    ((LCD_WIDTH + 3) & ~3)
 #define BMP_HEADERSIZE  (54 + 4 * BMP_NUMCOLORS)
-#define BMP_DATASIZE    (BMP_LINESIZE * LCD_HEIGHT)
+#define BMP_DATASIZE    (BMP_LINESIZE * (LCD_HEIGHT+LCD_SPLIT_LINES))
 #define BMP_TOTALSIZE   (BMP_HEADERSIZE + BMP_DATASIZE)
-
-#define LE16_CONST(x) (x)&0xff, ((x)>>8)&0xff
-#define LE32_CONST(x) (x)&0xff, ((x)>>8)&0xff, ((x)>>16)&0xff, ((x)>>24)&0xff
 
 static const unsigned char bmpheader[] =
 {

@@ -35,6 +35,7 @@
 #include "timer.h"
 #include "backlight.h"
 #include "lcd.h"
+#include "screendump.h"
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -57,9 +58,6 @@ int backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
 #include "backlight-sw-fading.h"
 #endif
 #ifdef SIMULATOR
-/* TODO: find a better way to do it but we need a kernel thread somewhere to
-   handle this */
-extern void screen_dump(void);
 
 static inline void _backlight_on(void)
 {
@@ -600,9 +598,13 @@ void backlight_thread(void)
 #endif /* HAVE_REMOTE_LCD/ HAVE_REMOTE_LCD_AS_MAIN */
 #endif /* !SIMULATOR */
 #ifdef SIMULATOR
-            /* This one here too for lack of a better place */
+            /* TODO: find a better way to do it but we need
+             * a kernel thread somewhere to handle this */
             case SYS_SCREENDUMP:
                 screen_dump();
+#ifdef HAVE_REMOTE_LCD
+                remote_screen_dump();
+#endif
                 break;
 #endif
             case SYS_USB_CONNECTED:

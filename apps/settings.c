@@ -43,6 +43,7 @@
 #include "ctype.h"
 #include "file.h"
 #include "system.h"
+#include "general.h"
 #include "misc.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"

@@ -18,11 +18,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <limits.h>
-#include "system.h"
+
 #include "config.h"
 #include "general.h"
 
+#include "dir.h"
+#include "limits.h"
+#include "sprintf.h"
+#include "stdlib.h"
+#include "string.h"
+#include "system.h"
+#include "time.h"
+#include "timefuncs.h"
+
+#if CONFIG_CODEC == SWCODEC
 int round_value_to_list32(unsigned long value,
                           const unsigned long list[],
                           int count,
@@ -78,3 +87,107 @@ int make_list_from_caps32(unsigned long src_mask,
 
     return count;
 } /* make_list_from_caps32 */
+#endif /* CONFIG_CODEC == SWCODEC */
+
+/* Create a filename with a number part in a way that the number is 1
+ * higher than the highest numbered file matching the same pattern.
+ * It is allowed that buffer and path point to the same memory location,
+ * saving a strcpy(). Path must always be given without trailing slash.
+ * "num" can point to an int specifying the number to use or NULL or a value
+ * less than zero to number automatically. The final number used will also
+ * be returned in *num. If *num is >= 0 then *num will be incremented by
+ * one. */
+char *create_numbered_filename(char *buffer, const char *path,
+                               const char *prefix, const char *suffix,
+                               int numberlen IF_CNFN_NUM_(, int *num))
+{
+    DIR *dir;
+    struct dirent *entry;
+    int max_num;
+    int pathlen;
+    int prefixlen = strlen(prefix);
+    char fmtstring[12];
+
+    if (buffer != path)
+        strncpy(buffer, path, MAX_PATH);
+
+    pathlen = strlen(buffer);
+
+#ifdef IF_CNFN_NUM
+    if (num && *num >= 0)
+    {
+        /* number specified */
+        max_num = *num;
+    }
+    else
+#endif
+    {
+        /* automatic numbering */
+        max_num = 0;
+
+    dir = opendir(pathlen ? buffer : "/");
+    if (!dir)
+        return NULL;
+
+    while ((entry = readdir(dir)))
+    {
+        int curr_num;
+
+        if (strncasecmp((char *)entry->d_name, prefix, prefixlen)
+            || strcasecmp((char *)entry->d_name + prefixlen + numberlen, suffix))
+            continue;
+
+        curr_num = atoi((char *)entry->d_name + prefixlen);
+        if (curr_num > max_num)
+            max_num = curr_num;
+    }
+
+    closedir(dir);
+    }
+
+    max_num++;
+
+    snprintf(fmtstring, sizeof(fmtstring), "/%%s%%0%dd%%s", numberlen);
+    snprintf(buffer + pathlen, MAX_PATH - pathlen, fmtstring, prefix,
+             max_num, suffix);
+
+#ifdef IF_CNFN_NUM
+    if (num)
+        *num = max_num;
+#endif
+
+    return buffer;
+}
+
+
+#if CONFIG_RTC
+/* Create a filename with a date+time part.
+   It is allowed that buffer and path point to the same memory location,
+   saving a strcpy(). Path must always be given without trailing slash.
+   unique_time as true makes the function wait until the current time has
+   changed. */
+char *create_datetime_filename(char *buffer, const char *path,
+                               const char *prefix, const char *suffix,
+                               bool unique_time)
+{
+    struct tm *tm = get_time();
+    static struct tm last_tm;
+    int pathlen;
+
+    while (unique_time && !memcmp(get_time(), &last_tm, sizeof (struct tm)))
+        sleep(HZ/10);
+
+    last_tm = *tm;
+
+    if (buffer != path)
+        strncpy(buffer, path, MAX_PATH);
+
+    pathlen = strlen(buffer);
+    snprintf(buffer + pathlen, MAX_PATH - pathlen,
+             "/%s%02d%02d%02d-%02d%02d%02d%s", prefix,
+             tm->tm_year % 100, tm->tm_mon + 1, tm->tm_mday,
+             tm->tm_hour, tm->tm_min, tm->tm_sec, suffix);
+
+    return buffer;
+}
+#endif /* CONFIG_RTC */

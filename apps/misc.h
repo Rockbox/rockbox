@@ -33,27 +33,6 @@
 char *output_dyn_value(char *buf, int buf_size, int value,
                       const unsigned char **units, bool bin_scale);
 
-/* Create a filename with a number part in a way that the number is 1
- * higher than the highest numbered file matching the same pattern.
- * It is allowed that buffer and path point to the same memory location,
- * saving a strcpy(). Path must always be given without trailing slash.
- *
- * "num" can point to an int specifying the number to use or NULL or a value
- * less than zero to number automatically. The final number used will also
- * be returned in *num. If *num is >= 0 then *num will be incremented by
- * one. */
-#if defined(HAVE_RECORDING) && (CONFIG_RTC == 0)
-/* this feature is needed by recording without a RTC to prevent disk access
-   when changing files */
-#define IF_CNFN_NUM_(...) __VA_ARGS__
-#define IF_CNFN_NUM
-#else
-#define IF_CNFN_NUM_(...)
-#endif
-char *create_numbered_filename(char *buffer, const char *path, 
-                               const char *prefix, const char *suffix,
-                               int numberlen IF_CNFN_NUM_(, int *num));
-
 /* Format time into buf.
  *
  * buf      - buffer to format to.
@@ -61,17 +40,6 @@ char *create_numbered_filename(char *buffer, const char *path,
  * t        - time to format, in milliseconds.
  */
 void format_time(char* buf, int buf_size, long t);
-
-#if CONFIG_RTC
-/* Create a filename with a date+time part.
-   It is allowed that buffer and path point to the same memory location,
-   saving a strcpy(). Path must always be given without trailing slash.
-   unique_time as true makes the function wait until the current time has
-   changed. */
-char *create_datetime_filename(char *buffer, const char *path,
-                               const char *prefix, const char *suffix,
-                               bool unique_time);
-#endif /* CONFIG_RTC */
 
 /* Ask the user if they really want to erase the current dynamic playlist
  * returns true if the playlist should be replaced */
@@ -86,24 +54,6 @@ bool warn_on_pl_erase(void);
 int read_line(int fd, char* buffer, int buffer_size);
 int fast_readline(int fd, char *buf, int buf_size, void *parameters,
                   int (*callback)(int n, const char *buf, void *parameters));
-
-#ifdef HAVE_LCD_BITMAP
-/* Save a .BMP file containing the current screen contents. */
-void screen_dump(void);
-void screen_dump_set_hook(void (*hook)(int fh));
-#endif
-
-/* Make BMP colour map entries from R, G, B triples, without and with blending.
- * Not within HAVE_LCD_BITMAP because it is also used for the Player sim */
-#define RED_CMP(c)   (((c) >> 16) & 0xff)
-#define GREEN_CMP(c) (((c) >> 8) & 0xff)
-#define BLUE_CMP(c)  ((c) & 0xff)
-
-#define BMP_COLOR(c)  BLUE_CMP(c), GREEN_CMP(c), RED_CMP(c), 0
-#define BMP_COLOR_MIX(c1, c2, num, den) \
-        (BLUE_CMP(c2)  - BLUE_CMP(c1))  * (num) / (den) + BLUE_CMP(c1),  \
-        (GREEN_CMP(c2) - GREEN_CMP(c1)) * (num) / (den) + GREEN_CMP(c1), \
-        (RED_CMP(c2)   - RED_CMP(c1))   * (num) / (den) + RED_CMP(c1),   0
 
 bool settings_parseline(char* line, char** name, char** value);
 long default_event_handler_ex(long event, void (*callback)(void *), void *parameter);
