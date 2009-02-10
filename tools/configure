@@ -258,7 +258,10 @@ arm7tdmicc () {
 
 arm9tdmicc () {
  prefixtools arm-elf-
- GCCOPTS="$CCOPTS -mcpu=arm9tdmi -mlong-calls"
+ GCCOPTS="$CCOPTS -mcpu=arm9tdmi"
+ if test "$modelname" != "gigabeatf"; then
+  GCCOPTS="$GCCOPTS -mlong-calls"
+ fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
  gccchoice="4.0.3"
@@ -290,7 +293,10 @@ arm926ejscc () {
 
 arm1136jfscc () {
  prefixtools arm-elf-
- GCCOPTS="$CCOPTS -mcpu=arm1136jf-s -mlong-calls"
+ GCCOPTS="$CCOPTS -mcpu=arm1136jf-s"
+ if test "$modelname" != "gigabeats"; then
+  GCCOPTS="$GCCOPTS -mlong-calls"
+ fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
  gccchoice="4.0.3"
