@@ -91,16 +91,18 @@ SECTIONS
     } AT> DRAM
 
     _vectorscopy = LOADADDR(.vectors);
-
-    .stack :
+    
+    .stack (NOLOAD) :
     {
        *(.stack)
        stackbegin = .;
        . += 0x2000;
        stackend = .;
     } > DRAM
+    
+    _sdmacodecopy = stackbegin;
 
-    .bss :
+    .bss (NOLOAD) :
     {
        _edata = .;
         *(.bss*)
@@ -110,28 +112,36 @@ SECTIONS
        _end = .;
     } > DRAM
 
-    .audiobuf ALIGN(4) :
+    .audiobuf (NOLOAD) :
     {
+    	. = ALIGN(0x4);
         _audiobuffer = .;
         audiobuffer = .;
     } > DRAM
 
-    .audiobufend ENDAUDIOADDR:
+    .audiobufend ENDAUDIOADDR (NOLOAD) :
     {
         audiobufend = .;
         _audiobufend = .;
     } > DRAM
 
-    .codec ENDAUDIOADDR:
+    .codec ENDAUDIOADDR (NOLOAD) :
     {
         codecbuf = .;
         _codecbuf = .;
     }
 
-    .plugin ENDADDR:
+    .plugin ENDADDR (NOLOAD) :
     {
         _pluginbuf = .;
         pluginbuf = .;
+    }
+    
+    .sdma _pluginbuf : AT( _sdmacodecopy )
+    {
+    	_sdmacodestart = .;
+    	*(.sdmacode);
+    	_sdmacodeend = .;
     }
     
     .devbss (NOLOAD) :

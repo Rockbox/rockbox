@@ -231,6 +231,26 @@ remap_end:
     bhi     1b
 #endif /* BOOTLOADER */
 
+#ifndef BOOTLOADER
+    /* Copy discardable SDMA code - loaded in the stack section
+     * and so must be done first. Destination is the plugin buffer
+     * which is safe when SDMA init takes place just after kernel
+     * init. */
+    ldr     r4, =_sdmacodecopy
+    ldr     r3, =_sdmacodeend
+    ldr     r2, =_sdmacodestart
+1:
+    cmp     r3, r2
+    ldrhi   r5, [r4], #4
+    strhi   r5, [r2], #4
+    bhi     1b
+
+    /* Make buffer coherent */
+    ldr     r0, =_sdmacodestart
+    sub     r1, r3, r0
+    bl      clean_dcache_range
+#endif /* BOOTLOADER */
+
     /* Initialise bss section to zero */
     ldr     r2, =_edata
     ldr     r3, =_end

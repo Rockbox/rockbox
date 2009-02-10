@@ -356,7 +356,8 @@
 /*!
  * Code download for i.MX system revision = 1.0
  */
-static __attribute__((aligned(4))) const short sdma_code_1[RAM_CODE_SIZE_1] =
+static __attribute__((aligned(4), section(".sdmacode")))
+    const short sdma_code_1[RAM_CODE_SIZE_1] =
 {
 	0xc0ec, 0x7d59, 0x0970, 0x0111, 0x5111, 0x5ad1, 0x5bd9, 0xc0fe,
 	0x5ce1, 0x7d02, 0x0200, 0x9806, 0x08ff, 0x0011, 0x28ff, 0x00bc,
@@ -851,7 +852,8 @@ static __attribute__((aligned(4))) const short sdma_code_1[RAM_CODE_SIZE_1] =
 /*!
  * Code download for i.MX system revision > 1.0
  */
-static __attribute__((aligned(4))) const short sdma_code_2[RAM_CODE_SIZE_2] =
+static __attribute__((aligned(4), section(".sdmacode")))
+    const short sdma_code_2[RAM_CODE_SIZE_2] =
 {
     0x0870, 0x0011, 0x5010, 0xc0ec, 0x7d61, 0x5ac0, 0x5bc8, 0x5ef8,
     0xc0fe, 0x56f8, 0x7d02, 0x0200, 0x9806, 0x6ec3, 0x6d07, 0x5df0,
