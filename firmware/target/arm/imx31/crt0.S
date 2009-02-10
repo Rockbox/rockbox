@@ -43,21 +43,19 @@ start:
  *
  */
 
-/* Initially this code is running at VA 0x8a000000 (PA 0x82000000).
- * The mapping stub is copied to IRAM (0x1fffc000) and jumps to the final
- * VA remapping starting at 0x01f00000 because the 1MB section containing
- * the framebuffer at PA 0x81000000 is skipped in the remapping giving 63MB
- * of contiguous RAM for the firmware. The TTB is placed at the end of said
- * section.
+/* Bootloader:
+ * Initially this code is running at VA 0x8a000000 (PA 0x82000000).
+ * The mapping stub is copied to IRAM (0x1fffc000), sets up the MMU and
+ * jumps into the final VA remapping starting at 0x02000000 (32MB).
  *
- * For now this will be done in bootloader, especially if usb will be needed
- * within the bootloader to load the main firmware file. Interrupts will be
- * needed for this (whether they be swi or irq).
+ * Firmware:
+ * This code will be running from VA 0x00000000 (PA 0x80000000) and perform
+ * similar steps to the bootloader code.
  */
 newstart:
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
 
-    adr     r2, remap_start    /* Load PC-relative labels */
+    adr     r2, remap_start    /* Load PC-relative labels (relocatable) */
     adr     r3, remap_end
     ldr     r5, =TTB_BASE_ADDR /* TTB pointer */
     ldr     r6, =IRAM_BASE_ADDR
