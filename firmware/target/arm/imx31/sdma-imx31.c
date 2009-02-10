@@ -441,7 +441,7 @@ static void set_channel_ownership(unsigned int channel, unsigned int config)
 
 static bool setup_channel(struct channel_control_block *ccb_p)
 {
-    static struct context_data context_buffer DEVBSS_ATTR;
+    struct context_data context_buffer;
     struct channel_descriptor *cd_p;
     unsigned int channel_cfg;
     unsigned int channel;
