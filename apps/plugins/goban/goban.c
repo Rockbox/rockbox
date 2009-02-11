@@ -236,9 +236,6 @@ enum plugin_status
 plugin_start (const void *parameter)
 {
     int btn;
-    int temp;
-
-    (void) temp;
 
     rb->mkdir ("/sgf");
 
@@ -496,6 +493,8 @@ plugin_start (const void *parameter)
 #if defined(GBN_BUTTON_NEXT_VAR)
         case GBN_BUTTON_NEXT_VAR:
         case GBN_BUTTON_NEXT_VAR | BUTTON_REPEAT:
+        {
+            int temp;
             if ((temp = next_variation_sgf ()) >= 0)
             {
                 draw_screen_display ();
@@ -512,6 +511,7 @@ plugin_start (const void *parameter)
                 draw_screen_display ();
             }
             break;
+        }
 #endif
 
         case BUTTON_NONE:
