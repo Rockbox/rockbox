@@ -1,0 +1,243 @@
+\subsection{Goban}
+\screenshot{plugins/images/ss-goban}{Goban}{The Rockbox Goban plugin}
+Goban is a a plugin for playing, viewing and recording games of Go (also known
+as Weiqi, Baduk, Igo and Goe).  It uses standard Smart Game Format (SGF) files
+for saving and loading games.
+
+You can find a short introduction to Go at
+\url{http://senseis.xmp.net/?WhatIsGo} and more information about SGF files
+can be read at \url{http://senseis.xmp.net/?SmartGameFormat} or the SGF
+specification at
+\url{http://www.red-bean.com/sgf/}.
+
+This plugin can load all modern SGF files (file format 3 or 4) with few problems.
+It attempts to preserve SGF properties which it doesn't understand, and most common
+SGF properties are handled fully.  It is possible to view (and edit if you like)
+Kogo's Joseki Dictionary (\url{http://waterfire.us/joseki.htm}) with this plugin,
+although the load and save times can be on the order of a minute or two on
+particularly slow devices.  Large SGF files may stop audio playback for the duration
+of the plugin's run in order to free up more memory and some very large SGF files will
+not even load on devices with little available memory.
+
+\emph{Note: } The plugin does \emph{NOT} support SGF files with multiple games in
+one file.  These are rare, but if you have one don't even try it (the file will most
+likely be corrupted if you save over it).  You have been warned.
+
+The file \fname {"/sgf/gbn\_def.sgf"} is used by the plugin to store any unsaved
+changes in the most recently loaded game.  This means that if you forget to save your
+changes, you should load \fname {"/sgf/gbn\_def.sgf"} immediately to offload the changes
+to another file.  If you load another file first then your changes will be lost
+permanently.  The \fname {"/sgf/gbn\_def.sgf"} file is also the file loaded if another
+is not selected.
+
+The information panel which displays the current move number may also contain
+these markers: \\
+\begin{tabularx}{\textwidth}{lX}\toprule
+\textbf{Mark} & \textbf{Meaning} \\ \midrule
+    \emph{+ } & There are nodes after the current node in the SGF tree. \\
+    \emph{* } & There are sibling variations which can be navigated to using the %
+    \emph{Next Variation} menu option of the \emph{Context Menu}%
+    \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD,RECORDER_PAD,%
+         MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,%
+         IRIVER_H300_PAD}{ or the %
+         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}{\ButtonRec}%
+         \opt{RECORDER_PAD}{\ButtonOn}%
+         \opt{MROBE100_PAD}{\ButtonPower}%
+         \opt{GIGABEAT_PAD}{\ButtonA}%
+         \opt{GIGABEAT_S_PAD}{\ButtonPlay}%
+         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec} button}. \\
+    \emph{C } & There is a comment at the current node.  It can be viewed/edited using
+                the \emph{Add/Edit Comment} menu option of the \emph{Context Menu}. \\
+\bottomrule
+\end{tabularx}
+
+\subsection{Controls}
+\begin{table}
+    \begin{btnmap}{}{}
+    \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,%
+         GIGABEAT_S_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,%
+         IAUDIO_X5_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonUp}%
+        \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}%
+        \opt{IRIVER_H10_PAD}{\ButtonScrollUp} & Move cursor up \\
+    \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,
+         IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,IAUDIO_X5_PAD,RECORDER_PAD,
+         ONDIO_PAD}{\ButtonDown}%
+        \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonPlay}%
+        \opt{IRIVER_H10_PAD}{\ButtonScrollDown} & Move cursor down \\
+    \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,%
+         SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H10_PAD,IRIVER_H100_PAD,%
+         IRIVER_H300_PAD,MROBE100_PAD,IAUDIO_X5_PAD,RECORDER_PAD,%
+         ONDIO_PAD}{\ButtonLeft} & Move cursor left %
+            \opt{ONDIO_PAD}{if in \emph{board} navigation mode, or %
+                            retreat one node in the game tree if in %
+                            \emph{tree} navigation mode} \\
+    \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,%
+         SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H10_PAD,IRIVER_H100_PAD,%
+         IRIVER_H300_PAD,MROBE100_PAD,IAUDIO_X5_PAD,RECORDER_PAD,%
+         ONDIO_PAD}{\ButtonRight} & Move cursor right
+            \opt{ONDIO_PAD}{if in \emph{board} navigation mode, or advance one node in
+                            the game tree if in \emph{tree} navigation mode} \\
+    \opt{ONDIO_PAD}{{\ButtonOff} & Toggle between \emph{board} and \emph{tree}
+                                   navigation modes \\}
+    \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,%
+         SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,%
+         MROBE100_PAD,IAUDIO_X5_PAD}{\ButtonSelect}%
+        \opt{IRIVER_H10_PAD,RECORDER_PAD}{\ButtonPlay}%
+        \opt{ONDIO_PAD}{\ButtonMenu} & Play a move (or use a tool if play-mode has
+                                       been changed). \\
+    \nopt{ONDIO_PAD}{
+        \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_1G2G_PAD,IPOD_3G_PAD,%
+             IPOD_4G_PAD}{\ButtonScrollBack}%
+            \opt{SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonVolDown}%
+            \opt{IRIVER_H10_PAD}{\ButtonFF}%
+            \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}%
+            \opt{MROBE100_PAD}{\ButtonMenu}%
+            \opt{IAUDIO_X5_PAD}{\ButtonPlay}%
+            \opt{RECORDER_PAD}{\ButtonFOne} & Retreat one node in the game tree \\
+        \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,%
+             IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonScrollFwd}%
+            \opt{SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonVolUp}%
+            \opt{IRIVER_H10_PAD}{\ButtonRew}%
+            \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
+            \opt{MROBE100_PAD}{\ButtonPlay}%
+            \opt{IAUDIO_X5_PAD}{\ButtonRec}%
+            \opt{RECORDER_PAD}{\ButtonFThree} & Advance one node in the game tree \\ }
+    \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,IRIVER_H10_PAD,%
+         IAUDIO_X5_PAD}{\ButtonPower}%
+        \opt{MROBE100_PAD}{\ButtonDisplay}%
+        \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{Long \ButtonSelect}%
+        \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonMenu}%
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}%
+        \opt{RECORDER_PAD}{\ButtonFTwo}%
+        \opt{ONDIO_PAD}{Long \ButtonMenu} & Main Menu \\
+    \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,%
+         IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,IAUDIO_X5_PAD,%
+         IRIVER_H10_PAD}{%
+        \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,%
+             GIGABEAT_S_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,%
+             IAUDIO_X5_PAD}{Long \ButtonSelect}%
+            \opt{IRIVER_H10_PAD}{Long \ButtonPlay} & Context Menu \\ }
+    \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD,RECORDER_PAD,MROBE100_PAD,%
+         GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{%
+        \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonRec}%
+        \opt{SANSA_C200_PAD}{\ButtonRec}%
+        \opt{RECORDER_PAD}{\ButtonOn}%
+        \opt{MROBE100_PAD}{\ButtonPower}%
+        \opt{GIGABEAT_PAD}{\ButtonA}%
+        \opt{GIGABEAT_S_PAD}{\ButtonPlay}%
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec} & Go to the next variation %
+                                                            when at the first node in %
+                                                            a branch \\ }
+    \end{btnmap}
+\end{table}
+
+\subsection{Menus}
+\begin {description}
+\item [Main Menu. ]
+    The main menu for game setup and access to other menus.
+
+    \emph {New. } Create a new game with your choice of board size and handicaps. \\
+    \emph {Save. } Save the current state of the game.  It will be saved to
+    \fname {"/sgf/gbn\_def.sgf"} unless otherwise set. \\
+    \emph {Save As. } Save to a specified file. \\
+    \emph {Game Info. } View and modify the metadata of the current game. \\
+    \emph {Playback Control. } Control the playback of the current playlist and
+    modify the volume of your player. \\
+    \emph {Zoom Level. } Zoom in or out on the board.  If you set the zoom level, it
+    will be saved and used again the next time you open this plugin. \\
+    \emph {Options. } Open the Options Menu. \\
+    \emph {Context Menu. } Open the Context Menu which allows you to set play modes
+    and other tools. \\
+    \emph {Quit. } Leave the plugin.  Any unsaved changes are saved to
+    \fname {"/sgf/gbn\_def.sgf"}. \\
+
+\item [Game Info. ]
+    The menu for modifying game info (metadata) of the current game.  This
+    information will be saved to the SGF file and can be viewed in almost all
+    SGF readers.
+
+    \emph {Basic Info. } Shows a quick view of the basic game metadata, if any
+    has been set (otherwise does nothing).  This option does not allow editing. \\
+    \emph {Time Limit. } The time limit of the current game. \\
+    \emph {Overtime. } The overtime settings of the current game. \\
+    \emph {Result. } The result of the current game.  This text must follow the
+    format specified at \url{http://www.red-bean.com/sgf/properties.html#RE} to
+    be read by other SGF readers.  Some examples are \emph {B+R} (Black wins by
+    resignation), \emph {B+5.5} (Black wins by 5.5 points), \emph {W+T} (White wins
+    on Time). \\
+    \emph {Handicap. } The handicap of the current game. \\
+    \emph {Komi. } The komi of the current game (compensation to the white
+    player for black having the first move). \\
+    \emph {Ruleset. } The name of the ruleset in use for this game.  The \emph{NZ}
+    and \emph{GOE} rulesets include suicide as a legal move (for multi-stone
+    suicide only); the rest do not. \\
+    \emph {Black Player. } The name of the black player. \\
+    \emph {Black Rank. } Black's rank, in dan or kyu. \\
+    \emph {Black Team. } The name of black's team, if any. \\
+    \emph {White Player. } The name of the white player. \\
+    \emph {White Rank. }  White's rank, in dan or kyu. \\
+    \emph {White Team. } The name of white's team, if any. \\
+    \emph {Date. } The date that this game took place.  This text must follow the
+    format specified at \url{http://www.red-bean.com/sgf/properties.html#DT} to
+    be read by other SGF readers. \\
+    \emph {Event. } The name of the event which this game was a part of, if any.
+    \\
+    \emph {Place. } The place that this game took place. \\
+    \emph {Round. } If part of a tournament, the round number for this game. \\
+    \emph {Done. } Return to the previous menu. \\
+
+\item [Options. ]
+    Customize the behavior of the plugin in certain ways.
+
+    \emph {Show Child Variations? } Enable this to mark child variations on the board
+    if there are more than one.  Note: variations which don't start with a move are
+    not visible in this way. \\
+    \emph {Disable Idle Poweroff? } Enable this if you do not want the \dap{} to turn
+    off after a certain period of inactivity (depends on your global Rockbox
+    settings). \\
+    \emph {Idle Autosave Time. } Set the amount of idle time to wait before
+    automatically saving any unsaved changes.  These autosaves go to the file
+    \fname {"/sgf/gbn\_def.sgf"} regardless of if you have loaded a game or used
+    \emph {Save As} to save the game before or not.  Set to \emph {Off} to disable
+    this functionality completely. \\
+    \emph {Automatically Show Comments? } If this is enabled and you navigate to a
+    node containing game comments, they will automatically be displayed. \\
+
+\item [Context Menu. ]
+    The menu for choosing different play modes and tools, adding or editing
+    comments, adding pass moves, or switching between sibling variations.
+
+    \emph {Play Mode. } Play moves normally on the board.  If there are
+    child moves from the current node, this mode will let you follow variations
+    by simply playing the first move in the sequence.  Unless it is following a
+    variation, this mode will not allow you to play illegal moves.  This is the
+    default mode before another is set after loading a game or creating a new
+    one. \\
+    \emph {Add Black Mode. } Add black stones to the board as desired. These
+    stones are not moves and do not perform captures or count as ko threats. \\
+    \emph {Add White Mode. } Add white stones to the board as desired. These
+    stones are not moves and do not perform captures or count as ko threats. \\
+    \emph {Erase Stone Mode. } Remove stones from the board as desired.  These
+    removed stones are not counted as captured, they are simply removed. \\
+    \emph {Pass. } Play a single pass move.  This does not change the mode of
+    play. \\
+    \emph {Next Variation. } If the game is at the first move in a variation,
+    this will navigate to the next variation after the current one.  This is
+    the only way to reach variations which start with adding or removing
+    stones, as you cannot follow them by "playing" the same move. \\
+    \emph {Force Play Mode. } The same as Play Mode except that this mode will
+    allow you to play illegal moves such as retaking a ko immediately without a
+    ko threat, suicide on rulesets which don't allow it (including single stone
+    suicide), and playing a move where there is already a stone. \\
+    \emph {Mark Mode. } Add generic marks to the board, or remove them. \\
+    \emph {Circle Mode. } Add circle marks to the board, or remove them. \\
+    \emph {Square Mode. } Add square marks to the board, or remove them. \\
+    \emph {Triangle Mode. } Add triangle marks to the board, or remove them. \\
+    \emph {Label Mode. } Add one character labels to the board.  Each label
+    starts at the letter 'a' and each subsequent application of a label will
+    increment the letter.  To remove a label, click on it until it cycles
+    through the allowed letters and disappears. \\
+    \emph {Add/Edit Comment. } Add or edit a comment at the current node. \\
+    \emph {Done. } Go back to the previous screen. \\
+\end{description}
+
