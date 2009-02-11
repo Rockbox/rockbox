@@ -149,7 +149,7 @@ bool mpeg_alloc_init(unsigned char *buf, size_t mallocsize)
         return false;
     }
 
-    IF_COP(invalidate_icache());
+    IF_COP(rb->cpucache_invalidate());
     return true;
 }
 

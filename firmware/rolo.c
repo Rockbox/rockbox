@@ -75,7 +75,7 @@ void rolo_restart_cop(void)
     COP_INT_DIS = -1;
 
     /* Invalidate cache */
-    invalidate_icache();
+    cpucache_invalidate();
     
     /* Disable cache */
     CACHE_CTL = CACHE_CTL_DISABLE;
@@ -147,7 +147,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
     CPU_INT_DIS = -1;
 
     /* Flush cache */
-    flush_icache();
+    cpucache_flush();
 
     /* Disable cache */
     CACHE_CTL = CACHE_CTL_DISABLE;
@@ -174,7 +174,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
 
 #elif defined(CPU_TCC780X) || (CONFIG_CPU == S3C2440)
     /* Flush and invalidate caches */
-    invalidate_icache();
+    cpucache_invalidate();
 
     asm volatile(
         "mov   pc, %0            \n"

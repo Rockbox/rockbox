@@ -311,7 +311,7 @@ static void __attribute__((noreturn)) handle_firmware_load(void)
 
     if (rc == EOK)
     {
-        invalidate_icache();
+        cpucache_invalidate();
         asm volatile ("bx %0": : "r"(start_addr));
     }
 
@@ -332,7 +332,7 @@ void main(void)
     int rc;
 
     /* Flush and invalidate all caches (because vectors were written) */
-    invalidate_icache();
+    cpucache_invalidate();
 
     system_init();
     kernel_init();

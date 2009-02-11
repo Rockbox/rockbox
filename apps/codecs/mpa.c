@@ -268,7 +268,7 @@ static void mad_synth_thread_quit(void)
     die=1;
     ci->semaphore_release(&synth_pending_sem);
     ci->thread_wait(mad_synth_thread_id);
-    invalidate_icache();
+    ci->cpucache_invalidate();
 }
 #else
 static inline void mad_synth_thread_ready(void)

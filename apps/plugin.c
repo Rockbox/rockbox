@@ -327,9 +327,9 @@ static const struct plugin_api rockbox_api = {
     trigger_cpu_boost,
     cancel_cpu_boost,
 #endif
-#ifdef CACHE_FUNCTIONS_AS_CALL
-    flush_icache,
-    invalidate_icache,
+#if NUM_CORES > 1
+    cpucache_flush,
+    cpucache_invalidate,
 #endif
     timer_register,
     timer_unregister,
@@ -694,7 +694,7 @@ int plugin_load(const char* plugin, const void* parameter)
 #if NUM_CORES > 1
     /* Make sure COP cache is flushed and invalidated before loading */
     my_core = switch_core(CURRENT_CORE ^ 1);
-    invalidate_icache();
+    cpucache_invalidate();
     switch_core(my_core);
 #endif
 
@@ -742,7 +742,7 @@ int plugin_load(const char* plugin, const void* parameter)
     lcd_remote_update();
 #endif
 
-    invalidate_icache();
+    cpucache_invalidate();
     oldbars = viewportmanager_set_statusbar(VP_SB_HIDE_ALL);
 
     rc = hdr->entry_point(parameter);
@@ -854,7 +854,7 @@ void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
     memset(iramcopy, 0, iram_size);
 #if NUM_CORES > 1
     /* writeback cleared iedata and iramcopy areas */
-    flush_icache();
+    cpucache_flush();
 #endif
 }
 #endif /* PLUGIN_USE_IRAM */

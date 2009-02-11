@@ -57,34 +57,12 @@ void imx31_regclr32(volatile uint32_t *reg_p, uint32_t mask);
 
 #define KDEV_INIT
 
-#define HAVE_INVALIDATE_ICACHE
-static inline void invalidate_icache(void)
-{
-    asm volatile(
-        /* Clean and invalidate entire data cache */
-        "mcr p15, 0, %0, c7, c14, 0 \n"
-        /* Invalidate entire instruction cache
-         * Also flushes the branch target cache */
-        "mcr p15, 0, %0, c7, c5, 0  \n"
-        /* Data synchronization barrier */
-        "mcr p15, 0, %0, c7, c10, 4 \n"
-        /* Flush prefetch buffer */
-        "mcr p15, 0, %0, c7, c5, 4  \n"
-        : : "r"(0)
-    );
-}
+#define HAVE_CPUCACHE_INVALIDATE
+#define HAVE_CPUCACHE_FLUSH
 
-#define HAVE_FLUSH_ICACHE
-static inline void flush_icache(void)
-{
-    asm volatile (
-        /* Clean entire data cache */
-        "mcr p15, 0, %0, c7, c10, 0 \n"
-        /* Data synchronization barrier */
-        "mcr p15, 0, %0, c7, c10, 4 \n"
-        : : "r"(0)
-    );
-}
+/* Different internal names */
+#define cpucache_flush      clean_dcache
+#define cpucache_invalidate invalidate_idcache
 
 struct ARM_REGS {
 	int r0;

@@ -163,8 +163,7 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
    to extend the funtions to do alternate cache configurations. */
 
 #ifndef BOOTLOADER
-void flush_icache(void) ICODE_ATTR;
-void flush_icache(void)
+void ICODE_ATTR cpucache_flush(void)
 {
     if (CACHE_CTL & CACHE_CTL_ENABLE)
     {
@@ -173,8 +172,7 @@ void flush_icache(void)
     }
 }
 
-void invalidate_icache(void) ICODE_ATTR;
-void invalidate_icache(void)
+void ICODE_ATTR cpucache_invalidate(void)
 {
     if (CACHE_CTL & CACHE_CTL_ENABLE)
     {

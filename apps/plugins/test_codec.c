@@ -480,9 +480,9 @@ static void init_ci(void)
     ci.profile_func_exit = rb->profile_func_exit;
 #endif
 
-#ifdef CACHE_FUNCTIONS_AS_CALL
-    ci.invalidate_icache = invalidate_icache;
-    ci.flush_icache = flush_icache;
+#if NUM_CORES > 1
+    ci.cpucache_invalidate = rb->cpucache_invalidate;
+    ci.cpucache_flush = rb->cpucache_flush;
 #endif
 
 #if NUM_CORES > 1

@@ -265,6 +265,8 @@ void __attribute__((naked)) clean_dcache(void)
         /* Clean entire data cache */
         "mov    r0, #0                 \n"
         "mcr    p15, 0, r0, c7, c10, 0 \n"
+        /* Data synchronization barrier */
+        "mcr    p15, 0, r0, c7, c10, 4 \n"
         "bx     lr                     \n"
     );
 }
@@ -287,6 +289,34 @@ void clean_dcache(void)
             );
         }
     }
+}
+#endif
+
+#if CONFIG_CPU == IMX31L
+void invalidate_idcache(void)
+{
+    asm volatile(
+        /* Clean and invalidate entire data cache */
+        "mcr p15, 0, %0, c7, c14, 0 \n"
+        /* Invalidate entire instruction cache
+         * Also flushes the branch target cache */
+        "mcr p15, 0, %0, c7, c5, 0  \n"
+        /* Data synchronization barrier */
+        "mcr p15, 0, %0, c7, c10, 4 \n"
+        /* Flush prefetch buffer */
+        "mcr p15, 0, %0, c7, c5, 4  \n"
+        : : "r"(0)
+    );
+}
+#else
+void invalidate_idcache(void)
+{
+    clean_dcache();
+    asm volatile(
+        "mov r0, #0 \n"
+        "mcr p15, 0, r0, c7, c5, 0 \n"
+        : : : "r0"
+    );
 }
 #endif
 

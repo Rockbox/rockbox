@@ -524,7 +524,7 @@ static void video_thread_msg(struct video_thread_data *td)
             }
             else
             {
-                IF_COP(invalidate_icache());
+                IF_COP(rb->cpucache_invalidate());
                 vo_lock();
                 rb->lcd_update();
                 vo_unlock();
@@ -996,7 +996,7 @@ bool video_thread_init(void)
 {
     intptr_t rep;
 
-    IF_COP(flush_icache());
+    IF_COP(rb->cpucache_flush());
 
     video_str.hdr.q = &video_str_queue;
     rb->queue_init(video_str.hdr.q, false);
@@ -1014,7 +1014,7 @@ bool video_thread_init(void)
 
     /* Wait for thread to initialize */
     rep = str_send_msg(&video_str, STREAM_NULL, 0);
-    IF_COP(invalidate_icache());
+    IF_COP(rb->cpucache_invalidate());
 
     return rep == 0; /* Normally STREAM_NULL should be ignored */
 }
@@ -1026,7 +1026,7 @@ void video_thread_exit(void)
     {
         str_post_msg(&video_str, STREAM_QUIT, 0);
         rb->thread_wait(video_str.thread);
-        IF_COP(invalidate_icache());
+        IF_COP(rb->cpucache_invalidate());
         video_str.thread = 0;
     }
 }

@@ -62,8 +62,7 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
    some other CPU frequency scaling. */
 
 #ifndef BOOTLOADER
-void flush_icache(void) ICODE_ATTR;
-void flush_icache(void)
+void ICODE_ATTR cpucache_flush(void)
 {
     intptr_t b, e;
 
@@ -73,8 +72,7 @@ void flush_icache(void)
     }
 }
 
-void invalidate_icache(void) ICODE_ATTR;
-void invalidate_icache(void)
+void ICODE_ATTR cpucache_invalidate(void)
 {
     intptr_t b, e;
 

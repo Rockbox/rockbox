@@ -438,9 +438,9 @@ struct plugin_api {
     void (*trigger_cpu_boost)(void);
     void (*cancel_cpu_boost)(void);
 #endif
-#ifdef CACHE_FUNCTIONS_AS_CALL
-    void (*flush_icache)(void);
-    void (*invalidate_icache)(void);
+#if NUM_CORES > 1
+    void (*cpucache_flush)(void);
+    void (*cpucache_invalidate)(void);
 #endif
     bool (*timer_register)(int reg_prio, void (*unregister_callback)(void),
                            long cycles, int int_prio,
@@ -853,21 +853,6 @@ void plugin_tsr(bool (*exit_callback)(bool reenter));
 extern const struct plugin_api *rb;
 enum plugin_status plugin_start(const void* parameter)
     NO_PROF_ATTR;
-
-#undef CACHE_FUNCTION_WRAPPERS
-#ifdef CACHE_FUNCTIONS_AS_CALL
-#define CACHE_FUNCTION_WRAPPERS \
-        void flush_icache(void) \
-        { \
-            rb->flush_icache(); \
-        } \
-        void invalidate_icache(void) \
-        { \
-            rb->invalidate_icache(); \
-        }
-#else
-#define CACHE_FUNCTION_WRAPPERS
-#endif /* CACHE_FUNCTIONS_AS_CALL */
 
 #endif /* __PCTOOL__ */
 #endif

@@ -1905,7 +1905,7 @@ void dynamic_recompile (struct dynarec_block *newblock)
     PC=oldpc;
     setmallocpos(dynapointer);
     newblock->length=dynapointer-newblock->block;
-    invalidate_icache();
+    IF_COP(rb->cpucache_invalidate());
     snprintf(meow,499,"/dyna_0x%x_code.rb",PC);
     fd=open(meow,O_WRONLY|O_CREAT|O_TRUNC);
     if(fd>=0)

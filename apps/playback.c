@@ -1317,9 +1317,9 @@ static void codec_thread(void)
                 queue_reply(&codec_queue, 1);
                 if ((void*)ev.data != NULL)
                 {
-                    invalidate_icache();
+                    cpucache_invalidate();
                     ((void (*)(void))ev.data)();
-                    flush_icache();
+                    cpucache_flush();
                 }
                 break;
 

@@ -194,14 +194,7 @@ static inline uint32_t swap_odd_even32(uint32_t value)
     return value;
 }
 
-#define HAVE_INVALIDATE_ICACHE
-static inline void invalidate_icache(void)
-{
-   asm volatile ("move.l #0x01000000,%d0\n"
-                 "movec.l %d0,%cacr\n"
-                 "move.l #0x80000000,%d0\n"
-                 "movec.l %d0,%cacr");
-}
+#define HAVE_CPUCACHE_INVALIDATE
 
 #define DEFAULT_PLLCR_AUDIO_BITS 0x10400000
 void coldfire_set_pllcr_audio_bits(long bits);

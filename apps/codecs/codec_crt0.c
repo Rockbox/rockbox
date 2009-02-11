@@ -34,8 +34,6 @@ extern unsigned char plugin_end_addr[];
 
 extern enum codec_status codec_main(void);
 
-CACHE_FUNCTION_WRAPPERS(ci);
-
 enum codec_status codec_start(void)
 {
 #ifndef SIMULATOR
@@ -47,7 +45,7 @@ enum codec_status codec_start(void)
 #endif
 #if NUM_CORES > 1
     /* writeback cleared iedata and bss areas */
-    flush_icache();
+    ci->cpucache_flush();
 #endif
     return codec_main();
 }

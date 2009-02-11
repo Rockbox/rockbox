@@ -415,7 +415,7 @@ void usb_storage_init_connection(void)
     audio_buffer = audio_get_buffer(false,&bufsize);
     tb.transfer_buffer =
         (void *)UNCACHED_ADDR((unsigned int)(audio_buffer + 31) & 0xffffffe0);
-    invalidate_icache();
+    cpucache_invalidate();
 #ifdef USB_USE_RAMDISK
     ramdisk_buffer = tb.transfer_buffer + BUFFER_SIZE*2;
 #endif

@@ -168,13 +168,8 @@ static inline void wake_core(int core)
 
 /** cache functions **/
 #ifndef BOOTLOADER
-#define CACHE_FUNCTIONS_AS_CALL
-
-#define HAVE_INVALIDATE_ICACHE
-void invalidate_icache(void);
-
-#define HAVE_FLUSH_ICACHE
-void flush_icache(void);
+#define HAVE_CPUCACHE_INVALIDATE
+#define HAVE_CPUCACHE_FLUSH
 #endif
 
 #endif /* CPU_PP */

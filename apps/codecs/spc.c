@@ -302,7 +302,7 @@ static bool emu_thread_process_msg(struct sample_queue_chunk *chunk)
     if (id == SPC_EMU_LOAD)
     {
         struct spc_load *ld = (struct spc_load *)chunk->data;
-        invalidate_icache();
+        ci->cpucache_invalidate();
         SPC_Init(&spc_emu);
         sample_queue.retval = SPC_load_spc(&spc_emu, ld->buf, ld->size);
 
@@ -376,7 +376,7 @@ static bool spc_emu_start(void)
 static inline int load_spc_buffer(uint8_t *buf, size_t size)
 {
     struct spc_load ld = { buf, size };
-    flush_icache();
+    ci->cpucache_flush();
     return emu_thread_send_msg(SPC_EMU_LOAD, (intptr_t)&ld);
 }
 
@@ -386,7 +386,7 @@ static inline void spc_emu_quit(void)
         emu_thread_send_msg(SPC_EMU_QUIT, 0);
         /* Wait for emu thread to be killed */
         ci->thread_wait(emu_thread_id);
-        invalidate_icache();
+        ci->cpucache_invalidate();
     }
 }
 

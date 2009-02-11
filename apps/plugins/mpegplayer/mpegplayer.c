@@ -296,8 +296,6 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #endif
 #endif
 
-CACHE_FUNCTION_WRAPPERS;
-
 /* One thing we can do here for targets with remotes is having a display
  * always on the remote instead of always forcing a popup on the main display */
 

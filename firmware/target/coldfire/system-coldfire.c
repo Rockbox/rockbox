@@ -358,3 +358,11 @@ void coldfire_set_dataincontrol(unsigned long value)
     DATAINCONTROL = (DATAINCONTROL & (1 << 9)) | value;
     restore_irq(level);
 }
+
+void cpucache_invalidate(void)
+{
+   asm volatile ("move.l #0x01000000,%d0\n"
+                 "movec.l %d0,%cacr\n"
+                 "move.l #0x80000000,%d0\n"
+                 "movec.l %d0,%cacr");
+}

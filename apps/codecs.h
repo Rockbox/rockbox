@@ -170,9 +170,9 @@ struct codec_api {
     void (*semaphore_release)(struct semaphore *s);
 #endif /* NUM_CORES */
 
-#ifdef CACHE_FUNCTIONS_AS_CALL
-    void (*flush_icache)(void);
-    void (*invalidate_icache)(void);
+#if NUM_CORES > 1
+    void (*cpucache_flush)(void);
+    void (*cpucache_invalidate)(void);
 #endif
 
     /* strings and memory */
@@ -296,23 +296,5 @@ int codec_load_file(const char* codec, struct codec_api *api);
 /* defined by the codec */
 enum codec_status codec_start(void);
 enum codec_status codec_main(void);
-
-#ifndef CACHE_FUNCTION_WRAPPERS
-
-#ifdef CACHE_FUNCTIONS_AS_CALL
-#define CACHE_FUNCTION_WRAPPERS(api) \
-        void flush_icache(void) \
-        { \
-            (api)->flush_icache(); \
-        } \
-        void invalidate_icache(void) \
-        { \
-            (api)->invalidate_icache(); \
-        }
-#else
-#define CACHE_FUNCTION_WRAPPERS(api)
-#endif /* CACHE_FUNCTIONS_AS_CALL */
-
-#endif /* CACHE_FUNCTION_WRAPPERS */
 
 #endif

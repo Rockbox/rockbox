@@ -272,12 +272,20 @@ static inline uint32_t swap_odd_even32(uint32_t value)
 #endif
 
 /* Just define these as empty if not declared */
-#ifndef HAVE_INVALIDATE_ICACHE
-#define invalidate_icache()
+#ifdef HAVE_CPUCACHE_INVALIDATE
+void cpucache_invalidate(void);
+#else
+static inline void cpucache_invalidate(void)
+{
+}
 #endif
 
-#ifndef HAVE_FLUSH_ICACHE
-#define flush_icache()
+#ifdef HAVE_CPUCACHE_FLUSH
+void cpucache_flush(void);
+#else
+static inline void cpucache_flush(void)
+{
+}
 #endif
 
 #ifdef PROC_NEEDS_CACHEALIGN

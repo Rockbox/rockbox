@@ -126,6 +126,4 @@ static inline uint32_t swap_odd_even32(uint32_t value)
     return value;
 }
 
-#define invalidate_icache()
-
 #endif /* SYSTEM_TARGET_H */

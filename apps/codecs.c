@@ -113,9 +113,9 @@ struct codec_api ci = {
     semaphore_release,
 #endif
 
-#ifdef CACHE_FUNCTIONS_AS_CALL
-    flush_icache,
-    invalidate_icache,
+#if NUM_CORES > 1
+    cpucache_flush,
+    cpucache_invalidate,
 #endif
 
     /* strings and memory */
@@ -232,7 +232,7 @@ static int codec_load_ram(int size, struct codec_api *api)
     }
 
     *(hdr->api) = api;
-    invalidate_icache();
+    cpucache_invalidate();
     status = hdr->entry_point();
 
     sim_codec_close(pd);

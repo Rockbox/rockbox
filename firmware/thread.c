@@ -179,17 +179,17 @@ static void __attribute__((naked,used)) start_thread(void)
 {
     /* r0 = context */
     asm volatile (
-        "ldr    sp, [r0, #32]          \n" /* Load initial sp */
-        "ldr    r4, [r0, #40]          \n" /* start in r4 since it's non-volatile */
-        "mov    r1, #0                 \n" /* Mark thread as running */
-        "str    r1, [r0, #40]          \n"
+        "ldr    sp, [r0, #32]            \n" /* Load initial sp */
+        "ldr    r4, [r0, #40]            \n" /* start in r4 since it's non-volatile */
+        "mov    r1, #0                   \n" /* Mark thread as running */
+        "str    r1, [r0, #40]            \n"
 #if NUM_CORES > 1
-        "ldr    r0, =invalidate_icache \n" /* Invalidate this core's cache. */
-        "mov    lr, pc                 \n" /* This could be the first entry into */
-        "bx     r0                     \n" /* plugin or codec code for this core. */
+        "ldr    r0, =cpucache_invalidate \n" /* Invalidate this core's cache. */
+        "mov    lr, pc                   \n" /* This could be the first entry into */
+        "bx     r0                       \n" /* plugin or codec code for this core. */
 #endif
-        "mov    lr, pc                 \n" /* Call thread function */
-        "bx     r4                     \n"
+        "mov    lr, pc                   \n" /* Call thread function */
+        "bx     r4                       \n"
     ); /* No clobber list - new thread doesn't care */
     thread_exit();
     //asm volatile (".ltorg"); /* Dump constant pool */
@@ -668,7 +668,7 @@ static inline void switch_to_idle_stack(const unsigned int core)
 static void core_switch_blk_op(unsigned int core, struct thread_entry *thread)
 {
     /* Flush our data to ram */
-    flush_icache();
+    cpucache_flush();
     /* Stash thread in r4 slot */
     thread->context.r[0] = (uint32_t)thread;
     /* Stash restart address in r5 slot */
@@ -696,24 +696,24 @@ static void __attribute__((naked))
      * Stack access also isn't permitted until restoring the original stack and
      * context. */
     asm volatile (
-        "stmfd  sp!, { r4-r12, lr }    \n" /* Stack all non-volatile context on current core */
-        "ldr    r2, =idle_stacks       \n" /* r2 = &idle_stacks[core][IDLE_STACK_WORDS] */
-        "ldr    r2, [r2, r0, lsl #2]   \n"
-        "add    r2, r2, %0*4           \n"
-        "stmfd  r2!, { sp }            \n" /* save original stack pointer on idle stack */
-        "mov    sp, r2                 \n" /* switch stacks */
-        "adr    r2, 1f                 \n" /* r2 = new core restart address */
-        "str    r2, [r1, #40]          \n" /* thread->context.start = r2 */
-        "ldr    pc, =switch_thread     \n" /* r0 = thread after call - see load_context */
-    "1:                                \n"
-        "ldr    sp, [r0, #32]          \n" /* Reload original sp from context structure */
-        "mov    r1, #0                 \n" /* Clear start address */
-        "str    r1, [r0, #40]          \n"
-        "ldr    r0, =invalidate_icache \n" /* Invalidate new core's cache */
-        "mov    lr, pc                 \n"
-        "bx     r0                     \n"
-        "ldmfd  sp!, { r4-r12, pc }    \n" /* Restore non-volatile context to new core and return */
-        ".ltorg                        \n" /* Dump constant pool */
+        "stmfd  sp!, { r4-r12, lr }      \n" /* Stack all non-volatile context on current core */
+        "ldr    r2, =idle_stacks         \n" /* r2 = &idle_stacks[core][IDLE_STACK_WORDS] */
+        "ldr    r2, [r2, r0, lsl #2]     \n"
+        "add    r2, r2, %0*4             \n"
+        "stmfd  r2!, { sp }              \n" /* save original stack pointer on idle stack */
+        "mov    sp, r2                   \n" /* switch stacks */
+        "adr    r2, 1f                   \n" /* r2 = new core restart address */
+        "str    r2, [r1, #40]            \n" /* thread->context.start = r2 */
+        "ldr    pc, =switch_thread       \n" /* r0 = thread after call - see load_context */
+    "1:                                  \n"
+        "ldr    sp, [r0, #32]            \n" /* Reload original sp from context structure */
+        "mov    r1, #0                   \n" /* Clear start address */
+        "str    r1, [r0, #40]            \n"
+        "ldr    r0, =cpucache_invalidate \n" /* Invalidate new core's cache */
+        "mov    lr, pc                   \n"
+        "bx     r0                       \n"
+        "ldmfd  sp!, { r4-r12, pc }      \n" /* Restore non-volatile context to new core and return */
+        ".ltorg                          \n" /* Dump constant pool */
         : : "i"(IDLE_STACK_WORDS)
     );
     (void)core; (void)thread;
@@ -2457,7 +2457,7 @@ unsigned int create_thread(void (*function)(void),
     /* Writeback stack munging or anything else before starting */
     if (core != CURRENT_CORE)
     {
-        flush_icache();
+        cpucache_flush();
     }
 #endif
 
@@ -2597,7 +2597,7 @@ void thread_exit(void)
         switch_to_idle_stack(core);
     }
 
-    flush_icache();
+    cpucache_flush();
 
     /* At this point, this thread isn't using resources allocated for
      * execution except the slot itself. */
