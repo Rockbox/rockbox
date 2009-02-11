@@ -725,7 +725,7 @@ target/arm/usb-fw-pp502x.c
 #ifdef GIGABEAT_F
 #ifndef SIMULATOR
 target/arm/lcd-as-memframe.S
-target/arm/mmu-arm.c
+target/arm/mmu-arm.S
 target/arm/s3c2440/debug-s3c2440.c
 target/arm/s3c2440/gigabeat-fx/adc-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/ata-meg-fx.c
@@ -750,7 +750,7 @@ target/arm/s3c2440/gigabeat-fx/wmcodec-meg-fx.c
 #ifdef GIGABEAT_S
 #ifndef SIMULATOR
 target/arm/lcd-as-memframe.S
-target/arm/mmu-arm.c
+target/arm/mmu-arm.S
 target/arm/imx31/debug-imx31.c
 target/arm/imx31/rolo_restart.S
 target/arm/imx31/gigabeat-s/adc-imx31.c
@@ -799,7 +799,7 @@ target/arm/tms320dm320/uart-dm320.c
 #ifdef MROBE_500
 #ifndef SIMULATOR
 target/arm/lcd-as-memframe.S
-target/arm/mmu-arm.c
+target/arm/mmu-arm.S
 target/arm/tms320dm320/mrobe-500/adc-mr500.c
 target/arm/tms320dm320/mrobe-500/ata-mr500.c
 target/arm/tms320dm320/mrobe-500/backlight-mr500.c
@@ -820,7 +820,7 @@ target/arm/tms320dm320/mrobe-500/usb-mr500.c
 #ifndef SIMULATOR
 target/arm/ata-as-arm.S
 target/arm/lcd-as-memframe.S
-target/arm/mmu-arm.c
+target/arm/mmu-arm.S
 target/arm/tms320dm320/creative-zvm/adc-creativezvm.c
 target/arm/tms320dm320/creative-zvm/ata-creativezvm.c
 target/arm/tms320dm320/creative-zvm/dma-creativezvm.c

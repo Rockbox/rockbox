@@ -57,13 +57,6 @@ void imx31_regclr32(volatile uint32_t *reg_p, uint32_t mask);
 
 #define KDEV_INIT
 
-#define HAVE_CPUCACHE_INVALIDATE
-#define HAVE_CPUCACHE_FLUSH
-
-/* Different internal names */
-#define cpucache_flush      clean_dcache
-#define cpucache_invalidate invalidate_idcache
-
 struct ARM_REGS {
 	int r0;
 	int r1;

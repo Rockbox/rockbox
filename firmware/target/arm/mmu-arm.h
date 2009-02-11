@@ -18,11 +18,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef MMU_ARM_H
+#define MMY_ARM_H
 
 #define CACHE_ALL   0x0C
 #define CACHE_NONE  0
 #define BUFFERED    0x04
 
+void memory_init(void);
 void ttb_init(void);
 void enable_mmu(void);
 void map_section(unsigned int pa, unsigned int va, int mb, int flags);
@@ -30,8 +33,12 @@ void map_section(unsigned int pa, unsigned int va, int mb, int flags);
 /* Cleans entire DCache */
 void clean_dcache(void);
 
+/* Invalidate entire DCache */
+/* will do writeback */
+void invalidate_dcache(void);
+
 /* Invalidate DCache for this range  */
-/* Will do write back */
+/* will do writeback */
 void invalidate_dcache_range(const void *base, unsigned int size);
 
 /* clean DCache for this range  */
@@ -39,7 +46,14 @@ void invalidate_dcache_range(const void *base, unsigned int size);
 void clean_dcache_range(const void *base, unsigned int size);
 
 /* Dump DCache for this range  */
-/* Will *NOT* do write back */
+/* Will *NOT* do write back except for buffer ends not on a line boundary */
 void dump_dcache_range(const void *base, unsigned int size);
 
-void memory_init(void);
+/* Invalidate entire ICache and DCache */
+/* will do writeback */
+void invalidate_idcache(void);
+
+#define HAVE_CPUCACHE_INVALIDATE
+#define HAVE_CPUCACHE_FLUSH
+
+#endif /* MMU_ARM_H */

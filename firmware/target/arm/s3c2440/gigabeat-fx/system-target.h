@@ -41,9 +41,4 @@ void s3c_regset32(volatile unsigned long *reg, unsigned long bits);
 /* Clear register bits */
 void s3c_regclr32(volatile unsigned long *reg, unsigned long bits);
 
-#define HAVE_CPUCACHE_FLUSH
-#define HAVE_CPUCACHE_INVALIDATE
-#define cpucache_flush      clean_dcache
-#define cpucache_invalidate invalidate_idcache
-
 #endif /* SYSTEM_TARGET_H */

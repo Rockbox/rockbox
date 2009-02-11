@@ -32,11 +32,12 @@
 /* must be 16Kb (0x4000) aligned */
 #if 0
 #define MEM_END          0x00900000 + (MEM*0x00100000)
-#define TTB_BASE         ((unsigned long *)(MEM_END - TTB_SIZE)) /* End of memory */
+#define TTB_BASE_ADDR    (MEM_END - TTB_SIZE)
 #else
-#define TTB_BASE         ((unsigned long *)(0x04900000 - TTB_SIZE)) /* End of memory */
+#define TTB_BASE_ADDR    (0x04900000 - TTB_SIZE)
 #endif
-#define FRAME            ((short *) ((char*)TTB_BASE - LCD_BUFFER_SIZE))  /* Right before TTB */
+#define TTB_BASE         ((unsigned long *)TTB_BASE_ADDR) /* End of memory */
+#define FRAME            ((short *) (TTB_BASE_ADDR - LCD_BUFFER_SIZE))  /* Right before TTB */
 
 #define PHY_IO_BASE      0x00030000
 #define DM320_REG(addr)  (*(volatile unsigned short *)(PHY_IO_BASE + (addr)))

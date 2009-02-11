@@ -24,8 +24,9 @@
 #define LCD_BUFFER_SIZE (320*240*2)
 #define TTB_SIZE (0x4000)
 /* must be 16Kb (0x4000) aligned */
-#define TTB_BASE   ((unsigned long *)(0x30000000 + (32*1024*1024) - TTB_SIZE)) /* End of memory */
-#define FRAME   ((unsigned short *)((unsigned char *)TTB_BASE - LCD_BUFFER_SIZE))  /* Right before TTB */
+#define TTB_BASE_ADDR (0x30000000 + (32*1024*1024) - TTB_SIZE)
+#define TTB_BASE   ((unsigned long *)TTB_BASE_ADDR) /* End of memory */
+#define FRAME   ((unsigned short *)(TTB_BASE_ADDR - LCD_BUFFER_SIZE))  /* Right before TTB */
 
 /* Memory Controllers */
 
