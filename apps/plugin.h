@@ -127,12 +127,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 142
+#define PLUGIN_API_VERSION 143
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 142
+#define PLUGIN_MIN_API_VERSION 143
 
 /* plugin return codes */
 enum plugin_status {
@@ -389,6 +389,7 @@ struct plugin_api {
                                       const char *prefix, const char *suffix,
                                       int numberlen IF_CNFN_NUM_(, int *num));
     bool (*file_exists)(const char *file);
+    char* (*strip_extension)(char* buffer, int buffer_size, const char *filename);
 
 
     /* dir */
@@ -400,6 +401,9 @@ struct plugin_api {
     bool (*dir_exists)(const char *path);
 
     /* kernel/ system */
+#ifdef CPU_ARM
+    void (*__div0)(void);
+#endif
     void (*sleep)(int ticks);
     void (*yield)(void);
     volatile long* current_tick;
@@ -783,10 +787,6 @@ struct plugin_api {
 	const char *appsversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-#ifdef CPU_ARM
-    void (*__div0)(void);
-#endif
-    char* (*strip_extension)(char* buffer, int buffer_size, const char *filename);
 };
 
 /* plugin header */

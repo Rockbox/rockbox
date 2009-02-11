@@ -101,6 +101,9 @@ struct codec_api ci = {
     NULL, /* configure */
     
     /* kernel/ system */
+#ifdef CPU_ARM
+    __div0,
+#endif
     PREFIX(sleep),
     yield,
 
@@ -169,9 +172,6 @@ struct codec_api ci = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-#ifdef CPU_ARM
-    __div0,
-#endif
 };
 
 void codec_get_full_path(char *path, const char *codec_root_fn)
