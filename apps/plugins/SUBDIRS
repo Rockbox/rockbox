@@ -20,7 +20,9 @@ chessbox
 jpeg
 sudoku
 reversi
+#if (CONFIG_KEYPAD != SANSA_CLIP_PAD && CONFIG_KEYPAD != SANSA_M200_PAD)
 goban
+#endif
 #ifndef OLYMPUS_MROBE_500
 zxbox
 #endif

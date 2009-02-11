@@ -238,6 +238,8 @@ plugin_start (const void *parameter)
     int btn;
     int temp;
 
+    (void) temp;
+
     rb->mkdir ("/sgf");
 
     global_setup ();

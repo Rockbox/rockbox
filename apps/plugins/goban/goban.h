@@ -78,8 +78,7 @@
 /* no context */
 /* no next var */
 
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD) \
-   || (CONFIG_KEYPAD == SANSA_FUZE_PAD)
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
 #define  GBN_BUTTON_UP                 BUTTON_UP
 #define  GBN_BUTTON_DOWN               BUTTON_DOWN
 #define  GBN_BUTTON_LEFT               BUTTON_LEFT
@@ -90,6 +89,18 @@
 #define  GBN_BUTTON_PLAY               BUTTON_SELECT | BUTTON_REL
 #define  GBN_BUTTON_CONTEXT            BUTTON_SELECT | BUTTON_REPEAT
 #define  GBN_BUTTON_NEXT_VAR           BUTTON_REC
+
+#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
+#define  GBN_BUTTON_UP                 BUTTON_UP
+#define  GBN_BUTTON_DOWN               BUTTON_DOWN
+#define  GBN_BUTTON_LEFT               BUTTON_LEFT
+#define  GBN_BUTTON_RIGHT              BUTTON_RIGHT
+#define  GBN_BUTTON_RETREAT            BUTTON_SCROLL_BACK
+#define  GBN_BUTTON_ADVANCE            BUTTON_SCROLL_FWD
+#define  GBN_BUTTON_MENU               BUTTON_POWER
+#define  GBN_BUTTON_PLAY               BUTTON_SELECT | BUTTON_REL
+#define  GBN_BUTTON_CONTEXT            BUTTON_SELECT | BUTTON_REPEAT
+/* no next var */
 
 #elif (CONFIG_KEYPAD == SANSA_C200_PAD)
 #define  GBN_BUTTON_UP                 BUTTON_UP
@@ -103,7 +114,7 @@
 #define  GBN_BUTTON_CONTEXT            BUTTON_SELECT | BUTTON_REPEAT
 #define  GBN_BUTTON_NEXT_VAR           BUTTON_REC
 
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD) \
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 #define  GBN_BUTTON_UP                 BUTTON_UP
 #define  GBN_BUTTON_DOWN               BUTTON_DOWN
 #define  GBN_BUTTON_LEFT               BUTTON_LEFT
@@ -176,7 +187,7 @@
 #define  GBN_BUTTON_CONTEXT            BUTTON_SELECT | BUTTON_REPEAT
 /* no next var */
 
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#elif (CONFIG_KEYPAD == IAUDIO_M3_PAD)
 /* TODO: these are basically complete guesses, I have no manual to go by */
 #define  GBN_BUTTON_UP                 BUTTON_RC_VOL_UP
 #define  GBN_BUTTON_DOWN               BUTTON_RC_VOL_DOWN
