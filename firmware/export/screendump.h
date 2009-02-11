@@ -47,11 +47,13 @@
 
 #else /* !BOOTLOADER */
 
-#ifdef HAVE_LCD_BITMAP
 /* Save a .BMP file containing the current screen contents. */
 void screen_dump(void);
+
+#ifdef HAVE_LCD_BITMAP
 void screen_dump_set_hook(void (*hook)(int fd));
 #endif
+
 #ifdef HAVE_REMOTE_LCD
 /* Save a .BMP file containing the current remote screen contents. */
 void remote_screen_dump(void);

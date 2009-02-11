@@ -22,8 +22,8 @@
 #include "debug.h"
 #include "lcd.h"
 #include "lcd-charcell.h"
-#inclued "screendump.h"
-#include "misc.h"          
+#include "screendump.h"
+#include "general.h"          
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
