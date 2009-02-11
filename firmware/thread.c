@@ -744,48 +744,15 @@ static void core_thread_init(unsigned int core)
 }
 #endif /* NUM_CORES */
 
-#elif CONFIG_CPU == S3C2440
-
-/*---------------------------------------------------------------------------
- * Put core in a power-saving state if waking list wasn't repopulated.
- *---------------------------------------------------------------------------
- */
-static inline void core_sleep(void)
-{
-    /* FIQ also changes the CLKCON register so FIQ must be disabled
-       when changing it here */
-    asm volatile (
-        "mrs    r0, cpsr        \n"
-        "orr    r2, r0, #0x40   \n" /* Disable FIQ */
-        "bic    r0, r0, #0x80   \n" /* Prepare IRQ enable */
-        "msr    cpsr_c, r2      \n"
-        "mov    r1, #0x4c000000 \n" /* CLKCON = 0x4c00000c */
-        "ldr    r2, [r1, #0xc]  \n" /* Set IDLE bit */
-        "orr    r2, r2, #4      \n"
-        "str    r2, [r1, #0xc]  \n"
-        "msr    cpsr_c, r0      \n" /* Enable IRQ, restore FIQ */
-        "mov    r2, #0          \n" /* wait for IDLE */
-    "1:                         \n"
-        "add    r2, r2, #1      \n"
-        "cmp    r2, #10         \n"
-        "bne    1b              \n"
-        "orr    r2, r0, #0xc0   \n" /* Disable IRQ, FIQ */
-        "msr    cpsr_c, r2      \n"
-        "ldr    r2, [r1, #0xc]  \n" /* Reset IDLE bit */
-        "bic    r2, r2, #4      \n"
-        "str    r2, [r1, #0xc]  \n"
-        "msr    cpsr_c, r0      \n" /* Enable IRQ, restore FIQ */
-        :  :  : "r0", "r1", "r2");
-}
 #elif defined(CPU_TCC780X) || defined(CPU_TCC77X) /* Single core only for now */ \
-|| CONFIG_CPU == IMX31L || CONFIG_CPU == DM320 || CONFIG_CPU == AS3525
-/* Use the generic ARMv4/v5 wait for IRQ */
+|| CONFIG_CPU == IMX31L || CONFIG_CPU == DM320 || CONFIG_CPU == AS3525 \
+|| CONFIG_CPU == S3C2440
+/* Use the generic ARMv4/v5/v6 wait for IRQ */
 static inline void core_sleep(void)
 {
     asm volatile (
-        "mov r0, #0                \n"
-        "mcr p15, 0, r0, c7, c0, 4 \n" /* Wait for interrupt */
-        : : : "r0"
+        "mcr p15, 0, %0, c7, c0, 4" /* Wait for interrupt */
+        : : "r"(0)
     );
     enable_irq();
 }
