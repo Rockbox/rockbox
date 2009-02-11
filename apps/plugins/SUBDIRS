@@ -20,6 +20,7 @@ chessbox
 jpeg
 sudoku
 reversi
+goban
 #ifndef OLYMPUS_MROBE_500
 zxbox
 #endif
