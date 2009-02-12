@@ -425,8 +425,8 @@ void pcm_record_more(void *start, size_t size)
     start = (void *)(((unsigned long)start + 3) & ~3);
     size &= ~3;
 
-    /* Write back and invalidate - buffer must be coherent */
-    invalidate_dcache_range(start, size);
+    /* Invalidate - buffer must be coherent */
+    dump_dcache_range(start, size);
 
     start = (void *)addr_virt_to_phys((unsigned long)start);
 
@@ -460,7 +460,8 @@ void pcm_rec_dma_start(void *addr, size_t size)
     addr = (void *)(((unsigned long)addr + 3) & ~3);
     size &= ~3;
 
-    invalidate_dcache_range(addr, size);
+    /* Invalidate - buffer must be coherent */
+    dump_dcache_range(addr, size);
 
     addr = (void *)addr_virt_to_phys((unsigned long)addr);
     pcm_rec_peak_addr = addr;
