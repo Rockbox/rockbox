@@ -20,12 +20,8 @@ chessbox
 jpeg
 sudoku
 reversi
-/* Exclude targets without keypads set or with not enough plugin buffer.
-   Plugin is about 40k, rounding up to 65k to be safe. */
-#if (CONFIG_KEYPAD != SANSA_CLIP_PAD && CONFIG_KEYPAD != SANSA_M200_PAD && \
-     CONFIG_KEYPAD != CREATIVEZVM_PAD && CONFIG_KEYPAD != CREATIVEZV_PAD && \
-     CONFIG_KEYPAD != PHILIPS_HDD1630_PAD && defined(PLUGIN_BUFFER_SIZE) && \
-     PLUGIN_BUFFER_SIZE >= 0x10000)
+/* Plugin is about 40k, rounding up to 65k to be safe. */
+#if (defined(PLUGIN_BUFFER_SIZE) && PLUGIN_BUFFER_SIZE >= 0x10000)
 goban
 #endif
 #ifndef OLYMPUS_MROBE_500
