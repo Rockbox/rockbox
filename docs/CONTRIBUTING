@@ -29,7 +29,7 @@ Write normal C code. Don't redefine the language. No new types (structs are
 structs, not typedefs), no C++isms or Javaisms.
 
 Identifiers
------
+-----------
 We do not want mixed case identifiers.
 Variables and function names should be all lower case.
 Struct and enum names should be all lower case.
