@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2006 by Michael Sevakis
+ * Copyright (C) 2005 by Linus Nielsen Feltzing
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,45 +29,30 @@
 #include "spdif.h"
 #endif
 
-#define IIS_PLAY_DEFPARM    ( (freq_ent[FPARM_CLOCKSEL] << 12) | \
-                              (IIS_PLAY & (7 << 8)) | \
-                              (4 << 2) )  /* 64 bit clocks / word clock */
-#define IIS_FIFO_RESET      (1 << 11)
-#define PDIR2_FIFO_RESET    (1 << 9)
+#define IIS_PLAY_DEFPARM ( (freq_ent[FPARM_CLOCKSEL] << 12) | \
+                           (IIS_PLAY & (7 << 8)) | \
+                           (4 << 2) )  /* 64 bit clocks / word clock */
+#define IIS_FIFO_RESET   (1 << 11)
+#define PDIR2_FIFO_RESET (1 << 9)
 
 #if defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(IAUDIO_M3)
-#define SET_IIS_PLAY(x) IIS1CONFIG = (x)
-#define IIS_PLAY        IIS1CONFIG
+#define IIS_PLAY         IIS1CONFIG
 #else
-#define SET_IIS_PLAY(x) IIS2CONFIG = (x)
-#define IIS_PLAY        IIS2CONFIG
+#define IIS_PLAY         IIS2CONFIG
 #endif
 
-struct dma_lock
-{
-    int locked;
-    unsigned long state;
-};
+#ifdef HAVE_SPDIF_OUT
+/* EBU TX auto sync, PDIR2 fifo auto sync, IIS1 fifo auto sync */
+#define AUDIOGLOB_DEFPARM   ((1 << 10) | (1 << 8) | (1 << 7))
+#else
+/* PDIR2 fifo auto sync, IIS1 fifo auto sync */
+#define AUDIOGLOB_DEFPARM   ((1 << 8) | (1 << 7))
+#endif
 
-static bool is_playback_monitoring(void)
-{
-    return (IIS_PLAY & (7 << 8)) == (3 << 8);
-}
-
-static void iis_play_reset_if_playback(bool if_playback)
-{
-    bool is_playback = is_playback_monitoring();
-
-    if (is_playback != if_playback)
-        return;
-
-    or_l(IIS_FIFO_RESET, &IIS_PLAY);
-}
-
+/** Sample rates **/
 #define PLLCR_SET_AUDIO_BITS_DEFPARM \
             ((freq_ent[FPARM_CLSEL] << 28) | (1 << 22))
 
-/** Sample rates **/
 #define FPARM_CLOCKSEL       0
 #define FPARM_CLSEL          1
 #if CONFIG_CPU == MCF5249 && defined(HAVE_UDA1380)
@@ -91,62 +77,62 @@ static const unsigned char pcm_freq_parms[HW_NUM_FREQ][2] =
 
 static const unsigned char *freq_ent;
 
-/* apply audio settings */
-static bool _pcm_dma_apply_settings(bool clear_reset)
+/* Lock status struct for playback and recording */
+struct dma_lock
 {
-    bool did_reset = false;
-    unsigned long iis_play_defparm;
+    int locked;
+    unsigned long state;
+};
 
+static void iis_play_reset(void)
+{
+    or_l(IIS_FIFO_RESET, &IIS_PLAY);
+    and_l(~IIS_FIFO_RESET, &IIS_PLAY);
+    PDOR3 = 0;
+}
+
+static bool is_playback_monitoring(void)
+{
+    return (IIS_PLAY & (7 << 8)) == (3 << 8);
+}
+
+static void iis_play_reset_if_playback(bool if_playback)
+{
     int level = set_irq_level(DMA_IRQ_LEVEL);
-
-    /* remember table entry */
-    freq_ent = pcm_freq_parms[pcm_fsel];
- 
-    iis_play_defparm = IIS_PLAY_DEFPARM;
-
-    if (pcm_sampr != pcm_curr_sampr)
-    {
-        /* Reprogramming bits 15-12 requires FIFO to be in a reset
-           condition - Users Manual 17-8, Note 11 */
-        or_l(IIS_FIFO_RESET, &IIS_PLAY);
-        /* Important for TLV320 - this must happen in the correct order
-           or starting recording will sound absolutely awful once in
-           awhile - audiohw_set_frequency then coldfire_set_pllcr_audio_bits
-         */
-        SET_IIS_PLAY(IIS_PLAY_DEFPARM | IIS_FIFO_RESET);
-        audiohw_set_frequency(pcm_fsel);
-        coldfire_set_pllcr_audio_bits(PLLCR_SET_AUDIO_BITS_DEFPARM);
-        did_reset = true;
-    }
-
-    /* If a reset was done because of a sample rate change, IIS_PLAY will have
-       been set already, so only needs to be set again if the reset flag must
-       be cleared. If the frequency didn't change, it was never altered and
-       the reset flag can just be removed or no action taken. */
-    if (clear_reset)
-        SET_IIS_PLAY(IIS_PLAY_DEFPARM & ~IIS_FIFO_RESET);
-
+    if (is_playback_monitoring() == if_playback)
+        iis_play_reset();
     restore_irq(level);
+}
 
-#if 0
-    logf("IISPLAY: %08X", IIS_PLAY);
-#endif
-
-    return did_reset;
-} /* _pcm_dma_apply_settings */
-
+/* apply audio settings */
 /* This clears the reset bit to enable monitoring immediately if monitoring
    recording sources or always if playback is in progress - we might be 
    switching samplerates on the fly */
 void pcm_dma_apply_settings(void)
 {
     int level = set_irq_level(DMA_IRQ_LEVEL);
-    bool pbm = is_playback_monitoring();
-    bool kick = (DCR0 & DMA_EEXT) != 0 && pbm;
 
-    /* Clear reset if not playback monitoring or peripheral request is
-       active and playback monitoring */
-    if (_pcm_dma_apply_settings(!pbm || kick) && kick)
+    /* remember table entry */
+    freq_ent = pcm_freq_parms[pcm_fsel];
+ 
+    /* Reprogramming bits 15-12 requires FIFO to be in a reset
+       condition - Users Manual 17-8, Note 11 */
+    or_l(IIS_FIFO_RESET, &IIS_PLAY);
+    /* Important for TLV320 - this must happen in the correct order
+       or starting recording will sound absolutely awful once in
+       awhile - audiohw_set_frequency then coldfire_set_pllcr_audio_bits
+     */
+    IIS_PLAY = IIS_PLAY_DEFPARM | IIS_FIFO_RESET;
+    restore_irq(level);
+
+    audiohw_set_frequency(pcm_fsel);
+    coldfire_set_pllcr_audio_bits(PLLCR_SET_AUDIO_BITS_DEFPARM);
+
+    level = set_irq_level(DMA_IRQ_LEVEL);
+
+    IIS_PLAY = IIS_PLAY_DEFPARM;
+
+    if ((DCR0 & DMA_EEXT) != 0 && is_playback_monitoring())
         PDOR3 = 0; /* Kick FIFO out of reset by writing to it */
 
     restore_irq(level);
@@ -156,24 +142,18 @@ void pcm_play_dma_init(void)
 {
     freq_ent = pcm_freq_parms[pcm_fsel];
 
-    AUDIOGLOB =   (1 <<  8) /* IIS1 fifo auto sync  */
-                | (1 <<  7) /* PDIR2 fifo auto sync */
-#ifdef HAVE_SPDIF_OUT
-                | (1 << 10) /* EBU TX auto sync     */
-#endif
-                ;
-    DIVR0     = 54;     /* DMA0 is mapped into vector 54 in system.c */
+    AUDIOGLOB = AUDIOGLOB_DEFPARM;
+    DIVR0     = 54; /* DMA0 is mapped into vector 54 in system.c */
     and_l(0xffffff00, &DMAROUTE);
     or_l(DMA0_REQ_AUDIO_1, &DMAROUTE);
-    DMACONFIG = 1;      /* DMA0Req = PDOR3, DMA1Req = PDIR2          */
-
-    /* Call pcm_play_dma_stop to initialize everything. */
-    pcm_play_dma_stop();
+    DMACONFIG = 1;  /* DMA0Req = PDOR3, DMA1Req = PDIR2 */
+    BCR0 = 0; /* No bytes waiting */
+    ICR6 = (6 << 2); /* Enable interrupt at level 6, priority 0 */
 
     /* Setup Coldfire I2S before initializing hardware or changing
        other settings. */
     or_l(IIS_FIFO_RESET, &IIS_PLAY);
-    SET_IIS_PLAY(IIS_PLAY_DEFPARM | IIS_FIFO_RESET);
+    IIS_PLAY = IIS_PLAY_DEFPARM | IIS_FIFO_RESET;
     audio_set_output_source(AUDIO_SRC_PLAYBACK);
 
     /* Initialize default register values. */
@@ -187,13 +167,12 @@ void pcm_play_dma_init(void)
 #if defined(HAVE_SPDIF_REC) || defined(HAVE_SPDIF_OUT)
     spdif_init();
 #endif
-    /* Enable interrupt at level 6, priority 0 */
-    ICR6 = (6 << 2);
 } /* pcm_play_dma_init */
 
 void pcm_postinit(void)
 {
     audiohw_postinit();
+    iis_play_reset();
 }
 
 /** DMA **/
@@ -225,22 +204,22 @@ void pcm_play_unlock(void)
 /* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    logf("pcm_play_dma_start");
+    /* Stop any DMA in progress */
+    pcm_play_dma_stop();
 
-    /* stop any DMA in progress */
-    DSR0 = 1;
-    DCR0 = 0;
+    addr = (void *)(((long)addr + 3) & ~3);
+    size &= ~3;
+
+    if (size <= 0)
+        return;
 
     /* Set up DMA transfer  */
     SAR0 = (unsigned long)addr;   /* Source address      */
     DAR0 = (unsigned long)&PDOR3; /* Destination address */
     BCR0 = (unsigned long)size;   /* Bytes to transfer   */
 
-    /* Enable the FIFO and force one write to it */
-    _pcm_dma_apply_settings(is_playback_monitoring());
-
-    DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA |
-           DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE) | DMA_START;
+    DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA | DMA_SINC |
+           DMA_SSIZE(DMA_SIZE_LINE) | DMA_START;
 
     dma_play_lock.state = (1 << 14);
 } /* pcm_play_dma_start */
@@ -248,12 +227,10 @@ void pcm_play_dma_start(const void *addr, size_t size)
 /* Stops the DMA transfer and interrupt */
 void pcm_play_dma_stop(void)
 {
-    DSR0 = 1;
-    DCR0 = 0;
-    BCR0 = 0;
+    and_l(~(DMA_EEXT | DMA_INT), &DCR0); /* per request and int OFF */
+    BCR0 = 0; /* No bytes remaining */
+    DSR0 = 1; /* Clear interrupt, errors, stop transfer */
 
-    /* Place TX FIFO in reset condition if playback monitoring is on.
-       Recording monitoring something else should not be stopped. */
     iis_play_reset_if_playback(true);
 
     dma_play_lock.state = (0 << 14);
@@ -264,16 +241,16 @@ void pcm_play_dma_pause(bool pause)
     if (pause)
     {
         /* pause playback on current buffer */
-        and_l(~DMA_EEXT, &DCR0);
+        and_l(~(DMA_EEXT | DMA_INT), &DCR0); /* per request and int OFF */
+        DSR0 = 1;                            /* stop channel */
         iis_play_reset_if_playback(true);
         dma_play_lock.state = (0 << 14);
     }
     else
     {
         /* restart playback on current buffer */
-        /* Enable the FIFO and force one write to it */
-        _pcm_dma_apply_settings(is_playback_monitoring());
-        or_l(DMA_EEXT | DMA_START, &DCR0);
+        iis_play_reset_if_playback(true);
+        or_l(DMA_INT | DMA_EEXT | DMA_START, &DCR0); /* everything ON */
         dma_play_lock.state = (1 << 14);
     }
 } /* pcm_play_dma_pause */
@@ -288,38 +265,14 @@ size_t pcm_get_bytes_waiting(void)
 void DMA0(void) __attribute__ ((interrupt_handler, section(".icode")));
 void DMA0(void)
 {
-    int res = DSR0;
+    unsigned long res = DSR0;
 
-    DSR0  = 1;                  /* Clear interrupt */
-    and_l(~DMA_EEXT, &DCR0);    /* Disable peripheral request */
-    /* Stop on error */
-    if ((res & 0x70) == 0)
+    and_l(~(DMA_EEXT | DMA_INT), &DCR0); /* per request and int OFF */
+    DSR0 = 1; /* Clear interrupt and errors */
+
+    if (res & 0x70)
     {
-        pcm_more_callback_type get_more  = pcm_callback_for_more;
-        unsigned char         *next_start;
-        size_t                 next_size = 0;
-
-        if (get_more)
-            get_more(&next_start, &next_size);
-
-        if (next_size > 0)
-        {
-            SAR0  = (unsigned long)next_start;  /* Source address */
-            BCR0  = next_size;                  /* Bytes to transfer */
-            or_l(DMA_EEXT, &DCR0);              /* Enable peripheral request */
-            return;
-        }
-        else
-        {
-            /* Finished playing */
-#if 0
-            /* int. logfs can trash the display */
-            logf("DMA0 No Data:0x%04x", res);
-#endif
-        }
-    }
-    else
-    {
+        /* Stop on error */
         logf("DMA0 err: %02x", res);
 #if 0
         logf("  SAR0: %08x", SAR0);
@@ -327,6 +280,27 @@ void DMA0(void)
         logf("  BCR0: %08x", BCR0);
         logf("  DCR0: %08x", DCR0);
 #endif
+    }
+    else
+    {
+        pcm_more_callback_type get_more  = pcm_callback_for_more;
+        unsigned char *start;
+        size_t size = 0;
+
+        if (get_more)
+            get_more(&start, &size);
+
+        start = (unsigned char *)(((long)start + 3) & ~3);
+        size &= ~3;
+
+        if (size > 0)
+        {
+            SAR0 = (unsigned long)start;     /* Source address */
+            BCR0 = size;                     /* Bytes to transfer */
+            or_l(DMA_EEXT | DMA_INT, &DCR0); /* per request and int ON */
+            return;
+        }
+        /* Finished playing */
     }
 
     /* Stop interrupt and futher transfers */
@@ -337,8 +311,15 @@ void DMA0(void)
 
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
-    unsigned long addr = SAR0;
-    int cnt = BCR0;
+    unsigned long addr, cnt;
+
+    /* Make sure interrupt doesn't change the second value after we read the
+     * first value. */
+    int level = set_irq_level(DMA_IRQ_LEVEL);
+    addr = SAR0;
+    cnt = BCR0;
+    restore_irq(level);
+
     *count = (cnt & 0xffffff) >> 2;
     return (void *)((addr + 2) & ~3);
 } /* pcm_play_dma_get_peak_buffer */
@@ -370,13 +351,15 @@ void pcm_rec_unlock(void)
 void pcm_rec_dma_start(void *addr, size_t size)
 {
     /* stop any DMA in progress */
-    and_l(~DMA_EEXT, &DCR1);
-    DSR1 = 1;
+    pcm_rec_dma_stop();
+
+    addr = (void *)(((long)addr + 3) & ~3);
+    size &= ~3;
+
+    if (size <= 0)
+        return;
 
     and_l(~PDIR2_FIFO_RESET, &DATAINCONTROL);
-    /* Clear TX FIFO reset bit if the source is not set to monitor playback
-       otherwise maintain independence between playback and recording. */
-    _pcm_dma_apply_settings(!is_playback_monitoring());
 
     /* Start the DMA transfer.. */
 #ifdef HAVE_SPDIF_REC
@@ -384,10 +367,10 @@ void pcm_rec_dma_start(void *addr, size_t size)
     INTERRUPTCLEAR = (1 << 25) | (1 << 24) | (1 << 23) | (1 << 22);
 #endif
 
-    SAR1              = (unsigned long)&PDIR2; /* Source address        */
     pcm_rec_peak_addr = (unsigned long *)addr; /* Start peaking at dest */
-    DAR1              = (unsigned long)addr;   /* Destination address   */
-    BCR1              = (unsigned long)size;   /* Bytes to transfer     */
+    SAR1 = (unsigned long)&PDIR2; /* Source address      */
+    DAR1 = (unsigned long)addr;   /* Destination address */
+    BCR1 = (unsigned long)size;   /* Bytes to transfer   */
 
     DCR1 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA | DMA_DINC |
            DMA_DSIZE(DMA_SIZE_LINE) | DMA_START;
@@ -397,9 +380,10 @@ void pcm_rec_dma_start(void *addr, size_t size)
 
 void pcm_rec_dma_stop(void)
 {
-    DSR1 = 1;         /* Clear interrupt */
-    DCR1 = 0;
-    BCR1 = 0;
+    and_l(~(DMA_EEXT | DMA_INT), &DCR1); /* per request and int OFF */
+    DSR1 = 1; /* Clear interrupt, errors, stop transfer */
+    BCR1 = 0; /* No bytes received */
+
     or_l(PDIR2_FIFO_RESET, &DATAINCONTROL);
 
     iis_play_reset_if_playback(false);
@@ -422,6 +406,8 @@ void pcm_rec_dma_init(void)
 
 void pcm_rec_dma_close(void)
 {
+    pcm_rec_dma_stop();
+
     and_l(0xffff00ff, &DMAROUTE);
     ICR7 = 0x00;     /* Disable interrupt */
     dma_rec_lock.state = (0 << 15);
@@ -432,12 +418,12 @@ void pcm_rec_dma_close(void)
 void DMA1(void) __attribute__ ((interrupt_handler, section(".icode")));
 void DMA1(void)
 {
-    int res = DSR1;
+    unsigned long res = DSR1;
     int status = 0;
     pcm_more_callback_type2 more_ready;
 
-    DSR1  = 1;               /* Clear interrupt */
-    and_l(~DMA_EEXT, &DCR1); /* Disable peripheral request */
+    and_l(~(DMA_EEXT | DMA_INT), &DCR1); /* per request and int OFF */
+    DSR1 = 1;                            /* Clear interrupt and errors */
 
     if (res & 0x70)
     {
@@ -468,10 +454,6 @@ void DMA1(void)
     if (more_ready != NULL && more_ready(status) >= 0)
         return;
 
-#if 0
-    /* int. logfs can trash the display */
-    logf("DMA1 done:%04x %d", res, status);
-#endif
     /* Finished recording */
     pcm_rec_dma_stop();
     /* Inform PCM that we're done */
@@ -481,16 +463,32 @@ void DMA1(void)
 /* Continue transferring data in - call from interrupt callback */
 void pcm_record_more(void *start, size_t size)
 {
+    start = (void *)(((long)start + 3) & ~3);
+    size &= ~3;
+
+    if (size <= 0)
+    {
+        pcm_rec_dma_stop();
+        return;
+    }
+
     pcm_rec_peak_addr = (unsigned long *)start; /* Start peaking at dest */
-    DAR1              = (unsigned long)start;   /* Destination address */
-    BCR1              = (unsigned long)size;    /* Bytes to transfer   */
-    or_l(DMA_EEXT, &DCR1);                  /* Enable peripheral request */
+    DAR1 = (unsigned long)start;     /* Destination address */
+    BCR1 = (unsigned long)size;      /* Bytes to transfer */
+    or_l(DMA_EEXT | DMA_INT, &DCR1); /* per request and int ON */
 } /* pcm_record_more */
 
 const void * pcm_rec_dma_get_peak_buffer(int *count)
 {
-    unsigned long addr = (unsigned long)pcm_rec_peak_addr;
-    unsigned long end = DAR1;
+    unsigned long addr, end;
+
+    /* Make sure interrupt doesn't change the second value after we read the
+     * first value. */
+    int level = set_irq_level(DMA_IRQ_LEVEL);
+    addr = (unsigned long)pcm_rec_peak_addr;
+    end = DAR1;
+    restore_irq(level);
+
     addr >>= 2;
     *count = (end >> 2) - addr;
     return (void *)(addr << 2);
