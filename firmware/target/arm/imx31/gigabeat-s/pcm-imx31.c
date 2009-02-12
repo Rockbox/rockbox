@@ -51,7 +51,7 @@ static struct dma_data dma_play_data =
 static void play_dma_callback(void)
 {
     unsigned char *start;
-    size_t        size;
+    size_t size = 0;
     pcm_more_callback_type get_more = pcm_callback_for_more;
 
     if (dma_play_data.locked != 0)
@@ -61,13 +61,11 @@ static void play_dma_callback(void)
         return;
     }
 
-    if (get_more == NULL || (get_more(&start, &size), size == 0))
+    if (dma_play_bd.mode.status & BD_RROR)
     {
-        /* Callback missing or no more DMA to do */
-        pcm_play_dma_stop();
-        pcm_play_dma_stopped_callback();
+        /* Stop on error */
     }
-    else
+    else if (get_more != NULL && (get_more(&start, &size), size != 0))
     {
         start = (void*)(((unsigned long)start + 3) & ~3);
         size &= ~3;
@@ -79,7 +77,12 @@ static void play_dma_callback(void)
         dma_play_bd.mode.command = TRANSFER_16BIT;
         dma_play_bd.mode.status = BD_DONE | BD_WRAP | BD_INTR;
         sdma_channel_run(DMA_PLAY_CH_NUM);
+        return;
     }
+
+    /* Error, callback missing or no more DMA to do */
+    pcm_play_dma_stop();
+    pcm_play_dma_stopped_callback();
 }
 
 void pcm_play_lock(void)
