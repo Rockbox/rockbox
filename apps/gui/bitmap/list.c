@@ -301,7 +301,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
         return ACTION_NONE;
     if (x<list_text[screen].x)
     {
-        /* Top left corner is hopefully GO_TO_ROOT */
+        /* Top left corner is GO_TO_ROOT */
         if (y<list_text[SCREEN_MAIN].y)
         {
             if (button == BUTTON_REL)
@@ -351,7 +351,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
          * | will bring up the context menu of it.                  |
          * |--------------------------------------------------------|
          */
-        if (y > list_text[screen].y)
+        if (y > list_text[screen].y || button & BUTTON_REPEAT)
         {
             int line_height, actual_y;
             static int last_y = 0;
