@@ -34,8 +34,6 @@ PLUGIN_HEADER
 #define TESTCODEC_EXITBUTTON BUTTON_SELECT
 #endif
 
-CACHE_FUNCTION_WRAPPERS
-
 /* Log functions copied from test_disk.c */
 static int line = 0;
 static int max_line = 0;
