@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 #ifndef MMU_ARM_H
-#define MMY_ARM_H
+#define MMU_ARM_H
 
 #define CACHE_ALL   0x0C
 #define CACHE_NONE  0
