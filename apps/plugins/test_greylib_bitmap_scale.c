@@ -21,7 +21,6 @@
 
 #include "plugin.h"
 #include "lib/grey.h"
-#include "lib/pluginlib_resize.h"
 #include "lib/pluginlib_bmp.h"
 
 #if LCD_DEPTH == 1
