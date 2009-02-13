@@ -201,7 +201,6 @@ enum plugin_status plugin_start(const void* parameter)
                 /* eat these... */
                 break;    
             default:
-                if (IS_SYSEVENT(button))
                     quit = true;
         }
     } while (!quit);
