@@ -466,12 +466,6 @@ void pcm_record_more(void *start, size_t size)
     start = (void *)(((long)start + 3) & ~3);
     size &= ~3;
 
-    if (size <= 0)
-    {
-        pcm_rec_dma_stop();
-        return;
-    }
-
     pcm_rec_peak_addr = (unsigned long *)start; /* Start peaking at dest */
     DAR1 = (unsigned long)start;     /* Destination address */
     BCR1 = (unsigned long)size;      /* Bytes to transfer */
