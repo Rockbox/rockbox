@@ -24,14 +24,19 @@
 #include "adc.h"
 #include "powermgmt.h"
 
+#define SMLAL(lo, hi, x, y)              \
+    asm volatile ("smlal %0, %1, %2, %3" \
+	 : "+r" (lo), "+r" (hi)              \
+	 : "%r" (x), "r" (y))
+
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3450
+    3550
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    3400
+    3500
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
@@ -48,19 +53,20 @@ const unsigned short percent_to_volt_charge[11] =
 };
 #endif /* CONFIG_CHARGING */
 
-#define BATTERY_SCALE_FACTOR 6003
+#define BATTERY_SCALE_FACTOR 4200
 /* full-scale ADC readout (2^10) in millivolt */
-
-/* adc readout
- * max with charger connected: 690
- * max fully charged:          682
- * min just before shutdown:   570
- */
 
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    /* For now, assume as battery full (we need to calibrate) */
     /* return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10; */
-    return 3990;
+
+    /* This may be overly complicated (pulled from the OF) */
+    int lo = 0;
+    int val = adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR;
+
+    SMLAL(lo, val, 0x8a42f871, val);
+    val>>= 9;
+    val -= (val >> 31);
+    return val;
 }

@@ -118,11 +118,11 @@
 /* define this if you have a light associated with the buttons */
 /* #define HAVE_BUTTON_LIGHT */
 
-#define BATTERY_CAPACITY_DEFAULT 1550 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN 1500  /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 50   /* capacity increment */
-#define BATTERY_TYPES_COUNT  1    /* only one type */
+#define BATTERY_CAPACITY_DEFAULT 630 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN     630 /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX     630 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC       0 /* capacity increment */
+#define BATTERY_TYPES_COUNT        1 /* only one type */
 
 /* Hardware controlled charging */
 #define CONFIG_CHARGING CHARGING_SIMPLE
