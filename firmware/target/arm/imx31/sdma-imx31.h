@@ -212,7 +212,7 @@ void sdma_init(void);
 void sdma_read_words(unsigned long *buf, unsigned long start, int count);
 void sdma_write_words(const unsigned long *buf, unsigned long start, int count);
 void sdma_channel_set_priority(unsigned int channel, unsigned int priority);
-void sdma_channel_start(unsigned int channel);
+bool sdma_channel_reset(unsigned int channel);
 void sdma_channel_run(unsigned int channel);
 void sdma_channel_pause(unsigned int channel);
 void sdma_channel_stop(unsigned int channel);

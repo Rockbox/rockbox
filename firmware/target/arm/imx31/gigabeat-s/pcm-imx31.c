@@ -272,6 +272,12 @@ void pcm_play_dma_start(const void *addr, size_t size)
     addr = (void *)(((unsigned long)addr + 3) & ~3);
     size &= ~3;
 
+    if (size <= 0)
+        return;
+
+    if (!sdma_channel_reset(DMA_PLAY_CH_NUM))
+        return;
+
     clean_dcache_range(addr, size);
     dma_play_bd.buf_addr =
         (void *)addr_virt_to_phys((unsigned long)(void *)addr);
@@ -280,7 +286,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     dma_play_bd.mode.status = BD_DONE | BD_WRAP | BD_INTR;
 
     play_start_pcm();
-    sdma_channel_start(DMA_PLAY_CH_NUM);
+    sdma_channel_run(DMA_PLAY_CH_NUM);
 }
 
 void pcm_play_dma_stop(void)
@@ -463,6 +469,12 @@ void pcm_rec_dma_start(void *addr, size_t size)
     addr = (void *)(((unsigned long)addr + 3) & ~3);
     size &= ~3;
 
+    if (size <= 0)
+        return;
+
+    if (!sdma_channel_reset(DMA_REC_CH_NUM))
+        return;
+    
     /* Invalidate - buffer must be coherent */
     dump_dcache_range(addr, size);
 
@@ -483,8 +495,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
 
     /* Enable receive */
     SSI_SCR2 |= SSI_SCR_RE;
-
-    sdma_channel_start(DMA_REC_CH_NUM);
+    sdma_channel_run(DMA_REC_CH_NUM);
 }
 
 void pcm_rec_dma_close(void)

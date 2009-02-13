@@ -613,23 +613,23 @@ void sdma_channel_set_priority(unsigned int channel, unsigned int priority)
     SDMA_CHNPRI(channel) = priority;
 }
 
-/* Start a channel cold - resets execution to start of script */
-void sdma_channel_start(unsigned int channel)
+/* Resets a channel to start of script next time it runs. */
+bool sdma_channel_reset(unsigned int channel)
 {
     struct channel_control_block *ccb_p;
 
     if (channel == 0 || channel >= CH_NUM)
-        return;
+        return false;
 
     ccb_p = &ccb_array[channel];
 
     if (ccb_p->status.opened_init == 0)
-        return;
+        return false;
 
     if (!setup_channel(ccb_p))
-        return;
+        return false;
 
-    SDMA_HSTART = 1ul << channel;
+    return true;
 }
 
 /* Resume or start execution on a channel */
