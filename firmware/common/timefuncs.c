@@ -104,10 +104,13 @@ int set_time(const struct tm *tm)
 {
 #if CONFIG_RTC
     int rc;
+#if CONFIG_RTC != RTC_JZ47XX
     char rtcbuf[7];
+#endif
     
     if (valid_time(tm))
     {
+#if CONFIG_RTC != RTC_JZ47XX
         rtcbuf[0]=((tm->tm_sec/10) << 4) | (tm->tm_sec%10);
         rtcbuf[1]=((tm->tm_min/10) << 4) | (tm->tm_min%10);
         rtcbuf[2]=((tm->tm_hour/10) << 4) | (tm->tm_hour%10);
@@ -122,6 +125,9 @@ int set_time(const struct tm *tm)
 #endif
 
         rc = rtc_write_datetime(rtcbuf);
+#else
+        rc = rtc_write_datetime((unsigned char*)tm);
+#endif
 
         if (rc < 0)
             return -1;

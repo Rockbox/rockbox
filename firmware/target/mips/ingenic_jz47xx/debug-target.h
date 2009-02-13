@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2008 by Maurus Cuelenaere
+ * Copyright (C) 2009 by Maurus Cuelenaere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,23 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef BACKLIGHT_TARGET_H
-#define BACKLIGHT_TARGET_H
 
-#ifdef BOOTLOADER
-#define BACKLIGHT_DRIVER_CLOSE
-/* Force the whole driver to be built */
-#define BACKLIGHT_FULL_INIT
-#endif
+#ifndef __DEBUG_TARGET_H_
+#define __DEBUG_TARGET_H_
 
-#include <stdbool.h>
+bool __dbg_hw_info(void);
+bool __dbg_ports(void);
 
-/*
-bool _backlight_init(void);
-void _backlight_on(void);
-void _backlight_off(void);
-void _backlight_set_brightness(int brightness);
-bool backlight_enabled(void);
-*/
-
-#endif /* BACKLIGHT_TARGET_H */
+#endif /* __DEBUG_TARGET_H_ */

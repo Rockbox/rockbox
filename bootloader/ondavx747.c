@@ -101,7 +101,7 @@ static void boot_of(void)
 
 int main(void)
 {
-    int rc;
+    int rc, dummy;
     void (*kernel_entry)(void);
     
     kernel_init();
@@ -114,7 +114,7 @@ int main(void)
     reset_screen();
     
 #ifdef HAVE_TOUCHSCREEN
-    rc = button_read_device(NULL);
+    rc = button_read_device(&dummy);
 #else
     rc = button_read_device();
 #endif

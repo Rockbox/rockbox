@@ -26,12 +26,11 @@
 #include "jz4740.h"
 #include "mipsregs.h"
 
+#define CACHE_SIZE       16*1024
+#define CACHE_LINE_SIZE  32
+#include "mmu-mips.h"
+
 /* This one returns the old status */
-#define HIGHEST_IRQ_LEVEL 0
-
-#define set_irq_level(status) \
-    set_interrupt_status((status), ST0_IE)
-
 static inline int set_interrupt_status(int status, int mask)
 {
 	unsigned int res, oldstatus;
@@ -56,48 +55,32 @@ static inline void disable_interrupt(void)
     clear_c0_status(ST0_IE);
 }
 
-#define disable_irq() \
-    disable_interrupt()
-
-#define enable_irq() \
-    enable_interrupt()
-
 static inline int disable_interrupt_save(int mask)
 {
-	unsigned int oldstatus;
-    
-	oldstatus = read_c0_status();
-	write_c0_status(oldstatus & ~mask);
-    
-	return oldstatus;
+    return set_interrupt_status(0, mask);
 }
-
-#define disable_irq_save() \
-    disable_interrupt_save(ST0_IE)
 
 static inline void restore_interrupt(int status)
 {
     write_c0_status(status);
 }
 
-#define restore_irq(c0_status) \
-    restore_interrupt(c0_status)
+#define disable_irq() disable_interrupt()
+#define enable_irq()  enable_interrupt()
+#define HIGHEST_IRQ_LEVEL 0
+#define set_irq_level(status)  set_interrupt_status((status), ST0_IE)
+#define disable_irq_save()     disable_interrupt_save(ST0_IE)
+#define restore_irq(c0_status) restore_interrupt(c0_status)
     
 #define	swap16(x) (((x) & 0xff) << 8 | ((x) >> 8) & 0xff)
-#define	swap32(x) (((x) & 0xff) << 24 | ((x) & 0xff00) << 8 | ((x) & 0xff0000) >> 8 | ((x) >> 24) & 0xff)
+#define	swap32(x) (((x) & 0xff) << 24 | ((x) & 0xff00) << 8 | \
+                   ((x) & 0xff0000) >> 8 | ((x) >> 24) & 0xff)
 
 #define UNCACHED_ADDRESS(addr)    ((unsigned int)(addr) | 0xA0000000)
 #define UNCACHED_ADDR(x)          UNCACHED_ADDRESS((x))
 #define PHYSADDR(x)               ((x) & 0x1fffffff)
 
-void __dcache_writeback_all(void);
-void __dcache_invalidate_all(void);
-void __icache_invalidate_all(void);
-void __flush_dcache_line(unsigned long addr);
-void dma_cache_wback_inv(unsigned long addr, unsigned long size);
 void system_enable_irq(unsigned int irq);
-void store_interrupts(void);
-void clear_interrupts(void);
 void udelay(unsigned int usec);
 void mdelay(unsigned int msec);
 void power_off(void);

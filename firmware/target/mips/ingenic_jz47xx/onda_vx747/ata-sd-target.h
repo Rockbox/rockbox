@@ -38,16 +38,20 @@ int _sd_read_sectors(unsigned long start, int count, void* buf);
 int _sd_write_sectors(unsigned long start, int count, const void* buf);
 int _sd_init(void);
 
-#define MMC_CD_PIN    (29 + 1 * 32)  /* Pin to check card insertion */
+#define MMC_CD_PIN    (32*1 + 29)  /* Pin to check card insertion */
+#define MSC_D0        (32*3 + 10)
+#define MSC_D1        (32*3 + 11)
+#define MSC_D2        (32*3 + 12)
+#define MSC_CLK       (32*3 + 9 )
 
 static inline void mmc_init_gpio(void)
 {
     __gpio_as_msc();
     __gpio_as_input(MMC_CD_PIN);
-    //__gpio_enable_pull(32*3+29);
-    __gpio_enable_pull(32*3+10);
-    __gpio_enable_pull(32*3+11);
-    __gpio_enable_pull(32*3+12);
+    __gpio_enable_pull(MSC_CLK);
+    __gpio_enable_pull(MSC_D0);
+    __gpio_enable_pull(MSC_D1);
+    __gpio_enable_pull(MSC_D2);
 }
 
 #endif

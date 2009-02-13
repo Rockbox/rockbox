@@ -30,16 +30,19 @@
 #include "panic.h"
 #include "debug.h"
 #include "storage.h"
+#include "string.h"
 
 static struct wakeup sd_wakeup;
+static long last_disk_activity = -1;
 
 //#define MMC_DMA_ENABLE
 #define MMC_DMA_INTERRUPT 0
 
-#define DEBUG(x...) logf(x);
+#define DEBUG(x...)         logf(x)
+
+#define BLOCK_SIZE          512
 
 #define MMC_INSERT_STATUS() __gpio_get_pin(MMC_CD_PIN)
-
 #define MMC_RESET()         __msc_reset()
 
 #define MMC_IRQ_MASK()             \
@@ -81,49 +84,49 @@ enum mmc_result_t
 #define MMC_CLOCK_FAST  20000000      /* 20 MHz for maximum for normal operation */
 #define SD_CLOCK_FAST   24000000      /* 24 MHz for SD Cards */
 #define SD_CLOCK_HIGH   48000000      /* 48 MHz for SD Cards */
- 
+
 /* Extra MMC commands for state control */
 /* Use negative numbers to disambiguate */
 #define MMC_CIM_RESET            -1
 
-/* Standard MMC commands (3.1)                type  argument     response */
+/* Standard MMC commands (3.1)           type  argument     response */
    /* class 1 */
 #define MMC_GO_IDLE_STATE         0   /* bc                          */
-#define MMC_SEND_OP_COND          1   /* bcr  [31:0] OCR         R3  */
+#define MMC_SEND_OP_COND          1   /* bcr  [31:0]  OCR        R3  */
 #define MMC_ALL_SEND_CID          2   /* bcr                     R2  */
 #define MMC_SET_RELATIVE_ADDR     3   /* ac   [31:16] RCA        R1  */
 #define MMC_SET_DSR               4   /* bc   [31:16] RCA            */
 #define MMC_SELECT_CARD           7   /* ac   [31:16] RCA        R1  */
 #define MMC_SEND_CSD              9   /* ac   [31:16] RCA        R2  */
 #define MMC_SEND_CID             10   /* ac   [31:16] RCA        R2  */
-#define MMC_READ_DAT_UNTIL_STOP  11   /* adtc [31:0] dadr        R1  */
+#define MMC_READ_DAT_UNTIL_STOP  11   /* adtc [31:0]  dadr       R1  */
 #define MMC_STOP_TRANSMISSION    12   /* ac                      R1b */
 #define MMC_SEND_STATUS          13   /* ac   [31:16] RCA        R1  */
 #define MMC_GO_INACTIVE_STATE    15   /* ac   [31:16] RCA            */
 
   /* class 2 */
-#define MMC_SET_BLOCKLEN         16   /* ac   [31:0] block len   R1  */
-#define MMC_READ_SINGLE_BLOCK    17   /* adtc [31:0] data addr   R1  */
-#define MMC_READ_MULTIPLE_BLOCK  18   /* adtc [31:0] data addr   R1  */
+#define MMC_SET_BLOCKLEN         16   /* ac   [31:0]  block len  R1  */
+#define MMC_READ_SINGLE_BLOCK    17   /* adtc [31:0]  data addr  R1  */
+#define MMC_READ_MULTIPLE_BLOCK  18   /* adtc [31:0]  data addr  R1  */
 
   /* class 3 */
-#define MMC_WRITE_DAT_UNTIL_STOP 20   /* adtc [31:0] data addr   R1  */
+#define MMC_WRITE_DAT_UNTIL_STOP 20   /* adtc [31:0]  data addr  R1  */
 
   /* class 4 */
-#define MMC_SET_BLOCK_COUNT      23   /* adtc [31:0] data addr   R1  */
-#define MMC_WRITE_BLOCK          24   /* adtc [31:0] data addr   R1  */
+#define MMC_SET_BLOCK_COUNT      23   /* adtc [31:0]  data addr  R1  */
+#define MMC_WRITE_BLOCK          24   /* adtc [31:0]  data addr  R1  */
 #define MMC_WRITE_MULTIPLE_BLOCK 25   /* adtc                    R1  */
 #define MMC_PROGRAM_CID          26   /* adtc                    R1  */
 #define MMC_PROGRAM_CSD          27   /* adtc                    R1  */
 
   /* class 6 */
-#define MMC_SET_WRITE_PROT       28   /* ac   [31:0] data addr   R1b */
-#define MMC_CLR_WRITE_PROT       29   /* ac   [31:0] data addr   R1b */
-#define MMC_SEND_WRITE_PROT      30   /* adtc [31:0] wpdata addr R1  */
+#define MMC_SET_WRITE_PROT       28   /* ac   [31:0]  data addr  R1b */
+#define MMC_CLR_WRITE_PROT       29   /* ac   [31:0]  data addr  R1b */
+#define MMC_SEND_WRITE_PROT      30   /* adtc [31:0]  wpdata addr R1 */
 
   /* class 5 */
-#define MMC_ERASE_GROUP_START    35   /* ac   [31:0] data addr   R1  */
-#define MMC_ERASE_GROUP_END      36   /* ac   [31:0] data addr   R1  */
+#define MMC_ERASE_GROUP_START    35   /* ac   [31:0]  data addr  R1  */
+#define MMC_ERASE_GROUP_END      36   /* ac   [31:0]  data addr  R1  */
 #define MMC_ERASE                37   /* ac                      R1b */
 
   /* class 9 */
@@ -135,12 +138,12 @@ enum mmc_result_t
 
   /* class 8 */
 #define MMC_APP_CMD              55   /* ac   [31:16] RCA        R1  */
-#define MMC_GEN_CMD              56   /* adtc [0] RD/WR          R1b */
+#define MMC_GEN_CMD              56   /* adtc [0]     RD/WR      R1b */
 
   /* SD class */
-#define SD_SEND_OP_COND          41   /* bcr  [31:0] OCR         R3  */
-#define SET_BUS_WIDTH            6    /* ac   [1:0] bus width    R1  */
-#define SEND_SCR                 51   /* adtc [31:0] staff       R1  */
+#define SD_SEND_OP_COND          41   /* bcr  [31:0]  OCR        R3  */
+#define SET_BUS_WIDTH            6    /* ac   [1:0]   bus width  R1  */
+#define SEND_SCR                 51   /* adtc [31:0]  staff      R1  */
 
 /* Don't change the order of these; they are used in dispatch tables */
 enum mmc_rsp_t
@@ -154,6 +157,7 @@ enum mmc_rsp_t
     RESPONSE_R4      = 6,
     RESPONSE_R5      = 7,
     RESPONSE_R6      = 8,
+    RESPONSE_R7      = 9,
 };
 
 
@@ -195,20 +199,6 @@ enum mmc_rsp_t
 #define R1_CURRENT_STATE(x)    ((x & 0x00001E00) >> 9)    /* sx, b (4 bits) */
 #define R1_READY_FOR_DATA      (1 << 8)     /* sx, a */
 #define R1_APP_CMD             (1 << 7)     /* sr, c */
-
-enum card_state
-{
-    CARD_STATE_EMPTY = -1,
-    CARD_STATE_IDLE  = 0,
-    CARD_STATE_READY = 1,
-    CARD_STATE_IDENT = 2,
-    CARD_STATE_STBY  = 3,
-    CARD_STATE_TRAN  = 4,
-    CARD_STATE_DATA  = 5,
-    CARD_STATE_RCV   = 6,
-    CARD_STATE_PRG   = 7,
-    CARD_STATE_DIS   = 8,
-};
 
 /* These are unpacked versions of the actual responses */
 struct mmc_response_r1
@@ -276,7 +266,7 @@ struct mmc_csd
 struct mmc_response_r3
 {  
     unsigned int ocr;
-}; 
+};
 
 #define MMC_VDD_145_150  0x00000001    /* VDD voltage 1.45 - 1.50 */
 #define MMC_VDD_150_155  0x00000002    /* VDD voltage 1.50 - 1.55 */
@@ -323,7 +313,6 @@ typedef struct MMC_INFO
     int             rca;    /* RCA */
     unsigned int    scr;    /* SCR 63:32*/        
     int             flags;  /* Ejected, inserted */
-    enum card_state state;  /* empty, ident, ready, whatever */
 
     /* Card specific information */
     struct mmc_cid  cid;
@@ -332,8 +321,6 @@ typedef struct MMC_INFO
     unsigned int    block_len;
     unsigned int    erase_unit;
 } mmc_info;
-
-static mmc_info mmcinfo;
 
 struct mmc_request
 {
@@ -354,6 +341,7 @@ struct mmc_request
 };
 
 #define MMC_OCR_ARG             0x00ff8000  /* Argument of OCR */
+//#define MMC_OCR_ARG 0x40300000
 
 /***********************************************************************
  *  MMC Events
@@ -363,16 +351,320 @@ struct mmc_request
 #define MMC_EVENT_TX_DATA_DONE    0x02    /* Tx data done */
 #define MMC_EVENT_PROG_DONE       0x04    /* Programming is done */
 
-static int use_4bit;        /* Use 4-bit data bus */
-static int num_6;
-static int sd2_0 = 1;
+static int use_4bit = 1;        /* Use 4-bit data bus */
+static int num_6 = 0;
+static int sd2_0 = 0;
+static mmc_info mmcinfo;
+
+/**************************************************************************
+ * Utility functions
+ **************************************************************************/
+
+#define PARSE_U32(_buf,_index) \
+    (((unsigned int)_buf[_index]) << 24) | (((unsigned int)_buf[_index+1]) << 16) | \
+        (((unsigned int)_buf[_index+2]) << 8) | ((unsigned int)_buf[_index+3]);
+
+#define PARSE_U16(_buf,_index) \
+    (((unsigned short)_buf[_index]) << 8) | ((unsigned short)_buf[_index+1]);
+
+int mmc_unpack_csd(struct mmc_request *request, struct mmc_csd *csd)
+{
+    unsigned char *buf = request->response;
+    int num = 0;
+    
+    if (request->result)
+        return request->result;
+
+    csd->csd_structure      = (buf[1] & 0xc0) >> 6;
+    if (csd->csd_structure)
+        sd2_0 = 1;
+    else
+        sd2_0 = 0;
+    
+    switch (csd->csd_structure) {
+    case 0 :
+        csd->taac               = buf[2];
+        csd->nsac               = buf[3];
+        csd->tran_speed         = buf[4];
+        csd->ccc                = (((unsigned short)buf[5]) << 4) | ((buf[6] & 0xf0) >> 4);
+        csd->read_bl_len        = buf[6] & 0x0f;
+        /* for support 2GB card*/
+        if (csd->read_bl_len >= 10) 
+        {
+            num = csd->read_bl_len - 9;
+            csd->read_bl_len = 9;
+        }
+        
+        csd->read_bl_partial    = (buf[7] & 0x80) ? 1 : 0;
+        csd->write_blk_misalign = (buf[7] & 0x40) ? 1 : 0;
+        csd->read_blk_misalign  = (buf[7] & 0x20) ? 1 : 0;
+        csd->dsr_imp            = (buf[7] & 0x10) ? 1 : 0;
+        csd->c_size             = ((((unsigned short)buf[7]) & 0x03) << 10) | (((unsigned short)buf[8]) << 2) | (((unsigned short)buf[9]) & 0xc0) >> 6;
+
+        if (num)
+            csd->c_size = csd->c_size << num;
+        
+        
+        csd->vdd_r_curr_min     = (buf[9] & 0x38) >> 3;
+        csd->vdd_r_curr_max     = buf[9] & 0x07;
+        csd->vdd_w_curr_min     = (buf[10] & 0xe0) >> 5;
+        csd->vdd_w_curr_max     = (buf[10] & 0x1c) >> 2;
+        csd->c_size_mult        = ((buf[10] & 0x03) << 1) | ((buf[11] & 0x80) >> 7);
+        switch (csd->csd_structure) {
+        case CSD_STRUCT_VER_1_0:
+        case CSD_STRUCT_VER_1_1:
+            csd->erase.v22.sector_size    = (buf[11] & 0x7c) >> 2;
+            csd->erase.v22.erase_grp_size = ((buf[11] & 0x03) << 3) | ((buf[12] & 0xe0) >> 5);
+
+            break;
+        case CSD_STRUCT_VER_1_2:
+        default:
+            csd->erase.v31.erase_grp_size = (buf[11] & 0x7c) >> 2;
+            csd->erase.v31.erase_grp_mult = ((buf[11] & 0x03) << 3) | ((buf[12] & 0xe0) >> 5);
+            break;
+        }
+        csd->wp_grp_size        = buf[12] & 0x1f;
+        csd->wp_grp_enable      = (buf[13] & 0x80) ? 1 : 0;
+        csd->default_ecc        = (buf[13] & 0x60) >> 5;
+        csd->r2w_factor         = (buf[13] & 0x1c) >> 2;
+        csd->write_bl_len       = ((buf[13] & 0x03) << 2) | ((buf[14] & 0xc0) >> 6);
+        if (csd->write_bl_len >= 10)
+            csd->write_bl_len = 9;
+        
+        csd->write_bl_partial   = (buf[14] & 0x20) ? 1 : 0;
+        csd->file_format_grp    = (buf[15] & 0x80) ? 1 : 0;
+        csd->copy               = (buf[15] & 0x40) ? 1 : 0;
+        csd->perm_write_protect = (buf[15] & 0x20) ? 1 : 0;
+        csd->tmp_write_protect  = (buf[15] & 0x10) ? 1 : 0;
+        csd->file_format        = (buf[15] & 0x0c) >> 2;
+        csd->ecc                = buf[15] & 0x03;
+        
+        DEBUG("csd_structure=%d  spec_vers=%d  taac=%02x  nsac=%02x  tran_speed=%02x",
+              csd->csd_structure, csd->spec_vers, 
+              csd->taac, csd->nsac, csd->tran_speed);
+        DEBUG("ccc=%04x  read_bl_len=%d  read_bl_partial=%d  write_blk_misalign=%d",
+              csd->ccc, csd->read_bl_len, 
+              csd->read_bl_partial, csd->write_blk_misalign);
+        DEBUG("read_blk_misalign=%d  dsr_imp=%d  c_size=%d  vdd_r_curr_min=%d",
+              csd->read_blk_misalign, csd->dsr_imp, 
+              csd->c_size, csd->vdd_r_curr_min);
+        DEBUG("vdd_r_curr_max=%d  vdd_w_curr_min=%d  vdd_w_curr_max=%d  c_size_mult=%d",
+              csd->vdd_r_curr_max, csd->vdd_w_curr_min, 
+              csd->vdd_w_curr_max, csd->c_size_mult);
+        DEBUG("wp_grp_size=%d  wp_grp_enable=%d  default_ecc=%d  r2w_factor=%d",
+              csd->wp_grp_size, csd->wp_grp_enable,
+              csd->default_ecc, csd->r2w_factor);
+        DEBUG("write_bl_len=%d  write_bl_partial=%d  file_format_grp=%d  copy=%d",
+              csd->write_bl_len, csd->write_bl_partial,
+              csd->file_format_grp, csd->copy);
+        DEBUG("perm_write_protect=%d  tmp_write_protect=%d  file_format=%d  ecc=%d",
+              csd->perm_write_protect, csd->tmp_write_protect,
+              csd->file_format, csd->ecc);
+        switch (csd->csd_structure) {
+        case CSD_STRUCT_VER_1_0:
+        case CSD_STRUCT_VER_1_1:
+            DEBUG("V22 sector_size=%d erase_grp_size=%d", 
+                  csd->erase.v22.sector_size, 
+                  csd->erase.v22.erase_grp_size);
+            break;
+        case CSD_STRUCT_VER_1_2:
+        default:
+            DEBUG("V31 erase_grp_size=%d erase_grp_mult=%d", 
+                  csd->erase.v31.erase_grp_size,
+                  csd->erase.v31.erase_grp_mult);
+            break;
+            
+        }
+        break;    
+        
+    case 1 :
+        csd->taac               = 0;
+        csd->nsac               = 0;
+        csd->tran_speed         = buf[4];
+        csd->ccc                = (((unsigned short)buf[5]) << 4) | ((buf[6] & 0xf0) >> 4);
+
+        csd->read_bl_len        = 9;
+        csd->read_bl_partial    = 0;
+        csd->write_blk_misalign = 0;
+        csd->read_blk_misalign  = 0;
+        csd->dsr_imp            = (buf[7] & 0x10) ? 1 : 0;
+        csd->c_size             = ((((unsigned short)buf[8]) & 0x3f) << 16) | (((unsigned short)buf[9]) << 8) | ((unsigned short)buf[10]) ;
+        switch (csd->csd_structure) {
+        case CSD_STRUCT_VER_1_0:
+        case CSD_STRUCT_VER_1_1:
+            csd->erase.v22.sector_size    = 0x7f;
+            csd->erase.v22.erase_grp_size = 0;
+            break;
+        case CSD_STRUCT_VER_1_2:
+        default:
+            csd->erase.v31.erase_grp_size = 0x7f;
+            csd->erase.v31.erase_grp_mult = 0;
+            break;
+        }
+        csd->wp_grp_size        = 0;
+        csd->wp_grp_enable      = 0;
+        csd->default_ecc        = (buf[13] & 0x60) >> 5;
+        csd->r2w_factor         = 4;/* Unused */
+        csd->write_bl_len       = 9;
+        
+        csd->write_bl_partial   = 0;
+        csd->file_format_grp    = 0;
+        csd->copy               = (buf[15] & 0x40) ? 1 : 0;
+        csd->perm_write_protect = (buf[15] & 0x20) ? 1 : 0;
+        csd->tmp_write_protect  = (buf[15] & 0x10) ? 1 : 0;
+        csd->file_format        = 0;
+        csd->ecc                = buf[15] & 0x03;
+        
+        DEBUG("csd_structure=%d  spec_vers=%d  taac=%02x  nsac=%02x  tran_speed=%02x",
+              csd->csd_structure, csd->spec_vers, 
+              csd->taac, csd->nsac, csd->tran_speed);
+        DEBUG("ccc=%04x  read_bl_len=%d  read_bl_partial=%d  write_blk_misalign=%d",
+              csd->ccc, csd->read_bl_len, 
+              csd->read_bl_partial, csd->write_blk_misalign);
+        DEBUG("read_blk_misalign=%d  dsr_imp=%d  c_size=%d  vdd_r_curr_min=%d",
+              csd->read_blk_misalign, csd->dsr_imp, 
+              csd->c_size, csd->vdd_r_curr_min);
+        DEBUG("vdd_r_curr_max=%d  vdd_w_curr_min=%d  vdd_w_curr_max=%d  c_size_mult=%d",
+              csd->vdd_r_curr_max, csd->vdd_w_curr_min, 
+              csd->vdd_w_curr_max, csd->c_size_mult);
+        DEBUG("wp_grp_size=%d  wp_grp_enable=%d  default_ecc=%d  r2w_factor=%d",
+              csd->wp_grp_size, csd->wp_grp_enable,
+              csd->default_ecc, csd->r2w_factor);
+        DEBUG("write_bl_len=%d  write_bl_partial=%d  file_format_grp=%d  copy=%d",
+              csd->write_bl_len, csd->write_bl_partial,
+              csd->file_format_grp, csd->copy);
+        DEBUG("perm_write_protect=%d  tmp_write_protect=%d  file_format=%d  ecc=%d",
+              csd->perm_write_protect, csd->tmp_write_protect,
+              csd->file_format, csd->ecc);
+        switch (csd->csd_structure) {
+        case CSD_STRUCT_VER_1_0:
+        case CSD_STRUCT_VER_1_1:
+            DEBUG("V22 sector_size=%d erase_grp_size=%d", 
+                  csd->erase.v22.sector_size, 
+                  csd->erase.v22.erase_grp_size);
+            break;
+        case CSD_STRUCT_VER_1_2:
+        default:
+            DEBUG("V31 erase_grp_size=%d erase_grp_mult=%d", 
+                  csd->erase.v31.erase_grp_size,
+                  csd->erase.v31.erase_grp_mult);
+            break;
+        }
+    }
+
+    if (buf[0] != 0x3f)
+        return MMC_ERROR_HEADER_MISMATCH;
+
+    return 0;
+}
+
+int mmc_unpack_r1(struct mmc_request *request, struct mmc_response_r1 *r1)
+{
+    unsigned char *buf = request->response;
+
+    if (request->result)
+        return request->result;
+
+    r1->cmd    = buf[0];
+    r1->status = PARSE_U32(buf,1);
+
+    DEBUG("mmc_unpack_r1: cmd=%d status=%08x", r1->cmd, r1->status);
+
+    if (R1_STATUS(r1->status)) {
+        if (r1->status & R1_OUT_OF_RANGE)       return MMC_ERROR_OUT_OF_RANGE;
+        if (r1->status & R1_ADDRESS_ERROR)      return MMC_ERROR_ADDRESS;
+        if (r1->status & R1_BLOCK_LEN_ERROR)    return MMC_ERROR_BLOCK_LEN;
+        if (r1->status & R1_ERASE_SEQ_ERROR)    return MMC_ERROR_ERASE_SEQ;
+        if (r1->status & R1_ERASE_PARAM)        return MMC_ERROR_ERASE_PARAM;
+        if (r1->status & R1_WP_VIOLATION)       return MMC_ERROR_WP_VIOLATION;
+        //if (r1->status & R1_CARD_IS_LOCKED)     return MMC_ERROR_CARD_IS_LOCKED;
+        if (r1->status & R1_LOCK_UNLOCK_FAILED) return MMC_ERROR_LOCK_UNLOCK_FAILED;
+        if (r1->status & R1_COM_CRC_ERROR)      return MMC_ERROR_COM_CRC;
+        if (r1->status & R1_ILLEGAL_COMMAND)    return MMC_ERROR_ILLEGAL_COMMAND;
+        if (r1->status & R1_CARD_ECC_FAILED)    return MMC_ERROR_CARD_ECC_FAILED;
+        if (r1->status & R1_CC_ERROR)           return MMC_ERROR_CC;
+        if (r1->status & R1_ERROR)              return MMC_ERROR_GENERAL;
+        if (r1->status & R1_UNDERRUN)           return MMC_ERROR_UNDERRUN;
+        if (r1->status & R1_OVERRUN)            return MMC_ERROR_OVERRUN;
+        if (r1->status & R1_CID_CSD_OVERWRITE)  return MMC_ERROR_CID_CSD_OVERWRITE;
+    }
+
+    if (buf[0] != request->cmd)
+        return MMC_ERROR_HEADER_MISMATCH;
+
+    /* This should be last - it's the least dangerous error */
+
+    return 0;
+}
+
+int mmc_unpack_scr(struct mmc_request *request, struct mmc_response_r1 *r1, unsigned int *scr)
+{
+    unsigned char *buf = request->response;
+    if (request->result)
+        return request->result;
+
+    *scr = PARSE_U32(buf, 5); /* Save SCR returned by the SD Card */
+    return mmc_unpack_r1(request, r1); 
+}
+
+int mmc_unpack_r6(struct mmc_request *request, struct mmc_response_r1 *r1, int *rca)
+{
+    unsigned char *buf = request->response;
+
+    if (request->result)        return request->result;
+        
+        *rca = PARSE_U16(buf,1);  /* Save RCA returned by the SD Card */
+        
+        *(buf+1) = 0;
+        *(buf+2) = 0;
+        
+        return mmc_unpack_r1(request, r1);
+}   
+
+int mmc_unpack_cid(struct mmc_request *request, struct mmc_cid *cid)
+{
+    unsigned char *buf = request->response;
+    int i;
+
+    if (request->result) return request->result;
+
+    cid->mid = buf[1];
+    cid->oid = PARSE_U16(buf,2);
+    for (i = 0 ; i < 6 ; i++)
+        cid->pnm[i] = buf[4+i];
+    cid->pnm[6] = 0;
+    cid->prv = buf[10];
+    cid->psn = PARSE_U32(buf,11);
+    cid->mdt = buf[15];
+    
+    DEBUG("mmc_unpack_cid: mid=%d oid=%d pnm=%s prv=%d.%d psn=%08x mdt=%d/%d",
+          cid->mid, cid->oid, cid->pnm, 
+          (cid->prv>>4), (cid->prv&0xf), 
+          cid->psn, (cid->mdt>>4), (cid->mdt&0xf)+1997);
+
+    if (buf[0] != 0x3f)  return MMC_ERROR_HEADER_MISMATCH;
+          return 0;
+}
+
+int mmc_unpack_r3(struct mmc_request *request, struct mmc_response_r3 *r3)
+{
+    unsigned char *buf = request->response;
+
+    if (request->result) return request->result;
+
+    r3->ocr = PARSE_U32(buf,1);
+    DEBUG("mmc_unpack_r3: ocr=%08x", r3->ocr);
+
+    if (buf[0] != 0x3f)  return MMC_ERROR_HEADER_MISMATCH;
+    return 0;
+}
 
 /* Stop the MMC clock and wait while it happens */
 static inline int jz_mmc_stop_clock(void)
 {
-    int timeout = 1000;
+    register int timeout = 1000;
 
-    DEBUG("stop MMC clock");
+    //DEBUG("stop MMC clock");
     REG_MSC_STRPCL = MSC_STRPCL_CLOCK_CONTROL_STOP;
 
     while (timeout && (REG_MSC_STAT & MSC_STAT_CLK_EN))
@@ -385,40 +677,26 @@ static inline int jz_mmc_stop_clock(void)
         }
         udelay(1);
     }
-    DEBUG("clock off time is %d microsec", timeout);
+    //DEBUG("clock off time is %d microsec", timeout);
     return MMC_NO_ERROR;
 }
 
 /* Start the MMC clock and operation */
 static inline int jz_mmc_start_clock(void)
 {
-    REG_MSC_STRPCL =
-        MSC_STRPCL_CLOCK_CONTROL_START | MSC_STRPCL_START_OP;
+    REG_MSC_STRPCL = MSC_STRPCL_CLOCK_CONTROL_START | MSC_STRPCL_START_OP;
     return MMC_NO_ERROR;
-}
-
-static inline unsigned int jz_mmc_calc_clkrt(int is_sd, unsigned int rate)
-{
-    unsigned int clkrt;
-    unsigned int clk_src = is_sd ? 24000000 : 20000000;
-
-    clkrt = 0;
-    while (rate < clk_src)
-    {
-        clkrt++;
-        clk_src >>= 1;
-    }
-    return clkrt;
 }
 
 static int jz_mmc_check_status(struct mmc_request *request)
 {
+    (void)request;
     unsigned int status = REG_MSC_STAT;
 
     /* Checking for response or data timeout */
     if (status & (MSC_STAT_TIME_OUT_RES | MSC_STAT_TIME_OUT_READ))
     {
-        DEBUG("MMC/SD timeout, MMC_STAT 0x%x CMD %d", status,
+        DEBUG("MMC/SD timeout, MSC_STAT 0x%x CMD %d", status,
                request->cmd);
         return MMC_ERROR_TIMEOUT;
     }
@@ -428,9 +706,18 @@ static int jz_mmc_check_status(struct mmc_request *request)
         (MSC_STAT_CRC_READ_ERROR | MSC_STAT_CRC_WRITE_ERROR |
          MSC_STAT_CRC_RES_ERR))
     {
-        DEBUG("MMC/CD CRC error, MMC_STAT 0x%x", status);
+        DEBUG("MMC/SD CRC error, MSC_STAT 0x%x", status);
         return MMC_ERROR_CRC;
+    
     }
+    
+    
+    /* Checking for FIFO empty */
+    /*if(status & MSC_STAT_DATA_FIFO_EMPTY && request->rtype != RESPONSE_NONE)
+    {
+        DEBUG("MMC/SD FIFO empty, MSC_STAT 0x%x", status);
+        return MMC_ERROR_UNDERRUN;
+    }*/
 
     return MMC_NO_ERROR;
 }
@@ -451,6 +738,7 @@ static void jz_mmc_get_response(struct mmc_request *request)
     {
         case RESPONSE_R1:
         case RESPONSE_R1B:
+        case RESPONSE_R7:
         case RESPONSE_R6:
         case RESPONSE_R3:
         case RESPONSE_R4:
@@ -686,6 +974,20 @@ static int jz_mmc_transmit_data(struct mmc_request *req)
     return MMC_NO_ERROR;
 }
 
+static inline unsigned int jz_mmc_calc_clkrt(int is_sd, unsigned int rate)
+{
+    unsigned int clkrt;
+    unsigned int clk_src = is_sd ? 24000000 : 20000000;
+
+    clkrt = 0;
+    while (rate < clk_src)
+    {
+        clkrt++;
+        clk_src >>= 1;
+    }
+    return clkrt;
+}
+
 /* Set the MMC clock frequency */
 static void jz_mmc_set_clock(int sd, unsigned int rate)
 {
@@ -695,19 +997,20 @@ static void jz_mmc_set_clock(int sd, unsigned int rate)
 
     jz_mmc_stop_clock();
 
-    if(sd2_0)
+    if (sd2_0)
     {
-        __cpm_select_msc_hs_clk(sd);    /* select clock source from CPM */
+        __cpm_select_msc_hs_clk(sd);        /* select clock source from CPM */
         REG_CPM_CPCCR |= CPM_CPCCR_CE;
         REG_MSC_CLKRT = 0;
     }
     else
     {
-        __cpm_select_msc_clk(sd);    /* select clock source from CPM */
+        __cpm_select_msc_clk(sd);           /* select clock source from CPM */
         REG_CPM_CPCCR |= CPM_CPCCR_CE;
         clkrt = jz_mmc_calc_clkrt(sd, rate);
         REG_MSC_CLKRT = clkrt;
     }
+    
     DEBUG("set clock to %u Hz is_sd=%d clkrt=%d", rate, sd, clkrt);
 }
 
@@ -724,8 +1027,8 @@ static int jz_mmc_exec_cmd(struct mmc_request *request)
 
     /* Indicate we have no result yet */
     request->result = MMC_NO_RESPONSE;
-    if (request->cmd == MMC_CIM_RESET)
-    {
+
+    if (request->cmd == MMC_CIM_RESET) {
         /* On reset, 1-bit bus width */
         use_4bit = 0;
 
@@ -733,19 +1036,11 @@ static int jz_mmc_exec_cmd(struct mmc_request *request)
         __msc_reset();
 
         /* On reset, drop MMC clock down */
-        jz_mmc_set_clock(0, MMC_CLOCK_SLOW);
+        jz_mmc_set_clock(1, MMC_CLOCK_SLOW);
 
         /* On reset, stop MMC clock */
         jz_mmc_stop_clock();
     }
-#if 0
-    if (request->cmd == MMC_SEND_OP_COND)
-    {
-        DEBUG("Have a MMC card");
-        /* always use 1bit for MMC */
-        use_4bit = 0;
-    }
-#endif
     if (request->cmd == SET_BUS_WIDTH)
     {
         if (request->arg == 0x2)
@@ -764,7 +1059,7 @@ static int jz_mmc_exec_cmd(struct mmc_request *request)
     jz_mmc_stop_clock();
 
     /* mask all interrupts */
-    REG_MSC_IMASK = 0xffff;
+    //REG_MSC_IMASK = 0xffff;
     /* clear status */
     REG_MSC_IREG = 0xffff;
     /*open interrupt */
@@ -778,9 +1073,8 @@ static int jz_mmc_exec_cmd(struct mmc_request *request)
     {
         /* MMC core extra command */
         case MMC_CIM_RESET:
-            cmdat |= MSC_CMDAT_INIT;    /* Initialization sequence sent prior to command */
+            cmdat |= MSC_CMDAT_INIT; /* Initialization sequence sent prior to command */
             break;
-
             /* bc - broadcast - no response */
         case MMC_GO_IDLE_STATE:
         case MMC_SET_DSR:
@@ -854,8 +1148,9 @@ static int jz_mmc_exec_cmd(struct mmc_request *request)
             break;
         case RESPONSE_R1B:
             cmdat |= MSC_CMDAT_BUSY;
-        /*FALLTHRU*/
+            /* FALLTHRU */
         case RESPONSE_R1:
+        case RESPONSE_R7:
             cmdat |= MSC_CMDAT_RESPONSE_R1;
             break;
         case RESPONSE_R2_CID:
@@ -964,7 +1259,6 @@ static int jz_mmc_exec_cmd(struct mmc_request *request)
         /* Wait for Data Done */
         while (!(REG_MSC_IREG & MSC_IREG_DATA_TRAN_DONE));
         REG_MSC_IREG = MSC_IREG_DATA_TRAN_DONE;    /* clear status */
-
     }
 
     /* Wait for Prog Done event */
@@ -1027,6 +1321,7 @@ static void jz_mmc_rx_handler(unsigned int arg)
 void MSC(void)
 {
     //wakeup_signal(&sd_wakeup);
+    logf("MSC interrupt");
 }
 
 /*******************************************************************************************************************
@@ -1037,8 +1332,8 @@ void MSC(void)
 ********************************************************************************************************************/
 static void jz_mmc_hardware_init(void)
 {
-    mmc_init_gpio();     /* init GPIO */
     __cpm_start_msc();   /* enable mmc clock */
+    mmc_init_gpio();     /* init GPIO */
 #ifdef MMC_POWER_ON
     MMC_POWER_ON();      /* turn on power of card */
 #endif
@@ -1060,7 +1355,7 @@ static void jz_mmc_hardware_init(void)
 #endif
 }
 
-static void mmc_send_cmd(struct mmc_request *request, int cmd, unsigned int arg,
+static int mmc_send_cmd(struct mmc_request *request, int cmd, unsigned int arg,
                          unsigned short nob, unsigned short block_len,
                          enum mmc_rsp_t rtype, unsigned char* buffer)
 {
@@ -1071,26 +1366,284 @@ static void mmc_send_cmd(struct mmc_request *request, int cmd, unsigned int arg,
     request->block_len = block_len;
     request->buffer = buffer;
     request->cnt = nob * block_len;
-    logf("mmc_send_cmd: command = %d",cmd);
-    jz_mmc_exec_cmd(request);
+
+    return jz_mmc_exec_cmd(request);
 }
 
-static bool inited = false;
-int _sd_init(void)
+static void mmc_simple_cmd(struct mmc_request *request, int cmd, unsigned int arg,
+                           enum mmc_rsp_t rtype)
 {
+    mmc_send_cmd(request, cmd, arg, 0, 0, rtype, NULL);
+}
+
+#define KBPS 1
+#define MBPS 1000
+static unsigned int ts_exp[] = { 100*KBPS, 1*MBPS, 10*MBPS, 100*MBPS, 0, 0, 0, 0 };
+static unsigned int ts_mul[] = { 0,    1000, 1200, 1300, 1500, 2000, 2500, 3000, 
+            3500, 4000, 4500, 5000, 5500, 6000, 7000, 8000 };
+
+unsigned int mmc_tran_speed(unsigned char ts)
+{
+    unsigned int rate = ts_exp[(ts & 0x7)] * ts_mul[(ts & 0x78) >> 3];
+
+    if (rate <= 0)
+    {
+        DEBUG("mmc_tran_speed: error - unrecognized speed 0x%02x", ts);
+        return 1;
+    }
+
+    return rate;
+}
+
+static void mmc_configure_card(void)
+{
+    unsigned int rate;
+
+    /* Get card info */
+    if (sd2_0)
+        mmcinfo.block_num = (mmcinfo.csd.c_size + 1) << 10;
+    else
+        mmcinfo.block_num = (mmcinfo.csd.c_size + 1) * (1 << (mmcinfo.csd.c_size_mult + 2));
+
+    mmcinfo.block_len = 1 << mmcinfo.csd.read_bl_len;
+
+    /* Fix the clock rate */
+    rate = mmc_tran_speed(mmcinfo.csd.tran_speed);
+    if (rate < MMC_CLOCK_SLOW)
+        rate = MMC_CLOCK_SLOW;
+    if (rate > SD_CLOCK_FAST)
+        rate = SD_CLOCK_FAST;
+
+    DEBUG("mmc_configure_card: block_len=%d block_num=%d rate=%d", mmcinfo.block_len, mmcinfo.block_num, rate);
+
+    jz_mmc_set_clock(1, rate);
+}
+
+#define MMC_INIT_DOING   0
+#define MMC_INIT_PASSED  1
+#define MMC_INIT_FAILED  2
+
+static int mmc_init_card_state(struct mmc_request *request)
+{
+    struct mmc_response_r1 r1;
+    struct mmc_response_r3 r3;
+    int retval;
+    int ocr = 0x40300000;
+    int limit_41 = 0;
+
+    switch (request->cmd)
+    {
+        case MMC_GO_IDLE_STATE: /* No response to parse */
+            mmc_simple_cmd(request, SD_SEND_IF_COND, 0x1AA, RESPONSE_R1);
+            break;
+
+        case SD_SEND_IF_COND:
+            mmc_simple_cmd(request, MMC_APP_CMD,  0, RESPONSE_R1);
+            break;
+
+        case MMC_APP_CMD:
+            retval = mmc_unpack_r1(request, &r1);
+            if (retval & (limit_41 < 100))
+            {
+                DEBUG("mmc_init_card_state: unable to MMC_APP_CMD error=%d", 
+                      retval);
+                limit_41++;
+                mmc_simple_cmd(request, SD_SEND_OP_COND, ocr, RESPONSE_R3);
+            } else if (limit_41 < 100) {
+                limit_41++;        
+                mmc_simple_cmd(request, SD_SEND_OP_COND, ocr, RESPONSE_R3);
+            } else{
+                /* reset the card to idle*/
+                mmc_simple_cmd(request, MMC_GO_IDLE_STATE, 0, RESPONSE_NONE);
+            }
+            break;
+
+        case SD_SEND_OP_COND:
+            retval = mmc_unpack_r3(request, &r3);
+            if (retval)
+            {
+              /* Try MMC card */
+                mmc_simple_cmd(request, MMC_SEND_OP_COND, MMC_OCR_ARG, RESPONSE_R3);
+                break;
+            }
+
+            DEBUG("mmc_init_card_state: read ocr value = 0x%08x", r3.ocr);
+            
+            if(!(r3.ocr & MMC_CARD_BUSY || ocr == 0)){
+                udelay(10000);
+                mmc_simple_cmd(request, MMC_APP_CMD, 0, RESPONSE_R1);
+            }
+            else
+            {
+              /* Set the data bus width to 4 bits */
+              use_4bit = 1;
+              mmc_simple_cmd(request, MMC_ALL_SEND_CID, 0, RESPONSE_R2_CID);
+            }
+            break;
+
+        case MMC_SEND_OP_COND:
+            retval = mmc_unpack_r3(request, &r3);
+            if (retval)
+            {
+                DEBUG("mmc_init_card_state: failed SEND_OP_COND error=%d", 
+                      retval);
+                return MMC_INIT_FAILED;
+            }
+
+            DEBUG("mmc_init_card_state: read ocr value = 0x%08x", r3.ocr);
+            if (!(r3.ocr & MMC_CARD_BUSY))
+                mmc_simple_cmd(request, MMC_SEND_OP_COND, MMC_OCR_ARG, RESPONSE_R3);
+            else
+                mmc_simple_cmd(request, MMC_ALL_SEND_CID, 0, RESPONSE_R2_CID);
+            break;
+            
+        case MMC_ALL_SEND_CID: 
+            retval = mmc_unpack_cid( request, &mmcinfo.cid );
+            
+            if ( retval && (retval != MMC_ERROR_CRC)) {
+                DEBUG("mmc_init_card_state: unable to ALL_SEND_CID error=%d", 
+                      retval);
+                return MMC_INIT_FAILED;
+            }
+            mmc_simple_cmd(request, MMC_SET_RELATIVE_ADDR, 0, RESPONSE_R6);
+            break;
+
+        case MMC_SET_RELATIVE_ADDR:
+            retval = mmc_unpack_r6(request, &r1, &mmcinfo.rca);
+            mmcinfo.rca = mmcinfo.rca << 16; 
+            DEBUG("mmc_init_card_state: Get RCA from SD: 0x%04x Status: %x", mmcinfo.rca, r1.status);
+            if (retval)
+            {
+                DEBUG("mmc_init_card_state: unable to SET_RELATIVE_ADDR error=%d", 
+                      retval);
+                return MMC_INIT_FAILED;
+            }
+
+            mmc_simple_cmd(request, MMC_SEND_CSD, mmcinfo.rca, RESPONSE_R2_CSD);
+            break;
+            
+        case MMC_SEND_CSD:
+            retval = mmc_unpack_csd(request, &mmcinfo.csd);
+
+            DEBUG("SD card is ready");
+                    
+            /*FIXME:ignore CRC error for CMD2/CMD9/CMD10 */
+            if (retval && (retval != MMC_ERROR_CRC))
+            {
+                DEBUG("mmc_init_card_state: unable to SEND_CSD error=%d", 
+                      retval);
+                return MMC_INIT_FAILED;
+            }
+            mmc_configure_card();
+            return MMC_INIT_PASSED;
+            
+        default:
+            DEBUG("mmc_init_card_state: error!  Illegal last cmd %d", request->cmd);
+            return MMC_INIT_FAILED;
+    }
+
+    return MMC_INIT_DOING;
+}
+
+static int mmc_sd_switch(struct mmc_request *request, int mode, int group,
+              unsigned char value, unsigned char * resp)
+{
+    unsigned int arg;
+
+    mode = !!mode;
+    value &= 0xF;
+    arg = (mode << 31 | 0x00FFFFFF);
+    arg &= ~(0xF << (group * 4));
+    arg |= value << (group * 4);
+    mmc_send_cmd(request, 6, arg, 1, 64, RESPONSE_R1, resp);
+    
+    return 0;
+}
+
+/*
+ * Fetches and decodes switch information
+ */
+static int mmc_read_switch(struct mmc_request *request)
+{
+    unsigned int status[64 / 4];
+
+    memset((unsigned char *)status, 0, 64);
+    mmc_sd_switch(request, 0, 0, 1, (unsigned char*) status);
+    
+    if (((unsigned char *)status)[13] & 0x02)
+        return 0;
+    else 
+        return 1;
+}
+
+/*
+ * Test if the card supports high-speed mode and, if so, switch to it.
+ */
+static int mmc_switch_hs(struct mmc_request *request)
+{
+    unsigned int status[64 / 4];
+
+    mmc_sd_switch(request, 1, 0, 1, (unsigned char*) status);
+    return 0;
+}
+
+int mmc_select_card(void)
+{
+    struct mmc_request request;
+    struct mmc_response_r1 r1;
+    int retval;
+
+    mmc_simple_cmd(&request, MMC_SELECT_CARD, mmcinfo.rca,
+               RESPONSE_R1B);
+    retval = mmc_unpack_r1(&request, &r1);
+    if (retval)
+        return retval;
+
+    if (sd2_0)
+    {
+        retval = mmc_read_switch(&request);
+        if (!retval)
+        {
+            mmc_switch_hs(&request);
+            jz_mmc_set_clock(1, SD_CLOCK_HIGH);
+        }
+    }
+    num_6 = 3;
+    mmc_simple_cmd(&request, MMC_APP_CMD, mmcinfo.rca,
+               RESPONSE_R1);
+    retval = mmc_unpack_r1(&request, &r1);
+    if (retval)
+        return retval;
+    mmc_simple_cmd(&request, SET_BUS_WIDTH, 2, RESPONSE_R1);
+    retval = mmc_unpack_r1(&request, &r1);
+    if (retval)
+        return retval;
+    
+    return retval;
+}
+
+int sd_init(void)
+{
+    int retval;
+    static bool inited = false;
+    struct mmc_request init_req;
     if(!inited)
     {
         jz_mmc_hardware_init();
         wakeup_init(&sd_wakeup);
+        num_6 = 0;
         inited = true;
     }
     
-    struct mmc_request test;
-    //mmc_send_cmd(&test, MMC_CIM_RESET, 0, 0, 0, RESPONSE_NONE, NULL);
-    mmc_send_cmd(&test, MMC_GO_IDLE_STATE, 0, 0, 0, RESPONSE_NONE, NULL);
-    mmc_send_cmd(&test, SD_SEND_OP_COND, MMC_OCR_ARG, 0, 0, RESPONSE_R3, NULL);
+    mmc_send_cmd(&init_req, MMC_CIM_RESET,    0, 0, 0, RESPONSE_NONE, NULL);
+    mmc_send_cmd(&init_req, SD_GO_IDLE_STATE, 0, 0, 0, RESPONSE_NONE, NULL);
     
-    return 0;
+    while ((retval = mmc_init_card_state(&init_req)) == MMC_INIT_DOING);
+
+    if (retval == MMC_INIT_PASSED)
+        return mmc_select_card();
+    else
+        return -1;
 }
 
 bool card_detect_target(void)
@@ -1115,27 +1668,150 @@ void card_enable_monitoring_target(bool on)
 /* TODO */
 tCardInfo* card_get_info_target(int card_no)
 {
+    (void)card_no;
+    int i, temp;
     static tCardInfo card;
+    static const char mantissa[] = {  /* *10 */
+        0,  10, 12, 13, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80 };
+    static const int exponent[] = {  /* use varies */
+      1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000 };
+    
+    card.initialized = true;
+    card.ocr = 0;
+    for(i=0; i<4; i++)
+        card.csd[i] = (*((unsigned long*)&mmcinfo.csd+4*i));
+    for(i=0; i<4; i++)
+        card.cid[i] = (*((unsigned long*)&mmcinfo.cid+4*i));
+    temp              = card_extract_bits(card.csd, 29, 3);
+    card.speed        = mantissa[card_extract_bits(card.csd, 25, 4)]
+                      * exponent[temp > 2 ? 7 : temp + 4];
+    card.nsac         = 100 * card_extract_bits(card.csd, 16, 8);
+    temp              = card_extract_bits(card.csd, 13, 3);
+    card.tsac         = mantissa[card_extract_bits(card.csd, 9, 4)]
+                      * exponent[temp] / 10;
+    card.numblocks = mmcinfo.block_num;
+    card.blocksize = mmcinfo.block_len;
     
     return &card;
 }
 
-/* TODO */
-int _sd_read_sectors(unsigned long start, int count, void* buf)
+int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
 {
-    (void)start;
-    (void)count;
-    (void)buf;
-    return -1;
+    (void)drive;
+    struct mmc_request request;
+    struct mmc_response_r1 r1;
+    int retval; 
+
+    if (!card_detect_target() || count == 0 || start > mmcinfo.block_num)
+        return -1;
+    
+    mmc_simple_cmd(&request, MMC_SEND_STATUS, mmcinfo.rca, RESPONSE_R1);
+    retval = mmc_unpack_r1(&request, &r1);
+    if (retval && (retval != MMC_ERROR_STATE_MISMATCH))
+        return retval;
+    
+    mmc_simple_cmd(&request, MMC_SET_BLOCKLEN, BLOCK_SIZE, RESPONSE_R1);
+    if ((retval = mmc_unpack_r1(&request, &r1)))
+        return retval;
+    
+    if (sd2_0)
+    {
+        mmc_send_cmd(&request, MMC_READ_MULTIPLE_BLOCK, start,
+                     count, BLOCK_SIZE, RESPONSE_R1, buf);
+        if ((retval = mmc_unpack_r1(&request, &r1)))
+            return retval;
+    }
+    else
+    {
+        mmc_send_cmd(&request, MMC_READ_MULTIPLE_BLOCK,
+                     start * BLOCK_SIZE, count,
+                     BLOCK_SIZE, RESPONSE_R1, buf);
+        if ((retval = mmc_unpack_r1(&request, &r1)))
+            return retval;
+    }
+    
+    last_disk_activity = current_tick;
+
+    mmc_simple_cmd(&request, MMC_STOP_TRANSMISSION, 0, RESPONSE_R1B);
+    if ((retval = mmc_unpack_r1(&request, &r1)))
+        return retval;
+    
+    return retval;
 }
 
-/* TODO */
-int _sd_write_sectors(unsigned long start, int count, const void* buf)
+int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf)
 {
-    (void)start;
-    (void)count;
-    (void)buf;
-    return -1;
+    (void)drive;
+    struct mmc_request request;
+    struct mmc_response_r1 r1;
+    int retval;
+
+    if (!card_detect_target() || count == 0 || start > mmcinfo.block_num)
+        return -1;
+
+    mmc_simple_cmd(&request, MMC_SEND_STATUS, mmcinfo.rca, RESPONSE_R1);
+    retval = mmc_unpack_r1(&request, &r1);
+    if (retval && (retval != MMC_ERROR_STATE_MISMATCH))
+        return retval;
+
+    mmc_simple_cmd(&request, MMC_SET_BLOCKLEN, BLOCK_SIZE, RESPONSE_R1);
+    if ((retval = mmc_unpack_r1(&request, &r1)))
+        return retval;
+
+    if (sd2_0)
+    {
+        mmc_send_cmd(&request, MMC_WRITE_MULTIPLE_BLOCK, start,
+                 count, BLOCK_SIZE, RESPONSE_R1,
+                 (void*)buf);
+        if ((retval = mmc_unpack_r1(&request, &r1)))
+            return retval;
+    }
+    else
+    {
+        mmc_send_cmd(&request, MMC_WRITE_MULTIPLE_BLOCK,
+                 start * BLOCK_SIZE, count,
+                 BLOCK_SIZE, RESPONSE_R1, (void*)buf);
+        if ((retval = mmc_unpack_r1(&request, &r1)))
+            return retval;
+    }
+    mmc_simple_cmd(&request, MMC_STOP_TRANSMISSION, 0, RESPONSE_R1B);
+    if ((retval = mmc_unpack_r1(&request, &r1)))
+        return retval;
+
+    return retval;
+}
+
+void sd_sleep(void)
+{
+}
+
+void sd_spin(void)
+{
+}
+
+long sd_last_disk_activity(void)
+{
+    return last_disk_activity;
+}
+
+void sd_spindown(int seconds)
+{
+    (void)seconds;
+}
+
+#ifdef HAVE_HOTSWAP
+bool sd_removable(IF_MV_NONVOID(int drive))
+{
+    (void)drive;
+    //return true;
+    return false;
+}
+#endif
+
+bool sd_present(IF_MV_NONVOID(int drive))
+{
+    (void)drive;
+    return (mmcinfo.block_num > 0 && card_detect_target());
 }
 
 #ifdef STORAGE_GET_INFO
@@ -1149,8 +1825,7 @@ void sd_get_info(IF_MV2(int drive,) struct storage_info *info)
     info->product="SD Storage";
 
     /* blocks count */
-    /* TODO: proper amount of sectors! */
-    info->num_sectors = 0;
-    info->sector_size = 512;
+    info->num_sectors = mmcinfo.block_num;
+    info->sector_size = mmcinfo.block_len;
 }
 #endif

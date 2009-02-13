@@ -22,11 +22,9 @@
 #include "config.h"
 #include "jz4740.h"
 #include "mips.h"
-#include "mipsregs.h"
 #include "mmu-mips.h"
 #include "panic.h"
 #include "system.h"
-#include "string.h"
 #include "kernel.h"
 
 #define NUM_DMA  6
@@ -36,165 +34,40 @@
 static int irq;
 static void UIRQ(void)
 {
-    panicf("Unhandled interrupt occurred: %d\n", irq);
+    panicf("Unhandled interrupt occurred: %d", irq);
 }
 
-#define default_interrupt(name) \
-  extern __attribute__((weak,alias("UIRQ"))) void name (void)
+#define intr(name) extern __attribute__((weak,alias("UIRQ"))) void name (void)
 
-default_interrupt(I2C);
-default_interrupt(EMC);
-default_interrupt(UHC);
-default_interrupt(UART0);
-default_interrupt(SADC);
-default_interrupt(MSC);
-default_interrupt(RTC);
-default_interrupt(SSI);
-default_interrupt(CIM);
-default_interrupt(AIC);
-default_interrupt(ETH);
-default_interrupt(TCU2);
-default_interrupt(TCU1);
-default_interrupt(TCU0);
-default_interrupt(UDC);
-default_interrupt(IPU);
-default_interrupt(LCD);
+intr(I2C);intr(EMC);intr(UHC);intr(UART0);intr(SADC);intr(MSC);intr(RTC);
+intr(SSI);intr(CIM);intr(AIC);intr(ETH);intr(TCU2);intr(TCU1);intr(TCU0);
+intr(UDC);intr(IPU);intr(LCD);
 
-default_interrupt(DMA0);
-default_interrupt(DMA1);
-default_interrupt(DMA2);
-default_interrupt(DMA3);
-default_interrupt(DMA4);
-default_interrupt(DMA5);
+intr(DMA0);intr(DMA1);intr(DMA2);intr(DMA3);intr(DMA4);intr(DMA5);
 
-default_interrupt(GPIO0);
-default_interrupt(GPIO1);
-default_interrupt(GPIO2);
-default_interrupt(GPIO3);
-default_interrupt(GPIO4);
-default_interrupt(GPIO5);
-default_interrupt(GPIO6);
-default_interrupt(GPIO7);
-default_interrupt(GPIO8);
-default_interrupt(GPIO9);
-default_interrupt(GPIO10);
-default_interrupt(GPIO11);
-default_interrupt(GPIO12);
-default_interrupt(GPIO13);
-default_interrupt(GPIO14);
-default_interrupt(GPIO15);
-default_interrupt(GPIO16);
-default_interrupt(GPIO17);
-default_interrupt(GPIO18);
-default_interrupt(GPIO19);
-default_interrupt(GPIO20);
-default_interrupt(GPIO21);
-default_interrupt(GPIO22);
-default_interrupt(GPIO23);
-default_interrupt(GPIO24);
-default_interrupt(GPIO25);
-default_interrupt(GPIO26);
-default_interrupt(GPIO27);
-default_interrupt(GPIO28);
-default_interrupt(GPIO29);
-default_interrupt(GPIO30);
-default_interrupt(GPIO31);
-default_interrupt(GPIO32);
-default_interrupt(GPIO33);
-default_interrupt(GPIO34);
-default_interrupt(GPIO35);
-default_interrupt(GPIO36);
-default_interrupt(GPIO37);
-default_interrupt(GPIO38);
-default_interrupt(GPIO39);
-default_interrupt(GPIO40);
-default_interrupt(GPIO41);
-default_interrupt(GPIO42);
-default_interrupt(GPIO43);
-default_interrupt(GPIO44);
-default_interrupt(GPIO45);
-default_interrupt(GPIO46);
-default_interrupt(GPIO47);
-default_interrupt(GPIO48);
-default_interrupt(GPIO49);
-default_interrupt(GPIO50);
-default_interrupt(GPIO51);
-default_interrupt(GPIO52);
-default_interrupt(GPIO53);
-default_interrupt(GPIO54);
-default_interrupt(GPIO55);
-default_interrupt(GPIO56);
-default_interrupt(GPIO57);
-default_interrupt(GPIO58);
-default_interrupt(GPIO59);
-default_interrupt(GPIO60);
-default_interrupt(GPIO61);
-default_interrupt(GPIO62);
-default_interrupt(GPIO63);
-default_interrupt(GPIO64);
-default_interrupt(GPIO65);
-default_interrupt(GPIO66);
-default_interrupt(GPIO67);
-default_interrupt(GPIO68);
-default_interrupt(GPIO69);
-default_interrupt(GPIO70);
-default_interrupt(GPIO71);
-default_interrupt(GPIO72);
-default_interrupt(GPIO73);
-default_interrupt(GPIO74);
-default_interrupt(GPIO75);
-default_interrupt(GPIO76);
-default_interrupt(GPIO77);
-default_interrupt(GPIO78);
-default_interrupt(GPIO79);
-default_interrupt(GPIO80);
-default_interrupt(GPIO81);
-default_interrupt(GPIO82);
-default_interrupt(GPIO83);
-default_interrupt(GPIO84);
-default_interrupt(GPIO85);
-default_interrupt(GPIO86);
-default_interrupt(GPIO87);
-default_interrupt(GPIO88);
-default_interrupt(GPIO89);
-default_interrupt(GPIO90);
-default_interrupt(GPIO91);
-default_interrupt(GPIO92);
-default_interrupt(GPIO93);
-default_interrupt(GPIO94);
-default_interrupt(GPIO95);
-default_interrupt(GPIO96);
-default_interrupt(GPIO97);
-default_interrupt(GPIO98);
-default_interrupt(GPIO99);
-default_interrupt(GPIO100);
-default_interrupt(GPIO101);
-default_interrupt(GPIO102);
-default_interrupt(GPIO103);
-default_interrupt(GPIO104);
-default_interrupt(GPIO105);
-default_interrupt(GPIO106);
-default_interrupt(GPIO107);
-default_interrupt(GPIO108);
-default_interrupt(GPIO109);
-default_interrupt(GPIO110);
-default_interrupt(GPIO111);
-default_interrupt(GPIO112);
-default_interrupt(GPIO113);
-default_interrupt(GPIO114);
-default_interrupt(GPIO115);
-default_interrupt(GPIO116);
-default_interrupt(GPIO117);
-default_interrupt(GPIO118);
-default_interrupt(GPIO119);
-default_interrupt(GPIO120);
-default_interrupt(GPIO121);
-default_interrupt(GPIO122);
-default_interrupt(GPIO123);
-default_interrupt(GPIO124);
-default_interrupt(GPIO125);
-default_interrupt(GPIO126);
-default_interrupt(GPIO127);
+intr(GPIO0);intr(GPIO1);intr(GPIO2);intr(GPIO3);intr(GPIO4);intr(GPIO5);
+intr(GPIO6);intr(GPIO7);intr(GPIO8);intr(GPIO9);intr(GPIO10);intr(GPIO11);
+intr(GPIO12);intr(GPIO13);intr(GPIO14);intr(GPIO15);intr(GPIO16);intr(GPIO17);
+intr(GPIO18);intr(GPIO19);intr(GPIO20);intr(GPIO21);intr(GPIO22);intr(GPIO23);
+intr(GPIO24);intr(GPIO25);intr(GPIO26);intr(GPIO27);intr(GPIO28);intr(GPIO29);
+intr(GPIO30);intr(GPIO31);intr(GPIO32);intr(GPIO33);intr(GPIO34);intr(GPIO35);
+intr(GPIO36);intr(GPIO37);intr(GPIO38);intr(GPIO39);intr(GPIO40);intr(GPIO41);
+intr(GPIO42);intr(GPIO43);intr(GPIO44);intr(GPIO45);intr(GPIO46);intr(GPIO47);
+intr(GPIO48);intr(GPIO49);intr(GPIO50);intr(GPIO51);intr(GPIO52);intr(GPIO53);
+intr(GPIO54);intr(GPIO55);intr(GPIO56);intr(GPIO57);intr(GPIO58);intr(GPIO59);
+intr(GPIO60);intr(GPIO61);intr(GPIO62);intr(GPIO63);intr(GPIO64);intr(GPIO65);
+intr(GPIO66);intr(GPIO67);intr(GPIO68);intr(GPIO69);intr(GPIO70);intr(GPIO71);
+intr(GPIO72);intr(GPIO73);intr(GPIO74);intr(GPIO75);intr(GPIO76);intr(GPIO77);
+intr(GPIO78);intr(GPIO79);intr(GPIO80);intr(GPIO81);intr(GPIO82);intr(GPIO83);
+intr(GPIO84);intr(GPIO85);intr(GPIO86);intr(GPIO87);intr(GPIO88);intr(GPIO89);
+intr(GPIO90);intr(GPIO91);intr(GPIO92);intr(GPIO93);intr(GPIO94);intr(GPIO95);
+intr(GPIO96);intr(GPIO97);intr(GPIO98);intr(GPIO99);intr(GPIO100);intr(GPIO101);
+intr(GPIO102);intr(GPIO103);intr(GPIO104);intr(GPIO105);intr(GPIO106);
+intr(GPIO107);intr(GPIO108);intr(GPIO109);intr(GPIO110);intr(GPIO111);
+intr(GPIO112);intr(GPIO113);intr(GPIO114);intr(GPIO115);intr(GPIO116);
+intr(GPIO117);intr(GPIO118);intr(GPIO119);intr(GPIO120);intr(GPIO121);
+intr(GPIO122);intr(GPIO123);intr(GPIO124);intr(GPIO125);intr(GPIO126);
+intr(GPIO127);
 
 static void (* const irqvector[])(void) =
 {
@@ -281,17 +154,16 @@ static void ack_irq(unsigned int irq)
         __intc_ack_irq(irq);
 }
 
-static unsigned long ipl;
 static int get_irq_number(void)
 {
-    register int irq = 0;
+    static unsigned long ipl;
+    register int irq;
     
     ipl |= REG_INTC_IPR;
     
     if (ipl == 0)
         return -1;
 
-    /* find out the real irq defined in irq_xxx.c */
     for (irq = 31; irq >= 0; irq--)
         if (ipl & (1 << irq))
             break;
@@ -369,15 +241,14 @@ void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
     panicf("Exception occurred: %s [0x%08x] at 0x%08x (stack at 0x%08x)", parse_exception(cause), cause, epc, (unsigned int)stack_ptr);
 }
 
-static unsigned int iclk;
-static void detect_clock(void)
+void tlb_refill_handler(void)
 {
-    iclk = __cpm_get_cclk();
+    panicf("TLB refill handler at 0x%08lx! [0x%x]", read_c0_epc(), read_c0_badvaddr());
 }
 
 void udelay(unsigned int usec)
 {
-    unsigned int i = usec * (iclk / 2000000);
+    unsigned int i = usec * (__cpm_get_cclk() / 2000000);
     __asm__ __volatile__ (
                           ".set noreorder    \n"
                           "1:                \n"
@@ -394,135 +265,6 @@ void mdelay(unsigned int msec)
     unsigned int i;
     for(i=0; i<msec; i++)
         udelay(1000);
-}
-
-/* Core-level interrupt masking */
-void clear_interrupts(void)
-{
-    register unsigned int t;
-    t = read_c0_status();
-    t &= ~1;
-    write_c0_status(t);
-}
-
-unsigned int mips_get_sr(void)
-{
-    return read_c0_status();
-}
-
-void store_interrupts(void)
-{
-    register unsigned int t;
-    t = read_c0_status();
-    t |= 1;
-    t &= ~2;
-    write_c0_status(t);
-}
-
-#define Index_Invalidate_I      0x00
-#define Index_Writeback_Inv_D   0x01
-#define Index_Load_Tag_I        0x04
-#define Index_Load_Tag_D        0x05
-#define Index_Store_Tag_I       0x08
-#define Index_Store_Tag_D       0x09
-#define Hit_Invalidate_I        0x10
-#define Hit_Invalidate_D        0x11
-#define Hit_Writeback_Inv_D     0x15
-#define Hit_Writeback_I         0x18
-#define Hit_Writeback_D         0x19
-
-#define CACHE_SIZE              16*1024
-#define CACHE_LINE_SIZE         32
-#define KSEG0                   0x80000000
-
-#define SYNC_WB() __asm__ __volatile__ ("sync")
-
-#define __CACHE_OP(op, addr)                 \
-    __asm__ __volatile__(                    \
-    "    .set    noreorder        \n"        \
-    "    .set    mips32\n\t       \n"        \
-    "    cache   %0, %1           \n"        \
-    "    .set    mips0            \n"        \
-    "    .set    reorder          \n"        \
-    :                                        \
-    : "i" (op), "m" (*(unsigned char *)(addr)))
-
-void __flush_dcache_line(unsigned long addr)
-{
-    __CACHE_OP(Hit_Writeback_Inv_D, addr);
-    SYNC_WB();
-}
-
-void __icache_invalidate_all(void)
-{
-    unsigned int i;
-
-    asm volatile (".set   noreorder  \n"
-                  ".set   mips32     \n"
-                  "mtc0   $0, $28    \n" /* TagLo */
-                  "mtc0   $0, $29    \n" /* TagHi */
-                  ".set   mips0      \n"
-                  ".set   reorder    \n"
-                  );
-    for(i=KSEG0; i<KSEG0+CACHE_SIZE; i+=CACHE_LINE_SIZE)
-        __CACHE_OP(Index_Store_Tag_I, i);
-
-    /* invalidate btb */
-    asm volatile (
-        ".set mips32        \n"
-        "mfc0 %0, $16, 7    \n"
-        "nop                \n"
-        "ori  %0, 2         \n"
-        "mtc0 %0, $16, 7    \n"
-        ".set mips0         \n"
-        :
-        : "r" (i));
-}
-
-void __dcache_invalidate_all(void)
-{
-    unsigned int i;
-
-    asm volatile (".set   noreorder  \n"
-                  ".set   mips32     \n"
-                  "mtc0   $0, $28    \n"
-                  "mtc0   $0, $29    \n"
-                  ".set   mips0      \n"
-                  ".set   reorder    \n"
-                  );
-    for (i=KSEG0; i<KSEG0+CACHE_SIZE; i+=CACHE_LINE_SIZE)
-        __CACHE_OP(Index_Store_Tag_D, i);
-}
-
-void __dcache_writeback_all(void)
-{
-    unsigned int i;
-    for(i=KSEG0; i<KSEG0+CACHE_SIZE; i+=CACHE_LINE_SIZE)
-        __CACHE_OP(Index_Writeback_Inv_D, i);
-    
-    SYNC_WB();
-}
-
-void dma_cache_wback_inv(unsigned long addr, unsigned long size)
-{
-    unsigned long end, a;
-
-    if (size >= CACHE_SIZE)
-        __dcache_writeback_all();
-    else
-    {
-        unsigned long dc_lsize = CACHE_LINE_SIZE;
-        
-        a = addr & ~(dc_lsize - 1);
-        end = (addr + size - 1) & ~(dc_lsize - 1);
-        for(; a < end; a += dc_lsize)
-            __flush_dcache_line(a);    /* Hit_Writeback_Inv_D */
-    }
-}
-
-void tlb_refill_handler(void)
-{
-    panicf("TLB refill handler at 0x%08lx! [0x%x]", read_c0_epc(), read_c0_badvaddr());
 }
 
 static int dma_count = 0;
@@ -718,9 +460,8 @@ static void sdram_init(void)
     /* everything is ok now */
 }
 
-extern int main(void);
-void system_main(void) ICODE_ATTR;
-void system_main(void)
+/* Gets called *before* main */
+void ICODE_ATTR system_main(void)
 {
     int i;
        
@@ -733,24 +474,16 @@ void system_main(void)
     for(i=0; i<IRQ_MAX; i++)
         dis_irq(i);
     
-    tlb_init();
-    
-    //pll_init();
-    //sdram_init();
-    
-    detect_clock();
+    mmu_init();
+    pll_init();
+    sdram_init();
     
     /* Disable unneeded clocks, clocks are enabled when needed */
     __cpm_stop_all();
     __cpm_suspend_usbhost();
     
     /* Enable interrupts at core level */
-    store_interrupts();
-    
-    main(); /* Shouldn't return */
-    
-    while(1)
-        core_idle();
+    enable_interrupt();
 }
 
 void system_reboot(void)
@@ -781,8 +514,8 @@ void power_off(void)
     __rtc_clear_hib_stat_all();
     /* __rtc_set_scratch_pattern(0x12345678); */
     __rtc_enable_alarm_wakeup();
-    __rtc_set_hrcr_val(0xfe0);
-    __rtc_set_hwfcr_val((0xFFFF << 4));
+    __rtc_set_hrcr_val(0xFE0);
+    __rtc_set_hwfcr_val(0xFFFF << 4);
     __rtc_power_down();
     
     while(1);

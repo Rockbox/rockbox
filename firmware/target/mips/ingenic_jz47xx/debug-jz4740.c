@@ -21,6 +21,29 @@
 
 #include "config.h"
 #include "jz4740.h"
+#include "debug-target.h"
+#include <stdarg.h>
+#include <stdio.h>
+#include "lcd.h"
+#include "kernel.h"
+#include "font.h"
+#include "button.h"
+
+static int line = 0;
+static void printf(const char *format, ...)
+{
+    int len;
+    unsigned char *ptr;
+    char printfbuf[256];
+    va_list ap;
+    va_start(ap, format);
+
+    ptr = printfbuf;
+    len = vsnprintf(ptr, sizeof(printfbuf), format, ap);
+    va_end(ap);
+
+    lcd_puts(0, line++, ptr);
+}
 
 /*
  * Clock Generation Module
@@ -126,6 +149,20 @@ bool __dbg_ports(void)
 
 bool __dbg_hw_info(void)
 {
-    return false;
+    int btn = 0, touch;
+    
+    lcd_setfont(FONT_SYSFIXED);
+    while(btn ^ BUTTON_POWER)
+    {
+        lcd_clear_display();
+        line = 0;
+        display_clocks();
+        display_enabled_clocks();
+        btn = button_read_device(&touch);
+        printf("X: %d Y: %d BTN: 0x%X", touch>>16, touch&0xFFFF, btn);
+        lcd_update();
+        sleep(HZ/16);
+    }
+    return true;
 }
 

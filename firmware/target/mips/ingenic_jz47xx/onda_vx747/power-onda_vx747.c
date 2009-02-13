@@ -42,3 +42,8 @@ void power_init(void)
 {
     __gpio_as_input(USB_CHARGER_GPIO);
 }
+
+bool charging_state(void)
+{
+    return false;
+}

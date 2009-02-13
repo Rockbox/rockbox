@@ -43,14 +43,16 @@
     .set mips32
 
     .extern system_main
+    .extern main
+    .global _start
 
-    .global    _start
     .section .init.text
     .set    noreorder
     .set    noat
 
 #ifdef BOOTLOADER
-    .word 0 /* Unknown */
+    /* These will get filled in scramble */
+    .word 0 /* Unknown  */
     .word 0 /* Filesize */
 
     /* Relocate bootloader */
@@ -64,12 +66,12 @@ _relocate_loop:
     bne    t1, t2, _relocate_loop
     addiu  t0, 4
 #endif
-    
+
 _start:
     la      ra, _start
     /*
       ----------------------------------------------------
-       init cp0 registers.
+       Init CP0 registers.
       ----------------------------------------------------
     */
     mtc0    zero, C0_WATCHLO
@@ -90,21 +92,21 @@ _start:
 
     /*
       ----------------------------------------------------
-       init caches, assumes a 4way*128set*32byte i/d cache
+       Init caches, assumes a 4way*128set*32byte I/D cache
       ----------------------------------------------------
     */
-    li      t0, 3            // enable cache for kseg0 accesses
-    mtc0    t0, C0_CONFIG    // CONFIG reg
-    la      t0, 0x80000000   // an idx op should use an unmappable address
-    ori     t1, t0, 0x4000   // 16kB cache
-    mtc0    zero, C0_TAGLO   // TAGLO reg
-    mtc0    zero, C0_TAGHI   // TAGHI reg
+    li      t0, 3            # enable cache for kseg0 accesses
+    mtc0    t0, C0_CONFIG    # CONFIG reg
+    la      t0, 0x80000000   # an idx op should use an unmappable address
+    ori     t1, t0, 0x4000   # 16kB cache
+    mtc0    zero, C0_TAGLO   # TAGLO reg
+    mtc0    zero, C0_TAGHI   # TAGHI reg
 
 _init_cache_loop:
-    cache   0x8, 0(t0)       // index store icache tag
-    cache   0x9, 0(t0)       // index store dcache tag
+    cache   0x8, 0(t0)       # index store icache tag
+    cache   0x9, 0(t0)       # index store dcache tag
     bne     t0, t1, _init_cache_loop
-    addiu   t0, t0, 0x20     // 32 bytes per cache line
+    addiu   t0, t0, 0x20     # 32 bytes per cache line
     nop
 
     /*
@@ -120,7 +122,7 @@ _init_cache_loop:
     
     /*
       ----------------------------------------------------
-       clear BSS section
+       Clear BSS section
       ----------------------------------------------------
     */
     la     t0, _edata
@@ -132,7 +134,7 @@ _init_bss_loop:
     
     /*
       ----------------------------------------------------
-       clear IBSS section
+       Clear IBSS section
       ----------------------------------------------------
     */
     la     t0, _iedata
@@ -144,7 +146,7 @@ _init_ibss_loop:
     
     /*
       ----------------------------------------------------
-       copy IRAM section
+       Copy IRAM section
       ----------------------------------------------------
     */
     la     t0, _iramcopy
@@ -159,7 +161,7 @@ _init_iram_loop:
 
     /*
       ----------------------------------------------------
-       setup stack, jump to C code
+       Setup stack
       ----------------------------------------------------
     */
     la      sp, stackend
@@ -171,7 +173,15 @@ _init_stack_loop:
     bne     t0, sp, _init_stack_loop
     addiu   t0, t0, 4
 
-    la      t0, system_main
+    /*
+      ----------------------------------------------------
+       Jump to C code
+      ----------------------------------------------------
+    */
+    la      t0, system_main        /* Init clocks etc first */
+    jalr    t0
+    nop
+    la      t0, main
     jr      t0
     nop
 
@@ -182,11 +192,10 @@ _init_stack_loop:
      * 0x180 - Exception/Interrupt handler
      * 0x200 - Special Exception Interrupt handler (when IV is set in CP0_CAUSE)
      */
-
     
     .section .vectors.1, "ax", %progbits
-    la k0, tlb_refill_handler
-    jr k0
+    la     k0, tlb_refill_handler
+    jr     k0
     nop
     
     .section .vectors.2, "ax", %progbits
@@ -235,10 +244,10 @@ real_exception_handler:
     sw      v1, 0x64(sp)
     sw      v0, 0x68(sp)
     sw      $1, 0x6C(sp)
-    mflo    k0             # Move From LO
+    mflo    k0
     nop
     sw      k0, 0x70(sp)
-    mfhi    k0             # Move From HI
+    mfhi    k0
     nop
     sw      k0, 0x74(sp)
     mfc0    k0, C0_STATUS  # Status register
@@ -294,10 +303,10 @@ _int:
     lw      v0, 0x68(sp)
     lw      $1, 0x6C(sp)
     lw      k0, 0x70(sp)
-    mtlo    k0             # Move To LO
+    mtlo    k0
     nop
     lw      k0, 0x74(sp)
-    mthi    k0             # Move To HI
+    mthi    k0
     nop
     lw      k0, 0x78(sp)
     nop
@@ -360,10 +369,10 @@ _exception:
     lw      v0, 0x68(sp)
     lw      $1, 0x6C(sp)
     lw      k0, 0x70(sp)
-    mtlo    k0             # Move To LO
+    mtlo    k0
     nop
     lw      k0, 0x74(sp)
-    mthi    k0             # Move To HI
+    mthi    k0
     nop
     lw      k0, 0x78(sp)
     nop

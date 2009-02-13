@@ -35,7 +35,7 @@ static bool backlight_on;
 
 static void set_backlight(int val)
 {
-(void)val;
+    (void)val;
 }
 
 bool _backlight_init(void)
@@ -151,5 +151,13 @@ void _backlight_off(void)
 void _backlight_set_brightness(int brightness)
 {
     set_backlight(brightness);
+}
+#endif
+
+#ifdef HAVE_LCD_SLEEP
+/* Turn off LED supply */
+void _backlight_lcd_sleep(void)
+{
+    set_backlight_off();
 }
 #endif

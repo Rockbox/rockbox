@@ -28,11 +28,7 @@
 #include "jz4740.h"
 #include "rtc.h"
 #include "timefuncs.h"
-
-static unsigned int epoch = 1900;
-static const unsigned char days_in_mo[] = {
-    0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
-};
+#include "logf.h"
 
 static const unsigned int yearday[5] = {0, 366, 366+365, 366+365*2, 366+365*3};
 static const unsigned int sweekday = 6;
@@ -52,8 +48,8 @@ static const unsigned int sum_monthday[13] = {
     365
 };
 
-#if 0
-static unsigned int jz_mktime(int year, int mon, int day, int hour, int min, int sec)
+static unsigned int jz_mktime(int year, int mon, int day, int hour, int min,
+                              int sec)
 {
     unsigned int seccounter;
 
@@ -79,10 +75,9 @@ static unsigned int jz_mktime(int year, int mon, int day, int hour, int min, int
 
     return seccounter;
 }
-#endif
 
-static void jz_gettime(unsigned int rtc, int *year, int *mon, int *day, int *hour,
-         int *min, int *sec, int *weekday)
+static void jz_gettime(unsigned int rtc, int *year, int *mon, int *day,
+                       int *hour, int *min, int *sec, int *weekday)
 {
     unsigned int tday, tsec, i, tmp;
 
@@ -143,9 +138,9 @@ int rtc_read_datetime(unsigned char* buf)
     rtc_tm.tm_wday = wday;
     /* Don't use centry, but start from year 1970 */
     rtc_tm.tm_mon = mon;
-    if ((year += (epoch - 1900)) <= 69)
+    if (year <= 69)
         year += 100;
-    rtc_tm.tm_year = year + 1900;
+    rtc_tm.tm_year = year;
     
     rtc_tm.tm_yday = 0; /* Not implemented for now */
     rtc_tm.tm_isdst = -1; /* Not implemented for now */
@@ -156,7 +151,20 @@ int rtc_read_datetime(unsigned char* buf)
 
 int rtc_write_datetime(unsigned char* buf)
 {
-    (void)buf;
+    struct tm *rtc_tm = (struct tm*)buf;
+    unsigned int year, lval;
+    
+    year = rtc_tm->tm_year;
+    /* Don't use centry, but start from year 1970 */
+    if (year > 69)
+        year -= 100;
+    year += 2000;
+    
+    lval = jz_mktime(year, rtc_tm->tm_mon, rtc_tm->tm_mday, rtc_tm->tm_hour,
+                     rtc_tm->tm_min, rtc_tm->tm_sec);
+    REG_RTC_RSR = lval;
+    
+    return 0;
 }
 
 #if 0

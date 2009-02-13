@@ -112,7 +112,7 @@ void map_address(unsigned long virtual, unsigned long physical,
     add_wired_entry(entry0, entry1, entryhi, DEFAULT_PAGE_MASK);
 }
 
-void tlb_init(void)
+void mmu_init(void)
 {
     write_c0_pagemask(DEFAULT_PAGE_MASK);
     write_c0_wired(0);
@@ -123,4 +123,94 @@ void tlb_init(void)
     map_address(0x80000000, 0x80000000, 0x4000, K_CacheAttrC);
     map_address(0x80004000, 0x80004000, MEM * 0x100000, K_CacheAttrC);
 */
+}
+
+#define SYNC_WB() __asm__ __volatile__ ("sync")
+
+#define __CACHE_OP(op, addr)                 \
+    __asm__ __volatile__(                    \
+    "    .set    noreorder        \n"        \
+    "    .set    mips32\n\t       \n"        \
+    "    cache   %0, %1           \n"        \
+    "    .set    mips0            \n"        \
+    "    .set    reorder          \n"        \
+    :                                        \
+    : "i" (op), "m" (*(unsigned char *)(addr)))
+
+void __flush_dcache_line(unsigned long addr)
+{
+    __CACHE_OP(DCHitWBInv, addr);
+    SYNC_WB();
+}
+
+void __icache_invalidate_all(void)
+{
+    unsigned int i;
+
+    asm volatile (".set   noreorder  \n"
+                  ".set   mips32     \n"
+                  "mtc0   $0, $28    \n" /* TagLo */
+                  "mtc0   $0, $29    \n" /* TagHi */
+                  ".set   mips0      \n"
+                  ".set   reorder    \n"
+                  );
+    for(i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHE_LINE_SIZE)
+        __CACHE_OP(ICIndexStTag, i);
+
+    /* invalidate btb */
+    asm volatile (
+        ".set mips32        \n"
+        "mfc0 %0, $16, 7    \n"
+        "nop                \n"
+        "ori  %0, 2         \n"
+        "mtc0 %0, $16, 7    \n"
+        ".set mips0         \n"
+        :
+        : "r" (i));
+}
+
+void cpucache_invalidate(void)
+{
+    __icache_invalidate_all();
+}
+
+void __dcache_invalidate_all(void)
+{
+    unsigned int i;
+
+    asm volatile (".set   noreorder  \n"
+                  ".set   mips32     \n"
+                  "mtc0   $0, $28    \n"
+                  "mtc0   $0, $29    \n"
+                  ".set   mips0      \n"
+                  ".set   reorder    \n"
+                  );
+    for (i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHE_LINE_SIZE)
+        __CACHE_OP(DCIndexStTag, i);
+}
+
+void __dcache_writeback_all(void)
+{
+    unsigned int i;
+    for(i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHE_LINE_SIZE)
+        __CACHE_OP(DCIndexWBInv, i);
+    
+    SYNC_WB();
+}
+
+void dma_cache_wback_inv(unsigned long addr, unsigned long size)
+{
+    unsigned long end, a;
+
+    if (size >= CACHE_SIZE)
+        __dcache_writeback_all();
+    else
+    {
+        unsigned long dc_lsize = CACHE_LINE_SIZE;
+        
+        a = addr & ~(dc_lsize - 1);
+        end = (addr + size - 1) & ~(dc_lsize - 1);
+        for(; a < end; a += dc_lsize)
+            __flush_dcache_line(a);
+    }
 }

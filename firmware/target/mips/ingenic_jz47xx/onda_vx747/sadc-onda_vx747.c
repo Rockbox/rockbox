@@ -26,6 +26,8 @@
 #include "button-target.h"
 #include "powermgmt.h"
 #include "kernel.h"
+#include "backlight.h"
+#include "logf.h"
 
 #ifdef ONDA_VX747
 #define BTN_OFF      (1 << 29)
@@ -54,15 +56,16 @@
                         (2 << SADC_CFG_CLKOUT_NUM_BIT) |  \
                         SADC_CFG_XYZ1Z2                |  \
                         SADC_CFG_SNUM                  |  \
-                        (2 << SADC_CFG_CLKDIV_BIT)     |  \
+                        (1 << SADC_CFG_CLKDIV_BIT)     |  \
                         SADC_CFG_PBAT_HIGH             |  \
                         SADC_CFG_CMD_INT_PEN              \
                         )
 
 static signed int x_pos, y_pos;
-static int datacount = 0, cur_touch = 0;
-static bool pen_down = false;
-static volatile unsigned short bat_val = 0;
+static int datacount = 0;
+static volatile int cur_touch = 0;
+static volatile bool pen_down = false;
+static volatile unsigned short bat_val;
 static struct mutex battery_mtx;
 
 static enum touchscreen_mode current_mode = TOUCHSCREEN_POINT;
@@ -76,20 +79,20 @@ static const int touchscreen_buttons[3][3] =
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     /* TODO */
-    3400
+    1400
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     /* TODO */
-    3300
+    1300
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
     /* TODO */
-    { 3300, 3680, 3740, 3760, 3780, 3810, 3870, 3930, 3970, 4070, 4160 },
+    { 1300, 3680, 3740, 3760, 3780, 3810, 3870, 3930, 3970, 4070, 4160 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
@@ -105,23 +108,34 @@ const unsigned short percent_to_volt_charge[11] =
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    register unsigned short dummy;
+    unsigned int val, i;
     
     mutex_lock(&battery_mtx);
     
-    dummy = REG_SADC_BATDAT;
-    dummy = REG_SADC_BATDAT;
+    val = REG_SADC_BATDAT;
+    val = REG_SADC_BATDAT;
     
-    bat_val = 0;
     REG_SADC_ENA |= SADC_ENA_PBATEN;
+    for(i=0; i<4; i++)
+    {
+        bat_val = 0;
+        
+        /* primitive wakeup event */
+        while(bat_val == 0)
+            sleep(0);
+        
+        val += bat_val;
+    }
+    REG_SADC_ENA &= ~SADC_ENA_PBATEN;
     
-    /* primitive wakeup event */
-    while(bat_val == 0)
-        yield();
+    val /= 4;
+    
+    logf("%d %d %d", val, (val*BATTERY_SCALE_FACTOR)>>12,
+                     (val*0xAAAAAAAB >> 32) >> 1);
     
     mutex_unlock(&battery_mtx);
     
-    return (bat_val*BATTERY_SCALE_FACTOR)>>12;
+    return (val*BATTERY_SCALE_FACTOR)>>12;
 }
 
 void button_init_device(void)
@@ -135,11 +149,11 @@ void button_init_device(void)
     
     system_enable_irq(IRQ_SADC);
     
-    REG_SADC_SAMETIME = 350;
+    REG_SADC_SAMETIME = 10;
     REG_SADC_WAITTIME = 100;
     REG_SADC_STATE &= (~REG_SADC_STATE);
     REG_SADC_CTRL = (~(SADC_CTRL_PENDM | SADC_CTRL_PENUM | SADC_CTRL_TSRDYM | SADC_CTRL_PBATRDYM));
-    REG_SADC_ENA = (SADC_ENA_TSEN | SADC_ENA_PBATEN);
+    REG_SADC_ENA = SADC_ENA_TSEN;
     
 #ifdef ONDA_VX747
     __gpio_as_input(32*3 + 29);
@@ -213,19 +227,24 @@ int button_read_device(int *data)
     if(tmp & BTN_OFF)
         ret |= BUTTON_POWER;
 
-    if(current_mode == TOUCHSCREEN_BUTTON && cur_touch != 0)
+    if(cur_touch != 0)
     {
-        int px_x = cur_touch >> 16;
-        int px_y = cur_touch & 0xFFFF;
-        ret |= touchscreen_buttons[px_y/(LCD_HEIGHT/3)]
-                                  [px_x/(LCD_WIDTH/3)];
-    }
-    else if(pen_down)
-    {
-        ret |= BUTTON_TOUCH;
-        if(data != NULL && cur_touch != 0)
+        if(current_mode == TOUCHSCREEN_BUTTON)
+        {
+            int px_x = cur_touch >> 16;
+            int px_y = cur_touch & 0xFFFF;
+            ret |= touchscreen_buttons[px_y/(LCD_HEIGHT/3)]
+                                      [px_x/(LCD_WIDTH/3)];
+        }
+        else if(pen_down)
+        {
+            ret |= BUTTON_TOUCHSCREEN;
             *data = cur_touch;
+        }
     }
+    
+    if(ret & BUTTON_TOUCHSCREEN && !is_backlight_on(true))
+        *data = 0;
 
     return ret;
 }
@@ -299,15 +318,17 @@ void SADC(void)
                 x_pos += xData;
                 y_pos += yData;
             }
+            
+            datacount++;
+            
+            if(datacount >= TS_AD_COUNT)
+            {
+                cur_touch = touch_to_pixels(x_pos/datacount, y_pos/datacount);
+                datacount = 0;
+            }
         }
-        
-        datacount++;
-        
-        if(datacount >= TS_AD_COUNT)
-        {
-            cur_touch = touch_to_pixels(x_pos/datacount, y_pos/datacount);
+        else
             datacount = 0;
-        }
     }
     
     if(state & SADC_CTRL_PBATRDYM)
@@ -315,4 +336,8 @@ void SADC(void)
         bat_val = REG_SADC_BATDAT;
         /* Battery AD IRQ */
     }
+}
+
+void adc_init(void)
+{
 }

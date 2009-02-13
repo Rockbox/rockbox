@@ -113,7 +113,8 @@ size_t pcm_get_bytes_waiting(void)
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
     /* TODO */
-    *count = REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL)>>2;
+    //*count = REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL)>>2;
+    *count = 0;
     return NULL;
 }
 
