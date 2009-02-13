@@ -788,7 +788,8 @@ redo_node_sgf_succeeded:
             /* newlines display badly in rb->splash, so replace them
              * with spaces
              */
-            if (comment_buffer[i] == '\n')
+            if (comment_buffer[i] == '\n' ||
+                comment_buffer[i] == '\r')
             {
                 comment_buffer[i] = ' ';
             }
