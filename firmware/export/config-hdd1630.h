@@ -12,7 +12,7 @@
 #define CONFIG_STORAGE STORAGE_ATA
 
 /* define this if you have recording possibility */
-/* #define HAVE_RECORDING */
+#define HAVE_RECORDING
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
@@ -99,8 +99,8 @@
 /* TODO: #define AB_REPEAT_ENABLE 1 */
 
 /* FM Tuner */
-/* #define CONFIG_TUNER TEA5767 */
-/* #define CONFIG_TUNER_XTAL  32768 */
+#define CONFIG_TUNER      TEA5767
+#define CONFIG_TUNER_XTAL 32768
 
 /* define this if you have a disk storage, i.e. something
    that needs spinups and can cause skips when shaked */

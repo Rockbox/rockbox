@@ -555,6 +555,7 @@ target/arm/i2s-pp.c
 target/arm/adc-pp5020.c
 target/arm/philips/hdd1630/backlight-hdd1630.c
 target/arm/philips/hdd1630/button-hdd1630.c
+target/arm/philips/hdd1630/fmradio_i2c-hdd1630.c
 target/arm/philips/hdd1630/lcd-hdd1630.c
 target/arm/philips/hdd1630/power-hdd1630.c
 target/arm/philips/hdd1630/powermgmt-hdd1630.c

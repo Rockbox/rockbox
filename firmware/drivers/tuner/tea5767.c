@@ -28,7 +28,12 @@
 #include "fmradio.h"
 #include "fmradio_i2c.h" /* physical interface driver */
 
+#if defined(PHILIPS_HDD1630)
+#define I2C_ADR 0x60
+#else
 #define I2C_ADR 0xC0
+#endif
+
 static unsigned char write_bytes[5] = { 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 static void tea5767_set_clear(int byte, unsigned char bits, int set)
@@ -87,7 +92,7 @@ int tea5767_set(int setting, int value)
             tea5767_set_clear(4, (1<<6), rd->deemphasis);
             tea5767_set_clear(3, (1<<5), rd->band);
             break;
-            }
+        }
         case RADIO_FORCE_MONO:
             tea5767_set_clear(2, 0x08, value);
             break;

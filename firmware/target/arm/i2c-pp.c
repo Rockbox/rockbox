@@ -196,6 +196,29 @@ int i2c_readbyte(unsigned int dev_addr, int addr)
     return (int)data;
 }
 
+int i2c_sendbytes(unsigned int addr, int len, const unsigned char *data)
+{
+    int i, n;
+
+    mutex_lock(&i2c_mtx);
+
+    i = 0;
+    while (len > 0)
+    {
+        n = (len < 4) ? len : 4;
+
+        if (pp_i2c_send_bytes(addr, n, (unsigned char *)(data + i)) < 0)
+            break;
+
+        len -= n;
+        i   += n;
+    }
+
+    mutex_unlock(&i2c_mtx);
+
+    return i;
+}
+
 int pp_i2c_send(unsigned int addr, int data0, int data1)
 {
     int retval;
@@ -234,7 +257,14 @@ void i2c_init(void)
 
 #if CONFIG_I2C == I2C_PP5020
     outl(0x0, 0x600060a4);
+#if defined(PHILIPS_HDD1630)
+    outl(inl(0x600060a4) | 0x20, 0x600060a4);
+    outl(inl(0x7000c020) | 0x3, 0x7000c020);
+    outl(0x55, 0x7000c02c);
+    outl(0x54, 0x7000c030);
+#else
     outl(0x80 | (0 << 8), 0x600060a4);
+#endif
 #elif CONFIG_I2C == I2C_PP5024
 #if defined(SANSA_E200) || defined(PHILIPS_SA9200)
     /* Sansa OF sets this to 0x20 first, communicates with the AS3514

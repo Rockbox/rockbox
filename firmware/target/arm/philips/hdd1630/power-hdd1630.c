@@ -39,6 +39,13 @@ void power_init(void)
     /* charger inserted bit */
     GPIOE_ENABLE |= 0x20;
     GPIOE_INPUT_VAL |= 0x20;
+
+#if CONFIG_TUNER
+    /* fm antenna? */
+    GPIOE_ENABLE |= 0x40;
+    GPIOE_OUTPUT_EN |= 0x40;
+    GPIOE_OUTPUT_VAL &= ~0x40; /* off */
+#endif
 }
 
 unsigned int power_input_status(void)
@@ -77,3 +84,15 @@ void power_off(void)
     GPIOB_OUTPUT_VAL &= ~0x80;
     GPIOB_OUTPUT_EN |= 0x80;
 }
+
+#if CONFIG_TUNER
+bool tuner_power(bool status)
+{
+    if (status)
+        GPIOE_OUTPUT_VAL |= 0x40;
+    else
+        GPIOE_OUTPUT_VAL &= ~0x40;
+
+    return status;
+}
+#endif
