@@ -557,6 +557,7 @@ target/arm/philips/hdd1630/backlight-hdd1630.c
 target/arm/philips/hdd1630/button-hdd1630.c
 target/arm/philips/hdd1630/fmradio_i2c-hdd1630.c
 target/arm/philips/hdd1630/lcd-hdd1630.c
+target/arm/philips/hdd1630/lcd-as-hdd1630.S
 target/arm/philips/hdd1630/power-hdd1630.c
 target/arm/philips/hdd1630/powermgmt-hdd1630.c
 target/arm/usb-fw-pp502x.c

@@ -126,7 +126,7 @@ static const struct plugin_api rockbox_api = {
     lcd_bitmap_transparent,
     lcd_blit_yuv,
 #if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200) \
-    || defined(IRIVER_H10) || defined(COWON_D2)
+    || defined(IRIVER_H10) || defined(COWON_D2) || defined(PHILIPS_HDD1630)
     lcd_yuv_set_options,
 #endif
 #elif (LCD_DEPTH < 4) && !defined(SIMULATOR)
