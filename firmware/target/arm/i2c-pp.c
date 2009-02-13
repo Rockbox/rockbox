@@ -54,35 +54,46 @@ static int pp_i2c_wait_not_busy(void)
     return -1;
 }
 
-static int pp_i2c_read_byte(unsigned int addr, unsigned int *data)
+static int pp_i2c_read_bytes(unsigned int addr, int len, unsigned char *data)
 {
-    if (pp_i2c_wait_not_busy() < 0)
+    int i;
+
+    if (len < 1 || len > 4)
     {
         return -1;
     }
 
+    if (pp_i2c_wait_not_busy() < 0)
     {
-        unsigned int byte;
+        return -2;
+    }
+
+    {
         int old_irq_level = disable_irq_save();
 
         /* clear top 15 bits, left shift 1, or in 0x1 for a read */
-        I2C_ADDR = ((addr << 17) >> 16) | 0x1 ;
+        I2C_ADDR = ((addr << 17) >> 16) | 0x1;
 
         I2C_CTRL |= 0x20;
+
+        I2C_CTRL = (I2C_CTRL & ~0x6) | ((len-1) << 1);
 
         I2C_CTRL |= I2C_SEND;
 
         restore_irq(old_irq_level);
+
         if (pp_i2c_wait_not_busy() < 0)
         {
-            return -1;
+            return -2;
         }
+
         old_irq_level = disable_irq_save();
 
-        byte = I2C_DATA(0);
-
         if (data)
-            *data = byte;
+        {
+            for ( i = 0; i < len; i++ )
+                *data++ = I2C_DATA(i);
+        }
 
         restore_irq(old_irq_level);
     }
@@ -90,9 +101,9 @@ static int pp_i2c_read_byte(unsigned int addr, unsigned int *data)
     return 0;
 }
 
-static int pp_i2c_send_bytes(unsigned int addr, unsigned int len, unsigned char *data)
+static int pp_i2c_send_bytes(unsigned int addr, int len, unsigned char *data)
 {
-    unsigned int i;
+    int i;
 
     if (len < 1 || len > 4)
     {
@@ -117,14 +128,14 @@ static int pp_i2c_send_bytes(unsigned int addr, unsigned int len, unsigned char 
             I2C_DATA(i) = *data++;
         }
 
-        I2C_CTRL = (I2C_CTRL & ~0x26) | ((len-1) << 1);
+        I2C_CTRL = (I2C_CTRL & ~0x6) | ((len-1) << 1);
 
         I2C_CTRL |= I2C_SEND;
 
         restore_irq(old_irq_level);
     }
 
-    return 0x0;
+    return 0;
 }
 
 static int pp_i2c_send_byte(unsigned int addr, int data0)
@@ -147,29 +158,42 @@ void i2c_unlock(void)
     mutex_unlock(&i2c_mtx);
 }
 
-int i2c_readbytes(unsigned int dev_addr, int addr, int len, unsigned char *data) {
-    unsigned int temp;
-    int i;
+int i2c_readbytes(unsigned int dev_addr, int addr, int len, unsigned char *data)
+{
+    int i, n;
+
     mutex_lock(&i2c_mtx);
-    pp_i2c_send_byte(dev_addr, addr);
-    for (i = 0; i < len; i++) {
-        pp_i2c_read_byte(dev_addr, &temp);
-        data[i] = temp;
+
+    if (addr >= 0)
+        pp_i2c_send_byte(dev_addr, addr);
+
+    i = 0;
+    while (len > 0)
+    {
+        n = (len < 4) ? len : 4;
+
+        if (pp_i2c_read_bytes(dev_addr, n, data + i) < 0)
+            break;
+
+        len -= n;
+        i   += n;
     }
+
     mutex_unlock(&i2c_mtx);
+
     return i;
 }
 
 int i2c_readbyte(unsigned int dev_addr, int addr)
 {
-    int data;
+    unsigned char data;
 
     mutex_lock(&i2c_mtx);
     pp_i2c_send_byte(dev_addr, addr);
-    pp_i2c_read_byte(dev_addr, &data);
+    pp_i2c_read_bytes(dev_addr, 1, &data);
     mutex_unlock(&i2c_mtx);
 
-    return data;
+    return (int)data;
 }
 
 int pp_i2c_send(unsigned int addr, int data0, int data1)
