@@ -110,7 +110,7 @@ static void play_start_pcm(void)
     SRCPND = DMA2_MASK;
 
     /* Flush any pending writes */
-    clean_dcache_range((void*)DISRC2, (DCON2 & 0xFFFFF) * 2);
+    clean_dcache_range((char*)DISRC2-0x30000000, (DCON2 & 0xFFFFF) * 2);
 
     /* unmask DMA interrupt when unlocking */
     dma_play_lock.state = DMA2_MASK;
