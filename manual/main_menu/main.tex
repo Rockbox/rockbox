@@ -16,60 +16,64 @@ Changes to settings may therefore not be saved unless the \dap{} is shut down
 safely (see \reference{ref:Safeshutdown}).
 
 \section{Navigating the Main Menu}
-\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD}{
-  \begin{table}
-    \begin{btnmap}{}{}
-      \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonScrollFwd}
-      \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonUp}
-      \opt{IRIVER_H10_PAD}{\ButtonScrollUp} 
-      & Moves up in the menu.\\
-      & Inside a setting, increases the value or
-        chooses next option \\
-      %
-      \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonScrollBack}
-      \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonDown}
-      \opt{IRIVER_H10_PAD}{\ButtonScrollDown} 
-      & Moves down in the menu.\\
-      & Inside a setting, decreases the value or
-        chooses previous option \\
-      %
-      \opt{RECORDER_PAD}{\ButtonPlay/\ButtonRight}
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect/\ButtonRight}
-      \opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD,IRIVER_H10_PAD}{\ButtonRight} 
-      & Selects option \\
-      %
-      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff/\ButtonLeft}
-      \opt{IAUDIO_X5_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD,IRIVER_H10_PAD}{\ButtonLeft} 
-      & Exits menu, setting or moves to parent menu\\
-    \end{btnmap}
-  \end{table}
-}
-\opt{PLAYER_PAD}{
-  \begin{table}
-    \begin{btnmap}{}{}
-      %
-      \ButtonLeft  & Selects previous option in the menu.\\
-                   & Inside an setting, decreases the value or chooses previous option \\
-      %
-      \ButtonRight & Selects next option in the menu.\\
-                   & Inside an setting increases the value or chooses next option \\
-      %
-      \ButtonPlay  & Selects item \\
-      %
-      \ButtonStop  & Exit menu, setting or moves to parent menu.\\
-    \end{btnmap}
-  \end{table}
-}
+\begin{table}
+  \begin{btnmap}{}{}
+    \ActionStdNext
+    & Selects the next option in the menu.\\
+    & Inside a setting, increases the value or
+      chooses next option \\
+    %
+    \ActionStdPrev
+    & Selects the previous option in the menu.\\
+    & Inside a setting, decreases the value or
+      chooses previous option \\
+    %
+    \ActionStdOk
+    & Selects option \\
+    %
+    \ActionStdCancel
+    & Exits menu, setting or moves to parent menu\\
+  \end{btnmap}
+\end{table}
 
 \section {Recent Bookmarks}
 \screenshot{main_menu/images/ss-list-bookmarks}%
-  {The list bookmarks screen}{}
+{The list bookmarks screen}{}
 If the \setting{Save a list of recently created bookmarks} option is enabled 
 then you can view a list of several recent bookmarks here and select one to 
-jump straight to that track. See \reference{ref:Bookmarkconfigactual} 
+jump straight to that track.
+
+\begin{table}
+  \begin{btnmap}{}{}
+    \ActionStdNext
+    & Selects the next bookmark.\\
+    %
+    \ActionStdPrev
+    & Selects the previous bookmark.\\
+    %
+    \ActionStdOk
+    & Resumes from the selected bookmark.\\
+    %
+    \ActionStdCancel
+    & Exits Recent Bookmark menu\\
+    %
+    \nopt{GIGABEATS_PAD}{\ActionBmDelete}  
+    & Deletes the currently selected bookmark\\
+    %
+    \ActionStdContext  
+    & Enters the context menu for the selected bookmark.\\
+  \end{btnmap}
+\end{table}
+
+There are two options in the context menu:\\*
+  
+  \setting{Resume} will commence playback of the currently selected bookmark entry.
+  
+  \setting{Delete} will remove the currently selected bookmark entry from the list.\\*
+  
+This entry is not shown in the \setting{Main Menu} when the option is off
+(the default setting).  See \reference{ref:Bookmarkconfigactual} 
 for more details on configuring bookmarking in Rockbox.
-\note{This entry is not shown in the \setting{Main Menu} when the option is off
-  and the option is off by default.}
 
 \section{Files}
 Browse the files on your \dap{} (see \reference{ref:file_browser}).

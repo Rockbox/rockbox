@@ -16,7 +16,7 @@
 \newcommand{\ActionStdPrevRepeat}{Long \ButtonScrollBack}
 \newcommand{\ActionStdNext}{\ButtonScrollFwd}
 \newcommand{\ActionStdNextRepeat}{Long \ButtonScrollFwd}
-\newcommand{\ActionStdCancel}{\ButtonLeft}
+\newcommand{\ActionStdCancel}{\ButtonLeft{} or \ButtonPower}
 \newcommand{\ActionStdContext}{Long \ButtonSelect}
 \newcommand{\ActionStdQuickScreen}{Long \ButtonDown}
 \newcommand{\ActionQuickScreenExit}{\ButtonPower}
@@ -57,8 +57,8 @@
 \newcommand{\ActionYesNoAccept}{\ButtonSelect}
 
 %Button actions, Setting context
-\newcommand{\ActionSettingInc}{\ButtonScrollBack}
-\newcommand{\ActionSettingDec}{\ButtonScrollFwd}
+\newcommand{\ActionSettingInc}{\ButtonScrollFwd}
+\newcommand{\ActionSettingDec}{\ButtonScrollBack}
 
 %Button actions, Virtual Keyboard Context
 \newcommand{\ActionKbdLeft}{\ButtonLeft}
@@ -105,4 +105,7 @@
 \newcommand{\ActionFMSettingsDec}{\ButtonDown}
 \newcommand{\ActionFMPrev}{\ActionRecSettingsInc}
 \newcommand{\ActionFMNext}{\ActionRecSettingsDec}
+
+%Button actions, Bookmark screen context
+\newcommand{\ActionBmDelete}{\ButtonRec}
 
