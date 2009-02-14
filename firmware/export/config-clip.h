@@ -134,14 +134,14 @@
 /* define this if the flash memory uses the SecureDigital Memory Card protocol */
 #define CONFIG_STORAGE STORAGE_SD
 
-#define BATTERY_CAPACITY_DEFAULT 750    /* default battery capacity */
-#define BATTERY_CAPACITY_MIN 750        /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 750        /* max. capacity selectable */
+#define BATTERY_CAPACITY_DEFAULT 380    /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 380        /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 380        /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0          /* capacity increment */
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
-/* Hardware controlled charging? FIXME */
-#define CONFIG_CHARGING CHARGING_SIMPLE
+/* Charging implemented in a target-specific algorithm */
+#define CONFIG_CHARGING CHARGING_TARGET
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER

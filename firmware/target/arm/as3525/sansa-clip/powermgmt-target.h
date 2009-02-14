@@ -7,7 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright © 2008 Rafaël Carré
+ * Copyright (C) 2009 by Michael Sevakis
+ * Copyright (C) 2008 by Bertrik Sikken
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,34 +19,24 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef POWERMGMT_TARGET_H
+#define POWERMGMT_TARGET_H
 
-#include "config.h"
+/* Check if topped-off and monitor voltage while plugged. */
+#define BATT_FULL_VOLTAGE   4160
+#define BATT_VAUTO_RECHARGE 4100
+#define BATT_CHG_V          CHG_V_4_20V
+#define BATT_CHG_I          CHG_I_100MA
+#define CHARGER_TOTAL_TIMER (6*3600*2)  /* about 1.5 * capacity / current */
+#define ADC_BATTERY         ADC_BVDD
 
-/* The battery manufacturer's website shows discharge curves down to 3.0V,
-   so 'dangerous' and 'shutoff' levels of 3.4V and 3.3V should be safe.
- */
-const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
-{
-    3400
-};
+void powermgmt_init_target(void);
+void charging_algorithm_step(void);
+void charging_algorithm_close(void);
 
-const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3300
-};
+/* We want to be able to reset the averaging filter */
+#define HAVE_RESET_BATTERY_FILTER
 
-/* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
-{
-    { 3300, 3653, 3701, 3735, 3768, 3790, 3833, 3900, 3966, 4056, 4140 }
-};
+#define BATT_AVE_SAMPLES 32
 
-#if CONFIG_CHARGING
-/* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
-const unsigned short percent_to_volt_charge[11] =
-{
-    /* TODO: simple linear uncalibrated curve */
-    3300, 3390, 3480, 3570, 3660, 3750, 3840, 3930, 4020, 4110, 4200
-};
-#endif /* CONFIG_CHARGING */
-
+#endif /*  POWERMGMT_TARGET_H */
