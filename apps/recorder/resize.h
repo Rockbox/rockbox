@@ -78,14 +78,13 @@ static inline unsigned sc_mul32(unsigned a, unsigned b)
         "addc    %[t2], %[t3]    \n" /* t3 += t2, carry -> t2 */
         "movt    %[t2]           \n"
         "mulu    %[a], %[b]      \n" /* b * d */
-        "mov     %[t3], %[t1]    \n" /* t2t3 <<= 16 */
+        "mov     %[t3], %[t1]    \n" /* t1t3 = t2t3 << 16 */
         "xtrct   %[t2], %[t1]    \n"
-        "mov     %[t1], %[t2]    \n"
         "shll16  %[t3]           \n"
-        "sts     macl, %[t1]     \n" /* lo = b * d */
-        "clrt                    \n" /* hi.lo += t2t3 */
-        "addc    %[t3], %[t1]    \n"
-        "addc    %[t2], %[r]     \n"
+        "sts     macl, %[t2]     \n" /* lo = b * d */
+        "clrt                    \n" /* hi.lo += t1t3 */
+        "addc    %[t3], %[t2]    \n"
+        "addc    %[t1], %[r]     \n"
         : /* outputs */
         [r] "=&r"(r),
         [t1]"=&r"(t1),
