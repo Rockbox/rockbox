@@ -1717,7 +1717,7 @@ int settings_menu(void)
     bool old_val;
 
     MENUITEM_STRINGLIST(settings_menu, "PictureFlow Settings", NULL, "Show FPS",
-                        "Spacing", "Center margin", "Number of slides", "Zoom",
+                        "Spacing", "Centre margin", "Number of slides", "Zoom",
                         "Show album title", "Resize Covers", "Rebuild cache");
 
     do {
@@ -1737,7 +1737,7 @@ int settings_menu(void)
                 break;
 
             case 2:
-                rb->set_int("Center margin", "", 1,
+                rb->set_int("Centre margin", "", 1,
                             &center_margin,
                             NULL, 1, 0, 80, NULL );
                 recalc_offsets();
