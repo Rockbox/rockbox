@@ -59,7 +59,47 @@
     t; \
 })
 #elif (CONFIG_CPU == SH7034)
-#define SC_SHIFT 24
+/* multiply two unsigned 32 bit values and return the top 32 bit
+ * of the 64 bit result */
+static inline unsigned sc_mul32(unsigned a, unsigned b)
+{
+    unsigned r, t1, t2, t3;
+
+    asm (
+        "swap.w  %[a], %[t1]     \n" /* t1 = ba */
+        "mulu    %[t1], %[b]     \n" /* a * d */
+        "swap.w  %[b], %[t3]     \n" /* t3 = dc */
+        "sts     macl, %[t2]     \n" /* t2 = a * d */
+        "mulu    %[t1], %[t3]    \n" /* a * c */
+        "sts     macl, %[r]      \n" /* hi = a * c */
+        "mulu    %[a], %[t3]     \n" /* b * c */
+        "clrt                    \n"
+        "sts     macl, %[t3]     \n" /* t3 = b * c */
+        "addc    %[t2], %[t3]    \n" /* t3 += t2, carry -> t2 */
+        "movt    %[t2]           \n"
+        "mulu    %[a], %[b]      \n" /* b * d */
+        "mov     %[t3], %[t1]    \n" /* t2t3 <<= 16 */
+        "xtrct   %[t2], %[t1]    \n"
+        "mov     %[t1], %[t2]    \n"
+        "shll16  %[t3]           \n"
+        "sts     macl, %[t1]     \n" /* lo = b * d */
+        "clrt                    \n" /* hi.lo += t2t3 */
+        "addc    %[t3], %[t1]    \n"
+        "addc    %[t2], %[r]     \n"
+        : /* outputs */
+        [r] "=&r"(r),
+        [t1]"=&r"(t1),
+        [t2]"=&r"(t2),
+        [t3]"=&r"(t3)
+        : /* inputs */
+        [a] "r"  (a),
+        [b] "r"  (b)
+    );
+    return r;
+}
+#define SC_MUL(x, y) sc_mul32(x, y)
+#define SC_MUL_INIT
+#define SC_MUL_END
 #endif
 
 #ifndef SC_SHIFT
