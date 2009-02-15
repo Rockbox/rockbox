@@ -23,6 +23,17 @@
 #include "lib/grey.h"
 #include "lib/pluginlib_bmp.h"
 
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
+#define GBS_QUIT BUTTON_MENU
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define GBS_QUIT BUTTON_RC_REC
+#elif defined(BUTTON_OFF)
+#define GBS_QUIT BUTTON_OFF
+#else
+#define GBS_QUIT BUTTON_POWER
+#endif
+
 #if LCD_DEPTH == 1
 #define BMP_LOAD read_bmp_file
 #else
@@ -74,7 +85,8 @@ enum plugin_status plugin_start(const void* parameter)
     grey_ub_gray_bitmap(grey_bm_buf, x, y, grey_bm.width, grey_bm.height);
     grey_show(true);
 
-    rb->button_get(true);
+    /* wait until user closes plugin */
+    while (rb->button_get(true) != GBS_QUIT);
 
     grey_release();
     
