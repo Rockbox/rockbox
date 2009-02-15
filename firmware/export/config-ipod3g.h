@@ -114,7 +114,7 @@
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 
 /* Hardware controlled charging? FIXME */
-//#define CONFIG_CHARGING CHARGING_SIMPLE
+#define CONFIG_CHARGING CHARGING_SIMPLE
 
 #ifndef SIMULATOR
 

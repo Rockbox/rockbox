@@ -60,6 +60,11 @@ unsigned int power_input_status(void)
     if ((GPIOC_INPUT_VAL & 0x04) == 0)
         status = POWER_INPUT_MAIN_CHARGER;
     /* */
+#elif defined(IPOD_3G)
+    /* firewire power */
+    if ((GPIOC_INPUT_VAL & 0x10) == 0)
+        status = POWER_INPUT_MAIN_CHARGER;
+    /* */
 #else
     /* This needs filling in for other ipods. */
 #endif
