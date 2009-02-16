@@ -99,13 +99,13 @@ static void ams3525_dbop_init(void)
 
     DBOP_TIMPOL_01 = 0xe167e167;
     DBOP_TIMPOL_23 = 0xe167006e;
-    DBOP_CTRL = 0x41008;
+    DBOP_CTRL = (1<<18)|(1<<12)|(8<<0);  /* short count, 16bit write, read-timing =8 */
 
     GPIOB_AFSEL = 0xfc;
     GPIOC_AFSEL = 0xff;
 
     DBOP_TIMPOL_23 = 0x6000e;
-    DBOP_CTRL = 0x51008;
+    DBOP_CTRL = (1<<18)|(1<<16)|(1<<12)|(8<<0);/* short count,write enable, 16bit write, read-timing =8 */
     DBOP_TIMPOL_01 = 0x6e167;
     DBOP_TIMPOL_23 = 0xa167e06f;
 
@@ -365,7 +365,10 @@ void lcd_update(void)
 {
     if (!display_on)
         return;
-
+        
+    /* we must disable interrupts because buttondriver also writes to lcd */
+    disable_irq();   
+    
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
 
     /* Set start position and window */
@@ -377,7 +380,8 @@ void lcd_update(void)
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
     lcd_write_data((unsigned short *)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
-    
+
+    enable_irq();
 } /* lcd_update */
 
 
@@ -389,7 +393,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     if (!display_on)
         return;
-
+        
     if (x + width > LCD_WIDTH)
         width = LCD_WIDTH - x; /* Clip right */
     if (x < 0)
@@ -405,6 +409,9 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (y >= ymax)
         return; /* nothing left to do */
 
+    /* we must disable interrupts because buttondriver also writes to lcd */   
+    disable_irq();
+        
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
     /* Set start position and window */
     lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 
@@ -423,4 +430,28 @@ void lcd_update_rect(int x, int y, int width, int height)
         ptr += LCD_WIDTH;
     }
     while (++y < ymax);
+    
+    enable_irq();
 } /* lcd_update_rect */
+
+/* writes one read pixel outside the visible area, needed for correct dbop reads */
+void lcd_button_support(void)
+{
+    int x=LCD_HEIGHT+1;
+    int y=LCD_WIDTH+1;
+    int width=1;
+    int height=1;    
+    unsigned short data = (0xf<<12);
+    
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
+    /* Set start position and window */
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 
+                  ((x + width-1) << 8) | x);
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, 
+                  ((y_offset + y + height - 1) << 8) | (y_offset + y));
+    lcd_write_reg(R_RAM_ADDR_SET, ((y + y_offset) << 8) | x);
+
+    lcd_write_cmd(R_WRITE_DATA_2_GRAM);
+
+    lcd_write_data(&data, width);
+}
