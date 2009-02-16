@@ -108,34 +108,25 @@ const unsigned short percent_to_volt_charge[11] =
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    unsigned int val, i;
+    unsigned int dummy, timeout=1000;
     
     mutex_lock(&battery_mtx);
     
-    val = REG_SADC_BATDAT;
-    val = REG_SADC_BATDAT;
+    dummy = REG_SADC_BATDAT;
+    dummy = REG_SADC_BATDAT;
     
     REG_SADC_ENA |= SADC_ENA_PBATEN;
-    for(i=0; i<4; i++)
-    {
-        bat_val = 0;
-        
-        /* primitive wakeup event */
-        while(bat_val == 0)
-            sleep(0);
-        
-        val += bat_val;
-    }
-    REG_SADC_ENA &= ~SADC_ENA_PBATEN;
+    bat_val = 0;
     
-    val /= 4;
+    /* primitive wakeup event */
+    while(bat_val == 0 && timeout--)
+        sleep(0);
     
-    logf("%d %d %d", val, (val*BATTERY_SCALE_FACTOR)>>12,
-                     (val*0xAAAAAAAB >> 32) >> 1);
+    logf("%d %d", bat_val, (bat_val*BATTERY_SCALE_FACTOR)>>12);
     
     mutex_unlock(&battery_mtx);
     
-    return (val*BATTERY_SCALE_FACTOR)>>12;
+    return (bat_val*BATTERY_SCALE_FACTOR)>>12;
 }
 
 void button_init_device(void)

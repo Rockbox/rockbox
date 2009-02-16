@@ -509,6 +509,9 @@ void system_exception_wait(void)
 
 void power_off(void)
 {
+    /* Enable RTC clock */
+    __cpm_start_rtc();
+    
     /* Put system into hibernate mode */
     __rtc_clear_alarm_flag();
     __rtc_clear_hib_stat_all();

@@ -28,6 +28,7 @@
 #include "kernel.h"
 #include "font.h"
 #include "button.h"
+#include "timefuncs.h"
 
 static int line = 0;
 static void printf(const char *format, ...)
@@ -150,6 +151,7 @@ bool __dbg_ports(void)
 bool __dbg_hw_info(void)
 {
     int btn = 0, touch;
+    struct tm *cur_time;
     
     lcd_setfont(FONT_SYSFIXED);
     while(btn ^ BUTTON_POWER)
@@ -159,7 +161,11 @@ bool __dbg_hw_info(void)
         display_clocks();
         display_enabled_clocks();
         btn = button_read_device(&touch);
+        cur_time = get_time();
         printf("X: %d Y: %d BTN: 0x%X", touch>>16, touch&0xFFFF, btn);
+        printf("%02d/%02d/%04d %02d:%02d:%02d", cur_time->tm_mday,
+               cur_time->tm_mon, cur_time->tm_year, cur_time->tm_hour,
+               cur_time->tm_min, cur_time->tm_sec);
         lcd_update();
         sleep(HZ/16);
     }

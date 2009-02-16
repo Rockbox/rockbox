@@ -85,8 +85,13 @@
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
-
 #define HAVE_BACKLIGHT_BRIGHTNESS
+
+/* define this if the backlight can be set to a brightness */
+#define __BACKLIGHT_INIT
+
+/* Which backlight fading type? */
+//#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_PWM
 
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING          100
@@ -95,7 +100,7 @@
 #define DEFAULT_DIMNESS_SETTING         100 /* "most dim" */
 
 /* Define this if you have a software controlled poweroff */
-//#define HAVE_SW_POWEROFF
+#define HAVE_SW_POWEROFF
 
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x100000
@@ -108,7 +113,7 @@
 
 #define CONFIG_I2C I2C_JZ47XX
 
-/* TLV320 has no tone controls, so we use the software ones */
+/* has no tone controls, so we use the software ones */
 //#define HAVE_SW_TONE_CONTROLS
 
 /*#define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
@@ -140,9 +145,6 @@
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
-
-/* define this if the backlight can be set to a brightness */
-#define __BACKLIGHT_INIT
 
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC  0
