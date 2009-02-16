@@ -1051,8 +1051,9 @@ static void track_change(void)
     if (num_tracks_in_memory() > 0)
     {
         remove_current_tag();
-        send_event(PLAYBACK_EVENT_TRACK_CHANGE, audio_current_track());
         update_playlist();
+        if (is_playing)
+            send_event(PLAYBACK_EVENT_TRACK_CHANGE, audio_current_track());
     }
 
     current_track_counter++;
