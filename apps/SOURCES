@@ -221,4 +221,6 @@ keymaps/keymap-iaudio67.c
 keymaps/keymap-logikdax.c
 #elif CONFIG_KEYPAD == SANSA_FUZE_PAD
 keymaps/keymap-fuze.c
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+keymaps/keymap-ondavx747.c
 #endif
