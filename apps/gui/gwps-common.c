@@ -482,13 +482,15 @@ static void draw_progressbar(struct gui_wps *gwps,
     struct wps_state *state = gwps->state;
     struct progressbar *pb = wps_vp->pb;
     int y = pb->y;
-    int line_height = font_get(wps_vp->vp.font)->height;
 
-    /* center the pb in the line, but only if the line is higher than the pb */
-    int center = (line_height-pb->height)/2;
-
-    if (y < 0) /* if Y was not set calculate by font height,Y is -line_number-1 */
+    if (y < 0)
+    {
+        int line_height = font_get(wps_vp->vp.font)->height;
+        /* center the pb in the line, but only if the line is higher than the pb */
+        int center = (line_height-pb->height)/2;
+        /* if Y was not set calculate by font height,Y is -line_number-1 */
         y = (-y -1)*line_height + (0 > center ? 0 : center);
+    }
 
     if (pb->have_bitmap_pb)
         gui_bitmap_scrollbar_draw(display, pb->bm,
