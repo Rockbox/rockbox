@@ -73,6 +73,7 @@ struct gui_img{
 struct progressbar {
     /* regular pb */
     short x;
+    /* Negative if y is line number based (-line_num-1), positive if set explicitely */
     short y;
     short width;
     short height;
