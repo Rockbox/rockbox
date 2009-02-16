@@ -40,7 +40,7 @@
 #if defined(IPOD_ARCH) || defined(IRIVER_H10)  || defined(IRIVER_H10_5GB) \
  || defined(SANSA_E200) || defined(SANSA_C200) || defined(GIGABEAT_F) \
  || defined(PHILIPS_SA9200) || (CONFIG_CPU == AS3525) || defined(COWON_D2) \
- || defined(MROBE_100) || defined(PHILIPS_HDD1630)
+ || defined(MROBE_100) || defined(PHILIPS_HDD1630) || defined(ONDA_VX747)
 bool verbose = false;
 #else
 bool verbose = true;

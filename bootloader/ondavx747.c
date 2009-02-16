@@ -31,7 +31,6 @@
 #include "storage.h"
 #include "disk.h"
 #include "string.h"
-#include "rockboxlogo.h"
 
 static void show_splash(int timeout, const char *msg)
 {
@@ -41,13 +40,6 @@ static void show_splash(int timeout, const char *msg)
     lcd_update();
 
     sleep(timeout);
-}
-
-extern int line;
-static void show_logo(void)
-{
-    lcd_bitmap(rockboxlogo, 0, 0, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
-    line += BMPHEIGHT_rockboxlogo/SYSFONT_HEIGHT + 1;
 }
 
 static void usb_mode(void)
@@ -126,12 +118,9 @@ int main(void)
     else if(rc)
         verbose = true;
     
+    /* Only enable backlight when button is pressed */
     if(verbose)
         backlight_init();
-
-    show_logo();
-    printf(MODEL_NAME" Rockbox Bootloader");
-    printf("Version "APPSVERSION);
     
     rc = storage_init();
     if(rc)
