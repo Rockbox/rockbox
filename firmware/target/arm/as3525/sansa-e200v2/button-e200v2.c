@@ -43,8 +43,9 @@ static          long last_wheel_post   = 0;
 static          long next_backlight_on = 0;
 /* Buttons */
 static bool hold_button     = false;
+#ifndef BOOTLOADER  
 static bool hold_button_old = false;
-#define _button_hold() hold_button
+#endif
 
 extern void lcd_button_support(void);
 
@@ -55,7 +56,7 @@ void button_init_device(void)
 
 bool button_hold(void)
 {
-    return _button_hold();
+    return hold_button;
 }
 
 void clickwheel(unsigned int wheel_value)
