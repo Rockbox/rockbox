@@ -285,20 +285,19 @@ static void pcmbuf_under_watermark(bool under)
     {
         if (under)
         {
+            /* Fill audio buffer by boosting cpu */
+            trigger_cpu_boost();
 #ifdef HAVE_PRIORITY_SCHEDULING
             /* If buffer is critically low, override UI priority, else
                set back to the original priority. */
             boost_codec_thread(LOW_DATA(2) && pcm_is_playing());
 #endif
-            /* Fill audio buffer by boosting cpu */
-            trigger_cpu_boost();
         }
         else
         {
 #ifdef HAVE_PRIORITY_SCHEDULING
             boost_codec_thread(false);
 #endif
-            cancel_cpu_boost();
         }
     }
 
@@ -1016,7 +1015,7 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
     }
     else if (nsamples <= MINIBUF_SAMPLES)
     {
-        static int16_t minibuf[MINIBUF_SAMPLES*2];
+        static int16_t minibuf[MINIBUF_SAMPLES*2] __attribute__((aligned(4)));
         /* Use mini buffer */
         bufstart = minibuf;
         bufend = SKIPBYTES(bufstart, MINIBUF_SIZE);
