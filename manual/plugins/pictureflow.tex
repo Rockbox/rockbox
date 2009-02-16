@@ -1,0 +1,89 @@
+\subsection{PictureFlow}
+\screenshot{plugins/images/ss-pictureflow}{PictureFlow}{img:pictureflow}
+PictureFlow is a plugin that provides a visualisation of your albums with
+their associated cover art.
+
+\subsubsection{Requirements}
+PictureFlow uses both the album art (see \wikilink{AlbumArt} in the wiki) and 
+database (see \reference{ref:database}) features of Rockbox.
+It is therefore important that these are working correctly before attempting
+to use PictureFlow. In addition, there are some other points of which to be
+aware:
+
+  \begin{itemize}
+    \item PictureFlow will accept album art larger than the dimensions of the
+    screen, but the larger the dimensions, the longer they will take to scale.
+    \item The main playback buffer is used which means that unless the size of the
+    playing tracks is small you will have to stop playback to use PictureFlow.
+  \end{itemize}
+
+\note{PictureFlow is a visualisation only. It cannot be used to select and
+play music.}
+
+\subsubsection{Keys}
+\begin{table}
+    \begin{btnmap}{}{}
+        \opt{scrollwheel,ipodmini,IRIVER_H10_PAD}{
+          \opt{scrollwheel,ipodmini}{\ButtonScrollFwd{} / \ButtonScrollBack}
+          \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
+          & Scroll through albums / track list\\}
+          
+        \nopt{scrollwheel,ipodmini,IRIVER_H10_PAD}{\ButtonLeft{} / \ButtonRight
+         & Scroll through albums\\}
+
+        \nopt{scrollwheel,ipodmini,SANSA_C200_PAD,IRIVER_H10_PAD}{\ButtonUp{} / \ButtonDown    
+        & Scroll through track list\\}
+        
+        \opt{SANSA_C200_PAD}{\ButtonUp
+        & Scroll up through track list\\}
+       
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD,%
+             GIGABEATS_PAD,SANSA_E200_PAD,SANSA_C200_PAD,MROBE100_PAD,%
+              IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonSelect}
+        \opt{IRIVER_H10_PAD}{\ButtonRew}
+        & Switch between cover view and track list\\
+
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+        \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,GIGABEAT_PAD,%
+             GIGABEATS_PAD,MROBE100_PAD}{\ButtonMenu}
+        \opt{IAUDIO_X5_PAD}{\ButtonRec}
+        \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonDown}
+        \opt{IRIVER_H10_PAD}{\ButtonFF}
+        & Enter / exit menu\\
+
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+        \opt{IAUDIO_X5_PAD,GIGABEAT_PAD,SANSA_E200_PAD,SANSA_C200_PAD,%
+             IRIVER_H10_PAD,MROBE_100_PAD}{\ButtonPower}
+        \opt{GIGABEATS_PAD}{\ButtonBack}
+        \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonSelect+\ButtonMenu}
+        & Exit menu or PictureFlow\\
+    \end{btnmap}
+\end{table}
+
+\subsubsection{Main Menu}
+\begin{description}
+  \item[Settings.] Enter the settings menu.
+  \item[Return.] Exit menu.
+  \item[Exit.] Exit PictureFlow plugin.
+\end{description}
+
+\subsubsection{Settings Menu}
+
+\begin{description}
+  \item[Show FPS.] Displays frames per second on screen.
+  \item[Spacing.] The distance between the front edges of the side slides, i.e. changes
+  the degree of overlap of the side slides. A larger number means less overlap. Scales with zoom.
+  \item[Centre margin.] The distance, in screen pixels, with zoom at 100, between
+  the centre and side slides. Scales with zoom.
+  \item[Number of slides.] Sets the number of slides at each side, including the
+  centre slide. Therefore if set to 4, there will be 3 slides on the left,
+  the centre slide, and then 3 slides on the right.
+  \item[Zoom.] Changes the distance at which slides are rendered from the "camera".
+  \item[Show album title.] Allows setting the album title to be shown above or
+  below the cover art, or not at all.
+  \item[Resize Covers.] Set whether to automatically resize the covers or to leave
+  them at their original size.
+  \item[Rebuild cache.] Rebuild the PictureFlow cache. This is needed in order
+  for PictureFlow to pick up new albums, and may occasionally be needed if albums
+  are removed.
+\end{description}
