@@ -388,6 +388,30 @@ void usb_drv_reset(void)
     sleep(HZ/20);
     REG_USBCMD |= USBCMD_CTRL_RESET;
     while (REG_USBCMD & USBCMD_CTRL_RESET);
+
+#if CONFIG_CPU == PP5022 || CONFIG_CPU == PP5024
+    /* On a CPU which identifies as a PP5022, this 
+       initialization must be done after USB is reset.
+     */
+    outl(inl(0x70000060) | 0xF, 0x70000060);
+    outl(inl(0x70000028) | 0x10000, 0x70000028);
+    outl(inl(0x70000028) & ~0x10000, 0x70000028);
+    outl(inl(0x70000060) & ~0x20, 0x70000060);
+    udelay(10);
+    outl(inl(0x70000060) | 0x20, 0x70000060);
+    udelay(10);
+    outl((inl(0x70000060) & ~0xF) | 4, 0x70000060);
+    udelay(10);
+    outl(inl(0x70000060) & ~0x20, 0x70000060);
+    udelay(10);
+    outl(inl(0x70000060) & ~0xF, 0x70000060);
+    udelay(10);
+    outl(inl(0x70000060) | 0x20, 0x70000060);
+    udelay(10);
+    outl(inl(0x70000028) | 0x800, 0x70000028);
+    outl(inl(0x70000028) & ~0x800, 0x70000028);
+    while (inl(0x70000028) & 0x80);
+#endif
 }
 
 /* One-time driver startup init */
