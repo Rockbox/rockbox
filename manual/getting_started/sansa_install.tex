@@ -1,32 +1,11 @@
 % $Id$ %
-\opt{e200}{\fixme{NOTE: These instructions will not work on the 
-``Rhapsody'' version of the E200 series (also known as E200R).  Please 
-follow the instructions at 
-\url{http://www.rockbox.org/twiki/bin/view/Main/SansaE200RInstallation}.}}
-
-\warn{If your \daps{} original firmware starts with a version number of 03.XX.XX, then do \emph{not} proceed with these install instructions.
-If your \daps{} original firmware starts with 01.XX.XX, then you can
-install Rockbox.}
-
-In order to make your \playertype{} load and execute the Rockbox firmware you
-have just installed, you will need to install the Rockbox
-bootloader. Unless bugs are found in the bootloader code, or
-significant new features are added, you will only have to perform this
-step once.
-
-These steps use the sansapatcher tool. Source code is available in the Rockbox
-SVN repository (\url{http://svn.rockbox.org/viewvc.cgi/trunk/rbutil/sansapatcher/}).
-
 \subsubsection{Bootloader installation from Windows}
 
 \begin{enumerate}
 
-\item Make sure you are logged into your computer as Administrator, or a 
-user with Administrator privileges and connect your \dap{}.
-
 \item Download sansapatcher.exe from 
 \download{bootloader/sandisk-sansa/sansapatcher/win32/sansapatcher.exe} 
-and run it.
+and run it whilst logged in with an administrator account.
 
 \item If all has gone well, you should see some information displayed about
 your \playertype{} and a message asking you if you wish to install the Rockbox
@@ -34,9 +13,6 @@ bootloader. Press i followed by ENTER, and sansapatcher will now
 install the bootloader. After a short time you should see the message
 ``[INFO] Bootloader installed successfully.'' Press ENTER again to exit
 sansapatcher.
-
-\item Disconnect your \dap{} in the usual way. The bootloader is now installed. 
-
 \end{enumerate}
 
 \subsubsection{Bootloader installation from Mac OS X}
@@ -54,11 +30,8 @@ and then double-click on the sansapatcher icon inside.
 information displayed about your \dap{} and a message asking you if you 
 wish to install the Rockbox bootloader. Press i followed by ENTER, and 
 sansapatcher will now unmount your \dap{} and install the bootloader. 
-After a short time you should see the message ``[INFO] Bootloader installed successfully.'' Press ENTER again to exit sansapatcher and then quit the Terminal application.
-
-\item Your \dap{} will now automatically reconnect itself to your Mac. 
-Wait for it to connect, and then eject and unplug it in the normal way. 
-
+After a short time you should see the message ``[INFO] Bootloader installed successfully.''
+Press ENTER again to exit sansapatcher and then quit the Terminal application.
 \end{enumerate}
 
 \subsubsection{Bootloader installation from Linux}
@@ -81,7 +54,7 @@ steps will assume you have saved it in your home directory.
     ./sansapatcher
 \end{code}
 
-\warn{You may need to be the root user in order for sansapatcher to have
+\note{You need to be the root user in order for sansapatcher to have
 sufficient permission to perform raw disk access to your \dap{}.}
 
 \item If all has gone well, you should see some information displayed about
@@ -89,7 +62,4 @@ your \playertype{} and a message asking you if you wish to install the Rockbox
 bootloader. Press i followed by ENTER, and sansapatcher will now install the
 bootloader. After a short time you should see the message ``[INFO] Bootloader
 installed successfully.'' Press ENTER again to exit sansapatcher.
-
-\item Disconnect your \dap{} in the usual way. The bootloader is now installed.
-
 \end{enumerate}

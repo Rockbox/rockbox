@@ -1,11 +1,5 @@
 % $Id$
 
-Installing the bootloader is only needed once. It simply requires you
-to replace a file on your \dap{} with the Rockbox bootloader. To be able
-booting the original firmware please make sure to rename the original file
-properly. If you ever wish to uninstall Rockbox you should keep a backup copy
-of the original file.
-
 \begin{itemize}
 \item Download the Rockbox bootloader from
   \url{http://download.rockbox.org/bootloader/gigabeat/}
@@ -16,17 +10,8 @@ of the original file.
 \item In that directory you'll find a file called \fname{FWIMG01.DAT}. This too
   may be hidden. Rename the file to \fname{FWIMG01.DAT.ORIG}. Make sure you
   spelled that name  correctly as it is needed for booting the \playerman{} firmware.
+  \warn{If you do not complete this step then you will be unable to uninstall Rockbox
+  without a copy of the original firmware from the original install CD.}
 \item Now copy the file \fname{FWIMG01.DAT} you downloaded to that directory.
   Make sure the spelling is correct.
-\end{itemize}
-
-\warn{After installing the bootloader you \emph{need} to power-cycle the 
-\dap{} by doing the following steps. Failure to do so may result in problems.}
-\begin{itemize}
-\item Eject / unmount USB drive and unplug the USB cable.
-\item Unplug any power adapter.
-\item Hold the \ButtonPower{} button to turn off the \dap{}.
-\item Slide the battery switch located on the bottom of the \dap{} from 
-    `on' to `off'
-\item Slide the battery switch back from `off' to `on'
 \end{itemize}

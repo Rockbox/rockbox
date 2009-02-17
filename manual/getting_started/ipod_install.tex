@@ -1,31 +1,12 @@
 % $Id$ %
 
-\opt{ipodnano}{\warn{If your Nano has a stainless steel back and plastic front,  
-it is a 1st generation and is compatible with Rockbox.  If, on the other hand, 
-your Nano has a one-piece aluminum body it is a 2nd generation Nano and there 
-is currently no Rockbox port available.  Do not attempt to install the 
-bootloader on a 2nd generation Nano}}
-
-In order to make your \dap{} load and execute the Rockbox firmware you
-have just installed, you will need to install the Rockbox
-bootloader. Unless bugs are found in the bootloader code, or
-significant new feature are added, you will only have to perform this
-step once.
-
 \subsubsection{Bootloader installation from Windows}
 
 \begin{enumerate}
 
-\item Make sure you are logged into your computer as Administrator, or a 
-user with Administrator privileges and connect your \dap{}. If you have
-configured iTunes to open automatically when your \dap{} is attached
-(the default behaviour), then wait for it to open and then quit it. You
-also need to ensure the ``Enable use as disk'' option is enabled for
-your \dap{} in iTunes.
-
 \item Download ipodpatcher.exe from 
 \download{bootloader/ipod/ipodpatcher/win32/ipodpatcher.exe} 
-and run it.
+and run it whilst logged in with an administrator account.
 
 \item If all has gone well, you should see some information displayed about
 your \dap{} and a message asking you if you wish to install the Rockbox
@@ -35,16 +16,10 @@ install the bootloader. After a short time you should see the message
 ipodpatcher.
 
 \item \note{If ipodpatcher fails to install the bootloader for you, please
-be certain that you do indeed have a supported iPod model. If you do, run
+be certain that you do indeed have a supported iPod model and are logged in
+as an administrator. If you do, run
 ipodpatcher once more and try again. If you don't, then do not attempt to
 install again.}
-
-\item Make sure that you have correctly extracted a build of Rockbox so that
-you have a \fname{/.rockbox}, which contains all the files needed by Rockbox
-in the root of your \daps{} drive and that you have also installed the fonts
-package -- see \reference{sec:installing_fonts} for more information.
-
-\item Disconnect your \dap{} in the usual way. The bootloader is now installed. 
 
 \end{enumerate}
 
@@ -53,10 +28,7 @@ package -- see \reference{sec:installing_fonts} for more information.
 \begin{enumerate}
 
 \item Attach your \dap{} to your Mac and wait for its icon to appear in 
-Finder. If you have configured iTunes to open automatically when your
-\dap{} is attached (the default behaviour), then wait for it to open and
-then quit it. You also need to ensure the ``Enable use as disk'' option
-is enabled for your \dap{} in iTunes.
+Finder. 
 
 \item Download and open ipodpatcher.dmg from 
 \download{bootloader/ipod/ipodpatcher/macosx/ipodpatcher.dmg} 
@@ -76,17 +48,11 @@ be certain that you do indeed have a supported iPod model. If you do, run
 ipodpatcher once more and try again. If you don't, then do not attempt to
 install again.}
 
-
 \item Your \dap{} will now automatically reconnect itself to your Mac. 
 Wait for it to connect, and then eject and unplug it in the normal way. 
 \note{You should unplug your ipod immediately after ejecting it to 
 prevent Rockbox immediately rebooting your \dap{} into disk mode when it 
 detects that your \dap{} is attached to a computer. }
-
-\item Make sure that you have correctly extracted a build of Rockbox so that
-you have a \fname{/.rockbox}, which contains all the files needed by Rockbox
-in the root of your \daps{} drive and that you have also installed the fonts
-package -- see \reference{sec:installing_fonts} for more information.
 
 \end{enumerate}
 
@@ -110,7 +76,7 @@ steps will assume you have saved it in your home directory.
     ./ipodpatcher
 \end{code}
 
-\warn{You may need to be the root user in order for ipodpatcher to have
+\note{You need to be the root user in order for ipodpatcher to have
 sufficient permission to perform raw disk access to your \dap{}.}
 
 \item If all has gone well, you should see some information displayed about
@@ -118,12 +84,5 @@ your \dap{} and a message asking you if you wish to install the Rockbox
 bootloader. Press i followed by ENTER, and ipodpatcher will now install the
 bootloader. After a short time you should see the message ``[INFO] Bootloader
 installed successfully.'' Press ENTER again to exit ipodpatcher.
-
-\item Make sure that you have correctly extracted a build of Rockbox so that
-you have a \fname{/.rockbox}, which contains all the files needed by Rockbox
-in the root of your \daps{} drive and that you have also installed the fonts
-package -- see \reference{sec:installing_fonts} for more information.
-
-\item Disconnect your \dap{} in the usual way. The bootloader is now installed.
 
 \end{enumerate}

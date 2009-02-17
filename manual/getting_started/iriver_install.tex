@@ -1,102 +1,29 @@
 % $Id$ %
 
   Installing the bootloader is the trickiest part of the installation.
-  The Rockbox bootloader allows users to boot into either the Rockbox 
-  firmware or the \playerman{} firmware. For legal reasons, we cannot distribute 
-  the bootloader. Instead, we have developed a program that will patch the 
-  Iriver firmware with the Rockbox bootloader. These instructions will explain 
-  how to download and patch the Iriver firmware with the Rockbox bootloader 
-  and install it on your jukebox.
+  As explained above, we cannot distribute the bootloader directly, and
+  thus need to patch a compatible version of the Iriver firmware, which
+  can be downloaded as described above.
 
 
 \begin{enumerate}
-  \item Download a supported version of the Iriver firmware for your 
-  \playername{} from the Iriver website, links can be found on 
-  \wikilink{IriverBoot}.
-  Supported Iriver firmware versions currently include 
-  \opt{IRIVER_H100_PAD}{1.63US, 1.63EU, 1.63K, 1.65US, 1.65EU, 1.65K, 1.66US, 
-    1.66EU and 1.66K.  Note that the H140 uses the same firmware as the H120;
-    H120 and H140 owners should use the	firmware called \fname{ihp\_120.hex}.
-    Likewise, the iHP110 and iHP115 use the same firmware, called 
-    \fname{ihp\_100.hex}.   Be sure to use the correct firmware file for 
-    your player.}
-  \opt{IRIVER_H300_PAD}{1.28K, 1.28EU, 1.28J, 1.29K, 1.29J and 1.30EU.
-    \note{The US \playername{} firmware is not supported and cannot be
-    patched to be used with the bootloader. If you wish to install Rockbox
-    on a US \playername, you must first install a non-US version of the
-    original firmware and then install one of the supported versions patched
-    with the Rockbox bootloader. 
-    \warn{Installing non-US firmware on a US \playername{} will
-    permanently remove DRM support from the player.}}
-  }%
-  If the file that you downloaded is a \fname{.zip} file, use an unzip 
-  utility like mentioned in the prerequisites section to extract
-  the \fname{.hex} from the \fname{.zip} file
-  to your desktop. Likewise, if the file that you downloaded is an 
-  \fname{.exe} file, double-click on the \fname{.exe} file to extract 
-  the \fname{.hex} file to your desktop.
-  When running Linux you should be able extracting \fname{.exe}
-  files using \fname{unzip}.
-  %
   \item Download the firmware patcher \fname{fwpatcher.exe} from 
   \url{http://download.rockbox.org/bootloader/iriver/} and save it to your desktop.
-    \warn{The firmware patcher contains Unicode support, which is not supported by 
+    \note{The firmware patcher contains Unicode support, which is not supported by 
     all versions of Windows. If you have difficulty with the firmware patcher, try 
     downloading the alternate firmware patcher \fname{fwpatchernu.exe}, which is 
     built without Unicode support.}
   %
-  \item Go to your desktop and double-click on whichever version of the firmware 
-  patcher you downloaded in the prior step.
+  \item Go to your desktop and double-click on the firmware patcher.
   %
   \item In the firmware patcher dialog box, click on the \setting{Browse}
   button and navigate
-  to the \fname{.hex} file that you previously downloaded to your desktop.
+  to the \fname{.hex} file that you previously downloaded.
   %
   \item Click \setting{Patch}. The firmware patcher will patch the
     original firmware to include the Rockbox bootloader. The \fname{.hex}
     file on your desktop is now a modified version of the original
     \fname{.hex} file.
   %
-  \item Turn on your \playerman{} and connect it to your computer via USB.
-  %
-  \item Copy or move the modified \fname{.hex} file directly to the root of
-    your \daps{} drive. Do not put it inside a directory on your \dap.
-  %
-  \item Disconnect the jukebox from USB. (Be sure to use Windows' ``safely remove
-  hardware'' option.)
-  \warn{Before proceeding further, make sure that your player has a full charge
-    or that it is connected to the power adaptor. Interrupting the next step
-    due to a power failure most likely will brick your \dap{}.}
-  %
-  \item Update your \daps{} firmware with the patched bootloader. To do this, turn
-    the jukebox on. Press and hold the
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect{} button }%
-    to enter the main menu, and navigate to \setting{General $\rightarrow$ Firmware 
-    Upgrade}. Select \setting{Yes} when asked to confirm if you want to upgrade the 
-    firmware. The \playerman{} will display a message indicating that the
-    firmware update 
-    is in progress. Do \emph{not} interrupt this process. When the
-    firmware update is complete the player will turn itself off. (The update
-    firmware process usually takes a minute or so.)
-    
-    You have now installed the Rockbox bootloader.
+  \item Copy \fname{.hex} to the root folder (the highest level) of your \dap{}
 \end{enumerate}
-
-\note{If you install the Rockbox bootloader but do not install the
-  Rockbox firmware the Rockbox bootloader will load the Iriver firmware when the
-  jukebox is turned on.
-  To load the \playerman{} firmware press and hold \ButtonRec{} before
-  powering up the \dap{} until the \playerman{} logo appears.
-  }
-
-\note{The bootloader has a built-in ``bootloader USB mode''. This function
-  switches to USB mode when the \dap{} is connected to a computer upon
-  power-up. This way you can access the \daps{} hard disk without the need
-  to boot any firmware (which is also useful when your hard disk is 
-  damaged). The screen will simply display the text ``bootloader USB mode''.
-  After you disconnect the \dap{} from USB the bootloader will
-  continue booting Rockbox. As in bootloader USB mode the firmware
-  itself has not been loaded this is also a simple way of updating Rockbox.
-  After the disconnect the bootloader will load the updated version of
-  Rockbox.
-}
