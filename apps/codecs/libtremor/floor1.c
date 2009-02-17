@@ -299,7 +299,7 @@ static void render_line(int n, int x0,register int x1,int y0,int y1,ogg_int32_t 
   if(n>x1)n=x1;
   ady-=abs(base*adx);
 
-  if(x<n)
+  if(LIKELY(x<n))
     d[x]= MULT31_SHIFT15(d[x],FLOOR_fromdB_LOOKUP[y]);
 
   while(++x<n){

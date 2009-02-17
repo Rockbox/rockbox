@@ -142,7 +142,7 @@ typedef struct {
 
 extern void  oggpack_readinit(oggpack_buffer *b,ogg_reference *r);
 extern long  oggpack_look_full(oggpack_buffer *b,int bits);
-extern long  oggpack_read(oggpack_buffer *b,int bits);
+extern long  oggpack_read(oggpack_buffer *b,register int bits);
 
 /* Inline a few, often called functions */
 

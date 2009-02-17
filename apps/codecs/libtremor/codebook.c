@@ -451,7 +451,7 @@ static long vorbis_book_decodevv_add_2ch_even(codebook *book,ogg_int32_t **a,
 long vorbis_book_decodevv_add(codebook *book,ogg_int32_t **a,
 			      long offset,int ch,
 			      oggpack_buffer *b,int n,int point){
-  if(book->used_entries>0){
+  if(LIKELY(book->used_entries>0)){
     long i,j,k,chunk,read;
     int chptr=0;
     int shift=point-book->binarypoint;

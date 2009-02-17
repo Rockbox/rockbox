@@ -131,8 +131,8 @@ static int _halt_one(oggpack_buffer *b){
 }
 
 /* bits <= 32 */
-long oggpack_read(oggpack_buffer *b,int bits) ICODE_ATTR_TREMOR_NOT_MDCT;
-long oggpack_read(oggpack_buffer *b,int bits){
+long oggpack_read(oggpack_buffer *b,register int bits) ICODE_ATTR_TREMOR_NOT_MDCT;
+long oggpack_read(oggpack_buffer *b,register int bits){
   unsigned long m=oggpack_mask[bits];
   ogg_uint32_t ret=-1;
 
