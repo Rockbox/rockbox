@@ -42,6 +42,8 @@ static bool display_on = false; /* is the display turned on? */
 static bool display_flipped = false;
 static int xoffset = 20; /* needed for flip */
 
+static volatile int _ystart, _ymax, _xstart, _xmax;
+
 static void as3525_dbop_init(void)
 {
     CGU_DBOP = (1<<3) | CLK_DIV(AS3525_PCLK_FREQ, AS3525_DBOP_FREQ);
@@ -258,22 +260,20 @@ void lcd_init_device()
 }
 
 /* Set horizontal window addresses */
-static void lcd_window_x(int xmin, int xmax)
+void lcd_window_x(int xmin, int xmax)
 {
     xmin += xoffset;
     xmax += xoffset;
-
     lcd_write_reg(0x46, (xmax << 8) | xmin);
     lcd_write_reg(0x20, xmin);
 }
 
 /* Set vertical window addresses */
-static void lcd_window_y(int ymin, int ymax)
+void lcd_window_y(int ymin, int ymax)
 {
     lcd_write_reg(0x47, ymax);
     lcd_write_reg(0x48, ymin);
     lcd_write_reg(0x21, ymin);
-    lcd_write_cmd(0x22);
 }
 
 /* Update the display.
@@ -285,6 +285,8 @@ void lcd_update(void)
 
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
 
+    /* we must disable interrupts because buttondriver also writes to lcd */
+    disable_irq();
     lcd_window_x(0, LCD_WIDTH - 1);
     lcd_window_y(0, LCD_HEIGHT - 1);
 
@@ -293,6 +295,7 @@ void lcd_update(void)
 
     /* Write data */
     lcd_write_data((unsigned short *)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
+    enable_irq();
 }
 
 /* Update a fraction of the display. */
@@ -324,6 +327,8 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
 
+    /* we must disable interrupts because buttondriver also writes to lcd */
+    disable_irq();
     lcd_window_x(x, xmax);
     lcd_window_y(y, ymax);
 
@@ -338,4 +343,18 @@ void lcd_update_rect(int x, int y, int width, int height)
         ptr += LCD_WIDTH;
     }
     while (++y <= ymax);
+    enable_irq();
+}
+
+/* writes one read pixel outside the visible area, needed for correct dbop reads */
+void lcd_button_support(void)
+{
+    fb_data data = 0xf<<12;
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
+    /* Set start position and window */
+
+    lcd_window_x(-1, 1);
+    lcd_write_cmd(R_WRITE_DATA_2_GRAM);
+
+    lcd_write_data(&data, 1);
 }

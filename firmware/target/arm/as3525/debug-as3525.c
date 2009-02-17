@@ -31,6 +31,15 @@
 #define _DEBUG_PRINTF(a,varargs...) \
     snprintf(buf, sizeof(buf), (a), ##varargs); lcd_puts(0,line++,buf)
 
+/* FIXME: target tree is including ./debug-target.h rather than the one in
+ * sansa-fuze/, even though deps contains the correct one
+ * if I put the below into a sansa-fuze/debug-target.h, it doesn't work*/
+#ifdef SANSA_FUZE
+#define DEBUG_DBOP
+short button_dbop_data(void);
+#endif
+
+
 /* TODO */
 
 bool __dbg_hw_info(void)
@@ -54,10 +63,10 @@ bool __dbg_ports(void)
         _DEBUG_PRINTF("GPIOB: %2x DIR: %2x", GPIOB_DATA, GPIOB_DIR);
         _DEBUG_PRINTF("GPIOC: %2x DIR: %2x", GPIOC_DATA, GPIOC_DIR);
         _DEBUG_PRINTF("GPIOD: %2x DIR: %2x", GPIOD_DATA, GPIOD_DIR);
-#ifdef TRACK_DBOP_DIN
+#ifdef DEBUG_DBOP
         line++;
         _DEBUG_PRINTF("[DBOP_DIN]");
-        _DEBUG_PRINTF("DBOP_DIN: %4x", _dbop_din);
+        _DEBUG_PRINTF("DBOP_DIN: %4x", button_dbop_data());
 #endif
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))

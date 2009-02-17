@@ -42,8 +42,9 @@ static bool hold_button_old = false;
 #else
 #define hold_button false
 #endif /* !BOOTLOADER */
-static int  int_btn         = BUTTON_NONE;
-short      _dbop_din        = BUTTON_NONE;
+static short _dbop_din    = BUTTON_NONE;
+
+extern void lcd_button_support(void);
 
 void button_init_device(void)
 {
@@ -53,12 +54,12 @@ void button_init_device(void)
 
 /* clickwheel */
 #if !defined(BOOTLOADER) && defined(HAVE_SCROLLWHEEL)
-static void get_wheel(void)
+static void clickwheel(void)
 {
     static unsigned int  old_wheel_value    = 0;
     static unsigned int  wheel_value        = 0;
     static unsigned int  wheel_repeat       = BUTTON_NONE;
-    /* getting BUTTON_REPEAT works like this: We increment repeat by if the
+    /* getting BUTTON_REPEAT works like this: We increment repeat by 2 if the
      * wheel was turned, and decrement it by 1 each tick,
      * that means: if you change the wheel fast enough, repeat will be >1 and
      * we send BUTTON_REPEAT
@@ -126,30 +127,15 @@ static void get_wheel(void)
 }
 #endif /* !defined(BOOTLOADER) && defined(SCROLLWHEEL) */
 
-#if !defined(BOOTLOADER)
-/* get hold button state */
-static void get_hold(void)
-{
-    hold_button = _dbop_din & (1<<12);
-}
-#endif
-
 bool button_hold(void)
 {
     return hold_button;
 }
 
-static void get_power(void)
+static int button_dbop(void)
 {
-    if (_dbop_din & (1<<8))
-        int_btn |= BUTTON_POWER;
-}
-
-static void get_button_from_dbob(void)
-{
-    int_btn &= ~(BUTTON_HOLD|
-                BUTTON_POWER);
-
+    int ret = 0;
+    lcd_button_support();
     /* Wait for fifo to empty */
     while ((DBOP_STAT & (1<<10)) == 0);
 
@@ -181,34 +167,43 @@ static void get_button_from_dbob(void)
     DBOP_CTRL &= ~(1<<19);
 
 #if !defined(BOOTLOADER)
-    get_hold();
-#if defined(HAVE_SCROLLWHEEL)
-    get_wheel();
+    hold_button = _dbop_din & (1<<12);
+    if (hold_button)
+        return BUTTON_NONE;
 #endif
+    /* read power */
+    if (_dbop_din & (1<<8))
+        ret |= BUTTON_POWER;
+    if(!(_dbop_din & (1<<15)))
+        ret |= BUTTON_HOME;
+#if defined(HAVE_SCROLLWHEEL)    
+    clickwheel();
 #endif
-    get_power();
+
+    return ret;
 }
 
-static void get_button_from_gpio(void)
+/* for the debug menu */
+short button_dbop_data(void)
 {
-    /* reset buttons we're going to read */
-    int_btn &= ~(BUTTON_LEFT|
-                BUTTON_RIGHT|
-                BUTTON_UP|
-                BUTTON_DOWN|
-                BUTTON_SELECT);
+    return _dbop_din;
+}
+
+static int button_gpio(void)
+{
+    int btn = BUTTON_NONE;
     if(hold_button)
-        return;
+        return btn;
     /* set afsel, so that we can read our buttons */
     GPIOC_AFSEL &= ~(1<<2|1<<3|1<<4|1<<5|1<<6);
     /* set dir so we can read our buttons (but reset the C pins first) */
     GPIOB_DIR &= ~(1<<4);
     GPIOC_DIR |= (1<<2|1<<3|1<<4|1<<5|1<<6);
-    GPIOC_PIN(2) |= (1<<2);
-    GPIOC_PIN(3) |= (1<<3);
-    GPIOC_PIN(4) |= (1<<4);
-    GPIOC_PIN(5) |= (1<<5);
-    GPIOC_PIN(6) |= (1<<6);
+    GPIOC_PIN(2) = (1<<2);
+    GPIOC_PIN(3) = (1<<3);
+    GPIOC_PIN(4) = (1<<4);
+    GPIOC_PIN(5) = (1<<5);
+    GPIOC_PIN(6) = (1<<6);
 
     GPIOC_DIR &= ~(1<<2|1<<3|1<<4|1<<5|1<<6);
 
@@ -218,31 +213,30 @@ static void get_button_from_gpio(void)
 
     /* direct GPIO connections */
     if (!GPIOC_PIN(3))
-        int_btn |= BUTTON_LEFT;
+        btn |= BUTTON_LEFT;
     if (!GPIOC_PIN(2))
-        int_btn |= BUTTON_UP;
+        btn |= BUTTON_UP;
     if (!GPIOC_PIN(6))
-        int_btn |= BUTTON_DOWN;
+        btn |= BUTTON_DOWN;
     if (!GPIOC_PIN(5))
-        int_btn |= BUTTON_RIGHT;
+        btn |= BUTTON_RIGHT;
     if (!GPIOC_PIN(4))
-        int_btn |= BUTTON_SELECT;
+        btn |= BUTTON_SELECT;
     /* return to settings needed for lcd */
     GPIOC_DIR |= (1<<2|1<<3|1<<4|1<<5|1<<6);
     GPIOC_AFSEL |= (1<<2|1<<3|1<<4|1<<5|1<<6);
+
+    return btn;
 }
 
-static inline void get_buttons_from_hw(void)
-{
-    get_button_from_dbob();
-    get_button_from_gpio();
-}
 /*
  * Get button pressed from hardware
  */
 int button_read_device(void)
 {
-    get_buttons_from_hw();
+    int ret = BUTTON_NONE;
+    ret |= button_dbop();
+    ret |= button_gpio();
 #ifndef BOOTLOADER
     /* light handling */
     if (hold_button != hold_button_old)
@@ -252,5 +246,5 @@ int button_read_device(void)
     }
 #endif /* BOOTLOADER */
 
-    return int_btn; /* set in button_int */
+    return ret;
 }
