@@ -120,7 +120,11 @@ int main(void)
     
     /* Only enable backlight when button is pressed */
     if(verbose)
+    {
         backlight_init();
+        printf(MODEL_NAME" Rockbox Bootloader"); 	 
+	    printf("Version "APPSVERSION);
+    }
     
     rc = storage_init();
     if(rc)
