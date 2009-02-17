@@ -168,15 +168,17 @@ static int button_dbop(void)
     hold_button = _dbop_din & (1<<12);
     if (hold_button)
         return BUTTON_NONE;
-#endif
-    /* read power */
-    if (_dbop_din & (1<<8))
-        ret |= BUTTON_POWER;
-    if(!(_dbop_din & (1<<15)))
-        ret |= BUTTON_HOME;
-#if defined(HAVE_SCROLLWHEEL)    
+#if defined(HAVE_SCROLLWHEEL)
+    /* read wheel on bit 13 & 14, but sent to the button queue seperately */
     clickwheel();
 #endif
+#endif
+    /* read power on bit 8 */
+    if (_dbop_din & (1<<8))
+        ret |= BUTTON_POWER;
+    /* read home on bit 15 */
+    if(!(_dbop_din & (1<<15)))
+        ret |= BUTTON_HOME;
 
     return ret;
 }
