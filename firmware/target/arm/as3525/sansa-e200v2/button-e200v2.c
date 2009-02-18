@@ -208,6 +208,11 @@ static short read_dbop(void)
     return _dbop_din;
 }
 
+short button_dbop_data(void)
+{
+    return _dbop_din;
+}
+
 /*
  * Get button pressed from hardware
  */
