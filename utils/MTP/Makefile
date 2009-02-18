@@ -1,8 +1,8 @@
 CFLAGS = -Wall
 LIBS = -lmtp
 OUTPUT = sendfirm
-EXTRA_CFLAGS = $(shell echo -e \
-	'\#include <libmtp.h>\nlibmtp version: LIBMTP_VERSION' | \
+EXTRA_CFLAGS = $(shell printf \
+	'\#include <libmtp.h>\nlibmtp version: LIBMTP_VERSION\n' | \
 	gcc -E -P - -o - | grep -q '^libmtp version: 0\.2' && echo '-DOLDMTP')
 
 all: $(OUTPUT)
