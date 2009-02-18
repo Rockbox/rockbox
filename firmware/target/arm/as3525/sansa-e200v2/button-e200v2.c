@@ -31,6 +31,7 @@
 #define WHEEL_FAST_OFF_INTERVAL  60000
 #define WHEELCLICKS_PER_ROTATION    48 /* wheelclicks per full rotation */
 
+static short _dbop_din;
 /* Clickwheel */
 static unsigned int  old_wheel_value   = 0;
 static unsigned int  wheel_repeat      = BUTTON_NONE;
@@ -47,7 +48,7 @@ static bool hold_button     = false;
 static bool hold_button_old = false;
 #endif
 
-extern void lcd_button_support(void);
+extern bool lcd_button_support(void);
 
 void button_init_device(void)
 {
@@ -85,8 +86,7 @@ void clickwheel(unsigned int wheel_value)
         unsigned long usec = TIMER1_VALUE; /* WAG!!!  and it works!!*/
         unsigned v = (usec - last_wheel_usec) & 0x7fffffff;
 
-        v = (v>0) ? 1000000 / v : 0;     /* clicks/sec = 1000000 *
-+clicks/usec */
+        v = (v>0) ? 1000000 / v : 0;   /* clicks/sec = 1000000 * +clicks/usec */
         v = (v>0xffffff) ? 0xffffff : v; /* limit to 24 bit */
 
         /* some velocity filtering to smooth things out */
@@ -119,8 +119,7 @@ void clickwheel(unsigned int wheel_value)
         }
         else
         {
-            /* fast ON gets filtered to avoid inadvertent jumps to fast mode
-*/
+            /* fast ON gets filtered to avoid inadvertent jumps to fast mode */
             if (repeat && wheel_velocity > 1000000/WHEEL_FAST_ON_INTERVAL)
             {
                 /* moving into fast mode */
@@ -180,12 +179,13 @@ void clickwheel(unsigned int wheel_value)
     old_wheel_value = wheel_value;
 }
 
-int read_dbop(void)
+static short read_dbop(void)
 {
     /*write a red pixel */
-   lcd_button_support();
+    if (!lcd_button_support())
+        return _dbop_din;
 
-  /* Set up dbop for input */
+    /* Set up dbop for input */
     while (!(DBOP_STAT & (1<<10))); 	  /* Wait for fifo to empty */
     DBOP_CTRL |= (1<<19);
     DBOP_CTRL &= ~(1<<16);               /* disable output */
@@ -198,14 +198,14 @@ int read_dbop(void)
     int delay = 50;
     while(delay--);    			/* small delay to set up read */
 
-    int ret = DBOP_DIN; 		/* now read dbop & store info*/
+    _dbop_din = DBOP_DIN; 		/* now read dbop & store info*/
 
     DBOP_TIMPOL_01 = 0x6e167;
     DBOP_TIMPOL_23 = 0xa167e06f;
     DBOP_CTRL |= (1<<16);
     DBOP_CTRL &= ~(1<<19);
 
-    return ret;    
+    return _dbop_din;
 }
 
 /*
@@ -215,7 +215,7 @@ int button_read_device(void)
 {
     int btn = BUTTON_NONE;
     /* read buttons from dbop */
-    int dbop = read_dbop();
+    short dbop = read_dbop();
     
     /* hold button */
     if(dbop & (1<<12))

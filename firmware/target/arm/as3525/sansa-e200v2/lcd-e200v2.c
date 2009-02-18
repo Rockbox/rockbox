@@ -435,7 +435,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 } /* lcd_update_rect */
 
 /* writes one read pixel outside the visible area, needed for correct dbop reads */
-void lcd_button_support(void)
+bool lcd_button_support(void)
 {
     int x=LCD_HEIGHT+1;
     int y=LCD_WIDTH+1;
@@ -444,7 +444,7 @@ void lcd_button_support(void)
     unsigned short data = (0xf<<12);
 
     if (lcd_busy)
-        return;
+        return false;
 
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
     /* Set start position and window */
@@ -457,4 +457,5 @@ void lcd_button_support(void)
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
     lcd_write_data(&data, width);
+    return true;
 }
