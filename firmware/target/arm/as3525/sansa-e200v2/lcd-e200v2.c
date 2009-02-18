@@ -36,6 +36,10 @@
 static bool display_on = false; /* is the display turned on? */
 static bool display_flipped = false;
 static int y_offset = 0; /* needed for flip */
+/* we need to write a red pixel for correct button reads
+ * (see lcd_button_support()), but that must not happen while the lcd is updating
+ * so block lcd_button_support the during updates */
+static volatile bool lcd_busy = false;
 
 /* register defines */
 #define R_START_OSC             0x00
@@ -365,12 +369,10 @@ void lcd_update(void)
 {
     if (!display_on)
         return;
-        
-    /* we must disable interrupts because buttondriver also writes to lcd */
-    disable_irq();   
-    
+
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
 
+    lcd_busy = true;
     /* Set start position and window */
     lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (LCD_WIDTH-1) << 8);
     lcd_write_reg(R_VERT_RAM_ADDR_POS, 
@@ -381,7 +383,7 @@ void lcd_update(void)
 
     lcd_write_data((unsigned short *)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
 
-    enable_irq();
+    lcd_busy = false;
 } /* lcd_update */
 
 
@@ -393,7 +395,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     if (!display_on)
         return;
-        
+
     if (x + width > LCD_WIDTH)
         width = LCD_WIDTH - x; /* Clip right */
     if (x < 0)
@@ -409,10 +411,8 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (y >= ymax)
         return; /* nothing left to do */
 
-    /* we must disable interrupts because buttondriver also writes to lcd */   
-    disable_irq();
-        
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
+    lcd_busy = true;
     /* Set start position and window */
     lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 
                   ((x + width-1) << 8) | x);
@@ -430,8 +430,8 @@ void lcd_update_rect(int x, int y, int width, int height)
         ptr += LCD_WIDTH;
     }
     while (++y < ymax);
-    
-    enable_irq();
+
+    lcd_busy = false;
 } /* lcd_update_rect */
 
 /* writes one read pixel outside the visible area, needed for correct dbop reads */
@@ -440,9 +440,12 @@ void lcd_button_support(void)
     int x=LCD_HEIGHT+1;
     int y=LCD_WIDTH+1;
     int width=1;
-    int height=1;    
+    int height=1;
     unsigned short data = (0xf<<12);
-    
+
+    if (lcd_busy)
+        return;
+
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
     /* Set start position and window */
     lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 

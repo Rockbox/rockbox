@@ -41,8 +41,10 @@
 static bool display_on = false; /* is the display turned on? */
 static bool display_flipped = false;
 static int xoffset = 20; /* needed for flip */
-
-static volatile int _ystart, _ymax, _xstart, _xmax;
+/* we need to write a red pixel for correct button reads
+ * (see lcd_button_support()), but that must not happen while the lcd is updating
+ * so block lcd_button_support the during updates */
+static volatile bool lcd_busy = false;
 
 static void as3525_dbop_init(void)
 {
@@ -285,8 +287,7 @@ void lcd_update(void)
 
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
 
-    /* we must disable interrupts because buttondriver also writes to lcd */
-    disable_irq();
+    lcd_busy = true;
     lcd_window_x(0, LCD_WIDTH - 1);
     lcd_window_y(0, LCD_HEIGHT - 1);
 
@@ -295,7 +296,7 @@ void lcd_update(void)
 
     /* Write data */
     lcd_write_data((unsigned short *)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
-    enable_irq();
+    lcd_busy = false;
 }
 
 /* Update a fraction of the display. */
@@ -327,8 +328,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
 
-    /* we must disable interrupts because buttondriver also writes to lcd */
-    disable_irq();
+    lcd_busy = true;
     lcd_window_x(x, xmax);
     lcd_window_y(y, ymax);
 
@@ -343,13 +343,15 @@ void lcd_update_rect(int x, int y, int width, int height)
         ptr += LCD_WIDTH;
     }
     while (++y <= ymax);
-    enable_irq();
+    lcd_busy = false;
 }
 
 /* writes one read pixel outside the visible area, needed for correct dbop reads */
 void lcd_button_support(void)
 {
     fb_data data = 0xf<<12;
+    if (lcd_busy)
+        return;
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
     /* Set start position and window */
 
