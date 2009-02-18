@@ -317,12 +317,12 @@ whichadvanced () {
   #
   echo ""
   echo "Enter your developer options (press enter when done)"
-  echo -n "(D)EBUG, (L)ogf, (S)imulator, (P)rofiling, (V)oice"
+  printf "(D)EBUG, (L)ogf, (S)imulator, (P)rofiling, (V)oice"
   if [ "$memory" = "2" ]; then
-    echo -n ", (8)MB MOD"
+    printf ", (8)MB MOD"
   fi
   if [ "$modelname" = "h120" ]; then
-    echo -n ", (R)TC MOD"
+    printf ", (R)TC MOD"
   fi
   echo ""
 
