@@ -108,15 +108,17 @@
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
-/* #define HAVE_BACKLIGHT_BRIGHTNESS */
+#define HAVE_BACKLIGHT_BRIGHTNESS
+/* #define CONFIG_BACKLIGHT_FADING     BACKLIGHT_FADING_SW_SETTING */
 
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING      1
-#define MAX_BRIGHTNESS_SETTING     12
-#define DEFAULT_BRIGHTNESS_SETTING  6
+#define MAX_BRIGHTNESS_SETTING     16
+#define DEFAULT_BRIGHTNESS_SETTING 13 /* match OF brightness */
 
 /* define this if you have a light associated with the buttons */
-/* #define HAVE_BUTTON_LIGHT */
+#define HAVE_BUTTON_LIGHT
+#define HAVE_BUTTONLIGHT_BRIGHTNESS
 
 #define BATTERY_CAPACITY_DEFAULT 630 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN     630 /* min. capacity selectable */

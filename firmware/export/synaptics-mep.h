@@ -18,10 +18,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef SYNAPTICS_MEP_H
+#define SYNAPTICS_MEP_H
 
-int syn_init(void);
-int syn_read_device(int *data, int len);
+int  syn_init(void);
+int  syn_get_status(void);
+void syn_int_enable(bool enable);
+int  syn_read(int *data, int len);
+int  syn_send(int *data, int len);
 
-#ifdef ROCKBOX_HAS_LOGF
-void syn_info(void);
 #endif

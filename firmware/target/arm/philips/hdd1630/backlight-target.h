@@ -24,7 +24,6 @@
 #define _backlight_init() true
 void _backlight_on(void);
 void _backlight_off(void);
-int  __backlight_is_on(void);
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 void _backlight_set_brightness(int brightness);
@@ -33,6 +32,7 @@ void _backlight_set_brightness(int brightness);
 #ifdef HAVE_BUTTON_LIGHT
 void _buttonlight_on(void);
 void _buttonlight_off(void);
+void _buttonlight_set_brightness(int brightness);
 #endif
 
 #endif

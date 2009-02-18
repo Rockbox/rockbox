@@ -35,8 +35,6 @@
 static int int_btn = BUTTON_NONE;
 
 #ifndef BOOTLOADER
-static int syn_status = 0;
-
 void button_init_device(void)
 {
     /* enable touchpad leds */
@@ -58,21 +56,9 @@ void button_init_device(void)
     GPIOD_OUTPUT_EN  |=  0x4; /* DATA */
     GPIOD_OUTPUT_VAL |=  0x4; /* high */
 
-    if (syn_init())
+    if (!syn_init())
     {
-#ifdef ROCKBOX_HAS_LOGF
-        syn_info();
-#endif
-
-        syn_status = 1;
-
-        /* enable interrupts */
-        GPIOD_INT_LEV &= ~0x2;
-        GPIOD_INT_CLR |=  0x2;
-        GPIOD_INT_EN  |=  0x2;
-
-        CPU_INT_EN    |= HI_MASK;
-        CPU_HI_INT_EN |= GPIO0_MASK;
+        logf("button_init_dev: touchpad not ready");
     }
 }
 
@@ -86,13 +72,12 @@ void button_int(void)
 
     int_btn = BUTTON_NONE;
 
-    if (syn_status)
+    if (syn_get_status())
     {
         /* disable interrupt while we read the touchpad */
-        GPIOD_INT_EN  &= ~0x2;
-        GPIOD_INT_CLR |=  0x2;
+        syn_int_enable(false);
 
-        val = syn_read_device(data, 4);
+        val = syn_read(data, 4);
         if (val > 0)
         {
             val = data[0] & 0xff;      /* packet header */
@@ -119,7 +104,7 @@ void button_int(void)
                     int_btn |= BUTTON_RIGHT;
 
                 /* An Absolute packet should follow which we ignore */
-                val = syn_read_device(data, 4);
+                val = syn_read(data, 4);
 
                 logf("  int_btn = 0x%04x", int_btn);
             }
@@ -148,8 +133,7 @@ void button_int(void)
         }
 
         /* re-enable interrupts */
-        GPIOD_INT_LEV &= ~0x2;
-        GPIOD_INT_EN  |=  0x2;
+        syn_int_enable(true);
     }
 }
 #else

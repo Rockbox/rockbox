@@ -28,6 +28,7 @@
 #include "power.h"
 #include "logf.h"
 #include "usb.h"
+#include "synaptics-mep.h"
 
 void power_init(void)
 {
@@ -45,6 +46,27 @@ void power_init(void)
     GPIOE_ENABLE |= 0x40;
     GPIOE_OUTPUT_EN |= 0x40;
     GPIOE_OUTPUT_VAL &= ~0x40; /* off */
+#endif
+
+#ifndef BOOTLOADER
+    /* enable touchpad here because we need it for
+       both buttons and button lights */
+    GPO32_ENABLE     |=  0x80;
+    GPO32_VAL        &= ~0x80;
+    udelay(1000);
+
+    GPIOD_ENABLE |= 0x80;          /* enable ACK */
+    GPIOA_ENABLE |= (0x10 | 0x20); /* enable DATA, CLK */
+
+    GPIOD_OUTPUT_EN  |=  0x80; /* set ACK */
+    GPIOD_OUTPUT_VAL |=  0x80; /*    high */
+
+    GPIOA_OUTPUT_EN  &= ~0x20; /* CLK */
+    
+    GPIOA_OUTPUT_EN  |=  0x10; /* set DATA */
+    GPIOA_OUTPUT_VAL |=  0x10; /*     high */
+
+    syn_init();
 #endif
 }
 
@@ -69,7 +91,6 @@ void ide_power_enable(bool on)
     (void)on;
     /* We do nothing */
 }
-
 
 bool ide_powered(void)
 {

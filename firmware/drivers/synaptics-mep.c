@@ -33,6 +33,9 @@
    Protocol: 3-Wire Interface Specification" documentation */
 
 #if defined(MROBE_100)
+#define INT_ENABLE  GPIOD_INT_LEV &= ~0x2; GPIOD_INT_EN  |= 0x2
+#define INT_DISABLE GPIOD_INT_EN  &= ~0x2; GPIOD_INT_CLR |= 0x2
+
 #define ACK     (GPIOD_INPUT_VAL & 0x1)
 #define ACK_HI  GPIOD_OUTPUT_VAL |=  0x1
 #define ACK_LO  GPIOD_OUTPUT_VAL &= ~0x1
@@ -47,6 +50,9 @@
 #define DATA_CL GPIOD_OUTPUT_EN &= ~0x4
 
 #elif defined(PHILIPS_HDD1630)
+#define INT_ENABLE  GPIOA_INT_LEV &= ~0x20; GPIOA_INT_EN  |= 0x20
+#define INT_DISABLE GPIOA_INT_EN  &= ~0x20; GPIOA_INT_CLR |= 0x20
+
 #define ACK     (GPIOD_INPUT_VAL & 0x80)
 #define ACK_HI  GPIOD_OUTPUT_VAL |=  0x80
 #define ACK_LO  GPIOD_OUTPUT_VAL &= ~0x80
@@ -72,6 +78,8 @@
 
 #define MEP_READ  0x1
 #define MEP_WRITE 0x3
+
+static unsigned short syn_status = 0;
 
 static int syn_wait_clk_change(unsigned int val)
 {
@@ -140,12 +148,12 @@ static void syn_flush(void)
     syn_wait_guest_flush();
 }
 
-static int syn_send_data(int *data, int len)
+int syn_send(int *data, int len)
 {
     int i, bit;
     int parity = 0;
 
-    logf("syn_send_data...");
+    logf("syn_send...");
 
     /* 1. Lower DATA line to issue a request-to-send to guest */
     DATA_LO;
@@ -380,7 +388,7 @@ static int syn_read_data(int *data, int data_len)
     return len;
 }
 
-int syn_read_device(int *data, int len)
+int syn_read(int *data, int len)
 {
     int i;
     int ret = READ_ERROR;
@@ -406,7 +414,7 @@ int syn_read_device(int *data, int len)
     return ret;
 }
 
-static int syn_reset(void)
+int syn_reset(void)
 {
     int val, id;
     int data[2];
@@ -415,9 +423,9 @@ static int syn_reset(void)
 
     /* reset module 0 */
     val = (0 << 4) | (1 << 3) | 0;
-    syn_send_data(&val, 1);
+    syn_send(&val, 1);
 
-    val = syn_read_device(data, 2);
+    val = syn_read(data, 2);
     if (val == 1)
     {
         val = data[0] & 0xff;      /* packet header */
@@ -436,7 +444,35 @@ static int syn_reset(void)
 int syn_init(void)
 {
     syn_flush();
-    return syn_reset();
+    syn_status = syn_reset();
+
+    if (syn_status)
+    {
+        INT_DISABLE;
+        INT_ENABLE;
+
+        CPU_INT_EN    |= HI_MASK;
+        CPU_HI_INT_EN |= GPIO0_MASK;
+    }
+
+    return syn_status;
+}
+
+int syn_get_status(void)
+{
+    return syn_status;
+}
+
+void syn_int_enable(bool enable)
+{
+    if (enable)
+    {
+        INT_ENABLE;
+    }
+    else
+    {
+        INT_DISABLE;
+    }
 }
 
 #ifdef ROCKBOX_HAS_LOGF
@@ -451,8 +487,8 @@ void syn_info(void)
     logf("module base info:");
     data[0] = MEP_READ;
     data[1] = 0x80;
-    syn_send_data(data, 2);
-    val = syn_read_device(data, 8);
+    syn_send(data, 2);
+    val = syn_read(data, 8);
     if (val > 0)
     {
         for (i = 0; i < 8; i++)
@@ -463,8 +499,8 @@ void syn_info(void)
     logf("module product info:");
     data[0] = MEP_READ;
     data[1] = 0x81;
-    syn_send_data(data, 2);
-    val = syn_read_device(data, 8);
+    syn_send(data, 2);
+    val = syn_read(data, 8);
     if (val > 0)
     {
         for (i = 0; i < 8; i++)
@@ -475,8 +511,8 @@ void syn_info(void)
     logf("module serialization:");
     data[0] = MEP_READ;
     data[1] = 0x82;
-    syn_send_data(data, 2);
-    val = syn_read_device(data, 8);
+    syn_send(data, 2);
+    val = syn_read(data, 8);
     if (val > 0)
     {
         for (i = 0; i < 8; i++)
@@ -487,8 +523,8 @@ void syn_info(void)
     logf("1-d sensor info:");
     data[0] = MEP_READ;
     data[1] = 0x80 + 0x20;
-    syn_send_data(data, 2);
-    val = syn_read_device(data, 8);
+    syn_send(data, 2);
+    val = syn_read(data, 8);
     if (val > 0)
     {
         for (i = 0; i < 8; i++)

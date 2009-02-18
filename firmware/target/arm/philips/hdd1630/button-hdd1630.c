@@ -46,41 +46,11 @@ void button_click(void)
 }
 
 #ifndef BOOTLOADER
-static int syn_status = 0;
-
 void button_init_device(void)
 {
-    /* enable touchpad */
-    GPO32_ENABLE     |=  0x80;
-    GPO32_VAL        &= ~0x80;
-    udelay(1000);
-
-    /* enable ACK, CLK, DATA lines */
-    GPIOD_ENABLE |= 0x80;
-    GPIOA_ENABLE |= (0x10 | 0x20);
-
-    GPIOD_OUTPUT_EN  |=  0x80; /* ACK  */
-    GPIOD_OUTPUT_VAL |=  0x80; /* high */
-
-    GPIOA_OUTPUT_EN  &= ~0x20; /* CLK  */
-    
-    GPIOA_OUTPUT_EN  |=  0x10; /* DATA */
-    GPIOA_OUTPUT_VAL |=  0x10; /* high */
-
-    if (syn_init())
+    if (!syn_get_status())
     {
-#ifdef ROCKBOX_HAS_LOGF
-        syn_info();
-#endif
-        syn_status = 1;
-
-        /* enable interrupts */
-        GPIOA_INT_LEV &= ~0x20;
-        GPIOA_INT_CLR |=  0x20;
-        GPIOA_INT_EN  |=  0x20;
-
-        CPU_INT_EN    |= HI_MASK;
-        CPU_HI_INT_EN |= GPIO0_MASK;
+        logf("button_init_dev: touchpad not ready");
     }
 }
 
@@ -94,19 +64,18 @@ void button_int(void)
 
     int_btn = BUTTON_NONE;
 
-    if (syn_status)
+    if (syn_get_status())
     {
         /* disable interrupt while we read the touchpad */
-        GPIOA_INT_EN  &= ~0x20;
-        GPIOA_INT_CLR |=  0x20;
+        syn_int_enable(false);
 
-        val = syn_read_device(data, 4);
+        val = syn_read(data, 4);
         if (val > 0)
         {
             val = data[0] & 0xff;      /* packet header */
             id = (data[1] >> 4) & 0xf; /* packet id */
 
-            logf("button_read_device...");
+            logf("syn_read:");
             logf("  data[0] = 0x%08x", data[0]);
             logf("  data[1] = 0x%08x", data[1]);
             logf("  data[2] = 0x%08x", data[2]);
@@ -121,7 +90,7 @@ void button_int(void)
                     int_btn |= BUTTON_RIGHT;
 
                 /* An Absolute packet should follow which we ignore */
-                val = syn_read_device(data, 4);
+                val = syn_read(data, 4);
                 logf("  int_btn = 0x%04x", int_btn);
             }
             else if (val == MEP_ABSOLUTE_HEADER)
@@ -149,8 +118,7 @@ void button_int(void)
         }
 
         /* re-enable interrupts */
-        GPIOA_INT_LEV &= ~0x20;
-        GPIOA_INT_EN  |=  0x20;
+        syn_int_enable(true);
     }
 }
 #else
