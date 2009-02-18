@@ -723,8 +723,8 @@ cat <<EOF
  90) Zen Vision:M 30GB                           57) Sansa m200v4
  91) Zen Vision:M 60GB    ==Philips==            58) Sansa Fuze
  92) Zen Vision           100) GoGear SA9200     59) Sansa c200v2
-                          101) GoGear HDD1630
-                                                 ==Logik==
+                          101) GoGear HDD1630/
+                               HDD1830           ==Logik==
  ==Onda==                                        80) DAX 1GB MP3/DAB
  120) VX747               ==Meizu==
  121) VX767               110) M6SL
