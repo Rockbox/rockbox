@@ -116,6 +116,9 @@ drivers/dac.c
 drivers/serial.c
 #endif
 #endif /* SIMULATOR */
+#ifdef HAVE_TOUCHSCREEN
+drivers/touchscreen.c
+#endif
 
 
 /* Storage */
