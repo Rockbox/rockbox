@@ -326,7 +326,7 @@ bool set_option_dithering(void)
 static void display_options(void)
 {
     static const struct menu_item items[] = {
-        { "Grayscale", set_option_grayscale },
+        { "Greyscale", set_option_grayscale },
         { "Dithering", set_option_dithering },
     };
 
