@@ -192,7 +192,7 @@ void* main(void)
     printf("Zeroing flash");
     for(i=0;i<250816;i++)
     {
-       storage_write_sectors(IF_MV2(0,) i*32,32,zero);
+       storage_write_sectors(0,i*32,32,zero);
        if(i%64 == 0)
        {
            printf("%d kB left",(250816-i)/2);
@@ -200,13 +200,13 @@ void* main(void)
     }
 
     printf("Writing MBR");
-    storage_write_sectors(IF_MV2(0,) 0,1,mbr);
+    storage_write_sectors(0,0,1,mbr);
     printf("Writing FAT bootsector");
-    storage_write_sectors(IF_MV2(0,) 1023,1,fat);
+    storage_write_sectors(0,1023,1,fat);
     printf("Writing more FAT");
-    storage_write_sectors(IF_MV2(0,) 1024,1,backupfat);
+    storage_write_sectors(0,1024,1,backupfat);
     printf("Writing more FAT");
-    storage_write_sectors(IF_MV2(0,) 1264,1,backupfat);
+    storage_write_sectors(0,1264,1,backupfat);
     if (button_hold())
         printf("Release Hold and");
 
