@@ -169,6 +169,7 @@ void ICODE_ATTR cpucache_flush(void)
     {
         CACHE_OPERATION |= CACHE_OP_FLUSH;
         while ((CACHE_CTL & CACHE_CTL_BUSY) != 0);
+        nop; nop; nop; nop;
     }
 }
 
@@ -469,11 +470,6 @@ void system_init(void)
         GPIOJ_INT_EN        = 0;
         GPIOK_INT_EN        = 0;
         GPIOL_INT_EN        = 0;
-
-#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
-        /* outl(0x00000000, 0x6000b000); */
-        outl(inl(0x6000a000) | 0x80000000, 0x6000a000); /* Init DMA controller? */
-#endif 
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #if NUM_CORES > 1

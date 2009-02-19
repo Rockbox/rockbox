@@ -23,6 +23,9 @@
 
 /* All info gleaned and/or copied from the iPodLinux project. */
 
+/* PCM addresses for obtaining buffers will be what DMA is using (physical) */
+#define HAVE_PCM_DMA_ADDRESS
+
 /* USBOTG */
 #define USB_NUM_ENDPOINTS  3
 /* This needs to be 2048 byte aligned, but USB_QHARRAY_ATTR should take care
@@ -104,6 +107,10 @@
 #define USB_IRQ      20
 #define IDE_IRQ      23
 #define FIREWIRE_IRQ 25
+#define DMA0_IRQ     26
+#define DMA1_IRQ     27 /* guess */
+#define DMA2_IRQ     28 /* guess */
+#define DMA3_IRQ     29 /* guess */
 #define HI_IRQ       30
 #define GPIO0_IRQ    (32+0) /* Ports A..D */
 #define GPIO1_IRQ    (32+1) /* Ports E..H */
@@ -119,6 +126,10 @@
 #define IDE_MASK      (1 << IDE_IRQ)
 #define USB_MASK      (1 << USB_IRQ)
 #define FIREWIRE_MASK (1 << FIREWIRE_IRQ)
+#define DMA0_MASK     (1 << DMA0_IRQ)
+#define DMA1_MASK     (1 << DMA1_IRQ)
+#define DMA2_MASK     (1 << DMA2_IRQ)
+#define DMA3_MASK     (1 << DMA3_IRQ)
 #define HI_MASK       (1 << HI_IRQ)
 #define GPIO0_MASK    (1 << (GPIO0_IRQ-32))
 #define GPIO1_MASK    (1 << (GPIO1_IRQ-32))
@@ -600,5 +611,89 @@
 #define MMAP6_PHYSICAL          (*(volatile unsigned long*)(0xf000f034))
 #define MMAP7_LOGICAL           (*(volatile unsigned long*)(0xf000f038))
 #define MMAP7_PHYSICAL          (*(volatile unsigned long*)(0xf000f03c))
+
+/** DMA engine **/
+#define DMA0_BASE_ADDR          0x6000b000
+#define DMA1_BASE_ADDR          0x6000b020
+#define DMA2_BASE_ADDR          0x6000b040
+#define DMA3_BASE_ADDR          0x6000b060
+
+/* DMA request IDs */
+#define DMA_REQ_IIS             2
+#define DMA_REQ_SDHC            13
+
+#define DMA_MASTER_CONTROL      (*(volatile unsigned long*)(0x6000a000))
+#define DMA_MASTER_STATUS       (*(volatile unsigned long*)(0x6000a004))
+    /* 1ul << DMA_REQ_xxx to set bit */
+#define DMA_REQ_STATUS          (*(volatile unsigned long*)(0x6000a008))
+
+#define DMA_MASTER_CONTROL_EN   (1 << 31)
+
+#define DMA_MASTER_STATUS_CH0   (0x1 << 24)
+#define DMA_MASTER_STATUS_CH1   (0x1 << 25)
+#define DMA_MASTER_STATUS_CH2   (0x1 << 26)
+#define DMA_MASTER_STATUS_CH3   (0x1 << 27)
+
+#define DMA0_CMD                (*(volatile unsigned long*)(DMA0_BASE_ADDR+0x00))
+#define DMA0_STATUS             (*(volatile unsigned long*)(DMA0_BASE_ADDR+0x04))
+#define DMA0_RAM_ADDR           (*(volatile unsigned long*)(DMA0_BASE_ADDR+0x10))
+#define DMA0_FLAGS              (*(volatile unsigned long*)(DMA0_BASE_ADDR+0x14))
+#define DMA0_PER_ADDR           (*(volatile unsigned long*)(DMA0_BASE_ADDR+0x18))
+#define DMA0_INCR               (*(volatile unsigned long*)(DMA0_BASE_ADDR+0x1c))
+
+#define DMA1_CMD                (*(volatile unsigned long*)(DMA1_BASE_ADDR+0x00))
+#define DMA1_STATUS             (*(volatile unsigned long*)(DMA1_BASE_ADDR+0x04))
+#define DMA1_RAM_ADDR           (*(volatile unsigned long*)(DMA1_BASE_ADDR+0x10))
+#define DMA1_FLAGS              (*(volatile unsigned long*)(DMA1_BASE_ADDR+0x14))
+#define DMA1_PER_ADDR           (*(volatile unsigned long*)(DMA1_BASE_ADDR+0x18))
+#define DMA1_INCR               (*(volatile unsigned long*)(DMA1_BASE_ADDR+0x1c))
+
+#define DMA2_CMD                (*(volatile unsigned long*)(DMA2_BASE_ADDR+0x00))
+#define DMA2_STATUS             (*(volatile unsigned long*)(DMA2_BASE_ADDR+0x04))
+#define DMA2_RAM_ADDR           (*(volatile unsigned long*)(DMA2_BASE_ADDR+0x10))
+#define DMA2_FLAGS              (*(volatile unsigned long*)(DMA2_BASE_ADDR+0x14))
+#define DMA2_PER_ADDR           (*(volatile unsigned long*)(DMA2_BASE_ADDR+0x18))
+#define DMA2_INCR               (*(volatile unsigned long*)(DMA2_BASE_ADDR+0x1c))
+
+#define DMA3_CMD                (*(volatile unsigned long*)(DMA3_BASE_ADDR+0x00))
+#define DMA3_STATUS             (*(volatile unsigned long*)(DMA3_BASE_ADDR+0x04))
+#define DMA3_RAM_ADDR           (*(volatile unsigned long*)(DMA3_BASE_ADDR+0x10))
+#define DMA3_FLAGS              (*(volatile unsigned long*)(DMA3_BASE_ADDR+0x14))
+#define DMA3_PER_ADDR           (*(volatile unsigned long*)(DMA3_BASE_ADDR+0x18))
+#define DMA3_INCR               (*(volatile unsigned long*)(DMA3_BASE_ADDR+0x1c))
+
+#define DMA_CMD_SIZE            (0xffff)
+#define DMA_CMD_REQ_ID          (0xf << 16)
+    #define DMA_CMD_REQ_ID_POS  16
+#define DMA_CMD_WAIT_REQ        (0x1 << 24)
+#define DMA_CMD_UNK25           (0x1 << 25)
+#define DMA_CMD_SINGLE          (0x1 << 26) /* stop on complete, no auto reload */
+#define DMA_CMD_RAM_TO_PER      (0x1 << 27) /* otherwise per to ram */
+#define DMA_CMD_SLEEP_WAIT      (0x1 << 28)
+#define DMA_CMD_INTR            (0x1 << 30)
+#define DMA_CMD_START           (0x1 << 31)
+
+#define DMA_STATUS_SIZE_REMAIN  (0xffff)
+#define DMA_STATUS_INTR         (0x1 << 30)
+#define DMA_STATUS_BUSY         (0x1 << 31)
+
+#define DMA_FLAGS_ALIGNED       (0x1 << 24)
+#define DMA_FLAGS_UNK26         (0x1 << 26)
+
+#define DMA_INCR_RANGE          (0x7 << 16)
+#define DMA_INCR_RANGE_UNL      (0x0 << 16)
+#define DMA_INCR_RANGE_FIXED    (0x1 << 16)
+#define DMA_INCR_RANGE_ALTR     (0x2 << 16)
+#define DMA_INCR_RANGE_4        (0x3 << 16)
+#define DMA_INCR_RANGE_8        (0x4 << 16)
+#define DMA_INCR_RANGE_16       (0x5 << 16)
+#define DMA_INCR_RANGE_32       (0x6 << 16)
+#define DMA_INCR_RANGE_64       (0x7 << 16)
+
+#define DMA_INCR_WIDTH          (0x7 << 28)
+#define DMA_INCR_WIDTH_8BIT     (0x0 << 28)
+#define DMA_INCR_WIDTH_16BIT    (0x1 << 28)
+#define DMA_INCR_WIDTH_32BIT    (0x2 << 28)
+/* All other values reserved? */
 
 #endif /* __PP5020_H__ */

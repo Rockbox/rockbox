@@ -32,6 +32,18 @@
 #ifdef CPU_PP502x
 /* 16-bit, L-R packed into 32 bits with left in the least significant halfword */
 #define SAMPLE_SIZE   16
+/* DMA Requests from IIS, Memory to peripheral, single transfer,
+   wait for DMA request, interrupt on complete */
+#define DMA_PLAY_CONFIG ((DMA_REQ_IIS << DMA_CMD_REQ_ID_POS) | \
+                          DMA_CMD_RAM_TO_PER | DMA_CMD_SINGLE | \
+                          DMA_CMD_WAIT_REQ | DMA_CMD_INTR)
+/* DMA status cannot be viewed from outside code in control because that can
+ * clear the interrupt from outside the handler and prevent the handler from
+ * from being called. Split up transfers to a reasonable size that is good as
+ * a timer, obtaining a keyclick position and peaking yet still keeps the
+ * FIQ count low.
+ */
+#define MAX_DMA_CHUNK_SIZE (pcm_curr_sampr >> 6) /* ~1/256 seconds */
 #else
 /* 32-bit, one left 32-bit sample followed by one right 32-bit sample */
 #define SAMPLE_SIZE   32
@@ -41,11 +53,12 @@ struct dma_data
 {
 /* NOTE: The order of size and p is important if you use assembler
    optimised fiq handler, so don't change it. */
-#if SAMPLE_SIZE == 16
-    uint32_t *p;
-#elif SAMPLE_SIZE == 32
-    uint16_t *p;
-#endif
+    union
+    {
+        unsigned long addr;
+        uint32_t *p16;  /* For packed 16-16 stereo pairs */
+        uint16_t *p32;  /* For individual samples converted to 32-bit */
+    };
     size_t size;
 #if NUM_CORES > 1
     unsigned core;
@@ -67,15 +80,24 @@ void fiq_handler(void)
     );
 }
 
+#ifdef HAVE_PCM_DMA_ADDRESS
+void * pcm_dma_addr(void *addr)
+{
+    if (addr != NULL && (unsigned long)addr < UNCACHED_BASE_ADDR)
+        addr = UNCACHED_ADDR(addr);
+    return addr;
+}
+#endif
+
 /* TODO: Get simultaneous recording and playback to work. Just needs some tweaking */
 
 /****************************************************************************
  ** Playback DMA transfer
  **/
-static struct dma_data dma_play_data SHAREDBSS_ATTR =
+static struct dma_data dma_play_data IBSS_ATTR =
 {
     /* Initialize to a locked, stopped state */
-    .p = NULL,
+    { .addr = 0 },
     .size = 0,
 #if NUM_CORES > 1
     .core = 0x00,
@@ -89,6 +111,59 @@ void pcm_dma_apply_settings(void)
     audiohw_set_frequency(pcm_fsel);
 }
 
+#if defined(CPU_PP502x)
+/* NOTE: direct stack use forbidden by GCC stack handling bug for FIQ */
+void ICODE_ATTR __attribute__((interrupt("FIQ"))) fiq_playback(void)
+{
+    register pcm_more_callback_type get_more;
+    register size_t size;
+
+    DMA0_STATUS; /* Clear any pending interrupt */
+
+    size = (DMA0_CMD & 0xffff) + 4; /* Get size of trasfer that caused this
+                                       interrupt */
+    dma_play_data.addr += size;
+    dma_play_data.size -= size;
+
+    while (1)
+    {
+        if (dma_play_data.size > 0) {
+            size = MAX_DMA_CHUNK_SIZE;
+            /* Not at least MAX_DMA_CHUNK_SIZE left or there would be less
+             * than a FIFO's worth of data after this transfer? */
+            if (size + 16*4 > dma_play_data.size)
+                size = dma_play_data.size;
+
+            /* Set the new DMA values and activate channel */
+            DMA0_RAM_ADDR = dma_play_data.addr;
+            DMA0_CMD = DMA_PLAY_CONFIG | (size - 4) | DMA_CMD_START;
+            return;
+        }
+
+        /* Buffer empty.  Try to get more. */
+        get_more = pcm_callback_for_more;
+        if (get_more) {
+            get_more((unsigned char **)&dma_play_data.addr, &dma_play_data.size);
+            dma_play_data.addr = (dma_play_data.addr + 3) & ~3;  
+            dma_play_data.size &= 0xfffc;
+        }
+
+        if (dma_play_data.size <= 0) {
+            break;
+        }
+
+        if (dma_play_data.addr < UNCACHED_BASE_ADDR) {
+            /* Flush any pending cache writes */
+            dma_play_data.addr = UNCACHED_ADDR(dma_play_data.addr);
+            cpucache_flush();
+        }
+    }
+
+    /* Callback missing or no more DMA to do */
+    pcm_play_dma_stop();
+    pcm_play_dma_stopped_callback();
+}
+#else
 /* ASM optimised FIQ handler. Checks for the minimum allowed loop cycles by
  * evalutation of free IISFIFO-slots against available source buffer words.
  * Through this it is possible to move the check for IIS_TX_FREE_COUNT outside
@@ -221,10 +296,10 @@ void fiq_playback(void)
                 return;
             }
 #if SAMPLE_SIZE == 16
-            IISFIFO_WR = *dma_play_data.p++;
+            IISFIFO_WR = *dma_play_data.p16++;
 #elif SAMPLE_SIZE == 32
-            IISFIFO_WR = *dma_play_data.p++ << 16;
-            IISFIFO_WR = *dma_play_data.p++ << 16;
+            IISFIFO_WR = *dma_play_data.p32++ << 16;
+            IISFIFO_WR = *dma_play_data.p32++ << 16;
 #endif
             dma_play_data.size -= 4;
         }
@@ -232,7 +307,7 @@ void fiq_playback(void)
         /* p is empty, get some more data */
         get_more = pcm_callback_for_more;
         if (get_more) {
-            get_more((unsigned char**)&dma_play_data.p,
+            get_more((unsigned char**)&dma_play_data.addr,
                      &dma_play_data.size);
         }
     } while (dma_play_data.size);
@@ -242,6 +317,7 @@ void fiq_playback(void)
     pcm_play_dma_stopped_callback();
 }
 #endif /* ASM / C selection */
+#endif /* CPU_PP502x */
 
 /* For the locks, FIQ must be disabled because the handler manipulates
    IISCONFIG and the operation is not atomic - dual core support
@@ -251,7 +327,11 @@ void pcm_play_lock(void)
     int status = disable_fiq_save();
 
     if (++dma_play_data.locked == 1) {
+#ifdef CPU_PP502x
+        CPU_INT_DIS = DMA0_MASK;
+#else
         IIS_IRQTX_REG &= ~IIS_IRQTX;
+#endif
     }
 
     restore_fiq(status);
@@ -262,7 +342,11 @@ void pcm_play_unlock(void)
    int status = disable_fiq_save();
 
     if (--dma_play_data.locked == 0 && dma_play_data.state != 0) {
+#ifdef CPU_PP502x
+        CPU_INT_EN = DMA0_MASK;
+#else
         IIS_IRQTX_REG |= IIS_IRQTX;
+#endif
     }
 
    restore_fiq(status);
@@ -272,30 +356,71 @@ static void play_start_pcm(void)
 {
     fiq_function = fiq_playback;
 
-    IISCONFIG &= ~IIS_TXFIFOEN;  /* Stop transmitting */
+#ifdef CPU_PP502x
+    /* Not at least MAX_DMA_CHUNK_SIZE left or there would be less than a
+     * FIFO's worth of data after this transfer? */
+    size_t size = MAX_DMA_CHUNK_SIZE;
+    if (dma_play_data.size + 16*4 < size)
+        size = dma_play_data.size;
+
+    DMA0_RAM_ADDR = dma_play_data.addr;
+    DMA0_CMD = DMA_PLAY_CONFIG | (size - 4) | DMA_CMD_START;
     dma_play_data.state = 1;
+#else
+    IISCONFIG &= ~IIS_TXFIFOEN;  /* Stop transmitting */
 
     /* Fill the FIFO or start when data is used up */
     while (1) {
         if (IIS_TX_FREE_COUNT < 2 || dma_play_data.size == 0) {
             IISCONFIG |= IIS_TXFIFOEN; /* Start transmitting */
+            dma_play_data.state = 1;
             return;
         }
 
 #if SAMPLE_SIZE == 16
-        IISFIFO_WR = *dma_play_data.p++;
+        IISFIFO_WR = *dma_play_data.p16++;
 #elif SAMPLE_SIZE == 32
-        IISFIFO_WR = *dma_play_data.p++ << 16;
-        IISFIFO_WR = *dma_play_data.p++ << 16;
+        IISFIFO_WR = *dma_play_data.p32++ << 16;
+        IISFIFO_WR = *dma_play_data.p32++ << 16;
 #endif
         dma_play_data.size -= 4;
     }
+#endif
 }
 
 static void play_stop_pcm(void)
 {
+#ifdef CPU_PP502x
+    size_t status = DMA0_STATUS;
+    size_t size;
+
+    /* Stop transfer */
+    DMA0_CMD &= ~(DMA_CMD_START | DMA_CMD_INTR);
+
+    /* Wait for not busy + clear int */
+    while (DMA0_STATUS & (DMA_STATUS_BUSY | DMA_STATUS_INTR));
+
+    size = (status & 0xfffc) + 4;
+
+    if (status & DMA_STATUS_BUSY)
+    {
+        /* Transfer was interrupted - leave what's left */
+        dma_play_data.addr += dma_play_data.size - size;
+        dma_play_data.size = size;
+    }
+    else if (status & DMA_STATUS_INTR)
+    {
+        /* Tranfer was finished - DMA0_STATUS will have been reloaded
+         * automatically with size in DMA0_CMD. */
+        dma_play_data.addr += size;
+        dma_play_data.size -= size;
+        if (dma_play_data.size <= 0)
+            dma_play_data.addr = 0; /* Entire buffer has completed */
+    }
+#else
     /* Disable TX interrupt */
     IIS_IRQTX_REG &= ~IIS_IRQTX;
+#endif
 
     /* Wait for FIFO to empty */
     while (!IIS_TX_IS_EMPTY);
@@ -305,16 +430,32 @@ static void play_stop_pcm(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    dma_play_data.p    = (void *)(((uintptr_t)addr + 2) & ~3);
-    dma_play_data.size = (size & ~3);
+    addr = (void *)(((long)addr + 2) & ~3);
+    size &= 0xfffc;
 
 #if NUM_CORES > 1
     /* This will become more important later - and different ! */
     dma_play_data.core = processor_id(); /* save initiating core */
 #endif
 
-    CPU_INT_PRIORITY |= IIS_MASK;   /* FIQ priority for I2S */
-    CPU_INT_EN = IIS_MASK;
+    pcm_play_dma_stop();
+
+    if (size <= 0)
+        return;
+
+#ifdef CPU_PP502x
+    if ((unsigned long)addr < UNCACHED_BASE_ADDR) {
+        /* Flush any pending cache writes */
+        addr = UNCACHED_ADDR(addr);
+        cpucache_flush();
+    }
+
+    dma_play_data.addr = (unsigned long)addr;
+    dma_play_data.size = size;
+    DMA0_PER_ADDR = (unsigned long)&IISFIFO_WR;
+    DMA0_FLAGS = DMA_FLAGS_UNK26;
+    DMA0_INCR = DMA_INCR_RANGE_FIXED | DMA_INCR_WIDTH_32BIT;
+#endif
 
     play_start_pcm();
 }
@@ -323,6 +464,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 void pcm_play_dma_stop(void)
 {
     play_stop_pcm();
+    dma_play_data.addr = 0;
     dma_play_data.size = 0;
 #if NUM_CORES > 1
     dma_play_data.core = 0; /* no core in control */
@@ -345,6 +487,20 @@ size_t pcm_get_bytes_waiting(void)
 
 void pcm_play_dma_init(void)
 {
+    /* Initialize default register values. */
+    audiohw_init();
+
+#ifdef CPU_PP502x
+    /* Enable DMA controller */
+    DMA_MASTER_CONTROL |= DMA_MASTER_CONTROL_EN;
+    /* FIQ priority for DMA0 */
+    CPU_INT_PRIORITY |= DMA0_MASK;
+    /* Enable request?? Not setting or clearing everything doesn't seem to
+     * prevent it operating. Perhaps important for reliability (how requests
+     * are handled). */
+    DMA_REQ_STATUS |= 1ul << DMA_REQ_IIS;
+    DMA0_STATUS;
+#else
     /* Set up banked registers for FIQ mode */
 
     /* Use non-banked registers for scratch. */
@@ -363,12 +519,9 @@ void pcm_play_dma_init(void)
         : [iiscfg]"r"(iiscfg), [dmapd]"r"(dmapd)
         : "r2");
 
-    /* Initialize default register values. */
-    audiohw_init();
-
-    dma_play_data.size = 0;
-#if NUM_CORES > 1
-    dma_play_data.core = 0; /* no core in control */
+    /* FIQ priority for I2S */
+    CPU_INT_PRIORITY |= IIS_MASK;
+    CPU_INT_EN = IIS_MASK;
 #endif
 
     IISCONFIG |= IIS_TXFIFOEN;
@@ -381,9 +534,14 @@ void pcm_postinit(void)
 
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
-    unsigned long addr = (unsigned long)dma_play_data.p;
-    size_t cnt = dma_play_data.size;
-    *count = cnt >> 2;
+    unsigned long addr, size;
+
+    int status = disable_fiq_save();
+    addr = dma_play_data.addr;
+    size = dma_play_data.size;
+    restore_fiq(status);
+
+    *count = size >> 2;
     return (void *)((addr + 2) & ~3);
 }
 
@@ -392,10 +550,10 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
  **/
 #ifdef HAVE_RECORDING
 /* PCM recording interrupt routine lockout */
-static struct dma_data dma_rec_data SHAREDBSS_ATTR =
+static struct dma_data dma_rec_data IBSS_ATTR =
 {
     /* Initialize to a locked, stopped state */
-    .p = NULL,
+    { .addr = 0 },
     .size = 0,
 #if NUM_CORES > 1
     .core = 0x00,
@@ -447,7 +605,7 @@ void fiq_record(void)
             value = IISFIFO_RD;
             IISFIFO_RD;
 
-            *dma_rec_data.p++ = value;
+            *dma_rec_data.p16++ = value;
             dma_rec_data.size -= 4;
 
             /* TODO: Figure out how to do IIS loopback */
@@ -475,7 +633,7 @@ void fiq_record(void)
 
             value = (uint16_t)value | (value << 16);
 
-            *dma_rec_data.p++ = value;
+            *dma_rec_data.p16++ = value;
             dma_rec_data.size -= 4;
 
             if (audio_output_source != AUDIO_SRC_PLAYBACK) {
@@ -485,7 +643,7 @@ void fiq_record(void)
                     IISFIFO_WR = 0;
                 }
 
-                value = *((int32_t *)dma_rec_data.p - 1);
+                value = *((int32_t *)dma_rec_data.p16 - 1);
                 IISFIFO_WR = value;
                 IISFIFO_WR = value;
             }
@@ -512,10 +670,10 @@ void fiq_record(void)
         }
 
 #if SAMPLE_SIZE == 16
-        *dma_rec_data.p++ = IISFIFO_RD;
+        *dma_rec_data.p16++ = IISFIFO_RD;
 #elif SAMPLE_SIZE == 32
-        *dma_rec_data.p++ = IISFIFO_RD >> 16;
-        *dma_rec_data.p++ = IISFIFO_RD >> 16;
+        *dma_rec_data.p32++ = IISFIFO_RD >> 16;
+        *dma_rec_data.p32++ = IISFIFO_RD >> 16;
 #endif
         dma_rec_data.size -= 4;
     }
@@ -535,8 +693,8 @@ void fiq_record(void)
 void pcm_record_more(void *start, size_t size)
 {
     pcm_rec_peak_addr = start; /* Start peaking at dest */
-    dma_rec_data.p    = start; /* Start of RX buffer    */
-    dma_rec_data.size = size;  /* Bytes to transfer     */
+    dma_rec_data.addr = (unsigned long)start; /* Start of RX buffer */
+    dma_rec_data.size = size; /* Bytes to transfer */
 }
 
 void pcm_rec_dma_stop(void)
@@ -560,7 +718,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
     pcm_rec_dma_stop();
 
     pcm_rec_peak_addr = addr;
-    dma_rec_data.p    = addr;
+    dma_rec_data.addr = (unsigned long)addr;
     dma_rec_data.size = size;
 #if NUM_CORES > 1
     /* This will become more important later - and different ! */
@@ -592,8 +750,13 @@ void pcm_rec_dma_init(void)
 
 const void * pcm_rec_dma_get_peak_buffer(int *count)
 {
-    unsigned long addr = (unsigned long)pcm_rec_peak_addr;
-    unsigned long end = (unsigned long)dma_rec_data.p;
+    unsigned long addr, end;
+
+    int status = disable_fiq_save();
+    addr = (unsigned long)pcm_rec_peak_addr;
+    end = dma_rec_data.addr;
+    restore_fiq(status);
+
     *count = (end >> 2) - (addr >> 2);
     return (void *)(addr & ~3);
 } /* pcm_rec_dma_get_peak_buffer */

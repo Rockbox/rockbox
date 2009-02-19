@@ -18,10 +18,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-#include <stdbool.h>
 #include <stdio.h>
 #include "config.h"
+#include "system.h"
 #include "debug.h"
 #include "panic.h"
 #include <kernel.h>
@@ -31,7 +30,6 @@
 #ifndef SIMULATOR
 #include "cpu.h"
 #endif
-#include "system.h"
 #include <string.h>
 #include "buffer.h"
 #include "settings.h"

@@ -71,8 +71,8 @@ void i2s_reset(void)
     IISCONFIG = ((IISCONFIG & ~IIS_FIFO_FORMAT_MASK) | IIS_FIFO_FORMAT_LE16_2);
 
     /* RX_ATN_LVL = when 12 slots full */
-    /* TX_ATN_LVL = when 12 slots empty */
-    IISFIFO_CFG |= IIS_RX_FULL_LVL_12 | IIS_TX_EMPTY_LVL_12;
+    /* TX_ATN_LVL = DMA request when 4 slots empty */
+    IISFIFO_CFG |= IIS_RX_FULL_LVL_12 | IIS_TX_EMPTY_LVL_4;
 
     /* Rx.CLR = 1, TX.CLR = 1 */
     IISFIFO_CFG |= IIS_RXCLR | IIS_TXCLR;
