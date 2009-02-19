@@ -33,6 +33,7 @@
 #include "uart-target.h"
 #include "tsc2100.h"
 #include "string.h"
+#include "touchscreen.h"
 
 #define BUTTON_TIMEOUT 50
 
@@ -41,22 +42,6 @@
                                 /* but always the same one for the session? */
 static short last_x, last_y, last_z1, last_z2; /* for the touch screen */
 static bool touch_available = false;
-
-static enum touchscreen_mode current_mode = TOUCHSCREEN_POINT;
-static int touchscreen_buttons[3][3] = {
-    {BUTTON_TOPLEFT, BUTTON_TOPMIDDLE, BUTTON_TOPRIGHT},
-    {BUTTON_MIDLEFT, BUTTON_CENTER, BUTTON_MIDRIGHT},
-    {BUTTON_BOTTOMLEFT, BUTTON_BOTTOMMIDDLE, BUTTON_BOTTOMRIGHT},
-};
-
-void touchscreen_set_mode(enum touchscreen_mode mode)
-{
-    current_mode = mode;
-}
-enum touchscreen_mode touchscreen_get_mode(void)
-{
-    return current_mode;
-}
 
 static struct touch_calibration_point topleft, bottomright;
 
@@ -183,19 +168,9 @@ int button_read_device(int *data)
             last_x = x;
             last_y = y;
             *data = touch_to_pixels(x, y);
-            switch (current_mode)
-            {
-                case TOUCHSCREEN_POINT:
-                    r_button |= BUTTON_TOUCHSCREEN;
-                    break;
-                case TOUCHSCREEN_BUTTON:
-                {
-                    int px_x = ((*data&0xffff0000)>>16), px_y = ((*data&0x0000ffff));
-                    r_button |= touchscreen_buttons[px_y/(LCD_HEIGHT/3)][px_x/(LCD_WIDTH/3)];
-                    oldbutton = r_button;
-                    break;
-                }
-            }
+            r_button |= touchscreen_to_pixels((*data&0xffff0000)>>16,
+                                              *data&0x0000ffff, data);
+            oldbutton = r_button;
         }
         last_touch = current_tick;
         touch_available = false;
