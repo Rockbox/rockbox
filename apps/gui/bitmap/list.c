@@ -282,7 +282,6 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     display->set_viewport(NULL);
 }
 
-
 #if defined(HAVE_TOUCHSCREEN)
 /* This needs to be fixed if we ever get more than 1 touchscreen on a target.
  * This also assumes the whole screen is used, which is a bad assumption but
@@ -354,28 +353,28 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
         if (y > list_text[screen].y || button & BUTTON_REPEAT)
         {
             int line_height, actual_y;
-            static int last_y = 0;
             
-            actual_y =  y - list_text[screen].y;
+            actual_y = y - list_text[screen].y;
             line_height = font_get(gui_list->parent[screen]->font)->height;
             line = actual_y / line_height;
             
-            if(actual_y%line_height == 0) /* Pressed a border */
+            /* Pressed below the list*/
+            if (gui_list->start_item[screen]+line >= gui_list->nb_items)
                 return ACTION_NONE;
-
-            if (gui_list->start_item[screen]+line > gui_list->nb_items)
-            {
-                 /* Pressed below the list*/
+            
+            /* Pressed a border */
+            if(UNLIKELY(actual_y % line_height == 0))
                 return ACTION_NONE;
-            }
-            last_y = actual_y;
-            if (line != gui_list->selected_item
-                    - gui_list->start_item[screen] && button ^ BUTTON_REL)
+            
+            if (line != (gui_list->selected_item - gui_list->start_item[screen])
+                && button ^ BUTTON_REL)
             {
                 if(button & BUTTON_REPEAT)
                     scrolling = true;
+                
                 gui_synclist_select_item(gui_list, gui_list->start_item[screen]
-                        + line);
+                                                   + line);
+                
                 return ACTION_REDRAW;
             }
             
@@ -399,7 +398,8 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
                     return ACTION_NONE;
                 }
             }
-            else if(button == BUTTON_REL)
+            else if(button == BUTTON_REL &&
+                    line == gui_list->selected_item - gui_list->start_item[screen])
             {
                 /* Pen was released on either the same line as the previously
                  *  selected one or an other one
@@ -410,17 +410,9 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
             else
                 return ACTION_NONE;
         }
-        /* Title goes up one level (only on BUTTON_REL&~BUTTON_REPEAT) */
-        else if (y > title_text[screen].y && draw_title(display, gui_list)
-                && button == BUTTON_REL)
-        {
+        /* Everything above the items is cancel */
+        else if (y < list_text[screen].y && button == BUTTON_REL)
             return ACTION_STD_CANCEL;
-        }
-        /* Title or statusbar is cancel (only on BUTTON_REL&~BUTTON_REPEAT) */
-        else if (global_settings.statusbar && button == BUTTON_REL)
-        {
-            return ACTION_STD_CANCEL;
-        }
     }
     return ACTION_NONE;
 }
