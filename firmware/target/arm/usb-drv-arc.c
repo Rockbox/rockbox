@@ -389,7 +389,7 @@ void usb_drv_reset(void)
     REG_USBCMD |= USBCMD_CTRL_RESET;
     while (REG_USBCMD & USBCMD_CTRL_RESET);
 
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5022 || CONFIG_CPU == PP5024
+#if CONFIG_CPU == PP5022 || CONFIG_CPU == PP5024
     /* On a CPU which identifies as a PP5022, this 
        initialization must be done after USB is reset.
      */
