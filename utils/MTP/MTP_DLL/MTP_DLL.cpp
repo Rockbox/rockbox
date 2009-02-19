@@ -1,5 +1,4 @@
-// MTP_DLL.cpp : Defines the entry point for the DLL application.
-//
+/* MTP_DLL.cpp : Defines the entry point for the DLL application. */
 
 #include "stdafx.h"
 #include "MTP_DLL.h"
