@@ -128,13 +128,14 @@ bool button_hold(void)
 
 static short button_dbop(void)
 {
-    /* skip home reading if lcd_button_support was blocked,
+    /* skip home and power reading if lcd_button_support was blocked,
      * since the dbop bit 15 is invalid then, and use the old value instead */
-    /* -20 (arbitary value) indicates valid home button read */
-    int old_home = -20;
-    int delay = 0;
+    /* -20 (arbitary value) indicates valid home&power button read */
+    int old_home_power = -20;
     if(!lcd_button_support())
-        old_home = (_dbop_din & 1<<15);
+    {
+        old_home_power = (_dbop_din & (1<<15|1<<8));
+    }
 
     /* Wait for fifo to empty */
     while ((DBOP_STAT & (1<<10)) == 0);
@@ -145,10 +146,8 @@ static short button_dbop(void)
     DBOP_TIMPOL_01 = 0xe167e167;
     DBOP_TIMPOL_23 = 0xe167006e;
 
-    while(delay++ < 64);
-
     DBOP_CTRL |= (1<<15); /* start read */
-    ((DBOP_STAT & (1<<16)) == 0); /* wait for valid data */
+    while((DBOP_STAT & (1<<16)) == 0); /* wait for valid data */
 
     _dbop_din = DBOP_DIN; /* now read */
 
@@ -158,8 +157,12 @@ static short button_dbop(void)
     DBOP_CTRL |= (1<<16);
     DBOP_CTRL &= ~(1<<19);
 
-    if (old_home != -20)
-        _dbop_din |= old_home;
+    /* write back old values if blocked */
+    if (old_home_power != -20)
+    {
+        _dbop_din |= old_home_power & 1<<15;
+        _dbop_din &= 0xfeff|(old_home_power & 1<<8);
+    }
     return _dbop_din;
 }
 
