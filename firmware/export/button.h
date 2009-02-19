@@ -75,15 +75,8 @@ int button_apply_acceleration(const unsigned int data);
  || !defined(BUTTON_BOTTOMRIGHT)) && !defined(__PCTOOL__)
 #error Touchscreen button mode BUTTON_* defines not set up correctly
 #endif
-enum touchscreen_mode {
-    TOUCHSCREEN_POINT = 0, /* touchscreen returns pixel co-ords */
-    TOUCHSCREEN_BUTTON,    /* touchscreen returns BUTTON_* area codes
-                                  actual pixel value will still be accessable
-                                  from button_get_data */
-};
-/* maybe define the number of buttons in button-target.h ? */
-void touchscreen_set_mode(enum touchscreen_mode mode);
-enum touchscreen_mode touchscreen_get_mode(void);
+
+#include "touchscreen.h"
 #endif
 
 #endif /* _BUTTON_H_ */
