@@ -145,7 +145,7 @@ void lcd_write_data(const fb_data* p_bytes, int count)
 
 static void lcd_write_reg(int reg, int value)
 {
-    unsigned short data = value;
+    fb_data data = value;
 
     lcd_write_cmd(reg);
     lcd_write_data(&data, 1);
@@ -363,6 +363,18 @@ void lcd_blit_yuv(unsigned char * const src[3],
     (void)height;
 }
 
+static void lcd_window_x(int xmin, int xmax)
+{
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (xmax << 8) | xmin);
+}
+
+static void lcd_window_y(int ymin, int ymax)
+{
+    ymin += y_offset;
+    ymax += y_offset;
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, (ymax << 8) | ymin);
+    lcd_write_reg(R_RAM_ADDR_SET, ymin << 8);
+}
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void)
@@ -374,14 +386,12 @@ void lcd_update(void)
 
     lcd_busy = true;
     /* Set start position and window */
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (LCD_WIDTH-1) << 8);
-    lcd_write_reg(R_VERT_RAM_ADDR_POS, 
-                  ((y_offset + LCD_HEIGHT-1) << 8) | y_offset);
-    lcd_write_reg(R_RAM_ADDR_SET, (y_offset) << 8);
+    lcd_window_x(0, LCD_WIDTH-1);
+    lcd_window_x(0, LCD_HEIGHT-1);
 
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
-    lcd_write_data((unsigned short *)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
+    lcd_write_data((fb_data*)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
 
     lcd_busy = false;
 } /* lcd_update */
@@ -390,46 +400,42 @@ void lcd_update(void)
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
+    const fb_data *ptr;
     int ymax;
-    const unsigned short *ptr;
 
     if (!display_on)
         return;
 
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x; /* Clip right */
+    if (x + width >= LCD_WIDTH)
+        width = LCD_WIDTH - x -1; /* Clip right */
     if (x < 0)
         width += x, x = 0; /* Clip left */
     if (width <= 0)
         return; /* nothing left to do */
 
-    ymax = y + height;
-    if (ymax > LCD_HEIGHT)
-        ymax = LCD_HEIGHT; /* Clip bottom */
+    if (y + height >= LCD_HEIGHT)
+        height = LCD_HEIGHT - y - 1; /* Clip bottom */
     if (y < 0)
-        y = 0; /* Clip top */
-    if (y >= ymax)
+        height += y; y = 0; /* Clip top */
+    if (height <= 0)
         return; /* nothing left to do */
 
+    ymax = y+height;
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
     lcd_busy = true;
-    /* Set start position and window */
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 
-                  ((x + width-1) << 8) | x);
-    lcd_write_reg(R_VERT_RAM_ADDR_POS, 
-                  ((y_offset + y + height - 1) << 8) | (y_offset + y));
-    lcd_write_reg(R_RAM_ADDR_SET, ((y + y_offset) << 8) | x);
 
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
+    lcd_window_x(x, x + width);
+    lcd_window_y(y, ymax);
 
-    ptr = (unsigned short *)&lcd_framebuffer[y][x];
+    ptr = &lcd_framebuffer[y][x];
 
     do
     {
         lcd_write_data(ptr, width);
         ptr += LCD_WIDTH;
     }
-    while (++y < ymax);
+    while (++y <= ymax);
 
     lcd_busy = false;
 } /* lcd_update_rect */
@@ -437,25 +443,18 @@ void lcd_update_rect(int x, int y, int width, int height)
 /* writes one read pixel outside the visible area, needed for correct dbop reads */
 bool lcd_button_support(void)
 {
-    int x=LCD_HEIGHT+1;
-    int y=LCD_WIDTH+1;
-    int width=1;
-    int height=1;
-    unsigned short data = (0xf<<12);
+    fb_data data = (0xf<<12);
 
     if (lcd_busy)
         return false;
 
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
     /* Set start position and window */
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 
-                  ((x + width-1) << 8) | x);
-    lcd_write_reg(R_VERT_RAM_ADDR_POS, 
-                  ((y_offset + y + height - 1) << 8) | (y_offset + y));
-    lcd_write_reg(R_RAM_ADDR_SET, ((y + y_offset) << 8) | x);
+    lcd_window_x(LCD_WIDTH+1, 1);
+    lcd_window_y(LCD_HEIGHT+1, 1);
 
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
-    lcd_write_data(&data, width);
+    lcd_write_data(&data, 1);
     return true;
 }
