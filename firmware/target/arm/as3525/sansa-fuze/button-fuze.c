@@ -35,34 +35,35 @@
 #define WHEEL_REPEAT_INTERVAL   30
 #define WHEELCLICKS_PER_ROTATION    48 /* wheelclicks per full rotation */
 
-#ifndef BOOTLOADER
 /* Buttons */
 static bool hold_button     = false;
+#ifndef BOOTLOADER
 static bool hold_button_old = false;
-#else
-#define hold_button false
-#endif /* !BOOTLOADER */
+#endif
 static short _dbop_din    = BUTTON_NONE;
 
-extern void lcd_button_support(void);
+/* in the lcd driver */
+extern bool lcd_button_support(void);
 
 void button_init_device(void)
 {
+    GPIOA_DIR |= (1<<1); 	 
+    GPIOA_PIN(1) = (1<<1);
 }
 
-/* clickwheel */
 #if !defined(BOOTLOADER) && defined(HAVE_SCROLLWHEEL)
-static void clickwheel(void)
+static void scrollwheel(void)
 {
-    static unsigned int  old_wheel_value    = 0;
-    static unsigned int  wheel_value        = 0;
-    static unsigned int  wheel_repeat       = BUTTON_NONE;
+    static unsigned old_wheel_value = 0;
+    static unsigned wheel_value     = 0;
+    static unsigned wheel_repeat    = BUTTON_NONE;
+    unsigned        btn             = BUTTON_NONE;
     /* getting BUTTON_REPEAT works like this: We increment repeat by 2 if the
      * wheel was turned, and decrement it by 1 each tick,
      * that means: if you change the wheel fast enough, repeat will be >1 and
      * we send BUTTON_REPEAT
      */
-    static int repeat;
+    static int repeat = 0;
     /* we omit 3 of 4 posts to the button_queue, that works better, so count */
     static int counter = 0;
     /* Read wheel 
@@ -77,43 +78,38 @@ static void clickwheel(void)
     };
     wheel_value = _dbop_din & (1<<13|1<<14);
     wheel_value >>= 13;
-    /* did the wheel value change? */    
-    if (!hold_button)
-    {
-        unsigned int btn = BUTTON_NONE;
-        if (old_wheel_value == wheel_tbl[0][wheel_value])
-            btn = BUTTON_SCROLL_FWD;
-        else if (old_wheel_value == wheel_tbl[1][wheel_value])
-            btn = BUTTON_SCROLL_BACK;
 
+    if (old_wheel_value == wheel_tbl[0][wheel_value])
+        btn = BUTTON_SCROLL_FWD;
+    else if (old_wheel_value == wheel_tbl[1][wheel_value])
+        btn = BUTTON_SCROLL_BACK;
+
+    if (btn != BUTTON_NONE)
+    {
+        if (btn != wheel_repeat)
+        {
+            /* direction reversals nullify repeats */
+            wheel_repeat      = btn;
+            repeat            = 0;
+        }
         if (btn != BUTTON_NONE)
         {
-            if (btn != wheel_repeat)
+            /* generate repeats if quick enough */
+            if (repeat > 0)
             {
-                /* direction reversals nullify repeats */
-                wheel_repeat      = btn;
-                repeat            = 0;
+                btn |= BUTTON_REPEAT;
             }
-            if (btn != BUTTON_NONE)
+            repeat += 2;
+            /* the wheel is more reliable if we don't send ever change,
+             * every 4th is basically one "physical click" is 1 item in
+             * the rockbox menus */
+            if (queue_empty(&button_queue) && ++counter >= 4)
             {
-                /* generate repeats if quick enough */
-                if (repeat > 0)
-                {
-                    btn |= BUTTON_REPEAT;
-                }
-                repeat += 2;
-                /* the wheel is more reliable if we don't send ever change,
-                 * every 4th is basically one "physical click" is 1 item in
-                 * the rockbox menus */
-                if (queue_empty(&button_queue) && ++counter >= 4)
-                {
-                    buttonlight_on();
-                    backlight_on();
-                    /* 1<<24 is rather arbitary, seems to work well */
-                    queue_post(&button_queue, btn, 1<<24);
-                    /* message posted - reset count */
-                    counter = 0;
-                }
+                buttonlight_on();
+                backlight_on();
+                queue_post(&button_queue, btn, 1<<24);
+                /* message posted - reset count */
+                counter = 0;
             }
         }
     }
@@ -130,10 +126,16 @@ bool button_hold(void)
     return hold_button;
 }
 
-static int button_dbop(void)
+static short button_dbop(void)
 {
-    int ret = 0;
-    lcd_button_support();
+    /* skip home reading if lcd_button_support was blocked,
+     * since the dbop bit 15 is invalid then, and use the old value instead */
+    /* -20 (arbitary value) indicates valid home button read */
+    int old_home = -20;
+    int delay = 0;
+    if(!lcd_button_support())
+        old_home = (_dbop_din & 1<<15);
+
     /* Wait for fifo to empty */
     while ((DBOP_STAT & (1<<10)) == 0);
 
@@ -142,19 +144,11 @@ static int button_dbop(void)
 
     DBOP_TIMPOL_01 = 0xe167e167;
     DBOP_TIMPOL_23 = 0xe167006e;
-    int loop = 0;
-    do
-    {
-        asm volatile ("nop\n");
-        loop++;
-    } while(loop < 64);
+
+    while(delay++ < 64);
 
     DBOP_CTRL |= (1<<15); /* start read */
-    int temp;
-    do
-    {
-        temp = DBOP_STAT;
-    } while ((temp & (1<<16)) == 0); /* wait for valid data */
+    ((DBOP_STAT & (1<<16)) == 0); /* wait for valid data */
 
     _dbop_din = DBOP_DIN; /* now read */
 
@@ -164,23 +158,9 @@ static int button_dbop(void)
     DBOP_CTRL |= (1<<16);
     DBOP_CTRL &= ~(1<<19);
 
-#if !defined(BOOTLOADER)
-    hold_button = _dbop_din & (1<<12);
-    if (hold_button)
-        return BUTTON_NONE;
-#if defined(HAVE_SCROLLWHEEL)
-    /* read wheel on bit 13 & 14, but sent to the button queue seperately */
-    clickwheel();
-#endif
-#endif
-    /* read power on bit 8 */
-    if (_dbop_din & (1<<8))
-        ret |= BUTTON_POWER;
-    /* read home on bit 15 */
-    if(!(_dbop_din & (1<<15)))
-        ret |= BUTTON_HOME;
-
-    return ret;
+    if (old_home != -20)
+        _dbop_din |= old_home;
+    return _dbop_din;
 }
 
 /* for the debug menu */
@@ -208,8 +188,8 @@ static int button_gpio(void)
     GPIOC_DIR &= ~(1<<2|1<<3|1<<4|1<<5|1<<6);
 
     /* small delay needed to read buttons correctly */
-    int delay = 50;
-    while(delay >0) delay--;
+    int delay = 0;
+    while(delay++ < 32);
 
     /* direct GPIO connections */
     if (!GPIOC_PIN(3))
@@ -234,9 +214,35 @@ static int button_gpio(void)
  */
 int button_read_device(void)
 {
-    int ret = BUTTON_NONE;
-    ret |= button_dbop();
-    ret |= button_gpio();
+    int btn = BUTTON_NONE;
+    short dbop = button_dbop();
+    static unsigned power_counter = HZ;
+    /* hold button */
+    if(dbop & (1<<12))
+    {
+        power_counter = 0;
+        hold_button = true;
+    }
+    else
+    {
+        /* might wrap, but shouldn't be much of an issue*/
+        power_counter++;
+        hold_button = false;
+#if defined(HAVE_SCROLLWHEEL) && !defined(BOOTLOADER)
+    /* read wheel on bit 13 & 14, but sent to the button queue seperately */
+        scrollwheel();
+#endif
+    /* read power on bit 8, but not if hold button was just released, since
+     * you basically always hit power due to the slider mechanism after releasing
+     * hold (wait ~1 sec) */
+        if (dbop & (1<<8) && power_counter>HZ)
+            btn |= BUTTON_POWER;
+    /* read home on bit 15 */
+        if (!(dbop & (1<<15)))
+            btn |= BUTTON_HOME;
+        btn |= button_gpio();
+    }
+
 #ifndef BOOTLOADER
     /* light handling */
     if (hold_button != hold_button_old)
@@ -246,5 +252,5 @@ int button_read_device(void)
     }
 #endif /* BOOTLOADER */
 
-    return ret;
+    return btn;
 }
