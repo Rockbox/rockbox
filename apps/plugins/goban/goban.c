@@ -45,6 +45,12 @@ int nav_mode = NAV_MODE_BOARD;
 
 #endif
 
+/* the stack that uses this buffer is used for both storing intersections
+ * in board algorithms (could store one short for each board location), and
+ * for parsing (could store an indefinite number of ints, related to how
+ * many levels deep branches go (in other words, how many branches off of
+ * branches there are).  50 should take care of any reasonable file.
+ */
 #define PARSE_STACK_BUFFER_SIZE (max(MAX_BOARD_SIZE * MAX_BOARD_SIZE * sizeof(unsigned short), 50 * sizeof(int)))
 
 /* used in SGF file parsing and outputting as well as in liberty counting
@@ -243,7 +249,7 @@ plugin_start (const void *parameter)
 
 #ifdef GBN_TEST
     run_tests ();
-    return 0;
+    return PLUGIN_OK;
 #endif
 
     if (!(parameter && load_game (parameter)))

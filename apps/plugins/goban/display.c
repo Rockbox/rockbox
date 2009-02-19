@@ -146,11 +146,6 @@ draw_all_marks (void)
                     char to_display[2];
                     int width, height;
 
-                    if (intersection_size < 7)
-                    {
-                        DEBUGF ("screen too small to draw labels\n");
-                    }
-
                     to_display[0] =
                         display_marks[x + y * board_width] & (~(1 << 7));
                     to_display[1] = '\0';
@@ -188,7 +183,7 @@ draw_all_marks (void)
 
                 switch (display_marks[x + y * board_width])
                 {
-                    // moves, 'mark', 'square'
+                    /* moves, 'mark', 'square' */
                 case 'b':
                 case 'w':
                     if (intersection_size <= 5)
@@ -886,7 +881,12 @@ void
 setup_display (void)
 {
     set_zoom_display (0);       /* 0 means set to default */
-    /* cursor starts on tengen (middle of the board) */
+
+    /* The cursor starts out in the top right of the board
+     * (on the hoshi point for most board sizes), unless the board
+     * is really small in which case the cursor starts at the center
+     * of the board.
+     */
     int start_x, start_y;
     if (board_width >= 7)
     {
@@ -915,8 +915,6 @@ setup_display (void)
 static void
 draw_cursor (unsigned short pos)
 {
-    /* int saved_draw_mode = rb->lcd_get_drawmode(); */
-
     if (!on_board (pos))
     {
         return;

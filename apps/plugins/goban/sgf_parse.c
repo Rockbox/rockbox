@@ -288,6 +288,7 @@ parse_prop (void)
         }
     }
 }
+
 static enum prop_type_t
 parse_prop_type (void)
 {

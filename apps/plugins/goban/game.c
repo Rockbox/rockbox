@@ -32,14 +32,15 @@
 static void pre_game_setup (void);
 
 char save_file[SAVE_FILE_LENGTH];
-bool game_dirty = false;
-bool autosave_dirty = false;
+bool game_dirty = false;      /* flag for unsaved changes */
+bool autosave_dirty = false;  /* flag for unsaved changes which haven't even
+                                 been autosaved yet */
 
 int move_num = 0;
 
 unsigned char current_player = BLACK;
 
-struct header_t header;
+struct header_t header;     /* game metadata header info */
 
 void
 set_game_modified (void)

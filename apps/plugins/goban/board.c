@@ -55,7 +55,13 @@ static int flood_fill_helper (unsigned short pos, unsigned char orig_color,
 
 /* these aren't "board marks" in the marks on the SGF sense, they are used
    internally to mark already visited points and the like (such as when
-   doing liberty counting for groups) */
+   doing liberty counting for groups)
+
+   We avoid having to clear the entire array every time by storing the
+   "current_mark" number and defining marked as "== current_mark".  We
+   still need to clear the whole array once per "cycle" though, or we'd get
+   false positives sometimes
+   */
 static void
 setup_marks (void)
 {
@@ -92,13 +98,10 @@ is_marked (unsigned short pos)
 void
 clear_board (void)
 {
-    unsigned int i, x, y;
+    unsigned int x, y;
 
     /* for the borders */
-    for (i = 0; i < (2 + MAX_BOARD_SIZE) * (2 + MAX_BOARD_SIZE); ++i)
-    {
-        board_data[i] = INVALID;
-    }
+    rb->memset(board_data, INVALID, sizeof(board_data));
 
     /* now make the actual board part */
     for (y = 0; y < board_height; ++y)

@@ -422,7 +422,7 @@ stupid_num_variations (void)
         }
         else
         {
-            // variations are at the beginning of the prop list
+            /* variations are at the beginning of the prop list */
             break;
         }
 

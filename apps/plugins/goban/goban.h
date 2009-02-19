@@ -303,7 +303,7 @@
 #define LCD_BOARD_WIDTH LCD_WIDTH
 #define LCD_BOARD_HEIGHT (LCD_HEIGHT - FOOTER_RESERVE)
 
-#endif // LCD_WIDTH > LCD_HEIGHT
+#endif /* LCD_WIDTH > LCD_HEIGHT */
 
 
 /* The directory we default to for saving crap */

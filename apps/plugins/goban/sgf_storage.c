@@ -409,7 +409,6 @@ setup_storage_buffer (char *temp_buffer, size_t size)
     }
 
     /* same as temp = size / (sizeof(union storage_t) + 1/8)
-
        (we need 1 bit extra for each union storage_t, for the free list) */
     temp =
         (8 * (size - ALIGNMENT_VAL - 1)) / (8 * sizeof (union storage_t) + 1);
