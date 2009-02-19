@@ -57,6 +57,10 @@ void button_set_touch_available(void);
 
 #define BUTTON_TOUCH        0x00002000
 
+#define DEFAULT_TOUCHSCREEN_CALIBRATION {.A=0xFFF9FDA2, .B=0xFFFFE82A, \
+                                         .C=0xA22AA2C,  .D=0x23DC, .E=0x8E3E6, \
+                                         .F=0x76CF88AA, .divider=0xFFAD4013}
+
 #define BUTTON_MAIN 0x3FFF
 
 /* No remote */

@@ -68,14 +68,6 @@ static volatile bool pen_down = false;
 static volatile unsigned short bat_val;
 static struct mutex battery_mtx;
 
-static enum touchscreen_mode current_mode = TOUCHSCREEN_POINT;
-static const int touchscreen_buttons[3][3] =
-{
-    {BUTTON_TOPLEFT,    BUTTON_TOPMIDDLE,    BUTTON_TOPRIGHT},
-    {BUTTON_MIDLEFT,    BUTTON_CENTER,       BUTTON_MIDRIGHT},
-    {BUTTON_BOTTOMLEFT, BUTTON_BOTTOMMIDDLE, BUTTON_BOTTOMRIGHT}
-};
-
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     /* TODO */
@@ -163,30 +155,6 @@ void button_init_device(void)
     mutex_init(&battery_mtx);
 }
 
-static int touch_to_pixels(short x, short y)
-{
-    /* X:300 -> 3800 Y:300->3900 */
-    x -= 300;
-    y -= 300;
-    
-#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
-    x /= 3200 / LCD_WIDTH;
-    y /= 3600 / LCD_HEIGHT;
-
-    y = LCD_HEIGHT - y;
-    
-    return (x << 16) | y;
-#else
-    x /= 3200 / LCD_HEIGHT;
-    y /= 3600 / LCD_WIDTH;
-
-    y = LCD_WIDTH - y;
-    x = LCD_HEIGHT - x;
-    
-    return (y << 16) | x;
-#endif
-}
-
 bool button_hold(void)
 {
     return (
@@ -218,36 +186,14 @@ int button_read_device(int *data)
     if(tmp & BTN_OFF)
         ret |= BUTTON_POWER;
 
-    if(cur_touch != 0)
+    if(cur_touch != 0 && pen_down)
     {
-        if(current_mode == TOUCHSCREEN_BUTTON)
-        {
-            int px_x = cur_touch >> 16;
-            int px_y = cur_touch & 0xFFFF;
-            ret |= touchscreen_buttons[px_y/(LCD_HEIGHT/3)]
-                                      [px_x/(LCD_WIDTH/3)];
-        }
-        else if(pen_down)
-        {
-            ret |= BUTTON_TOUCHSCREEN;
-            *data = cur_touch;
-        }
+        ret |= touchscreen_to_pixels(cur_touch >> 16, cur_touch & 0xFFFF, data);
+        if( UNLIKELY(!is_backlight_on(true)) )
+            *data = 0;
     }
-    
-    if(ret & BUTTON_TOUCHSCREEN && !is_backlight_on(true))
-        *data = 0;
 
     return ret;
-}
-
-void touchscreen_set_mode(enum touchscreen_mode mode)
-{
-    current_mode = mode;
-}
-
-enum touchscreen_mode touchscreen_get_mode(void)
-{
-    return current_mode;
 }
 
 /* Interrupt handler */
@@ -314,7 +260,8 @@ void SADC(void)
             
             if(datacount >= TS_AD_COUNT)
             {
-                cur_touch = touch_to_pixels(x_pos/datacount, y_pos/datacount);
+                cur_touch = ((x_pos / datacount) << 16) |
+                            ((y_pos / datacount) & 0xFFFF);
                 datacount = 0;
             }
         }
