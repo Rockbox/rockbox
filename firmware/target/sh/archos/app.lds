@@ -90,6 +90,7 @@ SECTIONS
     } > IRAM AT> DRAM
 
     _iramcopy = LOADADDR(.iram);
+    _noloaddram = LOADADDR(.iram);
 
     .ibss (NOLOAD) :
     {
@@ -98,18 +99,16 @@ SECTIONS
         . = ALIGN(0x4);
         _iend = .;
     } > IRAM
-
-    /* TRICK ALERT! We want 0x2000 bytes of stack, but we set the section
-       size smaller, and allow the stack to grow into the .iram copy */
-    .stack ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram):
+    
+    .stack _noloaddram (NOLOAD) :
     {
        *(.stack)
-       _stackbegin = . - SIZEOF(.iram);
-       . += 0x2000 - SIZEOF(.iram);
+       _stackbegin = .;
+       . += 0x2000;
        _stackend = .;
     } > DRAM
 
-    .bss :
+    .bss (NOLOAD) :
     {
        _edata = .;
         *(.bss*)
@@ -118,25 +117,26 @@ SECTIONS
        _end = .;
     } > DRAM
 
-    .audiobuf ALIGN(4) :
+    .audiobuf (NOLOAD) :
     {
+    	. = ALIGN(4);
         _audiobuffer = .;
         audiobuffer = .;
     } > DRAM
 
-    .audiobufend ENDAUDIOADDR:
+    .audiobufend ENDAUDIOADDR (NOLOAD) :
     {
         audiobufend = .;
         _audiobufend = .;
     } > DRAM
 
-    .codec ENDAUDIOADDR:
+    .codec ENDAUDIOADDR (NOLOAD) :
     {
         codecbuf = .;
         _codecbuf = .;
     }
 
-    .plugin ENDADDR:
+    .plugin ENDADDR (NOLOAD) :
     {
         _pluginbuf = .;
         pluginbuf = .;

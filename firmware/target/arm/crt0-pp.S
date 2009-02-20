@@ -41,7 +41,6 @@ start:
     .equ    COP_CTRL,    0xcf004058
     .equ    CPU_STATUS,  0xcf004050
     .equ    COP_STATUS,  0xcf004050
-    .equ    IIS_CONFIG,  0xc0002500
     .equ    SLEEP,       0x000000ca
     .equ    WAKE,        0x000000ce
     .equ    CPUSLEEPING, 0x00008000
@@ -63,7 +62,6 @@ start:
     .equ    COP_ICLR,    0x60004038
     .equ    COP_CTRL,    0x60007004
     .equ    COP_STATUS,  0x60007004
-    .equ    IIS_CONFIG,  0x70002800
     .equ    SLEEP,       0x80000000
     .equ    WAKE,        0x00000000
     .equ    CPUSLEEPING, 0x80000000
@@ -186,6 +184,9 @@ cpu_init:
     ldr    r3, [r4]
     tst    r3, #COPSLEEPING
     beq    1b
+    
+    /* Vectors and IRAM copy is done first since they are reclaimed for
+     * other uninitialized sections */
 
     /* Copy exception handler code to address 0 */
     ldr    r2, =_vectorsstart
@@ -196,16 +197,7 @@ cpu_init:
     ldrhi  r5, [r4], #4
     strhi  r5, [r2], #4
     bhi    1b
-
-    /* Zero out IBSS */
-    ldr    r2, =_iedata
-    ldr    r3, =_iend
-    mov    r4, #0
-1:
-    cmp    r3, r2
-    strhi  r4, [r2], #4
-    bhi    1b
-
+    
     /* Copy the IRAM */
     ldr    r2, =_iramcopy
     ldr    r3, =_iramstart
@@ -214,6 +206,15 @@ cpu_init:
     cmp    r4, r3
     ldrhi  r5, [r2], #4
     strhi  r5, [r3], #4
+    bhi    1b
+
+    /* Zero out IBSS */
+    ldr    r2, =_iedata
+    ldr    r3, =_iend
+    mov    r4, #0
+1:
+    cmp    r3, r2
+    strhi  r4, [r2], #4
     bhi    1b
 
     /* Initialise bss section to zero */

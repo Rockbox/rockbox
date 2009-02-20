@@ -94,6 +94,7 @@ SECTIONS
     } > IRAM AT> DRAM
 
     _iramcopy = LOADADDR(.iram);
+    _noloaddram = LOADADDR(.iram);
 
     .ibss (NOLOAD) :
     {
@@ -103,7 +104,7 @@ SECTIONS
         _iend = .;
     } > IRAM
 
-    .stack :
+    .stack (NOLOAD) :
     {
        *(.stack)
        stackbegin = .;
@@ -111,7 +112,7 @@ SECTIONS
        stackend = .;
     } > IRAM
 
-    .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram):
+    .bss _noloaddram (NOLOAD):
     {
        _edata = .;
         *(.bss*)
@@ -120,25 +121,26 @@ SECTIONS
        _end = .;
     } > DRAM
 
-    .audiobuf ALIGN(4) :
+    .audiobuf (NOLOAD) :
     {
+    	. = ALIGN(4);
         _audiobuffer = .;
         audiobuffer = .;
     } > DRAM
 
-    .audiobufend ENDAUDIOADDR:
+    .audiobufend ENDAUDIOADDR (NOLOAD) :
     {
         audiobufend = .;
         _audiobufend = .;
     } > DRAM
 
-    .codec ENDAUDIOADDR:
+    .codec ENDAUDIOADDR (NOLOAD) :
     {
         codecbuf = .;
         _codecbuf = .;
     }
 
-    .plugin ENDADDR:
+    .plugin ENDADDR (NOLOAD) :
     {
         _pluginbuf = .;
         pluginbuf = .;

@@ -103,6 +103,7 @@ SECTIONS
     } AT> DRAM
 
     _vectorscopy = LOADADDR(.vectors);
+    _noloaddram  = LOADADDR(.vectors);
 
     .ibss IRAMORIG (NOLOAD) :
     {
@@ -148,8 +149,7 @@ SECTIONS
 
     /* .bss and .ncbss are treated as a single section to use one init loop to
      * zero it - note "_edata" and "_end" */
-    .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.ncdata) +\
-         SIZEOF(.iram) + SIZEOF(.vectors) (NOLOAD) :
+    .bss _noloaddram (NOLOAD) :
     {
        _edata = .;
         *(.bss*)

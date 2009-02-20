@@ -234,15 +234,8 @@ start:
     movec.l %d0,%acr1
 
 #ifndef BOOTLOADER
-    /* zero out .ibss */
-    lea     _iedata,%a2
-    lea     _iend,%a4
-    bra.b   .iedatastart
-.iedataloop:
-    clr.l   (%a2)+
-.iedatastart:
-    cmp.l   %a2,%a4
-    bhi.b   .iedataloop
+    /* .iram copy is done first since it is reclaimed for other
+     * uninitialized sections */
 
     /* copy the .iram section */
     lea     _iramcopy,%a2
@@ -254,6 +247,16 @@ start:
 .iramstart:
     cmp.l   %a3,%a4
     bhi.b   .iramloop
+
+    /* zero out .ibss */
+    lea     _iedata,%a2
+    lea     _iend,%a4
+    bra.b   .iedatastart
+.iedataloop:
+    clr.l   (%a2)+
+.iedatastart:
+    cmp.l   %a2,%a4
+    bhi.b   .iedataloop
 #endif /* !BOOTLOADER */
 
 #ifdef IRIVER_H300_SERIES

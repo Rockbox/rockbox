@@ -98,16 +98,8 @@ start:
     mov     #0,r0
     ldc     r0,gbr
 
-    /* zero out .ibss */
-    mov.l   .iedata_k,r0
-    mov.l   .iend_k,r1
-    bra     .iedatastart
-    mov     #0,r2
-.iedataloop: /* backwards is faster and shorter */
-    mov.l   r2,@-r1
-.iedatastart:
-    cmp/hi  r0,r1
-    bt      .iedataloop
+    /* .iram copy is done first since it is reclaimed for other
+     * uninitialized sections */
 
     /* copy the .iram section */
     mov.l   .iramcopy_k,r0
@@ -126,6 +118,17 @@ start:
     cmp/hi  r1,r2
     bt      .iramloop
 .noiramcopy:
+
+    /* zero out .ibss */
+    mov.l   .iedata_k,r0
+    mov.l   .iend_k,r1
+    bra     .iedatastart
+    mov     #0,r2
+.iedataloop: /* backwards is faster and shorter */
+    mov.l   r2,@-r1
+.iedatastart:
+    cmp/hi  r0,r1
+    bt      .iedataloop
 
     /* zero out bss */
     mov.l   .edata_k,r0
