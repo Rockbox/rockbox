@@ -20,10 +20,7 @@ chessbox
 jpeg
 sudoku
 reversi
-/* Plugin is about 40k, rounding up to 65k to be safe. */
-#if (defined(PLUGIN_BUFFER_SIZE) && PLUGIN_BUFFER_SIZE >= 0x10000)
 goban
-#endif
 #ifndef OLYMPUS_MROBE_500
 zxbox
 #endif

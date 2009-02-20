@@ -326,7 +326,7 @@ setup_sgf (void)
 
     if (total_storage_size < MIN_STORAGE_BUFFER_SIZE)
     {
-        rb->splash (2 * HZ, "Stopping music playback to get more space");
+        rb->splash (1 * HZ, "Stopping music playback to get more space");
         DEBUGF ("storage_buffer_size < MIN!!: %d\n", (int) total_storage_size);
 
         temp_buffer = rb->plugin_get_audio_buffer (&size);
@@ -335,7 +335,7 @@ setup_sgf (void)
 
     if (total_storage_size < MIN_STORAGE_BUFFER_SIZE)
     {
-        rb->splash (5 * HZ, "Low memory.  Large files may not load.");
+        rb->splash (1 * HZ, "Low memory.  Large files may not load.");
 
         DEBUGF ("storage_buffer_size < MIN!!!!: %d\n",
                 (int) total_storage_size);
@@ -386,6 +386,15 @@ setup_storage_buffer (char *temp_buffer, size_t size)
 {
     unsigned int index = 0;
     int temp;
+
+#if PLUGIN_BUFFER_SIZE < 0x10000 && !defined(SIMULATOR)
+    /* loaded as an overlay plugin, protect from overwriting ourselves */
+    if (plugin_start_addr >= (unsigned char *) temp_buffer &&
+        plugin_start_addr < (unsigned char *) temp_buffer + size)
+    {
+        size = plugin_start_addr - (unsigned char *) temp_buffer;
+    }
+#endif
 
     while (1)
     {

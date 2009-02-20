@@ -107,6 +107,11 @@ rockboy.c
 zxbox.c
 #endif
 
+/* overlay loader for Goban */
+#if (PLUGIN_BUFFER_SIZE < 0x10000) && !defined(SIMULATOR)
+goban.c
+#endif
+
 /* not support recorder models for now */
 #if (LCD_WIDTH > 112) && (LCD_HEIGHT > 64)
 fireworks.c
