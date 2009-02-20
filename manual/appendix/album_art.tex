@@ -1,0 +1,37 @@
+% $Id: wps_tags.tex 19361 2008-12-07 23:00:15Z bluebrother $ %
+\chapter{\label{ref:album_art}Album Art}
+\section{Introduction}
+
+Rockbox allows you to put the album art, or another image related to the music
+on your \dap to display it in the PictureFlow plugin\opt{albumart}{ or in the
+WPS}. For this feature to work, you must observe a few rules.
+
+\section{Limitations}
+
+Rockbox does not support album art embedded in your files' tags, and will
+instead look for a picture located in the filesystem. In addition to this, the
+pictures must be in the BMP format.
+
+\section{Where to put album art}
+
+The pictures can be named a number of different ways, and placed a number of
+different locations. You can have pictures specific to the file or the album
+or use a generic picture. You can place the picture in the same direcotry
+as the file, in the parent directory or in a fixed directory named
+\fname{/.rockbox/albumart/}. The order Rockbox uses when looking for a picture
+is as follows:
+
+\begin{enumerate}
+\item  \fname{./filename.bmp}
+\item  \fname{./albumtitle.bmp}
+\item  \fname{./cover.bmp}
+\item  \fname{/.rockbox/albumart/artist-albumtitle.bmp}
+\item  \fname{../albumtitle.bmp}
+\item  \fname{../cover.bmp}
+\end{enumerate}
+
+The following characters will be replaced with an underscore (\_) when looking
+for albumtitle.bmp or artist-albumtitle.bmp: \textbackslash{} / : \textless{}
+\textgreater{} ? * \textbar{}. Doublequotes will be replaced by single qutoes.
+See \wikilink{AlbumArt} in the wiki for more details and programs that will
+help you automate the process of putting album art on your \dap{}.

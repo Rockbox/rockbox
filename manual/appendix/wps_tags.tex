@@ -201,6 +201,7 @@ that, it will display the volume value.
 Example: Can be used as a simple tag \config{\%St{\textbar}skip length{\textbar}} or with conditionals
 \config{\%?St{\textbar}eq enabled{\textbar}{\textless}Equalizer is enabled{\textbar}Equalizer is disabled{\textgreater}}.
 
+\opt{lcd_bitmap}{
 \section{Images}
 \begin{table}
   \begin{tagmap}{}{}
@@ -254,6 +255,41 @@ with image ID ``M'', and then reference the individual sub-images in a condition
         for appropriate sizes of each device. The x and y coordinates must 
         repect each of the players' limits.
   \end{itemize}
+}
+}
+
+\opt{albumart}{
+\section{Album art}
+\begin{table}
+  \begin{tagmap}{}{}
+    \config{\%Cl{\textbar}x{\textbar}y{\textbar}[l{\textbar}c{\textbar}r]maxwidth{\textbar}[t{\textbar}c{\textbar}b]maxheight{\textbar}}
+        & Define the settings for albumart\\
+        & \config{x}: x coordinate\\
+        & \config{y}: y coordinate\\
+        & \config{maxwidth}: Maximum height.\\
+        & \config{maxheight}: Maximum width.\\
+    \config{\%C}  & Display the album art as configured\\
+  \end{tagmap}
+\end{table}
+
+The picture will be rescaled, preserving aspect ratio to fit the given
+\config{maxwidth} and \config{maxheight}. If the aspect ratio doesn't match the
+configured values, the picture will be placed according to the flags to the
+\config{maxwidth} and \config{maxheight} parameters:
+\begin{itemize}
+  \item \config{maxwidth}:
+    \begin{description}
+      \item[\config{l}.] Align left
+      \item[\config{c}.] Align center (default)
+      \item[\config{r}.] Align right
+    \end{description}
+  \item \config{maxheight}:
+    \begin{description}
+      \item[\config{t}.] Align left
+      \item[\config{c}.] Align center (default)
+      \item[\config{b}.] Align right
+    \end{description}
+\end{itemize}
 }
 
 \section{Alignment}
