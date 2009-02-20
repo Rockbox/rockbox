@@ -259,16 +259,16 @@ with image ID ``M'', and then reference the individual sub-images in a condition
 }
 
 \opt{albumart}{
-\section{Album art}
+\section{Album Art}
 \begin{table}
   \begin{tagmap}{}{}
-    \config{\%Cl{\textbar}x{\textbar}y{\textbar}[l{\textbar}c{\textbar}r]maxwidth{\textbar}[t{\textbar}c{\textbar}b]maxheight{\textbar}}
+    \config{\%Cl{\textbar}x{\textbar}y{\textbar}[[l{\textbar}c{\textbar}r]maxwidth]{\textbar}[[t{\textbar}c{\textbar}b]maxheight]{\textbar}}
         & Define the settings for albumart\\
         & \config{x}: x coordinate\\
         & \config{y}: y coordinate\\
         & \config{maxwidth}: Maximum height.\\
         & \config{maxheight}: Maximum width.\\
-    \config{\%C}  & Display the album art as configured\\
+    \config{\%C}  & Display the album art as configured. This tag can also be used as a conditional.\\
   \end{tagmap}
 \end{table}
 
@@ -290,6 +290,16 @@ configured values, the picture will be placed according to the flags to the
       \item[\config{b}.] Align right
     \end{description}
 \end{itemize}
+
+Examples:
+\begin{enumerate}
+  \item Load albumart at position 20,40 and display it without resizing:\\
+  \config{\%Cl{\textbar}20{\textbar}40{\textbar}{\textbar}{\textbar}}
+  \item Load albumart at position 0,20 and resize it to be at most 100x100
+        pixels. If the image isn't square, align it to the bottom-right
+        corner:\\
+  \config{\%CL{\textbar}0{\textbar}20{\textbar}r100{\textbar}b100{\textbar}}
+\end{enumerate}
 }
 
 \section{Alignment}
