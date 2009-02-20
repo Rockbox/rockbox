@@ -18,20 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "plugin.h"
-
-#if PLUGIN_BUFFER_SIZE < 0x10000 && !defined(SIMULATOR)
-
-#include "lib/overlay.h"
-
-PLUGIN_HEADER
-
-enum plugin_status plugin_start(const void* parameter)
-{
-    return run_overlay(parameter, PLUGIN_GAMES_DIR "/goban.ovl", "Goban");
-}
-#endif
-
 #include "lib/playback_control.h"
 #include "lib/configfile.h"
 
