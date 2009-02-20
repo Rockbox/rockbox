@@ -597,16 +597,6 @@ void backlight_thread(void)
                 break;
 #endif /* HAVE_REMOTE_LCD/ HAVE_REMOTE_LCD_AS_MAIN */
 #endif /* !SIMULATOR */
-#ifdef SIMULATOR
-            /* TODO: find a better way to do it but we need
-             * a kernel thread somewhere to handle this */
-            case SYS_SCREENDUMP:
-                screen_dump();
-#ifdef HAVE_REMOTE_LCD
-                remote_screen_dump();
-#endif
-                break;
-#endif
             case SYS_USB_CONNECTED:
                 /* Tell the USB thread that we are safe */
                 DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");

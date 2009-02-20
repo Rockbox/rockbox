@@ -112,6 +112,7 @@
 #include "cuesheet.h"
 
 #ifdef SIMULATOR
+#include "sim_tasks.h"
 #include "system-sdl.h"
 #endif
 
@@ -294,6 +295,7 @@ static void init(void)
     show_logo();
     button_init();
     backlight_init();
+    sim_tasks_init();
     lang_init();
 #ifdef DEBUG
     debug_init();

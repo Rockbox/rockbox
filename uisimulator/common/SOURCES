@@ -6,6 +6,7 @@ font-player.c
 lcd-playersim.c
 #endif
 sim_icons.c
+sim_tasks.c
 stubs.c
 powermgmt-sim.c
 

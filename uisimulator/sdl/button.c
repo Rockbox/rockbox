@@ -27,6 +27,7 @@
 #include "kernel.h"
 #include "backlight.h"
 #include "misc.h"
+#include "sim_tasks.h"
 
 #include "debug.h"
 
@@ -1097,7 +1098,7 @@ void button_event(int key, bool pressed)
     case SDLK_F5:
         if(pressed)
         {
-            queue_broadcast(SYS_SCREENDUMP, 0);
+            sim_trigger_screendump();
             return;
         }
         break;
