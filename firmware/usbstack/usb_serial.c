@@ -71,30 +71,16 @@ static unsigned char receive_buffer[32]
 
 static bool busy_sending = false;
 static int buffer_start;
+/* The number of bytes to transfer that haven't been given to the USB stack yet */
 static int buffer_length;
+/* The number of bytes to transfer that have been given to the USB stack */
+static int buffer_transitlength;
 static bool active = false;
 
 static int ep_in, ep_out;
 static int usb_interface;
 
 static struct mutex sendlock SHAREDBSS_ATTR;
-
-static void sendout(void)
-{
-    if(buffer_start+buffer_length > BUFFER_SIZE)
-    {
-        /* Buffer wraps. Only send the first part */
-        usb_drv_send_nonblocking(ep_in, &send_buffer[buffer_start],
-                                 (BUFFER_SIZE - buffer_start));
-    }
-    else
-    {
-        /* Send everything */
-        usb_drv_send_nonblocking(ep_in, &send_buffer[buffer_start],
-                                 buffer_length);
-    }
-    busy_sending=true;
-}
 
 int usb_serial_request_endpoints(struct usb_class_driver *drv)
 {
@@ -141,6 +127,17 @@ int usb_serial_get_config_descriptor(unsigned char *dest,int max_packet_size)
     return (dest - orig_dest);
 }
 
+/* called by usb_core_control_request() */
+bool usb_serial_control_request(struct usb_ctrlrequest* req)
+{
+    bool handled = false;
+    switch (req->bRequest) {
+        default:
+            logf("serial: unhandeld req %d", req->bRequest);
+    }
+    return handled;
+}
+
 void usb_serial_init_connection(void)
 {
     /* prime rx endpoint */
@@ -164,6 +161,7 @@ void usb_serial_init(void)
     busy_sending = false;
     buffer_start = 0;
     buffer_length = 0;
+    buffer_transit_length = 0;
     active = true;
     mutex_init(&sendlock);
 }
@@ -173,6 +171,24 @@ void usb_serial_disconnect(void)
     active = false;
 }
 
+static void sendout(void)
+{
+    if(buffer_start+buffer_length > BUFFER_SIZE)
+    {
+        /* Buffer wraps. Only send the first part */
+        buffer_transitlength=BUFFER_SIZE - buffer_start;
+    }
+    else
+    {
+        /* Send everything */
+        buffer_transitlength=buffer_length;
+    }
+    usb_drv_send_nonblocking(ep_in, &send_buffer[buffer_start],
+                             buffer_transitlength);
+    buffer_length-=buffer_transitlength;
+    busy_sending=true;
+}
+
 void usb_serial_send(unsigned char *data,int length)
 {
     if(!active)
@@ -180,21 +196,22 @@ void usb_serial_send(unsigned char *data,int length)
     if(length<=0)
         return;
     mutex_lock(&sendlock);
-    if(buffer_start+buffer_length > BUFFER_SIZE)
+    int freestart=(buffer_start+buffer_length+buffer_transitlength)%BUFFER_SIZE;
+    if(buffer_start+buffer_transit_length+buffer_length > BUFFER_SIZE)
     { 
         /* current buffer wraps, so new data can't */
-        int available_space = BUFFER_SIZE - buffer_length;
+        int available_space = BUFFER_SIZE - buffer_length - buffer_transitlength;
         length=MIN(length,available_space);
-        memcpy(&send_buffer[(buffer_start+buffer_length)%BUFFER_SIZE],
+        memcpy(&send_buffer[freestart],
                data,length);
         buffer_length+=length;
     }
     else
     {
         /* current buffer doesn't wrap, so new data might */
-        int available_end_space = (BUFFER_SIZE - (buffer_start+buffer_length));
+        int available_end_space = (BUFFER_SIZE - (buffer_start+buffer_length+buffer_transit_length));
         int first_chunk = MIN(length,available_end_space);
-        memcpy(&send_buffer[buffer_start + buffer_length],data,first_chunk);
+        memcpy(&send_buffer[freestart],data,first_chunk);
         length-=first_chunk;
         buffer_length+=first_chunk;
         if(length>0)
@@ -223,6 +240,8 @@ void usb_serial_transfer_complete(int ep,int dir, int status, int length)
         case USB_DIR_OUT:
             logf("serial: %s", receive_buffer);
             /* Data received. TODO : Do something with it ? */
+
+            /* Get the next bit */
             usb_drv_recv(ep_out, receive_buffer, sizeof receive_buffer);
             break;
 
@@ -232,7 +251,7 @@ void usb_serial_transfer_complete(int ep,int dir, int status, int length)
             if(status == 0)
             {
                 buffer_start = (buffer_start + length)%BUFFER_SIZE;
-                buffer_length -= length;
+                buffer_transitlength -= length;
             }
             busy_sending = false;
 
@@ -245,15 +264,5 @@ void usb_serial_transfer_complete(int ep,int dir, int status, int length)
     }
 }
 
-/* called by usb_core_control_request() */
-bool usb_serial_control_request(struct usb_ctrlrequest* req)
-{
-    bool handled = false;
-    switch (req->bRequest) {
-        default:
-            logf("serial: unhandeld req %d", req->bRequest);
-    }
-    return handled;
-}
 
 #endif /*USB_SERIAL*/
