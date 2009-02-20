@@ -179,6 +179,15 @@ void lcd_set_flip(bool yesno)
         flip_lcd(yesno);
 }
 
+static void lcd_window(int xmin, int ymin, int xmax, int ymax)
+{
+    ymin += y_offset;
+    ymax += y_offset;
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (xmax << 8) | xmin);
+    lcd_write_reg(R_VERT_RAM_ADDR_POS,  (ymax << 8) | ymin);
+    lcd_write_reg(R_RAM_ADDR_SET,       (ymin << 8) | xmin);
+}
+
 static void _display_on(void)
 {
     /* Initialisation the display the same way as the original firmware */
@@ -269,16 +278,12 @@ static void _display_on(void)
     lcd_write_reg(R_GAMMA_AMP_AVG_ADJ_RES_NEG, 0x0f08);
 
 
-    lcd_write_reg(R_RAM_ADDR_SET, 0);
     lcd_write_reg(R_GATE_SCAN_POS, 0);
     lcd_write_reg(R_VERT_SCROLL_CONTROL, 0);
-    
-    lcd_write_reg(R_1ST_SCR_DRV_POS, 219 << 8);
-    lcd_write_reg(R_2ND_SCR_DRV_POS, 219 << 8);
 
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 175 << 8);
-    lcd_write_reg(R_VERT_RAM_ADDR_POS, 219 << 8);
-
+    lcd_window(0, 0, LCD_WIDTH-1, LCD_HEIGHT-1);    
+    lcd_write_reg(R_1ST_SCR_DRV_POS, (LCD_HEIGHT-1) << 8);
+    lcd_write_reg(R_2ND_SCR_DRV_POS, (LCD_HEIGHT-1) << 8);
 
     lcd_write_reg(R_DISP_CONTROL1, 0x0037);
 
@@ -363,18 +368,6 @@ void lcd_blit_yuv(unsigned char * const src[3],
     (void)height;
 }
 
-static void lcd_window_x(int xmin, int xmax)
-{
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (xmax << 8) | xmin);
-}
-
-static void lcd_window_y(int ymin, int ymax)
-{
-    ymin += y_offset;
-    ymax += y_offset;
-    lcd_write_reg(R_VERT_RAM_ADDR_POS, (ymax << 8) | ymin);
-    lcd_write_reg(R_RAM_ADDR_SET, ymin << 8);
-}
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void)
@@ -386,8 +379,7 @@ void lcd_update(void)
 
     lcd_busy = true;
     /* Set start position and window */
-    lcd_window_x(0, LCD_WIDTH-1);
-    lcd_window_x(0, LCD_HEIGHT-1);
+    lcd_window(0, 0, LCD_WIDTH-1, LCD_HEIGHT-1);
 
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
@@ -401,34 +393,36 @@ void lcd_update(void)
 void lcd_update_rect(int x, int y, int width, int height)
 {
     const fb_data *ptr;
-    int ymax;
+    int ymax, xmax;
+
 
     if (!display_on)
         return;
 
-    if (x + width >= LCD_WIDTH)
-        width = LCD_WIDTH - x -1; /* Clip right */
+    xmax = x + width;
+    if (xmax >= LCD_WIDTH)
+        xmax = LCD_WIDTH - 1; /* Clip right */
     if (x < 0)
-        width += x, x = 0; /* Clip left */
-    if (width <= 0)
+        x = 0;                /* Clip left */
+    if (x >= xmax)
         return; /* nothing left to do */
 
-    if (y + height >= LCD_HEIGHT)
-        height = LCD_HEIGHT - y - 1; /* Clip bottom */
+    width = xmax - x + 1;     /* Fix width */
+
+    ymax = y + height;
+    if (ymax >= LCD_HEIGHT)
+        ymax = LCD_HEIGHT - 1; /* Clip bottom */
     if (y < 0)
-        height += y; y = 0; /* Clip top */
-    if (height <= 0)
+        y = 0; /* Clip top */
+    if (y >= ymax)
         return; /* nothing left to do */
 
-    ymax = y+height;
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
     lcd_busy = true;
-
+    lcd_window(x, y, xmax, ymax);
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
-    lcd_window_x(x, x + width);
-    lcd_window_y(y, ymax);
 
-    ptr = &lcd_framebuffer[y][x];
+    ptr = (fb_data*)&lcd_framebuffer[y][x];
 
     do
     {
@@ -450,8 +444,7 @@ bool lcd_button_support(void)
 
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
     /* Set start position and window */
-    lcd_window_x(LCD_WIDTH+1, 1);
-    lcd_window_y(LCD_HEIGHT+1, 1);
+    lcd_window(LCD_WIDTH+1, LCD_HEIGHT+1, LCD_WIDTH+2, LCD_HEIGHT+2);
 
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
