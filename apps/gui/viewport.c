@@ -50,8 +50,12 @@ int viewport_get_nb_lines(struct viewport *vp)
 static bool showing_bars(enum screen_type screen)
 {
     if (statusbar_enabled & VP_SB_ONSCREEN(screen))
+#ifdef HAVE_LCD_BITMAP
         return global_settings.statusbar ||
-           (statusbar_enabled & VP_SB_IGNORE_SETTING(screen));
+               (statusbar_enabled & VP_SB_IGNORE_SETTING(screen));
+#else
+        return true;
+#endif
     return false;
 }    
 
