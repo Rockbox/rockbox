@@ -56,18 +56,11 @@ static struct usb_endpoint_descriptor __attribute__((aligned(2))) endpoint_descr
     .bInterval        = 0
 };
 
-#define BUFFER_SIZE 150
-#if CONFIG_CPU == IMX31L
-static unsigned char send_buffer[BUFFER_SIZE]
-    USBDEVBSS_ATTR __attribute__((aligned(32)));
-static unsigned char receive_buffer[32]
-    USBDEVBSS_ATTR __attribute__((aligned(32)));
-#else
+#define BUFFER_SIZE 512
 static unsigned char send_buffer[BUFFER_SIZE]
     USB_DEVBSS_ATTR __attribute__((aligned(32)));
 static unsigned char receive_buffer[32]
     USB_DEVBSS_ATTR __attribute__((aligned(32)));
-#endif
 
 static void sendout(void);
 
