@@ -130,7 +130,7 @@ bool ide_powered(void)
 
 void power_off(void)
 {
-#if defined(HAVE_LCD_COLOR)
+#if defined(HAVE_LCD_COLOR) && !defined(HAVE_LCD_SHUTDOWN)
     /* Clear the screen and backdrop to
     remove ghosting effect on shutdown */
     lcd_set_backdrop(NULL);

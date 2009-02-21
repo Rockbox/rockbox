@@ -29,6 +29,10 @@ void _backlight_led_on(void);
 void _backlight_led_off(void);
 void _backlight_hw_enable(bool on);
 
+#ifdef HAVE_LCD_SLEEP
+void lcd_awake(void);
+#endif
+
 #ifdef BOOTLOADER
 #define _backlight_on()  do { _backlight_hw_enable(true); \
                               _backlight_led_on(); } while(0)

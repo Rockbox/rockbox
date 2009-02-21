@@ -204,4 +204,12 @@
 #define IPOD_ACCESSORY_PROTOCOL
 #define HAVE_SERIAL
 
+#ifndef BOOTLOADER
+/* Support for LCD sleep/BCM shutdown */
+#define HAVE_LCD_SLEEP
+#define HAVE_LCD_SLEEP_SETTING
+/* The same code may also be used when shutting down the iPod */
+#define HAVE_LCD_SHUTDOWN
+#endif
+
 #endif

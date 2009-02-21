@@ -73,9 +73,18 @@ void _backlight_set_brightness(int val)
 
 void _backlight_hw_enable(bool on)
 {
+#ifdef HAVE_LCD_SLEEP
+    if (on)
+        /* If the fade-out is interrupted, enabled will be true, but 
+           lcd_awake() needs to be called anyways because the LCD 
+           may be sleeping.
+         */
+        lcd_awake();
+#endif
+
     if (on == enabled)
         return;
-        
+
     if (on)
     {
         GPIO_SET_BITWISE(GPIOB_OUTPUT_VAL, 0x08);
