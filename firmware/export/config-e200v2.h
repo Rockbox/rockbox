@@ -171,7 +171,7 @@
 #define HAVE_HOTSWAP
 #endif
 
-/* #define USB_IPODSTYLE */
+#define USB_HANDLED_BY_OF
 
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_AS3525

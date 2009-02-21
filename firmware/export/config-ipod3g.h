@@ -150,7 +150,7 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
-#define USB_IPODSTYLE
+#define USB_HANDLED_BY_OF
 /* actually both firewire and USB, USB isn't handled yet */
 
 /* Virtual LED (icon) */

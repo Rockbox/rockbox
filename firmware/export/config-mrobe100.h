@@ -144,8 +144,6 @@
 /* We're able to shut off power to the HDD */
 #define HAVE_ATA_POWER_OFF
 
-/* #define USB_IPODSTYLE */
-
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
 

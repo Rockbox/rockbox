@@ -154,8 +154,6 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
-#define USB_IPODSTYLE
-
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
 

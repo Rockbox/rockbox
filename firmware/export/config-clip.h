@@ -170,6 +170,8 @@
 
 #ifndef BOOTLOADER
 
+#define USB_HANDLED_BY_OF
+
 #if 0 /* disabled since there is no USB driver */
 
 /* USB On-the-go */
@@ -182,6 +184,7 @@
 #endif /* BOOTLOADER */
 
 #endif
+
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL

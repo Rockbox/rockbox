@@ -133,8 +133,6 @@
 /* Type of LCD TODO: hopefully the same as the x5 but check this*/
 #define CONFIG_LCD LCD_SA9200
 
-/* #define USB_IPODSTYLE */
-
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
 

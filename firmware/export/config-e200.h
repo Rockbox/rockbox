@@ -167,8 +167,6 @@
 #define HAVE_HOTSWAP
 #endif
 
-/* #define USB_IPODSTYLE */
-
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
 

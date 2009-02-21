@@ -73,7 +73,7 @@ int get_replaygain_mode(bool have_track_gain, bool have_album_gain);
 int open_utf8(const char* pathname, int flags);
 
 #ifdef BOOTFILE
-#if !defined(USB_NONE) && !defined(USB_IPODSTYLE)
+#if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF)
 void check_bootfile(bool do_rolo);
 #endif
 #endif

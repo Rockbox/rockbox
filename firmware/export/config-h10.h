@@ -159,8 +159,6 @@
 #define FIRMWARE_OFFSET_FILE_CRC    0x0
 #define FIRMWARE_OFFSET_FILE_DATA   0x8
 
-/* #define USB_IPODSTYLE */
-
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
 
