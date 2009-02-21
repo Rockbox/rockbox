@@ -1,8 +1,78 @@
 % $Id$
 
+\warn{Before starting this procedure, ensure that you have a copy
+of the original \playerman{} firmware. Without this, it is
+\emph{not} possible to uninstall Rockbox. The \playerman{}
+firmware can be downloaded from
+\url{http://www.tacp.toshiba.com/tacpassets-images/firmware/MESV12US.zip}.\\}
+
 Installing the bootloader is only needed once. It involves replacing the
-existing firmware file on your \dap{} with another version. To be able
-to boot the original firmware you must generate your own \fname{nk.bin} file
-using the mknkboot utility. Alternatively you can use a pre-built bootloader,
-however you must keep in mind that by using the pre-built version you will be
-unable to dual-boot your \dap{}.
+existing firmware file on your \dap{} with another version.
+When running the original \playerman{} firmware (a version of Windows CE), it is
+only possible to connect the \dap{} to a PC in ``MTP mode'', which hides
+the actual content of your \daps{} disk and provides restricted access
+to its contents.
+In reality, the \daps{} hard disk contains two partitions, a small
+(150MB) ``firmware partition'' containing the \daps{} firmware (operating
+system), and a second ``data partition'' containing your media files. The main
+firmware file in the bootloader partition is called \fname{nk.bin}, and
+this is the file that is loaded into RAM (by the \daps{} ROM-based
+bootloader) and executed when your \dap{} is powered on.
+
+\subsubsection{Bootloader installation from Windows}
+
+\begin{enumerate}
+\item Download \fname{sendfirm.exe} from \fixme{add download location}.
+\item Download the bootloader (\fname{nk.bin}) from \fixme{add download location}.
+\item From the command prompt, enter the directory into which you downloaded
+\fname{sendfirm.exe} and \fname{nk.bin} and run:
+\begin{code} 
+    sendfirm.exe nk.bin
+\end{code}
+\item After a successful installation, your \dap{} will immediately reboot
+and (because it is still connected to your PC) enter the Rockbox bootloader's
+``USB Mass Storage'' mode, which exposes your \daps{} disk to your computer
+as a standard USB Mass Storage device.
+\end{enumerate}
+
+\subsubsection{Bootloader installation from Unix (Linux / Mac OS X)}
+
+\begin{enumerate}
+\item Download \fname{sendfirm} from \fixme{add download location}.
+\item Download the bootloader (\fname{nk.bin}) from \fixme{add download location}.
+\item From the terminal, enter the directory into which you downloaded
+\fname{sendfirm} and \fname{nk.bin} and run:
+\begin{code} 
+    chmod +x sendfirm 
+    ./sendfirm nk.bin
+\end{code}
+\item After a successful installation, your \dap{} will immediately reboot
+and (because it is still connected to your PC) enter the Rockbox bootloader's
+``USB Mass Storage'' mode, which exposes your \daps{} disk to your computer
+as a standard USB Mass Storage device.
+\end{enumerate}
+
+\subsubsection{Fixing the partition table}
+The factory-standard partition table on your \daps{} disk is technically
+invalid, and the Linux kernel (and maybe other operating systems) rejects it.
+To fix this, you need to use the fdisk utility to correctly set the ``bootable
+flag'' field to a valid value (it doesn't matter if this is true or false).\\
+
+\note{Windows does not seem to mind this, so if you only use your \dap{} with
+Windows the following steps are not necessary.\\}
+
+Assuming your \dap{} is appearing as /dev/sdz (the output of the dmesg
+command will show the log messages including the device node assigned to
+your \dap{}), type the following:
+
+\begin{code}
+    fdisk /dev/sdz
+    a
+    1
+    a
+    2
+    w
+\end{code}
+
+After exiting fdisk, you may need to unplug and then reattach your \dap{}
+in order for it to be recognised by your computer.

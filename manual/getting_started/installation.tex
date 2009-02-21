@@ -40,14 +40,15 @@ follow the instructions at
 }
 
 \opt{h300}{
-\begin{description}
+\begin{description}  
   \item[DRM capability.] If your \dap{} has a US firmware, then by installing Rockbox you will
   \emph{permanently} lose the ability to playback files with DRM.
 \end{description}
 }
 
-\begin{description}
-\item[USB connection.] To transfer Rockbox to your \dap{} you need to
+\nopt{gigabeats}{
+\begin{description}  
+  \item[USB connection.] To transfer Rockbox to your \dap{} you need to
   connect it to your computer. For manual installation/uninstallation, or 
   should autodetection fail during automatic installation, you need to know 
   where to access the \dap{}. On Windows this means you need to know 
@@ -105,9 +106,10 @@ follow the instructions at
   using the cradle but plug the USB cable directly to the \dap{}.
   } 
 \end{description}
+}
 
 \opt{ipod,sansa}{
-\begin{description}
+\begin{description}  
   \item[Administrator/Root rights.] Installing the bootloader portion of Rockbox
   requires you to have administrative (Windows) or root (Linux) rights.
   Consequently when doing either the automatic or manual bootloader install,
@@ -131,10 +133,15 @@ follow the instructions at
 \section{Installing Rockbox}\label{sec:installing_rockbox}\index{Installation}
 There are two ways to install Rockbox: automated and manual. The automated
 way is the preferred method of installing Rockbox for the majority of
-people. Rockbox Utility is a graphical 
-application that does almost everything for you.
-However, should you encounter a problem, then the manual way is
-still available to you.
+people. Rockbox Utility is a graphical application that does almost everything
+for you. However, should you encounter a problem, then the manual way is
+still available to you.\\
+
+\opt{gigabeats}{\note{The automated install is not yet available for the
+  \playertype{}. For now you can use the manual method to install Rockbox.
+  Please still read the section on the automatic install as it explains
+  various important aspects of Rockbox, such as the different versions
+  available.\\}}
 
 \opt{MASCODEC}{Rockbox itself comes as a single package. There is no need
   to install additional software to run Rockbox.}
@@ -309,10 +316,19 @@ by following the instructions below. If you have used Rockbox Utility
 to install Rockbox, then you do not need to follow the next section and can skip
 straight to \reference{ref:finish_install}
 
+\opt{gigabeats}{\subsubsection{Installing the bootloader}
+    \input{getting_started/gigabeats_install.tex}
+}
+
 \subsubsection{Installing the firmware}\label{sec:installing_firmware}
 
-\begin{enumerate}
+\opt{gigabeats}{\note{When your \dap{} is in the Rockbox USB or bootloader
+USB mode, you will see two visible partitions - the 150MB firmware
+partition (containing at least a file called \fname{nk.bin}) and
+the main data partition. Rockbox \emph{must} be installed onto the main
+data partiton.}}
 
+\begin{enumerate} 
 \item Download your chosen version of Rockbox from the links in the
   previous section.
 \opt{ipodvideo}{\note{There are separate versions of Rockbox for the 30GB and 
@@ -326,14 +342,13 @@ straight to \reference{ref:finish_install}
 \item Take the \fname{.zip} file that you downloaded and use
  the ``Extract all'' command of your unzip program to extract 
  the files onto your \dap{}.
+\end{enumerate}
 
 \note{The entire contents of the \fname{.zip} file should be extracted 
 directly to the root of your \daps{} drive. Do not try to
 create a separate directory on your \dap{} for the Rockbox
 files! The \fname{.zip} file already contains the internal
 structure that Rockbox needs.}
-
-\end{enumerate}
 
 \opt{archos}{
  If the contents of the \fname{.zip} file are extracted correctly, you will
@@ -350,7 +365,7 @@ structure that Rockbox needs.}
  by Rockbox, in the main directory of your \daps{} drive.
 }
 
-\opt{swcodec}{
+\opt{swcodec}{\nopt{gigabeats}{
   \subsubsection{Installing the bootloader}
   \opt{h100,h300}{\input{getting_started/iriver_install.tex}}
   \opt{ipod}{\input{getting_started/ipod_install.tex}}
@@ -359,8 +374,7 @@ structure that Rockbox needs.}
   \opt{gigabeatf}{\input{getting_started/gigabeat_install.tex}}
   \opt{sansa}{\input{getting_started/sansa_install.tex}}
   \opt{mrobe100}{\input{getting_started/mrobe100_install.tex}}
-  \opt{gigabeats}{\input{getting_started/gigabeats_install.tex}}
-}
+}}
 
 \subsection{Finishing the install}\label{ref:finish_install}
 
@@ -389,6 +403,10 @@ structure that Rockbox needs.}
 
 \opt{h10,h10_5gb,ipod,mrobe100,sansa,archos}{
   Safely eject / unmount the USB drive, unplug the cable and restart.
+}
+
+\opt{gigabeats}{
+  Safely eject / unmount your \dap{}.
 }
 
 \opt{h100,h300}{
@@ -425,7 +443,7 @@ Rockbox Utility can also aid in the production of talk files, which allow Rockbo
 to speak file and folder names.
 
 \section{Running Rockbox}
-\nopt{ipod,e200}{Unplug any connected power supply and turn the unit off. When
+\nopt{ipod,e200,gigabeats}{Unplug any connected power supply and turn the unit off. When
 you next turn the unit on, Rockbox should load.}%
 \opt{ipod}{Hard resetting the Ipod by holding
   \opt{IPOD_4G_PAD}{\ButtonMenu{}+\ButtonSelect{}}%
@@ -435,6 +453,16 @@ you next turn the unit on, Rockbox should load.}%
 \opt{e200}{Your e200 will automatically reboot and Rockbox should load. }%
 When you see the Rockbox splash screen, Rockbox is loaded and ready for
 use.
+
+\opt{gigabeats}{Rockbox should automatically load when you unplug the USB
+cable.
+  \note{
+    If you have loaded music onto your \dap{} using the \playerman{} firmaware, 
+    you will not be able to see your music properly in the \setting{File Browser}. 
+    Files placed on your \dap{} using the \playerman{} can be viewed by
+    initialising and using Rockbox's database.
+    See \reference{ref:database} for more information.}
+}
 
 \opt{ipod}{
   \note{
@@ -453,22 +481,32 @@ You can also update Rockbox manually - download a Rockbox build
 as detailed above, and unzip the build to the root directory
 of your \dap{} as in the manual installation stage. If your unzip
 program asks you whether to overwrite files, choose the ``Yes to all'' option.
-The new build will be installed over your current build.
+The new build will be installed over your current build.\\
+
+\opt{gigabeats}{
+  \note{When your \dap{} is in the Rockbox USB or bootloader
+  USB mode, you will see two visible partitions, the 150MB firmware
+  partition (containing at least a file called \fname{nk.bin}) and
+  the main data partition. Rockbox \emph{must} be installed onto the main
+  data partiton.\\}
+}
 
 The bootloader only changes rarely, and should not normally
-need to be updated.
+need to be updated.\\
 
 \note{If you use Rockbox Utility be aware that it cannot detect manually
         installed components.}
 
 \section{Uninstalling Rockbox}\index{Installation!uninstall}
 
-\nopt{gigabeatf,m5,x5,archos,mrobe100}{
+\nopt{gigabeatf,m5,x5,archos,mrobe100,gigabeats}{
   \note{The Rockbox bootloader allows you to choose between Rockbox and 
   the original firmware. (See \reference{ref:Dualboot} for more information.)}
 }
 
 \subsection{Automatic Uninstallation}
+\opt{gigabeats}{\note{Rockbox can only be uninstalled manually for now.}}
+
 You can uninstall Rockbox automatically by using Rockbox Utility. If you
 installed Rockbox manually you can still use Rockbox Utility for uninstallation
 but will not be able to do this selectively.
@@ -542,23 +580,37 @@ completely follow the manual uninstallation instructions below.}}
     }
 }
 
-If you wish to clean up your disk, you may also wish to delete the
-\fname{.rockbox} directory and its contents.
-\nopt{m5,x5}{Turn the \playerman{} off.
-  Turn the \dap{} back on and the original \playerman{} software will load.}
+\nopt{gigabeats}{
+  If you wish to clean up your disk, you may also wish to delete the
+  \fname{.rockbox} directory and its contents.
+  \nopt{m5,x5}{Turn the \playerman{} off.
+    Turn the \dap{} back on and the original \playerman{} software will load.}
+}
+
+\opt{gigabeats}{
+  Before installation you should have downloaded a copy of the \playerman{}
+  firmware from
+  \url{http://www.tacp.toshiba.com/tacpassets-images/firmware/MESV12US.zip}.
+  \begin{itemize}
+  \item Extract \fname{MES12US.iso} from the \fname{.zip} downloaded above.
+  \item There are two files within \fname{MES12US.iso} called
+  \fname{Autorun.inf} and \fname{gbs\_update\_1\_2\_us.exe}.  Extract them with
+  your favourite unzipping utility e.g. 7zip.
+  \item Connect your \dap{} to your computer.
+  \item From Windows, you can run \fname{gbs\_update\_1\_2\_us.exe} to restore
+  your \dap{}
+  \warn{This will format your \dap{}, removing all files}
+  \item From Linux, extract \fname{nk.bin} from within
+  \fname{gbs\_update\_1\_2\_us.exe} using e.g. 7zip and copy it to the 150 MB
+  firmware partition of your \dap{}.  If you wish to clean up your disk,
+  you may also wish to delete the \fname{.rockbox} directory and its contents
+  from the main partition.
+  \item Safely eject / unmount the USB drive, unplug the cable and restart.
+  \end{itemize}
+}
 
 \section{Troubleshooting}
-\begin{description}
-  \item[``-1 error'']
-  If you receive a ``-1 error'' from the bootloader, then
-  the bootloader cannot find the Rockbox firmware. This is usually a result of
-  not extracting the contents of the \fname{.zip} file to the proper location,
-  and should not happen when Rockbox has been installed with Rockbox Utility.
-
-  To fix this, either install Rockbox with the Rockbox Utility which will take care
-  of this for you, or recheck the Manual Install section to see where the files
-  need to be located.
-
+\begin{description} 
 \opt{sansa,ipod}{
   \item[Bootloader install problems]
   If you have trouble installing the bootloader,
@@ -572,4 +624,41 @@ If you wish to clean up your disk, you may also wish to delete the
   has not been correctly installed. The original firmware update will only perform
   the update if the filename is correct, including case. Make sure that the patched
   Iriver firmware is called \fname{.hex}.}
+
+\nopt{h100,h300}{\item[``File Not Found'']}
+\opt{h100,h300}{\item[``-1 error'']}
+  If you receive a
+  \nopt{h100,h300}{``File Not Found''}\opt{h100,h300}{``-1 error''} from the
+  bootloader, then the bootloader cannot find the Rockbox firmware. This is
+  usually a result of not extracting the contents of the \fname{.zip} file
+  to the proper location, and should not happen when Rockbox has been
+  installed with Rockbox Utility.
+
+  To fix this, either install Rockbox with the Rockbox Utility which will take care
+  of this for you, or recheck the Manual Install section to see where the files
+  need to be located.
 \end{description}
+
+\optv{gigabeats}{
+If this does not fix the problem, there are two additional procedures that you
+can try to solve this:
+
+\begin{itemize}
+\item Formatting the storage partition. It is possible that using the
+mkdosfs utility from Linux to format the data partition from your PC
+before installing will resolve this problem. The appropriate format command is:
+\begin{code}
+    mkdosfs -f 2 -F 32 -S 512 -s 64 -v -n TFAT /path/to/partition/device
+\end{code}
+\warn{This will remove all your files.}
+  
+\item Copying a \fname{tar}. If you have a Rockbox build environment
+then you can try generating \fname{rockbox.tar} instead of
+\fname{rockbox.zip} as follows:
+\begin{code}
+    make tar
+\end{code}
+and copying it to the data partition.  During the next boot, the bootloader
+will extract it.
+\end{itemize}
+}
