@@ -56,7 +56,7 @@ static struct usb_endpoint_descriptor __attribute__((aligned(2))) endpoint_descr
     .bInterval        = 0
 };
 
-#define BUFFER_SIZE 512 
+#define BUFFER_SIZE 150
 #if CONFIG_CPU == IMX31L
 static unsigned char send_buffer[BUFFER_SIZE]
     USBDEVBSS_ATTR __attribute__((aligned(32)));
@@ -69,7 +69,8 @@ static unsigned char receive_buffer[32]
     USB_DEVBSS_ATTR __attribute__((aligned(32)));
 #endif
 
-static bool busy_sending = false;
+static void sendout(void);
+
 static int buffer_start;
 /* The number of bytes to transfer that haven't been given to the USB stack yet */
 static int buffer_length;
@@ -79,8 +80,6 @@ static bool active = false;
 
 static int ep_in, ep_out;
 static int usb_interface;
-
-static struct mutex sendlock SHAREDBSS_ATTR;
 
 int usb_serial_request_endpoints(struct usb_class_driver *drv)
 {
@@ -144,26 +143,22 @@ void usb_serial_init_connection(void)
     usb_drv_recv(ep_out, receive_buffer, sizeof receive_buffer);
 
     /* we come here too after a bus reset, so reset some data */
-    mutex_lock(&sendlock);
-    busy_sending = false;
+    buffer_transitlength = 0;
     if(buffer_length>0)
     {
         sendout();
     }
     active=true;
-    mutex_unlock(&sendlock);
 }
 
 /* called by usb_code_init() */
 void usb_serial_init(void)
 {
     logf("serial: init");
-    busy_sending = false;
     buffer_start = 0;
     buffer_length = 0;
-    buffer_transit_length = 0;
+    buffer_transitlength = 0;
     active = true;
-    mutex_init(&sendlock);
 }
 
 void usb_serial_disconnect(void)
@@ -173,7 +168,7 @@ void usb_serial_disconnect(void)
 
 static void sendout(void)
 {
-    if(buffer_start+buffer_length > BUFFER_SIZE)
+    if(buffer_start+buffer_length >= BUFFER_SIZE)
     {
         /* Buffer wraps. Only send the first part */
         buffer_transitlength=BUFFER_SIZE - buffer_start;
@@ -183,10 +178,12 @@ static void sendout(void)
         /* Send everything */
         buffer_transitlength=buffer_length;
     }
-    usb_drv_send_nonblocking(ep_in, &send_buffer[buffer_start],
-                             buffer_transitlength);
-    buffer_length-=buffer_transitlength;
-    busy_sending=true;
+    if(buffer_transitlength>0)
+    {
+        buffer_length-=buffer_transitlength;
+        usb_drv_send_nonblocking(ep_in, &send_buffer[buffer_start],
+                                 buffer_transitlength);
+    }
 }
 
 void usb_serial_send(unsigned char *data,int length)
@@ -195,9 +192,8 @@ void usb_serial_send(unsigned char *data,int length)
         return;
     if(length<=0)
         return;
-    mutex_lock(&sendlock);
     int freestart=(buffer_start+buffer_length+buffer_transitlength)%BUFFER_SIZE;
-    if(buffer_start+buffer_transit_length+buffer_length > BUFFER_SIZE)
+    if(buffer_start+buffer_transitlength+buffer_length >= BUFFER_SIZE)
     { 
         /* current buffer wraps, so new data can't */
         int available_space = BUFFER_SIZE - buffer_length - buffer_transitlength;
@@ -209,7 +205,7 @@ void usb_serial_send(unsigned char *data,int length)
     else
     {
         /* current buffer doesn't wrap, so new data might */
-        int available_end_space = (BUFFER_SIZE - (buffer_start+buffer_length+buffer_transit_length));
+        int available_end_space = (BUFFER_SIZE - (buffer_start+buffer_length+buffer_transitlength));
         int first_chunk = MIN(length,available_end_space);
         memcpy(&send_buffer[freestart],data,first_chunk);
         length-=first_chunk;
@@ -221,7 +217,7 @@ void usb_serial_send(unsigned char *data,int length)
             buffer_length+=MIN(length,buffer_start);
         }
     }
-    if(busy_sending)
+    if(buffer_transitlength>0)
     {
         /* Do nothing. The transfer completion handler will pick it up */
     }
@@ -229,7 +225,6 @@ void usb_serial_send(unsigned char *data,int length)
     {
         sendout();
     }
-    mutex_unlock(&sendlock);
 }
 
 /* called by usb_core_transfer_complete() */
@@ -246,20 +241,21 @@ void usb_serial_transfer_complete(int ep,int dir, int status, int length)
             break;
 
         case USB_DIR_IN:
-            mutex_lock(&sendlock);
             /* Data sent out. Update circular buffer */
             if(status == 0)
             {
-                buffer_start = (buffer_start + length)%BUFFER_SIZE;
-                buffer_transitlength -= length;
+                if(length!=buffer_transitlength)
+                {
+                    /* do something? */
+                }
+                buffer_start = (buffer_start + buffer_transitlength)%BUFFER_SIZE;
+                buffer_transitlength = 0;
             }
-            busy_sending = false;
 
             if(buffer_length>0)
             {
                 sendout();
             }
-            mutex_unlock(&sendlock);
             break;
     }
 }
