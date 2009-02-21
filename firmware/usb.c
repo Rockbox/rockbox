@@ -270,8 +270,12 @@ static void usb_thread(void)
                     /* Only charging is desired */
                     usb_state = USB_POWERED;
 #ifdef HAVE_USBSTACK
+#ifdef USB_STORAGE
                     usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, false);
+#endif                
+#ifdef USB_CHARGING_ONLY
                     usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, true);
+#endif                
                     usb_attach();
 #endif
                     break;
@@ -284,8 +288,12 @@ static void usb_thread(void)
                  * USB_CONNECTED. */
                 usb_state = USB_POWERED;
 #endif
+#ifdef USB_STORAGE
                 usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, true);
+#endif                
+#ifdef USB_CHARGING_ONLY
                 usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, false);
+#endif                
 
                 /* Check any drivers enabled at this point for exclusive storage
                  * access requirements. */
