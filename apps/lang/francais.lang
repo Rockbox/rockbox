@@ -44,7 +44,7 @@
 #    Refonte totale du fichier par Mustapha Senhaji (Moos) <moos75 AT gmail.com>
 #    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006, Mar 2007, Sep 2007,
 #    Oct 2007, Nov 2007, Dec 2007, Jan 2008, Avril 2008, Août 2008, Oct 2008
-#    Dec 2008
+#    Dec 2008, Fév 2009
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -6991,7 +6991,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user:
   <source>
     *: "Version"
@@ -8105,7 +8105,6 @@
   </dest>
   <voice>
     *: "Fin de la liste de lecture"
-    player: "Fin de la liste"
   </voice>
 </phrase>
 <phrase>
@@ -11649,7 +11648,7 @@
 <phrase>
   id: LANG_STUDY_HOP_STEP
   desc: DEPRECATED
-  user: deprecated
+  user:
   <source>
     *: ""
   </source>
@@ -12066,7 +12065,6 @@
     *: "Résultats de la recherche"
   </voice>
 </phrase>
-</phrase>
 <phrase>
   id: LANG_QS_ITEMS
   desc: DEPRECATED
@@ -12159,11 +12157,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Choisir comme item de gauche"
+    quickscreen: "Ajouter aux raccourcis comme item de gauche"
   </dest>
   <voice>
     *: none
-    quickscreen: "Choisir comme item de gauche"
+    quickscreen: "Ajouter aux raccourcis comme item de gauche"
   </voice>
 </phrase>
 <phrase>
@@ -12176,11 +12174,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Choisir comme item de droite"
+    quickscreen: "Ajouter aux raccourcis comme item de droite"
   </dest>
   <voice>
     *: none
-    quickscreen: "Choisir comme item de droite"
+    quickscreen: "Ajouter aux raccourcis comme item de droite"
   </voice>
 </phrase>
 <phrase>
@@ -12193,10 +12191,126 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Choisir comme item du bas"
+    quickscreen: "Ajouter aux raccourcis comme item du bas"
   </dest>
   <voice>
     *: none
-    quickscreen: "Choisir comme item du bas"
+    quickscreen: "Ajouter aux raccourcis comme item du bas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "Débit série"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "Débit série"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "Auto"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "Automatique"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "57600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user:
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Credits"
+  </dest>
+  <voice>
+    *: "Credits"
   </voice>
 </phrase>
