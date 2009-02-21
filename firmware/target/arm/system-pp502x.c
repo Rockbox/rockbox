@@ -370,7 +370,7 @@ void system_init(void)
         DEV_INIT2      = 0x40000000;
 
         /* reset all allowed devices */
-        DEV_RS         = 0x3ffffef8;
+        DEV_RS         = 0x3dfffef8;
         DEV_RS2        = 0xffffdfff;
         DEV_RS         = 0x00000000;
         DEV_RS2        = 0x00000000;
