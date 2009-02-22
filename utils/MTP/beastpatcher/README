@@ -1,0 +1,61 @@
+beastpatcher - a tool for installing the Rockbox bootloader on the Gigabeat S
+
+Unlike most other parts of the Rockbox project, this tool is
+distributed under the BSD license.  This is due to the fact that the
+Windows version links with the Microsoft MTP library.
+
+
+
+Building instructions - All OSes
+--------------------------------
+
+For all versions, you need to copy a "bootloader.bin" file (containing
+the Rockbox bootloader) into this directory.
+
+This can be built from the Rockbox source by selecting "41" and then
+"B" when running tools/configure.
+
+You need the Rockbox toolchain to build any Rockbox target binaries -
+this can be downloaded and built with the tools/rockboxdev.sh script.
+
+The latest officially released bootloader can always be downloaded from:
+
+http://download.rockbox.org/bootloader/gigabeat-s/
+
+
+
+Linux
+-----
+
+The Unix versions requires libmtp, which in turn requires libusb.
+
+beastpatcher is built to statically link to these libraries and
+expects them to exist as /usr/lib/libmtp.a and /usr/lib/libusb.a
+respectively.  Change the definition of LIBS in the Makefile if this
+is not the case for your system.
+
+After this, just type "make" to get a 
+
+
+
+OS X
+----
+
+[Not yet implemented]
+
+The OS X build is a universal binary statically linked with libusb and libmtp.
+
+
+
+Windows
+-------
+
+[Not yet implemented]
+
+The MTP_DLL.dll requires VC2005 to compile - see instructions in
+MTP_DLL/README
+
+To compile beastpatcher itself, you can either cross-compile from
+Linux using the mingw32 package, or compile in Cygwin.  Just type
+"make beastpatcher.exe" (in Linux) or "make" (in Cygwin).
+

@@ -1,0 +1,17 @@
+Basic implementation:
+
+* Windows support - need to expand API provided by MTP_DLL.dll
+* OS X support - need to statically link against libusb and libmtp
+* Load bootloader.bin from a file
+
+Ideas for future features:
+
+* Dual-boot.  Look for nk.bin in current directory, and check its
+  md5sum to confirm it's an original firmware.  Possibly include
+  override for user-modified OFs, and option for user to specify an
+  alternate location.  
+
+  This will give the user three options - rockbox only, OF only
+  (i.e. uninstall) or dual-boot.  It would be easy to give the choice
+  of two boot orders (RB on hold or OF on hold) if that was desired.
+
