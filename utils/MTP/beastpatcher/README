@@ -50,8 +50,6 @@ The OS X build is a universal binary statically linked with libusb and libmtp.
 Windows
 -------
 
-[Not yet implemented]
-
 The MTP_DLL.dll requires VC2005 to compile - see instructions in
 MTP_DLL/README
 
@@ -59,3 +57,5 @@ To compile beastpatcher itself, you can either cross-compile from
 Linux using the mingw32 package, or compile in Cygwin.  Just type
 "make beastpatcher.exe" (in Linux) or "make" (in Cygwin).
 
+To run beastpatcher.exe, you need MTP_DLL.dll in the same directory
+(or the Windows DLL path).

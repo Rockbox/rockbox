@@ -3,20 +3,17 @@ CFLAGS=-Wall -W
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
 OUTPUT=beastpatcher.exe
 CROSS=
+CFLAGS+=-mno-cygwin
 else
 OUTPUT=beastpatcher
 CROSS=i586-mingw32msvc-
 endif
 
-ifeq ($(OUTPUT),beastpatcher)
 LIBS = /usr/lib/libmtp.a /usr/lib/libusb.a
 CFLAGS += $(shell printf \
 	'\#include <libmtp.h>\nlibmtp version: LIBMTP_VERSION\n' | \
 	gcc -E -P - -o - | grep -q '^libmtp version: 0\.2' && echo '-DOLDMTP')
-else
-CFLAGS+=-mno-cygwin
-LIBS = ../MTP_DLL.dll
-endif
+WINLIBS = ../MTP_DLL.dll
 
 NATIVECC = gcc
 CC = $(CROSS)gcc
@@ -27,8 +24,8 @@ beastpatcher: beastpatcher.c bootimg.c mtp_common.h mtp_libmtp.c
 	gcc $(CFLAGS) -o beastpatcher beastpatcher.c bootimg.c mtp_libmtp.c $(LIBS)
 	strip beastpatcher
 
-beastpatcher.exe:  beastpatcher.c bootimg.c mtp_common.h mtp_win32.c $(LIBS)
-	$(CROSS)$(CC) $(CFLAGS) $(LIBS) -o beastpatcher.exe beastpatcher.c bootimg.c
+beastpatcher.exe:  beastpatcher.c bootimg.c mtp_common.h mtp_win32.c $(WINLIBS)
+	$(CC) $(CFLAGS) -o beastpatcher.exe beastpatcher.c bootimg.c mtp_win32.c $(WINLIBS)
 	$(CROSS)strip beastpatcher.exe
 
 beastpatcher-mac: beastpatcher-i386 beastpatcher-ppc

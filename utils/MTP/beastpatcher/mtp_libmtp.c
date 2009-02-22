@@ -6,7 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  * 
- * $Id:$
+ * $Id$
  *
  * Copyright (c) 2009, Dave Chapman
  * All rights reserved.

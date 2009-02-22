@@ -6,7 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * $Id:$
+ * $Id$
  *
  * Copyright (c) 2009, Dave Chapman
  * All rights reserved.
@@ -41,7 +41,6 @@
 #define _MTP_COMMON_H
 
 #ifdef __WIN32__
-#error Windows support not yet implemented
 #else
 #include "libmtp.h"
 #endif
