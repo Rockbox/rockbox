@@ -251,17 +251,11 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
     len = data_size + sizeof(struct memory_handle);
 
     /* First, will the handle wrap? */
-    overlap = RINGBUF_ADD_CROSS(new_widx, sizeof(struct memory_handle),
-                                buffer_len - 1);
     /* If the handle would wrap, move to the beginning of the buffer,
-     * otherwise check if the data can/would wrap and move it to the
-     * beginning if needed */
-    if (overlap > 0) {
+     * or if the data must not but would wrap, move it to the beginning */
+    if( (new_widx + sizeof(struct memory_handle) > buffer_len) ||
+                   (!can_wrap && (new_widx + len > buffer_len)) ) {
         new_widx = 0;
-    } else if (!can_wrap) {
-        overlap = RINGBUF_ADD_CROSS(new_widx, len, buffer_len - 1);
-        if (overlap > 0)
-            new_widx += data_size - overlap;
     }
 
     /* How far we shifted buf_widx to align things, must be < buffer_len */
