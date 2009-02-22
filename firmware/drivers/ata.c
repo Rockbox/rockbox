@@ -955,10 +955,17 @@ static void ata_thread(void)
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 /* There is no need to force ATA power on */
 #else
-                if (poweroff) {
+                if (sleeping) {
                     mutex_lock(&ata_mtx);
                     ata_led(true);
-                    ata_power_on();
+                    if (poweroff) {
+                        ata_power_on();
+                        poweroff = false;
+                    }
+                    else {
+                        perform_soft_reset();
+                    }
+                    sleeping = false;                   
                     ata_led(false);
                     mutex_unlock(&ata_mtx);
                 }
