@@ -341,14 +341,14 @@ data partiton.}}
 
 \item Take the \fname{.zip} file that you downloaded and use
  the ``Extract all'' command of your unzip program to extract 
- the files onto your \dap{}.
+ the files onto \opt{gigabeats}{the main data partition of }your \dap{}.
 \end{enumerate}
 
 \note{The entire contents of the \fname{.zip} file should be extracted 
 directly to the root of your \daps{} drive. Do not try to
 create a separate directory on your \dap{} for the Rockbox
 files! The \fname{.zip} file already contains the internal
-structure that Rockbox needs.}
+structure that Rockbox needs.\\}
 
 \opt{archos}{
  If the contents of the \fname{.zip} file are extracted correctly, you will
@@ -427,6 +427,9 @@ structure that Rockbox needs.}
 \end{itemize}
 }
 
+\opt{e200}{Your e200 will automatically reboot and Rockbox should load.}
+
+
 
 \subsection{Enabling Speech Support (optional)}\label{sec:enabling_speech_support}
 \index{Speech}\index{Installation!Optional Steps}
@@ -443,24 +446,22 @@ Rockbox Utility can also aid in the production of talk files, which allow Rockbo
 to speak file and folder names.
 
 \section{Running Rockbox}
-\nopt{ipod,e200,gigabeats}{Unplug any connected power supply and turn the unit off. When
-you next turn the unit on, Rockbox should load.}%
-\opt{ipod}{Hard resetting the Ipod by holding
+\nopt{ipod,gigabeats}{When
+you turn the unit on, Rockbox should load.}
+\opt{ipod}{Hard reset the Ipod by holding
   \opt{IPOD_4G_PAD}{\ButtonMenu{}+\ButtonSelect{}}%
   \opt{IPOD_3G_PAD}{\ButtonMenu{}+\ButtonPlay{}}
   for a couple of seconds until the \dap{} resets. Now Rockbox should load.
-} %
-\opt{e200}{Your e200 will automatically reboot and Rockbox should load. }%
-When you see the Rockbox splash screen, Rockbox is loaded and ready for
-use.
+}
 
-\opt{gigabeats}{Rockbox should automatically load when you unplug the USB
-cable.
+\opt{gigabeats}{Rockbox should automatically load when you turn on your player.\\
+
   \note{
-    If you have loaded music onto your \dap{} using the \playerman{} firmaware, 
-    you will not be able to see your music properly in the \setting{File Browser}. 
-    Files placed on your \dap{} using the \playerman{} can be viewed by
-    initialising and using Rockbox's database.
+    If you have loaded music onto your \dap{} using the \playerman{}
+    firmware, you will not be able to see your music properly in the
+    \setting{File Browser} as MTP mode changes the location and file names. 
+    Files placed on your \dap{} using the \playerman{} firmware can be
+    viewed by initialising and using Rockbox's database.
     See \reference{ref:database} for more information.}
 }
 
@@ -588,6 +589,10 @@ completely follow the manual uninstallation instructions below.}}
 }
 
 \opt{gigabeats}{
+  If you wish to clean up your disk by deleting the
+  \fname{.rockbox} directory and its contents, this must be done
+  before uninstalling the bootloader in the next step.
+
   Before installation you should have downloaded a copy of the \playerman{}
   firmware from
   \url{http://www.tacp.toshiba.com/tacpassets-images/firmware/MESV12US.zip}.
@@ -597,16 +602,15 @@ completely follow the manual uninstallation instructions below.}}
   \fname{Autorun.inf} and \fname{gbs\_update\_1\_2\_us.exe}.  Extract them with
   your favourite unzipping utility e.g. 7zip.
   \item Connect your \dap{} to your computer.
-  \item From Windows, you can run \fname{gbs\_update\_1\_2\_us.exe} to restore
-  your \dap{}
-  \warn{This will format your \dap{}, removing all files}
-  \item From Linux, extract \fname{nk.bin} from within
+  \item Extract \fname{nk.bin} from within
   \fname{gbs\_update\_1\_2\_us.exe} using e.g. 7zip and copy it to the 150 MB
-  firmware partition of your \dap{}.  If you wish to clean up your disk,
-  you may also wish to delete the \fname{.rockbox} directory and its contents
-  from the main partition.
+  firmware partition of your \dap{}.
   \item Safely eject / unmount the USB drive, unplug the cable and restart.
   \end{itemize}
+
+  \note{From Windows, you can also run \fname{gbs\_update\_1\_2\_us.exe}
+  directly to restore your \dap{}. This will format your \dap{}, 
+  removing all files.}
 }
 
 \section{Troubleshooting}

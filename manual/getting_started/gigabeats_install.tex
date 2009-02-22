@@ -22,57 +22,84 @@ bootloader) and executed when your \dap{} is powered on.
 \subsubsection{Bootloader installation from Windows}
 
 \begin{enumerate}
-\item Download \fname{sendfirm.exe} from \fixme{add download location}.
-\item Download the bootloader (\fname{nk.bin}) from \fixme{add download location}.
-\item From the command prompt, enter the directory into which you downloaded
-\fname{sendfirm.exe} and \fname{nk.bin} and run:
-\begin{code} 
-    sendfirm.exe nk.bin
-\end{code}
-\item After a successful installation, your \dap{} will immediately reboot
-and (because it is still connected to your PC) enter the Rockbox bootloader's
+
+\item Attach your \dap{} to your computer.
+
+\item Download \fname{beastpatcher.exe} from
+\fixme{add download location}
+and run it.
+
+\item You should see some information displayed about
+your \dap{} and a message asking you if you wish to install the Rockbox
+bootloader. Press i followed by ENTER, and beastpatcher will
+install the bootloader. After a short time you should see the message
+``[INFO] Bootloader installed successfully'' followed by some error
+messages that you can safely ignore. Press ENTER again to exit
+beastpatcher.
+
+\item After a successful installation, your \dap{} will immediately turn off.
+Turn it on again, and (because it is still connected to your PC)
+it will enter the Rockbox bootloader's
 ``USB Mass Storage'' mode, which exposes your \daps{} disk to your computer
 as a standard USB Mass Storage device.
 \end{enumerate}
 
-\subsubsection{Bootloader installation from Unix (Linux / Mac OS X)}
+\subsubsection{Bootloader installation from Mac OS X}
+\begin{enumerate}
+\item Attach your \dap{} to your computer.
+
+\item Download and open beastpatcher.dmg from 
+\fixme{add download location}
+and then double-click on the beastpatcher icon inside. You can also
+drag the beastpatcher icon to a location on your hard drive and launch
+it from the Terminal.
+
+\item If all has gone well, you should see some 
+information displayed about your \dap{} and a message asking you if you 
+wish to install the Rockbox bootloader. Press i followed by ENTER, and 
+beastpatcher will now install the bootloader. After a short time you 
+should see the message ``[INFO] Bootloader installed successfully''
+followed by some error messages that you can safely ignore. Press 
+ENTER again to exit beastpatcher and then quit the Terminal application.
+
+\item After a successful installation, your \dap{} will immediately turn off.
+Turn it on again, and (because it is still connected to your Mac)
+it will enter the Rockbox bootloader's
+``USB Mass Storage'' mode, which exposes your \daps{} disk to your computer
+as a standard USB Mass Storage device.
+\end{enumerate}
+
+\subsubsection{Bootloader installation from Linux}
 
 \begin{enumerate}
-\item Download \fname{sendfirm} from \fixme{add download location}.
-\item Download the bootloader (\fname{nk.bin}) from \fixme{add download location}.
-\item From the terminal, enter the directory into which you downloaded
-\fname{sendfirm} and \fname{nk.bin} and run:
+
+\item Download beastpatcher from
+\fixme{add download location} (32-bit x86 
+binary) or \fixme{add download location} 
+(64-bit amd64 binary). You can save this anywhere you wish, but the next 
+steps will assume you have saved it in your home directory.
+
+\item Attach your \dap{} to your computer.
+
+\item Open up a terminal window and type the following commands:
+
 \begin{code} 
-    chmod +x sendfirm 
-    ./sendfirm nk.bin
+    cd $HOME
+    chmod +x beastpatcher
+    ./beastpatcher
 \end{code}
-\item After a successful installation, your \dap{} will immediately reboot
-and (because it is still connected to your PC) enter the Rockbox bootloader's
+
+\item If all has gone well, you should see some information displayed about
+your \dap{} and a message asking you if you wish to install the Rockbox
+bootloader. Press i followed by ENTER, and beastpatcher will now install the
+bootloader. After a short time you should see the message ``[INFO] Bootloader
+installed successfully'' followed by some error
+messages that you can safely ignore. Press ENTER again to exit beastpatcher.
+
+\item After a successful installation, your \dap{} will immediately turn off.
+Turn it on again, and (because it is still connected to your PC)
+it will enter the Rockbox bootloader's
 ``USB Mass Storage'' mode, which exposes your \daps{} disk to your computer
 as a standard USB Mass Storage device.
+
 \end{enumerate}
-
-\subsubsection{Fixing the partition table}
-The factory-standard partition table on your \daps{} disk is technically
-invalid, and the Linux kernel (and maybe other operating systems) rejects it.
-To fix this, you need to use the fdisk utility to correctly set the ``bootable
-flag'' field to a valid value (it doesn't matter if this is true or false).\\
-
-\note{Windows does not seem to mind this, so if you only use your \dap{} with
-Windows the following steps are not necessary.\\}
-
-Assuming your \dap{} is appearing as /dev/sdz (the output of the dmesg
-command will show the log messages including the device node assigned to
-your \dap{}), type the following:
-
-\begin{code}
-    fdisk /dev/sdz
-    a
-    1
-    a
-    2
-    w
-\end{code}
-
-After exiting fdisk, you may need to unplug and then reattach your \dap{}
-in order for it to be recognised by your computer.
