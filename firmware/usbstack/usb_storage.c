@@ -283,6 +283,23 @@ static enum {
     SENDING_CSW
 } state = WAITING_FOR_COMMAND;
 
+#ifdef TOSHIBA_GIGABEAT_S
+
+/* The Gigabeat S factory partition table contains invalid values for the
+   "active" flag in the MBR.  This prevents at least the Linux kernel from
+   accepting the partition table, so we fix it on-the-fly. */
+
+static void fix_mbr(unsigned char* mbr)
+{
+    unsigned char* p = mbr + 0x1be;
+
+    p[0x00] &= 0x80;
+    p[0x10] &= 0x80;
+    p[0x20] &= 0x80;
+    p[0x30] &= 0x80;
+}
+#endif
+
 static bool check_disk_present(IF_MV_NONVOID(int volume))
 {
 #ifdef USB_USE_RAMDISK
@@ -985,6 +1002,12 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                                              MIN(BUFFER_SIZE/SECTOR_SIZE,
                                                  cur_cmd.count),
                                              cur_cmd.data[cur_cmd.data_select]);
+
+#ifdef TOSHIBA_GIGABEAT_S
+                if (cur_cmd.sector == 0) {
+                    fix_mbr(cur_cmd.data[cur_cmd.data_select]);
+                }
+#endif
 #endif
                 send_and_read_next();
             }
