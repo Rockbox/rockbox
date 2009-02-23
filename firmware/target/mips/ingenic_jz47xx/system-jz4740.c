@@ -238,7 +238,7 @@ static char* parse_exception(unsigned int cause)
 
 void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
 {
-    panicf("Exception occurred: %s [0x%08x] at 0x%08x (stack at 0x%08x)", parse_exception(cause), cause, epc, (unsigned int)stack_ptr);
+    panicf("Exception occurred: %s [0x%08x] at 0x%08x (stack at 0x%08x)", parse_exception(cause), read_c0_badvaddr(), epc, (unsigned int)stack_ptr);
 }
 
 void tlb_refill_handler(void)
@@ -308,7 +308,7 @@ static void pll_init(void)
         7, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0,
         9
     };
-    int div[5] = {1, 3, 3, 3, 3}; /* divisors of I:S:P:L:M */
+    int div[5] = {0, 3, 3, 3, 3}; /* divisors of I:S:P:L:M */
     int nf, pllout2;
 
     cfcr = CPM_CPCCR_CLKOEN |
