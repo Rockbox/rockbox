@@ -2425,6 +2425,8 @@ static void audio_thread(void)
     while (1)
     {
         if (filling != STATE_FILLING) {
+            /* End of buffering, let's calculate the watermark and unboost */
+            set_filebuf_watermark();
             cancel_cpu_boost();
         }
 
@@ -2436,7 +2438,6 @@ static void audio_thread(void)
             case Q_AUDIO_FILL_BUFFER:
                 LOGFQUEUE("audio < Q_AUDIO_FILL_BUFFER %d", (int)ev.data);
                 audio_fill_file_buffer((bool)ev.data, 0);
-                set_filebuf_watermark();
                 break;
 
             case Q_AUDIO_FINISH_LOAD:
