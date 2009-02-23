@@ -1727,7 +1727,7 @@ static bool audio_load_track(size_t offset, bool start_play)
     {
         tracks[track_widx].id3_hid = bufopen(trackname, 0, TYPE_ID3);
 
-        if (tracks[track_widx].id3_hid < 0)
+        if (tracks[track_widx].id3_hid == ERR_BUFFER_FULL)
         {
             /* Buffer is full. */
             get_metadata(&lasttrack_id3, fd, trackname);
@@ -1735,6 +1735,13 @@ static bool audio_load_track(size_t offset, bool start_play)
             close(fd);
             logf("buffer is full for now");
             filling = STATE_FULL;
+            return false;
+        }
+        else if (tracks[track_widx].id3_hid < 0)
+        {
+            last_peek_offset--;
+            close(fd);
+            logf("Could not add metadata handle");
             return false;
         }
 
@@ -1809,7 +1816,17 @@ static void audio_finish_load_track(void)
             tracks[track_widx].aa_hid = bufopen(aa_path, 0, TYPE_BITMAP);
 
             if(tracks[track_widx].aa_hid == ERR_BUFFER_FULL)
+            {
+                filling = STATE_FULL;
+                logf("buffer is full for now");
                 return;  /* No space for track's album art, not an error */
+            }
+            else if (tracks[track_widx].aa_hid < 0)
+            {
+                /* another error, do not continue either */
+                logf("Could not add album art handle");
+                return;
+            }
         }
     }
 #endif
@@ -1887,8 +1904,19 @@ static void audio_finish_load_track(void)
 
     tracks[track_widx].audio_hid = bufopen(track_id3->path, file_offset, type);
 
-    if (tracks[track_widx].audio_hid < 0)
+    /* No space left, not an error */
+    if (tracks[track_widx].audio_hid == ERR_BUFFER_FULL)
+    {
+        filling = STATE_FULL;
+        logf("buffer is full for now");
         return;
+    }
+    else if (tracks[track_widx].audio_hid < 0)
+    {
+        /* another error, do not continue either */
+        logf("Could not add audio data handle");
+        return;
+    }
 
     /* All required data is now available for the codec. */
     tracks[track_widx].taginfo_ready = true;
