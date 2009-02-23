@@ -169,7 +169,7 @@ $(BUILDDIR)/$(BINARY) : $(BUILDDIR)/rockbox.bin $(FLASHFILE)
 
 # archos
 $(BUILDDIR)/rockbox.ucl: $(BUILDDIR)/rockbox.bin
-	$(call PRINTS,UCLPACK $(@F))$(TOOLSDIR)/uclpack --best --2e -b1048576 $< $@ >/dev/null 2>&1
+	$(call PRINTS,UCLPACK $(@F))$(TOOLSDIR)/uclpack --best --2e -b1048576 $< $@ >/dev/null
 
 MAXINFILE = $(BUILDDIR)/temp.txt
 MAXOUTFILE = $(BUILDDIR)/romstart.txt

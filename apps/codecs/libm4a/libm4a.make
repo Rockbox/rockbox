@@ -15,7 +15,7 @@ OTHER_SRC += $(M4ALIB_SRC)
 
 $(M4ALIB): $(M4ALIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
-	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
+	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null
 
 M4AFLAGS = $(filter-out -O%,$(CODECFLAGS))
 M4AFLAGS += -O3

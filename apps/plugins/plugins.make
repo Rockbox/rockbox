@@ -47,7 +47,7 @@ $(ROCKS): $(PLUGINLIB) $(APPSDIR)/plugin.h $(PLUGINLINK_LDS) $(PLUGINBITMAPLIB)
 
 $(PLUGINLIB): $(PLUGINLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
-	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
+	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null
 
 $(PLUGINLINK_LDS): $(PLUGIN_LDS)
 	$(call PRINTS,PP $(@F))

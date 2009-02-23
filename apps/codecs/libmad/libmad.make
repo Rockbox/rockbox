@@ -22,7 +22,7 @@ OTHER_SRC += $(MADLIB_SRC)
 
 $(MADLIB): $(MADLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
-	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
+	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null
 
 # libmad-mpeg
 MPEGMADLIB := $(CODECDIR)/libmad-mpeg.a
@@ -30,7 +30,7 @@ MPEGMADLIB_SRC := $(call preprocess, $(APPSDIR)/codecs/libmad/SOURCES)
 MPEGMADLIB_OBJ := $(addsuffix .o,$(basename $(subst $(ROOTDIR)/apps/codecs/libmad,$(BUILDDIR)/apps/codecs/libmad-mpeg,$(MPEGMADLIB_SRC))))
 
 $(MPEGMADLIB): $(MPEGMADLIB_OBJ)
-	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
+	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null
 
 # pattern rules
 

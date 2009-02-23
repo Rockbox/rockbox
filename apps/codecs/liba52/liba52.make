@@ -15,4 +15,4 @@ OTHER_SRC += $(A52LIB_SRC)
 
 $(A52LIB): $(A52LIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
-	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
+	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null

@@ -14,7 +14,7 @@ OTHER_SRC += $(CODECLIB_SRC)
 
 $(CODECLIB): $(CODECLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
-	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null 2>&1
+	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null
 
 CODECLIBFLAGS = $(CODECFLAGS) -ffunction-sections
 
