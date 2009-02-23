@@ -1489,4 +1489,5 @@ void buffering_get_debugdata(struct buffering_debug *dbgdata)
     dbgdata->wasted_space = data_counters.wasted;
     dbgdata->buffered_data = data_counters.buffered;
     dbgdata->useful_data = data_counters.useful;
+    dbgdata->watermark = conf_watermark;
 }

@@ -111,7 +111,6 @@ enum {
 };
 void buf_set_watermark(size_t bytes);
 
-
 /* Debugging */
 struct buffering_debug {
     int num_handles;
@@ -119,6 +118,7 @@ struct buffering_debug {
     size_t wasted_space;
     size_t data_rem;
     size_t useful_data;
+    size_t watermark;
 };
 void buffering_get_debugdata(struct buffering_debug *dbgdata);
 

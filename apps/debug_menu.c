@@ -392,6 +392,9 @@ static bool dbg_buffering_thread(void)
         snprintf(buf, sizeof(buf), "pcmbufdesc: %2d/%2d",
                 pcmbuf_used_descs(), pcmbufdescs);
         lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "watermark: %6d",
+                (int)(d.watermark));
+        lcd_puts(0, line++, buf);
 
         lcd_update();
     }
