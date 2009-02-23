@@ -1805,7 +1805,12 @@ static void audio_finish_load_track(void)
     {
         char aa_path[MAX_PATH];
         if (find_albumart(track_id3, aa_path, sizeof(aa_path)))
+        {
             tracks[track_widx].aa_hid = bufopen(aa_path, 0, TYPE_BITMAP);
+
+            if(tracks[track_widx].aa_hid == ERR_BUFFER_FULL)
+                return;  /* No space for track's album art, not an error */
+        }
     }
 #endif
 
