@@ -1837,6 +1837,7 @@ static void audio_finish_load_track(void)
         if (tracks[track_widx].codec_hid == ERR_BUFFER_FULL)
         {
             /* No space for codec on buffer, not an error */
+            filling = STATE_FULL;
             return;
         }
 
