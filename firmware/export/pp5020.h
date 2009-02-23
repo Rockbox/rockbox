@@ -107,10 +107,7 @@
 #define USB_IRQ      20
 #define IDE_IRQ      23
 #define FIREWIRE_IRQ 25
-#define DMA0_IRQ     26
-#define DMA1_IRQ     27 /* guess */
-#define DMA2_IRQ     28 /* guess */
-#define DMA3_IRQ     29 /* guess */
+#define DMA_IRQ      26
 #define HI_IRQ       30
 #define GPIO0_IRQ    (32+0) /* Ports A..D */
 #define GPIO1_IRQ    (32+1) /* Ports E..H */
@@ -126,10 +123,7 @@
 #define IDE_MASK      (1 << IDE_IRQ)
 #define USB_MASK      (1 << USB_IRQ)
 #define FIREWIRE_MASK (1 << FIREWIRE_IRQ)
-#define DMA0_MASK     (1 << DMA0_IRQ)
-#define DMA1_MASK     (1 << DMA1_IRQ)
-#define DMA2_MASK     (1 << DMA2_IRQ)
-#define DMA3_MASK     (1 << DMA3_IRQ)
+#define DMA_MASK      (1 << DMA_IRQ)
 #define HI_MASK       (1 << HI_IRQ)
 #define GPIO0_MASK    (1 << (GPIO0_IRQ-32))
 #define GPIO1_MASK    (1 << (GPIO1_IRQ-32))

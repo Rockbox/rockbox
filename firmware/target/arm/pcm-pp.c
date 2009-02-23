@@ -328,7 +328,7 @@ void pcm_play_lock(void)
 
     if (++dma_play_data.locked == 1) {
 #ifdef CPU_PP502x
-        CPU_INT_DIS = DMA0_MASK;
+        CPU_INT_DIS = DMA_MASK;
 #else
         IIS_IRQTX_REG &= ~IIS_IRQTX;
 #endif
@@ -343,7 +343,7 @@ void pcm_play_unlock(void)
 
     if (--dma_play_data.locked == 0 && dma_play_data.state != 0) {
 #ifdef CPU_PP502x
-        CPU_INT_EN = DMA0_MASK;
+        CPU_INT_EN = DMA_MASK;
 #else
         IIS_IRQTX_REG |= IIS_IRQTX;
 #endif
@@ -493,8 +493,8 @@ void pcm_play_dma_init(void)
 #ifdef CPU_PP502x
     /* Enable DMA controller */
     DMA_MASTER_CONTROL |= DMA_MASTER_CONTROL_EN;
-    /* FIQ priority for DMA0 */
-    CPU_INT_PRIORITY |= DMA0_MASK;
+    /* FIQ priority for DMA */
+    CPU_INT_PRIORITY |= DMA_MASK;
     /* Enable request?? Not setting or clearing everything doesn't seem to
      * prevent it operating. Perhaps important for reliability (how requests
      * are handled). */
