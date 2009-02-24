@@ -83,7 +83,7 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     connect(ui.configEncoder, SIGNAL(clicked()), this, SLOT(configEnc()));
     connect(ui.comboTts, SIGNAL(currentIndexChanged(int)), this, SLOT(updateTtsState(int)));
     connect(ui.treeDevices, SIGNAL(itemSelectionChanged()), this, SLOT(updateEncState()));
-     
+
 }
 
 
@@ -91,6 +91,9 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
 void Config::accept()
 {
     qDebug() << "Config::accept()";
+    QString errormsg = tr("The following errors occurred:") + "<ul>";
+    bool error = false;
+
     // proxy: save entered proxy values, not displayed.
     if(ui.radioManualProxy->isChecked()) {
         proxy.setScheme("http");
@@ -99,7 +102,7 @@ void Config::accept()
         proxy.setHost(ui.proxyHost->text());
         proxy.setPort(ui.proxyPort->text().toInt());
     }
-    
+
     settings->setProxy(proxy.toString());
     qDebug() << "new proxy:" << proxy;
     // proxy type
@@ -118,8 +121,25 @@ void Config::accept()
 
     // mountpoint
     QString mp = ui.mountPoint->text();
-    if(QFileInfo(mp).isDir())
+    if(mp.isEmpty()) {
+        errormsg += "<li>" + tr("No mountpoint given") + "</li>";
+        error = true;
+    }
+    else if(!QFileInfo(mp).exists()) {
+        errormsg += "<li>" + tr("Mountpoint does not exist") + "</li>";
+        error = true;
+    }
+    else if(!QFileInfo(mp).isDir()) {
+        errormsg += "<li>" + tr("Mountpoint is not a directory.") + "</li>";
+        error = true;
+    }
+    else if(!QFileInfo(mp).isWritable()) {
+        errormsg += "<li>" + tr("Mountpoint is not writeable") + "</li>";
+        error = true;
+    }
+    else {
         settings->setMountpoint(QDir::fromNativeSeparators(mp));
+    }
 
     // platform
     QString nplat;
@@ -127,25 +147,44 @@ void Config::accept()
         nplat = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
         settings->setCurPlatform(nplat);
     }
+    else {
+        errormsg += "<li>" + tr("No player selected") + "</li>";
+        error = true;
+    }
 
     // cache settings
-    if(QFileInfo(ui.cachePath->text()).isDir())
-        settings->setCachePath(ui.cachePath->text());
+    if(QFileInfo(ui.cachePath->text()).isDir()) {
+        if(!QFileInfo(ui.cachePath->text()).isWritable()) {
+            errormsg += "<li>" + tr("Cache path not writeable. Leave path empty "
+                        "to default to systems temporary path.") + "</li>";
+            error = true;
+        }
+        else
+            settings->setCachePath(ui.cachePath->text());
+    }
     else // default to system temp path
-        settings->setCachePath( QDir::tempPath());
+        settings->setCachePath(QDir::tempPath());
     settings->setCacheDisable(ui.cacheDisable->isChecked());
     settings->setCacheOffline(ui.cacheOfflineMode->isChecked());
 
     // tts settings
     int i = ui.comboTts->currentIndex();
     settings->setCurTTS(ui.comboTts->itemData(i).toString());
-   
+
     settings->setCurVersion(PUREVERSION);
 
-    // sync settings
-    settings->sync();
-    this->close();
-    emit settingsUpdated();
+    errormsg += "</ul>";
+    errormsg += tr("You need to fix the above errors before you can continue.");
+
+    if(error) {
+        QMessageBox::critical(this, tr("Configuration error"), errormsg);
+    }
+    else {
+        // sync settings
+        settings->sync();
+        this->close();
+        emit settingsUpdated();
+    }
 }
 
 
@@ -158,7 +197,7 @@ void Config::abort()
 void Config::setSettings(RbSettings* sett)
 {
     settings = sett;
-      
+
     setUserSettings();
     setDevices();
 }
