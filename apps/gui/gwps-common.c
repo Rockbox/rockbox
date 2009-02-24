@@ -153,22 +153,20 @@ bool update_onvol_change(struct gui_wps * gwps)
 
 void play_hop(int direction)
 {
-    if(!wps_state.id3 || !wps_state.id3->length
-       || global_settings.skip_length == 0)
-        return;
-#define STEP ((unsigned)global_settings.skip_length*1000)
-    if(direction == 1
-       && wps_state.id3->length - wps_state.id3->elapsed < STEP+1000) {
+    unsigned step = ((unsigned)global_settings.skip_length*1000);
+    unsigned long *elapsed = &(wps_state.id3->elapsed);
+
+    if (direction == 1 && wps_state.id3->length - *elapsed < step+1000) {
 #if CONFIG_CODEC == SWCODEC
         if(global_settings.beep)
             pcmbuf_beep(1000, 150, 1500*global_settings.beep);
 #endif
         return;
+    } else if ((direction == -1 && *elapsed < step)) {
+        *elapsed = 0;
+    } else {
+        *elapsed += step * direction;
     }
-    if((direction == -1 && wps_state.id3->elapsed < STEP))
-        wps_state.id3->elapsed = 0;
-    else
-        wps_state.id3->elapsed += STEP *direction;
     if((audio_status() & AUDIO_STATUS_PLAY) && !wps_state.paused) {
 #if (CONFIG_CODEC == SWCODEC)
         audio_pre_ff_rewind();
@@ -176,12 +174,11 @@ void play_hop(int direction)
         audio_pause();
 #endif
     }
-    audio_ff_rewind(wps_state.id3->elapsed);
+    audio_ff_rewind(*elapsed);
 #if (CONFIG_CODEC != SWCODEC)
     if (!wps_state.paused)
         audio_resume();
 #endif
-#undef STEP
 }
 
 bool ffwd_rew(int button)
@@ -2190,4 +2187,3 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     viewportmanager_draw_statusbars(NULL);
     return true;
 }
-
