@@ -131,13 +131,6 @@ if test ! -w $prefix; then
 fi
 
 
-###########################################################################
-# If there's already a build dir, we don't overwrite it
-if test -d $builddir; then
-  echo "You already have a $builddir directory!"
-  echo "Please remove it and re-run the script"
-  exit
-fi
 
 cleardir () {
   # $1 is the name of the build dir
@@ -213,9 +206,6 @@ else
   pathadd="$bindir"
 fi
 
-mkdir -p $builddir
-cd $builddir
-
 summary="summary-$1"
 
 echo "============================ Summary ============================" > $summary
@@ -261,6 +251,18 @@ if test -n "$gccpatch"; then
     getfile "$gccpatch" "$gccurl"
   fi
 fi
+
+###########################################################################
+# If there's already a build dir, we don't overwrite it
+if test -d $builddir; then
+  echo "You already have a $builddir directory!"
+  echo "Please remove it and re-run the script"
+  exit
+else
+  mkdir -p $builddir
+  cd $builddir
+fi
+
 
 echo "ROCKBOXDEV: extracting binutils-$binutils in $builddir"
 tar xjf $dlwhere/binutils-$binutils.tar.bz2
