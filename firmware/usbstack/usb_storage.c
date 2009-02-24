@@ -34,14 +34,6 @@
 
 #ifdef USB_STORAGE
 
-/* The SD card driver on Sansa c200 and e200 can cause write corruption,
- * often triggered by simultaneous USB activity. This can be largely avoided
- * by not overlapping storage_write_sector() with USB transfers. This does reduce
- * write performance, so we only do it for the affected DAPs
- */
-#if (CONFIG_STORAGE & STORAGE_SD)
-#define SERIALIZE_WRITES
-#endif
 /* Enable the following define to export only the SD card slot. This
  * is useful for USBCV MSC tests, as those are destructive.
  * This won't work right if the device doesn't have a card slot.
@@ -470,13 +462,11 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                              MIN(cur_cmd.count,BUFFER_SIZE/SECTOR_SIZE);
                 int next_select = !cur_cmd.data_select;
 
-#ifndef SERIALIZE_WRITES
                 if(next_count!=0) {
                     /* Ask the host to send more, to the other buffer */
                     receive_block_data(cur_cmd.data[next_select],
                                        MIN(BUFFER_SIZE,next_count*SECTOR_SIZE));
                 }
-#endif
 
                 /* Now write the data that just came in, while the host is
                    sending the next bit */
@@ -498,13 +488,6 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                     break;
                 }
 #endif                
-#ifdef SERIALIZE_WRITES
-                if(next_count!=0) {
-                    /* Ask the host to send more, to the other buffer */
-                    receive_block_data(cur_cmd.data[next_select],
-                                       MIN(BUFFER_SIZE,next_count*SECTOR_SIZE));
-                }
-#endif
 
                 if(next_count==0) {
                     send_csw(UMS_STATUS_GOOD);
