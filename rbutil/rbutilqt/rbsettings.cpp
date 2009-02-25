@@ -16,10 +16,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "rbsettings.h"
 
 #include <QSettings>
+
+#if defined(Q_OS_LINUX)
+#include <unistd.h>
+#endif
 
 void RbSettings::open()
 {
@@ -28,11 +32,12 @@ void RbSettings::open()
      // portable installation:
     // check for a configuration file in the program folder.
     QFileInfo config;
-    config.setFile(QCoreApplication::instance()->applicationDirPath() + "/RockboxUtility.ini");
-    if(config.isFile()) 
+    config.setFile(QCoreApplication::instance()->applicationDirPath()
+            + "/RockboxUtility.ini");
+    if(config.isFile())
     {
-        userSettings = new QSettings(QCoreApplication::instance()->applicationDirPath() + "/RockboxUtility.ini",
-            QSettings::IniFormat, this);
+        userSettings = new QSettings(QCoreApplication::instance()->applicationDirPath()
+                + "/RockboxUtility.ini", QSettings::IniFormat, this);
         qDebug() << "config: portable";
     }
     else
@@ -46,7 +51,25 @@ void RbSettings::open()
 void RbSettings::sync()
 {
     userSettings->sync();
-} 
+#if defined(Q_OS_LINUX)
+    // when using sudo it runs rbutil with uid 0 but unfortunately without a
+    // proper login shell, thus the configuration file gets placed in the
+    // calling users $HOME. This in turn will cause issues if trying to
+    // run rbutil later as user. Try to detect this case via the environment
+    // variable SUDO_UID and SUDO_GID and if set chown the user config file.
+    if(getuid() == 0)
+    {
+        char* realuser = getenv("SUDO_UID");
+        char* realgroup = getenv("SUDO_GID");
+        if(realuser != NULL && realgroup != NULL)
+        {
+            int realuid = atoi(realuser);
+            int realgid = atoi(realgroup);
+            chown(qPrintable(userSettings->fileName()), realuid, realgid);
+        }
+    }
+#endif
+}
 
 QVariant RbSettings::deviceSettingCurGet(QString entry,QString def)
 {
@@ -260,12 +283,12 @@ QString RbSettings::lastTalkedFolder()
 {
     return userSettings->value("last_talked_folder").toString();
 }
- 
+
 QString RbSettings::voiceLanguage()
 {
     return userSettings->value("voicelanguage").toString();
 }
- 
+
 int RbSettings::wavtrimTh()
 {
     return userSettings->value("wavtrimthreshold",500).toInt();
@@ -328,7 +351,7 @@ QStringList RbSettings::allPlatforms()
     QStringList result;
     devices->beginGroup("platforms");
     QStringList a = devices->childKeys();
-    for(int i = 0; i < a.size(); i++) 
+    for(int i = 0; i < a.size(); i++)
     {
         result.append(devices->value(a.at(i), "null").toString());
     }
@@ -341,7 +364,7 @@ QStringList RbSettings::allLanguages()
     QStringList result;
     devices->beginGroup("languages");
     QStringList a = devices->childKeys();
-    for(int i = 0; i < a.size(); i++) 
+    for(int i = 0; i < a.size(); i++)
     {
         result.append(devices->value(a.at(i), "null").toString());
     }
@@ -385,7 +408,7 @@ QString RbSettings::nameOfTargetId(int id)
         }
         devices->endGroup();
     }
-    
+
     return result;
 }
 
@@ -397,7 +420,7 @@ QMap<int, QString> RbSettings::usbIdMap()
     devices->beginGroup("platforms");
     platforms = devices->childKeys();
     devices->endGroup();
-    
+
     for(int i = 0; i < platforms.size(); i++)
     {
         devices->beginGroup("platforms");
@@ -423,7 +446,7 @@ QMap<int, QString> RbSettings::usbIdErrorMap()
     devices->beginGroup("platforms");
     platforms = devices->childKeys();
     devices->endGroup();
-    
+
     for(int i = 0; i < platforms.size(); i++)
     {
         devices->beginGroup("platforms");
@@ -449,7 +472,7 @@ QMap<int, QString> RbSettings::usbIdIncompatMap()
     devices->beginGroup("platforms");
     platforms = devices->childKeys();
     devices->endGroup();
-    
+
     for(int i = 0; i < platforms.size(); i++)
     {
         devices->beginGroup("platforms");
@@ -580,7 +603,7 @@ void RbSettings::setTTSLang(QString tts, QString lang)
 void RbSettings::setTTSUseSapi4(bool value)
 {
     userSettingsGroupSet("sapi","useSapi4",value);
-} 
+}
 
 void RbSettings::setEncoderPath(QString enc, QString path)
 {
