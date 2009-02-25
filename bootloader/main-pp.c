@@ -445,7 +445,9 @@ void* main(void)
     int num_partitions;
     struct partinfo* pinfo;
 #if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
+#if !defined(USE_ROCKBOX_USB)
     int usb_retry = 0;
+#endif
     bool usb = false;
 #else
     char buf[256];
