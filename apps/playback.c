@@ -436,6 +436,9 @@ unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
     }
     /* else buffer_state will be AUDIOBUF_STATE_TRASHED at this point */
 
+    /* Reset the buffering thread so that it doesn't try to use the data */
+    buffering_reset(filebuf, filebuflen);
+
     if (buffer_size == NULL)
     {
         /* Special case for talk_init to use since it already knows it's
