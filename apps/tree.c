@@ -477,11 +477,21 @@ static int update_dir(void)
 /* load tracks from specified directory to resume play */
 void resume_directory(const char *dir)
 {
+	int dirfilter = *tc.dirfilter;
+	int ret;
 #ifdef HAVE_TAGCACHE
     bool id3db = *tc.dirfilter == SHOW_ID3DB;
 #endif
-
-    if (ft_load(&tc, dir) < 0)
+	/* make sure the dirfilter is sane. The only time it should be possible
+	 * thats its not is when resume playlist is called from a plugin
+	 */
+#ifdef HAVE_TAGCACHE
+	if (!id3db)
+#endif
+		*tc.dirfilter = global_settings.dirfilter;			
+	ret = ft_load(&tc, dir);
+	*tc.dirfilter = dirfilter;
+	if (ret < 0)
         return;
     lastdir[0] = 0;
 
