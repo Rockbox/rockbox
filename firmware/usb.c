@@ -197,7 +197,7 @@ static inline void usb_slave_mode(bool on)
 #ifdef HAVE_USB_POWER
 static inline bool usb_power_button(void)
 {
-#if defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
+#if (defined(IRIVER_H10) || defined (IRIVER_H10_5GB)) && !defined(USE_ROCKBOX_USB)
     return (button_status() & ~USBPOWER_BTN_IGNORE) != USBPOWER_BUTTON;
 #else
     return (button_status() & ~USBPOWER_BTN_IGNORE) == USBPOWER_BUTTON;
