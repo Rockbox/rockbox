@@ -41,8 +41,6 @@ PLUGIN_HEADER
 #define ROCKBLOX_RESTART       (BUTTON_SELECT | BUTTON_PLAY)
 #define ROCKBLOX_DROP          (BUTTON_SELECT | BUTTON_REL)
 
-#define SCROLL_WHEEL
-
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
 
@@ -116,6 +114,7 @@ PLUGIN_HEADER
 
 #define ROCKBLOX_OFF           BUTTON_POWER
 #define ROCKBLOX_ROTATE_RIGHT  BUTTON_SCROLL_BACK
+#define ROCKBLOX_ROTATE_RIGHT2 BUTTON_UP
 #define ROCKBLOX_ROTATE_LEFT   BUTTON_SCROLL_FWD
 #define ROCKBLOX_DOWN          BUTTON_DOWN
 #define ROCKBLOX_LEFT          BUTTON_LEFT
@@ -127,14 +126,13 @@ PLUGIN_HEADER
 
 #define ROCKBLOX_OFF           BUTTON_POWER
 #define ROCKBLOX_ROTATE_RIGHT  BUTTON_SCROLL_BACK
+#define ROCKBLOX_ROTATE_RIGHT2 BUTTON_UP
 #define ROCKBLOX_ROTATE_LEFT   BUTTON_SCROLL_FWD
 #define ROCKBLOX_DOWN          BUTTON_DOWN
 #define ROCKBLOX_LEFT          BUTTON_LEFT
 #define ROCKBLOX_RIGHT         BUTTON_RIGHT
 #define ROCKBLOX_DROP          BUTTON_SELECT
-/* TODO:
-#define ROCKBLOX_RESTART       BUTTON_HOME */
-#define ROCKBLOX_RESTART       BUTTON_SELECT|BUTTON_DOWN
+#define ROCKBLOX_RESTART       BUTTON_HOME
 
 
 #elif CONFIG_KEYPAD == SANSA_C200_PAD
@@ -584,7 +582,7 @@ static bool gameover = false;
 static int lines = 0, level = 0, score = 0, cx, cy, cf, co, nf;
 static short board[BOARD_HEIGHT][BOARD_WIDTH];   /* 20 rows of 10 blocks */
 
-#ifdef SCROLL_WHEEL
+#ifdef HAVE_SCROLLWHEEL
 int wheel_events = 0, last_wheel_event = 0;
 bool wheel_enabled = false;
 #endif
@@ -1110,7 +1108,7 @@ static int rockblox_loop (void)
 #endif
             case ROCKBLOX_ROTATE_RIGHT:
             case ROCKBLOX_ROTATE_RIGHT | BUTTON_REPEAT:
-#ifdef SCROLL_WHEEL
+#ifdef HAVE_SCROLLWHEEL
                 /* if the wheel is disabled, add an event to the stack. */
                 if(wheel_enabled == false)
                     wheel_events++;
@@ -1123,7 +1121,7 @@ static int rockblox_loop (void)
 
             case ROCKBLOX_ROTATE_LEFT:
             case ROCKBLOX_ROTATE_LEFT | BUTTON_REPEAT:
-#ifdef SCROLL_WHEEL
+#ifdef HAVE_SCROLLWHEEL
                 if(wheel_enabled == false)
                     wheel_events++;
 
@@ -1179,7 +1177,7 @@ static int rockblox_loop (void)
         if (button != BUTTON_NONE)
             lastbutton = button;
 
-#ifdef SCROLL_WHEEL
+#ifdef HAVE_SCROLLWHEEL
         /* check if we should enable the scroll wheel, if events
          * begin to stack up... */
         if(wheel_enabled == false)
