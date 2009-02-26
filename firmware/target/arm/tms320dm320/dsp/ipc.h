@@ -34,7 +34,7 @@
 #define PACKED
 #endif
 
-#define PCM_SIZE 32768 /* bytes */
+#define PCM_SIZE 0x8000 /* bytes */
 
 struct sdram_buffer {
     unsigned long addr;

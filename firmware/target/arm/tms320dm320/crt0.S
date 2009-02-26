@@ -143,7 +143,7 @@ start:
     bhi    1b
 
     /* Set up stack for IRQ mode */
-    msr    cpsr_c, #0x92 /* IRQ disabled, FIQ enabled */
+    msr    cpsr_c, #0xd2 /* IRQ disabled, FIQ enabled */
     ldr    sp, =irq_stack
     /* Set up stack for FIQ mode */
     msr    cpsr_c, #0xd1 /* IRQ/FIQ disabled */

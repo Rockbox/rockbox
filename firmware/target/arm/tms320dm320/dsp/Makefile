@@ -10,9 +10,11 @@
 # http://daniel.haxx.se/blog/2007/11/18/free-to-use-compiler-from-ti/
 CC = cl500
 LD = lnk500
-CFLAGS = $(BUILDDATE)
+CFLAGS = 
 # There's more in linker.cmd.
 LDFLAGS = -w
+
+OBJDIR=./build
 
 OBJS = arm.obj main.obj vectors.obj dma.obj
 
@@ -24,14 +26,15 @@ endif
 
 OBJS := $(patsubst %.obj, $(OBJDIR)/%.obj, $(OBJS))
 
-all: $(BUILDDIR)/dsp-image.h
-
+all: dsp-image.h
+	
 clean:
 	$(call PRINTS,cleaning DSP firmware)rm -f $(OBJS) $(OBJDIR)/dsp-image.out $(OBJDIR)/dsp-image.xml
+	rmdir $(OBJDIR)
 
-$(BUILDDIR)/dsp-image.h: $(OBJS) linker.cmd
+dsp-image.h: $(OBJS) linker.cmd
 	$(call PRINTS,LNK500 dsp-image.out)lnk500 $(LDFLAGS) -o $(OBJDIR)/dsp-image.out $^
-	$(call PRINTS,OFD500+XML2H $(@F))ofd500 -x -o /dev/stdout $(OBJDIR)/dsp-image.out | python $(TOOLSDIR)/xml2h.py $(OBJDIR)/dsp-image.xml > $@
+	$(call PRINTS,OFD500+XML2H $(@F))ofd500 -x -o /dev/stdout $(OBJDIR)/dsp-image.out | python xml2h.py $(OBJDIR)/dsp-image.xml > $@
 
 $(OBJDIR)/%.obj: %.asm
 	$(SILENT)mkdir -p $(dir $@)
@@ -51,5 +54,3 @@ $(OBJDIR)/tsc2100.obj: tsc2100.c audio.h registers.h
 
 $(OBJDIR)/dma.obj: dma.c dma.h registers.h ipc.h
 
-# For PRINTS.
-include $(TOOLSDIR)/make.inc

@@ -41,9 +41,10 @@ void main(void) {
 
     audiohw_postinit();
 
-#if 0
-    for (i = 0; i < 32; i++)
-    {
+    debugf("DSP inited...");
+
+#ifdef DATA_32_SINE
+    for (i = 0; i < 32; i++) {
         double ratio = ((double)i)/32.0;
         double rad = 3.0*3.141592*ratio;
         double normal = sin(rad);
@@ -51,24 +52,7 @@ void main(void) {
         data[2*i + 0] = -(signed short)scaled;
         data[2*i + 1] = (signed short)scaled;
     }
-
-    debugf("starting write");
-
-    i = 0;
-    p = data;
-    SPSA0 = 0x01;
-    for (;;) {
-        while ((SPSD0 & (1 << 1)) == 0);
-        DXR20 = *p++; // left channel
-        DXR10 = *p++; // right channel
-        if (++i == 32)
-        {
-            p = data;
-            i = 0;
-        }
-    }
 #endif
-    debugf("DSP inited...");
 
     for (;;) {
         asm("        IDLE 1");
@@ -85,16 +69,6 @@ void main(void) {
     memset((unsigned short *)0x7f80, 0, 0x80);
 #endif
 
-#ifdef DATA_32_SINE
-    for (i = 0; i < 32; i++) {
-        double ratio = ((double)i)/32.0;
-        double rad = 3.0*3.141592*ratio;
-        double normal = sin(rad);
-        double scaled = 32767.0*(normal);
-        data[2*i + 0] = -(signed short)scaled;
-        data[2*i + 1] = (signed short)scaled;
-    }
-#endif
 
 #ifdef MANUAL_TRANSFER
     register signed short *p;

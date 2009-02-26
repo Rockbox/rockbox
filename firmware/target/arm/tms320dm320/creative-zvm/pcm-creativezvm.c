@@ -40,7 +40,7 @@ void pcm_play_dma_init(void)
     audiohw_set_frequency(HW_FREQ_DEFAULT);
 
     /* init DSP */
-    dsp_init();
+//    dsp_init();
 }
 
 void pcm_postinit(void)
@@ -48,7 +48,7 @@ void pcm_postinit(void)
     audiohw_postinit();
 
     /* wake DSP */
-    dsp_wake();
+//    dsp_wake();
 }
 
 const void * pcm_play_dma_get_peak_buffer(int *count)
