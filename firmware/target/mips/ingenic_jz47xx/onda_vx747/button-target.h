@@ -21,8 +21,6 @@
 #ifndef BUTTON_TARGET_H
 #define BUTTON_TARGET_H
 
-
-#include <stdbool.h>
 #include "config.h"
 
 #define HAS_BUTTON_HOLD
@@ -33,16 +31,16 @@ int button_read_device(int *data);
 void button_set_touch_available(void);
 
 /* Main unit's buttons */
-#define BUTTON_POWER      0x00000001
-#define BUTTON_VOL_UP     0x00000002
-#define BUTTON_VOL_DOWN   0x00000004
-#define BUTTON_MENU       0x00000008
+#define BUTTON_POWER        0x00000001
+#define BUTTON_VOL_UP       0x00000002
+#define BUTTON_VOL_DOWN     0x00000004
+#define BUTTON_MENU         0x00000008
 
 /* Compatibility hacks for flipping. Needs a somewhat better fix. */
-#define BUTTON_LEFT  BUTTON_MIDLEFT
-#define BUTTON_RIGHT BUTTON_MIDRIGHT
-#define BUTTON_UP    BUTTON_TOPMIDDLE
-#define BUTTON_DOWN  BUTTON_BOTTOMMIDDLE
+#define BUTTON_LEFT         BUTTON_MIDLEFT
+#define BUTTON_RIGHT        BUTTON_MIDRIGHT
+#define BUTTON_UP           BUTTON_TOPMIDDLE
+#define BUTTON_DOWN         BUTTON_BOTTOMMIDDLE
 
 /* Touch Screen Area Buttons */
 #define BUTTON_TOPLEFT      0x00000010
@@ -55,19 +53,21 @@ void button_set_touch_available(void);
 #define BUTTON_BOTTOMMIDDLE 0x00000800
 #define BUTTON_BOTTOMRIGHT  0x00001000
 
-#define BUTTON_TOUCH        0x00002000
-
 #define DEFAULT_TOUCHSCREEN_CALIBRATION {.A=0xFFF9FDA2, .B=0xFFFFE82A, \
                                          .C=0xA22AA2C,  .D=0x23DC, .E=0x8E3E6, \
                                          .F=0x76CF88AA, .divider=0xFFAD4013}
 
-#define BUTTON_MAIN 0x3FFF
+#define BUTTON_MAIN (BUTTON_POWER    | BUTTON_VOL_UP     | BUTTON_VOL_DOWN     | \
+                     BUTTON_MENU     | BUTTON_TOPLEFT    | BUTTON_TOPMIDDLE    | \
+                     BUTTON_TOPRIGHT | BUTTON_MIDLEFT    | BUTTON_CENTER       | \
+                     BUTTON_MIDRIGHT | BUTTON_BOTTOMLEFT | BUTTON_BOTTOMMIDDLE | \
+                     BUTTON_BOTTOMRIGHT)
 
 /* No remote */
-#define BUTTON_REMOTE 0
+#define BUTTON_REMOTE   0
 
 /* Software power-off */
 #define POWEROFF_BUTTON BUTTON_POWER
-#define POWEROFF_COUNT 10
+#define POWEROFF_COUNT  10
 
 #endif /* BUTTON_TARGET_H */

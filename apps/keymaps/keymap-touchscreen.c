@@ -224,8 +224,12 @@ static const struct button_mapping button_context_keyboard[]  = {
 
 const struct button_mapping* get_context_mapping(int context)
 {
-    if ((context&CONTEXT_REMOTE) || (context&CONTEXT_CUSTOM2))
-        return target_get_context_mapping(context&(~CONTEXT_CUSTOM2));
+    if (context & CONTEXT_CUSTOM2
+#if BUTTON_REMOTE != 0
+        || context & CONTEXT_REMOTE
+#endif
+       )
+        return target_get_context_mapping(context & ~CONTEXT_CUSTOM2);
     
     switch (context)
     {
