@@ -735,7 +735,7 @@ static bool clipboard_pastefile(const char *src, const char *target, bool copy)
                     while(bytesread > 0) {
                         byteswritten = write(target_fd, buffer, bytesread);
 
-                        if (byteswritten == -1) {
+                        if (byteswritten < 0) {
                             result = false;
                             size = 0;
                             break;
