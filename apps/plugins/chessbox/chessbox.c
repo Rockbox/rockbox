@@ -25,6 +25,7 @@
 
 #ifdef HAVE_LCD_BITMAP
 
+#include "lib/playback_control.h"
 #include "gnuchess.h"
 #include "opening.h"
 #include "chessbox_pgn.h"
@@ -587,7 +588,8 @@ static int cb_menu(void)
     bool menu_quit = false;
     
     MENUITEM_STRINGLIST(menu,"Chessbox Menu",NULL,"New Game","Resume Game",
-                        "Save Game", "Restore Game", "Quit");                  
+                        "Save Game", "Restore Game", "Playback Control",
+                        "Quit");                  
     
     while(!menu_quit)
     {
@@ -610,6 +612,9 @@ static int cb_menu(void)
                 menu_quit = true;
                 break;
             case 4:
+                playback_control(NULL);
+                break;
+            case 5:
                 result = COMMAND_QUIT;
                 menu_quit = true;
                 break;

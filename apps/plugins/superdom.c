@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "lib/playback_control.h"
 PLUGIN_HEADER
 
 extern const fb_data superdom_boarditems[];
@@ -714,7 +715,7 @@ int ingame_menu(void) {
     int selection = 0;
      
     MENUITEM_STRINGLIST(ingame_menu,"Super Domination Menu",NULL,
-                    "Return to game","Save Game", "Quit");
+                    "Return to game","Save Game","Playback Control", "Quit");
 
     selection=rb->do_menu(&ingame_menu,&selection, NULL, false);
     switch(selection) {
@@ -728,6 +729,9 @@ int ingame_menu(void) {
                 rb->splash(HZ, "Error in save");
             break;
         case 2:
+            playback_control(NULL);
+            break;
+        case 3:
             return SUPERDOM_QUIT;
             break;
         case MENU_ATTACHED_USB:

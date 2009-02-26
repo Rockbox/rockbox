@@ -19,6 +19,7 @@
  **************************************************************************/
 #include "plugin.h"
 #include "lib/fixedpoint.h"
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
@@ -471,7 +472,8 @@ static bool vu_meter_menu(void)
     bool exit = false;
     
     MENUITEM_STRINGLIST(menu,"VU Meter Menu",NULL,"Meter Type","Scale",
-                        "Minimeters","Decay Speed","Quit");
+                        "Minimeters","Decay Speed","Playback Control",
+                        "Quit");
     
     static const struct opt_items meter_type_option[2] = {
         { "Analog", -1 },
@@ -536,6 +538,10 @@ static bool vu_meter_menu(void)
                 break;
 
             case 4:
+                playback_control(NULL);
+                break;
+
+            case 5:
                 exit = true;
                 /* fall through to exit the menu */
             default:

@@ -48,6 +48,7 @@ further options:
 #include "reversi-gui.h"
 
 #include "lib/oldmenuapi.h"
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
@@ -383,6 +384,7 @@ static bool reversi_gui_menu(void) {
         { MENU_TEXT_STRAT_BLACK, NULL },
         { MENU_TEXT_STRAT_WHITE, NULL },
         { MENU_TEXT_WRAP_MODE, NULL },
+        { "Playback Control", NULL },
         { "Quit", NULL },
     };
 
@@ -422,7 +424,11 @@ static bool reversi_gui_menu(void) {
             cursor_wrap_mode = cursor_wrap_mode_values[index];
             break;
 
-        case 5: /* Quit */
+        case 5:
+            playback_control(NULL);
+            break;
+
+        case 6: /* Quit */
             quit_plugin = true;
             break;
     }

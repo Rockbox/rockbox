@@ -22,6 +22,7 @@
 
 #include "plugin.h"
 #include "lib/helper.h"
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
@@ -901,7 +902,7 @@ static inline void move_board (void)
 static int game_menu (void)
 {
     MENUITEM_STRINGLIST(menu, "XOBOX Menu", NULL, "Start New Game",
-                        "Speed","Difficulty","Quit");
+                        "Speed","Difficulty","Playback Control","Quit");
     int selection = 0;
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground (rb->global_settings->fg_color);
@@ -917,6 +918,8 @@ static int game_menu (void)
         else if (selection==2)
             rb->set_int ("Difficulty", "", UNIT_INT, &difficulty, NULL,
                          5, 50, 95, NULL);
+        else if (selection==3)
+            playback_control (NULL);
         else
             break;
     }

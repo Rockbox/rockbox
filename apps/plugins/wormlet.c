@@ -21,6 +21,7 @@
 #include "plugin.h"
 #include "lib/configfile.h"
 #include "lib/helper.h"
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
@@ -2671,7 +2672,7 @@ enum plugin_status plugin_start(const void* parameter)
                         "Number of Worms", "Number of Players", "Control Style",
                         "Worm Growth Per Food","Worm Speed","Arghs Per Food",
                         "Argh Size","Food Size","Revert to Default Settings",
-                        "Quit");
+                        "Playback Control", "Quit");
 
     rb->button_clear_queue();
 
@@ -2767,6 +2768,9 @@ enum plugin_status plugin_start(const void* parameter)
                 rb->set_option("Reset Settings?", &new_setting,INT, noyes , 2, NULL);
                 if (new_setting == 1)
                     default_settings();
+                break;
+            case 10:
+                playback_control(NULL);
                 break;
             default:
                 menu_quit=1;

@@ -24,6 +24,7 @@
 #include "lib/xlcd.h"
 #include "lib/configfile.h"
 #include "lib/helper.h"
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
@@ -704,7 +705,7 @@ static int chopMenu(int menunum)
     };
     
     MENUITEM_STRINGLIST(menu,"Chopper Menu",NULL,"Start New Game","Resume Game",
-                        "Level","Quit");
+                        "Level","Playback Control","Quit");
 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
@@ -736,6 +737,9 @@ static int chopMenu(int menunum)
                 rb->set_option("Level", &iLevelMode, INT, levels, 2, NULL);
                 break;
             case 3:
+                playback_control(NULL);
+                break;
+            case 4:
                 menu_quit=true;
                 res = PLUGIN_OK;
                 break;

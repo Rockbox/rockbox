@@ -23,6 +23,8 @@
 
 #ifdef HAVE_LCD_BITMAP
 
+#include "lib/playback_control.h"
+
 PLUGIN_HEADER
 
 /* what the minesweeper() function can return */
@@ -548,7 +550,7 @@ enum minesweeper_status menu( void )
 
     MENUITEM_STRINGLIST( menu, "Minesweeper Menu", NULL, "Play Minesweeper",
                          "Mine Percentage", "Number of Rows",
-                         "Number of Columns", "Quit" );
+                         "Number of Columns", "Playback Control", "Quit" );
 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground( rb->global_settings->fg_color );
@@ -577,6 +579,10 @@ enum minesweeper_status menu( void )
             case 3:
                 rb->set_int( "Number of Columns", "", UNIT_INT, &width, NULL,
                              1, 1, MAX_WIDTH, NULL );
+                break;
+
+            case 4:
+                playback_control( NULL );
                 break;
 
             default:

@@ -28,6 +28,7 @@
 #include "lib/xlcd.h"
 #include "lib/pluginlib_actions.h"
 #include "lib/fixedpoint.h"
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
@@ -2398,7 +2399,8 @@ static int bubbles(struct game_context* bb) {
     ********************/
     MENUITEM_STRINGLIST(menu,"Bubbles Menu",NULL,
                         "Start New Game", "Resume Game",
-                        "Level", "Display High Scores", "Quit");
+                        "Level", "Display High Scores", "Playback Control",
+                        "Quit");
     while(!startgame){
         switch (rb->do_menu(&menu, NULL, NULL, false))
         {
@@ -2421,7 +2423,10 @@ static int bubbles(struct game_context* bb) {
             case 3: /* High scores */
                 bubbles_displayscores(bb);
                 break;
-            case 4: /* quit */
+            case 4: /* Playback Control */
+                playback_control(NULL);
+                break;
+            case 5: /* quit */
                 return BB_QUIT;
             case MENU_ATTACHED_USB:
                 bubbles_callback(bb);

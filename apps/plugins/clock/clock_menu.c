@@ -22,6 +22,7 @@
 #include "clock.h"
 #include "clock_bitmaps.h"
 #include "clock_settings.h"
+#include "lib/playback_control.h"
 
 /* Option structs (possible selections per each option) */
 static const struct opt_items noyes_text[] = {
@@ -210,7 +211,8 @@ bool main_menu(void){
     bool exit_clock=false;
 
     MENUITEM_STRINGLIST(menu,"Clock Menu",NULL,"View Clock","Mode Selector",
-                        "Mode Settings","General Settings","Quit");
+                        "Mode Settings","General Settings","Playback Control",
+                        "Quit");
 
     while(!done){
         switch(rb->do_menu(&menu, &selection, NULL, false)){
@@ -235,6 +237,10 @@ bool main_menu(void){
                 break;
 
             case 4:
+                playback_control(NULL);
+                break;
+
+            case 5:
                 exit_clock = true;
                 done = true;
                 break;

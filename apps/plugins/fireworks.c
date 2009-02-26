@@ -21,6 +21,7 @@
 #include "plugin.h"
 #include "lib/oldmenuapi.h"
 #include "lib/helper.h"
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
@@ -289,6 +290,7 @@ static const struct menu_item items[] = {
     { "Gravity", NULL },
     { "Show Rockets", NULL },
     { "FPS (Speed)", NULL },
+    { "Playback Control", NULL },
     { "Quit", NULL }
 };
 
@@ -403,6 +405,10 @@ void fireworks_menu(void)
                 break;
 
             case 7:
+                playback_control(NULL);
+                break;
+
+            case 8:
                 quit_plugin = true;
                 menu_quit = true;
                 break;
