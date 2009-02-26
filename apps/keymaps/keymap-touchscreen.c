@@ -166,6 +166,16 @@ static const struct button_mapping button_context_bmark[]  = {
 }; /* button_context_bmark */
 
 static const struct button_mapping button_context_time[]  = {
+    { ACTION_SETTINGS_INC,       BUTTON_TOPMIDDLE,                   BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_TOPMIDDLE|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_BOTTOMMIDDLE,                BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_STD_PREV,           BUTTON_MIDLEFT,                     BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,     BUTTON_MIDLEFT|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_STD_NEXT,           BUTTON_MIDRIGHT,                    BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,     BUTTON_MIDRIGHT|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_STD_OK,             BUTTON_CENTER|BUTTON_REL,           BUTTON_CENTER  },
+    { ACTION_STD_CANCEL,         BUTTON_TOPLEFT|BUTTON_REL,          BUTTON_TOPLEFT },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_SETTINGS_TIME),
 }; /* button_context_time */
 

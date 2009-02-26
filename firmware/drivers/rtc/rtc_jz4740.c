@@ -162,7 +162,9 @@ int rtc_write_datetime(unsigned char* buf)
     
     lval = jz_mktime(year, rtc_tm->tm_mon, rtc_tm->tm_mday, rtc_tm->tm_hour,
                      rtc_tm->tm_min, rtc_tm->tm_sec);
+    __cpm_start_rtc();
     REG_RTC_RSR = lval;
+    __cpm_stop_rtc();
     
     return 0;
 }

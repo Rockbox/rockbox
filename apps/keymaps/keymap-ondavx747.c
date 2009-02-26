@@ -118,6 +118,12 @@ static const struct button_mapping button_context_bmark[]  = {
 }; /* button_context_bmark */
 
 static const struct button_mapping button_context_time[]  = {
+    { ACTION_SETTINGS_INC,       BUTTON_VOL_UP,                   BUTTON_NONE  },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_VOL_UP|BUTTON_REPEAT,     BUTTON_NONE  },
+    { ACTION_SETTINGS_DEC,       BUTTON_VOL_DOWN,                 BUTTON_NONE  },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_VOL_DOWN|BUTTON_REPEAT,   BUTTON_NONE  },
+    { ACTION_STD_OK,             BUTTON_MENU|BUTTON_REL,          BUTTON_MENU  },
+    { ACTION_STD_CANCEL,         BUTTON_POWER|BUTTON_REL,         BUTTON_POWER },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS),
 }; /* button_context_time */
 
