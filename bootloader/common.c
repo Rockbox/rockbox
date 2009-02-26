@@ -304,7 +304,7 @@ void display_logf(void) /* Doesn't return! */
         else if(button & LOGF_CLEAR)
             user_index = 0;
 #ifdef HAVE_TOUCHSCREEN
-        else if(button & BUTTON_TOUCH)
+        else if(button & BUTTON_TOUCHSCREEN)
         {
             touch = button_get_data();
             
