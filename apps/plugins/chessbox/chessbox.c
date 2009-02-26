@@ -25,7 +25,10 @@
 
 #ifdef HAVE_LCD_BITMAP
 
+#if (MEMORYSIZE <= 8) && !defined(SIMULATOR) /* Lowmem doesn't have playback in chessbox */
 #include "lib/playback_control.h"
+#endif
+
 #include "gnuchess.h"
 #include "opening.h"
 #include "chessbox_pgn.h"
@@ -588,8 +591,11 @@ static int cb_menu(void)
     bool menu_quit = false;
     
     MENUITEM_STRINGLIST(menu,"Chessbox Menu",NULL,"New Game","Resume Game",
-                        "Save Game", "Restore Game", "Playback Control",
-                        "Quit");                  
+                        "Save Game", "Restore Game",
+#if (MEMORYSIZE <= 8) && !defined(SIMULATOR) /* Lowmem doesn't have playback in chessbox */
+                        "Playback Control",
+#endif
+                                            "Quit");                  
     
     while(!menu_quit)
     {
@@ -612,9 +618,11 @@ static int cb_menu(void)
                 menu_quit = true;
                 break;
             case 4:
+#if (MEMORYSIZE <= 8) && !defined(SIMULATOR) /* Lowmem doesn't have playback in chessbox */
                 playback_control(NULL);
                 break;
             case 5:
+#endif
                 result = COMMAND_QUIT;
                 menu_quit = true;
                 break;
