@@ -108,8 +108,13 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x100000
 
-/* Define this if you have the */
-//#define HAVE_INGENIC_CODEC
+/* Define this if you have the Jz4740 internal codec */
+#define HAVE_JZ4740_CODEC
+
+/* define the bitmask of hardware sample rates */
+#define HW_SAMPR_CAPS   (SAMPR_CAP_48 | SAMPR_CAP_44 | SAMPR_CAP_32 | \
+                         SAMPR_CAP_24 | SAMPR_CAP_22 | SAMPR_CAP_16 | \
+                         SAMPR_CAP_12 | SAMPR_CAP_11 | SAMPR_CAP_8)
 
 #define CONFIG_I2C I2C_JZ47XX
 

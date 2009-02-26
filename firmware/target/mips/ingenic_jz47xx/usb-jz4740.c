@@ -730,7 +730,7 @@ int usb_drv_send_nonblocking(int endpoint, void* ptr, int length)
         {
             //dma_cache_wback_inv((unsigned long)ptr, length);
             __dcache_writeback_all();
-            REG_USB_REG_ADDR1 = (unsigned long)ptr & 0x7fffffff;
+            REG_USB_REG_ADDR1 = PHYSADDR((unsigned long)ptr);
             REG_USB_REG_COUNT1 = length;
             REG_USB_REG_CNTL1 = (USB_CNTL_INTR_EN | USB_CNTL_MODE_1 |
                                  USB_CNTL_DIR_IN  | USB_CNTL_ENA |
@@ -780,7 +780,7 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
         {
             //dma_cache_wback_inv((unsigned long)ptr, length);
             __dcache_writeback_all();
-            REG_USB_REG_ADDR2 = (unsigned long)ptr & 0x7fffffff;
+            REG_USB_REG_ADDR2 = PHYSADDR((unsigned long)ptr);
             REG_USB_REG_COUNT2 = length;
             REG_USB_REG_CNTL2 = (USB_CNTL_INTR_EN | USB_CNTL_MODE_1 |
                                  USB_CNTL_ENA | USB_CNTL_EP(endpoint) |

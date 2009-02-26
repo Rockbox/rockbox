@@ -77,7 +77,7 @@ static void i2s_codec_init(void)
     i2s_codec_reset();
     
     //REG_ICDC_CDCCR2 = (ICDC_CDCCR2_AINVOL(ICDC_CDCCR2_AINVOL_DB(0)) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_48)
-    REG_ICDC_CDCCR2 = ( ICDC_CDCCR2_AINVOL(23) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_48)
+    REG_ICDC_CDCCR2 = ( ICDC_CDCCR2_AINVOL(23) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_44)
                       | ICDC_CDCCR2_HPVOL(ICDC_CDCCR2_HPVOL_6));
     
     REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_SUSPD | ICDC_CDCCR1_RST);
@@ -98,7 +98,7 @@ static void i2s_codec_init(void)
     
     REG_ICDC_CDCCR2 |= 3;
     
-    HP_on_off_flag = 0; /* HP is off */
+    HP_on_off_flag = 1; /* HP is on */
 }
 
 static void i2s_codec_set_mic(unsigned short v) /* 0 <= v <= 100 */
@@ -208,37 +208,36 @@ static void i2s_codec_set_samplerate(unsigned short rate)
     switch (rate)
     {
         case 8000:
-            speed = 0;
+            speed = 0 << 8;
             break;
         case 11025:
-            speed = 1;
+            speed = 1 << 8;
             break;
         case 12000:
-            speed = 2;
+            speed = 2 << 8;
             break;
         case 16000:
-            speed = 3;
+            speed = 3 << 8;
             break;
         case 22050:
-            speed = 4;
+            speed = 4 << 8;
             break;
         case 24000:
-            speed = 5;
+            speed = 5 << 8;
             break;
         case 32000:
-            speed = 6;
+            speed = 6 << 8;
             break;
         case 44100:
-            speed = 7;
+            speed = 7 << 8;
             break;
         case 48000:
-            speed = 8;
+            speed = 8 << 8;
             break;
         default:
             break;
     }
     REG_ICDC_CDCCR2 |= 0x00000f00;
-    speed = speed << 8;
 
     speed |= 0xfffff0ff;
     REG_ICDC_CDCCR2 &= speed;
@@ -326,4 +325,9 @@ void audiohw_postinit(void)
 void audiohw_init(void)
 {
     i2s_codec_init();
+}
+
+void audiohw_set_frequency(int freq)
+{
+    i2s_codec_set_samplerate(freq);
 }

@@ -57,6 +57,8 @@
 #include "mas35xx.h"
 #elif defined(HAVE_TSC2100)
 #include "tsc2100.h"
+#elif defined(HAVE_JZ4740_CODEC)
+#include "jz4740-codec.h"
 #endif
 
 /* convert caps into defines */

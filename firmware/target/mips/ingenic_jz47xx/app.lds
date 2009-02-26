@@ -12,10 +12,7 @@ STARTUP(target/mips/ingenic_jz47xx/crt0.o)
 #define STUBOFFSET 0
 #endif
 
-#define PLUGINSIZE    PLUGIN_BUFFER_SIZE
-#define CODECSIZE     CODEC_SIZE
-
-#define DRAMSIZE      ((MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGINSIZE - CODECSIZE)
+#define DRAMSIZE      (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - STUBOFFSET - CODEC_SIZE
 
 #define DRAMORIG      0x80004000
 #define IRAMORIG      0x80000000
@@ -25,7 +22,7 @@ STARTUP(target/mips/ingenic_jz47xx/crt0.o)
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
 
 /* Where the codec buffer ends, and the plugin buffer starts */
-#define ENDADDR       (ENDAUDIOADDR + CODECSIZE)
+#define ENDADDR       (ENDAUDIOADDR + CODEC_SIZE)
 
 MEMORY
 {

@@ -281,7 +281,7 @@ void dma_enable(void)
         REG_DMAC_DCCSR(4) = 0;
         REG_DMAC_DCCSR(5) = 0;
         
-        REG_DMAC_DMACR = (DMAC_DMACR_PR_012345 | DMAC_DMACR_DMAE);
+        REG_DMAC_DMACR = (DMAC_DMACR_PR_RR | DMAC_DMACR_DMAE);
     }
 }
 
