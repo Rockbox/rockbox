@@ -223,9 +223,8 @@ void DSPHINT(void)
 {
     unsigned int i;
     char buffer[80];
-    static unsigned short level = 2;
      
-    unsigned short *pcm_topbottom, *pcm_topbottom_end;
+    unsigned short *pcm_topbottom;
 
     
     IO_INTC_IRQ0 = 1 << 11;

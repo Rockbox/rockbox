@@ -30,6 +30,7 @@
 #include "font.h"
 #include "debug-target.h"
 #include "lcd-target.h"
+#include "dsp-target.h"
 
 #ifndef CREATIVE_ZVx
 #include "tsc2100.h"
