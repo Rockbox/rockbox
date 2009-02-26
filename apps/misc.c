@@ -25,7 +25,6 @@
 #include "lcd.h"
 #include "file.h"
 #ifdef __PCTOOL__
-#include <stdint.h>
 #include <stdarg.h>
 #include <stdio.h>
 #ifdef WPSEDITOR
@@ -766,16 +765,6 @@ char* strrsplt(char* str, int c)
     return s;
 }
 
-char* skip_whitespace(char* const str)
-{
-    char *s = str;
-
-    while (isspace(*s)) 
-        s++;
-    
-    return s;
-}
-
 /* Test file existence, using dircache of possible */
 bool file_exists(const char *file)
 {
@@ -838,6 +827,16 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename)
     return buffer;
 }
 #endif /* !defined(__PCTOOL__) */
+
+char* skip_whitespace(char* const str)
+{
+    char *s = str;
+
+    while (isspace(*s)) 
+        s++;
+    
+    return s;
+}
 
 /* Format time into buf.
  *

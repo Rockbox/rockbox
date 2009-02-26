@@ -1,4 +1,6 @@
+ifndef V
 SILENT = @
+endif
 INCLUDE = -I../../firmware/export \
 	-I../../apps -I../../uisimulator/sdl -I/usr/include/SDL
 FIRMINC = -I../../firmware/include -fno-builtin
@@ -12,7 +14,7 @@ SRC = database.o tagcache.o replaygain.o \
 	a52.o mp3.o adx.o mp4.o aiff.o mpc.o ape.o ogg.o \
 	asap.o sid.o asf.o spc.o flac.o vorbis.o wave.o \
 	mod.o wavpack.o monkeys.o \
-	logf.o unicode.o ctype.o structec.o crc32.o io.o
+	logf.o unicode.o ctype.o structec.o crc32.o io.o misc.o
 
 OBJ = $(SRC:.c=.o)
 
@@ -20,7 +22,9 @@ OBJ = $(SRC:.c=.o)
 VPATH = ../../apps ../../apps/metadata ../../firmware/common ../../firmware/ \
 	../../uisimulator/common
 
-all: database
+TARGET= database
+
+all: $(TARGET)
 
 %.o : ../../uisimulator/common/%.c
 	@echo CC $(<F)
@@ -35,4 +39,4 @@ database: $(OBJ)
 	$(SILENT)$(CC) -g -ldl -o $@ $+
 
 clean:
-	rm $(OBJ)
+	rm -f $(OBJ) $(TARGET)
