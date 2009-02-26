@@ -2655,7 +2655,8 @@ static const struct the_menu_item menuitems[] = {
         { "Dump ROM contents", dbg_save_roms },
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP) \
-    || CONFIG_CPU == S3C2440 || CONFIG_CPU == IMX31L || CONFIG_CPU == AS3525
+    || CONFIG_CPU == S3C2440 || CONFIG_CPU == IMX31L || CONFIG_CPU == AS3525 \
+    || CONFIG_CPU == DM320
         { "View I/O ports", dbg_ports },
 #endif
 #if (CONFIG_RTC == RTC_PCF50605) && !defined(SIMULATOR)

@@ -46,7 +46,7 @@
 #include "time.h"
 #include "system-arm.h"
 
-#define MRDEBUG
+//#define MRDEBUG
 
 #if defined(MRDEBUG)
 
@@ -194,19 +194,28 @@ void main(void)
     int rc;
     int(*kernel_entry)(void);
 
-    power_init();
-    lcd_init();
+    /* Make sure interrupts are disabled */
+    set_irq_level(IRQ_DISABLED);
+    set_fiq_status(FIQ_DISABLED);
     system_init();
     kernel_init();
     
-    enable_irq();
-    enable_fiq();
+    /* Now enable interrupts */
+    set_irq_level(IRQ_ENABLED);
+    set_fiq_status(FIQ_ENABLED);
+
+    backlight_init();
+    lcd_init();
+    font_init();
+    button_init();
+    usb_init();
+    
+    
+    power_init();
+//    enable_irq();
+//    enable_fiq();
 
     adc_init();
-    button_init();
-    backlight_init();
-
-    font_init();
 
     lcd_setfont(FONT_SYSFIXED);
 
@@ -216,8 +225,6 @@ void main(void)
 
     printf("Rockbox boot loader");
     printf("Version %s", APPSVERSION);
-
-    usb_init();
 
     /* Enter USB mode without USB thread */
     if(usb_detect() == USB_INSERTED)
@@ -244,9 +251,13 @@ void main(void)
         reset_screen();
         lcd_update();
     }
+    
 #if defined(MRDEBUG)
     mrdebug();
 #endif
+
+    sleep(50);
+
     printf("ATA");
     rc = storage_init();
     if(rc)

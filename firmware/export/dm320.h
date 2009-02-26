@@ -30,7 +30,7 @@
 #define LCD_BUFFER_SIZE  (LCD_WIDTH*LCD_HEIGHT*2)
 #define TTB_SIZE         (0x4000)
 /* must be 16Kb (0x4000) aligned */
-#if 0
+#if 1
 #define MEM_END          0x00900000 + (MEM*0x00100000)
 #define TTB_BASE_ADDR    (MEM_END - TTB_SIZE)
 #else
