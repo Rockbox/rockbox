@@ -35,7 +35,7 @@
 #include "screen_access.h"
 #include "appevents.h"
 
-static int statusbar_enabled = VP_SB_ALLSCREENS;
+static int statusbar_enabled = 0;
 
 int viewport_get_nb_lines(struct viewport *vp)
 {
@@ -101,6 +101,7 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 int viewportmanager_set_statusbar(int enabled)
 {
     int old = statusbar_enabled;
+    statusbar_enabled = enabled;
     if (enabled)
     {
         int i;
@@ -115,7 +116,6 @@ int viewportmanager_set_statusbar(int enabled)
     {
         remove_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_draw_statusbars);
     }
-    statusbar_enabled = enabled;
     return old;
 }
 
