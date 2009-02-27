@@ -140,7 +140,7 @@ extern int _wrmdir(const wchar_t*);
 
 #ifdef HAVE_DIRCACHE
 void dircache_remove(const char *name);
-void dircache_rename(const char *oldpath, const char *newpath);
+void dircache_rename(const char *oldname, const char *newname);
 #endif
 
 
@@ -264,11 +264,11 @@ static const char *get_sim_pathname(const char *name)
 
     if(name[0] == '/')
     {
-        snprintf(buffer, sizeof(buffer), "%s%s",
+        snprintf(buffer, sizeof(buffer), "%s%s", 
             sim_root_dir != NULL ? sim_root_dir : SIMULATOR_DEFAULT_ROOT, name);
         return buffer;
     }
-    DEBUGF("warning, filename lacks leading slash: %s\n", name);
+    fprintf(stderr, "WARNING, bad file name lacks slash: %s\n", name);
     return name;
 }
 #else
@@ -308,7 +308,7 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
     strcpy((char *)secret.d_name, OS_TO_UTF8(x11->d_name));
 
     /* build file name */
-    snprintf(buffer, sizeof(buffer), "%s/%s",
+    snprintf(buffer, sizeof(buffer), "%s/%s", 
         get_sim_pathname(dir->name), secret.d_name);
     STAT(buffer, &s); /* get info */
 
@@ -337,62 +337,30 @@ void sim_closedir(MYDIR *dir)
 
 int sim_open(const char *name, int o)
 {
-    char buffer[MAX_PATH]; /* sufficiently big */
     int opts = rockbox2sim(o);
     int ret;
 
     if (num_openfiles >= MAX_OPEN_FILES)
         return -2;
 
-#ifndef __PCTOOL__
-    if(name[0] == '/')
-    {
-        snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
-
-        /* debugf("We open the real file '%s'\n", buffer); */
-        if (num_openfiles < MAX_OPEN_FILES)
-        {
-            ret = OPEN(buffer, opts, 0666);
-            if (ret >= 0) num_openfiles++;
-            return ret;
-        }
-    }
-
-    fprintf(stderr, "WARNING, bad file name lacks slash: %s\n",
-            name);
-    return -1;
-#else
-    ret = OPEN(name, opts, 0666);
+    ret = OPEN(get_sim_pathname(name), opts, 0666);
     if (ret >= 0)
         num_openfiles++;
     return ret;
-#endif
 }
 
 int sim_close(int fd)
 {
     int ret;
     ret = CLOSE(fd);
-    if (ret == 0) num_openfiles--;
+    if (ret == 0)
+        num_openfiles--;
     return ret;
 }
 
 int sim_creat(const char *name)
 {
-#ifndef __PCTOOL__
-    char buffer[MAX_PATH]; /* sufficiently big */
-    if(name[0] == '/')
-    {
-        snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
-
-        /* debugf("We create the real file '%s'\n", buffer); */
-        return OPEN(buffer, O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
-    }
-    fprintf(stderr, "WARNING, bad file name lacks slash: %s\n", name);
-    return -1;
-#else
-    return OPEN(name, O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
-#endif
+    return OPEN(get_sim_pathname(name), O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
 }
 
 ssize_t sim_read(int fd, void *buf, size_t count)
@@ -432,79 +400,28 @@ ssize_t sim_write(int fd, const void *buf, size_t count)
 
 int sim_mkdir(const char *name)
 {
-#ifdef __PCTOOL__
-    return MKDIR(name, 0777);
-#else
-    char buffer[MAX_PATH]; /* sufficiently big */
-
-    snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
-
-    /* debugf("We create the real directory '%s'\n", buffer); */
-    return MKDIR(buffer, 0777);
-#endif
+    return MKDIR(get_sim_pathname(name), 0777);
 }
 
 int sim_rmdir(const char *name)
 {
-#ifdef __PCTOOL__
-    return RMDIR(name);
-#else
-    char buffer[MAX_PATH]; /* sufficiently big */
-    if(name[0] == '/')
-    {
-        snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
-
-        /* debugf("We remove the real directory '%s'\n", buffer); */
-        return RMDIR(buffer);
-    }
-    return RMDIR(name);
-#endif
+    return RMDIR(get_sim_pathname(name));
 }
 
 int sim_remove(const char *name)
 {
-#ifdef __PCTOOL__
-    return REMOVE(name);
-#else
-    char buffer[MAX_PATH]; /* sufficiently big */
-
 #ifdef HAVE_DIRCACHE
     dircache_remove(name);
 #endif
-
-    if(name[0] == '/') {
-        snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
-
-        /* debugf("We remove the real file '%s'\n", buffer); */
-        return REMOVE(buffer);
-    }
-    return REMOVE(name);
-#endif
+    return REMOVE(get_sim_pathname(name));
 }
 
-int sim_rename(const char *oldpath, const char* newpath)
+int sim_rename(const char *oldname, const char *newname)
 {
-#ifdef __PCTOOL__
-    return RENAME(oldpath, newpath);
-#else
-    char buffer1[MAX_PATH];
-    char buffer2[MAX_PATH];
-
 #ifdef HAVE_DIRCACHE
-    dircache_rename(oldpath, newpath);
+    dircache_rename(oldname, newname);
 #endif
-
-    if(oldpath[0] == '/') {
-        snprintf(buffer1, sizeof(buffer1), "%s%s", get_sim_rootdir(),
-                                                   oldpath);
-        snprintf(buffer2, sizeof(buffer2), "%s%s", get_sim_rootdir(),
-                                                   newpath);
-
-        /* debugf("We rename the real file '%s' to '%s'\n", buffer1, buffer2); */
-        return RENAME(buffer1, buffer2);
-    }
-    return -1;
-#endif
+    return RENAME(get_sim_pathname(oldname), get_sim_pathname(newname));
 }
 
 /* rockbox off_t may be different from system off_t */
@@ -588,11 +505,10 @@ int sim_fsync(int fd)
 #include <dlfcn.h>
 #endif
 
-#define TEMP_CODEC_FILE SIMULATOR_DEFAULT_ROOT "/_temp_codec%d.dll"
-
 void *sim_codec_load_ram(char* codecptr, int size, void **pd)
 {
     void *hdr;
+    char name[MAX_PATH];
     char path[MAX_PATH];
     int fd;
     int codec_count;
@@ -608,8 +524,8 @@ void *sim_codec_load_ram(char* codecptr, int size, void **pd)
        to find an unused filename */
     for (codec_count = 0; codec_count < 10; codec_count++)
     {
-        snprintf(path, sizeof(path), TEMP_CODEC_FILE, codec_count);
-
+        snprintf(name, sizeof(name), "/_temp_codec%d.dll", codec_count);
+        snprintf(path, sizeof(path), "%s", get_sim_pathname(name));
         fd = OPEN(path, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRWXU);
         if (fd >= 0)
             break;  /* Created a file ok */
@@ -620,7 +536,8 @@ void *sim_codec_load_ram(char* codecptr, int size, void **pd)
         return NULL;
     }
 
-    if (write(fd, codecptr, size) != size) {
+    if (write(fd, codecptr, size) != size)
+    {
         DEBUGF("write failed");
         return NULL;
     }
@@ -628,7 +545,7 @@ void *sim_codec_load_ram(char* codecptr, int size, void **pd)
 
     /* Now load the library. */
     *pd = dlopen(path, RTLD_NOW);
-    if (*pd == NULL)
+    if (*pd == NULL) 
     {
         DEBUGF("failed to load %s\n", path);
 #ifdef WIN32
@@ -661,7 +578,7 @@ void *sim_plugin_load(char *plugin, void **pd)
     char buf[MAX_PATH];
 #endif
 
-    snprintf(path, sizeof(path), SIMULATOR_DEFAULT_ROOT "%s", plugin);
+    snprintf(path, sizeof(path), "%s", get_sim_pathname(plugin));
 
     *pd = NULL;
 
