@@ -2217,7 +2217,11 @@ gccver=`$CC -dumpversion`;
 
 # figure out the binutil version too and display it, mostly for the build
 # system etc to be able to see it easier
-ldver=`$LD --version | head -n 1 | sed -e 's/[^0-9.]//g'`
+if [ $uname = "Darwin" ]; then
+ ldver=`$LD -v 2>&1 | sed -e 's/[^0-9.-]//g'`
+else
+ ldver=`$LD --version | head -n 1 | sed -e 's/[^0-9.]//g'`
+fi
 
 if [ -z "$gccver" ]; then
   echo "WARNING: The compiler you must use ($CC) is not in your path!"
