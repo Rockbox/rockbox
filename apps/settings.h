@@ -189,11 +189,7 @@ enum {  ALARM_START_WPS = 0,
    This helps to save space for menus and options. */
 
 #define VIRT_SIZE 0xFFFF /* more than enough for our string ID range */
-#ifdef SIMULATOR
-/* a space which is defined in stubs.c */
-extern unsigned char vp_dummy[VIRT_SIZE];
-#define VIRT_PTR vp_dummy
-#elif CONFIG_CPU==DM320
+#if CONFIG_CPU==DM320
 /* the DM320 has IRAM at 0, so we use 0xffff bytes right after that */
 #define VIRT_PTR ((unsigned char*)0x4000)
 #else

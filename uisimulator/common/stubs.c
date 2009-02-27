@@ -351,7 +351,3 @@ void system_reboot(void)
     thread_sdl_exception_wait();
 }
 
-/* assure an unused place to direct virtual pointers to */
-#define VIRT_SIZE 0xFFFF /* more than enough for our string ID range */
-unsigned char vp_dummy[VIRT_SIZE];
-
