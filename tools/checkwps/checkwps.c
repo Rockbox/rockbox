@@ -43,6 +43,8 @@ const int nb_settings = 0;
                                                (((unsigned long)(x) & 0xff0000ul) >> 8) | \
                                                (((unsigned long)(x) & 0xff00ul) << 8) | \
                                                 ((unsigned long)(x) << 24)))
+
+#ifndef letoh16
 unsigned short letoh16(unsigned short x)
 {
     unsigned short n = 0x1234;
@@ -56,7 +58,9 @@ unsigned short letoh16(unsigned short x)
         return SWAP_16(x);
     }
 }
+#endif
 
+#ifndef letoh32
 unsigned short letoh32(unsigned short x)
 {
     unsigned short n = 0x1234;
@@ -70,7 +74,9 @@ unsigned short letoh32(unsigned short x)
         return SWAP_32(x);
     }
 }
+#endif
 
+#ifndef htole32
 unsigned int htole32(unsigned int x)
 {
     unsigned short n = 0x1234;
@@ -84,6 +90,7 @@ unsigned int htole32(unsigned int x)
         return SWAP_32(x);
     }
 }
+#endif
 
 int read_line(int fd, char* buffer, int buffer_size)
 {
