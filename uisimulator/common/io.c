@@ -258,31 +258,31 @@ static ssize_t io_trigger_and_wait(int cmd)
 }
 
 #ifndef __PCTOOL__
-static const char *get_sim_rootdir()
+static const char *get_sim_pathname(const char *name)
 {
-    if (sim_root_dir != NULL)
-        return sim_root_dir;
-    return SIMULATOR_DEFAULT_ROOT;
+    static char buffer[MAX_PATH]; /* sufficiently big */
+
+    if(name[0] == '/')
+    {
+        snprintf(buffer, sizeof(buffer), "%s%s",
+            sim_root_dir != NULL ? sim_root_dir : SIMULATOR_DEFAULT_ROOT, name);
+        return buffer;
+    }
+    DEBUGF("warning, filename lacks leading slash: %s\n", name);
+    return name;
 }
+#else
+#define get_sim_pathname(name) name
 #endif
 
 MYDIR *sim_opendir(const char *name)
 {
     DIR_T *dir;
 
-#ifndef __PCTOOL__
-    char buffer[MAX_PATH]; /* sufficiently big */
+    dir = (DIR_T *) OPENDIR(get_sim_pathname(name));
 
-    if(name[0] == '/')
+    if (dir)
     {
-        snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
-        dir=(DIR_T *)OPENDIR(buffer);
-    }
-    else
-#endif
-        dir=(DIR_T *)OPENDIR(name);
-
-    if(dir) {
         MYDIR *my = (MYDIR *)malloc(sizeof(MYDIR));
         my->dir = dir;
         my->name = (char *)malloc(strlen(name)+1);
@@ -308,12 +308,8 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
     strcpy((char *)secret.d_name, OS_TO_UTF8(x11->d_name));
 
     /* build file name */
-#ifdef __PCTOOL__
-    snprintf(buffer, sizeof(buffer), "%s/%s", dir->name, secret.d_name);
-#else
-    snprintf(buffer, sizeof(buffer), "%s/%s/%s",
-            get_sim_rootdir(), dir->name, secret.d_name);
-#endif
+    snprintf(buffer, sizeof(buffer), "%s/%s",
+        get_sim_pathname(dir->name), secret.d_name);
     STAT(buffer, &s); /* get info */
 
 #define ATTR_DIRECTORY 0x10
@@ -632,7 +628,8 @@ void *sim_codec_load_ram(char* codecptr, int size, void **pd)
 
     /* Now load the library. */
     *pd = dlopen(path, RTLD_NOW);
-    if (*pd == NULL) {
+    if (*pd == NULL)
+    {
         DEBUGF("failed to load %s\n", path);
 #ifdef WIN32
         FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0,
