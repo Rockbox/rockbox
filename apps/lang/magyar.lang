@@ -186,13 +186,13 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_SHUFFLE
-  desc: displayed on screen while shuffling a playlist
+  desc: DEPRECATED
   user:
   <source>
-    *: "Shuffling..."
+    *: ""
   </source>
   <dest>
-    *: "Keverek..."
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -261,13 +261,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200*,c200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Igen"
     h100,h120,h300: "NAVI = Igen"
-    ipod*,x5,m5,gigabeatf,e200*,c200,h10,h10_5gb: "SELECT = Igen"
+    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Igen"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -1157,87 +1157,87 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE
-  desc: in the sound settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Hardware Equalizer"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Hardware Equalizer"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Hardware equalizer"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_ENABLED
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Enable Hardware EQ"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Hardveres EQ bekapcsolása"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Enable hardware equalizer"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_BANDWIDTH
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Sávszélesség"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Szűk"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Széles"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -1429,13 +1429,13 @@
   desc: in settings_menu()
   user:
   <source>
-    *: "Playback"
+    *: "Playback Settings"
   </source>
   <dest>
-    *: "Lejátszás"
+    *: "Lejátszás beállítása"
   </dest>
   <voice>
-    *: "Playback"
+    *: "Playback Settings"
   </voice>
 </phrase>
 <phrase>
@@ -1980,44 +1980,44 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: in playback settings screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "ID3 Tag Priority"
+    *: ""
   </source>
   <dest>
-    *: "ID3 címke verzió"
+    *: ""
   </dest>
   <voice>
-    *: "ID3 tag priority"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "V1 then V2"
+    *: ""
   </source>
   <dest>
-    *: "V1, ha nincs, akkor V2"
+    *: ""
   </dest>
   <voice>
-    *: "Version 1 then version 2"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "V2 then V1"
+    *: ""
   </source>
   <dest>
-    *: "V2, ha nincs, akkor V1"
+    *: ""
   </dest>
   <voice>
-    *: "Version 2 then version 1"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2360,16 +2360,16 @@
   <source>
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
-    x5,m5: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200*,c200: "Building database... %d found (PREV to return)"
+    ipod*: "Building database... %d found (PREV to return)"
+    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Készítem az adatbázist... %d-t találtam (OFF - vissza)"
     h100,h120,h300: "Készítem az adatbázist... %d-t találtam (STOP - vissza)"
-    ipod*: "Készítem az adatbázist... %d-t találtam (PLAY/PAUSE - vissza)"
-    x5,m5: "Készítem az adatbázist... %d-t találtam (BAL - vissza)"
-    h10,h10_5gb,e200*,c200: "Készítem az adatbázist... %d-t találtam (PREV - vissza)"
+    ipod*: "Készítem az adatbázist... %d-t találtam (PREV - vissza)"
+    x5,m5,gigabeat*,mrobe100: "Készítem az adatbázist... %d-t találtam (BAL - vissza)"
+    h10,h10_5gb,e200*,c200,sa9200: "Készítem az adatbázist... %d-t találtam (PREV - vissza)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -2838,7 +2838,7 @@
   user:
   <source>
     *: none
-    lcd_bitmap: "Line Selector"
+    lcd_bitmap: "Line Selector Type"
   </source>
   <dest>
     *: none
@@ -2846,7 +2846,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Line Selector"
+    lcd_bitmap: "Line Selector Type"
   </voice>
 </phrase>
 <phrase>
@@ -3846,11 +3846,11 @@
   user:
   <source>
     *: none
-    gigabeatf: "Button Light Brightness"
+    buttonlight_brightness: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf: "Gomb-világítás erőssége"
+    buttonlight_brightness: "Gomb-világítás erőssége"
   </dest>
   <voice>
     *: none
@@ -4119,13 +4119,13 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Beállít"
     h100,h120,h300: "NAVI = Beállít"
-    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeatf: "SELECT = Beállít"
+    ipod*,x5,m5,h10,h10_5gb,e200*,c200,gigabeat*,mrobe100,sa9200: "SELECT = Beállít"
   </dest>
   <voice>
     *: none
@@ -4140,19 +4140,23 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,c200: "MENU = Revert"
+    ipod*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*: "PREV = Revert"
     gigabeatf: "A = Revert"
+    mrobe100: "DISPLAY = Revert"
+    gigabeats: "BACK = Revert"
   </source>
   <dest>
     *: none
     rtc: "KI = mégsem"
     h100,h120,h300: "STOP = mégsem"
-    ipod*,c200: "MENU = mégsem"
+    ipod*,c200,sa9200: "MENU = mégsem"
     x5,m5: "RECORD = mégsem"
     h10,h10_5gb,e200*: "PREV = mégsem"
-    gigabeatf: "POWER = mégsem"
+    gigabeatf: "A = mégsem"
+    mrobe100: "DISPLAY = mégsem"
+    gigabeats: "VISSZA = mégsem"
   </dest>
   <voice>
     *: none
@@ -4679,11 +4683,15 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
+    h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=OK KI=Mégsem"
     ipod*: "SELECT=OK MENU=Mégsem"
+    h10,h10_5gb: "SELECT=OK PREV=Mégsem"
+    gigabeats: "SELECT=OK POWER=Mégsem"
   </dest>
   <voice>
     *: none
@@ -6386,15 +6394,15 @@
 </phrase>
 <phrase>
   id: LANG_RECORDING_LEFT
-  desc: in the recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Gain Left"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Módosítás bal"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -6403,15 +6411,15 @@
 </phrase>
 <phrase>
   id: LANG_RECORDING_RIGHT
-  desc: in the recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Gain Right"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Módosítás jobb"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -6420,18 +6428,18 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_AGC_PRESET
-  desc: automatic gain control in record settings
+  desc: deprecated
   <source>
     *: none
-    agc: "Automatic Gain Control"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Automatikus módosítás"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Automatic gain control"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -6516,18 +6524,18 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
-  desc: in record settings
+  desc: deprecated
   <source>
     *: none
-    agc: "AGC clip time"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Túlvezérlés küszöbérték"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "AGC clip time"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -6890,11 +6898,13 @@
   user:
   <source>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
+    multivolume: "HD1"
     e200*,c200: "mSD"
     ondio*: "MMC:"
   </dest>
@@ -6906,7 +6916,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user:
   <source>
     *: "Version"
@@ -6934,16 +6944,16 @@
 </phrase>
 <phrase>
   id: LANG_CURRENT_TIME
-  desc: in run time screen
+  desc: deprecated
   user:
   <source>
-    *: "Current Time"
+    *: ""
   </source>
   <dest>
-    *: "Jelenlegi idő"
+    *: ""
   </dest>
   <voice>
-    *: "Current Time"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7371,13 +7381,13 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
     *: "Fájl info"
   </dest>
   <voice>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </voice>
 </phrase>
 <phrase>
@@ -8123,29 +8133,27 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "Save Failed"
+    *: ""
   </source>
   <dest>
-    *: "Mentés nem sikerült"
+    *: ""
   </dest>
   <voice>
-    *: "Save Failed"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "No partition?"
-    player: "Partition?"
+    *: ""
   </source>
   <dest>
-    *: "Nincs partíció?"
-    player: "Partíció?"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -8271,7 +8279,7 @@
     recording: "A merevlemez tele van. Folytatáshoz nyomj OFF-ot."
     h100,h120,h300: "A merevlemez tele van. Folytatáshoz nyomj STOP-ot."
     m5,x5: "A merevlemez tele van. Folytatáshoz nyomd meg a POWER gombot."
-    e200*,c200: "A merevlemez tele van. Folytatáshoz nyomd meg az PREV gombot."
+    e200*,c200: "A merevlemez tele van. Folytatáshoz nyomd meg a PREV gombot."
   </dest>
   <voice>
     *: none
@@ -8367,6 +8375,8 @@
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
     h10,h10_5gb,e200*,c200: "PREV to abort"
+    gigabeats: "BACK to abort"
+    gigabeatf: "POWER to abort"
   </source>
   <dest>
     *: "OFF - megszakít"
@@ -8374,6 +8384,8 @@
     ipod*: "PLAY/PAUSE - megszakít"
     x5,m5: "PLAY hosszan - megszakít"
     h10,h10_5gb,e200*,c200: "PREV - megszakít"
+    gigabeats: "VISSZA - megszakít"
+    gigabeatf: "POWER - megszakít"
   </dest>
   <voice>
     *: ""
@@ -8549,15 +8561,15 @@
 </phrase>
 <phrase>
   id: LANG_RESTARTING_PLAYBACK
-  desc: splash screen displayed when pcm buffer size is changed
+  desc: deprecated
   user:
   <source>
     *: none
-    swcodec: "Restarting playback..."
+    swcodec: ""
   </source>
   <dest>
     *: none
-    swcodec: "Lejátszás újrakezdése..."
+    swcodec: ""
   </dest>
   <voice>
     *: none
@@ -10022,70 +10034,70 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_YES
-  desc: bool true representation
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Yes"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Igen"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Yes"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_NO
-  desc: bool false representation
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "No"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Nem"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "No"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ON
-  desc: Used in a lot of places
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "On"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Be"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "On"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_OFF
-  desc: Used in a lot of places
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Off"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Ki"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Off"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -10094,11 +10106,11 @@
   user:
   <source>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "Edit mode: %s %s"
   </source>
   <dest>
     *: none
-    swcodec: "Szerkesztés: %s"
+    swcodec: "Szerkesztés: %s %s"
   </dest>
   <voice>
     *: none
@@ -10111,7 +10123,7 @@
   user:
   <source>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Cutoff"
   </source>
   <dest>
     *: none
@@ -10119,7 +10131,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Cutoff"
   </voice>
 </phrase>
 <phrase>
@@ -10141,202 +10153,202 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SHUFFLE
-  desc: in settings_menu
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Shuffle"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Véletlen sorrend"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Shuffle"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT
-  desc: in settings_menu
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Repeat"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Ismétlés"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_repeat: "Repeat"
+    lcd_repeat: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ALL
-  desc: repeat playlist once all songs have completed
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "All"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Mindent"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "All"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_ONE
-  desc: repeat one song
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "One"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Egy"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "One"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_AB
-  desc: repeat range from point A to B
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "A-B"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "A-B"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "A-B"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER
-  desc: setting name for dir filter
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Show Files"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Megjelenítendő fájlok"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Show Files"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_SUPPORTED
-  desc: show all file types supported by Rockbox
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Supported"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Támogatott fájlok"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Supported"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_MUSIC
-  desc: show only music-related files
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Music"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Zenei fájlok"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Music"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_PLAYLIST
-  desc: show only playlist
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Playlists"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Lejátszólisták"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Playlists"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FLIP_DISPLAY
-  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Upside Down"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Fejjel lefelé"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Upside Down"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SCROLL_BAR
-  desc: display menu, F3 substitute
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Scroll Bar"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Gördítő sáv"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll Bar"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_STATUS_BAR
-  desc: display menu, F3 substitute
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Status Bar"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Állapotjelző"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
@@ -10413,19 +10425,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_DISK_FULL
-  desc: in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    h100,h120,h300: "The disk is full. Press STOP to continue."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: "The disk is full. Press LEFT to continue."
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "A merevlemez tele van. Folytatáshoz nyomj OFF-ot."
-    h100,h120,h300: "A merevlemez tele van. Folytatáshoz nyomj STOP-ot."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200*,c200: "A merevlemez tele van. Folytatáshoz nyomd meg a BAL gombot."
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10434,19 +10442,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_VOLUME
-  desc: in sound_settings
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Volume"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Hangerő"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Volume"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -10621,15 +10629,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_TIME
-  desc: Display of recorded time
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Time:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Idő:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10638,15 +10646,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_TIMESPLIT_REC
-  desc: Display of record timer interval setting, on the record screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Split Time:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Új fájl ennyi idő után:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10655,15 +10663,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_SIZE
-  desc: Display of recorded file size
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Size:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Méret:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10672,15 +10680,15 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_PRERECORD
-  desc: in recording and radio screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Pre-Recording"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Előfelvétel"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10723,31 +10731,31 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
-  desc: in record timesplit options
+  desc: deprecated
   <source>
     *: none
-    recording: "Split Filesize"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Darabok mérete"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Split Filesize"
+    recording: "ze"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_FILENAME
-  desc: Filename header in recording screen
+  desc: deprecated
   user:
   <source>
     *: none
-    recording: "Filename:"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Fájlnév:"
+    recording: ""
   </dest>
   <voice>
     *: none
@@ -10756,114 +10764,114 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
-  desc: automatic gain control in recording screen
+  desc: deprecated
   <source>
     *: none
-    agc: "AGC"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "AGC"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "AGC"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
-  desc: AGC preset
+  desc: deprecated
   <source>
     *: none
-    agc: "Safety (clip)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Biztonság (levágás)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Safety (clip)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
-  desc: AGC preset
+  desc: deprecated
   <source>
     *: none
-    agc: "Live (slow)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Élő (lassú)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Live (slow)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
-  desc: AGC preset
+  desc: deprecated
   <source>
     *: none
-    agc: "DJ-Set (slow)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "DJ berendezés (lassú)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "DJ set (slow)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
-  desc: AGC preset
+  desc: deprecated
   <source>
     *: none
-    agc: "Medium"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Közepes"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Medium"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
-  desc: AGC preset
+  desc: deprecated
   <source>
     *: none
-    agc: "Voice (fast)"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "Hang (gyors)"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "Voice (fast)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
-  desc: AGC maximum gain in recording screen
+  desc: deprecated
   <source>
     *: none
-    agc: "AGC max. gain"
+    agc: ""
   </source>
   <dest>
     *: none
-    agc: "AGC max. gain"
+    agc: ""
   </dest>
   <voice>
     *: none
-    agc: "AGC maximum gain"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -11177,5 +11185,1066 @@
   <voice>
     *: none
     usbstack: "Device Driver"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILETYPE
+  desc: voice settings menu
+  user:
+  <source>
+    *: "Say File Type"
+  </source>
+  <dest>
+    *: "Fájl típus bemondása"
+  </dest>
+  <voice>
+    *: "Say File Type"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_PRESENT
+  desc: when external memory is not present
+  user:
+  <source>
+    *: none
+    multivolume: "Not present"
+  </source>
+  <dest>
+    *: none
+    multivolume: "Nem található"
+  </dest>
+  <voice>
+    *: none
+    multivolume: "Not present"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SIZE
+  desc: Display of recorded file size
+  user:
+  <source>
+    *: none
+    recording: "Size:"
+  </source>
+  <dest>
+    *: none
+    recording: "Méret:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS_CUTOFF
+  desc: Bass setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Alsó határfrekvencia"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  user:
+  <source>
+    *: none
+    agc: "AGC max. gain"
+  </source>
+  <dest>
+    *: none
+    agc: "Maximális erősítés"
+  </dest>
+  <voice>
+    *: none
+    agc: "AGC maximum gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_START_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Primary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Fő szín"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Primary Colour"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLANK
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Blank"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_STUDY_MODE
+  desc: DEPRECATED
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMART
+  desc: Display the expected AA size
+  user:
+  <source>
+    *: none
+    albumart: "Album Art:"
+  </source>
+  <dest>
+    *: none
+    albumart: "Lemezborító:"
+  </dest>
+  <voice>
+    *: none
+    albumart: "Album Art:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFTRIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Monó bal + jobb"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Mono Left plus Right"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHPAD_SENSITIVITY
+  desc: touchpad sensitivity setting
+  user:
+  <source>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Érintőpad érzékenysége"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_BATTERY_LEVEL
+  desc: Setting for spontaneous battery level announcement
+  user:
+  <source>
+    *: "Announce Battery Level"
+  </source>
+  <dest>
+    *: "Akku töltöttségének bemondása"
+  </dest>
+  <voice>
+    *: "Announce Battery Level"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_COLOR_MENU
+  desc: line selector color menu title
+  user:
+  <source>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Sorkiemelés színe"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FAST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Fast"
+  </source>
+  <dest>
+    *: "Gyors"
+  </dest>
+  <voice>
+    *: "Fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "Soros port szélessége"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "Serial Bitrate"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EMPTY_LIST
+  desc: spoken only, when a list dialog contains no elements
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Empty list"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_LENGTH
+  desc: playback settings menu
+  user:
+  <source>
+    *: "Skip Length"
+  </source>
+  <dest>
+    *: "Ugrás egysége"
+  </dest>
+  <voice>
+    *: "Skip Length"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Left Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Beállítás gyorsmenü baloldali elemének"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Set as Left Quickscreen Item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_SETTING
+  desc: used in the settings context menu
+  user:
+  <source>
+    *: "Reset Setting"
+  </source>
+  <dest>
+    *: "Beállítások törlése"
+  </dest>
+  <voice>
+    *: "Reset Setting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_SLASH
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "slash"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_RANDOM
+  desc: "<Random>" entry in tag browser
+  user:
+  <source>
+    *: "<Random>"
+  </source>
+  <dest>
+    *: "<Véletlenszerűen>"
+  </dest>
+  <voice>
+    *: "Random"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Bottom Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Beállítás gyorsmenü alsó elemének"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Set as Bottom Quickscreen Item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_TEXT_COLOR
+  desc: line selector text color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Text Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Szöveg színe"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Text Colour"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_THEME_MENU
+  desc: in the settings menu
+  user:
+  <source>
+    *: "Theme Settings"
+  </source>
+  <dest>
+    *: "Téma beállítások"
+  </dest>
+  <voice>
+    *: "Theme Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACCESSORY_SUPPLY
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    accessory_supply: "Accessory Power Supply"
+  </source>
+  <dest>
+    *: none
+    accessory_supply: "Accessory Power Supply"
+  </dest>
+  <voice>
+    *: none
+    accessory_supply: "Accessory Power Supply"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QS_ITEMS
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING_AND_SHUTDOWN
+  desc: in record timesplit options
+  user:
+  <source>
+    *: none
+    recording: "Stop Recording And Shutdown"
+  </source>
+  <dest>
+    *: none
+    recording: "Felvétel leállítása és kikapcsolás"
+  </dest>
+  <voice>
+    *: none
+    recording: "Stop Recording And Shutdown"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_TIMESPLIT_REC
+  desc: Display of record timer interval setting, on the record screen
+  user:
+  <source>
+    *: none
+    recording: "Split Time:"
+  </source>
+  <dest>
+    *: none
+    recording: "Új fájl ennyi idő után:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user:
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "Hangbeállítások mentése"
+  </dest>
+  <voice>
+    *: "Save Sound Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PM_CLIPCOUNT
+  desc: deprecated
+  user:
+  <source>
+    *: none
+    recording: ""
+  </source>
+  <dest>
+    *: none
+    recording: ""
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EDIT
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Edit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_MODE
+  desc: DEPRECATED
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user:
+  <source>
+    *: none
+    quickscreen: "Set as Right Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Beállítás gyorsmenü jobboldali elemének"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Set as Right Quickscreen Item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_HOP_STEP
+  desc: DEPRECATED
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_SLOW
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Very slow"
+  </source>
+  <dest>
+    *: "Nagyon lassú"
+  </dest>
+  <voice>
+    *: "Very slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK
+  desc: in keyclick settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Keyclick"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Billentyűhangok"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Keyclick"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "57600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN_RIGHT
+  desc: in the recording screen
+  user:
+  <source>
+    *: none
+    recording: "Gain R"
+  </source>
+  <dest>
+    *: none
+    recording: "Jobb csatorna módosítás"
+  </dest>
+  <voice>
+    *: none
+    recording: "Gain Right"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user:
+  <source>
+    *: none
+    recording: "Filename:"
+  </source>
+  <dest>
+    *: none
+    recording: "Fájlnév:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLOW
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Lassú"
+  </dest>
+  <voice>
+    *: "Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user:
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Köszönetnyilvánítás"
+  </dest>
+  <voice>
+    *: "Credits"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_GRADIENT
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Sor (halványodó)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN_LEFT
+  desc: in the recording screen
+  user:
+  <source>
+    *: none
+    recording: "Gain L"
+  </source>
+  <dest>
+    *: none
+    recording: "Bal csatorna módosítás"
+  </dest>
+  <voice>
+    *: none
+    recording: "Gain Left"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUICKSCREEN
+  desc: spoken only, Announces entering the "quick screen"
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Quick screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_FAST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Very fast"
+  </source>
+  <dest>
+    *: "Nagyon gyors"
+  </dest>
+  <voice>
+    *: "Very fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_COLOR
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Sor (egyszínű)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLORS_MENU
+  desc: colours menu under theme settings
+  user:
+  <source>
+    *: none
+    lcd_color: "Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Színek"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Colours"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user:
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "Keresés eredménye"
+  </dest>
+  <voice>
+    *: "Search Results"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_STUDY_MODE
+  desc: DEPRECATED
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_PRESET
+  desc: automatic gain control in record settings and screen
+  user:
+  <source>
+    *: none
+    agc: "AGC"
+  </source>
+  <dest>
+    *: none
+    agc: "AGC"
+  </dest>
+  <voice>
+    *: none
+    agc: "Automatic gain control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Secondary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Második szín"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Secondary Colour"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE_CUTOFF
+  desc: Treble setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Magas határfrekvencia"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MONO_MODE
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Mono mode"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Monó mód"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Mono mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "Közép-európai (CP1250)"
+  </dest>
+  <voice>
+    *: "Central European"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN
+  desc: generic string for unknown states, such as an unset clock
+  user:
+  <source>
+    *: "Unknown"
+  </source>
+  <dest>
+    *: "Ismeretlen"
+  </dest>
+  <voice>
+    *: "Unknown"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_CLIPTIME
+  desc: in record settings
+  user:
+  <source>
+    *: none
+    agc: "AGC clip time"
+  </source>
+  <dest>
+    *: none
+    agc: "Túlvezérlés küszöbértéke"
+  </dest>
+  <voice>
+    *: none
+    agc: "AGC clip time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_TRACK
+  desc: skip length setting entry 0
+  user:
+  <source>
+    *: "Skip Track"
+  </source>
+  <dest>
+    *: "Kihagyja a számot"
+  </dest>
+  <voice>
+    *: "Skip Track"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OK
+  desc: spoken only, On exiting a context, specifically the quick screen
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_REPEATS
+  desc: in keyclick settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Keyclick Repeats"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Billentyűhang ismétlés"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Keyclick Repeats"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIGH
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    gigabeatf: "High"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Magas"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "High"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "Automatikus"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "Automatic"
   </voice>
 </phrase>

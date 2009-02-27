@@ -6960,7 +6960,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user:
   <source>
     *: "Version"
@@ -12183,5 +12183,121 @@
   <voice>
     *: none
     quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "Серијски битски проток"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "Серијски битски проток"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "57600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user:
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Заслуге"
+  </dest>
+  <voice>
+    *: "Заслуге"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "Ауто"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "Аутоматски"
   </voice>
 </phrase>

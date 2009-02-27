@@ -6329,7 +6329,7 @@
   </dest>
   <voice>
     *: none
-    recording: "New file"
+    recording: "Novea fitchî"
   </voice>
 </phrase>
 <phrase>
@@ -8325,10 +8325,10 @@
   </source>
   <dest>
     *: none
-    recording: "Li plake est pline. Tchôkîz OFF et tcheryî pus lon."
-    h100,h120,h300: "Li plake est pline. Tchôkîz STOP et tcheryî pus lon."
-    m5,x5: "Li plake est pline. Tchôkîz POWER et tcheryî pus lon."
-    e200*,c200: "Li plake est pline. Tchôkîz PREV et tcheryî pus lon."
+    recording: "Li plake est plinne. Tchôkîz OFF et tcheryî pus lon."
+    h100,h120,h300: "Li plake est plinne. Tchôkîz STOP et tcheryî pus lon."
+    m5,x5: "Li plake est plinne. Tchôkîz POWER et tcheryî pus lon."
+    e200*,c200: "Li plake est plinne. Tchôkîz PREV et tcheryî pus lon."
   </dest>
   <voice>
     *: none
@@ -12283,9 +12283,9 @@
     *: "Credits"
   </source>
   <dest>
-    *: "Credits"
+    *: "Kiminålté"
   </dest>
   <voice>
-    *: "Credits"
+    *: "Kiminålté"
   </voice>
 </phrase>

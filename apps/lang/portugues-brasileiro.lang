@@ -6964,13 +6964,13 @@
   desc: start the credits.rock plugin which shows who made Rockbox
   user:
   <source>
-    *: "Credits"
+    *: "Version"
   </source>
   <dest>
-    *: "Créditos"
+    *: "Versão"
   </dest>
   <voice>
-    *: "Créditos"
+    *: "Versão"
   </voice>
 </phrase>
 <phrase>
@@ -8312,7 +8312,7 @@
   desc: in recording screen
   user:
   <source>
-     *: none
+    *: none
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
@@ -10928,6 +10928,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_DICTIONARIES
+  desc: in the main menu
+  user:
+  <source>
+    *: "Dictionaries"
+  </source>
+  <dest>
+    *: "Dicionários"
+  </dest>
+  <voice>
+    *: "Dicionários"
+  </voice>
+</phrase>
+<phrase>
   id: VOICE_OF
   desc: spoken only, as in 3/8 => 3 of 8
   user:
@@ -12268,5 +12282,19 @@
   <voice>
     *: none
     quickscreen: "Definir como Botão de Tela Rápida"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user:
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Créditos"
+  </dest>
+  <voice>
+    *: "Créditos"
   </voice>
 </phrase>

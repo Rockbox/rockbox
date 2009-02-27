@@ -883,7 +883,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user:
   <source>
     *: "Version"
@@ -3996,14 +3996,14 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Disken er fuld. Tryk SLUK for at fortsætte."
     h100,h120,h300: "Disken er fuld. Tryk STOP for at fortsætte."
     m5,x5: "Disken er fuld. Tryk TÆND/SLUK for at fortsætte."
-    e200*,c200: "Disken er fuld. Tryk OP for at fortsætte."
+    e200*,c200: "Disken er fuld. Tryk FORRIGE for at fortsætte."
   </dest>
   <voice>
     *: none
@@ -12207,5 +12207,121 @@
   <voice>
     *: none
     quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "Seriel Bitrate"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "Seriel Bitrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "57600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user:
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Bidragsydere"
+  </dest>
+  <voice>
+    *: "Bidragsydere"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "Automatisk"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "Automatisk"
   </voice>
 </phrase>
