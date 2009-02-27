@@ -89,29 +89,29 @@ my $voiceout = $o;
 my $check = ($binary?1:0) + ($prefix?1:0) + ($update?1:0) + ($voiceout?1:0) + ($sortfile?1:0);
 
 if($check > 1) {
-    print "Please use only one of -p, -u, -o, -b and -s\n";
+    print STDERR "Please use only one of -p, -u, -o, -b and -s\n";
     exit;
 }
 if(!$check) {
-    print "Please use at least one of -p, -u, -o, -b and -s\n";
+    print STDERR "Please use at least one of -p, -u, -o, -b and -s\n";
     exit;
 }
 
 
 if(($binary || $update || $voiceout || $sortfile) && !$english) {
-    print "Please use -e too when you use -b, -o, -u or -s\n";
+    print STDERR "Please use -e too when you use -b, -o, -u or -s\n";
     exit;
 }
 
 my $target_id = $i;
 if($binary && !$target_id) {
-    print "Please specify a target id number (with -i)!\n";
+    print STDERR "Please specify a target id number (with -i)!\n";
     exit;
 }
 
 my $target = $t;
 if(!$target && !$update && !$sortfile) {
-    print "Please specify a target (with -t)!\n";
+    print STDERR "Please specify a target (with -t)!\n";
     exit;
 }
 my $verbose=$v;
