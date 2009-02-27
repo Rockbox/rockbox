@@ -22,7 +22,7 @@
 #include "config.h"
 #include "codeclib.h"
 
-struct codec_api *ci __attribute__ ((section (".data")));
+struct codec_api *ci DATA_ATTR;
 
 extern unsigned char iramcopy[];
 extern unsigned char iramstart[];

@@ -624,6 +624,7 @@
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))
 #define IDATA_ATTR      __attribute__ ((section(".idata")))
 #define IBSS_ATTR       __attribute__ ((section(".ibss")))
+#define DATA_ATTR       __attribute__ ((section(".data")))
 #define USE_IRAM
 #if CONFIG_CPU != SH7034
 #define PLUGIN_USE_IRAM
@@ -641,6 +642,7 @@
 #define ICONST_ATTR
 #define IDATA_ATTR
 #define IBSS_ATTR
+#define DATA_ATTR
 #define STATICIRAM static
 #endif
 
