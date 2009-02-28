@@ -1730,7 +1730,7 @@ static bool audio_load_track(size_t offset, bool start_play)
     {
         tracks[track_widx].id3_hid = bufopen(trackname, 0, TYPE_ID3);
 
-        if (tracks[track_widx].id3_hid == ERR_BUFFER_FULL)
+        if (tracks[track_widx].id3_hid < 0)
         {
             /* Buffer is full. */
             get_metadata(&lasttrack_id3, fd, trackname);
@@ -1738,13 +1738,6 @@ static bool audio_load_track(size_t offset, bool start_play)
             close(fd);
             logf("buffer is full for now");
             filling = STATE_FULL;
-            return false;
-        }
-        else if (tracks[track_widx].id3_hid < 0)
-        {
-            last_peek_offset--;
-            close(fd);
-            logf("Could not add metadata handle");
             return false;
         }
 
