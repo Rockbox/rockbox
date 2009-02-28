@@ -115,9 +115,6 @@
 #if defined(HAVE_USBSTACK)
 #include "usb_core.h"
 #endif
-#ifdef USB_STORAGE
-#include "usbstack/usb_storage.h"
-#endif
 
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
@@ -2580,15 +2577,6 @@ static bool logf_usb_serial(void)
     usb_core_enable_driver(USB_DRIVER_SERIAL,serial_enabled);
     splashf(HZ, "USB logf %s",
                  serial_enabled?"enabled":"disabled");
-    return false;
-}
-#endif
-
-#if 0 && defined(HAVE_USBSTACK) && defined(USB_STORAGE)
-static bool usb_reconnect(void)
-{
-    splash(HZ, "Reconnect mass storage");
-    usb_storage_reconnect();
     return false;
 }
 #endif

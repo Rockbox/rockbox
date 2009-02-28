@@ -361,14 +361,9 @@ static void usb_thread(void)
                     break;
                 }
 
-                exclusive_storage_access = false;
 #endif /* HAVE_USBSTACK */
+                num_acks_to_expect = usb_release_exclusive_storage();
 
-                /* Tell all threads that we are back in business */
-                num_acks_to_expect =
-                    queue_broadcast(SYS_USB_DISCONNECTED, 0) - 1;
-                DEBUGF("USB extracted. Waiting for ack from %d threads...\n",
-                       num_acks_to_expect);
                 break;
 
             case SYS_USB_DISCONNECTED_ACK:
@@ -656,6 +651,20 @@ bool usb_exclusive_storage(void)
     return exclusive_storage_access;
 }
 #endif
+
+int usb_release_exclusive_storage(void)
+{
+    int num_acks_to_expect;
+#ifdef HAVE_USBSTACK
+    exclusive_storage_access = false;
+#endif /* HAVE_USBSTACK */
+    /* Tell all threads that we are back in business */
+    num_acks_to_expect =
+        queue_broadcast(SYS_USB_DISCONNECTED, 0) - 1;
+    DEBUGF("USB extracted. Waiting for ack from %d threads...\n",
+           num_acks_to_expect);
+    return num_acks_to_expect;
+}
 
 #ifdef HAVE_USB_POWER
 bool usb_powered(void)

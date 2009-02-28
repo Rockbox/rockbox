@@ -302,7 +302,6 @@ static bool check_disk_present(IF_MV_NONVOID(int volume))
 #endif
 }
 
-#if 0
 static void try_release_ata(void)
 {
     /* Check if there is a connected drive left. If not, 
@@ -317,10 +316,9 @@ static void try_release_ata(void)
     }
     if(canrelease) {
         logf("scsi release ata");
-        usb_release_exclusive_ata();
+        usb_release_exclusive_storage();
     }
 }
-#endif
 
 #ifdef HAVE_HOTSWAP
 void usb_storage_notify_hotswap(int volume,bool inserted)
@@ -331,28 +329,14 @@ void usb_storage_notify_hotswap(int volume,bool inserted)
     }
     else {
         ejected[volume] = true;
+        try_release_ata();
     }
 }
 #endif
 
-void usb_storage_reconnect(void)
-{
-    int i;
-    if(usb_core_driver_enabled(USB_DRIVER_MASS_STORAGE)
-       && usb_inserted()) {
-        for(i=0;i<NUM_VOLUMES;i++)
-            ejected[i] = !check_disk_present(IF_MV(i));
-        logf("%s", __func__);
-    }
-}
-
 /* called by usb_core_init() */
 void usb_storage_init(void)
 {
-    int i;
-    for(i=0;i<NUM_VOLUMES;i++) {
-        ejected[i] = !check_disk_present(IF_MV(i));
-    }
     logf("usb_storage_init done");
 }
 
@@ -431,10 +415,10 @@ void usb_storage_init_connection(void)
 #endif
     usb_drv_recv(ep_out, tb.transfer_buffer, 1024);
 
-    int lun;
-    for(lun=0;lun<NUM_VOLUMES;lun++)
-    {
-        queue_broadcast(SYS_USB_LUN_LOCKED, (lun<<16)+0);
+    int i;
+    for(i=0;i<NUM_VOLUMES;i++) {
+        ejected[i] = !check_disk_present(IF_MV(i));
+        queue_broadcast(SYS_USB_LUN_LOCKED, (i<<16)+0);
     }
 }
 
@@ -691,6 +675,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 #ifdef HAVE_HOTSWAP
     if(storage_removable(lun) && !storage_present(lun)) {
         ejected[lun] = true;
+        try_release_ata();
     }
 #endif
 
@@ -893,6 +878,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                     {
                         logf("scsi eject");
                         ejected[lun]=true;
+                        try_release_ata();
                     }
                 }
             }

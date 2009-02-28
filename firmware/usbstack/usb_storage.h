@@ -35,7 +35,5 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req);
 void usb_storage_notify_hotswap(int volume,bool inserted);
 #endif
 
-void usb_storage_reconnect(void);
-
 #endif
 

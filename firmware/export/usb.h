@@ -132,6 +132,7 @@ void usb_signal_transfer_completion(struct usb_transfer_completion_event_data* e
 bool usb_driver_enabled(int driver);
 bool usb_exclusive_storage(void); /* storage is available for usb */
 #endif
+int usb_release_exclusive_storage(void);
 
 #ifdef USB_FIREWIRE_HANDLING
 bool firewire_detect(void);
