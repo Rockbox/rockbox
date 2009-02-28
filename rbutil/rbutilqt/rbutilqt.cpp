@@ -509,8 +509,8 @@ void RbUtilQt::installBtn()
 bool RbUtilQt::installAuto()
 {
     QString file = QString("%1/%2/rockbox-%3-%4.zip")
-            .arg(settings->releaseUrl(), versmap.value(settings->curPlatform()),
-               settings->curPlatform(), versmap.value(settings->curPlatform()));
+            .arg(settings->releaseUrl(), versmap.value("rel_rev"),
+               settings->curPlatform(), versmap.value("rel_rev"));
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
     buildInfo.close();
