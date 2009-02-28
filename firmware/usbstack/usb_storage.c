@@ -966,6 +966,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 cbw->command_block[8]);
 
             //logf("scsi read %d %d", cur_cmd.sector, cur_cmd.count);
+            queue_broadcast(SYS_USB_READ_DATA, (lun<<16)+cur_cmd.count);
 
             if((cur_cmd.sector + cur_cmd.count) > block_count) {
                 send_csw(UMS_STATUS_FAIL);
@@ -1015,6 +1016,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             cur_cmd.count = block_size_mult *
                (cbw->command_block[7] << 8 |
                 cbw->command_block[8]);
+
+            queue_broadcast(SYS_USB_WRITE_DATA, (lun<<16)+cur_cmd.count);
             /* expect data */
             if((cur_cmd.sector + cur_cmd.count) > block_count) {
                 send_csw(UMS_STATUS_FAIL);
