@@ -268,7 +268,7 @@ void Install::setDetailsArchived(bool show)
 
 
 
-void Install::setVersionStrings(QMap<QString, QString> ver)
+void Install::setVersionStrings(QMap<QString, QString>& ver)
 {
     version = ver;
     // version strings map is as following:

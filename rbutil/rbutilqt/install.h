@@ -34,7 +34,7 @@ class Install : public QDialog
     Q_OBJECT
     public:
         Install(RbSettings* sett,QWidget *parent = 0);
-        void setVersionStrings(QMap<QString, QString>);
+        void setVersionStrings(QMap<QString, QString>&);
 
     public slots:
         void accept(void);
