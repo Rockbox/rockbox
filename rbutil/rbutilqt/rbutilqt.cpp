@@ -462,8 +462,10 @@ bool RbUtilQt::smallInstallInner()
         m_error = false;
         m_installed = false;
         m_auto = true;
-        if(!installBootloaderAuto())
+        if(!installBootloaderAuto()) {
+            logger->abort();
             return true;
+        }
         else
         {
             // wait for boot loader installation finished
@@ -665,6 +667,7 @@ void RbUtilQt::installBootloader()
                 if(m_auto) {
                     // keep logger open for auto installs.
                     // don't consider abort as error in auto-mode.
+                    logger->addItem(tr("Bootloader installation skipped"), LOGINFO);
                     installBootloaderPost(false);
                 }
                 else {
@@ -714,7 +717,10 @@ void RbUtilQt::installBootloader()
                "file."),
                QMessageBox::Ok | QMessageBox::Abort);
         if(ret != QMessageBox::Ok) {
+            // consider aborting an error to close window / abort automatic
+            // installation.
             m_error = true;
+            logger->addItem(tr("Bootloader installation aborted"), LOGINFO);
             return;
         }
         // open dialog to browse to hex file
