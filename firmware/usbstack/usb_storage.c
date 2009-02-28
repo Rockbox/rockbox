@@ -235,6 +235,8 @@ static union {
 static struct {
     unsigned int sector;
     unsigned int count;
+    unsigned int orig_count;
+    unsigned int cur_cmd;
     unsigned int tag;
     unsigned int lun;
     unsigned char *data[2];
@@ -519,6 +521,14 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             }
             //logf("csw sent, now go back to idle");
             state = WAITING_FOR_COMMAND;
+            if(cur_cmd.cur_cmd == SCSI_WRITE_10)
+            {
+                queue_broadcast(SYS_USB_WRITE_DATA, (cur_cmd.lun<<16)+cur_cmd.orig_count);
+            }
+            else if(cur_cmd.cur_cmd == SCSI_READ_10)
+            {
+                queue_broadcast(SYS_USB_READ_DATA, (cur_cmd.lun<<16)+cur_cmd.orig_count);
+            }
             usb_drv_recv(ep_out, tb.transfer_buffer, 1024);
             break;
         case SENDING_RESULT:
@@ -688,6 +698,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
     cur_cmd.tag = cbw->tag;
     cur_cmd.lun = lun;
+    cur_cmd.cur_cmd = cbw->command_block[0];
 
     switch (cbw->command_block[0]) {
         case SCSI_TEST_UNIT_READY:
@@ -964,9 +975,9 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             cur_cmd.count = block_size_mult *
                (cbw->command_block[7] << 8 |
                 cbw->command_block[8]);
+            cur_cmd.orig_count = cur_cmd.count;
 
             //logf("scsi read %d %d", cur_cmd.sector, cur_cmd.count);
-            queue_broadcast(SYS_USB_READ_DATA, (lun<<16)+cur_cmd.count);
 
             if((cur_cmd.sector + cur_cmd.count) > block_count) {
                 send_csw(UMS_STATUS_FAIL);
@@ -1016,8 +1027,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             cur_cmd.count = block_size_mult *
                (cbw->command_block[7] << 8 |
                 cbw->command_block[8]);
+            cur_cmd.orig_count = cur_cmd.count;
 
-            queue_broadcast(SYS_USB_WRITE_DATA, (lun<<16)+cur_cmd.count);
             /* expect data */
             if((cur_cmd.sector + cur_cmd.count) > block_count) {
                 send_csw(UMS_STATUS_FAIL);
