@@ -346,7 +346,7 @@ void usb_storage_reconnect(void)
     }
 }
 
-/* called by usb_code_init() */
+/* called by usb_core_init() */
 void usb_storage_init(void)
 {
     int i;
@@ -430,6 +430,12 @@ void usb_storage_init_connection(void)
 #endif
 #endif
     usb_drv_recv(ep_out, tb.transfer_buffer, 1024);
+
+    int lun;
+    for(lun=0;lun<NUM_VOLUMES;lun++)
+    {
+        queue_broadcast(SYS_USB_LUN_LOCKED, (lun<<16)+0);
+    }
 }
 
 void usb_storage_disconnect(void)
@@ -895,7 +901,14 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
         case SCSI_ALLOW_MEDIUM_REMOVAL:
             logf("scsi allow_medium_removal %d",lun);
-            /* TODO: use this to show the connect screen ? */
+            if((cbw->command_block[4] & 0x03) == 0) 
+            {
+                queue_broadcast(SYS_USB_LUN_LOCKED, (lun<<16)+0);
+            }
+            else
+            {
+                queue_broadcast(SYS_USB_LUN_LOCKED, (lun<<16)+1);
+            }
             send_csw(UMS_STATUS_GOOD);
             break;
         case SCSI_READ_FORMAT_CAPACITY: {
