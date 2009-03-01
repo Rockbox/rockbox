@@ -12359,3 +12359,45 @@
     *: "Credits"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user:
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Interpret numbers when sorting"
+  </dest>
+  <voice>
+    *: "Interpret numbers when sorting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user:
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "As digits"
+  </dest>
+  <voice>
+    *: "As digits"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user:
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "As whole numbers"
+  </dest>
+  <voice>
+    *: "As whole numbers"
+  </voice>
+</phrase>

@@ -147,6 +147,7 @@ enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, SHOW_ID3DB,
 /* file and dir sort options */
 enum { SORT_ALPHA, SORT_DATE, SORT_DATE_REVERSED, SORT_TYPE, /* available as settings */
        SORT_ALPHA_REVERSED, SORT_TYPE_REVERSED };            /* internal use only */
+enum { SORT_INTERPRET_AS_DIGIT, SORT_INTERPRET_AS_NUMBER };
 
 /* recursive dir insert options */
 enum { RECURSE_OFF, RECURSE_ON, RECURSE_ASK };
@@ -612,8 +613,9 @@ struct user_settings
 
     /* file browser sorting */
     bool sort_case; /* dir sort order: 0=case insensitive, 1=sensitive */
-    int sort_file;  /* 0=alpha, 1=date, 2=date (new first), 3=type */
     int sort_dir;   /* 0=alpha, 1=date (old first), 2=date (new first) */
+    int sort_file;  /* 0=alpha, 1=date, 2=date (new first), 3=type */
+    int interpret_numbers; /* true=strnatcmp, false=strcmp */
 
     /* power settings */
     int poweroff;   /* idle power off timer */

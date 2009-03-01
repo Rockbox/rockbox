@@ -12187,3 +12187,45 @@
     quickscreen: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user:
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Zahlen beim Sortieren interpretieren"
+  </dest>
+  <voice>
+    *: "Zahlen beim Sortieren interpretieren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user:
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "als Ziffern"
+  </dest>
+  <voice>
+    *: "als Ziffern"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user:
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "als komplette Zahlen"
+  </dest>
+  <voice>
+    *: "als komplette Zahlen"
+  </voice>
+</phrase>

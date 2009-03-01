@@ -45,6 +45,7 @@
 #include "cuesheet.h"
 #include "filetree.h"
 #include "misc.h"
+#include "strnatcmp.h"
 #ifdef HAVE_LCD_BITMAP
 #include "keyboard.h"
 #endif
@@ -242,12 +243,26 @@ static int compare(const void* p1, const void* p2)
 
         case SORT_ALPHA:
         case SORT_ALPHA_REVERSED:
+        {
             if (global_settings.sort_case)
-                return strncmp(e1->name, e2->name, MAX_PATH)
-                       * (criteria == SORT_ALPHA_REVERSED ? -1 : 1);
+            {
+                if (global_settings.interpret_numbers == SORT_INTERPRET_AS_NUMBER)
+                    return strnatcmp(e1->name, e2->name)
+                           * (criteria == SORT_ALPHA_REVERSED ? -1 : 1);
+                else
+                    return strncmp(e1->name, e2->name, MAX_PATH)
+                           * (criteria == SORT_ALPHA_REVERSED ? -1 : 1);
+            }
             else
-                return strncasecmp(e1->name, e2->name, MAX_PATH)
-                       * (criteria == SORT_ALPHA_REVERSED ? -1 : 1);
+            {
+                if (global_settings.interpret_numbers == SORT_INTERPRET_AS_NUMBER)
+                    return strnatcasecmp(e1->name, e2->name)
+                           * (criteria == SORT_ALPHA_REVERSED ? -1 : 1);
+                else
+                    return strncasecmp(e1->name, e2->name, MAX_PATH)
+                           * (criteria == SORT_ALPHA_REVERSED ? -1 : 1);
+            }
+        }
 
     }
     return 0; /* never reached */

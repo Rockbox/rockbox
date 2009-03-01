@@ -49,6 +49,7 @@ common/strcasestr.c
 common/strcat.c
 common/strchr.c
 common/strcmp.c
+common/strnatcmp.c
 common/strcpy.c
 common/strncmp.c
 common/strncpy.c

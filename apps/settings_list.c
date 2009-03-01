@@ -783,7 +783,20 @@ const struct settings_list settings[] = {
                    "all,supported,music,playlists", NULL, 4, ID2P(LANG_ALL),
                    ID2P(LANG_FILTER_SUPPORTED), ID2P(LANG_FILTER_MUSIC),
                    ID2P(LANG_PLAYLISTS)),
+    /* file sorting */
     OFFON_SETTING(0, sort_case, LANG_SORT_CASE, false, "sort case", NULL),
+    CHOICE_SETTING(0, sort_dir, LANG_SORT_DIR, 0 ,
+                   "sort dirs", "alpha,oldest,newest", NULL, 3,
+                   ID2P(LANG_SORT_ALPHA), ID2P(LANG_SORT_DATE),
+                   ID2P(LANG_SORT_DATE_REVERSE)),
+    CHOICE_SETTING(0, sort_file, LANG_SORT_FILE, 0 ,
+                   "sort files", "alpha,oldest,newest,type", NULL, 4,
+                   ID2P(LANG_SORT_ALPHA), ID2P(LANG_SORT_DATE),
+                   ID2P(LANG_SORT_DATE_REVERSE) , ID2P(LANG_SORT_TYPE)),
+    CHOICE_SETTING(0, interpret_numbers, LANG_SORT_INTERPRET_NUMBERS, 1,
+                    "sort interpret number", "digits,numbers",NULL, 2,
+                    ID2P(LANG_SORT_INTERPRET_AS_DIGIT),
+                    ID2P(LANG_SORT_INTERPRET_AS_NUMBERS)),
     CHOICE_SETTING(0, show_filename_ext, LANG_SHOW_FILENAME_EXT, 3,
                    "show filename exts", "off,on,unknown,view_all", NULL , 4 ,
                    ID2P(LANG_OFF), ID2P(LANG_ON), ID2P(LANG_UNKNOWN_TYPES),
@@ -892,16 +905,6 @@ const struct settings_list settings[] = {
                   "talk filetype", NULL),
     OFFON_SETTING(F_TEMPVAR, talk_battery_level, LANG_TALK_BATTERY_LEVEL, false,
                   "Announce Battery Level", NULL),
-
-    /* file sorting */
-    CHOICE_SETTING(0, sort_file, LANG_SORT_FILE, 0 ,
-                   "sort files", "alpha,oldest,newest,type", NULL, 4,
-                   ID2P(LANG_SORT_ALPHA), ID2P(LANG_SORT_DATE),
-                   ID2P(LANG_SORT_DATE_REVERSE) , ID2P(LANG_SORT_TYPE)),
-    CHOICE_SETTING(0, sort_dir, LANG_SORT_DIR, 0 ,
-                   "sort dirs", "alpha,oldest,newest", NULL, 3,
-                   ID2P(LANG_SORT_ALPHA), ID2P(LANG_SORT_DATE),
-                   ID2P(LANG_SORT_DATE_REVERSE)),
 
 #ifdef HAVE_RECORDING
     /* recording */
