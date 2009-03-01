@@ -31,6 +31,6 @@ PLUGIN_HEADER
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
-    return run_overlay(parameter, PLUGIN_GAMES_DIR "/rockboy.ovl", "RockBoy");
+    return run_overlay(parameter, VIEWERS_DIR "/rockboy.ovl", "RockBoy");
 }
 #endif
