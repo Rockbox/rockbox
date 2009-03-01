@@ -1821,7 +1821,6 @@ static void audio_finish_load_track(void)
             {
                 /* another error, do not continue either */
                 logf("Could not add album art handle");
-                return;
             }
         }
     }
