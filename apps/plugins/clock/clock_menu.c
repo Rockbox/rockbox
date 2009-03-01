@@ -145,7 +145,7 @@ void menu_general_settings(void){
     int selection=0, result=0;
 
     MENUITEM_STRINGLIST(menu,"General Settings",NULL,
-                        "Hour format","Date format","Show Counter",
+                        "Hour Format","Date Format","Show Counter",
                         "Reset Settings","Save Settings Now",
                         "Save On Exit","Backlight Settings",
                         "Idle Poweroff (temporary)");
