@@ -19,6 +19,31 @@ displays files.
   \setting{Sort Directories} are available in this option.  In addition, there 
   is a \setting{By type} option which sorts files alphabetically by their type 
   (such as \fname{.mp3}) then alphabetically within each type.
+
+\item[Interpret numbers when sorting:]
+  \setting{As whole numbers} enables a sorting algorithm which is similar to
+  the default sorting of, for example, Windows Explorer, Mac OS X's Finder
+  or Nautilus, with regards to numbers at the beginning or within file names.
+  It combines consecutive digits to numbers and uses this numbers for sorting.
+  \newline\setting{As whole numbers} disables this algorithm, and causes every digit to
+  be compared separately.
+  \begin{table}[h]
+    \centering
+    \caption{Example Sorting}
+    \begin{tabular}{ll}
+      \hline\hline
+      As whole numbers & As digits\\
+      \hline
+      1 Ring Of Fire.mp3 & 03 Jackson.mp3\\
+      2 I Walk The Line.mp3 & 1 Ring Of Fire.mp3\\
+      03 Jackson.mp3 & 10 A Thing Called Love.mp3\\
+      10 A Thing Called Love.mp3 & 2 I Walk The Line.mp3\\
+      Episode 1.ogg & Episode 1.ogg\\
+      Episode 2.ogg & Episode 10.ogg\\
+      Episode 10.ogg & Episode 2.ogg\\
+    \end{tabular}
+  \end{table}
+
   
 \item[\label{ref:ShowFiles}Show Files:]
   This option controls which files are displayed in the File Browser.
