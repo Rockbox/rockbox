@@ -1819,8 +1819,8 @@ static void audio_finish_load_track(void)
             }
             else if (tracks[track_widx].aa_hid < 0)
             {
-                /* another error, do not continue either */
-                logf("Could not add album art handle");
+                /* another error, ignore AlbumArt */
+                logf("Album art loading failed");
             }
         }
     }
