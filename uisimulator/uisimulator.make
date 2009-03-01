@@ -26,7 +26,7 @@ UIBMP = $(BUILDDIR)/UI256.bmp
 
 $(SIMLIB): $$(SIMOBJ) $(UIBMP)
 	$(SILENT)$(shell rm -f $@)
-	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null
+	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
 $(BUILDDIR)/$(BINARY): $$(OBJ) $(SIMLIB) $(VOICESPEEXLIB) $(FIRMLIB)
 	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(LDOPTS) 

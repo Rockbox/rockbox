@@ -15,7 +15,7 @@ OTHER_SRC += $(ALACLIB_SRC)
 
 $(ALACLIB): $(ALACLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
-	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null
+	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
 ALACFLAGS = $(filter-out -O%,$(CODECFLAGS))
 ALACFLAGS += -O3

@@ -22,7 +22,7 @@ OTHER_SRC += $(MADLIB_SRC)
 
 $(MADLIB): $(MADLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
-	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null
+	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
 # libmad-mpeg
 MPEGMADLIB := $(CODECDIR)/libmad-mpeg.a

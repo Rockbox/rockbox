@@ -15,7 +15,7 @@ OTHER_SRC += $(MUSEPACKLIB_SRC)
 
 $(MUSEPACKLIB): $(MUSEPACKLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
-	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null
+	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
 # libmusepack is faster on ARM-targets with -O1 than -O2
 MUSEPACKFLAGS = $(filter-out -O%,$(CODECFLAGS)) -I$(APPSDIR)/codecs/libmusepack

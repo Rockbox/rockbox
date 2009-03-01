@@ -38,7 +38,7 @@ $(PBMPHFILES): $(PLUGIN_BITMAPS)
 
 $(PLUGINBITMAPLIB): $(PLUGIN_BITMAPS)
 	$(SILENT)$(shell rm -f $@)
-	$(call PRINTS,AR $(@F))$(AR) rs $@ $+ >/dev/null
+	$(call PRINTS,AR $(@F))$(AR) rcs $@ $+ >/dev/null
 
 # pattern rules to create .c files from .bmp, one for each subdir:
 $(BUILDDIR)/apps/plugins/bitmaps/mono/%.c: $(ROOTDIR)/apps/plugins/bitmaps/mono/%.bmp $(TOOLSDIR)/bmp2rb

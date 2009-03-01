@@ -15,7 +15,7 @@ OTHER_SRC += $(DEMACLIB_SRC)
 
 $(DEMACLIB): $(DEMACLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
-	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null
+	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
 DEMACFLAGS = $(filter-out -O%,$(CODECFLAGS))
 DEMACFLAGS += -O3

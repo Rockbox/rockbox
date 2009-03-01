@@ -15,7 +15,7 @@ OTHER_SRC += $(TREMORLIB_SRC)
 
 $(TREMORLIB): $(TREMORLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
-	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null
+	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
 $(CODECDIR)/libtremor/%.o: $(ROOTDIR)/apps/codecs/libtremor/%.c
 	$(SILENT)mkdir -p $(dir $@)
