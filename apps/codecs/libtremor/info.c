@@ -149,12 +149,21 @@ static int _vorbis_unpack_comment(vorbis_comment *vc,oggpack_buffer *opb){
   vc->comment_lengths=(int *)_ogg_calloc(vc->comments+1, sizeof(*vc->comment_lengths));
 	    
   for(i=0;i<vc->comments;i++){
-    int len=oggpack_read(opb,32);
-    if(len<0)goto err_out;
-	vc->comment_lengths[i]=len;
-    vc->user_comments[i]=(char *)_ogg_calloc(len+1,1);
-    _v_readstring(opb,vc->user_comments[i],len);
-  }	  
+     int len=oggpack_read(opb,32);
+     if(len<0)goto err_out;
+     vc->comment_lengths[i]=len;
+     if(len>10000){  /*truncate long comments rather then seg faulting*/
+         vc->user_comments[i]=(char *)_ogg_calloc(10001,1);
+         _v_readstring(opb,vc->user_comments[i],10000);
+         /*just to be neat, consumed and discard the rest of the comment*/
+         len-=10000;
+         while(len--)
+             oggpack_read(opb,8);
+     }else{
+         vc->user_comments[i]=(char *)_ogg_calloc(len+1,1);
+         _v_readstring(opb,vc->user_comments[i],len);
+     }
+   }
   if(oggpack_read(opb,1)!=1)goto err_out; /* EOP check */
 
   return(0);
