@@ -1,5 +1,4 @@
-/* -*- mode: c; c-file-style: "k&r" -*-
-
+/* Based on:
   strnatcmp.c -- Perform 'natural order' comparisons of strings in C.
   Copyright (C) 2000, 2004 by Martin Pool <mbp sourcefrog net>
 
@@ -28,6 +27,10 @@
  * Eric Sosman pointed out that ctype functions take a parameter whose
  * value must be that of an unsigned int, even on platforms that have
  * negative chars in their default char type.
+ *
+ *
+ * This version is changed to ignore leading zeros, it does not equal to the
+ * original software.
  */
 
 #include <ctype.h>
