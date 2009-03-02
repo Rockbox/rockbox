@@ -245,6 +245,10 @@ sub voicestring {
             # festival_client lies to us, so we have to do awful soul-eating
             # work with IPC::open3()
             $cmd = "festival_client --server localhost --otype riff --ttw --output \"$output\"";
+            # Use festival-prolog.scm if it's there (created by user of tools/configure)
+            if (-f "festival-prolog.scm") {
+                $cmd .= " --prolog festival-prolog.scm";
+            }
             print("> $cmd\n") if $verbose;
             # Open command, and filehandles for STDIN, STDOUT, STDERR
             my $pid = open3(*CMD_IN, *CMD_OUT, *CMD_ERR, $cmd);

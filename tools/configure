@@ -526,6 +526,29 @@ voiceconfig () {
     esac
     echo "Using $TTS_ENGINE for TTS"
 
+    # Select which voice to use for Festival
+    if [ "$TTS_ENGINE" = "festival" ]; then
+        i=1
+        for voice in `echo "(voice.list)"|festival -i 2>/dev/null |tr "\n" " "|sed -e 's/.*festival> (\(.*\)) festival>/\1 foobar/'|sort`; do
+            if [ "$i" = "1" ]; then
+                TTS_FESTIVAL_VOICE="$voice" # Default choice
+            fi
+            printf "%3d. %s\n" "$i" "$voice"
+            i=`expr $i + 1`
+        done
+        printf "Please select which Festival voice to use (default is $TTS_FESTIVAL_VOICE): "
+        CHOICE=`input`
+        i=1
+        for voice in `echo "(voice.list)"|festival -i 2>/dev/null |tr "\n" " "|sed -e 's/.*festival> (\(.*\)) festival>/\1 foobar/'|sort`; do
+            if [ "$i" = "$CHOICE" -o "$voice" = "$CHOICE" ]; then
+                TTS_FESTIVAL_VOICE="$voice"
+            fi
+            i=`expr $i + 1`
+        done
+        echo "Festival voice set to $TTS_FESTIVAL_VOICE"
+        echo "(voice_$TTS_FESTIVAL_VOICE)" > festival-prolog.scm
+    fi
+
     # Allow the user to input manual commandline options
     printf "Enter $TTS_ENGINE options (enter for defaults \"$TTS_OPTS\"): "
     USER_TTS_OPTS=`input`
