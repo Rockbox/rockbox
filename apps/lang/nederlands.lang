@@ -12293,12 +12293,15 @@
   desc: in Settings -> Sound Settings
   user:
   <source>
-    *: "Enable Speaker"
+    *: none
+    speaker: "Enable Speaker"
   </source>
   <dest>
-    *: "Luidspreker inschakelen"
+    *: none
+    speaker: "Luidspreker inschakelen"
   </dest>
   <voice>
-    *: "Luidspreker inschakelen"
+    *: none
+    speaker: "Luidspreker inschakelen"
   </voice>
 </phrase>

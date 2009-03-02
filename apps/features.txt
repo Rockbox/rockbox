@@ -183,3 +183,7 @@ accessory_supply
 #if defined(IPOD_ACCESSORY_PROTOCOL)
 serial_port
 #endif
+
+#if defined(HAVE_SPEAKER)
+speaker
+#endif

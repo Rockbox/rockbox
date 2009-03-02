@@ -12406,12 +12406,15 @@
   desc: in Settings -> Sound Settings
   user:
   <source>
-    *: "Enable Speaker"
+    *: none
+    speaker: "Enable Speaker"
   </source>
   <dest>
-    *: "Enable Speaker"
+    *: none
+    speaker: "Enable Speaker"
   </dest>
   <voice>
-    *: "Enable Speaker"
+    *: none
+    speaker: "Enable Speaker"
   </voice>
 </phrase>
