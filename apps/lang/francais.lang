@@ -12308,9 +12308,68 @@
     *: "Credits"
   </source>
   <dest>
-    *: "Credits"
+    *: "Crédits"
   </dest>
   <voice>
-    *: "Credits"
+    *: "Crédits"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user:
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Interprétation des nombres lors du tri"
+  </dest>
+  <voice>
+    *: "Interprétation des nombres lors du tri"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user:
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Comme chiffres"
+  </dest>
+  <voice>
+    *: "Comme des chiffres"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user:
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "Comme nombres entiers"
+  </dest>
+  <voice>
+    *: "Comme des nombres entiers"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user:
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Activer le haut-parleur"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Activer le haut-parleur"
   </voice>
 </phrase>
