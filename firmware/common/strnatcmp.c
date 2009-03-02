@@ -95,34 +95,11 @@ compare_right(char const *a, char const *b)
      return 0;
 }
 
-
-static int
-compare_left(char const *a, char const *b)
-{
-     /* Compare two left-aligned numbers: the first to have a
-        different value wins. */
-     for (;; a++, b++) {
-	  if (!nat_isdigit(*a)  &&  !nat_isdigit(*b))
-	       return 0;
-	  else if (!nat_isdigit(*a))
-	       return -1;
-	  else if (!nat_isdigit(*b))
-	       return +1;
-	  else if (*a < *b)
-	       return -1;
-	  else if (*a > *b)
-	       return +1;
-     }
-	  
-     return 0;
-}
-
-
 static int strnatcmp0(char const *a, char const *b, int fold_case)
 {
      int ai, bi;
      char ca, cb;
-     int fractional, result;
+     int result;
      
      assert(a && b);
      ai = bi = 0;
@@ -138,15 +115,8 @@ static int strnatcmp0(char const *a, char const *b, int fold_case)
 
 	  /* process run of digits */
 	  if (nat_isdigit(ca)  &&  nat_isdigit(cb)) {
-	       fractional = (ca == '0' || cb == '0');
-
-	       if (fractional) {
-		    if ((result = compare_left(a+ai, b+bi)) != 0)
-			 return result;
-	       } else {
-		    if ((result = compare_right(a+ai, b+bi)) != 0)
-			 return result;
-	       }
+		if ((result = compare_right(a+ai, b+bi)) != 0)
+			return result;
 	  }
 
 	  if (!ca && !cb) {
