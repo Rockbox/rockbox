@@ -319,7 +319,7 @@ static int32_t backlight_getlang(int value, int unit)
 }
 #endif
 
-#ifndef HAVE_SCROLLWHEEL
+#ifndef HAVE_WHEEL_ACCELERATION
 static void scanaccel_formatter(char *buffer, size_t buffer_size,
         int val, const char *unit)
 {
@@ -1420,14 +1420,14 @@ const struct settings_list settings[] = {
                 MAX_BRIGHTNESS_SETTING, 1, NULL, NULL,
                 buttonlight_set_brightness),
 #endif
-#ifndef HAVE_SCROLLWHEEL
+#ifndef HAVE_WHEEL_ACCELERATION
     INT_SETTING(0, list_accel_start_delay, LANG_LISTACCEL_START_DELAY,
                 2, "list_accel_start_delay", UNIT_MS, 0, 10, 1,
                 formatter_unit_0_is_off, getlang_unit_0_is_off, NULL),
     INT_SETTING(0, list_accel_wait, LANG_LISTACCEL_ACCEL_SPEED,
                 3, "list_accel_wait", UNIT_SEC, 1, 10, 1, 
                 scanaccel_formatter, getlang_unit_0_is_off, NULL),
-#endif /* HAVE_SCROLLWHEEL */
+#endif /* HAVE_WHEEL_ACCELERATION */
 #if CONFIG_CODEC == SWCODEC
     /* keyclick */
     CHOICE_SETTING(0, keyclick, LANG_KEYCLICK, 0,

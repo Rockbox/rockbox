@@ -588,7 +588,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
     static bool scrolling_left = false;
 #endif
 
-#ifdef HAVE_SCROLLWHEEL
+#ifdef HAVE_WHEEL_ACCELERATION
     int next_item_modifier = button_apply_acceleration(get_action_data());
 #else
     static int next_item_modifier = 1;
@@ -659,7 +659,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
         case ACTION_STD_PREV:
         case ACTION_STD_PREVREPEAT:
                 gui_list_select_at_offset(lists, -next_item_modifier);
-#ifndef HAVE_SCROLLWHEEL
+#ifndef HAVE_WHEEL_ACCELERATION
             if (button_queue_count() < FRAMEDROP_TRIGGER)
 #endif
                 gui_synclist_draw(lists);
@@ -673,7 +673,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
         case ACTION_STD_NEXT:
         case ACTION_STD_NEXTREPEAT:
                 gui_list_select_at_offset(lists, next_item_modifier);
-#ifndef HAVE_SCROLLWHEEL
+#ifndef HAVE_WHEEL_ACCELERATION
             if (button_queue_count() < FRAMEDROP_TRIGGER)
 #endif
                 gui_synclist_draw(lists);

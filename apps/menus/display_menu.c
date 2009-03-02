@@ -251,11 +251,11 @@ MENUITEM_SETTING(jump_scroll, &global_settings.jump_scroll, NULL);
 MENUITEM_SETTING(jump_scroll_delay, &global_settings.jump_scroll_delay, NULL);
 #endif
 /* list acceleration */
-#ifndef HAVE_SCROLLWHEEL
+#ifndef HAVE_WHEEL_ACCELERATION
 MENUITEM_SETTING(list_accel_start_delay,
                  &global_settings.list_accel_start_delay, NULL);
 MENUITEM_SETTING(list_accel_wait, &global_settings.list_accel_wait, NULL);
-#endif /* HAVE_SCROLLWHEEL */
+#endif /* HAVE_WHEEL_ACCELERATION */
 #ifdef HAVE_LCD_BITMAP
 static int screenscroll_callback(int action,const struct menu_item_ex *this_item)
 {
@@ -290,7 +290,7 @@ MAKE_MENU(scroll_settings_menu, ID2P(LANG_SCROLL_MENU), 0, Icon_NOICON,
           &offset_out_of_view, &screen_scroll_step,
 #endif
           &scroll_paginated,
-#ifndef HAVE_SCROLLWHEEL
+#ifndef HAVE_WHEEL_ACCELERATION
           &list_accel_start_delay, &list_accel_wait
 #endif
           );

@@ -10531,15 +10531,15 @@
   user:
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "목록 가속 속도"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "목록 가속 속도"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -11715,15 +11715,15 @@
   user:
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "목록 가속 시작 지연시간"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "목록 가속 시작 지연시간"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>

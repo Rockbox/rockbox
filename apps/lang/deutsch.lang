@@ -3279,15 +3279,15 @@
   user:
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Listenbeschleunigungs-Verzögerung"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Listenbeschleunigungs-Verzögerung"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -3296,15 +3296,15 @@
   user:
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Listenbeschleunigung"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Listenbeschleunigung"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>

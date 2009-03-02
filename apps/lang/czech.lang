@@ -3264,15 +3264,15 @@
   user:
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Prodleva před zrychlením"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Prodleva před zrychlením"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -3281,15 +3281,15 @@
   user:
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Zrychlení seznamu"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Zrychlení seznamu"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>

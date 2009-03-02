@@ -478,7 +478,7 @@ struct user_settings
 #endif
 
     /* misc options */
-#ifndef HAVE_SCROLLWHEEL
+#ifndef HAVE_WHEEL_ACCELERATION
     int list_accel_start_delay; /* ms before we start increaseing step size */
     int list_accel_wait; /* ms between increases */
 #endif

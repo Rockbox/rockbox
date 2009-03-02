@@ -10022,15 +10022,15 @@
   user:
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Lijst Acceleratie Snelheid"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Lijst Acceleratie Snelheid"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -10202,15 +10202,15 @@
   user:
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Lijst Acceleratie Start Vertraging"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Lijst Acceleratie Start Vertraging"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>

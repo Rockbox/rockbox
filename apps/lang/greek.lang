@@ -3266,15 +3266,15 @@
   user:
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Καθυστέρηση εκκίνησης επιτάχυνσης λίστας"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Καθυστέρηση εκκίνησης επιτάχυνσης λίστας"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -3283,15 +3283,15 @@
   user:
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Ταχύτητα επιτάχυνσης λίστας"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Ταχύτητα επιτάχυνσης λίστας"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>

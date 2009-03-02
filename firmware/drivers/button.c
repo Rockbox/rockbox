@@ -549,7 +549,7 @@ void button_clear_queue(void)
 
 #endif /* SIMULATOR */
 
-#ifdef HAVE_SCROLLWHEEL
+#ifdef HAVE_WHEEL_ACCELERATION
 /* WHEEL_ACCEL_FACTOR = 2^16 / WHEEL_ACCEL_START */
 #define WHEEL_ACCEL_FACTOR (1<<16)/WHEEL_ACCEL_START
 /**
@@ -591,4 +591,4 @@ int button_apply_acceleration(const unsigned int data)
 
     return delta;
 }
-#endif /* HAVE_SCROLLWHEEL */
+#endif /* HAVE_WHEEL_ACCELERATION */

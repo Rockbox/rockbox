@@ -10090,15 +10090,15 @@
   user:
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Vis akselereringsfart"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Vis akselereringsfart"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -10831,15 +10831,15 @@
   user:
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Pause før listeakselerering"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Pause før listeakselerering"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>

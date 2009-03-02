@@ -3263,15 +3263,15 @@
   user:
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "หน่วงเวลาการเร่งรายการเริ่มต้น"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -3280,15 +3280,15 @@
   user:
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "ความเร็วของการเร่งรายการ"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>

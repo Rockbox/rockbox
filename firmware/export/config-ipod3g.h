@@ -70,6 +70,8 @@
 
 #define CONFIG_KEYPAD IPOD_3G_PAD
 
+#define HAVE_SCROLLWHEEL
+
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 

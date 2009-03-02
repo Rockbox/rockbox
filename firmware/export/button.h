@@ -56,7 +56,7 @@ int wheel_status(void);
 void wheel_send_events(bool send);
 #endif
 
-#ifdef HAVE_SCROLLWHEEL
+#ifdef HAVE_WHEEL_ACCELERATION
 int button_apply_acceleration(const unsigned int data);
 #endif
 

@@ -9183,15 +9183,15 @@
   user:
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "列表加速速度"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -10520,15 +10520,15 @@
   user:
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "列表加速緩沖"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>

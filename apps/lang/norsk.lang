@@ -10366,15 +10366,15 @@
   user:
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Aksellerasjonshastighet i lister"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Aksellerasjonshastighet i lister"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -11193,15 +11193,15 @@
   user:
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Listeaksellerasjon startforsinkelse"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Listeaksellerasjon startforsinkelse"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>

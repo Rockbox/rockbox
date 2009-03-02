@@ -143,6 +143,10 @@ rtc
 scrollwheel
 #endif
 
+#if defined(HAVE_WHEEL_ACCELERATION)
+wheel_acceleration
+#endif
+
 #if defined(ARCHOS_RECORDER) || defined(ARCHOS_PLAYER)
 soft_shutdown
 #endif

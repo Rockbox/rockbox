@@ -3269,15 +3269,15 @@
   user: 
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Opóźnienie przyspiesznie przy przeglądaniu list"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Opóźnienie przyspiesznie przy przeglądaniu list"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -3286,15 +3286,15 @@
   user: 
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Przyspieszenie przeglądania list"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Przyspieszenie przeglądania list"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>

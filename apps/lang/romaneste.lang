@@ -4820,15 +4820,15 @@
   user: 
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Viteza accelerare lista"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -9693,15 +9693,15 @@
   user: 
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Intarzierea accelerarii startului listei"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>

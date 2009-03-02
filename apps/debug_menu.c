@@ -2522,7 +2522,7 @@ static bool cpu_boost_log(void)
 }
 #endif
 
-#if (defined(HAVE_SCROLLWHEEL) && (CONFIG_KEYPAD==IPOD_4G_PAD) && !defined(SIMULATOR))
+#if (defined(HAVE_WHEEL_ACCELERATION) && (CONFIG_KEYPAD==IPOD_4G_PAD) && !defined(SIMULATOR))
 extern bool wheel_is_touched;
 extern int old_wheel_value;
 extern int new_wheel_value;
@@ -2724,7 +2724,7 @@ static const struct the_menu_item menuitems[] = {
 #ifdef CPU_BOOST_LOGGING
         {"cpu_boost log",cpu_boost_log},
 #endif
-#if (defined(HAVE_SCROLLWHEEL) && (CONFIG_KEYPAD==IPOD_4G_PAD) && !defined(SIMULATOR))
+#if (defined(HAVE_WHEEL_ACCELERATION) && (CONFIG_KEYPAD==IPOD_4G_PAD) && !defined(SIMULATOR))
         {"Debug scrollwheel", dbg_scrollwheel},
 #endif
     };

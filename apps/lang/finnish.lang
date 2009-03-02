@@ -10220,15 +10220,15 @@
   user:
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Listan kiihdytyksen aloitusviive"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Listan kiihdytyksen aloitusviive"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -10237,15 +10237,15 @@
   user:
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Listan kiihdytysnopeus"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Listan kiihdytysnopeus"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>

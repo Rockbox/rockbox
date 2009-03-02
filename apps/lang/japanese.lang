@@ -3285,15 +3285,15 @@
   user:
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "加速するまでの時間"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "加速するまでの時間"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -3302,15 +3302,15 @@
   user:
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "加速度"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "加速度"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>

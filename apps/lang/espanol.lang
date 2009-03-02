@@ -9778,15 +9778,15 @@
   user:
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Velocidad de aceleración de lista"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Velocidad de aceleración de lista"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -11019,15 +11019,15 @@
   user: 
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Retraso para comenzar la aceleración de la lista"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Retraso para comenzar la aceleración de la lista"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>

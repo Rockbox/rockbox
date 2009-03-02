@@ -94,6 +94,8 @@
 
 /* define this if the unit uses a scrollwheel for navigation */
 #define HAVE_SCROLLWHEEL
+/* define to activate advanced wheel acceleration code */
+#define HAVE_WHEEL_ACCELERATION
 /* define from which rotation speed [degree/sec] on the acceleration starts */
 #define WHEEL_ACCEL_START 270
 /* define type of acceleration (1 = ^2, 2 = ^3, 3 = ^4) */

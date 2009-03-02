@@ -8725,15 +8725,15 @@
   user:
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Ускорение списка"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Ускорение списка"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -10755,15 +10755,15 @@
   user:
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Задержка начала списка"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Задержка начала списка"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>

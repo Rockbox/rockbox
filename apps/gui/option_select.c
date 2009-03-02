@@ -38,9 +38,6 @@
 #include "quickscreen.h"
 
 #if defined (HAVE_SCROLLWHEEL)      || \
-    (CONFIG_KEYPAD == IPOD_3G_PAD)  || \
-    (CONFIG_KEYPAD == IPOD_4G_PAD)  || \
-    (CONFIG_KEYPAD == IPOD_1G2G_PAD) || \
     (CONFIG_KEYPAD == PLAYER_PAD)
 /* Define this if your target makes sense to have 
    smaller values at the top of the list increasing down the list */
