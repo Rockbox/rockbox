@@ -20,9 +20,6 @@
  ****************************************************************************/
 
 #include <file.h>
-#if defined(SIMULATOR) && defined(__MINGW32__)
-extern int printf(const char *format, ...);
-#endif
 
 #include "language.h"
 #include "lang.h"
@@ -76,8 +73,8 @@ int lang_load(const char *filename)
                 ptr+=2;                     /* pass the id */
                 if(id < LANG_LAST_INDEX_IN_ARRAY) {
 #if 0
-                    printf("%2x New: %30s ", id, ptr);
-                    printf("Replaces: %s\n", language_strings[id]);
+                    DEBUGF("%2x New: %30s ", id, ptr);
+                    DEBUGF("Replaces: %s\n", language_strings[id]);
 #endif
                     language_strings[id] = ptr; /* point to this string */
                 }
