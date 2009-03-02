@@ -111,6 +111,9 @@
 /* Define this if you have the Jz4740 internal codec */
 #define HAVE_JZ4740_CODEC
 
+/* Define this if you have a speaker */
+#define HAVE_SPEAKER
+
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_48 | SAMPR_CAP_44 | SAMPR_CAP_32 | \
                          SAMPR_CAP_24 | SAMPR_CAP_22 | SAMPR_CAP_16 | \
