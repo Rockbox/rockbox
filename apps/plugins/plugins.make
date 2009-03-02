@@ -94,8 +94,8 @@ else
 	$(SILENT)$(OC) -O binary $(BUILDDIR)/$*.elf $@
 endif
 
-$(BUILDDIR)/%.refmap: $(BUILDDIR)/%.o $(OVERLAYREF_LDS) $(PLUGINLIB) $(PLUGINBITMAPLIB)
+$(BUILDDIR)/%.refmap: $(BUILDDIR)/%.o $(APPSDIR)/plugin.h $(OVERLAYREF_LDS) $(PLUGINLIB) $(PLUGINBITMAPLIB)
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o /dev/null \
 		$(filter %.o, $^) \
-		$(filter %.a, $^) \
+		$(filter %.a, $+) \
 		-lgcc $(OVERLAYLDFLAGS)

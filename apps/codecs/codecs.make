@@ -101,7 +101,7 @@ endif
 $(CODECDIR)/%.codec: $(CODECDIR)/%.o
 	$(call PRINTS,LD $(@F))$(CC) $(CODECFLAGS) -o $(CODECDIR)/$*.elf \
 		$(filter %.o, $^) \
-		$(filter %.a, $^) \
+		$(filter %.a, $+) \
 		-lgcc $(CODECLDFLAGS)
 ifdef SIMVER
 	$(SILENT)cp $(CODECDIR)/$*.elf $@
