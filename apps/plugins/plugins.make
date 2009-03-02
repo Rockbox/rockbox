@@ -26,24 +26,25 @@ PLUGINLIB_OBJ := $(PLUGINLIB_SRC:.c=.o)
 PLUGINLIB_OBJ := $(PLUGINLIB_OBJ:.S=.o)
 PLUGINLIB_OBJ := $(subst $(ROOTDIR),$(BUILDDIR),$(PLUGINLIB_OBJ))
 
+### build data / rules
+ifndef SIMVER
+PLUGIN_LDS := $(APPSDIR)/plugins/plugin.lds
+PLUGINLINK_LDS := $(BUILDDIR)/apps/plugins/plugin.link
+OVERLAYREF_LDS := $(BUILDDIR)/apps/plugins/overlay_ref.link
+endif
+
 # multifile plugins (subdirs):
 PLUGINSUBDIRS := $(call preprocess, $(APPSDIR)/plugins/SUBDIRS)
 
 # include <dir>.make from each subdir (yay!)
 $(foreach dir,$(PLUGINSUBDIRS),$(eval include $(dir)/$(notdir $(dir)).make))
 
-### build data / rules
-ifndef SIMVER
-PLUGIN_LDS := $(APPSDIR)/plugins/plugin.lds
-PLUGINLINK_LDS := $(BUILDDIR)/apps/plugins/plugin.link
-endif
-
 OTHER_INC += -I$(APPSDIR)/plugins -I$(APPSDIR)/plugins/lib
 
 # special compile flags for plugins:
-PLUGINFLAGS = -I$(APPSDIR)/plugins -DPLUGIN $(CFLAGS) 
+PLUGINFLAGS = -I$(APPSDIR)/plugins -DPLUGIN $(CFLAGS)
 
-$(ROCKS): $(PLUGINLIB) $(APPSDIR)/plugin.h $(PLUGINLINK_LDS) $(PLUGINBITMAPLIB)
+$(ROCKS): $(APPSDIR)/plugin.h $(PLUGINLINK_LDS) $(PLUGINLIB) $(PLUGINBITMAPLIB)
 
 $(PLUGINLIB): $(PLUGINLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
@@ -54,11 +55,16 @@ $(PLUGINLINK_LDS): $(PLUGIN_LDS)
 	$(shell mkdir -p $(dir $@))
 	$(call preprocess2file,$<,$@,-DLOADADDRESS=$(LOADADDRESS))
 
+$(OVERLAYREF_LDS): $(PLUGIN_LDS)
+	$(call PRINTS,PP $(@F))
+	$(shell mkdir -p $(dir $@))
+	$(call preprocess2file,$<,$@,-DOVERLAY_OFFSET=0)
+
 $(BUILDDIR)/credits.raw credits.raw: $(DOCSDIR)/CREDITS
 	$(call PRINTS,Create credits.raw)perl $(APPSDIR)/plugins/credits.pl < $< > $(BUILDDIR)/$(@F)
 
 # special dependencies
-$(BUILDDIR)/apps/plugins/wav2wv.rock: $(BUILDDIR)/apps/codecs/libwavpack.a
+$(BUILDDIR)/apps/plugins/wav2wv.rock: $(BUILDDIR)/apps/codecs/libwavpack.a $(PLUGINLIB)
 
 # special pattern rule for compiling plugin lib (with -ffunction-sections)
 $(BUILDDIR)/apps/plugins/lib/%.o: $(ROOTDIR)/apps/plugins/lib/%.c
@@ -74,15 +80,22 @@ ifdef SIMVER
  PLUGINLDFLAGS = $(SHARED_FLAG) # <-- from Makefile
 else
  PLUGINLDFLAGS = -T$(PLUGINLINK_LDS) -Wl,--gc-sections -Wl,-Map,$*.map
+ OVERLAYLDFLAGS = -T$(OVERLAYREF_LDS) -Wl,--gc-sections -Wl,-Map,$*.refmap
 endif
 
-$(BUILDDIR)/%.rock: $(GCCSUPPORT_OBJ) $(BUILDDIR)/%.o $(PLUGINLINK_LDS)
+$(BUILDDIR)/%.rock: $(BUILDDIR)/%.o
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(BUILDDIR)/$*.elf \
 		$(filter %.o, $^) \
-		$(filter %.a, $^) \
+		$(filter %.a, $+) \
 		-lgcc $(PLUGINLDFLAGS)
 ifdef SIMVER
 	$(SILENT)cp $(BUILDDIR)/$*.elf $@
 else
 	$(SILENT)$(OC) -O binary $(BUILDDIR)/$*.elf $@
 endif
+
+$(BUILDDIR)/%.refmap: $(BUILDDIR)/%.o $(OVERLAYREF_LDS) $(PLUGINLIB) $(PLUGINBITMAPLIB)
+	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o /dev/null \
+		$(filter %.o, $^) \
+		$(filter %.a, $^) \
+		-lgcc $(OVERLAYLDFLAGS)

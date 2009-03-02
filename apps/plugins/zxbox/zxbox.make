@@ -17,12 +17,12 @@ OTHER_SRC += $(ZXBOX_SRC)
 
 ifndef SIMVER
 ifneq (,$(strip $(foreach tgt,RECORDER ONDIO,$(findstring $(tgt),$(TARGET)))))
-    ## archos recorder targets
-    ZXBOX_INLDS := $(ZXBOX_SRCDIR)/archos.lds
+    ## lowmem targets
     ROCKS += $(ZXBOX_OBJDIR)/zxbox.ovl
+    ZXBOX_OUTLDS = $(ZXBOX_OBJDIR)/zxbox.link
+    ZXBOX_LDFLAGS = -T$(ZXBOX_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
 else
     ### all other targets
-    ZXBOX_INLDS := $(APPSDIR)/plugins/plugin.lds
     ROCKS += $(ZXBOX_OBJDIR)/zxbox.rock
 endif
 else
@@ -32,22 +32,18 @@ endif
 
 ZXBOXFLAGS = $(filter-out -O%,$(PLUGINFLAGS)) -O3 -funroll-loops
 
-ifdef SIMVER
- ZXBOX_LDFLAGS = $(SHARED_FLAG) # <-- from Makefile
-else
- ZXBOX_OUTLDS = $(ZXBOX_OBJDIR)/zxbox.lds
- ZXBOX_LDFLAGS = -T$(ZXBOX_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
-endif
+$(ZXBOX_OBJDIR)/zxbox.rock: $(ZXBOX_OBJ)
 
-$(ZXBOX_OUTLDS): $(ZXBOX_INLDS) $(ZXBOX_OBJ)
-	$(call PRINTS,PP $(<F))$(call preprocess2file,$<,$@)
+$(ZXBOX_OBJDIR)/zxbox.refmap: $(ZXBOX_OBJ)
 
-$(ZXBOX_OBJDIR)/zxbox.rock: $(ZXBOX_OBJ) $(ZXBOX_OUTLDS) $(PLUGINBITMAPLIB)
+$(ZXBOX_OUTLDS): $(PLUGIN_LDS) $(ZXBOX_OBJDIR)/zxbox.refmap
+	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DOVERLAY_OFFSET=$(shell \
+		$(TOOLSDIR)/ovl_offset.pl $(ZXBOX_OBJDIR)/zxbox.refmap))
 
-$(ZXBOX_OBJDIR)/zxbox.ovl: $(ZXBOX_OBJ) $(ZXBOX_OUTLDS) $(PLUGINBITMAPLIB) $(PLUGINLIB)
+$(ZXBOX_OBJDIR)/zxbox.ovl: $(ZXBOX_OBJ) $(ZXBOX_OUTLDS)
 	$(SILENT)$(CC) $(PLUGINFLAGS) -o $(basename $@).elf \
 		$(filter %.o, $^) \
-		$(filter %.a, $^) \
+		$(filter %.a, $+) \
 		-lgcc $(ZXBOX_LDFLAGS)
 	$(call PRINTS,LD $(@F))$(OC) -O binary $(basename $@).elf $@
 

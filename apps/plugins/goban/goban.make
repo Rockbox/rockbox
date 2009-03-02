@@ -7,7 +7,6 @@
 # $Id$
 #
 
-
 GOBAN_SRCDIR := $(APPSDIR)/plugins/goban
 GOBAN_BUILDDIR := $(BUILDDIR)/apps/plugins/goban
 
@@ -18,31 +17,30 @@ OTHER_SRC += $(GOBAN_SRC)
 
 ifndef SIMVER
 ifneq (,$(strip $(foreach tgt,RECORDER ONDIO,$(findstring $(tgt),$(TARGET)))))
-    ### archos recorder targets
-    GOBAN_INLDS := $(GOBAN_SRCDIR)/archos.lds
+    ### lowmem targets
     ROCKS += $(GOBAN_BUILDDIR)/goban.ovl
+    GOBAN_OUTLDS = $(GOBAN_BUILDDIR)/goban.link
+    GOBAN_OVLFLAGS = -T$(GOBAN_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
 else
     ### all other targets
-    GOBAN_INLDS := $(APPSDIR)/plugins/plugin.lds
     ROCKS += $(GOBAN_BUILDDIR)/goban.rock
 endif
-    GOBAN_OVLFLAGS = -T$(GOBAN_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
-    GOBAN_OUTLDS = $(GOBAN_BUILDDIR)/goban.lds
 else
     ### simulator
     ROCKS += $(GOBAN_BUILDDIR)/goban.rock
-    GOBAN_OVLFLAGS = $(SHARED_FLAG) # <-- from Makefile
 endif
 
-$(GOBAN_OUTLDS): $(GOBAN_INLDS) $(GOBAN_OBJ)
-	$(call PRINTS,PP $(<F))$(call preprocess2file,$<,$@)
+$(GOBAN_BUILDDIR)/goban.rock: $(GOBAN_OBJ)
 
-$(GOBAN_BUILDDIR)/goban.rock: $(GOBAN_OBJ) $(GOBAN_OUTLDS)
+$(GOBAN_BUILDDIR)/goban.refmap: $(GOBAN_OBJ)
+
+$(GOBAN_OUTLDS): $(PLUGIN_LDS) $(GOBAN_BUILDDIR)/goban.refmap
+	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DOVERLAY_OFFSET=$(shell \
+		$(TOOLSDIR)/ovl_offset.pl $(GOBAN_BUILDDIR)/goban.refmap))
 
 $(GOBAN_BUILDDIR)/goban.ovl: $(GOBAN_OBJ) $(GOBAN_OUTLDS)
 	$(SILENT)$(CC) $(PLUGINFLAGS) -o $(basename $@).elf \
 		$(filter %.o, $^) \
-		$(filter %.a, $^) \
+		$(filter %.a, $+) \
 		-lgcc $(GOBAN_OVLFLAGS)
 	$(call PRINTS,LD $(@F))$(OC) -O binary $(basename $@).elf $@
-
