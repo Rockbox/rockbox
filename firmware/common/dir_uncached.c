@@ -268,7 +268,7 @@ int mkdir_uncached(const char *name)
         }
     }
 
-    memset(&newdir, sizeof(struct fat_dir), 0);
+    memset(&newdir, 0, sizeof(struct fat_dir));
     
     rc = fat_create_dir(basename, &newdir, &(dir->fatdir));
     closedir_uncached(dir);

@@ -2849,7 +2849,7 @@ void audio_init(void)
                   IF_PRIO(, PRIORITY_SYSTEM)
 		          IF_COP(, CPU));
 
-    memset(trackdata, sizeof(trackdata), 0);
+    memset(trackdata, 0, sizeof(trackdata));
 
 #if (CONFIG_CODEC == MAS3587F) && !defined(SIMULATOR)
     if (HW_MASK & PR_ACTIVE_HIGH)
