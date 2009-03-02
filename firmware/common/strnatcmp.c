@@ -41,6 +41,12 @@
 
 #define assert(x)   /* nothing */
 
+/* Convert char to int regardless of whether char is signed or not */
+static inline int
+to_int(char c)
+{
+    return (int) ((unsigned char) c);
+}
 
 /* These are defined as macros to make it easier to adapt this code to
  * different characters types or comparison functions. */
@@ -70,25 +76,28 @@ static int
 compare_right(char const *a, char const *b)
 {
      int bias = 0;
+     int ca, cb;
      
      /* The longest run of digits wins.  That aside, the greatest
 	value wins, but we can't know that it will until we've scanned
 	both numbers to know that they have the same magnitude, so we
 	remember it in BIAS. */
      for (;; a++, b++) {
-	  if (!nat_isdigit(*a)  &&  !nat_isdigit(*b))
+      ca = to_int(*a);
+      cb = to_int(*b);
+	  if (!nat_isdigit(ca)  &&  !nat_isdigit(cb))
 	       return bias;
-	  else if (!nat_isdigit(*a))
+	  else if (!nat_isdigit(ca))
 	       return -1;
-	  else if (!nat_isdigit(*b))
+	  else if (!nat_isdigit(cb))
 	       return +1;
-	  else if (*a < *b) {
+	  else if (ca < cb) {
 	       if (!bias)
 		    bias = -1;
-	  } else if (*a > *b) {
+	  } else if (ca > cb) {
 	       if (!bias)
 		    bias = +1;
-	  } else if (!*a  &&  !*b)
+	  } else if (!ca  &&  !cb)
 	       return bias;
      }
 
@@ -104,14 +113,15 @@ static int strnatcmp0(char const *a, char const *b, int fold_case)
      assert(a && b);
      ai = bi = 0;
      while (1) {
-	  ca = a[ai]; cb = b[bi];
+	  ca = to_int(a[ai]);
+      cb = to_int(b[bi]);
 
 	  /* skip over leading spaces or zeros */
 	  while (nat_isspace(ca))
-	       ca = a[++ai];
+	       ca = to_int(a[++ai]);
 
 	  while (nat_isspace(cb))
-	       cb = b[++bi];
+	       cb = to_int(b[++bi]);
 
 	  /* process run of digits */
 	  if (nat_isdigit(ca)  &&  nat_isdigit(cb)) {
