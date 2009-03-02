@@ -806,6 +806,10 @@ void settings_apply(bool read_disk)
         global_settings.peak_meter_clip_hold);
 #endif
 
+#ifdef HAVE_SPEAKER
+    audiohw_enable_speaker(global_settings.speaker_enabled);
+#endif
+
     if (read_disk)
     {
         

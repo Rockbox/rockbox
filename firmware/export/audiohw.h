@@ -305,4 +305,10 @@ void audiohw_set_stereo_width(int val);
 
 #endif /* CONFIG_CODEC != SWCODEC */
 
+#ifdef HAVE_SPEAKER
+
+void audiohw_enable_speaker(bool on);
+
+#endif /* HAVE_SPEAKER */
+
 #endif /* _AUDIOHW_H_ */

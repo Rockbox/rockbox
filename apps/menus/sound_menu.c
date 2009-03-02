@@ -102,6 +102,10 @@ MENUITEM_SETTING(stereo_width, &global_settings.stereo_width,
     MENUITEM_SETTING(mdb_shape, &global_settings.mdb_shape, NULL);
 #endif
 
+#ifdef HAVE_SPEAKER
+    MENUITEM_SETTING(speaker_enabled, &global_settings.speaker_enabled, NULL);
+#endif
+
 
 
 MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
@@ -121,6 +125,9 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
          ,&loudness,&avc,&superbass,&mdb_enable,&mdb_strength
          ,&mdb_harmonics,&mdb_center,&mdb_shape
+#endif
+#ifdef HAVE_SPEAKER
+         ,&speaker_enabled
 #endif
          );
 

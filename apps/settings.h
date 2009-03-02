@@ -730,6 +730,10 @@ struct user_settings
     bool accessory_supply; /* 0=off 1=on, accessory power supply for iPod */
 #endif
 
+#ifdef HAVE_SPEAKER
+    bool speaker_enabled;
+#endif
+
     /* If values are just added to the end, no need to bump plugin API
        version. */
     /* new stuff to be added at the end */

@@ -12288,3 +12288,17 @@
     serial_port: "Automatisch"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user:
+  <source>
+    *: "Enable Speaker"
+  </source>
+  <dest>
+    *: "Luidspreker inschakelen"
+  </dest>
+  <voice>
+    *: "Luidspreker inschakelen"
+  </voice>
+</phrase>

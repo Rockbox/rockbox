@@ -12401,3 +12401,17 @@
     *: "As whole numbers"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user:
+  <source>
+    *: "Enable Speaker"
+  </source>
+  <dest>
+    *: "Enable Speaker"
+  </dest>
+  <voice>
+    *: "Enable Speaker"
+  </voice>
+</phrase>

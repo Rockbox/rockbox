@@ -1458,6 +1458,10 @@ const struct settings_list settings[] = {
                   qs_load_from_cfg, qs_write_to_cfg,
                   qs_is_changed, qs_set_default),
 #endif
+#ifdef HAVE_SPEAKER
+    OFFON_SETTING(0, speaker_enabled, LANG_ENABLE_SPEAKER, false, "speaker",
+                  audiohw_enable_speaker),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);
