@@ -612,7 +612,7 @@ enum plugin_status plugin_start(const void *parameter) {
             if (reversi_game_is_finished(&game, cur_player)) {
                 reversi_count_occupied_cells(&game, &w_cnt, &b_cnt);
                 rb->snprintf(msg_buf, sizeof(msg_buf),
-                        "Game over. %s have won.",
+                        "Game over. %s won.",
                         (w_cnt>b_cnt?"WHITE":"BLACK"));
                 rb->splash(HZ*2, msg_buf);
                 draw_screen = true; /* Must update screen after splash */
@@ -648,7 +648,7 @@ enum plugin_status plugin_start(const void *parameter) {
                     if (reversi_game_is_finished(&game, cur_player)) {
                         reversi_count_occupied_cells(&game, &w_cnt, &b_cnt);
                         rb->snprintf(msg_buf, sizeof(msg_buf),
-                                "Game over. %s have won.",
+                                "Game over. %s won.",
                                 (w_cnt>b_cnt?"WHITE":"BLACK"));
                         rb->splash(HZ*2, msg_buf);
                         draw_screen = true; /* Must update screen after splash */
