@@ -17,7 +17,7 @@ $(OBJDIR)/%.o: %.S
 # errors/warnings to cause an error code to get returned and thus stop the
 # build
 #
-# This script checks for the presence of $(BUILDDIR)/lang.h and if it doesn't
+# This script checks for the presence of $(BUILDDIR)/lang/lang.h and if it doesn't
 # alreay exist, it is created. This is because lots of files include this
 # *generated* file and if it doesn't exist when we generate the deps it is no
 # good. There's a -MG compiler option to cover for this case, but it doesn't
@@ -45,7 +45,7 @@ $(DEPFILE): $(SOURCES)
 	        rm $$del; \
 	        del=""; \
 	    fi \
-	done | sed -e "s:[^[:space:]]*lang.h:$(OBJDIR)/lang.o:" \
+	done | sed -e "s:[^[:space:]]*lang.h:$(OBJDIR)/lang/lang_core.o:" \
 	-e "s:[^[:space:]]*sysfont.h:$(BUILDDIR)/sysfont.h:" \
 	-e "s:[^[:space:]]*max_language_size.h:$(BUILDDIR)/max_language_size.h:" \
 	-e "s: bitmaps/: $(BUILDDIR)/bitmaps/:g" \

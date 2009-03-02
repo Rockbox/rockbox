@@ -9,23 +9,23 @@
 
 LANGS := $(call preprocess, $(APPSDIR)/lang/SOURCES)
 LANGOBJ := $(LANGS:$(ROOTDIR)/%.lang=$(BUILDDIR)/%.lng)
-LANG_O = $(BUILDDIR)/lang.o
+LANG_O = $(BUILDDIR)/lang/lang_core.o
 
-CLEANOBJS += $(BUILDDIR)/max_language_size.h $(BUILDDIR)/lang.*
+CLEANOBJS += $(BUILDDIR)/lang/max_language_size.h $(BUILDDIR)/lang/lang*
 
 # $(BUILDDIR)/apps/lang must exist before we create dependencies on it,
 # otherwise make will simply ignore those dependencies.
 # Therefore we create it here.
 #DUMMY := $(shell mkdir -p $(BUILDDIR)/apps/lang)
 
-$(BUILDDIR)/max_language_size.h: $(LANGOBJ)
+$(BUILDDIR)/lang/max_language_size.h: $(LANGOBJ)
 	$(call PRINTS,Create $(notdir $@))
 	$(SILENT)echo "#define MAX_LANGUAGE_SIZE `ls -ln $(BUILDDIR)/apps/lang/* | awk '{print $$5}' | sort -n | tail -1`" > $@
 
-$(BUILDDIR)/lang.o: $(APPSDIR)/lang/$(LANGUAGE).lang $(BUILDDIR)/apps/features
+$(BUILDDIR)/lang/lang_core.o: $(APPSDIR)/lang/$(LANGUAGE).lang $(BUILDDIR)/apps/features
 	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
 		perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(MODELNAME)$$feat $<
-	$(call PRINTS,CC lang.c)$(CC) $(CFLAGS) -c $(BUILDDIR)/lang.c -o $@
+	$(call PRINTS,CC lang_core.c)$(CC) $(CFLAGS) -c $(BUILDDIR)/lang/lang_core.c -o $@
 
 $(BUILDDIR)/%.lng : $(ROOTDIR)/%.lang $(BUILDDIR)/apps/genlang-features
 	$(call PRINTS,GENLANG $(subst $(ROOTDIR)/,,$<))

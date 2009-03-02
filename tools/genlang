@@ -535,13 +535,13 @@ if ($sortfile) {
 if($prefix) {
     # We create a .c and .h file
 
-    open(HFILE, ">$prefix.h") ||
-        die "Error: couldn't create file $prefix.h\n";
-    open(CFILE, ">$prefix.c") ||
-        die "Error: couldn't create file $prefix.c\n";        
+    open(HFILE, ">$prefix/lang.h") ||
+        die "Error: couldn't create file $prefix/lang.h\n";
+    open(CFILE, ">$prefix/lang_core.c") ||
+        die "Error: couldn't create file $prefix/lang_core.c\n";        
 
    # get header file name
-   $headername = "$prefix.h";
+   $headername = "$prefix/lang.h";
    $headername =~ s/(.*\/)*//;
 
     print HFILE <<MOO

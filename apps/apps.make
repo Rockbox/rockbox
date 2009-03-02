@@ -17,6 +17,7 @@ SRC += $(call preprocess, $(APPSDIR)/SOURCES)
 #
 features $(BUILDDIR)/apps/features $(BUILDDIR)/apps/genlang-features: $(APPSDIR)/features.txt
 	$(SILENT)mkdir -p $(BUILDDIR)/apps
+	$(SILENT)mkdir -p $(BUILDDIR)/lang
 	$(call PRINTS,PP $(<F))
 	$(SILENT)$(CC) $(PPCFLAGS) \
                  -E -P -imacros "config.h" -imacros "button.h" -x c $< | \
