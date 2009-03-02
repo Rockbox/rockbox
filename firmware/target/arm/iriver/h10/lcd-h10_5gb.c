@@ -108,7 +108,11 @@ void lcd_set_flip(bool yesno)
 /* LCD init */
 void lcd_init_device(void)
 {  
+#ifndef BOOTLOADER
+    /* The OF won't boot if this is done in the bootloader - ideally we should 
+       tweak the lcd controller speed settings but this will do for now */
     CLCD_CLOCK_SRC |= 0xc0000000; /* Set LCD interface clock to PLL */
+#endif
     /* H10 LCD is initialised by the bootloader */
 }
 
