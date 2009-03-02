@@ -461,7 +461,7 @@
 #define ATA_TIME_DVH            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x12))
 #define ATA_TIME_DZFS           (*(REG8_PTR_T)(ATA_BASE_ADDR+0x13))
 #define ATA_TIME_DVS            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x14))
-#define ATA_TIME_CVS            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x15))
+#define ATA_TIME_CVH            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x15))
 #define ATA_TIME_SS             (*(REG8_PTR_T)(ATA_BASE_ADDR+0x16))
 #define ATA_TIME_CYC            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x17))
     /* */
