@@ -29,8 +29,9 @@ struct nand_info
     unsigned short    blocks_per_bank;
     unsigned short    page_size;
     unsigned short    spare_size;
-    unsigned short    col_cycles;
-    unsigned short    row_cycles;
+    unsigned char     col_cycles;
+    unsigned char     row_cycles;
+    unsigned char     planes;
 };
 
 struct nand_info* nand_identify(unsigned char data[5]);

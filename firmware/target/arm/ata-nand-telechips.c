@@ -44,11 +44,9 @@ static struct mutex ata_mtx SHAREDBSS_ATTR;
 
 #if defined(COWON_D2) || defined(IAUDIO_7)
 #define FTL_V2
-#define BLOCKS_PER_SEGMENT  4
 #define MAX_WRITE_CACHES    8
 #else
 #define FTL_V1
-#define BLOCKS_PER_SEGMENT  1
 #define MAX_WRITE_CACHES    4
 #endif
 
@@ -87,28 +85,26 @@ static struct mutex ata_mtx SHAREDBSS_ATTR;
 
 /* Chip characteristics, initialised by nand_get_chip_info() */
 
-static int page_size       = 0;
-static int spare_size      = 0;
-static int pages_per_block = 0;
-static int blocks_per_bank = 0;
-static int pages_per_bank  = 0;
-static int row_cycles      = 0;
-static int col_cycles      = 0;
-static int total_banks     = 0;
+static struct nand_info* nand_data = NULL;
+
+static int total_banks         = 0;
+static int pages_per_bank      = 0;
 static int sectors_per_page    = 0;
 static int bytes_per_segment   = 0;
 static int sectors_per_segment = 0;
 static int segments_per_bank   = 0;
+static int pages_per_segment   = 0;
 
 /* Maximum values for static buffers */
 
-#define MAX_PAGE_SIZE       4096
-#define MAX_SPARE_SIZE      128
-#define MAX_BLOCKS_PER_BANK 8192
-#define MAX_PAGES_PER_BLOCK 128
-#define MAX_BANKS           4
+#define MAX_PAGE_SIZE          4096
+#define MAX_SPARE_SIZE         128
+#define MAX_BLOCKS_PER_BANK    8192
+#define MAX_PAGES_PER_BLOCK    128
+#define MAX_BANKS              4
+#define MAX_BLOCKS_PER_SEGMENT 4
 
-#define MAX_SEGMENTS (MAX_BLOCKS_PER_BANK * MAX_BANKS / BLOCKS_PER_SEGMENT)
+#define MAX_SEGMENTS (MAX_BLOCKS_PER_BANK * MAX_BANKS / MAX_BLOCKS_PER_SEGMENT)
 
 /* Logical/Physical translation table */
 
@@ -134,7 +130,7 @@ struct write_cache
     short inplace_pages_used;
     short random_bank;
     short random_phys_segment;
-    short page_map[MAX_PAGES_PER_BLOCK * BLOCKS_PER_SEGMENT];
+    short page_map[MAX_PAGES_PER_BLOCK * MAX_BLOCKS_PER_SEGMENT];
 };
 static struct write_cache write_caches[MAX_WRITE_CACHES];
 
@@ -149,27 +145,41 @@ static unsigned int ecc_fail_count = 0;
 
 /* Conversion functions */
 
-static inline int phys_segment_to_page_addr(int phys_segment, int page_in_seg)
+static int phys_segment_to_page_addr(int phys_segment, int page_in_seg)
 {
-#if BLOCKS_PER_SEGMENT == 4 /* D2 */
-    int page_addr = phys_segment * pages_per_block * 2;
+    int page_addr = 0;
 
-    if (page_in_seg & 1)
+    switch (nand_data->planes)
     {
-        /* Data is located in block+1 */
-        page_addr += pages_per_block;
-    }
+        case 1:
+        {
+            page_addr = (phys_segment * nand_data->pages_per_block);
+            break;
+        }
 
-    if (page_in_seg & 2)
-    {
-        /* Data is located in second plane */
-        page_addr += (blocks_per_bank/2) * pages_per_block;
-    }
+        case 2:
+        case 4:
+        {
+            page_addr = phys_segment * nand_data->pages_per_block * 2;
 
-    page_addr += page_in_seg/4;
-#elif BLOCKS_PER_SEGMENT == 1 /* M200 */
-    int page_addr = (phys_segment * pages_per_block) + page_in_seg;
-#endif
+            if (page_in_seg & 1)
+            {
+                /* Data is located in block+1 */
+                page_addr += nand_data->pages_per_block;
+            }
+
+            if (nand_data->planes == 4 && page_in_seg & 2)
+            {
+                /* Data is located in 2nd half of bank */
+                page_addr +=
+                    (nand_data->blocks_per_bank/2) * nand_data->pages_per_block;
+            }
+
+            break;
+        }
+    }
+    
+    page_addr += (page_in_seg / nand_data->planes);
 
     return page_addr;
 }
@@ -276,8 +286,8 @@ static void nand_read_uid(int bank, unsigned int* uid_buf)
     NFC_CMD = 0x00;
 
     /* Write row/column address */
-    for (i = 0; i < col_cycles; i++) NFC_SADDR = 0;
-    for (i = 0; i < row_cycles; i++) NFC_SADDR = 0;
+    for (i = 0; i < nand_data->col_cycles; i++) NFC_SADDR = 0;
+    for (i = 0; i < nand_data->row_cycles; i++) NFC_SADDR = 0;
 
     /* End of read */
     NFC_CMD = 0x30;
@@ -323,14 +333,14 @@ static void nand_read_raw(int bank, int row, int column, int size, void* buf)
     NFC_CMD = 0x00;
 
     /* Write column address */
-    for (i = 0; i < col_cycles; i++)
+    for (i = 0; i < nand_data->col_cycles; i++)
     {
         NFC_SADDR = column & 0xFF;
         column = column >> 8;
     }
 
     /* Write row address */
-    for (i = 0; i < row_cycles; i++)
+    for (i = 0; i < nand_data->row_cycles; i++)
     {
         NFC_SADDR = row & 0xFF;
         row = row >> 8;
@@ -379,7 +389,7 @@ static void nand_get_chip_info(void)
     manuf_id = id_buf[0];
 
     /* Identify the chip geometry */
-    struct nand_info* nand_data = nand_identify(id_buf);
+    nand_data = nand_identify(id_buf);
 
     if (nand_data == NULL)
     {
@@ -387,18 +397,18 @@ static void nand_get_chip_info(void)
                 id_buf[0],id_buf[1],id_buf[2],id_buf[3],id_buf[4]);
     }
 
-    page_size       = nand_data->page_size;
-    spare_size      = nand_data->spare_size;
-    pages_per_block = nand_data->pages_per_block;
-    blocks_per_bank = nand_data->blocks_per_bank;
-    col_cycles      = nand_data->col_cycles;
-    row_cycles      = nand_data->row_cycles;
+    pages_per_bank = nand_data->blocks_per_bank * nand_data->pages_per_block;
 
-    pages_per_bank      = blocks_per_bank * pages_per_block;
-    segments_per_bank   = blocks_per_bank / BLOCKS_PER_SEGMENT;
-    bytes_per_segment   = page_size * pages_per_block * BLOCKS_PER_SEGMENT;
-    sectors_per_page    = page_size / SECTOR_SIZE;
+    segments_per_bank = nand_data->blocks_per_bank / nand_data->planes;
+
+    bytes_per_segment = nand_data->page_size * nand_data->pages_per_block
+        * nand_data->planes;
+
+    sectors_per_page = nand_data->page_size / SECTOR_SIZE;
+
     sectors_per_segment = bytes_per_segment / SECTOR_SIZE;
+    
+    pages_per_segment = sectors_per_segment / sectors_per_page;
 
     /* Establish how many banks are present */
     nand_read_id(1, id_buf);
@@ -447,10 +457,9 @@ static void nand_get_chip_info(void)
           This is not present on some older players (formatted with early FW?)
      */
 
-    nand_read_raw(0,          /* bank */
-                  0,          /* page */
-                  page_size,  /* offset */
-                  8, id_buf);
+    nand_read_raw(0, 0,                 /* bank, page */
+                  nand_data->page_size, /* offset */
+                  8, id_buf);           /* length, dest */
 
     if (strncmp(id_buf, "BMP", 3)) panicf("BMP tag not present");
 
@@ -611,7 +620,9 @@ static void read_random_writes_cache(int bank, int phys_segment)
 #ifndef FTL_V1
     /* Loop over each page in the phys segment (from page 1 onwards).
        Read spare for 1st sector, store location of page in array. */
-    for (page = 1; page < pages_per_block * BLOCKS_PER_SEGMENT; page++)
+    for (page = 1;
+         page < (nand_data->pages_per_block * nand_data->planes);
+         page++)
     {
         unsigned short cached_page;
         
@@ -663,7 +674,7 @@ static void read_inplace_writes_cache(int bank, int phys_segment)
     
     /* Find how many pages have been written to the new segment */
     while (log_segment != -1 &&
-           page < (pages_per_block * BLOCKS_PER_SEGMENT) - 1)
+           page < (nand_data->pages_per_block * nand_data->planes) - 1)
     {
         page++;
         nand_read_raw(bank, phys_segment_to_page_addr(phys_segment, page),
@@ -802,10 +813,9 @@ int nand_init(void)
             if (type == SECTYPE_MAIN_INPLACE_CACHE)
             {
                 /* Check last sector of sequential write cache block */
-                nand_read_raw(bank,
-                              phys_segment_to_page_addr(phys_segment,
-                                (pages_per_block * BLOCKS_PER_SEGMENT) - 1),
-                              page_size + spare_size - 16,
+                nand_read_raw(bank, phys_segment_to_page_addr
+                                (phys_segment, pages_per_segment - 1),
+                              nand_data->page_size + nand_data->spare_size - 16,
                               16, spare_buf);
                 
                 /* If last sector has been written, treat block as main data */
