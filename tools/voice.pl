@@ -140,6 +140,7 @@ sub correct_string {
                 }
                 case "festival" {
                     $string =~ s/\ba\b/ay/ig;
+                    $string =~ s/$/./;
                 }
             }
         }
