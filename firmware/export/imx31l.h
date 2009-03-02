@@ -439,11 +439,12 @@
 /* ATA */
 #define ATA_TIME_OFF            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x00))
 #define ATA_TIME_ON             (*(REG8_PTR_T)(ATA_BASE_ADDR+0x01))
+    /* PIO */
 #define ATA_TIME_1              (*(REG8_PTR_T)(ATA_BASE_ADDR+0x02))
 #define ATA_TIME_2W             (*(REG8_PTR_T)(ATA_BASE_ADDR+0x03))
-    /* PIO */
 #define ATA_TIME_2R             (*(REG8_PTR_T)(ATA_BASE_ADDR+0x04))
 #define ATA_TIME_AX             (*(REG8_PTR_T)(ATA_BASE_ADDR+0x05))
+#define ATA_TIME_PIO_RDX        (*(REG8_PTR_T)(ATA_BASE_ADDR+0x06))
 #define ATA_TIME_4              (*(REG8_PTR_T)(ATA_BASE_ADDR+0x07))
 #define ATA_TIME_9              (*(REG8_PTR_T)(ATA_BASE_ADDR+0x08))
     /* MDMA */
@@ -454,7 +455,7 @@
     /* UDMA */
 #define ATA_TIME_ACK            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x0D))
 #define ATA_TIME_ENV            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x0E))
-#define ATA_TIME_PIO_RDX        (*(REG8_PTR_T)(ATA_BASE_ADDR+0x0F))
+#define ATA_TIME_RPX            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x0F))
 #define ATA_TIME_ZAH            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x10))
 #define ATA_TIME_MLIX           (*(REG8_PTR_T)(ATA_BASE_ADDR+0x11))
 #define ATA_TIME_DVH            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x12))

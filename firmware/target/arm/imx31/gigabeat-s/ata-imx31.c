@@ -33,8 +33,8 @@ static const struct ata_pio_timings
 {
     uint16_t time_2w;       /* t2 during write */
     uint16_t time_2r;       /* t2 during read */
+    uint8_t  time_ax;       /* tA */
     uint8_t  time_1;        /* t1 */
-    uint8_t  time_pio_rdx;  /* trd */
     uint8_t  time_4;        /* t4 */
     uint8_t  time_9;        /* t9 */
 } pio_timings[5] =
@@ -44,6 +44,7 @@ static const struct ata_pio_timings
         .time_1 = 70,
         .time_2w = 290,
         .time_2r = 290,
+        .time_ax = 35,
         .time_4 = 30,
         .time_9 = 20
     },
@@ -52,6 +53,7 @@ static const struct ata_pio_timings
         .time_1 = 50,
         .time_2w = 290,
         .time_2r = 290,
+        .time_ax = 35,
         .time_4 = 20,
         .time_9 = 15
     },
@@ -60,6 +62,7 @@ static const struct ata_pio_timings
         .time_1 = 30,
         .time_2w = 290,
         .time_2r = 290,
+        .time_ax = 35,
         .time_4 = 15,
         .time_9 = 10
     },
@@ -68,6 +71,7 @@ static const struct ata_pio_timings
         .time_1 = 30,
         .time_2w = 80,
         .time_2r = 80,
+        .time_ax = 35,
         .time_4 = 10,
         .time_9 = 10
     },
@@ -76,6 +80,7 @@ static const struct ata_pio_timings
         .time_1 = 25,
         .time_2w = 70,
         .time_2r = 70,
+        .time_ax = 35,
         .time_4 = 10,
         .time_9 = 10
     },
@@ -99,13 +104,10 @@ void ata_set_pio_timings(int mode)
 
     pio_mode = mode;
 
-    ATA_TIME_OFF = 3;
-    ATA_TIME_ON = 3;
-
     ATA_TIME_1 = (timings->time_1 + T) / T;
     ATA_TIME_2W = (timings->time_2w + T) / T;
     ATA_TIME_2R = (timings->time_2r + T) / T;
-    ATA_TIME_AX = (35 + T) / T; /* tA */
+    ATA_TIME_AX = (timings->time_ax + T) / T + 2; /* 1.5 + tAX */
     ATA_TIME_PIO_RDX = 1;
     ATA_TIME_4 = (timings->time_4 + T) / T;
     ATA_TIME_9 = (timings->time_9 + T) / T;
@@ -153,6 +155,10 @@ void ata_device_init(void)
 {
     /* Make sure we're not in reset mode */
     ata_enable(true);
+
+    /* All modes use same tOFF/tON */
+    ATA_TIME_OFF = 3;
+    ATA_TIME_ON = 3;
 
     /* mode may be switched later once identify info is ready in which
      * case the main driver calls back */
