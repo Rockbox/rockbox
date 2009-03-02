@@ -45,23 +45,23 @@
 /* These are defined as macros to make it easier to adapt this code to
  * different characters types or comparison functions. */
 static inline int
-nat_isdigit(char a)
+nat_isdigit(int a)
 {
-     return isdigit((unsigned char) a);
+     return isdigit(a);
 }
 
 
 static inline int
-nat_isspace(char a)
+nat_isspace(int a)
 {
-     return a == '0' || isspace((unsigned char) a);
+     return a == '0' || isspace(a);
 }
 
 
-static inline char
-nat_toupper(char a)
+static inline int
+nat_toupper(int a)
 {
-     return toupper((unsigned char) a);
+     return toupper(a);
 }
 
 
@@ -98,7 +98,7 @@ compare_right(char const *a, char const *b)
 static int strnatcmp0(char const *a, char const *b, int fold_case)
 {
      int ai, bi;
-     char ca, cb;
+     int ca, cb;
      int result;
      
      assert(a && b);
