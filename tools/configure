@@ -529,7 +529,7 @@ voiceconfig () {
     # Select which voice to use for Festival
     if [ "$TTS_ENGINE" = "festival" ]; then
         i=1
-        for voice in `echo "(voice.list)"|festival -i 2>/dev/null |tr "\n" " "|sed -e 's/.*festival> (\(.*\)) festival>/\1 foobar/'|sort`; do
+        for voice in `echo "(voice.list)"|festival -i 2>/dev/null |tr "\n" " "|sed -e 's/.*festival> (\(.*\)) festival>/\1/'|sort`; do
             if [ "$i" = "1" ]; then
                 TTS_FESTIVAL_VOICE="$voice" # Default choice
             fi
@@ -539,7 +539,7 @@ voiceconfig () {
         printf "Please select which Festival voice to use (default is $TTS_FESTIVAL_VOICE): "
         CHOICE=`input`
         i=1
-        for voice in `echo "(voice.list)"|festival -i 2>/dev/null |tr "\n" " "|sed -e 's/.*festival> (\(.*\)) festival>/\1 foobar/'|sort`; do
+        for voice in `echo "(voice.list)"|festival -i 2>/dev/null |tr "\n" " "|sed -e 's/.*festival> (\(.*\)) festival>/\1/'|sort`; do
             if [ "$i" = "$CHOICE" -o "$voice" = "$CHOICE" ]; then
                 TTS_FESTIVAL_VOICE="$voice"
             fi
