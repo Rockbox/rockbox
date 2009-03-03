@@ -19,7 +19,7 @@
 #
 #    Fitchî e walon ki rote avou tolminme kéne éndjolreye
 #
-#    Stéphane QUERTINMONT <stefane AT walon.org> - Djanvî 2009
+#    Stéphane QUERTINMONT <stefane AT walon.org> - Måss 2009
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -2392,11 +2392,11 @@
     h10,h10_5gb,e200*,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
-    *: "Bastixhaedje del båze di dnêyes... %d trovés (OFF po-z eraler en erî)"
-    h100,h120,h300: "Bastixhaedje del båze di dnêyes... %d found (STOP po-z eraler en erî)"
-    ipod*: "Bastixhaedje del båze di dnêyes... %d trovés (PREV po-z eraler en erî)"
-    x5,m5,gigabeat*,mrobe100: "Bastixhaedje del båze di dnêyes... %d trovés (LEFT po-z eraler en erî)"
-    h10,h10_5gb,e200*,c200,sa9200: "Bastixhaedje del båze di dnêyes... %d trovés (PREV po-z eraler en erî)"
+    *: "Bastixhaedje del båze di dnêyes... %d di trovés (OFF po-z eraler en erî)"
+    h100,h120,h300: "Bastixhaedje del båze di dnêyes... %d di trovés (STOP po-z eraler en erî)"
+    ipod*: "Bastixhaedje del båze di dnêyes... %d di trovés (PREV po-z eraler en erî)"
+    x5,m5,gigabeat*,mrobe100: "Bastixhaedje del båze di dnêyes... %d di trovés (LEFT po-z eraler en erî)"
+    h10,h10_5gb,e200*,c200,sa9200: "Bastixhaedje del båze di dnêyes... %d di trovés (PREV po-z eraler en erî)"
   </dest>
   <voice>
     *: "intrêyes trovêyes pol båze di dnêyes"
@@ -3284,15 +3284,15 @@
   user: core
   <source>
     *: "List Acceleration Start Delay"
-    wheel_acceleration: none
+    scrollwheel: none
   </source>
   <dest>
     *: "Tårdjaedje divant acceleråcion djivêye"
-    wheel_acceleration: none
+    scrollwheel: none
   </dest>
   <voice>
     *: "Tårdjaedje divant l'acceleråcion del djivêye"
-    wheel_acceleration: none
+    scrollwheel: none
   </voice>
 </phrase>
 <phrase>
@@ -3301,15 +3301,15 @@
   user: core
   <source>
     *: "List Acceleration Speed"
-    wheel_acceleration: none
+    scrollwheel: none
   </source>
   <dest>
     *: "Radisté d'acceleråcion djivêye"
-    wheel_acceleration: none
+    scrollwheel: none
   </dest>
   <voice>
     *: "Radisté d'acceleråcion del djivêye"
-    wheel_acceleration: none
+    scrollwheel: none
   </voice>
 </phrase>
 <phrase>
@@ -12289,3 +12289,46 @@
     *: "Kiminålté"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Eterpreter les limeros po les rlére"
+  </dest>
+  <voice>
+    *: "Eterpreter les limeros po les rlére"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Come des chifes"
+  </dest>
+  <voice>
+    *: "Come des chifes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "Come des limeros tot etirs"
+  </dest>
+  <voice>
+    *: "Come des limeros tot etirs"
+  </voice>
+</phrase>
+
