@@ -3284,15 +3284,15 @@
   user: core
   <source>
     *: "List Acceleration Start Delay"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Tårdjaedje divant acceleråcion djivêye"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Tårdjaedje divant l'acceleråcion del djivêye"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -3301,15 +3301,15 @@
   user: core
   <source>
     *: "List Acceleration Speed"
-    scrollwheel: none
+    wheel_acceleration: none
   </source>
   <dest>
     *: "Radisté d'acceleråcion djivêye"
-    scrollwheel: none
+    wheel_acceleration: none
   </dest>
   <voice>
     *: "Radisté d'acceleråcion del djivêye"
-    scrollwheel: none
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -12329,6 +12329,23 @@
   </dest>
   <voice>
     *: "Come des limeros tot etirs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Hôt-pårloe en alaedje"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Hôt-pårloe en alaedje"
   </voice>
 </phrase>
 
