@@ -8625,6 +8625,7 @@
 <phrase>
   id: LANG_RECORD_AGC_PRESET
   desc: automatic gain control in record settings
+  user: core
   <source>
     *: "Automatic Gain Control"
   </source>
@@ -8708,6 +8709,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
+  user: core
   <source>
     *: "AGC max. gain"
   </source>
@@ -9181,6 +9183,7 @@
 <phrase>
   id: LANG_AGC_VOICE
   desc: AGC preset
+  user: core
   <source>
     *: "Voice (fast)"
   </source>
@@ -9249,6 +9252,7 @@
 <phrase>
   id: LANG_AGC_MEDIUM
   desc: AGC preset
+  user: core
   <source>
     *: "Medium"
   </source>
@@ -9276,6 +9280,7 @@
 <phrase>
   id: LANG_AGC_SAFETY
   desc: AGC preset
+  user: core
   <source>
     *: "Safety (clip)"
   </source>
@@ -9331,6 +9336,7 @@
 <phrase>
   id: LANG_SPLIT_MEASURE
   desc: in record timesplit options
+  user: core
   <source>
     *: "Split Measure"
   </source>
@@ -9456,6 +9462,7 @@
 <phrase>
   id: LANG_SPLIT_TIME
   desc: in record timesplit options
+  user: core
   <source>
     *: "Split Time"
   </source>
@@ -9567,6 +9574,7 @@
 <phrase>
   id: LANG_SPLIT_TYPE
   desc: in record timesplit options
+  user: core
   <source>
     *: "What to do when Splitting"
   </source>
@@ -9580,6 +9588,7 @@
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
   desc: in record timesplit options
+  user: core
   <source>
     *: "Split Filesize"
   </source>
@@ -9663,6 +9672,7 @@
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
   desc: in record settings
+  user: core
   <source>
     *: "AGC clip time"
   </source>
@@ -9690,6 +9700,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_PRESET
   desc: automatic gain control in recording screen
+  user: core
   <source>
     *: "AGC"
   </source>

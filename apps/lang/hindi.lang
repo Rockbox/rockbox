@@ -2873,6 +2873,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_NEWFILESTP
   desc: trigger types
+  user: core
   <source>
     *: none
     recording: "New file"
@@ -2889,6 +2890,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_STOP
   desc: trigger types
+  user: core
   <source>
     *: none
     recording: "Stop"
@@ -2956,6 +2958,7 @@
 <phrase>
   id: LANG_AGC_LIVE
   desc: AGC preset
+  user: core
   <source>
     *: none
     agc: "Live (slow)"
@@ -2972,6 +2975,7 @@
 <phrase>
   id: LANG_AGC_DJSET
   desc: AGC preset
+  user: core
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -2988,6 +2992,7 @@
 <phrase>
   id: LANG_AGC_MEDIUM
   desc: AGC preset
+  user: core
   <source>
     *: none
     agc: "Medium"
@@ -3004,6 +3009,7 @@
 <phrase>
   id: LANG_AGC_VOICE
   desc: AGC preset
+  user: core
   <source>
     *: none
     agc: "Voice (fast)"
@@ -5086,6 +5092,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
   desc: AGC preset
+  user: core
   <source>
     *: none
     agc: "Live (slow)"
@@ -5102,6 +5109,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
   desc: AGC preset
+  user: core
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -5118,6 +5126,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
   desc: AGC preset
+  user: core
   <source>
     *: none
     agc: "Medium"
@@ -5134,6 +5143,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
   desc: AGC preset
+  user: core
   <source>
     *: none
     agc: "Voice (fast)"

@@ -5582,6 +5582,7 @@
 <phrase>
   id: LANG_FM_REGION
   desc: fm tuner region setting
+  user: core
   <source>
     *: none
     radio: "Region"
@@ -5598,6 +5599,7 @@
 <phrase>
   id: LANG_FM_EUROPE
   desc: fm tuner region europe
+  user: core
   <source>
     *: none
     radio: "Europe"
@@ -5614,6 +5616,7 @@
 <phrase>
   id: LANG_FM_US
   desc: fm region us / canada
+  user: core
   <source>
     *: none
     radio: "US / Canada"
@@ -5630,6 +5633,7 @@
 <phrase>
   id: LANG_FM_JAPAN
   desc: fm region japan
+  user: core
   <source>
     *: none
     radio: "Japan"
@@ -5646,6 +5650,7 @@
 <phrase>
   id: LANG_FM_KOREA
   desc: fm region korea
+  user: core
   <source>
     *: none
     radio: "Korea"
@@ -5954,6 +5959,7 @@
 <phrase>
   id: LANG_SPLIT_MEASURE
   desc: in record timesplit options
+  user: core
   <source>
     *: none
     recording: "Split Measure"
@@ -5970,6 +5976,7 @@
 <phrase>
   id: LANG_SPLIT_TYPE
   desc: in record timesplit options
+  user: core
   <source>
     *: none
     recording: "What to do when Splitting"
@@ -6020,6 +6027,7 @@
 <phrase>
   id: LANG_SPLIT_TIME
   desc: in record timesplit options
+  user: core
   <source>
     *: none
     recording: "Split Time"
@@ -6036,6 +6044,7 @@
 <phrase>
   id: LANG_SPLIT_SIZE
   desc: in record timesplit options
+  user: core
   <source>
     *: none
     recording: "Split Filesize"
@@ -6273,6 +6282,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_TYPE
   desc: in recording trigger menu
+  user: core
   <source>
     *: none
     recording: "Trigtype"
@@ -6289,6 +6299,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_NEWFILESTP
   desc: trigger types
+  user: core
   <source>
     *: none
     recording: "New file"
@@ -6305,6 +6316,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_STOP
   desc: trigger types
+  user: core
   <source>
     *: none
     recording: "Stop"
@@ -6440,6 +6452,7 @@
 <phrase>
   id: LANG_RECORD_AGC_PRESET
   desc: deprecated
+  user: core
   <source>
     *: none
     agc: ""
@@ -6456,6 +6469,7 @@
 <phrase>
   id: LANG_AGC_SAFETY
   desc: AGC preset
+  user: core
   <source>
     *: none
     agc: "Safety (clip)"
@@ -6472,6 +6486,7 @@
 <phrase>
   id: LANG_AGC_LIVE
   desc: AGC preset
+  user: core
   <source>
     *: none
     agc: "Live (slow)"
@@ -6488,6 +6503,7 @@
 <phrase>
   id: LANG_AGC_DJSET
   desc: AGC preset
+  user: core
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -6504,6 +6520,7 @@
 <phrase>
   id: LANG_AGC_MEDIUM
   desc: AGC preset
+  user: core
   <source>
     *: none
     agc: "Medium"
@@ -6520,6 +6537,7 @@
 <phrase>
   id: LANG_AGC_VOICE
   desc: AGC preset
+  user: core
   <source>
     *: none
     agc: "Voice (fast)"
@@ -6536,6 +6554,7 @@
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
   desc: deprecated
+  user: core
   <source>
     *: none
     agc: ""
@@ -10779,6 +10798,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
   desc: deprecated
+  user: core
   <source>
     *: none
     agc: ""
@@ -10795,6 +10815,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: deprecated
+  user: core
   <source>
     *: none
     agc: ""
@@ -10811,6 +10832,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
   desc: deprecated
+  user: core
   <source>
     *: none
     agc: ""
@@ -10827,6 +10849,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
   desc: deprecated
+  user: core
   <source>
     *: none
     agc: ""
@@ -10843,6 +10866,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
   desc: deprecated
+  user: core
   <source>
     *: none
     agc: ""
@@ -10859,6 +10883,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
   desc: deprecated
+  user: core
   <source>
     *: none
     agc: ""
@@ -10875,6 +10900,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
   desc: deprecated
+  user: core
   <source>
     *: none
     agc: ""
@@ -11832,6 +11858,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_PRESET
   desc: automatic gain control in record settings and screen
+  user: core
   <source>
     *: none
     agc: "AGC"
@@ -11848,6 +11875,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_CLIPTIME
   desc: in record settings
+  user: core
   <source>
     *: none
     agc: "AGC clip time"
@@ -11864,6 +11892,7 @@
 <phrase>
   id: LANG_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
+  user: core
   <source>
     *: none
     agc: "AGC max. gain"
