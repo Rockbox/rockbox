@@ -12288,3 +12288,62 @@
     *: "Crediti"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Considera i numeri per l'ordinamento"
+  </dest>
+  <voice>
+    *: "Considera i numeri per l'ordinamento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Come cifre"
+  </dest>
+  <voice>
+    *: "Come cifre"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "Come numeri interi"
+  </dest>
+  <voice>
+    *: "Come numeri interi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Abilita altoparlante"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Abilita altoparlante"
+  </voice>
+</phrase>
