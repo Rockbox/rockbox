@@ -20,7 +20,7 @@
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
-  user:
+  user: core
   <source>
     *: "Yes"
   </source>
@@ -34,7 +34,7 @@
 <phrase>
   id: LANG_SET_BOOL_NO
   desc: bool false representation
-  user:
+  user: core
   <source>
     *: "No"
   </source>
@@ -48,7 +48,7 @@
 <phrase>
   id: LANG_ON
   desc: Used in a lot of places
-  user:
+  user: core
   <source>
     *: "On"
   </source>
@@ -62,7 +62,7 @@
 <phrase>
   id: LANG_OFF
   desc: Used in a lot of places
-  user:
+  user: core
   <source>
     *: "Off"
   </source>
@@ -76,7 +76,7 @@
 <phrase>
   id: LANG_RESUME_SETTING_ASK
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Ask"
   </source>
@@ -90,7 +90,7 @@
 <phrase>
   id: LANG_ALWAYS
   desc: (player) the jump scroll shall be done "always
-  user:
+  user: core
   <source>
     *: "Always"
   </source>
@@ -104,7 +104,7 @@
 <phrase>
   id: LANG_CONFIRM_SHUTDOWN
   desc: in shutdown screen
-  user:
+  user: core
   <source>
     *: "Press OFF to shut down"
   </source>
@@ -118,7 +118,7 @@
 <phrase>
   id: LANG_SHUTTINGDOWN
   desc: in main menu
-  user:
+  user: core
   <source>
     *: "Shutting down..."
   </source>
@@ -132,7 +132,7 @@
 <phrase>
   id: LANG_REMOVE_MMC
   desc: before acknowledging usb in case an MMC is inserted (Ondio)
-  user:
+  user: core
   <source>
     *: "Please remove inserted MMC"
   </source>
@@ -146,7 +146,7 @@
 <phrase>
   id: LANG_MENU_SETTING_CANCEL
   desc: Visual confirmation of canceling a changed setting
-  user:
+  user: core
   <source>
     *: "Canceled"
   </source>
@@ -160,7 +160,7 @@
 <phrase>
   id: LANG_FAILED
   desc: Something failed. To be appended after above actions
-  user:
+  user: core
   <source>
     *: "Failed"
   </source>
@@ -174,7 +174,7 @@
 <phrase>
   id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
   desc: Text for the menu text to access the most recent bookmarks list
-  user:
+  user: core
   <source>
     *: "Recent Bookmarks"
   </source>
@@ -188,7 +188,7 @@
 <phrase>
   id: LANG_SOUND_SETTINGS
   desc: in the main menu
-  user:
+  user: core
   <source>
     *: "Sound Settings"
   </source>
@@ -202,7 +202,7 @@
 <phrase>
   id: LANG_GENERAL_SETTINGS
   desc: in the main menu
-  user:
+  user: core
   <source>
     *: "General Settings"
   </source>
@@ -216,7 +216,7 @@
 <phrase>
   id: LANG_MANAGE_MENU
   desc: in the system sub menu
-  user:
+  user: core
   <source>
     *: "Manage Settings"
   </source>
@@ -230,7 +230,7 @@
 <phrase>
   id: LANG_FM_RADIO
   desc: in main menu
-  user:
+  user: core
   <source>
     *: "FM Radio"
   </source>
@@ -244,7 +244,7 @@
 <phrase>
   id: LANG_RECORDING
   desc: in the main menu
-  user:
+  user: core
   <source>
     *: "Recording"
   </source>
@@ -258,7 +258,7 @@
 <phrase>
   id: LANG_PLAYLIST_MENU
   desc: in main menu.
-  user:
+  user: core
   <source>
     *: "Playlist Options"
   </source>
@@ -272,7 +272,7 @@
 <phrase>
   id: LANG_PLUGINS
   desc: in main_menu()
-  user:
+  user: core
   <source>
     *: "Browse Plugins"
   </source>
@@ -286,7 +286,7 @@
 <phrase>
   id: LANG_INFO
   desc: in the main menu
-  user:
+  user: core
   <source>
     *: "Info"
   </source>
@@ -300,7 +300,7 @@
 <phrase>
   id: LANG_SHUTDOWN
   desc: in main menu
-  user:
+  user: core
   <source>
     *: "Shut down"
   </source>
@@ -314,7 +314,7 @@
 <phrase>
   id: LANG_VOLUME
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Volume"
   </source>
@@ -328,7 +328,7 @@
 <phrase>
   id: LANG_BASS
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Bass"
   </source>
@@ -342,7 +342,7 @@
 <phrase>
   id: LANG_TREBLE
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Treble"
   </source>
@@ -356,7 +356,7 @@
 <phrase>
   id: LANG_BALANCE
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Balance"
   </source>
@@ -370,7 +370,7 @@
 <phrase>
   id: LANG_CHANNEL_MENU
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Channels"
   </source>
@@ -384,7 +384,7 @@
 <phrase>
   id: LANG_CHANNEL
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Channel Configuration"
   </source>
@@ -398,7 +398,7 @@
 <phrase>
   id: LANG_CHANNEL_STEREO
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Stereo"
   </source>
@@ -412,7 +412,7 @@
 <phrase>
   id: LANG_CHANNEL_MONO
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Mono"
   </source>
@@ -426,7 +426,7 @@
 <phrase>
   id: LANG_CHANNEL_CUSTOM
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Custom"
   </source>
@@ -440,7 +440,7 @@
 <phrase>
   id: LANG_CHANNEL_LEFT
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Mono Left"
   </source>
@@ -454,7 +454,7 @@
 <phrase>
   id: LANG_CHANNEL_RIGHT
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Mono Right"
   </source>
@@ -468,7 +468,7 @@
 <phrase>
   id: LANG_CHANNEL_KARAOKE
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Karaoke"
   </source>
@@ -482,7 +482,7 @@
 <phrase>
   id: LANG_STEREO_WIDTH
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Stereo width"
   </source>
@@ -496,7 +496,7 @@
 <phrase>
   id: LANG_LOUDNESS
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Loudness"
   </source>
@@ -510,7 +510,7 @@
 <phrase>
   id: LANG_AUTOVOL
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Auto Volume"
   </source>
@@ -524,7 +524,7 @@
 <phrase>
   id: LANG_DECAY
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "AV Decay Time"
   </source>
@@ -538,7 +538,7 @@
 <phrase>
   id: LANG_SUPERBASS
   desc: in sound settings
-  user:
+  user: core
   <source>
     *: "Super bass"
   </source>
@@ -552,7 +552,7 @@
 <phrase>
   id: LANG_MDB_ENABLE
   desc: in sound settings
-  user:
+  user: core
   <source>
     *: "MDB Enable"
   </source>
@@ -566,7 +566,7 @@
 <phrase>
   id: LANG_MDB_STRENGTH
   desc: in sound settings
-  user:
+  user: core
   <source>
     *: "MDB Strength"
   </source>
@@ -580,7 +580,7 @@
 <phrase>
   id: LANG_MDB_HARMONICS
   desc: in sound settings
-  user:
+  user: core
   <source>
     *: "MDB Harmonics"
   </source>
@@ -594,7 +594,7 @@
 <phrase>
   id: LANG_MDB_CENTER
   desc: in sound settings
-  user:
+  user: core
   <source>
     *: "MDB Center frequency"
   </source>
@@ -608,7 +608,7 @@
 <phrase>
   id: LANG_MDB_SHAPE
   desc: in sound settings
-  user:
+  user: core
   <source>
     *: "MDB Shape"
   </source>
@@ -622,7 +622,7 @@
 <phrase>
   id: LANG_PLAYBACK
   desc: in settings_menu()
-  user:
+  user: core
   <source>
     *: "Playback"
   </source>
@@ -636,7 +636,7 @@
 <phrase>
   id: LANG_FILE
   desc: in settings_menu()
-  user:
+  user: core
   <source>
     *: "File View"
   </source>
@@ -650,7 +650,7 @@
 <phrase>
   id: LANG_DISPLAY
   desc: in settings_menu()
-  user:
+  user: core
   <source>
     *: "Display"
   </source>
@@ -664,7 +664,7 @@
 <phrase>
   id: LANG_SYSTEM
   desc: in settings_menu()
-  user:
+  user: core
   <source>
     *: "System"
   </source>
@@ -678,7 +678,7 @@
 <phrase>
   id: LANG_BOOKMARK_SETTINGS
   desc: in general settings
-  user:
+  user: core
   <source>
     *: "Bookmarking"
   </source>
@@ -692,7 +692,7 @@
 <phrase>
   id: LANG_LANGUAGE
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Language"
   </source>
@@ -706,7 +706,7 @@
 <phrase>
   id: LANG_VOICE
   desc: root of voice menu
-  user:
+  user: core
   <source>
     *: "Voice"
   </source>
@@ -720,7 +720,7 @@
 <phrase>
   id: LANG_CUSTOM_CFG
   desc: in setting_menu()
-  user:
+  user: core
   <source>
     *: "Browse .cfg Files"
   </source>
@@ -734,7 +734,7 @@
 <phrase>
   id: LANG_FIRMWARE
   desc: in the main menu
-  user:
+  user: core
   <source>
     *: "Browse Firmwares"
   </source>
@@ -748,7 +748,7 @@
 <phrase>
   id: LANG_RESET
   desc: in system_settings_menu()
-  user:
+  user: core
   <source>
     *: "Reset Settings"
   </source>
@@ -762,7 +762,7 @@
 <phrase>
   id: LANG_RESET_ASK_RECORDER
   desc: confirm to reset settings
-  user:
+  user: core
   <source>
     *: "Are You Sure?"
   </source>
@@ -776,7 +776,7 @@
 <phrase>
   id: LANG_CONFIRM_WITH_PLAY_RECORDER
   desc: Generic recorder string to use to confirm
-  user:
+  user: core
   <source>
     *: "PLAY = Yes"
   </source>
@@ -791,7 +791,7 @@
 <phrase>
   id: LANG_CANCEL_WITH_ANY_RECORDER
   desc: Generic recorder string to use to cancel
-  user:
+  user: core
   <source>
     *: "Any Other = No"
   </source>
@@ -805,7 +805,7 @@
 <phrase>
   id: LANG_RESET_DONE_SETTING
   desc: visual confirmation after settings reset
-  user:
+  user: core
   <source>
     *: "Settings"
   </source>
@@ -819,7 +819,7 @@
 <phrase>
   id: LANG_RESET_DONE_CLEAR
   desc: visual confirmation after settings reset
-  user:
+  user: core
   <source>
     *: "Cleared"
   </source>
@@ -833,7 +833,7 @@
 <phrase>
   id: LANG_RESET_DONE_CANCEL
   desc: Visual confirmation of cancelation
-  user:
+  user: core
   <source>
     *: "Canceled"
   </source>
@@ -847,7 +847,7 @@
 <phrase>
   id: LANG_SAVE_SETTINGS
   desc: in system_settings_menu()
-  user:
+  user: core
   <source>
     *: "Save .cfg File"
   </source>
@@ -861,7 +861,7 @@
 <phrase>
   id: LANG_SETTINGS_SAVE_PLAYER
   desc: displayed if save settings has failed
-  user:
+  user: core
   <source>
     *: "Save Failed"
   </source>
@@ -875,7 +875,7 @@
 <phrase>
   id: LANG_SETTINGS_BATTERY_PLAYER
   desc: if save settings has failed
-  user:
+  user: core
   <source>
     *: "Partition?"
   </source>
@@ -889,7 +889,7 @@
 <phrase>
   id: LANG_SETTINGS_SAVE_RECORDER
   desc: displayed if save settings has failed
-  user:
+  user: core
   <source>
     *: "Save Failed"
   </source>
@@ -903,7 +903,7 @@
 <phrase>
   id: LANG_SETTINGS_BATTERY_RECORDER
   desc: if save settings has failed
-  user:
+  user: core
   <source>
     *: "No partition?"
   </source>
@@ -917,7 +917,7 @@
 <phrase>
   id: LANG_RECORDING_MENU
   desc: in the recording sub menu
-  user:
+  user: core
   <source>
     *: "Recording screen"
   </source>
@@ -931,7 +931,7 @@
 <phrase>
   id: LANG_RECORDING_SETTINGS
   desc: in the main menu
-  user:
+  user: core
   <source>
     *: "Recording Settings"
   </source>
@@ -945,7 +945,7 @@
 <phrase>
   id: LANG_CREATE_PLAYLIST
   desc: Menu option for creating a playlist
-  user:
+  user: core
   <source>
     *: "Create Playlist"
   </source>
@@ -959,7 +959,7 @@
 <phrase>
   id: LANG_VIEW_DYNAMIC_PLAYLIST
   desc: in playlist menu.
-  user:
+  user: core
   <source>
     *: "View Current Playlist"
   </source>
@@ -973,7 +973,7 @@
 <phrase>
   id: LANG_SAVE_DYNAMIC_PLAYLIST
   desc: in playlist menu.
-  user:
+  user: core
   <source>
     *: "Save Current Playlist"
   </source>
@@ -987,7 +987,7 @@
 <phrase>
   id: LANG_RECURSE_DIRECTORY
   desc: In playlist menu
-  user:
+  user: core
   <source>
     *: "Recursively Insert Directories"
   </source>
@@ -1001,7 +1001,7 @@
 <phrase>
   id: LANG_INFO_MENU
   desc: in the info sub menu
-  user:
+  user: core
   <source>
     *: "Rockbox Info"
   </source>
@@ -1015,7 +1015,7 @@
 <phrase>
   id: LANG_VERSION
   desc: in the main menu
-  user:
+  user: core
   <source>
     *: "Version"
   </source>
@@ -1029,7 +1029,7 @@
 <phrase>
   id: LANG_DEBUG
   desc: in the main menu
-  user:
+  user: core
   <source>
     *: "Debug (Keep Out!)"
   </source>
@@ -1043,7 +1043,7 @@
 <phrase>
   id: LANG_USB
   desc: in the main menu
-  user:
+  user: core
   <source>
     *: "USB (Sim)"
   </source>
@@ -1057,7 +1057,7 @@
 <phrase>
   id: LANG_SHUFFLE
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Shuffle"
   </source>
@@ -1071,7 +1071,7 @@
 <phrase>
   id: LANG_REPEAT
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Repeat"
   </source>
@@ -1085,7 +1085,7 @@
 <phrase>
   id: LANG_REPEAT_ALL
   desc: repeat playlist once all songs have completed
-  user:
+  user: core
   <source>
     *: "All"
   </source>
@@ -1099,7 +1099,7 @@
 <phrase>
   id: LANG_REPEAT_ONE
   desc: repeat one song
-  user:
+  user: core
   <source>
     *: "One"
   </source>
@@ -1113,7 +1113,7 @@
 <phrase>
   id: LANG_PLAY_SELECTED
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Play Selected First"
   </source>
@@ -1127,7 +1127,7 @@
 <phrase>
   id: LANG_RESUME
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Resume on startup"
   </source>
@@ -1141,7 +1141,7 @@
 <phrase>
   id: LANG_WIND_MENU
   desc: in the playback sub menu
-  user:
+  user: core
   <source>
     *: "FFwd/Rewind"
   </source>
@@ -1155,7 +1155,7 @@
 <phrase>
   id: LANG_MP3BUFFER_MARGIN
   desc: MP3 buffer margin time
-  user:
+  user: core
   <source>
     *: "Anti-Skip Buffer"
   </source>
@@ -1169,7 +1169,7 @@
 <phrase>
   id: LANG_FADE_ON_STOP
   desc: options menu to set fade on stop or pause
-  user:
+  user: core
   <source>
     *: "Fade On Stop/Pause"
   </source>
@@ -1183,7 +1183,7 @@
 <phrase>
   id: LANG_CROSSFADE
   desc: in playback settings
-  user:
+  user: core
   <source>
     *: "Crossfade"
   </source>
@@ -1197,7 +1197,7 @@
 <phrase>
   id: LANG_SPDIF_ENABLE
   desc: in playback settings menu. enable/disable the optical out
-  user:
+  user: core
   <source>
     *: "Optical output"
   </source>
@@ -1211,7 +1211,7 @@
 <phrase>
   id: LANG_ID3_ORDER
   desc: in playback settings screen
-  user:
+  user: core
   <source>
     *: "ID3 tag priority"
   </source>
@@ -1225,7 +1225,7 @@
 <phrase>
   id: LANG_ID3_V1_FIRST
   desc: in playback settings screen
-  user:
+  user: core
   <source>
     *: "V1 then V2"
   </source>
@@ -1239,7 +1239,7 @@
 <phrase>
   id: LANG_ID3_V2_FIRST
   desc: in playback settings screen
-  user:
+  user: core
   <source>
     *: "V2 then V1"
   </source>
@@ -1253,7 +1253,7 @@
 <phrase>
   id: LANG_NEXT_FOLDER
   desc: in settings_menu.  Should we move to next folder when current one ends
-  user:
+  user: core
   <source>
     *: "Move to Next Folder"
   </source>
@@ -1267,7 +1267,7 @@
 <phrase>
   id: LANG_RUNTIMEDB_ACTIVE
   desc: in settings_menu.
-  user:
+  user: core
   <source>
     *: "Gather Runtime Data"
   </source>
@@ -1281,7 +1281,7 @@
 <phrase>
   id: LANG_SORT_CASE
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Sort Case Sensitive"
   </source>
@@ -1295,7 +1295,7 @@
 <phrase>
   id: LANG_SORT_DIR
   desc: browser sorting setting
-  user:
+  user: core
   <source>
     *: "Sort Directories"
   </source>
@@ -1309,7 +1309,7 @@
 <phrase>
   id: LANG_SORT_FILE
   desc: browser sorting setting
-  user:
+  user: core
   <source>
     *: "Sort Files"
   </source>
@@ -1323,7 +1323,7 @@
 <phrase>
   id: LANG_SORT_ALPHA
   desc: browser sorting setting
-  user:
+  user: core
   <source>
     *: "Alphabetical"
   </source>
@@ -1337,7 +1337,7 @@
 <phrase>
   id: LANG_SORT_DATE
   desc: browser sorting setting
-  user:
+  user: core
   <source>
     *: "by date"
   </source>
@@ -1351,7 +1351,7 @@
 <phrase>
   id: LANG_SORT_DATE_REVERSE
   desc: browser sorting setting
-  user:
+  user: core
   <source>
     *: "by newest date"
   </source>
@@ -1365,7 +1365,7 @@
 <phrase>
   id: LANG_SORT_TYPE
   desc: browser sorting setting
-  user:
+  user: core
   <source>
     *: "by type"
   </source>
@@ -1379,7 +1379,7 @@
 <phrase>
   id: LANG_FILTER
   desc: setting name for dir filter
-  user:
+  user: core
   <source>
     *: "Show Files"
   </source>
@@ -1393,7 +1393,7 @@
 <phrase>
   id: LANG_FILTER_ALL
   desc: show all files
-  user:
+  user: core
   <source>
     *: "All"
   </source>
@@ -1407,7 +1407,7 @@
 <phrase>
   id: LANG_FILTER_SUPPORTED
   desc: show all file types supported by Rockbox
-  user:
+  user: core
   <source>
     *: "Supported"
   </source>
@@ -1421,7 +1421,7 @@
 <phrase>
   id: LANG_FILTER_MUSIC
   desc: show only music-related files
-  user:
+  user: core
   <source>
     *: "Music"
   </source>
@@ -1435,7 +1435,7 @@
 <phrase>
   id: LANG_FILTER_PLAYLIST
   desc: show only playlist
-  user:
+  user: core
   <source>
     *: "Playlists"
   </source>
@@ -1449,7 +1449,7 @@
 <phrase>
   id: LANG_FILTER_ID3DB
   desc: show ID3 database
-  user:
+  user: core
   <source>
     *: "ID3 database"
   </source>
@@ -1463,7 +1463,7 @@
 <phrase>
   id: LANG_FOLLOW
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Follow Playlist"
   </source>
@@ -1477,7 +1477,7 @@
 <phrase>
   id: LANG_SHOW_ICONS
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Show Icons"
   </source>
@@ -1491,7 +1491,7 @@
 <phrase>
   id: LANG_CUSTOM_FONT
   desc: in setting_menu()
-  user:
+  user: core
   <source>
     *: "Browse Fonts"
   </source>
@@ -1505,7 +1505,7 @@
 <phrase>
   id: LANG_WHILE_PLAYING
   desc: in settings_menu()
-  user:
+  user: core
   <source>
     *: "Browse .wps files"
   </source>
@@ -1519,7 +1519,7 @@
 <phrase>
   id: LANG_LCD_MENU
   desc: in the display sub menu
-  user:
+  user: core
   <source>
     *: "LCD Settings"
   </source>
@@ -1533,7 +1533,7 @@
 <phrase>
   id: LANG_LCD_REMOTE_MENU
   desc: in the display sub menu
-  user:
+  user: core
   <source>
     *: "Remote-LCD Settings"
   </source>
@@ -1547,7 +1547,7 @@
 <phrase>
   id: LANG_SCROLL_MENU
   desc: in display_settings_menu()
-  user:
+  user: core
   <source>
     *: "Scrolling"
   </source>
@@ -1561,7 +1561,7 @@
 <phrase>
   id: LANG_BARS_MENU
   desc: in the display sub menu
-  user:
+  user: core
   <source>
     *: "Status-/Scrollbar"
   </source>
@@ -1575,7 +1575,7 @@
 <phrase>
   id: LANG_PM_MENU
   desc: in the display menu
-  user:
+  user: core
   <source>
     *: "Peak Meter"
   </source>
@@ -1589,7 +1589,7 @@
 <phrase>
   id: LANG_BATTERY_MENU
   desc: in the system sub menu
-  user:
+  user: core
   <source>
     *: "Battery"
   </source>
@@ -1603,7 +1603,7 @@
 <phrase>
   id: LANG_DISK_MENU
   desc: in the system sub menu
-  user:
+  user: core
   <source>
     *: "Disk"
   </source>
@@ -1617,7 +1617,7 @@
 <phrase>
   id: LANG_TIME_MENU
   desc: in the system sub menu
-  user:
+  user: core
   <source>
     *: "Time & Date"
   </source>
@@ -1631,7 +1631,7 @@
 <phrase>
   id: LANG_POWEROFF_IDLE
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Idle Poweroff"
   </source>
@@ -1645,7 +1645,7 @@
 <phrase>
   id: LANG_SLEEP_TIMER
   desc: sleep timer setting
-  user:
+  user: core
   <source>
     *: "Sleep Timer"
   </source>
@@ -1659,7 +1659,7 @@
 <phrase>
   id: LANG_ALARM_MOD_ALARM_MENU
   desc: The name of the additional entry in the main menu for the RTC alarm mod.
-  user:
+  user: core
   <source>
     *: "Wake-Up Alarm"
   </source>
@@ -1673,7 +1673,7 @@
 <phrase>
   id: LANG_LIMITS_MENU
   desc: in the system sub menu
-  user:
+  user: core
   <source>
     *: "Limits"
   </source>
@@ -1687,7 +1687,7 @@
 <phrase>
   id: LANG_LINE_IN
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Line In"
   </source>
@@ -1701,7 +1701,7 @@
 <phrase>
   id: LANG_CAR_ADAPTER_MODE
   desc: Displayed for setting car adapter mode to on/off
-  user:
+  user: core
   <source>
     *: "Car Adapter Mode"
   </source>
@@ -1715,7 +1715,7 @@
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
   desc: prompt for user to decide to create an bookmark
-  user:
+  user: core
   <source>
     *: "Bookmark on Stop"
   </source>
@@ -1729,7 +1729,7 @@
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
   desc: Save in recent bookmarks only
-  user:
+  user: core
   <source>
     *: "Yes - Recent only"
   </source>
@@ -1743,7 +1743,7 @@
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
   desc: Save in recent bookmarks only
-  user:
+  user: core
   <source>
     *: "Ask - Recent only"
   </source>
@@ -1757,7 +1757,7 @@
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
   desc: prompt for user to decide to create a bookmark
-  user:
+  user: core
   <source>
     *: "Load Last Bookmark"
   </source>
@@ -1771,7 +1771,7 @@
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
   desc: Configuration option to maintain a list of recent bookmarks
-  user:
+  user: core
   <source>
     *: "Maintain a List of Recent Bookmarks?"
   </source>
@@ -1785,7 +1785,7 @@
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
   desc: Save only on bookmark for each playlist in recent bookmarks
-  user:
+  user: core
   <source>
     *: "Unique only"
   </source>
@@ -1799,7 +1799,7 @@
 <phrase>
   id: LANG_VOICE_MENU
   desc: item of voice menu, enable/disable the voice UI
-  user:
+  user: core
   <source>
     *: "Voice Menus"
   </source>
@@ -1813,7 +1813,7 @@
 <phrase>
   id: LANG_VOICE_DIR
   desc: item of voice menu, set the "talkbox" mode for directories
-  user:
+  user: core
   <source>
     *: "Voice Directories"
   </source>
@@ -1827,7 +1827,7 @@
 <phrase>
   id: LANG_VOICE_FILE
   desc: item of voice menu, set the voive mode for files
-  user:
+  user: core
   <source>
     *: "Voice Filenames"
   </source>
@@ -1841,7 +1841,7 @@
 <phrase>
   id: LANG_VOICE_NUMBER
   desc: talkbox" mode for files+directories
-  user:
+  user: core
   <source>
     *: "Numbers"
   </source>
@@ -1855,7 +1855,7 @@
 <phrase>
   id: LANG_VOICE_SPELL
   desc: talkbox" mode for files+directories
-  user:
+  user: core
   <source>
     *: "Spell"
   </source>
@@ -1869,7 +1869,7 @@
 <phrase>
   id: LANG_VOICE_DIR_HOVER
   desc: talkbox" mode for directories + files
-  user:
+  user: core
   <source>
     *: ".talk mp3 clip"
   </source>
@@ -1883,7 +1883,7 @@
 <phrase>
   id: LANG_RECORDING_QUALITY
   desc: in the recording settings
-  user:
+  user: core
   <source>
     *: "Quality"
   </source>
@@ -1897,7 +1897,7 @@
 <phrase>
   id: LANG_RECORDING_FREQUENCY
   desc: in the recording settings
-  user:
+  user: core
   <source>
     *: "Frequency"
   </source>
@@ -1911,7 +1911,7 @@
 <phrase>
   id: LANG_RECORDING_SOURCE
   desc: in the recording settings
-  user:
+  user: core
   <source>
     *: "Source"
   </source>
@@ -1925,7 +1925,7 @@
 <phrase>
   id: LANG_RECORDING_SRC_MIC
   desc: in the recording settings
-  user:
+  user: core
   <source>
     *: "Mic"
   </source>
@@ -1939,7 +1939,7 @@
 <phrase>
   id: LANG_RECORDING_SRC_LINE
   desc: in the recording settings
-  user:
+  user: core
   <source>
     *: "Line In"
   </source>
@@ -1953,7 +1953,7 @@
 <phrase>
   id: LANG_RECORDING_SRC_DIGITAL
   desc: in the recording settings
-  user:
+  user: core
   <source>
     *: "Digital"
   </source>
@@ -1967,7 +1967,7 @@
 <phrase>
   id: LANG_RECORDING_CHANNELS
   desc: in the recording settings
-  user:
+  user: core
   <source>
     *: "Channels"
   </source>
@@ -1981,7 +1981,7 @@
 <phrase>
   id: LANG_RECORDING_EDITABLE
   desc: Editable recordings setting
-  user:
+  user: core
   <source>
     *: "Independent frames"
   </source>
@@ -1995,7 +1995,7 @@
 <phrase>
   id: LANG_RECORD_TIMESPLIT
   desc: Prompt for record timer interval setting, in the record settings menu
-  user:
+  user: core
   <source>
     *: "Time Split"
   </source>
@@ -2009,7 +2009,7 @@
 <phrase>
   id: LANG_RECORD_PRERECORD_TIME
   desc: in recording settings_menu
-  user:
+  user: core
   <source>
     *: "Prerecord time"
   </source>
@@ -2023,7 +2023,7 @@
 <phrase>
   id: LANG_RECORD_DIRECTORY
   desc: in recording settings_menu
-  user:
+  user: core
   <source>
     *: "Directory"
   </source>
@@ -2037,7 +2037,7 @@
 <phrase>
   id: LANG_RECORD_CURRENT_DIR
   desc: in recording directory options
-  user:
+  user: core
   <source>
     *: "Current dir"
   </source>
@@ -2051,7 +2051,7 @@
 <phrase>
   id: LANG_RECORD_STARTUP
   desc: Start Rockbox in Recording screen
-  user:
+  user: core
   <source>
     *: "Show recording screen on startup"
   </source>
@@ -2065,7 +2065,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER
   desc: in recording settings_menu
-  user:
+  user: core
   <source>
     *: "Trigger"
   </source>
@@ -2079,7 +2079,7 @@
 <phrase>
   id: LANG_FFRW_STEP
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "FF/RW Min Step"
   </source>
@@ -2093,7 +2093,7 @@
 <phrase>
   id: LANG_FFRW_ACCEL
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "FF/RW Accel"
   </source>
@@ -2107,7 +2107,7 @@
 <phrase>
   id: LANG_BACKLIGHT
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Backlight"
   </source>
@@ -2121,7 +2121,7 @@
 <phrase>
   id: LANG_BACKLIGHT_ON_WHEN_CHARGING
   desc: in display_settings_menu
-  user:
+  user: core
   <source>
     *: "Backlight On When Plugged"
   </source>
@@ -2135,7 +2135,7 @@
 <phrase>
   id: LANG_CAPTION_BACKLIGHT
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Caption backlight"
   </source>
@@ -2149,7 +2149,7 @@
 <phrase>
   id: LANG_BACKLIGHT_FADE_IN
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Backlight fade in"
   </source>
@@ -2163,7 +2163,7 @@
 <phrase>
   id: LANG_BACKLIGHT_FADE_OUT
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Backlight fade out"
   </source>
@@ -2177,7 +2177,7 @@
 <phrase>
   id: LANG_CONTRAST
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Contrast"
   </source>
@@ -2191,7 +2191,7 @@
 <phrase>
   id: LANG_INVERT
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "LCD Mode"
   </source>
@@ -2205,7 +2205,7 @@
 <phrase>
   id: LANG_INVERT_LCD_NORMAL
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Normal"
   </source>
@@ -2219,7 +2219,7 @@
 <phrase>
   id: LANG_INVERT_LCD_INVERSE
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Inverse"
   </source>
@@ -2233,7 +2233,7 @@
 <phrase>
   id: LANG_FLIP_DISPLAY
   desc: in settings_menu, option to turn display+buttos by 180 degreed
-  user:
+  user: core
   <source>
     *: "Upside Down"
   </source>
@@ -2247,7 +2247,7 @@
 <phrase>
   id: LANG_INVERT_CURSOR
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Line Selector"
   </source>
@@ -2261,7 +2261,7 @@
 <phrase>
   id: LANG_INVERT_CURSOR_POINTER
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Pointer"
   </source>
@@ -2275,7 +2275,7 @@
 <phrase>
   id: LANG_INVERT_CURSOR_BAR
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Bar(Inverse)"
   </source>
@@ -2289,7 +2289,7 @@
 <phrase>
   id: LANG_SCROLL_SPEED
   desc: in display_settings_menu()
-  user:
+  user: core
   <source>
     *: "Scroll Speed"
   </source>
@@ -2303,7 +2303,7 @@
 <phrase>
   id: LANG_SCROLL
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Scroll Speed Setting Example"
   </source>
@@ -2317,7 +2317,7 @@
 <phrase>
   id: LANG_SCROLL_DELAY
   desc: Delay before scrolling
-  user:
+  user: core
   <source>
     *: "Scroll Start Delay"
   </source>
@@ -2331,7 +2331,7 @@
 <phrase>
   id: LANG_SCROLL_STEP
   desc: Pixels to advance per scroll
-  user:
+  user: core
   <source>
     *: "Scroll Step Size"
   </source>
@@ -2345,7 +2345,7 @@
 <phrase>
   id: LANG_SCROLL_STEP_EXAMPLE
   desc: Pixels to advance per scroll
-  user:
+  user: core
   <source>
     *: "Scroll Step Size Setting Example Text"
   </source>
@@ -2359,7 +2359,7 @@
 <phrase>
   id: LANG_BIDIR_SCROLL
   desc: Bidirectional scroll limit
-  user:
+  user: core
   <source>
     *: "Bidirectional Scroll Limit"
   </source>
@@ -2373,7 +2373,7 @@
 <phrase>
   id: LANG_JUMP_SCROLL
   desc: (player) menu altarnative for jump scroll
-  user:
+  user: core
   <source>
     *: "Jump scroll"
   </source>
@@ -2387,7 +2387,7 @@
 <phrase>
   id: LANG_ONE_TIME
   desc: (player) the jump scroll shall be done "one time
-  user:
+  user: core
   <source>
     *: "One time"
   </source>
@@ -2401,7 +2401,7 @@
 <phrase>
   id: LANG_JUMP_SCROLL_DELAY
   desc: (player) Delay before making a jump scroll
-  user:
+  user: core
   <source>
     *: "Jump Scroll Delay"
   </source>
@@ -2415,7 +2415,7 @@
 <phrase>
   id: LANG_SCROLL_BAR
   desc: display menu, F3 substitute
-  user:
+  user: core
   <source>
     *: "Scroll Bar"
   </source>
@@ -2429,7 +2429,7 @@
 <phrase>
   id: LANG_STATUS_BAR
   desc: display menu, F3 substitute
-  user:
+  user: core
   <source>
     *: "Status Bar"
   </source>
@@ -2443,7 +2443,7 @@
 <phrase>
   id: LANG_BUTTON_BAR
   desc: in settings menu
-  user:
+  user: core
   <source>
     *: "Button bar"
   </source>
@@ -2457,7 +2457,7 @@
 <phrase>
   id: LANG_VOLUME_DISPLAY
   desc: Volume type title
-  user:
+  user: core
   <source>
     *: "Volume Display"
   </source>
@@ -2471,7 +2471,7 @@
 <phrase>
   id: LANG_BATTERY_DISPLAY
   desc: Battery type title
-  user:
+  user: core
   <source>
     *: "Battery Display"
   </source>
@@ -2485,7 +2485,7 @@
 <phrase>
   id: LANG_DISPLAY_GRAPHIC
   desc: Label for type of icon display
-  user:
+  user: core
   <source>
     *: "Graphic"
   </source>
@@ -2499,7 +2499,7 @@
 <phrase>
   id: LANG_DISPLAY_NUMERIC
   desc: Label for type of icon display
-  user:
+  user: core
   <source>
     *: "Numeric"
   </source>
@@ -2513,7 +2513,7 @@
 <phrase>
   id: LANG_PM_RELEASE
   desc: in the peak meter menu
-  user:
+  user: core
   <source>
     *: "Peak Release"
   </source>
@@ -2527,7 +2527,7 @@
 <phrase>
   id: LANG_PM_UNITS_PER_READ
   desc: in the peak meter menu
-  user:
+  user: core
   <source>
     *: "Units Per Read"
   </source>
@@ -2541,7 +2541,7 @@
 <phrase>
   id: LANG_PM_PEAK_HOLD
   desc: in the peak meter menu
-  user:
+  user: core
   <source>
     *: "Peak Hold Time"
   </source>
@@ -2555,7 +2555,7 @@
 <phrase>
   id: LANG_PM_CLIP_HOLD
   desc: in the peak meter menu
-  user:
+  user: core
   <source>
     *: "Clip Hold Time"
   </source>
@@ -2569,7 +2569,7 @@
 <phrase>
   id: LANG_PM_ETERNAL
   desc: in the peak meter menu
-  user:
+  user: core
   <source>
     *: "Eternal"
   </source>
@@ -2583,7 +2583,7 @@
 <phrase>
   id: LANG_PM_SCALE
   desc: in the peak meter menu
-  user:
+  user: core
   <source>
     *: "Scale"
   </source>
@@ -2597,7 +2597,7 @@
 <phrase>
   id: LANG_PM_DBFS
   desc: in the peak meter menu
-  user:
+  user: core
   <source>
     *: "Logarithmic(dB)"
   </source>
@@ -2611,7 +2611,7 @@
 <phrase>
   id: LANG_PM_LINEAR
   desc: in the peak meter menu
-  user:
+  user: core
   <source>
     *: "Linear(%)"
   </source>
@@ -2625,7 +2625,7 @@
 <phrase>
   id: LANG_PM_MIN
   desc: in the peak meter menu
-  user:
+  user: core
   <source>
     *: "Minimum Of Range"
   </source>
@@ -2639,7 +2639,7 @@
 <phrase>
   id: LANG_PM_MAX
   desc: in the peak meter menu
-  user:
+  user: core
   <source>
     *: "Maximum Of Range"
   </source>
@@ -2653,7 +2653,7 @@
 <phrase>
   id: LANG_BATTERY_CAPACITY
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Battery Capacity"
   </source>
@@ -2667,7 +2667,7 @@
 <phrase>
   id: LANG_BATTERY_TYPE
   desc: in battery settings
-  user:
+  user: core
   <source>
     *: "Battery Type"
   </source>
@@ -2681,7 +2681,7 @@
 <phrase>
   id: LANG_BATTERY_TYPE_ALKALINE
   desc: in battery settings
-  user:
+  user: core
   <source>
     *: "Alkaline"
   </source>
@@ -2695,7 +2695,7 @@
 <phrase>
   id: LANG_BATTERY_TYPE_NIMH
   desc: in battery settings
-  user:
+  user: core
   <source>
     *: "NiMH"
   </source>
@@ -2709,7 +2709,7 @@
 <phrase>
   id: LANG_SPINDOWN
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Disk Spindown"
   </source>
@@ -2723,7 +2723,7 @@
 <phrase>
   id: LANG_POWEROFF
   desc: disk poweroff flag
-  user:
+  user: core
   <source>
     *: "Disk Poweroff"
   </source>
@@ -2737,7 +2737,7 @@
 <phrase>
   id: LANG_TIME
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Set Time/Date"
   </source>
@@ -2751,7 +2751,7 @@
 <phrase>
   id: LANG_TIMEFORMAT
   desc: select the time format of time in status bar
-  user:
+  user: core
   <source>
     *: "Time Format"
   </source>
@@ -2765,7 +2765,7 @@
 <phrase>
   id: LANG_12_HOUR_CLOCK
   desc: option for 12 hour clock
-  user:
+  user: core
   <source>
     *: "12 Hour Clock"
   </source>
@@ -2779,7 +2779,7 @@
 <phrase>
   id: LANG_24_HOUR_CLOCK
   desc: option for 24 hour clock
-  user:
+  user: core
   <source>
     *: "24 Hour Clock"
   </source>
@@ -2793,7 +2793,7 @@
 <phrase>
   id: LANG_MAX_FILES_IN_DIR
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Max files in dir browser"
   </source>
@@ -2807,7 +2807,7 @@
 <phrase>
   id: LANG_MAX_FILES_IN_PLAYLIST
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Max playlist size"
   </source>
@@ -2821,7 +2821,7 @@
 <phrase>
   id: LANG_PLAYLIST
   desc: Used when you need to say playlist, also voiced
-  user:
+  user: core
   <source>
     *: "Playlist"
   </source>
@@ -2835,7 +2835,7 @@
 <phrase>
   id: LANG_BOOKMARK_MENU
   desc: Text on main menu to get to bookmark commands
-  user:
+  user: core
   <source>
     *: "Bookmarks"
   </source>
@@ -2849,7 +2849,7 @@
 <phrase>
   id: LANG_MENU_SHOW_ID3_INFO
   desc: Menu option to start id3 viewer
-  user:
+  user: core
   <source>
     *: "Show ID3 Info"
   </source>
@@ -2863,7 +2863,7 @@
 <phrase>
   id: LANG_MENU_SET_RATING
   desc: in wps context menu
-  user:
+  user: core
   <source>
     *: "Set song rating"
   </source>
@@ -2877,7 +2877,7 @@
 <phrase>
   id: LANG_RATING
   desc: in set_rating
-  user:
+  user: core
   <source>
     *: "Rating:"
   </source>
@@ -2891,7 +2891,7 @@
 <phrase>
   id: LANG_RENAME
   desc: The verb/action Rename
-  user:
+  user: core
   <source>
     *: "Rename"
   </source>
@@ -2905,7 +2905,7 @@
 <phrase>
   id: LANG_DELETE
   desc: The verb/action Delete
-  user:
+  user: core
   <source>
     *: "Delete"
   </source>
@@ -2919,7 +2919,7 @@
 <phrase>
   id: LANG_DELETE_DIR
   desc: in on+play menu
-  user:
+  user: core
   <source>
     *: "Delete directory"
   </source>
@@ -2933,7 +2933,7 @@
 <phrase>
   id: LANG_REALLY_DELETE
   desc: Really Delete?
-  user:
+  user: core
   <source>
     *: "Delete?"
   </source>
@@ -2947,7 +2947,7 @@
 <phrase>
   id: LANG_DELETED
   desc: A file has beed deleted
-  user:
+  user: core
   <source>
     *: "Deleted"
   </source>
@@ -2961,7 +2961,7 @@
 <phrase>
   id: LANG_ONPLAY_OPEN_WITH
   desc: Onplay open with
-  user:
+  user: core
   <source>
     *: "Open with"
   </source>
@@ -2975,7 +2975,7 @@
 <phrase>
   id: LANG_CREATE_DIR
   desc: in main menu
-  user:
+  user: core
   <source>
     *: "Create directory"
   </source>
@@ -2989,7 +2989,7 @@
 <phrase>
   id: LANG_VIEW
   desc: in on+play menu
-  user:
+  user: core
   <source>
     *: "View"
   </source>
@@ -3003,7 +3003,7 @@
 <phrase>
   id: LANG_SHUFFLE_PLAYLIST
   desc: in playlist menu, reshuffles the order in which songs are played
-  user:
+  user: core
   <source>
     *: "Reshuffle"
   </source>
@@ -3017,7 +3017,7 @@
 <phrase>
   id: LANG_INSERT
   desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-  user:
+  user: core
   <source>
     *: "Insert"
   </source>
@@ -3031,7 +3031,7 @@
 <phrase>
   id: LANG_INSERT_FIRST
   desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-  user:
+  user: core
   <source>
     *: "Insert Next"
   </source>
@@ -3045,7 +3045,7 @@
 <phrase>
   id: LANG_INSERT_LAST
   desc: in onplay menu.  append a track/playlist into dynamic playlist.
-  user:
+  user: core
   <source>
     *: "Insert Last"
   </source>
@@ -3059,7 +3059,7 @@
 <phrase>
   id: LANG_INSERT_SHUFFLED
   desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
-  user:
+  user: core
   <source>
     *: "Insert Shuffled"
   </source>
@@ -3073,7 +3073,7 @@
 <phrase>
   id: LANG_QUEUE
   desc: The verb/action Queue
-  user:
+  user: core
   <source>
     *: "Queue"
   </source>
@@ -3087,7 +3087,7 @@
 <phrase>
   id: LANG_QUEUE_FIRST
   desc: in onplay menu.  queue a track/playlist into dynamic playlist.
-  user:
+  user: core
   <source>
     *: "Queue Next"
   </source>
@@ -3101,7 +3101,7 @@
 <phrase>
   id: LANG_QUEUE_LAST
   desc: in onplay menu.  queue a track/playlist at end of playlist.
-  user:
+  user: core
   <source>
     *: "Queue Last"
   </source>
@@ -3115,7 +3115,7 @@
 <phrase>
   id: LANG_BOOKMARK_MENU_CREATE
   desc: Used off of the bookmark menu to create a bookmark
-  user:
+  user: core
   <source>
     *: "Create Bookmark"
   </source>
@@ -3129,7 +3129,7 @@
 <phrase>
   id: LANG_BOOKMARK_MENU_LIST
   desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
-  user:
+  user: core
   <source>
     *: "List Bookmarks"
   </source>
@@ -3143,7 +3143,7 @@
 <phrase>
   id: LANG_ROCKBOX_INFO
   desc: displayed topmost on the info screen
-  user:
+  user: core
   <source>
     *: "Rockbox Info:"
   </source>
@@ -3157,7 +3157,7 @@
 <phrase>
   id: LANG_BUFFER_STAT_PLAYER
   desc: the buffer size player-screen width, %d MB %d fraction of MB
-  user:
+  user: core
   <source>
     *: "Buf: %d.%03dMB"
   </source>
@@ -3171,7 +3171,7 @@
 <phrase>
   id: LANG_BUFFER_STAT_RECORDER
   desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-  user:
+  user: core
   <source>
     *: "Buffer: %d.%03dMB"
   </source>
@@ -3185,7 +3185,7 @@
 <phrase>
   id: LANG_BATTERY_CHARGE
   desc: tells that the battery is charging, instead of battery level
-  user:
+  user: core
   <source>
     *: "Battery: Charging"
   </source>
@@ -3199,7 +3199,7 @@
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
   desc: in info display, shows that top off charge is running
-  user:
+  user: core
   <source>
     *: "Battery: Top-Off Chg"
   </source>
@@ -3213,7 +3213,7 @@
 <phrase>
   id: LANG_BATTERY_TRICKLE_CHARGE
   desc: in info display, shows that trickle charge is running
-  user:
+  user: core
   <source>
     *: "Battery: Trickle Chg"
   </source>
@@ -3227,7 +3227,7 @@
 <phrase>
   id: LANG_BATTERY_TIME
   desc: battery level in % and estimated time remaining
-  user:
+  user: core
   <source>
     *: "%d%% %dh %dm"
   </source>
@@ -3241,7 +3241,7 @@
 <phrase>
   id: LANG_DISK_SIZE_INFO
   desc: disk size info
-  user:
+  user: core
   <source>
     *: "Disk:"
   </source>
@@ -3255,7 +3255,7 @@
 <phrase>
   id: LANG_DISK_FREE_INFO
   desc: disk size info
-  user:
+  user: core
   <source>
     *: "Free:"
   </source>
@@ -3269,7 +3269,7 @@
 <phrase>
   id: LANG_DISK_NAME_INTERNAL
   desc: in info menu; name for internal disk with multivolume (keep short!)
-  user:
+  user: core
   <source>
     *: "Int:"
   </source>
@@ -3283,7 +3283,7 @@
 <phrase>
   id: LANG_DISK_NAME_MMC
   desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
-  user:
+  user: core
   <source>
     *: "MMC:"
   </source>
@@ -3297,7 +3297,7 @@
 <phrase>
   id: VOICE_CURRENT_TIME
   desc: spoken only, for wall clock announce
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -3311,7 +3311,7 @@
 <phrase>
   id: LANG_PITCH_UP
   desc: in wps
-  user:
+  user: core
   <source>
     *: "Pitch Up"
   </source>
@@ -3325,7 +3325,7 @@
 <phrase>
   id: LANG_PITCH_DOWN
   desc: in wps
-  user:
+  user: core
   <source>
     *: "Pitch Down"
   </source>
@@ -3339,7 +3339,7 @@
 <phrase>
   id: LANG_PAUSE
   desc: in wps
-  user:
+  user: core
   <source>
     *: "Pause"
   </source>
@@ -3353,7 +3353,7 @@
 <phrase>
   id: LANG_F2_MODE
   desc: in wps F2 pressed
-  user:
+  user: core
   <source>
     *: "Mode:"
   </source>
@@ -3367,7 +3367,7 @@
 <phrase>
   id: LANG_F3_STATUS
   desc: in wps F3 pressed
-  user:
+  user: core
   <source>
     *: "Status"
   </source>
@@ -3381,7 +3381,7 @@
 <phrase>
   id: LANG_F3_SCROLL
   desc: in wps F3 pressed
-  user:
+  user: core
   <source>
     *: "Scroll"
   </source>
@@ -3395,7 +3395,7 @@
 <phrase>
   id: LANG_F3_BAR
   desc: in wps F3 pressed
-  user:
+  user: core
   <source>
     *: "Bar"
   </source>
@@ -3409,7 +3409,7 @@
 <phrase>
   id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
   desc: From the auto-load screen, allows user to list all bookmarks
-  user:
+  user: core
   <source>
     *: "Down = List"
   </source>
@@ -3423,7 +3423,7 @@
 <phrase>
   id: LANG_BOOKMARK_SELECT_EXIT
   desc: From the bookmark list screen, allows user to exit
-  user:
+  user: core
   <source>
     *: "OFF = Exit"
   </source>
@@ -3437,7 +3437,7 @@
 <phrase>
   id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
   desc: Used on the bookmark select window to label bookmark number
-  user:
+  user: core
   <source>
     *: "Bookmark"
   </source>
@@ -3451,7 +3451,7 @@
 <phrase>
   id: LANG_BOOKMARK_SELECT_INDEX_TEXT
   desc: Used on the bookmark select window to label index number
-  user:
+  user: core
   <source>
     *: "Index"
   </source>
@@ -3465,7 +3465,7 @@
 <phrase>
   id: LANG_BOOKMARK_SELECT_TIME_TEXT
   desc: Used on the bookmark select window to label elapsed time
-  user:
+  user: core
   <source>
     *: "Time"
   </source>
@@ -3479,7 +3479,7 @@
 <phrase>
   id: LANG_BOOKMARK_SELECT_PLAY
   desc: Used on the bookmark select window to indicated the play option
-  user:
+  user: core
   <source>
     *: "PLAY = Select"
   </source>
@@ -3494,7 +3494,7 @@
 <phrase>
   id: LANG_BOOKMARK_SELECT_DELETE
   desc: Used on the bookmark select window to indicated the bookmark delete option
-  user:
+  user: core
   <source>
     *: "ON+Play = Delete"
   </source>
@@ -3509,7 +3509,7 @@
 <phrase>
   id: LANG_BOOKMARK_AUTOLOAD_QUERY
   desc: prompt for user to decide to create a bookmark
-  user:
+  user: core
   <source>
     *: "Load Last Bookmark?"
   </source>
@@ -3523,7 +3523,7 @@
 <phrase>
   id: LANG_AUTO_BOOKMARK_QUERY
   desc: prompt for user to decide to create an bookmark
-  user:
+  user: core
   <source>
     *: "Create a Bookmark?"
   </source>
@@ -3537,7 +3537,7 @@
 <phrase>
   id: LANG_BOOKMARK_CREATE_SUCCESS
   desc: Indicates bookmark was successfully created
-  user:
+  user: core
   <source>
     *: "Bookmark Created"
   </source>
@@ -3551,7 +3551,7 @@
 <phrase>
   id: LANG_BOOKMARK_CREATE_FAILURE
   desc: Indicates bookmark was not created
-  user:
+  user: core
   <source>
     *: "Bookmark Failed!"
   </source>
@@ -3565,7 +3565,7 @@
 <phrase>
   id: LANG_BOOKMARK_LOAD_EMPTY
   desc: Indicates bookmark was empty
-  user:
+  user: core
   <source>
     *: "Bookmark Empty"
   </source>
@@ -3579,7 +3579,7 @@
 <phrase>
   id: LANG_TIME_SET
   desc: used in set_time()
-  user:
+  user: core
   <source>
     *: "ON To Set"
   </source>
@@ -3593,7 +3593,7 @@
 <phrase>
   id: LANG_TIME_REVERT
   desc: used in set_time()
-  user:
+  user: core
   <source>
     *: "OFF To Revert"
   </source>
@@ -3607,7 +3607,7 @@
 <phrase>
   id: LANG_KEYLOCK_ON_PLAYER
   desc: displayed when key lock is on
-  user:
+  user: core
   <source>
     *: "Key Lock ON"
   </source>
@@ -3621,7 +3621,7 @@
 <phrase>
   id: LANG_KEYLOCK_OFF_PLAYER
   desc: displayed when key lock is turned off
-  user:
+  user: core
   <source>
     *: "Key Lock OFF"
   </source>
@@ -3635,7 +3635,7 @@
 <phrase>
   id: LANG_KEYLOCK_ON_RECORDER
   desc: displayed when key lock is on
-  user:
+  user: core
   <source>
     *: "Key Lock Is ON"
   </source>
@@ -3649,7 +3649,7 @@
 <phrase>
   id: LANG_KEYLOCK_OFF_RECORDER
   desc: displayed when key lock is turned off
-  user:
+  user: core
   <source>
     *: "Key Lock Is OFF"
   </source>
@@ -3663,7 +3663,7 @@
 <phrase>
   id: LANG_RECORDING_TIME
   desc: Display of recorded time
-  user:
+  user: core
   <source>
     *: "Time:"
   </source>
@@ -3677,7 +3677,7 @@
 <phrase>
   id: LANG_RECORD_TIMESPLIT_REC
   desc: Display of record timer interval setting, on the record screen
-  user:
+  user: core
   <source>
     *: "Split time:"
   </source>
@@ -3691,7 +3691,7 @@
 <phrase>
   id: LANG_RECORDING_SIZE
   desc: Display of recorded file size
-  user:
+  user: core
   <source>
     *: "Size:"
   </source>
@@ -3705,7 +3705,7 @@
 <phrase>
   id: LANG_RECORD_PRERECORD
   desc: in recording and radio screen
-  user:
+  user: core
   <source>
     *: "Prerecording"
   </source>
@@ -3719,7 +3719,7 @@
 <phrase>
   id: LANG_RECORDING_GAIN
   desc: in the recording screen
-  user:
+  user: core
   <source>
     *: "Gain"
   </source>
@@ -3733,7 +3733,7 @@
 <phrase>
   id: LANG_RECORDING_LEFT
   desc: in the recording screen
-  user:
+  user: core
   <source>
     *: "Left"
   </source>
@@ -3747,7 +3747,7 @@
 <phrase>
   id: LANG_RECORDING_RIGHT
   desc: in the recording screen
-  user:
+  user: core
   <source>
     *: "Right"
   </source>
@@ -3761,7 +3761,7 @@
 <phrase>
   id: LANG_DISK_FULL
   desc: in recording screen
-  user:
+  user: core
   <source>
     *: "The disk is full. Press OFF to continue."
   </source>
@@ -3775,7 +3775,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_MODE
   desc: in recording settings_menu
-  user:
+  user: core
   <source>
     *: "Trigger"
   </source>
@@ -3789,7 +3789,7 @@
 <phrase>
   id: LANG_RECORD_TRIG_NOREARM
   desc: in recording settings_menu
-  user:
+  user: core
   <source>
     *: "Once"
   </source>
@@ -3803,7 +3803,7 @@
 <phrase>
   id: LANG_RECORD_TRIG_REARM
   desc: in recording settings_menu
-  user:
+  user: core
   <source>
     *: "Repeat"
   </source>
@@ -3817,7 +3817,7 @@
 <phrase>
   id: LANG_RECORD_START_THRESHOLD
   desc: in recording settings_menu
-  user:
+  user: core
   <source>
     *: "Start above"
   </source>
@@ -3831,7 +3831,7 @@
 <phrase>
   id: LANG_RECORD_MIN_DURATION
   desc: in recording settings_menu
-  user:
+  user: core
   <source>
     *: "for at least"
   </source>
@@ -3845,7 +3845,7 @@
 <phrase>
   id: LANG_RECORD_STOP_THRESHOLD
   desc: in recording settings_menu
-  user:
+  user: core
   <source>
     *: "Stop below"
   </source>
@@ -3859,7 +3859,7 @@
 <phrase>
   id: LANG_RECORD_STOP_POSTREC
   desc: in recording settings_menu
-  user:
+  user: core
   <source>
     *: "for at least"
   </source>
@@ -3873,7 +3873,7 @@
 <phrase>
   id: LANG_RECORD_STOP_GAP
   desc: in recording settings_menu
-  user:
+  user: core
   <source>
     *: "Presplit gap"
   </source>
@@ -3887,7 +3887,7 @@
 <phrase>
   id: LANG_DB_INF
   desc: -inf db for values below measurement
-  user:
+  user: core
   <source>
     *: "-inf"
   </source>
@@ -3901,7 +3901,7 @@
 <phrase>
   id: LANG_RECORD_TRIG_IDLE
   desc: waiting for threshold
-  user:
+  user: core
   <source>
     *: "Trigger idle"
   </source>
@@ -3915,7 +3915,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_ACTIVE
   desc: 
-  user:
+  user: core
   <source>
     *: "Trigger active"
   </source>
@@ -3929,7 +3929,7 @@
 <phrase>
   id: LANG_ALARM_MOD_TIME
   desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
-  user:
+  user: core
   <source>
     *: "Alarm Time: %02d:%02d"
   </source>
@@ -3943,7 +3943,7 @@
 <phrase>
   id: LANG_ALARM_MOD_TIME_TO_GO
   desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
-  user:
+  user: core
   <source>
     *: "Waking Up In %d:%02d"
   </source>
@@ -3957,7 +3957,7 @@
 <phrase>
   id: LANG_ALARM_MOD_SHUTDOWN
   desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-  user:
+  user: core
   <source>
     *: "Alarm Set"
   </source>
@@ -3971,7 +3971,7 @@
 <phrase>
   id: LANG_ALARM_MOD_ERROR
   desc: The text that tells that the time is incorrect (for the RTC alarm mod).
-  user:
+  user: core
   <source>
     *: "Alarm Time Is Too Soon!"
   </source>
@@ -3985,7 +3985,7 @@
 <phrase>
   id: LANG_ALARM_MOD_KEYS
   desc: Shown key functions in alarm menu (for the RTC alarm mod).
-  user:
+  user: core
   <source>
     *: "PLAY=Set OFF=Cancel"
   </source>
@@ -3999,7 +3999,7 @@
 <phrase>
   id: LANG_ALARM_MOD_DISABLE
   desc: Announce that the RTC alarm has been turned off
-  user:
+  user: core
   <source>
     *: "Alarm Disabled"
   </source>
@@ -4013,7 +4013,7 @@
 <phrase>
   id: LANG_ID3_TITLE
   desc: in wps
-  user:
+  user: core
   <source>
     *: "[Title]"
   </source>
@@ -4027,7 +4027,7 @@
 <phrase>
   id: LANG_ID3_ARTIST
   desc: in wps 
-  user:
+  user: core
   <source>
     *: "[Artist]"
   </source>
@@ -4041,7 +4041,7 @@
 <phrase>
   id: LANG_ID3_ALBUM
   desc: in wps
-  user:
+  user: core
   <source>
     *: "[Album]"
   </source>
@@ -4055,7 +4055,7 @@
 <phrase>
   id: LANG_ID3_TRACKNUM
   desc: in wps
-  user:
+  user: core
   <source>
     *: "[Tracknum]"
   </source>
@@ -4069,7 +4069,7 @@
 <phrase>
   id: LANG_ID3_GENRE
   desc: ID3 frame 'genre'
-  user:
+  user: core
   <source>
     *: "[Genre]"
   </source>
@@ -4083,7 +4083,7 @@
 <phrase>
   id: LANG_ID3_YEAR
   desc: ID3 info 'year'
-  user:
+  user: core
   <source>
     *: "[Year]"
   </source>
@@ -4097,7 +4097,7 @@
 <phrase>
   id: LANG_ID3_PLAYLIST
   desc: in wps
-  user:
+  user: core
   <source>
     *: "[Playlist]"
   </source>
@@ -4111,7 +4111,7 @@
 <phrase>
   id: LANG_ID3_BITRATE
   desc: in wps
-  user:
+  user: core
   <source>
     *: "[Bitrate]"
   </source>
@@ -4125,7 +4125,7 @@
 <phrase>
   id: LANG_ID3_FREQUENCY
   desc: in wps
-  user:
+  user: core
   <source>
     *: "[Frequency]"
   </source>
@@ -4139,7 +4139,7 @@
 <phrase>
   id: LANG_ID3_PATH
   desc: in wps
-  user:
+  user: core
   <source>
     *: "[Path]"
   </source>
@@ -4153,7 +4153,7 @@
 <phrase>
   id: LANG_ID3_NO_INFO
   desc: ID3 info is missing
-  user:
+  user: core
   <source>
     *: "<No Info>"
   </source>
@@ -4167,7 +4167,7 @@
 <phrase>
   id: LANG_WEEKDAY_SUNDAY
   desc: Maximum 3-letter abbreviation for weekday
-  user:
+  user: core
   <source>
     *: "Sun"
   </source>
@@ -4181,7 +4181,7 @@
 <phrase>
   id: LANG_WEEKDAY_MONDAY
   desc: Maximum 3-letter abbreviation for weekday
-  user:
+  user: core
   <source>
     *: "Mon"
   </source>
@@ -4195,7 +4195,7 @@
 <phrase>
   id: LANG_WEEKDAY_TUESDAY
   desc: Maximum 3-letter abbreviation for weekday
-  user:
+  user: core
   <source>
     *: "Tue"
   </source>
@@ -4209,7 +4209,7 @@
 <phrase>
   id: LANG_WEEKDAY_WEDNESDAY
   desc: Maximum 3-letter abbreviation for weekday
-  user:
+  user: core
   <source>
     *: "Wed"
   </source>
@@ -4223,7 +4223,7 @@
 <phrase>
   id: LANG_WEEKDAY_THURSDAY
   desc: Maximum 3-letter abbreviation for weekday
-  user:
+  user: core
   <source>
     *: "Thu"
   </source>
@@ -4237,7 +4237,7 @@
 <phrase>
   id: LANG_WEEKDAY_FRIDAY
   desc: Maximum 3-letter abbreviation for weekday
-  user:
+  user: core
   <source>
     *: "Fri"
   </source>
@@ -4251,7 +4251,7 @@
 <phrase>
   id: LANG_WEEKDAY_SATURDAY
   desc: Maximum 3-letter abbreviation for weekday
-  user:
+  user: core
   <source>
     *: "Sat"
   </source>
@@ -4265,7 +4265,7 @@
 <phrase>
   id: LANG_MONTH_JANUARY
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: core
   <source>
     *: "Jan"
   </source>
@@ -4279,7 +4279,7 @@
 <phrase>
   id: LANG_MONTH_FEBRUARY
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: core
   <source>
     *: "Feb"
   </source>
@@ -4293,7 +4293,7 @@
 <phrase>
   id: LANG_MONTH_MARCH
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: core
   <source>
     *: "Mar"
   </source>
@@ -4307,7 +4307,7 @@
 <phrase>
   id: LANG_MONTH_APRIL
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: core
   <source>
     *: "Apr"
   </source>
@@ -4321,7 +4321,7 @@
 <phrase>
   id: LANG_MONTH_MAY
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: core
   <source>
     *: "May"
   </source>
@@ -4335,7 +4335,7 @@
 <phrase>
   id: LANG_MONTH_JUNE
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: core
   <source>
     *: "Jun"
   </source>
@@ -4349,7 +4349,7 @@
 <phrase>
   id: LANG_MONTH_JULY
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: core
   <source>
     *: "Jul"
   </source>
@@ -4363,7 +4363,7 @@
 <phrase>
   id: LANG_MONTH_AUGUST
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: core
   <source>
     *: "Aug"
   </source>
@@ -4377,7 +4377,7 @@
 <phrase>
   id: LANG_MONTH_SEPTEMBER
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: core
   <source>
     *: "Sep"
   </source>
@@ -4391,7 +4391,7 @@
 <phrase>
   id: LANG_MONTH_OCTOBER
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: core
   <source>
     *: "Oct"
   </source>
@@ -4405,7 +4405,7 @@
 <phrase>
   id: LANG_MONTH_NOVEMBER
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: core
   <source>
     *: "Nov"
   </source>
@@ -4419,7 +4419,7 @@
 <phrase>
   id: LANG_MONTH_DECEMBER
   desc: Maximum 3-letter abbreviation for monthname
-  user:
+  user: core
   <source>
     *: "Dec"
   </source>
@@ -4433,7 +4433,7 @@
 <phrase>
   id: VOICE_ZERO
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4447,7 +4447,7 @@
 <phrase>
   id: VOICE_ONE
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4461,7 +4461,7 @@
 <phrase>
   id: VOICE_TWO
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4475,7 +4475,7 @@
 <phrase>
   id: VOICE_THREE
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4489,7 +4489,7 @@
 <phrase>
   id: VOICE_FOUR
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4503,7 +4503,7 @@
 <phrase>
   id: VOICE_FIVE
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4517,7 +4517,7 @@
 <phrase>
   id: VOICE_SIX
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4531,7 +4531,7 @@
 <phrase>
   id: VOICE_SEVEN
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4545,7 +4545,7 @@
 <phrase>
   id: VOICE_EIGHT
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4559,7 +4559,7 @@
 <phrase>
   id: VOICE_NINE
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4573,7 +4573,7 @@
 <phrase>
   id: VOICE_TEN
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4587,7 +4587,7 @@
 <phrase>
   id: VOICE_ELEVEN
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4601,7 +4601,7 @@
 <phrase>
   id: VOICE_TWELVE
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4615,7 +4615,7 @@
 <phrase>
   id: VOICE_THIRTEEN
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4629,7 +4629,7 @@
 <phrase>
   id: VOICE_FOURTEEN
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4643,7 +4643,7 @@
 <phrase>
   id: VOICE_FIFTEEN
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4657,7 +4657,7 @@
 <phrase>
   id: VOICE_SIXTEEN
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4671,7 +4671,7 @@
 <phrase>
   id: VOICE_SEVENTEEN
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4685,7 +4685,7 @@
 <phrase>
   id: VOICE_EIGHTEEN
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4699,7 +4699,7 @@
 <phrase>
   id: VOICE_NINETEEN
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4713,7 +4713,7 @@
 <phrase>
   id: VOICE_TWENTY
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4727,7 +4727,7 @@
 <phrase>
   id: VOICE_THIRTY
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4741,7 +4741,7 @@
 <phrase>
   id: VOICE_FORTY
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4755,7 +4755,7 @@
 <phrase>
   id: VOICE_FIFTY
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4769,7 +4769,7 @@
 <phrase>
   id: VOICE_SIXTY
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4783,7 +4783,7 @@
 <phrase>
   id: VOICE_SEVENTY
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4797,7 +4797,7 @@
 <phrase>
   id: VOICE_EIGHTY
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4811,7 +4811,7 @@
 <phrase>
   id: VOICE_NINETY
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4825,7 +4825,7 @@
 <phrase>
   id: VOICE_HUNDRED
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4839,7 +4839,7 @@
 <phrase>
   id: VOICE_THOUSAND
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4853,7 +4853,7 @@
 <phrase>
   id: VOICE_MILLION
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4867,7 +4867,7 @@
 <phrase>
   id: VOICE_BILLION
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4881,7 +4881,7 @@
 <phrase>
   id: VOICE_MINUS
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4895,7 +4895,7 @@
 <phrase>
   id: VOICE_PLUS
   desc: spoken only, for composing numbers
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4909,7 +4909,7 @@
 <phrase>
   id: VOICE_MILLISECONDS
   desc: spoken only, a unit postfix
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4923,7 +4923,7 @@
 <phrase>
   id: VOICE_SECOND
   desc: spoken only, a unit postfix
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4937,7 +4937,7 @@
 <phrase>
   id: VOICE_SECONDS
   desc: spoken only, a unit postfix
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4951,7 +4951,7 @@
 <phrase>
   id: VOICE_MINUTE
   desc: spoken only, a unit postfix
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4965,7 +4965,7 @@
 <phrase>
   id: VOICE_MINUTES
   desc: spoken only, a unit postfix
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4979,7 +4979,7 @@
 <phrase>
   id: VOICE_HOUR
   desc: spoken only, a unit postfix
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -4993,7 +4993,7 @@
 <phrase>
   id: VOICE_HOURS
   desc: spoken only, a unit postfix
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5007,7 +5007,7 @@
 <phrase>
   id: VOICE_KHZ
   desc: spoken only, a unit postfix
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5021,7 +5021,7 @@
 <phrase>
   id: VOICE_DB
   desc: spoken only, a unit postfix
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5035,7 +5035,7 @@
 <phrase>
   id: VOICE_PERCENT
   desc: spoken only, a unit postfix
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5049,7 +5049,7 @@
 <phrase>
   id: VOICE_MILLIAMPHOURS
   desc: spoken only, a unit postfix
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5063,7 +5063,7 @@
 <phrase>
   id: VOICE_PIXEL
   desc: spoken only, a unit postfix
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5077,7 +5077,7 @@
 <phrase>
   id: VOICE_PER_SEC
   desc: spoken only, a unit postfix
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5091,7 +5091,7 @@
 <phrase>
   id: VOICE_HERTZ
   desc: spoken only, a unit postfix
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5105,7 +5105,7 @@
 <phrase>
   id: LANG_BYTE
   desc: a unit postfix
-  user:
+  user: core
   <source>
     *: "B"
   </source>
@@ -5119,7 +5119,7 @@
 <phrase>
   id: LANG_KILOBYTE
   desc: a unit postfix, also voiced
-  user:
+  user: core
   <source>
     *: "KB"
   </source>
@@ -5133,7 +5133,7 @@
 <phrase>
   id: LANG_MEGABYTE
   desc: a unit postfix, also voiced
-  user:
+  user: core
   <source>
     *: "MB"
   </source>
@@ -5147,7 +5147,7 @@
 <phrase>
   id: LANG_GIGABYTE
   desc: a unit postfix, also voiced
-  user:
+  user: core
   <source>
     *: "GB"
   </source>
@@ -5161,7 +5161,7 @@
 <phrase>
   id: LANG_POINT
   desc: decimal separator for composing numbers
-  user:
+  user: core
   <source>
     *: "."
   </source>
@@ -5175,7 +5175,7 @@
 <phrase>
   id: VOICE_CHAR_A
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5189,7 +5189,7 @@
 <phrase>
   id: VOICE_CHAR_B
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5203,7 +5203,7 @@
 <phrase>
   id: VOICE_CHAR_C
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5217,7 +5217,7 @@
 <phrase>
   id: VOICE_CHAR_D
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5231,7 +5231,7 @@
 <phrase>
   id: VOICE_CHAR_E
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5245,7 +5245,7 @@
 <phrase>
   id: VOICE_CHAR_F
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5259,7 +5259,7 @@
 <phrase>
   id: VOICE_CHAR_G
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5273,7 +5273,7 @@
 <phrase>
   id: VOICE_CHAR_H
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5287,7 +5287,7 @@
 <phrase>
   id: VOICE_CHAR_I
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5301,7 +5301,7 @@
 <phrase>
   id: VOICE_CHAR_J
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5315,7 +5315,7 @@
 <phrase>
   id: VOICE_CHAR_K
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5329,7 +5329,7 @@
 <phrase>
   id: VOICE_CHAR_L
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5343,7 +5343,7 @@
 <phrase>
   id: VOICE_CHAR_M
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5357,7 +5357,7 @@
 <phrase>
   id: VOICE_CHAR_N
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5371,7 +5371,7 @@
 <phrase>
   id: VOICE_CHAR_O
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5385,7 +5385,7 @@
 <phrase>
   id: VOICE_CHAR_P
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5399,7 +5399,7 @@
 <phrase>
   id: VOICE_CHAR_Q
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5413,7 +5413,7 @@
 <phrase>
   id: VOICE_CHAR_R
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5427,7 +5427,7 @@
 <phrase>
   id: VOICE_CHAR_S
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5441,7 +5441,7 @@
 <phrase>
   id: VOICE_CHAR_T
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5455,7 +5455,7 @@
 <phrase>
   id: VOICE_CHAR_U
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5469,7 +5469,7 @@
 <phrase>
   id: VOICE_CHAR_V
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5483,7 +5483,7 @@
 <phrase>
   id: VOICE_CHAR_W
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5497,7 +5497,7 @@
 <phrase>
   id: VOICE_CHAR_X
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5511,7 +5511,7 @@
 <phrase>
   id: VOICE_CHAR_Y
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5525,7 +5525,7 @@
 <phrase>
   id: VOICE_CHAR_Z
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5539,7 +5539,7 @@
 <phrase>
   id: VOICE_DOT
   desc: spoken only, for spelling
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5553,7 +5553,7 @@
 <phrase>
   id: VOICE_PAUSE
   desc: spoken only, for spelling, a split second of silence (difficult to author)
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5567,7 +5567,7 @@
 <phrase>
   id: VOICE_FILE
   desc: spoken only, prefix for file number
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5581,7 +5581,7 @@
 <phrase>
   id: VOICE_DIR
   desc: spoken only, prefix for directory number
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5595,7 +5595,7 @@
 <phrase>
   id: VOICE_EXT_MPA
   desc: spoken only, for file extension
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5609,7 +5609,7 @@
 <phrase>
   id: VOICE_EXT_CFG
   desc: spoken only, for file extension
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5623,7 +5623,7 @@
 <phrase>
   id: VOICE_EXT_WPS
   desc: spoken only, for file extension
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5637,7 +5637,7 @@
 <phrase>
   id: VOICE_EXT_TXT
   desc: spoken only, for file extension
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5651,7 +5651,7 @@
 <phrase>
   id: VOICE_EXT_ROCK
   desc: spoken only, for file extension
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5665,7 +5665,7 @@
 <phrase>
   id: VOICE_EXT_FONT
   desc: spoken only, for file extension
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5679,7 +5679,7 @@
 <phrase>
   id: VOICE_EXT_BMARK
   desc: spoken only, for file extension and the word in general
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5693,7 +5693,7 @@
 <phrase>
   id: VOICE_EXT_UCL
   desc: spoken only, for file extension
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5707,7 +5707,7 @@
 <phrase>
   id: VOICE_EXT_AJZ
   desc: spoken only, for file extension
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5721,7 +5721,7 @@
 <phrase>
   id: LANG_PLAYLIST_LOAD
   desc: displayed on screen while loading a playlist
-  user:
+  user: core
   <source>
     *: "Loading..."
   </source>
@@ -5735,7 +5735,7 @@
 <phrase>
   id: LANG_PLAYLIST_SHUFFLE
   desc: displayed on screen while shuffling a playlist
-  user:
+  user: core
   <source>
     *: "Shuffling..."
   </source>
@@ -5749,7 +5749,7 @@
 <phrase>
   id: LANG_PLAYLIST_BUFFER_FULL
   desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
-  user:
+  user: core
   <source>
     *: "Playlist "
   </source>
@@ -5763,7 +5763,7 @@
 <phrase>
   id: LANG_END_PLAYLIST_PLAYER
   desc: when playlist has finished
-  user:
+  user: core
   <source>
     *: "End Of List"
   </source>
@@ -5777,7 +5777,7 @@
 <phrase>
   id: LANG_END_PLAYLIST_RECORDER
   desc: when playlist has finished
-  user:
+  user: core
   <source>
     *: "End Of Song List"
   </source>
@@ -5791,7 +5791,7 @@
 <phrase>
   id: LANG_CREATING
   desc: Screen feedback during playlist creation
-  user:
+  user: core
   <source>
     *: "Creating"
   </source>
@@ -5805,7 +5805,7 @@
 <phrase>
   id: LANG_PLAYLIST_INSERT_COUNT
   desc: splash number of tracks inserted
-  user:
+  user: core
   <source>
     *: "Inserted %d tracks (%s)"
   </source>
@@ -5819,7 +5819,7 @@
 <phrase>
   id: LANG_PLAYLIST_QUEUE_COUNT
   desc: splash number of tracks queued
-  user:
+  user: core
   <source>
     *: "Queued %d tracks (%s)"
   </source>
@@ -5833,7 +5833,7 @@
 <phrase>
   id: LANG_PLAYLIST_SAVE_COUNT
   desc: splash number of tracks saved
-  user:
+  user: core
   <source>
     *: "Saved %d tracks (%s)"
   </source>
@@ -5847,7 +5847,7 @@
 <phrase>
   id: LANG_RECURSE_DIRECTORY_QUESTION
   desc: Asked from onplay screen
-  user:
+  user: core
   <source>
     *: "Recursively?"
   </source>
@@ -5861,7 +5861,7 @@
 <phrase>
   id: LANG_NOTHING_TO_RESUME
   desc: Error message displayed when resume button pressed but no playlist
-  user:
+  user: core
   <source>
     *: "Nothing to resume"
   </source>
@@ -5875,7 +5875,7 @@
 <phrase>
   id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
   desc: Playlist error
-  user:
+  user: core
   <source>
     *: "Error updating playlist control file"
   </source>
@@ -5889,7 +5889,7 @@
 <phrase>
   id: LANG_PLAYLIST_ACCESS_ERROR
   desc: Playlist error
-  user:
+  user: core
   <source>
     *: "Error accessing playlist file"
   </source>
@@ -5903,7 +5903,7 @@
 <phrase>
   id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
   desc: Playlist error
-  user:
+  user: core
   <source>
     *: "Error accessing playlist control file"
   </source>
@@ -5917,7 +5917,7 @@
 <phrase>
   id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
   desc: Playlist error
-  user:
+  user: core
   <source>
     *: "Error accessing directory"
   </source>
@@ -5931,7 +5931,7 @@
 <phrase>
   id: LANG_PLAYLIST_CONTROL_INVALID
   desc: Playlist resume error
-  user:
+  user: core
   <source>
     *: "Playlist control file is invalid"
   </source>
@@ -5945,7 +5945,7 @@
 <phrase>
   id: LANG_FM_STATION
   desc: in radio screen
-  user:
+  user: core
   <source>
     *: "Station: %d.%02d MHz"
   </source>
@@ -5959,7 +5959,7 @@
 <phrase>
   id: LANG_FM_NO_PRESETS
   desc: DEPRECATED
-  user:
+  user: core
   <source>
     *: ""
   </source>
@@ -5973,7 +5973,7 @@
 <phrase>
   id: LANG_FM_EDIT_PRESET
   desc: in radio screen
-  user:
+  user: core
   <source>
     *: "Edit preset"
   </source>
@@ -5987,7 +5987,7 @@
 <phrase>
   id: LANG_FM_DELETE_PRESET
   desc: in radio screen
-  user:
+  user: core
   <source>
     *: "Remove preset"
   </source>
@@ -6001,7 +6001,7 @@
 <phrase>
   id: LANG_FM_PRESET_SAVE_FAILED
   desc: in radio screen
-  user:
+  user: core
   <source>
     *: "Preset save failed"
   </source>
@@ -6015,7 +6015,7 @@
 <phrase>
   id: LANG_FM_NO_FREE_PRESETS
   desc: in radio screen
-  user:
+  user: core
   <source>
     *: "The preset list is full"
   </source>
@@ -6029,7 +6029,7 @@
 <phrase>
   id: LANG_BUTTONBAR_MENU
   desc: in button bar
-  user:
+  user: core
   <source>
     *: "Menu"
   </source>
@@ -6043,7 +6043,7 @@
 <phrase>
   id: LANG_FM_BUTTONBAR_EXIT
   desc: in radio screen
-  user:
+  user: core
   <source>
     *: "Exit"
   </source>
@@ -6057,7 +6057,7 @@
 <phrase>
   id: LANG_FM_BUTTONBAR_ACTION
   desc: in radio screen
-  user:
+  user: core
   <source>
     *: "Action"
   </source>
@@ -6071,7 +6071,7 @@
 <phrase>
   id: LANG_FM_BUTTONBAR_PRESETS
   desc: in button bar
-  user:
+  user: core
   <source>
     *: "Preset"
   </source>
@@ -6085,7 +6085,7 @@
 <phrase>
   id: LANG_FM_BUTTONBAR_ADD
   desc: in radio screen
-  user:
+  user: core
   <source>
     *: "Add"
   </source>
@@ -6099,7 +6099,7 @@
 <phrase>
   id: LANG_FM_BUTTONBAR_RECORD
   desc: in main menu
-  user:
+  user: core
   <source>
     *: "Record"
   </source>
@@ -6113,7 +6113,7 @@
 <phrase>
   id: LANG_FM_MONO_MODE
   desc: in radio screen
-  user:
+  user: core
   <source>
     *: "Force Mono"
   </source>
@@ -6127,7 +6127,7 @@
 <phrase>
   id: LANG_DIRBROWSE_F1
   desc: in dir browser, F1 button bar text
-  user:
+  user: core
   <source>
     *: "Menu"
   </source>
@@ -6141,7 +6141,7 @@
 <phrase>
   id: LANG_DIRBROWSE_F2
   desc: in dir browser, F2 button bar text
-  user:
+  user: core
   <source>
     *: "Option"
   </source>
@@ -6155,7 +6155,7 @@
 <phrase>
   id: LANG_DIRBROWSE_F3
   desc: in dir browser, F3 button bar text
-  user:
+  user: core
   <source>
     *: "LCD"
   </source>
@@ -6169,7 +6169,7 @@
 <phrase>
   id: LANG_SHOWDIR_BUFFER_FULL
   desc: in showdir(), displayed on screen when you reach buffer limit
-  user:
+  user: core
   <source>
     *: "Dir Buffer Is Full!"
   </source>
@@ -6183,7 +6183,7 @@
 <phrase>
   id: LANG_LANGUAGE_LOADED
   desc: shown when a language has been loaded from the dir browser
-  user:
+  user: core
   <source>
     *: "New Language"
   </source>
@@ -6197,7 +6197,7 @@
 <phrase>
   id: LANG_SETTINGS_LOADED
   desc: Feedback shown when a .cfg file is loaded
-  user:
+  user: core
   <source>
     *: "Settings Loaded"
   </source>
@@ -6211,7 +6211,7 @@
 <phrase>
   id: LANG_SETTINGS_SAVED
   desc: Feedback shown when a .cfg file is saved
-  user:
+  user: core
   <source>
     *: "Settings Saved"
   </source>
@@ -6225,7 +6225,7 @@
 <phrase>
   id: LANG_BOOT_CHANGED
   desc: File browser discovered the boot file was changed
-  user:
+  user: core
   <source>
     *: "Boot changed"
   </source>
@@ -6239,7 +6239,7 @@
 <phrase>
   id: LANG_REBOOT_NOW
   desc: Do you want to reboot?
-  user:
+  user: core
   <source>
     *: "Reboot now?"
   </source>
@@ -6253,7 +6253,7 @@
 <phrase>
   id: LANG_OFF_ABORT
   desc: Used on recorder models
-  user:
+  user: core
   <source>
     *: "OFF to abort"
   </source>
@@ -6267,7 +6267,7 @@
 <phrase>
   id: LANG_STOP_ABORT
   desc: Used on player models
-  user:
+  user: core
   <source>
     *: "STOP to abort"
   </source>
@@ -6281,7 +6281,7 @@
 <phrase>
   id: LANG_NO_FILES
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "No files"
   </source>
@@ -6295,7 +6295,7 @@
 <phrase>
   id: LANG_ID3DB_ARTISTS
   desc: ID3 virtual folder name
-  user:
+  user: core
   <source>
     *: "Artists"
   </source>
@@ -6309,7 +6309,7 @@
 <phrase>
   id: LANG_ID3DB_ALBUMS
   desc: ID3 virtual folder name
-  user:
+  user: core
   <source>
     *: "Albums"
   </source>
@@ -6323,7 +6323,7 @@
 <phrase>
   id: LANG_ID3DB_SONGS
   desc: ID3 virtual folder name
-  user:
+  user: core
   <source>
     *: "Songs"
   </source>
@@ -6337,7 +6337,7 @@
 <phrase>
   id: LANG_ID3DB_SEARCH
   desc: ID3 virtual folder name
-  user:
+  user: core
   <source>
     *: "Search"
   </source>
@@ -6351,7 +6351,7 @@
 <phrase>
   id: LANG_ID3DB_SEARCH_ARTISTS
   desc: ID3 virtual folder name
-  user:
+  user: core
   <source>
     *: "Search Artists"
   </source>
@@ -6365,7 +6365,7 @@
 <phrase>
   id: LANG_ID3DB_SEARCH_ALBUMS
   desc: ID3 virtual folder name
-  user:
+  user: core
   <source>
     *: "Search Albums"
   </source>
@@ -6379,7 +6379,7 @@
 <phrase>
   id: LANG_ID3DB_SEARCH_SONGS
   desc: ID3 virtual folder name
-  user:
+  user: core
   <source>
     *: "Search Songs"
   </source>
@@ -6393,7 +6393,7 @@
 <phrase>
   id: LANG_ID3DB_MATCHES
   desc: ID3 virtual folder name
-  user:
+  user: core
   <source>
     *: "Found %d matches"
   </source>
@@ -6407,7 +6407,7 @@
 <phrase>
   id: LANG_ID3DB_ALL_SONGS
   desc: ID3 virtual folder name
-  user:
+  user: core
   <source>
     *: "<All songs>"
   </source>
@@ -6421,7 +6421,7 @@
 <phrase>
   id: LANG_MOVE
   desc: The verb/action Move
-  user:
+  user: core
   <source>
     *: "Move"
   </source>
@@ -6435,7 +6435,7 @@
 <phrase>
   id: LANG_MOVE_FAILED
   desc: Error message displayed in playlist viewer
-  user:
+  user: core
   <source>
     *: "Move failed"
   </source>
@@ -6449,7 +6449,7 @@
 <phrase>
   id: LANG_SHOW_INDICES
   desc: in playlist viewer menu
-  user:
+  user: core
   <source>
     *: "Show Indices"
   </source>
@@ -6463,7 +6463,7 @@
 <phrase>
   id: LANG_TRACK_DISPLAY
   desc: in playlist viewer on+play menu
-  user:
+  user: core
   <source>
     *: "Track Display"
   </source>
@@ -6477,7 +6477,7 @@
 <phrase>
   id: LANG_DISPLAY_TRACK_NAME_ONLY
   desc: track display options
-  user:
+  user: core
   <source>
     *: "Track name only"
   </source>
@@ -6491,7 +6491,7 @@
 <phrase>
   id: LANG_DISPLAY_FULL_PATH
   desc: track display options
-  user:
+  user: core
   <source>
     *: "Full path"
   </source>
@@ -6505,7 +6505,7 @@
 <phrase>
   id: LANG_REMOVE
   desc: in playlist viewer on+play menu
-  user:
+  user: core
   <source>
     *: "Remove"
   </source>
@@ -6519,7 +6519,7 @@
 <phrase>
   id: LANG_FILE_OPTIONS
   desc: in playlist viewer on+play menu
-  user:
+  user: core
   <source>
     *: "File Options"
   </source>
@@ -6533,7 +6533,7 @@
 <phrase>
   id: LANG_PLUGIN_CANT_OPEN
   desc: Plugin open error message
-  user:
+  user: core
   <source>
     *: "Can't open %s"
   </source>
@@ -6547,7 +6547,7 @@
 <phrase>
   id: LANG_READ_FAILED
   desc: There was an error reading a file
-  user:
+  user: core
   <source>
     *: "Failed reading %s"
   </source>
@@ -6561,7 +6561,7 @@
 <phrase>
   id: LANG_PLUGIN_WRONG_MODEL
   desc: The plugin is not compatible with the archos model trying to run it
-  user:
+  user: core
   <source>
     *: "Incompatible model"
   </source>
@@ -6575,7 +6575,7 @@
 <phrase>
   id: LANG_PLUGIN_WRONG_VERSION
   desc: The plugin is not compatible with the rockbox version trying to run it
-  user:
+  user: core
   <source>
     *: "Incompatible version"
   </source>
@@ -6589,7 +6589,7 @@
 <phrase>
   id: LANG_PLUGIN_ERROR
   desc: The plugin return an error code
-  user:
+  user: core
   <source>
     *: "Plugin returned error"
   </source>
@@ -6603,7 +6603,7 @@
 <phrase>
   id: LANG_FILETYPES_EXTENSION_FULL
   desc: Extension array full
-  user:
+  user: core
   <source>
     *: "Extension array full"
   </source>
@@ -6617,7 +6617,7 @@
 <phrase>
   id: LANG_FILETYPES_FULL
   desc: Filetype array full
-  user:
+  user: core
   <source>
     *: "Filetype array full"
   </source>
@@ -6631,7 +6631,7 @@
 <phrase>
   id: LANG_FILETYPES_PLUGIN_NAME_LONG
   desc: Viewer plugin name too long
-  user:
+  user: core
   <source>
     *: "Plugin name too long"
   </source>
@@ -6645,7 +6645,7 @@
 <phrase>
   id: LANG_FILETYPES_STRING_BUFFER_EMPTY
   desc: Filetype string buffer empty
-  user:
+  user: core
   <source>
     *: "Filetype string buffer empty"
   </source>
@@ -6659,7 +6659,7 @@
 <phrase>
   id: LANG_RESUME_CONFIRM_PLAYER
   desc: possible answers to resume question
-  user:
+  user: core
   <source>
     *: "(PLAY/STOP)"
   </source>
@@ -6673,7 +6673,7 @@
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_YES
   desc: bool true representation
-  user:
+  user: core
   <source>
     *: "Yes"
   </source>
@@ -6687,7 +6687,7 @@
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_NO
   desc: bool false representation
-  user:
+  user: core
   <source>
     *: "No"
   </source>
@@ -6701,7 +6701,7 @@
 <phrase>
   id: LANG_SYSFONT_ON
   desc: Used in a lot of places
-  user:
+  user: core
   <source>
     *: "On"
   </source>
@@ -6715,7 +6715,7 @@
 <phrase>
   id: LANG_SYSFONT_OFF
   desc: Used in a lot of places
-  user:
+  user: core
   <source>
     *: "Off"
   </source>
@@ -6729,7 +6729,7 @@
 <phrase>
   id: LANG_SYSFONT_VOLUME
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Volume"
   </source>
@@ -6743,7 +6743,7 @@
 <phrase>
   id: LANG_SYSFONT_CHANNEL_STEREO
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Stereo"
   </source>
@@ -6757,7 +6757,7 @@
 <phrase>
   id: LANG_SYSFONT_CHANNEL_MONO
   desc: in sound_settings
-  user:
+  user: core
   <source>
     *: "Mono"
   </source>
@@ -6771,7 +6771,7 @@
 <phrase>
   id: LANG_SYSFONT_SHUFFLE
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Shuffle"
   </source>
@@ -6785,7 +6785,7 @@
 <phrase>
   id: LANG_SYSFONT_REPEAT
   desc: in settings_menu
-  user:
+  user: core
   <source>
     *: "Repeat"
   </source>
@@ -6799,7 +6799,7 @@
 <phrase>
   id: LANG_SYSFONT_REPEAT_ALL
   desc: repeat playlist once all songs have completed
-  user:
+  user: core
   <source>
     *: "All"
   </source>
@@ -6813,7 +6813,7 @@
 <phrase>
   id: LANG_SYSFONT_REPEAT_ONE
   desc: repeat one song
-  user:
+  user: core
   <source>
     *: "One"
   </source>
@@ -6827,7 +6827,7 @@
 <phrase>
   id: LANG_SYSFONT_FILTER
   desc: setting name for dir filter
-  user:
+  user: core
   <source>
     *: "Show Files"
   </source>
@@ -6841,7 +6841,7 @@
 <phrase>
   id: LANG_SYSFONT_FILTER_ALL
   desc: show all files
-  user:
+  user: core
   <source>
     *: "All"
   </source>
@@ -6855,7 +6855,7 @@
 <phrase>
   id: LANG_SYSFONT_FILTER_SUPPORTED
   desc: show all file types supported by Rockbox
-  user:
+  user: core
   <source>
     *: "Supported"
   </source>
@@ -6869,7 +6869,7 @@
 <phrase>
   id: LANG_SYSFONT_FILTER_MUSIC
   desc: show only music-related files
-  user:
+  user: core
   <source>
     *: "Music"
   </source>
@@ -6883,7 +6883,7 @@
 <phrase>
   id: LANG_SYSFONT_FILTER_PLAYLIST
   desc: show only playlist
-  user:
+  user: core
   <source>
     *: "Playlists"
   </source>
@@ -6900,7 +6900,7 @@
 ### the previously used desc is commented below:
 ### desc: show ID3 database
   desc: show ID3 Database
-  user:
+  user: core
   <source>
 ### The <source> section differs from the english!
 ### the previously used one is commented below:
@@ -6917,7 +6917,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_QUALITY
   desc: in the recording settings
-  user:
+  user: core
   <source>
     *: "Quality"
   </source>
@@ -6931,7 +6931,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_FREQUENCY
   desc: in the recording settings
-  user:
+  user: core
   <source>
     *: "Frequency"
   </source>
@@ -6945,7 +6945,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_SOURCE
   desc: in the recording settings
-  user:
+  user: core
   <source>
     *: "Source"
   </source>
@@ -6959,7 +6959,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_SRC_MIC
   desc: in the recording settings
-  user:
+  user: core
   <source>
     *: "Mic"
   </source>
@@ -6973,7 +6973,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_SRC_LINE
   desc: in the recording settings
-  user:
+  user: core
   <source>
     *: "Line In"
   </source>
@@ -6987,7 +6987,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
   desc: in the recording settings
-  user:
+  user: core
   <source>
     *: "Digital"
   </source>
@@ -7001,7 +7001,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_CHANNELS
   desc: in the recording settings
-  user:
+  user: core
   <source>
     *: "Channels"
   </source>
@@ -7015,7 +7015,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORD_TRIGGER
   desc: in recording settings_menu
-  user:
+  user: core
   <source>
     *: "Trigger"
   </source>
@@ -7029,7 +7029,7 @@
 <phrase>
   id: LANG_SYSFONT_FLIP_DISPLAY
   desc: in settings_menu, option to turn display+buttos by 180 degreed
-  user:
+  user: core
   <source>
     *: "Upside Down"
   </source>
@@ -7043,7 +7043,7 @@
 <phrase>
   id: LANG_SYSFONT_SCROLL_BAR
   desc: display menu, F3 substitute
-  user:
+  user: core
   <source>
     *: "Scroll Bar"
   </source>
@@ -7057,7 +7057,7 @@
 <phrase>
   id: LANG_SYSFONT_STATUS_BAR
   desc: display menu, F3 substitute
-  user:
+  user: core
   <source>
     *: "Status Bar"
   </source>
@@ -7071,7 +7071,7 @@
 <phrase>
   id: LANG_SYSFONT_PITCH_UP
   desc: in wps
-  user:
+  user: core
   <source>
     *: "Pitch Up"
   </source>
@@ -7085,7 +7085,7 @@
 <phrase>
   id: LANG_SYSFONT_PITCH_DOWN
   desc: in wps
-  user:
+  user: core
   <source>
     *: "Pitch Down"
   </source>
@@ -7099,7 +7099,7 @@
 <phrase>
   id: LANG_SYSFONT_F2_MODE
   desc: in wps F2 pressed
-  user:
+  user: core
   <source>
     *: "Mode:"
   </source>
@@ -7113,7 +7113,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_TIME
   desc: Display of recorded time
-  user:
+  user: core
   <source>
     *: "Time:"
   </source>
@@ -7127,7 +7127,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORD_TIMESPLIT_REC
   desc: Display of record timer interval setting, on the record screen
-  user:
+  user: core
   <source>
 ### The <source> section differs from the english!
 ### the previously used one is commented below:
@@ -7144,7 +7144,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_SIZE
   desc: Display of recorded file size
-  user:
+  user: core
   <source>
     *: "Size:"
   </source>
@@ -7158,7 +7158,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORD_PRERECORD
   desc: in recording and radio screen
-  user:
+  user: core
   <source>
 ### The <source> section differs from the english!
 ### the previously used one is commented below:
@@ -7175,7 +7175,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_GAIN
   desc: in the recording screen
-  user:
+  user: core
   <source>
     *: "Gain"
   </source>
@@ -7189,7 +7189,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_LEFT
   desc: in the recording screen
-  user:
+  user: core
   <source>
 ### The <source> section differs from the english!
 ### the previously used one is commented below:
@@ -7206,7 +7206,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_RIGHT
   desc: in the recording screen
-  user:
+  user: core
   <source>
 ### The <source> section differs from the english!
 ### the previously used one is commented below:
@@ -7223,7 +7223,7 @@
 <phrase>
   id: LANG_SYSFONT_DISK_FULL
   desc: in recording screen
-  user:
+  user: core
   <source>
     *: "The disk is full. Press OFF to continue."
   </source>
@@ -7237,7 +7237,7 @@
 <phrase>
   id: LANG_SYSFONT_DIRBROWSE_F1
   desc: in dir browser, F1 button bar text
-  user:
+  user: core
   <source>
     *: "Menu"
   </source>
@@ -7251,7 +7251,7 @@
 <phrase>
   id: LANG_SYSFONT_DIRBROWSE_F2
   desc: in dir browser, F2 button bar text
-  user:
+  user: core
   <source>
     *: "Option"
   </source>
@@ -7265,7 +7265,7 @@
 <phrase>
   id: LANG_SYSFONT_DIRBROWSE_F3
   desc: in dir browser, F3 button bar text
-  user:
+  user: core
   <source>
     *: "LCD"
   </source>

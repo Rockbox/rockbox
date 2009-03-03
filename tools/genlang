@@ -20,6 +20,10 @@ my $langversion = 4; # 3 was the latest one used in the v1 format
 # figured it was boring and unnecessary to write support for now since we
 # don't use it anymore.
 
+my %user2num =
+  ('core' => 1);
+   
+
 if(!$ARGV[0]) {
     print <<MOO
 Usage: genlang [options] <langv2 file>
@@ -207,6 +211,8 @@ if($english) {
     my @phrase;
     my $id;
     my $maybeid;
+    my $user;
+    my $maybeuser;
     my $withindest;
     my $numphrases = 0;
     while(<ENG>) {
@@ -254,6 +260,7 @@ if($english) {
                     # we unconditionally always use all IDs when the "update"
                     # feature is used
                     $id = $maybeid;
+                    $user = $user2num{$maybeuser};
     #                print "DEST: use this id $id\n";
                 }
                 else {
@@ -277,6 +284,9 @@ if($english) {
         if($_ =~ /^ *id: ([^ \t\n]+)/i) {
             $maybeid=$1;
             $sortorder{$maybeid}=$numphrases++;
+        }
+        if($_ =~ /^ *user: ([^ \t\n]+)/i) {
+            $maybeuser=$1;
         }
     }
     close(ENG);
@@ -443,6 +453,12 @@ while(<LANG>) {
                     if($dest eq '""' && $phrase{'desc'} !~ /deprecated/i && $idstr !~ /^VOICE/) {
                         print STDERR "$input:$line:1: warning: empty dest before line in non-deprecated phrase!\n";
                     }
+                    
+                    my $user = $user2num{trim($phrase{'user'})};
+                    if(!$user) {
+                        print STDERR "$input:$line:1: warning: unknown user!\n";
+                        $user = 1;
+                    }
 
                     # Use the ID name to figure out which id number range we
                     # should use for this phrase. Voice-only strings are
@@ -467,11 +483,13 @@ while(<LANG>) {
                         print "source: $src\n";
                         print "dest: $dest\n";
                         print "voice: $voice\n";
+                        print "user: $user\n";
                     }
 
                     undef $src;
                     undef $dest;
                     undef $voice;
+                    undef $user;
                     undef %phrase;
                 }
 
