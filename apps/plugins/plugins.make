@@ -66,10 +66,10 @@ $(BUILDDIR)/credits.raw credits.raw: $(DOCSDIR)/CREDITS
 # special dependencies
 $(BUILDDIR)/apps/plugins/wav2wv.rock: $(BUILDDIR)/apps/codecs/libwavpack.a $(PLUGINLIB)
 
-# special pattern rule for compiling plugin lib (with -ffunction-sections)
+# special pattern rule for compiling plugin lib (with function and data sections)
 $(BUILDDIR)/apps/plugins/lib/%.o: $(ROOTDIR)/apps/plugins/lib/%.c
 	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PLUGINFLAGS) -ffunction-sections -c $< -o $@
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PLUGINFLAGS) -ffunction-sections -fdata-sections -c $< -o $@
 
 # special pattern rule for compiling plugins with extra flags
 $(BUILDDIR)/apps/plugins/%.o: $(ROOTDIR)/apps/plugins/%.c $(PLUGINBITMAPLIB)
