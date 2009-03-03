@@ -22,7 +22,7 @@
 /*
     This is the fmradio_i2c interface, used by the radio driver
     to communicate with the radio tuner chip.
-    
+
     It is implemented using the generic i2c driver, which does "bit-banged"
     I2C with a couple of GPIO pins.
  */
@@ -52,6 +52,8 @@
 #elif
 #error no FM I2C GPIOPIN defines
 #endif
+
+static int fm_i2c_bus;
 
 static void fm_scl_hi(void)
 {
@@ -107,22 +109,14 @@ static int fm_scl(void)
 static void fm_delay(void)
 {
     volatile int i;
-    
+
     /* this loop is uncalibrated and could use more sophistication */
     for (i = 0; i < 100; i++) {
     }
 }
 
 /* interface towards the generic i2c driver */
-static struct i2c_interface fm_i2c_interface = {
-#if     defined(SANSA_CLIP) || defined(SANSA_FUZE) || defined(SANSA_E200V2)
-    .address = 0x10 << 1,
-#elif   defined(SANSA_M200V4)
-    .address = 0xC0,
-#elif
-#error no fm i2c address defined
-#endif
-    
+static const struct i2c_interface fm_i2c_interface = {
     .scl_hi = fm_scl_hi,
     .scl_lo = fm_scl_lo,
     .sda_hi = fm_sda_hi,
@@ -133,7 +127,7 @@ static struct i2c_interface fm_i2c_interface = {
     .scl_output = fm_scl_output,
     .scl = fm_scl,
     .sda = fm_sda,
-    
+
     .delay_hd_sta = fm_delay,
     .delay_hd_dat = fm_delay,
     .delay_su_dat = fm_delay,
@@ -145,17 +139,17 @@ static struct i2c_interface fm_i2c_interface = {
 /* initialise i2c for fmradio */
 void fmradio_i2c_init(void)
 {
-    i2c_add_node(&fm_i2c_interface);
+    fm_i2c_bus = i2c_add_node(&fm_i2c_interface);
 }
 
 int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count)
 {
-    return i2c_write_data(address, -1, buf, count);
+    return i2c_write_data(fm_i2c_bus, address, -1, buf, count);
 }
 
 int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 {
-    return i2c_read_data(address, -1, buf, count);
+    return i2c_read_data(fm_i2c_bus, address, -1, buf, count);
 }
 
 

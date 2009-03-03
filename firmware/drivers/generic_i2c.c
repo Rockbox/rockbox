@@ -28,9 +28,9 @@
 #define MAX_I2C_INTERFACES 5
 
 static int i2c_num_ifs = 0;
-static struct i2c_interface *i2c_if[MAX_I2C_INTERFACES];
+static const struct i2c_interface *i2c_if[MAX_I2C_INTERFACES];
 
-static void i2c_start(struct i2c_interface *iface)
+static void i2c_start(const struct i2c_interface *iface)
 {
     iface->sda_output();
 
@@ -41,7 +41,7 @@ static void i2c_start(struct i2c_interface *iface)
     iface->scl_lo();
 }
 
-static void i2c_stop(struct i2c_interface *iface)
+static void i2c_stop(const struct i2c_interface *iface)
 {
     iface->sda_output();
 
@@ -51,7 +51,7 @@ static void i2c_stop(struct i2c_interface *iface)
     iface->sda_hi();
 }
 
-static void i2c_ack(struct i2c_interface *iface, bool ack)
+static void i2c_ack(const struct i2c_interface *iface, bool ack)
 {
     iface->sda_output();
     iface->scl_lo();
@@ -66,7 +66,7 @@ static void i2c_ack(struct i2c_interface *iface, bool ack)
     iface->scl_lo();
 }
 
-static int i2c_getack(struct i2c_interface *iface)
+static int i2c_getack(const struct i2c_interface *iface)
 {
     int ret = 1;
 
@@ -85,7 +85,7 @@ static int i2c_getack(struct i2c_interface *iface)
     return ret;
 }
 
-static unsigned char i2c_inb(struct i2c_interface *iface, bool ack)
+static unsigned char i2c_inb(const struct i2c_interface *iface, bool ack)
 {
     int i;
     unsigned char byte = 0;
@@ -107,7 +107,7 @@ static unsigned char i2c_inb(struct i2c_interface *iface, bool ack)
     return byte;
 }
 
-static int i2c_outb(struct i2c_interface *iface, unsigned char byte)
+static int i2c_outb(const struct i2c_interface *iface, unsigned char byte)
 {
     int i;
 
@@ -127,32 +127,19 @@ static int i2c_outb(struct i2c_interface *iface, unsigned char byte)
    }
 
    iface->sda_hi();
-   
+
    return i2c_getack(iface);
 }
 
-static struct i2c_interface *find_if(int address)
-{
-    int i;
-
-    for(i = 0;i < i2c_num_ifs;i++) {
-        if(i2c_if[i]->address == address)
-            return i2c_if[i];
-    }
-    return NULL;
-}
-
-int i2c_write_data(int bus_address, int address,
+int i2c_write_data(int bus_index, int bus_address, int address,
                    const unsigned char* buf, int count)
 {
     int i;
     int ret = 0;
-    struct i2c_interface *iface = find_if(bus_address);
-    if(!iface)
-        return -1;
+    const struct i2c_interface *iface = i2c_if[bus_index];;
 
     i2c_start(iface);
-    if (!i2c_outb(iface, iface->address & 0xfe))
+    if (!i2c_outb(iface, bus_address & 0xfe))
     {
         ret = -2;
         goto end;
@@ -181,19 +168,17 @@ end:
     return ret;
 }
 
-int i2c_read_data(int bus_address, int address,
+int i2c_read_data(int bus_index, int bus_address, int address,
                   unsigned char* buf, int count)
 {
     int i;
     int ret = 0;
-    struct i2c_interface *iface = find_if(bus_address);
-    if(!iface)
-        return -1;
+    const struct i2c_interface *iface = i2c_if[bus_index];;
 
     if (address != -1)
     {
         i2c_start(iface);
-        if (!i2c_outb(iface, iface->address & 0xfe))
+        if (!i2c_outb(iface, bus_address & 0xfe))
         {
             ret = -2;
             goto end;
@@ -206,7 +191,7 @@ int i2c_read_data(int bus_address, int address,
     }
 
     i2c_start(iface);
-    if (!i2c_outb(iface, iface->address | 1))
+    if (!i2c_outb(iface, bus_address | 1))
     {
         ret = -4;
         goto end;
@@ -222,14 +207,18 @@ end:
     return ret;
 }
 
-int i2c_add_node(struct i2c_interface *iface)
+/* returns bus index which can be used as a handle, or <0 on error */
+int i2c_add_node(const struct i2c_interface *iface)
 {
+    int bus_index;
+
     if (i2c_num_ifs == MAX_I2C_INTERFACES)
         return -1;
 
-    i2c_if[i2c_num_ifs++] = iface;
+    bus_index = i2c_num_ifs++;
+    i2c_if[bus_index] = iface;
 
     iface->scl_output();
 
-    return 0;
+    return bus_index;
 }

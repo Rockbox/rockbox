@@ -46,7 +46,6 @@
 #include "system.h"
 #include "jz4740.h"
 #include "logf.h"
-#include "generic_i2c.h"
 
 
 /* I2C protocol */

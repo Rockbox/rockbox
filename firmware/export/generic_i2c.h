@@ -23,9 +23,6 @@
 
 struct i2c_interface
 {
-    unsigned char address; /* Address of the chip that this interface
-                              describes */
-
     void (*scl_hi)(void);  /* Drive SCL high, might sleep on clk stretch */
     void (*scl_lo)(void);  /* Drive SCL low */
     void (*sda_hi)(void);  /* Drive SDA high */
@@ -47,9 +44,11 @@ struct i2c_interface
     void (*delay_thigh)(void);  /* SCL high period (tHIGH)     4.0us/0.6us */
 };
 
-extern int i2c_add_node(struct i2c_interface *iface);
-extern int i2c_write_data(int bus_address, int address,
-                          const unsigned char* buf, int count);
-extern int i2c_read_data(int bus_address, int address,
-                         unsigned char* buf, int count);
-#endif
+int i2c_add_node(const struct i2c_interface *iface);
+int i2c_write_data(int bus_index, int bus_address, int address,
+                   const unsigned char* buf, int count);
+int i2c_read_data(int bus_index, int bus_address, int address,
+                  unsigned char* buf, int count);
+
+#endif /* _GEN_I2C_ */
+
