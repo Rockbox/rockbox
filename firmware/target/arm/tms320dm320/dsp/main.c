@@ -43,17 +43,6 @@ void main(void) {
 
     debugf("DSP inited...");
 
-#ifdef DATA_32_SINE
-    for (i = 0; i < 32; i++) {
-        double ratio = ((double)i)/32.0;
-        double rad = 3.0*3.141592*ratio;
-        double normal = sin(rad);
-        double scaled = 32767.0*(normal);
-        data[2*i + 0] = -(signed short)scaled;
-        data[2*i + 1] = (signed short)scaled;
-    }
-#endif
-
     for (;;) {
         asm("        IDLE 1");
         asm("        NOP");
@@ -69,6 +58,16 @@ void main(void) {
     memset((unsigned short *)0x7f80, 0, 0x80);
 #endif
 
+#ifdef DATA_32_SINE
+    for (i = 0; i < 32; i++) {
+        double ratio = ((double)i)/32.0;
+        double rad = 3.0*3.141592*ratio;
+        double normal = sin(rad);
+        double scaled = 32767.0*(normal);
+        data[2*i + 0] = -(signed short)scaled;
+        data[2*i + 1] = (signed short)scaled;
+    }
+#endif
 
 #ifdef MANUAL_TRANSFER
     register signed short *p;

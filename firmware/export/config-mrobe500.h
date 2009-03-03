@@ -93,6 +93,9 @@
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
+/* There is no hardware tone control */
+#define HAVE_SW_TONE_CONTROLS
+
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_RX5X348AB
 
@@ -119,12 +122,6 @@
 
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x100000
-
-/* Define this if you have the WM8975 audio codec */
-//#define HAVE_WM8751
-
-/* Define this if you want to use the adaptive bass capibility of the 8751 */
-/* #define USE_ADAPTIVE_BASS */
 
 #define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
                        SAMPR_CAP_11)

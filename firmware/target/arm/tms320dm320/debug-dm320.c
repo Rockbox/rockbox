@@ -39,9 +39,6 @@
 bool __dbg_ports(void)
 {
 	dsp_init();
-#ifndef CREATIVE_ZVx
-	tsc2100_writereg(TSDACGAIN_PAGE, TSDACGAIN_ADDRESS, 0x2020/*x0303*/);
-#endif
 	dsp_wake();
     return false;
 }
