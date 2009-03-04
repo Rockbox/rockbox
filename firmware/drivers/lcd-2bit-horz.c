@@ -1019,7 +1019,7 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
         s->y = y;
         s->len = utf8length((char *)string);
         s->offset = offset;
-        s->startx = x * s->width / s->len;;
+        s->startx = x * s->width / s->len;
         s->backward = false;
         lcd_scroll_info.lines++;
     }

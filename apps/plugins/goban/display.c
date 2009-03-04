@@ -899,7 +899,7 @@ setup_display (void)
 
     if (board_height >= 7)
     {
-        start_y = 3;;
+        start_y = 3;
     }
     else
     {

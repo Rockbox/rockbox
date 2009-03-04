@@ -136,7 +136,7 @@ int i2c_write_data(int bus_index, int bus_address, int address,
 {
     int i;
     int ret = 0;
-    const struct i2c_interface *iface = i2c_if[bus_index];;
+    const struct i2c_interface *iface = i2c_if[bus_index];
 
     i2c_start(iface);
     if (!i2c_outb(iface, bus_address & 0xfe))
@@ -173,7 +173,7 @@ int i2c_read_data(int bus_index, int bus_address, int address,
 {
     int i;
     int ret = 0;
-    const struct i2c_interface *iface = i2c_if[bus_index];;
+    const struct i2c_interface *iface = i2c_if[bus_index];
 
     if (address != -1)
     {

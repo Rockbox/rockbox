@@ -2554,7 +2554,7 @@ unsigned long audio_num_recorded_bytes(void)
             if(num_bytes < 0)
                 num_bytes += audiobuflen;
             
-            return num_bytes;;
+            return num_bytes;
         }
         else
             return num_rec_bytes;

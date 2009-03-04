@@ -452,7 +452,7 @@ static int peak_meter_max(void) {
 
         /* for dBfs scale */
         int range_min = -global_settings.peak_meter_min;
-        int max = -global_settings.peak_meter_max;;
+        int max = -global_settings.peak_meter_max;
 
         retval =  set_int(str(LANG_PM_MAX), str(LANG_PM_DBFS), UNIT_DB,
             &max, NULL, 1, range_min, 0, NULL);

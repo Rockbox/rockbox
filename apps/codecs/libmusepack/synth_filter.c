@@ -234,7 +234,7 @@ mpc_calculate_new_V ( const MPC_SAMPLE_FORMAT * Sample, MPC_SAMPLE_FORMAT * V )
     B[ 4] = A[ 4] + A[11];
     B[ 5] = A[ 5] + A[10];
     B[ 6] = A[ 6] + A[ 9];
-    B[ 7] = A[ 7] + A[ 8];;
+    B[ 7] = A[ 7] + A[ 8];
     B[ 8] = MPC_MULTIPLY_V((A[ 0] - A[15]), INVCOS02);
     B[ 9] = MPC_MULTIPLY_V((A[ 1] - A[14]), INVCOS06);
     B[10] = MPC_MULTIPLY_V((A[ 2] - A[13]), INVCOS10);

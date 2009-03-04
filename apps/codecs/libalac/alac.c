@@ -449,7 +449,7 @@ static void predictor_decompress_fir_adapt(int32_t *error_buffer,
                          predictor_coef_table[predictor_num]++;
                          val=-val;
                        } else {
-                         predictor_coef_table[predictor_num]--;;
+                         predictor_coef_table[predictor_num]--;
                        }
                        error_val -= ((val >> predictor_quantitization) * (4 - predictor_num));
                     }                      
@@ -522,7 +522,7 @@ static void predictor_decompress_fir_adapt(int32_t *error_buffer,
                          predictor_coef_table[predictor_num]++;
                          val=-val;
                        } else {
-                         predictor_coef_table[predictor_num]--;;
+                         predictor_coef_table[predictor_num]--;
                        }
                        error_val -= ((val >> predictor_quantitization) * (8 - predictor_num));
                     }                      

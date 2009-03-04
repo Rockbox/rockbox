@@ -546,7 +546,7 @@ int usb_drv_send(int endpoint, void *ptr, int length)
 {
     int flags = disable_irq_save();
     int rc = 0;
-    char *data = (unsigned char*) ptr;;
+    char *data = (unsigned char*) ptr;
 
     DEBUG(2, "%s(%d,%d)" , __func__, endpoint, length);
 

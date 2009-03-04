@@ -537,7 +537,7 @@ bool set_time_screen(const char* title, struct tm *tm)
             {
                 if(i==3) /* second row */
                 {
-                    j = weekday_width + separator_width;;
+                    j = weekday_width + separator_width;
                     prev_line_height *= 2;
                 }
                 screens[s].getstringsize(ptr[i], &width, NULL);

@@ -74,7 +74,7 @@ static int calc_checksum(unsigned char* buf, int n)
 static void dump_header(unsigned char* buf, int i)
 {
     printf("0x%08x:\n",i);
-    printf("  HEADER: 0x%08x\n",i);;
+    printf("  HEADER: 0x%08x\n",i);
     printf("    FirmwareHeaderIndex:     0x%08x\n",get_uint32le(&buf[i]));
     printf("    FirmwareChecksum:        0x%08x\n",get_uint32le(&buf[i+0x04]));
     printf("    CodeBlockSizeMultiplier: 0x%08x\n",get_uint32le(&buf[i+0x08]));

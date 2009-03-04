@@ -1134,7 +1134,7 @@ void mpeg_thread(void)
 
                     filling = false;
 
-                    break;;
+                    break;
 
                 }
 
