@@ -4,6 +4,7 @@ configfile.c
 fixedpoint.c
 playback_control.c
 rgb_hsv.c
+buflib.c
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
 /*
    The scaler is not provided in core on mono targets, but is built in
