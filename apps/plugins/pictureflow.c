@@ -32,6 +32,7 @@
 #include "pluginbitmaps/pictureflow_logo.h"
 #include "lib/grey.h"
 #include "lib/feature_wrappers.h"
+#include "lib/buflib.h"
 
 PLUGIN_HEADER
 
@@ -116,7 +117,7 @@ typedef fb_data pix_t;
 #define DISPLAY_LEFT_R (PFREAL_HALF - LCD_WIDTH * PFREAL_HALF)
 #define MAXSLIDE_LEFT_R (PFREAL_HALF - DISPLAY_WIDTH * PFREAL_HALF)
 
-#define SLIDE_CACHE_SIZE 100
+#define SLIDE_CACHE_SIZE 64 /* probably more than can be loaded */
 
 #define MAX_SLIDES_COUNT 10
 
@@ -127,8 +128,6 @@ typedef fb_data pix_t;
 #define EV_WAKEUP 1337
 
 /* maximum number of albums */
-#define MAX_ALBUMS 1024
-#define AVG_ALBUM_NAME_LENGTH 20
 
 #define MAX_TRACKS 50
 #define AVG_TRACK_NAME_LENGTH 20
@@ -161,7 +160,8 @@ struct slide_data {
 struct slide_cache {
     int index;      /* index of the cached slide */
     int hid;        /* handle ID of the cached slide */
-    long touched;   /* last time the slide was touched */
+    short next; /* "next" slide, with LRU last */
+    short prev; /* "previous" slide */
 };
 
 struct album_data {
@@ -196,7 +196,7 @@ const struct picture logos[]={
     {pictureflow_logo, BMPWIDTH_pictureflow_logo, BMPHEIGHT_pictureflow_logo},
 };
 
-enum show_album_name_values { album_name_hide = 0, album_name_bottom ,
+enum show_album_name_values { album_name_hide = 0, album_name_bottom,
     album_name_top };
 static char* show_album_name_conf[] =
 {
@@ -216,7 +216,8 @@ static int zoom = 100;
 static bool show_fps = false;
 static bool resize = true;
 static int cache_version = 0;
-static int show_album_name = (LCD_HEIGHT > 100) ? album_name_top : album_name_bottom;
+static int show_album_name = (LCD_HEIGHT > 100)
+    ? album_name_top : album_name_bottom;
 
 static struct configdata config[] =
 {
@@ -239,7 +240,7 @@ static struct configdata config[] =
 /** below we allocate the memory we want to use **/
 
 static pix_t *buffer; /* for now it always points to the lcd framebuffer */
-static uint16_t reflect_table[REFLECT_HEIGHT];
+static uint8_t reflect_table[REFLECT_HEIGHT];
 static struct slide_data center_slide;
 static struct slide_data left_slides[MAX_SLIDES_COUNT];
 static struct slide_data right_slides[MAX_SLIDES_COUNT];
@@ -247,32 +248,34 @@ static int slide_frame;
 static int step;
 static int target;
 static int fade;
-static int center_index; /* index of the slide that is in the center */
+static int center_index = 0; /* index of the slide that is in the center */
 static int itilt;
 static PFreal offsetX;
 static PFreal offsetY;
 static int number_of_slides;
 
 static struct slide_cache cache[SLIDE_CACHE_SIZE];
-static int  slide_cache_in_use;
+static int cache_free;
+static int cache_used = -1;
+static int cache_left_index = -1;
+static int cache_right_index = -1;
+static int cache_center_index = -1;
 
 /* use long for aligning */
 unsigned long thread_stack[THREAD_STACK_SIZE / sizeof(long)];
 /* queue (as array) for scheduling load_surface */
-static int slide_cache_stack[SLIDE_CACHE_SIZE];
-static int slide_cache_stack_index;
-struct mutex slide_cache_stack_lock;
 
 static int empty_slide_hid;
 
 unsigned int thread_id;
 struct event_queue thread_q;
 
-static long uniqbuf[UNIQBUF_SIZE];
 static struct tagcache_search tcs;
 
-static struct album_data album[MAX_ALBUMS];
-static char album_names[MAX_ALBUMS*AVG_ALBUM_NAME_LENGTH];
+static struct buflib_context buf_ctx;
+
+static struct album_data *album;
+static char *album_names;
 static int album_count;
 
 static char track_names[MAX_TRACKS * AVG_TRACK_NAME_LENGTH];
@@ -333,6 +336,7 @@ static int pf_state;
 /** code */
 static inline pix_t fade_color(pix_t c, unsigned int a);
 bool save_pfraw(char* filename, struct bitmap *bm);
+bool load_new_slide(void);
 int load_surface(int);
 
 static inline PFreal fmul(PFreal a, PFreal b)
@@ -398,7 +402,7 @@ static inline int clz(uint32_t v)
 }
 #else
 static const char clz_lut[16] = { 4, 3, 2, 2, 1, 1, 1, 1,
-                                  0, 0, 0, 0, 0, 0, 0, 0 }; 
+                                  0, 0, 0, 0, 0, 0, 0, 0 };
 /* This clz is based on the log2(n) implementation at
  * http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogLookup
  * It is not any faster than the one above, but trades 16B in the lookup table
@@ -472,7 +476,7 @@ static inline PFreal fdiv(PFreal n, PFreal m)
 #endif
 
 /* warning: regenerate the table if IANGLE_MAX and PFREAL_SHIFT are changed! */
-static const PFreal sin_tab[] = {
+static const short sin_tab[] = {
         0,   100,   200,   297,   392,   483,   569,   650,
       724,   792,   851,   903,   946,   980,  1004,  1019,
      1024,  1019,  1004,   980,   946,   903,   851,   792,
@@ -562,30 +566,43 @@ void init_reflect_table(void)
  */
 int create_album_index(void)
 {
+    plugin_buf_size -= UNIQBUF_SIZE * sizeof(long);
+    long *uniqbuf = (long *)(plugin_buf_size + (char *)plugin_buf);
+    album = ((struct album_data *)uniqbuf) - 1;
     rb->memset(&tcs, 0, sizeof(struct tagcache_search) );
     album_count = 0;
     rb->tagcache_search(&tcs, tag_album);
     rb->tagcache_search_set_uniqbuf(&tcs, uniqbuf, UNIQBUF_SIZE);
-    int l, old_l = 0;
+    unsigned int l, old_l = 0;
+    album_names = plugin_buf;
     album[0].name_idx = 0;
-    while (rb->tagcache_get_next(&tcs) && album_count  < MAX_ALBUMS)
+    while (rb->tagcache_get_next(&tcs))
     {
+        plugin_buf_size -= sizeof(struct album_data);
         l = rb->strlen(tcs.result) + 1;
         if ( album_count > 0 )
-            album[album_count].name_idx = album[album_count-1].name_idx + old_l;
+            album[-album_count].name_idx = album[1-album_count].name_idx + old_l;
 
-        if ( (album[album_count].name_idx + l) >
-            MAX_ALBUMS*AVG_ALBUM_NAME_LENGTH )
+        if ( l > plugin_buf_size )
             /* not enough memory */
             return ERROR_BUFFER_FULL;
 
-        rb->strcpy(album_names + album[album_count].name_idx, tcs.result);
-        album[album_count].seek = tcs.result_seek;
+        rb->strcpy(plugin_buf, tcs.result);
+        plugin_buf_size -= l;
+        plugin_buf = l + (char *)plugin_buf;
+        album[-album_count].seek = tcs.result_seek;
         old_l = l;
         album_count++;
     }
     rb->tagcache_search_finish(&tcs);
-
+    ALIGN_BUFFER(plugin_buf, plugin_buf_size, 4);
+    int i;
+    struct album_data* tmp_album = (struct album_data*)plugin_buf;
+    for (i = album_count - 1; i >= 0; i--)
+        tmp_album[i] = album[-i];
+    album = tmp_album;
+    plugin_buf = album + album_count;
+    plugin_buf_size += UNIQBUF_SIZE * sizeof(long);
     return (album_count > 0) ? 0 : ERROR_NO_ALBUMS;
 }
 
@@ -825,123 +842,6 @@ bool create_albumart_cache(void)
 }
 
 /**
-   Return the index on the stack of slide_index.
-   Return -1 if slide_index is not on the stack.
- */
-static inline int slide_stack_get_index(const int slide_index)
-{
-    int i = slide_cache_stack_index + 1;
-    while (i--) {
-        if ( slide_cache_stack[i] == slide_index ) return i;
-    };
-    return -1;
-}
-
-/**
-   Push the slide_index on the stack so the image will be loaded.
-   The algorithm tries to keep the center_index on top and the
-   slide_index as high as possible (so second if center_index is
-   on the stack).
- */
-void slide_stack_push(const int slide_index)
-{
-    rb->mutex_lock(&slide_cache_stack_lock);
-
-    if ( slide_cache_stack_index == -1 ) {
-        /* empty stack, no checks at all */
-        slide_cache_stack[ ++slide_cache_stack_index ] = slide_index;
-        rb->mutex_unlock(&slide_cache_stack_lock);
-        return;
-    }
-
-    int i = slide_stack_get_index( slide_index );
-
-    if ( i == slide_cache_stack_index ) {
-        /* slide_index is on top, so we do not change anything */
-        rb->mutex_unlock(&slide_cache_stack_lock);
-        return;
-    }
-
-    if ( i >= 0 ) {
-        /* slide_index is already on the stack, but not on top */
-        int tmp = slide_cache_stack[ slide_cache_stack_index  ];
-        if ( tmp == center_index ) {
-            /* the center_index is on top of the stack so do not touch that */
-            if ( slide_cache_stack_index  > 0 ) {
-                /*
-                   but maybe it is possible to swap the given slide_index to
-                   the second place
-                */
-                tmp = slide_cache_stack[slide_cache_stack_index - 1];
-                slide_cache_stack[slide_cache_stack_index - 1] =
-                    slide_cache_stack[i];
-                slide_cache_stack[i] = tmp;
-            }
-        }
-        else {
-            /*
-               if the center_index is not on top (i.e. already loaded) bring
-               the slide_index to the top
-            */
-            slide_cache_stack[slide_cache_stack_index] = slide_cache_stack[i];
-            slide_cache_stack[i] = tmp;
-        }
-    }
-    else {
-        /* slide_index is not on the stack */
-        if ( slide_cache_stack_index >= SLIDE_CACHE_SIZE-1 ) {
-            /*
-               if we exceeded the stack size, clear the first half of the
-               stack
-            */
-            slide_cache_stack_index = SLIDE_CACHE_SIZE/2;
-            for (i = 0; i <= slide_cache_stack_index ; i++)
-                slide_cache_stack[i] = slide_cache_stack[i +
-                    slide_cache_stack_index];
-        }
-        if ( slide_cache_stack[ slide_cache_stack_index ] == center_index ) {
-            /* if the center_index is on top leave it there */
-            slide_cache_stack[ slide_cache_stack_index ] = slide_index;
-            slide_cache_stack[ ++slide_cache_stack_index ] = center_index;
-        }
-        else {
-            /* usual stack case: push the slide_index on top */
-            slide_cache_stack[ ++slide_cache_stack_index ] = slide_index;
-        }
-    }
-    rb->mutex_unlock(&slide_cache_stack_lock);
-}
-
-
-/**
-  Pop the topmost item from the stack and decrease the stack size
- */
-static inline int slide_stack_pop(void)
-{
-    rb->mutex_lock(&slide_cache_stack_lock);
-    int result;
-    if ( slide_cache_stack_index >= 0 )
-        result = slide_cache_stack[ slide_cache_stack_index-- ];
-    else
-        result = -1;
-    rb->mutex_unlock(&slide_cache_stack_lock);
-    return result;
-}
-
-
-/**
-  Load the slide into the cache.
-  Thus we have to queue the loading request in our thread while discarding the
-  oldest slide.
- */
-static inline void request_surface(const int slide_index)
-{
-    slide_stack_push(slide_index);
-    rb->queue_post(&thread_q, EV_WAKEUP, 0);
-}
-
-
-/**
  Thread used for loading and preparing bitmaps in the background
  */
 void thread(void)
@@ -957,10 +857,8 @@ void thread(void)
                 /* we just woke up */
                 break;
         }
-        int slide_index;
-        while ( (slide_index = slide_stack_pop()) != -1 ) {
-            load_surface( slide_index );
-            rb->queue_wait_w_tmo(&thread_q, &ev, HZ/10);
+        while ( load_new_slide() ) {
+            rb->yield();
             switch (ev.id) {
                 case EV_EXIT:
                     return;
@@ -999,13 +897,15 @@ bool create_pf_thread(void)
                            sizeof(thread_stack),
                             0,
                            "Picture load thread"
-                               IF_PRIO(, PRIORITY_BACKGROUND)
+                               IF_PRIO(, MAX(PRIORITY_USER_INTERFACE / 2,
+                                       PRIORITY_REALTIME + 1))
                                IF_COP(, CPU)
                                       )
         ) == 0) {
         return false;
     }
     thread_is_running = true;
+    rb->queue_post(&thread_q, EV_WAKEUP, 0);
     return true;
 }
 
@@ -1031,45 +931,201 @@ bool save_pfraw(char* filename, struct bitmap *bm)
 }
 
 
+/*
+ * The following functions implement the linked-list-in-array used to manage
+ * the LRU cache of slides, and the list of free cache slots.
+ */
+
+#define seek_right_while(start, cond) \
+({ \
+    int ind_, next_ = (start); \
+    do { \
+        ind_ = next_; \
+        next_ = cache[ind_].next; \
+    } while (next_ != cache_used && (cond)); \
+    ind_; \
+})
+
+#define seek_left_while(start, cond) \
+({ \
+    int ind_, next_ = (start); \
+    do { \
+        ind_ = next_; \
+        next_ = cache[ind_].prev; \
+    } while (ind_ != cache_used && (cond)); \
+    ind_; \
+})
+
+/**
+ Pop the given item from the linked list starting at *head, returning the next
+ item, or -1 if the list is now empty.
+*/
+static inline int lla_pop_item (int *head, int i)
+{
+    int prev = cache[i].prev;
+    int next = cache[i].next;
+    if (i == next)
+    {
+        *head = -1;
+        return -1;
+    }
+    else if (i == *head)
+        *head = next;
+    cache[next].prev = prev;
+    cache[prev].next = next;
+    return next;
+}
+
+
+/**
+ Pop the head item from the list starting at *head, returning the index of the
+ item, or -1 if the list is already empty.
+*/
+static inline int lla_pop_head (int *head)
+{
+    int i = *head;
+    if (i != -1)
+        lla_pop_item(head, i);
+    return i;
+}
+
+/**
+ Insert the item at index i before the one at index p.
+*/
+static inline void lla_insert (int i, int p)
+{
+    int next = p;
+    int prev = cache[next].prev;
+    cache[next].prev = i;
+    cache[prev].next = i;
+    cache[i].next = next;
+    cache[i].prev = prev;
+}
+
+
+/**
+ Insert the item at index i at the end of the list starting at *head.
+*/
+static inline void lla_insert_tail (int *head, int i)
+{
+    if (*head == -1)
+    {
+        *head = i;
+        cache[i].next = i;
+        cache[i].prev = i;
+    } else
+        lla_insert(i, *head);
+}
+
+/**
+ Insert the item at index i before the one at index p.
+*/
+static inline void lla_insert_after(int i, int p)
+{
+    p = cache[p].next;
+    lla_insert(i, p);
+}
+
+
+/**
+ Insert the item at index i before the one at index p in the list starting at
+ *head
+*/
+static inline void lla_insert_before(int *head, int i, int p)
+{
+    lla_insert(i, p);
+    if (*head == p)
+        *head = i;
+}
+
+
+/**
+ Free the used slide at index i, and its buffer, and move it to the free
+ slides list.
+*/
+static inline void free_slide(int i)
+{
+    if (cache[i].hid != empty_slide_hid)
+        buflib_free(&buf_ctx, cache[i].hid);
+    cache[i].index = -1;
+    lla_pop_item(&cache_used, i);
+    lla_insert_tail(&cache_free, i);
+    if (cache_used == -1)
+    {
+        cache_right_index = -1;
+        cache_left_index = -1;
+        cache_center_index = -1;
+    }
+}
+
+
+/**
+ Free one slide ranked above the given priority. If no such slide can be found,
+ return false.
+*/
+static inline int free_slide_prio(int prio)
+{
+    if (cache_used == -1)
+        return false;
+    int i, l = cache_used, r = cache[cache_used].prev, prio_max;
+    int prio_l = cache[l].index < center_index ?
+           center_index - cache[l].index : 0;
+    int prio_r = cache[r].index > center_index ?
+           cache[r].index - center_index : 0;
+    if (prio_l > prio_r)
+    {
+        i = l;
+        prio_max = prio_l;
+    } else {
+        i = r;
+        prio_max = prio_r;
+    }
+    if (prio_max > prio)
+    {
+        if (i == cache_left_index)
+            cache_left_index = cache[i].next;
+        if (i == cache_right_index)
+            cache_right_index = cache[i].prev;
+        free_slide(i);
+        return true;
+    } else
+        return false;
+}
+
 /**
  Read the pfraw image given as filename and return the hid of the buffer
  */
-int read_pfraw(char* filename)
+int read_pfraw(char* filename, int prio)
 {
     struct pfraw_header bmph;
     int fh = rb->open(filename, O_RDONLY);
-    rb->read(fh, &bmph, sizeof(struct pfraw_header));
-    if( fh < 0 ) {
+    if( fh < 0 )
         return empty_slide_hid;
-    }
+    else
+        rb->read(fh, &bmph, sizeof(struct pfraw_header));
 
     int size =  sizeof(struct bitmap) + sizeof( pix_t ) *
                 bmph.width * bmph.height;
 
-    int hid = rb->bufalloc(NULL, size, TYPE_BITMAP);
-    if (hid < 0) {
+    int hid;
+    while (!(hid = buflib_alloc(&buf_ctx, size)) && free_slide_prio(prio));
+
+    if (!hid) {
         rb->close( fh );
-        return -1;
+        return 0;
     }
 
-    struct bitmap *bm;
-    if (rb->bufgetdata(hid, 0, (void *)&bm) < size) {
-        rb->close( fh );
-        return -1;
-    }
+    struct dim *bm = buflib_get_data(&buf_ctx, hid);
 
     bm->width = bmph.width;
     bm->height = bmph.height;
-#if LCD_DEPTH > 1
-    bm->format = FORMAT_NATIVE;
-#endif
-    bm->data = ((unsigned char *)bm + sizeof(struct bitmap));
+    pix_t *data = (pix_t*)(sizeof(struct dim) + (char *)bm);
 
     int y;
     for( y = 0; y < bm->height; y++ )
     {
-        pix_t *d = (pix_t*)( bm->data ) + (y*bm->width);
-        rb->read( fh, d , sizeof( pix_t ) * bm->width );
+        rb->read( fh, data , sizeof( pix_t ) * bm->width );
+        data += bm->width;
     }
     rb->close( fh );
     return hid;
@@ -1080,21 +1136,21 @@ int read_pfraw(char* filename)
   Load the surface for the given slide_index into the cache at cache_index.
  */
 static inline bool load_and_prepare_surface(const int slide_index,
-                                            const int cache_index)
+                                            const int cache_index,
+                                            const int prio)
 {
     char tmp_path_name[MAX_PATH+1];
     rb->snprintf(tmp_path_name, sizeof(tmp_path_name), CACHE_PREFIX "/%d.pfraw",
                  slide_index);
 
-    int hid = read_pfraw(tmp_path_name);
-    if (hid < 0)
+    int hid = read_pfraw(tmp_path_name, prio);
+    if (!hid)
         return false;
 
     cache[cache_index].hid = hid;
 
     if ( cache_index < SLIDE_CACHE_SIZE ) {
         cache[cache_index].index = slide_index;
-        cache[cache_index].touched = *rb->current_tick;
     }
 
     return true;
@@ -1102,48 +1158,129 @@ static inline bool load_and_prepare_surface(const int slide_index,
 
 
 /**
- Load the surface from a bmp and overwrite the oldest slide in the cache
- if necessary.
- */
-int load_surface(const int slide_index)
+ Load the "next" slide that we can load, freeing old slides if needed, provided
+ that they are further from center_index than the current slide
+*/
+bool load_new_slide(void)
 {
-    long oldest_tick = *rb->current_tick;
-    int oldest_slide = 0;
-    int i;
-    if ( slide_cache_in_use < SLIDE_CACHE_SIZE ) { /* initial fill */
-        oldest_slide = slide_cache_in_use;
-        load_and_prepare_surface(slide_index, slide_cache_in_use++);
-    }
-    else {
-        for (i = 0; i < SLIDE_CACHE_SIZE; i++) { /* look for oldest slide */
-            if (cache[i].touched < oldest_tick) {
-                oldest_slide = i;
-                oldest_tick = cache[i].touched;
+    int i = -1;
+    if (cache_center_index != -1)
+    {
+        int next, prev;
+        if (cache[cache_center_index].index != center_index)
+        {
+            if (cache[cache_center_index].index < center_index)
+            {
+                cache_center_index = seek_right_while(cache_center_index,
+                                       cache[next_].index <= center_index);
+                prev = cache_center_index;
+                next = cache[cache_center_index].next;
+            }
+            else
+            {
+                cache_center_index = seek_left_while(cache_center_index,
+                                      cache[next_].index >= center_index);
+                next = cache_center_index;
+                prev = cache[cache_center_index].prev;
+            }
+            if (cache[cache_center_index].index != center_index)
+            {
+                if (cache_free == -1)
+                    free_slide_prio(0);
+                i = lla_pop_head(&cache_free);
+                if (!load_and_prepare_surface(center_index, i, 0))
+                    goto fail_and_refree;
+                if (cache[next].index == -1)
+                {
+                    if (cache[prev].index == -1)
+                        goto insert_first_slide;
+                    else
+                        next = cache[prev].next;
+                }
+                lla_insert(i, next);
+                if (cache[i].index < cache[cache_used].index)
+                    cache_used = i;
+                cache_center_index = i;
+                cache_left_index = i;
+                cache_right_index = i;
+                return true;
             }
         }
-        if (cache[oldest_slide].hid != empty_slide_hid) {
-            rb->bufclose(cache[oldest_slide].hid);
-            cache[oldest_slide].hid = -1;
+        if (cache[cache_left_index].index >
+                cache[cache_center_index].index)
+            cache_left_index = cache_center_index;
+        if (cache[cache_right_index].index <
+                cache[cache_center_index].index)
+            cache_right_index = cache_center_index;
+        cache_left_index = seek_left_while(cache_left_index,
+                   cache[ind_].index - 1 == cache[next_].index);
+        cache_right_index = seek_right_while(cache_right_index,
+                   cache[ind_].index - 1 == cache[next_].index);
+        int prio_l = cache[cache_center_index].index -
+                     cache[cache_left_index].index + 1;
+        int prio_r = cache[cache_right_index].index -
+                     cache[cache_center_index].index + 1;
+        if ((prio_l < prio_r ||
+             cache[cache_right_index].index >= number_of_slides) &&
+             cache[cache_left_index].index > 0)
+        {
+            if (cache_free == -1)
+                free_slide_prio(prio_l);
+            i = lla_pop_head(&cache_free);
+            if (load_and_prepare_surface(cache[cache_left_index].index
+                                         - 1, i, prio_l))
+            {
+                lla_insert_before(&cache_used, i, cache_left_index);
+                cache_left_index = i;
+                return true;
+            }
+        } else if(cache[cache_right_index].index < number_of_slides - 1)
+        {
+            if (cache_free == -1)
+                free_slide_prio(prio_l);
+            i = lla_pop_head(&cache_free);
+            if (load_and_prepare_surface(cache[cache_right_index].index
+                                         + 1, i, prio_r))
+            {
+                lla_insert_after(i, cache_right_index);
+                cache_right_index = i;
+                return true;
+            }
         }
-        load_and_prepare_surface(slide_index, oldest_slide);
+    } else {
+        i = lla_pop_head(&cache_free);
+        if (load_and_prepare_surface(center_index, i, 0))
+        {
+insert_first_slide:
+            cache[i].next = i;
+            cache[i].prev = i;
+            cache_center_index = i;
+            cache_left_index = i;
+            cache_right_index = i;
+            cache_used = i;
+            return true;
+        }
     }
-    return oldest_slide;
+fail_and_refree:
+    if (i != -1)
+    {
+        lla_insert_tail(&cache_free, i);
+    }
+    return false;
 }
 
 
 /**
   Get a slide from the buffer
  */
-static inline struct bitmap *get_slide(const int hid)
+static inline struct dim *get_slide(const int hid)
 {
-    if (hid < 0)
+    if (!hid)
         return NULL;
 
-    struct bitmap *bmp;
+    struct dim *bmp;
 
-    ssize_t ret = rb->bufgetdata(hid, 0, (void *)&bmp);
-    if (ret < 0)
-        return NULL;
+    bmp = buflib_get_data(&buf_ctx, hid);
 
     return bmp;
 }
@@ -1152,23 +1289,21 @@ static inline struct bitmap *get_slide(const int hid)
 /**
  Return the requested surface
 */
-static inline struct bitmap *surface(const int slide_index)
+static inline struct dim *surface(const int slide_index)
 {
     if (slide_index < 0)
         return 0;
     if (slide_index >= number_of_slides)
         return 0;
-
     int i;
-    for (i = 0; i < slide_cache_in_use; i++) {
-        /* maybe do the inverse mapping => implies dynamic allocation? */
-        if ( cache[i].index == slide_index ) {
-            /* We have already loaded our slide, so touch it and return it. */
-            cache[i].touched = *rb->current_tick;
-            return get_slide(cache[i].hid);
-        }
+    if ((i = cache_used ) != -1)
+    {
+        do {
+            if (cache[i].index == slide_index)
+                return get_slide(cache[i].hid);
+            i = cache[i].next;
+        } while (i != cache_used);
     }
-    request_surface(slide_index);
     return get_slide(empty_slide_hid);
 }
 
@@ -1293,13 +1428,13 @@ static inline pix_t fade_color(pix_t c, unsigned int a)
  */
 void render_slide(struct slide_data *slide, const int alpha)
 {
-    struct bitmap *bmp = surface(slide->slide_index);
+    struct dim *bmp = surface(slide->slide_index);
     if (!bmp) {
         return;
     }
     if (slide->angle > 255 || slide->angle < -255)
         return;
-    pix_t *src = (pix_t *)bmp->data;
+    pix_t *src = (pix_t*)(sizeof(struct dim) + (char *)bmp);
 
     const int sw = bmp->width;
     const int sh = bmp->height;
@@ -1329,7 +1464,7 @@ void render_slide(struct slide_data *slide, const int alpha)
     xsnum = CAM_DIST * (slide->cx - xp) - fmuln(xp, zo, PFREAL_SHIFT - 2, 0);
     xsden = fmuln(xp, sinr, PFREAL_SHIFT - 2, 0) - CAM_DIST * cosr;
     xs = fdiv(xsnum, xsden);
-    
+
     xsnumi = -CAM_DIST_R - zo;
     xsdeni = sinr;
     int x;
@@ -1411,11 +1546,10 @@ void render_slide(struct slide_data *slide, const int alpha)
             xs = fdiv(xsnum, xsden);
         } else
             xs += PFREAL_ONE;
-        
+
     }
     /* let the music play... */
     rb->yield();
-
     return;
 }
 
@@ -1425,8 +1559,11 @@ void render_slide(struct slide_data *slide, const int alpha)
  */
 static inline void set_current_slide(const int slide_index)
 {
+    int old_center_index = center_index;
     step = 0;
     center_index = fbound(slide_index, 0, number_of_slides - 1);
+    if (old_center_index != center_index)
+        rb->queue_post(&thread_q, EV_WAKEUP, 0);
     target = center_index;
     slide_frame = slide_index << 16;
     reset_slides();
@@ -1583,6 +1720,7 @@ void update_scroll_animation(void)
         index++;
     if (center_index != index) {
         center_index = index;
+        rb->queue_post(&thread_q, EV_WAKEUP, 0);
         slide_frame = index << 16;
         center_slide.slide_index = center_index;
         for (i = 0; i < num_slides; i++)
@@ -1652,12 +1790,6 @@ void cleanup(void *parameter)
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings(); /* backlight control in lib/helper.c */
 
-    int i;
-    for (i = 0; i < slide_cache_in_use; i++) {
-        rb->bufclose(cache[i].hid);
-    }
-    if ( empty_slide_hid != - 1)
-        rb->bufclose(empty_slide_hid);
 #ifdef USEGSLIB
     grey_release();
 #endif
@@ -1686,9 +1818,6 @@ int create_empty_slide(bool force)
         if (!save_pfraw(EMPTY_SLIDE, &input_bmp))
             return false;
     }
-
-    empty_slide_hid = read_pfraw( EMPTY_SLIDE );
-    if (empty_slide_hid == -1 ) return false;
 
     return true;
 }
@@ -2053,7 +2182,7 @@ void draw_album_text(void)
 int main(void)
 {
     int ret;
-    
+
     rb->lcd_setfont(FONT_UI);
     draw_splashscreen();
 
@@ -2068,6 +2197,7 @@ int main(void)
 
     init_reflect_table();
 
+    ALIGN_BUFFER(plugin_buf, plugin_buf_size, 4);
     ret = create_album_index();
     if (ret == ERROR_BUFFER_FULL) {
         rb->splash(HZ, "Not enough memory for album names");
@@ -2076,7 +2206,8 @@ int main(void)
         rb->splash(HZ, "No albums found. Please enable database");
         return PLUGIN_ERROR;
     }
-    
+
+    ALIGN_BUFFER(plugin_buf, plugin_buf_size, 4);
     number_of_slides  = album_count;
     if ((cache_version != CACHE_VERSION) && !create_albumart_cache()) {
         rb->splash(HZ, "Could not create album art cache");
@@ -2090,6 +2221,27 @@ int main(void)
     cache_version = CACHE_VERSION;
     configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
 
+
+#ifdef USEGSLIB
+    long grey_buf_used;
+    if (!grey_init(plugin_buf, plugin_buf_size, GREY_BUFFERED|GREY_ON_COP,
+                   LCD_WIDTH, LCD_HEIGHT, &grey_buf_used))
+    {
+        rb->splash(HZ, "Greylib init failed!");
+        return PLUGIN_ERROR;
+    }
+    grey_setfont(FONT_UI);
+    plugin_buf_size -= grey_buf_used;
+    plugin_buf = (void*)(grey_buf_used + (char*)plugin_buf);
+#endif
+    buflib_init(&buf_ctx, (void *)plugin_buf, plugin_buf_size);
+
+    if (!(empty_slide_hid = read_pfraw(EMPTY_SLIDE, 0)))
+    {
+        rb->splash(HZ, "Unable to load empty slide image");
+        return PLUGIN_ERROR;
+    }
+
     if (!create_pf_thread()) {
         rb->splash(HZ, "Cannot create thread!");
         return PLUGIN_ERROR;
@@ -2098,27 +2250,21 @@ int main(void)
     int i;
 
     /* initialize */
-    int min_slide_cache = fmin(number_of_slides, SLIDE_CACHE_SIZE);
-    for (i = 0; i < min_slide_cache; i++) {
-        cache[i].hid = -1;
-        cache[i].touched = 0;
-        slide_cache_stack[i] = SLIDE_CACHE_SIZE-i-1;
+    for (i = 0; i < SLIDE_CACHE_SIZE; i++) {
+        cache[i].hid = 0;
+        cache[i].index = 0;
+        cache[i].next = i + 1;
+        cache[i].prev = i - 1;
     }
-    slide_cache_stack_index = min_slide_cache-1;
-    slide_cache_in_use = 0;
-#ifdef USEGSLIB
-    if (!grey_init(plugin_buf, plugin_buf_size, GREY_BUFFERED|GREY_ON_COP,
-                   LCD_WIDTH, LCD_HEIGHT, NULL))
-        rb->splash(HZ, "Greylib init failed!");
-    grey_setfont(FONT_UI);
-#endif
+    cache[0].prev = i - 1;
+    cache[i - 1].next = 0;
+    cache_free = 0;
     buffer = LCD_BUF;
 
     pf_state = pf_idle;
 
     track_index = -1;
     extra_fade = 0;
-    center_index = 0;
     slide_frame = 0;
     step = 0;
     target = 0;
@@ -2289,7 +2435,6 @@ int main(void)
 enum plugin_status plugin_start(const void *parameter)
 {
     int ret;
-
     (void) parameter;
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
@@ -2300,7 +2445,6 @@ enum plugin_status plugin_start(const void *parameter)
     rb->cpu_boost(true);
 #endif
     plugin_buf = rb->plugin_get_buffer(&plugin_buf_size);
-    ALIGN_BUFFER(plugin_buf, plugin_buf_size, 4);
     ret = main();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
