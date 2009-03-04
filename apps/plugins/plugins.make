@@ -10,8 +10,10 @@
 # single-file plugins:
 PLUGINS_SRC = $(call preprocess, $(APPSDIR)/plugins/SOURCES)
 OTHER_SRC += $(PLUGINS_SRC)
-ROCKS := $(PLUGINS_SRC:.c=.rock)
-ROCKS := $(subst $(ROOTDIR),$(BUILDDIR),$(ROCKS))
+ROCKS1 := $(PLUGINS_SRC:.c=.rock)
+ROCKS1 := $(subst $(ROOTDIR),$(BUILDDIR),$(ROCKS1))
+
+ROCKS := $(ROCKS1)
 
 # libplugin.a
 PLUGINLIB := $(BUILDDIR)/apps/plugins/libplugin.a
@@ -44,6 +46,10 @@ OTHER_INC += -I$(APPSDIR)/plugins -I$(APPSDIR)/plugins/lib
 # special compile flags for plugins:
 PLUGINFLAGS = -I$(APPSDIR)/plugins -DPLUGIN $(CFLAGS)
 
+# single-file plugins depend on their respective .o
+$(ROCKS1): $(BUILDDIR)/%.rock: $(BUILDDIR)/%.o
+
+# dependency for all plugins
 $(ROCKS): $(APPSDIR)/plugin.h $(PLUGINLINK_LDS) $(PLUGINLIB) $(PLUGINBITMAPLIB)
 
 $(PLUGINLIB): $(PLUGINLIB_OBJ)
@@ -83,7 +89,7 @@ else
  OVERLAYLDFLAGS = -T$(OVERLAYREF_LDS) -Wl,--gc-sections -Wl,-Map,$*.refmap
 endif
 
-$(BUILDDIR)/%.rock: $(BUILDDIR)/%.o
+$(BUILDDIR)/%.rock:
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(BUILDDIR)/$*.elf \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
@@ -94,7 +100,7 @@ else
 	$(SILENT)$(OC) -O binary $(BUILDDIR)/$*.elf $@
 endif
 
-$(BUILDDIR)/%.refmap: $(BUILDDIR)/%.o $(APPSDIR)/plugin.h $(OVERLAYREF_LDS) $(PLUGINLIB) $(PLUGINBITMAPLIB)
+$(BUILDDIR)/%.refmap: $(APPSDIR)/plugin.h $(OVERLAYREF_LDS) $(PLUGINLIB) $(PLUGINBITMAPLIB)
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o /dev/null \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
