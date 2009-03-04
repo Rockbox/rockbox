@@ -75,20 +75,16 @@ void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
 void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
                     int height, int max_x, int max_y, int ui_x, int ui_y)
 {
-    int xmax, ymax;
-
-    ymax = y_start + height;
-    xmax = x_start + width;
-
-    if(xmax > max_x)
-        xmax = max_x;
-    if(ymax >= max_y)
-        ymax = max_y;
+    if (x_start + width > max_x)
+        width = max_x - x_start;
+    if (y_start + height > max_y)
+        height = max_y - y_start;
 
     SDL_Rect src = {x_start * display_zoom, y_start * display_zoom,
-                    xmax * display_zoom, ymax * display_zoom};
-    SDL_Rect dest= {(ui_x + x_start) * display_zoom, (ui_y + y_start) * display_zoom,
-                    xmax * display_zoom, ymax * display_zoom};
+                    width * display_zoom, height * display_zoom};
+    SDL_Rect dest= {(ui_x + x_start) * display_zoom,
+                    (ui_y + y_start) * display_zoom,
+                    width * display_zoom, height * display_zoom};
 
     if (surface->flags & SDL_SRCALPHA) /* alpha needs a black background */
         SDL_FillRect(gui_surface, &dest, 0);
