@@ -55,6 +55,12 @@ struct font {
     int		pixel_size;
     int		descent;
     int		fbbw, fbbh, fbbx, fbby;
+
+    /* Max 'overflow' of a char's ascent (descent) over the font's one */
+    int max_over_ascent, max_over_descent;
+    
+    /* The number of clipped ascents/descents/total */
+    int num_clipped_ascent, num_clipped_descent, num_clipped;
 };
 /* END font.h*/
 
@@ -310,9 +316,20 @@ struct font* bdf_read_font(char *path)
         goto errout;
     }
 
+    pf->max_over_ascent = pf->max_over_descent = 0;
+    pf->num_clipped_ascent = pf->num_clipped_descent = pf->num_clipped = 0;
+
     if (!bdf_read_bitmaps(fp, pf)) {
         fprintf(stderr, "Error reading font bitmaps\n");
         goto errout;
+    }
+    
+    if (pf->num_clipped > 0) {
+        fprintf(stderr, "Warning: %d characters were clipped "
+                "(%d at ascent, %d at descent)\n",
+                pf->num_clipped, pf->num_clipped_ascent, pf->num_clipped_descent);
+        fprintf(stderr, "         max overflows: ascent: %d, descent: %d\n",
+                pf->max_over_ascent, pf->max_over_descent);
     }
 
     fclose(fp);
@@ -487,7 +504,11 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
             return 0;
         }
         if (isprefix(buf, "STARTCHAR")) {
-            encoding = width = bbw = bbh = bbx = bby = -1;
+            encoding = width = -1;
+            bbw = pf->fbbw;
+            bbh = pf->fbbh;
+            bbx = pf->fbbx;
+            bby = pf->fbby;
             continue;
         }
         if (isprefix(buf, "ENCODING ")) {
@@ -519,6 +540,8 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
         if (strequal(buf, "BITMAP") || strequal(buf, "BITMAP ")) {
             bitmap_t *ch_bitmap = pf->bits + ofs;
             int ch_words;
+            int overflow_asc, overflow_desc;
+            int y;
 
             if (encoding < 0)
                 continue;
@@ -550,6 +573,32 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
 #define BM(row,col)	(*(ch_bitmap + ((row)*ch_words) + (col)))
 #define BITMAP_NIBBLES	(BITMAP_BITSPERIMAGE/4)
 
+            overflow_asc = bby + bbh - pf->ascent;
+            if (overflow_asc > 0) {
+                pf->num_clipped_ascent++;
+                if (overflow_asc > pf->max_over_ascent) {
+                    pf->max_over_ascent = overflow_asc;
+                }
+                fprintf(stderr, "Warning: character %d goes %d pixel(s)"
+                        " beyond the font's ascent, it will be clipped\n",
+                        encoding, overflow_asc);
+            }
+            overflow_desc = -bby - pf->descent;
+            if (overflow_desc > 0) {
+                pf->num_clipped_descent++;
+                if (overflow_desc > pf->max_over_descent) {
+                    pf->max_over_descent = overflow_desc;
+                }
+                fprintf(stderr, "Warning: character %d goes %d pixel(s)"
+                        " beyond the font's descent, it will be clipped\n",
+                        encoding, overflow_desc);
+            }
+            if (overflow_asc > 0 || overflow_desc > 0) {
+                pf->num_clipped++;
+            }
+
+            y = bby + bbh; /* 0-based y within the char */
+            
             /* read bitmaps*/
             for (i=0; ; ++i) {
                 int hexnibbles;
@@ -560,6 +609,12 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                 }
                 if (isprefix(buf, "ENDCHAR"))
                     break;
+                
+                y--;
+                if ((y >= pf->ascent) || (y < -pf->descent)) {
+                    /* We're beyond the area that Rockbox can render -> clip */
+                    continue;
+                }
 
                 hexnibbles = strlen(buf);
                 for (k=0; k<ch_words; ++k) {
