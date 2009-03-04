@@ -30,7 +30,7 @@ MPEGMADLIB_SRC := $(call preprocess, $(APPSDIR)/codecs/libmad/SOURCES)
 MPEGMADLIB_OBJ := $(addsuffix .o,$(basename $(subst $(ROOTDIR)/apps/codecs/libmad,$(BUILDDIR)/apps/codecs/libmad-mpeg,$(MPEGMADLIB_SRC))))
 
 $(MPEGMADLIB): $(MPEGMADLIB_OBJ)
-	$(call PRINTS,AR $(@F))$(AR) rs $@ $^ >/dev/null
+	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
 # pattern rules
 
