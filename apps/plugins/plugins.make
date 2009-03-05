@@ -19,10 +19,6 @@ ROCKS := $(ROCKS1)
 PLUGINLIB := $(BUILDDIR)/apps/plugins/libplugin.a
 PLUGINLIB_SRC = $(call preprocess, $(APPSDIR)/plugins/lib/SOURCES)
 OTHER_SRC += $(PLUGINLIB_SRC)
-# include gcc-support routines for linking first if in SOURCES
-ifneq "$(findstring gcc-support.c,$(PLUGINLIB_SRC))" ""
-GCCSUPPORT_OBJ := $(BUILDDIR)/apps/plugins/lib/gcc-support.o
-endif
 
 PLUGINLIB_OBJ := $(PLUGINLIB_SRC:.c=.o)
 PLUGINLIB_OBJ := $(PLUGINLIB_OBJ:.S=.o)
