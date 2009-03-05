@@ -48,7 +48,7 @@ struct font {
     int	bits_size;	/* # words of bitmap_t bits*/
     
     /* unused by runtime system, read in by convbdf */
-    unsigned int  nchars;   /* number of different glyphs */
+    int     nchars;     /* number of different glyphs */
     unsigned int* offrot;	/* offsets into rotated bitmap data*/
     char *	name;		/* font name*/
     char *	facename;	/* facename of font*/
@@ -329,7 +329,7 @@ struct font* bdf_read_font(char *path)
     }
     
     if (pf->num_clipped > 0) {
-        fprintf(stderr, "Warning: %d characters out of %u were clipped "
+        fprintf(stderr, "Warning: %d characters out of %d were clipped "
                 "(%d at ascent, %d at descent)\n",
                 pf->num_clipped, pf->nchars,
                 pf->num_clipped_ascent, pf->num_clipped_descent);
@@ -412,7 +412,7 @@ int bdf_read_header(FILE *fp, struct font* pf)
             continue;
         }
         if (isprefix(buf, "CHARS ")) {
-            if (sscanf(buf, "CHARS %u", &pf->nchars) != 1) {
+            if (sscanf(buf, "CHARS %d", &pf->nchars) != 1) {
                 fprintf(stderr, "Error: bad 'CHARS'\n");
                 return 0;
             }
