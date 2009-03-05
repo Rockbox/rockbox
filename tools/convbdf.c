@@ -67,6 +67,9 @@ struct font {
 #define isprefix(buf,str)	(!strncmp(buf, str, strlen(str)))
 #define	strequal(s1,s2)		(!strcmp(s1, s2))
 
+#define MAX(a,b)            ((a) > (b) ? (a) : (b))
+#define MIN(a,b)            ((a) < (b) ? (a) : (b))
+
 #define EXTRA	300		/* # bytes extra allocation for buggy .bdf files*/
 
 int gen_c = 0;
@@ -541,7 +544,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
             bitmap_t *ch_bitmap = pf->bits + ofs;
             int ch_words;
             int overflow_asc, overflow_desc;
-            int y;
+            int bbh_orig, bby_orig, y;
 
             if (encoding < 0)
                 continue;
@@ -573,12 +576,16 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
 #define BM(row,col)	(*(ch_bitmap + ((row)*ch_words) + (col)))
 #define BITMAP_NIBBLES	(BITMAP_BITSPERIMAGE/4)
 
+            bbh_orig = bbh;
+            bby_orig = bby;
+
             overflow_asc = bby + bbh - pf->ascent;
             if (overflow_asc > 0) {
                 pf->num_clipped_ascent++;
                 if (overflow_asc > pf->max_over_ascent) {
                     pf->max_over_ascent = overflow_asc;
                 }
+                bbh = MAX(bbh - overflow_asc, 0); /* Clipped -> decrease the height */
                 fprintf(stderr, "Warning: character %d goes %d pixel(s)"
                         " beyond the font's ascent, it will be clipped\n",
                         encoding, overflow_asc);
@@ -589,6 +596,8 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                 if (overflow_desc > pf->max_over_descent) {
                     pf->max_over_descent = overflow_desc;
                 }
+                bby += overflow_desc;
+                bbh = MAX(bbh - overflow_desc, 0); /* Clipped -> decrease the height */
                 fprintf(stderr, "Warning: character %d goes %d pixel(s)"
                         " beyond the font's descent, it will be clipped\n",
                         encoding, overflow_desc);
@@ -597,7 +606,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                 pf->num_clipped++;
             }
 
-            y = bby + bbh; /* 0-based y within the char */
+            y = bby_orig + bbh_orig; /* 0-based y within the char */
             
             /* read bitmaps*/
             for (i=0; ; ++i) {
@@ -613,6 +622,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                 y--;
                 if ((y >= pf->ascent) || (y < -pf->descent)) {
                     /* We're beyond the area that Rockbox can render -> clip */
+                    --i; /* This line doesn't count */
                     continue;
                 }
 
