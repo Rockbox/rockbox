@@ -1429,8 +1429,7 @@ void ata_get_info(struct storage_info *info)
     static char revision[4];
     int i;
     info->sector_size = SECTOR_SIZE;
-    info->num_sectors= ((unsigned long)identify_info[61] << 16 | \
-                 (unsigned long)identify_info[60]);
+    info->num_sectors= total_sectors;
 
     src = (unsigned short*)&identify_info[27];
     dest = (unsigned short*)vendor;
