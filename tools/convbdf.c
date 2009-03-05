@@ -40,14 +40,15 @@ struct font {
     int 	height;		/* height in pixels*/
     int		ascent;		/* ascent (baseline) height*/
     int		firstchar;	/* first character in bitmap*/
-    int		size;		/* font size in glyphs*/
+    int		size;		/* font size in glyphs ('holes' included) */
     bitmap_t*	bits;		/* 16-bit right-padded bitmap data*/
     unsigned int* offset;	/* offsets into bitmap data*/
     unsigned char* width;	/* character widths or NULL if fixed*/
     int		defaultchar;	/* default char (not glyph index)*/
     int	bits_size;	/* # words of bitmap_t bits*/
     
-    /* unused by runtime system, read in by convbdf*/
+    /* unused by runtime system, read in by convbdf */
+    unsigned int  nchars;   /* number of different glyphs */
     unsigned int* offrot;	/* offsets into rotated bitmap data*/
     char *	name;		/* font name*/
     char *	facename;	/* facename of font*/
@@ -328,9 +329,10 @@ struct font* bdf_read_font(char *path)
     }
     
     if (pf->num_clipped > 0) {
-        fprintf(stderr, "Warning: %d characters were clipped "
+        fprintf(stderr, "Warning: %d characters out of %u were clipped "
                 "(%d at ascent, %d at descent)\n",
-                pf->num_clipped, pf->num_clipped_ascent, pf->num_clipped_descent);
+                pf->num_clipped, pf->nchars,
+                pf->num_clipped_ascent, pf->num_clipped_descent);
         fprintf(stderr, "         max overflows: ascent: %d, descent: %d\n",
                 pf->max_over_ascent, pf->max_over_descent);
     }
@@ -348,7 +350,7 @@ struct font* bdf_read_font(char *path)
 int bdf_read_header(FILE *fp, struct font* pf)
 {
     int encoding;
-    int nchars, maxwidth;
+    int maxwidth;
     int firstchar = 65535;
     int lastchar = -1;
     char buf[256];
@@ -410,7 +412,7 @@ int bdf_read_header(FILE *fp, struct font* pf)
             continue;
         }
         if (isprefix(buf, "CHARS ")) {
-            if (sscanf(buf, "CHARS %d", &nchars) != 1) {
+            if (sscanf(buf, "CHARS %u", &pf->nchars) != 1) {
                 fprintf(stderr, "Error: bad 'CHARS'\n");
                 return 0;
             }
@@ -465,7 +467,7 @@ int bdf_read_header(FILE *fp, struct font* pf)
     maxwidth = pf->fbbw;
 
     /* initially use font maxwidth * height for bits allocation*/
-    pf->bits_size = nchars * BITMAP_WORDS(maxwidth) * pf->height;
+    pf->bits_size = pf->nchars * BITMAP_WORDS(maxwidth) * pf->height;
 
     /* allocate bits, offset, and width arrays*/
     pf->bits = (bitmap_t *)malloc(pf->bits_size * sizeof(bitmap_t) + EXTRA);
