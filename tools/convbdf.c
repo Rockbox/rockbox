@@ -5,7 +5,7 @@
  *
  * What fun it is converting font data...
  *
- * 09/17/02	Version 1.0
+ * 09/17/02    Version 1.0
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,45 +17,49 @@
 /* BEGIN font.h*/
 /* loadable font magic and version #*/
 #ifdef ROTATE
-#define VERSION		"RB12" /* newer version */
+#define VERSION     "RB12" /* newer version */
 #else
-#define VERSION		"RB11"
+#define VERSION     "RB11"
 #endif
 
-/* bitmap_t helper macros*/
-#define BITMAP_WORDS(x)         (((x)+15)/16)	/* image size in words*/
-#define BITMAP_BYTES(x)         (BITMAP_WORDS(x)*sizeof(bitmap_t))
-#define	BITMAP_BITSPERIMAGE     (sizeof(bitmap_t) * 8)
-#define	BITMAP_BITVALUE(n)      ((bitmap_t) (((bitmap_t) 1) << (n)))
-#define	BITMAP_FIRSTBIT         (BITMAP_BITVALUE(BITMAP_BITSPERIMAGE - 1))
-#define	BITMAP_TESTBIT(m)	((m) & BITMAP_FIRSTBIT)
-#define	BITMAP_SHIFTBIT(m)	((bitmap_t) ((m) << 1))
-
+/*
+ * bitmap_t helper macros
+ */
 typedef unsigned short bitmap_t; /* bitmap image unit size*/
+
+/* Number of words to hold a pixel line of width x pixels */
+#define BITMAP_BITSPERIMAGE     (sizeof(bitmap_t) * 8)
+#define BITMAP_WORDS(x)         (((x)+BITMAP_BITSPERIMAGE-1)/BITMAP_BITSPERIMAGE)
+#define BITMAP_BYTES(x)         (BITMAP_WORDS(x)*sizeof(bitmap_t))
+#define BITMAP_BITVALUE(n)      ((bitmap_t) (((bitmap_t) 1) << (n)))
+#define BITMAP_FIRSTBIT         (BITMAP_BITVALUE(BITMAP_BITSPERIMAGE - 1))
+#define BITMAP_TESTBIT(m)       ((m) & BITMAP_FIRSTBIT)
+#define BITMAP_SHIFTBIT(m)      ((bitmap_t) ((m) << 1))
+
 
 /* builtin C-based proportional/fixed font structure */
 /* based on The Microwindows Project http://microwindows.org */
 struct font {
-    int		maxwidth;	/* max width in pixels*/
-    int 	height;		/* height in pixels*/
-    int		ascent;		/* ascent (baseline) height*/
-    int		firstchar;	/* first character in bitmap*/
-    int		size;		/* font size in glyphs ('holes' included) */
-    bitmap_t*	bits;		/* 16-bit right-padded bitmap data*/
-    unsigned int* offset;	/* offsets into bitmap data*/
-    unsigned char* width;	/* character widths or NULL if fixed*/
-    int		defaultchar;	/* default char (not glyph index)*/
-    int	bits_size;	/* # words of bitmap_t bits*/
+    int     maxwidth;   /* max width in pixels */
+    int     height;     /* height in pixels */
+    int     ascent;     /* ascent (baseline) height */
+    int     firstchar;  /* first character in bitmap */
+    int     size;       /* font size in glyphs ('holes' included) */
+    bitmap_t*   bits;       /* 16-bit right-padded bitmap data */
+    int*    offset;     /* offsets into bitmap data */
+    unsigned char* width;   /* character widths or NULL if fixed */
+    int     defaultchar;    /* default char (not glyph index) */
+    int     bits_size;  /* # words of bitmap_t bits */
     
     /* unused by runtime system, read in by convbdf */
     int     nchars;     /* number of different glyphs */
-    unsigned int* offrot;	/* offsets into rotated bitmap data*/
-    char *	name;		/* font name*/
-    char *	facename;	/* facename of font*/
-    char *	copyright;	/* copyright info for loadable fonts*/
-    int		pixel_size;
-    int		descent;
-    int		fbbw, fbbh, fbbx, fbby;
+    unsigned int* offrot;   /* offsets into rotated bitmap data */
+    char*   name;       /* font name */
+    char*   facename;   /* facename of font */
+    char*   copyright;  /* copyright info for loadable fonts */
+    int     pixel_size;
+    int     descent;
+    int     fbbw, fbbh, fbbx, fbby;
 
     /* Max 'overflow' of a char's ascent (descent) over the font's one */
     int max_over_ascent, max_over_descent;
@@ -65,13 +69,11 @@ struct font {
 };
 /* END font.h*/
 
-#define isprefix(buf,str)	(!strncmp(buf, str, strlen(str)))
-#define	strequal(s1,s2)		(!strcmp(s1, s2))
+#define isprefix(buf,str)   (!strncmp(buf, str, strlen(str)))
+#define strequal(s1,s2)     (!strcmp(s1, s2))
 
 #define MAX(a,b)            ((a) > (b) ? (a) : (b))
 #define MIN(a,b)            ((a) < (b) ? (a) : (b))
-
-#define EXTRA	300		/* # bytes extra allocation for buggy .bdf files*/
 
 int gen_c = 0;
 int gen_h = 0;
@@ -92,6 +94,7 @@ int bdf_read_header(FILE *fp, struct font* pf);
 int bdf_read_bitmaps(FILE *fp, struct font* pf);
 char * bdf_getline(FILE *fp, char *buf, int len);
 bitmap_t bdf_hexval(unsigned char *buf, int ndx1, int ndx2);
+void bitmap_buf_alloc(struct font* pf);
 
 int gen_c_source(struct font* pf, char *path);
 int gen_h_header(struct font* pf, char *path);
@@ -101,16 +104,16 @@ void
 usage(void)
 {
     char help[] = {
-	"Usage: convbdf [options] [input-files]\n"
-	"       convbdf [options] [-o output-file] [single-input-file]\n"
-	"Options:\n"
-	"    -c     Convert .bdf to .c source file\n"
-	"    -h     Convert .bdf to .h header file (to create sysfont.h)\n"
-	"    -f     Convert .bdf to .fnt font file\n"
-	"    -s N   Start output at character encodings >= N\n"
-	"    -l N   Limit output to character encodings <= N\n"
-	"    -n     Don't generate bitmaps as comments in .c file\n"
-	};
+    "Usage: convbdf [options] [input-files]\n"
+    "       convbdf [options] [-o output-file] [single-input-file]\n"
+    "Options:\n"
+    "    -c     Convert .bdf to .c source file\n"
+    "    -h     Convert .bdf to .h header file (to create sysfont.h)\n"
+    "    -f     Convert .bdf to .fnt font file\n"
+    "    -s N   Start output at character encodings >= N\n"
+    "    -l N   Limit output to character encodings <= N\n"
+    "    -n     Don't generate bitmaps as comments in .c file\n"
+    };
 
     fprintf(stderr, "%s", help);
 }
@@ -128,25 +131,25 @@ void getopts(int *pac, char ***pav)
         p = &av[0][1]; 
         while( *p)
             switch(*p++) {
-            case ' ':			/* multiple -args on av[]*/
+            case ' ':           /* multiple -args on av[]*/
                 while( *p && *p == ' ')
                     p++;
-                if( *p++ != '-')	/* next option must have dash*/
+                if( *p++ != '-')    /* next option must have dash*/
                     p = "";
-                break;			/* proceed to next option*/
-            case 'c':			/* generate .c output*/
+                break;          /* proceed to next option*/
+            case 'c':           /* generate .c output*/
                 gen_c = 1;
                 break;
             case 'h':           /* generate .h output*/
                 gen_h = 1;
                 break;
-            case 'f':			/* generate .fnt output*/
+            case 'f':           /* generate .fnt output*/
                 gen_fnt = 1;
                 break;
-            case 'n':			/* don't gen bitmap comments*/
+            case 'n':           /* don't gen bitmap comments*/
                 gen_map = 0;
                 break;
-            case 'o':			/* set output file*/
+            case 'o':           /* set output file*/
                 oflag = 1;
                 if (*p) {
                     strcpy(outfile, p);
@@ -159,7 +162,7 @@ void getopts(int *pac, char ***pav)
                         strcpy(outfile, av[0]);
                 }
                 break;
-            case 'l':			/* set encoding limit*/
+            case 'l':           /* set encoding limit*/
                 if (*p) {
                     limit_char = atoi(p);
                     while (*p && *p != ' ')
@@ -171,7 +174,7 @@ void getopts(int *pac, char ***pav)
                         limit_char = atoi(av[0]);
                 }
                 break;
-            case 's':			/* set encoding start*/
+            case 's':           /* set encoding start*/
                 if (*p) {
                     start_char = atoi(p);
                     while (*p && *p != ' ')
@@ -192,13 +195,13 @@ void getopts(int *pac, char ***pav)
     *pav = av;
 }
 
-/* remove directory prefix and file suffix from full path*/
+/* remove directory prefix and file suffix from full path */
 char *basename(char *path)
 {
     char *p, *b;
     static char base[256];
 
-    /* remove prepended path and extension*/
+    /* remove prepended path and extension */
     b = path;
     for (p=path; *p; ++p) {
         if (*p == '/')
@@ -255,8 +258,8 @@ int main(int ac, char **av)
 {
     int ret = 0;
 
-    ++av; --ac;		/* skip av[0]*/
-    getopts(&ac, &av);	/* read command line options*/
+    ++av; --ac;     /* skip av[0] */
+    getopts(&ac, &av);  /* read command line options */
 
     if (ac < 1 || (!gen_c && !gen_h && !gen_fnt)) {
         usage();
@@ -277,7 +280,7 @@ int main(int ac, char **av)
     exit(ret);
 }
 
-/* free font structure*/
+/* free font structure */
 void free_font(struct font* pf)
 {
     if (!pf)
@@ -297,7 +300,7 @@ void free_font(struct font* pf)
     free(pf);
 }
 
-/* build incore structure from .bdf file*/
+/* build incore structure from .bdf file */
 struct font* bdf_read_font(char *path)
 {
     FILE *fp;
@@ -312,7 +315,8 @@ struct font* bdf_read_font(char *path)
     pf = (struct font*)calloc(1, sizeof(struct font));
     if (!pf)
         goto errout;
-	
+    memset(pf, 0, sizeof(struct font));
+    
     pf->name = strdup(basename(path));
 
     if (!bdf_read_header(fp, pf)) {
@@ -346,18 +350,17 @@ struct font* bdf_read_font(char *path)
     return NULL;
 }
 
-/* read bdf font header information, return 0 on error*/
+/* read bdf font header information, return 0 on error */
 int bdf_read_header(FILE *fp, struct font* pf)
 {
     int encoding;
-    int maxwidth;
     int firstchar = 65535;
     int lastchar = -1;
     char buf[256];
     char facename[256];
     char copyright[256];
 
-    /* set certain values to errors for later error checking*/
+    /* set certain values to errors for later error checking */
     pf->defaultchar = -1;
     pf->ascent = -1;
     pf->descent = -1;
@@ -367,7 +370,7 @@ int bdf_read_header(FILE *fp, struct font* pf)
             fprintf(stderr, "Error: EOF on file\n");
             return 0;
         }
-        if (isprefix(buf, "FONT ")) {		/* not required*/
+        if (isprefix(buf, "FONT ")) {       /* not required */
             if (sscanf(buf, "FONT %[^\n]", facename) != 1) {
                 fprintf(stderr, "Error: bad 'FONT'\n");
                 return 0;
@@ -375,7 +378,7 @@ int bdf_read_header(FILE *fp, struct font* pf)
             pf->facename = strdup(facename);
             continue;
         }
-        if (isprefix(buf, "COPYRIGHT ")) {	/* not required*/
+        if (isprefix(buf, "COPYRIGHT ")) {  /* not required */
             if (sscanf(buf, "COPYRIGHT \"%[^\"]", copyright) != 1) {
                 fprintf(stderr, "Error: bad 'COPYRIGHT'\n");
                 return 0;
@@ -383,7 +386,7 @@ int bdf_read_header(FILE *fp, struct font* pf)
             pf->copyright = strdup(copyright);
             continue;
         }
-        if (isprefix(buf, "DEFAULT_CHAR ")) {	/* not required*/
+        if (isprefix(buf, "DEFAULT_CHAR ")) {   /* not required */
             if (sscanf(buf, "DEFAULT_CHAR %d", &pf->defaultchar) != 1) {
                 fprintf(stderr, "Error: bad 'DEFAULT_CHAR'\n");
                 return 0;
@@ -451,30 +454,30 @@ int bdf_read_header(FILE *fp, struct font* pf)
     }
     pf->height = pf->ascent + pf->descent;
 
-    /* calc default char*/
+    /* calc default char */
     if (pf->defaultchar < 0 || 
         pf->defaultchar < firstchar || 
         pf->defaultchar > limit_char ||
         pf->defaultchar > lastchar)
         pf->defaultchar = firstchar;
 
-    /* calc font size (offset/width entries)*/
+    /* calc font size (offset/width entries) */
     pf->firstchar = firstchar;
     pf->size = lastchar - firstchar + 1;
-	
-    /* use the font boundingbox to get initial maxwidth*/
+    if (pf->size < pf->nchars) {
+        fprintf(stderr, "Error: NCHARS and max code mismatch\n");
+        return 0;
+    }
+    
+    /* use the font boundingbox to get initial maxwidth */
     /*maxwidth = pf->fbbw - pf->fbbx;*/
-    maxwidth = pf->fbbw;
+    pf->maxwidth = pf->fbbw;
+    bitmap_buf_alloc(pf); /* Allocate bitmaps */
 
-    /* initially use font maxwidth * height for bits allocation*/
-    pf->bits_size = pf->nchars * BITMAP_WORDS(maxwidth) * pf->height;
-
-    /* allocate bits, offset, and width arrays*/
-    pf->bits = (bitmap_t *)malloc(pf->bits_size * sizeof(bitmap_t) + EXTRA);
-    pf->offset = (unsigned int *)malloc(pf->size * sizeof(unsigned int));
+    pf->offset = (int *)malloc(pf->size * sizeof(int));
     pf->offrot = (unsigned int *)malloc(pf->size * sizeof(unsigned int));
     pf->width = (unsigned char *)malloc(pf->size * sizeof(unsigned char));
-	
+    
     if (!pf->bits || !pf->offset || !pf->offrot || !pf->width) {
         fprintf(stderr, "Error: no memory for font load\n");
         return 0;
@@ -483,23 +486,24 @@ int bdf_read_header(FILE *fp, struct font* pf)
     return 1;
 }
 
-/* read bdf font bitmaps, return 0 on error*/
+/* read bdf font bitmaps, return 0 on error */
 int bdf_read_bitmaps(FILE *fp, struct font* pf)
 {
     int ofs = 0;
     int ofr = 0;
-    int maxwidth = 0;
     int i, k, encoding, width;
     int bbw, bbh, bbx, bby;
     int proportional = 0;
     int encodetable = 0;
     int l;
     char buf[256];
+    bitmap_t *ch_bitmap;
+    int ch_words;
 
-    /* reset file pointer*/
+    /* reset file pointer */
     fseek(fp, 0L, SEEK_SET);
 
-    /* initially mark offsets as not used*/
+    /* initially mark offsets as not used */
     for (i=0; i<pf->size; ++i)
         pf->offset[i] = -1;
 
@@ -530,7 +534,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                 fprintf(stderr, "Error: bad 'DWIDTH'\n");
                 return 0;
             }
-            /* use font boundingbox width if DWIDTH <= 0*/
+            /* use font boundingbox width if DWIDTH <= 0 */
             if (width <= 0)
                 width = pf->fbbw - pf->fbbx;
             continue;
@@ -543,8 +547,6 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
             continue;
         }
         if (strequal(buf, "BITMAP") || strequal(buf, "BITMAP ")) {
-            bitmap_t *ch_bitmap = pf->bits + ofs;
-            int ch_words;
             int overflow_asc, overflow_desc;
             int bbh_orig, bby_orig, y;
 
@@ -552,7 +554,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                 continue;
 
             /* set bits offset in encode map*/
-            if (pf->offset[encoding-pf->firstchar] != (unsigned int)-1) {
+            if (pf->offset[encoding-pf->firstchar] != -1) {
                 fprintf(stderr, "Error: duplicate encoding for character %d (0x%02x), ignoring duplicate\n",
                         encoding, encoding);
                 continue;
@@ -560,23 +562,24 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
             pf->offset[encoding-pf->firstchar] = ofs;
             pf->offrot[encoding-pf->firstchar] = ofr;
 
-            /* calc char width*/
+            /* calc char width */
             if (bbx < 0) {
+                /* Rockbox can't render overlapping glyphs */
                 width -= bbx;
-				/*if (width > maxwidth)
-                                  width = maxwidth;*/
                 bbx = 0;
             }
-            if (width > maxwidth)
-                maxwidth = width;
+            if (width > pf->maxwidth) {
+                pf->maxwidth = width;
+                bitmap_buf_alloc(pf); /* Re-allocate bitmaps since the maxwidth has grown */
+            }
             pf->width[encoding-pf->firstchar] = width;
 
-            /* clear bitmap*/
-            memset(ch_bitmap, 0, BITMAP_BYTES(width) * pf->height);
-
+            ch_bitmap = pf->bits + ofs;
             ch_words = BITMAP_WORDS(width);
-#define BM(row,col)	(*(ch_bitmap + ((row)*ch_words) + (col)))
-#define BITMAP_NIBBLES	(BITMAP_BITSPERIMAGE/4)
+            memset(ch_bitmap, 0, BITMAP_BYTES(width) * pf->height); /* clear bitmap */
+
+#define BM(row,col) (*(ch_bitmap + ((row)*ch_words) + (col)))
+#define BITMAP_NIBBLES  (BITMAP_BITSPERIMAGE/4)
 
             bbh_orig = bbh;
             bby_orig = bby;
@@ -610,12 +613,13 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
 
             y = bby_orig + bbh_orig; /* 0-based y within the char */
             
-            /* read bitmaps*/
+            /* read bitmaps */
             for (i=0; ; ++i) {
                 int hexnibbles;
 
                 if (!bdf_getline(fp, buf, sizeof(buf))) {
-                    fprintf(stderr, "Error: EOF reading BITMAP data\n");
+                    fprintf(stderr, "Error: EOF reading BITMAP data for character %d\n",
+                            encoding);
                     return 0;
                 }
                 if (isprefix(buf, "ENDCHAR"))
@@ -633,7 +637,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                     int ndx = k * BITMAP_NIBBLES;
                     int padnibbles = hexnibbles - ndx;
                     bitmap_t value;
-					
+                    
                     if (padnibbles <= 0)
                         break;
                     if (padnibbles >= (int)BITMAP_NIBBLES)
@@ -645,7 +649,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
 
                     BM(pf->height - pf->descent - bby - bbh + i, k) |=
                         value >> bbx;
-                    /* handle overflow into next image word*/
+                    /* handle overflow into next image word */
                     if (bbx) {
                         BM(pf->height - pf->descent - bby - bbh + i, k+1) =
                             value << (BITMAP_BITSPERIMAGE - bbx);
@@ -662,18 +666,15 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
             break;
     }
 
-    /* set max width*/
-    pf->maxwidth = maxwidth;
-
-    /* change unused width values to default char values*/
+    /* change unused width values to default char values */
     for (i=0; i<pf->size; ++i) {
         int defchar = pf->defaultchar - pf->firstchar;
 
-        if (pf->offset[i] == (unsigned int)-1)
+        if (pf->offset[i] == -1)
             pf->width[i] = pf->width[defchar];
     }
 
-    /* determine whether font doesn't require encode table*/
+    /* determine whether font doesn't require encode table */
 #ifdef ROTATE
     l = 0;
     for (i=0; i<pf->size; ++i) {
@@ -698,9 +699,9 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
         pf->offset = NULL;
     }
 
-    /* determine whether font is fixed-width*/
+    /* determine whether font is fixed-width */
     for (i=0; i<pf->size; ++i) {
-        if (pf->width[i] != maxwidth) {
+        if (pf->width[i] != pf->maxwidth) {
             proportional = 1;
             break;
         }
@@ -710,20 +711,10 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
         pf->width = NULL;
     }
 
-    /* reallocate bits array to actual bits used*/
+    /* reallocate bits array to actual bits used */
     if (ofs < pf->bits_size) {
         pf->bits = realloc(pf->bits, ofs * sizeof(bitmap_t));
         pf->bits_size = ofs;
-    }
-    else {
-        if (ofs > pf->bits_size) {
-            fprintf(stderr, "Warning: DWIDTH spec > max FONTBOUNDINGBOX\n");
-            if (ofs > pf->bits_size+EXTRA) {
-                fprintf(stderr, "Error: Not enough bits initially allocated\n");
-                return 0;
-            }
-            pf->bits_size = ofs;
-        }
     }
 
 #ifdef ROTATE
@@ -733,7 +724,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
     return 1;
 }
 
-/* read the next non-comment line, returns buf or NULL if EOF*/
+/* read the next non-comment line, returns buf or NULL if EOF */
 char *bdf_getline(FILE *fp, char *buf, int len)
 {
     int c;
@@ -758,6 +749,19 @@ char *bdf_getline(FILE *fp, char *buf, int len)
     }
     return buf;
 }
+ 
+/*
+   Calculates the necessary size of the bit buffer to hold all the
+   bitmaps for the glyphs in the font. Shoud be called every time
+   the max width of the font grows. Font height, the max width and
+   the number of chars in the font must have been already set.
+*/
+void bitmap_buf_alloc(struct font* pf)
+{
+    pf->bits_size = pf->size * BITMAP_WORDS(pf->maxwidth) * pf->height;
+    pf->bits = (bitmap_t *)realloc(pf->bits, pf->bits_size * sizeof(bitmap_t));
+}
+
 
 /* return hex value of portion of buffer*/
 bitmap_t bdf_hexval(unsigned char *buf, int ndx1, int ndx2)
@@ -796,7 +800,7 @@ int rotleft(unsigned char *dst, /* output buffer */
             bitmap_t *src, unsigned int width, unsigned int height)
 {
     unsigned int i,j;
-    unsigned int src_words;        /* # words of input image*/
+    unsigned int src_words;     /* # words of input image */
     unsigned int dst_mask;      /* bit mask for destination */
     bitmap_t src_mask;          /* bit mask for source */
 
@@ -913,7 +917,7 @@ int gen_c_source(struct font* pf, char *path)
         bitmap_t bitvalue=0;
 
         /* Skip missing glyphs */
-        if (pf->offset && (pf->offset[i] == (unsigned int)-1))
+        if (pf->offset && (pf->offset[i] == -1))
             continue;
 
         bits = pf->bits + (pf->offset? (int)pf->offset[i]: (pf->height * i));
@@ -994,7 +998,7 @@ int gen_c_source(struct font* pf, char *path)
                 "static const unsigned short _sysfont_offset[] = {\n");
 
         for (i=0; i<pf->size; ++i) {
-            if (pf->offset[i] == (unsigned int)-1) {
+            if (pf->offset[i] == -1) {
                 pf->offset[i] = pf->offset[pf->defaultchar - pf->firstchar];
                 pf->offrot[i] = pf->offrot[pf->defaultchar - pf->firstchar];
             }
@@ -1030,7 +1034,7 @@ int gen_c_source(struct font* pf, char *path)
     else
         sprintf(buf, "0,  /* fixed width */");
 
-    fprintf(ofp, 	"/* Exported structure definition. */\n"
+    fprintf(ofp,    "/* Exported structure definition. */\n"
             "const struct font sysfont = {\n"
             "  %d,  /* maxwidth */\n"
             "  %d,  /* height */\n"
@@ -1188,9 +1192,9 @@ int gen_fnt_file(struct font* pf, char *path)
     writeint(ofp, pf->size);
 
     /* variable font data sizes*/
-    writeint(ofp, pf->bits_size);		  /* # words of bitmap_t*/
+    writeint(ofp, pf->bits_size);         /* # words of bitmap_t*/
     writeint(ofp, pf->offset? pf->size: 0);  /* # ints of offset*/
-    writeint(ofp, pf->width? pf->size: 0);	  /* # bytes of width*/
+    writeint(ofp, pf->width? pf->size: 0);    /* # bytes of width*/
     /* variable font data*/
 #ifdef ROTATE
     for (i=0; i<pf->size; ++i)
@@ -1201,7 +1205,7 @@ int gen_fnt_file(struct font* pf, char *path)
         unsigned char bytemap[512];
 
         /* Skip missing glyphs */
-        if (pf->offset && (pf->offset[i] == (unsigned int)-1))
+        if (pf->offset && (pf->offset[i] == -1))
             continue;
 
         bits = pf->bits + (pf->offset? (int)pf->offset[i]: (pf->height * i));
@@ -1231,7 +1235,7 @@ int gen_fnt_file(struct font* pf, char *path)
     {
         for (i=0; i<pf->size; ++i)
         {
-            if (pf->offset[i] == (unsigned int)-1) {
+            if (pf->offset[i] == -1) {
                 pf->offrot[i] = pf->offrot[pf->defaultchar - pf->firstchar];
             }
             if ( pf->bits_size < 0xFFDB )
@@ -1248,7 +1252,7 @@ int gen_fnt_file(struct font* pf, char *path)
     for (i=0; i<pf->bits_size; ++i)
         writeshort(ofp, pf->bits[i]);
     if (ftell(ofp) & 2)
-        writeshort(ofp, 0);		/* pad to 32-bit boundary*/
+        writeshort(ofp, 0);     /* pad to 32-bit boundary*/
 
     if (pf->offset)
         for (i=0; i<pf->size; ++i) {
