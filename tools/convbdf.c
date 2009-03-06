@@ -75,6 +75,10 @@ struct font {
 #define MAX(a,b)            ((a) > (b) ? (a) : (b))
 #define MIN(a,b)            ((a) < (b) ? (a) : (b))
 
+/* Depending on the verbosity level some warnings are printed or not */
+int verbose = 0;
+#define VERBOSE_CLIP  1  /* Only print clip related warnings if verb >= this */
+
 int gen_c = 0;
 int gen_h = 0;
 int gen_fnt = 0;
@@ -113,6 +117,7 @@ usage(void)
     "    -s N   Start output at character encodings >= N\n"
     "    -l N   Limit output to character encodings <= N\n"
     "    -n     Don't generate bitmaps as comments in .c file\n"
+    "    -v N   Verbosity level: 0=quite quiet, 1=more verbose\n"
     };
 
     fprintf(stderr, "%s", help);
@@ -184,6 +189,18 @@ void getopts(int *pac, char ***pav)
                     av++; ac--;
                     if (ac > 0)
                         start_char = atoi(av[0]);
+                }
+                break;
+            case 'v':           /* verbosity */
+                if (*p) {
+                    verbose = atoi(p);
+                    while (*p && *p != ' ')
+                        p++;
+                }
+                else {
+                    av++; ac--;
+                    if (ac > 0)
+                        verbose = atoi(av[0]);
                 }
                 break;
             default:
@@ -332,13 +349,15 @@ struct font* bdf_read_font(char *path)
         goto errout;
     }
     
-    if (pf->num_clipped > 0) {
-        fprintf(stderr, "Warning: %d characters out of %d were clipped "
-                "(%d at ascent, %d at descent)\n",
-                pf->num_clipped, pf->nchars,
-                pf->num_clipped_ascent, pf->num_clipped_descent);
-        fprintf(stderr, "         max overflows: ascent: %d, descent: %d\n",
-                pf->max_over_ascent, pf->max_over_descent);
+    if (verbose >= VERBOSE_CLIP) {
+        if (pf->num_clipped > 0) {
+            fprintf(stderr, "Warning: %d characters out of %d were clipped "
+                    "(%d at ascent, %d at descent)\n",
+                    pf->num_clipped, pf->nchars,
+                    pf->num_clipped_ascent, pf->num_clipped_descent);
+            fprintf(stderr, "         max overflows: ascent: %d, descent: %d\n",
+                    pf->max_over_ascent, pf->max_over_descent);
+        }
     }
 
     fclose(fp);
@@ -587,9 +606,11 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                     pf->max_over_ascent = overflow_asc;
                 }
                 bbh = MAX(bbh - overflow_asc, 0); /* Clipped -> decrease the height */
-                fprintf(stderr, "Warning: character %d goes %d pixel(s)"
-                        " beyond the font's ascent, it will be clipped\n",
-                        encoding, overflow_asc);
+                if (verbose >= VERBOSE_CLIP) {
+                    fprintf(stderr, "Warning: character %d goes %d pixel(s)"
+                            " beyond the font's ascent, it will be clipped\n",
+                            encoding, overflow_asc);
+                }
             }
             overflow_desc = -bby - pf->descent;
             if (overflow_desc > 0) {
@@ -599,9 +620,11 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                 }
                 bby += overflow_desc;
                 bbh = MAX(bbh - overflow_desc, 0); /* Clipped -> decrease the height */
-                fprintf(stderr, "Warning: character %d goes %d pixel(s)"
-                        " beyond the font's descent, it will be clipped\n",
-                        encoding, overflow_desc);
+                if (verbose >= VERBOSE_CLIP) {
+                    fprintf(stderr, "Warning: character %d goes %d pixel(s)"
+                            " beyond the font's descent, it will be clipped\n",
+                            encoding, overflow_desc);
+                }
             }
             if (overflow_asc > 0 || overflow_desc > 0) {
                 pf->num_clipped++;
