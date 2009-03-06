@@ -464,10 +464,6 @@ int bdf_read_header(FILE *fp, struct font* pf)
     /* calc font size (offset/width entries) */
     pf->firstchar = firstchar;
     pf->size = lastchar - firstchar + 1;
-    if (pf->size < pf->nchars) {
-        fprintf(stderr, "Error: NCHARS and max code mismatch\n");
-        return 0;
-    }
     
     /* use the font boundingbox to get initial maxwidth */
     /*maxwidth = pf->fbbw - pf->fbbx;*/
