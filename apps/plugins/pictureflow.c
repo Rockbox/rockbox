@@ -286,8 +286,8 @@ static int selected_track;
 static int selected_track_pulse;
 void reset_track_list(void);
 
-void * plugin_buf;
-size_t plugin_buf_size;
+void * buf;
+size_t buf_size;
 
 static int old_drawmode;
 
@@ -566,43 +566,43 @@ void init_reflect_table(void)
  */
 int create_album_index(void)
 {
-    plugin_buf_size -= UNIQBUF_SIZE * sizeof(long);
-    long *uniqbuf = (long *)(plugin_buf_size + (char *)plugin_buf);
+    buf_size -= UNIQBUF_SIZE * sizeof(long);
+    long *uniqbuf = (long *)(buf_size + (char *)buf);
     album = ((struct album_data *)uniqbuf) - 1;
     rb->memset(&tcs, 0, sizeof(struct tagcache_search) );
     album_count = 0;
     rb->tagcache_search(&tcs, tag_album);
     rb->tagcache_search_set_uniqbuf(&tcs, uniqbuf, UNIQBUF_SIZE);
     unsigned int l, old_l = 0;
-    album_names = plugin_buf;
+    album_names = buf;
     album[0].name_idx = 0;
     while (rb->tagcache_get_next(&tcs))
     {
-        plugin_buf_size -= sizeof(struct album_data);
+        buf_size -= sizeof(struct album_data);
         l = rb->strlen(tcs.result) + 1;
         if ( album_count > 0 )
             album[-album_count].name_idx = album[1-album_count].name_idx + old_l;
 
-        if ( l > plugin_buf_size )
+        if ( l > buf_size )
             /* not enough memory */
             return ERROR_BUFFER_FULL;
 
-        rb->strcpy(plugin_buf, tcs.result);
-        plugin_buf_size -= l;
-        plugin_buf = l + (char *)plugin_buf;
+        rb->strcpy(buf, tcs.result);
+        buf_size -= l;
+        buf = l + (char *)buf;
         album[-album_count].seek = tcs.result_seek;
         old_l = l;
         album_count++;
     }
     rb->tagcache_search_finish(&tcs);
-    ALIGN_BUFFER(plugin_buf, plugin_buf_size, 4);
+    ALIGN_BUFFER(buf, buf_size, 4);
     int i;
-    struct album_data* tmp_album = (struct album_data*)plugin_buf;
+    struct album_data* tmp_album = (struct album_data*)buf;
     for (i = album_count - 1; i >= 0; i--)
         tmp_album[i] = album[-i];
     album = tmp_album;
-    plugin_buf = album + album_count;
-    plugin_buf_size += UNIQBUF_SIZE * sizeof(long);
+    buf = album + album_count;
+    buf_size += UNIQBUF_SIZE * sizeof(long);
     return (album_count > 0) ? 0 : ERROR_NO_ALBUMS;
 }
 
@@ -817,11 +817,11 @@ bool create_albumart_cache(void)
         if (!get_albumart_for_index_from_db(i, albumart_file, MAX_PATH))
             continue;
 
-        input_bmp.data = plugin_buf;
+        input_bmp.data = buf;
         input_bmp.width = DISPLAY_WIDTH;
         input_bmp.height = DISPLAY_HEIGHT;
         ret = scaled_read_bmp_file(albumart_file, &input_bmp,
-                                plugin_buf_size, format, &format_transposed);
+                                buf_size, format, &format_transposed);
         if (ret <= 0) {
             rb->splash(HZ, "Could not read bmp");
             continue; /* skip missing/broken files */
@@ -1810,9 +1810,9 @@ int create_empty_slide(bool force)
 #if LCD_DEPTH > 1
         input_bmp.format = FORMAT_NATIVE;
 #endif
-        input_bmp.data = (char*)plugin_buf;
+        input_bmp.data = (char*)buf;
         ret = scaled_read_bmp_file(EMPTY_SLIDE_BMP, &input_bmp,
-                                plugin_buf_size,
+                                buf_size,
                                 FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
                                 &format_transposed);
         if (!save_pfraw(EMPTY_SLIDE, &input_bmp))
@@ -2197,7 +2197,7 @@ int main(void)
 
     init_reflect_table();
 
-    ALIGN_BUFFER(plugin_buf, plugin_buf_size, 4);
+    ALIGN_BUFFER(buf, buf_size, 4);
     ret = create_album_index();
     if (ret == ERROR_BUFFER_FULL) {
         rb->splash(HZ, "Not enough memory for album names");
@@ -2207,7 +2207,7 @@ int main(void)
         return PLUGIN_ERROR;
     }
 
-    ALIGN_BUFFER(plugin_buf, plugin_buf_size, 4);
+    ALIGN_BUFFER(buf, buf_size, 4);
     number_of_slides  = album_count;
     if ((cache_version != CACHE_VERSION) && !create_albumart_cache()) {
         rb->splash(HZ, "Could not create album art cache");
@@ -2224,17 +2224,17 @@ int main(void)
 
 #ifdef USEGSLIB
     long grey_buf_used;
-    if (!grey_init(plugin_buf, plugin_buf_size, GREY_BUFFERED|GREY_ON_COP,
+    if (!grey_init(buf, buf_size, GREY_BUFFERED|GREY_ON_COP,
                    LCD_WIDTH, LCD_HEIGHT, &grey_buf_used))
     {
         rb->splash(HZ, "Greylib init failed!");
         return PLUGIN_ERROR;
     }
     grey_setfont(FONT_UI);
-    plugin_buf_size -= grey_buf_used;
-    plugin_buf = (void*)(grey_buf_used + (char*)plugin_buf);
+    buf_size -= grey_buf_used;
+    buf = (void*)(grey_buf_used + (char*)buf);
 #endif
-    buflib_init(&buf_ctx, (void *)plugin_buf, plugin_buf_size);
+    buflib_init(&buf_ctx, (void *)buf, buf_size);
 
     if (!(empty_slide_hid = read_pfraw(EMPTY_SLIDE, 0)))
     {
@@ -2444,7 +2444,11 @@ enum plugin_status plugin_start(const void *parameter)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
-    plugin_buf = rb->plugin_get_buffer(&plugin_buf_size);
+#if PLUGIN_BUFFER_SIZE > 0x10000
+    buf = rb->plugin_get_buffer(&buf_size);
+#else
+    buf = rb->plugin_get_audio_buffer(&buf_size);
+#endif
     ret = main();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);

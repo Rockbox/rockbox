@@ -557,8 +557,8 @@ static const struct plugin_api rockbox_api = {
     codec_thread_do_callback,
     codec_load_file,
     get_codec_filename,
-    get_metadata,
 #endif
+    get_metadata,
     mp3info,
     count_mp3_frames,
     create_xing_header,
