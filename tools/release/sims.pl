@@ -85,7 +85,7 @@ sub runone {
     my ($dir, $confnum, $extra)=@_;
     my $a;
 
-    if(!grep(/$dir/, @doonly)) {
+    if(@doonly > 0 && !grep(/$dir/, @doonly)) {
         return;
     }
 
@@ -127,7 +127,7 @@ sub runone {
     chdir($toplevel);
 
     print "remove all contents in $newo\n" if($verbose);
-#    system("rm -rf $newo");
+    system("rm -rf $newo");
 
     return $a;
 };
