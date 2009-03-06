@@ -1224,8 +1224,8 @@ bool load_new_slide(void)
              cache[cache_right_index].index >= number_of_slides) &&
              cache[cache_left_index].index > 0)
         {
-            if (cache_free == -1)
-                free_slide_prio(prio_l);
+            if (cache_free == -1 && !free_slide_prio(prio_l))
+                return false;
             i = lla_pop_head(&cache_free);
             if (load_and_prepare_surface(cache[cache_left_index].index
                                          - 1, i, prio_l))
@@ -1236,8 +1236,8 @@ bool load_new_slide(void)
             }
         } else if(cache[cache_right_index].index < number_of_slides - 1)
         {
-            if (cache_free == -1)
-                free_slide_prio(prio_l);
+            if (cache_free == -1 && !free_slide_prio(prio_r))
+                return false;
             i = lla_pop_head(&cache_free);
             if (load_and_prepare_surface(cache[cache_right_index].index
                                          + 1, i, prio_r))
