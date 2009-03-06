@@ -49,7 +49,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define IDX_BUF_DEPTH 64
 
 /* Tag Cache Header version 'TCHxx'. Increment when changing internal structures. */
-#define TAGCACHE_MAGIC  0x5443480c
+#define TAGCACHE_MAGIC  0x5443480d
 
 /* How much to allocate extra space for ramcache. */
 #define TAGCACHE_RESERVE 32768

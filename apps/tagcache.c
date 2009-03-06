@@ -166,8 +166,8 @@ static struct mutex command_queue_mutex;
 
 /* Variable-length tag entry in tag files. */
 struct tagfile_entry {
-    short tag_length;  /* Length of the data in bytes including '\0' */
-    short idx_id;      /* Corresponding entry location in index file of not unique tags */
+    int32_t tag_length;  /* Length of the data in bytes including '\0' */
+    int32_t idx_id;      /* Corresponding entry location in index file of not unique tags */
     char tag_data[0];  /* Begin of the tag data */
 };
 
@@ -192,7 +192,7 @@ struct master_header {
 };
 
 /* For the endianess correction */
-static const char *tagfile_entry_ec   = "ss";
+static const char *tagfile_entry_ec   = "ll";
 /**
  Note: This should be (1 + TAG_COUNT) amount of l's.
  */
