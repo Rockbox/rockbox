@@ -46,9 +46,14 @@ const struct button_mapping *plugin_contexts[]
 #if LCD_DEPTH < 8
 #if LCD_DEPTH > 1
 #define N_BRIGHT(y) LCD_BRIGHTNESS(y)
-#else
+#else   /* LCD_DEPTH <= 1 */
 #define N_BRIGHT(y) ((y > 127) ? 0 : 1)
+#ifdef HAVE_NEGATIVE_LCD  /* m:robe 100, Clip */
+#define PICTUREFLOW_DRMODE DRMODE_SOLID
+#else
+#define PICTUREFLOW_DRMODE (DRMODE_SOLID|DRMODE_INVERSEVID)
 #endif
+#endif  /* LCD_DEPTH <= 1 */
 #define USEGSLIB
 GREY_INFO_STRUCT
 #define LCD_BUF _grey_info.buffer
@@ -60,7 +65,7 @@ GREY_INFO_STRUCT
 #define BUFFER_WIDTH _grey_info.width
 #define BUFFER_HEIGHT _grey_info.height
 typedef unsigned char pix_t;
-#else
+#else   /* LCD_DEPTH >= 8 */
 #define LCD_BUF rb->lcd_framebuffer
 #define MYLCD(fn) rb->lcd_ ## fn
 #define G_PIX LCD_RGBPACK
@@ -70,7 +75,7 @@ typedef unsigned char pix_t;
 #define BUFFER_WIDTH LCD_WIDTH
 #define BUFFER_HEIGHT LCD_HEIGHT
 typedef fb_data pix_t;
-#endif
+#endif  /* LCD_DEPTH >= 8 */
 
 #ifdef HAVE_SCROLLWHEEL
 #define PICTUREFLOW_NEXT_ALBUM          PLA_DOWN
@@ -749,15 +754,23 @@ bool get_albumart_for_index_from_db(const int slide_index, char *buf,
 void draw_splashscreen(void)
 {
     struct screen* display = rb->screens[0];
+    const struct picture* logo = &(logos[display->screen_type]);
 
 #if LCD_DEPTH > 1
     rb->lcd_set_background(N_BRIGHT(0));
     rb->lcd_set_foreground(N_BRIGHT(255));
+#else
+    rb->lcd_set_drawmode(PICTUREFLOW_DRMODE);
 #endif
     rb->lcd_clear_display();
 
-    const struct picture* logo = &(logos[display->screen_type]);
+#if LCD_DEPTH == 1  /* Mono LCDs need the logo inverted */
+    rb->lcd_set_drawmode(PICTUREFLOW_DRMODE ^ DRMODE_INVERSEVID);
     picture_draw(display, logo, (LCD_WIDTH - logo->width) / 2, 10);
+    rb->lcd_set_drawmode(PICTUREFLOW_DRMODE);
+#else
+    picture_draw(display, logo, (LCD_WIDTH - logo->width) / 2, 10);
+#endif
 
     rb->lcd_update();
 }
