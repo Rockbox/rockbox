@@ -4,7 +4,7 @@ use File::Basename;
 use File::Path;
 use Cwd;
 
-my $verbose, $update, $doonly, $version;
+my $verbose, $strip, $update, $doonly, $version;
 my @doonly;
 
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time());
@@ -23,6 +23,7 @@ Usage: w32sims [-v] [-u] [-r VERSION] [-f filename] [buildonly]
        -u Run svn up before building
        -r Use the specified version string for filenames (defaults to SVN
           revision)
+       -s Strip binaries before zipping them up.
        -f Filename format string (without extension). This can include a
           filepath (relative or absolute) May include the following special
           strings:
@@ -45,6 +46,9 @@ MOO
     elsif ($ARGV[0] eq "-u") {
         $update =1;
     }
+    elsif ($ARGV[0] eq "-s") {
+        $strip =1;
+    }
     elsif ($ARGV[0] eq "-r") {
         $version =$ARGV[1];
         shift @ARGV;
@@ -55,8 +59,6 @@ MOO
     }
     else {
         push(@doonly,$ARGV[0]);
-        # This will only be printed if the -v flag comes earler
-        print "only build ${ARGV[0]}\n" if($verbose);
     }
     shift @ARGV;
 }
@@ -75,6 +77,10 @@ if ($test eq "") {
 $rev = `tools/version.sh .`;
 chomp $rev;
 print "rev $rev\n" if($verbose);
+
+if (@doonly) {
+    printf("Build only %s\n", join(', ', @doonly)) if($verbose);
+}
 
 if (!defined($version)) {
     $version = $rev;
@@ -96,6 +102,19 @@ sub runone {
     # build the target
     $a = buildit($dir, $confnum, $extra);
 
+    if ($strip) {
+        print "Stripping binaries\n" if ($verbose);
+        # find \( -name "*.exe" -o -name "*.rock" -o -name "*.codec" \) -exec ls -l "{}" ";"
+        open(MAKE, "Makefile");
+        my $AS=(grep(/^export AS=/, <MAKE>))[0];
+        chomp($AS);
+        (my $striptool = $AS) =~ s/^export AS=(.*)as$/$1strip/;
+        
+        $cmd = "find \\( -name 'rockboxui*' -o -iname '*dll' -o -name '*.rock' -o -name '*.codec' \\) -exec $striptool '{}' ';'";
+        print("$cmd\n") if ($verbose);
+        `$cmd`;
+    }
+
     chdir "..";
 
     my $newo=$filename;
@@ -110,8 +129,6 @@ sub runone {
 
 
     print "Zip up the sim and associated files\n" if ($verbose);
-    print("Output: $newo\n");
-    print("Dir: " . dirname($newo) . "\n");
     mkpath(dirname($newo));
     system("mv build-$dir $newo");
     if (-f "$newo/rockboxui.exe") {
@@ -120,9 +137,8 @@ sub runone {
     }
     my $toplevel = getcwd();
     chdir(dirname($newo));
-    print(getcwd()."\n");
-    $cmd = "zip -9 -r -q ".basename($newo)." ".basename($newo)."/{rockboxui*,UI256.bmp,SDL.dll,simdisk}";
-    print("$cmd\n");
+    $cmd = "zip -9 -r -q \"".basename($newo)."\" \"".basename($newo)."\"/{rockboxui*,UI256.bmp,SDL.dll,simdisk}";
+    print("$cmd\n") if($verbose);
     `$cmd`;
     chdir($toplevel);
 
