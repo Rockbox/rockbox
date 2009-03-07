@@ -144,11 +144,11 @@ void ICODE_ATTR __attribute__((interrupt("FIQ"))) fiq_playback(void)
         get_more = pcm_callback_for_more;
         if (get_more) {
             get_more((unsigned char **)&dma_play_data.addr, &dma_play_data.size);
-            dma_play_data.addr = (dma_play_data.addr + 3) & ~3;  
-            dma_play_data.size &= 0xfffc;
+            dma_play_data.addr = (dma_play_data.addr + 2) & ~3;  
+            dma_play_data.size &= ~3;
         }
 
-        if (dma_play_data.size <= 0) {
+        if (dma_play_data.size == 0) {
             break;
         }
 
@@ -360,7 +360,7 @@ static void play_start_pcm(void)
     /* Not at least MAX_DMA_CHUNK_SIZE left or there would be less than a
      * FIFO's worth of data after this transfer? */
     size_t size = MAX_DMA_CHUNK_SIZE;
-    if (dma_play_data.size + 16*4 < size)
+    if (size + 16*4 > dma_play_data.size)
         size = dma_play_data.size;
 
     DMA0_RAM_ADDR = dma_play_data.addr;
@@ -391,32 +391,33 @@ static void play_start_pcm(void)
 static void play_stop_pcm(void)
 {
 #ifdef CPU_PP502x
-    size_t status = DMA0_STATUS;
-    size_t size;
+    unsigned long status = DMA0_STATUS; /* Snapshot- resume from this point */
+    unsigned long cmd = DMA0_CMD;
+    size_t size = 0;
 
     /* Stop transfer */
-    DMA0_CMD &= ~(DMA_CMD_START | DMA_CMD_INTR);
+    DMA0_CMD = cmd & ~(DMA_CMD_START | DMA_CMD_INTR);
 
     /* Wait for not busy + clear int */
     while (DMA0_STATUS & (DMA_STATUS_BUSY | DMA_STATUS_INTR));
 
-    size = (status & 0xfffc) + 4;
-
-    if (status & DMA_STATUS_BUSY)
-    {
+    if (status & DMA_STATUS_BUSY) {
         /* Transfer was interrupted - leave what's left */
-        dma_play_data.addr += dma_play_data.size - size;
-        dma_play_data.size = size;
+        size = (cmd & 0xfffc) - (status & 0xfffc);
     }
-    else if (status & DMA_STATUS_INTR)
-    {
-        /* Tranfer was finished - DMA0_STATUS will have been reloaded
-         * automatically with size in DMA0_CMD. */
-        dma_play_data.addr += size;
-        dma_play_data.size -= size;
-        if (dma_play_data.size <= 0)
-            dma_play_data.addr = 0; /* Entire buffer has completed */
+    else if (status & DMA_STATUS_INTR) {
+        /* Transfer was finished - DMA0_STATUS will have been reloaded
+         * automatically with size in DMA0_CMD. Setup to restart on next
+         * segment. */
+        size = (cmd & 0xfffc) + 4;
     }
+    /* else not an active state - size = 0 */
+
+    dma_play_data.addr += size;
+    dma_play_data.size -= size;
+
+    if (dma_play_data.size == 0)
+        dma_play_data.addr = 0; /* Entire buffer has completed. */
 #else
     /* Disable TX interrupt */
     IIS_IRQTX_REG &= ~IIS_IRQTX;
@@ -431,7 +432,7 @@ static void play_stop_pcm(void)
 void pcm_play_dma_start(const void *addr, size_t size)
 {
     addr = (void *)(((long)addr + 2) & ~3);
-    size &= 0xfffc;
+    size &= ~3;
 
 #if NUM_CORES > 1
     /* This will become more important later - and different ! */
@@ -440,7 +441,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
     pcm_play_dma_stop();
 
-    if (size <= 0)
+    if (size == 0)
         return;
 
 #ifdef CPU_PP502x
