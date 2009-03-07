@@ -534,16 +534,17 @@ target/arm/sandisk/audio-c200_e200.c
 
 #ifdef PHILIPS_SA9200
 #ifndef SIMULATOR
-target/arm/ata-sd-pp.c
-target/arm/philips/sa9200/lcd-sa9200.c
 target/arm/adc-as3514.c
 target/arm/ascodec-pp.c
-target/arm/philips/sa9200/backlight-sa9200.c
+target/arm/ata-sd-pp.c
+target/arm/i2s-pp.c
+target/arm/powermgmt-ascodec.c
 target/arm/usb-fw-pp502x.c
+target/arm/philips/sa9200/backlight-sa9200.c
 target/arm/philips/sa9200/button-sa9200.c
+target/arm/philips/sa9200/lcd-sa9200.c
 target/arm/philips/sa9200/power-sa9200.c
 target/arm/philips/sa9200/powermgmt-sa9200.c
-target/arm/i2s-pp.c
 #endif /* SIMULATOR */
 #endif /* PHILIPS_SA9200 */
 

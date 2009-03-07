@@ -105,8 +105,14 @@
 #define BATTERY_CAPACITY_INC 0          /* capacity increment */
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
-/* Hardware controlled charging? FIXME */
-#define CONFIG_CHARGING CHARGING_SIMPLE
+/* Charging implemented in a target-specific algorithm */
+#define CONFIG_CHARGING CHARGING_TARGET
+#define HAVE_POWEROFF_WHILE_CHARGING
+
+/* define current usage levels (copied from the e200v1 )*/
+#define CURRENT_NORMAL     30  /* Toni's measurements in Nov 2008  */
+#define CURRENT_BACKLIGHT  40  /* Screen is about 20, blue LEDs are another 20, so 40 if both */
+#define CURRENT_RECORD     30  /* flash player, so this is just unboosted current*/
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
