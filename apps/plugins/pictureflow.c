@@ -334,7 +334,7 @@ enum pf_states {
 static int pf_state;
 
 /** code */
-static inline pix_t fade_color(pix_t c, unsigned int a);
+static inline unsigned fade_color(pix_t c, unsigned a);
 bool save_pfraw(char* filename, struct bitmap *bm);
 bool load_new_slide(void);
 int load_surface(int);
@@ -455,6 +455,13 @@ static inline PFreal fdiv(PFreal num, PFreal den)
 #define fmax(a,b) (((a) > (b)) ? (a) : (b))
 #define fabs(a) (a < 0 ? -a : a)
 #define fbound(min,val,max) (fmax((min),fmin((max),(val))))
+
+#if CONFIG_CPU == SH7034
+/* 16*16->32 bit multiplication is a single instrcution on the SH1 */
+#define MULUQ(a, b) ((uint32_t) (((uint16_t) (a)) * ((uint16_t) (b))))
+#else
+#define MULUQ(a, b) ((a) * (b))
+#endif
 
 
 #if 0
@@ -1376,7 +1383,7 @@ void recalc_offsets(void)
    to an uint, multiply and compress the result back to a ushort.
  */
 #if (LCD_PIXELFORMAT == RGB565SWAPPED)
-static inline pix_t fade_color(pix_t c, unsigned int a)
+static inline unsigned fade_color(pix_t c, unsigned a)
 {
     unsigned int result;
     c = swap16(c);
@@ -1387,7 +1394,7 @@ static inline pix_t fade_color(pix_t c, unsigned int a)
     return swap16(result);
 }
 #elif LCD_PIXELFORMAT == RGB565
-static inline pix_t fade_color(pix_t c, unsigned int a)
+static inline unsigned fade_color(pix_t c, unsigned a)
 {
     unsigned int result;
     a = (a + 2) & 0x1fc;
@@ -1397,9 +1404,10 @@ static inline pix_t fade_color(pix_t c, unsigned int a)
     return result;
 }
 #else
-static inline pix_t fade_color(pix_t c, unsigned int a)
+static inline unsigned fade_color(pix_t c, unsigned a)
 {
-    return (unsigned int)c * a >> 8;
+    unsigned val = c;
+    return MULUQ(val, a) >> 8;
 }
 #endif
 
@@ -1489,14 +1497,14 @@ void render_slide(struct slide_data *slide, const int alpha)
         {
             while ((y1 >= 0) && (p1 >= 0))
             {
-                *pixel1 = ptr[p1 >> PFREAL_SHIFT];
+                *pixel1 = ptr[((unsigned)p1) >> PFREAL_SHIFT];
                 p1 -= dy;
                 y1--;
                 pixel1 -= pixelstep;
             }
             while ((p2 < sh * PFREAL_ONE) && (y2 < h))
             {
-                *pixel2 = ptr[p2 >> PFREAL_SHIFT];
+                *pixel2 = ptr[((unsigned)p2) >> PFREAL_SHIFT];
                 p2 += dy;
                 y2++;
                 pixel2 += pixelstep;
@@ -1504,7 +1512,7 @@ void render_slide(struct slide_data *slide, const int alpha)
             while ((p2 < MIN(sh + REFLECT_HEIGHT, sh * 2) * PFREAL_ONE) &&
                    (y2 < h))
             {
-                int ty = (p2 >> PFREAL_SHIFT) - sh;
+                int ty = (((unsigned)p2) >> PFREAL_SHIFT) - sh;
                 int lalpha = reflect_table[ty];
                 *pixel2 = fade_color(ptr[sh - 1 - ty],lalpha);
                 p2 += dy;
@@ -1516,14 +1524,14 @@ void render_slide(struct slide_data *slide, const int alpha)
         {
             while ((y1 >= 0) && (p1 >= 0))
             {
-                *pixel1 = fade_color(ptr[p1 >> PFREAL_SHIFT],alpha);
+                *pixel1 = fade_color(ptr[((unsigned)p1) >> PFREAL_SHIFT],alpha);
                 p1 -= dy;
                 y1--;
                 pixel1 -= pixelstep;
             }
             while ((p2 < sh * PFREAL_ONE) && (y2 < h))
             {
-                *pixel2 = fade_color(ptr[p2 >> PFREAL_SHIFT],alpha);
+                *pixel2 = fade_color(ptr[((unsigned)p2) >> PFREAL_SHIFT],alpha);
                 p2 += dy;
                 y2++;
                 pixel2 += pixelstep;
@@ -1531,8 +1539,9 @@ void render_slide(struct slide_data *slide, const int alpha)
             while ((p2 < MIN(sh + REFLECT_HEIGHT, sh * 2) * PFREAL_ONE) &&
                    (y2 < h))
             {
-                int ty = (p2 >> PFREAL_SHIFT) - sh;
-                int lalpha = (reflect_table[ty] * alpha + 128) >> 8;
+                int ty = (((unsigned)p2) >> PFREAL_SHIFT) - sh;
+                int lalpha = reflect_table[ty];
+                lalpha = (MULUQ(lalpha, alpha) + 128) >> 8;
                 *pixel2 = fade_color(ptr[sh - 1 - ty],lalpha);
                 p2 += dy;
                 y2++;
