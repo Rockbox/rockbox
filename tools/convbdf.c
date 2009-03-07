@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <time.h>
 
 #define ROTATE /* define this for the new, rotated format */
@@ -76,8 +77,15 @@ struct font {
 #define MIN(a,b)            ((a) < (b) ? (a) : (b))
 
 /* Depending on the verbosity level some warnings are printed or not */
-int verbose = 0;
-#define VERBOSE_CLIP  1  /* Only print clip related warnings if verb >= this */
+int verbosity_level = 0;
+
+/* Prints a warning of the specified verbosity level. It will only be
+   really printed if the level is >= the level set in the settings */
+void print_warning(int level, const char *fmt, ...);
+void print_error(const char *fmt, ...);
+void print_info(const char *fmt, ...);
+#define VL_CLIP  1  /* Verbosity level for clip related warnings */
+#define VL_MIS  1   /* Verbosity level for other warnings */
 
 int gen_c = 0;
 int gen_h = 0;
@@ -117,10 +125,10 @@ usage(void)
     "    -s N   Start output at character encodings >= N\n"
     "    -l N   Limit output to character encodings <= N\n"
     "    -n     Don't generate bitmaps as comments in .c file\n"
-    "    -v N   Verbosity level: 0=quite quiet, 1=more verbose\n"
+    "    -v N   Verbosity level: 0=quite quiet, 1=more verbose, 2=even more, etc.\n"
     };
 
-    fprintf(stderr, "%s", help);
+    print_info("%s", help);
 }
 
 /* parse command line options*/
@@ -136,25 +144,25 @@ void getopts(int *pac, char ***pav)
         p = &av[0][1]; 
         while( *p)
             switch(*p++) {
-            case ' ':           /* multiple -args on av[]*/
+            case ' ':           /* multiple -args on av[] */
                 while( *p && *p == ' ')
                     p++;
-                if( *p++ != '-')    /* next option must have dash*/
+                if( *p++ != '-')    /* next option must have dash */
                     p = "";
-                break;          /* proceed to next option*/
-            case 'c':           /* generate .c output*/
+                break;          /* proceed to next option */
+            case 'c':           /* generate .c output */
                 gen_c = 1;
                 break;
-            case 'h':           /* generate .h output*/
+            case 'h':           /* generate .h output */
                 gen_h = 1;
                 break;
-            case 'f':           /* generate .fnt output*/
+            case 'f':           /* generate .fnt output */
                 gen_fnt = 1;
                 break;
-            case 'n':           /* don't gen bitmap comments*/
+            case 'n':           /* don't gen bitmap comments */
                 gen_map = 0;
                 break;
-            case 'o':           /* set output file*/
+            case 'o':           /* set output file */
                 oflag = 1;
                 if (*p) {
                     strcpy(outfile, p);
@@ -167,7 +175,7 @@ void getopts(int *pac, char ***pav)
                         strcpy(outfile, av[0]);
                 }
                 break;
-            case 'l':           /* set encoding limit*/
+            case 'l':           /* set encoding limit */
                 if (*p) {
                     limit_char = atoi(p);
                     while (*p && *p != ' ')
@@ -179,7 +187,7 @@ void getopts(int *pac, char ***pav)
                         limit_char = atoi(av[0]);
                 }
                 break;
-            case 's':           /* set encoding start*/
+            case 's':           /* set encoding start */
                 if (*p) {
                     start_char = atoi(p);
                     while (*p && *p != ' ')
@@ -193,23 +201,49 @@ void getopts(int *pac, char ***pav)
                 break;
             case 'v':           /* verbosity */
                 if (*p) {
-                    verbose = atoi(p);
+                    verbosity_level = atoi(p);
                     while (*p && *p != ' ')
                         p++;
                 }
                 else {
                     av++; ac--;
                     if (ac > 0)
-                        verbose = atoi(av[0]);
+                        verbosity_level = atoi(av[0]);
                 }
                 break;
             default:
-                fprintf(stderr, "Unknown option ignored: %c\r\n", *(p-1));
+                print_info("Unknown option ignored: %c\n", *(p-1));
             }
         ++av; --ac;
     }
     *pac = ac;
     *pav = av;
+}
+
+void print_warning(int level, const char *fmt, ...) {
+    if (verbosity_level >= level) {
+        va_list ap;
+        va_start(ap, fmt);
+        fprintf(stderr, " WARN: ");
+        vfprintf(stderr, fmt, ap);
+        va_end(ap);
+    }
+}
+
+void print_error(const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    fprintf(stderr, "ERROR: ");
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+}
+
+void print_info(const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    fprintf(stderr, " INFO: ");
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
 }
 
 /* remove directory prefix and file suffix from full path */
@@ -325,7 +359,7 @@ struct font* bdf_read_font(char *path)
 
     fp = fopen(path, "rb");
     if (!fp) {
-        fprintf(stderr, "Error opening file: %s\n", path);
+        print_error("Error opening file: %s\n", path);
         return NULL;
     }
     
@@ -337,7 +371,7 @@ struct font* bdf_read_font(char *path)
     pf->name = strdup(basename(path));
 
     if (!bdf_read_header(fp, pf)) {
-        fprintf(stderr, "Error reading font header\n");
+        print_error("Error reading font header\n");
         goto errout;
     }
 
@@ -345,19 +379,17 @@ struct font* bdf_read_font(char *path)
     pf->num_clipped_ascent = pf->num_clipped_descent = pf->num_clipped = 0;
 
     if (!bdf_read_bitmaps(fp, pf)) {
-        fprintf(stderr, "Error reading font bitmaps\n");
+        print_error("Error reading font bitmaps\n");
         goto errout;
     }
     
-    if (verbose >= VERBOSE_CLIP) {
-        if (pf->num_clipped > 0) {
-            fprintf(stderr, "Warning: %d characters out of %d were clipped "
-                    "(%d at ascent, %d at descent)\n",
-                    pf->num_clipped, pf->nchars,
-                    pf->num_clipped_ascent, pf->num_clipped_descent);
-            fprintf(stderr, "         max overflows: ascent: %d, descent: %d\n",
-                    pf->max_over_ascent, pf->max_over_descent);
-        }
+    if (pf->num_clipped > 0) {
+        print_warning(VL_CLIP, "%d character(s) out of %d were clipped "
+                "(%d at ascent, %d at descent)\n",
+                pf->num_clipped, pf->nchars,
+                pf->num_clipped_ascent, pf->num_clipped_descent);
+        print_warning(VL_CLIP, "max overflows: %d pixel(s) at ascent, %d pixel(s) at descent\n",
+                pf->max_over_ascent, pf->max_over_descent);
     }
 
     fclose(fp);
@@ -386,12 +418,12 @@ int bdf_read_header(FILE *fp, struct font* pf)
 
     for (;;) {
         if (!bdf_getline(fp, buf, sizeof(buf))) {
-            fprintf(stderr, "Error: EOF on file\n");
+            print_error("EOF on file\n");
             return 0;
         }
         if (isprefix(buf, "FONT ")) {       /* not required */
             if (sscanf(buf, "FONT %[^\n]", facename) != 1) {
-                fprintf(stderr, "Error: bad 'FONT'\n");
+                print_error("bad 'FONT'\n");
                 return 0;
             }
             pf->facename = strdup(facename);
@@ -399,7 +431,7 @@ int bdf_read_header(FILE *fp, struct font* pf)
         }
         if (isprefix(buf, "COPYRIGHT ")) {  /* not required */
             if (sscanf(buf, "COPYRIGHT \"%[^\"]", copyright) != 1) {
-                fprintf(stderr, "Error: bad 'COPYRIGHT'\n");
+                print_error("bad 'COPYRIGHT'\n");
                 return 0;
             }
             pf->copyright = strdup(copyright);
@@ -407,20 +439,20 @@ int bdf_read_header(FILE *fp, struct font* pf)
         }
         if (isprefix(buf, "DEFAULT_CHAR ")) {   /* not required */
             if (sscanf(buf, "DEFAULT_CHAR %d", &pf->defaultchar) != 1) {
-                fprintf(stderr, "Error: bad 'DEFAULT_CHAR'\n");
+                print_error("bad 'DEFAULT_CHAR'\n");
                 return 0;
             }
         }
         if (isprefix(buf, "FONT_DESCENT ")) {
             if (sscanf(buf, "FONT_DESCENT %d", &pf->descent) != 1) {
-                fprintf(stderr, "Error: bad 'FONT_DESCENT'\n");
+                print_error("bad 'FONT_DESCENT'\n");
                 return 0;
             }
             continue;
         }
         if (isprefix(buf, "FONT_ASCENT ")) {
             if (sscanf(buf, "FONT_ASCENT %d", &pf->ascent) != 1) {
-                fprintf(stderr, "Error: bad 'FONT_ASCENT'\n");
+                print_error("bad 'FONT_ASCENT'\n");
                 return 0;
             }
             continue;
@@ -428,14 +460,14 @@ int bdf_read_header(FILE *fp, struct font* pf)
         if (isprefix(buf, "FONTBOUNDINGBOX ")) {
             if (sscanf(buf, "FONTBOUNDINGBOX %d %d %d %d",
                        &pf->fbbw, &pf->fbbh, &pf->fbbx, &pf->fbby) != 4) {
-                fprintf(stderr, "Error: bad 'FONTBOUNDINGBOX'\n");
+                print_error("bad 'FONTBOUNDINGBOX'\n");
                 return 0;
             }
             continue;
         }
         if (isprefix(buf, "CHARS ")) {
             if (sscanf(buf, "CHARS %d", &pf->nchars) != 1) {
-                fprintf(stderr, "Error: bad 'CHARS'\n");
+                print_error("bad 'CHARS'\n");
                 return 0;
             }
             continue;
@@ -448,7 +480,7 @@ int bdf_read_header(FILE *fp, struct font* pf)
          */
         if (isprefix(buf, "ENCODING ")) {
             if (sscanf(buf, "ENCODING %d", &encoding) != 1) {
-                fprintf(stderr, "Error: bad 'ENCODING'\n");
+                print_error("bad 'ENCODING'\n");
                 return 0;
             }
             if (encoding >= 0 &&
@@ -468,7 +500,7 @@ int bdf_read_header(FILE *fp, struct font* pf)
 
     /* calc font height*/
     if (pf->ascent < 0 || pf->descent < 0 || firstchar < 0) {
-        fprintf(stderr, "Error: Invalid BDF file, requires FONT_ASCENT/FONT_DESCENT/ENCODING\n");
+        print_error("Invalid BDF file, requires FONT_ASCENT/FONT_DESCENT/ENCODING\n");
         return 0;
     }
     pf->height = pf->ascent + pf->descent;
@@ -494,7 +526,7 @@ int bdf_read_header(FILE *fp, struct font* pf)
     pf->width = (unsigned char *)malloc(pf->size * sizeof(unsigned char));
     
     if (!pf->bits || !pf->offset || !pf->offrot || !pf->width) {
-        fprintf(stderr, "Error: no memory for font load\n");
+        print_error("no memory for font load\n");
         return 0;
     }
 
@@ -524,7 +556,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
 
     for (;;) {
         if (!bdf_getline(fp, buf, sizeof(buf))) {
-            fprintf(stderr, "Error: EOF on file\n");
+            print_error("EOF on file\n");
             return 0;
         }
         if (isprefix(buf, "STARTCHAR")) {
@@ -537,7 +569,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
         }
         if (isprefix(buf, "ENCODING ")) {
             if (sscanf(buf, "ENCODING %d", &encoding) != 1) {
-                fprintf(stderr, "Error: bad 'ENCODING'\n");
+                print_error("bad 'ENCODING'\n");
                 return 0;
             }
             if (encoding < start_char || encoding > limit_char)
@@ -546,7 +578,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
         }
         if (isprefix(buf, "DWIDTH ")) {
             if (sscanf(buf, "DWIDTH %d", &width) != 1) {
-                fprintf(stderr, "Error: bad 'DWIDTH'\n");
+                print_error("bad 'DWIDTH'\n");
                 return 0;
             }
             /* use font boundingbox width if DWIDTH <= 0 */
@@ -556,7 +588,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
         }
         if (isprefix(buf, "BBX ")) {
             if (sscanf(buf, "BBX %d %d %d %d", &bbw, &bbh, &bbx, &bby) != 4) {
-                fprintf(stderr, "Error: bad 'BBX'\n");
+                print_error("bad 'BBX'\n");
                 return 0;
             }
             continue;
@@ -570,7 +602,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
 
             /* set bits offset in encode map*/
             if (pf->offset[encoding-pf->firstchar] != -1) {
-                fprintf(stderr, "Error: duplicate encoding for character %d (0x%02x), ignoring duplicate\n",
+                print_error("duplicate encoding for character %d (0x%02x), ignoring duplicate\n",
                         encoding, encoding);
                 continue;
             }
@@ -606,11 +638,9 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                     pf->max_over_ascent = overflow_asc;
                 }
                 bbh = MAX(bbh - overflow_asc, 0); /* Clipped -> decrease the height */
-                if (verbose >= VERBOSE_CLIP) {
-                    fprintf(stderr, "Warning: character %d goes %d pixel(s)"
-                            " beyond the font's ascent, it will be clipped\n",
-                            encoding, overflow_asc);
-                }
+                print_warning(VL_CLIP, "character %d goes %d pixel(s)"
+                        " beyond the font's ascent, it will be clipped\n",
+                        encoding, overflow_asc);
             }
             overflow_desc = -bby - pf->descent;
             if (overflow_desc > 0) {
@@ -620,11 +650,9 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                 }
                 bby += overflow_desc;
                 bbh = MAX(bbh - overflow_desc, 0); /* Clipped -> decrease the height */
-                if (verbose >= VERBOSE_CLIP) {
-                    fprintf(stderr, "Warning: character %d goes %d pixel(s)"
-                            " beyond the font's descent, it will be clipped\n",
-                            encoding, overflow_desc);
-                }
+                print_warning(VL_CLIP, "character %d goes %d pixel(s)"
+                        " beyond the font's descent, it will be clipped\n",
+                        encoding, overflow_desc);
             }
             if (overflow_asc > 0 || overflow_desc > 0) {
                 pf->num_clipped++;
@@ -637,7 +665,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                 int hexnibbles;
 
                 if (!bdf_getline(fp, buf, sizeof(buf))) {
-                    fprintf(stderr, "Error: EOF reading BITMAP data for character %d\n",
+                    print_error("EOF reading BITMAP data for character %d\n",
                             encoding);
                     return 0;
                 }
@@ -827,7 +855,7 @@ int rotleft(unsigned char *dst, /* output buffer */
     src_words = BITMAP_WORDS(width) * height;
 
     if(((height + 7) / 8) * width > dstlen) {
-        fprintf(stderr, "%s:%d %d x %d overflows %ld bytes buffer, needs %d\n",
+        print_error("%s:%d %d x %d overflows %ld bytes buffer, needs %d\n",
                 __FILE__, __LINE__, width, height, (unsigned long)dstlen,
                 ((height + 7) / 8) * width );
         return 0;
@@ -907,7 +935,7 @@ int gen_c_source(struct font* pf, char *path)
 
     ofp = fopen(path, "w");
     if (!ofp) {
-        fprintf(stderr, "Can't create %s\n", path);
+        print_error("Can't create %s\n", path);
         return 1;
     }
 
@@ -1003,7 +1031,7 @@ int gen_c_source(struct font* pf, char *path)
         for (x=BITMAP_WORDS(width)*pf->height; x>0; --x) {
             fprintf(ofp, "0x%04x,\n", *bits);
             if (!did_syncmsg && *bits++ != *ofs++) {
-                fprintf(stderr, "Warning: found encoding values in non-sorted order (not an error).\n");
+                print_warning(VL_MISC, "found encoding values in non-sorted order (not an error).\n");
                 did_syncmsg = 1;
             }
         }
@@ -1109,7 +1137,7 @@ int gen_h_header(struct font* pf, char *path)
 
     ofp = fopen(path, "w");
     if (!ofp) {
-        fprintf(stderr, "Can't create %s\n", path);
+        print_error("Can't create %s\n", path);
         return 1;
     }
 
@@ -1188,7 +1216,7 @@ int gen_fnt_file(struct font* pf, char *path)
 
     ofp = fopen(path, "wb");
     if (!ofp) {
-        fprintf(stderr, "Can't create %s\n", path);
+        print_error("Can't create %s\n", path);
         return 1;
     }
 
