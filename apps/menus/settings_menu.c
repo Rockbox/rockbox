@@ -40,12 +40,6 @@
 #if CONFIG_CODEC == SWCODEC
 #include "playback.h"
 #endif
-#ifdef HAVE_RTC_ALARM
-#include "alarm_menu.h"
-#endif
-#if CONFIG_TUNER
-#include "radio.h"
-#endif
 #if CONFIG_RTC
 #include "screens.h"
 #endif

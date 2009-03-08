@@ -39,7 +39,6 @@
 #include "menu.h"
 #include "gwps.h"
 #include "settings.h"
-#include "status.h"
 #include "debug.h"
 #include "storage.h"
 #include "rolo.h"
@@ -68,7 +67,6 @@
 #include "yesno.h"
 #include "gwps-common.h"
 #include "eeprom_settings.h"
-#include "scrobbler.h"
 #include "playlist_catalog.h"
 
 /* gui api */
@@ -80,7 +78,6 @@
 #include "quickscreen.h"
 
 #include "root_menu.h"
-#include "backdrop.h"
 
 static const struct filetype *filetypes;
 static int filetypes_count;

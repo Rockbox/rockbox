@@ -28,7 +28,6 @@
 #include "playlist.h"
 #include "audio.h"
 #include "screens.h"
-#include "status.h"
 #include "settings.h"
 #include "icons.h"
 #include "menu.h"

@@ -22,7 +22,6 @@
 #include "config.h"
 #include "system.h"
 #include "debug.h"
-#include "panic.h"
 #include <kernel.h>
 #include "pcmbuf.h"
 #include "pcm.h"

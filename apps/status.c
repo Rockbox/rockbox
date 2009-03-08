@@ -29,7 +29,6 @@
 #include "mp3_playback.h"
 #include "audio.h"
 #include "gwps.h"
-#include "abrepeat.h"
 #include "statusbar.h"
 #if CONFIG_RTC
 #include "timefuncs.h"

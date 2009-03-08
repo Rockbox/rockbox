@@ -96,6 +96,7 @@
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
+#include "system.h"
 
 #include "lang.h"
 #include "talk.h"

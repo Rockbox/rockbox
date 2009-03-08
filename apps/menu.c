@@ -40,7 +40,6 @@
 #include "settings.h"
 #include "settings_list.h"
 #include "option_select.h"
-#include "status.h"
 #include "screens.h"
 #include "talk.h"
 #include "lang.h"

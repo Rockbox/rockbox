@@ -21,12 +21,10 @@
 #ifndef _ABREPEAT_H_
 #define _ABREPEAT_H_
 
-#include "system.h"
-
 #ifdef AB_REPEAT_ENABLE
-#include "audio.h"
-#include "kernel.h"
 #include <stdbool.h>
+#include "audio.h"
+#include "kernel.h" /* needed for HZ */
 
 #define AB_MARKER_NONE 0
 

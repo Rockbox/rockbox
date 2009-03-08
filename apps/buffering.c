@@ -44,7 +44,6 @@
 #include "audio.h"
 #include "mp3_playback.h"
 #include "usb.h"
-#include "status.h"
 #include "screens.h"
 #include "playlist.h"
 #include "pcmbuf.h"

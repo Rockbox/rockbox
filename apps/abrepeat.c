@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 
+#include "config.h"
 #include "abrepeat.h"
 
 #ifdef AB_REPEAT_ENABLE

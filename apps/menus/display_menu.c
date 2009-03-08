@@ -34,10 +34,8 @@
 #include "peakmeter.h"
 #endif
 #include "talk.h"
-#include "color_picker.h"
 #include "lcd.h"
 #include "lcd-remote.h"
-#include "backdrop.h"
 #include "statusbar.h"
 
 #ifdef HAVE_BACKLIGHT

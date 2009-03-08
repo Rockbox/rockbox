@@ -48,7 +48,6 @@
 #include "voice_thread.h"
 #include "mp3_playback.h"
 #include "usb.h"
-#include "status.h"
 #include "storage.h"
 #include "screens.h"
 #include "playlist.h"
