@@ -63,9 +63,6 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
-/* define this if more than one device/partition can be used */
-#define HAVE_MULTIVOLUME
-
 #define BATTERY_CAPACITY_DEFAULT 1000 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 500  /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 1500 /* max. capacity selectable */
@@ -127,6 +124,9 @@
 
 /* Define this if the MAS SIBI line can be controlled via PB8 */
 #define HAVE_MAS_SIBI_CONTROL
+
+/* define this if more than one device/partition can be used */
+#define HAVE_MULTIVOLUME
 
 /* define this if media can be exchanged on the fly */
 #define HAVE_HOTSWAP
