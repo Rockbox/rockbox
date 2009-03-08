@@ -197,7 +197,7 @@ static bool add_to_playlist(int position, bool queue)
                 /* Ask if user wants to recurse directory */
                 recurse = (gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES);
             }
-            
+
             playlist_insert_directory(NULL, selected_file, position, queue,
                                       recurse);
         }
@@ -342,12 +342,9 @@ static int treeplaylist_callback(int action,
                                  const struct menu_item_ex *this_item);
 
 /* insert items */
-MENUITEM_FUNCTION(i_pl_item_no_play, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT),
-                  playlist_insert_func, (intptr_t*)PLAYLIST_INSERT_LAST,
-                  treeplaylist_callback, Icon_Playlist);
 MENUITEM_FUNCTION(i_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT),
                   playlist_insert_func, (intptr_t*)PLAYLIST_INSERT,
-                  treeplaylist_wplayback_callback, Icon_Playlist);
+                  treeplaylist_callback, Icon_Playlist);
 MENUITEM_FUNCTION(i_first_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_FIRST),
                   playlist_insert_func, (intptr_t*)PLAYLIST_INSERT_FIRST,
                   treeplaylist_wplayback_callback, Icon_Playlist);
@@ -389,7 +386,7 @@ MAKE_ONPLAYMENU( tree_playlist_menu, ID2P(LANG_PLAYLIST),
                  &view_playlist_item,
                  
                  /* insert */
-                 &i_pl_item_no_play, &i_pl_item, &i_first_pl_item,
+                 &i_pl_item, &i_first_pl_item,
                  &i_last_pl_item, &i_shuf_pl_item,
                  
                  /* queue */
@@ -423,15 +420,6 @@ static int treeplaylist_callback(int action,
                 if ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U &&
                         context == CONTEXT_TREE)
                     return action;
-                else 
-                    return ACTION_EXIT_MENUITEM;
-            }
-            else if (this_item == &i_pl_item_no_play)
-            {
-                if (!(audio_status() & AUDIO_STATUS_PLAY))
-                {
-                    return action;
-                }
                 else 
                     return ACTION_EXIT_MENUITEM;
             }

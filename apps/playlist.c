@@ -712,8 +712,7 @@ static int add_track_to_playlist(struct playlist_info* playlist,
             else
                 position = insert_position = 0;
 
-            if (playlist->started)
-                playlist->last_insert_pos = position;
+            playlist->last_insert_pos = position;
             break;
         case PLAYLIST_INSERT_FIRST:
             if (playlist->amount > 0)
