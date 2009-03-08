@@ -720,14 +720,15 @@ static int add_track_to_playlist(struct playlist_info* playlist,
             else
                 position = insert_position = 0;
 
-            if (playlist->last_insert_pos < 0 && playlist->started)
-                playlist->last_insert_pos = position;
+            playlist->last_insert_pos = position;
             break;
         case PLAYLIST_INSERT_LAST:
             if (playlist->first_index > 0)
                 position = insert_position = playlist->first_index;
             else
                 position = insert_position = playlist->amount;
+
+            playlist->last_insert_pos = position;
             break;
         case PLAYLIST_INSERT_SHUFFLED:
         {
@@ -756,7 +757,7 @@ static int add_track_to_playlist(struct playlist_info* playlist,
             if (playlist_remove_all_tracks(playlist) < 0)
                 return -1;
     
-            position = insert_position = playlist->index + 1;
+            playlist->last_insert_pos = position = insert_position = playlist->index + 1;
             break;
     }
     
