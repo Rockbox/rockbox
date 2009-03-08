@@ -67,6 +67,7 @@ bool list_display_title(struct gui_synclist *list, enum screen_type screen);
 static bool draw_title(struct screen *display, struct gui_synclist *list)
 {
     const int screen = display->screen_type;
+    int style = STYLE_DEFAULT;
     if (!list_display_title(list, screen))
         return false;
     title_text[screen] = *(list->parent[screen]);
@@ -85,24 +86,21 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
         display->set_viewport(&title_icon);
         screen_put_icon(display, 0, 0, list->title_icon);
     }
-    title_text[screen].drawmode = STYLE_DEFAULT;
 #ifdef HAVE_LCD_COLOR
     if (list->title_color >= 0)
     {
-        title_text[screen].drawmode
-                |= (STYLE_COLORED|list->title_color);
+        style |= (STYLE_COLORED|list->title_color);
     }
 #endif
     display->set_viewport(&title_text[screen]);
-    display->puts_scroll_style(0, 0, list->title,
-            title_text[screen].drawmode);
+    display->puts_scroll_style(0, 0, list->title, style);
     return true;
 }
     
 void list_draw(struct screen *display, struct gui_synclist *list)
 {
     struct viewport list_icons;
-    int start, end, line_height, i;
+    int start, end, line_height, style, i;
     const int screen = display->screen_type;
     const int icon_width = get_icon_width(screen) + ICON_PADDING;
     const bool show_cursor = !global_settings.cursor_style &&
@@ -179,7 +177,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
                                          sizeof(entry_buffer));
         entry_name = P2STR(s);
         display->set_viewport(&list_text[screen]);
-        list_text[screen].drawmode = STYLE_DEFAULT;
+        style = STYLE_DEFAULT;
         /* position the string at the correct offset place */
         int item_width,h;
         display->getstringsize(entry_name, &item_width, &h);
@@ -195,7 +193,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
             /* if color selected */
             if (color >= 0)
             {
-                list_text[screen].drawmode |= STYLE_COLORED|color;
+                style |= STYLE_COLORED|color;
             }
         }
 #endif
@@ -212,25 +210,25 @@ void list_draw(struct screen *display, struct gui_synclist *list)
             )
             {
                 /* Display inverted-line-style */
-                list_text[screen].drawmode = STYLE_INVERT;
+                style = STYLE_INVERT;
             }
 #ifdef HAVE_LCD_COLOR
             else if (global_settings.cursor_style == 2)
             {
                 /* Display colour line selector */
-                list_text[screen].drawmode = STYLE_COLORBAR;
+                style = STYLE_COLORBAR;
             }
             else if (global_settings.cursor_style == 3)
             {
                 /* Display gradient line selector */
-                list_text[screen].drawmode = STYLE_GRADIENT;
+                style = STYLE_GRADIENT;
 
                 /* Make the lcd driver know how many lines the gradient should
                    cover and current line number */
                 /* number of selected lines */
-                list_text[screen].drawmode |= NUMLN_PACK(list->selected_size);
+                style |= NUMLN_PACK(list->selected_size);
                 /* current line number, zero based */
-                list_text[screen].drawmode |= CURLN_PACK(cur_line);
+                style |= CURLN_PACK(cur_line);
                 cur_line++;
             }
 #endif
@@ -240,22 +238,22 @@ void list_draw(struct screen *display, struct gui_synclist *list)
             {
                 /* don't scroll */
                 display->puts_style_offset(0, i-start, entry_name,
-                        list_text[screen].drawmode, item_offset);
+                        style, item_offset);
             }
             else
             {
                 display->puts_scroll_style_offset(0, i-start, entry_name,
-                        list_text[screen].drawmode, item_offset);
+                        style, item_offset);
             }
         }
         else
         {
             if (list->scroll_all)
                 display->puts_scroll_style_offset(0, i-start, entry_name,
-                        list_text[screen].drawmode, item_offset);
+                        style, item_offset);
             else
                 display->puts_style_offset(0, i-start, entry_name,
-                        list_text[screen].drawmode, item_offset);
+                        style, item_offset);
         }
         /* do the icon */
         if (list->callback_get_item_icon && global_settings.show_icons)
