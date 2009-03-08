@@ -41,7 +41,7 @@ class HttpGet : public QObject
         QHttp::Error error(void);
         QString errorString(void);
         void setFile(QFile*);
-        void setCache(QDir);
+        void setCache(const QDir&);
         void setCache(bool);
         int httpResponse(void);
         QByteArray readAll(void);
@@ -51,13 +51,13 @@ class HttpGet : public QObject
             { return m_serverTimestamp; }
         void setDumbCache(bool b) //< disable checking of http header timestamp for caching
             { m_dumbCache = b; }
-        static void setGlobalCache(const QDir d) //< set global cache path
+        static void setGlobalCache(const QDir& d) //< set global cache path
             { m_globalCache = d; }
-        static void setGlobalProxy(const QUrl p) //< set global proxy value
+        static void setGlobalProxy(const QUrl& p) //< set global proxy value
             { m_globalProxy = p; }
         static void setGlobalDumbCache(bool b) //< set "dumb" (ignore server status) caching mode
             { m_globalDumbCache = b; }
-        static void setGlobalUserAgent(QString u) //< set global user agent string
+        static void setGlobalUserAgent(const QString& u) //< set global user agent string
             { m_globalUserAgent = u; }
 
     public slots:

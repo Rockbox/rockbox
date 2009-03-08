@@ -64,7 +64,7 @@ HttpGet::HttpGet(QObject *parent)
 
 //! @brief set cache path
 //  @param d new directory to use as cache path
-void HttpGet::setCache(QDir d)
+void HttpGet::setCache(const QDir& d)
 {
     m_cachedir = d;
     bool result;
