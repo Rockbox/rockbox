@@ -91,6 +91,42 @@ static int clamp_value_wrap(int value, int max, int min)
 }
 #endif
 
+int handle_usb_events(struct event_queue *q)
+{
+    struct queue_event ev;
+    int next_update=0;
+
+    /* Don't return until we get SYS_USB_DISCONNECTED or SYS_TIMEOUT */
+    while(1)
+    {
+        queue_wait_w_tmo(q, &ev, HZ/4);
+        switch(ev.id)
+        {
+            case SYS_USB_DISCONNECTED:
+                usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
+                return 0;
+            case SYS_TIMEOUT:
+                break;
+        }
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+        if((button_status() & ~USBPOWER_BTN_IGNORE) == USBPOWER_BUTTON)
+        {
+            usb_storage_try_release_storage();
+        }
+#endif
+        if(TIME_AFTER(current_tick,next_update))
+        {
+            if(usb_inserted()) {
+#if (CONFIG_STORAGE & STORAGE_MMC) /* USB-MMC bridge can report activity */
+                led(mmc_usb_active(HZ));
+#endif /* STORAGE_MMC */
+                gui_syncstatusbar_draw(&statusbars, false);
+            }
+            next_update=current_tick+HZ/2;
+        }
+    }
+}
+
 void usb_screen(void)
 {
 #ifdef USB_NONE
@@ -142,14 +178,7 @@ void usb_screen(void)
     while (button_get(true) & BUTTON_REL);
 #else
     usb_acknowledge(SYS_USB_CONNECTED_ACK);
-    while(usb_wait_for_disconnect_w_tmo(&button_queue, HZ)) {
-        if(usb_inserted()) {
-#if (CONFIG_STORAGE & STORAGE_MMC) /* USB-MMC bridge can report activity */
-            led(mmc_usb_active(HZ));
-#endif /* STORAGE_MMC */
-            gui_syncstatusbar_draw(&statusbars, false);
-        }
-    }
+    while(handle_usb_events(&button_queue));
 #endif /* SIMULATOR */
 #ifdef HAVE_LCD_CHARCELLS
     status_set_usb(false);

@@ -260,6 +260,7 @@ static void receive_block_data(void *data,int size);
 static void fill_inquiry(IF_MV_NONVOID(int lun));
 static void send_and_read_next(void);
 static bool ejected[NUM_VOLUMES];
+static bool locked[NUM_VOLUMES];
 
 static int usb_interface;
 static int ep_in, ep_out;
@@ -304,14 +305,14 @@ static bool check_disk_present(IF_MV_NONVOID(int volume))
 #endif
 }
 
-static void try_release_ata(void)
+void usb_storage_try_release_storage(void)
 {
     /* Check if there is a connected drive left. If not, 
        release excusive access */
     bool canrelease=true;
     int i;
     for(i=0;i<NUM_VOLUMES;i++) {
-        if(ejected[i]==false){
+        if(ejected[i]==false && locked[i]==true){
             canrelease=false;
             break;
         }
@@ -331,7 +332,9 @@ void usb_storage_notify_hotswap(int volume,bool inserted)
     }
     else {
         ejected[volume] = true;
-        try_release_ata();
+        /* If this happens while the device is locked, weird things may happen.
+           At least try to keep our state consistent */
+        locked[volume]=false;
     }
 }
 #endif
@@ -419,6 +422,14 @@ void usb_storage_init_connection(void)
 
     int i;
     for(i=0;i<NUM_VOLUMES;i++) {
+#ifdef TOSHIBA_GIGABEAT_S
+        /* As long as the Gigabeat S is a non-removable device, we need
+           to mark the device as locked to avoid usb_storage_try_release_ata()
+           to leave MSC mode while the device is in use */
+        locked[i] = true;
+#else
+        locked[i] = false;
+#endif
         ejected[i] = !check_disk_present(IF_MV(i));
         queue_broadcast(SYS_USB_LUN_LOCKED, (i<<16)+0);
     }
@@ -685,7 +696,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 #ifdef HAVE_HOTSWAP
     if(storage_removable(lun) && !storage_present(lun)) {
         ejected[lun] = true;
-        try_release_ata();
     }
 #endif
 
@@ -889,7 +899,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                     {
                         logf("scsi eject");
                         ejected[lun]=true;
-                        try_release_ata();
                     }
                 }
             }
@@ -900,10 +909,12 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             logf("scsi allow_medium_removal %d",lun);
             if((cbw->command_block[4] & 0x03) == 0) 
             {
+                locked[lun]=false;
                 queue_broadcast(SYS_USB_LUN_LOCKED, (lun<<16)+0);
             }
             else
             {
+                locked[lun]=true;
                 queue_broadcast(SYS_USB_LUN_LOCKED, (lun<<16)+1);
             }
             send_csw(UMS_STATUS_GOOD);
