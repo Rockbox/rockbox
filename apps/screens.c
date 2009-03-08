@@ -108,7 +108,8 @@ int handle_usb_events(struct event_queue *q)
             case SYS_TIMEOUT:
                 break;
         }
-#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB) \
+    && defined(HAVE_USB_POWER)
         if((button_status() & ~USBPOWER_BTN_IGNORE) == USBPOWER_BUTTON)
         {
             usb_storage_try_release_storage();
