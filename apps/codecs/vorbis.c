@@ -25,6 +25,11 @@
 
 CODEC_HEADER
 
+#if defined(CPU_ARM) || defined(CPU_COLDFIRE)
+#include <setjmp.h>
+jmp_buf rb_jump_buf;
+#endif
+
 /* Some standard functions and variables needed by Tremor */
 
 static size_t read_handler(void *ptr, size_t size, size_t nmemb, void *datasource)
@@ -107,7 +112,7 @@ enum codec_status codec_main(void)
     int error;
     long n;
     int current_section;
-    int previous_section = -1;
+    int previous_section;
     int eof;
     ogg_int64_t vf_offsets[2];
     ogg_int64_t vf_dataoffsets;
@@ -118,6 +123,15 @@ enum codec_status codec_main(void)
     /* Note: These are sane defaults for these values.  Perhaps
      * they should be set differently based on quality setting
      */
+
+#if defined(CPU_ARM) || defined(CPU_COLDFIRE)
+    if (setjmp(rb_jump_buf) != 0)
+    {
+        /* malloc failed; skip to next track */
+        error = CODEC_ERROR;
+        goto done;
+    }
+#endif
 
 /* We need to flush reserver memory every track load. */
 next_track:
@@ -181,6 +195,7 @@ next_track:
         ci->set_offset(ov_raw_tell(&vf));
     }
 
+    previous_section = -1;
     eof = 0;
     while (!eof) {
         ci->yield();
@@ -227,7 +242,6 @@ done:
         vf.serialnos = NULL;
         vf.pcmlengths = NULL;
         ov_clear(&vf);
-        previous_section = -1;
         goto next_track;
     }
         

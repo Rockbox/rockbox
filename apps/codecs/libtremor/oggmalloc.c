@@ -1,5 +1,10 @@
 #include "os_types.h"
 
+#if defined(CPU_ARM) || defined(CPU_COLDFIRE)
+#include <setjmp.h>
+extern jmp_buf rb_jump_buf;
+#endif
+
 static size_t tmp_ptr;
 
 void ogg_malloc_init(void)
@@ -16,7 +21,11 @@ void *ogg_malloc(size_t size)
     size = (size + 3) & ~3;
 
     if (mem_ptr + size > tmp_ptr)
+#if defined(CPU_ARM) || defined(CPU_COLDFIRE)
+        longjmp(rb_jump_buf, 1);
+#else
         return NULL;
+#endif
     
     x = &mallocbuf[mem_ptr];
     mem_ptr += size; /* Keep memory 32-bit aligned */

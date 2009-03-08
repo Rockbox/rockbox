@@ -5,9 +5,14 @@ codeclib.c
 mdct2.c
 #ifdef CPU_ARM
 mdct_arm.S
+setjmp_arm.S
 #if ARM_ARCH == 4
 udiv32_armv4.S
 #endif
+#endif
+
+#ifdef CPU_COLDFIRE
+setjmp_cf.S
 #endif
 
 #elif defined(SIMULATOR) && defined(__APPLE__)
