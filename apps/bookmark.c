@@ -1036,10 +1036,21 @@ static bool generate_bookmark_file_name(const char *in)
         strcpy(global_bookmark_file_name, "/root_dir.bmark");
     else
     {
+#ifdef HAVE_MULTIVOLUME
+        /* The "root" of an extra volume need special handling too. */
+        bool volume_root = (strip_volume(in, global_bookmark_file_name) && 
+            !strcmp("/", global_bookmark_file_name));
+#endif
+        
         strcpy(global_bookmark_file_name, in);
         if(global_bookmark_file_name[len-1] == '/')
             len--;
-        strcpy(&global_bookmark_file_name[len], ".bmark");
+#ifdef HAVE_MULTIVOLUME
+        if (volume_root)
+            strcpy(&global_bookmark_file_name[len], "/volume_dir.bmark");
+        else
+#endif
+            strcpy(&global_bookmark_file_name[len], ".bmark");
     }
 
     return true;
