@@ -641,6 +641,14 @@ garbled.}
 {
     \section{Charging}
     The \dap{} can be powered over USB without connecting to your computer by holding \ActionStdUsbCharge{} while plugging in. This allows you to continue using the \dap{} normally.
+    \opt{usbstack}
+    {
+        \nopt{gigabeats}
+        {
+            \section{USB disconnect}
+            As soon as the operating system of your computer marks the \dap{} as unused (e.g. after you eject or safely remove the device), you can switch the device to Charging mode by pressing \ActionStdUsbCharge{}. Pressing \ActionStdUsbCharge{} while the host operating is still actively communicating with the \dap{} has no effect.
+        }
+    }
 }
 
 \input{rockbox_interface/browsing_and_playing.tex}

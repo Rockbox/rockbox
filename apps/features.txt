@@ -191,3 +191,8 @@ serial_port
 #if defined(HAVE_SPEAKER)
 speaker
 #endif
+
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+usbstack
+#endif
+
