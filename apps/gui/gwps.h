@@ -58,7 +58,7 @@
 /* wps_data*/
 
 #ifdef HAVE_LCD_BITMAP
-struct gui_img{
+struct gui_img {
     struct bitmap bm;
     struct viewport* vp;    /* The viewport to display this image in */
     short int x;                  /* x-pos */
@@ -73,7 +73,9 @@ struct gui_img{
 struct progressbar {
     /* regular pb */
     short x;
-    /* Negative if y is line number based (-line_num-1), positive if set explicitely */
+    /* >=0: explicitly set in the tag -> y-coord within the viewport
+       <0 : not set in the tag -> negated 1-based line number within
+            the viewport. y-coord will be computed based on the font height */
     short y;
     short width;
     short height;
