@@ -32,10 +32,8 @@
 #include "menu.h"
 #include "misc.h"
 #include "exported_menus.h"
-#include "yesno.h"
 #include "keyboard.h"
 #include "talk.h"
-#include "splash.h"
 #include "version.h"
 #include "time.h"
 #include "viewport.h"
@@ -43,6 +41,8 @@
 #include "alarm_menu.h"
 #include "screens.h"
 #include "radio.h"
+#include "font.h"
+#include "system.h"
 
 static int timedate_set(void)
 {

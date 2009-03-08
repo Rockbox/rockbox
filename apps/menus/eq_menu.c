@@ -40,7 +40,6 @@
 #include "talk.h"
 #include "misc.h"
 #include "sound.h"
-#include "splash.h"
 #include "dsp.h"
 #include "tree.h"
 #include "talk.h"

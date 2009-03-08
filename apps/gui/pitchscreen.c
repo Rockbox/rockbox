@@ -33,6 +33,9 @@
 #include "screens.h"
 #include "statusbar.h"
 #include "viewport.h"
+#include "font.h"
+#include "system.h"
+#include "misc.h"
 #include "pitchscreen.h"
 
 #define PITCH_MODE_ABSOLUTE 1

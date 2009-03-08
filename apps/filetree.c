@@ -41,7 +41,6 @@
 #include "rolo.h"
 #include "sprintf.h"
 #include "splash.h"
-#include "yesno.h"
 #include "cuesheet.h"
 #include "filetree.h"
 #include "misc.h"

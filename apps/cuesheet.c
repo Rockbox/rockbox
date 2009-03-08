@@ -31,7 +31,6 @@
 #include "sprintf.h"
 #include "misc.h"
 #include "screens.h"
-#include "splash.h"
 #include "list.h"
 #include "action.h"
 #include "lang.h"

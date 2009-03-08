@@ -22,10 +22,6 @@
 
 #include "config.h"
 #include "lcd.h"
-#include "font.h"
-#include "kernel.h"
-#include "system.h"
-#include "misc.h"
 #include "screen_access.h"
 
 /* return the number of text lines in the vp viewport */

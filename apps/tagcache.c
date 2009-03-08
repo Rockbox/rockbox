@@ -80,7 +80,6 @@
 #include "tagcache.h"
 
 #ifndef __PCTOOL__
-#include "splash.h"
 #include "lang.h"
 #include "eeprom_settings.h"
 #endif

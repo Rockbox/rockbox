@@ -38,7 +38,7 @@
 #include "quickscreen.h"
 #include "talk.h"
 #include "list.h"
-#include "splash.h"
+#include "option_select.h"
 
 static struct viewport vps[NB_SCREENS][QUICKSCREEN_ITEM_COUNT];
 static struct viewport vp_icons[NB_SCREENS];

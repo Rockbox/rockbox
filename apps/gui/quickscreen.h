@@ -26,7 +26,6 @@
 #ifndef _GUI_QUICKSCREEN_H_
 #define _GUI_QUICKSCREEN_H_
 
-#include "option_select.h"
 #include "screen_access.h"
 
 enum QUICKSCREEN_ITEM {

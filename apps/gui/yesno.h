@@ -22,8 +22,6 @@
 #ifndef _GUI_YESNO_H_
 #define _GUI_YESNO_H_
 
-#include "screen_access.h"
-
 enum yesno_res
 {
     YESNO_YES,
