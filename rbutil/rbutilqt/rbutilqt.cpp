@@ -265,6 +265,7 @@ void RbUtilQt::about()
     QFile credits(":/docs/CREDITS");
     credits.open(QIODevice::ReadOnly);
     QTextStream r(&credits);
+    r.setCodec(QTextCodec::codecForName("UTF-8"));
     QString rline = r.readAll();
     about.browserCredits->insertPlainText(rline);
     about.browserCredits->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
