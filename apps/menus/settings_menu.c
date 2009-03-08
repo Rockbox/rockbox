@@ -44,6 +44,9 @@
 #include "screens.h"
 #endif
 #include "quickscreen.h"
+#ifdef HAVE_DIRCACHE
+#include "dircache.h"
+#endif
 
 /***********************************/
 /*    TAGCACHE MENU                */

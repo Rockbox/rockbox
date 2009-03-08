@@ -44,6 +44,7 @@
 #include "pcm_record.h"
 #endif
 #include "appevents.h"
+#include "timefuncs.h"
 
 /* FIXME: should be removed from icon.h to avoid redefinition,
    but still needed for compatibility with old system */

@@ -23,22 +23,11 @@
 #define __SETTINGS_H__
 
 #include <stdbool.h>
+#include <stddef.h>
 #include "inttypes.h"
 #include "config.h"
-#include "file.h"
-#include "dircache.h"
-#include "timefuncs.h"
-#include "tagcache.h"
-#ifndef __PCTOOL__
-#include "button.h"
-#endif
-
 #if CONFIG_CODEC == SWCODEC
 #include "audio.h"
-#endif
-
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-#include "backlight.h" /* for [MIN|MAX]_BRIGHTNESS_SETTING */
 #endif
 
 struct opt_items {

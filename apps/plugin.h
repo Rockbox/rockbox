@@ -92,6 +92,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "viewport.h"
 #include "ata_idle_notify.h"
 #include "settings_list.h"
+#include "timefuncs.h"
 
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
