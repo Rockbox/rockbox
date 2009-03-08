@@ -38,6 +38,7 @@
 #include "lang.h"
 #include "keyboard.h"
 #include "viewport.h"
+#include "file.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0
