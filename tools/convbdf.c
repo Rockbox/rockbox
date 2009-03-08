@@ -54,6 +54,9 @@ struct font {
     
     /* unused by runtime system, read in by convbdf */
     int     nchars;     /* number of different glyphs */
+    int     nchars_declared; /* number of glyphs as declared in the header */
+    int     ascent_declared; /* ascent as declared in the header */
+    int     descent_declared; /* descent as declared in the header */
     unsigned int* offrot;   /* offsets into rotated bitmap data */
     char*   name;       /* font name */
     char*   facename;   /* facename of font */
@@ -70,6 +73,13 @@ struct font {
 };
 /* END font.h*/
 
+/* Description of how the ascent/descent is allowed to grow */
+struct stretch {
+    int value;    /* The delta value (in pixels or percents) */
+    int percent;  /* Is the value in percents (true) or pixels (false)? */
+    int force;    /* MUST the value be set (true) or is it just a max (false) */
+};
+
 #define isprefix(buf,str)   (!strncmp(buf, str, strlen(str)))
 #define strequal(s1,s2)     (!strcmp(s1, s2))
 
@@ -78,14 +88,17 @@ struct font {
 
 /* Depending on the verbosity level some warnings are printed or not */
 int verbosity_level = 0;
+int trace = 0;
 
 /* Prints a warning of the specified verbosity level. It will only be
    really printed if the level is >= the level set in the settings */
 void print_warning(int level, const char *fmt, ...);
 void print_error(const char *fmt, ...);
 void print_info(const char *fmt, ...);
-#define VL_CLIP  1  /* Verbosity level for clip related warnings */
-#define VL_MIS  1   /* Verbosity level for other warnings */
+void print_trace(const char *fmt, ...);
+#define VL_CLIP_FONT  1  /* Verbosity level for clip related warnings at font level */
+#define VL_CLIP_CHAR  2  /* Verbosity level for clip related warnings at char level */
+#define VL_MISC  1  /* Verbosity level for other warnings */
 
 int gen_c = 0;
 int gen_h = 0;
@@ -96,6 +109,10 @@ int limit_char = 65535;
 int oflag = 0;
 char outfile[256];
 
+struct stretch stretch_ascent  = { 0, 0, 1 }; /* Don't allow ascent to grow by default */
+struct stretch stretch_descent = { 0, 0, 1 }; /* Don't allow descent to grow by default */
+
+
 void usage(void);
 void getopts(int *pac, char ***pav);
 int convbdf(char *path);
@@ -104,9 +121,20 @@ void free_font(struct font* pf);
 struct font* bdf_read_font(char *path);
 int bdf_read_header(FILE *fp, struct font* pf);
 int bdf_read_bitmaps(FILE *fp, struct font* pf);
+
+/*
+   Counts the glyphs and determines the max dimensions of glyphs
+   (fills the fields nchars, maxwidth, max_over_ascent, max_over_descent).
+   Returns 0 on failure or not-0 on success.
+*/
+int bdf_analyze_font(FILE *fp, struct font* pf);
+void bdf_correct_bbx(int *width, int *bbx); /* Corrects bbx and width if bbx<0 */
+
+/* Corrects the ascent and returns the new value (value to use) */
+int adjust_ascent(int ascent, int overflow, struct stretch *stretch);
+
 char * bdf_getline(FILE *fp, char *buf, int len);
 bitmap_t bdf_hexval(unsigned char *buf, int ndx1, int ndx2);
-void bitmap_buf_alloc(struct font* pf);
 
 int gen_c_source(struct font* pf, char *path);
 int gen_h_header(struct font* pf, char *path);
@@ -115,20 +143,53 @@ int gen_fnt_file(struct font* pf, char *path);
 void
 usage(void)
 {
-    char help[] = {
-    "Usage: convbdf [options] [input-files]\n"
-    "       convbdf [options] [-o output-file] [single-input-file]\n"
-    "Options:\n"
-    "    -c     Convert .bdf to .c source file\n"
-    "    -h     Convert .bdf to .h header file (to create sysfont.h)\n"
-    "    -f     Convert .bdf to .fnt font file\n"
-    "    -s N   Start output at character encodings >= N\n"
-    "    -l N   Limit output to character encodings <= N\n"
-    "    -n     Don't generate bitmaps as comments in .c file\n"
-    "    -v N   Verbosity level: 0=quite quiet, 1=more verbose, 2=even more, etc.\n"
+    /* We use string array because some C compilers issue warnings about too long strings */
+    char *help[] = {
+    "Usage: convbdf [options] [input-files]\n",
+    "       convbdf [options] [-o output-file] [single-input-file]\n",
+    "Options:\n",
+    "    -c     Convert .bdf to .c source file\n",
+    "    -h     Convert .bdf to .h header file (to create sysfont.h)\n",
+    "    -f     Convert .bdf to .fnt font file\n",
+    "    -s N   Start output at character encodings >= N\n",
+    "    -l N   Limit output to character encodings <= N\n",
+    "    -n     Don't generate bitmaps as comments in .c file\n",
+    "    -a N[%][!] Allow the ascent to grow N pixels/% to avoid glyph clipping\n",
+    "    -d N[%][!] Allow the descent to grow N pixels/% to avoid glyph clipping\n",
+    "    -v N   Verbosity level: 0=quite quiet, 1=more verbose, 2=even more, etc.\n",
+    "    -t     Print internal tracing messages\n",
+    NULL /* Must be the last element in the array */
     };
 
-    print_info("%s", help);
+    char **p = help;
+    while (*p != NULL)
+        print_info("%s", *(p++));
+}
+
+
+void parse_ascent_opt(char *val, struct stretch *opt) {
+    char buf[256];
+    char *p;
+    strcpy(buf, val);
+    
+    opt->force = 0;
+    opt->percent = 0;
+    p = buf + strlen(buf);
+    while (p > buf) {
+        p--;
+        if (*p == '%') {
+            opt->percent = 1;
+            *p = '\0';
+        }
+        else if (*p == '!') {
+            opt->force = 1;
+            *p = '\0';
+        }
+        else {
+            break;
+        }
+    }
+    opt->value = atoi(buf);
 }
 
 /* parse command line options*/
@@ -199,6 +260,30 @@ void getopts(int *pac, char ***pav)
                         start_char = atoi(av[0]);
                 }
                 break;
+            case 'a':           /* ascent growth */
+                if (*p) {
+                    parse_ascent_opt(p, &stretch_ascent);
+                    while (*p && *p != ' ')
+                        p++;
+                }
+                else {
+                    av++; ac--;
+                    if (ac > 0)
+                        parse_ascent_opt(av[0], &stretch_ascent);
+                }
+                break;
+            case 'd':           /* descent growth */
+                if (*p) {
+                    parse_ascent_opt(p, &stretch_descent);
+                    while (*p && *p != ' ')
+                        p++;
+                }
+                else {
+                    av++; ac--;
+                    if (ac > 0)
+                        parse_ascent_opt(av[0], &stretch_descent);
+                }
+                break;
             case 'v':           /* verbosity */
                 if (*p) {
                     verbosity_level = atoi(p);
@@ -210,6 +295,9 @@ void getopts(int *pac, char ***pav)
                     if (ac > 0)
                         verbosity_level = atoi(av[0]);
                 }
+                break;
+            case 't':           /* tracing */
+                trace = 1;
                 break;
             default:
                 print_info("Unknown option ignored: %c\n", *(p-1));
@@ -225,6 +313,16 @@ void print_warning(int level, const char *fmt, ...) {
         va_list ap;
         va_start(ap, fmt);
         fprintf(stderr, " WARN: ");
+        vfprintf(stderr, fmt, ap);
+        va_end(ap);
+    }
+}
+
+void print_trace(const char *fmt, ...) {
+    if (trace) {
+        va_list ap;
+        va_start(ap, fmt);
+        fprintf(stderr, "TRACE: ");
         vfprintf(stderr, fmt, ap);
         va_end(ap);
     }
@@ -374,21 +472,64 @@ struct font* bdf_read_font(char *path)
         print_error("Error reading font header\n");
         goto errout;
     }
+    print_trace("Read font header, nchars_decl=%d\n", pf->nchars_declared);
 
-    pf->max_over_ascent = pf->max_over_descent = 0;
+    if (!bdf_analyze_font(fp, pf)) {
+        print_error("Error analyzing the font\n");
+        goto errout;
+    }
+    print_trace("Analyzed font, nchars=%d, maxwidth=%d, asc_over=%d, desc_over=%d\n",
+            pf->nchars, pf->maxwidth, pf->max_over_ascent, pf->max_over_descent);
+    
+    if (pf->nchars != pf->nchars_declared) {
+        print_warning(VL_MISC, "The declared number of chars (%d) "
+                "does not match the real number (%d)\n",
+                pf->nchars_declared, pf->nchars);
+    }
+    
+    /* Correct ascent/descent if necessary */
+    pf->ascent = adjust_ascent(pf->ascent_declared, pf->max_over_ascent, &stretch_ascent);
+    if (pf->ascent != pf->ascent_declared) {
+        print_info("Font ascent has been changed from %d to %d\n",
+                pf->ascent_declared, pf->ascent);
+    }
+    pf->descent = adjust_ascent(pf->descent, pf->max_over_descent, &stretch_descent);
+    if (pf->descent != pf->descent_declared) {
+        print_info("Font descent has been changed from %d to %d\n",
+                pf->descent_declared, pf->descent);
+    }
+    pf->height = pf->ascent + pf->descent;
+    if (pf->height != pf->ascent_declared + pf->descent_declared) {
+        print_warning(VL_CLIP_FONT, "Generated font's height: %d\n", pf->height);
+    }
+    
+    /* Alocate memory */
+    pf->bits_size = pf->size * BITMAP_WORDS(pf->maxwidth) * pf->height;
+    pf->bits = (bitmap_t *)malloc(pf->bits_size * sizeof(bitmap_t));
+    pf->offset = (int *)malloc(pf->size * sizeof(int));
+    pf->offrot = (unsigned int *)malloc(pf->size * sizeof(unsigned int));
+    pf->width = (unsigned char *)malloc(pf->size * sizeof(unsigned char));
+    
+    if (!pf->bits || !pf->offset || !pf->offrot || !pf->width) {
+        print_error("no memory for font load\n");
+        goto errout;
+    }
+
     pf->num_clipped_ascent = pf->num_clipped_descent = pf->num_clipped = 0;
+    pf->max_over_ascent = pf->max_over_descent = 0;
 
     if (!bdf_read_bitmaps(fp, pf)) {
         print_error("Error reading font bitmaps\n");
         goto errout;
     }
+    print_trace("Read bitmaps\n");
     
     if (pf->num_clipped > 0) {
-        print_warning(VL_CLIP, "%d character(s) out of %d were clipped "
+        print_warning(VL_CLIP_FONT, "%d character(s) out of %d were clipped "
                 "(%d at ascent, %d at descent)\n",
                 pf->num_clipped, pf->nchars,
                 pf->num_clipped_ascent, pf->num_clipped_descent);
-        print_warning(VL_CLIP, "max overflows: %d pixel(s) at ascent, %d pixel(s) at descent\n",
+        print_warning(VL_CLIP_FONT, "max overflows: %d pixel(s) at ascent, %d pixel(s) at descent\n",
                 pf->max_over_ascent, pf->max_over_descent);
     }
 
@@ -444,17 +585,19 @@ int bdf_read_header(FILE *fp, struct font* pf)
             }
         }
         if (isprefix(buf, "FONT_DESCENT ")) {
-            if (sscanf(buf, "FONT_DESCENT %d", &pf->descent) != 1) {
+            if (sscanf(buf, "FONT_DESCENT %d", &pf->descent_declared) != 1) {
                 print_error("bad 'FONT_DESCENT'\n");
                 return 0;
             }
+            pf->descent = pf->descent_declared; /* For now */
             continue;
         }
         if (isprefix(buf, "FONT_ASCENT ")) {
-            if (sscanf(buf, "FONT_ASCENT %d", &pf->ascent) != 1) {
+            if (sscanf(buf, "FONT_ASCENT %d", &pf->ascent_declared) != 1) {
                 print_error("bad 'FONT_ASCENT'\n");
                 return 0;
             }
+            pf->ascent = pf->ascent_declared; /* For now */
             continue;
         }
         if (isprefix(buf, "FONTBOUNDINGBOX ")) {
@@ -466,7 +609,7 @@ int bdf_read_header(FILE *fp, struct font* pf)
             continue;
         }
         if (isprefix(buf, "CHARS ")) {
-            if (sscanf(buf, "CHARS %d", &pf->nchars) != 1) {
+            if (sscanf(buf, "CHARS %d", &pf->nchars_declared) != 1) {
                 print_error("bad 'CHARS'\n");
                 return 0;
             }
@@ -515,20 +658,6 @@ int bdf_read_header(FILE *fp, struct font* pf)
     /* calc font size (offset/width entries) */
     pf->firstchar = firstchar;
     pf->size = lastchar - firstchar + 1;
-    
-    /* use the font boundingbox to get initial maxwidth */
-    /*maxwidth = pf->fbbw - pf->fbbx;*/
-    pf->maxwidth = pf->fbbw;
-    bitmap_buf_alloc(pf); /* Allocate bitmaps */
-
-    pf->offset = (int *)malloc(pf->size * sizeof(int));
-    pf->offrot = (unsigned int *)malloc(pf->size * sizeof(unsigned int));
-    pf->width = (unsigned char *)malloc(pf->size * sizeof(unsigned char));
-    
-    if (!pf->bits || !pf->offset || !pf->offrot || !pf->width) {
-        print_error("no memory for font load\n");
-        return 0;
-    }
 
     return 1;
 }
@@ -610,15 +739,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
             pf->offrot[encoding-pf->firstchar] = ofr;
 
             /* calc char width */
-            if (bbx < 0) {
-                /* Rockbox can't render overlapping glyphs */
-                width -= bbx;
-                bbx = 0;
-            }
-            if (width > pf->maxwidth) {
-                pf->maxwidth = width;
-                bitmap_buf_alloc(pf); /* Re-allocate bitmaps since the maxwidth has grown */
-            }
+            bdf_correct_bbx(&width, &bbx);
             pf->width[encoding-pf->firstchar] = width;
 
             ch_bitmap = pf->bits + ofs;
@@ -638,7 +759,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                     pf->max_over_ascent = overflow_asc;
                 }
                 bbh = MAX(bbh - overflow_asc, 0); /* Clipped -> decrease the height */
-                print_warning(VL_CLIP, "character %d goes %d pixel(s)"
+                print_warning(VL_CLIP_CHAR, "character %d goes %d pixel(s)"
                         " beyond the font's ascent, it will be clipped\n",
                         encoding, overflow_asc);
             }
@@ -650,7 +771,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                 }
                 bby += overflow_desc;
                 bbh = MAX(bbh - overflow_desc, 0); /* Clipped -> decrease the height */
-                print_warning(VL_CLIP, "character %d goes %d pixel(s)"
+                print_warning(VL_CLIP_CHAR, "character %d goes %d pixel(s)"
                         " beyond the font's descent, it will be clipped\n",
                         encoding, overflow_desc);
             }
@@ -796,17 +917,126 @@ char *bdf_getline(FILE *fp, char *buf, int len)
     }
     return buf;
 }
- 
-/*
-   Calculates the necessary size of the bit buffer to hold all the
-   bitmaps for the glyphs in the font. Shoud be called every time
-   the max width of the font grows. Font height, the max width and
-   the number of chars in the font must have been already set.
-*/
-void bitmap_buf_alloc(struct font* pf)
-{
-    pf->bits_size = pf->size * BITMAP_WORDS(pf->maxwidth) * pf->height;
-    pf->bits = (bitmap_t *)realloc(pf->bits, pf->bits_size * sizeof(bitmap_t));
+
+void bdf_correct_bbx(int *width, int *bbx) {
+    if (*bbx < 0) {
+        /* Rockbox can't render overlapping glyphs */
+        *width -= *bbx;
+        *bbx = 0;
+    }
+}
+
+int bdf_analyze_font(FILE *fp, struct font* pf) {
+    char buf[256];
+    int encoding;
+    int width, bbw, bbh, bbx, bby, overflow;
+    int read_enc = 0, read_width = 0, read_bbx = 0, read_endchar = 1;
+    int ignore_char = 0;
+
+    /* reset file pointer */
+    fseek(fp, 0L, SEEK_SET);
+    
+    pf->maxwidth = 0;
+    pf->nchars = 0;
+    pf->max_over_ascent = pf->max_over_descent = 0;
+
+    for (;;) {
+        
+        if (!bdf_getline(fp, buf, sizeof(buf))) {
+            print_error("EOF on file\n");
+            return 0;
+        }
+        if (isprefix(buf, "ENDFONT")) {
+            if (!read_endchar) {
+                print_error("No terminating ENDCHAR for character %d\n", encoding);
+                return 0;
+            }
+            break;
+        }
+        if (isprefix(buf, "STARTCHAR")) {
+            print_trace("Read STARTCHAR, nchars=%d, read_endchar=%d\n", pf->nchars, read_endchar);
+            if (!read_endchar) {
+                print_error("No terminating ENDCHAR for character %d\n", encoding);
+                return 0;
+            }
+            read_enc = read_width = read_bbx = read_endchar = 0;
+            continue;
+        }
+        if (isprefix(buf, "ENDCHAR")) {
+            if (!read_enc) {
+                print_error("ENCODING is not specified\n");
+                return 0;
+            }
+            ignore_char = (encoding < start_char || encoding > limit_char);
+            if (!ignore_char) {
+                if (!read_width || !read_bbx) {
+                    print_error("WIDTH or BBX is not specified for character %d\n",
+                            encoding);
+                }
+                bdf_correct_bbx(&width, &bbx);
+                if (width > pf->maxwidth) {
+                    pf->maxwidth = width;
+                }
+                overflow = bby + bbh - pf->ascent;
+                if (overflow > pf->max_over_ascent) {
+                    pf->max_over_ascent = overflow;
+                }
+                overflow = -bby - pf->descent;
+                if (overflow > pf->max_over_descent) {
+                    pf->max_over_descent = overflow;
+                }
+            }
+            pf->nchars++;
+            read_endchar = 1;
+            continue;
+        }
+        if (isprefix(buf, "ENCODING ")) {
+            if (sscanf(buf, "ENCODING %d", &encoding) != 1) {
+                print_error("bad 'ENCODING': '%s'\n", buf);
+                return 0;
+            }
+            read_enc = 1;
+            continue;
+        }
+        if (isprefix(buf, "DWIDTH ")) {
+            if (sscanf(buf, "DWIDTH %d", &width) != 1) {
+                print_error("bad 'DWIDTH': '%s'\n", buf);
+                return 0;
+            }
+            /* use font boundingbox width if DWIDTH <= 0 */
+            if (width < 0) {
+                print_error("Negative char width: %d\n", width);
+                return 0;
+            }
+            read_width = 1;
+        }
+        if (isprefix(buf, "BBX ")) {
+            if (sscanf(buf, "BBX %d %d %d %d", &bbw, &bbh, &bbx, &bby) != 4) {
+                print_error("bad 'BBX': '%s'\n", buf);
+                return 0;
+            }
+            read_bbx = 1;
+            continue;
+        }
+    }
+    return 1;
+}
+
+int adjust_ascent(int ascent, int overflow, struct stretch *stretch) {
+    int result;
+    int px = stretch->value;
+    if (stretch->percent) {
+        px = ascent * px / 100;
+    }
+    
+    if (stretch->force) {
+        result = ascent + px;
+    }
+    else {
+        result = ascent + MIN(overflow, px);
+    }
+    result = MAX(result, 0);
+    return result;
 }
 
 
