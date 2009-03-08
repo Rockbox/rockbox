@@ -155,8 +155,7 @@ void grey_hline(int x1, int x2, int y)
     int value = 0;
     unsigned char *dst;
     bool fillopt = false;
-    void (*pfunc)(unsigned char *address);
-    
+
     /* direction flip */
     if (x2 < x1)
     {
@@ -170,12 +169,7 @@ void grey_hline(int x1, int x2, int y)
         || (x1 >= _grey_info.width) || (x2 < 0))
         return;  
     
-    /* clipping */
-    if (x1 < 0)
-        x1 = 0;
-    if (x2 >= _grey_info.width)
-        x2 = _grey_info.width - 1;
-        
+    /* drawmode and optimisation */
     if (_grey_info.drawmode & DRMODE_INVERSEVID)
     {
         if (_grey_info.drawmode & DRMODE_BG)
@@ -192,17 +186,25 @@ void grey_hline(int x1, int x2, int y)
             value = _grey_info.fg_brightness;
         }
     }
-    pfunc = _grey_pixelfuncs[_grey_info.drawmode];
+    if (!fillopt && _grey_info.drawmode != DRMODE_COMPLEMENT)
+        return;
+
+    /* clipping */
+    if (x1 < 0)
+        x1 = 0;
+    if (x2 >= _grey_info.width)
+        x2 = _grey_info.width - 1;
+
     dst   = &_grey_info.buffer[_GREY_MULUQ(_grey_info.width, y) + x1];
 
     if (fillopt)
         rb->memset(dst, value, x2 - x1 + 1);
-    else
+    else  /* DRMODE_COMPLEMENT */
     {
         unsigned char *dst_end = dst + x2 - x1;
         do
-            pfunc(dst++);
-        while (dst <= dst_end);
+            *dst = ~(*dst);
+        while (++dst <= dst_end);
     }
 }
 
@@ -335,11 +337,30 @@ void grey_fillrect(int x, int y, int width, int height)
     int value = 0;
     unsigned char *dst, *dst_end;
     bool fillopt = false;
-    void (*pfunc)(unsigned char *address);
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= _grey_info.width)
         || (y >= _grey_info.height) || (x + width <= 0) || (y + height <= 0))
+        return;
+
+    /* drawmode and optimisation */
+    if (_grey_info.drawmode & DRMODE_INVERSEVID)
+    {
+        if (_grey_info.drawmode & DRMODE_BG)
+        {
+            fillopt = true;
+            value = _grey_info.bg_brightness;
+        }
+    }
+    else
+    {
+        if (_grey_info.drawmode & DRMODE_FG)
+        {
+            fillopt = true;
+            value = _grey_info.fg_brightness;
+        }
+    }
+    if (!fillopt && _grey_info.drawmode != DRMODE_COMPLEMENT)
         return;
 
     /* clipping */
@@ -358,23 +379,6 @@ void grey_fillrect(int x, int y, int width, int height)
     if (y + height > _grey_info.height)
         height = _grey_info.height - y;
     
-    if (_grey_info.drawmode & DRMODE_INVERSEVID)
-    {
-        if (_grey_info.drawmode & DRMODE_BG)
-        {
-            fillopt = true;
-            value = _grey_info.bg_brightness;
-        }
-    }
-    else
-    {
-        if (_grey_info.drawmode & DRMODE_FG)
-        {
-            fillopt = true;
-            value = _grey_info.fg_brightness;
-        }
-    }
-    pfunc = _grey_pixelfuncs[_grey_info.drawmode];
     dst   = &_grey_info.buffer[_GREY_MULUQ(_grey_info.width, y) + x];
     dst_end = dst + _GREY_MULUQ(_grey_info.width, height);
 
@@ -382,14 +386,14 @@ void grey_fillrect(int x, int y, int width, int height)
     {
         if (fillopt)
             rb->memset(dst, value, width);
-        else
+        else  /* DRMODE_COMPLEMENT */
         {
             unsigned char *dst_row = dst;
             unsigned char *row_end = dst_row + width;
 
             do
-                pfunc(dst_row++);
-            while (dst_row < row_end);
+                *dst_row = ~(*dst_row);
+            while (++dst_row < row_end);
         }
         dst += _grey_info.width;
     }
@@ -411,8 +415,9 @@ void grey_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
 {
     const unsigned char *src_end;
     unsigned char *dst, *dst_end;
-    void (*fgfunc)(unsigned char *address);
-    void (*bgfunc)(unsigned char *address);
+    unsigned dmask = 0x100; /* bit 8 == sentinel */
+    int drmode = _grey_info.drawmode;
+    int dwidth;
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= _grey_info.width)
@@ -440,37 +445,84 @@ void grey_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
     src    += _GREY_MULUQ(stride, src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
     src_end = src + width;
+    dwidth  = _grey_info.width;
+    dst     = &_grey_info.buffer[_GREY_MULUQ(dwidth, y) + x];
 
-    fgfunc = _grey_pixelfuncs[_grey_info.drawmode];
-    bgfunc = _grey_pixelfuncs[_grey_info.drawmode ^ DRMODE_INVERSEVID];
-    dst    = &_grey_info.buffer[_GREY_MULUQ(_grey_info.width, y) + x];
+    if (drmode & DRMODE_INVERSEVID)
+    {
+        dmask = 0x1ff;          /* bit 8 == sentinel */
+        drmode &= DRMODE_SOLID; /* mask out inversevid */
+    }
 
     do
     {
         const unsigned char *src_col = src++;
         unsigned char *dst_col = dst++;
-        unsigned data = *src_col >> src_y;
-        int numbits = 8 - src_y;
+        unsigned data = (*src_col ^ dmask) >> src_y;
+        int fg, bg;
+
+        dst_end = dst_col + _GREY_MULUQ(dwidth, height);
         
-        dst_end = dst_col + _GREY_MULUQ(_grey_info.width, height);
-        do
+#define UPDATE_SRC  do {                  \
+            data >>= 1;                   \
+            if (data == 0x001) {          \
+                src_col += stride;        \
+                data = *src_col ^ dmask;  \
+            }                             \
+        } while (0)
+
+        switch (drmode)
         {
-            if (data & 0x01)
-                fgfunc(dst_col);
-            else
-                bgfunc(dst_col);
-
-            dst_col += _grey_info.width;
-
-            data >>= 1;
-            if (--numbits == 0)
+          case DRMODE_COMPLEMENT:
+            do
             {
-                src_col += stride;
-                data = *src_col;
-                numbits = 8;
+                if (data & 0x01)
+                    *dst_col = ~(*dst_col);
+
+                dst_col += dwidth;
+                UPDATE_SRC;
             }
+            while (dst_col < dst_end);
+            break;
+
+          case DRMODE_BG:
+            bg = _grey_info.bg_brightness;
+            do
+            {
+                if (!(data & 0x01))
+                    *dst_col = bg;
+
+                dst_col += dwidth;
+                UPDATE_SRC;
+            }
+            while (dst_col < dst_end);
+            break;
+
+          case DRMODE_FG:
+            fg = _grey_info.fg_brightness;
+            do
+            {
+                if (data & 0x01)
+                    *dst_col = fg;
+
+                dst_col += dwidth;
+                UPDATE_SRC;
+            }
+            while (dst_col < dst_end);
+            break;
+
+          case DRMODE_SOLID:
+            fg = _grey_info.fg_brightness;
+            bg = _grey_info.bg_brightness;
+            do
+            {
+                *dst_col = (data & 0x01) ? fg : bg;
+                dst_col += dwidth;
+                UPDATE_SRC;
+            }
+            while (dst_col < dst_end);
+            break;
         }
-        while (dst_col < dst_end);
     }
     while (src < src_end);
 }
@@ -491,7 +543,7 @@ void grey_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
     if ((width <= 0) || (height <= 0) || (x >= _grey_info.width)
         || (y >= _grey_info.height) || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     /* clipping */
     if (x < 0)
     {
