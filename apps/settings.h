@@ -26,6 +26,7 @@
 #include <stddef.h>
 #include "inttypes.h"
 #include "config.h"
+#include "button.h"
 #if CONFIG_CODEC == SWCODEC
 #include "audio.h"
 #endif
@@ -655,6 +656,7 @@ struct user_settings
 #if CONFIG_CHARGING
     int backlight_timeout_plugged;
 #endif
+#ifdef HAVE_BACKLIGHT
 #ifdef HAS_BUTTON_HOLD
     int backlight_on_button_hold; /* what to do with backlight when hold
                                      switch is on */
@@ -662,6 +664,7 @@ struct user_settings
 #ifdef HAVE_LCD_SLEEP_SETTING
     int lcd_sleep_after_backlight_off; /* when to put lcd to sleep after backlight
                                           has turned off */
+#endif
 #endif
 #if defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
     int backlight_fade_in;  /* backlight fade in timing: 0..3 */
