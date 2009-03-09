@@ -24,6 +24,7 @@
 #include "kernel.h"
 #include "thread.h"
 #include "string.h"
+#include "file.h"
 
 #ifndef SIMULATOR
 long cpu_frequency SHAREDBSS_ATTR = CPU_FREQ;

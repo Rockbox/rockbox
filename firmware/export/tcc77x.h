@@ -258,4 +258,7 @@
 /* USB 2.0 device system MMR base address */
 #define USB_BASE 0x90000b00
 
+#define USB_NUM_ENDPOINTS 3
+#define USB_DEVBSS_ATTR   IBSS_ATTR
+
 #endif

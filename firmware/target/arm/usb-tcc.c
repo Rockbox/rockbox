@@ -122,7 +122,7 @@ void usb_drv_release_endpoint(int ep)
     int flags;
     ep = ep & 0x7f;
 
-    if (ep < 1 || ep > NUM_ENDPOINTS)
+    if (ep < 1 || ep > USB_NUM_ENDPOINTS)
         return ;
 
     flags = disable_irq_save();
@@ -744,6 +744,10 @@ void usb_enable(bool on)
         usb_core_exit();
 }
 
+void usb_attach(void)
+{
+   usb_enable(true);
+}
 
 int usb_detect(void)
 {
