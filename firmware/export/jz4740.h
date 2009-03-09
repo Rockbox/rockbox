@@ -5149,4 +5149,8 @@ struct Ration2m
 
 #endif /* _IPU_H_ */
 
+/* Rockbox USB defines */
+#define USB_NUM_ENDPOINTS  3
+#define USB_DEVBSS_ATTR    IBSS_ATTR
+
 #endif /* __JZ4740_H__ */

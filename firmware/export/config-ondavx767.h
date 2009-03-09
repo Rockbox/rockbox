@@ -164,10 +164,5 @@
 #define USE_ROCKBOX_USB
 #define USB_VENDOR_ID   0x07C4
 #define USB_PRODUCT_ID  0xA4A5
-#define USB_NUM_ENDPOINTS 3
-/* This needs to be 2048 byte aligned, but USB_QHARRAY_ATTR should take care
- * of that */
-#define USB_QHARRAY_ATTR   __attribute__((section(".qharray"),nocommon,aligned(4)))
-#define USB_DEVBSS_ATTR    IBSS_ATTR
 
 #endif
