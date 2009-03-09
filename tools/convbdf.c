@@ -662,6 +662,12 @@ int bdf_read_header(FILE *fp, struct font* pf)
     return 1;
 }
 
+/*
+ * TODO: rework the code to avoid logics duplication in
+ *       bdf_read_bitmaps and bdf_analyze_font
+ */
+
+
 /* read bdf font bitmaps, return 0 on error */
 int bdf_read_bitmaps(FILE *fp, struct font* pf)
 {
