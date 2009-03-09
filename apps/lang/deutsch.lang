@@ -1945,7 +1945,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "leise"
+    swcodec: "Leise"
   </voice>
 </phrase>
 <phrase>
@@ -1962,7 +1962,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "mittel"
+    swcodec: "Mittel"
   </voice>
 </phrase>
 <phrase>
@@ -1979,7 +1979,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "laut"
+    swcodec: "Laut"
   </voice>
 </phrase>
 <phrase>
@@ -2001,7 +2001,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: DEPRECATED 
+  desc: DEPRECATED
   user: core
   <source>
     *: ""
@@ -2015,7 +2015,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: DEPRECATED 
+  desc: DEPRECATED
   user: core
   <source>
     *: ""
@@ -2029,7 +2029,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: DEPRECATED 
+  desc: DEPRECATED
   user: core
   <source>
     *: ""
@@ -3068,10 +3068,10 @@
     *: "Show Icons"
   </source>
   <dest>
-    *: "Icons anzeigen"
+    *: "Symbole anzeigen"
   </dest>
   <voice>
-    *: "Sinnbilder anzeigen"
+    *: "Symbole anzeigen"
   </voice>
 </phrase>
 <phrase>
@@ -4113,11 +4113,11 @@
   </source>
   <dest>
     *: none
-    rtc: "12 Std. Uhr"
+    rtc: "12 Stunden"
   </dest>
   <voice>
     *: none
-    rtc: "12 Stunden Uhr"
+    rtc: "12 Stunden"
   </voice>
 </phrase>
 <phrase>
@@ -4130,11 +4130,11 @@
   </source>
   <dest>
     *: none
-    rtc: "24 Std. Uhr"
+    rtc: "24 Stunden"
   </dest>
   <voice>
     *: none
-    rtc:"24 Stunden Uhr"
+    rtc: "24 Stunden"
   </voice>
 </phrase>
 <phrase>
@@ -5167,7 +5167,7 @@
   </dest>
   <voice>
     *: none
-    radio:""
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -5677,7 +5677,7 @@
   </dest>
   <voice>
     *: none
-    radio:"Korea"
+    radio: "Korea"
   </voice>
 </phrase>
 <phrase>
@@ -12227,5 +12227,121 @@
   </dest>
   <voice>
     *: "als komplette Zahlen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest>
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Serielle Bitrate"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Serielle Bitrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest>
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "57600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Auto"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Automatisch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user: core
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Credits"
+  </dest>
+  <voice>
+    *: "Credits"
   </voice>
 </phrase>
