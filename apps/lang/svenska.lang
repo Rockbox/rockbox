@@ -11745,7 +11745,7 @@
 <phrase>
   id: LANG_SERIAL_BITRATE
   desc: in system settings menu
-  user:
+  user: core
   <source>
     *: none
     serial_port: "Serial Bitrate"
@@ -11762,7 +11762,7 @@
 <phrase>
   id: LANG_SERIAL_BITRATE_AUTO
   desc: in system settings menu
-  user:
+  user: core
   <source>
     *: none
     serial_port: "Auto"
@@ -11779,7 +11779,7 @@
 <phrase>
   id: LANG_SERIAL_BITRATE_9600
   desc: in system settings menu
-  user:
+  user: core
   <source>
     *: none
     serial_port: "9600"
@@ -11796,7 +11796,7 @@
 <phrase>
   id: LANG_SERIAL_BITRATE_19200
   desc: in system settings menu
-  user:
+  user: core
   <source>
     *: none
     serial_port: "19200"
@@ -11813,7 +11813,7 @@
 <phrase>
   id: LANG_SERIAL_BITRATE_38400
   desc: in system settings menu
-  user:
+  user: core
   <source>
     *: none
     serial_port: "38400"
@@ -11830,7 +11830,7 @@
 <phrase>
   id: LANG_SERIAL_BITRATE_57600
   desc: in system settings menu
-  user:
+  user: core
   <source>
     *: none
     serial_port: "57600"
