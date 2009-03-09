@@ -37,7 +37,7 @@
 //#define HAVE_HOTSWAP
 
 //#define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
-#define CONFIG_STORAGE STORAGE_RAMDISK /* Multivolume currently handled at firmware/target/ level */
+#define CONFIG_STORAGE STORAGE_SD /* Multivolume currently handled at firmware/target/ level */
 
 #define CONFIG_NAND NAND_CC
 
@@ -93,7 +93,7 @@
 #define DEFAULT_DIMNESS_SETTING         22
 
 /* Define this if you have a software controlled poweroff */
-//#define HAVE_SW_POWEROFF
+#define HAVE_SW_POWEROFF
 
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x100000
@@ -101,8 +101,11 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x100000
 
-/* Define this if you have the */
-//#define HAVE_INGENIC_CODEC
+/* Define this if you have the Jz4740 internal codec */
+#define HAVE_JZ4740_CODEC
+
+/* Define this if you have a speaker */
+//#define HAVE_SPEAKER
 
 #define CONFIG_I2C I2C_JZ47XX
 
@@ -123,7 +126,7 @@
 
 #ifndef SIMULATOR
 
-/* Define this if you have a Ingenic JZ4732 */
+/* Define this if you have a Ingenic JZ4740 */
 #define CONFIG_CPU JZ4732
 
 /* define this if the hardware can be powered off while charging */
@@ -150,6 +153,7 @@
 
 /* Define this if you have adjustable CPU frequency */
 /* #define HAVE_ADJUSTABLE_CPU_FREQ */
+#define CPUFREQ_NORMAL 336000000    /* CPU clock: 336 MHz */
 
 #define BOOTFILE_EXT "vx767"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
@@ -157,8 +161,9 @@
 
 #define CONFIG_USBOTG	USBOTG_JZ4740
 #define HAVE_USBSTACK
-#define USB_VENDOR_ID 0x07C4
-#define USB_PRODUCT_ID 0xA4A5
+#define USE_ROCKBOX_USB
+#define USB_VENDOR_ID   0x07C4
+#define USB_PRODUCT_ID  0xA4A5
 #define USB_NUM_ENDPOINTS 3
 /* This needs to be 2048 byte aligned, but USB_QHARRAY_ATTR should take care
  * of that */

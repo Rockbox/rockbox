@@ -150,7 +150,10 @@ bool __dbg_ports(void)
 
 bool __dbg_hw_info(void)
 {
-    int btn = 0, touch;
+    int btn = 0;
+#ifdef HAVE_TOUCHSCREEN
+    int touch;
+#endif
     struct tm *cur_time;
     
     lcd_setfont(FONT_SYSFIXED);
@@ -160,9 +163,13 @@ bool __dbg_hw_info(void)
         line = 0;
         display_clocks();
         display_enabled_clocks();
+#ifdef HAVE_TOUCHSCREEN
         btn = button_read_device(&touch);
-        cur_time = get_time();
         printf("X: %d Y: %d BTN: 0x%X", touch>>16, touch&0xFFFF, btn);
+#else
+        btn = button_read_device();
+#endif
+        cur_time = get_time();
         printf("%02d/%02d/%04d %02d:%02d:%02d", cur_time->tm_mday,
                cur_time->tm_mon, cur_time->tm_year, cur_time->tm_hour,
                cur_time->tm_min, cur_time->tm_sec);

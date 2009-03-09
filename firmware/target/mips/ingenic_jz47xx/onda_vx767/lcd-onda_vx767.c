@@ -23,7 +23,7 @@
 #include "jz4740.h"
 #include "lcd-target.h"
 
-#define PIN_CS_N     (32*1+17) /* Chip select */
+#define PIN_CS_N    (32*1+17) /* Chip select */
 #define PIN_RESET_N (32*1+18) /* Reset */
 #define PIN_UNK_N   (32*2+19)
 
@@ -207,4 +207,9 @@ void lcd_on(void)
 void lcd_off(void)
 {
     _display_off();
+}
+
+void lcd_set_contrast(int val)
+{
+    (void)val;
 }

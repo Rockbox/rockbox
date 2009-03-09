@@ -61,7 +61,7 @@
 #define HAVE_TAGCACHE
 
 /* define this if the target has volume keys which can be used in the lists */
-#define HAVE_VOLUME_IN_LIST
+//#define HAVE_VOLUME_IN_LIST
 
 /* LCD dimensions */
 #define CONFIG_LCD LCD_ONDAVX747
