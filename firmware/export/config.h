@@ -342,10 +342,8 @@
 #include "config-meizu-m6sp.h"
 #elif defined(MEIZU_M3)
 #include "config-meizu-m3.h"
-#elif defined(ONDA_VX747)
+#elif defined(ONDA_VX747) || defined(ONDA_VX747P)
 #include "config-ondavx747.h"
-#elif defined(ONDA_VX747P)
-#include "config-ondavx747p.h"
 #elif defined(ONDA_VX767)
 #include "config-ondavx767.h"
 #elif defined(SANSA_CLIP)

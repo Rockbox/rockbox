@@ -1697,7 +1697,9 @@ tCardInfo* card_get_info_target(int card_no)
 
 int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
 {
+#ifdef HAVE_MULTIVOLUME
     (void)drive;
+#endif
     struct mmc_request request;
     struct mmc_response_r1 r1;
     int retval; 
@@ -1741,7 +1743,9 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf
 
 int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf)
 {
+#ifdef HAVE_MULTIVOLUME
     (void)drive;
+#endif
     struct mmc_request request;
     struct mmc_response_r1 r1;
     int retval;
@@ -1802,7 +1806,9 @@ void sd_spindown(int seconds)
 #ifdef HAVE_HOTSWAP
 bool sd_removable(IF_MV_NONVOID(int drive))
 {
+#ifdef HAVE_MULTIVOLUME
     (void)drive;
+#endif
     //return true;
     return false;
 }
@@ -1810,14 +1816,18 @@ bool sd_removable(IF_MV_NONVOID(int drive))
 
 bool sd_present(IF_MV_NONVOID(int drive))
 {
+#ifdef HAVE_MULTIVOLUME
     (void)drive;
+#endif
     return (mmcinfo.block_num > 0 && card_detect_target());
 }
 
 #ifdef STORAGE_GET_INFO
 void sd_get_info(IF_MV2(int drive,) struct storage_info *info)
 {
+#ifdef HAVE_MULTIVOLUME
     (void)drive;
+#endif
     /* firmware version */
     info->revision="0.00";
 

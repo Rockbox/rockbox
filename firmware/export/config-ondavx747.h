@@ -20,18 +20,20 @@
  ****************************************************************************/
 
 /*
- * This config file is for the Onda VX747
+ * This config file is for the Onda VX747(+)
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
 #define CONFIG_SDRAM_START 0x80004000
 
-#define ONDA_VX747 1
-
+#ifdef ONDA_VX747P
+#define MODEL_NAME  "Onda VX747+"
+#define MODEL_NUMBER 44
+/* Define something for camera interface... */
+#else
 #define MODEL_NAME  "Onda VX747"
-
-/* For Rolo and boot loader */
 #define MODEL_NUMBER 45
+#endif
 
 //#define HAVE_ATA_SD
 //#define HAVE_HOTSWAP
@@ -41,7 +43,7 @@
 
 #define CONFIG_NAND NAND_CC
 
-#define HAVE_MULTIVOLUME
+//#define HAVE_MULTIVOLUME
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
@@ -164,7 +166,11 @@
 /* #define HAVE_ADJUSTABLE_CPU_FREQ */
 #define CPUFREQ_NORMAL 336000000    /* CPU clock: 336 MHz */
 
+#ifdef ONDA_VX747P
+#define BOOTFILE_EXT "vx747p"
+#else
 #define BOOTFILE_EXT "vx747"
+#endif
 #define BOOTFILE     "rockbox." BOOTFILE_EXT
 #define BOOTDIR      "/.rockbox"
 

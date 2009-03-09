@@ -345,7 +345,10 @@ static int jz_nand_read_page(unsigned long page_addr, unsigned char *dst)
     struct nand_param *nandp = &internal_param;
     int page_size, oob_size, page_per_block;
     int row_cycle, bus_width, ecc_count;
-    int i, j;
+    int i;
+#ifdef USE_ECC
+    int j;
+#endif
     unsigned char *data_buf;
     unsigned char oob_buf[nandp->oob_size];
     
@@ -629,6 +632,9 @@ static inline int read_sector(unsigned long start, unsigned int count,
 
 int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
 {
+#ifdef HAVE_MULTIVOLUME
+    (void)drive;
+#endif
     int ret = 0;
     unsigned int i, _count, chip_size = chip_info->page_size;
     unsigned long _start;
@@ -672,6 +678,10 @@ int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const 
     (void)start;
     (void)count;
     (void)buf;
+#ifdef HAVE_MULTIVOLUME
+    (void)drive;
+#endif
+
     return -1;
 }
 
@@ -712,7 +722,9 @@ void nand_enable(bool on)
 #ifdef STORAGE_GET_INFO
 void nand_get_info(IF_MV2(int drive,) struct storage_info *info)
 {
+#ifdef HAVE_MULTIVOLUME
     (void)drive;
+#endif
     
     /* firmware version */
     info->revision="0.00";
