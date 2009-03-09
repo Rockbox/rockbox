@@ -116,7 +116,7 @@ static void init_script_info(void)
         script_info.ap_2_bp_addr = ap_2_bp_ADDR_2;
         script_info.bp_2_ap_addr = bp_2_ap_ADDR_2;
         script_info.loopback_on_dsp_side_addr = -1;
-        script_info.mcu_2_app_addr = mcu_2_app_ADDR_2;
+        script_info.mcu_2_app_addr = mcu_2_app_patched_ADDR_2;
         script_info.mcu_2_shp_addr = mcu_2_shp_patched_ADDR_2;
         script_info.mcu_interrupt_only_addr = -1;
         script_info.shp_2_mcu_addr = shp_2_mcu_patched_ADDR_2;
@@ -161,8 +161,6 @@ static unsigned long get_script_pc(unsigned int peripheral_type,
         case SDMA_TRAN_INT_2_EMI:
             res = script_info.ap_2_ap_addr;
             break;
-        default:
-            break;
         }
         break;
 
@@ -181,8 +179,6 @@ static unsigned long get_script_pc(unsigned int peripheral_type,
             break;
         case SDMA_TRAN_EMI_2_DSP_LOOP:
             res = script_info.mcu_interrupt_only_addr;
-            break;
-        default:
             break;
         }
         break;
@@ -204,8 +200,6 @@ static unsigned long get_script_pc(unsigned int peripheral_type,
         case SDMA_TRAN_EMI_2_PER:
             res = script_info.mcu_2_firi_addr;
             break;
-        default:
-            break;
         }
         break;
 #endif
@@ -226,14 +220,12 @@ static unsigned long get_script_pc(unsigned int peripheral_type,
         case SDMA_TRAN_EMI_2_PER:
             res = script_info.mcu_2_app_addr;
             break;
-        default:
-            break;
         }
         break;
 #endif
 
 #if 0 /* Not using this */
-    case SDMA_PER_UART_SP:
+    case SDMA_PER_UART_SHP:
         switch (transfer_type)
         {
         case SDMA_TRAN_PER_2_INT:
@@ -248,8 +240,6 @@ static unsigned long get_script_pc(unsigned int peripheral_type,
         case SDMA_TRAN_EMI_2_PER:
             res = script_info.mcu_2_shp_addr;
             break;
-        default:
-            break;
         }
         break;
 #endif
@@ -262,8 +252,6 @@ static unsigned long get_script_pc(unsigned int peripheral_type,
             break;
         case SDMA_TRAN_EMI_2_PER:
             res = script_info.mcu_2_ata_addr;
-            break;
-        default:
             break;
         }
         break;
@@ -285,8 +273,6 @@ static unsigned long get_script_pc(unsigned int peripheral_type,
         case SDMA_TRAN_EMI_2_PER:
             res = script_info.mcu_2_app_addr;
             break;
-        default:
-            break;
         }
         break;
 
@@ -294,8 +280,8 @@ static unsigned long get_script_pc(unsigned int peripheral_type,
     case SDMA_PER_MMC:
     case SDMA_PER_SDHC:
 #endif
-    case SDMA_PER_SSI_SP:
-    case SDMA_PER_CSPI_SP:
+    case SDMA_PER_SSI_SHP:
+    case SDMA_PER_CSPI_SHP:
         switch (transfer_type)
         {
         case SDMA_TRAN_PER_2_INT:
@@ -310,9 +296,8 @@ static unsigned long get_script_pc(unsigned int peripheral_type,
         case SDMA_TRAN_EMI_2_PER:
             res = script_info.mcu_2_shp_addr;
             break;
-        default:
-            break;
         }
+        break;
 
     case SDMA_PER_MSHC:
         switch (transfer_type)
@@ -323,9 +308,8 @@ static unsigned long get_script_pc(unsigned int peripheral_type,
         case SDMA_TRAN_EMI_2_PER:
             res = script_info.mcu_2_mshc_addr;
             break;
-        default:
-            break;
         }
+        break;
 
     case SDMA_PER_CCM:
         switch (transfer_type)
@@ -333,9 +317,8 @@ static unsigned long get_script_pc(unsigned int peripheral_type,
         case SDMA_TRAN_PER_2_EMI:
             res = script_info.dptc_dvfs_addr;
             break;
-        default:
-            break;
         }
+        break;
     }
 
     if (res == (unsigned short)-1)

@@ -30,8 +30,8 @@ void audio_set_output_source(int source)
     {
     default:
     case AUDIO_SRC_PLAYBACK:
-        /* Receive data from PORT1 (SSI1) */
-        AUDMUX_PDCR4 = AUDMUX_PDCR_RXDSEL_PORT1;
+        /* Receive data from PORT2 (SSI2) */
+        AUDMUX_PDCR4 = AUDMUX_PDCR_RXDSEL_PORT2;
         /* wmc_clear(WMC_COMPANDING_CTRL, WMC_LOOPBACK); */
         break;
 

@@ -28,22 +28,24 @@
  * script to execute. */
 enum SDMA_PERIPHERAL_TYPE
 {
+    /* SHP = "Shared peripheral" where peripheral is mapped into SDMA
+     * core memory via the SPBA */
     __SDMA_PER_FIRST = -1,
     SDMA_PER_MEMORY,
     SDMA_PER_DSP,
     SDMA_PER_FIRI,
     SDMA_PER_UART,
-    SDMA_PER_UART_SP, /* Shared */
+    SDMA_PER_UART_SHP,
     SDMA_PER_ATA,
     SDMA_PER_CSPI,
     SDMA_PER_EXT,
     SDMA_PER_SSI,
-    SDMA_PER_SSI_SP, /* Shared */
+    SDMA_PER_SSI_SHP,
     SDMA_PER_MMC,
     SDMA_PER_SDHC,
-    SDMA_PER_CSPI_SP, /* Shared */
+    SDMA_PER_CSPI_SHP,
     SDMA_PER_MSHC,
-    SDMA_PER_MSHC_SP, /* Shared */
+    SDMA_PER_MSHC_SHP,
     SDMA_PER_CCM,
     SDMA_PER_ASRC,
     SDMA_PER_ESAI,
