@@ -130,9 +130,12 @@ static int strnatcmp0(char const *a, char const *b, int fold_case)
 	  }
 
 	  if (!ca && !cb) {
-	       /* The strings compare the same.  Perhaps the caller
-                  will want to call strcmp to break the tie. */
-	       return 0;
+	       /* The strings compare the same.  Call str[case]cmp() to ensure
+                  consistent results. */
+               if(fold_case)
+                   return strcasecmp(a,b);
+               else
+                   return strcmp(a,b);
 	  }
 
 	  if (fold_case) {
