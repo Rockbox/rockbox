@@ -34,16 +34,8 @@
 static intptr_t button_data; /* data value from last message dequeued */
 
 #ifdef HAVE_TOUCHSCREEN
+#include "touchscreen.h"
 static int mouse_coords = 0;
-static enum touchscreen_mode touchscreen_mode = TOUCHSCREEN_POINT;
-void touchscreen_set_mode(enum touchscreen_mode mode)
-{
-    touchscreen_mode = mode;
-}
-enum touchscreen_mode touchscreen_get_mode(void)
-{
-    return touchscreen_mode;
-}
 #endif
 /* how long until repeat kicks in */
 #define REPEAT_START      6
@@ -124,7 +116,7 @@ void button_event(int key, bool pressed)
 #ifdef HAVE_TOUCHSCREEN
     case BUTTON_TOUCHSCREEN:
         data = mouse_coords;
-        switch (touchscreen_mode)
+        switch (touchscreen_get_mode())
         {
             case TOUCHSCREEN_POINT:
                 new_btn = BUTTON_TOUCHSCREEN;
@@ -172,8 +164,8 @@ void button_event(int key, bool pressed)
     case SDLK_F4:
         if(pressed)
         {
-            touchscreen_mode = (touchscreen_mode == TOUCHSCREEN_POINT ? TOUCHSCREEN_BUTTON : TOUCHSCREEN_POINT);
-            printf("Touchscreen mode: %s\n", touchscreen_mode == TOUCHSCREEN_POINT ? "TOUCHSCREEN_POINT" : "TOUCHSCREEN_BUTTON");
+            touchscreen_set_mode(touchscreen_get_mode() == TOUCHSCREEN_POINT ? TOUCHSCREEN_BUTTON : TOUCHSCREEN_POINT);
+            printf("Touchscreen mode: %s\n", touchscreen_get_mode() == TOUCHSCREEN_POINT ? "TOUCHSCREEN_POINT" : "TOUCHSCREEN_BUTTON");
         }
         break;
             
@@ -1090,6 +1082,19 @@ void button_event(int key, bool pressed)
         break;
     case SDLK_KP_PLUS:
         new_btn = BUTTON_VIEW;
+        break;
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+    case SDLK_ESCAPE:
+        new_btn = BUTTON_POWER;
+        break;
+    case SDLK_KP_PLUS:
+        new_btn = BUTTON_VOL_UP;
+        break;
+    case SDLK_KP_MINUS:
+        new_btn = BUTTON_VOL_DOWN;
+        break;
+    case SDLK_KP_ENTER:
+        new_btn = BUTTON_MENU;
         break;
 #else
 #error No keymap defined!

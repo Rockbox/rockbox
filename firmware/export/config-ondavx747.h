@@ -113,9 +113,6 @@
 /* Define this if you have the Jz4740 internal codec */
 #define HAVE_JZ4740_CODEC
 
-/* Define this if you have a speaker */
-#define HAVE_SPEAKER
-
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_48 | SAMPR_CAP_44 | SAMPR_CAP_32 | \
                          SAMPR_CAP_24 | SAMPR_CAP_22 | SAMPR_CAP_16 | \
@@ -138,6 +135,8 @@
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR
 
+#define CFG_EXTAL 12000000    /* EXT clock: 12 Mhz */
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Ingenic JZ4732 */
@@ -146,9 +145,11 @@
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING
 
+/* Define this if you have a speaker */
+#define HAVE_SPEAKER
+
 /* Define this to the CPU frequency */
 #define CPU_FREQ 336000000    /* CPU clock: 336 MHz */
-#define CFG_EXTAL 12000000    /* EXT clock: 12 Mhz */
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE

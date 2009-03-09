@@ -291,6 +291,12 @@
 #define UI_LCD_POSX                 42 /* x position of lcd */
 #define UI_LCD_POSY                 55 /* y position of lcd */
 
+#elif defined(ONDA_VX747)
+#define UI_TITLE                    "Onda VX747"
+#define UI_WIDTH                    340 /* width of GUI window */
+#define UI_HEIGHT                   601 /* height of GUI window */
+#define UI_LCD_POSX                 45  /* x position of lcd */
+#define UI_LCD_POSY                 90  /* y position of lcd */
 
 #else
 #error no UI defines
