@@ -71,36 +71,36 @@ static struct mutex battery_mtx;
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     /* TODO */
-    1400
+    1000
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     /* TODO */
-    1300
+    900
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
     /* TODO */
-    { 1300, 3680, 3740, 3760, 3780, 3810, 3870, 3930, 3970, 4070, 4160 },
+    { 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
     /* TODO */
-    3300, 3680, 3740, 3760, 3780, 3810, 3870, 3930, 3970, 4070, 4160
+    1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000
 };
 
 /* VBAT = (BDATA/4096) * 7.5V */
-#define BATTERY_SCALE_FACTOR 7500
+#define BATTERY_SCALE_FACTOR 1875
 
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    unsigned int dummy, timeout=1000;
+    unsigned int dummy, timeout=HZ/4;
     
     mutex_lock(&battery_mtx);
     
@@ -114,18 +114,18 @@ unsigned int battery_adc_voltage(void)
     while(bat_val == 0 && timeout--)
         sleep(0);
     
-    logf("%d %d", bat_val, (bat_val*BATTERY_SCALE_FACTOR)>>12);
+    logf("%d %d", bat_val, (bat_val*BATTERY_SCALE_FACTOR)>>10);
     
     mutex_unlock(&battery_mtx);
     
-    return (bat_val*BATTERY_SCALE_FACTOR)>>12;
+    return (bat_val*BATTERY_SCALE_FACTOR)>>10;
 }
 
 void button_init_device(void)
 {
     __cpm_start_sadc();
     REG_SADC_ENA = 0;
-    REG_SADC_STATE &= (~REG_SADC_STATE);
+    REG_SADC_STATE &= ~REG_SADC_STATE;
     REG_SADC_CTRL = 0x1F;
     
     REG_SADC_CFG = SADC_CFG_INIT;
@@ -134,8 +134,8 @@ void button_init_device(void)
     
     REG_SADC_SAMETIME = 10;
     REG_SADC_WAITTIME = 100;
-    REG_SADC_STATE &= (~REG_SADC_STATE);
-    REG_SADC_CTRL = (~(SADC_CTRL_PENDM | SADC_CTRL_PENUM | SADC_CTRL_TSRDYM | SADC_CTRL_PBATRDYM));
+    REG_SADC_STATE &= ~REG_SADC_STATE;
+    REG_SADC_CTRL = ~(SADC_CTRL_PENDM | SADC_CTRL_PENUM | SADC_CTRL_TSRDYM | SADC_CTRL_PBATRDYM);
     REG_SADC_ENA = SADC_ENA_TSEN;
     
 #ifdef ONDA_VX747
@@ -192,6 +192,9 @@ int button_read_device(int *data)
         if( UNLIKELY(!is_backlight_on(true)) )
             *data = 0;
     }
+    
+    if(ret & (BUTTON_VOL_DOWN|BUTTON_VOL_UP))
+        touchscreen_set_mode( touchscreen_get_mode() == TOUCHSCREEN_BUTTON ? TOUCHSCREEN_POINT : TOUCHSCREEN_BUTTON);
 
     return ret;
 }
@@ -205,7 +208,7 @@ void SADC(void)
     sadcstate = REG_SADC_STATE;
     state = REG_SADC_STATE & (~REG_SADC_CTRL);
     REG_SADC_STATE &= sadcstate;
-            
+    
     if(state & SADC_CTRL_PENDM)
     {
         /* Pen down IRQ */

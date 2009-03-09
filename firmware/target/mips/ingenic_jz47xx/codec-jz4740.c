@@ -40,11 +40,13 @@ const struct sound_settings_info audiohw_settings[] = {
 #endif
 };
 
+#if 0
 static unsigned short codec_volume;
 static unsigned short codec_base_gain;
 static unsigned short codec_mic_gain;
+static int HP_register_value;
+#endif
 static bool HP_on_off_flag; 
-static int HP_register_value; 
 
 static void i2s_codec_set_samplerate(unsigned short rate);
 
@@ -77,7 +79,7 @@ static void i2s_codec_init(void)
     i2s_codec_reset();
     
     //REG_ICDC_CDCCR2 = (ICDC_CDCCR2_AINVOL(ICDC_CDCCR2_AINVOL_DB(0)) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_48)
-    REG_ICDC_CDCCR2 = ( ICDC_CDCCR2_AINVOL(23) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_44)
+    REG_ICDC_CDCCR2 = ( ICDC_CDCCR2_AINVOL(14) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_44)
                       | ICDC_CDCCR2_HPVOL(ICDC_CDCCR2_HPVOL_6));
     
     REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_SUSPD | ICDC_CDCCR1_RST);
@@ -101,6 +103,7 @@ static void i2s_codec_init(void)
     HP_on_off_flag = 1; /* HP is on */
 }
 
+#if 0
 static void i2s_codec_set_mic(unsigned short v) /* 0 <= v <= 100 */
 {
     v &= 0xff;
@@ -201,6 +204,67 @@ static unsigned short i2s_codec_get_volume(void)
     return val;
 }
 
+static void HP_turn_on(void)
+{ 
+    //see 1.3.4.1
+    
+    REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_SUSPD | ICDC_CDCCR1_RST); //set suspend 0
+
+    mdelay(15);
+    REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_PDVR | ICDC_CDCCR1_VRCGL | ICDC_CDCCR1_VRCGH);
+    REG_ICDC_CDCCR1 |= (ICDC_CDCCR1_EDAC | ICDC_CDCCR1_HPCG);
+    
+    mdelay(600);
+    REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_PDVRA | ICDC_CDCCR1_HPCG | ICDC_CDCCR1_PDHPM | ICDC_CDCCR1_PDHP);
+    
+    mdelay(2);
+    HP_register_value = REG_ICDC_CDCCR1; 
+
+    //see 1.3.4.2
+    /*REG_ICDC_CDCCR1 &= 0xfffffffc;
+    mdelay(7);
+    REG_ICDC_CDCCR1 |= 0x00040400;
+    mdelay(15);
+    REG_ICDC_CDCCR1 &= 0xfffbfbff;
+    udelay(500);
+    REG_ICDC_CDCCR1 &= 0xffe5fcff;
+    REG_ICDC_CDCCR1 |= 0x01000000;
+    mdelay(400);
+    REG_ICDC_CDCCR1 &= 0xfffeffff;
+    mdelay(7);
+    HP_register_value = REG_ICDC_CDCCR1;*/
+
+    //see 1.3.4.3
+}
+
+
+static void HP_turn_off(void)
+{
+    //see 1.3.4.1
+    mdelay(2);
+    REG_ICDC_CDCCR1 = HP_register_value;
+    REG_ICDC_CDCCR1 |= 0x001b0300;
+    REG_ICDC_CDCCR1 &= 0xfeffffff;
+
+    mdelay(15);
+    REG_ICDC_CDCCR1 |= 0x00000002;//set suspend 1
+
+    //see 1.3.4.2
+    /*mdelay(4);
+    REG_ICDC_CDCCR1 = HP_register_value;
+    REG_ICDC_CDCCR1 |= 0x001b0300;
+    REG_ICDC_CDCCR1 &= 0xfeffffff;
+    mdelay(4);
+    REG_ICDC_CDCCR1 |= 0x00000400;
+    mdelay(15);
+    REG_ICDC_CDCCR1 &= 0xfffffdff;
+    mdelay(7);
+    REG_ICDC_CDCCR1 |= 0x00000002;*/
+    
+    //see 1.3.4.3
+}
+#endif
+
 static void i2s_codec_set_samplerate(unsigned short rate)
 {
     unsigned short speed = 0;
@@ -241,68 +305,6 @@ static void i2s_codec_set_samplerate(unsigned short rate)
 
     speed |= 0xfffff0ff;
     REG_ICDC_CDCCR2 &= speed;
-}
-
-static void HP_turn_on(void)
-{ 
-    //see 1.3.4.1
-    
-    REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_SUSPD | ICDC_CDCCR1_RST); //set suspend 0
-
-    mdelay(15);
-    REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_PDVR | ICDC_CDCCR1_VRCGL | ICDC_CDCCR1_VRCGH);
-    REG_ICDC_CDCCR1 |= (ICDC_CDCCR1_EDAC | ICDC_CDCCR1_HPCG);
-    
-    mdelay(600);
-    REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_PDVRA | ICDC_CDCCR1_HPCG | ICDC_CDCCR1_PDHPM | ICDC_CDCCR1_PDHP);
-    
-    mdelay(2);
-    HP_register_value = REG_ICDC_CDCCR1; 
-
-    //see 1.3.4.2
-    /*REG_ICDC_CDCCR1 &= 0xfffffffc;
-    mdelay(7);
-    REG_ICDC_CDCCR1 |= 0x00040400;
-    mdelay(15);
-    REG_ICDC_CDCCR1 &= 0xfffbfbff;
-    udelay(500);
-    REG_ICDC_CDCCR1 &= 0xffe5fcff;
-    REG_ICDC_CDCCR1 |= 0x01000000;
-    mdelay(400);
-    REG_ICDC_CDCCR1 &= 0xfffeffff;
-    mdelay(7);
-    HP_register_value = REG_ICDC_CDCCR1;*/
-
-    //see 1.3.4.3
-    
-}
-
-
-static void HP_turn_off(void)
-{
-    //see 1.3.4.1
-    mdelay(2);
-    REG_ICDC_CDCCR1 = HP_register_value;
-    REG_ICDC_CDCCR1 |= 0x001b0300;
-    REG_ICDC_CDCCR1 &= 0xfeffffff;
-
-    mdelay(15);
-    REG_ICDC_CDCCR1 |= 0x00000002;//set suspend 1
-
-    //see 1.3.4.2
-    /*mdelay(4);
-    REG_ICDC_CDCCR1 = HP_register_value;
-    REG_ICDC_CDCCR1 |= 0x001b0300;
-    REG_ICDC_CDCCR1 &= 0xfeffffff;
-    mdelay(4);
-    REG_ICDC_CDCCR1 |= 0x00000400;
-    mdelay(15);
-    REG_ICDC_CDCCR1 &= 0xfffffdff;
-    mdelay(7);
-    REG_ICDC_CDCCR1 |= 0x00000002;*/
-    
-    //see 1.3.4.3
-
 }
 
 void audiohw_mute(bool mute)

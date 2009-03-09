@@ -74,6 +74,7 @@ static int i2c_put_data(unsigned char data)
         return -1;
 }
 
+#if 0
 static int i2c_put_data_nack(unsigned char data)
 {
     unsigned int timeout = TIMEOUT*10;
@@ -86,6 +87,7 @@ static int i2c_put_data_nack(unsigned char data)
     
     return 0;
 }
+#endif
 
 static int i2c_get_data(unsigned char *data, int ack)
 {
@@ -111,13 +113,17 @@ static int i2c_get_data(unsigned char *data, int ack)
         return -1;
 }
 
+void i2c_setclk(unsigned int i2cclk)
+{
+    __i2c_set_clk(__cpm_get_i2sclk(), i2cclk);
+}
+
 /*
  * I2C interface
  */
 void i2c_open(void)
 {
-    /* TODO */
-    //__i2c_set_clk(jz_clocks.extalclk, 10000); /* default 10 KHz */
+    i2c_setclk(10000); /* default 10 KHz */
     __i2c_enable();
 }
 
@@ -125,12 +131,6 @@ void i2c_close(void)
 {
     udelay(300); /* wait for STOP goes over. */
     __i2c_disable();
-}
-
-void i2c_setclk(unsigned int i2cclk)
-{
-    /* TODO */
-    //__i2c_set_clk(jz_clocks.extalclk, i2cclk);
 }
 
 int i2c_read(int device, unsigned char *buf, int count)

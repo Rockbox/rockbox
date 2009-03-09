@@ -1197,7 +1197,7 @@
   #define AIC_I2SDIV_BITCLK_1418KHZ    (0x1A << AIC_I2SDIV_DIV_BIT) /* BIT_CLK of 1.418MHz */
   #define AIC_I2SDIV_BITCLK_1024KHZ    (0x24 << AIC_I2SDIV_DIV_BIT) /* BIT_CLK of 1.024MHz */
   #define AIC_I2SDIV_BITCLK_7089KHZ    (0x34 << AIC_I2SDIV_DIV_BIT) /* BIT_CLK of 708.92KHz */
-  #define AIC_I2SDIV_BITCLK_512KHZ    (0x48 << AIC_I2SDIV_DIV_BIT) /* BIT_CLK of 512.00KHz */
+  #define AIC_I2SDIV_BITCLK_512KHZ     (0x48 << AIC_I2SDIV_DIV_BIT) /* BIT_CLK of 512.00KHz */
 
 
 /*************************************************************************

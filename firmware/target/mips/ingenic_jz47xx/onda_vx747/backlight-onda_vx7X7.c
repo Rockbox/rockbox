@@ -27,12 +27,11 @@
 #define BACKLIGHT_GPIO  (32*3+31)
 #define BACKLIGHT_PWM   7
 
+/* TODO: use HW PWM */
 #define SW_PWM 1
-
 #if SW_PWM
 
 static bool backlight_on;
-
 static void set_backlight(int val)
 {
     (void)val;
@@ -48,20 +47,19 @@ bool _backlight_init(void)
     return true;
 }
 
-bool backlight_enabled(void)
-{
-    return backlight_on;
-}
-
 void _backlight_on(void)
 {
-    __gpio_set_pin(BACKLIGHT_GPIO);
+    if(!backlight_on)
+        __gpio_set_pin(BACKLIGHT_GPIO);
+    
     backlight_on = true;
 }
 
 void _backlight_off(void)
 {
-    __gpio_clear_pin(BACKLIGHT_GPIO);
+    if(backlight_on)
+        __gpio_clear_pin(BACKLIGHT_GPIO);
+    
     backlight_on = false;
 }
 
@@ -129,11 +127,6 @@ bool _backlight_init(void)
     set_backlight_on();
 
     return true;
-}
-
-bool backlight_enabled(void)
-{
-    return old_val > -1 ? true : false;
 }
 
 void _backlight_on(void)

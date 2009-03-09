@@ -25,10 +25,9 @@
 #include "lcd-target.h"
 #include "system.h"
 #include "kernel.h"
-#include "backlight-target.h"
 
 /*
-   Warning: code behaviour is unpredictable when threads get switched in IRQ mode!
+   Warning: code behaviour is unpredictable when switch_thread() gets called in IRQ mode!
    So don't update the LCD in an interrupt handler!
  */
 
@@ -42,6 +41,7 @@ void lcd_init_device(void)
     __cpm_start_lcd();
     lcd_init_controller();
     __cpm_stop_lcd();
+    
     lcd_is_on = true;
     mutex_init(&lcd_mtx);
     wakeup_init(&lcd_wkup);
@@ -71,7 +71,7 @@ bool lcd_enabled(void)
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
-x=0;y=0;width=LCD_WIDTH;height=LCD_HEIGHT;
+x=0;y=0;width=LCD_WIDTH;height=LCD_HEIGHT; /* HACK! */
     mutex_lock(&lcd_mtx);
     
     __cpm_start_lcd();
@@ -133,12 +133,13 @@ void DMA_CALLBACK(DMA_LCD_CHANNEL)(void)
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void)
 {
-    if (!lcd_is_on || !backlight_enabled())
+    if(!lcd_is_on)
         return;
     
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
 
+/* TODO: use IPU */
 void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
