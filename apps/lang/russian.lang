@@ -12094,6 +12094,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user: core
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Благодарности"
+  </dest>
+  <voice>
+    *: "Благодарности"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_RIGHT
   desc: DEPRECATED
   user: core
