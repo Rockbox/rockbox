@@ -2011,8 +2011,12 @@ static inline void draw_gradient(int y, int h)
     selected_track_pulse = (selected_track_pulse+1) % 10;
     int c2 = selected_track_pulse - 5;
     for (r=0; r<h; r++) {
+#ifdef HAVE_LCD_COLOR
         MYLCD(set_foreground)(G_PIX(c2+80-(c >> 9), c2+100-(c >> 9),
                                            c2+250-(c >> 8)));
+#else
+        MYLCD(set_foreground)(G_BRIGHT(c2+160-(c >> 8)));
+#endif
         MYLCD(hline)(0, LCD_WIDTH, r+y);
         if ( r > h/2 )
             c-=inc;
