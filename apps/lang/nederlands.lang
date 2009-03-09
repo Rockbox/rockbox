@@ -12305,3 +12305,45 @@
     speaker: "Luidspreker inschakelen"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Interpreteer nummers tijdens sorteren"
+  </dest>
+  <voice>
+    *: "Interpreteer nummers tijdens sorteren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "Als volledig getal"
+  </dest>
+  <voice>
+    *: "Als volledig getal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Als cijfers"
+  </dest>
+  <voice>
+    *: "Als cijfers"
+  </voice>
+</phrase>
