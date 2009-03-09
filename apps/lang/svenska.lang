@@ -1,4 +1,4 @@
-
+#             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 #   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
@@ -6967,7 +6967,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user: core
   <source>
     *: "Version"
@@ -8081,7 +8081,6 @@
   </dest>
   <voice>
     *: "Slut på spellistan"
-    player: "Listan slut"
   </voice>
 </phrase>
 <phrase>
@@ -8323,14 +8322,14 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Disken är full. Tryck AV för att fortsätta."
     h100,h120,h300: "Disken är full. Tryck STOPP för att fortsätta."
     m5,x5: "Disken är full. Tryck PÅ/AV för att fortsätta."
-    e200*,c200: "Disken är full. Tryck UPP för att fortsätta."
+    e200*,c200: "Disken är full. Tryck FÖREGÅENDE för att fortsätta."
   </dest>
   <voice>
     *: none
@@ -11744,6 +11743,108 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "Seriell hastighet"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "Seriell hastighet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "Auto"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "Automatisk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user:
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "57600"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_VERY_SLOW
   desc: in settings_menu
   user: core
@@ -12173,5 +12274,78 @@
   <voice>
     *: none
     quickscreen: "Sätt som nedre snabbmenyval"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user: core
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Medarbetare"
+  </dest>
+  <voice>
+    *: "Medarbetare"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Tolka siffror vid sortering"
+  </dest>
+  <voice>
+    *: "Tolka siffror vid sortering"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Som siffror"
+  </dest>
+  <voice>
+    *: "Som siffror"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "Som hela tal"
+  </dest>
+  <voice>
+    *: "Som hela tal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Aktivera högtalare"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Aktivera högtalare"
   </voice>
 </phrase>
