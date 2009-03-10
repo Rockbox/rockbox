@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2008 by Catalin Patulea
+ * Copyright (C) 2009 by Karl Kurbjun
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,6 +25,7 @@
 #include "registers.h"
 
 extern volatile struct ipc_message status;
+void waitforack(void);
 
 void debugf(const char *fmt, ...);
 

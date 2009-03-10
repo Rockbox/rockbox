@@ -133,14 +133,13 @@ static void dsp_load(const struct dsp_section *im)
 
 static signed short *the_rover = (signed short *)0x1900000;
 static unsigned int index_rover = 0;
-static signed short __attribute__((aligned (16))) pcm_buffer[PCM_SIZE / 2];
+#define ARM_BUFFER_SIZE (PCM_SIZE)
 
 void dsp_init(void)
 {
     unsigned long sdem_addr;
     int fd;
     int bytes;
-
 
     IO_INTC_IRQ0 = 1 << 11;
     IO_INTC_EINT0 |= 1 << 11;
@@ -151,47 +150,18 @@ void dsp_init(void)
     dsp_load(dsp_image);
     
     /* Initialize codec. */
-    sdem_addr = (unsigned long)pcm_buffer - CONFIG_SDRAM_START;
+    sdem_addr = (unsigned long)the_rover - CONFIG_SDRAM_START;
     DEBUGF("pcm_sdram at 0x%08lx, sdem_addr 0x%08lx",
-		(unsigned long)pcm_buffer, (unsigned long)sdem_addr);
+		(unsigned long)the_rover, (unsigned long)sdem_addr);
     DSP_(_sdem_addrl) = sdem_addr & 0xffff;
     DSP_(_sdem_addrh) = sdem_addr >> 16;
-	
+    DSP_(_sdem_dsp_size) = ARM_BUFFER_SIZE;
+
 	fd = open("/test.raw", O_RDONLY);
 	bytes = read(fd, the_rover, 4*1024*1024);
 	close(fd);
 	
 	DEBUGF("read %d rover bytes", bytes);
-	
-	#if 0
-	{
-    unsigned int i;
-    memset(pcm_buffer, 0x80, PCM_SIZE);
-    for (i = 0; i < 8192; i++) {
-		signed short val = 0;
-		/*if (i < PCM_SIZE/4/2) {
-			val = 128*(i%256);
-		} else {
-			val = 2*128*128-128*(i%256);
-		}*/
-		val = 128*(i%256);
-		pcm_buffer[2*i] = pcm_buffer[2*i+1] = val;
-    }
-    clean_dcache();
-
-
-    {
-    unsigned int i;
-    volatile signed short *pdata = &DSP_(_data);
-    DEBUGF("dsp__data at %08x", pdata);
-    for (i = 0; i < 4096; i++) {
-		pdata[2*i]=pdata[2*i+1]=(i&1)*32767;
-    }
-    for (i = 4096; i < 8192; i++) {
-		pdata[2*i]=pdata[2*i+1]=0;
-    }
-    }
-    #endif
 
 #ifdef IPC_SIZES
 	DEBUGF("dsp_message at 0x%08x", &dsp_message);
@@ -199,7 +169,7 @@ void dsp_init(void)
 		sizeof(struct ipc_message), (int)&((struct ipc_message*)0)->payload);
 #endif
 
-#ifdef INIT_MSG
+#if 0//def INIT_MSG
     /* Prepare init message. */
     
     /* DSP accesses MUST be done a word at a time. */
@@ -221,15 +191,12 @@ void dsp_init(void)
 
 void DSPHINT(void)
 {
+	unsigned long sdem_addr;
     unsigned int i;
     char buffer[80];
-     
-    unsigned short *pcm_topbottom;
 
-    
     IO_INTC_IRQ0 = 1 << 11;
     
-
     switch (dsp_message.msg) 
     {
     case MSG_DEBUGF:
@@ -245,61 +212,21 @@ void DSPHINT(void)
         DEBUGF("DSP: %s", buffer);
         break;
     case MSG_REFILL:
-        DEBUGF("DSP: DMA0 with topbottom=%u (fill at %04lx)",
-            dsp_message.payload.refill.topbottom,
-            (unsigned long)pcm_buffer +
-            dsp_message.payload.refill.topbottom);
-        pcm_topbottom = pcm_buffer + dsp_message.payload.refill.topbottom / 2;
-		
-		/*
-		i = 0;
-		while (i < PCM_SIZE/4) {
-			unsigned int j;
-			for (j = 0; j < level; j++) {
-				pcm_topbottom[i+j] = -32768;
-			}
-			for (j = level; j < 2*level; j++) {
-				pcm_topbottom[i+j] = 32767;
-			}
-			i += 2*level;
-		}
-		
-		level += 2;
-		if (level > 256) {
-			level = 2;
-		}*/
-		
-		memcpy(pcm_topbottom, the_rover + index_rover, PCM_SIZE/2);
-		index_rover += PCM_SIZE/4;
-		if (index_rover >= 2*1024*1024) {
+		sdem_addr = (unsigned long)the_rover + index_rover - CONFIG_SDRAM_START;
+			
+    	DSP_(_sdem_addrl) = sdem_addr & 0xffff;
+    	DSP_(_sdem_addrh) = sdem_addr >> 16;
+    	DSP_(_sdem_dsp_size) = ARM_BUFFER_SIZE;
+
+		index_rover += ARM_BUFFER_SIZE;
+		if (index_rover >= 4*1024*1024) 
+		{
 			index_rover = 0;
 		}
 		
-		/*
-		pcm_topbottom = &p_pcm_sdram[dsp_message.payload.refill.topbottom/2];
-		DEBUGF("DSP: tofill begins: %04x %04x %04x %04x",
-			pcm_topbottom[0],
-			pcm_topbottom[1],
-			pcm_topbottom[2],
-			pcm_topbottom[3]
-		);
-		pcm_topbottom_end = &p_pcm_sdram[(dsp_message.payload.refill.topbottom+PCM_SIZE/2)/2];
-		DEBUGF("DSP: tofill ends: %04x %04x %04x %04x",
-			pcm_topbottom_end[-4],
-			pcm_topbottom_end[-3],
-			pcm_topbottom_end[-2],
-			pcm_topbottom_end[-1]
-		);
-		*/
+    	DEBUGF("pcm_sdram at 0x%08lx, sdem_addr 0x%08lx",
+			(unsigned long)the_rover, (unsigned long)sdem_addr);
 		
-        /*
-        DEBUGF("DSP: DMA0: SD %04x:%04x -> DSP %04x:%04x, TRG %04x",
-			dsp_message.payload.refill._SDEM_ADDRH,
-			dsp_message.payload.refill._SDEM_ADDRL,
-			dsp_message.payload.refill._DSP_ADDRH,
-			dsp_message.payload.refill._DSP_ADDRL,
-			dsp_message.payload.refill._DMA_TRG);
-        */
         break;
     default:
         DEBUGF("DSP: unknown msg 0x%04x", dsp_message.msg);

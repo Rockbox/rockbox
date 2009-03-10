@@ -27,8 +27,8 @@
 #include <math.h>
 
 void main(void) {
-    register int i;
-    register signed short *p;
+//    register int i;
+//    register signed short *p;
 
     TCR = 1 << 4; /* Stop the timer. */
     IMR = 0xffff; /* Unmask all interrupts. */

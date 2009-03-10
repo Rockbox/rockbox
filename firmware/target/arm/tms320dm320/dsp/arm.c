@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2008 by Catalin Patulea
+ * Copyright (C) 2009 by Karl Kurbjun
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -32,13 +33,8 @@ interrupt void handle_int0(void) {
     acked = 1;
 }
 
-void debugf(const char *fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    status.msg = MSG_DEBUGF;
-    vsnprintf((char *)status.payload.debugf.buffer, sizeof(status), fmt, args);
-    va_end(args);
-
+void waitforack(void)
+{
     /* Wait until ARM has picked up data. */
     acked = 0;
     int_arm();
@@ -47,5 +43,16 @@ void debugf(const char *fmt, ...) {
         asm("        IDLE 1");
         asm("        NOP");
     }
+}
+
+void debugf(const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    status.msg = MSG_DEBUGF;
+    vsnprintf((char *)status.payload.debugf.buffer, sizeof(status), fmt, args);
+    va_end(args);
+
+	waitforack();
+
     acked = 2;
 }

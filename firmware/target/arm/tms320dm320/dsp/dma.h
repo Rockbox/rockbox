@@ -24,7 +24,6 @@
 
 #include "ipc.h"
 
-extern signed short data[PCM_SIZE / 2];
 void dma_init(void);
 
 #endif
