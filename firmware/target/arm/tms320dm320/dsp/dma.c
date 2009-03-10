@@ -75,7 +75,7 @@ void rebuffer(void)
 	{
 		sdem_level=0;
 		
-		/* ARM, decode into same half, in SDRAM. */
+		/* Get a new buffer (location and size) from ARM */
 		status.msg = MSG_REFILL;
 		int_arm();
 	}
