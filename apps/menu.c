@@ -283,7 +283,7 @@ static int talk_menu_item(int selected_item, void *data)
         return 0;
 }
 
-bool do_setting_from_menu(const struct menu_item_ex *temp,
+void do_setting_from_menu(const struct menu_item_ex *temp,
                           struct viewport parent[NB_SCREENS])
 {
     int setting_id, oldval;
@@ -333,15 +333,6 @@ bool do_setting_from_menu(const struct menu_item_ex *temp,
     
     option_screen((struct settings_list *)setting, parent,
                   setting->flags&F_TEMPVAR, title);
-    if (var_type == F_T_INT || var_type == F_T_UINT)
-    {
-        return oldval != *(int*)setting->setting;
-    }
-    else if (var_type == F_T_BOOL)
-    {
-        return oldval != *(bool*)setting->setting;
-    }
-    return false;
 }
 
 /* display a menu */
@@ -619,11 +610,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 case MT_SETTING:
                 case MT_SETTING_W_TEXT:
                 {
-                    if (do_setting_from_menu(temp, vps))
-                    {
-                        init_menu_lists(menu, &lists, selected, true,vps);
-                        redraw_lists = false; /* above does the redraw */
-                    }
+                    do_setting_from_menu(temp, vps);
                     break;
                 }
                 case MT_RETURN_ID:
