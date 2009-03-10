@@ -31,6 +31,8 @@
 #elif defined(CPU_ARM)
 #define FPM_ARM
 #define ASO_IMDCT
+#elif defined(CPU_MIPS)
+#define FPM_MIPS
 #else
 #define FPM_DEFAULT
 #endif
