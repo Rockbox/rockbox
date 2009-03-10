@@ -38,7 +38,7 @@
 /* 64 bit multiply */
 /* #include <sys/types.h> */
 
-#if BYTE_ORDER==LITTLE_ENDIAN
+#if ROCKBOX_LITTLE_ENDIAN == 1
 union magic {
   struct {
     int32_t lo;
@@ -46,7 +46,7 @@ union magic {
   } halves;
   int64_t whole;
 };
-#elif BYTE_ORDER==BIG_ENDIAN
+#elif ROCKBOX_BIG_ENDIAN == 1
 union magic {
   struct {
     int32_t hi;
