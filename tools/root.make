@@ -29,7 +29,7 @@ RBINFO = $(BUILDDIR)/rockbox-info.txt
 
 .PHONY: all clean tags zip tools manual bin build info langs
 
-ifeq (,$(filter clean veryclean tags voice voicetools manual manual-pdf manual-html manual-zhtml manual-txt manual-ztxt manual-zip help fontzip ,$(MAKECMDGOALS)))
+ifeq (,$(filter clean veryclean reconf tags voice voicetools manual manual-pdf manual-html manual-zhtml manual-txt manual-ztxt manual-zip help fontzip ,$(MAKECMDGOALS)))
 # none of the above
 DEPFILE = $(BUILDDIR)/make.dep
 
