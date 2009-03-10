@@ -1155,7 +1155,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user: core
   <source>
     *: "Version"
@@ -1164,7 +1164,7 @@
     *: "版本"
   </dest>
   <voice>
-    *: "Version"
+    *: "版本"
   </voice>
 </phrase>
 <phrase>
@@ -7411,6 +7411,8 @@
     ipod*: "PLAY/PAUSE to abort"
     x5,m5: "Long PLAY to abort"
     h10,h10_5gb,e200*,c200: "PREV to abort"
+    gigabeats: "BACK to abort"
+    gigabeatf: "POWER to abort"
   </source>
   <dest>
     *: "OFF: 離開"
@@ -7418,6 +7420,8 @@
     ipod*: "PLAY/PAUSE: 離開"
     x5,m5: "長按PLAY: 離開"
     h10,h10_5gb,e200*,c200: "PREV: 離開"
+    gigabeats: "BACK: 離開"
+    gigabeatf: "POWER: 離開"
   </dest>
   <voice>
     *: ""
@@ -11699,5 +11703,671 @@
   </dest>
   <voice>
     *: "跳轉長度"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest>
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_EDIT_MODE
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Edit mode: %s %s"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Edit mode: %s %s"
+  </dest>
+  <voice>
+    *: none
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "使用喇叭"
+  </dest>
+  <voice>
+    *: none
+    speaker: "使用喇叭"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_CUTOFF
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Cutoff"
+  </source>
+  <dest>
+    *: none
+    swcodec: "截止頻率"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "截止頻率"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "排順序時考慮數字"
+  </dest>
+  <voice>
+    *: "排順序時考慮數字"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest>
+    *: none
+    serial_port: "串行端口比特率"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "串行端口比特率"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Left Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "設為快屏左鍵"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "設為快屏左鍵"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_SETTING
+  desc: used in the settings context menu
+  user: core
+  <source>
+    *: "Reset Setting"
+  </source>
+  <dest>
+    *: "恢復默認值"
+  </dest>
+  <voice>
+    *: "恢復默認值"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM
+  desc: DEPRECATED
+  user: core
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_SLASH
+  desc: spoken only, for spelling
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "斜杠"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Bottom Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "設為快屏右鍵"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "設為快屏右鍵"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: DEPRECATED
+  user: core
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QS_ITEMS
+  desc: DEPRECATED
+  user: core
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING_AND_SHUTDOWN
+  desc: in record timesplit options
+  user: core
+  <source>
+    *: none
+    recording: "Stop Recording And Shutdown"
+  </source>
+  <dest>
+    *: none
+    recording: "停止錄音並關機"
+  </dest>
+  <voice>
+    *: none
+    recording: "停止錄音並關機"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_TIMESPLIT_REC
+  desc: Display of record timer interval setting, on the record screen
+  user: core
+  <source>
+    *: none
+    recording: "Split Time:"
+  </source>
+  <dest>
+    *: none
+    recording: "分割長度: "
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_MODE
+  desc: DEPRECATED
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Right Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "設為快屏右鍵"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "設為快屏右鍵"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_HOP_STEP
+  desc: DEPRECATED
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_SLOW
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Very slow"
+  </source>
+  <dest>
+    *: "非常慢"
+  </dest>
+  <voice>
+    *: "非常慢"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest>
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "57600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user: core
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "峰值:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN_RIGHT
+  desc: in the recording screen
+  user: core
+  <source>
+    *: none
+    recording: "Gain R"
+  </source>
+  <dest>
+    *: none
+    recording: "右聲道增益"
+  </dest>
+  <voice>
+    *: none
+    recording: "右聲道增益"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user: core
+  <source>
+    *: none
+    recording: "Filename:"
+  </source>
+  <dest>
+    *: none
+    recording: "文件名:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "以整個數字排"
+  </dest>
+  <voice>
+    *: "以整個數字排"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLOW
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "慢"
+  </dest>
+  <voice>
+    *: "慢"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user: core
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "特別鳴謝"
+  </dest>
+  <voice>
+    *: "特別鳴謝"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN_LEFT
+  desc: in the recording screen
+  user: core
+  <source>
+    *: none
+    recording: "Gain L"
+  </source>
+  <dest>
+    *: none
+    recording: "左聲道增益"
+  </dest>
+  <voice>
+    *: none
+    recording: "左聲道增益"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUICKSCREEN
+  desc: spoken only, Announces entering the "quick screen"
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "快捷顯示"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_FAST
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Very fast"
+  </source>
+  <dest>
+    *: "非常快"
+  </dest>
+  <voice>
+    *: "非常快"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user: core
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "搜索結果"
+  </dest>
+  <voice>
+    *: "搜索結果"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_STUDY_MODE
+  desc: DEPRECATED
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_PRESET
+  desc: automatic gain control in record settings and screen
+  user: core
+  <source>
+    *: none
+    agc: "AGC"
+  </source>
+  <dest>
+    *: none
+    agc: "自動增益控制"
+  </dest>
+  <voice>
+    *: none
+    agc: "自動增益控制"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "以單個數字排"
+  </dest>
+  <voice>
+    *: "以單個數字排"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MONO_MODE
+  desc: in the recording settings
+  user: core
+  <source>
+    *: none
+    recording_swcodec: "Mono mode"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "單聲道模式"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "單聲道模式"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_CLIPTIME
+  desc: in record settings
+  user: core
+  <source>
+    *: none
+    agc: "AGC clip time"
+  </source>
+  <dest>
+    *: none
+    agc: "自動增益控制削波時長"
+  </dest>
+  <voice>
+    *: none
+    agc: "自動增益控制削波時長"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: DEPRECATED
+  user: core
+  <source>
+    *: none
+    quickscreen: ""
+  </source>
+  <dest>
+    *: none
+    quickscreen: ""
+  </dest>
+  <voice>
+    *: none
+    quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_TRACK
+  desc: skip length setting entry 0
+  user: core
+  <source>
+    *: "Skip Track"
+  </source>
+  <dest>
+    *: "跳轉整軌"
+  </dest>
+  <voice>
+    *: "跳轉整軌"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OK
+  desc: spoken only, On exiting a context, specifically the quick screen
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "確認"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIGH
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    gigabeatf: "High"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "高"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "高"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest>
+    *: none
+    serial_port: "自動"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "自動"
   </voice>
 </phrase>
