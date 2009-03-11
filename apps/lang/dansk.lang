@@ -10700,7 +10700,6 @@
   </dest>
   <voice>
     *: "Slut på sætliste"
-    player: "Liste slut"
   </voice>
 </phrase>
 <phrase>
@@ -12323,5 +12322,64 @@
   <voice> 
     *: none
     serial_port: "Automatisk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Aktiver højttaler"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Aktiver højttaler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Sorteringsmetode for tal"
+  </dest>
+  <voice>
+    *: "Sorteringsmetode for tal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "Som hele tal"
+  </dest>
+  <voice>
+    *: "Som hele tal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Som individuelle cifre"
+  </dest>
+  <voice>
+    *: "Som individuelle cifre"
   </voice>
 </phrase>

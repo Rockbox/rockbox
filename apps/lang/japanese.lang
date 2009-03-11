@@ -6967,7 +6967,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user: core
   <source>
     *: "Version"
@@ -8081,7 +8081,6 @@
   </dest>
   <voice>
     *: "プレイリストの終端です"
-    player: "プレイリストの終端です"
   </voice>
 </phrase>
 <phrase>
@@ -8325,14 +8324,14 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "ディスクが一杯です．停止ボタンを押してください"
     h100,h120,h300: "ディスクが一杯です．停止ボタンを押してください"
     m5,x5: "ディスクが一杯です．電源ボタンを押してください"
-    e200*,c200: "ディスクが一杯です．上ボタンを押してください"
+    e200*,c200: "ディスクが一杯です．PREVボタンを押してください"
   </dest>
   <voice>
     *: none
@@ -11746,6 +11745,108 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "シリアル通信のビットレート"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "シリアル通信のビットレート"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "自動"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "自動"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest> 
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice> 
+    *: none
+    serial_port: "57600"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_VERY_SLOW
   desc: in settings_menu
   user: core
@@ -12175,5 +12276,78 @@
   <voice>
     *: none
     quickscreen: "下クイック画面の項目として設定"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user: core
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "クレジット"
+  </dest>
+  <voice>
+    *: "クレジット"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "ソート時の数字の比較"
+  </dest>
+  <voice>
+    *: "ソート時の数字の比較"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "全ての桁を比較"
+  </dest>
+  <voice>
+    *: "全ての桁を比較"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "数として比較"
+  </dest>
+  <voice>
+    *: "数として比較"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "スピーカの有効化"
+  </dest>
+  <voice>
+    *: none
+    speaker: "スピーカの有効化"
   </voice>
 </phrase>
