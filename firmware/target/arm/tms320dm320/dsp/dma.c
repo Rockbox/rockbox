@@ -54,6 +54,7 @@ unsigned short last_size;
 /* This tells us which half of the DSP buffer (data) is free */
 unsigned short dma0_unlocked;
 
+int waiting=0;
 /* rebuffer sets up the next SDRAM to SARAM transfer and tells the ARM when it
  * is done with a buffer.
  */
@@ -77,44 +78,48 @@ void rebuffer(void)
 		
 		/* Get a new buffer (location and size) from ARM */
 		status.msg = MSG_REFILL;
-		int_arm();
+		waiting=1;
+		startack();
 	}
-
-	/* Size is in bytes (but forced 32 bit transfers */
-	if( (dsp_level + (sdem_dsp_size - sdem_level) ) > DSP_BUFFER_SIZE)
+	
+	if(!waiting)
 	{
-		last_size = DSP_BUFFER_SIZE-dsp_level;
+		/* Size is in bytes (but forced 32 bit transfers */
+		if( (dsp_level + (sdem_dsp_size - sdem_level) ) > DSP_BUFFER_SIZE)
+		{
+			last_size = DSP_BUFFER_SIZE-dsp_level;
+		}
+		else
+		{
+			last_size = sdem_dsp_size-sdem_level;
+		}
+	
+		/* DSP addresses are 16 bit (word) */
+		DSP_ADDRL = (unsigned short)data + (dma0_unlocked >> 1) + (dsp_level>>1);
+		DSP_ADDRH = 0;
+	
+		/* SDRAM addresses are 8 bit (byte)
+		 * Warning: These addresses are forced to 32 bit alignment!
+		 */
+		sdem_addr = ((unsigned long)sdem_addrh << 16 | sdem_addrl) + sdem_level;
+		SDEM_ADDRL = sdem_addr & 0xffff;
+		SDEM_ADDRH = sdem_addr >> 16;
+	
+		/* Set the size of the SDRAM to SARAM transfer (demac transfer) */
+		DMA_SIZE = last_size;
+
+		DMA_CTRL = 0;
+
+		/* These are just debug signals that are not used/needed right now */
+		status.payload.refill._DMA_TRG = DMA_TRG;
+		status.payload.refill._SDEM_ADDRH = SDEM_ADDRH;
+		status.payload.refill._SDEM_ADDRL = SDEM_ADDRL;
+		status.payload.refill._DSP_ADDRH = DSP_ADDRH;
+		status.payload.refill._DSP_ADDRL = DSP_ADDRL;
+
+		/* Start the demac transfer */
+		DMA_TRG = 1;
 	}
-	else
-	{
-		last_size = sdem_dsp_size-sdem_level;
-	}
-	
-	/* DSP addresses are 16 bit (word) */
-	DSP_ADDRL = (unsigned short)data + (dma0_unlocked >> 1) + (dsp_level>>1);
-	DSP_ADDRH = 0;
-	
-	/* SDRAM addresses are 8 bit (byte)
-	 * Warning: These addresses are forced to 32 bit alignment!
-	 */
-	sdem_addr = ((unsigned long)sdem_addrh << 16 | sdem_addrl) + sdem_level;
-	SDEM_ADDRL = sdem_addr & 0xffff;
-	SDEM_ADDRH = sdem_addr >> 16;
-	
-	/* Set the size of the SDRAM to SARAM transfer (demac transfer) */
-	DMA_SIZE = last_size;
-
-	DMA_CTRL = 0;
-
-	/* These are just debug signals that are not used/needed right now */
-	status.payload.refill._DMA_TRG = DMA_TRG;
-	status.payload.refill._SDEM_ADDRH = SDEM_ADDRH;
-	status.payload.refill._SDEM_ADDRL = SDEM_ADDRL;
-	status.payload.refill._DSP_ADDRH = DSP_ADDRH;
-	status.payload.refill._DSP_ADDRL = DSP_ADDRL;
-
-	/* Start the demac transfer */
-	DMA_TRG = 1;
 }
 
 /* This interupt handler is for the SARAM (on DSP) to McBSP IIS DMA transfer.
@@ -147,7 +152,6 @@ interrupt void handle_dma0(void)
  *  buffer is not full.
  */
 interrupt void handle_dmac(void) {
-	unsigned long sdem_addr;
     IFR = 1 << 11;
     
    	dsp_level+=last_size;

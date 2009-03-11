@@ -27,18 +27,26 @@
 
 volatile struct ipc_message status;
 
+extern int waiting;
 volatile int acked;
 interrupt void handle_int0(void) {
     IFR = 1;
     acked = 1;
+    waiting = 0;
+    rebuffer();
 }
 
-void waitforack(void)
+void startack(void)
 {
-    /* Wait until ARM has picked up data. */
     acked = 0;
     int_arm();
-    while (!acked) {
+}
+
+void waitack(void)
+{
+    /* Wait until ARM has picked up data. */
+    while (!acked) 
+    {
         /* IDLE alone never seems to wake up :( */
         asm("        IDLE 1");
         asm("        NOP");
@@ -52,7 +60,8 @@ void debugf(const char *fmt, ...) {
     vsnprintf((char *)status.payload.debugf.buffer, sizeof(status), fmt, args);
     va_end(args);
 
-	waitforack();
+	startack();
+	waitack();
 
     acked = 2;
 }

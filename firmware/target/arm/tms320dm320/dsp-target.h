@@ -23,7 +23,20 @@
 /* DSP memory is mapped into ARM space via HPIB. */
 #define DSP_(addr) (*(volatile unsigned short *)(0x40000 + ((addr) << 1)))
 
-void dsp_init(void);
+/* A "DSP image" is an array of these, terminated by raw_data_size_half = 0. */
+struct dsp_section {
+    const unsigned short *raw_data;
+    unsigned short physical_addr;
+    unsigned short raw_data_size_half;
+};
+
+#define dsp_message (*(volatile struct ipc_message *)&DSP_(_status))
+
+/* Must define struct dsp_section before including the image. */
+#include "dsp/dsp-image.h"
+
 void dsp_wake(void);
+void dsp_load(const struct dsp_section *im);
+void dsp_reset(void);
 
 #endif

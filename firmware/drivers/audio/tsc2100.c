@@ -83,7 +83,7 @@ void audiohw_init(void)
 
 void audiohw_postinit(void)
 {
-    audiohw_mute(0);
+    audiohw_mute(false);
 }
 
 void audiohw_set_master_vol(int vol_l, int vol_r)
@@ -112,7 +112,6 @@ void audiohw_close(void)
 {
     /* mute headphones */
     audiohw_mute(true);
-
 }
 
 void audiohw_set_frequency(int fsel)

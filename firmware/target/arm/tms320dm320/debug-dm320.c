@@ -26,20 +26,55 @@
 #include <stdbool.h>
 #include "button.h"
 #include "lcd.h"
+#include "debug.h"
 #include "sprintf.h"
 #include "font.h"
+#include "pcm.h"
 #include "debug-target.h"
 #include "lcd-target.h"
 #include "dsp-target.h"
+#include "dsp/ipc.h"
 
 #ifndef CREATIVE_ZVx
 #include "tsc2100.h"
 #endif
 
+#define ARM_BUFFER_SIZE (PCM_SIZE)
+
+static signed short *the_rover = (signed short *)0x1900000;
+static unsigned int index_rover = 0;
+
+void pcmtest_get_more(unsigned char** start, size_t* size)
+{
+	unsigned long sdem_addr;
+	sdem_addr = (unsigned long)the_rover + index_rover;
+		
+	*start = (unsigned char*)(sdem_addr);
+	*size = ARM_BUFFER_SIZE;
+
+	index_rover += ARM_BUFFER_SIZE;
+	if (index_rover >= 4*1024*1024) 
+	{
+		index_rover = 0;
+	}
+	
+	DEBUGF("pcm_sdram at 0x%08lx, sdem_addr 0x%08lx",
+		(unsigned long)the_rover, (unsigned long)sdem_addr);
+}
+
 bool __dbg_ports(void)
 {
-	dsp_init();
-	dsp_wake();
+    int fd;
+    int bytes;
+
+	fd = open("/test.raw", O_RDONLY);
+	bytes = read(fd, the_rover, 4*1024*1024);
+	close(fd);
+	
+	DEBUGF("read %d rover bytes", bytes);
+
+	pcm_play_data(&pcmtest_get_more,(unsigned char*)the_rover, ARM_BUFFER_SIZE);
+
     return false;
 }
 

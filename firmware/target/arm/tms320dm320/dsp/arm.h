@@ -25,7 +25,9 @@
 #include "registers.h"
 
 extern volatile struct ipc_message status;
-void waitforack(void);
+
+void startack(void);
+void waitack(void);
 
 void debugf(const char *fmt, ...);
 

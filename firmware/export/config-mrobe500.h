@@ -123,8 +123,7 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x100000
 
-#define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
-                       SAMPR_CAP_11)
+#define HW_SAMPR_CAPS SAMPR_CAP_44
 
 #define BATTERY_CAPACITY_DEFAULT 1100 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 500        /* min. capacity selectable */
