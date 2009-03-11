@@ -12284,3 +12284,62 @@
     *: "Créditos"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Interpretar números quando ordenar"
+  </dest>
+  <voice>
+    *: "Interpretar números quando ordenar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Como dígitos"
+  </dest>
+  <voice>
+    *: "Como dígitos"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "Como números inteiros"
+  </dest>
+  <voice>
+    *: "Como números inteiros"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Habilitar Auto-Falante"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Habilitar Auto-Falante"
+  </voice>
+</phrase>
