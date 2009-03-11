@@ -19,13 +19,19 @@
  *
  ****************************************************************************/
 
-#ifndef BACKLIGHT_THREAD_FADING_H
-#define BACKLIGHT_THREAD_FADING_H
+#ifndef BACKLIGHT_SW_FADING_H
+#define BACKLIGHT_SW_FADING_H
 
-/* delay supposed to be MAX_BRIGHTNESS_SETTING*2 rounded to the next multiple
- * of 5, however not more than 40 */
-#define _FADE_DELAY (((MAX_BRIGHTNESS_SETTING*2+4)/5)*5)
-#define FADE_DELAY (HZ/(MIN(_FADE_DELAY, 40)))
+
+/* total fading time will be current brightness level * FADE_DELAY * 10ms */
+#if (MAX_BRIGHTNESS_SETTING >= 25)
+#define FADE_DELAY 2 /* =HZ/50 => 20ms */
+#elif (MAX_BRIGHTNESS_SETTING >= 16)
+#define FADE_DELAY 3 /* =HZ/33 => 30ms */
+#else
+#define FADE_DELAY 4 /* =HZ/25 => 40ms*/
+#endif
+
 
 void _backlight_fade_update_state(int brightness);
 bool _backlight_fade_step(int direction);
@@ -38,4 +44,4 @@ enum {
     FADING_DOWN,
 };
 
-#endif /* _BACKLIGHT_THREAD_FADING_ */
+#endif /* BACKLIGHT_SW_FADING_H */
