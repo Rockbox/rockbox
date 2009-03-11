@@ -131,7 +131,7 @@ void _logf(const char *format, ...)
     va_end(ap);
 
     len = strlen(buf);
-#ifdef HAVE_SERIAL
+#if defined(HAVE_SERIAL) && !defined(SIMULATOR)
     serial_tx(buf);
     serial_tx("\r\n");
 #endif
