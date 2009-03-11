@@ -88,6 +88,7 @@ $(DEPFILE) dep:
 bin: $(DEPFILE) $(TOOLS) $(BUILDDIR)/$(BINARY)
 rocks: $(DEPFILE) $(TOOLS) $(ROCKS)
 codecs: $(DEPFILE) $(TOOLS) $(CODECS)
+tools: $(TOOLS)
 
 -include $(DEPFILE)
 
