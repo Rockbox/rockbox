@@ -1225,7 +1225,8 @@ drivers/qt1106.c
 #endif /* SIMULATOR */
 #endif /* MEIZU_M3 */
 
-#if CONFIG_CPU==JZ4732 && !defined(SIMULATOR)
+#ifndef SIMULATOR
+#if CONFIG_CPU == JZ4732
 target/mips/ingenic_jz47xx/ata-nand-jz4740.c
 target/mips/ingenic_jz47xx/ata-sd-jz4740.c
 target/mips/ingenic_jz47xx/debug-jz4740.c
@@ -1237,21 +1238,23 @@ target/mips/ingenic_jz47xx/usb-jz4740.c
 #ifndef BOOTLOADER
 target/mips/ingenic_jz47xx/codec-jz4740.c
 target/mips/ingenic_jz47xx/pcm-jz4740.c
-#endif
+#endif /* BOOTLOADER */
 drivers/nand_id.c
-#endif
+#endif /* CONFIG_CPU == JZ4732 */
 
-#if (defined(ONDA_VX747) || defined(ONDA_VX747P)) && !defined(SIMULATOR)
+#if defined(ONDA_VX747) || defined(ONDA_VX747P)
 target/mips/ingenic_jz47xx/onda_vx747/backlight-onda_vx7X7.c
 target/mips/ingenic_jz47xx/onda_vx747/lcd-onda_vx747.c
-target/mips/ingenic_jz47xx/onda_vx747/sadc-onda_vx747.c
 target/mips/ingenic_jz47xx/onda_vx747/power-onda_vx747.c
+target/mips/ingenic_jz47xx/onda_vx747/sadc-onda_vx747.c
 target/mips/ingenic_jz47xx/onda_vx747/speaker-onda_vx747.c
-#endif
+#endif /* ONDA_VX747 || ONDA_VX747P */
 
-#if defined(ONDA_VX767) && !defined(SIMULATOR)
+#ifdef ONDA_VX767
 target/mips/ingenic_jz47xx/onda_vx747/backlight-onda_vx7X7.c
 target/mips/ingenic_jz47xx/onda_vx767/button-onda_vx767.c
 target/mips/ingenic_jz47xx/onda_vx767/lcd-onda_vx767.c
+target/mips/ingenic_jz47xx/onda_vx767/power-onda_vx767.c
 target/mips/ingenic_jz47xx/onda_vx767/sadc-onda_vx767.c
-#endif
+#endif /* ONDA_VX767 */
+#endif /* SIMULATOR */
