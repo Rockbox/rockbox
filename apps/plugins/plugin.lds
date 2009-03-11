@@ -84,9 +84,8 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define IRAMSIZE 0
 #elif CONFIG_CPU==DM320
 #define DRAMORIG 0x00900000 + STUBOFFSET
-#define IRAMORIG DRAMORIG
-#define IRAMSIZE 0x4000
 #define IRAM DRAM
+#define IRAMSIZE 0
 #elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
 #define DRAMORIG 0x20000000
 /*#define IRAMORIG 0x1000c000
@@ -153,7 +152,7 @@ SECTIONS
     {
         *(.text*)
 #if defined(IRAMSIZE) && IRAMSIZE == 0
-	*(.icode)
+		*(.icode)
 #endif
 #ifdef CPU_ARM
         *(.glue_7)
@@ -165,7 +164,7 @@ SECTIONS
     {
         *(.rodata*)
 #if defined(IRAMSIZE) && IRAMSIZE == 0
-	*(.irodata)
+		*(.irodata)
 #endif
         . = ALIGN(0x4);
     } > PLUGIN_RAM
@@ -174,7 +173,7 @@ SECTIONS
     {
         *(.data*)
 #if defined(IRAMSIZE) && IRAMSIZE == 0
-	*(.idata)
+		*(.idata)
 #endif
     } > PLUGIN_RAM
 
@@ -224,7 +223,7 @@ SECTIONS
     	plugin_bss_start = .;
         *(.bss*)
 #if defined(IRAMSIZE) && IRAMSIZE == 0
-	*(.ibss)
+		*(.ibss)
 #endif
         *(COMMON)
         . = ALIGN(0x4);
