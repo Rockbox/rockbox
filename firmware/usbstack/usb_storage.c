@@ -532,6 +532,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             }
             //logf("csw sent, now go back to idle");
             state = WAITING_FOR_COMMAND;
+#if 0
             if(cur_cmd.cur_cmd == SCSI_WRITE_10)
             {
                 queue_broadcast(SYS_USB_WRITE_DATA, (cur_cmd.lun<<16)+cur_cmd.orig_count);
@@ -540,6 +541,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             {
                 queue_broadcast(SYS_USB_READ_DATA, (cur_cmd.lun<<16)+cur_cmd.orig_count);
             }
+#endif
             usb_drv_recv(ep_out, tb.transfer_buffer, 1024);
             break;
         case SENDING_RESULT:
