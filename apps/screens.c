@@ -91,6 +91,7 @@ static int clamp_value_wrap(int value, int max, int min)
 }
 #endif
 
+#ifndef SIMULATOR
 static int handle_usb_events(struct event_queue *q)
 {
     struct queue_event ev;
@@ -127,6 +128,7 @@ static int handle_usb_events(struct event_queue *q)
         }
     }
 }
+#endif
 
 void usb_screen(void)
 {
