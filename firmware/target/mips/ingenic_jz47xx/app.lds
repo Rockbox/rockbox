@@ -37,6 +37,7 @@ SECTIONS
     .text :
     {
         loadaddress = .;
+        _loadaddress = .;
         *(.init.text);
         *(.text*);
     } > DRAM
