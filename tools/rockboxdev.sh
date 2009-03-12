@@ -122,8 +122,13 @@ echo "Install prefix: $prefix/[target] (set RBDEV_PREFIX to change dir)"
 echo "Build dir: $builddir (set RBDEV_BUILD to change dir)"
 
 ###########################################################################
-# Verify that we can write in the prefix dir, as otherwise we will hardly
-# be able to install there!
+# Verify that the prefix dir exists and that we can write to it,
+#  as otherwise we will hardly be able to install there!
+if test ! -d $prefix; then
+  echo "WARNING: The installation destination does not exist."
+  echo "Please create it and re-run this script"
+  exit
+fi
 if test ! -w $prefix; then
   echo "WARNING: This script is set to install in $prefix but has no write permissions for it"
   echo "Please fix this and re-run this script"
@@ -206,6 +211,41 @@ else
   pathadd="$bindir"
 fi
 
+if test -f "$dlwhere/binutils-$binutils.tar.bz2"; then
+  echo "binutils $binutils already downloaded"
+else
+  getfile binutils-$binutils.tar.bz2 $GNU_MIRROR/binutils
+fi
+
+if test -f "$dlwhere/gcc-core-$gccver.tar.bz2"; then
+  echo "gcc $gccver already downloaded"
+else
+  getfile gcc-core-$gccver.tar.bz2 $GNU_MIRROR/gcc/gcc-$gccver
+fi
+
+if test -n "$gccpatch"; then
+  if test -f "$dlwhere/$gccpatch"; then
+    echo "$gccpatch already downloaded"
+  else
+    getfile "$gccpatch" "$gccurl"
+  fi
+fi
+
+###########################################################################
+# If there's already a build dir, we don't overwrite or delete it
+if test -d $builddir; then
+  echo "You already have a $builddir directory!"
+  echo "Please remove it and re-run the script"
+  exit
+else
+  mkdir -p $builddir
+  cd $builddir
+fi
+
+###########################################################################
+# Create a summary file for each toolchain, containing info about the version
+# and a remainder to append the compiler path to PATH
+
 summary="summary-$1"
 
 echo "============================ Summary ============================" > $summary
@@ -231,37 +271,6 @@ echo ""
 echo "Example:"
 echo "$ GNU_MIRROR=http://mirrors.kernel.org/gnu ./rockboxdev.sh"
 echo ""
-
-if test -f "$dlwhere/binutils-$binutils.tar.bz2"; then
-  echo "binutils $binutils already downloaded"
-else
-  getfile binutils-$binutils.tar.bz2 $GNU_MIRROR/binutils
-fi
-
-if test -f "$dlwhere/gcc-core-$gccver.tar.bz2"; then
-  echo "gcc $gccver already downloaded"
-else
-  getfile gcc-core-$gccver.tar.bz2 $GNU_MIRROR/gcc/gcc-$gccver
-fi
-
-if test -n "$gccpatch"; then
-  if test -f "$dlwhere/$gccpatch"; then
-    echo "$gccpatch already downloaded"
-  else
-    getfile "$gccpatch" "$gccurl"
-  fi
-fi
-
-###########################################################################
-# If there's already a build dir, we don't overwrite it
-if test -d $builddir; then
-  echo "You already have a $builddir directory!"
-  echo "Please remove it and re-run the script"
-  exit
-else
-  mkdir -p $builddir
-  cd $builddir
-fi
 
 
 echo "ROCKBOXDEV: extracting binutils-$binutils in $builddir"
