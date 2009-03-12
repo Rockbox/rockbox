@@ -63,6 +63,7 @@
 #include "pitchscreen.h"
 #include "appevents.h"
 #include "viewport.h"
+#include "pcmbuf.h"
 
 /* currently only one wps_state is needed */
 struct wps_state wps_state;
@@ -115,6 +116,37 @@ static void next_track(void)
 
     audio_next();
 }
+
+static void play_hop(int direction)
+{
+    unsigned step = ((unsigned)global_settings.skip_length*1000);
+    unsigned long *elapsed = &(wps_state.id3->elapsed);
+
+    if (direction == 1 && wps_state.id3->length - *elapsed < step+1000) {
+#if CONFIG_CODEC == SWCODEC
+        if(global_settings.beep)
+            pcmbuf_beep(1000, 150, 1500*global_settings.beep);
+#endif
+        return;
+    } else if ((direction == -1 && *elapsed < step)) {
+        *elapsed = 0;
+    } else {
+        *elapsed += step * direction;
+    }
+    if((audio_status() & AUDIO_STATUS_PLAY) && !wps_state.paused) {
+#if (CONFIG_CODEC == SWCODEC)
+        audio_pre_ff_rewind();
+#else
+        audio_pause();
+#endif
+    }
+    audio_ff_rewind(*elapsed);
+#if (CONFIG_CODEC != SWCODEC)
+    if (!wps_state.paused)
+        audio_resume();
+#endif
+}
+
 static int fix_wps_bars(void)
 {
 #ifdef HAVE_LCD_BITMAP

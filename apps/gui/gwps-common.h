@@ -29,7 +29,6 @@ void fade(bool fade_in, bool updatewps);
 bool gui_wps_display(void);
 bool update_onvol_change(struct gui_wps * gwps);
 bool update(struct gui_wps *gwps);
-void play_hop(int direction);
 bool ffwd_rew(int button);
 void display_keylock_text(bool locked);
 
