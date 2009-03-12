@@ -60,6 +60,12 @@
 #define CMD_SLEEP                  0xE6
 #define CMD_SET_FEATURES           0xEF
 #define CMD_SECURITY_FREEZE_LOCK   0xF5
+#ifdef HAVE_ATA_DMA
+#define CMD_READ_DMA               0xC8
+#define CMD_READ_DMA_EXT           0x25
+#define CMD_WRITE_DMA              0xCA
+#define CMD_WRITE_DMA_EXT          0x35
+#endif
 
 /* Should all be < 0x100 (which are reserved for control messages) */
 #define Q_SLEEP    0
@@ -188,6 +194,10 @@ static struct sector_cache_entry sector_cache;
 static int phys_sector_mult = 1;
 #endif
 
+#ifdef HAVE_ATA_DMA
+static int dma_mode = 0;
+#endif
+
 static int ata_power_on(void);
 static int perform_soft_reset(void);
 static int set_multiple_mode(int sectors);
@@ -308,6 +318,9 @@ int ata_read_sectors(IF_MV2(int drive,)
     int count;
     void* buf;
     long spinup_start;
+#ifdef HAVE_ATA_DMA
+    bool usedma = false;
+#endif
 
 #ifndef MAX_PHYS_SECTOR_SIZE
 #ifdef HAVE_MULTIVOLUME
@@ -358,6 +371,12 @@ int ata_read_sectors(IF_MV2(int drive,)
         ret = 0;
         last_disk_activity = current_tick;
 
+#ifdef HAVE_ATA_DMA
+        /* If DMA is supported and parameters are ok for DMA, use it */
+        if (dma_mode && ata_dma_setup(inbuf, incount * SECTOR_SIZE, false))
+            usedma = true;
+#endif
+
 #ifdef HAVE_LBA48
         if (lba48)
         {
@@ -370,7 +389,11 @@ int ata_read_sectors(IF_MV2(int drive,)
             SET_REG(ATA_HCYL, 0); /* 47:40 */
             SET_REG(ATA_HCYL, (start >> 16) & 0xff); /* 23:16 */
             SET_REG(ATA_SELECT, SELECT_LBA | ata_device);
+#ifdef HAVE_ATA_DMA
+            SET_REG(ATA_COMMAND, usedma ? CMD_READ_DMA_EXT : CMD_READ_MULTIPLE_EXT);
+#else
             SET_REG(ATA_COMMAND, CMD_READ_MULTIPLE_EXT);
+#endif
         }
         else
 #endif
@@ -380,7 +403,11 @@ int ata_read_sectors(IF_MV2(int drive,)
             SET_REG(ATA_LCYL, (start >> 8) & 0xff);
             SET_REG(ATA_HCYL, (start >> 16) & 0xff);
             SET_REG(ATA_SELECT, ((start >> 24) & 0xf) | SELECT_LBA | ata_device);
+#ifdef HAVE_ATA_DMA
+            SET_REG(ATA_COMMAND, usedma ? CMD_READ_DMA : CMD_READ_MULTIPLE);
+#else
             SET_REG(ATA_COMMAND, CMD_READ_MULTIPLE);
+#endif
         }
 
         /* wait at least 400ns between writing command and reading status */
@@ -390,22 +417,13 @@ int ata_read_sectors(IF_MV2(int drive,)
         __asm__ volatile ("nop");
         __asm__ volatile ("nop");
 
-        while (count) {
-            int sectors;
-            int wordcount;
-            int status;
+#ifdef HAVE_ATA_DMA
+        if (usedma) {
+            if (!ata_dma_finish())
+                ret = -7;
 
-            if (!wait_for_start_of_transfer()) {
-                /* We have timed out waiting for RDY and/or DRQ, possibly
-                   because the hard drive is shaking and has problems reading
-                   the data. We have two options:
-                   1) Wait some more
-                   2) Perform a soft reset and try again.
-
-                   We choose alternative 2.
-                */
+            if (ret != 0) {
                 perform_soft_reset();
-                ret = -5;
                 goto retry;
             }
 
@@ -415,36 +433,67 @@ int ata_read_sectors(IF_MV2(int drive,)
                 sleeping = false;
                 poweroff = false;
             }
+        }
+        else
+#endif /* HAVE_ATA_DMA */
+        {
+            while (count) {
+                int sectors;
+                int wordcount;
+                int status;
 
-            /* read the status register exactly once per loop */
-            status = ATA_STATUS;
+                if (!wait_for_start_of_transfer()) {
+                    /* We have timed out waiting for RDY and/or DRQ, possibly
+                       because the hard drive is shaking and has problems
+                       reading the data. We have two options:
+                       1) Wait some more
+                       2) Perform a soft reset and try again.
 
-            if (count >= multisectors )
-                sectors = multisectors;
-            else
-                sectors = count;
+                       We choose alternative 2.
+                    */
+                    perform_soft_reset();
+                    ret = -5;
+                    goto retry;
+                }
 
-            wordcount = sectors * SECTOR_SIZE / 2;
+                if (spinup) {
+                    spinup_time = current_tick - spinup_start;
+                    spinup = false;
+                    sleeping = false;
+                    poweroff = false;
+                }
 
-            copy_read_sectors(buf, wordcount);
+                /* read the status register exactly once per loop */
+                status = ATA_STATUS;
 
-            /*
-              "Device errors encountered during READ MULTIPLE commands are
-              posted at the beginning of the block or partial block transfer,
-              but the DRQ bit is still set to one and the data transfer shall
-              take place, including transfer of corrupted data, if any."
-                -- ATA specification
-            */
-            if ( status & (STATUS_BSY | STATUS_ERR | STATUS_DF) ) {
-                perform_soft_reset();
-                ret = -6;
-                goto retry;
+                if (count >= multisectors )
+                    sectors = multisectors;
+                else
+                    sectors = count;
+
+                wordcount = sectors * SECTOR_SIZE / 2;
+
+                copy_read_sectors(buf, wordcount);
+
+                /*
+                  "Device errors encountered during READ MULTIPLE commands
+                  are posted at the beginning of the block or partial block
+                  transfer, but the DRQ bit is still set to one and the data
+                  transfer shall take place, including transfer of corrupted
+                  data, if any."
+                    -- ATA specification
+                */
+                if ( status & (STATUS_BSY | STATUS_ERR | STATUS_DF) ) {
+                    perform_soft_reset();
+                    ret = -6;
+                    goto retry;
+                }
+
+                buf += sectors * SECTOR_SIZE; /* Advance one chunk of sectors */
+                count -= sectors;
+
+                last_disk_activity = current_tick;
             }
-
-            buf += sectors * SECTOR_SIZE; /* Advance one chunk of sectors */
-            count -= sectors;
-
-            last_disk_activity = current_tick;
         }
 
         if(!ret && !wait_for_end_of_transfer()) {
@@ -515,6 +564,9 @@ int ata_write_sectors(IF_MV2(int drive,)
     int i;
     int ret = 0;
     long spinup_start;
+#ifdef HAVE_ATA_DMA
+    bool usedma = false;
+#endif
 
 #ifndef MAX_PHYS_SECTOR_SIZE
 #ifdef HAVE_MULTIVOLUME
@@ -554,6 +606,12 @@ int ata_write_sectors(IF_MV2(int drive,)
         goto error;
     }
 
+#ifdef HAVE_ATA_DMA
+        /* If DMA is supported and parameters are ok for DMA, use it */
+        if (dma_mode && ata_dma_setup((void *)buf, count * SECTOR_SIZE, true))
+            usedma = true;
+#endif
+        
 #ifdef HAVE_LBA48
     if (lba48)
     {
@@ -566,7 +624,11 @@ int ata_write_sectors(IF_MV2(int drive,)
         SET_REG(ATA_HCYL, 0); /* 47:40 */
         SET_REG(ATA_HCYL, (start >> 16) & 0xff); /* 23:16 */
         SET_REG(ATA_SELECT, SELECT_LBA | ata_device);
+#ifdef HAVE_ATA_DMA
+        SET_REG(ATA_COMMAND, usedma ? CMD_WRITE_DMA_EXT : CMD_WRITE_SECTORS_EXT);
+#else
         SET_REG(ATA_COMMAND, CMD_WRITE_SECTORS_EXT);
+#endif
     }
     else
 #endif
@@ -576,32 +638,51 @@ int ata_write_sectors(IF_MV2(int drive,)
         SET_REG(ATA_LCYL, (start >> 8) & 0xff);
         SET_REG(ATA_HCYL, (start >> 16) & 0xff);
         SET_REG(ATA_SELECT, ((start >> 24) & 0xf) | SELECT_LBA | ata_device);
+#ifdef HAVE_ATA_DMA
+        SET_REG(ATA_COMMAND, usedma ? CMD_WRITE_DMA : CMD_WRITE_SECTORS);
+#else
         SET_REG(ATA_COMMAND, CMD_WRITE_SECTORS);
+#endif
     }
 
-    for (i=0; i<count; i++) {
-
-        if (!wait_for_start_of_transfer()) {
-            ret = -3;
-            break;
-        }
-
-        if (spinup) {
+#ifdef HAVE_ATA_DMA
+    if (usedma) {
+        if (!ata_dma_finish())
+            ret = -7;
+        else if (spinup) {
             spinup_time = current_tick - spinup_start;
             spinup = false;
             sleeping = false;
             poweroff = false;
         }
+    }
+    else
+#endif /* HAVE_ATA_DMA */
+    {
+        for (i=0; i<count; i++) {
 
-        copy_write_sectors(buf, SECTOR_SIZE/2);
+            if (!wait_for_start_of_transfer()) {
+                ret = -3;
+                break;
+            }
+
+            if (spinup) {
+                spinup_time = current_tick - spinup_start;
+                spinup = false;
+                sleeping = false;
+                poweroff = false;
+            }
+
+            copy_write_sectors(buf, SECTOR_SIZE/2);
 
 #ifdef USE_INTERRUPT
-        /* reading the status register clears the interrupt */
-        j = ATA_STATUS;
+            /* reading the status register clears the interrupt */
+            j = ATA_STATUS;
 #endif
-        buf += SECTOR_SIZE;
+            buf += SECTOR_SIZE;
 
-        last_disk_activity = current_tick;
+            last_disk_activity = current_tick;
+        }
     }
 
     if(!ret && !wait_for_end_of_transfer()) {
@@ -1039,7 +1120,12 @@ static int perform_soft_reset(void)
     SET_REG(ATA_CONTROL, CONTROL_nIEN|CONTROL_SRST );
     sleep(1); /* >= 5us */
 
+#ifdef HAVE_ATA_DMA
+    /* DMA requires INTRQ be enabled */
+    SET_REG(ATA_CONTROL, 0);
+#else
     SET_REG(ATA_CONTROL, CONTROL_nIEN);
+#endif
     sleep(1); /* >2ms */
 
     /* This little sucker can take up to 30 seconds */
@@ -1179,6 +1265,22 @@ static int set_multiple_mode(int sectors)
     return 0;
 }
 
+#ifdef HAVE_ATA_DMA
+static int get_best_mode(unsigned short identword, int max, int modetype)
+{
+    unsigned short testbit = 1u << max;
+
+    while (1) {
+        if (identword & testbit)
+            return max | modetype;
+        testbit >>= 1;
+        if (!testbit)
+            return 0;
+        max--;
+    }
+}
+#endif
+
 static int set_features(void)
 {
     static struct {
@@ -1191,6 +1293,9 @@ static int set_features(void)
         { 83, 3, 0x05, 0x80 }, /* adv. power management: lowest w/o standby */
         { 83, 9, 0x42, 0x80 }, /* acoustic management: lowest noise */
         { 82, 6, 0xaa, 0 },    /* enable read look-ahead */
+#ifdef HAVE_ATA_DMA
+        { 0, 0, 0x03, 0 },     /* DMA mode */
+#endif
     };
     int i;
     int pio_mode = 2;
@@ -1204,6 +1309,23 @@ static int set_features(void)
 
     /* Update the table: set highest supported pio mode that we also support */
     features[0].parameter = 8 + pio_mode;
+    
+#ifdef HAVE_ATA_DMA
+    if (identify_info[53] & (1<<2))
+        /* Ultra DMA mode info present, find a mode */
+        dma_mode = get_best_mode(identify_info[88], ATA_MAX_UDMA, 0x40);
+
+    if (!dma_mode) {
+        /* No UDMA mode found, try to find a multi-word DMA mode */
+        dma_mode = get_best_mode(identify_info[63], ATA_MAX_MWDMA, 0x20);
+        features[4].id_word = 63;
+    }
+    else
+        features[4].id_word = 88;
+    
+    features[4].id_bit = dma_mode & 7;
+    features[4].parameter = dma_mode;
+#endif /* HAVE_ATA_DMA */
 
     SET_REG(ATA_SELECT, ata_device);
 
@@ -1235,6 +1357,10 @@ static int set_features(void)
 
 #ifdef ATA_SET_DEVICE_FEATURES
     ata_set_pio_timings(pio_mode);
+#endif
+
+#ifdef HAVE_ATA_DMA
+    ata_dma_set_mode(dma_mode);
 #endif
 
     return 0;
@@ -1304,6 +1430,11 @@ int ata_init(void)
             ide_power_enable(true);
             sleep(HZ/4); /* allow voltage to build up */
         }
+
+#ifdef HAVE_ATA_DMA
+        /* DMA requires INTRQ be enabled */
+        SET_REG(ATA_CONTROL, 0);
+#endif
 
         /* first try, hard reset at cold start only */
         rc = init_and_check(coldstart);
@@ -1448,5 +1579,19 @@ void ata_get_info(struct storage_info *info)
     for (i=0;i<2;i++)
         dest[i] = htobe16(src[i]);
     info->revision=revision;
+}
+#endif
+
+#ifdef HAVE_ATA_DMA
+/* Returns last DMA mode as set by set_features() */
+int ata_get_dma_mode(void)
+{
+    return dma_mode;
+}
+
+/* Needed to allow updating while waiting for DMA to complete */
+void ata_keep_active(void)
+{
+    last_disk_activity = current_tick;
 }
 #endif

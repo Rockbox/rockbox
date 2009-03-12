@@ -60,5 +60,17 @@ bool ata_present(IF_MV_NONVOID(int drive));
 long ata_last_disk_activity(void);
 int ata_spinup_time(void); /* ticks */
 
+#ifdef HAVE_ATA_DMA
+/* Needed to allow updating while waiting for DMA to complete */
+void ata_keep_active(void);
+/* Returns current DMA mode */
+int ata_get_dma_mode(void);
+/* Set DMA mode for ATA interface */
+void ata_dma_set_mode(unsigned char mode);
+/* Sets up DMA transfer */
+bool ata_dma_setup(void *addr, unsigned long bytes, bool write);
+/* Waits for DMA transfer completion */
+bool ata_dma_finish(void);
+#endif /* HAVE_ATA_DMA */
 
-#endif
+#endif /* __ATA_H__ */

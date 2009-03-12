@@ -2029,7 +2029,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         simplelist_addline(SIMPLELIST_ADD_LINE,
                  "No timing info");
     }
-#if defined (TOSHIBA_GIGABEAT_F) || defined (TOSHIBA_GIGABEAT_S)
+#ifdef HAVE_ATA_DMA
     if (identify_info[63] & (1<<0)) {
         char mdma0[2], mdma1[2], mdma2[2];
         mdma0[1] = mdma1[1] = mdma2[1] = 0;
@@ -2047,24 +2047,25 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         simplelist_addline(SIMPLELIST_ADD_LINE,
                 "No MDMA mode info");
     }
-    if (identify_info[88] & (1<<0)) {
-        char udma0[2], udma1[2], udma2[2], udma3[2], udma4[2], udma5[2];
-        udma0[1] = udma1[1] = udma2[1] = udma3[1] = udma4[1] = udma5[1] = 0;
+    if (identify_info[53] & (1<<2)) {
+        char udma0[2], udma1[2], udma2[2], udma3[2], udma4[2], udma5[2], udma6[2];
+        udma0[1] = udma1[1] = udma2[1] = udma3[1] = udma4[1] = udma5[1] = udma6[1] = 0;
         udma0[0] = (identify_info[88] & (1<<0)) ? '0' : 0;
         udma1[0] = (identify_info[88] & (1<<1)) ? '1' : 0;
         udma2[0] = (identify_info[88] & (1<<2)) ? '2' : 0;
         udma3[0] = (identify_info[88] & (1<<3)) ? '3' : 0;
         udma4[0] = (identify_info[88] & (1<<4)) ? '4' : 0;
         udma5[0] = (identify_info[88] & (1<<5)) ? '5' : 0;
+        udma6[0] = (identify_info[88] & (1<<6)) ? '6' : 0;
         simplelist_addline(SIMPLELIST_ADD_LINE,
-                 "UDMA modes: %s %s %s %s %s %s", udma0, udma1, udma2,
-                                                  udma3, udma4, udma5);
+                 "UDMA modes: %s %s %s %s %s %s %s", udma0, udma1, udma2,
+                                                     udma3, udma4, udma5, udma6);
     }
     else {
         simplelist_addline(SIMPLELIST_ADD_LINE,
                 "No UDMA mode info");
     }
-#endif /* defined (TOSHIBA_GIGABEAT_F) || defined (TOSHIBA_GIGABEAT_S) */
+#endif /* HAVE_ATA_DMA */
     timing_info_present = identify_info[53] & (1<<1);
     if(timing_info_present) {
         i = identify_info[49] & (1<<11);
@@ -2079,6 +2080,18 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     }
     simplelist_addline(SIMPLELIST_ADD_LINE,
              "Cluster size: %d bytes", fat_get_cluster_size(IF_MV(0)));
+#ifdef HAVE_ATA_DMA
+    i = ata_get_dma_mode();
+    if (i == 0) {
+        simplelist_addline(SIMPLELIST_ADD_LINE,
+                 "DMA not enabled");
+    } else {
+        simplelist_addline(SIMPLELIST_ADD_LINE,
+                 "DMA mode: %s %c",
+                (i & 0x40) ? "UDMA" : "MDMA",
+                '0' + (i & 7));
+    }
+#endif /* HAVE_ATA_DMA */
     return btn;
 }
 #else /* No SD, MMC or ATA */
