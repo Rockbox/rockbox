@@ -30,7 +30,7 @@
     *: "Da"
   </dest>
   <voice>
-    *: ""
+    *: "Da"
   </voice>
 </phrase>
 <phrase>
@@ -44,7 +44,7 @@
     *: "Nu"
   </dest>
   <voice>
-    *: ""
+    *: "Nu"
   </voice>
 </phrase>
 <phrase>
@@ -58,7 +58,7 @@
     *: "Deschis"
   </dest>
   <voice>
-    *: ""
+    *: "Deschis"
   </voice>
 </phrase>
 <phrase>
@@ -72,7 +72,7 @@
     *: "Închis"
   </dest>
   <voice>
-    *: ""
+    *: "Închis"
   </voice>
 </phrase>
 <phrase>
@@ -86,7 +86,7 @@
     *: "Esec"
   </dest>
   <voice>
-    *: ""
+    *: "Esec"
   </voice>
 </phrase>
 <phrase>
@@ -100,7 +100,7 @@
     *: "Sunet"
   </dest>
   <voice>
-    *: ""
+    *: "Sunet"
   </voice>
 </phrase>
 <phrase>
@@ -114,7 +114,7 @@
     *: "Reglaje"
   </dest>
   <voice>
-    *: ""
+    *: "Reglaje"
   </voice>
 </phrase>
 <phrase>
@@ -131,7 +131,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Inregistrare"
   </voice>
 </phrase>
 <phrase>
@@ -145,7 +145,7 @@
     *: "Volum"
   </dest>
   <voice>
-    *: ""
+    *: "Volum"
   </voice>
 </phrase>
 <phrase>
@@ -159,7 +159,7 @@
     *: "Grave"
   </dest>
   <voice>
-    *: ""
+    *: "Grave"
   </voice>
 </phrase>
 <phrase>
@@ -173,7 +173,7 @@
     *: "Înalte"
   </dest>
   <voice>
-    *: ""
+    *: "Înalte"
   </voice>
 </phrase>
 <phrase>
@@ -187,7 +187,7 @@
     *: "Balans"
   </dest>
   <voice>
-    *: ""
+    *: "Balans"
   </voice>
 </phrase>
 <phrase>
@@ -201,7 +201,7 @@
     *: "Stereo"
   </dest>
   <voice>
-    *: ""
+    *: "Stereo"
   </voice>
 </phrase>
 <phrase>
@@ -215,7 +215,7 @@
     *: "Mono"
   </dest>
   <voice>
-    *: ""
+    *: "Mono"
   </voice>
 </phrase>
 <phrase>
@@ -229,7 +229,7 @@
     *: "Mono Stânga"
   </dest>
   <voice>
-    *: ""
+    *: "Mono Stânga"
   </voice>
 </phrase>
 <phrase>
@@ -243,7 +243,7 @@
     *: "Mono Dreapta"
   </dest>
   <voice>
-    *: ""
+    *: "Mono Dreapta"
   </voice>
 </phrase>
 <phrase>
@@ -257,7 +257,7 @@
     *: "Karaoke"
   </dest>
   <voice>
-    *: ""
+    *: "Karaoke"
   </voice>
 </phrase>
 <phrase>
@@ -274,7 +274,7 @@
   </dest>
   <voice>
     *: none
-    masf: ""
+    masf: "Optimizare de grave (Loudness)"
   </voice>
 </phrase>
 <phrase>
@@ -291,7 +291,7 @@
   </dest>
   <voice>
     *: none
-    masf: ""
+    masf: "Volum automat"
   </voice>
 </phrase>
 <phrase>
@@ -336,7 +336,7 @@
     *: "Optiuni fisier"
   </dest>
   <voice>
-    *: ""
+    *: "Optiuni fisier"
   </voice>
 </phrase>
 <phrase>
@@ -350,7 +350,7 @@
     *: "Mod de afisare"
   </dest>
   <voice>
-    *: ""
+    *: "Mod de afisare"
   </voice>
 </phrase>
 <phrase>
@@ -364,7 +364,7 @@
     *: "Optiuni sistem"
   </dest>
   <voice>
-    *: ""
+    *: "Optiuni sistem"
   </voice>
 </phrase>
 <phrase>
@@ -378,7 +378,7 @@
     *: "Reinitializare setari"
   </dest>
   <voice>
-    *: ""
+    *: "Reinitializare setari"
   </voice>
 </phrase>
 <phrase>
@@ -392,7 +392,7 @@
     *: "Setari sterse"
   </dest>
   <voice>
-    *: ""
+    *: "Setari sterse"
   </voice>
 </phrase>
 <phrase>
@@ -406,7 +406,7 @@
     *: "Salvare configuratie"
   </dest>
   <voice>
-    *: ""
+    *: "Salvare configuratie"
   </voice>
 </phrase>
 <phrase>
@@ -423,7 +423,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Optiuni inregistrare"
   </voice>
 </phrase>
 <phrase>
@@ -437,7 +437,7 @@
     *: "Creare playlist"
   </dest>
   <voice>
-    *: ""
+    *: "Creare playlist"
   </voice>
 </phrase>
 <phrase>
@@ -451,7 +451,7 @@
     *: "Versiune"
   </dest>
   <voice>
-    *: ""
+    *: "Versiune"
   </voice>
 </phrase>
 <phrase>
@@ -465,7 +465,7 @@
     *: "Debug (Atentie !)"
   </dest>
   <voice>
-    *: ""
+    *: "Debug, atentie"
   </voice>
 </phrase>
 <phrase>
@@ -479,7 +479,7 @@
     *: "Aleator"
   </dest>
   <voice>
-    *: ""
+    *: "Aleator"
   </voice>
 </phrase>
 <phrase>
@@ -493,7 +493,7 @@
     *: "In bucla"
   </dest>
   <voice>
-    *: ""
+    *: "In bucla"
   </voice>
 </phrase>
 <phrase>
@@ -507,7 +507,7 @@
     *: "O melodie"
   </dest>
   <voice>
-    *: ""
+    *: "O melodie"
   </voice>
 </phrase>
 <phrase>
@@ -521,7 +521,7 @@
     *: "Canta fisierul ales primul"
   </dest>
   <voice>
-    *: ""
+    *: "Canta fisierul ales primul"
   </voice>
 </phrase>
 <phrase>
@@ -537,7 +537,7 @@
     flash_storage: none
   </dest>
   <voice>
-    *: ""
+    *: "Memorie anti-soc"
     flash_storage: none
   </voice>
 </phrase>
@@ -552,7 +552,7 @@
     *: "Atenuare sunet la oprire/pauza"
   </dest>
   <voice>
-    *: ""
+    *: "Atenuare sunet la oprire/pauza"
   </voice>
 </phrase>
 <phrase>
@@ -566,7 +566,7 @@
     *: "Sortare senzitiva"
   </dest>
   <voice>
-    *: ""
+    *: "Sortare senzitiva"
   </voice>
 </phrase>
 <phrase>
@@ -580,7 +580,7 @@
     *: "Fisiere"
   </dest>
   <voice>
-    *: ""
+    *: "Fisiere"
   </voice>
 </phrase>
 <phrase>
@@ -594,7 +594,7 @@
     *: "Doar fisierele cunoscute"
   </dest>
   <voice>
-    *: ""
+    *: "Doar fisierele cunoscute"
   </voice>
 </phrase>
 <phrase>
@@ -608,7 +608,7 @@
     *: "Doar fisierele muzicale"
   </dest>
   <voice>
-    *: ""
+    *: "Doar fisierele muzicale"
   </voice>
 </phrase>
 <phrase>
@@ -622,7 +622,7 @@
     *: "Foloseste playlist"
   </dest>
   <voice>
-    *: ""
+    *: "Foloseste playlist"
   </voice>
 </phrase>
 <phrase>
@@ -636,7 +636,7 @@
     *: "Viteza de defilare"
   </dest>
   <voice>
-    *: ""
+    *: "Viteza de defilare"
   </voice>
 </phrase>
 <phrase>
@@ -652,7 +652,7 @@
     masd: none
   </dest>
   <voice>
-    *: ""
+    *: "Vu-metru"
     masd: none
   </voice>
 </phrase>
@@ -667,7 +667,7 @@
     *: "Oprire, ca urmare a inactivitatii"
   </dest>
   <voice>
-    *: ""
+    *: "Oprire, ca urmare a inactivitatii"
   </voice>
 </phrase>
 <phrase>
@@ -681,7 +681,7 @@
     *: "Numaratoare inversa"
   </dest>
   <voice>
-    *: ""
+    *: "Numaratoare inversa"
   </voice>
 </phrase>
 <phrase>
@@ -698,7 +698,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarma"
   </voice>
 </phrase>
 <phrase>
@@ -715,7 +715,7 @@
   </dest>
   <voice>
     *: none
-    recording_hwcodec: ""
+    recording_hwcodec: "Calitatea inregistrarii"
   </voice>
 </phrase>
 <phrase>
@@ -732,7 +732,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Frecventa"
   </voice>
 </phrase>
 <phrase>
@@ -749,7 +749,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Sursa inregistrare"
   </voice>
 </phrase>
 <phrase>
@@ -768,8 +768,8 @@
   </dest>
   <voice>
     *: none
-    recording: ""
-    h100,h120,h300: ""
+    recording: "Microfon"
+    h100,h120,h300: "Microfon intern"
   </voice>
 </phrase>
 <phrase>
@@ -786,7 +786,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Semnal digital"
   </voice>
 </phrase>
 <phrase>
@@ -800,7 +800,7 @@
     *: "Pas minim derulare"
   </dest>
   <voice>
-    *: ""
+    *: "Pas minim derulare"
   </voice>
 </phrase>
 <phrase>
@@ -814,7 +814,7 @@
     *: "Acceleratie derulare"
   </dest>
   <voice>
-    *: ""
+    *: "Acceleratie derulare"
   </voice>
 </phrase>
 <phrase>
@@ -828,7 +828,7 @@
     *: "Lumina afisor"
   </dest>
   <voice>
-    *: ""
+    *: "Lumina afisor"
   </voice>
 </phrase>
 <phrase>
@@ -845,7 +845,7 @@
   </dest>
   <voice>
     *: none
-    charging: ""
+    charging: "Iluminare afisaj (pe durata incarcarii bateriei)"
   </voice>
 </phrase>
 <phrase>
@@ -859,7 +859,7 @@
     *: "Contrast"
   </dest>
   <voice>
-    *: ""
+    *: "Contrast"
   </voice>
 </phrase>
 <phrase>
@@ -876,7 +876,7 @@
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: ""
+    lcd_invert,remote_lcd_invert: "Mod LCD"
   </voice>
 </phrase>
 <phrase>
@@ -890,7 +890,7 @@
     *: "Viteza de defilare"
   </dest>
   <voice>
-    *: ""
+    *: "Viteza de defilare"
   </voice>
 </phrase>
 <phrase>
@@ -918,7 +918,7 @@
     *: "Pauza inainte de inceputul defilarii"
   </dest>
   <voice>
-    *: ""
+    *: "Pauza inainte de inceputul defilarii"
   </voice>
 </phrase>
 <phrase>
@@ -932,7 +932,7 @@
     *: "Pas de defilare"
   </dest>
   <voice>
-    *: ""
+    *: "Pas de defilare"
   </voice>
 </phrase>
 <phrase>
@@ -960,7 +960,7 @@
     *: "Limita de defilare bidirectionala"
   </dest>
   <voice>
-    *: ""
+    *: "Limita de defilare bidirectionala"
   </voice>
 </phrase>
 <phrase>
@@ -977,7 +977,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Afisaj volum"
   </voice>
 </phrase>
 <phrase>
@@ -994,7 +994,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Afisaj baterie"
   </voice>
 </phrase>
 <phrase>
@@ -1011,7 +1011,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Grafic"
   </voice>
 </phrase>
 <phrase>
@@ -1028,7 +1028,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Numeric"
   </voice>
 </phrase>
 <phrase>
@@ -1044,7 +1044,7 @@
     masd: none
   </dest>
   <voice>
-    *: ""
+    *: "Rata de variatie a indicatorului"
     masd: none
   </voice>
 </phrase>
@@ -1075,7 +1075,7 @@
     masd: none
   </dest>
   <voice>
-    *: ""
+    *: "Persistenta indicatorului"
     masd: none
   </voice>
 </phrase>
@@ -1092,7 +1092,7 @@
     masd: none
   </dest>
   <voice>
-    *: ""
+    *: "Persistenta marcajului"
     masd: none
   </voice>
 </phrase>
@@ -1109,7 +1109,7 @@
     masd: none
   </dest>
   <voice>
-    *: ""
+    *: "Continu"
     masd: none
   </voice>
 </phrase>
@@ -1126,7 +1126,7 @@
     masd: none
   </dest>
   <voice>
-    *: ""
+    *: "dBfs <-> liniar"
     masd: none
   </voice>
 </phrase>
@@ -1143,7 +1143,7 @@
     masd: none
   </dest>
   <voice>
-    *: ""
+    *: "dBfs"
     masd: none
   </voice>
 </phrase>
@@ -1160,7 +1160,7 @@
     masd: none
   </dest>
   <voice>
-    *: ""
+    *: "Liniar"
     masd: none
   </voice>
 </phrase>
@@ -1177,7 +1177,7 @@
     masd: none
   </dest>
   <voice>
-    *: ""
+    *: "Minimum de spectru"
     masd: none
   </voice>
 </phrase>
@@ -1194,7 +1194,7 @@
     masd: none
   </dest>
   <voice>
-    *: ""
+    *: "Maximum de spectru"
     masd: none
   </voice>
 </phrase>
@@ -1209,7 +1209,7 @@
     *: "Capacitate baterie"
   </dest>
   <voice>
-    *: ""
+    *: "Capacitate baterie"
   </voice>
 </phrase>
 <phrase>
@@ -1225,7 +1225,7 @@
     flash_storage: none
   </dest>
   <voice>
-    *: ""
+    *: "Oprire disc"
     flash_storage: none
   </voice>
 </phrase>
@@ -1240,7 +1240,7 @@
     *: "Reglaj timp"
   </dest>
   <voice>
-    *: ""
+    *: "Reglaj timp"
   </voice>
 </phrase>
 <phrase>
@@ -1257,7 +1257,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Format ora"
   </voice>
 </phrase>
 <phrase>
@@ -1274,7 +1274,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Ora AM/PM"
   </voice>
 </phrase>
 <phrase>
@@ -1286,12 +1286,12 @@
     rtc: "24 Hour Clock"
   </source>
   <dest>
-    *: ""
+    *: none
     rtc: "Ora 24h"
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Ora 24h"
   </voice>
 </phrase>
 <phrase>
@@ -1305,7 +1305,7 @@
     *: "Info ID3"
   </dest>
   <voice>
-    *: ""
+    *: "Info ID3"
   </voice>
 </phrase>
 <phrase>
@@ -1319,7 +1319,7 @@
     *: "Redenumire"
   </dest>
   <voice>
-    *: ""
+    *: "Redenumire"
   </voice>
 </phrase>
 <phrase>
@@ -1333,7 +1333,7 @@
     *: "Stergere"
   </dest>
   <voice>
-    *: ""
+    *: "Stergere"
   </voice>
 </phrase>
 <phrase>
@@ -1361,7 +1361,7 @@
     *: "Sters"
   </dest>
   <voice>
-    *: ""
+    *: "Sters"
   </voice>
 </phrase>
 <phrase>
@@ -1375,7 +1375,7 @@
     *: "Queue"
   </dest>
   <voice>
-    *: ""
+    *: "Queue"
   </voice>
 </phrase>
 <phrase>
@@ -1389,7 +1389,7 @@
     *: "Rockbox Info"
   </dest>
   <voice>
-    *: ""
+    *: "Rockbox Info"
   </voice>
 </phrase>
 <phrase>
@@ -1406,7 +1406,7 @@
   </dest>
   <voice>
     *: none
-    charging: ""
+    charging: "Bateria: Incarcare"
   </voice>
 </phrase>
 <phrase>
@@ -1440,7 +1440,7 @@
   </dest>
   <voice>
     *: none
-    charging: ""
+    charging: "Incarcare persistenta"
   </voice>
 </phrase>
 <phrase>
@@ -1459,8 +1459,6 @@
   </dest>
   <voice>
     *: ""
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: ""
-    h10,ipodmini,ipodmini2g: ""
   </voice>
 </phrase>
 <phrase>
@@ -1508,7 +1506,7 @@
     *: "Pauza"
   </dest>
   <voice>
-    *: ""
+    *: "Pauza"
   </voice>
 </phrase>
 <phrase>
@@ -1623,7 +1621,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Trezire în"
   </voice>
 </phrase>
 <phrase>
@@ -1640,7 +1638,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarma setata"
   </voice>
 </phrase>
 <phrase>
@@ -1657,7 +1655,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarma e prea devreme!"
   </voice>
 </phrase>
 <phrase>
@@ -2184,7 +2182,7 @@
     *: "Playlist Buffer plin"
   </dest>
   <voice>
-    *: ""
+    *: "Playlist Buffer plin"
   </voice>
 </phrase>
 <phrase>
@@ -2212,7 +2210,7 @@
     *: "Director buffer plin!"
   </dest>
   <voice>
-    *: ""
+    *: "Director buffer plin!"
   </voice>
 </phrase>
 <phrase>
@@ -2226,7 +2224,7 @@
     *: "Limba romana"
   </dest>
   <voice>
-    *: ""
+    *: "Limba romana"
   </voice>
 </phrase>
 <phrase>
@@ -2240,7 +2238,7 @@
     *: "Configuratii Salvat"
   </dest>
   <voice>
-    *: ""
+    *: "Configuratii Salvat"
   </voice>
 </phrase>
 <phrase>
@@ -2254,7 +2252,7 @@
     *: "Configuratie Salvat"
   </dest>
   <voice>
-    *: ""
+    *: "Configuratie Salvat"
   </voice>
 </phrase>
 <phrase>
@@ -2356,7 +2354,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Stereo"
   </voice>
 </phrase>
 <phrase>
@@ -2373,7 +2371,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Mono"
   </voice>
 </phrase>
 <phrase>
@@ -2509,7 +2507,7 @@
   </dest>
   <voice>
     *: none
-    recording_hwcodec: ""
+    recording_hwcodec: "Calitatea inregistrarii"
   </voice>
 </phrase>
 <phrase>
@@ -2526,7 +2524,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Frecventa"
   </voice>
 </phrase>
 <phrase>
@@ -2543,7 +2541,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Sursa"
   </voice>
 </phrase>
 <phrase>
@@ -2560,7 +2558,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Microfon intern"
   </voice>
 </phrase>
 <phrase>
@@ -2577,7 +2575,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Semnal digital"
   </voice>
 </phrase>
 <phrase>
@@ -2623,7 +2621,7 @@
     recording: "Gain Left"
   </source>
   <dest>
-    *: ""
+    *: none
     recording: "Amplificare stanga"
   </dest>
   <voice>
@@ -2662,7 +2660,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Save Changes?"
+    radio: "Salvati modificarile?"
   </voice>
 </phrase>
 <phrase>
@@ -2713,7 +2711,7 @@
   </dest>
   <voice>
     *: none
-    recording: "File Split Options"
+    recording: "Optiuni despartire fisier"
   </voice>
 </phrase>
 <phrase>
@@ -2727,7 +2725,7 @@
     *: "Spune tipul fisierului"
   </dest>
   <voice>
-    *: "Say File Type"
+    *: "Spune tipul fisierului"
   </voice>
 </phrase>
 <phrase>
@@ -2744,7 +2742,6 @@
   </dest>
   <voice>
     *: none
-    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -2823,7 +2820,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Edit Preset"
+    radio: "Editare preset"
   </voice>
 </phrase>
 <phrase>
@@ -2840,7 +2837,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Line Selector Type"
+    lcd_bitmap: "Tip selector linie"
   </voice>
 </phrase>
 <phrase>
@@ -2868,7 +2865,7 @@
     *: "Cale completa"
   </dest>
   <voice>
-    *: "Full Path"
+    *: "Cale completa"
   </voice>
 </phrase>
 <phrase>
@@ -2927,7 +2924,7 @@
     *: "Singur"
   </dest>
   <voice>
-    *: "Unique only"
+    *: "Singur"
   </voice>
 </phrase>
 <phrase>
@@ -2944,7 +2941,7 @@
   </dest>
   <voice>
     *: none
-    multivolume: "Not present"
+    multivolume: "Nu este prezent"
   </voice>
 </phrase>
 <phrase>
@@ -2989,7 +2986,7 @@
     *: "Anunta stergerea listei muzicale dinamice"
   </dest>
   <voice>
-    *: "Warn When Erasing Dynamic Playlist"
+    *: "Anunta stergerea listei muzicale dinamice"
   </voice>
 </phrase>
 <phrase>
@@ -3006,7 +3003,7 @@
   </dest>
   <voice>
     *: none
-    usbstack: "USB Stack"
+    usbstack: "Stiva USB"
   </voice>
 </phrase>
 <phrase>
@@ -3023,7 +3020,7 @@
   </dest>
   <voice>
     *: none
-    spdif_power: "Optical Output"
+    spdif_power: "Iesire optica"
   </voice>
 </phrase>
 <phrase>
@@ -3071,7 +3068,7 @@
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo: "Taierea gravelor"
   </voice>
 </phrase>
 <phrase>
@@ -3116,7 +3113,7 @@
     *: "Setare clasare melodie"
   </dest>
   <voice>
-    *: "Set Song Rating"
+    *: "Setare clasare melodie"
   </voice>
 </phrase>
 <phrase>
@@ -3130,7 +3127,7 @@
     *: "Arata pictograme"
   </dest>
   <voice>
-    *: "Show Icons"
+    *: "Arata pictograme"
   </voice>
 </phrase>
 <phrase>
@@ -3147,7 +3144,7 @@
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Never"
+    lcd_sleep: "Niciodata"
   </voice>
 </phrase>
 <phrase>
@@ -3164,7 +3161,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Primary Colour"
+    lcd_color: "Culoare primara "
   </voice>
 </phrase>
 <phrase>
@@ -3181,7 +3178,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Line In"
+    recording: "Intrare"
   </voice>
 </phrase>
 <phrase>
@@ -3195,7 +3192,7 @@
     *: "Eroare accesare director"
   </dest>
   <voice>
-    *: "Error accessing directory"
+    *: "Eroare accesare director"
   </voice>
 </phrase>
 <phrase>
@@ -3209,7 +3206,7 @@
     *: "Urmeaza urmatorul"
   </dest>
   <voice>
-    *: "Queue Next"
+    *: "Urmeaza urmatorul"
   </voice>
 </phrase>
 <phrase>
@@ -3223,7 +3220,7 @@
     *: "Introducere baza de date"
   </dest>
   <voice>
-    *: "Committing database"
+    *: "Introducere baza de date"
   </voice>
 </phrase>
 <phrase>
@@ -3259,7 +3256,7 @@
     *: "Schimbare automata director"
   </dest>
   <voice>
-    *: "Auto-Change Directory"
+    *: "Schimbare automata director"
   </voice>
 </phrase>
 <phrase>
@@ -3363,7 +3360,7 @@
   </dest>
   <voice>
     *: none
-    battery_types: "Alkaline"
+    battery_types: "Alcaline"
   </voice>
 </phrase>
 <phrase>
@@ -3391,7 +3388,7 @@
     *: "Fisiere"
   </dest>
   <voice>
-    *: "Files"
+    *: "Fisiere"
   </voice>
 </phrase>
 <phrase>
@@ -3422,7 +3419,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Clear Backdrop"
+    lcd_non-mono: "Anulare imagine de fundal"
   </voice>
 </phrase>
 <phrase>
@@ -3436,7 +3433,7 @@
     *: "Rasfoieste teme"
   </dest>
   <voice>
-    *: "Browse Themes"
+    *: "Rasfoieste teme"
   </voice>
 </phrase>
 <phrase>
@@ -3509,7 +3506,7 @@
     *: "Semn de carte creat"
   </dest>
   <voice>
-    *: "Bookmark Created"
+    *: "Semn de carte creat"
   </voice>
 </phrase>
 <phrase>
@@ -3543,7 +3540,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Moderate"
+    swcodec: "Moderat"
   </voice>
 </phrase>
 <phrase>
@@ -3560,7 +3557,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Directory"
+    recording: "Director"
   </voice>
 </phrase>
 <phrase>
@@ -3574,7 +3571,7 @@
     *: "Restart acum?"
   </dest>
   <voice>
-    *: "Reboot now?"
+    *: "Restart acum?"
   </voice>
 </phrase>
 <phrase>
@@ -3602,7 +3599,7 @@
     *: "Inserare ultimul"
   </dest>
   <voice>
-    *: "Insert Last"
+    *: "Inserare ultimul"
   </voice>
 </phrase>
 <phrase>
@@ -3633,7 +3630,7 @@
     *: "Nu sunt fisiere"
   </dest>
   <voice>
-    *: "No files"
+    *: "Nu sunt fisiere"
   </voice>
 </phrase>
 <phrase>
@@ -3647,7 +3644,7 @@
     *: "Iluminare ecran inceput/sfarsit melodie"
   </dest>
   <voice>
-    *: "Caption Backlight"
+    *: "Iluminare ecran inceput/sfarsit melodie"
   </voice>
 </phrase>
 <phrase>
@@ -3678,7 +3675,7 @@
     *: "Importa modificari"
   </dest>
   <voice>
-    *: "Import Modifications"
+    *: "Importa modificari"
   </voice>
 </phrase>
 <phrase>
@@ -3777,7 +3774,7 @@
     *: "Afiseaza indici"
   </dest>
   <voice>
-    *: "Show Indices"
+    *: "Afiseaza indici"
   </voice>
 </phrase>
 <phrase>
@@ -3794,7 +3791,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Filesize"
+    recording: "Dimensiune fisier"
   </voice>
 </phrase>
 <phrase>
@@ -3808,7 +3805,7 @@
     *: "Dupa data cea mai noua"
   </dest>
   <voice>
-    *: "By Newest Date"
+    *: "Dupa data cea mai noua"
   </voice>
 </phrase>
 <phrase>
@@ -3836,7 +3833,7 @@
     *: "Amplificare"
   </dest>
   <voice>
-    *: "Gain"
+    *: "Amplificare"
   </voice>
 </phrase>
 <phrase>
@@ -3850,12 +3847,12 @@
     *: "Dupa data"
   </dest>
   <voice>
-    *: "By Date"
+    *: "Dupa data"
   </voice>
 </phrase>
 <phrase>
   id: LANG_DELETING
-  desc: 
+  desc:
   user: core
   <source>
     *: "Deleting..."
@@ -3881,7 +3878,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Force Mono"
+    radio: "Forteaza mono"
   </voice>
 </phrase>
 <phrase>
@@ -3898,7 +3895,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Enable Crossfade"
+    swcodec: "Activeaza Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -3915,7 +3912,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Background Colour"
+    lcd_non-mono: "Culoare fond de ecran "
   </voice>
 </phrase>
 <phrase>
@@ -3960,7 +3957,7 @@
     *: "Alfabetic"
   </dest>
   <voice>
-    *: "Alphabetical"
+    *: "Alfabetic"
   </voice>
 </phrase>
 <phrase>
@@ -3974,7 +3971,7 @@
     *: "Semne de carte"
   </dest>
   <voice>
-    *: "Bookmarks"
+    *: "Semne de carte"
   </voice>
 </phrase>
 <phrase>
@@ -3991,7 +3988,7 @@
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Invers"
   </voice>
 </phrase>
 <phrase>
@@ -4022,7 +4019,7 @@
     *: "Urmeaza aleator"
   </dest>
   <voice>
-    *: "Queue Shuffled"
+    *: "Urmeaza aleator"
   </voice>
 </phrase>
 <phrase>
@@ -4053,7 +4050,7 @@
     *: "Creaza director"
   </dest>
   <voice>
-    *: "Create Directory"
+    *: "Creaza director"
   </voice>
 </phrase>
 <phrase>
@@ -4070,7 +4067,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Display OFF"
+    remote: "Ecran la distanta oprit"
   </voice>
 </phrase>
 <phrase>
@@ -4104,7 +4101,7 @@
   </dest>
   <voice>
     *: none
-    remote_ticking: "Reduce Ticking"
+    remote_ticking: "Diminuare ticking"
   </voice>
 </phrase>
 <phrase>
@@ -4121,7 +4118,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Disable resume on startup if phones unplugged"
+    headphone_detection: "Dezactivare reluare la start daca castile nu sunt prezente"
   </voice>
 </phrase>
 <phrase>
@@ -4152,7 +4149,7 @@
     *: "Eroare accesare fisier de control lista muzicala"
   </dest>
   <voice>
-    *: "Error accessing playlist control file"
+    *: "Eroare accesare fisier de control lista muzicala"
   </voice>
 </phrase>
 <phrase>
@@ -4183,7 +4180,7 @@
     *: "Continuare"
   </dest>
   <voice>
-    *: "Resume"
+    *: "Continuare"
   </voice>
 </phrase>
 <phrase>
@@ -4197,7 +4194,7 @@
     *: "Lipire"
   </dest>
   <voice>
-    *: "Paste"
+    *: "Lipire"
   </voice>
 </phrase>
 <phrase>
@@ -4211,7 +4208,7 @@
     *: "Anunta nivel baterie"
   </dest>
   <voice>
-    *: "Announce Battery Level"
+    *: "Anunta nivel baterie"
   </voice>
 </phrase>
 <phrase>
@@ -4239,7 +4236,7 @@
     *: "Eroare la actualizare fisier de control lista muzicala"
   </dest>
   <voice>
-    *: "Error updating playlist control file"
+    *: "Eroare la actualizare fisier de control lista muzicala"
   </voice>
 </phrase>
 <phrase>
@@ -4256,7 +4253,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Europe"
+    radio: "Europa"
   </voice>
 </phrase>
 <phrase>
@@ -4301,7 +4298,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Strong"
+    swcodec: "Tare"
   </voice>
 </phrase>
 <phrase>
@@ -4349,7 +4346,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Line Selector Colours"
+    lcd_color: "Culori selector linie"
   </voice>
 </phrase>
 <phrase>
@@ -4366,7 +4363,7 @@
   </dest>
   <voice>
     *: none
-    backlight_fade*: "Backlight Fade In"
+    backlight_fade*: "Filare iluminare aprindere"
   </voice>
 </phrase>
 <phrase>
@@ -4400,7 +4397,7 @@
   </dest>
   <voice>
     *: none
-    recorder_pad: "Button Bar"
+    recorder_pad: "Bara de butoane"
   </voice>
 </phrase>
 <phrase>
@@ -4462,7 +4459,7 @@
     *: "ATENTIE! Nivel baterie scazut!"
   </dest>
   <voice>
-    *: "WARNING! Low Battery!"
+    *: "ATENTIE! Nivel baterie scazut!"
   </voice>
 </phrase>
 <phrase>
@@ -4493,7 +4490,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Encoder Settings"
+    recording: "Setari codare"
   </voice>
 </phrase>
 <phrase>
@@ -4507,7 +4504,7 @@
     *: "Setari vizualizare lista muzicala"
   </dest>
   <voice>
-    *: "Playlist Viewer Settings"
+    *: "Setari vizualizare lista muzicala"
   </voice>
 </phrase>
 <phrase>
@@ -4538,7 +4535,7 @@
     *: "Actualizare automata"
   </dest>
   <voice>
-    *: "Auto Update"
+    *: "Actualizare automata"
   </voice>
 </phrase>
 <phrase>
@@ -4583,7 +4580,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll Bar"
+    lcd_bitmap: "Bara derulanta"
   </voice>
 </phrase>
 <phrase>
@@ -4614,7 +4611,7 @@
     *: "Redare actuala"
   </dest>
   <voice>
-    *: "Now Playing"
+    *: "Redare actuala"
   </voice>
 </phrase>
 <phrase>
@@ -4631,7 +4628,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop recording"
+    recording: "Oprire inregistrare"
   </voice>
 </phrase>
 <phrase>
@@ -4662,7 +4659,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Preset Save Failed"
+    radio: "Salvare preset esuata"
   </voice>
 </phrase>
 <phrase>
@@ -4690,7 +4687,7 @@
     *: "Sterge lista muzicala dinamica?"
   </dest>
   <voice>
-    *: "Erase dynamic playlist?"
+    *: "Sterge lista muzicala dinamica?"
   </voice>
 </phrase>
 <phrase>
@@ -4707,7 +4704,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Prevent Clipping"
+    swcodec: "Prevenire clipping"
   </voice>
 </phrase>
 <phrase>
@@ -4738,7 +4735,7 @@
     *: "Baza de date nu este disponibila"
   </dest>
   <voice>
-    *: "Database is not ready"
+    *: "Baza de date nu este disponibila"
   </voice>
 </phrase>
 <phrase>
@@ -4827,7 +4824,7 @@
     wheel_acceleration: none
   </dest>
   <voice>
-    *: "List Acceleration Speed"
+    *: "Viteza accelerare lista"
     wheel_acceleration: none
   </voice>
 </phrase>
@@ -4887,7 +4884,7 @@
     *: "Urmeaza ultimul"
   </dest>
   <voice>
-    *: "Queue Last"
+    *: "Urmeaza ultimul"
   </voice>
 </phrase>
 <phrase>
@@ -4901,7 +4898,7 @@
     *: "Actiuni semne de carte"
   </dest>
   <voice>
-    *: "Bookmark Actions"
+    *: "Actiuni semne de carte"
   </voice>
 </phrase>
 <phrase>
@@ -4944,7 +4941,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Shuffle and Track Skip"
+    swcodec: "Aleator si salt melodie"
   </voice>
 </phrase>
 <phrase>
@@ -4961,7 +4958,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Foreground Colour"
+    lcd_non-mono: "Culoare prim plan"
   </voice>
 </phrase>
 <phrase>
@@ -5040,7 +5037,7 @@
     *: "Primul buton activeaza doar iluminarea"
   </dest>
   <voice>
-    *: "First Buttonpress Enables Backlight Only"
+    *: "Primul buton activeaza doar iluminarea"
   </voice>
 </phrase>
 <phrase>
@@ -5102,7 +5099,7 @@
     *: "Limite"
   </dest>
   <voice>
-    *: "Limits"
+    *: "Limite"
   </voice>
 </phrase>
 <phrase>
@@ -5164,7 +5161,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause and Resume"
+    headphone_detection: "Pauza si continuare redare"
   </voice>
 </phrase>
 <phrase>
@@ -5178,12 +5175,12 @@
     *: "Eroare accesare fisier lista muzicala"
   </dest>
   <voice>
-    *: "Error accessing playlist file"
+    *: "Eroare accesare fisier lista muzicala"
   </voice>
 </phrase>
 <phrase>
   id: LANG_REC_DIR_NOT_WRITABLE
-  desc: 
+  desc:
   user: core
   <source>
     *: none
@@ -5195,7 +5192,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Can't write to recording directory"
+    recording: "Nu se poate scrie in directorul de inregistrare"
   </voice>
 </phrase>
 <phrase>
@@ -5226,7 +5223,7 @@
     *: "Configurare canal"
   </dest>
   <voice>
-    *: "Channel Configuration"
+    *: "Configurare canal"
   </voice>
 </phrase>
 <phrase>
@@ -5356,7 +5353,7 @@
     *: "Actualizare acum"
   </dest>
   <voice>
-    *: "Update Now"
+    *: "Actualizare acum"
   </voice>
 </phrase>
 <phrase>
@@ -5373,7 +5370,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Volum beep"
   </voice>
 </phrase>
 <phrase>
@@ -5409,7 +5406,7 @@
 </phrase>
 <phrase>
   id: LANG_BROWSE_CUESHEET
-  desc: 
+  desc:
   user: core
   <source>
     *: "Browse Cuesheet"
@@ -5418,7 +5415,7 @@
     *: "Rasfoieste Cuesheet"
   </dest>
   <voice>
-    *: "Browse Cuesheet"
+    *: "Rasfoieste Cuesheet"
   </voice>
 </phrase>
 <phrase>
@@ -5435,7 +5432,7 @@
   </dest>
   <voice>
     *: none
-    backlight_brightness: "Brightness"
+    backlight_brightness: "Intensitate"
   </voice>
 </phrase>
 <phrase>
@@ -5449,7 +5446,7 @@
     *: "Demonstratii"
   </dest>
   <voice>
-    *: "Demos"
+    *: "Demonstratii"
   </voice>
 </phrase>
 <phrase>
@@ -5466,7 +5463,7 @@
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Bitrate"
+    recording_swcodec: "Rata de codare"
   </voice>
 </phrase>
 <phrase>
@@ -5551,7 +5548,7 @@
   </dest>
   <voice>
     *: none
-    backlight_fade*: "Backlight Fade Out"
+    backlight_fade*: "Filare iluminare stingere"
   </voice>
 </phrase>
 <phrase>
@@ -5579,7 +5576,7 @@
     *: "Timp de top"
   </dest>
   <voice>
-    *: "Top Time"
+    *: "Timp de top"
   </voice>
 </phrase>
 <phrase>
@@ -5610,7 +5607,7 @@
     *: "Insereaza urmatorul"
   </dest>
   <voice>
-    *: "Insert Next"
+    *: "Insereaza urmatorul"
   </voice>
 </phrase>
 <phrase>
@@ -5624,7 +5621,7 @@
     *: "Foloseste fisiere .talk clips"
   </dest>
   <voice>
-    *: "Use File .talk Clips"
+    *: "Foloseste fisiere .talk clips"
   </voice>
 </phrase>
 <phrase>
@@ -5641,7 +5638,7 @@
   </dest>
   <voice>
     *: none
-    tc_ramcache: "Load to RAM"
+    tc_ramcache: "Incarca in RAM"
   </voice>
 </phrase>
 <phrase>
@@ -5672,7 +5669,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Text Colour"
+    lcd_color: "Culoare text"
   </voice>
 </phrase>
 <phrase>
@@ -5712,7 +5709,7 @@
     *: "Creaza semn de carte"
   </dest>
   <voice>
-    *: "Create Bookmark"
+    *: "Creaza semn de carte"
   </voice>
 </phrase>
 <phrase>
@@ -5726,7 +5723,7 @@
     *: "Setari teme"
   </dest>
   <voice>
-    *: "Theme Settings"
+    *: "Setari teme"
   </voice>
 </phrase>
 <phrase>
@@ -5754,7 +5751,7 @@
     *: "Aleator"
   </dest>
   <voice>
-    *: "Random"
+    *: "Aleator"
   </voice>
 </phrase>
 <phrase>
@@ -5771,7 +5768,7 @@
   </dest>
   <voice>
     *: none
-    soft_shutdown: "Shut down"
+    soft_shutdown: "Oprire"
   </voice>
 </phrase>
 <phrase>
@@ -5802,7 +5799,7 @@
     *: "Toate"
   </dest>
   <voice>
-    *: "All"
+    *: "Toate"
   </voice>
 </phrase>
 <phrase>
@@ -5819,7 +5816,7 @@
   </dest>
   <voice>
     *: none
-    recording: "New file"
+    recording: "Fisier nou"
   </voice>
 </phrase>
 <phrase>
@@ -5841,7 +5838,7 @@
 </phrase>
 <phrase>
   id: LANG_ADD_TO_FAVES
-  desc: 
+  desc:
   user: core
   <source>
     *: "Add to Shortcuts"
@@ -5850,7 +5847,7 @@
     *: "Adaugare la comenzi rapide"
   </dest>
   <voice>
-    *: "Add to Shortcuts"
+    *: "Adaugare la comenzi rapide"
   </voice>
 </phrase>
 <phrase>
@@ -5881,7 +5878,7 @@
     *: "Meniu principal"
   </dest>
   <voice>
-    *: "Main Menu"
+    *: "Meniu principal"
   </voice>
 </phrase>
 <phrase>
@@ -5909,7 +5906,7 @@
     *: "Nume plugin prea lung"
   </dest>
   <voice>
-    *: "Plugin name too long"
+    *: "Nume plugin prea lung"
   </voice>
 </phrase>
 <phrase>
@@ -5926,7 +5923,7 @@
   </dest>
   <voice>
     *: none
-    usbstack: "USB Stack Mode"
+    usbstack: "Mod USB stiva"
   </voice>
 </phrase>
 <phrase>
@@ -5940,7 +5937,7 @@
     *: "Jocuri"
   </dest>
   <voice>
-    *: "Games"
+    *: "Jocuri"
   </voice>
 </phrase>
 <phrase>
@@ -5985,7 +5982,6 @@
   </dest>
   <voice>
     *: "End of Song List"
-    player: "End of List"
   </voice>
 </phrase>
 <phrase>
@@ -6002,7 +5998,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Gain"
+    lcd_bitmap: "Amplificare"
   </voice>
 </phrase>
 <phrase>
@@ -6030,7 +6026,7 @@
     *: "Semne de carte recente"
   </dest>
   <voice>
-    *: "Recent Bookmarks"
+    *: "Semne de carte recente"
   </voice>
 </phrase>
 <phrase>
@@ -6078,7 +6074,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Scrolling Options"
+    remote: "Optiuni defilare ecran la distanta"
   </voice>
 </phrase>
 <phrase>
@@ -6095,7 +6091,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB Harmonics"
+    masf: "Armonice MDB "
   </voice>
 </phrase>
 <phrase>
@@ -6112,7 +6108,7 @@
   </dest>
   <voice>
     *: none
-    usbstack: "Device"
+    usbstack: "Dispozitiv"
   </voice>
 </phrase>
 <phrase>
@@ -6143,7 +6139,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Wake up Screen"
+    alarm: "Ecran trezire alarma"
   </voice>
 </phrase>
 <phrase>
@@ -6188,12 +6184,12 @@
     *: "Tip Replaygain"
   </dest>
   <voice>
-    *: "Replaygain Type"
+    *: "Tip Replaygain"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CLEAR_REC_DIR
-  desc: 
+  desc:
   user: core
   <source>
     *: none
@@ -6205,7 +6201,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Clear Recording Directory"
+    recording: "Anulare director inregistrare"
   </voice>
 </phrase>
 <phrase>
@@ -6250,7 +6246,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Live (slow)"
+    agc: "Live (incet)"
   </voice>
 </phrase>
 <phrase>
@@ -6301,7 +6297,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB Enable"
+    masf: "Activare MDB "
   </voice>
 </phrase>
 <phrase>
@@ -6315,7 +6311,7 @@
     *: "Incarca ultimul semn de carte"
   </dest>
   <voice>
-    *: "Load Last Bookmark"
+    *: "Incarca ultimul semn de carte"
   </voice>
 </phrase>
 <phrase>
@@ -6343,7 +6339,7 @@
     *: "Ortografiaza"
   </dest>
   <voice>
-    *: "Spell"
+    *: "Ortografiaza"
   </voice>
 </phrase>
 <phrase>
@@ -6371,7 +6367,7 @@
     *: "Recursiv?"
   </dest>
   <voice>
-    *: "Recursively?"
+    *: "Recursiv?"
   </voice>
 </phrase>
 <phrase>
@@ -6385,7 +6381,7 @@
     *: "Salveaza setari teme"
   </dest>
   <voice>
-    *: "Save Theme Settings"
+    *: "Salveaza setari teme"
   </voice>
 </phrase>
 <phrase>
@@ -6433,7 +6429,7 @@
   </dest>
   <voice>
     *: none
-    radio: "No presets"
+    radio: "Nu exista preset-uri"
   </voice>
 </phrase>
 <phrase>
@@ -6492,7 +6488,7 @@
     *: "Copiere"
   </dest>
   <voice>
-    *: "Copy"
+    *: "Copiere"
   </voice>
 </phrase>
 <phrase>
@@ -6523,7 +6519,7 @@
   </dest>
   <voice>
     *: none
-    radio: "The Preset List is Full"
+    radio: "Lista preset-uri este plina"
   </voice>
 </phrase>
 <phrase>
@@ -6557,7 +6553,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Voice (fast)"
+    agc: "Voce (rapid)"
   </voice>
 </phrase>
 <phrase>
@@ -6571,7 +6567,7 @@
     *: "Exporta modificari"
   </dest>
   <voice>
-    *: "Export Modifications"
+    *: "Exporta modificari"
   </voice>
 </phrase>
 <phrase>
@@ -6613,7 +6609,7 @@
     *: "Indepartare"
   </dest>
   <voice>
-    *: "Remove"
+    *: "Indepartare"
   </voice>
 </phrase>
 <phrase>
@@ -6627,7 +6623,7 @@
     *: "Salveaza lista muzicala curenta"
   </dest>
   <voice>
-    *: "Save Current Playlist"
+    *: "Salveaza lista muzicala curenta"
   </voice>
 </phrase>
 <phrase>
@@ -6661,7 +6657,7 @@
   </dest>
   <voice>
     *: none
-    recording: "for at least"
+    recording: "pentru cel putin"
   </voice>
 </phrase>
 <phrase>
@@ -6703,7 +6699,7 @@
     *: "Fisier control lista muzicala nu este valid"
   </dest>
   <voice>
-    *: "Playlist control file is invalid"
+    *: "Fisier control lista muzicala nu este valid"
   </voice>
 </phrase>
 <phrase>
@@ -6720,7 +6716,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Filesize"
+    recording: "Despartire dimensiune fisier"
   </voice>
 </phrase>
 <phrase>
@@ -6748,7 +6744,7 @@
     *: "Canale"
   </dest>
   <voice>
-    *: "Channels"
+    *: "Canale"
   </voice>
 </phrase>
 <phrase>
@@ -6779,7 +6775,7 @@
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : Re-enable)"
+    remote: "(Vol- : Re-activare)"
   </voice>
 </phrase>
 <phrase>
@@ -6793,7 +6789,7 @@
     *: "Intreaba"
   </dest>
   <voice>
-    *: "Ask"
+    *: "Intreaba"
   </voice>
 </phrase>
 <phrase>
@@ -6852,7 +6848,7 @@
     *: "Intarziere salt defilare "
   </dest>
   <voice>
-    *: "Jump Scroll Delay"
+    *: "Intarziere salt defilare "
   </voice>
 </phrase>
 <phrase>
@@ -6883,7 +6879,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Medium"
+    agc: "Mediu"
   </voice>
 </phrase>
 <phrase>
@@ -6897,7 +6893,7 @@
     *: "O singura data"
   </dest>
   <voice>
-    *: "One time"
+    *: "O singura data"
   </voice>
 </phrase>
 <phrase>
@@ -6928,7 +6924,7 @@
     *: "Salveaza setari sunet"
   </dest>
   <voice>
-    *: "Save Sound Settings"
+    *: "Salveaza setari sunet"
   </voice>
 </phrase>
 <phrase>
@@ -6976,7 +6972,7 @@
     *: "Camp extensii plin"
   </dest>
   <voice>
-    *: "Extension array full"
+    *: "Camp extensii plin"
   </voice>
 </phrase>
 <phrase>
@@ -7044,7 +7040,7 @@
   </dest>
   <voice>
     *: none
-    recording_hwcodec: "Independent Frames"
+    recording_hwcodec: "Frame-uri independente"
   </voice>
 </phrase>
 <phrase>
@@ -7092,7 +7088,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Safety (clip)"
+    agc: "Securitate (clip)"
   </voice>
 </phrase>
 <phrase>
@@ -7123,7 +7119,7 @@
     *: "Marime pas defilare"
   </dest>
   <voice>
-    *: "Screen Scroll Step Size"
+    *: "Marime pas defilare"
   </voice>
 </phrase>
 <phrase>
@@ -7151,7 +7147,7 @@
     *: "Continuare redare"
   </dest>
   <voice>
-    *: "Resume Playback"
+    *: "Continuare redare"
   </voice>
 </phrase>
 <phrase>
@@ -7196,7 +7192,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause on Headphone Unplug"
+    headphone_detection: "Pauza la deconectare casti"
   </voice>
 </phrase>
 <phrase>
@@ -7210,7 +7206,7 @@
     *: "Lista muzicala"
   </dest>
   <voice>
-    *: "Playlist"
+    *: "Lista muzicala"
   </voice>
 </phrase>
 <phrase>
@@ -7241,7 +7237,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Scan"
+    radio: "Scanare"
   </voice>
 </phrase>
 <phrase>
@@ -7255,7 +7251,7 @@
     *: "Reda urmatorul"
   </dest>
   <voice>
-    *: "Play Next"
+    *: "Reda urmatorul"
   </voice>
 </phrase>
 <phrase>
@@ -7269,7 +7265,7 @@
     *: "Catalog lista muzicala"
   </dest>
   <voice>
-    *: "Playlist Catalog"
+    *: "Catalog lista muzicala"
   </voice>
 </phrase>
 <phrase>
@@ -7314,7 +7310,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Measure"
+    recording: "Masura despartire"
   </voice>
 </phrase>
 <phrase>
@@ -7342,7 +7338,7 @@
     *: "Limba"
   </dest>
   <voice>
-    *: "Language"
+    *: "Limba"
   </voice>
 </phrase>
 <phrase>
@@ -7418,7 +7414,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Preset List"
+    radio: "Lista preset-uri"
   </voice>
 </phrase>
 <phrase>
@@ -7435,7 +7431,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Delay"
+    swcodec: "Intarziere filare stingere"
   </voice>
 </phrase>
 <phrase>
@@ -7452,7 +7448,7 @@
   </dest>
   <voice>
     *: none
-    usbstack: "Device Driver"
+    usbstack: "Driver dispozitiv"
   </voice>
 </phrase>
 <phrase>
@@ -7494,7 +7490,7 @@
     *: "Setari ecran LCD"
   </dest>
   <voice>
-    *: "LCD Settings"
+    *: "Setari ecran LCD"
   </voice>
 </phrase>
 <phrase>
@@ -7508,7 +7504,7 @@
     *: "Ecranul defileaza inafara razei vizuale"
   </dest>
   <voice>
-    *: "Screen Scrolls Out Of View"
+    *: "Ecranul defileaza inafara razei vizuale"
   </voice>
 </phrase>
 <phrase>
@@ -7595,7 +7591,7 @@
     *: "Voce"
   </dest>
   <voice>
-    *: "Voice"
+    *: "Voce"
   </voice>
 </phrase>
 <phrase>
@@ -7609,7 +7605,7 @@
     *: "Semne de carte"
   </dest>
   <voice>
-    *: "Bookmarking"
+    *: "Semne de carte"
   </voice>
 </phrase>
 <phrase>
@@ -7623,7 +7619,7 @@
     *: "Initializeaza acum"
   </dest>
   <voice>
-    *: "Initialize Now"
+    *: "Initializeaza acum"
   </voice>
 </phrase>
 <phrase>
@@ -7637,7 +7633,7 @@
     *: "Insereaza directoare recursiv"
   </dest>
   <voice>
-    *: "Recursively Insert Directories"
+    *: "Insereaza directoare recursiv"
   </voice>
 </phrase>
 <phrase>
@@ -7679,7 +7675,7 @@
     *: "Baterie descarcata! Reincarcati!"
   </dest>
   <voice>
-    *: "Battery empty! RECHARGE!"
+    *: "Baterie descarcata! Reincarcati!"
   </voice>
 </phrase>
 <phrase>
@@ -7707,7 +7703,7 @@
     *: "Insereaza aleator"
   </dest>
   <voice>
-    *: "Insert Shuffled"
+    *: "Insereaza aleator"
   </voice>
 </phrase>
 <phrase>
@@ -7721,7 +7717,7 @@
     *: "Insereaza"
   </dest>
   <voice>
-    *: "Insert"
+    *: "Insereaza"
   </voice>
 </phrase>
 <phrase>
@@ -7735,7 +7731,7 @@
     *: "Vizualizare"
   </dest>
   <voice>
-    *: "View"
+    *: "Vizualizare"
   </voice>
 </phrase>
 <phrase>
@@ -7766,7 +7762,7 @@
     *: "Largime stereo"
   </dest>
   <voice>
-    *: "Stereo Width"
+    *: "Largime stereo"
   </voice>
 </phrase>
 <phrase>
@@ -7780,7 +7776,7 @@
     *: "Timp rulare"
   </dest>
   <voice>
-    *: "Running Time"
+    *: "Timp rulare"
   </voice>
 </phrase>
 <phrase>
@@ -7822,7 +7818,7 @@
     *: "Vorbeste meniuri"
   </dest>
   <voice>
-    *: "Voice Menus"
+    *: "Vorbeste meniuri"
   </voice>
 </phrase>
 <phrase>
@@ -7850,7 +7846,7 @@
     *: "Cauta in lista muzicala"
   </dest>
   <voice>
-    *: "Search In Playlist"
+    *: "Cauta in lista muzicala"
   </voice>
 </phrase>
 <phrase>
@@ -7881,7 +7877,7 @@
     *: "Rearanjeaza aleator"
   </dest>
   <voice>
-    *: "Reshuffle"
+    *: "Rearanjeaza aleator"
   </voice>
 </phrase>
 <phrase>
@@ -7895,7 +7891,7 @@
     *: "Mod petrecere"
   </dest>
   <voice>
-    *: "Party Mode"
+    *: "Mod petrecere"
   </voice>
 </phrase>
 <phrase>
@@ -7912,7 +7908,7 @@
   </dest>
   <voice>
     *: none
-    recording,player: "Line In"
+    recording,player: "Intrare"
   </voice>
 </phrase>
 <phrase>
@@ -7926,7 +7922,7 @@
     *: "Dupa tip"
   </dest>
   <voice>
-    *: "By Type"
+    *: "Dupa tip"
   </voice>
 </phrase>
 <phrase>
@@ -7957,7 +7953,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Pointer"
+    lcd_bitmap: "Cursor"
   </voice>
 </phrase>
 <phrase>
@@ -8022,7 +8018,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Once"
+    recording: "O data"
   </voice>
 </phrase>
 <phrase>
@@ -8039,7 +8035,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Status Bar"
+    lcd_bitmap: "Bara de status"
   </voice>
 </phrase>
 <phrase>
@@ -8112,7 +8108,7 @@
     *: "Fisier boot modificat"
   </dest>
   <voice>
-    *: "Boot changed"
+    *: "Fisier boot modificat"
   </voice>
 </phrase>
 <phrase>
@@ -8129,7 +8125,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Frecventa taiere"
   </voice>
 </phrase>
 <phrase>
@@ -8202,7 +8198,7 @@
     *: "Baterie"
   </dest>
   <voice>
-    *: "Battery"
+    *: "Baterie"
   </voice>
 </phrase>
 <phrase>
@@ -8233,7 +8229,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Clipping Light"
+    recording: "Lumina Clipping"
   </voice>
 </phrase>
 <phrase>
@@ -8250,7 +8246,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Remove Preset"
+    radio: "Indepartare preset"
   </voice>
 </phrase>
 <phrase>
@@ -8298,7 +8294,7 @@
     *: "Intreaba - Numai cele recente"
   </dest>
   <voice>
-    *: "Ask - Recent only"
+    *: "Intreaba - Numai cele recente"
   </voice>
 </phrase>
 <phrase>
@@ -8315,7 +8311,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Reset Colours"
+    lcd_non-mono: "Reseteaza culorile"
   </voice>
 </phrase>
 <phrase>
@@ -8329,7 +8325,7 @@
     *: "Intotdeauna"
   </dest>
   <voice>
-    *: "Always"
+    *: "Intotdeauna"
   </voice>
 </phrase>
 <phrase>
@@ -8377,7 +8373,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Region"
+    radio: "Regiunea"
   </voice>
 </phrase>
 <phrase>
@@ -8408,7 +8404,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Duration to Rewind"
+    headphone_detection: "Durata pentru inapoi"
   </voice>
 </phrase>
 <phrase>
@@ -8453,7 +8449,7 @@
     *: "Directoare voce "
   </dest>
   <voice>
-    *: "Voice Directories"
+    *: "Directoare voce "
   </voice>
 </phrase>
 <phrase>
@@ -8467,7 +8463,7 @@
     *: "Adauga la lista muzicala noua"
   </dest>
   <voice>
-    *: "Add to New Playlist"
+    *: "Adauga la lista muzicala noua"
   </voice>
 </phrase>
 <phrase>
@@ -8546,7 +8542,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-In Duration"
+    swcodec: "Durata filare aprindere"
   </voice>
 </phrase>
 <phrase>
@@ -8597,7 +8593,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Duration"
+    swcodec: "Durata filare stingere"
   </voice>
 </phrase>
 <phrase>
@@ -8642,7 +8638,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Time"
+    recording: "Timp de despartire"
   </voice>
 </phrase>
 <phrase>
@@ -8659,7 +8655,7 @@
   </dest>
   <voice>
     *: none
-    radio: "No settings found. Autoscan?"
+    radio: "Nu exista setari. Scanare automata?"
   </voice>
 </phrase>
 <phrase>
@@ -8690,7 +8686,7 @@
     *: "Restartati pentru a activa"
   </dest>
   <voice>
-    *: "Please reboot to enable"
+    *: "Restartati pentru a activa"
   </voice>
 </phrase>
 <phrase>
@@ -8721,7 +8717,7 @@
   </dest>
   <voice>
     *: none
-    dircache: "Directory Cache"
+    dircache: "Cache directoare "
   </voice>
 </phrase>
 <phrase>
@@ -8749,7 +8745,7 @@
     *: "Semn de carte lipsa"
   </dest>
   <voice>
-    *: "Bookmark Empty"
+    *: "Semn de carte lipsa"
   </voice>
 </phrase>
 <phrase>
@@ -8814,7 +8810,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Track Skip Only"
+    swcodec: "Numai salt melodie"
   </voice>
 </phrase>
 <phrase>
@@ -8828,7 +8824,7 @@
     *: "Meniu context"
   </dest>
   <voice>
-    *: "Context Menu"
+    *: "Meniu context"
   </voice>
 </phrase>
 <phrase>
@@ -8876,7 +8872,7 @@
     *: "Ecran precedent"
   </dest>
   <voice>
-    *: "Previous Screen"
+    *: "Ecran precedent"
   </voice>
 </phrase>
 <phrase>
@@ -8890,7 +8886,7 @@
     *: "Afisare melodie"
   </dest>
   <voice>
-    *: "Track Display"
+    *: "Afisare melodie"
   </voice>
 </phrase>
 <phrase>
@@ -8904,7 +8900,7 @@
     *: "Tastatura noua"
   </dest>
   <voice>
-    *: "New Keyboard"
+    *: "Tastatura noua"
   </voice>
 </phrase>
 <phrase>
@@ -8921,7 +8917,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Clear Preset List"
+    radio: "Stergere lista preset-uri"
   </voice>
 </phrase>
 <phrase>
@@ -8991,7 +8987,7 @@
     *: "Adauga la lista muzicala"
   </dest>
   <voice>
-    *: "Add to Playlist"
+    *: "Adauga la lista muzicala"
   </voice>
 </phrase>
 <phrase>
@@ -9045,7 +9041,7 @@
     *: "Plugin-uri"
   </dest>
   <voice>
-    *: "Plugins"
+    *: "Plugin-uri"
   </voice>
 </phrase>
 <phrase>
@@ -9059,7 +9055,7 @@
     *: "Baza de date"
   </dest>
   <voice>
-    *: "Database"
+    *: "Baza de date"
   </voice>
 </phrase>
 <phrase>
@@ -9073,7 +9069,7 @@
     *: "Suport Cuesheet "
   </dest>
   <voice>
-    *: "Cuesheet Support"
+    *: "Suport Cuesheet "
   </voice>
 </phrase>
 <phrase>
@@ -9090,7 +9086,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Bar (Gradient Colour)"
+    lcd_color: "Bara (Culoare gradient)"
   </voice>
 </phrase>
 <phrase>
@@ -9104,7 +9100,7 @@
     *: "Track Gain daca in mod aleator"
   </dest>
   <voice>
-    *: "Track Gain if Shuffling"
+    *: "Track Gain daca in mod aleator"
   </voice>
 </phrase>
 <phrase>
@@ -9132,7 +9128,7 @@
     *: "Afiseaza extensii nume fisiere"
   </dest>
   <voice>
-    *: "Show Filename Extensions"
+    *: "Afiseaza extensii nume fisiere"
   </voice>
 </phrase>
 <phrase>
@@ -9160,7 +9156,7 @@
     *: "Muta"
   </dest>
   <voice>
-    *: "Move"
+    *: "Muta"
   </voice>
 </phrase>
 <phrase>
@@ -9177,7 +9173,7 @@
   </dest>
   <voice>
     *: none
-    radio: "FM Radio"
+    radio: "Radio FM"
   </voice>
 </phrase>
 <phrase>
@@ -9194,7 +9190,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Presplit Gap"
+    recording: "Distanta despartire"
   </voice>
 </phrase>
 <phrase>
@@ -9253,7 +9249,7 @@
     *: "Acumuleaza date timp rulare"
   </dest>
   <voice>
-    *: "Gather Runtime Data"
+    *: "Acumuleaza date timp rulare"
   </voice>
 </phrase>
 <phrase>
@@ -9298,7 +9294,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Start new file"
+    recording: "Incepe fisier nou"
   </voice>
 </phrase>
 <phrase>
@@ -9315,7 +9311,7 @@
   </dest>
   <voice>
     *: none
-    recording: "What to do when Splitting"
+    recording: "Ce e de facut la despartire"
   </voice>
 </phrase>
 <phrase>
@@ -9329,7 +9325,7 @@
     *: "Ecran de inceput"
   </dest>
   <voice>
-    *: "Start Screen"
+    *: "Ecran de inceput"
   </voice>
 </phrase>
 <phrase>
@@ -9343,7 +9339,7 @@
     *: "Da - Numai cele recente"
   </dest>
   <voice>
-    *: "Yes - Recent only"
+    *: "Da - Numai cele recente"
   </voice>
 </phrase>
 <phrase>
@@ -9374,7 +9370,7 @@
     *: "Listeaza semne de carte"
   </dest>
   <voice>
-    *: "List Bookmarks"
+    *: "Listeaza semne de carte"
   </voice>
 </phrase>
 <phrase>
@@ -9436,7 +9432,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB Strength"
+    masf: "Putere MDB"
   </voice>
 </phrase>
 <phrase>
@@ -9453,7 +9449,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Bar (Solid Colour)"
+    lcd_color: "Bara (Culoare)"
   </voice>
 </phrase>
 <phrase>
@@ -9467,7 +9463,7 @@
     *: "Activeaza Replaygain"
   </dest>
   <voice>
-    *: "Enable Replaygain"
+    *: "Activeaza Replaygain"
   </voice>
 </phrase>
 <phrase>
@@ -9509,7 +9505,7 @@
     *: "Stergere"
   </dest>
   <voice>
-    *: "Delete"
+    *: "Stergere"
   </voice>
 </phrase>
 <phrase>
@@ -9591,7 +9587,7 @@
     *: "Arata calea"
   </dest>
   <voice>
-    *: "Show Path"
+    *: "Arata calea"
   </voice>
 </phrase>
 <phrase>
@@ -9605,7 +9601,7 @@
     *: "Selecteaza semn de carte"
   </dest>
   <voice>
-    *: "Select Bookmark"
+    *: "Selecteaza semn de carte"
   </voice>
 </phrase>
 <phrase>
@@ -9622,7 +9618,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Disabled"
+    alarm: "Alarma dezactivata"
   </voice>
 </phrase>
 <phrase>
@@ -9673,7 +9669,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Save Preset List"
+    radio: "Salveaza lista preset"
   </voice>
 </phrase>
 <phrase>
@@ -9687,7 +9683,7 @@
     *: "Aplicatii"
   </dest>
   <voice>
-    *: "Applications"
+    *: "Aplicatii"
   </voice>
 </phrase>
 <phrase>
@@ -9703,7 +9699,7 @@
     wheel_acceleration: none
   </dest>
   <voice>
-    *: "List Acceleration Start Delay"
+    *: "Intarzierea accelerarii startului listei"
     wheel_acceleration: none
   </voice>
 </phrase>
@@ -9754,7 +9750,7 @@
 </phrase>
 <phrase>
   id: LANG_MOVING
-  desc: 
+  desc:
   user: core
   <source>
     *: "Moving..."
@@ -9828,7 +9824,7 @@
     *: "Foloseste director .talk clips"
   </dest>
   <voice>
-    *: "Use Directory .talk Clips"
+    *: "Foloseste director .talk clips"
   </voice>
 </phrase>
 <phrase>
@@ -9879,7 +9875,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Add Preset"
+    radio: "Adaugare preset"
   </voice>
 </phrase>
 <phrase>
@@ -9893,7 +9889,7 @@
     *: "Proprietati"
   </dest>
   <voice>
-    *: "Properties"
+    *: "Proprietati"
   </voice>
 </phrase>
 <phrase>
@@ -9924,7 +9920,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Weak"
+    swcodec: "Slab"
   </voice>
 </phrase>
 <phrase>
@@ -10048,7 +10044,7 @@
     *: "Disc"
   </dest>
   <voice>
-    *: "Disk"
+    *: "Disc"
   </voice>
 </phrase>
 <phrase>
@@ -10062,7 +10058,7 @@
     *: "Administreaza setari"
   </dest>
   <voice>
-    *: "Manage Settings"
+    *: "Administreaza setari"
   </voice>
 </phrase>
 <phrase>
@@ -10110,12 +10106,12 @@
     *: "Vizualizeaza catalog"
   </dest>
   <voice>
-    *: "View Catalog"
+    *: "Vizualizeaza catalog"
   </voice>
 </phrase>
 <phrase>
   id: VOICE_EXT_CUESHEET
-  desc: 
+  desc:
   user: core
   <source>
     *: ""
@@ -10155,7 +10151,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Colours"
+    lcd_color: "Culori"
   </voice>
 </phrase>
 <phrase>
@@ -10214,7 +10210,7 @@
     *: "Vizualizeaza lista muzicala curenta"
   </dest>
   <voice>
-    *: "View Current Playlist"
+    *: "Vizualizeaza lista muzicala curenta"
   </voice>
 </phrase>
 <phrase>
@@ -10248,7 +10244,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB Shape"
+    masf: "Forma MDB"
   </voice>
 </phrase>
 <phrase>
@@ -10265,7 +10261,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Car Adapter Mode"
+    charging: "Mod adaptor masina"
   </voice>
 </phrase>
 <phrase>
@@ -10282,7 +10278,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop Below"
+    recording: "Opreste dedesupt"
   </voice>
 </phrase>
 <phrase>
@@ -10296,7 +10292,7 @@
     *: "Taiere"
   </dest>
   <voice>
-    *: "Cut"
+    *: "Taiere"
   </voice>
 </phrase>
 <phrase>
@@ -10333,7 +10329,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Upside Down"
+    lcd_bitmap: "Rasturnat"
   </voice>
 </phrase>
 <phrase>
@@ -10347,7 +10343,7 @@
     *: "Definit personal"
   </dest>
   <voice>
-    *: "Custom"
+    *: "Definit personal"
   </voice>
 </phrase>
 <phrase>
@@ -10440,7 +10436,7 @@
     *: "Numai directorul curent"
   </dest>
   <voice>
-    *: "Current Directory Only"
+    *: "Numai directorul curent"
   </voice>
 </phrase>
 <phrase>
@@ -10457,7 +10453,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Secondary Colour"
+    lcd_color: "Culoare secundara"
   </voice>
 </phrase>
 <phrase>
@@ -10471,7 +10467,7 @@
     *: "Numere"
   </dest>
   <voice>
-    *: "Numbers"
+    *: "Numere"
   </voice>
 </phrase>
 <phrase>
@@ -10485,7 +10481,7 @@
     *: "Numai nume melodie"
   </dest>
   <voice>
-    *: "Track Name Only"
+    *: "Numai nume melodie"
   </voice>
 </phrase>
 <phrase>
@@ -10499,7 +10495,7 @@
     *: "Voce nume fisier"
   </dest>
   <voice>
-    *: "Voice Filenames"
+    *: "Voce nume fisier"
   </voice>
 </phrase>
 <phrase>
@@ -10516,7 +10512,7 @@
   </dest>
   <voice>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo: "Taiere inalte"
   </voice>
 </phrase>
 <phrase>
@@ -10533,7 +10529,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Channels"
+    recording: "Canale"
   </voice>
 </phrase>
 <phrase>
@@ -10575,7 +10571,7 @@
     *: "Salt defilare"
   </dest>
   <voice>
-    *: "Jump Scroll"
+    *: "Salt defilare"
   </voice>
 </phrase>
 <phrase>
@@ -10668,7 +10664,7 @@
     *: "Liste muzicale"
   </dest>
   <voice>
-    *: "Playlists"
+    *: "Liste muzicale"
   </voice>
 </phrase>
 <phrase>
@@ -10682,7 +10678,7 @@
     *: "Numai la vizualizare toate tipurile"
   </dest>
   <voice>
-    *: "Only When Viewing All Types"
+    *: "Numai la vizualizare toate tipurile"
   </voice>
 </phrase>
 <phrase>
@@ -10724,7 +10720,7 @@
     *: "Numai tipurile necunoscute"
   </dest>
   <voice>
-    *: "Only Unknown Types"
+    *: "Numai tipurile necunoscute"
   </voice>
 </phrase>
 <phrase>
@@ -10828,7 +10824,7 @@
     *: "Pastreaza lista semne de carte recente?"
   </dest>
   <voice>
-    *: "Maintain a List of Recent Bookmarks?"
+    *: "Pastreaza lista semne de carte recente?"
   </voice>
 </phrase>
 <phrase>
@@ -10887,7 +10883,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Mode"
+    swcodec: "Mod filare"
   </voice>
 </phrase>
 <phrase>
@@ -10918,7 +10914,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Equalizer"
+    swcodec: "Egalizator"
   </voice>
 </phrase>
 <phrase>
@@ -10932,7 +10928,7 @@
     *: "Nu exista nimic de continuat"
   </dest>
   <voice>
-    *: "Nothing to resume"
+    *: "Nu exista nimic de continuat"
   </voice>
 </phrase>
 <phrase>
@@ -10946,7 +10942,7 @@
     *: "Resetati ora?"
   </dest>
   <voice>
-    *: "Clear Time?"
+    *: "Resetati ora?"
   </voice>
 </phrase>
 <phrase>
@@ -11022,7 +11018,7 @@
     *: "Raport Last.fm"
   </dest>
   <voice>
-    *: "Last.fm Log"
+    *: "Raport Last.fm"
   </voice>
 </phrase>
 <phrase>
@@ -11039,7 +11035,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Start Above"
+    recording: "Start deasupra"
   </voice>
 </phrase>
 <phrase>
@@ -11073,7 +11069,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Set As Backdrop"
+    lcd_non-mono: "Seteaza ca fond de ecran"
   </voice>
 </phrase>
 <phrase>
@@ -11087,7 +11083,7 @@
     *: "Camp de tipuri de fisiere plin"
   </dest>
   <voice>
-    *: "Filetype array full"
+    *: "Camp de tipuri de fisiere plin"
   </voice>
 </phrase>
 <phrase>
@@ -11101,7 +11097,7 @@
     *: "Setari"
   </dest>
   <voice>
-    *: "Settings"
+    *: "Setari"
   </voice>
 </phrase>
 <phrase>
@@ -11146,7 +11142,7 @@
     *: "Anulat"
   </dest>
   <voice>
-    *: "Cancelled"
+    *: "Anulat"
   </voice>
 </phrase>
 <phrase>
@@ -11177,7 +11173,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Clear Current Presets?"
+    radio: "Stergeti preset-uri curente?"
   </voice>
 </phrase>
 <phrase>
@@ -11225,7 +11221,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-In Delay"
+    swcodec: "Intarziere Fade-In"
   </voice>
 </phrase>
 <phrase>
@@ -11239,7 +11235,7 @@
     *: "Semn de carte la stop"
   </dest>
   <voice>
-    *: "Bookmark on Stop"
+    *: "Semn de carte la stop"
   </voice>
 </phrase>
 <phrase>
@@ -11295,7 +11291,7 @@
     *: "Sunteti sigur?"
   </dest>
   <voice>
-    *: "Are You Sure?"
+    *: "Sunteti sigur?"
   </voice>
 </phrase>
 <phrase>
@@ -11309,7 +11305,7 @@
     *: "Actualizare in fundal"
   </dest>
   <voice>
-    *: "Updating in background"
+    *: "Actualizare in fundal"
   </voice>
 </phrase>
 <phrase>
@@ -11340,7 +11336,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Rasfoieste fonturi"
   </voice>
 </phrase>
 <phrase>
@@ -11354,7 +11350,7 @@
     *: "Nu exista liste muzicale"
   </dest>
   <voice>
-    *: ""
+    *: "Nu exista liste muzicale"
   </voice>
 </phrase>
 <phrase>
@@ -11401,7 +11397,7 @@
 </phrase>
 <phrase>
   id: LANG_COPYING
-  desc: 
+  desc:
   user: core
   <source>
     *: "Copying..."
@@ -11424,7 +11420,7 @@
     *: "Semn de carte esuat!"
   </dest>
   <voice>
-    *: "Bookmark Failed!"
+    *: "Semn de carte esuat!"
   </voice>
 </phrase>
 <phrase>
@@ -11475,7 +11471,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Set As Recording Directory"
+    recording: "Seteaza ca director de inregistrari"
   </voice>
 </phrase>
 <phrase>
@@ -11489,7 +11485,7 @@
     *: "Creaza un semn de carte?"
   </dest>
   <voice>
-    *: "Create a Bookmark?"
+    *: "Creaza un semn de carte?"
   </voice>
 </phrase>
 <phrase>
@@ -11506,7 +11502,7 @@
   </dest>
   <voice>
     *: none
-    radio: "FM Radio Menu"
+    radio: "Meniu Radio FM"
   </voice>
 </phrase>
 <phrase>
