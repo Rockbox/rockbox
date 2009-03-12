@@ -19,6 +19,7 @@
 # - Liberman Shachar
 # - Rani Hod
 # - Tomer Shalev
+# - Sasha Khamkov
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
