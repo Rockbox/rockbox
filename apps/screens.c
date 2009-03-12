@@ -91,7 +91,7 @@ static int clamp_value_wrap(int value, int max, int min)
 }
 #endif
 
-int handle_usb_events(struct event_queue *q)
+static int handle_usb_events(struct event_queue *q)
 {
     struct queue_event ev;
     int next_update=0;
