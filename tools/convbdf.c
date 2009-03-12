@@ -57,6 +57,8 @@ struct font {
     int     nchars_declared; /* number of glyphs as declared in the header */
     int     ascent_declared; /* ascent as declared in the header */
     int     descent_declared; /* descent as declared in the header */
+    int     max_char_ascent;  /* max. char ascent (before adjusting) */
+    int     max_char_descent; /* max. char descent (before adjusting) */
     unsigned int* offrot;   /* offsets into rotated bitmap data */
     char*   name;       /* font name */
     char*   facename;   /* facename of font */
@@ -503,6 +505,16 @@ struct font* bdf_read_font(char *path)
         print_warning(VL_CLIP_FONT, "Generated font's height: %d\n", pf->height);
     }
     
+    if (pf->ascent > pf->max_char_ascent) {
+        print_trace("Font's ascent could be reduced by %d to %d without clipping\n",
+                (pf->ascent - pf->max_char_ascent), pf->max_char_ascent);
+    }
+    if (pf->descent > pf->max_char_descent) {
+        print_trace("Font's descent could be reduced by %d to %d without clipping\n",
+                (pf->descent - pf->max_char_descent), pf->max_char_descent);
+    }
+    
+    
     /* Alocate memory */
     pf->bits_size = pf->size * BITMAP_WORDS(pf->maxwidth) * pf->height;
     pf->bits = (bitmap_t *)malloc(pf->bits_size * sizeof(bitmap_t));
@@ -935,7 +947,7 @@ void bdf_correct_bbx(int *width, int *bbx) {
 int bdf_analyze_font(FILE *fp, struct font* pf) {
     char buf[256];
     int encoding;
-    int width, bbw, bbh, bbx, bby, overflow;
+    int width, bbw, bbh, bbx, bby, ascent, overflow;
     int read_enc = 0, read_width = 0, read_bbx = 0, read_endchar = 1;
     int ignore_char = 0;
 
@@ -944,6 +956,7 @@ int bdf_analyze_font(FILE *fp, struct font* pf) {
     
     pf->maxwidth = 0;
     pf->nchars = 0;
+    pf->max_char_ascent = pf->max_char_descent = 0;
     pf->max_over_ascent = pf->max_over_descent = 0;
 
     for (;;) {
@@ -983,14 +996,16 @@ int bdf_analyze_font(FILE *fp, struct font* pf) {
                 if (width > pf->maxwidth) {
                     pf->maxwidth = width;
                 }
-                overflow = bby + bbh - pf->ascent;
-                if (overflow > pf->max_over_ascent) {
-                    pf->max_over_ascent = overflow;
-                }
-                overflow = -bby - pf->descent;
-                if (overflow > pf->max_over_descent) {
-                    pf->max_over_descent = overflow;
-                }
+
+                ascent = bby + bbh;
+                pf->max_char_ascent = MAX(pf->max_char_ascent, ascent);
+                overflow = ascent - pf->ascent;
+                pf->max_over_ascent = MAX(pf->max_over_ascent, overflow);
+
+                ascent = -bby;
+                pf->max_char_descent = MAX(pf->max_char_descent, ascent);
+                overflow = ascent - pf->descent;
+                pf->max_over_descent = MAX(pf->max_over_descent, overflow);
             }
             pf->nchars++;
             read_endchar = 1;
