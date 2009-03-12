@@ -29,6 +29,8 @@
 
 #define DMA_PLAY_CH_NUM 2
 #define DMA_REC_CH_NUM 1
+#define DMA_PLAY_CH_PRIORITY 6
+#define DMA_REC_CH_PRIORITY 6
 
 static struct buffer_descriptor dma_play_bd DEVBSS_ATTR;
 static struct channel_descriptor dma_play_cd DEVBSS_ATTR;
@@ -126,6 +128,7 @@ void pcm_play_dma_init(void)
     dma_play_cd.event_id1 = SDMA_REQ_SSI2_TX1;
 
     sdma_channel_init(DMA_PLAY_CH_NUM, &dma_play_cd, &dma_play_bd);
+    sdma_channel_set_priority(DMA_PLAY_CH_NUM, DMA_PLAY_CH_PRIORITY);
 
     imx31_clkctl_module_clock_gating(CG_SSI1, CGM_ON_ALL);
     imx31_clkctl_module_clock_gating(CG_SSI2, CGM_ON_ALL);
@@ -518,6 +521,7 @@ void pcm_rec_dma_init(void)
     dma_rec_cd.event_id1 = SDMA_REQ_SSI1_RX1;
 
     sdma_channel_init(DMA_REC_CH_NUM, &dma_rec_cd, &dma_rec_bd);
+    sdma_channel_set_priority(DMA_REC_CH_NUM, DMA_REC_CH_PRIORITY);
 }
 
 const void * pcm_rec_dma_get_peak_buffer(int *count)

@@ -26,13 +26,14 @@
 #endif
 
 /* Plain C read & write loops */
+/* They likely won't be used anyway since DMA potentially works for any
+ * sector number and alignment. */
 #define PREFER_C_READING
 #define PREFER_C_WRITING
-#if 0
-#if !defined(BOOTLOADER)
-#define ATA_OPTIMIZED_WRITING
-void copy_write_sectors(const unsigned char* buf, int wordcount);
-#endif
+
+#ifdef HAVE_ATA_DMA
+#define ATA_MAX_MWDMA   2
+#define ATA_MAX_UDMA    4
 #endif
 
 #define ATA_DATA        ATA_DRIVE_DATA

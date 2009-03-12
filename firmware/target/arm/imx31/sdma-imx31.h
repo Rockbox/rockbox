@@ -85,7 +85,7 @@ enum SDMA_REQUEST_TYPE
 {
     SDMA_REQ_EXT0       =  0, /* Extern DMA request from MCU1_0 */
     SDMA_REQ_CCM        =  1, /* DVFS/DPTC event (ccm_dvfs_sdma_int) */
-    SDMA_REQ_ATA_TX_END =  2, /* ata_txfer_end_alarm (event_id) */
+    SDMA_REQ_ATA_TXFER_END =  2, /* ata_txfer_end_alarm (event_id1) */
     SDMA_REQ_ATA_TX     =  3, /* ata_tx_fifo_alarm (event_id2) */
     SDMA_REQ_ATA_RX     =  4, /* ata_rcv_fifo_alarm (event_id2) */
     SDMA_REQ_SIM        =  5, /* */
@@ -223,5 +223,6 @@ bool sdma_channel_init(unsigned int channel,
                        struct channel_descriptor *cd_p,
                        struct buffer_descriptor *base_bd_p);
 void sdma_channel_close(unsigned int channel);
+bool sdma_channel_is_error(unsigned int channel);
 
 #endif /* SDMA_IMX31_H */

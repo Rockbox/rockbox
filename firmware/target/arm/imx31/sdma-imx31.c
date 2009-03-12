@@ -468,6 +468,8 @@ static bool setup_channel(struct channel_control_block *ccb_p)
                      CHANNEL_CONTEXT_ADDR(channel),
                      sizeof (context_buffer)/4);
 
+    ccb_p->status.error = 0; /* Clear channel-wide error flag */
+
     if (cd_p->is_setup != 0)
         return true; /* No more to do */
 
@@ -757,6 +759,12 @@ void sdma_channel_close(unsigned int channel)
 
     /* Reset channel control block entry */
     memset(ccb_p, 0x00, sizeof (struct channel_control_block));
+}
+
+/* Check channel-wide error flag */
+bool sdma_channel_is_error(unsigned int channel)
+{
+    return channel < CH_NUM && ccb_array[channel].status.error;
 }
 
 /* Write 32-bit words to SDMA core memory. Host endian->SDMA endian. */

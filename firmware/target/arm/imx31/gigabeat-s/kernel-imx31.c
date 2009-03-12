@@ -65,9 +65,7 @@ void tick_start(unsigned int interval_in_ms)
 
 void kernel_device_init(void)
 {
-#ifndef BOOTLOADER
     sdma_init();
-#endif
     spi_init();
     mc13783_init();
 }

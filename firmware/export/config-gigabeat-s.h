@@ -186,6 +186,9 @@
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
 
+/* Define this to add support for ATA DMA */
+#define HAVE_ATA_DMA
+
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 

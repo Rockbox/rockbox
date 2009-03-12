@@ -497,11 +497,11 @@
 #define ATA_IORDY_EN            (1 << 0)
 
 /* ATA_INTERRUPT_PENDING, ATA_INTERRUPT_ENABLE, ATA_INTERRUPT_CLEAR flags */
-#define ATA_INTRQ1              (1 << 7)
+#define ATA_INTRQ1              (1 << 7) /* INTRQ to the DMA */
 #define ATA_FIFO_UNDERFLOW      (1 << 6)
 #define ATA_FIFO_OVERFLOW       (1 << 5)
 #define ATA_CONTROLLER_IDLE     (1 << 4)
-#define ATA_INTRQ2              (1 << 3)
+#define ATA_INTRQ2              (1 << 3) /* INTRQ to the MCU */
 
 /* EPIT */
 #define EPITCR1                 (*(REG32_PTR_T)(EPIT1_BASE_ADDR+0x00))
