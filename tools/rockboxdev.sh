@@ -211,6 +211,16 @@ else
   pathadd="$bindir"
 fi
 
+echo ""
+echo "In case you encounter a slow internet connection, you can use an alternative mirror."
+echo "A list of other GNU mirrors is available here: http://www.gnu.org/prep/ftp.html"
+echo ""
+echo "Usage: GNU_MIRROR=[URL] ./rockboxdev.sh"
+echo ""
+echo "Example:"
+echo "$ GNU_MIRROR=http://mirrors.kernel.org/gnu ./rockboxdev.sh"
+echo ""
+
 if test -f "$dlwhere/binutils-$binutils.tar.bz2"; then
   echo "binutils $binutils already downloaded"
 else
@@ -261,17 +271,6 @@ echo "When done, append $bindir to PATH" >> $summary
 echo "=================================================================" >> $summary
 
 cat $summary
-
-echo ""
-echo "In case you encounter a slow internet connection, you can use an alternative mirror."
-echo "A list of other GNU mirrors is available here: http://www.gnu.org/prep/ftp.html"
-echo ""
-echo "Usage: GNU_MIRROR=[URL] ./rockboxdev.sh"
-echo ""
-echo "Example:"
-echo "$ GNU_MIRROR=http://mirrors.kernel.org/gnu ./rockboxdev.sh"
-echo ""
-
 
 echo "ROCKBOXDEV: extracting binutils-$binutils in $builddir"
 tar xjf $dlwhere/binutils-$binutils.tar.bz2
