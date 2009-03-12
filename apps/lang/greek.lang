@@ -5774,11 +5774,11 @@
   </source>
   <dest>
     *: none
-    recording_swcodec: "Ρυθμός Βit"
+    recording_swcodec: "Ρυθμός μετάδοσης"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Ρυθμός Μπιτ"
+    recording_swcodec: "Ρυθμός μετάδοσης"
   </voice>
 </phrase>
 <phrase>
@@ -6945,7 +6945,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user: core
   <source>
     *: "Version"
@@ -7539,7 +7539,7 @@
     *: "[Bitrate]"
   </source>
   <dest>
-    *: "[Ρυθμός Bit]"
+    *: "[Ρυθμός μετάδοσης]"
   </dest>
   <voice>
     *: ""
@@ -8059,7 +8059,6 @@
   </dest>
   <voice>
     *: "Τέλος λίστας κομματιών"
-    player: "Τέλος λίστας"
   </voice>
 </phrase>
 <phrase>
@@ -12130,10 +12129,10 @@
     *: "Search Results"
   </source>
   <dest>
-    *: "Αποτελέσματα εύρεσης"
+    *: "Αποτελέσματα αναζήτησης"
   </dest>
   <voice>
-    *: "Αποτελέσματα εύρεσης"
+    *: "Αποτελέσματα αναζήτησης"
   </voice>
 </phrase>
 <phrase>
@@ -12168,5 +12167,180 @@
   <voice>
     *: none
     quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest>
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Ενεργοποίηση ηχείου"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Ενεργοποίηση ηχείου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Ερμηνεία αριθμών κατά την ταξινόμηση"
+  </dest>
+  <voice>
+    *: "Ερμηνεία αριθμών κατά την ταξινόμηση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Ρυθμός μετάδοσης σειριακής θύρας"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Ρυθμός μετάδοσης σειριακής θύρας"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest>
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "57600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "Ως ολόκληρους αριθμούς"
+  </dest>
+  <voice>
+    *: "Ως ολόκληρους αριθμούς"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user: core
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Συντελεστές"
+  </dest>
+  <voice>
+    *: "Συντελεστές"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Ως ψηφία"
+  </dest>
+  <voice>
+    *: "Ως ψηφία"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Αυτόματο"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Αυτόματο"
   </voice>
 </phrase>
