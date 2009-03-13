@@ -518,7 +518,7 @@ void Config::browseCache()
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
     cbrowser->setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
 #elif defined(Q_OS_WIN32)
-    cbrowser->setFilter(QDir::Drives);
+    cbrowser->setFilter(QDir::Drives | QDir::AllDirs | QDir::NoDotAndDotDot);
 #endif
     cbrowser->setDir(ui.cachePath->text());
     connect(cbrowser, SIGNAL(itemChanged(QString)), this, SLOT(setCache(QString)));
