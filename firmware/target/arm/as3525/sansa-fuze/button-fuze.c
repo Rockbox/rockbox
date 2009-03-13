@@ -32,9 +32,6 @@
 #include "button-target.h"
 #include "backlight.h"
 
-#define WHEEL_REPEAT_INTERVAL   30
-#define WHEELCLICKS_PER_ROTATION    48 /* wheelclicks per full rotation */
-
 /* Buttons */
 static bool hold_button     = false;
 #ifndef BOOTLOADER
@@ -52,12 +49,15 @@ void button_init_device(void)
 }
 
 #if !defined(BOOTLOADER) && defined(HAVE_SCROLLWHEEL)
-static void scrollwheel(void)
+static void scrollwheel(short dbop)
 {
-    static unsigned old_wheel_value = 0;
-    static unsigned wheel_value     = 0;
-    static unsigned wheel_repeat    = BUTTON_NONE;
+    /* current wheel values, parsed from dbop and the resulting button */
+    unsigned        wheel_value     = 0;
     unsigned        btn             = BUTTON_NONE;
+    /* old wheel values */
+    static unsigned old_wheel_value = 0;
+    static unsigned wheel_repeat    = BUTTON_NONE;
+
     /* getting BUTTON_REPEAT works like this: We increment repeat by 2 if the
      * wheel was turned, and decrement it by 1 each tick,
      * that means: if you change the wheel fast enough, repeat will be >1 and
@@ -76,7 +76,7 @@ static void scrollwheel(void)
         { 2, 0, 3, 1 }, /* Clockwise rotation */
         { 1, 3, 0, 2 }, /* Counter-clockwise  */ 
     };
-    wheel_value = _dbop_din & (1<<13|1<<14);
+    wheel_value = dbop & (1<<13|1<<14);
     wheel_value >>= 13;
 
     if (old_wheel_value == wheel_tbl[0][wheel_value])
@@ -89,25 +89,32 @@ static void scrollwheel(void)
         if (btn != wheel_repeat)
         {
             /* direction reversals nullify repeats */
-            wheel_repeat      = btn;
-            repeat            = 0;
+            wheel_repeat        = btn;
+            repeat              = 0;
         }
         if (btn != BUTTON_NONE)
         {
-            /* generate repeats if quick enough */
-            if (repeat > 0)
+            /* wheel_delta will cause lists to jump over items,
+             * we want this for fast scrolling, but we must keep it accurate
+             * for slow scrolling */
+            int wheel_delta = 0;
+            /* generate repeats if quick enough, scroll slightly faster too*/
+            if (repeat > 1)
             {
                 btn |= BUTTON_REPEAT;
+                wheel_delta = repeat>>2;
             }
+
             repeat += 2;
+
             /* the wheel is more reliable if we don't send ever change,
              * every 4th is basically one "physical click" is 1 item in
              * the rockbox menus */
-            if (queue_empty(&button_queue) && ++counter >= 4)
+            if (++counter >= 4 && queue_empty(&button_queue))
             {
                 buttonlight_on();
                 backlight_on();
-                queue_post(&button_queue, btn, 1<<24);
+                queue_post(&button_queue, btn, ((wheel_delta+1)<<24));
                 /* message posted - reset count */
                 counter = 0;
             }
@@ -219,26 +226,26 @@ int button_read_device(void)
 {
     int btn = BUTTON_NONE;
     short dbop = button_dbop();
-    static unsigned power_counter = HZ;
+    static unsigned power_counter = 0;
     /* hold button */
     if(dbop & (1<<12))
     {
-        power_counter = 0;
+        power_counter = HZ;
         hold_button = true;
     }
     else
     {
-        /* might wrap, but shouldn't be much of an issue*/
-        power_counter++;
         hold_button = false;
 #if defined(HAVE_SCROLLWHEEL) && !defined(BOOTLOADER)
     /* read wheel on bit 13 & 14, but sent to the button queue seperately */
-        scrollwheel();
+        scrollwheel(dbop);
 #endif
     /* read power on bit 8, but not if hold button was just released, since
      * you basically always hit power due to the slider mechanism after releasing
      * hold (wait ~1 sec) */
-        if (dbop & (1<<8) && power_counter>HZ)
+        if (power_counter)
+            power_counter--;
+        if (!power_counter && dbop & (1<<8))
             btn |= BUTTON_POWER;
     /* read home on bit 15 */
         if (!(dbop & (1<<15)))
