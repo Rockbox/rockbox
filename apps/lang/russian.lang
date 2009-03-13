@@ -12246,10 +12246,10 @@
     *: "Interpret numbers when sorting"
   </source>
   <dest>
-    *: "Interpret numbers when sorting"
+    *: "Как учитывать числа при сортировке"
   </dest>
   <voice>
-    *: "Interpret numbers when sorting"
+    *: "Как учитывать числа при сортировке"
   </voice>
 </phrase>
 <phrase>
@@ -12300,7 +12300,7 @@
   </dest>
   <voice>
     *: none
-    serial_port: "тридцать-восемь четыресто"
+    serial_port: "тридцать-восемь четыреста"
   </voice>
 </phrase>
 <phrase>
@@ -12328,10 +12328,10 @@
     *: "As whole numbers"
   </source>
   <dest>
-    *: "As whole numbers"
+    *: "Как числа"
   </dest>
   <voice>
-    *: "As whole numbers"
+    *: "Как числа"
   </voice>
 </phrase>
 <phrase>
