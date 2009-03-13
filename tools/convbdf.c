@@ -88,6 +88,10 @@ struct stretch {
 #define MAX(a,b)            ((a) > (b) ? (a) : (b))
 #define MIN(a,b)            ((a) < (b) ? (a) : (b))
 
+#ifdef ROTATE
+#define ROTATION_BUF_SIZE 2048
+#endif
+
 /* Depending on the verbosity level some warnings are printed or not */
 int verbosity_level = 0;
 int trace = 0;
@@ -1084,6 +1088,9 @@ bitmap_t bdf_hexval(unsigned char *buf, int ndx1, int ndx2)
     return val;
 }
 
+
+#ifdef ROTATE
+
 /*
  * Take an bitmap_t bitmap and convert to Rockbox format.
  * Used for converting font glyphs for the time being.
@@ -1092,28 +1099,36 @@ bitmap_t bdf_hexval(unsigned char *buf, int ndx1, int ndx2)
  *
  * Doing it this way keeps fonts in standard formats,
  * as well as keeping Rockbox hw bitmap format.
+ *
+ * Returns the size of the rotated glyph (in bytes) or a
+ * negative value if the glyph could not be rotated.
  */
 int rotleft(unsigned char *dst, /* output buffer */
             size_t dstlen,      /* buffer size */
-            bitmap_t *src, unsigned int width, unsigned int height)
+            bitmap_t *src, unsigned int width, unsigned int height,
+            int char_code)
 {
     unsigned int i,j;
     unsigned int src_words;     /* # words of input image */
     unsigned int dst_mask;      /* bit mask for destination */
     bitmap_t src_mask;          /* bit mask for source */
+    
+    /* How large the buffer should be to hold the rotated bitmap
+       of a glyph of size (width x height) */
+    unsigned int needed_size = ((height + 7) / 8) * width;
+
+    if (needed_size > dstlen) {
+        print_error("Character %d: Glyph of size %d x %d can't be rotated "
+                "(buffer size is %lu, needs %u)\n",
+                char_code, width, height, (unsigned long)dstlen, needed_size);
+        return -1;
+    }
 
     /* calc words of input image*/
     src_words = BITMAP_WORDS(width) * height;
-
-    if(((height + 7) / 8) * width > dstlen) {
-        print_error("%s:%d %d x %d overflows %ld bytes buffer, needs %d\n",
-                __FILE__, __LINE__, width, height, (unsigned long)dstlen,
-                ((height + 7) / 8) * width );
-        return 0;
-    }
     
     /* clear background*/
-    memset(dst, 0, ((height + 7) / 8) * width);
+    memset(dst, 0, needed_size);
 
     dst_mask = 1;
 
@@ -1145,17 +1160,21 @@ int rotleft(unsigned char *dst, /* output buffer */
             dst += width;        /* next output byte row */
         }
     }
-    return ((height + 7) / 8) * width; /* return result size in bytes */
+    return needed_size; /* return result size in bytes */
 }
+
+#endif /* ROTATE */
 
 
 /* generate C source from in-core font*/
 int gen_c_source(struct font* pf, char *path)
 {
     FILE *ofp;
-    int i, ofr = 0;
+    int i;
     time_t t = time(0);
-#ifndef ROTATE
+#ifdef ROTATE
+    int ofr = 0;
+#else
     int did_syncmsg = 0;
     bitmap_t *ofs = pf->bits;
 #endif
@@ -1211,6 +1230,7 @@ int gen_c_source(struct font* pf, char *path)
         int bitcount = 0;
         int width = pf->width ? pf->width[i] : pf->maxwidth;
         int height = pf->height;
+        int char_code = pf->firstchar + i;
         bitmap_t *bits;
         bitmap_t bitvalue=0;
 
@@ -1221,7 +1241,7 @@ int gen_c_source(struct font* pf, char *path)
         bits = pf->bits + (pf->offset? (int)pf->offset[i]: (pf->height * i));
 
         fprintf(ofp, "\n/* Character %d (0x%02x):\n   width %d",
-                i+pf->firstchar, i+pf->firstchar, width);
+                char_code, char_code, width);
 
         if (gen_map) {
             fprintf(ofp, "\n   +");
@@ -1259,11 +1279,15 @@ int gen_c_source(struct font* pf, char *path)
         bits = pf->bits + (pf->offset? (int)pf->offset[i]: (pf->height * i));
 #ifdef ROTATE /* pre-rotated into Rockbox bitmap format */
         {
-          unsigned char bytemap[512];
+          unsigned char bytemap[ROTATION_BUF_SIZE];
           int y8, ix=0;
           
           int size = rotleft(bytemap, sizeof(bytemap), bits, width,
-                             pf->height);
+                             pf->height, char_code);
+          if (size < 0) {
+              return -1;
+          }
+          
           for (y8=0; y8<pf->height; y8+=8) /* column rows */
           {
             for (x=0; x<width; x++) {
@@ -1442,7 +1466,7 @@ static int writestr(FILE *fp, char *str, int count)
 #ifndef ROTATE
 static int writestrpad(FILE *fp, char *str, int totlen)
 {
-    int ret;
+    int ret = EOF;
 
     while (str && *str && totlen > 0) {
         if (*str) {
@@ -1499,8 +1523,9 @@ int gen_fnt_file(struct font* pf, char *path)
     {
         bitmap_t* bits;
         int width = pf->width ? pf->width[i] : pf->maxwidth;
-        int size;  
-        unsigned char bytemap[512];
+        int size;
+        int char_code = pf->firstchar + i;
+        unsigned char bytemap[ROTATION_BUF_SIZE];
 
         /* Skip missing glyphs */
         if (pf->offset && (pf->offset[i] == -1))
@@ -1508,7 +1533,10 @@ int gen_fnt_file(struct font* pf, char *path)
 
         bits = pf->bits + (pf->offset? (int)pf->offset[i]: (pf->height * i));
 
-        size = rotleft(bytemap, sizeof(bytemap), bits, width, pf->height);
+        size = rotleft(bytemap, sizeof(bytemap), bits, width, pf->height, char_code);
+        if (size < 0) {
+            return -1;
+        }
         writestr(ofp, (char *)bytemap, size);
 
         /* update offrot since bits are now in sorted order */
@@ -1554,7 +1582,7 @@ int gen_fnt_file(struct font* pf, char *path)
 
     if (pf->offset)
         for (i=0; i<pf->size; ++i) {
-            if (pf->offset[i] == (unsigned int)-1) {
+            if (pf->offset[i] == -1) {
                 pf->offset[i] = pf->offset[pf->defaultchar - pf->firstchar];
             }
             writeint(ofp, pf->offset[i]);
