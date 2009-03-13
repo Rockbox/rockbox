@@ -1144,7 +1144,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user: core
   <source>
     *: "Version"
@@ -1398,7 +1398,7 @@
   </dest>
   <voice>
     *: none
-    spdif_power: ""
+    spdif_power: "Оптический выход"
   </voice>
 </phrase>
 <phrase>
@@ -1687,7 +1687,7 @@
     *: "Прокрутка"
   </dest>
   <voice>
-    *: ""
+    *: "Прокрутка"
   </voice>
 </phrase>
 <phrase>
@@ -2383,7 +2383,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Время предзаписи"
   </voice>
 </phrase>
 <phrase>
@@ -4340,18 +4340,17 @@
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
-    e200*,c200: "The disk is full. Press UP to continue."
+    e200*,c200: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
     recording: "Диск заполнен. Нажмите ВЫКЛ. для продолжения."
     h100,h120,h300: "Диск заполнен. Нажмите СТОП для продолжения."
     m5,x5: "Диск заполнен. Нажмите ВЫКЛ. для продолжения."
-    e200*,c200: "Диск заполнен. Нажмите ВВЕРХ для продолжения."
+    e200*,c200: "Диск заполнен. Нажмите ПРЕД. для продолжения."
   </dest>
   <voice>
     *: none
-    recording,h100,h120,h300,m5,x5,e200*,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -7794,7 +7793,7 @@
   </dest>
   <voice>
     *: none
-    recorder_pad: "Меню"
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -9043,7 +9042,7 @@
     *: "Демо"
   </dest>
   <voice>
-    *: ""
+    *: "Демо"
   </voice>
 </phrase>
 <phrase>
@@ -9322,7 +9321,6 @@
   </dest>
   <voice>
     *: "Конец списка"
-    player: "Конец списка"
   </voice>
 </phrase>
 <phrase>
@@ -11289,7 +11287,7 @@
     *: "Нет списков воспроизведения"
   </dest>
   <voice>
-    *: ""
+    *: "Нет списков воспроизведения"
   </voice>
 </phrase>
 <phrase>
@@ -12204,5 +12202,166 @@
   <voice>
     *: none
     quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest>
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "девятнадцать двести"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Включить динамик"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Включить динамик"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Interpret numbers when sorting"
+  </dest>
+  <voice>
+    *: "Interpret numbers when sorting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Скорость последовательного порта"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Скорость последовательного порта"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "девять шестьсот"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest>
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "тридцать-восемь четыресто"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "пятьдесят-семь шестьсот"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "As whole numbers"
+  </dest>
+  <voice>
+    *: "As whole numbers"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Как цифры"
+  </dest>
+  <voice>
+    *: "Как цифры"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Авто"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Автоматически"
   </voice>
 </phrase>
