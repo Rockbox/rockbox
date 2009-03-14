@@ -236,6 +236,9 @@ void system_init(void)
     CGU_PERI |= ((CLK_DIV(AS3525_PLLA_FREQ, AS3525_PCLK_FREQ) - 1) << 2)
                 | 1; /* clk_in = PLLA */
 
+
+    /* FIXME: dcache will not be active, since the mmu is not running
+     * See arm922t datasheet */
     asm volatile(
         "mov r0, #0               \n"
         "mcr p15, 0, r0, c7, c7   \n" /* invalidate icache & dcache */

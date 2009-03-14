@@ -31,6 +31,13 @@
 #define _DEBUG_PRINTF(a,varargs...) \
     snprintf(buf, sizeof(buf), (a), ##varargs); lcd_puts(0,line++,buf)
 
+#define ON "Enabled"
+#define OFF "Enabled"
+
+#define CP15_MMU (1<<0)            /* mmu off/on */
+#define CP15_DC  (1<<2)            /* dcache off/on */
+#define CP15_IC  (1<<12)           /* icache off/on */
+
 /* FIXME: target tree is including ./debug-target.h rather than the one in
  * sansa-fuze/, even though deps contains the correct one
  * if I put the below into a sansa-fuze/debug-target.h, it doesn't work*/
@@ -39,8 +46,16 @@
 short button_dbop_data(void);
 #endif
 
+static unsigned read_cp15 (void)
+{
+    unsigned value;
 
-/* TODO */
+    asm volatile (
+            "mrc p15, 0, %0, c1, c0, 0   @ read control reg\n":"=r"
+            (value)::"memory"
+    );
+    return (value);
+}
 
 bool __dbg_hw_info(void)
 {
@@ -68,6 +83,9 @@ bool __dbg_ports(void)
         _DEBUG_PRINTF("[DBOP_DIN]");
         _DEBUG_PRINTF("DBOP_DIN: %4x", button_dbop_data());
 #endif
+        line++;
+        _DEBUG_PRINTF("[CP15]");
+        _DEBUG_PRINTF("CP15: 0x%8x", read_cp15());
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
             break;
