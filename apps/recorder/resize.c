@@ -60,6 +60,15 @@
 #define DEBUGF(...)
 #endif
 
+#if CONFIG_CPU == SH7034
+/* 16*16->32 bit multiplication is a single instrcution on the SH1 */
+#define MULUQ(a, b) ((uint32_t) (((uint16_t) (a)) * ((uint16_t) (b))))
+#define MULQ(a, b) ((int32_t) (((int16_t) (a)) * ((int16_t) (b))))
+#else
+#define MULUQ(a, b) ((a) * (b))
+#define MULQ(a, b) ((a) * (b))
+#endif
+
 /* calculate the maximum dimensions which will preserve the aspect ration of
    src while fitting in the constraints passed in dst, and store result in dst,
    returning 0 if rounding and 1 if not rounding.
@@ -208,12 +217,12 @@ static bool scale_h_area(void *out_line_ptr,
             oxe -= ctx->src->width;
 
             /* add saved partial pixel from start of area */
-            acc = acc * ctx->bm->width + tmp * mul;
+            acc = MULUQ(acc, ctx->bm->width) + MULUQ(tmp, mul);
 
             /* get new pixel , then add its partial coverage to this area */
             tmp = *(part->buf);
             mul = ctx->bm->width - oxe;
-            acc += tmp * mul;
+            acc += MULUQ(tmp, mul);
             /* round, divide, and either store or accumulate to output row */
             if (accum)
             {
@@ -402,7 +411,7 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
             ixe -= (ctx->bm->width - 1);
             val = *(part->buf);
             inc = -val;
-            val *= (ctx->bm->width - 1);
+            val = MULUQ(val, ctx->bm->width - 1);
             ix += 1;
             /* If this wasn't the last pixel, add the next one to rgbinc. */
             if (ix < (uint32_t)ctx->src->width) {
@@ -414,10 +423,10 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
                 /* Add a partial step to rgbval, in this pixel isn't precisely
                    aligned with the new source pixel
                 */
-                val += inc * ixe;
+                val += MULQ(inc, ixe);
             }
             /* Now multiply the color increment to its proper value */
-            inc *= ctx->src->width - 1;
+            inc = MULQ(inc, ctx->src->width - 1);
         } else
             val += inc;
         /* round and scale values, and accumulate or store to output */
