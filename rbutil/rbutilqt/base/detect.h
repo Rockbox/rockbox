@@ -45,9 +45,9 @@ public:
 
     static QUrl systemProxy(void);
     static QString installedVersion(QString mountpoint);
-    static int installedTargetId(QString mountpoint);
+    static QString installedTarget(QString mountpoint);
 
-    static QString check(RbSettings* settings, bool permission, int targetId);
+    static QString check(RbSettings* settings, bool permission);
 
 };
 #endif

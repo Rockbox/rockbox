@@ -80,11 +80,12 @@ class RbSettings : public QObject
         double encoderVolume(QString enc);
         bool encoderNarrowband(QString enc);
 
-        QStringList allPlatforms();
+        QStringList allPlatforms(void);
+        QStringList allLanguages(void);
+
         QString name(QString plattform);
         QString brand(QString plattform);
-        QStringList allLanguages();
-        QString nameOfTargetId(int id);
+
         QMap<int, QString> usbIdMap();
         QMap<int, QString> usbIdErrorMap();
         QMap<int, QString> usbIdIncompatMap();

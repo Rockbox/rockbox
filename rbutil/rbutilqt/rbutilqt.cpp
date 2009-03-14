@@ -518,7 +518,7 @@ bool RbUtilQt::installAuto()
 
     // check installed Version and Target
     QString rbVersion = Detect::installedVersion(settings->mountpoint());
-    QString warning = Detect::check(settings, false, settings->curTargetId());
+    QString warning = Detect::check(settings, false);
 
     if(!warning.isEmpty())
     {

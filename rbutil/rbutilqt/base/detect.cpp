@@ -372,29 +372,29 @@ QString Detect::installedVersion(QString mountpoint)
 }
 
 
-/** @brief detects installed rockbox target id
- *  @return TargetId of installed rockbox, or -1 if not available
+/** @brief detects installed rockbox target string
+ *  @return target name (platform) of installed Rockbox, empty string on error.
  */
-int Detect::installedTargetId(QString mountpoint)
+QString Detect::installedTarget(QString mountpoint)
 {
     // read rockbox-info.txt
     QFile info(mountpoint +"/.rockbox/rockbox-info.txt");
     if(!info.open(QIODevice::ReadOnly))
     {
-        return -1;
+        return "";
     }
 
     while (!info.atEnd())
     {
         QString line = info.readLine();
-        if(line.contains("Target id:"))
+        if(line.contains("Target:"))
         {
             qDebug() << line;
-            return line.remove("Target id:").trimmed().toInt();
+            return line.remove("Target:").trimmed();
         }
     }
     info.close();
-    return -1;
+    return "";
 }
 
 
@@ -404,7 +404,7 @@ int Detect::installedTargetId(QString mountpoint)
  *  @param targetId the targetID to check for. if it is -1 no check is done.
  *  @return string with error messages if problems occurred, empty strings if none.
  */
-QString Detect::check(RbSettings* settings, bool permission, int targetId)
+QString Detect::check(RbSettings* settings, bool permission)
 {
     QString text = "";
 
@@ -421,15 +421,12 @@ QString Detect::check(RbSettings* settings, bool permission, int targetId)
     }
 
     // Check TargetId
-    if(targetId > 0)
+    QString installed = installedTarget(settings->mountpoint());
+    if(!installed.isEmpty() && installed != settings->curPlatform())
     {
-        int installedID = Detect::installedTargetId(settings->mountpoint());
-        if( installedID != -1 && installedID != targetId)
-        {
-            text += QObject::tr("<li>Target mismatch detected.\n"
-                    "Installed target: %1, selected target: %2.</li>")
-                    .arg(settings->nameOfTargetId(installedID),settings->curName());
-        }
+        text += QObject::tr("<li>Target mismatch detected.\n"
+                "Installed target: %1, selected target: %2.</li>")
+            .arg(settings->name(installed), settings->curName());
     }
 
     if(!text.isEmpty())

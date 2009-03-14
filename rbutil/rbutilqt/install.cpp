@@ -133,7 +133,7 @@ void Install::accept()
     }
     settings->sync();
 
-    QString warning = Detect::check(settings, false, settings->curTargetId());
+    QString warning = Detect::check(settings, false);
     if(!warning.isEmpty())
     {
         if(QMessageBox::warning(this, tr("Really continue?"), warning,
