@@ -573,7 +573,7 @@ static int sd_select_bank(unsigned char bank)
 static void sd_card_mux(int card_no)
 {
 /* Set the current card mux */
-#if defined(SANSA_E200) || defined(PHILIPS_SA9200)
+#if defined(SANSA_E200)
     if (card_no == 0)
     {
         GPO32_VAL |= 0x4;
@@ -598,7 +598,7 @@ static void sd_card_mux(int card_no)
 
         outl(inl(0x70000014) & ~(0x3ffff), 0x70000014);
     }
-#else /* SANSA_C200 */
+#elif defined(SANSA_C200)
     if (card_no == 0)
     {
         GPO32_VAL |= 0x4;
@@ -623,6 +623,23 @@ static void sd_card_mux(int card_no)
 
         outl((inl(0x70000014) & ~(0x3ffff)) | 0x255aa, 0x70000014);
     }
+#elif defined(PHILIPS_SA9200)
+    /* only 1 "card" (no external memory card) */
+    (void)card_no;
+
+    GPIO_SET_BITWISE(GPIOH_ENABLE, 0x80);
+    GPIO_SET_BITWISE(GPIOH_OUTPUT_EN, 0x80);
+
+    outl(0x255aa, 0x70000014);
+
+    GPIO_CLEAR_BITWISE(GPIOA_ENABLE, 0x04);
+    GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_EN, 0x04);
+
+    GPIO_CLEAR_BITWISE(GPIOA_ENABLE, 0x7a);
+    GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_EN, 0x7a);
+
+    GPIO_SET_BITWISE(GPIOH_OUTPUT_VAL, 0x80);
+    GPIO_SET_BITWISE(GPIOH_OUTPUT_EN, 0x80);
 #endif
 }
 
@@ -649,12 +666,21 @@ static void sd_init_device(int card_no)
     sd_card_mux(card_no);
 
 /* Init NAND */
+#if defined(PHILIPS_SA9200)
+    MMC_INIT_1 |=  (1 << 15);
+    MMC_INIT_2 |=  (1 << 15);
+    MMC_INIT_2 &= ~(3 << 12);
+    MMC_INIT_2 |=  (1 << 12);
+    MMC_INIT_1 &= ~(3 << 12);
+    MMC_INIT_1 |=  (1 << 12);
+#else
     MMC_INIT_1 |=  (1 << 15);
     MMC_INIT_2 |=  (1 << 15);
     MMC_INIT_2 &= ~(3 << 12);
     MMC_INIT_2 |=  (1 << 13);
     MMC_INIT_1 &= ~(3 << 12);
     MMC_INIT_1 |=  (1 << 13);
+#endif
 
     DEV_EN |= DEV_ATA; /* Enable controller */
     DEV_RS |= DEV_ATA; /* Reset controller */
@@ -1210,6 +1236,10 @@ int sd_init(void)
         initialized = true;
 
         /* init controller */
+#if defined(PHILIPS_SA9200)
+        GPIOA_ENABLE = 0x00;
+        GPIO_SET_BITWISE(GPIOD_ENABLE, 0x01);
+#else
         outl(inl(0x70000088) & ~(0x4), 0x70000088);
         outl(inl(0x7000008c) & ~(0x4), 0x7000008c);
         GPO32_ENABLE |= 0x4;
@@ -1217,6 +1247,7 @@ int sd_init(void)
         GPIO_SET_BITWISE(GPIOG_ENABLE, (0x3 << 5));
         GPIO_SET_BITWISE(GPIOG_OUTPUT_EN, (0x3 << 5));
         GPIO_SET_BITWISE(GPIOG_OUTPUT_VAL, (0x3 << 5));
+#endif
 
 #ifdef HAVE_HOTSWAP
         /* enable card detection port - mask interrupt first */

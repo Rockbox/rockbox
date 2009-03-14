@@ -56,7 +56,15 @@ void power_off(void)
 
 unsigned int power_input_status(void)
 {
-    return POWER_INPUT_NONE;
+    unsigned int status = POWER_INPUT_NONE;
+
+    /* GPIOF indicates that the connector is present,
+       GPIOB indicates that there's power there too.
+       Same status bits for both USB and the charger. */
+    if (!(GPIOF_INPUT_VAL & 0x80) && !(GPIOB_INPUT_VAL & 0x80))
+        status = POWER_INPUT_MAIN_CHARGER;
+
+    return status;
 }
 
 void ide_power_enable(bool on)
