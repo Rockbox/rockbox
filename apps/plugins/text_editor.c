@@ -404,7 +404,7 @@ enum plugin_status plugin_start(const void* parameter)
                     if (line_count)
                     {
                         MENUITEM_STRINGLIST(menu, "Edit What?", NULL, 
-                                            "Extension", "Color",);
+                                            "Extension", "Colour",);
                         switch (rb->do_menu(&menu, NULL, NULL, false))
                         {
                             case 0:
