@@ -203,7 +203,7 @@ bool headphones_inserted(void)
 #endif
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-bool lcd_enabled(void)
+bool lcd_active(void)
 {
     return true;
 }
