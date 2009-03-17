@@ -185,6 +185,7 @@ static void _display_on(void)
     lcd_update();
 }
 
+#if defined(HAVE_LCD_ENABLE)
 void lcd_enable(bool on)
 {
     if (display_on == on)
@@ -217,16 +218,14 @@ void lcd_enable(bool on)
         display_on = false;
     }
 }
+#endif
 
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 bool lcd_active(void)
 {
     return display_on;
 }
-
-void lcd_sleep(void)
-{
-    /* TODO */
-}
+#endif
 
 /*** update functions ***/
 

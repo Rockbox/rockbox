@@ -597,6 +597,11 @@ void lcd_sleep(void)
     mutex_unlock(&lcdstate_lock);
 }
 
+bool lcd_active(void)
+{
+    return lcd_state.display;
+}
+
 #ifdef HAVE_LCD_SHUTDOWN
 void lcd_shutdown(void) 
 {

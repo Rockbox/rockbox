@@ -24,7 +24,7 @@
 #include <stdbool.h>
 
 void lcd_enable(bool state);
-bool lcd_enabled(void);
+bool lcd_active(void);
 void lcd_init_device(void);
 
 

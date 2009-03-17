@@ -160,22 +160,6 @@ void lcd_set_flip(bool yesno)
 }
 
 #ifdef HAVE_LCD_ENABLE
-static void (*lcd_activation_hook)(void) = NULL;
-
-void lcd_activation_set_hook(void (*func)(void))
-{
-    lcd_activation_hook = func;
-}
-
-void lcd_activation_call_hook(void)
-{
-    void (*func)(void) = lcd_activation_hook;
-
-    if (func != NULL)
-        func();
-}
-
-
 void lcd_enable(bool enable)
 {
     if(display_on == enable)

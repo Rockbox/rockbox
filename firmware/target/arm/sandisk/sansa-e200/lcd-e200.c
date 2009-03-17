@@ -22,11 +22,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "lcd.h"
-#include "system.h"
 #include <string.h>
-#include "backlight-target.h"
 #include "cpu.h"
+#include "system.h"
+#include "backlight-target.h"
+#include "lcd.h"
 
 /* Power and display status */
 static bool power_on   = false; /* Is the power turned on?   */
@@ -427,7 +427,7 @@ void lcd_init_device(void)
 
     LCD_REG_6 |= 1; /* Start DMA */
 }
-
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 void lcd_enable(bool on)
 {
     if (on == display_on)
@@ -455,7 +455,7 @@ bool lcd_active(void)
 {
     return display_on;
 }
-
+#endif
 void lcd_sleep(void)
 {
     LCD_REG_6 &= ~1;

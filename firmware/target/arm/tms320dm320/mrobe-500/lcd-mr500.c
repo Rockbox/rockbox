@@ -46,7 +46,7 @@ volatile bool lcd_poweroff = false;
 extern unsigned fg_pattern;
 extern unsigned bg_pattern;
 
-bool lcd_enabled(void)
+bool lcd_active(void)
 {
     return lcd_on;
 }

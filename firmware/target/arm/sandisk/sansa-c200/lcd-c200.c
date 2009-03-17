@@ -190,6 +190,7 @@ void lcd_set_invert_display(bool yesno)
     (void)yesno;
 }
 
+#if defined(HAVE_LCD_ENABLE)
 void lcd_enable(bool yesno)
 {
     if (yesno == is_lcd_enabled)
@@ -206,11 +207,14 @@ void lcd_enable(bool yesno)
         lcd_send_command(R_STANDBY_ON);
     }
 }
+#endif
 
-bool lcd_enabled(void)
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+bool lcd_active(void)
 {
     return is_lcd_enabled;
 }
+#endif
 
 
 /* turn the display upside down (call lcd_update() afterwards) */

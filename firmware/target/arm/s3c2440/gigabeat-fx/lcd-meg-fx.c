@@ -42,10 +42,12 @@ extern struct viewport* current_vp;
 extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
                                  int width, int height);
 
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 bool lcd_active(void)
 {
     return lcd_on;
 }
+#endif
 
 static unsigned int LCDBANK(unsigned int address)
 {
@@ -278,6 +280,7 @@ void lcd_init_device(void)
     LCD_SPI_init();
 }
 
+#if defined(HAVE_LCD_SLEEP)
 void lcd_sleep(void)
 {
     if (lcd_powered)
@@ -289,7 +292,9 @@ void lcd_sleep(void)
         LCD_SPI_powerdown();
     }
 }
+#endif
 
+#if defined(HAVE_LCD_ENABLE)
 void lcd_enable(bool state)
 {
     if (state == lcd_on)
@@ -315,6 +320,7 @@ void lcd_enable(bool state)
         lcd_on = false;
     }
 }
+#endif
 
 void lcd_set_flip(bool yesno) {
     if (!lcd_on)

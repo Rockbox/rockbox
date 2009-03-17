@@ -374,6 +374,7 @@ void lcd_init_device(void)
 #endif
 }
 
+#if defined(HAVE_LCD_ENABLE)
 void lcd_enable(bool on)
 {
     if (on == display_on)
@@ -392,12 +393,10 @@ void lcd_enable(bool on)
         lcd_display_off();
     }
 }
+#endif
 
-bool lcd_active(void)
-{
-    return display_on;
-}
 
+#if defined(HAVE_LCD_SLEEP)
 void lcd_sleep(void)
 {
     if (power_on)
@@ -407,7 +406,14 @@ void lcd_sleep(void)
     /* BT2-0=000, DC2-0=000, AP2-0=000, SLP=0, STB=1 */
     lcd_write_reg(R_POWER_CONTROL1, 0x0001);
 }
+#endif
 
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+bool lcd_active(void)
+{
+    return display_on;
+}
+#endif
 /*** update functions ***/
 
 /* Line write helper function for lcd_yuv_blit. Write two lines of yuv420.

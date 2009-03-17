@@ -70,7 +70,8 @@
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
 /* Define this if your LCD can be enabled/disabled */
-#define HAVE_LCD_ENABLE
+/* Disabled until properly working
+#define HAVE_LCD_ENABLE */
 
 #define CONFIG_KEYPAD CREATIVEZVM_PAD
 #define HAVE_HEADPHONE_DETECTION

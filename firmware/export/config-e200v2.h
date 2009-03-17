@@ -54,10 +54,11 @@
 #define HAVE_LCD_ENABLE
 
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
-   should be defined as well. */
+   should be defined as well.
 #define HAVE_LCD_SLEEP
 #define HAVE_LCD_SLEEP_SETTING
 #endif
+ */
 
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP
