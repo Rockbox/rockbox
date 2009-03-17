@@ -305,8 +305,8 @@ static void scroll_thread(void)
 
         if (scroll & SCROLL_LCD)
         {
-#ifdef HAVE_LCD_ENABLE
-            if (lcd_enabled())
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+            if (lcd_active())
 #endif
                 lcd_scroll_fn();
             lcd_scroll_info.last_scroll = current_tick;
@@ -328,8 +328,8 @@ static void scroll_thread(void)
     while (1)
     {
         sleep(lcd_scroll_info.ticks);
-#ifdef HAVE_LCD_ENABLE
-        if (lcd_enabled())
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+        if (lcd_active())
 #endif
             lcd_scroll_fn();
     }

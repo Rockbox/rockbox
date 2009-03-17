@@ -42,7 +42,7 @@ extern struct viewport* current_vp;
 extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
                                  int width, int height);
 
-bool lcd_enabled(void)
+bool lcd_active(void)
 {
     return lcd_on;
 }
@@ -308,7 +308,7 @@ void lcd_enable(bool state)
 
         lcd_on = true;
         lcd_update();
-        lcd_call_enable_hook();
+        lcd_activation_call_hook();
     }
     else 
     {

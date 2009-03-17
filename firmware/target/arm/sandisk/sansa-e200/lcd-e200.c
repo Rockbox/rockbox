@@ -438,7 +438,7 @@ void lcd_enable(bool on)
         DEV_EN |= DEV_LCD; /* Enable LCD controller */
         lcd_display_on();  /* Turn on display */
         lcd_update();      /* Resync display */
-        lcd_call_enable_hook();
+        lcd_activation_call_hook();
         LCD_REG_6 |= 1;    /* Restart DMA */
         sleep(HZ/50);      /* Wait for a frame to be written */
     }
@@ -451,7 +451,7 @@ void lcd_enable(bool on)
     }
 }
 
-bool lcd_enabled(void)
+bool lcd_active(void)
 {
     return display_on;
 }

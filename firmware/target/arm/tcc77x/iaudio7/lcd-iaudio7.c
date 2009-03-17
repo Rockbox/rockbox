@@ -143,7 +143,7 @@ void lcd_enable(bool on)
 
     if (on) {
         _display_on();
-      lcd_call_enable_hook();
+      lcd_activation_call_hook();
     } else {
         /** Off sequence according to datasheet, p. 130 **/
         lcd_write_reg(R_FRAME_CYCLE_CONTROL, 0x0002);   /* EQ=0, 18 clks/line */
@@ -166,7 +166,7 @@ void lcd_enable(bool on)
     }
 }
 
-bool lcd_enabled(void)
+bool lcd_active(void)
 {
     return display_on;
 }

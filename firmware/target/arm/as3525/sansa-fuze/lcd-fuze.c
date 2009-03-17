@@ -206,6 +206,7 @@ void lcd_enable(bool on)
         /* a bit of delay before returning to
          * avoid irritating flash on backlight on */
         while(delay--);
+        lcd_activation_call_hook();
         
     }
     else
@@ -217,7 +218,7 @@ void lcd_enable(bool on)
     }
 }
 
-bool lcd_enabled(void)
+bool lcd_active(void)
 {
     return display_on;
 }

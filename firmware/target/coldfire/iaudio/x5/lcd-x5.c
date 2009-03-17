@@ -385,7 +385,7 @@ void lcd_enable(bool on)
         /* Probably out of sync and we don't wanna pepper the code with
            lcd_update() calls for this. */
         lcd_update();
-        lcd_call_enable_hook();
+        lcd_activation_call_hook();
     }
     else
     {
@@ -393,7 +393,7 @@ void lcd_enable(bool on)
     }
 }
 
-bool lcd_enabled(void)
+bool lcd_active(void)
 {
     return display_on;
 }

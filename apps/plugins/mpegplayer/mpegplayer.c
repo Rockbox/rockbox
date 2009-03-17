@@ -621,7 +621,7 @@ static void draw_putsxy_oriented(int x, int y, const char *str)
 }
 #endif /* LCD_PORTRAIT */
 
-#if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 /* So we can refresh the overlay */
 static void wvs_lcd_enable_hook(void)
 {
@@ -635,12 +635,12 @@ static void wvs_backlight_on_video_mode(bool video_on)
         /* Turn off backlight timeout */
         /* backlight control in lib/helper.c */
         backlight_force_on();
-#if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
-        rb->lcd_set_enable_hook(NULL);
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+        rb->lcd_activation_set_hook(NULL);
 #endif
     } else {
-#if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
-        rb->lcd_set_enable_hook(wvs_lcd_enable_hook);
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+        rb->lcd_activation_set_hook(wvs_lcd_enable_hook);
 #endif
         /* Revert to user's backlight settings */
         backlight_use_settings();
@@ -1485,7 +1485,7 @@ static void button_loop(void)
             continue;
             } /* BUTTON_NONE: */
 
-#ifdef HAVE_LCD_ENABLE
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
         case LCD_ENABLE_EVENT_1:
         {
             /* Draw the current frame if prepared already */
@@ -1628,10 +1628,10 @@ static void button_loop(void)
 
     wvs_stop();
 
-#if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
     /* Be sure hook is removed before exiting since the stop will put it
      * back because of the backlight restore. */
-    rb->lcd_set_enable_hook(NULL);
+    rb->lcd_activation_set_hook(NULL);
 #endif
 
     rb->lcd_setfont(FONT_UI);

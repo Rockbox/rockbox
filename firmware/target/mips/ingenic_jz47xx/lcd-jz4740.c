@@ -54,7 +54,7 @@ void lcd_enable(bool state)
     {
         lcd_on();
 #ifdef HAVE_LCD_ENABLE
-        lcd_call_enable_hook();
+        lcd_activation_call_hook();
 #endif
     }
     else
@@ -63,7 +63,7 @@ void lcd_enable(bool state)
     lcd_is_on = state;
 }
 
-bool lcd_enabled(void)
+bool lcd_active(void)
 {
     return lcd_is_on;
 }

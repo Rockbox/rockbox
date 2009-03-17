@@ -341,21 +341,21 @@ void lcd_poweroff(void);
 #ifdef HAVE_LCD_ENABLE
 /* Enable/disable the main display. */
 extern void lcd_enable(bool on);
-extern bool lcd_enabled(void);
-
-#ifdef HAVE_LCD_COLOR
-/* Register a hook that is called when the lcd is powered and after the
- * framebuffer data is synchronized */
-void lcd_set_enable_hook(void (*enable_hook)(void));
-#endif /* HAVE_LCD_COLOR */
-
 #endif /* HAVE_LCD_ENABLE */
-void lcd_call_enable_hook(void);
 
 #ifdef HAVE_LCD_SLEEP
 /* Put the LCD into a power saving state deeper than lcd_enable(false). */
 extern void lcd_sleep(void);
 #endif /* HAVE_LCD_SLEEP */
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+/* Register a hook that is called when the lcd is powered and after the
+ * framebuffer data is synchronized */
+/* Sansa Clip has these function in it's lcd driver, since it's the only
+ * 1-bit display featuring lcd_active, so far */
+extern bool lcd_active(void);
+extern void lcd_activation_set_hook(void (*enable_hook)(void));
+extern void lcd_activation_call_hook(void);
+#endif
 
 #ifdef HAVE_LCD_SHUTDOWN
 void lcd_shutdown(void);

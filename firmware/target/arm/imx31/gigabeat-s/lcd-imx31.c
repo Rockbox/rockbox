@@ -121,7 +121,7 @@ void lcd_enable(bool state)
         lcd_powered = true;
         lcd_on = true;
         lcd_update();
-        lcd_call_enable_hook();
+        lcd_activation_call_hook();
     }
     else
     {
@@ -129,7 +129,7 @@ void lcd_enable(bool state)
     }
 }
 
-bool lcd_enabled(void)
+bool lcd_active(void)
 {
     return lcd_on;
 }

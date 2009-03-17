@@ -237,7 +237,7 @@ return;
     {
         lcd_display_on(false);  /* Turn on display */
         lcd_update();      /* Resync display */
-        lcd_call_enable_hook();
+        lcd_activation_call_hook();
     }
     else
     {
@@ -245,7 +245,7 @@ return;
     }
 }
 
-bool lcd_enabled(void)
+bool lcd_active(void)
 {
     return display_on;
 }

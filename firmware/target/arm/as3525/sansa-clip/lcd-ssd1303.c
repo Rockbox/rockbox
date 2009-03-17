@@ -159,22 +159,43 @@ void lcd_set_flip(bool yesno)
     }
 }
 
+#ifdef HAVE_LCD_ENABLE
+static void (*lcd_activation_hook)(void) = NULL;
+
+void lcd_activation_set_hook(void (*func)(void))
+{
+    lcd_activation_hook = func;
+}
+
+void lcd_activation_call_hook(void)
+{
+    void (*func)(void) = lcd_activation_hook;
+
+    if (func != NULL)
+        func();
+}
+
+
 void lcd_enable(bool enable)
 {
     if(display_on == enable)
         return;
 
     if( (display_on = enable) ) /* simple '=' is not a typo ! */
+    {
         lcd_write_command(LCD_SET_DISPLAY_ON);
+        lcd_activation_call_hook();
+    }
     else
         lcd_write_command(LCD_SET_DISPLAY_OFF);
 }
 
-bool lcd_enabled(void)
+bool lcd_active(void)
 {
     return display_on;
 }
 
+#endif
 
 /* LCD init, largely based on what OF does */
 void lcd_init_device(void)

@@ -604,7 +604,7 @@ static int get_start_time(uint32_t duration)
     lcd_(update)();
 
 #if defined(HAVE_LCD_ENABLE) && defined(HAVE_LCD_COLOR)
-    rb->lcd_set_enable_hook(get_start_time_lcd_enable_hook);
+    rb->lcd_activation_set_hook(get_start_time_lcd_enable_hook);
 #endif
 
     draw_slider(0, 100, &rc_bound);
@@ -794,11 +794,10 @@ static int get_start_time(uint32_t duration)
         rb->yield();
     }
 
-#ifdef HAVE_LCD_COLOR
-#ifdef HAVE_LCD_ENABLE
-    rb->lcd_set_enable_hook(NULL);
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+    rb->lcd_activation_set_hook(NULL);
 #endif
-#else
+#ifndef HAVE_LCD_COLOR
     stream_gray_show(false);
     grey_clear_display();
     grey_update();

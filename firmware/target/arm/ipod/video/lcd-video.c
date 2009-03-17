@@ -575,10 +575,7 @@ void lcd_awake(void)
         lcd_state.state = LCD_INITIAL;
         tick_add_task(&lcd_tick);
         lcd_state.display_on = true;
-        /* Note that only the RGB data from lcd_framebuffer has been 
-           displayed.  If YUV data was displayed, it needs to be updated
-           now.  (eg. see lcd_call_enable_hook())
-         */
+        lcd_activation_call_hook();
     }
     mutex_unlock(&lcdstate_lock);
 }
