@@ -65,23 +65,8 @@
 #include "viewport.h"
 #include "pcmbuf.h"
 
-#define GWPS_INSTANT_RESTORE 0
-
-static void gwps_leave_wps(void)
-{
-    int oldbars = VP_SB_HIDE_ALL;
-
-    if (global_settings.statusbar)
-        oldbars = VP_SB_ALLSCREENS;
-
-    viewportmanager_set_statusbar(oldbars);
-#if LCD_DEPTH > 1
-    show_main_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-    show_remote_main_backdrop();
-#endif
-}
+#define RESTORE_WPS_INSTANTLY       0l
+#define RESTORE_WPS_NEXT_SECOND     ((long)(HZ+current_tick))
 
 static int wpsbars;
 /* currently only one wps_state is needed */
@@ -185,6 +170,22 @@ void gwps_fix_statusbars(void)
 }
 
 
+static void gwps_leave_wps(void)
+{
+    int oldbars = VP_SB_HIDE_ALL;
+
+    if (global_settings.statusbar)
+        oldbars = VP_SB_ALLSCREENS;
+
+    viewportmanager_set_statusbar(oldbars);
+#if LCD_DEPTH > 1
+    show_main_backdrop();
+#endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    show_remote_main_backdrop();
+#endif
+}
+
 /* The WPS can be left in two ways:
  *      a)  call a function, which draws over the wps. In this case, the wps
  *          will be still active (i.e. the below function didn't return)
@@ -198,7 +199,7 @@ long gui_wps_show(void)
 {
     long button = 0;
     bool restore = false;
-    long restoretimer = GWPS_INSTANT_RESTORE; /* timer to delay screen redraw temporarily */
+    long restoretimer = RESTORE_WPS_INSTANTLY; /* timer to delay screen redraw temporarily */
     bool exit = false;
     bool bookmark = false;
     bool update_track = false;
@@ -396,7 +397,7 @@ long gui_wps_show(void)
                 }
                 if (res) {
                     restore = true;
-                    restoretimer = current_tick + HZ;
+                    restoretimer = RESTORE_WPS_NEXT_SECOND;
                 }
             }
                 break;
@@ -416,7 +417,7 @@ long gui_wps_show(void)
                 }
                 if (res) {
                     restore = true;
-                    restoretimer = current_tick + HZ;
+                    restoretimer = RESTORE_WPS_NEXT_SECOND;
                 }
             }
                 break;
@@ -680,7 +681,7 @@ long gui_wps_show(void)
         }
 
         if (restore &&
-            ((restoretimer == GWPS_INSTANT_RESTORE) ||
+            ((restoretimer == RESTORE_WPS_INSTANTLY) ||
              TIME_AFTER(restore, current_tick)))
         {
             /*  restore wps backrops and statusbars */
@@ -692,7 +693,7 @@ long gui_wps_show(void)
 #endif
             viewportmanager_set_statusbar(wpsbars);
             restore = false;
-            restoretimer = GWPS_INSTANT_RESTORE;
+            restoretimer = RESTORE_WPS_INSTANTLY;
             if (gui_wps_display()) {
                 exit = true;
             }
