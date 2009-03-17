@@ -225,7 +225,7 @@ static void lcd_display_off(void)
     display_on = false;
 }
 
-
+#ifdef HAVE_LCD_ENABLE
 void lcd_enable(bool on)
 {
 /* Disabled until properly working */
@@ -244,11 +244,14 @@ return;
         lcd_display_off();  /* Turn off display */
     }
 }
+#endif
 
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 bool lcd_active(void)
 {
     return display_on;
 }
+#endif
 
 void lcd_set_direct_fb(bool yes)
 {

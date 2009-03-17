@@ -267,6 +267,7 @@ static void lcd_power_on(void)
     power_on = true;
 }
 
+#if defined(HAVE_LCD_SLEEP)
 static void lcd_power_off(void)
 {
     /* Display must be off first */
@@ -294,6 +295,17 @@ static void lcd_power_off(void)
     /* BT2-0=000, DC2-0=000, AP2-0=000, SLP=0, STB=0 */
     lcd_write_reg(R_POWER_CONTROL1, 0x0000);
 }
+
+void lcd_sleep(void)
+{
+    if (power_on)
+        lcd_power_off();
+
+    /* Set standby mode */
+    /* BT2-0=000, DC2-0=000, AP2-0=000, SLP=0, STB=1 */
+    lcd_write_reg(R_POWER_CONTROL1, 0x0001);
+}
+#endif
 
 static void lcd_display_on(void)
 {
@@ -392,19 +404,6 @@ void lcd_enable(bool on)
     {
         lcd_display_off();
     }
-}
-#endif
-
-
-#if defined(HAVE_LCD_SLEEP)
-void lcd_sleep(void)
-{
-    if (power_on)
-        lcd_power_off();
-
-    /* Set standby mode */
-    /* BT2-0=000, DC2-0=000, AP2-0=000, SLP=0, STB=1 */
-    lcd_write_reg(R_POWER_CONTROL1, 0x0001);
 }
 #endif
 

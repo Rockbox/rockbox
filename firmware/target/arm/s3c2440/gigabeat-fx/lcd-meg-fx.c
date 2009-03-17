@@ -181,29 +181,6 @@ static void LCD_SPI_stop(void)
     s3c_regclr32(&CLKCON, 0x40000);    /* disable SPI clock */  
 }
 
-static void LCD_SPI_powerdown(void)
-{
-    lcd_powered = false;
-
-    LCD_SPI_start();
-    LCD_SPI_setreg(0x04, 0x00);
-    LCD_SPI_stop();
-
-    reset_LCD(false);   /* This makes a big difference on power */
-    LCD_CTRL_clock(false);
-} 
-
-static void LCD_SPI_powerup(void)
-{
-    LCD_CTRL_clock(true);
-
-    LCD_SPI_start();
-    LCD_SPI_setreg(0x04, 0x01);
-    LCD_SPI_stop();
-
-    lcd_powered = true;
-}
-
 static void LCD_SPI_init(void)
 {
     /*
@@ -281,6 +258,18 @@ void lcd_init_device(void)
 }
 
 #if defined(HAVE_LCD_SLEEP)
+static void LCD_SPI_powerdown(void)
+{
+    lcd_powered = false;
+
+    LCD_SPI_start();
+    LCD_SPI_setreg(0x04, 0x00);
+    LCD_SPI_stop();
+
+    reset_LCD(false);   /* This makes a big difference on power */
+    LCD_CTRL_clock(false);
+}
+
 void lcd_sleep(void)
 {
     if (lcd_powered)
@@ -295,6 +284,17 @@ void lcd_sleep(void)
 #endif
 
 #if defined(HAVE_LCD_ENABLE)
+static void LCD_SPI_powerup(void)
+{
+    LCD_CTRL_clock(true);
+
+    LCD_SPI_start();
+    LCD_SPI_setreg(0x04, 0x01);
+    LCD_SPI_stop();
+
+    lcd_powered = true;
+}
+
 void lcd_enable(bool state)
 {
     if (state == lcd_on)

@@ -57,8 +57,8 @@
    should be defined as well.
 #define HAVE_LCD_SLEEP
 #define HAVE_LCD_SLEEP_SETTING
-#endif
  */
+#endif
 
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP

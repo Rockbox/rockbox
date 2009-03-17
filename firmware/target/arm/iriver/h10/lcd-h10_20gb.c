@@ -274,6 +274,7 @@ static void lcd_power_on(void)
     power_on = true;
 }
 
+#ifdef HAVE_LCD_SLEEP
 static void lcd_power_off(void)
 {
     /* Display must be off first */
@@ -302,6 +303,42 @@ static void lcd_power_off(void)
     lcd_write_reg(R_POWER_CONTROL1, 0x0000);
 }
 
+void lcd_sleep(void)
+{
+    if (power_on)
+        lcd_power_off();
+
+    /* Set standby mode */
+    /* BT2-0=000, DC2-0=000, AP2-0=000, SLP=0, STB=1 */
+    lcd_write_reg(R_POWER_CONTROL1, 0x0001);
+}
+#endif
+
+
+static void lcd_display_off(void)
+{
+    display_on = false;
+
+    /** Display OFF sequence **/
+    /* Per datasheet Rev.1.10, Jun.21.2003, p. 97 */
+
+    /* EQ1-0=00 already */
+
+    /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=1, REV=x, D1-0=10 */
+    lcd_write_reg(R_DISP_CONTROL, 0x0032 | disp_control_rev);
+
+    sleep(HZ/25); /* Wait 2 frames or more */
+
+    /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=0, REV=x, D1-0=10 */
+    lcd_write_reg(R_DISP_CONTROL, 0x0022 | disp_control_rev);
+
+    sleep(HZ/25); /* Wait 2 frames or more */
+
+    /* PT1-0=00, VLE2-1=00, SPT=0, GON=0, DTE=0, REV=0, D1-0=00 */
+    lcd_write_reg(R_DISP_CONTROL, 0x0000);
+}
+
+#if defined(HAVE_LCD_ENABLE)
 static void lcd_display_on(void)
 {
     /* Be sure power is on first */
@@ -329,30 +366,6 @@ static void lcd_display_on(void)
     display_on = true;
 }
 
-static void lcd_display_off(void)
-{
-    display_on = false;
-
-    /** Display OFF sequence **/
-    /* Per datasheet Rev.1.10, Jun.21.2003, p. 97 */
-
-    /* EQ1-0=00 already */
-
-    /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=1, REV=x, D1-0=10 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0032 | disp_control_rev);
-
-    sleep(HZ/25); /* Wait 2 frames or more */
-
-    /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=0, REV=x, D1-0=10 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0022 | disp_control_rev);
-
-    sleep(HZ/25); /* Wait 2 frames or more */
-
-    /* PT1-0=00, VLE2-1=00, SPT=0, GON=0, DTE=0, REV=0, D1-0=00 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0000);
-}
-
-#if defined(HAVE_LCD_ENABLE)
 void lcd_enable(bool on)
 {
     if (on == display_on)
@@ -370,18 +383,6 @@ void lcd_enable(bool on)
     {
         lcd_display_off();
     }
-}
-#endif
-
-#ifdef HAVE_LCD_SLEEP
-void lcd_sleep(void)
-{
-    if (power_on)
-        lcd_power_off();
-
-    /* Set standby mode */
-    /* BT2-0=000, DC2-0=000, AP2-0=000, SLP=0, STB=1 */
-    lcd_write_reg(R_POWER_CONTROL1, 0x0001);
 }
 #endif
 

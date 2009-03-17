@@ -196,7 +196,7 @@ void lcd_enable(bool yesno)
     if (yesno == is_lcd_enabled)
         return;
 
-    if (is_lcd_enabled = yesno)
+    if ((is_lcd_enabled = yesno))
     {
         lcd_send_command(R_STANDBY_OFF);
         lcd_send_command(R_DISPLAY_ON);

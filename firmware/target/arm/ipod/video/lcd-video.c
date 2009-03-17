@@ -599,7 +599,7 @@ void lcd_sleep(void)
 
 bool lcd_active(void)
 {
-    return lcd_state.display;
+    return lcd_state.display_on;
 }
 
 #ifdef HAVE_LCD_SHUTDOWN
