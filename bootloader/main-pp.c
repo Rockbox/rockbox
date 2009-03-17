@@ -543,6 +543,25 @@ void* main(void)
                 i, pinfo->type, pinfo->size / 2048);
     }
 
+    /* Try loading Rockbox, if that fails, fall back to the OF */
+    if((btn & BOOTLOADER_BOOT_OF) == 0)
+    {
+        printf("Loading Rockbox...");
+        rc = load_mi4(loadbuffer, BOOTFILE, MAX_LOADSIZE);
+        if (rc < EOK)
+        {
+            bool old_verbose = verbose;
+            verbose = true;
+            printf("Can't load " BOOTFILE ": ");
+            printf(strerror(rc));
+            verbose = old_verbose;
+            btn |= BOOTLOADER_BOOT_OF;
+            sleep(5*HZ);
+        }
+        else
+            return (void*)loadbuffer;
+    }
+
     if(btn & BOOTLOADER_BOOT_OF)
     {
         /* Load original mi4 firmware in to a memory buffer called loadbuffer.
@@ -602,42 +621,6 @@ void* main(void)
         }
         
         error(0, 0);
-
-    } else {
-#if 0 /* e200: enable to be able to dump the hidden partition */
-        if(btn & BUTTON_UP)
-        {
-            int fd;
-            pinfo = disk_partinfo(1);
-            fd = open("/part.bin", O_CREAT|O_RDWR);
-            char sector[512];
-            for(i=0; i<40960; i++){
-                if (!(i%100))
-                {
-                    printf("dumping sector %d", i);
-                }
-                storage_read_sectors(IF_MV2(0,) pinfo->start + i, 1, sector);
-                write(fd,sector,512);
-            }
-            close(fd);
-        }
-#endif
-        printf("Loading Rockbox...");
-        rc=load_mi4(loadbuffer, BOOTFILE, MAX_LOADSIZE);
-        if (rc < EOK) {
-            printf("Can't load " BOOTFILE ": ");
-            printf(strerror(rc));
-
-#ifdef OLD_BOOTFILE
-            /* Try loading rockbox from old rockbox.e200/rockbox.h10 format */
-            rc=load_firmware(loadbuffer, OLD_BOOTFILE, MAX_LOADSIZE);
-            if (rc < EOK) {
-                printf("Can't load " OLD_BOOTFILE" : ");
-                error(EBOOTFILE, rc);
-            }
-#endif
-        }
     }
-    
     return (void*)loadbuffer;
 }
