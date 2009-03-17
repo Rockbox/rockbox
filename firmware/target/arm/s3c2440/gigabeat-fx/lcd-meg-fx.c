@@ -29,7 +29,9 @@
 #define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
 
 static bool lcd_on = true;
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 static bool lcd_powered = true;
+#endif
 static unsigned lcd_yuv_options = 0;
 /*
 ** This is imported from lcd-16bit.c

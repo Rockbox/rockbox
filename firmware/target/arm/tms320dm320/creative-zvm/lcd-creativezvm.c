@@ -191,6 +191,7 @@ static void lcd_display_on(bool reset)
     display_on = true;
 }
 
+#ifdef HAVE_LCD_ENABLE
 static void lcd_display_off(void)
 {
     /* LQV shutdown sequence */
@@ -225,7 +226,6 @@ static void lcd_display_off(void)
     display_on = false;
 }
 
-#ifdef HAVE_LCD_ENABLE
 void lcd_enable(bool on)
 {
 /* Disabled until properly working */

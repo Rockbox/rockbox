@@ -187,6 +187,7 @@ void lcd_init_device(void)
     lcd_contrast     = DEFAULT_CONTRAST_SETTING << 8;
 }
 
+#ifdef HAVE_LCD_SLEEP
 static void lcd_power_on(void)
 {
     /* Be sure standby bit is clear. */
@@ -274,7 +275,6 @@ static void lcd_power_on(void)
     power_on = true;
 }
 
-#ifdef HAVE_LCD_SLEEP
 static void lcd_power_off(void)
 {
     /* Display must be off first */
@@ -314,7 +314,7 @@ void lcd_sleep(void)
 }
 #endif
 
-
+#if defined(HAVE_LCD_ENABLE)
 static void lcd_display_off(void)
 {
     display_on = false;
@@ -337,8 +337,6 @@ static void lcd_display_off(void)
     /* PT1-0=00, VLE2-1=00, SPT=0, GON=0, DTE=0, REV=0, D1-0=00 */
     lcd_write_reg(R_DISP_CONTROL, 0x0000);
 }
-
-#if defined(HAVE_LCD_ENABLE)
 static void lcd_display_on(void)
 {
     /* Be sure power is on first */
