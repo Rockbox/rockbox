@@ -24,7 +24,8 @@ displays files.
   \setting{As whole numbers} enables a sorting algorithm which is similar to
   the default sorting of, for example, Windows Explorer, Mac OS X's Finder
   or Nautilus, with regards to numbers at the beginning or within filenames.
-  It combines consecutive digits to a number used for sorting.
+  It combines consecutive digits to a number used for sorting, taking leading
+  zeros into account.
   \newline\setting{As digits} disables this algorithm, and causes every digit to
   be compared separately. The following table demonstrates the two sortings.
   \begin{table}
@@ -33,13 +34,13 @@ displays files.
     \toprule
       \textbf{As whole numbers} & \textbf{As digits}\\
       \midrule
-      1 Ring Of Fire.mp3 & 03 Jackson.mp3\\
-      2 I Walk The Line.mp3 & 1 Ring Of Fire.mp3\\
-      03 Jackson.mp3 & 10 A Thing Called Love.mp3\\
+      03 Jackson.mp3 & 03 Jackson.mp3\\
+      1 Ring Of Fire.mp3 & 1 Ring Of Fire.mp3\\
+      2 I Walk The Line.mp3 & 10 A Thing Called Love.mp3\\
       10 A Thing Called Love.mp3 & 2 I Walk The Line.mp3\\
       Episode 1.ogg & Episode 1.ogg\\
-      Episode 2.ogg & Episode 10.ogg\\
-      Episode 10.ogg & Episode 2.ogg\\
+      Episode 57.ogg & Episode 233.ogg\\
+      Episode 233.ogg & Episode 57.ogg\\
       \bottomrule
     \end{tabularx}
   \end{table}
