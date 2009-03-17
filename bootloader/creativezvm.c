@@ -60,7 +60,9 @@ void main(void)
     button_init();
     usb_init();
 
+#ifdef HAVE_LCD_ENABLE
     lcd_enable(true);
+#endif
     lcd_setfont(FONT_SYSFIXED);
     reset_screen();
     printf("Rockbox boot loader");
