@@ -29,8 +29,9 @@
  * negative chars in their default char type.
  *
  *
- * This version is changed to ignore leading zeros, it does not equal to the
- * original software.
+ * Changes for Rockbox:
+ * This version is changed slightly to deal better with the datatypes,
+ * it does not equal to the original software.
  */
 
 #include <ctype.h>
