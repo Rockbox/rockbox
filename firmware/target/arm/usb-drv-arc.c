@@ -410,7 +410,7 @@ void usb_drv_reset(void)
     udelay(10);
     outl(inl(0x70000028) | 0x800, 0x70000028);
     outl(inl(0x70000028) & ~0x800, 0x70000028);
-    while (inl(0x70000028) & 0x80);
+    while ((inl(0x70000028) & 0x80) == 0);
 #endif
 }
 

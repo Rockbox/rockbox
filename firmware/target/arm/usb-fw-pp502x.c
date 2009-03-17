@@ -106,6 +106,7 @@ void usb_init_device(void)
     while ((inl(0x70000028) & 0x80) == 0);
     outl(inl(0x70000028) | 0x2, 0x70000028);
     udelay(100000);
+    XMB_RAM_CFG |= 0x47A;
 
     /* Do one-time inits */
     usb_drv_startup();
