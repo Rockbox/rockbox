@@ -295,7 +295,7 @@ $make
 echo "ROCKBOXDEV: binutils/make install to $prefix/$target"
 $make install
 cd .. # get out of build-binu
-PATH="${PATH}:$bindir"
+PATH="$bindir:${PATH}"
 SHELL=/bin/sh # seems to be needed by the gcc build in some cases
 
 echo "ROCKBOXDEV: mkdir build-gcc"
