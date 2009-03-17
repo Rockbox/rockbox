@@ -440,6 +440,9 @@ bool wps_data_load(struct wps_data *wps_data,
                    const char *buf,
                    bool isfile);
 
+/* Sets up the statusbars for the wps and each screen */
+void gwps_fix_statusbars(void);
+
 /* Returns the index of the subline in the subline array
    line - 0-based line number
    subline - 0-based subline number within the line

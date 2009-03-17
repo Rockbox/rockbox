@@ -65,6 +65,25 @@
 #include "viewport.h"
 #include "pcmbuf.h"
 
+#define GWPS_INSTANT_RESTORE 0
+
+static void gwps_leave_wps(void)
+{
+    int oldbars = VP_SB_HIDE_ALL;
+
+    if (global_settings.statusbar)
+        oldbars = VP_SB_ALLSCREENS;
+
+    viewportmanager_set_statusbar(oldbars);
+#if LCD_DEPTH > 1
+    show_main_backdrop();
+#endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    show_remote_main_backdrop();
+#endif
+}
+
+static int wpsbars;
 /* currently only one wps_state is needed */
 struct wps_state wps_state;
 struct gui_wps gui_wps[NB_SCREENS];
@@ -147,38 +166,47 @@ static void play_hop(int direction)
 #endif
 }
 
-static int fix_wps_bars(void)
+void gwps_fix_statusbars(void)
 {
 #ifdef HAVE_LCD_BITMAP
     int i;  
-    int wpsbars = VP_SB_HIDE_ALL;
+    wpsbars = VP_SB_HIDE_ALL;
     FOR_NB_SCREENS(i)
     {
-        bool draw = global_settings.statusbar;
+        bool draw = false;
         if (gui_wps[i].data->wps_sb_tag)
             draw = gui_wps[i].data->show_sb_on_wps;
         if (draw)
             wpsbars |= (VP_SB_ONSCREEN(i) | VP_SB_IGNORE_SETTING(i));
     } 
-    return wpsbars;
 #else
-    return VP_SB_ALLSCREENS;
+    wpsbars = VP_SB_ALLSCREENS;
 #endif
 }
 
+
+/* The WPS can be left in two ways:
+ *      a)  call a function, which draws over the wps. In this case, the wps
+ *          will be still active (i.e. the below function didn't return)
+ *      b)  return with a value evaluated by root_menu.c, in this case the wps
+ *          is really left, and root_menu will handle the next screen
+ *
+ * In either way, call gwps_leave_wps(), in order to restore the correct
+ * "main screen" backdrops and statusbars
+ */
 long gui_wps_show(void)
 {
     long button = 0;
     bool restore = false;
-    long restoretimer = 0; /* timer to delay screen redraw temporarily */
+    long restoretimer = GWPS_INSTANT_RESTORE; /* timer to delay screen redraw temporarily */
     bool exit = false;
     bool bookmark = false;
     bool update_track = false;
     int i;
     long last_left = 0, last_right = 0;
-    int wpsbars, oldbars;
     
     wps_state_init();
+    gwps_fix_statusbars();
 
 #ifdef HAVE_LCD_CHARCELLS
     status_set_audio(true);
@@ -197,8 +225,6 @@ long gui_wps_show(void)
     ab_repeat_init();
     ab_reset_markers();
 #endif
-
-    oldbars = viewportmanager_set_statusbar(VP_SB_HIDE_ALL);
     if(audio_status() & AUDIO_STATUS_PLAY)
     {
         wps_state.id3 = audio_current_track();
@@ -210,8 +236,6 @@ long gui_wps_show(void)
 
         restore = true;
     }
-    wpsbars = fix_wps_bars();
-    viewportmanager_set_statusbar(wpsbars);
     
     while ( 1 )
     {
@@ -270,12 +294,11 @@ long gui_wps_show(void)
 
         /* The peak meter is disabled
            -> no additional screen updates needed */
-        else {
+        else
+#endif
+        {
             button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,HZ/5);
         }
-#else
-        button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,HZ/5);
-#endif
 
         /* Exit if audio has stopped playing. This can happen if using the
            sleep timer with the charger plugged or if starting a recording
@@ -310,28 +333,14 @@ long gui_wps_show(void)
         {
             case ACTION_WPS_CONTEXT:
             {
-#if LCD_DEPTH > 1
-                show_main_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-                show_remote_main_backdrop();
-#endif
-                viewportmanager_set_statusbar(oldbars);
+                gwps_leave_wps();
                 /* if music is stopped in the context menu we want to exit the wps */
                 if (onplay(wps_state.id3->path, 
                            FILE_ATTR_AUDIO, CONTEXT_WPS) == ONPLAY_MAINMENU 
                     || !audio_status())
                     return GO_TO_ROOT;
-                viewportmanager_set_statusbar(wpsbars);
                 /* track might have changed */
                 update_track = true;
-
-#if LCD_DEPTH > 1
-                show_wps_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-                show_remote_wps_backdrop();
-#endif
                 restore = true;
             }
             break;
@@ -577,23 +586,9 @@ long gui_wps_show(void)
 #ifdef HAVE_QUICKSCREEN
             case ACTION_WPS_QUICKSCREEN:
             {
-                viewportmanager_set_statusbar(oldbars);
-#if LCD_DEPTH > 1
-                show_main_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-                show_remote_main_backdrop();
-#endif
+                gwps_leave_wps();
                 if (quick_screen_quick(button))
                     return SYS_USB_CONNECTED;
-                wpsbars = fix_wps_bars();
-                viewportmanager_set_statusbar(wpsbars);
-#if LCD_DEPTH > 1
-                show_wps_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-                show_remote_wps_backdrop();
-#endif
                 restore = true;
             }
             break;
@@ -603,18 +598,10 @@ long gui_wps_show(void)
 #ifdef BUTTON_F3
             case ACTION_F3:
             {
-                viewportmanager_set_statusbar(oldbars);
-#if LCD_DEPTH > 1
-                show_main_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-                show_remote_main_backdrop();
-#endif
+                gwps_leave_wps();
                 if (quick_screen_f3(BUTTON_F3))
                     return SYS_USB_CONNECTED;
                 restore = true;
-                wpsbars = fix_wps_bars();
-                viewportmanager_set_statusbar(wpsbars);
             }
             break;
 #endif /* BUTTON_F3 */
@@ -623,23 +610,10 @@ long gui_wps_show(void)
 #ifdef HAVE_PITCHSCREEN
             case ACTION_WPS_PITCHSCREEN:
             {
-                viewportmanager_set_statusbar(oldbars);
-#if LCD_DEPTH > 1
-                show_main_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-                show_remote_main_backdrop();
-#endif
+                gwps_leave_wps();
                 if (1 == gui_syncpitchscreen_run())
                     return SYS_USB_CONNECTED;
-#if LCD_DEPTH > 1
-                show_wps_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-                show_remote_wps_backdrop();
-#endif
                 restore = true;
-                viewportmanager_set_statusbar(wpsbars);
             }
             break;
 #endif /* HAVE_PITCHSCREEN */
@@ -665,22 +639,9 @@ long gui_wps_show(void)
 
             case ACTION_WPS_ID3SCREEN:
             {
-                viewportmanager_set_statusbar(oldbars);
-#if LCD_DEPTH > 1
-                show_main_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-                show_remote_main_backdrop();
-#endif
+                gwps_leave_wps();
                 browse_id3();
-#if LCD_DEPTH > 1
-                show_wps_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-                show_remote_wps_backdrop();
-#endif
                 restore = true;
-                viewportmanager_set_statusbar(wpsbars);
             }
             break;
 
@@ -697,13 +658,7 @@ long gui_wps_show(void)
                 break;
 #endif
             case SYS_POWEROFF:
-                viewportmanager_set_statusbar(oldbars);
-#if LCD_DEPTH > 1
-                show_main_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-                show_remote_main_backdrop();
-#endif
+                gwps_leave_wps();
                 default_event_handler(SYS_POWEROFF);
                 break;
 
@@ -725,18 +680,26 @@ long gui_wps_show(void)
         }
 
         if (restore &&
-            ((restoretimer == 0) ||
-             (restoretimer < current_tick)))
+            ((restoretimer == GWPS_INSTANT_RESTORE) ||
+             TIME_AFTER(restore, current_tick)))
         {
+            /*  restore wps backrops and statusbars */
+#if LCD_DEPTH > 1
+            show_wps_backdrop();
+#endif
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+            show_remote_wps_backdrop();
+#endif
+            viewportmanager_set_statusbar(wpsbars);
             restore = false;
-            restoretimer = 0;
+            restoretimer = GWPS_INSTANT_RESTORE;
             if (gui_wps_display()) {
                 exit = true;
             }
         }
 
         if (exit) {
-            viewportmanager_set_statusbar(oldbars);
+            gwps_leave_wps();
 #ifdef HAVE_LCD_CHARCELLS
             status_set_record(false);
             status_set_audio(false);
