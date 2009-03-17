@@ -39,7 +39,9 @@ static int lcd_contrast;
 static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
 
 /* Forward declarations */
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 static void lcd_display_off(void);
+#endif
 
 /* register defines for the Renesas HD66773R */
 #define R_START_OSC             0x00
@@ -314,7 +316,7 @@ void lcd_sleep(void)
 }
 #endif
 
-#if defined(HAVE_LCD_ENABLE)
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 static void lcd_display_off(void)
 {
     display_on = false;
@@ -337,6 +339,9 @@ static void lcd_display_off(void)
     /* PT1-0=00, VLE2-1=00, SPT=0, GON=0, DTE=0, REV=0, D1-0=00 */
     lcd_write_reg(R_DISP_CONTROL, 0x0000);
 }
+#endif
+
+#if defined(HAVE_LCD_ENABLE)
 static void lcd_display_on(void)
 {
     /* Be sure power is on first */

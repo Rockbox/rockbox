@@ -52,9 +52,6 @@ static unsigned short r_gate_scan_start_pos = 0x0002;
 static unsigned short r_drv_output_control  = 0x0313;
 static unsigned short r_horiz_ram_addr_pos  = 0x7f00;
 
-/* Forward declarations */
-static void lcd_display_off(void);
-
 /* A15(0x8000) && CS1->CS, A1(0x0002)->RS */
 #define LCD_CMD  *(volatile unsigned short *)0xf0008000
 #define LCD_DATA *(volatile unsigned short *)0xf0008002
@@ -267,6 +264,58 @@ static void lcd_power_on(void)
     power_on = true;
 }
 
+static void lcd_display_on(void)
+{
+    /* Be sure power is on first */
+    if (!power_on)
+        lcd_power_on();
+
+    /** Display ON Sequence **/
+    /* Per datasheet Rev.1.10, Jun.21.2003, p. 97 */
+
+    /* PT1-0=00, VLE2-1=00, SPT=0, GON=0, DTE=0, REV=0, D1-0=01 */
+    lcd_write_reg(R_DISP_CONTROL, 0x0001);
+
+    sleep(HZ/25); /* Wait 2 frames or more */
+
+    /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=0, REV=x, D1-0=01 */
+    lcd_write_reg(R_DISP_CONTROL, 0x0021 | r_disp_control_rev);
+    /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=0, REV=x, D1-0=11 */
+    lcd_write_reg(R_DISP_CONTROL, 0x0023 | r_disp_control_rev);
+
+    sleep(HZ/25); /* Wait 2 frames or more */
+
+    /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=1, REV=x, D1-0=11 */
+    lcd_write_reg(R_DISP_CONTROL, 0x0033 | r_disp_control_rev);
+
+    display_on = true;
+}
+
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+static void lcd_display_off(void)
+{
+    display_on = false;
+
+    /** Display OFF sequence **/
+    /* Per datasheet Rev.1.10, Jun.21.2003, p. 97 */
+
+    /* EQ1-0=00 already */
+
+    /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=1, REV=x, D1-0=10 */
+    lcd_write_reg(R_DISP_CONTROL, 0x0032 | r_disp_control_rev);
+
+    sleep(HZ/25); /* Wait 2 frames or more */
+
+    /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=0, REV=x, D1-0=10 */
+    lcd_write_reg(R_DISP_CONTROL, 0x0022 | r_disp_control_rev);
+
+    sleep(HZ/25); /* Wait 2 frames or more */
+
+    /* PT1-0=00, VLE2-1=00, SPT=0, GON=0, DTE=0, REV=0, D1-0=00 */
+    lcd_write_reg(R_DISP_CONTROL, 0x0000);
+}
+#endif
+
 #if defined(HAVE_LCD_SLEEP)
 static void lcd_power_off(void)
 {
@@ -306,56 +355,6 @@ void lcd_sleep(void)
     lcd_write_reg(R_POWER_CONTROL1, 0x0001);
 }
 #endif
-
-static void lcd_display_on(void)
-{
-    /* Be sure power is on first */
-    if (!power_on)
-        lcd_power_on();
-
-    /** Display ON Sequence **/
-    /* Per datasheet Rev.1.10, Jun.21.2003, p. 97 */
-
-    /* PT1-0=00, VLE2-1=00, SPT=0, GON=0, DTE=0, REV=0, D1-0=01 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0001);
-
-    sleep(HZ/25); /* Wait 2 frames or more */
-
-    /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=0, REV=x, D1-0=01 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0021 | r_disp_control_rev);
-    /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=0, REV=x, D1-0=11 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0023 | r_disp_control_rev);
-
-    sleep(HZ/25); /* Wait 2 frames or more */
-
-    /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=1, REV=x, D1-0=11 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0033 | r_disp_control_rev);
-
-    display_on = true;
-}
-
-static void lcd_display_off(void)
-{
-    display_on = false;
-
-    /** Display OFF sequence **/
-    /* Per datasheet Rev.1.10, Jun.21.2003, p. 97 */
-
-    /* EQ1-0=00 already */
-
-    /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=1, REV=x, D1-0=10 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0032 | r_disp_control_rev);
-
-    sleep(HZ/25); /* Wait 2 frames or more */
-
-    /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=0, REV=x, D1-0=10 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0022 | r_disp_control_rev);
-
-    sleep(HZ/25); /* Wait 2 frames or more */
-
-    /* PT1-0=00, VLE2-1=00, SPT=0, GON=0, DTE=0, REV=0, D1-0=00 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0000);
-}
 
 /* LCD init */
 void lcd_init_device(void)
