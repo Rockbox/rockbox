@@ -50,6 +50,7 @@ to_int(char c)
 
 /* These are defined as macros to make it easier to adapt this code to
  * different characters types or comparison functions. */
+
 static inline int
 nat_isdigit(int a)
 {
@@ -60,7 +61,7 @@ nat_isdigit(int a)
 static inline int
 nat_isspace(int a)
 {
-     return a == '0' || isspace(a);
+     return isspace(a);
 }
 
 
@@ -104,16 +105,38 @@ compare_right(char const *a, char const *b)
      return 0;
 }
 
+
+static int
+compare_left(char const *a, char const *b)
+{
+     /* Compare two left-aligned numbers: the first to have a
+        different value wins. */
+     for (;; a++, b++) {
+	  if (!nat_isdigit(*a)  &&  !nat_isdigit(*b))
+	       return 0;
+	  else if (!nat_isdigit(*a))
+	       return -1;
+	  else if (!nat_isdigit(*b))
+	       return +1;
+	  else if (*a < *b)
+	       return -1;
+	  else if (*a > *b)
+	       return +1;
+     }
+	  
+     return 0;
+}
+
 static int strnatcmp0(char const *a, char const *b, int fold_case)
 {
      int ai, bi;
      int ca, cb;
-     int result;
+     int fractional, result;
      
      assert(a && b);
      ai = bi = 0;
      while (1) {
-	  ca = to_int(a[ai]);
+      ca = to_int(a[ai]);
       cb = to_int(b[bi]);
 
 	  /* skip over leading spaces or zeros */
@@ -125,8 +148,15 @@ static int strnatcmp0(char const *a, char const *b, int fold_case)
 
 	  /* process run of digits */
 	  if (nat_isdigit(ca)  &&  nat_isdigit(cb)) {
-		if ((result = compare_right(a+ai, b+bi)) != 0)
-			return result;
+	       fractional = (ca == '0' || cb == '0');
+
+	       if (fractional) {
+		    if ((result = compare_left(a+ai, b+bi)) != 0)
+			 return result;
+	       } else {
+		    if ((result = compare_right(a+ai, b+bi)) != 0)
+			 return result;
+	       }
 	  }
 
 	  if (!ca && !cb) {
