@@ -39,17 +39,82 @@ file find the instructions on the Rockbox website:
 \wikilink{LangFiles}
 
 \opt{lcd_color}{
-  \subsection{Changing Colours}
-  The colours used in the Rockbox interface can be changed to any combination
-  you like. To do this, go to
-  \setting{Settings $\rightarrow$ Theme Settings $\rightarrow$ Colours}.
-  The colours set here are used in all menus, browsers and in the
-  \setting{While Playing Screen}.
-      \subsection{Changing Filetype Colours}
-        Rockbox has the capability to modify the \setting{File Browser}
-        to show different filetypes in different colours depending upon
-        the file extension. See the \wikilink{CustomFiletypeColours} Wiki
-        page for details.
+  \subsection{Changing Filetype Colours}
+  Rockbox has the capability to modify the \setting{File Browser} to show
+  different filetypes in different colours, depending on the file extension. 
+      \subsubsection{Set-up}
+      There are two steps to changing the filetype colours - creating
+      a file with the extension \fname{.colours} and then activating it using
+      a config file.  The \fname{.colours} files \emph{must} be stored in
+      the \fname{/.rockbox/themes/} directory.
+      The \fname{.colours} file is just a text file, and can be edited with
+      your text editor of choice.
+
+      \subsubsection{Creating the .colours file}
+      The \fname{.colours} file consits of the file extension
+      (or \fname{folder}) followed by a colon and then the colour desired
+      as an RGB value in hexadecimal, as in the following example:\\*
+      \\
+      \config{folder:808080}\\
+      \config{mp3:00FF00}\\
+      \config{ogg:00FF00}\\
+      \config{txt:FF0000}\\
+      \config{???:FFFFFF}\\*
+
+      The permissible extensions are as follows:\\*
+      \\ 
+      \config{folder, m3u, m3u8, cfg, wps, lng, rock, bmark, cue, colours, mpa,
+      \firmwareextension{}, %
+      \opt{swcodec}{mp1, }mp2, mp3%
+      \opt{swcodec}{, ogg, oga, wma, wmv, asf, wav, flac, ac3, a52, mpc,
+      wv, m4a, m4b, mp4, mod, shn, aif, aiff, spx, sid, adx, nsf, nsfe,
+      spc, ape, mac, sap}%
+      \opt{lcd_bitmap}{\opt{swcodec}{, mpg, mpeg}}%
+      \opt{HAVE_REMOTE_LCD}{, rwps}%
+      \opt{lcd_non-mono}{, bmp}%
+      \opt{radio}{, fmr}%
+      \opt{lcd_bitmap}{, fnt, kbd}}\\*
+      %It'd be ideal to get these from filetypes.c
+
+      All file extensions that are not either specifically listed in the
+      \fname{.colours} files or are not in the list above will be
+      set to the colour given by \config{???}. Extensions that
+      are in the above list but not in the \fname{.colours}
+      file will be set to the foreground colour as normal.
+
+      \subsubsection{Activating}
+      To activate the filetype colours, the \fname{.colours} file needs to be
+      invoked from a \fname{.cfg} configuration file. The easiest way to do
+      this is to create a new text file containing the following single
+      line:\\*
+      \\
+      \config{filetype colours: /.rockbox/themes/filename.colours}\\*
+
+      where filename is replaced by the filename you used when creating the
+      \fname{.colours} file. Save this file as e.g. \fname{colours.cfg} in the
+      \fname{/.rockbox/themes} directory and then activate the config file
+      from the menu as normal
+      (\setting{Settings} $\rightarrow$ \setting{Theme Settings}%
+      $\rightarrow$ \setting{Browse Themes}).
+
+      \subsubsection{Editing}
+      The built-in \setting{Text Editor} (see \reference{sec:text_editor})
+      automatically understands the
+      \fname{.colours} file format, but an external text editor can
+      also be used. To edit the \fname{.colours} file using Rockbox,
+      select it in the \setting{File Browser}. The file will open in 
+      the \setting{Text Editor}. Upon selecting a line, the following choices
+      will appear:\\*
+      \\
+      \config{Extension}\\
+      \config{Colour}\\*
+
+      If \config{Extension} is selected, the \setting{virtual keyboard}
+      (see \reference{sec:virtual_keyboard}) appears,
+      allowing the file extension to be modified. If \config{Colour}
+      is selected, the colour selector screen appears. Choose the desired
+      colour, then save the \fname{.colours} file using the standard
+      \setting{Text Editor} controls.
 }
 
 \opt{lcd_non-mono}{%
