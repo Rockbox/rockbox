@@ -736,7 +736,6 @@ long gui_wps_show(void)
         }
 
         if (exit) {
-            viewportmanager_set_statusbar(oldbars);
 #ifdef HAVE_LCD_CHARCELLS
             status_set_record(false);
             status_set_audio(false);
@@ -752,6 +751,7 @@ long gui_wps_show(void)
 #ifdef AB_REPEAT_ENABLE
             ab_reset_markers();
 #endif
+            viewportmanager_set_statusbar(oldbars);
 #ifdef HAVE_RECORDING
             if (button == ACTION_WPS_REC)
                 return GO_TO_RECSCREEN;
