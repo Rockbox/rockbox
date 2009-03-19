@@ -262,14 +262,6 @@ static int wpsscrn(void* param)
     {
         splash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
     }
-#if LCD_DEPTH > 1
-    show_main_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-    show_remote_main_backdrop();
-#endif
-    /* always re-enable the statusbar after the WPS */
-    viewportmanager_set_statusbar(VP_SB_ALLSCREENS);
     return ret_val;
 }
 #if CONFIG_TUNER

@@ -172,18 +172,20 @@ void gwps_fix_statusbars(void)
 
 static void gwps_leave_wps(void)
 {
-    int oldbars = VP_SB_HIDE_ALL;
+    int i, oldbars = VP_SB_HIDE_ALL;
 
+    FOR_NB_SCREENS(i)
+        gui_wps[i].display->stop_scroll();
     if (global_settings.statusbar)
         oldbars = VP_SB_ALLSCREENS;
 
-    viewportmanager_set_statusbar(oldbars);
 #if LCD_DEPTH > 1
     show_main_backdrop();
 #endif
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     show_remote_main_backdrop();
 #endif
+    viewportmanager_set_statusbar(oldbars);
 }
 
 /* The WPS can be left in two ways:
@@ -207,7 +209,6 @@ long gui_wps_show(void)
     long last_left = 0, last_right = 0;
     
     wps_state_init();
-    gwps_fix_statusbars();
 
 #ifdef HAVE_LCD_CHARCELLS
     status_set_audio(true);
@@ -221,6 +222,7 @@ long gui_wps_show(void)
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     show_remote_wps_backdrop();
 #endif
+    gwps_fix_statusbars();
 
 #ifdef AB_REPEAT_ENABLE
     ab_repeat_init();
@@ -232,7 +234,10 @@ long gui_wps_show(void)
         wps_state.nid3 = audio_next_track();
         if (wps_state.id3) {
             if (gui_wps_display())
+            {
+                gwps_leave_wps();
                 return 0;
+            }
         }
 
         restore = true;
@@ -351,8 +356,7 @@ long gui_wps_show(void)
                 status_set_record(false);
                 status_set_audio(false);
 #endif
-                FOR_NB_SCREENS(i)
-                    gui_wps[i].display->stop_scroll();
+                gwps_leave_wps();
                 return GO_TO_PREVIOUS_BROWSER;
                 break;
 
@@ -578,8 +582,7 @@ long gui_wps_show(void)
                 break;
             /* menu key functions */
             case ACTION_WPS_MENU:
-                FOR_NB_SCREENS(i)
-                    gui_wps[i].display->stop_scroll();
+                gwps_leave_wps();
                 return GO_TO_ROOT;
                 break;
 
@@ -707,8 +710,6 @@ long gui_wps_show(void)
             if (global_settings.fade_on_stop)
                 fade(false, true);
 
-            FOR_NB_SCREENS(i)
-                gui_wps[i].display->stop_scroll();
             if (bookmark)
                 bookmark_autobookmark();
             audio_stop();
