@@ -285,10 +285,15 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
     if (!clear)
     {
         /* Draw the bitmap */
-        gwps->display->set_drawmode(DRMODE_FG);
         gwps->display->bitmap_part((fb_data*)bmp->data, 0, 0, bmp->width,
                                    x, y, width, height);
-        gwps->display->set_drawmode(DRMODE_SOLID);
+#ifdef HAVE_LCD_INVERT
+        if (global_settings.invert) {
+            gwps->display->set_drawmode(DRMODE_COMPLEMENT);
+            gwps->display->fillrect(x, y, width, height);
+            gwps->display->set_drawmode(DRMODE_SOLID);
+        }
+#endif
     }
     else
     {
