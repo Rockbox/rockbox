@@ -21,8 +21,72 @@
  
 #include "config.h"
 #include "jz4740.h"
+#include "system.h"
+#include "timer.h"
 
+/* Interrupt handler */
+void TCU1(void)
+{
+    __tcu_clear_full_match_flag(1);
+    
+    if (pfn_timer != NULL)
+        pfn_timer();
+}
 
-bool __timer_set(long cycles, bool set);
-bool __timer_register(void);
-void __timer_unregister(void);
+/* TODO: figure out what cycles means */
+bool __timer_set(long cycles, bool start)
+{
+    unsigned int latch, old_irq;
+    
+    if(cycles < 1)
+        return false;
+    
+    if (start && pfn_unregister != NULL)
+    {
+        pfn_unregister();
+        pfn_unregister = NULL;
+    }
+    
+    old_irq = disable_irq_save();
+    
+    __tcu_stop_counter(1);
+    __tcu_disable_pwm_output(1);
+    
+    __tcu_mask_half_match_irq(1); 
+    __tcu_unmask_full_match_irq(1);
+
+    /* EXTAL clock = 12Mhz */
+    __tcu_select_extalclk(1);
+    /* 12Mhz / 4 = 3Mhz */
+    __tcu_select_clk_div4(1);
+    
+    latch = cycles;
+
+    REG_TCU_TCNT(1) = 0;
+    REG_TCU_TDFR(1) = latch;
+    REG_TCU_TDHR(1) = latch;
+
+    __tcu_clear_full_match_flag(1);
+    
+    system_enable_irq(IRQ_TCU1);
+    
+    restore_irq(old_irq);
+}
+
+bool __timer_register(void)
+{
+    unsigned int old_irq = disable_irq_save();
+    
+    __tcu_start_counter(1);
+    
+    restore_irq(old_irq);
+}
+
+void __timer_unregister(void)
+{
+    unsigned int old_irq = disable_irq_save();
+    
+    __tcu_stop_counter(1);
+    
+    restore_irq(old_irq);
+}
