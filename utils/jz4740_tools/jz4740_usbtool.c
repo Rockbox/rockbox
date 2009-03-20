@@ -35,9 +35,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "jz4740.h"
 #include <stdbool.h>
 #include <unistd.h>
+#include "jz4740.h"
+#include "jz_xloader.h"
 
 #define VERSION "0.4"
 
@@ -120,11 +121,27 @@ enum OPTION
 int filesize(FILE* fd)
 {
     int ret;
+    
     fseek(fd, 0, SEEK_END);
     ret = ftell(fd);
     fseek(fd, 0, SEEK_SET);
+    
     return ret;
 }
+
+bool file_exists(const char* filename)
+{
+    FILE* fp = fopen(filename, "r");
+    
+    if(fp)
+    {
+        fclose(fp);
+        return true;
+    }
+    else
+        return false;
+}
+
 
 #define SEND_COMMAND(cmd, arg) err = usb_control_msg(dh, USB_ENDPOINT_OUT | USB_TYPE_VENDOR, (cmd), (arg)>>16, (arg)&0xFFFF, NULL, 0, TOUT);\
                                if (err < 0) \
@@ -155,8 +172,7 @@ int filesize(FILE* fd)
                                    fprintf(stderr,"[ERR]  Bulk write error (%d, %s)\n", err, strerror(-err)); \
                                    return -1; \
                                }
-
-int upload_app(usb_dev_handle* dh, int address, unsigned char* p, int len, bool stage2)
+int upload_data(usb_dev_handle* dh, int address, unsigned char* p, int len)
 {
     int err;
     char buf[9];
@@ -166,11 +182,6 @@ int upload_app(usb_dev_handle* dh, int address, unsigned char* p, int len, bool 
     GET_CPU_INFO(buf);
     buf[8] = 0;
     fprintf(stderr, "%s\n", buf);
-#if 0
-    fprintf(stderr, "[INFO] Flushing cache...");
-    SEND_COMMAND(VR_FLUSH_CACHES, 0);
-    fprintf(stderr, " Done!\n");
-#endif
 
     fprintf(stderr, "[INFO] SET_DATA_ADDRESS to 0x%x...", address);
     SEND_COMMAND(VR_SET_DATA_ADDRESS, address);
@@ -196,12 +207,32 @@ int upload_app(usb_dev_handle* dh, int address, unsigned char* p, int len, bool 
     else
         fprintf(stderr, " Done!\n");
     free(tmp_buf);
+    
+    return 0;
+}
 
-    fprintf(stderr, "[INFO] Booting device [STAGE%d]...", (stage2 ? 2 : 1));
+int boot(usb_dev_handle* dh, int address, bool stage2)
+{
+    int err;
+    
+    fprintf(stderr, "[INFO] Booting device STAGE%d...", (stage2 ? 2 : 1));
     SEND_COMMAND((stage2 ? VR_PROGRAM_START2 : VR_PROGRAM_START1), address );
     fprintf(stderr, " Done!\n");
     
-    return 0;
+    return err;
+}
+
+int upload_app(usb_dev_handle* dh, int address, unsigned char* p, int len, bool stage2)
+{
+    int err = upload_data(dh, address, p, len);
+    if(err == 0)
+    {
+        err = boot(dh, address, stage2);
+        if(err == 0)
+            fprintf(stderr, "[INFO] Done!\n");
+    }
+    
+    return err;
 }
 
 int read_data(usb_dev_handle* dh, int address, unsigned char *p, int len)
@@ -310,46 +341,6 @@ int test_device(usb_dev_handle* dh)
     TEST(SLCD_CTRL, 1);
     TEST(SLCD_STATE, 1);
     
-    return 0;
-}
-
-#define VOL_DOWN (1 << 27)
-#define VOL_UP (1 << 0)
-#define MENU (1 << 1)
-#define HOLD (1 << 16)
-#define OFF (1 << 29)
-#define MASK (VOL_DOWN|VOL_UP|MENU|HOLD|OFF)
-#define TS_MASK (SADC_STATE_PEND|SADC_STATE_PENU|SADC_STATE_TSRDY)
-int probe_device(usb_dev_handle* dh)
-{
-    int tmp;
-    
-    while(1)
-    {
-        if(read_reg(dh, SADC_STATE, 1) & SADC_STATE_TSRDY)
-        {
-            printf("%x\n", read_reg(dh, SADC_TSDAT, 4));
-            or_reg(dh, SADC_CTRL, read_reg(dh, SADC_STATE, 1) & TS_MASK, 1);
-        }
-        
-        tmp = read_reg(dh, GPIO_PXPIN(3), 4);
-        if(tmp < 0)
-            return tmp;
-        if(tmp ^ MASK)
-        {
-            if(!(tmp & VOL_DOWN))
-                printf("VOL_DOWN\t");
-            if(!(tmp & VOL_UP))
-                printf("VOL_UP\t");
-            if(!(tmp & MENU))
-                printf("MENU\t");
-            if(!(tmp & OFF))
-                printf("OFF\t");
-            if(!(tmp & HOLD))
-                printf("HOLD\t");
-            printf("\n");
-        }
-    }    
     return 0;
 }
 
@@ -508,30 +499,33 @@ int mimic_of(usb_dev_handle *dh, bool vx767)
     return 0;
 }
 
-int send_rockbox(usb_dev_handle *dh)
+int send_rockbox(usb_dev_handle *dh, const char* filename)
 {
-    int err, fsize;
-    unsigned char *buffer, *buffer2;
-    char cpu[8];
+    int fsize;
+    unsigned char *buffer;
     
     fprintf(stderr, "[INFO] Start!\n");
-    _GET_CPU;
-    _SET_ADDR(0x8000 << 16);
-    _SEND_FILE("1.bin");
-    _GET_CPU;
-    _VERIFY_DATA("1.bin", 0x8000 << 16);
-    _STAGE1(0x8000 << 16);
-    _SLEEP(3);
-    _GET_CPU;
-    _SET_ADDR(0x080004000);
-    _SEND_FILE("onda.bin");
-    _GET_CPU;
-    _VERIFY_DATA("onda.bin", 0x080004000);
-    _GET_CPU;
-    _FLUSH;
-    _GET_CPU;
-    _STAGE2(0x080004008);
+    if(file_exists("jz_xloader.bin"))
+    {
+        fprintf(stderr, "[INFO] Using jz_xloader.bin\n");
+        fsize = read_file("jz_xloader.bin", &buffer);
+        upload_data(dh, 0x080000000, buffer, fsize);
+        free(buffer);
+    }
+    else
+    {
+        fprintf(stderr, "[INFO] Using built-in jz_xloader.bin\n");
+        upload_data(dh, 0x080000000, jz_xloader, LEN_jz_xloader);
+    }
+    boot(dh, 0x080000000, false);
+    
+    fsize = read_file(filename, &buffer);
+    upload_data(dh, 0x080004000, buffer, fsize);
+    free(buffer);
+    boot(dh, 0x080004000, true);
+    
     fprintf(stderr, "[INFO] Done!\n");
+    
     return 0;
 }
 
@@ -558,7 +552,6 @@ int nand_dump(usb_dev_handle *dh)
         fclose(fd);
         return 0;
     }
-    memset(buffer, 0, LENGTH);
     
     SEND_NAND_COMMAND(0, NAND_INIT, 0);
     /*
@@ -595,9 +588,8 @@ int nand_dump(usb_dev_handle *dh)
     
     return n;
 }
-#undef LENGTH
 
-#define LENGTH 0x1000*16
+#define ROM_LENGTH 0x1000*16
 int rom_dump(usb_dev_handle *dh)
 {
     int err;
@@ -612,21 +604,20 @@ int rom_dump(usb_dev_handle *dh)
         return 0;
     }
     
-    buffer = (unsigned char*)malloc(LENGTH);
+    buffer = (unsigned char*)malloc(ROM_LENGTH);
     if (buffer == NULL)
     {
         fprintf(stderr, "[ERR]  Could not allocate memory.\n");
         fclose(fd);
         return 0;
     }
-    memset(buffer, 0, LENGTH);
     
     SEND_COMMAND(VR_SET_DATA_ADDRESS, 0x1FC00000);
-    SEND_COMMAND(VR_SET_DATA_LENGTH, LENGTH);
+    SEND_COMMAND(VR_SET_DATA_LENGTH, ROM_LENGTH);
     
     fprintf(stderr, "[INFO] Reading data...\n");
-    err = usb_bulk_read(dh, USB_ENDPOINT_IN | EP_BULK_TO, (char*)buffer, LENGTH, TOUT);
-    if (err != LENGTH) 
+    err = usb_bulk_read(dh, USB_ENDPOINT_IN | EP_BULK_TO, (char*)buffer, ROM_LENGTH, TOUT);
+    if (err != ROM_LENGTH) 
     {
         fprintf(stderr,"\n[ERR]  Error writing data\n");
         fprintf(stderr,"[ERR]  Bulk write error (%d, %s)\n", err, strerror(-err));
@@ -635,8 +626,8 @@ int rom_dump(usb_dev_handle *dh)
         return -1;
     }
     
-    n = fwrite(buffer, 1, LENGTH, fd);
-    if (n != LENGTH)
+    n = fwrite(buffer, 1, ROM_LENGTH, fd);
+    if (n != ROM_LENGTH)
     {
         fprintf(stderr, "[ERR]  Short write.\n");
         fclose(fd);
@@ -736,9 +727,6 @@ found:
         case 3:
             err = test_device(dh);
         break;
-        case 4:
-            err = probe_device(dh);
-        break;
         case 6:
         case 7:
             err = mimic_of(dh, (func == 7));
@@ -750,7 +738,7 @@ found:
             err = rom_dump(dh);
         break;
         case 10:
-            err = send_rockbox(dh);
+            err = send_rockbox(dh, buf);
         break;
     }
     
@@ -775,13 +763,12 @@ void print_usage(void)
     fprintf(stderr, "\t\t 1 -> upload file to specified address and boot from it\n");
     fprintf(stderr, "\t\t 2 -> read data from [ADDRESS] with length [LEN] to [FILE]\n");
     fprintf(stderr, "\t\t 3 -> read device status\n");
-    fprintf(stderr, "\t\t 4 -> probe keys (only Onda VX747)\n");
     fprintf(stderr, "\t\t 5 -> same as 1 but do a stage 2 boot\n");
     fprintf(stderr, "\t\t 6 -> mimic VX747 OF fw recovery\n");
     fprintf(stderr, "\t\t 7 -> mimic VX767 OF fw recovery\n");
     fprintf(stderr, "\t\t 8 -> do a NAND dump\n");
     fprintf(stderr, "\t\t 9 -> do a ROM dump\n");
-    fprintf(stderr, "\t\t10 -> send Rockbox bootloader to SDRAM\n");
+    fprintf(stderr, "\t\t10 -> send Rockbox bootloader at [FILE] to SDRAM\n");
 
 #ifdef _WIN32
     fprintf(stderr, "\nExample:\n\t usbtool.exe 1 fw.bin 0x80000000\n");
@@ -855,7 +842,6 @@ int main(int argc, char* argv[])
             fprintf(stderr, "[INFO] File size: %d bytes\n", n);
             
             return jzconnect(address, buf, len, cmd);
-        break;
         case 2:
             if (sscanf(argv[3], "0x%x", &address) <= 0)
             {
@@ -892,20 +878,28 @@ int main(int argc, char* argv[])
             fclose(fd);
             
             return err;
-        break;
+        case 10:
+            if(argc < 3)
+            {
+                print_usage();
+                return 1;
+            }
+            
+            if(!file_exists(argv[2]))
+            {
+                print_usage();
+                return 1;
+            }
+            return jzconnect(address, argv[2], 0, 10);
         case 3:
-        case 4:
         case 6:
         case 7:
         case 8:
         case 9:
-        case 10:
             return jzconnect(address, NULL, 0, cmd);
-        break;
         default:
             print_usage();
             return 1;
-        break;
     }
 
     return 0;

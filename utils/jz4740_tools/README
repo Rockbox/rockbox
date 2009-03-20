@@ -5,6 +5,9 @@
   Copyright (C) 2008
 *******************************************************************************
 
+To compile usbtools, you'll need jz_xloader (which can be get at
+http://repo.or.cz/w/jz_xloader.git).
+
 When you're on Linux, just type "make linux" to compile all the utilities (make
 sure you have libusb-dev installed).
 For cleaning: "make clean-linux"
