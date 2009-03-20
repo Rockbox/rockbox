@@ -353,16 +353,6 @@ bool gui_wps_display(void)
     FOR_NB_SCREENS(i)
     {
         gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_ALL);
-#ifdef HAVE_LCD_BITMAP        
-        /* temporary work around so the statusbar doesnt disappear when the WPS
-         * is first entered. This should be removed when the 
-         * WPS-statusbar handling is fixed up a bit more */
-        bool draw = global_settings.statusbar;
-        if (gui_wps[i].data->wps_sb_tag)
-            draw = gui_wps[i].data->show_sb_on_wps;
-        if (draw)
-            gui_statusbar_draw(&statusbars.statusbars[i], true);
-#endif            
     }
     return false;
 }
@@ -2114,6 +2104,10 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     data->peak_meter_enabled = enable_pm;
 #endif
 
+    if (refresh_mode & WPS_REFRESH_STATUSBAR)
+    {
+        gwps_draw_statusbars();
+    }
     /* Restore the default viewport */
     display->set_viewport(NULL);
 
@@ -2152,7 +2146,5 @@ bool gui_wps_refresh(struct gui_wps *gwps,
             remote_backlight_on();
     }
 #endif
-    /* force a bars update if they are being displayed */
-    viewportmanager_draw_statusbars(NULL);
     return true;
 }

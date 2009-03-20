@@ -26,15 +26,18 @@
 #include "metadata.h"
 
 /* constants used in line_type and as refresh_mode for wps_refresh */
-#define WPS_REFRESH_STATIC          1    /* line doesn't change over time */
-#define WPS_REFRESH_DYNAMIC         2    /* line may change (e.g. time flag) */
-#define WPS_REFRESH_SCROLL          4    /* line scrolls */
-#define WPS_REFRESH_PLAYER_PROGRESS 8    /* line contains a progress bar */
-#define WPS_REFRESH_PEAK_METER      16   /* line contains a peak meter */
+#define WPS_REFRESH_STATIC          (1<<0)  /* line doesn't change over time */
+#define WPS_REFRESH_DYNAMIC         (1<<1)  /* line may change (e.g. time flag) */
+#define WPS_REFRESH_SCROLL          (1<<2)  /* line scrolls */
+#define WPS_REFRESH_PLAYER_PROGRESS (1<<3)  /* line contains a progress bar */
+#define WPS_REFRESH_PEAK_METER      (1<<4) /* line contains a peak meter */
+#define WPS_REFRESH_STATUSBAR       (1<<5) /* refresh statusbar */
 #define WPS_REFRESH_ALL             0xff /* to refresh all line types */
-/* to refresh only those lines that change over time */
-#define WPS_REFRESH_NON_STATIC (WPS_REFRESH_ALL & ~WPS_REFRESH_STATIC & ~WPS_REFRESH_SCROLL)
 
+/* to refresh only those lines that change over time */
+#define WPS_REFRESH_NON_STATIC (WPS_REFRESH_DYNAMIC| \
+                                WPS_REFRESH_PLAYER_PROGRESS| \
+                                WPS_REFRESH_PEAK_METER)
 /* alignments */
 #define WPS_ALIGN_RIGHT 32
 #define WPS_ALIGN_CENTER 64
@@ -440,8 +443,8 @@ bool wps_data_load(struct wps_data *wps_data,
                    const char *buf,
                    bool isfile);
 
-/* Sets up the statusbars for the wps and each screen */
-void gwps_fix_statusbars(void);
+/* Redraw statusbars if necessary */
+void gwps_draw_statusbars(void);
 
 /* Returns the index of the subline in the subline array
    line - 0-based line number

@@ -151,7 +151,7 @@ static void play_hop(int direction)
 #endif
 }
 
-void gwps_fix_statusbars(void)
+static void gwps_fix_statusbars(void)
 {
 #ifdef HAVE_LCD_BITMAP
     int i;  
@@ -161,9 +161,11 @@ void gwps_fix_statusbars(void)
         bool draw = false;
         if (gui_wps[i].data->wps_sb_tag)
             draw = gui_wps[i].data->show_sb_on_wps;
+        else if (global_settings.statusbar)
+            wpsbars |= VP_SB_ONSCREEN(i);
         if (draw)
             wpsbars |= (VP_SB_ONSCREEN(i) | VP_SB_IGNORE_SETTING(i));
-    } 
+    }
 #else
     wpsbars = VP_SB_ALLSCREENS;
 #endif
@@ -188,6 +190,11 @@ static void gwps_leave_wps(void)
     viewportmanager_set_statusbar(oldbars);
 }
 
+void gwps_draw_statusbars(void)
+{
+    viewportmanager_set_statusbar(wpsbars);
+}
+
 /* The WPS can be left in two ways:
  *      a)  call a function, which draws over the wps. In this case, the wps
  *          will be still active (i.e. the below function didn't return)
@@ -207,7 +214,6 @@ long gui_wps_show(void)
     bool update_track = false;
     int i;
     long last_left = 0, last_right = 0;
-    
     wps_state_init();
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -685,7 +691,7 @@ long gui_wps_show(void)
 
         if (restore &&
             ((restoretimer == RESTORE_WPS_INSTANTLY) ||
-             TIME_AFTER(restore, current_tick)))
+             TIME_AFTER(current_tick, restoretimer)))
         {
             /*  restore wps backrops and statusbars */
 #if LCD_DEPTH > 1
@@ -694,7 +700,6 @@ long gui_wps_show(void)
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
             show_remote_wps_backdrop();
 #endif
-            viewportmanager_set_statusbar(wpsbars);
             restore = false;
             restoretimer = RESTORE_WPS_INSTANTLY;
             if (gui_wps_display()) {
@@ -751,22 +756,21 @@ static void statusbar_toggle_handler(void *data)
 {
     (void)data;
     int i;
-    bool draw = global_settings.statusbar;
+    gwps_fix_statusbars();
 
     FOR_NB_SCREENS(i)
     {
-        struct wps_viewport *vp = &gui_wps[i].data->viewports[0];
-        if (gui_wps[i].data->wps_sb_tag)
-            draw = gui_wps[i].data->show_sb_on_wps;
+        struct viewport *vp = &gui_wps[i].data->viewports[0].vp;
+        bool draw = wpsbars & (VP_SB_ONSCREEN(i) | VP_SB_IGNORE_SETTING(i));
         if (!draw)
         {
-            vp->vp.y = 0;
-            vp->vp.height = screens[i].lcdheight;
+            vp->y = 0;
+            vp->height = screens[i].lcdheight;
         }
         else
         {
-            vp->vp.y      = STATUSBAR_HEIGHT;
-            vp->vp.height = screens[i].lcdheight - STATUSBAR_HEIGHT;
+            vp->y      = STATUSBAR_HEIGHT;
+            vp->height = screens[i].lcdheight - STATUSBAR_HEIGHT;
         }
     }
 }

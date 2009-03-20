@@ -125,7 +125,6 @@ void viewportmanager_draw_statusbars(void* data)
     (void)data;
     int i;
 
-    gwps_fix_statusbars();
     FOR_NB_SCREENS(i)
     {
         if (showing_bars(i))
