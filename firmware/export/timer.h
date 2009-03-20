@@ -34,7 +34,8 @@
 #elif CONFIG_CPU == PNX0101
  #define TIMER_FREQ 3000000
 #elif CONFIG_CPU == S3C2440 || CONFIG_CPU == DM320 || CONFIG_CPU == TCC7801 \
-      || defined(CPU_TCC77X) || CONFIG_CPU == AS3525 || CONFIG_CPU == IMX31L
+      || defined(CPU_TCC77X) || CONFIG_CPU == AS3525 || CONFIG_CPU == IMX31L \
+      || CONFIG_CPU == JZ4732
  #include "timer-target.h"
 #elif defined(SIMULATOR)
  #define TIMER_FREQ 1000000
