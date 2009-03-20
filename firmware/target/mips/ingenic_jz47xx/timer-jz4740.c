@@ -71,6 +71,8 @@ bool __timer_set(long cycles, bool start)
     system_enable_irq(IRQ_TCU1);
     
     restore_irq(old_irq);
+    
+    return true;
 }
 
 bool __timer_register(void)
@@ -80,6 +82,8 @@ bool __timer_register(void)
     __tcu_start_counter(1);
     
     restore_irq(old_irq);
+    
+    return true;
 }
 
 void __timer_unregister(void)
