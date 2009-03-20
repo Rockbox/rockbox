@@ -75,12 +75,11 @@ static int fd_log = -1;
 #define FM_CLOCK_PIN    5
 #define FM_DATA_PIN     6
 #define FM_NRW_PIN      7
-//#define udelay(x)       /* Remove hack when D2 has udelay */
-
+/* Remove hack when i7 has udelay */
 static void udelay(int usecs)
 {
     while (usecs--)
-	asm("nop;nop;");
+    asm("nop;nop;");
 }
 
 #elif defined(COWON_D2)
@@ -90,7 +89,7 @@ static void udelay(int usecs)
 #define FM_NRW_PIN      31
 #define FM_CLOCK_PIN    29
 #define FM_DATA_PIN     30
-#define udelay(x)       /* Remove hack when D2 has udelay */
+
 #else
 #error GPIOs undefined for this target
 #endif

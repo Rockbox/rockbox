@@ -133,14 +133,6 @@ void usb_drv_release_endpoint(int ep)
     restore_irq(flags);
 }
 
-static void udelay(unsigned long msecs)
-{
-    /* TODO: implement me other way */
-    msecs*=126;
-    while (msecs--)
-        asm("nop;");
-}
-
 static inline void pullup_on(void)
 {
     TCC7xx_USB_PHY_CFG = 0x000c;

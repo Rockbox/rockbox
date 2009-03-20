@@ -34,4 +34,11 @@
 #define inw(a) (*(volatile unsigned short *) (a))
 #define outw(a,b) (*(volatile unsigned short *) (b) = (a))
 
+/* TC32 is configured to 1MHz in clock_init() */
+static inline void udelay(unsigned usecs)
+{
+    unsigned stop = TC32MCNT + usecs;
+    while (TIME_BEFORE(TC32MCNT, stop));
+}
+
 #endif /* SYSTEM_TARGET_H */

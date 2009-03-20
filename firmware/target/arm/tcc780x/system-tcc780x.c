@@ -231,6 +231,9 @@ static void clock_init(void)
     
     /* configure PCK_TCT to 2Mhz (clock source 4 (Xin) divided by 6) */
     PCLK_TCT = PCK_EN | (CKSEL_XIN<<24) | 5;
+    
+    /* set TC32 timer to XIN divided by 12 (1MHz) */
+    TC32EN = (1<<24) | 11;
 }
 #endif
 
