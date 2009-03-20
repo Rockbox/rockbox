@@ -424,6 +424,9 @@ enum plugin_status plugin_start(const void* parameter)
                                 rb->set_color(rb->screens[SCREEN_MAIN], name, &color, -1);
                                 temp_changed = (value == NULL) || (color != old_color);
                                 break;
+                            default:
+                                /* Should never happend but makes compiler happy */
+                                temp_changed = false;
                         }
                         
                         if (temp_changed)
