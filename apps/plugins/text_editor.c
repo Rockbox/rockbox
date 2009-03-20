@@ -22,7 +22,7 @@
 #include "lib/playback_control.h"
 
 #if PLUGIN_BUFFER_SIZE > 0x45000
-#define MAX_CHARS    0x40000 /* 128 kiB */
+#define MAX_CHARS    0x40000 /* 256 kiB */
 #else
 #define MAX_CHARS   0x6000 /* 24 kiB */
 #endif
@@ -58,7 +58,7 @@ int do_action(int action, char* str, int line)
 
 int _do_action(int action, char* str, int line)
 {
-    int len;
+    int len, lennew;
     int i=0,c=0;
     if (line>=last_action_line)
     {
@@ -76,7 +76,7 @@ int _do_action(int action, char* str, int line)
             len = rb->strlen(str)+1;
             if ( char_count+ len > MAX_CHARS )
                 return 0;
-            rb->memmove(&buffer[c+len],&buffer[c],char_count);
+            rb->memmove(&buffer[c+len],&buffer[c],char_count-c);
             rb->strcpy(&buffer[c],str);
             char_count += len;
             line_count++;
@@ -92,22 +92,27 @@ int _do_action(int action, char* str, int line)
             if (line > line_count)
                 return 0;
             len = rb->strlen(&buffer[c])+1;
+            rb->memmove(&buffer[c],&buffer[c+len],char_count-c-len);
             char_count -= len;
-            rb->memmove(&buffer[c],&buffer[c+len],char_count);
             line_count--;
             break;
         case ACTION_UPDATE:
             if (line > line_count)
                 return 0;
             len = rb->strlen(&buffer[c])+1;
-            rb->memmove(&buffer[c+rb->strlen(str)+1],&buffer[c+len],char_count);
+            lennew = rb->strlen(str)+1;
+            if ( char_count+ lennew-len > MAX_CHARS )
+                return 0;
+            rb->memmove(&buffer[c+lennew],&buffer[c+len],char_count-c-len);
             rb->strcpy(&buffer[c],str);
-            char_count += rb->strlen(str)+1-len;
+            char_count += lennew-len;
             break;
         case ACTION_CONCAT:
             if (line > line_count)
                 return 0;
-            rb->memmove(&buffer[c-1],&buffer[c],char_count);
+            rb->memmove(&buffer[c-1],&buffer[c],char_count-c);
+            char_count--;
+            line_count--;
             break;
         default:
             return 0;
@@ -264,7 +269,7 @@ int do_item_menu(int cur_sel, char* copy_buffer)
         break;
         case 6: /* playback menu */
             playback_control(NULL);
-            ret = MENU_RET_UPDATE;
+            ret = MENU_RET_NO_UPDATE;
         break;
         default:
             ret = MENU_RET_NO_UPDATE;
@@ -389,56 +394,57 @@ enum plugin_status plugin_start(const void* parameter)
         {
             case ACTION_STD_OK:
             {
-                bool edit_text = true;
-#ifdef HAVE_LCD_COLOR
-                int color;
-#endif
                 if (line_count)
                     rb->strcpy(temp_line,&buffer[do_action(ACTION_GET,0,cur_sel)]);
 #ifdef HAVE_LCD_COLOR
-                if (edit_colors_file)
+                if (edit_colors_file && line_count)
                 {
                     char *name = temp_line, *value = NULL;
                     char extension[MAX_LINE_LEN];
+                    int color, old_color;
+                    bool temp_changed;
                     rb->settings_parseline(temp_line, &name, &value);
                     if (line_count)
                     {
                         MENUITEM_STRINGLIST(menu, "Edit What?", NULL, 
                                             "Extension", "Colour",);
+                        rb->strcpy(extension, name);
+                        if (value)
+                            hex_to_rgb(value, &color);
+                        else
+                            color = 0;
+                        
                         switch (rb->do_menu(&menu, NULL, NULL, false))
                         {
                             case 0:
-                                edit_text = true;
+                                temp_changed = !rb->kbd_input(extension,MAX_LINE_LEN);
                                 break;
                             case 1:
-                                edit_text = false;
-                                if (value)
-                                    hex_to_rgb(value, &color);
-                                else color = 0;
-                                rb->strcpy(extension, name);
+                                old_color = color;
                                 rb->set_color(rb->screens[SCREEN_MAIN], name, &color, -1);
-                                rb->snprintf(temp_line, MAX_LINE_LEN, "%s: %02X%02X%02X",
-                                             extension, RGB_UNPACK_RED(color),
-                                             RGB_UNPACK_GREEN(color),
-                                             RGB_UNPACK_BLUE(color));
-                                if (line_count)
-                                {
-                                    do_action(ACTION_UPDATE,temp_line,cur_sel);
-                                }
-                                else do_action(ACTION_INSERT,temp_line,cur_sel);
-                                changed = true;
+                                temp_changed = (value == NULL) || (color != old_color);
                                 break;
+                        }
+                        
+                        if (temp_changed)
+                        {
+                            rb->snprintf(temp_line, MAX_LINE_LEN, "%s: %02X%02X%02X",
+                                         extension, RGB_UNPACK_RED(color),
+                                         RGB_UNPACK_GREEN(color),
+                                         RGB_UNPACK_BLUE(color));
+                            do_action(ACTION_UPDATE, temp_line, cur_sel);
+                            changed = true;
                         }
                     }
                 }
+                else
 #endif
-                if (edit_text &&!rb->kbd_input(temp_line,MAX_LINE_LEN))
+                if (!rb->kbd_input(temp_line,MAX_LINE_LEN))
                 {
                     if (line_count)
-                    {
                         do_action(ACTION_UPDATE,temp_line,cur_sel);
-                    }
-                    else do_action(ACTION_INSERT,temp_line,cur_sel);
+                    else
+                        do_action(ACTION_INSERT,temp_line,cur_sel);
                     changed = true;
                 }
             }
