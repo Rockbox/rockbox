@@ -681,8 +681,7 @@ void RbUtilQt::installBootloader()
     else if(bl->installed() == BootloaderInstallBase::BootloaderOther
         && bl->capabilities() & BootloaderInstallBase::Backup)
     {
-        QString targetFolder = settings->name(settings->curPlatform())
-                + " Firmware Backup";
+        QString targetFolder = settings->curPlatformName() + " Firmware Backup";
         // remove invalid character(s)
         targetFolder.remove(QRegExp("[:/]"));
         if(QMessageBox::question(this, tr("Create Bootloader backup"),
