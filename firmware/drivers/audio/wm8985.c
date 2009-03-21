@@ -186,6 +186,13 @@ void audiohw_set_lineout_vol(int vol_l, int vol_r)
     wmcodec_write(ROUT2VOL, 0x100 | vol_r);
 }
 
+void audiohw_set_aux_vol(int vol_l, int vol_r)
+{
+    /* OUTMIX */
+    wmcodec_write(LOUTMIX, 0x111 | (vol_l << 5) );
+    wmcodec_write(ROUTMIX, 0x111 | (vol_r << 5) );
+}
+
 void audiohw_set_bass(int value)
 {
     eq1_reg = (eq1_reg & ~EQ_GAIN_MASK) | EQ_GAIN_VALUE(value);

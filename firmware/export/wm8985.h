@@ -32,5 +32,6 @@ extern int tenthdb2master(int db);
 
 extern void audiohw_set_headphone_vol(int vol_l, int vol_r);
 extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
+extern void audiohw_set_aux_vol(int vol_l, int vol_r);
 
 #endif /* _WM8985_H */

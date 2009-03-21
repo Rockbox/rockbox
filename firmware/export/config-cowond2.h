@@ -49,9 +49,10 @@
 /* define this if you would like tagcache to build on this target */
 //#define HAVE_TAGCACHE
 
-/* FM Tuner 
+/* FM Tuner */
 #define CONFIG_TUNER LV24020LP
-#define HAVE_TUNER_PWR_CTRL*/
+#define HAVE_TUNER_PWR_CTRL
+#define HAVE_RADIO_REGION
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE

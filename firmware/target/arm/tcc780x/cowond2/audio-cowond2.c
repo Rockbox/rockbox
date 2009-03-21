@@ -57,6 +57,7 @@ void audio_input_mux(int source, unsigned flags)
             {
                 /*audiohw_set_monitor(false);
                 audiohw_disable_recording();*/
+                audiohw_set_aux_vol(0,0);
             }
             break;
 
@@ -86,6 +87,7 @@ void audio_input_mux(int source, unsigned flags)
             {
                 /*audiohw_disable_recording();
                 audiohw_set_monitor(true); /. line 1 analog audio path */
+                audiohw_set_aux_vol(7,7);
             }
             break;
     } /* end switch */

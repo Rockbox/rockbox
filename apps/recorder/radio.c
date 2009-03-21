@@ -109,6 +109,14 @@
 #elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
 #define FM_PRESET
 #define FM_MODE
+
+#elif (CONFIG_KEYPAD == COWOND2_PAD)
+#define FM_MENU
+#define FM_PRESET
+#define FM_STOP
+#define FM_MODE
+#define FM_EXIT
+#define FM_PLAY
 #endif
 
 #define RADIO_SCAN_MODE 0

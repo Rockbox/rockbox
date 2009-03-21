@@ -146,6 +146,13 @@ static const struct button_mapping button_context_keyboard[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_keyboard */
 
+static const struct button_mapping button_context_radio[]  = {
+    { ACTION_FM_MENU, BUTTON_MENU,    BUTTON_NONE },
+    { ACTION_FM_STOP, BUTTON_POWER,   BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+}; /* button_context_radio */
+
 const struct button_mapping* target_get_context_mapping(int context)
 {
     switch (context)
@@ -182,6 +189,8 @@ const struct button_mapping* target_get_context_mapping(int context)
 
         case CONTEXT_YESNOSCREEN:
             return button_context_yesno;
+        case CONTEXT_FM:
+            return button_context_radio;
         case CONTEXT_BOOKMARKSCREEN:
             return button_context_bmark;
         case CONTEXT_QUICKSCREEN:

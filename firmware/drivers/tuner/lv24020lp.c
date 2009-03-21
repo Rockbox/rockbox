@@ -29,19 +29,17 @@
 #include "power.h"
 #include "fmradio.h" /* physical interface driver */
 #include "sound.h"
-#include "pp5024.h"
 #include "system.h"
 
 #ifndef BOOTLOADER
 
 static struct mutex tuner_mtx;
 
-#if 0
 /* define to enable tuner logging */
-#define SANYO_TUNER_LOG
-#endif
+#undef SANYO_TUNER_LOG_FILE
+#undef SANYO_TUNER_LOGF
 
-#ifdef SANYO_TUNER_LOG
+#ifdef SANYO_TUNER_LOG_FILE
 #include "sprintf.h"
 #include "file.h"
 
@@ -52,6 +50,15 @@ static int fd_log = -1;
 /* syncing required because close() is never called */
 #define TUNER_LOG_SYNC()    fsync(fd_log)
 #define TUNER_LOG(s...)     fdprintf(fd_log, s)
+
+#elif defined(SANYO_TUNER_LOGF)
+#define LOGF_ENABLE
+#include "logf.h"
+
+#define TUNER_LOG_OPEN()
+#define TUNER_LOG_SYNC()
+#define TUNER_LOG(s...)     logf(s)
+
 #else
 #define TUNER_LOG_OPEN()
 #define TUNER_LOG_SYNC()
