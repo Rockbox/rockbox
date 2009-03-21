@@ -130,3 +130,43 @@ qulonglong filesystemFree(QString path)
     return size;
 }
 
+RockboxInfo::RockboxInfo(QString mountpoint)
+{
+    m_path = mountpoint +"/.rockbox/rockbox-info.txt";
+}
+
+bool RockboxInfo::open()
+{
+    QFile file(m_path);
+    if(!file.exists())
+        return false;
+        
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return false;
+    
+    // read file contents
+    while (!file.atEnd())
+    {
+        QString line = file.readLine();
+
+        if(line.contains("Version:"))
+        {
+            m_version = line.remove("Version:").trimmed();
+        }
+        else if(line.contains("Target: "))
+        {
+            m_target = line.remove("Target: ").trimmed();
+        }
+        else if(line.contains("Features:"))
+        {
+            m_features = line.remove("Features:").trimmed();
+        }
+        else if(line.contains("Target id:"))
+        {
+            m_targetid = line.remove("Target id:").trimmed();
+        }        
+    }
+    
+    file.close();
+    return true;
+}

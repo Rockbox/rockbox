@@ -58,6 +58,7 @@
 #include <sys/mount.h>
 #endif
 
+#include "utils.h"
 
 /** @brief detect permission of user (only Windows at moment).
  *  @return enum userlevel.
@@ -352,23 +353,13 @@ QUrl Detect::systemProxy(void)
  */
 QString Detect::installedVersion(QString mountpoint)
 {
-    // read rockbox-info.txt
-    QFile info(mountpoint +"/.rockbox/rockbox-info.txt");
-    if(!info.open(QIODevice::ReadOnly))
+    RockboxInfo info(mountpoint);
+    if(!info.open())
     {
         return "";
     }
 
-    while (!info.atEnd()) {
-        QString line = info.readLine();
-
-        if(line.contains("Version:"))
-        {
-            return line.remove("Version:").trimmed();
-        }
-    }
-    info.close();
-    return "";
+    return info.version();
 }
 
 
@@ -377,24 +368,13 @@ QString Detect::installedVersion(QString mountpoint)
  */
 QString Detect::installedTarget(QString mountpoint)
 {
-    // read rockbox-info.txt
-    QFile info(mountpoint +"/.rockbox/rockbox-info.txt");
-    if(!info.open(QIODevice::ReadOnly))
+    RockboxInfo info(mountpoint);
+    if(!info.open())
     {
         return "";
     }
 
-    while (!info.atEnd())
-    {
-        QString line = info.readLine();
-        if(line.contains("Target:"))
-        {
-            qDebug() << line;
-            return line.remove("Target:").trimmed();
-        }
-    }
-    info.close();
-    return "";
+    return info.target();
 }
 
 

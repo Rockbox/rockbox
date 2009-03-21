@@ -90,21 +90,18 @@ bool Autodetection::detect()
             }
 
             // check rockbox-info.txt afterwards.
-            QFile file(mounts.at(i) + "/.rockbox/rockbox-info.txt");
-            if(file.exists())
+            RockboxInfo info(mounts.at(i));
+            if(info.open())
             {
-                file.open(QIODevice::ReadOnly | QIODevice::Text);
-                QString line = file.readLine();
-                if(line.startsWith("Target: "))
+                if(m_device.isEmpty())
                 {
-                    line.remove("Target: ");
-                    if(m_device.isEmpty())
-                        m_device = line.trimmed(); // trim whitespaces
-                    m_mountpoint = mounts.at(i);
-                    qDebug() << "rockbox-info.txt detected:" << m_device << m_mountpoint;
-                    return true;
-                }
+                    m_device = info.target();
+                }                
+                m_mountpoint = mounts.at(i);
+                qDebug() << "rockbox-info.txt detected:" << m_device << m_mountpoint;
+                return true;
             }
+            
             // check for some specific files in root folder
             QDir root(mounts.at(i));
             QStringList rootentries = root.entryList(QDir::Files);

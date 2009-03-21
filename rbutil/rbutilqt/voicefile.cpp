@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include "voicefile.h"
+#include "utils.h"
 
 #define STATE_INVALID 0
 #define STATE_PHRASE 1
@@ -49,35 +50,20 @@ bool VoiceFileCreator::createVoiceFile(ProgressloggerInterface* logger)
     m_path = QDir::tempPath() + "/rbvoice/";   
     
     // read rockbox-info.txt
-    QFile info(m_mountpoint+"/.rockbox/rockbox-info.txt");
-    if(!info.open(QIODevice::ReadOnly))
+    RockboxInfo info(m_mountpoint);
+    if(!info.open())
     {
-        m_logger->addItem(tr("failed to open rockbox-info.txt"),LOGERROR);
+        m_logger->addItem(tr("could not find rockbox-info.txt"),LOGERROR);
         m_logger->abort();
         emit done(false);
         return false;
     }
     
-    QString target, features,version;
-    while (!info.atEnd()) {
-        QString line = info.readLine();
-        
-        if(line.contains("Target:"))
-        {
-            target = line.remove("Target:").trimmed();
-        }
-        else if(line.contains("Features:"))
-        {
-            features = line.remove("Features:").trimmed();
-        }
-        else if(line.contains("Version:"))
-        {
-            version = line.remove("Version:").trimmed();
-            version = version.left(version.indexOf("-")).remove(0,1);
-        }
-    }
-    info.close();
-        
+    QString target = info.target();
+    QString features = info.features();
+    QString version = info.version();
+    version = version.left(version.indexOf("-")).remove(0,1);
+           
     //prepare download url
     QUrl genlangUrl = settings->genlangUrl() +"?lang=" +m_lang+"&t="+target+"&rev="+version+"&f="+features;
     
