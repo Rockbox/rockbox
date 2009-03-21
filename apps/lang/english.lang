@@ -11232,87 +11232,87 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK
-  desc: in settings_menu
+  desc: deprecated
   user: core
   <source>
     *: none
-    usbstack: "USB Stack"
+    usbstack: ""
   </source>
   <dest>
     *: none
-    usbstack: "USB Stack"
+    usbstack: ""
   </dest>
   <voice>
     *: none
-    usbstack: "USB Stack"
+    usbstack: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_MODE
-  desc: in usbstack settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    usbstack: "USB Stack Mode"
+    usbstack: ""
   </source>
   <dest>
     *: none
-    usbstack: "USB Stack Mode"
+    usbstack: ""
   </dest>
   <voice>
     *: none
-    usbstack: "USB Stack Mode"
+    usbstack: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE
-  desc: in usbstack settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    usbstack: "Device"
+    usbstack: ""
   </source>
   <dest>
     *: none
-    usbstack: "Device"
+    usbstack: ""
   </dest>
   <voice>
     *: none
-    usbstack: "Device"
+    usbstack: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_HOST
-  desc: in usbstack settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    usbstack: "Host"
+    usbstack: ""
   </source>
   <dest>
     *: none
-    usbstack: "Host"
+    usbstack: ""
   </dest>
   <voice>
     *: none
-    usbstack: "Host"
+    usbstack: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE_DRIVER
-  desc: in usbstack settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    usbstack: "Device Driver"
+    usbstack: ""
   </source>
   <dest>
     *: none
-    usbstack: "Device Driver"
+    usbstack: ""
   </dest>
   <voice>
     *: none
-    usbstack: "Device Driver"
+    usbstack: ""
   </voice>
 </phrase>
 <phrase>

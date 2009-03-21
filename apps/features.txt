@@ -4,6 +4,10 @@
    version numbers should be updated. It also means that changing defines in
    the various config*.h files could also break back compatibility */  
 
+#if defined(HAVE_ACCESSORY_SUPPLY)
+accessory_supply
+#endif
+
 #if defined(HAVE_AGC)
 agc
 #endif
@@ -143,8 +147,8 @@ rtc
 scrollwheel
 #endif
 
-#if defined(HAVE_WHEEL_ACCELERATION)
-wheel_acceleration
+#if defined(IPOD_ACCESSORY_PROTOCOL)
+serial_port
 #endif
 
 #if defined(ARCHOS_RECORDER) || defined(ARCHOS_PLAYER)
@@ -153,6 +157,10 @@ soft_shutdown
 
 #if defined(HAVE_SPDIF_POWER)
 spdif_power
+#endif
+
+#if defined(HAVE_SPEAKER)
+speaker
 #endif
 
 #if CONFIG_CODEC == SWCODEC
@@ -176,23 +184,11 @@ usb_charging
 #endif
 #endif
 
-#if defined(HAVE_USBSTACK)
-usbstack
-#endif
-
-#if defined(HAVE_ACCESSORY_SUPPLY)
-accessory_supply
-#endif
-
-#if defined(IPOD_ACCESSORY_PROTOCOL)
-serial_port
-#endif
-
-#if defined(HAVE_SPEAKER)
-speaker
-#endif
-
 #if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
 usbstack
+#endif
+
+#if defined(HAVE_WHEEL_ACCELERATION)
+wheel_acceleration
 #endif
 
