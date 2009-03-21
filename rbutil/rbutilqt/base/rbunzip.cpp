@@ -24,13 +24,13 @@
 //! @brief extract archive to destination
 UnZip::ErrorCode RbUnZip::extractArchive(const QString& dest)
 {
+    qDebug() << "[UNZIP] extracting archive to" << dest;
     QStringList files = this->fileList();
     UnZip::ErrorCode error = Ok;
     m_abortunzip = false;
 
     int total = files.size();
     for(int i = 0; i < total; i++) {
-        qDebug() << __func__ << files.at(i);
         error = this->extractFile(files.at(i), dest, UnZip::ExtractPaths);
         emit unzipProgress(i + 1, total);
         QCoreApplication::processEvents(); // update UI
