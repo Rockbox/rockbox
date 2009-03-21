@@ -425,7 +425,7 @@ enum plugin_status plugin_start(const void* parameter)
                                 temp_changed = (value == NULL) || (color != old_color);
                                 break;
                             default:
-                                /* Should never happend but makes compiler happy */
+                                /* Should never happen but makes compiler happy */
                                 temp_changed = false;
                         }
                         
