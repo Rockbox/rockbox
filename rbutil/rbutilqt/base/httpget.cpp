@@ -255,7 +255,7 @@ void HttpGet::getFileFinish()
             }
             m_response = 200; // fake "200 OK" HTTP response
             m_cached = true;
-            httpDone(false); // we're done now. Fake http "done" signal.
+            httpDone(false); // we're done now. Handle http "done" signal.
             return;
         }
         else {
@@ -312,10 +312,6 @@ void HttpGet::httpDone(bool error)
             c.write(dataBuffer);
 
         c.close();
-    }
-    // if cached file found and cache enabled ignore http errors
-    if(m_usecache && m_cached && !http.hasPendingRequests()) {
-        error = false;
     }
     // take care of concurring requests. If there is still one running,
     // don't emit done(). That request will call this slot again.
