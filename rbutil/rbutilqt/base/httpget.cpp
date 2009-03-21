@@ -184,6 +184,11 @@ bool HttpGet::getFile(const QUrl &url)
             return false;
         }
     }
+    else {
+        // output to buffer. Make sure buffer is empty so no old data gets
+        // returned in case the object is reused.
+        dataBuffer.clear();
+    }
     qDebug() << "[HTTP] downloading" << url.toEncoded();
     // create request
     http.setHost(url.host(), url.port(80));
