@@ -1156,7 +1156,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user: core
   <source>
     *: "Version"
@@ -12163,5 +12163,180 @@
   <voice>
     *: none
     quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest>
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Enable Speaker"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Enable Speaker"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Tulkitse numerot järjestettäessä"
+  </dest>
+  <voice>
+    *: "Tulkitse numerot järjestettäessä"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Serial Bitrate"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Serial Bitrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest>
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "57600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "Kokonaislukuina"
+  </dest>
+  <voice>
+    *: "Kokonaislukuina"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user: core
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Kiitokset"
+  </dest>
+  <voice>
+    *: "Kiitokset"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Lukuina"
+  </dest>
+  <voice>
+    *: "Lukuina"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Auto"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Automatic"
   </voice>
 </phrase>
