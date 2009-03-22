@@ -133,6 +133,17 @@ void ThemesInstallWindow::downloadDone(bool error)
 
         iniDetails.endGroup();
     }
+    // check if there's a themes "MOTD" available
+    if(iniDetails.contains("status/msg")) {
+        // check if there's a localized msg available
+        QString lang = settings->curLang().split("_").at(0);
+        QString msg;
+        if(iniDetails.contains("status/msg." + lang))
+            msg = iniDetails.value("status/msg." + lang).toString();
+        else
+            msg = iniDetails.value("status/msg").toString();
+        QMessageBox::information(this, tr("Information"), msg);
+    }
 }
 
 
