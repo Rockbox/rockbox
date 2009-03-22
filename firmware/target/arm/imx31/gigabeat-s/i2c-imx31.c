@@ -57,7 +57,7 @@ static struct i2c_module_descriptor
     {
         .base    = (struct i2c_map *)I2C1_BASE_ADDR,
         .cg      = CG_I2C1,
-        .ints    = I2C1,
+        .ints    = INT_I2C1,
         .handler = I2C1_HANDLER,
     },
 #endif
@@ -65,7 +65,7 @@ static struct i2c_module_descriptor
     {
         .base    = (struct i2c_map *)I2C2_BASE_ADDR,
         .cg      = CG_I2C2,
-        .ints    = I2C2,
+        .ints    = INT_I2C2,
         .handler = I2C2_HANDLER,
     },
 #endif
@@ -73,7 +73,7 @@ static struct i2c_module_descriptor
     {
         .base    = (struct i2c_map *)I2C3_BASE_ADDR,
         .cg      = CG_I2C3,
-        .ints    = I2C3,
+        .ints    = INT_I2C3,
         .handler = I2C3_HANDLER,
     },
 #endif
@@ -286,11 +286,11 @@ void i2c_init(void)
     for (i = 0; i < I2C_NUM_I2C; i++)
     {
         struct i2c_module_descriptor *const desc = &i2c_descs[i];
-        imx31_clkctl_module_clock_gating(desc->cg, CGM_ON_ALL);
+        ccm_module_clock_gating(desc->cg, CGM_ON_RUN_WAIT);
         mutex_init(&desc->m);
         wakeup_init(&desc->w);
         desc->base->i2cr = 0;
-        imx31_clkctl_module_clock_gating(desc->cg, CGM_OFF);
+        ccm_module_clock_gating(desc->cg, CGM_OFF);
     }
 }
 
@@ -305,8 +305,9 @@ void i2c_enable_node(struct i2c_node *node, bool enable)
         if (++desc->enable == 1)
         {
             /* First enable */
-            imx31_clkctl_module_clock_gating(desc->cg, CGM_ON_ALL);
-            avic_enable_int(desc->ints, IRQ, 7, desc->handler);
+            ccm_module_clock_gating(desc->cg, CGM_ON_RUN_WAIT);
+            avic_enable_int(desc->ints, INT_TYPE_IRQ, INT_PRIO_DEFAULT,
+                            desc->handler);
         }
     }
     else
@@ -317,7 +318,7 @@ void i2c_enable_node(struct i2c_node *node, bool enable)
             while (desc->base->i2sr & I2C_I2SR_IBB); /* Wait for STOP */
             desc->base->i2cr &= ~I2C_I2CR_IEN;
             avic_disable_int(desc->ints);
-            imx31_clkctl_module_clock_gating(desc->cg, CGM_OFF);
+            ccm_module_clock_gating(desc->cg, CGM_OFF);
         }
     }
 

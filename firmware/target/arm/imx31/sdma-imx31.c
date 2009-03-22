@@ -502,9 +502,10 @@ static bool setup_channel(struct channel_control_block *ccb_p)
 /** Public routines **/
 void sdma_init(void)
 {
-    imx31_clkctl_module_clock_gating(CG_SDMA, CGM_ON_RUN_WAIT);
     int i;
     unsigned long acr;
+
+    ccm_module_clock_gating(CG_SDMA, CGM_ON_RUN_WAIT);
 
     /* Reset the controller */
     SDMA_RESET |= SDMA_RESET_RESET;
@@ -532,11 +533,11 @@ void sdma_init(void)
     /* 32-word channel contexts, use default bootscript address */
     SDMA_CHN0ADDR = SDMA_CHN0ADDR_SMSZ | 0x0050;
 
-    avic_enable_int(SDMA, IRQ, 8, SDMA_HANDLER);
+    avic_enable_int(INT_SDMA, INT_TYPE_IRQ, INT_PRIO_DEFAULT+1, SDMA_HANDLER);
 
-    /* SDMA core must run at the proper frequency based upon the AHB/IPG ratio */
-    acr = (imx31_clkctl_get_ahb_clk() / imx31_clkctl_get_ipg_clk()) < 2 ?
-          SDMA_CONFIG_ACR : 0;
+    /* SDMA core must run at the proper frequency based upon the AHB/IPG
+     * ratio */
+    acr = (ccm_get_ahb_clk() / ccm_get_ipg_clk()) < 2 ? SDMA_CONFIG_ACR : 0;
 
     /* No dsp, no debug
      * Static context switching - TLSbo86520L SW Workaround for SDMA Chnl0

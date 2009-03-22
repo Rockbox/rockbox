@@ -58,7 +58,7 @@ static struct spi_module_descriptor
     {
         .base    = (struct cspi_map *)CSPI1_BASE_ADDR,
         .cg      = CG_CSPI1,
-        .ints    = CSPI1,
+        .ints    = INT_CSPI1,
         .handler = CSPI1_HANDLER,
     },
 #endif
@@ -66,7 +66,7 @@ static struct spi_module_descriptor
     {
         .base    = (struct cspi_map *)CSPI2_BASE_ADDR,
         .cg      = CG_CSPI2,
-        .ints    = CSPI2,
+        .ints    = INT_CSPI2,
         .handler = CSPI2_HANDLER,
     },
 #endif
@@ -74,7 +74,7 @@ static struct spi_module_descriptor
     {
         .base    = (struct cspi_map *)CSPI3_BASE_ADDR,
         .cg      = CG_CSPI3,
-        .ints    = CSPI3,
+        .ints    = INT_CSPI3,
         .handler = CSPI3_HANDLER,
     },
 #endif
@@ -267,12 +267,13 @@ void spi_enable_module(struct spi_node *node)
         struct cspi_map * const base = desc->base;
 
         /* Enable clock-gating register */
-        imx31_clkctl_module_clock_gating(desc->cg, CGM_ON_ALL);
+        ccm_module_clock_gating(desc->cg, CGM_ON_RUN_WAIT);
         /* Reset */
         spi_reset(base);
         desc->last = NULL;
         /* Enable interrupt at controller level */
-        avic_enable_int(desc->ints, IRQ, 6, desc->handler);
+        avic_enable_int(desc->ints, INT_TYPE_IRQ, INT_PRIO_DEFAULT,
+                        desc->handler);
     }
 
     mutex_unlock(&desc->m);
@@ -297,7 +298,7 @@ void spi_disable_module(struct spi_node *node)
         base->conreg &= ~CSPI_CONREG_EN;
 
         /* Disable interface clock */
-        imx31_clkctl_module_clock_gating(desc->cg, CGM_OFF);
+        ccm_module_clock_gating(desc->cg, CGM_OFF);
     }
 
     mutex_unlock(&desc->m);

@@ -55,21 +55,21 @@ static struct gpio_module_descriptor
 #if (GPIO_EVENT_MASK & USE_GPIO1_EVENTS)
     {
         .base    = (struct gpio_map *)GPIO1_BASE_ADDR,
-        .ints    = GPIO1,
+        .ints    = INT_GPIO1,
         .handler = GPIO1_HANDLER,
     },
 #endif
 #if (GPIO_EVENT_MASK & USE_GPIO2_EVENTS)
     {
         .base    = (struct gpio_map *)GPIO2_BASE_ADDR,
-        .ints    = GPIO2,
+        .ints    = INT_GPIO2,
         .handler = GPIO2_HANDLER,
     },
 #endif
 #if (GPIO_EVENT_MASK & USE_GPIO3_EVENTS)
     {
         .base    = (struct gpio_map *)GPIO3_BASE_ADDR,
-        .ints    = GPIO3,
+        .ints    = INT_GPIO3,
         .handler = GPIO3_HANDLER,
     },
 #endif
@@ -168,7 +168,7 @@ bool gpio_enable_event(enum gpio_event_ids id)
     if (imr == 0)
     {
         /* First enabled interrupt for this GPIO */
-        avic_enable_int(desc->ints, IRQ, desc->list->ints_priority,
+        avic_enable_int(desc->ints, INT_TYPE_IRQ, desc->list->ints_priority,
                         desc->handler);
     }
 

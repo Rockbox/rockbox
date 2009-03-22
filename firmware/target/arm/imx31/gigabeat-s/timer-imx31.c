@@ -35,11 +35,11 @@ static void __attribute__((interrupt("IRQ"))) EPIT2_HANDLER(void)
 static void stop_timer(bool clock_off)
 {
     /* Ensure clock gating on (before touching any module registers) */
-    imx31_clkctl_module_clock_gating(CG_EPIT2, CGM_ON_ALL);
+    ccm_module_clock_gating(CG_EPIT2, CGM_ON_RUN_WAIT);
     /* Disable insterrupt */
-    avic_disable_int(EPIT2);
+    avic_disable_int(INT_EPIT2);
     /* Clear wakeup mask */
-    CLKCTL_WIMR0 &= ~WIM_IPI_INT_EPIT2;
+    CCM_WIMR0 &= ~CCM_WIMR0_IPI_INT_EPIT2;
     /* Disable counter */
     EPITCR2 &= ~(EPITCR_OCIEN | EPITCR_EN);
     /* Clear pending */
@@ -48,7 +48,7 @@ static void stop_timer(bool clock_off)
     if (clock_off)
     {
         /* Final stop, not reset; don't clock module any longer */
-        imx31_clkctl_module_clock_gating(CG_EPIT2, CGM_OFF);
+        ccm_module_clock_gating(CG_EPIT2, CGM_OFF);
     }
 }
 
@@ -77,7 +77,7 @@ bool _timer_set(long cycles, bool start)
      * Reload from modulus register,
      * Count from load value */
     EPITCR2 = EPITCR_CLKSRC_IPG_CLK | EPITCR_WAITEN | EPITCR_IOVW |
-              EPITCR_PRESCALER(1-1) | EPITCR_RLD | EPITCR_ENMOD;
+              (1-1) << EPITCR_PRESCALER_POS | EPITCR_RLD | EPITCR_ENMOD;
     EPITLR2 = cycles;
     /* Event when counter reaches 0 */
     EPITCMPR2 = 0;
@@ -95,7 +95,8 @@ bool _timer_register(void)
 
     /* Enable interrupt */
     EPITCR2 |= EPITCR_OCIEN;
-    avic_enable_int(EPIT2, IRQ, 8, EPIT2_HANDLER);
+    avic_enable_int(INT_EPIT2, INT_TYPE_IRQ, INT_PRIO_DEFAULT,
+                    EPIT2_HANDLER);
     /* Start timer */
     EPITCR2 |= EPITCR_EN;
 

@@ -59,7 +59,7 @@ void UIE_VECTOR(void)
     );
 
     offset = mode == 0x11 ?
-        (int32_t)FIVECSR : ((int32_t)NIVECSR >> 16);
+        (int32_t)AVIC_FIVECSR : ((int32_t)AVIC_NIVECSR >> 16);
 
     panicf("Unhandled %s %d: %s",
            mode == 0x11 ? "FIQ" : "IRQ", offset,
@@ -69,7 +69,7 @@ void UIE_VECTOR(void)
 /* We use the AVIC */
 void __attribute__((interrupt("IRQ"))) irq_handler(void)
 {
-    const int offset = (int32_t)NIVECSR >> 16;
+    const int offset = (int32_t)AVIC_NIVECSR >> 16;
 
     if (offset == -1)
     {
@@ -105,20 +105,20 @@ void avic_init(void)
     int i;
 
     /* Disable all interrupts and set to unhandled */
-    avic_disable_int(ALL);
+    avic_disable_int(INT_ALL);
 
     /* Reset AVIC control */
     avic->intcntl = 0;
 
     /* Init all interrupts to type IRQ */
-    avic_set_int_type(ALL, IRQ);
+    avic_set_int_type(INT_ALL, INT_TYPE_IRQ);
 
     /* Set all normal to lowest priority */
     for (i = 0; i < 8; i++)
         avic->nipriority[i] = 0;
 
     /* Set NM bit to enable VIC */
-    avic->intcntl |= INTCNTL_NM;
+    avic->intcntl |= AVIC_INTCNTL_NM;
 
     /* Enable VE bit in CP15 Control reg to enable VIC */
     asm volatile (
@@ -147,7 +147,7 @@ void avic_enable_int(enum IMX31_INT_LIST ints, enum INT_TYPE intstype,
     struct avic_map * const avic = (struct avic_map *)AVIC_BASE_ADDR;
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
 
-    if (ints != ALL) /* No mass-enable allowed */
+    if (ints != INT_ALL) /* No mass-enable allowed */
     {
         avic_set_int_type(ints, intstype);
         avic->vector[ints] = (long)handler;
@@ -163,7 +163,7 @@ void avic_disable_int(enum IMX31_INT_LIST ints)
     struct avic_map * const avic = (struct avic_map *)AVIC_BASE_ADDR;
     uint32_t i;
 
-    if (ints == ALL)
+    if (ints == INT_ALL)
     {
         for (i = 0; i < 64; i++)
         {
@@ -185,7 +185,7 @@ static void set_int_type(int i, enum INT_TYPE intstype)
     volatile uint32_t *reg = &avic->inttype[1 - (i >> 5)];
     uint32_t val = 1L << (i & 0x1f);
 
-    if (intstype == IRQ)
+    if (intstype == INT_TYPE_IRQ)
         val = *reg & ~val;
     else
         val = *reg | val;
@@ -197,7 +197,7 @@ void avic_set_int_type(enum IMX31_INT_LIST ints, enum INT_TYPE intstype)
 {
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
 
-    if (ints == ALL)
+    if (ints == INT_ALL)
     {
         int i;
         for (i = 0; i < 64; i++)

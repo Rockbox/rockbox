@@ -275,7 +275,7 @@ static unsigned long ata_dma_selected = ATA_DMA_PIO;
 static unsigned int get_T(void)
 {
     /* T = ATA clock period in nanoseconds */
-    return 1000 * 1000 * 1000 / imx31_clkctl_get_ata_clk();
+    return 1000 * 1000 * 1000 / ccm_get_ata_clk();
 }
 
 static void ata_wait_for_idle(void)
@@ -325,7 +325,7 @@ void ata_reset(void)
 void ata_enable(bool on)
 {
     /* Unconditionally clock module before writing regs */
-    imx31_clkctl_module_clock_gating(CG_ATA, CGM_ON_ALL);
+    ccm_module_clock_gating(CG_ATA, CGM_ON_RUN_WAIT);
     ata_wait_for_idle();
 
     if (on)
@@ -339,7 +339,7 @@ void ata_enable(bool on)
         sleep(HZ/100);
 
         /* Disable off - unclock ATA module */
-        imx31_clkctl_module_clock_gating(CG_ATA, CGM_OFF);
+        ccm_module_clock_gating(CG_ATA, CGM_OFF);
     }
 }
 

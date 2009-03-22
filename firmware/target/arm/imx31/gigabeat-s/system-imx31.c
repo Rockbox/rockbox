@@ -49,7 +49,7 @@ unsigned int iim_prod_rev(void)
 static void iim_init(void)
 {
     /* Initialize the IC revision info (required by SDMA) */
-    imx31_clkctl_module_clock_gating(CG_IIM, CGM_ON_ALL);
+    ccm_module_clock_gating(CG_IIM, CGM_ON_RUN_WAIT);
     product_rev = IIM_PREV;
     system_rev = IIM_SREV;
 }
@@ -59,13 +59,13 @@ static void iim_init(void)
 /* Initialize the watchdog timer */
 void watchdog_init(unsigned int half_seconds)
 {
-    uint16_t wcr = WDOG_WCR_WTw(half_seconds) | /* Timeout */
+    uint16_t wcr = ((half_seconds << WDOG_WCR_WT_POS) & WDOG_WCR_WT) |
                    WDOG_WCR_WOE |       /* WDOG output enabled */
                    WDOG_WCR_WDA |       /* WDOG assertion - no effect */
                    WDOG_WCR_SRS |       /* System reset - no effect */
                    WDOG_WCR_WRE;        /* Generate a WDOG signal */
 
-    imx31_clkctl_module_clock_gating(CG_WDOG, CGM_ON_RUN_WAIT);
+    ccm_module_clock_gating(CG_WDOG, CGM_ON_RUN_WAIT);
 
     WDOG_WCR = wcr;
     WDOG_WSR = 0x5555;
@@ -86,8 +86,8 @@ void watchdog_service(void)
 /* Start the general-purpose timer (1MHz) */
 void gpt_start(void)
 {
-    imx31_clkctl_module_clock_gating(CG_GPT, CGM_ON_RUN_WAIT);
-    unsigned int ipg_mhz = imx31_clkctl_get_ipg_clk() / 1000000;
+    ccm_module_clock_gating(CG_GPT, CGM_ON_RUN_WAIT);
+    unsigned int ipg_mhz = ccm_get_ipg_clk() / 1000000;
 
     GPTCR &= ~GPTCR_EN; /* Disable counter */
     GPTCR |= GPTCR_SWR; /* Reset module */
@@ -123,7 +123,7 @@ void system_reboot(void)
 void system_exception_wait(void)
 {
     /* Called in many contexts so button reading may be a chore */
-    avic_disable_int(ALL);
+    avic_disable_int(INT_ALL);
     core_idle();
     while (1);
 }
@@ -174,8 +174,8 @@ void system_init(void)
 
     unsigned int i;
 
-    /* MCR WFI enables wait mode */
-    CLKCTL_CCMR &= ~(3 << 14);
+    /* MCR WFI enables wait mode (CCM_CCMR_LPM_WAIT_MODE = 0) */
+    imx31_regclr32(&CCM_CCMR, CCM_CCMR_LPM);
 
     iim_init();
 
@@ -189,7 +189,7 @@ void system_init(void)
     imx31_regclr32(&UCR1_5, EUARTUCR1_UARTEN);
 
     for (i = 0; i < ARRAYLEN(disable_clocks); i++)
-        imx31_clkctl_module_clock_gating(disable_clocks[i], CGM_OFF);
+        ccm_module_clock_gating(disable_clocks[i], CGM_OFF);
 
     avic_init();
     gpt_start();
@@ -242,7 +242,7 @@ void __attribute__((naked)) imx31_regclr32(volatile uint32_t *reg_p,
 void system_prepare_fw_start(void)
 {
     disable_interrupt(IRQ_FIQ_STATUS);
-    avic_disable_int(ALL);
+    avic_disable_int(INT_ALL);
     mc13783_close();
     tick_stop();
 }

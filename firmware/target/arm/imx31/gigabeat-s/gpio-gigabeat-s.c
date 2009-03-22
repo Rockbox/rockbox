@@ -22,6 +22,7 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
+#include "avic-imx31.h"
 #include "gpio-imx31.h"
 
 /* Gigabeat S definitions for static GPIO event registration */
@@ -44,7 +45,7 @@ static const struct gpio_event gpio1_events[] =
 /* Describes the events attached to GPIO1 port */
 const struct gpio_event_list gpio1_event_list =
 {
-    .ints_priority = 7,
+    .ints_priority = INT_PRIO_DEFAULT,
     .count         = ARRAYLEN(gpio1_events),
     .events        = gpio1_events,
 };

@@ -89,7 +89,7 @@ void usb_enable(bool on)
 {
     /* Module clock should be on since since this could be called with
      * OFF initially and writing module registers would hardlock otherwise. */
-    imx31_clkctl_module_clock_gating(CG_USBOTG, CGM_ON_ALL);
+    ccm_module_clock_gating(CG_USBOTG, CGM_ON_RUN_WAIT);
     enable_transceiver(true);
 
     if (on)
@@ -100,7 +100,7 @@ void usb_enable(bool on)
     {
         usb_core_exit();
         enable_transceiver(false);
-        imx31_clkctl_module_clock_gating(CG_USBOTG, CGM_OFF);
+        ccm_module_clock_gating(CG_USBOTG, CGM_OFF);
     }
 }
 
@@ -117,9 +117,14 @@ static void __attribute__((interrupt("IRQ"))) USB_OTG_HANDLER(void)
 void usb_drv_int_enable(bool enable)
 {
     if (enable)
-        avic_enable_int(USB_OTG, IRQ, 7, USB_OTG_HANDLER);
-    else    
-        avic_disable_int(USB_OTG);
+    {
+        avic_enable_int(INT_USB_OTG, INT_TYPE_IRQ, INT_PRIO_DEFAULT,
+                        USB_OTG_HANDLER);
+    }
+    else
+    {
+        avic_disable_int(INT_USB_OTG);
+    }
 }
 
 /* Called during the bus reset interrupt when in detect mode */

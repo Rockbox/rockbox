@@ -176,7 +176,8 @@ void _backlight_off(void)
     sleep(HZ/100);
 
     /* Write final PWM setting */
-    mc13783_write_masked(MC13783_LED_CONTROL2, MC13783_LEDMDDCw(0),
+    mc13783_write_masked(MC13783_LED_CONTROL2,
+                         0 << MC13783_LEDMDDC_POS,
                          MC13783_LEDMDDC);
 
 #ifdef HAVE_LCD_SLEEP
@@ -198,10 +199,10 @@ void _backlight_set_brightness(int brightness)
 
     md = led_md_pwm_table[brightness].md;
     backlight_pwm_bits = backlight_on_status ?
-        MC13783_LEDMDDCw(led_md_pwm_table[brightness].pwm) : 0;
+        (led_md_pwm_table[brightness].pwm << MC13783_LEDMDDC_POS) : 0;
 
     mc13783_write_masked(MC13783_LED_CONTROL2,
-                         MC13783_LEDMDw(md) | backlight_pwm_bits,
+                         (md << MC13783_LEDMD_POS) | backlight_pwm_bits,
                          MC13783_LEDMD | MC13783_LEDMDDC);
 
     mutex_unlock(&backlight_mutex);

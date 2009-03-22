@@ -197,7 +197,7 @@ void button_init_device(void)
 #endif
 
     /* Enable keypad clock */
-    imx31_clkctl_module_clock_gating(CG_KPP, CGM_ON_ALL);
+    ccm_module_clock_gating(CG_KPP, CGM_ON_RUN_WAIT);
 
     /* 1. Enable number of rows in keypad (KPCR[4:0])
      *
@@ -219,8 +219,7 @@ void button_init_device(void)
      * 6. Set the KDIE control bit bit. */
     KPP_KPSR = KPP_KPSR_KDIE | KPP_KPSR_KRSS | KPP_KPSR_KDSC | KPP_KPSR_KPKD;
 
-    /* KPP IRQ at priority 3 */
-    avic_enable_int(KPP, IRQ, 3, KPP_HANDLER);
+    avic_enable_int(INT_KPP, INT_TYPE_IRQ, INT_PRIO_DEFAULT, KPP_HANDLER);
 
     button_power_event();
     mc13783_enable_event(MC13783_ONOFD1_EVENT);
@@ -235,7 +234,7 @@ void button_close_device(void)
 {
     int oldlevel = disable_irq_save();
 
-    avic_disable_int(KPP);
+    avic_disable_int(INT_KPP);
     KPP_KPSR &= ~(KPP_KPSR_KRIE | KPP_KPSR_KDIE);
     int_btn = BUTTON_NONE;
 

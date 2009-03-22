@@ -38,11 +38,11 @@ static __attribute__((interrupt("IRQ"))) void EPIT1_HANDLER(void)
 
 void tick_start(unsigned int interval_in_ms)
 {
-    imx31_clkctl_module_clock_gating(CG_EPIT1, CGM_ON_ALL); /* EPIT1 module
+    ccm_module_clock_gating(CG_EPIT1, CGM_ON_RUN_WAIT); /* EPIT1 module
                                                clock ON - before writing
                                                regs! */
     EPITCR1 &= ~(EPITCR_OCIEN | EPITCR_EN); /* Disable the counter */
-    CLKCTL_WIMR0 &= ~WIM_IPI_INT_EPIT1;     /* Clear wakeup mask */
+    CCM_WIMR0 &= ~CCM_WIMR0_IPI_INT_EPIT1;  /* Clear wakeup mask */
 
     /* mcu_main_clk = 528MHz = 27MHz * 2 * ((9 + 7/9) / 1)
      * CLKSRC = ipg_clk = 528MHz / 4 / 2 = 66MHz,
@@ -53,13 +53,14 @@ void tick_start(unsigned int interval_in_ms)
      * Compare interrupt enabled,
      * Count from load value */
     EPITCR1 = EPITCR_CLKSRC_IPG_CLK | EPITCR_WAITEN | EPITCR_IOVW |
-              EPITCR_PRESCALER(2640-1) | EPITCR_RLD | EPITCR_OCIEN |
+              (2640-1) << EPITCR_PRESCALER_POS | EPITCR_RLD | EPITCR_OCIEN |
               EPITCR_ENMOD;
  
     EPITLR1 = interval_in_ms*25; /* Count down from interval */
     EPITCMPR1 = 0;               /* Event when counter reaches 0 */
     EPITSR1 = EPITSR_OCIF;       /* Clear any pending interrupt */
-    avic_enable_int(EPIT1, IRQ, 7, EPIT1_HANDLER);
+    avic_enable_int(INT_EPIT1, INT_TYPE_IRQ, INT_PRIO_DEFAULT,
+                    EPIT1_HANDLER);
     EPITCR1 |= EPITCR_EN;        /* Enable the counter */
 }
 
@@ -73,9 +74,9 @@ void kernel_device_init(void)
 #ifdef BOOTLOADER
 void tick_stop(void)
 {
-    avic_disable_int(EPIT1);                /* Disable insterrupt */
+    avic_disable_int(INT_EPIT1);            /* Disable insterrupt */
     EPITCR1 &= ~(EPITCR_OCIEN | EPITCR_EN); /* Disable counter */
     EPITSR1 = EPITSR_OCIF;                  /* Clear pending */
-    imx31_clkctl_module_clock_gating(CG_EPIT1, CGM_OFF); /* Turn off module clock */
+    ccm_module_clock_gating(CG_EPIT1, CGM_OFF); /* Turn off module clock */
 }
 #endif

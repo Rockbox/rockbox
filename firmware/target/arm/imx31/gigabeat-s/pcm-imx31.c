@@ -130,8 +130,8 @@ void pcm_play_dma_init(void)
     sdma_channel_init(DMA_PLAY_CH_NUM, &dma_play_cd, &dma_play_bd);
     sdma_channel_set_priority(DMA_PLAY_CH_NUM, DMA_PLAY_CH_PRIORITY);
 
-    imx31_clkctl_module_clock_gating(CG_SSI1, CGM_ON_ALL);
-    imx31_clkctl_module_clock_gating(CG_SSI2, CGM_ON_ALL);
+    ccm_module_clock_gating(CG_SSI1, CGM_ON_RUN_WAIT);
+    ccm_module_clock_gating(CG_SSI2, CGM_ON_RUN_WAIT);
 
     /* Reset & disable SSIs */
     SSI_SCR1 &= ~SSI_SCR_SSIEN;
@@ -178,12 +178,12 @@ void pcm_play_dma_init(void)
                 SSI_STCR_TEFS | SSI_STCR_TFEN0;
 
     /* 16 bits per word, 2 words per frame */
-    SSI_STCCR2 = SSI_STRCCR_WL16 | SSI_STRCCR_DCw(2-1) |
-                 SSI_STRCCR_PMw(4-1);
+    SSI_STCCR2 = SSI_STRCCR_WL16 | ((2-1) << SSI_STRCCR_DC_POS) |
+                 ((4-1) << SSI_STRCCR_PM_POS);
 
     /* Transmit low watermark */
     SSI_SFCSR2 = (SSI_SFCSR2 & ~SSI_SFCSR_TFWM0) |
-                 SSI_SFCSR_TFWM0w(8-SDMA_SSI_TXFIFO_WML);
+                 ((8-SDMA_SSI_TXFIFO_WML) << SSI_SFCSR_TFWM0_POS);
     SSI_STMSK2 = 0;
 
     /* SSI1 - provides MCLK to codec. Receives data from codec. */
@@ -201,7 +201,7 @@ void pcm_play_dma_init(void)
      * The hardware seems to force a divide by 4 even if all bits are
      * zero but comply by setting DIV2 and the others to zero.
      */
-    SSI_STCCR1 = SSI_STRCCR_DIV2 | SSI_STRCCR_PMw(1-1);
+    SSI_STCCR1 = SSI_STRCCR_DIV2 | ((1-1) << SSI_STRCCR_PM_POS);
 
     /* SSI1 - receive - asynchronous clocks */
     SSI_SCR1 = SSI_SCR_I2S_MODE_SLAVE;
@@ -210,12 +210,12 @@ void pcm_play_dma_init(void)
                 SSI_SRCR_REFS;
 
     /* 16 bits per word, 2 words per frame */
-    SSI_SRCCR1 = SSI_STRCCR_WL16 | SSI_STRCCR_DCw(2-1) |
-                 SSI_STRCCR_PMw(4-1);
+    SSI_SRCCR1 = SSI_STRCCR_WL16 | ((2-1) << SSI_STRCCR_DC_POS) |
+                 ((4-1) << SSI_STRCCR_PM_POS);
 
     /* Receive high watermark */
     SSI_SFCSR1 = (SSI_SFCSR1 & ~SSI_SFCSR_RFWM0) |
-                 SSI_SFCSR_RFWM0w(SDMA_SSI_RXFIFO_WML);
+                 (SDMA_SSI_RXFIFO_WML << SSI_SFCSR_RFWM0_POS);
     SSI_SRMSK1 = 0;
 
     /* Enable SSI1 (codec clock) */
@@ -252,7 +252,7 @@ static void play_start_pcm(void)
 static void play_stop_pcm(void)
 {
     /* Wait for FIFO to empty */
-    while (SSI_SFCSR_TFCNT0r(SSI_SFCSR2) > 0);
+    while (SSI_SFCSR_TFCNT0 & SSI_SFCSR2);
 
     /* Disable transmission */
     SSI_STCR2 &= ~SSI_STCR_TFEN0;

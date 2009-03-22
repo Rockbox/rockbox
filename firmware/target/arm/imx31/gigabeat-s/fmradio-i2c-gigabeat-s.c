@@ -50,22 +50,18 @@ void fmradio_i2c_init(void)
      * disabled */
     imx31_regmod32(&SW_PAD_CTL_DSR_DTE1_RI_DTE1_DCD_DTE1,
         /* RI_DTE1 (I2C2_SCLK) */
-        SW_PAD_CTL_IO2w(SW_PAD_CTL_PUE_PKE_DISABLE |
-                        SW_PAD_CTL_PUS_UP_100K |
-                        SW_PAD_CTL_HYS |
-                        SW_PAD_CTL_ODE) |
+        ((SW_PAD_CTL_PUE_PKE_DISABLE | SW_PAD_CTL_PUS_UP_100K |
+          SW_PAD_CTL_HYS | SW_PAD_CTL_ODE) << SW_PAD_CTL_IO2_POS) |
         /* DCD_DTE1 (I2C2_SDA) */
-        SW_PAD_CTL_IO1w(SW_PAD_CTL_PUE_PKE_DISABLE |
-                        SW_PAD_CTL_PUS_UP_100K |
-                        SW_PAD_CTL_HYS |
-                        SW_PAD_CTL_ODE),
+        ((SW_PAD_CTL_PUE_PKE_DISABLE | SW_PAD_CTL_PUS_UP_100K |
+          SW_PAD_CTL_HYS | SW_PAD_CTL_ODE) << SW_PAD_CTL_IO1_POS),
         SW_PAD_CTL_IO2 | SW_PAD_CTL_IO1);
     /* set outputs to I2C2 */
     imx31_regmod32(&SW_MUX_CTL_RI_DTE1_DCD_DTE1_DTR_DCE2_RXD2,
        /* RI_DTE1 => I2C2_SCLK */
-       SW_MUX_CTL_SIG4w(SW_MUX_OUT_ALT2 | SW_MUX_IN_ALT2) |
+       ((SW_MUX_OUT_ALT2 | SW_MUX_IN_ALT2) << SW_MUX_CTL_SIG4_POS) |
        /* DCD_DTE1 => I2C2_SDA */
-       SW_MUX_CTL_SIG3w(SW_MUX_OUT_ALT2 | SW_MUX_IN_ALT2),
+       ((SW_MUX_OUT_ALT2 | SW_MUX_IN_ALT2) << SW_MUX_CTL_SIG3_POS),
        SW_MUX_CTL_SIG4 | SW_MUX_CTL_SIG3);
 }
 
@@ -79,7 +75,8 @@ void fmradio_i2c_enable(bool enable)
         imx31_regset32(&GPIO2_GDIR, (1 << 15)); /* SDIO OUT */
         /* I2C2_SDA => MCU2_15 */ 
         imx31_regmod32(&SW_MUX_CTL_RI_DTE1_DCD_DTE1_DTR_DCE2_RXD2,
-            SW_MUX_CTL_SIG3w(SW_MUX_OUT_GPIO_DR | SW_MUX_IN_GPIO_PSR_ISR),
+            (SW_MUX_OUT_GPIO_DR |
+             SW_MUX_IN_GPIO_PSR_ISR) << SW_MUX_CTL_SIG3_POS,
             SW_MUX_CTL_SIG3);
         /* enable CLK32KMCU clock */
         mc13783_set(MC13783_POWER_CONTROL0, MC13783_CLK32KMCUEN);

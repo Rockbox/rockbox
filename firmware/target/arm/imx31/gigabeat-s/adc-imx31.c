@@ -57,8 +57,8 @@ unsigned short adc_read(int channel)
     {
         /* Keep enable, start conversion, increment from channel 0,
          * increment from channel 4 */
-        uint32_t adc1 = MC13783_ADEN | MC13783_ASC | MC13783_ADA1w(0) |
-                        MC13783_ADA2w(4);
+        uint32_t adc1 = MC13783_ADEN | MC13783_ASC |
+                        (0 << MC13783_ADA1_POS) | (4 << MC13783_ADA2_POS);
 
         if (input_select == 1)
             adc1 |= MC13783_ADSEL; /* 2nd set of inputs */
@@ -81,7 +81,9 @@ unsigned short adc_read(int channel)
     mutex_unlock(&adc_mtx);
 
     /* Channels 0-3/8-11 in ADD1, 4-7/12-15 in ADD2 */
-    return (channel & 4) ? MC13783_ADD2r(data) : MC13783_ADD1r(data);
+    return (channel & 4) ?
+        ((data & MC13783_ADD2) >> MC13783_ADD2_POS) :
+        ((data & MC13783_ADD1) >> MC13783_ADD1_POS);
 }
 
 bool adc_enable_channel(int channel, bool enable)

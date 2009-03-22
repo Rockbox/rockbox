@@ -20,8 +20,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _CLKCTL_IMX31_H_
-#define _CLKCTL_IMX31_H_
+#ifndef _CCM_IMX31_H_
+#define _CCM_IMX31_H_
 
 enum IMX31_CG_LIST
 {
@@ -82,8 +82,8 @@ enum IMX31_CG_MODES
 
 /* Enable or disable module clocks independently - module must _not_ be
  * active! */
-void imx31_clkctl_module_clock_gating(enum IMX31_CG_LIST cg,
-                                      enum IMX31_CG_MODES mode);
+void ccm_module_clock_gating(enum IMX31_CG_LIST cg,
+                             enum IMX31_CG_MODES mode);
 
 enum IMX31_PLLS
 {
@@ -97,18 +97,18 @@ enum IMX31_PLLS
 #define CONFIG_HCLK_FREQ    27000000
 
 /* Get the PLL reference clock frequency in HZ */
-unsigned int imx31_clkctl_get_pll_ref_clk(void);
+unsigned int ccm_get_pll_ref_clk(void);
 
 /* Return PLL frequency in HZ */
-unsigned int imx31_clkctl_get_pll(enum IMX31_PLLS pll);
+unsigned int ccm_get_pll(enum IMX31_PLLS pll);
 
 /* Return ipg_clk in HZ */
-unsigned int imx31_clkctl_get_ipg_clk(void);
+unsigned int ccm_get_ipg_clk(void);
 
 /* Return ahb_clk in HZ */
-unsigned int imx31_clkctl_get_ahb_clk(void);
+unsigned int ccm_get_ahb_clk(void);
 
 /* Return the ATA frequency in HZ */
-unsigned int imx31_clkctl_get_ata_clk(void);
+unsigned int ccm_get_ata_clk(void);
 
-#endif /* _CLKCTL_IMX31_H_ */
+#endif /* _CCM_IMX31_H_ */

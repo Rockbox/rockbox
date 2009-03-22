@@ -50,15 +50,15 @@ bool __dbg_hw_info(void)
                  iim_system_rev());
         lcd_puts(0, line++, buf); line++;
 
-        mpctl = CLKCTL_MPCTL;
-        spctl = CLKCTL_SPCTL;
-        upctl = CLKCTL_UPCTL;
+        mpctl = CCM_MPCTL;
+        spctl = CCM_SPCTL;
+        upctl = CCM_UPCTL;
 
-        pllref = imx31_clkctl_get_pll_ref_clk();
+        pllref = ccm_get_pll_ref_clk();
 
-        mcu_pllfreq = imx31_clkctl_get_pll(PLL_MCU);
-        ser_pllfreq = imx31_clkctl_get_pll(PLL_SERIAL);
-        usb_pllfreq = imx31_clkctl_get_pll(PLL_USB);
+        mcu_pllfreq = ccm_get_pll(PLL_MCU);
+        ser_pllfreq = ccm_get_pll(PLL_SERIAL);
+        usb_pllfreq = ccm_get_pll(PLL_USB);
 
         snprintf(buf, sizeof (buf), "pll_ref_clk: %u", pllref);
         lcd_puts(0, line++, buf); line++;
@@ -70,7 +70,7 @@ bool __dbg_hw_info(void)
         snprintf(buf, sizeof (buf), " mpl_dpdgck_clk: %u", mcu_pllfreq);
         lcd_puts(0, line++, buf); line++;
 
-        regval = CLKCTL_PDR0;
+        regval = CCM_PDR0;
         snprintf(buf, sizeof (buf), "  PDR0: %08lX", regval);
         lcd_puts(0, line++, buf);
 
@@ -111,7 +111,7 @@ bool __dbg_hw_info(void)
         snprintf(buf, sizeof (buf), " upl_dpdgck_clk: %u", usb_pllfreq);
         lcd_puts(0, line++, buf); line++;
 
-        regval = CLKCTL_PDR1;
+        regval = CCM_PDR1;
         snprintf(buf, sizeof (buf), "  PDR1: %08lX", regval);
         lcd_puts(0, line++, buf);
 
@@ -120,7 +120,7 @@ bool __dbg_hw_info(void)
         snprintf(buf, sizeof (buf), "   usb_clk:       %u", freq);
         lcd_puts(0, line++, buf);
 
-        freq = usb_pllfreq / (((CLKCTL_PDR0 >> 16) & 0x1f) + 1);
+        freq = usb_pllfreq / (((CCM_PDR0 >> 16) & 0x1f) + 1);
         snprintf(buf, sizeof (buf), "   ipg_per_baud:  %u", freq);
         lcd_puts(0, line++, buf);
           

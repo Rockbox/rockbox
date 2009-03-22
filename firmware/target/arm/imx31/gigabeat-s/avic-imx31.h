@@ -172,32 +172,34 @@ struct avic_map
     };
 };
 
+#define INT_PRIO_DEFAULT    7
+
 enum INT_TYPE
 {
-    IRQ = 0,
-    FIQ
+    INT_TYPE_IRQ = 0,
+    INT_TYPE_FIQ
 };
 
 enum IMX31_INT_LIST
 {
     __IMX31_INT_FIRST = -1,
-   RESERVED0, RESERVED1,     RESERVED2, I2C3,
-   I2C2,      MPEG4_ENCODER, RTIC,      FIR,
-   MMC_SDHC2, MMC_SDHC1,     I2C1,      SSI2,
-   SSI1,      CSPI2,         CSPI1,     ATA,
-   MBX,       CSPI3,         UART3,     IIM,
-   SIM1,      SIM2,          RNGA,      EVTMON,
-   KPP,       RTC,           PWN,       EPIT2,
-   EPIT1,     GPT,           PWR_FAIL,  CCM_DVFS,
-   UART2,     NANDFC,        SDMA,      USB_HOST1,
-   USB_HOST2, USB_OTG,       RESERVED3, MSHC1,
-   MSHC2,     IPU_ERR,       IPU,       RESERVED4,
-   RESERVED5, UART1,         UART4,     UART5,
-   ETC_IRQ,   SCC_SCM,       SCC_SMN,   GPIO2,
-   GPIO1,     CCM_CLK,       PCMCIA,    WDOG,
-   GPIO3,     RESERVED6,     EXT_PWMG,  EXT_TEMP,
-   EXT_SENS1, EXT_SENS2,     EXT_WDOG,  EXT_TV,
-   ALL
+   INT_RESERVED0, INT_RESERVED1,     INT_RESERVED2, INT_I2C3,
+   INT_I2C2,      INT_MPEG4_ENCODER, INT_RTIC,      INT_FIR,
+   INT_MMC_SDHC2, INT_MMC_SDHC1,     INT_I2C1,      INT_SSI2,
+   INT_SSI1,      INT_CSPI2,         INT_CSPI1,     INT_ATA,
+   INT_MBX,       INT_CSPI3,         INT_UART3,     INT_IIM,
+   INT_SIM1,      INT_SIM2,          INT_RNGA,      INT_EVTMON,
+   INT_KPP,       INT_RTC,           INT_PWN,       INT_EPIT2,
+   INT_EPIT1,     INT_GPT,           INT_PWR_FAIL,  INT_CCM_DVFS,
+   INT_UART2,     INT_NANDFC,        INT_SDMA,      INT_USB_HOST1,
+   INT_USB_HOST2, INT_USB_OTG,       INT_RESERVED3, INT_MSHC1,
+   INT_MSHC2,     INT_IPU_ERR,       INT_IPU,       INT_RESERVED4,
+   INT_RESERVED5, INT_UART1,         INT_UART4,     INT_UART5,
+   INT_ETC_IRQ,   INT_SCC_SCM,       INT_SCC_SMN,   INT_GPIO2,
+   INT_GPIO1,     INT_CCM_CLK,       INT_PCMCIA,    INT_WDOG,
+   INT_GPIO3,     INT_RESERVED6,     INT_EXT_PWMG,  INT_EXT_TEMP,
+   INT_EXT_SENS1, INT_EXT_SENS2,     INT_EXT_WDOG,  INT_EXT_TV,
+   INT_ALL
 };
 
 void avic_init(void);
