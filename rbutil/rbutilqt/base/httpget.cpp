@@ -51,13 +51,18 @@ HttpGet::HttpGet(QObject *parent)
     m_serverTimestamp = QDateTime();
 
     connect(&http, SIGNAL(done(bool)), this, SLOT(httpDone(bool)));
-    connect(&http, SIGNAL(dataReadProgress(int, int)), this, SIGNAL(dataReadProgress(int, int)));
-    connect(&http, SIGNAL(requestFinished(int, bool)), this, SLOT(httpFinished(int, bool)));
-    connect(&http, SIGNAL(responseHeaderReceived(const QHttpResponseHeader&)), this, SLOT(httpResponseHeader(const QHttpResponseHeader&)));
+    connect(&http, SIGNAL(dataReadProgress(int, int)),
+            this, SIGNAL(dataReadProgress(int, int)));
+    connect(&http, SIGNAL(requestFinished(int, bool)),
+            this, SLOT(httpFinished(int, bool)));
+    connect(&http, SIGNAL(responseHeaderReceived(const QHttpResponseHeader&)),
+            this, SLOT(httpResponseHeader(const QHttpResponseHeader&)));
 //    connect(&http, SIGNAL(stateChanged(int)), this, SLOT(httpState(int)));
     connect(&http, SIGNAL(requestStarted(int)), this, SLOT(httpStarted(int)));
 
-    connect(&http, SIGNAL(readyRead(const QHttpResponseHeader&)), this, SLOT(httpResponseHeader(const QHttpResponseHeader&)));
+    connect(&http, SIGNAL(readyRead(const QHttpResponseHeader&)),
+            this, SLOT(httpResponseHeader(const QHttpResponseHeader&)));
+    connect(this, SIGNAL(headerFinished()), this, SLOT(getFileFinish()));
 
 }
 
@@ -210,7 +215,6 @@ bool HttpGet::getFile(const QUrl &url)
     }
     else {
         // schedule HTTP header request
-        connect(this, SIGNAL(headerFinished()), this, SLOT(getFileFinish()));
         m_header.setRequest("HEAD", m_path + m_query);
         headRequest = http.request(m_header);
         qDebug() << "[HTTP] HEAD scheduled:  " << headRequest;
