@@ -6493,7 +6493,7 @@
   </source>
   <dest>
     *: none
-    agc: "Sicherheit (Übersteuerung)"
+    agc: "Safety (Übersteuerung)"
   </dest>
   <voice>
     *: none
@@ -6964,7 +6964,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user: core
   <source>
     *: "Version"
@@ -12325,9 +12325,26 @@
     *: "Credits"
   </source>
   <dest>
-    *: "Dank"
+    *: "Mitwirkende"
   </dest>
   <voice>
-    *: "Dank an"
+    *: "Mitwirkende"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Lautsprecher einschalten"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Lautsprecher einschalten"
   </voice>
 </phrase>
