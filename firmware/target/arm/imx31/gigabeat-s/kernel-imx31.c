@@ -53,8 +53,8 @@ void tick_start(unsigned int interval_in_ms)
      * Compare interrupt enabled,
      * Count from load value */
     EPITCR1 = EPITCR_CLKSRC_IPG_CLK | EPITCR_WAITEN | EPITCR_IOVW |
-              (2640-1) << EPITCR_PRESCALER_POS | EPITCR_RLD | EPITCR_OCIEN |
-              EPITCR_ENMOD;
+              ((2640-1) << EPITCR_PRESCALER_POS) | EPITCR_RLD |
+              EPITCR_OCIEN | EPITCR_ENMOD;
  
     EPITLR1 = interval_in_ms*25; /* Count down from interval */
     EPITCMPR1 = 0;               /* Event when counter reaches 0 */

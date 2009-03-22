@@ -77,7 +77,7 @@ bool _timer_set(long cycles, bool start)
      * Reload from modulus register,
      * Count from load value */
     EPITCR2 = EPITCR_CLKSRC_IPG_CLK | EPITCR_WAITEN | EPITCR_IOVW |
-              (1-1) << EPITCR_PRESCALER_POS | EPITCR_RLD | EPITCR_ENMOD;
+              ((1-1) << EPITCR_PRESCALER_POS) | EPITCR_RLD | EPITCR_ENMOD;
     EPITLR2 = cycles;
     /* Event when counter reaches 0 */
     EPITCMPR2 = 0;
