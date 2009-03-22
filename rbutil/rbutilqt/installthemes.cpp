@@ -89,13 +89,13 @@ void ThemesInstallWindow::downloadDone(bool error)
 
     QSettings iniDetails(themesInfo.fileName(), QSettings::IniFormat, this);
     QStringList tl = iniDetails.childGroups();
-    qDebug() << tl.size();
     qDebug() << iniDetails.value("error/code").toString()
             << iniDetails.value("error/description").toString()
             << iniDetails.value("error/query").toString();
 
     if(error) {
-        logger->addItem(tr("Network error: %1.\nPlease check your network and proxy settings.")
+        logger->addItem(tr("Network error: %1.\n"
+                "Please check your network and proxy settings.")
                 .arg(getter->errorString()), LOGERROR);
         getter->abort();
         logger->abort();
@@ -120,7 +120,11 @@ void ThemesInstallWindow::downloadDone(bool error)
     for(int i = 0; i < tl.size(); i++) {
         iniDetails.beginGroup(tl.at(i));
         // skip all themes without name field set (i.e. error section)
-        if(iniDetails.value("name").toString().isEmpty()) continue;
+        if(iniDetails.value("name").toString().isEmpty()) {
+            iniDetails.endGroup();
+            continue;
+        }
+        qDebug() << "adding theme:" << tl.at(i);
         QListWidgetItem *w = new QListWidgetItem;
         w->setData(Qt::DisplayRole, iniDetails.value("name").toString());
         w->setData(Qt::UserRole, tl.at(i));
