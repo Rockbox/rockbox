@@ -37,6 +37,9 @@
      <property name="selectionBehavior" >
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
+     <property name="wordWrap" >
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="2" column="0" colspan="2" >
@@ -51,7 +54,7 @@
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>40</width>
        <height>20</height>
@@ -65,7 +68,8 @@
       <string>&amp;Abort</string>
      </property>
      <property name="icon" >
-      <iconset resource="rbutilqt.qrc" >:/icons/process-stop.png</iconset>
+      <iconset resource="rbutilqt.qrc" >
+       <normaloff>:/icons/process-stop.png</normaloff>:/icons/process-stop.png</iconset>
      </property>
     </widget>
    </item>
