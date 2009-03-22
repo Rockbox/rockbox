@@ -11146,19 +11146,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK
-  desc: in settings_menu
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack"
   </source>
   <dest>
     *: none
-    usbstack: "USB stak"
   </dest>
   <voice>
     *: none
-    usbstack: "USB stak"
   </voice>
 </phrase>
 <phrase>
@@ -11180,70 +11177,58 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_HOST
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Host"
   </source>
   <dest>
     *: none
-    usbstack: "Vært"
   </dest>
   <voice>
     *: none
-    usbstack: "Vært"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_MODE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack Mode"
   </source>
   <dest>
     *: none
-    usbstack: "USB stak tilstand"
   </dest>
   <voice>
     *: none
-    usbstack: "USB stak tilstand"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device"
   </source>
   <dest>
     *: none
-    usbstack: "Enhed"
   </dest>
   <voice>
     *: none
-    usbstack: "Enhed"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE_DRIVER
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device Driver"
   </source>
   <dest>
     *: none
-    usbstack: "Enhedsdriver"
   </dest>
   <voice>
     *: none
-    usbstack: "Enhedsdriver"
   </voice>
 </phrase>
 <phrase>

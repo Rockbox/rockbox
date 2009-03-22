@@ -11162,87 +11162,72 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK
-  desc: in settings_menu
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack"
   </source>
   <dest>
     *: none
-    usbstack: "Pile USB"
   </dest>
   <voice>
     *: none
-    usbstack: "Pile USB"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_MODE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack Mode"
   </source>
   <dest>
     *: none
-    usbstack: "Môde pile USB"
   </dest>
   <voice>
     *: none
-    usbstack: "Môde pile USB"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device"
   </source>
   <dest>
     *: none
-    usbstack: "Éndjin"
   </dest>
   <voice>
     *: none
-    usbstack: "éndjin"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_HOST
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Host"
   </source>
   <dest>
     *: none
-    usbstack: "Lodjoe"
   </dest>
   <voice>
     *: none
-    usbstack: "Lodjoe"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE_DRIVER
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device Driver"
   </source>
   <dest>
     *: none
-    usbstack: "Mineu d'éndjin"
   </dest>
   <voice>
     *: none
-    usbstack: "Mineu d'éndjin"
   </voice>
 </phrase>
 <phrase>

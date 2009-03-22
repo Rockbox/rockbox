@@ -1355,16 +1355,16 @@
 </phrase>
 <phrase>
   id: LANG_USB
-  desc: in the info menu
-  user: core
+  desc: deprecated
+  user:
   <source>
-    *: "USB (Sim)"
+    *: none
   </source>
   <dest>
-    *: "USB (Sim)"
+    *: none
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>

@@ -8733,19 +8733,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device"
   </source>
   <dest>
     *: none
-    usbstack: "Dispositivo"
   </dest>
   <voice>
     *: none
-    usbstack: "Device"
   </voice>
 </phrase>
 <phrase>
@@ -11206,19 +11203,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_MODE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack Mode"
   </source>
   <dest>
     *: none
-    usbstack: "Modo de USB Stack"
   </dest>
   <voice>
     *: none
-    usbstack: "USB Stack Mode"
   </voice>
 </phrase>
 <phrase>

@@ -11233,86 +11233,71 @@
 <phrase>
   id: LANG_USBSTACK
   desc: deprecated
-  user: core
+  user:
   <source>
     *: none
-    usbstack: ""
   </source>
   <dest>
     *: none
-    usbstack: ""
   </dest>
   <voice>
     *: none
-    usbstack: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_MODE
   desc: deprecated
-  user: core
+  user:
   <source>
     *: none
-    usbstack: ""
   </source>
   <dest>
     *: none
-    usbstack: ""
   </dest>
   <voice>
     *: none
-    usbstack: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE
   desc: deprecated
-  user: core
+  user:
   <source>
     *: none
-    usbstack: ""
   </source>
   <dest>
     *: none
-    usbstack: ""
   </dest>
   <voice>
     *: none
-    usbstack: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_HOST
   desc: deprecated
-  user: core
+  user:
   <source>
     *: none
-    usbstack: ""
   </source>
   <dest>
     *: none
-    usbstack: ""
   </dest>
   <voice>
     *: none
-    usbstack: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE_DRIVER
   desc: deprecated
-  user: core
+  user:
   <source>
     *: none
-    usbstack: ""
   </source>
   <dest>
     *: none
-    usbstack: ""
   </dest>
   <voice>
     *: none
-    usbstack: ""
   </voice>
 </phrase>
 <phrase>

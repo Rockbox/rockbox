@@ -10169,19 +10169,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK
-  desc: in settings_menu
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack"
   </source>
   <dest>
     *: none
-    usbstack: "USB 스택"
   </dest>
   <voice>
     *: none
-    usbstack: "USB 스택"
   </voice>
 </phrase>
 <phrase>
@@ -10636,19 +10633,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_HOST
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Host"
   </source>
   <dest>
     *: none
-    usbstack: "호스트"
   </dest>
   <voice>
     *: none
-    usbstack: "호스트"
   </voice>
 </phrase>
 <phrase>
@@ -10958,19 +10952,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_MODE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack Mode"
   </source>
   <dest>
     *: none
-    usbstack: "USB 스택 모드"
   </dest>
   <voice>
     *: none
-    usbstack: "USB 스택 모드"
   </voice>
 </phrase>
 <phrase>
@@ -11023,19 +11014,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device"
   </source>
   <dest>
     *: none
-    usbstack: "장치"
   </dest>
   <voice>
     *: none
-    usbstack: "장치"
   </voice>
 </phrase>
 <phrase>
@@ -11311,19 +11299,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE_DRIVER
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device Driver"
   </source>
   <dest>
     *: none
-    usbstack: "장치 드라이버"
   </dest>
   <voice>
     *: none
-    usbstack: "장치 드라이버"
   </voice>
 </phrase>
 <phrase>

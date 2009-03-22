@@ -2679,19 +2679,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK
-  desc: in settings_menu
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack"
   </source>
   <dest>
     *: none
-    usbstack: "USB Стек"
   </dest>
   <voice>
     *: none
-    usbstack: none
   </voice>
 </phrase>
 <phrase>
@@ -4820,19 +4817,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_HOST
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Host"
   </source>
   <dest>
     *: none
-    usbstack: "Host"
   </dest>
   <voice>
-    *: ""
-    usbstack: "Host"
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -5697,19 +5691,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_MODE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack Mode"
   </source>
   <dest>
     *: none
-    usbstack: "Режим на USB стека"
   </dest>
   <voice>
-    *: ""
-    usbstack: ""
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -5897,19 +5888,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device"
   </source>
   <dest>
     *: none
-    usbstack: "Устройство"
   </dest>
   <voice>
-    *: ""
-    usbstack: ""
+    *: none
   </voice>
 </phrase>
 <phrase>
@@ -7265,19 +7253,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE_DRIVER
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device Driver"
   </source>
   <dest>
     *: none
-    usbstack: "Драйвер за устройство"
   </dest>
   <voice>
-    *: ""
-    usbstack: ""
+    *: none
   </voice>
 </phrase>
 <phrase>

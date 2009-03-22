@@ -2991,19 +2991,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK
-  desc: in settings_menu
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack"
   </source>
   <dest>
     *: none
-    usbstack: "Stiva USB"
   </dest>
   <voice>
     *: none
-    usbstack: "Stiva USB"
   </voice>
 </phrase>
 <phrase>
@@ -5059,19 +5056,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_HOST
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Host"
   </source>
   <dest>
     *: none
-    usbstack: "Host"
   </dest>
   <voice>
     *: none
-    usbstack: "Host"
   </voice>
 </phrase>
 <phrase>
@@ -5911,19 +5905,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_MODE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack Mode"
   </source>
   <dest>
     *: none
-    usbstack: "Mod USB stiva"
   </dest>
   <voice>
     *: none
-    usbstack: "Mod USB stiva"
   </voice>
 </phrase>
 <phrase>
@@ -6096,19 +6087,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device"
   </source>
   <dest>
     *: none
-    usbstack: "Dispozitiv"
   </dest>
   <voice>
     *: none
-    usbstack: "Dispozitiv"
   </voice>
 </phrase>
 <phrase>
@@ -7436,19 +7424,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE_DRIVER
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device Driver"
   </source>
   <dest>
     *: none
-    usbstack: "Driver dispozitiv"
   </dest>
   <voice>
     *: none
-    usbstack: "Driver dispozitiv"
   </voice>
 </phrase>
 <phrase>

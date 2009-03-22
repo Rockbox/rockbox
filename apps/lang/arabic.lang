@@ -1625,19 +1625,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE_DRIVER
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device Driver"
   </source>
   <dest>
     *: none
-    usbstack: "تعريف الجهاز"
   </dest>
   <voice>
     *: none
-    usbstack: "Device Driver"
   </voice>
 </phrase>
 <phrase>
@@ -5577,19 +5574,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_HOST
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Host"
   </source>
   <dest>
     *: none
-    usbstack: "المضيف"
   </dest>
   <voice>
     *: none
-    usbstack: "Host"
   </voice>
 </phrase>
 <phrase>

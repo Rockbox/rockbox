@@ -11141,87 +11141,72 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK
-  desc: in settings_menu
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack"
   </source>
   <dest>
     *: none
-    usbstack: "Στοίβα USB"
   </dest>
   <voice>
     *: none
-    usbstack: "Στοίβα Γιού Ες Μπι"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_MODE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack Mode"
   </source>
   <dest>
     *: none
-    usbstack: "Τύπος στοίβας USB"
   </dest>
   <voice>
     *: none
-    usbstack: "Τύπος στοίβας Γιού Ες Μπι"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device"
   </source>
   <dest>
     *: none
-    usbstack: "Συσκευή"
   </dest>
   <voice>
     *: none
-    usbstack: "Συσκευή"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_HOST
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Host"
   </source>
   <dest>
     *: none
-    usbstack: "Ξενιστής"
   </dest>
   <voice>
     *: none
-    usbstack: "Ξενιστής"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE_DRIVER
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device Driver"
   </source>
   <dest>
     *: none
-    usbstack: "Οδηγός συσκευής"
   </dest>
   <voice>
     *: none
-    usbstack: "Οδηγός συσκευής"
   </voice>
 </phrase>
 <phrase>

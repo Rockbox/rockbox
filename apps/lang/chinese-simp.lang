@@ -11045,19 +11045,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK
-  desc: in settings_menu
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack"
   </source>
   <dest>
     *: none
-    usbstack: "USB 接口"
   </dest>
   <voice>
     *: none
-    usbstack: "USB接口"
   </voice>
 </phrase>
 <phrase>
@@ -11096,19 +11093,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_HOST
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Host"
   </source>
   <dest>
     *: none
-    usbstack: "USB主控模式"
   </dest>
   <voice>
     *: none
-    usbstack: "USB主控模式"
   </voice>
 </phrase>
 <phrase>
@@ -11130,36 +11124,30 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_MODE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack Mode"
   </source>
   <dest>
     *: none
-    usbstack: "USB接口模式"
   </dest>
   <voice>
     *: none
-    usbstack: "USB接口模式"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device"
   </source>
   <dest>
     *: none
-    usbstack: "设备"
   </dest>
   <voice>
     *: none
-    usbstack: "设备"
   </voice>
 </phrase>
 <phrase>
@@ -11181,19 +11169,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE_DRIVER
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device Driver"
   </source>
   <dest>
     *: none
-    usbstack: "设备驱动程序"
   </dest>
   <voice>
     *: none
-    usbstack: "设备驱动程序"
   </voice>
 </phrase>
 <phrase>

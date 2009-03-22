@@ -11058,19 +11058,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK
-  desc: in settings_menu
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack"
   </source>
   <dest>
     *: none
-    usbstack: "USB"
   </dest>
   <voice>
     *: none
-    usbstack: "USB"
   </voice>
 </phrase>
 <phrase>
@@ -11109,19 +11106,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_HOST
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Host"
   </source>
   <dest>
     *: none
-    usbstack: "Host"
   </dest>
   <voice>
     *: none
-    usbstack: "Host"
   </voice>
 </phrase>
 <phrase>
@@ -11143,36 +11137,30 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_MODE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "USB Stack Mode"
   </source>
   <dest>
     *: none
-    usbstack: "USB-Modus"
   </dest>
   <voice>
     *: none
-    usbstack: "USB-Modus"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device"
   </source>
   <dest>
     *: none
-    usbstack: "Gerät"
   </dest>
   <voice>
     *: none
-    usbstack: "Gerät"
   </voice>
 </phrase>
 <phrase>
@@ -11211,19 +11199,16 @@
 </phrase>
 <phrase>
   id: LANG_USBSTACK_DEVICE_DRIVER
-  desc: in usbstack settings
-  user: core
+  desc: deprecated
+  user:
   <source>
     *: none
-    usbstack: "Device Driver"
   </source>
   <dest>
     *: none
-    usbstack: "Gerätetreiber"
   </dest>
   <voice>
     *: none
-    usbstack: "Gerätetreiber"
   </voice>
 </phrase>
 <phrase>

@@ -1042,16 +1042,16 @@
 </phrase>
 <phrase>
   id: LANG_USB
-  desc: in the main menu
-  user: core
+  desc: deprecated
+  user:
   <source>
-    *: "USB (Sim)"
+    *: none
   </source>
   <dest>
-    *: "USB (Simulado)"
+    *: none
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>
