@@ -51,7 +51,6 @@ class ThemesInstallWindow : public QDialog
         HttpGet *getter;
         HttpGet igetter;
         QTemporaryFile themesInfo;
-        QString resolution(void);
         int currentItem;
         void resizeEvent(QResizeEvent*);
         QByteArray imgData;

@@ -35,17 +35,15 @@ ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
 
     connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(close()));
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(ui.listThemes, SIGNAL(currentRowChanged(int)),
+            this, SLOT(updateDetails(int)));
+    connect(&igetter, SIGNAL(done(bool)), this, SLOT(updateImage(bool)));
 }
 
 ThemesInstallWindow::~ThemesInstallWindow()
 {
     if(infocachedir!="")
         recRmdir(infocachedir);
-}
-
-QString ThemesInstallWindow::resolution()
-{
-    return settings->curResolution();
 }
 
 
@@ -60,13 +58,14 @@ void ThemesInstallWindow::downloadInfo()
     themesInfo.close();
 
     QUrl url;
-    url = QUrl(settings->themeUrl() + "/rbutilqt.php?res=" + resolution());
+    url = QUrl(settings->themeUrl() + "/rbutilqt.php?res="
+                + settings->curResolution());
     qDebug() << "downloadInfo()" << url;
     qDebug() << url.queryItems();
     if(settings->cacheOffline())
         getter->setCache(true);
     getter->setFile(&themesInfo);
-    
+
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
     connect(logger, SIGNAL(aborted()), getter, SLOT(abort()));
     getter->getFile(url);
@@ -129,7 +128,6 @@ void ThemesInstallWindow::downloadDone(bool error)
 
         iniDetails.endGroup();
     }
-    connect(ui.listThemes, SIGNAL(currentRowChanged(int)), this, SLOT(updateDetails(int)));
 }
 
 
@@ -164,9 +162,12 @@ void ThemesInstallWindow::updateDetails(int row)
     qDebug() << "img:" << img;
 
     QString text;
-    text = tr("<b>Author:</b> %1<hr/>").arg(iniDetails.value("author", tr("unknown")).toString());
-    text += tr("<b>Version:</b> %1<hr/>").arg(iniDetails.value("version", tr("unknown")).toString());
-    text += tr("<b>Description:</b> %1<hr/>").arg(iniDetails.value("about", tr("no description")).toString());
+    text = tr("<b>Author:</b> %1<hr/>").arg(iniDetails.value("author",
+                tr("unknown")).toString());
+    text += tr("<b>Version:</b> %1<hr/>").arg(iniDetails.value("version",
+                tr("unknown")).toString());
+    text += tr("<b>Description:</b> %1<hr/>").arg(iniDetails.value("about",
+                tr("no description")).toString());
 
     ui.themeDescription->setHtml(text);
     iniDetails.endGroup();
@@ -184,7 +185,7 @@ void ThemesInstallWindow::updateDetails(int row)
         }
         igetter.setCache(infocachedir);
     }
-    connect(&igetter, SIGNAL(done(bool)), this, SLOT(updateImage(bool)));
+
     igetter.getFile(img);
 }
 
@@ -234,8 +235,8 @@ void ThemesInstallWindow::show()
     logger = new ProgressLoggerGui(this);
     logger->show();
     logger->addItem(tr("getting themes information ..."), LOGINFO);
-    
-    connect(logger, SIGNAL(aborted()), this, SLOT(close()));  
+
+    connect(logger, SIGNAL(aborted()), this, SLOT(close()));
 
     downloadInfo();
 
@@ -293,9 +294,9 @@ void ThemesInstallWindow::accept()
     installer->setMountPoint(mountPoint);
     if(!settings->cacheDisabled())
         installer->setCache(true);
-        
-    connect(logger, SIGNAL(closed()), this, SLOT(close()));    
+
+    connect(logger, SIGNAL(closed()), this, SLOT(close()));
     installer->install(logger);
-    
+
 }
 
