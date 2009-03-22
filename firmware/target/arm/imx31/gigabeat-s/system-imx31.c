@@ -29,7 +29,7 @@
 #include "lcd.h"
 #include "serial-imx31.h"
 #include "debug.h"
-#include "clkctl-imx31.h"
+#include "ccm-imx31.h"
 #include "mc13783.h"
 
 static unsigned long product_rev;

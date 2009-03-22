@@ -28,7 +28,7 @@
 #include "debug-target.h"
 #include "mc13783.h"
 #include "adc.h"
-#include "clkctl-imx31.h"
+#include "ccm-imx31.h"
 
 bool __dbg_hw_info(void)
 {

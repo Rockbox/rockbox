@@ -23,7 +23,7 @@
 #include "kernel.h"
 #include "audio.h"
 #include "sound.h"
-#include "clkctl-imx31.h"
+#include "ccm-imx31.h"
 #include "sdma-imx31.h"
 #include "mmu-imx31.h"
 

@@ -23,7 +23,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "avic-imx31.h"
-#include "clkctl-imx31.h"
+#include "ccm-imx31.h"
 #include "i2c-imx31.h"
 
 /* Forward interrupt handler declarations */

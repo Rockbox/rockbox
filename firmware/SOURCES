@@ -758,6 +758,7 @@ target/arm/s3c2440/gigabeat-fx/wmcodec-meg-fx.c
 #ifndef SIMULATOR
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.S
+target/arm/imx31/ccm-imx31.c
 target/arm/imx31/debug-imx31.c
 target/arm/imx31/rolo_restart.S
 target/arm/imx31/sdma-imx31.c
@@ -766,7 +767,6 @@ target/arm/imx31/gigabeat-s/ata-imx31.c
 target/arm/imx31/gigabeat-s/avic-imx31.c
 target/arm/imx31/gigabeat-s/backlight-imx31.c
 target/arm/imx31/gigabeat-s/button-imx31.c
-target/arm/imx31/gigabeat-s/clkctl-imx31.c
 target/arm/imx31/gigabeat-s/gpio-gigabeat-s.c
 target/arm/imx31/gigabeat-s/gpio-imx31.c
 target/arm/imx31/gigabeat-s/kernel-imx31.c

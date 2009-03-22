@@ -23,7 +23,7 @@
 #include "avic-imx31.h"
 #include "spi-imx31.h"
 #include "mc13783.h"
-#include "clkctl-imx31.h"
+#include "ccm-imx31.h"
 #include "sdma-imx31.h"
 #include "kernel.h"
 #include "thread.h"

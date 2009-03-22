@@ -23,7 +23,7 @@
 #include <string.h>
 #include "logf.h"
 #include "panic.h"
-#include "clkctl-imx31.h"
+#include "ccm-imx31.h"
 #include "avic-imx31.h"
 #include "sdma_struct.h"
 #include "sdma-imx31.h"

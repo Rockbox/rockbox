@@ -27,7 +27,7 @@
 #include "usb_core.h"
 #include "usb_drv.h"
 #include "usb-target.h"
-#include "clkctl-imx31.h"
+#include "ccm-imx31.h"
 #include "power-imx31.h"
 #include "avic-imx31.h"
 #include "mc13783.h"

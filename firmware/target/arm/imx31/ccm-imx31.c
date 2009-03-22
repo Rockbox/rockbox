@@ -22,7 +22,7 @@
  ****************************************************************************/
 #include "system.h"
 #include "cpu.h"
-#include "clkctl-imx31.h"
+#include "ccm-imx31.h"
 
 unsigned int ccm_get_src_pll(void)
 {

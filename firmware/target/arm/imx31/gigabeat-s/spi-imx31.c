@@ -22,7 +22,7 @@
 #include "system.h"
 #include "spi-imx31.h"
 #include "avic-imx31.h"
-#include "clkctl-imx31.h"
+#include "ccm-imx31.h"
 #include "debug.h"
 #include "kernel.h"
 

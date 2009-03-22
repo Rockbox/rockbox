@@ -27,7 +27,7 @@
 #include "system.h"
 #include "backlight-target.h"
 #include "avic-imx31.h"
-#include "clkctl-imx31.h"
+#include "ccm-imx31.h"
 #include "mc13783.h"
 
 /* Most code in here is taken from the Linux BSP provided by Freescale

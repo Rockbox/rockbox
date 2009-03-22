@@ -21,7 +21,7 @@
 #include "config.h"
 #include "system.h"
 #include "timer.h"
-#include "clkctl-imx31.h"
+#include "ccm-imx31.h"
 #include "avic-imx31.h"
 
 static void __attribute__((interrupt("IRQ"))) EPIT2_HANDLER(void)

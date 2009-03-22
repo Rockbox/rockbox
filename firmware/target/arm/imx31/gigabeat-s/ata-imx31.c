@@ -27,7 +27,7 @@
 #include "panic.h"
 #include "ata.h"
 #include "ata-target.h"
-#include "clkctl-imx31.h"
+#include "ccm-imx31.h"
 #ifdef HAVE_ATA_DMA
 #include "sdma-imx31.h"
 #include "mmu-imx31.h"
