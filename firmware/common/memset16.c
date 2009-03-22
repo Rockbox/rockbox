@@ -20,6 +20,8 @@
  ****************************************************************************/
 
 #include <string.h>
+#include "memory.h"
+
 #define LBLOCKSIZE (sizeof(long)/2)
 #define UNALIGNED(X)   ((long)X & (sizeof(long) - 1))
 #define TOO_SMALL(LEN) ((LEN) < LBLOCKSIZE)

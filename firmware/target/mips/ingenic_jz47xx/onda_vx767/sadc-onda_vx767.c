@@ -25,6 +25,7 @@
 #include "powermgmt.h"
 #include "kernel.h"
 #include "logf.h"
+#include "adc.h"
 
 #define SADC_CFG_INIT   (                                 \
                         (2 << SADC_CFG_CLKOUT_NUM_BIT) |  \

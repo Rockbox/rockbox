@@ -28,6 +28,7 @@
 #include "kernel.h"
 #include "backlight.h"
 #include "logf.h"
+#include "adc.h"
 
 #ifdef ONDA_VX747
 #define BTN_OFF      (1 << 29)

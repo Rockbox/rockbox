@@ -21,6 +21,7 @@
  
 #include "config.h"
 #include "jz4740.h"
+#include "lcd.h"
 #include "lcd-target.h"
 
 #define PIN_CS_N    (32*1+17) /* Chip select */
