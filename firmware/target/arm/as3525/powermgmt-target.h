@@ -22,6 +22,8 @@
 #ifndef POWERMGMT_TARGET_H
 #define POWERMGMT_TARGET_H
 
+#if defined(SANSA_CLIP)
+
 /* Check if topped-off and monitor voltage while plugged. */
 #define BATT_FULL_VOLTAGE   4160
 #define BATT_VAUTO_RECHARGE 4100
@@ -29,6 +31,20 @@
 #define BATT_CHG_I          CHG_I_100MA
 #define CHARGER_TOTAL_TIMER (6*3600*2)  /* about 1.5 * capacity / current */
 #define ADC_BATTERY         ADC_BVDD
+
+#elif defined(SANSA_E200V2)
+
+/* Check if topped-off and monitor voltage while plugged. */
+#define BATT_FULL_VOLTAGE   4160
+#define BATT_VAUTO_RECHARGE 4100
+#define BATT_CHG_V          CHG_V_4_20V
+#define BATT_CHG_I          CHG_I_300MA
+#define CHARGER_TOTAL_TIMER (4*3600*2)
+#define ADC_BATTERY         ADC_BVDD
+
+#else
+#error "Charger settings not defined!"
+#endif
 
 void powermgmt_init_target(void);
 void charging_algorithm_step(void);

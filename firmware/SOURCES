@@ -1111,7 +1111,8 @@ target/arm/as3525/sansa-e200v2/lcd-e200v2.c
 target/arm/as3525/sansa-e200v2/button-e200v2.c
 target/arm/as3525/backlight-e200v2-fuze.c
 #ifndef BOOTLOADER
-target/arm/as3525/powermgmt-as3525.c
+target/arm/powermgmt-ascodec.c
+target/arm/as3525/sansa-e200v2/powermgmt-e200v2.c
 #endif /* !BOOTLOADER */
 #endif /* !SIMULATOR */
 #endif /* SANSA_E200V2 */
