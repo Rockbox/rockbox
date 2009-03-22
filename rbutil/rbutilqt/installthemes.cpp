@@ -32,6 +32,7 @@ ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
     ui.listThemes->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui.themePreview->clear();
     ui.themePreview->setText(tr("no theme selected"));
+    currentItem = -1;
 
     connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(close()));
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));
@@ -51,7 +52,7 @@ void ThemesInstallWindow::downloadInfo()
 {
     // try to get the current build information
     getter = new HttpGet(this);
-    
+
     qDebug() << "downloading themes info";
     themesInfo.open();
     qDebug() << "file:" << themesInfo.fileName();
@@ -198,7 +199,12 @@ void ThemesInstallWindow::updateImage(bool error)
 {
     qDebug() << "updateImage(bool) =" << error;
 
-    if(error) return;
+    if(error) {
+        ui.themePreview->clear();
+        ui.themePreview->setText(tr("Retrieving theme preview failed.\n"
+            "HTTP response code: %1").arg(igetter.httpResponse()));
+        return;
+    }
 
     QPixmap p;
     if(!error) {
