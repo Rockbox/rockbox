@@ -31,14 +31,16 @@ play music.}
         \nopt{scrollwheel,IRIVER_H10_PAD}{\ButtonLeft{} / \ButtonRight
          & Scroll through albums\\}
 
-        \nopt{scrollwheel,SANSA_C200_PAD,IRIVER_H10_PAD}{\ButtonUp{} / \ButtonDown    
+        \nopt{scrollwheel,SANSA_C200_PAD,ONDIO_PAD,IRIVER_H10_PAD}{\ButtonUp{} / \ButtonDown    
         & Scroll through track list\\}
         
         \opt{SANSA_C200_PAD}{\ButtonUp
         & Scroll up through track list\\}
        
-        \nopt{IRIVER_H10_PAD}{\ButtonSelect}
+        \nopt{IRIVER_H10_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonSelect}
         \opt{IRIVER_H10_PAD}{\ButtonRew}
+        \opt{RECORDER_PAD}{\ButtonPlay}
+        \opt{ONDIO_PAD}{\ButtonUp}
         & Switch between cover view and track list\\
 
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
@@ -47,9 +49,11 @@ play music.}
         \opt{IAUDIO_X5_PAD}{\ButtonRec}
         \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonDown}
         \opt{IRIVER_H10_PAD}{\ButtonFF}
+        \opt{RECORDER_PAD}{\ButtonFOne}
+        \opt{ONDIO_PAD}{\ButtonDown}
         & Enter / exit menu\\
 
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
         \opt{IAUDIO_X5_PAD,GIGABEAT_PAD,SANSA_E200_PAD,SANSA_C200_PAD,%
              IRIVER_H10_PAD,MROBE_100_PAD}{\ButtonPower}
         \opt{GIGABEATS_PAD}{\ButtonBack}
@@ -62,7 +66,7 @@ play music.}
 \begin{description}
   \item[Settings.] Enter the settings menu.
   \item[Return.] Exit menu.
-  \item[Exit.] Exit PictureFlow plugin.
+  \item[Quit.] Exit PictureFlow plugin.
 \end{description}
 
 \subsubsection{Settings Menu}
