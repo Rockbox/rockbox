@@ -294,8 +294,6 @@ void reset_track_list(void);
 void * buf;
 size_t buf_size;
 
-static int old_drawmode;
-
 static bool thread_is_running;
 
 static int cover_animation_keyframe;
@@ -502,8 +500,6 @@ static const short sin_tab[] = {
 
 static inline PFreal fsin(int iangle)
 {
-    while(iangle < 0)
-        iangle += IANGLE_MAX;
     iangle &= IANGLE_MASK;
 
     int i = (iangle >> 4);
@@ -1460,10 +1456,19 @@ void render_slide(struct slide_data *slide, const int alpha)
     const int sw = bmp->width;
     const int sh = bmp->height;
     const PFreal slide_left = -sw * PFREAL_HALF + PFREAL_HALF;
-
-    const int h = LCD_HEIGHT;
     const int w = LCD_WIDTH;
 
+    uint8_t reftab[REFLECT_HEIGHT]; /* on stack, which is in IRAM on several targets */
+
+    if (alpha == 256) { /* opaque -> copy table */
+        rb->memcpy(reftab, reflect_table, sizeof(reftab));
+    } else {            /* precalculate faded table */
+        int i, lalpha;
+        for (i = 0; i < REFLECT_HEIGHT; i++) {
+            lalpha = reflect_table[i];
+            reftab[i] = (MULUQ(lalpha, alpha) + 129) >> 8;
+        }
+    }
 
     PFreal cosr = fcos(slide->angle);
     PFreal sinr = fsin(slide->angle);
@@ -1496,71 +1501,54 @@ void render_slide(struct slide_data *slide, const int alpha)
             break;
         if (zo || slide->angle)
             dy = (CAM_DIST_R + zo + fmul(xs, sinr)) / CAM_DIST;
-        int y1 = (LCD_HEIGHT / 2) - 1;
-        int y2 = y1 + 1;
-        pix_t *pixel1 = &buffer[y1 * BUFFER_WIDTH + x];
-        pix_t *pixel2 = pixel1 + BUFFER_WIDTH;
+
+        const pix_t *ptr = &src[column * bmp->height];
         const int pixelstep = BUFFER_WIDTH;
 
-        int p1 = (bmp->height - 1 - (DISPLAY_OFFS)) * PFREAL_ONE;
-        int p2 = p1 + dy;
-        const pix_t *ptr = &src[column * bmp->height];
+        int p = (bmp->height-1-DISPLAY_OFFS) * PFREAL_ONE;
+        int plim = MAX(0, p - (LCD_HEIGHT/2-1) * dy);
+        pix_t *pixel = &buffer[((LCD_HEIGHT/2)-1)*BUFFER_WIDTH + x];
 
-        if (alpha == 256)
-        {
-            while ((y1 >= 0) && (p1 >= 0))
-            {
-                *pixel1 = ptr[((unsigned)p1) >> PFREAL_SHIFT];
-                p1 -= dy;
-                y1--;
-                pixel1 -= pixelstep;
+        if (alpha == 256) {
+            while (p >= plim) {
+                *pixel = ptr[((unsigned)p) >> PFREAL_SHIFT];
+                p -= dy;
+                pixel -= pixelstep;
             }
-            while ((p2 < sh * PFREAL_ONE) && (y2 < h))
-            {
-                *pixel2 = ptr[((unsigned)p2) >> PFREAL_SHIFT];
-                p2 += dy;
-                y2++;
-                pixel2 += pixelstep;
-            }
-            while ((p2 < MIN(sh + REFLECT_HEIGHT, sh * 2) * PFREAL_ONE) &&
-                   (y2 < h))
-            {
-                int ty = (((unsigned)p2) >> PFREAL_SHIFT) - sh;
-                int lalpha = reflect_table[ty];
-                *pixel2 = fade_color(ptr[sh - 1 - ty],lalpha);
-                p2 += dy;
-                y2++;
-                pixel2 += pixelstep;
+        } else {
+            while (p >= plim) {
+                *pixel = fade_color(ptr[((unsigned)p) >> PFREAL_SHIFT], alpha);
+                p -= dy;
+                pixel -= pixelstep;
             }
         }
-        else
-        {
-            while ((y1 >= 0) && (p1 >= 0))
-            {
-                *pixel1 = fade_color(ptr[((unsigned)p1) >> PFREAL_SHIFT],alpha);
-                p1 -= dy;
-                y1--;
-                pixel1 -= pixelstep;
+        p = (bmp->height-DISPLAY_OFFS) * PFREAL_ONE;   
+        plim = MIN(sh * PFREAL_ONE, p + (LCD_HEIGHT/2) * dy);
+        int plim2 = MIN(MIN(sh + REFLECT_HEIGHT, sh * 2) * PFREAL_ONE,
+                        p + (LCD_HEIGHT/2) * dy);
+        pixel = &buffer[(LCD_HEIGHT/2)*BUFFER_WIDTH + x];
+
+        if (alpha == 256) {
+            while (p < plim) {
+                *pixel = ptr[((unsigned)p) >> PFREAL_SHIFT];
+                p += dy;
+                pixel += pixelstep;
             }
-            while ((p2 < sh * PFREAL_ONE) && (y2 < h))
-            {
-                *pixel2 = fade_color(ptr[((unsigned)p2) >> PFREAL_SHIFT],alpha);
-                p2 += dy;
-                y2++;
-                pixel2 += pixelstep;
-            }
-            while ((p2 < MIN(sh + REFLECT_HEIGHT, sh * 2) * PFREAL_ONE) &&
-                   (y2 < h))
-            {
-                int ty = (((unsigned)p2) >> PFREAL_SHIFT) - sh;
-                int lalpha = reflect_table[ty];
-                lalpha = (MULUQ(lalpha, alpha) + 128) >> 8;
-                *pixel2 = fade_color(ptr[sh - 1 - ty],lalpha);
-                p2 += dy;
-                y2++;
-                pixel2 += pixelstep;
+        } else {
+            while (p < plim) {
+                *pixel = fade_color(ptr[((unsigned)p) >> PFREAL_SHIFT], alpha);
+                p += dy;
+                pixel += pixelstep;
             }
         }
+        while (p < plim2) {
+            int ty = (((unsigned)p) >> PFREAL_SHIFT) - sh;
+            int lalpha = reftab[ty];
+            *pixel = fade_color(ptr[sh - 1 - ty], lalpha);
+            p += dy;
+            pixel += pixelstep;
+        }
+
         if (zo || slide->angle)
         {
             xsnum += xsnumi;
@@ -1805,7 +1793,6 @@ void cleanup(void *parameter)
 #ifdef USEGSLIB
     grey_release();
 #endif
-    rb->lcd_set_drawmode(old_drawmode);
 }
 
 /**
@@ -2300,7 +2287,6 @@ int main(void)
     int fpstxt_y;
 
     bool instant_update;
-    old_drawmode = rb->lcd_get_drawmode();
 #ifdef USEGSLIB
     grey_show(true);
     grey_set_drawmode(DRMODE_FG);
