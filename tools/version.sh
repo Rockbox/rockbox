@@ -19,15 +19,7 @@
 
 svnversion_safe() {
     # LANG=C forces svnversion to not localize "exported".
-    if OUTPUT=`LANG=C svnversion "$@"`; then
-        if [ "$OUTPUT" = "exported" ]; then
-            echo "unknown"
-        else
-            echo "3.2-r$OUTPUT"
-        fi
-    else
-        echo "unknown"
-    fi
+    echo "3.2"
 }
 
 # This logic is pulled from the Linux's scripts/setlocalversion (also GPL) and tweaked for
