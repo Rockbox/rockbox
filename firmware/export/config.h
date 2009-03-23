@@ -456,17 +456,18 @@
 #define CONFIG_STORAGE_MULTI
 #endif
 
-/* deactive fading in bootloader/sim */
+/* deactivate fading in bootloader/sim */
 #if defined(BOOTLOADER) || defined(SIMULATOR)
 #undef CONFIG_BACKLIGHT_FADING
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_NO_FADING
 #endif
 
-/* determine which setting/manual text to use,
- * possibly overridden in target config */
+/* determine which setting/manual text to use */
 #if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_PWM)
 
-#ifndef HAVE_BACKLIGHT_FADING_INT_SETTING
+/* possibly overridden in target config */
+#if !defined(HAVE_BACKLIGHT_FADING_BOOL_SETTING) \
+    && !defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
 #define HAVE_BACKLIGHT_FADING_INT_SETTING
 #endif
 
@@ -474,7 +475,7 @@
     || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG) \
     || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_TARGET)
 
-/* BACKLIGHT_FADING_TARGET may the setting to use */
+/* possibly overridden in target config */
 #if !defined(HAVE_BACKLIGHT_FADING_BOOL_SETTING) \
     && !defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
 #define HAVE_BACKLIGHT_FADING_BOOL_SETTING
