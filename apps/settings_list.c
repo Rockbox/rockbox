@@ -793,7 +793,7 @@ const struct settings_list settings[] = {
                    "sort files", "alpha,oldest,newest,type", NULL, 4,
                    ID2P(LANG_SORT_ALPHA), ID2P(LANG_SORT_DATE),
                    ID2P(LANG_SORT_DATE_REVERSE) , ID2P(LANG_SORT_TYPE)),
-    CHOICE_SETTING(0, interpret_numbers, LANG_SORT_INTERPRET_NUMBERS, 1,
+    CHOICE_SETTING(0, interpret_numbers, LANG_SORT_INTERPRET_NUMBERS, 0,
                     "sort interpret number", "digits,numbers",NULL, 2,
                     ID2P(LANG_SORT_INTERPRET_AS_DIGIT),
                     ID2P(LANG_SORT_INTERPRET_AS_NUMBERS)),
