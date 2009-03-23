@@ -25,14 +25,25 @@
 
 #include "gwps.h"
 
+/* fades the volume, e.g. on pause or stop */
 void fade(bool fade_in, bool updatewps);
-bool gui_wps_display(void);
+
+/* Initially display the wps, can fall back to the build-in wps
+ * if the chosen wps is invalid */
+bool gui_wps_display(struct gui_wps *gui_wps);
+
+/* return true if screen restore is needed
+   return false otherwise */
 bool update_onvol_change(struct gui_wps * gwps);
-bool update(struct gui_wps *gwps);
+
+/* Update track info related stuff, handles cue sheets as well, and redraw */
+bool gui_wps_update(struct gui_wps *gwps);
+
 bool ffwd_rew(int button);
 void display_keylock_text(bool locked);
 
-bool gui_wps_refresh(struct gui_wps *gwps,
+/* Refresh the WPS according to refresh_mode. */
+bool gui_wps_redraw(struct gui_wps *gwps,
                      int ffwd_offset,
-                     unsigned char refresh_mode);
+                     unsigned refresh_mode);
 #endif

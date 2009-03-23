@@ -26,13 +26,13 @@
 #include "metadata.h"
 
 /* constants used in line_type and as refresh_mode for wps_refresh */
-#define WPS_REFRESH_STATIC          (1<<0)  /* line doesn't change over time */
-#define WPS_REFRESH_DYNAMIC         (1<<1)  /* line may change (e.g. time flag) */
-#define WPS_REFRESH_SCROLL          (1<<2)  /* line scrolls */
-#define WPS_REFRESH_PLAYER_PROGRESS (1<<3)  /* line contains a progress bar */
-#define WPS_REFRESH_PEAK_METER      (1<<4) /* line contains a peak meter */
-#define WPS_REFRESH_STATUSBAR       (1<<5) /* refresh statusbar */
-#define WPS_REFRESH_ALL             0xff /* to refresh all line types */
+#define WPS_REFRESH_STATIC          (1u<<0)  /* line doesn't change over time */
+#define WPS_REFRESH_DYNAMIC         (1u<<1)  /* line may change (e.g. time flag) */
+#define WPS_REFRESH_SCROLL          (1u<<2)  /* line scrolls */
+#define WPS_REFRESH_PLAYER_PROGRESS (1u<<3)  /* line contains a progress bar */
+#define WPS_REFRESH_PEAK_METER      (1u<<4)  /* line contains a peak meter */
+#define WPS_REFRESH_STATUSBAR       (1u<<5)  /* refresh statusbar */
+#define WPS_REFRESH_ALL       (0xffffffffu)   /* to refresh all line types */
 
 /* to refresh only those lines that change over time */
 #define WPS_REFRESH_NON_STATIC (WPS_REFRESH_DYNAMIC| \

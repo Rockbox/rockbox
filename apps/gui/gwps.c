@@ -219,15 +219,8 @@ long gui_wps_show(void)
 #ifdef HAVE_LCD_CHARCELLS
     status_set_audio(true);
     status_set_param(false);
-#else
-#if LCD_DEPTH > 1
-    show_wps_backdrop();
-#endif /* LCD_DEPTH > 1 */
 #endif
 
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-    show_remote_wps_backdrop();
-#endif
     gwps_fix_statusbars();
 
 #ifdef AB_REPEAT_ENABLE
@@ -239,18 +232,17 @@ long gui_wps_show(void)
         wps_state.id3 = audio_current_track();
         wps_state.nid3 = audio_next_track();
         if (wps_state.id3) {
-            if (gui_wps_display())
+            FOR_NB_SCREENS(i)
             {
-                gwps_leave_wps();
-                return 0;
+                if (!gui_wps_display(&gui_wps[i]))
+                    exit = true;
             }
         }
-
-        restore = true;
     }
     
     while ( 1 )
     {
+        yield();
         bool audio_paused = (audio_status() & AUDIO_STATUS_PAUSE)?true:false;
 
         /* did someone else (i.e power thread) change audio pause mode? */
@@ -295,7 +287,7 @@ long gui_wps_show(void)
                     FOR_NB_SCREENS(i)
                     {
                         if(gui_wps[i].data->peak_meter_enabled)
-                            gui_wps_refresh(&gui_wps[i], 0,
+                            gui_wps_redraw(&gui_wps[i], 0,
                                             WPS_REFRESH_PEAK_METER);
                         next_refresh += HZ / PEAK_METER_FPS;
                     }
@@ -392,7 +384,6 @@ long gui_wps_show(void)
                 }
                 break;
 
-                /* volume up */
             case ACTION_WPS_VOLUP:
             {
                 FOR_NB_SCREENS(i)
@@ -410,9 +401,7 @@ long gui_wps_show(void)
                     restoretimer = RESTORE_WPS_NEXT_SECOND;
                 }
             }
-                break;
-
-                /* volume down */
+            break;
             case ACTION_WPS_VOLDOWN:
             {
                 FOR_NB_SCREENS(i)
@@ -683,7 +672,7 @@ long gui_wps_show(void)
         {
             FOR_NB_SCREENS(i)
             {
-                if(update(&gui_wps[i]))
+                if(!gui_wps_update(&gui_wps[i]))
                     exit = true;
             }
             update_track = false;
@@ -702,8 +691,11 @@ long gui_wps_show(void)
 #endif
             restore = false;
             restoretimer = RESTORE_WPS_INSTANTLY;
-            if (gui_wps_display()) {
-                exit = true;
+            FOR_NB_SCREENS(i)
+            {
+                screens[i].stop_scroll();
+                if (!gui_wps_redraw(&gui_wps[i], 0, WPS_REFRESH_ALL))
+                    exit = true;
             }
         }
 

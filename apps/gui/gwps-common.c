@@ -74,8 +74,6 @@
 #define TIMEOUT_UNIT (HZ/10) /* I.e. 0.1 sec */
 #define DEFAULT_SUBLINE_TIME_MULTIPLIER 20 /* In TIMEOUT_UNIT's */
 
-
-/* fades the volume */
 bool wps_fading_out = false;
 void fade(bool fade_in, bool updatewps)
 {
@@ -100,7 +98,7 @@ void fade(bool fade_in, bool updatewps)
             if (updatewps)
             {
                 FOR_NB_SCREENS(i)
-                    gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
+                    gui_wps_redraw(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
             }
             sleep(1);
         }
@@ -116,7 +114,7 @@ void fade(bool fade_in, bool updatewps)
             if (updatewps)
             {
                 FOR_NB_SCREENS(i)
-                    gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
+                    gui_wps_redraw(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
             }
             sleep(1);
         }
@@ -135,12 +133,9 @@ void fade(bool fade_in, bool updatewps)
     }
 }
 
-/* return true if screen restore is needed
-   return false otherwise
-*/
 bool update_onvol_change(struct gui_wps * gwps)
 {
-    gui_wps_refresh(gwps, 0, WPS_REFRESH_NON_STATIC);
+    gui_wps_redraw(gwps, 0, WPS_REFRESH_NON_STATIC);
 
 #ifdef HAVE_LCD_CHARCELLS
     splashf(0, "Vol: %3d dB",
@@ -240,7 +235,7 @@ bool ffwd_rew(int button)
                 }
 
                 FOR_NB_SCREENS(i)
-                    gui_wps_refresh(&gui_wps[i],
+                    gui_wps_redraw(&gui_wps[i],
                                     (wps_state.wps_time_countup == false)?
                                     ff_rewind_count:-ff_rewind_count,
                                     WPS_REFRESH_PLAYER_PROGRESS |
@@ -259,7 +254,8 @@ bool ffwd_rew(int button)
                     audio_resume();
 #endif
 #ifdef HAVE_LCD_CHARCELLS
-                gui_wps_display();
+                FOR_NB_SCREENS(i)
+                    gui_wps_redraw(gwps,0, WPS_REFRESH_ALL);
 #endif
                 exit = true;
                 break;
@@ -278,145 +274,125 @@ bool ffwd_rew(int button)
     return usb;
 }
 
-bool gui_wps_display(void)
+bool gui_wps_display(struct gui_wps *gwps)
 {
-    int i;
-    if (!wps_state.id3 && !(audio_status() & AUDIO_STATUS_PLAY))
+    struct screen *display = gwps->display;
+    struct wps_data *data = gwps->data;
+    int screen = display->screen_type;
+
+    /* Update the values in the first (default) viewport - in case the user
+       has modified the statusbar or colour settings */
+#if LCD_DEPTH > 1
+    if (display->depth > 1)
     {
-        global_status.resume_index = -1;
-        splash(HZ, ID2P(LANG_END_PLAYLIST));
-        return true;
+        data->viewports[0].vp.fg_pattern = display->get_foreground();
+        data->viewports[0].vp.bg_pattern = display->get_background();
+    }
+#endif
+    display->clear_display();
+    if (!data->wps_loaded) {
+        if ( !data->num_tokens ) {
+            /* set the default wps for the main-screen */
+            if(screen == SCREEN_MAIN)
+            {
+#if LCD_DEPTH > 1
+                unload_wps_backdrop();
+#endif
+                wps_data_load(data,
+                              display,
+#ifdef HAVE_LCD_BITMAP
+                              "%s%?it<%?in<%in. |>%it|%fn>\n"
+                              "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
+                              "%s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>\n"
+                              "\n"
+                              "%al%pc/%pt%ar[%pp:%pe]\n"
+                              "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
+                              "%pb\n"
+                              "%pm\n", false);
+#else
+                              "%s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d2> - %?id<%id|%d1>\n"
+                              "%pc%?ps<*|/>%pt\n", false);
+#endif
+            }
+#ifdef HAVE_REMOTE_LCD
+             /* set the default wps for the remote-screen */
+             else if(screen == SCREEN_REMOTE)
+             {
+#if LCD_REMOTE_DEPTH > 1
+                 unload_remote_wps_backdrop();
+#endif
+                 wps_data_load(data,
+                               display,
+                               "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
+                               "%s%?it<%?in<%in. |>%it|%fn>\n"
+                               "%al%pc/%pt%ar[%pp:%pe]\n"
+                               "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
+                               "%pb\n", false);
+             }
+#endif
+        }
     }
     else
     {
-        FOR_NB_SCREENS(i)
-        {
-            /* Update the values in the first (default) viewport - in case the user
-               has modified the statusbar or colour settings */
-#ifdef HAVE_LCD_BITMAP
-#if LCD_DEPTH > 1
-            if (gui_wps[i].display->depth > 1)
-            {
-                gui_wps[i].data->viewports[0].vp.fg_pattern = gui_wps[i].display->get_foreground();
-                gui_wps[i].data->viewports[0].vp.bg_pattern = gui_wps[i].display->get_background();
-            }
-#endif
-#endif
-            gui_wps[i].display->clear_display();
-            if (!gui_wps[i].data->wps_loaded) {
-                if ( !gui_wps[i].data->num_tokens ) {
-                    /* set the default wps for the main-screen */
-                    if(i == 0)
-                    {
-#ifdef HAVE_LCD_BITMAP
-#if LCD_DEPTH > 1
-                        unload_wps_backdrop();
-#endif
-                        wps_data_load(gui_wps[i].data,
-                                      gui_wps[i].display,
-                                      "%s%?it<%?in<%in. |>%it|%fn>\n"
-                                      "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
-                                      "%s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>\n"
-                                      "\n"
-                                      "%al%pc/%pt%ar[%pp:%pe]\n"
-                                      "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
-                                      "%pb\n"
-                                      "%pm\n", false);
-#else
-                        wps_data_load(gui_wps[i].data,
-                                      gui_wps[i].display,
-                                      "%s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d2> - %?id<%id|%d1>\n"
-                                      "%pc%?ps<*|/>%pt\n", false);
-#endif
-                    }
-#if NB_SCREENS == 2
-                     /* set the default wps for the remote-screen */
-                     else if(i == 1)
-                     {
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-                         unload_remote_wps_backdrop();
+        if (screen == SCREEN_REMOTE)
+            show_remote_wps_backdrop();
+        else if (screen == SCREEN_MAIN)
 #endif
-                         wps_data_load(gui_wps[i].data,
-                                       gui_wps[i].display,
-                                       "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
-                                       "%s%?it<%?in<%in. |>%it|%fn>\n"
-                                       "%al%pc/%pt%ar[%pp:%pe]\n"
-                                       "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
-                                       "%pb\n", false);
-                     }
+#if LCD_DEPTH > 1
+            show_wps_backdrop();
 #endif
-                }
-            }
-        }
     }
-    yield();
-    FOR_NB_SCREENS(i)
-    {
-        gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_ALL);
-    }
-    return false;
+    return gui_wps_redraw(gwps, 0, WPS_REFRESH_ALL);
 }
 
-bool update(struct gui_wps *gwps)
+bool gui_wps_update(struct gui_wps *gwps)
 {
     bool track_changed = audio_has_changed_track();
-    bool retcode = false;
+    struct mp3entry *id3 = gwps->state->id3;
 
     gwps->state->nid3 = audio_next_track();
     if (track_changed)
     {
-        gwps->display->stop_scroll();
-        gwps->state->id3 = audio_current_track();
+        gwps->state->id3 = id3 = audio_current_track();
 
-        if (cuesheet_is_enabled() && gwps->state->id3->cuesheet_type
-            && strcmp(gwps->state->id3->path, curr_cue->audio_filename))
+        if (cuesheet_is_enabled() && id3->cuesheet_type
+            && strcmp(id3->path, curr_cue->audio_filename))
         {
             /* the current cuesheet isn't the right one any more */
             /* We need to parse the new cuesheet */
 
             char cuepath[MAX_PATH];
 
-            if (look_for_cuesheet_file(gwps->state->id3->path, cuepath) &&
+            if (look_for_cuesheet_file(id3->path, cuepath) &&
                 parse_cuesheet(cuepath, curr_cue))
             {
-                gwps->state->id3->cuesheet_type = 1;
-                strcpy(curr_cue->audio_filename, gwps->state->id3->path);
+                id3->cuesheet_type = 1;
+                strcpy(curr_cue->audio_filename, id3->path);
             }
 
-            cue_spoof_id3(curr_cue, gwps->state->id3);
-        }
-
-        if (gui_wps_display())
-            retcode = true;
-        else{
-            gui_wps_refresh(gwps, 0, WPS_REFRESH_ALL);
+            cue_spoof_id3(curr_cue, id3);
         }
     }
 
-    if (gwps->state->id3)
+    if (cuesheet_is_enabled() && id3->cuesheet_type
+        && (id3->elapsed < curr_cue->curr_track->offset
+            || (curr_cue->curr_track_idx < curr_cue->track_count - 1
+                && id3->elapsed >= (curr_cue->curr_track+1)->offset)))
     {
-        if (cuesheet_is_enabled() && gwps->state->id3->cuesheet_type
-            && (gwps->state->id3->elapsed < curr_cue->curr_track->offset
-                || (curr_cue->curr_track_idx < curr_cue->track_count - 1
-                    && gwps->state->id3->elapsed >= (curr_cue->curr_track+1)->offset)))
-        {
-            /* We've changed tracks within the cuesheet :
-               we need to update the ID3 info and refresh the WPS */
+        /* We've changed tracks within the cuesheet :
+           we need to update the ID3 info and refresh the WPS */
 
-            cue_find_current_track(curr_cue, gwps->state->id3->elapsed);
-            cue_spoof_id3(curr_cue, gwps->state->id3);
-
-            gwps->display->stop_scroll();
-            if (gui_wps_display())
-                retcode = true;
-            else
-                gui_wps_refresh(gwps, 0, WPS_REFRESH_ALL);
-        }
-        else
-            gui_wps_refresh(gwps, 0, WPS_REFRESH_NON_STATIC);
+        track_changed = true;
+        cue_find_current_track(curr_cue, id3->elapsed);
+        cue_spoof_id3(curr_cue, id3);
     }
 
-    return retcode;
+    if (track_changed)
+        gwps->display->stop_scroll();
+
+    return gui_wps_redraw(gwps, 0,
+                track_changed ? WPS_REFRESH_ALL : WPS_REFRESH_NON_STATIC);
 }
 
 
@@ -1745,7 +1721,6 @@ static void write_line(struct screen *display,
                        int line,
                        bool scroll)
 {
-
     int left_width = 0, left_xpos;
     int center_width = 0, center_xpos;
     int right_width = 0,  right_xpos;
@@ -1898,22 +1873,23 @@ static void write_line(struct screen *display,
     }
 }
 
-/* Refresh the WPS according to refresh_mode. */
-bool gui_wps_refresh(struct gui_wps *gwps,
+bool gui_wps_redraw(struct gui_wps *gwps,
                      int ffwd_offset,
-                     unsigned char refresh_mode)
+                     unsigned refresh_mode)
 {
     struct wps_data *data = gwps->data;
     struct screen *display = gwps->display;
     struct wps_state *state = gwps->state;
+    struct mp3entry *id3 = state->id3;
 
-    if(!gwps || !data || !state || !display)
+    if(!data || !state || !display || !id3)
+    {
         return false;
+    }
 
     int v, line, i, subline_idx;
-    unsigned char flags;
+    unsigned flags;
     char linebuf[MAX_PATH];
-    unsigned char vp_refresh_mode;
 
     struct align_pos align;
     align.left = NULL;
@@ -1955,12 +1931,6 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     }
 #endif
 
-    if (!state->id3)
-    {
-        display->stop_scroll();
-        return false;
-    }
-
     state->ff_rewind_count = ffwd_offset;
 
     /* disable any viewports which are conditionally displayed */
@@ -1977,8 +1947,8 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     for (v = 0; v < data->num_viewports; v++)
     {
         struct wps_viewport *wps_vp = &(data->viewports[v]);
+        unsigned vp_refresh_mode = refresh_mode;
         display->set_viewport(&wps_vp->vp);
-        vp_refresh_mode = refresh_mode;
 
 #ifdef HAVE_LCD_BITMAP
         /* Set images to not to be displayed */
@@ -2114,7 +2084,7 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     display->update();
 
 #ifdef HAVE_BACKLIGHT
-    if (global_settings.caption_backlight && state->id3)
+    if (global_settings.caption_backlight)
     {
         /* turn on backlight n seconds before track ends, and turn it off n
            seconds into the new track. n == backlight_timeout, or 5s */
@@ -2123,14 +2093,14 @@ bool gui_wps_refresh(struct gui_wps *gwps,
         if ( n < 1000 )
             n = 5000; /* use 5s if backlight is always on or off */
 
-        if (((state->id3->elapsed < 1000) ||
-             ((state->id3->length - state->id3->elapsed) < (unsigned)n)) &&
+        if (((id3->elapsed < 1000) ||
+             ((id3->length - id3->elapsed) < (unsigned)n)) &&
             (state->paused == false))
             backlight_on();
     }
 #endif
 #ifdef HAVE_REMOTE_LCD
-    if (global_settings.remote_caption_backlight && state->id3)
+    if (global_settings.remote_caption_backlight)
     {
         /* turn on remote backlight n seconds before track ends, and turn it
            off n seconds into the new track. n == remote_backlight_timeout,
@@ -2140,8 +2110,8 @@ bool gui_wps_refresh(struct gui_wps *gwps,
         if ( n < 1000 )
             n = 5000; /* use 5s if backlight is always on or off */
 
-        if (((state->id3->elapsed < 1000) ||
-             ((state->id3->length - state->id3->elapsed) < (unsigned)n)) &&
+        if (((id3->elapsed < 1000) ||
+             ((id3->length - id3->elapsed) < (unsigned)n)) &&
             (state->paused == false))
             remote_backlight_on();
     }
