@@ -8,7 +8,7 @@
  *
  * Copyright (C) 2006 Frederik M.J. Vestre
  * Based on vorbis.c codec interface:
- * Copyright (C) 2002 Bjrn Stenberg
+ * Copyright (C) 2002 Björn Stenberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
