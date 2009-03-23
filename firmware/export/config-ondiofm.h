@@ -50,9 +50,11 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x8000
 
+#ifndef BOOTLOADER
 /* Define this if you have an FM Radio */
 #define CONFIG_TUNER (S1A0903X01 | TEA5767) /* to be decided at runtime */
 #define CONFIG_TUNER_XTAL 13000000
+#endif
 
 /* Define this if you have a MAS3587F */
 #define CONFIG_CODEC MAS3587F
