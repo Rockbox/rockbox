@@ -3,83 +3,91 @@
 \section{Status Bar}
 \begin{table}
 \begin{tagmap}{}{}
-\config{\%we} & Status Bar Enabled\\
-\config{\%wd} & Status Bar Disabled\\
+\config{\%we} & Display Status Bar\\
+\config{\%wd} & Hide Status Bar\\
 \end{tagmap}
 \end{table}
 These tags override the player setting for the display of the status bar.
-They must be noted on their own line.
+They must be noted on their own line (which will not be shown in the WPS).
 
-\section{ID3 Info}
+\section{Information from the track tags}
 \begin{table}
   \begin{tagmap}{}{}
-    \config{\%ia} & ID3 Artist\\
-    \config{\%ic} & ID3 Composer\\
-    \config{\%id} & ID3 Album Name\\
-    \config{\%ig} & ID3 Genre Name\\
-    \config{\%in} & ID3 Track Number\\
-    \config{\%it} & ID3 Track Title\\
-    \config{\%iv} & ID3 Version (1.0, 1.1, 2.2, 2.3, 2.4 or empty if no id3 tag)\\
-    \config{\%iy} & ID3 Year\\
+    \config{\%ia} & Artist\\
+    \config{\%ic} & Composer\\
+    \config{\%id} & Album Name\\
+    \config{\%ig} & Genre Name\\
+    \config{\%in} & Track Number\\
+    \config{\%it} & Track Title\\
+    \config{\%iv} & ID3 version (1.0, 1.1, 2.2, 2.3, 2.4, or empty if not an ID3 tag)\\
+    \config{\%iy} & Year\\
   \end{tagmap}
 \end{table}
 Remember that this information is not always available, so use the 
 conditionals to show alternate information in preference to assuming.
 
+These tags, when written with a capital ``I'' (e.g. \config{\%Ia} or \config{\%Ic}),
+produce the information for the next song to be played.
+
 \section{Power Related Information}
 \begin{table}
   \begin{tagmap}{}{}
-    \config{\%bl} & Show numeric battery level in percent.\\
+    \config{\%bl} & Numeric battery level in percents\\
                   & Can also be used in a conditional: 
                     \config{\%?bl{\textless}-1{\textbar}0{\textbar}1{\textbar}%
-                    2{\textbar}\ldots{\textbar}N{\textgreater}}\\
-                  & Where the -1 value is used when the battery level isn't
-                        known (it usually is).\\
-    \config{\%bv} & Show the battery level in volts\\
-    \config{\%bt} & Show estimated battery time left\\
-    \config{\%bp} & ``p'' if the charger is connected \\
-                  & (only on targets that can charge batteries)\\
-    \config{\%bc} & ``c'' if the unit is currently charging the battery\\
-         & (only on targets that have software charge control or monitoring)\\
-    \config{\%bs} & Sleep timer. Shows the remaining time if the sleeptimer is set\\
+                    2{\textbar}\ldots{\textbar}N{\textgreater}},
+                    where the value $-1$ is used when the battery level isn't
+                    known (it usually is)\\
+    \config{\%bv} & The battery level in volts\\
+    \config{\%bt} & Estimated battery time left\\
+    \config{\%bp} & ``p'' if the charger is connected (only on targets
+                    that can charge batteries)\\
+    \config{\%bc} & ``c'' if the unit is currently charging the battery (only on
+                    targets that have software charge control or monitoring)\\
+    \config{\%bs} & Remaining time of the sleep timer (if it is set)\\
   \end{tagmap}
 \end{table}
 
-\section{File Info}
+\section{Information about the file}
 \begin{table}
   \begin{tagmap}{}{}
     \config{\%fb} & File Bitrate (in kbps)\\
     \config{\%fc} & File Codec (e.g. ``MP3'' or ``FLAC''). %
            This tag can also be used in a conditional tag, %
            \config{\%?fc{\textless}mp1\-{\textbar}mp2\-{\textbar}mp3\-%
-           {\textbar}aiff\-{\textbar}wav\-{\textbar}vorbis\-{\textbar}flac\-%
+           {\textbar}aiff\-{\textbar}wav\-{\textbar}ogg\-{\textbar}flac\-%
            {\textbar}mpc\-{\textbar}a52\-{\textbar}wavpack\-{\textbar}alac\-%
            {\textbar}aac\-{\textbar}shn\-{\textbar}sid\-{\textbar}adx\-%
+           {\textbar}nsf\-{\textbar}speex\-{\textbar}spc\-{\textbar}ape\-%
+           {\textbar}wma\-{\textbar}mod\-{\textbar}sap%
            {\textbar}unknown{\textgreater}}.\\
-                  & The codec order is as follows: MP1, MP2, MP3, AIFF, WAV,%
-           Ogg Vorbis (OGG), FLAC, MPC, AC3, WavPack (WV), ALAC, AAC,%
-           Shorten (SHN), SID, ADX, NSF, Speex, SPC, APE.\\
+                  & The codec order is as follows: MP1, MP2, MP3, AIFF, WAV,
+           Ogg Vorbis (OGG), FLAC, MPC, AC3, WavPack (WV), ALAC, AAC,
+           Shorten (SHN), SID, ADX, NSF, Speex, SPC, APE, WMA, MOD, SAP.\\
     \config{\%ff} & File Frequency (in Hz)\\
     \config{\%fm} & File Name\\
     \config{\%fn} & File Name (without extension)\\
     \config{\%fp} & File Path\\
-    \config{\%fs} & File Size (In Kilobytes)\\
-    \config{\%fv} & ``(avg)'' if variable bit rate or ``'' if constant bit rate\\
-    \config{\%d1} & First directory from end of file path.\\
-    \config{\%d2} & Second directory from end of file path.\\
-    \config{\%d3} & Third directory from end of file path.\\
+    \config{\%fs} & File Size (in Kilobytes)\\
+    \config{\%fv} & ``(avg)'' if variable bit rate or empty string if constant bit rate\\
+    \config{\%d1} & First directory from the end of the file path\\
+    \config{\%d2} & Second directory from the end of the file path\\
+    \config{\%d3} & Third directory from the end of the file path\\
   \end{tagmap}
 \end{table}
 Example for the \config{\%dN} commands: If the path is 
 ``/Rock/Kent/Isola/11 - 747.mp3'', \config{\%d1} is ``Isola'', 
-\config{\%d2} is ``Kent'' \dots{} You get the picture.
+\config{\%d2} is ``Kent'' and \config{\%d3} is ``Rock''.
+
+These tags, when written with the first letter capitalized (e.g. \config{\%Fn} or \config{\%D2}),
+produce the information for the next file to be played.
 
 \section{Playlist/Song Info}
 \begin{table}
   \begin{tagmap}{}{}
     \config{\%pb} & Progress Bar\\
     \opt{player}{
-          & This will display a 1 character ``cup'' %
+          & This will display a one character ``cup''
             that empties as the time progresses.}
     \opt{lcd_bitmap}{
          & This will replace the entire line with a progress bar. \\
@@ -96,14 +104,15 @@ Example for the \config{\%dN} commands: If the path is
     \config{\%pm} & Peak Meter. The entire line is used as %
                     volume peak meter.\\%
     }%
-    \config{\%pn} & Playlist Name (Without path or extension)\\
+    \config{\%pn} & Playlist Name (without path or extension)\\
     \config{\%pp} & Playlist Position\\
     \config{\%pr} & Remaining Time In Song\\
-    \config{\%ps} & Shuffle. Shows 's' if shuffle mode is enabled.\\
+    \config{\%ps} & ``s'' if shuffle mode is enabled\\
     \config{\%pt} & Total Track Time\\
-    \config{\%pv} & Current volume (x dB). Can also be used in a conditional: \\
+    \config{\%pv} & Current volume (in dB). Can also be used in a conditional: \\
          & \config{\%?pv{\textless}0{\textbar}1{\textbar}2{\textbar}\ldots%
            {\textbar}N{\textgreater}}\\
+         & 0 is used for mute, the last option is used for values greater than zero.\\
   \end{tagmap}
 \end{table}
 
@@ -111,7 +120,7 @@ Example for the \config{\%dN} commands: If the path is
 \begin{table}
   \begin{tagmap}{}{}
     \config{\%rp} & Song playcount\\
-    \config{\%rr} & Song rating (0-10). This tag can also be used in a conditional tag, %
+    \config{\%rr} & Song rating (0-10). This tag can also be used in a conditional tag: %
            \config{\%?rr{\textless}0{\textbar}1{\textbar}2{\textbar}3{\textbar}%
            4{\textbar}5{\textbar}6{\textbar}7{\textbar}8{\textbar}9{\textbar}%
            10{\textgreater}}\\
@@ -122,7 +131,7 @@ Example for the \config{\%dN} commands: If the path is
 \section{Sound (DSP) settings}
 \begin{table}
   \begin{tagmap}{}{}
-    \config{\%Sp} & Display current playback pitch \\
+    \config{\%Sp} & Current playback pitch \\
   \opt{swcodec}{
     \config{\%xf} & Crossfade setting, in the order: Off, Shuffle, Skip, Always\\
     \config{\%rg} & ReplayGain value in use (x.y dB). If used as a conditional,
@@ -164,7 +173,7 @@ Example: \config{\%?mm{\textless}Off{\textbar}All{\textbar}One{\textbar}Shuffle%
 \begin{table}
   \begin{tagmap}{}{}
     \config{\%mp} & Play status, 0-4, in the order: Stop, Play, Pause, 
-           Fast forward, Rewind\\
+           Fast Forward, Rewind\\
   \end{tagmap}
 \end{table}
 Example: \config{\%?mp{\textless}Stop{\textbar}Play{\textbar}Pause{\textbar}%
@@ -179,8 +188,8 @@ Ffwd{\textbar}Rew{\textgreater}}
 
 The tag produces the letter ``v'' while the volume is being changed and some
 amount of time after that, i.e. after the volume button has been released. The
-optional parameter \config{t} specifies that amout of time. If it is not
-specified, 1 sec is assumed.
+optional parameter \config{t} specifies that amount of time, in seconds. If it
+is not specified, 1 second is assumed.
 
 The tag can be used as the switch in a conditional tag to display different things
 depending on whether the volume is being changed. It can produce neat effects
@@ -195,11 +204,18 @@ that, it will display the volume value.
 \section{Settings}
 \begin{table}
   \begin{tagmap}{}{}
-    \config{\%St{\textbar}<setting name>{\textbar}} & Display the value of any Rockbox setting\\
+    \config{\%St{\textbar}<setting name>{\textbar}} & The value of the Rockbox
+             setting with the specified name. See \reference{ref:config_file_options}
+             for the list of the available settings.\\
   \end{tagmap}
 \end{table}
-Example: Can be used as a simple tag \config{\%St{\textbar}skip length{\textbar}} or with conditionals
-\config{\%?St{\textbar}eq enabled{\textbar}{\textless}Equalizer is enabled{\textbar}Equalizer is disabled{\textgreater}}.
+
+Examples:
+\begin{enumerate}
+\item As a simple tag: \config{\%St{\textbar}skip length{\textbar}}
+\item As a conditional: \config{\%?St{\textbar}eq enabled{\textbar}{\textless}Eq is enabled{\textbar}Eq is disabled{\textgreater}}
+\end{enumerate}
+
 
 \opt{lcd_bitmap}{
 \section{Images}
@@ -211,20 +227,20 @@ Example: Can be used as a simple tag \config{\%St{\textbar}skip length{\textbar}
           This image must be exactly the same size as your LCD.\\
     }%
     \config{\%P{\textbar}filename.bmp{\textbar}}
-        & Load a Progress bar image for the WPS. Use \config{\%pb} tag to show the 
+        & Load a Progress Bar image for the WPS. Use \config{\%pb} tag to show the 
           progress bar\\
     \config{\%x{\textbar}n{\textbar}filename{\textbar}x{\textbar}y{\textbar}}
         & Load and display an image\\
         & \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\\
-        & \config{filename}: filename relative to \fname{/.rockbox/} and including .bmp\\
+        & \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\\
         & \config{x}: x coordinate\\
         & \config{y}: y coordinate.\\
     \config{\%xl{\textbar}n{\textbar}filename{\textbar}x{\textbar}y{\textbar}[nimages{\textbar}]}
         & Preload an image for later display (useful for when your images are displayed conditionally)\\
         & \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\\
-        & \config{filename}: filename relative to \fname{/.rockbox/} and including .bmp\\
+        & \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\\
         & \config{x}: x coordinate\\
-        & \config{y}: y coordinate.\\
+        & \config{y}: y coordinate\\
         & \config{nimages}: (optional) number of sub-images (tiled vertically, of the same height)
           contained in the bitmap. Default is 1.\\
     \config{\%xdn[i]} & Display a preloaded image\\
@@ -266,8 +282,8 @@ with image ID ``M'', and then reference the individual sub-images in a condition
         & Define the settings for albumart\\
         & \config{x}: x coordinate\\
         & \config{y}: y coordinate\\
-        & \config{maxwidth}: Maximum height.\\
-        & \config{maxheight}: Maximum width.\\
+        & \config{maxwidth}: Maximum height\\
+        & \config{maxheight}: Maximum width\\
     \config{\%C}  & Display the album art as configured. This tag can also be used as a conditional.\\
   \end{tagmap}
 \end{table}
@@ -305,9 +321,9 @@ Examples:
 \section{Alignment}
 \begin{table}
   \begin{tagmap}{}{}
-    \config{\%al} & Text is left aligned\\
-    \config{\%ac} & Text is center aligned\\
-    \config{\%ar} & Text is right aligned\\
+    \config{\%al} & Align the text left\\
+    \config{\%ac} & Center the text\\
+    \config{\%ar} & Align the text right\\
   \end{tagmap}
 \end{table}
 All alignment tags may be present in one line, but they need to be in the 
@@ -330,10 +346,10 @@ order left -- center -- right. If the aligned texts overlap, they are merged.
     \begin{tagmap}{}{}
       \config{\%cd}          & Day of month\\
       \config{\%ce}          & Zero padded day of month\\
-      \config{\%cH}          & Zero padded hour from 00 to 24\\
-      \config{\%ck}          & Hour from 0 to 24\\
-      \config{\%cI}          & Zero padded hour from 12 to 12\\
-      \config{\%cl}          & Hour from 12 to 12\\
+      \config{\%cH}          & Zero padded hour from 00 to 23 (24 hour format)\\
+      \config{\%ck}          & Hour from 0 to 23 (24 hour format)\\
+      \config{\%cI}          & Zero padded hour from 12 to 12 (am/pm format)\\
+      \config{\%cl}          & Hour from 12 to 12 (am/pm format)\\
       \config{\%cm}          & Month\\
       \config{\%cM}          & Minutes\\
       \config{\%cS}          & Seconds\\
@@ -352,17 +368,16 @@ order left -- center -- right. If the aligned texts overlap, they are merged.
 \section{Other Tags}
 \begin{table}
 \begin{tagmap}{}{}
-  \config{\%\%}          & Display a `\%'\\
-  \config{\%{\textless}} & Display a `{\textless}'\\
-  \config{\%{\textbar}}  & Display a `{\textbar}'\\
-  \config{\%{\textgreater}} & Display a `{\textgreater}'\\
-  \config{\%;}           & Display a `;'\\
+  \config{\%\%}          & The character `\%'\\
+  \config{\%{\textless}} & The character `{\textless}'\\
+  \config{\%{\textbar}}  & The character `{\textbar}'\\
+  \config{\%{\textgreater}} & The character `{\textgreater}'\\
+  \config{\%;}           & The character `;'\\
   \config{\%s}           & Indicate that the line should scroll. Can occur 
                            anywhere in a line (given that the text is 
                            displayed; see conditionals above). You can specify 
-                           up to 10 scrolling lines. Scrolling lines can not 
+                           up to ten scrolling lines. Scrolling lines can not 
                            contain dynamic content such as timers, peak meters 
                            or progress bars.\\
 \end{tagmap}
 \end{table}
-
