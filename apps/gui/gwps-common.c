@@ -255,7 +255,7 @@ bool ffwd_rew(int button)
 #endif
 #ifdef HAVE_LCD_CHARCELLS
                 FOR_NB_SCREENS(i)
-                    gui_wps_redraw(gwps,0, WPS_REFRESH_ALL);
+                    gui_wps_redraw(&gui_wps[i],0, WPS_REFRESH_ALL);
 #endif
                 exit = true;
                 break;

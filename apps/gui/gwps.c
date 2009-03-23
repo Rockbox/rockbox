@@ -682,19 +682,12 @@ long gui_wps_show(void)
             ((restoretimer == RESTORE_WPS_INSTANTLY) ||
              TIME_AFTER(current_tick, restoretimer)))
         {
-            /*  restore wps backrops and statusbars */
-#if LCD_DEPTH > 1
-            show_wps_backdrop();
-#endif
-#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-            show_remote_wps_backdrop();
-#endif
             restore = false;
             restoretimer = RESTORE_WPS_INSTANTLY;
             FOR_NB_SCREENS(i)
             {
                 screens[i].stop_scroll();
-                if (!gui_wps_redraw(&gui_wps[i], 0, WPS_REFRESH_ALL))
+                if (!gui_wps_display(&gui_wps[i]))
                     exit = true;
             }
         }
