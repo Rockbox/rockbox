@@ -30,7 +30,7 @@ PLUGIN_HEADER
 /* define DUMMY if you only want to "play" with the UI, does no harm */
 /* #define DUMMY */
 
-#define LATEST_BOOTLOADER_VERSION 2 /* update this with the bootloader */
+#define LATEST_BOOTLOADER_VERSION 3 /* update this with the bootloader */
 
 #ifndef UINT8
 #define UINT8 unsigned char
