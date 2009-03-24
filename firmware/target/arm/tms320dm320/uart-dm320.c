@@ -39,8 +39,8 @@ static unsigned int uart1_recieve_count, uart1_recieve_read, uart1_recieve_write
 void uart_init(void)
 {
     // 8-N-1
-    IO_UART1_MSR=0x8000;
-    IO_UART1_BRSR=0x0057;
+    IO_UART1_MSR = 0x8000;
+    IO_UART1_BRSR = 0x0057;
     IO_UART1_RFCR = 0x8010; /* Trigger later */
     /* gio 27 is input, uart1 rx
        gio 28 is output, uart1 tx */

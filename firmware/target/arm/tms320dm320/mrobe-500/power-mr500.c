@@ -40,11 +40,16 @@ void power_init(void)
 
 unsigned int power_input_status(void)
 {
+	if(IO_GIO_BITSET1&(1<<9))
+	{
+		return POWER_INPUT_MAIN_CHARGER;
+	}
     return POWER_INPUT_NONE;
 }
 
 /* Returns true if the unit is charging the batteries. */
-bool charging_state(void) {
+bool charging_state(void) 
+{
     return false;
 }
 
@@ -67,5 +72,6 @@ void power_off(void)
     _backlight_off();
     sleep(HZ);
     /* Hard shutdown */
+    IO_GIO_DIR1&=~(1<<10);
     IO_GIO_BITSET1|=1<<10;
 }

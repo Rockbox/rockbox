@@ -24,6 +24,7 @@
 #include "arm.h"
 #include "registers.h"
 #include "ipc.h"
+#include "dma.h"
 
 volatile struct ipc_message status;
 
@@ -33,7 +34,19 @@ interrupt void handle_int0(void) {
     IFR = 1;
     acked = 1;
     waiting = 0;
-    rebuffer();
+    
+    if(dma0_stopped==0)
+   	{
+   		if(!(DMPREC&0x01))
+   		{
+   			DMPREC |= 1;
+   			audiohw_start();
+		}
+		else
+		{
+			rebuffer();
+		}
+	}
 }
 
 void startack(void)

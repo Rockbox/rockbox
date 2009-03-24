@@ -29,16 +29,18 @@
 #include "debug.h"
 #include "sprintf.h"
 #include "font.h"
-#include "pcm.h"
-#include "debug-target.h"
 #include "lcd-target.h"
-#include "dsp-target.h"
-#include "dsp/ipc.h"
 
 #ifndef CREATIVE_ZVx
 #include "tsc2100.h"
 #endif
 
+#if defined(PCM_TEST)
+/* Leaving this in for potential debugging for other targets */
+#include "pcm.h"
+#include "debug-target.h"
+#include "dsp-target.h"
+#include "dsp/ipc.h"
 #define ARM_BUFFER_SIZE (PCM_SIZE)
 
 static signed short *the_rover = (signed short *)0x1900000;
@@ -61,9 +63,11 @@ void pcmtest_get_more(unsigned char** start, size_t* size)
 	DEBUGF("pcm_sdram at 0x%08lx, sdem_addr 0x%08lx",
 		(unsigned long)the_rover, (unsigned long)sdem_addr);
 }
+#endif
 
 bool __dbg_ports(void)
 {
+#if defined(PCM_TEST)
     int fd;
     int bytes;
 
@@ -74,6 +78,7 @@ bool __dbg_ports(void)
 	DEBUGF("read %d rover bytes", bytes);
 
 	pcm_play_data(&pcmtest_get_more,(unsigned char*)the_rover, ARM_BUFFER_SIZE);
+#endif
 
     return false;
 }

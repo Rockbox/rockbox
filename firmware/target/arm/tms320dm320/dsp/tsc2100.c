@@ -35,8 +35,13 @@ void audiohw_init(void)
                                         0-bit data delay */
 }
 
-void audiohw_postinit(void)
+void audiohw_start(void)
 {
     /* Trigger first XEVT0 */
     SPCR20 |= 1;
+}
+audiohw_stop(void)
+{
+	/* Reset the transmitter */
+	SPCR20&=0xFFFE;
 }

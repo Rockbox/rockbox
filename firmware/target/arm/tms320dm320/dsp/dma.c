@@ -54,36 +54,56 @@ unsigned short last_size;
 /* This tells us which half of the DSP buffer (data) is free */
 unsigned short dma0_unlocked;
 
-int waiting=0;
+volatile unsigned short dma0_stopped=1;
+
+short waiting=0;
 /* rebuffer sets up the next SDRAM to SARAM transfer and tells the ARM when it
  * is done with a buffer.
  */
  
-/* Notes: Right now this can handle buffer sizes that are smaller even multiples
- *  of DSP_BUFFER_SIZE cleanly.  It won't fail with buffers that are larger or 
- *  non-multiples, but it won't sound right.  The upper limit on larger buffers
- *  is the size of a short.  If larger buffer sizes are needed the code on the 
- *  ARM side needs to be changed to update a full long.
+/* Notes: The upper limit on larger buffers is the size of a short.  If larger 
+ *  buffer sizes are needed the code on the ARM side needs to be changed to 
+ *  update a full long.
  */
 void rebuffer(void)
 {
 	unsigned long sdem_addr;
 	
+	if(dma0_stopped==1) /* Stop */
+	{
+		DMPREC&=0xFFFE; /* Stop MCBSP DMA0 */
+		audiohw_stop();
+		DMSFC0 = 2 << 12 | 1 << 11; 
+		sdem_level=0;
+		return;
+	}
+	
+   	if(dsp_level==DSP_BUFFER_SIZE || sdem_level==sdem_dsp_size)
+   	{
+   		if(dma0_stopped==2) /* Pause */
+		{
+			DMPREC&=0xFFFE; /* Stop MCBSP DMA0 */
+			audiohw_stop();
+			return;
+		}
+	}
+	
 	/* If the sdem_level is equal to the buffer size the ARM code gave
 	 *  (sdem_dsp_size) then reset the size and ask the arm for another buffer
 	 */
 	if(sdem_level==sdem_dsp_size)
-	{
+	{	
 		sdem_level=0;
 		
 		/* Get a new buffer (location and size) from ARM */
 		status.msg = MSG_REFILL;
 		waiting=1;
+		
 		startack();
 	}
 	
 	if(!waiting)
-	{
+	{		
 		/* Size is in bytes (but forced 32 bit transfers */
 		if( (dsp_level + (sdem_dsp_size - sdem_level) ) > DSP_BUFFER_SIZE)
 		{
@@ -130,7 +150,7 @@ void rebuffer(void)
 interrupt void handle_dma0(void) 
 {
     /* Byte offset to half-buffer locked by DMA0.
-            0 for top, PCM_SIZE/2(0x4000) for bottom */
+            0 for top, PCM_SIZE/2 for bottom */
     unsigned short dma0_locked;
     
     IFR = 1 << 6;
@@ -156,18 +176,18 @@ interrupt void handle_dmac(void) {
     
    	dsp_level+=last_size;
    	sdem_level+=last_size;
-    	
+   	
     if(dsp_level<DSP_BUFFER_SIZE)
     {
 		rebuffer();
-	}   	
+	}
 }
 
 void dma_init(void) {
     /* Configure SARAM to McBSP DMA */
     
     /* Event XEVT0, 32-bit transfers, 0 frame count */
-    DMSFC0 = 2 << 12 | 1 << 11; 
+   DMSFC0 = 2 << 12 | 1 << 11; 
     
     /* Interrupts generated, Half and full buffer.
      * ABU mode, From data space with postincrement, to data space with no 
@@ -185,6 +205,6 @@ void dma_init(void) {
     /* Set the size of the buffer */
     DMCTR0 = sizeof(data);
 
-    /* Run, Rudolf, run! (with DMA0 interrupts) */
-    DMPREC = 2 << 6 | 1;
+    /* Setup DMA0 interrupts and start the transfer */
+    DMPREC = 2 << 6;
 }

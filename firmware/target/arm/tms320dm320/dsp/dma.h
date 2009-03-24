@@ -26,4 +26,6 @@
 
 void dma_init(void);
 
+extern volatile unsigned short dma0_stopped;
+
 #endif
