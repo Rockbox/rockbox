@@ -139,8 +139,16 @@ int button_read_device(int *data)
         if (pcf50606_read(PCF5060X_ADCC1) & 0x80) /* Pen down */
         {
             unsigned char buf[3];
+
             pcf50606_write(PCF5060X_ADCC2, (0xE<<1) | 1); /* ADC start X+Y */
-            pcf50606_read_multiple(PCF5060X_ADCS1, buf, 3);
+
+            do {
+                buf[1] = pcf50606_read(PCF5060X_ADCS2);
+            } while (!(buf[1] & 0x80));        /* Busy wait on ADCRDY flag */
+
+            buf[0] = pcf50606_read(PCF5060X_ADCS1);
+            buf[2] = pcf50606_read(PCF5060X_ADCS3);
+
             pcf50606_write(PCF5060X_ADCC2, 0);            /* ADC stop */
 
             x = (buf[0] << 2) | (buf[1] & 3);
@@ -172,6 +180,7 @@ int button_read_device(int *data)
                                          (*data&0x0000ffff),
                                          data);
         }
+
         last_touch = current_tick;
         touch_available = false;
     }
