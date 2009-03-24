@@ -112,8 +112,10 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 24
 
+#ifndef BOOTLOADER
 /* Define this if you have an FM Radio */
 #define CONFIG_TUNER S1A0903X01
+#endif
 
 /* The start address index for ROM builds */
 /* #define ROM_START 0x12010 for behind original Archos */
