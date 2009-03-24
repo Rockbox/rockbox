@@ -192,3 +192,6 @@ usbstack
 wheel_acceleration
 #endif
 
+#if defined(HAVE_TOUCHSCREEN)
+touchscreen
+#endif

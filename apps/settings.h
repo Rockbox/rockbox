@@ -726,6 +726,10 @@ struct user_settings
     bool speaker_enabled;
 #endif
 
+#ifdef HAVE_TOUCHSCREEN
+    int touch_mode;
+#endif
+
     /* If values are just added to the end, no need to bump plugin API
        version. */
     /* new stuff to be added at the end */

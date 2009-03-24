@@ -12403,3 +12403,54 @@
     speaker: "Enable Speaker"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "3x3 Grid"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "3 by 3 grid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Absolute Point"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Absolute Point"
+  </voice>
+</phrase>

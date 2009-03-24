@@ -136,9 +136,6 @@ static void app_main(void)
         screens[i].update();
     }
     tree_gui_init();
-#ifdef HAVE_TOUCHSCREEN
-    touchscreen_set_mode(TOUCHSCREEN_BUTTON);
-#endif
     viewportmanager_set_statusbar(VP_SB_ALLSCREENS);
     add_event(GUI_EVENT_STATUSBAR_TOGGLE, false, 
               viewportmanager_statusbar_changed);

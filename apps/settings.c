@@ -960,6 +960,10 @@ void settings_apply(bool read_disk)
     usb_charging_enable(global_settings.usb_charging);
 #endif
 
+#ifdef HAVE_TOUCHSCREEN
+    touchscreen_set_mode(global_settings.touch_mode);
+#endif
+
     /* This should stay last */
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
     enc_global_settings_apply();
