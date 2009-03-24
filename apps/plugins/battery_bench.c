@@ -271,7 +271,7 @@ static unsigned int charge_state(void)
 #if CONFIG_CHARGING
     if (rb->charger_inserted())
         ret = BIT_CHARGER;
-#if CONFIG_CHARGING == CHARGING_MONITOR
+#if CONFIG_CHARGING >= CHARGING_MONITOR
     if (rb->charging_state())
         ret |= BIT_CHARGING;
 #endif
@@ -310,7 +310,7 @@ static bool flush_buffer(void)
                 "%02d:%02d,         %04d,   "
 #if CONFIG_CHARGING
                 "  %c"
-#if CONFIG_CHARGING == CHARGING_MONITOR
+#if CONFIG_CHARGING >= CHARGING_MONITOR
                 ",  %c"
 #endif
 #endif
@@ -324,7 +324,7 @@ static bool flush_buffer(void)
                 bat[i].voltage
 #if CONFIG_CHARGING
                 , (bat[i].flags & BIT_CHARGER) ? 'A' : '-'
-#if CONFIG_CHARGING == CHARGING_MONITOR
+#if CONFIG_CHARGING >= CHARGING_MONITOR
                 , (bat[i].flags & BIT_CHARGING) ? 'C' : '-'
 #endif
 #endif
@@ -517,7 +517,7 @@ int main(void)
 #if CONFIG_CHARGING
                 ", C:"
 #endif
-#if CONFIG_CHARGING == CHARGING_MONITOR
+#if CONFIG_CHARGING >= CHARGING_MONITOR
                 ", S:"
 #endif
 #ifdef HAVE_USB_POWER

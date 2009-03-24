@@ -519,7 +519,7 @@ static const struct plugin_api rockbox_api = {
 #endif
 #if CONFIG_CHARGING
     charger_inserted,
-# if CONFIG_CHARGING == CHARGING_MONITOR
+# if CONFIG_CHARGING >= CHARGING_MONITOR
     charging_state,
 # endif
 #endif
