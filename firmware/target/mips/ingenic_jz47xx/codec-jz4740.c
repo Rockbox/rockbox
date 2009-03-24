@@ -48,8 +48,6 @@ static int HP_register_value;
 #endif
 static bool HP_on_off_flag; 
 
-static void i2s_codec_set_samplerate(unsigned short rate);
-
 static void i2s_codec_reset(void)
 {
     REG_ICDC_CDCCR1 = (ICDC_CDCCR1_SW2ON | ICDC_CDCCR1_PDVR | ICDC_CDCCR1_PDVRA | ICDC_CDCCR1_VRCGL |
@@ -80,7 +78,7 @@ static void i2s_codec_init(void)
     
     //REG_ICDC_CDCCR2 = (ICDC_CDCCR2_AINVOL(ICDC_CDCCR2_AINVOL_DB(0)) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_48)
     REG_ICDC_CDCCR2 = ( ICDC_CDCCR2_AINVOL(14) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_44)
-                      | ICDC_CDCCR2_HPVOL(ICDC_CDCCR2_HPVOL_6));
+                      | ICDC_CDCCR2_HPVOL(ICDC_CDCCR2_HPVOL_0));
     
     REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_SUSPD | ICDC_CDCCR1_RST);
 
@@ -97,8 +95,6 @@ static void i2s_codec_init(void)
     REG_ICDC_CDCCR1 = (REG_ICDC_CDCCR1 & ~(ICDC_CDCCR1_ELININ | ICDC_CDCCR1_EMIC | ICDC_CDCCR1_EADC |
                                            ICDC_CDCCR1_SW1ON | ICDC_CDCCR1_HPMUTE)) | (ICDC_CDCCR1_EDAC
                                                                                     | ICDC_CDCCR1_SW2ON);
-    
-    REG_ICDC_CDCCR2 |= 3;
     
     HP_on_off_flag = 1; /* HP is on */
 }
@@ -265,46 +261,44 @@ static void HP_turn_off(void)
 }
 #endif
 
-static void i2s_codec_set_samplerate(unsigned short rate)
+static void i2s_codec_set_samplerate(unsigned int rate)
 {
-    unsigned short speed = 0;
+    unsigned int speed;
     
     switch (rate)
     {
         case 8000:
-            speed = 0 << 8;
+            speed = ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_8);
             break;
         case 11025:
-            speed = 1 << 8;
+            speed = ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_11);
             break;
         case 12000:
-            speed = 2 << 8;
+            speed = ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_12);
             break;
         case 16000:
-            speed = 3 << 8;
+            speed = ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_16);
             break;
         case 22050:
-            speed = 4 << 8;
+            speed = ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_22);
             break;
         case 24000:
-            speed = 5 << 8;
+            speed = ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_24);
             break;
         case 32000:
-            speed = 6 << 8;
+            speed = ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_32);
             break;
         case 44100:
-            speed = 7 << 8;
+            speed = ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_44);
             break;
         case 48000:
-            speed = 8 << 8;
+            speed = ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_48);
             break;
         default:
-            break;
+            return;
     }
-    REG_ICDC_CDCCR2 |= 0x00000f00;
-
-    speed |= 0xfffff0ff;
-    REG_ICDC_CDCCR2 &= speed;
+    REG_ICDC_CDCCR2 &= ~ICDC_CDCCR2_SMPR(0xF);
+    REG_ICDC_CDCCR2 |= speed;
 }
 
 void audiohw_mute(bool mute)
