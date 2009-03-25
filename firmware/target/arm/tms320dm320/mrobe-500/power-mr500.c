@@ -40,7 +40,8 @@ void power_init(void)
 
 unsigned int power_input_status(void)
 {
-	if(IO_GIO_BITSET1&(1<<9))
+	/* Charger is active low */
+	if(!(IO_GIO_BITSET1&(1<<9)))
 	{
 		return POWER_INPUT_MAIN_CHARGER;
 	}
