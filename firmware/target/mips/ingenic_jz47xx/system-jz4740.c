@@ -121,7 +121,6 @@ void system_enable_irq(unsigned int irq)
 static void dis_irq(unsigned int irq)
 {
     register unsigned int t;
-
     if ((irq >= IRQ_GPIO_0) && (irq <= IRQ_GPIO_0 + NUM_GPIO))
     {
         __gpio_mask_irq(irq - IRQ_GPIO_0);
@@ -161,14 +160,20 @@ static int get_irq_number(void)
     
     ipl |= REG_INTC_IPR;
     
-    if (ipl == 0)
+    if (UNLIKELY(ipl == 0))
         return -1;
 
-    for (irq = 31; irq >= 0; irq--)
-        if (ipl & (1 << irq))
-            break;
+    __asm__ __volatile__("negu  $8, %0        \n"
+                         "and   $8, %0, $8    \n"
+                         "clz   %0, %1        \n"
+                         "li    $8, 31        \n"
+                         "subu  %0, $8, %0    \n"
+                         : "=r" (irq)
+                         : "r" (ipl)
+                         : "t0"
+                        );
     
-    if (irq < 0)
+    if (UNLIKELY(irq < 0))
         return -1;
 
     ipl &= ~(1 << irq);
@@ -197,7 +202,7 @@ static int get_irq_number(void)
 
 void intr_handler(void)
 {
-    int irq = get_irq_number();
+    register int irq = get_irq_number();
     if(UNLIKELY(irq < 0))
         return;
     
@@ -313,8 +318,8 @@ static void pll_init(void)
 
     cfcr = CPM_CPCCR_CLKOEN |
         CPM_CPCCR_PCS |
-        (n2FR[div[0]] << CPM_CPCCR_CDIV_BIT) | 
-        (n2FR[div[1]] << CPM_CPCCR_HDIV_BIT) | 
+        (n2FR[div[0]] << CPM_CPCCR_CDIV_BIT) |
+        (n2FR[div[1]] << CPM_CPCCR_HDIV_BIT) |
         (n2FR[div[2]] << CPM_CPCCR_PDIV_BIT) |
         (n2FR[div[3]] << CPM_CPCCR_MDIV_BIT) |
         (n2FR[div[4]] << CPM_CPCCR_LDIV_BIT) |
@@ -327,7 +332,7 @@ static void pll_init(void)
 
     nf = CPU_FREQ * 2 / CFG_EXTAL;
     plcr1 = ((nf - 2) << CPM_CPPCR_PLLM_BIT) | /* FD */
-        (0 << CPM_CPPCR_PLLN_BIT) |    /* RD=0, NR=2 */
+        (0 << CPM_CPPCR_PLLN_BIT) |     /* RD=0, NR=2 */
         (0 << CPM_CPPCR_PLLOD_BIT) |    /* OD=0, NO=1 */
         (0x20 << CPM_CPPCR_PLLST_BIT) | /* PLL stable time */
         CPM_CPPCR_PLLEN;                /* enable PLL */          
