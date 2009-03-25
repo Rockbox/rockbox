@@ -38,17 +38,22 @@
     .align  2
     .global find_first_set_bit
     .type   find_first_set_bit, %function
+    .set    noreorder
+    .set    noat
     
 find_first_set_bit:
     beqz    a0, l                    # if(a0 == 0) goto l
+    nop                              #
     negu    t0, a0                   # t0 = -a0
     and     t0, a0, t0               # t0 = a0 & t0
-    clz     v0, a0                   # Get lead 0's count (v0=32 if all 0's)
+    clz     v0, t0                   # get lead 0's count
     li      t0, 31                   # t0 = 31
-    subu    v0, t0, v0               # v0 = t0 - v0
     jr      ra                       #
-    nop                              #
+    subu    v0, t0, v0               # v0 = t0 - v0
+
 l:
-    li      v0, 32                   # v0 = 32 (don't put this after jr ra!
-    jr      ra                       #          binutils bug?)
-    nop                              #
+    jr      ra                       #
+    li      v0, 32                   # v0 = 32
+    
+    .set    reorder
+    .set    at
