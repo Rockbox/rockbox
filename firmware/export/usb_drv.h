@@ -18,8 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef ARCOTG_DRV_H
-#define ARCOTG_DRV_H
+#ifndef _USB_DRV_H
+#define _USB_DRV_H
 #include "usb_ch9.h"
 #include "kernel.h"
 
@@ -47,4 +47,4 @@ bool usb_drv_connected(void);
 int usb_drv_request_endpoint(int dir);
 void usb_drv_release_endpoint(int ep);
 
-#endif
+#endif /* _USB_DRV_H */
