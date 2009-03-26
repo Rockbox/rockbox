@@ -48,7 +48,14 @@ follow the instructions at
 
 \nopt{gigabeats}{
 \begin{description}  
-  \item[USB connection.] To transfer Rockbox to your \dap{} you need to
+
+\nopt{ipod1g2g}{
+  \item[USB connection.]
+}
+\opt{ipod1g2g}{
+  \item[Firewire connection.]
+}
+  To transfer Rockbox to your \dap{} you need to
   connect it to your computer. For manual installation/uninstallation, or 
   should autodetection fail during automatic installation, you need to know 
   where to access the \dap{}. On Windows this means you need to know 
@@ -62,8 +69,8 @@ follow the instructions at
     then wait for it to open and then quit it. You
     also need to ensure the ``Enable use as disk'' option is enabled for
     your \dap{} in Itunes. Your \dap{} should then enter disk mode
-    automatically when connected to a
-    computer via USB. If your computer does not recognise your \dap{}, you may
+    automatically when connected to a computer via \nopt{ipod1g2g}{USB.}\opt{ipod1g2g}{Firewire.}
+    If your computer does not recognise your \dap{}, you may
     need to enter disk mode manually. Disconnect your \dap{} from the
     computer. Hard reset the \dap{} by pressing and holding the \ButtonMenu{} and
     \ButtonSelect{} buttons simultaneously. As soon as the \dap{} resets, press
