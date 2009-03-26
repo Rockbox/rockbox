@@ -12358,3 +12358,54 @@
     speaker: "Activer le haut-parleur"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Mode écran tactile"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Mode écran tactile"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Grille 3x3"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Grille 3 par 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Point absolu"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Point absolu"
+  </voice>
+</phrase>
