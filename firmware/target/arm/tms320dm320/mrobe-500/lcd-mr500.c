@@ -38,7 +38,11 @@
 extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
                                  int width, int height);
 
-static volatile bool lcd_on = true;
+static bool lcd_on = true;
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+static bool lcd_powered = true;
+#endif
+
 volatile bool lcd_poweroff = false;
 /*
 ** These are imported from lcd-16bit.c
@@ -46,10 +50,55 @@ volatile bool lcd_poweroff = false;
 extern unsigned fg_pattern;
 extern unsigned bg_pattern;
 
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 bool lcd_active(void)
 {
     return lcd_on;
 }
+#endif
+
+#if defined(HAVE_LCD_SLEEP)
+void lcd_sleep()
+{
+    if (lcd_powered)
+    {
+        /* "not powered" implies "disabled" */
+        if (lcd_on)
+            lcd_enable(false);
+    	IO_GIO_BITCLR2=1<<4;
+    	lcd_powered=false;
+    }
+}
+#endif
+
+#if defined(HAVE_LCD_ENABLE)
+void lcd_enable(bool state)
+{
+    if (state == lcd_on)
+        return;
+
+    if(state)
+    {
+        /* "enabled" implies "powered" */
+        if (!lcd_powered)
+        {
+        	lcd_powered=true;
+            IO_GIO_BITSET2=1<<4;
+            /* Wait long enough for a frame to be written - yes, it
+             * takes awhile. */
+            sleep(HZ/5);
+        }
+
+        lcd_on = true;
+        lcd_update();
+        lcd_activation_call_hook();
+    }
+    else 
+    {
+        lcd_on = false;
+    }
+}
+#endif
 
 /* LCD init - based on code from ingenient-bsp/bootloader/board/dm320/splash.c
  *  and code by Catalin Patulea from the M:Robe 500i linux port
@@ -80,6 +129,9 @@ void lcd_init_device(void)
     IO_OSD_OSDWIN0YP=0;
     IO_OSD_OSDWIN0XL=480;
     IO_OSD_OSDWIN0YL=640;
+    
+    /* Set pin 36 to an output */
+    IO_GIO_DIR2&=!(1<<4);
 }
 
 /* Update a fraction of the display. */
@@ -136,11 +188,6 @@ void lcd_update_rect(int x, int y, int width, int height)
         src+=x;
     }
 #endif
-}
-
-void lcd_enable(bool state)
-{
-    (void)state;
 }
 
 /* Update the display.
