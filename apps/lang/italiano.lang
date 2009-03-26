@@ -12332,3 +12332,54 @@
     speaker: "Abilita altoparlante"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Modo Touchscreen"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Modo Touchscreen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Griglia 3x3"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Griglia 3 per 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Punto Assoluto"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Punto Assoluto"
+  </voice>
+</phrase>
