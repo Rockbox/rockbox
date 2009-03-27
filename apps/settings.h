@@ -725,6 +725,7 @@ struct user_settings
 #ifdef HAVE_SPEAKER
     bool speaker_enabled;
 #endif
+    bool prevent_skip;
 
 #ifdef HAVE_TOUCHSCREEN
     int touch_mode;

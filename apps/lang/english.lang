@@ -12454,3 +12454,17 @@
     touchscreen: "Absolute Point"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Skipping"
+  </source>
+  <dest>
+    *: "Prevent Skipping"
+  </dest>
+  <voice>
+    *: "Prevent Skipping"
+  </voice>
+</phrase>

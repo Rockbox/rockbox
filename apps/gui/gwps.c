@@ -79,10 +79,14 @@ static void wps_state_init(void);
 
 static void prev_track(unsigned skip_thresh)
 {
-    if (!wps_state.id3 || (wps_state.id3->elapsed < skip_thresh*1000)) {
+    if (!global_settings.prevent_skip
+            && (wps_state.id3->elapsed < skip_thresh*1000))
+    {
         audio_prev();
+        return;
     }
-    else {
+    else
+    {
         if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
         {
             curr_cuesheet_skip(-1, wps_state.id3->elapsed);
@@ -107,6 +111,8 @@ static void prev_track(unsigned skip_thresh)
 
 static void next_track(void)
 {
+    if (global_settings.prevent_skip)
+        return;
     /* take care of if we're playing a cuesheet */
     if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
     {
@@ -125,19 +131,37 @@ static void play_hop(int direction)
 {
     unsigned step = ((unsigned)global_settings.skip_length*1000);
     unsigned long *elapsed = &(wps_state.id3->elapsed);
+    bool prevent_skip = global_settings.prevent_skip;
 
-    if (direction == 1 && wps_state.id3->length - *elapsed < step+1000) {
+    if (direction == 1 && wps_state.id3->length - *elapsed < step+1000)
+    {
 #if CONFIG_CODEC == SWCODEC
-        if(global_settings.beep)
-            pcmbuf_beep(1000, 150, 1500*global_settings.beep);
+        if (prevent_skip)
+        {
+            if(global_settings.beep)
+                pcmbuf_beep(1000, 150, 1500*global_settings.beep);
+        }
+        else
 #endif
+            next_track();
         return;
-    } else if ((direction == -1 && *elapsed < step)) {
-        *elapsed = 0;
-    } else {
+    }
+    else if ((direction == -1 && *elapsed < step))
+    {
+        if (!prevent_skip)
+        {
+            prev_track(3);
+            return;
+        }
+        else
+            *elapsed = 0;
+    }
+    else
+    {
         *elapsed += step * direction;
     }
-    if((audio_status() & AUDIO_STATUS_PLAY) && !wps_state.paused) {
+    if((audio_status() & AUDIO_STATUS_PLAY) && !wps_state.paused)
+    {
 #if (CONFIG_CODEC == SWCODEC)
         audio_pre_ff_rewind();
 #else
@@ -421,8 +445,7 @@ long gui_wps_show(void)
             }
                 break;
             /* fast forward 
-                OR next dir if this is straight after ACTION_WPS_SKIPNEXT
-                OR if skip length set, next track if straight after SKIPPREV. */
+                OR next dir if this is straight after ACTION_WPS_SKIPNEXT */
             case ACTION_WPS_SEEKFWD:
                 if (global_settings.party_mode)
                     break;
@@ -438,18 +461,12 @@ long gui_wps_show(void)
                         audio_next_dir();
                     }
                 }
-                else if (global_settings.skip_length > 0
-                        && current_tick -last_left < HZ) {
-                    next_track();
-                    update_track = true;
-                }
-                else ffwd_rew(ACTION_WPS_SEEKFWD);
+                else
+                    ffwd_rew(ACTION_WPS_SEEKFWD);
                 last_right = last_left = 0;
                 break;
             /* fast rewind 
-                OR prev dir if this is straight after ACTION_WPS_SKIPPREV,
-                OR if skip length set, beg of track or prev track if this is
-                straight after SKIPPREV */
+                OR prev dir if this is straight after ACTION_WPS_SKIPPREV,*/
             case ACTION_WPS_SEEKBACK:
                 if (global_settings.party_mode)
                     break;
@@ -471,13 +488,8 @@ long gui_wps_show(void)
                         audio_prev_dir();
                     }
                 }
-                else if (global_settings.skip_length > 0
-                        && current_tick -last_right < HZ)
-                {
-                    prev_track(3+global_settings.skip_length);
-                    update_track = true;
-                }
-                else ffwd_rew(ACTION_WPS_SEEKBACK);
+                else
+                    ffwd_rew(ACTION_WPS_SEEKBACK);
                 last_left = last_right = 0;
                 break;
 
