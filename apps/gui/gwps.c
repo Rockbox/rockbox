@@ -135,15 +135,15 @@ static void play_hop(int direction)
 
     if (direction == 1 && wps_state.id3->length - *elapsed < step+1000)
     {
+        if (!prevent_skip)
+            next_track();
 #if CONFIG_CODEC == SWCODEC
-        if (prevent_skip)
+        else
         {
             if(global_settings.beep)
                 pcmbuf_beep(1000, 150, 1500*global_settings.beep);
         }
-        else
 #endif
-            next_track();
         return;
     }
     else if ((direction == -1 && *elapsed < step))
