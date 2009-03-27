@@ -1467,7 +1467,7 @@ const struct settings_list settings[] = {
                    "touchscreen mode", "point,grid", NULL, 2,
                    ID2P(LANG_TOUCHSCREEN_POINT), ID2P(LANG_TOUCHSCREEN_GRID)),
 #endif
-    OFFON_SETTING(0, prevent_skip, LANG_PREVENT_SKIPPING, false, "prevent skip", NULL),
+    OFFON_SETTING(0, prevent_skip, LANG_PREVENT_SKIPPING, false, "prevent track skip", NULL),
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

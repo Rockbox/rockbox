@@ -12459,12 +12459,12 @@
   desc: in Settings -> Playback Settings
   user: core
   <source>
-    *: "Prevent Skipping"
+    *: "Prevent Track Skipping"
   </source>
   <dest>
-    *: "Prevent Skipping"
+    *: "Prevent Track Skipping"
   </dest>
   <voice>
-    *: "Prevent Skipping"
+    *: "Prevent Track Skipping"
   </voice>
 </phrase>
