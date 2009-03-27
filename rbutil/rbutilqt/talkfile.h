@@ -58,8 +58,8 @@ private:
     void doAbort(QStringList cleanupList);
     void resetProgress(int max);
     bool createDirAndFileMaps(QDir startDir,QMultiMap<QString,QString> *dirMap,QMultiMap<QString,QString> *fileMap);
-    bool voiceList(QStringList toSpeak,QString* errString);
-    bool encodeList(QStringList toEncode,QString* errString);
+    TTSStatus voiceList(QStringList toSpeak,QStringList& voicedEntries);
+    bool encodeList(QStringList toEncode,QStringList& encodedEntries);
     bool copyTalkDirFiles(QMultiMap<QString,QString> dirMap,QString* errString);
     bool copyTalkFileFiles(QMultiMap<QString,QString> fileMap,QString* errString);
     

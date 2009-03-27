@@ -26,9 +26,11 @@
 
 #include "ui_ttsexescfgfrm.h"
 #include "ui_sapicfgfrm.h"
+#include "ui_ttsfestivalcfgform.h"
 
 class RbSettings;
 class TTSSapi;
+class TTSFestival;
 
 class TTSSapiGui : public QDialog
 {
@@ -69,6 +71,34 @@ private:
     Ui::TTSExesCfgFrm ui;
     RbSettings* settings;
     QString m_name;
+};
+
+class TTSFestivalGui : public QDialog
+{
+	Q_OBJECT
+public:
+	TTSFestivalGui(TTSFestival* festival, QDialog* parent = NULL);
+
+	void showCfg();
+	void setCfg(RbSettings* sett){settings = sett;}
+
+public slots:
+	virtual void accept(void);
+	virtual void reject(void);
+	//virtual void reset(void);
+
+	void onRefreshButton();
+	void onShowDescription(int state);
+	void onBrowseServer();
+	void onBrowseClient();
+private:
+	Ui::TTSFestivalCfgFrm ui;
+	RbSettings* settings;
+	TTSFestival* festival;
+
+	void updateVoices();
+private slots:
+	void updateDescription(QString value);
 };
 
 #endif

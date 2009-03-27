@@ -33,7 +33,9 @@ void TTSBase::initTTSList()
 #if defined(Q_OS_WIN)
     ttsList["sapi"] = "Sapi TTS Engine";
 #endif
-
+#if defined(Q_OS_LINUX)
+    ttsList["festival"] = "Festival TTS Engine";
+#endif
 }
 
 // function to get a specific encoder
@@ -44,6 +46,7 @@ TTSBase* TTSBase::getTTS(QString ttsName)
         return ttsCache.value(ttsName);
 
     TTSBase* tts;
+#if defined(Q_OS_WIN)
     if(ttsName == "sapi")
     {
         tts = new TTSSapi();
@@ -51,6 +54,17 @@ TTSBase* TTSBase::getTTS(QString ttsName)
         return tts;
     }
     else 
+#endif
+#if defined(Q_OS_LINUX)
+    if (ttsName == "festival")
+    {
+    	tts = new TTSFestival();
+    	ttsCache[ttsName] = tts;
+    	return tts;
+    }
+    else
+#endif
+    if (true) // fix for OS other than WIN or LINUX
     {
         tts = new TTSExes(ttsName);
         ttsCache[ttsName] = tts;
@@ -92,7 +106,7 @@ TTSExes::TTSExes(QString name) : TTSBase()
     m_name = name;
     
     m_TemplateMap["espeak"] = "\"%exe\" %options -w \"%wavfile\" \"%text\"";
-    m_TemplateMap["flite"] = "\"%exe\" %options -o \"%wavfile\" \"%text\"";
+    m_TemplateMap["flite"] = "\"%exe\" %options -o \"%wavfile\" -t \"%text\"";
     m_TemplateMap["swift"] = "\"%exe\" %options -o \"%wavfile\" \"%text\"";
        
 }
@@ -153,8 +167,9 @@ bool TTSExes::start(QString *errStr)
     }
 }
 
-bool TTSExes::voice(QString text,QString wavfile)
+TTSStatus TTSExes::voice(QString text,QString wavfile, QString *errStr)
 {
+	(void) errStr;
     QString execstring = m_TTSTemplate;
 
     execstring.replace("%exe",m_TTSexec);
@@ -163,7 +178,7 @@ bool TTSExes::voice(QString text,QString wavfile)
     execstring.replace("%text",text);
     //qDebug() << "voicing" << execstring;
     QProcess::execute(execstring);
-    return true;
+    return NoError;
 
 }
 
@@ -304,15 +319,16 @@ QStringList TTSSapi::getVoiceList(QString language)
 
 
 
-bool TTSSapi::voice(QString text,QString wavfile)
+TTSStatus TTSSapi::voice(QString text,QString wavfile, QString *errStr)
 {
+	(void) errStr;
     QString query = "SPEAK\t"+wavfile+"\t"+text+"\r\n";
     qDebug() << "voicing" << query;
     *voicestream << query;
     *voicestream << "SYNC\tbla\r\n";
     voicestream->flush();
     voicescript->waitForReadyRead();
-    return true;
+    return NoError;
 }
 
 bool TTSSapi::stop()
@@ -349,5 +365,254 @@ bool TTSSapi::configOk()
         return false;
     return true;
 }
+/**********************************************************************
+ * TSSFestival - client-server wrapper
+ **********************************************************************/
+TTSFestival::~TTSFestival()
+{
+	stop();
+}
 
+void TTSFestival::startServer()
+{
+	if(!configOk())
+		return;
+
+	QStringList paths = settings->ttsPath("festival").split(":");
+
+	serverProcess.start(QString("%1 --server").arg(paths[0]));
+	serverProcess.waitForStarted();
+
+	queryServer("(getpid)");
+	if(serverProcess.state() == QProcess::Running)
+		qDebug() << "Festival is up and running";
+	else
+		qDebug() << "Festival failed to start";
+}
+
+void TTSFestival::ensureServerRunning()
+{
+	if(serverProcess.state() != QProcess::Running)
+	{
+		// least common denominator for all the server startup code paths
+		QProgressDialog progressDialog(tr(""), tr(""), 0, 0);
+		progressDialog.setWindowTitle(tr("Starting festival"));
+		progressDialog.setModal(true);
+		progressDialog.setLabel(0);
+		progressDialog.setCancelButton(0);
+		progressDialog.show();
+
+		QApplication::processEvents(); // actually show the dialog
+
+		startServer();
+	}
+}
+
+bool TTSFestival::start(QString* errStr)
+{
+	(void) errStr;
+	ensureServerRunning();
+	if (!settings->ttsVoice("festival").isEmpty())
+		queryServer(QString("(voice.select '%1)").arg(settings->ttsVoice("festival")));
+
+	return true;
+}
+
+bool TTSFestival::stop()
+{
+	serverProcess.terminate();
+	serverProcess.kill();
+
+	return true;
+}
+
+TTSStatus TTSFestival::voice(QString text, QString wavfile, QString* errStr)
+{
+	qDebug() << text << "->" << wavfile;
+
+	QStringList paths = settings->ttsPath("festival").split(":");
+	QString cmd = QString("%1 --server localhost --otype riff --ttw --withlisp --output \"%2\" - ").arg(paths[1]).arg(wavfile);
+	qDebug() << cmd;
+
+	QProcess clientProcess;
+	clientProcess.start(cmd);
+	clientProcess.write(QString("%1.\n").arg(text).toAscii());
+	clientProcess.waitForBytesWritten();
+	clientProcess.closeWriteChannel();
+	clientProcess.waitForReadyRead();
+	QString response = clientProcess.readAll();
+	response = response.trimmed();
+	if(!response.contains("Utterance"))
+	{
+		qDebug() << "Could not voice string: " << response;
+		*errStr = tr("engine could not voice string");
+		return Warning;
+		/* do not stop the voicing process because of a single string
+		TODO: needs proper settings */
+	}
+	clientProcess.closeReadChannel(QProcess::StandardError);
+	clientProcess.closeReadChannel(QProcess::StandardOutput);
+	clientProcess.terminate();
+	clientProcess.kill();
+
+	return NoError;
+}
+
+bool TTSFestival::configOk()
+{
+	QStringList paths = settings->ttsPath("festival").split(":");
+	if(paths.size() != 2)
+		return false;
+	bool ret = QFileInfo(paths[0]).isExecutable() &&
+		QFileInfo(paths[1]).isExecutable();
+	if(settings->ttsVoice("festival").size() > 0 && voices.size() > 0)
+		ret = ret && (voices.indexOf(settings->ttsVoice("festival")) != -1);
+	return ret;
+}
+
+void TTSFestival::showCfg()
+{
+#ifndef CONSOLE
+    TTSFestivalGui gui(this);
+#endif
+    gui.setCfg(settings);
+    gui.showCfg();
+}
+
+QStringList TTSFestival::getVoiceList()
+{
+	if(!configOk())
+		return QStringList();
+
+	if(voices.size() > 0)
+	{
+		qDebug() << "Using voice cache";
+		return voices;
+	}
+	QString response = queryServer("(voice.list)");
+
+	// get the 2nd line. It should be (<voice_name>, <voice_name>)
+	response = response.mid(response.indexOf('\n') + 1, -1);
+	response = response.left(response.indexOf('\n')).trimmed();
+
+	voices = response.mid(1, response.size()-2).split(' ');
+
+	voices.sort();
+	if (voices.size() == 1 && voices[0].size() == 0)
+		voices.removeAt(0);
+	if (voices.size() > 0)
+		qDebug() << "Voices: " << voices;
+	else
+		qDebug() << "No voices.";
+	return voices;
+}
+
+QString TTSFestival::getVoiceInfo(QString voice)
+{
+	if(!configOk())
+		return "";
+
+	if(!getVoiceList().contains(voice))
+		return "";
+
+	if(voiceDescriptions.contains(voice))
+		return voiceDescriptions[voice];
+
+	QString response = queryServer(QString("(voice.description '%1)").arg(voice), 3000);
+
+	if (response == "")
+	{
+		voiceDescriptions[voice]=tr("No description available");
+	}
+	else
+	{
+		response = response.remove(QRegExp("(description \"*\")", Qt::CaseInsensitive, QRegExp::Wildcard));
+		qDebug() << "voiceInfo w/o descr: " << response;
+		response = response.remove(')');
+		QStringList responseLines = response.split('(', QString::SkipEmptyParts);
+		responseLines.removeAt(0); // the voice name itself
+
+		QString description;
+		foreach(QString line, responseLines)
+		{
+			line = line.remove('(');
+			line = line.simplified();
+
+			line[0] = line[0].toUpper(); // capitalize the key
+
+			int firstSpace = line.indexOf(' ');
+			if (firstSpace > 0)
+			{
+				line = line.insert(firstSpace, ':'); // add a colon between the key and the value
+				line[firstSpace+2] = line[firstSpace+2].toUpper(); // capitalize the value
+			}
+
+			description += line + "\n";
+		}
+		voiceDescriptions[voice] = description.trimmed();
+	}
+	return voiceDescriptions[voice];
+}
+
+QString TTSFestival::queryServer(QString query, int timeout)
+{
+	if(!configOk())
+		return "";
+
+	ensureServerRunning();
+
+	qDebug() << "queryServer with " << query;
+	QString response;
+
+	QDateTime endTime;
+	if(timeout > 0)
+		endTime = QDateTime::currentDateTime().addMSecs(timeout);
+
+	/* Festival is *extremely* unreliable. Although at this
+	 * point we are sure that SIOD is accepting commands,
+	 * we might end up with an empty response. Hence, the loop.
+	 */
+	while(true)
+	{
+		QApplication::processEvents(QEventLoop::AllEvents, 50);
+		QTcpSocket socket;
+
+		socket.connectToHost("localhost", 1314);
+		socket.waitForConnected();
+
+		if(socket.state() == QAbstractSocket::ConnectedState)
+		{
+			socket.write(QString("%1\n").arg(query).toAscii());
+			socket.waitForBytesWritten();
+			socket.waitForReadyRead();
+
+			response = socket.readAll().trimmed();
+
+			if (response != "LP" && response != "")
+				break;
+		}
+		socket.abort();
+		socket.disconnectFromHost();
+
+		if(timeout > 0 && QDateTime::currentDateTime() >= endTime)
+			return "";
+
+		/* make sure we wait a little as we don't want to flood the server with requests */
+		QDateTime tmpEndTime = QDateTime::currentDateTime().addMSecs(500);
+		while(QDateTime::currentDateTime() < tmpEndTime)
+			QApplication::processEvents(QEventLoop::AllEvents);
+	}
+	if(response == "nil")
+		return "";
+
+	QStringList lines = response.split('\n');
+	if(lines.size() > 2)
+	{
+		lines.removeFirst();
+		lines.removeLast();
+	}
+	else
+		qDebug() << "Response too short: " << response;
+	return lines.join("\n");
+}
 

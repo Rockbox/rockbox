@@ -171,6 +171,7 @@ FORMS += rbutilqtfrm.ui \
  encexescfgfrm.ui \
  ttsexescfgfrm.ui \
  sapicfgfrm.ui \
+ ttsfestivalcfgform.ui \
  createvoicefrm.ui \
  sysinfofrm.ui
 

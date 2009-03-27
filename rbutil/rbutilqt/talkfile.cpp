@@ -34,7 +34,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     
     QMultiMap<QString,QString> fileList;
     QMultiMap<QString,QString> dirList;
-    QStringList toSpeakList;
+    QStringList toSpeakList, voicedEntries, encodedEntries;
     QString errStr;
     
     m_logger->addItem(tr("Starting Talk file generation"),LOGINFO);
@@ -103,20 +103,19 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         }
     }
     
-    // Voice entryies
+    // Voice entries
     m_logger->addItem(tr("Voicing entries..."),LOGINFO);
-    if(voiceList(toSpeakList,&errStr) == false)
+    TTSStatus voiceStatus= voiceList(toSpeakList,voicedEntries);
+    if(voiceStatus == FatalError)
     {
-        m_logger->addItem(errStr,LOGERROR);
         doAbort(toSpeakList);
         return false;
     }
     
     // Encoding Entries
     m_logger->addItem(tr("Encoding files..."),LOGINFO);
-    if(encodeList(toSpeakList,&errStr) == false)
+    if(encodeList(voicedEntries,encodedEntries) == false)
     {
-        m_logger->addItem(errStr,LOGERROR);
         doAbort(toSpeakList);
         return false;
     }
@@ -247,29 +246,45 @@ bool TalkFileCreator::createDirAndFileMaps(QDir startDir,QMultiMap<QString,QStri
 //!  \param toSpeak QStringList with the Entries to voice.
 //! \param errString pointer to where the Error cause is written
 //! \returns true on success, false on error or user abort
-bool TalkFileCreator::voiceList(QStringList toSpeak,QString* errString)
+TTSStatus TalkFileCreator::voiceList(QStringList toSpeak,QStringList& voicedEntries)
 {
     resetProgress(toSpeak.size());
+    QStringList errors;
 
+    bool warnings = false;
     for(int i=0; i < toSpeak.size(); i++)
     {
         if(m_abort)
         {
-            *errString = tr("Talk file creation aborted");
-            return false;
+            m_logger->addItem(tr("Talk file creation aborted"), LOGERROR);
+            return FatalError;
         }
         
         QString filename = QDir::tempPath()+ "/"+  toSpeak[i] + ".wav";
                 
-        if(!m_tts->voice(toSpeak[i],filename))
+        QString error;
+        TTSStatus status = m_tts->voice(toSpeak[i],filename, &error);
+        if(status == Warning)
         {
-            *errString =tr("Voicing of %s failed").arg(toSpeak[i]);
-            return false;
+        	warnings = true;
+            m_logger->addItem(tr("Voicing of %1 failed: %2").arg(toSpeak[i]).arg(error),
+            		LOGWARNING);
+        }
+        else if (status == FatalError)
+        {
+        	m_logger->addItem(tr("Voicing of %1 failed: %2").arg(toSpeak[i]).arg(error),
+        			LOGERROR);
+        	return FatalError;
         }       
+        else
+        	voicedEntries.append(toSpeak[i]);
         m_logger->setProgressValue(++m_progress);
         QCoreApplication::processEvents();
     }
-    return true;
+    if(warnings)
+    	return Warning;
+    else
+    	return NoError;
 }
 
 
@@ -279,14 +294,14 @@ bool TalkFileCreator::voiceList(QStringList toSpeak,QString* errString)
 //!  \param toSpeak QStringList with the Entries to encode.
 //! \param errString pointer to where the Error cause is written
 //! \returns true on success, false on error or user abort
-bool TalkFileCreator::encodeList(QStringList toEncode,QString* errString)
+bool TalkFileCreator::encodeList(QStringList toEncode,QStringList& encodedEntries)
 {
     resetProgress(toEncode.size());
     for(int i=0; i < toEncode.size(); i++)
     {
         if(m_abort)
         {
-            *errString = tr("Talk file creation aborted");
+        	m_logger->addItem(tr("Talk file creation aborted"), LOGERROR);
             return false;
         }
         
@@ -295,9 +310,10 @@ bool TalkFileCreator::encodeList(QStringList toEncode,QString* errString)
         
         if(!m_enc->encode(wavfilename,filename))
         {
-            *errString =tr("Encoding of %1 failed").arg(filename);
+            m_logger->addItem(tr("Encoding of %1 failed").arg(filename), LOGERROR);
             return false;
         }    
+        encodedEntries.append(toEncode[i]);
         m_logger->setProgressValue(++m_progress);
         QCoreApplication::processEvents();        
     }
@@ -327,6 +343,10 @@ bool TalkFileCreator::copyTalkDirFiles(QMultiMap<QString,QString> dirMap,QString
         }
                 
         QString source = QDir::tempPath()+ "/"+  it.value() + ".talk";
+
+        if(!QFileInfo(source).exists())
+        	continue; // this file was skipped in one of the previous steps
+
         QString target = it.key() + "/" + "_dirname.talk";
 
          // remove target if it exists, and if we should overwrite it
@@ -383,6 +403,9 @@ bool TalkFileCreator::copyTalkFileFiles(QMultiMap<QString,QString> fileMap,QStri
         else
             source = QDir::tempPath()+ "/"+  it.value() + ".talk";
         
+        if(!QFileInfo(source).exists())
+			continue; // this file was skipped in one of the previous steps
+
         // remove target if it exists, and if we should overwrite it
         if(m_overwriteTalk && QFile::exists(target))
             QFile::remove(target);

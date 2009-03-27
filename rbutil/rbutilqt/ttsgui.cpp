@@ -181,3 +181,159 @@ void TTSExesGui::browse()
     }
 }
 
+TTSFestivalGui::TTSFestivalGui(TTSFestival* api, QDialog* parent) :
+	QDialog(parent), festival(api)
+{
+    ui.setupUi(this);
+    this->setModal(true);
+    this->setDisabled(true);
+    this->show();
+
+    connect(ui.clientButton, SIGNAL(clicked()), this, SLOT(onBrowseClient()));
+    connect(ui.serverButton, SIGNAL(clicked()), this, SLOT(onBrowseServer()));
+
+    connect(ui.refreshButton, SIGNAL(clicked()), this, SLOT(onRefreshButton()));
+    connect(ui.voicesBox, SIGNAL(activated(QString)), this, SLOT(updateDescription(QString)));
+    connect(ui.showDescriptionCheckbox, SIGNAL(stateChanged(int)), this, SLOT(onShowDescription(int)));
+}
+
+void TTSFestivalGui::showCfg()
+{
+	qDebug() << "show\tpaths: " << settings->ttsPath("festival") << "\n"
+			<< "\tvoice: " << settings->ttsVoice("festival");
+
+	// will populate the voices if the paths are correct,
+	// otherwise, it will require the user to press Refresh
+	updateVoices();
+
+	// try to get config from settings
+	QStringList paths = settings->ttsPath("festival").split(":");
+	if(paths.size() == 2)
+	{
+		ui.serverPath->setText(paths[0]);
+		ui.clientPath->setText(paths[1]);
+	}
+
+	this->setEnabled(true);
+    this->exec();
+}
+
+void TTSFestivalGui::accept(void)
+{
+    //save settings in user config
+	QString newPath = QString("%1:%2").arg(ui.serverPath->text().trimmed()).arg(ui.clientPath->text().trimmed());
+	qDebug() << "set\tpaths: " << newPath << "\n\tvoice: " << ui.voicesBox->currentText();
+	settings->setTTSPath("festival", newPath);
+    settings->setTTSVoice("festival", ui.voicesBox->currentText());
+
+    settings->sync();
+
+    this->done(0);
+}
+
+void TTSFestivalGui::reject(void)
+{
+    this->done(0);
+}
+
+void TTSFestivalGui::onBrowseClient()
+{
+	BrowseDirtree browser(this);
+	browser.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+
+	QFileInfo currentPath(ui.clientPath->text().trimmed());
+	if(currentPath.isDir())
+	{
+		browser.setDir(ui.clientPath->text());
+	}
+	else if (currentPath.isFile())
+	{
+		browser.setDir(currentPath.dir().absolutePath());
+	}
+	if(browser.exec() == QDialog::Accepted)
+	{
+		qDebug() << browser.getSelected();
+		QString exe = browser.getSelected();
+		if(!QFileInfo(exe).isExecutable())
+			return;
+		ui.clientPath->setText(exe);
+	}
+}
+
+void TTSFestivalGui::onBrowseServer()
+{
+	BrowseDirtree browser(this);
+	browser.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+
+	QFileInfo currentPath(ui.serverPath->text().trimmed());
+	if(currentPath.isDir())
+	{
+		browser.setDir(ui.serverPath->text());
+	}
+	else if (currentPath.isFile())
+	{
+		browser.setDir(currentPath.dir().absolutePath());
+	}
+	if(browser.exec() == QDialog::Accepted)
+	{
+		qDebug() << browser.getSelected();
+		QString exe = browser.getSelected();
+		if(!QFileInfo(exe).isExecutable())
+			return;
+		ui.serverPath->setText(exe);
+	}
+}
+
+void TTSFestivalGui::onRefreshButton()
+{
+	/* Temporarily commit the settings so that we get the new path when we check for voices */
+	QString newPath = QString("%1:%2").arg(ui.serverPath->text().trimmed()).arg(ui.clientPath->text().trimmed());
+	QString oldPath = settings->ttsPath("festival");
+	qDebug() << "new path: " << newPath << "\n" << "old path: " << oldPath << "\nuse new: " << (newPath != oldPath);
+
+	if(newPath != oldPath)
+	{
+		qDebug() << "Using new paths for getVoiceList";
+		settings->setTTSPath("festival", newPath);
+		settings->sync();
+	}
+
+	updateVoices();
+
+	if(newPath != oldPath)
+	{
+		settings->setTTSPath("festival", oldPath);
+		settings->sync();
+	}
+}
+
+void TTSFestivalGui::onShowDescription(int state)
+{
+	if(state == Qt::Unchecked)
+		ui.descriptionLabel->setText("");
+	else
+		updateDescription(ui.voicesBox->currentText());
+}
+
+void TTSFestivalGui::updateVoices()
+{
+	ui.voicesBox->clear();
+	ui.voicesBox->addItem(tr("Loading.."));
+
+	QStringList voiceList = festival->getVoiceList();
+	ui.voicesBox->clear();
+	ui.voicesBox->addItems(voiceList);
+
+	ui.voicesBox->setCurrentIndex(ui.voicesBox->findText(settings->ttsVoice("festival")));
+
+	updateDescription(settings->ttsVoice("festival"));
+}
+
+void TTSFestivalGui::updateDescription(QString value)
+{
+	if(ui.showDescriptionCheckbox->checkState() == Qt::Checked)
+	{
+		ui.descriptionLabel->setText(tr("Querying festival"));
+		ui.descriptionLabel->setText(festival->getVoiceInfo(value));
+	}
+}

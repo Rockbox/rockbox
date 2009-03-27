@@ -230,7 +230,10 @@ void VoiceFileCreator::downloadDone(bool error)
            
             m_logger->addItem(tr("creating ")+toSpeak,LOGINFO);
             QCoreApplication::processEvents();
-            m_tts->voice(toSpeak,wavname); // generate wav
+
+            // TODO: add support for aborting the operation
+            QString errStr;
+            m_tts->voice(toSpeak,wavname, &errStr); // generate wav
         }
         
         // todo strip

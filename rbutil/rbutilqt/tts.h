@@ -23,9 +23,13 @@
 #ifndef TTS_H
 #define TTS_H
 
-
 #include "rbsettings.h"
 #include <QtCore>
+#include <QProcess>
+#include <QProgressDialog>
+#include <QDateTime>
+#include <QRegExp>
+#include <QTcpSocket>
 
 #ifndef CONSOLE
 #include "ttsgui.h"
@@ -33,14 +37,18 @@
 #include "ttsguicli.h"
 #endif
 
-
+enum TTSStatus{ FatalError, NoError, Warning };
+class TTSSapi;
+#if defined(Q_OS_LINUX)
+class TTSFestival;
+#endif
 class TTSBase : public QObject
 {
     Q_OBJECT
     public:
         TTSBase();
-        virtual bool voice(QString text,QString wavfile)
-            { (void)text; (void)wavfile; return false; }
+        virtual TTSStatus voice(QString text,QString wavfile, QString* errStr)
+        { (void) text; (void) wavfile; (void) errStr; return FatalError;}
         virtual bool start(QString *errStr) { (void)errStr; return false; }
         virtual bool stop() { return false; }
         virtual void showCfg(){}
@@ -72,7 +80,7 @@ class TTSSapi : public TTSBase
  Q_OBJECT
     public:
         TTSSapi();
-        virtual bool voice(QString text,QString wavfile);
+        virtual TTSStatus voice(QString text,QString wavfile, QString *errStr);
         virtual bool start(QString *errStr);
         virtual bool stop();
         virtual void showCfg();
@@ -99,7 +107,7 @@ class TTSExes : public TTSBase
     Q_OBJECT
     public:
         TTSExes(QString name);
-        virtual bool voice(QString text,QString wavfile);
+        virtual TTSStatus voice(QString text,QString wavfile, QString *errStr);
         virtual bool start(QString *errStr);
         virtual bool stop() {return true;}
         virtual void showCfg();
@@ -113,6 +121,28 @@ class TTSExes : public TTSBase
         QString m_TTSOpts;
         QString m_TTSTemplate;
         QMap<QString,QString> m_TemplateMap;
+};
+
+class TTSFestival : public TTSBase
+{
+	Q_OBJECT
+public:
+	~TTSFestival();
+	virtual bool configOk();
+	virtual bool start(QString *errStr);
+	virtual bool stop();
+	virtual void showCfg();
+	virtual TTSStatus voice(QString text,QString wavfile,  QString *errStr);
+
+	QStringList  getVoiceList();
+	QString 	 getVoiceInfo(QString voice);
+private:
+	inline void	startServer();
+	inline void	ensureServerRunning();
+	QString	queryServer(QString query, int timeout = -1);
+	QProcess serverProcess;
+	QStringList voices;
+	QMap<QString, QString> voiceDescriptions;
 };
 
 #endif
