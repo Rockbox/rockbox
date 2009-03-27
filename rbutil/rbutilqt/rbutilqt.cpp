@@ -511,7 +511,7 @@ bool RbUtilQt::installAuto()
 {
     QString file = QString("%1/%2/rockbox-%3-%4.zip")
             .arg(settings->releaseUrl(), versmap.value("rel_rev"),
-               settings->curPlatform(), versmap.value("rel_rev"));
+               settings->curBuildserver_Modelname(), versmap.value("rel_rev"));
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
     buildInfo.close();
@@ -649,8 +649,8 @@ void RbUtilQt::installBootloader()
     // special case for H10 pure: this player can have a different
     // bootloader file filename. This is handled here to keep the install
     // class clean, though having it here is also not the nicest solution.
-    if(settings->curPlatformName() == "h10_ums"
-        || settings->curPlatformName() == "h10_mtp") {
+    if(platform == "h10_ums"
+        || platform == "h10_mtp") {
         if(resolvePathCase(blfile).isEmpty())
             blfile = settings->mountpoint()
                 + settings->curBootloaderName().replace("H10",
@@ -681,7 +681,7 @@ void RbUtilQt::installBootloader()
     else if(bl->installed() == BootloaderInstallBase::BootloaderOther
         && bl->capabilities() & BootloaderInstallBase::Backup)
     {
-        QString targetFolder = settings->curPlatformName() + " Firmware Backup";
+        QString targetFolder = settings->curPlatform() + " Firmware Backup";
         // remove invalid character(s)
         targetFolder.remove(QRegExp("[:/]"));
         if(QMessageBox::question(this, tr("Create Bootloader backup"),
@@ -842,7 +842,7 @@ void RbUtilQt::installVoice()
 
     QString voiceurl = settings->voiceUrl();
 
-    voiceurl += settings->curVoiceName() + "-" +
+    voiceurl += settings->curConfigure_Modelname() + "-" +
         versmap.value("arch_date") + "-english.zip";
     qDebug() << voiceurl;
 
@@ -981,8 +981,8 @@ void RbUtilQt::uninstallBootloader(void)
     }
 
     QString blfile = settings->mountpoint() + settings->curBootloaderFile();
-    if(settings->curPlatformName() == "h10_ums"
-        || settings->curPlatformName() == "h10_mtp") {
+    if(settings->curPlatform() == "h10_ums"
+        || settings->curPlatform() == "h10_mtp") {
         if(resolvePathCase(blfile).isEmpty())
             blfile = settings->mountpoint()
                 + settings->curBootloaderName().replace("H10",

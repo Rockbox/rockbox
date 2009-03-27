@@ -227,9 +227,9 @@ QString RbSettings::curPlatform()
     return userSettings->value("platform").toString();
 }
 
-QString RbSettings::curPlatformName()
+QString RbSettings::curBuildserver_Modelname()
 {
-    return deviceSettingCurGet("platform").toString();
+    return deviceSettingCurGet("buidserver_modelname").toString();
 }
 
 QString RbSettings::curManual()
@@ -253,9 +253,9 @@ QString RbSettings::curBootloaderFile()
     return deviceSettingCurGet("bootloaderfile").toString();
 }
 
-QString RbSettings::curVoiceName()
+QString RbSettings::curConfigure_Modelname()
 {
-    return deviceSettingCurGet("voicename").toString();
+    return deviceSettingCurGet("configure_modelname").toString();
 }
 
 QString RbSettings::curLang()

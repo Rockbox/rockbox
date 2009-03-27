@@ -92,12 +92,12 @@ class RbSettings : public QObject
 
         QString curBrand();
         QString curName();
-        QString curPlatform();
-        QString curPlatformName();
+        QString curPlatform();              // rbutil internal target name.
+        QString curBuildserver_Modelname(); // modelnames used by the buildserver 
         QString curManual();
         QString curBootloaderMethod();
         QString curBootloaderName();
-        QString curVoiceName();
+        QString curConfigure_Modelname();   // modelname from configure (used for themes, voice, rockbox-info comparing. 
         QString curLang();
         QString curEncoder();
         QString curTTS();

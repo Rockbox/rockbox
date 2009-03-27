@@ -402,11 +402,11 @@ QString Detect::check(RbSettings* settings, bool permission)
 
     // Check TargetId
     QString installed = installedTarget(settings->mountpoint());
-    if(!installed.isEmpty() && installed != settings->curPlatform())
+    if(!installed.isEmpty() && installed != settings->curConfigure_Modelname())
     {
         text += QObject::tr("<li>Target mismatch detected.\n"
                 "Installed target: %1, selected target: %2.</li>")
-            .arg(settings->name(installed), settings->curName());
+            .arg(installed, settings->curName());    
     }
 
     if(!text.isEmpty())

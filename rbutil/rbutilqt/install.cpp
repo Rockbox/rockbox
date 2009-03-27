@@ -101,7 +101,7 @@ void Install::accept()
     }
 
     QString myversion;
-    QString buildname = settings->curPlatformName();
+    QString buildname = settings->curBuildserver_Modelname();
     if(ui.radioStable->isChecked()) {
         file = QString("%1/%2/rockbox-%3-%4.zip")
                 .arg(settings->releaseUrl(), version.value("rel_rev"),

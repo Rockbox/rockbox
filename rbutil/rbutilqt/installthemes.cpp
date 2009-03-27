@@ -59,8 +59,8 @@ void ThemesInstallWindow::downloadInfo()
     themesInfo.close();
 
     QUrl url;
-    url = QUrl(settings->themeUrl() + "/rbutilqt.php?res="
-                + settings->curResolution());
+    url = QUrl(settings->themeUrl() + "/rbutilqt.php?target="
+                + settings->curConfigure_Modelname());
     qDebug() << "downloadInfo()" << url;
     qDebug() << url.queryItems();
     if(settings->cacheOffline())
@@ -159,10 +159,10 @@ void ThemesInstallWindow::updateDetails(int row)
     ui.themePreview->clear();
     ui.themePreview->setText(tr("fetching preview ..."));
 
-    int size = 0;
+    double size = 0;
 
     iniDetails.beginGroup(ui.listThemes->item(row)->data(Qt::UserRole).toString());
-    size += iniDetails.value("size").toInt();
+    size += iniDetails.value("size").toDouble();
     qDebug() << ui.listThemes->item(row)->data(Qt::UserRole).toString() << size;
     iniDetails.endGroup();
     ui.labelSize->setText(tr("Download size %L1 kiB").arg(size));
