@@ -59,6 +59,7 @@ PLUGIN_HEADER
 #define JEWELS_LEFT   BUTTON_LEFT
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_SELECT
+#define JEWELS_MENU   BUTTON_MODE
 #define JEWELS_CANCEL BUTTON_OFF
 #define JEWELS_RC_CANCEL BUTTON_RC_STOP
 
@@ -133,6 +134,7 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define JEWELS_LEFT   BUTTON_LEFT
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_SELECT
+#define JEWELS_MENU   BUTTON_MENU
 #define JEWELS_CANCEL BUTTON_BACK
 
 #elif CONFIG_KEYPAD == MROBE100_PAD
@@ -355,7 +357,7 @@ struct jewels_menu {
     {"Jewels", false, 0, 6,
         {{"New Game",    MRES_NEW},
          {"Puzzle",      MRES_PUZZLE},
-         {"Resume Game", MRES_RESUME},
+         {"Resume Saved Game", MRES_RESUME},
          {"High Scores", MRES_SCORES},
          {"Help",        MRES_HELP},
          {"Quit",        MRES_QUIT}}},
@@ -1904,6 +1906,9 @@ static int jewels_main(struct game_context* bj) {
                 }
                 break;
 
+#ifdef JEWELS_MENU
+            case JEWELS_MENU:
+#endif
             case (JEWELS_SELECT|BUTTON_REPEAT): /* show menu */
                 if(!inmenu) inmenu = true;
                 break;
