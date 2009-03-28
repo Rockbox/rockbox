@@ -32,8 +32,10 @@
 #define SAMPLE_RATE SAMPR_44        /* 44100 */
 #endif
 
-#ifdef CPU_PP /* the pp based targets can't handle too many voices
-                 mainly because they have to use 44100Hz sample rate */
+/* Some of the pp based targets can't handle too many voices
+   mainly because they have to use 44100Hz sample rate, this could be
+   improved to increase MAX_VOICES for targets that can do 22kHz */
+#ifdef CPU_PP
 #define MAX_VOICES 16
 #else
 #define MAX_VOICES 24 /* Note: 24 midi channels is the minimum general midi spec implementation */
@@ -166,6 +168,8 @@ extern struct GPatch * drumSet[128];
 
 extern struct MIDIfile * mf;
 
-extern int numberOfSamples;
+extern int number_of_samples;
+extern int playing_time IBSS_ATTR;
+extern int samples_this_second IBSS_ATTR;
 extern long bpm;
 

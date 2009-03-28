@@ -29,24 +29,7 @@ PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
 
 /* variable button definitions */
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define BTN_QUIT     BUTTON_OFF
-#define BTN_RIGHT    BUTTON_RIGHT
-#define BTN_UP       BUTTON_UP
-#define BTN_DOWN     BUTTON_DOWN
-#define BTN_LEFT     BUTTON_LEFT
-#define BTN_PLAY     BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define BTN_QUIT         BUTTON_OFF
-#define BTN_RIGHT        BUTTON_RIGHT
-#define BTN_UP           BUTTON_UP
-#define BTN_DOWN         BUTTON_DOWN
-#define BTN_LEFT         BUTTON_LEFT
-#define BTN_PLAY         (BUTTON_MENU | BUTTON_OFF)
-
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define BTN_QUIT         BUTTON_OFF
 #define BTN_RIGHT        BUTTON_RIGHT
 #define BTN_UP           BUTTON_UP
@@ -209,27 +192,223 @@ PLUGIN_IRAM_DECLARE
 
 struct MIDIfile * mf IBSS_ATTR;
 
-int numberOfSamples IBSS_ATTR; /* the number of samples in the current tick */
-int playingTime IBSS_ATTR;  /* How many seconds into the file have we been playing? */
-int samplesThisSecond IBSS_ATTR;    /* How many samples produced during this second so far? */
-
+int number_of_samples IBSS_ATTR; /* the number of samples in the current tick */
+int playing_time IBSS_ATTR;  /* How many seconds into the file have we been playing? */
+int samples_this_second IBSS_ATTR;    /* How many samples produced during this second so far? */
 long bpm IBSS_ATTR;
 
 int32_t gmbuf[BUF_SIZE*NBUF];
 static unsigned int samples_in_buf;
 
-int quit=0;
+bool quit = false;
+bool swap = false;
+bool lastswap = true;
 
-static int midimain(const void * filename);
+static inline void synthbuf(void)
+{
+    int32_t *outptr;
+    int i = BUF_SIZE;
+
+#ifndef SYNC
+    if (lastswap == swap)
+        return;
+    lastswap = swap;
+
+    outptr = (swap ? gmbuf : gmbuf+BUF_SIZE);
+#else
+    outptr = gmbuf;
+#endif
+
+    /* synth samples for as many whole ticks as we can fit in the buffer */
+    for (; i >= number_of_samples; i -= number_of_samples)
+    {
+        synthSamples((int32_t*)outptr, number_of_samples);
+        outptr += number_of_samples;
+#ifndef SYNC
+        /* synthbuf is called in interrupt context is SYNC is defined so it cannot yield
+           that bug causing the sim to crach when not using SYNC should really be fixed */
+        rb->yield();
+#endif
+        if (tick() == 0)
+            quit = true;
+    }
+
+    /* how many samples did we write to the buffer? */
+    samples_in_buf = BUF_SIZE-i;
+}
+
+void get_more(unsigned char** start, size_t* size)
+{
+#ifndef SYNC
+    if(lastswap != swap)
+    {
+        printf("Buffer miss!"); /* Comment out the printf to make missses less noticable. */
+    }
+
+#else
+    synthbuf();  /* For some reason midiplayer crashes when an update is forced */
+#endif
+
+    *size = samples_in_buf*sizeof(int32_t);
+#ifndef SYNC
+    *start = (unsigned char*)((swap ? gmbuf : gmbuf + BUF_SIZE));
+    swap = !swap;
+#else
+    *start = (unsigned char*)(gmbuf);
+#endif
+}
+
+static int midimain(const void * filename)
+{
+    int a, notes_used, vol;
+    bool is_playing = true;  /* false = paused */
+
+    printf("Loading file");
+    mf = loadFile(filename);
+
+    if (mf == NULL)
+    {
+        printf("Error loading file.");
+        return -1;
+    }
+
+    if (initSynth(mf, ROCKBOX_DIR "/patchset/patchset.cfg",
+        ROCKBOX_DIR "/patchset/drums.cfg") == -1)
+        return -1;
+
+    rb->pcm_play_stop();
+#if INPUT_SRC_CAPS != 0
+    /* Select playback */
+    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
+#endif
+    rb->pcm_set_frequency(SAMPLE_RATE); /* 44100 22050 11025 */
+
+    /*
+        * tick() will do one MIDI clock tick. Then, there's a loop here that
+        * will generate the right number of samples per MIDI tick. The whole
+        * MIDI playback is timed in terms of this value.. there are no forced
+        * delays or anything. It just produces enough samples for each tick, and
+        * the playback of these samples is what makes the timings right.
+        *
+        * This seems to work quite well. On a laptop, anyway.
+        */
+
+    printf("Okay, starting sequencing");
+
+    bpm = mf->div*1000000/tempo;
+    number_of_samples = SAMPLE_RATE/bpm;
+
+    /* Skip over any junk in the beginning of the file, so start playing */
+    /* after the first note event */
+    do
+    {
+        notes_used = 0;
+        for (a = 0; a < MAX_VOICES; a++)
+            if (voices[a].isUsed)
+                notes_used++;
+        tick();
+    } while (notes_used == 0);
+
+    playing_time = 0;
+    samples_this_second = 0;
+
+    synthbuf();
+    rb->pcm_play_data(&get_more, NULL, 0);
+
+    while (!quit)
+    {
+    #ifndef SYNC
+        synthbuf();
+    #endif
+        rb->yield();
+
+        /* Prevent idle poweroff */
+        rb->reset_poweroff_timer();
+
+        /* Code taken from Oscilloscope plugin */
+        switch (rb->button_get(false))
+        {
+            case BTN_UP:
+            case BTN_UP | BUTTON_REPEAT:
+            {
+                vol = rb->global_settings->volume;
+                if (vol < rb->sound_max(SOUND_VOLUME))
+                {
+                    vol++;
+                    rb->sound_set(SOUND_VOLUME, vol);
+                    rb->global_settings->volume = vol;
+                }
+                break;
+            }
+
+            case BTN_DOWN:
+            case BTN_DOWN | BUTTON_REPEAT:
+            {
+                vol = rb->global_settings->volume;
+                if (vol > rb->sound_min(SOUND_VOLUME))
+                {
+                    vol--;
+                    rb->sound_set(SOUND_VOLUME, vol);
+                    rb->global_settings->volume = vol;
+                }
+                break;
+            }
+
+            case BTN_LEFT:
+            {
+                /* Rewinding is tricky. Basically start the file over */
+                /* but run through the tracks without the synth running */
+                rb->pcm_play_stop();
+                seekBackward(5);
+                printf("Rewind to %d:%02d\n", playing_time/60, playing_time%60);
+                if (is_playing)
+                    rb->pcm_play_data(&get_more, NULL, 0);
+                break;
+            }
+
+            case BTN_RIGHT:
+            {
+                rb->pcm_play_stop();
+                seekForward(5);
+                printf("Skip to %d:%02d\n", playing_time/60, playing_time%60);
+                if (is_playing)
+                    rb->pcm_play_data(&get_more, NULL, 0);
+                break;
+            }
+
+            case BTN_PLAY:
+            {
+                if (is_playing)
+                {
+                    printf("Paused at %d:%02d\n", playing_time/60, playing_time%60);
+                    is_playing = false;
+                    rb->pcm_play_stop();
+                } else
+                {
+                    printf("Playing from %d:%02d\n", playing_time/60, playing_time%60);
+                    is_playing = true;
+                    rb->pcm_play_data(&get_more, NULL, 0);
+                }
+                break;
+            }
+
+#ifdef BTN_RC_QUIT
+            case BTN_RC_QUIT:
+#endif
+            case BTN_QUIT:
+                quit = true;
+        }
+    }
+    return 0;
+}
 
 enum plugin_status plugin_start(const void* parameter)
 {
-    int retval = 0;
-
-
+    int retval;
     PLUGIN_IRAM_INIT(rb)
 
-    if(parameter == NULL)
+    if (parameter == NULL)
     {
         rb->splash(HZ*2, " Play .MID file ");
         return PLUGIN_OK;
@@ -261,210 +440,8 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
     rb->splash(HZ, "FINISHED PLAYING");
 
-    if(retval == -1)
+    if (retval == -1)
         return PLUGIN_ERROR;
     return PLUGIN_OK;
 }
 
-bool swap=0;
-bool lastswap=1;
-
-static inline void synthbuf(void)
-{
-    int32_t *outptr;
-    int i=BUF_SIZE;
-
-#ifndef SYNC
-    if(lastswap==swap) return;
-    lastswap=swap;
-
-    outptr=(swap ? gmbuf : gmbuf+BUF_SIZE);
-#else
-    outptr=gmbuf;
-#endif
-
-    /* synth samples for as many whole ticks as we can fit in the buffer */
-    for(; i >= numberOfSamples; i -= numberOfSamples)
-    {
-        synthSamples((int32_t*)outptr, numberOfSamples);
-        outptr += numberOfSamples;
-        if( tick() == 0 )
-            quit=1;
-    }
-
-    /* how many samples did we write to the buffer? */
-    samples_in_buf = BUF_SIZE-i;
-
-}
-
-void get_more(unsigned char** start, size_t* size)
-{
-#ifndef SYNC
-    if(lastswap!=swap)
-    {
-        printf("Buffer miss!"); // Comment out the printf to make missses less noticable.
-    }
-
-#else
-    synthbuf();  // For some reason midiplayer crashes when an update is forced
-#endif
-
-    *size = samples_in_buf*sizeof(int32_t);
-#ifndef SYNC
-    *start = (unsigned char*)((swap ? gmbuf : gmbuf + BUF_SIZE));
-    swap=!swap;
-#else
-    *start = (unsigned char*)(gmbuf);
-#endif
-}
-
-static int midimain(const void * filename)
-{
-    int notesUsed = 0;
-    int a=0;
-    printf("Loading file");
-    mf= loadFile(filename);
-
-    if(mf == NULL)
-    {
-        printf("Error loading file.");
-        return -1;
-    }
-
-    if (initSynth(mf, ROCKBOX_DIR "/patchset/patchset.cfg",
-        ROCKBOX_DIR "/patchset/drums.cfg") == -1)
-        return -1;
-
-    rb->pcm_play_stop();
-#if INPUT_SRC_CAPS != 0
-    /* Select playback */
-    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
-    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
-#endif
-    rb->pcm_set_frequency(SAMPLE_RATE); // 44100 22050 11025
-
-    /*
-        * tick() will do one MIDI clock tick. Then, there's a loop here that
-        * will generate the right number of samples per MIDI tick. The whole
-        * MIDI playback is timed in terms of this value.. there are no forced
-        * delays or anything. It just produces enough samples for each tick, and
-        * the playback of these samples is what makes the timings right.
-        *
-        * This seems to work quite well. On a laptop, anyway.
-        */
-
-    printf("Okay, starting sequencing");
-
-    bpm=mf->div*1000000/tempo;
-    numberOfSamples=SAMPLE_RATE/bpm;
-
-
-
-    /* Skip over any junk in the beginning of the file, so start playing */
-    /* after the first note event */
-    do
-    {
-        notesUsed = 0;
-        for(a=0; a<MAX_VOICES; a++)
-            if(voices[a].isUsed)
-                notesUsed++;
-        tick();
-    } while(notesUsed == 0);
-
-    playingTime = 0;
-    samplesThisSecond = 0;
-
-    synthbuf();
-    rb->pcm_play_data(&get_more, NULL, 0);
-
-    int isPlaying = 1;  /* 0 = paused */
-    int vol=0;
-
-    while(!quit)
-    {
-    #ifndef SYNC
-        synthbuf();
-    #endif
-        rb->yield();
-
-        /* Prevent idle poweroff */
-        rb->reset_poweroff_timer();
-
-        /* Code taken from Oscilloscope plugin */
-        switch(rb->button_get(false))
-        {
-                case BTN_UP:
-                case BTN_UP | BUTTON_REPEAT:
-                    vol = rb->global_settings->volume;
-                    if (vol < rb->sound_max(SOUND_VOLUME))
-                    {
-                        vol++;
-                        rb->sound_set(SOUND_VOLUME, vol);
-                        rb->global_settings->volume = vol;
-                    }
-                    break;
-
-                case BTN_DOWN:
-                case BTN_DOWN | BUTTON_REPEAT:
-                    vol = rb->global_settings->volume;
-                    if (vol > rb->sound_min(SOUND_VOLUME))
-                    {
-                        vol--;
-                        rb->sound_set(SOUND_VOLUME, vol);
-                        rb->global_settings->volume = vol;
-                    }
-                    break;
-
-
-                case BTN_LEFT:
-                {
-                    /* Rewinding is tricky. Basically start the file over */
-                    /* but run through the tracks without the synth running */
-                    rb->pcm_play_stop();
-                    seekBackward(5);
-                    printf("Rewind to %d:%02d\n", playingTime/60, playingTime%60);
-
-                    if(isPlaying)
-                        rb->pcm_play_data(&get_more, NULL, 0);
-                    break;
-                }
-
-                case BTN_RIGHT:
-                {
-                    rb->pcm_play_stop();
-                    seekForward(5);
-                    printf("Skip to %d:%02d\n", playingTime/60, playingTime%60);
-
-                    if(isPlaying)
-                        rb->pcm_play_data(&get_more, NULL, 0);
-                    break;
-                }
-
-                case BTN_PLAY:
-                {
-                    if(isPlaying == 1)
-                    {
-                        printf("Paused at %d:%02d\n", playingTime/60, playingTime%60);
-                        isPlaying = 0;
-                        rb->pcm_play_stop();
-                    } else
-                    {
-                        printf("Playing from %d:%02d\n", playingTime/60, playingTime%60);
-                        isPlaying = 1;
-                        rb->pcm_play_data(&get_more, NULL, 0);
-                    }
-                    break;
-                }
-
-#ifdef BTN_RC_QUIT
-                case BTN_RC_QUIT:
-#endif
-                case BTN_QUIT:
-                    quit=1;
-        }
-
-
-    }
-
-    return 0;
-}

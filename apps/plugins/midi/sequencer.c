@@ -23,10 +23,7 @@
 #include "guspat.h"
 #include "synth.h"
 
-extern int playingTime IBSS_ATTR;
-extern int samplesThisSecond IBSS_ATTR;
-
-long tempo=375000;
+long tempo = 375000;
 
 /* From the old patch config.... each patch is scaled.
  * Should be moved into patchset.cfg
@@ -62,13 +59,13 @@ static inline void setVolScale(int a)
 
 static inline void setVol(int ch, int vol)
 {
-    int a=0;
-    chVol[ch]=vol;
+    int a;
+    chVol[ch] = vol;
 
     /* If channel volume changes, we need to recalculate the volume scale */
     /* factor for all voices active on this channel                       */
-    for(a=0; a<MAX_VOICES; a++)
-        if(voices[a].ch == ch)
+    for (a = 0; a < MAX_VOICES; a++)
+        if (voices[a].ch == ch)
             setVolScale(a);
 }
 
@@ -76,8 +73,6 @@ static inline void setPatch(int ch, int pat)
 {
     chPat[ch]=pat;
 }
-
-
 
 /*
     This is the new pitch bend table. There are 512 entries.
@@ -143,11 +138,12 @@ const uint32_t pitchTbl[] ICONST_ATTR={
 
 static void findDelta(struct SynthObject * so, int ch, int note)
 {
-    struct GWaveform * wf = patchSet[chPat[ch]]->waveforms[patchSet[chPat[ch]]->noteTable[note]];
-    so->wf=wf;
+    struct GWaveform * wf =
+        patchSet[chPat[ch]]->waveforms[patchSet[chPat[ch]]->noteTable[note]];
+    so->wf = wf;
 
     /* Used to be unsigned int, but math had to be done in different order to avoid overflow */
-    unsigned long long delta= 0;
+    unsigned long long delta = 0;
 
 /*
     Old formula:
@@ -169,10 +165,10 @@ static void findDelta(struct SynthObject * so, int ch, int note)
 
 static inline void computeDeltas(int ch)
 {
-    int a=0;
-    for(a = 0; a<MAX_VOICES; a++)
+    int a;
+    for (a = 0; a < MAX_VOICES; a++)
     {
-        if(voices[a].isUsed && voices[a].ch == ch)
+        if (voices[a].isUsed && voices[a].ch == ch)
         {
             findDelta(&voices[a], ch, voices[a].note);
         }
@@ -212,16 +208,16 @@ inline void pressNote(int ch, int note, int vol)
     if(ch == 14) return;
     if(ch == 15) return;
 */
-    int a=0;
-    for(a=0; a<MAX_VOICES; a++)
+    int a;
+    for (a = 0; a < MAX_VOICES; a++)
     {
-        if(voices[a].ch == ch && voices[a].note == note)
+        if (voices[a].ch == ch && voices[a].note == note)
             break;
 
-        if(!voices[a].isUsed)
+        if (!voices[a].isUsed)
             break;
     }
-    if(a==MAX_VOICES)
+    if (a == MAX_VOICES)
     {
 //        printf("\nVoice kill");
 //        printf("\nToo many voices playing at once. No more left");
@@ -229,17 +225,17 @@ inline void pressNote(int ch, int note, int vol)
 //        for(a=0; a<48; a++)
 //            printf("\n#%d  Ch=%d  Note=%d  curRate=%d   curOffset=%d   curPoint=%d   targetOffset=%d", a, voices[a].ch, voices[a].note, voices[a].curRate, voices[a].curOffset, voices[a].curPoint, voices[a].targetOffset);
         lastKill++;
-        if(lastKill == MAX_VOICES)
+        if (lastKill == MAX_VOICES)
             lastKill = 0;
         a = lastKill;
 //        return; /* None available */
     }
-    voices[a].ch=ch;
-    voices[a].note=note;
-    voices[a].vol=vol;
-    voices[a].cp=0;
-    voices[a].state=STATE_ATTACK;
-    voices[a].decay=255;
+    voices[a].ch = ch;
+    voices[a].note = note;
+    voices[a].vol = vol;
+    voices[a].cp = 0;
+    voices[a].state = STATE_ATTACK;
+    voices[a].decay = 255;
 
     setVolScale(a);
 
@@ -251,28 +247,28 @@ inline void pressNote(int ch, int note, int vol)
      * sr = WAVE sampling rate
      */
 
-    if(ch!=9)
+    if (ch != 9)
     {
         findDelta(&voices[a], ch, note);
         /* Turn it on */
-        voices[a].isUsed=true;
+        voices[a].isUsed = true;
         setPoint(&voices[a], 0);
     } else
     {
-        if(drumSet[note]!=NULL)
+        if (drumSet[note] != NULL)
         {
-            if(note<35)
+            if (note < 35)
                 printf("NOTE LESS THAN 35, AND A DRUM PATCH EXISTS FOR THIS? WHAT THE HELL?");
 
             struct GWaveform * wf = drumSet[note]->waveforms[0];
-            voices[a].wf=wf;
+            voices[a].wf = wf;
             voices[a].delta = (((gustable[note]<<FRACTSIZE) / wf->rootFreq) * wf->sampRate / SAMPLE_RATE);
-            if(wf->mode & 28)
+            if (wf->mode & 28)
 //                printf("\nWoah, a drum patch has a loop. Stripping the loop...");
             wf->mode = wf->mode & (255-28);
 
             /* Turn it on */
-            voices[a].isUsed=true;
+            voices[a].isUsed = true;
             setPoint(&voices[a], 0);
 
         } else
@@ -284,16 +280,15 @@ inline void pressNote(int ch, int note, int vol)
 
 static void releaseNote(int ch, int note)
 {
-
-    if(ch==9)
+    if (ch == 9)
         return;
 
-    int a=0;
-    for(a=0; a<MAX_VOICES; a++)
+    int a;
+    for (a = 0; a < MAX_VOICES; a++)
     {
-        if(voices[a].ch == ch && voices[a].note == note)
+        if (voices[a].ch == ch && voices[a].note == note)
         {
-            if((voices[a].wf->mode & 28))
+            if (voices[a].wf->mode & 28)
             {
                 setPoint(&voices[a], 3);
             }
@@ -306,10 +301,10 @@ static void sendEvent(struct Event * ev)
     const unsigned char status_low = ev->status & 0x0F;
     const unsigned char d1 = ev->d1;
     const unsigned char d2 = ev->d2;
-    switch(ev->status & 0xF0)
+    switch (ev->status & 0xF0)
     {
         case MIDI_CONTROL:
-            switch(d1)
+            switch (d1)
             {
                 case CTRL_VOLUME:
                 {
@@ -318,7 +313,7 @@ static void sendEvent(struct Event * ev)
                 }
                 case CTRL_PANNING:
                 {
-                    chPan[status_low]=d2;
+                    chPan[status_low] = d2;
                     return;
                 }
                 case CTRL_DATAENT_MSB:
@@ -365,7 +360,7 @@ static void sendEvent(struct Event * ev)
             return;
 
         case MIDI_NOTE_ON:
-            switch(d2)
+            switch (d2)
             {
                 case 0: /* Release by vol=0 */
                     releaseNote(status_low, d1);
@@ -381,139 +376,131 @@ static void sendEvent(struct Event * ev)
             return;
 
         case MIDI_PRGM:
-            if((status_low) != 9)
+            if (status_low != 9)
                 setPatch(status_low, d1);
     }
 }
 
 void rewindFile(void)
 {
-    int i=0;
-    for(i=0; i<mf->numTracks; i++)
+    int i;
+    for (i = 0; i < mf->numTracks; i++)
     {
         mf->tracks[i]->delta = 0;
         mf->tracks[i]->pos = 0;
     }
 }
 
-
 int tick(void) ICODE_ATTR;
-
-void seekBackward(int nsec)
-{
-    int notesUsed = 0, a=0;
-    int desiredTime = playingTime - nsec;  /* Rewind 5 sec */
-
-    if(desiredTime < 0)
-        desiredTime = 0;
-
-    /* Set controllers to default values */
-    resetControllers();
-
-    /* Set the tempo to defalt */
-    bpm=mf->div*1000000/tempo;
-    numberOfSamples=SAMPLE_RATE/bpm;
-
-
-    /* Reset the tracks to start */
-    rewindFile();
-
-    /* Reset the time counter to 0 */
-    playingTime = 0;
-    samplesThisSecond = 0;
-
-    /* Quickly run through any initial things that occur before notes */
-    do
-    {
-        notesUsed = 0;
-        for(a=0; a<MAX_VOICES; a++)
-            if(voices[a].isUsed)
-                notesUsed++;
-        tick();
-    } while(notesUsed == 0);
-
-    /* Reset the time counter to 0 */
-    playingTime = 0;
-    samplesThisSecond = 0;
-
-    /* Tick until goal is reached */
-    while(playingTime < desiredTime)
-        tick();
-}
-
-
-void seekForward(int nsec)
-{
-    int desiredTime = playingTime + nsec;
-    while(tick() && playingTime < desiredTime);
-}
-
 int tick(void)
 {
-    if(mf==NULL)
+    if (mf == NULL)
         return 0;
 
-    int a=0;
-    int tracksAdv=0;
-    for(a=0; a<mf->numTracks; a++)
+    int a, tracksAdv=0;
+    for (a = 0; a < mf->numTracks; a++)
     {
         struct Track * tr = mf->tracks[a];
 
-        if(tr == NULL)
+        if (tr == NULL)
             printf("NULL TRACK: %d", a);
-
 
         //BIG DEBUG STATEMENT
         //printf("\nTrack %2d,  Event = %4d of %4d,   Delta = %5d,    Next = %4d", a, tr->pos, tr->numEvents, tr->delta, getEvent(tr, tr->pos)->delta);
 
-
-        if(tr != NULL && (tr->pos < tr->numEvents))
+        if (tr != NULL && (tr->pos < tr->numEvents))
         {
             tr->delta++;
             tracksAdv++;
-            while(getEvent(tr, tr->pos)->delta <= tr->delta)
+            while (getEvent(tr, tr->pos)->delta <= tr->delta)
             {
                 struct Event * e = getEvent(tr, tr->pos);
 
-                if(e->status != 0xFF)
+                if (e->status != 0xFF)
                 {
                     sendEvent(e);
-                    if(((e->status&0xF0) == MIDI_PRGM))
+                    if ((e->status&0xF0) == MIDI_PRGM)
                     {
 /*                        printf("\nPatch Event, patch[%d] ==> %d", e->status&0xF, e->d1); */
                     }
                 }
                 else
                 {
-                    if(e->d1 == 0x51)
+                    if (e->d1 == 0x51)
                     {
                         tempo = (((short)e->evData[0])<<16)|(((short)e->evData[1])<<8)|(e->evData[2]);
 /*                        printf("\nMeta-Event: Tempo Set = %d", tempo); */
                         bpm=mf->div*1000000/tempo;
-                        numberOfSamples=SAMPLE_RATE/bpm;
+                        number_of_samples=SAMPLE_RATE/bpm;
 
                     }
                 }
                 tr->delta = 0;
                 tr->pos++;
-                if(tr->pos>=(tr->numEvents-1))
+                if (tr->pos >= (tr->numEvents-1))
                     break;
             }
         }
     }
 
-    samplesThisSecond += numberOfSamples;
+    samples_this_second += number_of_samples;
 
-    while(samplesThisSecond >= SAMPLE_RATE)
+    while (samples_this_second >= SAMPLE_RATE)
     {
-        samplesThisSecond -= SAMPLE_RATE;
-        playingTime++;
-//         printf("Time: %d sec\n", playingTime);
+        samples_this_second -= SAMPLE_RATE;
+        playing_time++;
     }
 
-    if(tracksAdv != 0)
+    if (tracksAdv != 0)
         return 1;
     else
         return 0;
+}
+
+void seekBackward(int nsec)
+{
+    int notes_used, a;
+    int desired_time = playing_time - nsec;  /* Rewind 5 sec */
+
+    if (desired_time < 0)
+        desired_time = 0;
+
+    /* Set controllers to default values */
+    resetControllers();
+
+    /* Set the tempo to defalt */
+    bpm = mf->div*1000000/tempo;
+    number_of_samples = SAMPLE_RATE/bpm;
+
+    /* Reset the tracks to start */
+    rewindFile();
+
+    /* Reset the time counter to 0 */
+    playing_time = 0;
+    samples_this_second = 0;
+
+    /* Quickly run through any initial things that occur before notes */
+    do
+    {
+        notes_used = 0;
+        for (a = 0; a < MAX_VOICES; a++)
+            if (voices[a].isUsed)
+                notes_used++;
+        tick();
+    } while (notes_used == 0);
+
+    /* Reset the time counter to 0 */
+    playing_time = 0;
+    samples_this_second = 0;
+
+    /* Tick until goal is reached */
+    while (playing_time < desired_time)
+        tick();
+}
+
+void seekForward(int nsec)
+{
+    int desired_time = playing_time + nsec;
+    while (tick() && playing_time < desired_time);
 }
 
