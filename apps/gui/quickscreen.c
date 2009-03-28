@@ -44,7 +44,7 @@ static struct viewport vps[NB_SCREENS][QUICKSCREEN_ITEM_COUNT];
 static struct viewport vp_icons[NB_SCREENS];
 /* vp_icons will be used like this:
    the side icons will be aligned to the top of this vp and to their sides
-   the bottom icon wil be aligned center and at the bottom of this vp */
+   the bottom icon will be aligned center and at the bottom of this vp */
 
 #define MIN_LINES 4
 #define MAX_NEEDED_LINES 8
@@ -69,7 +69,7 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
 
     /* center the icons VP first */
     vp_icons[screen] = *parent;
-    vp_icons[screen].width = CENTER_ICONAREA_WIDTH; /* abosulte smallest allowed */
+    vp_icons[screen].width = CENTER_ICONAREA_WIDTH; /* absolute smallest allowed */
     vp_icons[screen].x = parent->x + (parent->width / 2 - CENTER_ICONAREA_WIDTH / 2);
 
     vps[screen][QUICKSCREEN_BOTTOM] = *parent;
