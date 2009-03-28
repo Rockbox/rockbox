@@ -27,7 +27,6 @@
 
 PLUGIN_HEADER
 
-#if defined(HAVE_BACKLIGHT)
 /* variable button definitions - only targets with a colour display */
 #if defined(HAVE_LCD_COLOR)
 #if (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -241,4 +240,4 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
     return PLUGIN_OK;
 }
-#endif
+
