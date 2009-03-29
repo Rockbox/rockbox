@@ -133,7 +133,7 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
 
             /* Calculate track length (in ms) and estimate the bitrate 
                (in kbit/s) */
-            fc->length = (fc->totalsamples / fc->samplerate) * 1000;
+            fc->length = ((int64_t) fc->totalsamples * 1000) / fc->samplerate;
 
             found_streaminfo=true;
         } else if ((buf[0] & 0x7f) == 3) { /* 3 is the SEEKTABLE block */
