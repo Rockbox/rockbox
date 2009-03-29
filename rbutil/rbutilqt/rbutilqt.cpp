@@ -181,7 +181,7 @@ void RbUtilQt::downloadDone(bool error)
     versmap.insert("arch_date", info.value("dailies/date").toString());
 
     info.beginGroup("release");
-    versmap.insert("rel_rev", info.value(settings->curPlatform()).toString());
+    versmap.insert("rel_rev", info.value(settings->curBuildserver_Modelname()).toString());
     info.endGroup();
 
     if(versmap.value("rel_rev").isEmpty()) {
