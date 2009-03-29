@@ -1086,11 +1086,11 @@ static int star_menu(void)
                                   "[REC] Next level", true);
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
                 star_display_text("KEYS\n\n"
-                                  "[MENU] Toggle Control\n"
-                                  "[A] Exit\n"
-                                  "[PWR+DOWN] Prev. level\n"
-                                  "[PWR+RIGHT] Reset level\n"
-                                  "[PWR+UP] Next level", true);
+                                  "[SELECT] Toggle Control\n"
+                                  "[POWER] Exit\n"
+                                  "[VOL DOWN] Prev. level\n"
+                                  "[A] Reset level\n"
+                                  "[VOL UP] Next level", true);
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
                 star_display_text("KEYS\n\n"
                                   "[REW] Toggle Ctl\n"
@@ -1098,6 +1098,13 @@ static int star_menu(void)
                                   "[PLAY+DOWN] Prev. level\n"
                                   "[PLAY+RIGHT] Reset level\n"
                                   "[PLAY+UP] Next level", true);
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+                star_display_text("KEYS\n\n"
+                                  "[SELECT] Toggle Control\n"
+                                  "[BACK] Exit\n"
+                                  "[VOL DOWN] Prev. level\n"
+                                  "[MENU] Reset level\n"
+                                  "[VOL UP] Next level", true);
 #endif
 #ifdef HAVE_TOUCHSCREEN
                 star_display_text("KEYS\n\n"

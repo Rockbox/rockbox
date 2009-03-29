@@ -1335,6 +1335,13 @@ static int sokoban_menu(void)
                 rb->lcd_putsxy(3, 36, "[SELECT+DOWN] Previous Level");
                 rb->lcd_putsxy(3, 46, "[SELECT+RIGHT] Restart Level");
                 rb->lcd_putsxy(3, 56, "[SELECT+UP] Next Level");
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+                rb->lcd_putsxy(3,  6, "[MENU] Menu");
+                rb->lcd_putsxy(3, 16, "[VOL+] Undo");
+                rb->lcd_putsxy(3, 26, "[VOL-] Redo");
+                rb->lcd_putsxy(3, 36, "[PREV] Previous Level");
+                rb->lcd_putsxy(3, 46, "[PLAY] Restart Level");
+                rb->lcd_putsxy(3, 56, "[NEXT] Next Level");
 #endif
 
 #ifdef HAVE_TOUCHSCREEN

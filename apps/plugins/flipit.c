@@ -722,6 +722,12 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_putsxy(2, 28, "[PL-LEFT] shuffle");
     rb->lcd_putsxy(2, 38, "[PL-RIGHT] solution");
     rb->lcd_putsxy(2, 48, "[PL-UP] step by step");
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+    rb->lcd_putsxy(2, 8, "[BACK] to stop");
+    rb->lcd_putsxy(2, 18, "[SELECT] toggle");
+    rb->lcd_putsxy(2, 28, "[MENU] shuffle");
+    rb->lcd_putsxy(2, 38, "[VOL+] solution");
+    rb->lcd_putsxy(2, 48, "[VOL-] step by step");
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
       (CONFIG_KEYPAD == SANSA_C200_PAD)
     rb->lcd_putsxy(2, 8, "[POWER] to stop");

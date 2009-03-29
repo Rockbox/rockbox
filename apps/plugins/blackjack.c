@@ -1258,18 +1258,28 @@ static unsigned int blackjack_menu(struct game_context* bj) {
             rb->lcd_puts(0, 3, "POWER to exit");
             rb->lcd_puts(0, 4, "VOL+ to hit");
             rb->lcd_puts(0, 5, "VOL- to stay");
-            rb->lcd_puts(0, 6, "CENTER to double down");
-            rb->lcd_puts(0, 6, "RIGHT to view highscores ");
+            rb->lcd_puts(0, 6, "SELECT to double down");
+            rb->lcd_puts(0, 7, "RIGHT to view highscores ");
+            rb->lcd_puts(0, 8, "MENU to save/resume");
+            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
+            rb->lcd_puts(0, 9, str);
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+            rb->lcd_puts(0, 2, "PLAY to start");
+            rb->lcd_puts(0, 3, "BACK to exit");
+            rb->lcd_puts(0, 4, "VOL+ to hit");
+            rb->lcd_puts(0, 5, "VOL- to stay");
+            rb->lcd_puts(0, 6, "SELECT to double down");
+            rb->lcd_puts(0, 7, "RIGHT to view highscores ");
             rb->lcd_puts(0, 8, "MENU to save/resume");
             rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
             rb->lcd_puts(0, 9, str);
 #elif CONFIG_KEYPAD == MROBE100_PAD
-            rb->lcd_puts(0, 2, "CENTER to start");
+            rb->lcd_puts(0, 2, "SELECT to start");
             rb->lcd_puts(0, 3, "POWER to exit");
             rb->lcd_puts(0, 4, "MENU to hit");
             rb->lcd_puts(0, 5, "DISPLAY to stay");
             rb->lcd_puts(0, 6, "DOWN to double down");
-            rb->lcd_puts(0, 6, "RIGHT to view highscores ");
+            rb->lcd_puts(0, 7, "RIGHT to view highscores ");
             rb->lcd_puts(0, 8, "PLAY to save/resume");
             rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
             rb->lcd_puts(0, 9, str);

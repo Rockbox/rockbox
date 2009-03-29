@@ -682,7 +682,7 @@ enum plugin_status plugin_start(
         rb->lcd_putsxy(0, 28, "[REC] shuffle");
         rb->lcd_putsxy(0, 38, "[PLAY] change pic");
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-        rb->lcd_putsxy(0, 18, "[OFF] to stop");
+        rb->lcd_putsxy(0, 18, "[POWER] to stop");
         rb->lcd_putsxy(0, 28, "[SELECT] shuffle");
         rb->lcd_putsxy(0, 38, "[A] change pic");
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
@@ -694,6 +694,10 @@ enum plugin_status plugin_start(
         rb->lcd_putsxy(0, 18, "[OFF] to stop");
         rb->lcd_putsxy(0, 28, "[REW] shuffle");
         rb->lcd_putsxy(0, 38, "[PLAY] change pic");
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+        rb->lcd_putsxy(0, 18, "[BACK] to stop");
+        rb->lcd_putsxy(0, 28, "[SELECT] shuffle");
+        rb->lcd_putsxy(0, 38, "[MENU] change pic");
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
         rb->lcd_putsxy(0, 18, "[REC] to stop");
         rb->lcd_putsxy(0, 28, "[MODE] shuffle");
