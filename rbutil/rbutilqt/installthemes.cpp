@@ -142,7 +142,9 @@ void ThemesInstallWindow::downloadDone(bool error)
             msg = iniDetails.value("status/msg." + lang).toString();
         else
             msg = iniDetails.value("status/msg").toString();
-        QMessageBox::information(this, tr("Information"), msg);
+        qDebug() << "[Themes] MOTD" << msg;
+        if(!msg.isEmpty())
+            QMessageBox::information(this, tr("Information"), msg);
     }
 }
 
