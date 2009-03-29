@@ -868,7 +868,7 @@ static void transfer_completed(void)
                 }
                 int length=0;
                 struct transfer_descriptor* td=&td_array[pipe*NUM_TDS_PER_EP];
-                while(td!=DTD_NEXT_TERMINATE && td!=0)
+                while(td!=(struct transfer_descriptor*)DTD_NEXT_TERMINATE && td!=0)
                 {
                     length += ((td->reserved & DTD_RESERVED_LENGTH_MASK) - 
                         ((td->size_ioc_sts & DTD_PACKET_SIZE) >> DTD_LENGTH_BIT_POS));
