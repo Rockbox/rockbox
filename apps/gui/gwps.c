@@ -255,18 +255,11 @@ long gui_wps_show(void)
     {
         wps_state.id3 = audio_current_track();
         wps_state.nid3 = audio_next_track();
-        if (wps_state.id3) {
-            FOR_NB_SCREENS(i)
-            {
-                if (!gui_wps_display(&gui_wps[i]))
-                    exit = true;
-            }
-        }
+        restore = true; /* force initial full redraw */
     }
-    
+
     while ( 1 )
     {
-        yield();
         bool audio_paused = (audio_status() & AUDIO_STATUS_PAUSE)?true:false;
 
         /* did someone else (i.e power thread) change audio pause mode? */
@@ -328,10 +321,9 @@ long gui_wps_show(void)
             button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,HZ/5);
         }
 
-        /* Exit if audio has stopped playing. This can happen if using the
-           sleep timer with the charger plugged or if starting a recording
-           from F1 */
-        if (!audio_status())
+        /* Exit if audio has stopped playing. This happens e.g. at end of
+           playlist or if using the sleep timer. */
+        if (!(audio_status() & AUDIO_STATUS_PLAY))
             exit = true;
 /* The iPods/X5/M5 use a single button for the A-B mode markers,
    defined as ACTION_WPSAB_SINGLE in their config files. */
@@ -684,13 +676,12 @@ long gui_wps_show(void)
         {
             FOR_NB_SCREENS(i)
             {
-                if(!gui_wps_update(&gui_wps[i]))
-                    exit = true;
+                gui_wps_update(&gui_wps[i]);
             }
             update_track = false;
         }
 
-        if (restore &&
+        if (restore && wps_state.id3 &&
             ((restoretimer == RESTORE_WPS_INSTANTLY) ||
              TIME_AFTER(current_tick, restoretimer)))
         {
@@ -699,8 +690,7 @@ long gui_wps_show(void)
             FOR_NB_SCREENS(i)
             {
                 screens[i].stop_scroll();
-                if (!gui_wps_display(&gui_wps[i]))
-                    exit = true;
+                gui_wps_display(&gui_wps[i]);
             }
         }
 
