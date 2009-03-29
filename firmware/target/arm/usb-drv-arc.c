@@ -308,6 +308,10 @@
 #define DTD_RESERVED_PIPE_OFFSET             20
 /*-------------------------------------------------------------------------*/
 
+/* 4 transfer descriptors per endpoint allow 64k transfers, which is the usual MSC
+   transfer size, so it seems like a good size */
+#define NUM_TDS_PER_EP 4
+
 /* manual: 32.13.2 Endpoint Transfer Descriptor (dTD) */
 struct transfer_descriptor {
     unsigned int next_td_ptr;           /* Next TD pointer(31-5), T(0) set
@@ -322,7 +326,7 @@ struct transfer_descriptor {
     unsigned int reserved;
 } __attribute__ ((packed));
 
-static struct transfer_descriptor td_array[USB_NUM_ENDPOINTS*2]
+static struct transfer_descriptor td_array[USB_NUM_ENDPOINTS*2*NUM_TDS_PER_EP]
     USB_DEVBSS_ATTR __attribute__((aligned(32)));
 
 /* manual: 32.13.1 Endpoint Queue Head (dQH) */
@@ -665,7 +669,7 @@ static int prime_transfer(int endpoint, void* ptr, int len, bool send, bool wait
     unsigned int mask = pipe2mask[pipe];
     struct queue_head* qh = &qh_array[pipe];
     static long last_tick;
-    struct transfer_descriptor* new_td;
+    struct transfer_descriptor* new_td,*cur_td,*prev_td;
 
     int oldlevel = disable_irq_save();
 /*
@@ -674,11 +678,23 @@ static int prime_transfer(int endpoint, void* ptr, int len, bool send, bool wait
     }
 */
     qh->status = 0;
-    qh->length = 0;
     qh->wait   = wait;
 
-    new_td=&td_array[pipe];
-    prepare_td(new_td, 0, ptr, len,pipe);
+    new_td=&td_array[pipe*NUM_TDS_PER_EP];
+    cur_td=new_td;
+    prev_td=0;
+    int tdlen;
+
+    do
+    {
+        tdlen=MIN(len,16384);
+        prepare_td(cur_td, prev_td, ptr, tdlen,pipe);
+        ptr+=tdlen;
+        prev_td=cur_td;
+        cur_td++;
+        len-=tdlen;
+    }
+    while(len>0 );
     //logf("starting ep %d %s",endpoint,send?"send":"receive");
 
     qh->dtd.next_td_ptr = (unsigned int)new_td;
@@ -807,6 +823,7 @@ static void prepare_td(struct transfer_descriptor* td,
 
     if (previous_td != 0) {
         previous_td->next_td_ptr=(unsigned int)td;
+        previous_td->size_ioc_sts&=~DTD_IOC;
     }
 }
 
@@ -845,27 +862,19 @@ static void transfer_completed(void)
             int pipe = ep * 2 + dir;
             if (mask & pipe2mask[pipe]) {
                 struct queue_head* qh = &qh_array[pipe];
-                struct transfer_descriptor *td = &td_array[pipe];
-
-                if(td->size_ioc_sts & DTD_STATUS_ACTIVE) {
-                    /* TODO this shouldn't happen, but...*/
-                    break;
-                }
-                if((td->size_ioc_sts & DTD_PACKET_SIZE) >> DTD_LENGTH_BIT_POS != 0 && dir==0) {
-                    /* We got less data than we asked for. */
-                }
-                qh->length = (td->reserved & DTD_RESERVED_LENGTH_MASK) - 
-                    ((td->size_ioc_sts & DTD_PACKET_SIZE) >> DTD_LENGTH_BIT_POS);
-                if(td->size_ioc_sts & DTD_ERROR_MASK) {
-                    logf("pipe %d err %x", pipe, td->size_ioc_sts & DTD_ERROR_MASK);
-                    qh->status |= td->size_ioc_sts & DTD_ERROR_MASK;
-                    /* TODO we need to handle this somehow. Flush the endpoint ? */
-                }
                 if(qh->wait) {
                     qh->wait=0;
                     wakeup_signal(&transfer_completion_signal[pipe]);
                 }
-                usb_core_transfer_complete(ep, dir?USB_DIR_IN:USB_DIR_OUT, qh->status, qh->length);
+                int length=0;
+                struct transfer_descriptor* td=&td_array[pipe*NUM_TDS_PER_EP];
+                while(td!=DTD_NEXT_TERMINATE && td!=0)
+                {
+                    length += ((td->reserved & DTD_RESERVED_LENGTH_MASK) - 
+                        ((td->size_ioc_sts & DTD_PACKET_SIZE) >> DTD_LENGTH_BIT_POS));
+                    td=(struct transfer_descriptor*) td->next_td_ptr;
+                }
+                usb_core_transfer_complete(ep, dir?USB_DIR_IN:USB_DIR_OUT, qh->status, length);
             }
         }
     }

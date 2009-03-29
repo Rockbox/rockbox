@@ -46,11 +46,12 @@
 
 #define SECTOR_SIZE 512
 
-/* We can currently use up to 20k buffer size. More than that requires
- * transfer chaining in the driver. Tests on sansa c200 show that the 16k
- * limitation causes no more than 2% slowdown.
+/* the ARC driver currently supports up to 64k USB transfers. This is
+ * enough for efficient mass storage support, as commonly host OSes
+ * don't do larger SCSI transfers anyway, so larger USB transfers
+ * wouldn't buy us anything.
  */
-#define BUFFER_SIZE 16384
+#define BUFFER_SIZE 65536
 
 /* bulk-only class specific requests */
 #define USB_BULK_RESET_REQUEST   0xff
