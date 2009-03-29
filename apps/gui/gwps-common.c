@@ -1880,12 +1880,14 @@ bool gui_wps_redraw(struct gui_wps *gwps,
     struct wps_data *data = gwps->data;
     struct screen *display = gwps->display;
     struct wps_state *state = gwps->state;
+
+    if (!data || !state || !display)
+        return false;
+
     struct mp3entry *id3 = state->id3;
 
-    if(!data || !state || !display || !id3)
-    {
+    if (!id3)
         return false;
-    }
 
     int v, line, i, subline_idx;
     unsigned flags;
