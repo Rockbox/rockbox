@@ -427,7 +427,15 @@ void lcd_init_device(void)
 
     LCD_REG_6 |= 1; /* Start DMA */
 }
+
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+bool lcd_active(void)
+{
+    return display_on;
+}
+#endif
+
+#if defined(HAVE_LCD_ENABLE)
 void lcd_enable(bool on)
 {
     if (on == display_on)
@@ -450,12 +458,9 @@ void lcd_enable(bool on)
         DEV_EN &= ~DEV_LCD; /* Disable LCD controller */
     }
 }
-
-bool lcd_active(void)
-{
-    return display_on;
-}
 #endif
+
+#if defined(HAVE_LCD_SLEEP)
 void lcd_sleep(void)
 {
     LCD_REG_6 &= ~1;
@@ -474,6 +479,7 @@ void lcd_sleep(void)
     /* SAP2-0=000, BT2-0=000, AP2-0=000, DK=0, SLP=0, STB=1 */
     lcd_write_reg(R_POWER_CONTROL1, 0x0001);
 }
+#endif
 
 /* Copies a rectangle from one framebuffer to another. Can be used in
    single transfer mode with width = num pixels, and height = 1 which
