@@ -26,32 +26,32 @@ Zip::ErrorCode RbZip::createZip(QString zip,QString dir)
     Zip::ErrorCode error = Ok;
     m_curEntry = 1;
     m_numEntrys=0;
-    
+
     QCoreApplication::processEvents();
-   
+
     // get number of entrys in dir
     QDirIterator it(dir, QDirIterator::Subdirectories);
-    while (it.hasNext()) 
+    while (it.hasNext())
     {
         it.next();
         m_numEntrys++;
         QCoreApplication::processEvents();
     }
 
-    
+
     //! create zip
     error = Zip::createArchive(zip);
     if(error != Ok)
         return error;
-    
+
     //! add the content
     error = Zip::addDirectory(dir);
     if(error != Ok)
         return error;
-    
+
     //! close zip
     error = Zip::closeArchive();
-   
+
     return error;
 }
 

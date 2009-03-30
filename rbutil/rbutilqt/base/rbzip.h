@@ -27,15 +27,15 @@
 
 class RbZip : public QObject, public Zip
 {
-	Q_OBJECT
-	public:
+    Q_OBJECT
+    public:
         Zip::ErrorCode createZip(QString zip,QString dir);
 
         virtual void progress();
-        
-        signals:
-		void zipProgress(int, int);
-    
+
+    signals:
+        void zipProgress(int, int);
+
     private:
         int m_curEntry;
         int m_numEntrys;
