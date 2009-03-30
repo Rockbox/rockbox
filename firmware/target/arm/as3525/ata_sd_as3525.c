@@ -8,7 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2006 Daniel Ankers
- * Copyright © 2008 Rafaël Carré
+ * Copyright © 2008-2009 Rafaël Carré
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,6 +21,8 @@
  ****************************************************************************/
 
 /* Driver for the ARM PL180 SD/MMC controller inside AS3525 SoC */
+
+/* TODO: Find the real capacity of >2GB models (will be useful for USB) */
 
 #include "config.h" /* for HAVE_MULTIVOLUME */
 #include "fat.h"
@@ -36,7 +38,6 @@
 #include "pl081.h"  /* DMA controller */
 #include "dma-target.h" /* DMA request lines */
 #include "clock-target.h"
-#include "panic.h"
 #include "stdbool.h"
 #include "ata_idle_notify.h"
 #include "sd.h"
@@ -87,11 +88,13 @@ static const int pl180_base[NUM_VOLUMES] = {
 #endif
 };
 
+static int sd_select_bank(signed char bank);
 static int sd_init_card(const int drive);
 static void init_pl180_controller(const int drive);
 /* TODO : BLOCK_SIZE != SECTOR_SIZE ? */
 #define BLOCK_SIZE      512
 #define SECTOR_SIZE     512
+#define BLOCKS_PER_BANK 0x7a7800
 
 static tSDCardInfo card_info[NUM_VOLUMES];
 
@@ -347,6 +350,19 @@ static int sd_init_card(const int drive)
 
     mci_set_clock_divider(drive, 1); /* full speed */
 
+    /*
+     * enable bank switching 
+     * without issuing this command, we only have access to 1/4 of the blocks
+     * of the first bank (0x1E9E00 blocks, which is the size reported in the
+     * CSD register)
+     */
+    if(drive == INTERNAL_AS3525)
+    {
+        const int ret = sd_select_bank(-1);
+        if(ret < 0)
+            return ret - 13;
+    }
+
     return 0;
 }
 
@@ -488,7 +504,7 @@ int sd_init(void)
     CCU_IO &= ~(1<<3);           /* bits 3:2 = 01, xpd is SD interface */
     CCU_IO |= (1<<2);
 #endif
-    
+
     wakeup_init(&transfer_completion_signal);
 
     init_pl180_controller(INTERNAL_AS3525);
@@ -563,7 +579,7 @@ static int sd_wait_for_state(const int drive, unsigned int state)
             return 0;
 
         if(TIME_AFTER(current_tick, t + timeout))
-            return -1;
+            return -2;
 
         if (TIME_AFTER((tick = current_tick), next_yield))
         {
@@ -574,6 +590,61 @@ static int sd_wait_for_state(const int drive, unsigned int state)
     }
 }
 
+static int sd_select_bank(signed char bank)
+{
+    unsigned char card_data[512];
+    int ret;
+
+    ret = sd_wait_for_state(INTERNAL_AS3525, SD_TRAN);
+    if (ret < 0)
+        return ret - 2;
+
+    if(!send_cmd(INTERNAL_AS3525, SD_SWITCH_FUNC, 0x80ffffef, MCI_ARG, NULL))
+        return -1;
+
+    mci_delay();
+
+    if(!send_cmd(INTERNAL_AS3525, 35, 0, MCI_NO_FLAGS, NULL))
+        return -2;
+
+    mci_delay();
+
+    memset(card_data, 0, 512);
+    if(bank == -1)
+    {   /* enable bank switching */
+        card_data[0] = 16;
+        card_data[1] = 1;
+        card_data[2] = 10;
+    }
+    else
+        card_data[0] = bank;
+
+    dma_retain();
+    dma_enable_channel(0, card_data, MCI_FIFO(INTERNAL_AS3525), DMA_PERI_SD,
+        DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
+
+    MCI_DATA_TIMER(INTERNAL_AS3525) = 0x1000000; /* FIXME: arbitrary */
+    MCI_DATA_LENGTH(INTERNAL_AS3525) = 512;
+    MCI_DATA_CTRL(INTERNAL_AS3525) =  (1<<0) /* enable */   |
+                            (0<<1) /* transfer direction */ |
+                            (1<<3) /* DMA */                |
+                            (9<<4) /* 2^9 = 512 */ ;
+
+    wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
+
+    dma_release();
+
+    mci_delay();
+
+    ret = sd_wait_for_state(INTERNAL_AS3525, SD_TRAN);
+    if (ret < 0)
+        return ret - 4;
+
+    card_info[INTERNAL_AS3525].current_bank = (bank == -1) ? 0 : bank;
+
+    return 0;
+}
+
 static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
                                int count, void* buf, bool write)
 {
@@ -581,13 +652,14 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
     const int drive = 0;
 #endif
     int ret = 0;
+    int bank;
 
     /* skip SanDisk OF */
     if (drive == INTERNAL_AS3525)
 #if defined(SANSA_E200V2) || defined(SANSA_FUZE)
-        start += 61440;
+        start += 0xf000;
 #else
-        start += 20480;
+        start += 0x5000;
 #endif
 
     mutex_lock(&sd_mtx);
@@ -599,17 +671,34 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
     {
         ret = sd_init_card(drive);
         if (!(card_info[drive].initialized))
-        {
-            panicf("card not initialised (%d)", ret);
             goto sd_transfer_error;
-        }
     }
 
     last_disk_activity = current_tick;
+
+    /* Only switch banks for internal storage */
+    if(drive == INTERNAL_AS3525)
+    {
+        bank = start / BLOCKS_PER_BANK;
+
+        if(card_info[INTERNAL_AS3525].current_bank != bank)
+        {
+            ret = sd_select_bank(bank);
+            if (ret < 0)
+            {
+                ret -= 20;
+                goto sd_transfer_error;
+            }
+        }
+
+        start -= bank * BLOCKS_PER_BANK;
+    }
+
+
     ret = sd_wait_for_state(drive, SD_TRAN);
     if (ret < 0)
     {
-        panicf("wait for state failed on drive %d", drive);
+        ret -= 2*20;
         goto sd_transfer_error;
     }
 
@@ -624,15 +713,15 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
         unsigned int transfer = (count >= 128) ? 127 : count; /* sectors */
         const int cmd =
             write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
+        int arg = start;
+        if(!(card_info[drive].ocr & (1<<30)))   /* not SDHC */
+            arg *= BLOCK_SIZE;
 
-        if(card_info[drive].ocr & (1<<30) ) /* SDHC */
-            ret = send_cmd(drive, cmd, start, MCI_ARG, NULL);
-        else
-            ret = send_cmd(drive, cmd, start * BLOCK_SIZE,
-                    MCI_ARG, NULL);
-
-        if (ret < 0)
-            panicf("transfer multiple blocks failed (%d)", ret);
+        if(!send_cmd(drive, cmd, arg, MCI_ARG, NULL))
+        {
+            ret -= 3*20;
+            goto sd_transfer_error;
+        }
 
         if(write)
             dma_enable_channel(0, buf, MCI_FIFO(drive),
@@ -663,15 +752,14 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
 
         if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_NO_FLAGS, NULL))
         {
-            ret = -666;
-            panicf("STOP TRANSMISSION failed");
+            ret = -4*20;
             goto sd_transfer_error;
         }
 
         ret = sd_wait_for_state(drive, SD_TRAN);
         if (ret < 0)
         {
-            panicf(" wait for state TRAN failed (%d)", ret);
+            ret -= 5*20;
             goto sd_transfer_error;
         }
     }
@@ -685,7 +773,6 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
     return 0;
 
 sd_transfer_error:
-    panicf("transfer error : %d",ret);
     card_info[drive].initialized = 0;
     return ret;
 }
