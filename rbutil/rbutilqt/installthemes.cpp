@@ -33,12 +33,13 @@ ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
     ui.listThemes->setSortingEnabled(true);
     ui.themePreview->clear();
     ui.themePreview->setText(tr("no theme selected"));
-    currentItem = -1;
+    ui.labelSize->setText(tr("no selection"));
 
     connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(close()));
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));
-    connect(ui.listThemes, SIGNAL(currentRowChanged(int)),
-            this, SLOT(updateDetails(int)));
+    connect(ui.listThemes, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
+            this, SLOT(updateDetails(QListWidgetItem*, QListWidgetItem*)));
+    connect(ui.listThemes, SIGNAL(itemSelectionChanged()), this, SLOT(updateSize()));
     connect(&igetter, SIGNAL(done(bool)), this, SLOT(updateImage(bool)));
 }
 
@@ -150,35 +151,43 @@ void ThemesInstallWindow::downloadDone(bool error)
 }
 
 
-void ThemesInstallWindow::updateDetails(int row)
+void ThemesInstallWindow::updateSize(void)
 {
-    if(row == currentItem) return;
-
-    currentItem = row;
-    qDebug() << "updateDetails(int) =" << row;
+    long size = 0;
+    // sum up size for all selected themes
     QSettings iniDetails(themesInfo.fileName(), QSettings::IniFormat, this);
+    int items = ui.listThemes->selectedItems().size();
+    for(int i = 0; i < items; i++) {
+        iniDetails.beginGroup(ui.listThemes->selectedItems()
+                              .at(i)->data(Qt::UserRole).toString());
+        size += iniDetails.value("size").toInt();
+        iniDetails.endGroup();
+    }
+    ui.labelSize->setText(tr("Download size %L1 kiB (%n item(s))", "", items)
+                             .arg((size + 512) / 1024));
+}
+
+
+void ThemesInstallWindow::updateDetails(QListWidgetItem* cur, QListWidgetItem* prev)
+{
+    if(cur == prev)
+        return;
+
+    QSettings iniDetails(themesInfo.fileName(), QSettings::IniFormat, this);
+
+    QCoreApplication::processEvents();
     ui.themeDescription->setText(tr("fetching details for %1")
-        .arg(ui.listThemes->item(row)->data(Qt::DisplayRole).toString()));
+        .arg(cur->data(Qt::DisplayRole).toString()));
     ui.themePreview->clear();
     ui.themePreview->setText(tr("fetching preview ..."));
 
-    double size = 0;
-
-    iniDetails.beginGroup(ui.listThemes->item(row)->data(Qt::UserRole).toString());
-    size += iniDetails.value("size").toDouble();
-    qDebug() << ui.listThemes->item(row)->data(Qt::UserRole).toString() << size;
-    iniDetails.endGroup();
-    ui.labelSize->setText(tr("Download size %L1 kiB").arg(size));
-
-    iniDetails.beginGroup(ui.listThemes->item(row)->data(Qt::UserRole).toString());
+    iniDetails.beginGroup(cur->data(Qt::UserRole).toString());
 
     QUrl img, txt;
     txt = QUrl(QString(settings->themeUrl() + "/"
         + iniDetails.value("descriptionfile").toString()));
     img = QUrl(QString(settings->themeUrl() + "/"
         + iniDetails.value("image").toString()));
-    qDebug() << "txt:" << txt;
-    qDebug() << "img:" << img;
 
     QString text;
     text = tr("<b>Author:</b> %1<hr/>").arg(iniDetails.value("author",
@@ -198,7 +207,7 @@ void ThemesInstallWindow::updateDetails(int row)
     {
         if(infocachedir=="")
         {
-            infocachedir = QDir::tempPath()+"rbutil-themeinfo";
+            infocachedir = QDir::tempPath() + "rbutil-themeinfo";
             QDir d = QDir::temp();
             d.mkdir("rbutil-themeinfo");
         }

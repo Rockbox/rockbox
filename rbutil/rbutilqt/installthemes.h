@@ -51,7 +51,6 @@ class ThemesInstallWindow : public QDialog
         HttpGet *getter;
         HttpGet igetter;
         QTemporaryFile themesInfo;
-        int currentItem;
         void resizeEvent(QResizeEvent*);
         QByteArray imgData;
         ProgressLoggerGui *logger;
@@ -64,9 +63,10 @@ class ThemesInstallWindow : public QDialog
     private slots:
         void downloadDone(bool);
         void downloadDone(int, bool);
-        void updateDetails(int);
         void updateImage(bool);
         void abort(void);
+        void updateDetails(QListWidgetItem* cur, QListWidgetItem* prev);
+        void updateSize(void);
 };
 
 
