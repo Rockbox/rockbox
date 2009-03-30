@@ -30,6 +30,7 @@ ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
     ui.setupUi(this);
     ui.listThemes->setAlternatingRowColors(true);
     ui.listThemes->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    ui.listThemes->setSortingEnabled(true);
     ui.themePreview->clear();
     ui.themePreview->setText(tr("no theme selected"));
     currentItem = -1;
