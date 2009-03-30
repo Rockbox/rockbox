@@ -229,11 +229,14 @@ static void clock_init(void)
         "nop      \n\t"
     );
     
-    /* configure PCK_TCT to 2Mhz (clock source 4 (Xin) divided by 6) */
+    /* Configure PCK_TCT to 2Mhz (Xin divided by 6) */
     PCLK_TCT = PCK_EN | (CKSEL_XIN<<24) | 5;
     
-    /* set TC32 timer to XIN divided by 12 (1MHz) */
+    /* Set TC32 timer to be our USEC_TIMER (Xin divided by 12 = 1MHz) */
     TC32EN = (1<<24) | 11;
+    
+    /* Unmask common timer IRQ (shared by tick and user timer) */
+    IEN |= TIMER0_IRQ_MASK;
 }
 #endif
 

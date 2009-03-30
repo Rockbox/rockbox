@@ -132,20 +132,37 @@
 
 /* Timer / Counters */
 
-#define TCFG0      (*(volatile unsigned long *)0xF3003000)
-#define TCNT0      (*(volatile unsigned long *)0xF3003004)
-#define TREF0      (*(volatile unsigned long *)0xF3003008)
-#define TCFG1      (*(volatile unsigned long *)0xF3003010)
-#define TCNT1      (*(volatile unsigned long *)0xF3003014)
-#define TREF1      (*(volatile unsigned long *)0xF3003018)
+/* Note: Timers 0-3 have a 16 bit counter, 4-5 have 20 bits */
+#define TCFG(_x_) (*(volatile unsigned int *)(0xF3003000+0x10*(_x_)))
+#define TCNT(_x_) (*(volatile unsigned int *)(0xF3003004+0x10*(_x_)))
+#define TREF(_x_) (*(volatile unsigned int *)(0xF3003008+0x10*(_x_)))
 
-#define TIREQ      (*(volatile unsigned long *)0xF3003060)
+#define TIREQ     (*(volatile unsigned long *)0xF3003060)
+
+/* TCFG flags */
+#define TCFG_EN    (1<<0)   /* enable timer */
+#define TCFG_CONT  (1<<1)   /* continue from zero once TREF is reached */
+#define TCFG_PWM   (1<<2)   /* PWM mode */
+#define TCFG_IEN   (1<<3)   /* IRQ enable */
+#define TCFG_SEL   (1<<4)   /* clock source & divider */
+#define TCFG_POL   (1<<7)   /* polarity */
+#define TCFG_CLEAR (1<<8)   /* reset TCNT to zero */
+#define TCFG_STOP  (1<<9)   /* stop counting once TREF reached */
 
 /* TIREQ flags */
-#define TF0 (1<<8) /* Timer 0 reference value reached */
-#define TF1 (1<<9) /* Timer 1 reference value reached */
-#define TI0 (1<<0) /* Timer 0 IRQ flag */
-#define TI1 (1<<1) /* Timer 1 IRQ flag */
+#define TIREQ_TI0  (1<<0)   /* Timer N IRQ flag */
+#define TIREQ_TI1  (1<<1)
+#define TIREQ_TI2  (1<<2)
+#define TIREQ_TI3  (1<<3)
+#define TIREQ_TI4  (1<<4)
+#define TIREQ_TI5  (1<<5)
+
+#define TIREQ_TF0  (1<<8)   /* Timer N reference value reached */
+#define TIREQ_TF1  (1<<9)
+#define TIREQ_TF2  (1<<10)
+#define TIREQ_TF3  (1<<11)
+#define TIREQ_TF4  (1<<12)
+#define TIREQ_TF5  (1<<13)
 
 #define TC32EN     (*(volatile unsigned long *)0xF3003080)
 #define TC32LDV    (*(volatile unsigned long *)0xF3003084)

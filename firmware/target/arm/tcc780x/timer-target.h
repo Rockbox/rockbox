@@ -21,8 +21,8 @@
 #ifndef TIMER_TARGET_H
 #define TIMER_TARGET_H
 
-/* timers are based on XIN (12Mhz) */
-#define TIMER_FREQ (12000000)
+/* Timer is based on PCK_TCT (set to 2Mhz in system.c) */
+#define TIMER_FREQ (2000000)
 
 bool __timer_set(long cycles, bool set);
 bool __timer_register(void);

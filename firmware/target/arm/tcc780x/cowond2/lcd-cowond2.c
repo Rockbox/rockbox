@@ -116,33 +116,11 @@ static void lcd_write_reg(unsigned char reg, unsigned short val)
     restore_irq(level);
 }
 
-
-/*
-   TEMP: Rough millisecond delay routine used by the LCD panel init sequence.
-   PCK_TCT must first have been initialised to 2Mhz by calling clock_init().
-*/
-static void sleep_ms(unsigned int ms)
-{
-    /* disable timer */
-    TCFG1 = 0;
-
-    /* set Timer1 reference value based on 125kHz tick */
-    TREF1 = ms * 125;
-
-    /* single count, zero the counter, divider = 16 [2^(3+1)], enable */
-    TCFG1 = (1<<9) | (1<<8) | (3<<4) | 1;
-
-    /* wait until Timer1 ref reached */
-    while (!(TIREQ & TF1)) {};
-}
-
-
 static void lcd_display_on(void)
 {
     /* power on sequence as per the D2 firmware */
     GPIOA_SET = (1<<16);
-    
-    sleep_ms(10);
+    udelay(10000);
     
     lcd_write_reg(1,  0x1D);
     lcd_write_reg(2,  0x0);
@@ -164,14 +142,14 @@ static void lcd_display_on(void)
     lcd_write_reg(23, 0x0);
     lcd_write_reg(24, 0x0);
     lcd_write_reg(25, 0x0);
-    sleep_ms(10);
+    udelay(10000);
     
     lcd_write_reg(9,  0x4055);
     lcd_write_reg(10, 0x0);
-    sleep_ms(40);
+    udelay(40000);
     
     lcd_write_reg(10, 0x2000);
-    sleep_ms(40);
+    udelay(40000);
     
     lcd_write_reg(1,  0xC01D);
     lcd_write_reg(2,  0x204);
@@ -191,11 +169,11 @@ static void lcd_display_on(void)
     lcd_write_reg(23, 0x406);
     lcd_write_reg(24, 0x2);
     lcd_write_reg(25, 0x0);
-    sleep_ms(60);
+    udelay(60000);
     
     lcd_write_reg(9,  0xA55);
     lcd_write_reg(10, 0x111F);
-    sleep_ms(10);
+    udelay(10000);
 
     /* tell that we're on now */
     display_on = true;
@@ -210,10 +188,10 @@ static void lcd_display_off(void)
     lcd_write_reg(9,  0x55);
     lcd_write_reg(10, 0x1417);
     lcd_write_reg(5,  0x4003);
-    sleep_ms(10);
+    udelay(10000);
     
     lcd_write_reg(9, 0x0);
-    sleep_ms(10);
+    udelay(10000);
     
     /* kill power to LCD panel (unconfirmed) */
     GPIOA_CLEAR = (1<<16);

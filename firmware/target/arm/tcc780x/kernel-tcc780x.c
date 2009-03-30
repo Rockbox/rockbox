@@ -29,16 +29,13 @@
 void tick_start(unsigned int interval_in_ms)
 {
     /* disable Timer0 */
-    TCFG0 &= ~1;
+    TCFG(0) &= ~TCFG_EN;
 
     /* set counter reference value based on 1Mhz tick */
-    TREF0 = interval_in_ms * 1000;
+    TREF(0) = interval_in_ms * 1000;
 
     /* Timer0 = reset to 0, divide=2, IRQ enable, enable (continuous) */
-    TCFG0 = (1<<8) | (0<<4) | (1<<3) | 1;
-
-    /* Unmask timer IRQ */
-    IEN |= TIMER0_IRQ_MASK;
+    TCFG(0) = TCFG_CLEAR | (0 << TCFG_SEL) | TCFG_IEN | TCFG_EN;
 }
 
 /* NB: Since we are using a single timer IRQ, tick tasks are dispatched as
