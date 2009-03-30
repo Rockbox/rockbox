@@ -1259,4 +1259,16 @@ target/mips/ingenic_jz47xx/onda_vx767/lcd-onda_vx767.c
 target/mips/ingenic_jz47xx/onda_vx767/power-onda_vx767.c
 target/mips/ingenic_jz47xx/onda_vx767/sadc-onda_vx767.c
 #endif /* ONDA_VX767 */
+
+#if defined(LYRE_PROTO1)
+target/arm/at91sam/lyre_proto1/adc-lyre_proto1.c
+target/arm/at91sam/lyre_proto1/backlight-lyre_proto1.c
+target/arm/at91sam/lyre_proto1/button-lyre_proto1.c
+target/arm/at91sam/lyre_proto1/crt0.S
+target/arm/at91sam/lyre_proto1/debug-lyre_proto1.c
+target/arm/at91sam/lyre_proto1/kernel-lyre_proto1.c
+target/arm/at91sam/lyre_proto1/lcd-lyre_proto1.c
+target/arm/at91sam/lyre_proto1/system-lyre_proto1.c
+target/arm/at91sam/lyre_proto1/timer-lyre_proto1.c
+#endif
 #endif /* SIMULATOR */

@@ -69,6 +69,7 @@
 #define S5L8700      8700
 #define JZ4732       4732
 #define AS3525       3525
+#define AT91SAM9260  9260
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          1
@@ -107,6 +108,7 @@
 #define MEIZU_M3_PAD       34
 #define SANSA_CLIP_PAD     35
 #define SANSA_FUZE_PAD     36
+#define LYRE_PROTO1_PAD    37
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -145,7 +147,7 @@
 #define CHARGING_TARGET  3 /* Any algorithm - usually software controlled
                             * charging or specific programming is required to
                             * use the charging hardware. */
-                      
+
 /* CONFIG_LCD */
 #define LCD_SSD1815   1 /* as used by Archos Recorders and Ondios */
 #define LCD_SSD1801   2 /* as used by Archos Player/Studio */
@@ -181,6 +183,7 @@
 #define LCD_ONDAVX767 30 /* as used by the Onda VX767 */
 #define LCD_SSD1303   31 /* as used by the Sansa Clip */
 #define LCD_FUZE      32 /* as used by the Sansa Fuze */
+#define LCD_LYRE_PROTO1      33 /* as used by the Lyre */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -196,6 +199,8 @@
 #define SCREEN_SQUARE       2
 
 /* CONFIG_I2C */
+#define I2C_NONE     0 /* For targets that do not use I2C - as the
+Lyre prototype 1*/
 #define I2C_PLAYREC  1 /* Archos Player/Recorder style */
 #define I2C_ONDIO    2 /* Ondio style */
 #define I2C_COLDFIRE 3 /* Coldfire style */
@@ -356,6 +361,8 @@
 #include "config-fuze.h"
 #elif defined(SANSA_C200V2)
 #include "config-c200v2.h"
+#elif defined(LYRE_PROTO1)
+#include "config-lyre_proto1.h"
 #else
 /* no known platform */
 #endif
@@ -535,7 +542,7 @@
 #endif /* BOOTLOADER */
 
 #if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) \
-    || (CONFIG_CPU == AS3525) || (CONFIG_CPU == S3C2440) 
+    || (CONFIG_CPU == AS3525) || (CONFIG_CPU == S3C2440)
 #define HAVE_WAKEUP_OBJECTS
 #endif
 
@@ -580,7 +587,8 @@
 #define ARM_ARCH 6 /* ARMv6 */
 #endif
 
-#if defined(CPU_TCC77X) || defined(CPU_TCC780X) || (CONFIG_CPU == DM320)
+#if defined(CPU_TCC77X) || defined(CPU_TCC780X) || (CONFIG_CPU == DM320) \
+  || (CONFIG_CPU == AT91SAM9260)
 #define CPU_ARM
 #define ARM_ARCH 5 /* ARMv5 */
 #endif

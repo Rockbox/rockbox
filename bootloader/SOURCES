@@ -47,4 +47,7 @@ creativezvm.c
 #elif CONFIG_CPU==AS3525
 sansa_as3525.c
 show_logo.c
+#elif defined(LYRE_PROTO1)
+lyre_proto1.c
+show_logo.c
 #endif

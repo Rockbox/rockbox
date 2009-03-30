@@ -1,0 +1,36 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ *
+ *
+ * Copyright (C) 2009 by Jorge Pinto
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+/* Include Standard files */
+#include "kernel.h"
+#include "system.h"
+
+/* Show the Rockbox logo - in show_logo.c */
+extern int show_logo(void);
+
+int main(void)
+{
+    /* Initialize Rockbox kernel */
+    kernel_init();
+
+    /* Never returns */
+    while(1) ;
+}
