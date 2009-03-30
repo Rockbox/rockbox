@@ -262,6 +262,7 @@ static void lcd_power_on(void)
     power_on = true;
 }
 
+#if defined(HAVE_LCD_ENABLE)
 /* Run the display on sequence for the driver IC */
 static void lcd_display_on(void)
 {
@@ -312,6 +313,13 @@ static void lcd_display_on(void)
     display_on = true;
 }
 
+
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+bool lcd_active(void)
+{
+    return display_on;
+}
+
 /* Turn off visible display operations */
 static void lcd_display_off(void)
 {
@@ -343,6 +351,7 @@ static void lcd_display_off(void)
     /* VCOMG=0, VDV4-0=10001, VCM4-0=11001 */
     lcd_write_reg(R_POWER_CONTROL4, 0x1119);
 }
+#endif
 
 void lcd_init_device(void)
 {
@@ -427,13 +436,6 @@ void lcd_init_device(void)
 
     LCD_REG_6 |= 1; /* Start DMA */
 }
-
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-bool lcd_active(void)
-{
-    return display_on;
-}
-#endif
 
 #if defined(HAVE_LCD_ENABLE)
 void lcd_enable(bool on)
