@@ -44,7 +44,7 @@ static int xoffset = 20; /* needed for flip */
 /* we need to write a red pixel for correct button reads
  * (see lcd_button_support()), but that must not happen while the lcd is updating
  * so block lcd_button_support the during updates */
-static volatile bool lcd_busy = false;
+static bool lcd_busy = false;
 
 static void as3525_dbop_init(void)
 {
@@ -108,32 +108,13 @@ static void lcd_write_reg(int reg, int value)
     lcd_write_data(&data, 1);
 }
 
-/*** hardware configuration ***/
-
-void lcd_set_contrast(int val)
-{
-    (void)val;
-}
-
-void lcd_set_invert_display(bool yesno)
-{
-    (void)yesno;
-}
-
-static void flip_lcd(bool yesno)
-{
-    (void)yesno;
-}
-
-
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
     display_flipped = yesno;
     xoffset = yesno ? 0 : 20;   /* TODO: Implement flipped mode */
 
-    if (display_on)
-        flip_lcd(yesno);
+    /* TODO */
 }
 
 
@@ -355,7 +336,8 @@ bool lcd_button_support(void)
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
     /* Set start position and window */
 
-    lcd_window_x(-1, 1);
+    lcd_window_x(-1, 0);
+    lcd_window_y(-1, 0);
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
     lcd_write_data(&data, 1);

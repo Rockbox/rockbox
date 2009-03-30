@@ -133,6 +133,12 @@ bool button_hold(void)
     return hold_button;
 }
 
+static void button_delay(void)
+{
+    int i = 32;
+    while(i--);
+}
+
 static short button_dbop(void)
 {
     /* skip home and power reading if lcd_button_support was blocked,
@@ -152,6 +158,8 @@ static short button_dbop(void)
 
     DBOP_TIMPOL_01 = 0xe167e167;
     DBOP_TIMPOL_23 = 0xe167006e;
+
+    button_delay();
 
     DBOP_CTRL |= (1<<15); /* start read */
     while((DBOP_STAT & (1<<16)) == 0); /* wait for valid data */

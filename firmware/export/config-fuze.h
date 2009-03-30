@@ -17,6 +17,11 @@
 #define REC_FREQ_DEFAULT    REC_FREQ_22 /* Default is not 44.1kHz */
 #define REC_SAMPR_DEFAULT   SAMPR_22
 
+/* Default recording levels */
+#define DEFAULT_REC_MIC_GAIN    23
+#define DEFAULT_REC_LEFT_GAIN   23
+#define DEFAULT_REC_RIGHT_GAIN  23
+
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
 #endif
@@ -24,11 +29,10 @@
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
-
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 
-/* define this if you want album art for this target */
+#ifndef BOOTLOADER/* define this if you want album art for this target */
 #define HAVE_ALBUMART
 
 /* define this if you have a light associated with the buttons */
@@ -43,13 +47,6 @@
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
-/* LCD dimensions */
-#define LCD_WIDTH  220
-#define LCD_HEIGHT 176
-#define LCD_DEPTH  16   /* 65536 colours */
-#define LCD_PIXELFORMAT RGB565 /* rgb565 */
-
-#ifndef BOOTLOADER
 /* define this if you have LCD enable function */
 #define HAVE_LCD_ENABLE
 
@@ -58,14 +55,21 @@
 #define HAVE_LCD_SLEEP
 #define HAVE_LCD_SLEEP_SETTING
 */
-#endif
 
 /* define this if you can flip your LCD */
-#define HAVE_LCD_FLIP
+//#define HAVE_LCD_FLIP
 
 /* define this if you can invert the colours on your LCD */
-#define HAVE_LCD_INVERT
+//#define HAVE_LCD_INVERT
 
+
+/* define this if you have a real-time clock */
+#define CONFIG_RTC RTC_AS3514
+
+/* There is no hardware tone control */
+#define HAVE_SW_TONE_CONTROLS
+
+#endif /* !BOOTLOADER */
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
 
 #define CONFIG_KEYPAD SANSA_FUZE_PAD
@@ -73,22 +77,22 @@
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
-/* There is no hardware tone control */
-#define HAVE_SW_TONE_CONTROLS
+
+/* LCD dimensions */
+#define LCD_WIDTH  220
+#define LCD_HEIGHT 176
+#define LCD_DEPTH  16   /* 65536 colours */
+#define LCD_PIXELFORMAT RGB565 /* rgb565 */
+
 
 /* We're working on the assumption that the AS3525 has something
    similar to the AS3514 for audio codec etc */
 #define HAVE_AS3514
 
-/* define this if you have a real-time clock */
-#ifndef BOOTLOADER
-#define CONFIG_RTC RTC_AS3514
-#endif
-
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
-/* Some Sansa E200s seem to be FAT16 formatted */
+/* Some Sansa Fuzes seem to be FAT16 formatted */
 #define HAVE_FAT16SUPPORT
 
 /* The number of bytes reserved for loadable codecs */
@@ -151,15 +155,8 @@
 /* Define this if you want to use the AS2525 i2c interface */
 #define CONFIG_I2C I2C_AS3525
 
-/* define this if the hardware can be powered off while charging */
-/* Sansa can't be powered off while charging */
-/* #define HAVE_POWEROFF_WHILE_CHARGING */
-
-/* The start address index for ROM builds */
-#define ROM_START 0x00000000
-
 /* Define this to the CPU frequency */
-#define CPU_FREQ      75000000
+#define CPU_FREQ      250000000
 
 /* Type of LCD */
 #define CONFIG_LCD LCD_FUZE
@@ -200,7 +197,3 @@
 
 #endif /* SIMULATOR */
 
-/* Default recording levels */
-#define DEFAULT_REC_MIC_GAIN    23
-#define DEFAULT_REC_LEFT_GAIN   23
-#define DEFAULT_REC_RIGHT_GAIN  23
