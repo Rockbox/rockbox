@@ -262,7 +262,6 @@ static void lcd_power_on(void)
     power_on = true;
 }
 
-#if defined(HAVE_LCD_ENABLE)
 /* Run the display on sequence for the driver IC */
 static void lcd_display_on(void)
 {
