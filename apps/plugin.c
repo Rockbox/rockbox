@@ -80,7 +80,9 @@ char *plugin_get_current_filename(void);
 static const struct plugin_api rockbox_api = {
 
     /* lcd */
+#ifdef HAVE_LCD_CONTRAST
     lcd_set_contrast,
+#endif
     lcd_update,
     lcd_clear_display,
     lcd_getstringsize,

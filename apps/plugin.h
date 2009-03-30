@@ -151,7 +151,10 @@ enum plugin_status {
 struct plugin_api {
 
     /* lcd */
+    
+#ifdef HAVE_LCD_CONTRAST
     void (*lcd_set_contrast)(int x);
+#endif
     void (*lcd_update)(void);
     void (*lcd_clear_display)(void);
     int  (*lcd_getstringsize)(const unsigned char *str, int *w, int *h);
