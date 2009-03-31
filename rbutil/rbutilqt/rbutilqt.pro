@@ -58,7 +58,7 @@ SOURCES += rbutilqt.cpp \
  ../ipodpatcher/ipodpatcher.c \
  ../sansapatcher/sansapatcher.c \
  browsedirtree.cpp \
- installthemes.cpp \
+ themesinstallwindow.cpp \
  base/uninstall.cpp \
  uninstallwindow.cpp \
  base/utils.cpp \
@@ -110,7 +110,7 @@ HEADERS += rbutilqt.h \
  irivertools/h120sums.h \
  irivertools/h300sums.h \
  browsedirtree.h \
- installthemes.h \
+ themesinstallwindow.h \
  base/uninstall.h \
  uninstallwindow.h \
  base/utils.h \
@@ -164,7 +164,7 @@ FORMS += rbutilqtfrm.ui \
  configurefrm.ui \
  browsedirtreefrm.ui \
  installtalkfrm.ui \
- installthemesfrm.ui \
+ themesinstallfrm.ui \
  uninstallfrm.ui \
  previewfrm.ui \
  rbspeexcfgfrm.ui \

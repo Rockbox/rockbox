@@ -28,7 +28,7 @@
 #include "installtalkwindow.h"
 #include "createvoicewindow.h"
 #include "httpget.h"
-#include "installthemes.h"
+#include "themesinstallwindow.h"
 #include "uninstallwindow.h"
 #include "utils.h"
 #include "rbzip.h"

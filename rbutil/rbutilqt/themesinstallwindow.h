@@ -25,7 +25,7 @@
 #include <QtGui>
 #include <QTemporaryFile>
 
-#include "ui_installthemesfrm.h"
+#include "ui_themesinstallfrm.h"
 #include "httpget.h"
 #include "installzip.h"
 #include "progressloggergui.h"

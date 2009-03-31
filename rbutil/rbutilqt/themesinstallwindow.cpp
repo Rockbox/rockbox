@@ -19,8 +19,8 @@
 
 #include <QtGui>
 
-#include "ui_installthemesfrm.h"
-#include "installthemes.h"
+#include "ui_themesinstallfrm.h"
+#include "themesinstallwindow.h"
 #include "installzip.h"
 #include "progressloggergui.h"
 #include "utils.h"
