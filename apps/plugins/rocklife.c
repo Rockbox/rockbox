@@ -82,7 +82,6 @@ PLUGIN_HEADER
 const struct button_mapping *plugin_contexts[]
 = {generic_directions, generic_actions};
 
-
 unsigned char grid_a[LCD_WIDTH][LCD_HEIGHT];
 unsigned char grid_b[LCD_WIDTH][LCD_HEIGHT];
 int generation = 0;
@@ -103,6 +102,48 @@ void init_grid(char *pgrid){
             pgrid[x+y*LCD_WIDTH] = 0;
         }
     }
+}
+
+/*fill grid with pattern from file (viewer mode)*/
+static bool load_cellfile(const char *file, char *pgrid){
+    int fd, file_size;
+    fd = rb->open(file, O_RDONLY);
+    if (fd==-1)
+        return false;
+
+    file_size = rb->filesize(fd);
+    if (file_size==-1)
+        return false;
+
+    char buf1[file_size];
+    int i, j, k, xmid, ymid;
+    j=0;
+    k=0;
+    xmid = (LCD_WIDTH>>1) - 2;
+    ymid = (LCD_HEIGHT>>1) - 2;
+
+    rb->read(fd, buf1, file_size - 1);
+
+    for(i=0; i<file_size; i++){ 
+
+        switch(buf1[i]){
+        case '.':
+            j=j++;
+            break;
+        case 'O':
+            set_cell(xmid + j, ymid + k, pgrid);
+            j++;
+            break;
+        case '\n':
+            k++;
+            j=0;
+            break;
+        default:
+            break;
+        }
+    }
+    rb->close(fd);
+    return true;
 }
 
 /* fill grid with initial pattern */
@@ -391,6 +432,8 @@ static void next_generation(char *pgrid, char *pnext_grid){
     generation++;
 }
 
+
+
 /**********************************/
 /* this is the plugin entry point */
 /**********************************/
@@ -403,8 +446,7 @@ enum plugin_status plugin_start(const void* parameter)
     char *pgrid;
     char *pnext_grid;
     char *ptemp;
-
-    (void)parameter;
+    (void)(parameter);
 
     backlight_force_on(); /* backlight control in lib/helper.c */
 #if LCD_DEPTH > 1
@@ -420,8 +462,27 @@ enum plugin_status plugin_start(const void* parameter)
     pgrid      = (char *)grid_a;
     pnext_grid = (char *)grid_b;
 
-    init_grid(pgrid);
-    setup_grid(pgrid, pattern++);
+    init_grid(pgrid);    
+
+
+ if( parameter == NULL )
+    {
+        setup_grid(pgrid, pattern++);
+    }
+    else
+    {
+        if( load_cellfile(parameter, pgrid) )
+        {
+            rb->splashf( 1*HZ, "Cells loaded (%s)", (char *)parameter );
+        }
+        else
+        {
+            rb->splash( 1*HZ, "File Open Error");
+            setup_grid(pgrid, pattern++);  /* fall back to stored patterns */
+        }
+    }
+
+
     show_grid(pgrid);
 
     while(!quit) {
@@ -490,5 +551,3 @@ enum plugin_status plugin_start(const void* parameter)
     backlight_use_settings(); /* backlight control in lib/helper.c */
     return PLUGIN_OK;
 }
-
-
