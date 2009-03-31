@@ -738,7 +738,7 @@ found:
             err = rom_dump(dh);
         break;
         case 10:
-            err = send_rockbox(dh, buf);
+            err = send_rockbox(dh, (char*)buf);
         break;
     }
     
@@ -890,7 +890,7 @@ int main(int argc, char* argv[])
                 print_usage();
                 return 1;
             }
-            return jzconnect(address, argv[2], 0, 10);
+            return jzconnect(address, (unsigned char*)argv[2], 0, 10);
         case 3:
         case 6:
         case 7:
