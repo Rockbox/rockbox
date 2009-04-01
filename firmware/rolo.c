@@ -172,7 +172,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
         "mov   pc, r0            \n"
     );
 
-#elif defined(CPU_TCC780X) || (CONFIG_CPU == S3C2440)
+#elif defined(CPU_TCC780X) || (CONFIG_CPU == S3C2440) || (CONFIG_CPU==DM320)
     /* Flush and invalidate caches */
     cpucache_invalidate();
 

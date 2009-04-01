@@ -41,6 +41,9 @@
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 
+/* define this if you want album art for this target */
+//#define HAVE_ALBUMART
+
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
 
@@ -58,14 +61,22 @@
 
 /* choose the lcd orientation. both work */
 /* #define CONFIG_ORIENTATION SCREEN_PORTRAIT */
-#define CONFIG_ORIENTATION SCREEN_LANDSCAPE
+#define CONFIG_ORIENTATION SCREEN_PORTRAIT
+
+#if 1
+#define NATIVE_MAX_WIDTH 480
+#define NATIVE_MAX_HEIGHT 640
+#else
+#define NATIVE_MAX_WIDTH 240
+#define NATIVE_MAX_HEIGHT 320
+#endif
 
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
-#define LCD_WIDTH  480
-#define LCD_HEIGHT 640
+#define LCD_WIDTH  NATIVE_MAX_WIDTH
+#define LCD_HEIGHT NATIVE_MAX_HEIGHT
 #else
-#define LCD_WIDTH  640
-#define LCD_HEIGHT 480
+#define LCD_WIDTH  NATIVE_MAX_HEIGHT
+#define LCD_HEIGHT NATIVE_MAX_WIDTH
 #endif
 
 #define LCD_DEPTH  16   /* 65k colours */
@@ -79,10 +90,6 @@
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
    should be defined as well. */
 #define HAVE_LCD_SLEEP
-
-/* We don't use a setting but a fixed delay after the backlight has
- * turned off */
-#define LCD_SLEEP_TIMEOUT (5*HZ)
 
 /* remote LCD */
 //#define HAVE_REMOTE_LCD

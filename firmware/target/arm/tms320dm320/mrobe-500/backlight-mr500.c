@@ -30,7 +30,7 @@
 
 void _backlight_on(void)
 {
-#ifdef HAVE_LCD_SLEEP
+#if defined(HAVE_LCD_SLEEP) && !defined(BOOTLOADER)
     backlight_lcd_sleep_countdown(false); /* stop counter */
 #endif
 #ifdef HAVE_LCD_ENABLE
@@ -42,7 +42,7 @@ void _backlight_on(void)
 void _backlight_off(void)
 {
     _backlight_set_brightness(0);
-#ifdef HAVE_LCD_SLEEP
+#if defined(HAVE_LCD_SLEEP) && !defined(BOOTLOADER)
     /* Disable lcd after fade completes (when lcd_sleep timeout expires) */
     backlight_lcd_sleep_countdown(true); /* start countdown */
 #endif

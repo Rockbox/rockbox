@@ -27,17 +27,14 @@
 #ifndef __DM320_H__
 #define __DM320_H__
 
-#define LCD_BUFFER_SIZE  (LCD_WIDTH*LCD_HEIGHT*2)
-#define TTB_SIZE         (0x4000)
-/* must be 16Kb (0x4000) aligned */
-#if 1
-#define MEM_END          0x00900000 + (MEM*0x00100000)
-#define TTB_BASE_ADDR    (MEM_END - TTB_SIZE)
-#else
-#define TTB_BASE_ADDR    (0x04900000 - TTB_SIZE)
+#if !defined(__ASSEMBLER__) && !defined(__LD__)
+/* These variables are created during linking (app/boot.lds) */
+extern unsigned long _lcdbuf;
+extern unsigned long _ttbstart;
 #endif
-#define TTB_BASE         ((unsigned long *)TTB_BASE_ADDR) /* End of memory */
-#define FRAME            ((short *) (TTB_BASE_ADDR - LCD_BUFFER_SIZE))  /* Right before TTB */
+
+#define TTB_BASE_ADDR    (_ttbstart) /* End of memory */
+#define FRAME            ((short *) (&_lcdbuf))  /* Right before TTB */
 
 #define PHY_IO_BASE      0x00030000
 #define DM320_REG(addr)  (*(volatile unsigned short *)(PHY_IO_BASE + (addr)))

@@ -36,7 +36,10 @@ OUTPUT_FORMAT(elf32-littlemips)
 #endif
 
 #if CONFIG_CPU==DM320 || CONFIG_CPU==S3C2440
-#include "cpu.h"
+#define LCD_BUFFER_SIZE  (LCD_WIDTH*LCD_HEIGHT*2)
+
+/* must be 16Kb (0x4000) aligned */
+#define TTB_SIZE         (0x4000) 
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGIN_BUFFER_SIZE - CODEC_SIZE - LCD_BUFFER_SIZE - TTB_SIZE
 #elif CONFIG_CPU==IMX31L
 #include "imx31l.h"
@@ -85,6 +88,7 @@ OUTPUT_FORMAT(elf32-littlemips)
 #elif CONFIG_CPU==DM320
 #define DRAMORIG 0x00900000 + STUBOFFSET
 #define IRAM DRAM
+/* The bit of IRAM that is available is used in the core */
 #define IRAMSIZE 0
 #elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
 #define DRAMORIG 0x20000000

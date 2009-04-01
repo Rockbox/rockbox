@@ -43,7 +43,6 @@ static bool lcd_on = true;
 static bool lcd_powered = true;
 #endif
 
-volatile bool lcd_poweroff = false;
 /*
 ** These are imported from lcd-16bit.c
 */
@@ -65,6 +64,14 @@ void lcd_sleep()
         /* "not powered" implies "disabled" */
         if (lcd_on)
             lcd_enable(false);
+            
+        /* Disabling these saves another ~15mA */
+        IO_OSD_OSDWINMD0&=~(0x01);
+		IO_VID_ENC_VMOD&=~(0x01);
+    	
+    	sleep(HZ/5);
+    	
+    	/* Disabling the LCD saves ~50mA */
     	IO_GIO_BITCLR2=1<<4;
     	lcd_powered=false;
     }
@@ -83,6 +90,11 @@ void lcd_enable(bool state)
         if (!lcd_powered)
         {
         	lcd_powered=true;
+        	
+        	IO_OSD_OSDWINMD0|=0x01;
+			IO_VID_ENC_VMOD|=0x01;
+    	
+    		sleep(2);
             IO_GIO_BITSET2=1<<4;
             /* Wait long enough for a frame to be written - yes, it
              * takes awhile. */
@@ -110,6 +122,41 @@ void lcd_init_device(void)
     /* Clear the Frame */
     memset16(FRAME, 0x0000, LCD_WIDTH*LCD_HEIGHT);
 
+	/* Setup the LCD controller */
+	IO_VID_ENC_VMOD=0x2015;
+	IO_VID_ENC_VDCTL=0x2000;
+	IO_VID_ENC_VDPRO=0x0000;
+	IO_VID_ENC_SYNCTL=0x100E;
+	IO_VID_ENC_HSPLS=1; /* HSYNC pulse width */
+	IO_VID_ENC_VSPLS=1; /* VSYNC pulse width */
+	
+	/* These calculations support 640x480 and 320x240  */
+	IO_VID_ENC_HINT=NATIVE_MAX_WIDTH+NATIVE_MAX_WIDTH/3;
+	IO_VID_ENC_HSTART=NATIVE_MAX_WIDTH/6; /* Front porch */
+	IO_VID_ENC_HVALID=NATIVE_MAX_WIDTH; /* Data valid */
+	IO_VID_ENC_VINT=NATIVE_MAX_HEIGHT+7;
+	IO_VID_ENC_VSTART=3;
+	IO_VID_ENC_VVALID=NATIVE_MAX_HEIGHT;
+	
+	IO_VID_ENC_HSDLY=0x0000;
+	IO_VID_ENC_VSDLY=0x0000;
+	IO_VID_ENC_YCCTL=0x0000;
+	IO_VID_ENC_RGBCTL=0x0000;
+	IO_VID_ENC_RGBCLP=0xFF00;
+	IO_VID_ENC_LNECTL=0x0000;
+	IO_VID_ENC_CULLLNE=0x0000;
+	IO_VID_ENC_LCDOUT=0x0000;
+	IO_VID_ENC_BRTS=0x0000;
+	IO_VID_ENC_BRTW=0x0000;
+	IO_VID_ENC_ACCTL=0x0000;
+	IO_VID_ENC_PWMP=0x0000;
+	IO_VID_ENC_PWMW=0x0000;
+	
+	IO_VID_ENC_DCLKCTL=0x0800;
+	IO_VID_ENC_DCLKPTN0=0x0001;
+
+
+	/* Setup the display */
     IO_OSD_MODE=0x00ff;
     IO_OSD_VIDWINMD=0x0002;
     IO_OSD_OSDWINMD0=0x2001;
@@ -117,21 +164,34 @@ void lcd_init_device(void)
     IO_OSD_ATRMD=0x0000;
     IO_OSD_RECTCUR=0x0000;
 
-    IO_OSD_OSDWIN0OFST=(480*2) / 32;
+    IO_OSD_OSDWIN0OFST=(NATIVE_MAX_WIDTH*2) / 32;
+    
     addr = ((int)FRAME-CONFIG_SDRAM_START) / 32;
     IO_OSD_OSDWINADH=addr >> 16;
     IO_OSD_OSDWIN0ADL=addr & 0xFFFF;
+    
+    IO_OSD_VIDWINADH=addr >> 16;
+    IO_OSD_VIDWIN0ADL=addr & 0xFFFF;
 
-    IO_OSD_BASEPX=80;
-    IO_OSD_BASEPY=2;
+    IO_OSD_BASEPX=IO_VID_ENC_HSTART;
+    IO_OSD_BASEPY=IO_VID_ENC_VSTART;
 
     IO_OSD_OSDWIN0XP=0;
     IO_OSD_OSDWIN0YP=0;
-    IO_OSD_OSDWIN0XL=480;
-    IO_OSD_OSDWIN0YL=640;
+  
+    IO_OSD_OSDWIN0XL=NATIVE_MAX_WIDTH;
+    IO_OSD_OSDWIN0YL=NATIVE_MAX_HEIGHT;
+
+    /* Set pin 36 and 35 (LCD POWER and LCD RESOLUTION) to an output */
+    IO_GIO_DIR2&=!(3<<3);
     
-    /* Set pin 36 to an output */
-    IO_GIO_DIR2&=!(1<<4);
+#if NATIVE_MAX_HEIGHT > 320
+	/* Set LCD resolution to VGA */
+    IO_GIO_BITSET2=1<<3;
+#else
+	/* Set LCD resolution to QVGA */
+	IO_GIO_BITCLR2=1<<3;
+#endif
 }
 
 /* Update a fraction of the display. */
@@ -204,50 +264,79 @@ void lcd_update(void)
 #endif
 }
 
-/* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
-extern void lcd_write_yuv420_lines(fb_data *dst,
-                                   unsigned char chroma_buf[LCD_HEIGHT/2*3],
-                                   unsigned char const * const src[3],
-                                   int width,
-                                   int stride);
+void lcd_blit_yuv(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, 
+                  int height) __attribute__ ((section(".icode")));
+                                           
 /* Performance function to blit a YUV bitmap directly to the LCD */
-/* For the Gigabeat - show it rotated */
-/* So the LCD_WIDTH is now the height */
+/* Show it rotated so the LCD_WIDTH is now the height */
 void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
     /* Caches for chroma data so it only need be recaculated every other
        line */
-    unsigned char chroma_buf[LCD_HEIGHT/2*3]; /* 480 bytes */
     unsigned char const * yuv_src[3];
     off_t z;
 
+	/* Turn off the RGB buffer and enable the YUV buffer */
+	IO_OSD_OSDWINMD0&=~(0x01);
+	IO_OSD_VIDWINMD|=0x01;
+
     if (!lcd_on)
         return;
+        
+    /* y has to be at multiple of 2 or else it will mess up the HW (interleaving) */
+    y &= ~1;
 
     /* Sorry, but width and height must be >= 2 or else */
     width &= ~1;
-    height >>= 1;
+    height>>=1;
 
-    fb_data *dst = (fb_data*)FRAME + x * LCD_WIDTH + (LCD_WIDTH - y) - 1;
+    fb_data *dst = (fb_data*)FRAME + LCD_WIDTH*LCD_HEIGHT - x * LCD_WIDTH + y;
 
     z = stride*src_y;
     yuv_src[0] = src[0] + z + src_x;
     yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
     yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
 
-    do
     {
-        lcd_write_yuv420_lines(dst, chroma_buf, yuv_src, width,
-                               stride);
+        do
+        {
+        	register fb_data *c_dst=dst;
+        	register int c_width=width;
+        	unsigned char const * c_yuv_src[3];
+        	c_yuv_src[0] = yuv_src[0];
+        	c_yuv_src[1] = yuv_src[1];
+        	c_yuv_src[2] = yuv_src[2];
 
-        yuv_src[0] += stride << 1; /* Skip down two luma lines */
-        yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-        yuv_src[2] += stride >> 1;
-        dst -= 2;
+        	do
+        	{
+        	/* This needs to be done in a block of 4 pixels */
+        		*c_dst=*c_yuv_src[0]<<8 | *c_yuv_src[1];
+        		*(c_dst+1)=*(c_yuv_src[0]+stride)<<8 | *c_yuv_src[2];
+        		c_dst-=LCD_WIDTH;
+        		c_yuv_src[0]++;
+        		*c_dst=*c_yuv_src[0]<<8 | *c_yuv_src[1];
+        		*(c_dst+1)=*(c_yuv_src[0]+stride)<<8 | *c_yuv_src[2];
+        		c_dst-=LCD_WIDTH;
+	            c_yuv_src[0]++;
+	            
+            	c_yuv_src[1]++;
+            	c_yuv_src[2]++;
+            	
+        		c_width -= 2;
+    		}
+    		while (c_width > 0);
+    		
+    		yuv_src[0] += stride << 1; /* Skip down two luma lines */
+            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
+            yuv_src[2] += stride >> 1;
+            dst+=2;
+        }
+        while (--height > 0);
     }
-    while (--height > 0);
 }
 
 void lcd_set_contrast(int val) {

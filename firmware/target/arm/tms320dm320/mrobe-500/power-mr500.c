@@ -25,6 +25,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "power.h"
+#include "lcd.h"
 #include "pcf50606.h"
 #include "backlight.h"
 #include "backlight-target.h"
@@ -71,6 +72,7 @@ void power_off(void)
 {
     /* turn off backlight and wait for 1 second */
     _backlight_off();
+    lcd_sleep();
     sleep(HZ);
     /* Hard shutdown */
     IO_GIO_DIR1&=~(1<<10);

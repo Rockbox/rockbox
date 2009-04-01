@@ -15,7 +15,11 @@ STARTUP(target/arm/tms320dm320/crt0.o)
 #define STUBOFFSET 0
 #endif
 
-#include "cpu.h"
+#define LCD_BUFFER_SIZE  (LCD_WIDTH*LCD_HEIGHT*2)
+
+/* must be 16Kb (0x4000) aligned */
+#define TTB_SIZE         (0x4000) 
+
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGINSIZE - CODECSIZE - LCD_BUFFER_SIZE - TTB_SIZE
 
 #define DRAMORIG 0x00900000 + STUBOFFSET
@@ -27,6 +31,10 @@ STARTUP(target/arm/tms320dm320/crt0.o)
 
 /* Where the codec buffer ends, and the plugin buffer starts */
 #define ENDADDR (ENDAUDIOADDR + CODECSIZE)
+
+#define LCDBEGIN (ENDADDR + PLUGINSIZE)
+
+#define TTBBEGIN (LCDBEGIN + LCD_BUFFER_SIZE)
 
 MEMORY
 {
@@ -40,7 +48,6 @@ SECTIONS
     {
         loadaddress = .;
         _loadaddress = .;
-        . = ALIGN(0x200);
         *(.init.text)
         *(.text*)
         *(.glue_7)
@@ -55,20 +62,22 @@ SECTIONS
         *(.rodata.str1.1)
         *(.rodata.str1.4)
         . = ALIGN(0x4);
-
-        /* Pseudo-allocate the copies of the data sections */
-        _datacopy = .;
     } > DRAM
 
-    /* TRICK ALERT! For RAM execution, we put the .data section at the
-       same load address as the copy. Thus, we don't waste extra RAM
-       when we don't actually need the copy.  */
-    .data : AT ( _datacopy )
+    .data : 
     {
-        _datastart = .;
         *(.data*)
         . = ALIGN(0x4);
-        _dataend  = .;
+    } > DRAM
+    
+    .bss (NOLOAD) :
+    {
+       	_edata = .;
+        *(.bss*)
+        *(.ibss*)
+        *(COMMON)
+        . = ALIGN(0x4);
+       	_end = .;
     } > DRAM
 
     /DISCARD/ :
@@ -81,30 +90,22 @@ SECTIONS
         _vectorsstart = .;
         *(.vectors);
         _vectorsend = .;
-#ifndef CREATIVE_ZVx
     } > IRAM AT> DRAM
 
     _vectorscopy = LOADADDR(.vectors);
-#else
-    } > IRAM
-#endif
 
     .iram :
     {
         _iramstart = .;
         *(.icode)
-        *(.irodata)
+        *(.irodata*)
         *(.idata)
         . = ALIGN(0x4);
         _iramend = .;
-#ifndef CREATIVE_ZVx
     } > IRAM AT> DRAM
 
     _iramcopy = LOADADDR(.iram);
-#else
-    } > IRAM
-#endif
-
+    
     .ibss (NOLOAD) :
     {
         _iedata = .;
@@ -113,49 +114,49 @@ SECTIONS
         _iend = .;
     } > IRAM
 
-    .stack :
+    .stack (NOLOAD) :
     {
        *(.stack)
        stackbegin = .;
        . += 0x2000;
        stackend = .;
     } > IRAM
+    
+    . = ADDR(.bss) + SIZEOF(.bss) + SIZEOF(.vectors) + SIZEOF(.iram);
 
-#ifndef CREATIVE_ZVx
-    .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram) + SIZEOF(.vectors):
-#else
-    .bss ADDR(.data) + SIZEOF(.data):
-#endif
+    .audiobuf (NOLOAD) :
     {
-       _edata = .;
-        *(.bss*)
-        *(COMMON)
-        . = ALIGN(0x4);
-       _end = .;
-    } > DRAM
-
-    .audiobuf ALIGN(4) :
-    {
+    	. = ALIGN(4);
         _audiobuffer = .;
         audiobuffer = .;
     } > DRAM
 
-    .audiobufend ENDAUDIOADDR:
+    .audiobufend ENDAUDIOADDR (NOLOAD) :
     {
         audiobufend = .;
         _audiobufend = .;
     } > DRAM
 
-    .codec ENDAUDIOADDR:
+    .codec ENDAUDIOADDR (NOLOAD) :
     {
         codecbuf = .;
         _codecbuf = .;
     }
 
-    .plugin ENDADDR:
+    .plugin ENDADDR (NOLOAD) :
     {
         _pluginbuf = .;
         pluginbuf = .;
+    }
+    
+    .lcdbuffer LCDBEGIN (NOLOAD) :
+    {
+        _lcdbuf = .;
+    }
+    
+    .ttbtable TTBBEGIN (NOLOAD) :
+    {
+        _ttbstart = .;
     }
 }
 
