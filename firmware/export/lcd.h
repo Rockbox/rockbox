@@ -92,6 +92,13 @@ typedef unsigned long fb_data;
 typedef unsigned char fb_data;
 #endif
 
+#if defined(HAVE_LCD_MODES)
+void lcd_set_mode(int mode);
+#define LCD_MODE_RGB565 0x00000001
+#define LCD_MODE_YUV 	0x00000002
+#define LCD_MODE_PAL256	0x00000004
+#endif
+
 /* common functions */
 extern void lcd_write_command(int byte);
 extern void lcd_write_command_e(int cmd, int data);

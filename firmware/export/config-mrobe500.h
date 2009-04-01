@@ -44,6 +44,8 @@
 /* define this if you want album art for this target */
 //#define HAVE_ALBUMART
 
+#define HAVE_LCD_MODES LCD_MODE_RGB565 | LCD_MODE_YUV | LCD_MODE_PAL256
+
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
 

@@ -791,6 +791,10 @@ struct plugin_api {
 	const char *appsversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+       
+#if defined(HAVE_LCD_MODES)
+	void (*lcd_set_mode)(int mode);
+#endif
 };
 
 /* plugin header */

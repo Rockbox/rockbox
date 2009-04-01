@@ -256,6 +256,7 @@ void lcd_update(void)
 {
     if (!lcd_on)
         return;
+	
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
     lcd_copy_buffer_rect((fb_data *)FRAME, &lcd_framebuffer[0][0],
                          LCD_WIDTH*LCD_HEIGHT, 1);
@@ -264,6 +265,30 @@ void lcd_update(void)
 #endif
 }
 
+#if defined(HAVE_LCD_MODES)
+void lcd_set_mode(int mode)
+{
+	if(mode==LCD_MODE_YUV)
+	{
+		/* Turn off the RGB buffer and enable the YUV buffer */
+		IO_OSD_OSDWINMD0&=~(0x01);
+		IO_OSD_VIDWINMD|=0x01;
+		memset16(FRAME, 0x0080, LCD_WIDTH*LCD_HEIGHT);
+	}
+	else if(mode==LCD_MODE_RGB565)
+	{
+		/* Turn on the RGB window and the YUV window off (This should probably be
+     	 * made into a function).
+     	 */
+    	IO_OSD_OSDWINMD0|=0x01;
+		IO_OSD_VIDWINMD&=~(0x01);
+	}
+	else if(mode==LCD_MODE_PAL256)
+	{
+	}
+}
+#endif
+	
 void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, 
@@ -280,13 +305,9 @@ void lcd_blit_yuv(unsigned char * const src[3],
     unsigned char const * yuv_src[3];
     off_t z;
 
-	/* Turn off the RGB buffer and enable the YUV buffer */
-	IO_OSD_OSDWINMD0&=~(0x01);
-	IO_OSD_VIDWINMD|=0x01;
-
     if (!lcd_on)
         return;
-        
+	
     /* y has to be at multiple of 2 or else it will mess up the HW (interleaving) */
     y &= ~1;
 

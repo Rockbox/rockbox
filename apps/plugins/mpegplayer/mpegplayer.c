@@ -1459,6 +1459,10 @@ static void button_loop(void)
     rb->lcd_clear_display();
     rb->lcd_update();
 
+#if (HAVE_LCD_MODES & LCD_MODE_YUV)
+	rb->lcd_set_mode(LCD_MODE_YUV);
+#endif
+
     wvs_init();
 
     /* Start playback at the specified starting time */
@@ -1537,6 +1541,10 @@ static void button_loop(void)
             stream_show_vo(false);
             wvs_backlight_brightness_video_mode(false);
 
+#if (HAVE_LCD_MODES & LCD_MODE_YUV)
+			rb->lcd_set_mode(LCD_MODE_RGB565);
+#endif
+
             result = mpeg_menu(0);
 
             /* The menu can change the font, so restore */
@@ -1549,6 +1557,9 @@ static void button_loop(void)
                 break;
 
             default:
+#if (HAVE_LCD_MODES & LCD_MODE_YUV)
+            	rb->lcd_set_mode(LCD_MODE_YUV);
+#endif
                 /* If not stopped, show video again */
                 if (state != STREAM_STOPPED) {
                     wvs_show(WVS_SHOW);
@@ -1707,6 +1718,10 @@ enum plugin_status plugin_start(const void* parameter)
             rb->splashf(HZ*2, errstring, err);
         }
     }
+    
+#if (HAVE_LCD_MODES & LCD_MODE_YUV)
+	rb->lcd_set_mode(LCD_MODE_RGB565);
+#endif
 
     stream_exit();
 
