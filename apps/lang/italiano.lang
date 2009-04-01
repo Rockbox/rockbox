@@ -12383,3 +12383,17 @@
     touchscreen: "Punto Assoluto"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Previene Salto Traccia"
+  </dest>
+  <voice>
+    *: "Previene Salto Traccia"
+  </voice>
+</phrase>
