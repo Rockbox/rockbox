@@ -69,16 +69,6 @@ SECTIONS
         *(.data*)
         . = ALIGN(0x4);
     } > DRAM
-    
-    .bss (NOLOAD) :
-    {
-       	_edata = .;
-        *(.bss*)
-        *(.ibss*)
-        *(COMMON)
-        . = ALIGN(0x4);
-       	_end = .;
-    } > DRAM
 
     /DISCARD/ :
     {
@@ -122,7 +112,20 @@ SECTIONS
        stackend = .;
     } > IRAM
     
-    . = ADDR(.bss) + SIZEOF(.bss) + SIZEOF(.vectors) + SIZEOF(.iram);
+    /* This could probably be shortened so that the audio buffer overwrites
+     * at the IRAM stuff (assuming that it is copied first in crt0.S), but
+     * leave it for now since the space is not critical at the moment.
+     */
+ 	.bss (NOLOAD) :
+    {
+    	. = ADDR(.data) + SIZEOF(.data) + SIZEOF(.vectors) + SIZEOF(.iram);
+       	_edata = .;
+        *(.bss*)
+        *(COMMON)
+        . = ALIGN(0x4);
+       	_end = .;
+    } > DRAM
+    
 
     .audiobuf (NOLOAD) :
     {
