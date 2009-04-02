@@ -22,15 +22,14 @@
 #include "lib/md5.h"
 PLUGIN_HEADER
 
-
 #define KEYBOX_FILE PLUGIN_DIR "/apps/keybox.dat"
 #define BLOCK_SIZE 8
 #define MAX_ENTRIES 12*BLOCK_SIZE /* keep this a multiple of BLOCK_SIZE */
 #define FIELD_LEN 32 /* should be enough for anyone ;) */
 
-/* salt 4 bytes (needed for decryption) not encrypted padded with 4 bytes of zeroes
-   pwhash 16 bytes (to check for the right password) encrypted
-   encrypted data. */
+/* The header begins with the unencrypted salt (4 bytes) padded with 4 bytes of
+   zeroes. After that comes the encrypted hash of the master password (16 bytes) */
+   
 
 #define HEADER_LEN 24
 
@@ -203,13 +202,25 @@ static void add_entry(int selected_item)
 
     rb->splash(HZ, "Enter title");
     pw_list.entries[i].title[0] = '\0';
-    rb->kbd_input(pw_list.entries[i].title, FIELD_LEN);
+    if (rb->kbd_input(pw_list.entries[i].title, FIELD_LEN))
+        return;
+
     rb->splash(HZ, "Enter name");
     pw_list.entries[i].name[0] = '\0';
-    rb->kbd_input(pw_list.entries[i].name, FIELD_LEN);
+    if (rb->kbd_input(pw_list.entries[i].name, FIELD_LEN))
+    {
+        pw_list.entries[i].title[0] = '\0';
+        return;
+    }
+
     rb->splash(HZ, "Enter password");
     pw_list.entries[i].password[0] = '\0';
-    rb->kbd_input(pw_list.entries[i].password, FIELD_LEN);
+    if (rb->kbd_input(pw_list.entries[i].password, FIELD_LEN))
+    {
+        pw_list.entries[i].title[0] = '\0';
+        pw_list.entries[i].name[0] = '\0';
+        return;
+    }
 
     for (j = 0; j < selected_item; j++)
     {
@@ -506,9 +517,12 @@ static int enter_pw(char *pw_buf, size_t buflen, bool new_pw)
     if (new_pw)
     {
         rb->splash(HZ, "Enter new master password");
-        rb->kbd_input(buf[0], sizeof(buf[0]));
+        if (rb->kbd_input(buf[0], sizeof(buf[0])))
+            return -1;
+
         rb->splash(HZ, "Confirm master password");
-        rb->kbd_input(buf[1], sizeof(buf[1]));
+        if (rb->kbd_input(buf[1], sizeof(buf[1])))
+            return -1;
 
         if (rb->strcmp(buf[0], buf[1]))
         {
