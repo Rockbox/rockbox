@@ -3,15 +3,17 @@
 \section{\label{ref:Supportedfileformats}Supported file formats}
 \begin{table}
 \begin{center}
-\begin{tabularx}{\textwidth}{llXX}\toprule
+\begin{tabularx}{\textwidth}{clp{7em}X}\toprule
 \textbf{Icon} & \textbf{File Type} & \textbf{Extension} 
-  & \textbf{Action when selected} \\\midrule
+  & \textbf{Action when selected} \\\midrule%
 \includegraphics[width=0.37cm]{appendix/images/icon-directory.png} 
   & Directory & \emph{none} & Enter the directory \\
 \includegraphics[width=0.37cm]{appendix/images/icon-audio-file.png} 
   & Audio file & 
-  \opt{MASCODEC}{\fname{.mp2, .mp3}}\opt{swcodec}{\emph{various (see
-    \reference{ref:Supportedaudioformats}})}
+  \opt{MASCODEC}{\fname{.mp2, .mp3}}%
+  \opt{swcodec}{\emph{various}\newline%
+  (see \ref{ref:Supportedaudioformats}})%
+  % do NOT use \reference{} here as that will break the table.
   & Start playing the file and show the WPS\\
   \includegraphics[width=0.37cm]{appendix/images/icon-cuesheet.png} 
   & Cuesheet & \fname{.cue} & View the cuesheet file \\
@@ -75,7 +77,7 @@
   \section{\label{ref:Supportedaudioformats}Supported audio formats}
   \begin{table}
   \begin{center}
-  \begin{tabularx}{\textwidth}{lXX}\toprule
+  \begin{tabularx}{\textwidth}{lp{6em}X}\toprule
   \textbf{Format} & \textbf{Extension} & \textbf{Notes} \\\midrule
     \emph{Lossy codecs} \\
     \midrule
