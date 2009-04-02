@@ -128,7 +128,7 @@ static bool load_cellfile(const char *file, char *pgrid){
 
         switch(buf1[i]){
         case '.':
-            j=j++;
+            j++;
             break;
         case 'O':
             set_cell(xmid + j, ymid + k, pgrid);
