@@ -1,0 +1,14 @@
+\subsection{Rocklife}
+
+This an implementation of J. H. Conway's Game of Life (see
+\url{http://en.wikipedia.org/wiki/Conway\%27s_Game_of_Life} for a detailed
+description).
+
+Rockbox can open files with a configuration description (\fname{.cells} files).
+Just ``play'' such file and the game configuration stored in it will be loaded
+into this plugin.
+
+A \fname{.cells} file is a text file. A capital `O' marks a live cell, a dot
+marks a dead cell, all other characters are ignored. Everything on a line
+starting with an exclamation sign (and including it) is a comment and is
+ignored.
