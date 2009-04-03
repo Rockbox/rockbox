@@ -85,7 +85,7 @@ $(DEPFILE) dep:
 	@mv $(DEPFILE)_ $(DEPFILE)
 	$(call bmpdepfile,$(DEPFILE),$(BMP) $(PBMP))
 
-bin: $(DEPFILE) $(TOOLS) $(BUILDDIR)/$(BINARY)
+bin: $(DEPFILE) $(TOOLS) $(BUILDDIR)/$(BINARY) $(RBINFO)
 rocks: $(DEPFILE) $(TOOLS) $(ROCKS)
 codecs: $(DEPFILE) $(TOOLS) $(CODECS)
 tools: $(TOOLS)
