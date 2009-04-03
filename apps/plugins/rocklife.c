@@ -82,61 +82,82 @@ PLUGIN_HEADER
 const struct button_mapping *plugin_contexts[]
 = {generic_directions, generic_actions};
 
-unsigned char grid_a[LCD_WIDTH][LCD_HEIGHT];
-unsigned char grid_b[LCD_WIDTH][LCD_HEIGHT];
+#define GRID_W LCD_WIDTH
+#define GRID_H LCD_HEIGHT
+
+unsigned char grid_a[GRID_W][GRID_H];
+unsigned char grid_b[GRID_W][GRID_H];
 int generation = 0;
 int population = 0;
 int status_line = 0;
 char buf[30];
 
-static inline void set_cell(int x, int y, char *pgrid){
-    pgrid[x+y*LCD_WIDTH]=1;
+
+static inline bool is_valid_cell(int x, int y) {
+    return (x >= 0 && x < GRID_W
+            && y >= 0 && y < GRID_H);
+}
+
+static inline void set_cell_age(int x, int y, unsigned char age, char *pgrid) {
+    pgrid[x+y*GRID_W] = age;
+}
+
+static inline void set_cell(int x, int y, char *pgrid) {
+    set_cell_age(x, y, 1, pgrid);
+}
+
+static inline unsigned char get_cell(int x, int y, char *pgrid) {
+    if (x < 0)
+        x += GRID_W;
+    else if (x >= GRID_W)
+        x -= GRID_W;
+
+    if (y < 0)
+        y += GRID_H;
+    else if (y >= GRID_H)
+        y -= GRID_H;
+
+    return pgrid[x+y*GRID_W];
 }
 
 /* clear grid */
 void init_grid(char *pgrid){
-    int x, y;
-
-    for(y=0; y<LCD_HEIGHT; y++){
-        for(x=0; x<LCD_WIDTH; x++){
-            pgrid[x+y*LCD_WIDTH] = 0;
-        }
-    }
+    memset(pgrid, 0, GRID_W * GRID_H);
 }
 
 /*fill grid with pattern from file (viewer mode)*/
 static bool load_cellfile(const char *file, char *pgrid){
-    int fd, file_size;
+    int fd;
     fd = rb->open(file, O_RDONLY);
     if (fd==-1)
         return false;
+        
+    init_grid(pgrid);
 
-    file_size = rb->filesize(fd);
-    if (file_size==-1)
-        return false;
+    char c;
+    int nc, x, y, xmid, ymid;
+    x=0;
+    y=0;
+    xmid = (GRID_W>>1) - 2;
+    ymid = (GRID_H>>1) - 2;
 
-    char buf1[file_size];
-    int i, j, k, xmid, ymid;
-    j=0;
-    k=0;
-    xmid = (LCD_WIDTH>>1) - 2;
-    ymid = (LCD_HEIGHT>>1) - 2;
+    while (true) { 
+        nc = read(fd, &c, 1);
+        if (nc <= 0)
+            break;
 
-    rb->read(fd, buf1, file_size - 1);
-
-    for(i=0; i<file_size; i++){ 
-
-        switch(buf1[i]){
+        switch(c) {
         case '.':
-            j++;
+            x++;
             break;
         case 'O':
-            set_cell(xmid + j, ymid + k, pgrid);
-            j++;
+            if (is_valid_cell(xmid + x, ymid + y))
+                set_cell(xmid + x, ymid + y, pgrid);
+            x++;
             break;
         case '\n':
-            k++;
-            j=0;
+            y++;
+            x=0;
             break;
         default:
             break;
@@ -151,7 +172,7 @@ static void setup_grid(char *pgrid, int pattern){
     int n, max;
     int xmid, ymid;
 
-    max = LCD_HEIGHT*LCD_WIDTH;
+    max = GRID_W * GRID_H;
 
     switch(pattern){
     case PATTERN_RANDOM:
@@ -174,8 +195,8 @@ static void setup_grid(char *pgrid, int pattern){
 
     case PATTERN_GROWTH_1:
         rb->splash(HZ, "Growth");
-        xmid = (LCD_WIDTH>>1) - 2;
-        ymid = (LCD_HEIGHT>>1) - 2;
+        xmid = (GRID_W>>1) - 2;
+        ymid = (GRID_H>>1) - 2;
         set_cell(xmid + 6, ymid + 0 , pgrid);
         set_cell(xmid + 4, ymid + 1 , pgrid);
         set_cell(xmid + 6, ymid + 1 , pgrid);
@@ -189,8 +210,8 @@ static void setup_grid(char *pgrid, int pattern){
         break;
     case PATTERN_ACORN:
         rb->splash(HZ, "Acorn");
-        xmid = (LCD_WIDTH>>1) - 3;
-        ymid = (LCD_HEIGHT>>1) - 1;
+        xmid = (GRID_W>>1) - 3;
+        ymid = (GRID_H>>1) - 1;
         set_cell(xmid + 1, ymid + 0 , pgrid);
         set_cell(xmid + 3, ymid + 1 , pgrid);
         set_cell(xmid + 0, ymid + 2 , pgrid);
@@ -201,8 +222,8 @@ static void setup_grid(char *pgrid, int pattern){
         break;
     case PATTERN_GROWTH_2:
         rb->splash(HZ, "Growth 2");
-        xmid = (LCD_WIDTH>>1) - 4;
-        ymid = (LCD_HEIGHT>>1) - 1;
+        xmid = (GRID_W>>1) - 4;
+        ymid = (GRID_H>>1) - 1;
         set_cell(xmid + 0, ymid + 0 , pgrid);
         set_cell(xmid + 1, ymid + 0 , pgrid);
         set_cell(xmid + 2, ymid + 0 , pgrid);
@@ -262,14 +283,12 @@ static void setup_grid(char *pgrid, int pattern){
 /* display grid */
 static void show_grid(char *pgrid){
     int x, y;
-    int m;
     unsigned char age;
 
     rb->lcd_clear_display();
-    for(y=0; y<LCD_HEIGHT; y++){
-        for(x=0; x<LCD_WIDTH; x++){
-            m = y*LCD_WIDTH+x;
-            age = pgrid[m];
+    for(y=0; y<GRID_H; y++){
+        for(x=0; x<GRID_W; x++){
+            age = get_cell(x, y, pgrid);
             if(age){
 #if LCD_DEPTH >= 16
                 rb->lcd_set_foreground( LCD_RGBPACK( age, age, age ));
@@ -291,11 +310,18 @@ static void show_grid(char *pgrid){
 }
 
 
-/* check state of cell depending on the number of neighbours */
-static inline int check_cell(unsigned char *n){
-    int sum;
+/* Calculates whether the cell will be alive in the next generation.
+   n is the array with 9 elements that represent the cell itself and its
+   neighborhood like this (the cell itself is n[4]):
+   0 1 2
+   3 4 5
+   6 7 8
+*/
+static inline bool check_cell(unsigned char *n)
+{
     int empty_cells = 0;
-    unsigned char live = 0;
+    int alive_cells;
+    bool result;
 
     /* count empty neighbour cells */
     if(n[0]==0) empty_cells++;
@@ -308,38 +334,32 @@ static inline int check_cell(unsigned char *n){
     if(n[8]==0) empty_cells++;
 
     /* now we build the number of non-zero neighbours :-P */
-    sum = 8 - empty_cells;
+    alive_cells = 8 - empty_cells;
+    
+    if (n[4]) {
+        /* If the cell is alive, it stays alive iff it has 2 or 3 alive neighbours */
+        result = (alive_cells==2 || alive_cells==3);
+    }
+    else {
+        /* If the cell is dead, it gets alive iff it has 3 alive neighbours */
+        result = (alive_cells==3);
+    }
 
-    /* 1st and 2nd rule*/
-    if (n[4]  && (sum<2 || sum>3))
-        live = false;
-
-    /* 3rd rule */
-    if (n[4] && (sum==2 || sum==3))
-        live = true;
-
-    /* 4rd rule */
-    if (!n[4] && sum==3)
-        live = true;
-
-    return live;
+    return result;
 }
 
 /* Calculate the next generation of cells
  *
  * The borders of the grid are connected to their opposite sides.
  *
- *
  * To avoid multiplications while accessing data in the 2-d grid
  * (pgrid) we try to re-use previously accessed neighbourhood
  * information which is stored in an 3x3 array.
- *
  */
 static void next_generation(char *pgrid, char *pnext_grid){
     int x, y;
-    unsigned char cell;
-    int age;
-    int m;
+    bool cell;
+    unsigned char age;
     unsigned char n[9];
 
     rb->memset(n, 0, sizeof(n));
@@ -357,31 +377,33 @@ static void next_generation(char *pgrid, char *pnext_grid){
     population = 0;
 
     /* go through the grid */
-    for(y=0; y<LCD_HEIGHT; y++){
-        for(x=0; x<LCD_WIDTH; x++){
+    for(y=0; y<GRID_H; y++){
+        for(x=0; x<GRID_W; x++){
             if(y==0 && x==0){
                 /* first cell in first row, we have to load all neighbours */
-                n[0] = pgrid[((x+LCD_WIDTH-1)%LCD_WIDTH)+((y+LCD_HEIGHT-1)%LCD_HEIGHT)*LCD_WIDTH];
-                n[1] = pgrid[((x            )%LCD_WIDTH)+((y+LCD_HEIGHT-1)%LCD_HEIGHT)*LCD_WIDTH];
-                n[2] = pgrid[((x          +1)%LCD_WIDTH)+((y+LCD_HEIGHT-1)%LCD_HEIGHT)*LCD_WIDTH];
-                n[3] = pgrid[((x+LCD_WIDTH-1)%LCD_WIDTH)+((y             )%LCD_HEIGHT)*LCD_WIDTH];
-                n[5] = pgrid[((x          +1)%LCD_WIDTH)+((y             )%LCD_HEIGHT)*LCD_WIDTH];
-                n[6] = pgrid[((x+LCD_WIDTH-1)%LCD_WIDTH)+((y           +1)%LCD_HEIGHT)*LCD_WIDTH];
-                n[7] = pgrid[((x            )%LCD_WIDTH)+((y           +1)%LCD_HEIGHT)*LCD_WIDTH];
-                n[8] = pgrid[((x          +1)%LCD_WIDTH)+((y           +1)%LCD_HEIGHT)*LCD_WIDTH];
+                n[0] = get_cell(x-1, y-1, pgrid);
+                n[1] = get_cell(x,   y-1, pgrid);
+                n[2] = get_cell(x+1, y-1, pgrid);
+                n[3] = get_cell(x-1, y,   pgrid);
+                n[4] = get_cell(x,   y,   pgrid);
+                n[5] = get_cell(x+1, y,   pgrid);
+                n[6] = get_cell(x-1, y+1, pgrid);
+                n[7] = get_cell(x,   y+1, pgrid);
+                n[8] = get_cell(x+1, y+1, pgrid);
             } else {
                 if(x==0){
                     /* beginning of a row, copy what we know about our predecessor,
-                       0, 1, 3 are known, 2, 5, 6, 7, 8 have to be loaded
+                       0, 1, 3, 4 are known, 2, 5, 6, 7, 8 have to be loaded
                     */
                     n[0] = n[4];
                     n[1] = n[5];
-                    n[2] = pgrid[((x          +1)%LCD_WIDTH)+((y+LCD_HEIGHT-1)%LCD_HEIGHT)*LCD_WIDTH];
+                    n[2] = get_cell(x+1, y-1, pgrid);
                     n[3] = n[7];
-                    n[5] = pgrid[((x          +1)%LCD_WIDTH)+((y             )%LCD_HEIGHT)*LCD_WIDTH];
-                    n[6] = pgrid[((x+LCD_WIDTH-1)%LCD_WIDTH)+((y           +1)%LCD_HEIGHT)*LCD_WIDTH];
-                    n[7] = pgrid[((x            )%LCD_WIDTH)+((y           +1)%LCD_HEIGHT)*LCD_WIDTH];
-                    n[8] = pgrid[((x          +1)%LCD_WIDTH)+((y           +1)%LCD_HEIGHT)*LCD_WIDTH];
+                    n[4] = n[8];
+                    n[5] = get_cell(x+1, y,   pgrid);
+                    n[6] = get_cell(x-1, y+1, pgrid);
+                    n[7] = get_cell(x,   y+1, pgrid);
+                    n[8] = get_cell(x+1, y+1, pgrid);
                 } else {
                     /* we are moving right in a row,
                      * copy what we know about the neighbours on our left side,
@@ -389,19 +411,17 @@ static void next_generation(char *pgrid, char *pnext_grid){
                      */
                     n[0] = n[1];
                     n[1] = n[2];
-                    n[2] = pgrid[((x          +1)%LCD_WIDTH)+((y+LCD_HEIGHT-1)%LCD_HEIGHT)*LCD_WIDTH];
+                    n[2] = get_cell(x+1, y-1, pgrid);
                     n[3] = n[4];
-                    n[5] = pgrid[((x          +1)%LCD_WIDTH)+((y             )%LCD_HEIGHT)*LCD_WIDTH];
+                    n[4] = n[5];
+                    n[5] = get_cell(x+1, y,   pgrid);
                     n[6] = n[7];
                     n[7] = n[8];
-                    n[8] = pgrid[((x          +1)%LCD_WIDTH)+((y           +1)%LCD_HEIGHT)*LCD_WIDTH];
+                    n[8] = get_cell(x+1, y+1, pgrid);
                 }
             }
 
-            m = x+y*LCD_WIDTH;
-
             /* how old is our cell? */
-            n[4] = pgrid[m];
             age  = n[4];
 
             /* calculate the cell based on given neighbour information */
@@ -411,14 +431,12 @@ static void next_generation(char *pgrid, char *pnext_grid){
             if(cell){
                 population++;
                 /* prevent overflow */
-                if(age>252){
-                    pnext_grid[m] = 252;
-                } else {
-                    pnext_grid[m] = age + 1;
-                }
+                if(age<252)
+                    age++;
+                set_cell_age(x, y, age, pnext_grid);
             }
             else
-                pnext_grid[m] = 0;
+                set_cell_age(x, y, 0, pnext_grid);
 #if 0
             DEBUGF("x=%d,y=%d\n", x, y);
             DEBUGF("cell: %d\n", cell);
@@ -465,7 +483,7 @@ enum plugin_status plugin_start(const void* parameter)
     init_grid(pgrid);    
 
 
- if( parameter == NULL )
+    if( parameter == NULL )
     {
         setup_grid(pgrid, pattern++);
     }
