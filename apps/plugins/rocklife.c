@@ -136,10 +136,12 @@ static bool load_cellfile(const char *file, char *pgrid){
 
     char c;
     int nc, x, y, xmid, ymid;
+    bool comment;
     x=0;
     y=0;
     xmid = (GRID_W>>1) - 2;
     ymid = (GRID_H>>1) - 2;
+    comment = false;
 
     while (true) { 
         nc = read(fd, &c, 1);
@@ -147,17 +149,23 @@ static bool load_cellfile(const char *file, char *pgrid){
             break;
 
         switch(c) {
+        case '!':
+            comment = true;
         case '.':
-            x++;
+            if (!comment)
+                x++;
             break;
         case 'O':
-            if (is_valid_cell(xmid + x, ymid + y))
-                set_cell(xmid + x, ymid + y, pgrid);
-            x++;
+            if (!comment) {
+                if (is_valid_cell(xmid + x, ymid + y))
+                    set_cell(xmid + x, ymid + y, pgrid);
+                x++;
+            }
             break;
         case '\n':
             y++;
             x=0;
+            comment = false;
             break;
         default:
             break;
