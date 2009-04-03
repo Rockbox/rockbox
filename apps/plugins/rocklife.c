@@ -144,7 +144,7 @@ static bool load_cellfile(const char *file, char *pgrid){
     comment = false;
 
     while (true) { 
-        nc = read(fd, &c, 1);
+        nc = rb->read(fd, &c, 1);
         if (nc <= 0)
             break;
 
