@@ -22,7 +22,7 @@
 #include "system.h"
 #include "usb_core.h"
 #include "usb_drv.h"
-//#define LOGF_ENABLE
+#define LOGF_ENABLE
 #include "logf.h"
 #include "storage.h"
 #include "hotswap.h"
@@ -397,8 +397,8 @@ void usb_storage_init_connection(void)
     /* prime rx endpoint. We only need room for commands */
     state = WAITING_FOR_COMMAND;
 
-#if CONFIG_CPU == IMX31L || CONFIG_USBOTG == USBOTG_ISP1583 || \
-        defined(CPU_TCC77X) || defined(CPU_TCC780X) || defined(BOOTLOADER)
+#if CONFIG_CPU == IMX31L || defined(CPU_TCC77X) || defined(CPU_TCC780X) || \
+    defined(BOOTLOADER)
     static unsigned char _transfer_buffer[BUFFER_SIZE*2]
         USB_DEVBSS_ATTR __attribute__((aligned(32)));
     tb.transfer_buffer = (void *)_transfer_buffer;
