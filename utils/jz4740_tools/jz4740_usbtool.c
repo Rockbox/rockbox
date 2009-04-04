@@ -518,6 +518,7 @@ int send_rockbox(usb_dev_handle *dh, const char* filename)
         upload_data(dh, 0x080000000, jz_xloader, LEN_jz_xloader);
     }
     boot(dh, 0x080000000, false);
+    _SLEEP(1);
     
     fsize = read_file(filename, &buffer);
     upload_data(dh, 0x080004000, buffer, fsize);
@@ -676,12 +677,9 @@ int jzconnect(int address, unsigned char* buf, int len, int func)
         }
     }
 
-    if (dev == NULL)
-    {
-        fprintf(stderr, "[ERR]  Device not found.\n");
-        fprintf(stderr, "[ERR]  Ensure your device is in USB boot mode and run usbtool again.\n");
-        return -4;
-    }
+    fprintf(stderr, "[ERR]  Device not found.\n");
+    fprintf(stderr, "[ERR]  Ensure your device is in USB boot mode and run usbtool again.\n");
+    return -4;
 
 found:
     if ( (dh = usb_open(dev)) == NULL)
