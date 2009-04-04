@@ -67,6 +67,8 @@
 
 #define RESTORE_WPS_INSTANTLY       0l
 #define RESTORE_WPS_NEXT_SECOND     ((long)(HZ+current_tick))
+/* in milliseconds */
+#define DEFAULT_SKIP_TRESH          3000ul
 
 static int wpsbars;
 /* currently only one wps_state is needed */
@@ -77,10 +79,21 @@ static struct wps_data wps_datas[NB_SCREENS];
 /* initial setup of wps_data  */
 static void wps_state_init(void);
 
-static void prev_track(unsigned skip_thresh)
+static void change_dir(int direction)
+{
+    if (global_settings.prevent_skip)
+        return;
+
+    if (direction < 0)
+        audio_prev_dir();
+    else if (direction > 0)
+        audio_next_dir();
+}
+
+static void prev_track(unsigned long skip_thresh)
 {
     if (!global_settings.prevent_skip
-            && (wps_state.id3->elapsed < skip_thresh*1000))
+            && (wps_state.id3->elapsed < skip_thresh))
     {
         audio_prev();
         return;
@@ -129,36 +142,35 @@ static void next_track(void)
 
 static void play_hop(int direction)
 {
-    unsigned step = ((unsigned)global_settings.skip_length*1000);
-    unsigned long *elapsed = &(wps_state.id3->elapsed);
-    bool prevent_skip = global_settings.prevent_skip;
+    unsigned long step = ((unsigned long)global_settings.skip_length)*1000;
+    unsigned long elapsed = wps_state.id3->elapsed;
+    unsigned long remaining = wps_state.id3->length - elapsed;
 
-    if (direction == 1 && wps_state.id3->length - *elapsed < step+1000)
-    {
-        if (!prevent_skip)
+    if (!global_settings.prevent_skip
+            && (!step || (step >= remaining || (direction < 0 && elapsed < DEFAULT_SKIP_TRESH))))
+    {   /* Do normal track skipping */
+        if (direction > 0)
             next_track();
+        else if (direction < 0)
+            prev_track(DEFAULT_SKIP_TRESH);
+        return;
+    }
+
+    if (direction == 1 && step >= remaining)
+    {
 #if CONFIG_CODEC == SWCODEC
-        else
-        {
-            if(global_settings.beep)
-                pcmbuf_beep(1000, 150, 1500*global_settings.beep);
-        }
+        if(global_settings.beep)
+            pcmbuf_beep(1000, 150, 1500*global_settings.beep);
 #endif
         return;
     }
-    else if ((direction == -1 && *elapsed < step))
+    else if ((direction == -1 && elapsed < step))
     {
-        if (!prevent_skip)
-        {
-            prev_track(3);
-            return;
-        }
-        else
-            *elapsed = 0;
+        elapsed = 0;
     }
     else
     {
-        *elapsed += step * direction;
+        elapsed += step * direction;
     }
     if((audio_status() & AUDIO_STATUS_PLAY) && !wps_state.paused)
     {
@@ -168,7 +180,7 @@ static void play_hop(int direction)
         audio_pause();
 #endif
     }
-    audio_ff_rewind(*elapsed);
+    audio_ff_rewind(wps_state.id3->elapsed = elapsed);
 #if (CONFIG_CODEC != SWCODEC)
     if (!wps_state.paused)
         audio_resume();
@@ -441,8 +453,7 @@ long gui_wps_show(void)
             case ACTION_WPS_SEEKFWD:
                 if (global_settings.party_mode)
                     break;
-                if (global_settings.skip_length == 0
-                    && current_tick -last_right < HZ)
+                if (current_tick -last_right < HZ)
                 {
                     if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
                     {
@@ -450,7 +461,7 @@ long gui_wps_show(void)
                     }
                     else
                     {
-                        audio_next_dir();
+                        change_dir(1);
                     }
                 }
                 else
@@ -462,8 +473,7 @@ long gui_wps_show(void)
             case ACTION_WPS_SEEKBACK:
                 if (global_settings.party_mode)
                     break;
-                if (global_settings.skip_length == 0
-                    && current_tick -last_left < HZ)
+                if (current_tick -last_left < HZ)
                 {
                     if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
                     {
@@ -477,7 +487,7 @@ long gui_wps_show(void)
                     }
                     else
                     {
-                        audio_prev_dir();
+                        change_dir(-1);
                     }
                 }
                 else
@@ -491,7 +501,6 @@ long gui_wps_show(void)
                     break;
                 last_left = current_tick;
                 update_track = true;
-
 #ifdef AB_REPEAT_ENABLE
                 /* if we're in A/B repeat mode and the current position
                    is past the A marker, jump back to the A marker... */
@@ -507,12 +516,10 @@ long gui_wps_show(void)
 #endif
                     }
                 }
+                else
                 /* ...otherwise, do it normally */
 #endif
-
-                if (global_settings.skip_length > 0)
                     play_hop(-1);
-                else prev_track(3);
                 break;
 
                 /* next
@@ -522,7 +529,6 @@ long gui_wps_show(void)
                     break;
                 last_right = current_tick;
                 update_track = true;
-
 #ifdef AB_REPEAT_ENABLE
                 /* if we're in A/B repeat mode and the current position is
                    before the A marker, jump to the A marker... */
@@ -538,12 +544,10 @@ long gui_wps_show(void)
 #endif
                     }
                 }
+                else
                 /* ...otherwise, do it normally */
 #endif
-
-                if (global_settings.skip_length > 0)
                     play_hop(1);
-                else next_track();
                 break;
                 /* next / prev directories */
                 /* and set A-B markers if in a-b mode */
@@ -560,9 +564,7 @@ long gui_wps_show(void)
                 else
 #endif
                 {
-                    if (global_settings.skip_length > 0)
-                        next_track();
-                    else audio_next_dir();
+                    change_dir(1);
                 }
                 break;
             case ACTION_WPS_ABSETA_PREVDIR:
@@ -574,9 +576,7 @@ long gui_wps_show(void)
                 else
 #endif
                 {
-                    if (global_settings.skip_length > 0)
-                        prev_track(3);
-                    else audio_prev_dir();
+                    change_dir(-1);
                 }
                 break;
             /* menu key functions */
