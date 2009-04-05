@@ -92,8 +92,7 @@ static void change_dir(int direction)
 
 static void prev_track(unsigned long skip_thresh)
 {
-    if (!global_settings.prevent_skip
-            && (wps_state.id3->elapsed < skip_thresh))
+    if (wps_state.id3->elapsed < skip_thresh)
     {
         audio_prev();
         return;
@@ -124,8 +123,6 @@ static void prev_track(unsigned long skip_thresh)
 
 static void next_track(void)
 {
-    if (global_settings.prevent_skip)
-        return;
     /* take care of if we're playing a cuesheet */
     if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
     {
