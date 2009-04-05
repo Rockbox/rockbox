@@ -1,40 +1,28 @@
 #include "zxvid_com.h"
-#if !defined HAVE_LCD_COLOR && defined USE_GREY
-/*
-use for slightly different colors
-#define N0 0x04
-#define N1 0x34
 
-#define B0 0x08
-#define B1 0x3F
-*/
+#ifdef USE_GREY
 
-/* these ones are the same as for color targets ... may be tweak for greyscale? */
 #define N0 0x00
-#define N1 0xAA
-
-#define B0 0x55
+#define N1 0xC0
+#define B0 0x00
 #define B1 0xFF
+
 static unsigned char graybuffer[LCD_HEIGHT*LCD_WIDTH] IBSS_ATTR; /* off screen buffer */
 
-struct rgb norm_colors[COLORNUM]={
-  {0,0,0},{N0,N0,N1},{N1,N0,N0},{N1,N0,N1},
-  {N0,N1,N0},{N0,N1,N1},{N1,N1,N0},{N1,N1,N1},
-
-  {0x15,0x15,0x15},{B0,B0,B1},{B1,B0,B0},{B1,B0,B1},
-  {B0,B1,B0},{B0,B1,B1},{B1,B1,B0},{B1,B1,B1}
+static const unsigned char graylevels[16] = {
+    N0, (6*N0+1*N1)/7, (5*N0+2*N1)/7, (4*N0+3*N1)/7,
+    (3*N0+4*N1)/7, (2*N0+5*N1)/7, (1*N0+6*N1)/7, N1,
+    B0, (6*B0+1*B1)/7, (5*B0+2*B1)/7, (4*B0+3*B1)/7,
+    (3*B0+4*B1)/7, (2*B0+5*B1)/7, (1*B0+6*B1)/7, B1
 };
 
 void init_spect_scr(void)
 {
     int i;
+    unsigned mask = settings.invert_colors ? 0xFF : 0;
+
     for(i = 0; i < 16; i++) 
-        sp_colors[i] = 0.3*norm_colors[i].r + 0.59*norm_colors[i].g + 0.11*norm_colors[i].b;
-    if ( settings.invert_colors ){
-        int i;
-        for ( i = 0 ; i < 16 ; i++ )
-            sp_colors[i] = 255 - sp_colors[i];
-    }
+        sp_colors[i] = graylevels[i] ^ mask;
 
     sp_image = (char *) &image_array;
     spscr_init_mask_color();
@@ -52,7 +40,7 @@ void update_screen(void)
     int srcx, srcy=0;     /* x / y coordinates in source image */
     image = sp_image + ( (Y_OFF)*(WIDTH) ) + X_OFF;
     unsigned char* buf_ptr;
-    buf_ptr = (unsigned char*) &graybuffer;
+    buf_ptr = graybuffer;
     for(y = 0; y < LCD_HEIGHT; y++)
     {
         srcx = 0;           /* reset our x counter before each row... */
@@ -94,4 +82,4 @@ void update_screen(void)
 
 }
 
-#endif
+#endif /* USE_GREY */

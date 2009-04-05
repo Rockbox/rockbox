@@ -1,48 +1,46 @@
 #include "zxvid_com.h"
 
-#if LCD_DEPTH > 4
 /* screen routines for color targets */
-
-/*
-use for slightly different colors
-#define N0 0x04
-#define N1 0x34
-
-#define B0 0x08
-#define B1 0x3F
-*/
 
 #define N0 0x00
 #define N1 0xC0
-
 #define B0 0x00
 #define B1 0xFF
 
-struct rgb norm_colors[COLORNUM]={
-  {0,0,0},{N0,N0,N1},{N1,N0,N0},{N1,N0,N1},
-  {N0,N1,N0},{N0,N1,N1},{N1,N1,N0},{N1,N1,N1},
+#define IN0 (0xFF-N0)
+#define IN1 (0xFF-N1)
+#define IB0 (0xFF-B0)
+#define IB1 (0xFF-B1)
 
-  {0,0,0},{B0,B0,B1},{B1,B0,B0},{B1,B0,B1},
-  {B0,B1,B0},{B0,B1,B1},{B1,B1,B0},{B1,B1,B1}
+static const fb_data _16bpp_colors[32] = {
+    /* normal */
+    LCD_RGBPACK(N0, N0, N0), LCD_RGBPACK(N0, N0, N1),
+    LCD_RGBPACK(N1, N0, N0), LCD_RGBPACK(N1, N0, N1),
+    LCD_RGBPACK(N0, N1, N0), LCD_RGBPACK(N0, N1, N1),
+    LCD_RGBPACK(N1, N1, N0), LCD_RGBPACK(N1, N1, N1),
+    LCD_RGBPACK(B0, B0, B0), LCD_RGBPACK(B0, B0, B1),
+    LCD_RGBPACK(B1, B0, B0), LCD_RGBPACK(B1, B0, B1),
+    LCD_RGBPACK(B0, B1, B0), LCD_RGBPACK(B0, B1, B1),
+    LCD_RGBPACK(B1, B1, B0), LCD_RGBPACK(B1, B1, B1),
+    /* inverted */
+    LCD_RGBPACK(IN0, IN0, IN0), LCD_RGBPACK(IN0, IN0, IN1),
+    LCD_RGBPACK(IN1, IN0, IN0), LCD_RGBPACK(IN1, IN0, IN1),
+    LCD_RGBPACK(IN0, IN1, IN0), LCD_RGBPACK(IN0, IN1, IN1),
+    LCD_RGBPACK(IN1, IN1, IN0), LCD_RGBPACK(IN1, IN1, IN1),
+    LCD_RGBPACK(IB0, IB0, IB0), LCD_RGBPACK(IB0, IB0, IB1),
+    LCD_RGBPACK(IB1, IB0, IB0), LCD_RGBPACK(IB1, IB0, IB1),
+    LCD_RGBPACK(IB0, IB1, IB0), LCD_RGBPACK(IB0, IB1, IB1),
+    LCD_RGBPACK(IB1, IB1, IB0), LCD_RGBPACK(IB1, IB1, IB1),
 };
-
-
-/* since emulator uses array of bytes for screen representation
- * short 16b colors won't fit there */
-short _16bpp_colors[16] IBSS_ATTR; 
 
 void init_spect_scr(void)
 {
     int i;
+    int offset = settings.invert_colors ? 16 : 0;
 
     for(i = 0; i < 16; i++) 
-        sp_colors[i] = i;
-    for(i = 0; i < 16; i++) 
-        _16bpp_colors[i] = LCD_RGBPACK(norm_colors[i].r,norm_colors[i].g,norm_colors[i].b);
-    if ( settings.invert_colors ){
-        for ( i = 0 ; i < 16 ; i++ )
-            _16bpp_colors[i] = 0xFFFFFF - _16bpp_colors[i];
-    }
+        sp_colors[i] = i + offset;
+
     sp_image = (char *) &image_array;
     spscr_init_mask_color();
     spscr_init_line_pointers(HEIGHT);
@@ -97,4 +95,3 @@ void update_screen(void)
 }
 
 
-#endif /* HAVE_LCD_COLOR */

@@ -27,6 +27,11 @@ z80_step.c
 z80optab.c
 zxbox.c
 zxbox_keyb.c
+#ifdef HAVE_LCD_COLOR
 zxvid_16bpp.c
-zxvid_4bpp.c
+#else
+#if LCD_DEPTH == 2
+zxvid_2bpp.c
+#endif
 zxvid_grey.c
+#endif

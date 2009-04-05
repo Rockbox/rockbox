@@ -1,6 +1,6 @@
 #include "zxvid_com.h"
 
-#if !defined USE_GREY && LCD_DEPTH < 4
+#ifndef USE_GREY
 /* screen routines for greyscale targets not using greyscale lib */
 
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING 
@@ -21,32 +21,19 @@ fb_data pixval[4] ICONST_ATTR = {
 };
 #endif
 
+static const unsigned char graylevels[16] = {
+    0, 1, 1, 1, 2, 2, 3, 3,
+    0, 1, 1, 1, 2, 2, 3, 3
+};
+
 void init_spect_scr(void)
 {
-    sp_colors[0] = 0;/* BLACK ? */
-    sp_colors[1] = 1;/* BLUE ? */
-    sp_colors[2] = 1;/* RED ? */
-    sp_colors[3] = 1;/* MAGENTA ? */
-    sp_colors[4] = 2;/* GREEN ? */
-    sp_colors[5] = 2;/* CYAN ? */
-    sp_colors[6] = 3;/* YELLOW ? */
-    sp_colors[7] = 3;/* WHITE ? */
+    int i;
+    unsigned mask = settings.invert_colors ? 0 : 3;
+    
+    for(i = 0; i < 16; i++)
+        sp_colors[i] = graylevels[i] ^ mask;
 
-    /* same but 'light/bright' colors */
-    sp_colors[8] = 0;
-    sp_colors[9] = 1;
-    sp_colors[10] = 1;
-    sp_colors[11] = 1;
-    sp_colors[12] = 2;
-    sp_colors[13] = 2;
-    sp_colors[14] = 3;
-    sp_colors[15] = 3;
-
-    if ( !settings.invert_colors ){
-        int i;
-        for ( i = 0 ; i < 16 ; i++ )
-            sp_colors[i] = 3 - sp_colors[i];
-    }
     sp_image = (char *) &image_array;
     spscr_init_mask_color();
     spscr_init_line_pointers(HEIGHT);
@@ -127,4 +114,4 @@ void update_screen(void)
     rb -> lcd_update();
 }
 
-#endif
+#endif /* !USE_GREY */
