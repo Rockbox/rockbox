@@ -24,9 +24,10 @@
 #include "lcd.h"
 #include "lcd-target.h"
 
-#define PIN_CS_N    (32*1+17) /* Chip select */
-#define PIN_RESET_N (32*1+18) /* Reset */
+#define PIN_CS_N    (32*1+17)  /* Chip select */
+#define PIN_RESET_N (32*1+18)  /* Reset */
 #define PIN_UNK_N   (32*2+19)
+#define LCD_PCLK    (20000000) /* LCD PCLK */
 
 #define my__gpio_as_lcd_16bit()            \
 do {                        \
