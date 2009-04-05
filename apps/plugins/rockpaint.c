@@ -2627,6 +2627,10 @@ static bool rockpaint_loop( void )
     int button=0,i,j;
     int accelaration;
 
+    toolbar();
+    restore_screen();
+    inv_cursor(true);
+
     while (!quit) {
         button = rb->button_get(true);
 
