@@ -45,39 +45,40 @@ public:
 
     // set infos
     void setSettings(RbSettings* sett) { settings = sett;}
-    
+
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
     void setTargetId(int id){m_targetid = id;}
     void setLang(QString name){m_lang =name;}
     void setWavtrimThreshold(int th){m_wavtrimThreshold = th;}
-    
+
 signals:
     void done(bool error);
-    
+
 private slots:
     void abort();
     void downloadDone(bool error);
     void updateDataReadProgress(int read, int total);
-    
+
 private:
-   
+
     // ptr to encoder, tts and settings
     TTSBase* m_tts;
     EncBase* m_enc;
     RbSettings* settings;
     HttpGet *getter;
-   
+
     QString filename;  //the temporary file
-   
+
     QString m_mountpoint;  //mountpoint of the device
     QString m_path;   //path where the wav and mp3 files are stored to
     int m_targetid;  //the target id
     QString m_lang;  // the language which will be spoken
     int m_wavtrimThreshold;
-  
+
     ProgressloggerInterface* m_logger;
 
     bool m_abort;
 };
-   
+
 #endif
+

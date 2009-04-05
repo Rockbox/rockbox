@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
- 
+
 #ifndef TTS_H
 #define TTS_H
 
@@ -55,16 +55,16 @@ class TTSBase : public QObject
         virtual bool configOk() { return false; }
 
         virtual void setCfg(RbSettings* sett) { settings = sett; }
-        
+
         static TTSBase* getTTS(QString ttsname);
         static QStringList getTTSList();
         static QString getTTSName(QString tts);
-        
-    public slots:
-        virtual void accept(void){}
+
+        public slots:
+            virtual void accept(void){}
         virtual void reject(void){}
         virtual void reset(void){}
-        
+
     private:
         //inits the tts List
         static void initTTSList();
@@ -77,7 +77,7 @@ class TTSBase : public QObject
 
 class TTSSapi : public TTSBase
 {
- Q_OBJECT
+    Q_OBJECT
     public:
         TTSSapi();
         virtual TTSStatus voice(QString text,QString wavfile, QString *errStr);
@@ -85,13 +85,13 @@ class TTSSapi : public TTSBase
         virtual bool stop();
         virtual void showCfg();
         virtual bool configOk();
-    
+
         QStringList getVoiceList(QString language);
     private:
         QProcess* voicescript;
         QTextStream* voicestream;
         QString defaultLanguage;
-        
+
         QString m_TTSexec;
         QString m_TTSOpts;
         QString m_TTSTemplate;
@@ -114,7 +114,7 @@ class TTSExes : public TTSBase
         virtual bool configOk();
 
         virtual void setCfg(RbSettings* sett);
-        
+
     private:
         QString m_name;
         QString m_TTSexec;
@@ -125,24 +125,24 @@ class TTSExes : public TTSBase
 
 class TTSFestival : public TTSBase
 {
-	Q_OBJECT
-public:
-	~TTSFestival();
-	virtual bool configOk();
-	virtual bool start(QString *errStr);
-	virtual bool stop();
-	virtual void showCfg();
-	virtual TTSStatus voice(QString text,QString wavfile,  QString *errStr);
+    Q_OBJECT
+    public:
+        ~TTSFestival();
+        virtual bool configOk();
+        virtual bool start(QString *errStr);
+        virtual bool stop();
+        virtual void showCfg();
+        virtual TTSStatus voice(QString text,QString wavfile,  QString *errStr);
 
-	QStringList  getVoiceList();
-	QString 	 getVoiceInfo(QString voice);
-private:
-	inline void	startServer();
-	inline void	ensureServerRunning();
-	QString	queryServer(QString query, int timeout = -1);
-	QProcess serverProcess;
-	QStringList voices;
-	QMap<QString, QString> voiceDescriptions;
+        QStringList  getVoiceList();
+        QString      getVoiceInfo(QString voice);
+    private:
+        inline void    startServer();
+        inline void    ensureServerRunning();
+        QString    queryServer(QString query, int timeout = -1);
+        QProcess serverProcess;
+        QStringList voices;
+        QMap<QString, QString> voiceDescriptions;
 };
 
 #endif

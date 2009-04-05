@@ -34,71 +34,72 @@ class TTSFestival;
 
 class TTSSapiGui : public QDialog
 {
- Q_OBJECT
-public:
-    TTSSapiGui(TTSSapi* sapi,QDialog* parent = NULL);
-    
-    void showCfg();
-    void setCfg(RbSettings* sett){settings = sett;}
-public slots:
+    Q_OBJECT
+    public:
+        TTSSapiGui(TTSSapi* sapi,QDialog* parent = NULL);
 
-    virtual void accept(void);
-    virtual void reject(void);
-    virtual void reset(void);
-    void updateVoices(QString language);
-    void useSapi4Changed(int);
-private:
-    Ui::SapiCfgFrm ui;
-    RbSettings* settings;
-    TTSSapi* m_sapi;
+        void showCfg();
+        void setCfg(RbSettings* sett){settings = sett;}
+        public slots:
+
+            virtual void accept(void);
+        virtual void reject(void);
+        virtual void reset(void);
+        void updateVoices(QString language);
+        void useSapi4Changed(int);
+    private:
+        Ui::SapiCfgFrm ui;
+        RbSettings* settings;
+        TTSSapi* m_sapi;
 };
 
 class TTSExesGui : public QDialog
 {
- Q_OBJECT
-public:
-    TTSExesGui(QDialog* parent = NULL);
-    
-    void showCfg(QString m_name);
-    void setCfg(RbSettings* sett){settings = sett;}
+    Q_OBJECT
+    public:
+        TTSExesGui(QDialog* parent = NULL);
 
-public slots:
-    virtual void accept(void);
-    virtual void reject(void);
-    virtual void reset(void); 
-    void browse(void);
-private:
-    Ui::TTSExesCfgFrm ui;
-    RbSettings* settings;
-    QString m_name;
+        void showCfg(QString m_name);
+        void setCfg(RbSettings* sett){settings = sett;}
+
+        public slots:
+            virtual void accept(void);
+        virtual void reject(void);
+        virtual void reset(void);
+        void browse(void);
+    private:
+        Ui::TTSExesCfgFrm ui;
+        RbSettings* settings;
+        QString m_name;
 };
 
 class TTSFestivalGui : public QDialog
 {
-	Q_OBJECT
-public:
-	TTSFestivalGui(TTSFestival* festival, QDialog* parent = NULL);
+    Q_OBJECT
+    public:
+        TTSFestivalGui(TTSFestival* festival, QDialog* parent = NULL);
 
-	void showCfg();
-	void setCfg(RbSettings* sett){settings = sett;}
+        void showCfg();
+        void setCfg(RbSettings* sett){settings = sett;}
 
-public slots:
-	virtual void accept(void);
-	virtual void reject(void);
-	//virtual void reset(void);
+        public slots:
+            virtual void accept(void);
+        virtual void reject(void);
+        //virtual void reset(void);
 
-	void onRefreshButton();
-	void onShowDescription(int state);
-	void onBrowseServer();
-	void onBrowseClient();
-private:
-	Ui::TTSFestivalCfgFrm ui;
-	RbSettings* settings;
-	TTSFestival* festival;
+        void onRefreshButton();
+        void onShowDescription(int state);
+        void onBrowseServer();
+        void onBrowseClient();
+    private:
+        Ui::TTSFestivalCfgFrm ui;
+        RbSettings* settings;
+        TTSFestival* festival;
 
-	void updateVoices();
-private slots:
-	void updateDescription(QString value);
+        void updateVoices();
+        private slots:
+            void updateDescription(QString value);
 };
 
 #endif
+
