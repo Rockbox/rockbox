@@ -398,7 +398,7 @@ void usb_storage_init_connection(void)
     state = WAITING_FOR_COMMAND;
 
 #if CONFIG_CPU == IMX31L || defined(CPU_TCC77X) || defined(CPU_TCC780X) || \
-    defined(BOOTLOADER)
+    defined(BOOTLOADER) || CONFIG_CPU == DM320
     static unsigned char _transfer_buffer[BUFFER_SIZE*2]
         USB_DEVBSS_ATTR __attribute__((aligned(32)));
     tb.transfer_buffer = (void *)_transfer_buffer;
