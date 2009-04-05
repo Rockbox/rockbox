@@ -146,8 +146,10 @@ static void play_hop(int direction)
     unsigned long elapsed = wps_state.id3->elapsed;
     unsigned long remaining = wps_state.id3->length - elapsed;
 
-    if (!global_settings.prevent_skip
-            && (!step || (step >= remaining || (direction < 0 && elapsed < DEFAULT_SKIP_TRESH))))
+    if (!global_settings.prevent_skip &&
+           (!step ||
+            (direction > 0 && step >= remaining) ||
+            (direction < 0 && elapsed < DEFAULT_SKIP_TRESH)))
     {   /* Do normal track skipping */
         if (direction > 0)
             next_track();
