@@ -122,9 +122,26 @@ void BootloaderInstallSansa::installStage2(void)
         return;
     }
 
+    // check model -- if sansapatcher reports a c200 don't install an e200
+    // bootloader and vice versa.
+    // The model is available in the mi4 file at offset 0x1fc and matches
+    // the targetname set by sansapatcher.
+    emit logItem(tr("Checking downloaded bootloader"), LOGINFO);
     m_tempfile.open();
     QString blfile = m_tempfile.fileName();
+    char magic[4];
+    m_tempfile.seek(0x1fc);
+    m_tempfile.read(magic, 4);
     m_tempfile.close();
+    if(memcmp(sansa.targetname, magic, 4) != 0) {
+        emit logItem(tr("Bootloader mismatch! Aborting."), LOGERROR);
+        qDebug("[BL-Sansa] Targetname: %s, mi4 magic: %c%c%c%c",
+                sansa.targetname, magic[0], magic[1], magic[2], magic[3]);
+        emit done(true);
+        sansa_close(&sansa);
+        return;
+    }
+
     if(sansa_add_bootloader(&sansa, blfile.toLatin1().data(),
             FILETYPE_MI4) == 0) {
         emit logItem(tr("Successfully installed bootloader"), LOGOK);
