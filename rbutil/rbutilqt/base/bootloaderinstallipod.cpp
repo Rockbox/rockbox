@@ -198,12 +198,13 @@ BootloaderInstallBase::BootloaderType BootloaderInstallIpod::installed(void)
         qDebug() << "BootloaderInstallIpod::installed(): BootloaderUnknown";
         result = BootloaderUnknown;
     }
-
-    if (ipod.ipod_directory[0].entryOffset == 0) {
+    else if (ipod.ipod_directory[0].entryOffset == 0) {
         qDebug() << "BootloaderInstallIpod::installed(): BootloaderOther";
         result = BootloaderOther;
     }
-    qDebug() << "BootloaderInstallIpod::installed(): BootloaderRockbox";
+    else {
+        qDebug() << "BootloaderInstallIpod::installed(): BootloaderRockbox";
+    }
     ipod_close(&ipod);
 
     return result;
