@@ -229,7 +229,7 @@ QString RbSettings::curPlatform()
 
 QString RbSettings::curBuildserver_Modelname()
 {
-    return deviceSettingCurGet("buidserver_modelname").toString();
+    return deviceSettingCurGet("buildserver_modelname").toString();
 }
 
 QString RbSettings::curManual()
