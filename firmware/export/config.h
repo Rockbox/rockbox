@@ -599,13 +599,13 @@ Lyre prototype 1*/
 #define ARM_ARCH 4 /* ARMv4 */
 #endif
 
+#if (CONFIG_CPU == JZ4732)
+#define CPU_MIPS 32
+#endif
+
 /* Determine if accesses should be strictly long aligned. */
 #if (CONFIG_CPU == SH7034) || defined(CPU_ARM) || defined(CPU_MIPS)
 #define ROCKBOX_STRICT_ALIGN 1
-#endif
-
-#if (CONFIG_CPU == JZ4732)
-#define CPU_MIPS 32
 #endif
 
 #ifndef CODEC_SIZE
