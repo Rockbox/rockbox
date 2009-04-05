@@ -674,15 +674,19 @@ void button_event(int key, bool pressed)
         new_btn = BUTTON_SCROLL_FWD;
         break;
     case SDLK_KP9:
+    case SDLK_PAGEUP:
         new_btn = BUTTON_UP;
         break;
     case SDLK_KP3:
+    case SDLK_PAGEDOWN:
         new_btn = BUTTON_DOWN;
         break;
     case SDLK_KP1:
+    case SDLK_HOME:
         new_btn = BUTTON_POWER;
         break;
     case SDLK_KP7:
+    case SDLK_END:
         new_btn = BUTTON_REC;
         break;
     case SDLK_KP5:
