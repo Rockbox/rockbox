@@ -163,16 +163,15 @@ static void _set_lcd_bus(void)
 static void _set_lcd_clock(void)
 {
     unsigned int val;
-    int pll_div;
     
     __cpm_stop_lcd();
-    pll_div = ( REG_CPM_CPCCR & CPM_CPCCR_PCS ); /* clock source, 0:pllout/2 1: pllout */
-    pll_div = pll_div ? 1 : 2 ;
-    val = ( __cpm_get_pllout()/pll_div ) / 336000000;
+    
+    val = __cpm_get_pllout2() / LCD_PCLK;
     val--;
     if ( val > 0x1ff )
         val = 0x1ff; /* CPM_LPCDR is too large, set it to 0x1ff */
     __cpm_set_pixdiv(val);
+    
     __cpm_start_lcd();
 }
 
