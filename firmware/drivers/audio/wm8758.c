@@ -172,20 +172,49 @@ void audiohw_close(void)
 /* Note: Disable output before calling this function */
 void audiohw_set_frequency(int fsel)
 {
-    /**** We force 44.1KHz for now. ****/
-    (void)fsel;
+    /* CLKCTRL_MCLKDIV_MASK and ADDCTRL_SR_MASK don't overlap,
+       so they can both fit in one byte.  Bit 0 selects PLL 
+       configuration via pll_setups.
+     */
+    static const unsigned char freq_setups[HW_NUM_FREQ] = 
+    {
+        [HW_FREQ_48] = CLKCTRL_MCLKDIV_2 | ADDCTRL_SR_48kHz | 1,
+        [HW_FREQ_44] = CLKCTRL_MCLKDIV_2 | ADDCTRL_SR_48kHz,
+        [HW_FREQ_32] = CLKCTRL_MCLKDIV_3 | ADDCTRL_SR_32kHz | 1,
+        [HW_FREQ_24] = CLKCTRL_MCLKDIV_4 | ADDCTRL_SR_24kHz | 1,
+        [HW_FREQ_22] = CLKCTRL_MCLKDIV_4 | ADDCTRL_SR_24kHz,
+        [HW_FREQ_16] = CLKCTRL_MCLKDIV_6 | ADDCTRL_SR_16kHz | 1,
+        [HW_FREQ_12] = CLKCTRL_MCLKDIV_8 | ADDCTRL_SR_12kHz | 1,
+        [HW_FREQ_11] = CLKCTRL_MCLKDIV_8 | ADDCTRL_SR_12kHz,
+        [HW_FREQ_8] = CLKCTRL_MCLKDIV_12 | ADDCTRL_SR_8kHz | 1
+    };
 
-    /* setup PLL for MHZ=11.2896 */
-    wmcodec_write(PLLN, PLLN_PLLPRESCALE | 0x7);
-    wmcodec_write(PLLK1, 0x21);
-    wmcodec_write(PLLK2, 0x161);
-    wmcodec_write(PLLK3, 0x26);
+    /* Each PLL configuration is an array consisting of 
+       { PLLN, PLLK1, PLLK2, PLLK3 }.  The WM8983 datasheet requires
+       5 < PLLN < 13, and states optimum is PLLN = 8, f2 = 90 MHz
+     */
+    static const unsigned short pll_setups[2][4] = 
+    {
+        /* f1 = 12 MHz, R = 7.5264, f2 = 90.3168 MHz, fPLLOUT = 22.5792 MHz */
+        { PLLN_PLLPRESCALE | 0x7, 0x21, 0x161, 0x26 },
+        /* f1 = 12 MHz, R = 8.192, f2 = 98.304 MHz, fPLLOUT = 24.576 MHz */
+        { PLLN_PLLPRESCALE | 0x8, 0xC, 0x93, 0xE9 }
+    };
 
-    /* set clock div */
-    wmcodec_write(CLKCTRL, CLKCTRL_CLKSEL | CLKCTRL_MCLKDIV_2
+    int i;
+
+    /* PLLN, PLLK1, PLLK2, PLLK3 are contiguous (at 0x24 to 0x27) */
+    for (i = 0; i < 4; i++)
+        wmcodec_write(PLLN + i, pll_setups[freq_setups[fsel] & 1][i]);
+
+    /* CLKCTRL_MCLKDIV divides fPLLOUT to get SYSCLK (256 * sample rate) */
+    wmcodec_write(CLKCTRL, CLKCTRL_CLKSEL 
+                         | (freq_setups[fsel] & CLKCTRL_MCLKDIV_MASK)
                          | CLKCTRL_BCLKDIV_2 | CLKCTRL_MS);
 
-    wmcodec_write(ADDCTRL, ADDCTRL_SR_48kHz | ADDCTRL_SLOWCLKEN);
+    /* set ADC and DAC filter characteristics according to sample rate */
+    wmcodec_write(ADDCTRL, (freq_setups[fsel] & ADDCTRL_SR_MASK) 
+                         | ADDCTRL_SLOWCLKEN);
     /* SLOWCLK enabled for zero cross timeout to work */
 }
 

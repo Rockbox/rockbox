@@ -107,6 +107,7 @@ extern void audiohw_set_mixer_vol(int channel1, int channel2);
 #define CLKCTRL_MCLKDIV_6       (5 << 5)
 #define CLKCTRL_MCLKDIV_8       (6 << 5)
 #define CLKCTRL_MCLKDIV_12      (7 << 5)
+#define CLKCTRL_MCLKDIV_MASK    (7 << 5)
 #define CLKCTRL_CLKSEL          (1 << 8)
 
 #define ADDCTRL                 0x07
