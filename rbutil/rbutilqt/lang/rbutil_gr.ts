@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="el_GR">
-<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstallBase</name>
     <message>
@@ -24,59 +23,64 @@
         <translation>Η λήψη ολοκληρώθηκε.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="102"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="103"/>
         <source>Creating backup of original firmware file.</source>
         <translation>Δημιουργία αντίγραφου ασφάλειας αυθεντικού firmware.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="104"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="105"/>
         <source>Creating backup folder failed</source>
         <translation>Η δημιουργία φακέλου αντίγραφου ασφάλειας απέτυχε</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="110"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="111"/>
         <source>Creating backup copy failed.</source>
         <translation>Η δημιουργία αντίγραφου ασφάλειας απέτυχε.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="113"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="114"/>
         <source>Backup created.</source>
         <translation>Δημιουργήθηκε αντίγραφο ασφάλειας.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="126"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="127"/>
         <source>Creating installation log</source>
         <translation>Δημιουργία αρχείου καταγραφής εγκατάστασης</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="149"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="152"/>
         <source>Bootloader installation is almost complete. Installation &lt;b&gt;requires&lt;/b&gt; you to perform the following steps manually:</source>
         <translation>Η εγκατάσταση του bootloader σχεδόν ολοκληρώθηκε. &lt;b&gt;Απαιτείται&lt;/b&gt; να κάνετε τα ακόλουθα βήματα χειροκίνητα:</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="152"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="155"/>
         <source>&lt;li&gt;Safely remove your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Κάντε ασφαλή κατάργηση της συσκευή σας.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="159"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="162"/>
         <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Επανεκινήστε τη συσκευή σας στο αυθεντικό firmware.&lt;/li&gt;&lt;li&gt;Eνημερώστε το firmware χρησιμοποιώντας τη λειτουργία ενημέρωσης του αυθεντικού firmware. Παρακαλώ διαβάστε τις οδηγίες χρήσης της συσκευής σας για λεπτομέρειες.&lt;/li&gt;&lt;li&gt;Μετά την ενημέρωση του firmware επανεκινήστε τη συσκευή σας.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="165"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="168"/>
         <source>&lt;li&gt;Turn the player off&lt;/li&gt;&lt;li&gt;Insert the charger&lt;/li&gt;</source>
         <translation>&lt;li&gt;Απενεργοποιήστε τη συσκευή&lt;/li&gt;&lt;li&gt;Εισάγετε το φορτιστή&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="172"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="175"/>
         <source>&lt;li&gt;Unplug USB and power adaptors&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to turn the player off&lt;/li&gt;&lt;li&gt;Toggle the battery switch on the player&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to boot into Rockbox&lt;/li&gt;</source>
         <translation>&lt;li&gt;Αφαιρέστε το καλώδιο USB και το φορτιστή/li&gt;&lt;li&gt;Κρατήστε το κουμπί &lt;i&gt; Ενεργοποίησης&lt;/i&gt; για να απενεργοποιήσετε τη συσκευή&lt;/li&gt;&lt;li&gt;&lt;/li&gt;&lt;li&gt;Κρατήστε το κουμπί &lt;i&gt; Ενεργοποίησης&lt;/ι&gt; για να ξεκινήσετε το Rockbox&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="177"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="180"/>
         <source>&lt;p&gt;&lt;b&gt;Note:&lt;/b&gt; You can safely install other parts first, but the above steps are &lt;b&gt;required&lt;/b&gt; to finish the installation!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Σημείωση:&lt;/b&gt; Μπορείτε να εγκαταστήσετε και άλλα μέρη πρώτα, αλλά τα παραπάνω βήματα &lt;b&gt;απαιτούνται&lt;/b&gt; για να ολοκληρώσετε την εγκατάσταση!&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallbase.cpp" line="138"/>
+        <source>Installation log created</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -92,37 +96,37 @@
         <translation>Εγκατάσταση Rockbox bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallfile.cpp" line="75"/>
+        <location filename="../base/bootloaderinstallfile.cpp" line="76"/>
         <source>Error accessing output folder</source>
         <translation>Σφάλμα προσπέλασης αρχείου εξόδου</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallfile.cpp" line="88"/>
+        <location filename="../base/bootloaderinstallfile.cpp" line="89"/>
         <source>Bootloader successful installed</source>
         <translation>Η εγκατάσταση του Rockbox bootloader ολοκληρώθηκε με επιτυχία.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallfile.cpp" line="98"/>
+        <location filename="../base/bootloaderinstallfile.cpp" line="99"/>
         <source>Removing Rockbox bootloader</source>
         <translation>Κατάργηση Rockbox bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallfile.cpp" line="102"/>
+        <location filename="../base/bootloaderinstallfile.cpp" line="103"/>
         <source>No original firmware file found.</source>
         <translation>Δεν βρέθηκε αρχείο αυθεντικού firmware.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallfile.cpp" line="108"/>
+        <location filename="../base/bootloaderinstallfile.cpp" line="109"/>
         <source>Can&apos;t remove Rockbox bootloader file.</source>
         <translation>Αδύνατη η κατάργηση του αρχείου Rockbox bootloader.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallfile.cpp" line="113"/>
+        <location filename="../base/bootloaderinstallfile.cpp" line="114"/>
         <source>Can&apos;t restore bootloader file.</source>
         <translation>Αδύνατη επαναφορά του αρχείου bootloader.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallfile.cpp" line="117"/>
+        <location filename="../base/bootloaderinstallfile.cpp" line="118"/>
         <source>Original bootloader restored successfully.</source>
         <translation>Επιτυχής επαναφορά του αυθεντικού bootloader.</translation>
     </message>
@@ -175,107 +179,107 @@
         <translation>Προσθήκεη bootloader στο αρχείο firmware</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="157"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="158"/>
         <source>could not open input file</source>
         <translation>Αδύνατο άνοιγμα αρχείο εισόδου</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="158"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="159"/>
         <source>reading header failed</source>
         <translation>Αποτυχία ανάγνωσης της κεφαλίδας</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="159"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="160"/>
         <source>reading firmware failed</source>
         <translation>Αποτυχια ανάγνωσης του firmware</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="160"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="161"/>
         <source>can&apos;t open bootloader file</source>
         <translation>Αδύνατο το άνοιγμα του αρχείου bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="161"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="162"/>
         <source>reading bootloader file failed</source>
         <translation>Αποτυχία ανάγνωσης του αρχείου bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="162"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="163"/>
         <source>can&apos;t open output file</source>
         <translation>Αδύνατο άνοιγμα αρχείο εξόδου</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="163"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="164"/>
         <source>writing output file failed</source>
         <translation>Αποτυχία εγγραφής αρχείου εξόδου</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="165"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="166"/>
         <source>Error in patching: %1</source>
         <translation>Σφάλμα διαδικασίας patching: %1</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="176"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="177"/>
         <source>Error in scramble: %1</source>
         <translation>Σφάλμα διαδικασίας scramble: %1</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="191"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="192"/>
         <source>Checking modified firmware file</source>
         <translation>Έλεγχος τροποποιημένου αρχείου firmware</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="193"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="194"/>
         <source>Error: modified file checksum wrong</source>
         <translation>Σφάλμα: το άθροισμα ελέγχου του τροποποιημένου αρχείου είναι λάθος</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="201"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="202"/>
         <source>Success: modified firmware file created</source>
         <translation>Επιτυχία: Τροποποιημένο αρχείο firmware δημιουργήθηκε</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="232"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="233"/>
         <source>Can&apos;t open input file</source>
         <translation>Αδύνατο άνοιγμα αρχείο εισόδου</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="233"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="234"/>
         <source>Can&apos;t open output file</source>
         <translation>Αδύνατο άνοιγμα αρχείο εξόδου</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="234"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="235"/>
         <source>invalid file: header length wrong</source>
         <translation>Μη έγκυρο αρχείο: λάθος μήκος κεφαλίδας</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="235"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="236"/>
         <source>invalid file: unrecognized header</source>
         <translation>Μη έγκυρο αρχείο: μη αναγνωρίσιμη κεφαλίδα</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="236"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="237"/>
         <source>invalid file: &quot;length&quot; field wrong</source>
         <translation>Μη έγκυρο αρχείο: λάθος πεδίο &quot;μήκους&quot;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="237"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="238"/>
         <source>invalid file: &quot;length2&quot; field wrong</source>
         <translation>Μη έγκυρο αρχείο: λάθος πεδίο &quot;μήκους2&quot;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="238"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="239"/>
         <source>invalid file: internal checksum error</source>
         <translation>Μη έγκυρο αρχείο: λάθος εσωτερικό άθροισμα ελέγχου</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="239"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="240"/>
         <source>invalid file: &quot;length3&quot; field wrong</source>
         <translation>Μη έγκυρο αρχείο: λάθος πεδίο &quot;μήκους3&quot;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="240"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="241"/>
         <source>unknown</source>
         <translation>Άγνωστο</translation>
     </message>
@@ -300,7 +304,7 @@ Permission for disc access denied!</source>
         <translation>Δεν βρέθηκε Ipod!</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="106"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="108"/>
         <source>Warning: This is a MacPod, Rockbox only runs on WinPods.
 See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation>Προσοχή, η συσκευή σας δουλεύει σαν MacPod, το Rockbox δεν το υποστηρίζει. Μετατρέψτε το σε WinPod.
@@ -312,59 +316,69 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation>Λήψη αρχείου bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="149"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="153"/>
         <source>Failed to read firmware directory</source>
         <translation>Αποτυχία ανάγνωσης του φακέλου που βρίσκεται το firmware</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="154"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="158"/>
         <source>Unknown version number in firmware (%1)</source>
         <translation>Άγνωστος αριθμός έκδοσης firmware (%1)</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="161"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="165"/>
         <source>Could not open Ipod in R/W mode</source>
         <translation>Αδύνατη η προσπέλαση του ipod με τρόπο RW</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="121"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="123"/>
         <source>Successfull added bootloader</source>
         <translation>Επιτυχής προσθήκη bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="128"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="130"/>
         <source>Failed to add bootloader</source>
         <translation>Αποτυχία προσθήκης bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="167"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="171"/>
         <source>No bootloader detected.</source>
         <translation>Δεν ανιχνεύθηκε bootloader.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="173"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="177"/>
         <source>Successfully removed bootloader</source>
         <translation>Επιτυχής κατάργηση bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="180"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="184"/>
         <source>Removing bootloader failed.</source>
         <translation>Η κατάργηση του  bootloader απέτυχε.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="219"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="224"/>
         <source>Could not open Ipod</source>
         <translation>Αδύνατο το άνοιγμα του ipod</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="224"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="229"/>
         <source>Could not read partition table</source>
         <translation>Αδύνατη η ανάγνωση του πίνακα κατάτμησης</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="229"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="234"/>
         <source>No firmware partition on disk</source>
         <translation>Δεν υπάρχει τμήμα firmware στο δίσκο</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallipod.cpp" line="85"/>
+        <source>Installing Rockbox bootloader</source>
+        <translation type="unfinished">Εγκατάσταση Rockbox bootloader</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallipod.cpp" line="142"/>
+        <source>Uninstalling bootloader</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -380,32 +394,32 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation>Εγκατάσταση Rockbox bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="65"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="66"/>
         <source>Bootloader successful installed</source>
         <translation>Η εγκατάσταση του Rockbox bootloader ολοκληρώθηκε με επιτυχία.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="77"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="78"/>
         <source>Checking for Rockbox bootloader</source>
         <translation>Έλεγχος Rockbox bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="79"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="80"/>
         <source>No Rockbox bootloader found</source>
         <translation>Ο Rockbox bootloader δεν βρέθηκε</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="84"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="85"/>
         <source>Checking for original firmware file</source>
         <translation>Έλεγχος αρχείου αυθεντικού firmware</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="89"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="90"/>
         <source>Error finding original firmware file</source>
         <translation>Σφάλμα εύρεσης αρχείου αυθεντικού firmware</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmi4.cpp" line="100"/>
+        <location filename="../base/bootloaderinstallmi4.cpp" line="101"/>
         <source>Rockbox bootloader successful removed</source>
         <translation>Επιτυχής απεγκατάσταση του Rockbox bootloader</translation>
     </message>
@@ -440,22 +454,22 @@ This is required to install the bootloader</source>
         <translation>Λήψη αρχείου bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="86"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="89"/>
         <source>could not open Sansa</source>
         <translation>Αδύνατο το άνοιγμα του sansa</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="93"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="96"/>
         <source>could not read partitiontable</source>
         <translation>Αδύνατη η ανάγνωση του πίνακα κατάτμησης</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="101"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="104"/>
         <source>Disk is not a Sansa (Error: %1), aborting.</source>
         <translation>Ο δίσκος δεν είναι sansa (%1), ματαίωση.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="178"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="201"/>
         <source>OLD ROCKBOX INSTALLATION DETECTED, ABORTING.
 You must reinstall the original Sansa firmware before running
 sansapatcher for the first time.
@@ -467,49 +481,69 @@ See http://www.rockbox.org/wiki/SansaE200Install
 Βλέπετε http://www.rockbox.org/wiki/SansaE200Install</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="185"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="208"/>
         <source>Could not open Sansa in R/W mode</source>
         <translation>Αδύνατη η προσπέλαση του sansa με τρόπο R/W</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="127"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="147"/>
         <source>Successfully installed bootloader</source>
         <translation>Επιτυχής εγκατάσταση bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="134"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="154"/>
         <source>Failed to install bootloader</source>
         <translation>Αποτυχία εγκατάστασης bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="150"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="173"/>
         <source>Can&apos;t find Sansa</source>
         <translation>Δεν βρέθηκε συσκευή sansa</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="156"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="179"/>
         <source>Could not open Sansa</source>
         <translation>Αδύνατο το άνοιγμα του sansa</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="162"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="185"/>
         <source>Could not read partition table</source>
         <translation>Αδύνατη η ανάγνωση του πίνακα κατάτμησης</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="169"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="192"/>
         <source>Disk is not a Sansa (Error %1), aborting.</source>
         <translation>Ο δίσκος δεν είναι sansa (%1), ματαίωση.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="191"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="214"/>
         <source>Successfully removed bootloader</source>
         <translation>Επιτυχής κατάργηση bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="198"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="221"/>
         <source>Removing bootloader failed.</source>
         <translation>Η κατάργηση του  bootloader απέτυχε.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="85"/>
+        <source>Installing Rockbox bootloader</source>
+        <translation type="unfinished">Εγκατάσταση Rockbox bootloader</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="129"/>
+        <source>Checking downloaded bootloader</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="137"/>
+        <source>Bootloader mismatch! Aborting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="169"/>
+        <source>Uninstalling bootloader</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -538,107 +572,152 @@ See http://www.rockbox.org/wiki/SansaE200Install
 <context>
     <name>Config</name>
     <message>
-        <location filename="../configure.cpp" line="114"/>
+        <location filename="../configure.cpp" line="117"/>
         <source>Language changed</source>
         <translation>Η γλώσσα άλλαξε</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="115"/>
+        <location filename="../configure.cpp" line="118"/>
         <source>You need to restart the application for the changed language to take effect.</source>
         <translation>Πρέπει να επανεκκινήσετε την εφαρμογή για να ενεργοποιηθεί η αλλαγή γλώσσας.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="230"/>
+        <location filename="../configure.cpp" line="269"/>
         <source>Current cache size is %L1 kiB.</source>
         <translation>Το μέγεθος της τρέχουσας προσωρινής μνήμης είναι %L1 kiB.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="352"/>
+        <location filename="../configure.cpp" line="391"/>
         <source>Configuration OK</source>
         <translation>Ρυθμίσεις εντάξει</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="357"/>
+        <location filename="../configure.cpp" line="396"/>
         <source>Configuration INVALID</source>
         <translation>Μη επιτρεπτές ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="456"/>
+        <location filename="../configure.cpp" line="495"/>
         <source>Select your device</source>
         <translation>Επιλέξτε τη συσκευή σας</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="548"/>
+        <location filename="../configure.cpp" line="587"/>
         <source>Sansa e200 in MTP mode found!
 You need to change your player to MSC mode for installation. </source>
         <translation>Βρέθηκε sansa e200 σε κατάσταση MTP!
 Πρέπει να αλλάξετε τη συσκευή σας σε κατάσταση MSC για την εγκατάσταση.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="551"/>
+        <location filename="../configure.cpp" line="590"/>
         <source>H10 20GB in MTP mode found!
 You need to change your player to UMS mode for installation. </source>
         <translation>Βρέθηκε H10 20GB σε κατάσταση MTP!
 Πρέπει να αλλάξετε τη συσκευή σας σε κατάσταση UMS για την εγκατάσταση.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="552"/>
+        <location filename="../configure.cpp" line="591"/>
         <source>Unless you changed this installation will fail!</source>
         <translation>Αν δεν το αλλάξετε αυτό η εγκατάσταση θα αποτύχει!</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="554"/>
+        <location filename="../configure.cpp" line="593"/>
         <source>Fatal error</source>
         <translation>Κρίσιμο σφάλμα</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="563"/>
+        <location filename="../configure.cpp" line="602"/>
         <source>Detected an unsupported %1 player variant. Sorry, Rockbox doesn&apos;t run on your player.</source>
         <translation>Εντοπίστηκε μια ανυποστήρικτη %1 παραλλαγή συσκευής. Συγγνώμη, το Rockbox δεν μπορεί να εγκατασταθεί στη συσκευή σας.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="565"/>
+        <location filename="../configure.cpp" line="604"/>
         <source>Fatal error: incompatible player found</source>
         <translation>Κρίσιμο σφάλμα: Βρέθηκε ανυποστήρικτη συσκευή</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="585"/>
+        <location filename="../configure.cpp" line="624"/>
         <source>Autodetection</source>
         <translation>Αυτόματος εντοπισμός</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="578"/>
+        <location filename="../configure.cpp" line="617"/>
         <source>Could not detect a Mountpoint.
 Select your Mountpoint manually.</source>
         <translation>Δεν εντοπίστηκε κάποιο σημείο προσάρτησης.
 Επιλέξτε το σημείο προσάρτησης χειροκίνητα.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="587"/>
+        <location filename="../configure.cpp" line="626"/>
         <source>Could not detect a device.
 Select your device and Mountpoint manually.</source>
         <translation>Δεν εντοπίστηκε κάποια συσκευή.
 Επιλέξτε τη συσκευή σας και το σημείο προσάρτησης χειροκίνητα.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="596"/>
+        <location filename="../configure.cpp" line="635"/>
         <source>Really delete cache?</source>
         <translation>Σίγουρα διαγραφή προσωρινής μνήμης;</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="599"/>
+        <location filename="../configure.cpp" line="638"/>
         <source>Do you really want to delete the cache? Make absolutely sure this setting is correct as it will remove &lt;b&gt;all&lt;/b&gt; files in this folder!</source>
         <translation>Θέλετε σίγουρα να διαγραφεί η προσωρινή μνήμη; Κάντε απόλυτα σίγουρο ότι αυτή η επιλογή είναι σωστή καθώς θα αφαιρεθούν &lt;b&gt;όλα&lt;/b&gt; τα αρχεία και οι φάκελοι!</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="605"/>
+        <location filename="../configure.cpp" line="644"/>
         <source>Path wrong!</source>
         <translation>Λάθος διαδρομή!</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="606"/>
+        <location filename="../configure.cpp" line="645"/>
         <source>The cache path is invalid. Aborting.</source>
         <translation>Η διαδρομή της προσωρινής μνήμης δεν είναι επιτρεπτή. Ακύρωση.</translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="94"/>
+        <source>The following errors occurred:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="125"/>
+        <source>No mountpoint given</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="129"/>
+        <source>Mountpoint does not exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="133"/>
+        <source>Mountpoint is not a directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="137"/>
+        <source>Mountpoint is not writeable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="151"/>
+        <source>No player selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="159"/>
+        <source>Cache path not writeable. Leave path empty to default to systems temporary path.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="177"/>
+        <source>You need to fix the above errors before you can continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="180"/>
+        <source>Configuration error</source>
+        <translation type="unfinished">Σφάλμα ρυθμίσεων</translation>
     </message>
 </context>
 <context>
@@ -845,7 +924,7 @@ Select your device and Mountpoint manually.</source>
 <context>
     <name>Configure</name>
     <message>
-        <location filename="../configure.cpp" line="440"/>
+        <location filename="../configure.cpp" line="479"/>
         <source>English</source>
         <comment>This is the localized language name, i.e. your language.</comment>
         <translation>Ελληνικά</translation>
@@ -958,69 +1037,74 @@ Select your device and Mountpoint manually.</source>
 <context>
     <name>Install</name>
     <message>
-        <location filename="../install.cpp" line="86"/>
+        <location filename="../install.cpp" line="98"/>
         <source>Mount point is wrong!</source>
         <translation>Το σημείο προσάρτησης είναι λάθος!</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="131"/>
+        <location filename="../install.cpp" line="143"/>
         <source>Aborted!</source>
         <translation>Ματαιώθηκε!</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="140"/>
+        <location filename="../install.cpp" line="152"/>
         <source>Beginning Backup...</source>
         <translation>Έναρξή αντίγραφου ασφαλείας...</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="155"/>
+        <location filename="../install.cpp" line="167"/>
         <source>Backup successful</source>
         <translation>Αντίγραφο ασφαλείας δημιουργήθηκε με επιτυχία</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="159"/>
+        <location filename="../install.cpp" line="171"/>
         <source>Backup failed!</source>
         <translation>Αποτυχία αντίγραφου ασφαλείας!</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="221"/>
+        <location filename="../install.cpp" line="234"/>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
         <translation>Αυτή είναι η απόλυτα ενημερωμένη, μέχρι λεπτού έκδοση Rockbox.  Η τωρινή έκδοση θα ενημερώνεται κάθε φορά που γίνεται κάποια αλλαγή. Η  τελευταία έκδοση είναι r%1 (%2).</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="225"/>
-        <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Σημείωση:&lt;/b&gt; Αυτή η επιλογή θα κάνει πάντα λήψη ενός νέου αντίγραφου. &lt;b&gt;Αυτή είναι η συνιστούσα έκδοση.&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <location filename="../install.cpp" line="228"/>
-        <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy.</source>
-        <translation>&lt;b&gt;Σημείωση:&lt;/b&gt; Αυτή η επιλογή θα κάνει πάντα λήψη ενός νέου αντίγραφου.</translation>
-    </message>
-    <message>
-        <location filename="../install.cpp" line="237"/>
+        <location filename="../install.cpp" line="245"/>
         <source>This is the last released version of Rockbox.</source>
         <translation>Αυτή είναι η τελευταία &lt;b&gt;επίσημη&lt;/b&gt; έκδοση του Rockbox.</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="243"/>
+        <location filename="../install.cpp" line="251"/>
         <source>&lt;b&gt;Note:&lt;/b&gt;The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Σημείωση:&lt;/b&gt;Η τελευταία &lt;b&gt;επίσημη&lt;/b&gt; έκδοση είναι %1. &lt;b&gt;Αυτή είναι η συνιστούσα &lt;b&gt;επίσημη&lt;/b&gt; έκδοση.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="255"/>
+        <location filename="../install.cpp" line="263"/>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
         <translation>Αυτές οι εκδόσεις δημιουργούνται καθημερινά από τον τρέχων πηγαίο κώδικα. Συνήθως εμπεριέχουν περισσότερα χαρακτηριστικά από ότι η τελευταία &lt;b&gt;επίσημη&lt;/b&gt; έκδοση αλλά ίσως είναι περισσότερο ασταθείς. Τα χαρακτηριστικά μπορεί να αλλάζουν τακτικά.</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="257"/>
+        <location filename="../install.cpp" line="265"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
         <translation>&lt;b&gt;Σημείωση:&lt;/b&gt; Η καθημερινή έκδοση είναι r%1 (%2).</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="127"/>
+        <location filename="../install.cpp" line="139"/>
         <source>Really continue?</source>
         <translation>Σίγουρα θέλετε να συνεχίσετε;</translation>
+    </message>
+    <message>
+        <location filename="../install.cpp" line="68"/>
+        <source>Backup to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../install.cpp" line="198"/>
+        <source>Select Backup Filename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../install.cpp" line="236"/>
+        <source>&lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1101,19 +1185,14 @@ Select your device and Mountpoint manually.</source>
         <translation>Τροποποίηση</translation>
     </message>
     <message>
-        <location filename="../installfrm.ui" line="221"/>
+        <location filename="../installfrm.ui" line="198"/>
         <source>Rockbox Utility stores copies of Rockbox it has downloaded on the local hard disk to save network traffic. If your local copy is no longer working, tick this box to download a fresh copy.</source>
         <translation>Το Rockbox Utility αποθηκεύει αντίγραφα του Rockbox, που έχουν ληφθεί στον τοπικό δίσκο, για οικονομία δικτυακών πόρων. Εάν το τοπικό αντίγραφο δεν λειτουργεί πια, μαρκάρετε αυτήν την επιλογή για να λάβετε ένα καινούργιο αντίγραφο.</translation>
     </message>
     <message>
-        <location filename="../installfrm.ui" line="224"/>
+        <location filename="../installfrm.ui" line="201"/>
         <source>&amp;Don&apos;t use locally cached copy</source>
         <translation>&amp;Να μην χρησιμοποιηθεί κάποιο προσωρινά αποθηκευμένο τοπικό αντίγραφο</translation>
-    </message>
-    <message>
-        <location filename="../installfrm.ui" line="207"/>
-        <source>Backup Location</source>
-        <translation>Τοποθεσία αντίγραφου ασφαλείας</translation>
     </message>
 </context>
 <context>
@@ -1228,7 +1307,7 @@ Select your device and Mountpoint manually.</source>
         <translation>Πρόοδος</translation>
     </message>
     <message>
-        <location filename="../progressloggerfrm.ui" line="65"/>
+        <location filename="../progressloggerfrm.ui" line="68"/>
         <source>&amp;Abort</source>
         <translation>&amp;Ματαίωση</translation>
     </message>
@@ -1254,46 +1333,46 @@ Select your device and Mountpoint manually.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../base/detect.cpp" line="109"/>
+        <location filename="../base/detect.cpp" line="110"/>
         <source>Guest</source>
         <translation>Επισκέπτης</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="112"/>
+        <location filename="../base/detect.cpp" line="113"/>
         <source>Admin</source>
         <translation>Διαχειριστής</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="115"/>
+        <location filename="../base/detect.cpp" line="116"/>
         <source>User</source>
         <translation>Χρήστης</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="118"/>
+        <location filename="../base/detect.cpp" line="119"/>
         <source>Error</source>
         <translation>Σφάλμα</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="225"/>
+        <location filename="../base/detect.cpp" line="226"/>
         <source>(no description available)</source>
         <translation>(δεν υπάρχει διαθέσιμη περιγραφή)</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="418"/>
+        <location filename="../base/detect.cpp" line="398"/>
         <source>&lt;li&gt;Permissions insufficient for bootloader installation.
 Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Ανεπαρκή δικαιώματα για την εγκατάσταση του bootloader.
 Απαιτούνται δικαιώματα διαχειριστή.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="431"/>
+        <location filename="../base/detect.cpp" line="409"/>
         <source>&lt;li&gt;Target mismatch detected.
 Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Βρέθηκε αναντιστοιχία συσκευών.
 Εγκατεστημένη συσκευή: %1, επιλεγμένη συσκευή: %2.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="436"/>
+        <location filename="../base/detect.cpp" line="413"/>
         <source>Problem detected:</source>
         <translation>Εντοπίστηκε πρόβλημα:</translation>
     </message>
@@ -1359,284 +1438,284 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <translation>Έκδοση</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="189"/>
+        <location filename="../rbutilqt.cpp" line="207"/>
         <source>New installation</source>
         <translation>Νέα εγκατάσταση</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="192"/>
+        <location filename="../rbutilqt.cpp" line="210"/>
         <source>This is a new installation of Rockbox Utility, or a new version. The configuration dialog will now open to allow you to setup the program,  or review your settings.</source>
         <translation>Αυτή είναι μια καινούργια εγκατάσταση του Rockbox Utility ή πρόκειται για μια νέα έκδοση. Το παράθυρο ρυθμίσεων θα εμφανισθεί τώρα για να σας επιτρέψει να παραμετροποιήσετε το πρόγραμμα ή να δείτε ξανά τις ρυθμίσεις σας. </translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1162"/>
+        <location filename="../rbutilqt.cpp" line="1178"/>
         <source>Configuration error</source>
         <translation>Σφάλμα ρυθμίσεων</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="200"/>
+        <location filename="../rbutilqt.cpp" line="218"/>
         <source>Your configuration is invalid. This is most likely due to a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
         <translation>Οι ρυθμίσεις σας δεν είναι έγκυρες. Πιθανότατα αυτό συμβαίνει λόγο αλλαγής διαδρομής της συσκευής. Το παράθυρο ρυθμίσεων θα εμφανισθεί τώρα για να σας επιτρέψει να διορθώσετε το πρόβλημα.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="225"/>
+        <location filename="../rbutilqt.cpp" line="243"/>
         <source>Network error: %1. Please check your network and proxy settings.</source>
         <translation>Σφάλμα δικτύου: %1. Παρακαλώ ελέγξτε τις ρυθμίσεις δικτύου.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="326"/>
+        <location filename="../rbutilqt.cpp" line="345"/>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
         <translation>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="343"/>
+        <location filename="../rbutilqt.cpp" line="362"/>
         <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Εγχειρίδιο μορφής PDF&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="345"/>
+        <location filename="../rbutilqt.cpp" line="364"/>
         <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Εγχειρίδιο μορφής HTML (ανοίγει σε πλοηγό)&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="348"/>
+        <location filename="../rbutilqt.cpp" line="367"/>
         <source>Select a device for a link to the correct manual</source>
         <translation>Επιλέξτε συσκευή για ένα σύνδεσμο για το σωστό εγχειρίδιο</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="350"/>
+        <location filename="../rbutilqt.cpp" line="369"/>
         <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Περίληψη εγχειριδίου&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="852"/>
+        <location filename="../rbutilqt.cpp" line="868"/>
         <source>Confirm Installation</source>
         <translation>Επαλήθευση εγκατάστασης</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1050"/>
+        <location filename="../rbutilqt.cpp" line="1066"/>
         <source>Mount point is wrong!</source>
         <translation>Το σημείο προσάρτησης είναι λάθος!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="508"/>
+        <location filename="../rbutilqt.cpp" line="528"/>
         <source>Aborted!</source>
         <translation>Ματαιώθηκε!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="517"/>
+        <location filename="../rbutilqt.cpp" line="537"/>
         <source>Installed Rockbox detected</source>
         <translation>Εντοπίστηκε εγκατάσταη Rockbox</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="518"/>
+        <location filename="../rbutilqt.cpp" line="538"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
         <translation>Εντοπίστηκε εγκατάσταση του Rockbox. Θέλετε ένα αντίγραφο ασφαλείας πρώτα;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="521"/>
+        <location filename="../rbutilqt.cpp" line="541"/>
         <source>Starting backup...</source>
         <translation>Έναρξη αντίγραφου ασφαλείας...</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="538"/>
+        <location filename="../rbutilqt.cpp" line="558"/>
         <source>Backup successful</source>
         <translation>Επιτυχία αντίγραφου ασφαλείας</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="542"/>
+        <location filename="../rbutilqt.cpp" line="562"/>
         <source>Backup failed!</source>
         <translation>Αποτυχία αντίγραφου ασφάλειας!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="594"/>
+        <location filename="../rbutilqt.cpp" line="607"/>
         <source>Do you really want to install the Bootloader?</source>
         <translation>Θέλετε σίγουρα να εγκαταστήσετε το bootloader;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="773"/>
+        <location filename="../rbutilqt.cpp" line="789"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>Θέλετε σίγουρα να εγκαταστήσετε το πακέτο γραμματοσειρών;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="811"/>
+        <location filename="../rbutilqt.cpp" line="827"/>
         <source>Warning</source>
         <translation>Προσοχη</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="813"/>
+        <location filename="../rbutilqt.cpp" line="829"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
         <translation>Η εφαρμογή λαμβάνει ακόμα πληροφορίες για καινούργιες εκδόσεις. Παρακαλώ προσπαθήστε ξανά σύντομα.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="818"/>
+        <location filename="../rbutilqt.cpp" line="834"/>
         <source>Do you really want to install the voice file?</source>
         <translation>Θέλετε σίγουρα να εγκαταστήσετε το αρχείο φωνής;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="847"/>
+        <location filename="../rbutilqt.cpp" line="863"/>
         <source>Error</source>
         <translation>Σφάλμα</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="848"/>
+        <location filename="../rbutilqt.cpp" line="864"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>Η συσκευή σας δεν διαθέτει το plugin doom. Ματαίωση.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="853"/>
+        <location filename="../rbutilqt.cpp" line="869"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>Θέλετε σίγουρα να εγκαταστήσετε τα αρχεία πρόσθετων παιχνιδιών;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="933"/>
+        <location filename="../rbutilqt.cpp" line="949"/>
         <source>Confirm Uninstallation</source>
         <translation>Επαλήθευση απεγκατάστασης</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="934"/>
+        <location filename="../rbutilqt.cpp" line="950"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>Θέλετε σίγουρα να απεγκαταστήσετε το bootloader;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="991"/>
+        <location filename="../rbutilqt.cpp" line="1007"/>
         <source>Confirm download</source>
         <translation>Επαλήθευση λήψης</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="993"/>
+        <location filename="../rbutilqt.cpp" line="1009"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>Θέλετε σιγουρα να λάβετε το εγχειρίδιο; Το εγχειρίδιο θα αποθηκευθεί στον αρχικό φάκλεο της συσκευής σας.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1036"/>
+        <location filename="../rbutilqt.cpp" line="1052"/>
         <source>Confirm installation</source>
         <translation>Επαλήθευση εγκατάστασης</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1038"/>
+        <location filename="../rbutilqt.cpp" line="1054"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Θέλετε σίγουρα να εγκαταστήσετε το Rockbox Utility στη συσκευή σας; Μετά την εγκατάσταση θα μπορείτε να το τρέξετε από το σκληρό δίσκο της συσκευής σας.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1046"/>
+        <location filename="../rbutilqt.cpp" line="1062"/>
         <source>Installing Rockbox Utility</source>
         <translation>Εγκατάσταση Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1061"/>
+        <location filename="../rbutilqt.cpp" line="1077"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Σφάλμα εγκατάστασης Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1065"/>
+        <location filename="../rbutilqt.cpp" line="1081"/>
         <source>Installing user configuration</source>
         <translation>Εγκατάσταση ρυθμίσεων χρήστη</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1068"/>
+        <location filename="../rbutilqt.cpp" line="1084"/>
         <source>Error installing user configuration</source>
         <translation>Σφάλμα εγκατάστασης ρυθμίσεων χρήστη</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1072"/>
+        <location filename="../rbutilqt.cpp" line="1088"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Επιτυχία εγκατάστασης Rockbox Utility.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1164"/>
+        <location filename="../rbutilqt.cpp" line="1180"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Οι ρυθμίσεις σας δεν είναι έγκυρες. Παρακαλώ δείτε το παράθυρο ρυθμίσεων και σιγουρευτείτε ότι οι επιλεγμένες τιμές είναι σωστές.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="166"/>
+        <location filename="../rbutilqt.cpp" line="171"/>
         <source>Network error</source>
         <translation>Σφάλμα δικτύου</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="167"/>
+        <location filename="../rbutilqt.cpp" line="172"/>
         <source>Can&apos;t get version information.</source>
         <translation>Αδύνατη λήψη πληροφοριών έκδοσης.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="505"/>
+        <location filename="../rbutilqt.cpp" line="525"/>
         <source>Really continue?</source>
         <translation>Σίγουρα θέλετε να συνεχίσετε;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="628"/>
+        <location filename="../rbutilqt.cpp" line="641"/>
         <source>No install method known.</source>
         <translation>Δεν είναι γνωστή κάποια μέθοδος εγκατάστασης.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="652"/>
+        <location filename="../rbutilqt.cpp" line="665"/>
         <source>Bootloader detected</source>
         <translation>Ανιχνεύθηκε bootloader</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="653"/>
+        <location filename="../rbutilqt.cpp" line="666"/>
         <source>Bootloader already installed. Do you want to reinstall the bootloader?</source>
         <translation>Ο bootloader είναι ήδη εγκατεστημένος. Θέλετε να επανεγκαταστήσετε το bootloader;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="674"/>
+        <location filename="../rbutilqt.cpp" line="687"/>
         <source>Create Bootloader backup</source>
         <translation>Δημιουργία αντίγραφου ασφαλείας του bootloader</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="679"/>
+        <location filename="../rbutilqt.cpp" line="692"/>
         <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
 Press &quot;No&quot; to skip this step.</source>
         <translation>Μπορείτε να δημιουργήσετε ένα αντίγραφο ασφαλείας του αυθεντικού bootloader. Πατήστε &quot;Ναι&quot; για να επιλέξετε έναν φάκελο στον υπολογιστή σας για να σώσετε το αρχείο. Το αρχείο θα τοποθετηθεί σε έναν νέο φάκελο &quot;%1&quot; δημιουργώντας τον παρακάτω επιλεγμένο φάκελο.
 Πατήστε &quot;Όχι&quot; για να παραλείψετε αυτό το βήμα.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="681"/>
+        <location filename="../rbutilqt.cpp" line="694"/>
         <source>Browse backup folder</source>
         <translation>Αναζήτηση φακέλου αντίγραφου ασφαλείας</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="694"/>
+        <location filename="../rbutilqt.cpp" line="707"/>
         <source>Prerequisites</source>
         <translation>Προϋποθέσεις</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="704"/>
+        <location filename="../rbutilqt.cpp" line="717"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (hex file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
         <translation>Η εγκατάσταση του bootloader απαιτεί την παροχή ενός firmware αρχείου από το αυθεντικό firmware (αρχείο hex). Χρειάζεται να κάνετε λήψη αυτού του αρχείου μόνοι σας για λόγους νομιμότητας. Παρακαλώ δείτε &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;τις οδηγίες χρήσης&lt;/a&gt; και την σελίδα &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; για τον τρόπο όπου μπορείτε να αποκτήσετε αυτό το αρχείο.&lt;br/&gt;Πατήστε OK για να συνεχίστε και να αναζητήσετε στον υπολογιστή σας το αρχείο firmware.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="713"/>
+        <location filename="../rbutilqt.cpp" line="729"/>
         <source>Select firmware file</source>
         <translation>Επιλέξτε αρχείο firmware</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="715"/>
+        <location filename="../rbutilqt.cpp" line="731"/>
         <source>Error opening firmware file</source>
         <translation>Σφάλμα ανοίγματος αρχείου firmware</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="733"/>
+        <location filename="../rbutilqt.cpp" line="749"/>
         <source>Backup error</source>
         <translation>Σφάλμα αντίγραφου ασφαλείας!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="734"/>
+        <location filename="../rbutilqt.cpp" line="750"/>
         <source>Could not create backup file. Continue?</source>
         <translation>Δεν ήταν δυνατή η δημιουργία αντίγραφου ασφαλείας. Συνέχεια;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="763"/>
+        <location filename="../rbutilqt.cpp" line="779"/>
         <source>Manual steps required</source>
         <translation>Απαιτούνται χειροκίνητα βήματα</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="962"/>
+        <location filename="../rbutilqt.cpp" line="978"/>
         <source>No uninstall method known.</source>
         <translation>Δεν είναι γνωστή κάποια μέθοδος εγκατάστασης.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="363"/>
+        <location filename="../rbutilqt.cpp" line="382"/>
         <source>Do you really want to perform a complete installation?
 
 This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
@@ -1645,13 +1724,23 @@ This will install Rockbox %1. To install the most recent development build avail
 Θα εγκατασταθεί το Rockbox %1. Για να εγκαταστήσετε την πιο ενημερωμένη έκδοση που υπάρχει πατήστε &quot;Άκυρο&quot; και χρησιμοποιήστε την καρτέλα &quot;Εγκατάσταση&quot;.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="421"/>
+        <location filename="../rbutilqt.cpp" line="440"/>
         <source>Do you really want to perform a minimal installation? A minimal installation will contain only the absolutely necessary parts to run Rockbox.
 
 This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
         <translation>Θέλετε σίγουρα να έχετε την ελάχιστη εγκατάσταση;
 
 Θα εγκατασταθεί το Rockbox %1. Για να εγκαταστήσετε την πιο ενημερωμένη έκδοση που υπάρχει πατήστε &quot;Άκυρο&quot; και χρησιμοποιήστε την καρτέλα &quot;Εγκατάσταση&quot;.</translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="671"/>
+        <source>Bootloader installation skipped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="723"/>
+        <source>Bootloader installation aborted</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1700,16 +1789,6 @@ This will install Rockbox %1. To install the most recent development build avail
         <location filename="../rbutilqtfrm.ui" line="159"/>
         <source>&lt;b&gt;Complete Installation&lt;/b&gt;&lt;br/&gt;This installs the bootloader, a current build and the extras package. This is the recommended method for new installations.</source>
         <translation>&lt;b&gt;Πλήρης εγκατάσταση&lt;/b&gt;&lt;br/&gt;Εγκαθιστά το bootloader, μία τρέχουσα έκδοση και τα έξτρα. Αυτή η μέθοδος εγκατάστασης προτείνεται για καινούργιες εγκαταστάσεις.</translation>
-    </message>
-    <message>
-        <location filename="../rbutilqtfrm.ui" line="172"/>
-        <source>Small Installation</source>
-        <translation type="obsolete">Μικρή εγκατάσταση</translation>
-    </message>
-    <message>
-        <location filename="../rbutilqtfrm.ui" line="188"/>
-        <source>&lt;b&gt;Small installation&lt;/b&gt;&lt;br/&gt;This installs bootloader and the current build of Rockbox. If you don&apos;t want the extras package, choose this option.</source>
-        <translation type="obsolete">&lt;b&gt;Μικρή εγκατάσταση&lt;/b&gt;&lt;br/&gt;Εγκαθιστά το bootloader και μία τρέχουσα έκδοση του Rockbox. Εάν δεν θέλετε τα έξτρα, επιλέξτε αυτήν τη μέθοδο.</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="815"/>
@@ -1974,11 +2053,6 @@ This will install Rockbox %1. To install the most recent development build avail
         <translation>&amp;Πλήρης εγκατάσταση</translation>
     </message>
     <message>
-        <location filename="../rbutilqtfrm.ui" line="917"/>
-        <source>&amp;Small Installation</source>
-        <translation type="obsolete">&amp;Μικρή εγκατάσταση</translation>
-    </message>
-    <message>
         <location filename="../rbutilqtfrm.ui" line="925"/>
         <source>Install &amp;Bootloader</source>
         <translation>Εγκατάσταση &amp;bootloader</translation>
@@ -2186,7 +2260,7 @@ This will install Rockbox %1. To install the most recent development build avail
 <context>
     <name>TTSExes</name>
     <message>
-        <location filename="../tts.cpp" line="151"/>
+        <location filename="../tts.cpp" line="165"/>
         <source>TTS executable not found</source>
         <translation>Δεν βρέθηκε εκτελέσιμο μηχανής TTS</translation>
     </message>
@@ -2235,14 +2309,93 @@ This will install Rockbox %1. To install the most recent development build avail
     </message>
 </context>
 <context>
+    <name>TTSFestival</name>
+    <message>
+        <location filename="../tts.cpp" line="401"/>
+        <source>Starting festival</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tts.cpp" line="450"/>
+        <source>engine could not voice string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tts.cpp" line="527"/>
+        <source>No description available</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TTSFestivalCfgFrm</name>
+    <message>
+        <location filename="../ttsfestivalcfgform.ui" line="13"/>
+        <source>Configuration</source>
+        <translation type="unfinished">Ρυθμίσεις</translation>
+    </message>
+    <message>
+        <location filename="../ttsfestivalcfgform.ui" line="44"/>
+        <source>Executables</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ttsfestivalcfgform.ui" line="73"/>
+        <source>Path to Festival server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ttsfestivalcfgform.ui" line="132"/>
+        <source>Browse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ttsfestivalcfgform.ui" line="109"/>
+        <source>Path to Festival client</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ttsfestivalcfgform.ui" line="182"/>
+        <source>Server voice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ttsfestivalcfgform.ui" line="209"/>
+        <source>Select a voice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ttsfestivalcfgform.ui" line="222"/>
+        <source>&amp;Refresh</source>
+        <translation type="unfinished">&amp;Ανανέωση</translation>
+    </message>
+    <message>
+        <location filename="../ttsfestivalcfgform.ui" line="262"/>
+        <source>Show voice description</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TTSFestivalGui</name>
+    <message>
+        <location filename="../ttsgui.cpp" line="321"/>
+        <source>Loading..</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ttsgui.cpp" line="336"/>
+        <source>Querying festival</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TTSSapi</name>
     <message>
-        <location filename="../tts.cpp" line="218"/>
+        <location filename="../tts.cpp" line="233"/>
         <source>Could not copy the Sapi-script</source>
         <translation>Δεν ήταν δυνατή η αντιγραφή του Sapi-script</translation>
     </message>
     <message>
-        <location filename="../tts.cpp" line="239"/>
+        <location filename="../tts.cpp" line="254"/>
         <source>Could not start the Sapi-script</source>
         <translation>Δεν ήταν δυνατή η εκκίνηση του Sapi-script</translation>
     </message>
@@ -2270,7 +2423,7 @@ This will install Rockbox %1. To install the most recent development build avail
         <translation>Ανάγνωση λίστας αρχείων...</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="373"/>
+        <location filename="../talkfile.cpp" line="393"/>
         <source>Talk file creation aborted</source>
         <translation>Η δημιουργία αρχείου ομιλίας ματαιώθηκε</translation>
     </message>
@@ -2285,75 +2438,75 @@ This will install Rockbox %1. To install the most recent development build avail
         <translation>Κωδικοποίηση αρχείων...</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="125"/>
+        <location filename="../talkfile.cpp" line="124"/>
         <source>Copying Talkfile for Dirs...</source>
         <translation>Αντιγραφή αρχείου ομιλίας φακέλων...</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="134"/>
+        <location filename="../talkfile.cpp" line="133"/>
         <source>Copying Talkfile for Files...</source>
         <translation>Αντιγραφή αρχείου ομιλίας αρχείων...</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="148"/>
+        <location filename="../talkfile.cpp" line="147"/>
         <source>Finished creating Talk files</source>
         <translation>Η δημιουργία αρχείων ομιλίας ολοκληρώθηκε</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="266"/>
-        <source>Voicing of %s failed</source>
-        <translation>Η εκφώνηση του %s απέτυχε</translation>
-    </message>
-    <message>
-        <location filename="../talkfile.cpp" line="298"/>
+        <location filename="../talkfile.cpp" line="313"/>
         <source>Encoding of %1 failed</source>
         <translation>Η κωδικοποίηση του %1 απέτυχε</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="394"/>
+        <location filename="../talkfile.cpp" line="417"/>
         <source>Copying of %1 to %2 failed</source>
         <translation>Η αντιγραφή του %1 στο %2 απέτυχε</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="416"/>
+        <location filename="../talkfile.cpp" line="439"/>
         <source>Cleaning up..</source>
         <translation>Καθαρισμός..</translation>
+    </message>
+    <message>
+        <location filename="../talkfile.cpp" line="275"/>
+        <source>Voicing of %1 failed: %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ThemeInstallFrm</name>
     <message>
-        <location filename="../installthemesfrm.ui" line="13"/>
+        <location filename="../themesinstallfrm.ui" line="13"/>
         <source>Theme Installation</source>
         <translation>Εγκατάσταση θέματος</translation>
     </message>
     <message>
-        <location filename="../installthemesfrm.ui" line="48"/>
+        <location filename="../themesinstallfrm.ui" line="48"/>
         <source>Selected Theme</source>
         <translation>Επιλεγμένο θέμα</translation>
     </message>
     <message>
-        <location filename="../installthemesfrm.ui" line="73"/>
+        <location filename="../themesinstallfrm.ui" line="73"/>
         <source>Description</source>
         <translation>Περιγραφή</translation>
     </message>
     <message>
-        <location filename="../installthemesfrm.ui" line="83"/>
+        <location filename="../themesinstallfrm.ui" line="83"/>
         <source>Download size:</source>
         <translation>Μέγεθος λήψης:</translation>
     </message>
     <message>
-        <location filename="../installthemesfrm.ui" line="115"/>
+        <location filename="../themesinstallfrm.ui" line="115"/>
         <source>&amp;Install</source>
         <translation>&amp;Εγκατάσταση</translation>
     </message>
     <message>
-        <location filename="../installthemesfrm.ui" line="125"/>
+        <location filename="../themesinstallfrm.ui" line="125"/>
         <source>&amp;Cancel</source>
         <translation>Ά&amp;κυρο</translation>
     </message>
     <message>
-        <location filename="../installthemesfrm.ui" line="93"/>
+        <location filename="../themesinstallfrm.ui" line="93"/>
         <source>Hold Ctrl to select multiple item, Shift for a range</source>
         <translation>Κρατήστε το πλήκτρο Ctrl για να επιλέξετε πολλαπλές καταχωρήσεις, Shift για ένα εύρος</translation>
     </message>
@@ -2361,83 +2514,102 @@ This will install Rockbox %1. To install the most recent development build avail
 <context>
     <name>ThemesInstallWindow</name>
     <message>
-        <location filename="../installthemes.cpp" line="34"/>
+        <location filename="../themesinstallwindow.cpp" line="35"/>
         <source>no theme selected</source>
         <translation>Δεν υπάρχει επιλεγμένο θέμα</translation>
     </message>
     <message>
-        <location filename="../installthemes.cpp" line="100"/>
+        <location filename="../themesinstallwindow.cpp" line="102"/>
         <source>Network error: %1.
 Please check your network and proxy settings.</source>
         <translation>Σφάλμα δικτύου: %1.
 Παρακαλώ ελέγξτε τις ρυθμίσεις δικτύου.</translation>
     </message>
     <message>
-        <location filename="../installthemes.cpp" line="111"/>
+        <location filename="../themesinstallwindow.cpp" line="113"/>
         <source>the following error occured:
 %1</source>
         <translation>Εμφανίσθηκε το παρακάτω σφάλμα:
 %1</translation>
     </message>
     <message>
-        <location filename="../installthemes.cpp" line="116"/>
+        <location filename="../themesinstallwindow.cpp" line="118"/>
         <source>done.</source>
         <translation>Ολοκληρώθηκε.</translation>
     </message>
     <message>
-        <location filename="../installthemes.cpp" line="144"/>
+        <location filename="../themesinstallwindow.cpp" line="180"/>
         <source>fetching details for %1</source>
         <translation>Λήψη λεπτομερειών για %1</translation>
     </message>
     <message>
-        <location filename="../installthemes.cpp" line="146"/>
+        <location filename="../themesinstallwindow.cpp" line="182"/>
         <source>fetching preview ...</source>
         <translation>Λήψη προεπισκόπησης...</translation>
     </message>
     <message>
-        <location filename="../installthemes.cpp" line="154"/>
-        <source>Download size %L1 kiB</source>
-        <translation>Μέγεθος λήψης %L1 kiB</translation>
-    </message>
-    <message>
-        <location filename="../installthemes.cpp" line="167"/>
+        <location filename="../themesinstallwindow.cpp" line="193"/>
         <source>&lt;b&gt;Author:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Συντάκτης:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../installthemes.cpp" line="168"/>
+        <location filename="../themesinstallwindow.cpp" line="196"/>
         <source>unknown</source>
         <translation>Άγνωστο</translation>
     </message>
     <message>
-        <location filename="../installthemes.cpp" line="168"/>
+        <location filename="../themesinstallwindow.cpp" line="195"/>
         <source>&lt;b&gt;Version:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Έκδοση:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../installthemes.cpp" line="169"/>
+        <location filename="../themesinstallwindow.cpp" line="197"/>
         <source>&lt;b&gt;Description:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Περιγραφή:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../installthemes.cpp" line="169"/>
+        <location filename="../themesinstallwindow.cpp" line="198"/>
         <source>no description</source>
         <translation>Δεν υπάρχει περιγραφή</translation>
     </message>
     <message>
-        <location filename="../installthemes.cpp" line="205"/>
+        <location filename="../themesinstallwindow.cpp" line="239"/>
         <source>no theme preview</source>
         <translation>Δεν υπάρχει προεπισκόπηση θέματος</translation>
     </message>
     <message>
-        <location filename="../installthemes.cpp" line="236"/>
+        <location filename="../themesinstallwindow.cpp" line="270"/>
         <source>getting themes information ...</source>
         <translation>Λήψη πληροφοριών θέματος...</translation>
     </message>
     <message>
-        <location filename="../installthemes.cpp" line="284"/>
+        <location filename="../themesinstallwindow.cpp" line="318"/>
         <source>Mount point is wrong!</source>
         <translation>Το σημείο προσάρτησης είναι λάθος!</translation>
+    </message>
+    <message>
+        <location filename="../themesinstallwindow.cpp" line="36"/>
+        <source>no selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../themesinstallwindow.cpp" line="149"/>
+        <source>Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../themesinstallwindow.cpp" line="166"/>
+        <source>Download size %L1 kiB (%n item(s))</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../themesinstallwindow.cpp" line="228"/>
+        <source>Retrieving theme preview failed.
+HTTP response code: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2607,74 +2779,74 @@ Please check your network and proxy settings.</source>
 <context>
     <name>VoiceFileCreator</name>
     <message>
-        <location filename="../voicefile.cpp" line="41"/>
+        <location filename="../voicefile.cpp" line="42"/>
         <source>Starting Voicefile generation</source>
         <translation>Εκκίνηση δημιουργίας αρχείου φωνής</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="55"/>
-        <source>failed to open rockbox-info.txt</source>
-        <translation>Το άνοιγμα του αρχείου rockbox-info.txt απέτυχε</translation>
-    </message>
-    <message>
-        <location filename="../voicefile.cpp" line="116"/>
+        <location filename="../voicefile.cpp" line="102"/>
         <source>Download error: received HTTP error %1.</source>
         <translation>Σφάλμα λήψης: σφάλμα HTTP %1.</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="121"/>
+        <location filename="../voicefile.cpp" line="107"/>
         <source>Cached file used.</source>
         <translation>Χρησιμοποιήθηκε προσωρινά αποθηκευμένο αρχείο.</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="123"/>
+        <location filename="../voicefile.cpp" line="109"/>
         <source>Download error: %1</source>
         <translation>Σφάλμα λήψης: %1</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="128"/>
+        <location filename="../voicefile.cpp" line="114"/>
         <source>Download finished.</source>
         <translation>Η λήψη ολοκληρώθηκε.</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="137"/>
+        <location filename="../voicefile.cpp" line="123"/>
         <source>failed to open downloaded file</source>
         <translation>Το άνοιγμα του ληφθέν αρχείου απέτυχε</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="151"/>
+        <location filename="../voicefile.cpp" line="137"/>
         <source>Init of TTS engine failed</source>
         <translation>Η αρχικοποίηση της μηχανής TTS απέτυχε</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="163"/>
+        <location filename="../voicefile.cpp" line="149"/>
         <source>Init of Encoder engine failed</source>
         <translation>Η αρχικοποίηση του κωδικοποιητή απέτυχε</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="206"/>
+        <location filename="../voicefile.cpp" line="192"/>
         <source>The downloaded file was empty!</source>
         <translation>Το ληφθέν αρχείο ήταν άδειο!</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="245"/>
+        <location filename="../voicefile.cpp" line="231"/>
         <source>creating </source>
         <translation>Δημιουργία</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="268"/>
+        <location filename="../voicefile.cpp" line="257"/>
         <source>Error opening downloaded file</source>
         <translation>Σφάλμα ανοίγματος ληφθέν αρχείου</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="277"/>
+        <location filename="../voicefile.cpp" line="266"/>
         <source>Error opening output file</source>
         <translation>Σφάλμα ανοίγματος αρχείου εξόδου</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="299"/>
+        <location filename="../voicefile.cpp" line="288"/>
         <source>successfully created.</source>
         <translation>Επιτυχής δημιουργία.</translation>
+    </message>
+    <message>
+        <location filename="../voicefile.cpp" line="56"/>
+        <source>could not find rockbox-info.txt</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2815,17 +2987,6 @@ Please check your network and proxy settings.</source>
         <source>The Rockbox Utility</source>
         <translation>Το Rockbox Utility</translation>
     </message>
-    <message encoding="UTF-8">
-        <location filename="../aboutbox.ui" line="56"/>
-        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.
-
-© 2005 - 2008 The Rockbox Team.
-Released under the GNU General Public License v2.</source>
-        <translation>Εφαρμογή για την εγκατάσταση και διαχείριση του ανοιχτού λογισμικού firmwrae Rockbox, για συσκευές ψηφιακού ήχου.
-
-© 2005 - 2008 Ομάδα Rockbox.
-Εκδόθηκε υπό την Γενική Άδεια Δημόσιας Χρήσης GNU, έκδοση δεύτερη.</translation>
-    </message>
     <message>
         <location filename="../aboutbox.ui" line="72"/>
         <source>http://www.rockbox.org</source>
@@ -2845,6 +3006,17 @@ Released under the GNU General Public License v2.</source>
         <location filename="../aboutbox.ui" line="157"/>
         <source>&amp;Ok</source>
         <translation>&amp;ΟΚ</translation>
+    </message>
+    <message encoding="UTF-8">
+        <location filename="../aboutbox.ui" line="56"/>
+        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.
+
+© 2005 - 2009 The Rockbox Team.
+Released under the GNU General Public License v2.</source>
+        <translation type="unfinished">Εφαρμογή για την εγκατάσταση και διαχείριση του ανοιχτού λογισμικού firmwrae Rockbox, για συσκευές ψηφιακού ήχου.
+
+© 2005 - 2008 Ομάδα Rockbox.
+Εκδόθηκε υπό την Γενική Άδεια Δημόσιας Χρήσης GNU, έκδοση δεύτερη. {2005 ?} {2009 ?} {2.?}</translation>
     </message>
 </context>
 </TS>
