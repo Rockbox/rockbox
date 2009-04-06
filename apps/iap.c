@@ -29,6 +29,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "serial.h"
+#include "appevents.h"
 
 #include "playlist.h"
 #include "playback.h"
@@ -80,6 +81,7 @@ void iap_setup(int ratenum)
     iap_setupflag = true;
     iap_remotebtn = BUTTON_NONE;
     tick_add_task(iap_task);
+    add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, iap_track_changed);
 }
 
 void iap_bitrate_set(int ratenum)
@@ -175,8 +177,10 @@ int iap_getc(unsigned char x)
     return newpkt;
 }
 
-void iap_track_changed(void)
+/* called by playback when the next track starts */
+void iap_track_changed(void *ignored)
 {
+    (void)ignored;
     iap_changedctr = 1;
 }
 

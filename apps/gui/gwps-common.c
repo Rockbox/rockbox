@@ -348,33 +348,8 @@ bool gui_wps_display(struct gui_wps *gwps)
 
 bool gui_wps_update(struct gui_wps *gwps)
 {
-    bool track_changed = audio_has_changed_track();
     struct mp3entry *id3 = gwps->state->id3;
-
-    gwps->state->nid3 = audio_next_track();
-    if (track_changed)
-    {
-        gwps->state->id3 = id3 = audio_current_track();
-
-        if (cuesheet_is_enabled() && id3->cuesheet_type
-            && strcmp(id3->path, curr_cue->audio_filename))
-        {
-            /* the current cuesheet isn't the right one any more */
-            /* We need to parse the new cuesheet */
-
-            char cuepath[MAX_PATH];
-
-            if (look_for_cuesheet_file(id3->path, cuepath) &&
-                parse_cuesheet(cuepath, curr_cue))
-            {
-                id3->cuesheet_type = 1;
-                strcpy(curr_cue->audio_filename, id3->path);
-            }
-
-            cue_spoof_id3(curr_cue, id3);
-        }
-    }
-
+    bool retval;
     if (cuesheet_is_enabled() && id3->cuesheet_type
         && (id3->elapsed < curr_cue->curr_track->offset
             || (curr_cue->curr_track_idx < curr_cue->track_count - 1
@@ -382,17 +357,15 @@ bool gui_wps_update(struct gui_wps *gwps)
     {
         /* We've changed tracks within the cuesheet :
            we need to update the ID3 info and refresh the WPS */
-
-        track_changed = true;
+        gwps->state->do_full_update = true;
         cue_find_current_track(curr_cue, id3->elapsed);
         cue_spoof_id3(curr_cue, id3);
     }
 
-    if (track_changed)
-        gwps->display->stop_scroll();
-
-    return gui_wps_redraw(gwps, 0,
-                track_changed ? WPS_REFRESH_ALL : WPS_REFRESH_NON_STATIC);
+    retval = gui_wps_redraw(gwps, 0,
+                            gwps->state->do_full_update ? 
+                                        WPS_REFRESH_ALL : WPS_REFRESH_NON_STATIC);
+    return retval;
 }
 
 

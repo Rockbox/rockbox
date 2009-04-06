@@ -26,6 +26,6 @@ extern void iap_setup(int ratenum);
 extern void iap_bitrate_set(int ratenum);
 extern void iap_periodic(void);
 extern void iap_handlepkt(void);
-extern void iap_track_changed(void);
+extern void iap_track_changed(void *ignored);
 
 #endif

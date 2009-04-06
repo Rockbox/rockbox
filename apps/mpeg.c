@@ -852,6 +852,7 @@ static void transfer_end(unsigned char** ppbuf, size_t* psize)
 static struct trackdata *add_track_to_tag_list(const char *filename)
 {
     struct trackdata *track;
+    bool send_nid3_event;
     
     if(num_tracks_in_memory() >= MAX_TRACK_ENTRIES)
     {
@@ -882,7 +883,11 @@ static struct trackdata *add_track_to_tag_list(const char *filename)
         if (cuesheet_callback(filename))
             track->id3.cuesheet_type = 1;
 
+    /* if this track is the next track then let the UI know it can get it */
+    send_nid3_event = (track_write_idx == track_read_idx + 1);
     track_write_idx = (track_write_idx+1) & MAX_TRACK_ENTRIES_MASK;
+    if (send_nid3_event)
+        send_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, NULL);
     debug_tags();
     return track;
 }

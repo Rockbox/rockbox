@@ -78,6 +78,8 @@ static struct wps_data wps_datas[NB_SCREENS];
 
 /* initial setup of wps_data  */
 static void wps_state_init(void);
+static void track_changed_callback(void *param);
+static void nextid3available_callback(void* param);
 
 static void change_dir(int direction)
 {
@@ -246,7 +248,7 @@ long gui_wps_show(void)
     long restoretimer = RESTORE_WPS_INSTANTLY; /* timer to delay screen redraw temporarily */
     bool exit = false;
     bool bookmark = false;
-    bool update_track = false;
+    bool update_track = false, partial_update = false;
     int i;
     long last_left = 0, last_right = 0;
     wps_state_init();
@@ -651,7 +653,7 @@ long gui_wps_show(void)
                 restore = true;
                 break;
             case ACTION_NONE: /* Timeout */
-                update_track = true;
+                partial_update = true;
                 ffwd_rew(button); /* hopefully fix the ffw/rwd bug */
                 break;
 #ifdef HAVE_RECORDING
@@ -671,13 +673,21 @@ long gui_wps_show(void)
                 break;
         }
 
-        if (update_track)
+        if (wps_state.do_full_update || partial_update || update_track)
         {
+            if (update_track)
+            {
+                wps_state.do_full_update = true;
+                wps_state.id3 = audio_current_track();
+                wps_state.nid3 = audio_next_track();
+            }
             FOR_NB_SCREENS(i)
             {
                 gui_wps_update(&gui_wps[i]);
             }
+            wps_state.do_full_update = false;
             update_track = false;
+            partial_update = false;
         }
 
         if (restore && wps_state.id3 &&
@@ -723,7 +733,36 @@ long gui_wps_show(void)
     return GO_TO_ROOT; /* unreachable - just to reduce compiler warnings */
 }
 
-/* needs checking if needed end*/
+/* this is called from the playback thread so NO DRAWING! */
+static void track_changed_callback(void *param)
+{
+    wps_state.id3 = (struct mp3entry*)param;
+    wps_state.nid3 = audio_next_track();
+    
+    if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type
+        && strcmp(wps_state.id3->path, curr_cue->audio_filename))
+    {
+        /* the current cuesheet isn't the right one any more */
+        /* We need to parse the new cuesheet */
+        char cuepath[MAX_PATH];
+
+        if (look_for_cuesheet_file(wps_state.id3->path, cuepath) &&
+            parse_cuesheet(cuepath, curr_cue))
+        {
+            wps_state.id3->cuesheet_type = 1;
+            strcpy(curr_cue->audio_filename, wps_state.id3->path);
+        }
+
+        cue_spoof_id3(curr_cue, wps_state.id3);
+    }
+    wps_state.do_full_update = true;
+}
+static void nextid3available_callback(void* param)
+{
+    (void)param;
+    wps_state.nid3 = audio_next_track();
+    wps_state.do_full_update = true;
+}
 
 /* wps_state */
 
@@ -733,6 +772,10 @@ static void wps_state_init(void)
     wps_state.paused = false;
     wps_state.id3 = NULL;
     wps_state.nid3 = NULL;
+    wps_state.do_full_update = true;
+    /* add the WPS track event callbacks */
+    add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, track_changed_callback);
+    add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, false, nextid3available_callback);
 }
 
 /* wps_state end*/

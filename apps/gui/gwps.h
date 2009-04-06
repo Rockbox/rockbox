@@ -478,6 +478,7 @@ struct wps_state
     bool wps_time_countup;
     struct mp3entry* id3;
     struct mp3entry* nid3;
+    bool do_full_update;
 };
 
 

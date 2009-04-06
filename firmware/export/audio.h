@@ -89,7 +89,6 @@ void audio_ff_rewind(long newtime);
 void audio_flush_and_reload_tracks(void);
 struct mp3entry* audio_current_track(void);
 struct mp3entry* audio_next_track(void);
-bool audio_has_changed_track(void);
 void audio_get_debugdata(struct audio_debug *dbgdata);
 #ifdef HAVE_DISK_STORAGE
 void audio_set_buffer_margin(int seconds);

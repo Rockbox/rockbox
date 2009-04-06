@@ -463,7 +463,6 @@ static const struct plugin_api rockbox_api = {
     audio_ff_rewind,
     audio_next_track,
     audio_status,
-    audio_has_changed_track,
     audio_current_track,
     audio_flush_and_reload_tracks,
     audio_get_file_pos,

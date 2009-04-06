@@ -128,12 +128,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 146
+#define PLUGIN_API_VERSION 147
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 146
+#define PLUGIN_MIN_API_VERSION 147
 
 /* plugin return codes */
 enum plugin_status {
@@ -588,7 +588,6 @@ struct plugin_api {
     void (*audio_ff_rewind)(long newtime);
     struct mp3entry* (*audio_next_track)(void);
     int (*audio_status)(void);
-    bool (*audio_has_changed_track)(void);
     struct mp3entry* (*audio_current_track)(void);
     void (*audio_flush_and_reload_tracks)(void);
     int (*audio_get_file_pos)(void);
