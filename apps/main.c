@@ -422,7 +422,9 @@ static void init(void)
     gui_syncstatusbar_init(&statusbars);
 
 #if CONFIG_CHARGING && (CONFIG_CPU == SH7034)
-    if (coldstart && charger_inserted()
+    /* charger_inserted() can't be used here because power_thread()
+       hasn't checked power_input_status() yet */
+    if (coldstart && (power_input_status() & POWER_INPUT_MAIN_CHARGER)
         && !global_settings.car_adapter_mode
 #ifdef ATA_POWER_PLAYERSTYLE
         && !ide_powered() /* relies on probing result from bootloader */
