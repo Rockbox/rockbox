@@ -2043,16 +2043,6 @@ static int audio_check_new_track(void)
         new_playlist = false;
     }
 
-    /* FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME 
-     * 1) why are we doing this?
-     * 2) thistrack_id3 has already been cleared anyway */
-    /* Update the main buffer copy of the track metadata with the one
-       the codec has been using (for the unbuffer callbacks) */
-    if (CUR_TI->id3_hid >= 0)
-        copy_mp3entry(bufgetid3(CUR_TI->id3_hid), thistrack_id3);
-    /* FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME */
-    
-    
     /* Save a pointer to the old track to allow later clearing */
     prev_ti = CUR_TI;
 
