@@ -1967,7 +1967,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.vx747"
     appextra="recorder:gui"
-    plugins="" #FIXME
+    plugins="yes"
     swcodec="yes"
     toolset=$genericbitmaptools
     boottool="cp"
