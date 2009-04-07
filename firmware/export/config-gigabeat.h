@@ -113,14 +113,19 @@
 
 #define HAVE_HEADPHONE_DETECTION
 
-#define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN 1500        /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 2500        /* max. capacity selectable */
+#define BATTERY_CAPACITY_DEFAULT 830 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 830        /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 830        /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 25         /* capacity increment */
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR
+
+/* define current usage levels */
+#define CURRENT_NORMAL     46 /* 18 hours from an 830 mah battery*/  
+#define CURRENT_BACKLIGHT  30 /* seems reasonable */ 
+#define CURRENT_RECORD     0  /* no recording on the gigabeat F/X */ 
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
