@@ -48,7 +48,7 @@ void dma_release(void)
 
 void dma_init(void)
 {
-    DMAC_SYNC = 0;
+    DMAC_SYNC = 0xffff; /* disable synchronisation logic */
     VIC_INT_ENABLE |= INTERRUPT_DMAC;
 }
 
@@ -88,9 +88,6 @@ void dma_enable_channel(int channel, void *src, void *dst, int peri,
 
     DMAC_CH_CONTROL(channel) = control;
 
-    /* only needed if DMAC and Peripheral do not run at the same clock speed */
-    DMAC_SYNC |= (1<<peri);
-
     /* we set the same peripheral as source and destination because we always
      * use memory-to-peripheral or peripheral-to-memory transfers */
     DMAC_CH_CONFIGURATION(channel) =
@@ -116,7 +113,7 @@ void INT_DMAC(void)
                 panicf("DMA error, channel %d", channel);
 
             /* clear terminal count interrupt */
-            DMAC_INT_TC_CLEAR |= (1<<channel);
+            DMAC_INT_TC_CLEAR = (1<<channel);
 
             if(dma_callback[channel])
                 dma_callback[channel]();
