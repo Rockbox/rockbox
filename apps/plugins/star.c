@@ -262,6 +262,12 @@ PLUGIN_HEADER
 #define STAR_LEVEL_REPEAT   BUTTON_VIEW
 #define STAR_MENU_RUN       BUTTON_MENU
 
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+
+#define STAR_QUIT           BUTTON_POWER
+#define STAR_QUIT_NAME      "[POWER]"
+#define STAR_MENU_RUN       BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

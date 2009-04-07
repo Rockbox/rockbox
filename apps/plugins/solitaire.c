@@ -398,6 +398,9 @@ PLUGIN_HEADER
 #   define HK_CUR2STACK    "SELECT.."
 #   define HK_REM2STACK    "VIEW+RIGHT"
 
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+#   define SOL_QUIT          BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

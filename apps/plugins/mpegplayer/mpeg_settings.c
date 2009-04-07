@@ -162,6 +162,9 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_SCROLL_UP   BUTTON_VOL_UP
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define MPEG_START_TIME_EXIT        BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

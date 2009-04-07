@@ -100,6 +100,9 @@ PLUGIN_HEADER
 #define BTN_MENU BUTTON_MENU
 #define BTN_FIRE BUTTON_SELECT
 
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+#define BTN_MENU (BUTTON_MENU|BUTTON_REL)
+
 #else
 #error No keymap defined!
 #endif

@@ -133,6 +133,9 @@ extern const fb_data matrix_normal[];
 #define MATRIX_SLEEP_LESS BUTTON_DOWN
 #define MATRIX_PAUSE BUTTON_SELECT
 
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+#define MATRIX_EXIT BUTTON_POWER
+
 #else
 #error Unsupported keypad
 #endif

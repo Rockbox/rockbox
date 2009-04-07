@@ -350,6 +350,9 @@ PLUGIN_HEADER
 #define SNAKE2_PLAYPAUSE BUTTON_VIEW
 #define SNAKE2_PLAYPAUSE_TEXT "View"
 
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+#define SNAKE2_QUIT BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

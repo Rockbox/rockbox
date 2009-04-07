@@ -276,6 +276,10 @@ PLUGIN_HEADER
 #define FLIPIT_STEP_BY_STEP BUTTON_PLAYLIST
 #define FLIPIT_TOGGLE       BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+
+#define FLIPIT_QUIT         BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

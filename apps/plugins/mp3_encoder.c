@@ -2489,6 +2489,9 @@ void get_mp3_filename(const char *wav_name)
 #define MP3ENC_DONE BUTTON_POWER
 #define MP3ENC_SELECT BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define MP3ENC_DONE BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

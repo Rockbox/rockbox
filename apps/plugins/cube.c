@@ -237,6 +237,10 @@ PLUGIN_HEADER
 #define CUBE_MODE          BUTTON_MENU
 #define CUBE_PAUSE         BUTTON_SELECT
 #define CUBE_HIGHSPEED     BUTTON_VIEW
+
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define CUBE_QUIT          BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

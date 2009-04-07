@@ -283,6 +283,9 @@ PLUGIN_HEADER
 #define MANDELBROT_MAXITER_DEC  BUTTON_VOL_DOWN
 #define MANDELBROT_RESET        BUTTON_MENU
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define MANDELBROT_QUIT          BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

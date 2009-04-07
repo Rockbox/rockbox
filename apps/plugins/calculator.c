@@ -324,6 +324,11 @@ PLUGIN_HEADER
 #define CALCULATOR_CALC  BUTTON_MENU
 #define CALCULATOR_CLEAR BUTTON_VIEW
 
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+
+#define CALCULATOR_QUIT           BUTTON_POWER
+#define CALCULATOR_CLEAR          BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

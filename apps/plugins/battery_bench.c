@@ -175,6 +175,11 @@ PLUGIN_HEADER
 #define BATTERY_ON_TXT  "MENU - start"
 #define BATTERY_OFF_TXT "POWER"
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+
+#define BATTERY_OFF BUTTON_POWER
+#define BATTERY_OFF_TXT "POWER"
+
 #else
 #error No keymap defined!
 #endif

@@ -324,6 +324,11 @@ PLUGIN_HEADER
 #define VIEWER_MENU BUTTON_MENU
 #define VIEWER_AUTOSCROLL BUTTON_VIEW
 
+/* Onda VX747 keys */
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define VIEWER_QUIT BUTTON_POWER
+#define VIEWER_MENU BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

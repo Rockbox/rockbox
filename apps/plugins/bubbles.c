@@ -120,8 +120,8 @@ PLUGIN_HEADER
 #define ROW_INDENT    11
 #define MAX_FPS       40
 
-/* 22x22 bubbles (Gigabeat) */
-#elif (LCD_HEIGHT == 320) && (LCD_WIDTH == 240)
+/* 22x22 bubbles (Gigabeat, Onda VX747) */
+#elif ((LCD_HEIGHT == 320) || (LCD_HEIGHT == 400)) && (LCD_WIDTH == 240)
 #define XOFS          64
 #define ROW_HEIGHT    18
 #define ROW_INDENT    11

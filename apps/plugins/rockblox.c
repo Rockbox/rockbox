@@ -286,6 +286,10 @@ PLUGIN_HEADER
 #define ROCKBLOX_DROP          BUTTON_SELECT
 #define ROCKBLOX_RESTART       BUTTON_MENU
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define ROCKBLOX_OFF           BUTTON_POWER
+#define ROCKBLOX_RESTART       BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif
@@ -371,7 +375,7 @@ PLUGIN_HEADER
 #define LEVEL_Y 70
 #define LINES_Y 105
 
-#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
+#elif (LCD_WIDTH == 240) && ((LCD_HEIGHT == 320) || (LCD_HEIGHT == 400))
 
 #define BLOCK_WIDTH 15
 #define BLOCK_HEIGHT 15

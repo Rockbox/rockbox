@@ -130,6 +130,9 @@ Still To do:
 #define ACTION2 BUTTON_SELECT
 #define ACTIONTEXT "MENU"
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define QUIT BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

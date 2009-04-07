@@ -333,6 +333,11 @@ PLUGIN_HEADER
 #define BJACK_RIGHT      BUTTON_RIGHT
 #define BJACK_LEFT       BUTTON_LEFT
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define BJACK_QUIT       BUTTON_POWER
+#define BJACK_DOUBLEDOWN BUTTON_VOL_DOWN
+#define BJACK_SCORES     BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

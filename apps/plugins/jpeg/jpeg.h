@@ -285,6 +285,8 @@
 #define JPEG_NEXT       BUTTON_VIEW
 #define JPEG_PREVIOUS   BUTTON_PLAYLIST
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+
 #else
 #error No keymap defined!
 #endif

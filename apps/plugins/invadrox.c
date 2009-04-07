@@ -134,6 +134,10 @@ PLUGIN_HEADER
 #define RIGHT BUTTON_RIGHT
 #define FIRE BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+
+#define QUIT BUTTON_POWER
+
 #else
     #error INVADROX: Unsupported keypad
 #endif
@@ -370,7 +374,7 @@ PLUGIN_HEADER
 #define MAX_Y 18
 
 
-#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
+#elif (LCD_WIDTH == 240) && ((LCD_HEIGHT == 320) || (LCD_HEIGHT == 400))
 
 /* Gigabeat: 240x320x16
  * ======================

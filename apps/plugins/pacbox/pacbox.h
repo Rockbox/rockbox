@@ -192,6 +192,10 @@
 #define PACMAN_COIN    BUTTON_VIEW
 #define PACMAN_MENU    BUTTON_MENU
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+
+#define PACMAN_MENU     (BUTTON_MENU|BUTTON_REL)
+
 #else
 
 #error Keymap not defined!

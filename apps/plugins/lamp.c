@@ -82,6 +82,10 @@ PLUGIN_HEADER
 #   define LAMP_LEFT       BUTTON_LEFT
 #   define LAMP_RIGHT      BUTTON_RIGHT
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#   define LAMP_LEFT       BUTTON_VOL_DOWN
+#   define LAMP_RIGHT      BUTTON_VOL_UP
+
 #else
 #   error Missing key definitions for this keypad
 #endif

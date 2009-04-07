@@ -370,6 +370,11 @@ PLUGIN_HEADER
 #define LVL_UP_TEXT "VOL+"
 #define LVL_DOWN_TEXT "VOL-"
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define PEGBOX_QUIT     BUTTON_POWER
+
+#define QUIT_TEXT "POWER"
+
 #else
 #error Unsupported keymap!
 #endif

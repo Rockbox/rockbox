@@ -190,6 +190,12 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define QUIT    BUTTON_POWER
+#define LEFT    BUTTON_VOL_DOWN
+#define RIGHT   BUTTON_VOL_UP
+#define SELECT  BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif
@@ -262,7 +268,7 @@ enum menu_items {
 #include "pluginbitmaps/brickmania_break.h"
 #endif
 
-#if (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
+#if ((LCD_WIDTH == 320) || (LCD_WIDTH == 400)) && (LCD_HEIGHT == 240)
 
 /* The time (in ms) for one iteration through the game loop - decrease this
    to speed up the game - note that current_tick is (currently) only accurate

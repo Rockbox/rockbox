@@ -164,6 +164,9 @@ PLUGIN_HEADER
 #define SNAKE_DOWN BUTTON_DOWN
 #define SNAKE_PLAYPAUSE BUTTON_MENU
 
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+#define SNAKE_QUIT BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

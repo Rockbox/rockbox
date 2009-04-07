@@ -159,6 +159,9 @@ PLUGIN_IRAM_DECLARE
 #define BTN_DOWN         BUTTON_DOWN
 #define BTN_PLAY         BUTTON_MENU
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define BTN_QUIT         BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

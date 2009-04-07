@@ -17,7 +17,7 @@ brickmania_bricks.220x176x16.bmp
 brickmania_pads.220x176x16.bmp
 brickmania_break.220x176x16.bmp
 brickmania_powerups.220x176x16.bmp
-#if LCD_HEIGHT == 320
+#if LCD_HEIGHT >= 320
 brickmania_menu_bg.240x320x16.bmp
 #elif LCD_HEIGHT == 176
 brickmania_menu_bg.220x176x16.bmp
@@ -325,7 +325,7 @@ jewels.160x128x16.bmp
 jewels.220x176x16.bmp
 #elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 220)
 jewels.220x176x16.bmp
-#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
+#elif (LCD_WIDTH == 240) && (LCD_HEIGHT >= 320)
 jewels.320x240x16.bmp
 #elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
 jewels.320x240x16.bmp
@@ -419,7 +419,7 @@ pegbox_pieces.9x7x1.bmp
 #if LCD_DEPTH == 16 /* colour versions*/
 #if   (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240)
 rockblox_background.320x240x16.bmp
-#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
+#elif (LCD_WIDTH == 240) && (LCD_HEIGHT >= 320)
 rockblox_background.240x320x16.bmp
 #elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176)
 rockblox_background.220x176x16.bmp
@@ -678,7 +678,7 @@ superdom_boarditems.220x176x16.bmp
 superdom_boarditems.176x132x16.bmp
 #elif (LCD_WIDTH == 320 && LCD_HEIGHT == 240)
 superdom_boarditems.320x240x16.bmp
-#elif (LCD_WIDTH == 240 && LCD_HEIGHT == 320)
+#elif (LCD_WIDTH == 240 && LCD_HEIGHT >= 320)
 superdom_boarditems.240x320x16.bmp
 #endif
 #endif

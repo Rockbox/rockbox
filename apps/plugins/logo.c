@@ -165,6 +165,9 @@ const unsigned char rockbox16x7[] = {
 #define LP_DEC_Y BUTTON_DOWN
 #define LP_INC_Y BUTTON_UP
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define LP_QUIT BUTTON_POWER
+
 #else
 #define LP_QUIT BUTTON_OFF
 #define LP_DEC_X BUTTON_LEFT

@@ -192,6 +192,10 @@ PLUGIN_HEADER
 #define DOWN BUTTON_DOWN
 #define PAUSE BUTTON_VIEW
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+
+#define QUIT BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

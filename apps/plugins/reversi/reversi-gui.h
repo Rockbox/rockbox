@@ -177,6 +177,10 @@
 #define REVERSI_BUTTON_MAKE_MOVE BUTTON_SELECT
 #define REVERSI_BUTTON_MENU BUTTON_MENU
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define REVERSI_QUIT                BUTTON_POWER
+#define REVERSI_BUTTON_MENU         BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

@@ -177,6 +177,9 @@ PLUGIN_HEADER
 #define PONG_RIGHT_UP BUTTON_VOL_UP
 #define PONG_RIGHT_DOWN BUTTON_VOL_DOWN
 
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+#define PONG_QUIT BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

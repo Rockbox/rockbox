@@ -224,6 +224,9 @@ enum minesweeper_status {
 #   define MINESWP_DISCOVER BUTTON_SELECT
 #   define MINESWP_INFO     BUTTON_MENU
 
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+#   define MINESWP_QUIT     BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

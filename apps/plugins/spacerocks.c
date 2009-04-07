@@ -267,6 +267,9 @@ PLUGIN_HEADER
 #define AST_FIRE BUTTON_PLAYLIST
 #define AST_FIRE_REP (BUTTON_PLAYLIST | BUTTON_REPEAT)
 
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+#define AST_QUIT BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

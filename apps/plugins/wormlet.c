@@ -275,6 +275,10 @@ PLUGIN_HEADER
 #define PLAYERS_TEXT "Up/Down"
 #define WORMS_TEXT "Left/Right"
 
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+
+#define BTN_QUIT BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif
@@ -366,7 +370,7 @@ PLUGIN_HEADER
 #define ARGH_SIZE 8
 #define SPEED 4
 #define MAX_WORM_SEGMENTS 512
-#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
+#elif (LCD_WIDTH == 240) && ((LCD_HEIGHT == 320) || (LCD_HEIGHT == 400))
 #define FOOD_SIZE 7
 #define ARGH_SIZE 8
 #define SPEED 4

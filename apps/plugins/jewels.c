@@ -182,6 +182,9 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_POWER
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define JEWELS_CANCEL BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif
@@ -207,9 +210,10 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #endif
 #endif
 
-/* use 30x30 tiles (iPod Video, Gigabeat) */
+/* use 30x30 tiles (iPod Video, Gigabeat, Onda VX747) */
 #if (LCD_HEIGHT == 240) && (LCD_WIDTH == 320) || \
-      ((LCD_HEIGHT == 320) && (LCD_WIDTH == 240))
+      ((LCD_HEIGHT == 320) && (LCD_WIDTH == 240)) || \
+      ((LCD_HEIGHT == 400) && (LCD_WIDTH == 240))
 #define TILE_WIDTH  30
 #define TILE_HEIGHT 30
 #define YOFS 0
@@ -1657,6 +1661,8 @@ static int jewels_main(struct game_context* bj) {
                 rb->lcd_puts(0, 8, "Directions to move");
                 rb->lcd_puts(0, 9, "SELECT/PLAY to select");
                 rb->lcd_puts(0, 10, "Long SELECT to show menu");
+                rb->lcd_puts(0, 11, "POWER to cancel");
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
                 rb->lcd_puts(0, 11, "POWER to cancel");
 #else
     #warning: missing help text.

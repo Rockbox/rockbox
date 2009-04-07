@@ -150,6 +150,9 @@
 #define ZX_SELECT       BUTTON_SELECT
 #define ZX_MENU         BUTTON_MENU
 
+#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#define ZX_MENU         (BUTTON_MENU|BUTTON_REL)
+
 #else
 #error Keymap not defined!
 

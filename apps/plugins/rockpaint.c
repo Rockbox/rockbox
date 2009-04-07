@@ -157,6 +157,10 @@ PLUGIN_HEADER
 #define ROCKPAINT_LEFT      BUTTON_LEFT
 #define ROCKPAINT_RIGHT     BUTTON_RIGHT
 
+#elif ( CONFIG_KEYPAD == ONDAVX747_PAD )
+#define ROCKPAINT_QUIT      BUTTON_POWER
+#define ROCKPAINT_MENU      BUTTON_MENU
+
 #else
 #error "Please define keys for this keypad"
 #endif

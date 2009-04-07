@@ -1102,6 +1102,9 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define CHIP8_KEY8 BUTTON_DOWN
 #define CHIP8_KEY9 BUTTON_VIEW
 
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+#define CHIP8_OFF  BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif
