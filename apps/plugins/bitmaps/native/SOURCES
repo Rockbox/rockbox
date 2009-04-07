@@ -256,30 +256,51 @@ flipit_tokens.16x26x1.bmp
 #endif
 
 /* Invadrox */
-#if (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
-invadrox.320x240x16.bmp
-invadrox_left.320x240x16.bmp
-invadrox_right.320x240x16.bmp
-#elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176)
-/* Use iPod Video character bitmap */
-invadrox.320x240x16.bmp
-#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
-/* Use iPod Video character bitmap */
-invadrox.320x240x16.bmp
-invadrox_logo.240x320x16.bmp
-#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132)
-invadrox.176x132x16.bmp
-#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH >= 8)
-/* Use iPod Nano character bitmap */
-invadrox.176x132x16.bmp
-#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)
-/* Grayscale */
-invadrox.160x128x2.bmp
-#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 220)
-/* Use iPod Nano character bitmap */
-invadrox.176x132x16.bmp
-invadrox_logo.176x220x16.bmp
+#if defined HAVE_LCD_COLOR
+#if LCD_WIDTH >= 220
+invadrox_aliens.24x24x16.bmp
+invadrox_alien_explode.13x7x16.bmp
+invadrox_ships.16x24x16.bmp
+invadrox_bombs.9x42x16.bmp
+invadrox_shield.22x16x16.bmp
+invadrox_ufo.16x7x16.bmp
+invadrox_ufo_explode.21x8x16.bmp
+invadrox_numbers.50x7x16.bmp
+#if LCD_WIDTH == 320
+invadrox_background.320x240x16.bmp
+#elif LCD_WIDTH == 240
+invadrox_background.240x320x16.bmp
+#elif LCD_WIDTH == 220
+invadrox_background.220x176x16.bmp
 #endif
+#elif LCD_WIDTH >= 160
+invadrox_aliens.16x15x16.bmp
+invadrox_alien_explode.10x5x16.bmp
+invadrox_ships.10x15x16.bmp
+invadrox_bombs.9x30x16.bmp
+invadrox_shield.15x10x16.bmp
+invadrox_ufo.11x5x16.bmp
+invadrox_ufo_explode.14x5x16.bmp
+invadrox_numbers.40x5x16.bmp
+#if LCD_WIDTH == 176 && LCD_HEIGHT == 220
+invadrox_background.176x220x16.bmp
+#elif LCD_WIDTH == 176 && LCD_HEIGHT == 132
+invadrox_background.176x132x16.bmp
+#elif LCD_WIDTH == 160 && LCD_HEIGHT == 128
+invadrox_background.160x128x16.bmp
+#endif
+#endif /* LCD_WIDTH */
+#elif LCD_DEPTH == 2 /* Greyscale */
+invadrox_aliens.16x15x16.bmp
+invadrox_alien_explode.10x5x16.bmp
+invadrox_ships.10x15x2.bmp
+invadrox_bombs.9x30x16.bmp
+invadrox_shield.15x10x2.bmp
+invadrox_ufo.11x5x2.bmp
+invadrox_ufo_explode.14x5x2.bmp
+invadrox_numbers.40x5x16.bmp
+invadrox_background.160x128x16.bmp
+#endif /* colour depth */
 
 /* Jewels */
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)

@@ -37,6 +37,15 @@ flipit_cursor.16x13x1.bmp
 #endif
 #endif
 
+/* Invadrox, not on monochrome targets yet */
+#if LCD_DEPTH > 1
+#if LCD_WIDTH >= 220
+invadrox_fire.8x8x1.bmp
+#elif LCD_WIDTH >= 160
+invadrox_fire.6x6x1.bmp
+#endif
+#endif
+
 #if CONFIG_CODEC == SWCODEC
 /* MPEGplayer */
 mpegplayer_status_icons_8x8x1.bmp

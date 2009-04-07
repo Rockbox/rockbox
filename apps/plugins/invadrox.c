@@ -166,7 +166,7 @@ PLUGIN_HEADER
 #define UFO_Y (SCORENUM_Y + FONT_HEIGHT + ALIEN_HEIGHT)
 #define PLAYFIELD_Y (LCD_HEIGHT - SHIP_HEIGHT - 2)
 #define PLAYFIELD_WIDTH (LCD_WIDTH - 2 * PLAYFIELD_X)
-#define LEVEL_X (LCD_WIDTH - PLAYFIELD_X - LIVES_X - LEVEL_WIDTH - 2 * NUMBERS_WIDTH - 3 * NUM_SPACING)
+#define LEVEL_X (LCD_WIDTH - PLAYFIELD_X - LIVES_X - 2 * NUMBERS_WIDTH - 3 * NUM_SPACING)
 #define SHIP_MIN_X (PLAYFIELD_X + PLAYFIELD_WIDTH / 5 - SHIELD_WIDTH / 2 - SHIP_WIDTH)
 #define SHIP_MAX_X (PLAYFIELD_X + 4 * PLAYFIELD_WIDTH / 5 + SHIELD_WIDTH / 2)
 /* SCORE_Y = 0 for most targets. Gigabeat redefines it later. */
@@ -211,7 +211,6 @@ PLUGIN_HEADER
 #define ALIEN_START_Y (UFO_Y + 3 * ALIEN_HEIGHT)
 #define SCORENUM_X (PLAYFIELD_X + NUMBERS_WIDTH)
 #define SCORENUM_Y SCORE_Y + (2 * (FONT_HEIGHT + 1) + 1)
-#define HISCORE_X (LCD_WIDTH - PLAYFIELD_X - HISCORE_WIDTH)
 #define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 1 - 6 * NUMBERS_WIDTH - 5 * NUM_SPACING)
 #define SHIELD_Y (PLAYFIELD_Y - 6 * SHIP_HEIGHT)
 #define LIVES_X 10
@@ -248,7 +247,7 @@ PLUGIN_HEADER
  *    Lives and Level goes inside bottom border
  */
 
-#define TINY_GRAPHICS
+#define SMALL_GRAPHICS
 #define PLAYFIELD_X 0
 #define SHIP_Y (PLAYFIELD_Y - 2 * SHIP_HEIGHT)
 #define SHIELD_Y (SHIP_Y - SHIP_HEIGHT - SHIELD_HEIGHT)
@@ -258,7 +257,6 @@ PLUGIN_HEADER
 #define SCORE_Y 70
 #define SCORENUM_X (PLAYFIELD_X + NUMBERS_WIDTH)
 #define SCORENUM_Y (SCORE_Y + 2 * FONT_HEIGHT)
-#define HISCORE_X (LCD_WIDTH - PLAYFIELD_X - HISCORE_WIDTH)
 #define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 1 - 6 * NUMBERS_WIDTH - 5 * NUM_SPACING)
 #define LIVES_X 8
 #define MAX_X 75
@@ -306,14 +304,13 @@ PLUGIN_HEADER
  *    Lives and Level goes inside bottom border
  */
 
-#define TINY_GRAPHICS
+#define SMALL_GRAPHICS
 #define PLAYFIELD_X 0
 #define SHIP_Y (PLAYFIELD_Y - 2 * SHIP_HEIGHT)
 #define ALIEN_START_Y (UFO_Y + 12)
-#define SCORENUM_X (PLAYFIELD_X + SCORE_WIDTH + NUMBERS_WIDTH + NUM_SPACING)
+#define SCORENUM_X (PLAYFIELD_X + 6 * NUMBERS_WIDTH + 5 * NUM_SPACING)
 #define SCORENUM_Y SCORE_Y
 #define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 4 * NUMBERS_WIDTH - 3 * NUM_SPACING)
-#define HISCORE_X (HISCORENUM_X - NUMBERS_WIDTH - NUM_SPACING - HISCORE_WIDTH)
 #define SHIELD_Y (SHIP_Y - SHIP_HEIGHT - SHIELD_HEIGHT)
 #define LIVES_X 8
 #define MAX_X 75
@@ -321,8 +318,8 @@ PLUGIN_HEADER
 
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
 
-/* iAudio X5, iRiver H10 20Gb, iPod 3g/4g: 160x128x16
- * ======================================
+/* iAudio X5, iRiver H10 20Gb, iPod 3g/4g, H100, M5: 160x128
+ * =========================================================
  * X: No padding. No border -> 160p playfield.
  *
  *    LIVES_X 0
@@ -360,14 +357,13 @@ PLUGIN_HEADER
  *    Lives and Level goes inside bottom border
  */
 
-#define TINY_GRAPHICS
+#define SMALL_GRAPHICS
 #define PLAYFIELD_X 0
 #define SHIP_Y (PLAYFIELD_Y - 2 * SHIP_HEIGHT)
 #define ALIEN_START_Y (UFO_Y + 10)
-#define SCORENUM_X (PLAYFIELD_X + SCORE_WIDTH + NUMBERS_WIDTH + NUM_SPACING)
+#define SCORENUM_X (PLAYFIELD_X + 6 * NUMBERS_WIDTH + 5 * NUM_SPACING)
 #define SCORENUM_Y SCORE_Y
 #define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 4 * NUMBERS_WIDTH - 3 * NUM_SPACING)
-#define HISCORE_X (HISCORENUM_X - NUMBERS_WIDTH - NUM_SPACING - HISCORE_WIDTH)
 #define SHIELD_Y (SHIP_Y - SHIP_HEIGHT - SHIELD_HEIGHT)
 #define LIVES_X 0
 #define MAX_X 75
@@ -410,7 +406,6 @@ PLUGIN_HEADER
 #define SCORE_Y 80
 #define SCORENUM_X (PLAYFIELD_X + NUMBERS_WIDTH)
 #define SCORENUM_Y SCORE_Y + (2 * (FONT_HEIGHT + 1) + 1)
-#define HISCORE_X (LCD_WIDTH - PLAYFIELD_X - HISCORE_WIDTH)
 #define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 1 - 6 * NUMBERS_WIDTH - 5 * NUM_SPACING)
 #define SHIELD_Y (PLAYFIELD_Y - 6 * SHIP_HEIGHT)
 #define LIVES_X 10
@@ -447,125 +442,72 @@ PLUGIN_HEADER
 #define SHIP_Y (PLAYFIELD_Y - 2 * SHIP_HEIGHT)
 #define ALIEN_START_Y (UFO_Y + 10)
 #define SCORENUM_Y SCORE_Y
-#define SCORENUM_X (PLAYFIELD_X + SCORE_WIDTH + NUMBERS_WIDTH + NUM_SPACING)
+#define SCORENUM_X (PLAYFIELD_X + 6 * NUMBERS_WIDTH + 6 * NUM_SPACING)
 #define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 4 * NUMBERS_WIDTH - 3 * NUM_SPACING)
-#define HISCORE_X (HISCORENUM_X - NUMBERS_WIDTH - NUM_SPACING - HISCORE_WIDTH)
 #define SHIELD_Y (PLAYFIELD_Y - 5 * SHIP_HEIGHT)
 #define LIVES_X 8
 #define MAX_X 95
 #define MAX_Y 15
 
+
 #else
     #error INVADROX: Unsupported LCD type
 #endif
 
+/* bitmaps */
+#include "pluginbitmaps/invadrox_background.h"
+
+/* get dimensions for later use from the bitmaps */
+#include "pluginbitmaps/invadrox_aliens.h"
+#include "pluginbitmaps/invadrox_ships.h"
+#include "pluginbitmaps/invadrox_bombs.h"
+#include "pluginbitmaps/invadrox_alien_explode.h"
+#include "pluginbitmaps/invadrox_shield.h"
+#include "pluginbitmaps/invadrox_ufo.h"
+#include "pluginbitmaps/invadrox_ufo_explode.h"
+#include "pluginbitmaps/invadrox_numbers.h"
+#include "pluginbitmaps/invadrox_fire.h"
+#define ALIEN_WIDTH           (BMPWIDTH_invadrox_aliens/2)
+#define ALIEN_HEIGHT          (BMPHEIGHT_invadrox_aliens/3)
+#define SHIP_WIDTH            BMPWIDTH_invadrox_ships
+#define SHIP_HEIGHT           (BMPHEIGHT_invadrox_ships/3)
+#define BOMB_WIDTH            (BMPWIDTH_invadrox_bombs/3)
+#define BOMB_HEIGHT           (BMPHEIGHT_invadrox_bombs/6)
+#define ALIEN_EXPLODE_WIDTH   BMPWIDTH_invadrox_alien_explode
+#define ALIEN_EXPLODE_HEIGHT  BMPHEIGHT_invadrox_alien_explode
+#define SHIELD_WIDTH          BMPWIDTH_invadrox_shield
+#define SHIELD_HEIGHT         BMPHEIGHT_invadrox_shield
+#define UFO_WIDTH             BMPWIDTH_invadrox_ufo
+#define UFO_HEIGHT            BMPHEIGHT_invadrox_ufo
+#define UFO_EXPLODE_WIDTH     BMPWIDTH_invadrox_ufo_explode
+#define UFO_EXPLODE_HEIGHT    BMPHEIGHT_invadrox_ufo_explode
+#define NUMBERS_WIDTH         (BMPWIDTH_invadrox_numbers/10)
+#define FONT_HEIGHT           BMPHEIGHT_invadrox_numbers
+#define FIRE_WIDTH            BMPWIDTH_invadrox_fire
+#define FIRE_HEIGHT           BMPHEIGHT_invadrox_fire
 
 /* Defines common to each "graphic type" */
 #ifdef ARCADISH_GRAPHICS
 
-#define STRIDE 71
-#define SHIP_SRC_X 24
-#define SHIP_WIDTH 16
-#define SHIP_HEIGHT 8
 #define SHOT_HEIGHT 5
-#define ALIEN_WIDTH 12
-#define ALIEN_EXPLODE_SRC_X 52
-#define ALIEN_EXPLODE_SRC_Y 39
-#define ALIEN_EXPLODE_WIDTH 13
-#define ALIEN_EXPLODE_HEIGHT 7
-#define ALIEN_HEIGHT 8
 #define ALIEN_SPACING 4
 #define ALIEN_SPEED 2
-#define UFO_SRC_X 40
-#define UFO_WIDTH 16
-#define UFO_HEIGHT 7
-#define UFO_EXPLODE_WIDTH 21
-#define UFO_EXPLODE_HEIGHT 8
 #define UFO_SPEED 1
-#define FONT_HEIGHT 7
-#define LEVEL_SRC_Y 24
-#define LEVEL_WIDTH 37
-#define SCORE_SRC_X 24
-#define SCORE_SRC_Y 31
-#define SCORE_WIDTH 37
-#define HISCORE_WIDTH 61
 #define NUM_SPACING 3
-#define NUMBERS_SRC_Y 38
-#define NUMBERS_WIDTH 5
-#define SHIELD_SRC_X 40
-#define SHIELD_SRC_Y 15
-#define SHIELD_WIDTH 22
-#define SHIELD_HEIGHT 16
-#define FIRE_WIDTH 8
-#define FIRE_HEIGHT 8
 #define FIRE_SPEED 8
-#define BOMB_SRC_X 62
-#define BOMB_WIDTH 3
-#define BOMB_HEIGHT 7
 #define BOMB_SPEED 3
 #define ALIENS 11
-unsigned char fire_sprite[FIRE_HEIGHT] = {
-    (1 << 7) | (0 << 6) | (0 << 5) | (0 << 4) | (1 << 3) | (0 << 2) | (0 << 1) | 1,
-    (0 << 7) | (0 << 6) | (1 << 5) | (0 << 4) | (0 << 3) | (0 << 2) | (1 << 1) | 0,
-    (0 << 7) | (1 << 6) | (1 << 5) | (1 << 4) | (1 << 3) | (1 << 2) | (1 << 1) | 0,
-    (1 << 7) | (1 << 6) | (1 << 5) | (1 << 4) | (1 << 3) | (1 << 2) | (1 << 1) | 1,
-    (0 << 7) | (1 << 6) | (1 << 5) | (1 << 4) | (1 << 3) | (1 << 2) | (1 << 1) | 1,
-    (0 << 7) | (1 << 6) | (1 << 5) | (1 << 4) | (1 << 3) | (1 << 2) | (1 << 1) | 0,
-    (0 << 7) | (0 << 6) | (1 << 5) | (0 << 4) | (0 << 3) | (1 << 2) | (0 << 1) | 0,
-    (1 << 7) | (0 << 6) | (0 << 5) | (1 << 4) | (0 << 3) | (0 << 2) | (0 << 1) | 1
-};
 
-#elif defined TINY_GRAPHICS
+#elif defined SMALL_GRAPHICS
 
-#define STRIDE 53
-#define SHIP_SRC_X 16
-#define SHIP_WIDTH 10
-#define SHIP_HEIGHT 5
 #define SHOT_HEIGHT 4
-#define ALIEN_WIDTH 8
-#define ALIEN_HEIGHT 5
-#define ALIEN_EXPLODE_SRC_X 40
-#define ALIEN_EXPLODE_SRC_Y 26
-#define ALIEN_EXPLODE_WIDTH 10
-#define ALIEN_EXPLODE_HEIGHT 5
 #define ALIEN_SPACING 3
 #define ALIEN_SPEED 2
-#define UFO_SRC_X 26
-#define UFO_WIDTH 11
-#define UFO_HEIGHT 5
-#define UFO_EXPLODE_WIDTH 14
-#define UFO_EXPLODE_HEIGHT 5
 #define UFO_SPEED 1
-#define FONT_HEIGHT 5
-#define LEVEL_SRC_Y 15
-#define LEVEL_WIDTH 29
-#define NUMBERS_WIDTH 4
 #define NUM_SPACING 2
-#define SCORE_SRC_X 17
-#define SCORE_SRC_Y 20
-#define SCORE_WIDTH 28
-#define HISCORE_WIDTH 45
-#define NUMBERS_SRC_Y 25
-#define SHIELD_SRC_X 29
-#define SHIELD_SRC_Y 10
-#define SHIELD_WIDTH 15
-#define SHIELD_HEIGHT 10
-#define FIRE_WIDTH 6
-#define FIRE_HEIGHT 6
 #define FIRE_SPEED 6
-#define BOMB_SRC_X 44
-#define BOMB_WIDTH 3
-#define BOMB_HEIGHT 5
 #define BOMB_SPEED 2
 #define ALIENS 11
-unsigned char fire_sprite[FIRE_HEIGHT] = {
-    (1 << 5) | (0 << 4) | (0 << 3) | (1 << 2) | (0 << 1) | 1,
-    (0 << 5) | (1 << 4) | (0 << 3) | (0 << 2) | (0 << 1) | 0,
-    (0 << 5) | (1 << 4) | (1 << 3) | (1 << 2) | (1 << 1) | 0,
-    (0 << 5) | (1 << 4) | (1 << 3) | (1 << 2) | (1 << 1) | 1,
-    (0 << 5) | (1 << 4) | (0 << 3) | (0 << 2) | (1 << 1) | 0,
-    (1 << 5) | (0 << 4) | (1 << 3) | (0 << 2) | (0 << 1) | 1
-};
 
 #else
     #error Graphic type not defined
@@ -643,19 +585,6 @@ fb_data screen_green, screen_white;
 /* For optimization, precalculate startoffset of each scanline */
 unsigned int ytab[LCD_HEIGHT];
 
-/* external bitmaps */
-extern const fb_data invadrox[];
-#if (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
-/* iPod Video only */
-extern const fb_data invadrox_left[];
-extern const fb_data invadrox_right[];
-#endif
-#if ((LCD_WIDTH == 240) && (LCD_HEIGHT == 320)) || ((LCD_WIDTH == 176) && (LCD_HEIGHT == 220))
-/* Gigabeat F, Sansa e200 */
-extern const fb_data invadrox_logo[];
-#endif
-
-
 int lives = 2;
 int score = 0;
 int scores[3] = { 30, 20, 10 };
@@ -716,8 +645,9 @@ void draw_number(int x, int y, int num, int digits)
     for (i = digits - 1; i >= 0; i--) {
         d = num % 10;
         num = num / 10;
-        rb->lcd_bitmap_part(invadrox, d * NUMBERS_WIDTH, NUMBERS_SRC_Y,
-                            STRIDE, x + i * (NUMBERS_WIDTH + NUM_SPACING), y,
+        rb->lcd_bitmap_part(invadrox_numbers, d * NUMBERS_WIDTH, 0,
+                            BMPWIDTH_invadrox_numbers,
+                            x + i * (NUMBERS_WIDTH + NUM_SPACING), y,
                             NUMBERS_WIDTH, FONT_HEIGHT);
     }
     /* Update lcd */
@@ -737,10 +667,7 @@ inline void draw_score(void)
 
 void draw_level(void)
 {
-    rb->lcd_bitmap_part(invadrox, 0, LEVEL_SRC_Y,
-                        STRIDE, LEVEL_X, PLAYFIELD_Y + 2,
-                        LEVEL_WIDTH, FONT_HEIGHT);
-    draw_number(LEVEL_X + LEVEL_WIDTH + 2 * NUM_SPACING, PLAYFIELD_Y + 2, level, 2);
+    draw_number(LEVEL_X + 2 * NUM_SPACING, PLAYFIELD_Y + 2, level, 2);
 }
 
 
@@ -748,18 +675,18 @@ void draw_lives(void)
 {
     int i;
     /* Lives num */
-    rb->lcd_bitmap_part(invadrox, lives * NUMBERS_WIDTH, NUMBERS_SRC_Y,
-                        STRIDE, PLAYFIELD_X + LIVES_X, PLAYFIELD_Y + 2,
+    rb->lcd_bitmap_part(invadrox_numbers, lives * NUMBERS_WIDTH, 0,
+                        BMPWIDTH_invadrox_numbers, PLAYFIELD_X + LIVES_X, PLAYFIELD_Y + 2,
                         NUMBERS_WIDTH, FONT_HEIGHT);
 
     /* Ships */
     for (i = 0; i < (lives - 1); i++) {
-        rb->lcd_bitmap_part(invadrox, SHIP_SRC_X, 0, STRIDE,
+        rb->lcd_bitmap_part(invadrox_ships, 0, 0, BMPWIDTH_invadrox_ships,
                             PLAYFIELD_X + LIVES_X + SHIP_WIDTH + i * (SHIP_WIDTH + NUM_SPACING),
                             PLAYFIELD_Y + 1, SHIP_WIDTH, SHIP_HEIGHT);
     }
 
-    /* Erase ship to the righ (if less than MAX_LIVES) */
+    /* Erase ship to the right (if less than MAX_LIVES) */
     if (lives < MAX_LIVES) {
         rb->lcd_fillrect(PLAYFIELD_X + LIVES_X + SHIP_WIDTH + i * (SHIP_WIDTH + NUM_SPACING),
                          PLAYFIELD_Y + 1, SHIP_WIDTH, SHIP_HEIGHT);
@@ -775,8 +702,8 @@ inline void draw_aliens(void)
     int i;
 
     for (i = 0; i < 5 * ALIENS; i++) {
-        rb->lcd_bitmap_part(invadrox, aliens[i].x & 1 ? ALIEN_WIDTH : 0, aliens[i].type * ALIEN_HEIGHT,
-                            STRIDE, PLAYFIELD_X + LIVES_X + aliens[i].x * ALIEN_SPEED,
+        rb->lcd_bitmap_part(invadrox_aliens, aliens[i].x & 1 ? ALIEN_WIDTH : 0, aliens[i].type * ALIEN_HEIGHT,
+                            BMPWIDTH_invadrox_aliens, PLAYFIELD_X + LIVES_X + aliens[i].x * ALIEN_SPEED,
                             ALIEN_START_Y + aliens[i].y * ALIEN_HEIGHT,
                             ALIEN_WIDTH, ALIEN_HEIGHT);
     }
@@ -912,9 +839,9 @@ bool move_aliens(void)
     /* Draw alien at new pos */
     x = PLAYFIELD_X + LIVES_X + aliens[curr_alien].x * ALIEN_SPEED;
     y = ALIEN_START_Y + aliens[curr_alien].y * ALIEN_HEIGHT;
-    rb->lcd_bitmap_part(invadrox,
+    rb->lcd_bitmap_part(invadrox_aliens,
                         aliens[curr_alien].x & 1 ? ALIEN_WIDTH : 0, aliens[curr_alien].type * ALIEN_HEIGHT,
-                        STRIDE, x, y, ALIEN_WIDTH, ALIEN_HEIGHT);
+                        BMPWIDTH_invadrox_aliens, x, y, ALIEN_WIDTH, ALIEN_HEIGHT);
 
     if (!next_alien()) {
         /* Round finished. Set curr_alien to first alive from bottom. */
@@ -941,8 +868,8 @@ inline void draw_ship(void)
     }
 
     /* Draw ship */
-    rb->lcd_bitmap_part(invadrox, SHIP_SRC_X, ship_frame * SHIP_HEIGHT,
-                        STRIDE, ship_x, SHIP_Y, SHIP_WIDTH, SHIP_HEIGHT);
+    rb->lcd_bitmap_part(invadrox_ships, 0, ship_frame * SHIP_HEIGHT,
+                        BMPWIDTH_invadrox_ships, ship_x, SHIP_Y, SHIP_WIDTH, SHIP_HEIGHT);
     if (ship_hit) {
         /* Alternate between frame 1 and 2 during hit */
         ship_frame_counter++;
@@ -962,22 +889,15 @@ inline void draw_ship(void)
 
 inline void fire_alpha(int xc, int yc, fb_data color)
 {
-    int x, y;
-    unsigned char mask;
+    int oldmode = rb->lcd_get_drawmode();
 
     rb->lcd_set_foreground(color);
-
-    for (y = 0; y < FIRE_HEIGHT; y++) {
-        mask = 1 << (FIRE_WIDTH - 1);
-        for (x = -(FIRE_WIDTH / 2); x < (FIRE_WIDTH / 2); x++) {
-            if (fire_sprite[y] & mask) {
-                rb->lcd_drawpixel(xc + x, yc + y);
-            }
-            mask >>= 1;
-        }
-    }
+    rb->lcd_set_drawmode(DRMODE_FG);
+    
+    rb->lcd_mono_bitmap(invadrox_fire, xc - (FIRE_WIDTH/2), yc, FIRE_WIDTH, FIRE_HEIGHT);
 
     rb->lcd_set_foreground(LCD_BLACK);
+    rb->lcd_set_drawmode(oldmode);
 }
 
 
@@ -1041,8 +961,8 @@ void move_fire(void)
                 fire_target = TARGET_UFO;
                 /* Center explosion */
                 ufo_x -= (UFO_EXPLODE_WIDTH - UFO_WIDTH) / 2;
-                rb->lcd_bitmap_part(invadrox, UFO_SRC_X, UFO_HEIGHT,
-                                    STRIDE, ufo_x, UFO_Y - 1, UFO_EXPLODE_WIDTH, UFO_EXPLODE_HEIGHT);
+                rb->lcd_bitmap(invadrox_ufo_explode, ufo_x, UFO_Y - 1,
+                               UFO_EXPLODE_WIDTH, UFO_EXPLODE_HEIGHT);
                 return;
             }
         }
@@ -1125,8 +1045,8 @@ void move_fire(void)
 
                     /* Paralyze aliens S_EXPLODE frames */
                     aliens_paralyzed = S_EXPLODE;
-                    rb->lcd_bitmap_part(invadrox, ALIEN_EXPLODE_SRC_X, ALIEN_EXPLODE_SRC_Y,
-                                        STRIDE, PLAYFIELD_X + LIVES_X + aliens[i].x * ALIEN_SPEED,
+                    rb->lcd_bitmap(invadrox_alien_explode,
+                                        PLAYFIELD_X + LIVES_X + aliens[i].x * ALIEN_SPEED,
                                         ALIEN_START_Y + aliens[i].y * ALIEN_HEIGHT,
                                         ALIEN_EXPLODE_WIDTH, ALIEN_EXPLODE_HEIGHT);
                     /* Since alien is 1 pixel taller than explosion sprite, erase bottom line */
@@ -1187,9 +1107,9 @@ inline int random_bomber(void)
 
 inline void draw_bomb(int i)
 {
-    rb->lcd_bitmap_part(invadrox, BOMB_SRC_X + bombs[i].type * BOMB_WIDTH,
-                        bombs[i].frame * (BOMB_HEIGHT + 1),
-                        STRIDE, bombs[i].x, bombs[i].y,
+    rb->lcd_bitmap_part(invadrox_bombs, bombs[i].type * BOMB_WIDTH,
+                        bombs[i].frame * BOMB_HEIGHT,
+                        BMPWIDTH_invadrox_bombs, bombs[i].x, bombs[i].y,
                         BOMB_WIDTH, BOMB_HEIGHT);
     /* Advance frame */
     bombs[i].frame++;
@@ -1288,8 +1208,9 @@ void move_bombs(void)
                         ship_frame_counter = 0;
                         bombs[i].state = S_EXPLODE * 4;
                         bombs[i].target = TARGET_SHIP;
-                        rb->lcd_bitmap_part(invadrox, SHIP_SRC_X, 1 * SHIP_HEIGHT, STRIDE,
-                                            ship_x, SHIP_Y, SHIP_WIDTH, SHIP_HEIGHT);
+                        rb->lcd_bitmap_part(invadrox_ships, 0, 1 * SHIP_HEIGHT,
+                                            BMPWIDTH_invadrox_ships, ship_x, SHIP_Y,
+                                            SHIP_WIDTH, SHIP_HEIGHT);
                         break;
                     }
                     /* Shield hit */
@@ -1399,8 +1320,7 @@ void move_ufo(void)
             break;
         }
         /* Draw new pos */
-        rb->lcd_bitmap_part(invadrox, UFO_SRC_X, 0,
-                            STRIDE, ufo_x, UFO_Y, UFO_WIDTH, UFO_HEIGHT);
+        rb->lcd_bitmap(invadrox_ufo, ufo_x, UFO_Y, UFO_WIDTH, UFO_HEIGHT);
         break;
 
     case S_SHOWSCORE:
@@ -1438,20 +1358,7 @@ void move_ufo(void)
 void draw_background(void)
 {
 
-#if (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
-    /* Erase background to black */
-    rb->lcd_fillrect(PLAYFIELD_X, 0, PLAYFIELD_WIDTH, LCD_HEIGHT);
-    /* Left and right bitmaps */
-    rb->lcd_bitmap(invadrox_left, 0, 0, PLAYFIELD_X, LCD_HEIGHT);
-    rb->lcd_bitmap(invadrox_right, LCD_WIDTH - PLAYFIELD_X, 0, PLAYFIELD_X, LCD_HEIGHT);
-#else
-    rb->lcd_fillrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-#endif
-
-#if ((LCD_WIDTH == 240) && (LCD_HEIGHT == 320)) || ((LCD_WIDTH == 176) && (LCD_HEIGHT == 220))
-    rb->lcd_bitmap(invadrox_logo, 0, 0, LCD_WIDTH, SCORE_Y);
-#endif
-
+    rb->lcd_bitmap(invadrox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
     rb->lcd_update();
 }
 
@@ -1468,12 +1375,6 @@ void new_level(void)
     draw_lives();
 
     /* Score */
-    rb->lcd_bitmap_part(invadrox, SCORE_SRC_X, SCORE_SRC_Y,
-                        STRIDE, PLAYFIELD_X, SCORE_Y, SCORE_WIDTH, FONT_HEIGHT);
-    /* Hi-score */
-    rb->lcd_bitmap_part(invadrox, 0, SCORE_SRC_Y,
-                        STRIDE, HISCORE_X, SCORE_Y,
-                        HISCORE_WIDTH, FONT_HEIGHT);
     draw_score();
     draw_number(HISCORENUM_X, SCORENUM_Y, hiscore.score, 4);
 
@@ -1539,7 +1440,7 @@ void new_level(void)
 
     /* 4 shields */
     for (i = 1; i <= 4; i++) {
-        rb->lcd_bitmap_part(invadrox, SHIELD_SRC_X, SHIELD_SRC_Y, STRIDE,
+        rb->lcd_bitmap(invadrox_shield,
                             PLAYFIELD_X + i * PLAYFIELD_WIDTH / 5 - SHIELD_WIDTH / 2,
                             SHIELD_Y, SHIELD_WIDTH, SHIELD_HEIGHT);
     }
