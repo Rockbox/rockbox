@@ -156,7 +156,7 @@ Still To do:
 #define LEVEL_MODE_NORMAL 0
 #define LEVEL_MODE_STEEP 1
 
-#if LCD_WIDTH <= 112
+#if LCD_HEIGHT <= 64
 #define CYCLETIME 100
 #define SCALE(x) ((x)==1 ? (x) : ((x) >> 1))
 #define SIZE 2
