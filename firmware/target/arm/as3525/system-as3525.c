@@ -27,6 +27,7 @@
 #include "dma-target.h"
 #include "clock-target.h"
 #include "fmradio_i2c.h"
+#include "button-target.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -217,8 +218,14 @@ static void sdram_init(void)
 
 void system_init(void)
 {
+    unsigned int reset_loops = 640;
 
-#ifdef BOOTLOADER   /* TODO: makes this work in the main build */
+    CCU_SRC = 0x1fffff0
+        & ~(1<<18); /* FIXME */
+    while(reset_loops--)
+        CCU_SRL = CCU_SRL_MAGIC_NUMBER;
+    CCU_SRC = CCU_SRL = 0;
+
     CGU_PROC = 0;           /* fclk 24 MHz */
     CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
 
@@ -248,6 +255,7 @@ void system_init(void)
         "mcr p15, 0, r0, c1, c0   \n"
         : : : "r0" );
 
+#ifdef BOOTLOADER
     sdram_init();
 #endif  /* BOOTLOADER */
 
@@ -262,10 +270,11 @@ void system_init(void)
 
     dma_init();
 
+    ascodec_init();
+
 #ifndef BOOTLOADER
     /* Disable fast hardware power-off, to use power button normally
      * We don't need the power button in the bootloader. */
-    ascodec_init();
     ascodec_write(AS3514_CVDD_DCDC3, ascodec_read(AS3514_CVDD_DCDC3) & (1<<2));
 
 #ifdef CONFIG_TUNER
@@ -289,7 +298,7 @@ void system_reboot(void)
 
 void system_exception_wait(void)
 {
-    while (1);
+    while(!button_read_device());
 }
 
 int system_memory_guard(int newmode)

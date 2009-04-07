@@ -29,7 +29,6 @@
 #include "lcd.h"
 #include "backlight-target.h"
 #include "button-target.h"
-#include "ascodec-target.h"
 #include "common.h"
 #include "storage.h"
 #include "disk.h"
@@ -53,7 +52,6 @@ void main(void)
     lcd_init();
     show_logo();
 
-    ascodec_init();  /* Required for backlight on e200v2 */
     _backlight_on();
 
     button_init_device();
