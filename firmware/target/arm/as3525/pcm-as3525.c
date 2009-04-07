@@ -84,7 +84,10 @@ static void dma_callback(void)
     }
 
     if(!dma_size)
+    {
         pcm_play_dma_stop();
+        pcm_play_dma_stopped_callback();
+    }
     else
         play_start_pcm();
 }
