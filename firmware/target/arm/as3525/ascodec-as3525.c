@@ -41,6 +41,7 @@
 #include "clock-target.h"
 #include "kernel.h"
 #include "as3525.h"
+#include "i2c.h"
 
 #define I2C2_DATA       *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x00))
 #define I2C2_SLAD0      *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x04))
@@ -57,14 +58,13 @@
 
 static struct mutex as_mtx SHAREDBSS_ATTR;
 
+void i2c_init(void)
+{
+}
+
 /* initialises the internal i2c bus and prepares for transfers to the codec */
 void ascodec_init(void)
 {
-    /* reset device */
-    CCU_SRC = CCU_SRC_I2C_AUDIO_EN;
-    CCU_SRL = CCU_SRL_MAGIC_NUMBER;
-    CCU_SRL = 0;
-    
     /* enable clock */
     CGU_PERI |= CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE;
 
