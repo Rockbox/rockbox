@@ -244,32 +244,24 @@ void gwps_draw_statusbars(void)
 long gui_wps_show(void)
 {
     long button = 0;
-    bool restore = false;
+    bool restore = true;
     long restoretimer = RESTORE_WPS_INSTANTLY; /* timer to delay screen redraw temporarily */
     bool exit = false;
     bool bookmark = false;
-    bool update_track = false, partial_update = false;
+    bool update = false;
     int i;
     long last_left = 0, last_right = 0;
-    wps_state_init();
 
 #ifdef HAVE_LCD_CHARCELLS
     status_set_audio(true);
     status_set_param(false);
 #endif
 
-    gwps_fix_statusbars();
-
 #ifdef AB_REPEAT_ENABLE
     ab_repeat_init();
     ab_reset_markers();
 #endif
-    if(audio_status() & AUDIO_STATUS_PLAY)
-    {
-        wps_state.id3 = audio_current_track();
-        wps_state.nid3 = audio_next_track();
-        restore = true; /* force initial full redraw */
-    }
+    wps_state_init();
 
     while ( 1 )
     {
@@ -331,7 +323,8 @@ long gui_wps_show(void)
         else
 #endif
         {
-            button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,HZ/5);
+            button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,
+                restore ? HZ/100 : HZ/5);
         }
 
         /* Exit if audio has stopped playing. This happens e.g. at end of
@@ -372,8 +365,6 @@ long gui_wps_show(void)
                            FILE_ATTR_AUDIO, CONTEXT_WPS) == ONPLAY_MAINMENU 
                     || !audio_status())
                     return GO_TO_ROOT;
-                /* track might have changed */
-                update_track = true;
                 restore = true;
             }
             break;
@@ -501,7 +492,6 @@ long gui_wps_show(void)
                 if (global_settings.party_mode)
                     break;
                 last_left = current_tick;
-                update_track = true;
 #ifdef AB_REPEAT_ENABLE
                 /* if we're in A/B repeat mode and the current position
                    is past the A marker, jump back to the A marker... */
@@ -529,7 +519,6 @@ long gui_wps_show(void)
                 if (global_settings.party_mode)
                     break;
                 last_right = current_tick;
-                update_track = true;
 #ifdef AB_REPEAT_ENABLE
                 /* if we're in A/B repeat mode and the current position is
                    before the A marker, jump to the A marker... */
@@ -560,7 +549,6 @@ long gui_wps_show(void)
                 {
                     ab_set_B_marker(wps_state.id3->elapsed);
                     ab_jump_to_A_marker();
-                    update_track = true;
                 }
                 else
 #endif
@@ -628,7 +616,7 @@ long gui_wps_show(void)
                 if (ab_repeat_mode_enabled())
                 {
                     ab_reset_markers();
-                    update_track = true;
+                    update = true;
                 }
                 break;
 #endif /* AB_REPEAT_ENABLE */
@@ -650,10 +638,9 @@ long gui_wps_show(void)
             break;
 
             case ACTION_REDRAW: /* yes are locked, just redraw */
-                restore = true;
-                break;
-            case ACTION_NONE: /* Timeout */
-                partial_update = true;
+                /* fall througgh */
+            case ACTION_NONE: /* Timeout, do an partial update */
+                update = true;
                 ffwd_rew(button); /* hopefully fix the ffw/rwd bug */
                 break;
 #ifdef HAVE_RECORDING
@@ -669,25 +656,18 @@ long gui_wps_show(void)
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                     return GO_TO_ROOT;
-                update_track = true;
+                update = true;
                 break;
         }
 
-        if (wps_state.do_full_update || partial_update || update_track)
+        if (wps_state.do_full_update || update)
         {
-            if (update_track)
-            {
-                wps_state.do_full_update = true;
-                wps_state.id3 = audio_current_track();
-                wps_state.nid3 = audio_next_track();
-            }
             FOR_NB_SCREENS(i)
             {
                 gui_wps_update(&gui_wps[i]);
             }
             wps_state.do_full_update = false;
-            update_track = false;
-            partial_update = false;
+            update = false;
         }
 
         if (restore && wps_state.id3 &&
@@ -770,9 +750,18 @@ static void wps_state_init(void)
 {
     wps_state.ff_rewind = false;
     wps_state.paused = false;
-    wps_state.id3 = NULL;
-    wps_state.nid3 = NULL;
-    wps_state.do_full_update = true;
+    if(audio_status() & AUDIO_STATUS_PLAY)
+    {
+        wps_state.id3 = audio_current_track();
+        wps_state.nid3 = audio_next_track();
+    }
+    else
+    {
+        wps_state.id3 = NULL;
+        wps_state.nid3 = NULL;
+    }
+    /* We'll be updating due to restore initialized with true */
+    wps_state.do_full_update = false;
     /* add the WPS track event callbacks */
     add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, track_changed_callback);
     add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, false, nextid3available_callback);
