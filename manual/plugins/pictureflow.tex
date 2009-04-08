@@ -13,8 +13,6 @@ aware:
   \begin{itemize}
     \item PictureFlow will accept album art larger than the dimensions of the
     screen, but the larger the dimensions, the longer they will take to scale.
-    \item The main playback buffer is used which means that unless the size of the
-    playing tracks is small you will have to stop playback to use PictureFlow.
   \end{itemize}
 
 \note{PictureFlow is a visualisation only. It cannot be used to select and
@@ -31,34 +29,33 @@ play music.}
         \nopt{scrollwheel,IRIVER_H10_PAD}{\ButtonLeft{} / \ButtonRight
          & Scroll through albums\\}
 
-        \nopt{scrollwheel,SANSA_C200_PAD,ONDIO_PAD,IRIVER_H10_PAD}{\ButtonUp{} / \ButtonDown    
+        \nopt{scrollwheel,IRIVER_H10_PAD}{\ButtonUp{} / \ButtonDown
         & Scroll through track list\\}
         
-        \opt{SANSA_C200_PAD}{\ButtonUp
-        & Scroll up through track list\\}
-       
-        \nopt{IRIVER_H10_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonSelect}
-        \opt{IRIVER_H10_PAD}{\ButtonRew}
-        \opt{RECORDER_PAD}{\ButtonPlay}
+        \opt{IRIVER_H10_PAD}{\ButtonRight}
         \opt{ONDIO_PAD}{\ButtonUp}
-        & Switch between cover view and track list\\
+        \opt{RECORDER_PAD}{\ButtonOn}
+        \nopt{ONDIO_PAD,IRIVER_H10_PAD,RECORDER_PAD}{\ButtonSelect}
+        & Enter track list\\
+
+        \ButtonLeft & Exit track list\\
 
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
         \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,GIGABEAT_PAD,%
-             GIGABEATS_PAD,MROBE100_PAD}{\ButtonMenu}
+             GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonMenu}
         \opt{IAUDIO_X5_PAD}{\ButtonRec}
-        \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonDown}
-        \opt{IRIVER_H10_PAD}{\ButtonFF}
+        \opt{SANSA_E200_PAD}{\ButtonDown}
+        \opt{IRIVER_H10_PAD,SANSA_C200_PAD}{\ButtonPower}
         \opt{RECORDER_PAD}{\ButtonFOne}
-        \opt{ONDIO_PAD}{\ButtonDown}
-        & Enter / exit menu\\
+        \opt{ONDIO_PAD}{Long \ButtonMenu}
+        & Enter menu\\
 
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
-        \opt{IAUDIO_X5_PAD,GIGABEAT_PAD,SANSA_E200_PAD,SANSA_C200_PAD,%
-             IRIVER_H10_PAD,MROBE_100_PAD}{\ButtonPower}
-        \opt{GIGABEATS_PAD}{\ButtonBack}
-        \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonSelect+\ButtonMenu}
-        & Exit menu or PictureFlow\\
+        \opt{IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,%
+             MROBE100_PAD}{\ButtonPower}
+        \opt{SANSA_C200_PAD,IRIVER_H10_PAD}{Long \ButtonPower}
+        \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{Long \ButtonMenu}
+        & Exit PictureFlow\\
     \end{btnmap}
 \end{table}
 
