@@ -1700,6 +1700,8 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf
 #ifdef HAVE_MULTIVOLUME
     (void)drive;
 #endif
+    led(true);
+
     struct mmc_request request;
     struct mmc_response_r1 r1;
     int retval; 
@@ -1738,6 +1740,8 @@ int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf
     if ((retval = mmc_unpack_r1(&request, &r1)))
         return retval;
     
+    led(false);
+
     return retval;
 }
 
@@ -1746,6 +1750,8 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const vo
 #ifdef HAVE_MULTIVOLUME
     (void)drive;
 #endif
+    led(true);
+
     struct mmc_request request;
     struct mmc_response_r1 r1;
     int retval;
@@ -1781,6 +1787,8 @@ int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const vo
     mmc_simple_cmd(&request, MMC_STOP_TRANSMISSION, 0, RESPONSE_R1B);
     if ((retval = mmc_unpack_r1(&request, &r1)))
         return retval;
+
+    led(false);
 
     return retval;
 }
