@@ -31,6 +31,7 @@
 #include "debug.h"
 #include "storage.h"
 #include "string.h"
+#include "led.h"
 
 static struct wakeup sd_wakeup;
 static long last_disk_activity = -1;
