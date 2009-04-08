@@ -676,6 +676,7 @@ long gui_wps_show(void)
         {
             restore = false;
             restoretimer = RESTORE_WPS_INSTANTLY;
+            gwps_fix_statusbars();
             FOR_NB_SCREENS(i)
             {
                 screens[i].stop_scroll();
