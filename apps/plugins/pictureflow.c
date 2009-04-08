@@ -130,7 +130,7 @@ const struct button_mapping pf_context_buttons[] =
     {PF_QUIT,         BUTTON_POWERPLAY|BUTTON_REPEAT, BUTTON_POWERPLAY},
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
     {PF_QUIT,         BUTTON_RC_REC,              BUTTON_NONE},
-#elif CONFIG_KEYPAD == MEIZU_M6SL_PAD
+#elif CONFIG_KEYPAD == MEIZU_X6SL_PAD
     {PF_QUIT,         BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU},
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD || \
     CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == ONDIO_PAD
@@ -937,6 +937,7 @@ bool create_albumart_cache(void)
             rb->splash(HZ, "Could not write bmp");
         }
         slides++;
+        if ( rb->button_get(false) == PF_MENU ) return false;
     }
     if ( slides == 0 ) {
         /* Warn the user that we couldn't find any albumart */
@@ -1716,16 +1717,6 @@ void show_next_slide(void)
 
 
 /**
-  Return true if the rect has size 0
-*/
-static inline bool is_empty_rect(struct rect *r)
-{
-    return ((r->left == 0) && (r->right == 0) && (r->top == 0)
-            && (r->bottom == 0));
-}
-
-
-/**
   Render the slides. Updates only the offscreen buffer.
 */
 void render_all_slides(void)
@@ -2097,8 +2088,12 @@ static inline void draw_gradient(int y, int h)
     selected_track_pulse = (selected_track_pulse+1) % 10;
     int c2 = selected_track_pulse - 5;
     for (r=0; r<h; r++) {
+#ifdef HAVE_LCD_COLOR
         MYLCD(set_foreground)(G_PIX(c2+80-(c >> 9), c2+100-(c >> 9),
                                            c2+250-(c >> 8)));
+#else
+        MYLCD(set_foreground)(G_BRIGHT(c2+160-(c >> 8)));
+#endif
         MYLCD(hline)(0, LCD_WIDTH, r+y);
         if ( r > h/2 )
             c-=inc;
