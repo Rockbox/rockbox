@@ -22,6 +22,7 @@
 /*
  * This config file is for the Onda VX747(+)
  */
+
 #define TARGET_TREE /* this target is using the target tree system */
 
 #define CONFIG_SDRAM_START 0x80004000
@@ -39,11 +40,10 @@
 //#define HAVE_HOTSWAP
 
 //#define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
-#define CONFIG_STORAGE STORAGE_SD /* Multivolume currently handled at firmware/target/ level */
+#define CONFIG_STORAGE STORAGE_SD
 
+/* ChinaChip NAND FTL */
 #define CONFIG_NAND NAND_CC
-
-//#define HAVE_MULTIVOLUME
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
@@ -126,9 +126,6 @@
 /* has no tone controls, so we use the software ones */
 //#define HAVE_SW_TONE_CONTROLS
 
-/*#define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
-    SAMPR_CAP_11)*/
-
 #define BATTERY_CAPACITY_DEFAULT 1250 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 500      /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 2500     /* max. capacity selectable */
@@ -169,6 +166,7 @@
 /* Define this if you have adjustable CPU frequency */
 /* #define HAVE_ADJUSTABLE_CPU_FREQ */
 #define CPUFREQ_NORMAL 336000000    /* CPU clock: 336 MHz */
+#define CPUFREQ_MAX 336000000       /* CPU clock: 336 MHz */
 
 #ifdef ONDA_VX747P
 #define BOOTFILE_EXT "vx747p"
