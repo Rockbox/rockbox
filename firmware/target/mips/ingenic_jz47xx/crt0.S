@@ -216,10 +216,10 @@ _init_stack_loop:
     .section .vectors, "ax", %progbits
 real_exception_handler:
     addiu   sp, -0x80
-    sw      ra, 0(sp)
-    sw      fp, 4(sp)
-    sw      gp, 8(sp)
-    sw      t9, 0xC(sp)
+    sw      ra,    0(sp)
+    sw      fp,    4(sp)
+    sw      gp,    8(sp)
+    sw      t9,  0xC(sp)
     sw      t8, 0x10(sp)
     sw      s7, 0x14(sp)
     sw      s6, 0x18(sp)
@@ -274,60 +274,10 @@ real_exception_handler:
 _int:
     jal     intr_handler
     nop
-    lw      ra, 0(sp)
-    lw      fp, 4(sp)
-    sw      gp, 8(sp)
-    lw      t9, 0xC(sp)
-    lw      t8, 0x10(sp)
-    lw      s7, 0x14(sp)
-    lw      s6, 0x18(sp)
-    lw      s5, 0x1C(sp)
-    lw      s4, 0x20(sp)
-    lw      s3, 0x24(sp)
-    lw      s2, 0x28(sp)
-    lw      s1, 0x2C(sp)
-    lw      s0, 0x30(sp)
-    lw      t7, 0x34(sp)
-    lw      t6, 0x38(sp)
-    lw      t5, 0x3C(sp)
-    lw      t4, 0x40(sp)
-    lw      t3, 0x44(sp)
-    lw      t2, 0x48(sp)
-    lw      t1, 0x4C(sp)
-    lw      t0, 0x50(sp)
-    lw      a3, 0x54(sp)
-    lw      a2, 0x58(sp)
-    lw      a1, 0x5C(sp)
-    lw      a0, 0x60(sp)
-    lw      v1, 0x64(sp)
-    lw      v0, 0x68(sp)
-    lw      $1, 0x6C(sp)
-    lw      k0, 0x70(sp)
-    mtlo    k0
-    nop
-    lw      k0, 0x74(sp)
-    mthi    k0
-    nop
-    lw      k0, 0x78(sp)
-    nop
-    mtc0    k0, C0_STATUS  # Status register
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
-    lw      k0, 0x7C(sp)
-    nop
-    mtc0    k0, C0_EPC     # Exception Program Counter
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
-    addiu   sp, 0x80
-    eret                   # Exception Return
-    nop
+    j       _exception_return
     
 _exception:
-    add     a0, sp, $0
+    move    a0, sp
     mfc0    a1, C0_CAUSE       # C0_CAUSE of last exception
     sll     zero, 1
     sll     zero, 1
@@ -340,10 +290,12 @@ _exception:
     sll     zero, 1
     jal     exception_handler
     nop
-    lw      ra, 0(sp)
-    lw      fp, 4(sp)
-    sw      gp, 8(sp)
-    lw      t9, 0xC(sp)
+
+_exception_return:
+    lw      ra,    0(sp)
+    lw      fp,    4(sp)
+    lw      gp,    8(sp)
+    lw      t9,  0xC(sp)
     lw      t8, 0x10(sp)
     lw      s7, 0x14(sp)
     lw      s6, 0x18(sp)
@@ -375,15 +327,15 @@ _exception:
     mthi    k0
     nop
     lw      k0, 0x78(sp)
-    nop
     mtc0    k0, C0_STATUS  # Status register
+    nop
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
     lw      k0, 0x7C(sp)
-    nop
     mtc0    k0, C0_EPC     # Exception Program Counter
+    nop
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
