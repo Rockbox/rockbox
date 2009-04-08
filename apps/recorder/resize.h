@@ -44,7 +44,6 @@
 #define HAVE_UPSCALER 1
 
 #if defined(CPU_COLDFIRE)
-#define SC_NUM 0x80000000U
 #define SC_MUL_INIT \
     unsigned long macsr_st = coldfire_get_macsr(); \
     coldfire_set_macsr(EMAC_UNSIGNED);
@@ -101,30 +100,10 @@ static inline unsigned sc_mul32(unsigned a, unsigned b)
 #define SC_MUL_END
 #endif
 
-#ifndef SC_SHIFT
-#define SC_SHIFT 32
-#endif
-
-#if SC_SHIFT == 24
-#define SC_NUM 0x1000000U
-#define SC_FIX 0
-
-#ifndef SC_MUL
-#define SC_MUL(x, y) ((x) * (y) >> 24)
-#define SC_MUL_INIT
-#define SC_MUL_END
-#endif
-
-#else /* SC_SHIFT == 32 */
-#define SC_NUM 0x80000000U
-#define SC_FIX 1
-
 #ifndef SC_MUL
 #define SC_MUL(x, y) ((x) * (uint64_t)(y) >> 32)
 #define SC_MUL_INIT
 #define SC_MUL_END
-#endif
-
 #endif
 
 struct img_part {

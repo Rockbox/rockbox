@@ -253,7 +253,7 @@ static inline bool scale_v_area(struct rowset *rset, struct scaler_context *ctx)
     /* Set up rounding and scale factors */
     ctx->divisor *= ctx->src->height;
     ctx->round = ctx->divisor >> 1;
-    ctx->divisor = (((ctx->divisor >> 1) + SC_NUM) / ctx->divisor) << SC_FIX;
+    ctx->divisor = 1 + (-((ctx->divisor + 1) >> 1)) / ctx->divisor;
     mul = 0;
     oy = rset->rowstart;
     oye = 0;
@@ -451,7 +451,7 @@ static inline bool scale_v_linear(struct rowset *rset,
     /* Set up scale and rounding factors, the divisor is bm->height - 1 */
     ctx->divisor *= (ctx->bm->height - 1);
     ctx->round = ctx->divisor >> 1;
-    ctx->divisor = (((ctx->divisor >> 1) + SC_NUM) / ctx->divisor) << SC_FIX;
+    ctx->divisor = 1 + (-((ctx->divisor + 1) >> 1)) / ctx->divisor;
     /* Set up our two temp buffers. The names are generic because they'll be
        swapped each time a new input row is read
     */
