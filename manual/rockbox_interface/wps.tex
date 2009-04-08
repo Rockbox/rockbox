@@ -81,22 +81,24 @@ your WPS (While Playing Screen).
       & Enter \setting{Main Menu}%
       \opt{ONDIO_PAD}{ via the \setting{WPS Context Menu}}.\\%
       %
-      \nopt{PLAYER_PAD,ONDIO_PAD}{%
+      \opt{quickscreen}{%
         \ActionWpsQuickScreen & Switches to the \setting{Quick Screen}.
-		(see \reference{ref:QuickScreen}) \\}%
+          (see \reference{ref:QuickScreen}) \\}%
       %
+      % software hold targets (currently Archos only)
+      \nopt{hold_button}{%
+          \opt{RECORDER_PAD}{\ButtonFOne+\ButtonDown}
+          \opt{PLAYER_PAD}{\ButtonMenu+\ButtonStop}
+          \opt{ONDIO_PAD}{\ButtonMenu+\ButtonDown}
+          & Key lock on/off.\\
+      }%
       %These actions need definitions for the other targets
       \opt{RECORDER_PAD}{%
         \ButtonFThree & Toggles Display quick screen.\\%
-        \ButtonFOne+\ButtonDown & Key lock on/off.\\%
         \ButtonFOne+\ButtonPlay & Mute on/off.\\%
       }%
       \opt{PLAYER_PAD}{%
-        \ButtonMenu+\ButtonStop & Key lock on/off.\\%
         \ButtonMenu+\ButtonPlay & Mute on/off.\\%
-      }%
-      \opt{ONDIO_PAD}{%
-        Long \ButtonMenu+\ButtonDown & Key lock on/off.\\%
       }%
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,MROBE100_PAD%
           ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
