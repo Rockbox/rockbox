@@ -38,10 +38,115 @@ PLUGIN_HEADER
 
 /******************************* Globals ***********************************/
 
-const struct button_mapping *plugin_contexts[]
-= {generic_actions, generic_directions};
+#define PF_PREV ACTION_STD_PREV
+#define PF_PREV_REPEAT ACTION_STD_PREVREPEAT
+#define PF_NEXT ACTION_STD_NEXT
+#define PF_NEXT_REPEAT ACTION_STD_NEXTREPEAT
+#define PF_SELECT ACTION_STD_OK
+#define PF_CONTEXT ACTION_STD_CONTEXT
+#define PF_BACK ACTION_STD_CANCEL
+#define PF_MENU ACTION_STD_MENU
+#define PF_QUIT (LAST_ACTION_PLACEHOLDER + 1)
 
-#define NB_ACTION_CONTEXTS sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
+const struct button_mapping pf_context_album_scroll[] =
+{
+#ifdef HAVE_TOUCHSCREEN
+    {PF_PREV,         BUTTON_MIDLEFT,                 BUTTON_NONE},
+    {PF_PREV_REPEAT,  BUTTON_MIDLEFT|BUTTON_REPEAT,   BUTTON_NONE},
+    {PF_NEXT,         BUTTON_MIDRIGHT,                BUTTON_NONE},
+    {PF_NEXT_REPEAT,  BUTTON_MIDRIGHT|BUTTON_REPEAT,  BUTTON_NONE},
+#endif
+#if CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD || \
+    CONFIG_KEYPAD == IAUDIO_X5M5_PAD || CONFIG_KEYPAD == GIGABEAT_PAD || \
+    CONFIG_KEYPAD == GIGABEAT_S_PAD || CONFIG_KEYPAD == RECORDER_PAD || \
+    CONFIG_KEYPAD == ARCHOS_AV300_PAD || CONFIG_KEYPAD == SANSA_C100_PAD || \
+    CONFIG_KEYPAD == SANSA_C200_PAD || CONFIG_KEYPAD == SANSA_CLIP_PAD || \
+    CONFIG_KEYPAD == SANSA_M200_PAD || CONFIG_KEYPAD == IRIVER_IFP7XX_PAD || \
+    CONFIG_KEYPAD == MROBE100_PAD || CONFIG_KEYPAD == PHILIPS_SA9200_PAD || \
+    CONFIG_KEYPAD == IAUDIO67_PAD || CONFIG_KEYPAD == CREATIVEZVM_PAD || \
+    CONFIG_KEYPAD == PHILIPS_HDD1630_PAD || CONFIG_KEYPAD == CREATIVEZV_PAD \
+    || CONFIG_KEYPAD == SANSA_CLIP_PAD || CONFIG_KEYPAD == LOGIK_DAX_PAD || \
+    CONFIG_KEYPAD == MEIZU_M6SL_PAD
+    {PF_PREV,         BUTTON_LEFT,                BUTTON_NONE},
+    {PF_PREV_REPEAT,  BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
+    {PF_NEXT,         BUTTON_RIGHT,               BUTTON_NONE},
+    {PF_NEXT_REPEAT,  BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+#elif CONFIG_KEYPAD == ONDIO_PAD
+    {PF_PREV,         BUTTON_LEFT,                BUTTON_NONE},
+    {PF_PREV_REPEAT,  BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
+    {PF_NEXT,         BUTTON_RIGHT,               BUTTON_NONE},
+    {PF_NEXT_REPEAT,  BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    {PF_SELECT,       BUTTON_UP|BUTTON_REL,       BUTTON_UP},
+    {PF_CONTEXT,      BUTTON_UP|BUTTON_REPEAT,    BUTTON_UP},
+    {ACTION_NONE,     BUTTON_UP,                  BUTTON_NONE},
+    {ACTION_NONE,     BUTTON_DOWN,                BUTTON_NONE},
+    {ACTION_NONE,     BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
+    {ACTION_NONE,     BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT},
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD || CONFIG_KEYPAD == MROBE500_PAD
+    {PF_PREV,         BUTTON_RC_REW,              BUTTON_NONE},
+    {PF_PREV_REPEAT,  BUTTON_RC_REW|BUTTON_REPEAT,BUTTON_NONE},
+    {PF_NEXT,         BUTTON_RC_FF,               BUTTON_NONE},
+    {PF_NEXT_REPEAT,  BUTTON_RC_FF|BUTTON_REPEAT, BUTTON_NONE},
+#endif
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|1)
+};
+
+const struct button_mapping pf_context_buttons[] =
+{
+#ifdef HAVE_TOUCHSCREEN
+    {PF_SELECT,       BUTTON_CENTER,              BUTTON_NONE},
+    {PF_MENU,         BUTTON_TOPLEFT,             BUTTON_NONE},
+    {PF_BACK,         BUTTON_BOTTOMRIGHT,         BUTTON_NONE},
+#endif
+#if CONFIG_KEYPAD == ARCHOS_AV300_PAD
+    {PF_QUIT,         BUTTON_OFF,                 BUTTON_NONE},
+#elif CONFIG_KEYPAD == SANSA_C100_PAD
+    {PF_QUIT,         BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU},
+#elif CONFIG_KEYPAD == CREATIVEZV_PAD || CONFIG_KEYPAD == CREATIVEZVM_PAD || \
+    CONFIG_KEYPAD == PHILIPS_HDD1630_PAD || CONFIG_KEYPAD == IAUDIO67_PAD || \
+    CONFIG_KEYPAD == GIGABEAT_PAD || CONFIG_KEYPAD == GIGABEAT_S_PAD || \
+    CONFIG_KEYPAD == MROBE100_PAD || CONFIG_KEYPAD == MROBE500_PAD || \
+    CONFIG_KEYPAD == PHILIPS_SA9200_PAD || CONFIG_KEYPAD == SANSA_CLIP_PAD || \
+    CONFIG_KEYPAD == SANSA_FUZE_PAD
+    {PF_QUIT,         BUTTON_POWER,               BUTTON_NONE},
+/* These all use short press of BUTTON_POWER for menu, map long POWER to quit
+*/
+#elif CONFIG_KEYPAD == SANSA_C200_PAD || CONFIG_KEYPAD == SANSA_M200_PAD || \
+    CONFIG_KEYPAD == IRIVER_H10_PAD || CONFIG_KEYPAD == COWOND2_PAD
+    {PF_QUIT,         BUTTON_POWER|BUTTON_REPEAT, BUTTON_POWER},
+#if CONFIG_KEYPAD == COWOND2_PAD
+    {PF_BACK,         BUTTON_POWER|BUTTON_REL,    BUTTON_POWER},
+    {ACTION_NONE,     BUTTON_POWER,               BUTTON_NONE},
+#endif
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+    {PF_QUIT,         BUTTON_POWER,               BUTTON_NONE},
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+    {PF_QUIT,         BUTTON_EQ,                  BUTTON_NONE},
+#elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+    {PF_QUIT,         BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU},
+#elif CONFIG_KEYPAD == LOGIK_DAX_PAD
+    {PF_QUIT,         BUTTON_POWERPLAY|BUTTON_REPEAT, BUTTON_POWERPLAY},
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+    {PF_QUIT,         BUTTON_RC_REC,              BUTTON_NONE},
+#elif CONFIG_KEYPAD == MEIZU_X6SL_PAD
+    {PF_QUIT,         BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU},
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD || \
+    CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == ONDIO_PAD
+    {PF_QUIT,         BUTTON_OFF,                 BUTTON_NONE},
+#endif
+#if CONFIG_KEYPAD == IAUDIO_M3_PAD
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD|CONTEXT_REMOTE)
+#else
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+#endif
+};
+const struct button_mapping *pf_contexts[] =
+{
+    pf_context_album_scroll,
+    pf_context_buttons
+};
 
 #if LCD_DEPTH < 8
 #if LCD_DEPTH > 1
@@ -76,26 +181,6 @@ typedef unsigned char pix_t;
 #define BUFFER_HEIGHT LCD_HEIGHT
 typedef fb_data pix_t;
 #endif  /* LCD_DEPTH >= 8 */
-
-#ifdef HAVE_SCROLLWHEEL
-#define PICTUREFLOW_NEXT_ALBUM          PLA_DOWN
-#define PICTUREFLOW_NEXT_ALBUM_REPEAT   PLA_DOWN_REPEAT
-#define PICTUREFLOW_PREV_ALBUM          PLA_UP
-#define PICTUREFLOW_PREV_ALBUM_REPEAT   PLA_UP_REPEAT
-#else
-#define PICTUREFLOW_NEXT_ALBUM          PLA_RIGHT
-#define PICTUREFLOW_NEXT_ALBUM_REPEAT   PLA_RIGHT_REPEAT
-#define PICTUREFLOW_PREV_ALBUM          PLA_LEFT
-#define PICTUREFLOW_PREV_ALBUM_REPEAT   PLA_LEFT_REPEAT
-#define PICTUREFLOW_NEXT_TRACK          PLA_DOWN
-#define PICTUREFLOW_NEXT_TRACK_REPEAT   PLA_DOWN_REPEAT
-#define PICTUREFLOW_PREV_TRACK          PLA_UP
-#define PICTUREFLOW_PREV_TRACK_REPEAT   PLA_UP_REPEAT
-#endif
-#define PICTUREFLOW_MENU                PLA_MENU
-#define PICTUREFLOW_QUIT                PLA_QUIT
-#define PICTUREFLOW_SELECT_ALBUM        PLA_FIRE
-
 
 /* for fixed-point arithmetic, we need minimum 32-bit long
    long long (64-bit) might be useful for multiplication and division */
@@ -558,6 +643,11 @@ const struct custom_format format_transposed = {
     .get_size = get_size
 };
 
+static const struct button_mapping* get_context_map(int context)
+{
+    return pf_contexts[context & ~CONTEXT_CUSTOM];
+}
+
 /* Create the lookup table with the scaling values for the reflections */
 void init_reflect_table(void)
 {
@@ -847,7 +937,6 @@ bool create_albumart_cache(void)
             rb->splash(HZ, "Could not write bmp");
         }
         slides++;
-        if ( rb->button_get(false) == PICTUREFLOW_MENU ) return false;
     }
     if ( slides == 0 ) {
         /* Warn the user that we couldn't find any albumart */
@@ -1627,6 +1716,16 @@ void show_next_slide(void)
 
 
 /**
+  Return true if the rect has size 0
+*/
+static inline bool is_empty_rect(struct rect *r)
+{
+    return ((r->left == 0) && (r->right == 0) && (r->top == 0)
+            && (r->bottom == 0));
+}
+
+
+/**
   Render the slides. Updates only the offscreen buffer.
 */
 void render_all_slides(void)
@@ -1998,12 +2097,8 @@ static inline void draw_gradient(int y, int h)
     selected_track_pulse = (selected_track_pulse+1) % 10;
     int c2 = selected_track_pulse - 5;
     for (r=0; r<h; r++) {
-#ifdef HAVE_LCD_COLOR
         MYLCD(set_foreground)(G_PIX(c2+80-(c >> 9), c2+100-(c >> 9),
                                            c2+250-(c >> 8)));
-#else
-        MYLCD(set_foreground)(G_BRIGHT(c2+160-(c >> 8)));
-#endif
         MYLCD(hline)(0, LCD_WIDTH, r+y);
         if ( r > h/2 )
             c-=inc;
@@ -2354,71 +2449,55 @@ int main(void)
         rb->yield();
 
         /*/ Handle buttons */
-        button = pluginlib_getaction(instant_update ? 0 : HZ/16,
-                                     plugin_contexts, NB_ACTION_CONTEXTS);
+        button = rb->get_custom_action(CONTEXT_CUSTOM|
+            (pf_state == pf_show_tracks ? 1 : 0),
+            instant_update ? 0 : HZ/16,
+            get_context_map);
 
         switch (button) {
-        case PICTUREFLOW_QUIT:
+        case PF_QUIT:
             return PLUGIN_OK;
 
-        case PICTUREFLOW_MENU:
-            if ( pf_state == pf_idle || pf_state == pf_scrolling ) {
-#ifdef USEGSLIB
-    grey_show(false);
-#endif
-                ret = main_menu();
-                if ( ret == -1 ) return PLUGIN_OK;
-                if ( ret != 0 ) return i;
-#ifdef USEGSLIB
-    grey_show(true);
-#endif
-                MYLCD(set_drawmode)(DRMODE_FG);
-            }
-            else {
+        case PF_BACK:
+            if ( pf_state == pf_show_tracks )
                 pf_state = pf_cover_out;
-            }
+            if (pf_state == pf_idle || pf_state == pf_scrolling)
+                return PLUGIN_OK;
             break;
 
-        case PICTUREFLOW_NEXT_ALBUM:
-        case PICTUREFLOW_NEXT_ALBUM_REPEAT:
-#ifdef HAVE_SCROLLWHEEL
+        case PF_MENU:
+#ifdef USEGSLIB
+            grey_show(false);
+#endif
+            ret = main_menu();
+            if ( ret == -1 ) return PLUGIN_OK;
+            if ( ret != 0 ) return i;
+#ifdef USEGSLIB
+            grey_show(true);
+#endif
+            MYLCD(set_drawmode)(DRMODE_FG);
+            break;
+
+        case PF_NEXT:
+        case PF_NEXT_REPEAT:
             if ( pf_state == pf_show_tracks )
                 select_next_track();
-#endif
             if ( pf_state == pf_idle || pf_state == pf_scrolling )
                 show_next_slide();
             break;
 
-        case PICTUREFLOW_PREV_ALBUM:
-        case PICTUREFLOW_PREV_ALBUM_REPEAT:
-#ifdef HAVE_SCROLLWHEEL
+        case PF_PREV:
+        case PF_PREV_REPEAT:
             if ( pf_state == pf_show_tracks )
                 select_prev_track();
-#endif
             if ( pf_state == pf_idle || pf_state == pf_scrolling )
                 show_previous_slide();
             break;
 
-#ifndef HAVE_SCROLLWHEEL
-        case PICTUREFLOW_NEXT_TRACK:
-        case PICTUREFLOW_NEXT_TRACK_REPEAT:
-            if ( pf_state == pf_show_tracks )
-                select_next_track();
-            break;
-
-        case PICTUREFLOW_PREV_TRACK:
-        case PICTUREFLOW_PREV_TRACK_REPEAT:
-            if ( pf_state == pf_show_tracks )
-                select_prev_track();
-            break;
-#endif
-
-        case PICTUREFLOW_SELECT_ALBUM:
+        case PF_SELECT:
             if ( pf_state == pf_idle ) {
                 pf_state = pf_cover_in;
             }
-            if ( pf_state == pf_show_tracks )
-                pf_state = pf_cover_out;
             break;
 
         default:
