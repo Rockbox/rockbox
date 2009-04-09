@@ -208,6 +208,20 @@ static void gwps_fix_statusbars(void)
 #endif
 }
 
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+/*
+ * If the user is unable to see the wps, because the display is deactivated,
+ * we surpress updates until the wps gets actived again (the lcd driver will
+ * call this hook)
+ * */
+static void wps_lcd_activation_hook(void)
+{
+    /* issue an update */
+    wps_state.do_full_update = true;
+    /* force timeout in wps main loop, so that the update is instantly */
+    queue_post(&button_queue, BUTTON_NONE, 0);
+}
+#endif
 
 static void gwps_leave_wps(void)
 {
@@ -225,6 +239,10 @@ static void gwps_leave_wps(void)
     show_remote_main_backdrop();
 #endif
     viewportmanager_set_statusbar(oldbars);
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+    /* Play safe and unregister the hook */
+    lcd_activation_set_hook(NULL);
+#endif
 }
 
 void gwps_draw_statusbars(void)
@@ -663,8 +681,17 @@ long gui_wps_show(void)
         if (wps_state.do_full_update || update)
         {
             FOR_NB_SCREENS(i)
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+                if (lcd_active()
+#ifdef HAVE_REMOTE_LCD
+                /* currently, all remotes are readable without backlight
+                 * so still update those */
+                            && (i == SCREEN_MAIN)
+#endif
+                                                )
+#endif
             {
-                gui_wps_update(&gui_wps[i]);
+                    gui_wps_update(&gui_wps[i]);
             }
             wps_state.do_full_update = false;
             update = false;
@@ -677,6 +704,9 @@ long gui_wps_show(void)
             restore = false;
             restoretimer = RESTORE_WPS_INSTANTLY;
             gwps_fix_statusbars();
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+            lcd_activation_set_hook(wps_lcd_activation_hook);
+#endif
             FOR_NB_SCREENS(i)
             {
                 screens[i].stop_scroll();
