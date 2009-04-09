@@ -140,6 +140,12 @@ static fb_data *paldata=NULL;
 //
 void I_ShutdownGraphics(void)
 {
+#if defined(HAVE_LCD_MODES)
+#if (HAVE_LCD_MODES & LCD_MODE_PAL256)
+	rb->lcd_set_mode(LCD_MODE_RGB565);
+#endif
+#endif
+
 #ifndef HAVE_LCD_COLOR
    grey_release();
 #endif
@@ -597,13 +603,19 @@ static void I_UploadNewPalette(int pal)
   }
 
 #ifdef RANGECHECK
-  if ((size_t)pal >= num_pals)
-    I_Error("I_UploadNewPalette: Palette number out of range (%d>=%d)",
-      pal, num_pals);
+    if ((size_t)pal >= num_pals)
+        I_Error("I_UploadNewPalette: Palette number out of range (%d>=%d)",
+            pal, num_pals);
 #endif
-   memcpy(palette,paldata+256*pal,256*sizeof(fb_data));
-}
 
+    memcpy(palette,paldata+256*pal,256*sizeof(fb_data));
+
+#if defined(HAVE_LCD_MODES)
+#if (HAVE_LCD_MODES & LCD_MODE_PAL256)
+	rb->lcd_pal256_update_pal(paldata+256*pal);
+#endif
+#endif
+}
 
 //
 // I_FinishUpdate
@@ -613,36 +625,37 @@ void I_FinishUpdate (void)
 {
     int count;
     byte *src = d_screens[0];
+    
 #if (CONFIG_LCD == LCD_H300) && !defined(SIMULATOR)
     count = SCREENWIDTH*SCREENHEIGHT;
 
     /* ASM screen update (drops ~300 tics) */
     asm volatile (
-        "move.w  #33, (%[LCD])                   \n" /* Setup the LCD controller */
-        "nop                                     \n"
-        "clr.w   (%[LCD2])                       \n"
-        "nop                                     \n"
-        "move.w  #34, (%[LCD])                   \n" /* End LCD controller setup */
-        "clr.l   %%d1                            \n"
-    ".loop:                                      \n"
-        "move.l  (%[scrp])+, %%d0                \n"
-        "swap.w  %%d0                            \n"
-        "move.w  %%d0, %%d1                      \n"
-        "lsr.l   #8,%%d1                         \n"
-        "move.w  (%[pal], %%d1.l:2), (%[LCD2])   \n"
-        "move.b  %%d0,%%d1                       \n"
-        "swap.w  %%d0                            \n"
-        "nop                                     \n"
-        "move.w  (%[pal], %%d1.l:2), (%[LCD2])   \n"
-        "move.w  %%d0, %%d1                      \n"
-        "lsr.l   #8,%%d1                         \n"
-        "nop                                     \n"
-        "move.w  (%[pal], %%d1.l:2), (%[LCD2])   \n"
-        "move.b  %%d0,%%d1                       \n"
-        "nop                                     \n"
-        "move.w  (%[pal], %%d1.l:2), (%[LCD2])   \n"
-        "subq.l  #4,%[cnt]                       \n"
-        "bne.b   .loop                           \n"
+        "move.w  #33, (%[LCD])                \n" /* Setup the LCD controller */
+        "nop                                  \n"
+        "clr.w   (%[LCD2])                    \n"
+        "nop                                  \n"
+        "move.w  #34, (%[LCD])                \n" /* End LCD controller setup */
+        "clr.l   %%d1                           \n"
+    ".loop:                                     \n"
+        "move.l  (%[scrp])+, %%d0               \n"
+        "swap.w  %%d0                           \n"
+        "move.w  %%d0, %%d1                     \n"
+        "lsr.l   #8,%%d1                        \n"
+        "move.w  (%[pal], %%d1.l:2), (%[LCD2])  \n"
+        "move.b  %%d0,%%d1                      \n"
+        "swap.w  %%d0                           \n"
+        "nop                                    \n"
+        "move.w  (%[pal], %%d1.l:2), (%[LCD2])  \n"
+        "move.w  %%d0, %%d1                     \n"
+        "lsr.l   #8,%%d1                        \n"
+        "nop                                    \n"
+        "move.w  (%[pal], %%d1.l:2), (%[LCD2])  \n"
+        "move.b  %%d0,%%d1                      \n"
+        "nop                                    \n"
+        "move.w  (%[pal], %%d1.l:2), (%[LCD2])  \n"
+        "subq.l  #4,%[cnt]                      \n"
+        "bne.b   .loop                          \n"
         : /* outputs */
         [scrp]"+a"(src),
         [cnt] "+d"(count)
@@ -713,7 +726,14 @@ void I_FinishUpdate (void)
         "d0", "d1", "d2", "d3"
    );
 #else
-#ifdef HAVE_LCD_COLOR
+
+/* If the hardware has support for a paletted mode it takes precidence */
+#if defined(HAVE_LCD_MODES)
+#if (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    (void) count;
+	rb->lcd_blit_pal256(src, 0, 0, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+#endif
+#elif defined(HAVE_LCD_COLOR)
 #if(LCD_HEIGHT>LCD_WIDTH)
     if(rotate_screen)
     {
@@ -742,8 +762,9 @@ void I_FinishUpdate (void)
             *dst++ = palette[*src++];
         while (--count);
     }
-    rb->lcd_update();
+    rb->lcd_update(); 
 #else /* !HAVE_LCD_COLOR */
+
     unsigned char *dst;
     int y;
 
@@ -758,8 +779,8 @@ void I_FinishUpdate (void)
 
         grey_ub_gray_bitmap(greybuffer, 0, y, SCREENWIDTH, 1);
     }
-#endif /* !HAVE_LCD_COLOR */
-#endif
+#endif 
+#endif  
 }
 
 //
@@ -786,6 +807,12 @@ void I_InitGraphics(void)
    printf("Starting Graphics engine\n");
 
    noprintf=1;
+   
+#if defined(HAVE_LCD_MODES)
+#if (HAVE_LCD_MODES & LCD_MODE_PAL256)
+	rb->lcd_set_mode(LCD_MODE_PAL256);
+#endif
+#endif
 
    /* Note: The other screens are allocated as needed */
 

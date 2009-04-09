@@ -112,6 +112,11 @@ void lcd_enable(bool state)
 }
 #endif
 
+/* Note this is expecting a screen size of 480x640 or 240x320, other screen
+ * sizes need to be considered for fudge factors
+ */
+#define LCD_FUDGE LCD_NATIVE_WIDTH%32
+
 /* LCD init - based on code from ingenient-bsp/bootloader/board/dm320/splash.c
  *  and code by Catalin Patulea from the M:Robe 500i linux port
  */
@@ -122,21 +127,26 @@ void lcd_init_device(void)
     /* Clear the Frame */
     memset16(FRAME, 0x0000, LCD_WIDTH*LCD_HEIGHT);
 
+	lcd_sleep();
+
+	IO_OSD_OSDWINMD0&=~(0x0001);
+	IO_OSD_VIDWINMD&=~(0x0001);
+
 	/* Setup the LCD controller */
-	IO_VID_ENC_VMOD=0x2015;
+	IO_VID_ENC_VMOD=0x2014;
 	IO_VID_ENC_VDCTL=0x2000;
 	IO_VID_ENC_VDPRO=0x0000;
 	IO_VID_ENC_SYNCTL=0x100E;
 	IO_VID_ENC_HSPLS=1; /* HSYNC pulse width */
 	IO_VID_ENC_VSPLS=1; /* VSYNC pulse width */
 	
-	/* These calculations support 640x480 and 320x240  */
-	IO_VID_ENC_HINT=NATIVE_MAX_WIDTH+NATIVE_MAX_WIDTH/3;
-	IO_VID_ENC_HSTART=NATIVE_MAX_WIDTH/6; /* Front porch */
-	IO_VID_ENC_HVALID=NATIVE_MAX_WIDTH; /* Data valid */
-	IO_VID_ENC_VINT=NATIVE_MAX_HEIGHT+7;
+	/* These calculations support 640x480 and 320x240 (based on OF) */
+	IO_VID_ENC_HINT=LCD_NATIVE_WIDTH+LCD_NATIVE_WIDTH/3;
+	IO_VID_ENC_HSTART=LCD_NATIVE_WIDTH/6; /* Front porch */
+	IO_VID_ENC_HVALID=LCD_NATIVE_WIDTH; /* Data valid */
+	IO_VID_ENC_VINT=LCD_NATIVE_HEIGHT+7;
 	IO_VID_ENC_VSTART=3;
-	IO_VID_ENC_VVALID=NATIVE_MAX_HEIGHT;
+	IO_VID_ENC_VVALID=LCD_NATIVE_HEIGHT;
 	
 	IO_VID_ENC_HSDLY=0x0000;
 	IO_VID_ENC_VSDLY=0x0000;
@@ -152,46 +162,88 @@ void lcd_init_device(void)
 	IO_VID_ENC_PWMP=0x0000;
 	IO_VID_ENC_PWMW=0x0000;
 	
-	IO_VID_ENC_DCLKCTL=0x0800;
 	IO_VID_ENC_DCLKPTN0=0x0001;
-
 
 	/* Setup the display */
     IO_OSD_MODE=0x00ff;
-    IO_OSD_VIDWINMD=0x0002;
-    IO_OSD_OSDWINMD0=0x2001;
-    IO_OSD_OSDWINMD1=0x0002;
+    
     IO_OSD_ATRMD=0x0000;
     IO_OSD_RECTCUR=0x0000;
-
-    IO_OSD_OSDWIN0OFST=(NATIVE_MAX_WIDTH*2) / 32;
     
-    addr = ((int)FRAME-CONFIG_SDRAM_START) / 32;
-    IO_OSD_OSDWINADH=addr >> 16;
-    IO_OSD_OSDWIN0ADL=addr & 0xFFFF;
-    
-    IO_OSD_VIDWINADH=addr >> 16;
-    IO_OSD_VIDWIN0ADL=addr & 0xFFFF;
-
     IO_OSD_BASEPX=IO_VID_ENC_HSTART;
     IO_OSD_BASEPY=IO_VID_ENC_VSTART;
+    
+    addr = ((int)FRAME-CONFIG_SDRAM_START) / 32;
+
+    /* Setup the OSD windows */
+    
+    /* Used for 565 RGB */
+    IO_OSD_OSDWINMD0=0x30C0;
+
+    IO_OSD_OSDWIN0OFST=LCD_NATIVE_WIDTH / 16;
+    
+    IO_OSD_OSDWINADH=addr >> 16;
+    IO_OSD_OSDWIN0ADL=addr & 0xFFFF;
 
     IO_OSD_OSDWIN0XP=0;
     IO_OSD_OSDWIN0YP=0;
-  
-    IO_OSD_OSDWIN0XL=NATIVE_MAX_WIDTH;
-    IO_OSD_OSDWIN0YL=NATIVE_MAX_HEIGHT;
+    
+    /* read from OF */
+    IO_OSD_OSDWIN0XL=LCD_NATIVE_WIDTH;
+    IO_OSD_OSDWIN0YL=LCD_NATIVE_HEIGHT;
+    
+    /* Unused */
+    IO_OSD_OSDWINMD1=0x10C0;
+    
+#if LCD_NATIVE_WIDTH%32!=0
+    IO_OSD_OSDWIN1OFST=LCD_NATIVE_WIDTH / 32+1;
+#else
+    IO_OSD_OSDWIN1OFST=LCD_NATIVE_WIDTH / 32;
+#endif
+
+    IO_OSD_OSDWIN1ADL=addr & 0xFFFF;
+    
+    IO_OSD_OSDWIN1XP=0;
+    IO_OSD_OSDWIN1YP=0;
+    
+    IO_OSD_OSDWIN1XL=LCD_NATIVE_WIDTH;
+    IO_OSD_OSDWIN1YL=LCD_NATIVE_HEIGHT;
+    
+    IO_OSD_VIDWINMD=0x0002;
+    
+    /* This is a bit messy, the LCD transfers appear to happen in chunks of 32
+     * pixels. (based on OF)
+     */
+#if LCD_NATIVE_WIDTH%32!=0
+    IO_OSD_VIDWIN0OFST=LCD_NATIVE_WIDTH / 32+1;
+#else
+    IO_OSD_VIDWIN0OFST=LCD_NATIVE_WIDTH / 32;
+#endif
+    
+    IO_OSD_VIDWINADH=addr >> 16;
+    IO_OSD_VIDWIN0ADL=addr & 0xFFFF;
+    
+    IO_OSD_VIDWIN0XP=0;
+    IO_OSD_VIDWIN0YP=0;
+    
+    IO_OSD_VIDWIN0XL=LCD_NATIVE_WIDTH;
+    IO_OSD_VIDWIN0YL=LCD_NATIVE_HEIGHT;
 
     /* Set pin 36 and 35 (LCD POWER and LCD RESOLUTION) to an output */
     IO_GIO_DIR2&=!(3<<3);
     
-#if NATIVE_MAX_HEIGHT > 320
+#if LCD_NATIVE_HEIGHT > 320
 	/* Set LCD resolution to VGA */
     IO_GIO_BITSET2=1<<3;
 #else
 	/* Set LCD resolution to QVGA */
 	IO_GIO_BITCLR2=1<<3;
 #endif
+
+	IO_OSD_OSDWINMD0|=0x01;
+	IO_VID_ENC_VMOD|=0x01;
+	
+	lcd_enable(true);
 }
 
 /* Update a fraction of the display. */
@@ -216,9 +268,10 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (height <= 0)
         return; /* nothing left to do */
 
+    src = &lcd_framebuffer[y][x];
+
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
     dst = (fb_data *)FRAME + LCD_WIDTH*y + x;
-    src = &lcd_framebuffer[y][x];
 
     /* Copy part of the Rockbox framebuffer to the second framebuffer */
     if (width < LCD_WIDTH)
@@ -232,21 +285,23 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
     }
 #else
-    src = &lcd_framebuffer[y][x];
-    
-    register int xc, yc;
-    register fb_data *start=FRAME + LCD_HEIGHT*(LCD_WIDTH-x-1) + y + 1;
+    dst=FRAME + (LCD_NATIVE_WIDTH*(LCD_NATIVE_HEIGHT-1)) 
+        - LCD_NATIVE_WIDTH*x + y ;
 
-    for(yc=0;yc<height;yc++)
+    do
     {
-        dst=start+yc;
-        for(xc=0; xc<width; xc++)
+        register int c_width=width;
+        register fb_data *c_dst=dst;
+        do
         {
-            *dst=*src++;
-            dst-=LCD_HEIGHT;
+            *c_dst=*src++;
+            c_dst-=LCD_NATIVE_WIDTH;
         }
-        src+=x;
+        while(--c_width);
+        src+=LCD_WIDTH-width-x;
+        dst++;
     }
+    while(--height);
 #endif
 }
 
@@ -271,20 +326,94 @@ void lcd_set_mode(int mode)
 	if(mode==LCD_MODE_YUV)
 	{
 		/* Turn off the RGB buffer and enable the YUV buffer */
-		IO_OSD_OSDWINMD0&=~(0x01);
-		IO_OSD_VIDWINMD|=0x01;
-		memset16(FRAME, 0x0080, LCD_WIDTH*LCD_HEIGHT);
+		IO_OSD_OSDWINMD0 &=~(0x01);
+		IO_OSD_VIDWINMD  |=0x01;
+		memset16(FRAME, 0x0080, LCD_NATIVE_HEIGHT*(LCD_NATIVE_WIDTH+LCD_FUDGE));
 	}
 	else if(mode==LCD_MODE_RGB565)
 	{
-		/* Turn on the RGB window and the YUV window off (This should probably be
-     	 * made into a function).
-     	 */
-    	IO_OSD_OSDWINMD0|=0x01;
-		IO_OSD_VIDWINMD&=~(0x01);
+		/* Turn on the RGB window, set it to 16 bit and turn YUV window off */
+		IO_OSD_VIDWINMD  &=~(0x01);
+		IO_OSD_OSDWIN0OFST=LCD_NATIVE_WIDTH / 16;
+    	IO_OSD_OSDWINMD0 |=(1<<13)|0x01;
+    	lcd_clear_display();
 	}
 	else if(mode==LCD_MODE_PAL256)
 	{
+#if LCD_NATIVE_WIDTH%32!=0
+        IO_OSD_OSDWIN0OFST=LCD_NATIVE_WIDTH / 32+1;
+#else
+        IO_OSD_OSDWIN0OFST=LCD_NATIVE_WIDTH / 32;
+#endif
+
+        IO_OSD_VIDWINMD  &=~(0x01);
+        IO_OSD_OSDWINMD0 &=~(1<<13);
+		IO_OSD_OSDWINMD0 |=0x01;
+	}
+}
+#endif
+
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
+	int width, int height)
+{
+#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
+	char *dst=(char *)FRAME+x+y*(LCD_NATIVE_WIDTH+LCD_FUDGE);
+	
+	src=src+src_x+src_y*LCD_NATIVE_WIDTH;
+	do
+	{
+		memcpy ( dst, src, width);
+		
+		/* The LCD uses the top 1/4 of the screen when in palette mode */
+		dst=dst+width+(LCD_NATIVE_WIDTH-x-width)+LCD_FUDGE; 
+		src+=width;
+	}
+	while(--height);
+#else
+	char *dst=(char *)FRAME
+	    + (LCD_NATIVE_WIDTH+LCD_FUDGE)*(LCD_NATIVE_HEIGHT-1)
+	    - (LCD_NATIVE_WIDTH+LCD_FUDGE)*x + y;
+	
+	src=src+src_x+src_y*LCD_WIDTH;
+	do
+	{
+	    register char *c_dst=dst;
+	    register int c_width=width;
+		do
+		{
+		    *c_dst=*src++;
+		    /* The LCD uses the top 1/4 of the screen when in palette mode */
+		    c_dst=c_dst-(LCD_NATIVE_WIDTH+LCD_FUDGE);
+		} while (--c_width);
+		dst++;
+		src=src+(LCD_WIDTH-width-x);
+	}
+	while(--height);
+#endif
+}
+
+void lcd_pal256_update_pal(fb_data *palette)
+{
+	unsigned char i;
+	for(i=0; i< 255; i++) 
+	{
+	    int y, cb, cr;
+		unsigned char r=RGB_UNPACK_RED_LCD(palette[i])<<3;
+		unsigned char g=RGB_UNPACK_GREEN_LCD(palette[i])<<2;
+		unsigned char b=RGB_UNPACK_BLUE_LCD(palette[i])<<3;
+        
+        y = ((77 * r + 150 * g + 29 * b) >> 8);        cb = ((-43 * r - 85 * g + 128 * b) >> 8) + 128;
+        cr = ((128 * r - 107 * g - 21 * b) >> 8) + 128;
+		
+        while(IO_OSD_MISCCTL&0x08)
+        {};
+		
+		/* Write in y and cb */
+       	IO_OSD_CLUTRAMYCB= ((unsigned char)y << 8) | (unsigned char)cb;
+		
+		/* Write in the index and cr */
+       	IO_OSD_CLUTRAMCR=((unsigned char)cr << 8) | i;
 	}
 }
 #endif
@@ -308,14 +437,32 @@ void lcd_blit_yuv(unsigned char * const src[3],
     if (!lcd_on)
         return;
 	
-    /* y has to be at multiple of 2 or else it will mess up the HW (interleaving) */
+    /* y has to be at multiple of 2 or else it will mess up the HW
+     * (interleaving) 
+     */
     y &= ~1;
+
+    if(y<0 || y>LCD_NATIVE_HEIGHT || x<0 || x>LCD_NATIVE_WIDTH 
+        || height<0 || width <0)
+    {
+        return;
+    }
+
+    if(y+height>LCD_NATIVE_WIDTH)
+    {
+        height=LCD_NATIVE_WIDTH-y;
+    }
+    if(x+width>LCD_NATIVE_HEIGHT)
+    {
+        width=LCD_NATIVE_HEIGHT-x;
+    }
 
     /* Sorry, but width and height must be >= 2 or else */
     width &= ~1;
     height>>=1;
 
-    fb_data *dst = (fb_data*)FRAME + LCD_WIDTH*LCD_HEIGHT - x * LCD_WIDTH + y;
+    fb_data * dst = FRAME + ((LCD_NATIVE_WIDTH+LCD_FUDGE)*(LCD_NATIVE_HEIGHT-1)) 
+        - (LCD_NATIVE_WIDTH+LCD_FUDGE)*x + y ;
 
     z = stride*src_y;
     yuv_src[0] = src[0] + z + src_x;
@@ -337,11 +484,11 @@ void lcd_blit_yuv(unsigned char * const src[3],
         	/* This needs to be done in a block of 4 pixels */
         		*c_dst=*c_yuv_src[0]<<8 | *c_yuv_src[1];
         		*(c_dst+1)=*(c_yuv_src[0]+stride)<<8 | *c_yuv_src[2];
-        		c_dst-=LCD_WIDTH;
+        		c_dst-=(LCD_NATIVE_WIDTH+LCD_FUDGE);
         		c_yuv_src[0]++;
         		*c_dst=*c_yuv_src[0]<<8 | *c_yuv_src[1];
         		*(c_dst+1)=*(c_yuv_src[0]+stride)<<8 | *c_yuv_src[2];
-        		c_dst-=LCD_WIDTH;
+        		c_dst-=(LCD_NATIVE_WIDTH+LCD_FUDGE);
 	            c_yuv_src[0]++;
 	            
             	c_yuv_src[1]++;

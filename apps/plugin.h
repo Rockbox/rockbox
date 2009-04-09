@@ -794,6 +794,14 @@ struct plugin_api {
 #if defined(HAVE_LCD_MODES)
 	void (*lcd_set_mode)(int mode);
 #endif
+
+#if defined(HAVE_LCD_MODES)
+#if HAVE_LCD_MODES & LCD_MODE_PAL256
+	void (*lcd_blit_pal256)(unsigned char *src, int src_x, int src_y, int x, int y,
+							int width, int height);
+	void (*lcd_pal256_update_pal)(fb_data *palette);
+#endif
+#endif
 };
 
 /* plugin header */

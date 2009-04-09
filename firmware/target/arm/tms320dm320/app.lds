@@ -6,35 +6,30 @@ OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/tms320dm320/crt0.o)
 
-#define PLUGINSIZE PLUGIN_BUFFER_SIZE
-#define CODECSIZE CODEC_SIZE
-
 #ifdef DEBUG
 #define STUBOFFSET 0x10000
 #else
 #define STUBOFFSET 0
 #endif
 
-#define LCD_BUFFER_SIZE  (LCD_WIDTH*LCD_HEIGHT*2)
+#define LCD_FUDGE       LCD_NATIVE_WIDTH%32
+
+#define LCD_BUFFER_SIZE  ((LCD_NATIVE_WIDTH+LCD_FUDGE)*LCD_NATIVE_HEIGHT*2)
 
 /* must be 16Kb (0x4000) aligned */
-#define TTB_SIZE         (0x4000) 
+#define TTB_SIZE        0x4000
 
-#define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGINSIZE - CODECSIZE - LCD_BUFFER_SIZE - TTB_SIZE
+/* Give this 1 meg to allow it to align to the MMU boundary */
+#define LCD_TTB_AREA    0x100000
 
-#define DRAMORIG 0x00900000 + STUBOFFSET
-#define IRAMORIG 0x00000000
-#define IRAMSIZE 0x4000
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET
+
+#define DRAMORIG        0x00900000 + STUBOFFSET
+#define IRAMORIG        0x00000000
+#define IRAMSIZE        0x4000
 
 /* End of the audio buffer, where the codec buffer starts */
-#define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
-
-/* Where the codec buffer ends, and the plugin buffer starts */
-#define ENDADDR (ENDAUDIOADDR + CODECSIZE)
-
-#define LCDBEGIN (ENDADDR + PLUGINSIZE)
-
-#define TTBBEGIN (LCDBEGIN + LCD_BUFFER_SIZE)
+#define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE - LCD_TTB_AREA)
 
 MEMORY
 {
@@ -144,22 +139,32 @@ SECTIONS
     {
         codecbuf = .;
         _codecbuf = .;
-    }
+        . += CODEC_SIZE;
+    } > DRAM
 
-    .plugin ENDADDR (NOLOAD) :
+    .plugin (NOLOAD) :
     {
         _pluginbuf = .;
         pluginbuf = .;
-    }
+        . += PLUGIN_BUFFER_SIZE;
+    } > DRAM
     
-    .lcdbuffer LCDBEGIN (NOLOAD) :
+    .ttbtable (NOLOAD) :
+    {
+        . = ALIGN (0x4000);
+        _ttbstart = .;
+        . += TTB_SIZE;
+    } > DRAM
+    
+    /* The LCD buffer should be at the end of memory to protect against
+     * overflowing something else when the YUV blitter is fudging the screen 
+     * size.
+     */
+    
+    .lcdbuffer (NOLOAD) :
     {
         _lcdbuf = .;
-    }
-    
-    .ttbtable TTBBEGIN (NOLOAD) :
-    {
-        _ttbstart = .;
-    }
+        . += LCD_BUFFER_SIZE;
+    } > DRAM
 }
 

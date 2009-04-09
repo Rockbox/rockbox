@@ -59,24 +59,21 @@
 /* LCD dimensions */
 #define CONFIG_LCD LCD_MROBE500
 
-/* choose the lcd orientation. both work */
-/* #define CONFIG_ORIENTATION SCREEN_PORTRAIT */
-#define CONFIG_ORIENTATION SCREEN_PORTRAIT
-
-#if 1
-#define NATIVE_MAX_WIDTH 480
-#define NATIVE_MAX_HEIGHT 640
+#if 0
+#define LCD_NATIVE_WIDTH 480
+#define LCD_NATIVE_HEIGHT 640
 #else
-#define NATIVE_MAX_WIDTH 240
-#define NATIVE_MAX_HEIGHT 320
+#define LCD_NATIVE_WIDTH 240
+#define LCD_NATIVE_HEIGHT 320
 #endif
 
-#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
-#define LCD_WIDTH  NATIVE_MAX_WIDTH
-#define LCD_HEIGHT NATIVE_MAX_HEIGHT
+/* choose the lcd orientation. CONFIG_ORIENTATION defined in config.h */
+#if 0
+#define LCD_WIDTH  LCD_NATIVE_WIDTH
+#define LCD_HEIGHT LCD_NATIVE_HEIGHT
 #else
-#define LCD_WIDTH  NATIVE_MAX_HEIGHT
-#define LCD_HEIGHT NATIVE_MAX_WIDTH
+#define LCD_WIDTH  LCD_NATIVE_HEIGHT
+#define LCD_HEIGHT LCD_NATIVE_WIDTH
 #endif
 
 #define LCD_DEPTH  16   /* 65k colours */
@@ -142,15 +139,19 @@
 
 #define HW_SAMPR_CAPS SAMPR_CAP_44
 
-#define BATTERY_CAPACITY_DEFAULT 1100 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN 500        /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 2500        /* max. capacity selectable */
+#define BATTERY_CAPACITY_DEFAULT 1500 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 1000        /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 2000        /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 100         /* capacity increment */
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
+/* define current usage levels */
+#define CURRENT_NORMAL     120 /* Measured */
+#define CURRENT_BACKLIGHT  80 /* Over 200 mA total measured when on */
+#define CURRENT_RECORD     0  /* no recording */
+
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR
-
 
 /* Define this if you have a Texas Instruments TSC2100 touch screen */
 #define HAVE_TSC2100

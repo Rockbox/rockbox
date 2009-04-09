@@ -636,6 +636,13 @@ static const struct plugin_api rockbox_api = {
 #if defined(HAVE_LCD_MODES)
 	lcd_set_mode,
 #endif
+
+#if defined(HAVE_LCD_MODES)
+#if HAVE_LCD_MODES & LCD_MODE_PAL256
+	lcd_blit_pal256,
+	lcd_pal256_update_pal,
+#endif
+#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)
