@@ -44,7 +44,7 @@ static          long last_wheel_post   = 0;
 static          long next_backlight_on = 0;
 /* Buttons */
 static bool hold_button     = false;
-#ifndef BOOTLOADER  
+#ifndef BOOTLOADER
 static bool hold_button_old = false;
 #endif
 
@@ -73,7 +73,7 @@ void clickwheel(unsigned int wheel_value)
      * Counter-clockwise    00 -> 10 -> 11 -> 01 -> 00
      */
 
-	/* did the wheel value change? */
+    /* did the wheel value change? */
     unsigned int btn = BUTTON_NONE;
     if (old_wheel_value == wheel_tbl[0][wheel_value])
         btn = BUTTON_SCROLL_FWD;
@@ -83,7 +83,7 @@ void clickwheel(unsigned int wheel_value)
     if (btn != BUTTON_NONE)
     {
         int repeat = 1; /* assume repeat */
-        unsigned long usec = TIMER1_VALUE; /* WAG!!!  and it works!!*/
+        unsigned long usec = TIMER1_VALUE;
         unsigned v = (usec - last_wheel_usec) & 0x7fffffff;
 
         v = (v>0) ? 1000000 / v : 0;   /* clicks/sec = 1000000 * +clicks/usec */
@@ -162,7 +162,7 @@ void clickwheel(unsigned int wheel_value)
              {
                  queue_post(&button_queue, btn, wheel_fast_mode |
                             (wheel_delta << 24) |
-			wheel_velocity*360/WHEELCLICKS_PER_ROTATION);
+                 wheel_velocity*360/WHEELCLICKS_PER_ROTATION);
                  /* message posted - reset delta */
                  wheel_delta = 1;
              }
@@ -173,7 +173,6 @@ void clickwheel(unsigned int wheel_value)
                      wheel_delta = 0x7f;
              }
          }
-
          last_wheel_usec = usec;
     }
     old_wheel_value = wheel_value;
@@ -183,26 +182,24 @@ static short read_dbop(void)
 {
     /*write a red pixel */
     if (!lcd_button_support())
-        return _dbop_din;
+      return _dbop_din;
 
     /* Set up dbop for input */
-    while (!(DBOP_STAT & (1<<10))); 	  /* Wait for fifo to empty */
+    while (!(DBOP_STAT & (1<<10)));      /* Wait for fifo to empty */
     DBOP_CTRL |= (1<<19);
-    DBOP_CTRL &= ~(1<<16);               /* disable output */
-  
-    DBOP_TIMPOL_01 = 0xe167e167; //11100001011001111110000101100111
-    DBOP_TIMPOL_23 = 0xe167006e; //11100001011001110000000001101110
- 
-    DBOP_CTRL |= (1<<15); 		/* start read */
-    while (!(DBOP_STAT & (1<<16))); 	/* wait for valid data */
-    int delay = 50;
-    while(delay--);    			/* small delay to set up read */
+    DBOP_CTRL &= ~(1<<16);               /* disable output (1:write enabled) */
+    DBOP_TIMPOL_01 = 0xe167e167;         /* Set Timing & Polarity regs 0 & 1 */
+    DBOP_TIMPOL_23 = 0xe167006e;         /* Set Timing & Polarity regs 2 & 3 */
 
-    _dbop_din = DBOP_DIN; 		/* now read dbop & store info*/
+    DBOP_CTRL |= (1<<15);                /* start read */
+    while (!(DBOP_STAT & (1<<16)));      /* wait for valid data */
 
-    DBOP_TIMPOL_01 = 0x6e167;
-    DBOP_TIMPOL_23 = 0xa167e06f;
-    DBOP_CTRL |= (1<<16);
+    _dbop_din = DBOP_DIN;                /* Read dbop data*/
+
+    /* Reset dbop for output */
+    DBOP_TIMPOL_01 = 0x6e167;            /* Set Timing & Polarity regs 0 & 1 */
+    DBOP_TIMPOL_23 = 0xa167e06f;         /* Set Timing & Polarity regs 2 & 3 */
+    DBOP_CTRL |= (1<<16);                /* Enable output (0:write disable)  */
     DBOP_CTRL &= ~(1<<19);
 
     return _dbop_din;
@@ -221,7 +218,7 @@ int button_read_device(void)
     int btn = BUTTON_NONE;
     /* read buttons from dbop */
     short dbop = read_dbop();
-    
+
     /* hold button */
     if(dbop & (1<<12))
     {
@@ -232,17 +229,18 @@ int button_read_device(void)
     {
         hold_button = false;
     }
-  
+
     if (dbop & (1<<8))
         btn |= BUTTON_POWER;
-	if (!(dbop & (1<<15)))
-	    btn |= BUTTON_REC;
+
+    if (!(dbop & (1<<15)))
+    btn |= BUTTON_REC;
 
     /* handle wheel */
     int wheel_value = dbop & (1<<13|1<<14);
     wheel_value >>= 13;
-    clickwheel(wheel_value);    
-        
+    clickwheel(wheel_value);
+
     /* Set afsel, so that we can read our buttons */
     GPIOC_AFSEL &= ~(1<<2|1<<3|1<<4|1<<5|1<<6);
     /* set dir so we can read our buttons (but reset the C pins first) */
@@ -256,7 +254,7 @@ int button_read_device(void)
 
     GPIOC_DIR &= ~(1<<2|1<<3|1<<4|1<<5|1<<6);
 
-    int delay = 50;    /* small delay needed to read buttons correctly */
+    int delay = 2;    /* small delay needed to read buttons correctly */
     while(delay--);
 
      /* direct GPIO connections */
@@ -268,14 +266,14 @@ int button_read_device(void)
         btn |= BUTTON_SELECT;
     if (!GPIOC_PIN(5))
         btn |= BUTTON_RIGHT;
-     if (!GPIOC_PIN(6))
-         btn |= BUTTON_DOWN;
+    if (!GPIOC_PIN(6))
+        btn |= BUTTON_DOWN;
 
     /* return to settings needed for lcd */
     GPIOC_DIR |= (1<<2|1<<3|1<<4|1<<5|1<<6);
     GPIOC_AFSEL |= (1<<2|1<<3|1<<4|1<<5|1<<6);
-    
-#ifndef BOOTLOADER    
+
+#ifndef BOOTLOADER
     /* light handling */
     if (hold_button != hold_button_old)
     {
