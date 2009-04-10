@@ -125,12 +125,12 @@ echo "Build dir: $builddir (set RBDEV_BUILD to change dir)"
 # Verify that the prefix dir exists and that we can write to it,
 #  as otherwise we will hardly be able to install there!
 if test ! -d $prefix; then
-  echo "WARNING: The installation destination does not exist."
+  echo "ERROR: The installation destination does not exist."
   echo "Please create it and re-run this script"
   exit
 fi
 if test ! -w $prefix; then
-  echo "WARNING: This script is set to install in $prefix but has no write permissions for it"
+  echo "ERROR: This script is set to install in $prefix but has no write permissions for it"
   echo "Please fix this and re-run this script"
   exit
 fi
@@ -139,8 +139,10 @@ fi
 
 cleardir () {
   # $1 is the name of the build dir
+  # $2 is the arch
   # delete the build dirs and the source dirs
-  rm -rf $1/build-gcc $1/build-binu $1/gcc* $1/binutils*
+  echo "Cleaning up build folder"
+  rm -rf $1/build-gcc-$2 $1/build-binu-$2
 }
 
 buildone () {
@@ -244,13 +246,15 @@ fi
 ###########################################################################
 # If there's already a build dir, we don't overwrite or delete it
 if test -d $builddir; then
-  echo "You already have a $builddir directory!"
-  echo "Please remove it and re-run the script"
-  exit
+  if test ! -w $builddir; then
+    echo "ERROR: No write permissions for the build directory!"
+    exit
+  fi
 else
   mkdir -p $builddir
-  cd $builddir
 fi
+
+cd $builddir
 
 ###########################################################################
 # Create a summary file for each toolchain, containing info about the version
@@ -282,10 +286,10 @@ if test -n "$gccpatch"; then
   patch -p0 < "$dlwhere/$gccpatch"
 fi
 
-echo "ROCKBOXDEV: mkdir build-binu"
-mkdir build-binu
-echo "ROCKBOXDEV: cd build-binu"
-cd build-binu
+echo "ROCKBOXDEV: mkdir build-binu-$1"
+mkdir build-binu-$1
+echo "ROCKBOXDEV: cd build-binu-$1"
+cd build-binu-$1
 echo "ROCKBOXDEV: binutils/configure"
 # we undefine _FORTIFY_SOURCE to make the binutils built run fine on recent
 # Ubuntu installations
@@ -294,14 +298,14 @@ echo "ROCKBOXDEV: binutils/make"
 $make
 echo "ROCKBOXDEV: binutils/make install to $prefix/$target"
 $make install
-cd .. # get out of build-binu
+cd .. # get out of build-binu-$1
 PATH="$bindir:${PATH}"
 SHELL=/bin/sh # seems to be needed by the gcc build in some cases
 
-echo "ROCKBOXDEV: mkdir build-gcc"
-mkdir build-gcc
-echo "ROCKBOXDEV: cd build-gcc"
-cd build-gcc
+echo "ROCKBOXDEV: mkdir build-gcc-$1"
+mkdir build-gcc-$1
+echo "ROCKBOXDEV: cd build-gcc-$1"
+cd build-gcc-$1
 echo "ROCKBOXDEV: gcc/configure"
 # we undefine _FORTIFY_SOURCE to make the gcc build go through fine on
 # recent Ubuntu installations
@@ -313,8 +317,7 @@ $make install
 cd .. # get out of build-gcc
 cd .. # get out of $builddir
 
-  # end of buildone() function
-}
+} # buildone()
 
 echo ""
 echo "Select target arch:"
@@ -323,7 +326,7 @@ echo "m   - m68k     (iriver h1x0/h3x0, ifp7x0 and iaudio)"
 echo "a   - arm      (ipods, iriver H10, Sansa, etc)"
 echo "i   - mips     (Jz4740 and ATJ-based players)"
 echo "separate multiple targets with spaces"
-echo "(i.e. \"s m a\" will build sh, m86k and arm)"
+echo "(Example: \"s m a\" will build sh, m86k and arm)"
 echo ""
 
 selarch=`input`
@@ -334,30 +337,33 @@ echo ""
 case $arch in
   [Ss])
     buildone $arch
+    cleardir $builddir $arch
     ;;
   [Ii])
     buildone $arch
+    cleardir $builddir $arch
     ;;
   [Mm])
     buildone $arch
+    cleardir $builddir $arch
     ;;
   [Aa])
     buildone $arch
+    cleardir $builddir $arch
     ;;
   *)
     echo "An unsupported architecture option: $arch"
     exit
     ;;
 esac
-
-echo "Cleaning up build folder"
-cleardir $builddir
-echo ""
-echo "Done!"
-echo ""
-echo "Make your PATH include $pathadd"
-
 done
 
 # show the summaries:
 cat $builddir/summary-*
+rm $builddir/summary-*
+
+echo ""
+echo "Done!"
+echo ""
+echo "Make your PATH include $pathadd"
+echo ""
