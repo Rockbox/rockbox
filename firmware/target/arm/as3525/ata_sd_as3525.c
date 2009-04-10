@@ -645,14 +645,18 @@ static int sd_select_bank(signed char bank)
     return 0;
 }
 
+#define UNALIGNED_NUM_SECTORS 10
+static int32_t aligned_buffer[UNALIGNED_NUM_SECTORS* (SECTOR_SIZE / 4)];
+
 static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
-                               int count, void* buf, bool write)
+                               int count, void* buf, const bool write)
 {
 #ifndef HAVE_MULTIVOLUME
     const int drive = 0;
 #endif
     int ret = 0;
     int bank;
+    bool unaligned_transfer = (int)buf & 3;
 
     /* skip SanDisk OF */
     if (drive == INTERNAL_AS3525)
@@ -706,16 +710,29 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
 
     while(count)
     {
-        /* Interrupt handler might set this to true during transfer */
-        retry = false;
         /* 128 * 512 = 2^16, and doesn't fit in the 16 bits of DATA_LENGTH
          * register, so we have to transfer maximum 127 sectors at a time. */
         unsigned int transfer = (count >= 128) ? 127 : count; /* sectors */
+        void *dma_buf;
         const int cmd =
             write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
         int arg = start;
         if(!(card_info[drive].ocr & (1<<30)))   /* not SDHC */
             arg *= BLOCK_SIZE;
+
+        /* Interrupt handler might set this to true during transfer */
+        retry = false;
+
+        if(unaligned_transfer)
+        {
+            dma_buf = aligned_buffer;
+            if(transfer > UNALIGNED_NUM_SECTORS)
+                transfer = UNALIGNED_NUM_SECTORS;
+            if(write)
+                memcpy(aligned_buffer, buf, transfer * SECTOR_SIZE);
+        }
+        else
+            dma_buf = buf;
 
         if(!send_cmd(drive, cmd, arg, MCI_ARG, NULL))
         {
@@ -724,11 +741,11 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
         }
 
         if(write)
-            dma_enable_channel(0, buf, MCI_FIFO(drive),
+            dma_enable_channel(0, dma_buf, MCI_FIFO(drive),
                 (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
                 DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
         else
-            dma_enable_channel(0, MCI_FIFO(drive), buf,
+            dma_enable_channel(0, MCI_FIFO(drive), dma_buf,
                 (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
@@ -743,6 +760,8 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
         if(!retry)
         {
+            if(unaligned_transfer && !write)
+                memcpy(buf, aligned_buffer, transfer * SECTOR_SIZE);
             buf += transfer * SECTOR_SIZE;
             start += transfer;
             count -= transfer;
