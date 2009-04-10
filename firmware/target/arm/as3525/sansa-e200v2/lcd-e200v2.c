@@ -84,9 +84,16 @@ static volatile bool lcd_busy = false;
 #define R_HORIZ_RAM_ADDR_POS    0x44
 #define R_VERT_RAM_ADDR_POS     0x45
 
-#define R_ENTRY_MODE_HORZ 0x7030
+#define R_ENTRY_MODE_HORZ_NORMAL 0x7030
+#define R_ENTRY_MODE_HORZ_FLIPPED 0x7000
 #define R_ENTRY_MODE_VERT 0x7038
 #define R_ENTRY_MODE_SOLID_VERT  0x1038
+static unsigned short r_entry_mode = R_ENTRY_MODE_HORZ_NORMAL;
+
+/* Reverse Flag */
+#define R_DISP_CONTROL_NORMAL 0x0004
+#define R_DISP_CONTROL_REV    0x0000
+static unsigned short r_disp_control_rev = R_DISP_CONTROL_NORMAL;
 
 /* TODO: Implement this function */
 static void lcd_delay(int x)
@@ -160,32 +167,41 @@ void lcd_set_contrast(int val)
 
 void lcd_set_invert_display(bool yesno)
 {
-    (void)yesno;
-}
+    r_disp_control_rev = yesno ? R_DISP_CONTROL_REV :
+                                 R_DISP_CONTROL_NORMAL;
 
-static void flip_lcd(bool yesno)
-{
-    (void)yesno;
-}
+    if (display_on)
+    {
+        lcd_write_reg(R_DISP_CONTROL1, 0x0033 | r_disp_control_rev);
+    }
 
+}
 
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
     display_flipped = yesno;
-    y_offset = yesno ? 4 : 0;   /* FIXME: Is a y_offset needed? */
-
-    if (display_on)
-        flip_lcd(yesno);
+ 
+    r_entry_mode = yesno ? R_ENTRY_MODE_HORZ_FLIPPED :
+                           R_ENTRY_MODE_HORZ_NORMAL;
 }
 
 static void lcd_window(int xmin, int ymin, int xmax, int ymax)
 {
     ymin += y_offset;
     ymax += y_offset;
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (xmax << 8) | xmin);
-    lcd_write_reg(R_VERT_RAM_ADDR_POS,  (ymax << 8) | ymin);
-    lcd_write_reg(R_RAM_ADDR_SET,       (ymin << 8) | xmin);
+    if (!display_flipped)
+    {
+        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (xmax << 8) | xmin);
+        lcd_write_reg(R_VERT_RAM_ADDR_POS,  (ymax << 8) | ymin);
+        lcd_write_reg(R_RAM_ADDR_SET,       (ymin << 8) | xmin);
+    }
+    else
+    {
+        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, ((LCD_WIDTH-1 - xmin) << 8) | (LCD_WIDTH-1 - xmax));
+        lcd_write_reg(R_VERT_RAM_ADDR_POS,  ((LCD_HEIGHT-1 - ymin) << 8) | (LCD_HEIGHT-1 - ymax));
+        lcd_write_reg(R_RAM_ADDR_SET,       ((LCD_HEIGHT-1 - ymin) << 8) | (LCD_WIDTH-1 - xmin));
+    }
 }
 
 static void _display_on(void)
@@ -205,13 +221,13 @@ static void _display_on(void)
     /* Address counter updated in horizontal direction; left to right;
      * vertical increment horizontal increment.
      * data format for 8bit transfer or spi = 65k (5,6,5) */
-    lcd_write_reg(R_ENTRY_MODE, 0x0030);
+    lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
 
     /* Replace data on writing to GRAM */
     lcd_write_reg(R_COMPARE_REG1, 0);
     lcd_write_reg(R_COMPARE_REG2, 0);
 
-    lcd_write_reg(R_DISP_CONTROL1, 0x0000);  /* GON = 0, DTE = 0, D1-0 = 00b */
+    lcd_write_reg(R_DISP_CONTROL1, 0x0000 | r_disp_control_rev);  /* GON = 0, DTE = 0, D1-0 = 00b */
 
     /* Front porch lines: 2; Back porch lines: 2; */
     lcd_write_reg(R_DISP_CONTROL2, 0x0203);
@@ -285,7 +301,7 @@ static void _display_on(void)
     lcd_write_reg(R_1ST_SCR_DRV_POS, (LCD_HEIGHT-1) << 8);
     lcd_write_reg(R_2ND_SCR_DRV_POS, (LCD_HEIGHT-1) << 8);
 
-    lcd_write_reg(R_DISP_CONTROL1, 0x0037);
+    lcd_write_reg(R_DISP_CONTROL1, 0x0033 | r_disp_control_rev);
 
     display_on=true;  /* must be done before calling lcd_update() */
     lcd_update();
@@ -301,16 +317,7 @@ void lcd_init_device(void)
     GPIOA_DIR |= (1<<5);
     GPIOA_PIN(5) = 0;
 
-    GPIOA_PIN(3) = (1<<3);
-
-    GPIOA_DIR |= (3<<3);
-
-    GPIOA_PIN(3) = (1<<3);
-
     GPIOA_PIN(4) = 0;  /*c80b0040 := 0;*/
-
-    GPIOA_DIR |= (1<<7);
-    GPIOA_PIN(7) = 0;
 
     lcd_delay(1);
 
@@ -333,8 +340,8 @@ void lcd_enable(bool on)
         }
         else
         {
-            /* TODO: Implement off sequence */
             display_on=false;
+            lcd_write_reg(R_POWER_CONTROL1, 0x0001);
         }
     }
 }
@@ -375,7 +382,7 @@ void lcd_update(void)
     if (!display_on)
         return;
 
-    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
+    lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
 
     lcd_busy = true;
     /* Set start position and window */
@@ -417,7 +424,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (y >= ymax)
         return; /* nothing left to do */
 
-    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
+    lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
     lcd_busy = true;
     lcd_window(x, y, xmax, ymax);
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
@@ -442,7 +449,7 @@ bool lcd_button_support(void)
     if (lcd_busy)
         return false;
 
-    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
+    lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
     /* Set start position and window */
     lcd_window(LCD_WIDTH+1, LCD_HEIGHT+1, LCD_WIDTH+2, LCD_HEIGHT+2);
 
