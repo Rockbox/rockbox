@@ -201,7 +201,7 @@ PLUGIN_HEADER
 #   define HK_REM2STACK      "RIGHT"
 
 #elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-#   define SOL_QUIT          BUTTON_POWER
+#   define SOL_QUIT          (BUTTON_HOME|BUTTON_REPEAT)
 #   define SOL_UP            BUTTON_UP
 #   define SOL_DOWN          BUTTON_DOWN
 #   define SOL_LEFT          BUTTON_SCROLL_BACK

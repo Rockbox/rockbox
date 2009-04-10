@@ -97,10 +97,10 @@
 #define  GBN_BUTTON_RIGHT              BUTTON_RIGHT
 #define  GBN_BUTTON_RETREAT            BUTTON_SCROLL_BACK
 #define  GBN_BUTTON_ADVANCE            BUTTON_SCROLL_FWD
-#define  GBN_BUTTON_MENU               BUTTON_POWER
+#define  GBN_BUTTON_MENU               (BUTTON_HOME|BUTTON_REPEAT)
 #define  GBN_BUTTON_PLAY               BUTTON_SELECT | BUTTON_REL
 #define  GBN_BUTTON_CONTEXT            BUTTON_SELECT | BUTTON_REPEAT
-#define  GBN_BUTTON_NEXT_VAR           BUTTON_HOME
+/* No next var */
 
 #elif (CONFIG_KEYPAD == SANSA_C200_PAD)
 #define  GBN_BUTTON_UP                 BUTTON_UP

@@ -485,7 +485,7 @@ static char* messages[] =
 
 #elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
 #   undef __PLUGINLIB_ACTIONS_H__
-#   define RFK_QUIT     (BUTTON_SELECT | BUTTON_REPEAT)
+#   define RFK_QUIT     (BUTTON_HOME|BUTTON_REPEAT)
 #   define RFK_RIGHT    BUTTON_RIGHT
 #   define RFK_LEFT     BUTTON_LEFT
 #   define RFK_UP       BUTTON_UP

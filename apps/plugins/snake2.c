@@ -254,7 +254,7 @@ PLUGIN_HEADER
 #define SNAKE2_RIGHT            BUTTON_RIGHT
 #define SNAKE2_UP               BUTTON_UP
 #define SNAKE2_DOWN             BUTTON_DOWN
-#define SNAKE2_QUIT             BUTTON_POWER
+#define SNAKE2_QUIT             (BUTTON_HOME|BUTTON_REPEAT)
 #define SNAKE2_LEVEL_UP         BUTTON_UP
 #define SNAKE2_LEVEL_DOWN       BUTTON_DOWN
 #define SNAKE2_MAZE_NEXT        BUTTON_RIGHT

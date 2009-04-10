@@ -124,9 +124,7 @@ PLUGIN_HEADER
 #define LABEL_VOLUME "Wheel"
 
 #elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-/* FIXME: 
-#define VUMETER_QUIT        BUTTON_HOME */
-#define VUMETER_QUIT        BUTTON_DOWN
+#define VUMETER_QUIT        (BUTTON_HOME|BUTTON_REPEAT)
 #define VUMETER_HELP        BUTTON_SELECT|BUTTON_REPEAT
 #define VUMETER_MENU        BUTTON_SELECT|BUTTON_REL
 #define VUMETER_MENU_EXIT   BUTTON_SELECT
@@ -134,7 +132,7 @@ PLUGIN_HEADER
 #define VUMETER_UP          BUTTON_SCROLL_FWD
 #define VUMETER_DOWN        BUTTON_SCROLL_BACK
 #define LABEL_HELP          "Hold Select"
-#define LABEL_QUIT          "Down"
+#define LABEL_QUIT          "HOME"
 #define LABEL_MENU          "Select"
 #define LABEL_VOLUME        "Scrollwheel"
 
