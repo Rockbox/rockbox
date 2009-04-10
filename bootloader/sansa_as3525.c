@@ -33,6 +33,7 @@
 #include "storage.h"
 #include "disk.h"
 #include "panic.h"
+#include "power.h"
 
 int show_logo(void);
 void main(void)
@@ -56,6 +57,18 @@ void main(void)
 
     button_init_device();
     int btn = button_read_device();
+
+#if !defined(SANSA_FUZE) && !defined(SANSA_CLIP)
+    if (button_hold())
+    {
+        verbose = true;
+        lcd_clear_display();
+        printf("Hold switch on");
+        printf("Shutting down...");
+        sleep(HZ);
+        power_off();
+    }
+#endif
 
     /* Enable bootloader messages if any button is pressed */
     if (btn)
