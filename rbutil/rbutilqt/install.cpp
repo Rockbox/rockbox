@@ -234,6 +234,8 @@ void Install::setDetailsCurrent(bool show)
                 .arg(version.value("bleed_rev"), version.value("bleed_date")));
         if(version.value("rel_rev").isEmpty())
             ui.labelNote->setText(tr("<b>This is the recommended version.</b>"));
+        else
+            ui.labelNote->setText("");
     }
 }
 
@@ -245,7 +247,7 @@ void Install::setDetailsStable(bool show)
             tr("This is the last released version of Rockbox."));
 
         if(!version.value("rel_rev").isEmpty())
-            ui.labelNote->setText(tr("<b>Note:</b>"
+            ui.labelNote->setText(tr("<b>Note:</b> "
             "The lastest released version is %1. "
             "<b>This is the recommended version.</b>")
                     .arg(version.value("rel_rev")));
