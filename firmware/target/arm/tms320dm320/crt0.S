@@ -54,7 +54,7 @@ start:
     orr    r0, r0, #0x00000002
     mcr    p15, 0, r0, c1, c0, 0
 
-#if !defined(BOOTLOADER) && !defined(STUB)
+#if !defined(STUB)
     /* Zero out IBSS */
     ldr    r2, =_iedata
     ldr    r3, =_iend

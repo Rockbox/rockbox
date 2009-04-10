@@ -127,8 +127,6 @@ void lcd_init_device(void)
     /* Clear the Frame */
     memset16(FRAME, 0x0000, LCD_WIDTH*LCD_HEIGHT);
 
-	lcd_sleep();
-
 	IO_OSD_OSDWINMD0&=~(0x0001);
 	IO_OSD_VIDWINMD&=~(0x0001);
 
@@ -242,8 +240,6 @@ void lcd_init_device(void)
 
 	IO_OSD_OSDWINMD0|=0x01;
 	IO_VID_ENC_VMOD|=0x01;
-	
-	lcd_enable(true);
 }
 
 /* Update a fraction of the display. */

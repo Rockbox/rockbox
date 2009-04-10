@@ -6,24 +6,42 @@ OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/tms320dm320/crt0.o)
 
-#define LCD_BUFFER_SIZE  (LCD_WIDTH*LCD_HEIGHT*2)
+#ifdef DEBUG
+#define STUBOFFSET 0x10000
+#else
+#define STUBOFFSET 0
+#endif
+
+#ifndef LCD_NATIVE_WIDTH
+#define LCD_NATIVE_WIDTH LCD_WIDTH
+#endif
+
+#ifndef LCD_NATIVE_HEIGHT
+#define LCD_NATIVE_HEIGHT LCD_HEIGHT
+#endif
+
+#define LCD_FUDGE       LCD_NATIVE_WIDTH%32
+
+#define LCD_BUFFER_SIZE  ((LCD_NATIVE_WIDTH+LCD_FUDGE)*LCD_NATIVE_HEIGHT*2)
 
 /* must be 16Kb (0x4000) aligned */
 #define TTB_SIZE         (0x4000)
 
-#define DRAMSIZE (MEMORYSIZE * 0x100000) - TTB_SIZE - LCD_BUFFER_SIZE
+/* Give this 1 meg to allow it to align to the MMU boundary */
+#define LCD_TTB_AREA    0x100000
 
-#define DRAMORIG 0x01900000 /* actually it's 0x00900000 */
-#define IRAMORIG 0x00000000
-#define IRAMSIZE 16K
-#define FLASHORIG 0x00100000
-#define FLASHSIZE 8M
+#define BOOT_OFFSET     0x1000000
 
-/* Now we have the LCD buffer */
-#define LCDBEGIN (DRAMSIZE+0x00900000)
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - BOOT_OFFSET
 
-/* Finally the TTB table */
-#define TTBBEGIN (LCDBEGIN + LCD_BUFFER_SIZE)
+#define DRAMORIG    (0x00900000+BOOT_OFFSET) /* actually it's 0x00900000 */
+#define IRAMORIG    0x00000000
+#define IRAMSIZE    0x4000
+#define FLASHORIG   0x00100000
+#define FLASHSIZE   8M
+
+/* End of the audio buffer, where the codec buffer starts */
+#define TTB_BEGIN   (DRAMORIG + DRAMSIZE - LCD_TTB_AREA)
 
 MEMORY
 {
@@ -40,7 +58,6 @@ SECTIONS
         loadaddress = .;
         _loadaddress = .;
         *(.init.text)
-        *(.icode)
         *(.text*)
         *(.glue_7)
         *(.glue_7t)
@@ -53,7 +70,6 @@ SECTIONS
         *(.rodata*)
         *(.rodata.str1.1)
         *(.rodata.str1.4)
-        *(.irodata)
         . = ALIGN(0x4);
 
         /* Pseudo-allocate the copies of the data sections */
@@ -61,29 +77,9 @@ SECTIONS
     } > DRAM
 
     .data : {
-        *(.idata)
         *(.data*)
         . = ALIGN(0x4);
         _dataend = . ;
-    } > DRAM
-
-    .stack :
-    {
-         *(.stack)
-         _stackbegin = .;
-         stackbegin = .;
-         . += 0x2000;
-         _stackend = .;
-         stackend = .;
-    } > DRAM
-
-    .bss :
-    {
-         _edata = .;
-         *(.bss*);
-         *(.ibss);
-         *(COMMON)
-         _end = .;
     } > DRAM
 
     .vectors IRAMORIG :
@@ -94,16 +90,57 @@ SECTIONS
         KEEP(*(.vectors));
         *(.vectors);
         _vectorsend = .;
-    } AT > DRAM
+    } > IRAM AT > DRAM
     _vectorscopy = LOADADDR(.vectors);
     
-    .lcdbuffer LCDBEGIN (NOLOAD) :
+    .iram :
+    {
+        _iramstart = .;
+        *(.icode)
+        *(.irodata*)
+        *(.idata)
+        . = ALIGN(0x4);
+        _iramend = .;
+    } > IRAM AT> DRAM
+
+    _iramcopy = LOADADDR(.iram);
+    
+    .ibss (NOLOAD) :
+    {
+        _iedata = .;
+        *(.ibss)
+        . = ALIGN(0x4);
+        _iend = .;
+    } > IRAM
+
+    .stack (NOLOAD) :
+    {
+         *(.stack)
+         stackbegin = .;
+         . += 0x2000;
+         stackend = .;
+    } > IRAM
+    
+ 	.bss (NOLOAD) :
+    {
+    	. = ADDR(.data) + SIZEOF(.data) + SIZEOF(.vectors) + SIZEOF(.iram);
+       	_edata = .;
+        *(.bss*)
+        *(COMMON)
+        . = ALIGN(0x4);
+       	_end = .;
+    } > DRAM
+    
+    .ttbtable TTB_BEGIN (NOLOAD) :
+    {
+        . = ALIGN (0x4000);
+        _ttbstart = .;
+        . += TTB_SIZE;
+    } > DRAM
+    
+    .lcdbuffer (NOLOAD) :
     {
         _lcdbuf = .;
-    }
-    
-    .ttbtable TTBBEGIN (NOLOAD) :
-    {
-        _ttbstart = .;
-    }
+        . += LCD_BUFFER_SIZE;
+    } > DRAM
 }
