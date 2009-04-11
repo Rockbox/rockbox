@@ -22,19 +22,6 @@ TOOLS = $(TOOLSDIR)/rdf2binary $(TOOLSDIR)/convbdf \
 	$(TOOLSDIR)/codepages $(TOOLSDIR)/scramble $(TOOLSDIR)/bmp2rb \
 	$(TOOLSDIR)/uclpack $(TOOLSDIR)/mktccboot $(TOOLSDIR)/mkboot
 
-
-ifeq (,$(PREFIX))
-ifdef SIMVER
-PREFIX = simdisk
-INSTALL = --install="$(PREFIX)"
-else
-# Don't set INSTALL and error out later
-INSTALL = 
-endif
-else
-INSTALL = --install="$(PREFIX)"
-endif
-
 RBINFO = $(BUILDDIR)/rockbox-info.txt
 
 # list suffixes to be understood by $*
@@ -82,7 +69,7 @@ endif # bootloader
 OBJ := $(SRC:.c=.o)
 OBJ := $(OBJ:.S=.o)
 OBJ += $(BMP:.bmp=.o)
-OBJ := $(subst $(ROOTDIR),$(BUILDDIR),$(OBJ))     
+OBJ := $(subst $(ROOTDIR),$(BUILDDIR),$(OBJ))
 
 build: $(TOOLS) $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS) $(ARCHOSROM) $(RBINFO)
 
@@ -267,15 +254,19 @@ voice: voicetools features
 
 endif
 
+ifdef SIMVER
+
 install:
-	@echo "Installing your build in your '$(PREFIX)' dir"
+	@echo "Installing your build in your 'simdisk' dir"
 	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
-	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 0 $(TARGET) $(BINARY)
+	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\" -s -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 0 $(TARGET) $(BINARY)
 
 fullinstall:
-	@echo "Installing a full setup in your '$(PREFIX)' dir"
+	@echo "Installing a full setup in your 'simdisk' dir"
 	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
-	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 $(TARGET) $(BINARY)
+	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\" -s -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 $(TARGET) $(BINARY)
+
+endif
 
 help:
 	@echo "A few helpful make targets"
@@ -301,8 +292,8 @@ help:
 	@echo "tools       - builds the tools only"
 	@echo "voice       - creates the voice clips (voice builds only)"
 	@echo "voicetools  - builds the voice tools only"
-	@echo "install     - installs your build (at PREFIX, defaults to simdisk/ for simulators (no fonts))"
-	@echo "fullinstall - installs your build (like install, but with fonts)"
+	@echo "install     - installs your build (for simulator builds only, no fonts)"
+	@echo "fullinstall - installs your build (for simulator builds only, with fonts)"
 	@echo "reconf      - rerun configure with the same selection"
 
 ### general compile rules:

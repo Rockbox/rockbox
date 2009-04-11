@@ -2526,7 +2526,6 @@ sed > Makefile \
  -e "s,@LANGS@,${buildlangs},g" \
  -e "s,@USE_ELF@,${USE_ELF},g" \
  -e "s,@RBDIR@,${rbdir},g" \
- -e "s,@PREFIX@,$PREFIX,g" \
  -e "s,@CMDLINE@,$cmdline,g" \
 <<EOF
 ## Automatically generated. http://www.rockbox.org/
@@ -2573,7 +2572,6 @@ export WINDRES=@WINDRES@
 export DLLTOOL=@DLLTOOL@
 export DLLWRAP=@DLLWRAP@
 export RANLIB=@RANLIB@
-export PREFIX=@PREFIX@
 export PROFILE_OPTS=@PROFILE_OPTS@
 export SIMVER=@SIMVER@
 export SIMDIR=\$(ROOTDIR)/uisimulator/sdl

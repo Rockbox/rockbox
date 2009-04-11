@@ -21,7 +21,7 @@ my $ROOT="..";
 my $ziptool="zip -r9";
 my $output="rockbox.zip";
 my $verbose;
-my $install="/dev/null";
+my $sim;
 my $exe;
 my $target;
 my $modelname;
@@ -75,7 +75,7 @@ GetOptions ( 'r|root=s'		=> \$ROOT,
 	     'o|output=s'	=> \$output,
 	     'f|fonts=s'	=> \$incfonts,   # 0 - no fonts, 1 - fonts only 2 - fonts and package
 	     'v|verbose'	=> \$verbose,
-	     'install=s'		=> \$install, # install destination
+	     's|sim'		=> \$sim,
 	     'rbdir=s'          => \$rbdir, # If we want to put in a different directory
     );
 
@@ -438,11 +438,8 @@ sub runone {
         print "$ziptool $output $rbdir $target >/dev/null\n";
     }
 
-    if($install) {
-        if ($install =~ /\/dev\/null/) {
-            die "ERROR: No PREFIX given\n"
-        }
-        system("cp -r $rbdir \"$install\" >/dev/null");
+    if($sim) {
+        system("cp -r $rbdir simdisk/ >/dev/null");
     }
     else {
         system("$ziptool $output $rbdir $target >/dev/null");
