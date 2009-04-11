@@ -92,6 +92,14 @@ void gui_scrollbar_draw(struct screen * screen, int x, int y,
     inner_y  = y + 1;
     inner_wd = width  - 2;
     inner_ht = height - 2;
+    
+    /* Boundary check to make sure that height is reasonable, otherwise nothing
+     *  to do 
+     */
+    if(height<2 || width<2)
+    {
+        return;
+    }
 
     if (flags & HORIZONTAL)
         inner_len = inner_wd;

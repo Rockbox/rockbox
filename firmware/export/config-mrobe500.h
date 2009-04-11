@@ -91,7 +91,7 @@
 /* remote LCD */
 #define HAVE_REMOTE_LCD
 #define LCD_REMOTE_WIDTH  79
-#define LCD_REMOTE_HEIGHT 64
+#define LCD_REMOTE_HEIGHT 16
 #define LCD_REMOTE_DEPTH  1
 
 /* Remote display colours, for screenshots and sim (0xRRGGBB) */
