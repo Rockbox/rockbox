@@ -82,7 +82,7 @@ endif # bootloader
 OBJ := $(SRC:.c=.o)
 OBJ := $(OBJ:.S=.o)
 OBJ += $(BMP:.bmp=.o)
-OBJ := $(subst $(ROOTDIR),$(BUILDDIR),$(OBJ))
+OBJ := $(subst $(ROOTDIR),$(BUILDDIR),$(OBJ))     
 
 build: $(TOOLS) $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS) $(ARCHOSROM) $(RBINFO)
 
@@ -275,7 +275,7 @@ install:
 fullinstall:
 	@echo "Installing a full setup in your '$(PREFIX)' dir"
 	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
-	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\" $(INSTALL) -z "zip -r0"-r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 $(TARGET) $(BINARY)
+	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 $(TARGET) $(BINARY)
 
 help:
 	@echo "A few helpful make targets"
