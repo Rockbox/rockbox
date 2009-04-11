@@ -349,19 +349,12 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
     backlight_force_on(); /* backlight control in lib/helper.c */
 
-    rb->cpu_boost(false);
-    log_text("Main LCD Update unboosted");
+    log_text("Main LCD Update");
     time_main_update();
-    rb->cpu_boost(true);
-    log_text("Main LCD Update boosted");
-    time_main_update();
-    rb->cpu_boost(false);
-/*
 #ifdef HAVE_LCD_COLOR
     log_text("Main LCD YUV");
     time_main_yuv();
 #endif
-*/
 #if LCD_DEPTH < 4
     log_text("Greyscale library");
     time_greyscale();
