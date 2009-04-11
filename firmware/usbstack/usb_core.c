@@ -520,7 +520,8 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
                         break;
                     usb_core_ack_control(req);
                     break;
-                case USB_REQ_SET_CONFIGURATION:
+                }
+                case USB_REQ_SET_CONFIGURATION: {
                     logf("usb_core: SET_CONFIG");
                     usb_drv_cancel_all_transfers();
                     if (req->wValue) {
