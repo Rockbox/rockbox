@@ -70,7 +70,9 @@
 #define HAVE_SW_TONE_CONTROLS
 
 #endif /* !BOOTLOADER */
-/* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
+
+/* put the lcd frame buffer in IRAM */
+#define IRAM_LCDFRAMEBUFFER IBSS_ATTR
 
 #define CONFIG_KEYPAD SANSA_FUZE_PAD
 

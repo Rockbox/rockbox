@@ -1,4 +1,5 @@
 /* plugins common to all models */
+test_fps.c
 chessclock.c
 credits.c
 cube.c
