@@ -188,6 +188,7 @@ static struct md5sums sansasums[] = {
     { MODEL_FUZE, "1.01.11",   1, "cac8ffa03c599330ac02c4d41de66166" },
     { MODEL_FUZE, "1.01.15",   1, "df0e2c1612727f722c19a3c764cff7f2" },
     { MODEL_FUZE, "1.01.22",   1, "5aff5486fe8dd64239cc71eac470af98" },
+    { MODEL_FUZE, "1.02.26",   1, "7c632c479461c48c8833baed74eb5e4f" },
 
     { MODEL_C200V2, "3.02.05",   1, "b6378ebd720b0ade3fad4dc7ab61c1a5" },
 
