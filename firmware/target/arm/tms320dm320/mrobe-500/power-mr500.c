@@ -29,6 +29,7 @@
 #include "pcf50606.h"
 #include "backlight.h"
 #include "backlight-target.h"
+#include "lcd-remote-target.h"
 
 void power_init(void)
 {

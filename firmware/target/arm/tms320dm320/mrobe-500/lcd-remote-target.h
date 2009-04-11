@@ -35,8 +35,10 @@ void lcd_remote_off(void);
 void lcd_remote_update(void);
 void lcd_remote_update_rect(int, int, int, int);
 
+#ifndef SIMULATOR
 void _remote_backlight_on(void);
 void _remote_backlight_off(void);
+#endif
 
 extern bool remote_initialized;
 
