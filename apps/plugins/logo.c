@@ -122,10 +122,6 @@ const unsigned char rockbox16x7[] = {
 
 #elif CONFIG_KEYPAD == MROBE500_PAD
 #define LP_QUIT BUTTON_POWER
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_RC_DOWN
-#define LP_INC_Y BUTTON_RC_PLAY
 
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
 #define LP_QUIT BUTTON_BACK
@@ -191,7 +187,15 @@ const unsigned char rockbox16x7[] = {
 #define LP_R_INC_X BUTTON_RC_FF
 #define LP_R_DEC_Y BUTTON_RC_SOURCE
 #define LP_R_INC_Y BUTTON_RC_BITRATE
+
+#elif (CONFIG_REMOTE_KEYPAD==MROBE_REMOTE)
+#define LP_R_QUIT BUTTON_RC_HEART
+#define LP_R_DEC_X BUTTON_RC_REW
+#define LP_R_INC_X BUTTON_RC_FF
+#define LP_R_DEC_Y BUTTON_RC_DOWN
+#define LP_R_INC_Y BUTTON_RC_PLAY
 #endif
+
 #endif /* CONFIG_REMOTE_KEYPAD */
 
 #ifdef HAVE_TOUCHSCREEN

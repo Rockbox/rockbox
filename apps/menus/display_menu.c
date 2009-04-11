@@ -182,9 +182,11 @@ MENUITEM_SETTING(remote_contrast,
                     &global_settings.remote_contrast, NULL);
 MENUITEM_SETTING(remote_invert, 
                     &global_settings.remote_invert, NULL);
-                    
+   
+#ifdef HAVE_LCD_FLIP                    
 MENUITEM_SETTING(remote_flip_display, 
                     &global_settings.remote_flip_display, flipdisplay_callback);
+#endif
 
 #ifdef HAVE_REMOTE_LCD_TICKING
 static int ticking_callback(int action,const struct menu_item_ex *this_item)
@@ -212,7 +214,11 @@ MAKE_MENU(lcd_remote_settings, ID2P(LANG_LCD_REMOTE_MENU),
             &remote_backlight_on_button_hold,
 #endif
             &remote_caption_backlight, &remote_bl_filter_first_keypress,
-            &remote_contrast, &remote_invert, &remote_flip_display
+            &remote_contrast, &remote_invert
+            
+#ifdef HAVE_LCD_FLIP
+            ,&remote_flip_display
+#endif
 #ifdef HAVE_REMOTE_LCD_TICKING
             ,&remote_reduce_ticking
 #endif

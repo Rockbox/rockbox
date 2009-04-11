@@ -742,7 +742,11 @@ void settings_apply(bool read_disk)
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_set_contrast(global_settings.remote_contrast);
     lcd_remote_set_invert_display(global_settings.remote_invert);
+
+#ifdef HAVE_LCD_FLIP
     lcd_remote_set_flip(global_settings.remote_flip_display);
+#endif
+
     lcd_remote_scroll_speed(global_settings.remote_scroll_speed);
     lcd_remote_scroll_step(global_settings.remote_scroll_step);
     lcd_remote_scroll_delay(global_settings.remote_scroll_delay);

@@ -59,6 +59,15 @@ const struct button_mapping remote_directions[] =
     { PLA_DOWN_REPEAT,       BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_RC_LEFT|BUTTON_REPEAT,     BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RC_RIGHT|BUTTON_REPEAT,    BUTTON_NONE},
+#elif (CONFIG_REMOTE_KEYPAD == MROBE_REMOTE)
+    { PLA_UP,                BUTTON_RC_PLAY,                   BUTTON_NONE},
+    { PLA_DOWN,              BUTTON_RC_DOWN,                   BUTTON_NONE},
+    { PLA_LEFT,              BUTTON_RC_REW,                    BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_RC_FF,                     BUTTON_NONE},
+    { PLA_UP_REPEAT,         BUTTON_RC_PLAY|BUTTON_REPEAT,     BUTTON_NONE},
+    { PLA_DOWN_REPEAT,       BUTTON_RC_DOWN|BUTTON_REPEAT,     BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_RC_REW|BUTTON_REPEAT,      BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_RC_FF|BUTTON_REPEAT,       BUTTON_NONE},
 #else
     #error pluginlib_actions: Unsupported remote keypad
 #endif

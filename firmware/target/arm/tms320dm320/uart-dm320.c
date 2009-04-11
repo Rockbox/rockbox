@@ -123,7 +123,7 @@ void UART1(void)
             panicf("UART1 buffer overflow");
         else
         {
-            if(uart1_recieve_write==RECIEVE_RING_SIZE)
+            if(uart1_recieve_write>=RECIEVE_RING_SIZE)
                 uart1_recieve_write=0;
 
             uart1_recieve_buffer_ring[uart1_recieve_write] = IO_UART1_DTRR & 0xff;

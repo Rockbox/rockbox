@@ -128,12 +128,6 @@ inline bool button_hold(void)
     return false;
 }
 
-static void remote_heartbeat(void)
-{
-    char data[5] = {0x11, 0x30, 0x11^0x30, 0x11+0x30, '\0'};
-    uart1_puts(data, 5);
-}
-
 #define TOUCH_MARGIN 8
 char r_buffer[5];
 int r_button = BUTTON_NONE;
@@ -142,13 +136,14 @@ int button_read_device(int *data)
     int retval, calbuf;
     static int oldbutton = BUTTON_NONE;
     
+    static long last_touch = 0;
+    
     r_button=BUTTON_NONE;
     *data = 0;
 
     if (touch_available)
     {
         short x,y;
-        static long last_touch = 0;
         bool send_touch = false;
         tsc2100_read_values(&x,  &y, &last_z1, &last_z2);
         if (TIME_BEFORE(last_touch + HZ/5, current_tick))
@@ -175,7 +170,14 @@ int button_read_device(int *data)
         last_touch = current_tick;
         touch_available = false;
     }
-    remote_heartbeat();
+    else
+    {
+        /* Touch hasn't happened in a while, clear the bits */
+        if(last_touch+3>current_tick)
+        {
+            oldbutton&=(0xFF);
+        }
+    }
 
     if ((IO_GIO_BITSET0&0x01) == 0)
     {

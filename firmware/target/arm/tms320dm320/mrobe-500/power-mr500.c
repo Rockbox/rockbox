@@ -72,6 +72,7 @@ void power_off(void)
 {
     /* turn off backlight and wait for 1 second */
     _backlight_off();
+    lcd_remote_sleep();
     lcd_sleep();
     sleep(HZ);
     /* Hard shutdown */
