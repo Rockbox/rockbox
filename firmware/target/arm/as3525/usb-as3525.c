@@ -19,10 +19,12 @@
  *
  ****************************************************************************/
 
+#include <stdbool.h>
+#include "config.h"
 #include "usb.h"
+#include "usb-target.h"
 #include "power.h"
 #include "as3525.h"
-#include <stdbool.h>
 
 #if defined(SANSA_CLIP)
 #define USB_DETECT_PIN 6
