@@ -681,17 +681,19 @@ long gui_wps_show(void)
         if (wps_state.do_full_update || update)
         {
             FOR_NB_SCREENS(i)
+            {
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
                 if (lcd_active()
 #ifdef HAVE_REMOTE_LCD
                 /* currently, all remotes are readable without backlight
                  * so still update those */
-                            && (i == SCREEN_MAIN)
+                            || (i == SCREEN_REMOTE)
 #endif
                                                 )
 #endif
-            {
+                {
                     gui_wps_update(&gui_wps[i]);
+                }
             }
             wps_state.do_full_update = false;
             update = false;
