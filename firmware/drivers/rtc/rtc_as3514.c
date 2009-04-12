@@ -19,10 +19,17 @@
  *
  ****************************************************************************/
 #include <stdbool.h>
+#include "config.h"
 #include "rtc.h"
-#include "i2c-pp.h"
 #include "as3514.h"
 #include "ascodec.h"
+
+/* AMS Sansas start counting from Jan 1st 1970 instead of 1980 */
+#if (CONFIG_CPU==AS3525)
+#define SECS_ADJUST 315532800   /* seconds between 1970-1-1 and 1980-1-1 */
+#else
+#define SECS_ADJUST 0
+#endif
 
 #define MINUTE_SECONDS      60
 #define HOUR_SECONDS        3600
@@ -61,6 +68,7 @@ int rtc_read_datetime(unsigned char* buf)
         tmp[i] = ascodec_read(AS3514_RTC_0 + i);
     }
     seconds = tmp[0] + (tmp[1]<<8) + (tmp[2]<<16) + (tmp[3]<<24);
+    seconds -= SECS_ADJUST;
     
     /* Convert seconds since Jan-1-1980 to format compatible with
      * get_time() from firmware/common/timefuncs.c */
@@ -160,6 +168,7 @@ int rtc_write_datetime(unsigned char* buf)
             + (buf[4]-1)*DAY_SECONDS
             + month_days*DAY_SECONDS
             + year_days*DAY_SECONDS;
+    seconds += SECS_ADJUST;
 
     /* Send data to RTC */
     for (i=0;i<4;i++){
