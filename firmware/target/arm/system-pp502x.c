@@ -380,7 +380,7 @@ void system_init(void)
         DEV_EN         = 0xc2000124;
         DEV_EN2        = 0x00000000;
         CACHE_PRIORITY = 0x0000003f;
-        GPO32_VAL      = 0x00004000;
+        GPO32_VAL     &= 0x00004000;
         DEV_INIT1      = 0x00000000;
         DEV_INIT2      = 0x40000000;
 

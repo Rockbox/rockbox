@@ -57,6 +57,8 @@
 /* Time until the BCM is considered stalled and will be re-kicked.
  * Must be guaranteed to be >~ 20ms. */
 #define BCM_UPDATE_TIMEOUT (HZ/20)  
+/* An LCD update command done while the LCD is off needs >~ 200ms */
+#define BCM_LCDINIT_TIMEOUT (HZ/2)
 
 /* Addresses within BCM */
 #define BCMA_SRAM_BASE   0
@@ -92,7 +94,7 @@ enum lcd_status {
 };
 
 struct {
-    long update_timeout;
+    long update_timeout;  /* also used to ensure BCM stays off for >= 50 ms */
     enum lcd_status state;
     bool blocked;
 #if NUM_CORES > 1
@@ -100,11 +102,12 @@ struct {
 #endif
 #ifdef HAVE_LCD_SLEEP
     bool display_on;
+    bool waking;
+    struct wakeup initwakeup;
 #endif
 } lcd_state IBSS_ATTR;
 
 #ifdef HAVE_LCD_SLEEP
-static long bcm_off_wait;
 const fb_data *flash_vmcs_offset;
 unsigned flash_vmcs_length;
 /* This mutex exists because enabling the backlight by changing a setting
@@ -179,6 +182,12 @@ static inline unsigned bcm_read32(unsigned address)
     return BCM_DATA32;             /* read value */
 }
 
+static void continue_lcd_awake(void)
+{
+    lcd_state.waking = false;
+    wakeup_signal(&(lcd_state.initwakeup));
+}
+
 #ifndef BOOTLOADER
 static void lcd_tick(void)
 {
@@ -201,11 +210,15 @@ static void lcd_tick(void)
             BCM_CONTROL = 0x31;
             lcd_state.update_timeout = current_tick + BCM_UPDATE_TIMEOUT;
             lcd_state.state = LCD_UPDATING;
+            if (lcd_state.waking)
+                continue_lcd_awake();
         }
         else if ((lcd_state.state == LCD_UPDATING) && !bcm_is_busy)
         {
             /* Update finished properly and no new update pending. */
             lcd_state.state = LCD_IDLE;
+            if (lcd_state.waking)
+                continue_lcd_awake();
         }
     }
 #if NUM_CORES > 1
@@ -246,6 +259,8 @@ static void lcd_unblock_and_update(void)
         BCM_CONTROL = 0x31;
         lcd_state.update_timeout = current_tick + BCM_UPDATE_TIMEOUT;
         lcd_state.state = LCD_UPDATING;
+        if (lcd_state.waking)
+            continue_lcd_awake();
     }
     else
     {
@@ -309,10 +324,7 @@ void lcd_init_device(void)
     /* These port initializations are supposed to be done when initializing
        the BCM.  None of it is changed when shutting down the BCM.
      */
-    GPO32_ENABLE |= 0x4000;
-    /* GPO32_VAL & 0x8000 may supply power for BCM sleep state */
-    GPO32_ENABLE |= 0x8000;
-    GPO32_VAL &= ~0x8000;
+    GPO32_ENABLE |= 0xC000;
     GPIO_CLEAR_BITWISE(GPIOC_ENABLE, 0x80);  
     /* This pin is used for BCM interrupts */
     GPIOC_ENABLE |= 0x40;
@@ -326,7 +338,6 @@ void lcd_init_device(void)
     corelock_init(&lcd_state.cl);
 #endif
 #ifdef HAVE_LCD_SLEEP
-    lcd_state.display_on = true;    /* Code in flash turned it on */
     if (!flash_get_section(ROM_ID('v', 'm', 'c', 's'), 
                            (void **)(&flash_vmcs_offset), &flash_vmcs_length))
         /* BCM cannot be shut down because firmware wasn't found */
@@ -336,8 +347,27 @@ void lcd_init_device(void)
         flash_vmcs_length = ((flash_vmcs_length + 3) >> 1) & ~1;
     }
     mutex_init(&lcdstate_lock);
-#endif
+    wakeup_init(&(lcd_state.initwakeup));
+    lcd_state.waking = false;
+
+    if (GPO32_VAL & 0x4000) 
+    {
+        /* BCM is powered.  Assume it is initialized. */
+        lcd_state.display_on = true;
+        tick_add_task(&lcd_tick);
+    }
+    else 
+    {
+        /* BCM is not powered, so it needs to be initialized. 
+           This can only happen when loading Rockbox via ROLO.
+         */
+        lcd_state.update_timeout = current_tick;
+        lcd_state.display_on = false;
+        lcd_awake();
+    }
+#else /* !HAVE_LCD_SLEEP */
     tick_add_task(&lcd_tick);
+#endif 
 #endif /* !BOOTLOADER */
 }
 
@@ -495,9 +525,7 @@ void bcm_init(void)
 
     /* Power up BCM */
     GPO32_VAL |= 0x4000;
-
-    /* Changed from HZ/2 to speed up this function */
-    sleep(HZ/8); 
+    sleep(HZ/20); 
 
     /* Bootstrap stage 1 */
 
@@ -511,7 +539,10 @@ void bcm_init(void)
     */
 
     /* Bootstrap stage 2 */
-        
+
+    while (BCM_ALT_CONTROL & 0x80);
+    while (!(BCM_ALT_CONTROL & 0x40));
+
     for (i = 0; i < 8; i++) {
         BCM_CONTROL = bcm_bootstrapdata[i];
     }
@@ -520,19 +551,15 @@ void bcm_init(void)
         BCM_ALT_CONTROL = bcm_bootstrapdata[i];
     }
      
-    while ((BCM_RD_ADDR & 1) == 0 || (BCM_ALT_RD_ADDR & 1) == 0)
-        yield();
+    while ((BCM_RD_ADDR & 1) == 0 || (BCM_ALT_RD_ADDR & 1) == 0);
     
     (void)BCM_WR_ADDR;
     (void)BCM_ALT_WR_ADDR;
     
     /* Bootstrap stage 3: upload firmware */
     
-    while (BCM_ALT_CONTROL & 0x80)
-        yield();
-
-    while (!(BCM_ALT_CONTROL & 0x40))
-        yield();
+    while (BCM_ALT_CONTROL & 0x80);
+    while (!(BCM_ALT_CONTROL & 0x40));
 
     /* Upload firmware to BCM SRAM */
     bcm_write_addr(BCMA_SRAM_BASE);
@@ -541,8 +568,7 @@ void bcm_init(void)
     bcm_write32(BCMA_COMMAND,  0);
     bcm_write32(0x10000C00, 0xC0000000);
     
-    while (!(bcm_read32(0x10000C00) & 1))
-        yield();
+    while (!(bcm_read32(0x10000C00) & 1));
     
     bcm_write32(0x10000C00, 0);
     bcm_write32(0x10000400, 0xA5A50002);
@@ -558,23 +584,26 @@ void lcd_awake(void)
     mutex_lock(&lcdstate_lock);
     if (!lcd_state.display_on && flash_vmcs_length != 0)
     {
-        /* Ensure BCM has been off for 1/2 s at least */
-        while (!TIME_AFTER(current_tick, lcd_state.update_timeout))
-            yield();
+        /* Ensure BCM has been off for >= 50 ms */
+        long sleepwait = lcd_state.update_timeout + HZ/20 - current_tick;
+        if (sleepwait > 0 && sleepwait < HZ/20)
+            sleep(sleepwait);
 
         bcm_init();
 
-        /* Update LCD, but don't use lcd_update().  Instead, wait here
-           until the command completes so LCD isn't white when the 
-           backlight turns on
-         */
-        bcm_write_addr(BCMA_CMDPARAM);
-        lcd_write_data(&(lcd_framebuffer[0][0]), LCD_WIDTH * LCD_HEIGHT);
-        bcm_command(BCMCMD_LCD_UPDATE);
-
+        /* Start the first LCD update, which also initializes the LCD */
         lcd_state.state = LCD_INITIAL;
-        tick_add_task(&lcd_tick);
         lcd_state.display_on = true;
+        lcd_update();
+        lcd_state.update_timeout = current_tick + BCM_LCDINIT_TIMEOUT;
+
+        /* Wait for end of first LCD update, so LCD isn't white 
+           when the backlight turns on.
+         */
+        lcd_state.waking = true;
+        tick_add_task(&lcd_tick);
+        wakeup_wait(&(lcd_state.initwakeup), TIMEOUT_BLOCK);
+
         lcd_activation_call_hook();
     }
     mutex_unlock(&lcdstate_lock);
@@ -592,7 +621,9 @@ void lcd_sleep(void)
         
         tick_remove_task(&lcd_tick);
         bcm_powerdown();
-        bcm_off_wait = current_tick + HZ/2;
+
+        /* Remember time to ensure BCM stays off for >= 50 ms */
+        lcd_state.update_timeout = current_tick;
     }
     mutex_unlock(&lcdstate_lock);
 }
