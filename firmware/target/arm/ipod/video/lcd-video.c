@@ -182,11 +182,13 @@ static inline unsigned bcm_read32(unsigned address)
     return BCM_DATA32;             /* read value */
 }
 
+#ifdef HAVE_LCD_SLEEP
 static void continue_lcd_awake(void)
 {
     lcd_state.waking = false;
     wakeup_signal(&(lcd_state.initwakeup));
 }
+#endif
 
 #ifndef BOOTLOADER
 static void lcd_tick(void)
@@ -210,15 +212,19 @@ static void lcd_tick(void)
             BCM_CONTROL = 0x31;
             lcd_state.update_timeout = current_tick + BCM_UPDATE_TIMEOUT;
             lcd_state.state = LCD_UPDATING;
+#ifdef HAVE_LCD_SLEEP
             if (lcd_state.waking)
                 continue_lcd_awake();
+#endif
         }
         else if ((lcd_state.state == LCD_UPDATING) && !bcm_is_busy)
         {
             /* Update finished properly and no new update pending. */
             lcd_state.state = LCD_IDLE;
+#ifdef HAVE_LCD_SLEEP
             if (lcd_state.waking)
                 continue_lcd_awake();
+#endif
         }
     }
 #if NUM_CORES > 1
@@ -259,8 +265,10 @@ static void lcd_unblock_and_update(void)
         BCM_CONTROL = 0x31;
         lcd_state.update_timeout = current_tick + BCM_UPDATE_TIMEOUT;
         lcd_state.state = LCD_UPDATING;
+#ifdef HAVE_LCD_SLEEP
         if (lcd_state.waking)
             continue_lcd_awake();
+#endif
     }
     else
     {
