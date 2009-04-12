@@ -22,6 +22,20 @@ TOOLS = $(TOOLSDIR)/rdf2binary $(TOOLSDIR)/convbdf \
 	$(TOOLSDIR)/codepages $(TOOLSDIR)/scramble $(TOOLSDIR)/bmp2rb \
 	$(TOOLSDIR)/uclpack $(TOOLSDIR)/mktccboot $(TOOLSDIR)/mkboot
 
+
+ifeq (,$(PREFIX))
+ifdef SIMVER
+# for sims, set simdisk/ as default
+PREFIX = simdisk
+INSTALL = --install="$(PREFIX)"
+else
+# /dev/null as magic to tell it wasn't set, error out later in buildzip.pl
+INSTALL = --install=/dev/null
+endif
+else
+INSTALL = --install="$(PREFIX)"
+endif
+
 RBINFO = $(BUILDDIR)/rockbox-info.txt
 
 # list suffixes to be understood by $*
@@ -254,19 +268,15 @@ voice: voicetools features
 
 endif
 
-ifdef SIMVER
-
 install:
-	@echo "Installing your build in your 'simdisk' dir"
+	@echo "Installing your build in your '$(PREFIX)' dir"
 	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
-	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\" -s -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 0 $(TARGET) $(BINARY)
+	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 0 $(TARGET) $(BINARY)
 
 fullinstall:
-	@echo "Installing a full setup in your 'simdisk' dir"
+	@echo "Installing a full setup in your '$(PREFIX)' dir"
 	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
-	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\" -s -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 $(TARGET) $(BINARY)
-
-endif
+	$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 $(TARGET) $(BINARY)
 
 help:
 	@echo "A few helpful make targets"
@@ -292,8 +302,8 @@ help:
 	@echo "tools       - builds the tools only"
 	@echo "voice       - creates the voice clips (voice builds only)"
 	@echo "voicetools  - builds the voice tools only"
-	@echo "install     - installs your build (for simulator builds only, no fonts)"
-	@echo "fullinstall - installs your build (for simulator builds only, with fonts)"
+	@echo "install     - installs your build (at PREFIX, defaults to simdisk/ for simulators (no fonts))"
+	@echo "fullinstall - installs your build (like install, but with fonts)"
 	@echo "reconf      - rerun configure with the same selection"
 
 ### general compile rules:
@@ -320,4 +330,4 @@ Makefile: $(TOOLSDIR)/configure
 	$(SILENT)echo "*** tools/configure is newer than Makefile. You should run 'make reconf'."
 
 reconf:
-	$(SILENT)$(TOOLSDIR)/configure $(CONFIGURE_OPTIONS)
+	$(SILENT$)PREFIX=$(PREFIX) $(TOOLSDIR)/configure $(CONFIGURE_OPTIONS)
