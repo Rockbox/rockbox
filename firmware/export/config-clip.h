@@ -134,9 +134,9 @@
 /* define this if the flash memory uses the SecureDigital Memory Card protocol */
 #define CONFIG_STORAGE STORAGE_SD
 
-#define BATTERY_CAPACITY_DEFAULT 380    /* default battery capacity */
-#define BATTERY_CAPACITY_MIN 380        /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 380        /* max. capacity selectable */
+#define BATTERY_CAPACITY_DEFAULT 350    /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 350        /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 350        /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0          /* capacity increment */
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
