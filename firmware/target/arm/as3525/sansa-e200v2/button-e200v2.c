@@ -60,7 +60,7 @@ bool button_hold(void)
     return hold_button;
 }
 
-void clickwheel(unsigned int wheel_value)
+static void scrollwheel(short dbop_din)
 {
     static const unsigned char wheel_tbl[2][4] =
     {
@@ -75,6 +75,10 @@ void clickwheel(unsigned int wheel_value)
 
     /* did the wheel value change? */
     unsigned int btn = BUTTON_NONE;
+
+    unsigned wheel_value = dbop_din & (1<<13|1<<14);
+    wheel_value >>= 13;
+
     if (old_wheel_value == wheel_tbl[0][wheel_value])
         btn = BUTTON_SCROLL_FWD;
     else if (old_wheel_value == wheel_tbl[1][wheel_value])
@@ -178,7 +182,7 @@ void clickwheel(unsigned int wheel_value)
     old_wheel_value = wheel_value;
 }
 
-static short read_dbop(void)
+short button_read_dbop(void)
 {
     /*write a red pixel */
     if (!lcd_button_support())
@@ -186,7 +190,7 @@ static short read_dbop(void)
 
     /* Set up dbop for input */
     while (!(DBOP_STAT & (1<<10)));      /* Wait for fifo to empty */
-    DBOP_CTRL |= (1<<19);
+    DBOP_CTRL |= (1<<19);                /* Tri-state DBOP on read cycle */
     DBOP_CTRL &= ~(1<<16);               /* disable output (1:write enabled) */
     DBOP_TIMPOL_01 = 0xe167e167;         /* Set Timing & Polarity regs 0 & 1 */
     DBOP_TIMPOL_23 = 0xe167006e;         /* Set Timing & Polarity regs 2 & 3 */
@@ -200,8 +204,9 @@ static short read_dbop(void)
     DBOP_TIMPOL_01 = 0x6e167;            /* Set Timing & Polarity regs 0 & 1 */
     DBOP_TIMPOL_23 = 0xa167e06f;         /* Set Timing & Polarity regs 2 & 3 */
     DBOP_CTRL |= (1<<16);                /* Enable output (0:write disable)  */
-    DBOP_CTRL &= ~(1<<19);
+    DBOP_CTRL &= ~(1<<19);               /* Tri-state when no active write */
 
+    scrollwheel(_dbop_din);
     return _dbop_din;
 }
 
@@ -217,7 +222,7 @@ int button_read_device(void)
 {
     int btn = BUTTON_NONE;
     /* read buttons from dbop */
-    short dbop = read_dbop();
+    short dbop = button_read_dbop();
 
     /* hold button */
     if(dbop & (1<<12))
@@ -239,7 +244,6 @@ int button_read_device(void)
     /* handle wheel */
     int wheel_value = dbop & (1<<13|1<<14);
     wheel_value >>= 13;
-    clickwheel(wheel_value);
 
     /* Set afsel, so that we can read our buttons */
     GPIOC_AFSEL &= ~(1<<2|1<<3|1<<4|1<<5|1<<6);

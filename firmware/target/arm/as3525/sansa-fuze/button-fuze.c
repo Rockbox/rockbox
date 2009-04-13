@@ -49,7 +49,7 @@ void button_init_device(void)
 }
 
 #if !defined(BOOTLOADER) && defined(HAVE_SCROLLWHEEL)
-static void scrollwheel(short dbop)
+static void scrollwheel(short dbop_din)
 {
     /* current wheel values, parsed from dbop and the resulting button */
     unsigned        wheel_value     = 0;
@@ -76,7 +76,7 @@ static void scrollwheel(short dbop)
         { 2, 0, 3, 1 }, /* Clockwise rotation */
         { 1, 3, 0, 2 }, /* Counter-clockwise  */ 
     };
-    wheel_value = dbop & (1<<13|1<<14);
+    wheel_value = dbop_din & (1<<13|1<<14);
     wheel_value >>= 13;
 
     if (old_wheel_value == wheel_tbl[0][wheel_value])
@@ -90,7 +90,7 @@ static void scrollwheel(short dbop)
         {
             /* direction reversals nullify repeats */
             wheel_repeat        = btn;
-            repeat              = 0;
+            repeat  =  counter  = 0;
         }
         if (btn != BUTTON_NONE)
         {
@@ -139,7 +139,7 @@ static void button_delay(void)
     while(i--);
 }
 
-static short button_dbop(void)
+short button_read_dbop(void)
 {
     /* skip home and power reading if lcd_button_support was blocked,
      * since the dbop bit 15 is invalid then, and use the old value instead */
@@ -150,27 +150,24 @@ static short button_dbop(void)
         old_home_power = (_dbop_din & (1<<15|1<<8));
     }
 
-    /* Wait for fifo to empty */
-    while ((DBOP_STAT & (1<<10)) == 0);
-
-    DBOP_CTRL |= (1<<19);
-    DBOP_CTRL &= ~(1<<16); /* disable output */
-
-    DBOP_TIMPOL_01 = 0xe167e167;
-    DBOP_TIMPOL_23 = 0xe167006e;
+    /* Set up dbop for input */
+    while (!(DBOP_STAT & (1<<10)));      /* Wait for fifo to empty */
+    DBOP_CTRL |= (1<<19);                /* Tri-state DBOP on read cycle */
+    DBOP_CTRL &= ~(1<<16);               /* disable output (1:write enabled) */
+    DBOP_TIMPOL_01 = 0xe167e167;         /* Set Timing & Polarity regs 0 & 1 */
+    DBOP_TIMPOL_23 = 0xe167006e;         /* Set Timing & Polarity regs 2 & 3 */
 
     button_delay();
+    DBOP_CTRL |= (1<<15);                /* start read */
+    while (!(DBOP_STAT & (1<<16)));      /* wait for valid data */
 
-    DBOP_CTRL |= (1<<15); /* start read */
-    while((DBOP_STAT & (1<<16)) == 0); /* wait for valid data */
+    _dbop_din = DBOP_DIN;                /* Read dbop data*/
 
-    _dbop_din = DBOP_DIN; /* now read */
-
-    DBOP_TIMPOL_01 = 0x6e167;
-    DBOP_TIMPOL_23 = 0xa167e06f;
-
-    DBOP_CTRL |= (1<<16);
-    DBOP_CTRL &= ~(1<<19);
+    /* Reset dbop for output */
+    DBOP_TIMPOL_01 = 0x6e167;            /* Set Timing & Polarity regs 0 & 1 */
+    DBOP_TIMPOL_23 = 0xa167e06f;         /* Set Timing & Polarity regs 2 & 3 */
+    DBOP_CTRL |= (1<<16);                /* Enable output (0:write disable)  */
+    DBOP_CTRL &= ~(1<<19);               /* Tri-state when no active write */
 
     /* write back old values if blocked */
     if (old_home_power != -20)
@@ -178,6 +175,10 @@ static short button_dbop(void)
         _dbop_din |= old_home_power & 1<<15;
         _dbop_din &= 0xfeff|(old_home_power & 1<<8);
     }
+#if defined(HAVE_SCROLLWHEEL) && !defined(BOOTLOADER)
+    /* read wheel on bit 13 & 14, but sent to the button queue seperately */
+        scrollwheel(_dbop_din);
+#endif
     return _dbop_din;
 }
 
@@ -233,7 +234,7 @@ static int button_gpio(void)
 int button_read_device(void)
 {
     int btn = BUTTON_NONE;
-    short dbop = button_dbop();
+    short dbop = button_read_dbop();
     static unsigned power_counter = 0;
     /* hold button */
     if(dbop & (1<<12))
@@ -244,10 +245,6 @@ int button_read_device(void)
     else
     {
         hold_button = false;
-#if defined(HAVE_SCROLLWHEEL) && !defined(BOOTLOADER)
-    /* read wheel on bit 13 & 14, but sent to the button queue seperately */
-        scrollwheel(dbop);
-#endif
     /* read power on bit 8, but not if hold button was just released, since
      * you basically always hit power due to the slider mechanism after releasing
      * hold (wait ~1 sec) */

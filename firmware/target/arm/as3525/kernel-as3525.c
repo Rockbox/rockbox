@@ -24,18 +24,40 @@
 #include "panic.h"
 #include "timer-target.h"
 
+#ifdef HAVE_SCROLLWHEEL
+/* The scrollwheel is polled every 5 ms (the tick tasks only every 10) */
+extern void button_read_dbop(void);
+static volatile int poll_scrollwheel = 0;
+
+void INT_TIMER2(void)
+{
+    if (!poll_scrollwheel)
+        call_tick_tasks();  /* Run through the list of tick tasks */
+    else
+        button_read_dbop();
+
+    poll_scrollwheel ^= 1;
+    TIMER2_INTCLR = 0;  /* clear interrupt */
+}
+#else
 void INT_TIMER2(void)
 {
     call_tick_tasks();  /* Run through the list of tick tasks */
 
     TIMER2_INTCLR = 0;  /* clear interrupt */
 }
+#endif
 
 void tick_start(unsigned int interval_in_ms)
 {
     int phi = 0;                            /* prescaler bits */
     int prescale = 1;
     int cycles = TIMER_FREQ / 1000 * interval_in_ms;
+
+#ifdef HAVE_SCROLLWHEEL
+    /* let the timer interrupt twice as often for the scrollwheel polling */
+    cycles >>= 1;
+#endif
 
     while(cycles > 0x10000)
     {
