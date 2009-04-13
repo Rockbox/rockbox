@@ -8,7 +8,7 @@
  * $Id$
  *
  * LCD driver for iPod Video
- * 
+ *
  * Based on code from the ipodlinux project - http://ipodlinux.org/
  * Adapted for Rockbox in December 2005
  *
@@ -56,7 +56,7 @@
 
 /* Time until the BCM is considered stalled and will be re-kicked.
  * Must be guaranteed to be >~ 20ms. */
-#define BCM_UPDATE_TIMEOUT (HZ/20)  
+#define BCM_UPDATE_TIMEOUT (HZ/20)
 /* An LCD update command done while the LCD is off needs >~ 200ms */
 #define BCM_LCDINIT_TIMEOUT (HZ/2)
 
@@ -81,19 +81,21 @@
 #define BCMCMD_LCD_UPDATERECT BCM_CMD(5)
 #define BCMCMD_LCD_SLEEP      BCM_CMD(8)
 /* BCM_CMD(12) involved in shutdown */
-/* Macrovision analog copy prevention is on by default on TV output.  
-   Execute this command after enabling TV out to turn it off. 
+/* Macrovision analog copy prevention is on by default on TV output.
+   Execute this command after enabling TV out to turn it off.
  */
-#define BCMCMD_TV_MVOFF       BCM_CMD(14) 
+#define BCMCMD_TV_MVOFF       BCM_CMD(14)
 
-enum lcd_status {
+enum lcd_status
+{
     LCD_IDLE,
     LCD_INITIAL,
     LCD_NEED_UPDATE,
     LCD_UPDATING
 };
 
-struct {
+struct
+{
     long update_timeout;  /* also used to ensure BCM stays off for >= 50 ms */
     enum lcd_status state;
     bool blocked;
@@ -125,7 +127,7 @@ static struct mutex lcdstate_lock SHAREDBSS_ATTR;
    Based on part of FS#6721.  This may belong elsewhere.
    (BCM initialization uploads the vmcs section to the BCM.)
  */
-bool flash_get_section(const unsigned int imageid, 
+bool flash_get_section(const unsigned int imageid,
                        void **offset,
                        unsigned int *length)
 {
@@ -134,7 +136,8 @@ bool flash_get_section(const unsigned int imageid,
     unsigned long checksum;
 
     /* Find the image in the directory */
-    while (1) {
+    while (1)
+    {
         if (p[0] != ROM_ID('f','l','s','h'))
             return false;
         if (p[1] == imageid)
@@ -148,7 +151,8 @@ bool flash_get_section(const unsigned int imageid,
     /* Verify checksum.  Probably unnecessary, but it's fast. */
     checksum = 0;
     csend = (unsigned char *)(ROM_BASE + p[3] + p[4]);
-    for(csp = (unsigned char *)(ROM_BASE + p[3]); csp < csend; csp++) {
+    for(csp = (unsigned char *)(ROM_BASE + p[3]); csp < csend; csp++)
+    {
         checksum += *csp;
     }
 
@@ -202,8 +206,8 @@ static void lcd_tick(void)
     {
         unsigned data = bcm_read32(BCMA_COMMAND);
         bool bcm_is_busy = (data == BCMCMD_LCD_UPDATE || data == 0xFFFF);
-        
-        if (((lcd_state.state == LCD_NEED_UPDATE) && !bcm_is_busy) 
+
+        if (((lcd_state.state == LCD_NEED_UPDATE) && !bcm_is_busy)
             /* Update requested and BCM is no longer busy. */
          || (TIME_AFTER(current_tick, lcd_state.update_timeout) && bcm_is_busy))
             /* BCM still busy after timeout, i.e. stalled. */
@@ -257,7 +261,7 @@ static void lcd_unblock_and_update(void)
 #endif
     data = bcm_read32(BCMA_COMMAND);
     bcm_is_busy = (data == BCMCMD_LCD_UPDATE || data == 0xFFFF);
-    
+
     if (!bcm_is_busy || (lcd_state.state == LCD_INITIAL) ||
         TIME_AFTER(current_tick, lcd_state.update_timeout))
     {
@@ -275,7 +279,7 @@ static void lcd_unblock_and_update(void)
          lcd_state.state = LCD_NEED_UPDATE; /* Post update request */
     }
     lcd_state.blocked = false;
-    
+
 #if NUM_CORES > 1
     corelock_unlock(&lcd_state.cl);
 #endif
@@ -289,7 +293,7 @@ static void lcd_unblock_and_update(void)
 static void lcd_unblock_and_update(void)
 {
     unsigned data;
-    
+
     if (lcd_state.state != LCD_INITIAL)
     {
         data = bcm_read32(BCMA_COMMAND);
@@ -333,7 +337,7 @@ void lcd_init_device(void)
        the BCM.  None of it is changed when shutting down the BCM.
      */
     GPO32_ENABLE |= 0xC000;
-    GPIO_CLEAR_BITWISE(GPIOC_ENABLE, 0x80);  
+    GPIO_CLEAR_BITWISE(GPIOC_ENABLE, 0x80);
     /* This pin is used for BCM interrupts */
     GPIOC_ENABLE |= 0x40;
     GPIOC_OUTPUT_EN &= ~0x40;
@@ -346,11 +350,12 @@ void lcd_init_device(void)
     corelock_init(&lcd_state.cl);
 #endif
 #ifdef HAVE_LCD_SLEEP
-    if (!flash_get_section(ROM_ID('v', 'm', 'c', 's'), 
+    if (!flash_get_section(ROM_ID('v', 'm', 'c', 's'),
                            (void **)(&flash_vmcs_offset), &flash_vmcs_length))
         /* BCM cannot be shut down because firmware wasn't found */
         flash_vmcs_length = 0;
-    else {
+    else
+    {
         /* lcd_write_data needs an even number of 16 bit values */
         flash_vmcs_length = ((flash_vmcs_length + 3) >> 1) & ~1;
     }
@@ -358,15 +363,15 @@ void lcd_init_device(void)
     wakeup_init(&(lcd_state.initwakeup));
     lcd_state.waking = false;
 
-    if (GPO32_VAL & 0x4000) 
+    if (GPO32_VAL & 0x4000)
     {
         /* BCM is powered.  Assume it is initialized. */
         lcd_state.display_on = true;
         tick_add_task(&lcd_tick);
     }
-    else 
+    else
     {
-        /* BCM is not powered, so it needs to be initialized. 
+        /* BCM is not powered, so it needs to be initialized.
            This can only happen when loading Rockbox via ROLO.
          */
         lcd_state.update_timeout = current_tick;
@@ -375,7 +380,7 @@ void lcd_init_device(void)
     }
 #else /* !HAVE_LCD_SLEEP */
     tick_add_task(&lcd_tick);
-#endif 
+#endif
 #endif /* !BOOTLOADER */
 }
 
@@ -396,7 +401,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         width = LCD_WIDTH - x;
     if (y + height >= LCD_HEIGHT)
         height = LCD_HEIGHT - y;
-        
+
     if ((width <= 0) || (height <= 0))
         return; /* Nothing left to do. */
 
@@ -404,7 +409,7 @@ void lcd_update_rect(int x, int y, int width, int height)
      * writes and would just ignore them. */
     width = (width + (x & 1) + 1) & ~1;
     x &= ~1;
-    
+
     /* Prevent the tick from triggering BCM updates while we're writing. */
     lcd_block_tick();
 
@@ -442,7 +447,7 @@ extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
                                    unsigned bcmaddr,
                                    int width,
                                    int stride);
-                  
+
 /* Performance function to blit a YUV bitmap directly to the LCD */
 void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
@@ -478,24 +483,26 @@ void lcd_blit_yuv(unsigned char * const src[3],
         yuv_src[0] += stride << 1;
         yuv_src[1] += stride >> 1; /* Skip down one chroma line */
         yuv_src[2] += stride >> 1;
-    } 
+    }
     while (--height > 0);
-    
+
     lcd_unblock_and_update();
 }
 
 #ifdef HAVE_LCD_SLEEP
-/* Executes a BCM command immediately and waits for it to complete. 
+/* Executes a BCM command immediately and waits for it to complete.
    Other BCM commands (eg. LCD updates or lcd_tick) must not interfere.
  */
-static void bcm_command(unsigned cmd) {
+static void bcm_command(unsigned cmd)
+{
     unsigned status;
-    
+
     bcm_write32(BCMA_COMMAND,  cmd);
 
     BCM_CONTROL = 0x31;
 
-    while (1) {
+    while (1)
+    {
         status = bcm_read32(BCMA_COMMAND);
         if (status != cmd && status != 0xFFFF)
             break;
@@ -507,7 +514,7 @@ void bcm_powerdown(void)
 {
     bcm_write32(0x10001400, bcm_read32(0x10001400) & ~0xF0);
 
-    /* Blanks the LCD and decreases power consumption 
+    /* Blanks the LCD and decreases power consumption
        below what clearing the LCD would achieve.
        Executing an LCD update command wakes it.
      */
@@ -523,17 +530,18 @@ void bcm_powerdown(void)
 }
 
 /* Data written to BCM_CONTROL and BCM_ALT_CONTROL */
-const unsigned char bcm_bootstrapdata[] = {
+const unsigned char bcm_bootstrapdata[] =
+{
     0xA1, 0x81, 0x91, 0x02, 0x12, 0x22, 0x72, 0x62
 };
 
-void bcm_init(void) 
+void bcm_init(void)
 {
     int i;
 
     /* Power up BCM */
     GPO32_VAL |= 0x4000;
-    sleep(HZ/20); 
+    sleep(HZ/20);
 
     /* Bootstrap stage 1 */
 
@@ -543,7 +551,7 @@ void bcm_init(void)
     /* Interrupt-related code for future use
        GPIOC_INT_LEV |= 0x40;
        GPIOC_INT_EN |= 0x40;
-       CPU_HI_INT_EN |= 0x40000; 
+       CPU_HI_INT_EN |= 0x40000;
     */
 
     /* Bootstrap stage 2 */
@@ -551,21 +559,23 @@ void bcm_init(void)
     while (BCM_ALT_CONTROL & 0x80);
     while (!(BCM_ALT_CONTROL & 0x40));
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < 8; i++)
+    {
         BCM_CONTROL = bcm_bootstrapdata[i];
     }
 
-    for (i = 3; i < 8; i++) {
+    for (i = 3; i < 8; i++)
+    {
         BCM_ALT_CONTROL = bcm_bootstrapdata[i];
     }
-     
+
     while ((BCM_RD_ADDR & 1) == 0 || (BCM_ALT_RD_ADDR & 1) == 0);
-    
+
     (void)BCM_WR_ADDR;
     (void)BCM_ALT_WR_ADDR;
-    
+
     /* Bootstrap stage 3: upload firmware */
-    
+
     while (BCM_ALT_CONTROL & 0x80);
     while (!(BCM_ALT_CONTROL & 0x40));
 
@@ -575,12 +585,12 @@ void bcm_init(void)
 
     bcm_write32(BCMA_COMMAND,  0);
     bcm_write32(0x10000C00, 0xC0000000);
-    
+
     while (!(bcm_read32(0x10000C00) & 1));
-    
+
     bcm_write32(0x10000C00, 0);
     bcm_write32(0x10000400, 0xA5A50002);
-    
+
     while (bcm_read32(BCMA_COMMAND) == 0)
         yield();
 
@@ -605,7 +615,7 @@ void lcd_awake(void)
         lcd_update();
         lcd_state.update_timeout = current_tick + BCM_LCDINIT_TIMEOUT;
 
-        /* Wait for end of first LCD update, so LCD isn't white 
+        /* Wait for end of first LCD update, so LCD isn't white
            when the backlight turns on.
          */
         lcd_state.waking = true;
@@ -617,16 +627,17 @@ void lcd_awake(void)
     mutex_unlock(&lcdstate_lock);
 }
 
-void lcd_sleep(void) 
+void lcd_sleep(void)
 {
     mutex_lock(&lcdstate_lock);
-    if (lcd_state.display_on && flash_vmcs_length != 0) {
+    if (lcd_state.display_on && flash_vmcs_length != 0)
+    {
         lcd_state.display_on = false;
-        
+
         /* Wait for BCM to finish work */
         while (lcd_state.state != LCD_INITIAL && lcd_state.state != LCD_IDLE)
             yield();
-        
+
         tick_remove_task(&lcd_tick);
         bcm_powerdown();
 
@@ -642,7 +653,7 @@ bool lcd_active(void)
 }
 
 #ifdef HAVE_LCD_SHUTDOWN
-void lcd_shutdown(void) 
+void lcd_shutdown(void)
 {
     lcd_sleep();
 }
