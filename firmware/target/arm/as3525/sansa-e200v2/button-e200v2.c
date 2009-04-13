@@ -26,28 +26,15 @@
 #include "backlight.h"
 #include "powermgmt.h"
 
-#define WHEEL_REPEAT_INTERVAL   300000
-#define WHEEL_FAST_ON_INTERVAL   20000
-#define WHEEL_FAST_OFF_INTERVAL  60000
-#define WHEELCLICKS_PER_ROTATION    48 /* wheelclicks per full rotation */
 
-static short _dbop_din;
-/* Clickwheel */
-static unsigned int  old_wheel_value   = 0;
-static unsigned int  wheel_repeat      = BUTTON_NONE;
-static unsigned int  wheel_click_count = 0;
-static unsigned int  wheel_delta       = 0;
-static          int  wheel_fast_mode   = 0;
-static unsigned long last_wheel_usec   = 0;
-static unsigned long wheel_velocity    = 0;
-static          long last_wheel_post   = 0;
-static          long next_backlight_on = 0;
-/* Buttons */
 static bool hold_button     = false;
 #ifndef BOOTLOADER
 static bool hold_button_old = false;
 #endif
+static short _dbop_din      = 0;
 
+#define WHEEL_REPEAT_INTERVAL   (HZ/5)
+/* in the lcd driver */
 extern bool lcd_button_support(void);
 
 void button_init_device(void)
@@ -60,23 +47,38 @@ bool button_hold(void)
     return hold_button;
 }
 
+#if !defined(BOOTLOADER) && defined(HAVE_SCROLLWHEEL)
 static void scrollwheel(short dbop_din)
 {
-    static const unsigned char wheel_tbl[2][4] =
-    {
-     { 2, 0, 3, 1 }, /* Clockwise rotation */
-     { 1, 3, 0, 2 }, /* Counter-clockwise  */
-    };
-   /* Read wheel
+    /* current wheel values, parsed from dbop and the resulting button */
+    unsigned        wheel_value     = 0;
+    unsigned        btn             = BUTTON_NONE;
+    /* old wheel values */
+    static unsigned old_wheel_value = 0;
+    static unsigned wheel_repeat    = BUTTON_NONE;
+
+    /* getting BUTTON_REPEAT works like this: Remember when the btn value was
+     * posted to the button_queue last, and if it was recent enough, generate
+     * BUTTON_REPEAT
+     */
+    static long last_wheel_post     = 0;
+    /* Repeat is used for the scrollwheel acceleration. If high enough then
+     * jump over some items */
+    static unsigned repeat          = 0;
+    /* we omit 1 of 2 posts to the button_queue, that works better, so count */
+    static int counter              = 0;
+    /* Read wheel 
      * Bits 13 and 14 of DBOP_DIN change as follows:
      * Clockwise rotation   00 -> 01 -> 11 -> 10 -> 00
      * Counter-clockwise    00 -> 10 -> 11 -> 01 -> 00
      */
-
-    /* did the wheel value change? */
-    unsigned int btn = BUTTON_NONE;
-
-    unsigned wheel_value = dbop_din & (1<<13|1<<14);
+    static const unsigned char wheel_tbl[2][4] =
+    {
+        { 2, 0, 3, 1 }, /* Clockwise rotation */
+        { 1, 3, 0, 2 }, /* Counter-clockwise  */ 
+    };
+    
+    wheel_value = dbop_din & (1<<13|1<<14);
     wheel_value >>= 13;
 
     if (old_wheel_value == wheel_tbl[0][wheel_value])
@@ -86,101 +88,47 @@ static void scrollwheel(short dbop_din)
 
     if (btn != BUTTON_NONE)
     {
-        int repeat = 1; /* assume repeat */
-        unsigned long usec = TIMER1_VALUE;
-        unsigned v = (usec - last_wheel_usec) & 0x7fffffff;
-
-        v = (v>0) ? 1000000 / v : 0;   /* clicks/sec = 1000000 * +clicks/usec */
-        v = (v>0xffffff) ? 0xffffff : v; /* limit to 24 bit */
-
-        /* some velocity filtering to smooth things out */
-        wheel_velocity = (7*wheel_velocity + v) / 8;
-
         if (btn != wheel_repeat)
         {
-            /* direction reversals nullify all fast mode states */
-            wheel_repeat      = btn;
-            repeat            =
-            wheel_fast_mode   =
-            wheel_velocity    =
-            wheel_click_count = 0;
+            /* direction reversals nullify repeats */
+            wheel_repeat        = btn;
+            repeat  =  counter  = 0;
         }
-
-        if (wheel_fast_mode != 0)
+        if (btn != BUTTON_NONE)
         {
-            /* fast OFF happens immediately when velocity drops below
-        threshold */
-            if (TIME_AFTER(usec,
-                    last_wheel_usec + WHEEL_FAST_OFF_INTERVAL))
+            /* wheel_delta will cause lists to jump over items,
+             * we want this for fast scrolling, but we must keep it accurate
+             * for slow scrolling */
+            int wheel_delta = 0;
+            /* generate repeats if quick enough, scroll slightly too*/
+            if (TIME_BEFORE(current_tick, last_wheel_post + WHEEL_REPEAT_INTERVAL))
             {
-                /* moving out of fast mode */
-                wheel_fast_mode = 0;
-                /* reset velocity */
-                wheel_velocity = 0;
-                /* wheel_delta is always 1 in slow mode */
-                wheel_delta = 1;
-            }
-        }
-        else
-        {
-            /* fast ON gets filtered to avoid inadvertent jumps to fast mode */
-            if (repeat && wheel_velocity > 1000000/WHEEL_FAST_ON_INTERVAL)
-            {
-                /* moving into fast mode */
-                wheel_fast_mode = 1 << 31;
-                wheel_click_count = 0;
-                wheel_velocity = 1000000/WHEEL_FAST_OFF_INTERVAL;
-            }
-            else if (++wheel_click_count < 2)
-            {
-                btn = BUTTON_NONE;
+                btn |= BUTTON_REPEAT;
+                wheel_delta = repeat>>2;
             }
 
-            /* wheel_delta is always 1 in slow mode */
-            wheel_delta = 1;
+            repeat += 2;
+
+            /* the wheel is more reliable if we don't send ever change,
+             * every 2th is basically one "physical click" is
+             * 1 item in the rockbox menus */
+            if (++counter >= 2 && queue_empty(&button_queue))
+            {
+                buttonlight_on();
+                backlight_on();
+                queue_post(&button_queue, btn, ((wheel_delta+1)<<24));
+                /* message posted - reset count & last post to the queue */
+                counter = 0;
+                last_wheel_post = current_tick;
+            }
         }
-
-        if (TIME_AFTER(current_tick, next_backlight_on) ||
-            v <= 4)
-        {
-            /* poke backlight to turn it on or maintain it no more often
-        than every 1/4 second*/
-            next_backlight_on = current_tick + HZ/4;
-            backlight_on();
-            buttonlight_on();
-            reset_poweroff_timer();
-        }
-
-         if (btn != BUTTON_NONE)
-         {
-             wheel_click_count = 0;
-
-             /* generate repeats if quick enough */
-             if (repeat && TIME_BEFORE(usec,
-                     last_wheel_post + WHEEL_REPEAT_INTERVAL))
-                 btn |= BUTTON_REPEAT;
-
-             last_wheel_post = usec;
-
-             if (queue_empty(&button_queue))
-             {
-                 queue_post(&button_queue, btn, wheel_fast_mode |
-                            (wheel_delta << 24) |
-                 wheel_velocity*360/WHEELCLICKS_PER_ROTATION);
-                 /* message posted - reset delta */
-                 wheel_delta = 1;
-             }
-             else
-             {
-                 /* skipped post - increment delta */
-                 if (++wheel_delta > 0x7f)
-                     wheel_delta = 0x7f;
-             }
-         }
-         last_wheel_usec = usec;
     }
+    if (repeat > 0)
+        repeat--;
+
     old_wheel_value = wheel_value;
 }
+#endif /* !defined(BOOTLOADER) && defined(HAVE_SCROLLWHEEL) */
 
 short button_read_dbop(void)
 {
@@ -205,8 +153,9 @@ short button_read_dbop(void)
     DBOP_TIMPOL_23 = 0xa167e06f;         /* Set Timing & Polarity regs 2 & 3 */
     DBOP_CTRL |= (1<<16);                /* Enable output (0:write disable)  */
     DBOP_CTRL &= ~(1<<19);               /* Tri-state when no active write */
-
+#if !defined(BOOTLOADER) && defined(HAVE_SCROLLWHEEL)
     scrollwheel(_dbop_din);
+#endif
     return _dbop_din;
 }
 
@@ -240,10 +189,6 @@ int button_read_device(void)
 
     if (!(dbop & (1<<15)))
     btn |= BUTTON_REC;
-
-    /* handle wheel */
-    int wheel_value = dbop & (1<<13|1<<14);
-    wheel_value >>= 13;
 
     /* Set afsel, so that we can read our buttons */
     GPIOC_AFSEL &= ~(1<<2|1<<3|1<<4|1<<5|1<<6);
