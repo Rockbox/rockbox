@@ -24,9 +24,9 @@ builddir="${RBDEV_BUILD:-/tmp/rbdev-build}"
 # by running the "make" command, on most BSD systems, GNU Make is invoked
 # by running the "gmake" command. Set the "make" variable accordingly.
 if [ -f "`which gmake 2>/dev/null`" ]; then
-    make="gmake"
+    make="gmake -r"
 else
-    make="make"
+    make="make -r"
 fi
 
 if [ -z $GNU_MIRROR ] ; then
