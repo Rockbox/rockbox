@@ -30,6 +30,7 @@
 bool button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
+short button_read_dbop(void);
 
 /* Sandisk Sansa E200 button codes */
 

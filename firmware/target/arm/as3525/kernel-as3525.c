@@ -25,8 +25,8 @@
 #include "timer-target.h"
 
 #ifdef HAVE_SCROLLWHEEL
+#include "button-target.h"
 /* The scrollwheel is polled every 5 ms (the tick tasks only every 10) */
-extern void button_read_dbop(void);
 static volatile int poll_scrollwheel = 0;
 
 void INT_TIMER2(void)
@@ -34,7 +34,10 @@ void INT_TIMER2(void)
     if (!poll_scrollwheel)
         call_tick_tasks();  /* Run through the list of tick tasks */
     else
-        button_read_dbop();
+    {
+        if (!button_hold())
+            button_read_dbop();
+    }
 
     poll_scrollwheel ^= 1;
     TIMER2_INTCLR = 0;  /* clear interrupt */

@@ -30,7 +30,7 @@
 void button_init_device(void);
 bool button_hold(void);
 int button_read_device(void);
-
+short button_read_dbop(void);
 /* Sandisk Sansa Fuze button codes */
 
 /* Main unit's buttons */

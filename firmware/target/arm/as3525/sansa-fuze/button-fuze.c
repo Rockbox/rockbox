@@ -56,7 +56,7 @@ static void scrollwheel(short dbop_din)
     unsigned        btn             = BUTTON_NONE;
     /* old wheel values */
     static unsigned old_wheel_value = 0;
-    static unsigned wheel_repeat    = BUTTON_NONE;
+    static unsigned old_btn         = BUTTON_NONE;
 
     /* getting BUTTON_REPEAT works like this: We increment repeat by 2 if the
      * wheel was turned, and decrement it by 1 each tick,
@@ -76,6 +76,13 @@ static void scrollwheel(short dbop_din)
         { 2, 0, 3, 1 }, /* Clockwise rotation */
         { 1, 3, 0, 2 }, /* Counter-clockwise  */ 
     };
+
+    if(hold_button)
+    {
+        repeat  =  counter  = 0;
+        return;
+    }
+
     wheel_value = dbop_din & (1<<13|1<<14);
     wheel_value >>= 13;
 
@@ -86,10 +93,10 @@ static void scrollwheel(short dbop_din)
 
     if (btn != BUTTON_NONE)
     {
-        if (btn != wheel_repeat)
+        if (btn != old_btn)
         {
             /* direction reversals nullify repeats */
-            wheel_repeat        = btn;
+            old_btn =  btn;
             repeat  =  counter  = 0;
         }
         if (btn != BUTTON_NONE)
