@@ -81,6 +81,50 @@ static void wps_state_init(void);
 static void track_changed_callback(void *param);
 static void nextid3available_callback(void* param);
 
+
+#if defined(HAVE_BACKLIGHT) || defined(HAVE_REMOTE_LCD)
+static void gwps_caption_backlight(struct wps_state *state)
+{
+    if (state && state->id3)
+    {
+#ifdef HAVE_BACKLIGHT
+        if (global_settings.caption_backlight)
+        {
+            /* turn on backlight n seconds before track ends, and turn it off n
+               seconds into the new track. n == backlight_timeout, or 5s */
+            int n = global_settings.backlight_timeout * 1000;
+
+            if ( n < 1000 )
+                n = 5000; /* use 5s if backlight is always on or off */
+
+            if (((state->id3->elapsed < 1000) ||
+                 ((state->id3->length - state->id3->elapsed) < (unsigned)n)) &&
+                (state->paused == false))
+                backlight_on();
+        }
+#endif
+#ifdef HAVE_REMOTE_LCD
+        if (global_settings.remote_caption_backlight)
+        {
+            /* turn on remote backlight n seconds before track ends, and turn it
+               off n seconds into the new track. n == remote_backlight_timeout,
+               or 5s */
+            int n = global_settings.remote_backlight_timeout * 1000;
+
+            if ( n < 1000 )
+                n = 5000; /* use 5s if backlight is always on or off */
+
+            if (((state->id3->elapsed < 1000) ||
+                 ((state->id3->length - state->id3->elapsed) < (unsigned)n)) &&
+                (state->paused == false))
+                remote_backlight_on();
+        }
+#endif
+    }
+}
+#endif
+
+
 static void change_dir(int direction)
 {
     if (global_settings.prevent_skip)
@@ -680,6 +724,9 @@ long gui_wps_show(void)
 
         if (wps_state.do_full_update || update)
         {
+#if defined(HAVE_BACKLIGHT) || defined(HAVE_REMOTE_LCD)
+            gwps_caption_backlight(&wps_state);
+#endif
             FOR_NB_SCREENS(i)
             {
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)

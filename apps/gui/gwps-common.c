@@ -40,7 +40,6 @@
 #endif
 #include "abrepeat.h"
 #include "mp3_playback.h"
-#include "backlight.h"
 #include "lang.h"
 #include "misc.h"
 #include "splash.h"
@@ -2058,38 +2057,5 @@ bool gui_wps_redraw(struct gui_wps *gwps,
 
     display->update();
 
-#ifdef HAVE_BACKLIGHT
-    if (global_settings.caption_backlight)
-    {
-        /* turn on backlight n seconds before track ends, and turn it off n
-           seconds into the new track. n == backlight_timeout, or 5s */
-        int n = global_settings.backlight_timeout * 1000;
-
-        if ( n < 1000 )
-            n = 5000; /* use 5s if backlight is always on or off */
-
-        if (((id3->elapsed < 1000) ||
-             ((id3->length - id3->elapsed) < (unsigned)n)) &&
-            (state->paused == false))
-            backlight_on();
-    }
-#endif
-#ifdef HAVE_REMOTE_LCD
-    if (global_settings.remote_caption_backlight)
-    {
-        /* turn on remote backlight n seconds before track ends, and turn it
-           off n seconds into the new track. n == remote_backlight_timeout,
-           or 5s */
-        int n = global_settings.remote_backlight_timeout * 1000;
-
-        if ( n < 1000 )
-            n = 5000; /* use 5s if backlight is always on or off */
-
-        if (((id3->elapsed < 1000) ||
-             ((id3->length - id3->elapsed) < (unsigned)n)) &&
-            (state->paused == false))
-            remote_backlight_on();
-    }
-#endif
     return true;
 }
