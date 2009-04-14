@@ -557,7 +557,6 @@ int audio_current_aa_hid(void)
 struct mp3entry* audio_current_track(void)
 {
     const char *filename;
-    static struct mp3entry temp_id3;
     struct playlist_track_info trackinfo;
     int cur_idx;
     int offset = ci.new_track + wps_offset;
@@ -580,15 +579,15 @@ struct mp3entry* audio_current_track(void)
     else if (tracks[cur_idx].id3_hid >= 0)
     {
         /* The current track's info has been buffered but not read yet, so get it */
-        if (bufread(tracks[cur_idx].id3_hid, sizeof(struct mp3entry), &temp_id3)
+        if (bufread(tracks[cur_idx].id3_hid, sizeof(struct mp3entry), thistrack_id3)
              == sizeof(struct mp3entry))
-            return &temp_id3;
+            return thistrack_id3;
     }
 
     /* We didn't find the ID3 metadata, so we fill temp_id3 with the little info
        we have and return that. */
 
-    memset(&temp_id3, 0, sizeof(struct mp3entry));
+    memset(thistrack_id3, 0, sizeof(struct mp3entry));
 
     playlist_get_track_info(NULL, playlist_next(0)+wps_offset, &trackinfo);
     filename = trackinfo.filename;
@@ -596,18 +595,18 @@ struct mp3entry* audio_current_track(void)
         filename = "No file!";
 
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-    if (tagcache_fill_tags(&temp_id3, filename))
-        return &temp_id3;
+    if (tagcache_fill_tags(thistrack_id3, filename))
+        return thistrack_id3;
 #endif
 
-    strncpy(temp_id3.path, filename, sizeof(temp_id3.path)-1);
-    temp_id3.title = strrchr(temp_id3.path, '/');
-    if (!temp_id3.title)
-        temp_id3.title = &temp_id3.path[0];
+    strncpy(thistrack_id3->path, filename, sizeof(thistrack_id3->path)-1);
+    thistrack_id3->title = strrchr(thistrack_id3->path, '/');
+    if (!thistrack_id3->title)
+        thistrack_id3->title = &thistrack_id3->path[0];
     else
-        temp_id3.title++;
+        thistrack_id3->title++;
 
-    return &temp_id3;
+    return thistrack_id3;
 }
 
 struct mp3entry* audio_next_track(void)
