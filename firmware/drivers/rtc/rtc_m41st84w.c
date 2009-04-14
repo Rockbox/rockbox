@@ -38,8 +38,6 @@ void rtc_init(void)
     rtc_check_alarm_started(false);
 #endif
 
-    rtc_write(0x13, 0x10); /* 32 kHz square wave */
-
     /* Clear the Stop bit if it is set */
     data = rtc_read(0x01);
     if(data & 0x80)

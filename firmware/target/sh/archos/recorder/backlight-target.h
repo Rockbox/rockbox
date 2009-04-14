@@ -28,14 +28,24 @@
 
 static inline void _backlight_on(void)
 {
-    /* Enable square wave */
-    rtc_write(0x0a, rtc_read(0x0a) | 0x40);
+    rtc_write(0x13, 0x10); /* 32 kHz square wave */
+    rtc_write(0x0a, rtc_read(0x0a) | 0x40); /* Enable square wave */
 }
 
 static inline void _backlight_off(void)
 {
-    /* Disable square wave */
-    rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
+    /* While on, backlight is flashing at 32 kHz.  If the square wave output
+       is disabled while the backlight is lit, it will become constantly lit,
+       (brighter) and slowly fade.  This resets the square wave counter and
+       results in the unlit state */
+    unsigned char rtc_0a = rtc_read(0x0a) & ~0x40;
+    rtc_write(0x0a, rtc_0a);        /* Disable square wave */
+    rtc_write(0x13, 0xF0);          /* 1 Hz square wave */
+    rtc_write(0x0a, rtc_0a | 0x40); /* Enable square wave */
+
+    /* When the square wave output is disabled in the unlit state,
+       the backlight stays off */
+    rtc_write(0x0a, rtc_0a);
 }
 
 #endif
