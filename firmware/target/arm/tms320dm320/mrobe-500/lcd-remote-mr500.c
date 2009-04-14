@@ -33,17 +33,22 @@ static enum remote_control_states
     REMOTE_CONTROL_NOP,
     REMOTE_CONTROL_POWER,
     REMOTE_CONTROL_MASK,
-    REMOTE_CONTROL_DRAW1,
-    REMOTE_CONTROL_DRAW_PAUSE1,
-    REMOTE_CONTROL_DRAW2,
-    REMOTE_CONTROL_DRAW_PAUSE2,
+    REMOTE_CONTROL_DRAW,
     REMOTE_CONTROL_SLEEP
-} remote_state_control = REMOTE_CONTROL_NOP;
+} remote_state_control = REMOTE_CONTROL_NOP, remote_state_control_next;
+
+static enum remote_draw_states
+{
+    DRAW_TOP,
+    DRAW_BOTTOM,
+    DRAW_PAUSE,
+} remote_state_draw = DRAW_TOP, remote_state_draw_next;
 
 bool remote_initialized=true;
 
 unsigned char remote_contrast=DEFAULT_REMOTE_CONTRAST_SETTING;
 unsigned char remote_power=0x00;
+unsigned char remote_mask=0x00;
 
 /*** hardware configuration ***/
 
@@ -54,7 +59,7 @@ int lcd_remote_default_contrast(void)
 
 void lcd_remote_sleep(void)
 {
-    remote_state_control=REMOTE_CONTROL_SLEEP;
+    remote_state_control_next=REMOTE_CONTROL_SLEEP;
 }
 
 void lcd_remote_powersave(bool on)
@@ -62,28 +67,22 @@ void lcd_remote_powersave(bool on)
     if(on)
     {
         remote_power|=0xC0;
-        remote_state_control=REMOTE_CONTROL_POWER;
+        remote_state_control_next=REMOTE_CONTROL_POWER;
     }
     else
     {
         remote_power&=~(0xC0);
-        remote_state_control=REMOTE_CONTROL_POWER;
+        remote_state_control_next=REMOTE_CONTROL_POWER;
     }
 }
 
 void lcd_remote_set_contrast(int val)
 {
     remote_contrast=(char)val;
-    remote_state_control=REMOTE_CONTROL_POWER;
+    remote_state_control_next=REMOTE_CONTROL_POWER;
 }
 
 void lcd_remote_set_invert_display(bool yesno)
-{
-    (void)yesno;
-}
-
-/* turn the display upside down (call lcd_remote_update() afterwards) */
-void lcd_remote_set_flip(bool yesno)
 {
     (void)yesno;
 }
@@ -96,32 +95,41 @@ bool remote_detect(void)
 void lcd_remote_on(void)
 {
     remote_power|=0x80;
-    remote_state_control=REMOTE_CONTROL_POWER;
+    remote_state_control_next=REMOTE_CONTROL_POWER;
 }
 
 void lcd_remote_off(void)
 {
     remote_power&=~(0x80);
-    remote_state_control=REMOTE_CONTROL_POWER;
+    remote_state_control_next=REMOTE_CONTROL_POWER;
 }
 
-unsigned char lcd_remote_test[16]=
-    {0x80,0xFF,0x80,0x00,0xFF,0x89,0x89,0x00,0xC1,0x89,0x8F,0x80,0xFF,0x80,0,0};
+/* This is the maximum transfer size to the remote (op 0x51= 7 bytes setup+79 
+ *  bytes screen data+xor+sum 
+ */
+unsigned char remote_payload[88];
+unsigned char remote_payload_size;
+bool remote_repeat_draw=false;
+
+unsigned char   remote_draw_x, remote_draw_y, 
+                remote_draw_width, remote_draw_height;
 
 /* Monitor remote hotswap */
 static void remote_tick(void)
 {
     unsigned char i;
-    unsigned char remote_payload[10], remote_payload_size;
-    unsigned char remote_check_xor, remote_check_sum;
+    static unsigned char pause_length=0;
+    
+    if(remote_state_control!=REMOTE_CONTROL_DRAW)
+        remote_state_control=remote_state_control_next;
     
     switch (remote_state_control)
     {
         case REMOTE_CONTROL_IDLE:
-            
             remote_payload_size=0;
             remote_state_control=REMOTE_CONTROL_IDLE;
             break;
+            
         case REMOTE_CONTROL_NOP:
             remote_payload[0]=0x11;
             remote_payload[1]=0x30;
@@ -129,6 +137,7 @@ static void remote_tick(void)
             remote_payload_size=2;
             remote_state_control=REMOTE_CONTROL_NOP;
             break;
+            
         case REMOTE_CONTROL_POWER:
             remote_payload[0]=0x31;
             remote_payload[1]=remote_power;
@@ -137,51 +146,65 @@ static void remote_tick(void)
             remote_payload_size=3;
             remote_state_control=REMOTE_CONTROL_NOP;
             break;
+            
         case REMOTE_CONTROL_MASK:
             remote_payload[0]=0x41;
-            remote_payload[1]=0x94;
+            remote_payload[1]=remote_mask;
             
             remote_payload_size=2;
             remote_state_control=REMOTE_CONTROL_NOP;
             break;
-        case REMOTE_CONTROL_DRAW1:
+            
+        case REMOTE_CONTROL_DRAW:
             remote_payload[0]=0x51;
             remote_payload[1]=0x80;
-            remote_payload[2]=14;
-            remote_payload[3]=0;
-            remote_payload[4]=0;
-            remote_payload[5]=14;
-            remote_payload[6]=8;
+            remote_payload[2]=remote_draw_width;
+            remote_payload[3]=remote_draw_x;
             
-            remote_payload_size=7;
-            remote_state_control=REMOTE_CONTROL_DRAW_PAUSE1;
-            break;
-        case REMOTE_CONTROL_DRAW_PAUSE1:
-            remote_payload[0]=0x11;
-            remote_payload[1]=0x30;
+            remote_payload[5]=remote_draw_x+remote_draw_width;
+            remote_payload_size=7+remote_payload[2];
             
-            remote_payload_size=2;
-            remote_state_control=REMOTE_CONTROL_DRAW2;
+            switch (remote_state_draw)
+            {
+                case DRAW_TOP:
+                    remote_payload[4]=0;
+                    remote_payload[6]=8;
+                    
+                    pause_length=6;
+                    remote_state_draw_next=DRAW_BOTTOM;
+                    remote_state_draw=DRAW_PAUSE;
+                    break;
+                    
+                case DRAW_BOTTOM:
+                    remote_payload[4]=8;
+                    remote_payload[6]=16;
+                    
+                    pause_length=6;
+                    remote_state_draw_next=DRAW_TOP;
+                    remote_state_draw=DRAW_PAUSE;
+                    break;
+                    
+                case DRAW_PAUSE:
+                    remote_payload_size=0;
+                    
+                    if(--pause_length==0)
+                    {
+                        if(remote_state_draw_next==DRAW_TOP)
+                            remote_state_control=REMOTE_CONTROL_NOP;
+                            
+                        remote_state_draw=remote_state_draw_next;
+                    }
+                    else
+                        remote_state_draw=DRAW_PAUSE;
+
+                    break;
+                    
+                default:
+                    remote_payload_size=0;
+                    break;
+            }
             break;
-        case REMOTE_CONTROL_DRAW2:
-            remote_payload[0]=0x51;
-            remote_payload[1]=0x80;
-            remote_payload[2]=14;
-            remote_payload[3]=0;
-            remote_payload[4]=8;
-            remote_payload[5]=14;
-            remote_payload[6]=16; 
             
-            remote_payload_size=7;
-            remote_state_control=REMOTE_CONTROL_DRAW_PAUSE2;
-            break;
-        case REMOTE_CONTROL_DRAW_PAUSE2:
-            remote_payload[0]=0x11;
-            remote_payload[1]=0x30;
-            
-            remote_payload_size=2;
-            remote_state_control=REMOTE_CONTROL_NOP;
-            break;
         case REMOTE_CONTROL_SLEEP:
             remote_payload[0]=0x71;
             remote_payload[1]=0x30;
@@ -189,6 +212,7 @@ static void remote_tick(void)
             remote_payload_size=2;
             remote_state_control=REMOTE_CONTROL_IDLE;
             break;
+            
         default:
             remote_payload_size=0;
             break;
@@ -199,46 +223,25 @@ static void remote_tick(void)
         return;
     }
     
-    remote_check_xor=remote_payload[0];
-    remote_check_sum=remote_payload[0];
-    for(i=1; i<remote_payload_size; i++)
-    {
-        remote_check_xor^=remote_payload[i];
-        remote_check_sum+=remote_payload[i];
-    }
-    
     if(remote_payload[0]==0x51)
     {
-        unsigned char offset;
-        unsigned char x;
-        
-        if(remote_payload[4]==8)
+        for(i=7; i<remote_payload_size; i++)
         {
-            offset=79;
+            remote_payload[i]=
+                lcd_remote_framebuffer[remote_payload[4]>>3][i+remote_draw_x-7];
         }
-        else
-        {
-            offset=0;
-        }
-    
-        for (x = 0; x < 14; x++)
-        {
-            remote_check_xor^=lcd_remote_test[x];
-            remote_check_sum+=lcd_remote_test[x];
-        }
-
-        uart1_puts(remote_payload, remote_payload_size);
-        lcd_remote_test[14]=remote_check_xor;
-        lcd_remote_test[15]=remote_check_sum;
-        uart1_puts(lcd_remote_test, 16);
     }
-    else
+    
+    /* Calculate the xor and sum to place in the payload */
+    remote_payload[remote_payload_size]=remote_payload[0];
+    remote_payload[remote_payload_size+1]=remote_payload[0];
+    for(i=1; i<remote_payload_size; i++)
     {
-        remote_payload[remote_payload_size]=remote_check_xor;
-        remote_payload[remote_payload_size+1]=remote_check_sum;
-    
-        uart1_puts(remote_payload, remote_payload_size+2);
+        remote_payload[remote_payload_size]^=remote_payload[i];
+        remote_payload[remote_payload_size+1]+=remote_payload[i];
     }
+
+    uart1_puts(remote_payload, remote_payload_size+2);
 }
 
 void lcd_remote_init_device(void)
@@ -246,6 +249,8 @@ void lcd_remote_init_device(void)
     lcd_remote_clear_display();
     if (remote_detect())
         lcd_remote_on();
+
+    lcd_remote_update();
 
     /* put the remote control in the tick task */
     tick_add_task(remote_tick);
@@ -255,33 +260,28 @@ void lcd_remote_init_device(void)
    This must be called after all other LCD functions that change the display. */
 void lcd_remote_update(void)
 {
-    if(remote_state_control!=REMOTE_CONTROL_DRAW1
-        && remote_state_control!=REMOTE_CONTROL_DRAW_PAUSE1
-        && remote_state_control!=REMOTE_CONTROL_DRAW2
-        && remote_state_control!=REMOTE_CONTROL_DRAW_PAUSE2)
-    {
-        remote_state_control=REMOTE_CONTROL_DRAW1;
-    }
+    lcd_remote_update_rect(0, 0, LCD_REMOTE_WIDTH, LCD_REMOTE_HEIGHT);
 }
 
 /* Update a fraction of the display. */
 void lcd_remote_update_rect(int x, int y, int width, int height)
 {
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
-    lcd_remote_update();
+    remote_draw_x=x;
+    remote_draw_y=y;
+    remote_draw_width=width;
+    remote_draw_height=height;
+    
+    remote_state_control=REMOTE_CONTROL_DRAW;
 }
 
 void _remote_backlight_on(void)
 {
     remote_power|=0x40;
-    remote_state_control=REMOTE_CONTROL_POWER;
+    remote_state_control_next=REMOTE_CONTROL_POWER;
 }
 
 void _remote_backlight_off(void)
 {
     remote_power&=~(0x40);
-    remote_state_control=REMOTE_CONTROL_POWER;
+    remote_state_control_next=REMOTE_CONTROL_POWER;
 }

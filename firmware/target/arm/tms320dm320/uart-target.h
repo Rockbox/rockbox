@@ -23,10 +23,10 @@
 void uart_init(void);
 bool uart1_available(void);
 
-int uart1_gets_queue(char *, unsigned int);
+int uart1_gets_queue(char *, int);
 void uart1_puts(const char *str, int size);
-void uart1_gets(char *str, unsigned int size);
+void uart1_gets(char *str, int size);
 void uart1_putc(char ch);
 
-
+void uart1_clear_queue(void);
 #endif

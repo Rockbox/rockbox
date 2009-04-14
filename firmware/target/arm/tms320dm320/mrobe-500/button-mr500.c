@@ -186,27 +186,26 @@ int button_read_device(int *data)
     }
 
     retval=uart1_gets_queue(r_buffer, 5);
-    do
+    
+    for(calbuf=0;calbuf<4;calbuf++)
     {
-        for(calbuf=0;calbuf<4;calbuf++)
-        {
-            if((r_buffer[calbuf]&0xF0)==0xF0 && (r_buffer[calbuf+1]&0xF0)!=0xF0)
-                break;
-        }
-        calbuf++;
-        if(calbuf==5)
-            calbuf=0;
-        if(retval>=0)
-        {
-            r_button |= r_buffer[calbuf];
-            oldbutton=r_button;
-        }
-        else
-        {
-            r_button=oldbutton;
-        }
-    } while((retval=uart1_gets_queue(r_buffer, 5))>=5);
-
+        if((r_buffer[calbuf]&0xF0)==0xF0 && (r_buffer[calbuf+1]&0xF0)!=0xF0)
+            break;
+    }
+    calbuf++;
+    if(calbuf==5)
+        calbuf=0;
+    if(retval>=0)
+    {
+        uart1_clear_queue();
+        r_button |= r_buffer[calbuf];
+        oldbutton=r_button;
+    }
+    else
+    {
+        r_button=oldbutton;
+    }
+    
     return r_button;
 }
 
@@ -226,6 +225,5 @@ void GIO14(void)
             read_battery_inputs();
             break;
     }
-    //touch_available = true;
     IO_INTC_IRQ2 = (1<<3); /* IRQ_GIO14 == 35 */
 }
