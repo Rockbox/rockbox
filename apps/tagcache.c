@@ -1491,6 +1491,7 @@ static bool update_master_header(void)
     
     myhdr.serial = current_tcmh.serial;
     myhdr.commitid = current_tcmh.commitid;
+    myhdr.dirty = current_tcmh.dirty;
     
     /* Write it back */
     lseek(fd, 0, SEEK_SET);
@@ -1502,6 +1503,7 @@ static bool update_master_header(void)
     {
         hdr->h.serial = current_tcmh.serial;
         hdr->h.commitid = current_tcmh.commitid;
+        hdr->h.dirty = current_tcmh.dirty;
     }
 #endif
     
@@ -2902,10 +2904,9 @@ static bool commit(void)
         {
             close(tmpfd);
             logf("tagcache failed init");
-            if (ret < 0)
-                remove_files();
-            else
+            if (ret == 0)
                 tc_stat.commit_delayed = true;
+            
             tc_stat.commit_step = 0;
             read_lock--;
             return false;
@@ -2916,13 +2917,14 @@ static bool commit(void)
     {
         logf("Failure to commit numeric indices");
         close(tmpfd);
-        remove_files();
         tc_stat.commit_step = 0;
         read_lock--;
         return false;
     }
     
     close(tmpfd);
+    remove(TAGCACHE_FILE_TEMP);
+    
     tc_stat.commit_step = 0;
     
     /* Update the master index headers. */
@@ -2944,7 +2946,6 @@ static bool commit(void)
     close(masterfd);
     
     logf("tagcache committed");
-    remove(TAGCACHE_FILE_TEMP);
     tc_stat.ready = check_all_headers();
     tc_stat.readyvalid = true;
     
