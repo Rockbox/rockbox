@@ -28,6 +28,14 @@
 #include "power.h"
 #include "spi-target.h"
 
+int _backlight_brightness=DEFAULT_BRIGHTNESS_SETTING;
+
+static void _backlight_write_brightness(int brightness)
+{
+    uint8_t bl_command[] = {0xa4, 0x00, brightness, 0xbb};
+    spi_block_transfer(SPI_target_BACKLIGHT, bl_command, 4, 0, 0);
+}
+
 void _backlight_on(void)
 {
 #if defined(HAVE_LCD_SLEEP) && !defined(BOOTLOADER)
@@ -36,12 +44,12 @@ void _backlight_on(void)
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
 #endif
-    _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+    _backlight_write_brightness(_backlight_brightness);
 }
 
 void _backlight_off(void)
 {
-    _backlight_set_brightness(0);
+    _backlight_write_brightness(0);
 #if defined(HAVE_LCD_SLEEP) && !defined(BOOTLOADER)
     /* Disable lcd after fade completes (when lcd_sleep timeout expires) */
     backlight_lcd_sleep_countdown(true); /* start countdown */
@@ -51,8 +59,8 @@ void _backlight_off(void)
 /* Assumes that the backlight has been initialized */
 void _backlight_set_brightness(int brightness)
 {
-    uint8_t bl_command[] = {0xa4, 0x00, brightness, 0xbb};
-    spi_block_transfer(SPI_target_BACKLIGHT, bl_command, 4, 0, 0);
+    _backlight_brightness=brightness;
+    _backlight_write_brightness(brightness);
 }
 
 void __backlight_dim(bool dim_now)
@@ -64,6 +72,6 @@ void __backlight_dim(bool dim_now)
 
 bool _backlight_init(void)
 {
-    _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+    _backlight_set_brightness(_backlight_brightness);
     return true;
 }
