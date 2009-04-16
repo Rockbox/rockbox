@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Karl Kurbjun
+ * Copyright (C) 2007, 2009 by Karl Kurbjun
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -42,6 +42,7 @@
                                 /* but always the same one for the session? */
 static short last_x, last_y, last_z1, last_z2; /* for the touch screen */
 static bool touch_available = false;
+static bool hold_button        = false;
 
 static struct touch_calibration_point topleft, bottomright;
 
@@ -125,7 +126,7 @@ void button_init_device(void)
 
 inline bool button_hold(void)
 {
-    return false;
+    return hold_button;
 }
 
 #define TOUCH_MARGIN 8
@@ -133,8 +134,9 @@ char r_buffer[5];
 int r_button = BUTTON_NONE;
 int button_read_device(int *data)
 {
-    int retval, calbuf;
+    int retval, button1_location, button2_location;
     static int oldbutton = BUTTON_NONE;
+    static bool oldhold = false;
     
     static long last_touch = 0;
     
@@ -187,23 +189,46 @@ int button_read_device(int *data)
 
     retval=uart1_gets_queue(r_buffer, 5);
     
-    for(calbuf=0;calbuf<4;calbuf++)
+    for(button1_location=0;button1_location<4;button1_location++)
     {
-        if((r_buffer[calbuf]&0xF0)==0xF0 && (r_buffer[calbuf+1]&0xF0)!=0xF0)
+        if((r_buffer[button1_location]&0xF0)==0xF0 
+            && (r_buffer[button1_location+1]&0xF0)!=0xF0)
             break;
     }
-    calbuf++;
-    if(calbuf==5)
-        calbuf=0;
+    button1_location++;
+    if(button1_location==5)
+        button1_location=0;
+        
+    if(button1_location==4)
+        button2_location=0;
+    else
+        button2_location=button1_location+1;
+        
     if(retval>=0)
     {
         uart1_clear_queue();
-        r_button |= r_buffer[calbuf];
+        r_button |= r_buffer[button1_location];
         oldbutton=r_button;
+        hold_button=((r_buffer[button2_location]&0x80)?true:false);
     }
     else
     {
         r_button=oldbutton;
+    }
+
+#ifndef BOOTLOADER
+    /* give BL notice if HB state chaged */
+    if (hold_button != oldhold)
+    {
+        backlight_hold_changed(hold_button);
+        oldhold=hold_button;
+    }
+#endif
+
+    if (hold_button)
+    {
+        r_button=BUTTON_NONE;
+        oldbutton=r_button;
     }
     
     return r_button;
