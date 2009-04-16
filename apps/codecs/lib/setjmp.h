@@ -24,8 +24,8 @@
 #define	_JBLEN	34
 #endif
 
-#ifdef __mips__
-#ifdef __mips64
+#ifdef CPU_MIPS
+#if CPU_MIPS == 64
 #define _JBTYPE long long
 #endif
 #ifdef __mips_soft_float

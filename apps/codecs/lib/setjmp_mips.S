@@ -1,3 +1,5 @@
+#include "config.h"
+
 /* This is a simple version of setjmp and longjmp for MIPS 32 and 64.
 
    Ian Lance Taylor, Cygnus Support, 13 May 1993.  */
@@ -40,7 +42,7 @@
 #define FPR_LAYOUT
 #endif
 
-#ifdef __mips64
+#if CPU_MIPS == 64
 #define BYTES_PER_WORD 8
 #define LOAD_GPR ld
 #define LOAD_FPR ldc1
