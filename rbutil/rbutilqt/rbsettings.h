@@ -41,6 +41,12 @@ class RbSettings : public QObject
         // returns the filename of the usersettings file
         QString userSettingFilename();
 
+        enum MapType {
+            MapDevice,
+            MapError,
+            MapIncompatible,
+        };
+
         //! access functions for the settings
         QString curVersion();
         bool cacheOffline();
@@ -86,9 +92,7 @@ class RbSettings : public QObject
         QString name(QString plattform);
         QString brand(QString plattform);
 
-        QMap<int, QString> usbIdMap();
-        QMap<int, QString> usbIdErrorMap();
-        QMap<int, QString> usbIdIncompatMap();
+        QMap<int, QString> usbIdMap(enum MapType);
 
         QString curBrand();
         QString curName();

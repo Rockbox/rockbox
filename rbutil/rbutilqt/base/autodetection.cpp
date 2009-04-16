@@ -333,9 +333,9 @@ bool Autodetection::detectUsb()
     // usbids holds the mapping in the form
     // ((VID<<16)|(PID)), targetname
     // the ini file needs to hold the IDs as hex values.
-    QMap<int, QString> usbids = settings->usbIdMap();
-    QMap<int, QString> usberror = settings->usbIdErrorMap();
-    QMap<int, QString> usbincompat = settings->usbIdIncompatMap();
+    QMap<int, QString> usbids = settings->usbIdMap(RbSettings::MapDevice);
+    QMap<int, QString> usberror = settings->usbIdMap(RbSettings::MapError);
+    QMap<int, QString> usbincompat = settings->usbIdMap(RbSettings::MapIncompatible);
 
     // usb pid detection
     QList<uint32_t> attached;
