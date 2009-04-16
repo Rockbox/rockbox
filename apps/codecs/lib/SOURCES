@@ -15,6 +15,10 @@ udiv32_armv4.S
 setjmp_cf.S
 #endif
 
+#ifdef CPU_MIPS
+setjmp_mips.S
+#endif
+
 #elif defined(SIMULATOR) && defined(__APPLE__)
 osx.dummy.c
 #endif
