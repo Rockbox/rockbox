@@ -1,4 +1,5 @@
 #include "config.h"
+#include "mips.h"
 
 /* This is a simple version of setjmp and longjmp for MIPS 32 and 64.
 
@@ -9,7 +10,7 @@
         .set nomips16
 #endif
 
-#define GPR_LAYOUT              \
+#define GPR_LAYOUT                  \
         GPR_OFFSET ($16, 0);        \
         GPR_OFFSET ($17, 1);        \
         GPR_OFFSET ($18, 2);        \
@@ -25,7 +26,7 @@
 #define NUM_GPRS_SAVED 11
 
 #ifdef __mips_hard_float
-#define FPR_LAYOUT              \
+#define FPR_LAYOUT                   \
         FPR_OFFSET ($f20, 0);        \
         FPR_OFFSET ($f21, 1);        \
         FPR_OFFSET ($f22, 2);        \
@@ -36,7 +37,7 @@
         FPR_OFFSET ($f27, 7);        \
         FPR_OFFSET ($f28, 8);        \
         FPR_OFFSET ($f29, 9);        \
-        FPR_OFFSET ($f30, 10);        \
+        FPR_OFFSET ($f30, 10);       \
         FPR_OFFSET ($f31, 11)
 #else
 #define FPR_LAYOUT
@@ -44,14 +45,14 @@
 
 #if CPU_MIPS == 64
 #define BYTES_PER_WORD 8
-#define LOAD_GPR ld
-#define LOAD_FPR ldc1
+#define LOAD_GPR  ld
+#define LOAD_FPR  ldc1
 #define STORE_GPR sd
 #define STORE_FPR sdc1
 #else
 #define BYTES_PER_WORD 4
-#define LOAD_GPR lw
-#define LOAD_FPR lwc1
+#define LOAD_GPR  lw
+#define LOAD_FPR  lwc1
 #define STORE_GPR sw
 #define STORE_FPR swc1
 #endif
@@ -60,41 +61,41 @@
 #define FPOFF(INDEX) ((INDEX + NUM_GPRS_SAVED) * BYTES_PER_WORD)
 
 /* int setjmp (jmp_buf);  */
-        .globl        setjmp
+        .globl      setjmp
         .ent        setjmp
 setjmp:
-        .frame        $sp,0,$31
+        .frame      sp, 0, ra
 
-#define GPR_OFFSET(REG, INDEX) STORE_GPR REG,GPOFF(INDEX)($4)
-#define FPR_OFFSET(REG, INDEX) STORE_FPR REG,FPOFF(INDEX)($4)
+#define GPR_OFFSET(REG, INDEX) STORE_GPR REG,GPOFF(INDEX)(a0)
+#define FPR_OFFSET(REG, INDEX) STORE_FPR REG,FPOFF(INDEX)(a0)
         GPR_LAYOUT
         FPR_LAYOUT
 #undef GPR_OFFSET
 #undef FPR_OFFSET
 
-        move        $2,$0
-        j        $31
+        move        v0, $0
+        j           ra
 
         .end        setjmp
 
 /* volatile void longjmp (jmp_buf, int);  */
-        .globl        longjmp
+        .globl      longjmp
         .ent        longjmp
 longjmp:
-        .frame        $sp,0,$31
+        .frame      sp, 0, ra
 
-#define GPR_OFFSET(REG, INDEX) LOAD_GPR REG,GPOFF(INDEX)($4)
-#define FPR_OFFSET(REG, INDEX) LOAD_FPR REG,FPOFF(INDEX)($4)
+#define GPR_OFFSET(REG, INDEX) LOAD_GPR REG,GPOFF(INDEX)(a0)
+#define FPR_OFFSET(REG, INDEX) LOAD_FPR REG,FPOFF(INDEX)(a0)
         GPR_LAYOUT
         FPR_LAYOUT
 #undef GPR_OFFSET
 #undef FPR_OFFSET
 
-        bne        $5,$0,1f
-        li        $5,1
+        bne        a1, $0, 1f
+        li         a1, 1
 1:
-        move        $2,$5
-        j        $31
+        move       v0, a1
+        j          ra
 
-        .end longjmp
+        .end       longjmp
 
