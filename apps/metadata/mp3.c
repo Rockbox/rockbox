@@ -398,7 +398,8 @@ static int parsembtid( struct mp3entry* entry, char* tag, int bufferpos )
     char* value = NULL;
     int desc_len = strlen(tag);
     /*DEBUGF("MBID len: %d\n", desc_len);*/
-    int value_len = 0;
+    /* Musicbrainz track IDs are always 36 chars long */
+    const size_t mbtid_len = 36; 
 
     if ((tag - entry->id3v2buf + desc_len + 2) < bufferpos)
     {
@@ -406,16 +407,15 @@ static int parsembtid( struct mp3entry* entry, char* tag, int bufferpos )
 
         if (strcasecmp(tag, "http://musicbrainz.org") == 0)
         {
-            /* Musicbrainz track IDs are always 36 chars long plus null */
-            value_len = 37;
-
-            entry->mb_track_id = value;
-
-            /*DEBUGF("ENTRY: %s LEN: %d\n", entry->mb_track_id, strlen(entry->mb_track_id));*/
+            if (mbtid_len == strlen(value))
+            {
+                entry->mb_track_id = value;
+                return bufferpos + mbtid_len + 1;
+            }
         }
     }
 
-    return tag - entry->id3v2buf + value_len;
+    return bufferpos;
 }
 
 static const struct tag_resolver taglist[] = {
