@@ -117,7 +117,7 @@ qulonglong filesystemFree(QString path)
     ret = statvfs(qPrintable(path), &fs);
 
     if(ret == 0)
-        size = fs.f_bsize * fs.f_bavail;
+        size = (qulonglong)fs.f_bsize * (qulonglong)fs.f_bavail;
 #endif
 #if defined(Q_OS_WIN32)
     BOOL ret;
@@ -140,10 +140,10 @@ bool RockboxInfo::open()
     QFile file(m_path);
     if(!file.exists())
         return false;
-        
+
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return false;
-    
+
     // read file contents
     while (!file.atEnd())
     {
