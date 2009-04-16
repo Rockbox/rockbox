@@ -250,19 +250,19 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (!lcd_on)
         return;
 
+    if ( (width | height) <= 0)
+        return; /* nothing left to do */
+
     if (x + width > LCD_WIDTH)
         width = LCD_WIDTH - x; /* Clip right */
     if (x < 0)
         width += x, x = 0; /* Clip left */
-    if (width <= 0)
-        return; /* nothing left to do */
 
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y; /* Clip bottom */
     if (y < 0)
         height += y, y = 0; /* Clip top */
-    if (height <= 0)
-        return; /* nothing left to do */
+
 
     src = &lcd_framebuffer[y][x];
 
@@ -284,20 +284,21 @@ void lcd_update_rect(int x, int y, int width, int height)
     dst=FRAME + (LCD_NATIVE_WIDTH*(LCD_NATIVE_HEIGHT-1)) 
         - LCD_NATIVE_WIDTH*x + y ;
 
-    do
+    while(height--)
     {
         register int c_width=width;
         register fb_data *c_dst=dst;
-        do
+        
+        while(c_width--)
         {
             *c_dst=*src++;
             c_dst-=LCD_NATIVE_WIDTH;
         }
-        while(--c_width);
-        src+=LCD_WIDTH-width-x;
+        
+        src+=LCD_WIDTH-width;
         dst++;
     }
-    while(--height);
+    
 #endif
 }
 
@@ -357,35 +358,34 @@ void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
 	char *dst=(char *)FRAME+x+y*(LCD_NATIVE_WIDTH+LCD_FUDGE);
 	
 	src=src+src_x+src_y*LCD_NATIVE_WIDTH;
-	do
+	while(height--);
 	{
 		memcpy ( dst, src, width);
 		
-		/* The LCD uses the top 1/4 of the screen when in palette mode */
 		dst=dst+width+(LCD_NATIVE_WIDTH-x-width)+LCD_FUDGE; 
 		src+=width;
 	}
-	while(--height);
+	
 #else
 	char *dst=(char *)FRAME
 	    + (LCD_NATIVE_WIDTH+LCD_FUDGE)*(LCD_NATIVE_HEIGHT-1)
 	    - (LCD_NATIVE_WIDTH+LCD_FUDGE)*x + y;
 	
 	src=src+src_x+src_y*LCD_WIDTH;
-	do
+	while(height--)
 	{
 	    register char *c_dst=dst;
 	    register int c_width=width;
-		do
+	    
+		while (c_width--)
 		{
 		    *c_dst=*src++;
-		    /* The LCD uses the top 1/4 of the screen when in palette mode */
 		    c_dst=c_dst-(LCD_NATIVE_WIDTH+LCD_FUDGE);
-		} while (--c_width);
+		} 
+		
 		dst++;
-		src=src+(LCD_WIDTH-width-x);
+		src+=LCD_WIDTH-width;
 	}
-	while(--height);
 #endif
 }
 
@@ -438,11 +438,9 @@ void lcd_blit_yuv(unsigned char * const src[3],
      */
     y &= ~1;
 
-    if(y<0 || y>LCD_NATIVE_HEIGHT || x<0 || x>LCD_NATIVE_WIDTH 
-        || height<0 || width <0)
-    {
+    if(     ((y | x | height | width ) < 0) 
+            || y>LCD_NATIVE_HEIGHT || x>LCD_NATIVE_WIDTH )
         return;
-    }
 
     if(y+height>LCD_NATIVE_WIDTH)
     {
