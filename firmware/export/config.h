@@ -626,7 +626,8 @@ Lyre prototype 1*/
     (((CONFIG_CPU == SH7034) && !defined(PLUGIN)) || /* SH1 archos: core only */ \
     defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
     defined(CPU_PP) ||  /* PortalPlayer: core, plugins, codecs */ \
-    (CONFIG_CPU == AS3525 && MEMORYSIZE > 2) || \
+    (CONFIG_CPU == AS3525 && MEMORYSIZE > 2) || /* AS3525 +2MB: core, plugins, codecs */ \
+    (CONFIG_CPU == AS3525 && MEMORYSIZE <= 2 && !defined(PLUGIN) && !defined(CODEC)) || /* AS3525 2MB:core only */ \
     (CONFIG_CPU == PNX0101) || \
     (CONFIG_CPU == S5L8700)) /* Samsung S5L8700: core, plugins, codecs */
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
@@ -634,7 +635,7 @@ Lyre prototype 1*/
 #define IDATA_ATTR      __attribute__ ((section(".idata")))
 #define IBSS_ATTR       __attribute__ ((section(".ibss")))
 #define USE_IRAM
-#if CONFIG_CPU != SH7034
+#if CONFIG_CPU != SH7034 && (CONFIG_CPU != AS3525 || MEMORYSIZE > 2)
 #define PLUGIN_USE_IRAM
 #endif
 #if defined(CPU_ARM)
