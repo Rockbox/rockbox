@@ -408,6 +408,9 @@ pegbox_menu_top.160x42x1.bmp
 pegbox_menu_items.60x17x1.bmp
 pegbox_pieces.12x12x1.bmp
 pegbox_header.160x24x1.bmp
+#elif LCD_WIDTH >= 128
+pegbox_header.20x64x1.bmp
+pegbox_pieces.9x7x1.bmp
 #elif LCD_WIDTH >= 112
 pegbox_header.112x8x1.bmp
 pegbox_pieces.9x7x1.bmp

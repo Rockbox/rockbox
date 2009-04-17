@@ -462,9 +462,9 @@ PLUGIN_HEADER
 #define LEVEL_TEXT_Y   14
 #define PEGS_TEXT_Y    58
 #elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 64)
-#define TEXT_X         114
-#define LEVEL_TEXT_Y   14
-#define PEGS_TEXT_Y    58
+#define TEXT_X         112
+#define LEVEL_TEXT_Y   27
+#define PEGS_TEXT_Y    50
 #else
 #error "Unsupported screen size"
 #endif
