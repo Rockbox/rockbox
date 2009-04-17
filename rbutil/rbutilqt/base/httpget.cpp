@@ -258,12 +258,13 @@ void HttpGet::getFileFinish()
             return;
         }
         else {
-            if(cachefile.isReadable())
-                qDebug() << "[HTTP] Cache: outdated, timestamp:" << cachefile.lastModified();
-            qDebug() << "[HTTP] Cache: caching as" << m_cachefile;
             // unlink old cache file
-            if(cachefile.isReadable())
+            if(cachefile.isReadable()) {
                 QFile(m_cachefile).remove();
+                qDebug() << "[HTTP] Cache: outdated, timestamp:"
+                         << cachefile.lastModified();
+            }
+            qDebug() << "[HTTP] Cache: caching as" << m_cachefile;
         }
 
     }
