@@ -36,7 +36,11 @@
 #define lseek rb->lseek
 #define memset rb->memset
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#ifdef CPU_BOOST_LOGGING
+#define cpu_boost_ rb->cpu_boost_
+#else
 #define cpu_boost rb->cpu_boost
+#endif
 #endif
 #define yield rb->yield
 #define file_exists rb->file_exists
