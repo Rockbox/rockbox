@@ -35,12 +35,6 @@
 #include "string.h"
 #include "touchscreen.h"
 
-#define BUTTON_TIMEOUT 50
-
-#define BUTTON_START_BYTE 0xF0
-#define BUTTON_START_BYTE2 0xF4 /* not sure why, but sometimes you get F0 or F4, */
-                                /* but always the same one for the session? */
-static short last_x, last_y, last_z1, last_z2; /* for the touch screen */
 static bool touch_available = false;
 static bool hold_button        = false;
 
@@ -129,93 +123,83 @@ inline bool button_hold(void)
     return hold_button;
 }
 
-#define TOUCH_MARGIN 8
-char r_buffer[5];
-int r_button = BUTTON_NONE;
 int button_read_device(int *data)
 {
-    int retval, button1_location, button2_location;
+    char r_buffer[5];
+    int r_button = BUTTON_NONE;
+    
     static int oldbutton = BUTTON_NONE;
     static bool oldhold = false;
-    
     static long last_touch = 0;
     
-    r_button=BUTTON_NONE;
     *data = 0;
 
+    /* Handle touchscreen */
     if (touch_available)
     {
         short x,y;
-        bool send_touch = false;
+        short last_z1, last_z2;
+
         tsc2100_read_values(&x,  &y, &last_z1, &last_z2);
-        if (TIME_BEFORE(last_touch + HZ/5, current_tick))
-        {
-            if ((x > last_x + TOUCH_MARGIN) ||
-                (x < last_x - TOUCH_MARGIN) ||
-                (y > last_y + TOUCH_MARGIN) ||
-                (y < last_y - TOUCH_MARGIN))
-            {
-                send_touch = true;
-            }
-        }
-        else
-            send_touch = true;
-        if (send_touch)
-        {
-            last_x = x;
-            last_y = y;
-            *data = touch_to_pixels(x, y);
-            r_button |= touchscreen_to_pixels((*data&0xffff0000)>>16,
-                                              *data&0x0000ffff, data);
-            oldbutton = r_button;
-        }
-        last_touch = current_tick;
+
+        *data = touch_to_pixels(x, y);
+        r_button |= touchscreen_to_pixels((*data&0xffff0000)>>16,
+                                          *data&0x0000ffff, data);
+        oldbutton = r_button;
+        
         touch_available = false;
+        last_touch=current_tick;
     }
     else
     {
         /* Touch hasn't happened in a while, clear the bits */
         if(last_touch+3>current_tick)
-        {
             oldbutton&=(0xFF);
-        }
     }
 
+    /* Handle power button */
     if ((IO_GIO_BITSET0&0x01) == 0)
     {
         r_button |= BUTTON_POWER;
         oldbutton=r_button;
     }
-
-    retval=uart1_gets_queue(r_buffer, 5);
-    
-    for(button1_location=0;button1_location<4;button1_location++)
-    {
-        if((r_buffer[button1_location]&0xF0)==0xF0 
-            && (r_buffer[button1_location+1]&0xF0)!=0xF0)
-            break;
-    }
-    button1_location++;
-    if(button1_location==5)
-        button1_location=0;
-        
-    if(button1_location==4)
-        button2_location=0;
     else
-        button2_location=button1_location+1;
-        
-    if(retval>=0)
+        oldbutton&=~BUTTON_POWER;
+
+    /* Handle remote buttons */
+    if(uart1_gets_queue(r_buffer, 5)>=0)
     {
+        int button_location;
+        
+        for(button_location=0;button_location<4;button_location++)
+        {
+            if((r_buffer[button_location]&0xF0)==0xF0 
+                && (r_buffer[button_location+1]&0xF0)!=0xF0)
+                break;
+        }
+        
+        if(button_location==4)
+            button_location=0;
+        
+        button_location++;
+            
+        r_button |= r_buffer[button_location];
+        
+        /* Find the hold status location */
+        if(button_location==4)
+            button_location=0;
+        else
+            button_location++;
+            
+        hold_button=((r_buffer[button_location]&0x80)?true:false);
+        
         uart1_clear_queue();
-        r_button |= r_buffer[button1_location];
         oldbutton=r_button;
-        hold_button=((r_buffer[button2_location]&0x80)?true:false);
     }
     else
-    {
         r_button=oldbutton;
-    }
 
+    /* Take care of hold notices */
 #ifndef BOOTLOADER
     /* give BL notice if HB state chaged */
     if (hold_button != oldhold)

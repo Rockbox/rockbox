@@ -35,58 +35,11 @@
 #include "tsc2100.h"
 #endif
 
-#if defined(PCM_TEST)
-/* Leaving this in for potential debugging for other targets */
-#include "pcm.h"
-#include "debug-target.h"
-#include "dsp-target.h"
-#include "dsp/ipc.h"
-#define ARM_BUFFER_SIZE (PCM_SIZE)
-
-static signed short *the_rover = (signed short *)0x1900000;
-static unsigned int index_rover = 0;
-
-void pcmtest_get_more(unsigned char** start, size_t* size)
-{
-	unsigned long sdem_addr;
-	sdem_addr = (unsigned long)the_rover + index_rover;
-		
-	*start = (unsigned char*)(sdem_addr);
-	*size = ARM_BUFFER_SIZE;
-
-	index_rover += ARM_BUFFER_SIZE;
-	if (index_rover >= 4*1024*1024) 
-	{
-		index_rover = 0;
-	}
-	
-	DEBUGF("pcm_sdram at 0x%08lx, sdem_addr 0x%08lx",
-		(unsigned long)the_rover, (unsigned long)sdem_addr);
-}
-#endif
-
 bool __dbg_ports(void)
 {
-#if defined(PCM_TEST)
-    int fd;
-    int bytes;
-
-	fd = open("/test.raw", O_RDONLY);
-	bytes = read(fd, the_rover, 4*1024*1024);
-	close(fd);
-	
-	DEBUGF("read %d rover bytes", bytes);
-
-	pcm_play_data(&pcmtest_get_more,(unsigned char*)the_rover, ARM_BUFFER_SIZE);
-#endif
-
     return false;
 }
 
-#ifndef CREATIVE_ZVx
-extern char r_buffer[5];
-extern int r_button;
-#endif
 bool __dbg_hw_info(void)
 {
     int line = 0, oldline;
@@ -171,11 +124,6 @@ bool __dbg_hw_info(void)
             address+=0x800;
         else if (button==BUTTON_RC_REW)
             address-=0x800;
-
-        snprintf(buf, sizeof(buf), "Buffer: 0x%02x%02x%02x%02x%02x",
-            r_buffer[0], r_buffer[1], r_buffer[2], r_buffer[3],r_buffer[4] );    lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "Button: 0x%08x, HWread: 0x%08x",
-            (unsigned int)button, r_button);  lcd_puts(0, line++, buf);
 #else
      button = button_get(false);
      if(button & BUTTON_POWER)
