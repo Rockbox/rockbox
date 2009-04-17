@@ -235,26 +235,26 @@ static const struct button_mapping button_context_radio[]  = {
 }; /* button_context_radio */
 
 static const struct button_mapping button_context_keyboard[]  = {
-    { ACTION_KBD_LEFT,         BUTTON_LEFT,                      BUTTON_NONE },
-    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
-    { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                     BUTTON_NONE },
-    { ACTION_KBD_RIGHT,        BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_KBD_LEFT,         BUTTON_LEFT,                     BUTTON_NONE },
+    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                    BUTTON_NONE },
+    { ACTION_KBD_RIGHT,        BUTTON_RIGHT|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_UP,                       BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_UP|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_DOWN,                     BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_DOWN|BUTTON_REPEAT,       BUTTON_NONE },
 
-    { ACTION_KBD_CURSOR_LEFT,  BUTTON_HOME|BUTTON_LEFT,                BUTTON_NONE },
-    { ACTION_KBD_CURSOR_LEFT,  BUTTON_HOME|BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_KBD_CURSOR_RIGHT, BUTTON_HOME|BUTTON_RIGHT,               BUTTON_NONE },
-    { ACTION_KBD_CURSOR_RIGHT, BUTTON_HOME|BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_VOL_UP,                   BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_VOL_UP|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_VOL_DOWN,                 BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_VOL_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
 
-    { ACTION_KBD_UP,           BUTTON_LEFT,                 BUTTON_NONE },
-    { ACTION_KBD_UP,           BUTTON_LEFT|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_KBD_DOWN,         BUTTON_RIGHT,               BUTTON_NONE },
-    { ACTION_KBD_DOWN,         BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_KBD_PAGE_FLIP,    BUTTON_HOME|BUTTON_SELECT,         BUTTON_HOME },
-    { ACTION_KBD_BACKSPACE,    BUTTON_DOWN,                      BUTTON_NONE },
-    { ACTION_KBD_BACKSPACE,    BUTTON_DOWN|BUTTON_REPEAT,        BUTTON_NONE },
-    { ACTION_KBD_SELECT,       BUTTON_SELECT,                    BUTTON_NONE },
-    { ACTION_KBD_DONE,         BUTTON_UP,                        BUTTON_NONE },
-    { ACTION_KBD_ABORT,        BUTTON_POWER,                     BUTTON_NONE },
+    /*{ ACTION_KBD_PAGE_FLIP,    ,       BUTTON_NONE },*/
+    { ACTION_KBD_BACKSPACE,    BUTTON_HOME,                     BUTTON_NONE },
+    { ACTION_KBD_BACKSPACE,    BUTTON_HOME|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_KBD_SELECT,       BUTTON_SELECT|BUTTON_REL,        BUTTON_NONE },
+    { ACTION_KBD_DONE,         BUTTON_SELECT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_KBD_ABORT,        BUTTON_POWER,                    BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
