@@ -44,4 +44,7 @@ extern bool remote_initialized;
 
 void lcd_remote_sleep(void);
 
+int remote_read_device(void);
+bool remote_button_hold(void);
+
 #endif

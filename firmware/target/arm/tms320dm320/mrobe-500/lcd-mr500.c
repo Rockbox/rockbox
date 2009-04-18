@@ -250,7 +250,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (!lcd_on)
         return;
 
-    if ( (width | height) <= 0)
+    if ( (width | height) < 0)
         return; /* nothing left to do */
 
     if (x + width > LCD_WIDTH)

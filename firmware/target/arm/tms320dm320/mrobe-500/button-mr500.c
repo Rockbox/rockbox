@@ -30,6 +30,7 @@
 #include "adc.h"
 #include "system.h"
 #include "backlight-target.h"
+#include "lcd-remote-target.h"
 #include "uart-target.h"
 #include "tsc2100.h"
 #include "string.h"
@@ -125,11 +126,9 @@ inline bool button_hold(void)
 
 int button_read_device(int *data)
 {
-    char r_buffer[5];
-    int r_button = BUTTON_NONE;
-    
-    static int oldbutton = BUTTON_NONE;
-    static bool oldhold = false;
+    int button_read = BUTTON_NONE;
+    static int button_old = BUTTON_NONE;
+    static bool hold_button_old = false;
     static long last_touch = 0;
     
     *data = 0;
@@ -143,9 +142,9 @@ int button_read_device(int *data)
         tsc2100_read_values(&x,  &y, &last_z1, &last_z2);
 
         *data = touch_to_pixels(x, y);
-        r_button |= touchscreen_to_pixels((*data&0xffff0000)>>16,
+        button_read |= touchscreen_to_pixels((*data&0xffff0000)>>16,
                                           *data&0x0000ffff, data);
-        oldbutton = r_button;
+        button_old = button_read;
         
         touch_available = false;
         last_touch=current_tick;
@@ -154,68 +153,39 @@ int button_read_device(int *data)
     {
         /* Touch hasn't happened in a while, clear the bits */
         if(last_touch+3>current_tick)
-            oldbutton&=(0xFF);
+            button_old&=(0xFF);
     }
 
     /* Handle power button */
     if ((IO_GIO_BITSET0&0x01) == 0)
     {
-        r_button |= BUTTON_POWER;
-        oldbutton=r_button;
+        button_read |=  BUTTON_POWER;
+        button_old  =   button_read;
     }
     else
-        oldbutton&=~BUTTON_POWER;
+        button_old&=~BUTTON_POWER;
 
-    /* Handle remote buttons */
-    if(uart1_gets_queue(r_buffer, 5)>=0)
-    {
-        int button_location;
-        
-        for(button_location=0;button_location<4;button_location++)
-        {
-            if((r_buffer[button_location]&0xF0)==0xF0 
-                && (r_buffer[button_location+1]&0xF0)!=0xF0)
-                break;
-        }
-        
-        if(button_location==4)
-            button_location=0;
-        
-        button_location++;
-            
-        r_button |= r_buffer[button_location];
-        
-        /* Find the hold status location */
-        if(button_location==4)
-            button_location=0;
-        else
-            button_location++;
-            
-        hold_button=((r_buffer[button_location]&0x80)?true:false);
-        
-        uart1_clear_queue();
-        oldbutton=r_button;
-    }
-    else
-        r_button=oldbutton;
-
-    /* Take care of hold notices */
+    /* Read data from the remote */
+    button_read |= remote_read_device();
+    hold_button=remote_button_hold();
+    
+    /* Take care of hold notifications */
 #ifndef BOOTLOADER
     /* give BL notice if HB state chaged */
-    if (hold_button != oldhold)
+    if (hold_button != hold_button_old)
     {
         backlight_hold_changed(hold_button);
-        oldhold=hold_button;
+        hold_button_old=hold_button;
     }
 #endif
 
     if (hold_button)
     {
-        r_button=BUTTON_NONE;
-        oldbutton=r_button;
+        button_read = BUTTON_NONE;
+        button_old  = button_read;
     }
     
-    return r_button;
+    return button_read;
 }
 
 /* Touchscreen data available interupt */
