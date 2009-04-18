@@ -1305,10 +1305,10 @@
 #define ICDC_CDCCR1_SUSPD  (1 << 1)
 #define ICDC_CDCCR1_RST    (1 << 0)
 
-#define ICDC_CDCCR2_AINVOL(n) ((n & 5) << 16)
-#define ICDC_CDCCR2_SMPR(n)   ((n & 4) << 8)
-#define ICDC_CDCCR2_MICBG(n)  ((n & 2) << 4)
-#define ICDC_CDCCR2_HPVOL(n)  ((n & 2) << 0)
+#define ICDC_CDCCR2_AINVOL(n) ((n & 0x1F) << 16)
+#define ICDC_CDCCR2_SMPR(n)   ((n & 0xF) << 8)
+#define ICDC_CDCCR2_MICBG(n)  ((n & 0x3) << 4)
+#define ICDC_CDCCR2_HPVOL(n)  ((n & 0x3) << 0)
 
 #define ICDC_CDCCR2_AINVOL_DB(n) ((n+34.5)/1.5)
 
@@ -1423,7 +1423,7 @@
 #define SSI_CR1_MULTS        (1 << 22)
 #define SSI_CR1_FMAT_BIT    20
 #define SSI_CR1_FMAT_MASK    (0x3 << SSI_CR1_FMAT_BIT)
-  #define SSI_CR1_FMAT_SPI      (0 << SSI_CR1_FMAT_BIT) /* Motorola��s SPI format */
+  #define SSI_CR1_FMAT_SPI      (0 << SSI_CR1_FMAT_BIT) /* Motorola¡¯s SPI format */
   #define SSI_CR1_FMAT_SSP      (1 << SSI_CR1_FMAT_BIT) /* TI's SSP format */
   #define SSI_CR1_FMAT_MW1      (2 << SSI_CR1_FMAT_BIT) /* National Microwire 1 format */
   #define SSI_CR1_FMAT_MW2      (3 << SSI_CR1_FMAT_BIT) /* National Microwire 2 format */
@@ -4984,7 +4984,7 @@ do{                                 \
 
 // IPU_REG_BASE
 #define IPU_P_BASE  0x13080000
-#define IPU__OFFSET 0x13080000
+#define IPU_V_BASE  0xB3080000
 #define IPU__SIZE   0x00001000
 
 struct ipu_module
@@ -5069,10 +5069,12 @@ struct Ration2m
 #define INFMT_YCbCr422  (5 << 0)
 #define INFMT_YCbCr444  (6 << 0)
 #define INFMT_YCbCr411  (7 << 0)
+#define INFMT_MASK      (7)
 
 #define OUTFMT_RGB555   (0 << 16)
 #define OUTFMT_RGB565   (1 << 16)
 #define OUTFMT_RGB888   (2 << 16)
+#define OUTFMT_MASK     (3 << 16)
 
 // REG_IN_FM_GS field define
 #define IN_FM_W(val)    ((val) << 16)
@@ -5086,7 +5088,6 @@ struct Ration2m
 #define U_STRIDE(val)    ((val) << 16)
 #define V_STRIDE(val)    ((val) << 0)
 
-
 #define VE_IDX_SFT       0
 #define HE_IDX_SFT       16
 
@@ -5099,53 +5100,106 @@ struct Ration2m
 #define W_COEF_MSK       0xFF
 
 // function about REG_CTRL
-#define IPU_STOP_IPU(IPU_V_BASE) \
+#define IPU_STOP_IPU() \
     REG32(IPU_V_BASE + REG_CTRL) &= ~IPU_EN;
 
-#define IPU_RUN_IPU(IPU_V_BASE) \
+#define IPU_RUN_IPU() \
     REG32(IPU_V_BASE + REG_CTRL) |= IPU_EN;
 
-#define IPU_RESET_IPU(IPU_V_BASE) \
+#define IPU_RESET_IPU() \
     REG32(IPU_V_BASE + REG_CTRL) |= IPU_RESET;
 
-#define IPU_DISABLE_IRQ(IPU_V_BASE) \
+#define IPU_DISABLE_IRQ() \
     REG32(IPU_V_BASE + REG_CTRL) &= ~FM_IRQ_EN;
 
-#define IPU_DISABLE_RSIZE(IPU_V_BASE) \
+#define IPU_DISABLE_RSIZE() \
     REG32(IPU_V_BASE + REG_CTRL) &= ~RSZ_EN;
 
-#define IPU_ENABLE_RSIZE(IPU_V_BASE) \
+#define IPU_ENABLE_RSIZE() \
     REG32(IPU_V_BASE + REG_CTRL) |= RSZ_EN;
 
-#define IPU_IS_ENABLED(IPU_V_BASE) \
+#define IPU_IS_ENABLED() \
     (REG32(IPU_V_BASE + REG_CTRL) & IPU_EN)
 
 // function about REG_STATUS
-#define IPU_CLEAR_END_FLAG(IPU_V_BASE) \
+#define IPU_CLEAR_END_FLAG() \
     REG32(IPU_V_BASE +  REG_STATUS) &= ~OUT_END;
 
-#define IPU_POLLING_END_FLAG(IPU_V_BASE) \
+#define IPU_POLLING_END_FLAG() \
     (REG32(IPU_V_BASE +  REG_STATUS) & OUT_END)
 
+#define IPU_SET_INFMT(fmt) \
+    REG32(IPU_V_BASE + REG_D_FMT) = (REG32(IPU_V_BASE + REG_D_FMT) & ~INFMT_MASK) | (fmt);
+
+#define IPU_SET_OUTFMT(fmt) \
+    REG32(IPU_V_BASE + REG_D_FMT) = (REG32(IPU_V_BASE + REG_D_FMT) & ~OUTFMT_MASK) | (fmt);
+
+#define IPU_SET_IN_FM(w, h) \
+    REG32(IPU_V_BASE + REG_IN_FM_GS) = IN_FM_W(w) | IN_FM_H(h);
+
+#define IPU_SET_Y_STRIDE(stride) \
+    REG32(IPU_V_BASE + REG_Y_STRIDE) = (stride);
+
+#define IPU_SET_UV_STRIDE(u, v) \
+    REG32(IPU_V_BASE + REG_UV_STRIDE) = U_STRIDE(u) | V_STRIDE(v);
+
+#define IPU_SET_Y_ADDR(addr) \
+    REG32(IPU_V_BASE + REG_Y_ADDR) = (addr);
+
+#define IPU_SET_U_ADDR(addr) \
+    REG32(IPU_V_BASE + REG_U_ADDR) = (addr);
+
+#define IPU_SET_V_ADDR(addr) \
+    REG32(IPU_V_BASE + REG_V_ADDR) = (addr);
+
+#define IPU_SET_OUT_ADDR(addr) \
+    REG32(IPU_V_BASE + REG_OUT_ADDR) = (addr);
+
+#define IPU_SET_OUT_FM(w, h) \
+    REG32(IPU_V_BASE + REG_OUT_GS) = OUT_FM_W(w) | OUT_FM_H(h);
+
+#define IPU_SET_OUT_STRIDE(stride) \
+    REG32(IPU_V_BASE + REG_OUT_STRIDE) = (stride);
+
+#define IPU_SET_CSC_C0_COEF(coef) \
+    REG32(IPU_V_BASE + REG_CSC_C0_COEF) = (coef);
+
+#define IPU_SET_CSC_C1_COEF(coef) \
+    REG32(IPU_V_BASE + REG_CSC_C1_COEF) = (coef);
+
+#define IPU_SET_CSC_C2_COEF(coef) \
+    REG32(IPU_V_BASE + REG_CSC_C2_COEF) = (coef);
+
+#define IPU_SET_CSC_C3_COEF(coef) \
+    REG32(IPU_V_BASE + REG_CSC_C3_COEF) = (coef);
+
+#define IPU_SET_CSC_C4_COEF(coef) \
+    REG32(IPU_V_BASE + REG_CSC_C4_COEF) = (coef);
+
+/* YCbCr */
 /* parameter
    R = 1.164 * (Y - 16) + 1.596 * (cr - 128)                      {C0, C1}
    G = 1.164 * (Y - 16) - 0.392 * (cb -128) - 0.813 * (cr - 128)  {C0, C2, C3}
    B = 1.164 * (Y - 16) + 2.017 * (cb - 128)                      {C0, C4}
 */
+#define YCBCR_CSC_C0 0x4A8        /* 1.164 * 1024 */
+#define YCBCR_CSC_C1 0x662        /* 1.596 * 1024 */
+#define YCBCR_CSC_C2 0x191        /* 0.392 * 1024 */
+#define YCBCR_CSC_C3 0x341        /* 0.813 * 1024 */
+#define YCBCR_CSC_C4 0x811        /* 2.017 * 1024 */
 
-#if 1
-#define YUV_CSC_C0 0x4A8        /* 1.164 * 1024 */
-#define YUV_CSC_C1 0x662        /* 1.596 * 1024 */
-#define YUV_CSC_C2 0x191        /* 0.392 * 1024 */
-#define YUV_CSC_C3 0x341        /* 0.813 * 1024 */
-#define YUV_CSC_C4 0x811        /* 2.017 * 1024 */
-#else
+
+/* YUV */
+/* parameter
+    R = 1 * (Y – 0) + 1.4026 * (V - 128)                         {C0, C1}
+    G = 1 * (Y – 0) – 0.3444 * (U - 128) – 0.7144 * (V - 128)    {C0, C2, C3}
+    B = 1 * (Y – 0) + 1.7730 * (U - 128)                         {C0, C4}
+*/
 #define YUV_CSC_C0 0x400
 #define YUV_CSC_C1 0x59C
 #define YUV_CSC_C2 0x161
 #define YUV_CSC_C3 0x2DC
 #define YUV_CSC_C4 0x718
-#endif
 
 #endif /* _IPU_H_ */
 

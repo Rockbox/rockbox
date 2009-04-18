@@ -71,7 +71,14 @@ bool lcd_active(void)
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
-x=0;y=0;width=LCD_WIDTH;height=LCD_HEIGHT; /* HACK! */
+    /* Currently only do full updates.
+     * DMA can't handle partial updates and CPU is too slow compared
+     * to full DMA updates */
+    x = 0;
+    y = 0;
+    width = LCD_WIDTH;
+    height = LCD_HEIGHT;
+
     mutex_lock(&lcd_mtx);
     
     __cpm_start_lcd();
@@ -82,12 +89,12 @@ x=0;y=0;width=LCD_WIDTH;height=LCD_HEIGHT; /* HACK! */
     
     REG_DMAC_DCCSR(DMA_LCD_CHANNEL) = DMAC_DCCSR_NDES;
     REG_DMAC_DSAR(DMA_LCD_CHANNEL)  = PHYSADDR((unsigned long)&lcd_framebuffer[y][x]);
-    REG_DMAC_DRSR(DMA_LCD_CHANNEL)  = DMAC_DRSR_RS_SLCD; /* source = SLCD */
+    REG_DMAC_DRSR(DMA_LCD_CHANNEL)  = DMAC_DRSR_RS_SLCD;
     REG_DMAC_DTAR(DMA_LCD_CHANNEL)  = PHYSADDR(SLCD_FIFO);
-    REG_DMAC_DTCR(DMA_LCD_CHANNEL)  = width*height;
+    REG_DMAC_DTCR(DMA_LCD_CHANNEL)  = (width * height) >> 3;
     
     REG_DMAC_DCMD(DMA_LCD_CHANNEL)  = ( DMAC_DCMD_SAI     | DMAC_DCMD_RDIL_IGN | DMAC_DCMD_SWDH_32
-                                      | DMAC_DCMD_DWDH_16 | DMAC_DCMD_DS_16BIT );
+                                      | DMAC_DCMD_DWDH_16 | DMAC_DCMD_DS_16BYTE );
     
     __dcache_writeback_all(); /* Size of framebuffer is way bigger than cache size.
                                  We need to find a way to make the framebuffer uncached, so this statement can get removed. */
@@ -101,7 +108,6 @@ x=0;y=0;width=LCD_WIDTH;height=LCD_HEIGHT; /* HACK! */
     wakeup_wait(&lcd_wkup, TIMEOUT_BLOCK); /* Sleeping in lcd_update() should be safe */
     
     REG_DMAC_DCCSR(DMA_LCD_CHANNEL) &= ~DMAC_DCCSR_EN; /* Disable DMA channel */
-    
     dma_disable();
     
     while(REG_SLCD_STATE & SLCD_STATE_BUSY);
@@ -139,17 +145,54 @@ void lcd_update(void)
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
 
-/* TODO: use IPU */
+/* (Mis)use LCD framebuffer as a temporary buffer */
 void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    (void)src;
-    (void)src_x;
-    (void)src_y;
-    (void)stride;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
+    __dcache_writeback_all();
+    
+    __cpm_start_ipu();
+    
+    IPU_STOP_IPU();
+    IPU_RESET_IPU()
+    IPU_CLEAR_END_FLAG();
+    
+    IPU_DISABLE_RSIZE();
+    IPU_DISABLE_IRQ();
+    
+    IPU_SET_INFMT(INFMT_YUV420);
+    IPU_SET_OUTFMT(OUTFMT_RGB565);
+    
+    IPU_SET_IN_FM(width, height);
+    IPU_SET_Y_STRIDE(stride);
+    IPU_SET_UV_STRIDE(stride, stride);
+    
+    IPU_SET_Y_ADDR((unsigned long)src[0]);
+    IPU_SET_U_ADDR((unsigned long)src[2]);
+    IPU_SET_V_ADDR((unsigned long)src[3]);
+    IPU_SET_OUT_ADDR(PHYSADDR((unsigned long)&lcd_framebuffer[y][x]));
+    
+    IPU_SET_OUT_FM(width, height);
+    IPU_SET_OUT_STRIDE(stride);
+    
+    IPU_SET_CSC_C0_COEF(YUV_CSC_C0);
+    IPU_SET_CSC_C1_COEF(YUV_CSC_C1);
+    IPU_SET_CSC_C2_COEF(YUV_CSC_C2);
+    IPU_SET_CSC_C2_COEF(YUV_CSC_C3);
+    IPU_SET_CSC_C4_COEF(YUV_CSC_C4);
+    
+    IPU_RUN_IPU();
+    
+    while(!(IPU_POLLING_END_FLAG()) && IPU_IS_ENABLED());
+    
+    IPU_CLEAR_END_FLAG();
+    IPU_STOP_IPU();
+    
+    //__cpm_stop_ipu();
+    
+    __dcache_invalidate_all();
+
+    /* YUV speed is limited by LCD speed */
+    lcd_update_rect(x, y, width, height);
 }

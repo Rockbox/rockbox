@@ -29,7 +29,7 @@ void lcd_init_device(void);
 
 
 void lcd_init_controller(void);
-void lcd_set_target(short x, short y, short width, short height);
+void lcd_set_target(int x, int y, int width, int height);
 void lcd_on(void);
 void lcd_off(void);
 

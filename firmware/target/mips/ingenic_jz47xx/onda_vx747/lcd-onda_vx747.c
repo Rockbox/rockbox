@@ -25,23 +25,22 @@
 #include "lcd.h"
 #include "lcd-target.h"
 
-#define PIN_CS_N    (32*1+17) /* Chip select */
-#define PIN_RESET_N (32*1+18) /* Reset */
-#define LCD_PCLK    (20000000) /* LCD PCLK */
+#define PIN_CS_N    (32*1+17)  /* Chip select */
+#define PIN_RESET_N (32*1+18)  /* Reset       */
+#define LCD_PCLK    (20000000) /* LCD PCLK    */
 
 #define my__gpio_as_lcd_16bit()         \
 do {                                    \
     REG_GPIO_PXFUNS(2) = 0x001cffff;    \
     REG_GPIO_PXSELC(2) = 0x001cffff;    \
-    REG_GPIO_PXPES(2) = 0x001cffff;     \
+    REG_GPIO_PXPES(2)  = 0x001cffff;    \
 } while (0)
 
 
-#define SLEEP(x) for(i=0; i<x; i++) asm("nop"); asm("nop");
+#define SLEEP(x) { register int __i; for(__i=0; __i<x; __i++) {asm("nop"); asm("nop");} }
 #define DELAY    SLEEP(700000);
 static void _display_pin_init(void)
 {
-    int i;
     my__gpio_as_lcd_16bit();
     __gpio_as_output(PIN_CS_N);
     __gpio_as_output(PIN_RESET_N);
@@ -61,8 +60,6 @@ static void _display_pin_init(void)
 #define SLCD_SEND_COMMAND(cmd,val) SLCD_SET_COMMAND(cmd); SLCD_SET_DATA(val);
 static void _display_init(void)
 {
-    int i;
-   
     SLCD_SEND_COMMAND(REG_SOFT_RESET, SOFT_RESET(1));
     SLEEP(700000);
     SLCD_SEND_COMMAND(REG_SOFT_RESET, SOFT_RESET(0));
@@ -72,9 +69,9 @@ static void _display_init(void)
     SLCD_SEND_COMMAND(REG_DRIVER_OUTPUT, 0x100);
     SLCD_SEND_COMMAND(REG_LCD_DR_WAVE_CTRL, 0x100);
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
-    SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_HID | ENTRY_MODE_HWM));
+    SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_HID));
 #else
-    SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_AM | ENTRY_MODE_HWM));
+    SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_AM));
 #endif
     SLCD_SEND_COMMAND(REG_DISP_CTRL2, 0x503);
     SLCD_SEND_COMMAND(REG_DISP_CTRL3, 1);
@@ -95,19 +92,6 @@ static void _display_init(void)
     SLCD_SEND_COMMAND(REG_PWR_CTRL4, 0x2f00);
     SLCD_SEND_COMMAND(REG_PWR_CTRL5, 0);
     SLCD_SEND_COMMAND(REG_PWR_CTRL6, 1);
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_SET, 0); /* set cursor at x_start */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_SET, 0); /* set cursor at y_start */
-#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_START, 0); /* y_start*/
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_END, 239); /* y_end */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_START, 0); /* x_start */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_END, 399); /* x_end */
-#else
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_START, 0); /* y_start*/
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_END, 399); /* y_end */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_START, 0); /* x_start */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_END, 239); /* x_end */
-#endif
     SLCD_SEND_COMMAND(REG_RW_NVM, 0);
     SLCD_SEND_COMMAND(REG_VCOM_HVOLTAGE1, 6);
     SLCD_SEND_COMMAND(REG_VCOM_HVOLTAGE2, 0);
@@ -144,42 +128,34 @@ static void _display_init(void)
     SLCD_SEND_COMMAND(0x7f5, 1);
     SLCD_SEND_COMMAND(0x7f0, 0);
     
-    /* LCD ON: */
-    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_BASEE | DISP_CTRL1_VON
-                                      | DISP_CTRL1_GON | DISP_CTRL1_DTE | DISP_CTRL1_D(3))
-                                      );
+    /* LCD ON */
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_BASEE | DISP_CTRL1_VON |
+                                       DISP_CTRL1_GON   | DISP_CTRL1_DTE | DISP_CTRL1_D(3)));
     SLEEP(3500000);
-    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_BASEE | DISP_CTRL1_VON
-                                      | DISP_CTRL1_GON | DISP_CTRL1_DTE | DISP_CTRL1_D(2))
-                                      );
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_BASEE | DISP_CTRL1_VON |
+                                       DISP_CTRL1_GON   | DISP_CTRL1_DTE | DISP_CTRL1_D(2)));
     SLEEP(3500000);
-    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_BASEE | DISP_CTRL1_VON
-                                      | DISP_CTRL1_GON | DISP_CTRL1_DTE | DISP_CTRL1_D(3))
-                                      );
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_BASEE | DISP_CTRL1_VON |
+                                       DISP_CTRL1_GON   | DISP_CTRL1_DTE | DISP_CTRL1_D(3)));
     SLEEP(3500000);
 }
 
 static void _display_on(void)
 {
-    int i;
     SLCD_SEND_COMMAND(REG_PWR_CTRL1, (PWR_CTRL1_SAPE | PWR_CTRL1_BT(6) | PWR_CTRL1_APE | PWR_CTRL1_AP(3)));
     SLEEP(3500000);
-    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON
-                                      | DISP_CTRL1_D(1))
-                                      );
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON |
+                                       DISP_CTRL1_D(1)));
     SLEEP(3500000);
-    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON
-                                      | DISP_CTRL1_DTE | DISP_CTRL1_D(3)
-                                      | DISP_CTRL1_BASEE)
-                                      );
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON  |
+                                       DISP_CTRL1_DTE | DISP_CTRL1_D(3) |
+                                       DISP_CTRL1_BASEE));
 }
 
 static void _display_off(void)
 {
-    int i;
-    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON
-                                      | DISP_CTRL1_DTE | DISP_CTRL1_D(2))
-                                      );
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON |
+                                       DISP_CTRL1_DTE | DISP_CTRL1_D(2)));
     SLEEP(3500000);
     SLCD_SEND_COMMAND(REG_DISP_CTRL1, DISP_CTRL1_D(1));
     SLEEP(3500000);
@@ -193,9 +169,9 @@ static void _set_lcd_bus(void)
     REG_LCD_CFG &= ~LCD_CFG_LCDPIN_MASK;
     REG_LCD_CFG |= LCD_CFG_LCDPIN_SLCD;
     
-    REG_SLCD_CFG = (SLCD_CFG_BURST_8_WORD | SLCD_CFG_DWIDTH_16 | SLCD_CFG_CWIDTH_16BIT
-                   | SLCD_CFG_CS_ACTIVE_LOW | SLCD_CFG_RS_CMD_LOW | SLCD_CFG_CLK_ACTIVE_FALLING
-                   | SLCD_CFG_TYPE_PARALLEL);
+    REG_SLCD_CFG = (SLCD_CFG_BURST_8_WORD | SLCD_CFG_DWIDTH_16 | SLCD_CFG_CWIDTH_16BIT |
+                    SLCD_CFG_CS_ACTIVE_LOW | SLCD_CFG_RS_CMD_LOW | SLCD_CFG_CLK_ACTIVE_FALLING |
+                    SLCD_CFG_TYPE_PARALLEL);
 }
 
 static void _set_lcd_clock(void)
@@ -204,8 +180,7 @@ static void _set_lcd_clock(void)
     
     __cpm_stop_lcd();
     
-    val = __cpm_get_pllout2() / LCD_PCLK;
-    val--;
+    val = (__cpm_get_pllout2() / LCD_PCLK) - 1;
     if ( val > 0x1ff )
         val = 0x1ff; /* CPM_LPCDR is too large, set it to 0x1ff */
     __cpm_set_pixdiv(val);
@@ -215,7 +190,6 @@ static void _set_lcd_clock(void)
 
 void lcd_init_controller(void)
 {
-    int i;
     _display_pin_init();
     _set_lcd_bus();
     _set_lcd_clock();
@@ -223,37 +197,37 @@ void lcd_init_controller(void)
     _display_init();
 }
 
-void lcd_set_target(short x, short y, short width, short height)
+void lcd_set_target(int x, int y, int width, int height)
 {
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_START, y); /* y_start */
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_END, y+width-1); /* y_end */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_START, x); /* x_start */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_END, x+height-1); /* x_end */
+    SLCD_SEND_COMMAND(REG_RAM_HADDR_START, x);
+    SLCD_SEND_COMMAND(REG_RAM_HADDR_END,   x + width  - 1);
+    SLCD_SEND_COMMAND(REG_RAM_VADDR_START, y);
+    SLCD_SEND_COMMAND(REG_RAM_VADDR_END,   y + height - 1);
+    SLCD_SEND_COMMAND(REG_RAM_HADDR_SET,   x);
+    SLCD_SEND_COMMAND(REG_RAM_VADDR_SET,   y);
 #else
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_START, y); /* y_start */
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_END, y+height-1); /* y_end */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_START, x); /* x_start */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_END, x+width-1); /* x_end */
+    SLCD_SEND_COMMAND(REG_RAM_HADDR_START, y);
+    SLCD_SEND_COMMAND(REG_RAM_HADDR_END,   y + height - 1);
+    SLCD_SEND_COMMAND(REG_RAM_VADDR_START, x);
+    SLCD_SEND_COMMAND(REG_RAM_VADDR_END,   x + width  - 1);
+    SLCD_SEND_COMMAND(REG_RAM_HADDR_SET,   y);
+    SLCD_SEND_COMMAND(REG_RAM_VADDR_SET,   x);
 #endif
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_SET, y); /* set cursor at x_start */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_SET, x); /* set cursor at y_start */
     SLCD_SET_COMMAND(REG_RW_GRAM); /* write data to GRAM */
 }
 
 void lcd_set_flip(bool yesno)
 {
-    int i;
-    
     __cpm_start_lcd();
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
     if(yesno)
     {
-        SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_HWM));
+        SLCD_SEND_COMMAND(REG_ENTRY_MODE, ENTRY_MODE_BGR);
     }
     else
     {
-        SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_HID | ENTRY_MODE_HWM));
+        SLCD_SEND_COMMAND(REG_ENTRY_MODE, (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_HID));
     }
 #else
     if(yesno)

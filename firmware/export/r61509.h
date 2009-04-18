@@ -26,6 +26,7 @@
 #define __R61509_H
 
 /* Register list */
+#define REG_DEVICE_CODE                  0x000
 #define REG_DRIVER_OUTPUT                0x001
 #define REG_LCD_DR_WAVE_CTRL             0x002
 #define REG_ENTRY_MODE                   0x003
