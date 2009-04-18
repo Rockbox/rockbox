@@ -150,12 +150,23 @@ void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
+    unsigned char const * yuv_src[3];
+    register off_t z;
+    
+    if(!lcd_is_on)
+        return;
+    
+    z = stride * src_y;
+    yuv_src[0] = src[0] + z + src_x;
+    yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
+    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
+    
     __dcache_writeback_all();
     
     __cpm_start_ipu();
     
     IPU_STOP_IPU();
-    IPU_RESET_IPU()
+    IPU_RESET_IPU();
     IPU_CLEAR_END_FLAG();
     
     IPU_DISABLE_RSIZE();
@@ -168,18 +179,18 @@ void lcd_blit_yuv(unsigned char * const src[3],
     IPU_SET_Y_STRIDE(stride);
     IPU_SET_UV_STRIDE(stride, stride);
     
-    IPU_SET_Y_ADDR((unsigned long)src[0]);
-    IPU_SET_U_ADDR((unsigned long)src[2]);
-    IPU_SET_V_ADDR((unsigned long)src[3]);
-    IPU_SET_OUT_ADDR(PHYSADDR((unsigned long)&lcd_framebuffer[y][x]));
+    IPU_SET_Y_ADDR(PHYSADDR((unsigned long)yuv_src[0]));
+    IPU_SET_U_ADDR(PHYSADDR((unsigned long)yuv_src[1]));
+    IPU_SET_V_ADDR(PHYSADDR((unsigned long)yuv_src[2]));
+    IPU_SET_OUT_ADDR(PHYSADDR((unsigned long)&lcd_framebuffer[x][y]));
     
-    IPU_SET_OUT_FM(width, height);
-    IPU_SET_OUT_STRIDE(stride);
+    IPU_SET_OUT_FM(height, width);
+    IPU_SET_OUT_STRIDE(height);
     
     IPU_SET_CSC_C0_COEF(YUV_CSC_C0);
     IPU_SET_CSC_C1_COEF(YUV_CSC_C1);
     IPU_SET_CSC_C2_COEF(YUV_CSC_C2);
-    IPU_SET_CSC_C2_COEF(YUV_CSC_C3);
+    IPU_SET_CSC_C3_COEF(YUV_CSC_C3);
     IPU_SET_CSC_C4_COEF(YUV_CSC_C4);
     
     IPU_RUN_IPU();
@@ -188,11 +199,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
     
     IPU_CLEAR_END_FLAG();
     IPU_STOP_IPU();
+    IPU_RESET_IPU();
     
-    //__cpm_stop_ipu();
-    
-    __dcache_invalidate_all();
+    __cpm_stop_ipu();
 
     /* YUV speed is limited by LCD speed */
-    lcd_update_rect(x, y, width, height);
+    lcd_update_rect(y, x, height, width);
 }
