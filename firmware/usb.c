@@ -42,7 +42,7 @@
 #ifdef HAVE_USBSTACK
 #include "usb_core.h"
 #endif
-#include "logf.h"  
+#include "logf.h"
 #include "screendump.h"
 
 /* Conditions under which we want the entire driver */
@@ -162,7 +162,7 @@ void usb_signal_transfer_completion(
 static inline void usb_slave_mode(bool on)
 {
     int rc;
-    
+
     if(on)
     {
         DEBUGF("Entering USB slave mode\n");
@@ -180,13 +180,13 @@ static inline void usb_slave_mode(bool on)
 
         /* Let the ISDx00 settle */
         sleep(HZ*1);
-        
+
         usb_enable(false);
 
         rc = storage_init();
         if(rc)
             panicf("storage: %d",rc);
-    
+
         rc = disk_mount_all();
         if (rc <= 0) /* no partition */
             panicf("mount: %d",rc);
@@ -272,10 +272,10 @@ static void usb_thread(void)
 #ifdef HAVE_USBSTACK
 #ifdef USB_STORAGE
                     usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, false);
-#endif                
+#endif
 #ifdef USB_CHARGING_ONLY
                     usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, true);
-#endif                
+#endif
                     usb_attach();
 #endif
                     break;
@@ -290,10 +290,10 @@ static void usb_thread(void)
 #endif
 #ifdef USB_STORAGE
                 usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, true);
-#endif                
+#endif
 #ifdef USB_CHARGING_ONLY
                 usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, false);
-#endif                
+#endif
 
                 /* Check any drivers enabled at this point for exclusive storage
                  * access requirements. */
@@ -493,7 +493,7 @@ static void usb_tick(void)
 #endif /* USB_FIREWIRE_HANDLING */
 
         current_status = usb_detect();
-    
+
         /* Only report when the status has changed */
         if(current_status != last_usb_status)
         {
@@ -561,7 +561,7 @@ void usb_init(void)
     usb_enable(false);
 
     queue_init(&usb_queue, true);
-    
+
     usb_thread_entry = create_thread(usb_thread, usb_stack,
                        sizeof(usb_stack), 0, usb_thread_name
                        IF_PRIO(, PRIORITY_SYSTEM) IF_COP(, CPU));

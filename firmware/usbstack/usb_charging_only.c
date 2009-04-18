@@ -46,7 +46,6 @@ static struct usb_interface_descriptor __attribute__((aligned(2)))
     .iInterface         = 0
 };
 
-
 static int usb_interface;
 
 int usb_charging_only_request_endpoints(struct usb_class_driver *drv)

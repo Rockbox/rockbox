@@ -95,8 +95,7 @@ enum {
     USB_DRIVER_CHARGING_ONLY,
     USB_NUM_DRIVERS
 };
-#endif
-#ifdef HAVE_USBSTACK
+
 struct usb_transfer_completion_event_data
 {
     unsigned char endpoint;

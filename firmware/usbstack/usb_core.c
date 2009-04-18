@@ -88,7 +88,7 @@ static const struct usb_device_descriptor __attribute__((aligned(2)))
 } ;
 
 static struct usb_config_descriptor __attribute__((aligned(2)))
-                                    config_descriptor = 
+                                    config_descriptor =
 {
     .bLength             = sizeof(struct usb_config_descriptor),
     .bDescriptorType     = USB_DT_CONFIG,
@@ -99,7 +99,6 @@ static struct usb_config_descriptor __attribute__((aligned(2)))
     .bmAttributes        = USB_CONFIG_ATT_ONE | USB_CONFIG_ATT_SELFPOWER,
     .bMaxPower           = (USB_MAX_CURRENT+1) / 2, /* In 2mA units */
 };
-
 
 static const struct usb_qualifier_descriptor __attribute__((aligned(2)))
                                              qualifier_descriptor =
@@ -242,7 +241,6 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req);
 
 static unsigned char response_data[256] USB_DEVBSS_ATTR;
 
-
 static short hex[16] = {'0','1','2','3','4','5','6','7',
                         '8','9','A','B','C','D','E','F'};
 #ifdef IPOD_ARCH
@@ -357,15 +355,15 @@ void usb_core_exit(void)
     for(i=0;i<USB_NUM_DRIVERS;i++) {
         if(drivers[i].enabled && drivers[i].disconnect != NULL)
         {
-            drivers[i].disconnect ();
+            drivers[i].disconnect();
             drivers[i].enabled = false;
         }
     }
 
     if (initialized) {
         usb_drv_exit();
+        initialized = false;
     }
-    initialized = false;
     usb_state = DEFAULT;
     logf("usb_core_exit() finished");
 }
@@ -373,6 +371,7 @@ void usb_core_exit(void)
 void usb_core_handle_transfer_completion(
               struct usb_transfer_completion_event_data* event)
 {
+    completion_handler_t handler;
     int ep = event->endpoint;
 
     switch(ep) {
@@ -382,9 +381,9 @@ void usb_core_handle_transfer_completion(
                                     (struct usb_ctrlrequest*)event->data);
             break;
         default:
-            if(ep_data[ep].completion_handler[event->dir>>7] != NULL)
-                ep_data[ep].completion_handler[event->dir>>7](ep,event->dir,
-                                              event->status,event->length);
+            handler = ep_data[ep].completion_handler[event->dir>>7];
+            if(handler != NULL)
+                handler(ep,event->dir,event->status,event->length);
             break;
     }
 }
@@ -403,8 +402,7 @@ bool usb_core_any_exclusive_storage(void)
 {
     int i;
     for(i=0;i<USB_NUM_DRIVERS;i++) {
-        if(drivers[i].enabled &&
-           drivers[i].needs_exclusive_storage)
+        if(drivers[i].enabled && drivers[i].needs_exclusive_storage)
         {
             return true;
         }
@@ -418,8 +416,7 @@ void usb_core_hotswap_event(int volume,bool inserted)
 {
     int i;
     for(i=0;i<USB_NUM_DRIVERS;i++) {
-        if(drivers[i].enabled &&
-           drivers[i].notify_hotswap!=NULL)
+        if(drivers[i].enabled && drivers[i].notify_hotswap!=NULL)
         {
             drivers[i].notify_hotswap(volume,inserted);
         }
@@ -481,7 +478,7 @@ static void allocate_interfaces_and_endpoints(void)
         usb_drv_release_endpoint(i | USB_DIR_IN);
     }
 
-    for(i=0; i < USB_NUM_DRIVERS; i++) {
+    for(i=0;i<USB_NUM_DRIVERS;i++) {
         if(drivers[i].enabled) {
             drivers[i].first_interface = interface;
 
@@ -762,19 +759,23 @@ void usb_core_bus_reset(void)
 /* called by usb_drv_transfer_completed() */
 void usb_core_transfer_complete(int endpoint, int dir, int status,int length)
 {
+    struct usb_transfer_completion_event_data *completion_event;
+
     switch (endpoint) {
         case EP_CONTROL:
             /* already handled */
             break;
 
         default:
-            ep_data[endpoint].completion_event.endpoint=endpoint;
-            ep_data[endpoint].completion_event.dir=dir;
-            ep_data[endpoint].completion_event.data=0;
-            ep_data[endpoint].completion_event.status=status;
-            ep_data[endpoint].completion_event.length=length;
+            completion_event = &ep_data[endpoint].completion_event;
+
+            completion_event->endpoint=endpoint;
+            completion_event->dir=dir;
+            completion_event->data=0;
+            completion_event->status=status;
+            completion_event->length=length;
             /* All other endoints. Let the thread deal with it */
-            usb_signal_transfer_completion(&ep_data[endpoint].completion_event);
+            usb_signal_transfer_completion(completion_event);
             break;
     }
 }
@@ -782,18 +783,21 @@ void usb_core_transfer_complete(int endpoint, int dir, int status,int length)
 /* called by usb_drv_int() */
 void usb_core_control_request(struct usb_ctrlrequest* req)
 {
-    ep_data[0].completion_event.endpoint=0;
-    ep_data[0].completion_event.dir=0;
-    ep_data[0].completion_event.data=(void *)req;
-    ep_data[0].completion_event.status=0;
-    ep_data[0].completion_event.length=0;
+    struct usb_transfer_completion_event_data *completion_event =
+        &ep_data[0].completion_event;
+
+    completion_event->endpoint=0;
+    completion_event->dir=0;
+    completion_event->data=(void *)req;
+    completion_event->status=0;
+    completion_event->length=0;
     logf("ctrl received %ld",current_tick);
-    usb_signal_transfer_completion(&ep_data[0].completion_event);
+    usb_signal_transfer_completion(completion_event);
 }
 
 int usb_core_ack_control(struct usb_ctrlrequest* req)
 {
-    if (req->bRequestType & 0x80)
+    if (req->bRequestType & USB_DIR_IN)
         return usb_drv_recv(EP_CONTROL, NULL, 0);
     else
         return usb_drv_send(EP_CONTROL, NULL, 0);
@@ -802,13 +806,6 @@ int usb_core_ack_control(struct usb_ctrlrequest* req)
 #ifdef HAVE_USB_POWER
 unsigned short usb_allowed_current()
 {
-    if (usb_state == CONFIGURED)
-    {
-        return MAX(USB_MAX_CURRENT, 100);
-    }
-    else
-    {
-        return 100;
-    }
+    return (usb_state == CONFIGURED) ? MAX(USB_MAX_CURRENT, 100) : 100;
 }
 #endif

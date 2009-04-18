@@ -32,7 +32,7 @@
 
 /* serial interface */
 static struct usb_interface_descriptor __attribute__((aligned(2)))
-                                interface_descriptor =
+    interface_descriptor =
 {
     .bLength            = sizeof(struct usb_interface_descriptor),
     .bDescriptorType    = USB_DT_INTERFACE,
@@ -46,7 +46,8 @@ static struct usb_interface_descriptor __attribute__((aligned(2)))
 };
 
 
-static struct usb_endpoint_descriptor __attribute__((aligned(2))) endpoint_descriptor =
+static struct usb_endpoint_descriptor __attribute__((aligned(2)))
+    endpoint_descriptor =
 {
     .bLength          = sizeof(struct usb_endpoint_descriptor),
     .bDescriptorType  = USB_DT_ENDPOINT,
@@ -77,12 +78,10 @@ static int usb_interface;
 int usb_serial_request_endpoints(struct usb_class_driver *drv)
 {
     ep_in = usb_core_request_endpoint(USB_DIR_IN, drv);
-
     if (ep_in < 0)
         return -1;
-    
-    ep_out = usb_core_request_endpoint(USB_DIR_OUT, drv);
 
+    ep_out = usb_core_request_endpoint(USB_DIR_OUT, drv);
     if (ep_out < 0) {
         usb_core_release_endpoint(ep_in);
         return -1;
@@ -97,8 +96,7 @@ int usb_serial_set_first_interface(int interface)
     return interface + 1;
 }
 
-
-int usb_serial_get_config_descriptor(unsigned char *dest,int max_packet_size)
+int usb_serial_get_config_descriptor(unsigned char *dest, int max_packet_size)
 {
     unsigned char *orig_dest = dest;
 
@@ -186,7 +184,7 @@ void usb_serial_send(unsigned char *data,int length)
         return;
     int freestart=(buffer_start+buffer_length+buffer_transitlength)%BUFFER_SIZE;
     if(buffer_start+buffer_transitlength+buffer_length >= BUFFER_SIZE)
-    { 
+    {
         /* current buffer wraps, so new data can't */
         int available_space = BUFFER_SIZE - buffer_length - buffer_transitlength;
         length=MIN(length,available_space);
@@ -245,12 +243,9 @@ void usb_serial_transfer_complete(int ep,int dir, int status, int length)
             }
 
             if(buffer_length>0)
-            {
                 sendout();
-            }
             break;
     }
 }
-
 
 #endif /*USB_SERIAL*/

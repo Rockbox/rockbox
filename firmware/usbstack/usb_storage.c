@@ -103,7 +103,7 @@
 #define USB_PROT_BULK    0x50            /* bulk only */
 
 static struct usb_interface_descriptor __attribute__((aligned(2)))
-                                       interface_descriptor = 
+                                       interface_descriptor =
 {
     .bLength            = sizeof(struct usb_interface_descriptor),
     .bDescriptorType    = USB_DT_INTERFACE,
@@ -131,7 +131,7 @@ struct inquiry_data {
     unsigned char DeviceType;
     unsigned char DeviceTypeModifier;
     unsigned char Versions;
-    unsigned char Format; 
+    unsigned char Format;
     unsigned char AdditionalLength;
     unsigned char Reserved[2];
     unsigned char Capability;
@@ -309,12 +309,12 @@ static bool check_disk_present(IF_MV_NONVOID(int volume))
 
 void usb_storage_try_release_storage(void)
 {
-    /* Check if there is a connected drive left. If not, 
+    /* Check if there is a connected drive left. If not,
        release excusive access */
     bool canrelease=true;
     int i;
     for(i=0;i<NUM_VOLUMES;i++) {
-        if(ejected[i]==false && locked[i]==true){
+        if(ejected[i]==false && locked[i]==true) {
             canrelease=false;
             break;
         }
@@ -329,7 +329,7 @@ void usb_storage_try_release_storage(void)
 void usb_storage_notify_hotswap(int volume,bool inserted)
 {
     logf("notify %d",inserted);
-    if(inserted  && check_disk_present(IF_MV(volume))) {
+    if(inserted && check_disk_present(IF_MV(volume))) {
         ejected[volume] = false;
     }
     else {
@@ -351,12 +351,12 @@ int usb_storage_request_endpoints(struct usb_class_driver *drv)
 {
     ep_in = usb_core_request_endpoint(USB_DIR_IN, drv);
 
-    if (ep_in < 0)
+    if(ep_in<0)
         return -1;
-    
+
     ep_out = usb_core_request_endpoint(USB_DIR_OUT, drv);
 
-    if (ep_out < 0) {
+    if(ep_out<0) {
         usb_core_release_endpoint(ep_in);
         return -1;
     }
@@ -410,7 +410,7 @@ void usb_storage_init_connection(void)
 
     audio_buffer = audio_get_buffer(false,&bufsize);
     tb.transfer_buffer =
-        (void *)UNCACHED_ADDR((unsigned int)(audio_buffer + 31) & 0xffffffe0);
+        (void *)UNCACHED_ADDR((unsigned int)(audio_buffer+31) & 0xffffffe0);
     cpucache_invalidate();
 #ifdef USB_USE_RAMDISK
     ramdisk_buffer = tb.transfer_buffer + BUFFER_SIZE*2;
@@ -452,7 +452,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             }
             logf("scsi write %d %d", cur_cmd.sector, cur_cmd.count);
             if(status==0) {
-                if((unsigned int)length!=(SECTOR_SIZE*cur_cmd.count)
+                if((unsigned int)length!=(SECTOR_SIZE* cur_cmd.count)
                   && (unsigned int)length!=BUFFER_SIZE) {
                     logf("unexpected length :%d",length);
                 }
@@ -473,14 +473,13 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                    sending the next bit */
 #ifdef USB_USE_RAMDISK
                 memcpy(ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
-                       cur_cmd.data[cur_cmd.data_select],
-                       MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
+                        cur_cmd.data[cur_cmd.data_select],
+                        MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
 #else
                 int result = storage_write_sectors(cur_cmd.lun,
-                                         cur_cmd.sector,
-                                         MIN(BUFFER_SIZE/SECTOR_SIZE,
-                                             cur_cmd.count),
-                                         cur_cmd.data[cur_cmd.data_select]);
+                        cur_cmd.sector,
+                        MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
+                        cur_cmd.data[cur_cmd.data_select]);
                 if(result != 0) {
                     send_csw(UMS_STATUS_FAIL);
                     cur_sense_data.sense_key=SENSE_MEDIUM_ERROR;
@@ -488,8 +487,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                     cur_sense_data.ascq=0;
                     break;
                 }
-#endif                
-
+#endif
                 if(next_count==0) {
                     send_csw(UMS_STATUS_GOOD);
                 }
@@ -499,7 +497,6 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
 
                 cur_cmd.sector = next_sector;
                 cur_cmd.count = next_count;
-
             }
             else {
                 logf("Transfer failed %X",status);
@@ -516,7 +513,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                 logf("IN received in WAITING_FOR_COMMAND");
             }
             //logf("command received");
-            if(letoh32(cbw->signature) == CBW_SIGNATURE){
+            if(letoh32(cbw->signature) == CBW_SIGNATURE) {
                 handle_scsi(cbw);
             }
             else {
@@ -622,7 +619,6 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req, unsigned char* des
             usb_drv_reset_endpoint(ep_in, false);
             usb_drv_reset_endpoint(ep_out, true);
 #endif
-            
             usb_drv_send(EP_CONTROL, NULL, 0);  /* ack */
             handled = true;
             break;
@@ -650,19 +646,18 @@ static void send_and_read_next(void)
     cur_cmd.sector+=(BUFFER_SIZE/SECTOR_SIZE);
     cur_cmd.count-=MIN(cur_cmd.count,BUFFER_SIZE/SECTOR_SIZE);
 
-    if(cur_cmd.count!=0){
+    if(cur_cmd.count!=0) {
         /* already read the next bit, so we can send it out immediately when the
          * current transfer completes.  */
 #ifdef USB_USE_RAMDISK
         memcpy(cur_cmd.data[cur_cmd.data_select],
-               ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
-               MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
+                ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
+                MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
 #else
         cur_cmd.last_result = storage_read_sectors(cur_cmd.lun,
-                                           cur_cmd.sector,
-                                           MIN(BUFFER_SIZE/SECTOR_SIZE,
-                                               cur_cmd.count),
-                                           cur_cmd.data[cur_cmd.data_select]);
+                cur_cmd.sector,
+                MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
+                cur_cmd.data[cur_cmd.data_select]);
 #endif
     }
 }
@@ -781,7 +776,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
         }
 
         case SCSI_MODE_SENSE_10: {
-            if(! lun_present) {
+            if(!lun_present) {
                 send_command_failed_result();
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
@@ -794,7 +789,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             switch(page_code) {
                 case 0x3f:
                     tb.ms_data_10->mode_data_length =
-                                   htobe16(sizeof(struct mode_sense_data_10)-2);
+                        htobe16(sizeof(struct mode_sense_data_10)-2);
                     tb.ms_data_10->medium_type = 0;
                     tb.ms_data_10->device_specific = 0;
                     tb.ms_data_10->reserved = 0;
@@ -806,24 +801,24 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                     memset(tb.ms_data_10->block_descriptor.num_blocks,0,8);
 
                     tb.ms_data_10->block_descriptor.num_blocks[4] =
-                               ((block_count/block_size_mult) & 0xff000000)>>24;
+                        ((block_count/block_size_mult) & 0xff000000)>>24;
                     tb.ms_data_10->block_descriptor.num_blocks[5] =
-                               ((block_count/block_size_mult) & 0x00ff0000)>>16;
+                        ((block_count/block_size_mult) & 0x00ff0000)>>16;
                     tb.ms_data_10->block_descriptor.num_blocks[6] =
-                               ((block_count/block_size_mult) & 0x0000ff00)>>8;
+                        ((block_count/block_size_mult) & 0x0000ff00)>>8;
                     tb.ms_data_10->block_descriptor.num_blocks[7] =
-                               ((block_count/block_size_mult) & 0x000000ff);
+                        ((block_count/block_size_mult) & 0x000000ff);
 
                     tb.ms_data_10->block_descriptor.block_size[0] =
-                                ((block_size*block_size_mult) & 0xff000000)>>24;
+                        ((block_size*block_size_mult) & 0xff000000)>>24;
                     tb.ms_data_10->block_descriptor.block_size[1] =
-                                ((block_size*block_size_mult) & 0x00ff0000)>>16;
+                        ((block_size*block_size_mult) & 0x00ff0000)>>16;
                     tb.ms_data_10->block_descriptor.block_size[2] =
-                                ((block_size*block_size_mult) & 0x0000ff00)>>8;
+                        ((block_size*block_size_mult) & 0x0000ff00)>>8;
                     tb.ms_data_10->block_descriptor.block_size[3] =
-                                ((block_size*block_size_mult) & 0x000000ff);
+                        ((block_size*block_size_mult) & 0x000000ff);
                     send_command_result(tb.ms_data_10,
-                              MIN(sizeof(struct mode_sense_data_10), length));
+                            MIN(sizeof(struct mode_sense_data_10), length));
                     break;
                 default:
                     send_command_failed_result();
@@ -831,11 +826,12 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                     cur_sense_data.asc=ASC_INVALID_FIELD_IN_CBD;
                     cur_sense_data.ascq=0;
                     break;
-                }
+            }
             break;
         }
+
         case SCSI_MODE_SENSE_6: {
-            if(! lun_present) {
+            if(!lun_present) {
                 send_command_failed_result();
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
@@ -849,34 +845,34 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 case 0x3f:
                     /* All supported pages. */
                     tb.ms_data_6->mode_data_length =
-                         sizeof(struct mode_sense_data_6)-1;
+                        sizeof(struct mode_sense_data_6)-1;
                     tb.ms_data_6->medium_type = 0;
                     tb.ms_data_6->device_specific = 0;
                     tb.ms_data_6->block_descriptor_length =
-                            sizeof(struct mode_sense_bdesc_shortlba);
+                        sizeof(struct mode_sense_bdesc_shortlba);
                     tb.ms_data_6->block_descriptor.density_code = 0;
                     tb.ms_data_6->block_descriptor.reserved = 0;
-                    if(block_count/block_size_mult > 0xffffff){
+                    if(block_count/block_size_mult > 0xffffff) {
                         tb.ms_data_6->block_descriptor.num_blocks[0] = 0xff;
                         tb.ms_data_6->block_descriptor.num_blocks[1] = 0xff;
                         tb.ms_data_6->block_descriptor.num_blocks[2] = 0xff;
                     }
                     else {
                         tb.ms_data_6->block_descriptor.num_blocks[0] =
-                             ((block_count/block_size_mult) & 0xff0000)>>16;
+                            ((block_count/block_size_mult) & 0xff0000)>>16;
                         tb.ms_data_6->block_descriptor.num_blocks[1] =
-                             ((block_count/block_size_mult) & 0x00ff00)>>8;
+                            ((block_count/block_size_mult) & 0x00ff00)>>8;
                         tb.ms_data_6->block_descriptor.num_blocks[2] =
-                             ((block_count/block_size_mult) & 0x0000ff);
+                            ((block_count/block_size_mult) & 0x0000ff);
                     }
                     tb.ms_data_6->block_descriptor.block_size[0] =
-                         ((block_size*block_size_mult) & 0xff0000)>>16;
+                        ((block_size*block_size_mult) & 0xff0000)>>16;
                     tb.ms_data_6->block_descriptor.block_size[1] =
-                         ((block_size*block_size_mult) & 0x00ff00)>>8;
+                        ((block_size*block_size_mult) & 0x00ff00)>>8;
                     tb.ms_data_6->block_descriptor.block_size[2] =
-                         ((block_size*block_size_mult) & 0x0000ff);
+                        ((block_size*block_size_mult) & 0x0000ff);
                     send_command_result(tb.ms_data_6,
-                              MIN(sizeof(struct mode_sense_data_6), length));
+                        MIN(sizeof(struct mode_sense_data_6), length));
                     break;
                 default:
                     send_command_failed_result();
@@ -907,57 +903,55 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
         case SCSI_ALLOW_MEDIUM_REMOVAL:
             logf("scsi allow_medium_removal %d",lun);
-            if((cbw->command_block[4] & 0x03) == 0) 
-            {
+            if((cbw->command_block[4] & 0x03) == 0) {
                 locked[lun]=false;
                 queue_broadcast(SYS_USB_LUN_LOCKED, (lun<<16)+0);
             }
-            else
-            {
+            else {
                 locked[lun]=true;
                 queue_broadcast(SYS_USB_LUN_LOCKED, (lun<<16)+1);
             }
             send_csw(UMS_STATUS_GOOD);
             break;
+
         case SCSI_READ_FORMAT_CAPACITY: {
             logf("scsi read_format_capacity %d",lun);
             if(lun_present) {
                 tb.format_capacity_data->following_length=htobe32(8);
                 /* "block count" actually means "number of last block" */
                 tb.format_capacity_data->block_count =
-                     htobe32(block_count/block_size_mult - 1);
+                    htobe32(block_count/block_size_mult - 1);
                 tb.format_capacity_data->block_size =
-                     htobe32(block_size*block_size_mult);
+                    htobe32(block_size*block_size_mult);
                 tb.format_capacity_data->block_size |=
-                     htobe32(SCSI_FORMAT_CAPACITY_FORMATTED_MEDIA);
+                    htobe32(SCSI_FORMAT_CAPACITY_FORMATTED_MEDIA);
 
                 send_command_result(tb.format_capacity_data,
-                          MIN(sizeof(struct format_capacity), length));
-            }
-            else
-            {
-                send_command_failed_result();
-                cur_sense_data.sense_key=SENSE_NOT_READY;
-                cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
-                cur_sense_data.ascq=0;
-            }
-            break;
+                    MIN(sizeof(struct format_capacity), length));
+           }
+           else {
+               send_command_failed_result();
+               cur_sense_data.sense_key=SENSE_NOT_READY;
+               cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+               cur_sense_data.ascq=0;
+           }
+           break;
         }
+
         case SCSI_READ_CAPACITY: {
             logf("scsi read_capacity %d",lun);
 
             if(lun_present) {
                 /* "block count" actually means "number of last block" */
                 tb.capacity_data->block_count =
-                     htobe32(block_count/block_size_mult - 1);
+                    htobe32(block_count/block_size_mult - 1);
                 tb.capacity_data->block_size =
-                     htobe32(block_size*block_size_mult);
+                    htobe32(block_size*block_size_mult);
 
                 send_command_result(tb.capacity_data,
-                     MIN(sizeof(struct capacity), length));
+                    MIN(sizeof(struct capacity), length));
             }
-            else
-            {
+            else {
                 send_command_failed_result();
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
@@ -968,7 +962,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
         case SCSI_READ_10:
             logf("scsi read10 %d",lun);
-            if(! lun_present) {
+            if(!lun_present) {
                 send_command_failed_result();
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
@@ -979,13 +973,13 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             cur_cmd.data[1] = &tb.transfer_buffer[BUFFER_SIZE];
             cur_cmd.data_select=0;
             cur_cmd.sector = block_size_mult *
-               (cbw->command_block[2] << 24 |
-                cbw->command_block[3] << 16 |
-                cbw->command_block[4] << 8  |
-                cbw->command_block[5] );
+                (cbw->command_block[2] << 24 |
+                 cbw->command_block[3] << 16 |
+                 cbw->command_block[4] << 8  |
+                 cbw->command_block[5] );
             cur_cmd.count = block_size_mult *
-               (cbw->command_block[7] << 8 |
-                cbw->command_block[8]);
+                (cbw->command_block[7] << 8 |
+                 cbw->command_block[8]);
             cur_cmd.orig_count = cur_cmd.count;
 
             //logf("scsi read %d %d", cur_cmd.sector, cur_cmd.count);
@@ -999,17 +993,16 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             else {
 #ifdef USB_USE_RAMDISK
                 memcpy(cur_cmd.data[cur_cmd.data_select],
-                       ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
-                       MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
+                        ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
+                        MIN(BUFFER_SIZE/SECTOR_SIZE,cur_cmd.count)*SECTOR_SIZE);
 #else
                 cur_cmd.last_result = storage_read_sectors(cur_cmd.lun,
-                                             cur_cmd.sector,
-                                             MIN(BUFFER_SIZE/SECTOR_SIZE,
-                                                 cur_cmd.count),
-                                             cur_cmd.data[cur_cmd.data_select]);
+                        cur_cmd.sector,
+                        MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
+                        cur_cmd.data[cur_cmd.data_select]);
 
 #ifdef TOSHIBA_GIGABEAT_S
-                if (cur_cmd.sector == 0) {
+                if(cur_cmd.sector == 0) {
                     fix_mbr(cur_cmd.data[cur_cmd.data_select]);
                 }
 #endif
@@ -1020,7 +1013,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
         case SCSI_WRITE_10:
             logf("scsi write10 %d",lun);
-            if(! lun_present) {
+            if(!lun_present) {
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
@@ -1031,13 +1024,13 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             cur_cmd.data[1] = &tb.transfer_buffer[BUFFER_SIZE];
             cur_cmd.data_select=0;
             cur_cmd.sector = block_size_mult *
-               (cbw->command_block[2] << 24 |
-                cbw->command_block[3] << 16 |
-                cbw->command_block[4] << 8  |
-                cbw->command_block[5] );
+                (cbw->command_block[2] << 24 |
+                 cbw->command_block[3] << 16 |
+                 cbw->command_block[4] << 8  |
+                 cbw->command_block[5] );
             cur_cmd.count = block_size_mult *
-               (cbw->command_block[7] << 8 |
-                cbw->command_block[8]);
+                (cbw->command_block[7] << 8 |
+                 cbw->command_block[8]);
             cur_cmd.orig_count = cur_cmd.count;
 
             /* expect data */
@@ -1049,10 +1042,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             }
             else {
                 receive_block_data(cur_cmd.data[0],
-                                   MIN(BUFFER_SIZE,
-                                   cur_cmd.count*SECTOR_SIZE));
+                        MIN(BUFFER_SIZE, cur_cmd.count*SECTOR_SIZE));
             }
-
             break;
 
         default:
@@ -1097,7 +1088,7 @@ static void send_csw(int status)
     tb.csw->status = status;
 
     usb_drv_send_nonblocking(ep_in, tb.csw,
-                             sizeof(struct command_status_wrapper));
+            sizeof(struct command_status_wrapper));
     state = SENDING_CSW;
     //logf("CSW: %X",status);
 
@@ -1127,8 +1118,8 @@ static void copy_padded(char *dest, char *src, int len)
 /* build SCSI INQUIRY */
 static void fill_inquiry(IF_MV_NONVOID(int lun))
 {
-    memset(tb.inquiry, 0, sizeof(struct inquiry_data));
     struct storage_info info;
+    memset(tb.inquiry, 0, sizeof(struct inquiry_data));
     storage_get_info(lun,&info);
     copy_padded(tb.inquiry->VendorId,info.vendor,sizeof(tb.inquiry->VendorId));
     copy_padded(tb.inquiry->ProductId,info.product,sizeof(tb.inquiry->ProductId));
@@ -1138,7 +1129,7 @@ static void fill_inquiry(IF_MV_NONVOID(int lun))
     tb.inquiry->AdditionalLength = 0x1f;
     memset(tb.inquiry->Reserved, 0, 3);
     tb.inquiry->Versions = 4; /* SPC-2 */
-    tb.inquiry->Format   = 2; /* SPC-2/3 inquiry format */
+    tb.inquiry->Format = 2; /* SPC-2/3 inquiry format */
 
 #ifdef TOSHIBA_GIGABEAT_S
     tb.inquiry->DeviceTypeModifier = 0;
