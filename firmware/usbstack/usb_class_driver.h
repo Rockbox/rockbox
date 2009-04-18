@@ -25,14 +25,14 @@
 /* Common api, implemented by all class drivers */
 
 struct usb_class_driver {
-	/* First some runtime data */
+    /* First some runtime data */
     bool enabled;
     int first_interface;
     int last_interface;
 
-	/* Driver api starts here */
+    /* Driver api starts here */
 
-	/* Set this to true if the driver needs exclusive disk access (e.g. usb storage) */
+    /* Set this to true if the driver needs exclusive disk access (e.g. usb storage) */
     bool needs_exclusive_storage;
 
     /* Let the driver request endpoints it need. Returns zero on success */
@@ -52,7 +52,7 @@ struct usb_class_driver {
     int (*get_config_descriptor)(unsigned char *dest, int max_packet_size);
 
     /* Tells the driver that a usb connection has been set up and is now
-       ready to use. 
+       ready to use.
 	   Optional function */
     void (*init_connection)(void);
 
@@ -62,24 +62,24 @@ struct usb_class_driver {
 	   Optional function */
     void (*init)(void);
 
-    /* Tells the driver that the usb connection is no longer active 
+    /* Tells the driver that the usb connection is no longer active
 	   Optional function */
     void (*disconnect)(void);
 
     /* Tells the driver that a usb transfer has been completed. Note that "dir"
-       is relative to the host 
+       is relative to the host
 	   Optional function */
     void (*transfer_complete)(int ep,int dir, int status, int length);
 
     /* Tells the driver that a control request has come in. If the driver is
        able to handle it, it should ack the request, and return true. Otherwise
-       it should return false. 
+       it should return false.
 	   Optional function */
     bool (*control_request)(struct usb_ctrlrequest* req);
 
 #ifdef HAVE_HOTSWAP
     /* Tells the driver that a hotswappable disk/card was inserted or
-       extracted 
+       extracted
 	   Optional function */
     void (*notify_hotswap)(int volume, bool inserted);
 #endif

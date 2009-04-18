@@ -107,7 +107,6 @@ struct usb_transfer_completion_event_data
 };
 #endif
 
-
 void usb_init(void);
 void usb_enable(bool on);
 void usb_attach(void);
@@ -128,7 +127,8 @@ bool usb_charging_enabled(void);
 #endif
 #endif
 #ifdef HAVE_USBSTACK
-void usb_signal_transfer_completion(struct usb_transfer_completion_event_data* event_data);
+void usb_signal_transfer_completion(
+    struct usb_transfer_completion_event_data *event_data);
 bool usb_driver_enabled(int driver);
 bool usb_exclusive_storage(void); /* storage is available for usb */
 void usb_storage_try_release_storage(void);
