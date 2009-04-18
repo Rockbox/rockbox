@@ -27,7 +27,12 @@
  * This file holds USB constants and structures that are needed for
  * USB device APIs.  These are used by the USB device model, which is
  * defined in chapter 9 of the USB 2.0 specification and in the
- * Wireless USB 1.0 (spread around).
+ * Wireless USB 1.0 (spread around).  Linux has several APIs in C that
+ * need these:
+ *
+ * - the master/host side Linux-USB kernel driver API;
+ * - the "usbfs" user space API; and
+ * - the Linux "gadget" slave/device/peripheral side driver API.
  *
  * USB 2.0 adds an additional "On The Go" (OTG) mode, which lets systems
  * act either as a USB master/host or as a USB slave/device.  That means
@@ -55,50 +60,36 @@
 
 #include <inttypes.h>
 
+/*-------------------------------------------------------------------------*/
+
+/* CONTROL REQUEST SUPPORT */
+
 /*
  * USB directions
  *
  * This bit flag is used in endpoint descriptors' bEndpointAddress field.
  * It's also one of three fields in control requests bRequestType.
  */
-#define USB_DIR_OUT         0        /* to device */
-#define USB_DIR_IN          0x80     /* to host */
+#define USB_DIR_OUT                     0               /* to device */
+#define USB_DIR_IN                      0x80            /* to host */
 
 /*
  * USB types, the second of three bRequestType fields
  */
-#define USB_TYPE_MASK           (0x03 << 5)
-#define USB_TYPE_STANDARD       (0x00 << 5)
-#define USB_TYPE_CLASS          (0x01 << 5)
-#define USB_TYPE_VENDOR         (0x02 << 5)
-#define USB_TYPE_RESERVED       (0x03 << 5)
+#define USB_TYPE_MASK                   (0x03 << 5)
+#define USB_TYPE_STANDARD               (0x00 << 5)
+#define USB_TYPE_CLASS                  (0x01 << 5)
+#define USB_TYPE_VENDOR                 (0x02 << 5)
+#define USB_TYPE_RESERVED               (0x03 << 5)
 
 /*
  * USB recipients, the third of three bRequestType fields
  */
-#define USB_RECIP_MASK          0x1f
-#define USB_RECIP_DEVICE        0x00
-#define USB_RECIP_INTERFACE     0x01
-#define USB_RECIP_ENDPOINT      0x02
-#define USB_RECIP_OTHER         0x03
-
-/*-------------------------------------------------------------------------*/
-
-/**
- * struct usb_ctrlrequest - SETUP data for a USB device control request
- * @bRequestType: matches the USB bmRequestType field
- * @bRequest: matches the USB bRequest field
- * @wValue: matches the USB wValue field (le16 byte order)
- * @wIndex: matches the USB wIndex field (le16 byte order)
- * @wLength: matches the USB wLength field (le16 byte order)
- */
-struct usb_ctrlrequest {
-    uint8_t bRequestType;
-    uint8_t bRequest;
-    uint16_t wValue;
-    uint16_t wIndex;
-    uint16_t wLength;
-} __attribute__ ((packed));
+#define USB_RECIP_MASK                  0x1f
+#define USB_RECIP_DEVICE                0x00
+#define USB_RECIP_INTERFACE             0x01
+#define USB_RECIP_ENDPOINT              0x02
+#define USB_RECIP_OTHER                 0x03
 
 /*
  * Standard requests, for the bRequest field of a SETUP packet.
@@ -107,17 +98,42 @@ struct usb_ctrlrequest {
  * TYPE_CLASS or TYPE_VENDOR specific feature flags could be retrieved
  * by a GET_STATUS request.
  */
-#define USB_REQ_GET_STATUS          0x00
-#define USB_REQ_CLEAR_FEATURE       0x01
-#define USB_REQ_SET_FEATURE         0x03
-#define USB_REQ_SET_ADDRESS         0x05
-#define USB_REQ_GET_DESCRIPTOR      0x06
-#define USB_REQ_SET_DESCRIPTOR      0x07
-#define USB_REQ_GET_CONFIGURATION   0x08
-#define USB_REQ_SET_CONFIGURATION   0x09
-#define USB_REQ_GET_INTERFACE       0x0A
-#define USB_REQ_SET_INTERFACE       0x0B
-#define USB_REQ_SYNCH_FRAME         0x0C
+#define USB_REQ_GET_STATUS              0x00
+#define USB_REQ_CLEAR_FEATURE           0x01
+#define USB_REQ_SET_FEATURE             0x03
+#define USB_REQ_SET_ADDRESS             0x05
+#define USB_REQ_GET_DESCRIPTOR          0x06
+#define USB_REQ_SET_DESCRIPTOR          0x07
+#define USB_REQ_GET_CONFIGURATION       0x08
+#define USB_REQ_SET_CONFIGURATION       0x09
+#define USB_REQ_GET_INTERFACE           0x0A
+#define USB_REQ_SET_INTERFACE           0x0B
+#define USB_REQ_SYNCH_FRAME             0x0C
+
+/**
+ * struct usb_ctrlrequest - SETUP data for a USB device control request
+ * @bRequestType: matches the USB bmRequestType field
+ * @bRequest: matches the USB bRequest field
+ * @wValue: matches the USB wValue field (le16 byte order)
+ * @wIndex: matches the USB wIndex field (le16 byte order)
+ * @wLength: matches the USB wLength field (le16 byte order)
+ *
+ * This structure is used to send control requests to a USB device.  It matches
+ * the different fields of the USB 2.0 Spec section 9.3, table 9-2.  See the
+ * USB spec for a fuller description of the different fields, and what they are
+ * used for.
+ *
+ * Note that the driver for any interface can issue control requests.
+ * For most devices, interfaces don't coordinate with each other, so
+ * such requests may be made at any time.
+ */
+struct usb_ctrlrequest {
+        uint8_t bRequestType;
+        uint8_t bRequest;
+        uint16_t wValue;
+        uint16_t wIndex;
+        uint16_t wLength;
+} __attribute__ ((packed));
 
 /*-------------------------------------------------------------------------*/
 
@@ -138,9 +154,9 @@ struct usb_ctrlrequest {
 #define USB_DT_STRING                   0x03
 #define USB_DT_INTERFACE                0x04
 #define USB_DT_ENDPOINT                 0x05
-#define USB_DT_DEVICE_QUALIFIER		    0x06
-#define USB_DT_OTHER_SPEED_CONFIG	    0x07
-#define USB_DT_INTERFACE_POWER		    0x08
+#define USB_DT_DEVICE_QUALIFIER         0x06
+#define USB_DT_OTHER_SPEED_CONFIG       0x07
+#define USB_DT_INTERFACE_POWER          0x08
 /* these are from a minor usb 2.0 revision (ECN) */
 #define USB_DT_OTG                      0x09
 #define USB_DT_DEBUG                    0x0a
@@ -154,61 +170,71 @@ struct usb_ctrlrequest {
 #define USB_DT_WIRELESS_ENDPOINT_COMP   0x11
 #define USB_DT_WIRE_ADAPTER             0x21
 #define USB_DT_RPIPE                    0x22
+#define USB_DT_CS_RADIO_CONTROL         0x23
 
 /* Conventional codes for class-specific descriptors.  The convention is
  * defined in the USB "Common Class" Spec (3.11).  Individual class specs
  * are authoritative for their usage, not the "common class" writeup.
  */
-#define USB_DT_CS_DEVICE        (USB_TYPE_CLASS | USB_DT_DEVICE)
-#define USB_DT_CS_CONFIG        (USB_TYPE_CLASS | USB_DT_CONFIG)
-#define USB_DT_CS_STRING        (USB_TYPE_CLASS | USB_DT_STRING)
-#define USB_DT_CS_INTERFACE     (USB_TYPE_CLASS | USB_DT_INTERFACE)
-#define USB_DT_CS_ENDPOINT      (USB_TYPE_CLASS | USB_DT_ENDPOINT)
+#define USB_DT_CS_DEVICE                (USB_TYPE_CLASS | USB_DT_DEVICE)
+#define USB_DT_CS_CONFIG                (USB_TYPE_CLASS | USB_DT_CONFIG)
+#define USB_DT_CS_STRING                (USB_TYPE_CLASS | USB_DT_STRING)
+#define USB_DT_CS_INTERFACE             (USB_TYPE_CLASS | USB_DT_INTERFACE)
+#define USB_DT_CS_ENDPOINT              (USB_TYPE_CLASS | USB_DT_ENDPOINT)
+
+/* All standard descriptors have these 2 fields at the beginning */
+struct usb_descriptor_header {
+        uint8_t  bLength;
+        uint8_t  bDescriptorType;
+} __attribute__ ((packed));
+
 
 /*-------------------------------------------------------------------------*/
 
 /* USB_DT_DEVICE: Device descriptor */
 struct usb_device_descriptor {
-    uint8_t  bLength;
-    uint8_t  bDescriptorType;
-    uint16_t bcdUSB;
-    uint8_t  bDeviceClass;
-    uint8_t  bDeviceSubClass;
-    uint8_t  bDeviceProtocol;
-    uint8_t  bMaxPacketSize0;
-    uint16_t idVendor;
-    uint16_t idProduct;
-    uint16_t bcdDevice;
-    uint8_t  iManufacturer;
-    uint8_t  iProduct;
-    uint8_t  iSerialNumber;
-    uint8_t  bNumConfigurations;
+        uint8_t  bLength;
+        uint8_t  bDescriptorType;
+
+        uint16_t bcdUSB;
+        uint8_t  bDeviceClass;
+        uint8_t  bDeviceSubClass;
+        uint8_t  bDeviceProtocol;
+        uint8_t  bMaxPacketSize0;
+        uint16_t idVendor;
+        uint16_t idProduct;
+        uint16_t bcdDevice;
+        uint8_t  iManufacturer;
+        uint8_t  iProduct;
+        uint8_t  iSerialNumber;
+        uint8_t  bNumConfigurations;
 } __attribute__ ((packed));
 
-#define USB_DT_DEVICE_SIZE    18
+#define USB_DT_DEVICE_SIZE              18
+
 
 /*
  * Device and/or Interface Class codes
  * as found in bDeviceClass or bInterfaceClass
  * and defined by www.usb.org documents
  */
-#define USB_CLASS_PER_INTERFACE          0 /* for DeviceClass */
-#define USB_CLASS_AUDIO                  1
-#define USB_CLASS_COMM                   2
-#define USB_CLASS_HID                    3
-#define USB_CLASS_PHYSICAL               5
-#define USB_CLASS_STILL_IMAGE            6
-#define USB_CLASS_PRINTER                7
-#define USB_CLASS_MASS_STORAGE           8
-#define USB_CLASS_HUB                    9
-#define USB_CLASS_CDC_DATA               0x0a
-#define USB_CLASS_CSCID                  0x0b /* chip+ smart card */
-#define USB_CLASS_CONTENT_SEC            0x0d /* content security */
-#define USB_CLASS_VIDEO                  0x0e
-#define USB_CLASS_WIRELESS_CONTROLLER    0xe0
-#define USB_CLASS_MISC                   0xef
-#define USB_CLASS_APP_SPEC               0xfe
-#define USB_CLASS_VENDOR_SPEC            0xff
+#define USB_CLASS_PER_INTERFACE         0       /* for DeviceClass */
+#define USB_CLASS_AUDIO                 1
+#define USB_CLASS_COMM                  2
+#define USB_CLASS_HID                   3
+#define USB_CLASS_PHYSICAL              5
+#define USB_CLASS_STILL_IMAGE           6
+#define USB_CLASS_PRINTER               7
+#define USB_CLASS_MASS_STORAGE          8
+#define USB_CLASS_HUB                   9
+#define USB_CLASS_CDC_DATA              0x0a
+#define USB_CLASS_CSCID                 0x0b    /* chip+ smart card */
+#define USB_CLASS_CONTENT_SEC           0x0d    /* content security */
+#define USB_CLASS_VIDEO                 0x0e
+#define USB_CLASS_WIRELESS_CONTROLLER   0xe0
+#define USB_CLASS_MISC                  0xef
+#define USB_CLASS_APP_SPEC              0xfe
+#define USB_CLASS_VENDOR_SPEC           0xff
 
 /*-------------------------------------------------------------------------*/
 
@@ -221,32 +247,33 @@ struct usb_device_descriptor {
  * descriptors.
  */
 struct usb_config_descriptor {
-    uint8_t  bLength;
-    uint8_t  bDescriptorType;
-    uint16_t wTotalLength;
-    uint8_t  bNumInterfaces;
-    uint8_t  bConfigurationValue;
-    uint8_t  iConfiguration;
-    uint8_t  bmAttributes;
-    uint8_t  bMaxPower;
+       uint8_t  bLength;
+       uint8_t  bDescriptorType;
+
+       uint16_t wTotalLength;
+       uint8_t  bNumInterfaces;
+       uint8_t  bConfigurationValue;
+       uint8_t  iConfiguration;
+       uint8_t  bmAttributes;
+       uint8_t  bMaxPower;
 } __attribute__ ((packed));
 
-#define USB_DT_CONFIG_SIZE    9
+#define USB_DT_CONFIG_SIZE              9
 
 /* from config descriptor bmAttributes */
-#define USB_CONFIG_ATT_ONE          (1 << 7) /* must be set */
-#define USB_CONFIG_ATT_SELFPOWER    (1 << 6) /* self powered */
-#define USB_CONFIG_ATT_WAKEUP       (1 << 5) /* can wakeup */
-#define USB_CONFIG_ATT_BATTERY      (1 << 4) /* battery powered */
+#define USB_CONFIG_ATT_ONE              (1 << 7)        /* must be set */
+#define USB_CONFIG_ATT_SELFPOWER        (1 << 6)        /* self powered */
+#define USB_CONFIG_ATT_WAKEUP           (1 << 5)        /* can wakeup */
+#define USB_CONFIG_ATT_BATTERY          (1 << 4)        /* battery powered */
 
 /*-------------------------------------------------------------------------*/
 
 /* USB_DT_STRING: String descriptor */
 struct usb_string_descriptor {
-    uint8_t  bLength;
-    uint8_t  bDescriptorType;
+        uint8_t  bLength;
+        uint8_t  bDescriptorType;
 
-    uint16_t wString[]; /* UTF-16LE encoded */
+        uint16_t wString[];             /* UTF-16LE encoded */
 } __attribute__ ((packed));
 
 /* note that "string" zero is special, it holds language codes that
@@ -257,129 +284,128 @@ struct usb_string_descriptor {
 
 /* USB_DT_INTERFACE: Interface descriptor */
 struct usb_interface_descriptor {
-    uint8_t  bLength;
-    uint8_t  bDescriptorType;
+        uint8_t  bLength;
+        uint8_t  bDescriptorType;
 
-    uint8_t  bInterfaceNumber;
-    uint8_t  bAlternateSetting;
-    uint8_t  bNumEndpoints;
-    uint8_t  bInterfaceClass;
-    uint8_t  bInterfaceSubClass;
-    uint8_t  bInterfaceProtocol;
-    uint8_t  iInterface;
+        uint8_t  bInterfaceNumber;
+        uint8_t  bAlternateSetting;
+        uint8_t  bNumEndpoints;
+        uint8_t  bInterfaceClass;
+        uint8_t  bInterfaceSubClass;
+        uint8_t  bInterfaceProtocol;
+        uint8_t  iInterface;
 } __attribute__ ((packed));
 
-#define USB_DT_INTERFACE_SIZE    9
+#define USB_DT_INTERFACE_SIZE           9
 
 /*-------------------------------------------------------------------------*/
 
 /* USB_DT_ENDPOINT: Endpoint descriptor */
 struct usb_endpoint_descriptor {
-    uint8_t  bLength;
-    uint8_t  bDescriptorType;
+        uint8_t  bLength;
+        uint8_t  bDescriptorType;
 
-    uint8_t  bEndpointAddress;
-    uint8_t  bmAttributes;
-    uint16_t wMaxPacketSize;
-    uint8_t  bInterval;
-
-	/* NOTE:  these two are _only_ in audio endpoints. */
-	/* use USB_DT_ENDPOINT*_SIZE in bLength, not sizeof. */
-    //uint8_t  bRefresh;
-    //uint8_t  bSynchAddress;
+        uint8_t  bEndpointAddress;
+        uint8_t  bmAttributes;
+        uint16_t wMaxPacketSize;
+        uint8_t  bInterval;
 } __attribute__ ((packed));
 
-#define USB_DT_ENDPOINT_SIZE        7
-#define USB_DT_ENDPOINT_AUDIO_SIZE  9	/* Audio extension */
+#define USB_DT_ENDPOINT_SIZE            7
+#define USB_DT_ENDPOINT_AUDIO_SIZE      9       /* Audio extension */
+
+
+/*
+ * Endpoints
+ */
+#define USB_ENDPOINT_NUMBER_MASK        0x0f    /* in bEndpointAddress */
+#define USB_ENDPOINT_DIR_MASK           0x80
+
+#define USB_ENDPOINT_XFERTYPE_MASK      0x03    /* in bmAttributes */
+#define USB_ENDPOINT_XFER_CONTROL       0
+#define USB_ENDPOINT_XFER_ISOC          1
+#define USB_ENDPOINT_XFER_BULK          2
+#define USB_ENDPOINT_XFER_INT           3
+#define USB_ENDPOINT_MAX_ADJUSTABLE     0x80
+
 
 /*-------------------------------------------------------------------------*/
 
 /* USB_DT_DEVICE_QUALIFIER: Device Qualifier descriptor */
 struct usb_qualifier_descriptor {
-    uint8_t  bLength;
-    uint8_t  bDescriptorType;
+        uint8_t  bLength;
+        uint8_t  bDescriptorType;
 
-    uint16_t bcdUSB;
-    uint8_t  bDeviceClass;
-    uint8_t  bDeviceSubClass;
-    uint8_t  bDeviceProtocol;
-    uint8_t  bMaxPacketSize0;
-    uint8_t  bNumConfigurations;
-    uint8_t  bRESERVED;
+        uint16_t bcdUSB;
+        uint8_t  bDeviceClass;
+        uint8_t  bDeviceSubClass;
+        uint8_t  bDeviceProtocol;
+        uint8_t  bMaxPacketSize0;
+        uint8_t  bNumConfigurations;
+        uint8_t  bRESERVED;
 } __attribute__ ((packed));
+
 
 /*-------------------------------------------------------------------------*/
 
 /* USB_DT_OTG (from OTG 1.0a supplement) */
 struct usb_otg_descriptor {
-    uint8_t  bLength;
-    uint8_t  bDescriptorType;
+        uint8_t  bLength;
+        uint8_t  bDescriptorType;
 
-    uint8_t  bmAttributes;	/* support for HNP, SRP, etc */
+        uint8_t  bmAttributes;  /* support for HNP, SRP, etc */
 } __attribute__ ((packed));
 
 /* from usb_otg_descriptor.bmAttributes */
-#define USB_OTG_SRP    (1 << 0)
-#define USB_OTG_HNP    (1 << 1) /* swap host/device roles */
+#define USB_OTG_SRP             (1 << 0)
+#define USB_OTG_HNP             (1 << 1)        /* swap host/device roles */
 
 /*-------------------------------------------------------------------------*/
 
 /* USB_DT_DEBUG:  for special highspeed devices, replacing serial console */
 struct usb_debug_descriptor {
-    uint8_t  bLength;
-    uint8_t  bDescriptorType;
+        uint8_t  bLength;
+        uint8_t  bDescriptorType;
 
-	/* bulk endpoints with 8 byte maxpacket */
-    uint8_t  bDebugInEndpoint;
-    uint8_t  bDebugOutEndpoint;
-};
+        /* bulk endpoints with 8 byte maxpacket */
+        uint8_t  bDebugInEndpoint;
+        uint8_t  bDebugOutEndpoint;
+} __attribute__((packed));
 
 /*-------------------------------------------------------------------------*/
-
-/*
- * Endpoints
- */
-#define USB_ENDPOINT_XFERTYPE_MASK  0x03 /* in bmAttributes */
-#define USB_ENDPOINT_XFER_CONTROL   0
-#define USB_ENDPOINT_XFER_ISOC      1
-#define USB_ENDPOINT_XFER_BULK      2
-#define USB_ENDPOINT_XFER_INT       3
+/* USB 2.0 defines three speeds, here's how Linux identifies them */
 
 enum usb_device_speed {
-	USB_SPEED_UNKNOWN = 0,          /* enumerating */
-	USB_SPEED_LOW, USB_SPEED_FULL,  /* usb 1.1 */
-	USB_SPEED_HIGH,                 /* usb 2.0 */
-	USB_SPEED_VARIABLE,             /* wireless (usb 2.5) */
+        USB_SPEED_UNKNOWN = 0,                  /* enumerating */
+        USB_SPEED_LOW, USB_SPEED_FULL,          /* usb 1.1 */
+        USB_SPEED_HIGH,                         /* usb 2.0 */
+        USB_SPEED_VARIABLE,                     /* wireless (usb 2.5) */
 };
 
 enum usb_device_state {
-	/* NOTATTACHED isn't in the USB spec, and this state acts
-	 * the same as ATTACHED ... but it's clearer this way.
-	 */
-	USB_STATE_NOTATTACHED = 0,
+        /* NOTATTACHED isn't in the USB spec, and this state acts
+         * the same as ATTACHED ... but it's clearer this way.
+         */
+        USB_STATE_NOTATTACHED = 0,
 
-	/* chapter 9 and authentication (wireless) device states */
-	USB_STATE_ATTACHED,
-	USB_STATE_POWERED,			/* wired */
-	USB_STATE_UNAUTHENTICATED,		/* auth */
-	USB_STATE_RECONNECTING,			/* auth */
-	USB_STATE_DEFAULT,			/* limited function */
-	USB_STATE_ADDRESS,
-	USB_STATE_CONFIGURED,			/* most functions */
+        /* chapter 9 and authentication (wireless) device states */
+        USB_STATE_ATTACHED,
+        USB_STATE_POWERED,                      /* wired */
+        USB_STATE_UNAUTHENTICATED,              /* auth */
+        USB_STATE_RECONNECTING,                 /* auth */
+        USB_STATE_DEFAULT,                      /* limited function */
+        USB_STATE_ADDRESS,
+        USB_STATE_CONFIGURED,                   /* most functions */
 
-	USB_STATE_SUSPENDED
+        USB_STATE_SUSPENDED
 
-	/* NOTE:  there are actually four different SUSPENDED
-	 * states, returning to POWERED, DEFAULT, ADDRESS, or
-	 * CONFIGURED respectively when SOF tokens flow again.
-	 */
+        /* NOTE:  there are actually four different SUSPENDED
+         * states, returning to POWERED, DEFAULT, ADDRESS, or
+         * CONFIGURED respectively when SOF tokens flow again.
+         * At this level there's no difference between L1 and L2
+         * suspend states.  (L2 being original USB 1.1 suspend.)
+         */
 };
-
-/* All standard descriptors have these 2 fields at the beginning */
-struct usb_descriptor_header {
-    uint8_t  bLength;
-    uint8_t  bDescriptorType;
-} __attribute__ ((packed));
 
 /**
  * struct usb_string - wraps a C string and its USB id
@@ -390,8 +416,8 @@ struct usb_descriptor_header {
  * together with its ID.
  */
 struct usb_string {
-    uint8_t id;
-    const char* s;
+        uint8_t id;
+        const char* s;
 };
 
 /**
@@ -403,8 +429,8 @@ struct usb_string {
  * strings for a given language.
  */
 struct usb_gadget_strings {
-    uint16_t language;	/* 0x0409 for en-us */
-    struct usb_string* strings;
+        uint16_t language;                      /* 0x0409 for en-us */
+        struct usb_string* strings;
 };
 
 #endif /*_CH9_H_*/
