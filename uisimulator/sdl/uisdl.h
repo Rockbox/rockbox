@@ -163,12 +163,12 @@
 
 #elif defined(MROBE_500)
 #define UI_TITLE                    "Olympus M:Robe 500"
-#define UI_WIDTH                    401 /* width of GUI window */
-#define UI_HEIGHT                   655 /* height of GUI window */
-#define UI_LCD_POSX                 48 /* x position of lcd */
-#define UI_LCD_POSY                 60 /* y position of lcd */
+#define UI_WIDTH                    450 /* width of GUI window */
+#define UI_HEIGHT                   350 /* height of GUI window */
+#define UI_LCD_POSX                 65 /* x position of lcd */
+#define UI_LCD_POSY                 30 /* y position of lcd */
 #define UI_REMOTE_POSX              50  /* x position of remote lcd */
-#define UI_REMOTE_POSY              403 /* y position of remote lcd */
+#define UI_REMOTE_POSY              325 /* y position of remote lcd */
 
 #elif defined(IRIVER_H10)
 #define UI_TITLE                    "iriver H10 20Gb"
