@@ -24,7 +24,7 @@
 #include "usb_drv.h"
 #include "kernel.h"
 #include "usb_serial.h"
-
+#include "usb_class_driver.h"
 //#define LOGF_ENABLE
 #include "logf.h"
 
@@ -102,19 +102,16 @@ int usb_serial_get_config_descriptor(unsigned char *dest,int max_packet_size)
 {
     unsigned char *orig_dest = dest;
 
-    endpoint_descriptor.wMaxPacketSize=max_packet_size;
-    interface_descriptor.bInterfaceNumber=usb_interface;
+    interface_descriptor.bInterfaceNumber = usb_interface;
+    PACK_DESCRIPTOR(dest, interface_descriptor);
 
-    memcpy(dest,&interface_descriptor,sizeof(struct usb_interface_descriptor));
-    dest+=sizeof(struct usb_interface_descriptor);
+    endpoint_descriptor.wMaxPacketSize = max_packet_size;
 
     endpoint_descriptor.bEndpointAddress = ep_in;
-    memcpy(dest,&endpoint_descriptor,sizeof(struct usb_endpoint_descriptor));
-    dest+=sizeof(struct usb_endpoint_descriptor);
+    PACK_DESCRIPTOR(dest, endpoint_descriptor);
 
     endpoint_descriptor.bEndpointAddress = ep_out;
-    memcpy(dest,&endpoint_descriptor,sizeof(struct usb_endpoint_descriptor));
-    dest+=sizeof(struct usb_endpoint_descriptor);
+    PACK_DESCRIPTOR(dest, endpoint_descriptor);
 
     return (dest - orig_dest);
 }

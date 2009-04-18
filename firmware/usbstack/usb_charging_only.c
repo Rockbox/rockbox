@@ -24,6 +24,7 @@
 #include "usb_drv.h"
 #include "kernel.h"
 #include "usb_charging_only.h"
+#include "usb_class_driver.h"
 
 //#define LOGF_ENABLE
 #include "logf.h"
@@ -66,9 +67,7 @@ int usb_charging_only_get_config_descriptor(unsigned char *dest,int max_packet_s
     unsigned char *orig_dest = dest;
 
     interface_descriptor.bInterfaceNumber=usb_interface;
-    memcpy(dest,&interface_descriptor,sizeof(struct usb_interface_descriptor));
-
-    dest+=sizeof(struct usb_interface_descriptor);
+    PACK_DESCRIPTOR(dest, interface_descriptor);
 
     return (dest-orig_dest);
 }

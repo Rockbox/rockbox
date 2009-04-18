@@ -85,4 +85,10 @@ struct usb_class_driver {
 #endif
 };
 
+#define PACK_DESCRIPTOR(dest, descriptor) \
+    do { \
+        memcpy(dest, &(descriptor), sizeof(descriptor)); \
+        dest += sizeof(descriptor); \
+    } while (0)
+
 #endif
