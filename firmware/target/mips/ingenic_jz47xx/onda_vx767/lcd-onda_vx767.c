@@ -186,7 +186,7 @@ void lcd_init_controller(void)
     _display_init();
 }
 
-void lcd_set_target(short x, short y, short width, short height)
+void lcd_set_target(int x, short y, int width, int height)
 {
     SLCD_SEND_COMMAND(0x50, y);
     SLCD_SEND_COMMAND(0x51, y+height-1);
