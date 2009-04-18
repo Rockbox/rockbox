@@ -168,7 +168,7 @@ static enum { DEFAULT, ADDRESS, CONFIGURED } usb_state;
 static int usb_core_num_interfaces;
 
 typedef void (*completion_handler_t)(int ep,int dir, int status, int length);
-typedef bool (*control_handler_t)(struct usb_ctrlrequest* req);
+typedef bool (*control_handler_t)(struct usb_ctrlrequest* req, unsigned char *dest);
 
 static struct
 {
@@ -695,7 +695,7 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
                            drivers[i].first_interface <= (req->wIndex) &&
                            drivers[i].last_interface > (req->wIndex))
                         {
-                            handled = drivers[i].control_request(req);
+                            handled = drivers[i].control_request(req, response_data);
                         }
                     }
                     if(!handled) {
@@ -735,8 +735,10 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
                     break;
                 default: {
                     bool handled=false;
-                    if(ep_data[req->wIndex & 0xf].control_handler[0] != NULL)
-                        handled = ep_data[req->wIndex & 0xf].control_handler[0](req);
+                    if(ep_data[req->wIndex & 0xf].control_handler[0] != NULL) {
+                        handled = ep_data[req->wIndex & 0xf].control_handler[0](req,
+                                response_data);
+                    }
                     if(!handled) {
                         /* nope. flag error */
                         logf("usb bad req %d", req->bRequest);

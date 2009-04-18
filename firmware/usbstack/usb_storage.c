@@ -593,11 +593,11 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
 }
 
 /* called by usb_core_control_request() */
-bool usb_storage_control_request(struct usb_ctrlrequest* req)
+bool usb_storage_control_request(struct usb_ctrlrequest* req, unsigned char* dest)
 {
     bool handled = false;
 
-
+    (void)dest;
     switch (req->bRequest) {
         case USB_BULK_GET_MAX_LUN: {
 #ifdef ONLY_EXPOSE_CARD_SLOT

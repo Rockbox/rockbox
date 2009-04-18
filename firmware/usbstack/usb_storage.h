@@ -30,7 +30,7 @@ void usb_storage_init_connection(void);
 void usb_storage_disconnect(void);
 void usb_storage_init(void);
 void usb_storage_transfer_complete(int ep,int dir,int state,int length);
-bool usb_storage_control_request(struct usb_ctrlrequest* req);
+bool usb_storage_control_request(struct usb_ctrlrequest* req, unsigned char* dest);
 #ifdef HAVE_HOTSWAP
 void usb_storage_notify_hotswap(int volume,bool inserted);
 #endif
