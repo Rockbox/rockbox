@@ -756,8 +756,18 @@ int plugin_load(const char* plugin, const void* parameter)
 
     cpucache_invalidate();
     oldbars = viewportmanager_set_statusbar(VP_SB_HIDE_ALL);
+    
+#ifdef HAVE_TOUCHSCREEN
+    enum touchscreen_mode old_mode = touchscreen_get_mode();
+    
+    touchscreen_set_mode(TOUCHSCREEN_BUTTON);
+#endif
 
     rc = hdr->entry_point(parameter);
+    
+#ifdef HAVE_TOUCHSCREEN
+    touchscreen_set_mode(old_mode);
+#endif
     
     viewportmanager_set_statusbar(oldbars);
 
