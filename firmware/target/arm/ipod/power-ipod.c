@@ -59,6 +59,9 @@ unsigned int power_input_status(void)
     /* C2 is firewire power */
     if ((GPIOC_INPUT_VAL & 0x04) == 0)
         status = POWER_INPUT_MAIN_CHARGER;
+
+    if ((GPIOD_INPUT_VAL & 0x08) != 0)
+        status |= POWER_INPUT_USB_CHARGER;
     /* */
 #elif defined(IPOD_3G)
     /* firewire power */
