@@ -39,14 +39,13 @@
 #include "mips.h"
 
     .text
-    
-    .set mips32
 
     .extern system_main
     .extern main
     .global _start
 
     .section .init.text
+    .set    mips32
     .set    noreorder
     .set    noat
 
@@ -102,10 +101,10 @@ _start:
     mtc0    zero, C0_TAGLO   # TAGLO reg
     mtc0    zero, C0_TAGHI   # TAGHI reg
 
-_init_cache_loop:
+_cache_loop:
     cache   0x8, 0(t0)       # index store icache tag
     cache   0x9, 0(t0)       # index store dcache tag
-    bne     t0, t1, _init_cache_loop
+    bne     t0, t1, _cache_loop
     addiu   t0, t0, 0x20     # 32 bytes per cache line
     nop
 
@@ -130,11 +129,11 @@ _init_cache_loop:
     la     t0, _iramcopy
     la     t1, _iramstart
     la     t2, _iramend
-_init_iram_loop:
+_iram_loop:
     lw     t3, 0(t0)
     sw     t3, 0(t1)
     addiu  t1, 4
-    bne    t1, t2, _init_iram_loop
+    bne    t1, t2, _iram_loop
     addiu  t0, 4
     
     /*
@@ -144,9 +143,9 @@ _init_iram_loop:
     */
     la     t0, _edata
     la     t1, _end
-_init_bss_loop:
+_bss_loop:
     sw     zero, 0(t0)
-    bne    t0, t1, _init_bss_loop
+    bne    t0, t1, _bss_loop
     addiu  t0, 4
     
     /*
@@ -156,23 +155,23 @@ _init_bss_loop:
     */
     la     t0, _iedata
     la     t1, _iend
-_init_ibss_loop:
+_ibss_loop:
     sw     zero, 0(t0)
-    bne    t0, t1, _init_ibss_loop
+    bne    t0, t1, _ibss_loop
     addiu  t0, 4
 
     /*
       ----------------------------------------------------
-       Setup stack
+       Set up stack
       ----------------------------------------------------
     */
     la      sp, stackend
     la      t0, stackbegin
     li      t1, 0xDEADBEEF
     
-_init_stack_loop:    
+_stack_loop:    
     sw      t1, 0(t0)
-    bne     t0, sp, _init_stack_loop
+    bne     t0, sp, _stack_loop
     addiu   t0, t0, 4
 
     /*
@@ -180,11 +179,9 @@ _init_stack_loop:
        Jump to C code
       ----------------------------------------------------
     */
-    la      t0, system_main        /* Init clocks etc first */
-    jalr    t0
+    jal     system_main  /* Init clocks etc first */
     nop
-    la      t0, main
-    jr      t0
+    j       main
     nop
 
     
@@ -196,23 +193,19 @@ _init_stack_loop:
      */
     
     .section .vectors.1, "ax", %progbits
-    la     k0, tlb_refill_handler
-    jr     k0
+    j      tlb_refill_handler
     nop
     
     .section .vectors.2, "ax", %progbits
-    la     k0, real_exception_handler
-    jr     k0
+    j      real_exception_handler
     nop
     
     .section .vectors.3, "ax", %progbits
-    la     k0, real_exception_handler
-    jr     k0
+    j      real_exception_handler
     nop
     
     .section .vectors.4, "ax", %progbits
-    la     k0, real_exception_handler
-    jr     k0
+    j      real_exception_handler
     nop
 
     .section .vectors, "ax", %progbits
@@ -252,13 +245,13 @@ real_exception_handler:
     mfhi    k0
     nop
     sw      k0, 0x74(sp)
-    mfc0    k0, C0_STATUS  # Status register
+    mfc0    k0, C0_STATUS
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
     sw      k0, 0x78(sp)
-    mfc0    k0, C0_EPC     # Exception Program Counter
+    mfc0    k0, C0_EPC
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
@@ -266,7 +259,7 @@ real_exception_handler:
     sw      k0, 0x7C(sp)
     
     li      k1, M_CauseExcCode
-    mfc0    k0, C0_CAUSE   # C0_CAUSE of last exception
+    mfc0    k0, C0_CAUSE
     and     k0, k1
     beq     zero, k0, _int
     nop
@@ -280,12 +273,12 @@ _int:
     
 _exception:
     move    a0, sp
-    mfc0    a1, C0_CAUSE       # C0_CAUSE of last exception
+    mfc0    a1, C0_CAUSE
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
-    mfc0    a2, C0_EPC         # Exception Program Counter
+    mfc0    a2, C0_EPC
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
@@ -329,20 +322,21 @@ _exception_return:
     mthi    k0
     nop
     lw      k0, 0x78(sp)
-    mtc0    k0, C0_STATUS  # Status register
+    mtc0    k0, C0_STATUS
     nop
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
     lw      k0, 0x7C(sp)
-    mtc0    k0, C0_EPC     # Exception Program Counter
+    mtc0    k0, C0_EPC
     nop
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
     sll     zero, 1
     addiu   sp, 0x80
-    eret                   # Exception Return
+    eret
     nop
     .set reorder
+    .set at

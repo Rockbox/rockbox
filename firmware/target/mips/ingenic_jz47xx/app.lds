@@ -57,17 +57,7 @@ SECTIONS
         *(.sdata*);
         *(.rel.dyn);
     } > DRAM
-    
-    . = ALIGN(4);
-    
-    .stack (NOLOAD):
-    {
-         *(.stack);
-         stackbegin = .;
-         . += 0x2000;
-         stackend = .;
-    } > DRAM
-    
+       
     . = ALIGN(4);
     
     /* Set the load address of .iram at the same address as .bss
@@ -93,6 +83,16 @@ SECTIONS
         _iramend = .;
     } > IRAM
     _iramcopy = LOADADDR(.iram);
+    
+    . = ALIGN(4);
+    
+    .stack (NOLOAD):
+    {
+         *(.stack);
+         stackbegin = .;
+         . += 0x2000;
+         stackend = .;
+    } > IRAM
     
     . = ALIGN(4);
 
@@ -123,7 +123,7 @@ SECTIONS
     .audiobufend ENDAUDIOADDR:
     {
         audiobufend = .;
-    } > DRAM
+    }
 
     .codec ENDAUDIOADDR:
     {
