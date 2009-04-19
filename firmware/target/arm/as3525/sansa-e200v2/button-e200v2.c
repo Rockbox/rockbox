@@ -100,33 +100,29 @@ static void scrollwheel(short dbop_din)
             old_btn =  btn;
             repeat  =  counter  = 0;
         }
-        if (btn != BUTTON_NONE)
+        /* wheel_delta will cause lists to jump over items,
+         * we want this for fast scrolling, but we must keep it accurate
+         * for slow scrolling */
+        int wheel_delta = 0;
+        /* generate repeats if quick enough, scroll slightly too*/
+        if (TIME_BEFORE(current_tick, last_wheel_post + WHEEL_REPEAT_INTERVAL))
         {
-            /* wheel_delta will cause lists to jump over items,
-             * we want this for fast scrolling, but we must keep it accurate
-             * for slow scrolling */
-            int wheel_delta = 0;
-            /* generate repeats if quick enough, scroll slightly too*/
-            if (TIME_BEFORE(current_tick, last_wheel_post + WHEEL_REPEAT_INTERVAL))
-            {
-                btn |= BUTTON_REPEAT;
-                wheel_delta = repeat>>2;
-            }
+            btn |= BUTTON_REPEAT;
+            wheel_delta = repeat>>2;
+        }
 
-            repeat += 2;
-
-            /* the wheel is more reliable if we don't send ever change,
-             * every 2th is basically one "physical click" is
-             * 1 item in the rockbox menus */
-            if (++counter >= 2 && queue_empty(&button_queue))
-            {
-                buttonlight_on();
-                backlight_on();
-                queue_post(&button_queue, btn, ((wheel_delta+1)<<24));
-                /* message posted - reset count & last post to the queue */
-                counter = 0;
-                last_wheel_post = current_tick;
-            }
+        repeat += 2;
+        /* the wheel is more reliable if we don't send ever change,
+         * every 2th is basically one "physical click" is
+         * 1 item in the rockbox menus */
+        if (++counter >= 2 && queue_empty(&button_queue))
+        {
+            buttonlight_on();
+            backlight_on();
+            queue_post(&button_queue, btn, ((wheel_delta+1)<<24));
+            /* message posted - reset count & last post to the queue */
+            counter = 0;
+            last_wheel_post = current_tick;
         }
     }
     if (repeat > 0)
