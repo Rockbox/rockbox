@@ -42,16 +42,16 @@ struct usb_class_driver;
 void usb_core_init(void);
 void usb_core_exit(void);
 void usb_core_control_request(struct usb_ctrlrequest* req);
-void usb_core_transfer_complete(int endpoint, int dir, int status, int length);
+void usb_core_transfer_complete(int endpoint,int dir,int status,int length);
 void usb_core_bus_reset(void);
 bool usb_core_any_exclusive_storage(void);
 void usb_core_enable_driver(int driver,bool enabled);
-bool usb_core_driver_enabled (int driver);
+bool usb_core_driver_enabled(int driver);
 void usb_core_handle_transfer_completion(
-                             struct usb_transfer_completion_event_data* event);
+        struct usb_transfer_completion_event_data* event);
 int usb_core_ack_control(struct usb_ctrlrequest* req);
 
-int usb_core_request_endpoint(int dir, struct usb_class_driver *drv);
+int usb_core_request_endpoint(int dir,struct usb_class_driver* drv);
 void usb_core_release_endpoint(int dir);
 
 #ifdef HAVE_HOTSWAP

@@ -109,6 +109,24 @@
 #define USB_REQ_GET_INTERFACE           0x0A
 #define USB_REQ_SET_INTERFACE           0x0B
 #define USB_REQ_SYNCH_FRAME             0x0C
+/*
+ * USB feature flags are written using USB_REQ_{CLEAR,SET}_FEATURE, and
+ * are read as a bit array returned by USB_REQ_GET_STATUS.  (So there
+ * are at most sixteen features of each type.)  Hubs may also support a
+ * new USB_REQ_TEST_AND_SET_FEATURE to put ports into L1 suspend.
+ */
+#define USB_DEVICE_SELF_POWERED		0	/* (read only) */
+#define USB_DEVICE_REMOTE_WAKEUP	1	/* dev may initiate wakeup */
+#define USB_DEVICE_TEST_MODE		2	/* (wired high speed only) */
+#define USB_DEVICE_BATTERY		2	/* (wireless) */
+#define USB_DEVICE_B_HNP_ENABLE		3	/* (otg) dev may initiate HNP */
+#define USB_DEVICE_WUSB_DEVICE		3	/* (wireless)*/
+#define USB_DEVICE_A_HNP_SUPPORT	4	/* (otg) RH port supports HNP */
+#define USB_DEVICE_A_ALT_HNP_SUPPORT	5	/* (otg) other RH port does */
+#define USB_DEVICE_DEBUG_MODE		6	/* (special devices only) */
+
+#define USB_ENDPOINT_HALT		0	/* IN/OUT will STALL */
+
 
 /**
  * struct usb_ctrlrequest - SETUP data for a USB device control request
