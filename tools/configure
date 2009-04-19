@@ -304,7 +304,7 @@ arm1136jfscc () {
 
 mipselcc () {
  prefixtools mipsel-elf-
- GCCOPTS="$CCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-abicalls -mlong-calls -Wno-parentheses"
+ GCCOPTS="$CCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-abicalls -mno-long-calls -Wno-parentheses"
  GCCOPTIMIZE="-fomit-frame-pointer"
  GCCOPTS="$GCCOPTS -fno-pic -fno-builtin -fno-exceptions -ffunction-sections -msoft-float -G 0"
  endian="little"
