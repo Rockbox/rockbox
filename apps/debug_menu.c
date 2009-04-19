@@ -2583,7 +2583,8 @@ static bool dbg_scrollwheel(void)
 }
 #endif
 
-#if defined (HAVE_USBSTACK)
+#if defined (HAVE_USBSTACK) \
+   && (defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL) || defined(USB_HID))
 static bool toggle_usb_core_driver(int driver, char *msg)
 {
     bool enabled = !usb_core_driver_enabled(driver);
