@@ -832,7 +832,7 @@ static void set_filebuf_watermark(void)
 
 #ifdef HAVE_DISK_STORAGE
     int seconds;
-    int spinup = storage_spinup_time();
+    int spinup = ata_spinup_time();
     if (spinup)
         seconds = (spinup / HZ) + 1;
     else
