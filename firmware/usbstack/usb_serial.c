@@ -158,45 +158,41 @@ void usb_serial_disconnect(void)
 
 static void sendout(void)
 {
-    if(buffer_start+buffer_length >= BUFFER_SIZE)
+    buffer_transitlength = MIN(buffer_length,BUFFER_SIZE-buffer_start);
+    if(buffer_transitlength > 0)
     {
-        /* Buffer wraps. Only send the first part */
-        buffer_transitlength=BUFFER_SIZE - buffer_start;
-    }
-    else
-    {
-        /* Send everything */
-        buffer_transitlength=buffer_length;
-    }
-    if(buffer_transitlength>0)
-    {
-        buffer_length-=buffer_transitlength;
+        buffer_length -= buffer_transitlength;
         usb_drv_send_nonblocking(ep_in, &send_buffer[buffer_start],
-                                 buffer_transitlength);
+                buffer_transitlength);
     }
 }
 
 void usb_serial_send(unsigned char *data,int length)
 {
-    if(!active)
+    int freestart, available_end_space, i;
+
+    if (!active||length<=0)
         return;
-    if(length<=0)
-        return;
-    int freestart=(buffer_start+buffer_length+buffer_transitlength)%BUFFER_SIZE;
-    if(buffer_start+buffer_transitlength+buffer_length >= BUFFER_SIZE)
+
+    i=buffer_start+buffer_length+buffer_transitlength;
+    freestart=i%BUFFER_SIZE;
+    available_end_space=BUFFER_SIZE-i;
+
+    if (0>=available_end_space)
     {
-        /* current buffer wraps, so new data can't */
-        int available_space = BUFFER_SIZE - buffer_length - buffer_transitlength;
-        length=MIN(length,available_space);
-        memcpy(&send_buffer[freestart],
-               data,length);
+        /* current buffer wraps, so new data can't wrap */
+        int available_space = BUFFER_SIZE -
+            (buffer_length + buffer_transitlength);
+
+        length = MIN(length,available_space);
+        memcpy(&send_buffer[freestart],data,length);
         buffer_length+=length;
     }
     else
     {
         /* current buffer doesn't wrap, so new data might */
-        int available_end_space = (BUFFER_SIZE - (buffer_start+buffer_length+buffer_transitlength));
         int first_chunk = MIN(length,available_end_space);
+
         memcpy(&send_buffer[freestart],data,first_chunk);
         length-=first_chunk;
         buffer_length+=first_chunk;
@@ -207,20 +203,18 @@ void usb_serial_send(unsigned char *data,int length)
             buffer_length+=MIN(length,buffer_start);
         }
     }
-    if(buffer_transitlength>0)
-    {
-        /* Do nothing. The transfer completion handler will pick it up */
-    }
-    else
-    {
+
+    if (buffer_transitlength==0)
         sendout();
-    }
+    /* else do nothing. The transfer completion handler will pick it up */
 }
 
 /* called by usb_core_transfer_complete() */
 void usb_serial_transfer_complete(int ep,int dir, int status, int length)
 {
     (void)ep;
+    (void)length;
+
     switch (dir) {
         case USB_DIR_OUT:
             logf("serial: %s", receive_buffer);
@@ -234,11 +228,9 @@ void usb_serial_transfer_complete(int ep,int dir, int status, int length)
             /* Data sent out. Update circular buffer */
             if(status == 0)
             {
-                if(length!=buffer_transitlength)
-                {
-                    /* do something? */
-                }
-                buffer_start = (buffer_start + buffer_transitlength)%BUFFER_SIZE;
+                /* TODO: Handle (length != buffer_transitlength) */
+
+                buffer_start=(buffer_start+buffer_transitlength)%BUFFER_SIZE;
                 buffer_transitlength = 0;
             }
 
