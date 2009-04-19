@@ -264,7 +264,7 @@ static bool track_load_started = false;
 static bool codec_requested_stop = false;
 
 #ifdef HAVE_DISK_STORAGE
-static size_t buffer_margin  = 0; /* Buffer margin aka anti-skip buffer (A/C-) */
+static size_t buffer_margin  = 5; /* Buffer margin aka anti-skip buffer (A/C-) */
 #endif
 
 /* Multiple threads */
@@ -776,7 +776,7 @@ int audio_get_file_pos(void)
 #ifdef HAVE_DISK_STORAGE
 void audio_set_buffer_margin(int setting)
 {
-    static const int lookup[] = {5, 15, 30, 60, 120, 180, 300, 600};
+    static const unsigned short lookup[] = {5, 15, 30, 60, 120, 180, 300, 600};
     buffer_margin = lookup[setting];
     logf("buffer margin: %ld", (long)buffer_margin);
     set_filebuf_watermark();
@@ -830,15 +830,18 @@ static void set_filebuf_watermark(void)
     if (!filebuf)
         return;     /* Audio buffers not yet set up */
 
-#ifdef HAVE_FLASH_STORAGE
-    int seconds = 1;
-#else
+#ifdef HAVE_DISK_STORAGE
     int seconds;
-    int spinup = ata_spinup_time();
+    int spinup = storage_spinup_time();
     if (spinup)
         seconds = (spinup / HZ) + 1;
     else
         seconds = 5;
+
+    seconds += buffer_margin;
+#else
+    /* flash storage */
+    int seconds = 1;
 #endif
 
     /* bitrate of last track in buffer dictates watermark */
