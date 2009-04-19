@@ -70,7 +70,10 @@ SECTIONS
     
     . = ALIGN(4);
     
-    .iram IRAMORIG:
+    /* Set the load address of .iram at the same address as .bss
+     * so RAM won't be wasted as .iram in the end will get copied
+     * to IRAM. */
+    .iram IRAMORIG: AT (_edata)
     {
         _iramstart = .;
         *(.vectors.1);
@@ -88,7 +91,7 @@ SECTIONS
         KEEP(*(.vectors))
         *(.vectors);
         _iramend = .;
-    } > IRAM AT> DRAM
+    } > IRAM
     _iramcopy = LOADADDR(.iram);
     
     . = ALIGN(4);

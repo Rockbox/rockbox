@@ -122,6 +122,23 @@ _init_cache_loop:
     
     /*
       ----------------------------------------------------
+       Copy IRAM section
+        * copy IRAM first before BSS gets cleared, as both
+          have the same address
+      ----------------------------------------------------
+    */
+    la     t0, _iramcopy
+    la     t1, _iramstart
+    la     t2, _iramend
+_init_iram_loop:
+    lw     t3, 0(t0)
+    sw     t3, 0(t1)
+    addiu  t1, 4
+    bne    t1, t2, _init_iram_loop
+    addiu  t0, 4
+    
+    /*
+      ----------------------------------------------------
        Clear BSS section
       ----------------------------------------------------
     */
@@ -142,21 +159,6 @@ _init_bss_loop:
 _init_ibss_loop:
     sw     zero, 0(t0)
     bne    t0, t1, _init_ibss_loop
-    addiu  t0, 4
-    
-    /*
-      ----------------------------------------------------
-       Copy IRAM section
-      ----------------------------------------------------
-    */
-    la     t0, _iramcopy
-    la     t1, _iramstart
-    la     t2, _iramend
-_init_iram_loop:
-    lw     t3, 0(t0)
-    sw     t3, 0(t1)
-    addiu  t1, 4
-    bne    t1, t2, _init_iram_loop
     addiu  t0, 4
 
     /*
