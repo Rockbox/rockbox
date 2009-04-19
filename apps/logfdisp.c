@@ -33,18 +33,19 @@
 #include "logf.h"
 #include "settings.h"
 #include "logfdisp.h"
+#include "action.h"
 
 #ifdef HAVE_LCD_BITMAP
 bool logfdisplay(void)
-
 {
     int w, h;
     int lines;
     int columns;
     int i;
+    int action;
 
     bool lcd = false; /* fixed atm */
-    int index;
+    int index, user_index=0;
 
     lcd_getstringsize("A", &w, &h);
     lines = (lcd?
@@ -68,10 +69,10 @@ bool logfdisplay(void)
     if(!lines)
         return false;
 
-    lcd_clear_display();
-    
     do {
-        index = logfindex;
+        lcd_clear_display();
+        
+        index = logfindex + user_index;
         for(i = lines-1; i>=0; i--) {
             unsigned char buffer[columns + 1];
 
@@ -92,7 +93,34 @@ bool logfdisplay(void)
             lcd_puts(0, i, buffer);
         }
         lcd_update();
-    } while(!action_userabort(HZ));
+        
+        action = get_action(CONTEXT_STD, HZ);
+        if(action == ACTION_STD_NEXT)
+            user_index++;
+        else if(action == ACTION_STD_PREV)
+            user_index--;
+        else if(action == ACTION_STD_OK)
+            user_index = 0;
+#ifdef HAVE_TOUCHSCREEN
+        else if(action == ACTION_TOUCHSCREEN)
+        {
+            short x, y;
+            static int prev_y;
+            
+            action = action_get_touchscreen_press(&x, &y);
+            
+            if(action & BUTTON_REL)
+                prev_y = 0;
+            else
+            {
+                if(prev_y != 0)
+                    user_index += (prev_y - y) / h;
+                
+                prev_y = y;
+            }
+        }
+#endif
+    } while(action != ACTION_STD_CANCEL);
 
     return false;
 }
