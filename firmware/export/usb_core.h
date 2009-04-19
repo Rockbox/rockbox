@@ -26,6 +26,7 @@
 //#define USB_SERIAL
 #define USB_STORAGE
 #define USB_CHARGING_ONLY
+//#define USB_HID
 #else /* BOOTLOADER */
 #define USB_CHARGING_ONLY
 #endif /* BOOTLOADER */

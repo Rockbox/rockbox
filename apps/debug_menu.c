@@ -2583,15 +2583,36 @@ static bool dbg_scrollwheel(void)
 }
 #endif
 
-#if defined(HAVE_USBSTACK) && defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL)
-static bool logf_usb_serial(void)
+#if defined (HAVE_USBSTACK)
+static bool toggle_usb_core_driver(int driver, char *msg)
 {
-    bool serial_enabled = !usb_core_driver_enabled(USB_DRIVER_SERIAL);
-    usb_core_enable_driver(USB_DRIVER_SERIAL,serial_enabled);
-    splashf(HZ, "USB logf %s",
-                 serial_enabled?"enabled":"disabled");
+    bool enabled = !usb_core_driver_enabled(driver);
+
+    usb_core_enable_driver(driver,enabled);
+    splashf(HZ, "%s %s", msg, enabled?"enabled":"disabled");
+
     return false;
 }
+#if 0 && defined(USB_STORAGE)
+static bool toggle_usb_mass_storage(void)
+{
+    return toggle_usb_core_driver(USB_DRIVER_MASS_STORAGE,"USB Mass Storage");
+}
+#endif
+
+#if defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL)
+static bool toggle_usb_serial(void)
+{
+    return toggle_usb_core_driver(USB_DRIVER_SERIAL,"USB Serial");
+}
+#endif
+
+#if defined(USB_HID)
+static bool toggle_usb_hid(void)
+{
+    return toggle_usb_core_driver(USB_DRIVER_HID, "USB HID");
+}
+#endif
 #endif
 
 #if CONFIG_USBOTG == USBOTG_ISP1583
@@ -2728,17 +2749,22 @@ static const struct the_menu_item menuitems[] = {
         {"logf", logfdisplay },
         {"logfdump", logfdump },
 #endif
-#if defined(HAVE_USBSTACK) && defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL)
-        {"logf over usb",logf_usb_serial },
+#if defined(HAVE_USBSTACK)
+#if 0 && defined(USB_STORAGE)
+        {"USB Mass-Storage driver", toggle_usb_mass_storage },
 #endif
-#if 0 && defined(HAVE_USBSTACK) && defined(USB_STORAGE)
-        {"reconnect usb storage",usb_reconnect},
+#if defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL)
+        {"USB Serial driver (logf)", toggle_usb_serial },
 #endif
+#if defined(USB_HID)
+        {"USB HID driver", toggle_usb_hid },
+#endif
+#endif /* HAVE_USBSTACK */
 #ifdef CPU_BOOST_LOGGING
         {"cpu_boost log",cpu_boost_log},
 #endif
 #if (defined(HAVE_WHEEL_ACCELERATION) && (CONFIG_KEYPAD==IPOD_4G_PAD) && !defined(SIMULATOR))
-        {"Debug scrollwheel", dbg_scrollwheel},
+        {"Debug scrollwheel", dbg_scrollwheel },
 #endif
     };
 static int menu_action_callback(int btn, struct gui_synclist *lists)

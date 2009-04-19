@@ -43,6 +43,10 @@
 #include "usb_charging_only.h"
 #endif
 
+#if defined(USB_HID)
+#include "usb_hid.h"
+#endif
+
 /* TODO: Move target-specific stuff somewhere else (serial number reading) */
 
 #ifdef HAVE_AS3514
@@ -166,8 +170,8 @@ static enum { DEFAULT, ADDRESS, CONFIGURED } usb_state;
 
 static int usb_core_num_interfaces;
 
-typedef void (*completion_handler_t)(int ep,int dir, int status, int length);
-typedef bool (*control_handler_t)(struct usb_ctrlrequest* req, unsigned char* dest);
+typedef void (*completion_handler_t)(int ep,int dir,int status,int length);
+typedef bool (*control_handler_t)(struct usb_ctrlrequest* req,unsigned char* dest);
 
 static struct
 {
@@ -234,6 +238,25 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .notify_hotswap = NULL,
 #endif
     },
+#ifdef USB_HID
+    [USB_DRIVER_HID] = {
+        .enabled = false,
+        .needs_exclusive_storage = false,
+        .first_interface = 0,
+        .last_interface = 0,
+        .request_endpoints = usb_hid_request_endpoints,
+        .set_first_interface = usb_hid_set_first_interface,
+        .get_config_descriptor = usb_hid_get_config_descriptor,
+        .init_connection = usb_hid_init_connection,
+        .init = usb_hid_init,
+        .disconnect = usb_hid_disconnect,
+        .transfer_complete = usb_hid_transfer_complete,
+        .control_request = usb_hid_control_request,
+#ifdef HAVE_HOTSWAP
+        .notify_hotswap = NULL,
+#endif
+    },
+#endif
 #endif
 };
 
