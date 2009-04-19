@@ -77,7 +77,16 @@ unsigned int power_input_status(void)
 
 /* Returns true if the unit is charging the batteries. */
 bool charging_state(void) {
+#if defined(IPOD_COLOR)
+    /* 0x70000088 appears to be the input value for GPO32 bits.
+       Write a zero to 0x70000088 before reading.
+       To enable input set the corresponding 0x7000008C bit,
+       and clear the corresponding GPO32_ENABLE bit. */
+    outl(0, 0x70000088);
+    return (inl(0x70000088) & 1)?false:true;
+#else
     return (GPIOB_INPUT_VAL & 0x01)?false:true;
+#endif
 }
 #endif /* CONFIG_CHARGING */
 
