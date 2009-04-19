@@ -46,10 +46,7 @@ SECTIONS
 
     .rodata :
     {
-        *(.rodata);  /* problems without this, dunno why */
         *(.rodata*);
-        *(.rodata.str1.1);
-        *(.rodata.str1.4);
     } > DRAM
     
     . = ALIGN(4);
