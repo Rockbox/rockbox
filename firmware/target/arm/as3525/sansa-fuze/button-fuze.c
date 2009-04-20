@@ -37,7 +37,7 @@ static bool hold_button     = false;
 #ifndef BOOTLOADER
 static bool hold_button_old = false;
 #endif
-static short _dbop_din    = BUTTON_NONE;
+static unsigned short _dbop_din    = BUTTON_NONE;
 
 /* in the lcd driver */
 extern bool lcd_button_support(void);
@@ -49,7 +49,7 @@ void button_init_device(void)
 }
 
 #if !defined(BOOTLOADER) && defined(HAVE_SCROLLWHEEL)
-static void scrollwheel(short dbop_din)
+static void scrollwheel(unsigned short dbop_din)
 {
     /* current wheel values, parsed from dbop and the resulting button */
     unsigned        wheel_value     = 0;
@@ -143,7 +143,7 @@ static void button_delay(void)
     while(i--);
 }
 
-short button_read_dbop(void)
+unsigned short button_read_dbop(void)
 {
     /* skip home and power reading if lcd_button_support was blocked,
      * since the dbop bit 15 is invalid then, and use the old value instead */
@@ -187,7 +187,7 @@ short button_read_dbop(void)
 }
 
 /* for the debug menu */
-short button_dbop_data(void)
+unsigned short button_dbop_data(void)
 {
     return _dbop_din;
 }
@@ -238,7 +238,7 @@ static int button_gpio(void)
 int button_read_device(void)
 {
     int btn = BUTTON_NONE;
-    short dbop = button_read_dbop();
+    unsigned short dbop = button_read_dbop();
     static unsigned power_counter = 0;
     /* hold button */
     if(dbop & (1<<12))

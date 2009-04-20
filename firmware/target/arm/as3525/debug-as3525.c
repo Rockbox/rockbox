@@ -43,7 +43,7 @@
  * if I put the below into a sansa-fuze/debug-target.h, it doesn't work*/
 #if defined(SANSA_FUZE) || defined(SANSA_E200V2)
 #define DEBUG_DBOP
-short button_dbop_data(void);
+unsigned short button_dbop_data(void);
 #endif
 
 static unsigned read_cp15 (void)

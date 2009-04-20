@@ -31,7 +31,7 @@ static bool hold_button     = false;
 #ifndef BOOTLOADER
 static bool hold_button_old = false;
 #endif
-static short _dbop_din      = 0;
+static unsigned short _dbop_din      = 0;
 
 #define WHEEL_REPEAT_INTERVAL   (HZ/5)
 /* in the lcd driver */
@@ -48,7 +48,7 @@ bool button_hold(void)
 }
 
 #if !defined(BOOTLOADER) && defined(HAVE_SCROLLWHEEL)
-static void scrollwheel(short dbop_din)
+static void scrollwheel(unsigned short dbop_din)
 {
     /* current wheel values, parsed from dbop and the resulting button */
     unsigned        wheel_value     = 0;
@@ -132,7 +132,7 @@ static void scrollwheel(short dbop_din)
 }
 #endif /* !defined(BOOTLOADER) && defined(HAVE_SCROLLWHEEL) */
 
-short button_read_dbop(void)
+unsigned short button_read_dbop(void)
 {
     /*write a red pixel */
     if (!lcd_button_support())
@@ -161,7 +161,7 @@ short button_read_dbop(void)
     return _dbop_din;
 }
 
-short button_dbop_data(void)
+unsigned short button_dbop_data(void)
 {
     return _dbop_din;
 }
@@ -173,7 +173,7 @@ int button_read_device(void)
 {
     int btn = BUTTON_NONE;
     /* read buttons from dbop */
-    short dbop = button_read_dbop();
+    unsigned short dbop = button_read_dbop();
 
     /* hold button */
     if(dbop & (1<<12))
