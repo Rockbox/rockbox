@@ -68,7 +68,7 @@
 #define USB_SC_SCSI      0x06            /* Transparent */
 #define USB_PROT_BULK    0x50            /* bulk only */
 
-static const struct usb_device_descriptor __attribute__((aligned(2)))
+static struct usb_device_descriptor __attribute__((aligned(2)))
                                           device_descriptor=
 {
     .bLength            = sizeof(struct usb_device_descriptor),
@@ -338,16 +338,9 @@ static void set_serial_descriptor(void)
     usb_string_iSerial.bLength=68;
 }
 #else
-#warning No proper set_serial_descriptor() implementation for this target
 static void set_serial_descriptor(void)
 {
-    short* p = &usb_string_iSerial.wString[1];
-    int i;
-    for (i = 0; i < 16; i++) {
-        *p++ = hex[(2*i)&0xF];
-        *p++ = hex[(2*i+1)&0xF];
-    }
-    usb_string_iSerial.bLength=68;
+    device_descriptor.iSerialNumber = 0;
 }
 #endif
 
