@@ -25,4 +25,6 @@
 
 #define ADC_BUTTONS 0
 
+void adc_close(void);
+
 #endif /* _ADC_TARGET_H_ */
