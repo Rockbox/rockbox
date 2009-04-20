@@ -46,11 +46,12 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define TTB_SIZE         (0x4000) 
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGIN_BUFFER_SIZE - CODEC_SIZE - LCD_BUFFER_SIZE - TTB_SIZE
 
-#elif CONFIG_CPU==AS3525 && MEMORYSIZE <= 2
+#elif CONFIG_CPU==AS3525
+#if MEMORYSIZE <= 2
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - STUBOFFSET
-
 #else
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - STUBOFFSET - CODEC_SIZE
+#endif
 #endif
 
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300)
@@ -61,39 +62,47 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define DRAMORIG 0x31000000
 #define IRAMORIG 0x1000c000
 #define IRAMSIZE 0xc000
+
 #elif defined(IAUDIO_X5) || defined(IAUDIO_M5)
 #define DRAMORIG 0x31000000
 #define IRAMORIG 0x10010000
 #define IRAMSIZE 0x10000
+
 #elif CONFIG_CPU == PP5022 || CONFIG_CPU == PP5024
 /* PP5022/24 have 128KB of IRAM */
 #define DRAMORIG 0x00000000
 #define IRAMORIG 0x4000c000
 #define IRAMSIZE 0x14000
+
 #elif defined(CPU_PP)
 /* all other PP's have 96KB of IRAM */
 #define DRAMORIG 0x00000000
 #define IRAMORIG 0x4000c000
 #define IRAMSIZE 0x0c000
+
 #elif CONFIG_CPU == PNX0101
 #define DRAMORIG 0xc00000 + STUBOFFSET
 #define IRAMORIG 0x407000
 #define IRAMSIZE 0x9000
+
 #elif CONFIG_CPU == IMX31L || CONFIG_CPU == S3C2440
 #define DRAMORIG 0x0 + STUBOFFSET
 #define IRAM DRAM
 #define IRAMSIZE 0
+
 #elif CONFIG_CPU==DM320
 #define DRAMORIG 0x00900000 + STUBOFFSET
 #define IRAM DRAM
 /* The bit of IRAM that is available is used in the core */
 #define IRAMSIZE 0
+
 #elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
 #define DRAMORIG 0x20000000
 /*#define IRAMORIG 0x1000c000
 #define IRAMSIZE 0xc000*/
 #define IRAM DRAM
 #define IRAMSIZE 0
+
 #elif CONFIG_CPU==AS3525
 #if MEMORYSIZE <= 2
 #define IRAMSIZE 0  /* simulates no IRAM since codec is already entirely in IRAM */
