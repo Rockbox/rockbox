@@ -72,7 +72,8 @@ MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH]
 enum codec_status codec_main(void)
 {
     mpc_int64_t samplesdone;
-    unsigned long frequency;
+    uint32_t frequency; /* 0.1 kHz accuracy */
+    uint32_t elapsed_time; /* milliseconds */
     unsigned status;
     mpc_reader reader;
     mpc_streaminfo info;
@@ -107,7 +108,7 @@ next_track:
         retval = CODEC_ERROR;
         goto done;
     }
-    frequency = info.sample_freq / 1000;
+    frequency = info.sample_freq / 100; /* 0.1 kHz accuracy */
     ci->configure(DSP_SWITCH_FREQUENCY, info.sample_freq);
         
     /* set playback engine up for correct number of channels */
@@ -131,10 +132,11 @@ next_track:
     }
     
     /* Resume to saved sample offset. */
-    if(samplesdone > 0) {
+    if (samplesdone > 0) {
         /* hack to improve seek time if filebuf goes empty */
         if (mpc_decoder_seek_sample(&decoder, samplesdone)) {
-            ci->set_elapsed(samplesdone/frequency);
+            elapsed_time = (samplesdone*10)/frequency;
+            ci->set_elapsed(elapsed_time);
         } else {
             samplesdone = 0;
         }
@@ -143,29 +145,17 @@ next_track:
 
     /* This is the decoding loop. */
     do {
-       #if 1
        /* Complete seek handler. */
         if (ci->seek_time) {
             /* hack to improve seek time if filebuf goes empty */
-            mpc_int64_t new_offset = (ci->seek_time - 1)*frequency;
+            mpc_int64_t new_offset = ((ci->seek_time - 1)/10)*frequency;
             if (mpc_decoder_seek_sample(&decoder, new_offset)) {
                 samplesdone = new_offset;
                 ci->set_elapsed(ci->seek_time);
             }
             ci->seek_complete();
             /* reset chunksize */
-
         }
-        #else
-        /* Seek to start of track handler. */
-        if (ci->seek_time) {
-            if (ci->seek_time == 1 && mpc_decoder_seek_sample(&decoder, 0)) {
-                samplesdone = 0;
-                ci->set_elapsed(0);
-            }
-            ci->seek_complete();
-        }
-        #endif
         if (ci->stop_codec || ci->new_track)
             break;
 
@@ -181,7 +171,8 @@ next_track:
                               sample_buffer + MPC_FRAME_LENGTH,
                               status);
             samplesdone += status;
-            ci->set_elapsed(samplesdone/frequency);
+            elapsed_time = (samplesdone*10)/frequency;
+            ci->set_elapsed(elapsed_time);
             ci->set_offset(samplesdone);
         }
     } while (status != 0);
