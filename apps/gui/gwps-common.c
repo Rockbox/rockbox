@@ -1292,6 +1292,13 @@ static const char *get_token_value(struct gui_wps *gwps,
                                           token->value.i * TIMEOUT_UNIT))
                 return "v";
             return NULL;
+        case WPS_TOKEN_LASTTOUCH:
+#ifdef HAVE_TOUCHSCREEN
+            if (TIME_BEFORE(current_tick, token->value.i * TIMEOUT_UNIT +
+                                          touchscreen_last_touch()))
+                return "t";
+#endif
+            return NULL;
 
         case WPS_TOKEN_SETTING:
         {

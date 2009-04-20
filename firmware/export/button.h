@@ -68,6 +68,8 @@ int button_apply_acceleration(const unsigned int data);
 #define BUTTON_TOUCHSCREEN 0x08000000
 
 #ifdef HAVE_TOUCHSCREEN
+int touchscreen_last_touch(void);
+
 #if (!defined(BUTTON_TOPLEFT) || !defined(BUTTON_TOPMIDDLE) \
  || !defined(BUTTON_TOPRIGHT) || !defined(BUTTON_MIDLEFT) \
  || !defined(BUTTON_CENTER) || !defined(BUTTON_MIDRIGHT) \

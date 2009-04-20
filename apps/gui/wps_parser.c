@@ -121,7 +121,7 @@ struct wps_tag {
     unsigned char refresh_type;
     const wps_tag_parse_func parse_func;
 };
-
+static int skip_end_of_line(const char *wps_bufptr);
 /* prototypes of all special parse functions : */
 static int parse_timeout(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
@@ -131,7 +131,7 @@ static int parse_dir_level(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_setting(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
-
+    
 #ifdef HAVE_LCD_BITMAP
 static int parse_viewport_display(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
@@ -156,7 +156,18 @@ static int parse_albumart_load(const char *wps_bufptr,
 static int parse_albumart_conditional(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 #endif /* HAVE_ALBUMART */
-
+#ifdef HAVE_TOUCHSCREEN
+static int parse_touchregion(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data);
+#else
+static int fulline_tag_not_supported(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data)
+{
+    (void)token; (void)wps_data;
+    return skip_end_of_line(wps_bufptr);
+}
+#define parse_touchregion fulline_tag_not_supported
+#endif        
 #ifdef CONFIG_RTC
 #define WPS_RTC_REFRESH WPS_REFRESH_DYNAMIC
 #else
@@ -337,7 +348,10 @@ static const struct wps_tag all_tags[] = {
 #endif
 
     { WPS_TOKEN_SETTING,                  "St",  WPS_REFRESH_DYNAMIC, parse_setting },
-
+    
+    { WPS_TOKEN_LASTTOUCH,                "Tl",  WPS_REFRESH_DYNAMIC, parse_timeout },
+    { WPS_NO_TOKEN,                       "T",   0,    parse_touchregion      },
+    
     { WPS_TOKEN_UNKNOWN,                  "",    0, NULL }
     /* the array MUST end with an empty string (first char is \0) */
 };
@@ -1141,6 +1155,70 @@ static int parse_albumart_conditional(const char *wps_bufptr,
     }
 };
 #endif /* HAVE_ALBUMART */
+
+#ifdef HAVE_TOUCHSCREEN
+   
+struct touchaction {char* s; int action;};
+static struct touchaction touchactions[] = {
+    {"play", ACTION_WPS_PLAY }, {"stop", ACTION_WPS_STOP },
+    {"prev", ACTION_WPS_SKIPPREV }, {"next", ACTION_WPS_SKIPNEXT },
+    {"menu", ACTION_WPS_MENU }, {"browse", ACTION_WPS_BROWSE }
+};
+static int parse_touchregion(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data)
+{
+    (void)token;
+    unsigned i;
+    struct touchregion *region;
+    const char *ptr = wps_bufptr;
+    const char *action;
+    int x,y,w,h;
+    
+    /* format: %T|x|y|width|height|action|
+     * action is one of:
+     * play  -  play/pause playback
+     * stop  -  stop playback, exit the wps
+     * prev  -  prev track
+     * next  -  next track
+     * ffwd
+     * rwd
+     * menu  -  go back to the main menu
+     * browse - go back to the file/db browser
+    */
+
+    if ((wps_data->touchregion_count +1 >= MAX_TOUCHREGIONS) || (*ptr != '|'))
+        return WPS_ERROR_INVALID_PARAM;
+    ptr++;
+
+    if (!(ptr = parse_list("dddds", NULL, '|', ptr, &x, &y, &w, &h, &action)))
+        return WPS_ERROR_INVALID_PARAM;
+
+    /* Check there is a terminating | */
+    if (*ptr != '|')
+        return WPS_ERROR_INVALID_PARAM;
+        
+    /* should probably do some bounds checking here with the viewport... but later */
+    region = &wps_data->touchregion[wps_data->touchregion_count];
+    region->action = ACTION_NONE;
+    region->x = x;
+    region->y = y;
+    region->width = w;
+    region->height = h;
+    region->wvp = &wps_data->viewports[wps_data->num_viewports];
+    i = 0;
+    while ((region->action == ACTION_NONE) && 
+            (i < sizeof(touchactions)/sizeof(*touchactions)))
+    {
+        if (!strncmp(touchactions[i].s, action, strlen(touchactions[i].s)))
+            region->action = touchactions[i].action;
+        i++;
+    }
+    if (region->action == ACTION_NONE)
+        return WPS_ERROR_INVALID_PARAM;
+    wps_data->touchregion_count++;
+    return skip_end_of_line(wps_bufptr); 
+}               
+#endif        
 
 /* Parse a generic token from the given string. Return the length read */
 static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)

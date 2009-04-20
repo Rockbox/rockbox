@@ -293,7 +293,38 @@ void gwps_draw_statusbars(void)
 {
     viewportmanager_set_statusbar(wpsbars);
 }
-
+#ifdef HAVE_TOUCHSCREEN
+static int wps_get_touchaction(struct wps_data *data)
+{
+    short x,y;
+    short vx, vy;
+    int type = action_get_touchscreen_press(&x, &y);
+    int i;
+    struct touchregion *r;
+    if (type != BUTTON_REL)
+        return ACTION_TOUCHSCREEN;
+    for (i=0; i<data->touchregion_count; i++)
+    {
+        r = &data->touchregion[i];
+        /* make sure this region's viewport is visible */
+        if (r->wvp->hidden_flags&VP_DRAW_HIDDEN)
+            continue;
+        /* reposition the touch inside the viewport */    
+        vx = x - r->wvp->vp.x;
+        vy = y - r->wvp->vp.y;
+        /* check if its inside this viewport */
+        if (vx >= 0 && vx < r->wvp->vp.x + r->wvp->vp.width &&
+            vy >= 0 && vy < r->wvp->vp.y + r->wvp->vp.height)
+        {
+            /* now see if the point is inside this region */
+            if (vx >= r->x && vx < r->x+r->width &&
+                vy >= r->y && vy < r->y+r->height)
+                return r->action;
+        }
+    }
+    return ACTION_TOUCHSCREEN;
+}
+#endif
 /* The WPS can be left in two ways:
  *      a)  call a function, which draws over the wps. In this case, the wps
  *          will be still active (i.e. the below function didn't return)
@@ -393,6 +424,10 @@ long gui_wps_show(void)
            playlist or if using the sleep timer. */
         if (!(audio_status() & AUDIO_STATUS_PLAY))
             exit = true;
+#ifdef HAVE_TOUCHSCREEN
+        if (button == ACTION_TOUCHSCREEN)
+            button = wps_get_touchaction(gui_wps[SCREEN_MAIN].data);
+#endif
 /* The iPods/X5/M5 use a single button for the A-B mode markers,
    defined as ACTION_WPSAB_SINGLE in their config files. */
 #ifdef ACTION_WPSAB_SINGLE

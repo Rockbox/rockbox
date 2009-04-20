@@ -81,6 +81,9 @@ static int button_read(int *data);
 static int button_read(void);
 #endif
 
+#ifdef HAVE_TOUCHSCREEN
+    int last_touchscreen_touch;
+#endif    
 #if defined(HAVE_HEADPHONE_DETECTION)
 static struct timeout hp_detect_timeout; /* Debouncer for headphone plug/unplug */
 /* This callback can be used for many different functions if needed -
@@ -406,7 +409,9 @@ void button_init(void)
     remote_filter_first_keypress = false;
 #endif    
 #endif
-
+#ifdef HAVE_TOUCHSCREEN
+    last_touchscreen_touch = 0xffff;
+#endif    
     /* Start polling last */
     tick_add_task(button_tick);
 }
@@ -522,7 +527,10 @@ static int button_read(void)
     if (btn && flipped)
         btn = button_flip(btn); /* swap upside down */
 #endif
-
+#ifdef HAVE_TOUCHSCREEN
+    if (btn & BUTTON_TOUCHSCREEN)
+        last_touchscreen_touch = current_tick;
+#endif        
     /* Filter the button status. It is only accepted if we get the same
        status twice in a row. */
 #ifndef HAVE_TOUCHSCREEN
@@ -536,7 +544,6 @@ static int button_read(void)
     return retval;
 }
 
-
 int button_status(void)
 {
     return lastbtn;
@@ -547,6 +554,12 @@ void button_clear_queue(void)
     queue_clear(&button_queue);
 }
 
+#ifdef HAVE_TOUCHSCREEN
+int touchscreen_last_touch(void)
+{
+    return last_touchscreen_touch;
+}
+#endif
 #endif /* SIMULATOR */
 
 #ifdef HAVE_WHEEL_ACCELERATION

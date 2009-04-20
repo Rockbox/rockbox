@@ -36,6 +36,7 @@ static intptr_t button_data; /* data value from last message dequeued */
 #ifdef HAVE_TOUCHSCREEN
 #include "touchscreen.h"
 static int mouse_coords = 0;
+static int last_touchscreen_touch = 0xffff;
 #endif
 /* how long until repeat kicks in */
 #define REPEAT_START      6
@@ -1310,10 +1311,15 @@ void mouse_tick_task(void)
         }
         
         mouse_coords = (x<<16)|y;
+        last_touchscreen_touch = current_tick;
         button_event(BUTTON_TOUCHSCREEN, true);
         if (debug_wps)
             printf("Mouse at: (%d, %d)\n", x, y);
     }
+}
+int touchscreen_last_touch(void)
+{
+    return last_touchscreen_touch;
 }
 #endif
 void button_init(void)

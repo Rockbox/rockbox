@@ -88,6 +88,8 @@ struct progressbar {
 };
 #endif
 
+
+
 struct align_pos {
     char* left;
     char* center;
@@ -297,6 +299,7 @@ enum wps_token_type {
 
     /* buttons */
     WPS_TOKEN_BUTTON_VOLUME,
+    WPS_TOKEN_LASTTOUCH,
 
     /* Setting option */
     WPS_TOKEN_SETTING,
@@ -363,6 +366,17 @@ struct wps_viewport {
     char label;
 };
 
+#ifdef HAVE_TOUCHSCREEN
+struct touchregion {
+    struct wps_viewport* wvp;/* The viewport this region is in */
+    short int x;             /* x-pos */
+    short int y;             /* y-pos */
+    short int width;         /* width */
+    short int height;        /* height */
+    int action;              /* action this button will return */
+};
+#define MAX_TOUCHREGIONS    12
+#endif
 /* wps_data
    this struct holds all necessary data which describes the
    viewable content of a wps */
@@ -399,6 +413,11 @@ struct wps_data
     bool full_line_progressbar;
 #endif
 
+#ifdef HAVE_TOUCHSCREEN
+    struct touchregion touchregion[MAX_TOUCHREGIONS];
+    short touchregion_count;
+#endif
+    
 #ifdef HAVE_REMOTE_LCD
     bool remote_wps;
 #endif
