@@ -123,22 +123,7 @@ unsigned int battery_adc_voltage(void)
 }
 
 void button_init_device(void)
-{
-    __cpm_start_sadc();
-    REG_SADC_ENA = 0;
-    REG_SADC_STATE &= ~REG_SADC_STATE;
-    REG_SADC_CTRL = 0x1F;
-    
-    REG_SADC_CFG = SADC_CFG_INIT;
-    
-    system_enable_irq(IRQ_SADC);
-    
-    REG_SADC_SAMETIME = 10;
-    REG_SADC_WAITTIME = 100;
-    REG_SADC_STATE &= ~REG_SADC_STATE;
-    REG_SADC_CTRL = ~(SADC_CTRL_PENDM | SADC_CTRL_PENUM | SADC_CTRL_TSRDYM | SADC_CTRL_PBATRDYM);
-    REG_SADC_ENA = SADC_ENA_TSEN;
-    
+{   
 #ifdef ONDA_VX747
     __gpio_as_input(32*3 + 29);
     __gpio_as_input(32*3 + 27);
@@ -152,8 +137,6 @@ void button_init_device(void)
     __gpio_as_input(32*3 + 19);
     __gpio_as_input(32*2 + 22);
 #endif
-    
-    mutex_init(&battery_mtx);
 }
 
 bool button_hold(void)
@@ -282,4 +265,29 @@ void SADC(void)
 
 void adc_init(void)
 {
+    __cpm_start_sadc();
+    REG_SADC_ENA = 0;
+    REG_SADC_STATE &= (~REG_SADC_STATE);
+    REG_SADC_CTRL = 0x1f;
+    
+    REG_SADC_CFG = SADC_CFG_INIT;
+    
+    system_enable_irq(IRQ_SADC);
+    
+    REG_SADC_SAMETIME = 10;
+    REG_SADC_WAITTIME = 100;
+    REG_SADC_STATE &= ~REG_SADC_STATE;
+    REG_SADC_CTRL = ~(SADC_CTRL_PENDM | SADC_CTRL_PENUM | SADC_CTRL_TSRDYM | SADC_CTRL_PBATRDYM);
+    REG_SADC_ENA = SADC_ENA_TSEN;
+    
+    mutex_init(&battery_mtx);
 }
+
+void adc_close(void)
+{
+    REG_SADC_ENA = 0;
+    __intc_mask_irq(IRQ_SADC);
+    sleep(20);
+    __cpm_stop_sadc();
+}
+

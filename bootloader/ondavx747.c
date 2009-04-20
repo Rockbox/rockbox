@@ -31,6 +31,7 @@
 #include "storage.h"
 #include "disk.h"
 #include "string.h"
+#include "adc.h"
 
 static void show_splash(int timeout, const char *msg)
 {
@@ -101,6 +102,7 @@ int main(void)
     font_init();
     lcd_setfont(FONT_SYSFIXED);
     button_init();
+    adc_init();
     storage_init();
 
     reset_screen();
@@ -142,6 +144,7 @@ int main(void)
     if (rc == EOK)
     {
         printf("Starting Rockbox...");
+        adc_close(); /* Disable SADC */
         disable_interrupt();
         kernel_entry = (void*) CONFIG_SDRAM_START;
         kernel_entry();

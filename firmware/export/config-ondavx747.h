@@ -123,6 +123,8 @@
 
 #define CONFIG_I2C I2C_JZ47XX
 
+#define NEED_ADC_CLOSE 1
+
 /* has no tone controls, so we use the software ones */
 //#define HAVE_SW_TONE_CONTROLS
 
