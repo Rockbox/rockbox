@@ -91,12 +91,17 @@ static int get_file_pos(int newtime)
     struct mp3entry *id3 = ci->id3;
 
     if (id3->vbr) {
+        /* Convert newtime and id3->length to seconds to
+         * avoid overflow */
+        unsigned int newtime_s = newtime/1000;
+        unsigned int length_s  = id3->length/1000;
+        
         if (id3->has_toc) {
             /* Use the TOC to find the new position */
             unsigned int percent, remainder;
             int curtoc, nexttoc, plen;
 
-            percent = (newtime*100) / id3->length;
+            percent = (newtime_s*100) / length_s;
             if (percent > 99)
                 percent = 99;
 
@@ -111,14 +116,13 @@ static int get_file_pos(int newtime)
             pos = (id3->filesize/256)*curtoc;
 
             /* Use the remainder to get a more accurate position */
-            remainder   = (newtime*100) % id3->length;
-            remainder   = (remainder*100) / id3->length;
+            remainder   = (newtime_s*100) % length_s;
+            remainder   = (remainder*100) / length_s;
             plen        = (nexttoc - curtoc)*(id3->filesize/256);
             pos        += (plen/100)*remainder;
         } else {
             /* No TOC exists, estimate the new position */
-            pos = (id3->filesize / (id3->length / 1000)) *
-                (newtime / 1000);
+            pos = (id3->filesize / length_s) * newtime_s;
         }
     } else if (id3->bitrate) {
         pos = newtime * (id3->bitrate / 8);
