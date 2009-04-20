@@ -54,6 +54,12 @@ OUTPUT_FORMAT(elf32-littlemips)
 #endif
 #endif
 
+ /* default to full RAM (minus codecs&plugins) unless specified otherwise */
+#ifndef DRAMSIZE
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - STUBOFFSET - CODEC_SIZE
+#endif
+
+
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300)
 #define ARCH_IRIVER
 #endif
@@ -123,6 +129,7 @@ OUTPUT_FORMAT(elf32-littlemips)
 #endif
 
 #define PLUGIN_LENGTH PLUGIN_BUFFER_SIZE
+
 
 #ifndef CODEC_ORIGIN /* targets can specify another origin */
 #define CODEC_ORIGIN (DRAMORIG + (DRAMSIZE))
