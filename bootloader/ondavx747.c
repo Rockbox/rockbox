@@ -94,7 +94,10 @@ static void boot_of(void)
 
 int main(void)
 {
-    int rc, dummy;
+    int rc;
+#ifdef HAVE_TOUCHSCREEN
+    int dummy;
+#endif
     void (*kernel_entry)(void);
     
     kernel_init();
