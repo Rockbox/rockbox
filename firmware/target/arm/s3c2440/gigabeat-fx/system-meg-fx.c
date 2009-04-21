@@ -60,7 +60,7 @@ default_interrupt(SPI1);
 default_interrupt(RTC);
 default_interrupt(ADC);
 
-static void (* const irqvector[32])(void) =
+static void (* const irqvector[32])(void) __attribute__((__used__)) =
 {
     EINT0, EINT1, EINT2, EINT3,
     EINT4_7, EINT8_23, CAM, nBATT_FLT, TICK, WDT_AC97,
@@ -119,9 +119,14 @@ void system_exception_wait(void)
 
 static void set_page_tables(void)
 {
-    map_section(0, 0, 0x1000, CACHE_NONE); /* map every memory region to itself */
-    map_section(0x30000000, 0, 32, CACHE_ALL); /* map RAM to 0 and enable caching for it */
-    map_section((int)FRAME, (int)FRAME, 1, BUFFERED); /* enable buffered writing for the framebuffer */
+    /* map every memory region to itself */
+    map_section(0, 0, 0x1000, CACHE_NONE); 
+    
+    /* map RAM to 0 and enable caching for it */
+    map_section(0x30000000, 0, 32, CACHE_ALL); 
+    
+    /* enable buffered writing for the framebuffer */
+    map_section((int)FRAME, (int)FRAME, 1, BUFFERED); 
 }
 
 void memory_init(void)
