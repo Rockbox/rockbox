@@ -205,7 +205,7 @@ static int lcd_sleep_timeout = 10*HZ;
 static const int lcd_sleep_timeout = LCD_SLEEP_TIMEOUT;
 #endif
 
-static int lcd_sleep_timer = 0;
+static int lcd_sleep_timer SHAREDDATA_ATTR = 0;
 
 void backlight_lcd_sleep_countdown(bool start)
 {
@@ -220,7 +220,12 @@ void backlight_lcd_sleep_countdown(bool start)
     if (lcd_sleep_timeout < 0)
     {
         lcd_sleep_timer = 0; /* Setting == Always */
+#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_PWM)
+        /* Ensure lcd_sleep() is called from backlight_thread() */
+        queue_post(&backlight_queue, LCD_SLEEP, 0);
+#else
         lcd_sleep();
+#endif
     }
     else
     {
@@ -304,6 +309,11 @@ static void backlight_isr(void)
 #endif
         timer_unregister();
         bl_timer_active = false;
+
+#ifdef HAVE_LCD_SLEEP
+        if (bl_dim_current == 0)
+            backlight_lcd_sleep_countdown(true);
+#endif
     }
     else
         timer_set_period(timer_period);
@@ -320,6 +330,10 @@ static void backlight_switch(void)
     {
         _backlight_off_normal();
         bl_dim_fraction = 0;
+
+#ifdef HAVE_LCD_SLEEP
+        backlight_lcd_sleep_countdown(true);
+#endif
     }
 }
 
@@ -388,11 +402,11 @@ static void _backlight_off(void)
     {
         bl_dim_target = bl_dim_fraction = 0;
         _backlight_off_normal();
-    }
 
 #ifdef HAVE_LCD_SLEEP
-    backlight_lcd_sleep_countdown(true);
+        backlight_lcd_sleep_countdown(true);
 #endif
+    }
 }
 
 void backlight_set_fade_in(int value)
