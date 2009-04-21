@@ -174,6 +174,9 @@ PLUGIN_HEADER
 #define BOUNCE_QUIT BUTTON_POWER
 #define BOUNCE_MODE BUTTON_MENU
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define BOUNCE_QUIT BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

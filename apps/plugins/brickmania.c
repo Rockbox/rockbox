@@ -208,6 +208,9 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define RIGHT   BUTTON_VOL_UP
 #define SELECT  BUTTON_MENU
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define QUIT    BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

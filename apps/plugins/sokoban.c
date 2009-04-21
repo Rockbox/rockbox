@@ -380,6 +380,11 @@ PLUGIN_HEADER
 #define SOKOBAN_MENU BUTTON_MENU
 #define SOKOBAN_MENU_NAME "[MENU]"
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+
+#define SOKOBAN_MENU BUTTON_POWER
+#define SOKOBAN_MENU_NAME "[POWER]"
+
 #else
 #error No keymap defined!
 #endif

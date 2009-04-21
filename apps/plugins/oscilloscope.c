@@ -248,6 +248,9 @@ PLUGIN_HEADER
 #define OSCILLOSCOPE_VOL_UP       BUTTON_VOL_UP
 #define OSCILLOSCOPE_VOL_DOWN     BUTTON_VOL_DOWN
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define OSCILLOSCOPE_QUIT         BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

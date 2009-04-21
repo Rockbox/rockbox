@@ -103,6 +103,8 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD)
 #define BTN_MENU (BUTTON_MENU|BUTTON_REL)
 
+#elif defined(HAVE_TOUCHSCREEN)
+    /* This is a touchscreen target */
 #else
 #error No keymap defined!
 #endif

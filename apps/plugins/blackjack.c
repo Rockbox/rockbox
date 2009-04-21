@@ -338,11 +338,20 @@ PLUGIN_HEADER
 #define BJACK_DOUBLEDOWN BUTTON_VOL_DOWN
 #define BJACK_SCORES     BUTTON_MENU
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define BJACK_QUIT       BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
+#ifndef BJACK_DOUBLEDOWN 
+#define BJACK_DOUBLEDOWN BUTTON_MIDLEFT
+#endif
+#ifndef BJACK_SCORES
+#define BJACK_SCORES     BUTTON_MIDRIGHT
+#endif
 #ifndef BJACK_START
 #define BJACK_START      BUTTON_CENTER
 #endif

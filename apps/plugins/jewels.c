@@ -192,7 +192,7 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_POWER
 
-#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#elif CONFIG_KEYPAD == ONDAVX747_PAD || CONFIG_KEYPAD == MROBE500_PAD
 #define JEWELS_CANCEL BUTTON_POWER
 
 #else
@@ -1672,7 +1672,7 @@ static int jewels_main(struct game_context* bj) {
                 rb->lcd_puts(0, 9, "SELECT/PLAY to select");
                 rb->lcd_puts(0, 10, "Long SELECT to show menu");
                 rb->lcd_puts(0, 11, "POWER to cancel");
-#elif CONFIG_KEYPAD == ONDAVX747_PAD
+#elif CONFIG_KEYPAD == ONDAVX747_PAD || CONFIG_KEYPAD == MROBE500_PAD
                 rb->lcd_puts(0, 11, "POWER to cancel");
 #else
     #warning: missing help text.

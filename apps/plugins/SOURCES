@@ -29,7 +29,6 @@ firmware_flash.c
 rockbox_flash.c
 #endif /* CONFIG_CPU */
 
-#ifndef OLYMPUS_MROBE_500
 
 #if (CONFIG_CODEC == SWCODEC) || !defined(SIMULATOR)
 metronome.c
@@ -161,6 +160,5 @@ iriver_flash.c
 invadrox.c
 superdom.c
 #endif
-#endif /* m:robe 500 */
 
 md5sum.c

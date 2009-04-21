@@ -282,6 +282,10 @@ PLUGIN_HEADER
 #define STAR_QUIT_NAME      "[POWER]"
 #define STAR_MENU_RUN       BUTTON_MENU
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define STAR_QUIT           BUTTON_POWER
+#define STAR_QUIT_NAME      "[POWER]"
+
 #else
 #error No keymap defined!
 #endif

@@ -105,6 +105,11 @@ PLUGIN_HEADER
 #define ONEDROCKBLOX_DOWN              BUTTON_MENU
 #define ONEDROCKBLOX_QUIT              BUTTON_POWER
 
+#elif defined(HAVE_TOUCHSCREEN)
+
+#define ONEDROCKBLOX_DOWN              BUTTON_BOTTOMMIDDLE
+#define ONEDROCKBLOX_QUIT              BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

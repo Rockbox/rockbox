@@ -342,6 +342,9 @@ PLUGIN_HEADER
 #define CALCULATOR_QUIT           BUTTON_POWER
 #define CALCULATOR_CLEAR          BUTTON_MENU
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define CALCULATOR_QUIT           BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

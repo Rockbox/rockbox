@@ -279,6 +279,10 @@ PLUGIN_HEADER
 #define LABEL_QUIT "POWER"
 #define LABEL_MENU "MENU"
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define VUMETER_QUIT BUTTON_POWER
+#define LABEL_QUIT "POWER"
+
 #else
 #error No keymap defined!
 #endif

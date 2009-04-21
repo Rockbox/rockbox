@@ -158,6 +158,9 @@ PLUGIN_HEADER
 #define ROCKPAINT_QUIT      BUTTON_POWER
 #define ROCKPAINT_MENU      BUTTON_MENU
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define ROCKPAINT_QUIT      BUTTON_POWER
+
 #else
 #error "Please define keys for this keypad"
 #endif
