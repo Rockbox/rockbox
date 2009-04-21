@@ -170,7 +170,7 @@ void main(void)
     reset_screen();
 
     /* Show debug messages if button is pressed */
-    if(button_read_device())
+    if(button_read_device()&BUTTON_A)
         verbose = true;
 
     printf("Rockbox boot loader");
