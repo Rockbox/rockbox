@@ -415,6 +415,8 @@ whichadvanced () {
   if [ "yes" = "$simulator" ]; then
     debug="-DDEBUG"
     extradefines="$extradefines -DSIMULATOR"
+    archosrom=""
+    flash=""
   fi
   if [ "yes" = "$profile" ]; then
     extradefines="$extradefines -DRB_PROFILE"
