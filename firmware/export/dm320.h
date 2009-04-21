@@ -30,11 +30,13 @@
 #if !defined(__ASSEMBLER__) && !defined(__LD__)
 /* These variables are created during linking (app/boot.lds) */
 extern unsigned long _lcdbuf;
+extern unsigned long _lcdbuf2;
 extern unsigned long _ttbstart;
 #endif
 
 #define TTB_BASE_ADDR    (_ttbstart) /* End of memory */
-#define FRAME            ((short *) (&_lcdbuf))  /* Right before TTB */
+#define FRAME            ((short *) (&_lcdbuf))  /* Right after TTB */
+#define FRAME2            ((short *) (&_lcdbuf2))  /* Right after FRAME */
 
 #define PHY_IO_BASE      0x00030000
 #define DM320_REG(addr)  (*(volatile unsigned short *)(PHY_IO_BASE + (addr)))
@@ -651,7 +653,7 @@ extern unsigned long _ttbstart;
 #define IO_MEM_STICK_DMA_STATUS   DM320_REG(0x0C96)
 
 /* ATM : WBB Need to find these Register values */
-#define IO_ATM_                   DM320_REG(0x0D00
+#define IO_ATM_                   DM320_REG(0x0D00)
 
 /* I2C */
 #define IO_I2C_TXDATA             DM320_REG(0x0D80)

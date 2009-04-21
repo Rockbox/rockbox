@@ -27,8 +27,11 @@ STARTUP(target/arm/tms320dm320/crt0.o)
 /* must be 16Kb (0x4000) aligned */
 #define TTB_SIZE        0x4000
 
-/* Give this 1 meg to allow it to align to the MMU boundary */
-#define LCD_TTB_AREA    0x100000
+/* Give this some memory to allow it to align to the MMU boundary.
+ * Note that since there are two buffers (YUV/RGB) it calculates the approximate
+ * memory needed in steps of 1 Meg.
+ */
+#define LCD_TTB_AREA    0x100000*((LCD_BUFFER_SIZE>>19)+1)
 
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET
 
@@ -172,6 +175,12 @@ SECTIONS
     .lcdbuffer (NOLOAD) :
     {
         _lcdbuf = .;
+        . += LCD_BUFFER_SIZE;
+    } > DRAM
+    
+    .lcdbuffer2 (NOLOAD) :
+    {
+        _lcdbuf2 = .;
         . += LCD_BUFFER_SIZE;
     } > DRAM
 }

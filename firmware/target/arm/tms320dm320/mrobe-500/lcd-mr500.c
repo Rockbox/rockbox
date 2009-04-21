@@ -209,6 +209,8 @@ void lcd_init_device(void)
     
     IO_OSD_VIDWINMD=0x0002;
     
+    addr = ((int)FRAME2-CONFIG_SDRAM_START) / 32;
+    
     /* This is a bit messy, the LCD transfers appear to happen in chunks of 32
      * pixels. (based on OF)
      */
@@ -241,6 +243,40 @@ void lcd_init_device(void)
 	IO_OSD_OSDWINMD0|=0x01;
 	IO_VID_ENC_VMOD|=0x01;
 }
+
+#if defined(HAVE_LCD_MODES)
+void lcd_set_mode(int mode)
+{
+	if(mode==LCD_MODE_YUV)
+	{
+		/* Turn off the RGB buffer and enable the YUV buffer */
+		IO_OSD_OSDWINMD0 |=0x04;
+		IO_OSD_VIDWINMD  |=0x01;
+		memset16(FRAME2, 0x0080, LCD_NATIVE_HEIGHT*(LCD_NATIVE_WIDTH+LCD_FUDGE));
+	}
+	else if(mode==LCD_MODE_RGB565)
+	{
+		/* Turn on the RGB window, set it to 16 bit and turn YUV window off */
+		IO_OSD_VIDWINMD  &=~(0x01);
+		IO_OSD_OSDWIN0OFST=LCD_NATIVE_WIDTH / 16;
+    	IO_OSD_OSDWINMD0 |=(1<<13);
+    	IO_OSD_OSDWINMD0 &=~0x04;
+    	lcd_clear_display();
+	}
+	else if(mode==LCD_MODE_PAL256)
+	{
+#if LCD_NATIVE_WIDTH%32!=0
+        IO_OSD_OSDWIN0OFST=LCD_NATIVE_WIDTH / 32+1;
+#else
+        IO_OSD_OSDWIN0OFST=LCD_NATIVE_WIDTH / 32;
+#endif
+
+        IO_OSD_VIDWINMD  &=~(0x01);
+        IO_OSD_OSDWINMD0 &=~(1<<13);
+		IO_OSD_OSDWINMD0 |=0x01;
+	}
+}
+#endif
 
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
@@ -317,39 +353,6 @@ void lcd_update(void)
 #endif
 }
 
-#if defined(HAVE_LCD_MODES)
-void lcd_set_mode(int mode)
-{
-	if(mode==LCD_MODE_YUV)
-	{
-		/* Turn off the RGB buffer and enable the YUV buffer */
-		IO_OSD_OSDWINMD0 &=~(0x01);
-		IO_OSD_VIDWINMD  |=0x01;
-		memset16(FRAME, 0x0080, LCD_NATIVE_HEIGHT*(LCD_NATIVE_WIDTH+LCD_FUDGE));
-	}
-	else if(mode==LCD_MODE_RGB565)
-	{
-		/* Turn on the RGB window, set it to 16 bit and turn YUV window off */
-		IO_OSD_VIDWINMD  &=~(0x01);
-		IO_OSD_OSDWIN0OFST=LCD_NATIVE_WIDTH / 16;
-    	IO_OSD_OSDWINMD0 |=(1<<13)|0x01;
-    	lcd_clear_display();
-	}
-	else if(mode==LCD_MODE_PAL256)
-	{
-#if LCD_NATIVE_WIDTH%32!=0
-        IO_OSD_OSDWIN0OFST=LCD_NATIVE_WIDTH / 32+1;
-#else
-        IO_OSD_OSDWIN0OFST=LCD_NATIVE_WIDTH / 32;
-#endif
-
-        IO_OSD_VIDWINMD  &=~(0x01);
-        IO_OSD_OSDWINMD0 &=~(1<<13);
-		IO_OSD_OSDWINMD0 |=0x01;
-	}
-}
-#endif
-
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
 void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
 	int width, int height)
@@ -362,7 +365,7 @@ void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
 	{
 		memcpy ( dst, src, width);
 		
-		dst=dst+width+(LCD_NATIVE_WIDTH-x-width)+LCD_FUDGE; 
+		dst=dst+(LCD_NATIVE_WIDTH-x+LCD_FUDGE); 
 		src+=width;
 	}
 	
@@ -425,10 +428,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    /* Caches for chroma data so it only need be recaculated every other
-       line */
-    unsigned char const * yuv_src[3];
-    off_t z;
+    register unsigned char const * yuv_src[3];
 
     if (!lcd_on)
         return;
@@ -455,50 +455,55 @@ void lcd_blit_yuv(unsigned char * const src[3],
     width &= ~1;
     height>>=1;
 
-    fb_data * dst = FRAME + ((LCD_NATIVE_WIDTH+LCD_FUDGE)*(LCD_NATIVE_HEIGHT-1)) 
+    fb_data * dst = FRAME2 
+        + ((LCD_NATIVE_WIDTH+LCD_FUDGE)*(LCD_NATIVE_HEIGHT-1)) 
         - (LCD_NATIVE_WIDTH+LCD_FUDGE)*x + y ;
 
-    z = stride*src_y;
-    yuv_src[0] = src[0] + z + src_x;
-    yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
-    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
-
+    /* Scope z */
     {
-        do
-        {
-        	register fb_data *c_dst=dst;
-        	register int c_width=width;
-        	unsigned char const * c_yuv_src[3];
-        	c_yuv_src[0] = yuv_src[0];
-        	c_yuv_src[1] = yuv_src[1];
-        	c_yuv_src[2] = yuv_src[2];
-
-        	do
-        	{
-        	/* This needs to be done in a block of 4 pixels */
-        		*c_dst=*c_yuv_src[0]<<8 | *c_yuv_src[1];
-        		*(c_dst+1)=*(c_yuv_src[0]+stride)<<8 | *c_yuv_src[2];
-        		c_dst-=(LCD_NATIVE_WIDTH+LCD_FUDGE);
-        		c_yuv_src[0]++;
-        		*c_dst=*c_yuv_src[0]<<8 | *c_yuv_src[1];
-        		*(c_dst+1)=*(c_yuv_src[0]+stride)<<8 | *c_yuv_src[2];
-        		c_dst-=(LCD_NATIVE_WIDTH+LCD_FUDGE);
-	            c_yuv_src[0]++;
-	            
-            	c_yuv_src[1]++;
-            	c_yuv_src[2]++;
-            	
-        		c_width -= 2;
-    		}
-    		while (c_width > 0);
-    		
-    		yuv_src[0] += stride << 1; /* Skip down two luma lines */
-            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-            yuv_src[2] += stride >> 1;
-            dst+=2;
-        }
-        while (--height > 0);
+        off_t z;
+        z = stride*src_y;
+        yuv_src[0] = src[0] + z + src_x;
+        yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
+        yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
     }
+
+    register int cbcr_remain=(stride>>1)-(width>>1);
+    register int y_remain=(stride<<1)-width;
+    do
+    {
+    	register fb_data *c_dst=dst;
+    	register int c_width=width;
+
+    	do
+    	{
+    	    /* This needs to be done in a block of 4 pixels */
+    	    
+    		*c_dst=*yuv_src[0]<<8 | *yuv_src[1];
+    		*(c_dst+1)=*(yuv_src[0]+stride)<<8 | *yuv_src[2];
+    		c_dst-=(LCD_NATIVE_WIDTH+LCD_FUDGE);
+    		
+    		yuv_src[0]++;
+    		
+    		*c_dst=*yuv_src[0]<<8 | *yuv_src[1];
+    		*(c_dst+1)=*(yuv_src[0]+stride)<<8 | *yuv_src[2];
+    		c_dst-=(LCD_NATIVE_WIDTH+LCD_FUDGE);
+    		
+            yuv_src[0]++;
+            
+        	yuv_src[1]++;
+        	yuv_src[2]++;
+        	
+    		c_width -= 2;
+		}
+		while (c_width > 0);
+		
+		yuv_src[0] += y_remain; /* Skip down two luma lines-width */
+        yuv_src[1] += cbcr_remain; /* Skip down one chroma line-width/2 */
+        yuv_src[2] += cbcr_remain;
+        dst+=2;
+    }
+    while (--height > 0);
 }
 
 void lcd_set_contrast(int val) {
