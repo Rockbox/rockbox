@@ -180,6 +180,7 @@ void ThemesInstallWindow::updateDetails(QListWidgetItem* cur, QListWidgetItem* p
         .arg(cur->data(Qt::DisplayRole).toString()));
     ui.themePreview->clear();
     ui.themePreview->setText(tr("fetching preview ..."));
+    imgData.clear();
 
     iniDetails.beginGroup(cur->data(Qt::UserRole).toString());
 
