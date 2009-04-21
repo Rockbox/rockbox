@@ -99,6 +99,11 @@ start:
     cmp     r0, #0xA0000
     bne     poweron
 
+    /* Point LCDSADDR1 to the boot logo for lcd_init_device in lcd-meg-fx.c */
+    mov     r2, #0x4D000000
+    ldr     r1, =0x020200A8
+    str     r1, [r2, #0x14]
+    
     /* Did an RTC event wake the player up? */ 
 
     mov     r2, #0x4A000000
