@@ -560,6 +560,7 @@ struct mp3entry* audio_current_track(void)
     struct playlist_track_info trackinfo;
     int cur_idx;
     int offset = ci.new_track + wps_offset;
+    struct mp3entry *write_id3;
 
     cur_idx = (track_ridx + offset) & MAX_TRACK_MASK;
 
@@ -576,18 +577,36 @@ struct mp3entry* audio_current_track(void)
              codec_pcmbuf_position_callback */
         return othertrack_id3;
     }
-    else if (tracks[cur_idx].id3_hid >= 0)
+
+    if (offset != 0)
+    {
+        /* Codec may be using thistrack_id3, so it must not be overwritten.
+             If this is a manual skip, othertrack_id3 will become 
+             thistrack_id3 in audio_check_new_track().
+           FIXME: If this is an automatic skip, it probably means multiple 
+             short tracks fit in the PCM buffer.  Overwriting othertrack_id3
+             can lead to an incorrect value later.
+           Note that othertrack_id3 may also be used for next track.
+          */
+        write_id3 = othertrack_id3;
+    }
+    else 
+    {
+        write_id3 = thistrack_id3;
+    }
+
+    if (tracks[cur_idx].id3_hid >= 0)
     {
         /* The current track's info has been buffered but not read yet, so get it */
-        if (bufread(tracks[cur_idx].id3_hid, sizeof(struct mp3entry), thistrack_id3)
+        if (bufread(tracks[cur_idx].id3_hid, sizeof(struct mp3entry), write_id3)
              == sizeof(struct mp3entry))
-            return thistrack_id3;
+            return write_id3;
     }
 
     /* We didn't find the ID3 metadata, so we fill temp_id3 with the little info
        we have and return that. */
 
-    memset(thistrack_id3, 0, sizeof(struct mp3entry));
+    memset(write_id3, 0, sizeof(struct mp3entry));
 
     playlist_get_track_info(NULL, playlist_next(0)+wps_offset, &trackinfo);
     filename = trackinfo.filename;
@@ -595,18 +614,18 @@ struct mp3entry* audio_current_track(void)
         filename = "No file!";
 
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-    if (tagcache_fill_tags(thistrack_id3, filename))
-        return thistrack_id3;
+    if (tagcache_fill_tags(write_id3, filename))
+        return write_id3;
 #endif
 
-    strncpy(thistrack_id3->path, filename, sizeof(thistrack_id3->path)-1);
-    thistrack_id3->title = strrchr(thistrack_id3->path, '/');
-    if (!thistrack_id3->title)
-        thistrack_id3->title = &thistrack_id3->path[0];
+    strncpy(write_id3->path, filename, sizeof(write_id3->path)-1);
+    write_id3->title = strrchr(write_id3->path, '/');
+    if (!write_id3->title)
+        write_id3->title = &write_id3->path[0];
     else
-        thistrack_id3->title++;
+        write_id3->title++;
 
-    return thistrack_id3;
+    return write_id3;
 }
 
 struct mp3entry* audio_next_track(void)
