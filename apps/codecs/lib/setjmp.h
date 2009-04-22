@@ -52,6 +52,8 @@ typedef	_JBTYPE jmp_buf[_JBLEN];
 #else
 typedef	int jmp_buf[_JBLEN];
 #endif
+#else
+typedef int jmp_buf;
 #endif
 
 
