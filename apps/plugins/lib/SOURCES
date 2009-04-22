@@ -53,3 +53,16 @@ helper.c
 touchscreen.c
 #endif
 md5.c
+
+#ifndef SIMULATOR
+#ifdef CPU_ARM
+../../codecs/lib/setjmp_arm.S
+#endif
+#ifdef CPU_COLDFIRE
+../../codecs/lib/setjmp_cf.S
+#endif
+#ifdef CPU_MIPS
+../../codecs/lib/setjmp_mips.S
+#endif
+#endif
+pluginlib_exit.c
