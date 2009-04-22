@@ -35,6 +35,7 @@
 #endif
 #endif
 
+#if 0 /* Disabled for now, as SH doesn't have setjmp implementation (yet) */
 #ifdef  __sh__
 #if __SH5__
 #define _JBLEN 50
@@ -42,6 +43,7 @@
 #else
 #define _JBLEN 20
 #endif /* __SH5__ */
+#endif
 #endif
 
 #ifdef _JBLEN
