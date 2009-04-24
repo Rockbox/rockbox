@@ -636,7 +636,7 @@ void backlight_thread(void)
         switch(ev.id)
         {   /* These events are only processed if backlight isn't locked */
 #ifdef HAVE_REMOTE_LCD
-            case REMOTE_BACKLIGHT_TMO_CHANGED
+            case REMOTE_BACKLIGHT_TMO_CHANGED:
             case REMOTE_BACKLIGHT_ON:
                 remote_backlight_update_state();
                 break;
