@@ -105,9 +105,11 @@ static inline void _remote_backlight_off(void)
 enum {
     BACKLIGHT_ON,
     BACKLIGHT_OFF,
+    BACKLIGHT_TMO_CHANGED,
 #ifdef HAVE_REMOTE_LCD
     REMOTE_BACKLIGHT_ON,
     REMOTE_BACKLIGHT_OFF,
+    REMOTE_BACKLIGHT_TMO_CHANGED,
 #endif
 #if defined(_BACKLIGHT_FADE_BOOST) || defined(_BACKLIGHT_FADE_ENABLE)
     BACKLIGHT_FADE_FINISH,
@@ -118,6 +120,7 @@ enum {
 #ifdef HAVE_BUTTON_LIGHT
     BUTTON_LIGHT_ON,
     BUTTON_LIGHT_OFF,
+    BUTTON_LIGHT_TMO_CHANGED,
 #endif
 #ifdef BACKLIGHT_DRIVER_CLOSE
     BACKLIGHT_QUIT,
@@ -176,7 +179,7 @@ void buttonlight_off(void)
 void buttonlight_set_timeout(int value)
 {
     _buttonlight_timeout = HZ * value;
-    buttonlight_update_state();
+    queue_post(&backlight_queue, BUTTON_LIGHT_TMO_CHANGED, 0);
 }
 
 #endif /* HAVE_BUTTON_LIGHT */
@@ -633,6 +636,7 @@ void backlight_thread(void)
         switch(ev.id)
         {   /* These events are only processed if backlight isn't locked */
 #ifdef HAVE_REMOTE_LCD
+            case REMOTE_BACKLIGHT_TMO_CHANGED
             case REMOTE_BACKLIGHT_ON:
                 remote_backlight_update_state();
                 break;
@@ -643,6 +647,7 @@ void backlight_thread(void)
                 break;
 #endif /* HAVE_REMOTE_LCD */
 
+            case BACKLIGHT_TMO_CHANGED:
             case BACKLIGHT_ON:
                 backlight_update_state();
                 break;
@@ -662,6 +667,7 @@ void backlight_thread(void)
                 break;
 #endif
 #ifdef HAVE_BUTTON_LIGHT
+            case BUTTON_LIGHT_TMO_CHANGED:
             case BUTTON_LIGHT_ON:
                 buttonlight_update_state();
                 break;
@@ -806,14 +812,14 @@ int backlight_get_current_timeout(void)
 void backlight_set_timeout(int value)
 {
     backlight_timeout_normal = HZ * value;
-    backlight_update_state();
+    queue_post(&backlight_queue, BACKLIGHT_TMO_CHANGED, 0);
 }
 
 #if CONFIG_CHARGING
 void backlight_set_timeout_plugged(int value)
 {
     backlight_timeout_plugged = HZ * value;
-    backlight_update_state();
+    queue_post(&backlight_queue, BACKLIGHT_TMO_CHANGED, 0);
 }
 #endif /* CONFIG_CHARGING */
 
@@ -833,7 +839,7 @@ void backlight_set_on_button_hold(int index)
         index = 0;
 
     backlight_on_button_hold = index;
-    backlight_update_state();
+    queue_post(&backlight_queue, BACKLIGHT_TMO_CHANGED, 0);
 }
 #endif /* HAS_BUTTON_HOLD */
 
@@ -872,14 +878,14 @@ void remote_backlight_off(void)
 void remote_backlight_set_timeout(int value)
 {
     remote_backlight_timeout_normal = HZ * value;
-    remote_backlight_update_state();
+    queue_post(&backlight_queue, REMOTE_BACKLIGHT_TMO_CHANGED, 0);
 }
 
 #if CONFIG_CHARGING
 void remote_backlight_set_timeout_plugged(int value)
 {
     remote_backlight_timeout_plugged = HZ * value;
-    remote_backlight_update_state();
+    queue_post(&backlight_queue, REMOTE_BACKLIGHT_TMO_CHANGED, 0);
 }
 #endif /* CONFIG_CHARGING */
 
@@ -899,7 +905,7 @@ void remote_backlight_set_on_button_hold(int index)
         index = 0;
 
     remote_backlight_on_button_hold = index;
-    remote_backlight_update_state();
+    queue_post(&backlight_queue, REMOTE_BACKLIGHT_TMO_CHANGED, 0);
 }
 #endif /* HAS_REMOTE_BUTTON_HOLD */
 
