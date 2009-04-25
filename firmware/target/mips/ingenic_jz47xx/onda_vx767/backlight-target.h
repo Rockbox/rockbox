@@ -21,12 +21,6 @@
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-#ifdef BOOTLOADER
-#define BACKLIGHT_DRIVER_CLOSE
-/* Force the whole driver to be built */
-#define BACKLIGHT_FULL_INIT
-#endif
-
 #include <stdbool.h>
 
 bool _backlight_init(void);
