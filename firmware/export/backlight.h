@@ -23,6 +23,13 @@
 
 #include "config.h"
 
+
+
+#if !defined(BOOTLOADER)
+/* The whole driver should be built */
+#define BACKLIGHT_FULL_INIT
+#endif
+
 bool is_backlight_on(bool ignore_always_off);
 void backlight_on(void);
 void backlight_off(void);
@@ -79,7 +86,11 @@ void sim_remote_backlight(int value);
 #endif
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
+#ifdef BACKLIGHT_FULL_INIT
 extern int backlight_brightness;
+#else
+#define backlight_brightness DEFAULT_BRIGHTNESS_SETTING
+#endif
 void backlight_set_brightness(int val);
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 

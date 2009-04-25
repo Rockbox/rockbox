@@ -44,11 +44,6 @@
 #include "backlight-target.h"
 #endif
 
-#if !defined(BOOTLOADER)
-/* The whole driver should be built */
-#define BACKLIGHT_FULL_INIT
-#endif
-
 
 #if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
     || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
