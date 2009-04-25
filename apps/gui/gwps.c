@@ -256,12 +256,10 @@ static void gwps_fix_statusbars(void)
 /*
  * If the user is unable to see the wps, because the display is deactivated,
  * we surpress updates until the wps gets actived again (the lcd driver will
- * call this hook)
+ * call this hook to issue an instant update)
  * */
 static void wps_lcd_activation_hook(void)
 {
-    /* issue an update */
-    wps_state.do_full_update = true;
     /* force timeout in wps main loop, so that the update is instantly */
     queue_post(&button_queue, BUTTON_NONE, 0);
 }
