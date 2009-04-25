@@ -131,7 +131,6 @@ static unsigned int backlight_thread_id = 0;
 int backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
 #endif
 static int backlight_timer SHAREDBSS_ATTR;
-static int backlight_timeout SHAREDBSS_ATTR;
 static int backlight_timeout_normal = 5*HZ;
 #if CONFIG_CHARGING
 static int backlight_timeout_plugged = 5*HZ;
@@ -186,7 +185,6 @@ int buttonlight_get_current_timeout(void)
 
 #ifdef HAVE_REMOTE_LCD
 static int remote_backlight_timer;
-static int remote_backlight_timeout;
 static int remote_backlight_timeout_normal = 5*HZ;
 #if CONFIG_CHARGING
 static int remote_backlight_timeout_plugged = 5*HZ;
@@ -490,27 +488,11 @@ static void backlight_setup_fade_down(void)
 /* Update state of backlight according to timeout setting */
 static void backlight_update_state(void)
 {
-#ifdef HAS_BUTTON_HOLD
-    if ((backlight_on_button_hold != 0)
-#ifdef HAVE_REMOTE_LCD_AS_MAIN
-        && remote_button_hold()
-#else
-        && button_hold()
-#endif
-        )
-        backlight_timeout = (backlight_on_button_hold == 2) ? 0 : -1;
-        /* always on or always off */
-    else
-#endif
-#if CONFIG_CHARGING
-        if (power_input_present())
-            backlight_timeout = backlight_timeout_plugged;
-        else
-#endif
-            backlight_timeout = backlight_timeout_normal;
+
+    int timeout = backlight_get_current_timeout();
 
     /* Backlight == OFF in the setting? */
-    if (UNLIKELY(backlight_timeout < 0))
+    if (UNLIKELY(timeout < 0))
     {
         backlight_timer = 0; /* Disable the timeout */
 #if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
@@ -524,7 +506,7 @@ static void backlight_update_state(void)
     }
     else
     {
-        backlight_timer = backlight_timeout;
+        backlight_timer = timeout;
 #if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
     || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
         backlight_setup_fade_up();
@@ -538,28 +520,16 @@ static void backlight_update_state(void)
 /* Update state of remote backlight according to timeout setting */
 static void remote_backlight_update_state(void)
 {
-#ifdef HAS_REMOTE_BUTTON_HOLD
-    if (remote_button_hold() && (remote_backlight_on_button_hold != 0))
-        remote_backlight_timeout = (remote_backlight_on_button_hold == 2)
-                                 ? 0 : -1;  /* always on or always off */
-    else
-#endif
-#if CONFIG_CHARGING
-        if (power_input_present())
-            remote_backlight_timeout = remote_backlight_timeout_plugged;
-        else
-#endif
-            remote_backlight_timeout = remote_backlight_timeout_normal;
-
+    int timeout = remote_backlight_get_current_timeout();
     /* Backlight == OFF in the setting? */
-    if (remote_backlight_timeout < 0)
+    if (timeout < 0)
     {
         remote_backlight_timer = 0; /* Disable the timeout */
         _remote_backlight_off();
     }
     else
     {
-        remote_backlight_timer = remote_backlight_timeout;
+        remote_backlight_timer = timeout;
         _remote_backlight_on();
     }
 }
@@ -798,15 +768,33 @@ void backlight_off(void)
  * and optionally when it's set to always off. */
 bool is_backlight_on(bool ignore_always_off)
 {
+    int timeout = backlight_get_current_timeout();
     return (backlight_timer > 0)   /* countdown */
-        || (backlight_timeout == 0) /* always on */
-        || ((backlight_timeout < 0) && !ignore_always_off);
+        || (timeout == 0) /* always on */
+        || ((timeout < 0) && !ignore_always_off);
 }
 
 /* return value in ticks; 0 means always on, <0 means always off */
 int backlight_get_current_timeout(void)
 {
-    return backlight_timeout;
+#ifdef HAS_BUTTON_HOLD
+    if ((backlight_on_button_hold != 0)
+#ifdef HAVE_REMOTE_LCD_AS_MAIN
+        && remote_button_hold()
+#else
+        && button_hold()
+#endif
+        )
+        return (backlight_on_button_hold == 2) ? 0 : -1;
+        /* always on or always off */
+    else
+#endif
+#if CONFIG_CHARGING
+        if (power_input_present())
+            return backlight_timeout_plugged;
+        else
+#endif
+            return backlight_timeout_normal;
 }
 
 void backlight_set_timeout(int value)
@@ -912,16 +900,28 @@ void remote_backlight_set_on_button_hold(int index)
 /* return value in ticks; 0 means always on, <0 means always off */
 int remote_backlight_get_current_timeout(void)
 {
-    return remote_backlight_timeout;
+#ifdef HAS_REMOTE_BUTTON_HOLD
+    if (remote_button_hold() && (remote_backlight_on_button_hold != 0))
+        return (remote_backlight_on_button_hold == 2)
+                                 ? 0 : -1;  /* always on or always off */
+    else
+#endif
+#if CONFIG_CHARGING
+        if (power_input_present())
+            return remote_backlight_timeout_plugged;
+        else
+#endif
+            return remote_backlight_timeout_normal;
 }
 
 /* returns true when the backlight is on, and
  * optionally  when it's set to always off */
 bool is_remote_backlight_on(bool ignore_always_off)
 {
+    int timeout = remote_backlight_get_current_timeout();
     return (remote_backlight_timer > 0)   /* countdown */
-        || (remote_backlight_timeout == 0) /* always on */
-        || ((remote_backlight_timeout < 0) && !ignore_always_off);
+        || (timeout == 0) /* always on */
+        || ((timeout < 0) && !ignore_always_off);
 }
 
 #endif /* HAVE_REMOTE_LCD */
