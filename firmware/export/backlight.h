@@ -95,7 +95,7 @@ void buttonlight_set_timeout(int value);
 
 /* Private API for use in target tree backlight code only */
 #ifdef HAVE_BUTTON_LIGHT
-extern int _buttonlight_timeout;
+int  buttonlight_get_current_timeout(void);
 #endif
 
 #endif /* BACKLIGHT_H */

@@ -49,9 +49,6 @@
 #define BACKLIGHT_FULL_INIT
 #endif
 
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-int backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
-#endif
 
 #if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
     || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
@@ -135,6 +132,9 @@ static struct event_queue backlight_queue;
 static unsigned int backlight_thread_id = 0;
 #endif
 
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+int backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
+#endif
 static int backlight_timer SHAREDBSS_ATTR;
 static int backlight_timeout SHAREDBSS_ATTR;
 static int backlight_timeout_normal = 5*HZ;
@@ -147,12 +147,12 @@ static int backlight_on_button_hold = 0;
 
 #ifdef HAVE_BUTTON_LIGHT
 static int buttonlight_timer;
-int _buttonlight_timeout = 5*HZ;
+static int buttonlight_timeout = 5*HZ;
 
 /* Update state of buttonlight according to timeout setting */
 static void buttonlight_update_state(void)
 {
-    buttonlight_timer = _buttonlight_timeout;
+    buttonlight_timer = buttonlight_timeout;
 
     /* Buttonlight == OFF in the setting? */
     if (buttonlight_timer < 0)
@@ -178,8 +178,13 @@ void buttonlight_off(void)
 
 void buttonlight_set_timeout(int value)
 {
-    _buttonlight_timeout = HZ * value;
+    buttonlight_timeout = HZ * value;
     queue_post(&backlight_queue, BUTTON_LIGHT_TMO_CHANGED, 0);
+}
+
+int buttonlight_get_current_timeout(void)
+{
+    return buttonlight_timeout;
 }
 
 #endif /* HAVE_BUTTON_LIGHT */
@@ -205,7 +210,7 @@ const signed char lcd_sleep_timeout_value[10] =
 static int lcd_sleep_timeout = 10*HZ;
 #else
 /* Target defines needed value */
-static const int lcd_sleep_timeout = LCD_SLEEP_TIMEOUT;
+#define lcd_sleep_timeout LCD_SLEEP_TIMEOUT
 #endif
 
 static int lcd_sleep_timer SHAREDDATA_ATTR = 0;
