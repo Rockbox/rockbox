@@ -29,7 +29,6 @@
 #include "disk.h"
 #include "panic.h"
 #include "lcd.h"
-#include "adc.h"
 #include "usb.h"
 #include "button.h"
 #include "sprintf.h"

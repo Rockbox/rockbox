@@ -33,7 +33,6 @@
 #include "fat.h"
 #include "disk.h"
 #include "font.h"
-#include "adc.h"
 #include "backlight.h"
 #include "backlight-target.h"
 #include "button.h"

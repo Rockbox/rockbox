@@ -36,7 +36,6 @@
 #include "button.h"
 #include "kernel.h"
 #include "backlight.h"
-#include "adc.h"
 #include "serial.h"
 #include "power.h"
 #include "system.h"

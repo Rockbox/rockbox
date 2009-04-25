@@ -34,8 +34,6 @@
 #include "fat.h"
 #include "disk.h"
 #include "font.h"
-#include "adc.h"
-#include "backlight.h"
 #include "panic.h"
 #include "power.h"
 #include "file.h"

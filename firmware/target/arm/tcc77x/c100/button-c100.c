@@ -22,7 +22,6 @@
 #include "config.h"
 #include "cpu.h"
 #include "button.h"
-#include "adc.h"
 
 void button_init_device(void)
 {

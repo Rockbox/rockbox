@@ -28,7 +28,6 @@
 #include "button.h"
 #include "kernel.h"
 #include "backlight.h"
-#include "adc.h"
 #include "system.h"
 
 void button_init_device(void)

@@ -21,7 +21,6 @@
  ****************************************************************************/
 
 #include "config.h"
-#include "adc.h"
 #include "powermgmt.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =

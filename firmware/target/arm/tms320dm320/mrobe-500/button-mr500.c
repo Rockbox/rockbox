@@ -27,7 +27,6 @@
 #include "button.h"
 #include "kernel.h"
 #include "backlight.h"
-#include "adc.h"
 #include "backlight-target.h"
 #include "lcd-remote-target.h"
 #include "uart-target.h"

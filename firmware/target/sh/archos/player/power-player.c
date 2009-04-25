@@ -21,7 +21,6 @@
 #include "config.h"
 #include "cpu.h"
 #include <stdbool.h>
-#include "adc.h"
 #include "kernel.h"
 #include "system.h"
 #include "power.h"
