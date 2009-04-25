@@ -47,7 +47,7 @@
 /* TGB is the only target fast enough for gaussian and realtime BRR decode */
 /* echo is almost fast enough but not quite */
 #if defined(TOSHIBA_GIGABEAT_F) || defined(TOSHIBA_GIGABEAT_S) ||\
-    defined(SIMULATOR)
+    defined(SIMULATOR) || MEMORYSIZE <= 2
     /* Don't cache BRR waves */
     #define SPC_BRRCACHE 0 
     

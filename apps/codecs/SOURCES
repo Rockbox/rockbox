@@ -16,10 +16,7 @@ ape.c
 nsf.c
 asap.c
 aac.c
-
-#if MEMORYSIZE > 2
 spc.c
-#endif
 mod.c
 shorten.c
 aiff.c
