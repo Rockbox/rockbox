@@ -143,7 +143,7 @@ static inline
 void vect_add(int32_t *x, int32_t *y, int n)
 {
   /* align to 16 bytes */
-  while(n>0 && (int)x&16) {
+  while(n>0 && (int)x&15) {
     *x++ += *y++;
     n--;
   }
@@ -177,7 +177,7 @@ static inline
 void vect_copy(int32_t *x, int32_t *y, int n)
 {
   /* align to 16 bytes */
-  while(n>0 && (int)x&16) {
+  while(n>0 && (int)x&15) {
     *x++ = *y++;
     n--;
   }
@@ -204,7 +204,7 @@ static inline
 void vect_mult_fw(int32_t *data, int32_t *window, int n)
 {
   /* ensure data is aligned to 16-bytes */
-  while(n>0 && (int)data%16) {
+  while(n>0 && (int)data&15) {
     *data = MULT31(*data, *window);
     data++;
     window++;
@@ -258,7 +258,7 @@ static inline
 void vect_mult_bw(int32_t *data, int32_t *window, int n)
 {
   /* ensure at least data is aligned to 16-bytes */
-  while(n>0 && (int)data%16) {
+  while(n>0 && (int)data&15) {
     *data = MULT31(*data, *window);
     data++;
     window--;

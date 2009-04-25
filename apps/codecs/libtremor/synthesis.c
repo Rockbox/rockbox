@@ -25,15 +25,7 @@
 #include "os.h"
 
 
-/* IRAM buffer keep the block pcm data; only for windows size upto 2048
-   for space restrictions. 
-   libVorbis 1.1 Oggenc doesn't use larger windows anyway. */
-/* max 2 channels on the ihp-1xx (stereo), 2048 samples (2*2048*4=16Kb)  */
-#define IRAM_PCM_END      2048    
-#define CHANNELS          2          
-
 static ogg_int32_t *ipcm_vect[CHANNELS] IBSS_ATTR;
-static ogg_int32_t ipcm_buff[CHANNELS*IRAM_PCM_END] IBSS_ATTR LINE_ATTR;
 
 int vorbis_synthesis(vorbis_block *vb,ogg_packet *op,int decodep)
     ICODE_ATTR_TREMOR_NOT_MDCT;
@@ -76,23 +68,33 @@ int vorbis_synthesis(vorbis_block *vb,ogg_packet *op,int decodep){
   vb->eofflag=op->e_o_s;
 
   if(decodep && vi->channels<=CHANNELS){
+    vb->pcm = ipcm_vect;
+
     /* alloc pcm passback storage */
     vb->pcmend=ci->blocksizes[vb->W];
-    if (vb->pcmend<=IRAM_PCM_END) { 
+    if (vd->iram_pcm_storage >= vb->pcmend) { 
       /* use statically allocated iram buffer */
-      vb->pcm = ipcm_vect;
-      for(i=0; i<CHANNELS; i++)
-        vb->pcm[i] = &ipcm_buff[i*IRAM_PCM_END];  
+      if(vd->reset_pcmb || vb->pcm[0]==NULL)
+      {
+        /* one-time initialisation at codec start
+           NOT for every block synthesis start
+           allows us to flip between buffers once initialised
+           by simply flipping pointers */
+        for(i=0; i<vi->channels; i++)
+          vb->pcm[i] = &vd->iram_pcm[i*vd->iram_pcm_storage];
+      }
     } else {
-      /* dynamic allocation (slower) */
-      vb->pcm=(ogg_int32_t **)_vorbis_block_alloc(vb,sizeof(*vb->pcm)*vi->channels);
-      for(i=0;i<vi->channels;i++)
-        vb->pcm[i]=(ogg_int32_t *)_vorbis_block_alloc(vb,vb->pcmend*sizeof(*vb->pcm[i]));
+      if(vd->reset_pcmb || vb->pcm[0]==NULL)
+      {
+        /* dynamic allocation (slower) */
+        for(i=0;i<vi->channels;i++)
+          vb->pcm[i]=(ogg_int32_t *)_vorbis_block_alloc(vb,vb->pcmend*sizeof(*vb->pcm[i]));
+      }
     }
+    vd->reset_pcmb = false;
       
     /* unpack_header enforces range checking */
     type=ci->map_type[ci->mode_param[mode]->mapping];
-    
     return(_mapping_P[type]->inverse(vb,b->mode[mode]));
   }else{
     /* no pcm */

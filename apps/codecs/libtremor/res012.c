@@ -172,8 +172,6 @@ static vorbis_look_residue *res0_look(vorbis_dsp_state *vd,vorbis_info_mode *vm,
   return(look);
 }
 
-#define CHANNELS 2
-
 /* a truncated packet here just means 'stop working'; it's not an error */
 static int _01inverse(vorbis_block *vb,vorbis_look_residue *vl,
                       ogg_int32_t **in,int ch,

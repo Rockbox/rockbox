@@ -81,3 +81,27 @@ void ogg_tmpmalloc_free(long pos)
 {
     tmp_ptr = pos;
 }
+
+/* Allocate IRAM buffer */
+static unsigned char iram_buff[IRAM_IBSS_SIZE] IBSS_ATTR __attribute__ ((aligned (16)));
+static size_t iram_remain;
+
+void iram_malloc_init(void){
+    iram_remain=IRAM_IBSS_SIZE;
+}
+
+void *iram_malloc(size_t size){
+    void* x;
+    
+    /* always ensure 16-byte aligned */
+    if(size&0x0f)
+      size=(size-(size&0x0f))+16;
+      
+    if(size>iram_remain)
+      return NULL;
+    
+    x = &iram_buff[IRAM_IBSS_SIZE-iram_remain];
+    iram_remain-=size;
+
+    return x;
+}

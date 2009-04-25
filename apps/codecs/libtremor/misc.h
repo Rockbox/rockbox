@@ -155,8 +155,11 @@ static inline void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
 #ifndef _V_VECT_OPS
 #define _V_VECT_OPS
 
+/* generic misc.h has symmetrical versions of vect_add_right_left
+   and vect_add_left_right  (since symmetrical versions of
+   vect_mult_fw and vect_mult_bw  i.e.  both use MULT31) */
 static inline 
-void vect_add(ogg_int32_t *x, ogg_int32_t *y, int n)
+void vect_add_right_left(ogg_int32_t *x, const ogg_int32_t *y, int n)
 {
   while (n>0) {
     *x++ += *y++;
@@ -164,13 +167,10 @@ void vect_add(ogg_int32_t *x, ogg_int32_t *y, int n)
   }
 }
 
-static inline 
-void vect_copy(ogg_int32_t *x, ogg_int32_t *y, int n)
+static inline
+void vect_add_left_right(ogg_int32_t *x, const ogg_int32_t *y, int n)
 {
-  while (n>0) {
-    *x++ = *y++;
-    n--;
-  }
+  vect_add_right_left(x,y,n);
 }
 
 static inline 
@@ -193,6 +193,12 @@ void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
     window--;
     n--;
   }
+}
+
+/* generic memcpy is probably optimal */
+static inline void vect_copy(ogg_int32_t *x, const ogg_int32_t *y, int n)
+{
+  memcpy(x,y,n*sizeof(ogg_int32_t));
 }
 #endif
 

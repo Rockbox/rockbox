@@ -99,104 +99,120 @@ static inline void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
 #define _V_VECT_OPS
 
 /* asm versions of vector operations for block.c, window.c */
+/* SOME IMPORTANT NOTES: this implementation of vect_mult_bw does
+   NOT do a final shift, meaning that the result of vect_mult_bw is
+   only 31 bits not 32.  This is so that we can do the shift in-place
+   in vect_add_xxxx instead to save one instruction for each mult on arm */
 static inline 
-void vect_add(ogg_int32_t *x, ogg_int32_t *y, int n)
+void vect_add_right_left(ogg_int32_t *x, const ogg_int32_t *y, int n)
 {
-  while (n>=4) {
-    asm volatile ("ldmia %[x], {r0, r1, r2, r3};"
+  /* first arg is right subframe of previous frame and second arg
+     is left subframe of current frame.  overlap left onto right overwriting
+     the right subframe */
+     
+  do{
+    asm volatile (
+                  "ldmia %[x], {r0, r1, r2, r3};"
                   "ldmia %[y]!, {r4, r5, r6, r7};"
-                  "add r0, r0, r4;"
-                  "add r1, r1, r5;"
-                  "add r2, r2, r6;"
-                  "add r3, r3, r7;"
+                  "add r0, r4, r0, lsl #1;"
+                  "add r1, r5, r1, lsl #1;"
+                  "add r2, r6, r2, lsl #1;"
+                  "add r3, r7, r3, lsl #1;"
+                  "stmia %[x]!, {r0, r1, r2, r3};"
+                  "ldmia %[x], {r0, r1, r2, r3};"
+                  "ldmia %[y]!, {r4, r5, r6, r7};"
+                  "add r0, r4, r0, lsl #1;"
+                  "add r1, r5, r1, lsl #1;"
+                  "add r2, r6, r2, lsl #1;"
+                  "add r3, r7, r3, lsl #1;"
                   "stmia %[x]!, {r0, r1, r2, r3};"
                   : [x] "+r" (x), [y] "+r" (y)
                   : : "r0", "r1", "r2", "r3",
                   "r4", "r5", "r6", "r7",
                   "memory");
-    n -= 4;
-  }
-  /* add final elements */
-  while (n>0) {
-    *x++ += *y++;
-    n--;
-  }
+    n -= 8;
+  } while (n);
 }
 
 static inline 
-void vect_copy(ogg_int32_t *x, ogg_int32_t *y, int n)
+void vect_add_left_right(ogg_int32_t *x, const ogg_int32_t *y, int n)
 {
-  while (n>=4) {
-    asm volatile ("ldmia %[y]!, {r0, r1, r2, r3};"
+  /* first arg is left subframe of current frame and second arg
+     is right subframe of previous frame.  overlap right onto left overwriting
+     the LEFT subframe */
+  do{
+    asm volatile (
+                  "ldmia %[x], {r0, r1, r2, r3};"
+                  "ldmia %[y]!, {r4, r5, r6, r7};"
+                  "add r0, r0, r4, lsl #1;"
+                  "add r1, r1, r5, lsl #1;"
+                  "add r2, r2, r6, lsl #1;"
+                  "add r3, r3, r7, lsl #1;"
+                  "stmia %[x]!, {r0, r1, r2, r3};"
+                  "ldmia %[x], {r0, r1, r2, r3};"
+                  "ldmia %[y]!, {r4, r5, r6, r7};"
+                  "add r0, r0, r4, lsl #1;"
+                  "add r1, r1, r5, lsl #1;"
+                  "add r2, r2, r6, lsl #1;"
+                  "add r3, r3, r7, lsl #1;"
                   "stmia %[x]!, {r0, r1, r2, r3};"
                   : [x] "+r" (x), [y] "+r" (y)
                   : : "r0", "r1", "r2", "r3",
+                  "r4", "r5", "r6", "r7",
                   "memory");
-    n -= 4;
-  }
-  /* copy final elements */
-  while (n>0) {
-    *x++ = *y++;
-    n--;
-  }
+    n -= 8;
+  } while (n);
 }
 
 static inline 
 void vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
-  while (n>=4) {
-    asm volatile ("ldmia %[d], {r0, r1, r2, r3};"
+  /* Note, mult_fw uses MULT31 */
+  do{
+    asm volatile (
+                  "ldmia %[d], {r0, r1, r2, r3};"
                   "ldmia %[w]!, {r4, r5, r6, r7};"
-                  "smull r8, r9, r0, r4;"
-                  "mov   r0, r9, lsl #1;"
-                  "smull r8, r9, r1, r5;"
-                  "mov   r1, r9, lsl #1;"
-                  "smull r8, r9, r2, r6;"
-                  "mov   r2, r9, lsl #1;"
-                  "smull r8, r9, r3, r7;"
-                  "mov   r3, r9, lsl #1;"
+                  "smull r8, r0, r4, r0;"
+                  "mov   r0, r0, lsl #1;"
+                  "smull r8, r1, r5, r1;"
+                  "mov   r1, r1, lsl #1;"
+                  "smull r8, r2, r6, r2;"
+                  "mov   r2, r2, lsl #1;"
+                  "smull r8, r3, r7, r3;"
+                  "mov   r3, r3, lsl #1;"
                   "stmia %[d]!, {r0, r1, r2, r3};"
                   : [d] "+r" (data), [w] "+r" (window)
                   : : "r0", "r1", "r2", "r3",
-                  "r4", "r5", "r6", "r7", "r8", "r9",
+                  "r4", "r5", "r6", "r7", "r8",
                   "memory", "cc");
     n -= 4;
-  }
-  while(n>0) {
-    *data = MULT31(*data, *window);
-    data++;
-    window++;
-    n--;
-  }
+  } while (n);
 }
 
 static inline
 void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
-  while (n>=4) {
+  /* NOTE mult_bw uses MULT_32 i.e. doesn't shift result left at end */
+  /* On ARM, we can do the shift at the same time as the overlap-add */
+  do{
     asm volatile ("ldmia %[d], {r0, r1, r2, r3};"
                   "ldmda %[w]!, {r4, r5, r6, r7};"
-                  "smull r8, r9, r0, r7;"
-                  "mov   r0, r9, lsl #1;"
-                  "smull r8, r9, r1, r6;"
-                  "mov   r1, r9, lsl #1;"
-                  "smull r8, r9, r2, r5;"
-                  "mov   r2, r9, lsl #1;"
-                  "smull r8, r9, r3, r4;"
-                  "mov   r3, r9, lsl #1;"
+                  "smull r8, r0, r7, r0;"
+                  "smull r7, r1, r6, r1;"
+                  "smull r6, r2, r5, r2;"
+                  "smull r5, r3, r4, r3;"
                   "stmia %[d]!, {r0, r1, r2, r3};"
                   : [d] "+r" (data), [w] "+r" (window)
                   : : "r0", "r1", "r2", "r3",
-                  "r4", "r5", "r6", "r7", "r8", "r9",
+                  "r4", "r5", "r6", "r7", "r8",
                   "memory", "cc");
     n -= 4;
-  }
-  while(n>0) {
-    *data = MULT31(*data, *window);
-    data++;
-    window--;
-    n--;
-  }
+  } while (n);
+}
+
+static inline void vect_copy(ogg_int32_t *x, const ogg_int32_t *y, int n)
+{
+  memcpy(x,y,n*sizeof(ogg_int32_t));
 }
 
 #endif

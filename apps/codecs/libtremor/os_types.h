@@ -25,9 +25,11 @@
 #ifdef _LOW_ACCURACY_
 #  define X(n) (((((n)>>22)+1)>>1) - ((((n)>>22)+1)>>9))
 #  define LOOKUP_T const unsigned char  
+#  define LOOKUP_TNC unsigned char  
 #else
 #  define X(n) (n)
 #  define LOOKUP_T const ogg_int32_t
+#  define LOOKUP_TNC ogg_int32_t  
 #endif
 
 /* make it easy on the folks that want to compile the libs with a
@@ -46,6 +48,8 @@ void *ogg_tmpcalloc(size_t nmemb, size_t size);
 void *ogg_realloc(void *ptr, size_t size);
 long ogg_tmpmalloc_pos(void);
 void ogg_tmpmalloc_free(long pos);
+void iram_malloc_init(void);
+void *iram_malloc(size_t size);
 
    typedef short ogg_int16_t;
    typedef int ogg_int32_t;

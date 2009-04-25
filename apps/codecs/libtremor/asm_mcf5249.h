@@ -140,10 +140,10 @@ void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
 /* asm versions of vector operations for block.c, window.c */
 /* assumes MAC is initialized & accumulators cleared */
 static inline 
-void vect_add(ogg_int32_t *x, ogg_int32_t *y, int n)
+void vect_add_right_left(ogg_int32_t *x, const ogg_int32_t *y, int n)
 {
   /* align to 16 bytes */
-  while(n>0 && (int)x&16) {
+  while(n>0 && (int)x&15) {
     *x++ += *y++;
     n--;
   }
@@ -172,12 +172,20 @@ void vect_add(ogg_int32_t *x, ogg_int32_t *y, int n)
     n--;
   }
 }
+static inline 
+void vect_add_left_right(ogg_int32_t *x, const ogg_int32_t *y, int n)
+{
+    /* coldfire asm has symmetrical versions of vect_add_right_left
+       and vect_add_left_right  (since symmetrical versions of
+       vect_mult_fw and vect_mult_bw  i.e.  both use MULT31) */
+    vect_add_right_left(x, y, n );
+}
 
 static inline 
-void vect_copy(ogg_int32_t *x, ogg_int32_t *y, int n)
+void vect_copy(ogg_int32_t *x, const ogg_int32_t *y, int n)
 {
   /* align to 16 bytes */
-  while(n>0 && (int)x&16) {
+  while(n>0 && (int)x&15) {
     *x++ = *y++;
     n--;
   }  
@@ -199,12 +207,11 @@ void vect_copy(ogg_int32_t *x, ogg_int32_t *y, int n)
   }
 }
 
-
 static inline 
 void vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
   /* ensure data is aligned to 16-bytes */
-  while(n>0 && (int)data%16) {
+  while(n>0 && (int)data&15) {
     *data = MULT31(*data, *window);
     data++;
     window++;
@@ -258,7 +265,7 @@ static inline
 void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
   /* ensure at least data is aligned to 16-bytes */
-  while(n>0 && (int)data%16) {
+  while(n>0 && (int)data&15) {
     *data = MULT31(*data, *window);
     data++;
     window--;
