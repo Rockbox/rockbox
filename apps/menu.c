@@ -30,7 +30,6 @@
 
 #include "lcd.h"
 #include "font.h"
-#include "backlight.h"
 #include "menu.h"
 #include "button.h"
 #include "kernel.h"

@@ -26,7 +26,6 @@
 #include "cpu.h"
 #include "system.h"
 #include "kernel.h"
-#include "backlight.h"
 #include "adc.h"
 #include "lcd.h"
 #include "serial.h"

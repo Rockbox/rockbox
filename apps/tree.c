@@ -28,7 +28,6 @@
 #include "file.h"
 #include "lcd.h"
 #include "font.h"
-#include "backlight.h"
 #include "button.h"
 #include "kernel.h"
 #include "usb.h"

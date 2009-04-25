@@ -39,7 +39,6 @@
 #include "lang.h"
 #include "power.h"
 #include "alarm_menu.h"
-#include "backlight.h"
 #include "splash.h"
 #include "statusbar.h"
 #include "viewport.h"
