@@ -86,8 +86,10 @@ extern struct codec_api* ci;
 
 /* Allow decoding of MAIN profile AAC */
 #define MAIN_DEC
+#if MEMORYSIZE > 2
 /* Allow decoding of SSR profile AAC */
 #define SSR_DEC
+#endif
 /* Allow decoding of LTP profile AAC */
 #define LTP_DEC
 /* Allow decoding of LD profile AAC */
@@ -123,9 +125,11 @@ extern struct codec_api* ci;
   #undef ERROR_RESILIENCE
 #endif
 
+#if MEMORYSIZE > 2
 #define SBR_DEC
 //#define SBR_LOW_POWER
 #define PS_DEC
+#endif
 
 /* FIXED POINT: No MAIN decoding */
 #ifdef FIXED_POINT

@@ -1058,6 +1058,8 @@ static uint8_t fill_element(NeAACDecHandle hDecoder, bitfile *ld, drc_info *drc
             }
 #endif
         } else {
+#else
+        (void)hDecoder;
 #endif
             while (count > 0)
             {

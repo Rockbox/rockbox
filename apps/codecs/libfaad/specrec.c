@@ -719,6 +719,8 @@ static uint8_t allocate_single_channel(NeAACDecHandle hDecoder, uint8_t channel,
             memset(hDecoder->time_out[channel+1], 0, mul*hDecoder->frameLength*sizeof(real_t));
         }
     }
+#else
+    (void)output_channels;  /*silence warning when PS disabled*/
 #endif
 
     if (hDecoder->fb_intermed[channel] == NULL)

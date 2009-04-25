@@ -15,8 +15,9 @@ sid.c
 ape.c
 nsf.c
 asap.c
-#if MEMORYSIZE > 2
 aac.c
+
+#if MEMORYSIZE > 2
 spc.c
 #endif
 mod.c
