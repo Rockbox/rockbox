@@ -35,7 +35,6 @@
 
 static bool display_on = false; /* is the display turned on? */
 static bool display_flipped = false;
-static int y_offset = 0; /* needed for flip */
 /* we need to write a red pixel for correct button reads
  * (see lcd_button_support()), but that must not happen while the lcd is updating
  * so block lcd_button_support the during updates */
@@ -84,11 +83,13 @@ static volatile bool lcd_busy = false;
 #define R_HORIZ_RAM_ADDR_POS    0x44
 #define R_VERT_RAM_ADDR_POS     0x45
 
+/* Flip Flag */
 #define R_ENTRY_MODE_HORZ_NORMAL 0x7030
 #define R_ENTRY_MODE_HORZ_FLIPPED 0x7000
+static unsigned short r_entry_mode = R_ENTRY_MODE_HORZ_NORMAL;
 #define R_ENTRY_MODE_VERT 0x7038
 #define R_ENTRY_MODE_SOLID_VERT  0x1038
-static unsigned short r_entry_mode = R_ENTRY_MODE_HORZ_NORMAL;
+
 
 /* Reverse Flag */
 #define R_DISP_CONTROL_NORMAL 0x0004
@@ -177,7 +178,7 @@ void lcd_set_invert_display(bool yesno)
 
 }
 
-/* turn the display upside down (call lcd_update() afterwards) */
+/* turn the display upside down  */
 void lcd_set_flip(bool yesno)
 {
     display_flipped = yesno;
@@ -188,8 +189,6 @@ void lcd_set_flip(bool yesno)
 
 static void lcd_window(int xmin, int ymin, int xmax, int ymax)
 {
-    ymin += y_offset;
-    ymax += y_offset;
     if (!display_flipped)
     {
         lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (xmax << 8) | xmin);
