@@ -867,7 +867,7 @@ void lcd_set_sleep_after_backlight_off(int index)
 
     lcd_sleep_timeout = HZ * lcd_sleep_timeout_value[index];
 
-    if (backlight_timer > 0 || backlight_get_current_timeout() == 0)
+    if (is_backlight_on(true))
         /* Timer will be set when bl turns off or bl set to on. */
         return;
 
