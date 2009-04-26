@@ -127,9 +127,6 @@ void _backlight_on(void)
 
     mutex_lock(&backlight_mutex);
 
-#ifdef HAVE_LCD_SLEEP
-    backlight_lcd_sleep_countdown(false); /* stop counter */
-#endif
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true);
 #endif
@@ -179,11 +176,6 @@ void _backlight_off(void)
     mc13783_write_masked(MC13783_LED_CONTROL2,
                          0 << MC13783_LEDMDDC_POS,
                          MC13783_LEDMDDC);
-
-#ifdef HAVE_LCD_SLEEP
-    /* Disable lcd after fade completes (when lcd_sleep timeout expires) */
-    backlight_lcd_sleep_countdown(true); /* start countdown */
-#endif
 
     mutex_unlock(&backlight_mutex);
 }

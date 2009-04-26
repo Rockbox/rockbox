@@ -210,7 +210,7 @@ static int lcd_sleep_timeout = 10*HZ;
 
 static int lcd_sleep_timer SHAREDDATA_ATTR = 0;
 
-void backlight_lcd_sleep_countdown(bool start)
+static void backlight_lcd_sleep_countdown(bool start)
 {
     if (!start)
     {
@@ -223,8 +223,8 @@ void backlight_lcd_sleep_countdown(bool start)
     if (lcd_sleep_timeout < 0)
     {
         lcd_sleep_timer = 0; /* Setting == Always */
-#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_PWM)
         /* Ensure lcd_sleep() is called from backlight_thread() */
+#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_PWM)
         queue_post(&backlight_queue, LCD_SLEEP, 0);
 #else
         lcd_sleep();
@@ -504,11 +504,19 @@ static void backlight_update_state(void)
         queue_post(&backlight_queue, SYS_TIMEOUT, 0);
 #else
         _backlight_off();
+#ifdef HAVE_LCD_SLEEP
+        backlight_lcd_sleep_countdown(true); /* start sleep countdown */
+#endif
 #endif
     }
     else
     {
         backlight_timer = timeout;
+
+#ifdef HAVE_LCD_SLEEP
+        backlight_lcd_sleep_countdown(false); /* wake up lcd */
+#endif
+
 #if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
     || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
         backlight_setup_fade_up();
@@ -670,7 +678,15 @@ void backlight_thread(void)
                 if (backlight_fading_state != NOT_FADING)
                 {
                     if ((_backlight_fade_step(backlight_fading_state)))
-                        backlight_fading_state = NOT_FADING; /* finished fading */
+                    {   /* finished fading */
+#ifdef HAVE_LCD_SLEEP
+                        if (backlight_fading_state == FADING_DOWN)
+                        {   /* start sleep countdown */
+                             backlight_lcd_sleep_countdown(true);
+                        }
+#endif
+                        backlight_fading_state = NOT_FADING;
+                    }
                 }
                 else
 #endif /* CONFIG_BACKLIGHT_FADING */

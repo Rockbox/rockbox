@@ -37,9 +37,6 @@ bool _backlight_init(void)
 void _backlight_on(void)
 {
     int level;
-#ifdef HAVE_LCD_SLEEP
-    backlight_lcd_sleep_countdown(false); /* stop counter */
-#endif
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
 #endif
@@ -55,9 +52,6 @@ void _backlight_off(void)
     restore_irq(level);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
-#endif
-#ifdef HAVE_LCD_SLEEP
-    backlight_lcd_sleep_countdown(true); /* start countdown */
 #endif
 }
 

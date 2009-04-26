@@ -56,11 +56,8 @@ void backlight_hold_changed(bool hold_button);
 void backlight_set_on_button_hold(int index);
 #endif
 
-#ifdef HAVE_LCD_SLEEP
-void backlight_lcd_sleep_countdown(bool start);
-#ifdef HAVE_LCD_SLEEP_SETTING
+#if defined(HAVE_LCD_SLEEP) && defined(HAVE_LCD_SLEEP_SETTING)
 void lcd_set_sleep_after_backlight_off(int index);
-#endif
 #endif
 
 #else /* !HAVE_BACKLIGHT */

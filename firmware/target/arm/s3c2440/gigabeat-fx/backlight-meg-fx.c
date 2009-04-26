@@ -337,9 +337,6 @@ static void __backlight_dim(bool dim_now)
 
 void _backlight_on(void)
 {
-#ifdef HAVE_LCD_SLEEP
-    backlight_lcd_sleep_countdown(false); /* stop counter */
-#endif
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
 #endif
@@ -349,10 +346,6 @@ void _backlight_on(void)
 void _backlight_off(void)
 {
     __backlight_dim(true);
-#ifdef HAVE_LCD_SLEEP
-    /* Disable lcd after fade completes (when lcd_sleep timeout expires) */
-    backlight_lcd_sleep_countdown(true); /* start countdown */
-#endif
 }
 
 static inline void __buttonlight_on(void)

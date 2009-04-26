@@ -38,9 +38,6 @@ static void _backlight_write_brightness(int brightness)
 
 void _backlight_on(void)
 {
-#if defined(HAVE_LCD_SLEEP) && !defined(BOOTLOADER)
-    backlight_lcd_sleep_countdown(false); /* stop counter */
-#endif
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
 #endif
@@ -50,10 +47,6 @@ void _backlight_on(void)
 void _backlight_off(void)
 {
     _backlight_write_brightness(0);
-#if defined(HAVE_LCD_SLEEP) && !defined(BOOTLOADER)
-    /* Disable lcd after fade completes (when lcd_sleep timeout expires) */
-    backlight_lcd_sleep_countdown(true); /* start countdown */
-#endif
 }
 
 /* Assumes that the backlight has been initialized */
