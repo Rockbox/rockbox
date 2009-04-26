@@ -376,10 +376,6 @@ static void backlight_dim(int value)
 
 static void _backlight_on(void)
 {
-#ifdef HAVE_LCD_SLEEP
-    backlight_lcd_sleep_countdown(false);
-#endif
-
     if (bl_fade_in_step > 0)
     {
 #ifdef _BACKLIGHT_FADE_ENABLE
@@ -405,10 +401,6 @@ static void _backlight_off(void)
     {
         bl_dim_target = bl_dim_fraction = 0;
         _backlight_off_normal();
-
-#ifdef HAVE_LCD_SLEEP
-        backlight_lcd_sleep_countdown(true);
-#endif
     }
 }
 
