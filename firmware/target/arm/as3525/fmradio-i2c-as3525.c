@@ -31,7 +31,7 @@
 #include "generic_i2c.h"
 #include "fmradio_i2c.h"
 
-#if     defined(SANSA_CLIP)
+#if     defined(SANSA_CLIP) || defined(SANSA_C200V2)
 #define I2C_GPIO(x) GPIOB_PIN(x)
 #define I2C_GPIO_DIR GPIOB_DIR
 #define I2C_SCL_PIN 4
