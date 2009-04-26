@@ -205,7 +205,7 @@ int button_read_device(void)
 
     GPIOC_DIR &= ~(1<<2|1<<3|1<<4|1<<5|1<<6);
 
-    int delay = 2;    /* small delay needed to read buttons correctly */
+    int delay = 8;    /* small delay needed to read buttons correctly */
     while(delay--);
 
      /* direct GPIO connections */
