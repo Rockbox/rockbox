@@ -42,54 +42,14 @@
 #endif
 #ifndef SIMULATOR
 #include "backlight-target.h"
+#else
+#include "backlight-sim.h"
 #endif
 
 #if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
     || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
 #include "backlight-sw-fading.h"
 #endif
-#ifdef SIMULATOR
-
-static inline void _backlight_on(void)
-{
-    sim_backlight(100);
-}
-
-static inline void _backlight_off(void)
-{
-    sim_backlight(0);
-}
-
-static inline void _backlight_set_brightness(int val)
-{
-    (void)val;
-}
-
-static inline void _buttonlight_on(void)
-{
-}
-
-static inline void _buttonlight_off(void)
-{
-}
-
-static inline void _buttonlight_set_brightness(int val)
-{
-    (void)val;
-}
-#ifdef HAVE_REMOTE_LCD
-static inline void _remote_backlight_on(void)
-{
-    sim_remote_backlight(100);
-}
-
-static inline void _remote_backlight_off(void)
-{
-    sim_remote_backlight(0);
-}
-#endif /* HAVE_REMOTE_LCD */
-
-#endif /* SIMULATOR */
 
 #if defined(HAVE_BACKLIGHT) && defined(BACKLIGHT_FULL_INIT)
 
