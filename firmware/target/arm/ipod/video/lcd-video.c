@@ -112,10 +112,6 @@ struct
 #ifdef HAVE_LCD_SLEEP
 const fb_data *flash_vmcs_offset;
 unsigned flash_vmcs_length;
-/* This mutex exists because enabling the backlight by changing a setting
-   will cause multiple concurrent lcd_wake() calls.
- */
-static struct mutex lcdstate_lock SHAREDBSS_ATTR;
 
 #define ROM_BASE        0x20000000
 #define ROM_ID(a,b,c,d) (unsigned int)(  ((unsigned int)(d))        | \
@@ -359,7 +355,6 @@ void lcd_init_device(void)
         /* lcd_write_data needs an even number of 16 bit values */
         flash_vmcs_length = ((flash_vmcs_length + 3) >> 1) & ~1;
     }
-    mutex_init(&lcdstate_lock);
     wakeup_init(&(lcd_state.initwakeup));
     lcd_state.waking = false;
 
@@ -599,7 +594,6 @@ void bcm_init(void)
 
 void lcd_awake(void)
 {
-    mutex_lock(&lcdstate_lock);
     if (!lcd_state.display_on && flash_vmcs_length != 0)
     {
         /* Ensure BCM has been off for >= 50 ms */
@@ -624,12 +618,10 @@ void lcd_awake(void)
 
         lcd_activation_call_hook();
     }
-    mutex_unlock(&lcdstate_lock);
 }
 
 void lcd_sleep(void)
 {
-    mutex_lock(&lcdstate_lock);
     if (lcd_state.display_on && flash_vmcs_length != 0)
     {
         lcd_state.display_on = false;
@@ -644,7 +636,6 @@ void lcd_sleep(void)
         /* Remember time to ensure BCM stays off for >= 50 ms */
         lcd_state.update_timeout = current_tick;
     }
-    mutex_unlock(&lcdstate_lock);
 }
 
 bool lcd_active(void)
