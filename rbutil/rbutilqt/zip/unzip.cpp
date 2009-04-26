@@ -1,6 +1,6 @@
 /****************************************************************************
 ** Filename: unzip.cpp
-** Last updated [dd/mm/yyyy]: 28/01/2007
+** Last updated [dd/mm/yyyy]: 07/09/2008
 **
 ** pkzip 2.0 decompression.
 **
@@ -8,7 +8,7 @@
 ** (mainly Info-Zip and Gilles Vollant's minizip).
 ** Compression and decompression actually uses the zlib library.
 **
-** Copyright (C) 2007 Angius Fabrizio. All rights reserved.
+** Copyright (C) 2007-2008 Angius Fabrizio. All rights reserved.
 **
 ** This file is part of the OSDaB project (http://osdab.sourceforge.net/).
 **
@@ -761,7 +761,8 @@ UnZip::ErrorCode UnzipPrivate::seekToCentralDirectory()
 				break;
 			}
 
-			offset -= UNZIP_EOCD_SIZE;
+			// TODO: This is very slow and only a temporary bug fix. Need some pattern matching algorithm here.
+			offset -= 1 /*UNZIP_EOCD_SIZE*/;
 			if (offset <= 0)
 				return UnZip::InvalidArchive;
 

@@ -1,5 +1,5 @@
 The *.cpp and *.h files in this archive are 
-Copyright (C) 2007 Angius Fabrizio (blue_death@users.sourceforge.net)
+Copyright (C) 2007-2008 Angius Fabrizio (blue_death@users.sourceforge.net)
 
 You may use, distribute and copy the files under the terms of
 GNU General Public License version 2 (see the file LICENSE.GPL for details)
@@ -27,6 +27,7 @@ Please refer to the example application's main.cpp file or to the class comments
 
 history
 -------
+2008-09-97 - Bug fix: end of central directory was sometimes not being found when the archive had a comment.
 2007-02-01 - New IgnorePaths compression option and two more "addDirectoryContents()" convenience methods to use this option.
 2007-01-28 - Major changes:
  - Bug fix: there was a big problem with directory names.
