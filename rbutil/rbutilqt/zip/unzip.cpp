@@ -128,7 +128,12 @@
 	versions from 2.1 to 2.7 may use unsupported compression methods
 	versions after 2.7 may have an incompatible header format
 */
-#define UNZIP_VERSION 0x1B
+/* NOTE: changed to 0x1e as info-zip 3.0 uses that header type which breaks
+ *       usage. Extraction seems to work fine with the value increased.
+ *       No guarantees though.
+ */
+//#define UNZIP_VERSION 0x1B
+#define UNZIP_VERSION 0x1e
 //! Full compatibility granted until this version
 #define UNZIP_VERSION_STRICT 0x14
 
