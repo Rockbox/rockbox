@@ -25,7 +25,7 @@
 #include <QtGui>
 
 #include "ui_installfrm.h"
-#include "installzip.h"
+#include "zipinstaller.h"
 #include "progressloggergui.h"
 #include "rbsettings.h"
 

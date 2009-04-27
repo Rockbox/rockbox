@@ -28,7 +28,7 @@
 
 #include "ui_rbutilqtfrm.h"
 #include "httpget.h"
-#include "installzip.h"
+#include "zipinstaller.h"
 #include "progressloggergui.h"
 #include "bootloaderinstallbase.h"
 

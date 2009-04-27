@@ -21,7 +21,7 @@
 
 #include "ui_themesinstallfrm.h"
 #include "themesinstallwindow.h"
-#include "installzip.h"
+#include "zipinstaller.h"
 #include "progressloggergui.h"
 #include "utils.h"
 
