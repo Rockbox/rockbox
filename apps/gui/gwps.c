@@ -260,6 +260,7 @@ static void gwps_fix_statusbars(void)
  * */
 static void wps_lcd_activation_hook(void)
 {
+    wps_state.do_full_update = true;
     /* force timeout in wps main loop, so that the update is instantly */
     queue_post(&button_queue, BUTTON_NONE, 0);
 }
