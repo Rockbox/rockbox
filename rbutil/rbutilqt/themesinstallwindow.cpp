@@ -129,7 +129,7 @@ void ThemesInstallWindow::downloadDone(bool error)
         }
         qDebug() << "adding theme:" << tl.at(i);
         QListWidgetItem *w = new QListWidgetItem;
-        w->setData(Qt::DisplayRole, iniDetails.value("name").toString());
+        w->setData(Qt::DisplayRole, iniDetails.value("name").toString().trimmed());
         w->setData(Qt::UserRole, tl.at(i));
         ui.listThemes->addItem(w);
 
@@ -198,6 +198,8 @@ void ThemesInstallWindow::updateDetails(QListWidgetItem* cur, QListWidgetItem* p
     text += tr("<b>Description:</b> %1<hr/>").arg(iniDetails.value("about",
                 tr("no description")).toString());
 
+    text.trimmed();
+    text.replace("\n", "<br/>");
     ui.themeDescription->setHtml(text);
     iniDetails.endGroup();
 
