@@ -23,6 +23,8 @@
 #ifndef DETECT_H
 #define DETECT_H
 
+#include <inttypes.h>
+
 #include <QString>
 #include <QUrl>
 #include "rbsettings.h"
