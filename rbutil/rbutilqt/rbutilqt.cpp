@@ -223,16 +223,19 @@ void RbUtilQt::downloadDone(bool error)
 
 void RbUtilQt::downloadBleedingDone(bool error)
 {
-    if(error) qDebug() << "network error:" << bleeding->error();
+    if(error) {
+        qDebug() << "network error:" << bleeding->error();
+    }
+    else {
+        bleedingInfo.open();
+        QSettings info(bleedingInfo.fileName(), QSettings::IniFormat, this);
+        bleedingInfo.close();
+        versmap.insert("bleed_rev", info.value("bleeding/rev").toString());
+        versmap.insert("bleed_date", info.value("bleeding/timestamp").toString());
+        qDebug() << "versmap =" << versmap;
 
-    bleedingInfo.open();
-    QSettings info(bleedingInfo.fileName(), QSettings::IniFormat, this);
-    bleedingInfo.close();
-    versmap.insert("bleed_rev", info.value("bleeding/rev").toString());
-    versmap.insert("bleed_date", info.value("bleeding/timestamp").toString());
-    qDebug() << "versmap =" << versmap;
-
-    m_gotInfo = true;
+        m_gotInfo = true;
+    }
 }
 
 
