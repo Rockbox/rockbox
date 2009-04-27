@@ -128,8 +128,14 @@ void ThemesInstallWindow::downloadDone(bool error)
             continue;
         }
         qDebug() << "adding theme:" << tl.at(i);
+        // convert to unicode and replace HTML-specific entities
+        QByteArray raw = iniDetails.value("name").toByteArray();
+        QTextCodec* codec = QTextCodec::codecForHtml(raw);
+        QString name = codec->toUnicode(raw);
+        name.replace("&quot;", "\"").replace("&amp;", "&");
+        name.replace("&lt;", "<").replace("&gt;", ">");
         QListWidgetItem *w = new QListWidgetItem;
-        w->setData(Qt::DisplayRole, iniDetails.value("name").toString().trimmed());
+        w->setData(Qt::DisplayRole, name.trimmed());
         w->setData(Qt::UserRole, tl.at(i));
         ui.listThemes->addItem(w);
 
@@ -191,12 +197,13 @@ void ThemesInstallWindow::updateDetails(QListWidgetItem* cur, QListWidgetItem* p
         + iniDetails.value("image").toString()));
 
     QString text;
-    text = tr("<b>Author:</b> %1<hr/>").arg(iniDetails.value("author",
-                tr("unknown")).toString());
-    text += tr("<b>Version:</b> %1<hr/>").arg(iniDetails.value("version",
-                tr("unknown")).toString());
-    text += tr("<b>Description:</b> %1<hr/>").arg(iniDetails.value("about",
-                tr("no description")).toString());
+    QTextCodec* codec = QTextCodec::codecForName("UTF-8");
+    text = tr("<b>Author:</b> %1<hr/>").arg(codec->toUnicode(iniDetails
+                    .value("author", tr("unknown")).toByteArray()));
+    text += tr("<b>Version:</b> %1<hr/>").arg(codec->toUnicode(iniDetails
+                    .value("version", tr("unknown")).toByteArray()));
+    text += tr("<b>Description:</b> %1<hr/>").arg(codec->toUnicode(iniDetails
+                    .value("about", tr("no description")).toByteArray()));
 
     text.trimmed();
     text.replace("\n", "<br/>");
