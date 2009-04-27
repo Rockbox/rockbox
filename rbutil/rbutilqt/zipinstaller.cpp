@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 
-#include "installzip.h"
+#include "zipinstaller.h"
 #include "rbunzip.h"
 #include "utils.h"
 

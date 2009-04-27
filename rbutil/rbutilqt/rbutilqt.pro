@@ -50,7 +50,7 @@ SOURCES += rbutilqt.cpp \
  configure.cpp \
  zip/zip.cpp \
  zip/unzip.cpp \
- installzip.cpp \
+ zipinstaller.cpp \
  progressloggergui.cpp \
  installtalkwindow.cpp \
  talkfile.cpp \
@@ -95,7 +95,7 @@ HEADERS += rbutilqt.h \
  zip/unzip_p.h \
  zip/zip_p.h \
  version.h \
- installzip.h \
+ zipinstaller.h \
  installtalkwindow.h \
  talkfile.h \
  base/autodetection.h \
