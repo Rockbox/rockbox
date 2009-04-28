@@ -84,9 +84,8 @@ void lcd_awake(void)
 	
 		sleep(2);
         IO_GIO_BITSET2=1<<4;
-        /* Wait long enough for a frame to be written - yes, it
-         * takes awhile. */
-        sleep(HZ/5);
+        /* Wait long enough for a frame to be written */
+        sleep(HZ/20);
         
         lcd_update();
         lcd_activation_call_hook();

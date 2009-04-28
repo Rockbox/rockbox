@@ -25,20 +25,64 @@
 #include "spi.h"
 #include "tsc2100.h"
 
-/* Read X, Y, Z1, Z2 touchscreen coordinates. */
-void tsc2100_read_values(short *x, short* y, short *z1, short *z2)
+/* adc_data contains the last readings from the tsc2100 */
+static short adc_data[10];
+
+void tsc2100_read_data(void)
 {
     int page = 0, address = 0;
+    unsigned int i;
     unsigned short command = 0x8000|(page << 11)|(address << 5);
     unsigned char out[] = {command >> 8, command & 0xff};
-    unsigned char in[8];
+    unsigned char *p_adc_data=(unsigned char *)&adc_data;
+    
     spi_block_transfer(SPI_target_TSC2100, 
-                       out, sizeof(out), in, sizeof(in));
+                       out, sizeof(out), (char *)adc_data, sizeof(adc_data));
+                       
+    for(i=0; i<sizeof(adc_data); i+=2)
+        adc_data[i>>1]=(short)(p_adc_data[i]<<8|p_adc_data[i+1]);
+}
 
-    *x = (in[0]<<8)|in[1];
-    *y = (in[2]<<8)|in[3];
-    *z1 = (in[4]<<8)|in[5];
-    *z2 = (in[6]<<8)|in[7];
+/* Read X, Y, Z1, Z2 touchscreen coordinates. */
+void tsc2100_read_touch(short *x, short* y, short *z1, short *z2)
+{
+    *x      = adc_data[0];
+    *y      = adc_data[1];
+    *z1     = adc_data[2];
+    *z2     = adc_data[3];
+}
+
+void tsc2100_read_volt(short *bat1, short *bat2, short *aux)
+{
+    *bat1   = adc_data[5];
+    *bat2   = adc_data[6];
+    *aux    = adc_data[7];
+}
+
+void tsc2100_set_mode(unsigned char scan_mode)
+{
+    short tsadc=(scan_mode<<TSADC_ADSCM_SHIFT)| /* mode */
+                 (0x3<<TSADC_RESOL_SHIFT)| /* 12 bit resolution */
+                 (0x2<<TSADC_ADCR_SHIFT )| /* 2 MHz internal clock */
+                 (0x2<<TSADC_PVSTC_SHIFT);
+                 
+    if(scan_mode<6)
+        tsadc|=TSADC_PSTCM;
+        
+    tsc2100_writereg(TSADC_PAGE, TSADC_ADDRESS, tsadc);
+}
+
+void tsc2100_adc_init(void)
+{
+    /* Set the TSC2100 to read touchscreen */
+    tsc2100_set_mode(0x01);
+                     
+    tsc2100_writereg(TSSTAT_PAGE, TSSTAT_ADDRESS, 
+                     (0x1<<TSSTAT_PINTDAV_SHIFT) /* Data available only */
+                     );
+                     
+    tsc2100_writereg(TSREF_PAGE, TSREF_ADDRESS,
+                     TSREF_VREFM|TSREF_IREFV);
 }
 
 short tsc2100_readreg(int page, int address)
