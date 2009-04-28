@@ -53,6 +53,11 @@
 
 #if defined(HAVE_BACKLIGHT) && defined(BACKLIGHT_FULL_INIT)
 
+#define BACKLIGHT_FADE_IN_THREAD \
+    (CONFIG_BACKLIGHT_FADING &  (BACKLIGHT_FADING_SW_SETTING \
+                                |BACKLIGHT_FADING_SW_HW_REG \
+                                |BACKLIGHT_FADING_PWM) )
+
 #define BACKLIGHT_THREAD_TIMEOUT HZ
 
 enum {
@@ -334,7 +339,7 @@ static void backlight_dim(int value)
         backlight_switch();
 }
 
-static void _backlight_on(void)
+static void backlight_setup_fade_up(void)
 {
     if (bl_fade_in_step > 0)
     {
@@ -351,7 +356,7 @@ static void _backlight_on(void)
     }
 }
 
-static void _backlight_off(void)
+static void backlight_setup_fade_down(void)
 {
     if (bl_fade_out_step > 0)
     {
@@ -361,6 +366,9 @@ static void _backlight_off(void)
     {
         bl_dim_target = bl_dim_fraction = 0;
         _backlight_off_normal();
+#ifdef HAVE_LCD_SLEEP
+        backlight_lcd_sleep_countdown(true);
+#endif
     }
 }
 
@@ -435,9 +443,27 @@ static void backlight_setup_fade_down(void)
          * fading up is glitch free */
         _backlight_set_brightness(MIN_BRIGHTNESS_SETTING);
 #endif
+#ifdef HAVE_LCD_SLEEP
+        backlight_lcd_sleep_countdown(true);
+#endif
     }
 }
 #endif /* CONFIG_BACKLIGHT_FADING */
+
+static inline void do_backlight_off(void)
+{
+    backlight_timer = 0;
+#if BACKLIGHT_FADE_IN_THREAD
+    backlight_setup_fade_down();
+#else
+    _backlight_off();
+    /* targets that have fading need to start the countdown when done with
+     * fading */
+#ifdef HAVE_LCD_SLEEP
+    backlight_lcd_sleep_countdown(true);
+#endif
+#endif
+}
 
 /* Update state of backlight according to timeout setting */
 static void backlight_update_state(void)
@@ -448,17 +474,11 @@ static void backlight_update_state(void)
     /* Backlight == OFF in the setting? */
     if (UNLIKELY(timeout < 0))
     {
-        backlight_timer = 0; /* Disable the timeout */
-#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
+        do_backlight_off();
+#if  (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
     || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
-        backlight_setup_fade_down();
-        /* necessary step to issue fading down when the setting is selected */
+    /* necessary step to issue fading down when the setting is selected */
         queue_post(&backlight_queue, SYS_TIMEOUT, 0);
-#else
-        _backlight_off();
-#ifdef HAVE_LCD_SLEEP
-        backlight_lcd_sleep_countdown(true); /* start sleep countdown */
-#endif
 #endif
     }
     else
@@ -469,8 +489,7 @@ static void backlight_update_state(void)
         backlight_lcd_sleep_countdown(false); /* wake up lcd */
 #endif
 
-#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
-    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
+#if BACKLIGHT_FADE_IN_THREAD
         backlight_setup_fade_up();
 #else
         _backlight_on();
@@ -496,16 +515,6 @@ static void remote_backlight_update_state(void)
     }
 }
 #endif /* HAVE_REMOTE_LCD */
-static inline void do_backlight_off(void)
-{
-    backlight_timer = 0;
-#if  (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
-    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
-    backlight_setup_fade_down();
-#else
-    _backlight_off();
-#endif /* CONFIG_BACKLIGHT_FADING */
-}
 
 void backlight_thread(void)
 {
