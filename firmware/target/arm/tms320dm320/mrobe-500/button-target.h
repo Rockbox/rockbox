@@ -30,6 +30,9 @@ bool button_hold(void);
 void button_init_device(void);
 int button_read_device(int *data);
 
+/* This is called from the tsc2100 interupt handler in adc-mr500.c */
+void touch_read_coord(void);
+
 struct touch_calibration_point {
     short px_x; /* known pixel value */
     short px_y;

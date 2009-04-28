@@ -38,9 +38,8 @@
 extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
                                  int width, int height);
 
+#if defined(HAVE_LCD_SLEEP)
 static bool lcd_on = true;
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-static bool lcd_powered = true;
 #endif
 
 /*
@@ -49,7 +48,7 @@ static bool lcd_powered = true;
 extern unsigned fg_pattern;
 extern unsigned bg_pattern;
 
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+#if defined(HAVE_LCD_SLEEP)
 bool lcd_active(void)
 {
     return lcd_on;
@@ -59,12 +58,8 @@ bool lcd_active(void)
 #if defined(HAVE_LCD_SLEEP)
 void lcd_sleep()
 {
-    if (lcd_powered)
+    if (lcd_on)
     {
-        /* "not powered" implies "disabled" */
-        if (lcd_on)
-            lcd_enable(false);
-            
         /* Disabling these saves another ~15mA */
         IO_OSD_OSDWINMD0&=~(0x01);
 		IO_VID_ENC_VMOD&=~(0x01);
@@ -73,41 +68,28 @@ void lcd_sleep()
     	
     	/* Disabling the LCD saves ~50mA */
     	IO_GIO_BITCLR2=1<<4;
-    	lcd_powered=false;
+    	lcd_on = false;
     }
 }
-#endif
 
-#if defined(HAVE_LCD_ENABLE)
-void lcd_enable(bool state)
+void lcd_awake(void)
 {
-    if (state == lcd_on)
-        return;
-
-    if(state)
+    /* "enabled" implies "powered" */
+    if (!lcd_on)
     {
-        /* "enabled" implies "powered" */
-        if (!lcd_powered)
-        {
-        	lcd_powered=true;
-        	
-        	IO_OSD_OSDWINMD0|=0x01;
-			IO_VID_ENC_VMOD|=0x01;
+    	lcd_on=true;
     	
-    		sleep(2);
-            IO_GIO_BITSET2=1<<4;
-            /* Wait long enough for a frame to be written - yes, it
-             * takes awhile. */
-            sleep(HZ/5);
-        }
-
-        lcd_on = true;
+    	IO_OSD_OSDWINMD0|=0x01;
+		IO_VID_ENC_VMOD|=0x01;
+	
+		sleep(2);
+        IO_GIO_BITSET2=1<<4;
+        /* Wait long enough for a frame to be written - yes, it
+         * takes awhile. */
+        sleep(HZ/5);
+        
         lcd_update();
         lcd_activation_call_hook();
-    }
-    else 
-    {
-        lcd_on = false;
     }
 }
 #endif

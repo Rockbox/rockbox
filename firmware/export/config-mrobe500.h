@@ -79,14 +79,12 @@
 #define LCD_DEPTH  16   /* 65k colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
-/* Define this if your LCD can be enabled/disabled */
-#define HAVE_LCD_ENABLE
-
-#define HAVE_LCD_SLEEP_SETTING
-
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
    should be defined as well. */
 #define HAVE_LCD_SLEEP
+//#define HAVE_LCD_SLEEP_SETTING
+/* Do this for now till lcd sleeping is working properly */
+#define LCD_SLEEP_TIMEOUT 0
 
 /* remote LCD */
 #define HAVE_REMOTE_LCD

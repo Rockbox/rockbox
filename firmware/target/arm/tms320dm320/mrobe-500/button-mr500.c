@@ -35,7 +35,10 @@
 #include "touchscreen.h"
 
 static bool touch_available = false;
-static bool hold_button        = false;
+static bool hold_button     = false;
+
+static short touch_x, touch_y, touch_z1, touch_z2;
+static long last_touch = 0;
 
 static struct touch_calibration_point topleft, bottomright;
 
@@ -49,16 +52,16 @@ static struct touch_calibration_point topleft, bottomright;
  *      (640,480) = 3880, 3900
 */
 
-static int touch_to_pixels(short val_x, short val_y)
+static int touch_to_pixels(short *val_x, short *val_y)
 {
     short x,y;
 
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
-    x=val_x;
-    y=val_y;
+    x=*val_x;
+    y=*val_y;
 #else
-    x=val_y;
-    y=val_x;
+    x=*val_y;
+    y=*val_x;
 #endif
 
     x = (x-topleft.val_x)*(bottomright.px_x - topleft.px_x) / (bottomright.val_x - topleft.val_x) + topleft.px_x;
@@ -74,6 +77,8 @@ static int touch_to_pixels(short val_x, short val_y)
     else if (y>=LCD_HEIGHT)
         y=LCD_HEIGHT-1;
 
+    *val_x=x;
+    *val_y=y;
 
     return (x<<16)|y;
 }
@@ -103,18 +108,6 @@ void button_init_device(void)
 
     bottomright.px_x = LCD_WIDTH;
     bottomright.px_y = LCD_HEIGHT;
-
-    /* Enable the touchscreen interrupt */
-    IO_INTC_EINT2 |= (1<<3); /* IRQ_GIO14 */
-#if 0
-    tsc2100_writereg(TSADC_PAGE, TSADC_ADDRESS, 
-                     TSADC_PSTCM|
-                     (0x2<<TSADC_ADSCM_SHIFT)| /* scan x,y,z1,z2 */
-                     (0x1<<TSADC_RESOL_SHIFT) /* 8 bit resolution */
-                     );
-    /* doesnt work for some reason... 
-        setting to 8bit would probably be better than the 12bit currently */
-#endif
 }
 
 inline bool button_hold(void)
@@ -122,46 +115,35 @@ inline bool button_hold(void)
     return hold_button;
 }
 
+/* This is called from the tsc2100 interupt handler in adc-mr500.c */
+void touch_read_coord(void)
+{
+    touch_available = true;
+    tsc2100_read_touch(&touch_x, &touch_y, &touch_z1, &touch_z2);
+}
+
 int button_read_device(int *data)
 {
     int button_read = BUTTON_NONE;
-    static int button_old = BUTTON_NONE;
     static bool hold_button_old = false;
-    static long last_touch = 0;
     
     *data = 0;
 
     /* Handle touchscreen */
     if (touch_available)
     {
-        short x,y;
-        short last_z1, last_z2;
-
-        tsc2100_read_values(&x,  &y, &last_z1, &last_z2);
-
-        *data = touch_to_pixels(x, y);
-        button_read |= touchscreen_to_pixels((*data&0xffff0000)>>16,
-                                          *data&0x0000ffff, data);
-        button_old = button_read;
+        *data = touch_to_pixels(&touch_x, &touch_y);
+        button_read |= touchscreen_to_pixels(touch_x, touch_y, data);
         
         touch_available = false;
         last_touch=current_tick;
-    }
-    else
-    {
-        /* Touch hasn't happened in a while, clear the bits */
-        if(last_touch+3>current_tick)
-            button_old&=(0xFF);
     }
 
     /* Handle power button */
     if ((IO_GIO_BITSET0&0x01) == 0)
     {
         button_read |=  BUTTON_POWER;
-        button_old  =   button_read;
     }
-    else
-        button_old&=~BUTTON_POWER;
 
     /* Read data from the remote */
     button_read |= remote_read_device();
@@ -180,27 +162,8 @@ int button_read_device(int *data)
     if (hold_button)
     {
         button_read = BUTTON_NONE;
-        button_old  = button_read;
     }
     
     return button_read;
 }
 
-/* Touchscreen data available interupt */
-void read_battery_inputs(void);
-void GIO14(void)
-{
-    short tsadc = tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS);
-    short adscm = (tsadc&TSADC_ADSCM_MASK)>>TSADC_ADSCM_SHIFT;
-    switch (adscm)
-    {
-        case 1:
-        case 2:
-            touch_available = true;
-            break;
-        case 0xb:
-            read_battery_inputs();
-            break;
-    }
-    IO_INTC_IRQ2 = (1<<3); /* IRQ_GIO14 == 35 */
-}

@@ -188,7 +188,11 @@ void system_reboot(void)
 
 void system_exception_wait(void)
 {
-    while (1);
+    /* Mask all Interrupts. */
+    IO_INTC_EINT0 = 0;
+    IO_INTC_EINT1 = 0;
+    IO_INTC_EINT2 = 0;
+    while ((IO_GIO_BITSET0&0x01) != 0); /* Wait for power button */
 }
 
 void system_init(void)

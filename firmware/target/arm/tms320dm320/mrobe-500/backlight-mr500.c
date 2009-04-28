@@ -27,6 +27,7 @@
 #include "lcd.h"
 #include "power.h"
 #include "spi-target.h"
+#include "lcd-target.h"
 
 int _backlight_brightness=DEFAULT_BRIGHTNESS_SETTING;
 
@@ -38,15 +39,15 @@ static void _backlight_write_brightness(int brightness)
 
 void _backlight_on(void)
 {
-#ifdef HAVE_LCD_ENABLE
-    lcd_enable(true); /* power on lcd + visible display */
-#endif
+    lcd_awake(); /* power on lcd + visible display */
+
     _backlight_write_brightness(_backlight_brightness);
 }
 
 void _backlight_off(void)
 {
     _backlight_write_brightness(0);
+    lcd_sleep(); /* HACK to get lcd_sleep called again */
 }
 
 /* Assumes that the backlight has been initialized */

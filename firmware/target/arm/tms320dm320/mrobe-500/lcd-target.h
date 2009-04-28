@@ -20,4 +20,5 @@
  ****************************************************************************/
 
 extern void lcd_enable(bool state);
+extern void lcd_awake(void);
 

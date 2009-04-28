@@ -21,8 +21,11 @@
 #ifndef __TSC2100_H_
 #define __TSC2100_H_
 
-/* Read X, Y, Z1, Z2 touchscreen coordinates. */
-void tsc2100_read_values(short *x, short* y, short *z1, short *z2);
+void tsc2100_read_data(void);
+void tsc2100_read_touch(short *x, short* y, short *z1, short *z2);
+void tsc2100_read_volt(short *bat1, short *bat2, short *aux);
+void tsc2100_set_mode(unsigned char scan_mode);
+void tsc2100_adc_init(void);
 
 /* read a register */
 short tsc2100_readreg(int page, int address);
@@ -68,6 +71,14 @@ void tsc2100_keyclick(void);
 #define TSSTAT_T1STAT           (1<<2)
 #define TSSTAT_T2STAT           (1<<1)
 // Bit 0 is reserved            (1<<0)
+
+/* ts Reference Control */
+#define TSREF_PAGE              1
+#define TSREF_ADDRESS           0x03
+#define TSREF_VREFM             (1<<4)
+#define TSREF_RPWUDL_SHIFT      2
+#define TSREF_RPWDN             (1<<1)
+#define TSREF_IREFV             (1<<0)
 
 /* ts Reset Control */
 #define TSRESET_PAGE    1
