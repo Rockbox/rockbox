@@ -28,8 +28,9 @@ $(SIMLIB): $$(SIMOBJ) $(UIBMP)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
-$(BUILDDIR)/$(BINARY): $$(OBJ) $(FIRMLIB) $(SIMLIB) $(VOICESPEEXLIB)
-	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(LDOPTS) 
+# SIMLIB needs to be linked twice for some reason
+$(BUILDDIR)/$(BINARY): $$(OBJ) $(SIMLIB) $(VOICESPEEXLIB) $(FIRMLIB)
+	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(SIMLIB) $(LDOPTS) 
 
 $(BUILDDIR)/uisimulator/%.o: $(ROOTDIR)/uisimulator/%.c
 	$(SILENT)mkdir -p $(dir $@)

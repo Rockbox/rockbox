@@ -91,9 +91,13 @@
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
+#ifndef BOOTLOADER
 /* Support for LCD sleep/BCM shutdown */
 #define HAVE_LCD_SLEEP
 #define HAVE_LCD_SLEEP_SETTING
+/* The same code may also be used when shutting down the iPod */
+#define HAVE_LCD_SHUTDOWN
+#endif
 
 /* We can fade the backlight by using PWM */
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_PWM
@@ -210,10 +214,5 @@
 
 #define IPOD_ACCESSORY_PROTOCOL
 #define HAVE_SERIAL
-
-#ifndef BOOTLOADER
-/* The same code may also be used when shutting down the iPod */
-#define HAVE_LCD_SHUTDOWN
-#endif
 
 #endif
