@@ -9,4 +9,5 @@ sim_icons.c
 sim_tasks.c
 stubs.c
 powermgmt-sim.c
+backlight-sim.c
 

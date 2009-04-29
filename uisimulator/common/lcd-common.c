@@ -22,8 +22,15 @@
  *
  ****************************************************************************/
 
+#include "config.h"
 #include "lcd.h"
-#include "lcd-sdl.h"
+
+#ifdef HAVE_LCD_ENABLE
+static bool lcd_enabled = false;
+#endif
+#ifdef HAVE_LCD_SLEEP
+static bool lcd_sleeping = true;
+#endif
 
 void lcd_set_flip(bool yesno)
 {
@@ -62,5 +69,51 @@ void lcd_remote_set_flip(bool yesno)
 void lcd_remote_set_invert_display(bool invert)
 {
     (void)invert;
+}
+#endif
+
+#ifdef HAVE_LCD_SLEEP
+void lcd_sleep(void)
+{
+    lcd_sleeping = true;
+}
+
+void lcd_awake(void)
+{
+    if (lcd_sleeping)
+    {
+        lcd_activation_call_hook();
+        lcd_sleeping = false;
+    }
+}
+#endif
+#ifdef HAVE_LCD_ENABLE
+void lcd_enable(bool on)
+{
+    if (on && !lcd_enabled)
+    {
+#ifdef HAVE_LCD_SLEEP
+        /* lcd_awake will handle the activation call */
+        lcd_awake();
+#else
+        lcd_activation_call_hook();
+#endif
+    }
+    lcd_enabled = on;
+}
+#endif
+
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+bool lcd_active(void)
+{
+    bool retval = false;
+#ifdef HAVE_LCD_ENABLE
+    retval = lcd_enabled;
+#endif
+#ifdef HAVE_LCD_SLEEP
+    if (!retval)
+        retval = !lcd_sleeping;
+#endif
+    return retval;
 }
 #endif

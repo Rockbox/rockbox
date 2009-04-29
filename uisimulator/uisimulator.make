@@ -28,7 +28,7 @@ $(SIMLIB): $$(SIMOBJ) $(UIBMP)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
-$(BUILDDIR)/$(BINARY): $$(OBJ) $(SIMLIB) $(VOICESPEEXLIB) $(FIRMLIB)
+$(BUILDDIR)/$(BINARY): $$(OBJ) $(FIRMLIB) $(SIMLIB) $(VOICESPEEXLIB)
 	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(LDOPTS) 
 
 $(BUILDDIR)/uisimulator/%.o: $(ROOTDIR)/uisimulator/%.c

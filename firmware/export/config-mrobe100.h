@@ -90,6 +90,15 @@
 
 #define HAVE_BUTTONLIGHT_BRIGHTNESS
 
+/* Define this if your LCD can be enabled/disabled */
+/* TODO: #define HAVE_LCD_ENABLE */
+
+/* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
+ * should be defined as well.
+ * We can currently put the lcd to sleep but it won't wake up properly */
+/*TODO: #define HAVE_LCD_SLEEP*/
+/*TODO: #define HAVE_LCD_SLEEP_SETTING <= optional */
+
 #define BATTERY_CAPACITY_DEFAULT 720 /* default battery capacity */
 
 #ifndef SIMULATOR
@@ -132,14 +141,6 @@
 #define MAX_CONTRAST_SETTING        40
 #define DEFAULT_CONTRAST_SETTING    20
 
-/* Define this if your LCD can be enabled/disabled */
-/* TODO: #define HAVE_LCD_ENABLE */
-
-/* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
- * should be defined as well.
- * We can currently put the lcd to sleep but it won't wake up properly */
-/*TODO: #define HAVE_LCD_SLEEP*/
-/*TODO: #define HAVE_LCD_SLEEP_SETTING <= optional */
 
 /* We're able to shut off power to the HDD */
 #define HAVE_ATA_POWER_OFF

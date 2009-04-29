@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:$
+ * $Id$
  *
  * Copyright (C) 2009 by Thomas Martitz
  *
@@ -19,30 +19,66 @@
  *
  ****************************************************************************/
 
-#ifndef BACKLIGHT_SIM_H
-#define BACKLIGHT_SIM_H
-
+#include <stdbool.h>
 #include "config.h"
+#include "backlight.h"
+#include "lcd.h"
 
-void _backlight_on(void);
-void _backlight_off(void);
+#ifdef HAVE_LCD_SLEEP
+extern void lcd_awake(void);
+#endif
+/* in uisimulator/sdl/lcd-bitmap.c and lcd-charcell.c */
+extern void sim_backlight(int value);
+
+void _backlight_on(void)
+{
+    sim_backlight(100);
+#if defined(HAVE_LCD_ENABLE)
+    lcd_enable(true);
+#elif defined(HAVE_LCD_SLEEP)
+    lcd_awake();
+#endif
+}
+
+void _backlight_off(void)
+{
+    sim_backlight(0);
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(false);
+#endif
+}
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-void _backlight_set_brightness(int val);
+void _backlight_set_brightness(int val)
+{
+    (void)val;
+}
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 #ifdef HAVE_BUTTON_LIGHT
-void _buttonlight_on(void);
-void _buttonlight_off(void);
+void _buttonlight_on(void)
+{
+}
+
+void _buttonlight_off(void)
+{
+}
+
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
-void _buttonlight_set_brightness(int val);
+void _buttonlight_set_brightness(int val)
+{
+    (void)val;
+}
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 #endif /* HAVE_BUTTON_LIGHT */
 
 #ifdef HAVE_REMOTE_LCD
-void _remote_backlight_on(void);
-void _remote_backlight_off(void);
+void _remote_backlight_on(void)
+{
+    sim_remote_backlight(100);
+}
+
+void _remote_backlight_off(void)
+{
+    sim_remote_backlight(0);
+}
 #endif /* HAVE_REMOTE_LCD */
-
-
-#endif /* BACKLIGHT_SIM_H */
-

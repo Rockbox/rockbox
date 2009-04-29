@@ -202,19 +202,6 @@ bool headphones_inserted(void)
 }
 #endif
 
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-bool lcd_active(void)
-{
-    return true;
-}
-#endif
-
-#ifdef HAVE_LCD_SLEEP
-void lcd_sleep(void)
-{
-}
-#endif
-
 #ifdef HAVE_SPDIF_POWER
 void spdif_power_enable(bool on)
 {
