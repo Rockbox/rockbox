@@ -71,7 +71,7 @@ SOURCES += rbutilqt.cpp \
  ../../tools/voicefont.c \
  voicefile.cpp \
  createvoicewindow.cpp \
- rbsettings.cpp \
+ base/rbsettings.cpp \
  base/rbunzip.cpp \
  base/rbzip.cpp \
  base/detect.cpp \
@@ -123,7 +123,7 @@ HEADERS += rbutilqt.h \
  ../../tools/voicefont.h \
  voicefile.h \
  createvoicewindow.h \
- rbsettings.h \
+ base/rbsettings.h \
  base/rbunzip.h \
  base/rbzip.h \
  sysinfo.h \
