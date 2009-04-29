@@ -32,8 +32,11 @@ static bool hold_button     = false;
 static bool hold_button_old = false;
 #endif
 static unsigned short _dbop_din      = 0;
+/* read_missed is true if buttons could not
+ * be read (see lcd_button_support) */
+static bool read_missed              = false;
 
-#define WHEEL_REPEAT_INTERVAL   (HZ/5)
+#define WHEEL_REPEAT_INTERVAL   (HZ/4)
 /* in the lcd driver */
 extern bool lcd_button_support(void);
 
@@ -104,14 +107,14 @@ static void scrollwheel(unsigned short dbop_din)
          * we want this for fast scrolling, but we must keep it accurate
          * for slow scrolling */
         int wheel_delta = 0;
-        /* generate repeats if quick enough, scroll slightly too*/
+        /* generate repeats if quick enough, scroll slightly too */
         if (TIME_BEFORE(current_tick, last_wheel_post + WHEEL_REPEAT_INTERVAL))
         {
             btn |= BUTTON_REPEAT;
-            wheel_delta = repeat>>2;
+            wheel_delta = repeat>>1;
         }
 
-        repeat += 2;
+        repeat += 3;
         /* the wheel is more reliable if we don't send ever change,
          * every 2th is basically one "physical click" is
          * 1 item in the rockbox menus */
@@ -125,7 +128,7 @@ static void scrollwheel(unsigned short dbop_din)
             last_wheel_post = current_tick;
         }
     }
-    if (repeat > 0)
+    if (repeat > 0 && !read_missed)
         repeat--;
 
     old_wheel_value = wheel_value;
@@ -136,28 +139,33 @@ unsigned short button_read_dbop(void)
 {
     /*write a red pixel */
     if (!lcd_button_support())
-      return _dbop_din;
+    {
+      read_missed = true;
+    }
+    if (!read_missed)
+    {
+        /* Set up dbop for input */
+        while (!(DBOP_STAT & (1<<10)));      /* Wait for fifo to empty */
+        DBOP_CTRL |= (1<<19);                /* Tri-state DBOP on read cycle */
+        DBOP_CTRL &= ~(1<<16);               /* disable output (1:write enabled) */
+        DBOP_TIMPOL_01 = 0xe167e167;         /* Set Timing & Polarity regs 0 & 1 */
+        DBOP_TIMPOL_23 = 0xe167006e;         /* Set Timing & Polarity regs 2 & 3 */
 
-    /* Set up dbop for input */
-    while (!(DBOP_STAT & (1<<10)));      /* Wait for fifo to empty */
-    DBOP_CTRL |= (1<<19);                /* Tri-state DBOP on read cycle */
-    DBOP_CTRL &= ~(1<<16);               /* disable output (1:write enabled) */
-    DBOP_TIMPOL_01 = 0xe167e167;         /* Set Timing & Polarity regs 0 & 1 */
-    DBOP_TIMPOL_23 = 0xe167006e;         /* Set Timing & Polarity regs 2 & 3 */
+        DBOP_CTRL |= (1<<15);                /* start read */
+        while (!(DBOP_STAT & (1<<16)));      /* wait for valid data */
 
-    DBOP_CTRL |= (1<<15);                /* start read */
-    while (!(DBOP_STAT & (1<<16)));      /* wait for valid data */
+        _dbop_din = DBOP_DIN;                /* Read dbop data*/
 
-    _dbop_din = DBOP_DIN;                /* Read dbop data*/
-
-    /* Reset dbop for output */
-    DBOP_TIMPOL_01 = 0x6e167;            /* Set Timing & Polarity regs 0 & 1 */
-    DBOP_TIMPOL_23 = 0xa167e06f;         /* Set Timing & Polarity regs 2 & 3 */
-    DBOP_CTRL |= (1<<16);                /* Enable output (0:write disable)  */
-    DBOP_CTRL &= ~(1<<19);               /* Tri-state when no active write */
+        /* Reset dbop for output */
+        DBOP_TIMPOL_01 = 0x6e167;            /* Set Timing & Polarity regs 0 & 1 */
+        DBOP_TIMPOL_23 = 0xa167e06f;         /* Set Timing & Polarity regs 2 & 3 */
+        DBOP_CTRL |= (1<<16);                /* Enable output (0:write disable)  */
+        DBOP_CTRL &= ~(1<<19);               /* Tri-state when no active write */
+    }
 #if !defined(BOOTLOADER) && defined(HAVE_SCROLLWHEEL)
     scrollwheel(_dbop_din);
 #endif
+    read_missed = false;
     return _dbop_din;
 }
 
