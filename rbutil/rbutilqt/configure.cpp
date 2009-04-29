@@ -103,20 +103,20 @@ void Config::accept()
         proxy.setPort(ui.proxyPort->text().toInt());
     }
 
-    settings->setProxy(proxy.toString());
+    settings->setValue(RbSettings::Proxy, proxy.toString());
     qDebug() << "new proxy:" << proxy;
     // proxy type
     QString proxyType;
     if(ui.radioNoProxy->isChecked()) proxyType = "none";
     else if(ui.radioSystemProxy->isChecked()) proxyType = "system";
     else proxyType = "manual";
-    settings->setProxyType(proxyType);
+    settings->setValue(RbSettings::ProxyType, proxyType);
 
     // language
-    if(settings->curLang() != language && !language.isEmpty()) {
+    if(settings->value(RbSettings::Language).toString() != language && !language.isEmpty()) {
         QMessageBox::information(this, tr("Language changed"),
             tr("You need to restart the application for the changed language to take effect."));
-        settings->setLang(language);
+        settings->setValue(RbSettings::Language, language);
     }
 
     // mountpoint
@@ -138,14 +138,14 @@ void Config::accept()
         error = true;
     }
     else {
-        settings->setMountpoint(QDir::fromNativeSeparators(mp));
+        settings->setValue(RbSettings::Mountpoint, QDir::fromNativeSeparators(mp));
     }
 
     // platform
     QString nplat;
     if(ui.treeDevices->selectedItems().size() != 0) {
         nplat = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
-        settings->setCurPlatform(nplat);
+        settings->setValue(RbSettings::Platform, nplat);
     }
     else {
         errormsg += "<li>" + tr("No player selected") + "</li>";
@@ -160,18 +160,18 @@ void Config::accept()
             error = true;
         }
         else
-            settings->setCachePath(ui.cachePath->text());
+            settings->setValue(RbSettings::CachePath, ui.cachePath->text());
     }
     else // default to system temp path
-        settings->setCachePath(QDir::tempPath());
-    settings->setCacheDisable(ui.cacheDisable->isChecked());
-    settings->setCacheOffline(ui.cacheOfflineMode->isChecked());
+        settings->setValue(RbSettings::CachePath, QDir::tempPath());
+    settings->setValue(RbSettings::CacheDisabled, ui.cacheDisable->isChecked());
+    settings->setValue(RbSettings::CacheOffline, ui.cacheOfflineMode->isChecked());
 
     // tts settings
     int i = ui.comboTts->currentIndex();
-    settings->setCurTTS(ui.comboTts->itemData(i).toString());
+    settings->setValue(RbSettings::Tts, ui.comboTts->itemData(i).toString());
 
-    settings->setCurVersion(PUREVERSION);
+    settings->setValue(RbSettings::RbutilVersion, PUREVERSION);
 
     errormsg += "</ul>";
     errormsg += tr("You need to fix the above errors before you can continue.");
@@ -205,7 +205,7 @@ void Config::setSettings(RbSettings* sett)
 void Config::setUserSettings()
 {
     // set proxy
-    proxy = settings->proxy();
+    proxy = settings->value(RbSettings::Proxy).toString();
 
     if(proxy.port() > 0)
         ui.proxyPort->setText(QString("%1").arg(proxy.port()));
@@ -214,7 +214,7 @@ void Config::setUserSettings()
     ui.proxyUser->setText(proxy.userName());
     ui.proxyPass->setText(proxy.password());
 
-    QString proxyType = settings->proxyType();
+    QString proxyType = settings->value(RbSettings::ProxyType).toString();
     if(proxyType == "manual") ui.radioManualProxy->setChecked(true);
     else if(proxyType == "system") ui.radioSystemProxy->setChecked(true);
     else ui.radioNoProxy->setChecked(true);
@@ -224,12 +224,15 @@ void Config::setUserSettings()
     QString b;
     // find key for lang value
     QMap<QString, QString>::const_iterator i = lang.constBegin();
+    QString l = settings->value(RbSettings::Language).toString();
+    if(l.isEmpty())
+        l = QLocale::system().name();
     while (i != lang.constEnd()) {
-        if(i.value() == settings->curLang()) {
+        if(i.value() == l) {
             b = i.key();
             break;
         }
-        else if(settings->curLang().startsWith(i.value(), Qt::CaseInsensitive)) {
+        else if(l.startsWith(i.value(), Qt::CaseInsensitive)) {
             // check if there is a base language (en -> en_US, etc.)
             b = i.key();
             break;
@@ -244,15 +247,15 @@ void Config::setUserSettings()
     connect(ui.listLanguages, SIGNAL(itemSelectionChanged()), this, SLOT(updateLanguage()));
 
     // devices tab
-    ui.mountPoint->setText(QDir::toNativeSeparators(settings->mountpoint()));
+    ui.mountPoint->setText(QDir::toNativeSeparators(settings->value(RbSettings::Mountpoint).toString()));
 
     // cache tab
-    if(!QFileInfo(settings->cachePath()).isDir())
-        settings->setCachePath(QDir::tempPath());
-    ui.cachePath->setText(QDir::toNativeSeparators(settings->cachePath()));
-    ui.cacheDisable->setChecked(settings->cacheDisabled());
-    ui.cacheOfflineMode->setChecked(settings->cacheOffline());
-    updateCacheInfo(settings->cachePath());
+    if(!QFileInfo(settings->value(RbSettings::CachePath).toString()).isDir())
+        settings->setValue(RbSettings::CachePath, QDir::tempPath());
+    ui.cachePath->setText(QDir::toNativeSeparators(settings->value(RbSettings::CachePath).toString()));
+    ui.cacheDisable->setChecked(settings->value(RbSettings::CacheDisabled).toBool());
+    ui.cacheOfflineMode->setChecked(settings->value(RbSettings::CacheOffline).toBool());
+    updateCacheInfo(settings->value(RbSettings::CachePath).toString());
 }
 
 
@@ -276,7 +279,7 @@ void Config::setDevices()
     // setup devices table
     qDebug() << "Config::setDevices()";
     
-    QStringList platformList = settings->allPlatforms();
+    QStringList platformList = settings->platforms();
 
     QMap <QString, QString> manuf;
     QMap <QString, QString> devcs;
@@ -289,7 +292,7 @@ void Config::setDevices()
     }
 
     QString platform;
-    platform = devcs.value(settings->curPlatform());
+    platform = devcs.value(settings->value(RbSettings::Platform).toString());
 
     // set up devices table
     ui.treeDevices->header()->hide();
@@ -342,7 +345,7 @@ void Config::setDevices()
     for(int a = 0; a < ttslist.size(); a++)
         ui.comboTts->addItem(TTSBase::getTTSName(ttslist.at(a)), ttslist.at(a));
     //update index of combobox
-    int index = ui.comboTts->findData(settings->curTTS());
+    int index = ui.comboTts->findData(settings->value(RbSettings::Tts).toString());
     if(index < 0) index = 0;
     ui.comboTts->setCurrentIndex(index);
     updateTtsState(index);
@@ -377,11 +380,11 @@ void Config::updateEncState()
         return;
 
     QString devname = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
-    QString olddevice = settings->curPlatform();
-    settings->setCurPlatform(devname);
-    QString encoder = settings->curEncoder();
-    ui.encoderName->setText(EncBase::getEncoderName(settings->curEncoder()));
-    settings->setCurPlatform(olddevice);
+    QString olddevice = settings->value(RbSettings::Platform).toString();
+    settings->setValue(RbSettings::Platform, devname);
+    QString encoder = settings->value(RbSettings::CurEncoder).toString();
+    ui.encoderName->setText(EncBase::getEncoderName(settings->value(RbSettings::CurEncoder).toString()));
+    settings->setValue(RbSettings::Platform, olddevice);
 
     EncBase* enc = EncBase::getEncoder(encoder);
     enc->setCfg(settings);
@@ -597,9 +600,10 @@ void Config::autodetect()
             QString text;
             // we need to set the platform here to get the brand from the
             // settings object
-            settings->setCurPlatform(detector.incompatdev());
+            settings->setValue(RbSettings::Platform, detector.incompatdev());
             text = tr("Detected an unsupported %1 player variant. Sorry, "
-                      "Rockbox doesn't run on your player.").arg(settings->curBrand());
+                      "Rockbox doesn't run on your player.")
+                      .arg(settings->value(RbSettings::CurBrand).toString());
 
             QMessageBox::critical(this, tr("Fatal error: incompatible player found"),
                                   text, QMessageBox::Ok);
@@ -655,7 +659,7 @@ void Config::cacheClear()
         QFile::remove(f);
         qDebug() << "removed:" << f;
     }
-    updateCacheInfo(settings->cachePath());
+    updateCacheInfo(settings->value(RbSettings::CachePath).toString());
 }
 
 
@@ -672,7 +676,7 @@ void Config::configTts()
 
 void Config::configEnc()
 {
-    EncBase* enc = EncBase::getEncoder(settings->curEncoder());
+    EncBase* enc = EncBase::getEncoder(settings->value(RbSettings::CurEncoder).toString());
     
     enc->setCfg(settings);
     enc->showCfg();

@@ -56,7 +56,7 @@ EncBase* EncBase::getEncoder(QString encoder)
         return encoderCache.value(encoder);
 
     EncBase* enc;
-	if(encoder == "lame")
+    if(encoder == "lame")
     {
         enc = new EncExes(encoder);
         encoderCache[encoder] = enc;
@@ -99,8 +99,8 @@ EncExes::EncExes(QString name,QObject *parent) : EncBase(parent)
 
 bool EncExes::start()
 {
-    m_EncExec = settings->encoderPath(m_name);
-    m_EncOpts = settings->encoderOptions(m_name);
+    m_EncExec = settings->subValue(m_name, RbSettings::EncoderPath).toString();
+    m_EncOpts = settings->subValue(m_name, RbSettings::EncoderOptions).toString();
     
     m_EncTemplate = m_TemplateMap.value(m_name);
 
@@ -144,7 +144,7 @@ void EncExes::showCfg()
 
 bool EncExes::configOk()
 {
-    QString path = settings->encoderPath(m_name);
+    QString path = settings->subValue(m_name, RbSettings::EncoderPath).toString();
     
     if (QFileInfo(path).exists())
         return true;
@@ -171,10 +171,10 @@ bool EncRbSpeex::start()
 {
    
     // try to get config from settings
-    quality = settings->encoderQuality("rbspeex");
-    complexity = settings->encoderComplexity("rbspeex");
-    volume = settings->encoderVolume("rbspeex");
-    narrowband = settings->encoderNarrowband("rbspeex");
+    quality = settings->subValue("rbspeex", RbSettings::EncoderQuality).toDouble();
+    complexity = settings->subValue("rbspeex", RbSettings::EncoderComplexity).toInt();
+    volume = settings->subValue("rbspeex", RbSettings::EncoderVolume).toDouble();
+    narrowband = settings->subValue("rbspeex", RbSettings::EncoderNarrowBand).toBool();
    
 
     return true;
@@ -227,13 +227,13 @@ bool EncRbSpeex::configOk()
     bool result=true;
     // check config
     
-    if(settings->encoderVolume("rbspeex") <= 0)
+    if(settings->subValue("rbspeex", RbSettings::EncoderVolume).toDouble() <= 0)
         result =false;
     
-    if(settings->encoderQuality("rbspeex") <= 0)
+    if(settings->subValue("rbspeex", RbSettings::EncoderQuality).toDouble() <= 0)
         result =false;
         
-    if(settings->encoderComplexity("rbspeex") <= 0)
+    if(settings->subValue("rbspeex", RbSettings::EncoderComplexity).toInt() <= 0)
         result =false;
        
     return result;

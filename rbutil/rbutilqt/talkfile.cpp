@@ -24,25 +24,25 @@ TalkFileCreator::TalkFileCreator(QObject* parent): QObject(parent)
 
 }
 
-//! \brief Creates Talkfiles. 
+//! \brief Creates Talkfiles.
 //!
 //! \param logger A pointer to a Loggerobject
 bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
 {
     m_abort = false;
     m_logger = logger;
-    
+
     QMultiMap<QString,QString> fileList;
     QMultiMap<QString,QString> dirList;
     QStringList toSpeakList, voicedEntries, encodedEntries;
     QString errStr;
-    
+
     m_logger->addItem(tr("Starting Talk file generation"),LOGINFO);
-    
+
     //tts
-    m_tts = TTSBase::getTTS(settings->curTTS());  
+    m_tts = TTSBase::getTTS(settings->value(RbSettings::Tts).toString());
     m_tts->setCfg(settings);
-    
+
     if(!m_tts->start(&errStr))
     {
         m_logger->addItem(errStr.trimmed(),LOGERROR);
@@ -52,9 +52,9 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     }
 
     // Encoder
-    m_enc = EncBase::getEncoder(settings->curEncoder());  
+    m_enc = EncBase::getEncoder(settings->value(RbSettings::CurEncoder).toString());
     m_enc->setCfg(settings);
-  
+
     if(!m_enc->start())
     {
         m_logger->addItem(tr("Init of Encoder engine failed"),LOGERROR);
@@ -67,7 +67,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
 
     connect(logger,SIGNAL(aborted()),this,SLOT(abort()));
     m_logger->setProgressMax(0);
-         
+
     // read in Maps of paths - file/dirnames
     m_logger->addItem(tr("Reading Filelist..."),LOGINFO);
     if(createDirAndFileMaps(m_dir,&dirList,&fileList) == false)
@@ -76,21 +76,21 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         doAbort(toSpeakList);
         return false;
     }
-    
+
     // create List of all Files/Dirs to speak
     QMapIterator<QString, QString> dirIt(dirList);
-    while (dirIt.hasNext()) 
+    while (dirIt.hasNext())
     {
         dirIt.next();
         // insert only non dublicate dir entries into list
         if(!toSpeakList.contains(dirIt.value()))
         {
             qDebug() << "toSpeaklist dir:" << dirIt.value();
-            toSpeakList.append(dirIt.value()); 
+            toSpeakList.append(dirIt.value());
         }
     }
     QMapIterator<QString, QString> fileIt(fileList);
-    while (fileIt.hasNext()) 
+    while (fileIt.hasNext())
     {
         fileIt.next();
         // insert only non- dublictae file entries into list
@@ -99,10 +99,10 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
             if(m_stripExtensions)
                 toSpeakList.append(stripExtension(fileIt.value()));
             else
-                toSpeakList.append(fileIt.value()); 
+                toSpeakList.append(fileIt.value());
         }
     }
-    
+
     // Voice entries
     m_logger->addItem(tr("Voicing entries..."),LOGINFO);
     TTSStatus voiceStatus= voiceList(toSpeakList,voicedEntries);
@@ -111,7 +111,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         doAbort(toSpeakList);
         return false;
     }
-    
+
     // Encoding Entries
     m_logger->addItem(tr("Encoding files..."),LOGINFO);
     if(encodeList(voicedEntries,encodedEntries) == false)
@@ -119,25 +119,25 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         doAbort(toSpeakList);
         return false;
     }
-        
-    // Copying talk files    
+
+    // Copying talk files
     m_logger->addItem(tr("Copying Talkfile for Dirs..."),LOGINFO);
     if(copyTalkDirFiles(dirList,&errStr) == false)
     {
         m_logger->addItem(errStr,LOGERROR);
-        doAbort(toSpeakList);    
+        doAbort(toSpeakList);
         return false;
     }
-        
+
     //Copying file talk files
     m_logger->addItem(tr("Copying Talkfile for Files..."),LOGINFO);
     if(copyTalkFileFiles(fileList,&errStr) == false)
     {
         m_logger->addItem(errStr,LOGERROR);
-        doAbort(toSpeakList);    
+        doAbort(toSpeakList);
         return false;
     }
-     
+
     // Deleting left overs
     if( !cleanup(toSpeakList))
         return false;
@@ -184,7 +184,7 @@ void TalkFileCreator::doAbort(QStringList cleanupList)
     m_logger->setProgressValue(0);
     m_logger->abort();
     m_tts->stop();
-    m_enc->stop();    
+    m_enc->stop();
 }
 
 //! \brief Creates MultiMaps (paths -> File/dir names)  of all Dirs and Files in a Folder.
@@ -194,16 +194,16 @@ void TalkFileCreator::doAbort(QStringList cleanupList)
 //! \param startDir     The dir where it beginns scanning
 //! \param dirMap       The MulitMap where the dirs are stored
 //! \param filMap       The MultiMap where Files are stored
-//! \returns true on Success, false if User aborted.  
+//! \returns true on Success, false if User aborted.
 bool TalkFileCreator::createDirAndFileMaps(QDir startDir,QMultiMap<QString,QString> *dirMap,QMultiMap<QString,QString> *fileMap)
 {
     // create Iterator
     QDirIterator::IteratorFlags flags = QDirIterator::NoIteratorFlags;
     if(m_recursive)
         flags = QDirIterator::Subdirectories;
-        
+
     QDirIterator it(startDir,flags);
-    
+
     // read in Maps of paths - file/dirnames
     while (it.hasNext())
     {
@@ -212,14 +212,14 @@ bool TalkFileCreator::createDirAndFileMaps(QDir startDir,QMultiMap<QString,QStri
         {
             return false;
         }
-        
+
         QFileInfo fileInf = it.fileInfo();
-        
+
         // its a dir
         if(fileInf.isDir())
         {
             QDir dir = fileInf.dir();
-            
+
             // insert into List
             if(!dir.dirName().isEmpty() && m_talkFolders)
             {
@@ -238,7 +238,7 @@ bool TalkFileCreator::createDirAndFileMaps(QDir startDir,QMultiMap<QString,QStri
         }
         QCoreApplication::processEvents();
     }
-    return true;    
+    return true;
 }
 
 //! \brief Voices a List of string to the temp dir. Progress is handled inside.
@@ -259,37 +259,37 @@ TTSStatus TalkFileCreator::voiceList(QStringList toSpeak,QStringList& voicedEntr
             m_logger->addItem(tr("Talk file creation aborted"), LOGERROR);
             return FatalError;
         }
-        
+
         QString filename = QDir::tempPath()+ "/"+  toSpeak[i] + ".wav";
-                
+
         QString error;
         TTSStatus status = m_tts->voice(toSpeak[i],filename, &error);
         if(status == Warning)
         {
-        	warnings = true;
+            warnings = true;
             m_logger->addItem(tr("Voicing of %1 failed: %2").arg(toSpeak[i]).arg(error),
-            		LOGWARNING);
+                    LOGWARNING);
         }
         else if (status == FatalError)
         {
-        	m_logger->addItem(tr("Voicing of %1 failed: %2").arg(toSpeak[i]).arg(error),
-        			LOGERROR);
-        	return FatalError;
-        }       
+            m_logger->addItem(tr("Voicing of %1 failed: %2").arg(toSpeak[i]).arg(error),
+                    LOGERROR);
+            return FatalError;
+        }
         else
-        	voicedEntries.append(toSpeak[i]);
+            voicedEntries.append(toSpeak[i]);
         m_logger->setProgressValue(++m_progress);
         QCoreApplication::processEvents();
     }
     if(warnings)
-    	return Warning;
+        return Warning;
     else
-    	return NoError;
+        return NoError;
 }
 
 
 //! \brief Encodes a List of strings from/to the temp dir. Progress is handled inside.
-//! It expects the inputfile in the temp dir with the name in the List appended with ".wav" 
+//! It expects the inputfile in the temp dir with the name in the List appended with ".wav"
 //!
 //!  \param toSpeak QStringList with the Entries to encode.
 //! \param errString pointer to where the Error cause is written
@@ -301,21 +301,21 @@ bool TalkFileCreator::encodeList(QStringList toEncode,QStringList& encodedEntrie
     {
         if(m_abort)
         {
-        	m_logger->addItem(tr("Talk file creation aborted"), LOGERROR);
+            m_logger->addItem(tr("Talk file creation aborted"), LOGERROR);
             return false;
         }
-        
+
         QString wavfilename = QDir::tempPath()+ "/"+   toEncode[i] + ".wav";
         QString filename = QDir::tempPath()+ "/"+  toEncode[i] + ".talk";
-        
+
         if(!m_enc->encode(wavfilename,filename))
         {
             m_logger->addItem(tr("Encoding of %1 failed").arg(filename), LOGERROR);
             return false;
-        }    
+        }
         encodedEntries.append(toEncode[i]);
         m_logger->setProgressValue(++m_progress);
-        QCoreApplication::processEvents();        
+        QCoreApplication::processEvents();
     }
     return true;
 }
@@ -324,16 +324,16 @@ bool TalkFileCreator::encodeList(QStringList toEncode,QStringList& encodedEntrie
 //!
 //! \param dirMap   a MultiMap of Paths -> Dirnames
 //! \param errString Pointer to a QString where the error cause is written.
-//! \returns true on success, false on error or user abort 
+//! \returns true on success, false on error or user abort
 bool TalkFileCreator::copyTalkDirFiles(QMultiMap<QString,QString> dirMap,QString* errString)
 {
     resetProgress(dirMap.size());
-    
+
     QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
     installlog.beginGroup("talkfiles");
-    
+
     QMapIterator<QString, QString> it(dirMap);
-    while (it.hasNext()) 
+    while (it.hasNext())
     {
         it.next();
         if(m_abort)
@@ -341,51 +341,51 @@ bool TalkFileCreator::copyTalkDirFiles(QMultiMap<QString,QString> dirMap,QString
             *errString = tr("Talk file creation aborted");
             return false;
         }
-                
+
         QString source = QDir::tempPath()+ "/"+  it.value() + ".talk";
 
         if(!QFileInfo(source).exists())
-        	continue; // this file was skipped in one of the previous steps
+            continue; // this file was skipped in one of the previous steps
 
         QString target = it.key() + "/" + "_dirname.talk";
 
-         // remove target if it exists, and if we should overwrite it
+        // remove target if it exists, and if we should overwrite it
         if(m_overwriteTalk && QFile::exists(target))
             QFile::remove(target);
-        
+
         // copying
         if(!QFile::copy(source,target))
         {
             *errString = tr("Copying of %1 to %2 failed").arg(source).arg(target);
             return false;
-        } 
-        
+        }
+
         // add to installlog
         QString now = QDate::currentDate().toString("yyyyMMdd");
         installlog.setValue(target.remove(0,m_mountpoint.length()),now);
-       
+
         m_logger->setProgressValue(++m_progress);
         QCoreApplication::processEvents();
     }
     installlog.endGroup();
-    installlog.sync(); 
-    return true;  
+    installlog.sync();
+    return true;
 }
 
 //! \brief copys Talkfile for Files from the temp dir to the target. Progress and installlog is handled inside
 //!
 //! \param fileMap   a MultiMap of Paths -> Filenames
 //! \param errString Pointer to a QString where the error cause is written.
-//! \returns true on success, false on error or user abort 
+//! \returns true on success, false on error or user abort
 bool TalkFileCreator::copyTalkFileFiles(QMultiMap<QString,QString> fileMap,QString* errString)
 {
     resetProgress(fileMap.size());
-    
+
     QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
     installlog.beginGroup("talkfiles");
-    
+
     QMapIterator<QString, QString> it(fileMap);
-    while (it.hasNext()) 
+    while (it.hasNext())
     {
         it.next();
         if(m_abort)
@@ -393,58 +393,58 @@ bool TalkFileCreator::copyTalkFileFiles(QMultiMap<QString,QString> fileMap,QStri
             *errString = tr("Talk file creation aborted");
             return false;
         }
-                
+
         QString source;
         QString target = it.key() + "/" + it.value() + ".talk";
-        
-        // correct source if we hav stripExtension enabled        
+
+        // correct source if we hav stripExtension enabled
         if(m_stripExtensions)
-            source = QDir::tempPath()+ "/"+ stripExtension(it.value()) + ".talk"; 
+            source = QDir::tempPath()+ "/"+ stripExtension(it.value()) + ".talk";
         else
             source = QDir::tempPath()+ "/"+  it.value() + ".talk";
-        
+
         if(!QFileInfo(source).exists())
-			continue; // this file was skipped in one of the previous steps
+            continue; // this file was skipped in one of the previous steps
 
         // remove target if it exists, and if we should overwrite it
         if(m_overwriteTalk && QFile::exists(target))
             QFile::remove(target);
-        
+
         // copy file
         qDebug() << "copying: " << source << " to " << target;
         if(!QFile::copy(source,target))
         {
             *errString = tr("Copying of %1 to %2 failed").arg(source).arg(target);
             return false;
-        }    
-        
+        }
+
         //  add to Install log
         QString now = QDate::currentDate().toString("yyyyMMdd");
         installlog.setValue(target.remove(0,m_mountpoint.length()),now);
-        
+
         m_logger->setProgressValue(++m_progress);
         QCoreApplication::processEvents();
     }
     installlog.endGroup();
-    installlog.sync(); 
-    return true;  
+    installlog.sync();
+    return true;
 }
 
 
 //! \brief Cleans up Files potentially left in the temp dir
-//! 
+//!
 //! \param list List of file to try to delete in the temp dir. Function appends ".wav" and ".talk" to the filenames
 bool TalkFileCreator::cleanup(QStringList list)
 {
     m_logger->addItem(tr("Cleaning up.."),LOGINFO);
-        
+
     for(int i=0; i < list.size(); i++)
-    {            
+    {
         if(QFile::exists(QDir::tempPath()+ "/"+  list[i] + ".wav"))
                 QFile::remove(QDir::tempPath()+ "/"+  list[i] + ".wav");
         if(QFile::exists(QDir::tempPath()+ "/"+  list[i] + ".talk"))
                 QFile::remove(QDir::tempPath()+ "/"+  list[i] + ".talk");
-        
+
         QCoreApplication::processEvents();
     }
     return true;

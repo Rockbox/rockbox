@@ -61,11 +61,11 @@ void ThemesInstallWindow::downloadInfo()
     themesInfo.close();
 
     QUrl url;
-    url = QUrl(settings->themeUrl() + "/rbutilqt.php?target="
-                + settings->curConfigure_Modelname());
+    url = QUrl(settings->value(RbSettings::ThemesUrl).toString() + "/rbutilqt.php?target="
+                + settings->value(RbSettings::CurConfigureModel).toString());
     qDebug() << "downloadInfo()" << url;
     qDebug() << url.queryItems();
-    if(settings->cacheOffline())
+    if(settings->value(RbSettings::CacheOffline).toBool())
         getter->setCache(true);
     getter->setFile(&themesInfo);
 
@@ -144,7 +144,7 @@ void ThemesInstallWindow::downloadDone(bool error)
     // check if there's a themes "MOTD" available
     if(iniDetails.contains("status/msg")) {
         // check if there's a localized msg available
-        QString lang = settings->curLang().split("_").at(0);
+        QString lang = settings->value(RbSettings::Language).toString().split("_").at(0);
         QString msg;
         if(iniDetails.contains("status/msg." + lang))
             msg = iniDetails.value("status/msg." + lang).toString();
@@ -191,9 +191,9 @@ void ThemesInstallWindow::updateDetails(QListWidgetItem* cur, QListWidgetItem* p
     iniDetails.beginGroup(cur->data(Qt::UserRole).toString());
 
     QUrl img, txt;
-    txt = QUrl(QString(settings->themeUrl() + "/"
+    txt = QUrl(QString(settings->value(RbSettings::ThemesUrl).toString() + "/"
         + iniDetails.value("descriptionfile").toString()));
-    img = QUrl(QString(settings->themeUrl() + "/"
+    img = QUrl(QString(settings->value(RbSettings::ThemesUrl).toString() + "/"
         + iniDetails.value("image").toString()));
 
     QString text;
@@ -211,7 +211,7 @@ void ThemesInstallWindow::updateDetails(QListWidgetItem* cur, QListWidgetItem* p
     iniDetails.endGroup();
 
     igetter.abort();
-    if(!settings->cacheDisabled())
+    if(!settings->value(RbSettings::CacheDisabled).toBool())
         igetter.setCache(true);
     else
     {
@@ -307,7 +307,7 @@ void ThemesInstallWindow::accept()
     QSettings iniDetails(themesInfo.fileName(), QSettings::IniFormat, this);
     for(int i = 0; i < ui.listThemes->selectedItems().size(); i++) {
         iniDetails.beginGroup(ui.listThemes->selectedItems().at(i)->data(Qt::UserRole).toString());
-        zip = settings->themeUrl()
+        zip = settings->value(RbSettings::ThemesUrl).toString()
                 + "/" + iniDetails.value("archive").toString();
         themes.append(zip);
         names.append("Theme: " +
@@ -321,7 +321,7 @@ void ThemesInstallWindow::accept()
 
     logger = new ProgressLoggerGui(this);
     logger->show();
-    QString mountPoint = settings->mountpoint();
+    QString mountPoint = settings->value(RbSettings::Mountpoint).toString();
     qDebug() << "mountpoint:" << mountPoint;
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountPoint).isDir()) {
@@ -335,7 +335,7 @@ void ThemesInstallWindow::accept()
     installer->setLogSection(names);
     installer->setLogVersion(version);
     installer->setMountPoint(mountPoint);
-    if(!settings->cacheDisabled())
+    if(!settings->value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
 
     connect(logger, SIGNAL(closed()), this, SLOT(close()));

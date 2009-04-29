@@ -46,118 +46,97 @@ class RbSettings : public QObject
             MapError,
             MapIncompatible,
         };
+        enum UserSettings {
+            RbutilVersion,
+            CurrentPlatform,
+            Mountpoint,
+            CachePath,
+            Build,
+            ProxyType,
+            Proxy,
+            OfPath,
+            Platform,
+            Language,
+            Tts,
+            LastTalkedFolder,
+            VoiceLanguage,
+            TtsLanguage,
+            TtsOptions,
+            TtsPath,
+            TtsVoice,
+            EncoderPath,
+            EncoderOptions,
+            WavtrimThreshold,
+            EncoderComplexity,
+            TtsSpeed,
+            CacheOffline,
+            CacheDisabled,
+            TtsUseSapi4,
+            EncoderNarrowBand,
+            EncoderQuality,
+            EncoderVolume,
+        };
+        enum SystemSettings {
+            ManualUrl,
+            BleedingUrl,
+            BootloaderUrl,
+            BootloaderInfoUrl,
+            FontUrl,
+            VoiceUrl,
+            DoomUrl,
+            ReleaseUrl,
+            DailyUrl,
+            ServerConfUrl,
+            GenlangUrl,
+            ThemesUrl,
+            BleedingInfo,
+            CurPlatformName,
+            CurManual,
+            CurBootloaderMethod,
+            CurBootloaderName,
+            CurBootloaderFile,
+            CurEncoder,
+            CurResolution,
+            CurBrand,
+            CurName,
+            CurBuildserverModel,
+            CurConfigureModel,
+            CurTargetId,
+        };
 
-        //! access functions for the settings
-        QString curVersion();
-        bool cacheOffline();
-        bool cacheDisabled();
-        QString mountpoint();
-        QString manualUrl();
-        QString bleedingUrl();
-        QString cachePath();
-        QString build(void);
-        QString bootloaderUrl();
-        QString bootloaderInfoUrl();
-        QString fontUrl();
-        QString voiceUrl();
-        QString doomUrl();
-        QString releaseUrl();
-        QString dailyUrl();
-        QString serverConfUrl();
-        QString themeUrl();
-        QString genlangUrl();
-        QString proxyType();
-        QString proxy();
-        QString bleedingInfo();
-        QString ofPath();
-        QString lastTalkedFolder();
-        QString voiceLanguage();
-        int wavtrimTh();
-        QString ttsPath(QString tts);
-        QString ttsOptions(QString tts);
-        QString ttsVoice(QString tts);
-        int ttsSpeed(QString tts);
-        QString ttsLang(QString tts);
-        bool ttsUseSapi4();
-        QString encoderPath(QString enc);
-        QString encoderOptions(QString enc);
-        double encoderQuality(QString enc);
-        int encoderComplexity(QString enc);
-        double encoderVolume(QString enc);
-        bool encoderNarrowband(QString enc);
+        QVariant value(enum SystemSettings setting);
+        // generic and "current selection" values -- getters
+        QVariant value(enum UserSettings setting)
+            { QString empty; return subValue(empty, setting); }
+        void setValue(enum UserSettings setting , QVariant value)
+            { QString empty; return setSubValue(empty, setting, value); }
 
-        QStringList allPlatforms(void);
-        QStringList allLanguages(void);
+        QVariant subValue(QString& sub, enum UserSettings setting);
+        QVariant subValue(const char* sub, enum UserSettings setting)
+            { QString s = sub; return subValue(s, setting); }
+        void setSubValue(QString& sub, enum UserSettings setting, QVariant value);
+        void setSubValue(const char* sub, enum UserSettings setting, QVariant value)
+            { QString s = sub; return setSubValue(s, setting, value); }
+
+        QStringList platforms(void);
+        QStringList languages(void);
 
         QString name(QString plattform);
         QString brand(QString plattform);
 
         QMap<int, QString> usbIdMap(enum MapType);
 
-        QString curBrand();
-        QString curName();
-        QString curPlatform();              // rbutil internal target name.
-        QString curBuildserver_Modelname(); // modelnames used by the buildserver 
-        QString curManual();
-        QString curBootloaderMethod();
-        QString curBootloaderName();
-        QString curConfigure_Modelname();   // modelname from configure (used for themes, voice, rockbox-info comparing. 
-        QString curLang();
-        QString curEncoder();
-        QString curTTS();
-        QString curResolution();
-        QString curBootloaderFile();
-        int curTargetId();
-
-        //! Set Functions
-        void setCurVersion(QString version);
-        void setOfPath(QString path);
-        void setCachePath(QString path);
-        void setBuild(QString build);
-        void setLastTalkedDir(QString dir);
-        void setVoiceLanguage(QString lang);
-        void setWavtrimTh(int th);
-        void setProxy(QString proxy);
-        void setProxyType(QString proxytype);
-        void setLang(QString lang);
-        void setMountpoint(QString mp);
-        void setCurPlatform(QString platt);
-        void setCacheDisable(bool on);
-        void setCacheOffline(bool on);
-        void setCurTTS(QString tts);
-        void setTTSPath(QString tts, QString path);
-        void setTTSOptions(QString tts, QString options);
-        void setTTSSpeed(QString tts, int speed);
-        void setTTSVoice(QString tts, QString voice);
-        void setTTSLang(QString tts, QString lang);
-        void setTTSUseSapi4(bool value);
-        void setEncoderPath(QString enc, QString path);
-        void setEncoderOptions(QString enc, QString options);
-        void setEncoderQuality(QString enc, double q);
-        void setEncoderComplexity(QString enc, int c);
-        void setEncoderVolume(QString enc,double v);
-        void setEncoderNarrowband(QString enc,bool nb);
-
     private:
-
-        //! helper function to get an entry in the current platform section
-        QVariant deviceSettingCurGet(QString entry,QString def="");
-        //! helper function to get an entry out of a group in the userSettings
-        QVariant userSettingsGroupGet(QString group,QString entry,QVariant def="");
-        //! helper function to set an entry in a group in the userSettings
-        void userSettingsGroupSet(QString group,QString entry,QVariant value);
-
-
         //! private copy constructors to prvent copying
         RbSettings&  operator= (const RbSettings& other)
             { (void)other; return *this; }
         RbSettings(const RbSettings& other) :QObject()
             { (void)other; }
+        QString constructSettingPath(QString path, QString substitute = QString());
 
         //! pointers to our setting objects
-        QSettings *devices;
+        QSettings *systemSettings;
         QSettings *userSettings;
-
 };
 
 #endif

@@ -401,12 +401,13 @@ QString Detect::check(RbSettings* settings, bool permission)
     }
 
     // Check TargetId
-    QString installed = installedTarget(settings->mountpoint());
-    if(!installed.isEmpty() && installed != settings->curConfigure_Modelname())
+    QString installed = installedTarget(settings->value(RbSettings::Mountpoint).toString());
+    if(!installed.isEmpty() && installed != settings->value(RbSettings::CurConfigureModel).toString())
     {
         text += QObject::tr("<li>Target mismatch detected.\n"
                 "Installed target: %1, selected target: %2.</li>")
-            .arg(installed, settings->curName());    
+            .arg(installed, settings->value(RbSettings::CurPlatformName).toString());
+            // FIXME: replace installed by human-friendly name
     }
 
     if(!text.isEmpty())

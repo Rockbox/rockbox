@@ -36,18 +36,18 @@ TTSSapiGui::TTSSapiGui(TTSSapi* sapi,QDialog* parent) : QDialog(parent)
 void TTSSapiGui::showCfg()
 {
     // try to get config from settings
-    ui.ttsoptions->setText(settings->ttsOptions("sapi"));
-    QString selLang = settings->ttsLang("sapi");
-    QString selVoice = settings->ttsVoice("sapi");
-    ui.speed->setValue(settings->ttsSpeed("sapi"));
-    if(settings->ttsUseSapi4())
+    ui.ttsoptions->setText(settings->subValue("sapi", RbSettings::TtsOptions).toString());
+    QString selLang = settings->subValue("sapi", RbSettings::TtsLanguage).toString();
+    QString selVoice = settings->subValue("sapi", RbSettings::TtsVoice).toString();
+    ui.speed->setValue(settings->subValue("sapi", RbSettings::TtsSpeed).toInt());
+    if(settings->value(RbSettings::TtsUseSapi4).toBool())
         ui.usesapi4->setCheckState(Qt::Checked);
     else
         ui.usesapi4->setCheckState(Qt::Unchecked);
 
      // fill in language combobox
-    QStringList languages = settings->allLanguages();
-
+    QStringList languages = settings->languages();
+    
     languages.sort();
     ui.languagecombo->clear();
     ui.languagecombo->addItems(languages);
@@ -78,14 +78,14 @@ void TTSSapiGui::reset()
 void TTSSapiGui::accept(void)
 {
     //save settings in user config
-    settings->setTTSOptions("sapi",ui.ttsoptions->text());
-    settings->setTTSLang("sapi",ui.languagecombo->currentText());
-    settings->setTTSVoice("sapi",ui.voicecombo->currentText());
-    settings->setTTSSpeed("sapi",ui.speed->value());
+    settings->setSubValue("sapi", RbSettings::TtsOptions, ui.ttsoptions->text());
+    settings->setSubValue("sapi", RbSettings::TtsLanguage, ui.languagecombo->currentText());
+    settings->setSubValue("sapi", RbSettings::TtsVoice, ui.voicecombo->currentText());
+    settings->setSubValue("sapi", RbSettings::TtsSpeed, ui.speed->value());
     if(ui.usesapi4->checkState() == Qt::Checked)
-        settings->setTTSUseSapi4(true);
+        settings->setValue(RbSettings::TtsUseSapi4, true);
     else
-        settings->setTTSUseSapi4(false);
+        settings->setValue(RbSettings::TtsUseSapi4, false);
     // sync settings
     settings->sync();
 
@@ -108,9 +108,9 @@ void TTSSapiGui::updateVoices(QString language)
 void TTSSapiGui::useSapi4Changed(int)
 {
     if(ui.usesapi4->checkState() == Qt::Checked)
-        settings->setTTSUseSapi4(true);
+        settings->setValue(RbSettings::TtsUseSapi4, true);
     else
-        settings->setTTSUseSapi4(false);
+        settings->setValue(RbSettings::TtsUseSapi4, false);
     // sync settings
     settings->sync();
     updateVoices(ui.languagecombo->currentText());
@@ -136,8 +136,8 @@ void TTSExesGui::showCfg(QString name)
 {
     m_name = name;
     // try to get config from settings
-    QString exepath =settings->ttsPath(m_name);
-    ui.ttsoptions->setText(settings->ttsOptions(m_name));
+    QString exepath =settings->subValue(m_name, RbSettings::TtsPath).toString();
+    ui.ttsoptions->setText(settings->subValue(m_name, RbSettings::TtsOptions).toString());
     ui.ttspath->setText(exepath);
 
      //show dialog
@@ -148,8 +148,8 @@ void TTSExesGui::showCfg(QString name)
 void TTSExesGui::accept(void)
 {
     //save settings in user config
-    settings->setTTSPath(m_name,ui.ttspath->text());
-    settings->setTTSOptions(m_name,ui.ttsoptions->text());
+    settings->setSubValue(m_name, RbSettings::TtsPath, ui.ttspath->text());
+    settings->setSubValue(m_name, RbSettings::TtsOptions, ui.ttsoptions->text());
     // sync settings
     settings->sync();
 
@@ -199,15 +199,15 @@ TTSFestivalGui::TTSFestivalGui(TTSFestival* api, QDialog* parent) :
 
 void TTSFestivalGui::showCfg()
 {
-    qDebug() << "show\tpaths: " << settings->ttsPath("festival") << "\n"
-            << "\tvoice: " << settings->ttsVoice("festival");
+    qDebug() << "show\tpaths: " << settings->subValue("festival", RbSettings::TtsPath) << "\n"
+            << "\tvoice: " << settings->subValue("festival", RbSettings::TtsVoice);
 
     // will populate the voices if the paths are correct,
     // otherwise, it will require the user to press Refresh
     updateVoices();
 
     // try to get config from settings
-    QStringList paths = settings->ttsPath("festival").split(":");
+    QStringList paths = settings->subValue("festival", RbSettings::TtsPath).toString().split(":");
     if(paths.size() == 2)
     {
         ui.serverPath->setText(paths[0]);
@@ -223,8 +223,8 @@ void TTSFestivalGui::accept(void)
     //save settings in user config
     QString newPath = QString("%1:%2").arg(ui.serverPath->text().trimmed()).arg(ui.clientPath->text().trimmed());
     qDebug() << "set\tpaths: " << newPath << "\n\tvoice: " << ui.voicesBox->currentText();
-    settings->setTTSPath("festival", newPath);
-    settings->setTTSVoice("festival", ui.voicesBox->currentText());
+    settings->setSubValue("festival", RbSettings::TtsPath, newPath);
+    settings->setSubValue("festival", RbSettings::TtsVoice, ui.voicesBox->currentText());
 
     settings->sync();
 
@@ -288,13 +288,13 @@ void TTSFestivalGui::onRefreshButton()
 {
     /* Temporarily commit the settings so that we get the new path when we check for voices */
     QString newPath = QString("%1:%2").arg(ui.serverPath->text().trimmed()).arg(ui.clientPath->text().trimmed());
-    QString oldPath = settings->ttsPath("festival");
+    QString oldPath = settings->subValue("festival", RbSettings::TtsPath).toString();
     qDebug() << "new path: " << newPath << "\n" << "old path: " << oldPath << "\nuse new: " << (newPath != oldPath);
 
     if(newPath != oldPath)
     {
         qDebug() << "Using new paths for getVoiceList";
-        settings->setTTSPath("festival", newPath);
+        settings->setSubValue("festival", RbSettings::TtsPath, newPath);
         settings->sync();
     }
 
@@ -302,7 +302,7 @@ void TTSFestivalGui::onRefreshButton()
 
     if(newPath != oldPath)
     {
-        settings->setTTSPath("festival", oldPath);
+        settings->setSubValue("festival", RbSettings::TtsPath, oldPath);
         settings->sync();
     }
 }
@@ -324,9 +324,10 @@ void TTSFestivalGui::updateVoices()
     ui.voicesBox->clear();
     ui.voicesBox->addItems(voiceList);
 
-    ui.voicesBox->setCurrentIndex(ui.voicesBox->findText(settings->ttsVoice("festival")));
+    ui.voicesBox->setCurrentIndex(ui.voicesBox->findText(
+                settings->subValue("festival", RbSettings::TtsVoice).toString()));
 
-    updateDescription(settings->ttsVoice("festival"));
+    updateDescription(settings->subValue("festival", RbSettings::TtsVoice).toString());
 }
 
 void TTSFestivalGui::updateDescription(QString value)

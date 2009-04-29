@@ -34,8 +34,8 @@ void EncExesGui::showCfg(QString name)
 {
     m_name = name;
     // try to get config from settings
-    QString exepath =settings->encoderPath(m_name);
-    ui.encoderoptions->setText(settings->encoderOptions(m_name));   
+    QString exepath =settings->subValue(m_name, RbSettings::EncoderPath).toString();
+    ui.encoderoptions->setText(settings->subValue(m_name, RbSettings::EncoderOptions).toString());
     
     if(exepath == "")
     {
@@ -75,8 +75,8 @@ void EncExesGui::showCfg(QString name)
 void EncExesGui::accept(void)
 {
     //save settings in user config
-    settings->setEncoderPath(m_name,ui.encoderpath->text());
-    settings->setEncoderOptions(m_name,ui.encoderoptions->text());
+    settings->setSubValue(m_name, RbSettings::EncoderPath, ui.encoderpath->text());
+    settings->setSubValue(m_name, RbSettings::EncoderOptions, ui.encoderoptions->text());
     
     // sync settings
     settings->sync();
@@ -130,11 +130,11 @@ void EncRbSpeexGui::showCfg(float defQ,float defV,int defC, bool defB)
     defaultBand =defB;
     
     //fill in the usersettings
-    ui.volume->setValue(settings->encoderVolume("rbspeex"));
-    ui.quality->setValue(settings->encoderQuality("rbspeex"));
-    ui.complexity->setValue(settings->encoderComplexity("rbspeex"));
+    ui.volume->setValue(settings->subValue("rbspeex", RbSettings::EncoderVolume).toDouble());
+    ui.quality->setValue(settings->subValue("rbspeex", RbSettings::EncoderQuality).toDouble());
+    ui.complexity->setValue(settings->subValue("rbspeex", RbSettings::EncoderComplexity).toInt());
     
-    if(settings->encoderNarrowband("rbspeex"))
+    if(settings->subValue("rbspeex", RbSettings::EncoderNarrowBand).toBool())
         ui.narrowband->setCheckState(Qt::Checked);
     else
         ui.narrowband->setCheckState(Qt::Unchecked);
@@ -146,10 +146,10 @@ void EncRbSpeexGui::showCfg(float defQ,float defV,int defC, bool defB)
 void EncRbSpeexGui::accept(void)
 {
     //save settings in user config
-    settings->setEncoderVolume("rbspeex",ui.volume->value());
-    settings->setEncoderQuality("rbspeex",ui.quality->value());
-    settings->setEncoderComplexity("rbspeex",ui.complexity->value());
-    settings->setEncoderNarrowband("rbspeex",ui.narrowband->isChecked() ? true : false);
+    settings->setSubValue("rbspeex", RbSettings::EncoderVolume, ui.volume->value());
+    settings->setSubValue("rbspeex", RbSettings::EncoderQuality, ui.quality->value());
+    settings->setSubValue("rbspeex", RbSettings::EncoderComplexity, ui.complexity->value());
+    settings->setSubValue("rbspeex", RbSettings::EncoderNarrowBand, ui.narrowband->isChecked() ? true : false);
 
     // sync settings
     settings->sync();

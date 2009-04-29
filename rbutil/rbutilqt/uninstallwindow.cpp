@@ -73,7 +73,7 @@ void UninstallWindow::setSettings(RbSettings *sett)
 {
     settings = sett;
 
-    QString mountpoint =settings->mountpoint();
+    QString mountpoint = settings->value(RbSettings::Mountpoint).toString();
     uninstaller = new Uninstaller(this,mountpoint);
 
     // disable smart uninstall, if not possible

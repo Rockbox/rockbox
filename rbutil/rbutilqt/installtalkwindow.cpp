@@ -88,13 +88,13 @@ void InstallTalkWindow::accept()
         return;
     }
 
-    settings->setLastTalkedDir(folderToTalk);
+    settings->setValue(RbSettings::LastTalkedFolder, folderToTalk);
 
     settings->sync();
 
     talkcreator->setSettings(settings);
     talkcreator->setDir(QDir(folderToTalk));
-    talkcreator->setMountPoint(settings->mountpoint());
+    talkcreator->setMountPoint(settings->value(RbSettings::Mountpoint).toString());
     
     talkcreator->setOverwriteTalk(ui.OverwriteTalk->isChecked());
     talkcreator->setRecursive(ui.recursive->isChecked());
@@ -115,7 +115,7 @@ void InstallTalkWindow::setSettings(RbSettings* sett)
 
 void InstallTalkWindow::updateSettings(void)
 {
-    QString ttsName = settings->curTTS();
+    QString ttsName = settings->value(RbSettings::Tts).toString();
     TTSBase* tts = TTSBase::getTTS(ttsName);
     tts->setCfg(settings);
     if(tts->configOk())
@@ -125,7 +125,7 @@ void InstallTalkWindow::updateSettings(void)
         ui.labelTtsProfile->setText(tr("Selected TTS engine: <b>%1</b>")
             .arg("Invalid TTS configuration!"));
     
-    QString encoder = settings->curEncoder();
+    QString encoder = settings->value(RbSettings::CurEncoder).toString();
     EncBase* enc = EncBase::getEncoder(encoder);
     if(enc != NULL) {
         enc->setCfg(settings);
@@ -140,7 +140,7 @@ void InstallTalkWindow::updateSettings(void)
         ui.labelEncProfile->setText(tr("Selected encoder: <b>%1</b>")
             .arg("Invalid encoder configuration!"));
 
-    setTalkFolder(settings->lastTalkedFolder());
+    setTalkFolder(settings->value(RbSettings::LastTalkedFolder).toString());
     emit settingsUpdated();
 }
 

@@ -34,12 +34,12 @@ Install::Install(RbSettings *sett,QWidget *parent) : QDialog(parent)
     connect(ui.backup, SIGNAL(stateChanged(int)), this, SLOT(backupCheckboxChanged(int)));
 
     //! check if rockbox is already installed
-    QString version = Detect::installedVersion(settings->mountpoint());
+    QString version = Detect::installedVersion(settings->value(RbSettings::Mountpoint).toString());
 
     if(version != "")
     {
         ui.Backupgroup->show();
-        m_backupName = settings->mountpoint();
+        m_backupName = settings->value(RbSettings::Mountpoint).toString();
         if(!m_backupName.endsWith("/")) m_backupName += "/";
         m_backupName += ".backup/rockbox-backup-"+version+".zip";
         // for some reason the label doesn't return its final size yet.
@@ -91,8 +91,8 @@ void Install::accept()
 {
     logger = new ProgressLoggerGui(this);
     logger->show();
-    QString mountPoint = settings->mountpoint();
-    qDebug() << "mountpoint:" << settings->mountpoint();
+    QString mountPoint = settings->value(RbSettings::Mountpoint).toString();
+    qDebug() << "mountpoint:" << settings->value(RbSettings::Mountpoint).toString();
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountPoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
@@ -101,30 +101,30 @@ void Install::accept()
     }
 
     QString myversion;
-    QString buildname = settings->curBuildserver_Modelname();
+    QString buildname = settings->value(RbSettings::CurBuildserverModel).toString();
     if(ui.radioStable->isChecked()) {
         file = QString("%1/%2/rockbox-%3-%4.zip")
-                .arg(settings->releaseUrl(), version.value("rel_rev"),
+                .arg(settings->value(RbSettings::ReleaseUrl).toString(), version.value("rel_rev"),
                     buildname, version.value("rel_rev"));
         fileName = QString("rockbox-%1-%2.zip")
                    .arg(version.value("rel_rev"), buildname);
-        settings->setBuild("stable");
+        settings->setValue(RbSettings::Build, "stable");
         myversion = version.value("rel_rev");
     }
     else if(ui.radioArchived->isChecked()) {
         file = QString("%1%2/rockbox-%3-%4.zip")
-            .arg(settings->dailyUrl(),
+            .arg(settings->value(RbSettings::DailyUrl).toString(),
             buildname, buildname, version.value("arch_date"));
         fileName = QString("rockbox-%1-%2.zip")
             .arg(buildname, version.value("arch_date"));
-        settings->setBuild("archived");
+        settings->setValue(RbSettings::Build, "archived");
         myversion = "r" + version.value("arch_rev") + "-" + version.value("arch_date");
     }
     else if(ui.radioCurrent->isChecked()) {
         file = QString("%1%2/rockbox.zip")
-            .arg(settings->bleedingUrl(), buildname);
+            .arg(settings->value(RbSettings::BleedingUrl).toString(), buildname);
         fileName = QString("rockbox.zip");
-        settings->setBuild("current");
+        settings->setValue(RbSettings::Build, "current");
         myversion = "r" + version.value("bleed_rev");
     }
     else {
@@ -162,7 +162,8 @@ void Install::accept()
         //! create backup
         RbZip backup;
         connect(&backup,SIGNAL(zipProgress(int,int)),logger,SLOT(setProgress(int,int)));
-        if(backup.createZip(m_backupName,settings->mountpoint() + "/.rockbox") == Zip::Ok)
+        if(backup.createZip(m_backupName,
+            settings->value(RbSettings::Mountpoint).toString() + "/.rockbox") == Zip::Ok)
         {
             logger->addItem(tr("Backup successful"),LOGOK);
         }
@@ -178,7 +179,7 @@ void Install::accept()
     installer = new ZipInstaller(this);
     installer->setUrl(file);
     installer->setLogSection("Rockbox (Base)");
-    if(!settings->cacheDisabled()
+    if(!settings->value(RbSettings::CacheDisabled).toBool()
         && !ui.checkBoxCache->isChecked())
     {
         installer->setCache(true);
@@ -218,9 +219,9 @@ void Install::done(bool error)
     // no error, close the window, when the logger is closed
     connect(logger,SIGNAL(closed()),this,SLOT(close()));
     // add platform info to log file for later detection
-    QSettings installlog(settings->mountpoint()
+    QSettings installlog(settings->value(RbSettings::Mountpoint).toString()
             + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
-    installlog.setValue("platform", settings->curPlatform());
+    installlog.setValue("platform", settings->value(RbSettings::Platform).toString());
     installlog.sync();
 }
 
@@ -288,11 +289,12 @@ void Install::setVersionStrings(QMap<QString, QString>& ver)
 
     // try to use the old selection first. If no selection has been made
     // in the past, use a preselection based on released status.
-    if(settings->build() == "stable" && !version.value("rel_rev").isEmpty())
+    if(settings->value(RbSettings::Build).toString() == "stable"
+        && !version.value("rel_rev").isEmpty())
         ui.radioStable->setChecked(true);
-    else if(settings->build() == "archived")
+    else if(settings->value(RbSettings::Build).toString() == "archived")
         ui.radioArchived->setChecked(true);
-    else if(settings->build() == "current")
+    else if(settings->value(RbSettings::Build).toString() == "current")
         ui.radioCurrent->setChecked(true);
     else if(!version.value("rel_rev").isEmpty()) {
         ui.radioStable->setChecked(true);

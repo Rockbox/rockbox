@@ -25,10 +25,79 @@
 #include <unistd.h>
 #endif
 
+// device settings
+const static struct {
+    RbSettings::SystemSettings setting;
+    const char* name;
+    const char* def;
+} SystemSettingsList[] = {
+    { RbSettings::ManualUrl,            "manual_url",           "" },
+    { RbSettings::BleedingUrl,          "bleeding_url",         "" },
+    { RbSettings::BootloaderUrl,        "bootloader_url",       "" },
+    { RbSettings::BootloaderInfoUrl,    "bootloader_info_url",  "" },
+    { RbSettings::FontUrl,              "font_url",             "" },
+    { RbSettings::VoiceUrl,             "voice_url",            "" },
+    { RbSettings::DoomUrl,              "doom_url",             "" },
+    { RbSettings::ReleaseUrl,           "release_url",          "" },
+    { RbSettings::DailyUrl,             "daily_url",            "" },
+    { RbSettings::ServerConfUrl,        "server_conf_url",      "" },
+    { RbSettings::GenlangUrl,           "genlang_url",          "" },
+    { RbSettings::ThemesUrl,            "themes_url",           "" },
+    { RbSettings::BleedingInfo,         "bleeding_info",        "" },
+    { RbSettings::CurPlatformName,      ":platform:/name",      "" },
+    { RbSettings::CurManual,            ":platform:/manual",    "rockbox-:platform:" },
+    { RbSettings::CurBootloaderMethod,  ":platform:/bootloadermethod", "none" },
+    { RbSettings::CurBootloaderName,    ":platform:/bootloadername", "" },
+    { RbSettings::CurBootloaderFile,    ":platform:/bootloaderfile", "" },
+    { RbSettings::CurEncoder,           ":platform:/encoder",   "" },
+    { RbSettings::CurResolution,        ":platform:/resolution", "" },
+    { RbSettings::CurBrand,             ":platform:/brand",     "" },
+    { RbSettings::CurName,              ":platform:/name",      "" },
+    { RbSettings::CurBuildserverModel,  ":platform:/buildserver_modelname", "" },
+    { RbSettings::CurConfigureModel,    ":platform:/configure_modelname", "" },
+    { RbSettings::CurTargetId,          ":platform:/targetid",  "" },
+};
+
+// user settings
+const static struct {
+    RbSettings::UserSettings setting;
+    const char* name;
+    const char* def;
+} UserSettingsList[] = {
+    { RbSettings::RbutilVersion,        "rbutil_version",       "" },
+    { RbSettings::CurrentPlatform,      "platform",             "" },
+    { RbSettings::Mountpoint,           "mountpoint",           "" },
+    { RbSettings::CachePath,            "cachepath",            "" },
+    { RbSettings::Build,                "build",                "" },
+    { RbSettings::ProxyType,            "proxytype",            "" },
+    { RbSettings::Proxy,                "proxy",                "" },
+    { RbSettings::OfPath,               "ofpath",               "" },
+    { RbSettings::Platform,             "platform",             "" },
+    { RbSettings::Language,             "lang",                 "" },
+    { RbSettings::Tts,                  "tts",                  "" },
+    { RbSettings::LastTalkedFolder,     "last_talked_folder",   "" },
+    { RbSettings::VoiceLanguage,        "voicelanguage",        "" },
+    { RbSettings::TtsLanguage,          ":tts:/language",       "" },
+    { RbSettings::TtsOptions,           ":tts:/options",        "" },
+    { RbSettings::TtsPath,              ":tts:/path",           "" },
+    { RbSettings::TtsVoice,             ":tts:/voice",          "" },
+    { RbSettings::EncoderPath,          ":encoder:/encoderpath",        "" },
+    { RbSettings::EncoderOptions,       ":encoder:/encoderoptions",     "" },
+    { RbSettings::CacheOffline,         "offline",              "false" },
+    { RbSettings::CacheDisabled,        "cachedisable",         "false" },
+    { RbSettings::TtsUseSapi4,          "sapi/useSapi4",        "false" },
+    { RbSettings::EncoderNarrowBand,    ":encoder:/narrowband", "false" },
+    { RbSettings::WavtrimThreshold,     "wavtrimthreshold",     "500"},
+    { RbSettings::TtsSpeed,             ":tts:/speed",          "0" },
+    { RbSettings::EncoderComplexity,    ":encoder:/complexity", "10" },
+    { RbSettings::EncoderQuality,       ":encoder:/quality",    "8.0" },
+    { RbSettings::EncoderVolume,        ":encoder:/volume",     "1.0" },
+};
+
 void RbSettings::open()
 {
     // only use built-in rbutil.ini
-    devices = new QSettings(":/ini/rbutil.ini", QSettings::IniFormat, 0);
+    systemSettings = new QSettings(":/ini/rbutil.ini", QSettings::IniFormat, 0);
      // portable installation:
     // check for a configuration file in the program folder.
     QFileInfo config;
@@ -74,331 +143,99 @@ void RbSettings::sync()
 #endif
 }
 
-QVariant RbSettings::deviceSettingCurGet(QString entry,QString def)
+
+QVariant RbSettings::value(enum SystemSettings setting)
 {
-    QString platform = userSettings->value("platform").toString();
-    devices->beginGroup(platform);
-    QVariant result = devices->value(entry,def);
-    devices->endGroup();
-    return result;
+    // locate setting item
+    int i = 0;
+    while(SystemSettingsList[i].setting != setting)
+        i++;
+
+    QString s = constructSettingPath(SystemSettingsList[i].name);
+    QString d = SystemSettingsList[i].def;
+    d.replace(":platform:", userSettings->value("platform").toString());
+    qDebug() << "[Settings] GET S:" << s << systemSettings->value(s, d).toString();
+    return systemSettings->value(s, d);
 }
 
-QVariant RbSettings::userSettingsGroupGet(QString group,QString entry,QVariant def)
-{
-    userSettings->beginGroup(group);
-    QVariant result = userSettings->value(entry,def);
-    userSettings->endGroup();
-    return result;
-}
-
-void RbSettings::userSettingsGroupSet(QString group,QString entry,QVariant value)
-{
-    userSettings->beginGroup(group);
-    userSettings->setValue(entry,value);
-    userSettings->endGroup();
-}
 
 QString RbSettings::userSettingFilename()
 {
     return userSettings->fileName();
 }
 
-QString RbSettings::curVersion()
+
+QVariant RbSettings::subValue(QString& sub, enum UserSettings setting)
 {
-    return userSettings->value("rbutil_version").toString();
+    // locate setting item
+    int i = 0;
+    while(UserSettingsList[i].setting != setting)
+        i++;
+
+    QString s = constructSettingPath(UserSettingsList[i].name, sub);
+    qDebug() << "[Settings] GET U:" << s << userSettings->value(s).toString();
+    return userSettings->value(s, UserSettingsList[i].def);
 }
 
-bool RbSettings::cacheOffline()
+
+void RbSettings::setSubValue(QString& sub, enum UserSettings setting, QVariant value)
 {
-    return userSettings->value("offline").toBool();
+    // locate setting item
+    int i = 0;
+    while(UserSettingsList[i].setting != setting)
+        i++;
+
+    QString s = constructSettingPath(UserSettingsList[i].name, sub);
+    qDebug() << "[Settings] SET U:" << s << userSettings->value(s).toString();
+    userSettings->setValue(s, value);
 }
 
-QString RbSettings::mountpoint()
-{
-    return userSettings->value("mountpoint").toString();
-}
 
-QString RbSettings::manualUrl()
-{
-    return devices->value("manual_url").toString();
-}
 
-QString RbSettings::bleedingUrl()
-{
-    return devices->value("bleeding_url").toString();
-}
-
-QString RbSettings::cachePath()
-{
-    return userSettings->value("cachepath", QDir::tempPath()).toString();
-}
-
-QString RbSettings::build()
-{
-    return userSettings->value("build").toString();
-}
-
-QString RbSettings::bootloaderUrl()
-{
-    return devices->value("bootloader_url").toString();
-}
-
-QString RbSettings::bootloaderInfoUrl()
-{
-    return devices->value("bootloader_info_url").toString();
-}
-
-QString RbSettings::fontUrl()
-{
-    return devices->value("font_url").toString();
-}
-
-QString RbSettings::voiceUrl()
-{
-    return devices->value("voice_url").toString();
-}
-
-QString RbSettings::doomUrl()
-{
-    return devices->value("doom_url").toString();
-}
-
-QString RbSettings::releaseUrl()
-{
-    return devices->value("release_url").toString();
-}
-
-QString RbSettings::dailyUrl()
-{
-    return devices->value("daily_url").toString();
-}
-
-QString RbSettings::serverConfUrl()
-{
-    return devices->value("server_conf_url").toString();
-}
-
-QString RbSettings::genlangUrl()
-{
-    return devices->value("genlang_url").toString();
-}
-
-QString RbSettings::themeUrl()
-{
-    return devices->value("themes_url").toString();
-}
-
-QString RbSettings::bleedingInfo()
-{
-    return devices->value("bleeding_info").toString();
-}
-
-bool RbSettings::cacheDisabled()
-{
-    return userSettings->value("cachedisable").toBool();
-}
-
-QString RbSettings::proxyType()
-{
-    return userSettings->value("proxytype", "none").toString();
-}
-
-QString RbSettings::proxy()
-{
-    return userSettings->value("proxy").toString();
-}
-
-QString RbSettings::ofPath()
-{
-    return userSettings->value("ofpath").toString();
-}
-
-QString RbSettings::curBrand()
-{
-    QString platform = userSettings->value("platform").toString();
-    return brand(platform);
-}
-
-QString RbSettings::curName()
-{
-    QString platform = userSettings->value("platform").toString();
-    return name(platform);
-}
-
-QString RbSettings::curPlatform()
-{
-    return userSettings->value("platform").toString();
-}
-
-QString RbSettings::curBuildserver_Modelname()
-{
-    return deviceSettingCurGet("buildserver_modelname").toString();
-}
-
-QString RbSettings::curManual()
-{
-    return deviceSettingCurGet("manualname","rockbox-" +
-            devices->value("platform").toString()).toString();
-}
-
-QString RbSettings::curBootloaderMethod()
-{
-    return deviceSettingCurGet("bootloadermethod", "none").toString();
-}
-
-QString RbSettings::curBootloaderName()
-{
-    return deviceSettingCurGet("bootloadername").toString();
-}
-
-QString RbSettings::curBootloaderFile()
-{
-    return deviceSettingCurGet("bootloaderfile").toString();
-}
-
-QString RbSettings::curConfigure_Modelname()
-{
-    return deviceSettingCurGet("configure_modelname").toString();
-}
-
-QString RbSettings::curLang()
-{
-    // QSettings::value only returns the default when the setting
-    // doesn't exist. Make sure to return the system language if
-    // the language in the configuration is present but empty too.
-    QString lang = userSettings->value("lang").toString();
-    if(lang.isEmpty())
-        lang = QLocale::system().name();
-    return lang;
-}
-
-QString RbSettings::curEncoder()
-{
-    return deviceSettingCurGet("encoder").toString();
-}
-
-QString RbSettings::curTTS()
-{
-    return userSettings->value("tts").toString();
-}
-
-QString RbSettings::lastTalkedFolder()
-{
-    return userSettings->value("last_talked_folder").toString();
-}
-
-QString RbSettings::voiceLanguage()
-{
-    return userSettings->value("voicelanguage").toString();
-}
-
-int RbSettings::wavtrimTh()
-{
-    return userSettings->value("wavtrimthreshold",500).toInt();
-}
-
-QString RbSettings::ttsPath(QString tts)
-{
-    return userSettingsGroupGet(tts,"ttspath").toString();
-}
-QString RbSettings::ttsOptions(QString tts)
-{
-    return userSettingsGroupGet(tts,"ttsoptions").toString();
-}
-QString RbSettings::ttsVoice(QString tts)
-{
-    return userSettingsGroupGet(tts,"ttsvoice","Microsoft Sam").toString();
-}
-int RbSettings::ttsSpeed(QString tts)
-{
-    return userSettingsGroupGet(tts,"ttsspeed",0).toInt();
-}
-QString RbSettings::ttsLang(QString tts)
-{
-    return userSettingsGroupGet(tts,"ttslanguage","english").toString();
-}
-
-bool RbSettings::ttsUseSapi4()
-{
-    return userSettingsGroupGet("sapi","useSapi4",false).toBool();
-}
-
-QString RbSettings::encoderPath(QString enc)
-{
-    return userSettingsGroupGet(enc,"encoderpath").toString();
-}
-QString RbSettings::encoderOptions(QString enc)
-{
-    return userSettingsGroupGet(enc,"encoderoptions").toString();
-}
-
-double RbSettings::encoderQuality(QString enc)
-{
-    return userSettingsGroupGet(enc,"quality",8.f).toDouble();
-}
-int RbSettings::encoderComplexity(QString enc)
-{
-    return userSettingsGroupGet(enc,"complexity",10).toInt();
-}
-double RbSettings::encoderVolume(QString enc)
-{
-    return userSettingsGroupGet(enc,"volume",1.f).toDouble();
-}
-bool RbSettings::encoderNarrowband(QString enc)
-{
-    return userSettingsGroupGet(enc,"narrowband",false).toBool();
-}
-
-QStringList RbSettings::allPlatforms()
+QStringList RbSettings::platforms()
 {
     QStringList result;
-    devices->beginGroup("platforms");
-    QStringList a = devices->childKeys();
+    systemSettings->beginGroup("platforms");
+    QStringList a = systemSettings->childKeys();
     for(int i = 0; i < a.size(); i++)
     {
-        result.append(devices->value(a.at(i), "null").toString());
+        result.append(systemSettings->value(a.at(i), "null").toString());
     }
-    devices->endGroup();
+    systemSettings->endGroup();
     return result;
 }
 
-QStringList RbSettings::allLanguages()
+QStringList RbSettings::languages()
 {
     QStringList result;
-    devices->beginGroup("languages");
-    QStringList a = devices->childKeys();
+    systemSettings->beginGroup("languages");
+    QStringList a = systemSettings->childKeys();
     for(int i = 0; i < a.size(); i++)
     {
-        result.append(devices->value(a.at(i), "null").toString());
+        result.append(systemSettings->value(a.at(i), "null").toString());
     }
-    devices->endGroup();
+    systemSettings->endGroup();
     return result;
 }
 
-QString RbSettings::name(QString plattform)
+QString RbSettings::name(QString platform)
 {
-    devices->beginGroup(plattform);
-    QString name = devices->value("name").toString();
-    devices->endGroup();
-    return name;
+    return systemSettings->value(platform + "/name").toString();
 }
 
-QString RbSettings::brand(QString plattform)
+QString RbSettings::brand(QString platform)
 {
-    devices->beginGroup(plattform);
-    QString brand = devices->value("brand").toString();
-    devices->endGroup();
-    return brand;
+    return systemSettings->value(platform + "/brand").toString();
 }
 
 QMap<int, QString> RbSettings::usbIdMap(enum MapType type)
 {
     QMap<int, QString> map;
-     // get a list of ID -> target name
+    // get a list of ID -> target name
     QStringList platforms;
-    devices->beginGroup("platforms");
-    platforms = devices->childKeys();
-    devices->endGroup();
+    systemSettings->beginGroup("platforms");
+    platforms = systemSettings->childKeys();
+    systemSettings->endGroup();
 
     QString t;
     switch(type) {
@@ -415,161 +252,34 @@ QMap<int, QString> RbSettings::usbIdMap(enum MapType type)
 
     for(int i = 0; i < platforms.size(); i++)
     {
-        devices->beginGroup("platforms");
-        QString target = devices->value(platforms.at(i)).toString();
-        devices->endGroup();
-        devices->beginGroup(target);
-        QStringList ids = devices->value(t).toStringList();
+        systemSettings->beginGroup("platforms");
+        QString target = systemSettings->value(platforms.at(i)).toString();
+        systemSettings->endGroup();
+        systemSettings->beginGroup(target);
+        QStringList ids = systemSettings->value(t).toStringList();
         int j = ids.size();
         while(j--)
             map.insert(ids.at(j).toInt(0, 16), target);
 
-        devices->endGroup();
+        systemSettings->endGroup();
     }
     return map;
 }
 
 
-QString RbSettings::curResolution()
+QString RbSettings::constructSettingPath(QString path, QString substitute)
 {
-    return deviceSettingCurGet("resolution").toString();
-}
+    QString platform = userSettings->value("platform").toString();
+    if(!substitute.isEmpty()) {
+        path.replace(":tts:", substitute);
+        path.replace(":encoder:", substitute);
+    }
+    else {
+        path.replace(":tts:", userSettings->value("tts").toString());
+        path.replace(":encoder:", systemSettings->value(platform + "/encoder").toString());
+    }
+    path.replace(":platform:", platform);
 
-int RbSettings::curTargetId()
-{
-    return deviceSettingCurGet("targetid").toInt();
-}
-
-void RbSettings::setCurVersion(QString version)
-{
-    userSettings->setValue("rbutil_version",version);
-}
-
-void RbSettings::setOfPath(QString path)
-{
-    userSettings->setValue("ofpath",path);
-}
-
-void RbSettings::setCachePath(QString path)
-{
-    userSettings->setValue("cachepath", path);
-}
-
-void RbSettings::setBuild(QString build)
-{
-    userSettings->setValue("build", build);
-}
-
-void RbSettings::setLastTalkedDir(QString dir)
-{
-    userSettings->setValue("last_talked_folder", dir);
-}
-
-void RbSettings::setVoiceLanguage(QString dir)
-{
-    userSettings->setValue("voicelanguage", dir);
-}
-
-void RbSettings::setWavtrimTh(int th)
-{
-    userSettings->setValue("wavtrimthreshold", th);
-}
-
-void RbSettings::setProxy(QString proxy)
-{
-    userSettings->setValue("proxy", proxy);
-}
-
-void RbSettings::setProxyType(QString proxytype)
-{
-    userSettings->setValue("proxytype", proxytype);
-}
-
-void RbSettings::setLang(QString lang)
-{
-    userSettings->setValue("lang", lang);
-}
-
-void RbSettings::setMountpoint(QString mp)
-{
-    userSettings->setValue("mountpoint",mp);
-}
-
-void RbSettings::setCurPlatform(QString platt)
-{
-    userSettings->setValue("platform",platt);
-}
-
-
-void RbSettings::setCacheDisable(bool on)
-{
-    userSettings->setValue("cachedisable",on);
-}
-
-void RbSettings::setCacheOffline(bool on)
-{
-    userSettings->setValue("offline",on);
-}
-
-void RbSettings::setCurTTS(QString tts)
-{
-    userSettings->setValue("tts",tts);
-}
-
-void RbSettings::setTTSPath(QString tts, QString path)
-{
-    userSettingsGroupSet(tts,"ttspath",path);
-}
-
-void RbSettings::setTTSOptions(QString tts, QString options)
-{
-    userSettingsGroupSet(tts,"ttsoptions",options);
-}
-
-void RbSettings::setTTSVoice(QString tts, QString voice)
-{
-    userSettingsGroupSet(tts,"ttsvoice",voice);
-}
-
-void RbSettings::setTTSSpeed(QString tts, int speed)
-{
-    userSettingsGroupSet(tts,"ttsspeed",speed);
-}
-
-void RbSettings::setTTSLang(QString tts, QString lang)
-{
-    userSettingsGroupSet(tts,"ttslanguage",lang);
-}
-
-void RbSettings::setTTSUseSapi4(bool value)
-{
-    userSettingsGroupSet("sapi","useSapi4",value);
-}
-
-void RbSettings::setEncoderPath(QString enc, QString path)
-{
-    userSettingsGroupSet(enc,"encoderpath",path);
-}
-
-void RbSettings::setEncoderOptions(QString enc, QString options)
-{
-    userSettingsGroupSet(enc,"encoderoptions",options);
-}
-
-void RbSettings::setEncoderQuality(QString enc, double q)
-{
-    userSettingsGroupSet(enc,"quality",q);
-}
-void RbSettings::setEncoderComplexity(QString enc, int c)
-{
-    userSettingsGroupSet(enc,"complexity",c);
-}
-void RbSettings::setEncoderVolume(QString enc,double v)
-{
-    userSettingsGroupSet(enc,"volume",v);
-}
-void RbSettings::setEncoderNarrowband(QString enc,bool nb)
-{
-    userSettingsGroupSet(enc,"narrowband",nb);
+    return path;
 }
 

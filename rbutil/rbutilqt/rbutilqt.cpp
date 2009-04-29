@@ -154,13 +154,13 @@ void RbUtilQt::downloadInfo()
     connect(daily, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
     connect(daily, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadDone(int, bool)));
     connect(qApp, SIGNAL(lastWindowClosed()), daily, SLOT(abort()));
-    if(settings->cacheOffline())
+    if(settings->value(RbSettings::CacheOffline).toBool())
         daily->setCache(true);
     else
         daily->setCache(false);
     qDebug() << "downloading build info";
     daily->setFile(&buildInfo);
-    daily->getFile(QUrl(settings->serverConfUrl()));
+    daily->getFile(QUrl(settings->value(RbSettings::ServerConfUrl).toString()));
 }
 
 
@@ -181,7 +181,7 @@ void RbUtilQt::downloadDone(bool error)
     versmap.insert("arch_date", info.value("dailies/date").toString());
 
     info.beginGroup("release");
-    versmap.insert("rel_rev", info.value(settings->curBuildserver_Modelname()).toString());
+    versmap.insert("rel_rev", info.value(settings->value(RbSettings::CurBuildserverModel).toString()).toString());
     info.endGroup();
 
     if(versmap.value("rel_rev").isEmpty()) {
@@ -197,12 +197,12 @@ void RbUtilQt::downloadDone(bool error)
     connect(bleeding, SIGNAL(done(bool)), this, SLOT(downloadBleedingDone(bool)));
     connect(bleeding, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadDone(int, bool)));
     connect(qApp, SIGNAL(lastWindowClosed()), daily, SLOT(abort()));
-    if(settings->cacheOffline())
+    if(settings->value(RbSettings::CacheOffline).toBool())
         bleeding->setCache(true);
     bleeding->setFile(&bleedingInfo);
-    bleeding->getFile(QUrl(settings->bleedingInfo()));
+    bleeding->getFile(QUrl(settings->value(RbSettings::BleedingInfo).toString()));
 
-    if(settings->curVersion() != PUREVERSION) {
+    if(settings->value(RbSettings::RbutilVersion) != PUREVERSION) {
         QApplication::processEvents();
         QMessageBox::information(this, tr("New installation"),
             tr("This is a new installation of Rockbox Utility, or a new version. "
@@ -303,23 +303,23 @@ void RbUtilQt::updateSettings()
     qDebug() << "updateSettings()";
     updateDevice();
     updateManual();
-    if(settings->proxyType() == "system") {
+    if(settings->value(RbSettings::ProxyType) == "system") {
         HttpGet::setGlobalProxy(Detect::systemProxy());
     }
-    else if(settings->proxyType() == "manual") {
-        HttpGet::setGlobalProxy(settings->proxy());
+    else if(settings->value(RbSettings::ProxyType) == "manual") {
+        HttpGet::setGlobalProxy(settings->value(RbSettings::Proxy).toString());
     }
     else {
         HttpGet::setGlobalProxy(QUrl(""));
     }
-    HttpGet::setGlobalCache(settings->cachePath());
-    HttpGet::setGlobalDumbCache(settings->cacheOffline());
+    HttpGet::setGlobalCache(settings->value(RbSettings::CachePath).toString());
+    HttpGet::setGlobalDumbCache(settings->value(RbSettings::CacheOffline).toBool());
 }
 
 
 void RbUtilQt::updateDevice()
 {
-    if(settings->curBootloaderMethod() == "none" ) {
+    if(settings->value(RbSettings::CurBootloaderMethod) == "none" ) {
         ui.buttonBootloader->setEnabled(false);
         ui.buttonRemoveBootloader->setEnabled(false);
         ui.labelBootloader->setEnabled(false);
@@ -328,7 +328,7 @@ void RbUtilQt::updateDevice()
     else {
         ui.buttonBootloader->setEnabled(true);
         ui.labelBootloader->setEnabled(true);
-        if(settings->curBootloaderMethod() == "fwpatcher") {
+        if(settings->value(RbSettings::CurBootloaderMethod) == "fwpatcher") {
             ui.labelRemoveBootloader->setEnabled(false);
             ui.buttonRemoveBootloader->setEnabled(false);
         }
@@ -339,9 +339,9 @@ void RbUtilQt::updateDevice()
     }
 
     // displayed device info
-    QString mountpoint = settings->mountpoint();
-    QString brand = settings->curBrand();
-    QString name = settings->curName();
+    QString mountpoint = settings->value(RbSettings::Mountpoint).toString();
+    QString brand = settings->value(RbSettings::CurBrand).toString();
+    QString name = settings->value(RbSettings::CurName).toString();
     if(name.isEmpty()) name = "&lt;none&gt;";
     if(mountpoint.isEmpty()) mountpoint = "&lt;invalid&gt;";
     ui.labelDevice->setText(tr("<b>%1 %2</b> at <b>%3</b>")
@@ -351,16 +351,18 @@ void RbUtilQt::updateDevice()
 
 void RbUtilQt::updateManual()
 {
-    if(settings->curPlatform() != "")
+    if(settings->value(RbSettings::Platform) != "")
     {
-        QString manual= settings->curManual();
+        QString manual= settings->value(RbSettings::CurManual).toString();
 
         if(manual == "")
-            manual = "rockbox-" + settings->curPlatform();
+            manual = "rockbox-" + settings->value(RbSettings::Platform).toString();
         QString pdfmanual;
-        pdfmanual = settings->manualUrl() + "/" + manual + ".pdf";
+        pdfmanual = settings->value(RbSettings::ManualUrl).toString()
+                            + "/" + manual + ".pdf";
         QString htmlmanual;
-        htmlmanual = settings->manualUrl() + "/" + manual + "/rockbox-build.html";
+        htmlmanual = settings->value(RbSettings::ManualUrl).toString()
+                            + "/" + manual + "/rockbox-build.html";
         ui.labelPdfManual->setText(tr("<a href='%1'>PDF Manual</a>")
             .arg(pdfmanual));
         ui.labelHtmlManual->setText(tr("<a href='%1'>HTML Manual (opens in browser)</a>")
@@ -453,7 +455,7 @@ void RbUtilQt::smallInstall()
 
 bool RbUtilQt::smallInstallInner()
 {
-    QString mountpoint = settings->mountpoint();
+    QString mountpoint = settings->value(RbSettings::Mountpoint).toString();
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountpoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
@@ -461,7 +463,7 @@ bool RbUtilQt::smallInstallInner()
         return true;
     }
     // Bootloader
-    if(settings->curBootloaderMethod() != "none")
+    if(settings->value(RbSettings::CurBootloaderMethod) != "none")
     {
         m_error = false;
         m_installed = false;
@@ -513,14 +515,16 @@ void RbUtilQt::installBtn()
 bool RbUtilQt::installAuto()
 {
     QString file = QString("%1/%2/rockbox-%3-%4.zip")
-            .arg(settings->releaseUrl(), versmap.value("rel_rev"),
-               settings->curBuildserver_Modelname(), versmap.value("rel_rev"));
+            .arg(settings->value(RbSettings::ReleaseUrl).toString(),
+                versmap.value("rel_rev"),
+                settings->value(RbSettings::CurBuildserverModel).toString(),
+                versmap.value("rel_rev"));
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
     buildInfo.close();
 
     // check installed Version and Target
-    QString rbVersion = Detect::installedVersion(settings->mountpoint());
+    QString rbVersion = Detect::installedVersion(settings->value(RbSettings::Mountpoint).toString());
     QString warning = Detect::check(settings, false);
 
     if(!warning.isEmpty())
@@ -542,7 +546,7 @@ bool RbUtilQt::installAuto()
            QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
             logger->addItem(tr("Starting backup..."),LOGINFO);
-            QString backupName = settings->mountpoint()
+            QString backupName = settings->value(RbSettings::Mountpoint).toString()
                 + "/.backup/rockbox-backup-" + rbVersion + ".zip";
 
             //! create dir, if it doesnt exist
@@ -556,7 +560,8 @@ bool RbUtilQt::installAuto()
             //! create backup
             RbZip backup;
             connect(&backup,SIGNAL(zipProgress(int,int)),logger, SLOT(setProgress(int,int)));
-            if(backup.createZip(backupName,settings->mountpoint() + "/.rockbox") == Zip::Ok)
+            if(backup.createZip(backupName,
+                settings->value(RbSettings::Mountpoint).toString() + "/.rockbox") == Zip::Ok)
             {
                 logger->addItem(tr("Backup successful"),LOGOK);
             }
@@ -574,9 +579,9 @@ bool RbUtilQt::installAuto()
     installer->setUrl(file);
     installer->setLogSection("Rockbox (Base)");
     installer->setLogVersion(versmap.value("rel_rev"));
-    if(!settings->cacheDisabled())
+    if(!settings->value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
-    installer->setMountPoint(settings->mountpoint());
+    installer->setMountPoint(settings->value(RbSettings::Mountpoint).toString());
 
     connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
 
@@ -618,13 +623,13 @@ void RbUtilQt::installBootloaderBtn()
 
 void RbUtilQt::installBootloader()
 {
-    QString platform = settings->curPlatform();
+    QString platform = settings->value(RbSettings::Platform).toString();
     QString backupDestination = "";
     m_error = false;
 
     // create installer
     BootloaderInstallBase *bl;
-    QString type = settings->curBootloaderMethod();
+    QString type = settings->value(RbSettings::CurBootloaderMethod).toString();
     if(type == "mi4") {
         bl = new BootloaderInstallMi4(this);
     }
@@ -648,21 +653,24 @@ void RbUtilQt::installBootloader()
 
     // set bootloader filename. Do this now as installed() needs it.
     QString blfile;
-    blfile = settings->mountpoint() + settings->curBootloaderFile();
+    blfile = settings->value(RbSettings::Mountpoint).toString()
+            + settings->value(RbSettings::CurBootloaderFile).toString();
     // special case for H10 pure: this player can have a different
     // bootloader file filename. This is handled here to keep the install
     // class clean, though having it here is also not the nicest solution.
-    if(platform == "h10_ums"
-        || platform == "h10_mtp") {
+    if(settings->value(RbSettings::Platform).toString() == "h10_ums"
+        || settings->value(RbSettings::Platform) == "h10_mtp") {
         if(resolvePathCase(blfile).isEmpty())
-            blfile = settings->mountpoint()
-                + settings->curBootloaderName().replace("H10",
-                    "H10EMP", Qt::CaseInsensitive);
+            blfile = settings->value(RbSettings::Mountpoint).toString()
+                + settings->value(RbSettings::CurBootloaderName).toString()
+                    .replace("H10", "H10EMP", Qt::CaseInsensitive);
     }
     bl->setBlFile(blfile);
-    QUrl url(settings->bootloaderUrl() + settings->curBootloaderName());
+    QUrl url(settings->value(RbSettings::BootloaderUrl).toString()
+            + settings->value(RbSettings::CurBootloaderName).toString());
     bl->setBlUrl(url);
-    bl->setLogfile(settings->mountpoint() + "/.rockbox/rbutil.log");
+    bl->setLogfile(settings->value(RbSettings::Mountpoint).toString()
+                    + "/.rockbox/rbutil.log");
 
     if(bl->installed() == BootloaderInstallBase::BootloaderRockbox) {
         if(QMessageBox::question(this, tr("Bootloader detected"),
@@ -684,7 +692,8 @@ void RbUtilQt::installBootloader()
     else if(bl->installed() == BootloaderInstallBase::BootloaderOther
         && bl->capabilities() & BootloaderInstallBase::Backup)
     {
-        QString targetFolder = settings->curPlatform() + " Firmware Backup";
+        QString targetFolder = settings->value(RbSettings::CurPlatformName).toString()
+                                + " Firmware Backup";
         // remove invalid character(s)
         targetFolder.remove(QRegExp("[:/]"));
         if(QMessageBox::question(this, tr("Create Bootloader backup"),
@@ -777,7 +786,8 @@ void RbUtilQt::installBootloaderPost(bool error)
     if(m_auto)
         return;
 
-    QString msg = BootloaderInstallBase::postinstallHints(settings->curPlatform());
+    QString msg = BootloaderInstallBase::postinstallHints(
+                    settings->value(RbSettings::Platform).toString());
     if(!msg.isEmpty()) {
         QMessageBox::information(this, tr("Manual steps required"), msg);
         logger->close();
@@ -809,11 +819,11 @@ void RbUtilQt::installFonts()
     // create zip installer
     installer = new ZipInstaller(this);
 
-    installer->setUrl(settings->fontUrl());
+    installer->setUrl(settings->value(RbSettings::FontUrl).toString());
     installer->setLogSection("Fonts");
     installer->setLogVersion(versmap.value("arch_date"));
-    installer->setMountPoint(settings->mountpoint());
-    if(!settings->cacheDisabled())
+    installer->setMountPoint(settings->value(RbSettings::Mountpoint).toString());
+    if(!settings->value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
 
     connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
@@ -843,17 +853,17 @@ void RbUtilQt::installVoice()
     // create zip installer
     installer = new ZipInstaller(this);
 
-    QString voiceurl = settings->voiceUrl();
+    QString voiceurl = settings->value(RbSettings::VoiceUrl).toString();
 
-    voiceurl += settings->curConfigure_Modelname() + "-" +
+    voiceurl += settings->value(RbSettings::CurConfigureModel).toString() + "-" +
         versmap.value("arch_date") + "-english.zip";
     qDebug() << voiceurl;
 
     installer->setUrl(voiceurl);
     installer->setLogSection("Voice");
     installer->setLogVersion(versmap.value("arch_date"));
-    installer->setMountPoint(settings->mountpoint());
-    if(!settings->cacheDisabled())
+    installer->setMountPoint(settings->value(RbSettings::Mountpoint).toString());
+    if(!settings->value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
     installer->install(logger);
 
@@ -885,7 +895,8 @@ bool RbUtilQt::installDoomAuto()
 
 bool RbUtilQt::hasDoom()
 {
-    QFile doomrock(settings->mountpoint() +"/.rockbox/rocks/games/doom.rock");
+    QFile doomrock(settings->value(RbSettings::Mountpoint).toString()
+                    +"/.rockbox/rocks/games/doom.rock");
     return doomrock.exists();
 }
 
@@ -894,11 +905,11 @@ void RbUtilQt::installDoom()
     // create zip installer
     installer = new ZipInstaller(this);
 
-    installer->setUrl(settings->doomUrl());
+    installer->setUrl(settings->value(RbSettings::DoomUrl).toString());
     installer->setLogSection("Game Addons");
     installer->setLogVersion(versmap.value("arch_date"));
-    installer->setMountPoint(settings->mountpoint());
-    if(!settings->cacheDisabled())
+    installer->setMountPoint(settings->value(RbSettings::Mountpoint).toString());
+    if(!settings->value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
     connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
     installer->install(logger);
@@ -957,11 +968,11 @@ void RbUtilQt::uninstallBootloader(void)
     logger->setProgressVisible(false);
     logger->show();
 
-    QString platform = settings->curPlatform();
+    QString platform = settings->value(RbSettings::Platform).toString();
 
     // create installer
     BootloaderInstallBase *bl;
-    QString type = settings->curBootloaderMethod();
+    QString type = settings->value(RbSettings::CurBootloaderMethod).toString();
     if(type == "mi4") {
         bl = new BootloaderInstallMi4();
     }
@@ -983,13 +994,14 @@ void RbUtilQt::uninstallBootloader(void)
         return;
     }
 
-    QString blfile = settings->mountpoint() + settings->curBootloaderFile();
-    if(settings->curPlatform() == "h10_ums"
-        || settings->curPlatform() == "h10_mtp") {
+    QString blfile = settings->value(RbSettings::Mountpoint).toString()
+        + settings->value(RbSettings::CurBootloaderFile).toString();
+    if(settings->value(RbSettings::Platform).toString() == "h10_ums"
+        || settings->value(RbSettings::Platform).toString() == "h10_mtp") {
         if(resolvePathCase(blfile).isEmpty())
-            blfile = settings->mountpoint()
-                + settings->curBootloaderName().replace("H10",
-                    "H10EMP", Qt::CaseInsensitive);
+            blfile = settings->value(RbSettings::Mountpoint).toString()
+                + settings->value(RbSettings::CurBootloaderName).toString()
+                    .replace("H10", "H10EMP", Qt::CaseInsensitive);
     }
     bl->setBlFile(blfile);
 
@@ -1017,7 +1029,7 @@ void RbUtilQt::downloadManual(void)
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
     buildInfo.close();
 
-    QString manual = settings->curManual();
+    QString manual = settings->value(RbSettings::CurManual).toString();
 
     QString date = (info.value("dailies/date").toString());
 
@@ -1032,14 +1044,14 @@ void RbUtilQt::downloadManual(void)
         target = "/" + manual + "-" + date + "-html.zip";
         section = "Manual (HTML)";
     }
-    manualurl = settings->manualUrl() + "/" + target;
+    manualurl = settings->value(RbSettings::ManualUrl).toString() + "/" + target;
     qDebug() << "manualurl =" << manualurl;
 
     ProgressLoggerGui* logger = new ProgressLoggerGui(this);
     logger->show();
     installer = new ZipInstaller(this);
-    installer->setMountPoint(settings->mountpoint());
-    if(!settings->cacheDisabled())
+    installer->setMountPoint(settings->value(RbSettings::Mountpoint).toString());
+    if(!settings->value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
     installer->setLogSection(section);
     installer->setLogVersion(date);
@@ -1065,24 +1077,28 @@ void RbUtilQt::installPortable(void)
     logger->addItem(tr("Installing Rockbox Utility"), LOGINFO);
 
     // check mountpoint
-    if(!QFileInfo(settings->mountpoint()).isDir()) {
+    if(!QFileInfo(settings->value(RbSettings::Mountpoint).toString()).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
         logger->abort();
         return;
     }
 
     // remove old files first.
-    QFile::remove(settings->mountpoint() + "/RockboxUtility.exe");
-    QFile::remove(settings->mountpoint() + "/RockboxUtility.ini");
+    QFile::remove(settings->value(RbSettings::Mountpoint).toString()
+            + "/RockboxUtility.exe");
+    QFile::remove(settings->value(RbSettings::Mountpoint).toString()
+            + "/RockboxUtility.ini");
     // copy currently running binary and currently used settings file
-    if(!QFile::copy(qApp->applicationFilePath(), settings->mountpoint()
+    if(!QFile::copy(qApp->applicationFilePath(),
+            settings->value(RbSettings::Mountpoint).toString()
             + "/RockboxUtility.exe")) {
         logger->addItem(tr("Error installing Rockbox Utility"), LOGERROR);
         logger->abort();
         return;
     }
     logger->addItem(tr("Installing user configuration"), LOGINFO);
-    if(!QFile::copy(settings->userSettingFilename(), settings->mountpoint()
+    if(!QFile::copy(settings->userSettingFilename(),
+            settings->value(RbSettings::Mountpoint).toString()
             + "/RockboxUtility.ini")) {
         logger->addItem(tr("Error installing user configuration"), LOGERROR);
         logger->abort();
@@ -1100,8 +1116,8 @@ void RbUtilQt::updateInfo()
 {
     qDebug() << "RbUtilQt::updateInfo()";
 
-    QSettings log(settings->mountpoint() + "/.rockbox/rbutil.log",
-                    QSettings::IniFormat, this);
+    QSettings log(settings->value(RbSettings::Mountpoint).toString()
+                    + "/.rockbox/rbutil.log", QSettings::IniFormat, this);
     QStringList groups = log.childGroups();
     QList<QTreeWidgetItem *> items;
     QTreeWidgetItem *w, *w2;
@@ -1137,7 +1153,7 @@ void RbUtilQt::updateInfo()
 
         for(int b = 0; b < keys.size(); b++) {
             QString file;
-            file = settings->mountpoint() + "/" + keys.at(b);
+            file = settings->value(RbSettings::Mountpoint).toString() + "/" + keys.at(b);
             if(QFileInfo(file).isDir())
                 continue;
             w2 = new QTreeWidgetItem(w, QStringList() << "/"
@@ -1162,9 +1178,9 @@ void RbUtilQt::updateInfo()
 
 QUrl RbUtilQt::proxy()
 {
-    if(settings->proxyType() == "manual")
-        return QUrl(settings->proxy());
-    else if(settings->proxy() == "system")
+    if(settings->value(RbSettings::ProxyType) == "manual")
+        return QUrl(settings->value(RbSettings::Proxy).toString());
+    else if(settings->value(RbSettings::ProxyType) == "system")
         return Detect::systemProxy();
     return QUrl("");
 }
@@ -1173,9 +1189,9 @@ QUrl RbUtilQt::proxy()
 bool RbUtilQt::chkConfig(bool warn)
 {
     bool error = false;
-    if(settings->curPlatform().isEmpty()
-        || settings->mountpoint().isEmpty()
-        || !QFileInfo(settings->mountpoint()).isWritable()) {
+    if(settings->value(RbSettings::Platform).toString().isEmpty()
+        || settings->value(RbSettings::Mountpoint).toString().isEmpty()
+        || !QFileInfo(settings->value(RbSettings::Mountpoint).toString()).isWritable()) {
         error = true;
 
         if(warn) QMessageBox::critical(this, tr("Configuration error"),
