@@ -72,6 +72,9 @@ struct font {
     
     /* The number of clipped ascents/descents/total */
     int num_clipped_ascent, num_clipped_descent, num_clipped;
+
+    /* default width in pixels (can be overwritten at char level) */
+    int default_width;
 };
 /* END font.h*/
 
@@ -567,11 +570,13 @@ int bdf_read_header(FILE *fp, struct font* pf)
     char buf[256];
     char facename[256];
     char copyright[256];
+    int is_header = 1;
 
     /* set certain values to errors for later error checking */
     pf->defaultchar = -1;
     pf->ascent = -1;
     pf->descent = -1;
+    pf->default_width = -1;
 
     for (;;) {
         if (!bdf_getline(fp, buf, sizeof(buf))) {
@@ -627,6 +632,19 @@ int bdf_read_header(FILE *fp, struct font* pf)
         if (isprefix(buf, "CHARS ")) {
             if (sscanf(buf, "CHARS %d", &pf->nchars_declared) != 1) {
                 print_error("bad 'CHARS'\n");
+                return 0;
+            }
+            continue;
+        }
+        if (isprefix(buf, "ENDPROPERTIES") || isprefix(buf, "STARTCHAR")) {
+            is_header = 0;
+            continue;
+        }
+
+        /* for BDF version 2.2 */
+        if (is_header && isprefix(buf, "DWIDTH ")) {
+            if (sscanf(buf, "DWIDTH %d", &pf->default_width) != 1) {
+                print_error("bad 'DWIDTH' at font level\n");
                 return 0;
             }
             continue;
@@ -750,6 +768,9 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
 
             if (encoding < 0)
                 continue;
+
+            if (width < 0 && pf->default_width > 0)
+                width = pf->default_width;
 
             /* set bits offset in encode map*/
             if (pf->offset[encoding-pf->firstchar] != -1) {
@@ -992,6 +1013,11 @@ int bdf_analyze_font(FILE *fp, struct font* pf) {
             }
             ignore_char = (encoding < start_char || encoding > limit_char);
             if (!ignore_char) {
+                if (!read_width && pf->default_width > 0)
+                {
+                    width = pf->default_width;
+                    read_width = 1;
+                }
                 if (!read_width || !read_bbx) {
                     print_error("WIDTH or BBX is not specified for character %d\n",
                             encoding);
