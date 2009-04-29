@@ -98,7 +98,7 @@ void CreateVoiceWindow::updateSettings(void)
     ui.comboLanguage->setCurrentIndex(sel);
     
     QString ttsName = settings->value(RbSettings::Tts).toString();
-    TTSBase* tts = TTSBase::getTTS(ttsName);
+    TTSBase* tts = TTSBase::getTTS(this,ttsName);
     tts->setCfg(settings);
     if(tts->configOk())
         ui.labelTtsProfile->setText(tr("Selected TTS engine: <b>%1</b>")
@@ -109,7 +109,7 @@ void CreateVoiceWindow::updateSettings(void)
     
     QString encoder = settings->value(RbSettings::CurEncoder).toString();
     // only proceed if encoder setting is set
-    EncBase* enc = EncBase::getEncoder(encoder);
+    EncBase* enc = EncBase::getEncoder(this,encoder);
     if(enc != NULL) {
         enc->setCfg(settings);
         if(enc->configOk())

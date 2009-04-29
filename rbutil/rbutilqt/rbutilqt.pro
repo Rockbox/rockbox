@@ -64,9 +64,9 @@ SOURCES += rbutilqt.cpp \
  base/utils.cpp \
  preview.cpp \
  encoders.cpp \
- encodersgui.cpp \
+ encttscfggui.cpp \
+ encttssettings.cpp \
  tts.cpp \
- ttsgui.cpp \
  ../../tools/wavtrim.c \
  ../../tools/voicefont.c \
  voicefile.cpp \
@@ -116,9 +116,9 @@ HEADERS += rbutilqt.h \
  base/utils.h \
  preview.h \
  encoders.h \
- encodersgui.h \
+ encttscfggui.h \
+ encttssettings.h \
  tts.h \
- ttsgui.h \
  ../../tools/wavtrim.h \
  ../../tools/voicefont.h \
  voicefile.h \
@@ -167,11 +167,6 @@ FORMS += rbutilqtfrm.ui \
  themesinstallfrm.ui \
  uninstallfrm.ui \
  previewfrm.ui \
- rbspeexcfgfrm.ui \
- encexescfgfrm.ui \
- ttsexescfgfrm.ui \
- sapicfgfrm.ui \
- ttsfestivalcfgform.ui \
  createvoicefrm.ui \
  sysinfofrm.ui
 

@@ -116,7 +116,7 @@ void InstallTalkWindow::setSettings(RbSettings* sett)
 void InstallTalkWindow::updateSettings(void)
 {
     QString ttsName = settings->value(RbSettings::Tts).toString();
-    TTSBase* tts = TTSBase::getTTS(ttsName);
+    TTSBase* tts = TTSBase::getTTS(this,ttsName);
     tts->setCfg(settings);
     if(tts->configOk())
         ui.labelTtsProfile->setText(tr("Selected TTS engine: <b>%1</b>")
@@ -126,7 +126,7 @@ void InstallTalkWindow::updateSettings(void)
             .arg("Invalid TTS configuration!"));
     
     QString encoder = settings->value(RbSettings::CurEncoder).toString();
-    EncBase* enc = EncBase::getEncoder(encoder);
+    EncBase* enc = EncBase::getEncoder(this,encoder);
     if(enc != NULL) {
         enc->setCfg(settings);
         if(enc->configOk())

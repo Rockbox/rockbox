@@ -27,6 +27,7 @@
 #include "encoders.h"
 #include "tts.h"
 #include "detect.h"
+#include "encttscfggui.h"
 
 #include <stdio.h>
 #if defined(Q_OS_WIN32)
@@ -356,7 +357,7 @@ void Config::setDevices()
 void Config::updateTtsState(int index)
 {
     QString ttsName = ui.comboTts->itemData(index).toString();
-    TTSBase* tts = TTSBase::getTTS(ttsName);
+    TTSBase* tts = TTSBase::getTTS(this,ttsName);
     tts->setCfg(settings);
     
     if(tts->configOk())
@@ -386,7 +387,7 @@ void Config::updateEncState()
     ui.encoderName->setText(EncBase::getEncoderName(settings->value(RbSettings::CurEncoder).toString()));
     settings->setValue(RbSettings::Platform, olddevice);
 
-    EncBase* enc = EncBase::getEncoder(encoder);
+    EncBase* enc = EncBase::getEncoder(this,encoder);
     enc->setCfg(settings);
     
     if(enc->configOk())
@@ -666,19 +667,36 @@ void Config::cacheClear()
 void Config::configTts()
 {
     int index = ui.comboTts->currentIndex();
-    TTSBase* tts = TTSBase::getTTS(ui.comboTts->itemData(index).toString());
+    TTSBase* tts = TTSBase::getTTS(this,ui.comboTts->itemData(index).toString());
     
     tts->setCfg(settings);
-    tts->showCfg();
+    EncTtsCfgGui gui(this,tts,TTSBase::getTTSName(settings->value(RbSettings::Tts).toString()));
+    gui.exec();
     updateTtsState(ui.comboTts->currentIndex());
 }
 
 
 void Config::configEnc()
 {
-    EncBase* enc = EncBase::getEncoder(settings->value(RbSettings::CurEncoder).toString());
+    // FIXME: this is a workaround to make the encoder follow the device selection
+    // even with the settings (and thus the device) being saved. Needs to be redone
+    // properly later by extending the settings object
+    if(ui.treeDevices->selectedItems().size() == 0)
+        return;
+
+    QString devname = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
+    QString olddevice = settings->value(RbSettings::CurrentPlatform).toString();
+    settings->setValue(RbSettings::CurrentPlatform,devname);
+    QString encoder = settings->value(RbSettings::CurEncoder).toString();
+    ui.encoderName->setText(EncBase::getEncoderName(settings->value(RbSettings::CurEncoder).toString()));
+    settings->setValue(RbSettings::CurrentPlatform,olddevice);
+
+
+    EncBase* enc = EncBase::getEncoder(this,encoder);
     
     enc->setCfg(settings);
-    enc->showCfg();
+    EncTtsCfgGui gui(this,enc,EncBase::getEncoderName(encoder));
+    gui.exec();
+
     updateEncState();
 }

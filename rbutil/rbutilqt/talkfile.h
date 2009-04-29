@@ -34,7 +34,7 @@ class TalkFileCreator :public QObject
     Q_OBJECT
 
 public:
-    TalkFileCreator(QObject* parent=0);
+    TalkFileCreator(QObject* parent);
 
     bool createTalkFiles(ProgressloggerInterface* logger);
 

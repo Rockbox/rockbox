@@ -128,7 +128,7 @@ void VoiceFileCreator::downloadDone(bool error)
     }
 
     //tts
-    m_tts = TTSBase::getTTS(settings->value(RbSettings::Tts).toString());
+    m_tts = TTSBase::getTTS(this,settings->value(RbSettings::Tts).toString());
     m_tts->setCfg(settings);
 
     QString errStr;
@@ -142,7 +142,7 @@ void VoiceFileCreator::downloadDone(bool error)
     }
 
     // Encoder
-    m_enc = EncBase::getEncoder(settings->value(RbSettings::CurEncoder).toString());
+    m_enc = EncBase::getEncoder(this,settings->value(RbSettings::CurEncoder).toString());
     m_enc->setCfg(settings);
 
     if(!m_enc->start())

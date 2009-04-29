@@ -40,7 +40,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     m_logger->addItem(tr("Starting Talk file generation"),LOGINFO);
 
     //tts
-    m_tts = TTSBase::getTTS(settings->value(RbSettings::Tts).toString());
+    m_tts = TTSBase::getTTS(this,settings->value(RbSettings::Tts).toString());
     m_tts->setCfg(settings);
 
     if(!m_tts->start(&errStr))
@@ -52,7 +52,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     }
 
     // Encoder
-    m_enc = EncBase::getEncoder(settings->value(RbSettings::CurEncoder).toString());
+    m_enc = EncBase::getEncoder(this,settings->value(RbSettings::CurEncoder).toString());
     m_enc->setCfg(settings);
 
     if(!m_enc->start())

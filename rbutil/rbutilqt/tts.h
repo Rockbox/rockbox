@@ -19,52 +19,49 @@
  *
  ****************************************************************************/
 
-
+ 
 #ifndef TTS_H
 #define TTS_H
 
 #include "rbsettings.h"
 #include <QtCore>
 #include <QProcess>
-#include <QProgressDialog>
 #include <QDateTime>
 #include <QRegExp>
 #include <QTcpSocket>
 
-#ifndef CONSOLE
-#include "ttsgui.h"
-#else
-#include "ttsguicli.h"
-#endif
+#include "encttssettings.h"
 
 enum TTSStatus{ FatalError, NoError, Warning };
-class TTSSapi;
-#if defined(Q_OS_LINUX)
-class TTSFestival;
-#endif
-class TTSBase : public QObject
+
+class TTSBase : public EncTtsSettingInterface
 {
     Q_OBJECT
     public:
-        TTSBase();
-        virtual TTSStatus voice(QString text,QString wavfile, QString* errStr)
-        { (void) text; (void) wavfile; (void) errStr; return FatalError;}
-        virtual bool start(QString *errStr) { (void)errStr; return false; }
-        virtual bool stop() { return false; }
-        virtual void showCfg(){}
-        virtual bool configOk() { return false; }
-
-        virtual void setCfg(RbSettings* sett) { settings = sett; }
-
-        static TTSBase* getTTS(QString ttsname);
+        TTSBase(QObject *parent);
+        //! Child class should generate a clip
+        virtual TTSStatus voice(QString text,QString wavfile, QString* errStr) =0;
+        //! Child class should do startup
+        virtual bool start(QString *errStr) =0;
+        //! child class should stop
+        virtual bool stop() =0;
+        
+        // configuration
+        //! Child class should return true, when configuration is good
+        virtual bool configOk()=0;        
+         //! Child class should generate and insertSetting(..) its settings
+        virtual void generateSettings() = 0;
+        //! Chlid class should commit the Settings to permanent storage
+        virtual void saveSettings() = 0;
+        
+        // static functions
+        static TTSBase* getTTS(QObject* parent,QString ttsname);
         static QStringList getTTSList();
-        static QString getTTSName(QString tts);
-
-        public slots:
-            virtual void accept(void){}
-        virtual void reject(void){}
-        virtual void reset(void){}
-
+        static QString getTTSName(QString tts); 
+        
+        // sets the config. Users of TTS classes, always have to call this first
+        void setCfg(RbSettings* sett) { settings = sett; }
+        
     private:
         //inits the tts List
         static void initTTSList();
@@ -72,26 +69,42 @@ class TTSBase : public QObject
     protected:
         RbSettings* settings;
         static QMap<QString,QString> ttsList;
-        static QMap<QString,TTSBase*> ttsCache;
 };
 
 class TTSSapi : public TTSBase
 {
-    Q_OBJECT
+    //! Enum to identify the settings
+    enum ESettings
+    {
+        eLANGUAGE,
+        eVOICE,
+        eSPEED,
+        eOPTIONS
+    };
+    
+ Q_OBJECT
     public:
-        TTSSapi();
-        virtual TTSStatus voice(QString text,QString wavfile, QString *errStr);
-        virtual bool start(QString *errStr);
-        virtual bool stop();
-        virtual void showCfg();
-        virtual bool configOk();
-
+        TTSSapi(QObject* parent=NULL);
+        
+        TTSStatus voice(QString text,QString wavfile, QString *errStr);
+        bool start(QString *errStr);
+        bool stop();
+        
+        // for settings
+        bool configOk();
+        void generateSettings();
+        void saveSettings();
+    
+    private slots:
+        void updateVoiceList();
+        
+    private:       
         QStringList getVoiceList(QString language);
-    private:
+    
         QProcess* voicescript;
         QTextStream* voicestream;
         QString defaultLanguage;
-
+        
         QString m_TTSexec;
         QString m_TTSOpts;
         QString m_TTSTemplate;
@@ -104,16 +117,23 @@ class TTSSapi : public TTSBase
 
 class TTSExes : public TTSBase
 {
+    enum ESettings
+    {
+        eEXEPATH,
+        eOPTIONS
+    };
+    
     Q_OBJECT
     public:
-        TTSExes(QString name);
-        virtual TTSStatus voice(QString text,QString wavfile, QString *errStr);
-        virtual bool start(QString *errStr);
-        virtual bool stop() {return true;}
-        virtual void showCfg();
-        virtual bool configOk();
-
-        virtual void setCfg(RbSettings* sett);
+        TTSExes(QString name,QObject* parent=NULL);
+        TTSStatus voice(QString text,QString wavfile, QString *errStr);
+        bool start(QString *errStr);
+        bool stop() {return true;}
+        
+        // for settings 
+        void generateSettings();
+        void saveSettings();
+        bool configOk();
 
     private:
         QString m_name;
@@ -125,24 +145,41 @@ class TTSExes : public TTSBase
 
 class TTSFestival : public TTSBase
 {
-    Q_OBJECT
-    public:
-        ~TTSFestival();
-        virtual bool configOk();
-        virtual bool start(QString *errStr);
-        virtual bool stop();
-        virtual void showCfg();
-        virtual TTSStatus voice(QString text,QString wavfile,  QString *errStr);
+    enum ESettings
+    {
+        eSERVERPATH,
+        eCLIENTPATH,
+        eVOICE,
+        eVOICEDESC
+    };
+    
+	Q_OBJECT
+public:
+    TTSFestival(QObject* parent=NULL) :TTSBase(parent) {}
+	~TTSFestival();
+	bool start(QString *errStr);
+	bool stop();
+	TTSStatus voice(QString text,QString wavfile,  QString *errStr);
 
-        QStringList  getVoiceList();
-        QString      getVoiceInfo(QString voice);
-    private:
-        inline void    startServer();
-        inline void    ensureServerRunning();
-        QString    queryServer(QString query, int timeout = -1);
-        QProcess serverProcess;
-        QStringList voices;
-        QMap<QString, QString> voiceDescriptions;
+    // for settings 
+    bool configOk();
+    void generateSettings();
+    void saveSettings();
+    
+private slots:
+    void updateVoiceList();
+    void updateVoiceDescription();
+    void clearVoiceDescription();
+private:
+	QStringList  getVoiceList(QString path ="");
+	QString 	 getVoiceInfo(QString voice,QString path ="");
+    
+	inline void	startServer(QString path="");
+	inline void	ensureServerRunning(QString path="");
+	QString	queryServer(QString query, int timeout = -1,QString path="");
+	QProcess serverProcess;
+	QStringList voices;
+	QMap<QString, QString> voiceDescriptions;
 };
 
 #endif

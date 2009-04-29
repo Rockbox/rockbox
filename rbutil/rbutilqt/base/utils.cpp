@@ -130,6 +130,35 @@ qulonglong filesystemFree(QString path)
     return size;
 }
 
+//! \brief searches for a Executable in the Environement Path
+QString findExecutable(QString name)
+{
+    QString exepath;
+    //try autodetect tts   
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+    QStringList path = QString(getenv("PATH")).split(":", QString::SkipEmptyParts);
+#elif defined(Q_OS_WIN)
+    QStringList path = QString(getenv("PATH")).split(";", QString::SkipEmptyParts);
+#endif
+    qDebug() << path;
+    for(int i = 0; i < path.size(); i++) 
+    {
+        QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + name;
+#if defined(Q_OS_WIN)
+        executable += ".exe";
+        QStringList ex = executable.split("\"", QString::SkipEmptyParts);
+        executable = ex.join("");
+#endif
+        qDebug() << executable;
+        if(QFileInfo(executable).isExecutable())
+        {
+            return QDir::toNativeSeparators(executable);
+        }
+    }
+    return "";
+}
+
+
 RockboxInfo::RockboxInfo(QString mountpoint)
 {
     m_path = mountpoint +"/.rockbox/rockbox-info.txt";

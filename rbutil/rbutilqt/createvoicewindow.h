@@ -33,7 +33,7 @@ class CreateVoiceWindow : public QDialog
 {
     Q_OBJECT
     public:
-        CreateVoiceWindow(QWidget *parent = 0);
+        CreateVoiceWindow(QWidget *parent);
         void setSettings(RbSettings* sett);
         void setProxy(QUrl proxy){m_proxy = proxy;}
 

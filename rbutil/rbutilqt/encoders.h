@@ -25,32 +25,38 @@
 #include <QtCore>
  
 #include "rbsettings.h"
-
+#include "encttssettings.h"
 #include "rbspeex.h"
 
 
-class EncBase : public QObject
+class EncBase : public EncTtsSettingInterface
 {
     Q_OBJECT
     public:
         EncBase(QObject *parent );
 
-        virtual bool encode(QString input,QString output)
-            {(void)input; (void)output; return false;}
-        virtual bool start(){return false;}
-        virtual bool stop(){return false;}
-        virtual void showCfg(){}
-        virtual bool configOk(){return false;}
-
-        void setCfg(RbSettings *sett){settings = sett;}
-        static QString getEncoderName(QString);
-        static EncBase* getEncoder(QString);
+        //! Child class should encode a wav file 
+        virtual bool encode(QString input,QString output) =0;
+        //! Child class should do startup
+        virtual bool start()=0;
+        //! Child class should stop
+        virtual bool stop()=0;
+        
+        // settings
+        //! Child class should return true when configuration is ok
+        virtual bool configOk()=0;
+         //! Child class should fill in the setttingsList
+        virtual void generateSettings() = 0;
+        //! Chlid class should commit the from SettingsList to permanent storage
+        virtual void saveSettings() = 0;
+     
+        // static functions
+        static QString getEncoderName(QString name);
+        static EncBase* getEncoder(QObject* parent,QString name);
         static QStringList getEncoderList(void);
-
-    public slots:
-        virtual void accept(void){}
-        virtual void reject(void){}
-        virtual void reset(void){}
+        
+        //set the config. users of Encoder classes, always have to call this first
+        void setCfg(RbSettings *sett){settings = sett;}
     private:
         static void initEncodernamesList(void);
 
@@ -58,22 +64,29 @@ class EncBase : public QObject
         RbSettings* settings;
 
         static QMap<QString,QString> encoderList;
-        static QMap<QString,EncBase*> encoderCache;
 };
-
 
 
 class EncExes : public EncBase
 {
+    enum ESettings
+    {
+        eEXEPATH,
+        eEXEOPTIONS
+    };
+    
     Q_OBJECT
 public:
     EncExes(QString name,QObject *parent = NULL);
-    virtual bool encode(QString input,QString output);
-    virtual bool start();
-    virtual bool stop() {return true;}
-    virtual void showCfg();
-    virtual bool configOk();
+    bool encode(QString input,QString output);
+    bool start();
+    bool stop() {return true;}
     
+    // setting
+    bool configOk();
+    void generateSettings();
+    void saveSettings();
+
 private:
     QString m_name;
     QString m_EncExec;
@@ -84,15 +97,26 @@ private:
 
 class EncRbSpeex : public EncBase 
 {
+    enum ESettings
+    {
+        eVOLUME,
+        eQUALITY,
+        eCOMPLEXITY,
+        eNARROWBAND
+    };
+    
     Q_OBJECT
 public:
     EncRbSpeex(QObject *parent = NULL);
-    virtual bool encode(QString input,QString output);
-    virtual bool start();
-    virtual bool stop() {return true;}
-    virtual void showCfg();
-    virtual bool configOk();
-
+    bool encode(QString input,QString output);
+    bool start();
+    bool stop() {return true;}
+    
+    // for settings view
+    bool configOk();
+    void generateSettings();
+    void saveSettings();
+    
 private:
     float quality;
     float volume;

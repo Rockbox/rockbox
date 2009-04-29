@@ -38,7 +38,7 @@ class VoiceFileCreator :public QObject
 {
     Q_OBJECT
 public:
-    VoiceFileCreator(QObject* parent=0);
+    VoiceFileCreator(QObject* parent);
 
     //start creation
     bool createVoiceFile(ProgressloggerInterface* logger);
