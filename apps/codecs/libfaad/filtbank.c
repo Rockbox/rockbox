@@ -198,8 +198,8 @@ static INLINE void mdct(fb_info *fb, real_t *in_data, real_t *out_data, uint16_t
 
 ALIGN real_t transf_buf[2*1024] IBSS_ATTR;
 
-void ifilter_bank(uint8_t window_sequence,
-                  real_t *freq_in,
+void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
+                  uint8_t window_shape_prev, real_t *freq_in,
                   real_t *time_out, real_t *overlap,
                   uint8_t object_type, uint16_t frame_len)
 {
@@ -232,10 +232,22 @@ void ifilter_bank(uint8_t window_sequence,
         (void) object_type;
 #endif
 
-        window_long       = sine_long_1024;
+    /*AAC uses two different window shapes depending on spectal features*/
+    if(window_shape == 0){
+        window_long  = sine_long_1024;
+        window_short = sine_short_128;
+    } else {
+        window_long  = kbd_long_1024;
+        window_short = kbd_short_128;            
+    }
+    
+    if(window_shape_prev == 0){
+        window_long_prev  = sine_long_1024;
+        window_short_prev = sine_short_128;
+    } else {
         window_long_prev  = kbd_long_1024;
-        window_short      = sine_short_128;
         window_short_prev = kbd_short_128;
+    }
 
 #ifdef LD_DEC
     }
