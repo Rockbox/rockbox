@@ -63,10 +63,10 @@ SOURCES += rbutilqt.cpp \
  uninstallwindow.cpp \
  base/utils.cpp \
  preview.cpp \
- encoders.cpp \
+ base/encoders.cpp \
  encttscfggui.cpp \
- encttssettings.cpp \
- tts.cpp \
+ base/encttssettings.cpp \
+ base/tts.cpp \
  ../../tools/wavtrim.c \
  ../../tools/voicefont.c \
  voicefile.cpp \
@@ -115,10 +115,10 @@ HEADERS += rbutilqt.h \
  uninstallwindow.h \
  base/utils.h \
  preview.h \
- encoders.h \
+ base/encoders.h \
  encttscfggui.h \
- encttssettings.h \
- tts.h \
+ base/encttssettings.h \
+ base/tts.h \
  ../../tools/wavtrim.h \
  ../../tools/voicefont.h \
  voicefile.h \
