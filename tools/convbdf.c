@@ -636,7 +636,7 @@ int bdf_read_header(FILE *fp, struct font* pf)
             }
             continue;
         }
-        if (isprefix(buf, "ENDPROPERTIES") || isprefix(buf, "STARTCHAR")) {
+        if (isprefix(buf, "STARTCHAR")) {
             is_header = 0;
             continue;
         }
