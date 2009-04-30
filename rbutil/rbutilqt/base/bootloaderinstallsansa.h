@@ -38,6 +38,7 @@ class BootloaderInstallSansa : public BootloaderInstallBase
         Capabilities capabilities(void);
 
     private:
+        bool sansaInitialize(struct sansa_t *);
 
     private slots:
         void installStage2(void);

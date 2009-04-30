@@ -22,6 +22,7 @@
 #include "bootloaderinstallipod.h"
 
 #include "../ipodpatcher/ipodpatcher.h"
+#include "autodetection.h"
 
 
 BootloaderInstallIpod::BootloaderInstallIpod(QObject *parent)
@@ -36,7 +37,8 @@ BootloaderInstallIpod::BootloaderInstallIpod(QObject *parent)
 
 BootloaderInstallIpod::~BootloaderInstallIpod()
 {
-    free(ipod_sectorbuf);
+    if(ipod_sectorbuf)
+        free(ipod_sectorbuf);
 }
 
 
@@ -198,12 +200,15 @@ BootloaderInstallBase::BootloaderType BootloaderInstallIpod::installed(void)
         qDebug() << "BootloaderInstallIpod::installed(): BootloaderUnknown";
         result = BootloaderUnknown;
     }
-    else if (ipod.ipod_directory[0].entryOffset == 0) {
-        qDebug() << "BootloaderInstallIpod::installed(): BootloaderOther";
-        result = BootloaderOther;
-    }
     else {
-        qDebug() << "BootloaderInstallIpod::installed(): BootloaderRockbox";
+        read_directory(&ipod);
+        if(ipod.ipod_directory[0].entryOffset == 0) {
+            qDebug() << "BootloaderInstallIpod::installed(): BootloaderOther";
+            result = BootloaderOther;
+        }
+        else {
+            qDebug() << "BootloaderInstallIpod::installed(): BootloaderRockbox";
+        }
     }
     ipod_close(&ipod);
 
@@ -219,20 +224,38 @@ BootloaderInstallBase::Capabilities BootloaderInstallIpod::capabilities(void)
 
 bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
 {
-    ipod_scan(ipod);
+    if(!m_blfile.isEmpty()) {
+#if defined(Q_OS_WIN32)
+        sprintf(ipod->diskname, "\\\\.\\PhysicalDrive%i",
+                Autodetection::resolveDevicename(m_blfile).toInt());
+#elif defined(Q_OS_MACX)
+        sprintf(ipod->diskname,
+            qPrintable(Autodetection::resolveDevicename(m_blfile)
+            .remove(QRegExp("s[0-9]+$"))));
+#else
+        sprintf(ipod->diskname,
+            qPrintable(Autodetection::resolveDevicename(m_blfile)
+            .remove(QRegExp("[0-9]+$"))));
+#endif
+        qDebug() << "ipodpatcher: overriding scan, using" << ipod->diskname;
+    }
+    else {
+        ipod_scan(ipod);
+    }
     if(ipod_open(ipod, 0) < 0) {
         emit logItem(tr("Could not open Ipod"), LOGERROR);
         return false;
     }
 
     if(read_partinfo(ipod, 0) < 0) {
-        emit logItem(tr("Could not read partition table"), LOGERROR);
+        emit logItem(tr("Error reading partition table - possibly not an Ipod"), LOGERROR);
+        ipod_close(ipod);
         return false;
     }
 
     if(ipod->pinfo[0].start == 0) {
         emit logItem(tr("No firmware partition on disk"), LOGERROR);
-
+        ipod_close(ipod);
         return false;
     }
     return true;

@@ -238,6 +238,11 @@ QStringList Autodetection::mountpoints()
     return tempList;
 }
 
+
+/** resolve device name to mount point / drive letter
+ *  @param device device name / disk number
+ *  @return mount point / drive letter
+ */
 QString Autodetection::resolveMountPoint(QString device)
 {
     qDebug() << "Autodetection::resolveMountPoint(QString)" << device;
@@ -289,39 +294,97 @@ QString Autodetection::resolveMountPoint(QString device)
     QString result;
     unsigned int driveno = device.replace(QRegExp("^.*([0-9]+)"), "\\1").toInt();
 
-    for(int letter = 'A'; letter <= 'Z'; letter++) {
-        DWORD written;
-        HANDLE h;
-        TCHAR uncpath[MAX_PATH];
-        UCHAR buffer[0x400];
-        PVOLUME_DISK_EXTENTS extents = (PVOLUME_DISK_EXTENTS)buffer;
-
-        _stprintf(uncpath, _TEXT("\\\\.\\%c:"), letter);
-        h = CreateFile(uncpath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
-                NULL, OPEN_EXISTING, 0, NULL);
-        if(h == INVALID_HANDLE_VALUE) {
-            //qDebug() << "error getting extents for" << uncpath;
-            continue;
+    int letter;
+    for(letter = 'A'; letter <= 'Z'; letter++) {
+        if(resolveDevicename(QString(letter)).toUInt() == driveno) {
+            result = letter;
+            break;
         }
-        // get the extents
-        if(DeviceIoControl(h, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,
-                    NULL, 0, extents, sizeof(buffer), &written, NULL)) {
-            for(unsigned int a = 0; a < extents->NumberOfDiskExtents; a++) {
-                qDebug() << "Disk:" << extents->Extents[a].DiskNumber;
-                if(extents->Extents[a].DiskNumber == driveno) {
-                    result = letter;
-                    qDebug("drive found for volume %i: %c", driveno, letter);
-                    break;
-                }
-            }
-
-        }
-
     }
+    qDebug() << "Autodetection::resolveMountPoint(QString)" << "->" << result;
     if(!result.isEmpty())
         return result + ":/";
 #endif
     return QString("");
+}
+
+
+/** Resolve mountpoint to devicename / disk number
+ *  @param path mountpoint path / drive letter
+ *  @return devicename / disk number
+ */
+QString Autodetection::resolveDevicename(QString path)
+{
+    qDebug() << __func__;
+#if defined(Q_OS_LINUX)
+    FILE *mn = setmntent("/etc/mtab", "r");
+    if(!mn)
+        return QString("");
+
+    struct mntent *ent;
+    while((ent = getmntent(mn))) {
+        if(QString(ent->mnt_dir).startsWith(path)
+           && QString(ent->mnt_type).contains("vfat", Qt::CaseInsensitive)) {
+            endmntent(mn);
+            return QString(ent->mnt_fsname);
+        }
+    }
+    endmntent(mn);
+
+#endif
+
+#if defined(Q_OS_MACX)
+    int num;
+    struct statfs *mntinf;
+
+    num = getmntinfo(&mntinf, MNT_WAIT);
+    while(num--) {
+        if(QString(mntinf->f_mntonname).startsWith(path)
+           && QString(mntinf->f_fstypename).contains("vfat", Qt::CaseInsensitive))
+            return QString(mntinf->f_mntfromname);
+        mntinf++;
+    }
+#endif
+
+#if defined(Q_OS_OPENBSD)
+    int num;
+    struct statfs *mntinf;
+
+    num = getmntinfo(&mntinf, MNT_WAIT);
+    while(num--) {
+        if(QString(mntinf->f_mntonname).startsWith(device)
+           && QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive))
+            return QString(mntinf->f_mntfromname);
+        mntinf++;
+    }
+#endif
+#if defined(Q_OS_WIN32)
+    DWORD written;
+    HANDLE h;
+    TCHAR uncpath[MAX_PATH];
+    UCHAR buffer[0x400];
+    PVOLUME_DISK_EXTENTS extents = (PVOLUME_DISK_EXTENTS)buffer;
+
+    _stprintf(uncpath, _TEXT("\\\\.\\%c:"), path.toAscii().at(0));
+    h = CreateFile(uncpath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+            NULL, OPEN_EXISTING, 0, NULL);
+    if(h == INVALID_HANDLE_VALUE) {
+        //qDebug() << "error getting extents for" << uncpath;
+        return "";
+    }
+    // get the extents
+    if(DeviceIoControl(h, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,
+                NULL, 0, extents, sizeof(buffer), &written, NULL)) {
+        if(extents->NumberOfDiskExtents > 1) {
+            qDebug() << "volume spans multiple disks!";
+            return "";
+        }
+        //qDebug() << "Disk:" << extents->Extents[0].DiskNumber;
+        return QString("%1").arg(extents->Extents[0].DiskNumber);
+    }
+#endif
+    return QString("");
+
 }
 
 

@@ -22,6 +22,7 @@
 #include "bootloaderinstallsansa.h"
 
 #include "../sansapatcher/sansapatcher.h"
+#include "autodetection.h"
 
 BootloaderInstallSansa::BootloaderInstallSansa(QObject *parent)
         : BootloaderInstallBase(parent)
@@ -36,7 +37,8 @@ BootloaderInstallSansa::BootloaderInstallSansa(QObject *parent)
 
 BootloaderInstallSansa::~BootloaderInstallSansa()
 {
-    free(sansa_sectorbuf);
+    if(sansa_sectorbuf)
+        free(sansa_sectorbuf);
 }
 
 
@@ -80,30 +82,12 @@ bool BootloaderInstallSansa::install(void)
 void BootloaderInstallSansa::installStage2(void)
 {
     struct sansa_t sansa;
-    sansa_scan(&sansa);
 
     emit logItem(tr("Installing Rockbox bootloader"), LOGINFO);
     QCoreApplication::processEvents();
-
-    if(sansa_open(&sansa, 0) < 0) {
-        emit logItem(tr("could not open Sansa"), LOGERROR);
-        emit done(true);
-        return;
-    }
-
-    if(sansa_read_partinfo(&sansa, 0) < 0)
-    {
-        emit logItem(tr("could not read partitiontable"), LOGERROR);
-        emit done(true);
-        return;
-    }
-
-    int i = is_sansa(&sansa);
-    if(i < 0) {
-
-        emit logItem(tr("Disk is not a Sansa (Error: %1), aborting.").arg(i), LOGERROR);
-        emit done(true);
-        return;
+    if(!sansaInitialize(&sansa)) {
+            emit done(true);
+            return;
     }
 
     if(sansa.hasoldbootloader) {
@@ -169,27 +153,7 @@ bool BootloaderInstallSansa::uninstall(void)
     emit logItem(tr("Uninstalling bootloader"), LOGINFO);
     QCoreApplication::processEvents();
 
-    if(sansa_scan(&sansa) != 1) {
-        emit logItem(tr("Can't find Sansa"), LOGERROR);
-        emit done(true);
-        return false;
-    }
-
-    if (sansa_open(&sansa, 0) < 0) {
-        emit logItem(tr("Could not open Sansa"), LOGERROR);
-        emit done(true);
-        return false;
-    }
-
-    if (sansa_read_partinfo(&sansa,0) < 0) {
-        emit logItem(tr("Could not read partition table"), LOGERROR);
-        emit done(true);
-        return false;
-    }
-
-    int i = is_sansa(&sansa);
-    if(i < 0) {
-        emit logItem(tr("Disk is not a Sansa (Error %1), aborting.").arg(i), LOGERROR);
+    if(!sansaInitialize(&sansa)) {
         emit done(true);
         return false;
     }
@@ -235,18 +199,7 @@ BootloaderInstallBase::BootloaderType BootloaderInstallSansa::installed(void)
     struct sansa_t sansa;
     int num;
 
-    if(sansa_scan(&sansa) != 1) {
-        return BootloaderUnknown;
-    }
-    if (sansa_open(&sansa, 0) < 0) {
-        return BootloaderUnknown;
-    }
-    if (sansa_read_partinfo(&sansa,0) < 0) {
-        sansa_close(&sansa);
-        return BootloaderUnknown;
-    }
-    if(is_sansa(&sansa) < 0) {
-        sansa_close(&sansa);
+    if(!sansaInitialize(&sansa)) {
         return BootloaderUnknown;
     }
     if((num = sansa_list_images(&sansa)) == 2) {
@@ -259,6 +212,43 @@ BootloaderInstallBase::BootloaderType BootloaderInstallSansa::installed(void)
     }
     return BootloaderUnknown;
 
+}
+
+bool BootloaderInstallSansa::sansaInitialize(struct sansa_t *sansa)
+{
+    if(!m_blfile.isEmpty()) {
+#if defined(Q_OS_WIN32)
+        sprintf(sansa->diskname, "\\\\.\\PhysicalDrive%i",
+                Autodetection::resolveDevicename(m_blfile).toInt());
+#else
+        sprintf(sansa->diskname,
+            qPrintable(Autodetection::resolveDevicename(m_blfile).remove(QRegExp("[0-9]+$"))));
+#endif
+        qDebug() << "sansapatcher: overriding scan, using" << sansa->diskname;
+    }
+    else if(sansa_scan(sansa) != 1) {
+        emit logItem(tr("Can't find Sansa"), LOGERROR);
+        return false;
+    }
+
+    if (sansa_open(sansa, 0) < 0) {
+        emit logItem(tr("Could not open Sansa"), LOGERROR);
+        return false;
+    }
+
+    if (sansa_read_partinfo(sansa,0) < 0) {
+        emit logItem(tr("Could not read partition table"), LOGERROR);
+        sansa_close(sansa);
+        return false;
+    }
+
+    int i = is_sansa(sansa);
+    if(i < 0) {
+        emit logItem(tr("Disk is not a Sansa (Error %1), aborting.").arg(i), LOGERROR);
+        sansa_close(sansa);
+        return false;
+    }
+    return true;
 }
 
 
