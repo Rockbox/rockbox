@@ -22,7 +22,7 @@
 #include "encttssettings.h"
 
     
-EncTtsSetting::EncTtsSetting(QObject* parent,ESettingType type,QString name,QVariant current, EButton btn)
+EncTtsSetting::EncTtsSetting(QObject* parent,ESettingType type,QString name,QVariant current, EButton btn) : QObject(parent)
 {
     m_btn = btn;
     m_name =name;
@@ -30,7 +30,7 @@ EncTtsSetting::EncTtsSetting(QObject* parent,ESettingType type,QString name,QVar
     m_currentValue = current;
 }
  
-EncTtsSetting::EncTtsSetting(QObject* parent,ESettingType type,QString name,QVariant current,QStringList list,EButton btn)
+EncTtsSetting::EncTtsSetting(QObject* parent,ESettingType type,QString name,QVariant current,QStringList list,EButton btn) : QObject(parent)
 {
     m_btn = btn;
     m_name =name;
@@ -39,7 +39,7 @@ EncTtsSetting::EncTtsSetting(QObject* parent,ESettingType type,QString name,QVar
     m_list = list;
 }
 
-EncTtsSetting::EncTtsSetting(QObject* parent,ESettingType type,QString name,QVariant current,QVariant min,QVariant max, EButton btn)
+EncTtsSetting::EncTtsSetting(QObject* parent,ESettingType type,QString name,QVariant current,QVariant min,QVariant max, EButton btn) : QObject(parent)
 {
     m_btn = btn;
     m_name =name;
