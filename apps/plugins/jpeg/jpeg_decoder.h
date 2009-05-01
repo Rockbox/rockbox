@@ -27,62 +27,7 @@
 
 #ifndef _JPEG_JPEG_DECODER_H
 #define _JPEG_JPEG_DECODER_H
-
-#define HUFF_LOOKAHEAD 8 /* # of bits of lookahead */
-
-struct derived_tbl
-{
-    /* Basic tables: (element [0] of each array is unused) */
-    long mincode[17]; /* smallest code of length k */
-    long maxcode[18]; /* largest code of length k (-1 if none) */
-    /* (maxcode[17] is a sentinel to ensure huff_DECODE terminates) */
-    int valptr[17]; /* huffval[] index of 1st symbol of length k */
-
-    /* Back link to public Huffman table (needed only in slow_DECODE) */
-    int* pub;
-
-    /* Lookahead tables: indexed by the next HUFF_LOOKAHEAD bits of
-    the input data stream.  If the next Huffman code is no more
-    than HUFF_LOOKAHEAD bits long, we can obtain its length and
-    the corresponding symbol directly from these tables. */
-    int look_nbits[1<<HUFF_LOOKAHEAD]; /* # bits, or 0 if too long */
-    unsigned char look_sym[1<<HUFF_LOOKAHEAD]; /* symbol, or unused */
-};
-
-#define QUANT_TABLE_LENGTH  64
-
-/* for type of Huffman table */
-#define DC_LEN 28
-#define AC_LEN 178
-
-struct huffman_table
-{   /* length and code according to JFIF format */
-    int huffmancodes_dc[DC_LEN];
-    int huffmancodes_ac[AC_LEN];
-};
-
-struct frame_component
-{
-    int ID;
-    int horizontal_sampling;
-    int vertical_sampling;
-    int quanttable_select;
-};
-
-struct scan_component
-{
-    int ID;
-    int DC_select;
-    int AC_select;
-};
-
-struct bitstream
-{
-    unsigned long get_buffer; /* current bit-extraction buffer */
-    int bits_left; /* # of unused bits in it */
-    unsigned char* next_input_byte;
-    unsigned char* input_end; /* upper limit +1 */
-};
+#include "jpeg_common.h"
 
 struct jpeg
 {
@@ -112,17 +57,6 @@ struct jpeg
     int subsample_x[3]; /* info per component */
     int subsample_y[3];
 };
-
-
-/* possible return flags for process_markers() */
-#define HUFFTAB   0x0001 /* with huffman table */
-#define QUANTTAB  0x0002 /* with quantization table */
-#define APP0_JFIF 0x0004 /* with APP0 segment following JFIF standard */
-#define FILL_FF   0x0008 /* with 0xFF padding bytes at begin/end */
-#define SOF0      0x0010 /* with SOF0-Segment */
-#define DHT       0x0020 /* with Definition of huffman tables */
-#define SOS       0x0040 /* with Start-of-Scan segment */
-#define DQT       0x0080 /* with definition of quantization table */
 
 /* various helper functions */
 void default_huff_tbl(struct jpeg* p_jpeg);

@@ -89,6 +89,7 @@ gui/viewport.c
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 gui/backdrop.c
 recorder/resize.c
+recorder/jpeg_load.c
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS

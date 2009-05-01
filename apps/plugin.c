@@ -643,6 +643,9 @@ static const struct plugin_api rockbox_api = {
 	lcd_pal256_update_pal,
 #endif
 #endif
+#if defined(HAVE_LCD_BITMAP) && LCD_DEPTH > 1
+    read_jpeg_file,
+#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)
