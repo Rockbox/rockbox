@@ -153,8 +153,14 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     /* the first file we look for is one specific to the track playing */
     strip_extension(path, sizeof(path) - strlen(size_string) - 4, trackname);
     strcat(path, size_string);
+#if LCD_DEPTH > 1
+    strcat(path, ".");
+    pathlen = strlen(path);
+    found = try_exts(path, pathlen);
+#else
     strcat(path, ".bmp");
     found = file_exists(path);
+#endif
     if (!found && albumlen > 0)
     {
         /* if it doesn't exist,
