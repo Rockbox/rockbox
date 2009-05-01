@@ -91,6 +91,27 @@ static void fix_path_part(char* path, int offset, int count)
     }
 }
 
+#if LCD_DEPTH > 1
+const char * extensions[] = { "jpeg", "jpg", "bmp" };
+int extension_lens[] = { 4, 3, 3 };
+/* Try checking for several file extensions, return true if a file is found and
+ * leaving the path modified to include the matching extension.
+ */
+static bool try_exts(char *path, int len)
+{
+    int i;
+    for (i = 0; i < 3; i++)
+    {
+        if (extension_lens[i] + len > MAX_PATH)
+            continue;
+        strcpy(path + len, extensions[i]);
+        if (file_exists(path))
+            return true;
+    }
+    return false;
+}
+#endif
+
 /* Look for the first matching album art bitmap in the following list:
  *  ./<trackname><size>.bmp
  *  ./<albumname><size>.bmp
@@ -113,6 +134,9 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     const char *artist;
     int dirlen;
     int albumlen;
+#if LCD_DEPTH > 1
+    int pathlen;
+#endif
 
     if (!id3 || !buf)
         return false;
@@ -135,25 +159,55 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     {
         /* if it doesn't exist,
          * we look for a file specific to the track's album name */
+#if LCD_DEPTH > 1
+        pathlen = snprintf(path, sizeof(path),
+                           "%s%s%s.", dir, id3->album, size_string);
+        fix_path_part(path, dirlen, albumlen);
+        found = try_exts(path, pathlen);
+#else
         snprintf(path, sizeof(path),
                  "%s%s%s.bmp", dir, id3->album, size_string);
         fix_path_part(path, dirlen, albumlen);
         found = file_exists(path);
+#endif
     }
 
     if (!found)
     {
         /* if it still doesn't exist, we look for a generic file */
+#if LCD_DEPTH > 1
+        pathlen = snprintf(path, sizeof(path),
+                           "%scover%s.", dir, size_string);
+        found = try_exts(path, pathlen);
+#else
         snprintf(path, sizeof(path),
                  "%scover%s.bmp", dir, size_string);
         found = file_exists(path);
+#endif
     }
+
+#if LCD_DEPTH > 1
+    if (!found)
+    {
+        snprintf (path, sizeof(path), "%sfolder.jpg", dir);
+        found = file_exists(path);
+    }
+#endif
 
     artist = id3->albumartist != NULL ? id3->albumartist : id3->artist;
 
     if (!found && artist && id3->album)
     {
         /* look in the albumart subdir of .rockbox */
+#if LCD_DEPTH > 1
+        pathlen = snprintf(path, sizeof(path),
+                           ROCKBOX_DIR "/albumart/%s-%s%s.",
+                           artist,
+                           id3->album,
+                           size_string);
+        fix_path_part(path, strlen(ROCKBOX_DIR "/albumart/"), MAX_PATH);
+        found = try_exts(path, pathlen);
+#else
         snprintf(path, sizeof(path),
                 ROCKBOX_DIR "/albumart/%s-%s%s.bmp",
                 artist,
@@ -161,6 +215,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
                 size_string);
         fix_path_part(path, strlen(ROCKBOX_DIR "/albumart/"), MAX_PATH);
         found = file_exists(path);
+#endif
     }
 
     if (!found)
@@ -180,19 +235,32 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
         {
             /* we look in the parent directory
              * for a file specific to the track's album name */
+#if LCD_DEPTH > 1
+            pathlen = snprintf(path, sizeof(path),
+                               "%s%s%s.", dir, id3->album, size_string);
+            fix_path_part(path, dirlen, albumlen);
+            found = try_exts(path, pathlen);
+#else
             snprintf(path, sizeof(path),
                      "%s%s%s.bmp", dir, id3->album, size_string);
             fix_path_part(path, dirlen, albumlen);
             found = file_exists(path);
+#endif
         }
     
         if (!found)
         {
             /* if it still doesn't exist, we look in the parent directory
              * for a generic file */
+#if LCD_DEPTH > 1
+            pathlen = snprintf(path, sizeof(path),
+                               "%scover%s.", dir, size_string);
+            found = try_exts(path, pathlen);
+#else
             snprintf(path, sizeof(path),
                      "%scover%s.bmp", dir, size_string);
             found = file_exists(path);
+#endif
         }
     }
 

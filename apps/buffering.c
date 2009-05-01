@@ -53,6 +53,7 @@
 #include "metadata.h"
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
+#include "jpeg_load.h"
 #endif
 
 #define GUARD_BUFSIZE   (32*1024)
@@ -830,9 +831,10 @@ static bool fill_buffer(void)
 /* Given a file descriptor to a bitmap file, write the bitmap data to the
    buffer, with a struct bitmap and the actual data immediately following.
    Return value is the total size (struct + data). */
-static int load_bitmap(int fd)
+static int load_image(int fd, const char *path)
 {
     int rc;
+    int pathlen = strlen(path);
     struct bitmap *bmp = (struct bitmap *)&buffer[buf_widx];
     /* FIXME: alignment may be needed for the data buffer. */
     bmp->data = &buffer[buf_widx + sizeof(struct bitmap)];
@@ -846,8 +848,12 @@ static int load_bitmap(int fd)
 
     get_albumart_size(bmp);
 
-    rc = read_bmp_fd(fd, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
-                     FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
+    if (strcmp(path + pathlen - 4, ".bmp"))
+        rc = read_jpeg_fd(fd, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
+                         FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
+    else
+        rc = read_bmp_fd(fd, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
+                         FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
     return rc + (rc > 0 ? sizeof(struct bitmap) : 0);
 }
 #endif
@@ -942,7 +948,7 @@ int bufopen(const char *file, size_t offset, enum data_type type)
         /* Bitmap file: we load the data instead of the file */
         int rc;
         mutex_lock(&llist_mutex); /* Lock because load_bitmap yields */
-        rc = load_bitmap(fd);
+        rc = load_image(fd, file);
         mutex_unlock(&llist_mutex);
         if (rc <= 0)
         {
