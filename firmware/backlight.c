@@ -64,6 +64,9 @@ enum {
     BACKLIGHT_ON,
     BACKLIGHT_OFF,
     BACKLIGHT_TMO_CHANGED,
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    BACKLIGHT_BRIGHTNESS_CHANGED,
+#endif
 #ifdef HAVE_REMOTE_LCD
     REMOTE_BACKLIGHT_ON,
     REMOTE_BACKLIGHT_OFF,
@@ -79,7 +82,10 @@ enum {
     BUTTON_LIGHT_ON,
     BUTTON_LIGHT_OFF,
     BUTTON_LIGHT_TMO_CHANGED,
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+    BUTTON_LIGHT_BRIGHTNESS_CHANGED,
 #endif
+#endif /* HAVE_BUTTON_LIGHT */
 #ifdef BACKLIGHT_DRIVER_CLOSE
     BACKLIGHT_QUIT,
 #endif
@@ -604,6 +610,17 @@ void backlight_thread(void)
             case BACKLIGHT_OFF:
                 do_backlight_off();
                 break;
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+            case BACKLIGHT_BRIGHTNESS_CHANGED:
+                backlight_brightness = (int)ev.data;
+                _backlight_set_brightness((int)ev.data);
+#if  (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
+    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
+                /* receive backlight brightness */
+                _backlight_fade_update_state((int)ev.data);
+#endif
+                break;
+#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 #ifdef HAVE_LCD_SLEEP
             case LCD_SLEEP:
                 lcd_sleep();
@@ -619,7 +636,12 @@ void backlight_thread(void)
                 buttonlight_timer = 0;
                 _buttonlight_off();
                 break;
-#endif
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+            case BUTTON_LIGHT_BRIGHTNESS_CHANGED:                
+                _buttonlight_set_brightness((int)ev.data);
+                break;
+#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
+#endif /* HAVE_BUTTON_LIGHT */
 
             case SYS_POWEROFF:  /* Lock backlight on poweroff so it doesn't */
                 locked = true;      /* go off before power is actually cut. */
@@ -922,13 +944,7 @@ void backlight_set_brightness(int val)
     else if (val > MAX_BRIGHTNESS_SETTING)
         val = MAX_BRIGHTNESS_SETTING;
 
-    backlight_brightness = val;
-    _backlight_set_brightness(val);
-#if  (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
-    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
-    /* receive backlight brightness */
-    _backlight_fade_update_state(val);
-#endif
+    queue_post(&backlight_queue, BACKLIGHT_BRIGHTNESS_CHANGED, val);
 }
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
@@ -940,7 +956,7 @@ void buttonlight_set_brightness(int val)
     else if (val > MAX_BRIGHTNESS_SETTING)
         val = MAX_BRIGHTNESS_SETTING;
 
-    _buttonlight_set_brightness(val);
+     queue_post(&backlight_queue, BUTTON_LIGHT_BRIGHTNESS_CHANGED, val);
 }
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
