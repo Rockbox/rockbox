@@ -30,15 +30,21 @@ BootloaderInstallIpod::BootloaderInstallIpod(QObject *parent)
 {
     (void)parent;
     // initialize sector buffer. ipod_sectorbuf is defined in ipodpatcher.
-    ipod_sectorbuf = NULL;
-    ipod_alloc_buffer(&ipod_sectorbuf, BUFFER_SIZE);
+    // The buffer itself is only present once, so make sure to not allocate
+    // it if it was already allocated. The application needs to take care
+    // no concurrent (i.e. multiple objects of this class running) requests
+    // are done.
+    if(ipod_sectorbuf == NULL)
+        ipod_alloc_buffer(&ipod_sectorbuf, BUFFER_SIZE);
 }
 
 
 BootloaderInstallIpod::~BootloaderInstallIpod()
 {
-    if(ipod_sectorbuf)
+    if(ipod_sectorbuf) {
         free(ipod_sectorbuf);
+        ipod_sectorbuf = NULL;
+    }
 }
 
 

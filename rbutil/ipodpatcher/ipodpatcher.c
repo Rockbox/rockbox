@@ -50,7 +50,7 @@
 
 int ipod_verbose = 0;
 
-unsigned char* ipod_sectorbuf;
+unsigned char* ipod_sectorbuf = NULL;
 
 /* The following string appears at the start of the firmware partition */
 static const char *apple_stop_sign = "{{~~  /-----\\   "\

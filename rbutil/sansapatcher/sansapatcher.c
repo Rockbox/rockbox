@@ -47,7 +47,7 @@ int sansa_verbose = 0;
    and initialise it with sansa_alloc_buf() in main().
 */
 
-unsigned char* sansa_sectorbuf;
+unsigned char* sansa_sectorbuf = NULL;
 
 static off_t filesize(int fd) {
     struct stat buf;

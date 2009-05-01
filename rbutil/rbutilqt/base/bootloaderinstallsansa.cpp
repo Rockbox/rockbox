@@ -30,15 +30,21 @@ BootloaderInstallSansa::BootloaderInstallSansa(QObject *parent)
     (void)parent;
     // initialize sector buffer. sansa_sectorbuf is instantiated by
     // sansapatcher.
-    sansa_sectorbuf = NULL;
-    sansa_alloc_buffer(&sansa_sectorbuf, BUFFER_SIZE);
+    // The buffer itself is only present once, so make sure to not allocate
+    // it if it was already allocated. The application needs to take care
+    // no concurrent (i.e. multiple objects of this class running) requests
+    // are done.
+    if(sansa_sectorbuf == NULL)
+        sansa_alloc_buffer(&sansa_sectorbuf, BUFFER_SIZE);
 }
 
 
 BootloaderInstallSansa::~BootloaderInstallSansa()
 {
-    if(sansa_sectorbuf)
+    if(sansa_sectorbuf) {
         free(sansa_sectorbuf);
+        sansa_sectorbuf = NULL;
+    }
 }
 
 
