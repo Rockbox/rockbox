@@ -77,8 +77,9 @@ typedef struct vorbis_dsp_state{
 
   void       *backend_state;
   
-  ogg_int32_t *iram_pcm;  /* IRAM PCM buffer */
-  int iram_pcm_storage;   /* size of IRAM PCM buffer */
+  ogg_int32_t *iram_pcm;        /* IRAM PCM buffer */
+  ogg_int32_t *iram_double_pcm; /* IRAM PCM 2nd buffer */
+  int iram_pcm_storage;         /* size of IRAM PCM buffer */
   bool reset_pcmb;
 } vorbis_dsp_state;
 

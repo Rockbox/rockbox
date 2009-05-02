@@ -39,9 +39,6 @@ static int ilog(unsigned int v){
 static ogg_int32_t* _pcmp [CHANNELS] IBSS_ATTR;
 static ogg_int32_t* _pcmbp[CHANNELS] IBSS_ATTR;
 static ogg_int32_t* _pcmret[CHANNELS] IBSS_ATTR;
-/* if true, we have both pcm buffers in iram and we use a bufferflip.
-   if false, we have one in iram and one in mem, and we use a memcpy */
-static bool iram_pcm_doublebuffer IBSS_ATTR;
 
 /* pcm accumulator examples (not exhaustive):
 
@@ -154,7 +151,6 @@ static int _vds_init(vorbis_dsp_state *v,vorbis_info *vi){
   int i;
   long b_size[2];
   LOOKUP_TNC *iramposw;
-  ogg_int32_t *internal_pcm=NULL;
   
   codec_setup_info *ci=(codec_setup_info *)vi->codec_setup;
   private_state *b=NULL;
@@ -213,14 +209,12 @@ static int _vds_init(vorbis_dsp_state *v,vorbis_info *vi){
   _pcmp[1]=NULL;
   _pcmbp[0]=NULL;
   _pcmbp[1]=NULL;
-  
-  if(NULL != (internal_pcm = iram_malloc(vi->channels*v->pcm_storage*sizeof(ogg_int32_t))))
+  if(NULL != (v->iram_double_pcm = iram_malloc(vi->channels*v->pcm_storage*sizeof(ogg_int32_t))))
   {
     /* one-time initialisation at codec start or on switch from
        blocksizes greater than IRAM_PCM_END to sizes that fit */
     for(i=0;i<vi->channels;i++)
-      v->pcm[i]=&internal_pcm[i*v->pcm_storage];
-    iram_pcm_doublebuffer = true;
+      v->pcm[i]=&v->iram_double_pcm[i*v->pcm_storage];
   }
   else
   {
@@ -228,7 +222,6 @@ static int _vds_init(vorbis_dsp_state *v,vorbis_info *vi){
        blocksizes that fit in IRAM_PCM_END to those that don't */
     for(i=0;i<vi->channels;i++)
       v->pcm[i]=(ogg_int32_t *)_ogg_calloc(v->pcm_storage,sizeof(*v->pcm[i])); 
-    iram_pcm_doublebuffer = false;
   }  
 
   /* all 1 (large block) or 0 (small block) */
@@ -250,6 +243,7 @@ static int _vds_init(vorbis_dsp_state *v,vorbis_info *vi){
 int vorbis_synthesis_restart(vorbis_dsp_state *v){
   vorbis_info *vi=v->vi;
   codec_setup_info *ci;
+  int i;
 
   if(!v->backend_state)return -1;
   if(!vi)return -1;
@@ -267,6 +261,10 @@ int vorbis_synthesis_restart(vorbis_dsp_state *v){
   /* indicate to synthesis code that buffer pointers no longer valid
      (if we're using double pcm buffer) and will need to reset them */
   v->reset_pcmb = true;
+  /* also reset our copy of the double buffer pointers if we have one */
+  if(v->iram_double_pcm)
+    for(i=0;i<vi->channels;i++)
+      v->pcm[i]=&v->iram_double_pcm[i*v->pcm_storage];
 
   return(0);
 }
@@ -285,12 +283,11 @@ void vorbis_dsp_clear(vorbis_dsp_state *v){
     codec_setup_info *ci=(codec_setup_info *)(vi?vi->codec_setup:NULL);
     private_state *b=(private_state *)v->backend_state;
 
-    if(!iram_pcm_doublebuffer)
+    if(NULL == v->iram_double_pcm)
     {
-      if(v->pcm){
-        for(i=0;i<vi->channels;i++)
-          if(v->pcm[i])_ogg_free(v->pcm[i]);
-      } 
+      /* pcm buffer came from oggmalloc rather than iram */
+      for(i=0;i<vi->channels;i++)
+        if(v->pcm[i])_ogg_free(v->pcm[i]);
     }
 
     /* free mode lookups; these are actually vorbis_look_mapping structs */
@@ -322,6 +319,7 @@ int vorbis_synthesis_blockin(vorbis_dsp_state *v,vorbis_block *vb){
   codec_setup_info *ci=(codec_setup_info *)vi->codec_setup;
   private_state *b=v->backend_state;
   int j;
+  bool iram_pcm_doublebuffer = (NULL != v->iram_double_pcm);
 
   if(v->pcm_current>v->pcm_returned  && v->pcm_returned!=-1)return(OV_EINVAL);
 
