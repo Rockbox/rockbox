@@ -43,8 +43,10 @@
  */
 #if LCD_DEPTH > 1
 #define scaled_read_bmp_file rb->read_bmp_file
+#define scaled_read_bmp_fd rb->read_bmp_fd
 #else
 #define scaled_read_bmp_file read_bmp_file
+#define scaled_read_bmp_fd read_bmp_fd
 #endif
 
 #endif

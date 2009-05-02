@@ -643,8 +643,12 @@ static const struct plugin_api rockbox_api = {
 	lcd_pal256_update_pal,
 #endif
 #endif
-#if defined(HAVE_LCD_BITMAP) && LCD_DEPTH > 1
+#ifdef HAVE_LCD_BITMAP
+#if LCD_DEPTH > 1
     read_jpeg_file,
+    read_jpeg_fd,
+#endif
+    read_bmp_fd,
 #endif
 };
 

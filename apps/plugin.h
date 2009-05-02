@@ -79,9 +79,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #ifdef HAVE_LCD_BITMAP
 #include "screendump.h"
 #include "scrollbar.h"
-#if LCD_DEPTH > 1
 #include "jpeg_load.h"
-#endif
 #include "../recorder/bmp.h"
 #endif
 #include "statusbar.h"
@@ -131,7 +129,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 148
+#define PLUGIN_API_VERSION 149
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -806,9 +804,15 @@ struct plugin_api {
 #endif
 #endif
 
-#if defined(HAVE_LCD_BITMAP) && LCD_DEPTH > 1
+#ifdef HAVE_LCD_BITMAP
+#if LCD_DEPTH > 1
     int (*read_jpeg_file)(const char* filename, struct bitmap *bm, int maxsize,
                           int format, const struct custom_format *cformat);
+    int (*read_jpeg_fd)(int fd, struct bitmap *bm, int maxsize,
+                        int format, const struct custom_format *cformat);
+#endif
+    int (*read_bmp_fd)(int fd, struct bitmap *bm, int maxsize,
+                       int format, const struct custom_format *cformat);
 #endif
 };
 
