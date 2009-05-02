@@ -339,7 +339,11 @@ void ThemesInstallWindow::accept()
         installer->setCache(true);
 
     connect(logger, SIGNAL(closed()), this, SLOT(close()));
-    installer->install(logger);
+    connect(installer, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(installer, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+    connect(installer, SIGNAL(done(bool)), logger, SLOT(setFinished()));
+    connect(logger, SIGNAL(aborted()), installer, SLOT(abort()));
+    installer->install();
 
 }
 

@@ -26,7 +26,6 @@
 
 
 #include <QtCore>
-#include <QtNetwork>
 
 #include "progressloggerinterface.h"
 #include "httpget.h"
@@ -37,7 +36,7 @@ class ZipInstaller : public QObject
 public:
     ZipInstaller(QObject* parent) ;
     ~ZipInstaller(){}
-    void install(ProgressloggerInterface* dp);
+    void install(void);
     void setMountPoint(QString mountpoint) {m_mountpoint = mountpoint;}
     void setUrl(QString url){m_urllist = QStringList(url);}
     void setUrl(QStringList url) { m_urllist = url; }
@@ -51,17 +50,22 @@ public:
     void setCache(bool c) { m_usecache = c; };
     void setCache(QString c) { m_cache = QDir(c); m_usecache = true; }
 
-signals:
-    void done(bool error);
-    void cont();
+public slots:
+    void abort(void);
 
 private slots:
     void downloadDone(bool);
     void installStart(void);
     void installContinue(void);
 
+signals:
+    void done(bool error);
+    void cont();
+    void logItem(QString, int); //! set logger item
+    void logProgress(int, int); //! set progress bar.
+    void internalAborted(void);
+
 private:
-    void installSingle(ProgressloggerInterface *dp);
     QString m_url, m_file, m_mountpoint, m_logsection, m_logver;
     QStringList m_urllist, m_loglist, m_verlist;
     bool m_unzip;
@@ -72,8 +76,6 @@ private:
 
     HttpGet *getter;
     QTemporaryFile *downloadFile;
-
-    ProgressloggerInterface* m_dp;
 };
 
 

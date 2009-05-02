@@ -189,7 +189,11 @@ void Install::accept()
 
     connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
 
-    installer->install(logger);
+    connect(installer, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(installer, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+    connect(installer, SIGNAL(done(bool)), logger, SLOT(setFinished()));
+    connect(logger, SIGNAL(aborted()), installer, SLOT(abort()));
+    installer->install();
 
 }
 

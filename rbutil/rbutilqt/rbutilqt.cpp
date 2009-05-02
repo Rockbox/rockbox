@@ -584,8 +584,11 @@ bool RbUtilQt::installAuto()
     installer->setMountPoint(settings->value(RbSettings::Mountpoint).toString());
 
     connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
-
-    installer->install(logger);
+    connect(installer, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(installer, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+    connect(installer, SIGNAL(done(bool)), logger, SLOT(setFinished()));
+    connect(logger, SIGNAL(aborted()), installer, SLOT(abort()));
+    installer->install();
     return true;
 }
 
@@ -827,7 +830,11 @@ void RbUtilQt::installFonts()
         installer->setCache(true);
 
     connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
-    installer->install(logger);
+    connect(installer, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(installer, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+    connect(installer, SIGNAL(done(bool)), logger, SLOT(setFinished()));
+    connect(logger, SIGNAL(aborted()), installer, SLOT(abort()));
+    installer->install();
 }
 
 
@@ -865,7 +872,11 @@ void RbUtilQt::installVoice()
     installer->setMountPoint(settings->value(RbSettings::Mountpoint).toString());
     if(!settings->value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
-    installer->install(logger);
+    connect(installer, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(installer, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+    connect(installer, SIGNAL(done(bool)), logger, SLOT(setFinished()));
+    connect(logger, SIGNAL(aborted()), installer, SLOT(abort()));
+    installer->install();
 
 }
 
@@ -912,7 +923,11 @@ void RbUtilQt::installDoom()
     if(!settings->value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
     connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
-    installer->install(logger);
+    connect(installer, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(installer, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+    connect(installer, SIGNAL(done(bool)), logger, SLOT(setFinished()));
+    connect(logger, SIGNAL(aborted()), installer, SLOT(abort()));
+    installer->install();
 
 }
 
@@ -1058,7 +1073,11 @@ void RbUtilQt::downloadManual(void)
     installer->setUrl(manualurl);
     installer->setUnzip(false);
     installer->setTarget(target);
-    installer->install(logger);
+    connect(installer, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(installer, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+    connect(installer, SIGNAL(done(bool)), logger, SLOT(setFinished()));
+    connect(logger, SIGNAL(aborted()), installer, SLOT(abort()));
+    installer->install();
 }
 
 
