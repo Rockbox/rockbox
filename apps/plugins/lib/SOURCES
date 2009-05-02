@@ -12,6 +12,7 @@ buflib.c
 */
 #if LCD_DEPTH == 1
 pluginlib_resize.c
+pluginlib_jpeg_load.c
 #endif
 grey_core.c
 grey_draw.c
