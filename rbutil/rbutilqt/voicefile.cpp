@@ -54,7 +54,7 @@ bool VoiceFileCreator::createVoiceFile(ProgressloggerInterface* logger)
     if(!info.open())
     {
         m_logger->addItem(tr("could not find rockbox-info.txt"),LOGERROR);
-        m_logger->abort();
+        m_logger->setFinished();
         emit done(false);
         return false;
     }
@@ -101,14 +101,14 @@ void VoiceFileCreator::downloadDone(bool error)
     m_logger->setProgressValue(max);
     if(getter->httpResponse() != 200 && !getter->isCached()) {
         m_logger->addItem(tr("Download error: received HTTP error %1.").arg(getter->httpResponse()),LOGERROR);
-        m_logger->abort();
+        m_logger->setFinished();
         emit done(false);
         return;
     }
     if(getter->isCached()) m_logger->addItem(tr("Cached file used."), LOGINFO);
     if(error) {
         m_logger->addItem(tr("Download error: %1").arg(getter->errorString()),LOGERROR);
-        m_logger->abort();
+        m_logger->setFinished();
         emit done(false);
         return;
     }
@@ -122,7 +122,7 @@ void VoiceFileCreator::downloadDone(bool error)
     if(!genlang.open(QIODevice::ReadOnly))
     {
         m_logger->addItem(tr("failed to open downloaded file"),LOGERROR);
-        m_logger->abort();
+        m_logger->setFinished();
         emit done(false);
         return;
     }
@@ -136,7 +136,7 @@ void VoiceFileCreator::downloadDone(bool error)
     {
         m_logger->addItem(errStr,LOGERROR);
         m_logger->addItem(tr("Init of TTS engine failed"),LOGERROR);
-        m_logger->abort();
+        m_logger->setFinished();
         emit done(false);
         return;
     }
@@ -149,7 +149,7 @@ void VoiceFileCreator::downloadDone(bool error)
     {
         m_logger->addItem(tr("Init of Encoder engine failed"),LOGERROR);
         m_tts->stop();
-        m_logger->abort();
+        m_logger->setFinished();
         emit done(false);
         return;
     }
@@ -191,7 +191,7 @@ void VoiceFileCreator::downloadDone(bool error)
     if(voicepairs.size() == 0)
     {
         m_logger->addItem(tr("The downloaded file was empty!"),LOGERROR);
-        m_logger->abort();
+        m_logger->setFinished();
         m_tts->stop();
         emit done(false);
         return;
@@ -207,7 +207,7 @@ void VoiceFileCreator::downloadDone(bool error)
         if(m_abort)
         {
             m_logger->addItem("aborted.",LOGERROR);
-            m_logger->abort();
+            m_logger->setFinished();
             m_tts->stop();
             emit done(false);
             return;
@@ -256,7 +256,7 @@ void VoiceFileCreator::downloadDone(bool error)
     if (ids2 == NULL)
     {
         m_logger->addItem(tr("Error opening downloaded file"),LOGERROR);
-        m_logger->abort();
+        m_logger->setFinished();
         emit done(false);
         return;
     }
@@ -287,7 +287,7 @@ void VoiceFileCreator::downloadDone(bool error)
     m_logger->setProgressMax(100);
     m_logger->setProgressValue(100);
     m_logger->addItem(tr("successfully created."),LOGOK);
-    m_logger->abort();
+    m_logger->setFinished();
 
     emit done(true);
 }

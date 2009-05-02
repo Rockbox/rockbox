@@ -101,7 +101,7 @@ void ThemesInstallWindow::downloadDone(bool error)
                 "Please check your network and proxy settings.")
                 .arg(getter->errorString()), LOGERROR);
         getter->abort();
-        logger->abort();
+        logger->setFinished();
         disconnect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
         connect(logger, SIGNAL(closed()), this, SLOT(close()));
         return;
@@ -111,12 +111,12 @@ void ThemesInstallWindow::downloadDone(bool error)
         qDebug() << "error!";
         logger->addItem(tr("the following error occured:\n%1")
             .arg(iniDetails.value("error/description", "unknown error").toString()), LOGERROR);
-        logger->abort();
+        logger->setFinished();
         connect(logger, SIGNAL(closed()), this, SLOT(close()));
         return;
     }
     logger->addItem(tr("done."), LOGOK);
-    logger->abort();
+    logger->setFinished();
     logger->close();
 
     // setup list
@@ -289,7 +289,7 @@ void ThemesInstallWindow::show()
 void ThemesInstallWindow::abort()
 {
     igetter.abort();
-    logger->abort();
+    logger->setFinished();
     this->close();
 }
 
@@ -326,7 +326,7 @@ void ThemesInstallWindow::accept()
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountPoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
-        logger->abort();
+        logger->setFinished();
         return;
     }
 

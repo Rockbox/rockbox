@@ -47,7 +47,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     {
         m_logger->addItem(errStr.trimmed(),LOGERROR);
         m_logger->addItem(tr("Init of TTS engine failed"),LOGERROR);
-        m_logger->abort();
+        m_logger->setFinished();
         return false;
     }
 
@@ -58,7 +58,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     if(!m_enc->start())
     {
         m_logger->addItem(tr("Init of Encoder engine failed"),LOGERROR);
-        m_logger->abort();
+        m_logger->setFinished();
         m_tts->stop();
         return false;
     }
@@ -147,7 +147,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     m_logger->addItem(tr("Finished creating Talk files"),LOGOK);
     m_logger->setProgressMax(1);
     m_logger->setProgressValue(1);
-    m_logger->abort();
+    m_logger->setFinished();
 
     return true;
 }
@@ -182,7 +182,7 @@ void TalkFileCreator::doAbort(QStringList cleanupList)
     cleanup(cleanupList);
     m_logger->setProgressMax(1);
     m_logger->setProgressValue(0);
-    m_logger->abort();
+    m_logger->setFinished();
     m_tts->stop();
     m_enc->stop();
 }

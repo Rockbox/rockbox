@@ -36,7 +36,7 @@ void Uninstaller::deleteAll(ProgressloggerInterface* dp)
     m_dp->setProgressMax(1);
     m_dp->setProgressValue(1);
     m_dp->addItem(tr("Finished Uninstallation"),LOGOK);
-    m_dp->abort();
+    m_dp->setFinished();
 }
 
 void Uninstaller::uninstall(ProgressloggerInterface* dp)
@@ -110,7 +110,7 @@ void Uninstaller::uninstall(ProgressloggerInterface* dp)
     m_dp->setProgressMax(1);
     m_dp->setProgressValue(1);
     m_dp->addItem(tr("Uninstallation finished"),LOGOK);
-    m_dp->abort();
+    m_dp->setFinished();
 }
 
 QStringList Uninstaller::getAllSections()

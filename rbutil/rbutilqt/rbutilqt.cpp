@@ -393,7 +393,7 @@ void RbUtilQt::completeInstall()
 
     if(smallInstallInner())
         return;
-    logger->undoAbort();
+    logger->setRunning();
     // Fonts
     m_error = false;
     m_installed = false;
@@ -406,7 +406,7 @@ void RbUtilQt::completeInstall()
            QApplication::processEvents();
     }
     if(m_error) return;
-    logger->undoAbort();
+    logger->setRunning();
 
     // Doom
     if(hasDoom())
@@ -459,7 +459,7 @@ bool RbUtilQt::smallInstallInner()
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountpoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
-        logger->abort();
+        logger->setFinished();
         return true;
     }
     // Bootloader
@@ -469,7 +469,7 @@ bool RbUtilQt::smallInstallInner()
         m_installed = false;
         m_auto = true;
         if(!installBootloaderAuto()) {
-            logger->abort();
+            logger->setFinished();
             return true;
         }
         else
@@ -480,7 +480,7 @@ bool RbUtilQt::smallInstallInner()
         }
         m_auto = false;
         if(m_error) return true;
-        logger->undoAbort();
+        logger->setRunning();
     }
 
     // Rockbox
@@ -533,7 +533,7 @@ bool RbUtilQt::installAuto()
             QMessageBox::Ok | QMessageBox::Abort, QMessageBox::Abort) == QMessageBox::Abort)
         {
             logger->addItem(tr("Aborted!"), LOGERROR);
-            logger->abort();
+            logger->setFinished();
             return false;
         }
     }
@@ -568,7 +568,7 @@ bool RbUtilQt::installAuto()
             else
             {
                 logger->addItem(tr("Backup failed!"),LOGERROR);
-                logger->abort();
+                logger->setFinished();
                 return false;
             }
         }
@@ -647,7 +647,7 @@ void RbUtilQt::installBootloader()
     }
     else {
         logger->addItem(tr("No install method known."), LOGERROR);
-        logger->abort();
+        logger->setFinished();
         return;
     }
 
@@ -749,7 +749,7 @@ void RbUtilQt::installBootloader()
 
     // the bootloader install class does NOT use any GUI stuff.
     // All messages are passed via signals.
-    connect(bl, SIGNAL(done(bool)), logger, SLOT(abort()));
+    connect(bl, SIGNAL(done(bool)), logger, SLOT(setFinished()));
     connect(bl, SIGNAL(done(bool)), this, SLOT(installBootloaderPost(bool)));
     connect(bl, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
     connect(bl, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
@@ -762,7 +762,7 @@ void RbUtilQt::installBootloader()
                     tr("Could not create backup file. Continue?"),
                     QMessageBox::No | QMessageBox::Yes)
                 == QMessageBox::No) {
-                logger->abort();
+                logger->setFinished();
                 return;
             }
         }
@@ -990,7 +990,7 @@ void RbUtilQt::uninstallBootloader(void)
     }
     else {
         logger->addItem(tr("No uninstall method known."), LOGERROR);
-        logger->abort();
+        logger->setFinished();
         return;
     }
 
@@ -1011,7 +1011,7 @@ void RbUtilQt::uninstallBootloader(void)
     int result;
     result = bl->uninstall();
 
-    logger->abort();
+    logger->setFinished();
 
 }
 
@@ -1079,7 +1079,7 @@ void RbUtilQt::installPortable(void)
     // check mountpoint
     if(!QFileInfo(settings->value(RbSettings::Mountpoint).toString()).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
-        logger->abort();
+        logger->setFinished();
         return;
     }
 
@@ -1093,7 +1093,7 @@ void RbUtilQt::installPortable(void)
             settings->value(RbSettings::Mountpoint).toString()
             + "/RockboxUtility.exe")) {
         logger->addItem(tr("Error installing Rockbox Utility"), LOGERROR);
-        logger->abort();
+        logger->setFinished();
         return;
     }
     logger->addItem(tr("Installing user configuration"), LOGINFO);
@@ -1101,11 +1101,11 @@ void RbUtilQt::installPortable(void)
             settings->value(RbSettings::Mountpoint).toString()
             + "/RockboxUtility.ini")) {
         logger->addItem(tr("Error installing user configuration"), LOGERROR);
-        logger->abort();
+        logger->setFinished();
         return;
     }
     logger->addItem(tr("Successfully installed Rockbox Utility."), LOGOK);
-    logger->abort();
+    logger->setFinished();
     logger->setProgressMax(1);
     logger->setProgressValue(1);
 

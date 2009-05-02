@@ -46,10 +46,10 @@ public slots:
     virtual void addItem(const QString &text, int flag);  //! add a string to the list
     virtual void setProgress(int, int); //! set progress bar
 
-    virtual void abort();
-    virtual void undoAbort();
     virtual void close();
     virtual void show();
+    virtual void setRunning();
+    virtual void setFinished();
 
 private:
     Ui::ProgressLoggerFrm dp;

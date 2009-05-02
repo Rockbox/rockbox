@@ -49,10 +49,10 @@ public slots:
     virtual void addItem(const QString &text)=0; //! add a string to the progress
     virtual void addItem(const QString &text, int flag)=0; //! add a string to the list, with icon
 
-    virtual void abort()=0;
-    virtual void undoAbort()=0;
     virtual void close()=0;
     virtual void show()=0;
+    virtual void setRunning()=0;
+    virtual void setFinished()=0;
 
 private:
 

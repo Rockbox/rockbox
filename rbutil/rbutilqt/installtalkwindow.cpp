@@ -84,7 +84,7 @@ void InstallTalkWindow::accept()
     if(!QFileInfo(folderToTalk).isDir())
     {
         logger->addItem(tr("The Folder to Talk is wrong!"),LOGERROR);
-        logger->abort();
+        logger->setFinished();
         return;
     }
 

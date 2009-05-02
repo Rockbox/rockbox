@@ -25,7 +25,7 @@ ProgressLoggerGui::ProgressLoggerGui(QWidget* parent): ProgressloggerInterface(p
     downloadProgress->setModal(true);
     dp.setupUi(downloadProgress);
     dp.listProgress->setAlternatingRowColors(true);
-    connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(abort()));
+    setRunning();
 }
 
 void ProgressLoggerGui::addItem(const QString &text)
@@ -87,22 +87,39 @@ void ProgressLoggerGui::setProgressVisible(bool b)
 }
 
 
-void ProgressLoggerGui::abort()
-{
-    dp.buttonAbort->setText(tr("&Ok"));
-    dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/go-next.png")));
-    disconnect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(abort()));
-    connect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
-    connect(dp.buttonAbort, SIGNAL(clicked()), this, SIGNAL(closed()));
-    emit aborted();
-}
-
-void ProgressLoggerGui::undoAbort()
+/** Set logger into "running" state -- the reporting process is still running.
+ *  Display "Abort" and emit the aborted() signal on button press.
+ */
+void ProgressLoggerGui::setRunning()
 {
     dp.buttonAbort->setText(tr("&Abort"));
     dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/process-stop.png")));
-    connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(abort()));
+
+    // make sure to not close the window on button press.
+    disconnect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
+    // emit aborted() once button is pressed but not closed().
+    disconnect(dp.buttonAbort, SIGNAL(clicked()), this, SIGNAL(closed()));
+    connect(dp.buttonAbort, SIGNAL(clicked()), this, SIGNAL(aborted()));
+
 }
+
+
+/** Set logger into "finished" state -- the reporting process is finished.
+ *  Display "Ok". Don't emit aborted() as there is nothing running left.
+ *  Close logger on button press and emit closed().
+ */
+void ProgressLoggerGui::setFinished()
+{
+    dp.buttonAbort->setText(tr("&Ok"));
+    dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/go-next.png")));
+
+    // close the window on button press.
+    connect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
+    // emit closed() once button is pressed but not aborted().
+    disconnect(dp.buttonAbort, SIGNAL(clicked()), this, SIGNAL(aborted()));
+    connect(dp.buttonAbort, SIGNAL(clicked()), this, SIGNAL(closed()));
+}
+
 
 void ProgressLoggerGui::close()
 {

@@ -59,7 +59,7 @@ void ZipInstaller::installContinue()
     }
     else {
         m_dp->addItem(tr("Installation finished successfully."),LOGOK);
-        m_dp->abort();
+        m_dp->setFinished();
 
         emit done(false);
         return;
@@ -112,14 +112,14 @@ void ZipInstaller::downloadDone(bool error)
     m_dp->setProgressValue(max);
     if(getter->httpResponse() != 200 && !getter->isCached()) {
         m_dp->addItem(tr("Download error: received HTTP error %1.").arg(getter->httpResponse()),LOGERROR);
-        m_dp->abort();
+        m_dp->setFinished();
         emit done(true);
         return;
     }
     if(getter->isCached()) m_dp->addItem(tr("Cached file used."), LOGINFO);
     if(error) {
         m_dp->addItem(tr("Download error: %1").arg(getter->errorString()),LOGERROR);
-        m_dp->abort();
+        m_dp->setFinished();
         emit done(true);
         return;
     }
@@ -143,7 +143,7 @@ void ZipInstaller::downloadDone(bool error)
                 .arg(uz.formatError(ec)),LOGERROR);
             m_dp->setProgressMax(1);
             m_dp->setProgressValue(1);
-            m_dp->abort();
+            m_dp->setFinished();
             emit done(true);
             return;
         }
@@ -153,7 +153,7 @@ void ZipInstaller::downloadDone(bool error)
         // cluster sizes on the player).
         if(filesystemFree(m_mountpoint) < (uz.totalSize() + 1000000)) {
             m_dp->addItem(tr("Not enough disk space! Aborting."), LOGERROR);
-            m_dp->abort();
+            m_dp->setFinished();
             m_dp->setProgressMax(1);
             m_dp->setProgressValue(1);
             emit done(true);
@@ -164,7 +164,7 @@ void ZipInstaller::downloadDone(bool error)
         if(ec != UnZip::Ok) {
             m_dp->addItem(tr("Extracting failed: %1.")
                 .arg(uz.formatError(ec)),LOGERROR);
-            m_dp->abort();
+            m_dp->setFinished();
             m_dp->setProgressMax(1);
             m_dp->setProgressValue(1);
 
@@ -188,7 +188,7 @@ void ZipInstaller::downloadDone(bool error)
         QFile(m_mountpoint + m_target).remove();
         if(!downloadFile->copy(m_mountpoint + m_target)) {
             m_dp->addItem(tr("Installing file failed."), LOGERROR);
-            m_dp->abort();
+            m_dp->setFinished();
             emit done(true);
             return;
         }

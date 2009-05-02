@@ -96,7 +96,7 @@ void Install::accept()
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountPoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
-        logger->abort();
+        logger->setFinished();
         return;
     }
 
@@ -141,7 +141,7 @@ void Install::accept()
             == QMessageBox::Abort)
         {
             logger->addItem(tr("Aborted!"),LOGERROR);
-            logger->abort();
+            logger->setFinished();
             return;
         }
     }
@@ -170,7 +170,7 @@ void Install::accept()
         else
         {
             logger->addItem(tr("Backup failed!"),LOGERROR);
-            logger->abort();
+            logger->setFinished();
             return;
         }
     }
@@ -212,7 +212,7 @@ void Install::done(bool error)
 
     if(error)
     {
-       logger->abort();
+        logger->setFinished();
         return;
     }
 
