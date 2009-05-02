@@ -25,6 +25,7 @@
 
 #include "plugin.h"
 #include <albumart.h>
+#include "lib/read_image.h"
 #include "lib/pluginlib_actions.h"
 #include "lib/helper.h"
 #include "lib/configfile.h"
@@ -926,8 +927,8 @@ bool create_albumart_cache(void)
         input_bmp.data = buf;
         input_bmp.width = DISPLAY_WIDTH;
         input_bmp.height = DISPLAY_HEIGHT;
-        ret = scaled_read_bmp_file(albumart_file, &input_bmp,
-                                buf_size, format, &format_transposed);
+        ret = read_image_file(albumart_file, &input_bmp,
+                              buf_size, format, &format_transposed);
         if (ret <= 0) {
             rb->splash(HZ, "Could not read bmp");
             continue; /* skip missing/broken files */
