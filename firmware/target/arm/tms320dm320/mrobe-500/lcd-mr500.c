@@ -60,15 +60,17 @@ void lcd_sleep()
 {
     if (lcd_on)
     {
+        lcd_on = false;
+		memset16(FRAME, 0xFFFF, LCD_WIDTH*LCD_HEIGHT);
+		sleep(HZ/5);
         /* Disabling these saves another ~15mA */
-        IO_OSD_OSDWINMD0&=~(0x01);
-		IO_VID_ENC_VMOD&=~(0x01);
-    	
-    	sleep(HZ/5);
+        IO_OSD_OSDWINMD0&=  ~(0x01);
+		IO_VID_ENC_VMOD &=  ~(0x01);
+		
+//		IO_CLK_MOD1     &=  ~(0x0018);
     	
     	/* Disabling the LCD saves ~50mA */
     	IO_GIO_BITCLR2=1<<4;
-    	lcd_on = false;
     }
 }
 
@@ -79,15 +81,19 @@ void lcd_awake(void)
     {
     	lcd_on=true;
     	
-    	IO_OSD_OSDWINMD0|=0x01;
-		IO_VID_ENC_VMOD|=0x01;
+//	    IO_CLK_MOD1     |=  0x0018;
+    	IO_OSD_OSDWINMD0|=  0x01;
+		IO_VID_ENC_VMOD |=  0x01;
 	
 		sleep(2);
         IO_GIO_BITSET2=1<<4;
-        /* Wait long enough for a frame to be written */
-        sleep(HZ/20);
         
         lcd_update();
+        
+        /* Wait long enough for a frame to be written */
+        sleep(HZ/10);
+        
+        
         lcd_activation_call_hook();
     }
 }

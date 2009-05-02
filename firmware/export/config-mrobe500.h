@@ -82,9 +82,7 @@
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
    should be defined as well. */
 #define HAVE_LCD_SLEEP
-//#define HAVE_LCD_SLEEP_SETTING
-/* Do this for now till lcd sleeping is working properly */
-#define LCD_SLEEP_TIMEOUT 0
+#define HAVE_LCD_SLEEP_SETTING
 
 /* remote LCD */
 #define HAVE_REMOTE_LCD
@@ -110,8 +108,13 @@
 #define HAVE_TOUCHSCREEN
 #define HAVE_BUTTON_DATA
 
+/* define this if the target has volume keys which can be used in the lists */
+#define HAVE_VOLUME_IN_LIST
+
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
+
+//#define HAVE_HARDWARE_BEEP
 
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS
@@ -152,8 +155,8 @@
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
 /* define current usage levels */
-#define CURRENT_NORMAL     120 /* Measured */
-#define CURRENT_BACKLIGHT  80 /* Over 200 mA total measured when on */
+#define CURRENT_NORMAL     100 /* Measured */
+#define CURRENT_BACKLIGHT  100 /* Over 200 mA total measured when on */
 #define CURRENT_RECORD     0  /* no recording */
 
 /* Hardware controlled charging with monitoring */
@@ -178,10 +181,12 @@
 #define FLASH_SIZE 0x400000
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ 16934400
+#define CPU_FREQ 87500000
 
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
+
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_HW_REG
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
@@ -196,7 +201,7 @@
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
 /* Define this if you have adjustable CPU frequency */
-/* #define HAVE_ADJUSTABLE_CPU_FREQ */
+#define HAVE_ADJUSTABLE_CPU_FREQ
 
 #define BOOTFILE_EXT "mrobe500"
 #define BOOTFILE "rockbox." BOOTFILE_EXT

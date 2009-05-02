@@ -23,9 +23,9 @@
 
 #include "system-arm.h"
 
-#define CPUFREQ_SLEEP      32768
-#define CPUFREQ_DEFAULT 24000000
-#define CPUFREQ_NORMAL  30000000
-#define CPUFREQ_MAX     80000000
+#define CPUFREQ_SLEEP       32768
+#define CPUFREQ_DEFAULT  87500000
+#define CPUFREQ_NORMAL   87500000
+#define CPUFREQ_MAX     175000000
 
 #endif /* SYSTEM_TARGET_H */

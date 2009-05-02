@@ -65,10 +65,14 @@ static void spi_disable_all_targets(void)
 }
 
 int spi_block_transfer(enum SPI_target target,
+                       const bool spi_msb_first,
                        const uint8_t *tx_bytes, unsigned int tx_size,
                              uint8_t *rx_bytes, unsigned int rx_size)
 {
     mutex_lock(&spi_mtx);
+    
+    IO_SERIAL0_MODE = (IO_SERIAL0_MODE& ~(spi_msb_first<<9))|(spi_msb_first<<9);
+    
     /* Activate the slave select pin */
     *spi_targets[target].setreg = spi_targets[target].bit;
 
@@ -102,8 +106,8 @@ int spi_block_transfer(enum SPI_target target,
 void spi_init(void)
 {
     mutex_init(&spi_mtx);
-    /* Set SCLK idle level = 0 */
-    IO_SERIAL0_MODE |= IO_SERIAL0_MODE_SCLK;
+    
+    IO_SERIAL0_MODE = 0x3607;
     /* Enable TX */
     IO_SERIAL0_TX_ENABLE = 0x0001;
 #ifndef CREATIVE_ZVx

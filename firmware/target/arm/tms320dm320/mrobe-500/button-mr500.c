@@ -19,8 +19,6 @@
  *
  ****************************************************************************/
 
-/* this file also handles the touch screen driver interface */
-
 #include "config.h"
 #include "cpu.h"
 #include "system.h"
@@ -34,11 +32,7 @@
 #include "string.h"
 #include "touchscreen.h"
 
-static bool touch_available = false;
 static bool hold_button     = false;
-
-static short touch_x, touch_y, touch_z1, touch_z2;
-static long last_touch = 0;
 
 static struct touch_calibration_point topleft, bottomright;
 
@@ -85,7 +79,6 @@ static int touch_to_pixels(short *val_x, short *val_y)
 
 void button_init_device(void)
 {
-    touch_available = false;
     /* GIO is the power button, set as input */
     IO_GIO_DIR0 |= 0x01;
 
@@ -115,33 +108,25 @@ inline bool button_hold(void)
     return hold_button;
 }
 
-/* This is called from the tsc2100 interupt handler in adc-mr500.c */
-void touch_read_coord(void)
-{
-    touch_available = true;
-    tsc2100_read_touch(&touch_x, &touch_y, &touch_z1, &touch_z2);
-}
-
 int button_read_device(int *data)
 {
     int button_read = BUTTON_NONE;
+    short touch_x, touch_y, touch_z1, touch_z2;
     static bool hold_button_old = false;
     
     *data = 0;
 
     /* Handle touchscreen */
-    if (touch_available)
+    if (tsc2100_read_touch(&touch_x, &touch_y, &touch_z1, &touch_z2))
     {
         *data = touch_to_pixels(&touch_x, &touch_y);
         button_read |= touchscreen_to_pixels(touch_x, touch_y, data);
-        
-        touch_available = false;
-        last_touch=current_tick;
     }
 
+    tsc2100_set_mode(true, 0x01);
+        
     /* Handle power button */
-    if ((IO_GIO_BITSET0&0x01) == 0)
-    {
+    if ((IO_GIO_BITSET0&0x01) == 0) {
         button_read |=  BUTTON_POWER;
     }
 
@@ -152,8 +137,7 @@ int button_read_device(int *data)
     /* Take care of hold notifications */
 #ifndef BOOTLOADER
     /* give BL notice if HB state chaged */
-    if (hold_button != hold_button_old)
-    {
+    if (hold_button != hold_button_old) {
         backlight_hold_changed(hold_button);
         hold_button_old=hold_button;
     }

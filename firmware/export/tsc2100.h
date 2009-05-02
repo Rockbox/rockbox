@@ -22,9 +22,9 @@
 #define __TSC2100_H_
 
 void tsc2100_read_data(void);
-void tsc2100_read_touch(short *x, short* y, short *z1, short *z2);
-void tsc2100_read_volt(short *bat1, short *bat2, short *aux);
-void tsc2100_set_mode(unsigned char scan_mode);
+bool tsc2100_read_touch(short *x, short* y, short *z1, short *z2);
+bool tsc2100_read_volt(short *bat1, short *bat2, short *aux);
+void tsc2100_set_mode(bool poweron, unsigned char scan_mode);
 void tsc2100_adc_init(void);
 
 /* read a register */

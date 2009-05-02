@@ -36,7 +36,7 @@ void rtc_init(void)
 int rtc_read_datetime(unsigned char* buf)
 {
     char command = ADDR_READ|ADDR_BURST; /* burst read from the start of the time/date reg */
-    spi_block_transfer(SPI_target_RX5X348AB,
+    spi_block_transfer(SPI_target_RX5X348AB, true,
                        &command, 1, buf, 7);
     return 1;
 }
@@ -48,7 +48,7 @@ int rtc_write_datetime(unsigned char* buf)
     data[0] = command;
     for (i=1;i<8;i++)
         data[i] = buf[i-1];
-    spi_block_transfer(SPI_target_RX5X348AB,
+    spi_block_transfer(SPI_target_RX5X348AB, true,
                        data, 8, NULL, 0);
     return 1;
 }

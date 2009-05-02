@@ -217,12 +217,36 @@ void system_init(void)
     IO_INTC_FISEL0 = 0;
     IO_INTC_FISEL1 = 0;
     IO_INTC_FISEL2 = 0;
+    
+    /* setup the clocks */
+    IO_CLK_DIV0=0x0003;
+    IO_CLK_DIV1=0x0102;
+    IO_CLK_DIV2=0x021F;
+    IO_CLK_DIV3=0x1FFF;
+    IO_CLK_DIV4=0x1F00;
+    
+    IO_CLK_PLLA=0x80A0;
+    IO_CLK_PLLB=0x80C0;
+    
+    IO_CLK_SEL0=0x017E;
+    IO_CLK_SEL1=0x1000;
+    IO_CLK_SEL2=0x1001;
+    
+    /* need to wait before bypassing */
+    
+    IO_CLK_BYP=0x0000;
+    
+    /* turn off some unneeded modules */
+    IO_CLK_MOD0 &=  ~0x0018;
+    IO_CLK_MOD1 =   0x0918;
+    IO_CLK_MOD2 =   ~0x7C58;
 
     /* IRQENTRY only reflects enabled interrupts */
     IO_INTC_RAW = 0;
 
     IO_INTC_ENTRY_TBA0 = 0;
     IO_INTC_ENTRY_TBA1 = 0;
+    
     
     int i;
     /* Set interrupt priorities to predefined values */
@@ -275,27 +299,13 @@ int system_memory_guard(int newmode)
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-
 void set_cpu_frequency(long frequency)
 {
-    if (frequency == CPUFREQ_MAX)
-    {
-        asm volatile("mov r0, #0\n"
-            "mrc p15, 0, r0, c1, c0, 0\n"
-            "orr r0, r0, #3<<30\n" /* set to Asynchronous mode*/
-            "mcr p15, 0, r0, c1, c0, 0" : : : "r0");
-
-        FREQ = CPUFREQ_MAX;
-    }
-    else
-    {
-        asm volatile("mov r0, #0\n"
-            "mrc p15, 0, r0, c1, c0, 0\n"
-            "bic r0, r0, #3<<30\n" /* set to FastBus mode*/
-            "mcr p15, 0, r0, c1, c0, 0" : : : "r0");
-
-        FREQ = CPUFREQ_NORMAL;
+    if (frequency == CPUFREQ_MAX) {
+        IO_CLK_DIV0 = 0x0101;  /* 175 MHz ARM */
+    } else {
+        IO_CLK_DIV0 = 0x0003; /* 87.5 MHz ARM - not much savings, about 3 mA */
     }
 }
-
 #endif
+

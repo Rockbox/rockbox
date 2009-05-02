@@ -26,8 +26,6 @@
 #include "tsc2100.h"
 #include "button-target.h"
 
-void read_battery_inputs(void);
-
 void adc_init(void)
 {
     /* Initialize the touchscreen and the battery readout */
@@ -48,13 +46,24 @@ void GIO14(void)
     
     switch (adscm)
     {
-        case 1:
-        case 2:
-            touch_read_coord();
+        case 0x01:
+        case 0x02:
+        case 0x03:
+        case 0x04:
+        case 0x05:
+            /* do a battery read - this will shutdown the adc till the next tick
+             */
+//            tsc2100_set_mode(true, 0x0B); 
             break;
+        case 0x06:
+        case 0x07:
+        case 0x08:
+        case 0x09:
         case 0x0B:
-            read_battery_inputs();
+            tsc2100_set_mode(true, 0x01);
             break;
     }
+    
     IO_INTC_IRQ2 = (1<<3); /* IRQ_GIO14 == 35 */
 }
+
