@@ -89,11 +89,11 @@ static void enable_venc(bool enable)
 static void lcd_write_reg(unsigned char reg, unsigned short val)
 {
     unsigned char block[3] = {LTV_OPC_INDEX, 0, reg | 0xFF};
-    spi_block_transfer(SPI_target_LTV250QV, block, sizeof(block), NULL, 0);
+    spi_block_transfer(SPI_target_LTV250QV, false,block, sizeof(block), NULL, 0);
     block[0] = LTV_OPC_DATA;
     block[1] = val >> 8;
     block[2] = val & 0xFF;
-    spi_block_transfer(SPI_target_LTV250QV, block, sizeof(block), NULL, 0);
+    spi_block_transfer(SPI_target_LTV250QV, false,block, sizeof(block), NULL, 0);
 }
 
 static void sleep_ms(unsigned int ms)
@@ -207,7 +207,7 @@ static void lcd_display_off(void)
     sleep_ms(10);
     unsigned char temp[1];
     temp[0] = 0;
-    spi_block_transfer(SPI_target_LTV250QV, temp, sizeof(temp), NULL, 0);
+    spi_block_transfer(SPI_target_LTV250QV, false,temp, sizeof(temp), NULL, 0);
     
     IO_GIO_BITCLR2 = (1 << 4);
     sleep_ms(5);
