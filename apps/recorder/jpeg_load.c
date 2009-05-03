@@ -1689,7 +1689,7 @@ INLINE int huff_decode_ac(struct jpeg *p_jpeg, struct derived_tbl* tbl)
     return s;
 }
 
-struct img_part *store_row_jpeg(void *jpeg_args)
+static struct img_part *store_row_jpeg(void *jpeg_args)
 {
     struct jpeg *p_jpeg = (struct jpeg*) jpeg_args;
     unsigned int width = p_jpeg->x_mbl << p_jpeg->h_scale[1];

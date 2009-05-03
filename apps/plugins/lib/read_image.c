@@ -23,6 +23,7 @@
 
 #include <plugin.h>
 #include "feature_wrappers.h"
+#include "read_image.h"
 
 int read_image_file(const char* filename, struct bitmap *bm, int maxsize,
                     int format, const struct custom_format *cformat)
