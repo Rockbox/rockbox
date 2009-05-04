@@ -39,7 +39,7 @@ void _backlight_on(void)
 {
     lcd_awake(); /* power on lcd + visible display */
 
-#if !defined(CONFIG_BACKLIGHT_FADING)
+#if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_NO_FADING)
     _backlight_write_brightness(backlight_brightness);
 #endif
 }
