@@ -805,7 +805,7 @@ struct plugin_api {
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-#if LCD_DEPTH > 1
+#ifdef HAVE_JPEG
     int (*read_jpeg_file)(const char* filename, struct bitmap *bm, int maxsize,
                           int format, const struct custom_format *cformat);
     int (*read_jpeg_fd)(int fd, struct bitmap *bm, int maxsize,

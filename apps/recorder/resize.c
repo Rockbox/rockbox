@@ -516,8 +516,9 @@ static inline bool scale_v_linear(struct rowset *rset,
 }
 #endif /* HAVE_UPSCALER */
 
-#ifndef PLUGIN
-static void output_row_native(uint32_t row, void * row_in, struct scaler_context *ctx)
+#if !defined(PLUGIN) || LCD_DEPTH > 1
+void output_row_native(uint32_t row, void * row_in,
+                              struct scaler_context *ctx)
 {
     int col;
     int fb_width = BM_WIDTH(ctx->bm->width,FORMAT_NATIVE,0);
@@ -606,6 +607,18 @@ static void output_row_native(uint32_t row, void * row_in, struct scaler_context
 }
 #endif
 
+#if defined(PLUGIN) && LCD_DEPTH > 1
+unsigned int get_size_native(struct bitmap *bm)
+{
+    return BM_SIZE(bm->width,bm->height,FORMAT_NATIVE,FALSE);
+}
+
+const struct custom_format format_native = {
+    .output_row = output_row_native,
+    .get_size = get_size_native
+};
+#endif
+
 int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
                    struct rowset *rset, unsigned char *buf, unsigned int len,
                    const struct custom_format *format,
@@ -669,7 +682,7 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     ctx.bm = bm;
     ctx.src = src;
     ctx.dither = dither;
-#ifndef PLUGIN
+#if !defined(PLUGIN)
     ctx.output_row = output_row_native;
     if (format)
 #endif

@@ -35,6 +35,12 @@
 #ifndef BOOTLOADER/* define this if you want album art for this target */
 #define HAVE_ALBUMART
 
+/* define this to enable bitmap scaling */
+#define HAVE_BMP_SCALING
+
+/* define this to enable JPEG decoding */
+#define HAVE_JPEG
+
 /* define this if you have a light associated with the buttons */
 #define HAVE_BUTTON_LIGHT
 

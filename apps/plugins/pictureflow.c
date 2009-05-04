@@ -927,8 +927,13 @@ bool create_albumart_cache(void)
         input_bmp.data = buf;
         input_bmp.width = DISPLAY_WIDTH;
         input_bmp.height = DISPLAY_HEIGHT;
+#if PLUGIN_BUFFER_SIZE > 0x10000
         ret = read_image_file(albumart_file, &input_bmp,
                               buf_size, format, &format_transposed);
+#else
+        ret = scaled_read_bmp_file(albumart_file, &input_bmp,
+                              buf_size, format, &format_transposed);
+#endif
         if (ret <= 0) {
             rb->splash(HZ, "Could not read bmp");
             continue; /* skip missing/broken files */

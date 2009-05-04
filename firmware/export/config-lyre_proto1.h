@@ -52,6 +52,12 @@
 
 #define HAVE_ALBUMART
 
+/* define this to enable bitmap scaling */
+#define HAVE_BMP_SCALING
+
+/* define this to enable JPEG decoding */
+#define HAVE_JPEG
+
 #define CONFIG_KEYPAD LYRE_PROTO1_PAD
 
 /* Define this if you do software codec */

@@ -5,15 +5,13 @@ fixedpoint.c
 playback_control.c
 rgb_hsv.c
 buflib.c
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
-/*
-   The scaler is not provided in core on mono targets, but is built in
-   pluginlib for use with greylib overlay output
-*/
-#if LCD_DEPTH == 1
+#if !defined(HAVE_BMP_SCALING) || !defined(HAVE_JPEG)
 pluginlib_resize.c
+#endif
+#ifndef HAVE_JPEG
 pluginlib_jpeg_load.c
 #endif
+#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
 grey_core.c
 grey_draw.c
 grey_parm.c
@@ -45,7 +43,7 @@ read_image.c
 #ifdef HAVE_LCD_COLOR
 bmp_smooth_scale.c
 #endif
-#ifndef HAVE_ALBUMART
+#if !defined(HAVE_ALBUMART) || !defined(HAVE_JPEG)
 pluginlib_albumart.c
 #endif
 #endif

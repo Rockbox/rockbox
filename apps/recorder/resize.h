@@ -149,6 +149,12 @@ struct custom_format {
 };
 
 struct rowset;
+
+void output_row_native(uint32_t row, void * row_in,
+                              struct scaler_context *ctx);
+
+extern const struct custom_format format_native;
+
 int recalc_dimension(struct dim *dst, struct dim *src);
 
 int resize_on_load(struct bitmap *bm, bool dither,

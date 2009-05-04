@@ -644,7 +644,7 @@ static const struct plugin_api rockbox_api = {
 #endif
 #endif
 #ifdef HAVE_LCD_BITMAP
-#if LCD_DEPTH > 1
+#ifdef HAVE_JPEG
     read_jpeg_file,
     read_jpeg_fd,
 #endif

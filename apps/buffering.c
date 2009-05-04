@@ -834,7 +834,6 @@ static bool fill_buffer(void)
 static int load_image(int fd, const char *path)
 {
     int rc;
-    int pathlen = strlen(path);
     struct bitmap *bmp = (struct bitmap *)&buffer[buf_widx];
     /* FIXME: alignment may be needed for the data buffer. */
     bmp->data = &buffer[buf_widx + sizeof(struct bitmap)];
@@ -848,10 +847,13 @@ static int load_image(int fd, const char *path)
 
     get_albumart_size(bmp);
 
+#ifdef HAVE_JPEG
+    int pathlen = strlen(path);
     if (strcmp(path + pathlen - 4, ".bmp"))
         rc = read_jpeg_fd(fd, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
                          FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
     else
+#endif
         rc = read_bmp_fd(fd, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
                          FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
     return rc + (rc > 0 ? sizeof(struct bitmap) : 0);

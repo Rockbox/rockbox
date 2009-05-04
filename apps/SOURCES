@@ -88,8 +88,6 @@ gui/viewport.c
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 gui/backdrop.c
-recorder/resize.c
-recorder/jpeg_load.c
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -101,6 +99,12 @@ recorder/bmp.c
 recorder/icons.c
 recorder/keyboard.c
 recorder/peakmeter.c
+#if defined(HAVE_ALBUMART) || defined(HAVE_JPEG)
+recorder/resize.c
+#endif
+#ifdef HAVE_JPEG
+recorder/jpeg_load.c
+#endif
 #ifdef HAVE_ALBUMART
 recorder/albumart.c
 #endif

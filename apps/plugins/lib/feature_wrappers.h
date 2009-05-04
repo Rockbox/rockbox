@@ -30,23 +30,26 @@
  * but can easily be implement in pluginlib as long as the database is
  * available.
  */
-#ifdef HAVE_ALBUMART
+#if defined(HAVE_ALBUMART) && defined(HAVE_JPEG)
 #define search_albumart_files rb->search_albumart_files
 #endif
 
 /* This should only be used when loading scaled bitmaps, or using custom output
- * plugins. The pluginlib loader does not support loading bitmaps unscaled in
- * native format, so rb->read_bmp_file should always be used directly to load
- * such images.
+ * plugins. A native output plugin for the scaler is available as format_native
+ * on targets with LCD_DEPTH > 1
  */
-#if LCD_DEPTH > 1
+#ifdef HAVE_BMP_SCALING
 #define scaled_read_bmp_file rb->read_bmp_file
 #define scaled_read_bmp_fd rb->read_bmp_fd
-#define read_jpeg_file rb->read_jpeg_file
-#define read_jpeg_fd rb->read_jpeg_fd
 #else
 #define scaled_read_bmp_file read_bmp_file
 #define scaled_read_bmp_fd read_bmp_fd
+#endif
+
+#ifdef HAVE_JPEG
+#define read_jpeg_file rb->read_jpeg_file
+#define read_jpeg_fd rb->read_jpeg_fd
+#else
 #endif
 
 #endif
