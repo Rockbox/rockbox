@@ -131,6 +131,8 @@
 
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
+
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING          0
 #define MAX_BRIGHTNESS_SETTING          127
@@ -185,8 +187,6 @@
 
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
-
-#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_HW_REG
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL

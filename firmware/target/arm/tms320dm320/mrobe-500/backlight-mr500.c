@@ -29,8 +29,6 @@
 #include "spi-target.h"
 #include "lcd-target.h"
 
-int _backlight_brightness=DEFAULT_BRIGHTNESS_SETTING;
-
 static void _backlight_write_brightness(int brightness)
 {
     uint8_t bl_command[] = {0xa4, 0x00, brightness, 0xbb};
@@ -41,7 +39,9 @@ void _backlight_on(void)
 {
     lcd_awake(); /* power on lcd + visible display */
 
-    _backlight_write_brightness(_backlight_brightness);
+#if !defined(CONFIG_BACKLIGHT_FADING)
+    _backlight_write_brightness(backlight_brightness);
+#endif
 }
 
 void _backlight_off(void)
@@ -52,7 +52,6 @@ void _backlight_off(void)
 /* Assumes that the backlight has been initialized */
 void _backlight_set_brightness(int brightness)
 {
-    _backlight_brightness=brightness;
     _backlight_write_brightness(brightness);
 }
 
@@ -65,6 +64,6 @@ void __backlight_dim(bool dim_now)
 
 bool _backlight_init(void)
 {
-    _backlight_set_brightness(_backlight_brightness);
+    _backlight_set_brightness(backlight_brightness);
     return true;
 }

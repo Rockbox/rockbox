@@ -25,29 +25,35 @@
 #include "tsc2100.h"
 #include "kernel.h"
 
+unsigned short current_bat2 = 3910;
+unsigned short current_aux = 3910;
 static unsigned short current_voltage = 3910;
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    0
+    3450
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    0
+    3400
 };
+
+/* Right now these are linear translations, it would be good to model them
+ * appropriate to the actual battery curve.
+ */
 
 /* 6.10 format */
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 375, 1125, 1500, 1875, 2250, 2625, 3000, 3375, 3750, 4500, 4950 },
+    { 3400, 3300, 3600, 3700, 3800, 3900, 4000, 4100, 4200, 4300, 4400 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    375, 1125, 1500, 1875, 2250, 2625, 3000, 3375, 3750, 4500, 4950,
+    4000, 4105, 4210, 4315, 4420, 4525, 4630, 4735, 4840, 4945, 5050,
 };
     
 /* Returns battery voltage from ADC [millivolts] */
@@ -59,6 +65,8 @@ unsigned int battery_adc_voltage(void)
     
     if(tsc2100_read_volt(&bat1, &bat2, &aux)){
         current_voltage=((short)((int)(bat1<<10)/4096*6*2.5));
+        current_bat2=((short)((int)(bat2<<10)/4096*6*2.5));
+        current_aux=((short)((int)(aux<<10)/4096*6*2.5));
     }
 
     if (TIME_BEFORE(last_tick+2*HZ, current_tick))
