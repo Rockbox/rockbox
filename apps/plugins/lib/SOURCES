@@ -5,12 +5,6 @@ fixedpoint.c
 playback_control.c
 rgb_hsv.c
 buflib.c
-#if !defined(HAVE_BMP_SCALING) || !defined(HAVE_JPEG)
-pluginlib_resize.c
-#endif
-#ifndef HAVE_JPEG
-pluginlib_jpeg_load.c
-#endif
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
 grey_core.c
 grey_draw.c
@@ -33,6 +27,12 @@ playergfx.c
 profile_plugin.c
 #endif
 #ifdef HAVE_LCD_BITMAP
+#if !defined(HAVE_BMP_SCALING) || !defined(HAVE_JPEG)
+pluginlib_resize.c
+#endif
+#ifndef HAVE_JPEG
+pluginlib_jpeg_load.c
+#endif
 checkbox.c
 picture.c
 xlcd_core.c
