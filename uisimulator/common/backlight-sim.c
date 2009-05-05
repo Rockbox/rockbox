@@ -30,6 +30,11 @@ extern void lcd_awake(void);
 /* in uisimulator/sdl/lcd-bitmap.c and lcd-charcell.c */
 extern void sim_backlight(int value);
 
+bool _backlight_init(void)
+{
+    return true;
+}
+
 void _backlight_on(void)
 {
     sim_backlight(100);

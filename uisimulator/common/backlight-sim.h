@@ -24,6 +24,7 @@
 
 #include "config.h"
 
+bool _backlight_init(void);
 void _backlight_on(void);
 void _backlight_off(void);
 

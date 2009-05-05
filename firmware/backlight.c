@@ -725,7 +725,6 @@ void backlight_init(void)
 {
     queue_init(&backlight_queue, true);
 
-#ifndef SIMULATOR
     if (_backlight_init())
     {
 #if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_PWM)
@@ -734,7 +733,6 @@ void backlight_init(void)
         bl_dim_fraction = (BL_PWM_COUNT<<16);
 #endif
     }
-#endif
     /* Leave all lights as set by the bootloader here. The settings load will
      * call the appropriate backlight_set_*() functions, only changing light
      * status if necessary. */
