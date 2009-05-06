@@ -65,12 +65,15 @@ void i2c_init(void)
 /* initialises the internal i2c bus and prepares for transfers to the codec */
 void ascodec_init(void)
 {
+    int prescaler;
+
     /* enable clock */
     CGU_PERI |= CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE;
 
     /* prescaler for i2c clock */
-    I2C2_CPSR0 = CLK_DIV(AS3525_PCLK_FREQ, AS3525_I2C_FREQ);
-    I2C2_CPSR1 = 0;     /* MSB */    
+    prescaler = CLK_DIV(AS3525_PCLK_FREQ, AS3525_I2C_FREQ);
+    I2C2_CPSR0 = prescaler & 0xFF;
+    I2C2_CPSR1 = (prescaler >> 8) & 0xFF;
     
     /* set i2c slave address of codec part */
     I2C2_SLAD0 = AS3514_I2C_ADDR << 1;
