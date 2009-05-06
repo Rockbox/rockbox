@@ -65,6 +65,13 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
     int left_width, right_width, bottom_lines = 2;
     unsigned char *s;
     int nb_lines = viewport_get_nb_lines(parent);
+
+    /* nb_lines only returns the number of fully visible lines, small screens
+        or really large fonts could cause problems with the calculation below.
+     */
+    if(nb_lines==0)
+        nb_lines++;
+        
     char_height = parent->height/nb_lines;
 
     /* center the icons VP first */
