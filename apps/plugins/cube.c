@@ -175,14 +175,6 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == MROBE500_PAD
 #define CUBE_QUIT          BUTTON_POWER
-#define CUBE_NEXT          BUTTON_RIGHT
-#define CUBE_PREV          BUTTON_LEFT
-#define CUBE_INC           BUTTON_RC_VOL_UP
-#define CUBE_DEC           BUTTON_RC_VOL_DOWN
-#define CUBE_MODE          BUTTON_RC_MODE
-#define CUBE_PAUSE_PRE     BUTTON_RC_HEART
-#define CUBE_PAUSE         (BUTTON_RC_HEART | BUTTON_REL)
-#define CUBE_HIGHSPEED     BUTTON_RC_HEART  /* fixme: clashes with pause */
 
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
 #define CUBE_QUIT          BUTTON_BACK
