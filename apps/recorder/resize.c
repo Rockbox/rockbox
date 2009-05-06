@@ -59,6 +59,7 @@
 #undef DEBUGF
 #define DEBUGF(...)
 #endif
+#include <jpeg_load.h>
 
 #if CONFIG_CPU == SH7034
 /* 16*16->32 bit multiplication is a single instrcution on the SH1 */
@@ -516,6 +517,35 @@ static inline bool scale_v_linear(struct rowset *rset,
 }
 #endif /* HAVE_UPSCALER */
 
+#if defined(HAVE_LCD_COLOR) && (defined(HAVE_JPEG) || defined(PLUGIN))
+void output_row_native_fromyuv(uint32_t row, void * row_in,
+                               struct scaler_context *ctx)
+{
+    int col;
+    int fb_width = BM_WIDTH(ctx->bm->width,FORMAT_NATIVE,0);
+    uint8_t dy = DITHERY(row);
+    struct uint32_rgb *qp = (struct uint32_rgb *)row_in;
+    SDEBUGF("output_row: y: %lu in: %p\n",row, row_in);
+    fb_data *dest = (fb_data *)ctx->bm->data + fb_width * row;
+    int delta = 127;
+    unsigned r, g, b, y, u, v;
+
+    for (col = 0; col < ctx->bm->width; col++) {
+        if (ctx->dither)
+            delta = DITHERXDY(col,dy);
+        y = SC_MUL(qp->b + ctx->round, ctx->divisor);
+        u = SC_MUL(qp->g + ctx->round, ctx->divisor);
+        v = SC_MUL(qp->r + ctx->round, ctx->divisor);
+        qp++;
+        yuv_to_rgb(y, u, v, &r, &g, &b);
+        r = (31 * r + (r >> 3) + delta) >> 8;
+        g = (63 * g + (g >> 2) + delta) >> 8;
+        b = (31 * b + (b >> 3) + delta) >> 8;
+        *dest++ = LCD_RGBPACK_LCD(r, g, b);
+    }
+}
+#endif
+
 #if !defined(PLUGIN) || LCD_DEPTH > 1
 void output_row_native(uint32_t row, void * row_in,
                               struct scaler_context *ctx)
@@ -614,7 +644,14 @@ unsigned int get_size_native(struct bitmap *bm)
 }
 
 const struct custom_format format_native = {
+#if defined(HAVE_LCD_COLOR) && (defined(HAVE_JPEG) || defined(PLUGIN))
+    .output_row = {
+        output_row_native,
+        output_row_native_fromyuv
+    },
+#else
     .output_row = output_row_native,
+#endif
     .get_size = get_size_native
 };
 #endif
@@ -622,6 +659,7 @@ const struct custom_format format_native = {
 int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
                    struct rowset *rset, unsigned char *buf, unsigned int len,
                    const struct custom_format *format,
+                   IF_PIX_FMT(int format_index,)
                    struct img_part* (*store_part)(void *args),
                    void *args)
 {
@@ -683,10 +721,19 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     ctx.src = src;
     ctx.dither = dither;
 #if !defined(PLUGIN)
+#if defined(HAVE_LCD_COLOR) && defined(HAVE_JPEG)
+    ctx.output_row = format_index ? output_row_native_fromyuv
+                                  : output_row_native;
+#else
     ctx.output_row = output_row_native;
+#endif
     if (format)
 #endif
+#if defined(HAVE_LCD_COLOR) && (defined(HAVE_JPEG) || defined(PLUGIN))
+        ctx.output_row = format->output_row[format_index];
+#else
         ctx.output_row = format->output_row;
+#endif
 #ifdef HAVE_UPSCALER
     if (sw > dw)
     {

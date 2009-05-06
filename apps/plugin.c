@@ -135,11 +135,18 @@ static const struct plugin_api rockbox_api = {
     lcd_blit_mono,
     lcd_blit_grey_phase,
 #endif /* LCD_DEPTH */
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    lcd_blit_pal256,
+    lcd_pal256_update_pal,
+#endif
     lcd_puts_style,
     lcd_puts_scroll_style,
 #ifdef HAVE_LCD_INVERT
     lcd_set_invert_display,
 #endif /* HAVE_LCD_INVERT */
+#if defined(HAVE_LCD_MODES)
+    lcd_set_mode,
+#endif
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
     lcd_activation_set_hook,
     &button_queue,
@@ -571,6 +578,11 @@ static const struct plugin_api rockbox_api = {
 #endif
 #ifdef HAVE_LCD_BITMAP
     read_bmp_file,
+    read_bmp_fd,
+#ifdef HAVE_JPEG
+    read_jpeg_file,
+    read_jpeg_fd,
+#endif
     screen_dump_set_hook,
 #endif
     show_logo,
@@ -632,24 +644,6 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-       
-#if defined(HAVE_LCD_MODES)
-	lcd_set_mode,
-#endif
-
-#if defined(HAVE_LCD_MODES)
-#if HAVE_LCD_MODES & LCD_MODE_PAL256
-	lcd_blit_pal256,
-	lcd_pal256_update_pal,
-#endif
-#endif
-#ifdef HAVE_LCD_BITMAP
-#ifdef HAVE_JPEG
-    read_jpeg_file,
-    read_jpeg_fd,
-#endif
-    read_bmp_fd,
-#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)

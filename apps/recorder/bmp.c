@@ -603,7 +603,7 @@ int read_bmp_fd(int fd,
     {
         if (resize_on_load(bm, dither, &src_dim, &rset,
                            bitmap + totalsize, maxsize - totalsize,
-                           cformat, store_part_bmp, &ba))
+                           cformat, IF_PIX_FMT(0,) store_part_bmp, &ba))
             return totalsize;
         else
             return 0;

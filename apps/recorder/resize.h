@@ -143,8 +143,18 @@ struct scaler_context {
     bool (*h_scaler)(void*,struct scaler_context*, bool);
 };
 
+#if defined(HAVE_LCD_COLOR) && (defined(HAVE_JPEG) || defined(PLUGIN))
+#define IF_PIX_FMT(...) __VA_ARGS__
+#else
+#define IF_PIX_FMT(...)
+#endif
+
 struct custom_format {
+#if defined(HAVE_LCD_COLOR)
+    void (*output_row[2])(uint32_t,void*,struct scaler_context*);
+#else
     void (*output_row)(uint32_t,void*,struct scaler_context*);
+#endif
     unsigned int (*get_size)(struct bitmap *bm);
 };
 
@@ -161,6 +171,7 @@ int resize_on_load(struct bitmap *bm, bool dither,
                    struct dim *src, struct rowset *tmp_row,
                    unsigned char *buf, unsigned int len,
                    const struct custom_format *cformat,
+                   IF_PIX_FMT(int format_index,)
                    struct img_part* (*store_part)(void *args),
                    void *args);
 

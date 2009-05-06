@@ -634,13 +634,43 @@ static void output_row_transposed(uint32_t row, void * row_in,
 #endif
 }
 
+#ifdef HAVE_LCD_COLOR
+static void output_row_transposed_fromyuv(uint32_t row, void * row_in,
+                                       struct scaler_context *ctx)
+{
+    pix_t *dest = (pix_t*)ctx->bm->data + row;
+    pix_t *end = dest + ctx->bm->height * ctx->bm->width;
+    struct uint32_rgb *qp = (struct uint32_rgb*)row_in;
+    for (; dest < end; dest += ctx->bm->height)
+    {
+        unsigned r, g, b, y, u, v;
+        y = SC_MUL(qp->b + ctx->round, ctx->divisor);
+        u = SC_MUL(qp->g + ctx->round, ctx->divisor);
+        v = SC_MUL(qp->r + ctx->round, ctx->divisor);
+        qp++;
+        yuv_to_rgb(y, u, v, &r, &g, &b);
+        r = (31 * r + (r >> 3) + 127) >> 8;
+        g = (63 * g + (g >> 2) + 127) >> 8;
+        b = (31 * b + (b >> 3) + 127) >> 8;
+        *dest = LCD_RGBPACK_LCD(r, g, b);
+    }
+}
+#endif
+
 static unsigned int get_size(struct bitmap *bm)
 {
     return bm->width * bm->height * sizeof(pix_t);
 }
 
 const struct custom_format format_transposed = {
+#ifdef HAVE_LCD_COLOR
+    .output_row = {
+        output_row_transposed,
+        output_row_transposed_fromyuv
+    },
+#else
     .output_row = output_row_transposed,
+#endif
     .get_size = get_size
 };
 

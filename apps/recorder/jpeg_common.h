@@ -28,6 +28,8 @@
 #ifndef _JPEG_COMMON_H
 #define _JPEG_COMMON_H
 
+#include "bmp.h"
+
 #define HUFF_LOOKAHEAD 8 /* # of bits of lookahead */
 #define JPEG_READ_BUF_SIZE 16
 struct derived_tbl
@@ -50,6 +52,55 @@ struct derived_tbl
 };
 
 #define QUANT_TABLE_LENGTH  64
+
+/*
+ * Conversion of full 0-255 range YCrCb to RGB:
+ *   |R|   |1.000000 -0.000001  1.402000| |Y'|
+ *   |G| = |1.000000 -0.334136 -0.714136| |Pb|
+ *   |B|   |1.000000  1.772000  0.000000| |Pr|
+ * Scaled (yields s15-bit output):
+ *   |R|   |128    0  179| |Y       |
+ *   |G| = |128  -43  -91| |Cb - 128|
+ *   |B|   |128  227    0| |Cr - 128|
+ */
+#define YFAC            128
+#define RVFAC           179
+#define GUFAC           (-43)
+#define GVFAC           (-91)
+#define BUFAC           227
+#define COMPONENT_SHIFT  15
+
+struct uint8_yuv {
+    uint8_t y;
+    uint8_t u;
+    uint8_t v;
+};
+
+union uint8_rgbyuv {
+    struct uint8_yuv yuv;
+    struct uint8_rgb rgb;
+};
+
+static inline int clamp_component(int x)
+{
+    if ((unsigned)x > 255)
+        x = x < 0 ? 0 : 255;
+    return x;
+}
+#include <debug.h>
+static inline void yuv_to_rgb(int y, int u, int v, unsigned *r, unsigned *g, unsigned *b)
+{
+    int rv, guv, bu;
+    y = y * YFAC + (YFAC >> 1);
+    u = u - 128;
+    v = v - 128;
+    rv = RVFAC * v;
+    guv = GUFAC * u + GVFAC * v;
+    bu = BUFAC * u;
+    *r = clamp_component((y + rv) / YFAC);
+    *g = clamp_component((y + guv) / YFAC);
+    *b = clamp_component((y + bu) / YFAC);
+}
 
 /* for type of Huffman table */
 #define DC_LEN 28

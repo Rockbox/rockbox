@@ -48,13 +48,6 @@
 #define COMPONENT_SHIFT  15
 #define MATRIX_SHIFT      7
 
-static inline int clamp_component(int x)
-{
-    if ((unsigned)x > YUV_WHITE)
-        x = x < 0 ? 0 : YUV_WHITE;
-    return x;
-}
-
 static inline int clamp_component_bits(int x, int bits)
 {
     if ((unsigned)x > (1u << bits) - 1)

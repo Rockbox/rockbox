@@ -129,12 +129,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 149
+#define PLUGIN_API_VERSION 150
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 147
+#define PLUGIN_MIN_API_VERSION 150
 
 /* plugin return codes */
 enum plugin_status {
@@ -220,12 +220,20 @@ struct plugin_api {
                                 int bx, int by, int bwidth, int bheight,
                                 int stride);
 #endif /* LCD_DEPTH */
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    void (*lcd_blit_pal256)(unsigned char *src, int src_x, int src_y, int x, int y,
+                            int width, int height);
+    void (*lcd_pal256_update_pal)(fb_data *palette);
+#endif
     void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
     void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,
                                   int style);
 #ifdef HAVE_LCD_INVERT
     void (*lcd_set_invert_display)(bool yesno);
 #endif /* HAVE_LCD_INVERT */
+#if defined(HAVE_LCD_MODES)
+    void (*lcd_set_mode)(int mode);
+#endif
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
     void (*lcd_activation_set_hook)(void (*enable_hook)(void));
@@ -723,6 +731,14 @@ struct plugin_api {
 #ifdef HAVE_LCD_BITMAP
     int (*read_bmp_file)(const char* filename, struct bitmap *bm, int maxsize,
                          int format, const struct custom_format *cformat);
+    int (*read_bmp_fd)(int fd, struct bitmap *bm, int maxsize,
+                       int format, const struct custom_format *cformat);
+#ifdef HAVE_JPEG
+    int (*read_jpeg_file)(const char* filename, struct bitmap *bm, int maxsize,
+                          int format, const struct custom_format *cformat);
+    int (*read_jpeg_fd)(int fd, struct bitmap *bm, int maxsize,
+                        int format, const struct custom_format *cformat);
+#endif
     void (*screen_dump_set_hook)(void (*hook)(int fh));
 #endif
     int (*show_logo)(void);
@@ -788,32 +804,9 @@ struct plugin_api {
     void (*semaphore_release)(struct semaphore *s);
 #endif
 
-	const char *appsversion;
+    const char *appsversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-       
-#if defined(HAVE_LCD_MODES)
-	void (*lcd_set_mode)(int mode);
-#endif
-
-#if defined(HAVE_LCD_MODES)
-#if HAVE_LCD_MODES & LCD_MODE_PAL256
-	void (*lcd_blit_pal256)(unsigned char *src, int src_x, int src_y, int x, int y,
-							int width, int height);
-	void (*lcd_pal256_update_pal)(fb_data *palette);
-#endif
-#endif
-
-#ifdef HAVE_LCD_BITMAP
-#ifdef HAVE_JPEG
-    int (*read_jpeg_file)(const char* filename, struct bitmap *bm, int maxsize,
-                          int format, const struct custom_format *cformat);
-    int (*read_jpeg_fd)(int fd, struct bitmap *bm, int maxsize,
-                        int format, const struct custom_format *cformat);
-#endif
-    int (*read_bmp_fd)(int fd, struct bitmap *bm, int maxsize,
-                       int format, const struct custom_format *cformat);
-#endif
 };
 
 /* plugin header */

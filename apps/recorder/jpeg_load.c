@@ -153,13 +153,6 @@ INLINE unsigned range_limit(int value)
 #endif
 }
 
-static inline int clamp_component(int x)
-{
-    if ((unsigned)x > 255)
-        x = x < 0 ? 0 : 255;
-    return x;
-}
-
 /* IDCT implementation */
 
 
@@ -1810,27 +1803,8 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
             unsigned int xp;
             int yp;
             unsigned char *row = out;
-            if (p_jpeg->blocks > 1) {
-                for (yp = 0; yp < height; yp++, row += b_width)
-                {
-                    unsigned char *px = row;
-                    for (xp = 0; xp < 1U << p_jpeg->h_scale[1];
-                        xp++, px += JPEG_PIX_SZ)
-                    {
-                        int y, u, v, rv, guv, bu;
-                        y = px[0] * YFAC + (YFAC >> 1);
-                        u = px[1] - 128;
-                        v = px[2] - 128;
-                        rv = RVFAC * v;
-                        guv = GUFAC * u + GVFAC * v;
-                        bu = BUFAC * u;
-                        struct uint8_rgb *rgb = (struct uint8_rgb *)px;
-                        rgb->red = clamp_component((y + rv) / YFAC);
-                        rgb->green = clamp_component((y + guv) / YFAC);
-                        rgb->blue = clamp_component((y + bu) / YFAC);
-                    }
-                }
-            } else {
+            if (p_jpeg->blocks == 1)
+            {
                 for (yp = 0; yp < height; yp++, row += b_width)
                 {
                     unsigned char *px = row;
@@ -2003,7 +1977,7 @@ int read_jpeg_fd(int fd,
     rset.rowstop = bm->height;
     rset.rowstep = 1;
     if (resize_on_load(bm, dither, &src_dim, &rset, buf_start, maxsize, cformat,
-        store_row_jpeg, p_jpeg))
+        IF_PIX_FMT(p_jpeg->blocks == 1 ? 0 : 1,) store_row_jpeg, p_jpeg))
         return bm_size;
     else
         return 0;
