@@ -151,14 +151,6 @@ const struct button_mapping generic_directions[] =
     { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
 #elif (CONFIG_KEYPAD == MROBE500_PAD)
-    { PLA_UP,                BUTTON_RC_PLAY,                    BUTTON_NONE},
-    { PLA_DOWN,              BUTTON_RC_DOWN,                    BUTTON_NONE},
-    { PLA_LEFT,              BUTTON_RC_REW,                     BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RC_FF,                      BUTTON_NONE},
-    { PLA_UP_REPEAT,         BUTTON_RC_PLAY|BUTTON_REPEAT,      BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_RC_DOWN|BUTTON_REPEAT,      BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_RC_REW|BUTTON_REPEAT,       BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RC_FF|BUTTON_REPEAT,        BUTTON_NONE},
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
     { PLA_UP,                BUTTON_RC_VOL_UP,                  BUTTON_NONE},
