@@ -2115,7 +2115,7 @@ case $modelname in
      gdbstub="(G)DB stub, "
      ;;
   e200r|e200)
-     gdbstub="(I)installer, "
+     gdbstub="(I)nstaller, "
      ;;
   c200)
      gdbstub="(E)raser, "
