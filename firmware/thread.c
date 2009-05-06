@@ -943,21 +943,20 @@ static void __attribute__((used)) _start_thread(void)
         ".set noreorder       \n"
         ".set noat            \n"
         "lw     $8,    4($9)  \n" /* Fetch thread function pointer ($8 = t0, $9 = t1) */
-        "lw     $29,  40($9)  \n" /* Set initial sp(=$29) */
+        "lw     $29,  36($9)  \n" /* Set initial sp(=$29) */
         "jalr   $8            \n" /* Start the thread */
-        "sw     $0,   48($9)  \n" /* Clear start address */
+        "sw     $0,   44($9)  \n" /* Clear start address */
         ".set at              \n"
         ".set reorder         \n"
-        ::: "t0"
     );
     thread_exit();
 }
 
 /* Place context pointer in s0 slot, function pointer in s1 slot, and
  * start_thread pointer in context_start */
-#define THREAD_STARTUP_INIT(core, thread, function)           \
-    ({ (thread)->context.r[0] = (uint32_t)&(thread)->context, \
-       (thread)->context.r[1] = (uint32_t)(function),         \
+#define THREAD_STARTUP_INIT(core, thread, function)            \
+    ({ (thread)->context.r[0]  = (uint32_t)&(thread)->context, \
+       (thread)->context.r[1]  = (uint32_t)(function),         \
        (thread)->context.start = (uint32_t)start_thread; })
 
 /*---------------------------------------------------------------------------
@@ -977,10 +976,9 @@ static inline void store_context(void* addr)
         "sw    $21, 20(%0)     \n" /* s5 */
         "sw    $22, 24(%0)     \n" /* s6 */
         "sw    $23, 28(%0)     \n" /* s7 */
-        "sw    $28, 32(%0)     \n" /* gp */
-        "sw    $30, 36(%0)     \n" /* fp */
-        "sw    $29, 40(%0)     \n" /* sp */
-        "sw    $31, 44(%0)     \n" /* ra */
+        "sw    $30, 32(%0)     \n" /* fp */
+        "sw    $29, 36(%0)     \n" /* sp */
+        "sw    $31, 40(%0)     \n" /* ra */
         ".set at               \n"
         ".set reorder          \n"
         : : "r" (addr)
@@ -996,7 +994,7 @@ static inline void load_context(const void* addr)
     asm volatile (
         ".set noat             \n"
         ".set noreorder        \n"
-        "lw    $8, 48(%0)      \n" /* Get start address ($8 = t0) */
+        "lw    $8, 44(%0)      \n" /* Get start address ($8 = t0) */
         "beqz  $8, running     \n" /* NULL -> already running */
         "nop                   \n"
         "jr    $8              \n"
@@ -1010,10 +1008,9 @@ static inline void load_context(const void* addr)
         "lw    $21, 20(%0)     \n" /* s5 */
         "lw    $22, 24(%0)     \n" /* s6 */
         "lw    $23, 28(%0)     \n" /* s7 */
-        "lw    $28, 32(%0)     \n" /* gp */
-        "lw    $30, 36(%0)     \n" /* fp */
-        "lw    $29, 40(%0)     \n" /* sp */
-        "lw    $31, 44(%0)     \n" /* ra */
+        "lw    $30, 32(%0)     \n" /* fp */
+        "lw    $29, 36(%0)     \n" /* sp */
+        "lw    $31, 40(%0)     \n" /* ra */
         ".set at               \n"
         ".set reorder          \n"
         : : "r" (addr) : "t0", "t1"
@@ -1034,9 +1031,9 @@ static inline void core_sleep(void)
                  "move   $9, $8             \n" /* move t1, t0 */
                  "la     $10, 0x8000000     \n" /* la t2, 0x8000000 */
                  "or     $8, $8, $10        \n" /* Enable reduced power mode */
-                 "mtc0   $8, $12            \n"
+                 "mtc0   $8, $12            \n" /* mtc t0, $12 */
                  "wait                      \n"
-                 "mtc0   $9, $12            \n"
+                 "mtc0   $9, $12            \n" /* mtc t1, $12 */
                  ".set   mips0              \n"
                  ::: "t0", "t1", "t2"
                  );
