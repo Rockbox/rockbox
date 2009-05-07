@@ -93,7 +93,11 @@ static int battery_type = 0;
 /* Power history: power_history[0] is the newest sample */
 unsigned short power_history[POWER_HISTORY_LEN];
 
+#if CONFIG_CPU == JZ4732 /* FIXME! */
+static char power_stack[DEFAULT_STACK_SIZE + POWERMGMT_DEBUG_STACK];
+#else
 static char power_stack[DEFAULT_STACK_SIZE/2 + POWERMGMT_DEBUG_STACK];
+#endif
 static const char power_thread_name[] = "power";
 
 static int poweroff_timeout = 0;
