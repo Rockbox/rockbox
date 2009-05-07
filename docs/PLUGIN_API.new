@@ -1690,10 +1690,10 @@ bool pcm_is_playing(void)
 void pcm_play_data(pcm_more_callback_type get_more, unsigned char* start, size_t size)
     \group sound
     \conditions (CONFIG_CODEC == SWCODEC)
-    \param get_more
-    \param start
-    \param size
-    \description
+    \param get_more Optional callback
+    \param start is the address of raw 16-16, interleaved PCM data
+    \param size is the size of the data to play
+    \description May be used without the callback parameter in order to play a single clip. If you wish to play sound continuously, then use the callback instead and return the buffer address and size to be played from that callback. Every time that a buffer is played out, the callback is asked for the next buffer to play but without stopping and starting playback. The callback is called asynchronously in interrupt context so what you may do in there is limited. 
 
 void pcm_play_lock(void)
     \group sound
