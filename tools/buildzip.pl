@@ -326,6 +326,11 @@ STOP
         if ($line =~ /([^,]*),(.*)/) {
             my ($plugin, $dir)=($1, $2);
             move("$rbdir/rocks/${plugin}.rock", "$rbdir/rocks/$dir/${plugin}.rock");
+            if(-e "$rbdir/rocks/${plugin}.ovl") {
+                # if there's an "overlay" file for the .rock, move that as
+                # well
+                move("$rbdir/rocks/${plugin}.ovl", "$rbdir/rocks/$dir");
+            }
         }
     }
 

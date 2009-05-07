@@ -55,10 +55,6 @@ text_editor.c
 wavview.c
 robotfindskitten.c
 
-#if defined(HAVE_TAGCACHE)
-pictureflow.c
-#endif
-
 #ifdef HAVE_LCD_COLOR
 ppmviewer.c
 #endif
@@ -109,6 +105,7 @@ zxbox.c
 /* overlay loader for Goban */
 #if (PLUGIN_BUFFER_SIZE < 0x10000) && !defined(SIMULATOR)
 goban.c
+pictureflow.c
 #endif
 
 /* not support recorder models for now */

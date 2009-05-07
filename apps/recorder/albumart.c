@@ -91,7 +91,7 @@ static void fix_path_part(char* path, int offset, int count)
     }
 }
 
-#if defined(HAVE_JPEG) || (defined(PLUGIN) && PLUGIN_BUFFER_SIZE > 0x10000)
+#if defined(HAVE_JPEG) || defined(PLUGIN)
 const char * extensions[] = { "jpeg", "jpg", "bmp" };
 int extension_lens[] = { 4, 3, 3 };
 /* Try checking for several file extensions, return true if a file is found and
@@ -134,7 +134,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     const char *artist;
     int dirlen;
     int albumlen;
-#if defined(HAVE_JPEG) || (defined(PLUGIN) && PLUGIN_BUFFER_SIZE > 0x10000)
+#if defined(HAVE_JPEG) || defined(PLUGIN)
     int pathlen;
 #endif
 
@@ -153,7 +153,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     /* the first file we look for is one specific to the track playing */
     strip_extension(path, sizeof(path) - strlen(size_string) - 4, trackname);
     strcat(path, size_string);
-#if defined(HAVE_JPEG) || (defined(PLUGIN) && PLUGIN_BUFFER_SIZE > 0x10000)
+#if defined(HAVE_JPEG) || defined(PLUGIN)
     strcat(path, ".");
     pathlen = strlen(path);
     found = try_exts(path, pathlen);
@@ -165,7 +165,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     {
         /* if it doesn't exist,
          * we look for a file specific to the track's album name */
-#if defined(HAVE_JPEG) || (defined(PLUGIN) && PLUGIN_BUFFER_SIZE > 0x10000)
+#if defined(HAVE_JPEG) || defined(PLUGIN)
         pathlen = snprintf(path, sizeof(path),
                            "%s%s%s.", dir, id3->album, size_string);
         fix_path_part(path, dirlen, albumlen);
@@ -181,7 +181,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     if (!found)
     {
         /* if it still doesn't exist, we look for a generic file */
-#if defined(HAVE_JPEG) || (defined(PLUGIN) && PLUGIN_BUFFER_SIZE > 0x10000)
+#if defined(HAVE_JPEG) || defined(PLUGIN)
         pathlen = snprintf(path, sizeof(path),
                            "%scover%s.", dir, size_string);
         found = try_exts(path, pathlen);
@@ -192,7 +192,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
 #endif
     }
 
-#if defined(HAVE_JPEG) || (defined(PLUGIN) && PLUGIN_BUFFER_SIZE > 0x10000)
+#if defined(HAVE_JPEG) || defined(PLUGIN)
     if (!found)
     {
         snprintf (path, sizeof(path), "%sfolder.jpg", dir);
@@ -205,7 +205,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     if (!found && artist && id3->album)
     {
         /* look in the albumart subdir of .rockbox */
-#if defined(HAVE_JPEG) || (defined(PLUGIN) && PLUGIN_BUFFER_SIZE > 0x10000)
+#if defined(HAVE_JPEG) || defined(PLUGIN)
         pathlen = snprintf(path, sizeof(path),
                            ROCKBOX_DIR "/albumart/%s-%s%s.",
                            artist,
@@ -241,7 +241,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
         {
             /* we look in the parent directory
              * for a file specific to the track's album name */
-#if defined(HAVE_JPEG) || (defined(PLUGIN) && PLUGIN_BUFFER_SIZE > 0x10000)
+#if defined(HAVE_JPEG) || defined(PLUGIN)
             pathlen = snprintf(path, sizeof(path),
                                "%s%s%s.", dir, id3->album, size_string);
             fix_path_part(path, dirlen, albumlen);
@@ -258,7 +258,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
         {
             /* if it still doesn't exist, we look in the parent directory
              * for a generic file */
-#if defined(HAVE_JPEG) || (defined(PLUGIN) && PLUGIN_BUFFER_SIZE > 0x10000)
+#if defined(HAVE_JPEG) || defined(PLUGIN)
             pathlen = snprintf(path, sizeof(path),
                                "%scover%s.", dir, size_string);
             found = try_exts(path, pathlen);

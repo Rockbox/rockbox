@@ -957,13 +957,8 @@ bool create_albumart_cache(void)
         input_bmp.data = buf;
         input_bmp.width = DISPLAY_WIDTH;
         input_bmp.height = DISPLAY_HEIGHT;
-#if PLUGIN_BUFFER_SIZE > 0x10000
         ret = read_image_file(albumart_file, &input_bmp,
                               buf_size, format, &format_transposed);
-#else
-        ret = scaled_read_bmp_file(albumart_file, &input_bmp,
-                              buf_size, format, &format_transposed);
-#endif
         if (ret <= 0) {
             rb->splash(HZ, "Could not read bmp");
             continue; /* skip missing/broken files */
@@ -1648,7 +1643,7 @@ void render_slide(struct slide_data *slide, const int alpha)
                 pixel -= pixelstep;
             }
         }
-        p = (bmp->height-DISPLAY_OFFS) * PFREAL_ONE;   
+        p = (bmp->height-DISPLAY_OFFS) * PFREAL_ONE;
         plim = MIN(sh * PFREAL_ONE, p + (LCD_HEIGHT/2) * dy);
         int plim2 = MIN(MIN(sh + REFLECT_HEIGHT, sh * 2) * PFREAL_ONE,
                         p + (LCD_HEIGHT/2) * dy);
@@ -2556,7 +2551,7 @@ enum plugin_status plugin_start(const void *parameter)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
-#if PLUGIN_BUFFER_SIZE > 0x10000
+#if PLUGIN_BUFFER_SIZE > 0x10000 && 0
     buf = rb->plugin_get_buffer(&buf_size);
 #else
     buf = rb->plugin_get_audio_buffer(&buf_size);

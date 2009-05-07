@@ -16,6 +16,9 @@ rockboy
 
 /* For all targets with a bitmap display */
 #ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_TAGCACHE
+pictureflow
+#endif
 chessbox
 jpeg
 sudoku
