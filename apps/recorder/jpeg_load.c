@@ -73,13 +73,17 @@ struct jpeg
     int store_pos[4]; /* for Y block ordering */
 #ifdef HAVE_LCD_COLOR
     int last_dc_val[3];
-#else
-    int last_dc_val;
-#endif
     int h_scale[2]; /* horizontal scalefactor = (2**N) / 8 */
     int v_scale[2]; /* same as above, for vertical direction */
-    int k_need[3]; /* per component zig-zag index of last needed coefficient */
-    int zero_need[3]; /* per compenent number of coefficients to zero */
+    int k_need[2]; /* per component zig-zag index of last needed coefficient */
+    int zero_need[2]; /* per compenent number of coefficients to zero */
+#else
+    int last_dc_val;
+    int h_scale[1]; /* horizontal scalefactor = (2**N) / 8 */
+    int v_scale[1]; /* same as above, for vertical direction */
+    int k_need[1]; /* per component zig-zag index of last needed coefficient */
+    int zero_need[1]; /* per compenent number of coefficients to zero */
+#endif
     jpeg_pix_t *img_buf;
 
     int quanttable[4][QUANT_TABLE_LENGTH]; /* raw quantization tables 0-3 */
@@ -1685,15 +1689,25 @@ INLINE int huff_decode_ac(struct jpeg *p_jpeg, struct derived_tbl* tbl)
 static struct img_part *store_row_jpeg(void *jpeg_args)
 {
     struct jpeg *p_jpeg = (struct jpeg*) jpeg_args;
-    unsigned int width = p_jpeg->x_mbl << p_jpeg->h_scale[1];
+#ifdef HAVE_LCD_COLOR
+    int mcu_hscale = p_jpeg->h_scale[1];
+    int mcu_vscale = p_jpeg->v_scale[1];
+#else
+    int mcu_hscale = (p_jpeg->h_scale[0] + p_jpeg->frameheader[0].horizontal_sampling - 1);
+    int mcu_vscale = (p_jpeg->v_scale[0] + p_jpeg->frameheader[0].vertical_sampling - 1);
+#endif
+    unsigned int width = p_jpeg->x_mbl << mcu_hscale;
     unsigned int b_width = width * JPEG_PIX_SZ;
-    int height = 1U << p_jpeg->v_scale[1];
+    int height = 1U << mcu_vscale;
     int x;
     if (!p_jpeg->mcu_row) /* Need to decode a new row of MCUs */
     {
         p_jpeg->out_ptr = (unsigned char *)p_jpeg->img_buf;
         int store_offs[4];
-        int mcu_offset = JPEG_PIX_SZ << p_jpeg->h_scale[1];
+#ifdef HAVE_LCD_COLOR
+        unsigned mcu_width = 1U << mcu_hscale;
+#endif
+        int mcu_offset = JPEG_PIX_SZ << mcu_hscale;
         unsigned char *out = p_jpeg->out_ptr;
         store_offs[p_jpeg->store_pos[0]] = 0;
         store_offs[p_jpeg->store_pos[1]] = JPEG_PIX_SZ << p_jpeg->h_scale[0];
@@ -1729,7 +1743,7 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
                     p_jpeg->last_dc_val += s;
                     /* output it (assumes zag[0] = 0) */
                     block[0] = p_jpeg->last_dc_val *
-                        p_jpeg->quanttable[!!ci][0];
+                        p_jpeg->quanttable[0][0];
 #endif
                     /* coefficient buffer must be cleared */
                     MEMSET(block+1, 0, p_jpeg->zero_need[!!ci] * sizeof(int));
@@ -1787,13 +1801,12 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
                 if (!ci)
 #endif
                 {
-                    unsigned char si = !!ci;
-                    int idct_cols = 1 << MIN(p_jpeg->h_scale[si], 3);
-                    int idct_rows = 1 << p_jpeg->v_scale[si];
+                    int idct_cols = 1 << MIN(p_jpeg->h_scale[!!ci], 3);
+                    int idct_rows = 1 << p_jpeg->v_scale[!!ci];
                     unsigned char *b_out = out + (ci ? ci : store_offs[blkn]);
-                    if (idct_tbl[p_jpeg->v_scale[si]].v_idct)
-                        idct_tbl[p_jpeg->v_scale[si]].v_idct(block, idct_cols);
-                    idct_tbl[p_jpeg->h_scale[si]].h_idct(block, b_out,
+                    if (idct_tbl[p_jpeg->v_scale[!!ci]].v_idct)
+                        idct_tbl[p_jpeg->v_scale[!!ci]].v_idct(block, idct_cols);
+                    idct_tbl[p_jpeg->h_scale[!!ci]].h_idct(block, b_out,
                         idct_rows, b_width);
                 }
             } /* for blkn */
@@ -1808,8 +1821,7 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
                 for (yp = 0; yp < height; yp++, row += b_width)
                 {
                     unsigned char *px = row;
-                    for (xp = 0; xp < 1U << p_jpeg->h_scale[1];
-                        xp++, px += JPEG_PIX_SZ)
+                    for (xp = 0; xp < mcu_width; xp++, px += JPEG_PIX_SZ)
                     {
                         px[1] = px[2] = px[0];
                     }
@@ -1863,11 +1875,11 @@ int read_jpeg_file(const char* filename,
     return ret;
 }
 
-static int calc_scale(int in_size, int out_size, int subsample)
+static int calc_scale(int in_size, int out_size)
 {
     int scale = 0;
     out_size <<= 3;
-    for (scale = 0; scale < 5 - subsample; scale++)
+    for (scale = 0; scale < 3; scale++)
     {
         if (out_size <= in_size)
             break;
@@ -1926,25 +1938,27 @@ int read_jpeg_fd(int fd,
         bm->width = p_jpeg->x_size;
         bm->height = p_jpeg->y_size;
     }
-    p_jpeg->h_scale[0] = calc_scale(p_jpeg->x_size, bm->width,
-        p_jpeg->frameheader[0].horizontal_sampling);
-    p_jpeg->v_scale[0] = calc_scale(p_jpeg->y_size, bm->height,
-        p_jpeg->frameheader[0].vertical_sampling);
+    p_jpeg->h_scale[0] = calc_scale(p_jpeg->x_size, bm->width);
+    p_jpeg->v_scale[0] = calc_scale(p_jpeg->y_size, bm->height);
+#ifdef HAVE_LCD_COLOR
     p_jpeg->h_scale[1] = p_jpeg->h_scale[0] +
         p_jpeg->frameheader[0].horizontal_sampling - 1;
     p_jpeg->v_scale[1] = p_jpeg->v_scale[0] +
         p_jpeg->frameheader[0].vertical_sampling - 1;
+#endif
     fix_quant_tables(p_jpeg);
-    int decode_w = (1 << MIN(p_jpeg->h_scale[0],3)) - 1;
-    int decode_h = (1 << MIN(p_jpeg->v_scale[0],3)) - 1;
+    int decode_w = (1 << p_jpeg->h_scale[0]) - 1;
+    int decode_h = (1 << p_jpeg->v_scale[0]) - 1;
     src_dim.width = (p_jpeg->x_size << p_jpeg->h_scale[0]) >> 3;
     src_dim.height = (p_jpeg->y_size << p_jpeg->v_scale[0]) >> 3;
     p_jpeg->zero_need[0] = (decode_h << 3) + decode_w;
     p_jpeg->k_need[0] = zig[p_jpeg->zero_need[0]];
+#ifdef HAVE_LCD_COLOR
     decode_w = (1 << MIN(p_jpeg->h_scale[1],3)) - 1;
     decode_h = (1 << MIN(p_jpeg->v_scale[1],3)) - 1;
-    p_jpeg->zero_need[1] = p_jpeg->zero_need[2] = (decode_h << 3) + decode_w;
-    p_jpeg->k_need[1] = p_jpeg->k_need[2] = zig[p_jpeg->zero_need[1]];
+    p_jpeg->zero_need[1] = (decode_h << 3) + decode_w;
+    p_jpeg->k_need[1] =  zig[p_jpeg->zero_need[1]];
+#endif
     if (cformat)
         bm_size = cformat->get_size(bm);
     else
@@ -1962,8 +1976,15 @@ int read_jpeg_fd(int fd,
     fix_huff_tables(p_jpeg);
     buf_start += sizeof(struct jpeg);
     maxsize = buf_end - buf_start;
+#ifdef HAVE_LCD_COLOR
     int decode_buf_size = (p_jpeg->x_mbl << p_jpeg->h_scale[1])
         << p_jpeg->v_scale[1];
+#else
+    int decode_buf_size = (p_jpeg->x_mbl << p_jpeg->h_scale[0])
+        << p_jpeg->v_scale[0];
+    decode_buf_size <<= p_jpeg->frameheader[0].horizontal_sampling +
+        p_jpeg->frameheader[0].vertical_sampling - 2;
+#endif
     decode_buf_size *= JPEG_PIX_SZ;
     p_jpeg->img_buf = (jpeg_pix_t *)buf_start;
     if (buf_end - buf_start < decode_buf_size)
