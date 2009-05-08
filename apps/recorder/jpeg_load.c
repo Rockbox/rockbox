@@ -1647,6 +1647,8 @@ static void search_restart(struct jpeg *p_jpeg)
 }
 
 /* Figure F.12: extend sign bit. */
+#if CONFIG_CPU == SH7034
+/* SH1 lacks a variable-shift instruction */
 #define HUFF_EXTEND(x,s)  ((x) < extend_test[s] ? (x) + extend_offset[s] : (x))
 
 static const int extend_test[16] =   /* entry n is 2**(n-1) */
@@ -1662,6 +1664,15 @@ static const int extend_offset[16] = /* entry n is (-1 << n) + 1 */
     ((-1)<<9) + 1, ((-1)<<10) + 1, ((-1)<<11) + 1, ((-1)<<12) + 1,
     ((-1)<<13) + 1, ((-1)<<14) + 1, ((-1)<<15) + 1
 };
+#else
+/* This saves some code and data size, benchmarks about the same on RAM */
+#define HUFF_EXTEND(x,s) \
+({ \
+    int x__ = x; \
+    int s__ = s; \
+    x__ & (1 << (s__- 1)) ? x__ : x__ + (-1 << s__) + 1; \
+})
+#endif
 
 /* Decode a single value */
 INLINE int huff_decode_dc(struct jpeg *p_jpeg, struct derived_tbl* tbl)
