@@ -33,6 +33,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <fcntl.h>
@@ -63,7 +64,10 @@ int open_wav(char* filename) {
 
     fd=open(filename,O_CREAT|O_WRONLY|O_TRUNC,S_IRUSR|S_IWUSR);
     if (fd >= 0) {
-        write(fd,wav_header,sizeof(wav_header));
+        if (write(fd,wav_header,sizeof(wav_header)) < sizeof(wav_header)) {
+            fprintf(stderr,"[ERR}  Failed to write wav header\n");
+            exit(1);
+        }
     }
     return(fd);
 }
@@ -114,7 +118,10 @@ void close_wav(int fd, FLACContext* fc) {
     wav_header[43]=(x&0xff000000)>>24;
 
     lseek(fd,0,SEEK_SET);
-    write(fd,wav_header,sizeof(wav_header));
+    if (write(fd,wav_header,sizeof(wav_header)) < sizeof(wav_header)) {
+        fprintf(stderr,"[ERR}  Failed to write wav header\n");
+        exit(1);
+    }
     close(fd);
 }
 
@@ -295,7 +302,11 @@ int main(int argc, char* argv[]) {
                  if (fc.bps==24) *(p++)=(decoded1[i]&0xff0000)>>16;
              }
         }
-        write(fdout,wavbuf,fc.blocksize*fc.channels*(fc.bps/8));
+        n = fc.blocksize*fc.channels*(fc.bps/8);
+        if (write(fdout,wavbuf,n) < n) {
+            fprintf(stderr,"[ERR] Write failed\n");
+            exit(1);
+        }
 
         memmove(buf,&buf[consumed],bytesleft-consumed);
         bytesleft-=consumed;
