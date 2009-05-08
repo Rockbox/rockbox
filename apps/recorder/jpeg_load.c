@@ -1675,84 +1675,74 @@ static const int extend_offset[16] = /* entry n is (-1 << n) + 1 */
 #endif
 
 /* Decode a single value */
-INLINE int huff_decode_dc(struct jpeg *p_jpeg, struct derived_tbl* tbl)
-{
-    int nb, look, s, r;
-
-    check_bit_buffer(p_jpeg, HUFF_LOOKAHEAD);
-    look = peek_bits(p_jpeg, HUFF_LOOKAHEAD);
-    if ((nb = tbl->look_nbits[look]) != 0)
-    {
-        drop_bits(p_jpeg, nb);
-        s = tbl->look_sym[look];
-        check_bit_buffer(p_jpeg, s);
-        r = get_bits(p_jpeg, s);
-        s = HUFF_EXTEND(r, s);
-    }
-    else
-    {   /*  slow_DECODE(s, HUFF_LOOKAHEAD+1)) < 0); */
-        long code;
-        nb=HUFF_LOOKAHEAD+1;
-        check_bit_buffer(p_jpeg, nb);
-        code = get_bits(p_jpeg, nb);
-        while (code > tbl->maxcode[nb])
-        {
-            code <<= 1;
-            check_bit_buffer(p_jpeg, 1);
-            code |= get_bits(p_jpeg, 1);
-            nb++;
-        }
-        if (nb > 16) /* error in Huffman */
-        {
-            s=0; /* fake a zero, this is most safe */
-        }
-        else
-        {
-            s = tbl->pub[16 + tbl->valptr[nb] +
-                ((int) (code - tbl->mincode[nb]))];
-            check_bit_buffer(p_jpeg, s);
-            r = get_bits(p_jpeg, s);
-            s = HUFF_EXTEND(r, s);
-        }
-    } /* end slow decode */
-    return s;
+#define huff_decode_dc(p_jpeg, tbl, s, r) \
+{ \
+    int nb, look; \
+\
+    check_bit_buffer((p_jpeg), HUFF_LOOKAHEAD); \
+    look = peek_bits((p_jpeg), HUFF_LOOKAHEAD); \
+    if ((nb = (tbl)->look_nbits[look]) != 0) \
+    { \
+        drop_bits((p_jpeg), nb); \
+        s = (tbl)->look_sym[look]; \
+        check_bit_buffer((p_jpeg), s); \
+        r = get_bits((p_jpeg), s); \
+    } else { \
+        /*  slow_DECODE(s, HUFF_LOOKAHEAD+1)) < 0); */ \
+        long code; \
+        nb=HUFF_LOOKAHEAD+1; \
+        check_bit_buffer((p_jpeg), nb); \
+        code = get_bits((p_jpeg), nb); \
+        while (code > (tbl)->maxcode[nb]) \
+        { \
+            code <<= 1; \
+            check_bit_buffer((p_jpeg), 1); \
+            code |= get_bits((p_jpeg), 1); \
+            nb++; \
+        } \
+        if (nb > 16) /* error in Huffman */ \
+        { \
+            r = 0; s = 0; /* fake a zero, this is most safe */ \
+        } else { \
+            s = (tbl)->pub[16 + (tbl)->valptr[nb] + \
+                ((int) (code - (tbl)->mincode[nb]))]; \
+            check_bit_buffer((p_jpeg), s); \
+            r = get_bits((p_jpeg), s); \
+        } \
+    } /* end slow decode */ \
 }
 
-INLINE int huff_decode_ac(struct jpeg *p_jpeg, struct derived_tbl* tbl)
-{
-    int nb, look, s;
-
-    check_bit_buffer(p_jpeg, HUFF_LOOKAHEAD);
-    look = peek_bits(p_jpeg, HUFF_LOOKAHEAD);
-    if ((nb = tbl->look_nbits[look]) != 0)
-    {
-        drop_bits(p_jpeg, nb);
-        s = tbl->look_sym[look];
-    }
-    else
-    {   /*  slow_DECODE(s, HUFF_LOOKAHEAD+1)) < 0); */
-        long code;
-        nb=HUFF_LOOKAHEAD+1;
-        check_bit_buffer(p_jpeg, nb);
-        code = get_bits(p_jpeg, nb);
-        while (code > tbl->maxcode[nb])
-        {
-            code <<= 1;
-            check_bit_buffer(p_jpeg, 1);
-            code |= get_bits(p_jpeg, 1);
-            nb++;
-        }
-        if (nb > 16) /* error in Huffman */
-        {
-            s=0; /* fake a zero, this is most safe */
-        }
-        else
-        {
-            s = tbl->pub[16 + tbl->valptr[nb] +
-                ((int) (code - tbl->mincode[nb]))];
-        }
-    } /* end slow decode */
-    return s;
+#define huff_decode_ac(p_jpeg, tbl, s) \
+{ \
+    int nb, look; \
+\
+    check_bit_buffer((p_jpeg), HUFF_LOOKAHEAD); \
+    look = peek_bits((p_jpeg), HUFF_LOOKAHEAD); \
+    if ((nb = (tbl)->look_nbits[look]) != 0) \
+    { \
+        drop_bits((p_jpeg), nb); \
+        s = (tbl)->look_sym[look]; \
+    } else { \
+        /*  slow_DECODE(s, HUFF_LOOKAHEAD+1)) < 0); */ \
+        long code; \
+        nb=HUFF_LOOKAHEAD+1; \
+        check_bit_buffer((p_jpeg), nb); \
+        code = get_bits((p_jpeg), nb); \
+        while (code > (tbl)->maxcode[nb]) \
+        { \
+            code <<= 1; \
+            check_bit_buffer((p_jpeg), 1); \
+            code |= get_bits((p_jpeg), 1); \
+            nb++; \
+        } \
+        if (nb > 16) /* error in Huffman */ \
+        { \
+            s = 0; /* fake a zero, this is most safe */ \
+        } else { \
+            s = (tbl)->pub[16 + (tbl)->valptr[nb] + \
+                ((int) (code - (tbl)->mincode[nb]))]; \
+        } \
+    } /* end slow decode */ \
 }
 
 static struct img_part *store_row_jpeg(void *jpeg_args)
@@ -1799,12 +1789,13 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
                 struct derived_tbl* actbl = &p_jpeg->ac_derived_tbls[ti];
 
                 /* Section F.2.2.1: decode the DC coefficient difference */
-                s = huff_decode_dc(p_jpeg, dctbl);
+                huff_decode_dc(p_jpeg, dctbl, s, r);
 
 #ifndef HAVE_LCD_COLOR
                 if (!ci)
 #endif
                 {
+                    s = HUFF_EXTEND(r, s);
 #ifdef HAVE_LCD_COLOR
                     p_jpeg->last_dc_val[ci] += s;
                     /* output it (assumes zag[0] = 0) */
@@ -1821,7 +1812,7 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
                     /* Section F.2.2.2: decode the AC coefficients */
                     for (; k < p_jpeg->k_need[!!ci]; k++)
                     {
-                        s = huff_decode_ac(p_jpeg, actbl);
+                        huff_decode_ac(p_jpeg, actbl, s);
                         r = s >> 4;
                         s &= 15;
                         if (s)
@@ -1851,7 +1842,7 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
                 }
                 for (; k < 64; k++)
                 {
-                    s = huff_decode_ac(p_jpeg, actbl);
+                    huff_decode_ac(p_jpeg, actbl, s);
                     r = s >> 4;
                     s &= 15;
 
