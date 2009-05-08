@@ -28,10 +28,7 @@
 #include "settings.h"
 #include "talk.h"
 #include "splash.h"
-
-#ifndef MAX
-#define MAX(a, b) (((a)>(b))?(a):(b))
-#endif
+#include "viewport.h"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -44,6 +41,8 @@
 #define MAXBUFFER 64
 
 #endif
+
+#define RECT_SPACING 2
 
 static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 {
@@ -59,10 +58,8 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     int y, i;
     int space_w, w, h;
 #ifdef HAVE_LCD_BITMAP
+    struct viewport vp;
     int maxw = 0;
-#if LCD_DEPTH > 1
-    unsigned prevfg = 0;
-#endif
 
     screen->getstringsize(" ", &space_w, &h);
 #else /* HAVE_LCD_CHARCELLS */
@@ -91,7 +88,8 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 #endif
         if (lastbreak)
         {
-            if (x + (next - lastbreak) * space_w + w > screen->lcdwidth)
+            if (x + (next - lastbreak) * space_w + w
+                    > screen->lcdwidth - RECT_SPACING*2)
             {   /* too wide, wrap */
                 widths[line] = x;
 #ifdef HAVE_LCD_BITMAP
@@ -125,38 +123,54 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
         }
     }
 
-    /* prepare screen */
+    /* prepare viewport
+     * First boundaries, then the grey filling, then the black border and finally
+     * the text*/
 
     screen->stop_scroll();
 
 #ifdef HAVE_LCD_BITMAP
+    viewport_set_defaults(&vp, screen->screen_type);
     /* If we center the display, then just clear the box we need and put
        a nice little frame and put the text in there! */
-    y = (screen->lcdheight - y) / 2;  /* height => y start position */
-    x = (screen->lcdwidth - maxw) / 2 - 2;
+    vp.y = (screen->lcdheight - y) / 2 - RECT_SPACING;  /* height => y start position */
+    vp.x = (screen->lcdwidth - maxw) / 2 - RECT_SPACING;
+    vp.width = maxw + 2*RECT_SPACING;
+    vp.height = screen->lcdheight - (vp.y*2) + RECT_SPACING;
 
+    if (vp.y < 0)
+        vp.y = 0;
+    if (vp.x < 0)
+        vp.x = 0;
+    if (vp.width > screen->lcdwidth)
+        vp.width = screen->lcdwidth;
+    if (vp.height > screen->lcdheight)
+        vp.height = screen->lcdheight;
+    
 #if LCD_DEPTH > 1
     if (screen->depth > 1)
     {
-        prevfg = screen->get_foreground();
-        screen->set_drawmode(DRMODE_FG);
-        screen->set_foreground(
-            SCREEN_COLOR_TO_NATIVE(screen, LCD_LIGHTGRAY));
+        vp.drawmode = DRMODE_FG;
+        vp.fg_pattern = SCREEN_COLOR_TO_NATIVE(screen, LCD_LIGHTGRAY);
     }
     else
 #endif
-        screen->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        vp.drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
 
-    screen->fillrect(x, y-2, maxw+4, screen->lcdheight-y*2+4);
+    screen->set_viewport(&vp);
+    screen->fillrect(0, 0, vp.width, vp.height);
 
 #if LCD_DEPTH > 1
     if (screen->depth > 1)
-        screen->set_foreground(SCREEN_COLOR_TO_NATIVE(screen, LCD_BLACK));
+        vp.fg_pattern = SCREEN_COLOR_TO_NATIVE(screen, LCD_BLACK);
     else
 #endif
-        screen->set_drawmode(DRMODE_SOLID);
+        vp.drawmode = DRMODE_SOLID;
 
-    screen->drawrect(x, y-2, maxw+4, screen->lcdheight-y*2+4);
+    screen->drawrect(0, 0, vp.width, vp.height);
+
+    /* prepare putting the text */
+    y = RECT_SPACING;
 #else /* HAVE_LCD_CHARCELLS */
     y = 0;    /* vertical centering on 2 lines would be silly */
     x = 0;
@@ -164,27 +178,25 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 #endif
 
     /* print the message to screen */
-
-    for (i = 0; i <= line; i++)
+    for (i = 0; i <= line; i++, y+=h)
     {
-        x = MAX((screen->lcdwidth - widths[i]) / 2, 0);
-
 #ifdef HAVE_LCD_BITMAP
-        screen->putsxy(x, y, lines[i]);
+#define W (vp.width - RECT_SPACING*2)
+#else
+#define W (screens->lcdwidth)
+#endif
+        x = (W - widths[i])/2;
+        if (x < 0)
+            x = 0;
+#ifdef HAVE_LCD_BITMAP
+        screen->putsxy(x+RECT_SPACING, y, lines[i]);
 #else
         screen->puts(x, y, lines[i]);
 #endif
-        y += h;
+#undef W
     }
-
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH > 1)
-    if (screen->depth > 1)
-    {
-        screen->set_foreground(prevfg);
-        screen->set_drawmode(DRMODE_SOLID);
-    }
-#endif
-    screen->update();
+    screen->update_viewport();
+    screen->set_viewport(NULL);
 }
 
 void splashf(int ticks, const char *fmt, ...)
@@ -198,12 +210,10 @@ void splashf(int ticks, const char *fmt, ...)
     FOR_NB_SCREENS(i)
     {
         va_start(ap, fmt);
-        screens[i].set_viewport(NULL);
         splash_internal(&(screens[i]), fmt, ap);
         va_end(ap);
     }
-
-    if(ticks)
+    if (ticks)
         sleep(ticks);
 }
 
