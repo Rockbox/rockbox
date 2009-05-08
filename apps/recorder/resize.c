@@ -640,7 +640,7 @@ void output_row_native(uint32_t row, void * row_in,
 #if defined(PLUGIN) && LCD_DEPTH > 1
 unsigned int get_size_native(struct bitmap *bm)
 {
-    return BM_SIZE(bm->width,bm->height,FORMAT_NATIVE,FALSE);
+    return BM_SIZE(bm->width,bm->height,FORMAT_NATIVE,0);
 }
 
 const struct custom_format format_native = {
