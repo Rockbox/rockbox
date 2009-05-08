@@ -36,6 +36,11 @@
 #define MEMCPY(d,s,c) memcpy(d,s,c)
 #define INLINE static inline
 #define ENDIAN_SWAP16(n) n /* only for poor little endian machines */
+#ifdef ROCKBOX_DEBUG_JPEG
+#define JDEBUGF DEBUGF
+#else
+#define JDEBUGF(...)
+#endif
 
 /**************** begin JPEG code ********************/
 
@@ -51,9 +56,14 @@ typedef uint8_t jpeg_pix_t;
  */
 struct jpeg
 {
+#ifdef JPEG_FROM_MEM
+    unsigned char *data;
+    unsigned long len;
+#else
     int fd;
     int buf_left;
     unsigned char *buf_index;
+#endif
     unsigned long int bitbuf;
     int bitbuf_bits;
     int marker_ind;
@@ -102,6 +112,10 @@ struct jpeg
     unsigned char buf[JPEG_READ_BUF_SIZE];
     struct img_part part;
 };
+
+#ifdef JPEG_FROM_MEM
+static struct jpeg jpeg;
+#endif
 
 INLINE unsigned range_limit(int value)
 {
@@ -811,6 +825,37 @@ struct idct_entry idct_tbl[] = {
 
 /* JPEG decoder implementation */
 
+#ifdef JPEG_FROM_MEM
+INLINE unsigned char *getc(struct jpeg* p_jpeg)
+{
+    if (p_jpeg->len)
+    {
+        p_jpeg->len--;
+        return p_jpeg->data++;
+    } else
+        return NULL;
+}
+
+INLINE bool skip_bytes(struct jpeg* p_jpeg, int count)
+{
+    if (p_jpeg->len >= (unsigned)count)
+    {
+        p_jpeg->len -= count;
+        p_jpeg->data += count;
+        return true;
+    } else {
+        p_jpeg->data += p_jpeg->len;
+        p_jpeg->len = 0;
+        return false;
+    }
+}
+
+INLINE void putc(struct jpeg* p_jpeg)
+{
+    p_jpeg->len++;
+    p_jpeg->data--;
+}
+#else
 INLINE void fill_buf(struct jpeg* p_jpeg)
 {
         p_jpeg->buf_left = read(p_jpeg->fd, p_jpeg->buf, JPEG_READ_BUF_SIZE);
@@ -842,6 +887,13 @@ static bool skip_bytes(struct jpeg* p_jpeg, int count)
     return p_jpeg->buf_left >= 0 || skip_bytes_seek(p_jpeg);
 }
 
+static void putc(struct jpeg* p_jpeg)
+{
+    p_jpeg->buf_left++;
+    p_jpeg->buf_index--;
+}
+#endif
+
 #define e_skip_bytes(jpeg, count) \
 do {\
     if (!skip_bytes((jpeg),(count))) \
@@ -863,12 +915,6 @@ do {\
     c; \
 })
 
-static void putc(struct jpeg* p_jpeg)
-{
-    p_jpeg->buf_left++;
-    p_jpeg->buf_index--;
-}
-
 /* Preprocess the JPEG JFIF file */
 static int process_markers(struct jpeg* p_jpeg)
 {
@@ -881,11 +927,13 @@ static int process_markers(struct jpeg* p_jpeg)
     {
         if (c != 0xFF) /* no marker? */
         {
+            JDEBUGF("Non-marker data\n");
             putc(p_jpeg);
             break; /* exit marker processing */
         }
 
         c = e_getc(p_jpeg, -1);
+        JDEBUGF("marker value %X\n",c);
         switch (c)
         {
         case 0xFF: /* Fill byte */
@@ -896,9 +944,11 @@ static int process_markers(struct jpeg* p_jpeg)
 
         case 0xC0: /* SOF Huff  - Baseline DCT */
             {
+                JDEBUGF("SOF marker ");
                 ret |= SOF0;
                 marker_size = e_getc(p_jpeg, -1) << 8; /* Highbyte */
                 marker_size |= e_getc(p_jpeg, -1); /* Lowbyte */
+                JDEBUGF("len: %d\n", marker_size);
                 n = e_getc(p_jpeg, -1); /* sample precision (= 8 or 12) */
                 if (n != 8)
                 {
@@ -908,6 +958,8 @@ static int process_markers(struct jpeg* p_jpeg)
                 p_jpeg->y_size |= e_getc(p_jpeg, -1); /* Lowbyte */
                 p_jpeg->x_size = e_getc(p_jpeg, -1) << 8; /* Highbyte */
                 p_jpeg->x_size |= e_getc(p_jpeg, -1); /* Lowbyte */
+                JDEBUGF("  dimensions: %dx%d\n", p_jpeg->x_size,
+                    p_jpeg->y_size);
 
                 n = (marker_size-2-6)/3;
                 if (e_getc(p_jpeg, -1) != n || (n != 1 && n != 3))
@@ -1013,8 +1065,13 @@ static int process_markers(struct jpeg* p_jpeg)
             return(-6); /* Arithmetic coding not supported */
 
         case 0xD8: /* Start of Image */
+            JDEBUGF("SOI\n");
+            break;
         case 0xD9: /* End of Image */
+            JDEBUGF("EOI\n");
+            break;
         case 0x01: /* for temp private use arith code */
+            JDEBUGF("private\n");
             break; /* skip parameterless marker */
 
 
@@ -1107,6 +1164,7 @@ static int process_markers(struct jpeg* p_jpeg)
                 marker_size = e_getc(p_jpeg, -1) << 8; /* Highbyte */
                 marker_size |= e_getc(p_jpeg, -1); /* Lowbyte */
                 marker_size -= 2;
+                JDEBUGF("unhandled marker len %d\n", marker_size);
                 e_skip_bytes(p_jpeg, marker_size); /* skip segment */
             }
             break;
@@ -1693,8 +1751,10 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
     int mcu_hscale = p_jpeg->h_scale[1];
     int mcu_vscale = p_jpeg->v_scale[1];
 #else
-    int mcu_hscale = (p_jpeg->h_scale[0] + p_jpeg->frameheader[0].horizontal_sampling - 1);
-    int mcu_vscale = (p_jpeg->v_scale[0] + p_jpeg->frameheader[0].vertical_sampling - 1);
+    int mcu_hscale = (p_jpeg->h_scale[0] +
+        p_jpeg->frameheader[0].horizontal_sampling - 1);
+    int mcu_vscale = (p_jpeg->v_scale[0] +
+        p_jpeg->frameheader[0].vertical_sampling - 1);
 #endif
     unsigned int width = p_jpeg->x_mbl << mcu_hscale;
     unsigned int b_width = width * JPEG_PIX_SZ;
@@ -1855,6 +1915,7 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
  * Reads a JPEG file and puts the data in rockbox format in *bitmap.
  *
  *****************************************************************************/
+#ifndef JPEG_FROM_MEM
 int read_jpeg_file(const char* filename,
                    struct bitmap *bm,
                    int maxsize,
@@ -1874,6 +1935,7 @@ int read_jpeg_file(const char* filename,
     close(fd);
     return ret;
 }
+#endif
 
 static int calc_scale(int in_size, int out_size)
 {
@@ -1889,7 +1951,28 @@ static int calc_scale(int in_size, int out_size)
     return scale;
 }
 
+#ifdef JPEG_FROM_MEM
+int get_jpeg_dim_mem(unsigned char *data, unsigned long len,
+                     struct dim *size)
+{
+    struct jpeg *p_jpeg = &jpeg;
+    memset(p_jpeg, 0, sizeof(struct jpeg));
+    p_jpeg->data = data;
+    p_jpeg->len = len;
+    int status = process_markers(p_jpeg);
+    if (status < 0)
+        return status;
+    if ((status & (DQT | SOF0)) != (DQT | SOF0))
+        return -(status * 16);
+    size->width = p_jpeg->x_size;
+    size->height = p_jpeg->y_size;
+    return 0;
+}
+
+int decode_jpeg_mem(unsigned char *data, unsigned long len,
+#else
 int read_jpeg_fd(int fd,
+#endif
                  struct bitmap *bm,
                  int maxsize,
                  int format,
@@ -1898,17 +1981,25 @@ int read_jpeg_fd(int fd,
     bool resize = false, dither = false;
     struct rowset rset;
     struct dim src_dim;
-    struct jpeg *p_jpeg = (struct jpeg*)bm->data;
-    int tmp_size = maxsize;
     int status;
     int bm_size;
+#ifdef JPEG_FROM_MEM
+    struct jpeg *p_jpeg = &jpeg;
+#else
+    struct jpeg *p_jpeg = (struct jpeg*)bm->data;
+    int tmp_size = maxsize;
     ALIGN_BUFFER(p_jpeg, tmp_size, sizeof(int));
     /* not enough memory for our struct jpeg */
     if ((size_t)tmp_size < sizeof(struct jpeg))
         return -1;
-
+#endif
     memset(p_jpeg, 0, sizeof(struct jpeg));
+#ifdef JPEG_FROM_MEM
+    p_jpeg->data = data;
+    p_jpeg->len = len;
+#else
     p_jpeg->fd = fd;
+#endif
     status = process_markers(p_jpeg);
     if (status < 0)
         return status;
@@ -1968,14 +2059,16 @@ int read_jpeg_fd(int fd,
     char *buf_start = (char *)bm->data + bm_size;
     char *buf_end = (char *)bm->data + maxsize;
     maxsize = buf_end - buf_start;
+#ifndef JPEG_FROM_MEM
     ALIGN_BUFFER(buf_start, maxsize, sizeof(uint32_t));
     if (maxsize < (int)sizeof(struct jpeg))
         return -1;
     memmove(buf_start, p_jpeg, sizeof(struct jpeg));
     p_jpeg = (struct jpeg *)buf_start;
-    fix_huff_tables(p_jpeg);
     buf_start += sizeof(struct jpeg);
     maxsize = buf_end - buf_start;
+#endif
+    fix_huff_tables(p_jpeg);
 #ifdef HAVE_LCD_COLOR
     int decode_buf_size = (p_jpeg->x_mbl << p_jpeg->h_scale[1])
         << p_jpeg->v_scale[1];

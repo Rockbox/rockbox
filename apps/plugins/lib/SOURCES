@@ -27,9 +27,8 @@ playergfx.c
 profile_plugin.c
 #endif
 #ifdef HAVE_LCD_BITMAP
-#if !defined(HAVE_BMP_SCALING) || !defined(HAVE_JPEG)
+pluginlib_jpeg_mem.c
 pluginlib_resize.c
-#endif
 #ifndef HAVE_JPEG
 pluginlib_jpeg_load.c
 #endif
