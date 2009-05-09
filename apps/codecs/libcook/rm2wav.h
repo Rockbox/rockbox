@@ -18,6 +18,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _RM2WAV_H
+#define _RM2WAV_H
+
 #include <stdio.h>
 #include <stdint.h>
 
@@ -72,3 +75,4 @@ int open_wav(char* filename);
 void close_wav(int fd, RMContext *rmctx);
 int real_parse_header(int fd, RMContext *rmctx);
 void rm_get_packet(int fd,RMContext *rmctx, RMPacket *pkt);
+#endif
