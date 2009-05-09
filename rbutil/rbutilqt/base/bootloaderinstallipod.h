@@ -31,7 +31,7 @@ class BootloaderInstallIpod : public BootloaderInstallBase
     Q_OBJECT
 
     public:
-        BootloaderInstallIpod(QObject *parent = 0);
+        BootloaderInstallIpod(QObject *parent);
         ~BootloaderInstallIpod();
         bool install(void);
         bool uninstall(void);

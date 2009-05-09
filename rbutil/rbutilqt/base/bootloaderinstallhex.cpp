@@ -44,10 +44,23 @@ BootloaderInstallHex::BootloaderInstallHex(QObject *parent)
 {
 }
 
+QString BootloaderInstallHex::ofHint()
+{
+    return tr("Bootloader installation requires you to provide "
+               "a firmware file of the original firmware (hex file). "
+               "You need to download this file yourself due to legal "
+               "reasons. Please refer to the "
+               "<a href='http://www.rockbox.org/manual.shtml'>manual</a> and the "
+               "<a href='http://www.rockbox.org/wiki/IriverBoot"
+               "#Download_and_extract_a_recent_ve'>IriverBoot</a> wiki page on "
+               "how to obtain this file.<br/>"
+               "Press Ok to continue and browse your computer for the firmware "
+               "file.");
+}
 
 bool BootloaderInstallHex::install(void)
 {
-    if(m_hex.isEmpty())
+    if(m_offile.isEmpty())
         return false;
     m_hashindex = -1;
 
@@ -55,7 +68,7 @@ bool BootloaderInstallHex::install(void)
     emit logItem(tr("checking MD5 hash of input file ..."), LOGINFO);
     QByteArray filedata;
     // read hex file into QByteArray
-    QFile file(m_hex);
+    QFile file(m_offile);
     file.open(QIODevice::ReadOnly);
     filedata = file.readAll();
     file.close();
@@ -97,7 +110,7 @@ bool BootloaderInstallHex::install(void)
     emit logItem(tr("Descrambling file"), LOGINFO);
     m_descrambled.open();
     int result;
-    result = iriver_decode(m_hex.toAscii().data(),
+    result = iriver_decode(m_offile.toAscii().data(),
         m_descrambled.fileName().toAscii().data(), FALSE, STRIP_NONE);
     qDebug() << "iriver_decode" << result;
 
@@ -223,7 +236,7 @@ BootloaderInstallBase::BootloaderType BootloaderInstallHex::installed(void)
 
 BootloaderInstallBase::Capabilities BootloaderInstallHex::capabilities(void)
 {
-    return (Install | NeedsFlashing);
+    return (Install | NeedsOf);
 }
 
 QString BootloaderInstallHex::scrambleError(int err)

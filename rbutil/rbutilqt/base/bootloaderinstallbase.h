@@ -24,39 +24,50 @@
 #include "progressloggerinterface.h"
 #include "httpget.h"
 
-
+//! baseclass for all Bootloader installs
 class BootloaderInstallBase : public QObject
 {
     Q_OBJECT
-
     public:
         enum Capability
             { Install = 0x01, Uninstall = 0x02, Backup = 0x04,
-              IsFile = 0x08, IsRaw = 0x10, NeedsFlashing = 0x20,
+              IsFile = 0x08, IsRaw = 0x10, NeedsOf = 0x20,
               CanCheckInstalled = 0x40, CanCheckVersion = 0x80 };
         Q_DECLARE_FLAGS(Capabilities, Capability)
 
         enum BootloaderType
             { BootloaderNone, BootloaderRockbox, BootloaderOther, BootloaderUnknown };
 
-        BootloaderInstallBase(QObject *parent = 0) : QObject(parent)
+        BootloaderInstallBase(QObject *parent) : QObject(parent)
             { }
 
-        virtual bool install(void)
-            { return false; }
-        virtual bool uninstall(void)
-            { return false; }
-        virtual BootloaderType installed(void);
-        virtual Capabilities capabilities(void);
+        //! install the bootloader, must be implemented
+        virtual bool install(void) = 0;
+        //! uninstall the bootloader, must be implemented
+        virtual bool uninstall(void) = 0;
+        //! returns the installed bootloader
+        virtual BootloaderType installed(void)=0;
+        //! returns the capabilities of the bootloader class
+        virtual Capabilities capabilities(void)=0;
+               //! returns a OF Firmware hint or empty if there is none
+        virtual QString ofHint() {return QString();}
+        
+        
+        //! backup a already installed bootloader
         bool backup(QString to);
 
+        //! set the differen filenames and paths
         void setBlFile(QString f)
             { m_blfile = f; }
         void setBlUrl(QUrl u)
             { m_blurl = u; }
         void setLogfile(QString f)
             { m_logfile = f; }
-
+        void setOfFile(QString f)
+            {m_offile = f;}
+        
+        //!  returns a port Install Hint or empty if there is none
+        //! static and in the base class, so the installer classes dont need to be modified for new targets 
         static QString postinstallHints(QString model);
 
     protected slots:
@@ -76,7 +87,7 @@ class BootloaderInstallBase : public QObject
         QUrl m_blurl;          //! bootloader download URL
         QTemporaryFile m_tempfile; //! temporary file for download
         QDateTime m_blversion; //! download timestamp used for version information
-
+        QString m_offile;      //! path to the offile
     signals:
         void downloadDone(void); //! internal signal sent when download finished.
         void done(bool);

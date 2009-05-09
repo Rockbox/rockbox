@@ -37,12 +37,9 @@ class BootloaderInstallHex : public BootloaderInstallBase
         bool uninstall(void);
         BootloaderInstallBase::BootloaderType installed(void);
         Capabilities capabilities(void);
-
-        void setHexfile(QString h)
-            { m_hex = h; }
+        QString ofHint();
 
     private:
-        QString m_hex;
         int m_hashindex;
         int m_model;
         QTemporaryFile m_descrambled;

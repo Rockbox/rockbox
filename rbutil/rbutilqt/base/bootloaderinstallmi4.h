@@ -30,7 +30,7 @@ class BootloaderInstallMi4 : public BootloaderInstallBase
     Q_OBJECT
 
     public:
-        BootloaderInstallMi4(QObject *parent = 0);
+        BootloaderInstallMi4(QObject *parent);
         bool install(void);
         bool uninstall(void);
         BootloaderInstallBase::BootloaderType installed(void);

@@ -714,21 +714,11 @@ void RbUtilQt::installBootloader()
         }
     }
 
-    if(bl->capabilities() & BootloaderInstallBase::NeedsFlashing)
+    if(bl->capabilities() & BootloaderInstallBase::NeedsOf)
     {
         int ret;
         ret = QMessageBox::information(this, tr("Prerequisites"),
-            tr("Bootloader installation requires you to provide "
-               "a firmware file of the original firmware (hex file). "
-               "You need to download this file yourself due to legal "
-               "reasons. Please refer to the "
-               "<a href='http://www.rockbox.org/manual.shtml'>manual</a> and the "
-               "<a href='http://www.rockbox.org/wiki/IriverBoot"
-               "#Download_and_extract_a_recent_ve'>IriverBoot</a> wiki page on "
-               "how to obtain this file.<br/>"
-               "Press Ok to continue and browse your computer for the firmware "
-               "file."),
-               QMessageBox::Ok | QMessageBox::Abort);
+            bl->ofHint(),QMessageBox::Ok | QMessageBox::Abort);
         if(ret != QMessageBox::Ok) {
             // consider aborting an error to close window / abort automatic
             // installation.
@@ -736,16 +726,16 @@ void RbUtilQt::installBootloader()
             logger->addItem(tr("Bootloader installation aborted"), LOGINFO);
             return;
         }
-        // open dialog to browse to hex file
-        QString hexfile;
-        hexfile = QFileDialog::getOpenFileName(this,
-                tr("Select firmware file"), QDir::homePath(), "*.hex");
-        if(!QFileInfo(hexfile).isReadable()) {
+        // open dialog to browse to of file
+        QString offile;
+        offile = QFileDialog::getOpenFileName(this,
+                tr("Select firmware file"), QDir::homePath());
+        if(!QFileInfo(offile).isReadable()) {
             logger->addItem(tr("Error opening firmware file"), LOGERROR);
             m_error = true;
             return;
         }
-        ((BootloaderInstallHex*)bl)->setHexfile(hexfile);
+        bl->setOfFile(offile);
     }
 
     // the bootloader install class does NOT use any GUI stuff.
@@ -983,19 +973,19 @@ void RbUtilQt::uninstallBootloader(void)
     BootloaderInstallBase *bl;
     QString type = RbSettings::value(RbSettings::CurBootloaderMethod).toString();
     if(type == "mi4") {
-        bl = new BootloaderInstallMi4();
+        bl = new BootloaderInstallMi4(this);
     }
     else if(type == "hex") {
-        bl = new BootloaderInstallHex();
+        bl = new BootloaderInstallHex(this);
     }
     else if(type == "sansa") {
-        bl = new BootloaderInstallSansa();
+        bl = new BootloaderInstallSansa(this);
     }
     else if(type == "ipod") {
-        bl = new BootloaderInstallIpod();
+        bl = new BootloaderInstallIpod(this);
     }
     else if(type == "file") {
-        bl = new BootloaderInstallFile();
+        bl = new BootloaderInstallFile(this);
     }
     else {
         logger->addItem(tr("No uninstall method known."), LOGERROR);
