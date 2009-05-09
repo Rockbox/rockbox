@@ -45,18 +45,9 @@
 #include <math.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
 
-#include "libavutil/lfg.h"
-#include "bitstream.h"
-#include "dsputil.h"
-#include "bytestream.h"
-
+#include "cook.h"
 #include "cookdata.h"
-#include "rm2wav.h"
 
 /* The following table is taken from libavutil/mathematics.c */
 const uint8_t ff_log2_tab[256]={
@@ -81,90 +72,6 @@ const uint8_t ff_log2_tab[256]={
 //#define COOKDEBUG
 //#define DUMP_RAW_FRAMES
 #define DEBUGF(message,args ...) av_log(NULL,AV_LOG_ERROR,message,## args)
-
-typedef struct {
-    int *now;
-    int *previous;
-} cook_gains;
-
-typedef struct cook {
-    /*
-     * The following 5 functions provide the lowlevel arithmetic on
-     * the internal audio buffers.
-     */
-    void (* scalar_dequant)(struct cook *q, int index, int quant_index,
-                            int* subband_coef_index, int* subband_coef_sign,
-                            float* mlt_p);
-
-    void (* decouple) (struct cook *q,
-                       int subband,
-                       float f1, float f2,
-                       float *decode_buffer,
-                       float *mlt_buffer1, float *mlt_buffer2);
-
-    void (* imlt_window) (struct cook *q, float *buffer1,
-                          cook_gains *gains_ptr, float *previous_buffer);
-
-    void (* interpolate) (struct cook *q, float* buffer,
-                          int gain_index, int gain_index_next);
-
-    void (* saturate_output) (struct cook *q, int chan, int16_t *out);
-
-    GetBitContext       gb;
-    int                 frame_number;
-    int                 block_align;
-    int                 extradata_size;
-    /* stream data */
-    int                 nb_channels;
-    int                 joint_stereo;
-    int                 bit_rate;
-    int                 sample_rate;
-    int                 samples_per_channel;
-    int                 samples_per_frame;
-    int                 subbands;
-    int                 log2_numvector_size;
-    int                 numvector_size;                //1 << log2_numvector_size;
-    int                 js_subband_start;
-    int                 total_subbands;
-    int                 num_vectors;
-    int                 bits_per_subpacket;
-    int                 cookversion;
-    /* states */
-    AVLFG               random_state;
-    /* transform data */
-    MDCTContext         mdct_ctx;
-    float*              mlt_window;
-
-    /* gain buffers */
-    cook_gains          gains1;
-    cook_gains          gains2;
-    int                 gain_1[9];
-    int                 gain_2[9];
-    int                 gain_3[9];
-    int                 gain_4[9];
-
-    /* VLC data */
-    int                 js_vlc_bits;
-    VLC                 envelope_quant_index[13];
-    VLC                 sqvh[7];          //scalar quantization
-    VLC                 ccpl;             //channel coupling
-
-    /* generatable tables and related variables */
-    int                 gain_size_factor;
-    float               gain_table[23];
-
-    /* data buffers */
-
-    uint8_t*            decoded_bytes_buffer;
-    float mono_mdct_output[2048] __attribute__ ((aligned(16))); //DECLARE_ALIGNED_16(float,mono_mdct_output[2048]);
-    float               mono_previous_buffer1[1024];
-    float               mono_previous_buffer2[1024];
-    float               decode_buffer_1[1024];
-    float               decode_buffer_2[1024];
-    float               decode_buffer_0[1060]; /* static allocation for joint decode */
-
-    const float         *cplscales[5];
-} COOKContext;
 
 static float     pow2tab[127];
 static float rootpow2tab[127];
@@ -335,7 +242,7 @@ static inline int decode_bytes(const uint8_t* inbuffer, uint8_t* out, int bytes)
  * Cook uninit
  */
 
-static av_cold int cook_decode_close(COOKContext *q)
+av_cold int cook_decode_close(COOKContext *q)
 {
     int i;
     //COOKContext *q = avctx->priv_data;
@@ -997,7 +904,7 @@ static int decode_subpacket(COOKContext *q, const uint8_t *inbuffer,
  * @param rmctx     pointer to the RMContext
  */
 
-static int cook_decode_frame(RMContext *rmctx,COOKContext *q,
+int cook_decode_frame(RMContext *rmctx,COOKContext *q,
             int16_t *outbuffer, int *data_size,
             const uint8_t *inbuffer, int buf_size) {
     //COOKContext *q = avctx->priv_data;
@@ -1053,7 +960,7 @@ static av_cold int cook_count_channels(unsigned int mask){
  * Cook initialization
  */
 
-static av_cold int cook_decode_init(RMContext *rmctx, COOKContext *q)
+av_cold int cook_decode_init(RMContext *rmctx, COOKContext *q)
 {   
     /* cook extradata */
     q->cookversion = rmctx->cook_version;
@@ -1203,87 +1110,3 @@ static av_cold int cook_decode_init(RMContext *rmctx, COOKContext *q)
     return 0;
 }
 
-
-int main(int argc, char *argv[])
-{
-    int fd, fd_dec;
-    int res, datasize,x,i;
-    int nb_frames = 0;
-#ifdef DUMP_RAW_FRAMES 
-    char filename[15];
-    int fd_out;
-#endif
-    int16_t outbuf[2048];
-    uint8_t inbuf[1024];
-    uint16_t fs,sps,h;
-    uint32_t packet_count;
-    COOKContext q;
-    RMContext rmctx;
-    RMPacket pkt;
-
-    memset(&q,0,sizeof(COOKContext));
-    memset(&rmctx,0,sizeof(RMContext));
-    memset(&pkt,0,sizeof(RMPacket));
-
-    if (argc != 2) {
-        av_log(NULL,AV_LOG_ERROR,"Incorrect number of arguments\n");
-        return -1;
-    }
-
-    fd = open(argv[1],O_RDONLY);
-    if (fd < 0) {
-        av_log(NULL,AV_LOG_ERROR,"Error opening file %s\n", argv[1]);
-        return -1;
-    }
-    
-    fd_dec = open_wav("output.wav");
-    if (fd_dec < 0) {
-        av_log(NULL,AV_LOG_ERROR,"Error creating output file\n");
-        return -1;
-    }
-    res = real_parse_header(fd, &rmctx);
-    packet_count = rmctx.nb_packets;
-    rmctx.audio_framesize = rmctx.block_align;
-    rmctx.block_align = rmctx.sub_packet_size;
-    fs = rmctx.audio_framesize;
-    sps= rmctx.block_align;
-    h = rmctx.sub_packet_h;
-    cook_decode_init(&rmctx,&q);
-    av_log(NULL,AV_LOG_ERROR,"nb_frames = %d\n",nb_frames);
-    x = 0;
-    if(packet_count % h)
-    {
-        packet_count += h - (packet_count % h);
-        rmctx.nb_packets = packet_count;
-    }
-    while(packet_count)
-    {  
-        
-        memset(pkt.data,0,sizeof(pkt.data));
-        rm_get_packet(fd, &rmctx, &pkt);
-        DEBUGF("total frames = %d packet count = %d output counter = %d \n",rmctx.audio_pkt_cnt*(fs/sps), packet_count,rmctx.audio_pkt_cnt);
-        for(i = 0; i < rmctx.audio_pkt_cnt*(fs/sps) ; i++)
-        { 
-            /* output raw audio frames that are sent to the decoder into separate files */
-            #ifdef DUMP_RAW_FRAMES 
-              snprintf(filename,sizeof(filename),"dump%d.raw",++x);
-              fd_out = open(filename,O_WRONLY|O_CREAT|O_APPEND);           
-              write(fd_out,pkt.data+i*sps,sps);  
-              close(fd_out);
-            #endif
-
-            memcpy(inbuf,pkt.data+i*sps,sps);
-            nb_frames = cook_decode_frame(&rmctx,&q, outbuf, &datasize, inbuf , rmctx.block_align);
-            rmctx.frame_number++;
-            write(fd_dec,outbuf,datasize);        
-        }
-        packet_count -= rmctx.audio_pkt_cnt;
-        rmctx.audio_pkt_cnt = 0;
-    } 
-    cook_decode_close(&q);
-    close_wav(fd_dec,&rmctx);
-    close(fd);
-
-
-  return 0;
-}
