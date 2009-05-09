@@ -31,7 +31,6 @@
 #include "sound.h"
 #include "list.h"
 #include "action.h"
-#include "statusbar.h"
 #include "misc.h"
 #include "splash.h"
 #include "menu.h"

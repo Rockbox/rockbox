@@ -35,7 +35,6 @@
 #include "screen_access.h"
 #include "list.h"
 #include "scrollbar.h"
-#include "statusbar.h"
 #include "lang.h"
 #include "sound.h"
 #include "misc.h"

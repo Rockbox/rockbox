@@ -31,7 +31,6 @@
 #include "lang.h"
 #include "icons.h"
 #include "screens.h"
-#include "statusbar.h"
 #include "viewport.h"
 #include "font.h"
 #include "system.h"

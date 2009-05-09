@@ -42,7 +42,6 @@
 #include "plugin.h"
 #include "backdrop.h"
 #include "file.h"
-#include "statusbar.h"
 
 #define MAX_BOOKMARKS 10
 #define MAX_BOOKMARK_SIZE  350

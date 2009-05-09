@@ -36,7 +36,6 @@
 #include "talk.h"
 #include "lcd.h"
 #include "lcd-remote.h"
-#include "statusbar.h"
 
 #ifdef HAVE_BACKLIGHT
 static int filterfirstkeypress_callback(int action,const struct menu_item_ex *this_item)

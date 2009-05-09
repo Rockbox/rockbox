@@ -30,7 +30,6 @@
 #include "general.h"
 #include "codecs.h"
 #include "menu.h"
-#include "statusbar.h"
 #include "settings.h"
 #include "audio.h"
 #include "pcm_record.h"

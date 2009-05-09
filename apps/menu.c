@@ -59,7 +59,6 @@
 
 /* gui api */
 #include "list.h"
-#include "statusbar.h"
 #include "buttonbar.h"
 
 #define MAX_MENUS 8

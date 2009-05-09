@@ -42,7 +42,6 @@
 #include "tree.h"
 #include "buffer.h"
 #include "settings.h"
-#include "statusbar.h"
 #include "playlist_viewer.h"
 #include "talk.h"
 #include "onplay.h"

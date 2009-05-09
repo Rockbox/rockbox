@@ -24,7 +24,6 @@
 #include <string.h>
 #include "font.h"
 #include "screens.h"
-#include "statusbar.h"
 #include "talk.h"
 #include "settings.h"
 #include "misc.h"

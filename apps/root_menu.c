@@ -38,11 +38,9 @@
 #include "talk.h"
 #include "audio.h"
 #include "hotswap.h"
-#include "backdrop.h"
 
 /* gui api */
 #include "list.h"
-#include "statusbar.h"
 #include "splash.h"
 #include "action.h"
 #include "yesno.h"

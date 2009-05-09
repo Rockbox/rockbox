@@ -53,7 +53,6 @@
 #include "icon.h"
 #include "screens.h"
 #include "peakmeter.h"
-#include "statusbar.h"
 #include "menu.h"
 #include "sound_menu.h"
 #include "timefuncs.h"

@@ -60,7 +60,6 @@
 #include "sound.h"
 #include "rbunicode.h"
 #include "dircache.h"
-#include "statusbar.h"
 #include "splash.h"
 #include "list.h"
 #include "settings_list.h"

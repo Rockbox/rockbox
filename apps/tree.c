@@ -70,7 +70,6 @@
 
 /* gui api */
 #include "list.h"
-#include "statusbar.h"
 #include "splash.h"
 #include "buttonbar.h"
 #include "action.h"

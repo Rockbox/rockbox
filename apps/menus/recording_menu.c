@@ -31,7 +31,6 @@
 #include "button.h"
 #include "mp3_playback.h"
 #include "settings.h"
-#include "statusbar.h"
 #include "screens.h"
 #include "icons.h"
 #ifdef HAVE_LCD_BITMAP

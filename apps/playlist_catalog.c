@@ -42,7 +42,6 @@
 #include "filetypes.h"
 #include "debug.h"
 #include "playlist_catalog.h"
-#include "statusbar.h"
 #include "talk.h"
 
 #define MAX_PLAYLISTS 400

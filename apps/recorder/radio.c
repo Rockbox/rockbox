@@ -55,7 +55,6 @@
 #include "power.h"
 #include "sound.h"
 #include "screen_access.h"
-#include "statusbar.h"
 #include "splash.h"
 #include "yesno.h"
 #include "buttonbar.h"

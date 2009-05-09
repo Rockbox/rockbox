@@ -27,7 +27,6 @@
 #include "font.h"
 #include "kernel.h"
 #include "misc.h"
-#include "statusbar.h"
 #include "action.h"
 #include "settings_list.h"
 #include "lang.h"

@@ -31,7 +31,6 @@
 #include "action.h"
 #include "mp3_playback.h"
 #include "settings.h"
-#include "statusbar.h"
 #include "screens.h"
 #include "icons.h"
 #include "font.h"

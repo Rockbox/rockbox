@@ -40,7 +40,6 @@
 #include "power.h"
 #include "alarm_menu.h"
 #include "splash.h"
-#include "statusbar.h"
 #include "viewport.h"
 
 static void speak_time(int hours, int minutes, bool speak_hours)

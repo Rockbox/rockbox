@@ -47,7 +47,6 @@
 #include "playlist_catalog.h"
 #include "icon.h"
 #include "list.h"
-#include "statusbar.h"
 #include "splash.h"
 #include "playlist_menu.h"
 #include "action.h"
