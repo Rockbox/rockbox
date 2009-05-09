@@ -110,7 +110,7 @@ void TTSExes::generateSettings()
     if(exepath == "") exepath = findExecutable(m_name);
     
     insertSetting(eEXEPATH,new EncTtsSetting(this,EncTtsSetting::eSTRING,"Path to TTS engine:",exepath,EncTtsSetting::eBROWSEBTN));
-    insertSetting(eOPTIONS,new EncTtsSetting(this,EncTtsSetting::eSTRING,"TTS enginge options:",RbSettings::subValue(m_name,RbSettings::TtsOptions)));
+    insertSetting(eOPTIONS,new EncTtsSetting(this,EncTtsSetting::eSTRING,"TTS engine options:",RbSettings::subValue(m_name,RbSettings::TtsOptions)));
 }
 
 void TTSExes::saveSettings()
