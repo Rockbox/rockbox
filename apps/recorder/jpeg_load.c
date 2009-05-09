@@ -578,6 +578,7 @@ static void idct8h(int *ws, unsigned char *out, int rows, int rowstep)
     }
 }
 
+#ifdef HAVE_LCD_COLOR
 /* vertical-pass 16-point IDCT */
 static void idct16v(int *ws, int cols)
 {
@@ -808,6 +809,7 @@ static void idct16h(int *ws, unsigned char *out, int rows, int rowstep)
             DS_OUT));
     }
 }
+#endif
 
 struct idct_entry {
     int v_scale;
@@ -821,7 +823,9 @@ struct idct_entry idct_tbl[] = {
     { PASS1_BITS, CONST_BITS, idct2v, idct2h },
     { 0, 0, idct4v, idct4h },
     { 0, 0, idct8v, idct8h },
+#ifdef HAVE_LCD_COLOR
     { 0, 0, idct16v, idct16h },
+#endif
 };
 
 /* JPEG decoder implementation */
