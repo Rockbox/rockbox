@@ -352,6 +352,9 @@ static inline int rgbcmp(struct uint8_rgb rgb1, struct uint8_rgb rgb2)
         return 1;
 }
 #if LCD_DEPTH > 1
+#if !defined(PLUGIN) && !defined(HAVE_JPEG) && !defined(HAVE_BMP_SCALING)
+static inline
+#endif
 void output_row_8_native(uint32_t row, void * row_in,
                               struct scaler_context *ctx)
 {
@@ -703,6 +706,7 @@ int read_bmp_fd(int fd,
         .dither = dither,
     };
 #endif
+#if defined(PLUGIN) || defined(HAVE_JPEG) || defined(HAVE_BMP_SCALING)
 #if LCD_DEPTH > 1
     void (*output_row_8)(uint32_t, void*, struct scaler_context*) =
         output_row_8_native;
@@ -712,6 +716,7 @@ int read_bmp_fd(int fd,
 #if LCD_DEPTH > 1 || defined(PLUGIN)
     if (cformat)
         output_row_8 = cformat->output_row_8;
+#endif
 #endif
 
     int row;
@@ -762,7 +767,11 @@ int read_bmp_fd(int fd,
     (LCD_REMOTE_DEPTH > 1) */
 #if LCD_DEPTH > 1 || defined(PLUGIN)
             {
+#if !defined(PLUGIN) && !defined(HAVE_JPEG) && !defined(HAVE_BMP_SCALING)
+                output_row_8_native(row, ba.buf, &ctx);
+#else
                 output_row_8(row, ba.buf, &ctx);
+#endif
             }
 #endif
 #if ((LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)) && \
