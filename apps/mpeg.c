@@ -107,7 +107,6 @@ struct trackdata
 static struct trackdata trackdata[MAX_TRACK_ENTRIES];
 
 static unsigned int current_track_counter = 0;
-static unsigned int last_track_counter = 0;
 
 /* Play time of the previous track */
 unsigned long prev_track_elapsed;
@@ -2067,16 +2066,6 @@ struct mp3entry* audio_next_track()
     else
         return NULL;
 #endif /* !SIMULATOR */
-}
-
-bool audio_has_changed_track(void)
-{
-    if(last_track_counter != current_track_counter)
-    {
-        last_track_counter = current_track_counter;
-        return true;
-    }
-    return false;
 }
 
 #if CONFIG_CODEC == MAS3587F
