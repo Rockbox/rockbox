@@ -7598,7 +7598,7 @@
   desc: in tag cache settings
   user: core
   <source>
-    *: "Initialise Now"
+    *: "Initialize Now"
   </source>
   <dest>
     *: "Initializeaza acum"

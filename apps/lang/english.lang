@@ -2506,13 +2506,13 @@
   desc: in tag cache settings
   user: core
   <source>
-    *: "Initialise Now"
+    *: "Initialize Now"
   </source>
   <dest>
-    *: "Initialise Now"
+    *: "Initialize Now"
   </dest>
   <voice>
-    *: "Initialise Now"
+    *: "Initialize Now"
   </voice>
 </phrase>
 <phrase>

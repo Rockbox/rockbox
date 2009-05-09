@@ -1518,7 +1518,7 @@
   desc: in tag cache settings
   user: core
   <source>
-    *: "Initialise Now"
+    *: "Initialize Now"
   </source>
   <dest>
     *: "即刻初始化"
