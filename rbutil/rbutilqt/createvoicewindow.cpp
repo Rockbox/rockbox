@@ -28,7 +28,7 @@ CreateVoiceWindow::CreateVoiceWindow(QWidget *parent) : QDialog(parent)
 {
     ui.setupUi(this);
     voicecreator = new VoiceFileCreator(this);
-    
+    updateSettings();
     connect(ui.change,SIGNAL(clicked()),this,SLOT(change()));
 }
 
