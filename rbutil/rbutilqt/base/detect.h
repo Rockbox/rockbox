@@ -27,7 +27,6 @@
 
 #include <QString>
 #include <QUrl>
-#include "rbsettings.h"
 
 class Detect
 {
@@ -49,7 +48,7 @@ public:
     static QString installedVersion(QString mountpoint);
     static QString installedTarget(QString mountpoint);
 
-    static QString check(RbSettings* settings, bool permission);
+    static QString check(bool permission);
 
 };
 #endif

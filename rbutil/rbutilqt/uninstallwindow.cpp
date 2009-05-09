@@ -19,7 +19,7 @@
 
 #include "uninstallwindow.h"
 #include "ui_uninstallfrm.h"
-
+#include "rbsettings.h"
 
 UninstallWindow::UninstallWindow(QWidget *parent) : QDialog(parent)
 {
@@ -27,6 +27,24 @@ UninstallWindow::UninstallWindow(QWidget *parent) : QDialog(parent)
     ui.UninstalllistWidget->setAlternatingRowColors(true);
     connect(ui.UninstalllistWidget,SIGNAL(itemSelectionChanged()),this,SLOT(selectionChanged()));
     connect(ui.CompleteRadioBtn,SIGNAL(toggled(bool)),this,SLOT(UninstallMethodChanged(bool)));
+    
+    QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
+
+    uninstaller = new Uninstaller(this,mountpoint);
+
+    // disable smart uninstall, if not possible
+    if(!uninstaller->uninstallPossible())
+    {
+        ui.smartRadioButton->setEnabled(false);
+        ui.smartGroupBox->setEnabled(false);
+        ui.CompleteRadioBtn->setChecked(true);
+    }
+    else // fill in installed parts
+    {
+       ui.smartRadioButton->setChecked(true);
+       ui.UninstalllistWidget->addItems(uninstaller->getAllSections());
+    }
+    
 }
 
 
@@ -68,24 +86,3 @@ void UninstallWindow::UninstallMethodChanged(bool complete)
        ui.smartGroupBox->setEnabled(true);
 }
 
-
-void UninstallWindow::setSettings(RbSettings *sett)
-{
-    settings = sett;
-
-    QString mountpoint = settings->value(RbSettings::Mountpoint).toString();
-    uninstaller = new Uninstaller(this,mountpoint);
-
-    // disable smart uninstall, if not possible
-    if(!uninstaller->uninstallPossible())
-    {
-        ui.smartRadioButton->setEnabled(false);
-        ui.smartGroupBox->setEnabled(false);
-        ui.CompleteRadioBtn->setChecked(true);
-    }
-    else // fill in installed parts
-    {
-       ui.smartRadioButton->setChecked(true);
-       ui.UninstalllistWidget->addItems(uninstaller->getAllSections());
-    }
-}

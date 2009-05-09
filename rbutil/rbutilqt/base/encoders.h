@@ -24,7 +24,6 @@
  
 #include <QtCore>
  
-#include "rbsettings.h"
 #include "encttssettings.h"
 #include "rbspeex.h"
 
@@ -54,15 +53,11 @@ class EncBase : public EncTtsSettingInterface
         static QString getEncoderName(QString name);
         static EncBase* getEncoder(QObject* parent,QString name);
         static QStringList getEncoderList(void);
-        
-        //set the config. users of Encoder classes, always have to call this first
-        void setCfg(RbSettings *sett){settings = sett;}
+
     private:
         static void initEncodernamesList(void);
 
     protected:
-        RbSettings* settings;
-
         static QMap<QString,QString> encoderList;
 };
 

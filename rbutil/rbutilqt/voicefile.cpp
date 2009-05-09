@@ -19,6 +19,7 @@
 
 #include "voicefile.h"
 #include "utils.h"
+#include "rbsettings.h"
 
 #define STATE_INVALID 0
 #define STATE_PHRASE 1
@@ -65,7 +66,7 @@ bool VoiceFileCreator::createVoiceFile(ProgressloggerInterface* logger)
     version = version.left(version.indexOf("-")).remove(0,1);
 
     //prepare download url
-    QUrl genlangUrl = settings->value(RbSettings::GenlangUrl).toString()
+    QUrl genlangUrl = RbSettings::value(RbSettings::GenlangUrl).toString()
             +"?lang=" + m_lang + "&t=" + target + "&rev=" + version + "&f=" + features;
 
     qDebug() << "downloading " << genlangUrl;
@@ -128,8 +129,7 @@ void VoiceFileCreator::downloadDone(bool error)
     }
 
     //tts
-    m_tts = TTSBase::getTTS(this,settings->value(RbSettings::Tts).toString());
-    m_tts->setCfg(settings);
+    m_tts = TTSBase::getTTS(this,RbSettings::value(RbSettings::Tts).toString());
 
     QString errStr;
     if(!m_tts->start(&errStr))
@@ -142,8 +142,7 @@ void VoiceFileCreator::downloadDone(bool error)
     }
 
     // Encoder
-    m_enc = EncBase::getEncoder(this,settings->value(RbSettings::CurEncoder).toString());
-    m_enc->setCfg(settings);
+    m_enc = EncBase::getEncoder(this,RbSettings::value(RbSettings::CurEncoder).toString());
 
     if(!m_enc->start())
     {

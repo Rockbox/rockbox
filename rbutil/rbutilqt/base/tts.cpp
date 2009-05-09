@@ -19,6 +19,7 @@
 
 #include "tts.h"
 #include "utils.h"
+#include "rbsettings.h"
 /*********************************************************************
 * TTS Base
 **********************************************************************/
@@ -105,24 +106,24 @@ TTSExes::TTSExes(QString name,QObject* parent) : TTSBase(parent)
 
 void TTSExes::generateSettings()
 {
-    QString exepath =settings->subValue(m_name,RbSettings::TtsPath).toString();
+    QString exepath =RbSettings::subValue(m_name,RbSettings::TtsPath).toString();
     if(exepath == "") exepath = findExecutable(m_name);
     
     insertSetting(eEXEPATH,new EncTtsSetting(this,EncTtsSetting::eSTRING,"Path to TTS engine:",exepath,EncTtsSetting::eBROWSEBTN));
-    insertSetting(eOPTIONS,new EncTtsSetting(this,EncTtsSetting::eSTRING,"TTS enginge options:",settings->subValue(m_name,RbSettings::TtsOptions)));
+    insertSetting(eOPTIONS,new EncTtsSetting(this,EncTtsSetting::eSTRING,"TTS enginge options:",RbSettings::subValue(m_name,RbSettings::TtsOptions)));
 }
 
 void TTSExes::saveSettings()
 {
-    settings->setSubValue(m_name,RbSettings::TtsPath,getSetting(eEXEPATH)->current().toString());
-    settings->setSubValue(m_name,RbSettings::TtsOptions,getSetting(eOPTIONS)->current().toString());
-    settings->sync();
+    RbSettings::setSubValue(m_name,RbSettings::TtsPath,getSetting(eEXEPATH)->current().toString());
+    RbSettings::setSubValue(m_name,RbSettings::TtsOptions,getSetting(eOPTIONS)->current().toString());
+    RbSettings::sync();
 }
 
 bool TTSExes::start(QString *errStr)
 {
-    m_TTSexec = settings->subValue(m_name,RbSettings::TtsPath).toString();
-    m_TTSOpts = settings->subValue(m_name,RbSettings::TtsOptions).toString();
+    m_TTSexec = RbSettings::subValue(m_name,RbSettings::TtsPath).toString();
+    m_TTSOpts = RbSettings::subValue(m_name,RbSettings::TtsOptions).toString();
     
     m_TTSTemplate = m_TemplateMap.value(m_name);
 
@@ -155,7 +156,7 @@ TTSStatus TTSExes::voice(QString text,QString wavfile, QString *errStr)
 
 bool TTSExes::configOk()
 {
-    QString path = settings->subValue(m_name,RbSettings::TtsPath).toString();
+    QString path = RbSettings::subValue(m_name,RbSettings::TtsPath).toString();
     
     if (QFileInfo(path).exists())
         return true;
@@ -176,31 +177,31 @@ TTSSapi::TTSSapi(QObject* parent) : TTSBase(parent)
 void TTSSapi::generateSettings()
 {
     // language
-    QStringList languages = settings->languages();
+    QStringList languages = RbSettings::languages();
     languages.sort(); 
-    EncTtsSetting* setting =new EncTtsSetting(this,EncTtsSetting::eSTRINGLIST,"Language:",settings->subValue("sapi",RbSettings::TtsLanguage),languages); 
+    EncTtsSetting* setting =new EncTtsSetting(this,EncTtsSetting::eSTRINGLIST,"Language:",RbSettings::subValue("sapi",RbSettings::TtsLanguage),languages); 
     connect(setting,SIGNAL(dataChanged()),this,SLOT(updateVoiceList()));
     insertSetting(eLANGUAGE,setting); 
     // voice
-    setting = new EncTtsSetting(this,EncTtsSetting::eSTRINGLIST,"Voice:",settings->subValue("sapi",RbSettings::TtsVoice),getVoiceList(settings->subValue("sapi",RbSettings::TtsLanguage).toString()),EncTtsSetting::eREFRESHBTN);
+    setting = new EncTtsSetting(this,EncTtsSetting::eSTRINGLIST,"Voice:",RbSettings::subValue("sapi",RbSettings::TtsVoice),getVoiceList(RbSettings::subValue("sapi",RbSettings::TtsLanguage).toString()),EncTtsSetting::eREFRESHBTN);
     connect(setting,SIGNAL(refresh()),this,SLOT(updateVoiceList()));
     insertSetting(eVOICE,setting);
     //speed    
-    insertSetting(eSPEED,new EncTtsSetting(this,EncTtsSetting::eINT,"Speed:",settings->subValue("sapi",RbSettings::TtsSpeed),-10,10));
+    insertSetting(eSPEED,new EncTtsSetting(this,EncTtsSetting::eINT,"Speed:",RbSettings::subValue("sapi",RbSettings::TtsSpeed),-10,10));
     // options
-    insertSetting(eOPTIONS,new EncTtsSetting(this,EncTtsSetting::eSTRING,"Options:",settings->subValue("sapi",RbSettings::TtsOptions)));
+    insertSetting(eOPTIONS,new EncTtsSetting(this,EncTtsSetting::eSTRING,"Options:",RbSettings::subValue("sapi",RbSettings::TtsOptions)));
 
 }
 
 void TTSSapi::saveSettings()
 {
     //save settings in user config
-    settings->setSubValue("sapi",RbSettings::TtsLanguage,getSetting(eLANGUAGE)->current().toString());
-    settings->setSubValue("sapi",RbSettings::TtsVoice,getSetting(eVOICE)->current().toString());
-    settings->setSubValue("sapi",RbSettings::TtsSpeed,getSetting(eSPEED)->current().toInt());
-    settings->setSubValue("sapi",RbSettings::TtsOptions,getSetting(eOPTIONS)->current().toString());
+    RbSettings::setSubValue("sapi",RbSettings::TtsLanguage,getSetting(eLANGUAGE)->current().toString());
+    RbSettings::setSubValue("sapi",RbSettings::TtsVoice,getSetting(eVOICE)->current().toString());
+    RbSettings::setSubValue("sapi",RbSettings::TtsSpeed,getSetting(eSPEED)->current().toInt());
+    RbSettings::setSubValue("sapi",RbSettings::TtsOptions,getSetting(eOPTIONS)->current().toString());
     
-    settings->sync();
+    RbSettings::sync();
 }
 
 void TTSSapi::updateVoiceList()
@@ -215,11 +216,11 @@ void TTSSapi::updateVoiceList()
 bool TTSSapi::start(QString *errStr)
 {    
 
-    m_TTSOpts = settings->subValue("sapi",RbSettings::TtsOptions).toString();
-    m_TTSLanguage =settings->subValue("sapi",RbSettings::TtsLanguage).toString();
-    m_TTSVoice=settings->subValue("sapi",RbSettings::TtsVoice).toString();
-    m_TTSSpeed=settings->subValue("sapi",RbSettings::TtsSpeed).toString();
-    m_sapi4 = settings->subValue("sapi",RbSettings::TtsUseSapi4).toBool();
+    m_TTSOpts = RbSettings::subValue("sapi",RbSettings::TtsOptions).toString();
+    m_TTSLanguage =RbSettings::subValue("sapi",RbSettings::TtsLanguage).toString();
+    m_TTSVoice=RbSettings::subValue("sapi",RbSettings::TtsVoice).toString();
+    m_TTSSpeed=RbSettings::subValue("sapi",RbSettings::TtsSpeed).toString();
+    m_sapi4 = RbSettings::subValue("sapi",RbSettings::TtsUseSapi4).toBool();
     
     QFile::remove(QDir::tempPath() +"/sapi_voice.vbs");
     QFile::copy(":/builtin/sapi_voice.vbs",QDir::tempPath() + "/sapi_voice.vbs");
@@ -283,7 +284,7 @@ QStringList TTSSapi::getVoiceList(QString language)
     execstring.replace("%exe",m_TTSexec);
     execstring.replace("%lang",language);
     
-    if(settings->value(RbSettings::TtsUseSapi4).toBool())
+    if(RbSettings::value(RbSettings::TtsUseSapi4).toBool())
         execstring.append(" /sapi4 ");
     
     qDebug() << "init" << execstring; 
@@ -348,7 +349,7 @@ bool TTSSapi::stop()
 
 bool TTSSapi::configOk()
 {
-    if(settings->subValue("sapi",RbSettings::TtsVoice).toString().isEmpty())
+    if(RbSettings::subValue("sapi",RbSettings::TtsVoice).toString().isEmpty())
         return false;
     return true;
 }
@@ -363,17 +364,17 @@ TTSFestival::~TTSFestival()
 void TTSFestival::generateSettings()
 {
     // server path
-    QString exepath = settings->subValue("festival-server",RbSettings::TtsPath).toString();
+    QString exepath = RbSettings::subValue("festival-server",RbSettings::TtsPath).toString();
     if(exepath == "" ) exepath = findExecutable("festival");
     insertSetting(eSERVERPATH,new EncTtsSetting(this,EncTtsSetting::eSTRING,"Path to Festival server:",exepath,EncTtsSetting::eBROWSEBTN)); 
    
     // client path
-    QString clientpath = settings->subValue("festival-client",RbSettings::TtsPath).toString();  
+    QString clientpath = RbSettings::subValue("festival-client",RbSettings::TtsPath).toString();  
     if(clientpath == "" ) clientpath = findExecutable("festival_client");
     insertSetting(eCLIENTPATH,new EncTtsSetting(this,EncTtsSetting::eSTRING,"Path to Festival client:",clientpath,EncTtsSetting::eBROWSEBTN)); 
     
     // voice
-    EncTtsSetting* setting = new EncTtsSetting(this,EncTtsSetting::eSTRINGLIST,"Voice:",settings->subValue("festival",RbSettings::TtsVoice),getVoiceList(exepath),EncTtsSetting::eREFRESHBTN);
+    EncTtsSetting* setting = new EncTtsSetting(this,EncTtsSetting::eSTRINGLIST,"Voice:",RbSettings::subValue("festival",RbSettings::TtsVoice),getVoiceList(exepath),EncTtsSetting::eREFRESHBTN);
     connect(setting,SIGNAL(refresh()),this,SLOT(updateVoiceList()));
     connect(setting,SIGNAL(dataChanged()),this,SLOT(clearVoiceDescription()));
     insertSetting(eVOICE,setting);
@@ -387,11 +388,11 @@ void TTSFestival::generateSettings()
 void TTSFestival::saveSettings()
 {
     //save settings in user config
-    settings->setSubValue("festival-server",RbSettings::TtsPath,getSetting(eSERVERPATH)->current().toString());
-    settings->setSubValue("festival-client",RbSettings::TtsPath,getSetting(eCLIENTPATH)->current().toString());
-    settings->setSubValue("festival",RbSettings::TtsVoice,getSetting(eVOICE)->current().toString());
+    RbSettings::setSubValue("festival-server",RbSettings::TtsPath,getSetting(eSERVERPATH)->current().toString());
+    RbSettings::setSubValue("festival-client",RbSettings::TtsPath,getSetting(eCLIENTPATH)->current().toString());
+    RbSettings::setSubValue("festival",RbSettings::TtsVoice,getSetting(eVOICE)->current().toString());
     
-    settings->sync();
+    RbSettings::sync();
 }
 
 void TTSFestival::updateVoiceDescription()
@@ -420,7 +421,7 @@ void TTSFestival::startServer(QString path)
 		return;
 
     if(path == "")    
-        path = settings->subValue("festival-server",RbSettings::TtsPath).toString();
+        path = RbSettings::subValue("festival-server",RbSettings::TtsPath).toString();
 
 	serverProcess.start(QString("%1 --server").arg(path));
 	serverProcess.waitForStarted();
@@ -444,9 +445,9 @@ bool TTSFestival::start(QString* errStr)
 {
 	(void) errStr;
 	ensureServerRunning();
-	if (!settings->subValue("festival",RbSettings::TtsVoice).toString().isEmpty())
+	if (!RbSettings::subValue("festival",RbSettings::TtsVoice).toString().isEmpty())
         queryServer(QString("(voice.select '%1)")
-        .arg(settings->subValue("festival", RbSettings::TtsVoice).toString()));
+        .arg(RbSettings::subValue("festival", RbSettings::TtsVoice).toString()));
 
 	return true;
 }
@@ -463,7 +464,7 @@ TTSStatus TTSFestival::voice(QString text, QString wavfile, QString* errStr)
 {
 	qDebug() << text << "->" << wavfile;
 
-	QString path = settings->subValue("festival-client",RbSettings::TtsPath).toString();
+	QString path = RbSettings::subValue("festival-client",RbSettings::TtsPath).toString();
 	QString cmd = QString("%1 --server localhost --otype riff --ttw --withlisp --output \"%2\" - ").arg(path).arg(wavfile);
 	qDebug() << cmd;
 
@@ -493,13 +494,13 @@ TTSStatus TTSFestival::voice(QString text, QString wavfile, QString* errStr)
 
 bool TTSFestival::configOk()
 {
-	QString serverPath = settings->subValue("festival-server",RbSettings::TtsPath).toString();
-    QString clientPath = settings->subValue("festival-client",RbSettings::TtsVoice).toString();
+	QString serverPath = RbSettings::subValue("festival-server",RbSettings::TtsPath).toString();
+    QString clientPath = RbSettings::subValue("festival-client",RbSettings::TtsVoice).toString();
     
 	bool ret = QFileInfo(serverPath).isExecutable() &&
 		QFileInfo(clientPath).isExecutable();
-	if(settings->subValue("festival",RbSettings::TtsVoice).toString().size() > 0 && voices.size() > 0)
-		ret = ret && (voices.indexOf(settings->subValue("festival",RbSettings::TtsVoice).toString()) != -1);
+	if(RbSettings::subValue("festival",RbSettings::TtsVoice).toString().size() > 0 && voices.size() > 0)
+		ret = ret && (voices.indexOf(RbSettings::subValue("festival",RbSettings::TtsVoice).toString()) != -1);
 	return ret;
 }
 

@@ -59,6 +59,7 @@
 #endif
 
 #include "utils.h"
+#include "rbsettings.h"
 
 /** @brief detect permission of user (only Windows at moment).
  *  @return enum userlevel.
@@ -384,7 +385,7 @@ QString Detect::installedTarget(QString mountpoint)
  *  @param targetId the targetID to check for. if it is -1 no check is done.
  *  @return string with error messages if problems occurred, empty strings if none.
  */
-QString Detect::check(RbSettings* settings, bool permission)
+QString Detect::check(bool permission)
 {
     QString text = "";
 
@@ -401,12 +402,12 @@ QString Detect::check(RbSettings* settings, bool permission)
     }
 
     // Check TargetId
-    QString installed = installedTarget(settings->value(RbSettings::Mountpoint).toString());
-    if(!installed.isEmpty() && installed != settings->value(RbSettings::CurConfigureModel).toString())
+    QString installed = installedTarget(RbSettings::value(RbSettings::Mountpoint).toString());
+    if(!installed.isEmpty() && installed != RbSettings::value(RbSettings::CurConfigureModel).toString())
     {
         text += QObject::tr("<li>Target mismatch detected.\n"
                 "Installed target: %1, selected target: %2.</li>")
-            .arg(installed, settings->value(RbSettings::CurPlatformName).toString());
+            .arg(installed, RbSettings::value(RbSettings::CurPlatformName).toString());
             // FIXME: replace installed by human-friendly name
     }
 

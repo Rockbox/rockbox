@@ -27,14 +27,12 @@
 #include "ui_uninstallfrm.h"
 #include "progressloggergui.h"
 #include "uninstall.h"
-#include "rbsettings.h"
 
 class UninstallWindow : public QDialog
 {
     Q_OBJECT
     public:
         UninstallWindow(QWidget *parent = 0);
-        void setSettings(RbSettings* sett);
 
     public slots:
         void accept(void);
@@ -46,8 +44,6 @@ class UninstallWindow : public QDialog
         Uninstaller* uninstaller;
         Ui::UninstallFrm ui;
         ProgressLoggerGui* logger;
-        RbSettings* settings;
-
 };
 
 

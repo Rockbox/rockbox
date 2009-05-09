@@ -27,13 +27,12 @@
 #include "ui_installfrm.h"
 #include "zipinstaller.h"
 #include "progressloggergui.h"
-#include "rbsettings.h"
 
 class Install : public QDialog
 {
     Q_OBJECT
     public:
-        Install(RbSettings* sett,QWidget *parent = 0);
+        Install(QWidget *parent);
         void setVersionStrings(QMap<QString, QString>&);
 
     public slots:
@@ -42,7 +41,6 @@ class Install : public QDialog
     private:
         Ui::InstallFrm ui;
         ProgressLoggerGui* logger;
-        RbSettings* settings;
         QHttp *download;
         QFile *target;
         QString file;

@@ -23,7 +23,6 @@
 #ifndef TTS_H
 #define TTS_H
 
-#include "rbsettings.h"
 #include <QtCore>
 #include <QProcess>
 #include <QDateTime>
@@ -58,16 +57,12 @@ class TTSBase : public EncTtsSettingInterface
         static TTSBase* getTTS(QObject* parent,QString ttsname);
         static QStringList getTTSList();
         static QString getTTSName(QString tts); 
-        
-        // sets the config. Users of TTS classes, always have to call this first
-        void setCfg(RbSettings* sett) { settings = sett; }
-        
+                
     private:
         //inits the tts List
         static void initTTSList();
 
     protected:
-        RbSettings* settings;
         static QMap<QString,QString> ttsList;
 };
 

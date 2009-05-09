@@ -37,8 +37,6 @@ public:
     TalkFileCreator(QObject* parent);
 
     bool createTalkFiles(ProgressloggerInterface* logger);
-
-    void setSettings(RbSettings* sett) { settings = sett;}
     
     void setDir(QDir dir){m_dir = dir; }
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
@@ -65,7 +63,6 @@ private:
     
     TTSBase* m_tts;
     EncBase* m_enc;
-    RbSettings* settings;
    
     QDir   m_dir;
     QString m_mountpoint;

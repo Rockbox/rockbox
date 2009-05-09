@@ -29,7 +29,6 @@
 #include "encoders.h"
 #include "tts.h"
 #include "httpget.h"
-#include "rbsettings.h"
 
 #include "wavtrim.h"
 #include "voicefont.h"
@@ -42,9 +41,6 @@ public:
 
     //start creation
     bool createVoiceFile(ProgressloggerInterface* logger);
-
-    // set infos
-    void setSettings(RbSettings* sett) { settings = sett;}
 
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
     void setTargetId(int id){m_targetid = id;}
@@ -64,7 +60,6 @@ private:
     // ptr to encoder, tts and settings
     TTSBase* m_tts;
     EncBase* m_enc;
-    RbSettings* settings;
     HttpGet *getter;
 
     QString filename;  //the temporary file

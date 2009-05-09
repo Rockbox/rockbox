@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include "talkfile.h"
+#include "rbsettings.h"
 
 TalkFileCreator::TalkFileCreator(QObject* parent): QObject(parent)
 {
@@ -40,8 +41,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     m_logger->addItem(tr("Starting Talk file generation"),LOGINFO);
 
     //tts
-    m_tts = TTSBase::getTTS(this,settings->value(RbSettings::Tts).toString());
-    m_tts->setCfg(settings);
+    m_tts = TTSBase::getTTS(this,RbSettings::value(RbSettings::Tts).toString());
 
     if(!m_tts->start(&errStr))
     {
@@ -52,8 +52,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     }
 
     // Encoder
-    m_enc = EncBase::getEncoder(this,settings->value(RbSettings::CurEncoder).toString());
-    m_enc->setCfg(settings);
+    m_enc = EncBase::getEncoder(this,RbSettings::value(RbSettings::CurEncoder).toString());
 
     if(!m_enc->start())
     {

@@ -24,7 +24,6 @@
 #define AUTODETECTION_H_
 
 #include <QtCore>
-#include "rbsettings.h"
 
 class Autodetection :public QObject
 {
@@ -32,8 +31,6 @@ class Autodetection :public QObject
 
 public:
     Autodetection(QObject* parent=0);
-
-    void setSettings(RbSettings* sett) {settings = sett;}
 
     bool detect();
 
@@ -54,7 +51,6 @@ private:
     QString m_errdev;
     QString m_incompat;
     QList<int> m_usbconid;
-    RbSettings* settings;
 };
 
 

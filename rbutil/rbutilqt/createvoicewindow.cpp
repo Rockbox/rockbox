@@ -22,6 +22,7 @@
 
 #include "browsedirtree.h"
 #include "configure.h"
+#include "rbsettings.h"
 
 CreateVoiceWindow::CreateVoiceWindow(QWidget *parent) : QDialog(parent)
 {
@@ -34,7 +35,6 @@ CreateVoiceWindow::CreateVoiceWindow(QWidget *parent) : QDialog(parent)
 void CreateVoiceWindow::change()
 {
     Config *cw = new Config(this,4);
-    cw->setSettings(settings);
     connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
     cw->show();    
 }
@@ -49,14 +49,13 @@ void CreateVoiceWindow::accept()
     int wvThreshold = ui.wavtrimthreshold->value();
     
     //safe selected language
-    settings->setValue(RbSettings::Language, lang);
-    settings->setValue(RbSettings::WavtrimThreshold, wvThreshold);
-    settings->sync();
+    RbSettings::setValue(RbSettings::Language, lang);
+    RbSettings::setValue(RbSettings::WavtrimThreshold, wvThreshold);
+    RbSettings::sync();
     
     //configure voicecreator
-    voicecreator->setSettings(settings);
-    voicecreator->setMountPoint(settings->value(RbSettings::Mountpoint).toString());
-    voicecreator->setTargetId(settings->value(RbSettings::CurTargetId).toInt());
+    voicecreator->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
+    voicecreator->setTargetId(RbSettings::value(RbSettings::CurTargetId).toInt());
     voicecreator->setLang(lang);
     voicecreator->setWavtrimThreshold(wvThreshold);
        
@@ -65,28 +64,19 @@ void CreateVoiceWindow::accept()
 }
 
 
-/** @brief set settings object
- */
-void CreateVoiceWindow::setSettings(RbSettings* sett)
-{
-    settings = sett;
-    updateSettings();
-}
-
-
 /** @brief update displayed settings
  */
 void CreateVoiceWindow::updateSettings(void)
 {
     // fill in language combobox
-    QStringList languages = settings->languages();
+    QStringList languages = RbSettings::languages();
     languages.sort();
     ui.comboLanguage->addItems(languages);
     // set saved lang
-    int sel = ui.comboLanguage->findText(settings->value(RbSettings::VoiceLanguage).toString());
+    int sel = ui.comboLanguage->findText(RbSettings::value(RbSettings::VoiceLanguage).toString());
     // if no saved language is found try to figure the language from the UI lang
     if(sel == -1) {
-        QString f = settings->value(RbSettings::Language).toString();
+        QString f = RbSettings::value(RbSettings::Language).toString();
         // if no language is set default to english. Make sure not to check an empty string.
         if(f.isEmpty()) f = "english";
         sel = ui.comboLanguage->findText(f, Qt::MatchStartsWith);
@@ -97,9 +87,8 @@ void CreateVoiceWindow::updateSettings(void)
     }
     ui.comboLanguage->setCurrentIndex(sel);
     
-    QString ttsName = settings->value(RbSettings::Tts).toString();
+    QString ttsName = RbSettings::value(RbSettings::Tts).toString();
     TTSBase* tts = TTSBase::getTTS(this,ttsName);
-    tts->setCfg(settings);
     if(tts->configOk())
         ui.labelTtsProfile->setText(tr("Selected TTS engine: <b>%1</b>")
             .arg(TTSBase::getTTSName(ttsName)));
@@ -107,11 +96,10 @@ void CreateVoiceWindow::updateSettings(void)
         ui.labelTtsProfile->setText(tr("Selected TTS engine: <b>%1</b>")
             .arg("Invalid TTS configuration!"));
     
-    QString encoder = settings->value(RbSettings::CurEncoder).toString();
+    QString encoder = RbSettings::value(RbSettings::CurEncoder).toString();
     // only proceed if encoder setting is set
     EncBase* enc = EncBase::getEncoder(this,encoder);
     if(enc != NULL) {
-        enc->setCfg(settings);
         if(enc->configOk())
             ui.labelEncProfile->setText(tr("Selected encoder: <b>%1</b>")
                 .arg(EncBase::getEncoderName(encoder)));
@@ -122,7 +110,7 @@ void CreateVoiceWindow::updateSettings(void)
     else
         ui.labelEncProfile->setText(tr("Selected encoder: <b>%1</b>")
             .arg("Invalid encoder configuration!"));
-    ui.wavtrimthreshold->setValue(settings->value(RbSettings::WavtrimThreshold).toInt());
+    ui.wavtrimthreshold->setValue(RbSettings::value(RbSettings::WavtrimThreshold).toInt());
     emit settingsUpdated();
 }
 

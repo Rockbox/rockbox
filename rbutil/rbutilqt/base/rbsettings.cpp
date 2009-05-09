@@ -25,6 +25,7 @@
 #include <unistd.h>
 #endif
 
+
 // device settings
 const static struct {
     RbSettings::SystemSettings setting;
@@ -94,31 +95,45 @@ const static struct {
     { RbSettings::EncoderVolume,        ":encoder:/volume",     "1.0" },
 };
 
-void RbSettings::open()
+//! pointer to setting object to NULL
+QSettings* RbSettings::systemSettings = NULL;
+QSettings* RbSettings::userSettings = NULL;
+
+void RbSettings::ensureRbSettingsExists()
 {
-    // only use built-in rbutil.ini
-    systemSettings = new QSettings(":/ini/rbutil.ini", QSettings::IniFormat, 0);
-     // portable installation:
-    // check for a configuration file in the program folder.
-    QFileInfo config;
-    config.setFile(QCoreApplication::instance()->applicationDirPath()
-            + "/RockboxUtility.ini");
-    if(config.isFile())
+    //check and create settings object
+    if(systemSettings == NULL)
     {
-        userSettings = new QSettings(QCoreApplication::instance()->applicationDirPath()
-                + "/RockboxUtility.ini", QSettings::IniFormat, this);
-        qDebug() << "config: portable";
+        // only use built-in rbutil.ini
+        systemSettings = new QSettings(":/ini/rbutil.ini", QSettings::IniFormat, 0);
     }
-    else
+    
+    if(userSettings == NULL)
     {
-        userSettings = new QSettings(QSettings::IniFormat,
-            QSettings::UserScope, "rockbox.org", "RockboxUtility",this);
-        qDebug() << "config: system";
+        // portable installation:
+        // check for a configuration file in the program folder.
+        QFileInfo config;
+        config.setFile(QCoreApplication::instance()->applicationDirPath()
+            + "/RockboxUtility.ini");
+        if(config.isFile())
+        {
+            userSettings = new QSettings(QCoreApplication::instance()->applicationDirPath()
+                + "/RockboxUtility.ini", QSettings::IniFormat, NULL);
+            qDebug() << "config: portable";
+        }
+        else
+        {
+            userSettings = new QSettings(QSettings::IniFormat,
+            QSettings::UserScope, "rockbox.org", "RockboxUtility",NULL);
+            qDebug() << "config: system";
+        }
     }
 }
 
 void RbSettings::sync()
 {
+    ensureRbSettingsExists(); 
+
     userSettings->sync();
 #if defined(Q_OS_LINUX)
     // when using sudo it runs rbutil with uid 0 but unfortunately without a
@@ -143,9 +158,16 @@ void RbSettings::sync()
 #endif
 }
 
+QString RbSettings::userSettingFilename()
+{
+    ensureRbSettingsExists();       
+    return userSettings->fileName();
+}
 
 QVariant RbSettings::value(enum SystemSettings setting)
 {
+    ensureRbSettingsExists();       
+
     // locate setting item
     int i = 0;
     while(SystemSettingsList[i].setting != setting)
@@ -158,15 +180,16 @@ QVariant RbSettings::value(enum SystemSettings setting)
     return systemSettings->value(s, d);
 }
 
-
-QString RbSettings::userSettingFilename()
-{
-    return userSettings->fileName();
+QVariant RbSettings::value(enum UserSettings setting)
+{   
+    QString empty; 
+    return subValue(empty, setting);
 }
 
-
-QVariant RbSettings::subValue(QString& sub, enum UserSettings setting)
+QVariant RbSettings::subValue(QString sub, enum UserSettings setting)
 {
+    ensureRbSettingsExists();       
+
     // locate setting item
     int i = 0;
     while(UserSettingsList[i].setting != setting)
@@ -177,9 +200,16 @@ QVariant RbSettings::subValue(QString& sub, enum UserSettings setting)
     return userSettings->value(s, UserSettingsList[i].def);
 }
 
-
-void RbSettings::setSubValue(QString& sub, enum UserSettings setting, QVariant value)
+void RbSettings::setValue(enum UserSettings setting , QVariant value)
 {
+   QString empty; 
+   return setSubValue(empty, setting, value);
+}
+
+void RbSettings::setSubValue(QString sub, enum UserSettings setting, QVariant value)
+{
+    ensureRbSettingsExists();   
+
     // locate setting item
     int i = 0;
     while(UserSettingsList[i].setting != setting)
@@ -190,10 +220,10 @@ void RbSettings::setSubValue(QString& sub, enum UserSettings setting, QVariant v
     userSettings->setValue(s, value);
 }
 
-
-
 QStringList RbSettings::platforms()
 {
+    ensureRbSettingsExists();
+
     QStringList result;
     systemSettings->beginGroup("platforms");
     QStringList a = systemSettings->childKeys();
@@ -207,6 +237,8 @@ QStringList RbSettings::platforms()
 
 QStringList RbSettings::languages()
 {
+    ensureRbSettingsExists();
+
     QStringList result;
     systemSettings->beginGroup("languages");
     QStringList a = systemSettings->childKeys();
@@ -220,16 +252,20 @@ QStringList RbSettings::languages()
 
 QString RbSettings::name(QString platform)
 {
+    ensureRbSettingsExists();
     return systemSettings->value(platform + "/name").toString();
 }
 
 QString RbSettings::brand(QString platform)
 {
+    ensureRbSettingsExists();
     return systemSettings->value(platform + "/brand").toString();
 }
 
 QMap<int, QString> RbSettings::usbIdMap(enum MapType type)
 {
+    ensureRbSettingsExists();
+
     QMap<int, QString> map;
     // get a list of ID -> target name
     QStringList platforms;

@@ -29,23 +29,15 @@ class QSettings;
 class RbSettings : public QObject
 {
     Q_OBJECT
-
     public:
-        RbSettings() {}
-
-        //! open the settings files
-        void open();
-        //! call this to flush the user Settings
-        void sync();
-
-        // returns the filename of the usersettings file
-        QString userSettingFilename();
-
+        //! Type of requested usb-id map
         enum MapType {
             MapDevice,
             MapError,
             MapIncompatible,
         };
+        
+        //! All user settings
         enum UserSettings {
             RbutilVersion,
             CurrentPlatform,
@@ -76,6 +68,8 @@ class RbSettings : public QObject
             EncoderQuality,
             EncoderVolume,
         };
+        
+        //! All system settings
         enum SystemSettings {
             ManualUrl,
             BleedingUrl,
@@ -103,40 +97,43 @@ class RbSettings : public QObject
             CurConfigureModel,
             CurTargetId,
         };
-
-        QVariant value(enum SystemSettings setting);
-        // generic and "current selection" values -- getters
-        QVariant value(enum UserSettings setting)
-            { QString empty; return subValue(empty, setting); }
-        void setValue(enum UserSettings setting , QVariant value)
-            { QString empty; return setSubValue(empty, setting, value); }
-
-        QVariant subValue(QString& sub, enum UserSettings setting);
-        QVariant subValue(const char* sub, enum UserSettings setting)
-            { QString s = sub; return subValue(s, setting); }
-        void setSubValue(QString& sub, enum UserSettings setting, QVariant value);
-        void setSubValue(const char* sub, enum UserSettings setting, QVariant value)
-            { QString s = sub; return setSubValue(s, setting, value); }
-
-        QStringList platforms(void);
-        QStringList languages(void);
-
-        QString name(QString plattform);
-        QString brand(QString plattform);
-
-        QMap<int, QString> usbIdMap(enum MapType);
+        
+        //! call this to flush the user Settings
+        static void sync();
+        //! returns the filename of the usersettings file
+        static QString userSettingFilename();
+        //! return a list of all platforms (rbutil internal names)
+        static QStringList platforms(void);
+        //! returns a list of all languages
+        static QStringList languages(void);
+        //! maps a platform to its name
+        static QString name(QString plattform);
+        //! maps a platform to its brand
+        static QString brand(QString plattform);
+        //! returns a map of usb-ids and their targets
+        static QMap<int, QString> usbIdMap(enum MapType);
+        //! get a value from system settings
+        static QVariant value(enum SystemSettings setting);
+        //! get a vaulue from user settings
+        static QVariant value(enum UserSettings setting);
+        //! set a user setting value
+        static void setValue(enum UserSettings setting , QVariant value);
+        //! get a user setting from a subvalue (ie for encoders and tts engines)
+        static QVariant subValue(QString sub, enum UserSettings setting);
+        //! set a user setting from a subvalue (ie for encoders and tts engines)
+        static void setSubValue(QString sub, enum UserSettings setting, QVariant value);
 
     private:
-        //! private copy constructors to prvent copying
-        RbSettings&  operator= (const RbSettings& other)
-            { (void)other; return *this; }
-        RbSettings(const RbSettings& other) :QObject()
-            { (void)other; }
-        QString constructSettingPath(QString path, QString substitute = QString());
+        //! you shouldnt call this, its a fully static calls
+        RbSettings() {}
+        //! create the setting objects if neccessary
+        static void ensureRbSettingsExists();
+        //! create a settings path, substitute platform, tts and encoder
+        static QString constructSettingPath(QString path, QString substitute = QString());
 
         //! pointers to our setting objects
-        QSettings *systemSettings;
-        QSettings *userSettings;
+        static QSettings *systemSettings;
+        static QSettings *userSettings;
 };
 
 #endif

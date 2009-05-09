@@ -19,6 +19,7 @@
 
 #include "encoders.h"
 #include "utils.h"
+#include "rbsettings.h"
 
 /*********************************************************************
 * Encoder Base
@@ -87,24 +88,24 @@ EncExes::EncExes(QString name,QObject *parent) : EncBase(parent)
 
 void EncExes::generateSettings()
 {
-    QString exepath =settings->subValue(m_name,RbSettings::EncoderPath).toString();
+    QString exepath =RbSettings::subValue(m_name,RbSettings::EncoderPath).toString();
     if(exepath == "") exepath = findExecutable(m_name);
     
     insertSetting(eEXEPATH,new EncTtsSetting(this,EncTtsSetting::eSTRING,"Path to Encoder:",exepath,EncTtsSetting::eBROWSEBTN));
-    insertSetting(eEXEOPTIONS,new EncTtsSetting(this,EncTtsSetting::eSTRING,"Encoder options:",settings->subValue(m_name,RbSettings::EncoderOptions)));
+    insertSetting(eEXEOPTIONS,new EncTtsSetting(this,EncTtsSetting::eSTRING,"Encoder options:",RbSettings::subValue(m_name,RbSettings::EncoderOptions)));
 }
 
 void EncExes::saveSettings()
 {
-    settings->setSubValue(m_name,RbSettings::EncoderPath,getSetting(eEXEPATH)->current().toString());
-    settings->setSubValue(m_name,RbSettings::EncoderOptions,getSetting(eEXEOPTIONS)->current().toString());
-    settings->sync();
+    RbSettings::setSubValue(m_name,RbSettings::EncoderPath,getSetting(eEXEPATH)->current().toString());
+    RbSettings::setSubValue(m_name,RbSettings::EncoderOptions,getSetting(eEXEOPTIONS)->current().toString());
+    RbSettings::sync();
 }
 
 bool EncExes::start()
 {
-    m_EncExec = settings->subValue(m_name, RbSettings::EncoderPath).toString();
-    m_EncOpts = settings->subValue(m_name, RbSettings::EncoderOptions).toString();
+    m_EncExec = RbSettings::subValue(m_name, RbSettings::EncoderPath).toString();
+    m_EncOpts = RbSettings::subValue(m_name, RbSettings::EncoderOptions).toString();
     
     m_EncTemplate = m_TemplateMap.value(m_name);
 
@@ -136,7 +137,7 @@ bool EncExes::encode(QString input,QString output)
 
 bool EncExes::configOk()
 {
-    QString path = settings->subValue(m_name, RbSettings::EncoderPath).toString();
+    QString path = RbSettings::subValue(m_name, RbSettings::EncoderPath).toString();
     
     if (QFileInfo(path).exists())
         return true;
@@ -154,31 +155,31 @@ EncRbSpeex::EncRbSpeex(QObject *parent) : EncBase(parent)
 
 void EncRbSpeex::generateSettings()
 {
-    insertSetting(eVOLUME,new EncTtsSetting(this,EncTtsSetting::eDOUBLE,"Volume:",settings->subValue("rbspeex",RbSettings::EncoderVolume),1.0,10.0));
-    insertSetting(eQUALITY,new EncTtsSetting(this,EncTtsSetting::eDOUBLE,"Quality:",settings->subValue("rbspeex",RbSettings::EncoderQuality),0,10.0));
-    insertSetting(eCOMPLEXITY,new EncTtsSetting(this,EncTtsSetting::eINT,"Complexity:",settings->subValue("rbspeex",RbSettings::EncoderComplexity),0,10));
-    insertSetting(eNARROWBAND,new EncTtsSetting(this,EncTtsSetting::eBOOL,"Use Narrowband:",settings->subValue("rbspeex",RbSettings::EncoderNarrowBand)));    
+    insertSetting(eVOLUME,new EncTtsSetting(this,EncTtsSetting::eDOUBLE,"Volume:",RbSettings::subValue("rbspeex",RbSettings::EncoderVolume),1.0,10.0));
+    insertSetting(eQUALITY,new EncTtsSetting(this,EncTtsSetting::eDOUBLE,"Quality:",RbSettings::subValue("rbspeex",RbSettings::EncoderQuality),0,10.0));
+    insertSetting(eCOMPLEXITY,new EncTtsSetting(this,EncTtsSetting::eINT,"Complexity:",RbSettings::subValue("rbspeex",RbSettings::EncoderComplexity),0,10));
+    insertSetting(eNARROWBAND,new EncTtsSetting(this,EncTtsSetting::eBOOL,"Use Narrowband:",RbSettings::subValue("rbspeex",RbSettings::EncoderNarrowBand)));    
 }
 
 void EncRbSpeex::saveSettings()
 {
     //save settings in user config
-    settings->setSubValue("rbspeex",RbSettings::EncoderVolume,getSetting(eVOLUME)->current().toDouble());
-    settings->setSubValue("rbspeex",RbSettings::EncoderQuality,getSetting(eQUALITY)->current().toDouble());
-    settings->setSubValue("rbspeex",RbSettings::EncoderComplexity,getSetting(eCOMPLEXITY)->current().toInt());
-    settings->setSubValue("rbspeex",RbSettings::EncoderNarrowBand,getSetting(eNARROWBAND)->current().toBool());
+    RbSettings::setSubValue("rbspeex",RbSettings::EncoderVolume,getSetting(eVOLUME)->current().toDouble());
+    RbSettings::setSubValue("rbspeex",RbSettings::EncoderQuality,getSetting(eQUALITY)->current().toDouble());
+    RbSettings::setSubValue("rbspeex",RbSettings::EncoderComplexity,getSetting(eCOMPLEXITY)->current().toInt());
+    RbSettings::setSubValue("rbspeex",RbSettings::EncoderNarrowBand,getSetting(eNARROWBAND)->current().toBool());
     
-    settings->sync();
+    RbSettings::sync();
 }
 
 bool EncRbSpeex::start()
 {
    
     // try to get config from settings
-    quality = settings->subValue("rbspeex", RbSettings::EncoderQuality).toDouble();
-    complexity = settings->subValue("rbspeex", RbSettings::EncoderComplexity).toInt();
-    volume = settings->subValue("rbspeex", RbSettings::EncoderVolume).toDouble();
-    narrowband = settings->subValue("rbspeex", RbSettings::EncoderNarrowBand).toBool();
+    quality = RbSettings::subValue("rbspeex", RbSettings::EncoderQuality).toDouble();
+    complexity = RbSettings::subValue("rbspeex", RbSettings::EncoderComplexity).toInt();
+    volume = RbSettings::subValue("rbspeex", RbSettings::EncoderVolume).toDouble();
+    narrowband = RbSettings::subValue("rbspeex", RbSettings::EncoderNarrowBand).toBool();
    
 
     return true;
@@ -219,13 +220,13 @@ bool EncRbSpeex::configOk()
     bool result=true;
     // check config
     
-    if(settings->subValue("rbspeex", RbSettings::EncoderVolume).toDouble() <= 0)
+    if(RbSettings::subValue("rbspeex", RbSettings::EncoderVolume).toDouble() <= 0)
         result =false;
     
-    if(settings->subValue("rbspeex", RbSettings::EncoderQuality).toDouble() <= 0)
+    if(RbSettings::subValue("rbspeex", RbSettings::EncoderQuality).toDouble() <= 0)
         result =false;
         
-    if(settings->subValue("rbspeex", RbSettings::EncoderComplexity).toInt() <= 0)
+    if(RbSettings::subValue("rbspeex", RbSettings::EncoderComplexity).toInt() <= 0)
         result =false;
        
     return result;
