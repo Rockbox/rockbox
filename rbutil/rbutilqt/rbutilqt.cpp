@@ -618,7 +618,7 @@ void RbUtilQt::installBootloaderBtn()
 
     // create logger
     logger = new ProgressLoggerGui(this);
-
+    logger->show();
     installBootloader();
 }
 
@@ -724,6 +724,7 @@ void RbUtilQt::installBootloader()
             // installation.
             m_error = true;
             logger->addItem(tr("Bootloader installation aborted"), LOGINFO);
+            logger->setFinished();
             return;
         }
         // open dialog to browse to of file
@@ -732,6 +733,7 @@ void RbUtilQt::installBootloader()
                 tr("Select firmware file"), QDir::homePath());
         if(!QFileInfo(offile).isReadable()) {
             logger->addItem(tr("Error opening firmware file"), LOGERROR);
+            logger->setFinished();
             m_error = true;
             return;
         }
@@ -745,8 +747,7 @@ void RbUtilQt::installBootloader()
     connect(bl, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
     connect(bl, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
 
-    // show logger and start install.
-    logger->show();
+    // start install.
     if(!backupDestination.isEmpty()) {
         if(!bl->backup(backupDestination)) {
             if(QMessageBox::warning(this, tr("Backup error"),
