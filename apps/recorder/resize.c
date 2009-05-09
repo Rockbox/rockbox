@@ -518,7 +518,7 @@ static inline bool scale_v_linear(struct rowset *rset,
 #endif /* HAVE_UPSCALER */
 
 #if defined(HAVE_LCD_COLOR) && (defined(HAVE_JPEG) || defined(PLUGIN))
-void output_row_native_fromyuv(uint32_t row, void * row_in,
+static void output_row_32_native_fromyuv(uint32_t row, void * row_in,
                                struct scaler_context *ctx)
 {
     int col;
@@ -547,7 +547,7 @@ void output_row_native_fromyuv(uint32_t row, void * row_in,
 #endif
 
 #if !defined(PLUGIN) || LCD_DEPTH > 1
-void output_row_native(uint32_t row, void * row_in,
+static void output_row_32_native(uint32_t row, void * row_in,
                               struct scaler_context *ctx)
 {
     int col;
@@ -644,13 +644,14 @@ unsigned int get_size_native(struct bitmap *bm)
 }
 
 const struct custom_format format_native = {
+    .output_row_8 = output_row_8_native,
 #if defined(HAVE_LCD_COLOR) && (defined(HAVE_JPEG) || defined(PLUGIN))
-    .output_row = {
-        output_row_native,
-        output_row_native_fromyuv
+    .output_row_32 = {
+        output_row_32_native,
+        output_row_32_native_fromyuv
     },
 #else
-    .output_row = output_row_native,
+    .output_row_32 = output_row_32_native,
 #endif
     .get_size = get_size_native
 };
@@ -722,17 +723,17 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     ctx.dither = dither;
 #if !defined(PLUGIN)
 #if defined(HAVE_LCD_COLOR) && defined(HAVE_JPEG)
-    ctx.output_row = format_index ? output_row_native_fromyuv
-                                  : output_row_native;
+    ctx.output_row = format_index ? output_row_32_native_fromyuv
+                                  : output_row_32_native;
 #else
-    ctx.output_row = output_row_native;
+    ctx.output_row = output_row_32_native;
 #endif
     if (format)
 #endif
 #if defined(HAVE_LCD_COLOR) && (defined(HAVE_JPEG) || defined(PLUGIN))
-        ctx.output_row = format->output_row[format_index];
+        ctx.output_row = format->output_row_32[format_index];
 #else
-        ctx.output_row = format->output_row;
+        ctx.output_row = format->output_row_32;
 #endif
 #ifdef HAVE_UPSCALER
     if (sw > dw)

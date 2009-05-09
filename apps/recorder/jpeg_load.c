@@ -109,6 +109,7 @@ struct jpeg
     int tab_membership[6];
     int subsample_x[3]; /* info per component */
     int subsample_y[3];
+    bool resize;
     unsigned char buf[JPEG_READ_BUF_SIZE];
     struct img_part part;
 };
@@ -2025,14 +2026,15 @@ int read_jpeg_fd(int fd,
             recalc_dimension(&resize_dim, &src_dim);
         bm->width = resize_dim.width;
         bm->height = resize_dim.height;
-        if (bm->width == src_dim.width && bm->height == src_dim.height)
-            resize = false;
     } else {
         bm->width = p_jpeg->x_size;
         bm->height = p_jpeg->y_size;
     }
     p_jpeg->h_scale[0] = calc_scale(p_jpeg->x_size, bm->width);
     p_jpeg->v_scale[0] = calc_scale(p_jpeg->y_size, bm->height);
+    if ((p_jpeg->x_size << p_jpeg->h_scale[0]) >> 3 &&
+        (p_jpeg->y_size << p_jpeg->v_scale[0]) >> 3)
+        resize = false;
 #ifdef HAVE_LCD_COLOR
     p_jpeg->h_scale[1] = p_jpeg->h_scale[0] +
         p_jpeg->frameheader[0].horizontal_sampling - 1;
@@ -2092,11 +2094,54 @@ int read_jpeg_fd(int fd,
     rset.rowstart = 0;
     rset.rowstop = bm->height;
     rset.rowstep = 1;
-    if (resize_on_load(bm, dither, &src_dim, &rset, buf_start, maxsize, cformat,
-        IF_PIX_FMT(p_jpeg->blocks == 1 ? 0 : 1,) store_row_jpeg, p_jpeg))
+    p_jpeg->resize = resize;
+    if (resize)
+    {
+        if (resize_on_load(bm, dither, &src_dim, &rset, buf_start, maxsize,
+            cformat, IF_PIX_FMT(p_jpeg->blocks == 1 ? 0 : 1,) store_row_jpeg,
+            p_jpeg))
+            return bm_size;
+    } else {
+        int row;
+        struct scaler_context ctx = {
+            .bm = bm,
+            .dither = dither,
+        };
+#if LCD_DEPTH > 1
+        void (*output_row_8)(uint32_t, void*, struct scaler_context*) =
+            output_row_8_native;
+#elif defined(PLUGIN)
+        void (*output_row_8)(uint32_t, void*, struct scaler_context*) = NULL;
+#endif
+#if LCD_DEPTH > 1 || defined(PLUGIN)
+        if (cformat)
+            output_row_8 = cformat->output_row_8;
+#endif
+        struct img_part *part;
+        for (row = 0; row < bm->height; row++)
+        {
+            part = store_row_jpeg(p_jpeg);
+#ifdef HAVE_LCD_COLOR
+            struct uint8_rgb *qp = part->buf;
+            struct uint8_rgb *end = qp + bm->width;
+            uint8_t y, u, v;
+            unsigned r, g, b;
+            for (; qp < end; qp++)
+            {
+                y = qp->blue;
+                u = qp->green;
+                v = qp->red;
+                yuv_to_rgb(y, u, v, &r, &g, &b);
+                qp->red = r;
+                qp->blue = b;
+                qp->green = g;
+            }
+#endif
+            output_row_8(row, part->buf, &ctx);
+        }
         return bm_size;
-    else
-        return 0;
+    }
+    return 0;
 }
 
 /**************** end JPEG code ********************/

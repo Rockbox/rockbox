@@ -150,18 +150,16 @@ struct scaler_context {
 #endif
 
 struct custom_format {
+    void (*output_row_8)(uint32_t,void*, struct scaler_context*);
 #if defined(HAVE_LCD_COLOR)
-    void (*output_row[2])(uint32_t,void*,struct scaler_context*);
+    void (*output_row_32[2])(uint32_t,void*, struct scaler_context*);
 #else
-    void (*output_row)(uint32_t,void*,struct scaler_context*);
+    void (*output_row_32)(uint32_t,void*, struct scaler_context*);
 #endif
     unsigned int (*get_size)(struct bitmap *bm);
 };
 
 struct rowset;
-
-void output_row_native(uint32_t row, void * row_in,
-                              struct scaler_context *ctx);
 
 extern const struct custom_format format_native;
 

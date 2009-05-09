@@ -42,13 +42,14 @@ static void output_row_null(uint32_t row, void * row_in,
 }
 
 const struct custom_format format_null = {
+    .output_row_8 = output_row_null,
 #ifdef HAVE_LCD_COLOR
-    .output_row = {
+    .output_row_32 = {
         output_row_null,
         output_row_null
     },
 #else
-    .output_row = output_row_null,
+    .output_row_32 = output_row_null,
 #endif
     .get_size = get_size_null
 };

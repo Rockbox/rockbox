@@ -124,14 +124,7 @@ void simple_resize_bitmap(struct bitmap *src, struct bitmap *dst)
 
 #endif /* LCD_DEPTH > 1 */
 
-#ifndef HAVE_BMP_SCALING
 #include "wrappers.h"
 
 /* import the core bmp loader */
 #include "recorder/bmp.c"
-#else
-/* the full 16x16 Bayer dither matrix may be calculated quickly with this table
-*/
-const unsigned char dither_table[16] =
-    {   0,192, 48,240, 12,204, 60,252,  3,195, 51,243, 15,207, 63,255 };
-#endif

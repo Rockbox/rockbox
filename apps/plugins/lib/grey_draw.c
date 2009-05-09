@@ -719,7 +719,15 @@ void grey_ub_gray_bitmap(const unsigned char *src, int x, int y, int width,
     grey_ub_gray_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
 
-static void output_row_grey(uint32_t row, void * row_in, struct scaler_context *ctx)
+static void output_row_grey_8(uint32_t row, void * row_in,
+                              struct scaler_context *ctx)
+{
+    uint8_t *dest = (uint8_t*)ctx->bm->data + ctx->bm->width * row;
+    rb->memcpy(dest, row_in, ctx->bm->width);
+}
+
+static void output_row_grey_32(uint32_t row, void * row_in,
+                               struct scaler_context *ctx)
 {
     int col;
     uint32_t *qp = (uint32_t*)row_in;
@@ -734,6 +742,7 @@ static unsigned int get_size_grey(struct bitmap *bm)
 }
 
 const struct custom_format format_grey = {
-    .output_row = output_row_grey,
+    .output_row_8 = output_row_grey_8,
+    .output_row_32 = output_row_grey_32,
     .get_size = get_size_grey
 };

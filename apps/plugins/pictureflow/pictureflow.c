@@ -607,7 +607,29 @@ static inline uint32_t div255(uint32_t val)
 
 #define SCALE_VAL(val,out) div255((val) * (out) + 127)
 
-static void output_row_transposed(uint32_t row, void * row_in,
+static void output_row_8_transposed(uint32_t row, void * row_in,
+                                       struct scaler_context *ctx)
+{
+    pix_t *dest = (pix_t*)ctx->bm->data + row;
+    pix_t *end = dest + ctx->bm->height * ctx->bm->width;
+#ifdef USEGSLIB
+    uint8_t *qp = (uint8_t*)row_in;
+    for (; dest < end; dest += ctx->bm->height)
+        *dest = *qp++;
+#else
+    struct uint8_rgb *qp = (struct uint8_rgb*)row_in;
+    unsigned r, g, b;
+    for (; dest < end; dest += ctx->bm->height)
+    {
+        r = qp->red;
+        g = qp->green;
+        b = (qp++)->blue;
+        *dest = LCD_RGBPACK_LCD(r,g,b);
+    }
+#endif
+}
+
+static void output_row_32_transposed(uint32_t row, void * row_in,
                                        struct scaler_context *ctx)
 {
     pix_t *dest = (pix_t*)ctx->bm->data + row;
@@ -635,7 +657,7 @@ static void output_row_transposed(uint32_t row, void * row_in,
 }
 
 #ifdef HAVE_LCD_COLOR
-static void output_row_transposed_fromyuv(uint32_t row, void * row_in,
+static void output_row_32_transposed_fromyuv(uint32_t row, void * row_in,
                                        struct scaler_context *ctx)
 {
     pix_t *dest = (pix_t*)ctx->bm->data + row;
@@ -663,13 +685,14 @@ static unsigned int get_size(struct bitmap *bm)
 }
 
 const struct custom_format format_transposed = {
+    .output_row_8 = output_row_8_transposed,
 #ifdef HAVE_LCD_COLOR
-    .output_row = {
-        output_row_transposed,
-        output_row_transposed_fromyuv
+    .output_row_32 = {
+        output_row_32_transposed,
+        output_row_32_transposed_fromyuv
     },
 #else
-    .output_row = output_row_transposed,
+    .output_row_32 = output_row_32_transposed,
 #endif
     .get_size = get_size
 };

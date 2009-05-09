@@ -351,6 +351,93 @@ static inline int rgbcmp(struct uint8_rgb rgb1, struct uint8_rgb rgb2)
     else
         return 1;
 }
+#if LCD_DEPTH > 1
+void output_row_8_native(uint32_t row, void * row_in,
+                              struct scaler_context *ctx)
+{
+    int col;
+    int fb_width = BM_WIDTH(ctx->bm->width,FORMAT_NATIVE,0);
+    uint8_t dy = DITHERY(row);
+#ifdef HAVE_LCD_COLOR
+    struct uint8_rgb *qp = (struct uint8_rgb*)row_in;
+#else
+    uint8_t *qp = (uint8_t*)row_in;
+#endif
+    BDEBUGF("output_row: y: %lu in: %p\n",row, row_in);
+#if LCD_DEPTH == 2
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+                /* greyscale iPods */
+                fb_data *dest = (fb_data *)ctx->bm->data + fb_width * row;
+                int shift = 6;
+                int delta = 127;
+                unsigned bright;
+                unsigned data = 0;
+
+                for (col = 0; col < ctx->bm->width; col++) {
+                    if (ctx->dither)
+                        delta = DITHERXDY(col,dy);
+                    bright = *qp++;
+                    bright = (3 * bright + (bright >> 6) + delta) >> 8;
+                    data |= (~bright & 3) << shift;
+                    shift -= 2;
+                    if (shift < 0) {
+                        *dest++ = data;
+                        data = 0;
+                        shift = 6;
+                    }
+                }
+                if (shift < 6)
+                    *dest++ = data;
+#elif LCD_PIXELFORMAT == VERTICAL_PACKING
+                /* iriver H1x0 */
+                fb_data *dest = (fb_data *)ctx->bm->data + fb_width *
+                                (row >> 2);
+                int shift = 2 * (row & 3);
+                int delta = 127;
+                unsigned bright;
+
+                for (col = 0; col < ctx->bm->width; col++) {
+                    if (ctx->dither)
+                        delta = DITHERXDY(col,dy);
+                    bright = *qp++;
+                    bright = (3 * bright + (bright >> 6) + delta) >> 8;
+                    *dest++ |= (~bright & 3) << shift;
+                }
+#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
+                /* iAudio M3 */
+                fb_data *dest = (fb_data *)ctx->bm->data + fb_width *
+                                (row >> 3);
+                int shift = row & 7;
+                int delta = 127;
+                unsigned bright;
+
+                for (col = 0; col < ctx->bm->width; col++) {
+                    if (ctx->dither)
+                        delta = DITHERXDY(col,dy);
+                    bright = *qp++;
+                    bright = (3 * bright + (bright >> 6) + delta) >> 8;
+                    *dest++ |= vi_pattern[bright] << shift;
+                }
+#endif /* LCD_PIXELFORMAT */
+#elif LCD_DEPTH == 16
+                /* iriver h300, colour iPods, X5 */
+                fb_data *dest = (fb_data *)ctx->bm->data + fb_width * row;
+                int delta = 127;
+                unsigned r, g, b;
+                for (col = 0; col < ctx->bm->width; col++) {
+                    if (ctx->dither)
+                        delta = DITHERXDY(col,dy);
+                    r = qp->red;
+                    g = qp->green;
+                    b = (qp++)->blue;
+                    r = (31 * r + (r >> 3) + delta) >> 8;
+                    g = (63 * g + (g >> 2) + delta) >> 8;
+                    b = (31 * b + (b >> 3) + delta) >> 8;
+                    *dest++ = LCD_RGBPACK_LCD(r, g, b);
+                }
+#endif /* LCD_DEPTH */
+}
+#endif
 
 /******************************************************************************
  * read_bmp_fd()
@@ -598,7 +685,7 @@ int read_bmp_fd(int fd,
 #if (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)) && \
     defined(HAVE_BMP_SCALING) || defined(PLUGIN)
 #if LCD_DEPTH > 1 && defined(HAVE_BMP_SCALING)
-    if (resize || cformat)
+    if (resize)
 #endif
     {
         if (resize_on_load(bm, dither, &src_dim, &rset,
@@ -610,31 +697,43 @@ int read_bmp_fd(int fd,
     }
 #endif /* LCD_DEPTH */
 
-#ifndef PLUGIN
-#if (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1))
-    int fb_width = BM_WIDTH(bm->width,bm->format,remote);
+#if LCD_DEPTH > 1 || defined(PLUGIN)
+    struct scaler_context ctx = {
+        .bm = bm,
+        .dither = dither,
+    };
 #endif
-    int col, row;
+#if LCD_DEPTH > 1
+    void (*output_row_8)(uint32_t, void*, struct scaler_context*) =
+        output_row_8_native;
+#elif defined(PLUGIN)
+    void (*output_row_8)(uint32_t, void*, struct scaler_context*) = NULL;
+#endif
+#if LCD_DEPTH > 1 || defined(PLUGIN)
+    if (cformat)
+        output_row_8 = cformat->output_row_8;
+#endif
 
+    int row;
     /* loop to read rows and put them to buffer */
     for (row = rset.rowstart; row != rset.rowstop; row += rset.rowstep) {
+        if (!read_part_line(&ba))
+            return -9;
+#ifndef PLUGIN
 #if !defined(HAVE_LCD_COLOR) && \
         (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1))
         uint8_t* qp = ba.buf;
 #else
         struct uint8_rgb *qp = (struct uint8_rgb *)ba.buf;
 #endif
-        unsigned mask;
-        unsigned char *p;
-        if (!read_part_line(&ba))
-           return -9;
-
+#endif
         /* Convert to destination format */
-#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
-        unsigned char dy = DITHERY(row);
+#if ((LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)) && \
+    !defined(PLUGIN)
         if (format == FORMAT_NATIVE) {
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
             if (remote) {
+                unsigned char dy = DITHERY(row);
 #if (LCD_REMOTE_DEPTH == 2) && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
                 /* iAudio X5/M5 remote */
                 fb_remote_data *dest = (fb_remote_data *)bitmap
@@ -643,6 +742,7 @@ int read_bmp_fd(int fd,
                 int delta = 127;
                 unsigned bright;
 
+                int col;
                 for (col = 0; col < bm->width; col++) {
                     if (dither)
                         delta = DITHERXDY(col,dy);
@@ -658,85 +758,25 @@ int read_bmp_fd(int fd,
 #endif /* LCD_REMOTE_DEPTH / LCD_REMOTE_PIXELFORMAT */
             } else
 #endif /* defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1 */
+#endif /* (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) &&
+    (LCD_REMOTE_DEPTH > 1) */
+#if LCD_DEPTH > 1 || defined(PLUGIN)
             {
-#if LCD_DEPTH == 2
-#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-                /* greyscale iPods */
-                fb_data *dest = (fb_data *)bitmap + fb_width * row;
-                int shift = 6;
-                int delta = 127;
-                unsigned bright;
-                unsigned data = 0;
-
-                for (col = 0; col < bm->width; col++) {
-                    if (dither)
-                        delta = DITHERXDY(col,dy);
-                    bright = *qp++;
-                    bright = (3 * bright + (bright >> 6) + delta) >> 8;
-                    data |= (~bright & 3) << shift;
-                    shift -= 2;
-                    if (shift < 0) {
-                        *dest++ = data;
-                        data = 0;
-                        shift = 6;
-                    }
-                }
-                if (shift < 6)
-                    *dest++ = data;
-#elif LCD_PIXELFORMAT == VERTICAL_PACKING
-                /* iriver H1x0 */
-                fb_data *dest = (fb_data *)bitmap + fb_width * (row >> 2);
-                int shift = 2 * (row & 3);
-                int delta = 127;
-                unsigned bright;
-
-                for (col = 0; col < bm->width; col++) {
-                    if (dither)
-                        delta = DITHERXDY(col,dy);
-                    bright = *qp++;
-                    bright = (3 * bright + (bright >> 6) + delta) >> 8;
-                    *dest++ |= (~bright & 3) << shift;
-                }
-#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
-                /* iAudio M3 */
-                fb_data *dest = (fb_data *)bitmap + fb_width * (row >> 3);
-                int shift = row & 7;
-                int delta = 127;
-                unsigned bright;
-
-                for (col = 0; col < bm->width; col++) {
-                    if (dither)
-                        delta = DITHERXDY(col,dy);
-                    bright = *qp++;
-                    bright = (3 * bright + (bright >> 6) + delta) >> 8;
-                    *dest++ |= vi_pattern[bright] << shift;
-                }
-#endif /* LCD_PIXELFORMAT */
-#elif LCD_DEPTH == 16
-                /* iriver h300, colour iPods, X5 */
-                fb_data *dest = (fb_data *)bitmap + fb_width * row;
-                int delta = 127;
-                unsigned r, g, b;
-                struct uint8_rgb q0;
-
-                for (col = 0; col < bm->width; col++) {
-                    if (dither)
-                        delta = DITHERXDY(col,dy);
-                    q0 = *qp++;
-                    r = (31 * q0.red + (q0.red >> 3) + delta) >> 8;
-                    g = (63 * q0.green + (q0.green >> 2) + delta) >> 8;
-                    b = (31 * q0.blue + (q0.blue >> 3) + delta) >> 8;
-                    *dest++ = LCD_RGBPACK_LCD(r, g, b);
-                }
-#endif /* LCD_DEPTH */
+                output_row_8(row, ba.buf, &ctx);
             }
-        } else
-#endif /* (LCD_DEPTH > 1) ||
-          defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1) */
+#endif
+#if ((LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)) && \
+    !defined(PLUGIN)
+        }
+#ifndef PLUGIN
+        else
+#endif
+#endif
+#ifndef PLUGIN
         {
-            p = bitmap + bm->width * (row >> 3);
-            mask = 1 << (row & 7);
-
+            unsigned char *p = bitmap + bm->width * (row >> 3);
+            unsigned char mask = 1 << (row & 7);
+            int col;
             for (col = 0; col < bm->width; col++, p++)
 #if !defined(HAVE_LCD_COLOR) && \
         (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1))
@@ -747,7 +787,7 @@ int read_bmp_fd(int fd,
                     *p |= mask;
 #endif
         }
+#endif
     }
     return totalsize; /* return the used buffer size. */
-#endif
 }

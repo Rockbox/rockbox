@@ -212,4 +212,8 @@ int read_bmp_fd(int fd,
                 int format,
                 const struct custom_format *cformat);
 
+#if LCD_DEPTH > 1
+void output_row_8_native(uint32_t row, void * row_in,
+                         struct scaler_context *ctx);
+#endif
 #endif
