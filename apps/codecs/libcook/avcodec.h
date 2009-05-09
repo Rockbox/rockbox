@@ -406,6 +406,7 @@ enum SampleFormat {
 #define FF_MIN_BUFFER_SIZE 16384
 
 
+#if 0/* MT : DELETE THIS LINE.*/
 /**
  * motion estimation type.
  */
@@ -3428,5 +3429,7 @@ void av_register_hwaccel(AVHWAccel *hwaccel);
  * after hwaccel, or NULL if hwaccel is the last one.
  */
 AVHWAccel *av_hwaccel_next(AVHWAccel *hwaccel);
+
+#endif/* MT : DELETE THIS LINE.*/
 
 #endif /* AVCODEC_AVCODEC_H */

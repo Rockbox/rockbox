@@ -27,7 +27,7 @@
 #define AVUTIL_BSWAP_H
 
 #include <stdint.h>
-#include "config.h"
+//#include "ffmpeg_config.h"
 #include "common.h"
 
 #if   ARCH_ARM

@@ -1,0 +1,40 @@
+Library: libcook
+Imported by : Mohamed Tarek
+
+These files comprise a rm parser and a cook decoder based on the decoder
+from ffmpeg.
+
+LICENSING INFORMATION
+
+ffmpeg is licensed under the Lesser GNU General Public License and the
+file cook.c is Copyright 2003 Sascha Sommer and 2005 Benjamin Larsson.
+
+IMPORT DETAILS
+
+The decoder is based on ffmpeg-svn r18079.
+
+The file libavcodec/cook.c was modified to remove all ffmpeg-specific
+code and to use the current rm parser.
+
+In initializing random_state in COOKContext, ffmpeg used a random_seed()
+function that was weird in the way it gets the random number. So it was
+decided to not use this function at all,and the value was initialized to 1,
+because according to Benjamin Larsson random_seed() could just be 
+replaced by any value.
+
+The current files contain lots of code which is either not needed by
+the decoder or totally disabled (#if 0 .. #endif) to enable
+compiling. This was during the isolation of the decoder from ffmpeg,
+the intention was to take as few files as possible to be able to
+compile cook.c and the related files outside ffmpeg.
+
+The decoder still uses floating point and relies on dynamic allocations 
+in some parts of it. It's still not ready to be ported to rockbox.
+
+TESTING
+
+The test program should compile in any Unix-like environment using the
+command "make -f Makefile.test".
+
+Running "./cooktest file.rm" will decode the audio data to a WAV file
+called "output.wav" in the current directory.

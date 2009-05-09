@@ -36,6 +36,7 @@
 
 //#define DEBUG
 /* dct code */
+#if 0 /*MT : DELETE THIS LINE.*/
 typedef short DCTELEM;
 typedef int DWTELEM;
 typedef short IDWTELEM;
@@ -590,8 +591,10 @@ void dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx);
 void dsputil_init_sh4(DSPContext* c, AVCodecContext *avctx);
 void dsputil_init_vis(DSPContext* c, AVCodecContext *avctx);
 
+#endif /*MT : DELETE THIS LINE ONLY. */
 #define DECLARE_ALIGNED_16(t, v) DECLARE_ALIGNED(16, t, v)
 
+#if 0 /*MT : DELETE THIS LINE ONLY. */
 #if HAVE_MMX
 
 #undef emms_c
@@ -644,10 +647,12 @@ extern int mm_flags;
 
 #endif
 
+#endif /* MT : DELETE THIS LINE ONLY */
 #ifndef DECLARE_ALIGNED_8
 #   define DECLARE_ALIGNED_8(t, v) DECLARE_ALIGNED(8, t, v)
 #endif
 
+#if 0 /* MT : DELETE THIS LINE ONLY */
 #ifndef STRIDE_ALIGN
 #   define STRIDE_ALIGN 8
 #endif
@@ -657,6 +662,7 @@ void get_psnr(uint8_t *orig_image[3], uint8_t *coded_image[3],
               int orig_linesize[3], int coded_linesize,
               AVCodecContext *avctx);
 
+#endif /*MT : DELETE THIS LINE.*/
 /* FFT computation */
 
 /* NOTE: soon integer code will be added, so you must use the
@@ -715,6 +721,7 @@ static inline void ff_fft_calc(FFTContext *s, FFTComplex *z)
 }
 void ff_fft_end(FFTContext *s);
 
+#endif /*MT : DELETE THIS LINE.*/
 /* MDCT computation */
 
 typedef struct MDCTContext {
@@ -735,6 +742,7 @@ static inline void ff_imdct_half(MDCTContext *s, FFTSample *output, const FFTSam
     s->fft.imdct_half(s, output, input);
 }
 
+#if 0 /* MT : DELETE THIS LINE. */
 /**
  * Generate a Kaiser-Bessel Derived Window.
  * @param   window  pointer to half window
@@ -742,6 +750,7 @@ static inline void ff_imdct_half(MDCTContext *s, FFTSample *output, const FFTSam
  * @param   n       size of half window
  */
 void ff_kbd_window_init(float *window, float alpha, int n);
+#endif /* MT : DELETE THIS LINE.*/
 
 /**
  * Generate a sine window.
@@ -769,6 +778,7 @@ void ff_imdct_half_sse(MDCTContext *s, FFTSample *output, const FFTSample *input
 void ff_mdct_calc(MDCTContext *s, FFTSample *out, const FFTSample *input);
 void ff_mdct_end(MDCTContext *s);
 
+#if 0 /* MT : DELETE THIS LINE.*/
 /* Real Discrete Fourier Transform */
 
 enum RDFTransformType {

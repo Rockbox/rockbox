@@ -34,10 +34,10 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <assert.h>
-#include "config.h"
+//#include "ffmpeg_config.h"
 #include "common.h"
 #include "mem.h"
-#include "timer.h"
+//#include "timer.h"
 
 #ifndef attribute_align_arg
 #if (!defined(__ICC) || __ICC > 1100) && AV_GCC_VERSION_AT_LEAST(4,2)
@@ -223,10 +223,10 @@ if((y)<(x)){\
 #define realloc please_use_av_realloc
 #undef  time
 #define time time_is_forbidden_due_to_security_issues
-#undef  rand
-#define rand rand_is_forbidden_due_to_state_trashing_use_av_random
-#undef  srand
-#define srand srand_is_forbidden_due_to_state_trashing_use_av_random_init
+//#undef  rand
+//#define rand rand_is_forbidden_due_to_state_trashing_use_av_random
+//#undef  srand
+//#define srand srand_is_forbidden_due_to_state_trashing_use_av_random_init
 #undef  random
 #define random random_is_forbidden_due_to_state_trashing_use_av_random
 #undef  sprintf

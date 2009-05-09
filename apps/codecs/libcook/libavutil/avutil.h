@@ -54,10 +54,10 @@
 unsigned avutil_version(void);
 
 #include "common.h"
-#include "mathematics.h"
-#include "rational.h"
-#include "intfloat_readwrite.h"
+//#include "mathematics.h"
+//#include "rational.h"
+//#include "intfloat_readwrite.h"
 #include "log.h"
-#include "pixfmt.h"
+//#include "pixfmt.h"
 
 #endif /* AVUTIL_AVUTIL_H */

@@ -20,7 +20,7 @@
 #define AVUTIL_INTREADWRITE_H
 
 #include <stdint.h>
-#include "config.h"
+//#include "ffmpeg_config.h"
 #include "bswap.h"
 
 #ifdef __GNUC__

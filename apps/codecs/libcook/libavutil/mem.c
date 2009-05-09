@@ -24,7 +24,6 @@
  * default memory allocator for libavutil
  */
 
-#include "config.h"
 
 #include <limits.h>
 #include <stdlib.h>

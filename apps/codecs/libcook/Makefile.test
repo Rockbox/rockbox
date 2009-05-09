@@ -1,0 +1,10 @@
+CFLAGS = -Wall -O3
+OBJS = bitstream.o cook.o fft.o libavutil/log.o mdct.o libavutil/mem.o libavutil/lfg.o libavutil/md5.o rm2wav.o
+cooktest: $(OBJS)
+	gcc -o cooktest $(OBJS) -lm
+
+.c.o :
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+clean:
+	rm -f cooktest $(OBJS) *~

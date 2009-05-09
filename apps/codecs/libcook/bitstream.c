@@ -73,6 +73,7 @@ void ff_put_string(PutBitContext * pbc, const char *s, int put_zero)
         put_bits(pbc, 8, 0);
 }
 
+#if 0
 void ff_copy_bits(PutBitContext *pb, const uint8_t *src, int length)
 {
     const uint16_t *srcw= (const uint16_t*)src;
@@ -94,6 +95,7 @@ void ff_copy_bits(PutBitContext *pb, const uint8_t *src, int length)
 
     put_bits(pb, bits, AV_RB16(&srcw[words])>>(16-bits));
 }
+#endif
 
 /* VLC decoding */
 
