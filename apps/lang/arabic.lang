@@ -1743,7 +1743,7 @@
   desc: in tag cache settings
   user: core
   <source>
-    *: "Initialize Now"
+    *: "Initialise Now"
   </source>
   <dest>
     *: "ابدأ الآن"
@@ -2409,7 +2409,7 @@
   user: core
   <source>
     *: none
-    swcodec: "Center Frequency"
+    swcodec: "Centre Frequency"
   </source>
   <dest>
     *: none

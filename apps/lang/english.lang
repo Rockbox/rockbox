@@ -1220,15 +1220,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Center Frequency"
+    swcodec: "Centre Frequency"
   </source>
   <dest>
     *: none
-    swcodec: "Center Frequency"
+    swcodec: "Centre Frequency"
   </dest>
   <voice>
     *: none
-    swcodec: "Center frequency"
+    swcodec: "Centre frequency"
   </voice>
 </phrase>
 <phrase>
@@ -1475,15 +1475,15 @@
   user: core
   <source>
     *: none
-    masf: "MDB Center Frequency"
+    masf: "MDB Centre Frequency"
   </source>
   <dest>
     *: none
-    masf: "MDB Center Frequency"
+    masf: "MDB Centre Frequency"
   </dest>
   <voice>
     *: none
-    masf: "MDB Center Frequency"
+    masf: "MDB Centre Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -2506,13 +2506,13 @@
   desc: in tag cache settings
   user: core
   <source>
-    *: "Initialize Now"
+    *: "Initialise Now"
   </source>
   <dest>
-    *: "Initialize Now"
+    *: "Initialise Now"
   </dest>
   <voice>
-    *: "Initialize Now"
+    *: "Initialise Now"
   </voice>
 </phrase>
 <phrase>

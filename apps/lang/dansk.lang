@@ -609,7 +609,7 @@
   user: core
   <source>
     *: none
-    masf: "MDB Center Frequency"
+    masf: "MDB Centre Frequency"
   </source>
   <dest>
     *: none
@@ -7275,7 +7275,7 @@
   desc: in tag cache settings
   user: core
   <source>
-    *: "Initialize Now"
+    *: "Initialise Now"
   </source>
   <dest>
     *: "Genopbyg database"
@@ -7513,7 +7513,7 @@
   user: core
   <source>
     *: none
-    swcodec: "Center Frequency"
+    swcodec: "Centre Frequency"
   </source>
   <dest>
     *: none

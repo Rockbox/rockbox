@@ -1319,7 +1319,7 @@
   desc: in tag cache settings
   user: core
   <source>
-    *: "Initialize Now"
+    *: "Initialise Now"
   </source>
   <dest>
     *: "अभी Initialize कर"
