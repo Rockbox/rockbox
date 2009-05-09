@@ -2032,8 +2032,8 @@ int read_jpeg_fd(int fd,
     }
     p_jpeg->h_scale[0] = calc_scale(p_jpeg->x_size, bm->width);
     p_jpeg->v_scale[0] = calc_scale(p_jpeg->y_size, bm->height);
-    if ((p_jpeg->x_size << p_jpeg->h_scale[0]) >> 3 &&
-        (p_jpeg->y_size << p_jpeg->v_scale[0]) >> 3)
+    if ((p_jpeg->x_size << p_jpeg->h_scale[0]) >> 3 == bm->width &&
+        (p_jpeg->y_size << p_jpeg->v_scale[0]) >> 3 == bm->height)
         resize = false;
 #ifdef HAVE_LCD_COLOR
     p_jpeg->h_scale[1] = p_jpeg->h_scale[0] +
