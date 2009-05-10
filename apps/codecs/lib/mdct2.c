@@ -403,7 +403,6 @@ void mdct_backward(int n, int32_t *in, int32_t *out) {
   mdct_butterflies(out+n2,n2,shift);
   mdct_bitreverse(out,n,step,shift);
   /* rotate + window */
-
   step>>=2;
   {
     int32_t *oX1=out+n2+n4;
@@ -517,5 +516,7 @@ void mdct_backward(int n, int32_t *in, int32_t *out) {
       oX1[3]= iX[0];
       iX+=4;
     }while(oX1>oX2);
+    
+    
   }
 }
