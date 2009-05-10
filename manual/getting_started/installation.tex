@@ -77,10 +77,6 @@ follow the instructions at
     and hold the \ButtonSelect{} and \ButtonPlay{} buttons simultaneously. Your
     \dap{} should enter disk mode and you can try reconnecting to the computer.
   }
-  \opt{ipod3g,ipod4g,ipodcolor,ipodmini}{
-    \index{Firewire}Firewire detection is not supported in Rockbox at 
-    the moment. Please use USB only.
-  }
   \opt{x5}{
     When instructed to connect/disconnect the USB cable, always use
     the USB port through the subpack, not the side 'USB Host' port. The side port
@@ -263,9 +259,9 @@ filesystem.\\*
     patched to be used with the bootloader. If you wish to install Rockbox
     on a US \playername{}, you must first install a non-US version of the
     original firmware and then install one of the supported versions patched
-    with the Rockbox bootloader. 
-    \warn{Installing non-US firmware on a US \playername{} will
-    permanently remove DRM support from the player.}}}
+    with the Rockbox bootloader.}
+    \warn{Installing a non-US firmware on a US \playername{} will
+    \emph{permanently} remove DRM support from the player.}}
 
   If the file that you downloaded is a \fname{.zip} file, use an unzip 
   utility like mentioned in the prerequisites section to extract
@@ -553,7 +549,7 @@ completely follow the manual uninstallation instructions below.}}
   connect the \dap{} to your computer, and follow the instructions to install
   the bootloader, but when prompted by sansapatcher, enter \texttt{u} for uninstall,
   instead of \texttt{i} for install. As in the installation, it may be necessary to
-  first put your device into MSC mode.
+  first put your \dap{} into MSC mode.
 }
 
 \optv{ipod}{
