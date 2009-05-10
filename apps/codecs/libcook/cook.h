@@ -19,7 +19,6 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-
 #ifndef _COOK_H
 #define _COOK_H
 
@@ -29,6 +28,7 @@
 #include "dsputil.h"
 #include "bytestream.h"
 #include "rm2wav.h"
+#include "cookdata_fixpoint.h"
 
 typedef struct {
     int *now;
@@ -42,18 +42,18 @@ typedef struct cook {
      */
     void (* scalar_dequant)(struct cook *q, int index, int quant_index,
                             int* subband_coef_index, int* subband_coef_sign,
-                            float* mlt_p);
+                            REAL_T* mlt_p);
 
     void (* decouple) (struct cook *q,
                        int subband,
-                       float f1, float f2,
-                       float *decode_buffer,
-                       float *mlt_buffer1, float *mlt_buffer2);
+                       REAL_T f1, REAL_T f2,
+                       REAL_T *decode_buffer,
+                       REAL_T *mlt_buffer1, REAL_T *mlt_buffer2);
 
     void (* imlt_window) (struct cook *q, float *buffer1,
                           cook_gains *gains_ptr, float *previous_buffer);
 
-    void (* interpolate) (struct cook *q, float* buffer,
+    void (* interpolate) (struct cook *q, REAL_T* buffer,
                           int gain_index, int gain_index_next);
 
     void (* saturate_output) (struct cook *q, int chan, int16_t *out);
@@ -104,12 +104,12 @@ typedef struct cook {
     /* data buffers */
 
     uint8_t*            decoded_bytes_buffer;
-    float mono_mdct_output[2048] __attribute__ ((aligned(16))); //DECLARE_ALIGNED_16(float,mono_mdct_output[2048]);
-    float               mono_previous_buffer1[1024];
-    float               mono_previous_buffer2[1024];
-    float               decode_buffer_1[1024];
-    float               decode_buffer_2[1024];
-    float               decode_buffer_0[1060]; /* static allocation for joint decode */
+    REAL_T mono_mdct_output[2048] __attribute__ ((aligned(16))); //DECLARE_ALIGNED_16(float,mono_mdct_output[2048]);
+    REAL_T              mono_previous_buffer1[1024];
+    REAL_T              mono_previous_buffer2[1024];
+    REAL_T              decode_buffer_1[1024];
+    REAL_T              decode_buffer_2[1024];
+    REAL_T              decode_buffer_0[1060]; /* static allocation for joint decode */
 
     const float         *cplscales[5];
 } COOKContext;

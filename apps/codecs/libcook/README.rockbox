@@ -31,6 +31,24 @@ compile cook.c and the related files outside ffmpeg.
 The decoder still uses floating point and relies on dynamic allocations 
 in some parts of it. It's still not ready to be ported to rockbox.
 
+CONVERSION TO FIXED-POINT
+
+A patch from ffmpeg's mailing list was used to convert the decoder to
+use fixed-point arithmetic. The patch was done by Ian Braithwaite, and
+discussed here :
+
+http://thread.gmane.org/gmane.comp.video.ffmpeg.devel/46024
+
+The patch is a bit dated (2007) so the modifications to cook.c had to
+be done manually.  The patch was also applied to cookdata.h and was
+used to create cookdata_fixpoint.h, cook_fixpoint.h and
+cook_fixp_mdct.h.
+
+The patch used a cook_random() function for noise filling. this was
+dropped and av_lfg_get() was used instead for consistency.
+
+Note : Only parts of the patch were committed to ffmpeg's repository.
+
 TESTING
 
 The test program should compile in any Unix-like environment using the

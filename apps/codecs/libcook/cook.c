@@ -70,11 +70,11 @@ const uint8_t ff_log2_tab[256]={
 #define SUBBAND_SIZE    20
 #define MAX_SUBPACKETS   5
 //#define COOKDEBUG
-//#define DUMP_RAW_FRAMES
 #define DEBUGF(message,args ...) av_log(NULL,AV_LOG_ERROR,message,## args)
 
 static float     pow2tab[127];
 static float rootpow2tab[127];
+#include "cook_fixpoint.h"
 
 /* debug functions */
 
@@ -189,7 +189,7 @@ static const float *maybe_reformat_buffer32 (COOKContext *q, const float *ptr, i
 static av_cold void init_cplscales_table (COOKContext *q) {
     int i;
     for (i=0;i<5;i++)
-        q->cplscales[i] = maybe_reformat_buffer32 (q, cplscales[i], (1<<(i+2))-1);
+        q->cplscales[i] = maybe_reformat_buffer32 (q, q->cplscales[i], (1<<(i+2))-1);
 }
 
 /*************** init functions end ***********/
@@ -454,6 +454,7 @@ static inline void expand_category(COOKContext *q, int* category,
  * @param mlt_p                 pointer into the mlt buffer
  */
 
+#if 0
 static void scalar_dequant_float(COOKContext *q, int index, int quant_index,
                            int* subband_coef_index, int* subband_coef_sign,
                            float* mlt_p){
@@ -472,6 +473,7 @@ static void scalar_dequant_float(COOKContext *q, int index, int quant_index,
         mlt_p[i] = f1 * rootpow2tab[quant_index+63];
     }
 }
+#endif
 /**
  * Unpack the subband_coef_index and subband_coef_sign vectors.
  *
@@ -527,7 +529,7 @@ static int unpack_SQVH(COOKContext *q, int category, int* subband_coef_index,
 
 
 static void decode_vectors(COOKContext* q, int* category,
-                           int *quant_index_table, float* mlt_buffer){
+                           int *quant_index_table, REAL_T* mlt_buffer){
     /* A zero in this table means that the subband coefficient is
        random noise coded. */
     int subband_coef_index[SUBBAND_SIZE];
@@ -567,7 +569,7 @@ static void decode_vectors(COOKContext* q, int* category,
  * @param mlt_buffer        pointer to mlt coefficients
  */
 
-static void mono_decode(COOKContext *q, float* mlt_buffer) {
+static void mono_decode(COOKContext *q, REAL_T* mlt_buffer) {
 
     int category_index[128];
     int quant_index_table[102];
@@ -593,6 +595,7 @@ static void mono_decode(COOKContext *q, float* mlt_buffer) {
  * @param gain_index_next   index for the next block multiplier
  */
 
+#if 0
 static void interpolate_float(COOKContext *q, float* buffer,
                         int gain_index, int gain_index_next){
     int i;
@@ -613,6 +616,7 @@ static void interpolate_float(COOKContext *q, float* buffer,
         return;
     }
 }
+#endif
 
 /**
  * Apply transform window, overlap buffers.
@@ -652,12 +656,12 @@ static void imlt_window_float (COOKContext *q, float *buffer1,
  * @param gains_ptr         current and previous gains
  * @param previous_buffer   pointer to the previous buffer to be used for overlapping
  */
-
-static void imlt_gain(COOKContext *q, float *inbuffer,
-                      cook_gains *gains_ptr, float* previous_buffer)
+#if 0
+static void imlt_gain(COOKContext *q, REAL_T *inbuffer,
+                      cook_gains *gains_ptr, REAL_T* previous_buffer)
 {
-    float *buffer0 = q->mono_mdct_output;
-    float *buffer1 = q->mono_mdct_output + q->samples_per_channel;
+    REAL_T *buffer0 = q->mono_mdct_output;
+    REAL_T *buffer1 = q->mono_mdct_output + q->samples_per_channel;
     int i;
 
     /* Inverse modified discrete cosine transform */
@@ -676,7 +680,7 @@ static void imlt_gain(COOKContext *q, float *inbuffer,
     memcpy(previous_buffer, buffer0, sizeof(float)*q->samples_per_channel);
 }
 
-
+#endif
 /**
  * function for getting the jointstereo coupling information
  *
@@ -720,9 +724,9 @@ static void decouple_info(COOKContext *q, int* decouple_tab){
  */
 static void decouple_float (COOKContext *q,
                             int subband,
-                            float f1, float f2,
-                            float *decode_buffer,
-                            float *mlt_buffer1, float *mlt_buffer2)
+                            REAL_T f1, REAL_T f2,
+                            REAL_T *decode_buffer,
+                            REAL_T *mlt_buffer1, REAL_T *mlt_buffer2)
 {
     int j, tmp_idx;
     for (j=0 ; j<SUBBAND_SIZE ; j++) {
@@ -740,21 +744,19 @@ static void decouple_float (COOKContext *q,
  * @param mlt_buffer2       pointer to right channel mlt coefficients
  */
 
-static void joint_decode(COOKContext *q, float* mlt_buffer1,
-                         float* mlt_buffer2) {
+static void joint_decode(COOKContext *q, REAL_T* mlt_buffer1,
+                         REAL_T* mlt_buffer2) {
     int i,j;
     int decouple_tab[SUBBAND_SIZE];
-    float *decode_buffer = q->decode_buffer_0;
-    int idx, cpl_tmp;
-    float f1,f2;
-    const float* cplscale;
+    REAL_T *decode_buffer = q->decode_buffer_0;
+    int idx;
 
     memset(decouple_tab, 0, sizeof(decouple_tab));
     memset(decode_buffer, 0, sizeof(decode_buffer));
 
     /* Make sure the buffers are zeroed out. */
-    memset(mlt_buffer1,0, 1024*sizeof(float));
-    memset(mlt_buffer2,0, 1024*sizeof(float));
+    memset(mlt_buffer1,0, 1024*sizeof(REAL_T));
+    memset(mlt_buffer2,0, 1024*sizeof(REAL_T));
     decouple_info(q, decouple_tab);
     mono_decode(q, decode_buffer);
 
@@ -770,13 +772,13 @@ static void joint_decode(COOKContext *q, float* mlt_buffer1,
        the coefficients are stored in a coupling scheme. */
     idx = (1 << q->js_vlc_bits) - 1;
     for (i=q->js_subband_start ; i<q->subbands ; i++) {
-        cpl_tmp = cplband[i];
-        idx -=decouple_tab[cpl_tmp];
-        cplscale = q->cplscales[q->js_vlc_bits-2];  //choose decoupler table
-        f1 = cplscale[decouple_tab[cpl_tmp]];
-        f2 = cplscale[idx-1];
-        q->decouple (q, i, f1, f2, decode_buffer, mlt_buffer1, mlt_buffer2);
-        idx = (1 << q->js_vlc_bits) - 1;
+        int i1 = decouple_tab[cplband[i]];
+        int i2 = idx - i1 - 1;
+        for (j=0 ; j<SUBBAND_SIZE ; j++) {
+            REAL_T x = decode_buffer[((q->js_subband_start + i)*20)+j];
+            mlt_buffer1[20*i+j] = cplscale_math(x, q->js_vlc_bits, i1);
+            mlt_buffer2[20*i+j] = cplscale_math(x, q->js_vlc_bits, i2);
+        }
     }
 }
 
@@ -818,7 +820,7 @@ static void
 saturate_output_float (COOKContext *q, int chan, int16_t *out)
 {
     int j;
-    float *output = q->mono_mdct_output + q->samples_per_channel;
+    float *output = (float*)q->mono_mdct_output + q->samples_per_channel;
     /* Clip and convert floats to 16 bits.
      */
     for (j = 0; j < q->samples_per_channel; j++) {
@@ -841,12 +843,29 @@ saturate_output_float (COOKContext *q, int chan, int16_t *out)
  */
 
 static inline void
-mlt_compensate_output(COOKContext *q, float *decode_buffer,
-                      cook_gains *gains, float *previous_buffer,
+mlt_compensate_output(COOKContext *q, REAL_T *decode_buffer,
+                      cook_gains *gains, REAL_T *previous_buffer,
                       int16_t *out, int chan)
 {
-    imlt_gain(q, decode_buffer, gains, previous_buffer);
-    q->saturate_output (q, chan, out);
+    REAL_T *buffer = q->mono_mdct_output;
+    int i;
+    imlt_math(q, decode_buffer);
+
+    /* Overlap with the previous block. */
+    overlap_math(q, gains->previous[0], previous_buffer);
+
+    /* Apply gain profile */
+    for (i = 0; i < 8; i++) {
+        if (gains->now[i] || gains->now[i + 1])
+            interpolate_math(q, &buffer[q->samples_per_channel/8 * i],
+                             gains->now[i], gains->now[i + 1]);
+    }
+
+    /* Save away the current to be previous block. */
+    memcpy(previous_buffer, buffer+q->samples_per_channel,
+           sizeof(REAL_T)*q->samples_per_channel);
+
+    output_math(q, out, chan);
 }
 
 
@@ -946,6 +965,7 @@ static void dump_cook_context(COOKContext *q)
 }
 #endif
 
+#if 0
 static av_cold int cook_count_channels(unsigned int mask){
     int i;
     int channels = 0;
@@ -955,6 +975,7 @@ static av_cold int cook_count_channels(unsigned int mask){
     }
     return channels;
 }
+#endif
 
 /**
  * Cook initialization
@@ -1077,10 +1098,10 @@ av_cold int cook_decode_init(RMContext *rmctx, COOKContext *q)
 
     /* Initialize COOK signal arithmetic handling */
     if (1) {
-        q->scalar_dequant  = scalar_dequant_float;
+        q->scalar_dequant  = scalar_dequant_math;
         q->decouple        = decouple_float;
         q->imlt_window     = imlt_window_float;
-        q->interpolate     = interpolate_float;
+        q->interpolate     = interpolate_math;
         q->saturate_output = saturate_output_float;
     }
 
