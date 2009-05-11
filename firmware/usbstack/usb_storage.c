@@ -771,7 +771,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             tb.sense_data->SKSV=0;
             tb.sense_data->SenseKeySpecific=0;
             logf("scsi request_sense %d",lun);
-            send_command_result(tb.sense_data, sizeof(struct sense_data));
+            send_command_result(tb.sense_data,
+                                MIN(sizeof(struct sense_data), length));
             break;
         }
 
