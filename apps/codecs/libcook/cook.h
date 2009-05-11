@@ -23,7 +23,6 @@
 #define _COOK_H
 
 #include <stdint.h>
-#include "libavutil/lfg.h"
 #include "bitstream.h"
 #include "bytestream.h"
 #include "rm2wav.h"
@@ -66,7 +65,7 @@ typedef struct cook {
     int                 bits_per_subpacket;
     int                 cookversion;
     /* states */
-    AVLFG               random_state;
+    int                 random_state;
 
     /* gain buffers */
     cook_gains          gains1;

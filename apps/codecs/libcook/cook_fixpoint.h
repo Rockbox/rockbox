@@ -110,7 +110,7 @@ static void scalar_dequant_math(COOKContext *q, int index,
     for(i=0 ; i<SUBBAND_SIZE ; i++) {
         f = table[subband_coef_index[i]];
         /* noise coding if subband_coef_index[i] == 0 */
-        if (((subband_coef_index[i] == 0) && av_lfg_get(&q->random_state) < 0x80000000) ||
+        if (((subband_coef_index[i] == 0) && cook_random(q)) ||
             ((subband_coef_index[i] != 0) && subband_coef_sign[i]))
             f = -f;
 

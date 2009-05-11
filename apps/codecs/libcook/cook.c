@@ -71,6 +71,17 @@ const uint8_t ff_log2_tab[256]={
 #define MAX_SUBPACKETS   5
 //#define COOKDEBUG
 #define DEBUGF(message,args ...) av_log(NULL,AV_LOG_ERROR,message,## args)
+
+/**
+ * Random bit stream generator.
+ */
+static int inline cook_random(COOKContext *q)
+{
+    q->random_state =
+      q->random_state * 214013 + 2531011; /* typical RNG numbers */
+
+    return (q->random_state/0x1000000)&1;  /*>>31*/
+}
 #include "cook_fixpoint.h"
 
 /* debug functions */
@@ -742,7 +753,7 @@ av_cold int cook_decode_init(RMContext *rmctx, COOKContext *q)
     q->bit_rate = rmctx->bit_rate;  
 
     /* Initialize RNG. */
-    av_lfg_init(&q->random_state, 1);
+    q->random_state = 0;
 
     /* Initialize extradata related variables. */
     q->samples_per_channel = q->samples_per_frame / q->nb_channels;
