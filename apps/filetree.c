@@ -601,6 +601,7 @@ int ft_enter(struct tree_context* c)
         }
         else {
             if (*c->dirfilter > NUM_FILTER_MODES &&
+                *c->dirfilter != SHOW_CFG &&
                 *c->dirfilter != SHOW_FONT &&
                 *c->dirfilter != SHOW_PLUGINS)
             {
