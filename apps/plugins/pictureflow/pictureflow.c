@@ -2574,7 +2574,7 @@ enum plugin_status plugin_start(const void *parameter)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
-#if PLUGIN_BUFFER_SIZE > 0x10000 && 0
+#if PLUGIN_BUFFER_SIZE > 0x10000
     buf = rb->plugin_get_buffer(&buf_size);
 #else
     buf = rb->plugin_get_audio_buffer(&buf_size);
