@@ -27,7 +27,6 @@
  * bitstream api.
  */
 
-#include "avcodec.h"
 #include "bitstream.h"
 
 const uint8_t ff_log2_run[32]={
