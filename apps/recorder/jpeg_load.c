@@ -62,7 +62,7 @@ struct jpeg
 #else
     int fd;
     int buf_left;
-    unsigned char *buf_index;
+    int buf_index;
 #endif
     unsigned long int bitbuf;
     int bitbuf_bits;
@@ -864,7 +864,7 @@ INLINE void putc(struct jpeg* p_jpeg)
 INLINE void fill_buf(struct jpeg* p_jpeg)
 {
         p_jpeg->buf_left = read(p_jpeg->fd, p_jpeg->buf, JPEG_READ_BUF_SIZE);
-        p_jpeg->buf_index = p_jpeg->buf;
+        p_jpeg->buf_index = 0;
 }
 
 static unsigned char *getc(struct jpeg* p_jpeg)
@@ -874,7 +874,7 @@ static unsigned char *getc(struct jpeg* p_jpeg)
     if (p_jpeg->buf_left < 1)
         return NULL;
     p_jpeg->buf_left--;
-    return p_jpeg->buf_index++;
+    return (p_jpeg->buf_index++) + p_jpeg->buf;
 }
 
 INLINE bool skip_bytes_seek(struct jpeg* p_jpeg)
@@ -1571,7 +1571,7 @@ static void fill_bit_buffer(struct jpeg* p_jpeg)
     p_jpeg->bitbuf = (p_jpeg->bitbuf << 8) | byte;
     p_jpeg->bitbuf_bits += 16;
 #ifdef JPEG_BS_DEBUG
-    DEBUGF("read in: %X\n", p_jpeg->bitbuf & 0xFFFF);
+    DEBUGF("read in: %04X\n", p_jpeg->bitbuf & 0xFFFF);
 #endif
 }
 
@@ -1872,7 +1872,8 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
                     int idct_rows = 1 << p_jpeg->v_scale[!!ci];
                     unsigned char *b_out = out + (ci ? ci : store_offs[blkn]);
                     if (idct_tbl[p_jpeg->v_scale[!!ci]].v_idct)
-                        idct_tbl[p_jpeg->v_scale[!!ci]].v_idct(block, idct_cols);
+                        idct_tbl[p_jpeg->v_scale[!!ci]].v_idct(block,
+                            idct_cols);
                     idct_tbl[p_jpeg->h_scale[!!ci]].h_idct(block, b_out,
                         idct_rows, b_width);
                 }
@@ -1932,6 +1933,8 @@ int read_jpeg_file(const char* filename,
     int fd, ret;
     fd = open(filename, O_RDONLY);
 
+    JDEBUGF("read_jpeg_file: filename: %s buffer len: %d cformat: %p\n",
+        filename, maxsize, cformat);
     /* Exit if file opening failed */
     if (fd < 0) {
         DEBUGF("read_jpeg_file: can't open '%s', rc: %d\n", filename, fd);
@@ -2008,6 +2011,10 @@ int read_jpeg_fd(int fd,
     p_jpeg->fd = fd;
 #endif
     status = process_markers(p_jpeg);
+#ifndef JPEG_FROM_MEM
+    JDEBUGF("position in file: %d buffer fill: %d\n",
+        (int)lseek(p_jpeg->fd, 0, SEEK_CUR), p_jpeg->buf_left);
+#endif
     if (status < 0)
         return status;
     if ((status & (DQT | SOF0)) != (DQT | SOF0))
@@ -2036,6 +2043,8 @@ int read_jpeg_fd(int fd,
     }
     p_jpeg->h_scale[0] = calc_scale(p_jpeg->x_size, bm->width);
     p_jpeg->v_scale[0] = calc_scale(p_jpeg->y_size, bm->height);
+    JDEBUGF("luma IDCT size: %dx%d\n", 1 << p_jpeg->h_scale[0],
+        1 << p_jpeg->v_scale[0]);
     if ((p_jpeg->x_size << p_jpeg->h_scale[0]) >> 3 == bm->width &&
         (p_jpeg->y_size << p_jpeg->v_scale[0]) >> 3 == bm->height)
         resize = false;
@@ -2044,7 +2053,13 @@ int read_jpeg_fd(int fd,
         p_jpeg->frameheader[0].horizontal_sampling - 1;
     p_jpeg->v_scale[1] = p_jpeg->v_scale[0] +
         p_jpeg->frameheader[0].vertical_sampling - 1;
+    JDEBUGF("chroma IDCT size: %dx%d\n", 1 << p_jpeg->h_scale[1],
+        1 << p_jpeg->v_scale[1]);
 #endif
+    JDEBUGF("scaling from %dx%d -> %dx%d\n",
+        (p_jpeg->x_size << p_jpeg->h_scale[0]) >> 3,
+        (p_jpeg->y_size << p_jpeg->v_scale[0]) >> 3,
+        bm->width, bm->height);
     fix_quant_tables(p_jpeg);
     int decode_w = (1 << p_jpeg->h_scale[0]) - 1;
     int decode_h = (1 << p_jpeg->v_scale[0]) - 1;
@@ -2052,11 +2067,13 @@ int read_jpeg_fd(int fd,
     src_dim.height = (p_jpeg->y_size << p_jpeg->v_scale[0]) >> 3;
     p_jpeg->zero_need[0] = (decode_h << 3) + decode_w;
     p_jpeg->k_need[0] = zig[p_jpeg->zero_need[0]];
+    JDEBUGF("need luma components to %d\n", p_jpeg->k_need[0]);
 #ifdef HAVE_LCD_COLOR
     decode_w = (1 << MIN(p_jpeg->h_scale[1],3)) - 1;
     decode_h = (1 << MIN(p_jpeg->v_scale[1],3)) - 1;
     p_jpeg->zero_need[1] = (decode_h << 3) + decode_w;
     p_jpeg->k_need[1] =  zig[p_jpeg->zero_need[1]];
+    JDEBUGF("need chroma components to %d\n", p_jpeg->k_need[1]);
 #endif
     if (cformat)
         bm_size = cformat->get_size(bm);
@@ -2087,6 +2104,7 @@ int read_jpeg_fd(int fd,
         p_jpeg->frameheader[0].vertical_sampling - 2;
 #endif
     decode_buf_size *= JPEG_PIX_SZ;
+    JDEBUGF("decode buffer size: %d\n", decode_buf_size);
     p_jpeg->img_buf = (jpeg_pix_t *)buf_start;
     if (buf_end - buf_start < decode_buf_size)
         return -1;
