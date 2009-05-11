@@ -833,7 +833,7 @@ struct idct_entry idct_tbl[] = {
 #ifdef JPEG_FROM_MEM
 INLINE unsigned char *getc(struct jpeg* p_jpeg)
 {
-    if (p_jpeg->len)
+    if (LIKELY(p_jpeg->len))
     {
         p_jpeg->len--;
         return p_jpeg->data++;
@@ -869,9 +869,9 @@ INLINE void fill_buf(struct jpeg* p_jpeg)
 
 static unsigned char *getc(struct jpeg* p_jpeg)
 {
-    if (p_jpeg->buf_left < 1)
+    if (UNLIKELY(p_jpeg->buf_left < 1))
         fill_buf(p_jpeg);
-    if (p_jpeg->buf_left < 1)
+    if (UNLIKELY(p_jpeg->buf_left < 1))
         return NULL;
     p_jpeg->buf_left--;
     return (p_jpeg->buf_index++) + p_jpeg->buf;
@@ -879,7 +879,7 @@ static unsigned char *getc(struct jpeg* p_jpeg)
 
 INLINE bool skip_bytes_seek(struct jpeg* p_jpeg)
 {
-    if (lseek(p_jpeg->fd, -p_jpeg->buf_left, SEEK_CUR) < 0)
+    if (UNLIKELY(lseek(p_jpeg->fd, -p_jpeg->buf_left, SEEK_CUR) < 0))
         return false;
     p_jpeg->buf_left = 0;
     return true;
@@ -901,14 +901,14 @@ static void putc(struct jpeg* p_jpeg)
 
 #define e_skip_bytes(jpeg, count) \
 do {\
-    if (!skip_bytes((jpeg),(count))) \
+    if (UNLIKELY(!skip_bytes((jpeg),(count)))) \
         return -1; \
 } while (0)
 
 #define e_getc(jpeg, code) \
 ({ \
     unsigned char *c; \
-    if (!(c = getc(jpeg))) \
+    if (UNLIKELY(!(c = getc(jpeg)))) \
         return (code); \
     *c; \
 })
@@ -916,7 +916,7 @@ do {\
 #define d_getc(jpeg, def) \
 ({ \
     unsigned char *cp = getc(jpeg); \
-    unsigned char c = cp ? *cp : (def); \
+    unsigned char c = LIKELY(cp) ? *cp : (def); \
     c; \
 })
 
@@ -1547,7 +1547,7 @@ static void fill_bit_buffer(struct jpeg* p_jpeg)
     if (p_jpeg->marker_val)
         p_jpeg->marker_ind += 16;
     byte = d_getc(p_jpeg, 0);
-    if (byte == 0xFF) /* legal marker can be byte stuffing or RSTm */
+    if (UNLIKELY(byte == 0xFF)) /* legal marker can be byte stuffing or RSTm */
     {   /* simplification: just skip the (one-byte) marker code */
         marker = d_getc(p_jpeg, 0);
         if ((marker & ~7) == 0xD0)
@@ -1559,7 +1559,7 @@ static void fill_bit_buffer(struct jpeg* p_jpeg)
     p_jpeg->bitbuf = (p_jpeg->bitbuf << 8) | byte;
 
     byte = d_getc(p_jpeg, 0);
-    if (byte == 0xFF) /* legal marker can be byte stuffing or RSTm */
+    if (UNLIKELY(byte == 0xFF)) /* legal marker can be byte stuffing or RSTm */
     {   /* simplification: just skip the (one-byte) marker code */
         marker = d_getc(p_jpeg, 0);
         if ((marker & ~7) == 0xD0)
