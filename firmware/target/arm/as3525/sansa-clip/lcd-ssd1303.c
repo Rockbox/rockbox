@@ -120,7 +120,6 @@ void lcd_write_data(const fb_data* p_bytes, int count)
 
 /** globals **/
 
-static int xoffset; /* needed for flip */
 static bool display_on; /* used by lcd_enable */
 
 /*** hardware configuration ***/
@@ -266,8 +265,8 @@ void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
     while (bheight--)
     {
         lcd_write_command (LCD_CNTL_PAGE | (by++ & 0xf));
-        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+2+xoffset)>>4) & 0xf));
-        lcd_write_command (LCD_CNTL_LOWCOL | ((x+2+xoffset) & 0xf));
+        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+2)>>4) & 0xf));
+        lcd_write_command (LCD_CNTL_LOWCOL | ((x+2) & 0xf));
 
         lcd_write_data(data, width);
         data += stride;
@@ -290,8 +289,8 @@ void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
     while (bheight--)
     {
         lcd_write_command (LCD_CNTL_PAGE | (by++ & 0xf));
-        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+2+xoffset)>>4) & 0xf));
-        lcd_write_command (LCD_CNTL_LOWCOL | ((x+2+xoffset) & 0xf));
+        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+2)>>4) & 0xf));
+        lcd_write_command (LCD_CNTL_LOWCOL | ((x+2) & 0xf));
 
         lcd_grey_data(values, phases, width);
 
@@ -314,8 +313,8 @@ void lcd_update(void)
     for (y = 0; y < LCD_FBHEIGHT; y++)
     {
         lcd_write_command (LCD_CNTL_PAGE | (y & 0xf));
-        lcd_write_command (LCD_CNTL_HIGHCOL | (((xoffset+2) >> 4) & 0xf));
-        lcd_write_command (LCD_CNTL_LOWCOL | ((xoffset+2) & 0xf));
+        lcd_write_command (LCD_CNTL_HIGHCOL | ((2 >> 4) & 0xf));
+        lcd_write_command (LCD_CNTL_LOWCOL | (2 & 0xf));
 
         lcd_write_data (lcd_framebuffer[y], LCD_WIDTH);
     }
@@ -345,8 +344,8 @@ void lcd_update_rect(int x, int y, int width, int height)
     for (; y <= ymax; y++)
     {
         lcd_write_command (LCD_CNTL_PAGE | (y & 0xf));
-        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+2+xoffset) >> 4) & 0xf));
-        lcd_write_command (LCD_CNTL_LOWCOL | ((x+2+xoffset) & 0xf));
+        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+2) >> 4) & 0xf));
+        lcd_write_command (LCD_CNTL_LOWCOL | ((x+2) & 0xf));
 
         lcd_write_data (&lcd_framebuffer[y][x], width);
     }
