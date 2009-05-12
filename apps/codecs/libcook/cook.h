@@ -24,7 +24,6 @@
 
 #include <stdint.h>
 #include "bitstream.h"
-#include "bytestream.h"
 #include "rm2wav.h"
 #include "cookdata_fixpoint.h"
 
@@ -88,7 +87,7 @@ typedef struct cook {
     /* data buffers */
 
     uint8_t*            decoded_bytes_buffer;
-    REAL_T mono_mdct_output[2048] __attribute__ ((aligned(16))); //DECLARE_ALIGNED_16(float,mono_mdct_output[2048]);
+    REAL_T mono_mdct_output[2048] __attribute__ ((aligned(16)));
     REAL_T              mono_previous_buffer1[1024];
     REAL_T              mono_previous_buffer2[1024];
     REAL_T              decode_buffer_1[1024];
