@@ -80,7 +80,12 @@ start:
     msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
     b      pad_skip
 
-.space 64*4 /* (more than enough) space for exception vectors and mi4 magic */
+.space 6*4  /* pad to offset 0x20 */
+
+    .ascii "Rockbox"    /* signature for bootloader checking osos */
+    .byte 1             /* osos boot version, only 1 exists for now */
+
+.space 56*4 /* (more than enough) space for exception vectors and mi4 magic */
 
 pad_skip:
     /* Find out which processor we are - r0 should be preserved for the

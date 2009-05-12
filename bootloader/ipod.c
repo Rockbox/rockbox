@@ -222,6 +222,61 @@ void fatal_error(void)
 
 }
 
+/* The bootloader is started from the OSOS image on the firmware
+ * partition. There are several ways it can be installed there:
+ * appended to the Apple firmware, on its own, or appended to
+ * Rockbox itself. The Apple ROM loader loads the entire OSOS
+ * image to DRAM_START, whatever it contains. If the bootloader
+ * is appended to another image then it will've modified the
+ * entry point in the OSOS header such that the ROM will call the
+ * bootloader rather than the main image.
+ *
+ * So, once the bootloader has control:
+ *
+ * 1) If the hold switch is on, or the menu button is being held,
+ *    try to boot the Apple firmware.
+ *   1a) First, it looks for apple_os.ipod on the FAT32 partition,
+ *       in .rockbox or the root directory. If found it loads that
+ *       without further checking and runs it.
+ *   1b) Next, it checks to see if the OSOS image already loaded
+ *       into RAM is in fact the Apple firmware with the bootloader
+ *       appended. It looks at DRAM_START+0x20 for the string
+ *       "portalplayer", and if it's there, just jumps back to
+ *       DRAM_START where the entry point was before the bootloader
+ *       was appended.
+ *   1c) If neither of those worked, it displays an error and dies.
+ *
+ * 2) If the play button is being held, try to boot Linux. It looks
+ *    for linux.bin in the root directory, and if it's not there,
+ *    it displays an error and dies.
+ *
+ * 3) Otherwise, try to boot Rockbox.
+ *   3a) First, it looks for rockbox.ipod on the FAT32 partition,
+ *       in .rockbox or the root directory. If found it loads that
+ *       without further checking and runs it.
+ *   3b) Next, it checks to see if the OSOS image already loaded
+ *       into RAM is in fact Rockbox with the bootloader appended.
+ *       It looks at DRAM_START+0x20 for the string "Rockbox\1"
+ *       (which is inserted there in crt0-pp.S), and if it's there,
+ *       just humps back to DRAM_START where the entry point was
+ *       before the bootloader was appended.
+ *   3c) If neither of those worked, it displays an error and dies.
+ *
+ * The result is that any of the three install configurations work,
+ * and that images of apple_os.ipod or rockbox.ipod on the FAT32
+ * partition take priority over the contents of OSOS (this avoids
+ * upgrades failing to work if OSOS is not updated).
+ *
+ * Loading from OSOS is somewhat faster than loading from FAT32,
+ * because the Apple ROM doesn't have to deal with filesystems or
+ * fragmentation, and is already loading from OSOS anyway. Thus,
+ * the fastest boot configuration that still allows dual booting
+ * is to install Rockbox into OSOS with the bootloader appended
+ * (and delete/rename rockbox.ipod from the FAT32 partition).
+ *
+ * It is of course faster to just install Rockbox to OSOS alone,
+ * but then it's impossible to boot the Apple firmware.
+ */
 
 void* main(void)
 {
@@ -229,7 +284,7 @@ void* main(void)
     int i;
     int btn;
     int rc;
-    bool haveretailos;
+    bool haveramos;
     bool button_was_held;
     struct partinfo* pinfo;
     unsigned short* identify_info;
@@ -319,8 +374,8 @@ void* main(void)
         } else if (rc == EFILE_NOT_FOUND) {
             /* If apple_os.ipod doesn't exist, then check if there is an Apple 
                firmware image in RAM  */
-            haveretailos = (memcmp((void*)(DRAM_START+0x20),"portalplayer",12)==0);
-            if (haveretailos) {
+            haveramos = (memcmp((void*)(DRAM_START+0x20),"portalplayer",12)==0);
+            if (haveramos) {
                 /* We have a copy of the retailos in RAM, lets just run it. */
                 return (void*)DRAM_START;
             }
@@ -346,14 +401,22 @@ void* main(void)
     } else {
         printf("Loading Rockbox...");
         rc=load_firmware(loadbuffer, BOOTFILE, MAX_LOADSIZE);
-        if (rc < EOK) {
-            printf("Error!");
-            printf("Can't load " BOOTFILE ": ");
-            printf(strerror(rc));
-        } else {
+        if (rc == EOK) {
             printf("Rockbox loaded.");
             return (void*)DRAM_START;
+        } else if (rc == EFILE_NOT_FOUND) {
+            /* if rockbox.ipod doesn't exist, then check if there is a Rockbox
+               image in RAM  */
+            haveramos = (memcmp((void*)(DRAM_START+0x20),"Rockbox\1",8)==0);
+            if (haveramos) {
+                /* We have a copy of Rockbox in RAM, lets just run it. */
+                return (void*)DRAM_START;
+            }
         }
+
+        printf("Error!");
+        printf("Can't load " BOOTFILE ": ");
+        printf(strerror(rc));
     }
     
     /* If we get to here, then we haven't been able to load any firmware */
