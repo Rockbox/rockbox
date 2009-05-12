@@ -74,7 +74,7 @@ static volatile bool lcd_busy = false;
 #define R_GAMMA_GRAD_ADJ_NEG    0x37
 
 #define R_GAMMA_AMP_ADJ_RES_POS     0x38
-#define R_GAMMA_AMP_AVG_ADJ_RES_NEG 0x39 
+#define R_GAMMA_AMP_AVG_ADJ_RES_NEG 0x39
 
 #define R_GATE_SCAN_POS         0x40
 #define R_VERT_SCROLL_CONTROL   0x41
@@ -89,6 +89,7 @@ static volatile bool lcd_busy = false;
 static unsigned short r_entry_mode = R_ENTRY_MODE_HORZ_NORMAL;
 #define R_ENTRY_MODE_VERT 0x7038
 #define R_ENTRY_MODE_SOLID_VERT  0x1038
+#define R_ENTRY_MODE_VIDEO 0x7020
 
 
 /* Reverse Flag */
@@ -182,7 +183,7 @@ void lcd_set_invert_display(bool yesno)
 void lcd_set_flip(bool yesno)
 {
     display_flipped = yesno;
- 
+
     r_entry_mode = yesno ? R_ENTRY_MODE_HORZ_FLIPPED :
                            R_ENTRY_MODE_HORZ_NORMAL;
 }
@@ -253,13 +254,13 @@ static void _display_on(void)
     /* DC12-10 = 000b: Step-up1 = clock/8,
      * DC02-00 = 000b: Step-up2 = clock/16,
      * VC2-0   = 010b: VciOUT = 0.87 * VciLVL */
-    lcd_write_reg(R_POWER_CONTROL2, 0x0002); 
+    lcd_write_reg(R_POWER_CONTROL2, 0x0002);
 
     /* VRH3-0 = 1000b: Vreg1OUT = REGP * 1.90 */
     lcd_write_reg(R_POWER_CONTROL3, 0x0008);
 
     lcd_delay(40);
-    
+
     lcd_write_reg(R_POWER_CONTROL4, 0x0000); /* VCOMG = 0 */
 
     /* This register is unknown */
@@ -270,8 +271,8 @@ static void _display_on(void)
 
     lcd_delay(10);
 
-    lcd_write_reg(R_POWER_CONTROL2, 0x0000); 
-    lcd_write_reg(R_POWER_CONTROL3, 0x0013); 
+    lcd_write_reg(R_POWER_CONTROL2, 0x0000);
+    lcd_write_reg(R_POWER_CONTROL3, 0x0013);
 
     lcd_delay(20);
 
@@ -296,7 +297,7 @@ static void _display_on(void)
     lcd_write_reg(R_GATE_SCAN_POS, 0);
     lcd_write_reg(R_VERT_SCROLL_CONTROL, 0);
 
-    lcd_window(0, 0, LCD_WIDTH-1, LCD_HEIGHT-1);    
+    lcd_window(0, 0, LCD_WIDTH-1, LCD_HEIGHT-1);
     lcd_write_reg(R_1ST_SCR_DRV_POS, (LCD_HEIGHT-1) << 8);
     lcd_write_reg(R_2ND_SCR_DRV_POS, (LCD_HEIGHT-1) << 8);
 
@@ -356,6 +357,30 @@ bool lcd_active(void)
 
 /*** update functions ***/
 
+static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
+
+/* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
+extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
+                                   int width,
+                                   int stride);
+extern void lcd_write_yuv420_lines_odither(unsigned char const * const src[3],
+                                           int width,
+                                           int stride,
+                                           int x_screen, /* To align dither pattern */
+                                           int y_screen);
+
+void lcd_yuv_set_options(unsigned options)
+{
+    lcd_yuv_options = options;
+}
+
+static void lcd_window_blit(int xmin, int ymin, int xmax, int ymax)
+{
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, ((LCD_WIDTH-1 - xmin) << 8) | (LCD_WIDTH-1 - xmax));
+    lcd_write_reg(R_VERT_RAM_ADDR_POS,  (ymax << 8) | ymin);
+    lcd_write_reg(R_RAM_ADDR_SET,       (ymin << 8) | (LCD_WIDTH-1 - xmin));
+}
+
 /* Performance function to blit a YUV bitmap directly to the LCD
  * src_x, src_y, width and height should be even
  * x, y, width and height have to be within LCD bounds
@@ -364,14 +389,58 @@ void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    (void)src;
-    (void)src_x;
-    (void)src_y;
-    (void)stride;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
+    unsigned char const * yuv_src[3];
+    off_t z;
+
+    lcd_busy = true;
+
+    /* Sorry, but width and height must be >= 2 or else */
+    width &= ~1;
+    height >>= 1;
+
+    z = stride*src_y;
+    yuv_src[0] = src[0] + z + src_x;
+    yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
+    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
+
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_VIDEO);
+
+    if (lcd_yuv_options & LCD_YUV_DITHER)
+    {
+        do
+        {
+            lcd_window_blit(y, x, y+1, x+width-1);
+
+            /* Start write to GRAM */
+            lcd_write_cmd(R_WRITE_DATA_2_GRAM);
+
+            lcd_write_yuv420_lines_odither(yuv_src, width, stride, x, y);
+            yuv_src[0] += stride << 1; /* Skip down two luma lines */
+            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
+            yuv_src[2] += stride >> 1;
+            y+=2;
+        }
+        while (--height > 0);
+    }
+    else
+    {
+        do
+        {
+            lcd_window_blit(y, x, y+1, x+width-1);
+
+            /* Start write to GRAM */
+            lcd_write_cmd(R_WRITE_DATA_2_GRAM);
+
+            lcd_write_yuv420_lines(yuv_src, width, stride);
+            yuv_src[0] += stride << 1; /* Skip down two luma lines */
+            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
+            yuv_src[2] += stride >> 1;
+            y+=2;
+        }
+        while (--height > 0);
+    }
+
+    lcd_busy = false;
 }
 
 /* Update the display.

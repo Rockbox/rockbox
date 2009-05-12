@@ -205,7 +205,7 @@ static struct configdata config[] =
      NULL},
     {TYPE_INT, 0, MPEG_RESUME_NUM_OPTIONS,
      { .int_p = &settings.resume_options }, "Resume options", NULL},
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200) || defined(SANSA_FUZE) || defined(SANSA_E200V2)
     {TYPE_INT, 0, INT_MAX, { .int_p = &settings.displayoptions },
      "Display options", NULL},
 #endif

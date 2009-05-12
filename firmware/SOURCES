@@ -1108,6 +1108,7 @@ target/arm/as3525/sansa-clip/powermgmt-clip.c
 #ifdef SANSA_E200V2
 #ifndef SIMULATOR
 target/arm/as3525/sansa-e200v2/lcd-e200v2.c
+target/arm/as3525/lcd-as-e200v2-fuze.S
 target/arm/as3525/sansa-e200v2/button-e200v2.c
 target/arm/as3525/backlight-e200v2-fuze.c
 #ifndef BOOTLOADER
@@ -1142,6 +1143,7 @@ target/arm/as3525/sansa-m200v4/powermgmt-m200v4.c
 #ifndef SIMULATOR
 target/arm/as3525/sansa-fuze/button-fuze.c
 target/arm/as3525/sansa-fuze/lcd-fuze.c
+target/arm/as3525/lcd-as-e200v2-fuze.S
 target/arm/as3525/backlight-e200v2-fuze.c
 #ifndef BOOTLOADER
 target/arm/as3525/powermgmt-as3525.c
