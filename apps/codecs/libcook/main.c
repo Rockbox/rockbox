@@ -23,6 +23,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "rm2wav.h"
 #include "cook.h"
@@ -111,8 +112,7 @@ int main(int argc, char *argv[])
         }
         packet_count -= rmctx.audio_pkt_cnt;
         rmctx.audio_pkt_cnt = 0;
-    } 
-    cook_decode_close(&q);
+    }
     close_wav(fd_dec,&rmctx);
     close(fd);
 

@@ -427,7 +427,3 @@ static const FIXPU cplscale6[63] = {
     0x450d, 0x408b, 0x3bcd, 0x36c1, 0x314d, 0x2b4a, 0x246e, 0x1c1a, 0x1029
 };
 
-static const FIXPU* cplscales[5] = {
-    cplscale2, cplscale3, cplscale4, cplscale5, cplscale6
-};
-

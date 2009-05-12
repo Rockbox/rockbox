@@ -45,21 +45,11 @@
 #include <math.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <limits.h>
+#include <string.h>
 
 #include "cook.h"
 #include "cookdata.h"
-
-/* The following table is taken from libavutil/mathematics.c */
-const uint8_t ff_log2_tab[256]={
-        0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-        5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
-        6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
-        6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
-        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
-        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
-        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
-        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
-};
 
 /* the different Cook versions */
 #define MONO            0x1000001
@@ -112,26 +102,35 @@ static void dump_short_table(short* table, int size, int delimiter) {
 #endif
 
 /*************** init functions ***************/
-static av_cold int init_cook_vlc_tables(COOKContext *q) {
+#define VLCBUFSIZE 1500
+VLC_TYPE vlcbuf[21][VLCBUFSIZE][2];
+
+static int init_cook_vlc_tables(COOKContext *q) {
     int i, result;
 
     result = 0;
     for (i=0 ; i<13 ; i++) {
+        q->envelope_quant_index[i].table = vlcbuf[i];
+        q->envelope_quant_index[i].table_allocated = VLCBUFSIZE;
         result |= init_vlc (&q->envelope_quant_index[i], 9, 24,
             envelope_quant_index_huffbits[i], 1, 1,
-            envelope_quant_index_huffcodes[i], 2, 2, 0);
+            envelope_quant_index_huffcodes[i], 2, 2, INIT_VLC_USE_NEW_STATIC);
     }
     DEBUGF("sqvh VLC init\n");
     for (i=0 ; i<7 ; i++) {
+        q->sqvh[i].table = vlcbuf[i+13];
+        q->sqvh[i].table_allocated = VLCBUFSIZE;
         result |= init_vlc (&q->sqvh[i], vhvlcsize_tab[i], vhsize_tab[i],
             cvh_huffbits[i], 1, 1,
-            cvh_huffcodes[i], 2, 2, 0);
+            cvh_huffcodes[i], 2, 2, INIT_VLC_USE_NEW_STATIC);
     }
 
     if (q->nb_channels==2 && q->joint_stereo==1){
+        q->ccpl.table = vlcbuf[20];
+        q->ccpl.table_allocated = VLCBUFSIZE;
         result |= init_vlc (&q->ccpl, 6, (1<<q->js_vlc_bits)-1,
             ccpl_huffbits[q->js_vlc_bits-2], 1, 1,
-            ccpl_huffcodes[q->js_vlc_bits-2], 2, 2, 0);
+            ccpl_huffcodes[q->js_vlc_bits-2], 2, 2, INIT_VLC_USE_NEW_STATIC);
         DEBUGF("Joint-stereo VLC used.\n");
     }
 
@@ -182,35 +181,6 @@ static inline int decode_bytes(const uint8_t* inbuffer, uint8_t* out, int bytes)
         obuf[i] = c ^ buf[i];
 
     return off;
-}
-
-/**
- * Cook uninit
- */
-
-av_cold int cook_decode_close(COOKContext *q)
-{
-    int i;
-    //COOKContext *q = avctx->priv_data;
-    DEBUGF( "Deallocating memory.\n");
-
-    /* Free allocated memory buffers. */
-    av_free(q->decoded_bytes_buffer);
-
-    /* Free the VLC tables. */
-    for (i=0 ; i<13 ; i++) {
-        free_vlc(&q->envelope_quant_index[i]);
-    }
-    for (i=0 ; i<7 ; i++) {
-        free_vlc(&q->sqvh[i]);
-    }
-    if(q->nb_channels==2 && q->joint_stereo==1 ){
-        free_vlc(&q->ccpl);
-    }
-
-    DEBUGF("Memory deallocated.\n");
-
-    return 0;
 }
 
 /**
@@ -739,7 +709,7 @@ static void dump_cook_context(COOKContext *q)
  * Cook initialization
  */
 
-av_cold int cook_decode_init(RMContext *rmctx, COOKContext *q)
+int cook_decode_init(RMContext *rmctx, COOKContext *q)
 {   
     /* cook extradata */
     q->cookversion = rmctx->cook_version;
@@ -820,25 +790,6 @@ av_cold int cook_decode_init(RMContext *rmctx, COOKContext *q)
 
 
     if(q->block_align >= UINT_MAX/2)
-        return -1;
-
-    /* Pad the databuffer with:
-       DECODE_BYTES_PAD1 or DECODE_BYTES_PAD2 for decode_bytes(),
-       INPUT_BUFFER_PADDING_SIZE, for the bitstreamreader. */
-
-#define INPUT_BUFFER_PADDING_SIZE 8
-    if (q->nb_channels==2 && q->joint_stereo==0) {
-        q->decoded_bytes_buffer =
-          av_mallocz(rmctx->block_align/2
-                     + DECODE_BYTES_PAD2(q->block_align/2)
-                     + INPUT_BUFFER_PADDING_SIZE);
-    } else {
-        q->decoded_bytes_buffer =
-          av_mallocz(rmctx->block_align
-                     + DECODE_BYTES_PAD1(q->block_align)
-                     + INPUT_BUFFER_PADDING_SIZE);
-    }
-    if (q->decoded_bytes_buffer == NULL)
         return -1;
 
     q->gains1.now      = q->gain_1;

@@ -34,7 +34,7 @@ typedef struct {
 
 typedef struct cook {
     /*
-     * The following 5 functions provide the lowlevel arithmetic on
+     * The following 2 functions provide the lowlevel arithmetic on
      * the internal audio buffers.
      */
     void (* scalar_dequant)(struct cook *q, int index, int quant_index,
@@ -86,7 +86,7 @@ typedef struct cook {
 
     /* data buffers */
 
-    uint8_t*            decoded_bytes_buffer;
+    uint8_t             decoded_bytes_buffer[1024];
     REAL_T mono_mdct_output[2048] __attribute__ ((aligned(16)));
     REAL_T              mono_previous_buffer1[1024];
     REAL_T              mono_previous_buffer2[1024];
@@ -95,9 +95,8 @@ typedef struct cook {
     REAL_T              decode_buffer_0[1060]; /* static allocation for joint decode */
 } COOKContext;
 
-av_cold int cook_decode_init(RMContext *rmctx, COOKContext *q);
+int cook_decode_init(RMContext *rmctx, COOKContext *q);
 int cook_decode_frame(RMContext *rmctx,COOKContext *q,
                       int16_t *outbuffer, int *data_size,
                       const uint8_t *inbuffer, int buf_size);
-av_cold int cook_decode_close(COOKContext *q);
 #endif

@@ -45,6 +45,8 @@ const uint8_t ff_log2_run[32]={
  * @deprecated. Code which uses ff_realloc_static is broken/misdesigned
  * and should correctly use static arrays
  */
+
+#if 0
 attribute_deprecated av_alloc_size(2)
 static void *ff_realloc_static(void *ptr, unsigned int size);
 
@@ -61,6 +63,7 @@ void align_put_bits(PutBitContext *s)
     put_bits(s,s->bit_left & 7,0);
 #endif
 }
+#endif
 
 void ff_put_string(PutBitContext * pbc, const char *s, int put_zero)
 {
@@ -123,15 +126,11 @@ static int alloc_table(VLC *vlc, int size, int use_static)
     index = vlc->table_size;
     vlc->table_size += size;
     if (vlc->table_size > vlc->table_allocated) {
-        if(use_static>1)
+        if(use_static>1){
+            printf("init_vlc() used with too little memory : table_size > allocated_memory\n");
             abort(); //cant do anything, init_vlc() is used with too little memory
-        vlc->table_allocated += (1 << vlc->bits);
-        if(use_static)
-            vlc->table = ff_realloc_static(vlc->table,
-                                           sizeof(VLC_TYPE) * 2 * vlc->table_allocated);
-        else
-            vlc->table = av_realloc(vlc->table,
-                                    sizeof(VLC_TYPE) * 2 * vlc->table_allocated);
+        }
+
         if (!vlc->table)
             return -1;
     }
@@ -305,10 +304,13 @@ int init_vlc_sparse(VLC *vlc, int nb_bits, int nb_codes,
                     codes, codes_wrap, codes_size,
                     symbols, symbols_wrap, symbols_size,
                     0, 0, flags) < 0) {
-        av_freep(&vlc->table);
+        free(&vlc->table);
         return -1;
     }
-    if((flags & INIT_VLC_USE_NEW_STATIC) && vlc->table_size != vlc->table_allocated)
+    /* Changed the following condition to be true if table_size > table_allocated. *
+     * This would be more sensible for static tables since we want warnings for    *
+     * memory shortages only.                                                      */
+    if((flags & INIT_VLC_USE_NEW_STATIC) && vlc->table_size > vlc->table_allocated)
         printf("needed %d had %d\n", vlc->table_size, vlc->table_allocated);
     return 0;
 }
@@ -316,6 +318,6 @@ int init_vlc_sparse(VLC *vlc, int nb_bits, int nb_codes,
 
 void free_vlc(VLC *vlc)
 {
-    av_freep(&vlc->table);
+    free(&vlc->table);
 }
 

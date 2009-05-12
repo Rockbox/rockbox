@@ -35,6 +35,24 @@
  *    in C using two 32 bit integer multiplications.
  */
 
+/* The following table is taken from libavutil/mathematics.c */
+const uint8_t ff_log2_tab[256]={
+        0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+        5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+        6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+        6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
+};
+
+/* cplscales was moved from cookdata_fixpoint.h since only   *
+ * cook_fixpoint.h should see/use it.                        */
+static const FIXPU* cplscales[5] = {
+    cplscale2, cplscale3, cplscale4, cplscale5, cplscale6
+};
+
 /**
  * Initialise fixed point implementation.
  * Nothing to do for fixed point.
@@ -86,6 +104,37 @@ static inline FIXP fixp_mult_su(FIXP a, FIXPU b)
     return hb + (lb >> 16) + ((lb & 0x8000) >> 15);
 }
 
+/* math functions taken from libavutil/common.h */
+
+static inline int av_log2(unsigned int v)
+{
+    int n = 0;
+    if (v & 0xffff0000) {
+        v >>= 16;
+        n += 16;
+    }
+    if (v & 0xff00) {
+        v >>= 8;
+        n += 8;
+    }
+    n += ff_log2_tab[v];
+
+    return n;
+}
+
+/**
+ * Clips a signed integer value into the amin-amax range.
+ * @param a value to clip
+ * @param amin minimum value of the clip range
+ * @param amax maximum value of the clip range
+ * @return clipped value
+ */
+static inline int av_clip(int a, int amin, int amax)
+{
+    if      (a < amin) return amin;
+    else if (a > amax) return amax;
+    else               return a;
+}
 
 /**
  * The real requantization of the mltcoefs

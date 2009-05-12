@@ -29,10 +29,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
+#include <stdio.h>
 #include "libavutil/bswap.h"
-#include "libavutil/common.h"
-//#include "libavutil/log.h"
-//#include "mathops.h"
 
 /* The following 2 defines are taken from libavutil/intreadwrite.h */
 #define AV_RB32(x)  ((((const uint8_t*)(x))[0] << 24) | \
@@ -881,7 +880,7 @@ void free_vlc(VLC *vlc);
  *                  read the longest vlc code
  *                  = (max_vlc_length + bits - 1) / bits
  */
-static av_always_inline int get_vlc2(GetBitContext *s, VLC_TYPE (*table)[2],
+static inline int get_vlc2(GetBitContext *s, VLC_TYPE (*table)[2],
                                   int bits, int max_depth)
 {
     int code;
