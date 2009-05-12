@@ -70,7 +70,11 @@ const uint8_t ff_log2_tab[256]={
 #define SUBBAND_SIZE    20
 #define MAX_SUBPACKETS   5
 //#define COOKDEBUG
-#define DEBUGF(message,args ...) av_log(NULL,AV_LOG_ERROR,message,## args)
+#if 0
+#define DEBUGF(message,args ...) printf
+#else
+#define DEBUGF(...)
+#endif
 
 /**
  * Random bit stream generator.
@@ -89,19 +93,19 @@ static int inline cook_random(COOKContext *q)
 #ifdef COOKDEBUG
 static void dump_int_table(int* table, int size, int delimiter) {
     int i=0;
-    av_log(NULL,AV_LOG_ERROR,"\n[%d]: ",i);
+    DEBUGF("\n[%d]: ",i);
     for (i=0 ; i<size ; i++) {
-        av_log(NULL, AV_LOG_ERROR, "%d, ", table[i]);
-        if ((i+1)%delimiter == 0) av_log(NULL,AV_LOG_ERROR,"\n[%d]: ",i+1);
+        DEBUGF("%d, ", table[i]);
+        if ((i+1)%delimiter == 0) DEBUGF("\n[%d]: ",i+1);
     }
 }
 
 static void dump_short_table(short* table, int size, int delimiter) {
     int i=0;
-    av_log(NULL,AV_LOG_ERROR,"\n[%d]: ",i);
+    DEBUGF("\n[%d]: ",i);
     for (i=0 ; i<size ; i++) {
-        av_log(NULL, AV_LOG_ERROR, "%d, ", table[i]);
-        if ((i+1)%delimiter == 0) av_log(NULL,AV_LOG_ERROR,"\n[%d]: ",i+1);
+        DEBUGF("%d, ", table[i]);
+        if ((i+1)%delimiter == 0) DEBUGF("\n[%d]: ",i+1);
     }
 }
 
@@ -117,7 +121,7 @@ static av_cold int init_cook_vlc_tables(COOKContext *q) {
             envelope_quant_index_huffbits[i], 1, 1,
             envelope_quant_index_huffcodes[i], 2, 2, 0);
     }
-    av_log(NULL,AV_LOG_DEBUG,"sqvh VLC init\n");
+    DEBUGF("sqvh VLC init\n");
     for (i=0 ; i<7 ; i++) {
         result |= init_vlc (&q->sqvh[i], vhvlcsize_tab[i], vhsize_tab[i],
             cvh_huffbits[i], 1, 1,
@@ -128,10 +132,10 @@ static av_cold int init_cook_vlc_tables(COOKContext *q) {
         result |= init_vlc (&q->ccpl, 6, (1<<q->js_vlc_bits)-1,
             ccpl_huffbits[q->js_vlc_bits-2], 1, 1,
             ccpl_huffcodes[q->js_vlc_bits-2], 2, 2, 0);
-        av_log(NULL,AV_LOG_DEBUG,"Joint-stereo VLC used.\n");
+        DEBUGF("Joint-stereo VLC used.\n");
     }
 
-    av_log(NULL,AV_LOG_ERROR,"VLC tables initialized. Result = %d\n",result);
+    DEBUGF("VLC tables initialized. Result = %d\n",result);
     return result;
 }
 /*************** init functions end ***********/
@@ -188,7 +192,7 @@ av_cold int cook_decode_close(COOKContext *q)
 {
     int i;
     //COOKContext *q = avctx->priv_data;
-    av_log(NULL,AV_LOG_ERROR, "Deallocating memory.\n");
+    DEBUGF( "Deallocating memory.\n");
 
     /* Free allocated memory buffers. */
     av_free(q->decoded_bytes_buffer);
@@ -204,7 +208,7 @@ av_cold int cook_decode_close(COOKContext *q)
         free_vlc(&q->ccpl);
     }
 
-    av_log(NULL,AV_LOG_ERROR,"Memory deallocated.\n");
+    DEBUGF("Memory deallocated.\n");
 
     return 0;
 }
@@ -650,9 +654,9 @@ static int decode_subpacket(COOKContext *q, const uint8_t *inbuffer,
                             int sub_packet_size, int16_t *outbuffer) {
     /* packet dump */
 //    for (i=0 ; i<sub_packet_size ; i++) {
-//        av_log(NULL, AV_LOG_ERROR, "%02x", inbuffer[i]);
+//        DEBUGF("%02x", inbuffer[i]);
 //    }
-//    av_log(NULL, AV_LOG_ERROR, "\n");
+//    DEBUGF("\n");
 
     decode_bytes_and_gain(q, inbuffer, &q->gains1);
 
@@ -710,9 +714,9 @@ int cook_decode_frame(RMContext *rmctx,COOKContext *q,
 static void dump_cook_context(COOKContext *q)
 {
     //int i=0;
-#define PRINT(a,b) av_log(NULL,AV_LOG_ERROR," %s = %d\n", a, b);
-    av_log(NULL,AV_LOG_ERROR,"COOKextradata\n");
-    av_log(NULL,AV_LOG_ERROR,"cookversion=%x\n",q->cookversion);
+#define PRINT(a,b) DEBUGF(" %s = %d\n", a, b);
+    DEBUGF("COOKextradata\n");
+    DEBUGF("cookversion=%x\n",q->cookversion);
     if (q->cookversion > STEREO) {
         PRINT("js_subband_start",q->js_subband_start);
         PRINT("js_vlc_bits",q->js_vlc_bits);
@@ -764,28 +768,28 @@ av_cold int cook_decode_init(RMContext *rmctx, COOKContext *q)
     q->total_subbands = q->subbands;
 
     /* Initialize version-dependent variables */
-    av_log(NULL,AV_LOG_DEBUG,"q->cookversion=%x\n",q->cookversion);
+    DEBUGF("q->cookversion=%x\n",q->cookversion);
     q->joint_stereo = 0;
     switch (q->cookversion) {
         case MONO:
             if (q->nb_channels != 1) {
-                av_log(NULL,AV_LOG_ERROR,"Container channels != 1, report sample!\n");
+                DEBUGF("Container channels != 1, report sample!\n");
                 return -1;
             }
-            av_log(NULL,AV_LOG_DEBUG,"MONO\n");
+            DEBUGF("MONO\n");
             break;
         case STEREO:
             if (q->nb_channels != 1) {
                 q->bits_per_subpacket = q->bits_per_subpacket/2;
             }
-            av_log(NULL,AV_LOG_DEBUG,"STEREO\n");
+            DEBUGF("STEREO\n");
             break;
         case JOINT_STEREO:
             if (q->nb_channels != 2) {
-                av_log(NULL,AV_LOG_ERROR,"Container channels != 2, report sample!\n");
+                DEBUGF("Container channels != 2, report sample!\n");
                 return -1;
             }
-            av_log(NULL,AV_LOG_ERROR,"JOINT_STEREO\n");
+            DEBUGF("JOINT_STEREO\n");
             if (q->extradata_size >= 16){
                 q->total_subbands = q->subbands + q->js_subband_start;
                 q->joint_stereo = 1;
@@ -798,11 +802,11 @@ av_cold int cook_decode_init(RMContext *rmctx, COOKContext *q)
             }
             break;
         case MC_COOK:
-            av_log(NULL,AV_LOG_ERROR,"MC_COOK not supported!\n");
+            DEBUGF("MC_COOK not supported!\n");
             return -1;
             break;
         default:
-            av_log(NULL,AV_LOG_ERROR,"Unknown Cook version, report sample!\n");
+            DEBUGF("Unknown Cook version, report sample!\n");
             return -1;
             break;
     }
@@ -851,20 +855,20 @@ av_cold int cook_decode_init(RMContext *rmctx, COOKContext *q)
 
     /* Try to catch some obviously faulty streams, othervise it might be exploitable */
     if (q->total_subbands > 53) {
-        av_log(NULL,AV_LOG_ERROR,"total_subbands > 53, report sample!\n");
+        DEBUGF("total_subbands > 53, report sample!\n");
         return -1;
     }
     if (q->subbands > 50) {
-        av_log(NULL,AV_LOG_ERROR,"subbands > 50, report sample!\n");
+        DEBUGF("subbands > 50, report sample!\n");
         return -1;
     }
     if ((q->samples_per_channel == 256) || (q->samples_per_channel == 512) || (q->samples_per_channel == 1024)) {
     } else {
-        av_log(NULL,AV_LOG_ERROR,"unknown amount of samples_per_channel = %d, report sample!\n",q->samples_per_channel);
+        DEBUGF("unknown amount of samples_per_channel = %d, report sample!\n",q->samples_per_channel);
         return -1;
     }
     if ((q->js_vlc_bits > 6) || (q->js_vlc_bits < 0)) {
-        av_log(NULL,AV_LOG_ERROR,"q->js_vlc_bits = %d, only >= 0 and <= 6 allowed!\n",q->js_vlc_bits);
+        DEBUGF("q->js_vlc_bits = %d, only >= 0 and <= 6 allowed!\n",q->js_vlc_bits);
         return -1;
     }
 

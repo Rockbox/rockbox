@@ -236,8 +236,8 @@ if((y)<(x)){\
 #undef  exit
 #define exit exit_is_forbidden
 #ifndef LIBAVFORMAT_BUILD
-#undef  printf
-#define printf please_use_av_log_instead_of_printf
+//#undef  printf
+//#define printf please_use_av_log_instead_of_printf
 #undef  fprintf
 #define fprintf please_use_av_log_instead_of_fprintf
 #undef  puts

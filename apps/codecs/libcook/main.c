@@ -28,7 +28,14 @@
 #include "cook.h"
 
 //#define DUMP_RAW_FRAMES
-#define DEBUGF(message,args ...) av_log(NULL,AV_LOG_ERROR,message,## args)
+#ifndef DEBUGF
+#  if 0
+#    define DEBUGF(message,args ...) printf
+#  else
+#    define DEBUGF(...)
+#  endif
+#endif
+
 int main(int argc, char *argv[])
 {
     int fd, fd_dec;
@@ -74,7 +81,7 @@ int main(int argc, char *argv[])
     sps= rmctx.block_align;
     h = rmctx.sub_packet_h;
     cook_decode_init(&rmctx,&q);
-    av_log(NULL,AV_LOG_ERROR,"nb_frames = %d\n",nb_frames);
+    DEBUGF("nb_frames = %d\n",nb_frames);
     x = 0;
     if(packet_count % h)
     {

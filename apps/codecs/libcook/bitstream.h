@@ -31,9 +31,19 @@
 #include <assert.h>
 #include "libavutil/bswap.h"
 #include "libavutil/common.h"
-#include "libavutil/intreadwrite.h"
-#include "libavutil/log.h"
+//#include "libavutil/log.h"
 //#include "mathops.h"
+
+/* The following 2 defines are taken from libavutil/intreadwrite.h */
+#define AV_RB32(x)  ((((const uint8_t*)(x))[0] << 24) | \
+                     (((const uint8_t*)(x))[1] << 16) | \
+                     (((const uint8_t*)(x))[2] <<  8) | \
+                      ((const uint8_t*)(x))[3])
+#define AV_WB32(p, d) do { \
+                    ((uint8_t*)(p))[3] = (d); \
+                    ((uint8_t*)(p))[2] = (d)>>8; \
+                    ((uint8_t*)(p))[1] = (d)>>16; \
+                    ((uint8_t*)(p))[0] = (d)>>24; } while(0)
 
 #if defined(ALT_BITSTREAM_READER_LE) && !defined(ALT_BITSTREAM_READER)
 #   define ALT_BITSTREAM_READER
@@ -731,7 +741,7 @@ static inline int check_marker(GetBitContext *s, const char *msg)
 {
     int bit= get_bits1(s);
     if(!bit)
-        av_log(NULL, AV_LOG_INFO, "Marker bit missing %s\n", msg);
+        printf("Marker bit missing %s\n", msg);
 
     return bit;
 }
@@ -892,17 +902,17 @@ static inline void print_bin(int bits, int n){
     int i;
 
     for(i=n-1; i>=0; i--){
-        av_log(NULL, AV_LOG_DEBUG, "%d", (bits>>i)&1);
+        printf("%d", (bits>>i)&1);
     }
     for(i=n; i<24; i++)
-        av_log(NULL, AV_LOG_DEBUG, " ");
+        printf(" ");
 }
 
 static inline int get_bits_trace(GetBitContext *s, int n, char *file, const char *func, int line){
     int r= get_bits(s, n);
 
     print_bin(r, n);
-    av_log(NULL, AV_LOG_DEBUG, "%5d %2d %3d bit @%5d in %s %s:%d\n", r, n, r, get_bits_count(s)-n, file, func, line);
+    printf("%5d %2d %3d bit @%5d in %s %s:%d\n", r, n, r, get_bits_count(s)-n, file, func, line);
     return r;
 }
 static inline int get_vlc_trace(GetBitContext *s, VLC_TYPE (*table)[2], int bits, int max_depth, char *file, const char *func, int line){
@@ -914,7 +924,7 @@ static inline int get_vlc_trace(GetBitContext *s, VLC_TYPE (*table)[2], int bits
 
     print_bin(bits2, len);
 
-    av_log(NULL, AV_LOG_DEBUG, "%5d %2d %3d vlc @%5d in %s %s:%d\n", bits2, len, r, pos, file, func, line);
+    printf("%5d %2d %3d vlc @%5d in %s %s:%d\n", bits2, len, r, pos, file, func, line);
     return r;
 }
 static inline int get_xbits_trace(GetBitContext *s, int n, char *file, const char *func, int line){
@@ -922,7 +932,7 @@ static inline int get_xbits_trace(GetBitContext *s, int n, char *file, const cha
     int r= get_xbits(s, n);
 
     print_bin(show, n);
-    av_log(NULL, AV_LOG_DEBUG, "%5d %2d %3d xbt @%5d in %s %s:%d\n", show, n, r, get_bits_count(s)-n, file, func, line);
+    printf("%5d %2d %3d xbt @%5d in %s %s:%d\n", show, n, r, get_bits_count(s)-n, file, func, line);
     return r;
 }
 
@@ -932,7 +942,7 @@ static inline int get_xbits_trace(GetBitContext *s, int n, char *file, const cha
 #define get_vlc(s, vlc)            get_vlc_trace(s, (vlc)->table, (vlc)->bits, 3, __FILE__, __PRETTY_FUNCTION__, __LINE__)
 #define get_vlc2(s, tab, bits, max) get_vlc_trace(s, tab, bits, max, __FILE__, __PRETTY_FUNCTION__, __LINE__)
 
-#define tprintf(p, ...) av_log(p, AV_LOG_DEBUG, __VA_ARGS__)
+#define tprintf(p, ...) printf
 
 #else //TRACE
 #define tprintf(p, ...) {}

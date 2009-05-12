@@ -1,5 +1,5 @@
 CFLAGS = -Wall -O3
-OBJS = main.o bitstream.o cook.o libavutil/log.o libavutil/mem.o rm2wav.o
+OBJS = main.o bitstream.o cook.o libavutil/mem.o rm2wav.o
 cooktest: $(OBJS)
 	gcc -o cooktest $(OBJS)
 
