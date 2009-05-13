@@ -412,17 +412,25 @@ PLUGIN_HEADER
 
 #elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 220)
 
+/* no room for the space in the highscore list */
+#define _SPACE ""
+
 #define BLOCK_WIDTH 10
 #define BLOCK_HEIGHT 10
 #define BOARD_X 6
 #define BOARD_Y 10
 #define PREVIEW_X 124
-#define PREVIEW_Y 167
+#define PREVIEW_Y 174
 #define LABEL_X 117
-#define SCORE_Y 24
-#define LEVEL_Y 65
-#define LINES_Y 103
+#define SCORE_Y 18
+#define LEVEL_Y 52
+#define LINES_Y 85
+#define HIGH_SCORE_Y 119
+#define HIGH_LEVEL_Y 126
+#define HIGH_LABEL_X 114
+
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
+
 
 #define BLOCK_WIDTH 6
 #define BLOCK_HEIGHT 6
@@ -543,6 +551,9 @@ extern const fb_data rockblox_background[];
 
 #endif
 
+#ifndef _SPACE
+#define _SPACE " "
+#endif
 /* <<Explanation on Rockblox shapes>>
 
    %%
@@ -742,7 +753,7 @@ static void show_highscores (void)
 
     for (i = MAX_HIGH_SCORES-1; i>=0; i--)
     {
-        rb->snprintf (str, sizeof (str), "%06d L%1d", Highest[i].score, Highest[i].level);
+        rb->snprintf (str, sizeof (str), "%06d" _SPACE "L%1d", Highest[i].score, Highest[i].level);
         rb->lcd_putsxy (HIGH_LABEL_X, HIGH_SCORE_Y + (10 * ((MAX_HIGH_SCORES-1) - i)), str);
     }
 }
