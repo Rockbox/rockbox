@@ -21,6 +21,9 @@
 #ifndef CLOCK_TARGET_H
 #define CLOCK_TARGET_H
 
+/* returns clock divider, given maximal target frequency and clock reference */
+#define CLK_DIV(ref, target) ((ref + target - 1) / target)
+
 /* PLL */
 
 #define AS3525_PLLA_FREQ        248000000
@@ -39,28 +42,26 @@
 
 /* peripherals */
 
-#define AS3525_PCLK_FREQ        65000000
-
-#define AS3525_IDE_FREQ         90000000
-
-#define AS3525_SD_IDENT_FREQ    400000      /* must be between 100 & 400 kHz */
-
-#define AS3525_I2C_FREQ         400000
-
-/* LCD controller : varies on the models */
-#if     defined(SANSA_CLIP)
-#define AS3525_DBOP_FREQ        6000000
-#elif   defined(SANSA_M200V4)
-#define AS3525_DBOP_FREQ        8000000
-#elif   defined(SANSA_FUZE)
-#define AS3525_DBOP_FREQ        8000000
-#elif   defined(SANSA_E200V2)
-#define AS3525_DBOP_FREQ        8000000
-#elif   defined(SANSA_C200V2)
-#define AS3525_DBOP_FREQ        8000000
+#define AS3525_PCLK_FREQ        62000000
+#if (CLK_DIV(AS3525_PLLA_FREQ, AS3525_PCLK_FREQ) - 1) >= (1<<4) /* 4 bits */
+#error PCLK frequency is too low : clock divider will not fit !
 #endif
 
-/* macro for not giving a target clock > at the one provided */
-#define CLK_DIV(ref, target) ((ref + target - 1) / target)
+#define AS3525_IDE_FREQ         66000000
+#if (CLK_DIV(AS3525_PLLA_FREQ, AS3525_IDE_FREQ) - 1) >= (1<<4) /* 4 bits */
+#error IDE frequency is too low : clock divider will not fit !
+#endif
+
+#define AS3525_I2C_FREQ         400000
+#if (CLK_DIV(AS3525_PLLA_FREQ, AS3525_I2C_FREQ)) >= (1<<16) /* 2*8 bits */
+#error I2C frequency is too low : clock divider will not fit !
+#endif
+
+#define AS3525_DBOP_FREQ        32000000
+#if (CLK_DIV(AS3525_PCLK_FREQ, AS3525_DBOP_FREQ) - 1) >= (1<<3) /* 3 bits */
+#error DBOP frequency is too low : clock divider will not fit !
+#endif
+
+#define AS3525_SD_IDENT_FREQ    400000      /* must be between 100 & 400 kHz */
 
 #endif /* CLOCK_TARGET_H */

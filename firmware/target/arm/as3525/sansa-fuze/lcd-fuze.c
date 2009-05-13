@@ -50,7 +50,7 @@ static bool lcd_busy = false;
 
 static void as3525_dbop_init(void)
 {
-    CGU_DBOP = (1<<3) | CLK_DIV(AS3525_PCLK_FREQ, AS3525_DBOP_FREQ);
+    CGU_DBOP = (1<<3) | (CLK_DIV(AS3525_PCLK_FREQ, AS3525_DBOP_FREQ) - 1);
 
     DBOP_TIMPOL_01 = 0xe167e167;
     DBOP_TIMPOL_23 = 0xe167006e;
