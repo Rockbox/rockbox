@@ -117,32 +117,6 @@ static volatile bool retry;
 
 static inline void mci_delay(void) { int i = 0xffff; while(i--) ; }
 
-static void mci_set_clock_divider(const int drive, int divider)
-{
-    int clock = MCI_CLOCK(drive);
-
-    if(divider > 1)
-    {
-        /* use divide logic */
-        clock &= ~MCI_CLOCK_BYPASS;
-
-        /* convert divider to MCI_CLOCK logic */
-        divider = (divider/2) - 1;
-        if(divider >= 256)
-            divider = 255;
-    }
-    else
-    {
-        /* bypass dividing logic */
-        clock |= MCI_CLOCK_BYPASS;
-        divider = 0;
-    }
-
-    MCI_CLOCK(drive) = clock | divider;
-
-    mci_delay();
-}
-
 #ifdef HAVE_HOTSWAP
 #if defined(SANSA_E200V2) || defined(SANSA_FUZE)
 static int sd1_oneshot_callback(struct timeout *tmo)
@@ -348,7 +322,8 @@ static int sd_init_card(const int drive)
 
     card_info[drive].initialized = 1;
 
-    mci_set_clock_divider(drive, 1); /* full speed */
+    MCI_CLOCK(drive) |= MCI_CLOCK_BYPASS;   /* full speed */
+    mci_delay();
 
     /*
      * enable bank switching 
@@ -481,12 +456,9 @@ static void init_pl180_controller(const int drive)
 
     MCI_SELECT(drive) = 0;
 
-    MCI_CLOCK(drive) = MCI_CLOCK_ENABLE;
-    MCI_CLOCK(drive) &= ~MCI_CLOCK_POWERSAVE;
-
-    /* set MCLK divider */
-    mci_set_clock_divider(drive,
-        CLK_DIV(AS3525_PCLK_FREQ, AS3525_SD_IDENT_FREQ));
+    MCI_CLOCK(drive) = MCI_CLOCK_ENABLE |
+                (((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SD_IDENT_FREQ)) / 2) - 1);
+    mci_delay();
 }
 
 int sd_init(void)

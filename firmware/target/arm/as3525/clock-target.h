@@ -63,5 +63,8 @@
 #endif
 
 #define AS3525_SD_IDENT_FREQ    400000      /* must be between 100 & 400 kHz */
+#if ((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SD_IDENT_FREQ) / 2) - 1) >= (1<<8) /* 8 bits */
+#error SD IDENTIFICATION frequency is too low : clock divider will not fit !
+#endif
 
 #endif /* CLOCK_TARGET_H */
