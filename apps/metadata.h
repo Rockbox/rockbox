@@ -147,7 +147,11 @@ struct afmt_entry
 /* database of labels and codecs. add formats per above enum */
 extern const struct afmt_entry audio_formats[AFMT_NUM_CODECS];
 
+#if MEMORYSIZE > 2
+#define ID3V2_BUF_SIZE 900
+#else
 #define ID3V2_BUF_SIZE 300
+#endif
 
 enum {
     ID3_VER_1_0 = 1,
