@@ -53,7 +53,7 @@
 #endif
 
 #define AS3525_I2C_FREQ         400000
-#if (CLK_DIV(AS3525_PLLA_FREQ, AS3525_I2C_FREQ)) >= (1<<16) /* 2*8 bits */
+#if (CLK_DIV(AS3525_PCLK_FREQ, AS3525_I2C_FREQ)) >= (1<<10) /* 2+8 bits */
 #error I2C frequency is too low : clock divider will not fit !
 #endif
 

@@ -72,8 +72,8 @@ void ascodec_init(void)
 
     /* prescaler for i2c clock */
     prescaler = CLK_DIV(AS3525_PCLK_FREQ, AS3525_I2C_FREQ);
-    I2C2_CPSR0 = prescaler & 0xFF;
-    I2C2_CPSR1 = (prescaler >> 8) & 0xFF;
+    I2C2_CPSR0 = prescaler & 0xFF;          /* 8 lsb */
+    I2C2_CPSR1 = (prescaler >> 8) & 0x3;    /* 2 msb */
     
     /* set i2c slave address of codec part */
     I2C2_SLAD0 = AS3514_I2C_ADDR << 1;
