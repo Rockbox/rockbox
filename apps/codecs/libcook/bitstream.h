@@ -31,7 +31,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
-#include "libavutil/bswap.h"
+#include "bswap.h"
 
 /* The following 2 defines are taken from libavutil/intreadwrite.h */
 #define AV_RB32(x)  ((((const uint8_t*)(x))[0] << 24) | \
