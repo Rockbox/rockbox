@@ -775,6 +775,7 @@ int plugin_load(const char* plugin, const void* parameter)
     button_clear_queue();
 
 #ifdef HAVE_LCD_BITMAP
+    lcd_setfont(FONT_UI);
 #if LCD_DEPTH > 1
     lcd_set_backdrop(old_backdrop);
 #ifdef HAVE_LCD_COLOR
