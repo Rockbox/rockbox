@@ -13,6 +13,10 @@
 %xl|D|shuffle-320x240x16.bmp|218|211|
 %xl|E|repeat-320x240x16.bmp|261|207|4|
 %xl|F|playmode-320x240x16.bmp|286|207|5|
+
+# toggle the touchscreen button viewport
+%?Tl2.5<%Vdt|%Vdu>
+
 %Cl|16|32|s120|s120|
 %pb|pb-320x240x16.bmp|10|162|300|15|
 %?mh<%xdAa|%xdAb>
@@ -47,3 +51,22 @@
 %V|0|180|-|20|1|-|-|
 %al   %pc%ac%pp of %pe%ar%pr   
 
+#viewport for the touch icons
+%xl|G|browser-320x240x16.bmp|5|5|
+%xl|I|pitch-320x240x16.bmp|50|5|
+%xl|H|context-320x240x16.bmp|80|5|
+%xl|J|quick-320x240x16.bmp|110|5|
+%xl|K|rew-320x240x16.bmp|150|5|
+%xl|L|ff-320x240x16.bmp|175|5|
+
+%Vl|t|0|74|-|30|1|-|-|
+%xdG %xdH %xdI %xdJ %xdK %xdL
+%T|0|5|37|24|browse|
+#%T|50|5|24|24|pitch|
+%T|80|5|24|24|contextmenu|
+%T|110|5|24|24|quickscreen|
+%T|150|5|24|24|prev|
+%T|175|5|24|24|next|
+
+%Vl|u|0|74|-|30|1|-|-|
+#purposly left blank

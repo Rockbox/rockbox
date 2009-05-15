@@ -1163,7 +1163,8 @@ static struct touchaction touchactions[] = {
     {"play", ACTION_WPS_PLAY }, {"stop", ACTION_WPS_STOP },
     {"prev", ACTION_WPS_SKIPPREV }, {"next", ACTION_WPS_SKIPNEXT },
     {"menu", ACTION_WPS_MENU }, {"browse", ACTION_WPS_BROWSE },
-    {"shuffle", ACTION_TOUCH_SHUFFLE }, {"repmode", ACTION_TOUCH_REPMODE }
+    {"shuffle", ACTION_TOUCH_SHUFFLE }, {"repmode", ACTION_TOUCH_REPMODE },
+    {"quickscreen", ACTION_WPS_QUICKSCREEN },{"contextmenu", ACTION_WPS_CONTEXT },
 };
 static int parse_touchregion(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data)
@@ -1187,6 +1188,8 @@ static int parse_touchregion(const char *wps_bufptr,
      * browse - go back to the file/db browser
      * shuffle - toggle shuffle mode
      * repmode - cycle the repeat mode
+     * quickscreen - go into the quickscreen
+     * contextmenu - open the context menu
     */
 
     if ((wps_data->touchregion_count +1 >= MAX_TOUCHREGIONS) || (*ptr != '|'))
