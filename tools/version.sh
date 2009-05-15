@@ -45,11 +45,10 @@ gitversion() {
 	# Is this a git-svn commit?
 	if ! git log  HEAD^.. --pretty=format:"%b" | grep -q "git-svn-id: svn" ; then
 	    mod="M"
-	fi
-
 	# Are there uncommitted changes?
-	git update-index --refresh --unmerged > /dev/null
-	if git diff-index --name-only HEAD | read dummy; then
+	elif git diff --name-only HEAD | read dummy; then
+	    mod="M"
+	elif git diff --name-only --cached HEAD | read dummy; then
 	    mod="M"
 	fi
 
