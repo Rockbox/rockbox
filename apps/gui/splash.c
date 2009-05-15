@@ -61,6 +61,9 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     struct viewport vp;
     int maxw = 0;
 
+    viewport_set_defaults(&vp, screen->screen_type);
+    screen->set_viewport(&vp);
+    
     screen->getstringsize(" ", &space_w, &h);
 #else /* HAVE_LCD_CHARCELLS */
 
@@ -76,7 +79,7 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 
     next = strtok_r(splash_buf, " ", &store);
     if (!next)
-        return;  /* nothing to display */
+        goto end; /* nothing to display */
 
     lines[0] = next;
     while (true)
@@ -130,7 +133,6 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     screen->stop_scroll();
 
 #ifdef HAVE_LCD_BITMAP
-    viewport_set_defaults(&vp, screen->screen_type);
     /* If we center the display, then just clear the box we need and put
        a nice little frame and put the text in there! */
     vp.y = (screen->lcdheight - y) / 2 - RECT_SPACING;  /* height => y start position */
@@ -157,7 +159,6 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 #endif
         vp.drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
 
-    screen->set_viewport(&vp);
     screen->fillrect(0, 0, vp.width, vp.height);
 
 #if LCD_DEPTH > 1
@@ -196,6 +197,7 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 #undef W
     }
     screen->update_viewport();
+end:
     screen->set_viewport(NULL);
 }
 
