@@ -228,6 +228,14 @@ enum {
     ACTION_KBD_DOWN,
     ACTION_KBD_MORSE_INPUT,
     ACTION_KBD_MORSE_SELECT,
+    
+#ifdef HAVE_TOUCHSCREEN
+    /* the following are helper actions for touchscreen targets,
+     * These are for actions which are not doable or required if buttons are
+     * being used, but are nice additions if the touchscreen is used */
+    ACTION_TOUCH_SHUFFLE,
+    ACTION_TOUCH_REPMODE,
+#endif    
 
 
     LAST_ACTION_PLACEHOLDER, /* custom actions should be this + something */

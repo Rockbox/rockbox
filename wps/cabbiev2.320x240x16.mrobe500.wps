@@ -4,6 +4,8 @@
 %wd
 %T|286|207|24|24|play|
 %T|0|207|84|24|menu|
+%T|218|211|24|24|shuffle|
+%T|261|207|24|24|repmode|
 %X|wpsbackdrop-320x240x16.bmp|
 %xl|A|lock-320x240x16.bmp|91|207|2|
 %xl|B|battery-320x240x16.bmp|126|207|10|

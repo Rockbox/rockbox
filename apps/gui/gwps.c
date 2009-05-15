@@ -64,6 +64,8 @@
 #include "appevents.h"
 #include "viewport.h"
 #include "pcmbuf.h"
+#include "option_select.h"
+#include "dsp.h"
 
 #define RESTORE_WPS_INSTANTLY       0l
 #define RESTORE_WPS_NEXT_SECOND     ((long)(HZ+current_tick))
@@ -732,7 +734,29 @@ long gui_wps_show(void)
                 restore = true;
             }
             break;
-
+#ifdef HAVE_TOUCHSCREEN
+            case ACTION_TOUCH_SHUFFLE: /* toggle shuffle mode */
+            {
+                global_settings.playlist_shuffle = 
+                                                !global_settings.playlist_shuffle;
+#if CONFIG_CODEC == SWCODEC
+                dsp_set_replaygain();
+#endif
+                if (global_settings.playlist_shuffle)
+                    playlist_randomise(NULL, current_tick, true);
+                else
+                    playlist_sort(NULL, true);
+            }
+            break;
+            case ACTION_TOUCH_REPMODE: /* cycle the repeat mode setting */
+            {
+                const struct settings_list *rep_setting = 
+                                find_setting(&global_settings.repeat_mode, NULL);
+                option_select_next_val(rep_setting, false, true);
+                audio_flush_and_reload_tracks();
+            }
+            break;
+#endif /* HAVE_TOUCHSCREEN */            
             case ACTION_REDRAW: /* yes are locked, just redraw */
                 /* fall througgh */
             case ACTION_NONE: /* Timeout, do an partial update */
