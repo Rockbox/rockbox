@@ -340,6 +340,21 @@ order left -- center -- right. If the aligned texts overlap, they are merged.
 \end{tagmap}
 \end{table}
 
+\section{Subline Tags}
+
+\begin{table}
+\begin{tagmap}{}{}
+\config{\%t{\textless}time{\textgreater}}
+    & Set the subline display cycle time (\%t5 or \%t3.4 formats) \\
+\config{;}
+    & Split items on a line into separate sublines \\
+\end{tagmap}
+\end{table}
+
+Allows grouping of several items (sublines) onto one line, with the
+display cycling round the defined sublines. See
+\reference{ref:AlternatingSublines} for details. 
+
 \opt{rtc}{
   \section{Real Time Clock}
   \begin{table}
