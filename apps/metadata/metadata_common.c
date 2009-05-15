@@ -99,7 +99,7 @@ long read_string(int fd, char* buf, long buf_size, int eos, long size)
 
 #ifdef ROCKBOX_LITTLE_ENDIAN
 /* Read an unsigned 32-bit integer from a big-endian file. */
-int read_uint32be(int fd, unsigned int* buf)
+int read_uint32be(int fd, uint32_t* buf)
 {
   size_t n;
 

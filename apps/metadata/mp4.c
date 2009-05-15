@@ -130,8 +130,8 @@ static unsigned int read_mp4_tag_string(int fd, int size_left, char** buffer,
     return length;
 }
 
-static unsigned int read_mp4_atom(int fd, unsigned int* size, 
-                                  unsigned int* type, unsigned int size_left)
+static unsigned int read_mp4_atom(int fd, uint32_t* size, 
+                                  uint32_t* type, uint32_t size_left)
 {
     read_uint32be(fd, size);
     read_uint32be(fd, type);
@@ -168,7 +168,7 @@ static unsigned int read_mp4_atom(int fd, unsigned int* size,
     return size_left;
 }
 
-static unsigned int read_mp4_length(int fd, unsigned int* size)
+static unsigned int read_mp4_length(int fd, uint32_t* size)
 {
     unsigned int length = 0;
     int bytes = 0;
@@ -186,8 +186,7 @@ static unsigned int read_mp4_length(int fd, unsigned int* size)
     return length;
 }
 
-static bool read_mp4_esds(int fd, struct mp3entry* id3, 
-    unsigned int* size)
+static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
 {
     unsigned char buf[8];
     bool sbr = false;
@@ -349,10 +348,10 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3,
 }
 
 static bool read_mp4_tags(int fd, struct mp3entry* id3, 
-                          unsigned int size_left)
+                          uint32_t size_left)
 {
-    unsigned int size;
-    unsigned int type;
+    uint32_t size;
+    uint32_t type;
     unsigned int buffer_left = sizeof(id3->id3v2buf) + sizeof(id3->id3v1buf);
     char* buffer = id3->id3v2buf;
     bool cwrt = false;
@@ -456,7 +455,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
         case MP4_extra:
             {
                 char tag_name[TAG_NAME_LENGTH];
-                unsigned int sub_size;
+                uint32_t sub_size;
                 
                 /* "mean" atom */
                 read_uint32be(fd, &sub_size);
@@ -543,11 +542,11 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
 }
 
 static bool read_mp4_container(int fd, struct mp3entry* id3, 
-                               unsigned int size_left)
+                               uint32_t size_left)
 {
-    unsigned int size;
-    unsigned int type;
-    unsigned int handler = 0;
+    uint32_t size;
+    uint32_t type;
+    uint32_t handler = 0;
     bool rc = true;
     
     do
@@ -562,7 +561,7 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
         {
         case MP4_ftyp:
             {
-                unsigned int id;
+                uint32_t id;
                 
                 read_uint32be(fd, &id);
                 size -= 4;
@@ -625,7 +624,7 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
         
         case MP4_stts:
             {
-                unsigned int entries;
+                uint32_t entries;
                 unsigned int i;
                 
                 lseek(fd, 4, SEEK_CUR);
@@ -634,8 +633,8 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
 
                 for (i = 0; i < entries; i++)
                 {
-                    unsigned int n;
-                    unsigned int l;
+                    uint32_t n;
+                    uint32_t l;
 
                     read_uint32be(fd, &n);
                     read_uint32be(fd, &l);
@@ -649,7 +648,7 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
         case MP4_mp4a:
         case MP4_alac:
             {
-                unsigned int frequency;
+                uint32_t frequency;
 
                 id3->codectype = (type == MP4_mp4a) ? AFMT_AAC : AFMT_ALAC;
                 lseek(fd, 22, SEEK_CUR);
@@ -659,8 +658,8 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                 
                 if (type == MP4_mp4a)
                 {
-                    unsigned int subsize;
-                    unsigned int subtype;
+                    uint32_t subsize;
+                    uint32_t subtype;
 
                     /* Get frequency from the decoder info tag, if possible. */
                     lseek(fd, 2, SEEK_CUR);
