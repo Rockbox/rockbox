@@ -34,7 +34,7 @@ svnversion_safe() {
 # rockbox. If the commit information for HEAD has a svn-id in it we report that instead of
 # the git id
 gitversion() {
-    export GIT_DIR="$1"
+    export GIT_DIR="$1/.git"
 
     # This verifies we are in a git directory
     if head=`git rev-parse --verify --short HEAD 2>/dev/null`; then
@@ -46,10 +46,13 @@ gitversion() {
 	if ! git log  HEAD^.. --pretty=format:"%b" | grep -q "git-svn-id: svn" ; then
 	    mod="M"
 	# Are there uncommitted changes?
-	elif git diff --name-only HEAD | read dummy; then
-	    mod="M"
-	elif git diff --name-only --cached HEAD | read dummy; then
-	    mod="M"
+	else
+	    export GIT_WORK_TREE="$1"
+	    if git diff --name-only HEAD | read dummy; then
+		mod="M"
+	    elif git diff --name-only --cached HEAD | read dummy; then
+		mod="M"
+	    fi
 	fi
 
 	echo "${version}${mod}"
@@ -69,7 +72,7 @@ if [ -r $TOP/$VERSIONFILE ]; then VER=`cat $TOP/$VERSIONFILE`;
 else
     # Ok, we need to derive it from the Version Control system
     if [ -d "$TOP/.git" ]; then
-	VER=`gitversion $TOP/.git`
+	VER=`gitversion $TOP`
     else
 	VER=`svnversion_safe $TOP`;
 	if [ "$VER" = "unknown" ]; then
