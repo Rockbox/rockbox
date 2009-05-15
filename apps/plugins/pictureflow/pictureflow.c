@@ -220,7 +220,7 @@ typedef fb_data pix_t;
 
 /* maximum number of albums */
 
-#define MAX_TRACKS 50
+#define MAX_TRACKS 128
 #define AVG_TRACK_NAME_LENGTH 20
 
 
@@ -805,16 +805,26 @@ int create_track_index(const int slide_index)
     rb->tagcache_search_add_filter(&tcs, tag_album, album[slide_index].seek);
     track_count=0;
     int string_index = 0, i, track_num;
+    int disc_num;
 
-    while (rb->tagcache_get_next(&tcs) && track_count < MAX_TRACKS)
+    while (rb->tagcache_get_next(&tcs))
     {
+        if (track_count == MAX_TRACKS)
+            goto fail;
         track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber);
+        disc_num = rb->tagcache_get_numeric(&tcs, tag_discnumber);
         int avail = sizeof(track_names) - string_index;
-        int len;
+        int len = 0;
+        if (disc_num < 0)
+            disc_num = 0;
         if (track_num >= 0)
         {
-            len = 1 + rb->snprintf(track_names + string_index , avail,
-                "%d:  %s", track_num, tcs.result);
+            if (disc_num > 0)
+                len = 1 + rb->snprintf(track_names + string_index , avail,
+                    "%d.%02d:  %s", disc_num, track_num, tcs.result);
+            else
+                len = 1 + rb->snprintf(track_names + string_index , avail,
+                    "%d:  %s", track_num, tcs.result);
         }
         else
         {
@@ -823,8 +833,9 @@ int create_track_index(const int slide_index)
             rb->strncpy(track_names + string_index, tcs.result, avail);
         }
         if (len > avail)
-            return -1;
-        temp_tracknums[track_count] = (track_num << 8) + track_count;
+            goto fail;
+        temp_tracknums[track_count] = (disc_num << 16) + (track_num << 7)
+            + track_count;
         temp_tracks[track_count].name_idx = string_index;
         temp_tracks[track_count].seek = tcs.result_seek;
         track_count++;
@@ -838,10 +849,16 @@ int create_track_index(const int slide_index)
     rb->qsort(temp_tracknums, track_count, sizeof(int), compare_uints);
     for (i = 0; i < track_count; i++)
     {
-        tracks[i].name_idx = temp_tracks[0xFF & temp_tracknums[i]].name_idx;
-        tracks[i].seek = temp_tracks[0xFF & temp_tracknums[i]].seek;
+        track_num = 127 & temp_tracknums[i];
+        tracks[i].name_idx = temp_tracks[track_num].name_idx;
+        tracks[i].seek = temp_tracks[track_num].seek;
     }
-    return (track_count > 0) ? 0 : -1;
+    if (track_count == 0)
+        goto fail;
+    return 0;
+fail:
+    track_count = 0;
+    return -1;
 }
 
 /**
