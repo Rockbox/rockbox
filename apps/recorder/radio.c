@@ -519,7 +519,6 @@ int radio_screen(void)
 
     if(num_presets <= 0)
     {
-        memset(presets, 0, sizeof(presets));
         radio_load_presets(global_settings.fmr_file);
     }
 
