@@ -144,6 +144,7 @@ static int num_handles;  /* number of handles in the list */
 static int base_handle_id;
 
 static struct mutex llist_mutex;
+static struct mutex llist_mod_mutex;
 
 /* Handle cache (makes find_handle faster).
    This is global so that move_handle and rm_handle can invalidate it. */
@@ -229,6 +230,7 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
         return NULL;
 
     mutex_lock(&llist_mutex);
+    mutex_lock(&llist_mod_mutex);
 
     if (cur_handle && cur_handle->filerem > 0) {
         /* the current handle hasn't finished buffering. We can only add
@@ -237,6 +239,7 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
         size_t req = cur_handle->filerem + sizeof(struct memory_handle);
         if (RINGBUF_ADD_CROSS(cur_handle->widx, req, buf_ridx) >= 0) {
             /* Not enough space */
+            mutex_unlock(&llist_mod_mutex);
             mutex_unlock(&llist_mutex);
             return NULL;
         } else {
@@ -265,6 +268,7 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
     overlap = RINGBUF_ADD_CROSS(buf_widx, shift + len, buf_ridx);
     if (overlap >= 0 && (alloc_all || (unsigned)overlap > data_size)) {
         /* Not enough space for required allocations */
+        mutex_unlock(&llist_mod_mutex);
         mutex_unlock(&llist_mutex);
         return NULL;
     }
@@ -294,6 +298,7 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
 
     cur_handle = new_handle;
 
+    mutex_unlock(&llist_mod_mutex);
     mutex_unlock(&llist_mutex);
     return new_handle;
 }
@@ -306,6 +311,7 @@ static bool rm_handle(const struct memory_handle *h)
         return true;
 
     mutex_lock(&llist_mutex);
+    mutex_lock(&llist_mod_mutex);
 
     if (h == first_handle) {
         first_handle = h->next;
@@ -330,6 +336,7 @@ static bool rm_handle(const struct memory_handle *h)
                 buf_widx = cur_handle->widx;
             }
         } else {
+            mutex_unlock(&llist_mod_mutex);
             mutex_unlock(&llist_mutex);
             return false;
         }
@@ -341,6 +348,7 @@ static bool rm_handle(const struct memory_handle *h)
 
     num_handles--;
 
+    mutex_unlock(&llist_mod_mutex);
     mutex_unlock(&llist_mutex);
     return true;
 }
@@ -413,6 +421,7 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
     }
 
     mutex_lock(&llist_mutex);
+    mutex_lock(&llist_mod_mutex);
 
     newpos = RINGBUF_ADD((void *)src - (void *)buffer, final_delta);
     overlap = RINGBUF_ADD_CROSS(newpos, size_to_move, buffer_len - 1);
@@ -436,6 +445,7 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
         if (correction) {
             if (final_delta < correction + sizeof(struct memory_handle)) {
                 /* Delta cannot end up less than the size of the struct */
+                mutex_unlock(&llist_mod_mutex);
                 mutex_unlock(&llist_mutex);
                 return false;
             }
@@ -459,6 +469,7 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
         if (m && m->next == src) {
             m->next = dest;
         } else {
+            mutex_unlock(&llist_mod_mutex);
             mutex_unlock(&llist_mutex);
             return false;
         }
@@ -484,6 +495,7 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
     /* Update the caller with the new location of h and the distance moved */
     *h = dest;
     *delta = final_delta;
+    mutex_unlock(&llist_mod_mutex);
     mutex_unlock(&llist_mutex);
     return dest;
 }
@@ -941,7 +953,10 @@ int bufopen(const char *file, size_t offset, enum data_type type)
     strncpy(h->path, file, MAX_PATH);
     h->offset = adjusted_offset;
     h->ridx = buf_widx;
+    h->widx = buf_widx;
     h->data = buf_widx;
+    h->available = 0;
+    h->filerem = 0;
     h->type = type;
 
 #ifdef HAVE_ALBUMART
@@ -949,9 +964,9 @@ int bufopen(const char *file, size_t offset, enum data_type type)
     {
         /* Bitmap file: we load the data instead of the file */
         int rc;
-        mutex_lock(&llist_mutex); /* Lock because load_bitmap yields */
+        mutex_lock(&llist_mod_mutex); /* Lock because load_bitmap yields */
         rc = load_image(fd, file);
-        mutex_unlock(&llist_mutex);
+        mutex_unlock(&llist_mod_mutex);
         if (rc <= 0)
         {
             rm_handle(h);
@@ -1442,9 +1457,11 @@ void buffering_thread(void)
 void buffering_init(void)
 {
     mutex_init(&llist_mutex);
+    mutex_init(&llist_mod_mutex);
 #ifdef HAVE_PRIORITY_SCHEDULING
     /* This behavior not safe atm */
     mutex_set_preempt(&llist_mutex, false);
+    mutex_set_preempt(&llist_mod_mutex, false);
 #endif
 
     conf_watermark = BUFFERING_DEFAULT_WATERMARK;
