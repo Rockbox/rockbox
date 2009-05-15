@@ -130,9 +130,11 @@ int button_read_device(int *data)
         button_read |=  BUTTON_POWER;
     }
 
+#if defined(HAVE_REMOTE_LCD)
     /* Read data from the remote */
     button_read |= remote_read_device();
     hold_button=remote_button_hold();
+#endif
     
     /* Take care of hold notifications */
 #ifndef BOOTLOADER

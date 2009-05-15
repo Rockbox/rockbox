@@ -246,8 +246,7 @@ void system_init(void)
 
     IO_INTC_ENTRY_TBA0 = 0;
     IO_INTC_ENTRY_TBA1 = 0;
-    
-    
+
     int i;
     /* Set interrupt priorities to predefined values */
     for(i = 0; i < 23; i++)
