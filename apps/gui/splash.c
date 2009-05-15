@@ -153,7 +153,9 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     if (screen->depth > 1)
     {
         vp.drawmode = DRMODE_FG;
-        vp.fg_pattern = SCREEN_COLOR_TO_NATIVE(screen, LCD_LIGHTGRAY);
+        /* can't do vp.fg_pattern here, since set_foreground does a bit more on
+         * greyscale */
+        screen->set_foreground(SCREEN_COLOR_TO_NATIVE(screen, LCD_LIGHTGRAY));
     }
     else
 #endif
@@ -163,7 +165,9 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 
 #if LCD_DEPTH > 1
     if (screen->depth > 1)
-        vp.fg_pattern = SCREEN_COLOR_TO_NATIVE(screen, LCD_BLACK);
+        /* can't do vp.fg_pattern here, since set_foreground does a bit more on
+         * greyscale */
+        screen->set_foreground(SCREEN_COLOR_TO_NATIVE(screen, LCD_BLACK));
     else
 #endif
         vp.drawmode = DRMODE_SOLID;
