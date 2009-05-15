@@ -10,7 +10,10 @@ WPS}. For this feature to work, you must observe a few rules.
 
 Rockbox does not support album art embedded in your files' tags, and will
 instead look for a picture located in the filesystem. In addition to this, the
-pictures must be in the BMP or JPG formats.
+pictures must be in the BMP or JPEG formats. Rockbox does not support
+RLE-compressed BMP files, nor does it support progressive and multi-scan
+JPEG files. JPEG files must consist of a single scan with interleaved components, 
+as progessive and multi-scan images require much more memory to decode.
 
 \section{Where to put album art}
 
