@@ -731,7 +731,7 @@ int create_album_index(void)
     while (rb->tagcache_get_next(&tcs))
     {
         buf_size -= sizeof(struct album_data);
-        l = rb->strlen(tcs.result) + 1;
+        l = tcs.result_len;
         if ( album_count > 0 )
             album[-album_count].name_idx = album[1-album_count].name_idx + old_l;
 
@@ -778,6 +778,16 @@ char* get_track_name(const int track_index)
 }
 
 /**
+  Compare two unsigned ints passed via pointers.
+ */
+int compare_uints (const void *a_v, const void *b_v)
+{
+    uint32_t a = *(uint32_t *)a_v;
+    uint32_t b = *(uint32_t *)b_v;
+    return (int)(a - b);
+}
+
+/**
   Create the track index of the given slide_index.
  */
 int create_track_index(const int slide_index)
@@ -789,62 +799,49 @@ int create_track_index(const int slide_index)
     if (!rb->tagcache_search(&tcs, tag_title))
         return -1;
 
-    int ret = 0;
-    char temp_titles[MAX_TRACKS][AVG_TRACK_NAME_LENGTH*4];
-    int temp_seeks[MAX_TRACKS];
+    struct track_data temp_tracks[MAX_TRACKS];
+    uint32_t temp_tracknums[MAX_TRACKS];
 
     rb->tagcache_search_add_filter(&tcs, tag_album, album[slide_index].seek);
     track_count=0;
-    int string_index = 0;
-    int l, track_num, heighest_index = 0;
+    int string_index = 0, i, track_num;
 
-    for(l=0;l<MAX_TRACKS;l++)
-        temp_titles[l][0] = '\0';
-    while (rb->tagcache_get_next(&tcs) && track_count  < MAX_TRACKS)
+    while (rb->tagcache_get_next(&tcs) && track_count < MAX_TRACKS)
     {
-        track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber) - 1;
+        track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber);
+        int avail = sizeof(track_names) - string_index;
+        int len;
         if (track_num >= 0)
         {
-            rb->snprintf(temp_titles[track_num],sizeof(temp_titles[track_num]),
-                         "%d:  %s", track_num+1, tcs.result);
-            temp_seeks[track_num] = tcs.result_seek;
+            len = 1 + rb->snprintf(track_names + string_index , avail,
+                "%d:  %s", track_num, tcs.result);
         }
         else
         {
             track_num = 0;
-            while (temp_titles[track_num][0] != '\0')
-                track_num++;
-            rb->strcpy(temp_titles[track_num], tcs.result);
-            temp_seeks[track_num] = tcs.result_seek;
+            len = tcs.result_len;
+            rb->strncpy(track_names + string_index, tcs.result, avail);
         }
-        if (track_num > heighest_index)
-            heighest_index = track_num;
+        if (len > avail)
+            return -1;
+        temp_tracknums[track_count] = (track_num << 8) + track_count;
+        temp_tracks[track_count].name_idx = string_index;
+        temp_tracks[track_count].seek = tcs.result_seek;
         track_count++;
+        string_index += len;
     }
 
     rb->tagcache_search_finish(&tcs);
     track_index = slide_index;
 
     /* now fix the track list order */
-    l = 0;
-    track_count = 0;
-    while (l <= heighest_index &&
-           string_index <  MAX_TRACKS*AVG_TRACK_NAME_LENGTH)
+    rb->qsort(temp_tracknums, track_count, sizeof(int), compare_uints);
+    for (i = 0; i < track_count; i++)
     {
-        if (temp_titles[l][0] != '\0')
-        {
-            rb->strcpy(track_names + string_index, temp_titles[l]);
-            tracks[track_count].name_idx = string_index;
-            tracks[track_count].seek = temp_seeks[l];
-            string_index += rb->strlen(temp_titles[l]) + 1;
-            track_count++;
-        }
-        l++;
+        tracks[i].name_idx = temp_tracks[0xFF & temp_tracknums[i]].name_idx;
+        tracks[i].seek = temp_tracks[0xFF & temp_tracknums[i]].seek;
     }
-    if (ret != 0)
-        return ret;
-    else
-        return (track_count > 0) ? 0 : -1;
+    return (track_count > 0) ? 0 : -1;
 }
 
 /**
