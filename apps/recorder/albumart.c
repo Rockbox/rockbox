@@ -193,7 +193,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     }
 
 #if defined(HAVE_JPEG) || defined(PLUGIN)
-    if (!found)
+    if (!found && !*size_string)
     {
         snprintf (path, sizeof(path), "%sfolder.jpg", dir);
         found = file_exists(path);
