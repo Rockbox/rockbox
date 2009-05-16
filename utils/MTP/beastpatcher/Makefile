@@ -5,14 +5,21 @@ OUTPUT=beastpatcher.exe
 CROSS=
 CFLAGS+=-mno-cygwin
 else
+ifeq ($(findstring MINGW,$(shell uname)),MINGW)
+OUTPUT=beastpatcher.exe
+CROSS=
+else
 OUTPUT=beastpatcher
 CROSS=i586-mingw32msvc-
 endif
+endif
 
+ifneq ($(findstring MINGW,$(shell uname)),MINGW)
 LIBS = /usr/lib/libmtp.a /usr/lib/libusb.a
 CFLAGS += $(shell printf \
 	'\#include <libmtp.h>\nlibmtp version: LIBMTP_VERSION\n' | \
 	gcc -E -P - -o - | grep -q '^libmtp version: 0\.2' && echo '-DOLDMTP')
+endif
 WINLIBS = ../MTP_DLL.dll
 
 NATIVECC = gcc
