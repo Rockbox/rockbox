@@ -30,6 +30,12 @@ char buf[255];
 
 #define MARGIN 5
 
+#if (LCD_DEPTH == 16)
+#define MY_BITMAP_PART   rb->lcd_bitmap_transparent_part
+#else
+#define MY_BITMAP_PART   rb->lcd_mono_bitmap_part
+#endif
+
 #if LCD_WIDTH > LCD_HEIGHT
 #define BOX_WIDTH ((LCD_WIDTH-(MARGIN*2))/10)
 #define BOX_HEIGHT ((BOX_WIDTH*2)/3)
@@ -183,7 +189,7 @@ int select_square(void);
 void update_score(void);
 void gen_resources(void);
 void draw_cursor(void);
-int calc_strength(bool colour, int x, int y);
+int calc_strength(int colour, int x, int y);
 void draw_board(void);
 
 struct tile{
@@ -221,6 +227,7 @@ struct settings {
 
 struct resources humanres;
 struct resources compres;
+enum { GS_PROD, GS_MOVE, GS_WAR } gamestate;
 
 struct cursor{
     int x;
@@ -230,8 +237,8 @@ struct cursor{
 struct tile board[12][12];
 
 void init_board(void) {
-    rb->srand(*rb->current_tick);
     int i,j;
+    rb->srand(*rb->current_tick);
     for(i=0;i<12;i++) {  /* Hopefully about 50% each colour */
         for(j=0;j<12;j++) {
             if((i<1)||(j<1)||(i>10)||(j>10))
@@ -253,7 +260,6 @@ void init_board(void) {
         if((board[i][j].colour == COLOUR_DARK) && (board[i][j].farm == false)) {
             board[i][j].farm = true;
             compres.farms++;
-            break;
         }
     }
     while(compres.inds < superdom_settings.compstartinds) {
@@ -262,7 +268,6 @@ void init_board(void) {
         if((board[i][j].colour == COLOUR_DARK) && (board[i][j].ind == false)) {
             board[i][j].ind = true;
             compres.inds++;
-            break;
         }
     }
     while(humanres.farms<superdom_settings.humanstartfarms) {
@@ -284,8 +289,8 @@ void init_board(void) {
 }
 
 void draw_board(void) {
-    rb->lcd_clear_display();
     int i,j;
+    rb->lcd_clear_display();
     for(i=1;i<11;i++) {
         for(j=1;j<11;j++) {
             if(board[i][j].colour == COLOUR_DARK) {
@@ -300,11 +305,7 @@ void draw_board(void) {
             rb->lcd_set_drawmode(DRMODE_BG | DRMODE_INVERSEVID); 
 #endif
             if(board[i][j].ind) {
-#if (LCD_DEPTH == 16)
-                rb->lcd_bitmap_transparent_part(superdom_boarditems, 
-#else
-                rb->lcd_mono_bitmap_part(superdom_boarditems,
-#endif
+                MY_BITMAP_PART(superdom_boarditems,
                                 board[i][j].colour?ICON_WIDTH:0, 0, STRIDE, 
 #if LCD_WIDTH > LCD_HEIGHT
                                 MARGIN+(BOX_WIDTH*(i-1))+1, 
@@ -316,33 +317,21 @@ void draw_board(void) {
                                 ICON_WIDTH, ICON_HEIGHT);
             }
             if(board[i][j].farm) {
-#if (LCD_DEPTH == 16)
-                rb->lcd_bitmap_transparent_part(superdom_boarditems, 
-#else
-                rb->lcd_mono_bitmap_part(superdom_boarditems,
-#endif
+                MY_BITMAP_PART(superdom_boarditems,
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT, 
                                 STRIDE, MARGIN+(BOX_WIDTH*(i-1))+1, 
                                 MARGIN+(BOX_HEIGHT*(j-1))+1, 
                                 ICON_WIDTH, ICON_HEIGHT);
             }
             if(board[i][j].tank) {
-#if (LCD_DEPTH == 16)
-                rb->lcd_bitmap_transparent_part(superdom_boarditems, 
-#else
-                rb->lcd_mono_bitmap_part(superdom_boarditems,
-#endif
+                MY_BITMAP_PART(superdom_boarditems,
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*2,
                                 STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1, 
                                 MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1, 
                                 ICON_WIDTH, ICON_HEIGHT);
             }
             if(board[i][j].men) {
-#if (LCD_DEPTH == 16)
-                rb->lcd_bitmap_transparent_part(superdom_boarditems, 
-#else
-                rb->lcd_mono_bitmap_part(superdom_boarditems,
-#endif
+                MY_BITMAP_PART(superdom_boarditems,
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*3,
 #if LCD_WIDTH > LCD_HEIGHT
                                 STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1,
@@ -354,11 +343,7 @@ void draw_board(void) {
                                 ICON_WIDTH, ICON_HEIGHT);
             }
             if(board[i][j].plane) {
-#if (LCD_DEPTH == 16)
-                rb->lcd_bitmap_transparent_part(superdom_boarditems, 
-#else
-                rb->lcd_mono_bitmap_part(superdom_boarditems,
-#endif
+                MY_BITMAP_PART(superdom_boarditems,
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*4,
 #if LCD_WIDTH > LCD_HEIGHT
                                 STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH*2+1,
@@ -370,11 +355,7 @@ void draw_board(void) {
                                 ICON_WIDTH, ICON_HEIGHT);
             }
             if(board[i][j].nuke) {
-#if (LCD_DEPTH == 16)
-                rb->lcd_bitmap_transparent_part(superdom_boarditems, 
-#else
-                rb->lcd_mono_bitmap_part(superdom_boarditems,
-#endif
+                MY_BITMAP_PART(superdom_boarditems,
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*5,
 #if LCD_WIDTH > LCD_HEIGHT
                                 STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH*2+1,
@@ -400,34 +381,23 @@ void draw_board(void) {
     rb->lcd_update();
 }
 
-int calc_strength(bool colour, int x, int y) {
+int calc_strength(int colour, int x, int y) {
     int a, b, score=0;
-    for (a = -1; a < 2; a++){
-   for (b = -1; b < 2; b++){
-       if (b == 0){
-           if(board[x + a][y].colour == colour)
-           score+=10;
-       if(((board[x + a][y].colour == colour) && board[x + a][y].tank) || ((board[x + a][y].colour == colour) && board[x + a][y].farm))
-               score+=30;
-       if(((board[x + a][y].colour == colour) && board[x + a][y].plane) || ((board[x + a][y].colour == colour) && board[x + a][y].ind))
-               score+=40;
-       if((board[x + a][y].colour == colour) && board[x + a][y].nuke)
-               score+=20;
-       if((board[x + a][y].colour == colour) && board[x + a][y].men)
-               score+=(board[x + a][y].men*133/1000);
-       } else if (a == 0){
-                if(board[x][y + b].colour == colour)
-           score+=10;
-       if(((board[x][y + b].colour == colour) && board[x][y + b].tank) || ((board[x][y + b].colour == colour) && board[x][y + b].farm))
-               score+=30;
-       if(((board[x][y + b].colour == colour) && board[x][y + b].plane) || ((board[x][y + b].colour == colour) && board[x][y + b].ind))
-               score+=40;
-       if((board[x][y + b].colour == colour) && board[x][y + b].nuke)
-               score+=20;
-       if((board[x][y + b].colour == colour) && board[x][y + b].men)
-               score+=(board[x][y + b].men*133/1000);
-       }
-   }
+    for (a = -1; a < 2; a++) {
+        for (b = -1; b < 2; b++) {
+            if ((b == 0 || a == 0) &&
+                (board[x + a][y + b].colour == colour)) {
+                score += 10;
+                if(board[x + a][y + b].tank || board[x + a][y + b].farm)
+                    score += 30;
+                if(board[x + a][y + b].plane || board[x + a][y + b].ind)
+                    score += 40;
+                if(board[x + a][y + b].nuke)
+                    score += 20;
+                if(board[x + a][y + b].men)
+                    score += (board[x + a][y + b].men*133/1000);
+            }
+        }
     }
     return score;
 }
@@ -437,6 +407,7 @@ void gen_interest(void) {
     rb->srand(*rb->current_tick);
     int interest = 7+rb->rand()%6;
     humanres.bank = humanres.bank+(interest*humanres.bank/100);
+    compres.bank = compres.bank+(interest*compres.bank/100);
 }
 
 void draw_cursor(void) {
@@ -448,10 +419,12 @@ void draw_cursor(void) {
 }
 
 void gen_resources(void) {
-    gen_interest();
     int inccash = 0;
     int incfood = 0;
+    int ratecash = 0;
+    int ratefood = 0;
     int i;
+    gen_interest();
     rb->srand(*rb->current_tick);
     /* Generate Human's resources */
         for(i=0;i<humanres.inds;i++) {
@@ -460,29 +433,31 @@ void gen_resources(void) {
         for(i=0;i<humanres.farms;i++) {
             incfood += (200+rb->rand()%200);
         }
-        if(inccash/humanres.inds > 450) {
-            if(incfood/humanres.farms > 350) {
+        if(humanres.inds)
+            ratecash = inccash/humanres.inds;
+        if(humanres.farms)
+            ratefood = incfood/humanres.farms;
+        if(ratecash > 450) {
+            if(ratefood > 350) {
                 rb->splash(HZ*2, "Patriotism sweeps the land, all production" 
                                 " is up this year!");
             } else {
                 rb->splash(HZ*2, "Factories working at maximum efficiency," 
                                 " cash production up this year!");
             }
-        } else if((inccash/humanres.inds>350)&&(inccash/humanres.inds<=450)) {
-            if(incfood/humanres.farms > 350) {
+        } else if(ratecash > 350) {
+            if(ratefood > 350) {
                 rb->splash(HZ*2, "Record crop harvest this year!");
-            } else if((incfood/humanres.farms > 250) &&
-                            (incfood/humanres.farms <= 350)) {
+            } else if(ratefood > 250) {
                 rb->splash(HZ*2, "Production continues as normal");
             } else {
                 rb->splash(HZ*2, "Spoilage of crops leads to reduced farm" 
                                 " output this  year");
             }
         } else {
-            if(incfood/humanres.farms > 350) {
+            if(ratefood > 350) {
                 rb->splash(HZ*2, "Record crop harvest this year!");
-            } else if((incfood/humanres.farms > 250) &&
-                            (incfood/humanres.farms <= 350)) {
+            } else if(ratefood > 250) {
                 rb->splash(HZ*2, "Factory unions introduced. Industrial" 
                                 " production is down this year.");
             } else {
@@ -507,17 +482,20 @@ void gen_resources(void) {
 }
 
 void update_score(void) {
+    int strength;
+    rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_set_drawmode(DRMODE_BG|DRMODE_INVERSEVID);
     rb->lcd_fillrect(5,LCD_HEIGHT-20,105,20);
     rb->lcd_set_drawmode(DRMODE_SOLID);
+    strength = calc_strength(COLOUR_LIGHT, cursor.x, cursor.y);
     rb->snprintf(buf, sizeof(buf), "Your power: %d.%d", 
-                    calc_strength(COLOUR_LIGHT, cursor.x, cursor.y)/10, 
-                    calc_strength(COLOUR_LIGHT, cursor.x, cursor.y)%10);
+                    strength/10, strength%10);
     rb->lcd_putsxy(5,LCD_HEIGHT-20, buf);
+    strength = calc_strength(COLOUR_DARK, cursor.x, cursor.y);
     rb->snprintf(buf, sizeof(buf), "Comp power: %d.%d", 
-                    calc_strength(COLOUR_DARK, cursor.x, cursor.y)/10,
-                    calc_strength(COLOUR_DARK, cursor.x, cursor.y)%10);
+                    strength/10, strength%10);
     rb->lcd_putsxy(5,LCD_HEIGHT-10, buf);
+    rb->lcd_setfont(FONT_UI);
 }
 
 int settings_menu_function(void) {
@@ -527,55 +505,52 @@ int settings_menu_function(void) {
                     "Computer starting farms","Computer starting factories",
                     "Human starting farms","Human starting factories",
                     "Starting cash","Starting food","Moves per turn");
-settings_menu:
-    selection=rb->do_menu(&settings_menu,&selection, NULL, false);
-    switch(selection) {
+
+    while(1) {
+        selection=rb->do_menu(&settings_menu,&selection, NULL, false);
+        switch(selection) {
         case 0:
             rb->set_int("Computer starting farms", "", UNIT_INT, 
                             &superdom_settings.compstartfarms, NULL, 
                             1, 0, 5, NULL);
-            goto settings_menu;
             break;
         case 1:
             rb->set_int("Computer starting factories", "", UNIT_INT, 
                             &superdom_settings.compstartinds, NULL, 
                             1, 0, 5, NULL);
-            goto settings_menu;
             break;
         case 2:
             rb->set_int("Human starting farms", "", UNIT_INT, 
                             &superdom_settings.humanstartfarms, NULL, 
                             1, 0, 5, NULL);
-            goto settings_menu;
             break;
         case 3:
-            superdom_settings.humanstartinds = 
-                    rb->set_int("Human starting factories", "", UNIT_INT, 
-                            &superdom_settings.humanstartinds, NULL, 
-                            1, 0, 5, NULL);
-            goto settings_menu;
+            rb->set_int("Human starting factories", "", UNIT_INT,
+                    &superdom_settings.humanstartinds, NULL,
+                    1, 0, 5, NULL);
             break;
         case 4:
             rb->set_int("Starting cash", "", UNIT_INT, 
                             &superdom_settings.startcash, NULL, 
                             250, 0, 5000, NULL);
-            goto settings_menu;
             break;
         case 5:
             rb->set_int("Starting food", "", UNIT_INT, 
                             &superdom_settings.startfood, NULL, 
                             250, 0, 5000, NULL);
-            goto settings_menu;
             break;
         case 6:
             rb->set_int("Moves per turn", "", UNIT_INT, 
                             &superdom_settings.movesperturn, NULL,
                             1, 1, 5, NULL);
-            goto settings_menu;
             break;
         case MENU_ATTACHED_USB:
             return PLUGIN_USB_CONNECTED;
             break;
+        case GO_TO_PREVIOUS:
+            return 0;
+            break;
+        }
     }
     return 0;
 }
@@ -688,7 +663,8 @@ int save_game(void) {
         return -1;
     }    
     
-    rb->write(fd, "SSGv2", 5);
+    rb->write(fd, "SSGv3", 5);
+    rb->write(fd, &gamestate, sizeof(gamestate));
     rb->write(fd, &humanres.cash, sizeof(humanres.cash));
     rb->write(fd, &humanres.food, sizeof(humanres.food));
     rb->write(fd, &humanres.bank, sizeof(humanres.bank));
@@ -747,6 +723,9 @@ int ingame_menu(void) {
         case MENU_ATTACHED_USB:
             return PLUGIN_USB_CONNECTED;
             break;
+        case GO_TO_PREVIOUS:
+            return 0;
+            break;
     }
     return 0;
 }
@@ -754,6 +733,9 @@ int ingame_menu(void) {
 int get_number(char* param, int* value) {
     //int numbers[3][3] = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     int numbers[3][3];
+    int i,j,x=0,y=0;
+    int height, width;
+    int button = 0;
     numbers[0][0] = 1;
     numbers[0][1] = 2;
     numbers[0][2] = 3;
@@ -765,7 +747,6 @@ int get_number(char* param, int* value) {
     numbers[2][2] = 9;
     rb->lcd_clear_display();
     /* Draw a 3x4 grid */
-    int i,j,x=0,y=0;
     for(i=0;i<=3;i++) {  /* Vertical lines */
         rb->lcd_vline(NUM_MARGIN_X+(NUM_BOX_WIDTH*i), NUM_MARGIN_Y,
                       NUM_MARGIN_Y+(4*NUM_BOX_HEIGHT));
@@ -774,13 +755,11 @@ int get_number(char* param, int* value) {
         rb->lcd_hline(NUM_MARGIN_X, NUM_MARGIN_X+(3*NUM_BOX_WIDTH),
                       NUM_MARGIN_Y+(NUM_BOX_HEIGHT*i));
     }
-    int temp = 1;
     for(i=0;i<3;i++) {
         for(j=0;j<3;j++) {
-            rb->snprintf(buf, sizeof(buf), "%d", temp);
+            rb->snprintf(buf, sizeof(buf), "%d", numbers[i][j]);
             rb->lcd_putsxy(NUM_MARGIN_X+(j*NUM_BOX_WIDTH)+10, 
                             NUM_MARGIN_Y+(i*NUM_BOX_HEIGHT)+8, buf);
-            temp++;
         }
     }
     rb->lcd_putsxy(NUM_MARGIN_X+5, NUM_MARGIN_Y+(3*NUM_BOX_HEIGHT)+8, "CLR");
@@ -790,7 +769,6 @@ int get_number(char* param, int* value) {
                     NUM_MARGIN_Y+(3*NUM_BOX_HEIGHT)+8, "OK");
     rb->snprintf(buf,sizeof(buf), "%d", *value);
     rb->lcd_putsxy(NUM_MARGIN_X+10, NUM_MARGIN_Y+4*NUM_BOX_HEIGHT+10, buf);
-    int height, width;
     rb->lcd_getstringsize(param, &width, &height);
     rb->lcd_putsxy((LCD_WIDTH-width)/2, (NUM_MARGIN_Y-height)/2, param);
     rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
@@ -798,19 +776,19 @@ int get_number(char* param, int* value) {
                     NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y), NUM_BOX_WIDTH+1, 
                     NUM_BOX_HEIGHT+1);
     rb->lcd_set_drawmode(DRMODE_SOLID);
-    int button = 0;
     rb->lcd_update();
     while(1) {
         button = rb->button_get(true);
         switch(button) {
             case SUPERDOM_OK:
-                *value *= 10;
                 if(y!=3) {
+                    *value *= 10;
                     *value += numbers[y][x];
-                } else if(y==3 && x==0) {
-                    *value /= 100;
-                } else if(y==3 && x==2) {
+                } else if(x==0) {
                     *value /= 10;
+                } else if(x==1) {
+                    *value *= 10;
+                } else if(x==2) {
                     return 0;
                 }
                 rb->lcd_set_drawmode(DRMODE_BG|DRMODE_INVERSEVID);
@@ -822,7 +800,9 @@ int get_number(char* param, int* value) {
                                 NUM_MARGIN_Y+4*NUM_BOX_HEIGHT+10, buf);
                 break;
             case SUPERDOM_CANCEL:
-                return 0;
+                *value = 0;
+                rb->splash(HZ, "Cancelled");
+                return 2;
                 break;
 #if CONFIG_KEYPAD != IRIVER_H10_PAD
             case SUPERDOM_LEFT:
@@ -932,329 +912,387 @@ int get_number(char* param, int* value) {
     return 0;
 }
 
-int buy_resources_menu(void) {
-    int selection,tempmenu,nummen;
-
-    MENUITEM_STRINGLIST(res_menu, "Buy Resources", NULL, "Buy men ($1)", 
-                    "Buy tank ($300)", "Buy plane ($600)", "Buy Farm ($1150)", 
-                    "Buy Factory ($1300)", "Buy Nuke ($2000)", 
-                    "Finish buying", "Game menu");
-
-resources_menu:
-    selection=rb->do_menu(&res_menu,&selection, NULL, false);
-    switch(selection) {
+bool tile_has_item(int type, int x, int y) {
+    switch(type) {
         case 0:
-            nummen = 0;
-            if(get_number("How many men would you like?", &nummen)
-                            == PLUGIN_USB_CONNECTED)
-                return PLUGIN_USB_CONNECTED;
-            if(humanres.cash>=nummen) {
-                rb->splash(HZ, "Where do you want to place them?");
-                tempmenu = select_square();
-                switch(tempmenu) {
-                    case 0:
-                        rb->splash(HZ, "Cancelled");
-                        break;
-                    case 2:
-                        if(board[cursor.x][cursor.y].colour == COLOUR_LIGHT) {
-                            humanres.men += nummen;
-                            board[cursor.x][cursor.y].men += nummen;
-                            humanres.cash -= nummen;
-                        } else {
-                            rb->splash(HZ,"Can't place men on enemy territory");
-                        }
-                        break;
-                    case PLUGIN_USB_CONNECTED:
-                        return PLUGIN_USB_CONNECTED;
-                        break;
-                }
-            } else {
-                rb->splash(HZ, "Not enough money!");
-            }
-            goto resources_menu;
+            return (board[x][y].men > 0);
             break;
         case 1:
-            if(humanres.cash>=300) {
-                rb->splash(HZ, "Where do you want to place the tank?");
-                tempmenu = select_square();
-                switch(tempmenu) {
-                    case 0:
-                        rb->splash(HZ, "Cancelled");
-                        goto resources_menu;
-                        break;
-                    case PLUGIN_USB_CONNECTED:
-                        return PLUGIN_USB_CONNECTED;
-                        break;
-                }
-                if(board[cursor.x][cursor.y].colour == COLOUR_LIGHT) {
-                    if(board[cursor.x][cursor.y].tank) {
-                        rb->splash(HZ, "There is already a tank there");
-                    } else {
-                        board[cursor.x][cursor.y].tank = true;
-                        humanres.cash -= 300;
-                        humanres.tanks++;
-                    }
-                } else {
-                    rb->splash(HZ, "Can't place men on enemy territory");
-                }
-            } else {
-                rb->splash(HZ, "Not enough money!");
-            }
-            goto resources_menu;
+            return board[x][y].tank;
             break;
         case 2:
-            if(humanres.cash>=600) {
-                rb->splash(HZ, "Where do you want to place the plane?");
-                tempmenu = select_square();
-                switch(tempmenu) {
-                    case 0:
-                        rb->splash(HZ, "Cancelled");
-                        goto resources_menu;
-                        break;
-                    case PLUGIN_USB_CONNECTED:
-                        return PLUGIN_USB_CONNECTED;
-                        break;
-                }
-                if(board[cursor.x][cursor.y].colour == COLOUR_LIGHT) {
-                    if(board[cursor.x][cursor.y].plane) {
-                        rb->splash(HZ, "There is already a plane there");
-                    } else {
-                        board[cursor.x][cursor.y].plane = true;
-                        humanres.cash -= 600;
-                        humanres.planes++;
-                    }
-                } else {
-                    rb->splash(HZ, "Can't place men on enemy territory");
-                }
-            } else {
-                rb->splash(HZ, "Not enough money!");
-            }
-            goto resources_menu;
+            return board[x][y].plane;
             break;
         case 3:
-            if(humanres.cash>=1150) {
-                rb->splash(HZ, "Where do you want to place the farm?");
-                tempmenu = select_square();
-                switch(tempmenu) {
-                    case 0:
-                        rb->splash(HZ, "Cancelled");
-                        goto resources_menu;
-                        break;
-                    case PLUGIN_USB_CONNECTED:
-                        return PLUGIN_USB_CONNECTED;
-                        break;
-                }
-                if(board[cursor.x][cursor.y].colour == COLOUR_LIGHT) {
-                    if(board[cursor.x][cursor.y].farm) {
-                        rb->splash(HZ, "There is already a farm there");
-                    } else {
-                        board[cursor.x][cursor.y].farm = true;
-                        humanres.cash -= 1150;
-                        humanres.farms++;
-                    }
-                } else {
-                    rb->splash(HZ, "Can't build on enemy territory");
-                }
-            } else {
-                rb->splash(HZ, "Not enough money!");
-            }
-            goto resources_menu;
+            return board[x][y].farm;
             break;
         case 4:
-            if(humanres.cash>=1300) {
-                rb->splash(HZ, "Where do you want to place the industrial" 
-                               " plant?");
-                tempmenu = select_square();
-                switch(tempmenu) {
-                    case 0:
-                        rb->splash(HZ, "Cancelled");
-                        goto resources_menu;
-                        break;
-                    case PLUGIN_USB_CONNECTED:
-                        return PLUGIN_USB_CONNECTED;
-                        break;
-                }
-                if(board[cursor.x][cursor.y].colour == COLOUR_LIGHT) {
-                    if(board[cursor.x][cursor.y].ind) {
-                        rb->splash(HZ, "There is already an industrial" 
-                                       " plant there");
-                    } else {
-                        board[cursor.x][cursor.y].ind = true;
-                        humanres.cash -= 1300;
-                        humanres.inds++;
-                    }
-                } else {
-                    rb->splash(HZ, "Can't build on enemy territory");
-                }
-            } else {
-                rb->splash(HZ, "Not enough money!");
-            }
-            goto resources_menu;
+            return board[x][y].ind;
             break;
         case 5:
-            if(humanres.cash>=2000) {
-                rb->splash(HZ, "Where do you want to place the nuke?");
-                tempmenu = select_square();
-                switch(tempmenu) {
-                    case 0:
-                        rb->splash(HZ, "Cancelled");
-                        goto resources_menu;
-                        break;
-                    case PLUGIN_USB_CONNECTED:
-                        return PLUGIN_USB_CONNECTED;
-                        break;
-                }
-                if(board[cursor.x][cursor.y].colour == COLOUR_LIGHT) {
-                    if(board[cursor.x][cursor.y].nuke) {
-                        rb->splash(HZ, "There is already a nuke there");
-                    } else {
-                        board[cursor.x][cursor.y].nuke = true;
-                        humanres.cash -= 2000;
-                        humanres.nukes++;
-                    }
-                } else {
-                    rb->splash(HZ, "Can't place a nuke on enemy territory");
-                }
-            } else {
-                rb->splash(HZ, "Not enough money!");
+            return board[x][y].nuke;
+            break;
+    }
+    return false;
+}
+
+int buy_resources(int colour, int type, int x, int y, int nummen) {
+    const char *itemnames[][6] = {
+        {
+            "them",
+            "the tank",
+            "the plane",
+            "the farm",
+            "the industrial plant",
+            "the nuke",
+        }, {
+            "place men",
+            "place a tank",
+            "place a plane",
+            "build a farm",
+            "build an industrial plant",
+            "place a nuke",
+        }, {
+            NULL,
+            "a tank",
+            "a plane",
+            "a farm",
+            "an industrial plant",
+            "a nuke",
+        },
+    };
+
+    bool human = (colour == COLOUR_LIGHT);
+    int price = 0;
+    struct resources *res;
+
+    if(human) {
+        res = &humanres;
+    } else {
+        res = &compres;
+    }
+    switch(type) {
+        case 0: /* men */
+            price = 1*nummen;
+            break;
+        case 1: /* tank */
+            price = 300;
+            break;
+        case 2: /* plane */
+            price = 600;
+            break;
+        case 3: /* Farm */
+            price = 1150;
+            break;
+        case 4: /* Factory */
+            price = 1300;
+            break;
+        case 5: /* nuke */
+            price = 2000;
+            break;
+    }
+    if(res->cash < price) {
+        if(human)
+            rb->splash(HZ, "Not enough money!");
+        return 2;
+    }
+    if(human) {
+        rb->splashf(HZ, "Where do you want to place %s?", itemnames[0][type]);
+        switch(select_square()) {
+            case 2:
+                return 2;
+                break;
+            case PLUGIN_USB_CONNECTED:
+                return PLUGIN_USB_CONNECTED;
+                break;
+        }
+        x = cursor.x;
+        y = cursor.y;
+    }
+    if(board[x][y].colour != colour) {
+        if(human)
+            rb->splashf(HZ, "Can't %s on enemy territory", itemnames[1][type]);
+        return 2;
+    }
+    if(type != 0 && tile_has_item(type, x, y)) {
+        if(human)
+            rb->splashf(HZ, "There is already %s there", itemnames[2][type]);
+        return 2;
+    }
+    switch(type) {
+        case 0:
+            board[x][y].men += nummen;
+            res->men += nummen;
+            break;
+        case 1:
+            board[x][y].tank = true;
+            res->tanks++;
+            break;
+        case 2:
+            board[x][y].plane = true;
+            res->planes++;
+            break;
+        case 3:
+            board[x][y].farm = true;
+            res->farms++;
+            break;
+        case 4:
+            board[x][y].ind = true;
+            res->inds++;
+            break;
+        case 5:
+            board[x][y].nuke = true;
+            res->nukes++;
+            break;
+    }
+    res->cash -= price;
+
+    draw_board();
+    rb->sleep(HZ);
+
+    return 0;
+}
+
+int buy_resources_menu(void) {
+    int selection,nummen;
+
+    MENUITEM_STRINGLIST(res_menu, "Buy Resources", NULL, "Buy men ($1)",
+                    "Buy tank ($300)", "Buy plane ($600)", "Buy Farm ($1150)",
+                    "Buy Factory ($1300)", "Buy Nuke ($2000)",
+                    "Finish buying");
+
+    while(1) {
+        selection=rb->do_menu(&res_menu,&selection, NULL, false);
+        switch(selection) {
+            case 0:
+                nummen = 0;
+                if(get_number("How many men would you like?", &nummen)
+                                == PLUGIN_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
+                if(!nummen)
+                    break;
+                /* fall through */
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                if(buy_resources(COLOUR_LIGHT, selection, 0, 0, nummen)
+                    == PLUGIN_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
+                break;
+            case 6:
+                return 0;
+                break;
+            case MENU_ATTACHED_USB:
+                return PLUGIN_USB_CONNECTED;
+                break;
+            case GO_TO_PREVIOUS:
+                return 0;
+                break;
+        }
+    }
+    return 0;
+}
+
+int move_unit(int colour, int type, int fromx, int fromy,
+                int tox, int toy, int nummen) {
+    const char *itemnames[][3] = {
+        {
+            "troops",
+            "the tank",
+            "the plane",
+        }, {
+            "any troops",
+            "a tank",
+            "a plane",
+        }, {
+            "the troops",
+            "the tank",
+            "the plane",
+        }
+    };
+    bool human = (colour == COLOUR_LIGHT);
+
+    if(human) {
+        rb->splashf(HZ, "Select where you want to move %s from",
+                        itemnames[0][type]);
+        switch(select_square()) {
+            case 2:
+                return 2;
+                break;
+            case PLUGIN_USB_CONNECTED:
+                return PLUGIN_USB_CONNECTED;
+                break;
+        }
+        fromx = cursor.x;
+        fromy = cursor.y;
+    }
+    if(board[fromx][fromy].colour != colour) {
+        if(human)
+            rb->splash(HZ, "That isn't your territory");
+        return 2;
+    }
+    if(!tile_has_item(type, fromx, fromy)) {
+        if(human)
+            rb->splashf(HZ, "You don't have %s there", itemnames[1][type]);
+        return 2;
+    }
+    if(type == 0) {
+        if(human) {
+            nummen = board[fromx][fromy].men;
+            switch(get_number("How many men do you want to move?", &nummen)) {
+                case 2:
+                    return 2;
+                    break;
+                case PLUGIN_USB_CONNECTED:
+                    return PLUGIN_USB_CONNECTED;
+                    break;
             }
-            goto resources_menu;
+        }
+        if(nummen > board[fromx][fromy].men) {
+            if(human)
+                rb->splash(HZ, "You don't have that many troops.");
+            return 2;
+        }
+    }
+    if(human) {
+        rb->splashf(HZ, "Select where you want to move %s to",
+                        itemnames[2][type]);
+        switch(select_square()) {
+            case 2:
+                return 2;
+                break;
+            case PLUGIN_USB_CONNECTED:
+                return PLUGIN_USB_CONNECTED;
+                break;
+        }
+        tox = cursor.x;
+        toy = cursor.y;
+    }
+    if((tox == fromx && toy == fromy) ||
+       board[tox][toy].colour != colour ||
+       (type != 2 && (abs(tox - fromx) > 1 || abs(toy - fromy) > 1))) {
+        if(human)
+            rb->splash(HZ, "Invalid move");
+        return 2;
+    }
+    if(type != 0 && tile_has_item(type, tox, toy)) {
+        if(human)
+            rb->splashf(HZ, "There is already %s there", itemnames[1][type]);
+        return 2;
+    }
+    switch(type) {
+        case 0:
+            board[fromx][fromy].men -= nummen;
+            board[tox][toy].men += nummen;
             break;
-        case 6:
-            return 0;
+        case 1:
+            board[fromx][fromy].tank = false;
+            board[tox][toy].tank = true;
             break;
-        case MENU_ATTACHED_USB:
-            return PLUGIN_USB_CONNECTED;
+        case 2:
+            board[fromx][fromy].plane = false;
+            board[tox][toy].plane = true;
             break;
     }
     return 0;
 }
 
-int move_unit(void) {
-    int selection, nummen;
-    struct cursor from;
+int move_unit_menu(void) {
+    int selection;
 
     MENUITEM_STRINGLIST(move_unit_menu, "Move unit", NULL, "Move men", 
                     "Move tank", "Move plane");
     selection=rb->do_menu(&move_unit_menu,&selection, NULL, false);
     switch(selection) {
         case 0:
-            rb->splash(HZ, "Select where to move troops from");
-            if(select_square() == PLUGIN_USB_CONNECTED)
-                return PLUGIN_USB_CONNECTED;
-            if(board[cursor.x][cursor.y].colour == COLOUR_LIGHT) {
-                if(board[cursor.x][cursor.y].men) {
-                    from.x = cursor.x;
-                    from.y = cursor.y;
-                    nummen = board[from.x][from.y].men;
-                    if(get_number("How many men do you want to move?", 
-                                           &nummen) == PLUGIN_USB_CONNECTED)
-                        return PLUGIN_USB_CONNECTED;
-                    if(nummen > board[from.x][from.y].men) {
-                        rb->splash(HZ, "You don't have that many troops.");
-                    } else {
-                        rb->splash(HZ,"Select where to move the troops to");
-                        if(select_square() == PLUGIN_USB_CONNECTED)
-                            return PLUGIN_USB_CONNECTED;
-                        if((board[cursor.x][cursor.y].colour == COLOUR_LIGHT) && 
-                                        (abs(cursor.x - from.x) <= 1) && 
-                                        abs(cursor.y - from.y) <= 1) {
-                            board[from.x][from.y].men -= nummen;
-                            board[cursor.x][cursor.y].men += nummen;
-                            humanres.moves--;
-                            return 0;
-                        }
-                    }
-                } else {
-                    rb->splash(HZ, "You don't have any troops there");
-                }
-            } else {
-                rb->splash(HZ, "Can't move enemy troops");
-            }
-            break;
         case 1:
-            rb->splash(HZ, "Select where you want to move the tank from");
-            if(select_square() == PLUGIN_USB_CONNECTED)
-                return PLUGIN_USB_CONNECTED;
-            if(board[cursor.x][cursor.y].colour == COLOUR_LIGHT) {
-                if(board[cursor.x][cursor.y].tank) {
-                    from.x = cursor.x;
-                    from.y = cursor.y;
-                    rb->splash(HZ, "Select where you want" 
-                                   " to move the tank to");
-                    if(select_square() == PLUGIN_USB_CONNECTED)
-                        return PLUGIN_USB_CONNECTED;
-                    if((board[cursor.x][cursor.y].colour == COLOUR_LIGHT)&& 
-                                    (abs(cursor.x-from.x) <= 1) && 
-                                    (abs(cursor.y-from.y) <= 1)) {
-                        if(board[cursor.x][cursor.y].tank) {
-                            rb->splash(HZ, "There is already a tank there");
-                        } else {
-                            board[from.x][from.y].tank = false;
-                            board[cursor.x][cursor.y].tank = true;
-                            humanres.moves--;
-                            return 0;
-                        }
-                    } else {
-                        rb->splash(HZ, "Invalid move");
-                    }
-                } else {
-                    rb->splash(HZ, "You don't have a tank there");
-                }
-            } else {
-                rb->splash(HZ, "That isn't your territory");
-            }
-            break;
         case 2:
-            rb->splash(HZ, "Select where you want"
-                           " to move the plane from");
-            if(select_square() == PLUGIN_USB_CONNECTED)
-                return PLUGIN_USB_CONNECTED;
-            if(board[cursor.x][cursor.y].colour == COLOUR_LIGHT) {
-                if(board[cursor.x][cursor.y].plane) {
-                    from.x = cursor.x;
-                    from.y = cursor.y;
-                    rb->splash(HZ, "Select where you want" 
-                                   " to move the plane to");
-                    if(select_square() == PLUGIN_USB_CONNECTED)
-                        return PLUGIN_USB_CONNECTED;
-                    if(board[cursor.x][cursor.y].colour == COLOUR_LIGHT) {  
-                        if(board[cursor.x][cursor.y].plane) {
-                            rb->splash(HZ,"There is already a plane there");
-                        } else {
-                            board[from.x][from.y].plane = false;
-                            board[cursor.x][cursor.y].plane = true;
-                            humanres.moves--;
-                            return 0;
-                        }
-                    } else {
-                        rb->splash(HZ, "Invalid move");
-                    }
-                } else {
-                    rb->splash(HZ, "You don't have a plane there");
-                }
-            } else {
-                rb->splash(HZ, "That isn't your territory");
+            switch(move_unit(COLOUR_LIGHT, selection, 0, 0, 0, 0, 0)) {
+                case 0:
+                    humanres.moves--;
+                    break;
+                case PLUGIN_USB_CONNECTED:
+                    return PLUGIN_USB_CONNECTED;
+                    break;
             }
             break;
+        case MENU_ATTACHED_USB:
+            return PLUGIN_USB_CONNECTED;
     }
+    return 0;
+}
+
+int launch_nuke(int colour, int nukex, int nukey, int targetx, int targety) {
+    bool human = (colour == COLOUR_LIGHT);
+    struct resources *res;
+
+    if(board[nukex][nukey].colour != colour) {
+        if(human)
+            rb->splash(HZ, "That isn't your territory");
+        return 2;
+    }
+    if(! board[nukex][nukey].nuke) {
+        if(human)
+            rb->splashf(HZ, "You don't have %s there", "a nuke");
+        return 2;
+    }
+    if(human) {
+        rb->splash(HZ, "Select place to target with nuke");
+        switch(select_square()) {
+            case 2:
+                return 2;
+                break;
+            case PLUGIN_USB_CONNECTED:
+                return PLUGIN_USB_CONNECTED;
+                break;
+        }
+        targetx = cursor.x;
+        targety = cursor.y;
+    }
+    if(human) {
+        humanres.nukes--;
+    } else {
+        compres.nukes--;
+    }
+    board[nukex][nukey].nuke = false;
+
+    if(board[targetx][targety].colour == COLOUR_LIGHT) {
+        res = &humanres;
+    } else {
+        res = &compres;
+    }
+    res->men -= board[targetx][targety].men;
+    res->tanks -= board[targetx][targety].tank;
+    res->planes -= board[targetx][targety].plane;
+    res->nukes -= board[targetx][targety].nuke;
+    res->farms -= board[targetx][targety].farm;
+    res->inds -= board[targetx][targety].ind;
+    board[targetx][targety].men = 0;
+    board[targetx][targety].tank = false;
+    board[targetx][targety].plane = false;
+    board[targetx][targety].ind = false;
+    board[targetx][targety].nuke = false;
+    board[targetx][targety].farm = false;
+    /* TODO: Fallout carried by wind */
+
     return 0;
 }
 
 int movement_menu(void) {
     int selection, tempmenu;
-    bool menu_quit = false;
 
     MENUITEM_STRINGLIST(move_menu, "Movement", NULL, "Move unit", 
                     "Buy additional moves ($100)", "Launch nuclear missile", 
                     "Check map", "Finish moving", "Game menu");
 
-    while(!menu_quit) {
+    while(1) {
         selection=rb->do_menu(&move_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
                 if(humanres.moves) {
-                    if(move_unit()==PLUGIN_USB_CONNECTED)
+                    if(move_unit_menu()==PLUGIN_USB_CONNECTED)
                         return PLUGIN_USB_CONNECTED;
                 } else {
                     rb->splash(HZ, "You have no more moves left." 
@@ -1275,21 +1313,15 @@ int movement_menu(void) {
                     rb->splash(HZ, "You do not have any nukes to launch");
                 } else {
                     rb->splash(HZ, "Select place to launch nuke from");
-                    if(select_square() == PLUGIN_USB_CONNECTED) {
-                        return PLUGIN_USB_CONNECTED;
-                    }
-                    if(board[cursor.x][cursor.y].nuke) {
-                        rb->splash(HZ, "Select place to target with nuke");
-                        if(select_square() == PLUGIN_USB_CONNECTED) {
+                    switch(select_square()) {
+                        case 0:
+                            if(launch_nuke(COLOUR_LIGHT, cursor.x, cursor.y,
+                                0, 0) == PLUGIN_USB_CONNECTED)
+                                return PLUGIN_USB_CONNECTED;
+                            break;
+                        case PLUGIN_USB_CONNECTED:
                             return PLUGIN_USB_CONNECTED;
-                        }
-                        board[cursor.x][cursor.y].men = 0;
-                        board[cursor.x][cursor.y].tank = 0;
-                        board[cursor.x][cursor.y].plane = 0;
-                        board[cursor.x][cursor.y].ind = 0;
-                        board[cursor.x][cursor.y].nuke = 0;
-                        board[cursor.x][cursor.y].farm = 0;
-                        /* TODO: Fallout carried by wind */
+                            break;
                     }
                 }
                 break;
@@ -1320,8 +1352,6 @@ int movement_menu(void) {
 }
 
 int show_inventory(void) {
-    rb->lcd_clear_display();
-    rb->lcd_puts(1, 0, "Inventory");
     char men[20], tanks[20], planes[20], inds[20], farms[20], nukes[20], 
          cash[20], food[20], bank[20];
     rb->snprintf(men, sizeof(men), "Men: %d", humanres.men);
@@ -1333,6 +1363,8 @@ int show_inventory(void) {
     rb->snprintf(cash, sizeof(cash), "Cash: %d", humanres.cash);
     rb->snprintf(food, sizeof(food), "Food: %d", humanres.food);
     rb->snprintf(bank, sizeof(bank), "Bank: %d", humanres.bank);
+    rb->lcd_clear_display();
+    rb->lcd_puts(1, 0, "Inventory");
     rb->lcd_puts(2, 1, men);
     rb->lcd_puts(2, 2, tanks);
     rb->lcd_puts(2, 3, planes);
@@ -1361,38 +1393,16 @@ int production_menu(void) {
         selection=rb->do_menu(&prod_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
-                tempmenu = buy_resources_menu();
-                switch(tempmenu) {
-                    case PLUGIN_USB_CONNECTED:
-                        return PLUGIN_USB_CONNECTED;
-                        break;
-                    case SUPERDOM_QUIT:
-                        return SUPERDOM_QUIT;
-                        break;
-                }
+                if(buy_resources_menu() == PLUGIN_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
                 break;
             case 1:
-                tempmenu = show_inventory();
-                switch(tempmenu) {
-                    case 0:
-                        break;
-                    case PLUGIN_USB_CONNECTED:
-                        return PLUGIN_USB_CONNECTED;
-                        break;
-                }
+                if(show_inventory() == PLUGIN_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
                 break;
             case 2:
-                tempmenu = select_square();
-                switch(tempmenu) {
-                    case PLUGIN_USB_CONNECTED:
-                        return PLUGIN_USB_CONNECTED;
-                        break;
-                    case SUPERDOM_QUIT:
-                        return SUPERDOM_QUIT;
-                        break;
-                    case 0:
-                        break;
-                }
+                if(select_square() == PLUGIN_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
                 break;
             case 3:
                 tempbank = humanres.cash;
@@ -1464,25 +1474,28 @@ void init_resources(void) {
 }
 
 int select_square(void) {
+    int button = 0;
     draw_board();
     draw_cursor();
     update_score();
 #if LCD_WIDTH >= 220
+    rb->lcd_setfont(FONT_SYSFIXED);
     rb->snprintf(buf, sizeof(buf), "Cash: %d", humanres.cash);
     rb->lcd_putsxy(125, LCD_HEIGHT-20, buf);
     rb->snprintf(buf, sizeof(buf), "Food: %d", humanres.food);
     rb->lcd_putsxy(125, LCD_HEIGHT-10, buf);
+    rb->lcd_setfont(FONT_UI);
 #endif
     rb->lcd_update();
-    int button = 0;
     while(1) {
         button = rb->button_get(true);
         switch(button) {
             case SUPERDOM_CANCEL:
-                return 0;
+                rb->splash(HZ, "Cancelled");
+                return 2;
                 break;
             case SUPERDOM_OK:
-                return 2;
+                return 0;
                 break;
 #if CONFIG_KEYPAD != IRIVER_H10_PAD
             case SUPERDOM_LEFT:
@@ -1565,7 +1578,8 @@ int select_square(void) {
     }
 }
 
-int killmen(bool human) {
+int killmen(int colour) {
+    bool human = (colour == COLOUR_LIGHT);
     int menkilled,i,j;
     int percent;
     if(human) {
@@ -1576,11 +1590,12 @@ int killmen(bool human) {
         compres.food = 0;
     }
     menkilled = 0;
-    for(i=1;i<12;i++) {
-        for(j=1;j<12;j++) {
-            if(board[i][j].colour == human) {
-                menkilled += ((board[i][j].men * percent)/1000);
-                board[i][j].men = (board[i][j].men * percent)/1000;
+    for(i=1;i<11;i++) {
+        for(j=1;j<11;j++) {
+            if(board[i][j].colour == colour) {
+                int nummen = ((board[i][j].men * percent)/1000);
+                menkilled += board[i][j].men - nummen;
+                board[i][j].men = nummen;
             }
         }
     }
@@ -1592,54 +1607,82 @@ int killmen(bool human) {
     return menkilled;
 }
 
+/* return -1 if error, 1 if attack is succeeded, 0 otherwise */
+int attack_territory(int colour, int x, int y) {
+    bool human = (colour == COLOUR_LIGHT);
+    int str_diff;
+
+    if(board[x][y].colour == colour) {
+        if(human)
+            rb->splash(HZ, "You can't attack your own territory");
+        return -1;
+    }
+    str_diff = calc_strength(COLOUR_DARK, x, y) -
+               calc_strength(COLOUR_LIGHT, x, y);
+    if(human) {
+        str_diff = -str_diff;
+    }
+    rb->srand(*rb->current_tick);
+    if(str_diff > 0 || (str_diff == 0 && rb->rand()%2)) {
+        struct resources *offres, *defres;
+        if(human) {
+            offres = &humanres;
+            defres = &compres;
+        } else {
+            offres = &compres;
+            defres = &humanres;
+        }
+        defres->men -= board[x][y].men;
+        defres->tanks -= board[x][y].tank;
+        defres->planes -= board[x][y].plane;
+        defres->nukes -= board[x][y].nuke;
+        defres->farms -= board[x][y].farm;
+        defres->inds -= board[x][y].ind;
+        offres->farms += board[x][y].farm;
+        offres->inds += board[x][y].ind;
+        board[x][y].colour = colour;
+        board[x][y].men = 0;
+        board[x][y].tank = false;
+        board[x][y].plane = false;
+        board[x][y].nuke = false;
+        draw_board();
+        if(human)
+            rb->sleep(HZ*2);
+        else
+            rb->sleep(HZ);
+        return 1;
+    } else {
+        if(human)
+            rb->splash(HZ, "Your troops were unable to overcome"
+                           " the enemy troops");
+        else
+            rb->splash(HZ*2, "The computer attempted to "
+                            "attack, but the invasion was"
+                            " pushed back");
+        return 0;
+    }
+    return 0;
+}
+
 int war_menu(void) {
     int selection, tempmenu;
 
     MENUITEM_STRINGLIST(wartime_menu, "War!", NULL, 
                     "Select territory to attack", "Finish turn", "Game menu");
 
-    humanres.moves = superdom_settings.movesperturn;
     while(humanres.moves) {
         selection=rb->do_menu(&wartime_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
-                if(select_square() == PLUGIN_USB_CONNECTED)
-                    return PLUGIN_USB_CONNECTED;
-                if(board[cursor.x][cursor.y].colour == COLOUR_DARK) {
-                    if(calc_strength(COLOUR_LIGHT, cursor.x, 
-                                     cursor.y) > calc_strength(COLOUR_DARK, 
-                                     cursor.x, cursor.y)) {
-                        board[cursor.x][cursor.y].colour = COLOUR_LIGHT;
-                        board[cursor.x][cursor.y].tank = 0;
-                        board[cursor.x][cursor.y].men = 0;
-                        board[cursor.x][cursor.y].plane = 0;
-                        board[cursor.x][cursor.y].nuke = 0;
-                        draw_board();
-                        rb->sleep(HZ*2);
-                        humanres.moves--;
-                    } else if(calc_strength(COLOUR_LIGHT, cursor.x, cursor.y)==
-                              calc_strength(COLOUR_DARK, cursor.x, cursor.y)) {
-                        if(rb->rand()%2) {
-                            board[cursor.x][cursor.y].colour = COLOUR_LIGHT;
-                            board[cursor.x][cursor.y].tank = 0;
-                            board[cursor.x][cursor.y].men = 0;
-                            board[cursor.x][cursor.y].plane = 0;
-                            board[cursor.x][cursor.y].nuke = 0;
-                            draw_board();
-                            rb->sleep(HZ*2);
+                switch(select_square()) {
+                    case 0:
+                        if(attack_territory(COLOUR_LIGHT, cursor.x, cursor.y)
+                            >= 0)
                             humanres.moves--;
-                        } else {
-                            rb->splash(HZ, "Your troops were unable to" 
-                                           " overcome the enemy troops");
-                            humanres.moves--;
-                        }
-                    } else {
-                        rb->splash(HZ, "Your troops were unable to overcome"
-                                       " the enemy troops");
-                        humanres.moves--;
-                    }
-                } else {
-                    rb->splash(HZ, "You can't attack your own territory");
+                        break;
+                    case PLUGIN_USB_CONNECTED:
+                        return PLUGIN_USB_CONNECTED;
+                        break;
                 }
                 break;
             case 1:
@@ -1668,58 +1711,23 @@ struct threat {
 };
 
 bool place_adjacent(bool tank, int x, int y) {
-    if(tank) {
-        if(!board[x-1][y].tank && (board[x][y].colour==board[x-1][y].colour)) {
-            compres.cash -= 300;
-            board[x-1][y].tank = true;
-            compres.tanks++;
-            return 0;
-        }
-        if(!board[x+1][y].tank && (board[x][y].colour==board[x+1][y].colour)) {
-            compres.cash -= 300;
-            board[x+1][y].tank = true;
-            compres.tanks++;
-            return 0;
-        }
-        if(!board[x][y-1].tank && (board[x][y].colour==board[x][y-1].colour)) {
-            compres.cash -= 300;
-            board[x][y-1].tank = true;
-            compres.tanks++;
-            return 0;
-        }
-        if(!board[x][y+1].tank && (board[x][y].colour==board[x][y+1].colour)) {
-            compres.cash -= 300;
-            board[x][y+1].tank = true;
-            compres.tanks++;
-            return 0;
-        }
-    } else {
-        if(!board[x-1][y].plane && (board[x][y].colour==board[x-1][y].colour)) {
-            compres.cash -= 600;
-            board[x-1][y].plane = true;
-            compres.planes++;
-            return 0;
-        }
-        if(!board[x+1][y].plane && (board[x][y].colour==board[x+1][y].colour)) {
-            compres.cash -= 600;
-            board[x+1][y].plane = true;
-            compres.planes++;
-            return 0;
-        }
-        if(!board[x][y-1].plane && (board[x][y].colour==board[x][y-1].colour)) {
-            compres.cash -= 600;
-            board[x][y-1].plane = true;
-            compres.planes++;
-            return 0;
-        }
-        if(!board[x][y+1].plane && (board[x][y].colour==board[x][y+1].colour)) {
-            compres.cash -= 600;
-            board[x][y+1].plane = true;
-            compres.planes++;
-            return 0;
-        }
+    int type = (tank? 1: 2);
+    if(!buy_resources(COLOUR_DARK, type, x, y, 0)) {
+        return true;
     }
-    return 1;
+    if(!buy_resources(COLOUR_DARK, type, x-1, y, 0)) {
+        return true;
+    }
+    if(!buy_resources(COLOUR_DARK, type, x+1, y, 0)) {
+        return true;
+    }
+    if(!buy_resources(COLOUR_DARK, type, x, y-1, 0)) {
+        return true;
+    }
+    if(!buy_resources(COLOUR_DARK, type, x, y+1, 0)) {
+        return true;
+    }
+    return false;
 }
 
 bool has_adjacent(int x, int y) {
@@ -1733,61 +1741,28 @@ bool has_adjacent(int x, int y) {
         return 0;
 }
 
-void find_adjacent(int x, int y, int* adj_x, int* adj_y, bool* full) {
+void find_adjacent(int x, int y, int* adj_x, int* adj_y) {
     /* Finds adjacent squares, returning squares without tanks on them
      * in preference to those with them */
-    if(((board[x-1][y].tank && (board[x-1][y].colour == COLOUR_DARK)) ||
-        board[x-1][y].colour != COLOUR_DARK) &&
-       ((board[x+1][y].tank && (board[x+1][y].colour == COLOUR_DARK)) ||
-        board[x+1][y].colour != COLOUR_DARK) &&
-       ((board[x][y-1].tank && (board[x][y-1].colour == COLOUR_DARK)) ||
-        board[x][y-1].colour != COLOUR_DARK) &&
-       ((board[x][y+1].tank && (board[x][y+1].colour == COLOUR_DARK)) || 
-        board[x][y+1].colour != COLOUR_DARK)) {
-        *full = true;
-    } else {
-        *full = false;
-    }
-
     if(board[x-1][y].colour == COLOUR_DARK) {
         *adj_x = x-1;
         *adj_y = y;
-        if(board[x-1][y].tank) {
-            if(*full)
-                return;
-        } else {
-            return;
-        }
+        return;
     }
     if(board[x+1][y].colour == COLOUR_DARK) {
         *adj_x = x+1;
         *adj_y = y;
-        if(board[x+1][y].tank) {
-            if(*full)
-                return;
-        } else {
-            return;
-        }
+        return;
     }
     if(board[x][y-1].colour == COLOUR_DARK) {
         *adj_x = x;
         *adj_y = y-1;
-        if(board[x][y-1].tank) {
-            if(*full)
-                return;
-        } else {
-            return;
-        }
+        return;
     }
     if(board[x][y+1].colour == COLOUR_DARK) {
         *adj_x = x;
         *adj_y = y+1;
-        if(board[x][y+1].tank) {
-            if(*full)
-                return;
-        } else {
-            return;
-        }
+        return;
     }
 }
 
@@ -1800,24 +1775,27 @@ void computer_allocate(void) {
     struct threat threats[4];
     int numthreats = 0;
     int total_str_diff = 0;
+    int numterritory = 0;
+    int str_diff;
     int men_needed;
     struct threat targets[2];
     int numtargets;
     struct cursor adj;
-    bool full = false;
-    for(i=1;i<12;i++) {
-        for(j=1;j<12;j++) {
-            if((board[i][j].colour == COLOUR_DARK) && 
-               (calc_strength(COLOUR_DARK,i,j) < 
-                calc_strength(COLOUR_LIGHT,i,j))) {
-                if(board[i][j].ind || board[i][j].farm) {
+
+    compres.cash += compres.bank;
+    compres.bank = 0;
+    for(i=1;i<11;i++) {
+        for(j=1;j<11;j++) {
+            if(board[i][j].colour == COLOUR_DARK) {
+                numterritory++;
+                str_diff = calc_strength(COLOUR_LIGHT,i,j) -
+                           calc_strength(COLOUR_DARK,i,j);
+                if(str_diff > 0 && (board[i][j].ind || board[i][j].farm)) {
                     if(numthreats < 3) {
                         offensive = false;
                         threats[numthreats].x = i;
                         threats[numthreats].y = j;
-                        threats[numthreats].str_diff = 
-                                calc_strength(COLOUR_LIGHT,i,j) - 
-                                calc_strength(COLOUR_DARK,i,j);
+                        threats[numthreats].str_diff = str_diff;
                         numthreats++;
                     }
                 }
@@ -1839,87 +1817,56 @@ void computer_allocate(void) {
          * owned by the computer. If none are found just place troops in
          * random places around the map until we run out of money */
         k = 0;
-        while(k<numtargets) {
-            for(i=1;i<12;i++) {
-                for(j=1;j<12;j++) {
-                    if((board[i][j].colour == COLOUR_LIGHT) && 
-                       (board[i][j].ind || board[i][j].farm) &&
-                        has_adjacent(i,j)) {
+        for(i=1;i<11;i++) {
+            for(j=1;j<11;j++) {
+                if(has_adjacent(i,j) &&
+                   (board[i][j].ind || board[i][j].farm)) {
+                    if(k<numtargets) {
                         targets[k].x = i;
                         targets[k].y = j;
-                        targets[k].str_diff = abs(calc_strength(COLOUR_LIGHT, 
-                                              i, j) - calc_strength(COLOUR_DARK,
-                                              i, j));
+                        targets[k].str_diff =
+                                calc_strength(COLOUR_LIGHT, i, j) -
+                                calc_strength(COLOUR_DARK, i, j);
                         k++;
                     }
-                    rb->yield();
                 }
+                rb->yield();
             }
         }
         if(k == 0) {
             /* No targets found! Randomly pick squares and if they're owned 
              * by the computer then stick a tank on it. */
                 rb->srand(*rb->current_tick);
-                while(compres.cash >= 300) {
-                    i = rb->rand()%11 + 1;
-                    j = rb->rand()%11 + 1;
+                while(compres.cash >= 300 && compres.tanks < numterritory) {
+                    i = rb->rand()%10 + 1;
+                    j = rb->rand()%10 + 1;
                     if(board[i][j].colour == COLOUR_DARK) {
-                        if(compres.cash >= 300) {
-                            if(!board[i][j].tank) {
-                                board[i][j].tank = true;
-                                compres.tanks++;
-                                compres.cash -= 300;
-                                draw_board();
-                                rb->sleep(HZ);
-                            }
-                        }
+                        buy_resources(COLOUR_DARK, 1, i, j, 0);
                     }
+                    rb->yield();
                 }
-                compres.bank += compres.cash;
-                compres.cash = 0;
         } else {
             for(i=0;i<k;i++) {
-                men_needed = targets[i].str_diff + 20;
-                find_adjacent(targets[i].x,targets[i].y, &adj.x, &adj.y, &full);
-                while(((calc_strength(COLOUR_LIGHT, targets[i].x, targets[i].y)
-                       + 20) > calc_strength(COLOUR_DARK, targets[i].x, 
-                               targets[i].y)) && compres.cash > 0) {
+                str_diff = targets[i].str_diff;
+                while(str_diff + 20 > 0 && compres.cash > 0) {
                     /* While we still need them keep placing men */
-                    if(compres.cash >= 300 && !full) {
-                        if(board[adj.x][adj.y].tank) {
-                            find_adjacent(targets[i].x, targets[i].y, 
-                                            &adj.x, &adj.y, &full);
-                        } else {
-                            board[adj.x][adj.y].tank = true;
-                            compres.tanks++;
-                            compres.cash -= 300;
-                            draw_board();
-                            rb->sleep(HZ);
+                    if(!place_adjacent(true, targets[i].x, targets[i].y)) {
+                        find_adjacent(targets[i].x, targets[i].y,
+                            &adj.x, &adj.y);
+                        men_needed = (str_diff + 20)*1000/133;
+                        if(compres.cash < men_needed) {
+                            men_needed = compres.cash;
                         }
-                    } else {
-                        men_needed = (calc_strength(COLOUR_LIGHT, targets[i].x,
-                                      targets[i].y) + 20 - 
-                                      calc_strength(COLOUR_DARK, targets[i].x, 
-                                      targets[i].y))*1000/133;
-                        if(compres.cash >= men_needed) {
-                            board[adj.x][adj.y].men += men_needed;
-                            compres.men += men_needed;
-                            compres.cash -= men_needed;
-                            compres.bank += compres.cash;
-                            compres.cash = 0;
-                        } else {
-                            board[adj.x][adj.y].men += compres.cash;
-                            compres.men += compres.cash;
-                            compres.cash = 0;
-                        }
-                        draw_board();
-                        rb->sleep(HZ);
+                        buy_resources(COLOUR_DARK, 0, adj.x, adj.y,
+                                            men_needed);
+                        break;
                     }
+                    str_diff = calc_strength(COLOUR_LIGHT,
+                                      targets[i].x, targets[i].y) -
+                               calc_strength(COLOUR_DARK,
+                                      targets[i].x, targets[i].y);
                 }
             }
-            compres.bank += compres.cash;
-            compres.cash = 0;
-            rb->yield();
         }
     } else {
         /* Work out what to place on each square to defend it.
@@ -1937,93 +1884,42 @@ void computer_allocate(void) {
              * use men as a backup */
             for(i=0;i<numthreats;i++) {
                 men_needed = ((threats[i].str_diff + 20)*1000)/133;
-                if(compres.cash >= men_needed) {
-                    board[threats[i].x][threats[i].y].men += men_needed;
-                    compres.cash -= men_needed;
-                    compres.men += men_needed;
-                    draw_board();
-                    rb->sleep(HZ);
-                } else {
-                    board[threats[i].x][threats[i].y].men += compres.cash;
-                    compres.men += compres.cash;
-                    compres.cash = 0;
-                    draw_board();
-                    rb->sleep(HZ);
+                if(compres.cash < men_needed) {
+                    men_needed = compres.cash;
                 }
-                rb->yield();
-            }
-        } else if((total_str_diff+20)*15 < compres.cash) {
-            /* Enough money to pay their way by planes */
-            for(i=0;i<numthreats;i++) {
-                while(calc_strength(COLOUR_DARK,threats[i].x, threats[i].y) < 
-                      (calc_strength(COLOUR_LIGHT,threats[i].x, threats[i].y) +
-                       20)) {
-                    if(board[threats[i].x][threats[i].y].plane) {
-                        if(place_adjacent(0, threats[i].x, threats[i].y)) {
-                            /* No room for any more planes, revert to men */
-                            men_needed = (calc_strength(COLOUR_LIGHT, 
-                                         threats[i].x, threats[i].y) + 20 - 
-                                         calc_strength(COLOUR_DARK, 
-                                         threats[i].x, threats[i].y)*1000/133);
-                            if(compres.cash >= men_needed) {
-                                compres.cash -= men_needed;
-                                compres.men += men_needed;
-                                board[threats[i].x][threats[i].y].men += 
-                                        men_needed;
-                                draw_board();
-                                rb->sleep(HZ);
-                            }
-                        }
-                    } else {
-                        if(compres.cash >= 600) {
-                            board[threats[i].x][threats[i].y].plane = true;
-                            compres.cash -= 600;
-                            compres.planes++;
-                            draw_board();
-                            rb->sleep(HZ);
-                        }
-                    }
-                }
-                rb->yield();
+                buy_resources(COLOUR_DARK, 0, threats[i].x, threats[i].y,
+                                    men_needed);
             }
         } else {
             /* Tanks it is */
+            /* Enough money to pay their way by planes? */
+            bool tank = ((total_str_diff+20)*15 >= compres.cash);
             for(i=0;i<numthreats;i++) {
-                while(calc_strength(COLOUR_DARK,threats[i].x, threats[i].y) < 
-                      (calc_strength(COLOUR_LIGHT,threats[i].x, threats[i].y) +
-                       20) && compres.cash > 0) {
-                    if(board[threats[i].x][threats[i].y].tank) {
-                        if(place_adjacent(1, threats[i].x, threats[i].y)) {
-                            /* No room for any more tanks, revert to men */
-                            men_needed = (calc_strength(COLOUR_LIGHT, 
-                                         threats[i].x, threats[i].y) + 20 - 
-                                         calc_strength(COLOUR_DARK, 
-                                         threats[i].x, threats[i].y)*1000/133);
-                            if(compres.cash >= men_needed) {
-                                compres.cash -= men_needed;
-                                compres.men += men_needed;
-                                board[threats[i].x][threats[i].y].men += 
-                                        men_needed;
-                                draw_board();
-                                rb->sleep(HZ);
-                            }
+                str_diff = threats[i].str_diff;
+                while(str_diff + 20 > 0) {
+                    if(!place_adjacent(tank, threats[i].x, threats[i].y)) {
+                        /* No room for any more planes or tanks, revert to
+                         * men */
+                        find_adjacent(threats[i].x, threats[i].y,
+                            &adj.x, &adj.y);
+                        men_needed = (str_diff + 20)*1000/133;
+                        if(compres.cash < men_needed) {
+                            men_needed = compres.cash;
                         }
-                    } else {
-                        if(compres.cash >= 300) {
-                            board[threats[i].x][threats[i].y].tank = true;
-                            compres.tanks++;
-                            compres.cash -= 300;
-                            draw_board();
-                            rb->sleep(HZ);
-                        }
+                        buy_resources(COLOUR_DARK, 0, threats[i].x,
+                                        threats[i].y, men_needed);
+                        break;
                     }
+                    str_diff = calc_strength(COLOUR_LIGHT,
+                                      threats[i].x, threats[i].y) -
+                               calc_strength(COLOUR_DARK,
+                                      threats[i].x, threats[i].y);
                 }
-                rb->yield();
             }
         }
-        compres.bank += compres.cash;
-        compres.cash = 0;
     }
+    compres.bank += compres.cash;
+    compres.cash = 0;
 }
 
 int find_adj_target(int x, int y, struct cursor* adj) {
@@ -2059,127 +1955,65 @@ int find_adj_target(int x, int y, struct cursor* adj) {
 void computer_war(void) {
     /* Work out where to attack - prioritise the defence of buildings */
     int i, j;
+    bool found_target = true;
     struct cursor adj;
     
-    while(compres.moves) {
-        for(i=1;i<12;i++) {
-            for(j=1;j<12;j++) {
+    while(found_target) {
+        found_target = false;
+        for(i=1;i<11;i++) {
+            for(j=1;j<11;j++) {
                 if((board[i][j].colour == COLOUR_DARK) &&
-                   (board[i][j].farm || board[i][j].ind)) { 
-                    if(find_adj_target(i, j, &adj) && compres.moves) {
-                        if(calc_strength(COLOUR_LIGHT, adj.x, adj.y) == 
-                                  calc_strength(COLOUR_DARK, adj.x, adj.y)) {
-                                rb->srand(*rb->current_tick);
-                                if(rb->rand()%2) {
-                                    board[adj.x][adj.y].colour = COLOUR_DARK;
-                                    board[adj.x][adj.y].tank = false;
-                                    board[adj.x][adj.y].plane = false;
-                                    board[adj.x][adj.y].nuke = false;
-                                    humanres.men -= board[adj.x][adj.y].men;
-                                    board[adj.x][adj.y].men = 0;
-                                    draw_board();
-                                    rb->sleep(HZ);
-                                    compres.moves--;
-                                } else {
-                                    rb->splash(HZ*2, "The computer attempted"
-                                                     " to attack, but the"
-                                                     " invasion was pushed"
-                                                     " back");
-                                    compres.moves--;
-                                }
-                        } else {
-                            if(compres.moves) {
-                                board[adj.x][adj.y].colour = COLOUR_DARK;
-                                board[adj.x][adj.y].tank = false;
-                                board[adj.x][adj.y].plane = false;
-                                board[adj.x][adj.y].nuke = false;
-                                humanres.men -= board[adj.x][adj.y].men;
-                                board[adj.x][adj.y].men = 0;
-                                draw_board();
-                                rb->sleep(HZ);
-                                compres.moves--;
-                            }
-                        }
+                   (board[i][j].farm || board[i][j].ind) &&
+                   find_adj_target(i, j, &adj)) {
+                    found_target = true;
+                    if(attack_territory(COLOUR_DARK, adj.x, adj.y) >= 0) {
+                        compres.moves--;
+                        if(!compres.moves)
+                            return;
                     }
                 }
                 rb->yield();
             }
         }
-        if(compres.moves) {
-            /* Defence stage done, move on to OFFENCE */
-            for(i=1;i<12;i++) {
-                for(j=1;j<12;j++) {
-                    if(board[i][j].colour == COLOUR_LIGHT && compres.moves &&
-                            (board[i][j].ind || board[i][j].farm) &&
-                            (calc_strength(COLOUR_DARK, i, j) >=
-                             calc_strength(COLOUR_LIGHT, i, j))) {
-                        if(calc_strength(COLOUR_DARK, i, j) ==
-                           calc_strength(COLOUR_LIGHT, i, j)) {
-                            if(rb->rand()%2) {
-                                board[i][j].colour = COLOUR_DARK;
-                                board[i][j].tank = false;
-                                board[i][j].plane = false;
-                                board[i][j].nuke = false;
-                                board[i][j].men = 0;
-                                draw_board();
-                                rb->sleep(HZ);
-                                compres.moves--;
-                            } else {
-                                rb->splash(HZ*2, "The computer attempted to " 
-                                                "attack, but the invasion was"
-                                                " pushed back");
-                                compres.moves--;
-                            }
-                        } else {
-                            board[i][j].colour = COLOUR_DARK;
-                            board[i][j].tank = false;
-                            board[i][j].plane = false;
-                            board[i][j].nuke = false;
-                            board[i][j].men = 0;
-                            draw_board();
-                            rb->sleep(HZ);
-                            compres.moves--;
-                        }
+    }
+    /* Defence stage done, move on to OFFENCE */
+    found_target = true;
+    while(found_target) {
+        found_target = false;
+        for(i=1;i<11;i++) {
+            for(j=1;j<11;j++) {
+                if(board[i][j].colour == COLOUR_LIGHT &&
+                        (board[i][j].ind || board[i][j].farm) &&
+                        (calc_strength(COLOUR_DARK, i, j) >=
+                         calc_strength(COLOUR_LIGHT, i, j))) {
+                    found_target = true;
+                    if(attack_territory(COLOUR_DARK, i, j) >= 0) {
+                        compres.moves--;
+                        if(!compres.moves)
+                            return;
                     }
-                    rb->yield();
                 }
+                rb->yield();
             }
-            while(compres.moves > 0) {
-                /* Spend leftover moves wherever attacking randomly */
-                rb->srand(*rb->current_tick);
-                i = (rb->rand()%10)+1;
-                j = (rb->rand()%10)+1;
+        }
+    }
+    /* Spend leftover moves wherever attacking randomly */
+    found_target = true;
+    while(found_target) {
+        found_target = false;
+        for(i=1;i<11;i++) {
+            for(j=1;j<11;j++) {
                 if(board[i][j].colour == COLOUR_LIGHT && 
                   (calc_strength(COLOUR_DARK, i, j)  >= 
                    calc_strength(COLOUR_LIGHT, i, j))) {
-                    if(calc_strength(COLOUR_DARK, i, j) == 
-                                    calc_strength(COLOUR_LIGHT, i, j)) {
-                        if(rb->rand()%2) {
-                            board[i][j].colour = COLOUR_DARK;
-                            board[i][j].tank = false;
-                            board[i][j].plane = false;
-                            board[i][j].nuke = false;
-                            board[i][j].men = 0;
-                            draw_board();
-                            rb->sleep(HZ);
-                            compres.moves--;
-                        } else {
-                            rb->splash(HZ*2, "The computer attempted to" 
-                                             " attack, but the invasion was"
-                                             " pushed back");
-                            compres.moves--;
-                        }
-                    } else {
-                        board[i][j].colour = COLOUR_DARK;
-                        board[i][j].tank = false;
-                        board[i][j].plane = false;
-                        board[i][j].nuke = false;
-                        board[i][j].men = 0;
-                        draw_board();
-                        rb->sleep(HZ);
+                    found_target = true;
+                    if(attack_territory(COLOUR_DARK, i, j) >= 0) {
                         compres.moves--;
+                        if(!compres.moves)
+                            return;
                     }
                 }
+                rb->yield();
             }
         }
     }
@@ -2194,10 +2028,11 @@ static int load_game(const char* file) {
         return -1;
     }
     rb->read(fd, buf, 5);
-    if(rb->strcmp(buf, "SSGv2")) {
-        rb->splash(HZ, "Invalid/incompatible savegame\n");
+    if(rb->strcmp(buf, "SSGv3")) {
+        rb->splash(HZ, "Invalid/incompatible savegame");
         return -1;
     }
+    rb->read(fd, &gamestate, sizeof(gamestate));
     rb->read(fd, &humanres.cash, sizeof(humanres.cash));
     rb->read(fd, &humanres.food, sizeof(humanres.food));
     rb->read(fd, &humanres.bank, sizeof(humanres.bank));
@@ -2226,6 +2061,7 @@ static int load_game(const char* file) {
     rb->read(fd, &superdom_settings.startcash, sizeof(int));
     rb->read(fd, &superdom_settings.startfood, sizeof(int));
     rb->read(fd, &superdom_settings.movesperturn, sizeof(int));
+    rb->close(fd);
     return 0;
 }
 
@@ -2239,13 +2075,13 @@ void default_settings(void) {
     superdom_settings.movesperturn = 2;
 }
 
-int average_strength(bool colour) {
+int average_strength(int colour) {
     /* This function calculates the average strength of the given player,
      * used to determine when the computer wins or loses. */
     int i,j;
     int totalpower = 0;
-    for(i=0;i<12;i++) {
-        for(j=0;j<12;j++) {
+    for(i=1;i<11;i++) {
+        for(j=1;j<11;j++) {
             if(board[i][j].colour != -1) {
                 totalpower += calc_strength(colour, i, j);
             }
@@ -2256,31 +2092,34 @@ int average_strength(bool colour) {
 
 enum plugin_status plugin_start(const void* parameter)
 {
-    int tempmenu;
-    bool statusbar_setting;
-
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
     rb->lcd_set_foreground(LCD_BLACK);
     rb->lcd_set_background(LCD_WHITE);
 #endif
 
-    statusbar_setting = rb->global_settings->statusbar; 
-    rb->global_settings->statusbar = false;
     cursor.x = 1;
     cursor.y = 1;
     default_settings();
     if(parameter) {
         if(load_game(parameter) != 0) {
             DEBUGF("Loading failed, generating new game\n");
-            init_resources();
-            init_board();
         } else {
-            goto startyear;
+            switch(gamestate) {
+                case GS_PROD:
+                    goto startprod;
+                    break;
+                case GS_MOVE:
+                    goto startmove;
+                    break;
+                case GS_WAR:
+                    goto startwar;
+                    break;
+                default:
+                    goto startyear;
+                    break;
+            }
         }
-    } else {
-        init_resources();
-        init_board();
     }
 
     bool play = false;
@@ -2290,82 +2129,93 @@ enum plugin_status plugin_start(const void* parameter)
                 play = true;
                 break;
             case 2:
-                rb->global_settings->statusbar = statusbar_setting; 
                 return PLUGIN_OK;
+                break;
+            case PLUGIN_USB_CONNECTED:
+                return PLUGIN_USB_CONNECTED;
                 break;
         }
     }
+    init_resources();
+    init_board();
     gen_resources();
 startyear:
-    if((average_strength(COLOUR_LIGHT) - average_strength(COLOUR_DARK)) > 15) {
-        rb->splash(HZ*4, "The computer has surrendered. You win.");
-        rb->global_settings->statusbar = statusbar_setting; 
-        return PLUGIN_OK;
-    }
-    if((average_strength(COLOUR_DARK) - average_strength(COLOUR_LIGHT)) > 15) {
-        rb->splash(HZ*4, "Your army have suffered terrible morale from the bleak prospects of winning. You lose");
-        rb->global_settings->statusbar = statusbar_setting; 
-        return PLUGIN_OK;
-    }
-    tempmenu = production_menu();
-    switch(tempmenu) {
-        case PLUGIN_USB_CONNECTED:
-            rb->global_settings->statusbar = statusbar_setting; 
-            return PLUGIN_USB_CONNECTED;       
-            break;
-        case SUPERDOM_QUIT:
-            rb->global_settings->statusbar = statusbar_setting; 
+    while(1) {
+        int avg_str_diff = (average_strength(COLOUR_LIGHT) -
+                            average_strength(COLOUR_DARK));
+        if(avg_str_diff > 15) {
+            rb->splash(HZ*4, "The computer has surrendered. You win.");
             return PLUGIN_OK;
-            break;
-    }
-    computer_allocate();
-    humanres.moves += superdom_settings.movesperturn;
-    tempmenu = movement_menu();
-    switch(tempmenu) {
-        case PLUGIN_USB_CONNECTED:
-            rb->global_settings->statusbar = statusbar_setting; 
-            return PLUGIN_USB_CONNECTED;       
-            break;
-        case SUPERDOM_QUIT:
-            rb->global_settings->statusbar = statusbar_setting; 
-            return PLUGIN_OK;
-            break;
-    }
-    if(humanres.men) {
-        if(humanres.food > humanres.men) {
-            rb->snprintf(buf, sizeof(buf), "Your men ate %d units of food", 
-                            humanres.men);
-            humanres.food -= humanres.men;
-        } else {
-            rb->snprintf(buf, sizeof(buf), "There was not enough food to feed" 
-                            " all your men, %d men have died of starvation", 
-                            killmen(COLOUR_LIGHT));
         }
-        rb->splash(HZ*2, buf);
-    }
-    if(compres.men) {
-        if(compres.food < compres.men) {
-            rb->snprintf(buf, sizeof(buf), "The computer does not have enough"
-                            " food to feed its men. %d have ided of starvation",
-                            killmen(COLOUR_DARK));
-            rb->splash(HZ, buf);
-        }
-    }
-    tempmenu = war_menu();
-    switch(tempmenu) {
-        case PLUGIN_USB_CONNECTED:
-            rb->global_settings->statusbar = statusbar_setting; 
-            return PLUGIN_USB_CONNECTED;       
-            break;
-        case SUPERDOM_QUIT:
-            rb->global_settings->statusbar = statusbar_setting; 
+        if(-avg_str_diff > 15) {
+            rb->splash(HZ*4, "Your army have suffered terrible morale from"
+                             " the bleak prospects of winning. You lose.");
             return PLUGIN_OK;
-            break;
+        }
+
+        /* production */
+startprod:
+        gamestate = GS_PROD;
+        switch(production_menu()) {
+            case PLUGIN_USB_CONNECTED:
+                return PLUGIN_USB_CONNECTED;
+                break;
+            case SUPERDOM_QUIT:
+                return PLUGIN_OK;
+                break;
+        }
+        computer_allocate();
+
+        /* movement */
+        humanres.moves = superdom_settings.movesperturn;
+startmove:
+        gamestate = GS_MOVE;
+        switch(movement_menu()) {
+            case PLUGIN_USB_CONNECTED:
+                return PLUGIN_USB_CONNECTED;
+                break;
+            case SUPERDOM_QUIT:
+                return PLUGIN_OK;
+                break;
+        }
+        /* feed men */
+        if(humanres.men) {
+            if(humanres.food > humanres.men) {
+                rb->snprintf(buf, sizeof(buf), "Your men ate %d units of food",
+                                humanres.men);
+                humanres.food -= humanres.men;
+            } else {
+                rb->snprintf(buf, sizeof(buf), "There was not enough food"
+                   " to feed all your men, %d men have died of starvation",
+                                killmen(COLOUR_LIGHT));
+            }
+            rb->splash(HZ*2, buf);
+        }
+        if(compres.men) {
+            if(compres.food > compres.men) {
+                compres.food -= compres.men;
+            } else {
+                rb->snprintf(buf, sizeof(buf), "The computer does not have"
+                 " enough food to feed its men. %d have died of starvation",
+                                killmen(COLOUR_DARK));
+                rb->splash(HZ, buf);
+            }
+        }
+        /* war */
+        humanres.moves = superdom_settings.movesperturn;
+startwar:
+        gamestate = GS_WAR;
+        switch(war_menu()) {
+            case PLUGIN_USB_CONNECTED:
+                return PLUGIN_USB_CONNECTED;
+                break;
+            case SUPERDOM_QUIT:
+                return PLUGIN_OK;
+                break;
+        }
+        compres.moves = superdom_settings.movesperturn;
+        computer_war();
+        gen_resources();
     }
-    compres.moves += superdom_settings.movesperturn;
-    computer_war();
-    gen_resources();
-    goto startyear;
-    rb->global_settings->statusbar = statusbar_setting; 
     return PLUGIN_OK;
 }
