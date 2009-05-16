@@ -92,8 +92,8 @@ static void fix_path_part(char* path, int offset, int count)
 }
 
 #if defined(HAVE_JPEG) || defined(PLUGIN)
-const char * extensions[] = { "jpeg", "jpg", "bmp" };
-int extension_lens[] = { 4, 3, 3 };
+static const char * extensions[] = { "jpeg", "jpg", "bmp" };
+static int extension_lens[] = { 4, 3, 3 };
 /* Try checking for several file extensions, return true if a file is found and
  * leaving the path modified to include the matching extension.
  */
