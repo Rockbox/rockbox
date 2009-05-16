@@ -586,11 +586,24 @@ extern const fb_data rockblox_background[];
    %  %%%  %
  */
 
-
-static bool gameover = false;
 /* c=current f=figure o=orientation n=next */
-static int lines = 0, level = 0, score = 0, cx, cy, cf, co, nf;
-static short board[BOARD_HEIGHT][BOARD_WIDTH];   /* 20 rows of 10 blocks */
+static struct _rockblox_status
+{
+    int gameover;
+    int lines;
+    int level;
+    int score;
+    int cx;
+    int cy;
+    int cf;
+    int co;
+    int nf;
+    short board[BOARD_HEIGHT][BOARD_WIDTH]; /* 20 rows of 10 blocks */
+} rockblox_status;
+
+/* prototypes */
+static void draw_next_block(void);
+static void new_block(void);
 
 #ifdef HAVE_SCROLLWHEEL
 int wheel_events = 0, last_wheel_event = 0;
@@ -705,6 +718,7 @@ figures[BLOCKS_NUM] = {
 /* Rockbox File System only supports full filenames inc dir */
 #define HIGH_SCORE PLUGIN_GAMES_DIR "/rockblox.score"
 #define MAX_HIGH_SCORES 5
+
 /* Default High Scores... */
 struct highscore Highest[MAX_HIGH_SCORES];
 
@@ -720,7 +734,7 @@ static void init_board (void)
     int i, j;
     for (i = 0; i < BOARD_WIDTH; i++)
         for (j = 0; j < BOARD_HEIGHT; j++)
-            board[j][i] = EMPTY_BLOCK;
+            rockblox_status.board[j][i] = EMPTY_BLOCK;
 }
 
 /* show the score, level and lines */
@@ -733,16 +747,17 @@ static void show_details (void)
     rb->lcd_set_foreground (LCD_BLACK);
     rb->lcd_set_background (LCD_WHITE);
 #endif
-    rb->snprintf (str, sizeof (str), "%d", score);
+    rb->snprintf (str, sizeof (str), "%d", rockblox_status.score);
     rb->lcd_putsxy (LABEL_X, SCORE_Y, str);
-    rb->snprintf (str, sizeof (str), "%d", level);
+    rb->snprintf (str, sizeof (str), "%d", rockblox_status.level);
     rb->lcd_putsxy (LEVEL_X, LEVEL_Y, str);
-    rb->snprintf (str, sizeof (str), "%d", lines);
+    rb->snprintf (str, sizeof (str), "%d", rockblox_status.lines);
     rb->lcd_putsxy (LINES_X, LINES_Y, str);
 #else  /* HAVE_LCD_CHARCELLS */
-    rb->snprintf (str, sizeof (str), "L%d/%d", level, lines);
+    rb->snprintf (str, sizeof (str), "L%d/%d", rockblox_status.level,
+            rockblox_status.lines);
     rb->lcd_puts (5, 0, str);
-    rb->snprintf (str, sizeof (str), "S%d", score);
+    rb->snprintf (str, sizeof (str), "S%d", rockblox_status.score);
     rb->lcd_puts (5, 1, str);
 #endif
 }
@@ -755,7 +770,7 @@ static void show_highscores (void)
 
     for (i = MAX_HIGH_SCORES-1; i>=0; i--)
     {
-        rb->snprintf (str, sizeof (str), "%06d" _SPACE "L%1d", Highest[i].score, Highest[i].level);
+        rb->snprintf (str, sizeof (str), "%06d" _SPACE "L%1d",Highest[i].score, Highest[i].level);
         rb->lcd_putsxy (HIGH_LABEL_X, HIGH_SCORE_Y + (10 * ((MAX_HIGH_SCORES-1) - i)), str);
     }
 }
@@ -763,13 +778,15 @@ static void show_highscores (void)
 
 static void init_rockblox (void)
 {
-    highscore_update(score, level, Highest, MAX_HIGH_SCORES);
+    highscore_update(rockblox_status.score, rockblox_status.level, Highest,
+            MAX_HIGH_SCORES);
 
-    level = 1;
-    lines = 0;
-    score = 0;
-    gameover = false;
-    nf = t_rand (BLOCKS_NUM);
+    rockblox_status.level = 1;
+    rockblox_status.lines = 0;
+    rockblox_status.score = 0;
+    rockblox_status.nf = t_rand (BLOCKS_NUM);
+    rockblox_status.gameover = false;
+
     init_board ();
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
@@ -849,7 +866,7 @@ static void refresh_board (void)
 
     for (i = 0; i < BOARD_WIDTH; i++)
         for (j = 0; j < BOARD_HEIGHT; j++) {
-            block = board[j][i];
+            block = rockblox_status.board[j][i];
             if (block != EMPTY_BLOCK) {
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
@@ -886,17 +903,21 @@ static void refresh_board (void)
         }
 
     for (i = 0; i < 4; i++) {
-        x = getRelativeX (cf, i, co) + cx;
-        y = getRelativeY (cf, i, co) + cy;
+        x = getRelativeX (rockblox_status.cf, i, rockblox_status.co)
+                + rockblox_status.cx;
+        y = getRelativeY (rockblox_status.cf, i, rockblox_status.co)
+                + rockblox_status.cy;
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
-        rb->lcd_set_foreground (figures[cf].color[1]);  /* middle drawing */
+        /* middle drawing */
+        rb->lcd_set_foreground (figures[rockblox_status.cf].color[1]);
 #endif
         rb->lcd_fillrect (BOARD_X + x * BLOCK_WIDTH,
                           BOARD_Y + y * BLOCK_HEIGHT,
                           BLOCK_WIDTH, BLOCK_HEIGHT);
 #if LCD_DEPTH >= 2
-        rb->lcd_set_foreground (figures[cf].color[0]);  /* light drawing */
+        /* light drawing */
+        rb->lcd_set_foreground (figures[rockblox_status.cf].color[0]);
 #endif
         rb->lcd_vline (BOARD_X + x * BLOCK_WIDTH, BOARD_Y + y * BLOCK_HEIGHT,
                        BOARD_Y + (y + 1) * BLOCK_HEIGHT - 2);
@@ -904,7 +925,8 @@ static void refresh_board (void)
                        BOARD_X + (x + 1) * BLOCK_WIDTH - 2,
                        BOARD_Y + y * BLOCK_HEIGHT);
 #if LCD_DEPTH >= 2
-        rb->lcd_set_foreground (figures[cf].color[2]);  /* shadow drawing */
+        /* shadow drawing */
+        rb->lcd_set_foreground (figures[rockblox_status.cf].color[2]);
 #endif
         rb->lcd_vline (BOARD_X + (x + 1) * BLOCK_WIDTH - 1,
                        BOARD_Y + y * BLOCK_HEIGHT + 1,
@@ -923,10 +945,11 @@ static bool canMoveTo (int x, int y, int newOrientation)
 {
     int i, rx, ry;
     for (i = 0; i < 4; i++) {
-        ry = getRelativeY (cf, i, newOrientation) + y;
-        rx = getRelativeX (cf, i, newOrientation) + x;
+        ry = getRelativeY (rockblox_status.cf, i, newOrientation) + y;
+        rx = getRelativeX (rockblox_status.cf, i, newOrientation) + x;
         if ((rx < 0 || rx >= BOARD_WIDTH) ||
-            (ry < 0 || ry >= BOARD_HEIGHT) || (board[ry][rx] != EMPTY_BLOCK))
+            (ry < 0 || ry >= BOARD_HEIGHT) ||
+            (rockblox_status.board[ry][rx] != EMPTY_BLOCK))
             return false;
     }
     return true;
@@ -967,17 +990,17 @@ static void draw_next_block (void)
 
     /* draw the figure */
     for (i = 0; i < 4; i++) {
-        rx = getRelativeX (nf, i, 0) + 2;
-        ry = getRelativeY (nf, i, 0) + 2;
+        rx = getRelativeX (rockblox_status.nf, i, 0) + 2;
+        ry = getRelativeY (rockblox_status.nf, i, 0) + 2;
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
-        rb->lcd_set_foreground (figures[nf].color[1]);  /* middle drawing */
+        rb->lcd_set_foreground (figures[rockblox_status.nf].color[1]);  /* middle drawing */
 #endif
         rb->lcd_fillrect (PREVIEW_X + rx * BLOCK_WIDTH,
                           PREVIEW_Y + ry * BLOCK_HEIGHT,
                           BLOCK_WIDTH, BLOCK_HEIGHT);
 #if LCD_DEPTH >= 2
-        rb->lcd_set_foreground (figures[nf].color[0]);  /* light drawing */
+        rb->lcd_set_foreground (figures[rockblox_status.nf].color[0]);  /* light drawing */
 #endif
         rb->lcd_vline (PREVIEW_X + rx * BLOCK_WIDTH,
                        PREVIEW_Y + ry * BLOCK_HEIGHT,
@@ -986,7 +1009,7 @@ static void draw_next_block (void)
                        PREVIEW_X + (rx + 1) * BLOCK_WIDTH - 2,
                        PREVIEW_Y + ry * BLOCK_HEIGHT);
 #if LCD_DEPTH >= 2
-        rb->lcd_set_foreground (figures[nf].color[2]);  /* shadow drawing */
+        rb->lcd_set_foreground (figures[rockblox_status.nf].color[2]);  /* shadow drawing */
 #endif
         rb->lcd_vline (PREVIEW_X + (rx + 1) * BLOCK_WIDTH - 1,
                        PREVIEW_Y + ry * BLOCK_HEIGHT + 1,
@@ -1004,40 +1027,47 @@ static void draw_next_block (void)
 /* move the block to a relative location */
 static void move_block (int x, int y, int o)
 {
-    if (canMoveTo (cx + x, cy + y, o)) {
-        cy += y;
-        cx += x;
-        co = o;
+    if (canMoveTo (rockblox_status.cx + x, rockblox_status.cy + y, o)) {
+        rockblox_status.cy += y;
+        rockblox_status.cx += x;
+        rockblox_status.co = o;
     }
 }
 
 /* try to add a new block to play with (return true if gameover) */
 static void new_block (void)
 {
-    cy = 1;
-    cx = 5;
-    cf = nf;
-    co = 0;                     /* start at the same orientation all time */
-    nf = t_rand (BLOCKS_NUM);
-    gameover = !canMoveTo (cx, cy, co);
+    rockblox_status.cy = 1;
+    rockblox_status.cx = 5;
+    rockblox_status.cf = rockblox_status.nf;
+    rockblox_status.co = 0;                     /* start at the same orientation all time */
+    rockblox_status.nf = t_rand (BLOCKS_NUM);
+    rockblox_status.gameover = !canMoveTo (rockblox_status.cx,
+            rockblox_status.cy, rockblox_status.co);
 
     draw_next_block ();
 }
 
 
-/* check for filled lines and do what necessary */
+/* check for filled rockblox_status.lines and do what necessary */
 static int check_lines (void)
+
 {
     int i, j, y;
     int rockblox = 0;
 
     for (j = 0; j < BOARD_HEIGHT; j++) {
-        for (i = 0; ((i < BOARD_WIDTH) && (board[j][i] != EMPTY_BLOCK)); i++);
+        for (i = 0; ((i < BOARD_WIDTH) &&
+                (rockblox_status.board[j][i] != EMPTY_BLOCK)); i++);
         if (i == BOARD_WIDTH) { /* woo hoo, we have a line */
             rockblox++;
             for (y = j; y > 0; y--)
+            {
                 for (i = 0; i < BOARD_WIDTH; i++)
-                    board[y][i] = board[y - 1][i];      /* fall line */
+                {   /* fall line */
+                    rockblox_status.board[y][i] = rockblox_status.board[y - 1][i];
+                }
+            }
         }
     }
 
@@ -1049,20 +1079,20 @@ static void move_down (void)
 {
     int l, i, rx, ry;
 
-    if (!canMoveTo (cx, cy + 1, co)) {
+    if (!canMoveTo (rockblox_status.cx, rockblox_status.cy + 1, rockblox_status.co)) {
         /* save figure to board */
         for (i = 0; i < 4; i++) {
-            rx = getRelativeX (cf, i, co) + cx;
-            ry = getRelativeY (cf, i, co) + cy;
-            board[ry][rx] = cf;
+            rx = getRelativeX (rockblox_status.cf, i, rockblox_status.co) + rockblox_status.cx;
+            ry = getRelativeY (rockblox_status.cf, i, rockblox_status.co) + rockblox_status.cy;
+            rockblox_status.board[ry][rx] = rockblox_status.cf;
         }
         /* check if formed some lines */
         l = check_lines ();
         if (l) {
             /* the original scoring from "http://en.wikipedia.org/wiki/Rockblox" */
-            score += scoring[l - 1] * level;
-            lines += l;
-            level = (int) lines / 10 + 1;
+            rockblox_status.score += scoring[l - 1] * rockblox_status.level;
+            rockblox_status.lines += l;
+            rockblox_status.level = (int) rockblox_status.lines / 10 + 1;
         }
 
         /* show details */
@@ -1071,14 +1101,14 @@ static void move_down (void)
         /* generate a new figure */
         new_block ();
     } else
-        move_block (0, 1, co);
+        move_block (0, 1, rockblox_status.co);
 }
 
 static int rockblox_loop (void)
 {
     int button;
     int lastbutton = BUTTON_NONE;
-    long next_down_tick = *rb->current_tick + level_speed(level);
+    long next_down_tick = *rb->current_tick + level_speed(rockblox_status.level);
 
     new_block ();
 
@@ -1126,7 +1156,7 @@ static int rockblox_loop (void)
                 /* if it's enabled, go ahead and rotate.. */
                 if(wheel_enabled)
 #endif
-                move_block (0, 0, (co + 1) % figures[cf].max_or);
+                move_block (0, 0, (rockblox_status.co + 1) % figures[rockblox_status.cf].max_or);
                 break;
 
             case ROCKBLOX_ROTATE_LEFT:
@@ -1138,29 +1168,29 @@ static int rockblox_loop (void)
                 if(wheel_enabled)
 #endif
                 move_block (0, 0,
-                            (co + figures[cf].max_or -
-                             1) % figures[cf].max_or);
+                            (rockblox_status.co + figures[rockblox_status.cf].max_or -
+                             1) % figures[rockblox_status.cf].max_or);
                 break;
 
 #ifdef ROCKBLOX_ROTATE_RIGHT2
             case ROCKBLOX_ROTATE_RIGHT2:
-                move_block (0, 0, (co + 1) % figures[cf].max_or);
+                move_block (0, 0, (rockblox_status.co + 1) % figures[rockblox_status.cf].max_or);
                 break;
 #endif
 
             case ROCKBLOX_DOWN:
             case ROCKBLOX_DOWN | BUTTON_REPEAT:
-                move_block (0, 1, co);
+                move_block (0, 1, rockblox_status.co);
                 break;
 
             case ROCKBLOX_RIGHT:
             case ROCKBLOX_RIGHT | BUTTON_REPEAT:
-                move_block (1, 0, co);
+                move_block (1, 0, rockblox_status.co);
                 break;
 
             case ROCKBLOX_LEFT:
             case ROCKBLOX_LEFT | BUTTON_REPEAT:
-                move_block (-1, 0, co);
+                move_block (-1, 0, rockblox_status.co);
                 break;
 
             case ROCKBLOX_DROP:
@@ -1168,8 +1198,8 @@ static int rockblox_loop (void)
                 if (lastbutton != ROCKBLOX_DROP_PRE)
                     break;
 #endif
-                while (canMoveTo (cx, cy + 1, co))
-                    move_block (0, 1, co);
+                while (canMoveTo (rockblox_status.cx, rockblox_status.cy + 1, rockblox_status.co))
+                    move_block (0, 1, rockblox_status.co);
                 break;
 #ifdef ROCKBLOX_RESTART
             case ROCKBLOX_RESTART:
@@ -1215,20 +1245,19 @@ static int rockblox_loop (void)
 
         if (TIME_AFTER(*rb->current_tick, next_down_tick)) {
             move_down ();
-            next_down_tick += level_speed(level);
+            next_down_tick += level_speed(rockblox_status.level);
             if (TIME_AFTER(*rb->current_tick, next_down_tick))
                 /* restart time "raster" when we had to wait longer than usual
                  * (pause, game restart etc) */
-                next_down_tick = *rb->current_tick + level_speed(level);
+                next_down_tick = *rb->current_tick + level_speed(rockblox_status.level);
         }
 
-        if (gameover) {
+        if (rockblox_status.gameover) {
 #if LCD_DEPTH >= 2
             rb->lcd_set_foreground (LCD_BLACK);
 #endif
             rb->splash (HZ * 2, "Game Over");
             init_rockblox ();
-            new_block ();
         }
 
         refresh_board ();
@@ -1267,9 +1296,7 @@ enum plugin_status plugin_start (const void *parameter)
     init_rockblox ();
     ret = rockblox_loop ();
 
-#ifdef HAVE_LCD_BITMAP
-    rb->lcd_setfont (FONT_UI);
-#else
+#ifndef HAVE_LCD_BITMAP
     pgfx_release();
 #endif
     /* Save user's HighScore */
