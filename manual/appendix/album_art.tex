@@ -17,22 +17,22 @@ as progessive and multi-scan images require much more memory to decode.
 
 \section{Where to put album art}
 
-The pictures can be named a number of different ways, and placed a number of
+The pictures can be named a number of different ways, and placed to a number of
 different locations. You can have pictures specific to the file or the album
-or use a generic picture. You can place the picture in the same direcotry
+or use a generic picture. You can place the picture in the same directory
 as the file, in the parent directory or in a fixed directory named
 \fname{/.rockbox/albumart/}. The order Rockbox uses when looking for a picture
-is as follows:
+is as follows (a list in braces means that those file extensions are tried in
+that order):
 
 \begin{enumerate}
-\item  \fname{./cover.jpg}
+\item  \fname{./filename.\{jpeg,jpg,bmp\}}
+\item  \fname{./albumtitle.\{jpeg,jpg,bmp\}}
+\item  \fname{./cover.\{jpeg,jpg,bmp\}}
 \item  \fname{./folder.jpg}
-\item  \fname{./filename.bmp}
-\item  \fname{./albumtitle.bmp}
-\item  \fname{./cover.bmp}
-\item  \fname{/.rockbox/albumart/artist-albumtitle.bmp}
-\item  \fname{../albumtitle.bmp}
-\item  \fname{../cover.bmp}
+\item  \fname{/.rockbox/albumart/artist-albumtitle.\{jpeg,jpg,bmp\}}
+\item  \fname{../albumtitle.\{jpeg,jpg,bmp\}}
+\item  \fname{../cover.\{jpeg,jpg,bmp\}}
 \end{enumerate}
 
 The following characters will be replaced with an underscore (\_) when looking
