@@ -811,7 +811,7 @@ static int dump_resume(void)
     int fd;
 
     fd = rb->open(RESUME_FILE, O_WRONLY|O_CREAT);
-    if (fd <= 0)
+    if (fd < 0)
         goto fail;
 
     if (rb->write(fd, &rockblox_status, sizeof(struct _rockblox_status))
