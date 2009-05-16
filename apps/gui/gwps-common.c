@@ -1037,6 +1037,14 @@ static const char *get_token_value(struct gui_wps *gwps,
                 *intval = global_settings.repeat_mode + 1;
             snprintf(buf, buf_size, "%d", global_settings.repeat_mode);
             return buf;
+            
+        case WPS_TOKEN_RTC_PRESENT:
+#if CONFIG_RTC
+                return "c";
+#else
+                return NULL;
+#endif
+
 #if CONFIG_RTC
         case WPS_TOKEN_RTC_12HOUR_CFG:
             if (intval)

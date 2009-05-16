@@ -173,6 +173,8 @@ enum wps_token_type {
 
     /* Time */
 
+    WPS_TOKEN_RTC_PRESENT,
+
     /* The begin/end values allow us to know if a token is an RTC one.
        New RTC tokens should be added between the markers. */
 
