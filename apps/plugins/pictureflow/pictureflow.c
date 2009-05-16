@@ -218,12 +218,6 @@ typedef fb_data pix_t;
 #define EV_EXIT 9999
 #define EV_WAKEUP 1337
 
-/* maximum number of albums */
-
-#define MAX_TRACKS 128
-#define AVG_TRACK_NAME_LENGTH 20
-
-
 #define UNIQBUF_SIZE (64*1024)
 
 #define EMPTY_SLIDE CACHE_PREFIX "/emptyslide.pfraw"
@@ -261,6 +255,7 @@ struct album_data {
 };
 
 struct track_data {
+    uint32_t sort;
     int name_idx;
     long seek;
 };
@@ -369,8 +364,9 @@ static struct album_data *album;
 static char *album_names;
 static int album_count;
 
-static char track_names[MAX_TRACKS * AVG_TRACK_NAME_LENGTH];
-static struct track_data tracks[MAX_TRACKS];
+static struct track_data *tracks;
+static char *track_names;
+static size_t borrowed = 0;
 static int track_count;
 static int track_index;
 static int selected_track;
@@ -423,6 +419,7 @@ enum pf_states {
 static int pf_state;
 
 /** code */
+static bool free_slide_prio(int prio);
 static inline unsigned fade_color(pix_t c, unsigned a);
 bool save_pfraw(char* filename, struct bitmap *bm);
 bool load_new_slide(void);
@@ -780,51 +777,51 @@ char* get_track_name(const int track_index)
 /**
   Compare two unsigned ints passed via pointers.
  */
-int compare_uints (const void *a_v, const void *b_v)
+int compare_tracks (const void *a_v, const void *b_v)
 {
-    uint32_t a = *(uint32_t *)a_v;
-    uint32_t b = *(uint32_t *)b_v;
+    uint32_t a = ((struct track_data *)a_v)->sort;
+    uint32_t b = ((struct track_data *)b_v)->sort;
     return (int)(a - b);
 }
 
 /**
   Create the track index of the given slide_index.
  */
-int create_track_index(const int slide_index)
+void create_track_index(const int slide_index)
 {
-    if ( slide_index == track_index ) {
-        return -1;
-    }
+    if ( slide_index == track_index )
+        return;
+    track_index = slide_index;
 
     if (!rb->tagcache_search(&tcs, tag_title))
-        return -1;
-
-    struct track_data temp_tracks[MAX_TRACKS];
-    uint32_t temp_tracknums[MAX_TRACKS];
+        goto fail;
 
     rb->tagcache_search_add_filter(&tcs, tag_album, album[slide_index].seek);
     track_count=0;
-    int string_index = 0, i, track_num;
+    int string_index = 0, track_num;
     int disc_num;
-
+    size_t out = 0;
+    track_names = (char *)buflib_buffer_out(&buf_ctx, &out);
+    borrowed += out;
+    int avail = borrowed;
+    tracks = (struct track_data*)(track_names + borrowed);
     while (rb->tagcache_get_next(&tcs))
     {
-        if (track_count == MAX_TRACKS)
-            goto fail;
-        track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber);
+        avail -= sizeof(struct track_data);
+        track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber) - 1;
         disc_num = rb->tagcache_get_numeric(&tcs, tag_discnumber);
-        int avail = sizeof(track_names) - string_index;
         int len = 0;
         if (disc_num < 0)
             disc_num = 0;
+retry:
         if (track_num >= 0)
         {
-            if (disc_num > 0)
+            if (disc_num)
                 len = 1 + rb->snprintf(track_names + string_index , avail,
-                    "%d.%02d:  %s", disc_num, track_num, tcs.result);
+                    "%d.%02d:  %s", disc_num, track_num + 1, tcs.result);
             else
                 len = 1 + rb->snprintf(track_names + string_index , avail,
-                    "%d:  %s", track_num, tcs.result);
+                    "%d:  %s", track_num + 1, tcs.result);
         }
         else
         {
@@ -833,32 +830,43 @@ int create_track_index(const int slide_index)
             rb->strncpy(track_names + string_index, tcs.result, avail);
         }
         if (len > avail)
-            goto fail;
-        temp_tracknums[track_count] = (disc_num << 16) + (track_num << 7)
-            + track_count;
-        temp_tracks[track_count].name_idx = string_index;
-        temp_tracks[track_count].seek = tcs.result_seek;
+        {
+            while (len > avail)
+            {
+                if (!free_slide_prio(0))
+                    goto fail;
+                out = 0;
+                buflib_buffer_out(&buf_ctx, &out);
+                avail += out;
+                borrowed += out;
+                if (track_count)
+                {
+                    struct track_data *new_tracks = (struct track_data *)(out + (uintptr_t)tracks);
+                    unsigned int bytes = track_count * sizeof(struct track_data);
+                    rb->memmove(new_tracks, tracks, bytes);
+                    tracks = new_tracks;
+                }
+            }
+            goto retry;
+        }
+            
+        avail -= len;
+        tracks--;
+        tracks->sort = ((disc_num - 1) << 24) + (track_num << 14) + track_count;
+        tracks->name_idx = string_index;
+        tracks->seek = tcs.result_seek;
         track_count++;
         string_index += len;
     }
 
     rb->tagcache_search_finish(&tcs);
-    track_index = slide_index;
 
     /* now fix the track list order */
-    rb->qsort(temp_tracknums, track_count, sizeof(int), compare_uints);
-    for (i = 0; i < track_count; i++)
-    {
-        track_num = 127 & temp_tracknums[i];
-        tracks[i].name_idx = temp_tracks[track_num].name_idx;
-        tracks[i].seek = temp_tracks[track_num].seek;
-    }
-    if (track_count == 0)
-        goto fail;
-    return 0;
+    rb->qsort(tracks, track_count, sizeof(struct track_data), compare_tracks);
+    return;
 fail:
     track_count = 0;
-    return -1;
+    return;
 }
 
 /**
@@ -1237,7 +1245,7 @@ static inline void free_slide(int i)
  Free one slide ranked above the given priority. If no such slide can be found,
  return false.
 */
-static inline int free_slide_prio(int prio)
+static bool free_slide_prio(int prio)
 {
     if (cache_used == -1)
         return false;
@@ -2523,7 +2531,12 @@ int main(void)
 
         case PF_BACK:
             if ( pf_state == pf_show_tracks )
+            {
+                buflib_buffer_in(&buf_ctx, borrowed);
+                borrowed = 0;
+                track_index = -1;
                 pf_state = pf_cover_out;
+            }
             if (pf_state == pf_idle || pf_state == pf_scrolling)
                 return PLUGIN_OK;
             break;
