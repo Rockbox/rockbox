@@ -315,7 +315,7 @@ static void usb_thread(void)
                    We subtract one for our own thread. */
                 num_acks_to_expect = queue_broadcast(SYS_USB_CONNECTED, 0) - 1;
                 DEBUGF("USB inserted. Waiting for ack from %d threads...\n",
-                       num_acks_for_connect);
+                       num_acks_to_expect);
                 break;
 
             case SYS_USB_CONNECTED_ACK:
