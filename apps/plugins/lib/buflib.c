@@ -61,6 +61,7 @@ buflib_init(struct buflib_context *ctx, void *buf, size_t size)
     ctx->last_handle = bd_buf + size;
     ctx->first_free_handle = bd_buf + size - 1;
     ctx->first_free_block = bd_buf;
+    ctx->buf_start = bd_buf;
     /* A marker is needed for the end of allocated data, to make sure that it
      * does not collide with the handle table, and to detect end-of-buffer.
      */
@@ -165,6 +166,53 @@ buflib_compact(struct buflib_context *ctx)
     ctx->first_free_block = ctx->alloc_end;
     ctx->compact = true;
     return ret || shift;
+}
+
+/* Shift buffered items by size units, and update handle pointers. The shift
+ * value must be determined to be safe *before* calling.
+ */
+static void
+buflib_buffer_shift(struct buflib_context *ctx, int shift)
+{
+    rb->memmove(ctx->buf_start + shift, ctx->buf_start,
+        (ctx->alloc_end - ctx->buf_start) * sizeof(union buflib_data));
+    union buflib_data *ptr;
+    for (ptr = ctx->last_handle; ptr < ctx->handle_table; ptr++)
+        if (ptr->ptr)
+            ptr->ptr += shift;
+    ctx->first_free_block += shift;
+    ctx->buf_start += shift;
+    ctx->alloc_end += shift;
+}
+
+/* Shift buffered items up by size bytes, or as many as possible if size == 0.
+ * Set size to the number of bytes freed.
+ */
+void*
+buflib_buffer_out(struct buflib_context *ctx, size_t *size)
+{
+    if (!ctx->compact)
+        buflib_compact(ctx);
+    size_t avail = ctx->last_handle - ctx->alloc_end;
+    size_t avail_b = avail * sizeof(union buflib_data);
+    if (*size && *size < avail_b)
+    {
+        avail = (*size + sizeof(union buflib_data) - 1)
+            / sizeof(union buflib_data);
+        avail_b = avail * sizeof(union buflib_data);
+    }
+    *size = avail_b;
+    void *ret = ctx->buf_start;
+    buflib_buffer_shift(ctx, avail);
+    return ret;
+}
+
+/* Shift buffered items down by size bytes */
+void
+buflib_buffer_in(struct buflib_context *ctx, int size)
+{
+    size /= sizeof(union buflib_data);
+    buflib_buffer_shift(ctx, -size);
 }
 
 /* Allocate a buffer of size bytes, returning a handle for it */

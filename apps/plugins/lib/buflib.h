@@ -38,6 +38,7 @@ struct buflib_context
     union buflib_data *first_free_handle;
     union buflib_data *last_handle;
     union buflib_data *first_free_block;
+    union buflib_data *buf_start;
     union buflib_data *alloc_end;
     bool compact;
 };
@@ -45,6 +46,10 @@ struct buflib_context
 void buflib_init(struct buflib_context *context, void *buf, size_t size);
 int buflib_alloc(struct buflib_context *context, size_t size);
 void buflib_free(struct buflib_context *context, int handle);
+void* buflib_buffer_out(struct buflib_context *ctx, size_t *size);
+void buflib_buffer_in(struct buflib_context *ctx, int size);
+
+
 
 /* always_inline is due to this not getting inlined when not optimizing, which
  * leads to an unresolved reference since it doesn't exist as a non-inline
