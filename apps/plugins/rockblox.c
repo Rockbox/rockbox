@@ -717,6 +717,7 @@ figures[BLOCKS_NUM] = {
 
 /* Rockbox File System only supports full filenames inc dir */
 #define HIGH_SCORE PLUGIN_GAMES_DIR "/rockblox.score"
+#define RESUME_FILE PLUGIN_GAMES_DIR "/rockblox.resume"
 #define MAX_HIGH_SCORES 5
 
 /* Default High Scores... */
@@ -726,6 +727,11 @@ struct highscore Highest[MAX_HIGH_SCORES];
 static int t_rand (int range)
 {
     return rb->rand () % range;
+}
+
+static inline void show_game_over (void)
+{
+    rb->splash(HZ,"Game over!");
 }
 
 /* init the board array to have no blocks */
@@ -776,18 +782,55 @@ static void show_highscores (void)
 }
 #endif
 
-static void init_rockblox (void)
+/* Returns >0 on successful read AND if the game wasn't over, else 0 */
+static int load_resume(void)
+{
+    int fd;
+    fd = rb->open(RESUME_FILE, O_RDONLY);
+    if (fd < 0)
+        return 0;
+
+    if (rb->read(fd, &rockblox_status, sizeof(struct _rockblox_status))
+            < (ssize_t)sizeof(struct _rockblox_status))
+    {
+        rb->splash(HZ/2, "Loading Rockblox resume info failed");
+        return 0;
+    }
+
+    rb->close(fd);
+
+    if (rockblox_status.gameover)
+        show_game_over();
+    
+    return !rockblox_status.gameover;
+}
+
+/* Returns >0 on success, else 0 */
+static int dump_resume(void)
+{
+    int fd;
+
+    fd = rb->open(RESUME_FILE, O_WRONLY|O_CREAT);
+    if (fd <= 0)
+        goto fail;
+
+    if (rb->write(fd, &rockblox_status, sizeof(struct _rockblox_status))
+            <= 0)
+    {
+        rb->close(fd);
+        goto fail;
+    }
+    rb->close(fd);
+    return 1;
+
+fail:
+    rb->splash(HZ/2, "Writing Rockblox resume info failed");
+    return 0;
+}
+static void init_rockblox (bool resume)
 {
     highscore_update(rockblox_status.score, rockblox_status.level, Highest,
             MAX_HIGH_SCORES);
-
-    rockblox_status.level = 1;
-    rockblox_status.lines = 0;
-    rockblox_status.score = 0;
-    rockblox_status.nf = t_rand (BLOCKS_NUM);
-    rockblox_status.gameover = false;
-
-    init_board ();
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #else  /* HAVE_LCD_CHARCELLS */
@@ -799,6 +842,17 @@ static void init_rockblox (void)
     pgfx_fillrect (15, 7, 2, 7);
     pgfx_update();
 #endif
+    if (!resume || !load_resume())
+    {
+        rockblox_status.level = 1;
+        rockblox_status.lines = 0;
+        rockblox_status.score = 0;
+        rockblox_status.nf = t_rand(BLOCKS_NUM);
+        init_board ();
+        new_block ();
+    }
+    draw_next_block();
+
     show_details ();
 #ifdef HIGH_SCORE_Y
     show_highscores ();
@@ -1110,8 +1164,6 @@ static int rockblox_loop (void)
     int lastbutton = BUTTON_NONE;
     long next_down_tick = *rb->current_tick + level_speed(rockblox_status.level);
 
-    new_block ();
-
     while (1) {
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold ()) {
@@ -1204,8 +1256,7 @@ static int rockblox_loop (void)
 #ifdef ROCKBLOX_RESTART
             case ROCKBLOX_RESTART:
                 rb->splash (HZ * 1, "Restarting...");
-                init_rockblox ();
-                new_block ();
+                init_rockblox (false);
                 break;
 #endif
 
@@ -1256,8 +1307,8 @@ static int rockblox_loop (void)
 #if LCD_DEPTH >= 2
             rb->lcd_set_foreground (LCD_BLACK);
 #endif
-            rb->splash (HZ * 2, "Game Over");
-            init_rockblox ();
+            show_game_over();
+            init_rockblox (false);
         }
 
         refresh_board ();
@@ -1293,7 +1344,7 @@ enum plugin_status plugin_start (const void *parameter)
     /* Turn off backlight timeout */
     backlight_force_on(); /* backlight control in lib/helper.c */
 
-    init_rockblox ();
+    init_rockblox (true);
     ret = rockblox_loop ();
 
 #ifndef HAVE_LCD_BITMAP
@@ -1302,6 +1353,8 @@ enum plugin_status plugin_start (const void *parameter)
     /* Save user's HighScore */
     highscore_save(HIGH_SCORE,Highest,MAX_HIGH_SCORES);
     backlight_use_settings(); /* backlight control in lib/helper.c */
+
+    dump_resume();
 
     return ret;
 }
