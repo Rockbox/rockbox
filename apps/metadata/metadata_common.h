@@ -38,12 +38,15 @@ bool read_vorbis_tags(int fd, struct mp3entry *id3,
 bool skip_id3v2(int fd, struct mp3entry *id3);
 long read_string(int fd, char* buf, long buf_size, int eos, long size);
 
+int read_uint8(int fd, uint8_t* buf);
 #ifdef ROCKBOX_BIG_ENDIAN
+#define read_uint16be(fd,buf) read((fd), (buf), 2)
 #define read_uint32be(fd,buf) read((fd), (buf), 4)
 int read_uint16le(int fd, uint16_t* buf);
 int read_uint32le(int fd, uint32_t* buf);
 int read_uint64le(int fd, uint64_t* buf);
 #else
+int read_uint16be(int fd, uint16_t* buf);
 int read_uint32be(int fd, uint32_t* buf);
 #define read_uint16le(fd,buf) read((fd), (buf), 2)
 #define read_uint32le(fd,buf) read((fd), (buf), 4)

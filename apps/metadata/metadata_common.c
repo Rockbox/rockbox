@@ -96,8 +96,25 @@ long read_string(int fd, char* buf, long buf_size, int eos, long size)
     *buf = 0;
     return read_bytes;
 }
+/* Read an unsigned 8-bit integer from a file. */
+int read_uint8(int fd, uint8_t* buf)
+{
+  size_t n;
+
+  n = read(fd, (char*) buf, 1);
+  return n;
+}
 
 #ifdef ROCKBOX_LITTLE_ENDIAN
+/* Read an unsigned 16-bit integer from a big-endian file. */
+int read_uint16be(int fd, uint16_t* buf)
+{
+  size_t n;
+
+  n = read(fd, (char*) buf, 2);
+  *buf = betoh16(*buf);
+  return n;
+}
 /* Read an unsigned 32-bit integer from a big-endian file. */
 int read_uint32be(int fd, uint32_t* buf)
 {
