@@ -113,6 +113,10 @@ static bool try_exts(char *path, int len)
     }
     return false;
 }
+#define EXT
+#else
+#define EXT "bmp"
+#define try_exts(path, len) file_exists(path)
 #endif
 
 /* Look for the first matching album art bitmap in the following list:
@@ -137,9 +141,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     const char *artist;
     int dirlen;
     int albumlen;
-#ifdef USE_JPEG_COVER
     int pathlen;
-#endif
 
     if (!id3 || !buf)
         return false;
@@ -156,43 +158,27 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     /* the first file we look for is one specific to the track playing */
     strip_extension(path, sizeof(path) - strlen(size_string) - 4, trackname);
     strcat(path, size_string);
+    strcat(path, "." EXT);
 #ifdef USE_JPEG_COVER
-    strcat(path, ".");
     pathlen = strlen(path);
-    found = try_exts(path, pathlen);
-#else
-    strcat(path, ".bmp");
-    found = file_exists(path);
 #endif
+    found = try_exts(path, pathlen);
     if (!found && albumlen > 0)
     {
         /* if it doesn't exist,
          * we look for a file specific to the track's album name */
-#ifdef USE_JPEG_COVER
         pathlen = snprintf(path, sizeof(path),
-                           "%s%s%s.", dir, id3->album, size_string);
+                           "%s%s%s." EXT, dir, id3->album, size_string);
         fix_path_part(path, dirlen, albumlen);
         found = try_exts(path, pathlen);
-#else
-        snprintf(path, sizeof(path),
-                 "%s%s%s.bmp", dir, id3->album, size_string);
-        fix_path_part(path, dirlen, albumlen);
-        found = file_exists(path);
-#endif
     }
 
     if (!found)
     {
         /* if it still doesn't exist, we look for a generic file */
-#ifdef USE_JPEG_COVER
         pathlen = snprintf(path, sizeof(path),
-                           "%scover%s.", dir, size_string);
+                           "%scover%s." EXT, dir, size_string);
         found = try_exts(path, pathlen);
-#else
-        snprintf(path, sizeof(path),
-                 "%scover%s.bmp", dir, size_string);
-        found = file_exists(path);
-#endif
     }
 
 #ifdef USE_JPEG_COVER
@@ -208,23 +194,13 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     if (!found && artist && id3->album)
     {
         /* look in the albumart subdir of .rockbox */
-#ifdef USE_JPEG_COVER
         pathlen = snprintf(path, sizeof(path),
-                           ROCKBOX_DIR "/albumart/%s-%s%s.",
+                           ROCKBOX_DIR "/albumart/%s-%s%s." EXT,
                            artist,
                            id3->album,
                            size_string);
         fix_path_part(path, strlen(ROCKBOX_DIR "/albumart/"), MAX_PATH);
         found = try_exts(path, pathlen);
-#else
-        snprintf(path, sizeof(path),
-                ROCKBOX_DIR "/albumart/%s-%s%s.bmp",
-                artist,
-                id3->album,
-                size_string);
-        fix_path_part(path, strlen(ROCKBOX_DIR "/albumart/"), MAX_PATH);
-        found = file_exists(path);
-#endif
     }
 
     if (!found)
@@ -244,32 +220,19 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
         {
             /* we look in the parent directory
              * for a file specific to the track's album name */
-#ifdef USE_JPEG_COVER
             pathlen = snprintf(path, sizeof(path),
-                               "%s%s%s.", dir, id3->album, size_string);
+                               "%s%s%s." EXT, dir, id3->album, size_string);
             fix_path_part(path, dirlen, albumlen);
             found = try_exts(path, pathlen);
-#else
-            snprintf(path, sizeof(path),
-                     "%s%s%s.bmp", dir, id3->album, size_string);
-            fix_path_part(path, dirlen, albumlen);
-            found = file_exists(path);
-#endif
         }
     
         if (!found)
         {
             /* if it still doesn't exist, we look in the parent directory
              * for a generic file */
-#ifdef USE_JPEG_COVER
             pathlen = snprintf(path, sizeof(path),
-                               "%scover%s.", dir, size_string);
+                               "%scover%s." EXT, dir, size_string);
             found = try_exts(path, pathlen);
-#else
-            snprintf(path, sizeof(path),
-                     "%scover%s.bmp", dir, size_string);
-            found = file_exists(path);
-#endif
         }
     }
 
