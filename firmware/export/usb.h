@@ -105,7 +105,7 @@ struct usb_transfer_completion_event_data
     int length;
     void* data;
 };
-#endif
+#endif /* HAVE_USBSTACK */
 
 void usb_init(void);
 void usb_enable(bool on);

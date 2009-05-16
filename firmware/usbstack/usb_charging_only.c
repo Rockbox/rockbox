@@ -66,7 +66,7 @@ int usb_charging_only_get_config_descriptor(unsigned char *dest,int max_packet_s
     unsigned char *orig_dest = dest;
 
     interface_descriptor.bInterfaceNumber=usb_interface;
-    PACK_DESCRIPTOR(dest, interface_descriptor);
+    PACK_DATA(dest, interface_descriptor);
 
     return (dest-orig_dest);
 }

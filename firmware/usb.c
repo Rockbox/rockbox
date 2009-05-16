@@ -273,6 +273,9 @@ static void usb_thread(void)
 #ifdef USB_STORAGE
                     usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, false);
 #endif
+#ifdef USB_HID
+                    usb_core_enable_driver(USB_DRIVER_HID, false);
+#endif
 #ifdef USB_CHARGING_ONLY
                     usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, true);
 #endif
@@ -290,6 +293,9 @@ static void usb_thread(void)
 #endif
 #ifdef USB_STORAGE
                 usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, true);
+#endif
+#ifdef USB_HID
+                usb_core_enable_driver(USB_DRIVER_HID, true);
 #endif
 #ifdef USB_CHARGING_ONLY
                 usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, false);

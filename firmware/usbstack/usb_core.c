@@ -397,7 +397,7 @@ void usb_core_handle_transfer_completion(
                                     (struct usb_ctrlrequest*)event->data);
             break;
         default:
-            handler = ep_data[ep].completion_handler[event->dir>>7];
+            handler = ep_data[ep].completion_handler[EP_DIR(event->dir)];
             if(handler != NULL)
                 handler(ep,event->dir,event->status,event->length);
             break;
@@ -451,17 +451,17 @@ static void usb_core_set_serial_function_id(void)
     usb_string_iSerial.wString[0] = hex[id];
 }
 
-int usb_core_request_endpoint(int dir, struct usb_class_driver* drv)
+int usb_core_request_endpoint(int type, int dir, struct usb_class_driver* drv)
 {
     int ret, ep;
 
-    ret = usb_drv_request_endpoint(dir);
+    ret = usb_drv_request_endpoint(type, dir);
 
     if (ret==-1)
         return -1;
 
-    ep = ret & 0x7f;
-    dir = ret >> 7;
+    dir = EP_DIR(ret);
+    ep = EP_NUM(ret);
 
     ep_data[ep].completion_handler[dir] = drv->transfer_complete;
     ep_data[ep].control_handler[dir] = drv->control_request;
@@ -475,8 +475,8 @@ void usb_core_release_endpoint(int ep)
 
     usb_drv_release_endpoint(ep);
 
-    dir = ep >> 7;
-    ep &= 0x7f;
+    dir = EP_DIR(ep);
+    ep = EP_NUM(ep);
 
     ep_data[ep].completion_handler[dir] = NULL;
     ep_data[ep].control_handler[dir] = NULL;
@@ -512,13 +512,14 @@ static void allocate_interfaces_and_endpoints(void)
 
 static void control_request_handler_drivers(struct usb_ctrlrequest* req)
 {
-    int i;
+    int i, interface = req->wIndex;
     bool handled=false;
+
     for(i=0;i<USB_NUM_DRIVERS;i++) {
         if(drivers[i].enabled &&
                 drivers[i].control_request &&
-                drivers[i].first_interface <= (req->wIndex) &&
-                drivers[i].last_interface > (req->wIndex))
+                drivers[i].first_interface <= interface &&
+                drivers[i].last_interface > interface)
         {
             handled = drivers[i].control_request(req, response_data);
             if(handled)
@@ -528,7 +529,7 @@ static void control_request_handler_drivers(struct usb_ctrlrequest* req)
     if(!handled) {
         /* nope. flag error */
         logf("bad req:desc %d:%d", req->bRequest, req->wValue>>8);
-        usb_drv_stall(EP_CONTROL, true,true);
+        usb_drv_stall(EP_CONTROL, true, true);
         usb_core_ack_control(req);
     }
 }
@@ -730,15 +731,13 @@ static void request_handler_endpoint(struct usb_ctrlrequest* req)
     switch (req->bRequest) {
         case USB_REQ_CLEAR_FEATURE:
             if (req->wValue==USB_ENDPOINT_HALT) {
-                usb_drv_stall(req->wIndex & 0xf, false,
-                        (req->wIndex & USB_DIR_IN)!=0);
+                usb_drv_stall(EP_NUM(req->wIndex), false, EP_DIR(req->wIndex));
             }
             usb_core_ack_control(req);
             break;
         case USB_REQ_SET_FEATURE:
             if (req->wValue==USB_ENDPOINT_HALT) {
-               usb_drv_stall(req->wIndex & 0xf,true,
-                        (req->wIndex & USB_DIR_IN)!=0);
+               usb_drv_stall(EP_NUM(req->wIndex), true, EP_DIR(req->wIndex));
             }
             usb_core_ack_control(req);
             break;
@@ -747,8 +746,8 @@ static void request_handler_endpoint(struct usb_ctrlrequest* req)
             response_data[1]=0;
             logf("usb_core: GET_STATUS");
             if(req->wIndex>0) {
-                response_data[0]=usb_drv_stalled(req->wIndex & 0xf,
-                        (req->wIndex & USB_DIR_IN)!=0);
+                response_data[0]=usb_drv_stalled(EP_NUM(req->wIndex),
+                        EP_DIR(req->wIndex));
             }
             if(!usb_drv_send(EP_CONTROL,response_data,2))
                 usb_core_ack_control(req);
@@ -757,7 +756,8 @@ static void request_handler_endpoint(struct usb_ctrlrequest* req)
                 bool handled;
                 control_handler_t control_handler;
 
-               control_handler=ep_data[req->wIndex & 0xf].control_handler[0];
+               control_handler=
+                   ep_data[EP_NUM(req->wIndex)].control_handler[EP_CONTROL];
                 if (!control_handler)
                     break;
 
@@ -835,9 +835,9 @@ void usb_core_transfer_complete(int endpoint,int dir,int status,int length)
 void usb_core_control_request(struct usb_ctrlrequest* req)
 {
     struct usb_transfer_completion_event_data* completion_event =
-        &ep_data[0].completion_event;
+        &ep_data[EP_CONTROL].completion_event;
 
-    completion_event->endpoint=0;
+    completion_event->endpoint=EP_CONTROL;
     completion_event->dir=0;
     completion_event->data=(void*)req;
     completion_event->status=0;

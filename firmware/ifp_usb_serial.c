@@ -63,9 +63,6 @@
 
 #define ISP1582_UNLOCK_CODE 0xaa37
 
-#define DIR_RX 0
-#define DIR_TX 1
-
 #define TYPE_BULK 2
 
 #define STATE_DEFAULT 0

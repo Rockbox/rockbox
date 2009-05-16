@@ -36,6 +36,17 @@
 
 /* endpoints */
 #define EP_CONTROL 0
+
+#define DIR_OUT 0
+#define DIR_IN 1
+
+/* The USB core is a device, and OUT is RX from that P.O.V */
+#define DIR_RX DIR_OUT
+#define DIR_TX DIR_IN
+
+#define EP_DIR(ep) (((ep) & USB_ENDPOINT_DIR_MASK) ? DIR_IN : DIR_OUT)
+#define EP_NUM(ep) ((ep) & USB_ENDPOINT_NUMBER_MASK)
+
 extern int usb_max_pkt_size;
 
 struct usb_class_driver;
@@ -52,7 +63,7 @@ void usb_core_handle_transfer_completion(
         struct usb_transfer_completion_event_data* event);
 int usb_core_ack_control(struct usb_ctrlrequest* req);
 
-int usb_core_request_endpoint(int dir,struct usb_class_driver* drv);
+int usb_core_request_endpoint(int type, int dir,struct usb_class_driver* drv);
 void usb_core_release_endpoint(int dir);
 
 #ifdef HAVE_HOTSWAP

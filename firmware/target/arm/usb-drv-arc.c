@@ -248,10 +248,6 @@
 #define EPCTRL_RX_EP_STALL                     (0x00000001)
 
 /* bit 19-18 and 3-2 are endpoint type */
-#define EPCTRL_EP_TYPE_CONTROL                 (0)
-#define EPCTRL_EP_TYPE_ISO                     (1)
-#define EPCTRL_EP_TYPE_BULK                    (2)
-#define EPCTRL_EP_TYPE_INTERRUPT               (3)
 #define EPCTRL_TX_EP_TYPE_SHIFT                (18)
 #define EPCTRL_RX_EP_TYPE_SHIFT                (2)
 
@@ -312,6 +308,14 @@
    transfer size, so it seems like a good size */
 #define NUM_TDS_PER_EP 4
 
+typedef struct usb_endpoint
+{
+    bool allocated[2];
+    short type[2];
+    short max_pkt_size[2];
+} usb_endpoint_t;
+static usb_endpoint_t endpoints[USB_NUM_ENDPOINTS];
+
 /* manual: 32.13.2 Endpoint Transfer Descriptor (dTD) */
 struct transfer_descriptor {
     unsigned int next_td_ptr;           /* Next TD pointer(31-5), T(0) set
@@ -356,16 +360,12 @@ static const unsigned int pipe2mask[] = {
     0x10, 0x100000,
 };
 
-static char ep_allocation[USB_NUM_ENDPOINTS];
-
 /*-------------------------------------------------------------------------*/
 static void transfer_completed(void);
 static void control_received(void);
-static int prime_transfer(int endpoint, void* ptr,
-                          int len, bool send, bool wait);
+static int prime_transfer(int ep_num, void* ptr, int len, bool send, bool wait);
 static void prepare_td(struct transfer_descriptor* td,
-                       struct transfer_descriptor* previous_td,
-                       void *ptr, int len,int pipe);
+        struct transfer_descriptor* previous_td, void *ptr, int len,int pipe);
 static void bus_reset(void);
 static void init_control_queue_heads(void);
 static void init_bulk_queue_heads(void);
@@ -394,7 +394,7 @@ void usb_drv_reset(void)
     while (REG_USBCMD & USBCMD_CTRL_RESET);
 
 #if CONFIG_CPU == PP5022 || CONFIG_CPU == PP5024
-    /* On a CPU which identifies as a PP5022, this 
+    /* On a CPU which identifies as a PP5022, this
        initialization must be done after USB is reset.
      */
     outl(inl(0x70000060) | 0xF, 0x70000060);
@@ -475,6 +475,27 @@ static void _usb_drv_init(bool attach)
     (void)attach;
 }
 
+#ifdef LOGF_ENABLE
+#define XFER_DIR_STR(dir) ((dir) ? "IN" : "OUT")
+#define XFER_TYPE_STR(type) \
+    ((type) == USB_ENDPOINT_XFER_CONTROL ? "CTRL" : \
+     ((type) == USB_ENDPOINT_XFER_ISOC ? "ISOC" : \
+      ((type) == USB_ENDPOINT_XFER_BULK ? "BULK" : \
+       ((type) == USB_ENDPOINT_XFER_INT ? "INTR" : "INVL"))))
+
+static void log_ep(int ep_num, int ep_dir, char* prefix)
+{
+    usb_endpoint_t* endpoint = &endpoints[ep_num];
+
+    logf("%s: ep%d %s %s %d", prefix, ep_num, XFER_DIR_STR(ep_dir),
+            XFER_TYPE_STR(endpoint->type[ep_dir]),
+            endpoint->max_pkt_size[ep_dir]);
+}
+#else
+#undef log_ep
+#define log_ep(...)
+#endif
+
 void usb_drv_init(void)
 {
     _usb_drv_init(false);
@@ -483,6 +504,7 @@ void usb_drv_init(void)
 /* fully enable driver */
 void usb_drv_attach(void)
 {
+    logf("usb_drv_attach");
     sleep(HZ/10);
     _usb_drv_init(true);
 }
@@ -555,49 +577,51 @@ void usb_drv_int(void)
 bool usb_drv_stalled(int endpoint,bool in)
 {
     if(in) {
-        return ((REG_ENDPTCTRL(endpoint&0x7f) & EPCTRL_TX_EP_STALL)!=0);
+        return ((REG_ENDPTCTRL(EP_NUM(endpoint)) & EPCTRL_TX_EP_STALL)!=0);
     }
     else {
-        return ((REG_ENDPTCTRL(endpoint&0x7f) & EPCTRL_RX_EP_STALL)!=0);
+        return ((REG_ENDPTCTRL(EP_NUM(endpoint)) & EPCTRL_RX_EP_STALL)!=0);
     }
 
 }
-void usb_drv_stall(int endpoint, bool stall,bool in)
+void usb_drv_stall(int endpoint, bool stall, bool in)
 {
-    logf("%sstall %d", stall?"":"un", endpoint&0x7f);
+    int ep_num = EP_NUM(endpoint);
+
+    logf("%sstall %d", stall ? "" : "un", ep_num);
 
     if(in) {
         if (stall) {
-            REG_ENDPTCTRL(endpoint&0x7f) |= EPCTRL_TX_EP_STALL;
+            REG_ENDPTCTRL(ep_num) |= EPCTRL_TX_EP_STALL;
         }
         else {
-            REG_ENDPTCTRL(endpoint&0x7f) &= ~EPCTRL_TX_EP_STALL;
+            REG_ENDPTCTRL(ep_num) &= ~EPCTRL_TX_EP_STALL;
         }
     }
     else {
         if (stall) {
-            REG_ENDPTCTRL(endpoint) |= EPCTRL_RX_EP_STALL;
+            REG_ENDPTCTRL(ep_num) |= EPCTRL_RX_EP_STALL;
         }
         else {
-            REG_ENDPTCTRL(endpoint) &= ~EPCTRL_RX_EP_STALL;
+            REG_ENDPTCTRL(ep_num) &= ~EPCTRL_RX_EP_STALL;
         }
     }
 }
 
 int usb_drv_send_nonblocking(int endpoint, void* ptr, int length)
 {
-    return prime_transfer(endpoint&0x7f, ptr, length, true, false);
+    return prime_transfer(EP_NUM(endpoint), ptr, length, true, false);
 }
 
 int usb_drv_send(int endpoint, void* ptr, int length)
 {
-    return prime_transfer(endpoint&0x7f, ptr, length, true, true);
+    return prime_transfer(EP_NUM(endpoint), ptr, length, true, true);
 }
 
 int usb_drv_recv(int endpoint, void* ptr, int length)
 {
     //logf("usbrecv(%x, %d)", ptr, length);
-    return prime_transfer(endpoint&0x7f, ptr, length, false, false);
+    return prime_transfer(EP_NUM(endpoint), ptr, length, false, false);
 }
 
 int usb_drv_port_speed(void)
@@ -627,7 +651,7 @@ void usb_drv_set_address(int address)
 
 void usb_drv_reset_endpoint(int endpoint, bool send)
 {
-    int pipe = (endpoint&0x7f) * 2 + (send ? 1 : 0);
+    int pipe = EP_NUM(endpoint) * 2 + (send ? 1 : 0);
     unsigned int mask = pipe2mask[pipe];
     REG_ENDPTFLUSH = mask;
     while (REG_ENDPTFLUSH & mask);
@@ -662,23 +686,23 @@ void usb_drv_set_test_mode(int mode)
 /*-------------------------------------------------------------------------*/
 
 /* manual: 32.14.5.2 */
-static int prime_transfer(int endpoint, void* ptr, int len, bool send, bool wait)
+static int prime_transfer(int ep_num, void* ptr, int len, bool send, bool wait)
 {
     int rc = 0;
-    int pipe = endpoint * 2 + (send ? 1 : 0);
+    int pipe = ep_num * 2 + (send ? 1 : 0);
     unsigned int mask = pipe2mask[pipe];
     struct queue_head* qh = &qh_array[pipe];
     static long last_tick;
-    struct transfer_descriptor* new_td,*cur_td,*prev_td;
+    struct transfer_descriptor *new_td, *cur_td, *prev_td;
 
     int oldlevel = disable_irq_save();
 /*
-    if (send && endpoint > EP_CONTROL) {
+    if (send && ep_num > EP_CONTROL) {
         logf("usb: sent %d bytes", len);
     }
 */
     qh->status = 0;
-    qh->wait   = wait;
+    qh->wait = wait;
 
     new_td=&td_array[pipe*NUM_TDS_PER_EP];
     cur_td=new_td;
@@ -694,15 +718,15 @@ static int prime_transfer(int endpoint, void* ptr, int len, bool send, bool wait
         cur_td++;
         len-=tdlen;
     }
-    while(len>0 );
-    //logf("starting ep %d %s",endpoint,send?"send":"receive");
+    while(len>0);
+    //logf("starting ep %d %s",ep_num,send?"send":"receive");
 
     qh->dtd.next_td_ptr = (unsigned int)new_td;
     qh->dtd.size_ioc_sts &= ~(QH_STATUS_HALT | QH_STATUS_ACTIVE);
 
     REG_ENDPTPRIME |= mask;
 
-    if(endpoint == EP_CONTROL && (REG_ENDPTSETUPSTAT & EPSETUP_STATUS_EP0)) {
+    if(ep_num == EP_CONTROL && (REG_ENDPTSETUPSTAT & EPSETUP_STATUS_EP0)) {
         /* 32.14.3.2.2 */
         logf("new setup arrived");
         rc = -4;
@@ -724,11 +748,11 @@ static int prime_transfer(int endpoint, void* ptr, int len, bool send, bool wait
     }
 
     if (!(REG_ENDPTSTATUS & mask)) {
-        logf("no prime! %d %d %x", endpoint, pipe, qh->dtd.size_ioc_sts & 0xff );
+        logf("no prime! %d %d %x", ep_num, pipe, qh->dtd.size_ioc_sts & 0xff);
         rc = -3;
         goto pt_error;
     }
-    if(endpoint == EP_CONTROL && (REG_ENDPTSETUPSTAT & EPSETUP_STATUS_EP0)) {
+    if(ep_num == EP_CONTROL && (REG_ENDPTSETUPSTAT & EPSETUP_STATUS_EP0)) {
         /* 32.14.3.2.2 */
         logf("new setup arrived");
         rc = -4;
@@ -780,17 +804,38 @@ void usb_drv_cancel_all_transfers(void)
     }
 }
 
-int usb_drv_request_endpoint(int dir)
+int usb_drv_request_endpoint(int type, int dir)
 {
-    int i, bit;
+    int ep_num, ep_dir;
+    short ep_type;
 
-    bit=(dir & USB_DIR_IN)? 2:1;
+    /* Safety */
+    ep_dir = EP_DIR(dir);
+    ep_type = type & USB_ENDPOINT_XFERTYPE_MASK;
 
-    for (i=1; i < USB_NUM_ENDPOINTS; i++) {
-        if((ep_allocation[i] & bit)!=0)
+    logf("req: %s %s", XFER_DIR_STR(ep_dir), XFER_TYPE_STR(ep_type));
+
+    /* Find an available ep/dir pair */
+    for (ep_num=1;ep_num<USB_NUM_ENDPOINTS;ep_num++) {
+        usb_endpoint_t* endpoint=&endpoints[ep_num];
+        int other_dir=(ep_dir ? 0:1);
+
+        if (endpoint->allocated[ep_dir])
             continue;
-        ep_allocation[i] |= bit;
-        return i | dir;
+
+        if (endpoint->allocated[other_dir] &&
+                endpoint->type[other_dir] != ep_type) {
+            logf("ep of different type!");
+            return -1;
+        }
+
+        log_ep(ep_num, ep_dir, "add");
+
+        endpoint->allocated[ep_dir] = 1;
+        endpoint->type[ep_dir] = ep_type;
+
+        log_ep(ep_num, ep_dir, "got");
+        return (ep_num | (dir & USB_ENDPOINT_DIR_MASK));
     }
 
     return -1;
@@ -798,8 +843,11 @@ int usb_drv_request_endpoint(int dir)
 
 void usb_drv_release_endpoint(int ep)
 {
-    int mask = (ep & USB_DIR_IN)? ~2:~1;
-    ep_allocation[ep & 0x7f] &= mask;
+    int ep_num = EP_NUM(ep);
+    int ep_dir = EP_DIR(ep);
+
+    log_ep(ep_num, ep_dir, "rel");
+    endpoints[ep_num].allocated[ep_dir] = 0;
 }
 
 
@@ -870,11 +918,12 @@ static void transfer_completed(void)
                 struct transfer_descriptor* td=&td_array[pipe*NUM_TDS_PER_EP];
                 while(td!=(struct transfer_descriptor*)DTD_NEXT_TERMINATE && td!=0)
                 {
-                    length += ((td->reserved & DTD_RESERVED_LENGTH_MASK) - 
+                    length += ((td->reserved & DTD_RESERVED_LENGTH_MASK) -
                         ((td->size_ioc_sts & DTD_PACKET_SIZE) >> DTD_LENGTH_BIT_POS));
                     td=(struct transfer_descriptor*) td->next_td_ptr;
                 }
-                usb_core_transfer_complete(ep, dir?USB_DIR_IN:USB_DIR_OUT, qh->status, length);
+                usb_core_transfer_complete(ep, dir?USB_DIR_IN:USB_DIR_OUT,
+                        qh->status, length);
             }
         }
     }
@@ -906,7 +955,7 @@ static void bus_reset(void)
     }
 
     usb_drv_cancel_all_transfers();
-    
+
     if (!(REG_PORTSC1 & PORTSCX_PORT_RESET)) {
         logf("usb: slow reset!");
     }
@@ -926,39 +975,41 @@ static void init_control_queue_heads(void)
 /* manual: 32.14.4.1 Queue Head Initialization */
 static void init_bulk_queue_heads(void)
 {
-    int tx_packetsize;
-    int rx_packetsize;
+    int packetsize = (usb_drv_port_speed() ? 512 : 64);
     int i;
 
-    if (usb_drv_port_speed()) {
-        rx_packetsize = 512;
-        tx_packetsize = 512;
-    }
-    else {
-        rx_packetsize = 64;
-        tx_packetsize = 64;
-    }
     /* TODO: this should take ep_allocation into account */
-
-    /*** bulk ***/
-    for(i=1;i<USB_NUM_ENDPOINTS;i++) {
-        qh_array[i*2].max_pkt_length = rx_packetsize << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL;
+    for (i=1;i<USB_NUM_ENDPOINTS;i++) {
+        qh_array[i*2].max_pkt_length = packetsize << QH_MAX_PKT_LEN_POS |
+            QH_ZLT_SEL;
         qh_array[i*2].dtd.next_td_ptr = QH_NEXT_TERMINATE;
-        qh_array[i*2+1].max_pkt_length = tx_packetsize << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL;
+        qh_array[i*2+1].max_pkt_length = packetsize << QH_MAX_PKT_LEN_POS |
+            QH_ZLT_SEL;
         qh_array[i*2+1].dtd.next_td_ptr = QH_NEXT_TERMINATE;
     }
 }
 
 static void init_endpoints(void)
 {
-    int i;
-    /* TODO: this should take ep_allocation into account */
-    /* bulk */
-    for(i=1;i<USB_NUM_ENDPOINTS;i++) {
-        REG_ENDPTCTRL(i) =
+    int ep_num;
+
+    logf("init_endpoints");
+    /* RX/TX from the device POV: OUT/IN, respectively */
+    for(ep_num=1;ep_num<USB_NUM_ENDPOINTS;ep_num++) {
+        usb_endpoint_t *endpoint = &endpoints[ep_num];
+
+        /* manual: 32.9.5.18 (Caution) */
+        if (!endpoint->allocated[DIR_OUT]) {
+            endpoint->type[DIR_OUT] = USB_ENDPOINT_XFER_BULK;
+        }
+        if (!endpoint->allocated[DIR_IN]) {
+            endpoint->type[DIR_IN] = USB_ENDPOINT_XFER_BULK;
+        }
+
+        REG_ENDPTCTRL(ep_num) =
             EPCTRL_RX_DATA_TOGGLE_RST | EPCTRL_RX_ENABLE |
             EPCTRL_TX_DATA_TOGGLE_RST | EPCTRL_TX_ENABLE |
-            (EPCTRL_EP_TYPE_BULK << EPCTRL_RX_EP_TYPE_SHIFT) |
-            (EPCTRL_EP_TYPE_BULK << EPCTRL_TX_EP_TYPE_SHIFT);
+            (endpoint->type[DIR_OUT] << EPCTRL_RX_EP_TYPE_SHIFT) |
+            (endpoint->type[DIR_IN] << EPCTRL_TX_EP_TYPE_SHIFT);
     }
 }

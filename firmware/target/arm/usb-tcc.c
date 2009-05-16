@@ -94,11 +94,14 @@ static struct tcc_ep tcc_endpoints[] = {
 static bool usb_drv_write_ep(struct tcc_ep *ep);
 static void usb_set_speed(int);
 
-int usb_drv_request_endpoint(int dir)
+int usb_drv_request_endpoint(int type, int dir)
 {
     int flags = disable_irq_save();
     size_t ep;
     int ret = 0;
+
+    if (type != USB_ENDPOINT_XFER_BULK)
+        return -1;
 
     if (dir == USB_DIR_IN)
         ep = 1;

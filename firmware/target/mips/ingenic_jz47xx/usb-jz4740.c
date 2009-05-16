@@ -852,10 +852,13 @@ void usb_drv_release_endpoint(int ep)
     logf("usb_drv_release_endpoint(%d, %s)", (ep & 0x7F), (ep >> 7) ? "IN" : "OUT");
 }
 
-int usb_drv_request_endpoint(int dir)
+int usb_drv_request_endpoint(int type, int dir)
 {
     logf("usb_drv_request_endpoint(%s)", (dir == USB_DIR_IN) ? "IN" : "OUT");
-    
+
+    if (type != USB_ENDPOINT_XFER_BULK)
+        return -1;
+
     /* There are only 3+2 endpoints, so hardcode this ... */
     /* Currently only BULK endpoints ... */
     if(dir == USB_DIR_OUT)

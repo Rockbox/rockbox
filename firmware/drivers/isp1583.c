@@ -29,9 +29,6 @@
 #include "logf.h"
 #include "stdio.h"
 
-#define DIR_RX                      0
-#define DIR_TX                      1
- 
 struct usb_endpoint
 {
     unsigned char *out_buf;
@@ -602,9 +599,12 @@ void usb_drv_cancel_all_transfers(void)
         endpoints[i].halt[0] = endpoints[i].halt[1] = 1;
 }
 
-int usb_drv_request_endpoint(int dir)
+int usb_drv_request_endpoint(int type, int dir)
 {
     int i, bit;
+ 
+    if (type != USB_ENDPOINT_XFER_BULK)
+        return -1;
 
     bit=(dir & USB_DIR_IN)? 2:1;
 

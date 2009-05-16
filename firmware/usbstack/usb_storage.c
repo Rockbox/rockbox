@@ -349,12 +349,13 @@ void usb_storage_init(void)
 
 int usb_storage_request_endpoints(struct usb_class_driver *drv)
 {
-    ep_in = usb_core_request_endpoint(USB_DIR_IN, drv);
+    ep_in = usb_core_request_endpoint(USB_ENDPOINT_XFER_BULK, USB_DIR_IN, drv);
 
     if(ep_in<0)
         return -1;
 
-    ep_out = usb_core_request_endpoint(USB_DIR_OUT, drv);
+    ep_out = usb_core_request_endpoint(USB_ENDPOINT_XFER_BULK, USB_DIR_OUT,
+            drv);
 
     if(ep_out<0) {
         usb_core_release_endpoint(ep_in);
@@ -375,15 +376,15 @@ int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size)
     unsigned char *orig_dest = dest;
 
     interface_descriptor.bInterfaceNumber = usb_interface;
-    PACK_DESCRIPTOR(dest, interface_descriptor);
+    PACK_DATA(dest, interface_descriptor);
 
     endpoint_descriptor.wMaxPacketSize = max_packet_size;
 
     endpoint_descriptor.bEndpointAddress = ep_in;
-    PACK_DESCRIPTOR(dest, endpoint_descriptor);
+    PACK_DATA(dest, endpoint_descriptor);
 
     endpoint_descriptor.bEndpointAddress = ep_out;
-    PACK_DESCRIPTOR(dest, endpoint_descriptor);
+    PACK_DATA(dest, endpoint_descriptor);
 
     return (dest - orig_dest);
 }
