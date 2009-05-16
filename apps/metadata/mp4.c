@@ -570,8 +570,8 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                     && (id != MP4_qt) && (id != MP4_3gp6))
                 {
                     DEBUGF("Unknown MP4 file type: '%c%c%c%c'\n", 
-                        id >> 24 & 0xff, id >> 16 & 0xff, id >> 8 & 0xff,
-                        id & 0xff);
+                        (int)(id >> 24 & 0xff), (int)(id >> 16 & 0xff),
+                        (int)(id >> 8 & 0xff), (int)(id & 0xff));
                     return false;
                 }
             }
