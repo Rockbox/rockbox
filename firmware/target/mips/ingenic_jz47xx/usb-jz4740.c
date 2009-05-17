@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "config.h"
+#define LOGF_ENABLE
 #include "logf.h"
 #include "system.h"
 #include "usb_ch9.h"
@@ -76,9 +77,9 @@ static struct usb_endpoint endpoints[] =
 {/*    buf        length sent  busy  type      use_dma  wait   fifo_addr  fifo_size */
     {&ep0_rx_buf,    0,  {0}, false, ep_control,   false, false,  USB_FIFO_EP0,  64 },
     {NULL,           0,  {0}, false, ep_control,   false, false,  USB_FIFO_EP0,  64 },
+    {NULL,           0,  {0}, false, ep_interrupt, false, false,  USB_FIFO_EP1,  64 },
     {NULL,           0,  {0}, false, ep_bulk,      false, false,  USB_FIFO_EP1,  512},
-    {NULL,           0,  {0}, false, ep_bulk,      false, false,  USB_FIFO_EP1,  512},
-    {NULL,           0,  {0}, false, ep_interrupt, false, false,  USB_FIFO_EP2,  64 }
+    {NULL,           0,  {0}, false, ep_bulk,      false, false,  USB_FIFO_EP2,  512}
 };
 static struct wakeup ep_wkup[TOTAL_EP()];
 
@@ -436,6 +437,9 @@ static void setup_endpoint(struct usb_endpoint *ep)
         if(ep->use_dma)
             csrh |= (USB_INCSRH_DMAREQENAB | USB_INCSRH_AUTOSET | USB_INCSRH_DMAREQMODE);
         
+        if(ep->type == ep_interrupt)
+            csrh |= USB_INCSRH_FRCDATATOG;
+
         REG_USB_REG_INMAXP = ep->fifo_size;
         REG_USB_REG_INCSR = csr;
         REG_USB_REG_INCSRH = csrh;
@@ -860,14 +864,18 @@ int usb_drv_request_endpoint(int type, int dir)
     type &= USB_ENDPOINT_XFERTYPE_MASK;
 
     /* There are only 3+2 endpoints, so hardcode this ... */
+    /* Use the endpoint combinations from the Ingenic Linux USB driver */
     switch(type)
     {
         case USB_ENDPOINT_XFER_BULK:
-            return (1 | dir);
+            if(dir == USB_DIR_IN)
+                return (2 | USB_DIR_IN);
+            else
+                return (1 | USB_DIR_OUT);
 
         case USB_ENDPOINT_XFER_INT:
             if(dir == USB_DIR_IN)
-                return (2 | USB_DIR_IN);
+                return (1 | USB_DIR_IN);
 
         default:
             return -1;

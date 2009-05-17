@@ -2475,6 +2475,7 @@
 #define USB_INCSRH_ISO         0x40
 #define USB_INCSRH_MODE        0x20
 #define USB_INCSRH_DMAREQENAB  0x10
+#define USB_INCSRH_FRCDATATOG  0x08
 #define USB_INCSRH_DMAREQMODE  0x04
 #define USB_INCSR_CDT          0x40
 #define USB_INCSR_SENTSTALL    0x20
@@ -5111,6 +5112,9 @@ struct Ration2m
 
 #define IPU_DISABLE_IRQ() \
     REG32(IPU_V_BASE + REG_CTRL) &= ~FM_IRQ_EN;
+
+#define IPU_ENABLE_IRQ() \
+    REG32(IPU_V_BASE + REG_CTRL) |= FM_IRQ_EN;
 
 #define IPU_DISABLE_RSIZE() \
     REG32(IPU_V_BASE + REG_CTRL) &= ~RSZ_EN;
