@@ -58,7 +58,7 @@ void pcm_play_dma_init(void)
 void pcm_dma_apply_settings(void)
 {
     /* TODO */
-    audiohw_set_frequency(pcm_fsel);
+    audiohw_set_frequency(pcm_sampr);
 }
 
 static void play_start_pcm(void)
