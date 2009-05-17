@@ -34,7 +34,6 @@
 #include "statusbar.h"
 #include "screen_access.h"
 #include "appevents.h"
-#include "gwps.h"
 
 static int statusbar_enabled = 0;
 

@@ -18,36 +18,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "string.h"
-#include "lcd.h"
-#include "debug.h"
-#include "kernel.h"
-#include "power.h"
-#include "thread.h"
-#include "settings.h"
+#include <string.h>
+#include <stdbool.h>
+#include "config.h"
 #include "status.h"
-#include "mp3_playback.h"
 #include "audio.h"
-#include "gwps.h"
-#if CONFIG_RTC
-#include "timefuncs.h"
-#endif
-#ifdef HAVE_LCD_BITMAP
-#include "icons.h"
-#include "font.h"
-#endif
-#include "powermgmt.h"
-#include "led.h"
-#include "sound.h"
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
-#include "button.h"
-#endif
-#include "usb.h"
 #if CONFIG_TUNER
 #include "radio.h"
-#endif
-#if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
-#include "pcm_record.h"
 #endif
 
 static enum playmode ff_mode;
