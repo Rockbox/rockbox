@@ -72,7 +72,6 @@
 #include "list.h"
 #include "splash.h"
 #include "buttonbar.h"
-#include "action.h"
 #include "quickscreen.h"
 
 #include "root_menu.h"

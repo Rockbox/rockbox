@@ -25,7 +25,6 @@
 #include "config.h"
 #include "cpu.h"
 #include "string.h"
-#include "lcd.h"
 #include "kernel.h"
 #include "memory.h"
 #include "system-target.h"

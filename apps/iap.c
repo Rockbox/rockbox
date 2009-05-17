@@ -38,7 +38,6 @@
 #include "metadata.h"
 #include "gwps.h"
 
-#include "button.h"
 #include "action.h"
 
 #define RX_BUFLEN 260

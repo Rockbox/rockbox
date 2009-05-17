@@ -49,7 +49,6 @@
 #include "list.h"
 #include "splash.h"
 #include "playlist_menu.h"
-#include "action.h"
 
 /* Maximum number of tracks we can have loaded at one time */
 #define MAX_PLAYLIST_ENTRIES 200

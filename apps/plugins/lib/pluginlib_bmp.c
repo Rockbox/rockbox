@@ -24,7 +24,6 @@
 
 #include "lcd.h"
 #include "file.h"
-#include "lcd.h"
 #include "system.h"
 
 #if LCD_DEPTH > 1  /* save is only available for color, resize for >1bpp */

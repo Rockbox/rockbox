@@ -46,7 +46,6 @@
 #include "icons.h"
 #include "peakmeter.h"
 #endif
-#include "action.h"
 #include "lang.h"
 #include "bookmark.h"
 #include "misc.h"

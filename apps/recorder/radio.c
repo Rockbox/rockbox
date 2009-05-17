@@ -58,7 +58,6 @@
 #include "splash.h"
 #include "yesno.h"
 #include "buttonbar.h"
-#include "power.h"
 #include "tree.h"
 #include "dir.h"
 #include "action.h"

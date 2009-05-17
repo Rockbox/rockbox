@@ -42,7 +42,6 @@
 #include "power.h"
 #include "system.h"
 #include "powermgmt.h"
-#include "action.h"
 #include "talk.h"
 #include "misc.h"
 #include "metadata.h"

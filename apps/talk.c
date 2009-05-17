@@ -44,7 +44,6 @@
 #include "playback.h"
 #endif
 #include "debug.h"
-#include "kernel.h"
 
 
 /* Memory layout varies between targets because the

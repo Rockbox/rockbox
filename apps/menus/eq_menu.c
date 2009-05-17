@@ -41,11 +41,9 @@
 #include "sound.h"
 #include "dsp.h"
 #include "tree.h"
-#include "talk.h"
 #include "screen_access.h"
 #include "keyboard.h"
 #include "gui/scrollbar.h"
-#include "eq_menu.h"
 #include "menu_common.h"
 #include "viewport.h"
 

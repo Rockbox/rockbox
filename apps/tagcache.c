@@ -69,7 +69,6 @@
 #include "string.h"
 #include "usb.h"
 #include "metadata.h"
-#include "metadata.h"
 #include "tagcache.h"
 #include "buffer.h"
 #include "crc32.h"
@@ -77,7 +76,6 @@
 #include "settings.h"
 #include "dir.h"
 #include "structec.h"
-#include "tagcache.h"
 
 #ifndef __PCTOOL__
 #include "lang.h"

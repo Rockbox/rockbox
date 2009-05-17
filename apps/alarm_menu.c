@@ -37,7 +37,6 @@
 #include "screens.h"
 #include "talk.h"
 #include "lang.h"
-#include "power.h"
 #include "alarm_menu.h"
 #include "splash.h"
 #include "viewport.h"

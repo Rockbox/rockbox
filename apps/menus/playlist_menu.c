@@ -31,7 +31,6 @@
 #include "menu.h"
 #include "playlist_menu.h"
 
-#include "menu.h"
 #include "file.h"
 #include "keyboard.h"
 #include "playlist.h"

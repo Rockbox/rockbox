@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 #include "config.h"
 #include "misc.h"
 #include "lcd.h"
@@ -27,14 +28,10 @@
 #ifdef __PCTOOL__
 #include <stdarg.h>
 #include <stdio.h>
-#ifdef WPSEDITOR
-#include "string.h"
-#endif
 #else
 #include "sprintf.h"
 #include "appevents.h"
 #include "lang.h"
-#include "string.h"
 #include "dir.h"
 #include "lcd-remote.h"
 #include "errno.h"

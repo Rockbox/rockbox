@@ -24,7 +24,6 @@
 #include "system.h"
 #include "button.h"
 #include "backlight.h"
-#include "system.h"
 #include "backlight-target.h"
 #include "avic-imx31.h"
 #include "ccm-imx31.h"

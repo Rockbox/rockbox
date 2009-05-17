@@ -38,7 +38,6 @@
 #include "backlight.h"
 #include "serial.h"
 #include "power.h"
-#include "system.h"
 #include "powermgmt.h"
 
 #define WHEEL_FAST_OFF_TIMEOUT   250000 /* timeout for acceleration = 250ms */

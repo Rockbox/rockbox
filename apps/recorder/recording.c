@@ -73,7 +73,6 @@
 #include "screen_access.h"
 #include "action.h"
 #include "radio.h"
-#include "sound_menu.h"
 #include "viewport.h"
 #include "list.h"
 #include "general.h"

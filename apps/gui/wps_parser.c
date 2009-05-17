@@ -29,7 +29,6 @@
 #ifdef __PCTOOL__
 #ifdef WPSEDITOR
 #include "proxy.h"
-#include "settings.h"
 #include "sysfont.h"
 #else
 #include "checkwps.h"
@@ -42,13 +41,10 @@
 
 #include <ctype.h>
 #include <stdbool.h>
-#include <string.h>
 #include "font.h"
 
 #include "gwps.h"
-#ifndef __PCTOOL__
 #include "settings.h"
-#endif
 #include "settings_list.h"
 
 #ifdef HAVE_LCD_BITMAP

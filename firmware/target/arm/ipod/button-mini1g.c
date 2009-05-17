@@ -38,7 +38,6 @@
 #include "backlight.h"
 #include "serial.h"
 #include "power.h"
-#include "system.h"
 #include "powermgmt.h"
 
 /* Variable to use for setting button status in interrupt handler */

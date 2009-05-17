@@ -24,7 +24,6 @@
 #include "cpu.h"
 #include "system.h"
 #include "kernel.h"
-#include "system.h"
 
 #define LOGF_ENABLE
 #include "logf.h"
