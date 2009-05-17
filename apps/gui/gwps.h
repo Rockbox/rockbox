@@ -375,6 +375,7 @@ struct touchregion {
     short int y;             /* y-pos */
     short int width;         /* width */
     short int height;        /* height */
+    bool repeat;             /* requires the area be held for the action */
     int action;              /* action this button will return */
 };
 #define MAX_TOUCHREGIONS    12
@@ -532,6 +533,10 @@ extern struct wps_state wps_state;
 extern struct gui_wps gui_wps[NB_SCREENS];
 
 void gui_sync_wps_init(void);
+
+#ifdef HAVE_TOUCHSCREEN
+int wps_get_touchaction(struct wps_data *data);
+#endif
 
 #ifdef HAVE_ALBUMART
 /* gives back if WPS contains an albumart tag */

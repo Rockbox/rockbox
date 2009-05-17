@@ -295,15 +295,16 @@ void gwps_draw_statusbars(void)
     viewportmanager_set_statusbar(wpsbars);
 }
 #ifdef HAVE_TOUCHSCREEN
-static int wps_get_touchaction(struct wps_data *data)
+int wps_get_touchaction(struct wps_data *data)
 {
     short x,y;
     short vx, vy;
     int type = action_get_touchscreen_press(&x, &y);
     int i;
+    static int last_action = ACTION_NONE;
     struct touchregion *r;
-    if (type != BUTTON_REL)
-        return ACTION_TOUCHSCREEN;
+    bool repeated = (type == BUTTON_REPEAT);
+    bool released = (type == BUTTON_REL);
     for (i=0; i<data->touchregion_count; i++)
     {
         r = &data->touchregion[i];
@@ -320,9 +321,19 @@ static int wps_get_touchaction(struct wps_data *data)
             /* now see if the point is inside this region */
             if (vx >= r->x && vx < r->x+r->width &&
                 vy >= r->y && vy < r->y+r->height)
-                return r->action;
+            {
+                if ((repeated && r->repeat) ||
+                    (released && !r->repeat))
+                {
+                    last_action = r->action;    
+                    return r->action;
+                }    
+            }    
         }
     }
+    if ((last_action == ACTION_WPS_SEEKBACK || last_action == ACTION_WPS_SEEKFWD))
+        return ACTION_WPS_STOPSEEK;
+    last_action = ACTION_TOUCHSCREEN;
     return ACTION_TOUCHSCREEN;
 }
 #endif

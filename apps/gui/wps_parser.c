@@ -1163,6 +1163,7 @@ struct touchaction {char* s; int action;};
 static struct touchaction touchactions[] = {
     {"play", ACTION_WPS_PLAY }, {"stop", ACTION_WPS_STOP },
     {"prev", ACTION_WPS_SKIPPREV }, {"next", ACTION_WPS_SKIPNEXT },
+    {"ffwd", ACTION_WPS_SEEKFWD }, {"rwd", ACTION_WPS_SEEKBACK },
     {"menu", ACTION_WPS_MENU }, {"browse", ACTION_WPS_BROWSE },
     {"shuffle", ACTION_TOUCH_SHUFFLE }, {"repmode", ACTION_TOUCH_REPMODE },
     {"quickscreen", ACTION_WPS_QUICKSCREEN },{"contextmenu", ACTION_WPS_CONTEXT },
@@ -1178,13 +1179,14 @@ static int parse_touchregion(const char *wps_bufptr,
     int x,y,w,h;
     
     /* format: %T|x|y|width|height|action|
+     * if action starts with & the area must be held to happen
      * action is one of:
      * play  -  play/pause playback
      * stop  -  stop playback, exit the wps
      * prev  -  prev track
      * next  -  next track
-     * ffwd
-     * rwd
+     * ffwd  -  seek forward
+     * rwd   -  seek backwards
      * menu  -  go back to the main menu
      * browse - go back to the file/db browser
      * shuffle - toggle shuffle mode
@@ -1213,6 +1215,14 @@ static int parse_touchregion(const char *wps_bufptr,
     region->height = h;
     region->wvp = &wps_data->viewports[wps_data->num_viewports];
     i = 0;
+    if (*action == '&')
+    {
+        action++;
+        region->repeat = true;
+    }
+    else
+        region->repeat = false;
+        
     while ((region->action == ACTION_NONE) && 
             (i < sizeof(touchactions)/sizeof(*touchactions)))
     {

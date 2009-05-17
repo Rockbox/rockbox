@@ -268,7 +268,13 @@ bool ffwd_rew(int button)
                 break;
         }
         if (!exit)
+        {
             button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,TIMEOUT_BLOCK);
+#ifdef HAVE_TOUCHSCREEN
+            if (button == ACTION_TOUCHSCREEN)
+                button = wps_get_touchaction(gui_wps[SCREEN_MAIN].data);
+#endif
+        }        
     }
     return usb;
 }
