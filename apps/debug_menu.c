@@ -112,8 +112,11 @@
 #include "as3514.h"
 #endif
 
-#if defined(HAVE_USBSTACK)
+#ifdef HAVE_USBSTACK
 #include "usb_core.h"
+#ifdef USB_HID
+#include "usbstack/usb_hid.h"
+#endif
 #endif
 
 /*---------------------------------------------------*/
@@ -191,7 +194,7 @@ static int dbg_threads_action_callback(int action, struct gui_synclist *lists)
         int selpos = gui_synclist_get_sel_pos(lists);
 #if NUM_CORES > 1
         if (selpos >= NUM_CORES)
-            remove_thread(&threads[selpos - NUM_CORES]);
+            remove_thread(threads[selpos - NUM_CORES].id);
 #else
         remove_thread(&threads[selpos]);
 #endif
@@ -2583,8 +2586,9 @@ static bool dbg_scrollwheel(void)
 }
 #endif
 
-#if defined (HAVE_USBSTACK) \
-   && (defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL) || defined(USB_HID))
+#if defined (HAVE_USBSTACK)
+
+#if defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL)
 static bool toggle_usb_core_driver(int driver, char *msg)
 {
     bool enabled = !usb_core_driver_enabled(driver);
@@ -2594,24 +2598,55 @@ static bool toggle_usb_core_driver(int driver, char *msg)
 
     return false;
 }
-#if 0 && defined(USB_STORAGE)
-static bool toggle_usb_mass_storage(void)
-{
-    return toggle_usb_core_driver(USB_DRIVER_MASS_STORAGE,"USB Mass Storage");
-}
-#endif
 
-#if defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL)
 static bool toggle_usb_serial(void)
 {
     return toggle_usb_core_driver(USB_DRIVER_SERIAL,"USB Serial");
 }
 #endif
 
-#if defined(USB_HID)
-static bool toggle_usb_hid(void)
+#ifdef USB_HID
+static bool hid_send_cmd(consumer_usage_page_t cmd, char *msg)
 {
-    return toggle_usb_core_driver(USB_DRIVER_HID, "USB HID");
+    (void)msg;
+
+    if (!usb_core_driver_enabled(USB_DRIVER_HID)) {
+        splashf(HZ, "Send failed. Driver is disabled");
+        return false;
+    }
+
+    usb_hid_send_consumer_usage(cmd);
+    logf("Sent %s command", msg);
+
+    return false;
+}
+static bool usb_hid_send_play_pause(void)
+{
+    return hid_send_cmd(PLAY_PAUSE, "Play/Pause");
+}
+static bool usb_hid_send_stop(void)
+{
+    return hid_send_cmd(STOP, "Stop");
+}
+static bool usb_hid_send_scan_previous_track(void)
+{
+    return hid_send_cmd(SCAN_PREVIOUS_TRACK, "Scan previous track");
+}
+static bool usb_hid_send_scan_next_track(void)
+{
+    return hid_send_cmd(SCAN_NEXT_TRACK, "Scan next track");
+}
+static bool usb_hid_send_mute(void)
+{
+    return hid_send_cmd(MUTE, "Mute");
+}
+static bool usb_hid_send_volume_decrement(void)
+{
+    return hid_send_cmd(VOLUME_DECREMENT, "Vol Down");
+}
+static bool usb_hid_send_volume_increment(void)
+{
+    return hid_send_cmd(VOLUME_INCREMENT, "Vol Up");
 }
 #endif
 #endif
@@ -2751,14 +2786,17 @@ static const struct the_menu_item menuitems[] = {
         {"logfdump", logfdump },
 #endif
 #if defined(HAVE_USBSTACK)
-#if 0 && defined(USB_STORAGE)
-        {"USB Mass-Storage driver", toggle_usb_mass_storage },
-#endif
 #if defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL)
         {"USB Serial driver (logf)", toggle_usb_serial },
 #endif
 #if defined(USB_HID)
-        {"USB HID driver", toggle_usb_hid },
+        {"USB HID play/pause", usb_hid_send_play_pause },
+        {"USB HID stop", usb_hid_send_stop },
+        {"USB HID prev track", usb_hid_send_scan_previous_track },
+        {"USB HID next track", usb_hid_send_scan_next_track },
+        {"USB HID mute", usb_hid_send_mute },
+        {"USB HID vol down", usb_hid_send_volume_decrement },
+        {"USB HID vol up", usb_hid_send_volume_increment },
 #endif
 #endif /* HAVE_USBSTACK */
 #ifdef CPU_BOOST_LOGGING
