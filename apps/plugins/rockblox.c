@@ -79,7 +79,8 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == PLAYER_PAD
 
-#define ROCKBLOX_OFF           BUTTON_STOP
+#define ROCKBLOX_OFF_PRE       BUTTON_STOP
+#define ROCKBLOX_OFF           (BUTTON_STOP|BUTTON_REL)
 #define ROCKBLOX_ROTATE_RIGHT  BUTTON_PLAY
 #define ROCKBLOX_ROTATE_LEFT   (BUTTON_ON|BUTTON_PLAY)
 #define ROCKBLOX_DOWN          BUTTON_MENU
@@ -91,7 +92,8 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 
-#define ROCKBLOX_OFF           BUTTON_OFF
+#define ROCKBLOX_OFF_PRE       BUTTON_OFF
+#define ROCKBLOX_OFF           (BUTTON_OFF|BUTTON_REL)
 #define ROCKBLOX_ROTATE_RIGHT  BUTTON_UP
 #define ROCKBLOX_ROTATE_LEFT   (BUTTON_MENU|BUTTON_UP)
 #define ROCKBLOX_DOWN          BUTTON_DOWN
@@ -1193,6 +1195,10 @@ static int rockblox_loop (void)
             case ROCKBLOX_RC_OFF:
 #endif
             case ROCKBLOX_OFF:
+#ifdef ROCKBLOX_OFF_PRE
+                if (lastbutton != ROCKBLOX_OFF_PRE)
+                    break;
+#endif
                 return PLUGIN_OK;
 
 #if defined(ROCKBLOX_ROTATE)
