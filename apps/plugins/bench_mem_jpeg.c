@@ -119,17 +119,18 @@ enum plugin_status plugin_start(const void* parameter)
                             &format_null);
         if (ret == 1)
         {
-            long t1, t2;
+            long t1, t2, t_end;
             int count = 0;
             t2 = *(rb->current_tick);
             while (t2 != (t1 = *(rb->current_tick)));
+            t_end = t1 + 10 * HZ;
             do {
                 decode_jpeg_mem(jpeg_buf, filesize, &bm, plugin_buf_len,
                                 FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
                                 &format_null);
                 count++;
                 t2 = *(rb->current_tick);
-            } while (t2 - t1 < HZ || count < 10);
+            } while (TIME_BEFORE(t2, t_end) || count < 10);
             t2 -= t1;
             t2 *= 10;
             t2 += count >> 1;

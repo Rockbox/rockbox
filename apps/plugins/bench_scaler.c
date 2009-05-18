@@ -109,17 +109,18 @@ enum plugin_status plugin_start(const void* parameter)
             if (in == out)
                 continue;
             lcd_printf("timing %dx%d->%dx>%d scale", in, in, out, out);
-            long t1, t2;
+            long t1, t2, t_end;
             int count = 0;
             t2 = *(rb->current_tick);
             in_dim.width = in_dim.height = in;
             bm.width = bm.height = rset.rowstop = out;
             while (t2 != (t1 = *(rb->current_tick)));
+            t_end = t1 + 10 * HZ;
             do {
                 resize_on_load(&bm, false, &in_dim, &rset, (unsigned char *)plugin_buf, plugin_buf_len, &format_null, IF_PIX_FMT(0,) store_part_null, NULL);
                 count++;
                 t2 = *(rb->current_tick);
-            } while (t2 - t1 < HZ || count < 10);
+            } while (TIME_BEFORE(t2, t_end) || count < 10);
             t2 -= t1;
             t2 *= 10;
             t2 += count >> 1;

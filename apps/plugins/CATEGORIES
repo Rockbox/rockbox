@@ -1,6 +1,7 @@
 alpine_cdc,apps
 autostart,apps
 battery_bench,apps
+bench_scaler,apps
 blackjack,games
 bounce,demos
 brickmania,games
