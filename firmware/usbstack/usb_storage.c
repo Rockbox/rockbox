@@ -234,6 +234,8 @@ static union {
     char *max_lun;
 } tb;
 
+static char *cbw_buffer;
+
 static struct {
     unsigned int sector;
     unsigned int count;
@@ -397,6 +399,10 @@ void usb_storage_init_connection(void)
 
 #if CONFIG_CPU == IMX31L || defined(CPU_TCC77X) || defined(CPU_TCC780X) || \
     defined(BOOTLOADER) || CONFIG_CPU == DM320
+    static unsigned char _cbw_buffer[BUFFER_SIZE*2]
+        USB_DEVBSS_ATTR __attribute__((aligned(32)));
+    cbw_buffer = (void *)_cbw_buffer;
+
     static unsigned char _transfer_buffer[BUFFER_SIZE*2]
         USB_DEVBSS_ATTR __attribute__((aligned(32)));
     tb.transfer_buffer = (void *)_transfer_buffer;
@@ -410,14 +416,14 @@ void usb_storage_init_connection(void)
     unsigned char * audio_buffer;
 
     audio_buffer = audio_get_buffer(false,&bufsize);
-    tb.transfer_buffer =
-        (void *)UNCACHED_ADDR((unsigned int)(audio_buffer+31) & 0xffffffe0);
+    cbw_buffer = (void *)UNCACHED_ADDR((unsigned int)(audio_buffer+31) & 0xffffffe0);
+    tb.transfer_buffer = cbw_buffer + 1024;
     cpucache_invalidate();
 #ifdef USB_USE_RAMDISK
     ramdisk_buffer = tb.transfer_buffer + BUFFER_SIZE*2;
 #endif
 #endif
-    usb_drv_recv(ep_out, tb.transfer_buffer, 1024);
+    usb_drv_recv(ep_out, cbw_buffer, 1024);
 
     int i;
     for(i=0;i<NUM_VOLUMES;i++) {
@@ -443,7 +449,7 @@ void usb_storage_disconnect(void)
 void usb_storage_transfer_complete(int ep,int dir,int status,int length)
 {
     (void)ep;
-    struct command_block_wrapper* cbw = (void*)tb.transfer_buffer;
+    struct command_block_wrapper* cbw = (void*)cbw_buffer;
 
     //logf("transfer result %X %d", status, length);
     switch(state) {
@@ -538,7 +544,6 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                 queue_broadcast(SYS_USB_READ_DATA, (cur_cmd.lun<<16)+cur_cmd.orig_count);
             }
 #endif
-            usb_drv_recv(ep_out, tb.transfer_buffer, 1024);
             break;
         case SENDING_RESULT:
             if(dir==USB_DIR_OUT) {
@@ -1093,6 +1098,8 @@ static void send_csw(int status)
             sizeof(struct command_status_wrapper));
     state = SENDING_CSW;
     //logf("CSW: %X",status);
+    /* Already start waiting for the next command */
+    usb_drv_recv(ep_out, cbw_buffer, 1024);
 
     if(status == UMS_STATUS_GOOD) {
         cur_sense_data.sense_key=0;
