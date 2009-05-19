@@ -56,16 +56,15 @@ void ThemesInstallWindow::downloadInfo()
     // try to get the current build information
     getter = new HttpGet(this);
 
-    qDebug() << "downloading themes info";
     themesInfo.open();
-    qDebug() << "file:" << themesInfo.fileName();
+    qDebug() << "[Themes] downloading info to" << themesInfo.fileName();
     themesInfo.close();
 
     QUrl url;
-    url = QUrl(RbSettings::value(RbSettings::ThemesUrl).toString() + "/rbutilqt.php?target="
+    url = QUrl(RbSettings::value(RbSettings::ThemesUrl).toString()
+                + "/rbutilqt.php?target="
                 + RbSettings::value(RbSettings::CurConfigureModel).toString());
-    qDebug() << "downloadInfo()" << url;
-    qDebug() << url.queryItems();
+    qDebug() << "[Themes] Info URL:" << url << "Query:" << url.queryItems();
     if(RbSettings::value(RbSettings::CacheOffline).toBool())
         getter->setCache(true);
     getter->setFile(&themesInfo);
@@ -79,13 +78,13 @@ void ThemesInstallWindow::downloadInfo()
 void ThemesInstallWindow::downloadDone(int id, bool error)
 {
     downloadDone(error);
-    qDebug() << "downloadDone(bool) =" << id << error;
+    qDebug() << "[Themes] Download" << id << "done, error:" << error;
 }
 
 
 void ThemesInstallWindow::downloadDone(bool error)
 {
-    qDebug() << "downloadDone(bool) =" << error;
+    qDebug() << "[Themes] Download done, error:" << error;
 
     disconnect(logger, SIGNAL(aborted()), getter, SLOT(abort()));
     disconnect(logger, SIGNAL(aborted()), this, SLOT(close()));
@@ -93,9 +92,10 @@ void ThemesInstallWindow::downloadDone(bool error)
 
     QSettings iniDetails(themesInfo.fileName(), QSettings::IniFormat, this);
     QStringList tl = iniDetails.childGroups();
-    qDebug() << iniDetails.value("error/code").toString()
-            << iniDetails.value("error/description").toString()
-            << iniDetails.value("error/query").toString();
+    qDebug() << "[Themes] Theme site result:"
+             << iniDetails.value("error/code").toString()
+             << iniDetails.value("error/description").toString()
+             << iniDetails.value("error/query").toString();
 
     if(error) {
         logger->addItem(tr("Network error: %1.\n"
@@ -109,7 +109,8 @@ void ThemesInstallWindow::downloadDone(bool error)
     }
     // handle possible error codes
     if(iniDetails.value("error/code").toInt() != 0 || !iniDetails.contains("error/code")) {
-        qDebug() << "error!";
+        qDebug() << "[Themes] Theme site returned an error:"
+                 << iniDetails.value("error/code");
         logger->addItem(tr("the following error occured:\n%1")
             .arg(iniDetails.value("error/description", "unknown error").toString()), LOGERROR);
         logger->setFinished();
@@ -128,7 +129,7 @@ void ThemesInstallWindow::downloadDone(bool error)
             iniDetails.endGroup();
             continue;
         }
-        qDebug() << "adding theme:" << tl.at(i);
+        qDebug() << "[Themes] adding to list:" << tl.at(i);
         // convert to unicode and replace HTML-specific entities
         QByteArray raw = iniDetails.value("name").toByteArray();
         QTextCodec* codec = QTextCodec::codecForHtml(raw);
@@ -231,7 +232,7 @@ void ThemesInstallWindow::updateDetails(QListWidgetItem* cur, QListWidgetItem* p
 
 void ThemesInstallWindow::updateImage(bool error)
 {
-    qDebug() << "updateImage(bool) =" << error;
+    qDebug() << "[Themes] Updating image:"<< !error;
 
     if(error) {
         ui.themePreview->clear();
@@ -257,7 +258,7 @@ void ThemesInstallWindow::updateImage(bool error)
 
 void ThemesInstallWindow::resizeEvent(QResizeEvent* e)
 {
-    qDebug() << "resizeEvent(QResizeEvent*) =" << e;
+    qDebug() << "[Themes]" << e;
 
     QPixmap p, q;
     QSize img;
@@ -318,12 +319,12 @@ void ThemesInstallWindow::accept()
                 QDate().currentDate().toString("yyyyMMdd")).toString());
         iniDetails.endGroup();
     }
-    qDebug() << "installing themes:" << themes;
+    qDebug() << "[Themes] installing:" << themes;
 
     logger = new ProgressLoggerGui(this);
     logger->show();
     QString mountPoint = RbSettings::value(RbSettings::Mountpoint).toString();
-    qDebug() << "mountpoint:" << mountPoint;
+    qDebug() << "[Themes] mountpoint:" << mountPoint;
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountPoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
