@@ -39,6 +39,7 @@ HttpGet::HttpGet(QObject *parent)
     // if a request is cancelled before a reponse is available return some
     // hint about this in the http response instead of nonsense.
     m_response = -1;
+    m_useproxy = false;
 
     // default to global proxy / cache if not empty.
     // proxy is automatically enabled, disable it by setting an empty proxy
@@ -130,16 +131,23 @@ QHttp::Error HttpGet::error()
 void HttpGet::setProxy(const QUrl &proxy)
 {
     m_proxy = proxy;
-    http.setProxy(m_proxy.host(), m_proxy.port(), m_proxy.userName(), m_proxy.password());
+    m_useproxy = true;
+    http.setProxy(m_proxy.host(), m_proxy.port(),
+                  m_proxy.userName(), m_proxy.password());
 }
 
 
 void HttpGet::setProxy(bool enable)
 {
-    if(enable)
-        http.setProxy(m_proxy.host(), m_proxy.port(), m_proxy.userName(), m_proxy.password());
-    else
+    if(enable) {
+        m_useproxy = true;
+        http.setProxy(m_proxy.host(), m_proxy.port(),
+                      m_proxy.userName(), m_proxy.password());
+    }
+    else {
+        m_useproxy = false;
         http.setProxy("", 0);
+    }
 }
 
 
@@ -203,7 +211,12 @@ bool HttpGet::getFile(const QUrl &url)
 
     // create hash used for caching
     m_hash = QCryptographicHash::hash(url.toEncoded(), QCryptographicHash::Md5).toHex();
-    m_path = QString(QUrl::toPercentEncoding(url.path(), "/"));
+    // RFC2616: the absoluteURI form must get used when the request is being
+    // sent to a proxy.
+    m_path.clear();
+    if(m_useproxy)
+        m_path = url.scheme() + "://" + url.host();
+    m_path += QString(QUrl::toPercentEncoding(url.path(), "/"));
 
     // construct request header
     m_header.setValue("Host", url.host());
@@ -239,7 +252,8 @@ void HttpGet::getFileFinish()
             getRequest = -1;
             QFile c(m_cachefile);
             if(!outputToBuffer) {
-                qDebug() << "[HTTP] Cache: copying file to output" << outputFile->fileName();
+                qDebug() << "[HTTP] Cache: copying file to output"
+                         << outputFile->fileName();
                 c.open(QIODevice::ReadOnly);
                 outputFile->open(QIODevice::ReadWrite);
                 outputFile->write(c.readAll());
@@ -272,6 +286,7 @@ void HttpGet::getFileFinish()
         qDebug() << "[HTTP] cache DISABLED";
     }
     // schedule GET request
+
     m_header.setRequest("GET", m_path + m_query);
     if(outputToBuffer) {
         qDebug() << "[HTTP] downloading to buffer.";

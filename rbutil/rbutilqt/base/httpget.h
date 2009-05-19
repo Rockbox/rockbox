@@ -91,6 +91,7 @@ class HttpGet : public QObject
         QString m_cachefile; // cached filename
         bool m_cached;
         QUrl m_proxy;
+        bool m_useproxy;
         QDateTime m_serverTimestamp; //< timestamp of file on server
         QString m_query; //< constructed query to pass http getter
         QString m_path; //< constructed path to pass http getter
