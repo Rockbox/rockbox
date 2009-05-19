@@ -51,8 +51,14 @@
  * enough for efficient mass storage support, as commonly host OSes
  * don't do larger SCSI transfers anyway, so larger USB transfers
  * wouldn't buy us anything.
+ * Due to being the double-buffering system used, using a smaller write buffer
+ * ends up being more efficient. Measurements have shown that 24k to 28k is
+ * optimal
  */
-#define BUFFER_SIZE 65536
+#define READ_BUFFER_SIZE (1024*64)
+#define WRITE_BUFFER_SIZE (1024*24)
+
+#define ALLOCATE_BUFFER_SIZE (2*MAX(READ_BUFFER_SIZE,WRITE_BUFFER_SIZE))
 
 /* bulk-only class specific requests */
 #define USB_BULK_RESET_REQUEST   0xff
@@ -399,11 +405,11 @@ void usb_storage_init_connection(void)
 
 #if CONFIG_CPU == IMX31L || defined(CPU_TCC77X) || defined(CPU_TCC780X) || \
     defined(BOOTLOADER) || CONFIG_CPU == DM320
-    static unsigned char _cbw_buffer[BUFFER_SIZE*2]
+    static unsigned char _cbw_buffer[ALLOCATE_BUFFER_SIZE]
         USB_DEVBSS_ATTR __attribute__((aligned(32)));
     cbw_buffer = (void *)_cbw_buffer;
 
-    static unsigned char _transfer_buffer[BUFFER_SIZE*2]
+    static unsigned char _transfer_buffer[ALLOCATE_BUFFER_SIZE]
         USB_DEVBSS_ATTR __attribute__((aligned(32)));
     tb.transfer_buffer = (void *)_transfer_buffer;
 #ifdef USB_USE_RAMDISK
@@ -420,7 +426,7 @@ void usb_storage_init_connection(void)
     tb.transfer_buffer = cbw_buffer + 1024;
     cpucache_invalidate();
 #ifdef USB_USE_RAMDISK
-    ramdisk_buffer = tb.transfer_buffer + BUFFER_SIZE*2;
+    ramdisk_buffer = tb.transfer_buffer + ALLOCATE_BUFFER_SIZE;
 #endif
 #endif
     usb_drv_recv(ep_out, cbw_buffer, 1024);
@@ -460,20 +466,20 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             logf("scsi write %d %d", cur_cmd.sector, cur_cmd.count);
             if(status==0) {
                 if((unsigned int)length!=(SECTOR_SIZE* cur_cmd.count)
-                  && (unsigned int)length!=BUFFER_SIZE) {
+                  && (unsigned int)length!=WRITE_BUFFER_SIZE) {
                     logf("unexpected length :%d",length);
                 }
 
                 unsigned int next_sector = cur_cmd.sector +
-                             (BUFFER_SIZE/SECTOR_SIZE);
+                             (WRITE_BUFFER_SIZE/SECTOR_SIZE);
                 unsigned int next_count = cur_cmd.count -
-                             MIN(cur_cmd.count,BUFFER_SIZE/SECTOR_SIZE);
+                             MIN(cur_cmd.count,WRITE_BUFFER_SIZE/SECTOR_SIZE);
                 int next_select = !cur_cmd.data_select;
 
                 if(next_count!=0) {
                     /* Ask the host to send more, to the other buffer */
                     receive_block_data(cur_cmd.data[next_select],
-                                       MIN(BUFFER_SIZE,next_count*SECTOR_SIZE));
+                                       MIN(WRITE_BUFFER_SIZE,next_count*SECTOR_SIZE));
                 }
 
                 /* Now write the data that just came in, while the host is
@@ -481,11 +487,11 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
 #ifdef USB_USE_RAMDISK
                 memcpy(ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
                         cur_cmd.data[cur_cmd.data_select],
-                        MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
+                        MIN(WRITE_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
 #else
                 int result = storage_write_sectors(cur_cmd.lun,
                         cur_cmd.sector,
-                        MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
+                        MIN(WRITE_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
                         cur_cmd.data[cur_cmd.data_select]);
                 if(result != 0) {
                     send_csw(UMS_STATUS_FAIL);
@@ -644,13 +650,13 @@ static void send_and_read_next(void)
         return;
     }
     send_block_data(cur_cmd.data[cur_cmd.data_select],
-                    MIN(BUFFER_SIZE,cur_cmd.count*SECTOR_SIZE));
+                    MIN(READ_BUFFER_SIZE,cur_cmd.count*SECTOR_SIZE));
 
     /* Switch buffers for the next one */
     cur_cmd.data_select=!cur_cmd.data_select;
 
-    cur_cmd.sector+=(BUFFER_SIZE/SECTOR_SIZE);
-    cur_cmd.count-=MIN(cur_cmd.count,BUFFER_SIZE/SECTOR_SIZE);
+    cur_cmd.sector+=(READ_BUFFER_SIZE/SECTOR_SIZE);
+    cur_cmd.count-=MIN(cur_cmd.count,READ_BUFFER_SIZE/SECTOR_SIZE);
 
     if(cur_cmd.count!=0) {
         /* already read the next bit, so we can send it out immediately when the
@@ -658,11 +664,11 @@ static void send_and_read_next(void)
 #ifdef USB_USE_RAMDISK
         memcpy(cur_cmd.data[cur_cmd.data_select],
                 ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
-                MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
+                MIN(READ_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count)*SECTOR_SIZE);
 #else
         cur_cmd.last_result = storage_read_sectors(cur_cmd.lun,
                 cur_cmd.sector,
-                MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
+                MIN(READ_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
                 cur_cmd.data[cur_cmd.data_select]);
 #endif
     }
@@ -977,7 +983,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 break;
             }
             cur_cmd.data[0] = tb.transfer_buffer;
-            cur_cmd.data[1] = &tb.transfer_buffer[BUFFER_SIZE];
+            cur_cmd.data[1] = &tb.transfer_buffer[READ_BUFFER_SIZE];
             cur_cmd.data_select=0;
             cur_cmd.sector = block_size_mult *
                 (cbw->command_block[2] << 24 |
@@ -1001,11 +1007,11 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 #ifdef USB_USE_RAMDISK
                 memcpy(cur_cmd.data[cur_cmd.data_select],
                         ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
-                        MIN(BUFFER_SIZE/SECTOR_SIZE,cur_cmd.count)*SECTOR_SIZE);
+                        MIN(READ_BUFFER_SIZE/SECTOR_SIZE,cur_cmd.count)*SECTOR_SIZE);
 #else
                 cur_cmd.last_result = storage_read_sectors(cur_cmd.lun,
                         cur_cmd.sector,
-                        MIN(BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
+                        MIN(READ_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
                         cur_cmd.data[cur_cmd.data_select]);
 
 #ifdef TOSHIBA_GIGABEAT_S
@@ -1028,7 +1034,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 break;
             }
             cur_cmd.data[0] = tb.transfer_buffer;
-            cur_cmd.data[1] = &tb.transfer_buffer[BUFFER_SIZE];
+            cur_cmd.data[1] = &tb.transfer_buffer[WRITE_BUFFER_SIZE];
             cur_cmd.data_select=0;
             cur_cmd.sector = block_size_mult *
                 (cbw->command_block[2] << 24 |
@@ -1049,7 +1055,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             }
             else {
                 receive_block_data(cur_cmd.data[0],
-                        MIN(BUFFER_SIZE, cur_cmd.count*SECTOR_SIZE));
+                        MIN(WRITE_BUFFER_SIZE, cur_cmd.count*SECTOR_SIZE));
             }
             break;
 
