@@ -221,6 +221,8 @@ char buf[50];
 
     while(1)
     {
+        while(1)
+        {
         lcd_clear_display();
         line = 0;
         _DEBUG_PRINTF("[Clock Frequencies:]");
@@ -232,14 +234,14 @@ char buf[50];
 
 #if LCD_HEIGHT < 176  /* clip  */
         lcd_update();
+        int btn = button_get_w_tmo(HZ/10);
+        if(btn == (DEBUG_CANCEL|BUTTON_REL))
+            goto end;
+        else if(btn == (BUTTON_DOWN|BUTTON_REL))
+            break;
+        }
         while(1)
         {
-            int btn = button_get_w_tmo(HZ/10);
-            if(btn == (DEBUG_CANCEL|BUTTON_REL))
-                goto end;
-            else if(btn == (BUTTON_DOWN|BUTTON_REL))
-                break;
-        }
         lcd_clear_display();
         line = 0;
 #endif  /*  LCD_HEIGHT < 176 */
@@ -253,14 +255,14 @@ char buf[50];
 
 #if LCD_HEIGHT < 176  /* clip  */
         lcd_update();
+        int btn = button_get_w_tmo(HZ/10);
+        if(btn == (DEBUG_CANCEL|BUTTON_REL))
+            goto end;
+        else if(btn == (BUTTON_DOWN|BUTTON_REL))
+            break;
+        }
         while(1)
         {
-            int btn = button_get_w_tmo(HZ/10);
-            if(btn == (DEBUG_CANCEL|BUTTON_REL))
-                goto end;
-            else if(btn == (BUTTON_DOWN|BUTTON_REL))
-                break;
-        }
         lcd_clear_display();
         line = 0;
 #endif  /*  LCD_HEIGHT < 176 */
@@ -271,14 +273,14 @@ char buf[50];
         _DEBUG_PRINTF("USB:           %3dMHz", calc_freq(CLK_USB)/1000000);
 
         lcd_update();
+        int btn = button_get_w_tmo(HZ/10);
+        if(btn == (DEBUG_CANCEL|BUTTON_REL))
+            goto end;
+        else if(btn == (BUTTON_DOWN|BUTTON_REL))
+            break;
+        }
         while(1)
         {
-            int btn = button_get_w_tmo(HZ/10);
-            if(btn == (DEBUG_CANCEL|BUTTON_REL))
-                goto end;
-            else if(btn == (BUTTON_DOWN|BUTTON_REL))
-                break;
-        }
         lcd_clear_display();
         line = 0;
 
@@ -291,14 +293,14 @@ char buf[50];
 
 #if LCD_HEIGHT < 176  /* clip  */
         lcd_update();
+        int btn = button_get_w_tmo(HZ/10);
+        if(btn == (DEBUG_CANCEL|BUTTON_REL))
+            goto end;
+        else if(btn == (BUTTON_DOWN|BUTTON_REL))
+            break;
+        }
         while(1)
         {
-            int btn = button_get_w_tmo(HZ/10);
-            if(btn == (DEBUG_CANCEL|BUTTON_REL))
-                goto end;
-            else if(btn == (BUTTON_DOWN|BUTTON_REL))
-                break;
-        }
         lcd_clear_display();
         line = 0;
 #endif  /*  LCD_HEIGHT < 176 */
@@ -310,13 +312,11 @@ char buf[50];
         _DEBUG_PRINTF("MCI_SD    :%8x", (unsigned int)(MCI_SD));
 
         lcd_update();
-        while(1)
-        {
-            int btn = button_get_w_tmo(HZ/10);
-            if(btn == (DEBUG_CANCEL|BUTTON_REL))
-                goto end;
-            else if(btn == (BUTTON_DOWN|BUTTON_REL))
-                break;
+        int btn = button_get_w_tmo(HZ/10);
+        if(btn == (DEBUG_CANCEL|BUTTON_REL))
+            goto end;
+        else if(btn == (BUTTON_DOWN|BUTTON_REL))
+            break;
         }
     }
 
