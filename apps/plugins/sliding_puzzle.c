@@ -229,6 +229,13 @@ PLUGIN_HEADER
 #endif
 #endif
 
+#ifdef HAVE_ALBUMART
+#include "lib/read_image.h"
+#define READ_IMAGE read_image_file
+#else
+#define READ_IMAGE rb->read_bmp_file
+#endif
+
 #include "pluginbitmaps/sliding_puzzle.h"
 #define IMAGE_WIDTH BMPWIDTH_sliding_puzzle
 #define IMAGE_HEIGHT BMPHEIGHT_sliding_puzzle
@@ -277,9 +284,8 @@ static int num_font = FONT_UI;
 static int moves_font = FONT_UI;
 static int moves_y = 0;
 
-static unsigned char img_buf
-    [BM_SCALED_SIZE(IMAGE_WIDTH,IMAGE_HEIGHT,FORMAT_NATIVE,0)]
-    __attribute__ ((aligned(16)));
+static unsigned char *img_buf;
+static size_t img_buf_len;
 #ifdef HAVE_ALBUMART
 static char albumart_path[MAX_PATH+1];
 #endif
@@ -358,10 +364,10 @@ static bool load_resize_bitmap(void)
         main_bitmap.width = IMAGE_WIDTH;
         main_bitmap.height = IMAGE_HEIGHT;
 
-        rc = rb->read_bmp_file( filename, &main_bitmap,
-                                sizeof(img_buf),
-                                FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_DITHER,
-                                NULL);
+        rc = READ_IMAGE( filename, &main_bitmap,
+                         img_buf_len,
+                         FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_DITHER,
+                         NULL);
         if( rc > 0 )
         {
             puzzle_bmp_ptr = (const fb_data *)img_buf;
@@ -637,6 +643,7 @@ enum plugin_status plugin_start(
     int i, w, h;
 
     initial_bmp_path=(const char *)parameter;
+    img_buf = rb->plugin_get_buffer(&img_buf_len);
     picmode = PICMODE_INITIAL_PICTURE;
     img_buf_path[0] = '\0';
 
