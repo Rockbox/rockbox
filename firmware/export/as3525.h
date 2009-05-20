@@ -22,9 +22,27 @@
 
 #define UART_CHANNELS 1
 
+
+#if MEMORYSIZE <= 2
+/* we put the codec buffer in IRAM */
+#define AMS_LOWMEM
+#endif
+/* these addresses are valid after mapping through the MMU */
+#define DRAM_ORIG 0x30000000
+#define IRAM_ORIG 0x0
+
+#define DRAM_SIZE (MEMORYSIZE * 0x100000)
+#define IRAM_SIZE 0x50000
+
+
 /* AS352X only supports 512 Byte HW ECC */
 #define ECCSIZE 512
 #define ECCBYTES 3
+
+/* AS352X MMU Page Table Entries */
+/* to be implemented */
+#define TTB_SIZE                  0x0           /* Mimics OF  */
+#define TTB_BASE_ADDR             (DRAM_ORIG + DRAM_SIZE - TTB_SIZE)
 
 
 /* AS352X device base addresses */

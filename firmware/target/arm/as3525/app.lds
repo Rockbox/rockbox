@@ -1,15 +1,11 @@
 #include "config.h"
+#include "cpu.h"
 
 ENTRY(start)
 
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/crt0.o)
-
-#if MEMORYSIZE <= 2
-/* we put the codec buffer in IRAM */
-#define LOWMEM
-#endif
 
 #define PLUGINSIZE PLUGIN_BUFFER_SIZE
 #define CODECSIZE CODEC_SIZE
@@ -20,26 +16,27 @@ STARTUP(target/arm/crt0.o)
 #define STUBOFFSET 0
 #endif
 
-#include "cpu.h"
 
-#ifdef LOWMEM
-#define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGINSIZE
-#define CODECORIG (IRAMORIG + 0x50000 - CODEC_SIZE)
-#define IRAMSIZE (0x50000 - CODEC_SIZE)
-#else
-#define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGINSIZE - CODECSIZE
-#define CODECORIG (ENDAUDIOADDR)
-#define IRAMSIZE (0x20000)
-#endif
-
-#define IRAMORIG 0x0
-#define DRAMORIG 0x30000000 + STUBOFFSET
+#define IRAMORIG IRAM_ORIG
+#define DRAMORIG (DRAM_ORIG + STUBOFFSET)
 
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
 
+
+#ifdef AMS_LOWMEM
+#define DRAMSIZE (DRAM_SIZE - STUBOFFSET - PLUGINSIZE - TTB_SIZE)
+#define CODECORIG (IRAMORIG + (IRAM_SIZE - CODEC_SIZE))
+#define IRAMSIZE (IRAM_SIZE - CODEC_SIZE)
+#else
+#define DRAMSIZE (DRAM_SIZE - STUBOFFSET - PLUGINSIZE - CODECSIZE - TTB_SIZE)
+#define CODECORIG (ENDAUDIOADDR)
+#define IRAMSIZE (0x20000)
+#endif
+
+
 /* Where the codec buffer ends, and the plugin buffer starts */
-#ifdef LOWMEM
+#ifdef AMS_LOWMEM
 #define ENDADDR (ENDAUDIOADDR)
 #else
 #define ENDADDR (ENDAUDIOADDR + CODECSIZE)
@@ -47,7 +44,7 @@ STARTUP(target/arm/crt0.o)
 
 MEMORY
 {
-#ifdef LOWMEM
+#ifdef AMS_LOWMEM
     CODEC_IRAM : ORIGIN = CODECORIG, LENGTH = CODEC_SIZE
 #endif
     IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
@@ -56,7 +53,7 @@ MEMORY
 
 SECTIONS
 {
-    loadaddress = 0x30000000;
+    loadaddress = DRAM_ORIG;
 
     .text :
     {
@@ -71,10 +68,7 @@ SECTIONS
 
     .rodata :
     {
-        *(.rodata)  /* problems without this, dunno why */
         *(.rodata*)
-        *(.rodata.str1.1)
-        *(.rodata.str1.4)
         . = ALIGN(0x4);
     } > DRAM
 
@@ -152,7 +146,7 @@ SECTIONS
     {
         codecbuf = .;
         _codecbuf = .;
-#ifdef LOWMEM
+#ifdef AMS_LOWMEM
     } > CODEC_IRAM
 #else
     } > DRAM

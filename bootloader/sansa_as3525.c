@@ -93,8 +93,8 @@ void main(void)
 
     printf("Loading firmware");
 
-    loadbuffer = (unsigned char*)0x30000000; /* DRAM */
-    buffer_size = (int)(loadbuffer + (MEM * 0x100000));
+    loadbuffer = (unsigned char*)DRAM_ORIG; /* DRAM */
+    buffer_size = (int)(loadbuffer + (DRAM_SIZE) - TTB_SIZE);
 
     ret = load_firmware(loadbuffer, BOOTFILE, buffer_size);
     if(ret < 0)

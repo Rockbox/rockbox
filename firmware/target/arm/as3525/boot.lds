@@ -1,18 +1,22 @@
 #include "config.h"
+#include "cpu.h"
 
 ENTRY(start)
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/crt0.o)
 
-#define DRAMSIZE (MEMORYSIZE * 0x100000)
+/*
+No need for DRAM in our bootloader
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - TTB_SIZE
 #define DRAMORIG 0x30000000
-#define IRAMORIG 0
+*/
+#define IRAMORIG 0x81000000
 #define IRAMSIZE 0x50000
 
 MEMORY
 {
-    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
+    /*DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE*/
     IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
 }
 
