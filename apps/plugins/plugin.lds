@@ -1,5 +1,4 @@
 #include "config.h"
-#include "cpu.h"
 
 /* These output formats should be in the config-files */
 
@@ -42,12 +41,13 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGIN_BUFFER_SIZE - CODEC_SIZE - LCD_TTB_AREA
 
 #elif CONFIG_CPU==S3C2440
-#define LCD_BUFFER_SIZE  (LCD_WIDTH*LCD_HEIGHT*2)
+#include "cpu.h"
 /* must be 16Kb (0x4000) aligned */
 #define TTB_SIZE         (0x4000) 
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGIN_BUFFER_SIZE - CODEC_SIZE - LCD_BUFFER_SIZE - TTB_SIZE
 
 #elif CONFIG_CPU==AS3525
+#include "cpu.h"
 #define DRAMORIG DRAM_ORIG
 #ifdef AMS_LOWMEM
 #define DRAMSIZE (DRAM_SIZE - PLUGIN_BUFFER_SIZE - STUBOFFSET - TTB_SIZE)
