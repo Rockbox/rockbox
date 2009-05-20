@@ -71,13 +71,11 @@ bool lcd_active(void)
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    /* Currently only do full updates.
-     * DMA can't handle partial updates and CPU is too slow compared
-     * to full DMA updates */
+   /* Currently only do updates with full LCD width.
+     * DMA can't handle full partial updates and CPU is too slow compared
+     * to DMA updates */
     x = 0;
-    y = 0;
     width = LCD_WIDTH;
-    height = LCD_HEIGHT;
 
     mutex_lock(&lcd_mtx);
     
