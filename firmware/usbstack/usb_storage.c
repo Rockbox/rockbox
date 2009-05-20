@@ -53,10 +53,16 @@
  * wouldn't buy us anything.
  * Due to being the double-buffering system used, using a smaller write buffer
  * ends up being more efficient. Measurements have shown that 24k to 28k is
- * optimal
+ * optimal, except for sd devices that apparently don't gain anything from
+ * double-buffering
  */
 #define READ_BUFFER_SIZE (1024*64)
+
+#if (CONFIG_STORAGE & STORAGE_SD)
+#define WRITE_BUFFER_SIZE (1024*64)
+#else
 #define WRITE_BUFFER_SIZE (1024*24)
+#endif
 
 #define ALLOCATE_BUFFER_SIZE (2*MAX(READ_BUFFER_SIZE,WRITE_BUFFER_SIZE))
 
