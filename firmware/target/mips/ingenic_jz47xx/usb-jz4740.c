@@ -633,9 +633,15 @@ void usb_init_device(void)
 }
 
 #ifdef USB_GPIO_IRQ
+static unsigned long last_tick;
 void USB_GPIO_IRQ(void)
 {
-    usb_status_event(usb_detect());
+    /* Prevent enabled-disabled bouncing */
+    if(current_tick - last_tick > HZ/16)
+    {
+        usb_status_event(usb_detect());
+        last_tick = current_tick;
+    }
 }
 #endif
 
