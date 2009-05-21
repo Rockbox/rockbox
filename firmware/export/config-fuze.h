@@ -160,6 +160,9 @@
 /* Define this if you have an AMS AS3525*/
 #define CONFIG_CPU AS3525
 
+/* Define how much SD sectors are reserved for OF */
+#define AMS_OF_SIZE 0xF000
+
 /* Define this if you want to use the AS2525 i2c interface */
 #define CONFIG_I2C I2C_AS3525
 

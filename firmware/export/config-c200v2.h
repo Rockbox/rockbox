@@ -145,6 +145,9 @@
 /* Define this if you have a PortalPlayer PP5024 */
 #define CONFIG_CPU AS3525
 
+/* Define how much SD sectors are reserved for OF */
+#define AMS_OF_SIZE 0x5000  /* TODO : check */
+
 /* Define this if you want to use the PP5024 i2c interface */
 #define CONFIG_I2C I2C_AS3525
 

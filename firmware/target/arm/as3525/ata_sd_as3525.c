@@ -24,7 +24,7 @@
 
 /* TODO: Find the real capacity of >2GB models (will be useful for USB) */
 
-#include "config.h" /* for HAVE_MULTIVOLUME */
+#include "config.h" /* for HAVE_MULTIVOLUME & AMS_OF_SIZE */
 #include "fat.h"
 #include "thread.h"
 #include "hotswap.h"
@@ -632,11 +632,7 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
 
     /* skip SanDisk OF */
     if (drive == INTERNAL_AS3525)
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE)
-        start += 0xf000;
-#else
-        start += 0x5000;
-#endif
+        start += AMS_OF_SIZE;
 
     mutex_lock(&sd_mtx);
 #ifndef BOOTLOADER

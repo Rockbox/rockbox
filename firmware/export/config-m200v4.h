@@ -105,6 +105,9 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
+/* Define how much SD sectors are reserved for OF */
+#define AMS_OF_SIZE 0x5000
+
 #define CONFIG_I2C I2C_AS3525
 
 #define BATTERY_CAPACITY_DEFAULT 1500 /* default battery capacity */
