@@ -28,6 +28,16 @@
 #include "lauxlib.h"
 #include "rocklib.h"
 
+/*
+ * http://www.lua.org/manual/5.1/manual.html#lua_CFunction
+ *
+ * In order to communicate properly with Lua, a C function must use the following protocol,
+ * which defines the way parameters and results are passed: a C function receives its arguments
+ * from Lua in its stack in direct order (the first argument is pushed first). To return values to Lua,
+ * a C function just pushes them onto the stack, in direct order (the first result is pushed first),
+ * and returns the number of results. Any other value in the stack below the results will be properly
+ * discarded by Lua. Like a Lua function, a C function called by Lua can also return many results. 
+ */
 #define RB_WRAP(M) static int rock_##M(lua_State *L)
 
 RB_WRAP(splash)
@@ -35,21 +45,21 @@ RB_WRAP(splash)
     int ticks = luaL_checkint(L, 1);
     const char *s = luaL_checkstring(L, 2);
     rb->splash(ticks, s);
-    return 1;
+    return 0;
 }
 
 RB_WRAP(lcd_update)
 {
     (void)L;
     rb->lcd_update();
-    return 1;
+    return 0;
 }
 
 RB_WRAP(lcd_clear_display)
 {
     (void)L;
     rb->lcd_clear_display();
-    return 1;
+    return 0;
 }
 
 RB_WRAP(lcd_putsxy)
@@ -58,7 +68,7 @@ RB_WRAP(lcd_putsxy)
     int y = luaL_checkint(L, 2);
     const char* string = luaL_checkstring(L, 3);
     rb->lcd_putsxy(x, y, string);
-    return 1;
+    return 0;
 }
 
 RB_WRAP(lcd_puts)
@@ -67,7 +77,7 @@ RB_WRAP(lcd_puts)
     int y = luaL_checkint(L, 2);
     const char* string = luaL_checkstring(L, 3);
     rb->lcd_puts(x, y, string);
-    return 1;
+    return 0;
 }
 
 RB_WRAP(lcd_puts_scroll)
@@ -76,14 +86,14 @@ RB_WRAP(lcd_puts_scroll)
     int y = luaL_checkint(L, 2);
     const char* string = luaL_checkstring(L, 3);
     rb->lcd_puts_scroll(x, y, string);
-    return 1;
+    return 0;
 }
 
 RB_WRAP(lcd_stop_scroll)
 {
     (void)L;
     rb->lcd_stop_scroll();
-    return 1;
+    return 0;
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -91,7 +101,7 @@ RB_WRAP(lcd_set_drawmode)
 {
     int drawmode = luaL_checkint(L, 1);
     rb->lcd_set_drawmode(drawmode);
-    return 1;
+    return 0;
 }
 
 RB_WRAP(lcd_get_drawmode)
@@ -105,7 +115,7 @@ RB_WRAP(lcd_setfont)
 {
     int font = luaL_checkint(L, 1);
     rb->lcd_setfont(font);
-    return 1;
+    return 0;
 }
 
 RB_WRAP(lcd_drawpixel)
@@ -114,8 +124,7 @@ RB_WRAP(lcd_drawpixel)
     int y = luaL_checkint(L, 2);
 
     rb->lcd_drawpixel(x, y);
-    
-    return 1;
+    return 0;
 }
 
 RB_WRAP(lcd_drawline)
@@ -126,8 +135,7 @@ RB_WRAP(lcd_drawline)
     int y2 = luaL_checkint(L, 4);
 
     rb->lcd_drawline(x1, y1, x2, y2);
-    
-    return 1;
+    return 0;
 }
 
 RB_WRAP(lcd_hline)
@@ -137,8 +145,7 @@ RB_WRAP(lcd_hline)
     int y = luaL_checkint(L, 3);
 
     rb->lcd_hline(x1, x2, y);
-    
-    return 1;
+    return 0;
 }
 
 RB_WRAP(lcd_vline)
@@ -148,8 +155,7 @@ RB_WRAP(lcd_vline)
     int y2 = luaL_checkint(L, 3);
 
     rb->lcd_vline(x, y1, y2);
-    
-    return 1;
+    return 0;
 }
 
 RB_WRAP(lcd_drawrect)
@@ -160,8 +166,7 @@ RB_WRAP(lcd_drawrect)
     int height = luaL_checkint(L, 4);
 
     rb->lcd_drawrect(x, y, width, height);
-    
-    return 1;
+    return 0;
 }
 
 RB_WRAP(lcd_fillrect)
@@ -172,8 +177,7 @@ RB_WRAP(lcd_fillrect)
     int height = luaL_checkint(L, 4);
 
     rb->lcd_fillrect(x, y, width, height);
-    
-    return 1;
+    return 0;
 }
 #endif
 
@@ -181,14 +185,14 @@ RB_WRAP(yield)
 {
     (void)L;
     rb->yield();
-    return 1;
+    return 0;
 }
 
 RB_WRAP(sleep)
 {
     int ticks = luaL_checkint(L, 1);
     rb->sleep(ticks);
-    return 1;
+    return 0;
 }
 
 RB_WRAP(current_tick)
@@ -268,21 +272,21 @@ RB_WRAP(backlight_on)
 {
     (void)L;
     rb->backlight_on();
-    return 1;
+    return 0;
 }
 
 RB_WRAP(backlight_off)
 {
     (void)L;
     rb->backlight_off();
-    return 1;
+    return 0;
 }
 
 RB_WRAP(backlight_set_timeout)
 {
     int val = luaL_checkint(L, 1);
     rb->backlight_set_timeout(val);
-    return 1;
+    return 0;
 }
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
@@ -290,13 +294,13 @@ RB_WRAP(backlight_set_brightness)
 {
     int val = luaL_checkint(L, 1);
     rb->backlight_set_brightness(val);
-    return 1;
+    return 0;
 }
 #endif
 
-
 #define R(NAME) {#NAME, rock_##NAME}
-static const luaL_Reg rocklib[] = {
+static const luaL_Reg rocklib[] =
+{
     /* Graphics */
     R(lcd_clear_display),
     R(lcd_update),
@@ -355,6 +359,7 @@ static const luaL_Reg rocklib[] = {
 LUALIB_API int luaopen_rock(lua_State *L)
 {
     luaL_register(L, LUA_ROCKLIBNAME, rocklib);
+
     RB_CONSTANT(HZ);
     RB_CONSTANT(LCD_WIDTH);
     RB_CONSTANT(LCD_HEIGHT);
