@@ -133,7 +133,6 @@ enum
 /** **/
 
 void tuner_init(void);
-bool tuner_power(bool power);
 
 #endif /* #if CONFIG_TUNER */
 

@@ -158,7 +158,6 @@ static int root_menu;
 static int current_offset;
 static int current_entry_count;
 
-static int format_count;
 static struct tree_context *tc;
 
 static int get_token_str(char *buf, int size)

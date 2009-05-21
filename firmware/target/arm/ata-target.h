@@ -79,6 +79,5 @@ void copy_write_sectors(const unsigned char* buf, int wordcount);
 #endif
 
 void ata_reset(void);
-void ata_enable(bool on);
 bool ata_is_coldstart(void);
 void ata_device_init(void);

@@ -83,8 +83,6 @@ static inline void restore_interrupt(int status)
 void system_enable_irq(unsigned int irq);
 void udelay(unsigned int usec);
 void mdelay(unsigned int msec);
-void power_off(void);
-void system_reboot(void);
 void dma_enable(void);
 void dma_disable(void);
 

@@ -32,8 +32,6 @@
 extern void TIMER1(void);
 extern void TIMER2(void);
 extern void SERIAL0(void);
-extern void ipod_mini_button_int(void); /* iPod Mini 1st gen only */
-extern void ipod_4g_button_int(void);   /* iPod 4th gen and higher only */
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
 static struct corelock cpufreq_cl SHAREDBSS_ATTR;

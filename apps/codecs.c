@@ -69,7 +69,6 @@ void *sim_codec_load_ram(char* codecptr, int size, void **pd);
 void sim_codec_close(void *pd);
 #else
 #define sim_codec_close(x)
-extern unsigned char codecbuf[];
 #endif
 
 size_t codec_size;

@@ -31,6 +31,7 @@
 #include "thread.h"
 #include "logf.h"
 #include "system.h"
+#include "i2c.h"
 #include "i2c-pp.h"
 #include "ascodec.h"
 #include "as3514.h"

@@ -612,7 +612,6 @@ MENUITEM_FUNCTION(rectrigger_item, 0, ID2P(LANG_RECORD_TRIGGER),
                   rectrigger, NULL, NULL, Icon_Menu_setting);
 
 static struct browse_folder_info rec_config_browse = {RECPRESETS_DIR, SHOW_CFG};
-int browse_folder(void *param);
 MENUITEM_FUNCTION(browse_recconfigs, MENU_FUNC_USEPARAM, ID2P(LANG_CUSTOM_CFG), 
                   browse_folder, (void*)&rec_config_browse, NULL, Icon_Config);
 static int write_settings_file(void)

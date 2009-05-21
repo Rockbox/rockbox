@@ -36,7 +36,6 @@ void button_close_device(void);
 int button_read_device(void);
 void button_power_event(void);
 void headphone_detect_event(void);
-bool headphones_inserted(void);
 void headphone_init(void);
 void button_headphone_set(int button);
 
