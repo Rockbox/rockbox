@@ -52,4 +52,9 @@ mpegplayer
 #endif
 #endif
 
+/* Lua needs at least 160 KB to work in */
+#if (PLUGIN_BUFFER_SIZE >= 0x80000)
+lua
+#endif
+
 #endif /* IRIVER_IFP7XX_SERIES */

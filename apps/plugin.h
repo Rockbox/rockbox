@@ -511,7 +511,7 @@ struct plugin_api {
     void* (*memset)(void *dst, int c, size_t length);
     void* (*memcpy)(void *out, const void *in, size_t n);
     void* (*memmove)(void *out, const void *in, size_t n);
-    const unsigned char *_ctype_;
+    const unsigned char *_rbctype_;
     int (*atoi)(const char *str);
     char *(*strchr)(const char *s, int c);
     char *(*strcat)(char *s1, const char *s2);

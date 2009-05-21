@@ -37,7 +37,7 @@ int _EXFUN(_toupper, (int __c));
 #define	_B	0200
 
 #ifdef PLUGIN
-#define _ctype_ (rb->_ctype_)
+#define _ctype_ (rb->_rbctype_)
 #else
 extern const unsigned char _ctype_[257];
 #endif

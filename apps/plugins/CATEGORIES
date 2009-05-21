@@ -37,6 +37,7 @@ jpeg,viewers
 keybox,apps
 lamp,apps
 logo,demos
+lua,viewers
 mandelbrot,demos
 matrix,demos
 maze,games

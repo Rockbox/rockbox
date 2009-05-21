@@ -1,0 +1,19 @@
+The following files are (with slight modifications for Rockbox) from dietlibc
+version 0.31 which is licensed under the GPL version 2:
+
+    strcspn.c
+    strncat.c
+    strpbrk.c
+    strtol.c
+    strtoul.c
+    strstr.c
+
+The malloc routine is Doug Lea's malloc with the following license:
+
+  Version 2.8.3 Thu Sep 22 11:16:15 2005  Doug Lea  (dl at gee)
+
+  This is a version (aka dlmalloc) of malloc/free/realloc written by
+  Doug Lea and released to the public domain, as explained at
+  http://creativecommons.org/licenses/publicdomain.  Send questions,
+  comments, complaints, performance data, etc to dl@cs.oswego.edu
+

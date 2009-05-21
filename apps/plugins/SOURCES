@@ -159,3 +159,8 @@ superdom.c
 #endif
 
 md5sum.c
+
+#if (PLUGIN_BUFFER_SIZE >= 0x80000)
+lua.c
+#endif
+

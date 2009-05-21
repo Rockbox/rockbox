@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+############################################################################
+#             __________               __   ___.                  
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/ 
+# $Id$
+#
+# Copyright (C) 2009 by Maurus Cuelenaere
+#
+# All files in this archive are subject to the GNU General Public License.
+# See the file COPYING in the source tree root for full license agreement.
+#
+# This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+# KIND, either express or implied.
+#
+############################################################################
+
+$input = "../../action.h";
+
+open(ACTION, "<$input") or die "Can't open $input!";
+
+print "rb.actions = {\n";
+
+$i = 0;
+while(my $line = <ACTION>)
+{
+    chomp($line);
+    if($line =~ /^\s*(ACTION_[^\s]+)(\s*=.*)?,$/)
+    {
+        printf "\t%s = %d,\n", $1, $i;
+        $i++;
+    }
+}
+
+print "}\n";
+
+close(ACTION);
