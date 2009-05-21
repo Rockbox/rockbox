@@ -228,7 +228,7 @@ typedef fb_data pix_t;
 #define ERROR_BUFFER_FULL   -2
 
 /* current version for cover cache */
-#define CACHE_VERSION 2
+#define CACHE_VERSION 3
 #define CONFIG_VERSION 1
 #define CONFIG_FILE "pictureflow.cfg"
 
@@ -603,6 +603,18 @@ static inline uint32_t div255(uint32_t val)
 }
 
 #define SCALE_VAL(val,out) div255((val) * (out) + 127)
+#define SCALE_VAL32(val, out) \
+({ \
+    uint32_t val__ = (val) * (out); \
+    val__ = ((((val__ >> 8) + val__) >> 8) + val__ + 128) >> 8; \
+    val__; \
+})
+#define SCALE_VAL8(val, out) \
+({ \
+    unsigned val__ = (val) * (out); \
+    val__ = ((val__ >> 8) + val__ + 128) >> 8; \
+    val__; \
+})
 
 static void output_row_8_transposed(uint32_t row, void * row_in,
                                        struct scaler_context *ctx)
@@ -618,9 +630,9 @@ static void output_row_8_transposed(uint32_t row, void * row_in,
     unsigned r, g, b;
     for (; dest < end; dest += ctx->bm->height)
     {
-        r = qp->red;
-        g = qp->green;
-        b = (qp++)->blue;
+        r = SCALE_VAL8(qp->red, 31);
+        g = SCALE_VAL8(qp->green, 63);
+        b = SCALE_VAL8((qp++)->blue, 31);
         *dest = LCD_RGBPACK_LCD(r,g,b);
     }
 #endif
@@ -637,10 +649,10 @@ static void output_row_32_transposed(uint32_t row, void * row_in,
         *dest = SC_MUL((*qp++) + ctx->round, ctx->divisor);
 #else
     struct uint32_rgb *qp = (struct uint32_rgb*)row_in;
-    uint32_t rb_mul = SCALE_VAL(ctx->divisor, 31),
-             rb_rnd = SCALE_VAL(ctx->round, 31),
-             g_mul = SCALE_VAL(ctx->divisor, 63),
-             g_rnd = SCALE_VAL(ctx->round, 63);
+    uint32_t rb_mul = SCALE_VAL32(ctx->divisor, 31),
+             rb_rnd = SCALE_VAL32(ctx->round, 31),
+             g_mul = SCALE_VAL32(ctx->divisor, 63),
+             g_rnd = SCALE_VAL32(ctx->round, 63);
     int r, g, b;
     for (; dest < end; dest += ctx->bm->height)
     {
