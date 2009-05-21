@@ -637,7 +637,15 @@ bool set_time_screen(const char* title, struct tm *tm)
                 break;
         }
 
+#ifdef HAVE_TOUCHSCREEN
+    enum touchscreen_mode old_mode = touchscreen_get_mode();
+
+    touchscreen_set_mode(TOUCHSCREEN_BUTTON);
+#endif
         button = get_action(CONTEXT_SETTINGS_TIME, TIMEOUT_BLOCK);
+#ifdef HAVE_TOUCHSCREEN
+    touchscreen_set_mode(old_mode);
+#endif
         switch ( button ) {
             case ACTION_STD_PREV:
                 cursorpos = clamp_value_wrap(--cursorpos, 5, 0);
