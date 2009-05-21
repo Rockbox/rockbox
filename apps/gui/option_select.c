@@ -158,7 +158,7 @@ void option_talk_value(const struct settings_list *setting, int value, bool enqu
 {
     if ((setting->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
     {
-        bool val = value==1?true:false;
+        bool val = (value==1);
         talk_id(val? setting->bool_setting->lang_yes :
                 setting->bool_setting->lang_no, enqueue);
     }

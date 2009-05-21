@@ -351,7 +351,7 @@ int gui_syncpitchscreen_run(void)
             if (pitch_mode == PITCH_MODE_ABSOLUTE) {
                 pitch = pitch_increase(pitch, delta, true);
             } else {
-                pitch = pitch_increase_semitone(pitch, delta > 0 ? true:false);
+                pitch = pitch_increase_semitone(pitch, delta > 0);
             }
 
             delta = 0;

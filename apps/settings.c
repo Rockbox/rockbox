@@ -315,9 +315,9 @@ bool settings_load_config(const char* file, bool apply)
                     {
                         int temp;
                         if (cfg_string_to_int(i,&temp,value))
-                            *(bool*)settings[i].setting = (temp==0?false:true);
+                            *(bool*)settings[i].setting = (temp!=0);
                         if (settings[i].bool_setting->option_callback)
-                            settings[i].bool_setting->option_callback(temp==0?false:true);
+                            settings[i].bool_setting->option_callback(temp!=0);
                         break;
                     }
                     case F_T_CHARPTR:
@@ -1132,7 +1132,7 @@ bool set_option(const char* string, const void* variable, enum optiontype type,
     if (!option_screen(&item, NULL, false, NULL))
     {
         if (type == BOOL)
-            *(bool*)variable = (temp == 1? true: false);
+            *(bool*)variable = (temp == 1);
         else
             *(int*)variable = temp;
         return false;

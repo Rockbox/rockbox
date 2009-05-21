@@ -450,9 +450,9 @@ static void trigger_speak_item(const struct settings_list **settings,
          selected_setting == STOP_THRESHOLD) &&
         temp == 0)
     {
-        talk_id(LANG_OFF, title?true:false);
+        talk_id(LANG_OFF, title);
     } else {
-        option_talk_value(s, temp, title?true:false);
+        option_talk_value(s, temp, title);
     }
 }
 int rectrigger(void)

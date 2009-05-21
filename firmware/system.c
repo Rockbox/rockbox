@@ -107,7 +107,7 @@ void cpu_boost_(bool on_off, char* location, int line)
     {
         int message = (cpu_boost_first+cpu_boost_calls_count)%MAX_BOOST_LOG;
         snprintf(cpu_boost_calls[message], MAX_PATH,
-                    "%c %s:%d",on_off==true?'B':'U',location,line);
+                    "%c %s:%d",on_off?'B':'U',location,line);
         cpu_boost_calls_count++;
     }
 #else

@@ -323,7 +323,7 @@ static void __backlight_dim(bool dim_now)
 {
     /* dont let the interrupt tick happen */
     backlight_control = BACKLIGHT_CONTROL_IDLE;
-    backlight_target = (dim_now == true) ? 0 : _backlight_brightness;
+    backlight_target = dim_now ? 0 : _backlight_brightness;
     if(backlight_target==0 && _backlight_brightness==0)
     {
         if(dim_now == false)
@@ -361,7 +361,7 @@ static inline void __buttonlight_off(void)
 static void __buttonlight_dim(bool dim_now)
 {
     buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
-    buttonlight_target = (dim_now == true) ? 0 : buttonlight_brightness;
+    buttonlight_target = dim_now ? 0 : buttonlight_brightness;
     if(buttonlight_target==0 && buttonlight_brightness==0)
     {
         if(dim_now == false)

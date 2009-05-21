@@ -2414,7 +2414,7 @@ void audio_set_recording_options(struct audio_recording_options *options)
 {
     bool is_mpeg1;
 
-    is_mpeg1 = (options->rec_frequency < 3)?true:false;
+    is_mpeg1 = (options->rec_frequency < 3);
 
     rec_version_index = is_mpeg1?3:2;
     rec_frequency_index = options->rec_frequency % 3;
