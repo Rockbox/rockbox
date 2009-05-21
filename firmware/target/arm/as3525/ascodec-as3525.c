@@ -27,7 +27,14 @@
     
     I2C register description:
     * I2C2_CNTRL needs to be set to 0x51 for transfers to work at all.
-      bit 1 indicates direction of transfer (0 = write, 1 = read)
+      bit 0: ? possibly related to using ACKs during transfers
+      bit 1: direction of transfer (0 = write, 1 = read)
+      bit 2: use 2-byte slave address
+    * I2C2_IMR, I2C2_RIS, I2C2_MIS, I2C2_INT_CLR interrupt bits:
+      bit 2: byte read interrupt
+      bit 3: byte write interrupt
+      bit 4: ? possibly some kind of error status
+      bit 7: ACK error
     * I2C2_SR (status register) indicates in bit 0 if a transfer is busy.
     * I2C2_SLAD0 contains the i2c slave address to read from / write to.
     * I2C2_CPSR0/1 is the divider from the peripheral clock to the i2c clock.
