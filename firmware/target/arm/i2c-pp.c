@@ -36,6 +36,17 @@
 #include "ascodec.h"
 #include "as3514.h"
 
+#define I2C_CTRL    (*(volatile unsigned char*)(I2C_BASE+0x00))
+#define I2C_ADDR    (*(volatile unsigned char*)(I2C_BASE+0x04))
+#define I2C_DATA(X) (*(volatile unsigned char*)(I2C_BASE+0xc+(4*X)))
+#define I2C_STATUS  (*(volatile unsigned char*)(I2C_BASE+0x1c))
+
+/* I2C_CTRL bit definitions */
+#define I2C_SEND    0x80
+
+/* I2C_STATUS bit definitions */
+#define I2C_BUSY    (1<<6)
+
 /* Local functions definitions */
 static struct mutex i2c_mtx SHAREDBSS_ATTR;
 
