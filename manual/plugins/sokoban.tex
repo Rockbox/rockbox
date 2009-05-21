@@ -15,7 +15,8 @@ information about the level format, see
 \begin{btnmap}{}{}
 \multicolumn{2}{c}{\textbf{In game}} \\
 \hline
-\opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD}
+\opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD%
+    ,IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD}
     {\ButtonUp, \ButtonDown, }%
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu, \ButtonPlay, }%
 \opt{IRIVER_H10_PAD}{\ButtonScrollUp, \ButtonScrollDown, }%
@@ -24,6 +25,7 @@ information about the level format, see
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
 \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
+\opt{GIGABEAT_S_PAD}{\ButtonMenu}
     & Menu \\
 \nopt{IAUDIO_X5_PAD}{
     \opt{RECORDER_PAD,ARCHOS_AV300_PAD}{\ButtonFOne}
@@ -34,6 +36,7 @@ information about the level format, see
     \opt{GIGABEAT_PAD,SANSA_C200_PAD}{\ButtonVolDown}
     \opt{MROBE10_PAD}{\ButtonDisplay}
     \opt{SANSA_E200_PAD}{\ButtonSelect+\ButtonDown}
+    \opt{GIGABEAT_S_PAD}{\ButtonPrev}
     & Back to previous level \\
 }
 \nopt{IPOD_4G_PAD,IPOD_3G_PAD}{
@@ -44,6 +47,7 @@ information about the level format, see
     \opt{IRIVER_H10_PAD}{\ButtonPlay+\ButtonRight}
     \opt{GIGABEAT_PAD,MROBE100_PAD}{\ButtonMenu}
     \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonSelect+\ButtonRight}
+    \opt{GIGABEAT_S_PAD}{\ButtonPlay}
     & Restart level \\
 }
 \nopt{IAUDIO_X5_PAD}{
@@ -53,6 +57,7 @@ information about the level format, see
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonRight}
     \opt{IRIVER_H10_PAD}{\ButtonPlay+\ButtonScrollUp}
     \opt{GIGABEAT_PAD,SANSA_C200_PAD}{\ButtonVolUp}
+    \opt{GIGABEAT_S_PAD}{\ButtonNext}
     \opt{MROBE100_PAD}{\ButtonPlay}
     \opt{SANSA_E200_PAD}{\ButtonSelect+\ButtonUp}
     & Go to next level \\
@@ -62,6 +67,7 @@ information about the level format, see
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonSelect}
 \opt{IRIVER_H10_PAD}{\ButtonRew}
+\opt{GIGABEAT_S_PAD}{\ButtonVolUp}
     & Undo last movement \\
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,IAUDIO_X5_PAD}{\ButtonPlay}
 \opt{ONDIO_PAD}{\ButtonMenu+\ButtonDown}
@@ -69,6 +75,7 @@ information about the level format, see
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}
 \opt{IRIVER_H10_PAD}{\ButtonFF}
 \opt{GIGABEAT_PAD}{\ButtonA}
+\opt{GIGABEAT_S_PAD}{\ButtonVolDown}
 \opt{MROBE100_PAD}{\ButtonDisplay}
 \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}
     & Redo previously undone move \\
@@ -78,9 +85,11 @@ information about the level format, see
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}
 \opt{ONDIO_PAD}{\ButtonMenu}
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonSelect}
+\opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD%
+      ,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonSelect}
     & Pause/resume \\
-\opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD}
+\opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD%
+    ,IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD}
     {\ButtonUp/\ButtonDown}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu/\ButtonPlay}
 \opt{IRIVER_H10_PAD}{\ButtonScrollUp/\ButtonScrollDown}
@@ -90,6 +99,7 @@ information about the level format, see
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
 \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
+\opt{GIGABEAT_S_PAD}{\ButtonMenu}
     & Quit \\
 \end{btnmap}
 \end{table}

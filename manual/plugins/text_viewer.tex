@@ -14,6 +14,7 @@ files without a \fname{.txt} extension by using \emph{Open with} from the
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollBack}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
     \opt{SANSA_C200_PAD}{\ButtonVolUp}
+    \opt{GIGABEAT_S_PAD}{\ButtonPrev}
         & Scroll{}-up\\
 
     \opt{PLAYER_PAD}{\ButtonRight}
@@ -22,43 +23,53 @@ files without a \fname{.txt} extension by using \emph{Open with} from the
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd}
     \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
     \opt{SANSA_C200_PAD}{\ButtonVolDown}
+    \opt{GIGABEAT_S_PAD}{\ButtonNext}
         & Scroll{}-down\\
 
     \opt{PLAYER_PAD}{\ButtonMenu+\ButtonLeft}
-    \nopt{PLAYER_PAD}{\ButtonLeft}
+    \opt{GIGABEAT_S_PAD}{\ButtonPlay+\ButtonLeft}
+    \nopt{PLAYER_PAD,GIGABEAT_S_PAD}{\ButtonLeft}
         & Top of file (Narrow mode) /
         One screen left (Wide mode)\\
 
     \opt{PLAYER_PAD}{\ButtonMenu+\ButtonRight}
-    \nopt{PLAYER_PAD}{\ButtonRight}
+    \opt{GIGABEAT_S_PAD}{\ButtonPlay+\ButtonRight}
+    \nopt{PLAYER_PAD,GIGABEAT_S_PAD}{\ButtonRight}
         & Bottom of file (Narrow mode) /
         One screen right (Wide mode)\\
 
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD%
+      ,SANSA_C200_PAD,GIGABEAT_S_PAD}{%
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonUp}
         \opt{SANSA_E200_PAD}{\ButtonScrollBack}
         \opt{SANSA_C200_PAD}{\ButtonUp}
+        \opt{GIGABEAT_S_PAD}{\ButtonUp}
         & One line up\\
     }
 
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD%
+      ,SANSA_C200_PAD,GIGABEAT_S_PAD}{%
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonDown}
         \opt{SANSA_E200_PAD}{\ButtonScrollFwd}
         \opt{SANSA_C200_PAD}{\ButtonDown}
+        \opt{GIGABEAT_S_PAD}{\ButtonDown}
         & One line down\\
     }
 
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{
-        \ButtonOn+\ButtonLeft
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_S_PAD}{
+        \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonLeft}
+        \opt{GIGABEAT_S_PAD}{\ButtonLeft}
         & One column left\\
     }
 
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{
-        \ButtonOn+\ButtonRight
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_S_PAD}{
+        \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonRight}
+        \opt{GIGABEAT_S_PAD}{\ButtonRight}
         & One column right\\
     }
 
-    \opt{RECORDER_PAD,PLAYER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}
+    \opt{RECORDER_PAD,PLAYER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD%
+        ,IRIVER_H10_PAD,GIGABEAT_S_PAD}{\ButtonPlay}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
     \opt{ONDIO_PAD}{\ButtonMenu}
     \opt{GIGABEAT_PAD}{\ButtonA}
@@ -68,7 +79,8 @@ files without a \fname{.txt} extension by using \emph{Open with} from the
 
     \opt{RECORDER_PAD}{\ButtonFOne}
     \opt{ONDIO_PAD}{Long \ButtonMenu}
-    \opt{PLAYER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonMenu}
+    \opt{PLAYER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
+      ,MROBE100_PAD}{\ButtonMenu}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
     \opt{IAUDIO_X5_PAD,SANSA_C200_PAD,SANSA_E200_PAD}{\ButtonSelect}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
@@ -79,6 +91,7 @@ files without a \fname{.txt} extension by using \emph{Open with} from the
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
     \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
         ,MROBE100_PAD}{\ButtonPower}
+    \opt{GIGABEAT_S_PAD}{\ButtonBack}
         & Exit text viewer\\
 
     \end{btnmap}

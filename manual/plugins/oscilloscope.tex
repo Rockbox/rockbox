@@ -15,10 +15,11 @@ being played.
   \begin{btnmap}{}{}
     \opt{RECORDER_PAD}{\ButtonFOne}
     \opt{ONDIO_PAD}{\ButtonMenu}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}
-        {\ButtonSelect}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD%
+      ,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonSelect}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
+    \opt{GIGABEAT_S_PAD}{\ButtonPrev}
     & Toggle filled / curve / plot \\
     \opt{RECORDER_PAD}{\ButtonFTwo}
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonRight}
@@ -27,6 +28,7 @@ being played.
     \opt{IAUDIO_X5_PAD}{\ButtonRec}
     \opt{IRIVER_H10_PAD}{\ButtonFF}
     \opt{SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonDown}
+    \opt{GIGABEAT_S_PAD}{\ButtonNext}
     & Toggle whether to scroll or not \\
     \opt{RECORDER_PAD}{\ButtonFThree}
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}
@@ -35,8 +37,10 @@ being played.
     \opt{IAUDIO_X5_PAD}{Long \ButtonSelect}
     \opt{IRIVER_H10_PAD}{Long \ButtonRew}
     \opt{SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonUp}
+    \opt{GIGABEAT_S_PAD}{\ButtonMenu}
     & Toggle drawing orientation \\
-    \opt{RECORDER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}
+    \opt{RECORDER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD%
+      ,GIGABEAT_S_PAD}{\ButtonPlay}
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonOff}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
     \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}
@@ -47,7 +51,8 @@ being played.
         {\ButtonUp{} / \ButtonDown}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD}{\ButtonScrollFwd{} / \ButtonScrollBack}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
-    \opt{SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonVolUp{} / \ButtonVolDown}
+    \opt{SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}
+      {\ButtonVolUp{} / \ButtonVolDown}
     & Increase / decrease volume\\
     \ButtonRight{} / \ButtonLeft
     & Increase / decrease speed\\
@@ -55,6 +60,7 @@ being played.
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
     \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}
         {\ButtonPower}
+    \opt{GIGABEAT_S_PAD}{\ButtonBack}
     & Exit demo \\
   \end{btnmap}
 \end{table}
