@@ -1,0 +1,145 @@
+% $Id$ %
+\subsection{Rockpaint}
+\screenshot{plugins/images/ss-rockpaint}{Rockpaint}%
+{img:Rockpaint}
+Rockpaint is a bitmap (\fname{.bmp}) editor for Rockbox. It can open any \fname{.bmp} file
+whose dimensions are the same size as your device's screen or smaller; it can
+also create empty bitmaps for you to work with.\\
+
+\subsubsection{Opening A File}
+To open a file, you may use either the context menu option "Open With" in the
+File Browser, or you may enter Rockpaint first using the Plugins menu and open
+a file from there. To perform the latter, simply press Rockpaint's Menu button
+or move the cursor beyond the bottom of the screen; then move the cursor onto
+"Menu" and select it. Finally, select "Load" and navigate to the image you
+wish to open.\\
+
+\subsubsection{Tools}
+Rockpaint offers several tools to aid you in editing; you can view them by
+either pressing Rockpaint's "Menu" key or by attempting to move the cursor
+beyond the bottom of the screen. From top to bottom and left to right, and
+by section, they are as follows:
+\begin{description}
+    \item[Colour Picker]
+        The top left tool shows your colours that are at the ready. To
+        swap them, "click" on the background colour. To edit the foreground colour,
+        click on it.
+    \item[Preset Pallete]
+        Several preset colours are availible. Clicking on one changes
+        the foreground of the Colour Picker to the selected colour.
+    \item[Pencil]
+        Draws as you move the cursor. You can change the brush size with the
+        Menu option "Brush Size". Use the Select key to toggle the tool while editing
+        the image.
+    \item[Selection tool]
+        Allows you to select a rectangular region; once you do, you
+        will be shown a menu of options (including "cancel" if you make a mistake).
+    \item[Line tool]
+        Draws a straight line.
+    \item[Curve tool]
+        Allows you to draw a line and curve it.
+    \item[Rectangle tool]
+        Draws an unfilled rectangle.
+    \item[Circle tool]
+        Draws an unfilled circle.
+    \item[Gradient fill]
+        To use this tool, click at the starting and ending points.
+        Starting with the background and going to the foreground colour, Rockpaint
+        will fill the region with a gradual colour change.
+    \item[Bucket fill]
+        Fills an same-colour or empty region with a colour.
+    \item[Dropper]
+        Click on a colour in the image to change the foreground colour to it.
+    \item[Eraser]
+        The opposite of the pencil; it changes painted pixels to white.
+    \item[Text tool]
+        "Draws" text on the image.
+    \item[Filled rectangle]
+        Same as the Rectangle tool, but fills it with colour.
+    \item[Filled circle]
+        Same as the Circle tool, but fills it with colour.
+    \item[Curved Gradient Fill]
+        Same as Gradient fill, but you must draw two lines.
+        Rockpaint will draw a curved, gradual change of colour in the region.
+    \item[Menu]
+        This opens the Main Menu. You can also press the Menu key to open it.
+\end{description}
+
+\subsubsection{Main Menu}
+The main menu consists of the following:
+\begin{description}
+    \item[Resume]
+        Closes the Main Menu.
+    \item[New]
+        Creates a new canvas and discards the current file. BE CAREFUL.
+        You will lose any unsaved changes in the file that is currently open.
+    \item[Load]
+        Loads a bitmap file. Simply navigate to the file as you
+        would in the file browser.
+    \item[Save]
+        Saves the current file. If it has not been saved before,
+        you will be given a chance to name it and choose the saving location.
+    \item[Brush speed]
+        Changes the speed at which the selection cursor
+        moves when you hold down a movement button.
+    \item[Brush size]
+        Allows you to adjust the drawing size of the pencil tool.
+    \item[Choose colour]
+        Allows you to manually edit the foreground colour.
+        You can edit the RBG and/or the HSV values.
+    \item[Grid size]
+        Allows you to show or hide a grid over the canvas,
+        and to specify its size.
+    \item[Exit]
+        Exits Rockpaint.
+\end{description}
+
+\warn{BE CAREFUL. Rockpaint will NOT prompt you to save
+if you select Exit, so any unsaved changes will be lost.}
+
+\begin{table}
+\begin{btnmap}{}{}
+    \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{
+        \nopt{IRIVER_H300_PAD,GIGABEAT_S_PAD}{\ButtonPower}
+        \opt{IRIVER_H300_PAD}{\ButtonOff}
+        \opt{GIGABEAT_S_PAD}{\ButtonBack}
+        & Quits Rockpaint immediately.\\
+    }
+
+    \ButtonLeft
+    & Moves the cursor to the left.\\
+
+    \ButtonRight
+    & Moves the cursor to the right.\\
+
+    \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,IRIVER_H10_PAD}{\ButtonUp}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonMenu}
+    \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
+    & Moves the cursor up.\\
+
+    \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,IRIVER_H10_PAD}{\ButtonDown}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonPlay}
+    \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
+    & Moves the cursor down.\\
+
+    \opt{IRIVER_H300_PAD}{\ButtonOn}%
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonSelect+\ButtonMenu}%
+    \opt{SANSA_C200_PAD,SANSA_E200_PAD}{\ButtonSelect+\ButtonPower}%
+    \opt{IAUDIO_X5_PAD}{\ButtonPlay}%
+    \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonMenu}%
+    \opt{IRIVER_H10_PAD}{\ButtonPlay}%
+    & Displays the Main Menu.\\
+
+    \opt{IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_C200_PAD,SANSA_E200_PAD}{\ButtonRec}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonMenu+\ButtonLeft}
+    \opt{GIGABEAT_PAD}{\ButtonA}
+    \opt{IRIVER_H10_PAD}{\ButtonRew}
+    \opt{GIGABEAT_S_PAD}{\ButtonPlay}
+    & Displays the toolbar.\\
+
+    \nopt{IRIVER_H10_PAD}{\ButtonSelect}%
+    \opt{IRIVER_H10_PAD}{\ButtonFF}%
+    & Toggles the brush and selects objects.\\
+
+    \end{btnmap}
+\end{table}
