@@ -75,8 +75,6 @@ include $(TOOLSDIR)/make.inc
 $(LINKFILE): $(LDS)
 	$(call PRINTS,build $(@F))cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) \
 	$(DEFINES) -E -P - >$@
-	./action_helper.pl > actions.lua
-	echo $(pwd)
 
 clean:
 	$(call PRINTS,cleaning lua)rm -rf $(OBJDIR)/lua
