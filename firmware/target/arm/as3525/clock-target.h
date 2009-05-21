@@ -47,7 +47,9 @@
 #error PCLK frequency is too low : clock divider will not fit !
 #endif
 
-#define AS3525_IDE_FREQ         66000000
+#define AS3525_IDE_FREQ         90000000    /* The OF uses 66MHz maximal freq
+                                               but sd transfers fail on some
+                                               players with this limit */
 #if (CLK_DIV(AS3525_PLLA_FREQ, AS3525_IDE_FREQ) - 1) >= (1<<4) /* 4 bits */
 #error IDE frequency is too low : clock divider will not fit !
 #endif
