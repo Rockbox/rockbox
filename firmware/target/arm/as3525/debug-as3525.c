@@ -183,8 +183,18 @@ int calc_freq(int clk)
         case CLK_DBOP:
             return calc_freq(CLK_PCLK)/((CGU_DBOP & 7)+1);
         case CLK_SD_IDENT_NAND:
-            return calc_freq(CLK_PCLK)/(((MCI_NAND & 0xff)*2)+1);
+            if(!(MCI_NAND & (1<<8)))
+                return 0;
+            else if(MCI_NAND & (1<<10))
+                return calc_freq(CLK_PCLK);
+            else
+                return calc_freq(CLK_PCLK)/(((MCI_NAND & 0xff)*2)+1);
         case CLK_SD_IDENT_MSD:
+            if(!(MCI_SD & (1<<8)))
+                return 0;
+            else if(MCI_SD & (1<<10))
+                return calc_freq(CLK_PCLK);
+            else
             return calc_freq(CLK_PCLK)/(((MCI_SD & 0xff)*2)+1);
         case CLK_USB:
             switch(CGU_USB & 3) {     /* 0-> div=1  other->div=1/(2*n)  */
