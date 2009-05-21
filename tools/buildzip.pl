@@ -409,6 +409,8 @@ STOP
     # copy the already built lng files
     glob_copy('apps/lang/*lng', "$rbdir/langs/");
 
+    # copy the .lua files
+    glob_copy('apps/plugins/lua/*.lua', "$rbdir/rocks/viewers/");
 }
 
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =

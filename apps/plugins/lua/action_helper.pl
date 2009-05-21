@@ -18,10 +18,12 @@
 #
 ############################################################################
 
-$input = "../../action.h";
+$input = $ARGV[0] . "/../../action.h";
 
 open(ACTION, "<$input") or die "Can't open $input!";
 
+print "-- Don't change this file!\n";
+print "-- It is automatically generated of action.h\n";
 print "rb.actions = {\n";
 
 $i = 0;
