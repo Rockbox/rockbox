@@ -1,0 +1,24 @@
+Changes
+
+* (March 30 2005) Daniel
+
+ Linus Nielsen Feltzing provided a patch that corrected several minor problems
+ that prevented dbestfit from working good. Linus also tested and timed
+ dbestfit for real in a target where he replaced the pSOS-provided memory
+ subsystem.
+
+* 3.2
+
+ Made eons ago, all older changes have been forgotten.
+Changes
+
+* (March 30 2005) Daniel
+
+ Linus Nielsen Feltzing provided a patch that corrected several minor problems
+ that prevented dbestfit from working good. Linus also tested and timed
+ dbestfit for real in a target where he replaced the pSOS-provided memory
+ subsystem.
+
+* 3.2
+
+ Made eons ago, all older changes have been forgotten.

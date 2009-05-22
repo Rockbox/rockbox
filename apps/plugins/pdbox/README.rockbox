@@ -1,0 +1,16 @@
+Library: PDa (Pure Data Anywhere)
+Imported: 2009-05-22 by Wincent Balin (GSoC), commit by Peter D'Hoye
+
+This directory structure contains the Pure Data Anywhere implementation
+
+LICENSING INFORMATION
+
+PDa is licensed under the Standard Improved BSD License and is copyrighted
+Miller Puckette and others
+
+IMPORT DETAILS
+
+PDbox is based on PDa 0.6 which is based on pd-0.37-4 (date?)
+
+[more info from Wincent Balin goes here]
+

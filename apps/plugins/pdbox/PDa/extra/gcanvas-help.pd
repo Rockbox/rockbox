@@ -1,0 +1,16 @@
+#N canvas 0 0 240 300 8;
+#X obj 21 61 gcanvas 80 80;
+#X text 14 9 gcanvas .. mouse coordinate enabled canvas;
+#X text 13 22 ==========================================;
+#X floatatom 21 148 5 0 0 0 - - -;
+#X floatatom 94 147 5 0 0 0 - - -;
+#X connect 0 0 3 0;
+#X connect 0 1 4 0;
+#N canvas 0 0 240 300 8;
+#X obj 21 61 gcanvas 80 80;
+#X text 14 9 gcanvas .. mouse coordinate enabled canvas;
+#X text 13 22 ==========================================;
+#X floatatom 21 148 5 0 0 0 - - -;
+#X floatatom 94 147 5 0 0 0 - - -;
+#X connect 0 0 3 0;
+#X connect 0 1 4 0;

@@ -1,0 +1,118 @@
+0.6:
+ - added compilation for blackfin architecture (blackfin.uclinux.org)
+ - added third outlet for mouseup to gcanvas.
+ - debian package support (for maemo)
+ - don't ask quit question
+
+0.5:
+ - fixed a crasher bug in sfread~.c
+
+0.4:
+ - added ipod gui communication in m_pd.c (pd_bind) and m_fixed.c
+ - moved the pd internal objects in a folder called interns
+ - restructuring of the makefile, you can build a static binary
+   now with "make static", needed for the iPod part mainly.
+ - the oscillator tables are precalculated now (faster startup).
+   see src/makecostable.c for that
+ - the scheduler is simplified (added an additional scheduler called
+   m_scheduler_pda(), this is a lot faster now
+ - changed the "look" of PDa
+ - The menubar in the patcher window is now optional, its off by default.
+ - stdin interface added. It is now possible to communicate with pd via the 
+   keyboard even in -nogui mode
+ - fixed loading and saving of arrays (g_array.c)
+ - corrected rounding when calculation phase update osc~ and phasor~
+   (there are better methods to do this, but they are slower)
+ - fixed tabosc4~
+ - enabled array drawing
+ - fixed array saving in subpatch
+
+
+0.3test2:
+  - added the O_CREAT flag to sfwrite
+  - removed the OSC stuff (now in PDa-externals)
+
+0.3test1:
+  - moved all objects into the extra dir
+  
+
+ d_arithmetic: t_float -> t_sample .. exchanged * with mult / with divide
+ d_fft: t_float -> t_sample
+ d_global: t_float -> t_sample
+ d_misc: put print~ into extra folder
+ d_resample: t_float -> t_sample
+ g_array: disable editing
+          fixtof()
+          t_float -> t_sample (check out the savefn thingy)
+
+ g_graph: 1 t_float -> t_sample
+ g_io: t_float -> t_sample
+ m_conf: remove calls to setup routines
+ m_obj.c ftofix
+ m_pd.h definition of t_sample
+ double -> t_time
+      ... and more
+ m_sched.c
+ double t_time
+ s_inter: check !!!
+ s_main: check !!!
+					    
+0.6:
+ - added compilation for blackfin architecture (blackfin.uclinux.org)
+ - added third outlet for mouseup to gcanvas.
+ - debian package support (for maemo)
+ - don't ask quit question
+
+0.5:
+ - fixed a crasher bug in sfread~.c
+
+0.4:
+ - added ipod gui communication in m_pd.c (pd_bind) and m_fixed.c
+ - moved the pd internal objects in a folder called interns
+ - restructuring of the makefile, you can build a static binary
+   now with "make static", needed for the iPod part mainly.
+ - the oscillator tables are precalculated now (faster startup).
+   see src/makecostable.c for that
+ - the scheduler is simplified (added an additional scheduler called
+   m_scheduler_pda(), this is a lot faster now
+ - changed the "look" of PDa
+ - The menubar in the patcher window is now optional, its off by default.
+ - stdin interface added. It is now possible to communicate with pd via the 
+   keyboard even in -nogui mode
+ - fixed loading and saving of arrays (g_array.c)
+ - corrected rounding when calculation phase update osc~ and phasor~
+   (there are better methods to do this, but they are slower)
+ - fixed tabosc4~
+ - enabled array drawing
+ - fixed array saving in subpatch
+
+
+0.3test2:
+  - added the O_CREAT flag to sfwrite
+  - removed the OSC stuff (now in PDa-externals)
+
+0.3test1:
+  - moved all objects into the extra dir
+  
+
+ d_arithmetic: t_float -> t_sample .. exchanged * with mult / with divide
+ d_fft: t_float -> t_sample
+ d_global: t_float -> t_sample
+ d_misc: put print~ into extra folder
+ d_resample: t_float -> t_sample
+ g_array: disable editing
+          fixtof()
+          t_float -> t_sample (check out the savefn thingy)
+
+ g_graph: 1 t_float -> t_sample
+ g_io: t_float -> t_sample
+ m_conf: remove calls to setup routines
+ m_obj.c ftofix
+ m_pd.h definition of t_sample
+ double -> t_time
+      ... and more
+ m_sched.c
+ double t_time
+ s_inter: check !!!
+ s_main: check !!!
+					    
