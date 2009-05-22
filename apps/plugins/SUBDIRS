@@ -48,7 +48,9 @@ doom
 midi
 /* beatbox */
 #ifndef RB_PROFILE
+#if MEMORYSIZE > 2  /* mpegplayer allocates at least 2MB of RAM */
 mpegplayer
+#endif
 #endif
 #endif
 
