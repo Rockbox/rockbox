@@ -121,7 +121,7 @@ void close_wav(int fd, RMContext *rmctx) {
 int main(int argc, char *argv[])
 {
     int fd, fd_dec;
-    int res, datasize,x,i;
+    int res, datasize,i;
     int nb_frames = 0;
 #ifdef DUMP_RAW_FRAMES 
     char filename[15];
@@ -167,12 +167,6 @@ int main(int argc, char *argv[])
     h = rmctx.sub_packet_h;
     cook_decode_init(&rmctx,&q);
     DEBUGF("nb_frames = %d\n",nb_frames);
-    x = 0;
-    if(packet_count % h)
-    {
-        packet_count += h - (packet_count % h);
-        rmctx.nb_packets = packet_count;
-    }
 
     /* change the buffer pointer to point at the first audio frame */
     advance_buffer(&filebuf, rmctx.data_offset+ DATA_HEADER_SIZE);

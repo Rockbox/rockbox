@@ -434,6 +434,17 @@ int real_parse_header(int fd, RMContext *rmctx)
 	      skipped += 4;
               if (!rmctx->nb_packets && (rmctx->flags & 4))
                   rmctx->nb_packets = 3600 * 25;		
+
+              /***
+               * nb_packets correction :
+               *   in some samples, number of packets may not exactly form
+               *   an integer number of scrambling units. This is corrected
+               *   by constructing a partially filled unit out of the few 
+               *   remaining samples at the end of decoding.
+               ***/
+              if(rmctx->nb_packets % rmctx->sub_packet_h)
+                  rmctx->nb_packets += rmctx->sub_packet_h - (rmctx->nb_packets % rmctx->sub_packet_h);
+
 	      printf("    data_nb_packets = %d\n",rmctx->nb_packets);
 	      printf("    next DATA offset = %d\n",next_data_off);
               header_end = 1;			
