@@ -1238,7 +1238,7 @@ void printResult(void)
     }
 
     rb->lcd_getstringsize(buf, &w, &h);
-    rb->screen_clear_area(rb->screens[0], 0, 0, LCD_WIDTH, REC_HEIGHT-1);
+    rb->screen_clear_area(rb->screens[0], 0, 0, LCD_WIDTH, Y_1_POS - 1);
     rb->lcd_putsxy(4, Y_1_POS - h -1, operbuf);
     rb->lcd_putsxy(LCD_WIDTH - w - 4, Y_1_POS - h -1, buf);
     rb->lcd_update_rect(0, 1, LCD_WIDTH, Y_1_POS);
