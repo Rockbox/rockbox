@@ -547,60 +547,62 @@ static int errfile (lua_State *L, const char *what, int fnameindex) {
   return LUA_ERRFILE;
 }
 
+static void make_path(char* dest, size_t dest_size, char* curfile, char* newfile)
+{
+    char* pos = rb->strrchr(curfile, '/');
+    if(pos != NULL)
+    {
+        unsigned int len = (unsigned int)(pos - curfile);
+        len = len + 1 > dest_size ? dest_size - 1 : len;
+
+        if(len > 0)
+            memcpy(dest, curfile, len);
+
+        dest[len] = '/';
+        dest[len+1] = '\0';
+    }
+    else
+        dest[0] = '\0';
+
+    strncat(dest, newfile, dest_size - strlen(dest));
+}
 
 LUALIB_API int luaL_loadfile (lua_State *L, const char *filename) {
   LoadF lf;
-  int status; //, readstatus;
+  int status;
   char buffer[MAX_PATH];
-//  int c;
   int fnameindex = lua_gettop(L) + 1;  /* index of filename on the stack */
   lf.extraline = 0;
-//  if (filename == NULL) {
-//    lua_pushliteral(L, "=stdin");
-//    lf.f = stdin;
-//  }
-//  else {
-    lua_pushfstring(L, "@%s", filename);
-    lf.f = rb->open(filename, O_RDONLY);
-    if (lf.f < 0)
-    {
-        /* Fallback */
-        snprintf(buffer, sizeof(buffer), "%s/%s", curpath, filename);
-        lf.f = rb->open(buffer, O_RDONLY);
+  lf.f = rb->open(filename, O_RDONLY);
+  if(lf.f < 0) {
+    /* Fallback */
 
-        if(lf.f < 0)
-        {
-            snprintf(buffer, sizeof(buffer), "%s/%s", VIEWERS_DIR, filename);
-            lf.f = rb->open(buffer, O_RDONLY);
+    lua_Debug ar;
+    if(lua_getstack(L, 1, &ar)) {
+      lua_getinfo(L, "S", &ar);
 
-            if(lf.f < 0)
-                return errfile(L, "open", fnameindex);
-        }
+      /* Try determining the base path of the current Lua chunk
+         and prepend it to filename in buffer. */
+      make_path(buffer, sizeof(buffer), (char*)&ar.source[1], (char*)filename);
+      lf.f = rb->open(buffer, O_RDONLY);
     }
-//  }
-//  c = getc(lf.f);
-//  if (c == '#') {  /* Unix exec. file? */
-//    lf.extraline = 1;
-//    while ((c = getc(lf.f)) != EOF && c != '\n') ;  /* skip first line */
-//    if (c == '\n') c = getc(lf.f);
-//  }
-//  if (c == LUA_SIGNATURE[0]) { // && lf.f != stdin) {  /* binary file? */
-//    rb->close(lf.f);
-//    lf.f = rb->open(filename, O_RDONLY);  /* reopen in binary mode */
-//    if (lf.f < 0) return errfile(L, "reopen", fnameindex);
-    /* skip eventual `#!...' */
-//   while ((c = getc(lf.f)) != EOF && c != LUA_SIGNATURE[0]) ;
-//    lf.extraline = 0;
-//  }
-//  ungetc(c, lf.f);
+
+    if(lf.f < 0) {
+      snprintf(buffer, sizeof(buffer), "%s/%s", VIEWERS_DIR, filename);
+      lf.f = rb->open(buffer, O_RDONLY);
+
+      if(lf.f < 0)
+        return errfile(L, "open", fnameindex);
+    }
+
+    if(lf.f >= 0)
+      lua_pushfstring(L, "@%s", buffer);
+  }
+  else
+    lua_pushfstring(L, "@%s", filename);
+
   status = lua_load(L, getF, &lf, lua_tostring(L, -1));
-//  readstatus = ferror(lf.f);
-  //if (lf.f != stdin) rb->close(lf.f);  /* close file (even in case of errors) */
   rb->close(lf.f);
-//  if (readstatus) {
-//    lua_settop(L, fnameindex);  /* ignore results from `lua_load' */
-//    return errfile(L, "read", fnameindex);
-//  }
   lua_remove(L, fnameindex);
   return status;
 }
@@ -653,8 +655,9 @@ static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
 
 
 static int panic (lua_State *L) {
-    (void)L;  /* to avoid warnings */
     DEBUGF("PANIC: unprotected error in call to Lua API (%s)\n",
+        lua_tostring(L, -1));
+    rb->splashf(5 * HZ, "PANIC: unprotected error in call to Lua API (%s)",
         lua_tostring(L, -1));
 
     return 0;

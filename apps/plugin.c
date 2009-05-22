@@ -644,6 +644,10 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+
+#ifdef HAVE_TOUCHSCREEN
+    action_get_touchscreen_press,
+#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)

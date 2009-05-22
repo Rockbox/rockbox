@@ -22,21 +22,38 @@ $input = $ARGV[0] . "/../../action.h";
 
 open(ACTION, "<$input") or die "Can't open $input!";
 
-print "-- Don't change this file!\n";
-print "-- It is automatically generated of action.h\n";
-print "rb.actions = {\n";
-
 $i = 0;
+$j = 0;
 while(my $line = <ACTION>)
 {
     chomp($line);
-    if($line =~ /^\s*(ACTION_[^\s]+)(\s*=.*)?,$/)
+    if($line =~ /^\s*(ACTION_[^\s]+)(\s*=.*)?,\s*$/)
     {
-        printf "\t%s = %d,\n", $1, $i;
+        $actions[$i] = sprintf("\t%s = %d,\n", $1, $i);
         $i++;
+    }
+    elsif($line =~ /^\s*(CONTEXT_[^\s]+)(\s*=.*)?,\s*$/)
+    {
+        $contexts[$j] = sprintf("\t%s = %d,\n", $1, $j);
+        $j++;
     }
 }
 
+close(ACTION);
+
+print "-- Don't change this file!\n";
+printf "-- It is automatically generated of action.h %s\n", '$Revision';
+
+print "rb.actions = {\n";
+foreach $action(@actions)
+{
+    print $action;
+}
 print "}\n";
 
-close(ACTION);
+print "rb.contexts = {\n";
+foreach $context(@contexts)
+{
+    print $context;
+}
+print "}\n";

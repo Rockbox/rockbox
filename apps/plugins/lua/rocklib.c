@@ -251,6 +251,19 @@ RB_WRAP(get_action)
     return 1;
 }
 
+#ifdef HAVE_TOUCHSCREEN
+RB_WRAP(action_get_touchscreen_press)
+{
+    short x, y;
+    int result = rb->action_get_touchscreen_press(&x, &y);
+
+    lua_pushinteger(L, result);
+    lua_pushinteger(L, x);
+    lua_pushinteger(L, y);
+    return 3;
+}
+#endif
+
 RB_WRAP(action_userabort)
 {
     int timeout = luaL_checkint(L, 1);
@@ -261,10 +274,15 @@ RB_WRAP(action_userabort)
 
 RB_WRAP(kbd_input)
 {
-    char* buffer = (char*)luaL_checkstring(L, 1);
-    int buflen = luaL_checkint(L, 2);
-    int result = rb->kbd_input(buffer, buflen);
-    lua_pushinteger(L, result);
+    luaL_Buffer b;
+    luaL_buffinit(L, &b);
+
+    char *buffer = luaL_prepbuffer(&b);
+    buffer[0] = '\0';
+    rb->kbd_input(buffer, LUAL_BUFFERSIZE);
+    luaL_addsize(&b, strlen(buffer));
+
+    luaL_pushresult(&b);
     return 1;
 }
 
@@ -467,6 +485,9 @@ static const luaL_Reg rocklib[] =
 #endif
     R(get_action),
     R(action_userabort),
+#ifdef HAVE_TOUCHSCREEN
+    R(action_get_touchscreen_press),
+#endif
     R(kbd_input),
 
     /* Hardware */

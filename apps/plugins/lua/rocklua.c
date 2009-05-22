@@ -46,23 +46,6 @@ static void rocklua_openlibs(lua_State *L) {
   }
 }
 
-char curpath[MAX_PATH];
-static void fill_curpath(const char* filename)
-{
-    char* pos = rb->strrchr(filename, '/');
-
-    if(pos != NULL)
-    {
-        int len = (int)(pos - filename);
-
-        if(len > 0)
-            memcpy(curpath, filename, len);
-
-        curpath[len] = '\0';
-    }
-}
-
-
 /***************** Plugin Entry Point *****************/
 enum plugin_status plugin_start(const void* parameter)
 {
@@ -79,7 +62,6 @@ enum plugin_status plugin_start(const void* parameter)
     else
     {
         filename = (char*) parameter;
-        fill_curpath(filename);
 
         lua_State *L = luaL_newstate();
 
