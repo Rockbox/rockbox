@@ -32,7 +32,7 @@ endif
 
 $(LUA_BUILDDIR)/lua.rock: $(LUA_OBJ) $(LUA_BUILDDIR)/actions.lua
 
-$(LUA_BUILDDIR)/actions.lua:
+$(LUA_BUILDDIR)/actions.lua: $(LUA_OBJ)
 	$(call PRINTS,GEN $(@F))$(LUA_SRCDIR)/action_helper.pl $(LUA_SRCDIR) > $@
 
 $(LUA_BUILDDIR)/lua.refmap: $(LUA_OBJ)
