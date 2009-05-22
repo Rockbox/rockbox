@@ -42,7 +42,7 @@ while(my $line = <ACTION>)
 close(ACTION);
 
 print "-- Don't change this file!\n";
-printf "-- It is automatically generated of action.h %s\n", '$Revision';
+printf "-- It is automatically generated of action.h %s\n", '$Revision$';
 
 print "rb.actions = {\n";
 foreach $action(@actions)
