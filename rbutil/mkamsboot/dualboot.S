@@ -97,14 +97,14 @@ uclcopy:
         /* here are model specific tests, for dual boot without a computer */
 
 #ifdef SANSA_CLIP
-        /* HOME button */
-.set row, (1<<6) /* enable output on C6 */
+        /* LEFT button */
+.set row, (1<<5) /* enable output on C5 */
         ldr   r0, =GPIOC
         mov   r1, #row
         str   r1, [r0, #0x400]
         str   r1, [r0, #(4*row)]
 
-.set col, (1<<2) /* read keyscan column B2 */
+.set col, (1<<0) /* read keyscan column B0 */
         ldr   r0, =GPIOB
         mov   r1, #0
         str   r1, [r0, #0x400]
