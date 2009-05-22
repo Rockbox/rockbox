@@ -38,6 +38,21 @@
 #endif
            
 /* Some Rockbox-like functions (these should be implemented in metadata_common.[ch] */
+static uint8_t get_uint8(uint8_t *buf)
+{
+    return (uint8_t)buf[0];
+}
+
+static uint16_t get_uint16be(uint8_t *buf)
+{
+    return (uint16_t)((buf[0] << 8)|buf[1]);
+}
+
+static uint32_t get_uint32be(uint8_t *buf)
+{
+    return (uint32_t)((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3]);
+}
+
 static int read_uint8(int fd, uint8_t* buf)
 {
     unsigned char tmp[1];
@@ -77,6 +92,11 @@ off_t filesize(int fd)
   } else {
     return buf.st_size;
   }
+}
+
+void advance_buffer(uint8_t **buf, int val)
+{
+    *buf += val;
 }
 
 int read_cook_extradata(int fd, RMContext *rmctx) {
@@ -273,7 +293,6 @@ int real_parse_header(int fd, RMContext *rmctx)
     uint32_t duration;
     uint32_t preroll;
     uint32_t index_offset;
-    uint32_t data_offset;
     uint16_t num_streams;
     uint16_t flags = 0;
 
@@ -331,7 +350,7 @@ int real_parse_header(int fd, RMContext *rmctx)
                 read_uint32be(fd, &duration);
                 read_uint32be(fd, &preroll);
                 read_uint32be(fd, &index_offset);
-                read_uint32be(fd, &data_offset);
+                read_uint32be(fd, &rmctx->data_offset);
                 read_uint16be(fd, &num_streams);
                 read_uint16be(fd, &rmctx->flags);
                 skipped += 40;
@@ -344,7 +363,7 @@ int real_parse_header(int fd, RMContext *rmctx)
                 printf("    duration = %d\n",duration);
                 printf("    preroll = %d\n",preroll);
                 printf("    index_offset = %d\n",index_offset);
-                printf("    data_offset = %d\n",data_offset);
+                printf("    data_offset = %d\n",rmctx->data_offset);
                 printf("    num_streams = %d\n",num_streams);
                 printf("    flags=0x%04x\n",flags);
                 break;
@@ -474,6 +493,54 @@ void rm_get_packet(int fd,RMContext *rmctx, RMPacket *pkt)
 
     //return pkt->data;
 }
+
+/**
+ * Another version of rm_get_packet which reads from a memory buffer 
+ * instead of readind from a file descriptor.
+ **/
+void rm_get_packet_membuf(uint8_t **filebuf,RMContext *rmctx, RMPacket *pkt)
+{   
+    uint8_t unknown;
+    uint16_t x, place;
+    uint16_t sps = rmctx->sub_packet_size;
+    uint16_t h = rmctx->sub_packet_h;
+    uint16_t y = rmctx->sub_packet_cnt;
+    uint16_t w = rmctx->audio_framesize;
+    do
+    {
+        y = rmctx->sub_packet_cnt;
+        pkt->version       = get_uint16be(*filebuf);
+        pkt->length        = get_uint16be(*filebuf+2);
+        pkt->stream_number = get_uint16be(*filebuf+4);
+        pkt->timestamp     = get_uint32be(*filebuf+6);
+        DEBUGF("    version = %d\n"
+               "    length  = %d\n"
+               "    stream  = %d\n"
+               "    timestamp= %d\n",pkt->version,pkt->length,pkt->stream_number,pkt->timestamp);
+
+        unknown      = get_uint8(*filebuf+10);
+        pkt->flags   = get_uint8(*filebuf+11);
+
+        if(pkt->version == 1)
+            unknown = get_uint8(*filebuf+10);
+
+        if (pkt->flags & 2) /* keyframe */
+            y = rmctx->sub_packet_cnt = 0;
+        if (!y) /* if keyframe update playback elapsed time */
+            rmctx->audiotimestamp = pkt->timestamp;
+        
+        advance_buffer(filebuf,12);
+        
+        for(x = 0 ; x < w/sps; x++)
+        {
+            place = sps*(h*x+((h+1)/2)*(y&1)+(y>>1)); 
+            pkt->frames[place/sps] = *filebuf;
+            advance_buffer(filebuf,sps);
+        }
+        rmctx->audio_pkt_cnt++;
+    }while(++(rmctx->sub_packet_cnt) < h);
+}
+
 #ifdef DEBUG
 void dump_rm_context(RMContext *rmctx)
 {

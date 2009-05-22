@@ -27,6 +27,7 @@
 typedef struct rm_packet
 {
     uint8_t  data[30000]; /* Reordered data. No malloc, hence the size */
+    uint8_t *frames[100]; /* Pointers to ordered audio frames in buffer */
     uint16_t version;
     uint16_t length;
     uint32_t timestamp;
@@ -44,6 +45,7 @@ typedef struct rm_context
     int audio_pkt_cnt; /* Output packet counter*/
 
     /* Stream Variables */
+    uint32_t data_offset;
     uint32_t audiotimestamp; /* Audio packet timestamp*/
     uint16_t sub_packet_cnt; /* Subpacket counter, used while reading */
     uint16_t sub_packet_size, sub_packet_h, coded_framesize; /* Descrambling parameters from container */
@@ -75,4 +77,7 @@ int open_wav(char* filename);
 void close_wav(int fd, RMContext *rmctx);
 int real_parse_header(int fd, RMContext *rmctx);
 void rm_get_packet(int fd,RMContext *rmctx, RMPacket *pkt);
+void rm_get_packet_membuf(uint8_t **filebuf,RMContext *rmctx, RMPacket *pkt);
+off_t filesize(int fd);
+void advance_buffer(uint8_t **buf, int val);
 #endif
