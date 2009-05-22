@@ -1,0 +1,109 @@
+% $Id$
+
+\newcommand{\ButtonLeft}{\btnfnt{Left}}
+\newcommand{\ButtonRight}{\btnfnt{Right}}
+\newcommand{\ButtonHome}{\btnfnt{Home}}
+\newcommand{\ButtonUp}{\btnfnt{Play}}
+\newcommand{\ButtonDown}{\btnfnt{Submenu}}
+\newcommand{\ButtonSelect}{\btnfnt{Select}}
+\newcommand{\ButtonPower}{\btnfnt{Power}}
+\newcommand{\ButtonScrollBack}{\btnfnt{Scroll Backward}}
+\newcommand{\ButtonScrollFwd}{\btnfnt{Scroll Forward}}
+\newcommand{\ButtonHold}{\btnfnt{Hold}}
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonScrollBack}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonScrollBack}
+\newcommand{\ActionStdNext}{\ButtonScrollFwd}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonScrollFwd}
+\newcommand{\ActionStdCancel}{\ButtonLeft}
+\newcommand{\ActionStdContext}{Long \ButtonSelect}
+\newcommand{\ActionStdQuickScreen}{Long \ButtonDown}
+\newcommand{\ActionQuickScreenExit}{\ButtonPower}
+\newcommand{\ActionStdMenu}{\ButtonDown}
+\newcommand{\ActionStdOk}{\ButtonSelect{} or \ButtonRight}
+\newcommand{\ActionStdUsbCharge}{\ButtonSelect}
+
+%Button actions, wps context
+\newcommand{\ActionWpsPlay}{\ButtonUp}
+\newcommand{\ActionWpsSkipNext}{\ButtonRight}
+\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
+
+\newcommand{\ActionWpsStop}{Long \ButtonHome}
+\newcommand{\ActionWpsVolDown}{\ButtonScrollBack}
+\newcommand{\ActionWpsVolUp}{\ButtonScrollFwd}
+
+\newcommand{\ActionWpsQuickScreen}{Long \ButtonDown}
+\newcommand{\ActionWpsMenu}{\ButtonDown}
+\newcommand{\ActionWpsContext}{Long \ButtonSelect}
+\newcommand{\ActionWpsBrowse}{\ButtonSelect}
+\newcommand{\ActionWpsPitchScreen}{\ButtonSelect{} + \ButtonUp}
+\newcommand{\ActionWpsIdThreeScreen}{\ButtonSelect{} + \ButtonDown}
+
+\newcommand{\ActionWpsAbSetBNextDir}{\ButtonHome{} + \ButtonRight}
+\newcommand{\ActionWpsAbSetAPrevDir}{\ButtonHome{} + \ButtonLeft}
+\newcommand{\ActionWpsAbReset}{\ButtonHome{} + \ButtonUp}
+
+%Button actions, tree context
+\newcommand{\ActionTreeWps}{\ButtonUp}
+\newcommand{\ActionTreeStop}{\ButtonHome}
+\newcommand{\ActionTreeEnter}{\ButtonSelect{} or \ButtonRight}
+\newcommand{\ActionTreeParentDirectory}{\ButtonLeft}
+
+%Button actions, YesNo context
+\newcommand{\ActionYesNoAccept}{\ButtonSelect}
+
+%Button actions, Setting context
+\newcommand{\ActionSettingInc}{\ButtonScrollFwd}
+\newcommand{\ActionSettingDec}{\ButtonScrollBack}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionKbdLeft}{\ButtonLeft}
+\newcommand{\ActionKbdRight}{\ButtonRight}
+\newcommand{\ActionKbdSelect}{\ButtonSelect}
+\newcommand{\ActionKbdDone}{\ButtonUp}
+\newcommand{\ActionKbdAbort}{Long \ButtonHome}
+\newcommand{\ActionKbdUp}{\ButtonScrollBack}
+\newcommand{\ActionKbdDown}{\ButtonScrollFwd}
+\newcommand{\ActionKbdCursorLeft}{\ButtonHome{} + \ButtonLeft}
+\newcommand{\ActionKbdCursorRight}{\ButtonHome{} + \ButtonRight}
+\newcommand{\ActionKbdBackSpace}{\ButtonDown}
+\newcommand{\ActionKbdPageFlip}{\ButtonHome{} + \ButtonSelect}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionPsToggleMode}{\ButtonHome}
+\newcommand{\ActionPsIncSmall}{\ButtonScrollFwd}
+\newcommand{\ActionPsIncBig}{Long \ButtonScrollFwd}
+\newcommand{\ActionPsDecSmall}{\ButtonScrollBack}
+\newcommand{\ActionPsDecBig}{Long \ButtonScrollBack}
+\newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
+\newcommand{\ActionPsNudgeRight}{\ButtonRight}
+\newcommand{\ActionPsReset}{\ButtonSelect}
+\newcommand{\ActionPsExit}{Long \ButtonHome{} or \ButtonUp}
+
+%Button actions, Recording screen context
+%\newcommand{\ActionRecPause}{\ButtonUp}
+%\newcommand{\ActionRecExit}{\ButtonDown}
+%\newcommand{\ActionRecNewfile}{\ButtonHome}
+%\newcommand{\ActionRecMenu}{Long \ButtonSelect}
+%\newcommand{\ActionRecSettingsInc}{\ButtonRight}
+%\newcommand{\ActionRecSettingsDec}{\ButtonLeft}
+%\newcommand{\ActionRecPrev}{\ButtonScrollBack}
+%\newcommand{\ActionRecNext}{\ButtonScrollFwd}
+
+%Button actions, FM radio context
+\newcommand{\ActionFMPreset}{\ButtonSelect}
+\newcommand{\ActionFMMenu}{Long \ButtonSelect}
+\newcommand{\ActionFMMode}{Long \ButtonUp}
+\newcommand{\ActionFMStop}{Long \ButtonHome}
+\newcommand{\ActionFMExit}{\ButtonDown}
+\newcommand{\ActionFMPlay}{\ButtonUp}
+\newcommand{\ActionFMSettingsInc}{\ButtonUp} %?
+\newcommand{\ActionFMSettingsDec}{\ButtonDown} %?
+\newcommand{\ActionFMPrev}{\ButtonLeft}
+\newcommand{\ActionFMNext}{\ButtonRight}
+
+%Button actions, Bookmark screen context
+\newcommand{\ActionBmDelete}{\ButtonHome}
