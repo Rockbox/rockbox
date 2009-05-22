@@ -1518,8 +1518,18 @@ bool recording_screen(bool no_source)
                 update_countdown = 0; /* Update immediately */
                 break;
 #endif
-            case ACTION_REC_PAUSE:
             case ACTION_REC_NEWFILE:
+            
+                /* Only act if in the middle of recording. */
+                if(audio_stat & AUDIO_STATUS_RECORD)
+                {
+                    rec_command(RECORDING_CMD_START_NEWFILE);
+                    last_seconds = 0;
+                }
+                break;
+        
+            case ACTION_REC_PAUSE:
+            
                 /* Only act if the mpeg is stopped */
                 if(!(audio_stat & AUDIO_STATUS_RECORD))
                 {
@@ -1547,30 +1557,22 @@ bool recording_screen(bool no_source)
                         peak_meter_set_trigger_listener(&trigger_listener);
                     }
                 }
+                /* If we're in the middle of recording */
                 else
                 {
-                    /*if new file button pressed, start new file */
-                    if (button == ACTION_REC_NEWFILE)
+                    /* if pause button pressed, pause or resume */
+                    if(audio_stat & AUDIO_STATUS_PAUSE)
                     {
-                        rec_command(RECORDING_CMD_START_NEWFILE);
-                        last_seconds = 0;
+                        rec_command(RECORDING_CMD_RESUME);
+                        if (global_settings.talk_menu)
+                        {
+                            /* no voice possible here, but a beep */
+                            audio_beep(HZ/4); /* short beep on resume */
+                        }
                     }
                     else
-                        /* if pause button pressed, pause or resume */
                     {
-                        if(audio_stat & AUDIO_STATUS_PAUSE)
-                        {
-                            rec_command(RECORDING_CMD_RESUME);
-                            if (global_settings.talk_menu)
-                            {
-                                /* no voice possible here, but a beep */
-                                audio_beep(HZ/4); /* short beep on resume */
-                            }
-                        }
-                        else
-                        {
-                            rec_command(RECORDING_CMD_PAUSE);
-                        }
+                        rec_command(RECORDING_CMD_PAUSE);
                     }
                 }
                 update_countdown = 0; /* Update immediately */
