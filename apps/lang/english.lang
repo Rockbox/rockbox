@@ -1993,15 +1993,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </dest>
   <voice>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </voice>
 </phrase>
 <phrase>
