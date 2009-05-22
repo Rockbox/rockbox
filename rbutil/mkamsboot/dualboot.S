@@ -21,10 +21,7 @@
 
 .text
 
-/* This is the size of the Clip's RAM, but there is nothing to be gained
-   (at the moment) by making use of the larger RAM of other targets */
-
-.set DRAM_SIZE, 0x50000
+.set IRAM_SIZE, 0x50000
 
 .set GPIOA,     0xC80B0000
 .set GPIOB,     0xC80C0000
@@ -60,7 +57,7 @@ start:
         ldr   r1, uclunpack_size    /* Source length */
         sub   r2, r0, r1            /* Source start - 1*/
 
-        ldr   r3, =(DRAM_SIZE-1)    /* Destination end */
+        ldr   r3, =(IRAM_SIZE-1)    /* Destination end */
 
 uclcopy:
         ldrb  r4, [r0], #-1
