@@ -170,20 +170,21 @@ static const struct button_mapping button_context_keyboard[]  = {
 #ifdef HAVE_RECORDING
 const struct button_mapping button_context_recscreen[]  = {
     
-    { ACTION_REC_NEWFILE,        BUTTON_PLAY|BUTTON_REPEAT,         BUTTON_PLAY },	
-    { ACTION_STD_CANCEL,         BUTTON_MENU|BUTTON_REL,            BUTTON_MENU },
+    { ACTION_REC_NEWFILE,        BUTTON_SELECT|BUTTON_REL,        BUTTON_SELECT },
     { ACTION_STD_MENU,           BUTTON_SELECT|BUTTON_REPEAT,     BUTTON_SELECT },
     { ACTION_REC_PAUSE,          BUTTON_PLAY|BUTTON_REL,            BUTTON_PLAY },
+    { ACTION_STD_CANCEL,         BUTTON_PLAY|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_STD_CANCEL,         BUTTON_MENU,                       BUTTON_NONE },
     { ACTION_STD_NEXT,           BUTTON_SCROLL_FWD,                 BUTTON_NONE },
     { ACTION_STD_NEXT,           BUTTON_SCROLL_FWD|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_STD_PREV,           BUTTON_SCROLL_BACK,                BUTTON_NONE },
     { ACTION_STD_PREV,           BUTTON_SCROLL_BACK|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_SETTINGS_INC,       BUTTON_RIGHT,                       BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT, BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE },
-    { ACTION_SETTINGS_DEC,       BUTTON_LEFT,                      BUTTON_NONE },
-    { ACTION_SETTINGS_DECREPEAT, BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },	
+    { ACTION_SETTINGS_INC,       BUTTON_RIGHT,                      BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_LEFT,                       BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE },	
     
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+    LAST_ITEM_IN_LIST
 }; /* button_context_recscreen */
 #endif
 
