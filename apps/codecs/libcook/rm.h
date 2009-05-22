@@ -18,8 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _RM2WAV_H
-#define _RM2WAV_H
+#ifndef _RM_H
+#define _RM_H
 
 #include <stdio.h>
 #include <stdint.h>

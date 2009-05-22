@@ -25,7 +25,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "rm2wav.h"
+#include "rm.h"
 #include "cook.h"
 
 //#define DUMP_RAW_FRAMES

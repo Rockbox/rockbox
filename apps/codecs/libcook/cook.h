@@ -24,7 +24,7 @@
 
 #include <stdint.h>
 #include "bitstream.h"
-#include "rm2wav.h"
+#include "rm.h"
 #include "cookdata_fixpoint.h"
 
 typedef struct {

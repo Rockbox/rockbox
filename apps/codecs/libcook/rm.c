@@ -27,11 +27,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "rm2wav.h"
-
-#define MAX_PATH 260
-#define PKT_HEADER_SIZE 12
-#define RAW_AUDIO_DATA packet_length-PKT_HEADER_SIZE
+#include "rm.h"
 
 
 #if 0
@@ -40,23 +36,8 @@
 #else
 #define DEBUGF(...)
 #endif
-
-/* ASF codec IDs */
-#define CODEC_ID_WMAV1 0x160
-#define CODEC_ID_WMAV2 0x161
            
 /* Some Rockbox-like functions (these should be implemented in metadata_common.[ch] */
-struct cook_extradata {
-    uint32_t cook_version;
-    uint16_t samples_pf_pc;    /* samples per frame per channel */
-    uint16_t nb_subbands;      /* number of subbands in the frequency domain */
-
-    /* extra 8 bytes for stereo data */
-    uint32_t unused;
-    uint16_t js_subband_start; /* joint stereo subband start */
-    uint16_t js_vlc_bits;
-};
-
 static int read_uint8(int fd, uint8_t* buf)
 {
     unsigned char tmp[1];
