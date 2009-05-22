@@ -41,7 +41,7 @@
 
 /* AS352X MMU Page Table Entries */
 /* to be implemented */
-#define TTB_SIZE                  0x0           /* Mimics OF  */
+#define TTB_SIZE                  0x0
 #define TTB_BASE_ADDR             (DRAM_ORIG + DRAM_SIZE - TTB_SIZE)
 
 
