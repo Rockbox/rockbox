@@ -93,6 +93,7 @@ enum plugin_status plugin_start(const void* parameter)
         dlmalloc_stats();
 
         if (status) {
+            DEBUGF("%s\n", lua_tostring(L, -1));
             rb->splashf(5 * HZ, "%s", lua_tostring(L, -1));
             lua_pop(L, 1);
         }

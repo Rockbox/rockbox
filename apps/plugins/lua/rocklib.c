@@ -406,6 +406,14 @@ RB_WRAP(filesize)
     return 1;
 }
 
+RB_WRAP(file_exists)
+{
+    const char* path = luaL_checkstring(L, 1);
+    bool result = rb->file_exists(path);
+    lua_pushboolean(L, result);
+    return 1;
+}
+
 #define R(NAME) {#NAME, rock_##NAME}
 static const luaL_Reg rocklib[] =
 {
@@ -440,6 +448,7 @@ static const luaL_Reg rocklib[] =
     R(rename),
     R(ftruncate),
     R(filesize),
+    R(file_exists),
 
     /* Kernel */
     R(sleep),
