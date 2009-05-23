@@ -486,7 +486,7 @@ static const struct button_mapping button_context_usb_hid[] = {
 
 static const struct button_mapping remote_button_context_usb_hid[] = {
     { ACTION_USB_HID_PLAY,     BUTTON_RC_PLAY,                   BUTTON_NONE },
-    { ACTION_USB_HID_STOP,     BUTTON_RC_POWER,                  BUTTON_NONE },
+    { ACTION_USB_HID_STOP,     BUTTON_RC_PLAY|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_USB_HID_SKIPPREV, BUTTON_RC_REW,                    BUTTON_NONE },
     { ACTION_USB_HID_SKIPNEXT, BUTTON_RC_FF,                     BUTTON_NONE },
     { ACTION_USB_HID_VOLUP,    BUTTON_RC_VOL_UP,                 BUTTON_NONE },
