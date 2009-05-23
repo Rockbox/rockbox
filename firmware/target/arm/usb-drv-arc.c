@@ -829,12 +829,11 @@ int usb_drv_request_endpoint(int type, int dir)
             return -1;
         }
 
-        log_ep(ep_num, ep_dir, "add");
 
         endpoint->allocated[ep_dir] = 1;
         endpoint->type[ep_dir] = ep_type;
 
-        log_ep(ep_num, ep_dir, "got");
+        log_ep(ep_num, ep_dir, "add");
         return (ep_num | (dir & USB_ENDPOINT_DIR_MASK));
     }
 
@@ -998,13 +997,13 @@ static void init_endpoints(void)
     for(ep_num=1;ep_num<USB_NUM_ENDPOINTS;ep_num++) {
         usb_endpoint_t *endpoint = &endpoints[ep_num];
 
-        /* manual: 32.9.5.18 (Caution) */
-        if (!endpoint->allocated[DIR_OUT]) {
+        /* manual: 32.9.5.18 (Caution): Leaving an unconfigured endpoint control
+         * will cause undefined behavior for the data pid tracking on the active
+         * endpoint/direction. */
+        if (!endpoint->allocated[DIR_OUT])
             endpoint->type[DIR_OUT] = USB_ENDPOINT_XFER_BULK;
-        }
-        if (!endpoint->allocated[DIR_IN]) {
+        if (!endpoint->allocated[DIR_IN])
             endpoint->type[DIR_IN] = USB_ENDPOINT_XFER_BULK;
-        }
 
         REG_ENDPTCTRL(ep_num) =
             EPCTRL_RX_DATA_TOGGLE_RST | EPCTRL_RX_ENABLE |
