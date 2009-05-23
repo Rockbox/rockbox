@@ -786,8 +786,8 @@ Lyre prototype 1*/
 #else /* BOOTLOADER */
 
 /* enable usb storage for targets that do bootloader usb */
-#if  (defined(TOSHIBA_GIGABEAT_S) && defined(USE_ROCKBOX_USB) && defined(USB_STORAGE)) || \
-     (defined(HAVE_USBSTACK) && (defined(CREATIVE_ZVx) || \
+#if  (defined(TOSHIBA_GIGABEAT_S) || \
+     (defined(CREATIVE_ZVx) || \
      defined(CPU_TCC77X) || defined(CPU_TCC780X))) || \
      (CONFIG_USBOTG == USBOTG_JZ4740)
 #define USB_ENABLE_STORAGE
