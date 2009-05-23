@@ -48,7 +48,7 @@ void class_set_extern_dir(t_symbol *s);
 
 #ifdef STATIC
 int sys_load_lib(char *dirname, char *classname)
-{ return 1;}
+{ return 0;}
 #else
 int sys_load_lib(char *dirname, char *classname)
 {
