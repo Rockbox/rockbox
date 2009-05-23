@@ -29,8 +29,6 @@
 #include "lib/pluginlib_actions.h"
 #include "lib/helper.h"
 #include "lib/configfile.h"
-#include "lib/picture.h"
-#include "pluginbitmaps/pictureflow_logo.h"
 #include "lib/grey.h"
 #include "lib/feature_wrappers.h"
 #include "lib/buflib.h"
@@ -222,6 +220,7 @@ typedef fb_data pix_t;
 
 #define EMPTY_SLIDE CACHE_PREFIX "/emptyslide.pfraw"
 #define EMPTY_SLIDE_BMP PLUGIN_DEMOS_DIR "/pictureflow_emptyslide.bmp"
+#define SPLASH_BMP PLUGIN_DEMOS_DIR "/pictureflow_splash.bmp"
 
 /* Error return values */
 #define ERROR_NO_ALBUMS     -1
@@ -276,10 +275,6 @@ struct load_slide_event_data {
 struct pfraw_header {
     int32_t width;          /* bmap width in pixels */
     int32_t height;         /* bmap height in pixels */
-};
-
-const struct picture logos[]={
-    {pictureflow_logo, BMPWIDTH_pictureflow_logo, BMPHEIGHT_pictureflow_logo},
 };
 
 enum show_album_name_values { album_name_hide = 0, album_name_bottom,
@@ -927,9 +922,24 @@ bool get_albumart_for_index_from_db(const int slide_index, char *buf,
  */
 void draw_splashscreen(void)
 {
+    unsigned char * buf_tmp = buf;
+    size_t buf_tmp_size = buf_size;
     struct screen* display = rb->screens[0];
-    const struct picture* logo = &(logos[display->screen_type]);
-
+#if FB_DATA_SZ > 1
+    ALIGN_BUFFER(buf_tmp, buf_tmp_size, sizeof(fb_data));
+#endif
+    struct bitmap logo = {
+#if LCD_WIDTH < 200
+        .width = 100,
+        .height = 18,
+#else
+        .width = 193,
+        .height = 34,
+#endif
+        .data = buf_tmp
+    };
+    int ret = rb->read_bmp_file(SPLASH_BMP, &logo, buf_tmp_size, FORMAT_NATIVE,
+        NULL);
 #if LCD_DEPTH > 1
     rb->lcd_set_background(N_BRIGHT(0));
     rb->lcd_set_foreground(N_BRIGHT(255));
@@ -938,13 +948,17 @@ void draw_splashscreen(void)
 #endif
     rb->lcd_clear_display();
 
+    if (ret > 0)
+    {
 #if LCD_DEPTH == 1  /* Mono LCDs need the logo inverted */
-    rb->lcd_set_drawmode(PICTUREFLOW_DRMODE ^ DRMODE_INVERSEVID);
-    picture_draw(display, logo, (LCD_WIDTH - logo->width) / 2, 10);
-    rb->lcd_set_drawmode(PICTUREFLOW_DRMODE);
-#else
-    picture_draw(display, logo, (LCD_WIDTH - logo->width) / 2, 10);
+        rb->lcd_set_drawmode(PICTUREFLOW_DRMODE ^ DRMODE_INVERSEVID);
 #endif
+        display->bitmap(logo.data, (LCD_WIDTH - logo.width) / 2, 10,
+            logo.width, logo.height);
+#if LCD_DEPTH == 1  /* Mono LCDs need the logo inverted */
+        rb->lcd_set_drawmode(PICTUREFLOW_DRMODE);
+#endif
+    }
 
     rb->lcd_update();
 }

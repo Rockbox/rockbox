@@ -692,15 +692,6 @@ matrix_bold.bmp
 matrix_normal.bmp
 #endif
 
-/* pictureflow */
-#if defined(HAVE_LCD_BITMAP) && defined(HAVE_TAGCACHE)
-#if (LCD_WIDTH < 200)
-pictureflow_logo.100x18x16.bmp
-#else
-pictureflow_logo.193x34x16.bmp
-#endif
-#endif
-
 /* Sliding puzzle */
 #if (LCD_WIDTH != LCD_HEIGHT)
 #define SMALLER_DIMENSION ((LCD_WIDTH < LCD_HEIGHT) ? LCD_WIDTH : LCD_HEIGHT)

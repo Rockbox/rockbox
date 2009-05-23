@@ -95,6 +95,8 @@ sub gettargetinfo {
 #ifdef HAVE_LCD_BITMAP
 Bitmap: yes
 Depth: LCD_DEPTH
+LCD Width: LCD_WIDTH
+LCD Height: LCD_HEIGHT
 Icon Width: CONFIG_DEFAULT_ICON_WIDTH
 Icon Height: CONFIG_DEFAULT_ICON_HEIGHT
 #endif
@@ -119,7 +121,7 @@ STOP
 
     open(TARGET, "$c|");
 
-    my ($bitmap, $depth, $swcodec, $icon_h, $icon_w);
+    my ($bitmap, $width, $height, $depth, $swcodec, $icon_h, $icon_w);
     my ($remote_depth, $remote_icon_h, $remote_icon_w);
     my ($recording);
     my $icon_count = 1;
@@ -130,6 +132,12 @@ STOP
         }
         elsif($_ =~ /^Depth: (\d*)/) {
             $depth = $1;
+        }
+        elsif($_ =~ /^LCD Width: (\d*)/) {
+            $width = $1;
+        }
+        elsif($_ =~ /^LCD Height: (\d*)/) {
+            $height = $1;
         }
         elsif($_ =~ /^Icon Width: (\d*)/) {
             $icon_w = $1;
@@ -157,7 +165,7 @@ STOP
     close(TARGET);
     unlink("gcctemp");
 
-    return ($bitmap, $depth, $icon_w, $icon_h, $recording,
+    return ($bitmap, $depth, $width, $height, $icon_w, $icon_h, $recording,
             $swcodec, $remote_depth, $remote_icon_w, $remote_icon_h);
 }
 
@@ -174,8 +182,9 @@ sub buildzip {
 
     print "buildzip: image=$image fonts=$fonts\n" if $verbose;
     
-    my ($bitmap, $depth, $icon_w, $icon_h, $recording, $swcodec,
-        $remote_depth, $remote_icon_w, $remote_icon_h) = &gettargetinfo();
+    my ($bitmap, $depth, $width, $height, $icon_w, $icon_h, $recording,
+        $swcodec, $remote_depth, $remote_icon_w, $remote_icon_h) =
+      &gettargetinfo();
 
     # print "Bitmap: $bitmap\nDepth: $depth\nSwcodec: $swcodec\n";
 
@@ -351,7 +360,17 @@ STOP
     }
 
     if(-e "$rbdir/rocks/demos/pictureflow.rock") {
-        copy("$ROOT/apps/plugins/bitmaps/native/pictureflow_emptyslide.100x100x16.bmp", "$rbdir/rocks/demos/pictureflow_emptyslide.bmp");
+        copy("$ROOT/apps/plugins/bitmaps/native/pictureflow_emptyslide.100x100x16.bmp",
+             "$rbdir/rocks/demos/pictureflow_emptyslide.bmp");
+        my ($pf_logo);
+        if ($width < 200) {
+            $pf_logo = "pictureflow_logo.100x18x16.bmp";
+        } else {
+            $pf_logo = "pictureflow_logo.193x34x16.bmp";
+        }
+        copy("$ROOT/apps/plugins/bitmaps/native/$pf_logo",
+             "$rbdir/rocks/demos/pictureflow_splash.bmp");
+
     }
 
     if($image) {
