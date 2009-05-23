@@ -1922,15 +1922,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Volume Beep"
+    swcodec: "Beep Cambio Traccia"
   </dest>
   <voice>
     *: none
-    swcodec: "Volume beep"
+    swcodec: "beep Cambio Traccia"
   </voice>
 </phrase>
 <phrase>
