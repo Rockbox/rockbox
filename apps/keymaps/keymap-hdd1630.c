@@ -282,6 +282,27 @@ static const struct button_mapping button_context_radio[]  = {
 };
 #endif
 
+#ifdef HAVE_USBSTACK
+static const struct button_mapping button_context_usb_hid[] = {
+    { ACTION_USB_HID_PLAY,     BUTTON_VIEW,                      BUTTON_NONE },
+    { ACTION_USB_HID_STOP,     BUTTON_POWER,                     BUTTON_NONE },
+    { ACTION_USB_HID_SKIPPREV, BUTTON_LEFT,                      BUTTON_NONE },
+    { ACTION_USB_HID_SKIPNEXT, BUTTON_RIGHT,                     BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_UP,                        BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_UP|BUTTON_REPEAT,          BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_VOL_UP,                    BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_VOL_UP|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_DOWN,                      BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_DOWN|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_VOL_DOWN,                  BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_VOL_DOWN|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_USB_HID_MUTE,     BUTTON_SELECT,                    BUTTON_NONE },
+    { ACTION_USB_HID_MENU,     BUTTON_MENU,                      BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+}; /* button_context_usb_hid */
+#endif
+
 const struct button_mapping* get_context_mapping(int context)
 {
     switch (context)
@@ -328,6 +349,10 @@ const struct button_mapping* get_context_mapping(int context)
 #if CONFIG_TUNER
         case CONTEXT_FM:
             return button_context_radio;
+#endif
+#ifdef HAVE_USBSTACK
+        case CONTEXT_USB_HID:
+            return button_context_usb_hid;
 #endif
     }
     return button_context_standard;

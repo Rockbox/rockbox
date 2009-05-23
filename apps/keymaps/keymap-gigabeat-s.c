@@ -464,6 +464,42 @@ static const struct button_mapping remote_button_context_right_is_inc[]  = {
     LAST_ITEM_IN_LIST
 }; /* remote_button_context_right_is_inc */
 
+#ifdef HAVE_USBSTACK
+static const struct button_mapping button_context_usb_hid[] = {
+    { ACTION_USB_HID_PLAY,     BUTTON_PLAY,                      BUTTON_NONE },
+    { ACTION_USB_HID_STOP,     BUTTON_POWER,                     BUTTON_NONE },
+    { ACTION_USB_HID_SKIPPREV, BUTTON_LEFT,                      BUTTON_NONE },
+    { ACTION_USB_HID_SKIPNEXT, BUTTON_RIGHT,                     BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_UP,                        BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_UP|BUTTON_REPEAT,          BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_VOL_UP,                    BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_VOL_UP|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_DOWN,                      BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_DOWN|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_VOL_DOWN,                  BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_VOL_DOWN|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_USB_HID_MUTE,     BUTTON_SELECT,                    BUTTON_NONE },
+    { ACTION_USB_HID_MENU,     BUTTON_MENU,                      BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+}; /* button_context_usb_hid */
+
+static const struct button_mapping remote_button_context_usb_hid[] = {
+    { ACTION_USB_HID_PLAY,     BUTTON_RC_PLAY,                   BUTTON_NONE },
+    { ACTION_USB_HID_STOP,     BUTTON_RC_POWER,                  BUTTON_NONE },
+    { ACTION_USB_HID_SKIPPREV, BUTTON_RC_REW,                    BUTTON_NONE },
+    { ACTION_USB_HID_SKIPNEXT, BUTTON_RC_FF,                     BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_RC_VOL_UP,                 BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_RC_VOL_DOWN,               BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_USB_HID_MUTE,     BUTTON_RC_DSP|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_USB_HID_MENU,     BUTTON_RC_DSP,                    BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+}; /* remote_button_context_usb_hid */
+#endif
+
 static const struct button_mapping* get_context_mapping_remote( int context )
 {
     context &= ~CONTEXT_REMOTE;
@@ -506,6 +542,10 @@ static const struct button_mapping* get_context_mapping_remote( int context )
         case CONTEXT_FM:
             return remote_button_context_radio;
 
+#ifdef HAVE_USBSTACK
+        case CONTEXT_USB_HID:
+            return remote_button_context_usb_hid;
+#endif
         default:
             return remote_button_context_standard;
     }
@@ -573,6 +613,10 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_FM:
             return button_context_radio;
 
+#ifdef HAVE_USBSTACK
+        case CONTEXT_USB_HID:
+            return button_context_usb_hid;
+#endif
         default:
             return button_context_standard;
     }

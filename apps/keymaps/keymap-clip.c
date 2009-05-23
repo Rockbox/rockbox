@@ -265,6 +265,23 @@ static const struct button_mapping button_context_bmark[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_bmark */
 
+#ifdef HAVE_USBSTACK
+static const struct button_mapping button_context_usb_hid[] = {
+    { ACTION_USB_HID_PLAY,     BUTTON_UP,                        BUTTON_NONE },
+    { ACTION_USB_HID_STOP,     BUTTON_POWER,                     BUTTON_NONE },
+    { ACTION_USB_HID_SKIPPREV, BUTTON_LEFT,                      BUTTON_NONE },
+    { ACTION_USB_HID_SKIPNEXT, BUTTON_RIGHT,                     BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_VOL_UP,                    BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_VOL_UP|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_VOL_DOWN,                  BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_VOL_DOWN|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_USB_HID_MUTE,     BUTTON_SELECT,                    BUTTON_NONE },
+    { ACTION_USB_HID_MENU,     BUTTON_DOWN,                      BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+}; /* button_context_usb_hid */
+#endif
+
 /* get_context_mapping returns a pointer to one of the above defined arrays depending on the context */
 const struct button_mapping* get_context_mapping(int context)
 {
@@ -310,7 +327,10 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_recscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
-
+#ifdef HAVE_USBSTACK
+        case CONTEXT_USB_HID:
+            return button_context_usb_hid;
+#endif
         default:
             return button_context_standard;
     }

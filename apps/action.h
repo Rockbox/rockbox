@@ -74,6 +74,7 @@ enum {
     CONTEXT_RECSCREEN,
     CONTEXT_KEYBOARD,
     CONTEXT_FM,
+    CONTEXT_USB_HID,
 };
 
 
@@ -237,6 +238,15 @@ enum {
     ACTION_TOUCH_REPMODE,
 #endif    
 
+    /* USB HID codes */
+    ACTION_USB_HID_PLAY,
+    ACTION_USB_HID_STOP,
+    ACTION_USB_HID_SKIPPREV,
+    ACTION_USB_HID_SKIPNEXT,
+    ACTION_USB_HID_VOLDOWN,
+    ACTION_USB_HID_VOLUP,
+    ACTION_USB_HID_MUTE,
+    ACTION_USB_HID_MENU,
 
     LAST_ACTION_PLACEHOLDER, /* custom actions should be this + something */
 };

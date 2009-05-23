@@ -245,6 +245,18 @@ static const struct button_mapping button_context_radio[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_FM)
 }; /* button_context_radio */
 
+#ifdef HAVE_USBSTACK
+static const struct button_mapping button_context_usb_hid[] = {
+    { ACTION_USB_HID_PLAY,     BUTTON_TOPRIGHT,                  BUTTON_NONE },
+    { ACTION_USB_HID_SKIPPREV, BUTTON_MIDLEFT,                   BUTTON_NONE },
+    { ACTION_USB_HID_SKIPNEXT, BUTTON_MIDRIGHT,                  BUTTON_NONE },
+    { ACTION_USB_HID_MUTE,     BUTTON_CENTER,                    BUTTON_NONE },
+    { ACTION_USB_HID_MENU,     BUTTON_TOPLEFT,                   BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_USB_HID)
+}; /* button_context_usb_hid */
+#endif
+
 const struct button_mapping* get_context_mapping(int context)
 {
     if (context & CONTEXT_CUSTOM2
@@ -297,6 +309,10 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_pitchscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
+#ifdef HAVE_USBSTACK
+        case CONTEXT_USB_HID:
+            return button_context_usb_hid;
+#endif
     }
     return button_context_standard;
 }

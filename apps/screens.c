@@ -34,6 +34,12 @@
 #include "audio.h"
 #include "mp3_playback.h"
 #include "usb.h"
+#if defined(HAVE_USBSTACK)
+#include "usb_core.h"
+#ifdef USB_CLASS_HID
+#include "usbstack/usb_hid.h"
+#endif
+#endif
 #include "settings.h"
 #include "status.h"
 #include "playlist.h"
@@ -90,23 +96,70 @@ static int clamp_value_wrap(int value, int max, int min)
 #endif
 
 #ifndef SIMULATOR
-static int handle_usb_events(struct event_queue *q)
+static int handle_usb_events(void)
 {
-    struct queue_event ev;
     int next_update=0;
+#ifdef HAVE_TOUCHSCREEN
+    enum touchscreen_mode old_mode = touchscreen_get_mode();
+
+    /* TODO: Paint buttons on screens OR switch to point mode and use
+     * touchscreen as a touchpad to move the host's mouse cursor */
+    touchscreen_set_mode(TOUCHSCREEN_BUTTON);
+#endif
 
     /* Don't return until we get SYS_USB_DISCONNECTED or SYS_TIMEOUT */
     while(1)
     {
-        queue_wait_w_tmo(q, &ev, HZ/4);
-        switch(ev.id)
+        int button;
+#if defined(HAVE_USBSTACK) && defined(USB_CLASS_HID)
+        bool hid_enabled = usb_core_driver_enabled(USB_DRIVER_HID);
+
+        if (hid_enabled)
+        {
+            consumer_usage_page_t cmd = UNASSIGNED;
+            button = get_action(CONTEXT_USB_HID, HZ/4);
+
+            switch (button)
+            {
+                case ACTION_USB_HID_PLAY:
+                    cmd = PLAY_PAUSE;
+                    break;
+                case ACTION_USB_HID_STOP:
+                    cmd = STOP;
+                    break;
+                case ACTION_USB_HID_SKIPPREV:
+                    cmd = SCAN_PREVIOUS_TRACK;
+                    break;
+                case ACTION_USB_HID_SKIPNEXT:
+                    cmd = SCAN_NEXT_TRACK;
+                    break;
+                case ACTION_USB_HID_VOLDOWN:
+                    cmd = VOLUME_DECREMENT;
+                    break;
+                case ACTION_USB_HID_VOLUP:
+                    cmd = VOLUME_INCREMENT;
+                    break;
+                case ACTION_USB_HID_MUTE:
+                    cmd = MUTE;
+                    break;
+            }
+
+            if (cmd != UNASSIGNED)
+                usb_hid_send_consumer_usage(cmd);
+        }
+        else
+#endif
+            button = button_get_w_tmo(HZ/4);
+
+        switch(button)
         {
             case SYS_USB_DISCONNECTED:
                 usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
-                return 0;
+                goto Exit;
             case SYS_TIMEOUT:
                 break;
         }
+
         if(TIME_AFTER(current_tick,next_update))
         {
             if(usb_inserted()) {
@@ -118,6 +171,11 @@ static int handle_usb_events(struct event_queue *q)
             next_update=current_tick+HZ/2;
         }
     }
+Exit:
+#ifdef HAVE_TOUCHSCREEN
+    touchscreen_set_mode(old_mode);
+#endif
+    return 0;
 }
 #endif
 
@@ -172,7 +230,7 @@ void usb_screen(void)
     while (button_get(true) & BUTTON_REL);
 #else
     usb_acknowledge(SYS_USB_CONNECTED_ACK);
-    while(handle_usb_events(&button_queue));
+    while (handle_usb_events());
 #endif /* SIMULATOR */
 #ifdef HAVE_LCD_CHARCELLS
     status_set_usb(false);

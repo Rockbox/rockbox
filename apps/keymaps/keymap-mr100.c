@@ -313,6 +313,37 @@ static const struct button_mapping remote_button_context_tree[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 };
 
+#ifdef HAVE_USBSTACK
+static const struct button_mapping button_context_usb_hid[] = {
+    { ACTION_USB_HID_PLAY,     BUTTON_PLAY,                      BUTTON_NONE },
+    { ACTION_USB_HID_STOP,     BUTTON_POWER,                     BUTTON_NONE },
+    { ACTION_USB_HID_SKIPPREV, BUTTON_LEFT,                      BUTTON_NONE },
+    { ACTION_USB_HID_SKIPNEXT, BUTTON_RIGHT,                     BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_UP,                        BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_UP|BUTTON_REPEAT,          BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_DOWN,                      BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_DOWN|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_USB_HID_MUTE,     BUTTON_SELECT,                    BUTTON_NONE },
+    { ACTION_USB_HID_MENU,     BUTTON_MENU,                      BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+}; /* button_context_usb_hid */
+
+static const struct button_mapping remote_button_context_usb_hid[] = {
+    { ACTION_USB_HID_PLAY,     BUTTON_RC_PLAY,                   BUTTON_NONE },
+    { ACTION_USB_HID_STOP,     BUTTON_RC_PLAY|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_USB_HID_SKIPPREV, BUTTON_RC_REW,                    BUTTON_NONE },
+    { ACTION_USB_HID_SKIPNEXT, BUTTON_RC_FF,                     BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_RC_UP,                     BUTTON_NONE },
+    { ACTION_USB_HID_VOLUP,    BUTTON_RC_UP|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_RC_DOWN,                   BUTTON_NONE },
+    { ACTION_USB_HID_VOLDOWN,  BUTTON_RC_DOWN|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_USB_HID_MENU,     BUTTON_RC_FAV,                    BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+}; /* remote_button_context_usb_hid */
+#endif
+
 static const struct button_mapping* get_context_mapping_remote( int context )
 {
     context ^= CONTEXT_REMOTE;
@@ -324,6 +355,10 @@ static const struct button_mapping* get_context_mapping_remote( int context )
         case CONTEXT_MAINMENU:
         case CONTEXT_TREE:
             return remote_button_context_tree;
+#ifdef HAVE_USBSTACK
+        case CONTEXT_USB_HID:
+            return remote_button_context_usb_hid;
+#endif
     }
     return remote_button_context_standard;
 }
@@ -374,6 +409,10 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_pitchscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
+#ifdef HAVE_USBSTACK
+        case CONTEXT_USB_HID:
+            return button_context_usb_hid;
+#endif
     }
     return button_context_standard;
 }
