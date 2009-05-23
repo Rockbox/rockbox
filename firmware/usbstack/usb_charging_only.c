@@ -29,8 +29,6 @@
 //#define LOGF_ENABLE
 #include "logf.h"
 
-#ifdef USB_CHARGING_ONLY
-
 /* charging_only interface */
 static struct usb_interface_descriptor __attribute__((aligned(2)))
                                 interface_descriptor =
@@ -70,5 +68,3 @@ int usb_charging_only_get_config_descriptor(unsigned char *dest,int max_packet_s
 
     return (dest-orig_dest);
 }
-
-#endif /*USB_CHARGING_ONLY*/

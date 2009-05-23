@@ -114,7 +114,7 @@
 
 #ifdef HAVE_USBSTACK
 #include "usb_core.h"
-#ifdef USB_HID
+#ifdef USB_ENABLE_HID
 #include "usbstack/usb_hid.h"
 #endif
 #endif
@@ -2588,7 +2588,7 @@ static bool dbg_scrollwheel(void)
 
 #if defined (HAVE_USBSTACK)
 
-#if defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL)
+#if defined(ROCKBOX_HAS_LOGF) && defined(USB_ENABLE_SERIAL)
 static bool toggle_usb_core_driver(int driver, char *msg)
 {
     bool enabled = !usb_core_driver_enabled(driver);
@@ -2605,7 +2605,7 @@ static bool toggle_usb_serial(void)
 }
 #endif
 
-#ifdef USB_HID
+#ifdef USB_ENABLE_HID
 static bool hid_send_cmd(consumer_usage_page_t cmd, char *msg)
 {
     (void)msg;
@@ -2786,10 +2786,10 @@ static const struct the_menu_item menuitems[] = {
         {"logfdump", logfdump },
 #endif
 #if defined(HAVE_USBSTACK)
-#if defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL)
+#if defined(ROCKBOX_HAS_LOGF) && defined(USB_ENABLE_SERIAL)
         {"USB Serial driver (logf)", toggle_usb_serial },
 #endif
-#if defined(USB_HID)
+#if defined(USB_ENABLE_HID)
         {"USB HID play/pause", usb_hid_send_play_pause },
         {"USB HID stop", usb_hid_send_stop },
         {"USB HID prev track", usb_hid_send_scan_previous_track },

@@ -257,10 +257,18 @@ drivers/audio/mas35xx.c
 #if !defined(SIMULATOR)
 #ifdef HAVE_USBSTACK
 usbstack/usb_core.c
+#ifdef USB_ENABLE_STORAGE
 usbstack/usb_storage.c
+#endif
+#ifdef USB_ENABLE_SERIAL
 usbstack/usb_serial.c
+#endif
+#ifdef USB_ENABLE_CHARGING_ONLY
 usbstack/usb_charging_only.c
+#endif
+#ifdef USB_ENABLE_HID
 usbstack/usb_hid.c
+#endif
 #if CONFIG_USBOTG == USBOTG_ARC
 target/arm/usb-drv-arc.c
 #elif CONFIG_USBOTG == USBOTG_ISP1583

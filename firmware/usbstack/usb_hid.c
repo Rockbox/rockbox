@@ -28,8 +28,6 @@
 //#define LOGF_ENABLE
 #include "logf.h"
 
-#ifdef USB_HID
-
 #define CONCAT(low, high)               ((high << 8) | low)
 #define PACK_VAL1(dest, val)            *(dest)++ = (val) & 0xff
 #define PACK_VAL2(dest, val)            PACK_VAL1((dest), (val)); \
@@ -392,5 +390,3 @@ void usb_hid_send_consumer_usage(consumer_usage_page_t id)
 
     usb_hid_try_send_drv();
 }
-
-#endif /*USB_HID*/

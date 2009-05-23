@@ -28,8 +28,6 @@
 //#define LOGF_ENABLE
 #include "logf.h"
 
-#ifdef USB_SERIAL
-
 /* serial interface */
 static struct usb_interface_descriptor __attribute__((aligned(2)))
     interface_descriptor =
@@ -240,5 +238,3 @@ void usb_serial_transfer_complete(int ep,int dir, int status, int length)
             break;
     }
 }
-
-#endif /*USB_SERIAL*/

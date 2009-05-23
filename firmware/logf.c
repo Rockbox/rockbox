@@ -135,7 +135,7 @@ void _logf(const char *format, ...)
     serial_tx(buf);
     serial_tx("\r\n");
 #endif
-#ifdef USB_SERIAL
+#ifdef USB_ENABLE_SERIAL
     usb_serial_send(buf, len);
     usb_serial_send("\r\n", 2);
 #endif

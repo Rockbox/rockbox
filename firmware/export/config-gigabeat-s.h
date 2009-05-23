@@ -183,7 +183,6 @@
 /* enable these for the usb stack */
 #define USE_ROCKBOX_USB
 #define HAVE_USBSTACK
-#define USB_STORAGE
 /* usb stack and driver settings */
 #define USB_PORTSCX_PHY_TYPE PORTSCX_PTS_ULPI
 #define USB_VENDOR_ID 0x0930

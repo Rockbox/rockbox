@@ -33,8 +33,6 @@
 #include "usb_storage.h"
 
 
-#ifdef USB_STORAGE
-
 /* Enable the following define to export only the SD card slot. This
  * is useful for USBCV MSC tests, as those are destructive.
  * This won't work right if the device doesn't have a card slot.
@@ -1158,5 +1156,3 @@ static void fill_inquiry(IF_MV_NONVOID(int lun))
     tb.inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
 #endif
 }
-
-#endif /* USB_STORAGE */

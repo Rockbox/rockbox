@@ -47,7 +47,7 @@
 
 /* Conditions under which we want the entire driver */
 #if !defined(BOOTLOADER) || (CONFIG_CPU == SH7034) || \
-     (defined(TOSHIBA_GIGABEAT_S) && defined(USE_ROCKBOX_USB) && defined(USB_STORAGE)) || \
+     (defined(TOSHIBA_GIGABEAT_S) && defined(USE_ROCKBOX_USB) && defined(USB_ENABLE_STORAGE)) || \
      (defined(HAVE_USBSTACK) && (defined(CREATIVE_ZVx) || \
      defined(CPU_TCC77X) || defined(CPU_TCC780X))) || \
      (CONFIG_USBOTG == USBOTG_JZ4740)
@@ -270,13 +270,19 @@ static void usb_thread(void)
                     /* Only charging is desired */
                     usb_state = USB_POWERED;
 #ifdef HAVE_USBSTACK
-#ifdef USB_STORAGE
+#ifdef USB_ENABLE_STORAGE
                     usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, false);
 #endif
-#ifdef USB_HID
+
+#ifdef USB_ENABLE_HID
+#ifdef USB_ENABLE_CHARGING_ONLY
                     usb_core_enable_driver(USB_DRIVER_HID, false);
-#endif
-#ifdef USB_CHARGING_ONLY
+#else
+                    usb_core_enable_driver(USB_DRIVER_HID, true);
+#endif /* USB_ENABLE_CHARGING_ONLY */
+#endif /* USB_ENABLE_HID */
+
+#ifdef USB_ENABLE_CHARGING_ONLY
                     usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, true);
 #endif
                     usb_attach();
@@ -291,13 +297,13 @@ static void usb_thread(void)
                  * USB_CONNECTED. */
                 usb_state = USB_POWERED;
 #endif
-#ifdef USB_STORAGE
+#ifdef USB_ENABLE_STORAGE
                 usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, true);
 #endif
-#ifdef USB_HID
+#ifdef USB_ENABLE_HID
                 usb_core_enable_driver(USB_DRIVER_HID, true);
 #endif
-#ifdef USB_CHARGING_ONLY
+#ifdef USB_ENABLE_CHARGING_ONLY
                 usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, false);
 #endif
 

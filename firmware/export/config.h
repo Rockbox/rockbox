@@ -540,6 +540,7 @@ Lyre prototype 1*/
 #endif
 #endif /* HAVE_USBSTACK */
 
+
 #endif /* BOOTLOADER */
 
 #if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) \
@@ -755,5 +756,47 @@ Lyre prototype 1*/
 #ifdef CPU_MIPS
 #include <stdbool.h> /* MIPS GCC fix? */
 #endif
+
+#if defined(HAVE_USBSTACK)
+/* Define the implemented USB transport classes */
+#if CONFIG_USBOTG == USBOTG_ISP1583
+#define USB_HAS_BULK
+#elif CONFIG_USBOTG == USBOTG_ARC
+#define USB_HAS_BULK
+#define USB_HAS_INTERRUPT
+#elif CONFIG_USBOTG == USBOTG_JZ4740
+#define USB_HAS_BULK
+#define USB_HAS_INTERRUPT
+#elif defined(CPU_TCC780X) || defined(define CPU_TCC77X)
+#define USB_HAS_BULK
+#endif /* CONFIG_USBOTG */
+
+/* define the class drivers to enable */
+#ifndef BOOTLOADER
+
+//#define USB_ENABLE_SERIAL
+#define USB_ENABLE_STORAGE
+
+#ifdef USB_HAS_INTERRUPT
+#define USB_ENABLE_HID
+#else
+#define USB_ENABLE_CHARGING_ONLY
+#endif
+
+#else /* BOOTLOADER */
+
+/* enable usb storage for targets that do bootloader usb */
+#if  (defined(TOSHIBA_GIGABEAT_S) && defined(USE_ROCKBOX_USB) && defined(USB_STORAGE)) || \
+     (defined(HAVE_USBSTACK) && (defined(CREATIVE_ZVx) || \
+     defined(CPU_TCC77X) || defined(CPU_TCC780X))) || \
+     (CONFIG_USBOTG == USBOTG_JZ4740)
+#define USB_ENABLE_STORAGE
+#endif
+
+#endif /* BOOTLOADER */
+
+#endif /* HAVE_USBSTACK */
+
+
 
 #endif /* __CONFIG_H__ */

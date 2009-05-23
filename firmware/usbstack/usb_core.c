@@ -31,19 +31,19 @@
 #include "usb_core.h"
 #include "usb_class_driver.h"
 
-#if defined(USB_STORAGE)
+#if defined(USB_ENABLE_STORAGE)
 #include "usb_storage.h"
 #endif
 
-#if defined(USB_SERIAL)
+#if defined(USB_ENABLE_SERIAL)
 #include "usb_serial.h"
 #endif
 
-#if defined(USB_CHARGING_ONLY)
+#if defined(USB_ENABLE_CHARGING_ONLY)
 #include "usb_charging_only.h"
 #endif
 
-#if defined(USB_HID)
+#if defined(USB_ENABLE_HID)
 #include "usb_hid.h"
 #endif
 
@@ -182,7 +182,7 @@ static struct
 
 static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 {
-#ifdef USB_STORAGE
+#ifdef USB_ENABLE_STORAGE
     [USB_DRIVER_MASS_STORAGE] = {
         .enabled = false,
         .needs_exclusive_storage = true,
@@ -201,7 +201,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 #endif
     },
 #endif
-#ifdef USB_SERIAL
+#ifdef USB_ENABLE_SERIAL
     [USB_DRIVER_SERIAL] = {
         .enabled = false,
         .needs_exclusive_storage = false,
@@ -220,7 +220,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 #endif
     },
 #endif
-#ifdef USB_CHARGING_ONLY
+#ifdef USB_ENABLE_CHARGING_ONLY
     [USB_DRIVER_CHARGING_ONLY] = {
         .enabled = false,
         .needs_exclusive_storage = false,
@@ -239,7 +239,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 #endif
     },
 #endif
-#ifdef USB_HID
+#ifdef USB_ENABLE_HID
     [USB_DRIVER_HID] = {
         .enabled = false,
         .needs_exclusive_storage = false,

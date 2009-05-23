@@ -66,9 +66,6 @@
 #define HAVE_USBSTACK
 #define USB_VENDOR_ID   0x0e21
 #define USB_PRODUCT_ID  0x0750
-
-#define USB_STORAGE
-#define USB_SERIAL
 #endif
 
 /* define this if you have a flash memory storage */

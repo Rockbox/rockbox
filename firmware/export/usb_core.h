@@ -21,16 +21,6 @@
 #ifndef USB_CORE_H
 #define USB_CORE_H
 
-#ifndef BOOTLOADER
-
-//#define USB_SERIAL
-#define USB_STORAGE
-#define USB_CHARGING_ONLY
-//#define USB_HID
-#else /* BOOTLOADER */
-#define USB_CHARGING_ONLY
-#endif /* BOOTLOADER */
-
 #include "usb_ch9.h"
 #include "usb.h"
 
