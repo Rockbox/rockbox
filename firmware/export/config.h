@@ -772,18 +772,7 @@ Lyre prototype 1*/
 #endif /* CONFIG_USBOTG */
 
 /* define the class drivers to enable */
-#ifndef BOOTLOADER
-
-//#define USB_ENABLE_SERIAL
-#define USB_ENABLE_STORAGE
-
-#ifdef USB_HAS_INTERRUPT
-#define USB_ENABLE_HID
-#else
-#define USB_ENABLE_CHARGING_ONLY
-#endif
-
-#else /* BOOTLOADER */
+#ifdef BOOTLOADER
 
 /* enable usb storage for targets that do bootloader usb */
 #if  (defined(TOSHIBA_GIGABEAT_S) || \
@@ -791,6 +780,16 @@ Lyre prototype 1*/
      defined(CPU_TCC77X) || defined(CPU_TCC780X))) || \
      (CONFIG_USBOTG == USBOTG_JZ4740)
 #define USB_ENABLE_STORAGE
+#endif
+
+#else /* BOOTLOADER */
+
+//#define USB_ENABLE_SERIAL
+
+#ifdef USB_HAS_INTERRUPT
+#define USB_ENABLE_HID
+#else
+#define USB_ENABLE_CHARGING_ONLY
 #endif
 
 #endif /* BOOTLOADER */
