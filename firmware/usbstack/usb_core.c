@@ -238,6 +238,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .notify_hotswap = NULL,
 #endif
     },
+#endif
 #ifdef USB_HID
     [USB_DRIVER_HID] = {
         .enabled = false,
@@ -256,7 +257,6 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .notify_hotswap = NULL,
 #endif
     },
-#endif
 #endif
 };
 
