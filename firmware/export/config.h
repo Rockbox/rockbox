@@ -785,6 +785,7 @@ Lyre prototype 1*/
 #else /* BOOTLOADER */
 
 //#define USB_ENABLE_SERIAL
+#define USB_ENABLE_STORAGE
 
 #ifdef USB_HAS_INTERRUPT
 #define USB_ENABLE_HID
