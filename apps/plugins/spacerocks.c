@@ -325,6 +325,8 @@ PLUGIN_HEADER
 #define MISSILE_SURVIVAL_LENGTH 40
 
 #define EXTRA_LIFE 250
+#define SPAWN_TIME 30
+#define BLINK_TIME 10
 #define SCALE 5000
 #define MISSILE_SCALE 5000
 #define WRAP_GAP                12
@@ -412,6 +414,7 @@ PLUGIN_HEADER
 #ifdef HAVE_LCD_COLOR
 #define COL_MISSILE  LCD_RGBPACK(200,0,0)
 #define COL_PLAYER   LCD_RGBPACK(200,200,200)
+#define COL_INVULN   LCD_RGBPACK(100,100,200)
 #define COL_STARS    LCD_WHITE
 #define COL_ASTEROID LCD_RGBPACK(ASTEROID_R,ASTEROID_G,ASTEROID_B)
 #define COL_TEXT     LCD_RGBPACK(200,200,255)
@@ -564,6 +567,8 @@ struct Ship
     struct Point vertices[NUM_SHIP_VERTICES];
     struct Point position;
     bool waiting_for_space;
+    bool invulnerable;
+    int spawn_time;
     int explode_countdown;
 };
 
@@ -1252,10 +1257,13 @@ void check_collisions(void)
             {
                 if(is_ship_within_asteroid(asteroid))
                 {
-                    /*blow up ship*/
-                    ship.explode_countdown = EXPLOSION_LENGTH;
-                    /* initialise_explosion(ship.vertices, NUM_SHIP_VERTICES); */
-                    create_trail_blaze(SHIP_EXPLOSION_COLOUR, &ship.position);
+		    if (!ship.invulnerable)
+		    {
+                    	/*if not invulnerable, blow up ship*/
+                    	ship.explode_countdown = EXPLOSION_LENGTH;
+                    	/* initialise_explosion(ship.vertices, NUM_SHIP_VERTICES); */
+                    	create_trail_blaze(SHIP_EXPLOSION_COLOUR, &ship.position);
+		    }
                 }
                 
                 /*has the enemy missile blown something up?*/
@@ -1291,9 +1299,12 @@ void check_collisions(void)
         /*has the enemy collided with the ship?*/
         if(is_point_within_enemy(&ship.position))
         {
-            ship.explode_countdown = EXPLOSION_LENGTH;
-            /* initialise_explosion(ship.vertices, NUM_SHIP_VERTICES); */
-            create_trail_blaze(SHIP_EXPLOSION_COLOUR, &ship.position);
+	    if (!ship.invulnerable)
+            {
+	    	ship.explode_countdown = EXPLOSION_LENGTH;
+            	/* initialise_explosion(ship.vertices, NUM_SHIP_VERTICES); */
+            	create_trail_blaze(SHIP_EXPLOSION_COLOUR, &ship.position);
+	    }
             create_trail_blaze(ENEMY_EXPLOSION_COLOUR, &enemy.position);
         }
         
@@ -1318,10 +1329,13 @@ void check_collisions(void)
                      enemy_missile.position.x - ship.position.x,
                      enemy_missile.position.y - ship.position.y))
     {
-        ship.explode_countdown = EXPLOSION_LENGTH;
-        /* initialise_explosion(ship.vertices, NUM_SHIP_VERTICES); */
-        create_trail_blaze(SHIP_EXPLOSION_COLOUR, &ship.position);
-        enemy_missile.survived = 0;
+	if (!ship.invulnerable)
+	{        
+	     ship.explode_countdown = EXPLOSION_LENGTH;
+	     /* initialise_explosion(ship.vertices, NUM_SHIP_VERTICES); */
+	     create_trail_blaze(SHIP_EXPLOSION_COLOUR, &ship.position);
+	}        
+	enemy_missile.survived = 0;
         enemy_missile.position.x = enemy_missile.position.y = 0;
     }   
     
@@ -1617,6 +1631,8 @@ void initialise_ship(void)
     ship.position.x *= SCALE;
     ship.position.y *= SCALE;
     ship.position.dx = ship.position.dy = 0;
+    ship.spawn_time = SPAWN_TIME;
+    ship.invulnerable = 1;
     
     point = ship.vertices;
     lives_point = lives_points;
@@ -1672,9 +1688,25 @@ void draw_and_move_ship(void)
 {
     int nxoffset = ship.position.x/SCALE;
     int nyoffset = ship.position.y/SCALE;
-    SET_FG(COL_PLAYER);
+    if (ship.invulnerable && (ship.spawn_time > BLINK_TIME || ship.spawn_time % 2 == 0))
+    {
+	SET_FG(COL_INVULN);
+    }
+    else
+    {
+    	SET_FG(COL_PLAYER);
+    }
     if(!ship.explode_countdown)
     {
+	/* make sure ship is invulnerable until spawn time over */
+	if (ship.spawn_time)
+	{
+	     ship.spawn_time--;
+	     if (ship.spawn_time <= 0)
+	     {
+	          ship.invulnerable = 0;
+	     }
+	}
         if(!ship.waiting_for_space)
         {
            draw_polygon(ship.vertices, nxoffset, nyoffset, NUM_SHIP_VERTICES);
