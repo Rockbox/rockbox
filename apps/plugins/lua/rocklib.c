@@ -54,6 +54,7 @@ struct rocklua_image
     int width;
     int height;
     fb_data *data;
+    fb_data dummy[1][1];
 };
 
 static void rli_wrap(lua_State *L, fb_data *src, int width, int height)
@@ -80,6 +81,7 @@ static int rli_new(lua_State *L)
 
     a->width = width;
     a->height = height;
+    a->data = &a->dummy[0][0];
     return 1;
 }
 
@@ -691,6 +693,27 @@ RB_WRAP(font_getstringsize)
     return 3;
 }
 
+#ifdef HAVE_LCD_COLOR
+RB_WRAP(lcd_rgbpack)
+{
+    int r = luaL_checkint(L, 1);
+    int g = luaL_checkint(L, 2);
+    int b = luaL_checkint(L, 3);
+    int result = LCD_RGBPACK(r, g, b);
+    lua_pushinteger(L, result);
+    return 1;
+}
+
+RB_WRAP(lcd_rgbunpack)
+{
+    int rgb = luaL_checkint(L, 1);
+    lua_pushinteger(L, RGB_UNPACK_RED(rgb));
+    lua_pushinteger(L, RGB_UNPACK_GREEN(rgb));
+    lua_pushinteger(L, RGB_UNPACK_BLUE(rgb));
+    return 3;
+}
+#endif
+
 #define R(NAME) {#NAME, rock_##NAME}
 static const luaL_Reg rocklib[] =
 {
@@ -727,6 +750,10 @@ static const luaL_Reg rocklib[] =
     R(lcd_bitmap_transparent_part),
     R(lcd_bitmap_transparent),
 #endif
+#endif
+#ifdef HAVE_LCD_COLOR
+    R(lcd_rgbpack),
+    R(lcd_rgbunpack),
 #endif
 
     /* File handling */
