@@ -356,7 +356,7 @@ void usb_core_init(void)
      * won't be used. This simplifies other logic (i.e. we don't need to know
      * yet which drivers will be enabled */
     for(i=0;i<USB_NUM_DRIVERS;i++) {
-        if(drivers[i].enabled && drivers[i].init != NULL)
+        if(drivers[i].init != NULL)
             drivers[i].init();
     }
 
