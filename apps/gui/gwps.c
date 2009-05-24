@@ -779,7 +779,6 @@ long gui_wps_show(void)
                 break;
 #endif
             case SYS_POWEROFF:
-                gwps_leave_wps();
                 default_event_handler(SYS_POWEROFF);
                 break;
 
