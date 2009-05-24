@@ -19,26 +19,3 @@ TODO:
 
  * Make a separate application that samples the memory usage of a program
    and is capable of replaying it (in order to test properly).
-
-Package: dbestfit - a dynamic memory allocator
-Date:	 March 30, 2005
-Version: 3.3
-Author:	 Daniel Stenberg <daniel@haxx.se>
-
- I wrote the dmalloc part for small allocation sizes to improve the behavior
-of the built-in (first-fit) allocator found in pSOS (around 1996).
-
- I wrote the bmalloc part (best-fit with splay-tree sorting) just for the fun
-of it and to see how good malloc() clone I could make. The quality of my
-implementation is still left to be judged in real-world tests.
-
-TODO:
- * Remove the final not-so-very-nice loop in dmalloc.c that checks for a block
-   with free fragments (when the list gets longer too much time might be spent
-   in that loop).
-
- * Add semaphore protection in bmalloc.
-
- * Make a separate application that samples the memory usage of a program
-   and is capable of replaying it (in order to test properly).
-
