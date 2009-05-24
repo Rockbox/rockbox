@@ -118,7 +118,7 @@ static fb_data* rli_element(lua_State *L)
                     "index out of range");
 
     /* return element address */
-    return &a->data[a->height * (y - 1) + (x - 1)];
+    return &a->data[a->width * (y - 1) + (x - 1)];
 }
 
 static int rli_set(lua_State *L)
