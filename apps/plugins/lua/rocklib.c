@@ -181,6 +181,73 @@ static inline void rli_init(lua_State *L)
 
 #define RB_WRAP(M) static int rock_##M(lua_State *L)
 
+/* Helper function for opt_viewport */
+static void check_tablevalue(lua_State *L, const char* key, int tablepos, void* res, bool unsigned_val)
+{
+    lua_pushstring(L, key); /* Push the key on the stack */
+    lua_gettable(L, tablepos); /* Find table[key] (pops key off the stack) */
+
+    if(!lua_isnoneornil(L, -1))
+    {
+        if(unsigned_val)
+            *(unsigned*)res = luaL_checkint(L, -1);
+        else
+            *(int*)res = luaL_checkint(L, -1);
+    }
+
+    lua_pop(L, 1); /* Pop the value off the stack */
+}
+
+static struct viewport* opt_viewport(lua_State *L, int narg, struct viewport* alt)
+{
+    if(lua_isnoneornil(L, narg))
+        return alt;
+
+    int tablepos = lua_gettop(L);
+
+    lua_pushliteral(L, "vp"); /* push 'vp' on the stack */
+    struct viewport *vp = (struct viewport*)lua_newuserdata(L, sizeof(struct viewport)); /* allocate memory and push it as udata on the stack */
+    memset(vp, 0, sizeof(struct viewport)); /* Init viewport values to 0 */
+    lua_settable(L, tablepos); /* table['vp'] = vp (pops key & value off the stack) */
+
+    luaL_checktype(L, narg, LUA_TTABLE);
+
+    check_tablevalue(L, "x", tablepos, &vp->x, false);
+    check_tablevalue(L, "y", tablepos, &vp->y, false);
+    check_tablevalue(L, "width", tablepos, &vp->width, false);
+    check_tablevalue(L, "height", tablepos, &vp->height, false);
+#ifdef HAVE_LCD_BITMAP
+    check_tablevalue(L, "font", tablepos, &vp->font, false);
+    check_tablevalue(L, "drawmode", tablepos, &vp->drawmode, false);
+#endif
+#if LCD_DEPTH > 1
+    check_tablevalue(L, "fg_pattern", tablepos, &vp->fg_pattern, true);
+    check_tablevalue(L, "bg_pattern", tablepos, &vp->bg_pattern, true);
+#ifdef HAVE_LCD_COLOR
+    check_tablevalue(L, "lss_pattern", tablepos, &vp->lss_pattern, true);
+    check_tablevalue(L, "lse_pattern", tablepos, &vp->lse_pattern, true);
+    check_tablevalue(L, "lst_pattern", tablepos, &vp->lse_pattern, true);
+#endif
+#endif
+
+    return vp;
+}
+
+RB_WRAP(set_viewport)
+{
+    struct viewport *vp = opt_viewport(L, 1, NULL);
+    int screen = luaL_optint(L, 2, SCREEN_MAIN);
+    rb->screens[screen]->set_viewport(vp);
+    return 0;
+}
+
+RB_WRAP(clear_viewport)
+{
+    int screen = luaL_optint(L, 2, SCREEN_MAIN);
+    rb->screens[screen]->clear_viewport();
+    return 0;
+}
+
 RB_WRAP(splash)
 {
     int ticks = luaL_checkint(L, 1);
@@ -837,6 +904,8 @@ static const luaL_Reg rocklib[] =
 
     R(font_getstringsize),
     R(read_bmp_file),
+    R(set_viewport),
+    R(clear_viewport),
 
     {"new_image", rli_new},
 
@@ -866,9 +935,11 @@ LUALIB_API int luaopen_rock(lua_State *L)
     RB_CONSTANT(SEEK_SET);
     RB_CONSTANT(SEEK_CUR);
     RB_CONSTANT(SEEK_END);
+    
+    RB_CONSTANT(FONT_SYSFIXED);
+    RB_CONSTANT(FONT_UI);
 
     rli_init(L);
 
     return 1;
 }
-

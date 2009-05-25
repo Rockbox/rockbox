@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: helloworld.c 12807 2007-03-16 21:56:08Z amiconn $
+ * $Id$
  *
  * Copyright (C) 2007 Dave Chapman
  *
