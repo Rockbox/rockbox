@@ -69,11 +69,9 @@ static void rli_wrap(lua_State *L, fb_data *src, int width, int height)
     a->data = src;
 }
 
-static int rli_new(lua_State *L)
+static fb_data* rli_alloc(lua_State *L, int width, int height)
 {
-    int width = luaL_checkint(L, 1);
-    int height = luaL_checkint(L, 2);
-    size_t nbytes = sizeof(struct rocklua_image) + (width - 1)*(height - 1)*sizeof(fb_data);
+    size_t nbytes = sizeof(struct rocklua_image) + ((width*height) - 1) * sizeof(fb_data);
     struct rocklua_image *a = (struct rocklua_image *)lua_newuserdata(L, nbytes);
 
     luaL_getmetatable(L, ROCKLUA_IMAGE);
@@ -82,6 +80,17 @@ static int rli_new(lua_State *L)
     a->width = width;
     a->height = height;
     a->data = &a->dummy[0][0];
+
+    return a->data;
+}
+
+static int rli_new(lua_State *L)
+{
+    int width = luaL_checkint(L, 1);
+    int height = luaL_checkint(L, 2);
+
+    rli_alloc(L, width, height);
+
     return 1;
 }
 
@@ -450,7 +459,7 @@ RB_WRAP(current_tick)
 
 RB_WRAP(button_get)
 {
-    bool block = lua_toboolean(L, 1);
+    bool block = luaL_checkboolean(L, 1);
     long result = rb->button_get(block);
     lua_pushinteger(L, result);
     return 1;
@@ -714,6 +723,33 @@ RB_WRAP(lcd_rgbunpack)
 }
 #endif
 
+RB_WRAP(read_bmp_file)
+{
+    struct bitmap bm;
+    const char* filename = luaL_checkstring(L, 1);
+    bool dither = luaL_optboolean(L, 2, true);
+    bool transparent = luaL_optboolean(L, 3, false);
+    int format = FORMAT_NATIVE;
+
+    if(dither)
+        format |= FORMAT_DITHER;
+
+    if(transparent)
+        format |= FORMAT_TRANSPARENT;
+
+    int result = rb->read_bmp_file(filename, &bm, 0, format | FORMAT_RETURN_SIZE, NULL);
+
+    if(result > 0)
+    {
+        bm.data = (unsigned char*) rli_alloc(L, bm.width, bm.height);
+        rb->read_bmp_file(filename, &bm, result, format, NULL);
+
+        return 1;
+    }
+
+    return 0;
+}
+
 #define R(NAME) {#NAME, rock_##NAME}
 static const luaL_Reg rocklib[] =
 {
@@ -800,6 +836,7 @@ static const luaL_Reg rocklib[] =
 #endif
 
     R(font_getstringsize),
+    R(read_bmp_file),
 
     {"new_image", rli_new},
 

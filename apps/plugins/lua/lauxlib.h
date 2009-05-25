@@ -58,6 +58,10 @@ LUALIB_API lua_Integer (luaL_checkinteger) (lua_State *L, int numArg);
 LUALIB_API lua_Integer (luaL_optinteger) (lua_State *L, int nArg,
                                           lua_Integer def);
 
+LUALIB_API int (luaL_checkboolean) (lua_State *L, int numArg);
+LUALIB_API int (luaL_optboolean) (lua_State *L, int nArg,
+                                  int def);
+
 LUALIB_API void (luaL_checkstack) (lua_State *L, int sz, const char *msg);
 LUALIB_API void (luaL_checktype) (lua_State *L, int narg, int t);
 LUALIB_API void (luaL_checkany) (lua_State *L, int narg);

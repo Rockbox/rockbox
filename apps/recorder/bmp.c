@@ -460,6 +460,7 @@ int read_bmp_fd(int fd,
     int read_width;
     int depth, numcolors, compression, totalsize;
     int ret;
+    bool return_size = format & FORMAT_RETURN_SIZE;
 
     unsigned char *bitmap = bm->data;
     struct uint8_rgb palette[256];
@@ -594,6 +595,9 @@ int read_bmp_fd(int fd,
         totalsize = cformat->get_size(bm);
     else
         totalsize = BM_SIZE(bm->width,bm->height,format,remote);
+
+    if(return_size)
+        return totalsize;
 
     /* Check if this fits the buffer */
     if (totalsize > maxsize) {

@@ -200,6 +200,19 @@ LUALIB_API lua_Integer luaL_optinteger (lua_State *L, int narg,
 }
 
 
+LUALIB_API int luaL_checkboolean (lua_State *L, int narg) {
+  int b = lua_toboolean(L, narg);
+  if( b == 0 && !lua_isboolean(L, narg))
+    tag_error(L, narg, LUA_TBOOLEAN);
+  return b;
+}
+
+
+LUALIB_API int luaL_optboolean (lua_State *L, int narg, int def) {
+  return luaL_opt(L, luaL_checkboolean, narg, def);
+}
+
+
 LUALIB_API int luaL_getmetafield (lua_State *L, int obj, const char *event) {
   if (!lua_getmetatable(L, obj))  /* no metatable? */
     return 0;
