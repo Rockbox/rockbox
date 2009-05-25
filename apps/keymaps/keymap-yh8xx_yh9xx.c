@@ -47,8 +47,8 @@ CONTEXT_CUSTOM|CONTEXT_SETTINGS = the direction keys for the eq/col picker scree
 
 
 static const struct button_mapping button_context_standard[]  = {
-    { ACTION_STD_OK,            BUTTON_RIGHT,                   BUTTON_NONE },
-    { ACTION_STD_CANCEL,        BUTTON_LEFT,                    BUTTON_NONE },
+    { ACTION_STD_OK,            BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT },
+    { ACTION_STD_CANCEL,        BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT },
 
     { ACTION_STD_PREV,          BUTTON_UP,                      BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,    BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
@@ -57,7 +57,7 @@ static const struct button_mapping button_context_standard[]  = {
 
     { ACTION_STD_MENU,          BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_LEFT },
     { ACTION_STD_CONTEXT,       BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_RIGHT },
-    { ACTION_STD_QUICKSCREEN,   BUTTON_PLAY|BUTTON_LEFT,        BUTTON_PLAY },
+    { ACTION_STD_QUICKSCREEN,   BUTTON_FFWD|BUTTON_RIGHT,       BUTTON_FFWD },
 
     { ACTION_STD_REC,           BUTTON_REC|BUTTON_REPEAT,       BUTTON_NONE },
 
@@ -85,14 +85,12 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_VOLUP,         BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_WPS_VOLUP,         BUTTON_UP,                      BUTTON_NONE },
 
-    { ACTION_WPS_BROWSE,        BUTTON_LEFT,                    BUTTON_NONE },
-    { ACTION_WPS_ID3SCREEN,     BUTTON_RIGHT,                   BUTTON_NONE },
-    { ACTION_WPS_PITCHSCREEN,   BUTTON_PLAY|BUTTON_RIGHT,       BUTTON_PLAY },
+    { ACTION_WPS_BROWSE,        BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT },
 
     /* these match context_standard */
     { ACTION_WPS_MENU,          BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_LEFT },
     { ACTION_WPS_CONTEXT,       BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_RIGHT },
-    { ACTION_WPS_QUICKSCREEN,   BUTTON_PLAY|BUTTON_LEFT,        BUTTON_PLAY },
+    { ACTION_WPS_QUICKSCREEN,   BUTTON_FFWD|BUTTON_RIGHT,       BUTTON_FFWD },
 
     { ACTION_WPS_REC,           BUTTON_REC|BUTTON_REPEAT,       BUTTON_NONE },
     
@@ -135,14 +133,11 @@ static const struct button_mapping button_context_listtree_scroll_without_combo[
     { ACTION_STD_CANCEL,        BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT },
     { ACTION_TREE_ROOT_INIT,    BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_LEFT },
 
-    { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
-    { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT|BUTTON_REPEAT },
-
-    { ACTION_NONE,              BUTTON_RIGHT,                   BUTTON_NONE },
-    { ACTION_STD_OK,            BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT },
+    { ACTION_TREE_PGLEFT,       BUTTON_REW|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_TREE_PGLEFT,       BUTTON_REW|BUTTON_REL,         BUTTON_REW|BUTTON_REPEAT },
     
-    { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT|BUTTON_REPEAT },
+    { ACTION_TREE_PGRIGHT,      BUTTON_FFWD|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_TREE_PGRIGHT,      BUTTON_FFWD|BUTTON_REL,        BUTTON_FFWD|BUTTON_REPEAT },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE)
 };
@@ -184,7 +179,7 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
 }; /* button_context_settingsgraphical */
 
 static const struct button_mapping button_context_yesno[]  = {
-    { ACTION_YESNO_ACCEPT,      BUTTON_RIGHT|BUTTON_REL,        BUTTON_PLAY },
+    { ACTION_YESNO_ACCEPT,      BUTTON_RIGHT,                   BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings_yesno */
@@ -215,19 +210,21 @@ static const struct button_mapping button_context_time[]  = {
 }; /* button_context_settings_bmark */
 
 static const struct button_mapping button_context_quickscreen[]  = {
+    { ACTION_NONE,              BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_QS_DOWNINV,        BUTTON_UP,                      BUTTON_NONE },
     { ACTION_QS_DOWNINV,        BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
 
-    { ACTION_QS_DOWN,           BUTTON_DOWN,                    BUTTON_NONE },
+    { ACTION_QS_DOWN,           BUTTON_DOWN|BUTTON_REL,         BUTTON_NONE },
     { ACTION_QS_DOWN,           BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
 
-    { ACTION_QS_LEFT,           BUTTON_LEFT,                    BUTTON_NONE },
+    { ACTION_QS_LEFT,           BUTTON_LEFT|BUTTON_REL,         BUTTON_NONE },
     { ACTION_QS_LEFT,           BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
 
-    { ACTION_QS_RIGHT,          BUTTON_RIGHT,                   BUTTON_NONE },
+    { ACTION_QS_RIGHT,          BUTTON_RIGHT|BUTTON_REL,        BUTTON_NONE },
     { ACTION_QS_RIGHT,          BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
 
     { ACTION_STD_CANCEL,        BUTTON_PLAY,                    BUTTON_NONE },
+    { ACTION_STD_CANCEL,        BUTTON_FFWD,                    BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
