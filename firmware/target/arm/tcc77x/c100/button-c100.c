@@ -31,30 +31,31 @@ void button_init_device(void)
 int button_read_device(void)
 {
     int btn = BUTTON_NONE;
-	
-	if (!button_hold()){
+
+    if (!button_hold())
+    {
         GPIOA |= 0x4;
         GPIOA &= ~0x8;
-    	
+
         int i=20; while (i--);
-        	    
-        if (GPIOA & 0x10) btn |= BUTTON_PLAYPAUSE; /* up */
+
+        if (GPIOA & 0x10) btn |= BUTTON_UP; 
         if (GPIOA & 0x20) btn |= BUTTON_RIGHT;
         if (GPIOA & 0x40) btn |= BUTTON_LEFT;
 
         GPIOA |= 0x8;
         GPIOA &= ~0x4;
-	
+
         i=20; while (i--);
-	
+
         if (GPIOA & 0x10) btn |= BUTTON_VOLUP;
         if (GPIOA & 0x20) btn |= BUTTON_VOLDOWN;
-        if (GPIOA & 0x40) btn |= BUTTON_REPEATAB; /* down */
-	
+        if (GPIOA & 0x40) btn |= BUTTON_DOWN; 
+
         if (GPIOA & 0x80) btn |= BUTTON_SELECT;  
-        if (GPIOA & 0x100) btn |= BUTTON_MENU;
+        if (GPIOA & 0x100) btn |= BUTTON_POWER;
 	}
-	return btn;
+    return btn;
 }
 
 bool button_hold(void)
