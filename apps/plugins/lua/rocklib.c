@@ -184,8 +184,7 @@ static inline void rli_init(lua_State *L)
 /* Helper function for opt_viewport */
 static void check_tablevalue(lua_State *L, const char* key, int tablepos, void* res, bool unsigned_val)
 {
-    lua_pushstring(L, key); /* Push the key on the stack */
-    lua_gettable(L, tablepos); /* Find table[key] (pops key off the stack) */
+    lua_getfield(L, tablepos, key); /* Find table[key] */
 
     if(!lua_isnoneornil(L, -1))
     {
@@ -204,11 +203,22 @@ static struct viewport* opt_viewport(lua_State *L, int narg, struct viewport* al
         return alt;
 
     int tablepos = lua_gettop(L);
+    struct viewport *vp;
 
-    lua_pushliteral(L, "vp"); /* push 'vp' on the stack */
-    struct viewport *vp = (struct viewport*)lua_newuserdata(L, sizeof(struct viewport)); /* allocate memory and push it as udata on the stack */
-    memset(vp, 0, sizeof(struct viewport)); /* Init viewport values to 0 */
-    lua_settable(L, tablepos); /* table['vp'] = vp (pops key & value off the stack) */
+    lua_getfield(L, tablepos, "vp");  /* get table['vp'] */
+    if(lua_isnoneornil(L, -1))
+    {
+        lua_pop(L, 1); /* Pop nil off stack */
+
+        vp = (struct viewport*) lua_newuserdata(L, sizeof(struct viewport)); /* Allocate memory and push it as udata on the stack */
+        memset(vp, 0, sizeof(struct viewport)); /* Init viewport values to 0 */
+        lua_setfield(L, tablepos, "vp"); /* table['vp'] = vp (pops value off the stack) */
+    }
+    else
+    {
+        vp = (struct viewport*) lua_touserdata(L, -1); /* Reuse viewport struct */
+        lua_pop(L, 1); /* We don't need the value on stack */
+    }
 
     luaL_checktype(L, narg, LUA_TTABLE);
 
