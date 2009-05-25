@@ -598,8 +598,11 @@ int read_bmp_fd(int fd,
 
     if(return_size)
     {
+#if (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)) && \
+    defined(HAVE_BMP_SCALING) || defined(PLUGIN)
         if(resize)
             totalsize += BM_SCALED_SIZE(bm->width, 0, 0, 0);
+#endif
         return totalsize;
     }
 
