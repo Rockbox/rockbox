@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Barry Wardell
+ * Copyright (C) 2009 by Mark Arigo
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,44 +19,59 @@
  *
  ****************************************************************************/
 
-/* ATA stuff was taken from the iPod code */
+/* Created from power.c using some iPod code, and some custom stuff based on 
+   GPIO analysis 
+*/
 
+#include "config.h"
+#include "cpu.h"
 #include <stdbool.h>
+#include "adc.h"
+#include "kernel.h"
 #include "system.h"
-#include "ata.h"
-#include "ata-target.h"
+#include "power.h"
+#include "logf.h"
+#include "usb.h"
 
-void ata_reset() 
+void power_init(void)
 {
-
 }
 
-void ata_enable(bool on)
+unsigned int power_input_status(void)
 {
-    /* TODO: Implement ata_enable() */
+    unsigned int status = POWER_INPUT_NONE;
+
+    if (GPIOL_INPUT_VAL & 0x80)
+        status = POWER_INPUT_MAIN_CHARGER;
+
+    if (GPIOD_INPUT_VAL & 0x10)
+        status |= POWER_INPUT_USB_CHARGER;
+
+    return status;
+}
+
+void ide_power_enable(bool on)
+{
     (void)on;
+    /* We do nothing */
 }
 
-bool ata_is_coldstart()
+
+bool ide_powered(void)
 {
-    return false;
-    /* TODO: Implement coldstart variable */
+    /* pretend we are always powered - we don't turn it off */
+    return true;
 }
 
-void ata_device_init()
+void power_off(void)
 {
-#ifdef SAMSUNG_YH920
-    CPU_INT_DIS = (1<<IDE_IRQ);
-#endif
+    /* Disable interrupts on this core */
+    disable_interrupt(IRQ_FIQ_STATUS);
 
-    /* From ipod-ide.c:ipod_ide_register() */
-    IDE0_CFG |= (1<<5);
-#ifdef IPOD_NANO
-    IDE0_CFG |= (0x10000000); /* cpu > 65MHz */
-#else
-    IDE0_CFG &=~(0x10000000); /* cpu < 65MHz */
-#endif
+    /* Mask them on both cores */
+    CPU_INT_DIS = -1;
+    COP_INT_DIS = -1;
 
-    IDE0_PRI_TIMING0 = 0x10;
-    IDE0_PRI_TIMING1 = 0x80002150;
+    while (1)
+        DEV_RS = -1;
 }

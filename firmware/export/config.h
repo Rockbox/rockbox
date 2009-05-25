@@ -109,6 +109,7 @@
 #define SANSA_CLIP_PAD     35
 #define SANSA_FUZE_PAD     36
 #define LYRE_PROTO1_PAD    37
+#define SAMSUNG_YH_PAD     38
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -185,7 +186,8 @@
 #define LCD_SSD1303   31 /* as used by the Sansa Clip */
 #define LCD_FUZE      32 /* as used by the Sansa Fuze */
 #define LCD_LYRE_PROTO1      33 /* as used by the Lyre */
-
+#define LCD_YH925     34 /* as used by Samsung YH-925 (similar to the H10 20GB) */
+ 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
 #define VERTICAL_PACKING 2
@@ -364,6 +366,12 @@ Lyre prototype 1*/
 #include "config-c200v2.h"
 #elif defined(LYRE_PROTO1)
 #include "config-lyre_proto1.h"
+#elif defined(SAMSUNG_YH820)
+#include "config-yh820.h"
+#elif defined(SAMSUNG_YH920)
+#include "config-yh920.h"
+#elif defined(SAMSUNG_YH925)
+#include "config-yh925.h"
 #else
 /* no known platform */
 #endif

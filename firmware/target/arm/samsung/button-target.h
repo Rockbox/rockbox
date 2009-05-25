@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Barry Wardell
+ * Copyright (C) 2009 by Mark Arigo
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,44 +19,37 @@
  *
  ****************************************************************************/
 
-/* ATA stuff was taken from the iPod code */
+#ifndef _BUTTON_TARGET_H_
+#define _BUTTON_TARGET_H_
 
 #include <stdbool.h>
-#include "system.h"
-#include "ata.h"
-#include "ata-target.h"
+#include "config.h"
 
-void ata_reset() 
-{
+#define HAS_BUTTON_HOLD
 
-}
+bool button_hold(void);
+void button_init_device(void);
+int button_read_device(void);
 
-void ata_enable(bool on)
-{
-    /* TODO: Implement ata_enable() */
-    (void)on;
-}
+/* Button codes for Samsung YH-820, 920, 925 */
 
-bool ata_is_coldstart()
-{
-    return false;
-    /* TODO: Implement coldstart variable */
-}
+/* Main unit's buttons */
+/* Left = Menu, Right = Sel */
+#define BUTTON_LEFT         0x00000001
+#define BUTTON_RIGHT        0x00000002
+#define BUTTON_UP           0x00000004
+#define BUTTON_DOWN         0x00000008
+#define BUTTON_PLAY         0x00000010
+#define BUTTON_REW          0x00000020
+#define BUTTON_FFWD         0x00000040
+#define BUTTON_REC          0x00000080
 
-void ata_device_init()
-{
-#ifdef SAMSUNG_YH920
-    CPU_INT_DIS = (1<<IDE_IRQ);
-#endif
+#define BUTTON_MAIN         0x000000ff
 
-    /* From ipod-ide.c:ipod_ide_register() */
-    IDE0_CFG |= (1<<5);
-#ifdef IPOD_NANO
-    IDE0_CFG |= (0x10000000); /* cpu > 65MHz */
-#else
-    IDE0_CFG &=~(0x10000000); /* cpu < 65MHz */
-#endif
+/* No Remote control */
+#define BUTTON_REMOTE 0
 
-    IDE0_PRI_TIMING0 = 0x10;
-    IDE0_PRI_TIMING1 = 0x80002150;
-}
+#define POWEROFF_BUTTON BUTTON_PLAY
+#define POWEROFF_COUNT  15
+
+#endif /* _BUTTON_TARGET_H_ */

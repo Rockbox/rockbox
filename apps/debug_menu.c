@@ -1032,6 +1032,9 @@ static bool dbg_spdif(void)
       (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD)
 #   define DEBUG_CANCEL  BUTTON_POWER
 
+#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+#   define DEBUG_CANCEL  BUTTON_PLAY
+
 #endif /* key definitions */
 
 /* Test code!!! */

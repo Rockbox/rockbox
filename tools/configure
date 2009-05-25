@@ -736,25 +736,27 @@ cat <<EOF
   5) Ondio FM             15) H10 5/6Gb          25) Mini 1G
   6) AV300                                       26) Mini 2G
                           ==Toshiba==            27) 1G, 2G
-                          40) Gigabeat F
- ==Cowon/iAudio==         41) Gigabeat S         ==SanDisk==
- 30) X5/X5V/X5L                                  50) Sansa e200
- 31) M5/M5L               ==Tatung==             51) Sansa e200R
- 32) 7                    60) Elio TPJ-1022      52) Sansa c200
- 33) D2                                          53) Sansa m200
- 34) M3/M3L               ==Olympus==            54) Sansa c100
-                          70) M:Robe 500         55) Sansa Clip
- ==Creative==             71) M:Robe 100         56) Sansa e200v2
- 90) Zen Vision:M 30GB                           57) Sansa m200v4
- 91) Zen Vision:M 60GB    ==Philips==            58) Sansa Fuze
- 92) Zen Vision           100) GoGear SA9200     59) Sansa c200v2
-                          101) GoGear HDD1630/
-                               HDD1830           ==Logik==
- ==Onda==                                        80) DAX 1GB MP3/DAB
- 120) VX747               ==Meizu==
- 121) VX767               110) M6SL              ==Lyre project==
- 122) VX747+              111) M6SP              130) Lyre proto 1
-                          112) M3
+ ==Cowon/iAudio==         40) Gigabeat F
+ 30) X5/X5V/X5L           41) Gigabeat S         ==SanDisk==
+ 31) M5/M5L                                      50) Sansa e200
+ 32) 7                    ==Tatung==             51) Sansa e200R
+ 33) D2                   60) Elio TPJ-1022      52) Sansa c200
+ 34) M3/M3L                                      53) Sansa m200
+                          ==Olympus==            54) Sansa c100
+ ==Creative==             70) M:Robe 500         55) Sansa Clip
+ 90) Zen Vision:M 30GB    71) M:Robe 100         56) Sansa e200v2
+ 91) Zen Vision:M 60GB                           57) Sansa m200v4
+ 92) Zen Vision           ==Philips==            58) Sansa Fuze
+                          100) GoGear SA9200     59) Sansa c200v2
+ ==Onda==                 101) GoGear HDD1630/
+ 120) VX747                    HDD1830           ==Logik==
+ 121) VX767                                      80) DAX 1GB MP3/DAB
+ 122) VX747+              ==Meizu==
+                          110) M6SL              ==Lyre project==
+ ==Samsung==              111) M6SP              130) Lyre proto 1
+ 140) YH-820              112) M3
+ 141) YH-920
+ 142) YH-925
 EOF
 
   buildfor=`input`;
@@ -2046,6 +2048,78 @@ fi
     t_cpu="arm"
     t_manufacturer="at91sam"
     t_model="lyre_proto1"
+    ;;
+
+   140|yh_820)
+    target_id=57
+    modelname="yh_820"
+    target="-DSAMSUNG_YH820"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -mi4v2 -model=y820 -type=RBOS"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.mi4"
+    appextra="recorder:gui"
+    plugins=""
+    swcodec="yes"
+    boottool="$rootdir/tools/scramble -mi4v2 -model=y820 -type=RBBL"
+    bootoutput="FW_YH820.mi4"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$scramblebitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="samsung"
+    t_model="yh820"
+    ;;
+
+   141|yh_920)
+    target_id=58
+    modelname="yh_920"
+    target="-DSAMSUNG_YH920"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -mi4v2 -model=y920 -type=RBOS"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 2"
+    output="rockbox.mi4"
+    appextra="recorder:gui"
+    plugins=""
+    swcodec="yes"
+    boottool="$rootdir/tools/scramble -mi4v2 -model=y920 -type=RBBL"
+    bootoutput="PP5020.mi4"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$scramblebitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="samsung"
+    t_model="yh920"
+    ;;
+
+   142|yh_925)
+    target_id=59
+    modelname="yh_925"
+    target="-DSAMSUNG_YH925"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -mi4v2 -model=y925 -type=RBOS"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.mi4"
+    appextra="recorder:gui"
+    plugins=""
+    swcodec="yes"
+    boottool="$rootdir/tools/scramble -mi4v2 -model=y925 -type=RBBL"
+    bootoutput="FW_YH925.mi4"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$scramblebitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="samsung"
+    t_model="yh925"
     ;;
 
    *)

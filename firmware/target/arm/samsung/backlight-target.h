@@ -18,45 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef BACKLIGHT_TARGET_H
+#define BACKLIGHT_TARGET_H
 
-/* ATA stuff was taken from the iPod code */
+#define _backlight_init() true
+void _backlight_on(void);
+void _backlight_off(void);
 
-#include <stdbool.h>
-#include "system.h"
-#include "ata.h"
-#include "ata-target.h"
-
-void ata_reset() 
-{
-
-}
-
-void ata_enable(bool on)
-{
-    /* TODO: Implement ata_enable() */
-    (void)on;
-}
-
-bool ata_is_coldstart()
-{
-    return false;
-    /* TODO: Implement coldstart variable */
-}
-
-void ata_device_init()
-{
-#ifdef SAMSUNG_YH920
-    CPU_INT_DIS = (1<<IDE_IRQ);
 #endif
-
-    /* From ipod-ide.c:ipod_ide_register() */
-    IDE0_CFG |= (1<<5);
-#ifdef IPOD_NANO
-    IDE0_CFG |= (0x10000000); /* cpu > 65MHz */
-#else
-    IDE0_CFG &=~(0x10000000); /* cpu < 65MHz */
-#endif
-
-    IDE0_PRI_TIMING0 = 0x10;
-    IDE0_PRI_TIMING1 = 0x80002150;
-}

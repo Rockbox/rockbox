@@ -75,6 +75,13 @@
 #define USB_GPIO        GPIOE
 #define USB_GPIO_MASK   0x04
 #define USB_GPIO_VAL    0x04
+
+#elif defined(SAMSUNG_YH820) || defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
+    /* GPIO D bit 4 is usb detect */
+#define USB_GPIO        GPIOD
+#define USB_GPIO_MASK   0x10
+#define USB_GPIO_VAL    0x10
+
 #else
 #error No USB GPIO config specified
 #endif

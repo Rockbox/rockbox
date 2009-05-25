@@ -302,6 +302,24 @@
 #define UI_LCD_POSX                 45  /* x position of lcd */
 #define UI_LCD_POSY                 90  /* y position of lcd */
 
+#elif defined(SAMSUNG_YH820)
+#define UI_TITLE                    "Samsung YH-820"
+#define UI_WIDTH                    368 /* width of GUI window */
+#define UI_HEIGHT                   428 /* height of GUI window */
+#define UI_LCD_POSX                 120 /* x position of lcd */
+#define UI_LCD_POSY                 75  /* y position of lcd */
+
+#elif defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
+#ifdef SAMSUNG_YH920
+#define UI_TITLE                    "Samsung YH-920"
+#else
+#define UI_TITLE                    "Samsung YH-925"
+#endif
+#define UI_WIDTH                    408 /* width of GUI window */
+#define UI_HEIGHT                   454 /* height of GUI window */
+#define UI_LCD_POSX                 124 /* x position of lcd */
+#define UI_LCD_POSY                 42  /* y position of lcd */
+
 #else
 #error no UI defines
 #endif

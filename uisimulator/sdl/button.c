@@ -1101,6 +1101,42 @@ void button_event(int key, bool pressed)
     case SDLK_KP_ENTER:
         new_btn = BUTTON_MENU;
         break;
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+    case SDLK_KP4:
+    case SDLK_LEFT:
+        new_btn = BUTTON_LEFT;
+        break;
+    case SDLK_KP6:
+    case SDLK_RIGHT:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case SDLK_KP8:
+    case SDLK_UP:
+        new_btn = BUTTON_UP;
+        break;
+    case SDLK_KP2:
+    case SDLK_DOWN:
+        new_btn = BUTTON_DOWN;
+        break;
+    case SDLK_KP5:
+    case SDLK_KP_ENTER:
+        new_btn = BUTTON_PLAY;
+        break;
+    case SDLK_KP9:
+    case SDLK_PAGEUP:
+        new_btn = BUTTON_FFWD;
+        break;
+#ifdef SAMSUNG_YH820
+    case SDLK_KP7:
+#else
+    case SDLK_KP3:
+#endif
+    case SDLK_PAGEDOWN:
+        new_btn = BUTTON_REW;
+        break;
+    case SDLK_KP_PLUS:
+        new_btn = BUTTON_REC;
+        break;
 #else
 #error No keymap defined!
 #endif /* CONFIG_KEYPAD */

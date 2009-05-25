@@ -122,7 +122,8 @@ void usage(void)
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd, mn2g\n"
            "\t                   ip3g, ip4g, mini, iax5, iam5, iam3, h10, h10_5gb,\n"
            "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2,\n");
-    printf("\t                   9200, 1630, ldax, m200, clip, e2v2, m2v4, fuze)\n");
+    printf("\t                   9200, 1630, ldax, m200, clip, e2v2, m2v4, fuze,\n"
+           "\t                   y820, y920, y925)\n");
     printf("\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -297,6 +298,12 @@ int main (int argc, char** argv)
             modelnum = 44;
         else if (!strcmp(&argv[1][5], "x747"))
             modelnum = 45;
+        else if (!strcmp(&argv[1][5], "y820")) /* Samsung YH-820 */
+            modelnum = 57;
+        else if (!strcmp(&argv[1][5], "y920")) /* Samsung YH-920 */
+            modelnum = 58;
+        else if (!strcmp(&argv[1][5], "y925")) /* Samsung YH-925 */
+            modelnum = 59;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

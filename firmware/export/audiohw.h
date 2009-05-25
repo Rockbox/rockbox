@@ -59,6 +59,8 @@
 #include "tsc2100.h"
 #elif defined(HAVE_JZ4740_CODEC)
 #include "jz4740-codec.h"
+#elif defined(HAVE_AK4537)
+#include "ak4537.h"
 #endif
 
 /* convert caps into defines */

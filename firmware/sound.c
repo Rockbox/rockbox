@@ -254,7 +254,8 @@ static void set_prescaled_volume(void)
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 #elif defined(HAVE_UDA1380) || defined(HAVE_WM8975) || defined(HAVE_WM8758) \
    || defined(HAVE_WM8711) || defined(HAVE_WM8721) || defined(HAVE_WM8731) \
-   || defined(HAVE_WM8751) || defined(HAVE_AS3514) || defined(HAVE_TSC2100)
+   || defined(HAVE_WM8751) || defined(HAVE_AS3514) || defined(HAVE_TSC2100) \
+   || defined(HAVE_AK4537)
     audiohw_set_master_vol(tenthdb2master(l), tenthdb2master(r));
 #if defined(HAVE_WM8975) || defined(HAVE_WM8758) \
 	|| (defined(HAVE_WM8751) && !defined(MROBE_100)) || defined(HAVE_WM8985)
@@ -584,8 +585,8 @@ void sound_set(int setting, int value)
 #if (!defined(HAVE_AS3514) && !defined(HAVE_WM8975) \
   && !defined(HAVE_WM8758) && !defined(HAVE_TSC2100) \
   && !defined (HAVE_WM8711) && !defined (HAVE_WM8721) \
-  && !defined (HAVE_WM8731) && !defined (HAVE_WM8978)) \
-  || defined(SIMULATOR)
+  && !defined (HAVE_WM8731) && !defined (HAVE_WM8978) \
+  && !defined(HAVE_AK4537)) || defined(SIMULATOR)
 int sound_val2phys(int setting, int value)
 {
 #if CONFIG_CODEC == MAS3587F

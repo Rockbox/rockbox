@@ -250,6 +250,8 @@ drivers/audio/as3514.c
 drivers/audio/tlv320.c
 #elif defined(HAVE_MAS35XX)
 drivers/audio/mas35xx.c
+#elif defined(HAVE_AK4537)
+drivers/audio/ak4537.c
 #endif /* defined(HAVE_*) */
 #endif /* !defined(SIMULATOR) && !defined(BOOTLOADER) */
 
@@ -1282,3 +1284,53 @@ target/arm/at91sam/lyre_proto1/system-lyre_proto1.c
 target/arm/at91sam/lyre_proto1/timer-lyre_proto1.c
 #endif
 #endif /* SIMULATOR */
+
+#ifdef SAMSUNG_YH820
+#ifndef SIMULATOR
+target/arm/ata-as-arm.S
+target/arm/ata-pp5020.c
+target/arm/adc-pp5020.c
+target/arm/i2s-pp.c
+target/arm/usb-fw-pp502x.c
+target/arm/samsung/akcodec-yh82x_yh92x.c
+target/arm/samsung/button-yh82x_yh92x.c
+target/arm/samsung/power-yh82x_yh92x.c
+target/arm/samsung/yh820/backlight-yh820.c
+target/arm/samsung/yh820/lcd-yh820.c
+target/arm/samsung/yh820/lcd-as-yh820.S
+target/arm/samsung/yh820/powermgmt-yh820.c
+#endif /* SIMULATOR */
+#endif /* SAMSUNG_YH820 */
+
+#ifdef SAMSUNG_YH920
+#ifndef SIMULATOR
+target/arm/ata-as-arm.S
+target/arm/ata-pp5020.c
+target/arm/adc-pp5020.c
+target/arm/i2s-pp.c
+target/arm/usb-fw-pp502x.c
+target/arm/samsung/akcodec-yh82x_yh92x.c
+target/arm/samsung/button-yh82x_yh92x.c
+target/arm/samsung/power-yh82x_yh92x.c
+target/arm/samsung/yh920/backlight-yh920.c
+target/arm/samsung/yh920/lcd-yh920.c
+target/arm/samsung/yh920/powermgmt-yh920.c
+#endif /* SIMULATOR */
+#endif /* SAMSUNG_YH920 */
+
+#ifdef SAMSUNG_YH925
+#ifndef SIMULATOR
+target/arm/ata-as-arm.S
+target/arm/ata-pp5020.c
+target/arm/adc-pp5020.c
+target/arm/i2s-pp.c
+target/arm/usb-fw-pp502x.c
+target/arm/samsung/akcodec-yh82x_yh92x.c
+target/arm/samsung/button-yh82x_yh92x.c
+target/arm/samsung/power-yh82x_yh92x.c
+target/arm/samsung/yh925/backlight-yh925.c
+target/arm/samsung/yh925/lcd-yh925.c
+target/arm/samsung/yh925/lcd-as-yh925.S
+target/arm/samsung/yh925/powermgmt-yh925.c
+#endif /* SIMULATOR */
+#endif /* SAMSUNG_YH925 */

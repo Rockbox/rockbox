@@ -141,6 +141,12 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
                 usb_insert_int();
         }
 /* end PHILIPS_HDD1630 */
+#elif defined(SAMSUNG_YH820) || defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
+        else if (CPU_HI_INT_STAT & GPIO0_MASK) {
+            if (GPIOD_INT_STAT & 0x10)
+                usb_insert_int();
+        }
+/* end SAMSUNG_YHxxx */
 #endif
 #ifdef IPOD_ACCESSORY_PROTOCOL
         else if (CPU_HI_INT_STAT & SER0_MASK) {

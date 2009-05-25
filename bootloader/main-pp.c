@@ -70,6 +70,9 @@ extern int show_logo(void);
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
 #define BOOTLOADER_BOOT_OF      BUTTON_MENU
 
+#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#define BOOTLOADER_BOOT_OF      BUTTON_LEFT
+
 #endif
 
 /* Maximum allowed firmware image size. 10MB is more than enough */

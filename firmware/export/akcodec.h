@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Barry Wardell
+ * Copyright (C) 2006 by Marcoen Hirschberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,44 +19,11 @@
  *
  ****************************************************************************/
 
-/* ATA stuff was taken from the iPod code */
+#ifndef _AKCODEC_H
+#define _AKCODEC_H
 
-#include <stdbool.h>
-#include "system.h"
-#include "ata.h"
-#include "ata-target.h"
+int  akcodec_read(int reg);
+void akcodec_write(int reg, int data);
+void akcodec_close(void);
 
-void ata_reset() 
-{
-
-}
-
-void ata_enable(bool on)
-{
-    /* TODO: Implement ata_enable() */
-    (void)on;
-}
-
-bool ata_is_coldstart()
-{
-    return false;
-    /* TODO: Implement coldstart variable */
-}
-
-void ata_device_init()
-{
-#ifdef SAMSUNG_YH920
-    CPU_INT_DIS = (1<<IDE_IRQ);
 #endif
-
-    /* From ipod-ide.c:ipod_ide_register() */
-    IDE0_CFG |= (1<<5);
-#ifdef IPOD_NANO
-    IDE0_CFG |= (0x10000000); /* cpu > 65MHz */
-#else
-    IDE0_CFG &=~(0x10000000); /* cpu < 65MHz */
-#endif
-
-    IDE0_PRI_TIMING0 = 0x10;
-    IDE0_PRI_TIMING1 = 0x80002150;
-}
