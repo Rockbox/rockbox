@@ -376,6 +376,7 @@ static unsigned char* load_rockbox_file(char* filename, int model, off_t* bufsiz
     if (memcmp(rb_model_names[model],header + 4,4)!=0) {
         fprintf(stderr,"[ERR]  Model name \"%s\" not found in %s\n",
                        rb_model_names[model],filename);
+        return NULL;
     }
 
     *bufsize = filesize(fd) - sizeof(header);
@@ -468,8 +469,6 @@ int main(int argc, char* argv[])
         fprintf(stderr,"[INFO] Original firmware MD5 checksum match - %s %s\n",
                        model_names[model], sansasums[i].version);
     } else {
-        fprintf(stderr,"[WARN] ****** Original firmware unknown ******\n");
-        
         if (get_uint32le(&buf[0x204])==0x0000f000) {
             fw_version = 2;
             model_id = buf[0x219];
@@ -480,12 +479,21 @@ int main(int argc, char* argv[])
 
         model = get_model(model_id);
 
+#if 0
+        /* if you are a tester this info might help */
+        fprintf(stderr,"[WARN] ****** Original firmware unknown ******\n");
         if (model == MODEL_UNKNOWN) {
             fprintf(stderr,"[ERR]  Unknown firmware - model id 0x%02x\n",
                            model_id);
             free(buf);
             return 1;
         }
+#else
+        /* else you don't want to brick your player */
+        fprintf(stderr, "[ERR]  Original firmware untested - aborting\n");
+        free(buf);
+        return 1;
+#endif
     }
     
 
