@@ -22,7 +22,7 @@
 
 #include "plugin.h"
 
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
 int errno = 0;
 #endif
 
