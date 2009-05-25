@@ -113,4 +113,4 @@ rb.lcd_update()
 
 rb.button_get(true)
 
-rb.set_viewport()
+rb.set_viewport(nil)

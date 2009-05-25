@@ -226,7 +226,7 @@ static struct viewport* opt_viewport(lua_State *L, int narg, struct viewport* al
 #ifdef HAVE_LCD_COLOR
     check_tablevalue(L, "lss_pattern", tablepos, &vp->lss_pattern, true);
     check_tablevalue(L, "lse_pattern", tablepos, &vp->lse_pattern, true);
-    check_tablevalue(L, "lst_pattern", tablepos, &vp->lse_pattern, true);
+    check_tablevalue(L, "lst_pattern", tablepos, &vp->lst_pattern, true);
 #endif
 #endif
 
@@ -243,7 +243,7 @@ RB_WRAP(set_viewport)
 
 RB_WRAP(clear_viewport)
 {
-    int screen = luaL_optint(L, 2, SCREEN_MAIN);
+    int screen = luaL_optint(L, 1, SCREEN_MAIN);
     rb->screens[screen]->clear_viewport();
     return 0;
 }
