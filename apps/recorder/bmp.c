@@ -597,7 +597,11 @@ int read_bmp_fd(int fd,
         totalsize = BM_SIZE(bm->width,bm->height,format,remote);
 
     if(return_size)
+    {
+        if(resize)
+            totalsize += BM_SCALED_SIZE(bm->width, 0, 0, 0);
         return totalsize;
+    }
 
     /* Check if this fits the buffer */
     if (totalsize > maxsize) {
