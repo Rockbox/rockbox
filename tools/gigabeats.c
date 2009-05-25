@@ -74,6 +74,7 @@ int gigabeat_s_code(char *infile, char *outfile)
     unsigned int size;
     unsigned int newsize;
     unsigned char* buf;
+    size_t rc;
 
     in = openinfile(infile);
     out = openoutfile(outfile);
@@ -87,13 +88,19 @@ int gigabeat_s_code(char *infile, char *outfile)
     newsize = 15 + 16 + 12 + size + 12;
     buf = malloc(newsize);
     if(buf == NULL) {
-        fprintf(stderr, "Not enough memory to perform the requested operation. Aborting.\n" );
-        return 0;
+        fprintf(stderr,
+                "Not enough memory to perform the operation. Aborting.\n" );
+        return 1;
     }
     fseek(in, 0, SEEK_SET);
-    fread(buf + 43, size, 1, in);
+    rc = fread(buf + 43, 1, size, in);
     fclose(in);
 
+    if(rc != size) {
+        /* failed to read the wanted amount */
+        fprintf(stderr, "Failed reading from %s.\n", infile);
+        return 2;
+    }
     /* Step 2: Create the file header */
     sprintf((char *)buf, "B000FF\n");
     put_uint32le(0x88200000, buf+7);

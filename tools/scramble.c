@@ -329,8 +329,7 @@ int main (int argc, char** argv)
     else if(!strcmp(argv[1], "-gigabeats")) {
         iname = argv[2];
         oname = argv[3];
-        gigabeat_s_code(iname, oname);
-        return 0;
+        return gigabeat_s_code(iname, oname);
     }
     else if(!strcmp(argv[1], "-iaudiox5")) {
         iname = argv[2];
