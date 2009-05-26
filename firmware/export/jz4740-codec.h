@@ -24,4 +24,6 @@
 #define VOLUME_MIN -730
 #define VOLUME_MAX  60
 
+void audiohw_set_volume(int v);
+
 #endif /* __JZ4740_CODEC_H_ */
