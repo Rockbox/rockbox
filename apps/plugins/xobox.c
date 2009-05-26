@@ -967,7 +967,7 @@ static int xobox_menu(bool ingame)
         MENUITEM_STRINGLIST (main_menu, "Xobox Menu", NULL,
                                  "Start Game",
                                  "Speed",
-                                 "Difficult",
+                                 "Difficulty",
                                  "Playback Control",
                                  "Quit");
 
