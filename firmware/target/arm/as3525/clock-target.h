@@ -39,7 +39,7 @@
  *  value fits into the number of bits allotted to it.
  *
  *  The CLOCK_DIV macro does a pretty good job at selecting divider values but
- *  you can always overide it by choosing your own value and commenting out the
+ *  you can always override it by choosing your own value and commenting out the
  *  macro.  If you are going to use AS3525_FCLK_PREDIV or AS3525_PCLK_DIV1 you
  *  will have to do a manual calculation.  I have included USB & PLLB for future
  *  use but commented them out for now.
