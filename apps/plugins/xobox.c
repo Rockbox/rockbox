@@ -909,37 +909,6 @@ static inline void move_board (void)
     }
 }
 
-/* the main menu */
-static int game_menu (void)
-{
-    MENUITEM_STRINGLIST(menu, "XOBOX Menu", NULL, "Start New Game",
-                        "Speed","Difficulty","Playback Control","Quit");
-    int selection = 0;
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground (rb->global_settings->fg_color);
-    rb->lcd_set_background (rb->global_settings->bg_color);
-#elif LCD_DEPTH>=2
-    rb->lcd_set_foreground(LCD_BLACK);
-    rb->lcd_set_background(LCD_WHITE);
-#endif
-    for (;;) {
-        rb->do_menu(&menu,&selection, NULL, false);
-        if (selection==1)
-            rb->set_int ("Speed", "", UNIT_INT, &speed, NULL, 1, 1, 10, NULL);
-        else if (selection==2)
-            rb->set_int ("Difficulty", "", UNIT_INT, &difficulty, NULL,
-                         5, 50, 95, NULL);
-        else if (selection==3)
-            playback_control (NULL);
-        else
-            break;
-    }
-    if (selection != MENU_START) {
-        selection = MENU_QUIT;
-    }
-    return selection;
-}
-
 /* init game's variables */
 static void init_game (void)
 {
@@ -948,18 +917,97 @@ static void init_game (void)
     player.lives = 3;
     player.gameover = false;
     player.drawing = false;
-    rb->lcd_setfont(FONT_SYSFIXED);
     init_board ();
     refresh_board ();
     rb->splash (HZ * 2, "Ready?");
 }
 
+/* the main menu */
+static int xobox_menu(bool ingame)
+{
+    rb->button_clear_queue();
+    int choice = 0;
+    if (ingame) {
+        MENUITEM_STRINGLIST (main_menu, "Xobox Menu", NULL,
+                                 "Resume Game",
+                                 "Restart Level",
+                                 "Speed",
+                                 "Difficult",
+                                 "Playback Control",
+                                 "Quit");
+
+        while (true) {
+            choice = rb->do_menu(&main_menu, &choice, NULL, false);
+            switch (choice) {
+                case 0:
+                    return 0;
+                case 1:
+                    init_game ();
+                    return 0;
+                case 2:
+                    rb->set_int ("Speed", "", UNIT_INT, &speed, NULL, 1, 1, 10, NULL);
+                    break;
+                case 3:
+                    rb->set_int ("Difficulty", "", UNIT_INT, &difficulty, NULL,
+                                5, 50, 95, NULL);
+                    break;
+                case 4:
+                    playback_control(NULL);
+                    break;
+                case 5:
+                    return 1;
+                case MENU_ATTACHED_USB:
+                    return 1;
+                default:
+                    break;
+            }
+        }
+    }
+    else {
+        MENUITEM_STRINGLIST (main_menu, "Xobox Menu", NULL,
+                                 "Start Game",
+                                 "Speed",
+                                 "Difficult",
+                                 "Playback Control",
+                                 "Quit");
+
+        while (true) {
+            choice = rb->do_menu(&main_menu, &choice, NULL, false);
+            switch (choice) {
+                case 0:
+                    init_game ();
+                    return 0;
+                case 1:
+                    rb->set_int ("Speed", "", UNIT_INT, &speed, NULL, 1, 1, 10, NULL);
+                    break;
+                case 2:
+                    rb->set_int ("Difficulty", "", UNIT_INT, &difficulty, NULL,
+                                5, 50, 95, NULL);
+                    break;
+                case 3:
+                    playback_control(NULL);
+                    break;
+                case 4:
+                    return 1;
+                case MENU_ATTACHED_USB:
+                    return 1;
+                default:
+                    break;
+            }
+        }
+    }
+}
+
 /* general keypad handler loop */
 static int xobox_loop (void)
 {
-    int button = 0, ret;
+    int button = 0;
     bool pause = false;
     int end;
+
+    if (xobox_menu(false)==1) {
+        return PLUGIN_OK;
+    }
 
     while (!quit) {
         end = *rb->current_tick + ((11-speed)*HZ)/100;
@@ -995,13 +1043,8 @@ static int xobox_loop (void)
                     rb->splash (HZ, "Paused");
                 break;
             case QUIT:
-                ret = game_menu ();
-                if (ret == MENU_START)
-                    init_game ();
-                else
-                {
+                if (xobox_menu(true)==1) {
                     quit = true;
-                    continue;
                 }
                 break;
             default:
@@ -1015,11 +1058,9 @@ static int xobox_loop (void)
         }
         if (player.gameover) {
             rb->splash (HZ, "Game Over!");
-            ret = game_menu ();
-            if (ret == MENU_START)
-                init_game ();
-            else
+            if (xobox_menu(false)==1) {
                 quit = true;
+            }
         }
 
         if (end > *rb->current_tick)
@@ -1046,13 +1087,8 @@ enum plugin_status plugin_start (const void *parameter)
     /* Turn off backlight timeout */
     backlight_force_on(); /* backlight control in lib/helper.c */
 
-    quit = false;
-
     randomize ();
-    if (game_menu () == MENU_START) {
-        init_game ();
-        ret = xobox_loop ();
-    }
+    ret = xobox_loop ();
 
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings(); /* backlight control in lib/helper.c */
