@@ -143,7 +143,7 @@ struct scaler_context {
     bool (*h_scaler)(void*,struct scaler_context*, bool);
 };
 
-#if defined(HAVE_LCD_COLOR) && (defined(HAVE_JPEG) || defined(PLUGIN))
+#if defined(HAVE_LCD_COLOR)
 #define IF_PIX_FMT(...) __VA_ARGS__
 #else
 #define IF_PIX_FMT(...)

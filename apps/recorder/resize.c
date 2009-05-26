@@ -858,7 +858,7 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
 #endif
     if (format)
 #endif
-#if defined(HAVE_LCD_COLOR) && (defined(HAVE_JPEG) || defined(PLUGIN))
+#ifdef HAVE_LCD_COLOR
         ctx.output_row = format->output_row_32[format_index];
 #else
         ctx.output_row = format->output_row_32;

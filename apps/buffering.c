@@ -849,7 +849,9 @@ static int load_image(int fd, const char *path)
     struct bitmap *bmp = (struct bitmap *)&buffer[buf_widx];
     /* FIXME: alignment may be needed for the data buffer. */
     bmp->data = &buffer[buf_widx + sizeof(struct bitmap)];
-
+#ifndef HAVE_JPEG
+    (void) path;
+#endif
 #if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
     bmp->maskdata = NULL;
 #endif
