@@ -264,6 +264,8 @@ static void set_prescaled_volume(void)
 
 #elif defined(HAVE_TLV320) || defined(HAVE_WM8978) || defined(HAVE_WM8985)
     audiohw_set_headphone_vol(tenthdb2master(l), tenthdb2master(r));
+#elif defined(HAVE_JZ4740_CODEC)
+    audiohw_set_volume(current_volume);
 #endif
 }
 #endif /* (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 */

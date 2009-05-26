@@ -86,10 +86,10 @@ void mdelay(unsigned int msec);
 void dma_enable(void);
 void dma_disable(void);
 
-#define DMA_LCD_CHANNEL    0
+#define DMA_AIC_TX_CHANNEL 0
 #define DMA_NAND_CHANNEL   1
 #define DMA_USB_CHANNEL    2
-#define DMA_AIC_TX_CHANNEL 3
+#define DMA_LCD_CHANNEL    3
 
 #define XDMA_CALLBACK(n) DMA ## n
 #define DMA_CALLBACK(n)  XDMA_CALLBACK(n)

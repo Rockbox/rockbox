@@ -1310,8 +1310,6 @@
 #define ICDC_CDCCR2_MICBG(n)  ((n & 0x3) << 4)
 #define ICDC_CDCCR2_HPVOL(n)  ((n & 0x3) << 0)
 
-#define ICDC_CDCCR2_AINVOL_DB(n) ((n+34.5)/1.5)
-
 #define ICDC_CDCCR2_SMPR_8    (0)
 #define ICDC_CDCCR2_SMPR_11   (1)
 #define ICDC_CDCCR2_SMPR_12   (2)

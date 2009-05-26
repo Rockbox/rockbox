@@ -21,11 +21,7 @@
 #ifndef __JZ4740_CODEC_H_
 #define __JZ4740_CODEC_H_
 
-/* TODO */
 #define VOLUME_MIN -730
 #define VOLUME_MAX  60
-
-int tenthdb2master(int db);
-void audiohw_set_headphone_vol(int vol_l, int vol_r);
 
 #endif /* __JZ4740_CODEC_H_ */

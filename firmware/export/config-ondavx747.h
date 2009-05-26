@@ -122,6 +122,9 @@
 /* Define this if you have the Jz4740 internal codec */
 #define HAVE_JZ4740_CODEC
 
+/* has no tone controls, so we use the software ones */
+#define HAVE_SW_TONE_CONTROLS
+
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_48 | SAMPR_CAP_44 | SAMPR_CAP_32 | \
                          SAMPR_CAP_24 | SAMPR_CAP_22 | SAMPR_CAP_16 | \
@@ -130,9 +133,6 @@
 #define CONFIG_I2C I2C_JZ47XX
 
 #define NEED_ADC_CLOSE 1
-
-/* has no tone controls, so we use the software ones */
-//#define HAVE_SW_TONE_CONTROLS
 
 #define BATTERY_CAPACITY_DEFAULT 1250 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 500      /* min. capacity selectable */

@@ -26,7 +26,7 @@
 
 /* TODO */
 const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1, -73,   6, -20},
+    [SOUND_VOLUME]        = {"dB", 0,  2,   0,   6,   0},
     /* HAVE_SW_TONE_CONTROLS */
     [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
     [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
@@ -62,40 +62,39 @@ static void i2s_codec_init(void)
 {
     __cpm_start_aic1();
     __cpm_start_aic2();
-    
+
     __aic_enable();
-    
+
     __i2s_internal_codec();
     __i2s_as_slave();
     __i2s_select_i2s();
     __aic_select_i2s(); 
-    
+
     __aic_disable_byteswap();
     __aic_disable_unsignadj();
     __aic_disable_mono2stereo();
-    
+
     i2s_codec_reset();
-    
-    //REG_ICDC_CDCCR2 = (ICDC_CDCCR2_AINVOL(ICDC_CDCCR2_AINVOL_DB(0)) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_48)
+
+    REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_SUSPD | ICDC_CDCCR1_RST);
+
     REG_ICDC_CDCCR2 = ( ICDC_CDCCR2_AINVOL(14) | ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_44)
                       | ICDC_CDCCR2_HPVOL(ICDC_CDCCR2_HPVOL_0));
-    
-    REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_SUSPD | ICDC_CDCCR1_RST);
 
     mdelay(15);
     REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_PDVR | ICDC_CDCCR1_VRCGL | ICDC_CDCCR1_VRCGH);
     REG_ICDC_CDCCR1 |= (ICDC_CDCCR1_EDAC | ICDC_CDCCR1_HPCG);
-    
+
     mdelay(600);
     REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_PDVRA | ICDC_CDCCR1_HPCG | ICDC_CDCCR1_PDHPM | ICDC_CDCCR1_PDHP);
-    
+
     mdelay(2);
-    
+
     /* CDCCR1.ELININ=0, CDCCR1.EMIC=0, CDCCR1.EADC=0, CDCCR1.SW1ON=0, CDCCR1.EDAC=1, CDCCR1.SW2ON=1, CDCCR1.HPMUTE=0 */
     REG_ICDC_CDCCR1 = (REG_ICDC_CDCCR1 & ~(ICDC_CDCCR1_ELININ | ICDC_CDCCR1_EMIC | ICDC_CDCCR1_EADC |
                                            ICDC_CDCCR1_SW1ON | ICDC_CDCCR1_HPMUTE)) | (ICDC_CDCCR1_EDAC
                                                                                     | ICDC_CDCCR1_SW2ON);
-    
+
     HP_on_off_flag = 1; /* HP is on */
 }
 
@@ -111,7 +110,7 @@ static void i2s_codec_set_mic(unsigned short v) /* 0 <= v <= 100 */
     REG_ICDC_CDCCR2 = ((REG_ICDC_CDCCR2 & ~(0x1f << 16)) | (codec_mic_gain << 16));
 }
 
-static void i2s_codec_set_bass(unsigned short v) /* 0 <= v <= 100 */
+static void i2s_codec_set_base(unsigned short v) /* 0 <= v <= 100 */
 {
     v &= 0xff;
 
@@ -200,6 +199,7 @@ static unsigned short i2s_codec_get_volume(void)
     return val;
 }
 
+static unsigned long HP_register_value;
 static void HP_turn_on(void)
 { 
     //see 1.3.4.1
@@ -261,11 +261,41 @@ static void HP_turn_off(void)
 }
 #endif
 
-static void i2s_codec_set_samplerate(unsigned int rate)
+void audiohw_mute(bool mute)
+{
+    if(mute)
+        REG_ICDC_CDCCR1 |= ICDC_CDCCR1_HPMUTE;
+    else
+        REG_ICDC_CDCCR1 &= ~ICDC_CDCCR1_HPMUTE;
+}
+
+void audiohw_preinit(void)
+{
+}
+
+void audiohw_postinit(void)
+{
+    audiohw_mute(false);
+    //HP_turn_on();
+}
+
+void audiohw_init(void)
+{
+    i2s_codec_init();
+}
+
+void audiohw_set_volume(int v)
+{
+    /* 0 <= v <= 60 */
+    unsigned int codec_volume = v / 20;
+    REG_ICDC_CDCCR2 = (REG_ICDC_CDCCR2 & ~ICDC_CDCCR2_HPVOL(0x3)) | ICDC_CDCCR2_HPVOL(codec_volume);
+}
+
+void audiohw_set_frequency(int freq)
 {
     unsigned int speed;
-    
-    switch (rate)
+
+    switch(freq)
     {
         case 8000:
             speed = ICDC_CDCCR2_SMPR(ICDC_CDCCR2_SMPR_8);
@@ -297,33 +327,6 @@ static void i2s_codec_set_samplerate(unsigned int rate)
         default:
             return;
     }
-    REG_ICDC_CDCCR2 &= ~ICDC_CDCCR2_SMPR(0xF);
-    REG_ICDC_CDCCR2 |= speed;
-}
 
-void audiohw_mute(bool mute)
-{
-    if(mute)
-        REG_ICDC_CDCCR1 |= ICDC_CDCCR1_HPMUTE;
-    else
-        REG_ICDC_CDCCR1 &= ~ICDC_CDCCR1_HPMUTE;
-}
-
-void audiohw_preinit(void)
-{
-}
-
-void audiohw_postinit(void)
-{
-    audiohw_mute(false);
-}
-
-void audiohw_init(void)
-{
-    i2s_codec_init();
-}
-
-void audiohw_set_frequency(int freq)
-{
-    i2s_codec_set_samplerate(freq);
+    REG_ICDC_CDCCR2 = (REG_ICDC_CDCCR2 & ~ICDC_CDCCR2_SMPR(0xF)) | speed;
 }
