@@ -142,8 +142,8 @@ void INT_GPIOA(void)
     GPIOA_IC = (1<<2);
     timeout_register(&sd1_oneshot, sd1_oneshot_callback, (3*HZ/10), 0);
 }
-#endif
-#endif
+#endif  /* defined(SANSA_E200V2) || defined(SANSA_FUZE) */
+#endif  /* HAVE_HOTSWAP */
 
 void INT_NAND(void)
 {
@@ -211,7 +211,7 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
         {   /* resp received */
             if(flags & MCI_LONG_RESP)
             {
-                /* store the response in little endian order for the words */
+                /* store the response in reverse words order */
                 response[0] = MCI_RESP3(drive);
                 response[1] = MCI_RESP2(drive);
                 response[2] = MCI_RESP1(drive);
@@ -322,7 +322,7 @@ static int sd_init_card(const int drive)
 
     card_info[drive].initialized = 1;
 
-    MCI_CLOCK(drive) |= MCI_CLOCK_BYPASS;   /* full speed */
+    MCI_CLOCK(drive) |= MCI_CLOCK_BYPASS; /* full speed for controller clock */
     mci_delay();
 
     /*
@@ -626,7 +626,6 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
     const int drive = 0;
 #endif
     int ret = 0;
-    int bank;
     bool unaligned_transfer = (int)buf & 3;
 
     /* skip SanDisk OF */
@@ -647,29 +646,10 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
 
     last_disk_activity = current_tick;
 
-    /* Only switch banks for internal storage */
-    if(drive == INTERNAL_AS3525)
-    {
-        bank = start / BLOCKS_PER_BANK;
-
-        if(card_info[INTERNAL_AS3525].current_bank != bank)
-        {
-            ret = sd_select_bank(bank);
-            if (ret < 0)
-            {
-                ret -= 20;
-                goto sd_transfer_error;
-            }
-        }
-
-        start -= bank * BLOCKS_PER_BANK;
-    }
-
-
     ret = sd_wait_for_state(drive, SD_TRAN);
     if (ret < 0)
     {
-        ret -= 2*20;
+        ret -= 20;
         goto sd_transfer_error;
     }
 
@@ -683,12 +663,34 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
         void *dma_buf;
         const int cmd =
             write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
-        int arg = start;
-        if(!(card_info[drive].ocr & (1<<30)))   /* not SDHC */
-            arg *= BLOCK_SIZE;
+        unsigned long bank_start = start;
 
         /* Interrupt handler might set this to true during transfer */
         retry = false;
+
+        /* Only switch banks for internal storage */
+        if(drive == INTERNAL_AS3525)
+        {
+            int bank = start / BLOCKS_PER_BANK; /* Current bank */
+
+            /* Switch bank if needed */
+            if(card_info[INTERNAL_AS3525].current_bank != bank)
+            {
+                ret = sd_select_bank(bank);
+                if (ret < 0)
+                {
+                    ret -= 2*20;
+                    goto sd_transfer_error;
+                }
+            }
+
+            /* Adjust start block in current bank */
+            bank_start -= bank * BLOCKS_PER_BANK;
+
+            /* Do not cross a bank boundary in a single transfer loop */
+            if((transfer + bank_start) >= BLOCKS_PER_BANK)
+                transfer = BLOCKS_PER_BANK - bank_start;
+        }
 
         if(unaligned_transfer)
         {
@@ -698,10 +700,14 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
             if(write)
                 memcpy(aligned_buffer, buf, transfer * SECTOR_SIZE);
         }
-        else
+        else    /* Aligned transfers are faster : no memcpy */
             dma_buf = buf;
 
-        if(!send_cmd(drive, cmd, arg, MCI_ARG, NULL))
+        /* Set bank_start to the correct unit (blocks or bytes) */
+        if(!(card_info[drive].ocr & (1<<30)))   /* not SDHC */
+            bank_start *= BLOCK_SIZE;
+
+        if(!send_cmd(drive, cmd, bank_start, MCI_ARG, NULL))
         {
             ret -= 3*20;
             goto sd_transfer_error;
