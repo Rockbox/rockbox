@@ -131,13 +131,31 @@ int recalc_dimension(struct dim *dst, struct dim *src)
         return false; \
 }
 
-/* Set up rounding and scale factors for horizontal area scaler */
-static inline void scale_h_area_setup(struct scaler_context *ctx)
+#if defined(CPU_COLDFIRE)
+#define MAC(op1, op2, num) \
+    asm volatile( \
+        "mac.l %0, %1, %%acc" #num \
+        : \
+        : "%d" (op1), "d" (op2)\
+    )
+#define MAC_OUT(dest, num) \
+    asm volatile( \
+        "movclr.l %%acc" #num ", %0" \
+        : "=d" (dest) \
+    )
+#elif defined(CPU_SH)
+/* calculate the 32-bit product of unsigned 16-bit op1 and op2 */
+static inline int32_t mul_s16_s16(int16_t op1, int16_t op2)
 {
-/* sum is output value * src->width */
-    SDEBUGF("scale_h_area_setup\n");
-    ctx->divisor = ctx->src->width;
+    return (int32_t)(op1 * op2);
 }
+
+/* calculate the 32-bit product of signed 16-bit op1 and op2 */
+static inline uint32_t mul_u16_u16(uint16_t op1, uint16_t op2)
+{
+    return (uint32_t)(op1 * op2);
+}
+#endif
 
 /* horizontal area average scaler */
 static bool scale_h_area(void *out_line_ptr,
@@ -145,6 +163,13 @@ static bool scale_h_area(void *out_line_ptr,
 {
     SDEBUGF("scale_h_area\n");
     unsigned int ix, ox, oxe, mul;
+#if defined(CPU_SH) || defined (TEST_SH_MATH)
+    const uint32_t h_i_val = ctx->src->width,
+                   h_o_val = ctx->bm->width;
+#else
+    const uint32_t h_i_val = ctx->h_i_val,
+                   h_o_val = ctx->h_o_val;
+#endif
 #ifdef HAVE_LCD_COLOR
     struct uint32_rgb rgbvalacc = { 0, 0, 0 },
                       rgbvaltmp = { 0, 0, 0 },
@@ -161,31 +186,57 @@ static bool scale_h_area(void *out_line_ptr,
     yield();
     for (ix = 0; ix < (unsigned int)ctx->src->width; ix++)
     {
-        oxe += ctx->bm->width;
+        oxe += h_o_val;
         /* end of current area has been reached */
         /* fill buffer if needed */
         FILL_BUF(part,ctx->store_part,ctx->args);
 #ifdef HAVE_LCD_COLOR
-        if (oxe >= (unsigned int)ctx->src->width)
+        if (oxe >= h_i_val)
         {
             /* "reset" error, which now represents partial coverage of next
                pixel by the next area
             */
-            oxe -= ctx->src->width;
+            oxe -= h_i_val;
 
+#if defined(CPU_COLDFIRE)
+/* Coldfire EMAC math */
             /* add saved partial pixel from start of area */
-            rgbvalacc.r = rgbvalacc.r * ctx->bm->width + rgbvaltmp.r * mul;
-            rgbvalacc.g = rgbvalacc.g * ctx->bm->width + rgbvaltmp.g * mul;
-            rgbvalacc.b = rgbvalacc.b * ctx->bm->width + rgbvaltmp.b * mul;
+            MAC(rgbvalacc.r, h_o_val, 0);
+            MAC(rgbvalacc.g, h_o_val, 1);
+            MAC(rgbvalacc.b, h_o_val, 2);
+            MAC(rgbvaltmp.r, mul, 0);
+            MAC(rgbvaltmp.g, mul, 1);
+            MAC(rgbvaltmp.b, mul, 2);
+            /* get new pixel , then add its partial coverage to this area */
+            mul = h_o_val - oxe;
+            rgbvaltmp.r = part->buf->red;
+            rgbvaltmp.g = part->buf->green;
+            rgbvaltmp.b = part->buf->blue;
+            MAC(rgbvaltmp.r, mul, 0);
+            MAC(rgbvaltmp.g, mul, 1);
+            MAC(rgbvaltmp.b, mul, 2);
+            MAC_OUT(rgbvalacc.r, 0);
+            MAC_OUT(rgbvalacc.g, 1);
+            MAC_OUT(rgbvalacc.b, 2);
+#else
+/* generic C math */
+            /* add saved partial pixel from start of area */
+            rgbvalacc.r = rgbvalacc.r * h_o_val + rgbvaltmp.r * mul;
+            rgbvalacc.g = rgbvalacc.g * h_o_val + rgbvaltmp.g * mul;
+            rgbvalacc.b = rgbvalacc.b * h_o_val + rgbvaltmp.b * mul;
 
             /* get new pixel , then add its partial coverage to this area */
             rgbvaltmp.r = part->buf->red;
             rgbvaltmp.g = part->buf->green;
             rgbvaltmp.b = part->buf->blue;
-            mul = ctx->bm->width - oxe;
+            mul = h_o_val - oxe;
             rgbvalacc.r += rgbvaltmp.r * mul;
             rgbvalacc.g += rgbvaltmp.g * mul;
             rgbvalacc.b += rgbvaltmp.b * mul;
+#endif /* CPU */
+            rgbvalacc.r = (rgbvalacc.r + (1 << 21)) >> 22;
+            rgbvalacc.g = (rgbvalacc.g + (1 << 21)) >> 22;
+            rgbvalacc.b = (rgbvalacc.b + (1 << 21)) >> 22;
             /* store or accumulate to output row */
             if (accum)
             {
@@ -200,7 +251,7 @@ static bool scale_h_area(void *out_line_ptr,
             rgbvalacc.r = 0;
             rgbvalacc.g = 0;
             rgbvalacc.b = 0;
-            mul = ctx->bm->width - mul;
+            mul = oxe;
             ox += 1;
         /* inside an area */
         } else {
@@ -210,21 +261,45 @@ static bool scale_h_area(void *out_line_ptr,
             rgbvalacc.b += part->buf->blue;
         }
 #else
-        if (oxe >= (unsigned int)ctx->src->width)
+        if (oxe >= h_i_val)
         {
             /* "reset" error, which now represents partial coverage of next
                pixel by the next area
             */
-            oxe -= ctx->src->width;
-
+            oxe -= h_i_val;
+#if defined(CPU_COLDFIRE)
+/* Coldfire EMAC math */
             /* add saved partial pixel from start of area */
-            acc = MULUQ(acc, ctx->bm->width) + MULUQ(tmp, mul);
+            MAC(acc, h_o_val, 0);
+            MAC(tmp, mul, 0);
+            /* get new pixel , then add its partial coverage to this area */
+            tmp = *(part->buf);
+            mul = h_o_val - oxe;
+            MAC(tmp, mul, 0);
+            MAC_OUT(acc, 0);
+#elif defined(CPU_SH)
+/* SH-1 16x16->32 math */
+            /* add saved partial pixel from start of area */
+            acc = mul_u16_u16(acc, h_o_val) + mul_u16_u16(tmp, mul);
 
             /* get new pixel , then add its partial coverage to this area */
             tmp = *(part->buf);
-            mul = ctx->bm->width - oxe;
-            acc += MULUQ(tmp, mul);
+            mul = h_o_val - oxe;
+            acc += mul_u16_u16(tmp, mul);
+#else
+/* generic C math */
+            /* add saved partial pixel from start of area */
+            acc = (acc * h_o_val) + (tmp * mul);
+
+            /* get new pixel , then add its partial coverage to this area */
+            tmp = *(part->buf);
+            mul = h_o_val - oxe;
+            acc += tmp * mul;
+#endif /* CPU */
+#if !(defined(CPU_SH) || defined(TEST_SH_MATH))
             /* round, divide, and either store or accumulate to output row */
+            acc = (acc + (1 << 21)) >> 22;
+#endif
             if (accum)
             {
                 acc += out_line[ox];
@@ -232,7 +307,7 @@ static bool scale_h_area(void *out_line_ptr,
             out_line[ox] = acc;
             /* reset accumulator */
             acc = 0;
-            mul = ctx->bm->width - mul;
+            mul = oxe;
             ox += 1;
         /* inside an area */
         } else {
@@ -249,56 +324,56 @@ static bool scale_h_area(void *out_line_ptr,
 /* vertical area average scaler */
 static inline bool scale_v_area(struct rowset *rset, struct scaler_context *ctx)
 {
-    uint32_t mul, x, oy, iy, oye;
+    uint32_t mul, oy, iy, oye;
+#if defined(CPU_SH) || defined (TEST_SH_MATH)
+    const uint32_t v_i_val = ctx->src->height,
+                   v_o_val = ctx->bm->height;
+#else
+    const uint32_t v_i_val = ctx->v_i_val,
+                   v_o_val = ctx->v_o_val;
+#endif
 
     /* Set up rounding and scale factors */
-    ctx->divisor *= ctx->src->height;
-    ctx->round = ctx->divisor >> 1;
-    ctx->divisor = 1 + (-((ctx->divisor + 1) >> 1)) / ctx->divisor;
     mul = 0;
     oy = rset->rowstart;
     oye = 0;
 #ifdef HAVE_LCD_COLOR
     uint32_t *rowacc = (uint32_t *) ctx->buf,
-             *rowtmp = rowacc + 3 * ctx->bm->width;
+             *rowtmp = rowacc + 3 * ctx->bm->width,
+             *rowacc_px, *rowtmp_px;
     memset((void *)ctx->buf, 0, ctx->bm->width * 2 * sizeof(struct uint32_rgb));
 #else
     uint32_t *rowacc = (uint32_t *) ctx->buf,
-             *rowtmp = rowacc + ctx->bm->width;
+             *rowtmp = rowacc + ctx->bm->width,
+             *rowacc_px, *rowtmp_px;
     memset((void *)ctx->buf, 0, ctx->bm->width * 2 * sizeof(uint32_t));
 #endif
     SDEBUGF("scale_v_area\n");
     /* zero the accumulator and temp rows */
     for (iy = 0; iy < (unsigned int)ctx->src->height; iy++)
     {
-        oye += ctx->bm->height;
+        oye += v_o_val;
         /* end of current area has been reached */
-        if (oye >= (unsigned int)ctx->src->height)
+        if (oye >= v_i_val)
         {
             /* "reset" error, which now represents partial coverage of the next
                row by the next area
             */
-            oye -= ctx->src->height;
+            oye -= v_i_val;
             /* add stored partial row to accumulator */
-#ifdef HAVE_LCD_COLOR
-            for (x = 0; x < 3 * (unsigned int)ctx->bm->width; x++)
-#else
-            for (x = 0; x < (unsigned int)ctx->bm->width; x++)
-#endif
-                rowacc[x] = rowacc[x] * ctx->bm->height + mul * rowtmp[x];
+            for(rowacc_px = rowacc, rowtmp_px = rowtmp; rowacc_px != rowtmp;
+                rowacc_px++, rowtmp_px++)
+                *rowacc_px = *rowacc_px * v_o_val + *rowtmp_px * mul;
             /* store new scaled row in temp row */
             if(!ctx->h_scaler(rowtmp, ctx, false))
                 return false;
             /* add partial coverage by new row to this area, then round and
                scale to final value
             */
-            mul = ctx->bm->height - oye;
-#ifdef HAVE_LCD_COLOR
-            for (x = 0; x < 3 * (unsigned int)ctx->bm->width; x++)
-#else
-            for (x = 0; x < (unsigned int)ctx->bm->width; x++)
-#endif
-                rowacc[x] += mul * rowtmp[x];
+            mul = v_o_val - oye;
+            for(rowacc_px = rowacc, rowtmp_px = rowtmp; rowacc_px != rowtmp;
+                rowacc_px++, rowtmp_px++)
+                *rowacc_px += mul * *rowtmp_px;
             ctx->output_row(oy, (void*)rowacc, ctx);
             /* clear accumulator row, store partial coverage for next row */
 #ifdef HAVE_LCD_COLOR
@@ -319,20 +394,18 @@ static inline bool scale_v_area(struct rowset *rset, struct scaler_context *ctx)
 }
 
 #ifdef HAVE_UPSCALER
-/* Set up rounding and scale factors for the horizontal scaler. The divisor
-   is bm->width - 1, so that the first and last pixels in the row align
-   exactly between input and output
-*/
-static inline void scale_h_linear_setup(struct scaler_context *ctx)
-{
-    ctx->divisor = ctx->bm->width - 1;
-}
-
 /* horizontal linear scaler */
 static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
                            bool accum)
 {
     unsigned int ix, ox, ixe;
+#if defined(CPU_SH) || defined (TEST_SH_MATH)
+    const uint32_t h_i_val = ctx->src->width - 1,
+                   h_o_val = ctx->bm->width - 1;
+#else
+    const uint32_t h_i_val = ctx->h_i_val,
+                   h_o_val = ctx->h_o_val;
+#endif
     /* type x = x is an ugly hack for hiding an unitialized data warning. The
        values are conditionally initialized before use, but other values are
        set such that this will occur before these are used.
@@ -348,27 +421,35 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
     FILL_BUF_INIT(part,ctx->store_part,ctx->args);
     ix = 0;
     /* The error is set so that values are initialized on the first pass. */
-    ixe = ctx->bm->width - 1;
+    ixe = h_o_val;
     /* give other tasks a chance to run */
     yield();
     for (ox = 0; ox < (uint32_t)ctx->bm->width; ox++)
     {
 #ifdef HAVE_LCD_COLOR
-        if (ixe >= ((uint32_t)ctx->bm->width - 1))
+        if (ixe >= h_o_val)
         {
             /* Store the new "current" pixel value in rgbval, and the color
                step value in rgbinc.
             */
-            ixe -= (ctx->bm->width - 1);
+            ixe -= h_o_val;
             rgbinc.r = -(part->buf->red);
             rgbinc.g = -(part->buf->green);
             rgbinc.b = -(part->buf->blue);
-            rgbval.r = (part->buf->red) * (ctx->bm->width - 1);
-            rgbval.g = (part->buf->green) * (ctx->bm->width - 1);
-            rgbval.b = (part->buf->blue) * (ctx->bm->width - 1);
+#if defined(CPU_COLDFIRE)
+/* Coldfire EMAC math */
+            MAC(part->buf->red, h_o_val, 0);
+            MAC(part->buf->green, h_o_val, 1);
+            MAC(part->buf->blue, h_o_val, 2);
+#else
+/* generic C math */
+            rgbval.r = (part->buf->red) * h_o_val;
+            rgbval.g = (part->buf->green) * h_o_val;
+            rgbval.b = (part->buf->blue) * h_o_val;
+#endif /* CPU */
             ix += 1;
             /* If this wasn't the last pixel, add the next one to rgbinc. */
-            if (ix < (uint32_t)ctx->src->width) {
+            if (LIKELY(ix < (uint32_t)ctx->src->width)) {
                 part->buf++;
                 part->len--;
                 /* Fetch new pixels if needed */
@@ -379,14 +460,28 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
                 /* Add a partial step to rgbval, in this pixel isn't precisely
                    aligned with the new source pixel
                 */
+#if defined(CPU_COLDFIRE)
+/* Coldfire EMAC math */
+                MAC(rgbinc.r, ixe, 0);
+                MAC(rgbinc.g, ixe, 1);
+                MAC(rgbinc.b, ixe, 2);
+#else
+/* generic C math */
                 rgbval.r += rgbinc.r * ixe;
                 rgbval.g += rgbinc.g * ixe;
                 rgbval.b += rgbinc.b * ixe;
+#endif
             }
-            /* Now multiple the color increment to its proper value */
-            rgbinc.r *= ctx->src->width - 1;
-            rgbinc.g *= ctx->src->width - 1;
-            rgbinc.b *= ctx->src->width - 1;
+#if defined(CPU_COLDFIRE)
+/* get final EMAC result out of ACC registers */
+            MAC_OUT(rgbval.r, 0);
+            MAC_OUT(rgbval.g, 1);
+            MAC_OUT(rgbval.b, 2);
+#endif
+            /* Now multiply the color increment to its proper value */
+            rgbinc.r *= h_i_val;
+            rgbinc.g *= h_i_val;
+            rgbinc.b *= h_i_val;
         } else {
             rgbval.r += rgbinc.r;
             rgbval.g += rgbinc.g;
@@ -395,27 +490,36 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
         /* round and scale values, and accumulate or store to output */
         if (accum)
         {
-            out_line[ox].r += rgbval.r;
-            out_line[ox].g += rgbval.g;
-            out_line[ox].b += rgbval.b;
+            out_line[ox].r += (rgbval.r + (1 << 21)) >> 22;
+            out_line[ox].g += (rgbval.g + (1 << 21)) >> 22;
+            out_line[ox].b += (rgbval.b + (1 << 21)) >> 22;
         } else {
-            out_line[ox].r = rgbval.r;
-            out_line[ox].g = rgbval.g;
-            out_line[ox].b = rgbval.b;
+            out_line[ox].r = (rgbval.r + (1 << 21)) >> 22;
+            out_line[ox].g = (rgbval.g + (1 << 21)) >> 22;
+            out_line[ox].b = (rgbval.b + (1 << 21)) >> 22;
         }
 #else
-        if (ixe >= ((uint32_t)ctx->bm->width - 1))
+        if (ixe >= h_o_val)
         {
             /* Store the new "current" pixel value in rgbval, and the color
                step value in rgbinc.
             */
-            ixe -= (ctx->bm->width - 1);
+            ixe -= h_o_val;
             val = *(part->buf);
             inc = -val;
-            val = MULUQ(val, ctx->bm->width - 1);
+#if defined(CPU_COLDFIRE)
+/* Coldfire EMAC math */
+            MAC(val, h_o_val, 0);
+#elif defined(CPU_SH)
+/* SH-1 16x16->32 math */
+            val = mul_u16_u16(val, h_o_val);
+#else
+/* generic C math */
+            val = val * h_o_val;
+#endif
             ix += 1;
             /* If this wasn't the last pixel, add the next one to rgbinc. */
-            if (ix < (uint32_t)ctx->src->width) {
+            if (LIKELY(ix < (uint32_t)ctx->src->width)) {
                 part->buf++;
                 part->len--;
                 /* Fetch new pixels if needed */
@@ -424,12 +528,40 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
                 /* Add a partial step to rgbval, in this pixel isn't precisely
                    aligned with the new source pixel
                 */
-                val += MULQ(inc, ixe);
+#if defined(CPU_COLDFIRE)
+/* Coldfire EMAC math */
+                MAC(inc, ixe, 0);
+#elif defined(CPU_SH)
+/* SH-1 16x16->32 math */
+                val += mul_s16_s16(inc, ixe);
+#else
+/* generic C math */
+                val += inc * ixe;
+#endif
             }
+#if defined(CPU_COLDFIRE)
+/* get final EMAC result out of ACC register */
+            MAC_OUT(val, 0);
+#endif
             /* Now multiply the color increment to its proper value */
-            inc = MULQ(inc, ctx->src->width - 1);
+#if defined(CPU_SH)
+/* SH-1 16x16->32 math */
+            inc = mul_s16_s16(inc, h_i_val);
+#else
+/* generic C math */
+            inc *= h_i_val;
+#endif
         } else
             val += inc;
+#if !(defined(CPU_SH) || defined(TEST_SH_MATH))
+        /* round and scale values, and accumulate or store to output */
+        if (accum)
+        {
+            out_line[ox] += (val + (1 << 21)) >> 22;
+        } else {
+            out_line[ox] = (val + (1 << 21)) >> 22;
+        }
+#else
         /* round and scale values, and accumulate or store to output */
         if (accum)
         {
@@ -438,7 +570,8 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
             out_line[ox] = val;
         }
 #endif
-        ixe += ctx->src->width - 1;
+#endif
+        ixe += h_i_val;
     }
     return true;
 }
@@ -447,71 +580,66 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
 static inline bool scale_v_linear(struct rowset *rset,
                                   struct scaler_context *ctx)
 {
-    uint32_t mul, x, iy, iye;
+    uint32_t mul, iy, iye;
     int32_t oy;
-    /* Set up scale and rounding factors, the divisor is bm->height - 1 */
-    ctx->divisor *= (ctx->bm->height - 1);
-    ctx->round = ctx->divisor >> 1;
-    ctx->divisor = 1 + (-((ctx->divisor + 1) >> 1)) / ctx->divisor;
-    /* Set up our two temp buffers. The names are generic because they'll be
-       swapped each time a new input row is read
+#if defined(CPU_SH) || defined (TEST_SH_MATH)
+    const uint32_t v_i_val = ctx->src->height - 1,
+                   v_o_val = ctx->bm->height - 1;
+#else
+    const uint32_t v_i_val = ctx->v_i_val,
+                   v_o_val = ctx->v_o_val;
+#endif
+    /* Set up our buffers, to store the increment and current value for each
+       column, and one temp buffer used to read in new rows.
     */
 #ifdef HAVE_LCD_COLOR
     uint32_t *rowinc = (uint32_t *)(ctx->buf),
              *rowval = rowinc + 3 * ctx->bm->width,
-             *rowtmp = rowval + 3 * ctx->bm->width;
+             *rowtmp = rowval + 3 * ctx->bm->width,
 #else
     uint32_t *rowinc = (uint32_t *)(ctx->buf),
              *rowval = rowinc + ctx->bm->width,
-             *rowtmp = rowval + ctx->bm->width;
+             *rowtmp = rowval + ctx->bm->width,
 #endif
+             *rowinc_px, *rowval_px, *rowtmp_px;
 
     SDEBUGF("scale_v_linear\n");
     mul = 0;
     iy = 0;
-    iye = ctx->bm->height - 1;
+    iye = v_o_val;
     /* get first scaled row in rowtmp */
     if(!ctx->h_scaler((void*)rowtmp, ctx, false))
         return false;
     for (oy = rset->rowstart; oy != rset->rowstop; oy += rset->rowstep)
     {
-        if (iye >= (uint32_t)ctx->bm->height - 1)
+        if (iye >= v_o_val)
         {
-            iye -= ctx->bm->height - 1;
+            iye -= v_o_val;
             iy += 1;
-#ifdef HAVE_LCD_COLOR
-            for (x = 0; x < 3 * (uint32_t)ctx->bm->width; x++)
-#else
-            for (x = 0; x < (uint32_t)ctx->bm->width; x++)
-#endif
+            for(rowinc_px = rowinc, rowtmp_px = rowtmp, rowval_px = rowval;
+                rowinc_px < rowval; rowinc_px++, rowtmp_px++, rowval_px++)
             {
-                rowinc[x] = -rowtmp[x];
-                rowval[x] = rowtmp[x] * (ctx->bm->height - 1);
+                *rowinc_px = -*rowtmp_px;
+                *rowval_px = *rowtmp_px * v_o_val;
             }
             if (iy < (uint32_t)ctx->src->height)
             {
                 if (!ctx->h_scaler((void*)rowtmp, ctx, false))
                     return false;
-#ifdef HAVE_LCD_COLOR
-                for (x = 0; x < 3 * (uint32_t)ctx->bm->width; x++)
-#else
-                for (x = 0; x < (uint32_t)ctx->bm->width; x++)
-#endif
+                for(rowinc_px = rowinc, rowtmp_px = rowtmp, rowval_px = rowval;
+                    rowinc_px < rowval; rowinc_px++, rowtmp_px++, rowval_px++)
                 {
-                    rowinc[x] += rowtmp[x];
-                    rowval[x] += rowinc[x] * iye;
-                    rowinc[x] *= ctx->src->height - 1;
+                    *rowinc_px += *rowtmp_px;
+                    *rowval_px += *rowinc_px * iye;
+                    *rowinc_px *= v_i_val;
                 }
             }
         } else
-#ifdef HAVE_LCD_COLOR
-            for (x = 0; x < 3 * (uint32_t)ctx->bm->width; x++)
-#else
-            for (x = 0; x < (uint32_t)ctx->bm->width; x++)
-#endif
-                    rowval[x] += rowinc[x];
+            for(rowinc_px = rowinc, rowval_px = rowval; rowinc_px < rowval;
+                rowinc_px++, rowval_px++)
+                *rowval_px += *rowinc_px;
         ctx->output_row(oy, (void*)rowval, ctx);
-        iye += ctx->src->height - 1;
+        iye += v_i_val;
     }
     return true;
 }
@@ -533,9 +661,9 @@ static void output_row_32_native_fromyuv(uint32_t row, void * row_in,
     for (col = 0; col < ctx->bm->width; col++) {
         if (ctx->dither)
             delta = DITHERXDY(col,dy);
-        y = SC_MUL(qp->b + ctx->round, ctx->divisor);
-        u = SC_MUL(qp->g + ctx->round, ctx->divisor);
-        v = SC_MUL(qp->r + ctx->round, ctx->divisor);
+        y = SC_OUT(qp->b, ctx);
+        u = SC_OUT(qp->g, ctx);
+        v = SC_OUT(qp->r, ctx);
         qp++;
         yuv_to_rgb(y, u, v, &r, &g, &b);
         r = (31 * r + (r >> 3) + delta) >> 8;
@@ -571,7 +699,7 @@ static void output_row_32_native(uint32_t row, void * row_in,
                 for (col = 0; col < ctx->bm->width; col++) {
                     if (ctx->dither)
                         delta = DITHERXDY(col,dy);
-                    bright = SC_MUL((*qp++) + ctx->round,ctx->divisor);
+                    bright = SC_OUT(*qp++, ctx);
                     bright = (3 * bright + (bright >> 6) + delta) >> 8;
                     data |= (~bright & 3) << shift;
                     shift -= 2;
@@ -594,7 +722,7 @@ static void output_row_32_native(uint32_t row, void * row_in,
                 for (col = 0; col < ctx->bm->width; col++) {
                     if (ctx->dither)
                         delta = DITHERXDY(col,dy);
-                    bright = SC_MUL((*qp++) + ctx->round, ctx->divisor);
+                    bright = SC_OUT(*qp++, ctx);
                     bright = (3 * bright + (bright >> 6) + delta) >> 8;
                     *dest++ |= (~bright & 3) << shift;
                 }
@@ -609,7 +737,7 @@ static void output_row_32_native(uint32_t row, void * row_in,
                 for (col = 0; col < ctx->bm->width; col++) {
                     if (ctx->dither)
                         delta = DITHERXDY(col,dy);
-                    bright = SC_MUL((*qp++) + ctx->round, ctx->divisor);
+                    bright = SC_OUT(*qp++, ctx);
                     bright = (3 * bright + (bright >> 6) + delta) >> 8;
                     *dest++ |= vi_pattern[bright] << shift;
                 }
@@ -625,9 +753,9 @@ static void output_row_32_native(uint32_t row, void * row_in,
                     if (ctx->dither)
                         delta = DITHERXDY(col,dy);
                     q0 = *qp++;
-                    r = SC_MUL(q0.r + ctx->round, ctx->divisor);
-                    g = SC_MUL(q0.g + ctx->round, ctx->divisor);
-                    b = SC_MUL(q0.b + ctx->round, ctx->divisor);
+                    r = SC_OUT(q0.r, ctx);
+                    g = SC_OUT(q0.g, ctx);
+                    b = SC_OUT(q0.b, ctx);
                     r = (31 * r + (r >> 3) + delta) >> 8;
                     g = (63 * g + (g >> 2) + delta) >> 8;
                     b = (31 * b + (b >> 3) + delta) >> 8;
@@ -664,13 +792,10 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
                    struct img_part* (*store_part)(void *args),
                    void *args)
 {
-
-#ifdef HAVE_UPSCALER
     const int sw = src->width;
     const int sh = src->height;
     const int dw = bm->width;
     const int dh = bm->height;
-#endif
     int ret;
 #ifdef HAVE_LCD_COLOR
     unsigned int needed = sizeof(struct uint32_rgb) * 3 * bm->width;
@@ -721,6 +846,9 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     ctx.bm = bm;
     ctx.src = src;
     ctx.dither = dither;
+#if defined(CPU_SH) || defined (TEST_SH_MATH)
+    uint32_t div;
+#endif
 #if !defined(PLUGIN)
 #if defined(HAVE_LCD_COLOR) && defined(HAVE_JPEG)
     ctx.output_row = format_index ? output_row_32_native_fromyuv
@@ -740,23 +868,56 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     {
 #endif
         ctx.h_scaler = scale_h_area;
-        scale_h_area_setup(&ctx);
+#if defined(CPU_SH) || defined (TEST_SH_MATH)
+        div = sw;
+#else
+        uint32_t h_div = (1U << 24) / sw;
+        ctx.h_i_val = sw * h_div;
+        ctx.h_o_val = dw * h_div;
+#endif
 #ifdef HAVE_UPSCALER
     } else {
         ctx.h_scaler = scale_h_linear;
-        scale_h_linear_setup(&ctx);
+#if defined(CPU_SH) || defined (TEST_SH_MATH)
+        div = dw - 1;
+#else
+        uint32_t h_div = (1U << 24) / (dw - 1);
+        ctx.h_i_val = (sw - 1) * h_div;
+        ctx.h_o_val = (dw - 1) * h_div;
+#endif
     }
 #endif
-    SC_MUL_INIT;
+#ifdef CPU_COLDFIRE
+    coldfire_set_macsr(EMAC_UNSIGNED);
+#endif
 #ifdef HAVE_UPSCALER
     if (sh > dh)
 #endif
+    {
+#if defined(CPU_SH) || defined (TEST_SH_MATH)
+        div *= sh;
+        ctx.recip = ((uint32_t)(-div)) / div + 1;
+#else
+        uint32_t v_div = (1U << 22) / sh;
+        ctx.v_i_val = sh * v_div;
+        ctx.v_o_val = dh * v_div;
+#endif
         ret = scale_v_area(rset, &ctx);
+    }
 #ifdef HAVE_UPSCALER
     else
-        ret = scale_v_linear(rset, &ctx);
+    {
+#if defined(CPU_SH) || defined (TEST_SH_MATH)
+        div *= dh - 1;
+        ctx.recip = ((uint32_t)(-div)) / div + 1;
+#else
+        uint32_t v_div = (1U << 22) / dh;
+        ctx.v_i_val = (sh - 1) * v_div;
+        ctx.v_o_val = (dh - 1) * v_div;
 #endif
-    SC_MUL_END;
+        ret = scale_v_linear(rset, &ctx);
+    }
+#endif
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     cpu_boost(false);
 #endif

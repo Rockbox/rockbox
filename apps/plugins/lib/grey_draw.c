@@ -733,7 +733,7 @@ static void output_row_grey_32(uint32_t row, void * row_in,
     uint32_t *qp = (uint32_t*)row_in;
     uint8_t *dest = (uint8_t*)ctx->bm->data + ctx->bm->width * row;
     for (col = 0; col < ctx->bm->width; col++)
-        *dest++ = SC_MUL((*qp++) + ctx->round,ctx->divisor);
+        *dest++ = SC_OUT(*qp++, ctx);
 }
 
 static unsigned int get_size_grey(struct bitmap *bm)

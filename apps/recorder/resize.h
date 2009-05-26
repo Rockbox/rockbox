@@ -43,67 +43,61 @@
 #define MAX_SC_STACK_ALLOC 0
 #define HAVE_UPSCALER 1
 
-#if defined(CPU_COLDFIRE)
-#define SC_MUL_INIT \
-    unsigned long macsr_st = coldfire_get_macsr(); \
-    coldfire_set_macsr(EMAC_UNSIGNED);
-#define SC_MUL_END coldfire_set_macsr(macsr_st);
-#define SC_MUL(x, y) \
-({ \
-    unsigned long t; \
-    asm ("mac.l    %[a], %[b], %%acc0\n\t" \
-         "move.l %%accext01, %[t]\n\t" \
-         "move.l #0, %%acc0\n\t" \
-         : [t] "=r" (t) : [a] "r" (x), [b] "r" (y)); \
-    t; \
-})
-#elif (CONFIG_CPU == SH7034)
-/* multiply two unsigned 32 bit values and return the top 32 bit
- * of the 64 bit result */
-static inline unsigned sc_mul32(unsigned a, unsigned b)
+#if defined(CPU_SH)
+/* perform 32x32->40 unsigned multiply, round off and return top 8 bits */
+static inline uint32_t sc_mul_u32_rnd(uint32_t m, uint32_t n)
 {
     unsigned r, t1, t2, t3;
-
+    unsigned h = 1 << 15;
+    /* notation:
+       m = ab, n = cd
+       final result is (((a *c) << 32) + ((b * c + a * d) << 16) + b * d +
+            (1 << 31)) >> 32
+    */
     asm (
-        "swap.w  %[a], %[t1]     \n" /* t1 = ba */
-        "mulu    %[t1], %[b]     \n" /* a * d */
-        "swap.w  %[b], %[t3]     \n" /* t3 = dc */
-        "sts     macl, %[t2]     \n" /* t2 = a * d */
-        "mulu    %[t1], %[t3]    \n" /* a * c */
-        "sts     macl, %[r]      \n" /* hi = a * c */
-        "mulu    %[a], %[t3]     \n" /* b * c */
-        "clrt                    \n"
-        "sts     macl, %[t3]     \n" /* t3 = b * c */
-        "addc    %[t2], %[t3]    \n" /* t3 += t2, carry -> t2 */
-        "movt    %[t2]           \n"
-        "mulu    %[a], %[b]      \n" /* b * d */
-        "mov     %[t3], %[t1]    \n" /* t1t3 = t2t3 << 16 */
-        "xtrct   %[t2], %[t1]    \n"
-        "shll16  %[t3]           \n"
-        "sts     macl, %[t2]     \n" /* lo = b * d */
-        "clrt                    \n" /* hi.lo += t1t3 */
-        "addc    %[t3], %[t2]    \n"
-        "addc    %[t1], %[r]     \n"
+        "swap.w  %[m], %[t1]\n\t" /* t1 = ba */
+        "mulu    %[m], %[n]\n\t" /* b * d */
+        "swap.w  %[n], %[t3]\n\t" /* t3 = dc */
+        "sts     macl, %[r]\n\t" /* r = b * d */
+        "mulu    %[m], %[t3]\n\t" /* b * c */
+        "shlr16  %[r]\n\t"
+        "sts     macl, %[t2]\n\t" /* t2 = b * c */
+        "mulu    %[t1], %[t3]\n\t" /* a * c */
+        "add     %[t2], %[r]\n\t"
+        "sts     macl, %[t3]\n\t" /* t3 = a * c */
+        "mulu    %[t1], %[n]\n\t" /* a * d */
+        "shll16  %[t3]\n\t"
+        "sts     macl, %[t2]\n\t" /* t2 = a * d */
+        "add     %[t2], %[r]\n\t"
+        "add     %[t3], %[r]\n\t" /* r = ((b * d) >> 16) + (b * c + a * d) +
+                                         ((a * c) << 16) */
+        "add     %[h], %[r]\n\t" /* round result */
+        "shlr16  %[r]\n\t" /* truncate result */
         : /* outputs */
         [r] "=&r"(r),
         [t1]"=&r"(t1),
         [t2]"=&r"(t2),
         [t3]"=&r"(t3)
         : /* inputs */
-        [a] "r"  (a),
-        [b] "r"  (b)
+        [h] "r"  (h),
+        [m] "r"  (m),
+        [n] "r"  (n)
     );
     return r;
 }
-#define SC_MUL(x, y) sc_mul32(x, y)
-#define SC_MUL_INIT
-#define SC_MUL_END
+#elif defined(TEST_SH_MATH)
+static inline uint32_t sc_mul_u32_rnd(uint32_t op1, uint32_t op2)
+{
+    uint64_t tmp = (uint64_t)op1 * op2;
+    tmp += 1LU << 31;
+    tmp >>= 32;
+    return tmp;
+}   
+#else
+#define SC_OUT(n, c) (((n) + (1 << 23)) >> 24)
 #endif
-
-#ifndef SC_MUL
-#define SC_MUL(x, y) ((x) * (uint64_t)(y) >> 32)
-#define SC_MUL_INIT
-#define SC_MUL_END
+#ifndef SC_OUT
+#define SC_OUT(n, c) (sc_mul_u32_rnd(n, (c)->recip))
 #endif
 
 struct img_part {
@@ -130,8 +124,14 @@ struct uint32_rgb {
    horizontal scaler, and row output
 */
 struct scaler_context {
-    uint32_t divisor;
-    uint32_t round;
+#if defined(CPU_SH) || defined(TEST_SH_MATH)
+    uint32_t recip;
+#else
+    uint32_t h_i_val;
+    uint32_t h_o_val;
+    uint32_t v_i_val;
+    uint32_t v_o_val;
+#endif
     struct bitmap *bm;
     struct dim *src;
     unsigned char *buf;

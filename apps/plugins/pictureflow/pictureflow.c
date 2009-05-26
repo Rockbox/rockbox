@@ -592,24 +592,11 @@ static inline PFreal fcos(int iangle)
     return fsin(iangle + (IANGLE_MAX >> 2));
 }
 
-static inline uint32_t div255(uint32_t val)
+static inline unsigned scale_val(unsigned val, unsigned bits)
 {
-    return ((((val >> 8) + val) >> 8) + val) >> 8;
+    val = val * ((1 << bits) - 1);
+    return ((val >> 8) + val + 128) >> 8;
 }
-
-#define SCALE_VAL(val,out) div255((val) * (out) + 127)
-#define SCALE_VAL32(val, out) \
-({ \
-    uint32_t val__ = (val) * (out); \
-    val__ = ((((val__ >> 8) + val__) >> 8) + val__ + 128) >> 8; \
-    val__; \
-})
-#define SCALE_VAL8(val, out) \
-({ \
-    unsigned val__ = (val) * (out); \
-    val__ = ((val__ >> 8) + val__ + 128) >> 8; \
-    val__; \
-})
 
 static void output_row_8_transposed(uint32_t row, void * row_in,
                                        struct scaler_context *ctx)
@@ -625,9 +612,9 @@ static void output_row_8_transposed(uint32_t row, void * row_in,
     unsigned r, g, b;
     for (; dest < end; dest += ctx->bm->height)
     {
-        r = SCALE_VAL8(qp->red, 31);
-        g = SCALE_VAL8(qp->green, 63);
-        b = SCALE_VAL8((qp++)->blue, 31);
+        r = scale_val(qp->red, 5);
+        g = scale_val(qp->green, 6);
+        b = scale_val((qp++)->blue, 5);
         *dest = LCD_RGBPACK_LCD(r,g,b);
     }
 #endif
@@ -641,19 +628,15 @@ static void output_row_32_transposed(uint32_t row, void * row_in,
 #ifdef USEGSLIB
     uint32_t *qp = (uint32_t*)row_in;
     for (; dest < end; dest += ctx->bm->height)
-        *dest = SC_MUL((*qp++) + ctx->round, ctx->divisor);
+        *dest = SC_OUT(*qp++, ctx);
 #else
     struct uint32_rgb *qp = (struct uint32_rgb*)row_in;
-    uint32_t rb_mul = SCALE_VAL32(ctx->divisor, 31),
-             rb_rnd = SCALE_VAL32(ctx->round, 31),
-             g_mul = SCALE_VAL32(ctx->divisor, 63),
-             g_rnd = SCALE_VAL32(ctx->round, 63);
     int r, g, b;
     for (; dest < end; dest += ctx->bm->height)
     {
-        r = SC_MUL(qp->r + rb_rnd, rb_mul);
-        g = SC_MUL(qp->g + g_rnd, g_mul);
-        b = SC_MUL(qp->b + rb_rnd, rb_mul);
+        r = scale_val(SC_OUT(qp->r, ctx), 5);
+        g = scale_val(SC_OUT(qp->g, ctx), 6);
+        b = scale_val(SC_OUT(qp->b, ctx), 5);
         qp++;
         *dest = LCD_RGBPACK_LCD(r,g,b);
     }
@@ -670,14 +653,14 @@ static void output_row_32_transposed_fromyuv(uint32_t row, void * row_in,
     for (; dest < end; dest += ctx->bm->height)
     {
         unsigned r, g, b, y, u, v;
-        y = SC_MUL(qp->b + ctx->round, ctx->divisor);
-        u = SC_MUL(qp->g + ctx->round, ctx->divisor);
-        v = SC_MUL(qp->r + ctx->round, ctx->divisor);
+        y = SC_OUT(qp->b, ctx);
+        u = SC_OUT(qp->g, ctx);
+        v = SC_OUT(qp->r, ctx);
         qp++;
         yuv_to_rgb(y, u, v, &r, &g, &b);
-        r = (31 * r + (r >> 3) + 127) >> 8;
-        g = (63 * g + (g >> 2) + 127) >> 8;
-        b = (31 * b + (b >> 3) + 127) >> 8;
+        r = scale_val(r, 5);
+        g = scale_val(g, 6);
+        b = scale_val(b, 5);
         *dest = LCD_RGBPACK_LCD(r, g, b);
     }
 }

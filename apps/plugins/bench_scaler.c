@@ -49,8 +49,8 @@ static void output_row_null(uint32_t row, void * row_in,
 #else
     uint32_t *lim = in + ctx->bm->width;
 #endif
-    for (; in < lim; in++)
-        output = SC_MUL(*in + ctx->round, ctx->divisor);
+    while (in < lim)
+        output = SC_OUT(*in++, ctx);
     return;
 }
 
