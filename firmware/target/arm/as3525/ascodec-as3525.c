@@ -78,7 +78,7 @@ void ascodec_init(void)
     CGU_PERI |= CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE;
 
     /* prescaler for i2c clock */
-    prescaler = CLK_DIV(AS3525_PCLK_FREQ, AS3525_I2C_FREQ);
+    prescaler = AS3525_I2C_PRESCALER;
     I2C2_CPSR0 = prescaler & 0xFF;          /* 8 lsb */
     I2C2_CPSR1 = (prescaler >> 8) & 0x3;    /* 2 msb */
     

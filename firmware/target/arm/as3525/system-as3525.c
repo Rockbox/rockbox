@@ -229,29 +229,25 @@ void system_init(void)
     CGU_PROC = 0;           /* fclk 24 MHz */
     CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
 
-    asm volatile(
-        "mrc p15, 0, r0, c1, c0  \n"
-        "orr r0, r0, #0xC0000000 \n" /* asynchronous clocking */
-        "mcr p15, 0, r0, c1, c0  \n"
-        : : : "r0" );
-
     CGU_PLLA = AS3525_PLLA_SETTING;
-    while(!(CGU_INTCTRL & (1<<0))); /* wait until PLLA is locked */
+    while(!(CGU_INTCTRL & (1<<0)));           /* wait until PLLA is locked */
 
-    CGU_PROC = (AS3525_CPU_PREDIV << 2) | 1;
+    /*  Set FCLK frequency */
+    CGU_PROC = ((AS3525_FCLK_POSTDIV << 4) |
+                (AS3525_FCLK_PREDIV  << 2) |
+                 AS3525_FCLK_SEL);
+    /*  Set PCLK frequency */
+    CGU_PERI = ((CGU_PERI & 0xffffff80)  |    /* reset divider bits 0:6 */
+                 (AS3525_PCLK_DIV0 << 2) |
+                 (AS3525_PCLK_DIV1 << 6) |
+                  AS3525_PCLK_SEL);
 
-    CGU_PERI |= ((CLK_DIV(AS3525_PLLA_FREQ, AS3525_PCLK_FREQ) - 1) << 2)
-                | 1; /* clk_in = PLLA */
-
-
-    /* FIXME: dcache will not be active, since the mmu is not running
-     * See arm922t datasheet */
     asm volatile(
         "mov r0, #0               \n"
-        "mcr p15, 0, r0, c7, c7   \n" /* invalidate icache & dcache */
-        "mrc p15, 0, r0, c1, c0   \n" /* control register */
-        "orr r0, r0, #0x1000      \n" /* enable icache */
-        "orr r0, r0, #4           \n" /* enable dcache */
+        "mcr p15, 0, r0, c7, c7   \n"      /* invalidate icache & dcache */
+        "mrc p15, 0, r0, c1, c0   \n"      /* control register */
+        "bic r0, r0, #3<<30       \n"      /* clears bus bits & sets fastbus */
+        "orr r0, r0, #1<<12       \n"      /* enable icache */
         "mcr p15, 0, r0, c1, c0   \n"
         : : : "r0" );
 
@@ -281,10 +277,6 @@ void system_init(void)
     fmradio_i2c_init();
 #endif
 #endif /* !BOOTLOADER */
-
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    set_cpu_frequency(CPUFREQ_DEFAULT);
-#endif
 }
 
 void system_reboot(void)
@@ -311,16 +303,34 @@ int system_memory_guard(int newmode)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void set_cpu_frequency(long frequency)
 {
-    int divider = frequency ? (CPUFREQ_MAX / frequency) : 16 /* minimal */ ;
+    if(frequency == CPUFREQ_MAX)
+    {
 
-    if(divider > 16)
-        divider = 16;
-    else if(divider < 1)
-        divider = 1;
+        asm volatile(
+            "mrc p15, 0, r0, c1, c0  \n"
 
-    cpu_frequency = CPUFREQ_MAX / divider;
+#ifdef ASYNCHRONOUS_BUS
+            "orr r0, r0, #3<<30      \n"   /* asynchronous bus clocking */
+#else
+            "bic r0, r0, #3<<30      \n"   /* clear bus bits */
+            "orr r0, r0, #1<<30      \n"   /* synchronous bus clocking */
+#endif
 
-    CGU_PROC = (CGU_PROC & 0x0f) | ((divider-1) << 4);
+            "mcr p15, 0, r0, c1, c0  \n"
+            : : : "r0" );
+
+        cpu_frequency = CPUFREQ_MAX;
+    }
+    else
+    {
+        asm volatile(
+            "mrc p15, 0, r0, c1, c0  \n"
+            "bic r0, r0, #3<<30      \n"     /* fastbus clocking */
+            "mcr p15, 0, r0, c1, c0  \n"
+            : : : "r0" );
+
+        cpu_frequency = CPUFREQ_NORMAL;
+    }
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
-#endif /* BOOTLOADER */
+#endif /* !BOOTLOADER */

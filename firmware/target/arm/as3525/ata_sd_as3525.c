@@ -456,8 +456,7 @@ static void init_pl180_controller(const int drive)
 
     MCI_SELECT(drive) = 0;
 
-    MCI_CLOCK(drive) = MCI_CLOCK_ENABLE |
-                (((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SD_IDENT_FREQ)) / 2) - 1);
+    MCI_CLOCK(drive) = MCI_CLOCK_ENABLE | AS3525_SD_IDENT_DIV;
     mci_delay();
 }
 
@@ -466,8 +465,8 @@ int sd_init(void)
     int ret;
     CGU_IDE =   (1<<7)  /* AHB interface enable */  |
                 (1<<6)  /* interface enable */      |
-                ((CLK_DIV(AS3525_PLLA_FREQ, AS3525_IDE_FREQ) - 1) << 2) |
-                1;       /* clock source = PLLA */
+                (AS3525_IDE_DIV << 2)               |
+                AS3525_CLK_PLLA;  /* clock source = PLLA */
 
 
     CGU_PERI |= CGU_NAF_CLOCK_ENABLE;
