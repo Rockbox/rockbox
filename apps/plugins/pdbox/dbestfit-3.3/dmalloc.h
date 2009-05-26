@@ -5,3 +5,8 @@ void *drealloc(void *, size_t);
 #define malloc(x)    dmalloc(x)
 #define free(x)      dfree(x)
 #define realloc(x,y) drealloc(x,y)
+
+#ifdef ROCKBOX
+void *dcalloc(size_t, size_t);
+#define calloc(x,y)  dcalloc(x,y)
+#endif

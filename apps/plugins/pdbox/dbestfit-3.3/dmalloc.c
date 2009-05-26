@@ -23,8 +23,13 @@
  *
  *****************************************************************************/
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#define memset rb->memset
+#else /* ROCKBOX */
 #include <stdio.h>
 #include <string.h>
+#endif /* ROCKBOX */
 
 #ifdef DEBUG
 #include <stdarg.h>
@@ -156,15 +161,23 @@ struct MemInfo {
    happy with us.
    */
 
-#if BIGBLOCKS==4060 /* previously */
+#if defined(BIGBLOCKS) && BIGBLOCKS==4060 /* previously */
+#ifdef ROCKBOX
+unsigned
+#endif /* ROCKBOX */
 short qinfo[]= { 20, 28, 52, 116, 312, 580, 812, 2028 };
 #else
+#ifdef ROCKBOX
+unsigned
+#endif /* ROCKBOX */
 short qinfo[]= { 20, 28, 52, 116, 312, 580, 1016, 2032};
 /* 52 and 312 only make use of 4056 bytes, but without them there are too
    wide gaps */
 #endif
 
+#ifndef ROCKBOX
 #define MIN(x,y) ((x)<(y)?(x):(y))
+#endif /* ROCKBOX */
 
 /* ---------------------------------------------------------------------- */
 /*                                 Globals                                */
@@ -335,6 +348,9 @@ static void FragBlock(char *memp, int size)
  **************************************************************************/
 static void initialize(void)
 {
+#ifdef ROCKBOX
+  unsigned
+#endif /* ROCKBOX */
   int i;
   /* Setup the nmax and fragsize fields of the top structs */
   for(i=0; i< sizeof(qinfo)/sizeof(qinfo[0]); i++) {
@@ -421,7 +437,11 @@ void *dmalloc(size_t size)
     struct MemTop *memtop=NULL; /* SAFE */
 
     /* Determine which queue to use */
+#ifdef ROCKBOX
+    unsigned
+#endif /* ROCKBOX */
     int queue;
+
     for(queue=0; size > qinfo[queue]; queue++)
       ;
     do {
@@ -622,7 +642,7 @@ void *drealloc(char *ptr, size_t size)
    * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
    */
   void *mem=NULL; /* SAFE */
-  size_t prevsize;
+  size_t prevsize = 0;
 
   /* NOTE that this is only valid if BLOCK_BIT isn't set: */
   struct MemBlock *block;

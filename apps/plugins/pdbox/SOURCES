@@ -1,11 +1,9 @@
 pdbox.c
 pdbox-net.c
 
-/*
 dbestfit-3.3/bmalloc.c
 dbestfit-3.3/bysize.c
 dbestfit-3.3/dmalloc.c
-*/
 
 /*
 PDa/src/g_canvas.c

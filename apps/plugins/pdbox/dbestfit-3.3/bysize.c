@@ -366,6 +366,7 @@ Tree *removebyaddr(Tree *t, Tree *remove)
   return x;
 }
 
+#ifdef DEBUG
 int printtree(Tree * t, int d, char output)
 {
   int distance=0;
@@ -395,6 +396,7 @@ int printtree(Tree * t, int d, char output)
   distance += printtree(t->smaller, d+1, output);
   return distance;
 }
+#endif /* DEBUG */
 
 /* Here follow the look-alike interface so that the tree-function names are
    the same as the list-ones to enable easy interchange */
@@ -416,9 +418,11 @@ char *obtainbysize( size_t size)
   return (char *)receive;
 }
 
+#ifdef DEBUG
 void print_sizes(void)
 {
   printtree(chunkHead, 0, 1);
 }
+#endif /* DEBUG */
 
 #endif

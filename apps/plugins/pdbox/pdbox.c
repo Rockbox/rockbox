@@ -105,7 +105,6 @@ enum plugin_status plugin_start(const void* parameter)
     /* Get the file name. */
     const char* filename = (const char*) parameter;
 
-#if 0
     /* Allocate memory; check it's size; add to the pool. */
     mem_pool = rb->plugin_get_audio_buffer(&mem_size);
     if(mem_size < MIN_MEM_SIZE)
@@ -114,9 +113,8 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_ERROR;
     }
     add_pool(mem_pool, mem_size);
-#endif
 
-    /* Initialze net. */
+    /* Initialize net. */
     net_init();
 
     /* Start threads. */

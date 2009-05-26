@@ -236,6 +236,7 @@ static void bmalloc_failed(size_t size)
 #define bmalloc_failed(x)
 #endif
 
+#ifdef DEBUG
 void print_lists()
 {
   struct BlockInfo *block = blockHead;
@@ -252,6 +253,7 @@ void print_lists()
 #endif
   print_sizes();
 }
+#endif /* DEBUG */
 
 void *bmalloc(size_t size)
 {

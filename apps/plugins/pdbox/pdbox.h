@@ -22,11 +22,9 @@
 #ifndef PDBOX_H
 #define PDBOX_H
 
-#if 0
 /* Use dbestfit. */
 #include "bmalloc.h"
 #include "dmalloc.h"
-#endif
 
 /* Minimal memory size. */
 #define MIN_MEM_SIZE (4 * 1024 * 1024)
