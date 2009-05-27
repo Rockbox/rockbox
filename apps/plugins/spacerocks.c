@@ -2017,8 +2017,8 @@ enum plugin_status start_game(void)
             button = rb->button_get(false);
 
 #ifdef HAS_BUTTON_HOLD
-        if (rb->button_hold())
-        game_state = PAUSE_MODE;
+            if (rb->button_hold() && game_state == PLAY_MODE)
+                game_state = PAUSE_MODE;
 #endif
 
             switch(button)
