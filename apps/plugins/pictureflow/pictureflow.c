@@ -2556,7 +2556,7 @@ int main(void)
 #endif
             ret = main_menu();
             if ( ret == -1 ) return PLUGIN_OK;
-            if ( ret != 0 ) return i;
+            if ( ret != 0 ) return ret;
 #ifdef USEGSLIB
             grey_show(true);
 #endif
