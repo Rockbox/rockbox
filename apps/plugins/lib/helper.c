@@ -25,8 +25,6 @@
 /*  Force the backlight on */
 void backlight_force_on(void)
 {
-    if(!rb)
-        return;
     if (rb->global_settings->backlight_timeout > 0)
         rb->backlight_set_timeout(0);
 #if CONFIG_CHARGING
@@ -38,8 +36,6 @@ void backlight_force_on(void)
 /*  Reset backlight operation to its settings */
 void backlight_use_settings(void)
 {
-    if (!rb)
-        return;
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
 #if CONFIG_CHARGING
     rb->backlight_set_timeout_plugged(rb->global_settings->
@@ -51,8 +47,6 @@ void backlight_use_settings(void)
 /*  Force the backlight on */
 void remote_backlight_force_on(void)
 {
-    if (!rb)
-        return;
     if (rb->global_settings->remote_backlight_timeout > 0)
         rb->remote_backlight_set_timeout(0);
 #if CONFIG_CHARGING
@@ -64,8 +58,6 @@ void remote_backlight_force_on(void)
 /*  Reset backlight operation to its settings */
 void remote_backlight_use_settings(void)
 {
-    if (!rb)
-        return;
     rb->remote_backlight_set_timeout(rb->global_settings->
                                      remote_backlight_timeout);
 #if CONFIG_CHARGING
@@ -79,8 +71,6 @@ void remote_backlight_use_settings(void)
 /*  Force the buttonlight on */
 void buttonlight_force_on(void)
 {
-    if (!rb)
-        return;
     if (rb->global_settings->buttonlight_timeout > 0)
         rb->buttonlight_set_timeout(0);
 }
@@ -88,8 +78,6 @@ void buttonlight_force_on(void)
 /*  Reset buttonlight operation to its settings */
 void buttonlight_use_settings(void)
 {
-    if (!rb)
-        return;
     rb->buttonlight_set_timeout(rb->global_settings->buttonlight_timeout);
 }
 #endif /* HAVE_BUTTON_LIGHT */
@@ -97,15 +85,11 @@ void buttonlight_use_settings(void)
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 void backlight_brightness_set(int brightness)
 {
-    if (!rb)
-        return;
     rb->backlight_set_brightness(brightness);
 }
 
 void backlight_brightness_use_setting(void)
 {
-    if (!rb)
-        return;
     rb->backlight_set_brightness(rb->global_settings->brightness);
 }
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
