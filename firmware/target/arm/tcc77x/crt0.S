@@ -63,7 +63,7 @@ bl_entrypoint:	.word  0   /* Location in RAM of the start of our bootloader */
     .word  0                 /* Second CRC32 */
     .word  0                 /* length of firmware file */
 
-#ifdef LOGIK_DAX
+#if defined(LOGIK_DAX) || defined(SANSA_C100)
     /* Some original firmwares have 0x40 bytes of zeroes here - we
        don't know why, but err on the side of caution and include it
        here. */
@@ -83,7 +83,7 @@ start_loc:
 
 #ifdef TCCBOOT
     mov    r0, #0x80000000
-#if defined(LOGIK_DAX)
+#if defined(LOGIK_DAX) || defined(SANSA_C100)
     ldr    r0, [r0, #0x300]     /* Hold button is GPIO A, pin 0x2 */
     tst    r0, #0x2
 #elif defined(SANSA_M200)

@@ -124,4 +124,8 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/"
 
+#ifdef BOOTLOADER
+#define TCCBOOT
+#endif
+
 #endif /* SIMULATOR */
