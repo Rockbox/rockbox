@@ -80,7 +80,13 @@ again:
         case 'U': no  = (tm->tm_yday - tm->tm_wday + 7) / 7; goto _no;
         case 'W': no  = (tm->tm_yday - (tm->tm_wday - 1 + 7) % 7 + 7) / 7; goto _no;
         case 's': {
-            time_t t = rb->mktime((struct tm*)tm);
+            time_t t =
+#if CONFIG_RTC
+                rb->mktime((struct tm*)tm)
+#else
+                0
+#endif
+            ;
             char buf[101];
             char* c;
             buf[100]=0;

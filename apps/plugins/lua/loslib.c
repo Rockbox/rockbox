@@ -67,6 +67,7 @@ static void setboolfield (lua_State *L, const char *key, int value) {
   lua_setfield(L, -2, key);
 }
 
+#if CONFIG_RTC
 static int getboolfield (lua_State *L, const char *key) {
   int res;
   lua_getfield(L, -1, key);
@@ -89,6 +90,7 @@ static int getfield (lua_State *L, const char *key, int d) {
   lua_pop(L, 1);
   return res;
 }
+#endif
 
 
 static int os_date (lua_State *L) {
