@@ -39,8 +39,8 @@ PLUGIN_HEADER
 #define PB_USB  2
 #define PB_QUIT 1
 
-#define DATA_FILE   PLUGIN_DIR "/games/pegbox.data"
-#define SAVE_FILE   PLUGIN_DIR "/games/pegbox.save"
+#define DATA_FILE   PLUGIN_GAMES_DIR "/pegbox.data"
+#define SAVE_FILE   PLUGIN_GAMES_DIR "/pegbox.save"
 
 #define ROWS       8   /* Number of rows on each board */
 #define COLS       12  /* Number of columns on each board */

@@ -22,7 +22,7 @@
 #include "lib/md5.h"
 PLUGIN_HEADER
 
-#define KEYBOX_FILE PLUGIN_DIR "/apps/keybox.dat"
+#define KEYBOX_FILE PLUGIN_APPS_DIR "/keybox.dat"
 #define BLOCK_SIZE 8
 #define MAX_ENTRIES 12*BLOCK_SIZE /* keep this a multiple of BLOCK_SIZE */
 #define FIELD_LEN 32 /* should be enough for anyone ;) */

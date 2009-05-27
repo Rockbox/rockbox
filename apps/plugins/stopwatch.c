@@ -32,7 +32,7 @@ PLUGIN_HEADER
 #define LAP_Y TIMER_Y+1
 #define MAX_LAPS 64
 
-#define STOPWATCH_FILE ROCKBOX_DIR "/apps/stopwatch.dat"
+#define STOPWATCH_FILE PLUGIN_APPS_DIR "/stopwatch.dat"
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
