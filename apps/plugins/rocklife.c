@@ -129,7 +129,7 @@ void init_grid(char *pgrid){
 static bool load_cellfile(const char *file, char *pgrid){
     int fd;
     fd = rb->open(file, O_RDONLY);
-    if (fd==-1)
+    if (fd<0)
         return false;
         
     init_grid(pgrid);
