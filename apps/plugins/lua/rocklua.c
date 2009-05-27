@@ -30,9 +30,10 @@
 PLUGIN_HEADER
 
 static const luaL_Reg lualibs[] = {
-  {"", luaopen_base},
-  {LUA_TABLIBNAME, luaopen_table},
-  {LUA_STRLIBNAME, luaopen_string},
+  {"",              luaopen_base},
+  {LUA_TABLIBNAME,  luaopen_table},
+  {LUA_STRLIBNAME,  luaopen_string},
+  {LUA_OSLIBNAME,   luaopen_os},
   {LUA_ROCKLIBNAME, luaopen_rock},
   {NULL, NULL}
 };

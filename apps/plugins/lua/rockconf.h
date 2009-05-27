@@ -43,8 +43,10 @@
 extern char curpath[MAX_PATH];
 void *dlrealloc(void *ptr, size_t size);
 void dlfree(void *ptr);
+struct tm *gmtime(const time_t *timep);
 long strtol(const char *nptr, char **endptr, int base);
 unsigned long strtoul(const char *str, char **endptr, int base);
+size_t strftime(char* dst, size_t max, const char* format, const struct tm* tm);
 long floor(long x);
 long pow(long x, long y);
 

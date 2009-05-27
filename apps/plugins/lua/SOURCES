@@ -11,6 +11,7 @@ llex.c
 lmem.c
 lobject.c
 lopcodes.c
+loslib.c
 lparser.c
 lstate.c
 lstring.c
@@ -24,7 +25,9 @@ lzio.c
 rockaux.c
 rocklib.c
 rockmalloc.c
+gmtime.c
 strcspn.c
+strftime.c
 strncat.c
 strpbrk.c
 strtoul.c

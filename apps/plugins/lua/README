@@ -1,7 +1,9 @@
 The following files are (with slight modifications for Rockbox) from dietlibc
 version 0.31 which is licensed under the GPL version 2:
 
+    gmtime.c
     strcspn.c
+    strftime.c
     strncat.c
     strpbrk.c
     strtol.c
