@@ -120,16 +120,20 @@ static bool try_exts(char *path, int len)
 #endif
 
 /* Look for the first matching album art bitmap in the following list:
- *  ./<trackname><size>.bmp
- *  ./<albumname><size>.bmp
+ *  ./<trackname><size>.{jpeg,jpg,bmp}
+ *  ./<albumname><size>.{jpeg,jpg,bmp}
  *  ./cover<size>.bmp
- *  ../<albumname><size>.bmp
- *  ../cover<size>.bmp
- *  ROCKBOX_DIR/albumart/<artist>-<albumname><size>.bmp
+ *  ../<albumname><size>.{jpeg,jpg,bmp}
+ *  ../cover<size>.{jpeg,jpg,bmp}
+ *  ROCKBOX_DIR/albumart/<artist>-<albumname><size>.{jpeg,jpg,bmp}
  * <size> is the value of the size_string parameter, <trackname> and
  * <albumname> are read from the ID3 metadata.
  * If a matching bitmap is found, its filename is stored in buf.
  * Return value is true if a bitmap was found, false otherwise.
+ *
+ * If the first symbol in size_string is a colon (e.g. ":100x100")
+ * then the colon is skipped ("100x100" will be used) and the track
+ * specific image (./<trackname><size>.bmp) is not tried.
  */
 bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
                            char *buf, int buflen)
