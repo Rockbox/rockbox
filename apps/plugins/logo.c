@@ -98,8 +98,7 @@ const unsigned char rockbox16x7[] = {
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
       (CONFIG_KEYPAD == SANSA_C200_PAD) || \
       (CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
-      (CONFIG_KEYPAD == SANSA_M200_PAD) || \
-      (CONFIG_KEYPAD == SANSA_FUZE_PAD)
+      (CONFIG_KEYPAD == SANSA_M200_PAD)
 #define LP_QUIT BUTTON_POWER
 #define LP_DEC_X BUTTON_LEFT
 #define LP_INC_X BUTTON_RIGHT
