@@ -739,22 +739,22 @@ cat <<EOF
  ==Cowon/iAudio==         40) Gigabeat F
  30) X5/X5V/X5L           41) Gigabeat S         ==SanDisk==
  31) M5/M5L                                      50) Sansa e200
- 32) 7                    ==Tatung==             51) Sansa e200R
- 33) D2                   60) Elio TPJ-1022      52) Sansa c200
- 34) M3/M3L                                      53) Sansa m200
-                          ==Olympus==            54) Sansa c100
- ==Creative==             70) M:Robe 500         55) Sansa Clip
- 90) Zen Vision:M 30GB    71) M:Robe 100         56) Sansa e200v2
- 91) Zen Vision:M 60GB                           57) Sansa m200v4
- 92) Zen Vision           ==Philips==            58) Sansa Fuze
-                          100) GoGear SA9200     59) Sansa c200v2
- ==Onda==                 101) GoGear HDD1630/
- 120) VX747                    HDD1830           ==Logik==
- 121) VX767                                      80) DAX 1GB MP3/DAB
- 122) VX747+              ==Meizu==
-                          110) M6SL              ==Lyre project==
- ==Samsung==              111) M6SP              130) Lyre proto 1
- 140) YH-820              112) M3
+ 32) 7                    ==Olympus=             51) Sansa e200R
+ 33) D2                   70) M:Robe 500         52) Sansa c200
+ 34) M3/M3L               71) M:Robe 100         53) Sansa m200
+                                                 54) Sansa c100
+ ==Creative==             ==Philips==            55) Sansa Clip
+ 90) Zen Vision:M 30GB    100) GoGear SA9200     56) Sansa e200v2
+ 91) Zen Vision:M 60GB    101) GoGear HDD1630/   57) Sansa m200v4
+ 92) Zen Vision                HDD1830           58) Sansa Fuze
+                                                 59) Sansa c200v2
+ ==Onda==                 ==Meizu==              60) Sansa Clipv2
+ 120) VX747               110) M6SL
+ 121) VX767               111) M6SP              ==Logik==
+ 122) VX747+              112) M3                80) DAX 1GB MP3/DAB
+
+ ==Samsung==              ==Tatung==             ==Lyre project==
+ 140) YH-820              150) Elio TPJ-1022     130) Lyre proto 1
  141) YH-920
  142) YH-925
 EOF
@@ -1824,7 +1824,29 @@ fi
     t_model="sansa-c200v2"
     ;;
 
-   60|tpj1022)
+   60|Clipv2|clipv2)
+    echo "Sansa Clipv2 is not yet supported !"
+    exit 1
+    target_id=60
+    modelname="clipv2"
+    target="-DSANSA_CLIPV2"
+    memory=8
+    arm926ejscc
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$bmp2rb_mono"
+    tool="$rootdir/tools/scramble -add=clv2"
+    output="rockbox.sansa"
+    bootoutput="bootloader-clipv2.sansa"
+    appextra="recorder:gui"
+    plugins="yes"
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="as3525"
+    t_model="sansa-clipv2"
+    ;;
+
+   150|tpj1022)
     target_id=25
     modelname="tpj1022"
     target="-DELIO_TPJ1022"
