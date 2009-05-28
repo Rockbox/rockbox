@@ -216,7 +216,8 @@ static struct md5sums sansasums[] = {
 
 #define NUM_MD5S (sizeof(sansasums)/sizeof(sansasums[0]))
 
-static off_t filesize(int fd) {
+static off_t filesize(int fd)
+{
     struct stat buf;
 
     if (fstat(fd, &buf) < 0) {
@@ -227,22 +228,26 @@ static off_t filesize(int fd) {
     }
 }
 
-static uint32_t get_uint32le(unsigned char* p) {
+static uint32_t get_uint32le(unsigned char* p)
+{
     return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 }
 
-static uint32_t get_uint32be(unsigned char* p) {
+static uint32_t get_uint32be(unsigned char* p)
+{
     return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
 }
 
-static void put_uint32le(unsigned char* p, uint32_t x) {
+static void put_uint32le(unsigned char* p, uint32_t x)
+{
     p[0] = x & 0xff;
     p[1] = (x >> 8) & 0xff;
     p[2] = (x >> 16) & 0xff;
     p[3] = (x >> 24) & 0xff;
 }
 
-void calc_MD5(unsigned char* buf, int len, char *md5str) {
+void calc_MD5(unsigned char* buf, int len, char *md5str)
+{
     int i;
     md5_context ctx;
     unsigned char md5sum[16];
@@ -256,7 +261,8 @@ void calc_MD5(unsigned char* buf, int len, char *md5str) {
 }
 
 /* Calculate a simple checksum used in Sansa Original Firmwares */
-static uint32_t calc_checksum(unsigned char* buf, uint32_t n) {
+static uint32_t calc_checksum(unsigned char* buf, uint32_t n)
+{
     uint32_t sum = 0;
     uint32_t i;
 
@@ -266,7 +272,8 @@ static uint32_t calc_checksum(unsigned char* buf, uint32_t n) {
     return sum;
 }
 
-static int get_model(int model_id) {
+static int get_model(int model_id)
+{
     switch(model_id) {
         case 0x1e:
             return MODEL_FUZE;
@@ -286,7 +293,8 @@ static int get_model(int model_id) {
 }
 
 /* Compress using nrv2e algorithm : Thumb decompressor fits in 168 bytes ! */
-static unsigned char* uclpack(unsigned char* inbuf, int insize, int* outsize) {
+static unsigned char* uclpack(unsigned char* inbuf, int insize, int* outsize)
+{
     int maxsize;
     unsigned char* outbuf;
     int r;
@@ -327,8 +335,8 @@ static unsigned char* uclpack(unsigned char* inbuf, int insize, int* outsize) {
 unsigned char* load_of_file(
         char* filename, off_t* bufsize, char* md5sum, int* model,
         int* fw_version, int* firmware_size, unsigned char** of_packed,
-        int* of_packedsize, char* errstr, int errstrsize
-) {
+        int* of_packedsize, char* errstr, int errstrsize)
+{
     int fd;
     unsigned char* buf =NULL;
     off_t n;
@@ -411,8 +419,8 @@ error:
 /* Loads a rockbox bootloader file into memory */
 unsigned char* load_rockbox_file(
             char* filename, int model, int* bufsize, int* rb_packedsize,
-            char* errstr, int errstrsize
-) {
+            char* errstr, int errstrsize)
+{
     int fd;
     unsigned char* buf = NULL;
     unsigned char* packed = NULL;
@@ -474,8 +482,8 @@ error:
 void patch_firmware(
         int model, int fw_version, int firmware_size, unsigned char* buf,
         int len, unsigned char* of_packed, int of_packedsize,
-        unsigned char* rb_packed, int rb_packedsize
-) {
+        unsigned char* rb_packed, int rb_packedsize)
+{
     unsigned char *p;
     uint32_t sum, filesum;
     unsigned int i;
@@ -543,14 +551,16 @@ void patch_firmware(
 }
 
 /* returns size of new firmware block */
-int total_size(int model, int rb_packedsize, int of_packedsize) {
+int total_size(int model, int rb_packedsize, int of_packedsize)
+{
     return bootloader_sizes[model] + sizeof(nrv2e_d8) + of_packedsize +
                 rb_packedsize;
 }
 
 #ifndef LIB
 /* standalone executable */
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     char *infile, *bootfile, *outfile;
     int fdout;
     off_t len;
