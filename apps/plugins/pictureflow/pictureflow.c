@@ -724,7 +724,6 @@ int create_album_index(void)
         rb->strcpy(buf, tcs.result);
         buf_size -= l;
         buf = l + (char *)buf;
-        DEBUGF("%lX: %s\n", tcs.idxfd[tag_album] ? rb->lseek(tcs.idxfd[tag_album], 0, SEEK_CUR) : -1, tcs.result);
         album[-album_count].seek = tcs.result_seek;
         old_l = l;
             album_count++;
@@ -2362,14 +2361,10 @@ void draw_album_text(void)
 */
 void error_wait(const char *message)
 {
-    rb->lcd_clear_display();
-    int y;
-    rb->lcd_getstringsize(message, NULL, &y);
-    rb->lcd_putsxy(0, 0, message);
-    rb->lcd_putsxy(0, y, "Press SELECT to exit.");
-    rb->lcd_update();
-    while (rb->get_action(CONTEXT_STD, 1) != ACTION_STD_OK)
+    rb->splashf(0, "%s. Press any button to continue.", message);
+    while (rb->get_action(CONTEXT_STD, 1) == ACTION_NONE)
         rb->yield();
+    rb->sleep(2 * HZ);
 }
 
 /**
