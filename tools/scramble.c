@@ -123,7 +123,7 @@ void usage(void)
            "\t                   ip3g, ip4g, mini, iax5, iam5, iam3, h10, h10_5gb,\n"
            "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2,\n");
     printf("\t                   9200, 1630, ldax, m200, clip, e2v2, m2v4, fuze,\n"
-           "\t                   y820, y920, y925)\n");
+           "\t                   c2v2, y820, y920, y925)\n");
     printf("\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
