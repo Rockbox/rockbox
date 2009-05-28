@@ -216,8 +216,6 @@ typedef fb_data pix_t;
 #define EV_EXIT 9999
 #define EV_WAKEUP 1337
 
-#define UNIQBUF_SIZE (64*1024)
-
 #define EMPTY_SLIDE CACHE_PREFIX "/emptyslide.pfraw"
 #define EMPTY_SLIDE_BMP PLUGIN_DEMOS_DIR "/pictureflow_emptyslide.bmp"
 #define SPLASH_BMP PLUGIN_DEMOS_DIR "/pictureflow_splash.bmp"
@@ -705,13 +703,10 @@ void init_reflect_table(void)
  */
 int create_album_index(void)
 {
-    buf_size -= UNIQBUF_SIZE * sizeof(long);
-    long *uniqbuf = (long *)(buf_size + (char *)buf);
-    album = ((struct album_data *)uniqbuf) - 1;
+    album = ((struct album_data *)(buf_size + (char *) buf)) - 1;
     rb->memset(&tcs, 0, sizeof(struct tagcache_search) );
     album_count = 0;
     rb->tagcache_search(&tcs, tag_album);
-    rb->tagcache_search_set_uniqbuf(&tcs, uniqbuf, UNIQBUF_SIZE);
     unsigned int l, old_l = 0;
     album_names = buf;
     album[0].name_idx = 0;
@@ -729,9 +724,10 @@ int create_album_index(void)
         rb->strcpy(buf, tcs.result);
         buf_size -= l;
         buf = l + (char *)buf;
+        DEBUGF("%lX: %s\n", tcs.idxfd[tag_album] ? rb->lseek(tcs.idxfd[tag_album], 0, SEEK_CUR) : -1, tcs.result);
         album[-album_count].seek = tcs.result_seek;
         old_l = l;
-        album_count++;
+            album_count++;
     }
     rb->tagcache_search_finish(&tcs);
     ALIGN_BUFFER(buf, buf_size, 4);
@@ -741,7 +737,6 @@ int create_album_index(void)
         tmp_album[i] = album[-i];
     album = tmp_album;
     buf = album + album_count;
-    buf_size += UNIQBUF_SIZE * sizeof(long);
     return (album_count > 0) ? 0 : ERROR_NO_ALBUMS;
 }
 
