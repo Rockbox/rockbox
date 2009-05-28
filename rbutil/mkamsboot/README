@@ -3,4 +3,63 @@ mkamsboot
 
 A tool to inject a bootloader into a Sansa V2 (AMS) firmware file.
 
-See comments in mkamsboot.c and dualboot.S for more information.
+
+Usage
+-----
+
+mkamsboot <firmware file> <boot file> <output file>
+
+<firmware file> is an original Sansa firmware file obtained from the Sansa
+    forums for example : http://forums.sandisk.com/sansa/?category.id=devices
+
+<boot file> is the code you want to execute (a rockbox bootloader), previously
+    scrambled with tools/scramble utility.
+
+<output file> is the resulting firmware file which you'll have to copy on your
+    Sansa player. See "Firmware filenames".
+
+
+Supported models
+----------------
+
+Sansa Clip  :   firmware version starting with "01."
+Sansa Clipv2:   firmware version starting with "02."
+Sansa Fuze  :   firmware version starting with "01."
+Sansa E200v2:   firmware version starting with "03."
+Sansa C200v2:   firmware version starting with "03."
+Sansa M200v4:   firmware version starting with "4."
+
+
+Firmware filenames
+------------------
+
+For the firmware upgrade to happen, the firmware has to be named specially:
+
+clip v2 :   m30pa.bin
+clip    :   m300a.bin
+fuze    :   fuzea.bin
+e200v2  :   e200pa.bin
+c200v2  :   c200pa.bin
+m200v4  :   m200a.bin
+
+
+Dual-Boot
+---------
+
+  The purpose of this program is to provide dual-boot between the original
+firmware and the new (rockbox) firmware.
+
+  By default the player will boot into the new firmware.
+
+  To boot into the Original Firmware, you need to press the Left key.
+  ***Note : on the c200v2 you need to press the Right key.
+
+  The player will boot into the Original Firmware as well if it is powered up by
+inserting an usb cable.
+  ***Note : on the m200v4 powering up by usb will cause booting into the new
+firmware
+
+Hacking
+-------
+
+See comments in mkamsboot.c and dualboot/dualboot.S for more information.

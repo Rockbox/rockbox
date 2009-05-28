@@ -24,7 +24,17 @@
 
 /*
 
-Insert a Rockbox bootloader into an AMS original firmware file.
+Insert a Rockbox bootloader into a Sansa AMS original firmware file.
+
+Layout of a Sansa AMS original firmware file:
+
+ ----------------------  0x0
+|        HEADER        |
+|----------------------| 0x400
+|    FIRMWARE BLOCK    |
+|----------------------| 0x400 + firmware block size
+|    LIBRARIES/DATA    |
+ ----------------------  END
 
 We replace the main firmware block (bytes 0x400..0x400+firmware_size)
 as follows:
@@ -50,9 +60,12 @@ as follows:
 
 This entire block fits into the space previously occupied by the main
 firmware block - the space saved by compressing the OF image is used
-to store the compressed version of the Rockbox bootloader.  The OF
-image is typically about 120KB, which allows us to store a Rockbox
-bootloader with an uncompressed size of about 60KB-70KB.
+to store the compressed version of the Rockbox bootloader.
+
+On version 1 firmwares, the OF image is typically about 120KB, which allows
+us to store a Rockbox bootloader with an uncompressed size of about 60KB-70KB.
+Version 2 firmwares are bigger and are stored in SDRAM (instead of IRAM).
+In both cases, the RAM we are using is mapped at offset 0x0.
 
 mkamsboot then corrects the checksums and writes a new legal firmware
 file which can be installed on the device.
@@ -65,14 +78,13 @@ end of RAM.
 
 Then, depending on the detection of the dual-boot keypress, either the
 OF image or the Rockbox image is copied to the end of RAM (just before
-the ucl unpack function) and uncompress it to the start of RAM.
+the ucl unpack function) and uncompressed to the start of RAM.
 
 Finally, the ucl unpack function branches to address 0x0, passing
 execution to the uncompressed firmware.
 
 
 */
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,27 +97,22 @@ execution to the uncompressed firmware.
 
 #include <ucl/ucl.h>
 
-/* Headers for ARM code binaries */
-#include "nrv2e_d8.h"
+#include "mkamsboot.h"
+
 #include "md5.h"
 
-#include "dualboot_clip.h"
-#include "dualboot_e200v2.h"
-#include "dualboot_fuze.h"
-#include "dualboot_m200v4.h"
-#include "dualboot_c200v2.h"
+/* Header for ARM code binaries */
+#include "dualboot.h"
 
 /* Win32 compatibility */
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
 
-#ifndef VERSION
-#define VERSION "0.1"
-#endif
+#define VERSION "1.0"
 
-enum
-{
+/* Supported models */
+enum {
     MODEL_UNKNOWN = -1,
     MODEL_FUZE = 0,
     MODEL_CLIP,
@@ -115,31 +122,31 @@ enum
     MODEL_C200V2,
 };
 
-static const char* model_names[] = 
-{
+/* Descriptive name of these models */
+static const char* model_names[] = {
     "Fuze",
     "Clip",
-    "Clip V2",
+    "Clip v2",
     "e200 v2",
     "m200 v4",
     "c200 v2"
 };
 
-static const unsigned char* bootloaders[] = 
-{
+/* Dualboot functions for these models */
+static const unsigned char* bootloaders[] = {
     dualboot_fuze,
     dualboot_clip,
-    NULL,
+    dualboot_clipv2,
     dualboot_e200v2,
     dualboot_m200v4,
     dualboot_c200v2,
 };
 
-static const int bootloader_sizes[] = 
-{
+/* Size of dualboot functions for these models */
+static const int bootloader_sizes[] = {
     sizeof(dualboot_fuze),
     sizeof(dualboot_clip),
-    0,
+    sizeof(dualboot_clipv2),
     sizeof(dualboot_e200v2),
     sizeof(dualboot_m200v4),
     sizeof(dualboot_c200v2),
@@ -147,11 +154,10 @@ static const int bootloader_sizes[] =
 
 /* Model names used in the Rockbox header in ".sansa" files - these match the
    -add parameter to the "scramble" tool */
-static const char* rb_model_names[] =
-{
+static const char* rb_model_names[] = {
     "fuze",
     "clip",
-    NULL,
+    "clv2",
     "e2v2",
     "m2v4",
     "c2v2",
@@ -159,11 +165,10 @@ static const char* rb_model_names[] =
 
 /* Model numbers used to initialise the checksum in the Rockbox header in
    ".sansa" files - these are the same as MODEL_NUMBER in config-target.h */
-static const int rb_model_num[] =
-{
+static const int rb_model_num[] = {
     43,
     40,
-    0,
+    60,
     41,
     42,
     44
@@ -172,7 +177,7 @@ static const int rb_model_num[] =
 struct md5sums {
     int model;
     char *version;
-    int fw_version;
+    int fw_version; /* version 2 is used in Clipv2 and Fuzev2 firmwares */
     char *md5;
 };
 
@@ -181,27 +186,32 @@ struct md5sums {
 static struct md5sums sansasums[] = {
     /* NOTE: Different regional versions of the firmware normally only
              differ in the filename - the md5sums are identical */
-    { MODEL_E200V2, "3.01.11",   1, "e622ca8cb6df423f54b8b39628a1f0a3" },
-    { MODEL_E200V2, "3.01.14",   1, "2c1d0383fc3584b2cc83ba8cc2243af6" },
-    { MODEL_E200V2, "3.01.16",   1, "12563ad71b25a1034cf2092d1e0218c4" },
 
-    { MODEL_FUZE, "1.01.11",   1, "cac8ffa03c599330ac02c4d41de66166" },
-    { MODEL_FUZE, "1.01.15",   1, "df0e2c1612727f722c19a3c764cff7f2" },
-    { MODEL_FUZE, "1.01.22",   1, "5aff5486fe8dd64239cc71eac470af98" },
-    { MODEL_FUZE, "1.02.26",   1, "7c632c479461c48c8833baed74eb5e4f" },
+    /*   model       version    fw_version      md5                        */
+    { MODEL_E200V2, "3.01.11",      1,  "e622ca8cb6df423f54b8b39628a1f0a3" },
+    { MODEL_E200V2, "3.01.14",      1,  "2c1d0383fc3584b2cc83ba8cc2243af6" },
+    { MODEL_E200V2, "3.01.16",      1,  "12563ad71b25a1034cf2092d1e0218c4" },
 
-    { MODEL_C200V2, "3.02.05",   1, "b6378ebd720b0ade3fad4dc7ab61c1a5" },
+    { MODEL_FUZE,   "1.01.11",      1,  "cac8ffa03c599330ac02c4d41de66166" },
+    { MODEL_FUZE,   "1.01.15",      1,  "df0e2c1612727f722c19a3c764cff7f2" },
+    { MODEL_FUZE,   "1.01.22",      1,  "5aff5486fe8dd64239cc71eac470af98" },
+    { MODEL_FUZE,   "1.02.26",      1,  "7c632c479461c48c8833baed74eb5e4f" },
 
-    { MODEL_M200V4, "4.00.45",   1, "82e3194310d1514e3bbcd06e84c4add3" },
-    { MODEL_M200V4, "4.01.08-A", 1, "fc9dd6116001b3e6a150b898f1b091f0" },
-    { MODEL_M200V4, "4.01.08-E", 1, "d3fb7d8ec8624ee65bc99f8dab0e2369" },
+    { MODEL_C200V2, "3.02.05",      1,  "b6378ebd720b0ade3fad4dc7ab61c1a5" },
 
-    { MODEL_CLIP, "1.01.17",   1, "12caad785d506219d73f538772afd99e" },
-    { MODEL_CLIP, "1.01.18",   1, "d720b266bd5afa38a198986ef0508a45" },
-    { MODEL_CLIP, "1.01.20",   1, "236d8f75189f468462c03f6d292cf2ac" },
-    { MODEL_CLIP, "1.01.29",   1, "c12711342169c66e209540cd1f27cd26" },
-    { MODEL_CLIP, "1.01.30",   1, "f2974d47c536549c9d8259170f1dbe4d" },
-    { MODEL_CLIP, "1.01.32",   1, "d835d12342500732ffb9c4ee54abec15" },
+    { MODEL_M200V4, "4.00.45",      1,  "82e3194310d1514e3bbcd06e84c4add3" },
+    { MODEL_M200V4, "4.01.08-A",    1,  "fc9dd6116001b3e6a150b898f1b091f0" },
+    { MODEL_M200V4, "4.01.08-E",    1,  "d3fb7d8ec8624ee65bc99f8dab0e2369" },
+
+    { MODEL_CLIP,   "1.01.17",      1,  "12caad785d506219d73f538772afd99e" },
+    { MODEL_CLIP,   "1.01.18",      1,  "d720b266bd5afa38a198986ef0508a45" },
+    { MODEL_CLIP,   "1.01.20",      1,  "236d8f75189f468462c03f6d292cf2ac" },
+    { MODEL_CLIP,   "1.01.29",      1,  "c12711342169c66e209540cd1f27cd26" },
+    { MODEL_CLIP,   "1.01.30",      1,  "f2974d47c536549c9d8259170f1dbe4d" },
+    { MODEL_CLIP,   "1.01.32",      1,  "d835d12342500732ffb9c4ee54abec15" },
+
+    { MODEL_CLIPV2, "2.01.16",      2,  "c57fb3fcbe07c2c9b360f060938f80cb" },
+    { MODEL_CLIPV2, "2.01.32",      2,  "0ad3723e52022509089d938d0fbbf8c5" }
 };
 
 #define NUM_MD5S (sizeof(sansasums)/sizeof(sansasums[0]))
@@ -209,7 +219,7 @@ static struct md5sums sansasums[] = {
 static off_t filesize(int fd) {
     struct stat buf;
 
-    if (fstat(fd,&buf) < 0) {
+    if (fstat(fd, &buf) < 0) {
         perror("[ERR]  Checking filesize of input file");
         return -1;
     } else {
@@ -217,30 +227,26 @@ static off_t filesize(int fd) {
     }
 }
 
-static uint32_t get_uint32le(unsigned char* p)
-{
+static uint32_t get_uint32le(unsigned char* p) {
     return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 }
 
-static uint32_t get_uint32be(unsigned char* p)
-{
+static uint32_t get_uint32be(unsigned char* p) {
     return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
 }
 
-static void put_uint32le(unsigned char* p, uint32_t x)
-{
+static void put_uint32le(unsigned char* p, uint32_t x) {
     p[0] = x & 0xff;
     p[1] = (x >> 8) & 0xff;
     p[2] = (x >> 16) & 0xff;
     p[3] = (x >> 24) & 0xff;
 }
 
-void calc_MD5(unsigned char* buf, int len, char *md5str)
-{
+void calc_MD5(unsigned char* buf, int len, char *md5str) {
     int i;
     md5_context ctx;
     unsigned char md5sum[16];
-    
+
     md5_starts(&ctx);
     md5_update(&ctx, buf, len);
     md5_finish(&ctx, md5sum);
@@ -249,9 +255,8 @@ void calc_MD5(unsigned char* buf, int len, char *md5str)
         sprintf(md5str + 2*i, "%02x", md5sum[i]);
 }
 
-
-static uint32_t calc_checksum(unsigned char* buf, uint32_t n)
-{
+/* Calculate a simple checksum used in Sansa Original Firmwares */
+static uint32_t calc_checksum(unsigned char* buf, uint32_t n) {
     uint32_t sum = 0;
     uint32_t i;
 
@@ -261,10 +266,8 @@ static uint32_t calc_checksum(unsigned char* buf, uint32_t n)
     return sum;
 }
 
-static int get_model(int model_id)
-{
-    switch(model_id)
-    {
+static int get_model(int model_id) {
+    switch(model_id) {
         case 0x1e:
             return MODEL_FUZE;
         case 0x22:
@@ -282,9 +285,8 @@ static int get_model(int model_id)
     return MODEL_UNKNOWN;
 }
 
-
-static unsigned char* uclpack(unsigned char* inbuf, int insize, int* outsize)
-{
+/* Compress using nrv2e algorithm : Thumb decompressor fits in 168 bytes ! */
+static unsigned char* uclpack(unsigned char* inbuf, int insize, int* outsize) {
     int maxsize;
     unsigned char* outbuf;
     int r;
@@ -295,10 +297,9 @@ static unsigned char* uclpack(unsigned char* inbuf, int insize, int* outsize)
     /* Allocate some memory for the output buffer */
     outbuf = malloc(maxsize);
 
-    if (outbuf == NULL) {
+    if (outbuf == NULL)
         return NULL;
-    }
-        
+
     r = ucl_nrv2e_99_compress(
             (const ucl_bytep) inbuf,
             (ucl_uint) insize,
@@ -306,8 +307,7 @@ static unsigned char* uclpack(unsigned char* inbuf, int insize, int* outsize)
             (ucl_uintp) outsize,
             0, 10, NULL, NULL);
 
-    if (r != UCL_E_OK || *outsize > maxsize)
-    {
+    if (r != UCL_E_OK || *outsize > maxsize) {
         /* this should NEVER happen, and implies memory corruption */
         fprintf(stderr, "internal error - compression failed: %d\n", r);
         free(outbuf);
@@ -317,42 +317,105 @@ static unsigned char* uclpack(unsigned char* inbuf, int insize, int* outsize)
     return outbuf;
 }
 
-static unsigned char* load_file(char* filename, off_t* bufsize)
-{
+#define ERROR(format, ...) \
+    do { \
+        snprintf(errstr, errstrsize, format, __VA_ARGS__); \
+        goto error; \
+    } while(0)
+
+/* Loads a Sansa AMS Original Firmware file into memory */
+unsigned char* load_of_file(
+        char* filename, off_t* bufsize, char* md5sum, int* model,
+        int* fw_version, int* firmware_size, unsigned char** of_packed,
+        int* of_packedsize, char* errstr, int errstrsize
+) {
     int fd;
-    unsigned char* buf;
+    unsigned char* buf =NULL;
     off_t n;
+    unsigned int i=0;
+    uint32_t checksum;
+    int model_id;
+    unsigned int last_word;
 
     fd = open(filename, O_RDONLY|O_BINARY);
     if (fd < 0)
-    {
-        fprintf(stderr,"[ERR]  Could not open %s for reading\n",filename);
-        return NULL;
-    }
+        ERROR("[ERR]  Could not open %s for reading\n", filename);
 
     *bufsize = filesize(fd);
 
     buf = malloc(*bufsize);
-    if (buf == NULL) {
-        fprintf(stderr,"[ERR]  Could not allocate memory for %s\n",filename);
-        return NULL;
-    }
+    if (buf == NULL)
+        ERROR("[ERR]  Could not allocate memory for %s\n", filename);
 
     n = read(fd, buf, *bufsize);
 
-    if (n != *bufsize) {
-        fprintf(stderr,"[ERR]  Could not read file %s\n",filename);
-        return NULL;
+    if (n != *bufsize)
+        ERROR("[ERR]  Could not read file %s\n", filename);
+
+    /* check the file */
+
+    /* Calculate MD5 checksum of OF */
+    calc_MD5(buf, *bufsize, md5sum);
+
+    while ((i < NUM_MD5S) && (strcmp(sansasums[i].md5, md5sum) != 0))
+        i++;
+
+    if (i < NUM_MD5S) {
+        *model = sansasums[i].model;
+        *fw_version = sansasums[i].fw_version;
+    } else {
+        fprintf(stderr, "[WARN] ****** Original firmware unknown ******\n");
+        if (get_uint32le(&buf[0x204])==0x0000f000) {
+            *fw_version = 2;
+            model_id = buf[0x219];
+        } else {
+            *fw_version = 1;
+            model_id = buf[0x215];
+        }
+
+        *model = get_model(model_id);
+
+        if (*model == MODEL_UNKNOWN)
+            ERROR("[ERR]  Unknown firmware - model id 0x%02x\n", model_id);
     }
 
+    /* TODO: Do some more sanity checks on the OF image. Some images (like
+       m200v4) dont have a checksum at the end, only padding (0xdeadbeef). */
+    last_word = *bufsize - 4;
+    checksum = get_uint32le(buf + last_word);
+    if (checksum != 0xefbeadde && checksum != calc_checksum(buf, last_word))
+        ERROR("%s", "[ERR]  Whole file checksum failed\n");
+
+    if (bootloaders[*model] == NULL)
+        ERROR("[ERR]  Unsupported model - \"%s\"\n", model_names[*model]);
+
+
+    /* Get the firmware size */
+    if (*fw_version == 1)
+        *firmware_size = get_uint32le(&buf[0x0c]);
+    else    /* fw_version == 2 */
+        *firmware_size = get_uint32le(&buf[0x10]);
+
+    /* Compress the original firmware image */
+    *of_packed = uclpack(buf + 0x400, *firmware_size, of_packedsize);
+    if (*of_packed == NULL)
+        ERROR("[ERR]  Could not compress %s\n", filename);
+
     return buf;
+
+error:
+    free(buf);
+    return NULL;
 }
 
-
-static unsigned char* load_rockbox_file(char* filename, int model, off_t* bufsize)
-{
+/* Loads a rockbox bootloader file into memory */
+unsigned char* load_rockbox_file(
+            char* filename, int model, int* bufsize, int* rb_packedsize,
+            char* errstr, int errstrsize
+) {
     int fd;
-    unsigned char* buf;
+    unsigned char* buf = NULL;
+    unsigned char* packed = NULL;
     unsigned char header[8];
     uint32_t sum;
     off_t n;
@@ -360,39 +423,28 @@ static unsigned char* load_rockbox_file(char* filename, int model, off_t* bufsiz
 
     fd = open(filename, O_RDONLY|O_BINARY);
     if (fd < 0)
-    {
-        fprintf(stderr,"[ERR]  Could not open %s for reading\n",filename);
-        return NULL;
-    }
+        ERROR("[ERR]  Could not open %s for reading\n", filename);
 
     /* Read Rockbox header */
     n = read(fd, header, sizeof(header));
-    if (n != sizeof(header)) {
-        fprintf(stderr,"[ERR]  Could not read file %s\n",filename);
-        return NULL;
-    }
+    if (n != sizeof(header))
+        ERROR("[ERR]  Could not read file %s\n", filename);
 
     /* Check for correct model string */
-    if (memcmp(rb_model_names[model],header + 4,4)!=0) {
-        fprintf(stderr,"[ERR]  Model name \"%s\" not found in %s\n",
-                       rb_model_names[model],filename);
-        return NULL;
-    }
+    if (memcmp(rb_model_names[model], header + 4, 4)!=0)
+        ERROR("[ERR]  Model name \"%s\" not found in %s\n",
+                       rb_model_names[model], filename);
 
     *bufsize = filesize(fd) - sizeof(header);
 
     buf = malloc(*bufsize);
-    if (buf == NULL) {
-        fprintf(stderr,"[ERR]  Could not allocate memory for %s\n",filename);
-        return NULL;
-    }
+    if (buf == NULL)
+        ERROR("[ERR]  Could not allocate memory for %s\n", filename);
 
     n = read(fd, buf, *bufsize);
 
-    if (n != *bufsize) {
-        fprintf(stderr,"[ERR]  Could not read file %s\n",filename);
-        return NULL;
-    }
+    if (n != *bufsize)
+        ERROR("[ERR]  Could not read file %s\n", filename);
 
     /* Check checksum */
     sum = rb_model_num[model];
@@ -401,175 +453,35 @@ static unsigned char* load_rockbox_file(char* filename, int model, off_t* bufsiz
          sum += buf[i];
     }
 
-    if (sum != get_uint32be(header)) {
-        fprintf(stderr,"[ERR]  Checksum mismatch in %s\n",filename);
-        return NULL;
-    }
-    return buf;
+    if (sum != get_uint32be(header))
+        ERROR("[ERR]  Checksum mismatch in %s\n", filename);
+
+    packed = uclpack(buf, *bufsize, rb_packedsize);
+    if(packed == NULL)
+        ERROR("[ERR]  Could not compress %s\n", filename);
+
+    free(buf);
+    return packed;
+
+error:
+    free(buf);
+    return NULL;
 }
 
+#undef ERROR
 
-int main(int argc, char* argv[])
-{
-    char *infile, *bootfile, *outfile;
-    int fdout;
-    off_t len;
-    uint32_t n;
-    unsigned char* buf;
-    int firmware_size;
-    off_t bootloader_size;
-    uint32_t sum,filesum;
-    uint8_t  model_id;
-    int model;
-    uint32_t i;
-    unsigned char* of_packed;
-    int of_packedsize;
-    unsigned char* rb_unpacked;
-    unsigned char* rb_packed;
-    int rb_packedsize;
-    int fw_version;
-    int totalsize;
-    unsigned char* p;
-    uint32_t checksum;
-    char md5sum[33]; /* 32 hex digits, plus terminating zero */
-
-    fprintf(stderr,"mkamsboot v" VERSION " - (C) Dave Chapman and Rafaël Carré 2008\n");
-    fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
-    fprintf(stderr,"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
-
-    if(argc != 4) {
-        printf("Usage: mkamsboot <firmware file> <boot file> <output file>\n\n");
-        return 1;
-    }
-
-    infile = argv[1];
-    bootfile = argv[2];
-    outfile = argv[3];
-
-    /* Load original firmware file */
-    buf = load_file(infile, &len);
-
-    if (buf == NULL) {
-        fprintf(stderr,"[ERR]  Could not load %s\n",infile);
-        return 1;
-    }
-
-    /* Calculate MD5 checksum of OF */
-    calc_MD5(buf, len, md5sum);
-
-    fprintf(stderr,"[INFO] MD5 sum - %s\n",md5sum);
-
-    i = 0;
-    while ((i < NUM_MD5S) && (strcmp(sansasums[i].md5, md5sum) != 0))
-        i++;
-
-    if (i < NUM_MD5S) {
-        model = sansasums[i].model;
-        fw_version = sansasums[i].fw_version;
-        fprintf(stderr,"[INFO] Original firmware MD5 checksum match - %s %s\n",
-                       model_names[model], sansasums[i].version);
-    } else {
-        if (get_uint32le(&buf[0x204])==0x0000f000) {
-            fw_version = 2;
-            model_id = buf[0x219];
-        } else {
-            fw_version = 1;
-            model_id = buf[0x215];
-        }
-
-        model = get_model(model_id);
-
-#if 0
-        /* if you are a tester this info might help */
-        fprintf(stderr,"[WARN] ****** Original firmware unknown ******\n");
-        if (model == MODEL_UNKNOWN) {
-            fprintf(stderr,"[ERR]  Unknown firmware - model id 0x%02x\n",
-                           model_id);
-            free(buf);
-            return 1;
-        }
-#else
-        /* else you don't want to brick your player */
-        fprintf(stderr, "[ERR]  Original firmware untested - aborting\n");
-        free(buf);
-        return 1;
-#endif
-    }
-    
-
-    /* TODO: Do some more sanity checks on the OF image. Some images (like
-       m200v4) dont have a checksum at the end, only padding (0xdeadbeef). */
-    checksum = get_uint32le(buf + len - 4); 
-    if (checksum != 0xefbeadde && checksum != calc_checksum(buf, len - 4)) {
-
-        fprintf(stderr,"[ERR]  Whole file checksum failed - %s\n",infile);
-        free(buf);
-        return 1;
-    }
-
-    if (bootloaders[model] == NULL) {
-        fprintf(stderr,"[ERR]  Unsupported model - \"%s\"\n",model_names[model]);
-        free(buf);
-        return 1;
-    }
-
-    /* Load bootloader file */
-    rb_unpacked = load_rockbox_file(bootfile, model, &bootloader_size);
-    if (rb_unpacked == NULL) {
-        fprintf(stderr,"[ERR]  Could not load %s\n",bootfile);
-        free(buf);
-        return 1;
-    }
-
-    printf("[INFO] Patching %s firmware\n",model_names[model]);
-
-    /* Get the firmware size */
-    firmware_size = get_uint32le(&buf[0x0c]);
-
-    /* Compress the original firmware image */
-    of_packed = uclpack(buf + 0x400, firmware_size, &of_packedsize);
-    if (of_packed == NULL) {
-        fprintf(stderr,"[ERR]  Could not compress original firmware\n");
-        free(buf);
-        free(rb_unpacked);
-        return 1;
-    }
-
-    rb_packed = uclpack(rb_unpacked, bootloader_size, &rb_packedsize);
-    if (rb_packed == NULL) {
-        fprintf(stderr,"[ERR]  Could not compress %s\n",bootfile);
-        free(buf);
-        free(rb_unpacked);
-        free(of_packed);
-        return 1;
-    }
-
-    /* We are finished with the unpacked version of the bootloader */
-    free(rb_unpacked);
-
-    fprintf(stderr,"[INFO] Original firmware size:   %d bytes\n",firmware_size);
-    fprintf(stderr,"[INFO] Packed OF size:           %d bytes\n",of_packedsize);
-    fprintf(stderr,"[INFO] Bootloader size:          %d bytes\n",(int)bootloader_size);
-    fprintf(stderr,"[INFO] Packed bootloader size:   %d bytes\n",rb_packedsize);
-    fprintf(stderr,"[INFO] Dual-boot function size:  %d bytes\n",bootloader_sizes[model]);
-    fprintf(stderr,"[INFO] UCL unpack function size: %d bytes\n",sizeof(nrv2e_d8));
-
-    totalsize = bootloader_sizes[model] + sizeof(nrv2e_d8) + of_packedsize + 
-                rb_packedsize;
-
-    fprintf(stderr,"[INFO] Total size of new image:  %d bytes\n",totalsize);
-
-    if (totalsize > firmware_size) {
-        fprintf(stderr,"[ERR]  No room to insert bootloader, aborting\n");
-        free(buf);
-        free(rb_unpacked);
-        free(of_packed);
-        return 1;
-    }
+/* Patches a Sansa AMS Original Firmware file */
+void patch_firmware(
+        int model, int fw_version, int firmware_size, unsigned char* buf,
+        int len, unsigned char* of_packed, int of_packedsize,
+        unsigned char* rb_packed, int rb_packedsize
+) {
+    unsigned char *p;
+    uint32_t sum, filesum;
+    unsigned int i;
 
     /* Zero the original firmware area - not needed, but helps debugging */
     memset(buf + 0x400, 0, firmware_size);
-
 
     /* Insert dual-boot bootloader at offset 0 */
     memcpy(buf + 0x400, bootloaders[model], bootloader_sizes[model]);
@@ -589,7 +501,7 @@ int main(int argc, char* argv[])
     p -= rb_packedsize;
     memcpy(p, rb_packed, rb_packedsize);
 
-    /* Write the locations of the various images to the variables at the 
+    /* Write the locations of the various images to the variables at the
        start of the dualboot image - we save the location of the last byte
        in each image, along with the size in bytes */
 
@@ -602,19 +514,18 @@ int main(int argc, char* argv[])
     put_uint32le(&buf[0x42c], of_packedsize);
 
     /* Compressed Rockbox image */
-    put_uint32le(&buf[0x430], firmware_size - sizeof(nrv2e_d8) - of_packedsize - 1);
+    put_uint32le(&buf[0x430], firmware_size - sizeof(nrv2e_d8) - of_packedsize
+            - 1);
     put_uint32le(&buf[0x434], rb_packedsize);
 
 
     /* Update the firmware block checksum */
-    sum = calc_checksum(buf + 0x400,firmware_size);
+    sum = calc_checksum(buf + 0x400, firmware_size);
 
     if (fw_version == 1) {
         put_uint32le(&buf[0x04], sum);
         put_uint32le(&buf[0x204], sum);
     } else {
-        /* TODO: Verify that this is correct for the v2 firmware */
-
         put_uint32le(&buf[0x08], sum);
         put_uint32le(&buf[0x208], sum);
 
@@ -629,29 +540,130 @@ int main(int argc, char* argv[])
         filesum += get_uint32le(&buf[i]);
 
     put_uint32le(buf + len - 4, filesum);
+}
 
+/* returns size of new firmware block */
+int total_size(int model, int rb_packedsize, int of_packedsize) {
+    return bootloader_sizes[model] + sizeof(nrv2e_d8) + of_packedsize +
+                rb_packedsize;
+}
+
+#ifndef LIB
+/* standalone executable */
+int main(int argc, char* argv[]) {
+    char *infile, *bootfile, *outfile;
+    int fdout;
+    off_t len;
+    uint32_t n;
+    unsigned char* buf;
+    int firmware_size;
+    int bootloader_size;
+    int model;
+    unsigned char* of_packed;
+    int of_packedsize;
+    unsigned char* rb_packed;
+    int rb_packedsize;
+    int fw_version;
+    int totalsize;
+    char md5sum[33]; /* 32 hex digits, plus terminating zero */
+    char errstr[200];
+
+    fprintf(stderr,
+"mkamsboot v" VERSION " - (C) Dave Chapman and Rafaël Carré 2008\n"
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+"\n");
+
+    if(argc != 4) {
+        printf("Usage: mkamsboot <firmware file> <boot file> <output file>\n");
+        return 1;
+    }
+
+    infile = argv[1];
+    bootfile = argv[2];
+    outfile = argv[3];
+
+    /* Load original firmware file */
+    buf = load_of_file(infile, &len, md5sum, &model, &fw_version,
+            &firmware_size, &of_packed, &of_packedsize, errstr, sizeof(errstr));
+
+    if (buf == NULL) {
+        fprintf(stderr, "%s", errstr);
+        fprintf(stderr, "[ERR]  Could not load %s\n", infile);
+        return 1;
+    }
+
+    fprintf(stderr, "[INFO] Original firmware MD5 checksum match - %s\n",
+            model_names[model]);
+
+
+    /* Load bootloader file */
+    rb_packed = load_rockbox_file(bootfile, model, &bootloader_size,
+            &rb_packedsize, errstr, sizeof(errstr));
+    if (rb_packed == NULL) {
+        fprintf(stderr, "%s", errstr);
+        fprintf(stderr, "[ERR]  Could not load %s\n", bootfile);
+        free(buf);
+        free(of_packed);
+        return 1;
+    }
+
+    printf("[INFO] Patching %s firmware\n", model_names[model]);
+
+    fprintf(stderr, "[INFO] Original firmware size:   %d bytes\n",
+            firmware_size);
+    fprintf(stderr, "[INFO] Packed OF size:           %d bytes\n",
+            of_packedsize);
+    fprintf(stderr, "[INFO] Bootloader size:          %d bytes\n",
+            (int)bootloader_size);
+    fprintf(stderr, "[INFO] Packed bootloader size:   %d bytes\n",
+            rb_packedsize);
+    fprintf(stderr, "[INFO] Dual-boot function size:  %d bytes\n",
+            bootloader_sizes[model]);
+    fprintf(stderr, "[INFO] UCL unpack function size: %d bytes\n",
+            sizeof(nrv2e_d8));
+
+    totalsize = total_size(model, of_packedsize, rb_packedsize);
+
+    fprintf(stderr, "[INFO] Total size of new image:  %d bytes\n", totalsize);
+
+    if (totalsize > firmware_size) {
+        fprintf(stderr, "[ERR]  No room to insert bootloader, aborting\n");
+        free(buf);
+        free(of_packed);
+        free(rb_packed);
+        return 1;
+    }
+
+    patch_firmware(model, fw_version, firmware_size, buf, len, of_packed,
+            of_packedsize, rb_packed, rb_packedsize);
 
     /* Write the new firmware */
-    fdout = open(outfile, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,0666);
+    fdout = open(outfile, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0666);
 
     if (fdout < 0) {
-        fprintf(stderr,"[ERR]  Could not open %s for writing\n",outfile);
+        fprintf(stderr, "[ERR]  Could not open %s for writing\n", outfile);
+        free(buf);
+        free(of_packed);
+        free(rb_packed);
         return 1;
     }
 
     n = write(fdout, buf, len);
 
     if (n != (unsigned)len) {
-        fprintf(stderr,"[ERR]  Could not write firmware file\n");
+        fprintf(stderr, "[ERR]  Could not write firmware file\n");
+        free(buf);
+        free(of_packed);
+        free(rb_packed);
         return 1;
     }
 
     close(fdout);
-
-    fprintf(stderr," *****************************************************************************\n");
-    fprintf(stderr," *** THIS CODE IS UNTESTED - DO NOT USE IF YOU CAN NOT RECOVER YOUR DEVICE ***\n");
-    fprintf(stderr," *****************************************************************************\n");
+    free(buf);
+    free(of_packed);
+    free(rb_packed);
 
     return 0;
-
 }
+#endif

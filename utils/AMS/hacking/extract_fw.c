@@ -105,7 +105,10 @@ int main(int argc, char* argv[])
     close(fdin);
 
     /* Get the firmware size */
-    firmware_size = get_uint32le(&buf[0x0c]);
+    if (get_uint32le(&buf[0x04])==0x0000f000)
+        firmware_size = get_uint32le(&buf[0x10]);   /* v2 format */
+    else
+        firmware_size = get_uint32le(&buf[0x0c]);   /* v1 format */
 
     fdout = open(outfile, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,0666);
 
