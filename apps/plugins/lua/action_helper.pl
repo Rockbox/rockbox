@@ -18,13 +18,9 @@
 #
 ############################################################################
 
-$input = $ARGV[0] . "/../../action.h";
-
-open(ACTION, "<$input") or die "Can't open $input!";
-
 $i = 0;
 $j = 0;
-while(my $line = <ACTION>)
+while(my $line = <STDIN>)
 {
     chomp($line);
     if($line =~ /^\s*(ACTION_[^\s]+)(\s*=.*)?,\s*$/)
@@ -38,8 +34,6 @@ while(my $line = <ACTION>)
         $j++;
     }
 }
-
-close(ACTION);
 
 print "-- Don't change this file!\n";
 printf "-- It is automatically generated of action.h %s\n", '$Revision$';
