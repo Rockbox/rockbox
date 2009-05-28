@@ -35,9 +35,7 @@ PDa/src/m_class.c
 PDa/src/m_obj.c
 PDa/src/m_atom.c
 */
-/*
 PDa/src/m_memory.c
-*/
 
 /* PDa/src/m_binbuf.c Does not compile, file handling stuff */
 /*

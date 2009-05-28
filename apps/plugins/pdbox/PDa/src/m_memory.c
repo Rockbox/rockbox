@@ -2,8 +2,13 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
+#ifdef ROCKBOX
+#include "plugin.h"
+#define memset rb->memset
+#else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>
+#endif /* ROCKBOX */
 #include "m_pd.h"
 #include "m_imp.h"
 
