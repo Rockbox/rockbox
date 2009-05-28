@@ -236,8 +236,10 @@ char buf[50];
         lcd_clear_display();
         line = 0;
         _DEBUG_PRINTF("[Clock Frequencies:]");
-        _DEBUG_PRINTF("      SET       ACT");
-        _DEBUG_PRINTF("922T:          %3dMHz", calc_freq(CLK_922T)/1000000);
+        _DEBUG_PRINTF("      SET       ACTUAL");
+        _DEBUG_PRINTF("922T:%s     %3dMHz", (!(read_cp15()>>30)) ? "FAST " :
+                                              (read_cp15()>>31) ? "ASYNC" : "SYNC " ,
+                                               calc_freq(CLK_922T)/1000000);
         _DEBUG_PRINTF("PLLA:%3dMHz    %3dMHz", AS3525_PLLA_FREQ/1000000, calc_freq(CLK_PLLA)/1000000);
         _DEBUG_PRINTF("PLLB:          %3dMHz", calc_freq(CLK_PLLB)/1000000);
         _DEBUG_PRINTF("FCLK:          %3dMHz", calc_freq(CLK_FCLK)/1000000);
@@ -281,6 +283,9 @@ char buf[50];
         _DEBUG_PRINTF("SD  :%3dkHz    %3dkHz", AS3525_SD_IDENT_FREQ/1000,calc_freq(CLK_SD_IDENT_NAND)/1000);
         _DEBUG_PRINTF("MSD :%3dkHz    %3dkHz", AS3525_SD_IDENT_FREQ/1000,calc_freq(CLK_SD_IDENT_MSD)/1000);
         _DEBUG_PRINTF("USB:           %3dMHz", calc_freq(CLK_USB)/1000000);
+        _DEBUG_PRINTF("MMU:   %s", (read_cp15() & CP15_MMU) ? " op" : "nop");
+        _DEBUG_PRINTF("Icache:%s Dcache:%s",(read_cp15() & CP15_IC)  ? " op" : "nop",
+                                            (read_cp15() & CP15_DC)  ? " op" : "nop");
 
         lcd_update();
         int btn = button_get_w_tmo(HZ/10);
