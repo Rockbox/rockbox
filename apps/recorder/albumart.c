@@ -156,13 +156,17 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     albumlen = id3->album ? strlen(id3->album) : 0;
 
     /* the first file we look for is one specific to the track playing */
-    strip_extension(path, sizeof(path) - strlen(size_string) - 4, trackname);
-    strcat(path, size_string);
-    strcat(path, "." EXT);
-#ifdef USE_JPEG_COVER
-    pathlen = strlen(path);
-#endif
-    found = try_exts(path, pathlen);
+    if (*size_string == ':')
+        size_string++;
+    else {
+        strip_extension(path, sizeof(path) - strlen(size_string) - 4, trackname);
+        strcat(path, size_string);
+        strcat(path, "." EXT);
+    #ifdef USE_JPEG_COVER
+        pathlen = strlen(path);
+    #endif
+        found = try_exts(path, pathlen);
+    }
     if (!found && albumlen > 0)
     {
         /* if it doesn't exist,

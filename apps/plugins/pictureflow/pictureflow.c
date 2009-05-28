@@ -892,7 +892,7 @@ bool get_albumart_for_index_from_db(const int slide_index, char *buf,
             rb->get_metadata(&id3, fd, tcs.result);
             rb->close(fd);
         }
-        if ( search_albumart_files(&id3, "", buf, buflen) )
+        if ( search_albumart_files(&id3, ":", buf, buflen) )
             result = true;
         else
             result = false;
