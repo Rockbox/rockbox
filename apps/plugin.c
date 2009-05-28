@@ -648,6 +648,9 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_TOUCHSCREEN
     action_get_touchscreen_press,
 #endif
+#if defined(HAVE_TAGCACHE) && defined(HAVE_TC_RAMCACHE)
+    tagcache_fill_tags
+#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)

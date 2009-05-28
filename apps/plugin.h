@@ -128,7 +128,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 152
+#define PLUGIN_API_VERSION 153
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -809,6 +809,9 @@ struct plugin_api {
 
 #ifdef HAVE_TOUCHSCREEN
     int (*action_get_touchscreen_press)(short *x, short *y);
+#endif
+#if defined(HAVE_TAGCACHE) && defined(HAVE_TC_RAMCACHE)
+    bool (*tagcache_fill_tags)(struct mp3entry *id3, const char *filename);
 #endif
 };
 

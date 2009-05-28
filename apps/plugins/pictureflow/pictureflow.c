@@ -879,9 +879,19 @@ bool get_albumart_for_index_from_db(const int slide_index, char *buf,
         struct mp3entry id3;
         int fd;
 
-        fd = rb->open(tcs.result, O_RDONLY);
-        rb->get_metadata(&id3, fd, tcs.result);
-        rb->close(fd);
+#ifdef HAVE_TC_RAMCACHE
+        if (rb->tagcache_fill_tags(&id3, tcs.result))
+        {
+            rb->strncpy(id3.path, tcs.result, sizeof(id3.path));
+            id3.path[sizeof(id3.path) - 1] = 0;
+        }
+        else
+#endif
+        {
+            fd = rb->open(tcs.result, O_RDONLY);
+            rb->get_metadata(&id3, fd, tcs.result);
+            rb->close(fd);
+        }
         if ( search_albumart_files(&id3, "", buf, buflen) )
             result = true;
         else
