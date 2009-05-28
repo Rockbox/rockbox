@@ -2357,6 +2357,20 @@ void draw_album_text(void)
 
 }
 
+/**
+  Display an error message and wait for input.
+*/
+void error_wait(const char *message)
+{
+    rb->lcd_clear_display();
+    int y;
+    rb->lcd_getstringsize(message, NULL, &y);
+    rb->lcd_putsxy(0, 0, message);
+    rb->lcd_putsxy(0, y, "Press SELECT to exit.");
+    rb->lcd_update();
+    while (rb->get_action(CONTEXT_STD, 1) != ACTION_STD_OK)
+        rb->yield();
+}
 
 /**
   Main function that also contain the main plasma
@@ -2371,7 +2385,7 @@ int main(void)
 
     if ( ! rb->dir_exists( CACHE_PREFIX ) ) {
         if ( rb->mkdir( CACHE_PREFIX ) < 0 ) {
-            rb->splash(HZ, "Could not create directory " CACHE_PREFIX );
+            error_wait("Could not create directory " CACHE_PREFIX);
             return PLUGIN_ERROR;
         }
     }
@@ -2383,22 +2397,22 @@ int main(void)
     ALIGN_BUFFER(buf, buf_size, 4);
     ret = create_album_index();
     if (ret == ERROR_BUFFER_FULL) {
-        rb->splash(HZ, "Not enough memory for album names");
+        error_wait("Not enough memory for album names");
         return PLUGIN_ERROR;
     } else if (ret == ERROR_NO_ALBUMS) {
-        rb->splash(HZ, "No albums found. Please enable database");
+        error_wait("No albums found. Please enable database");
         return PLUGIN_ERROR;
     }
 
     ALIGN_BUFFER(buf, buf_size, 4);
     number_of_slides  = album_count;
     if ((cache_version != CACHE_VERSION) && !create_albumart_cache()) {
-        rb->splash(HZ, "Could not create album art cache");
+        error_wait("Could not create album art cache");
         return PLUGIN_ERROR;
     }
 
     if (!create_empty_slide(cache_version != CACHE_VERSION)) {
-        rb->splash(HZ, "Could not load the empty slide");
+        error_wait("Could not load the empty slide");
         return PLUGIN_ERROR;
     }
     cache_version = CACHE_VERSION;
@@ -2410,7 +2424,7 @@ int main(void)
     if (!grey_init(buf, buf_size, GREY_BUFFERED|GREY_ON_COP,
                    LCD_WIDTH, LCD_HEIGHT, &grey_buf_used))
     {
-        rb->splash(HZ, "Greylib init failed!");
+        error_wait("Greylib init failed!");
         return PLUGIN_ERROR;
     }
     grey_setfont(FONT_UI);
@@ -2421,12 +2435,12 @@ int main(void)
 
     if (!(empty_slide_hid = read_pfraw(EMPTY_SLIDE, 0)))
     {
-        rb->splash(HZ, "Unable to load empty slide image");
+        error_wait("Unable to load empty slide image");
         return PLUGIN_ERROR;
     }
 
     if (!create_pf_thread()) {
-        rb->splash(HZ, "Cannot create thread!");
+        error_wait("Cannot create thread!");
         return PLUGIN_ERROR;
     }
 
