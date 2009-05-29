@@ -133,7 +133,7 @@ static bool try_exts(char *path, int len)
  *
  * If the first symbol in size_string is a colon (e.g. ":100x100")
  * then the colon is skipped ("100x100" will be used) and the track
- * specific image (./<trackname><size>.bmp) is not tried.
+ * specific image (./<trackname><size>.bmp) is tried last instead of first.
  */
 bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
                            char *buf, int buflen)
@@ -141,6 +141,8 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     char path[MAX_PATH + 1];
     char dir[MAX_PATH + 1];
     bool found = false;
+    int track_first = 1;
+    int pass;
     const char *trackname;
     const char *artist;
     int dirlen;
@@ -155,93 +157,107 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     if (strcmp(trackname, "No file!") == 0)
         return false;
 
+    if (*size_string == ':')
+    {
+        size_string++;
+        track_first = 0;
+    }
+
     strip_filename(dir, sizeof(dir), trackname);
     dirlen = strlen(dir);
     albumlen = id3->album ? strlen(id3->album) : 0;
 
-    /* the first file we look for is one specific to the track playing */
-    if (*size_string == ':')
-        size_string++;
-    else {
-        strip_extension(path, sizeof(path) - strlen(size_string) - 4, trackname);
-        strcat(path, size_string);
-        strcat(path, "." EXT);
-    #ifdef USE_JPEG_COVER
-        pathlen = strlen(path);
-    #endif
-        found = try_exts(path, pathlen);
-    }
-    if (!found && albumlen > 0)
+    for(pass = 0; pass < 2; pass++)
     {
-        /* if it doesn't exist,
-         * we look for a file specific to the track's album name */
-        pathlen = snprintf(path, sizeof(path),
-                           "%s%s%s." EXT, dir, id3->album, size_string);
-        fix_path_part(path, dirlen, albumlen);
-        found = try_exts(path, pathlen);
-    }
-
-    if (!found)
-    {
-        /* if it still doesn't exist, we look for a generic file */
-        pathlen = snprintf(path, sizeof(path),
-                           "%scover%s." EXT, dir, size_string);
-        found = try_exts(path, pathlen);
-    }
-
+        if (track_first || pass)
+        {
+            /* the first file we look for is one specific to the
+               current track */
+            strip_extension(path, sizeof(path) - strlen(size_string) - 4,
+                            trackname);
+            strcat(path, size_string);
+            strcat(path, "." EXT);
 #ifdef USE_JPEG_COVER
-    if (!found && !*size_string)
-    {
-        snprintf (path, sizeof(path), "%sfolder.jpg", dir);
-        found = file_exists(path);
-    }
+            pathlen = strlen(path);
 #endif
-
-    artist = id3->albumartist != NULL ? id3->albumartist : id3->artist;
-
-    if (!found && artist && id3->album)
-    {
-        /* look in the albumart subdir of .rockbox */
-        pathlen = snprintf(path, sizeof(path),
-                           ROCKBOX_DIR "/albumart/%s-%s%s." EXT,
-                           artist,
-                           id3->album,
-                           size_string);
-        fix_path_part(path, strlen(ROCKBOX_DIR "/albumart/"), MAX_PATH);
-        found = try_exts(path, pathlen);
-    }
-
-    if (!found)
-    {
-        /* if it still doesn't exist,
-         * we continue to search in the parent directory */
-        strcpy(path, dir);
-        path[dirlen - 1] = 0;
-        strip_filename(dir, sizeof(dir), path);
-        dirlen = strlen(dir);
-    }
-
-    /* only try parent if there is one */
-    if (dirlen > 0)
-    {
+            found = try_exts(path, pathlen);
+        }
+        if (pass)
+            break;
         if (!found && albumlen > 0)
         {
-            /* we look in the parent directory
-             * for a file specific to the track's album name */
+            /* if it doesn't exist,
+            * we look for a file specific to the track's album name */
             pathlen = snprintf(path, sizeof(path),
-                               "%s%s%s." EXT, dir, id3->album, size_string);
+                            "%s%s%s." EXT, dir, id3->album, size_string);
             fix_path_part(path, dirlen, albumlen);
             found = try_exts(path, pathlen);
         }
-    
+
         if (!found)
         {
-            /* if it still doesn't exist, we look in the parent directory
-             * for a generic file */
+            /* if it still doesn't exist, we look for a generic file */
             pathlen = snprintf(path, sizeof(path),
-                               "%scover%s." EXT, dir, size_string);
+                            "%scover%s." EXT, dir, size_string);
             found = try_exts(path, pathlen);
         }
+
+#ifdef USE_JPEG_COVER
+        if (!found && !*size_string)
+        {
+            snprintf (path, sizeof(path), "%sfolder.jpg", dir);
+            found = file_exists(path);
+        }
+#endif
+
+        artist = id3->albumartist != NULL ? id3->albumartist : id3->artist;
+
+        if (!found && artist && id3->album)
+        {
+            /* look in the albumart subdir of .rockbox */
+            pathlen = snprintf(path, sizeof(path),
+                            ROCKBOX_DIR "/albumart/%s-%s%s." EXT,
+                            artist,
+                            id3->album,
+                            size_string);
+            fix_path_part(path, strlen(ROCKBOX_DIR "/albumart/"), MAX_PATH);
+            found = try_exts(path, pathlen);
+        }
+
+        if (!found)
+        {
+            /* if it still doesn't exist,
+            * we continue to search in the parent directory */
+            strcpy(path, dir);
+            path[dirlen - 1] = 0;
+            strip_filename(dir, sizeof(dir), path);
+            dirlen = strlen(dir);
+        }
+
+        /* only try parent if there is one */
+        if (dirlen > 0)
+        {
+            if (!found && albumlen > 0)
+            {
+                /* we look in the parent directory
+                * for a file specific to the track's album name */
+                pathlen = snprintf(path, sizeof(path),
+                                "%s%s%s." EXT, dir, id3->album, size_string);
+                fix_path_part(path, dirlen, albumlen);
+                found = try_exts(path, pathlen);
+            }
+
+            if (!found)
+            {
+                /* if it still doesn't exist, we look in the parent directory
+                * for a generic file */
+                pathlen = snprintf(path, sizeof(path),
+                                "%scover%s." EXT, dir, size_string);
+                found = try_exts(path, pathlen);
+            }
+        }
+        if (found)
+            break;
     }
 
     if (!found)
