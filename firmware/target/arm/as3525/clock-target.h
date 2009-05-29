@@ -40,9 +40,13 @@
  *
  *  The CLOCK_DIV macro does a pretty good job at selecting divider values but
  *  you can always override it by choosing your own value and commenting out the
- *  macro.  If you are going to use AS3525_FCLK_PREDIV or AS3525_PCLK_DIV1 you
- *  will have to do a manual calculation.  I have included USB & PLLB for future
- *  use but commented them out for now.
+ *  macro.   AS3525_FCLK_PREDIV values other than 0 allow you to choose frequencies
+ *  from lines below the main PLL frequency lines.  AS3525_FCLK_POSTDIV
+ *  will be calculated automagically depending on the value you have selected
+ *  for AS3525_FCLK_FREQ.  You may add more PLL frequencies by simply commenting
+ *  out the current #defines for AS3525_PLLA_FREQ & AS3525_PLLA_SETTING and
+ *  adding a #define for FREQ and divider setting to produce that frequency.I
+ *  have included USB & PLLB for future use but commented them out for now.
  */
 
 /* Clock Sources  */
@@ -51,8 +55,8 @@
 //#define AS3525_CLK_PLLB           2
 #define AS3525_CLK_FCLK           3         /* Available as PCLK input only  */
 
+/** ************ Change these to reconfigure clocking scheme *******************/
 /* PLL  frequencies and settings*/
-
 #define AS3525_PLLA_FREQ        248000000   /*124,82.7,62,49.6,41.3,35.4 */
        /* FCLK_PREDIV->  *7/8 = 217MHz      108.5 ,72.3, 54.25, 43.4, 36.17 */
                       /* *6/8 = 186MHz      93, 62, 46.5, 37.2 */
@@ -69,11 +73,14 @@
 //#define AS3525_PLLB_FREQ
 //#define AS3525_PLLB_SETTING
 
-/** ************ Change these to reconfigure clocking scheme *******************/
+#define AS3525_FCLK_PREDIV    0 /* div = (8-n)/8 Enter manually & postdiv will be calculated*/
+                                /* 0 gives you the PLLA 1st line choices, 1 the 2nd line etc. */
 
-#define AS3525_FCLK_FREQ         248000000          /* Boosted FCLK frequency  */
-#define AS3525_PCLK_FREQ         62000000           /* Initial PCLK frequency  */
-#define AS3525_DBOP_FREQ         AS3525_PCLK_FREQ   /* Initial DBOP frequency  */
+#define AS3525_FCLK_FREQ      248000000            /* Boosted FCLK frequency  */
+#define AS3525_DRAM_FREQ       62000000            /* Initial DRAM frequency  */
+        /* AS3525_PCLK_FREQ != AS3525_DRAM_FREQ/1 will boot to white lcd screen */
+#define AS3525_PCLK_FREQ      AS3525_DRAM_FREQ/1   /* PCLK divided from DRAM freq */
+#define AS3525_DBOP_FREQ      AS3525_PCLK_FREQ/1   /* DBOP divided from PCLK freq */
 
 /** ****************************************************************************/
 
@@ -89,18 +96,18 @@
 
 /* FCLK */
 #define AS3525_FCLK_SEL          AS3525_CLK_PLLA
-#define AS3525_FCLK_PREDIV       0 /* div = (8-n)/8 Enter manually & postdiv will be calculated*/
 #define AS3525_FCLK_POSTDIV      (CLK_DIV((AS3525_PLLA_FREQ*(8-AS3525_FCLK_PREDIV)/8), AS3525_FCLK_FREQ) - 1) /*div=1/(n+1)*/
 
 /* PCLK */
 #ifdef ASYNCHRONOUS_BUS
 #define AS3525_PCLK_SEL          AS3525_CLK_PLLA    /* PLLA input for asynchronous */
-#define AS3525_PCLK_DIV0         (CLK_DIV(AS3525_PLLA_FREQ, AS3525_PCLK_FREQ) - 1)/*div=1/(n+1)*/
+#define AS3525_PCLK_DIV0         (CLK_DIV(AS3525_PLLA_FREQ, AS3525_DRAM_FREQ) - 1)/*div=1/(n+1)*/
 #else
 #define AS3525_PCLK_SEL          AS3525_CLK_FCLK    /* Fclk input for synchronous */
-#define AS3525_PCLK_DIV0         (CLK_DIV(AS3525_FCLK_FREQ, AS3525_PCLK_FREQ) - 1) /*div=1/(n+1)*/
+#define AS3525_PCLK_DIV0         (CLK_DIV(AS3525_FCLK_FREQ, AS3525_DRAM_FREQ) - 1) /*div=1/(n+1)*/
 #endif
-#define AS3525_PCLK_DIV1         0 /* div = 1/(n+1) unable to use successfuly so far*/
+         /*unable to use AS3525_PCLK_DIV1 != 0 successfuly so far*/
+#define AS3525_PCLK_DIV1         (CLK_DIV(AS3525_DRAM_FREQ, AS3525_PCLK_FREQ) - 1)/* div = 1/(n+1)*/ 
 
    /* PCLK as Source */
   #define AS3525_DBOP_DIV        (CLK_DIV(AS3525_PCLK_FREQ, AS3525_DBOP_FREQ) - 1) /*div=1/(n+1)*/
