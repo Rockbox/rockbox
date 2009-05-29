@@ -1,7 +1,3 @@
-#if defined(MEM) && (MEM > 16)
-#error "re-run configure this just so wrong"
-#endif
-
 #define TARGET_TREE /* this target is using the target tree system */
 
 /*
