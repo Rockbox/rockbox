@@ -167,7 +167,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     dirlen = strlen(dir);
     albumlen = id3->album ? strlen(id3->album) : 0;
 
-    for(pass = 0; pass < 2; pass++)
+    for(pass = 0; pass < 2 - track_first; pass++)
     {
         if (track_first || pass)
         {
