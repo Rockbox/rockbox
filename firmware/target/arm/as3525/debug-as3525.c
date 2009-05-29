@@ -84,6 +84,8 @@ static unsigned read_cp15 (void)
 int calc_freq(int clk)
 {
     int out_div;
+    unsigned int prediv = ((unsigned int)CGU_PROC>>2) & 0x3;
+    unsigned int postdiv = ((unsigned int)CGU_PROC>>4) & 0xf;
 
     switch(clk) {
         /* clk_main = clk_int = 24MHz oscillator */
@@ -119,14 +121,11 @@ int calc_freq(int clk)
         case CLK_FCLK:
             switch(CGU_PROC & 3) {
                 case 0:
-                    return CLK_MAIN/
-                    ((8/(8-((CGU_PROC>>2)& 0x3)))*(((CGU_PROC>>4)& 0xf) + 1));
+                    return (CLK_MAIN * (8 - prediv)) / (8*(postdiv + 1));
                 case 1:
-                    return calc_freq(CLK_PLLA)/
-                    ((8/(8-((CGU_PROC>>2)& 0x3)))*(((CGU_PROC>>4)& 0xf) + 1));
+                    return (calc_freq(CLK_PLLA) * (8 - prediv)) / (8*(postdiv + 1));
                 case 2:
-                    return calc_freq(CLK_PLLB)/
-                    ((8/(8-((CGU_PROC>>2)& 0x3)))*(((CGU_PROC>>4)& 0xf) + 1));
+                    return (calc_freq(CLK_PLLB) * (8 - prediv)) / (8*(postdiv + 1));
                 default:
                     return 0;
             }

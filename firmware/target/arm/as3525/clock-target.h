@@ -89,8 +89,8 @@
 
 /* FCLK */
 #define AS3525_FCLK_SEL          AS3525_CLK_PLLA
-#define AS3525_FCLK_PREDIV       0   /* div = (8-n)/8 acts strange when used!*/
-#define AS3525_FCLK_POSTDIV      (CLK_DIV(AS3525_PLLA_FREQ, AS3525_FCLK_FREQ) - 1) /*div=1/(n+1)*/
+#define AS3525_FCLK_PREDIV       0 /* div = (8-n)/8 Enter manually & postdiv will be calculated*/
+#define AS3525_FCLK_POSTDIV      (CLK_DIV((AS3525_PLLA_FREQ*(8-AS3525_FCLK_PREDIV)/8), AS3525_FCLK_FREQ) - 1) /*div=1/(n+1)*/
 
 /* PCLK */
 #ifdef ASYNCHRONOUS_BUS
