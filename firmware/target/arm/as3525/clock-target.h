@@ -49,7 +49,7 @@
 #define AS3525_CLK_MAIN           0
 #define AS3525_CLK_PLLA           1
 //#define AS3525_CLK_PLLB           2
-#define AS3525_CLK_FCLK           3         /* for synchronous bus only  */
+#define AS3525_CLK_FCLK           3         /* Available as PCLK input only  */
 
 /* PLL  frequencies and settings*/
 
