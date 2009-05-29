@@ -46,9 +46,6 @@
 /* Define this if you have a MAS3539F */
 #define CONFIG_CODEC MAS3539F
 
-/* Enable this if you have done the backlight mod */
-//#define HAVE_BACKLIGHT
-
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
