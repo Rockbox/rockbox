@@ -579,7 +579,7 @@ voiceconfig () {
         if [ -n "`findtool lame`" ]; then
             ENCODER="lame"
             ENC_CMD="lame"
-            ENC_OPTS="--resample 12 -t -m m -h -V 9 -S -B 64 --vbr-new"
+            ENC_OPTS="--resample 12 -t -m m -h -V 9.999 -S -B 64 --vbr-new"
          else
             echo "You need LAME in the system path to build voice files for"
             echo "HWCODEC targets."
