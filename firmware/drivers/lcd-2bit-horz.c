@@ -732,9 +732,8 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     do
     {
         const unsigned char *src_col = src++;
-        unsigned data = *src_col >> src_y;
-        int numbits = 8 - ((int)src_y);
-        
+        unsigned data = (*src_col | 0x100) >> src_y; /* bit 8 == sentinel */
+
         ymax = y + height;
         ny = y;
         do
@@ -747,11 +746,10 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             ny++;
 
             data >>= 1;
-            if (--numbits == 0)
+            if (data == 0x001)
             {
                 src_col += stride;
-                data = *src_col;
-                numbits = 8;
+                data = *src_col | 0x100;
             }
         }
         while (ny < ymax);

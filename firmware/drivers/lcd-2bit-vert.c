@@ -719,7 +719,6 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
 {
     int shift, ny;
     fb_data *dst, *dst_end;
-    unsigned mask, mask_bottom;
     lcd_blockfunc_type *bfunc;
 
     /* nothing to draw? */
@@ -757,20 +756,21 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     ny     = height - 1 + shift + src_y;
 
     bfunc  = lcd_blockfuncs[current_vp->drawmode];
-    mask   = 0xFFu << (shift + src_y);
-    mask_bottom = 0xFFu >> (~ny & 7);
     
     if (shift == 0)
     {
-        unsigned dmask1, dmask2, data;
+        unsigned dmask1, dmask2, dmask_bottom, data;
+
+        dmask1  = 0xFFFFu << (2 * (shift + src_y));
+        dmask2  = dmask1 >> 8;
+        dmask1 &= 0xFFu;
+        dmask_bottom  = 0xFFFFu >> (2 * (~ny & 7));
 
         for (; ny >= 8; ny -= 8)
         {
             const unsigned char *src_row = src;
             fb_data *dst_row = dst + LCD_WIDTH;
             
-            dmask1 = lcd_dibits[mask&0x0F];
-            dmask2 = lcd_dibits[(mask>>4)&0x0F];
             dst_end = dst_row + width;
 
             if (dmask1 != 0)
@@ -791,11 +791,11 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             }
             src += stride;
             dst += 2*LCD_WIDTH;
-            mask = 0xFFu;
+            dmask1 = dmask2 = 0xFFu;
         }
-        mask &= mask_bottom;
-        dmask1 = lcd_dibits[mask&0x0F];
-        dmask2 = lcd_dibits[(mask>>4)&0x0F];
+        dmask1 &= dmask_bottom; 
+                  /* & 0xFFu is unnecessary here - dmask1 can't exceed that*/
+        dmask2 &= (dmask_bottom >> 8);
         dst_end = dst + width;
         
         if (dmask1 != 0)
@@ -826,6 +826,9 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     }
     else
     {
+        unsigned mask   = 0xFFu << (shift + src_y);
+        unsigned mask_bottom = 0xFFu >> (~ny & 7);
+
         dst_end = dst + width;
         do
         {
