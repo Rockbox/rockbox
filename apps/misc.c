@@ -299,7 +299,10 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
         int audio_stat = audio_status();
 
         FOR_NB_SCREENS(i)
+        {
             screens[i].clear_display();
+            screens[i].update();
+        }
 
         if (batt_safe)
         {
