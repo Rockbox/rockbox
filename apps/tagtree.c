@@ -145,7 +145,7 @@ struct menu_entry {
     int link;
 };
 
-struct root_menu {
+struct menu_root {
     char title[64];
     char id[MAX_MENU_ID_SIZE];
     int itemcount;
@@ -155,12 +155,12 @@ struct root_menu {
 /* Statusbar text of the current view. */
 static char current_title[MAX_TAGS][128];
 
-static struct root_menu *menus[TAGMENU_MAX_MENUS];
-static struct root_menu *menu;
+static struct menu_root *menus[TAGMENU_MAX_MENUS];
+static struct menu_root *menu;
 static struct search_instruction *csi;
 static const char *strp;
 static int menu_count;
-static int root_menu;
+static int rootmenu;
 
 static int current_offset;
 static int current_entry_count;
@@ -551,7 +551,7 @@ static bool parse_search(struct menu_entry *entry, const char *str)
     struct search_instruction *inst = entry->si;
     char buf[MAX_PATH];
     int i;
-    struct root_menu *new_menu;
+    struct menu_root *new_menu;
     
     strp = str;
     
@@ -588,9 +588,9 @@ static bool parse_search(struct menu_entry *entry, const char *str)
         }
         
         /* Allocate a new menu unless link is found. */
-        menus[menu_count] = buffer_alloc(sizeof(struct root_menu));
+        menus[menu_count] = buffer_alloc(sizeof(struct menu_root));
         new_menu = menus[menu_count];
-        memset(new_menu, 0, sizeof(struct root_menu));
+        memset(new_menu, 0, sizeof(struct menu_root));
         strncpy(new_menu->id, buf, MAX_MENU_ID_SIZE-1);
         entry->link = menu_count;
         ++menu_count;
@@ -829,10 +829,10 @@ static int parse_line(int n, const char *buf, void *parameters)
             
                 if (menu == NULL) 
                 {
-                    menus[menu_count] = buffer_alloc(sizeof(struct root_menu));
+                    menus[menu_count] = buffer_alloc(sizeof(struct menu_root));
                     menu = menus[menu_count];
                     ++menu_count;
-                    memset(menu, 0, sizeof(struct root_menu));
+                    memset(menu, 0, sizeof(struct menu_root));
                     strncpy(menu->id, data, MAX_MENU_ID_SIZE-1);
                 }
             
@@ -847,12 +847,12 @@ static int parse_line(int n, const char *buf, void *parameters)
                 
             case var_rootmenu:
                 /* Only set root menu once. */
-                if (root_menu >= 0)
+                if (rootmenu >= 0)
                     break;
                 
                 if (get_token_str(data, sizeof(data)) < 0)
                 {
-                    logf("%%root_menu empty");
+                    logf("%%rootmenu empty");
                     return 0;
                 }
                 
@@ -860,7 +860,7 @@ static int parse_line(int n, const char *buf, void *parameters)
                 {
                     if (!strcasecmp(menus[i]->id, data))
                     {
-                        root_menu = i;
+                        rootmenu = i;
                     }
                 }
                 break;
@@ -922,13 +922,13 @@ void tagtree_init(void)
     format_count = 0;
     menu_count = 0;
     menu = NULL;
-    root_menu = -1;
+    rootmenu = -1;
     parse_menu(FILE_SEARCH_INSTRUCTIONS);
     
     /* If no root menu is set, assume it's the first single menu
      * we have. That shouldn't normally happen. */
-    if (root_menu < 0)
-        root_menu = 0;
+    if (rootmenu < 0)
+        rootmenu = 0;
     
     uniqbuf = buffer_alloc(UNIQBUF_SIZE);
 
@@ -1306,7 +1306,7 @@ static int load_root(struct tree_context *c)
     tc = c;
     c->currtable = ROOT;
     if (c->dirlevel == 0)
-        c->currextra = root_menu;
+        c->currextra = rootmenu;
     
     menu = menus[c->currextra];
     if (menu == NULL)
@@ -1350,7 +1350,7 @@ int tagtree_load(struct tree_context* c)
         c->dirfull = false;
         table = ROOT;
         c->currtable = table;
-        c->currextra = root_menu;
+        c->currextra = rootmenu;
     }
 
     switch (table) 
