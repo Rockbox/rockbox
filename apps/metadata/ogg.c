@@ -115,64 +115,7 @@ bool get_ogg_metadata(int fd, struct mp3entry* id3)
      * one from the last page (since we only support a single bitstream).
      */
     serial = get_long_le(&buf[14]);
-
-    /* Minimum header length for Ogg pages is 27. */
-    if (read(fd, buf, 27) < 27) 
-    {
-        return false;
-    }
-
-    if (memcmp(buf, "OggS", 4) !=0 )
-    {
-        return false;
-    }
-
-    segments = buf[26];
-
-    /* read in segment table */
-    if (read(fd, buf, segments) < segments) 
-    {
-        return false;
-    }
-
-    /* The second packet in a vorbis stream is the comment packet. It *may*
-     * extend beyond the second page, but usually does not. Here we find the
-     * length of the comment packet (or the rest of the page if the comment
-     * packet extends to the third page).
-     */
-    for (i = 0; i < segments; i++) 
-    {
-        remaining += buf[i];
-        
-        /* The last segment of a packet is always < 255 bytes */
-        if (buf[i] < 255) 
-        {
-              break;
-        }
-    }
-
-    comment_size = remaining;
-    
-    if (id3->codectype == AFMT_OGG_VORBIS) {
-        /* Now read in packet header (type and id string) */
-        if (read(fd, buf, 7) < 7) 
-        {
-            return false;
-        }
-
-        remaining -= 7;
-
-        /* The first byte of a packet is the packet type; comment packets are
-         * type 3.
-         */
-        if (buf[0] != 3)
-        {
-            return false;
-        }
-    }
-
-    /* Failure to read the tags isn't fatal. */
-    read_vorbis_tags(fd, id3, remaining);
+    comment_size = read_vorbis_tags(fd, id3, remaining);
 
     /* We now need to search for the last page in the file - identified by 
      * by ('O','g','g','S',0) and retrieve totalsamples.

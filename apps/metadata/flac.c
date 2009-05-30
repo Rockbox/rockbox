@@ -101,7 +101,7 @@ bool get_flac_metadata(int fd, struct mp3entry* id3)
         else if (type == 4)  /* 4 is the VORBIS_COMMENT block */
         {
             /* The next i bytes of the file contain the VORBIS COMMENTS. */
-            if (!read_vorbis_tags(fd, id3, i))
+            if (read_vorbis_tags(fd, id3, i) == 0)
             {
                 return rc;
             }

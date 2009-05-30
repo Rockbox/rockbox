@@ -32,7 +32,7 @@
 enum tagtype { TAGTYPE_APE = 1, TAGTYPE_VORBIS };
 
 bool read_ape_tags(int fd, struct mp3entry* id3);
-bool read_vorbis_tags(int fd, struct mp3entry *id3,
+long read_vorbis_tags(int fd, struct mp3entry *id3,
     long tag_remaining);
 
 bool skip_id3v2(int fd, struct mp3entry *id3);
