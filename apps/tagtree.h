@@ -30,8 +30,6 @@
 #define TAGMENU_MAX_MENUS  32
 #define TAGMENU_MAX_FMTS   32
 
-enum table { root = 1, navibrowse, allsubentries, playtrack };
-
 struct tagentry {
     char *name;
     int newtable;

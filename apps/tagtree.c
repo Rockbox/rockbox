@@ -57,6 +57,13 @@ static int tagtree_play_folder(struct tree_context* c);
 
 #define SEARCHSTR_SIZE 256
 
+enum table {
+    ROOT = 1,
+    NAVIBROWSE,
+    ALLSUBENTRIES,
+    PLAYTRACK,
+};
+
 static const struct id3_to_search_mapping {
     char   *string;
     size_t id3_offset;
@@ -1065,7 +1072,7 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
             , 0);
     }
     
-    if (c->currtable == allsubentries)
+    if (c->currtable == ALLSUBENTRIES)
     {
         tag = tag_title;
         level--;
@@ -1139,14 +1146,14 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     {
         if (offset == 0)
         {
-            dptr->newtable = allsubentries;
+            dptr->newtable = ALLSUBENTRIES;
             dptr->name = str(LANG_TAGNAVI_ALL_TRACKS);
             dptr++;
             current_entry_count++;
         }
         if (offset <= 1)
         {
-            dptr->newtable = navibrowse;
+            dptr->newtable = NAVIBROWSE;
             dptr->name = str(LANG_TAGNAVI_RANDOM);
             dptr->extraseek = -1;
             dptr++;
@@ -1162,10 +1169,10 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
         if (total_count++ < offset)
             continue;
         
-        dptr->newtable = navibrowse;
+        dptr->newtable = NAVIBROWSE;
         if (tag == tag_title || tag == tag_filename)
         {
-            dptr->newtable = playtrack;
+            dptr->newtable = PLAYTRACK;
             dptr->extraseek = tcs->idx_id;
         }
         else
@@ -1297,7 +1304,7 @@ static int load_root(struct tree_context *c)
     int i;
     
     tc = c;
-    c->currtable = root;
+    c->currtable = ROOT;
     if (c->dirlevel == 0)
         c->currextra = root_menu;
     
@@ -1311,12 +1318,12 @@ static int load_root(struct tree_context *c)
         switch (menu->items[i]->type)
         {
             case menu_next:
-                dptr->newtable = navibrowse;
+                dptr->newtable = NAVIBROWSE;
                 dptr->extraseek = i;
                 break;
             
             case menu_load:
-                dptr->newtable = root;
+                dptr->newtable = ROOT;
                 dptr->extraseek = menu->items[i]->link;
                 break;
         }
@@ -1341,19 +1348,19 @@ int tagtree_load(struct tree_context* c)
     if (!table)
     {
         c->dirfull = false;
-        table = root;
+        table = ROOT;
         c->currtable = table;
         c->currextra = root_menu;
     }
 
     switch (table) 
     {
-        case root:
+        case ROOT:
             count = load_root(c);
             break;
 
-        case allsubentries:
-        case navibrowse:
+        case ALLSUBENTRIES:
+        case NAVIBROWSE:
             logf("navibrowse...");
             cpu_boost(true);
             count = retrieve_entries(c, &tcs, 0, true);
@@ -1411,16 +1418,16 @@ int tagtree_enter(struct tree_context* c)
     c->dirlevel++;
 
     switch (c->currtable) {
-        case root:
+        case ROOT:
             c->currextra = newextra;
         
-            if (newextra == root)
+            if (newextra == ROOT)
             {
                 menu = menus[seek];
                 c->currextra = seek;
             }
         
-            else if (newextra == navibrowse)
+            else if (newextra == NAVIBROWSE)
             {
                 int i, j;
                 
@@ -1486,9 +1493,9 @@ int tagtree_enter(struct tree_context* c)
 
             break;
 
-        case navibrowse:
-        case allsubentries:
-            if (newextra == playtrack)
+        case NAVIBROWSE:
+        case ALLSUBENTRIES:
+            if (newextra == PLAYTRACK)
             {
                 if (global_settings.party_mode && audio_status()) {
                     splash(HZ, ID2P(LANG_PARTY_MODE));
@@ -1637,7 +1644,7 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
     dptr = tagtree_get_entry(tc, tc->selected_item);
     
     /* Insert a single track? */
-    if (dptr->newtable == playtrack)
+    if (dptr->newtable == PLAYTRACK)
     {
         if (tagtree_get_filename(tc, buf, sizeof buf) < 0)
         {
@@ -1649,27 +1656,27 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
         return true;
     }
     
-    if (dptr->newtable == navibrowse)
+    if (dptr->newtable == NAVIBROWSE)
     {
         tagtree_enter(tc);
         tagtree_load(tc);
         dptr = tagtree_get_entry(tc, tc->selected_item);
     }
-    else if (dptr->newtable != allsubentries)
+    else if (dptr->newtable != ALLSUBENTRIES)
     {
         logf("unsupported table: %d", dptr->newtable);
         return false;
     }
     
     /* Now the current table should be allsubentries. */
-    if (dptr->newtable != playtrack)
+    if (dptr->newtable != PLAYTRACK)
     {
         tagtree_enter(tc);
         tagtree_load(tc);
         dptr = tagtree_get_entry(tc, tc->selected_item);
     
         /* And now the newtable should be playtrack. */
-        if (dptr->newtable != playtrack)
+        if (dptr->newtable != PLAYTRACK)
         {
             logf("newtable: %d !!", dptr->newtable);
             tc->dirlevel = dirlevel;
@@ -1743,11 +1750,11 @@ char *tagtree_get_title(struct tree_context* c)
 {
     switch (c->currtable)
     {
-        case root:
+        case ROOT:
             return menu->title;
         
-        case navibrowse:
-        case allsubentries:
+        case NAVIBROWSE:
+        case ALLSUBENTRIES:
             return current_title[c->currextra];
     }
     
@@ -1759,14 +1766,14 @@ int tagtree_get_attr(struct tree_context* c)
     int attr = -1;
     switch (c->currtable)
     {
-        case navibrowse:
+        case NAVIBROWSE:
             if (csi->tagorder[c->currextra] == tag_title)
                 attr = FILE_ATTR_AUDIO;
             else
                 attr = ATTR_DIRECTORY;
             break;
 
-        case allsubentries:
+        case ALLSUBENTRIES:
             attr = FILE_ATTR_AUDIO;
             break;
         
