@@ -48,6 +48,10 @@ PLUGIN_HEADER
 #define PF_MENU ACTION_STD_MENU
 #define PF_QUIT (LAST_ACTION_PLACEHOLDER + 1)
 
+#if !defined(HAVE_SCROLLWHEEL)
+    /* scrollwheel targets use the wheel, just as they do in lists,
+     * so there's no need for a special context,
+     * others use left/right here too (as oppsed to up/down in lists) */
 const struct button_mapping pf_context_album_scroll[] =
 {
 #ifdef HAVE_TOUCHSCREEN
@@ -56,39 +60,28 @@ const struct button_mapping pf_context_album_scroll[] =
     {PF_NEXT,         BUTTON_MIDRIGHT,                BUTTON_NONE},
     {PF_NEXT_REPEAT,  BUTTON_MIDRIGHT|BUTTON_REPEAT,  BUTTON_NONE},
 #endif
-#if CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD || \
-    CONFIG_KEYPAD == IAUDIO_X5M5_PAD || CONFIG_KEYPAD == GIGABEAT_PAD || \
-    CONFIG_KEYPAD == GIGABEAT_S_PAD || CONFIG_KEYPAD == RECORDER_PAD || \
-    CONFIG_KEYPAD == ARCHOS_AV300_PAD || CONFIG_KEYPAD == SANSA_C100_PAD || \
-    CONFIG_KEYPAD == SANSA_C200_PAD || CONFIG_KEYPAD == SANSA_CLIP_PAD || \
-    CONFIG_KEYPAD == SANSA_M200_PAD || CONFIG_KEYPAD == IRIVER_IFP7XX_PAD || \
-    CONFIG_KEYPAD == MROBE100_PAD || CONFIG_KEYPAD == PHILIPS_SA9200_PAD || \
-    CONFIG_KEYPAD == IAUDIO67_PAD || CONFIG_KEYPAD == CREATIVEZVM_PAD || \
-    CONFIG_KEYPAD == PHILIPS_HDD1630_PAD || CONFIG_KEYPAD == CREATIVEZV_PAD \
-    || CONFIG_KEYPAD == LOGIK_DAX_PAD || CONFIG_KEYPAD == MEIZU_M6SL_PAD
+#if (CONFIG_KEYPAD == IAUDIO_M3_PAD || CONFIG_KEYPAD == MROBE500_PAD)
+    {PF_PREV,         BUTTON_RC_REW,              BUTTON_NONE},
+    {PF_PREV_REPEAT,  BUTTON_RC_REW|BUTTON_REPEAT,BUTTON_NONE},
+    {PF_NEXT,         BUTTON_RC_FF,               BUTTON_NONE},
+    {PF_NEXT_REPEAT,  BUTTON_RC_FF|BUTTON_REPEAT, BUTTON_NONE},
+#else
     {PF_PREV,         BUTTON_LEFT,                BUTTON_NONE},
     {PF_PREV_REPEAT,  BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
     {PF_NEXT,         BUTTON_RIGHT,               BUTTON_NONE},
     {PF_NEXT_REPEAT,  BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
-#elif CONFIG_KEYPAD == ONDIO_PAD
-    {PF_PREV,         BUTTON_LEFT,                BUTTON_NONE},
-    {PF_PREV_REPEAT,  BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    {PF_NEXT,         BUTTON_RIGHT,               BUTTON_NONE},
-    {PF_NEXT_REPEAT,  BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+#endif
+#if CONFIG_KEYPAD == ONDIO_PAD
     {PF_SELECT,       BUTTON_UP|BUTTON_REL,       BUTTON_UP},
     {PF_CONTEXT,      BUTTON_UP|BUTTON_REPEAT,    BUTTON_UP},
     {ACTION_NONE,     BUTTON_UP,                  BUTTON_NONE},
     {ACTION_NONE,     BUTTON_DOWN,                BUTTON_NONE},
     {ACTION_NONE,     BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
     {ACTION_NONE,     BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT},
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD || CONFIG_KEYPAD == MROBE500_PAD
-    {PF_PREV,         BUTTON_RC_REW,              BUTTON_NONE},
-    {PF_PREV_REPEAT,  BUTTON_RC_REW|BUTTON_REPEAT,BUTTON_NONE},
-    {PF_NEXT,         BUTTON_RC_FF,               BUTTON_NONE},
-    {PF_NEXT_REPEAT,  BUTTON_RC_FF|BUTTON_REPEAT, BUTTON_NONE},
 #endif
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|1)
 };
+#endif /* !defined(HAVE_SCROLLWHEEL) */
 
 const struct button_mapping pf_context_buttons[] =
 {
@@ -144,7 +137,9 @@ const struct button_mapping pf_context_buttons[] =
 };
 const struct button_mapping *pf_contexts[] =
 {
+#if !defined(HAVE_SCROLLWHEEL)
     pf_context_album_scroll,
+#endif
     pf_context_buttons
 };
 
@@ -2601,9 +2596,11 @@ int main(void)
         rb->yield();
 
         /*/ Handle buttons */
-        button = rb->get_custom_action(CONTEXT_CUSTOM|
-            (pf_state == pf_show_tracks ? 1 : 0),
-            instant_update ? 0 : HZ/16,
+        button = rb->get_custom_action(CONTEXT_CUSTOM
+#if !defined(HAVE_SCROLLWHEEL)
+            |(pf_state == pf_show_tracks ? 1 : 0)
+#endif
+            ,instant_update ? 0 : HZ/16,
             get_context_map);
 
         switch (button) {
