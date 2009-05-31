@@ -97,39 +97,31 @@ static int i2c_busy(void)
     return (I2C2_SR & 1);
 }
 
-
 /* returns 0 on success, <0 otherwise */
 int ascodec_write(unsigned int index, unsigned int value)
 {
-    int retval;
-
     ascodec_lock();
 
-    /* check if still busy */
-    if (i2c_busy()) {
-        retval = -1;
+    /* wait if still busy */
+    while (i2c_busy());
+
+    if (index == AS3514_CVDD_DCDC3) {
+        /* prevent setting of the LREG_CP_not bit */
+        value &= ~(1 << 5);
     }
-    else {
-        if (index == AS3514_CVDD_DCDC3) {
-            /* prevent setting of the LREG_CP_not bit */
-            value &= ~(1 << 5);
-        }
-        
-        /* start transfer */
-        I2C2_SADDR = index;
-        I2C2_CNTRL &= ~(1 << 1);
-        I2C2_DATA = value;
-        I2C2_DACNT = 1;
-        
-        /* wait for transfer*/
-        while (i2c_busy());
-        
-        retval = 0;
-    }
+    
+    /* start transfer */
+    I2C2_SADDR = index;
+    I2C2_CNTRL &= ~(1 << 1);
+    I2C2_DATA = value;
+    I2C2_DACNT = 1;
+    
+    /* wait for transfer */
+    while (I2C2_DACNT != 0);
 
     ascodec_unlock();
 
-    return retval;
+    return 0;
 }
 
 
@@ -140,21 +132,17 @@ int ascodec_read(unsigned int index)
 
     ascodec_lock();
 
-    /* check if still busy */
-    if (i2c_busy()) {
-        data = -1;
-    }
-    else {
-        /* start transfer */
-        I2C2_SADDR = index;
-        I2C2_CNTRL |= (1 << 1);
-        I2C2_DACNT = 1;
-        
-        /* wait for transfer*/
-        while (i2c_busy());
-        
-        data = I2C2_DATA;
-    }
+    /* wait if still busy */
+    while (i2c_busy());
+
+    /* start transfer */
+    I2C2_SADDR = index;
+    I2C2_CNTRL |= (1 << 1);
+    I2C2_DACNT = 1;
+    
+    /* wait for transfer*/
+    while (I2C2_DACNT != 0);
+    data = I2C2_DATA;
     
     ascodec_unlock();
     
