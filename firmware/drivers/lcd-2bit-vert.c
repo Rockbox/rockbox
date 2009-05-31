@@ -719,6 +719,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
 {
     int shift, ny;
     fb_data *dst, *dst_end;
+    unsigned mask, mask_bottom;
     lcd_blockfunc_type *bfunc;
 
     /* nothing to draw? */
@@ -754,17 +755,18 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     dst    = &lcd_framebuffer[y>>2][x];
     shift  = y & 3;
     ny     = height - 1 + shift + src_y;
+    mask   = 0xFFFFu << (2 * (shift + src_y));
+             /* Overflowing bits aren't important. */
+    mask_bottom  = 0xFFFFu >> (2 * (~ny & 7));
 
     bfunc  = lcd_blockfuncs[current_vp->drawmode];
     
     if (shift == 0)
     {
-        unsigned dmask1, dmask2, dmask_bottom, data;
+        unsigned dmask1, dmask2, data;
 
-        dmask1  = 0xFFFFu << (2 * (shift + src_y));
-        dmask2  = dmask1 >> 8;
-        dmask1 &= 0xFFu;
-        dmask_bottom  = 0xFFFFu >> (2 * (~ny & 7));
+        dmask1 = mask & 0xFFu;
+        dmask2 = mask >> 8;
 
         for (; ny >= 8; ny -= 8)
         {
@@ -793,9 +795,9 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             dst += 2*LCD_WIDTH;
             dmask1 = dmask2 = 0xFFu;
         }
-        dmask1 &= dmask_bottom; 
+        dmask1 &= mask_bottom;
                   /* & 0xFFu is unnecessary here - dmask1 can't exceed that*/
-        dmask2 &= (dmask_bottom >> 8);
+        dmask2 &= (mask_bottom >> 8);
         dst_end = dst + width;
         
         if (dmask1 != 0)
@@ -826,9 +828,6 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     }
     else
     {
-        unsigned mask   = 0xFFu << (shift + src_y);
-        unsigned mask_bottom = 0xFFu >> (~ny & 7);
-
         dst_end = dst + width;
         do
         {
@@ -841,27 +840,27 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             {
                 data |= *src_col << shift;
 
-                if (mask_col & 0xFFu)
+                if (mask_col & 0xFFFFu)
                 {
-                    if (mask_col & 0x0F)
-                        bfunc(dst_col, lcd_dibits[mask_col&0x0F], lcd_dibits[data&0x0F]);
-                    bfunc(dst_col + LCD_WIDTH, lcd_dibits[(mask_col>>4)&0x0F],
+                    if (mask_col & 0xFFu)
+                        bfunc(dst_col, mask_col, lcd_dibits[data&0x0F]);
+                    bfunc(dst_col + LCD_WIDTH, mask_col >> 8,
                           lcd_dibits[(data>>4)&0x0F]);
-                    mask_col = 0xFFu;
+                    mask_col = 0xFFFFu;
                 }
                 else
-                    mask_col >>= 8;
+                    mask_col >>= 16;
 
                 src_col += stride;
                 dst_col += 2*LCD_WIDTH;
                 data >>= 8;
             }
             data |= *src_col << shift;
-            mask_bottom &= mask_col;
-            if (mask_bottom & 0x0F)
-                bfunc(dst_col, lcd_dibits[mask_bottom&0x0F], lcd_dibits[data&0x0F]);
-            if (mask_bottom & 0xF0)
-                bfunc(dst_col + LCD_WIDTH, lcd_dibits[(mask_bottom&0xF0)>>4],
+            mask_col &= mask_bottom ;
+            if (mask_col & 0xFFu)
+                bfunc(dst_col, mask_col, lcd_dibits[data&0x0F]);
+            if (mask_col & 0xFF00u)
+                bfunc(dst_col + LCD_WIDTH, mask_col >> 8,
                       lcd_dibits[(data>>4)&0x0F]);
         }
         while (dst < dst_end);
