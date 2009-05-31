@@ -61,7 +61,7 @@
 #define SCL_HI_IN  and_l(~SCL_BIT, &SCL_GPIO_ENABLE); while(!SCL);
 
 #define DELAY                           \
-    asm (                               \
+    asm volatile (                      \
         "move.l  %[dly],%%d0 \n"        \
     "1:                      \n"        \
         "subq.l  #1,%%d0     \n"        \
@@ -89,7 +89,7 @@ void pcf50606_i2c_recalc_delay(int cpu_clock)
 inline void pcf50606_i2c_start(void)
 {
 #ifdef USE_ASM
-    asm (
+    asm volatile (
         "not.l   %[sdab]              \n" /* SDA_HI_IN */
         "and.l   %[sdab],(8,%[sdard]) \n"
         "not.l   %[sdab]              \n"
@@ -139,7 +139,7 @@ inline void pcf50606_i2c_start(void)
 inline void pcf50606_i2c_stop(void)
 {
 #ifdef USE_ASM
-    asm (
+    asm volatile (
         "or.l    %[sdab],(8,%[sdard]) \n" /* SDA_LO_OUT */
 
         "move.l  %[dly],%%d0          \n" /* DELAY */
@@ -186,7 +186,7 @@ inline void pcf50606_i2c_stop(void)
 inline void pcf50606_i2c_ack(bool ack)
 {
 #ifdef USE_ASM
-    asm (
+    asm volatile (
         "tst.b   %[ack]               \n" /* if (!ack) */
         "bne.s   1f                   \n"
 
@@ -245,7 +245,7 @@ inline bool pcf50606_i2c_getack(void)
     bool ret;
 
 #ifdef USE_ASM
-    asm (
+    asm volatile (
         "not.l   %[sdab]              \n" /* SDA_HI_IN */
         "and.l   %[sdab],(8,%[sdard]) \n"
         "not.l   %[sdab]              \n"
@@ -375,7 +375,7 @@ unsigned char pcf50606_i2c_inb(bool ack)
     unsigned char byte = 0;
 
 #ifdef USE_ASM
-    asm (
+    asm volatile (
         "not.l   %[sdab]              \n" /* SDA_HI_IN */
         "and.l   %[sdab],(8,%[sdard]) \n"
         "not.l   %[sdab]              \n"
@@ -550,3 +550,4 @@ int pcf50606_write(int address, unsigned char val)
 {
     return pcf50606_write_multiple(address, &val, 1);
 }
+
