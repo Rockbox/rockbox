@@ -655,6 +655,8 @@ static const struct plugin_api rockbox_api = {
     playlist_sync,
     playlist_remove_all_tracks,
     playlist_create,
+    playlist_insert_track,
+    playlist_shuffle,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

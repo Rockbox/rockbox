@@ -2330,27 +2330,42 @@ void select_prev_track(void)
  */
 void start_playback(void)
 {
-    static int old_playlist = -1;
-    if (center_slide.slide_index == old_playlist)
+    static int old_playlist = -1, old_shuffle = 0;
+    int count = 0;
+    int position = selected_track;
+    int shuffle = rb->global_settings->playlist_shuffle;
+    /* reuse existing playlist if possible
+     * regenerate if shuffle is on or changed, since playlist index and
+     * selected track are "out of sync" */
+    if (!shuffle && center_slide.slide_index == old_playlist
+            && (old_shuffle == shuffle))
     {
-        rb->playlist_start(selected_track, 0);
+        goto play;
     }
     /* First, replace the current playlist with a new one */
-    else if ((rb->playlist_remove_all_tracks(NULL) == 0) &&
-        (rb->playlist_create(PLUGIN_DEMOS_DIR, NULL) == 0))
+    else if (rb->playlist_remove_all_tracks(NULL) == 0
+            && rb->playlist_create(NULL, NULL) == 0)
     {
-        int count = 0;
         do {
-            if (rb->playlist_add(get_track_filename(count)) != 0)
+            rb->yield();
+            if (rb->playlist_insert_track(NULL, get_track_filename(count),
+                    PLAYLIST_INSERT_LAST, false, true) < 0)
                 break;
         } while(++count < track_count);
-
         rb->playlist_sync(NULL);
-
-        rb->playlist_start(selected_track, 0);
     }
+    else
+        return;
+
+    if (rb->global_settings->playlist_shuffle)
+        position = rb->playlist_shuffle(*rb->current_tick, selected_track);
+play:
+    /* TODO: can we adjust selected_track if !play_selected ?
+     * if shuffle, we can't predict the playing track easily, and for either
+     * case the track list doesn't get auto scrolled*/
+    rb->playlist_start(position, 0);
     old_playlist = center_slide.slide_index;
-    
+    old_shuffle = shuffle;
 }
 
 /**
