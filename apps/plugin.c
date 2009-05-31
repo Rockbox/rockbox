@@ -649,8 +649,12 @@ static const struct plugin_api rockbox_api = {
     action_get_touchscreen_press,
 #endif
 #if defined(HAVE_TAGCACHE) && defined(HAVE_TC_RAMCACHE)
-    tagcache_fill_tags
+    tagcache_fill_tags,
 #endif
+    playlist_add,
+    playlist_sync,
+    playlist_remove_all_tracks,
+    playlist_create,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

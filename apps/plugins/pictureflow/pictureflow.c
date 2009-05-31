@@ -253,8 +253,9 @@ struct album_data {
 
 struct track_data {
     uint32_t sort;
-    int name_idx;
+    int name_idx;       /* offset to the track name */
     long seek;
+    int filename_idx;   /* offset to the filename in the string */
 };
 
 struct rect {
@@ -758,6 +759,13 @@ char* get_track_name(const int track_index)
     return 0;
 }
 
+char* get_track_filename(const int track_index)
+{
+    if ( track_index < track_count )
+        return track_names + tracks[track_index].filename_idx;
+    return 0;
+}
+
 /**
   Compare two unsigned ints passed via pointers.
  */
@@ -791,28 +799,45 @@ void create_track_index(const int slide_index)
     tracks = (struct track_data*)(track_names + borrowed);
     while (rb->tagcache_get_next(&tcs))
     {
+        int len = 0, fn_idx = 0, remain;
+
         avail -= sizeof(struct track_data);
         track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber) - 1;
         disc_num = rb->tagcache_get_numeric(&tcs, tag_discnumber);
-        int len = 0;
+
         if (disc_num < 0)
             disc_num = 0;
 retry:
         if (track_num >= 0)
         {
             if (disc_num)
-                len = 1 + rb->snprintf(track_names + string_index , avail,
-                    "%d.%02d:  %s", disc_num, track_num + 1, tcs.result);
+                fn_idx = 1 + rb->snprintf(track_names + string_index , avail,
+                    "%d.%02d: %s", disc_num, track_num + 1, tcs.result);
             else
-                len = 1 + rb->snprintf(track_names + string_index , avail,
-                    "%d:  %s", track_num + 1, tcs.result);
+                fn_idx = 1 + rb->snprintf(track_names + string_index , avail,
+                    "%d: %s", track_num + 1, tcs.result);
         }
         else
         {
             track_num = 0;
-            len = tcs.result_len;
-            rb->strncpy(track_names + string_index, tcs.result, avail);
+            fn_idx = 1 + rb->snprintf(track_names + string_index, avail,
+                "%s", tcs.result);
         }
+        if (fn_idx <= 0)
+            goto fail;
+        remain = avail - fn_idx;
+        if (remain >= MAX_PATH)
+        {   /* retrieve filename for building the playlist */
+            rb->tagcache_retrieve(&tcs, tcs.idx_id, tag_filename,
+                    track_names + string_index + fn_idx, remain);
+            len = fn_idx + rb->strlen(track_names + string_index + fn_idx) + 1;
+            /* make sure track name and file name are really split by a \0, else
+             * get_track_name might fail */
+            *(track_names + string_index + fn_idx -1) = '\0';
+
+        }
+        else /* request more buffer so that track and filename fit */
+            len = (avail - remain) + MAX_PATH;
         if (len > avail)
         {
             while (len > avail)
@@ -839,6 +864,7 @@ retry:
         tracks->sort = ((disc_num - 1) << 24) + (track_num << 14) + track_count;
         tracks->name_idx = string_index;
         tracks->seek = tcs.result_seek;
+        tracks->filename_idx = fn_idx + string_index;
         track_count++;
         string_index += len;
     }
@@ -2297,6 +2323,34 @@ void select_prev_track(void)
     }
 }
 
+/*
+ * Puts the current tracklist into a newly created playlist and starts playling
+ */
+void start_playback(void)
+{
+    static int old_playlist = -1;
+    if (center_slide.slide_index == old_playlist)
+    {
+        rb->playlist_start(selected_track, 0);
+    }
+    /* First, replace the current playlist with a new one */
+    else if ((rb->playlist_remove_all_tracks(NULL) == 0) &&
+        (rb->playlist_create(PLUGIN_DEMOS_DIR, NULL) == 0))
+    {
+        int count = 0;
+        do {
+            if (rb->playlist_add(get_track_filename(count)) != 0)
+                break;
+        } while(++count < track_count);
+
+        rb->playlist_sync(NULL);
+
+        rb->playlist_start(selected_track, 0);
+    }
+    old_playlist = center_slide.slide_index;
+    
+}
+
 /**
    Draw the current album name
  */
@@ -2596,6 +2650,9 @@ int main(void)
         case PF_SELECT:
             if ( pf_state == pf_idle ) {
                 pf_state = pf_cover_in;
+            }
+            else if ( pf_state == pf_show_tracks ) {
+                start_playback();
             }
             break;
 

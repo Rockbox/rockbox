@@ -813,6 +813,10 @@ struct plugin_api {
 #if defined(HAVE_TAGCACHE) && defined(HAVE_TC_RAMCACHE)
     bool (*tagcache_fill_tags)(struct mp3entry *id3, const char *filename);
 #endif
+    int (*playlist_add)(const char *filename);
+    void (*playlist_sync)(struct playlist_info* playlist);
+    int (*playlist_remove_all_tracks)(struct playlist_info *playlist);
+    int (*playlist_create)(const char *dir, const char *file);
 };
 
 /* plugin header */
