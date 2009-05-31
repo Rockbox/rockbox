@@ -775,7 +775,7 @@ Lyre prototype 1*/
 #elif CONFIG_USBOTG == USBOTG_JZ4740
 #define USB_HAS_BULK
 #define USB_HAS_INTERRUPT
-#elif defined(CPU_TCC780X) || defined(define CPU_TCC77X)
+#elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
 #define USB_HAS_BULK
 #endif /* CONFIG_USBOTG */
 
