@@ -32,6 +32,7 @@
 #include "lib/grey.h"
 #include "lib/feature_wrappers.h"
 #include "lib/buflib.h"
+#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
@@ -2129,18 +2130,21 @@ int main_menu(void)
 #endif
 
     MENUITEM_STRINGLIST(main_menu,"PictureFlow Main Menu",NULL,
-                        "Settings", "Return", "Quit");
+                        "Playback Control", "Settings", "Return", "Quit");
     while (1)  {
         switch (rb->do_menu(&main_menu,&selection, NULL, false)) {
-            case 0:
+            case 0: /* Playback Control */
+                playback_control(NULL);
+                break;
+            case 1:
                 result = settings_menu();
                 if ( result != 0 ) return result;
                 break;
 
-            case 1:
+            case 2:
                 return 0;
 
-            case 2:
+            case 3:
                 return -1;
 
             case MENU_ATTACHED_USB:
