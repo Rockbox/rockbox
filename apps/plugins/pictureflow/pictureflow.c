@@ -70,6 +70,10 @@ const struct button_mapping pf_context_album_scroll[] =
     {PF_PREV_REPEAT,  BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
     {PF_NEXT,         BUTTON_RIGHT,               BUTTON_NONE},
     {PF_NEXT_REPEAT,  BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    {ACTION_NONE,     BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT},
+    {ACTION_NONE,     BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT},
+    {ACTION_NONE,     BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_LEFT},
+    {ACTION_NONE,     BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_RIGHT},
 #endif
 #if CONFIG_KEYPAD == ONDIO_PAD
     {PF_SELECT,       BUTTON_UP|BUTTON_REL,       BUTTON_UP},
@@ -77,9 +81,8 @@ const struct button_mapping pf_context_album_scroll[] =
     {ACTION_NONE,     BUTTON_UP,                  BUTTON_NONE},
     {ACTION_NONE,     BUTTON_DOWN,                BUTTON_NONE},
     {ACTION_NONE,     BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
-    {ACTION_NONE,     BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT},
 #endif
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|1)
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_PLUGIN|1)
 };
 #endif /* !defined(HAVE_SCROLLWHEEL) */
 
@@ -132,7 +135,7 @@ const struct button_mapping pf_context_buttons[] =
 #if CONFIG_KEYPAD == IAUDIO_M3_PAD
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD|CONTEXT_REMOTE)
 #else
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_TREE)
 #endif
 };
 const struct button_mapping *pf_contexts[] =
@@ -681,7 +684,7 @@ const struct custom_format format_transposed = {
 
 static const struct button_mapping* get_context_map(int context)
 {
-    return pf_contexts[context & ~CONTEXT_CUSTOM];
+    return pf_contexts[context & ~CONTEXT_PLUGIN];
 }
 
 /* Create the lookup table with the scaling values for the reflections */
@@ -2596,7 +2599,7 @@ int main(void)
         rb->yield();
 
         /*/ Handle buttons */
-        button = rb->get_custom_action(CONTEXT_CUSTOM
+        button = rb->get_custom_action(CONTEXT_PLUGIN
 #if !defined(HAVE_SCROLLWHEEL)
             |(pf_state == pf_show_tracks ? 1 : 0)
 #endif

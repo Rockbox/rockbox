@@ -71,7 +71,7 @@ const struct button_mapping remote_directions[] =
 #else
     #error pluginlib_actions: Unsupported remote keypad
 #endif
-    {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
+    {CONTEXT_PLUGIN,BUTTON_NONE,BUTTON_NONE}
 };
 #endif /* HAVE_REMOTE_LCD */
 
@@ -174,7 +174,7 @@ const struct button_mapping generic_directions[] =
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif
-    {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
+    {CONTEXT_PLUGIN,BUTTON_NONE,BUTTON_NONE}
 };
 
 const struct button_mapping generic_left_right_fire[] =
@@ -296,7 +296,7 @@ const struct button_mapping generic_left_right_fire[] =
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif
-    {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
+    {CONTEXT_PLUGIN,BUTTON_NONE,BUTTON_NONE}
 };
 
 /* these were taken from the bubbles plugin, so may need tweaking */
@@ -457,7 +457,7 @@ const struct button_mapping generic_actions[] =
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif
-    {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
+    {CONTEXT_PLUGIN,BUTTON_NONE,BUTTON_NONE}
 };
 
 const struct button_mapping generic_increase_decrease[] =
@@ -537,7 +537,7 @@ const struct button_mapping generic_increase_decrease[] =
 #else
 #error pluginlib_actions: Unsupported keypad
 #endif
-    {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
+    {CONTEXT_PLUGIN,BUTTON_NONE,BUTTON_NONE}
 };
 
 static struct button_mapping **plugin_context_order;
@@ -560,5 +560,5 @@ int pluginlib_getaction(int timeout,
     plugin_context_order = (struct button_mapping **)plugin_contexts;
     plugin_context_count = count;
     last_context = 0;
-    return rb->get_custom_action(CONTEXT_CUSTOM,timeout,get_context_map);
+    return rb->get_custom_action(CONTEXT_PLUGIN,timeout,get_context_map);
 }

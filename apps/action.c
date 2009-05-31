@@ -197,7 +197,7 @@ static int get_action_worker(int context, int timeout,
         if (button & BUTTON_REMOTE)
             context |= CONTEXT_REMOTE;
 #endif
-        if ((context & CONTEXT_CUSTOM) && get_context_map)
+        if ((context & CONTEXT_PLUGIN) && get_context_map)
             items = get_context_map(context);
         else
             items = get_context_mapping(context);
