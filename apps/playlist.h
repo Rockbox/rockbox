@@ -122,7 +122,7 @@ int playlist_create(const char *dir, const char *file);
 int playlist_resume(void);
 int playlist_add(const char *filename);
 int playlist_shuffle(int random_seed, int start_index);
-int playlist_start(int start_index, int offset);
+void playlist_start(int start_index, int offset);
 bool playlist_check(int steps);
 char *playlist_peek(int steps);
 int playlist_next(int steps);

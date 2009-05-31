@@ -586,7 +586,7 @@ struct plugin_api {
     /* playback control */
     int (*playlist_amount)(void);
     int (*playlist_resume)(void);
-    int (*playlist_start)(int start_index, int offset);
+    void (*playlist_start)(int start_index, int offset);
     void (*audio_play)(long offset);
     void (*audio_stop)(void);
     void (*audio_pause)(void);

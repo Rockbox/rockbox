@@ -2405,7 +2405,7 @@ int playlist_shuffle(int random_seed, int start_index)
 }
 
 /* start playing current playlist at specified index/offset */
-int playlist_start(int start_index, int offset)
+void playlist_start(int start_index, int offset)
 {
     struct playlist_info* playlist = &current_playlist;
 
@@ -2423,8 +2423,6 @@ int playlist_start(int start_index, int offset)
     playlist->started = true;
     sync_control(playlist, false);
     audio_play(offset);
-
-    return 0;
 }
 
 /* Returns false if 'steps' is out of bounds, else true */
