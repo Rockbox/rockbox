@@ -619,6 +619,15 @@ RB_WRAP(kbd_input)
     return 1;
 }
 
+#ifdef HAVE_TOUCHSCREEN
+RB_WRAP(touchscreen_set_mode)
+{
+    enum touchscreen_mode mode = luaL_checkint(L, 1);
+    rb->touchscreen_set_mode(mode);
+    return 0;
+}
+#endif
+
 RB_WRAP(backlight_on)
 {
     (void)L;
@@ -827,6 +836,18 @@ RB_WRAP(read_bmp_file)
     return 0;
 }
 
+RB_WRAP(current_path)
+{
+    char buffer[MAX_PATH];
+    if(get_cur_path(L, buffer, sizeof(buffer)))
+    {
+        lua_pushstring(L, buffer);
+        return 1;
+    }
+    else
+        return 0;
+}
+
 #define R(NAME) {#NAME, rock_##NAME}
 static const luaL_Reg rocklib[] =
 {
@@ -901,6 +922,7 @@ static const luaL_Reg rocklib[] =
     R(action_userabort),
 #ifdef HAVE_TOUCHSCREEN
     R(action_get_touchscreen_press),
+    R(touchscreen_set_mode),
 #endif
     R(kbd_input),
 
@@ -916,6 +938,7 @@ static const luaL_Reg rocklib[] =
     R(read_bmp_file),
     R(set_viewport),
     R(clear_viewport),
+    R(current_path),
 
     {"new_image", rli_new},
 
@@ -945,9 +968,18 @@ LUALIB_API int luaopen_rock(lua_State *L)
     RB_CONSTANT(SEEK_SET);
     RB_CONSTANT(SEEK_CUR);
     RB_CONSTANT(SEEK_END);
-    
+
     RB_CONSTANT(FONT_SYSFIXED);
     RB_CONSTANT(FONT_UI);
+
+#ifdef HAVE_TOUCHSCREEN
+    RB_CONSTANT(TOUCHSCREEN_POINT);
+    RB_CONSTANT(TOUCHSCREEN_BUTTON);
+    RB_CONSTANT(BUTTON_TOUCHSCREEN);
+#endif
+
+    RB_CONSTANT(BUTTON_REL);
+    RB_CONSTANT(BUTTON_REPEAT);
 
     rli_init(L);
 

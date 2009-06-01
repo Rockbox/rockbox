@@ -560,24 +560,35 @@ static int errfile (lua_State *L, const char *what, int fnameindex) {
   return LUA_ERRFILE;
 }
 
-static void make_path(char* dest, size_t dest_size, char* curfile, char* newfile)
+bool get_cur_path(lua_State *L, char* dest, size_t dest_size)
 {
-    char* pos = rb->strrchr(curfile, '/');
-    if(pos != NULL)
+    lua_Debug ar;
+    if(lua_getstack(L, 1, &ar))
     {
-        unsigned int len = (unsigned int)(pos - curfile);
-        len = len + 1 > dest_size ? dest_size - 1 : len;
+        /* Try determining the base path of the current Lua chunk
+            and write it to dest. */
+        lua_getinfo(L, "S", &ar);
 
-        if(len > 0)
-            memcpy(dest, curfile, len);
+        char* curfile = (char*) &ar.source[1];
+        char* pos = rb->strrchr(curfile, '/');
+        if(pos != NULL)
+        {
+            unsigned int len = (unsigned int)(pos - curfile);
+            len = len + 1 > dest_size ? dest_size - 1 : len;
 
-        dest[len] = '/';
-        dest[len+1] = '\0';
+            if(len > 0)
+                memcpy(dest, curfile, len);
+
+            dest[len] = '/';
+            dest[len+1] = '\0';
+
+            return true;
+        }
+        else
+            return false;
     }
     else
-        dest[0] = '\0';
-
-    strncat(dest, newfile, dest_size - strlen(dest));
+        return false;
 }
 
 LUALIB_API int luaL_loadfile (lua_State *L, const char *filename) {
@@ -590,13 +601,8 @@ LUALIB_API int luaL_loadfile (lua_State *L, const char *filename) {
   if(lf.f < 0) {
     /* Fallback */
 
-    lua_Debug ar;
-    if(lua_getstack(L, 1, &ar)) {
-      lua_getinfo(L, "S", &ar);
-
-      /* Try determining the base path of the current Lua chunk
-         and prepend it to filename in buffer. */
-      make_path(buffer, sizeof(buffer), (char*)&ar.source[1], (char*)filename);
+    if(get_cur_path(L, buffer, sizeof(buffer))) {
+      strncat(buffer, filename, sizeof(buffer) - strlen(buffer));
       lf.f = rb->open(buffer, O_RDONLY);
     }
 

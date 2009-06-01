@@ -24,6 +24,7 @@
 
 #define LUA_ROCKLIBNAME	"rb"
 LUALIB_API int (luaopen_rock) (lua_State *L);
+bool get_cur_path(lua_State *L, char* dest, size_t dest_size);
 
 #endif /* _ROCKLIB_H_ */
 
