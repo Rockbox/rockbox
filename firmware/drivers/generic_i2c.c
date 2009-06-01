@@ -36,6 +36,7 @@ static void i2c_start(const struct i2c_interface *iface)
 
     iface->sda_hi();
     iface->scl_hi();
+    iface->delay_su_sta();
     iface->sda_lo();
     iface->delay_hd_sta();
     iface->scl_lo();
