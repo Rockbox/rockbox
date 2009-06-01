@@ -251,6 +251,7 @@ static int sd_init_card(const int drive)
         mci_delay();
         mci_delay();
         mci_delay();
+        mci_delay();
 
         /* app_cmd */
         if( !send_cmd(drive, SD_APP_CMD, 0, MCI_RESP|MCI_ARG, &response) ||
