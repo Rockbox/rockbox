@@ -35,6 +35,7 @@ static const luaL_Reg lualibs[] = {
   {LUA_STRLIBNAME,  luaopen_string},
   {LUA_OSLIBNAME,   luaopen_os},
   {LUA_ROCKLIBNAME, luaopen_rock},
+  {LUA_BITLIBNAME,  luaopen_bit},
   {NULL, NULL}
 };
 

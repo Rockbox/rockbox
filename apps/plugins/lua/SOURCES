@@ -1,6 +1,7 @@
 lauxlib.c
 lapi.c
 lbaselib.c
+lbitlib.c
 lcode.c
 ldebug.c
 ldo.c
