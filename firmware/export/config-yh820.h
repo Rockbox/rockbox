@@ -35,6 +35,12 @@
 #define LCD_PIXELFORMAT RGB565
 
 #ifndef BOOTLOADER
+
+/* define this if you have a real-time clock */
+#define CONFIG_RTC RTC_E8564
+/* TODO ??? */
+//#define HAVE_RTC_ALARM
+
 /* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE
 
@@ -91,14 +97,6 @@
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
-
-/* define this if you have a real-time clock */
-/* todo verify rtc (or none) */
-/* #ifndef BOOTLOADER */
-#if 0
-#define CONFIG_RTC RTC_E8564
-#define HAVE_RTC_ALARM
-#endif
 
 /* define this if you have a disk storage, i.e. something
    that needs spinups and can cause skips when shaked */

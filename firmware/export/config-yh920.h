@@ -99,11 +99,10 @@
 #define CONFIG_CODEC SWCODEC
 
 /* define this if you have a real-time clock */
-/* todo verify rtc (or none) */
-/* #ifndef BOOTLOADER */
-#if 0
+#ifndef BOOTLOADER
 #define CONFIG_RTC RTC_E8564
-#define HAVE_RTC_ALARM
+/* TODO ??? */
+//#define HAVE_RTC_ALARM
 #endif
 
 /* define this if you have a disk storage, i.e. something

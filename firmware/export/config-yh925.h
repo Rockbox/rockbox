@@ -51,7 +51,7 @@
 #define HAVE_BACKLIGHT
 
 /* Define this if your LCD can set contrast */
-/* todo #define HAVE_LCD_CONTRAST */
+#define HAVE_LCD_CONTRAST 
 
 #define MIN_CONTRAST_SETTING        0
 #define MAX_CONTRAST_SETTING        30
@@ -96,11 +96,10 @@
 #define CONFIG_CODEC SWCODEC
 
 /* define this if you have a real-time clock */
-/* todo verify rtc (or none) */
-/* #ifndef BOOTLOADER */
-#if 0
+#ifndef BOOTLOADER
 #define CONFIG_RTC RTC_E8564
-#define HAVE_RTC_ALARM
+/* TODO */
+//#define HAVE_RTC_ALARM
 #endif
 
 /* define this if you have a disk storage, i.e. something
