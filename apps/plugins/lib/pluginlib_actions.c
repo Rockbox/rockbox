@@ -94,6 +94,7 @@ const struct button_mapping generic_directions[] =
     || (CONFIG_KEYPAD == RECORDER_PAD)      \
     || (CONFIG_KEYPAD == ARCHOS_AV300_PAD)  \
     || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
+    || (CONFIG_KEYPAD == ONDIO_PAD) \
     || (CONFIG_KEYPAD == SANSA_C200_PAD) \
     || (CONFIG_KEYPAD == GIGABEAT_S_PAD) \
     || (CONFIG_KEYPAD == MROBE100_PAD) \
@@ -123,15 +124,6 @@ const struct button_mapping generic_directions[] =
     { PLA_DOWN_REPEAT,       BUTTON_SCROLL_FWD|BUTTON_REPEAT, BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE},
-#elif CONFIG_KEYPAD == ONDIO_PAD
-    { PLA_UP,                BUTTON_UP,                  BUTTON_NONE},
-    { PLA_DOWN,              BUTTON_DOWN,                BUTTON_NONE},
-    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
-    { PLA_UP_REPEAT,         BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
 #elif CONFIG_KEYPAD == PLAYER_PAD
     {PLA_UP,                BUTTON_STOP,  BUTTON_NONE},
     {PLA_DOWN,              BUTTON_PLAY,  BUTTON_NONE},
