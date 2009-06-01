@@ -36,7 +36,7 @@
 #define LAST_ITEM_IN_LIST__NEXTLIST(a) { a, BUTTON_NONE, BUTTON_NONE }
 
 #ifndef HAS_BUTTON_HOLD
-#define ALLOW_SOFTLOCK 0x10000000 /* will be stripped.. never needed except in calls to get_action() */
+#define ALLOW_SOFTLOCK 0x08000000 /* will be stripped.. never needed except in calls to get_action() */
 #else
 #define ALLOW_SOFTLOCK 0
 #endif

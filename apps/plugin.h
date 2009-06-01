@@ -587,6 +587,13 @@ struct plugin_api {
     int (*playlist_amount)(void);
     int (*playlist_resume)(void);
     void (*playlist_start)(int start_index, int offset);
+    int (*playlist_add)(const char *filename);
+    void (*playlist_sync)(struct playlist_info* playlist);
+    int (*playlist_remove_all_tracks)(struct playlist_info *playlist);
+    int (*playlist_create)(const char *dir, const char *file);
+    int (*playlist_insert_track)(struct playlist_info* playlist,
+            const char *filename, int position, bool queue, bool sync);
+    int (*playlist_shuffle)(int random_seed, int start_index);
     void (*audio_play)(long offset);
     void (*audio_stop)(void);
     void (*audio_pause)(void);
@@ -657,6 +664,9 @@ struct plugin_api {
     int (*get_custom_action)(int context,int timeout,
                           const struct button_mapping* (*get_context_map)(int));
     int (*get_action)(int context, int timeout);
+#ifdef HAVE_TOUCHSCREEN
+    int (*action_get_touchscreen_press)(short *x, short *y);
+#endif
     bool (*action_userabort)(int timeout);
 
     /* power */
@@ -789,6 +799,9 @@ struct plugin_api {
                            int tag, char *buf, long size);
     void (*tagcache_search_finish)(struct tagcache_search *tcs);
     long (*tagcache_get_numeric)(const struct tagcache_search *tcs, int tag);
+#ifdef HAVE_TC_RAMCACHE
+    bool (*tagcache_fill_tags)(struct mp3entry *id3, const char *filename);
+#endif
 #endif
 
 #ifdef HAVE_ALBUMART
@@ -806,20 +819,6 @@ struct plugin_api {
     const char *appsversion;
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-#ifdef HAVE_TOUCHSCREEN
-    int (*action_get_touchscreen_press)(short *x, short *y);
-#endif
-#if defined(HAVE_TAGCACHE) && defined(HAVE_TC_RAMCACHE)
-    bool (*tagcache_fill_tags)(struct mp3entry *id3, const char *filename);
-#endif
-    int (*playlist_add)(const char *filename);
-    void (*playlist_sync)(struct playlist_info* playlist);
-    int (*playlist_remove_all_tracks)(struct playlist_info *playlist);
-    int (*playlist_create)(const char *dir, const char *file);
-    int (*playlist_insert_track)(struct playlist_info* playlist,
-            const char *filename, int position, bool queue, bool sync);
-    int (*playlist_shuffle)(int random_seed, int start_index);
 };
 
 /* plugin header */

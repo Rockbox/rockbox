@@ -461,6 +461,12 @@ static const struct plugin_api rockbox_api = {
     playlist_amount,
     playlist_resume,
     playlist_start,
+    playlist_add,
+    playlist_sync,
+    playlist_remove_all_tracks,
+    playlist_create,
+    playlist_insert_track,
+    playlist_shuffle,
     PREFIX(audio_play),
     audio_stop,
     audio_pause,
@@ -516,6 +522,9 @@ static const struct plugin_api rockbox_api = {
     /* action handling */
     get_custom_action,
     get_action,
+#ifdef HAVE_TOUCHSCREEN
+    action_get_touchscreen_press,
+#endif
     action_userabort,
 
     /* power */
@@ -628,6 +637,9 @@ static const struct plugin_api rockbox_api = {
     tagcache_retrieve,
     tagcache_search_finish,
     tagcache_get_numeric,
+#ifdef HAVE_TC_RAMCACHE
+    tagcache_fill_tags,
+#endif
 #endif
 
 #ifdef HAVE_ALBUMART
@@ -644,19 +656,6 @@ static const struct plugin_api rockbox_api = {
     appsversion,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-#ifdef HAVE_TOUCHSCREEN
-    action_get_touchscreen_press,
-#endif
-#if defined(HAVE_TAGCACHE) && defined(HAVE_TC_RAMCACHE)
-    tagcache_fill_tags,
-#endif
-    playlist_add,
-    playlist_sync,
-    playlist_remove_all_tracks,
-    playlist_create,
-    playlist_insert_track,
-    playlist_shuffle,
 };
 
 int plugin_load(const char* plugin, const void* parameter)
