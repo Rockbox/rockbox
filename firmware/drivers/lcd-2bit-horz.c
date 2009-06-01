@@ -690,10 +690,11 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
                                      int src_y, int stride, int x, int y,
                                      int width, int height)
 {
-    int ny, nx, ymax;
-    const unsigned char * src_end;
-    lcd_pixelfunc_type* fgfunc;
-    lcd_pixelfunc_type* bgfunc;
+    const unsigned char *src_end;
+    fb_data *dst, *dst_end;
+    unsigned dmask = 0x100; /* bit 8 == sentinel */
+    unsigned dst_mask;
+    int drmode = current_vp->drawmode;
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= current_vp->width) ||
@@ -718,42 +719,137 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     if (y + height > current_vp->height)
         height = current_vp->height - y;
 
-    /* adjust for viewport */
-    x += current_vp->x;
-    y += current_vp->y;
-
     src += stride * (src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
     src_end = src + width;
+    x += current_vp->x;          /* adjust for viewport */
+    dst = &lcd_framebuffer[current_vp->y + y][x >> 2];
+    dst_end = dst + height * LCD_FBWIDTH;
+    dst_mask = pixmask[x & 3];
 
-    fgfunc = lcd_pixelfuncs[current_vp->drawmode];    
-    bgfunc = lcd_pixelfuncs[current_vp->drawmode ^ DRMODE_INVERSEVID];    
-    nx = x;
+    if (drmode & DRMODE_INVERSEVID)
+    {
+        dmask = 0x1ff;          /* bit 8 == sentinel */
+        drmode &= DRMODE_SOLID; /* mask out inversevid */
+    }
+
     do
     {
         const unsigned char *src_col = src++;
-        unsigned data = (*src_col | 0x100) >> src_y; /* bit 8 == sentinel */
+        unsigned data = (*src_col ^ dmask) >> src_y;   
+        fb_data *dst_col = dst;
+        int fg, bg;
+        long bo;
 
-        ymax = y + height;
-        ny = y;
-        do
+#define UPDATE_SRC  do {                  \
+            data >>= 1;                   \
+            if (data == 0x001) {          \
+                src_col += stride;        \
+                data = *src_col ^ dmask;  \
+            }                             \
+        } while (0)
+        
+        switch (drmode)
         {
-            if (data & 0x01)
-                fgfunc(nx,ny);
-            else
-                bgfunc(nx,ny);
-
-            ny++;
-
-            data >>= 1;
-            if (data == 0x001)
+          case DRMODE_COMPLEMENT:
+            do
             {
-                src_col += stride;
-                data = *src_col | 0x100;
+                if (data & 0x01)
+                    *dst_col ^= dst_mask;
+
+                dst_col += LCD_FBWIDTH;
+                UPDATE_SRC;
             }
+            while (dst_col < dst_end);
+            break;
+            
+          case DRMODE_BG:
+            if (lcd_backdrop)
+            {
+                bo = lcd_backdrop_offset;
+                do
+                {
+                    if (!(data & 0x01))
+                    {
+                        unsigned block = *dst_col;
+                        *dst_col = block
+                                 ^ ((block ^ *(dst_col + bo)) & dst_mask);
+                    }
+                    dst_col += LCD_FBWIDTH;
+                    UPDATE_SRC;
+                }
+                while (dst_col < dst_end);
+            }
+            else
+            {
+                bg = bg_pattern;
+                do
+                {
+                    if (!(data & 0x01))
+                    {
+                        unsigned block = *dst_col;
+                        *dst_col = block ^ ((block ^ bg) & dst_mask);
+                    }
+                    dst_col += LCD_FBWIDTH;
+                    UPDATE_SRC;
+                }
+                while (dst_col < dst_end);
+            }
+            break;
+
+          case DRMODE_FG:
+            fg = fg_pattern;
+            do
+            {
+                if (data & 0x01)
+                {
+                    unsigned block = *dst_col;
+                    *dst_col = block ^ ((block ^ fg) & dst_mask);
+                }
+                dst_col += LCD_FBWIDTH;
+                UPDATE_SRC;
+            }
+            while (dst_col < dst_end);
+            break;
+
+          case DRMODE_SOLID:
+            fg = fg_pattern;
+            if (lcd_backdrop)
+            {
+                bo = lcd_backdrop_offset;
+                do
+                {
+                    unsigned block = *dst_col;
+                    *dst_col = block ^ ((block ^ ((data & 0x01) ? 
+                               fg : *(dst_col + bo))) & dst_mask);
+
+                    dst_col += LCD_FBWIDTH;
+                    UPDATE_SRC;
+                }
+                while (dst_col < dst_end);
+            }
+            else
+            {
+                bg = bg_pattern;
+                do
+                {
+                    unsigned block = *dst_col;
+                    *dst_col = block ^ ((block ^ ((data & 0x01) ?
+                               fg : bg)) & dst_mask);
+
+                    dst_col += LCD_FBWIDTH;
+                    UPDATE_SRC;
+                }
+                while (dst_col < dst_end);
+            }
+            break;
         }
-        while (ny < ymax);
-        nx++;
+        dst_mask >>= 2;
+        if (dst_mask == 0)
+        {
+            dst++;
+            dst_mask = 0xC0;
+        }
     }
     while (src < src_end);
 }

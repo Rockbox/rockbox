@@ -447,6 +447,7 @@ void grey_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
     src_end = src + width;
     dwidth  = _grey_info.width;
     dst     = &_grey_info.buffer[_GREY_MULUQ(dwidth, y) + x];
+    dst_end = dst + _GREY_MULUQ(dwidth, height);
 
     if (drmode & DRMODE_INVERSEVID)
     {
@@ -461,8 +462,6 @@ void grey_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
         unsigned data = (*src_col ^ dmask) >> src_y;
         int fg, bg;
 
-        dst_end = dst_col + _GREY_MULUQ(dwidth, height);
-        
 #define UPDATE_SRC  do {                  \
             data >>= 1;                   \
             if (data == 0x001) {          \

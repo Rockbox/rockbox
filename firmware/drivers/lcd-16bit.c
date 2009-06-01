@@ -752,6 +752,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     src_y  &= 7;
     src_end = src + width;
     dst = LCDADDR(current_vp->x + x, current_vp->y + y);
+    dst_end = dst + height * LCD_WIDTH;
 
     if (drmode & DRMODE_INVERSEVID)
     {
@@ -766,8 +767,6 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
         fb_data *dst_col = dst++;
         int fg, bg;
         long bo;
-
-        dst_end = dst_col + height * LCD_WIDTH;
 
 #define UPDATE_SRC  do {                  \
             data >>= 1;                   \
