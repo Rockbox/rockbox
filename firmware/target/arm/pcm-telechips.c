@@ -93,6 +93,8 @@ void pcm_play_dma_init(void)
     /* TODO */
 #elif defined(SANSA_M200)
     /* TODO */
+#elif defined(SANSA_C100)
+    /* TODO */    
 #else
 #error "Target isn't supported"
 #endif

@@ -34,15 +34,16 @@
  * Insert LAST_ITEM_IN_LIST at the end of each mapping 
  */
 static const struct button_mapping button_context_standard[]  = {
-    { ACTION_STD_PREV,          BUTTON_LEFT,                      BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
-    { ACTION_STD_NEXT,          BUTTON_RIGHT,                     BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE },
-    { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,         BUTTON_SELECT },
-    { ACTION_STD_CANCEL,        BUTTON_POWER,                     BUTTON_NONE },
-    { ACTION_STD_MENU,          BUTTON_DOWN|BUTTON_REL,           BUTTON_DOWN },
-    { ACTION_STD_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,      BUTTON_SELECT },
-    { ACTION_STD_QUICKSCREEN,   BUTTON_DOWN|BUTTON_REPEAT,        BUTTON_DOWN },
+    { ACTION_STD_PREV,          BUTTON_UP,                      BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,    BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_STD_NEXT,          BUTTON_DOWN,                    BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT },
+    { ACTION_STD_OK,            BUTTON_RIGHT,                   BUTTON_NONE   },
+    { ACTION_STD_CANCEL,        BUTTON_LEFT,                    BUTTON_NONE   },
+    { ACTION_STD_MENU,          BUTTON_POWER|BUTTON_REL,        BUTTON_POWER  },
+    { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT },
+    { ACTION_STD_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_SELECT },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */

@@ -1709,7 +1709,7 @@ fi
     target_id=42 
     modelname="c100" 
     target="-DSANSA_C100"     
-    memory=32  # unsure, must check
+    memory=2
     arm946cc
     tool="$rootdir/tools/scramble -add=c100"
     boottool="$rootdir/tools/scramble -tcc=crc"
@@ -1719,6 +1719,7 @@ fi
     output="rockbox.c100"
     appextra="recorder:gui"
     plugins=""
+    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$tccbitmaptools

@@ -28,7 +28,6 @@
 static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
 
 /* LCD command set for Samsung S6B33B2 */
-
 #define R_NOP                  0x00
 #define R_OSCILLATION_MODE     0x02
 #define R_DRIVER_OUTPUT_MODE   0x10
@@ -179,7 +178,7 @@ void lcd_init_device(void)
 
     lcd_send_command(R_SPEC_DISPLAY_PATTERN);
     lcd_send_command(0x0);
-
+    
     /* Rockbox init */
     lcd_clear_display();
     lcd_update();
@@ -212,88 +211,26 @@ void lcd_set_flip(bool yesno)
 }
 
 /*** update functions ***/
-
 void lcd_yuv_set_options(unsigned options)
 {
     lcd_yuv_options = options;
 }
 
-/* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
-extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
-                                   int width,
-                                   int stride);
-extern void lcd_write_yuv420_lines_odither(unsigned char const * const src[3],
-                                           int width,
-                                           int stride,
-                                           int x_screen, /* To align dither pattern */
-                                           int y_screen);
-/* Performance function to blit a YUV bitmap directly to the LCD */
-void lcd_blit_yuv(unsigned char * const src[3],
+/* TODO: implement me */
+void lcd_blit_yuv(unsigned char *const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    unsigned char const * yuv_src[3];
-    off_t z;
+    (void) src;
+    (void) src_x;
+    (void) src_y;
+    (void) stride;
+    (void) x;
+    (void) y;
 
-    /* Sorry, but width and height must be >= 2 or else */
-    width &= ~1;
-    height >>= 1;
-    
-    y += 0x1a;
+    return;
 
-    z = stride*src_y;
-    yuv_src[0] = src[0] + z + src_x;
-    yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
-    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
-
-    lcd_send_command(R_ENTRY_MODE);
-    lcd_send_command(0x80);
-
-    lcd_send_command(R_X_ADDR_AREA);
-    lcd_send_command(x);
-    lcd_send_command(x + width - 1);
-
-    if (lcd_yuv_options & LCD_YUV_DITHER)
-    {
-        do
-        {
-            lcd_send_command(R_Y_ADDR_AREA);
-            lcd_send_command(y);
-            lcd_send_command(y + 1);
-
-            /* NOP needed because on some c200s, the previous lcd_send_command
-               is interpreted as a separate command instead of part of
-               R_Y_ADDR_AREA. */
-            lcd_send_command(R_NOP);
-
-            lcd_write_yuv420_lines_odither(yuv_src, width, stride, x, y);
-            yuv_src[0] += stride << 1; /* Skip down two luma lines */
-            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-            yuv_src[2] += stride >> 1;
-            y += 2;
-        }
-         while (--height > 0);
-    }
-    else
-    {
-        do
-        {
-            lcd_send_command(R_Y_ADDR_AREA);
-            lcd_send_command(y);
-            lcd_send_command(y + 1);
-
-            lcd_send_command(R_NOP);
-
-            lcd_write_yuv420_lines(yuv_src, width, stride);
-            yuv_src[0] += stride << 1; /* Skip down two luma lines */
-            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-            yuv_src[2] += stride >> 1;
-            y += 2;
-        }
-         while (--height > 0);
-    }
 }
-
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */

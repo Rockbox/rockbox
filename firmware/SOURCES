@@ -1086,18 +1086,19 @@ target/arm/tcc77x/m200/audio-m200.c
 #ifdef SANSA_C100
 #ifndef SIMULATOR
 drivers/nand_id.c
-target/arm/tcc77x/adc-tcc77x.c
-target/arm/tcc77x/kernel-tcc77x.c
-target/arm/tcc77x/c100/lcd-S6B33B2.c
-target/arm/tcc77x/powermgmt-tcc77x.c
-target/arm/tcc77x/system-tcc77x.c
-target/arm/tcc77x/timer-tcc77x.c
 target/arm/usb-tcc.c
+target/arm/tcc77x/system-tcc77x.c
+target/arm/tcc77x/kernel-tcc77x.c
+target/arm/tcc77x/timer-tcc77x.c
+target/arm/tcc77x/adc-tcc77x.c
+target/arm/tcc77x/powermgmt-tcc77x.c
+target/arm/tcc77x/c100/lcd-S6B33B2.c
 target/arm/tcc77x/c100/button-c100.c
 target/arm/tcc77x/c100/power-c100.c
 #ifndef BOOTLOADER
 target/arm/tcc77x/debug-tcc77x.c
 target/arm/pcm-telechips.c
+target/arm/tcc77x/c100/audio-c100.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* SANSA_C100 */
