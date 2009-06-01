@@ -122,7 +122,7 @@ If bSAPI4 Then
     ' Speed selection
     If sSpeed <> "" Then oTTS.Speed = sSpeed
     
-    ' Get vendor infomration
+    ' Get vendor information
     sVendor = oTTS.MfgName(nMode)
 
 Else ' SAPI5
