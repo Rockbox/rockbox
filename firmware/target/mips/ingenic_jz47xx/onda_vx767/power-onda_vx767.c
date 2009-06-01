@@ -39,3 +39,22 @@ bool charging_state(void)
 {
     return false;
 }
+
+#if CONFIG_TUNER
+static bool tuner_on = false;
+bool tuner_power(bool status)
+{
+    if (status != tuner_on)
+    {
+        tuner_on = status;
+        status = !status;
+    }
+
+    return status;    
+}
+
+bool tuner_powered(void)
+{
+    return tuner_on;
+}
+#endif

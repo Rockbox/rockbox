@@ -362,6 +362,7 @@ void audio_input_mux(int source, unsigned flags)
             }
             break;
 
+#if INPUT_SRC_CAPS & SRC_CAP_MIC
         case AUDIO_SRC_MIC:             /* recording only */
             audio_channels = 1;
             if(source != last_source)
@@ -370,7 +371,9 @@ void audio_input_mux(int source, unsigned flags)
                                     | (ICDC_CDCCR1_EADC | ICDC_CDCCR1_SW1ON | ICDC_CDCCR1_EMIC);
             }
             break;
+#endif
 
+#if INPUT_SRC_CAPS & SRC_CAP_FMRADIO
         case AUDIO_SRC_FMRADIO:         /* recording and playback */
             audio_channels = 2;
 
@@ -390,6 +393,7 @@ void audio_input_mux(int source, unsigned flags)
                                    ICDC_CDCCR1_SW2ON | ICDC_CDCCR1_HPMUTE)) | (ICDC_CDCCR1_SW1ON | ICDC_CDCCR1_ELININ);
             }
             break;
+#endif
     } /* end switch */
 
     last_source = source;

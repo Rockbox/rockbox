@@ -104,6 +104,14 @@
 /* Define this if you have the Jz4740 internal codec */
 #define HAVE_JZ4740_CODEC
 
+/* Define bitmask of input sources - recordable bitmask can be defined
+   explicitly if different */
+#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_FMRADIO)
+
+/* Tuner config */
+#define CONFIG_TUNER TEA5767
+#define CONFIG_TUNER_XTAL 32768
+
 /* Define this if you have a speaker */
 //#define HAVE_SPEAKER
 

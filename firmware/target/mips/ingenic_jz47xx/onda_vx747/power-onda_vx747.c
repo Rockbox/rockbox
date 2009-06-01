@@ -27,6 +27,7 @@
 #define UNK_GPIO (32*1+30) /* STAT port */
 #define USB_CHARGER_GPIO (32*3+28)
 
+#if CONFIG_CHARGING
 /* Detect which power sources are present. */
 unsigned int power_input_status(void)
 {
@@ -37,6 +38,7 @@ unsigned int power_input_status(void)
 
     return status;
 }
+#endif
 
 void power_init(void)
 {
@@ -47,3 +49,22 @@ bool charging_state(void)
 {
     return false;
 }
+
+#if CONFIG_TUNER
+static bool tuner_on = false;
+bool tuner_power(bool status)
+{
+    if (status != tuner_on)
+    {
+        tuner_on = status;
+        status = !status;
+    }
+
+    return status;    
+}
+
+bool tuner_powered(void)
+{
+    return tuner_on;
+}
+#endif
