@@ -20,9 +20,10 @@
  ****************************************************************************/
 
 #include "config.h"
+#include "audio.h"
+#include "audiohw.h"
 #include "jz4740.h"
 #include "system.h"
-#include "audiohw.h"
 
 /* TODO */
 const struct sound_settings_info audiohw_settings[] = {
@@ -330,3 +331,66 @@ void audiohw_set_frequency(int freq)
 
     REG_ICDC_CDCCR2 = (REG_ICDC_CDCCR2 & ~ICDC_CDCCR2_SMPR(0xF)) | speed;
 }
+
+int audio_channels = 2;
+int audio_output_source = AUDIO_SRC_PLAYBACK;
+
+void audio_set_output_source(int source)
+{
+    if((unsigned)source >= AUDIO_NUM_SOURCES)
+        source = AUDIO_SRC_PLAYBACK;
+
+    audio_output_source = source;
+} /* audio_set_output_source */
+
+void audio_input_mux(int source, unsigned flags)
+{
+    static int last_source = AUDIO_SRC_PLAYBACK;
+    static bool last_recording = false;
+    bool recording = flags & SRCF_RECORDING;
+
+    switch (source)
+    {
+        default:                        /* playback - no recording */
+            source = AUDIO_SRC_PLAYBACK;
+        case AUDIO_SRC_PLAYBACK:
+            audio_channels = 2;
+            if(source != last_source)
+            {
+                REG_ICDC_CDCCR1 = (REG_ICDC_CDCCR1 & ~(ICDC_CDCCR1_ELININ | ICDC_CDCCR1_EMIC | ICDC_CDCCR1_EADC | ICDC_CDCCR1_SW1ON | ICDC_CDCCR1_HPMUTE))
+                                    | (ICDC_CDCCR1_EDAC | ICDC_CDCCR1_SW2ON);
+            }
+            break;
+
+        case AUDIO_SRC_MIC:             /* recording only */
+            audio_channels = 1;
+            if(source != last_source)
+            {
+                REG_ICDC_CDCCR1 = (REG_ICDC_CDCCR1 & ~(ICDC_CDCCR1_ELININ | ICDC_CDCCR1_EDAC | ICDC_CDCCR1_SW2ON | ICDC_CDCCR1_HPMUTE)) 
+                                    | (ICDC_CDCCR1_EADC | ICDC_CDCCR1_SW1ON | ICDC_CDCCR1_EMIC);
+            }
+            break;
+
+        case AUDIO_SRC_FMRADIO:         /* recording and playback */
+            audio_channels = 2;
+
+            if(source == last_source && recording == last_recording)
+                break;
+
+            last_recording = recording;
+
+            if(recording)
+            {
+                REG_ICDC_CDCCR1 = (REG_ICDC_CDCCR1 & ~(ICDC_CDCCR1_EMIC | ICDC_CDCCR1_EDAC | ICDC_CDCCR1_SW2ON | ICDC_CDCCR1_HPMUTE))
+                                    | (ICDC_CDCCR1_EADC | ICDC_CDCCR1_SW1ON | ICDC_CDCCR1_ELININ);
+            }
+            else
+            {
+                REG_ICDC_CDCCR1 = (REG_ICDC_CDCCR1 & ~(ICDC_CDCCR1_EMIC | ICDC_CDCCR1_EDAC | ICDC_CDCCR1_EADC |
+                                   ICDC_CDCCR1_SW2ON | ICDC_CDCCR1_HPMUTE)) | (ICDC_CDCCR1_SW1ON | ICDC_CDCCR1_ELININ);
+            }
+            break;
+    } /* end switch */
+
+    last_source = source;
+} /* audio_input_mux */

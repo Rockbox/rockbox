@@ -101,6 +101,7 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
 }; /* button_context_settingsgraphical */
 
 static const struct button_mapping button_context_yesno[]  = {
+    { ACTION_YESNO_ACCEPT,          BUTTON_MENU,              BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings_yesno */
 
@@ -141,6 +142,19 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_EXIT,      BUTTON_POWER,                  BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */
+
+/** FM Radio Screen **/
+static const struct button_mapping button_context_radio[]  = {
+    { ACTION_STD_PREV,       BUTTON_VOL_DOWN,                   BUTTON_NONE   },
+    { ACTION_STD_PREVREPEAT, BUTTON_VOL_DOWN|BUTTON_REPEAT,     BUTTON_NONE   },
+    { ACTION_STD_NEXT,       BUTTON_VOL_UP,                     BUTTON_NONE   },
+    { ACTION_STD_NEXTREPEAT, BUTTON_VOL_UP|BUTTON_REPEAT,       BUTTON_NONE   },
+    { ACTION_FM_MENU,        BUTTON_MENU|BUTTON_REPEAT,         BUTTON_NONE   },
+    { ACTION_FM_PRESET,      BUTTON_MENU|BUTTON_REL,            BUTTON_NONE   },
+    { ACTION_FM_MODE,        BUTTON_POWER|BUTTON_REL,           BUTTON_POWER  },
+    { ACTION_FM_EXIT,        BUTTON_POWER|BUTTON_REPEAT,        BUTTON_NONE   },
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+}; /* button_context_radio */
 
 static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_PAGE_FLIP,    BUTTON_MENU,                     BUTTON_NONE },
@@ -201,6 +215,8 @@ const struct button_mapping* target_get_context_mapping(int context)
 
         case CONTEXT_YESNOSCREEN:
             return button_context_yesno;
+        case CONTEXT_FM:
+            return button_context_radio;
         case CONTEXT_BOOKMARKSCREEN:
             return button_context_bmark;
         case CONTEXT_QUICKSCREEN:

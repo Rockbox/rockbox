@@ -94,6 +94,10 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_JZ47XX
 
+/* Tuner config */
+#define CONFIG_TUNER TEA5767
+#define CONFIG_TUNER_XTAL 32768
+
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
@@ -121,6 +125,10 @@
 
 /* Define this if you have the Jz4740 internal codec */
 #define HAVE_JZ4740_CODEC
+
+/* Define bitmask of input sources - recordable bitmask can be defined
+   explicitly if different */
+#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_FMRADIO)
 
 /* has no tone controls, so we use the software ones */
 #define HAVE_SW_TONE_CONTROLS

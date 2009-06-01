@@ -1244,6 +1244,7 @@ drivers/qt1106.c
 target/mips/ingenic_jz47xx/ata-nand-jz4740.c
 target/mips/ingenic_jz47xx/ata-sd-jz4740.c
 target/mips/ingenic_jz47xx/debug-jz4740.c
+target/mips/ingenic_jz47xx/fmradio-i2c-jz4740.c
 target/mips/ingenic_jz47xx/kernel-jz4740.c
 target/mips/ingenic_jz47xx/i2c-jz4740.c
 target/mips/ingenic_jz47xx/lcd-jz4740.c
