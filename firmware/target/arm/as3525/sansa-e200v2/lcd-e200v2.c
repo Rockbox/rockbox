@@ -357,7 +357,7 @@ bool lcd_active(void)
 
 /*** update functions ***/
 
-static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
+static unsigned lcd_yuv_options = 0;
 
 /* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
 extern void lcd_write_yuv420_lines(unsigned char const * const src[3],

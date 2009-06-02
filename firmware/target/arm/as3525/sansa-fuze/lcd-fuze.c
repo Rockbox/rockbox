@@ -39,7 +39,7 @@
 #define R_ENTRY_MODE_HORZ 0x7030
 #define R_ENTRY_MODE_VERT 0x7038
 
-static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
+static unsigned lcd_yuv_options = 0;
 static bool display_on = false; /* is the display turned on? */
 static bool display_flipped = false;
 static int xoffset = 20; /* needed for flip */

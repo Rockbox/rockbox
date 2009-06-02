@@ -106,7 +106,7 @@ static long next_yield = 0;
 
 static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x200)/sizeof(long)];
 static const char         sd_thread_name[] = "ata/sd";
-static struct mutex       sd_mtx SHAREDBSS_ATTR;
+static struct mutex       sd_mtx;
 static struct event_queue sd_queue;
 #ifndef BOOTLOADER
 static bool sd_enabled = false;

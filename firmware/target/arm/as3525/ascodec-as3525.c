@@ -63,7 +63,7 @@
 #define I2C2_INT_CLR    *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x40))
 #define I2C2_SADDR      *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x44))
 
-static struct mutex as_mtx SHAREDBSS_ATTR;
+static struct mutex as_mtx;
 
 void i2c_init(void)
 {
