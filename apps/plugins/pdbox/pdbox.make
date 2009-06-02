@@ -12,13 +12,13 @@ PDBOXBUILDDIR := $(BUILDDIR)/apps/plugins/pdbox
 
 ROCKS += $(PDBOXBUILDDIR)/pdbox.rock
 
-PDBOXSRC := $(call preprocess, $(PDBOXSRCDIR)/SOURCES)
-PDBOXOBJ := $(call c2obj, $(PDBOXSRC))
+PDBOX_SRC := $(call preprocess, $(PDBOXSRCDIR)/SOURCES)
+PDBOX_OBJ := $(call c2obj, $(PDBOX_SRC))
 
 # add source files to OTHERSRC to get automatic dependencies
-OTHERSRC += $(PDBOXSRC)
+OTHER_SRC += $(PDBOX_SRC)
 
-$(PDBOXBUILDDIR)/pdbox.rock: $(PDBOXOBJ)
+$(PDBOXBUILDDIR)/pdbox.rock: $(PDBOX_OBJ)
 
 PDBOXFLAGS = $(PLUGINFLAGS) \
              -DFIXEDPOINT -DSTATIC -DPD \
@@ -26,7 +26,7 @@ PDBOXFLAGS = $(PLUGINFLAGS) \
              -DBMALLOC -I$(PDBOXSRCDIR)/dbestfit-3.3
 
 # Compile PDBox with extra flags (adapted from ZXBox)
-$(PDBOXBUILDDIR)/%.o: $(PDBOXSRCDIR)/%.c $(PDBOXSRCDIR)/pdbox.make
+$(PDBOXBUILDDIR)/%.o: $(PDBOXSRCDIR)/%.c $(PDBOXSRCDIR)/pdbox.h $(PDBOXSRCDIR)/pdbox.make
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PDBOXFLAGS) -c $< -o $@
 
