@@ -23,14 +23,16 @@
 
 /* Basic button driver for the Fuze
  *
- * TODO: - Get the wheel working with interrupts
- *       - find that Home button
+ * TODO: - Get the wheel working with interrupts (seems to be impossible
+ *              so far)
  */
 
 #include "system.h"
 #include "button.h"
 #include "button-target.h"
 #include "backlight.h"
+
+#define WHEEL_REPEAT_INTERVAL   (HZ/5)
 
 /* Buttons */
 static bool hold_button     = false;
@@ -58,13 +60,22 @@ static void scrollwheel(unsigned short dbop_din)
     static unsigned old_wheel_value = 0;
     static unsigned old_btn         = BUTTON_NONE;
 
-    /* getting BUTTON_REPEAT works like this: We increment repeat by 2 if the
-     * wheel was turned, and decrement it by 1 each tick,
-     * that means: if you change the wheel fast enough, repeat will be >1 and
-     * we send BUTTON_REPEAT
+    /*
+     * Getting BUTTON_REPEAT works like this: Remember when the btn value was
+     * posted to the button_queue last, and if it was recent enough, generate
+     * BUTTON_REPEAT
      */
-    static int repeat = 0;
-    /* we omit 3 of 4 posts to the button_queue, that works better, so count */
+    static long last_wheel_post = 0;
+
+    /*
+     *  Providing wheel acceleration works as follows: We increment accel
+     * by 2 if the wheel was turned, and decrement it by 1 each tick
+     * (no matter if it was turned), that means: the longer and faster you turn,
+     * the higher accel will be. accel>>2 will actually posted to the button_queue
+     */
+    static int accel = 0;
+    /* We only post every 4th action, as this matches better with the physical
+     * clicks of the wheel */
     static int counter = 0;
     /* Read wheel 
      * Bits 13 and 14 of DBOP_DIN change as follows:
@@ -79,7 +90,7 @@ static void scrollwheel(unsigned short dbop_din)
 
     if(hold_button)
     {
-        repeat  =  counter  = 0;
+        accel  =  counter  = 0;
         return;
     }
 
@@ -95,39 +106,39 @@ static void scrollwheel(unsigned short dbop_din)
     {
         if (btn != old_btn)
         {
-            /* direction reversals nullify repeats */
+            /* direction reversals nullify acceleration and counters */
             old_btn =  btn;
-            repeat  =  counter  = 0;
+            accel  =  counter  = 0;
         }
         /* wheel_delta will cause lists to jump over items,
          * we want this for fast scrolling, but we must keep it accurate
          * for slow scrolling */
         int wheel_delta = 0;
-        /* generate repeats if quick enough, scroll slightly faster too*/
-        if (repeat > 1)
+        /* generate BUTTON_REPEAT if quick enough, scroll slightly faster too*/
+        if (TIME_BEFORE(current_tick, last_wheel_post + WHEEL_REPEAT_INTERVAL))
         {
             btn |= BUTTON_REPEAT;
-            wheel_delta = repeat>>2;
+            wheel_delta = accel>>2;
         }
 
-        repeat += 2;
+        accel += 2;
 
-        /* the wheel is more reliable if we don't send ever change,
-         * every 4th is basically one "physical click" is 1 item in
-         * the rockbox menus */
+        /* the wheel is more reliable if we don't send every change,
+         * every 4th is basically one "physical click" which should
+         * make up 1 item in lists */
         if (++counter >= 4 && queue_empty(&button_queue))
         {
             buttonlight_on();
             backlight_on();
             queue_post(&button_queue, btn, ((wheel_delta+1)<<24));
-            /* message posted - reset count */
+            /* message posted - reset count and remember post */
             counter = 0;
+            last_wheel_post = current_tick;
         }
     }
-    if (repeat > 0)
-        repeat--;
-    else
-        repeat = 0;
+    if (accel > 0)
+        accel--;
+
     old_wheel_value = wheel_value;
 }
 #endif /* !defined(BOOTLOADER) && defined(SCROLLWHEEL) */
@@ -139,8 +150,8 @@ bool button_hold(void)
 
 static void button_delay(void)
 {
-    int i = 32;
-    while(i--);
+    int i = 24;
+    while(i--) asm volatile ("nop\n");
 }
 
 unsigned short button_read_dbop(void)
@@ -155,7 +166,6 @@ unsigned short button_read_dbop(void)
     }
 
     /* Set up dbop for input */
-    while (!(DBOP_STAT & (1<<10)));      /* Wait for fifo to empty */
     DBOP_CTRL |= (1<<19);                /* Tri-state DBOP on read cycle */
     DBOP_CTRL &= ~(1<<16);               /* disable output (1:write enabled) */
     DBOP_TIMPOL_01 = 0xe167e167;         /* Set Timing & Polarity regs 0 & 1 */
@@ -211,8 +221,7 @@ static int button_gpio(void)
     GPIOC_DIR &= ~(1<<2|1<<3|1<<4|1<<5|1<<6);
 
     /* small delay needed to read buttons correctly */
-    int delay = 0;
-    while(delay++ < 32);
+    button_delay();
 
     /* direct GPIO connections */
     if (!GPIOC_PIN(3))
@@ -251,7 +260,7 @@ int button_read_device(void)
         hold_button = false;
     /* read power on bit 8, but not if hold button was just released, since
      * you basically always hit power due to the slider mechanism after releasing
-     * hold (wait ~1 sec) */
+     * hold (wait 1 sec) */
         if (power_counter)
             power_counter--;
         if (!power_counter && dbop & (1<<8))
