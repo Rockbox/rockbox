@@ -38,6 +38,11 @@ PLUGIN_HEADER
 
 /******************************* Globals ***********************************/
 
+/*
+ *  Targets which use plugin_get_audio_buffer() can't have playback from
+ * within pictureflow itself, as the whole core audio buffer is occupied */
+#define PF_PLAYBACK_CAPABLE (PLUGIN_BUFFER_SIZE > 0x10000)
+
 #define PF_PREV ACTION_STD_PREV
 #define PF_PREV_REPEAT ACTION_STD_PREVREPEAT
 #define PF_NEXT ACTION_STD_NEXT
@@ -254,7 +259,10 @@ struct track_data {
     uint32_t sort;
     int name_idx;       /* offset to the track name */
     long seek;
-    int filename_idx;   /* offset to the filename in the string */
+#if PF_PLAYBACK_CAPABLE
+    /* offset to the filename in the string, needed for playlist generation */
+    int filename_idx;
+#endif
 };
 
 struct rect {
@@ -757,14 +765,14 @@ char* get_track_name(const int track_index)
         return track_names + tracks[track_index].name_idx;
     return 0;
 }
-
+#if PF_PLAYBACK_CAPABLE
 char* get_track_filename(const int track_index)
 {
     if ( track_index < track_count )
         return track_names + tracks[track_index].filename_idx;
     return 0;
 }
-
+#endif
 /**
   Compare two unsigned ints passed via pointers.
  */
@@ -798,7 +806,7 @@ void create_track_index(const int slide_index)
     tracks = (struct track_data*)(track_names + borrowed);
     while (rb->tagcache_get_next(&tcs))
     {
-        int len = 0, fn_idx = 0, remain;
+        int len = 0, fn_idx = 0;
 
         avail -= sizeof(struct track_data);
         track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber) - 1;
@@ -824,7 +832,8 @@ retry:
         }
         if (fn_idx <= 0)
             goto fail;
-        remain = avail - fn_idx;
+#if PF_PLAYBACK_CAPABLE
+        int remain = avail - fn_idx;
         if (remain >= MAX_PATH)
         {   /* retrieve filename for building the playlist */
             rb->tagcache_retrieve(&tcs, tcs.idx_id, tag_filename,
@@ -837,6 +846,9 @@ retry:
         }
         else /* request more buffer so that track and filename fit */
             len = (avail - remain) + MAX_PATH;
+#else
+            len = fn_idx;
+#endif
         if (len > avail)
         {
             while (len > avail)
@@ -863,7 +875,9 @@ retry:
         tracks->sort = ((disc_num - 1) << 24) + (track_num << 14) + track_count;
         tracks->name_idx = string_index;
         tracks->seek = tcs.result_seek;
+#if PF_PLAYBACK_CAPABLE
         tracks->filename_idx = fn_idx + string_index;
+#endif
         track_count++;
         string_index += len;
     }
@@ -2325,6 +2339,7 @@ void select_prev_track(void)
     }
 }
 
+#if PF_PLAYBACK_CAPABLE
 /*
  * Puts the current tracklist into a newly created playlist and starts playling
  */
@@ -2367,7 +2382,7 @@ play:
     old_playlist = center_slide.slide_index;
     old_shuffle = shuffle;
 }
-
+#endif
 /**
    Draw the current album name
  */
@@ -2671,7 +2686,9 @@ int main(void)
                 pf_state = pf_cover_in;
             }
             else if ( pf_state == pf_show_tracks ) {
+#if PF_PLAYBACK_CAPABLE
                 start_playback();
+#endif
             }
             break;
 
@@ -2700,7 +2717,7 @@ enum plugin_status plugin_start(const void *parameter)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
-#if PLUGIN_BUFFER_SIZE > 0x10000
+#if PF_PLAYBACK_CAPABLE
     buf = rb->plugin_get_buffer(&buf_size);
 #else
     buf = rb->plugin_get_audio_buffer(&buf_size);
