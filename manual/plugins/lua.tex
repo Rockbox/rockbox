@@ -1,0 +1,26 @@
+\subsection{Lua scripting language}
+
+To quote from the Lua website (\url{http://www.lua.org}), Lua is a ``powerful,
+fast, lightweight, embeddable scripting language''. Select a \fname{.lua} file
+in the \setting{File Browser} to run it. For more information on programming
+in Lua, please see \url{http://www.lua.org/manual/5.1/} and
+\url{http://www.lua.org/pil/}.
+
+There are a few exceptions/additions to the Lua support in Rockbox:
+\begin{description}
+    \item[No floating point support.] The number type in Lua is usually float,
+    however in the Rockbox implementation it is integer.
+    \item[Non-supported libraries.] The coroutine, debug, file, io, math
+    and package libraries are not supported.
+    \item[Partially-supported libraries.]  The os library is only partially
+    supported.
+    \item[Additional libraries.] The bitlib library is integrated to support
+    bitwise operators.  See \url{http://luaforge.net/projects/bitlib} and
+    \url{http://lua-users.org/wiki/BitwiseOperators}.
+\end{description}
+
+Documentation of the API is still a work in progress, and the API itself is
+not finalised. For the latest information, see \wikilink{PluginLua}.\\
+
+\note{Please note that if a script does not provide a way to exit, then
+the only way to exit will be to reset the \dap.}

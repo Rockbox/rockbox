@@ -195,3 +195,7 @@ wheel_acceleration
 #if defined(HAVE_TOUCHSCREEN)
 touchscreen
 #endif
+
+#if (PLUGIN_BUFFER_SIZE >= 0x80000)
+large_plugin_buffer
+#endif
