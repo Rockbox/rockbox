@@ -57,11 +57,6 @@ void tick_start(unsigned int interval_in_ms)
     int prescale = 1;
     int cycles = TIMER_FREQ / 1000 * interval_in_ms;
 
-#ifdef HAVE_SCROLLWHEEL
-    /* let the timer interrupt twice as often for the scrollwheel polling */
-    cycles >>= 1;
-#endif
-
     while(cycles > 0x10000)
     {
         phi++;
