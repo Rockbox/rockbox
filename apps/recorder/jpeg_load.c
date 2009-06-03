@@ -2144,19 +2144,22 @@ int read_jpeg_fd(int fd,
         {
             part = store_row_jpeg(p_jpeg);
 #ifdef HAVE_LCD_COLOR
-            struct uint8_rgb *qp = part->buf;
-            struct uint8_rgb *end = qp + bm->width;
-            uint8_t y, u, v;
-            unsigned r, g, b;
-            for (; qp < end; qp++)
+            if (p_jpeg->blocks > 1)
             {
-                y = qp->blue;
-                u = qp->green;
-                v = qp->red;
-                yuv_to_rgb(y, u, v, &r, &g, &b);
-                qp->red = r;
-                qp->blue = b;
-                qp->green = g;
+                struct uint8_rgb *qp = part->buf;
+                struct uint8_rgb *end = qp + bm->width;
+                uint8_t y, u, v;
+                unsigned r, g, b;
+                for (; qp < end; qp++)
+                {
+                    y = qp->blue;
+                    u = qp->green;
+                    v = qp->red;
+                    yuv_to_rgb(y, u, v, &r, &g, &b);
+                    qp->red = r;
+                    qp->blue = b;
+                    qp->green = g;
+                }
             }
 #endif
             output_row_8(row, part->buf, &ctx);
