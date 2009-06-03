@@ -329,7 +329,7 @@ static bool read_clause(struct tagcache_search_clause *clause)
         strcpy(clause->str, buf);
     }    
     
-    if (tagcache_is_numeric_tag(clause->tag))
+    if (TAGCACHE_IS_NUMERIC(clause->tag))
     {
         clause->numeric = true;
         clause->numeric_data = atoi(clause->str);
@@ -1086,12 +1086,12 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     /* Prevent duplicate entries in the search list. */
     tagcache_search_set_uniqbuf(tcs, uniqbuf, UNIQBUF_SIZE);
     
-    if (level || csi->clause_count[0] || tagcache_is_numeric_tag(tag))
+    if (level || csi->clause_count[0] || TAGCACHE_IS_NUMERIC(tag))
         sort = true;
     
     for (i = 0; i < level; i++)
     {
-        if (tagcache_is_numeric_tag(csi->tagorder[i]))
+        if (TAGCACHE_IS_NUMERIC(csi->tagorder[i]))
         {
             static struct tagcache_search_clause cc;
             

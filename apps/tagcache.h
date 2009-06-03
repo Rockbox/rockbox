@@ -94,6 +94,21 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 /* Serialized DB. */
 #define TAGCACHE_STATEFILE       ROCKBOX_DIR "/database_state.tcd"
 
+/* Numeric tags (we can use these tags with conditional clauses). */
+#define TAGCACHE_NUMERIC_TAGS ((1LU << tag_year) | (1LU << tag_discnumber) | \
+    (1LU << tag_tracknumber) | (1LU << tag_length) | (1LU << tag_bitrate) | \
+    (1LU << tag_playcount) | (1LU << tag_rating) | (1LU << tag_playtime) | \
+    (1LU << tag_lastplayed) | (1LU << tag_commitid) | (1LU << tag_mtime) | \
+    (1LU << tag_virt_length_min) | (1LU << tag_virt_length_sec) | \
+    (1LU << tag_virt_playtime_min) | (1LU << tag_virt_playtime_sec) | \
+    (1LU << tag_virt_entryage) | (1LU << tag_virt_autoscore))
+
+#ifdef CPU_SH
+#define TAGCACHE_IS_NUMERIC(tag) (tagcache_is_numeric_tag(tag))
+#else
+#define TAGCACHE_IS_NUMERIC(tag) ((1LU << tag) & TAGCACHE_NUMERIC_TAGS)
+#endif
+
 /* Flags */
 #define FLAG_DELETED     0x0001  /* Entry has been removed from db */
 #define FLAG_DIRCACHE    0x0002  /* Filename is a dircache pointer */
@@ -183,9 +198,9 @@ void tagcache_reverse_scan(void);
 
 const char* tagcache_tag_to_str(int tag);
 
+#ifdef CPU_SH
 bool tagcache_is_numeric_tag(int type);
-bool tagcache_is_unique_tag(int type);
-bool tagcache_is_sorted_tag(int type);
+#endif
 bool tagcache_find_index(struct tagcache_search *tcs, const char *filename);
 bool tagcache_check_clauses(struct tagcache_search *tcs,
                             struct tagcache_search_clause **clause, int count);

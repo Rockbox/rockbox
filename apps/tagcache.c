@@ -107,21 +107,24 @@ static long tempbuf_size; /* Buffer size (TEMPBUF_SIZE). */
 static long tempbuf_left; /* Buffer space left. */
 static long tempbuf_pos;
 
+#ifdef CPU_SH
+#define TAGCACHE_IS_UNIQUE(tag) (tagcache_is_unique_tag(tag))
+#define TAGCACHE_IS_SORTED(tag) (tagcache_is_sorted_tag(tag))
+#else
+#define TAGCACHE_IS_UNIQUE(tag) ((1LU << tag) & TAGCACHE_UNIQUE_TAGS)
+#define TAGCACHE_IS_SORTED(tag) ((1LU << tag) & TAGCACHE_SORTED_TAGS)
+#endif
+
 /* Tags we want to get sorted (loaded to the tempbuf). */
-static const int sorted_tags[] = { tag_artist, tag_album, tag_genre, 
-    tag_composer, tag_comment, tag_albumartist, tag_grouping, tag_title };
+#define TAGCACHE_SORTED_TAGS ((1LU << tag_artist) | (1LU << tag_album) | \
+    (1LU << tag_genre) | (1LU << tag_composer) | (1LU << tag_comment) | \
+    (1LU << tag_albumartist) | (1LU << tag_grouping) | (1LU << tag_title))
+#define SORTED_TAGS_COUNT 8
 
 /* Uniqued tags (we can use these tags with filters and conditional clauses). */
-static const int unique_tags[] = { tag_artist, tag_album, tag_genre, 
-    tag_composer, tag_comment, tag_albumartist, tag_grouping };
-
-/* Numeric tags (we can use these tags with conditional clauses). */
-static const int numeric_tags[] = { tag_year, tag_discnumber, 
-    tag_tracknumber, tag_length, tag_bitrate, tag_playcount, tag_rating,
-    tag_playtime, tag_lastplayed, tag_commitid, tag_mtime,
-    tag_virt_length_min, tag_virt_length_sec,
-    tag_virt_playtime_min, tag_virt_playtime_sec,
-    tag_virt_entryage, tag_virt_autoscore };
+#define TAGCACHE_UNIQUE_TAGS ((1LU << tag_artist) | (1LU << tag_album) | \
+    (1LU << tag_genre) | (1LU << tag_composer) | (1LU << tag_comment) | \
+    (1LU << tag_albumartist) | (1LU << tag_grouping))
 
 /* String presentation of the tags defined in tagcache.h. Must be in correct order! */
 static const char *tags_str[] = { "artist", "album", "genre", "title", 
@@ -265,44 +268,22 @@ const char* tagcache_tag_to_str(int tag)
     return tags_str[tag];
 }
 
+#ifdef CPU_SH
 bool tagcache_is_numeric_tag(int type)
 {
-    int i;
-
-    for (i = 0; i < (int)(sizeof(numeric_tags)/sizeof(numeric_tags[0])); i++)
-    {
-        if (type == numeric_tags[i])
-            return true;
-    }
-
-    return false;
+    return (1LU << type) & TAGCACHE_NUMERIC_TAGS;
 }
 
-bool tagcache_is_unique_tag(int type)
+static bool tagcache_is_unique_tag(int type)
 {
-    int i;
-
-    for (i = 0; i < (int)(sizeof(unique_tags)/sizeof(unique_tags[0])); i++)
-    {
-        if (type == unique_tags[i])
-            return true;
-    }
-
-    return false;
+    return (1LU << type) & TAGCACHE_UNIQUE_TAGS;
 }
 
-bool tagcache_is_sorted_tag(int type)
+static bool tagcache_is_sorted_tag(int type)
 {
-    int i;
-
-    for (i = 0; i < (int)(sizeof(sorted_tags)/sizeof(sorted_tags[0])); i++)
-    {
-        if (type == sorted_tags[i])
-            return true;
-    }
-
-    return false;
+    return (1LU << type) & TAGCACHE_UNIQUE_TAGS;
 }
+#endif
 
 #ifdef HAVE_DIRCACHE
 /**
@@ -321,7 +302,7 @@ static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
     char buf[MAX_PATH];
     int rc;
     
-    if (tagcache_is_numeric_tag(tag) || tag < 0 || tag >= TAG_COUNT)
+    if (TAGCACHE_IS_NUMERIC(tag) || tag < 0 || tag >= TAG_COUNT)
         return -1;
     
     snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, tag);
@@ -654,7 +635,7 @@ static bool write_index(int masterfd, int idxid, struct index_entry *idx)
         
         for (tag = 0; tag < TAG_COUNT; tag++)
         {
-            if (tagcache_is_numeric_tag(tag))
+            if (TAGCACHE_IS_NUMERIC(tag))
             {
                 idx_ram->tag_seek[tag] = idx->tag_seek[tag];
             }
@@ -708,7 +689,7 @@ static bool retrieve(struct tagcache_search *tcs, struct index_entry *idx,
     
     *buf = '\0';
     
-    if (tagcache_is_numeric_tag(tag))
+    if (TAGCACHE_IS_NUMERIC(tag))
         return false;
     
     seek = idx->tag_seek[tag];
@@ -827,7 +808,7 @@ long tagcache_get_numeric(const struct tagcache_search *tcs, int tag)
     if (!tc_stat.ready)
         return false;
     
-    if (!tagcache_is_numeric_tag(tag))
+    if (!TAGCACHE_IS_NUMERIC(tag))
         return -1;
     
     if (!get_index(tcs->masterfd, tcs->idx_id, &idx, true))
@@ -945,7 +926,7 @@ static bool check_clauses(struct tagcache_search *tcs,
             
             seek = check_virtual_tags(clause[i]->tag, idx);
             
-            if (!tagcache_is_numeric_tag(clause[i]->tag))
+            if (!TAGCACHE_IS_NUMERIC(clause[i]->tag))
             {
                 if (clause[i]->tag == tag_filename)
                 {
@@ -976,7 +957,7 @@ static bool check_clauses(struct tagcache_search *tcs,
             seek = check_virtual_tags(clause[i]->tag, idx);
                 
             memset(str, 0, sizeof str);
-            if (!tagcache_is_numeric_tag(clause[i]->tag))
+            if (!TAGCACHE_IS_NUMERIC(clause[i]->tag))
             {
                 int fd = tcs->idxfd[clause[i]->tag];
                 lseek(fd, seek, SEEK_SET);
@@ -1021,9 +1002,8 @@ static bool add_uniqbuf(struct tagcache_search *tcs, unsigned long id)
     int i;
     
     /* If uniq buffer is not defined we must return true for search to work. */
-    if (tcs->unique_list == NULL 
-        || (!tagcache_is_unique_tag(tcs->type)
-            && !tagcache_is_numeric_tag(tcs->type)))
+    if (tcs->unique_list == NULL || (!TAGCACHE_IS_UNIQUE(tcs->type)
+        && !TAGCACHE_IS_NUMERIC(tcs->type)))
     {
         return true;
     }
@@ -1154,7 +1134,7 @@ static void remove_files(void)
     remove(TAGCACHE_FILE_MASTER);
     for (i = 0; i < TAG_COUNT; i++)
     {
-        if (tagcache_is_numeric_tag(i))
+        if (TAGCACHE_IS_NUMERIC(i))
             continue;
         
         snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, i);
@@ -1184,7 +1164,7 @@ static bool check_all_headers(void)
     
     for (tag = 0; tag < TAG_COUNT; tag++)
     {
-        if (tagcache_is_numeric_tag(tag))
+        if (TAGCACHE_IS_NUMERIC(tag))
             continue;
         
         if ( (fd = open_tag_fd(&tch, tag, false)) < 0)
@@ -1233,7 +1213,7 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
     else
 #endif
     {
-        if (!tagcache_is_numeric_tag(tcs->type))
+        if (!TAGCACHE_IS_NUMERIC(tcs->type))
         {
             tcs->idxfd[tcs->type] = open_tag_fd(&tag_hdr, tcs->type, false);
             if (tcs->idxfd[tcs->type] < 0)
@@ -1269,7 +1249,7 @@ bool tagcache_search_add_filter(struct tagcache_search *tcs,
     if (tcs->filter_count == TAGCACHE_MAX_FILTERS)
         return false;
 
-    if (!tagcache_is_unique_tag(tag) || tagcache_is_numeric_tag(tag))
+    if (!TAGCACHE_IS_UNIQUE(tag) || TAGCACHE_IS_NUMERIC(tag))
         return false;
     
     tcs->filter_tag[tcs->filter_count] = tag;
@@ -1299,7 +1279,7 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
             return true;
     }
     
-    if (!tagcache_is_numeric_tag(clause->tag) && tcs->idxfd[clause->tag] < 0)
+    if (!TAGCACHE_IS_NUMERIC(clause->tag) && tcs->idxfd[clause->tag] < 0)
     {
         char buf[MAX_PATH];
 
@@ -1330,7 +1310,7 @@ static bool get_next(struct tagcache_search *tcs)
     if (!tcs->valid || !tc_stat.ready)
         return false;
         
-    if (tcs->idxfd[tcs->type] < 0 && !tagcache_is_numeric_tag(tcs->type)
+    if (tcs->idxfd[tcs->type] < 0 && !TAGCACHE_IS_NUMERIC(tcs->type)
 #ifdef HAVE_TC_RAMCACHE
         && !tcs->ramsearch
 #endif
@@ -1339,7 +1319,7 @@ static bool get_next(struct tagcache_search *tcs)
     
     /* Relative fetch. */
     if (tcs->filter_count > 0 || tcs->clause_count > 0
-        || tagcache_is_numeric_tag(tcs->type))
+        || TAGCACHE_IS_NUMERIC(tcs->type))
     {
         /* Check for end of list. */
         if (tcs->seek_list_count == 0)
@@ -1357,7 +1337,7 @@ static bool get_next(struct tagcache_search *tcs)
         
         /* Seek stream to the correct position and continue to direct fetch. */
         if ((!tcs->ramsearch || !TAG_FILENAME_RAM(tcs))
-            && !tagcache_is_numeric_tag(tcs->type))
+            && !TAGCACHE_IS_NUMERIC(tcs->type))
         {
             if (!open_files(tcs, tcs->type))
                 return false;
@@ -1368,7 +1348,7 @@ static bool get_next(struct tagcache_search *tcs)
             tcs->position = tcs->seek_list[tcs->seek_list_count];
     }
     
-    if (tagcache_is_numeric_tag(tcs->type))
+    if (TAGCACHE_IS_NUMERIC(tcs->type))
     {
         snprintf(buf, sizeof(buf), "%d", tcs->position);
         tcs->result_seek = tcs->position;
@@ -2257,7 +2237,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
             
             for (j = 0; j < TAG_COUNT; j++)
             {
-                if (!tagcache_is_numeric_tag(j))
+                if (!TAGCACHE_IS_NUMERIC(j))
                     continue;
                 
                 idx.tag_seek[j] = entrybuf[i].tag_offset[j];
@@ -2395,7 +2375,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
          * it entirely into memory so we can resort it later for use with
          * chunked browsing.
          */
-        if (tagcache_is_sorted_tag(index_type))
+        if (TAGCACHE_IS_SORTED(index_type))
         {
             logf("loading tags...");
             for (i = 0; i < tch.entry_count; i++)
@@ -2437,7 +2417,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                  */
                 ret = tempbuf_insert(buf, loc/TAGFILE_ENTRY_CHUNK_LENGTH 
                                      + commit_entry_count, entry.idx_id,
-                                     tagcache_is_unique_tag(index_type));
+                                     TAGCACHE_IS_UNIQUE(index_type));
                 if (!ret)
                 {
                     close(fd);
@@ -2540,7 +2520,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
      * Load new unique tags in memory to be sorted later and added
      * to the master lookup file.
      */
-    if (tagcache_is_sorted_tag(index_type))
+    if (TAGCACHE_IS_SORTED(index_type))
     {
         lseek(tmpfd, sizeof(struct tagcache_header), SEEK_SET);
         /* h is the header of the temporary file containing new tags. */
@@ -2574,7 +2554,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 goto error_exit;
             }
             
-            if (tagcache_is_unique_tag(index_type))
+            if (TAGCACHE_IS_UNIQUE(index_type))
                 error = !tempbuf_insert(buf, i, -1, true);
             else
                 error = !tempbuf_insert(buf, i, tcmh.tch.entry_count + i, false);
@@ -2691,7 +2671,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
         /* Read entry headers. */
         for (j = 0; j < idxbuf_pos; j++)
         {
-            if (!tagcache_is_sorted_tag(index_type))
+            if (!TAGCACHE_IS_SORTED(index_type))
             {
                 struct temp_file_entry entry;
                 struct tagfile_entry fe;
@@ -2893,7 +2873,7 @@ static bool commit(void)
     {
         int ret;
         
-        if (tagcache_is_numeric_tag(i))
+        if (TAGCACHE_IS_NUMERIC(i))
             continue;
         
         tc_stat.commit_step++;
@@ -3006,7 +2986,7 @@ static bool modify_numeric_entry(int masterfd, int idx_id, int tag, long data)
     if (!tc_stat.ready)
         return false;
     
-    if (!tagcache_is_numeric_tag(tag))
+    if (!TAGCACHE_IS_NUMERIC(tag))
         return false;
     
     if (!get_index(masterfd, idx_id, &idx, false))
@@ -3443,7 +3423,7 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
         /* Now retrieve all tags. */
         for (j = 0; j < TAG_COUNT; j++)
         {
-            if (tagcache_is_numeric_tag(j))
+            if (TAGCACHE_IS_NUMERIC(j))
             {
                 snprintf(temp, sizeof temp, "%d", idx.tag_seek[j]);
                 write_tag(clfd, tagcache_tag_to_str(j), temp);
@@ -3540,7 +3520,7 @@ static bool delete_entry(long idx_id)
         
         for (tag = 0; tag < TAG_COUNT; tag++)
         {
-            if (tagcache_is_numeric_tag(tag))
+            if (TAGCACHE_IS_NUMERIC(tag))
                 continue;
             
             if (idxp->tag_seek[tag] == myidx.tag_seek[tag])
@@ -3554,7 +3534,7 @@ static bool delete_entry(long idx_id)
         struct tagcache_header tch;
         int oldseek = myidx.tag_seek[tag];
         
-        if (tagcache_is_numeric_tag(tag))
+        if (TAGCACHE_IS_NUMERIC(tag))
             continue;
         
         /** 
@@ -3866,7 +3846,7 @@ static bool load_tagcache(void)
         struct tagfile_entry *fe;
         char buf[TAG_MAXLEN+32];
 
-        if (tagcache_is_numeric_tag(tag))
+        if (TAGCACHE_IS_NUMERIC(tag))
             continue ;
         
         //p = ((void *)p+1);
@@ -4538,6 +4518,6 @@ int tagcache_get_commit_step(void)
 }
 int tagcache_get_max_commit_step(void)
 {
-    return (int)(sizeof(sorted_tags)/sizeof(sorted_tags[0]))+1;
+    return (int)(SORTED_TAGS_COUNT)+1;
 }
 
