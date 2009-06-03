@@ -154,6 +154,9 @@ unsigned short button_read_dbop(void)
         DBOP_CTRL |= (1<<15);                /* start read */
         while (!(DBOP_STAT & (1<<16)));      /* wait for valid data */
 
+        int delay=10;
+        while(delay--);                      /* short delay before reading */
+
         _dbop_din = DBOP_DIN;                /* Read dbop data*/
 
         /* Reset dbop for output */

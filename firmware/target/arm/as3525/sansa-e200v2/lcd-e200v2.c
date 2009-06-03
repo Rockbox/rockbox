@@ -138,6 +138,10 @@ static void lcd_write_cmd(int cmd)
     /* Wait for fifo to empty */
     while ((DBOP_STAT & (1<<10)) == 0);
 
+    /* Fuze OF has this loop and it seems to help us now also */
+    int delay=8;
+    while(delay--);
+
     DBOP_TIMPOL_23 = 0xa167e06f;
 }
 
