@@ -27,6 +27,13 @@
 #include "system.h"
 #include "kernel.h"
 
+#define EXTENDED_EXCEPTION_DESC 0
+#if EXTENDED_EXCEPTION_DESC
+#include "font.h"
+#include "lcd.h"
+#include "sprintf.h"
+#endif
+
 #define NUM_DMA  6
 #define NUM_GPIO 128
 #define IRQ_MAX  (IRQ_GPIO_0 + NUM_GPIO)
@@ -243,7 +250,35 @@ static char* parse_exception(unsigned int cause)
 
 void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
 {
+#if EXTENDED_EXCEPTION_DESC
+    (void)epc;
+
+    /* Depends on crt0.S ! */
+    char buffer[LCD_WIDTH/SYSFONT_WIDTH];
+    char *registers[] = { "ra", "fp", "gp", "t9", "t8", "s7", "s6", "s5", "s4",
+                          "s3", "s2", "s1", "s0", "t7", "t6", "t5", "t4", "t3",
+                          "t2", "t1", "t0", "a3", "a2", "a1", "a0", "v1", "v0",
+                          "$1", "LO", "HI", "STATUS", "EPC" };
+    int i;
+
+    lcd_clear_display();
+    lcd_setfont(FONT_SYSFIXED);
+
+    snprintf(buffer, sizeof(buffer), "0x%08x at 0x%08x", read_c0_badvaddr(), epc);
+    lcd_puts(0, 0, parse_exception(cause));
+    lcd_puts(0, 1, buffer);
+    for(i=0; i< 0x80/4; i+=2)
+    {
+        unsigned int* ptr = (unsigned int*)(stack_ptr + i*4);
+        snprintf(buffer, sizeof(buffer), "%s: 0x%08x %s: 0x%08x", registers[i], *ptr, registers[i+1], *(ptr+1));
+        lcd_puts(0, 3 + i/2, buffer);
+    }
+    lcd_update();
+
+    system_exception_wait();
+#else
     panicf("Exception occurred: %s [0x%08x] at 0x%08x (stack at 0x%08x)", parse_exception(cause), read_c0_badvaddr(), epc, (unsigned int)stack_ptr);
+#endif
 }
 
 void tlb_refill_handler(void)
@@ -507,7 +542,7 @@ void system_exception_wait(void)
     /* check for power button without including any .h file */
     while (1)
     {
-        if( (~(*(volatile unsigned int *)(0xB0010300))) & (1 << 29) )
+        if( ~REG_GPIO_PXPIN(3) & (1 << 29) )
             break;
     }
 }
