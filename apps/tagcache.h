@@ -104,7 +104,8 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
     (1LU << tag_virt_entryage) | (1LU << tag_virt_autoscore))
 
 #ifdef CPU_SH
-#define TAGCACHE_IS_NUMERIC(tag) (tagcache_is_numeric_tag(tag))
+extern const char tagcache_numeric_tags[];
+#define TAGCACHE_IS_NUMERIC(tag) ((bool)tagcache_numeric_tags[tag])
 #else
 #define TAGCACHE_IS_NUMERIC(tag) ((1LU << tag) & TAGCACHE_NUMERIC_TAGS)
 #endif
