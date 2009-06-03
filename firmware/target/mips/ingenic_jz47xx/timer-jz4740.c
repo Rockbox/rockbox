@@ -28,69 +28,67 @@
 void TCU1(void)
 {
     __tcu_clear_full_match_flag(1);
-    
+
     if (pfn_timer != NULL)
         pfn_timer();
 }
 
-/* TODO: figure out what cycles means */
 bool __timer_set(long cycles, bool start)
 {
-    unsigned int latch, old_irq;
-    
+    unsigned int divider = cycles, prescaler_bit = 0, prescaler = 1, old_irq;
+
     if(cycles < 1)
         return false;
-    
-    if (start && pfn_unregister != NULL)
+
+    if(start && pfn_unregister != NULL)
     {
         pfn_unregister();
         pfn_unregister = NULL;
     }
-    
+
     old_irq = disable_irq_save();
-    
+
     __tcu_stop_counter(1);
     __tcu_disable_pwm_output(1);
-    
+
     __tcu_mask_half_match_irq(1); 
     __tcu_unmask_full_match_irq(1);
 
-    /* EXTAL clock = 12Mhz */
+    /* EXTAL clock = CFG_EXTAL (12Mhz in most targets) */
     __tcu_select_extalclk(1);
-    /* 12Mhz / 4 = 3Mhz */
-    __tcu_select_clk_div4(1);
-    
-    latch = cycles;
 
+    /* Increase prescale values starting from 0 to make the cycle count fit */
+    while(divider > 65535 && prescaler <= 1024)
+    {
+        prescaler >>= 2; /* 1, 4, 16, 64, 256, 1024 */
+        prescaler_bit++;
+        divider = cycles / prescaler;
+    }
+
+    REG_TCU_TCSR(1) = (REG_TCU_TCSR(1) & ~TCU_TCSR_PRESCALE_MASK) | (prescaler_bit << TCU_TCSR_PRESCALE_BIT);
     REG_TCU_TCNT(1) = 0;
-    REG_TCU_TDFR(1) = latch;
-    REG_TCU_TDHR(1) = latch;
+    REG_TCU_TDHR(1) = 0;
+    REG_TCU_TDFR(1) = divider;
 
     __tcu_clear_full_match_flag(1);
-    
+
     system_enable_irq(IRQ_TCU1);
-    
+
     restore_irq(old_irq);
-    
+
     return true;
 }
 
 bool __timer_register(void)
 {
-    unsigned int old_irq = disable_irq_save();
-    
     __tcu_start_counter(1);
-    
-    restore_irq(old_irq);
-    
+
     return true;
 }
 
 void __timer_unregister(void)
 {
     unsigned int old_irq = disable_irq_save();
-    
     __tcu_stop_counter(1);
-    
     restore_irq(old_irq);
 }

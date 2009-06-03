@@ -22,7 +22,9 @@
 #ifndef __TIMER_H_
 #define __TIMER_H_
 
-#define TIMER_FREQ (27000000)
+#include "config.h"
+
+#define TIMER_FREQ (CFG_EXTAL) /* For full precision! */
 
 bool __timer_set(long cycles, bool set);
 bool __timer_register(void);
