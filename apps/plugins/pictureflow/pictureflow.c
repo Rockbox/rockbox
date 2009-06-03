@@ -2721,6 +2721,11 @@ enum plugin_status plugin_start(const void *parameter)
     buf = rb->plugin_get_buffer(&buf_size);
 #else
     buf = rb->plugin_get_audio_buffer(&buf_size);
+    if ((uintptr_t)buf < (uintptr_t)plugin_start_addr)
+    {
+        uint32_t tmp_size = (uintptr_t)plugin_start_addr - (uintptr_t)buf;
+        buf_size = MIN(buf_size, tmp_size);
+    }
 #endif
     ret = main();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
