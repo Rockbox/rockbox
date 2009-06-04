@@ -25,18 +25,26 @@
 #include "timer-target.h"
 
 #ifdef HAVE_SCROLLWHEEL
+/* let the timer interrupt twice as often for the scrollwheel polling */
+#define KERNEL_TIMER_FREQ (TIMER_FREQ/2)
+#else
+#define KERNEL_TIMER_FREQ TIMER_FREQ
+#endif
+
+#ifdef HAVE_SCROLLWHEEL
 #include "button-target.h"
 /* The scrollwheel is polled every 5 ms (the tick tasks only every 10) */
-static volatile int poll_scrollwheel = 0;
+static int poll_scrollwheel = 0;
 
 void INT_TIMER2(void)
 {
     if (!poll_scrollwheel)
-        call_tick_tasks();  /* Run through the list of tick tasks */
+        call_tick_tasks();      /* Run through the list of tick tasks
+                                 * (that includes reading the scrollwheel) */
     else
     {
         if (!button_hold())
-            button_read_dbop();
+            button_read_dbop(); /* Read the scrollwheel */
     }
 
     poll_scrollwheel ^= 1;
@@ -55,7 +63,7 @@ void tick_start(unsigned int interval_in_ms)
 {
     int phi = 0;                            /* prescaler bits */
     int prescale = 1;
-    int cycles = TIMER_FREQ / 1000 * interval_in_ms;
+    int cycles = KERNEL_TIMER_FREQ / 1000 * interval_in_ms;
 
     while(cycles > 0x10000)
     {

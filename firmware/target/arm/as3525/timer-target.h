@@ -25,14 +25,7 @@ bool __timer_set(long cycles, bool set);
 bool __timer_register(void);
 void __timer_unregister(void);
 
-#ifdef HAVE_SCROLLWHEEL
-/* The scrollwheel is polled every 5 ms (the tick tasks still every 10ms) */
-#define TIMER_DIV (16*2)
-#else
-#define TIMER_DIV (16)
-#endif
-
-#define TIMER_FREQ (24000000 / TIMER_DIV)
+#define TIMER_FREQ (24000000 / 16)
 
 #define __TIMER_SET(cycles, set) \
     __timer_set(cycles, set)
