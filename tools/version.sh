@@ -40,7 +40,7 @@ gitversion() {
     if head=`git rev-parse --verify --short HEAD 2>/dev/null`; then
 
 	# Get the svn revision of the most recent git-svn commit
-	version=`git log --pretty=format:'%b' --grep='git-svn-id: svn' -1 | head -n 1 | perl -ne 'm/@(\d*)/; print "r" . $1;'`
+	version=`git log --pretty=format:'%b' --grep='git-svn-id: svn' -1 | tail -n 1 | perl -ne 'm/@(\d*)/; print "r" . $1;'`
 	mod=""
 	# Is this a git-svn commit?
 	if ! git log  HEAD^.. --pretty=format:"%b" | grep -q "git-svn-id: svn" ; then
