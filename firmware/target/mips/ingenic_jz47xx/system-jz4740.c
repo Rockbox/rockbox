@@ -261,6 +261,7 @@ void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
                           "$1", "LO", "HI", "STATUS", "EPC" };
     int i;
 
+    lcd_set_backdrop(NULL);
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
