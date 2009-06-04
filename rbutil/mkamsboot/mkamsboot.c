@@ -372,7 +372,6 @@ unsigned char* load_of_file(
         *model = sansasums[i].model;
         *fw_version = sansasums[i].fw_version;
     } else {
-        fprintf(stderr, "[WARN] ****** Original firmware unknown ******\n");
         if (get_uint32le(&buf[0x204])==0x0000f000) {
             *fw_version = 2;
             model_id = buf[0x219];
@@ -380,11 +379,30 @@ unsigned char* load_of_file(
             *fw_version = 1;
             model_id = buf[0x215];
         }
-
         *model = get_model(model_id);
 
         if (*model == MODEL_UNKNOWN)
-            ERROR("[ERR]  Unknown firmware - model id 0x%02x\n", model_id);
+            ERROR("[ERR]  Unknown firmware model (v%d) - model id 0x%02x\n",
+                  *fw_version, model_id);
+
+#if 1   /* comment to test new OFs */
+        char tested_versions[100];
+        tested_versions[0] = '\0';
+
+        for (i = 0; i < NUM_MD5S ; i++)
+            if (sansasums[i].model == *model) {
+                if (tested_versions[0] != '\0') {
+                    strncat(tested_versions, ", ",
+                        sizeof(tested_versions) - strlen(tested_versions) - 1);
+                }
+                strncat(tested_versions, sansasums[i].version,
+                    sizeof(tested_versions) - strlen(tested_versions) - 1);
+            }
+
+        ERROR("[ERR]  Original firmware unknown, please try an other version." \
+              " Tested %s versions are : %s\n",
+              model_names[*model], tested_versions);
+#endif
     }
 
     /* TODO: Do some more sanity checks on the OF image. Some images (like
