@@ -189,6 +189,7 @@ void __dcache_invalidate_all(void)
         __CACHE_OP(DCIndexStTag, i);
 }
 
+void __dcache_writeback_all(void) __attribute__ ((section(".icode")));
 void __dcache_writeback_all(void)
 {
     unsigned int i;
