@@ -111,10 +111,11 @@ void lcd_write_data(const fb_data* p_bytes, int count)
 
         p_bytes++; /* next packed pixels */
 
-        /* While push fifo is not empty */
-        while ((DBOP_STAT & (1<<10)) == 0)
-            ;
+        /* Wait if push fifo is full */
+        while ((DBOP_STAT & (1<<6)) != 0);
     }
+    /* While push fifo is not empty */
+    while ((DBOP_STAT & (1<<10)) == 0);
 }
 
 
