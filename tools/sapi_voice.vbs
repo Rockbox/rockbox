@@ -270,6 +270,13 @@ Function LangIDs(ByRef sLanguage)
     Dim aIDs
 
     Select Case sLanguage
+        Case "arabic"
+            LangIDs = Array( &h401,  &h801,  &hc01, &h1001, &h1401, &h1801, _
+                            &h1c01, &h2001, &h2401, &h2801, &h2c01, &h3001, _
+                            &h3401, &h3801, &h3c01, &h4001)
+            ' Saudi Arabia, Iraq, Egypt, Libya, Algeria, Morocco, Tunisia,
+            ' Oman, Yemen, Syria, Jordan, Lebanon, Kuwait, U.A.E., Bahrain,
+            ' Qatar
         Case "afrikaans"
             LangIDs = Array(&h436)
         Case "bulgarian"
@@ -311,8 +318,8 @@ Function LangIDs(ByRef sLanguage)
         Case "finnish"
             LangIDs = Array(&h40b)
         Case "francais"
-            LangIDs = Array(&h40c, &h80c, &hc0c, &h100c, &h140c, &h180c)
-            ' Standard, Belgian, Canadian, Swiss, Luxembourg, Monaco
+            LangIDs = Array(&h40c, &hc0c, &h100c, &h140c, &h180c)
+            ' Standard, Canadian, Swiss, Luxembourg, Monaco (Belgian -> walon) 
         Case "galego"
             LangIDs = Array(&h456)
         Case "greek"
@@ -361,6 +368,8 @@ Function LangIDs(ByRef sLanguage)
             LangIDs = Array(&h41f)
         Case "wallisertitsch"
             LangIDs = Array(&h807) ' Swiss German
+        Case "walon"
+            LangIDs = Array(&h80c) ' Belgian French
     End Select
 End Function
 
