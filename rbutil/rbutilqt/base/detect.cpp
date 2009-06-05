@@ -174,6 +174,7 @@ QString Detect::osVersionString(void)
     result = QString("CPU: %1<br/>System: %2<br/>Release: %3<br/>Version: %4")
         .arg(u.machine).arg(u.sysname).arg(u.release).arg(u.version);
 #endif
+    result += QString("<br/>Qt version %1").arg(qVersion());
     return result;
 }
 

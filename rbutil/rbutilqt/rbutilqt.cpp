@@ -59,6 +59,12 @@
 
 RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 {
+    // startup log
+    qDebug() << "======================================";
+    qDebug() << "[System] Rockbox Utility " VERSION;
+    qDebug() << "[System] Qt version:" << qVersion();
+    qDebug() << "======================================";
+
     absolutePath = qApp->applicationDirPath();
 
     HttpGet::setGlobalUserAgent("rbutil/"VERSION);
