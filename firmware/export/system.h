@@ -267,7 +267,7 @@ static inline uint32_t swap_odd_even32(uint32_t value)
 #endif /* !SIMULATOR */
 
 #ifndef BIT_N
-#define BIT_N(n) (1UL << (n))
+#define BIT_N(n) (1U << (n))
 #endif
 
 /* Declare this as HIGHEST_IRQ_LEVEL if they don't differ */

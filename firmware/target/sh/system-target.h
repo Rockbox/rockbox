@@ -129,7 +129,7 @@ static inline uint32_t swap_odd_even32(uint32_t value)
 extern const unsigned bit_n_table[32];
 #define BIT_N(n) ( \
     __builtin_constant_p(n) \
-    ? (1LU << (n)) \
+    ? (1U << (n)) \
     : bit_n_table[n] \
 )
 
