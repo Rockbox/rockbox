@@ -266,6 +266,10 @@ static inline uint32_t swap_odd_even32(uint32_t value)
 
 #endif /* !SIMULATOR */
 
+#ifndef TEST_BIT_N
+#define TEST_BIT_N(n, mask) ((1UL << (n)) & (mask))
+#endif
+
 /* Declare this as HIGHEST_IRQ_LEVEL if they don't differ */
 #ifndef DISABLE_INTERRUPTS
 #define DISABLE_INTERRUPTS  HIGHEST_IRQ_LEVEL

@@ -22,6 +22,7 @@
 #ifndef _TAGCACHE_H
 #define _TAGCACHE_H
 
+#include "system.h"
 #include "metadata.h"
 
 /**
@@ -103,12 +104,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
     (1LU << tag_virt_playtime_min) | (1LU << tag_virt_playtime_sec) | \
     (1LU << tag_virt_entryage) | (1LU << tag_virt_autoscore))
 
-#ifdef CPU_SH
-extern const char tagcache_numeric_tags[];
-#define TAGCACHE_IS_NUMERIC(tag) ((bool)tagcache_numeric_tags[tag])
-#else
-#define TAGCACHE_IS_NUMERIC(tag) ((1LU << tag) & TAGCACHE_NUMERIC_TAGS)
-#endif
+#define TAGCACHE_IS_NUMERIC(tag) (BIT_N(tag) & TAGCACHE_NUMERIC_TAGS)
 
 /* Flags */
 #define FLAG_DELETED     0x0001  /* Entry has been removed from db */

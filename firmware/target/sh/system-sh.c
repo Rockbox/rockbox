@@ -27,6 +27,17 @@
 #include "font.h"
 #include "led.h"
 
+const unsigned bit_n_table[32] = {
+    1LU<< 0, 1LU<< 1, 1LU<< 2, 1LU<< 3,
+    1LU<< 4, 1LU<< 5, 1LU<< 6, 1LU<< 7,
+    1LU<< 8, 1LU<< 9, 1LU<<10, 1LU<<11,
+    1LU<<12, 1LU<<13, 1LU<<14, 1LU<<15,
+    1LU<<16, 1LU<<17, 1LU<<18, 1LU<<19,
+    1LU<<20, 1LU<<21, 1LU<<22, 1LU<<23,
+    1LU<<24, 1LU<<25, 1LU<<26, 1LU<<27,
+    1LU<<28, 1LU<<29, 1LU<<30, 1LU<<31
+};
+
 static const char* const irqname[] = {
     "", "", "", "", "IllInstr", "", "IllSltIn","","",
     "CPUAdrEr", "DMAAdrEr", "NMI", "UserBrk",

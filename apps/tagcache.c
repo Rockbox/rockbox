@@ -108,29 +108,10 @@ static long tempbuf_left; /* Buffer space left. */
 static long tempbuf_pos;
 
 #define SORTED_TAGS_COUNT 8
-#ifdef CPU_SH /* SH lacks a variable shift instruction */
-/* Numeric tags (we can use these tags with conditional clauses). */
-const char tagcache_numeric_tags[] =       { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
-                                             1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
-                                             1, 1, 1, 1, 1 };
-
-/* Uniqued tags (we can use these tags with filters and conditional clauses). */
-static const char tagcache_unique_tags[] = { 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0,
-                                             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                             0, 0, 0, 0, 0 };
-
-/* Tags we want to get sorted (loaded to the tempbuf). */
-static const char tagcache_sorted_tags[] = { 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0,
-                                             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                             0, 0, 0, 0, 0 };
-
-#define TAGCACHE_IS_UNIQUE(tag) ((bool)tagcache_unique_tags[tag])
-#define TAGCACHE_IS_SORTED(tag) ((bool)tagcache_sorted_tags[tag])
-
-#else
-#define TAGCACHE_IS_UNIQUE(tag) ((1LU << tag) & TAGCACHE_UNIQUE_TAGS)
-#define TAGCACHE_IS_SORTED(tag) ((1LU << tag) & TAGCACHE_SORTED_TAGS)
-
+#define TAGCACHE_IS_UNIQUE(tag) (BIT_N(tag) & TAGCACHE_UNIQUE_TAGS)
+#define TAGCACHE_IS_SORTED(tag) (BIT_N(tag) & TAGCACHE_SORTED_TAGS)
+#define TAGCACHE_IS_NUMERIC_OR_NONUNIQUE(tag) \
+    (BIT_N(tag) & (TAGCACHE_NUMERIC_TAGS | ~TAGCACHE_UNIQUE_TAGS))
 /* Tags we want to get sorted (loaded to the tempbuf). */
 #define TAGCACHE_SORTED_TAGS ((1LU << tag_artist) | (1LU << tag_album) | \
     (1LU << tag_genre) | (1LU << tag_composer) | (1LU << tag_comment) | \
@@ -140,7 +121,6 @@ static const char tagcache_sorted_tags[] = { 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0,
 #define TAGCACHE_UNIQUE_TAGS ((1LU << tag_artist) | (1LU << tag_album) | \
     (1LU << tag_genre) | (1LU << tag_composer) | (1LU << tag_comment) | \
     (1LU << tag_albumartist) | (1LU << tag_grouping))
-#endif
 
 /* String presentation of the tags defined in tagcache.h. Must be in correct order! */
 static const char *tags_str[] = { "artist", "album", "genre", "title", 
@@ -1248,7 +1228,7 @@ bool tagcache_search_add_filter(struct tagcache_search *tcs,
     if (tcs->filter_count == TAGCACHE_MAX_FILTERS)
         return false;
 
-    if (!TAGCACHE_IS_UNIQUE(tag) || TAGCACHE_IS_NUMERIC(tag))
+    if (TAGCACHE_IS_NUMERIC_OR_NONUNIQUE(tag))
         return false;
     
     tcs->filter_tag[tcs->filter_count] = tag;
