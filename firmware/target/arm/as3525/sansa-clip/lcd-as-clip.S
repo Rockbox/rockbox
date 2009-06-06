@@ -91,11 +91,16 @@ lcd_grey_data:
 
 1:
     ldr     r5, [lr, #0xC]      @ DBOP_STAT
-    ands    r5, r5, #(1<<10)    @ wait until push fifo empties
-    beq     1b
+    ands    r5, r5, #(1<<6)    @ wait until push fifo is full
+    bne     1b
 
     subs    r2, r2, #1
     bne     .greyloop
+
+1:
+    ldr     r5, [lr, #0xC]      @ DBOP_STAT
+    ands    r5, r5, #(1<<10)    @ wait until push fifo empties
+    beq     1b
 
     ldmfd   sp!, {r4-r8, pc}
     .size   lcd_grey_data,.-lcd_grey_data
