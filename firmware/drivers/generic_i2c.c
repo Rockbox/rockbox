@@ -40,6 +40,7 @@ static void i2c_start(const struct i2c_interface *iface)
     iface->sda_lo();
     iface->delay_hd_sta();
     iface->scl_lo();
+    iface->delay_hd_dat();
 }
 
 static void i2c_stop(const struct i2c_interface *iface)
@@ -47,6 +48,7 @@ static void i2c_stop(const struct i2c_interface *iface)
     iface->sda_output();
 
     iface->sda_lo();
+    iface->delay_su_dat();
     iface->scl_hi();
     iface->delay_su_sto();
     iface->sda_hi();
@@ -55,7 +57,6 @@ static void i2c_stop(const struct i2c_interface *iface)
 static void i2c_ack(const struct i2c_interface *iface, bool ack)
 {
     iface->sda_output();
-    iface->scl_lo();
     if ( ack )
         iface->sda_lo();
     else
@@ -65,6 +66,7 @@ static void i2c_ack(const struct i2c_interface *iface, bool ack)
     iface->scl_hi();
     iface->delay_thigh();
     iface->scl_lo();
+    iface->delay_hd_dat();
 }
 
 static int i2c_getack(const struct i2c_interface *iface)
@@ -74,14 +76,10 @@ static int i2c_getack(const struct i2c_interface *iface)
     iface->sda_input();
     iface->delay_su_dat();
     iface->scl_hi();
-
+    iface->delay_thigh();
     if (iface->sda())
         ret = 0; /* ack failed */
-
-    iface->delay_thigh();
     iface->scl_lo();
-    iface->sda_hi();
-    iface->sda_output();
     iface->delay_hd_dat();
     return ret;
 }
@@ -93,6 +91,7 @@ static unsigned char i2c_inb(const struct i2c_interface *iface, bool ack)
 
     iface->sda_input();
 
+    iface->delay_su_dat();
     /* clock in each bit, MSB first */
     for ( i=0x80; i; i>>=1 ) {
         iface->scl_hi();
@@ -126,8 +125,6 @@ static int i2c_outb(const struct i2c_interface *iface, unsigned char byte)
         iface->scl_lo();
         iface->delay_hd_dat();
    }
-
-   iface->sda_hi();
 
    return i2c_getack(iface);
 }
