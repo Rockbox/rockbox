@@ -31,6 +31,7 @@
 
 /*** AS3525 specifics ***/
 #include "as3525.h"
+#include "ascodec.h"
 
 /*** definitions ***/
 
@@ -167,11 +168,18 @@ void lcd_enable(bool enable)
 
     if( (display_on = enable) ) /* simple '=' is not a typo ! */
     {
+        /* Enable DC-DC AS3525 for some Clip v1 that need it */
+        ascodec_write(AS3514_DCDC15, 1);
+
         lcd_write_command(LCD_SET_DISPLAY_ON);
         lcd_activation_call_hook();
     }
-    else
+    else {
         lcd_write_command(LCD_SET_DISPLAY_OFF);
+
+        /* Disable DC-DC AS3525 */
+        ascodec_write(AS3514_DCDC15, 0);
+    }
 }
 
 bool lcd_active(void)
