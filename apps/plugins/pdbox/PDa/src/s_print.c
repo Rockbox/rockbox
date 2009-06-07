@@ -9,8 +9,29 @@
 #include <string.h>
 #include <errno.h>
 
+#if defined(ROCKBOX) && defined (SIMULATOR)
+/* Copied from stdio.h */
+int printf (__const char *__restrict __format, ...);
+int vprintf (__const char *__restrict __format, va_list __arg);
+int vsprintf (char *__restrict __s,
+                __const char *__restrict __format,
+                va_list __arg);
+int putchar (int __c);
+#endif
+
 void post(char *fmt, ...)
 {
+#ifdef ROCKBOX
+#ifdef SIMULATOR
+    va_list ap;
+    va_start(ap, fmt);
+    vprintf(fmt, ap);
+    va_end(ap);
+    putchar('\n');
+#else /* SIMULATOR */
+    (void) fmt;
+#endif /* SIMULATOR */
+#else /* ROCKBOX */
     va_list ap;
     t_int arg[8];
     int i;
@@ -18,10 +39,28 @@ void post(char *fmt, ...)
     vfprintf(stderr, fmt, ap);
     va_end(ap);
     putc('\n', stderr);
+#endif /* ROCKBOX */
 }
 
 void startpost(char *fmt, ...)
 {
+#ifdef ROCKBOX
+#ifdef SIMULATOR
+    va_list ap;
+    t_int arg[8];
+    unsigned int i;
+    va_start(ap, fmt);
+
+    for (i = 0 ; i < 8; i++)
+        arg[i] = va_arg(ap, t_int);
+
+    va_end(ap);
+    printf(fmt, arg[0], arg[1], arg[2], arg[3],
+    	arg[4], arg[5], arg[6], arg[7]);
+#else /* SIMULATOR */
+    (void) fmt;
+#endif /* SIMULATOR */
+#else /* ROCKBOX */
     va_list ap;
     t_int arg[8];
     int i;
@@ -31,11 +70,20 @@ void startpost(char *fmt, ...)
     va_end(ap);
     fprintf(stderr, fmt, arg[0], arg[1], arg[2], arg[3],
     	arg[4], arg[5], arg[6], arg[7]);
+#endif /* ROCKBOX */
 }
 
 void poststring(char *s)
 {
+#ifdef ROCKBOX
+#ifdef SIMULATOR
+    printf(" %s", s);
+#else /* SIMULATOR */
+    (void)s;
+#endif /* SIMULATOR */
+#else /* ROCKBOX */
     fprintf(stderr, " %s", s);
+#endif /* ROCKBOX */
 }
 
 void postatom(int argc, t_atom *argv)
@@ -51,7 +99,6 @@ void postatom(int argc, t_atom *argv)
 
 void postfloat(float f)
 {
-    char buf[80];
     t_atom a;
     SETFLOAT(&a, f);
     postatom(1, &a);
@@ -59,11 +106,29 @@ void postfloat(float f)
 
 void endpost(void)
 {
+#ifdef ROCKBOX
+#ifdef SIMULATOR
+    putchar('\n');
+#endif /* SIMULATOR */
+#else /* ROCKBOX */
     fprintf(stderr, "\n");
+#endif /* ROCKBOX */
 }
 
 void error(char *fmt, ...)
 {
+#ifdef ROCKBOX
+#ifdef SIMULATOR
+    va_list ap;
+    va_start(ap, fmt);
+    printf("error: ");
+    vprintf(fmt, ap);
+    va_end(ap);
+    putchar('\n');
+#else /* SIMULATOR */
+    (void) fmt;
+#endif /* SIMULATOR */
+#else /* ROCKBOX */
     va_list ap;
     t_int arg[8];
     int i;
@@ -72,6 +137,7 @@ void error(char *fmt, ...)
     vfprintf(stderr, fmt, ap);
     va_end(ap);
     putc('\n', stderr);
+#endif /* ROCKBOX */
 }
 
     /* here's the good way to log errors -- keep a pointer to the
@@ -84,6 +150,27 @@ void canvas_finderror(void *object);
 
 void pd_error(void *object, char *fmt, ...)
 {
+#ifdef ROCKBOX
+#ifdef SIMULATOR
+    va_list ap;
+    static int saidit = 0;
+
+    va_start(ap, fmt);
+    vsprintf(error_string, fmt, ap);
+    va_end(ap);
+    printf("error: %s\n", error_string);
+
+    error_object = object;
+    if (!saidit)
+    {
+        post("... you might be able to track this down from the Find menu.");
+        saidit = 1;
+    }
+#else /* SIMULATOR */
+    (void)object;
+    (void) fmt;
+#endif /* SIMULATOR */
+#else /* ROCKBOX */
     va_list ap;
     t_int arg[8];
     int i;
@@ -98,10 +185,14 @@ void pd_error(void *object, char *fmt, ...)
     	post("... you might be able to track this down from the Find menu.");
     	saidit = 1;
     }
+#endif /* ROCKBOX */
 }
 
 void glob_finderror(t_pd *dummy)
 {
+#ifdef ROCKBOX
+    (void)dummy;
+#endif /* ROCKBOX */
     if (!error_object)
     	post("no findable error yet.");
     else
@@ -114,6 +205,25 @@ void glob_finderror(t_pd *dummy)
 
 void bug(char *fmt, ...)
 {
+#ifdef ROCKBOX
+#ifdef SIMULATOR
+    va_list ap;
+    t_int arg[8];
+    unsigned int i;
+
+    va_start(ap, fmt);
+    for(i = 0; i < 8; i++)
+        arg[i] = va_arg(ap, t_int);
+    va_end(ap);
+
+    printf("Consistency check failed: ");
+    printf(fmt, arg[0], arg[1], arg[2], arg[3],
+            arg[4], arg[5], arg[6], arg[7]);
+    putchar('\n');
+#else /* SIMULATOR */
+    (void) fmt;
+#endif /* SIMULATOR */
+#else /* ROCKBOX */
     va_list ap;
     t_int arg[8];
     int i;
@@ -125,6 +235,7 @@ void bug(char *fmt, ...)
     fprintf(stderr, fmt, arg[0], arg[1], arg[2], arg[3],
     	arg[4], arg[5], arg[6], arg[7]);
     putc('\n', stderr);
+#endif /* ROCKBOX */
 }
 
     /* this isn't worked out yet. */

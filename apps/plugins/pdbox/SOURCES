@@ -46,7 +46,7 @@ PDa/src/m_sched.c
 /* PDa/src/s_main.c Does not compile, system reasons */
 /* PDa/src/s_inter.c Does not compile, BSD sockets */
 /* PDa/src/s_file.c Does not compile, file handling stuff */
-/* PDa/src/s_print.c Does not compile, system reasons */
+PDa/src/s_print.c
 /*
 PDa/src/s_loader.c
 */
