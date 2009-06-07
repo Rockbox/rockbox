@@ -182,7 +182,7 @@ static void gbSoundChannel1(int *r, int *l)
                 int newfreq = 0;
                 if(S1.swsteps)
                 {
-                    newfreq = freq + updown * freq / (1 << S1.swsteps);
+                    newfreq = freq + updown * freq / BIT_N(S1.swsteps);
                     if(newfreq == freq)
                         newfreq = 0;
                 }

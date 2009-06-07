@@ -54,7 +54,7 @@
 
 #define STATE_MASK              0x0000ff80
 #define STATE_SHIFT             (7-1)                        /* digits 1..9 */
-#define DIGIT_STATE(digit)      (1<<(STATE_SHIFT+(digit)))
+#define DIGIT_STATE(digit)      BIT_N(STATE_SHIFT+(digit))
 
 #define DIGIT_MASK              0x000f0000
 #define DIGIT_SHIFT             16
@@ -266,7 +266,7 @@ numset( int mask )
 {
     int i, n = 0;
     for( i = STATE_SHIFT + 1 ; i <= STATE_SHIFT + 9 ; ++i )
-        if( mask & (1<<i) )
+        if( mask & BIT_N(i) )
             ++n;
         else
             ++counts[ i - STATE_SHIFT - 1 ];

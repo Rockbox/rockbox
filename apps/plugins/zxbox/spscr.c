@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos
  * Email: mszeredi@inf.bme.hu
  *
@@ -82,7 +82,7 @@ byte *update_screen_line(byte *scrp, int coli, int scri, int border,
       SPNM(imag_mark)[coli] |= mark;
       SPNM(imag_horiz) |= mark;
       coli >>= 3;
-      SPNM(imag_vert) |= (1 << coli);
+      SPNM(imag_vert) |= BIT_N(coli);
       
       spmp = PRNM(proc).mem + (scri << 5);
       spcp = PRNM(proc).mem + 0x5800 + (coli << 5);

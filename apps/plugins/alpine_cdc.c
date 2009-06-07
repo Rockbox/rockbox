@@ -669,16 +669,16 @@ void dump_packet(char* dest, int dst_size, char* src, int n)
 
 bool bit_test(unsigned char* buf, unsigned bit)
 {
-    return (buf[bit/4] & (0x01 << bit%4)) != 0;
+    return (buf[bit>>2] & BIT_N(bit&3)) != 0;
 }
 
 
 void bit_set(unsigned char* buf, unsigned bit, bool val)
 {
     if (val)
-        buf[bit/4] |= (0x01 << bit%4);
+        buf[bit>>2] |= BIT_N(bit&3);
     else
-        buf[bit/4] &= ~(0x01 << bit%4);
+        buf[bit>>2] &= ~BIT_N(bit&3);
 }
 
 

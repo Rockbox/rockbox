@@ -169,7 +169,7 @@ void screen_dump(void)
 #if LCD_DEPTH == 1
             dst_end = dst + LCD_WIDTH/2;
             src = lcd_framebuffer[y >> 3];
-            mask = 1 << (y & 7);
+            mask = BIT_N(y & 7);
 
             do
             {
@@ -333,7 +333,7 @@ void remote_screen_dump(void)
 #if LCD_REMOTE_DEPTH == 1
         dst_end = dst + LCD_REMOTE_WIDTH/2;
         src = lcd_remote_framebuffer[y >> 3];
-        mask = 1 << (y & 7);
+        mask = BIT_N(y & 7);
 
         do
         {

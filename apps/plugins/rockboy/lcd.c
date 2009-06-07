@@ -216,8 +216,8 @@ static void updatepatpix(void)
             a = ((i<<4) | (j<<1));
             for (k = 0; k < 8; k++)
             {
-                c = vram[a] & (1<<k) ? 1 : 0;
-                c |= vram[a+1] & (1<<k) ? 2 : 0;
+                c = vram[a] & BIT_N(k) ? 1 : 0;
+                c |= vram[a+1] & BIT_N(k) ? 2 : 0;
                 patpix[i+1024][j][k] = c;
             }
             for (k = 0; k < 8; k++)

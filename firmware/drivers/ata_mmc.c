@@ -450,7 +450,7 @@ static int initialize_card(int card_no)
     card->tsac = card->tsac * exponent[taac_exp] / 10;
 
     /* r2w_factor, write timeout */
-    card->r2w_factor = 1 << card_extract_bits(card->csd, 99, 3);
+    card->r2w_factor = BIT_N(card_extract_bits(card->csd, 99, 3));
     card->write_timeout = card->read_timeout * card->r2w_factor;
 
     if (card->r2w_factor > 32) /* Such cards often need extra read delay */

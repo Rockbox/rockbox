@@ -617,7 +617,7 @@ int read_bmp_fd(int fd,
     if (depth <= 8) {
         numcolors = letoh32(bmph.clr_used);
         if (numcolors == 0)
-            numcolors = 1 << depth;
+            numcolors = BIT_N(depth);
     } else
         numcolors = (compression == 3) ? 3 : 0;
 
@@ -795,7 +795,7 @@ int read_bmp_fd(int fd,
 #ifndef PLUGIN
         {
             unsigned char *p = bitmap + bm->width * (row >> 3);
-            unsigned char mask = 1 << (row & 7);
+            unsigned char mask = BIT_N(row & 7);
             int col;
             for (col = 0; col < bm->width; col++, p++)
 #if !defined(HAVE_LCD_COLOR) && \

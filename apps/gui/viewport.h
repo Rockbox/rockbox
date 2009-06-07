@@ -22,6 +22,7 @@
 
 #include "config.h"
 #include "lcd.h"
+#include "system.h"
 #include "screen_access.h"
 
 /* return the number of text lines in the vp viewport */
@@ -58,8 +59,8 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen);
  * SB "displaying rules".
  */
 #define VP_SB_HIDE_ALL 0
-#define VP_SB_ONSCREEN(screen) (1u<<screen)
-#define VP_SB_IGNORE_SETTING(screen) (1u<<(4+screen))
+#define VP_SB_ONSCREEN(screen) BIT_N(screen)
+#define VP_SB_IGNORE_SETTING(screen) BIT_N(4+screen)
 #define VP_SB_ALLSCREENS (VP_SB_ONSCREEN(0)|VP_SB_ONSCREEN(1))
 int viewportmanager_set_statusbar(int enabled);
 

@@ -1268,7 +1268,7 @@ static int set_multiple_mode(int sectors)
 #ifdef HAVE_ATA_DMA
 static int get_best_mode(unsigned short identword, int max, int modetype)
 {
-    unsigned short testbit = 1u << max;
+    unsigned short testbit = BIT_N(max);
 
     while (1) {
         if (identword & testbit)
@@ -1335,7 +1335,7 @@ static int set_features(void)
     }
 
     for (i=0; i < (int)(sizeof(features)/sizeof(features[0])); i++) {
-        if (identify_info[features[i].id_word] & (1u << features[i].id_bit)) {
+        if (identify_info[features[i].id_word] & BIT_N(features[i].id_bit)) {
             SET_REG(ATA_FEATURE, features[i].subcommand);
             SET_REG(ATA_NSECTOR, features[i].parameter);
             SET_REG(ATA_COMMAND, CMD_SET_FEATURES);
@@ -1461,7 +1461,7 @@ int ata_init(void)
 #ifdef MAX_PHYS_SECTOR_SIZE
         /* Find out the physical sector size */
         if((identify_info[106] & 0xe000) == 0x6000)
-            phys_sector_mult = 1 << (identify_info[106] & 0x000f);
+            phys_sector_mult = BIT_N(identify_info[106] & 0x000f);
         else
             phys_sector_mult = 1;
 

@@ -85,7 +85,7 @@ int spkb_state_changed;
 
 #define SKE {0, 0, 0, 0, 0, 0, 0, 0}
 
-#define SKP(x) (1 << x)
+#define SKP(x) BIT_N(x)
 
 #define SKN0(x) {SKP(x), 0, 0, 0, 0, 0, 0, 0} 
 #define SKN1(x) {0, SKP(x), 0, 0, 0, 0, 0, 0} 
@@ -617,7 +617,7 @@ static void copy_basekeys(struct spbasekey *addk)
 static unsigned transform_shift(int modif)
 {
   if(!modif) return 0;
-  else return (1 << (modif - 1));
+  else return BIT_N(modif - 1);
 }
 
 

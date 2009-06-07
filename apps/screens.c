@@ -339,7 +339,7 @@ static void charging_display_info(bool animate)
                 bitpos = (phase + i/8) % 15; /* "bounce" effect */
                 if (bitpos > 7)
                     bitpos = 14 - bitpos;
-                charging_logo[i] = 0x01 << bitpos;
+                charging_logo[i] = BIT_N(bitpos);
             }
         }
         lcd_mono_bitmap(charging_logo, pox_x, pox_y + 8,

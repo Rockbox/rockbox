@@ -147,9 +147,9 @@ F = (F & (FN)) | ZFLAG(A) | daa_carry_table[LB(acc)>>2]; }
 (r) = swap_table[(r)]; \
 F = ZFLAG((r)); }
 
-#define BIT(n,r) { F = (F & FC) | ZFLAG(((r) & (1 << (n)))) | FH; }
-#define RES(n,r) { (r) &= ~(1 << (n)); }
-#define SET(n,r) { (r) |= (1 << (n)); }
+#define BIT(n,r) { F = (F & FC) | ZFLAG(((r) & BIT_N(n))) | FH; }
+#define RES(n,r) { (r) &= ~BIT_N(n); }
+#define SET(n,r) { (r) |= BIT_N(n); }
 
 #define CB_REG_CASES(r, n) \
 case 0x00|(n): RLC(r); break; \
@@ -225,7 +225,7 @@ label: op(b); break;
 
 
 #define PRE_INT ( DI, PUSH(PC) )
-#define THROW_INT(n) ( (IF &= ~(1<<(n))), (PC = 0x40+((n)<<3)) )
+#define THROW_INT(n) ( (IF &= ~BIT_N(n)), (PC = 0x40+((n)<<3)) )
 
 #ifdef DYNAREC
 un32 reg_backup[16];
@@ -355,7 +355,7 @@ static int cpu_idle(int max)
 
     /* Figure out when the next timer interrupt will happen */
     unit = ((-R_TAC) & 3) << 1;
-    cnt = (511 - cpu.tim + (1<<unit)) >> unit;
+    cnt = (511 - cpu.tim + BIT_N(unit)) >> unit;
     cnt += (255 - R_TIMA) << (9 - unit);
 
     if (max < cnt)

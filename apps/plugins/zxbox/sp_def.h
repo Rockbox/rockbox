@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos
  * Email: mszeredi@inf.bme.hu
  *
@@ -20,7 +20,7 @@
 
 #include "spperif.h"
 
-#define MARK_SCR(addr) SPNM(scr_mark)[(addr) >> 5] |= 1 << ((addr) & 0x1F)
+#define MARK_SCR(addr) SPNM(scr_mark)[(addr) >> 5] |= BIT_N((addr) & 0x1F)
 
 #define PUTMEM(addr, ptr, val)  \
 {                                                \

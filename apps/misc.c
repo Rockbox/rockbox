@@ -1045,7 +1045,7 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
                 break;
         }
         if (set_vals && set)
-            *set_vals |= (1<<i);
+            *set_vals |= BIT_N(i);
         i++;
     }
 

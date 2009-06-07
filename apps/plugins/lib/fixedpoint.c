@@ -22,6 +22,7 @@
  ****************************************************************************/
 
 #include <inttypes.h>
+#include "plugin.h"
 #include "fixedpoint.h"
 
 /* Inverse gain of circular cordic rotation in s0.31 format. */
@@ -144,7 +145,7 @@ long fsincos(unsigned long phase, long *cos)
  */
 long fsqrt(long a, unsigned int fracbits)
 {
-    long b = a/2 + (1 << fracbits); /* initial approximation */
+    long b = a/2 + BIT_N(fracbits); /* initial approximation */
     unsigned n;
     const unsigned iterations = 4;
     

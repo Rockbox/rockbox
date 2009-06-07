@@ -134,12 +134,12 @@ static long fp_div(long x, long y)
         y = -y;
     }
 
-    while ((x & (1 << (30 - msb))) == 0)
+    while ((x & BIT_N(30 - msb)) == 0)
     {
         msb++;
     }
 
-    while ((y & (1 << lsb)) == 0)
+    while ((y & BIT_N(lsb)) == 0)
     {
         lsb++;
     }
@@ -216,7 +216,7 @@ static long fp_exp10(long x)
 static long fp_atof(const char* s, int precision)
 {
     long int_part = 0;
-    long int_one = 1 << precision;
+    long int_one = BIT_N(precision);
     long frac_part = 0;
     long frac_count = 0;
     long frac_max = ((precision * 4) + 12) / 13;

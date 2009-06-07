@@ -860,7 +860,7 @@ static void grey_screendump_hook(int fd)
              + _GREY_MULUQ(_grey_info.width, gy & ~_GREY_BMASK);
 
 #if LCD_DEPTH == 1
-        mask = 1 << (y & 7);
+        mask = BIT_N(y & 7);
         src = rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 3);
 
         do

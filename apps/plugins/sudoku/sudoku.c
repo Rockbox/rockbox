@@ -337,7 +337,7 @@ void sudoku_init(Sudoku* sud);
 void sudoku_set(Sudoku* sud, int x, int y, int num, bool original);
 int  sudoku_get(Sudoku* sud, int x, int y, bool* original);
 
-#define BIT(n)          ((Bitset)(1<<(n)))
+#define BIT(n)          ((Bitset)BIT_N(n))
 #define BIT_TEST(v,n)   ((((Bitset)v) & BIT(n)) != 0)
 #define BIT_CLEAR(v,n)  (v) &= ~BIT(n)
 #define MARK_BIT        BIT(0)
@@ -965,7 +965,7 @@ void display_board(struct sudoku_state_t* state)
             rb->lcd_vline(XOFS+cellxpos[r]-2,YOFSSCRATCHPAD,
                           YOFSSCRATCHPAD+CELL_HEIGHT+1);
 #endif
-        if ((r>0) && state->possiblevals[state->y][state->x]&(1<<(r)))
+        if ((r>0) && state->possiblevals[state->y][state->x]&BIT_N(r))
             rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
                                 BITMAP_STRIDE,XOFS+cellxpos[r-1],
                                 YOFSSCRATCHPAD+1,CELL_WIDTH,CELL_HEIGHT);
@@ -976,7 +976,7 @@ void display_board(struct sudoku_state_t* state)
     rb->lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH+1,YOFSSCRATCHPAD,
                   YOFSSCRATCHPAD+CELL_HEIGHT+1);
 #endif
-    if (state->possiblevals[state->y][state->x]&(1<<(r)))
+    if (state->possiblevals[state->y][state->x]&BIT_N(r))
         rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
                             BITMAP_STRIDE,XOFS+cellxpos[8],YOFSSCRATCHPAD+1,
                             CELL_WIDTH,CELL_HEIGHT);
@@ -1004,7 +1004,7 @@ void display_board(struct sudoku_state_t* state)
             rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
                           YOFS+cellypos[r]-2);
 #endif
-        if ((r>0) && state->possiblevals[state->y][state->x]&(1<<(r)))
+        if ((r>0) && state->possiblevals[state->y][state->x]&BIT_N(r))
             rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
                                 BITMAP_STRIDE,XOFSSCRATCHPAD+1,
                                 YOFS+cellypos[r-1],CELL_WIDTH,CELL_HEIGHT);
@@ -1015,7 +1015,7 @@ void display_board(struct sudoku_state_t* state)
     rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
                   YOFS+cellypos[8]+CELL_HEIGHT+1);
 #endif
-    if (state->possiblevals[state->y][state->x]&(1<<(r)))
+    if (state->possiblevals[state->y][state->x]&BIT_N(r))
         rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
                             BITMAP_STRIDE,XOFSSCRATCHPAD+1,YOFS+cellypos[8],
                             CELL_WIDTH,CELL_HEIGHT);
@@ -1552,7 +1552,7 @@ enum plugin_status plugin_start(const void* parameter)
                 /* Toggle current number in the possiblevals structure */
                 if (state.currentboard[state.y][state.x]!='0') {
                     state.possiblevals[state.y][state.x]^=
-                        (1 << (state.currentboard[state.y][state.x] - '0'));
+                        BIT_N(state.currentboard[state.y][state.x] - '0');
                 }
                 break;
 #endif

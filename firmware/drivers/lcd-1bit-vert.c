@@ -155,17 +155,17 @@ int LCDFN(getstringsize)(const unsigned char *str, int *w, int *h)
 
 static void setpixel(int x, int y)
 {
-    LCDFN(framebuffer)[y>>3][x] |= 1 << (y & 7);
+    LCDFN(framebuffer)[y>>3][x] |= BIT_N(y & 7);
 }
 
 static void clearpixel(int x, int y)
 {
-    LCDFN(framebuffer)[y>>3][x] &= ~(1 << (y & 7));
+    LCDFN(framebuffer)[y>>3][x] &= ~BIT_N(y & 7);
 }
 
 static void flippixel(int x, int y)
 {
-    LCDFN(framebuffer)[y>>3][x] ^= 1 << (y & 7);
+    LCDFN(framebuffer)[y>>3][x] ^= BIT_N(y & 7);
 }
 
 static void nopixel(int x, int y)
@@ -401,7 +401,7 @@ void LCDFN(hline)(int x1, int x2, int y)
 
     bfunc = LCDFN(blockfuncs)[current_vp->drawmode];
     dst   = &LCDFN(framebuffer)[y>>3][x1];
-    mask  = 1 << (y & 7);
+    mask  = BIT_N(y & 7);
 
     dst_end = dst + width;
     do

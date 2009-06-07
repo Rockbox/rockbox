@@ -24,6 +24,7 @@
 #include <stdbool.h>
 #include <inttypes.h>
 #include "config.h"
+#include "system.h"
 
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
@@ -103,7 +104,7 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename);
  *   - position: 0-based number of the value
  *   - valid_vals: value after the call to 'parse_list'
  */
-#define LIST_VALUE_PARSED(setvals, position) ((setvals)&(1<<(position)))
+#define LIST_VALUE_PARSED(setvals, position) ((setvals) & BIT_N(position))
 const char* parse_list(const char *fmt, uint32_t *set_vals,
                        const char sep, const char* str, ...);
 

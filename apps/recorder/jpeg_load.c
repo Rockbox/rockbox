@@ -1506,7 +1506,8 @@ INLINE void fix_huff_tables(struct jpeg *p_jpeg)
  */
 INLINE void fix_quant_tables(struct jpeg *p_jpeg)
 {
-    int shift, i, x, y, a;
+    int shift, i, a;
+    unsigned x, y;
     for (i = 0; i < 2; i++)
     {
         shift = idct_tbl[p_jpeg->v_scale[i]].v_scale +
@@ -1514,9 +1515,9 @@ INLINE void fix_quant_tables(struct jpeg *p_jpeg)
         if (shift)
         {
             a = 0;
-            for (y = 0; y < 1 << p_jpeg->h_scale[i]; y++)
+            for (y = 0; y < BIT_N(p_jpeg->h_scale[i]); y++)
             {
-                for (x = 0; x < 1 << p_jpeg->v_scale[i]; x++)
+                for (x = 0; x < BIT_N(p_jpeg->v_scale[i]); x++)
                     p_jpeg->quanttable[i][zig[a+x]] <<= shift;
                 a += 8;
             }
@@ -1586,7 +1587,7 @@ INLINE int get_bits(struct jpeg *p_jpeg, int nbits)
 #ifdef JPEG_BS_DEBUG
     if (nbits > p_jpeg->bitbuf_bits)
         DEBUGF("bitbuffer underrun\n");
-    int mask = 1 << (p_jpeg->bitbuf_bits - 1);
+    int mask = BIT_N(p_jpeg->bitbuf_bits - 1);
     int i;
     DEBUGF("get %d bits: ", nbits);
     for (i = 0; i < nbits; i++)
@@ -1594,13 +1595,13 @@ INLINE int get_bits(struct jpeg *p_jpeg, int nbits)
     DEBUGF("\n");
 #endif
     return ((int) (p_jpeg->bitbuf >> (p_jpeg->bitbuf_bits -= nbits))) &
-        ((1<<nbits)-1);
+        (BIT_N(nbits)-1);
 }
 
 INLINE int peek_bits(struct jpeg *p_jpeg, int nbits)
 {
 #ifdef JPEG_BS_DEBUG
-    int mask = 1 << (p_jpeg->bitbuf_bits - 1);
+    int mask = BIT_N(p_jpeg->bitbuf_bits - 1);
     int i;
     DEBUGF("peek %d bits: ", nbits);
     for (i = 0; i < nbits; i++)
@@ -1608,13 +1609,13 @@ INLINE int peek_bits(struct jpeg *p_jpeg, int nbits)
     DEBUGF("\n");
 #endif
     return ((int) (p_jpeg->bitbuf >> (p_jpeg->bitbuf_bits - nbits))) &
-        ((1<<nbits)-1);
+        (BIT_N(nbits)-1);
 }
 
 INLINE void drop_bits(struct jpeg *p_jpeg, int nbits)
 {
 #ifdef JPEG_BS_DEBUG
-    int mask = 1 << (p_jpeg->bitbuf_bits - 1);
+    int mask = BIT_N(p_jpeg->bitbuf_bits - 1);
     int i;
     DEBUGF("drop %d bits: ", nbits);
     for (i = 0; i < nbits; i++)
@@ -1675,7 +1676,7 @@ static const int extend_offset[16] = /* entry n is (-1 << n) + 1 */
 ({ \
     int x__ = x; \
     int s__ = s; \
-    x__ & (1 << (s__- 1)) ? x__ : x__ + (-1 << s__) + 1; \
+    x__ & BIT_N(s__- 1) ? x__ : x__ + (-1 << s__) + 1; \
 })
 #endif
 
@@ -1764,14 +1765,14 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
 #endif
     unsigned int width = p_jpeg->x_mbl << mcu_hscale;
     unsigned int b_width = width * JPEG_PIX_SZ;
-    int height = 1U << mcu_vscale;
+    int height = BIT_N(mcu_vscale);
     int x;
     if (!p_jpeg->mcu_row) /* Need to decode a new row of MCUs */
     {
         p_jpeg->out_ptr = (unsigned char *)p_jpeg->img_buf;
         int store_offs[4];
 #ifdef HAVE_LCD_COLOR
-        unsigned mcu_width = 1U << mcu_hscale;
+        unsigned mcu_width = BIT_N(mcu_hscale);
 #endif
         int mcu_offset = JPEG_PIX_SZ << mcu_hscale;
         unsigned char *out = p_jpeg->out_ptr;
@@ -1868,8 +1869,8 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
                 if (!ci)
 #endif
                 {
-                    int idct_cols = 1 << MIN(p_jpeg->h_scale[!!ci], 3);
-                    int idct_rows = 1 << p_jpeg->v_scale[!!ci];
+                    int idct_cols = BIT_N(MIN(p_jpeg->h_scale[!!ci], 3));
+                    int idct_rows = BIT_N(p_jpeg->v_scale[!!ci]);
                     unsigned char *b_out = out + (ci ? ci : store_offs[blkn]);
                     if (idct_tbl[p_jpeg->v_scale[!!ci]].v_idct)
                         idct_tbl[p_jpeg->v_scale[!!ci]].v_idct(block,
@@ -2043,8 +2044,8 @@ int read_jpeg_fd(int fd,
     }
     p_jpeg->h_scale[0] = calc_scale(p_jpeg->x_size, bm->width);
     p_jpeg->v_scale[0] = calc_scale(p_jpeg->y_size, bm->height);
-    JDEBUGF("luma IDCT size: %dx%d\n", 1 << p_jpeg->h_scale[0],
-        1 << p_jpeg->v_scale[0]);
+    JDEBUGF("luma IDCT size: %dx%d\n", BIT_N(p_jpeg->h_scale[0]),
+        BIT_N(p_jpeg->v_scale[0]));
     if ((p_jpeg->x_size << p_jpeg->h_scale[0]) >> 3 == bm->width &&
         (p_jpeg->y_size << p_jpeg->v_scale[0]) >> 3 == bm->height)
         resize = false;
@@ -2053,24 +2054,24 @@ int read_jpeg_fd(int fd,
         p_jpeg->frameheader[0].horizontal_sampling - 1;
     p_jpeg->v_scale[1] = p_jpeg->v_scale[0] +
         p_jpeg->frameheader[0].vertical_sampling - 1;
-    JDEBUGF("chroma IDCT size: %dx%d\n", 1 << p_jpeg->h_scale[1],
-        1 << p_jpeg->v_scale[1]);
+    JDEBUGF("chroma IDCT size: %dx%d\n", BIT_N(p_jpeg->h_scale[1]),
+        BIT_N(p_jpeg->v_scale[1]));
 #endif
     JDEBUGF("scaling from %dx%d -> %dx%d\n",
         (p_jpeg->x_size << p_jpeg->h_scale[0]) >> 3,
         (p_jpeg->y_size << p_jpeg->v_scale[0]) >> 3,
         bm->width, bm->height);
     fix_quant_tables(p_jpeg);
-    int decode_w = (1 << p_jpeg->h_scale[0]) - 1;
-    int decode_h = (1 << p_jpeg->v_scale[0]) - 1;
+    int decode_w = BIT_N(p_jpeg->h_scale[0]) - 1;
+    int decode_h = BIT_N(p_jpeg->v_scale[0]) - 1;
     src_dim.width = (p_jpeg->x_size << p_jpeg->h_scale[0]) >> 3;
     src_dim.height = (p_jpeg->y_size << p_jpeg->v_scale[0]) >> 3;
     p_jpeg->zero_need[0] = (decode_h << 3) + decode_w;
     p_jpeg->k_need[0] = zig[p_jpeg->zero_need[0]];
     JDEBUGF("need luma components to %d\n", p_jpeg->k_need[0]);
 #ifdef HAVE_LCD_COLOR
-    decode_w = (1 << MIN(p_jpeg->h_scale[1],3)) - 1;
-    decode_h = (1 << MIN(p_jpeg->v_scale[1],3)) - 1;
+    decode_w = BIT_N(MIN(p_jpeg->h_scale[1],3)) - 1;
+    decode_h = BIT_N(MIN(p_jpeg->v_scale[1],3)) - 1;
     p_jpeg->zero_need[1] = (decode_h << 3) + decode_w;
     p_jpeg->k_need[1] =  zig[p_jpeg->zero_need[1]];
     JDEBUGF("need chroma components to %d\n", p_jpeg->k_need[1]);

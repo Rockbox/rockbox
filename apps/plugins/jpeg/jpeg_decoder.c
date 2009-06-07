@@ -1067,12 +1067,12 @@ INLINE void check_bit_buffer(struct bitstream* pb, int nbits)
 
 INLINE int get_bits(struct bitstream* pb, int nbits)
 {
-    return ((int) (pb->get_buffer >> (pb->bits_left -= nbits))) & ((1<<nbits)-1);
+    return ((int) (pb->get_buffer >> (pb->bits_left -= nbits))) & (BIT_N(nbits)-1);
 }
 
 INLINE int peek_bits(struct bitstream* pb, int nbits)
 {
-    return ((int) (pb->get_buffer >> (pb->bits_left - nbits))) & ((1<<nbits)-1);
+    return ((int) (pb->get_buffer >> (pb->bits_left - nbits))) & (BIT_N(nbits)-1);
 }
 
 INLINE void drop_bits(struct bitstream* pb, int nbits)
