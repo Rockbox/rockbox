@@ -4,6 +4,9 @@
 #derived from "cabbie" (C) Yohann Misquitta
 %wd
 
+# Touchscreen areas
+%T|206|372|24|24|play|
+
 %X|wpsbackdrop-240x400x16.bmp|
 %xl|A|lock-240x320x16.bmp|11|372|2|
 %xl|B|battery-240x320x16.bmp|46|372|10|
