@@ -1926,15 +1926,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Pipvolym"
+    swcodec: "Pip vid spårhopp"
   </dest>
   <voice>
     *: none
-    swcodec: "Pipvolym"
+    swcodec: "Pip vid spårhopp"
   </voice>
 </phrase>
 <phrase>
@@ -1947,11 +1947,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Svag"
+    swcodec: "Svagt"
   </dest>
   <voice>
     *: none
-    swcodec: "Svag"
+    swcodec: "Svagt"
   </voice>
 </phrase>
 <phrase>
@@ -1981,11 +1981,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Stark"
+    swcodec: "Starkt"
   </dest>
   <voice>
     *: none
-    swcodec: "Stark"
+    swcodec: "Starkt"
   </voice>
 </phrase>
 <phrase>
