@@ -1506,8 +1506,7 @@ INLINE void fix_huff_tables(struct jpeg *p_jpeg)
  */
 INLINE void fix_quant_tables(struct jpeg *p_jpeg)
 {
-    int shift, i, a;
-    unsigned x, y;
+    int shift, i, x, y, a;
     for (i = 0; i < 2; i++)
     {
         shift = idct_tbl[p_jpeg->v_scale[i]].v_scale +
@@ -1515,9 +1514,9 @@ INLINE void fix_quant_tables(struct jpeg *p_jpeg)
         if (shift)
         {
             a = 0;
-            for (y = 0; y < BIT_N(p_jpeg->h_scale[i]); y++)
+            for (y = 0; y < (int)BIT_N(p_jpeg->h_scale[i]); y++)
             {
-                for (x = 0; x < BIT_N(p_jpeg->v_scale[i]); x++)
+                for (x = 0; x < (int)BIT_N(p_jpeg->v_scale[i]); x++)
                     p_jpeg->quanttable[i][zig[a+x]] <<= shift;
                 a += 8;
             }
