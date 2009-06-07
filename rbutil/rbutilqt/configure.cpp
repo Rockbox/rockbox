@@ -92,7 +92,7 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
 
 void Config::accept()
 {
-    qDebug() << "Config::accept()";
+    qDebug() << "[Config] checking configuration";
     QString errormsg = tr("The following errors occurred:") + "<ul>";
     bool error = false;
 
@@ -106,7 +106,7 @@ void Config::accept()
     }
 
     RbSettings::setValue(RbSettings::Proxy, proxy.toString());
-    qDebug() << "new proxy:" << proxy;
+    qDebug() << "[Config] setting proxy to:" << proxy;
     // proxy type
     QString proxyType;
     if(ui.radioNoProxy->isChecked()) proxyType = "none";
@@ -192,7 +192,7 @@ void Config::accept()
 
 void Config::abort()
 {
-    qDebug() << "Config::abort()";
+    qDebug() << "[Config] aborted.";
     this->close();
 }
 
@@ -260,7 +260,6 @@ void Config::updateCacheInfo(QString path)
     qint64 sz = 0;
     for(int i = 0; i < fs.size(); i++) {
         sz += fs.at(i).size();
-        qDebug() << fs.at(i).fileName() << fs.at(i).size();
     }
     ui.cacheSize->setText(tr("Current cache size is %L1 kiB.")
             .arg(sz/1024));
@@ -269,15 +268,15 @@ void Config::updateCacheInfo(QString path)
 
 void Config::setDevices()
 {
-    
+
     // setup devices table
-    qDebug() << "Config::setDevices()";
-    
+    qDebug() << "[Config] setting up devices list";
+
     QStringList platformList = RbSettings::platforms();
 
     QMap <QString, QString> manuf;
     QMap <QString, QString> devcs;
-    for(int it = 0; it < platformList.size(); it++) 
+    for(int it = 0; it < platformList.size(); it++)
     {
         QString curname = RbSettings::name(platformList.at(it));
         QString curbrand = RbSettings::brand(platformList.at(it));
@@ -300,7 +299,6 @@ void Config::setDevices()
     QTreeWidgetItem *w2;
     QTreeWidgetItem *w3 = 0;
     for(int c = 0; c < brands.size(); c++) {
-        qDebug() << brands.at(c);
         w = new QTreeWidgetItem();
         w->setFlags(Qt::ItemIsEnabled);
         w->setText(0, brands.at(c));
@@ -308,12 +306,12 @@ void Config::setDevices()
 
         // go through platforms again for sake of order
         for(int it = 0; it < platformList.size(); it++) {
-           
+
             QString curname = RbSettings::name(platformList.at(it));
             QString curbrand = RbSettings::brand(platformList.at(it));
-       
+
             if(curbrand != brands.at(c)) continue;
-            qDebug() << "adding:" << brands.at(c) << curname;
+            qDebug() << "[Config] add supported device:" << brands.at(c) << curname;
             w2 = new QTreeWidgetItem(w, QStringList(curname));
             w2->setData(0, Qt::UserRole, platformList.at(it));
 
@@ -330,7 +328,7 @@ void Config::setDevices()
         ui.treeDevices->setCurrentItem(w3); // hilight old selection
 
     // tts / encoder tab
-    
+
     //encoders
     updateEncState();
 
@@ -343,7 +341,7 @@ void Config::setDevices()
     if(index < 0) index = 0;
     ui.comboTts->setCurrentIndex(index);
     updateTtsState(index);
-    
+
 }
 
 
@@ -351,7 +349,7 @@ void Config::updateTtsState(int index)
 {
     QString ttsName = ui.comboTts->itemData(index).toString();
     TTSBase* tts = TTSBase::getTTS(this,ttsName);
-    
+
     if(tts->configOk())
     {
         ui.configTTSstatus->setText(tr("Configuration OK"));
@@ -380,7 +378,7 @@ void Config::updateEncState()
     RbSettings::setValue(RbSettings::Platform, olddevice);
 
     EncBase* enc = EncBase::getEncoder(this,encoder);
-    
+
     if(enc->configOk())
     {
         ui.configEncstatus->setText(tr("Configuration OK"));
@@ -390,7 +388,7 @@ void Config::updateEncState()
     {
         ui.configEncstatus->setText(tr("Configuration INVALID"));
         ui.configEncstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/dialog-error.png")));
-    }        
+    }
 }
 
 void Config::setNoProxy(bool checked)
@@ -456,7 +454,7 @@ QStringList Config::findLanguageFiles()
         langs.append(a);
     }
     langs.sort();
-    qDebug() << "Config::findLanguageFiles()" << langs;
+    qDebug() << "[Config] available lang files:" << langs;
 
     return langs;
 }
@@ -477,11 +475,11 @@ QString Config::languageName(const QString &qmFile)
 
 void Config::updateLanguage()
 {
-    qDebug() << "updateLanguage()";
+    qDebug() << "[Config] update selected language";
     QList<QListWidgetItem*> a = ui.listLanguages->selectedItems();
     if(a.size() > 0)
         language = lang.value(a.at(0)->text());
-    qDebug() << language;
+    qDebug() << "[Config] new language:" << language;
 }
 
 
@@ -518,7 +516,7 @@ void Config::browseCache()
     cbrowser->setDir(ui.cachePath->text());
     connect(cbrowser, SIGNAL(itemChanged(QString)), this, SLOT(setCache(QString)));
     cbrowser->show();
-    
+
 }
 
 void Config::setMountpoint(QString m)
@@ -643,12 +641,10 @@ void Config::cacheClear()
     QDir dir(cache);
     QStringList fn;
     fn = dir.entryList(QStringList("*"), QDir::Files, QDir::Name);
-    qDebug() << fn;
 
     for(int i = 0; i < fn.size(); i++) {
         QString f = cache + fn.at(i);
         QFile::remove(f);
-        qDebug() << "removed:" << f;
     }
     updateCacheInfo(RbSettings::value(RbSettings::CachePath).toString());
 }
@@ -658,7 +654,7 @@ void Config::configTts()
 {
     int index = ui.comboTts->currentIndex();
     TTSBase* tts = TTSBase::getTTS(this,ui.comboTts->itemData(index).toString());
-    
+
     EncTtsCfgGui gui(this,tts,TTSBase::getTTSName(RbSettings::value(RbSettings::Tts).toString()));
     gui.exec();
     updateTtsState(ui.comboTts->currentIndex());
