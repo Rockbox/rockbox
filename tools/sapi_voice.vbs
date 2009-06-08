@@ -319,7 +319,7 @@ Function LangIDs(ByRef sLanguage)
             LangIDs = Array(&h40b)
         Case "francais"
             LangIDs = Array(&h40c, &hc0c, &h100c, &h140c, &h180c)
-            ' Standard, Canadian, Swiss, Luxembourg, Monaco (Belgian -> walon) 
+            ' Standard, Canadian, Swiss, Luxembourg, Monaco (Belgian -> walon)
         Case "galego"
             LangIDs = Array(&h456)
         Case "greek"
@@ -336,6 +336,8 @@ Function LangIDs(ByRef sLanguage)
             LangIDs = Array(&h411)
         Case "korean"
             LangIDs = Array(&h412)
+        Case "lietuviu"
+            LangIDs = Array(&h427)
         Case "magyar"
             LangIDs = Array(&h40e)
         Case "nederlands"
