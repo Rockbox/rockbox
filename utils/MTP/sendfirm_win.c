@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 
-#define LPWSTR wchar_t*
 
 #include <stdio.h>
 #include <string.h>
@@ -27,8 +26,9 @@
 #include <stdlib.h>
 #include <wchar.h>
 #include <stdbool.h>
+#include <windows.h>
 
-extern __declspec(dllimport) bool send_fw(LPWSTR file, int filesize, void (*callback)(unsigned int progress, unsigned int max));
+#include "MTP_DLL/MTP_DLL.h"
 
 void usage(void)
 {
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
     
     fprintf(stdout, "Sending firmware...\n");
     
-    if(send_fw(tmp, filesize(argv[1]), &callback))
+    if(mtp_sendnk(tmp, filesize(argv[1]), &callback))
         fprintf(stdout, "Firmware sent successfully!\n");
     else
         fprintf(stdout, "Error occured during sending!\n");

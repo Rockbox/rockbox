@@ -40,7 +40,7 @@
 #ifndef _MTP_COMMON_H
 #define _MTP_COMMON_H
 
-#ifdef __WIN32__
+#if defined(__WIN32__) || defined(_WIN32)
 #else
 #include "libmtp.h"
 #endif
@@ -53,7 +53,7 @@ struct mtp_info_t
     char version[200];
 
     /* OS-Specific data */
-#ifdef __WIN32__
+#if defined(__WIN32__) || defined(_WIN32)
 #else
     LIBMTP_mtpdevice_t *device;
 #endif

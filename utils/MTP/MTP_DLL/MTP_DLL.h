@@ -1,10 +1,21 @@
+
+#ifndef MTP_DLL_H
+#define MTP_DLL_H
+
 #ifdef MTP_DLL_EXPORTS
 #define MTP_DLL_API __declspec(dllexport)
 #else
 #define MTP_DLL_API __declspec(dllimport)
 #endif
 
+#ifdef __cplusplus
 extern "C"
 {
-    __declspec(dllexport) bool send_fw(LPWSTR file, int filesize, void (*callback)(unsigned int progress, unsigned int max));
+#endif
+MTP_DLL_API int mtp_sendnk(LPWSTR file, int filesize, void (*callback)(unsigned int progress, unsigned int max));
+MTP_DLL_API int mtp_description(wchar_t* name, wchar_t* manufacturer, DWORD* version);
+#ifdef __cplusplus
 }
+#endif
+
+#endif

@@ -1,0 +1,7 @@
+pstdint.h: A portable stdint.h
+
+This file is taken from http://www.azillionmonkeys.com/qed/pstdint.h
+
+Copyright (c) 2005-2007 Paul Hsieh
+Licensed under the BSD License. See file header for details.
+

@@ -38,11 +38,17 @@
  ****************************************************************************/
 
 #include <stdio.h>
+#if !defined(_MSC_VER)
 #include <unistd.h>
 #include <fcntl.h>
+#endif
 #include <string.h>
 #include <stdlib.h>
+#if !defined(_MSC_VER)
 #include <inttypes.h>
+#else
+#include "pstdint.h"
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -70,10 +76,10 @@ void print_usage(void)
 
 static void put_uint32le(uint32_t x, unsigned char* p)
 {
-    p[0] = x & 0xff;
-    p[1] = (x >> 8) & 0xff;
-    p[2] = (x >> 16) & 0xff;
-    p[3] = (x >> 24) & 0xff;
+    p[0] = (unsigned char)(x & 0xff);
+    p[1] = (unsigned char)((x >> 8) & 0xff);
+    p[2] = (unsigned char)((x >> 16) & 0xff);
+    p[3] = (unsigned char)((x >> 24) & 0xff);
 }
 
 static uint32_t calc_csum(const unsigned char* pb, int cb)
@@ -94,7 +100,7 @@ static void create_single_boot(unsigned char* boot, int bootlen,
     *fwsize = 15 + 16 + 12 + bootlen + 12;
     *fwbuf = malloc(*fwsize);
 
-    if(buf == NULL) {
+    if(fwbuf == NULL) {
         fprintf(stderr, "[ERR]  Cannot allocate memory.\n" );
         *fwbuf = NULL;
         *fwsize = 0;

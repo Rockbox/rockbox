@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="MTP_DLL"
-	ProjectGUID="{C7A39A2D-2ADF-40A3-A9A5-0DF4509B761B}"
-	RootNamespace="MTP_DLL"
+	Name="beastpatcher"
+	ProjectGUID="{AF17AD8F-DE5E-4A2D-ABF9-721736F6FA72}"
+	RootNamespace="beastpatcher"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -19,11 +19,12 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
-			CharacterSet="1"
+			ConfigurationType="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -40,12 +41,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="c:\wmsdk\wmfsdk95\include;c:\wmsdk\wmfsdk95\wmdm\inc"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;MTP_DLL_EXPORTS"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				UsePrecompiledHeader="2"
+				RuntimeLibrary="0"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
@@ -61,11 +62,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mssachlp.lib"
+				AdditionalDependencies="..\MTP_DLL.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="c:\wmsdk\wmfsdk95\lib,c:\wmsdk\wmfsdk95\wmdm\lib"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -91,13 +91,14 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -118,10 +119,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="c:\wmsdk\wmfsdk95\include;c:\wmsdk\wmfsdk95\wmdm\inc"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;MTP_DLL_EXPORTS"
+				AdditionalIncludeDirectories="&quot;$(InputDir)\..&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
@@ -137,12 +138,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mssachlp.lib"
+				AdditionalDependencies="..\MTP_DLL.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="c:\wmsdk\wmfsdk95\lib,c:\wmsdk\wmfsdk95\wmdm\lib"
-				GenerateManifest="true"
-				GenerateDebugInformation="false"
-				SubSystem="2"
+				GenerateDebugInformation="true"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -170,7 +169,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="echo Copying $(TargetName) dll / lib to ..&#x0D;&#x0A;copy /Y &quot;$(InputDir)$(ConfigurationName)\$(TargetFileName)&quot; &quot;$(InputDir)..\&quot;&#x0D;&#x0A;copy /Y &quot;$(InputDir)$(ConfigurationName)\$(TargetName).lib&quot; &quot;$(InputDir)..\&quot;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -183,36 +181,16 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\MTP_DLL.cpp"
+				RelativePath="..\beastpatcher.c"
 				>
 			</File>
 			<File
-				RelativePath=".\mtp_wrapper.cpp"
+				RelativePath="..\bootimg.c"
 				>
 			</File>
 			<File
-				RelativePath=".\progresshelper.cpp"
+				RelativePath="..\mtp_win32.c"
 				>
-			</File>
-			<File
-				RelativePath=".\stdafx.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
@@ -221,15 +199,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\MTP_DLL.h"
+				RelativePath="..\bootimg.h"
 				>
 			</File>
 			<File
-				RelativePath=".\progresshelper.h"
+				RelativePath="..\mtp_common.h"
 				>
 			</File>
 			<File
-				RelativePath=".\stdafx.h"
+				RelativePath="..\pstdint.h"
 				>
 			</File>
 		</Filter>

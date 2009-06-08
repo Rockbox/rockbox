@@ -43,15 +43,12 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <wchar.h>
-#include <stdbool.h>
 #include <windows.h>
 #include <tchar.h>
 
 #include "mtp_common.h"
 
-
-extern __declspec(dllimport) bool send_fw(LPWSTR file, int filesize, 
-              void (*callback)(unsigned int progress, unsigned int max));
+#include "../MTP_DLL/MTP_DLL.h"
 
 int mtp_init(struct mtp_info_t* mtp_info)
 {
@@ -71,11 +68,18 @@ int mtp_finished(struct mtp_info_t* mtp_info)
 
 int mtp_scan(struct mtp_info_t* mtp_info)
 {
-    strcpy(mtp_info->manufacturer,"<unknown>");
-    strcpy(mtp_info->modelname,"<unknown>");
-    strcpy(mtp_info->version,"<unknown>");
+    wchar_t name[256];
+    wchar_t manufacturer[256];
+    DWORD version;
+    int num = 0;
 
-    return 0;
+    num = mtp_description(name, manufacturer, &version);
+
+    wcstombs(mtp_info->manufacturer, manufacturer, 200);
+    wcstombs(mtp_info->modelname, name, 200);
+
+    sprintf(mtp_info->version, "%x", (unsigned int)version);
+    return (num > 0) ? num : -1;
 
 }
 
@@ -147,11 +151,11 @@ int mtp_send_firmware(struct mtp_info_t* mtp_info, unsigned char* fwbuf,
        return -1;
     }
 
-    tmp = (LPWSTR)malloc(strlen(szTempName)*2+1);
-    mbstowcs(tmp, szTempName, strlen(szTempName)*2+1);
+    tmp = (LPWSTR)malloc(_tcslen(szTempName)*2+1);
+    mbstowcs(tmp, (char*)szTempName, _tcslen(szTempName)*2+1);
     
     fprintf(stderr, "[INFO]  Sending firmware...\n");
-    if (send_fw(tmp, fwsize, &callback))
+    if (mtp_sendnk(tmp, fwsize, &callback))
     {
         fprintf(stderr, "[INFO] Firmware sent successfully\n");
         ret = 0;
@@ -172,3 +176,4 @@ int mtp_send_firmware(struct mtp_info_t* mtp_info, unsigned char* fwbuf,
 
     return ret;
 }
+
