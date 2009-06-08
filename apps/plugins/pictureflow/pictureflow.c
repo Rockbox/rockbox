@@ -32,7 +32,6 @@
 #include "lib/grey.h"
 #include "lib/feature_wrappers.h"
 #include "lib/buflib.h"
-#include "lib/playback_control.h"
 
 PLUGIN_HEADER
 
@@ -42,6 +41,10 @@ PLUGIN_HEADER
  *  Targets which use plugin_get_audio_buffer() can't have playback from
  * within pictureflow itself, as the whole core audio buffer is occupied */
 #define PF_PLAYBACK_CAPABLE (PLUGIN_BUFFER_SIZE > 0x10000)
+
+#if PF_PLAYBACK_CAPABLE
+#include "lib/playback_control.h"
+#endif
 
 #define PF_PREV ACTION_STD_PREV
 #define PF_PREV_REPEAT ACTION_STD_PREVREPEAT
@@ -2132,6 +2135,15 @@ int settings_menu(void)
 /**
   Show the main menu
  */
+enum {
+#if PF_PLAYBACK_CAPABLE
+    PF_MENU_PLAYBACK_CONTROl,
+#endif
+    PF_MENU_SETTINGS,
+    PF_MENU_RETURN,
+    PF_MENU_QUIT,
+};
+
 int main_menu(void)
 {
     int selection = 0;
@@ -2142,21 +2154,26 @@ int main_menu(void)
 #endif
 
     MENUITEM_STRINGLIST(main_menu,"PictureFlow Main Menu",NULL,
-                        "Playback Control", "Settings", "Return", "Quit");
+#if PF_PLAYBACK_CAPABLE
+                        "Playback Control",
+#endif
+                                            "Settings", "Return", "Quit");
     while (1)  {
         switch (rb->do_menu(&main_menu,&selection, NULL, false)) {
-            case 0: /* Playback Control */
+#if PF_PLAYBACK_CAPABLE
+            case PF_MENU_PLAYBACK_CONTROl: /* Playback Control */
                 playback_control(NULL);
                 break;
-            case 1:
+#endif
+            case PF_MENU_SETTINGS:
                 result = settings_menu();
                 if ( result != 0 ) return result;
                 break;
 
-            case 2:
+            case PF_MENU_RETURN:
                 return 0;
 
-            case 3:
+            case PF_MENU_QUIT:
                 return -1;
 
             case MENU_ATTACHED_USB:
