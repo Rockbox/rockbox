@@ -306,11 +306,10 @@ void lcd_init_device()
 {
     as3525_dbop_init();
 
-    GPIOA_DIR |= (1<<7|1<<5|1<<4|1<<3);
+    GPIOA_DIR |= (1<<5|1<<4|1<<3);
     GPIOA_PIN(5) = 0;
     GPIOA_PIN(3) = (1<<3);
     GPIOA_PIN(4) = 0;
-    GPIOA_PIN(7) = 0;
     GPIOA_PIN(5) = (1<<5);
 
     _display_on();
