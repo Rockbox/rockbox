@@ -12192,11 +12192,11 @@
   </source>
   <dest>
     *: none
-    speaker: "Enable Speaker"
+    speaker: "Käytä kaiutinta"
   </dest>
   <voice>
     *: none
-    speaker: "Enable Speaker"
+    speaker: "Käytä kaiutinta"
   </voice>
 </phrase>
 <phrase>
@@ -12210,7 +12210,7 @@
     *: "Tulkitse numerot järjestettäessä"
   </dest>
   <voice>
-    *: "Tulkitse numerot järjestettäessä"
+    *: "Tulkitse numerot lajiteltaessa"
   </voice>
 </phrase>
 <phrase>
@@ -12223,11 +12223,11 @@
   </source>
   <dest>
     *: none
-    serial_port: "Serial Bitrate"
+    serial_port: "Sarjaportin nopeus"
   </dest>
   <voice>
     *: none
-    serial_port: "Serial Bitrate"
+    serial_port: "Sarjaportin nopeus"
   </voice>
 </phrase>
 <phrase>
@@ -12333,10 +12333,75 @@
   </source>
   <dest>
     *: none
-    serial_port: "Auto"
+    serial_port: "Autom."
   </dest>
   <voice>
     *: none
-    serial_port: "Automatic"
+    serial_port: "Automaattinen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Estä kappaleen vaihtaminen"
+  </dest>
+  <voice>
+    *: "Estä kappaleen vaihtaminen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Absoluuttinen piste"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Absoluuttinen piste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "3x3 ruutu"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "3 kertaa 3 ruutu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Kosketusnäytön tila"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Kosketusnäytön tila"
   </voice>
 </phrase>

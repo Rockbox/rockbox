@@ -1,4 +1,4 @@
-#             __________               __   ___.
+﻿#             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 #   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
@@ -29,7 +29,7 @@
     *: "是"
   </dest>
   <voice>
-    *: "Yes"
+    *: "是"
   </voice>
 </phrase>
 <phrase>
@@ -40,10 +40,10 @@
     *: "No"
   </source>
   <dest>
-    *: "否"
+    *: "不"
   </dest>
   <voice>
-    *: "No"
+    *: "不"
   </voice>
 </phrase>
 <phrase>
@@ -203,10 +203,10 @@
     *: "Sound Settings"
   </source>
   <dest>
-    *: "聲音設定"
+    *: "聲音的設置"
   </dest>
   <voice>
-    *: "Sound Settings"
+    *: "聲音的設置"
   </voice>
 </phrase>
 <phrase>
@@ -1355,7 +1355,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    swcodec: "嗶音量"
   </voice>
 </phrase>
 <phrase>
@@ -12133,10 +12133,10 @@
     *: "Credits"
   </source>
   <dest>
-    *: "特別鳴謝"
+    *: "制作人員名單"
   </dest>
   <voice>
-    *: "特別鳴謝"
+    *: "制作人員名單"
   </voice>
 </phrase>
 <phrase>
@@ -12354,5 +12354,70 @@
   <voice>
     *: none
     serial_port: "自動"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "不要讓歌化"
+  </dest>
+  <voice>
+    *: "不要讓歌化"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "那個地方"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "那個地方"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "3x3網格"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "3x3網格"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Touchscreen選擇"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Touchscreen選擇"
   </voice>
 </phrase>

@@ -964,7 +964,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Egyszerű EQ beállítások"
+    swcodec: "Alap EQ beállítások"
   </dest>
   <voice>
     *: none
@@ -1130,7 +1130,7 @@
   user: core
   <source>
     *: none
-    swcodec: "Centre Frequency"
+    swcodec: "Center Frequency"
   </source>
   <dest>
     *: none
@@ -1385,7 +1385,7 @@
   user: core
   <source>
     *: none
-    masf: "MDB Centre Frequency"
+    masf: "MDB Center Frequency"
   </source>
   <dest>
     *: none
@@ -1656,7 +1656,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Track Skip Only"
+    swcodec: "Csak szám átugrása"
   </dest>
   <voice>
     *: none
@@ -2089,7 +2089,7 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Megállás fejhallgató kihúzásakor"
+    headphone_detection: "Szünet fejhallgató kihúzásakor"
   </dest>
   <voice>
     *: none
@@ -2140,7 +2140,7 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Folytatás bekapcsoláskor kikapcsolása, ha a fejhallgató nincs csatlakoztatva"
+    headphone_detection: "Ha a fejhallgató nincs csatlakoztatva, nincs folytatás bekapcsoláskor"
   </dest>
   <voice>
     *: none
@@ -2765,7 +2765,7 @@
   </source>
   <dest>
     *: none
-    backlight_brightness: "Világosság"
+    backlight_brightness: "Fényerő"
   </dest>
   <voice>
     *: none
@@ -3049,7 +3049,7 @@
     *: "Show Icons"
   </source>
   <dest>
-    *: "Ikonok kijelzése"
+    *: "Ikonok megjelenítése"
   </dest>
   <voice>
     *: "Show Icons"
@@ -3737,7 +3737,7 @@
     *: "Latin Extended (ISO-8859-2)"
   </source>
   <dest>
-    *: "Kelet-európai (ISO-8859-2)"
+    *: "Közép-európai (ISO-8859-2)"
   </dest>
   <voice>
     *: "Latin extended"
@@ -4058,7 +4058,7 @@
   </source>
   <dest>
     *: none
-    rtc: "Idő/Dátum beállítása"
+    rtc: "Dátum/Idő beállítása"
   </dest>
   <voice>
     *: none
@@ -4756,7 +4756,7 @@
     *: "Yes - Recent only"
   </source>
   <dest>
-    *: "Yes - Recent only"
+    *: "Igen - Csak az újak közé"
   </dest>
   <voice>
     *: "Yes - Recent only"
@@ -4770,7 +4770,7 @@
     *: "Ask - Recent only"
   </source>
   <dest>
-    *: "Ask - Recent only"
+    *: "Rákérdez - Csak az újak közé"
   </dest>
   <voice>
     *: "Ask - Recent only"
@@ -4798,7 +4798,7 @@
     *: "Maintain a List of Recent Bookmarks?"
   </source>
   <dest>
-    *: "Maintain a List of Recent Bookmarks?"
+    *: "Vezessek listák az új könyvjelzőkről?"
   </dest>
   <voice>
     *: "Maintain a List of Recent Bookmarks?"
@@ -4980,7 +4980,7 @@
     *: "Manage Settings"
   </source>
   <dest>
-    *: "Beállítások kezelése"
+    *: "Beállítások"
   </dest>
   <voice>
     *: "Manage Settings"
@@ -5008,7 +5008,7 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "Beállítások Betöltve"
+    *: "Beállítások betöltve"
   </dest>
   <voice>
     *: "Settings Loaded"
@@ -5064,7 +5064,7 @@
     *: "Settings Saved"
   </source>
   <dest>
-    *: "Beállítások Elmentve"
+    *: "Beállítások elmentve"
   </dest>
   <voice>
     *: "Settings Saved"
@@ -5583,7 +5583,7 @@
   </source>
   <dest>
     *: none
-    radio: "Földrész"
+    radio: "Régió"
   </dest>
   <voice>
     *: none
@@ -10746,7 +10746,7 @@
   </source>
   <dest>
     *: none
-    recording: "Módosítás jobb"
+    recording: "Jobboldali módosítás"
   </dest>
   <voice>
     *:none
@@ -12263,5 +12263,129 @@
   <voice> 
     *: none
     serial_port: "Automatic"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Számok nem maradnak ki"
+  </dest>
+  <voice>
+    *: "Prevent Track Skipping"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Hangszóró engedélyezése"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Enable Speaker"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Számok értelmezése sorbarakásnál"
+  </dest>
+  <voice>
+    *: "Interpret numbers when sorting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Abszolút pont"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Absolute Point"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "Teljes számként"
+  </dest>
+  <voice>
+    *: "As whole numbers"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "3x3-as rács"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "3 by 3 grid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Érintőképernyős mód"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Számjegyenként"
+  </dest>
+  <voice>
+    *: "As digits"
   </voice>
 </phrase>

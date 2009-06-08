@@ -12331,3 +12331,68 @@
     serial_port: "Automático"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Evitar salto de pista"
+  </dest>
+  <voice>
+    *: "Evitar salto de pista"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Punto absoluto"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Punto absoluto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Rejilla 3x3"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "rejilla de 3 por 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Modo de pantalla táctil"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Modo de pantalla táctil"
+  </voice>
+</phrase>

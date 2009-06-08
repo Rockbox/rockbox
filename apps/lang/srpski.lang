@@ -1906,15 +1906,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Јачина бипа"
+    swcodec: "Бип код прескакања нумера"
   </dest>
   <voice>
     *: none
-    swcodec: "Јачина бипа"
+    swcodec: "Бип код прескакања нумера"
   </voice>
 </phrase>
 <phrase>
@@ -12284,5 +12284,129 @@
   <voice> 
     *: none
     serial_port: "Аутоматски"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Спречи прескакање нумера"
+  </dest>
+  <voice>
+    *: "Спречи прескакање нумера"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Укључи спикера"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Укључи спикера"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Интерпретирај бројеве код сортирања"
+  </dest>
+  <voice>
+    *: "Интерпретирај бројеве код сортирања"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Апсолутна тачка"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Апсолутна тачка"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "Као целе бројеве"
+  </dest>
+  <voice>
+    *: "Као целе бројеве"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "3x3 мрежа"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "3 са 3 мрежа"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Тачскрин мод"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Тачскрин мод"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Као цифре"
+  </dest>
+  <voice>
+    *: "Као цифре"
   </voice>
 </phrase>

@@ -19,7 +19,7 @@
 #
 #    Fitchî e walon ki rote avou tolminme kéne éndjolreye
 #
-#    Stéphane QUERTINMONT <stefane AT walon.org> - Måss 2009
+#    Stéphane QUERTINMONT <stefane AT walon.org> - May 2009
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -266,13 +266,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Oyi"
     h100,h120,h300: "NAVI = Oyi"
-    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Oyi"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Oyi"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -1925,7 +1925,7 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
@@ -8104,10 +8104,10 @@
     *: "Nothing to resume"
   </source>
   <dest>
-    *: "I-g a rén a rataker"
+    *: "I-gn a rén a rataker"
   </dest>
   <voice>
-    *: "I-g a rén a rataker"
+    *: "I-gn a rén a rataker"
   </voice>
 </phrase>
 <phrase>
@@ -8633,10 +8633,10 @@
     *: "Please reboot to enable"
   </source>
   <dest>
-    *: "Renondoz po mete en alaedje, s' i vs plait"
+    *: "Renondez po mete en alaedje, s' i vs plait"
   </dest>
   <voice>
-    *: "Renondoz po mete en alaedje, s' i vs plait"
+    *: "Renondez po mete en alaedje, s' i vs plait"
   </voice>
 </phrase>
 <phrase>
@@ -9261,7 +9261,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plus"
+    *: "eyet"
   </voice>
 </phrase>
 <phrase>
@@ -11672,7 +11672,7 @@
     *: ""
   </dest>
   <voice>
-    *: "OK"
+    *: "Iva"
   </voice>
 </phrase>
 <phrase>
@@ -12333,4 +12333,68 @@
     speaker: "Hôt-pårloe en alaedje"
   </voice>
 </phrase>
-
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Môde waitroûle-taprece"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Môde waitroûle taprece"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Grile 3x3"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Grile 3 a 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Pont Absolou"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Pont Absolou"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Espaitchî d' passer les bokets"
+  </dest>
+  <voice>
+    *: "Espaitchî d' passer les bokets"
+  </voice>
+</phrase>

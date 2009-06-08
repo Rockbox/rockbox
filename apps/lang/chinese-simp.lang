@@ -41,10 +41,10 @@
     *: "No"
   </source>
   <dest>
-    *: "否"
+    *: "不"
   </dest>
   <voice>
-    *: "否"
+    *: "不"
   </voice>
 </phrase>
 <phrase>
@@ -204,10 +204,10 @@
     *: "Sound Settings"
   </source>
   <dest>
-    *: "音频设置"
+    *: "声音的设置"
   </dest>
   <voice>
-    *: "音频设置"
+    *: "声音的设置"
   </voice>
 </phrase>
 <phrase>
@@ -12298,10 +12298,10 @@
     *: "Credits"
   </source>
   <dest>
-    *: "特别鸣谢"
+    *: "制作人员名单"
   </dest>
   <voice>
-    *: "特别鸣谢"
+    *: "制作人员名单"
   </voice>
 </phrase>
 <phrase>
@@ -12333,5 +12333,70 @@
   <voice>
     *: none
     serial_port: "自动"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "h"
+  </dest>
+  <voice>
+    *: "不要让歌化"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "那个地方"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "那个地方"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "3x3网格"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "3x3网格"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "touchscreen 选择"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "touchscreen 选择"
   </voice>
 </phrase>

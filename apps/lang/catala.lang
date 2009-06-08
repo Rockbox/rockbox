@@ -6938,7 +6938,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user: core
   <source>
     *: "Version"
@@ -12144,5 +12144,245 @@
   <voice>
     *: none
     quickscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest>
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Evitar Salts en Reproducció"
+  </dest>
+  <voice>
+    *: "Evitar Salts en Reproducció"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Activar Altaveu"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Activar Altaveu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Interpretar els nombres en ordenar"
+  </dest>
+  <voice>
+    *: "Interpretar els nombres en ordenar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Bitrate port sèrie"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Bitrate port sèrie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Punt Absolut"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Punt Absolut"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest>
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "57600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "Com nombres sencers"
+  </dest>
+  <voice>
+    *: "Com nombres sencers"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user: core
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Crèdits"
+  </dest>
+  <voice>
+    *: "Crèdits"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Graella 3x3"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Graella 3 per 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Mode Pantalla Tàctil"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Mode Pantalla Tàctil"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Com dígits"
+  </dest>
+  <voice>
+    *: "Com dígits"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Auto"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Automàtic"
   </voice>
 </phrase>
