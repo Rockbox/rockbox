@@ -208,11 +208,11 @@ int button_read_device(void)
     /* set dir so we can read our buttons (but reset the C pins first) */
     GPIOB_DIR &= ~(1<<4);
     GPIOC_DIR |= (1<<2|1<<3|1<<4|1<<5|1<<6);
-    GPIOC_PIN(2) |= (1<<2);
-    GPIOC_PIN(3) |= (1<<3);
-    GPIOC_PIN(4) |= (1<<4);
-    GPIOC_PIN(5) |= (1<<5);
-    GPIOC_PIN(6) |= (1<<6);
+    GPIOC_PIN(2) = (1<<2);
+    GPIOC_PIN(3) = (1<<3);
+    GPIOC_PIN(4) = (1<<4);
+    GPIOC_PIN(5) = (1<<5);
+    GPIOC_PIN(6) = (1<<6);
 
     GPIOC_DIR &= ~(1<<2|1<<3|1<<4|1<<5|1<<6);
 
