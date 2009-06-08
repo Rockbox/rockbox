@@ -104,11 +104,8 @@ static int progress(uint64_t const sent, uint64_t const total,
     (void)data;
 
     int percent = (sent * 100) / total;
-#ifdef __WIN32__
-    printf("Progress: %I64u of %I64u (%d%%)\r", sent, total, percent);
-#else
+
     printf("Progress: %"PRIu64" of %"PRIu64" (%d%%)\r", sent, total, percent);
-#endif
     fflush(stdout);
     return 0;
 }
