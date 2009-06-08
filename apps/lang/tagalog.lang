@@ -261,20 +261,17 @@
  <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
  </source>
  <dest>
     *: "PLAY = Oo"
     h100,h120,h300: "NAVI = Oo"
-    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Oo"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Oo"
     player: "(PLAY/STOP)"
  </dest>
  <voice>
     *: ""
-    h100,h120,h300: ""
-    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: ""
-    player: ""
  </voice>
 </phrase>
 <phrase>
@@ -1906,15 +1903,15 @@
  user: core
  <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
  </source>
  <dest>
     *: none
-    swcodec: "Beep bulumen"
+    swcodec: "Landas Laktawan Beep"
  </dest>
  <voice>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Landas Laktawan Beep"
  </voice>
 </phrase>
 <phrase>
@@ -6880,16 +6877,16 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: start the credits.rock plugin which shows who made Rockbox
+  desc: in the Rockbox Info screen
   user: core
   <source>
-    *: "Credits"
+    *: "Version"
   </source>
   <dest>
-    *: "Kredito"
+    *: "Versiyon"
   </dest>
   <voice>
-    *: "Kredito"
+    *: "Versiyon"
   </voice>
 </phrase>
 <phrase>
@@ -12274,5 +12271,143 @@
   <voice>
     *: none
     serial_port: "Awtomatiko"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Hadlangan Landas Laktawan"
+  </dest>
+  <voice>
+    *: "Hadlangan Landas Laktawan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Magbigay-kaya Espiker"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Magbigay-kaya Espiker"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Ipaliwanag ng numero kung naguri"
+  </dest>
+  <voice>
+    *: "Ipaliwanag ng numero kung naguri"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Absoluto Ponto"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Absoluto Ponto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "Gaya ng buo numero"
+  </dest>
+  <voice>
+    *: "Gaya ng buo numero"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user: core
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Kredito"
+  </dest>
+  <voice>
+    *: "Kredito"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "3x3 Grid"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "3 by 3 grid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Touchscreen Modo"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Touchscreen Modo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Gaya ng numero"
+  </dest>
+  <voice>
+    *: "Gaya ng numero"
   </voice>
 </phrase>
