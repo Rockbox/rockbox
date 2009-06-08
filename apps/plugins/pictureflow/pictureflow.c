@@ -2137,7 +2137,7 @@ int settings_menu(void)
  */
 enum {
 #if PF_PLAYBACK_CAPABLE
-    PF_MENU_PLAYBACK_CONTROl,
+    PF_MENU_PLAYBACK_CONTROL,
 #endif
     PF_MENU_SETTINGS,
     PF_MENU_RETURN,
@@ -2161,7 +2161,7 @@ int main_menu(void)
     while (1)  {
         switch (rb->do_menu(&main_menu,&selection, NULL, false)) {
 #if PF_PLAYBACK_CAPABLE
-            case PF_MENU_PLAYBACK_CONTROl: /* Playback Control */
+            case PF_MENU_PLAYBACK_CONTROL: /* Playback Control */
                 playback_control(NULL);
                 break;
 #endif
