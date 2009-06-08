@@ -121,13 +121,12 @@ int viewportmanager_set_statusbar(int enabled)
 
 void viewportmanager_draw_statusbars(void* data)
 {
-    (void)data;
     int i;
 
     FOR_NB_SCREENS(i)
     {
         if (showing_bars(i))
-            gui_statusbar_draw(&statusbars.statusbars[i], false);
+            gui_statusbar_draw(&statusbars.statusbars[i], (bool)data);
     }
 }
 

@@ -507,6 +507,7 @@ int ft_enter(struct tree_context* c)
                 splash(0, ID2P(LANG_WAIT));
                 if (!settings_load_config(buf,true))
                     break;
+                gui_synclist_draw(&tree_lists);
                 splash(HZ, ID2P(LANG_SETTINGS_LOADED));
                 break;
 

@@ -66,7 +66,7 @@
 #include "filetypes.h"
 #include "option_select.h"
 #include "backdrop.h"
-
+#include "appevents.h"
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
@@ -972,6 +972,7 @@ void settings_apply(bool read_disk)
     enc_global_settings_apply();
 #endif
     list_init_viewports(NULL);
+    send_event(GUI_EVENT_ACTIONUPDATE, (void*)true);
 }
 
 
