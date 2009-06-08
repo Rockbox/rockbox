@@ -4148,7 +4148,7 @@
     ipod*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*: "PREV = Revert"
-    gigabeatf: "A = Revert"
+    gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
   </source>
@@ -4159,7 +4159,7 @@
     ipod*,c200,sa9200: "MENU = mégsem"
     x5,m5: "RECORD = mégsem"
     h10,h10_5gb,e200*: "PREV = mégsem"
-    gigabeatf: "A = mégsem"
+    gigabeatf: "POWER = mégsem"
     mrobe100: "DISPLAY = mégsem"
     gigabeats: "VISSZA = mégsem"
   </dest>

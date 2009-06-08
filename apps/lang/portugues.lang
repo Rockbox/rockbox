@@ -4261,7 +4261,7 @@
     ipod*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*: "PREV = Revert"
-    gigabeatf: "A = Revert"
+    gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
   </source>
@@ -4272,7 +4272,7 @@
     ipod*,c200,sa9200: "MENU Para Reverter"
     x5,m5: "RECORD Para Reverter"
     h10,h10_5gb,e200*: "PREV Para Reverter"
-    gigabeatf: "A Para Reverter"
+    gigabeatf: "POWER Para Reverter"
     mrobe100: "DISPLAY Para Reverter"
     gigabeats: "BACK Para Reverter"
   </dest>

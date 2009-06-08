@@ -4159,7 +4159,7 @@
     ipod*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*: "PREV = Revert"
-    gigabeatf: "A = Revert"
+    gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
   </source>
@@ -4170,7 +4170,7 @@
     ipod*,c200,sa9200: "MENU = Врати на старо"
     x5,m5: "RECORD = Врати на старо"
     h10,h10_5gb,e200*: "PREV = Врати на старо"
-    gigabeatf: "A = Врати на старо"
+    gigabeatf: "POWER = Врати на старо"
     mrobe100: "DISPLAY = Врати на старо"
     gigabeats: "BACK = Врати на старо"
   </dest>

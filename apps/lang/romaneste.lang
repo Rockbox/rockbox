@@ -1520,7 +1520,7 @@
     ipod*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*: "PREV = Revert"
-    gigabeatf: "A = Revert"
+    gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
   </source>
@@ -1531,7 +1531,7 @@
     ipod*,c200,sa9200: "MENU pentru anulare"
     x5,m5: "RECORD pentru anulare"
     h10,h10_5gb,e200*: "PREV pentru anulare"
-    gigabeatf: "A pentru anulare"
+    gigabeatf: "POWER pentru anulare"
     mrobe100: "DISPLAY pentru anulare"
     gigabeats: "BACK  pentru anulare"
   </dest>

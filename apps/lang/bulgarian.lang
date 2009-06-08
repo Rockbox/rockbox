@@ -1353,7 +1353,7 @@
     ipod*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*: "PREV = Revert"
-    gigabeatf: "A = Revert"
+    gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
   </source>
@@ -1364,7 +1364,7 @@
     ipod*,c200,sa9200: "MENU за отказ"
     x5,m5: "RECORD за отказ"
     h10,h10_5gb,e200*: "PREV за отказ"
-    gigabeatf: "A за отказ"
+    gigabeatf: "POWER за отказ"
     mrobe100: "DISPLAY за отказ"
     gigabeats: "BACK за отказ"
   </dest>
