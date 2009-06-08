@@ -250,6 +250,7 @@ Lyre prototype 1*/
 #define RTC_JZ47XX   16 /* Ingenic Jz47XX */
 
 /* USB On-the-go */
+#define USBOTG_M66591  6591 /* M:Robe 500 */
 #define USBOTG_ISP1362 1362 /* iriver H300 */
 #define USBOTG_ISP1583 1583 /* Creative Zen Vision:M */
 #define USBOTG_M5636   5636 /* iAudio X5 */
@@ -775,7 +776,7 @@ Lyre prototype 1*/
 #elif CONFIG_USBOTG == USBOTG_JZ4740
 #define USB_HAS_BULK
 #define USB_HAS_INTERRUPT
-#elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
+#elif defined(CPU_TCC780X) || defined(CPU_TCC77X) || defined(MROBE_500)
 #define USB_HAS_BULK
 #endif /* CONFIG_USBOTG */
 

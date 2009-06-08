@@ -75,7 +75,7 @@ start:
     strhi  r5, [r3], #4
     bhi    1b
 #endif
-#endif /* !BOOTLOADER,!STUB */
+#endif /* !STUB */
 
 
     /* Initialise bss section to zero */
@@ -113,26 +113,6 @@ stackmunge:
     /* Switch to supervisor mode (no IRQ) */
     msr    cpsr_c, #0xd3
     ldr    sp, =stackend
-    
-#if defined(BOOTLOADER) && !defined(CREATIVE_ZVx)
-    /* get the high part of our execute address */
-    ldr    r2, =0xffffff00
-    and    r4, pc, r2
-
-    /* Copy bootloader to safe area - 0x01900000 */
-    mov    r5, #0x01900000
-    ldr    r6, = _dataend
-    sub    r0, r6, r5       /* length of loader */
-    add    r0, r4, r0     /* r0 points to start of loader */
-1:
-    cmp    r5, r6
-    ldrcc  r2, [r4], #4
-    strcc  r2, [r5], #4
-    bcc    1b
-
-    ldr    pc, =start_loc    /* jump to the relocated start_loc:  */
-
-#endif
 
 start_loc:
      bl main

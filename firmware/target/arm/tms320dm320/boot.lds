@@ -138,9 +138,20 @@ SECTIONS
         . += TTB_SIZE;
     } > DRAM
     
+    /* The LCD buffer should be at the end of memory to protect against
+     * overflowing something else when the YUV blitter is fudging the screen 
+     * size.
+     */
+    
     .lcdbuffer (NOLOAD) :
     {
         _lcdbuf = .;
+        . += LCD_BUFFER_SIZE;
+    } > DRAM
+    
+    .lcdbuffer2 (NOLOAD) :
+    {
+        _lcdbuf2 = .;
         . += LCD_BUFFER_SIZE;
     } > DRAM
 }

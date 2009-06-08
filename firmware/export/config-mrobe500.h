@@ -35,6 +35,9 @@
 /* define this if you use an ATA controller */
 #define CONFIG_STORAGE STORAGE_ATA
 
+/* Define this to add support for ATA DMA */
+//#define HAVE_ATA_DMA
+
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
 
@@ -113,6 +116,19 @@
 #define CONFIG_KEYPAD MROBE500_PAD
 #define HAVE_TOUCHSCREEN
 #define HAVE_BUTTON_DATA
+
+/* M66591 register base */
+#define M66591_BASE 0x60000000
+
+/* enable these for the usb stack */
+#define CONFIG_USBOTG       USBOTG_M66591
+#define USE_ROCKBOX_USB
+#define HAVE_USBSTACK
+#define USB_STORAGE
+/* usb stack and driver settings */
+#define USB_NUM_ENDPOINTS   7
+#define USB_VENDOR_ID       0x07b4
+#define USB_PRODUCT_ID      0x0281
 
 /* define this if the target has volume keys which can be used in the lists */
 #define HAVE_VOLUME_IN_LIST

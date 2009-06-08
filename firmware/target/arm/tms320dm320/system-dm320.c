@@ -28,6 +28,7 @@
 #include "spi.h"
 #ifdef CREATIVE_ZVx
 #include "dma-target.h"
+#include "usb-mr500.h"
 #endif
 
 #define default_interrupt(name) \
@@ -307,4 +308,15 @@ void set_cpu_frequency(long frequency)
     }
 }
 #endif
+
+/* This function is pretty crude.  It is not acurate to a usec, but errors on
+ *  longer.
+ */
+void udelay(int usec) {
+    volatile int temp=usec*(175000/200);
+    
+    while(temp) {
+        temp--;
+    }
+}
 

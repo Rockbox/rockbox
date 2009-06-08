@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Karl Kurbjun
+ * Copyright (C) 2007, 2009 by Karl Kurbjun
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,42 +18,60 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#define LOGF_ENABLE
 
 #include "config.h"
+#include "logf.h"
 #include "cpu.h"
 #include "system.h"
-#include "kernel.h"
-#include "ata.h"
-#include "usb.h"
-#include "usb-target.h"
 
-#define USB_RST_ASSERT
-#define USB_RST_DEASSERT
+#include "m66591.h"
 
-#define USB_VPLUS_PWR_ASSERT
-#define USB_VPLUS_PWR_DEASSERT
+void usb_init_device(void) {
+    logf("mxx: SOC Init");
 
-#define USB_UNIT_IS_PRESENT USB_EXTRACTED
+    /* The EMIF timing that is currently used may not be apropriate when the 
+     *  device is boosted.  The following values were used with sucess too:
+     *      IO_EMIF_CS4CTRL1 = 0x66AB;
+     *      IO_EMIF_CS4CTRL2 = 0x4220; 
+     */
+    IO_EMIF_CS4CTRL1 = 0x2245;
+    IO_EMIF_CS4CTRL2 = 0x4110; 
 
-/* The usb detect is one pin to the cpu active low */
-inline int usb_detect(void)
-{
-    return USB_UNIT_IS_PRESENT;
+    IO_GIO_DIR0 &= ~(1<<2);
+    IO_GIO_INV0 &= ~(1<<2);
+    IO_GIO_FSEL0 &= ~(0x03);
+    
+    /* Drive the reset pin low */
+    IO_GIO_BITCLR0 = 1<<2;
+
+    /* Wait a bit */
+    udelay(3);
+
+    /* Release the reset (drive it high) */
+    IO_GIO_BITSET0 = 1<<2;
+    
+    udelay(300);
+    
+    IO_GIO_DIR0 |= 1<<3;
+    IO_GIO_INV0 &= ~(1<<3);
+    IO_GIO_IRQPORT |= 1<<3;
+
+    /* Enable the MXX interrupt */
+    IO_INTC_EINT1 |= (1<<8); /* IRQ_GIO3 */
 }
 
-void usb_init_device(void)
-{
-//    ata_enable(true);
+/* This is the initial interupt handler routine for the USB controller */
+void GIO3 (void) {
+    /* Clear the interrupt, this is critical to do before running the full
+     *  handler otherwise you might miss an interrupt and everything will stop
+     *  working.
+     *
+     * The M66591 interrupt line is attached to GPIO3.
+     */
+    IO_INTC_IRQ1 = (1<<8); 
+    
+    /* Start the full handler which is located in the driver */
+    USB_DEVICE();
 }
 
-void usb_enable(bool on)
-{
-    if (on)
-    {
-        USB_VPLUS_PWR_ASSERT;
-    }
-    else
-    {
-        USB_VPLUS_PWR_DEASSERT;
-    }
-}

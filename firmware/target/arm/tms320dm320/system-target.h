@@ -28,4 +28,6 @@
 #define CPUFREQ_NORMAL   87500000
 #define CPUFREQ_MAX     175000000
 
+void udelay(int usec);
+
 #endif /* SYSTEM_TARGET_H */

@@ -25,9 +25,9 @@
 #include "tsc2100.h"
 #include "kernel.h"
 
-unsigned short current_bat2 = 3910;
-unsigned short current_aux = 3910;
-static unsigned short current_voltage = 3910;
+unsigned short current_bat2 = 4200;
+unsigned short current_aux = 4200;
+static unsigned short current_voltage = 4200;
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     3450
@@ -69,7 +69,7 @@ unsigned int battery_adc_voltage(void)
         current_aux=((short)((int)(aux<<10)/4096*6*2.5));
     }
 
-    if (TIME_BEFORE(last_tick+2*HZ, current_tick))
+    if (TIME_BEFORE(last_tick+2*HZ, current_tick) || last_tick==0)
     {
         tsadc=tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS);
         

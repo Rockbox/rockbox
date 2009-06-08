@@ -271,7 +271,9 @@ usbstack/usb_charging_only.c
 #ifdef USB_ENABLE_HID
 usbstack/usb_hid.c
 #endif
-#if CONFIG_USBOTG == USBOTG_ARC
+#if CONFIG_USBOTG == USBOTG_M66591
+drivers/m66591.c
+#elif CONFIG_USBOTG == USBOTG_ARC
 target/arm/usb-drv-arc.c
 #elif CONFIG_USBOTG == USBOTG_ISP1583
 drivers/isp1583.c
