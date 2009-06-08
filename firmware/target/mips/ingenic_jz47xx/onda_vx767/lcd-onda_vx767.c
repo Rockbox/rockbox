@@ -30,10 +30,10 @@
 #define LCD_PCLK    (20000000) /* LCD PCLK */
 
 #define my__gpio_as_lcd_16bit()            \
-do {                        \
-    REG_GPIO_PXFUNS(2) = 0x0014ffff;    \
-    REG_GPIO_PXSELC(2) = 0x0014ffff;    \
-    REG_GPIO_PXPES(2) = 0x0014ffff;        \
+do {                                       \
+    REG_GPIO_PXFUNS(2) = 0x0014ffff;       \
+    REG_GPIO_PXSELC(2) = 0x0014ffff;       \
+    REG_GPIO_PXPES(2)  = 0x0014ffff;       \
 } while (0)
 
 
@@ -53,7 +53,7 @@ static void _display_pin_init(void)
     DELAY; /* delay_ms(10); */
     
     __gpio_set_pin(PIN_RESET_N);
-    DELAY; /* delay_ms(10); */    
+    DELAY; /* delay_ms(10); */
     __gpio_clear_pin(PIN_RESET_N);
     DELAY; /* delay_ms(10); */
     __gpio_set_pin(PIN_RESET_N);
@@ -157,8 +157,6 @@ static void _set_lcd_bus(void)
     REG_SLCD_CFG = (SLCD_CFG_BURST_4_WORD | SLCD_CFG_DWIDTH_18 | SLCD_CFG_CWIDTH_18BIT
                    | SLCD_CFG_CS_ACTIVE_LOW | SLCD_CFG_RS_CMD_LOW | SLCD_CFG_CLK_ACTIVE_FALLING
                    | SLCD_CFG_TYPE_PARALLEL);
-    
-    REG_SLCD_CTRL = SLCD_CTRL_DMA_EN;
 }
 
 static void _set_lcd_clock(void)
