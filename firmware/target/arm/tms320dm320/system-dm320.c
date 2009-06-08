@@ -28,6 +28,7 @@
 #include "spi.h"
 #ifdef CREATIVE_ZVx
 #include "dma-target.h"
+#else
 #include "usb-mr500.h"
 #endif
 
