@@ -12379,3 +12379,17 @@
     touchscreen: "Ponto Absoluto"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Prevenir Pular Faixa"
+  </dest>
+  <voice>
+    *: "Prevenir Pular Faixa"
+  </voice>
+</phrase>
