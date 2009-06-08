@@ -28,6 +28,7 @@
 #include "panic.h"
 #include "as3514.h"
 #include "audiohw.h"
+#include "mmu-arm.h"
 
 #define MAX_TRANSFER (4*((1<<11)-1)) /* maximum data we can transfer via DMA
                                       * i.e. 32 bits at once (size of I2SO_DATA)
@@ -69,6 +70,7 @@ static void play_start_pcm(void)
     CGU_PERI |= CGU_I2SOUT_APB_CLOCK_ENABLE;
     CGU_AUDIO |= (1<<11);
 
+    clean_dcache_range((void*)addr, size);  /* force write back */
     dma_enable_channel(1, (void*)addr, (void*)I2SOUT_DATA, DMA_PERI_I2SOUT,
                 DMAC_FLOWCTRL_DMAC_MEM_TO_PERI, true, false, size >> 2, DMA_S1,
                 dma_callback);
@@ -163,6 +165,15 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
     *count = dma_size >> 2;
     return (const void*)dma_start_addr;
 }
+
+#ifdef HAVE_PCM_DMA_ADDRESS
+void * pcm_dma_addr(void *addr)
+{
+    if (addr != NULL)
+        addr = UNCACHED_ADDR(addr);
+    return addr;
+}
+#endif
 
 
 /****************************************************************************

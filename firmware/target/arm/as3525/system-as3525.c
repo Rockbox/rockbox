@@ -28,6 +28,9 @@
 #include "clock-target.h"
 #include "fmradio_i2c.h"
 #include "button-target.h"
+#ifndef BOOTLOADER
+#include "mmu-arm.h"
+#endif
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -214,6 +217,26 @@ static void sdram_init(void)
 
     MPMC_DYNAMIC_CONFIG_0 |= (1<<19); /* buffer enable */
 }
+#else
+void memory_init(void)
+{
+    ttb_init();
+    /* map every region to itself, uncached */
+    map_section(0, 0, 4096, CACHE_NONE);
+
+    /* IRAM */
+    map_section(0, IRAM_ORIG, 1, CACHE_ALL);
+    map_section(0, UNCACHED_ADDR(IRAM_ORIG), 1, CACHE_NONE);
+
+    /* DRAM */
+    map_section(0x30000000, DRAM_ORIG, MEMORYSIZE, CACHE_ALL);
+    map_section(0x30000000, UNCACHED_ADDR(DRAM_ORIG), MEMORYSIZE, CACHE_NONE);
+
+    /* map 1st mbyte of DRAM at 0x0 to have exception vectors available */
+    map_section(0x30000000, 0, 1, CACHE_ALL);
+
+    enable_mmu();
+}
 #endif
 
 void system_init(void)
@@ -225,6 +248,9 @@ void system_init(void)
     while(reset_loops--)
         CCU_SRL = CCU_SRL_MAGIC_NUMBER;
     CCU_SRC = CCU_SRL = 0;
+
+    CCU_SCON = 1; /* AHB master's priority configuration :
+                     TIC (Test Interface Controller) > DMA > USB > IDE > ARM */
 
     CGU_PROC = 0;           /* fclk 24 MHz */
     CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
@@ -244,10 +270,8 @@ void system_init(void)
 
     asm volatile(
         "mov r0, #0               \n"
-        "mcr p15, 0, r0, c7, c7   \n"      /* invalidate icache & dcache */
         "mrc p15, 0, r0, c1, c0   \n"      /* control register */
-        "bic r0, r0, #3<<30       \n"      /* clears bus bits & sets fastbus */
-        "orr r0, r0, #1<<12       \n"      /* enable icache */
+        "bic r0, r0, #3<<30       \n"      /* clears bus bits : sets fastbus */
         "mcr p15, 0, r0, c1, c0   \n"
         : : : "r0" );
 

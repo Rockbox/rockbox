@@ -259,7 +259,7 @@ arm7tdmicc () {
 arm9tdmicc () {
  prefixtools arm-elf-
  GCCOPTS="$CCOPTS -mcpu=arm9tdmi"
- if test "$modelname" != "gigabeatf"; then
+ if test "$modelname" != "gigabeatf" -a "$t_manufacturer" != "as3525"; then
   GCCOPTS="$GCCOPTS -mlong-calls"
  fi
  GCCOPTIMIZE="-fomit-frame-pointer"
@@ -1734,7 +1734,6 @@ fi
     modelname="clip"
     target="-DSANSA_CLIP"
     memory=2
-    arm9tdmicc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"
     tool="$rootdir/tools/scramble -add=clip"
@@ -1747,6 +1746,7 @@ fi
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-clip"
+    arm9tdmicc
     ;;
 
 
@@ -1755,7 +1755,6 @@ fi
     modelname="e200v2"
     target="-DSANSA_E200V2"
     memory=8
-    arm9tdmicc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     tool="$rootdir/tools/scramble -add=e2v2"
@@ -1768,6 +1767,7 @@ fi
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-e200v2"
+    arm9tdmicc
     ;;
 
 
@@ -1776,7 +1776,6 @@ fi
     modelname="m200v4"
     target="-DSANSA_M200V4"
     memory=2
-    arm9tdmicc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"
     tool="$rootdir/tools/scramble -add=m2v4"
@@ -1789,6 +1788,7 @@ fi
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-m200v4"
+    arm9tdmicc
     ;;
 
 
@@ -1797,7 +1797,6 @@ fi
     modelname="fuze"
     target="-DSANSA_FUZE"
     memory=8
-    arm9tdmicc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     tool="$rootdir/tools/scramble -add=fuze"
@@ -1810,6 +1809,7 @@ fi
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-fuze"
+    arm9tdmicc
     ;;
 
 
@@ -1818,7 +1818,6 @@ fi
     modelname="c200v2"
     target="-DSANSA_C200V2"
     memory=2 # as per OF diagnosis mode
-    arm9tdmicc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     tool="$rootdir/tools/scramble -add=c2v2"
@@ -1834,6 +1833,7 @@ fi
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-c200v2"
+    arm9tdmicc
     ;;
 
    60|Clipv2|clipv2)

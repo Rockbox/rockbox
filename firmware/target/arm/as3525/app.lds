@@ -55,6 +55,12 @@ SECTIONS
 {
     loadaddress = DRAM_ORIG;
 
+    .vectors :
+    {
+        _vectors_start = .;
+        *(.init.text)
+    } > DRAM
+
     .text :
     {
         _loadaddress = .;
@@ -82,14 +88,6 @@ SECTIONS
     {
         *(.eh_frame)
     }
-
-    .vectors IRAMORIG:
-    {
-        _vectors_start = .;
-        *(.init.text)
-    } > IRAM AT > DRAM
-
-    _vectorscopy = LOADADDR(.vectors);
 
     .iram :
     {

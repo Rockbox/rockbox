@@ -27,9 +27,11 @@
 /* we put the codec buffer in IRAM */
 #define AMS_LOWMEM
 #endif
-/* these addresses are valid after mapping through the MMU */
+
+/* Virtual addresses */
+/* Do not apply to the bootloader, which uses physical addresses (no MMU) */
 #define DRAM_ORIG 0x30000000
-#define IRAM_ORIG 0x0
+#define IRAM_ORIG (DRAM_ORIG + DRAM_SIZE) /* IRAM is mapped just next to DRAM */
 
 #define DRAM_SIZE (MEMORYSIZE * 0x100000)
 #define IRAM_SIZE 0x50000
@@ -40,8 +42,7 @@
 #define ECCBYTES 3
 
 /* AS352X MMU Page Table Entries */
-/* to be implemented */
-#define TTB_SIZE                  0x0
+#define TTB_SIZE                  0x4000
 #define TTB_BASE_ADDR             (DRAM_ORIG + DRAM_SIZE - TTB_SIZE)
 
 
@@ -492,5 +493,8 @@ interface */
 #define I2SOUT_STATUS       (*(volatile unsigned char*)(I2SOUT_BASE+0x0C))
 #define I2SOUT_CLEAR        (*(volatile unsigned char*)(I2SOUT_BASE+0x10))
 #define I2SOUT_DATA         (volatile unsigned long*)(I2SOUT_BASE+0x14)
+
+/* PCM addresses for obtaining buffers will be what DMA is using (physical) */
+#define HAVE_PCM_DMA_ADDRESS
 
 #endif /*__AS3525_H__*/

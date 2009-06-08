@@ -58,16 +58,8 @@ newstart:
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
 
 #if CONFIG_CPU==AS3525 && !defined(BOOTLOADER)
-
-    /* relocate vectors */
-    mov     r1, #0              @ destination
-    ldr     r2, =_vectorscopy   @ source
-    ldr     r3, =_vectorsend    @ end
-
-1:  ldr     r0, [r2], #4
-    str     r0, [r1], #4
-    cmp     r1, r3
-    bne     1b
+    /* Setup MMU : has to be done before accessing IRAM ! */
+    bl      memory_init
 
     /* Zero out IBSS */
     ldr     r2, =_iedata

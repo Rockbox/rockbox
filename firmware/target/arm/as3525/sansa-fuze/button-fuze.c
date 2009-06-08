@@ -150,7 +150,7 @@ bool button_hold(void)
 
 static void button_delay(void)
 {
-    int i = 24;
+    int i = 50;
     while(i--) asm volatile ("nop\n");
 }
 

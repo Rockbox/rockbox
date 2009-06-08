@@ -46,8 +46,9 @@ int button_read_device(void)
 
     /* This is a keypad using C4-C6 as columns and B0-B2 as rows */
     GPIOC_PIN(4) = (1<<4);
+    asm volatile("nop\nnop\nnop\nnop\nnop\n"); /* small delay */
 
-    /* C4B0 is unused */
+    (void)GPIOB_PIN(0); /* C4B0 is unused */
 
     if (GPIOB_PIN(1))
         result |= BUTTON_VOL_UP;
@@ -58,6 +59,7 @@ int button_read_device(void)
     GPIOC_PIN(4) = 0x00;
 
     GPIOC_PIN(5) = (1<<5);
+    asm volatile("nop\nnop\nnop\nnop\nnop\n"); /* small delay */
 
     if (GPIOB_PIN(0))
         result |= BUTTON_LEFT;
@@ -71,6 +73,7 @@ int button_read_device(void)
     GPIOC_PIN(5) = 0x00;
 
     GPIOC_PIN(6) = (1<<6);
+    asm volatile("nop\nnop\nnop\nnop\nnop\n"); /* small delay */
 
     if (GPIOB_PIN(0))
         result |= BUTTON_DOWN;

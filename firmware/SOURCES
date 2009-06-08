@@ -374,6 +374,7 @@ target/arm/as3525/usb-as3525.c
 target/arm/as3525/dma-pl081.c
 target/arm/as3525/ascodec-as3525.c
 #ifndef BOOTLOADER
+target/arm/mmu-arm.S
 drivers/generic_i2c.c
 target/arm/adc-as3514.c
 target/arm/as3525/audio-as3525.c

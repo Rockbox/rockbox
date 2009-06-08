@@ -595,7 +595,7 @@ static int sd_select_bank(signed char bank)
     dma_enable_channel(0, card_data, MCI_FIFO(INTERNAL_AS3525), DMA_PERI_SD,
         DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
 
-    MCI_DATA_TIMER(INTERNAL_AS3525) = 0x1000000; /* FIXME: arbitrary */
+    MCI_DATA_TIMER(INTERNAL_AS3525) = 0xffffffff;/* FIXME: arbitrary */
     MCI_DATA_LENGTH(INTERNAL_AS3525) = 512;
     MCI_DATA_CTRL(INTERNAL_AS3525) =  (1<<0) /* enable */   |
                             (0<<1) /* transfer direction */ |
@@ -618,7 +618,8 @@ static int sd_select_bank(signed char bank)
 }
 
 #define UNALIGNED_NUM_SECTORS 10
-static int32_t aligned_buffer[UNALIGNED_NUM_SECTORS* (SECTOR_SIZE / 4)];
+static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SECTOR_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
+static unsigned char *uncached_buffer = UNCACHED_ADDR(aligned_buffer);
 
 static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
                                int count, void* buf, const bool write)
@@ -627,7 +628,6 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
     const int drive = 0;
 #endif
     int ret = 0;
-    bool unaligned_transfer = (int)buf & 3;
 
     /* skip SanDisk OF */
     if (drive == INTERNAL_AS3525)
@@ -693,16 +693,11 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
                 transfer = BLOCKS_PER_BANK - bank_start;
         }
 
-        if(unaligned_transfer)
-        {
-            dma_buf = aligned_buffer;
-            if(transfer > UNALIGNED_NUM_SECTORS)
-                transfer = UNALIGNED_NUM_SECTORS;
-            if(write)
-                memcpy(aligned_buffer, buf, transfer * SECTOR_SIZE);
-        }
-        else    /* Aligned transfers are faster : no memcpy */
-            dma_buf = buf;
+        dma_buf = aligned_buffer;
+        if(transfer > UNALIGNED_NUM_SECTORS)
+            transfer = UNALIGNED_NUM_SECTORS;
+        if(write)
+            memcpy(uncached_buffer, buf, transfer * SECTOR_SIZE);
 
         /* Set bank_start to the correct unit (blocks or bytes) */
         if(!(card_info[drive].ocr & (1<<30)))   /* not SDHC */
@@ -734,8 +729,8 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
         if(!retry)
         {
-            if(unaligned_transfer && !write)
-                memcpy(buf, aligned_buffer, transfer * SECTOR_SIZE);
+            if(!write)
+                memcpy(buf, uncached_buffer, transfer * SECTOR_SIZE);
             buf += transfer * SECTOR_SIZE;
             start += transfer;
             count -= transfer;

@@ -36,6 +36,8 @@
 #include "power.h"
 
 int show_logo(void);
+
+void main(void) __attribute__((naked, noreturn));
 void main(void)
 {
     unsigned char* loadbuffer;
