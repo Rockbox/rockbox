@@ -263,13 +263,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Ano"
     h100,h120,h300: "NAVI = Ano"
-    ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Ano"
+    yh*,ipod*,x5,m5,gigabeat*,e200*,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Ano"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
