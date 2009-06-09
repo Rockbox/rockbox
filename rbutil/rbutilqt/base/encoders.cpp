@@ -79,20 +79,22 @@ QStringList EncBase::getEncoderList()
 EncExes::EncExes(QString name,QObject *parent) : EncBase(parent)
 {
     m_name = name;
-    
+
     m_TemplateMap["lame"] = "\"%exe\" %options \"%input\" \"%output\"";
-      
+
 }
 
-    
+
 
 void EncExes::generateSettings()
 {
     QString exepath =RbSettings::subValue(m_name,RbSettings::EncoderPath).toString();
     if(exepath == "") exepath = findExecutable(m_name);
-    
-    insertSetting(eEXEPATH,new EncTtsSetting(this,EncTtsSetting::eSTRING,"Path to Encoder:",exepath,EncTtsSetting::eBROWSEBTN));
-    insertSetting(eEXEOPTIONS,new EncTtsSetting(this,EncTtsSetting::eSTRING,"Encoder options:",RbSettings::subValue(m_name,RbSettings::EncoderOptions)));
+
+    insertSetting(eEXEPATH,new EncTtsSetting(this,EncTtsSetting::eSTRING,
+            tr("Path to Encoder:"),exepath,EncTtsSetting::eBROWSEBTN));
+    insertSetting(eEXEOPTIONS,new EncTtsSetting(this,EncTtsSetting::eSTRING,
+            tr("Encoder options:"),RbSettings::subValue(m_name,RbSettings::EncoderOptions)));
 }
 
 void EncExes::saveSettings()
@@ -106,7 +108,7 @@ bool EncExes::start()
 {
     m_EncExec = RbSettings::subValue(m_name, RbSettings::EncoderPath).toString();
     m_EncOpts = RbSettings::subValue(m_name, RbSettings::EncoderOptions).toString();
-    
+
     m_EncTemplate = m_TemplateMap.value(m_name);
 
     QFileInfo enc(m_EncExec);
@@ -138,10 +140,10 @@ bool EncExes::encode(QString input,QString output)
 bool EncExes::configOk()
 {
     QString path = RbSettings::subValue(m_name, RbSettings::EncoderPath).toString();
-    
+
     if (QFileInfo(path).exists())
         return true;
-  
+
     return false;
 }
 
@@ -150,46 +152,54 @@ bool EncExes::configOk()
 **********************************************************************/
 EncRbSpeex::EncRbSpeex(QObject *parent) : EncBase(parent)
 {
-   
+
 }
 
 void EncRbSpeex::generateSettings()
 {
-    insertSetting(eVOLUME,new EncTtsSetting(this,EncTtsSetting::eDOUBLE,"Volume:",RbSettings::subValue("rbspeex",RbSettings::EncoderVolume),1.0,10.0));
-    insertSetting(eQUALITY,new EncTtsSetting(this,EncTtsSetting::eDOUBLE,"Quality:",RbSettings::subValue("rbspeex",RbSettings::EncoderQuality),0,10.0));
-    insertSetting(eCOMPLEXITY,new EncTtsSetting(this,EncTtsSetting::eINT,"Complexity:",RbSettings::subValue("rbspeex",RbSettings::EncoderComplexity),0,10));
-    insertSetting(eNARROWBAND,new EncTtsSetting(this,EncTtsSetting::eBOOL,"Use Narrowband:",RbSettings::subValue("rbspeex",RbSettings::EncoderNarrowBand)));    
+    insertSetting(eVOLUME,new EncTtsSetting(this,EncTtsSetting::eDOUBLE,
+        tr("Volume:"),RbSettings::subValue("rbspeex",RbSettings::EncoderVolume),1.0,10.0));
+    insertSetting(eQUALITY,new EncTtsSetting(this,EncTtsSetting::eDOUBLE,
+        tr("Quality:"),RbSettings::subValue("rbspeex",RbSettings::EncoderQuality),0,10.0));
+    insertSetting(eCOMPLEXITY,new EncTtsSetting(this,EncTtsSetting::eINT,
+        tr("Complexity:"),RbSettings::subValue("rbspeex",RbSettings::EncoderComplexity),0,10));
+    insertSetting(eNARROWBAND,new EncTtsSetting(this,EncTtsSetting::eBOOL,
+        tr("Use Narrowband:"),RbSettings::subValue("rbspeex",RbSettings::EncoderNarrowBand)));
 }
 
 void EncRbSpeex::saveSettings()
 {
     //save settings in user config
-    RbSettings::setSubValue("rbspeex",RbSettings::EncoderVolume,getSetting(eVOLUME)->current().toDouble());
-    RbSettings::setSubValue("rbspeex",RbSettings::EncoderQuality,getSetting(eQUALITY)->current().toDouble());
-    RbSettings::setSubValue("rbspeex",RbSettings::EncoderComplexity,getSetting(eCOMPLEXITY)->current().toInt());
-    RbSettings::setSubValue("rbspeex",RbSettings::EncoderNarrowBand,getSetting(eNARROWBAND)->current().toBool());
-    
+    RbSettings::setSubValue("rbspeex",RbSettings::EncoderVolume,
+                            getSetting(eVOLUME)->current().toDouble());
+    RbSettings::setSubValue("rbspeex",RbSettings::EncoderQuality,
+                            getSetting(eQUALITY)->current().toDouble());
+    RbSettings::setSubValue("rbspeex",RbSettings::EncoderComplexity,
+                            getSetting(eCOMPLEXITY)->current().toInt());
+    RbSettings::setSubValue("rbspeex",RbSettings::EncoderNarrowBand,
+                            getSetting(eNARROWBAND)->current().toBool());
+
     RbSettings::sync();
 }
 
 bool EncRbSpeex::start()
 {
-   
+
     // try to get config from settings
     quality = RbSettings::subValue("rbspeex", RbSettings::EncoderQuality).toDouble();
     complexity = RbSettings::subValue("rbspeex", RbSettings::EncoderComplexity).toInt();
     volume = RbSettings::subValue("rbspeex", RbSettings::EncoderVolume).toDouble();
     narrowband = RbSettings::subValue("rbspeex", RbSettings::EncoderNarrowBand).toBool();
-   
+
 
     return true;
 }
 
 bool EncRbSpeex::encode(QString input,QString output)
 {
-    qDebug() << "encoding " << input << " to "<< output;  
+    qDebug() << "encoding " << input << " to "<< output;
     char errstr[512];
-    
+
     FILE *fin,*fout;
     if ((fin = fopen(input.toLocal8Bit(), "rb")) == NULL) {
         qDebug() << "Error: could not open input file\n";
@@ -219,16 +229,16 @@ bool EncRbSpeex::configOk()
 {
     bool result=true;
     // check config
-    
+
     if(RbSettings::subValue("rbspeex", RbSettings::EncoderVolume).toDouble() <= 0)
         result =false;
-    
+
     if(RbSettings::subValue("rbspeex", RbSettings::EncoderQuality).toDouble() <= 0)
         result =false;
-        
+
     if(RbSettings::subValue("rbspeex", RbSettings::EncoderComplexity).toInt() <= 0)
         result =false;
-       
+
     return result;
 }
 
