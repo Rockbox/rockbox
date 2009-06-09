@@ -134,152 +134,157 @@
 <context>
     <name>BootloaderInstallHex</name>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="55"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="58"/>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (hex file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>ブートローダのインストールには、オリジナルのファームウェアを用意する必要があります(hex 形式)。法律上の問題のため、ファームウェアは、あなたがダウンロードする必要があります。&lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; および、どの様に、ファームウェアファイルを取得したらよいかに関した Wiki ページ&lt;a href=&apos;http://www.rockbox.org/twiki/bin/view/Main/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt;を参考にして下さい。&lt;br&gt;続行するために、OKボタンを押し、ファームウェアファイルを参照して下さい。</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallhex.cpp" line="68"/>
         <source>checking MD5 hash of input file ...</source>
         <translation>入力ファイルのMD5ハッシュ値をチェックしています...</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="66"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="79"/>
         <source>Could not verify original firmware file</source>
         <translation>オリジナルのファームウェアファイルの確認ができませんでした</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="81"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="94"/>
         <source>Firmware file not recognized.</source>
         <translation>ファームウェアファイルが認識されません。</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="85"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="98"/>
         <source>MD5 hash ok</source>
         <translation>MD5ハッシュ値ok</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="92"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="105"/>
         <source>Firmware file doesn&apos;t match selected player.</source>
         <translation>ファームウェアファイルは、選択されたプレイヤーに適合しません。</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="97"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="110"/>
         <source>Descrambling file</source>
         <translation>ファイルを復号しています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="105"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="118"/>
         <source>Error in descramble: %1</source>
         <translation>ファームウェアの復号処理時にエラーが発生しました: %1</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="110"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="123"/>
         <source>Downloading bootloader file</source>
         <translation>ブートローダをダウンロードしています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="120"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="133"/>
         <source>Adding bootloader to firmware file</source>
         <translation>ファームウェアファイルにブートローダを追加しています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="158"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="171"/>
         <source>could not open input file</source>
         <translation>入力ファイルを開くことができませんでした</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="159"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="172"/>
         <source>reading header failed</source>
         <translation>ヘッダの読み込みに失敗しました</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="160"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="173"/>
         <source>reading firmware failed</source>
         <translation>ファームウェアの読み込みに失敗しました</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="161"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="174"/>
         <source>can&apos;t open bootloader file</source>
         <translation>ブートローダが読み込めません</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="162"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="175"/>
         <source>reading bootloader file failed</source>
         <translation>ブートローダの読み込みに失敗しました</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="163"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="176"/>
         <source>can&apos;t open output file</source>
         <translation>出力ファイルが読み込めません</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="164"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="177"/>
         <source>writing output file failed</source>
         <translation>出力ファイルの出力に失敗しました</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="166"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="179"/>
         <source>Error in patching: %1</source>
         <translation>ファームウェアの変更時にエラーが発生しました: %1</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="177"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="190"/>
         <source>Error in scramble: %1</source>
         <translation>ファームウェアの暗号化処理に失敗しました: %1</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="192"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="205"/>
         <source>Checking modified firmware file</source>
         <translation>変更されたファームウェアをチェックしています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="194"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="207"/>
         <source>Error: modified file checksum wrong</source>
         <translation>エラー: 変更されたファームウェアのチェックサムの値が間違っています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="202"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="215"/>
         <source>Success: modified firmware file created</source>
         <translation>成功: 変更されたファームウェアが作成されました</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="233"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="246"/>
         <source>Can&apos;t open input file</source>
         <translation>入力ファイルをオープンすることができません</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="234"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="247"/>
         <source>Can&apos;t open output file</source>
         <translation>出力ファイルを開くことができません</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="235"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="248"/>
         <source>invalid file: header length wrong</source>
         <translation>不正なファイル: ヘッダの長さが間違っています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="236"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="249"/>
         <source>invalid file: unrecognized header</source>
         <translation>不正なファイル: ヘッダが正しくありません</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="237"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="250"/>
         <source>invalid file: &quot;length&quot; field wrong</source>
         <translation>不正なファイル: &quot;length&quot; の値が間違っています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="238"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="251"/>
         <source>invalid file: &quot;length2&quot; field wrong</source>
         <translation>不正なファイル: &quot;length2&quot; の値が間違っています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="239"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="252"/>
         <source>invalid file: internal checksum error</source>
         <translation>不正なファイル: ファームウェアに書かれたチェックサムの値が間違っています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="240"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="253"/>
         <source>invalid file: &quot;length3&quot; field wrong</source>
         <translation>不正なファイル: &quot;length3&quot; の値が間違っています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhex.cpp" line="241"/>
+        <location filename="../base/bootloaderinstallhex.cpp" line="254"/>
         <source>unknown</source>
         <translation>不明</translation>
     </message>
@@ -287,96 +292,96 @@
 <context>
     <name>BootloaderInstallIpod</name>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="46"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="54"/>
         <source>Error: can&apos;t allocate buffer memory!</source>
         <translation>エラー: メモリの割り当てに失敗しました!</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="56"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="64"/>
         <source>No Ipod detected
 Permission for disc access denied!</source>
         <translation>iPod が検出されませんでした
 このプレイヤーに対するディスクアクセスの権限がありません!</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="62"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="70"/>
         <source>No Ipod detected!</source>
         <translation>iPodが検出されませんでした!</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="108"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="116"/>
         <source>Warning: This is a MacPod, Rockbox only runs on WinPods.
 See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation>注意: Macintosh 専用の iPod です。Rockbox は、Windows で使用できる iPod でしか動作しません。
 http://www.rockbox.org/wiki/IpodConversionToFAT32 を参照して下さい</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="73"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="81"/>
         <source>Downloading bootloader file</source>
         <translation>ブートローダをダウンロードしています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="153"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="161"/>
         <source>Failed to read firmware directory</source>
         <translation>ファームウェアのあるディレクトリの読み込みに失敗しました</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="158"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="166"/>
         <source>Unknown version number in firmware (%1)</source>
         <translation>ファームウェアのバージョン(%1)が不明です</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="165"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="173"/>
         <source>Could not open Ipod in R/W mode</source>
         <translation>iPod に読み書きできるようにアクセスすることができませんでした</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="123"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="131"/>
         <source>Successfull added bootloader</source>
         <translation>ブートローダの追加が成功しました</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="130"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="138"/>
         <source>Failed to add bootloader</source>
         <translation>ブートローダの追加に失敗しました</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="171"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="179"/>
         <source>No bootloader detected.</source>
         <translation>ブートローダが検出されませんでした。</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="224"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="252"/>
         <source>Could not open Ipod</source>
         <translation>iPod にアクセスできませんでした</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="229"/>
-        <source>Could not read partition table</source>
-        <translation>パーティションテーブルを読み込めませんでした</translation>
+        <location filename="../base/bootloaderinstallipod.cpp" line="257"/>
+        <source>Error reading partition table - possibly not an Ipod</source>
+        <translation>パーティションテーブルの読み込みのエラー - iPod ではない可能性があります</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="234"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="263"/>
         <source>No firmware partition on disk</source>
         <translation>ファームウェアが存在しません</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="177"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="185"/>
         <source>Successfully removed bootloader</source>
         <translation>ブートローダの削除が成功しました</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="184"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="192"/>
         <source>Removing bootloader failed.</source>
         <translation>ブートローダの削除に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="85"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="93"/>
         <source>Installing Rockbox bootloader</source>
         <translation>Rockboxのブートローダをインストールしています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="142"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="150"/>
         <source>Uninstalling bootloader</source>
         <translation>ブートローダをアンインストールしています</translation>
     </message>
@@ -427,49 +432,34 @@ http://www.rockbox.org/wiki/IpodConversionToFAT32 を参照して下さい</tran
 <context>
     <name>BootloaderInstallSansa</name>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="48"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="56"/>
         <source>Error: can&apos;t allocate buffer memory!</source>
         <translation>エラー: メモリの割り当てに失敗しました!</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="53"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="61"/>
         <source>Searching for Sansa</source>
         <translation>Sansa を探しています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="60"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="68"/>
         <source>Permission for disc access denied!
 This is required to install the bootloader</source>
         <translation>このプレイヤーに対するディスクアクセスの権限がありません!
 ブートローダのインストールには、ディスクアクセスの権限が必要です</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="66"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="74"/>
         <source>No Sansa detected!</source>
         <translation>Sansa が検出されませんでした!</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="70"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="78"/>
         <source>Downloading bootloader file</source>
         <translation>ブートローダをダウンロードしています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="89"/>
-        <source>could not open Sansa</source>
-        <translation>Sansa にアクセスできませんでした</translation>
-    </message>
-    <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="96"/>
-        <source>could not read partitiontable</source>
-        <translation>パーティションテーブルを読み込めませんでした</translation>
-    </message>
-    <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="104"/>
-        <source>Disk is not a Sansa (Error: %1), aborting.</source>
-        <translation>Sansa にディスクが見つかりませんでした (エラー: %1)。処理を中止します。</translation>
-    </message>
-    <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="201"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="171"/>
         <source>OLD ROCKBOX INSTALLATION DETECTED, ABORTING.
 You must reinstall the original Sansa firmware before running
 sansapatcher for the first time.
@@ -482,69 +472,69 @@ http://www.rockbox.org/wiki/SansaE200Install を参照して下さい
 </translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="208"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="178"/>
         <source>Could not open Sansa in R/W mode</source>
         <translation>Sansa に読み書きできるようにアクセスすることができませんでした</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="147"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="137"/>
         <source>Successfully installed bootloader</source>
         <translation>ブートローダのインストールに成功しました</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="154"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="144"/>
         <source>Failed to install bootloader</source>
         <translation>ブートローダのインストールに失敗しました</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="173"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="236"/>
         <source>Can&apos;t find Sansa</source>
         <translation>Sansa が見つかりませんでした</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="179"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="241"/>
         <source>Could not open Sansa</source>
         <translation>Sansa にアクセスできませんでした</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="185"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="246"/>
         <source>Could not read partition table</source>
         <translation>パーティションテーブルを読み込めませんでした</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="192"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="253"/>
         <source>Disk is not a Sansa (Error %1), aborting.</source>
         <translation>Sansa にディスクが見つかりませんでした (エラー: %1)。処理を中止します。</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="214"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="184"/>
         <source>Successfully removed bootloader</source>
         <translation>ブートローダの削除が成功しました</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="221"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="191"/>
         <source>Removing bootloader failed.</source>
         <translation>ブートローダの削除に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="85"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="92"/>
         <source>Installing Rockbox bootloader</source>
         <translation>Rockboxのブートローダをインストールしています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="169"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="159"/>
         <source>Uninstalling bootloader</source>
         <translation>ブートローダをアンインストールしています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="129"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="119"/>
         <source>Checking downloaded bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>ダウンロードしたブートローダをチェックしています</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="137"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="127"/>
         <source>Bootloader mismatch! Aborting.</source>
-        <translation type="unfinished"></translation>
+        <translation>ブートローダが正しくありません! 処理を中止します。</translation>
     </message>
 </context>
 <context>
@@ -573,150 +563,150 @@ http://www.rockbox.org/wiki/SansaE200Install を参照して下さい
 <context>
     <name>Config</name>
     <message>
-        <location filename="../configure.cpp" line="117"/>
+        <location filename="../configure.cpp" line="119"/>
         <source>Language changed</source>
         <translation>表示言語の変更</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="118"/>
+        <location filename="../configure.cpp" line="120"/>
         <source>You need to restart the application for the changed language to take effect.</source>
         <translation>表示言語を変更するには、Rockbox Utilityを再起動する必要があります。</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="269"/>
+        <location filename="../configure.cpp" line="265"/>
         <source>Current cache size is %L1 kiB.</source>
         <translation>現在のキャッシュサイズは、%L1 kiB です。</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="391"/>
+        <location filename="../configure.cpp" line="384"/>
         <source>Configuration OK</source>
         <translation>設定OK</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="396"/>
+        <location filename="../configure.cpp" line="389"/>
         <source>Configuration INVALID</source>
         <translation>不正な設定</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="495"/>
+        <location filename="../configure.cpp" line="488"/>
         <source>Select your device</source>
         <translation>デバイスを選択して下さい</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="587"/>
+        <location filename="../configure.cpp" line="579"/>
         <source>Sansa e200 in MTP mode found!
 You need to change your player to MSC mode for installation. </source>
         <translation>MTP モードの Sansa e200 が見つかりました。
 インストールするためには、MSC モードに変更する必要があります。 </translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="590"/>
+        <location filename="../configure.cpp" line="582"/>
         <source>H10 20GB in MTP mode found!
 You need to change your player to UMS mode for installation. </source>
         <translation>MTP モードの H10 20GB が見つかりました。
 インストールするためには、UMS モードに変更する必要があります。 </translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="591"/>
+        <location filename="../configure.cpp" line="583"/>
         <source>Unless you changed this installation will fail!</source>
         <translation>設定を変更しないと、インストールに失敗するでしょう!</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="593"/>
+        <location filename="../configure.cpp" line="585"/>
         <source>Fatal error</source>
         <translation>致命的なエラー</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="602"/>
+        <location filename="../configure.cpp" line="595"/>
         <source>Detected an unsupported %1 player variant. Sorry, Rockbox doesn&apos;t run on your player.</source>
         <translation>サポートされていないプレイヤー %1 が見つかりました。Rockbox は、このプレイヤーで動かすことができません。</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="604"/>
+        <location filename="../configure.cpp" line="597"/>
         <source>Fatal error: incompatible player found</source>
         <translation>致命的なエラー: 互換性のないプレイヤーが見つかりました</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="624"/>
+        <location filename="../configure.cpp" line="617"/>
         <source>Autodetection</source>
         <translation>自動検出</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="617"/>
+        <location filename="../configure.cpp" line="610"/>
         <source>Could not detect a Mountpoint.
 Select your Mountpoint manually.</source>
         <translation>マウントポイントが検出できませんでした。
 マウントポイントを手動で選択して下さい。</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="626"/>
+        <location filename="../configure.cpp" line="619"/>
         <source>Could not detect a device.
 Select your device and Mountpoint manually.</source>
         <translation>デバイスが検出できませんでした。
 デバイスおよびマウントポイントを手動で選択して下さい。</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="635"/>
+        <location filename="../configure.cpp" line="628"/>
         <source>Really delete cache?</source>
         <translation>本当にキャッシュを削除していいですか?</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="638"/>
+        <location filename="../configure.cpp" line="631"/>
         <source>Do you really want to delete the cache? Make absolutely sure this setting is correct as it will remove &lt;b&gt;all&lt;/b&gt; files in this folder!</source>
         <translation>本当にキャッシュを削除しますか?  このフォルダに含まれる&lt;b&gt;全ての&lt;/b&gt;ファイルを削除しますので、絶対に正しい値を設定して下さい!</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="644"/>
+        <location filename="../configure.cpp" line="637"/>
         <source>Path wrong!</source>
         <translation>パスが間違っています!</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="645"/>
+        <location filename="../configure.cpp" line="638"/>
         <source>The cache path is invalid. Aborting.</source>
         <translation>キャッシュのパスが不正です。処理を中止します。</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="94"/>
+        <location filename="../configure.cpp" line="96"/>
         <source>The following errors occurred:</source>
         <translation>以下のエラーが発生しました:</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="125"/>
+        <location filename="../configure.cpp" line="127"/>
         <source>No mountpoint given</source>
         <translation>マウントポイントが入力されていません</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="129"/>
+        <location filename="../configure.cpp" line="131"/>
         <source>Mountpoint does not exist</source>
         <translation>マウントポイントが存在しません</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="133"/>
+        <location filename="../configure.cpp" line="135"/>
         <source>Mountpoint is not a directory.</source>
         <translation>マウントポイントがフォルダではありません。</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="137"/>
+        <location filename="../configure.cpp" line="139"/>
         <source>Mountpoint is not writeable</source>
         <translation>マウントポイントが書き込み禁止です</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="151"/>
+        <location filename="../configure.cpp" line="153"/>
         <source>No player selected</source>
         <translation>プレイヤーが選択されていません</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="159"/>
+        <location filename="../configure.cpp" line="161"/>
         <source>Cache path not writeable. Leave path empty to default to systems temporary path.</source>
         <translation>キャッシュのパスが書き込み禁止です。デフォルトのシステムテンポラリパスを空にします。</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="177"/>
+        <location filename="../configure.cpp" line="179"/>
         <source>You need to fix the above errors before you can continue.</source>
         <translation>処理を続行する前に、上記のエラーを修正する必要があります。</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="180"/>
+        <location filename="../configure.cpp" line="182"/>
         <source>Configuration error</source>
         <translation>設定エラー</translation>
     </message>
@@ -922,7 +912,7 @@ Select your device and Mountpoint manually.</source>
 <context>
     <name>Configure</name>
     <message>
-        <location filename="../configure.cpp" line="479"/>
+        <location filename="../configure.cpp" line="472"/>
         <source>English</source>
         <comment>This is the localized language name, i.e. your language.</comment>
         <translation>日本語</translation>
@@ -979,57 +969,83 @@ Select your device and Mountpoint manually.</source>
 <context>
     <name>CreateVoiceWindow</name>
     <message>
-        <location filename="../createvoicewindow.cpp" line="108"/>
+        <location filename="../createvoicewindow.cpp" line="97"/>
         <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>TTSエンジンの選択: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../createvoicewindow.cpp" line="124"/>
+        <location filename="../createvoicewindow.cpp" line="112"/>
         <source>Selected encoder: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>エンコーダの選択: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
 </context>
 <context>
-    <name>EncExesCfgFrm</name>
+    <name>EncExes</name>
     <message>
-        <location filename="../encexescfgfrm.ui" line="13"/>
-        <source>Configuration</source>
-        <translation>設定</translation>
+        <location filename="../base/encoders.cpp" line="95"/>
+        <source>Path to Encoder:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../encexescfgfrm.ui" line="19"/>
-        <source>Configure Encoder</source>
-        <translation>エンコーダの設定</translation>
+        <location filename="../base/encoders.cpp" line="97"/>
+        <source>Encoder options:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EncRbSpeex</name>
+    <message>
+        <location filename="../base/encoders.cpp" line="161"/>
+        <source>Volume:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../encexescfgfrm.ui" line="31"/>
-        <source>Path to Encoder</source>
-        <translation>エンコーダパス</translation>
+        <location filename="../base/encoders.cpp" line="163"/>
+        <source>Quality:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../encexescfgfrm.ui" line="43"/>
-        <source>&amp;Browse</source>
-        <translation>参照(&amp;B)</translation>
+        <location filename="../base/encoders.cpp" line="165"/>
+        <source>Complexity:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../encexescfgfrm.ui" line="52"/>
-        <source>Encoder options</source>
-        <translation>エンコーダオプション</translation>
+        <location filename="../base/encoders.cpp" line="167"/>
+        <source>Use Narrowband:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EncTtsCfgGui</name>
+    <message>
+        <location filename="../encttscfggui.cpp" line="32"/>
+        <source>Waiting for engine...</source>
+        <translation>エンコードエンジンを待っています...</translation>
     </message>
     <message>
-        <location filename="../encexescfgfrm.ui" line="77"/>
-        <source>Reset</source>
-        <translation>リセット</translation>
+        <location filename="../encttscfggui.cpp" line="67"/>
+        <source>Ok</source>
+        <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../encexescfgfrm.ui" line="97"/>
-        <source>&amp;Ok</source>
-        <translation>Ok(&amp;O)</translation>
+        <location filename="../encttscfggui.cpp" line="70"/>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
     </message>
     <message>
-        <location filename="../encexescfgfrm.ui" line="107"/>
-        <source>&amp;Cancel</source>
-        <translation>キャンセル(&amp;C)</translation>
+        <location filename="../encttscfggui.cpp" line="173"/>
+        <source>Browse</source>
+        <translation>参照</translation>
+    </message>
+    <message>
+        <location filename="../encttscfggui.cpp" line="181"/>
+        <source>Refresh</source>
+        <translation>リフレッシュ</translation>
+    </message>
+    <message>
+        <location filename="../encttscfggui.cpp" line="353"/>
+        <source>Select excutable</source>
+        <translation>実行可能の選択</translation>
     </message>
 </context>
 <context>
@@ -1037,7 +1053,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../install.cpp" line="98"/>
         <source>Mount point is wrong!</source>
-        <translation>マウントポジションが間違っています!</translation>
+        <translation>マウントポイントが間違っています!</translation>
     </message>
     <message>
         <location filename="../install.cpp" line="143"/>
@@ -1050,37 +1066,37 @@ Select your device and Mountpoint manually.</source>
         <translation>バックアップの開始...</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="167"/>
+        <location filename="../install.cpp" line="168"/>
         <source>Backup successful</source>
         <translation>バックアップが成功しました</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="171"/>
+        <location filename="../install.cpp" line="172"/>
         <source>Backup failed!</source>
         <translation>バックアップが失敗しました!</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="234"/>
+        <location filename="../install.cpp" line="239"/>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
         <translation>これは、最新版のRockboxです。最新版は毎日更新されます。現在のバージョンは、r%1 (%2) です。</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="245"/>
+        <location filename="../install.cpp" line="252"/>
         <source>This is the last released version of Rockbox.</source>
         <translation>これは、最新のリリース版のRockboxです。</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="251"/>
-        <source>&lt;b&gt;Note:&lt;/b&gt;The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
+        <location filename="../install.cpp" line="258"/>
+        <source>&lt;b&gt;Note:&lt;/b&gt; The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;注意:&lt;/b&gt;最新のリリース版は、%1です。 &lt;b&gt;これはお勧めのバージョンです。&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="263"/>
+        <location filename="../install.cpp" line="270"/>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
         <translation>これらは毎日、現在の開発ソースコードから自動的に作成されます。 一般に最新の安定版より多くの機能を持っていますが、安定版より動作が安定していない可能性があります。 機能は頻繁に変わる可能性があります。</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="265"/>
+        <location filename="../install.cpp" line="272"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
         <translation>&lt;b&gt;注意:&lt;/b&gt; 保存されているバージョンは、 r%1 (%2) です。</translation>
     </message>
@@ -1095,12 +1111,12 @@ Select your device and Mountpoint manually.</source>
         <translation>%1 をバックアップします</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="198"/>
+        <location filename="../install.cpp" line="203"/>
         <source>Select Backup Filename</source>
         <translation>バックアップファイルの選択</translation>
     </message>
     <message>
-        <location filename="../install.cpp" line="236"/>
+        <location filename="../install.cpp" line="241"/>
         <source>&lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;これはお勧めのバージョンです。&lt;/b&gt;</translation>
     </message>
@@ -1274,17 +1290,17 @@ Select your device and Mountpoint manually.</source>
 <context>
     <name>InstallTalkWindow</name>
     <message>
-        <location filename="../installtalkwindow.cpp" line="86"/>
+        <location filename="../installtalkwindow.cpp" line="88"/>
         <source>The Folder to Talk is wrong!</source>
         <translation>トークファイルを置くフォルダが間違っています!</translation>
     </message>
     <message>
-        <location filename="../installtalkwindow.cpp" line="126"/>
+        <location filename="../installtalkwindow.cpp" line="119"/>
         <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>選択されたTTS エンジン: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../installtalkwindow.cpp" line="141"/>
+        <location filename="../installtalkwindow.cpp" line="133"/>
         <source>Selected encoder: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>選択されたエンコーダ: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -1318,12 +1334,12 @@ Select your device and Mountpoint manually.</source>
 <context>
     <name>ProgressLoggerGui</name>
     <message>
-        <location filename="../progressloggergui.cpp" line="92"/>
+        <location filename="../progressloggergui.cpp" line="113"/>
         <source>&amp;Ok</source>
         <translation>Ok(&amp;O)</translation>
     </message>
     <message>
-        <location filename="../progressloggergui.cpp" line="102"/>
+        <location filename="../progressloggergui.cpp" line="95"/>
         <source>&amp;Abort</source>
         <translation>中止(&amp;A)</translation>
     </message>
@@ -1331,389 +1347,336 @@ Select your device and Mountpoint manually.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../base/detect.cpp" line="110"/>
+        <location filename="../base/detect.cpp" line="111"/>
         <source>Guest</source>
         <translation>ゲスト</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="113"/>
+        <location filename="../base/detect.cpp" line="114"/>
         <source>Admin</source>
         <translation>管理者</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="116"/>
+        <location filename="../base/detect.cpp" line="117"/>
         <source>User</source>
         <translation>ユーザ</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="119"/>
+        <location filename="../base/detect.cpp" line="120"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="226"/>
+        <location filename="../base/detect.cpp" line="228"/>
         <source>(no description available)</source>
         <translation>(利用可能な記述がありません)</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="398"/>
+        <location filename="../base/detect.cpp" line="400"/>
         <source>&lt;li&gt;Permissions insufficient for bootloader installation.
 Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation>&lt;li&gt;ブートローダをインストールするのに、アクセス権限が足りません。
 管理者権限が必要です。&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="409"/>
+        <location filename="../base/detect.cpp" line="411"/>
         <source>&lt;li&gt;Target mismatch detected.
 Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <translation>&lt;li&gt;検出されたターゲットが一致しません。
 インストールされているターゲット: %1, 選択されたターゲット: %2.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/detect.cpp" line="413"/>
+        <location filename="../base/detect.cpp" line="416"/>
         <source>Problem detected:</source>
         <translation>問題が見つかりました:</translation>
     </message>
 </context>
 <context>
-    <name>RbSpeexCfgFrm</name>
-    <message>
-        <location filename="../rbspeexcfgfrm.ui" line="13"/>
-        <source>Configuration</source>
-        <translation>設定</translation>
-    </message>
-    <message>
-        <location filename="../rbspeexcfgfrm.ui" line="19"/>
-        <source>Configure RbSpeex Encoder</source>
-        <translation>RbSpeex エンコーダの設定</translation>
-    </message>
-    <message>
-        <location filename="../rbspeexcfgfrm.ui" line="38"/>
-        <source>Volume</source>
-        <translation>ボリューム</translation>
-    </message>
-    <message>
-        <location filename="../rbspeexcfgfrm.ui" line="45"/>
-        <source>Narrowband</source>
-        <translation>ナローバンド</translation>
-    </message>
-    <message>
-        <location filename="../rbspeexcfgfrm.ui" line="68"/>
-        <source>Quality</source>
-        <translation>クオリリティ</translation>
-    </message>
-    <message>
-        <location filename="../rbspeexcfgfrm.ui" line="85"/>
-        <source>Complexity</source>
-        <translation>複雑性</translation>
-    </message>
-    <message>
-        <location filename="../rbspeexcfgfrm.ui" line="95"/>
-        <source>Reset</source>
-        <translation>リセット</translation>
-    </message>
-    <message>
-        <location filename="../rbspeexcfgfrm.ui" line="115"/>
-        <source>&amp;Ok</source>
-        <translation>Ok(&amp;O)</translation>
-    </message>
-    <message>
-        <location filename="../rbspeexcfgfrm.ui" line="125"/>
-        <source>&amp;Cancel</source>
-        <translation>キャンセル(&amp;C)</translation>
-    </message>
-</context>
-<context>
     <name>RbUtilQt</name>
     <message>
-        <location filename="../rbutilqt.cpp" line="79"/>
+        <location filename="../rbutilqt.cpp" line="84"/>
         <source>File</source>
         <translation>ファイル</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="79"/>
+        <location filename="../rbutilqt.cpp" line="84"/>
         <source>Version</source>
         <translation>バージョン</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="207"/>
+        <location filename="../rbutilqt.cpp" line="212"/>
         <source>New installation</source>
         <translation>新規インストール</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="210"/>
+        <location filename="../rbutilqt.cpp" line="215"/>
         <source>This is a new installation of Rockbox Utility, or a new version. The configuration dialog will now open to allow you to setup the program,  or review your settings.</source>
         <translation>これは、新規にインストール、または、新しいバージョンに更新された Rockbox Utility です。プログラムのセットアップを許可したり、または、設定を見直すために設定ダイアログが表示されることがあります。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1178"/>
+        <location filename="../rbutilqt.cpp" line="1207"/>
         <source>Configuration error</source>
         <translation>設定エラー</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="218"/>
+        <location filename="../rbutilqt.cpp" line="223"/>
         <source>Your configuration is invalid. This is most likely due to a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
         <translation>設定が正しくありません。たぶん、デバイスのパスが変更されているのが原因です。問題を修正できるように、設定ダイアログが表示されます。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="243"/>
+        <location filename="../rbutilqt.cpp" line="251"/>
         <source>Network error: %1. Please check your network and proxy settings.</source>
         <translation>ネットワークエラー: %1. ネットワークおよびプロキシーの設定を確認して下さい。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="345"/>
+        <location filename="../rbutilqt.cpp" line="352"/>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
         <translation>&lt;b&gt;%3&lt;/b&gt;の&lt;b&gt;%1 %2&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="362"/>
+        <location filename="../rbutilqt.cpp" line="371"/>
         <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;PDF 形式のマニュアル&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="364"/>
+        <location filename="../rbutilqt.cpp" line="373"/>
         <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;HTML 形式のマニュアル (ブラウザで開きます)&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="367"/>
+        <location filename="../rbutilqt.cpp" line="376"/>
         <source>Select a device for a link to the correct manual</source>
         <translation>正しいマニュアルへのリンクを指定するため、デバイスを選択して下さい</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="369"/>
+        <location filename="../rbutilqt.cpp" line="378"/>
         <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Manual の概要&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="868"/>
+        <location filename="../rbutilqt.cpp" line="887"/>
         <source>Confirm Installation</source>
         <translation>インストールの確認</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1066"/>
+        <location filename="../rbutilqt.cpp" line="1091"/>
         <source>Mount point is wrong!</source>
         <translation>マウントポイントが間違っています!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="528"/>
+        <location filename="../rbutilqt.cpp" line="539"/>
         <source>Aborted!</source>
         <translation>処理を中止します!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="537"/>
+        <location filename="../rbutilqt.cpp" line="548"/>
         <source>Installed Rockbox detected</source>
         <translation>インストールされたRockbox を検出しました</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="538"/>
+        <location filename="../rbutilqt.cpp" line="549"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
         <translation>Rockbox がインストールされていることを検出しました。まずバックアップを行いますか? </translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="541"/>
+        <location filename="../rbutilqt.cpp" line="552"/>
         <source>Starting backup...</source>
         <translation>バックアップを開始します...</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="558"/>
+        <location filename="../rbutilqt.cpp" line="570"/>
         <source>Backup successful</source>
         <translation>バックアップが成功しました</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="562"/>
+        <location filename="../rbutilqt.cpp" line="574"/>
         <source>Backup failed!</source>
         <translation>バックアップが失敗しました!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="607"/>
+        <location filename="../rbutilqt.cpp" line="622"/>
         <source>Do you really want to install the Bootloader?</source>
         <translation>ブートローダのインストールを本当に行いますか?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="789"/>
+        <location filename="../rbutilqt.cpp" line="800"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>フォントパッケージのインストールを本当に行いますか?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="827"/>
+        <location filename="../rbutilqt.cpp" line="842"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="829"/>
+        <location filename="../rbutilqt.cpp" line="844"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
         <translation>そのアプリケーションは、新規ビルドに対する情報をまだダウンロードしています。もう少し経ちましたら、再度行って下さい。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="834"/>
+        <location filename="../rbutilqt.cpp" line="849"/>
         <source>Do you really want to install the voice file?</source>
         <translation>ボイスファイルのインストールを本当に行いますか?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="863"/>
+        <location filename="../rbutilqt.cpp" line="882"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="864"/>
+        <location filename="../rbutilqt.cpp" line="883"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>デバイスには、Doom プラグインがありません。処理を中止します。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="869"/>
+        <location filename="../rbutilqt.cpp" line="888"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>ゲームのアドオンを本当にインストールしますか?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="949"/>
+        <location filename="../rbutilqt.cpp" line="969"/>
         <source>Confirm Uninstallation</source>
         <translation>アンインストールの確認</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="950"/>
+        <location filename="../rbutilqt.cpp" line="970"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>ブートローダのアンインストールを本当に行いますか?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1007"/>
+        <location filename="../rbutilqt.cpp" line="1028"/>
         <source>Confirm download</source>
         <translation>ダウンロードの確認</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1009"/>
+        <location filename="../rbutilqt.cpp" line="1030"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>マニュアルのダウンロードを本当に行いますか? マニュアルは、プレイヤーのルートフォルダに保存されます。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1052"/>
+        <location filename="../rbutilqt.cpp" line="1077"/>
         <source>Confirm installation</source>
         <translation>インストールの確認</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1054"/>
+        <location filename="../rbutilqt.cpp" line="1079"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Rockbox Utilityをプレイヤーにインストールしてもいいですか? インストール後、プレイヤーのハードディスクから実行して下さい。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1062"/>
+        <location filename="../rbutilqt.cpp" line="1087"/>
         <source>Installing Rockbox Utility</source>
         <translation>Rockbox Utilityをインストールしています</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1077"/>
+        <location filename="../rbutilqt.cpp" line="1105"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Rockbox Utilityのインストール中にエラーが発生しました</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1081"/>
+        <location filename="../rbutilqt.cpp" line="1109"/>
         <source>Installing user configuration</source>
         <translation>ユーザ設定をインストールしています</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1084"/>
+        <location filename="../rbutilqt.cpp" line="1113"/>
         <source>Error installing user configuration</source>
         <translation>ユーザ設定のインストール中にエラーが発生しました</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1088"/>
+        <location filename="../rbutilqt.cpp" line="1117"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Rockbox Utilityのインストールが成功しました。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1180"/>
+        <location filename="../rbutilqt.cpp" line="1209"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>設定が正しくありません。設定ダイアログを表示し、選択された値が正しいか確認して下さい。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="171"/>
+        <location filename="../rbutilqt.cpp" line="176"/>
         <source>Network error</source>
         <translation>ネットワークエラー</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="172"/>
+        <location filename="../rbutilqt.cpp" line="177"/>
         <source>Can&apos;t get version information.</source>
         <translation>バージョン情報が取得できません。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="641"/>
+        <location filename="../rbutilqt.cpp" line="656"/>
         <source>No install method known.</source>
         <translation>インストール方法が不明です。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="665"/>
+        <location filename="../rbutilqt.cpp" line="683"/>
         <source>Bootloader detected</source>
         <translation>ブートローダが検出されました</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="666"/>
+        <location filename="../rbutilqt.cpp" line="684"/>
         <source>Bootloader already installed. Do you want to reinstall the bootloader?</source>
         <translation>ブートローダは既にインストールされています。ブートローダをインストールしますか?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="687"/>
+        <location filename="../rbutilqt.cpp" line="706"/>
         <source>Create Bootloader backup</source>
         <translation>ブートローダのバックアップを作成します</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="692"/>
+        <location filename="../rbutilqt.cpp" line="711"/>
         <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
 Press &quot;No&quot; to skip this step.</source>
         <translation>オリジナルのブートローダファイルのバックアップファイルを作成することができます。&quot;はい&quot;ボタンを押して、バックアップファイルを保存するためのフォルダを選択して下さい。選択されたフォルダの下に &quot;%1&quot; フォルダを作成し、バックアップファイルを作成します。
 &quot;いいえ&quot;ボタンを押しますと、バックアップファイルを作成しません。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="694"/>
+        <location filename="../rbutilqt.cpp" line="713"/>
         <source>Browse backup folder</source>
         <translation>バックアップフォルダの表示</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="707"/>
+        <location filename="../rbutilqt.cpp" line="726"/>
         <source>Prerequisites</source>
         <translation>前提条件</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="717"/>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (hex file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>ブートローダのインストールには、オリジナルのファームウェアを用意する必要があります(hex 形式)。法律上の問題のため、ファームウェアは、あなたがダウンロードする必要があります。&lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; および、どの様に、ファームウェアファイルを取得したらよいかに関した Wiki ページ&lt;a href=&apos;http://www.rockbox.org/twiki/bin/view/Main/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt;を参考にして下さい。&lt;br&gt;続行するために、OKボタンを押し、ファームウェアファイルを参照して下さい。</translation>
-    </message>
-    <message>
-        <location filename="../rbutilqt.cpp" line="729"/>
+        <location filename="../rbutilqt.cpp" line="739"/>
         <source>Select firmware file</source>
         <translation>ファームウェアを選択して下さい</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="731"/>
+        <location filename="../rbutilqt.cpp" line="741"/>
         <source>Error opening firmware file</source>
         <translation>ファームウェア読み込み時のエラー</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="749"/>
+        <location filename="../rbutilqt.cpp" line="759"/>
         <source>Backup error</source>
         <translation>バックアップエラー</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="750"/>
+        <location filename="../rbutilqt.cpp" line="760"/>
         <source>Could not create backup file. Continue?</source>
         <translation>バックアップファイルが作成されませんでした。続行しますか?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="779"/>
+        <location filename="../rbutilqt.cpp" line="790"/>
         <source>Manual steps required</source>
         <translation>手動で行う必要があります</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="978"/>
+        <location filename="../rbutilqt.cpp" line="998"/>
         <source>No uninstall method known.</source>
         <translation>アンインストール方法が不明です。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="525"/>
+        <location filename="../rbutilqt.cpp" line="536"/>
         <source>Really continue?</source>
         <translation>本当に続行しますか?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="382"/>
+        <location filename="../rbutilqt.cpp" line="391"/>
         <source>Do you really want to perform a complete installation?
 
 This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
@@ -1722,7 +1685,7 @@ This will install Rockbox %1. To install the most recent development build avail
 Rockbox %1 をインストールします。 最新の開発版をインストールするのであれば、&quot;キャンセル&quot;ボタンを押したのち、&quot;インストール&quot;タブを選択して下さい。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="440"/>
+        <location filename="../rbutilqt.cpp" line="449"/>
         <source>Do you really want to perform a minimal installation? A minimal installation will contain only the absolutely necessary parts to run Rockbox.
 
 This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
@@ -1731,12 +1694,12 @@ This will install Rockbox %1. To install the most recent development build avail
 Rockbox %1 をインストールします。 最新の開発版をインストールするのであれば、&quot;キャンセル&quot;ボタンを押したのち、&quot;インストール&quot;タブを選択して下さい。</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="671"/>
+        <location filename="../rbutilqt.cpp" line="689"/>
         <source>Bootloader installation skipped</source>
         <translation>ブートローダのインストールをスキップしました</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="723"/>
+        <location filename="../rbutilqt.cpp" line="732"/>
         <source>Bootloader installation aborted</source>
         <translation>ブートローダのインストールが中止しました</translation>
     </message>
@@ -2146,59 +2109,6 @@ Rockbox %1 をインストールします。 最新の開発版をインスト�
     </message>
 </context>
 <context>
-    <name>SapiCfgFrm</name>
-    <message>
-        <location filename="../sapicfgfrm.ui" line="13"/>
-        <source>Configuration</source>
-        <translation>設定</translation>
-    </message>
-    <message>
-        <location filename="../sapicfgfrm.ui" line="19"/>
-        <source>Configure TTS Engine</source>
-        <translation>TTS エンジンの設定</translation>
-    </message>
-    <message>
-        <location filename="../sapicfgfrm.ui" line="25"/>
-        <source>Language</source>
-        <translation>言語</translation>
-    </message>
-    <message>
-        <location filename="../sapicfgfrm.ui" line="35"/>
-        <source>Voice</source>
-        <translation>ボイス</translation>
-    </message>
-    <message>
-        <location filename="../sapicfgfrm.ui" line="45"/>
-        <source>Speed</source>
-        <translation>速度</translation>
-    </message>
-    <message>
-        <location filename="../sapicfgfrm.ui" line="62"/>
-        <source>TTS options</source>
-        <translation>TTS のオプション</translation>
-    </message>
-    <message>
-        <location filename="../sapicfgfrm.ui" line="87"/>
-        <source>Reset</source>
-        <translation>設定のリセット</translation>
-    </message>
-    <message>
-        <location filename="../sapicfgfrm.ui" line="107"/>
-        <source>&amp;Ok</source>
-        <translation>Ok(&amp;O)</translation>
-    </message>
-    <message>
-        <location filename="../sapicfgfrm.ui" line="117"/>
-        <source>&amp;Cancel</source>
-        <translation>キャンセル(&amp;C)</translation>
-    </message>
-    <message>
-        <location filename="../sapicfgfrm.ui" line="129"/>
-        <source>Use Sapi 4</source>
-        <translation>Sapi 4 の使用</translation>
-    </message>
-</context>
-<context>
     <name>Sysinfo</name>
     <message>
         <location filename="../sysinfo.cpp" line="41"/>
@@ -2257,150 +2167,86 @@ Rockbox %1 をインストールします。 最新の開発版をインスト�
 <context>
     <name>TTSExes</name>
     <message>
-        <location filename="../tts.cpp" line="165"/>
+        <location filename="../base/tts.cpp" line="139"/>
         <source>TTS executable not found</source>
         <translation>実行可能な TTS が見つかりませんでした</translation>
     </message>
-</context>
-<context>
-    <name>TTSExesCfgFrm</name>
     <message>
-        <location filename="../ttsexescfgfrm.ui" line="13"/>
-        <source>Configuration</source>
-        <translation>設定</translation>
+        <location filename="../base/tts.cpp" line="113"/>
+        <source>Path to TTS engine:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ttsexescfgfrm.ui" line="19"/>
-        <source>Configure TTS Engine</source>
-        <translation>TTS エンジンの設定</translation>
-    </message>
-    <message>
-        <location filename="../ttsexescfgfrm.ui" line="31"/>
-        <source>Path to TTS Engine</source>
-        <translation>TTS エンジンのパス</translation>
-    </message>
-    <message>
-        <location filename="../ttsexescfgfrm.ui" line="43"/>
-        <source>&amp;Browse</source>
-        <translation>参照(&amp;B)</translation>
-    </message>
-    <message>
-        <location filename="../ttsexescfgfrm.ui" line="52"/>
-        <source>TTS options</source>
-        <translation>TTS のオプション</translation>
-    </message>
-    <message>
-        <location filename="../ttsexescfgfrm.ui" line="77"/>
-        <source>Reset</source>
-        <translation>リセット</translation>
-    </message>
-    <message>
-        <location filename="../ttsexescfgfrm.ui" line="97"/>
-        <source>&amp;Ok</source>
-        <translation>Ok(&amp;O)</translation>
-    </message>
-    <message>
-        <location filename="../ttsexescfgfrm.ui" line="107"/>
-        <source>&amp;Cancel</source>
-        <translation>キャンセル(&amp;C)</translation>
+        <location filename="../base/tts.cpp" line="115"/>
+        <source>TTS engine options:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>TTSFestival</name>
     <message>
-        <location filename="../tts.cpp" line="401"/>
-        <source>Starting festival</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../tts.cpp" line="450"/>
+        <location filename="../base/tts.cpp" line="491"/>
         <source>engine could not voice string</source>
-        <translation type="unfinished"></translation>
+        <translation>ボイス化する文字列が見つかりませんでした</translation>
     </message>
     <message>
-        <location filename="../tts.cpp" line="527"/>
+        <location filename="../base/tts.cpp" line="561"/>
         <source>No description available</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>TTSFestivalCfgFrm</name>
-    <message>
-        <location filename="../ttsfestivalcfgform.ui" line="13"/>
-        <source>Configuration</source>
-        <translation type="unfinished">設定</translation>
+        <translation>利用可能な記述がありません</translation>
     </message>
     <message>
-        <location filename="../ttsfestivalcfgform.ui" line="44"/>
-        <source>Executables</source>
+        <location filename="../base/tts.cpp" line="381"/>
+        <source>Path to Festival client:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ttsfestivalcfgform.ui" line="73"/>
-        <source>Path to Festival server</source>
+        <location filename="../base/tts.cpp" line="385"/>
+        <source>Voice:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ttsfestivalcfgform.ui" line="132"/>
-        <source>Browse</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ttsfestivalcfgform.ui" line="109"/>
-        <source>Path to Festival client</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ttsfestivalcfgform.ui" line="182"/>
-        <source>Server voice</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ttsfestivalcfgform.ui" line="209"/>
-        <source>Select a voice</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ttsfestivalcfgform.ui" line="222"/>
-        <source>&amp;Refresh</source>
-        <translation type="unfinished">リフレッシュ(&amp;R)</translation>
-    </message>
-    <message>
-        <location filename="../ttsfestivalcfgform.ui" line="262"/>
-        <source>Show voice description</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>TTSFestivalGui</name>
-    <message>
-        <location filename="../ttsgui.cpp" line="321"/>
-        <source>Loading..</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ttsgui.cpp" line="336"/>
-        <source>Querying festival</source>
+        <location filename="../base/tts.cpp" line="392"/>
+        <source>Voice description:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>TTSSapi</name>
     <message>
-        <location filename="../tts.cpp" line="233"/>
+        <location filename="../base/tts.cpp" line="238"/>
         <source>Could not copy the Sapi-script</source>
         <translation>Sapi-script がコピーできませんでした</translation>
     </message>
     <message>
-        <location filename="../tts.cpp" line="254"/>
+        <location filename="../base/tts.cpp" line="259"/>
         <source>Could not start the Sapi-script</source>
         <translation>Sapi-script が実行できませんでした</translation>
+    </message>
+    <message>
+        <location filename="../base/tts.cpp" line="185"/>
+        <source>Language:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/tts.cpp" line="190"/>
+        <source>Voice:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/tts.cpp" line="195"/>
+        <source>Speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/tts.cpp" line="198"/>
+        <source>Options:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>TalkFileCreator</name>
     <message>
-        <location filename="../talkfile.cpp" line="40"/>
+        <location filename="../talkfile.cpp" line="41"/>
         <source>Starting Talk file generation</source>
         <translation>トークファイルエンジンを実行しています</translation>
     </message>
@@ -2410,64 +2256,64 @@ Rockbox %1 をインストールします。 最新の開発版をインスト�
         <translation>TTS エンジンの初期化に失敗しました</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="60"/>
+        <location filename="../talkfile.cpp" line="59"/>
         <source>Init of Encoder engine failed</source>
         <translation>エンコーダエンジンの初期化に失敗しました</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="72"/>
+        <location filename="../talkfile.cpp" line="71"/>
         <source>Reading Filelist...</source>
         <translation>ファイルリストを読み込んでいます...</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="393"/>
+        <location filename="../talkfile.cpp" line="392"/>
         <source>Talk file creation aborted</source>
         <translation>トークファイルの作成を中止しました</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="107"/>
+        <location filename="../talkfile.cpp" line="106"/>
         <source>Voicing entries...</source>
         <translation>ボイス化しています...</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="116"/>
+        <location filename="../talkfile.cpp" line="115"/>
         <source>Encoding files...</source>
         <translation>エンコーディングしています...</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="124"/>
+        <location filename="../talkfile.cpp" line="123"/>
         <source>Copying Talkfile for Dirs...</source>
         <translation>フォルダ名のトークファイルをコピーしています...</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="133"/>
+        <location filename="../talkfile.cpp" line="132"/>
         <source>Copying Talkfile for Files...</source>
         <translation>ファイル名のトークファイルをコピーしています...</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="147"/>
+        <location filename="../talkfile.cpp" line="146"/>
         <source>Finished creating Talk files</source>
         <translation>トークファイルの作成が終了しました</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="313"/>
+        <location filename="../talkfile.cpp" line="312"/>
         <source>Encoding of %1 failed</source>
         <translation>%1 のエンコーディングに失敗しました</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="417"/>
+        <location filename="../talkfile.cpp" line="416"/>
         <source>Copying of %1 to %2 failed</source>
         <translation>%1 から %2 にファイルをコピーすることに失敗しました</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="439"/>
+        <location filename="../talkfile.cpp" line="438"/>
         <source>Cleaning up..</source>
         <translation>クリーンアップしています..</translation>
     </message>
     <message>
-        <location filename="../talkfile.cpp" line="275"/>
+        <location filename="../talkfile.cpp" line="274"/>
         <source>Voicing of %1 failed: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 のボイス化に失敗しました： %2</translation>
     </message>
 </context>
 <context>
@@ -2511,187 +2357,188 @@ Rockbox %1 をインストールします。 最新の開発版をインスト�
 <context>
     <name>ThemesInstallWindow</name>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="35"/>
+        <location filename="../themesinstallwindow.cpp" line="36"/>
         <source>no theme selected</source>
         <translation>テーマが選択されていません</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="102"/>
+        <location filename="../themesinstallwindow.cpp" line="103"/>
         <source>Network error: %1.
 Please check your network and proxy settings.</source>
         <translation>ネットワークエラー: %1.
 ネットワークおよびプロキシーの設定を確認して下さい。</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="113"/>
+        <location filename="../themesinstallwindow.cpp" line="115"/>
         <source>the following error occured:
 %1</source>
         <translation>以下のエラーが発生しました:
 %1</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="118"/>
+        <location filename="../themesinstallwindow.cpp" line="120"/>
         <source>done.</source>
         <translation>終了しました。</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="180"/>
+        <location filename="../themesinstallwindow.cpp" line="188"/>
         <source>fetching details for %1</source>
         <translation>%1 の説明を取得しています</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="182"/>
+        <location filename="../themesinstallwindow.cpp" line="190"/>
         <source>fetching preview ...</source>
         <translation>プレビューを取得しています...</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="193"/>
+        <location filename="../themesinstallwindow.cpp" line="203"/>
         <source>&lt;b&gt;Author:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;制作者:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="196"/>
+        <location filename="../themesinstallwindow.cpp" line="206"/>
         <source>unknown</source>
         <translation>不明</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="195"/>
+        <location filename="../themesinstallwindow.cpp" line="205"/>
         <source>&lt;b&gt;Version:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;バージョン:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="197"/>
+        <location filename="../themesinstallwindow.cpp" line="207"/>
         <source>&lt;b&gt;Description:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;説明:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="198"/>
+        <location filename="../themesinstallwindow.cpp" line="208"/>
         <source>no description</source>
         <translation>説明はありません</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="239"/>
+        <location filename="../themesinstallwindow.cpp" line="251"/>
         <source>no theme preview</source>
         <translation>テーマのプレビューはありません</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="270"/>
+        <location filename="../themesinstallwindow.cpp" line="282"/>
         <source>getting themes information ...</source>
         <translation>テーマの情報を取得しています...</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="318"/>
+        <location filename="../themesinstallwindow.cpp" line="330"/>
         <source>Mount point is wrong!</source>
         <translation>マウントポイントが間違っています!</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="36"/>
+        <location filename="../themesinstallwindow.cpp" line="37"/>
         <source>no selection</source>
-        <translation type="unfinished"></translation>
+        <translation>選択されていません</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="149"/>
+        <location filename="../themesinstallwindow.cpp" line="157"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>情報</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themesinstallwindow.cpp" line="166"/>
+        <location filename="../themesinstallwindow.cpp" line="174"/>
         <source>Download size %L1 kiB (%n item(s))</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>ダウンロードサイズ %L1 kiB (%n アイテム)</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="228"/>
+        <location filename="../themesinstallwindow.cpp" line="240"/>
         <source>Retrieving theme preview failed.
 HTTP response code: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>テーマのプレビュー画像の取得に失敗しました。
+HTTP レスポンスコード: %1</translation>
     </message>
 </context>
 <context>
     <name>UnZip</name>
     <message>
-        <location filename="../zip/unzip.cpp" line="245"/>
+        <location filename="../zip/unzip.cpp" line="250"/>
         <source>ZIP operation completed successfully.</source>
         <translation>ファイルの解凍処理が正常に終了しました。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="246"/>
+        <location filename="../zip/unzip.cpp" line="251"/>
         <source>Failed to initialize or load zlib library.</source>
         <translation>zip ライブラリの初期化に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="247"/>
+        <location filename="../zip/unzip.cpp" line="252"/>
         <source>zlib library error.</source>
         <translation>zip ライブラリのエラー。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="248"/>
+        <location filename="../zip/unzip.cpp" line="253"/>
         <source>Unable to create or open file.</source>
         <translation>ファイルの作成または、ファイルを開くことができません。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="249"/>
+        <location filename="../zip/unzip.cpp" line="254"/>
         <source>Partially corrupted archive. Some files might be extracted.</source>
         <translation>圧縮ファイルの一部が壊れています。 いくつかのファイルは、取り出せるかもしれません。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="250"/>
+        <location filename="../zip/unzip.cpp" line="255"/>
         <source>Corrupted archive.</source>
         <translation>圧縮ファイルは壊れています。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="251"/>
+        <location filename="../zip/unzip.cpp" line="256"/>
         <source>Wrong password.</source>
         <translation>パスワードが間違っています。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="252"/>
+        <location filename="../zip/unzip.cpp" line="257"/>
         <source>No archive has been created yet.</source>
         <translation>まだ、圧縮ファイルは作成されていません。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="253"/>
+        <location filename="../zip/unzip.cpp" line="258"/>
         <source>File or directory does not exist.</source>
         <translation>ファイルまたは、フォルダが存在しません。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="254"/>
+        <location filename="../zip/unzip.cpp" line="259"/>
         <source>File read error.</source>
         <translation>ファイルの読み込みエラー。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="255"/>
+        <location filename="../zip/unzip.cpp" line="260"/>
         <source>File write error.</source>
         <translation>ファイルの書き込みエラー。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="256"/>
+        <location filename="../zip/unzip.cpp" line="261"/>
         <source>File seek error.</source>
         <translation>ファイルのシークエラー。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="257"/>
+        <location filename="../zip/unzip.cpp" line="262"/>
         <source>Unable to create a directory.</source>
         <translation>フォルダが作成できません。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="258"/>
+        <location filename="../zip/unzip.cpp" line="263"/>
         <source>Invalid device.</source>
         <translation>不正なデバイス。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="259"/>
+        <location filename="../zip/unzip.cpp" line="264"/>
         <source>Invalid or incompatible zip archive.</source>
         <translation>不正または、zip 形式と互換性のない圧縮ファイル。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="260"/>
+        <location filename="../zip/unzip.cpp" line="265"/>
         <source>Inconsistent headers. Archive might be corrupted.</source>
         <translation>ヘッダが正しくありません。圧縮ファイルが壊れている可能性があります。</translation>
     </message>
     <message>
-        <location filename="../zip/unzip.cpp" line="264"/>
+        <location filename="../zip/unzip.cpp" line="269"/>
         <source>Unknown error.</source>
         <translation>不明なエラー。</translation>
     </message>
@@ -2775,37 +2622,37 @@ HTTP response code: %1</source>
 <context>
     <name>VoiceFileCreator</name>
     <message>
-        <location filename="../voicefile.cpp" line="42"/>
+        <location filename="../voicefile.cpp" line="43"/>
         <source>Starting Voicefile generation</source>
         <translation>ボイスファイルの作成を開始しています</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="102"/>
+        <location filename="../voicefile.cpp" line="104"/>
         <source>Download error: received HTTP error %1.</source>
         <translation>ダウンロードエラー: HTTP 受信のエラー %1.</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="107"/>
+        <location filename="../voicefile.cpp" line="109"/>
         <source>Cached file used.</source>
         <translation>キャッシュファイルを使用しました。</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="109"/>
+        <location filename="../voicefile.cpp" line="111"/>
         <source>Download error: %1</source>
         <translation>ダウンロードエラー: %1</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="114"/>
+        <location filename="../voicefile.cpp" line="116"/>
         <source>Download finished.</source>
         <translation>ダウンロードが終了しました。</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="123"/>
+        <location filename="../voicefile.cpp" line="125"/>
         <source>failed to open downloaded file</source>
         <translation>ダウンロードしたファイルが開けませんでした</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="137"/>
+        <location filename="../voicefile.cpp" line="138"/>
         <source>Init of TTS engine failed</source>
         <translation>TTSエンジンの初期化に失敗しました</translation>
     </message>
@@ -2840,9 +2687,9 @@ HTTP response code: %1</source>
         <translation>正常に作成されました。</translation>
     </message>
     <message>
-        <location filename="../voicefile.cpp" line="56"/>
+        <location filename="../voicefile.cpp" line="57"/>
         <source>could not find rockbox-info.txt</source>
-        <translation type="unfinished"></translation>
+        <translation>rockbox-info.txt が見つかりませんでした</translation>
     </message>
 </context>
 <context>
@@ -2901,72 +2748,72 @@ HTTP response code: %1</source>
 <context>
     <name>ZipInstaller</name>
     <message>
-        <location filename="../installzip.cpp" line="53"/>
+        <location filename="../base/zipinstaller.cpp" line="59"/>
         <source>done.</source>
         <translation>終了しました。</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="61"/>
+        <location filename="../base/zipinstaller.cpp" line="67"/>
         <source>Installation finished successfully.</source>
         <translation>インストールが正常に終了しました。</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="76"/>
+        <location filename="../base/zipinstaller.cpp" line="80"/>
         <source>Downloading file %1.%2</source>
         <translation>%1.%2 をダウンロードしています</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="114"/>
+        <location filename="../base/zipinstaller.cpp" line="115"/>
         <source>Download error: received HTTP error %1.</source>
         <translation>ダウンロードエラー: HTTP 受信のエラー %1.</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="119"/>
+        <location filename="../base/zipinstaller.cpp" line="120"/>
         <source>Cached file used.</source>
         <translation>キャッシュファイルを使用しました。</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="121"/>
+        <location filename="../base/zipinstaller.cpp" line="122"/>
         <source>Download error: %1</source>
         <translation>ダウンロードエラー: %1</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="126"/>
+        <location filename="../base/zipinstaller.cpp" line="126"/>
         <source>Download finished.</source>
         <translation>ダウンロードが終了しました。</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="132"/>
+        <location filename="../base/zipinstaller.cpp" line="132"/>
         <source>Extracting file.</source>
         <translation>解凍しています。</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="143"/>
+        <location filename="../base/zipinstaller.cpp" line="142"/>
         <source>Opening archive failed: %1.</source>
         <translation>圧縮ファイルが開けませんでした: %1.</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="166"/>
+        <location filename="../base/zipinstaller.cpp" line="161"/>
         <source>Extracting failed: %1.</source>
         <translation>解凍に失敗しました: %1.</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="179"/>
+        <location filename="../base/zipinstaller.cpp" line="171"/>
         <source>Installing file.</source>
         <translation>ファイルをインストールしています。</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="190"/>
+        <location filename="../base/zipinstaller.cpp" line="182"/>
         <source>Installing file failed.</source>
         <translation>ファイルのインストールに失敗しました。</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="200"/>
+        <location filename="../base/zipinstaller.cpp" line="191"/>
         <source>Creating installation log</source>
         <translation>インストール時のログを作成しています</translation>
     </message>
     <message>
-        <location filename="../installzip.cpp" line="155"/>
+        <location filename="../base/zipinstaller.cpp" line="152"/>
         <source>Not enough disk space! Aborting.</source>
         <translation>ディスクの空き領域が足りません! 処理を中止します。</translation>
     </message>
@@ -2994,12 +2841,12 @@ HTTP response code: %1</source>
         <translation>クレジット(&amp;C)</translation>
     </message>
     <message>
-        <location filename="../aboutbox.ui" line="124"/>
+        <location filename="../aboutbox.ui" line="127"/>
         <source>&amp;License</source>
         <translation>ライセンス(&amp;L)</translation>
     </message>
     <message>
-        <location filename="../aboutbox.ui" line="157"/>
+        <location filename="../aboutbox.ui" line="169"/>
         <source>&amp;Ok</source>
         <translation>Ok(&amp;O)</translation>
     </message>
