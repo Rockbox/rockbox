@@ -619,7 +619,7 @@ static int sd_select_bank(signed char bank)
 
 #define UNALIGNED_NUM_SECTORS 10
 static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SECTOR_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
-static unsigned char *uncached_buffer = UNCACHED_ADDR(aligned_buffer);
+static unsigned char *uncached_buffer = UNCACHED_ADDR(&aligned_buffer[0]);
 
 static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
                                int count, void* buf, const bool write)

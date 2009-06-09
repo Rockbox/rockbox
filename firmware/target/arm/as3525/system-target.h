@@ -28,7 +28,7 @@
 #ifdef BOOTLOADER
 #define UNCACHED_ADDR(a) (a)
 #else
-#define UNCACHED_ADDR(a) (a + 0x10000000)
+#define UNCACHED_ADDR(a) ((typeof(a)) ((uintptr_t)(a) + 0x10000000))
 #endif
 
 #endif /* SYSTEM_TARGET_H */
