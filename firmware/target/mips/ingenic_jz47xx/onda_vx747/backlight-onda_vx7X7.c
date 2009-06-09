@@ -42,7 +42,7 @@ static void set_backlight(int val)
        the flickering is not perceptible to the human eye but
        not greater than about 1kHz. */
 
-    /* Clock = 8192 Hz */
+    /* Clock = 32 768 Hz */
     /* 1 <= val <= 30 */
     int cycle = (MAX_BRIGHTNESS_SETTING - val + 1);
 
@@ -84,7 +84,7 @@ bool _backlight_init(void)
     __tcu_enable_pwm_output(BACKLIGHT_PWM);
 
     __tcu_select_rtcclk(BACKLIGHT_PWM); /* 32.768 kHz */
-    __tcu_select_clk_div1(BACKLIGHT_PWM); /* 8.192 kHz */
+    __tcu_select_clk_div1(BACKLIGHT_PWM);
 
     __tcu_mask_half_match_irq(BACKLIGHT_PWM);
     __tcu_mask_full_match_irq(BACKLIGHT_PWM);
