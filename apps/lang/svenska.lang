@@ -4173,7 +4173,7 @@
     ipod*,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb,e200*: "PREV = Revert"
-    gigabeatf: "A = Revert"
+    gigabeatf: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
   </source>
@@ -4184,7 +4184,7 @@
     ipod*,c200,sa9200: "MENY = Avbryt"
     x5,m5: "SPELA IN = Avbryt"
     h10,h10_5gb,e200*: "FÖREGÅENDE = Avbryt"
-    gigabeatf: "A = Avbryt"
+    gigabeatf: "PÅ/AV = Avbryt"
     mrobe100: "VISA = Avbryt"
     gigabeats: "BAKÅT = Avbryt"
   </dest>
