@@ -102,17 +102,14 @@
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
-/* define this if the backlight can be set to a brightness */
-#define __BACKLIGHT_INIT
-
 /* Which backlight fading type? */
-//#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_PWM
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_HW_REG
 
 /* Main LCD backlight brightness range and defaults */
-#define MIN_BRIGHTNESS_SETTING          100
-#define MAX_BRIGHTNESS_SETTING          300
-#define DEFAULT_BRIGHTNESS_SETTING      300 /* "full brightness" */
-#define DEFAULT_DIMNESS_SETTING         100 /* "most dim" */
+#define MIN_BRIGHTNESS_SETTING          1
+#define MAX_BRIGHTNESS_SETTING          30
+#define DEFAULT_BRIGHTNESS_SETTING      30 /* "full brightness" */
+#define DEFAULT_DIMNESS_SETTING         1 /* "most dim" */
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF

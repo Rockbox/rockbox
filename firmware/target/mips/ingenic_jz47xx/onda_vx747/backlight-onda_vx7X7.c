@@ -27,84 +27,50 @@
 #define BACKLIGHT_GPIO  (32*3+31)
 #define BACKLIGHT_PWM   7
 
-/* TODO: use HW PWM */
-#define SW_PWM 1
-#if SW_PWM
-
-static bool backlight_on;
-static void set_backlight(int val)
-{
-    (void)val;
-}
-
-bool _backlight_init(void)
-{
-    __gpio_as_output(BACKLIGHT_GPIO);
-    __gpio_set_pin(BACKLIGHT_GPIO);
-    
-    backlight_on = true;
-
-    return true;
-}
-
-void _backlight_on(void)
-{
-    if(!backlight_on)
-        __gpio_set_pin(BACKLIGHT_GPIO);
-    
-    backlight_on = true;
-}
-
-void _backlight_off(void)
-{
-    if(backlight_on)
-        __gpio_clear_pin(BACKLIGHT_GPIO);
-    
-    backlight_on = false;
-}
-
-#else
-
+/* PWM counter (PWM INITL = 0):
+ * [0, PWM half rate[ -> backlight off
+ * [PWM half rate, PWM full rate[ -> backlight on
+ * [PWM full rate, PWM full rate] -> counter reset to 0
+ */
 static int old_val;
 static void set_backlight(int val)
 {
     if(val == old_val)
         return;
-    
-    /* Taken from the OF */
-    int tmp;
-    tmp = (val/2 + __cpm_get_rtcclk()) / val;
-    if(tmp > 0xFFFF)
-        tmp = 0xFFFF;
 
-    __tcu_set_half_data(BACKLIGHT_PWM, (tmp * val * 1374389535) >> 5);
-    __tcu_set_full_data(BACKLIGHT_PWM, tmp);
-    
+    /* The pulse repetition frequency should be greater than 100Hz so
+       the flickering is not perceptible to the human eye but
+       not greater than about 1kHz. */
+
+    /* Clock = 8192 Hz */
+    /* 1 <= val <= 30 */
+    int cycle = (MAX_BRIGHTNESS_SETTING - val + 1);
+
+    __tcu_disable_pwm_output(BACKLIGHT_PWM);
+    __tcu_stop_counter(BACKLIGHT_PWM);
+
+    __tcu_set_count(BACKLIGHT_PWM, 0);
+    __tcu_set_half_data(BACKLIGHT_PWM, cycle-1);
+    __tcu_set_full_data(BACKLIGHT_PWM, cycle);
+
+    __tcu_start_counter(BACKLIGHT_PWM);
+    __tcu_enable_pwm_output(BACKLIGHT_PWM);
+
     old_val = val;
 }
 
 static void set_backlight_on(void)
 {
-    if(old_val == MAX_BRIGHTNESS_SETTING)
-        return;
-    
-    __tcu_start_timer_clock(BACKLIGHT_PWM);
-    
-    set_backlight(MAX_BRIGHTNESS_SETTING);
-
-    __tcu_set_count(BACKLIGHT_PWM, 0);
-    __tcu_start_counter(BACKLIGHT_PWM);
+    set_backlight(old_val);
 
     __tcu_enable_pwm_output(BACKLIGHT_PWM);
+    __tcu_start_counter(BACKLIGHT_PWM);
 }
 
 static void set_backlight_off(void)
 {
     __tcu_stop_counter(BACKLIGHT_PWM);
     __tcu_disable_pwm_output(BACKLIGHT_PWM);
-    __tcu_stop_timer_clock(BACKLIGHT_PWM);
-    
-    old_val = -1;
 }
 
 bool _backlight_init(void)
@@ -113,17 +79,17 @@ bool _backlight_init(void)
     __tcu_start_timer_clock(BACKLIGHT_PWM);
 
     __tcu_stop_counter(BACKLIGHT_PWM);
-    __tcu_disable_pwm_output(BACKLIGHT_PWM);
-
     __tcu_init_pwm_output_low(BACKLIGHT_PWM);
-    __tcu_select_rtcclk(BACKLIGHT_PWM);
-    __tcu_select_clk_div1(BACKLIGHT_PWM);
+    __tcu_set_pwm_output_shutdown_graceful(BACKLIGHT_PWM);
+    __tcu_enable_pwm_output(BACKLIGHT_PWM);
+
+    __tcu_select_rtcclk(BACKLIGHT_PWM); /* 32.768 kHz */
+    __tcu_select_clk_div1(BACKLIGHT_PWM); /* 8.192 kHz */
 
     __tcu_mask_half_match_irq(BACKLIGHT_PWM);
     __tcu_mask_full_match_irq(BACKLIGHT_PWM);
-    
-    old_val = -1;
 
+    old_val = MAX_BRIGHTNESS_SETTING;
     set_backlight_on();
 
     return true;
@@ -138,7 +104,6 @@ void _backlight_off(void)
 {
     set_backlight_off();
 }
-#endif /* !SW_PWM */
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 void _backlight_set_brightness(int brightness)
