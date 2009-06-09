@@ -6,8 +6,8 @@
 
 #include "config.h"
 
-#include <lua.h>
-#include <lauxlib.h>
+#include "lua.h"
+#include "lauxlib.h"
 #include <limits.h>
 
 
