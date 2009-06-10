@@ -14,6 +14,7 @@
 #define PEHEADER_H
 
 #include "PeLibAux.h"
+#include <string.h>
 
 namespace PeLib
 {

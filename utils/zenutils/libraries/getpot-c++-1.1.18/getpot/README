@@ -5,10 +5,10 @@ Attention: This version contains a couple of beautiful
 ---------- new features, that are not documented yet. 
  
            E.g.: -- automated ufo detection
-	         -- arbitrary comment delimiters
-		 -- arbitrary vector field separators
-		 -- tails, i.e. easy access to all tails
-		    of options such as '-L' or '-I'.
+             -- arbitrary comment delimiters
+         -- arbitrary vector field separators
+         -- tails, i.e. easy access to all tails
+            of options such as '-L' or '-I'.
 
           Please, refere to the example/ directory
           for usage descriptions.
@@ -47,4 +47,3 @@ Enjoy !
 
 Juli 2005, 
 Frank R. Schaefer
-

@@ -17,7 +17,7 @@
  */
 
 #include <iostream>
-#include <getpot/getpot.hpp>
+#include <getpot/GetPot>
 #include <cenc.h>
 #include <crypt.h>
 #include <file.h>

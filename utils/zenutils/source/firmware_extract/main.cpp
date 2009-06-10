@@ -18,7 +18,7 @@
 
 #include <iostream>
 #include <ctime>
-#include <getpot/getpot.hpp>
+#include <getpot/GetPot>
 #include <utils.h>
 #include <firmware.h>
 

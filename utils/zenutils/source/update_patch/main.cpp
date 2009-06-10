@@ -19,7 +19,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cstdio>
-#include <getpot/getpot.hpp>
+#include <getpot/GetPot>
 #include <file.h>
 #include <updater.h>
 #include <utils.h>

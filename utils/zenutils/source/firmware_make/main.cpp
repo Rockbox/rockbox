@@ -18,7 +18,7 @@
 
 #include <iostream>
 #include <sstream>
-#include <getpot/getpot.hpp>
+#include <getpot/GetPot>
 #include <file.h>
 #include <firmware.h>
 #include <utils.h>
