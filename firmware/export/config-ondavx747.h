@@ -42,6 +42,9 @@
 //#define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
 #define CONFIG_STORAGE STORAGE_SD
 
+/* Support FAT16 for SD cards <= 2GB */
+#define HAVE_FAT16SUPPORT
+
 /* ChinaChip NAND FTL */
 #define CONFIG_NAND NAND_CC
 
@@ -109,7 +112,7 @@
 #define MIN_BRIGHTNESS_SETTING          1
 #define MAX_BRIGHTNESS_SETTING          30
 #define DEFAULT_BRIGHTNESS_SETTING      30 /* "full brightness" */
-#define DEFAULT_DIMNESS_SETTING         1 /* "most dim" */
+#define DEFAULT_DIMNESS_SETTING         1  /* "most dim" */
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
