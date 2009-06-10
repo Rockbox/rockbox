@@ -1322,15 +1322,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Громкость информационных сигналов"
+    swcodec: "Сигнал при пропуске трэка"
   </dest>
   <voice>
     *: none
-    swcodec: "Громкость информационных сигналов"
+    swcodec: "Сигнал при пропуске трэка"
   </voice>
 </phrase>
 <phrase>
@@ -12348,5 +12348,70 @@
   <voice>
     *: none
     serial_port: "Автоматически"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Запретить пропуск трэка"
+  </dest>
+  <voice>
+    *: "Запретить пропуск трэка"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Абсолютный центр"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Абсолютный центр"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "3x3 Сетка"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Сетка 3 на 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> System menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Режим сенсорного экрана"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Режим сенсороного экрана"
   </voice>
 </phrase>

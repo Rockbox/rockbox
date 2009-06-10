@@ -1347,15 +1347,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "嗶音量"
+    swcodec: "改歌的聲音"
   </dest>
   <voice>
     *: none
-    swcodec: "嗶音量"
+    swcodec: "改歌的聲音"
   </voice>
 </phrase>
 <phrase>

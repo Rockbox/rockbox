@@ -6975,15 +6975,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Volumen del beep"
+    swcodec: "Sonido del salto de pista"
   </dest>
   <voice>
     *: none
-    swcodec: "Volumen del bip"
+    swcodec: "Sonido del salto de pista"
   </voice>
 </phrase>
 <phrase>
