@@ -1954,12 +1954,13 @@ static void audio_finish_load_track(void)
 
 static void audio_fill_file_buffer(bool start_play, size_t offset)
 {
-    filling = STATE_FILLING;
     trigger_cpu_boost();
 
-    /* No need to rebuffer if there are track skips pending. */
-    if (ci.new_track != 0)
+    /* No need to rebuffer if there are track skips pending,
+     * however don't cancel buffering on skipping while filling. */
+    if (ci.new_track != 0 && filling != STATE_FILLING)
         return;
+    filling = STATE_FILLING;
 
     /* Must reset the buffer before use if trashed or voice only - voice
        file size shouldn't have changed so we can go straight from
