@@ -33,6 +33,7 @@
 #include "splash.h"
 #include "settings.h"
 #include "pcmbuf.h"
+#include "misc.h"
 
 static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to
                                                     work on startup */
@@ -261,6 +262,10 @@ bool action_userabort(int timeout)
 {
     int action = get_action_worker(CONTEXT_STD,timeout,NULL);
     bool ret = (action == ACTION_STD_CANCEL);
+    if(!ret)
+    {
+        default_event_handler(action);
+    }
     return ret;
 }
 
