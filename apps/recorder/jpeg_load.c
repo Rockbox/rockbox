@@ -96,7 +96,7 @@ struct jpeg
 #endif
     jpeg_pix_t *img_buf;
 
-    int quanttable[4][QUANT_TABLE_LENGTH]; /* raw quantization tables 0-3 */
+    int16_t quanttable[4][QUANT_TABLE_LENGTH];/* raw quantization tables 0-3 */
 
     struct huffman_table hufftable[2]; /* Huffman tables  */
     struct derived_tbl dc_derived_tbls[2]; /* Huffman-LUTs */
@@ -206,9 +206,14 @@ INLINE unsigned range_limit(int value)
 * 16x16->32 bit multiply can be used instead of a full 32x32 multiply.
 * For 12-bit samples, a full 32-bit multiplication will be needed.
 */
-#define MULTIPLY16(var,const)  (((short) (var)) * ((short) (const)))
-
 #define MULTIPLY(var1, var2) ((var1) * (var2))
+
+#if defined(CPU_SH) || defined(CPU_COLDFIRE) || \
+    (defined(CPU_ARM) && ARM_ARCH > 4)
+#define MULTIPLY16(var,const)  (((short) (var)) * ((short) (const)))
+#else
+#define MULTIPLY16 MULTIPLY
+#endif
 
 /*
  * Macros for handling fixed-point arithmetic; these are used by many
@@ -255,19 +260,19 @@ INLINE unsigned range_limit(int value)
 #define COMPONENT_SHIFT  15
 
 /* horizontal-pass 1-point IDCT */
-static void idct1h(int *ws, unsigned char *out, int rows, int rowstep)
+static void idct1h(int16_t *ws, unsigned char *out, int rows, int rowstep)
 {
     int row;
     for (row = 0; row < rows; row++)
     {
-        *out = range_limit((int) DESCALE(*ws, DS_OUT));
+        *out = range_limit((int) DESCALE(*ws, 3 + PASS1_BITS));
         out += rowstep;
         ws += 8;
     }
 }
 
 /* vertical-pass 2-point IDCT */
-static void idct2v(int *ws, int cols)
+static void idct2v(int16_t *ws, int cols)
 {
     int col;
     for (col = 0; col < cols; col++)
@@ -281,30 +286,30 @@ static void idct2v(int *ws, int cols)
 }
 
 /* horizontal-pass 2-point IDCT */
-static void idct2h(int *ws, unsigned char *out, int rows, int rowstep)
+static void idct2h(int16_t *ws, unsigned char *out, int rows, int rowstep)
 {
     int row;
     for (row = 0; row < rows; row++)
     {
-        int tmp1 = ws[0] + (ONE << (DS_OUT - 1));
+        int tmp1 = ws[0] + (ONE << (PASS1_BITS + 2));
         int tmp2 = ws[1];
         out[JPEG_PIX_SZ*0] = range_limit((int) RIGHT_SHIFT(tmp1 + tmp2,
-            DS_OUT));
+            PASS1_BITS + 3));
         out[JPEG_PIX_SZ*1] = range_limit((int) RIGHT_SHIFT(tmp1 - tmp2,
-            DS_OUT));
+            PASS1_BITS + 3));
         out += rowstep;
         ws += 8;
     }
 }
 
 /* vertical-pass 4-point IDCT */
-static void idct4v(int *ws, int cols)
+static void idct4v(int16_t *ws, int cols)
 {
-    int tmp0, tmp2, tmp10, tmp12;
-    int z1, z2, z3;
     int col;
     for (col = 0; col < cols; col++, ws++)
     {
+        int tmp0, tmp2, tmp10, tmp12;
+        int z1, z2, z3;
         /* Even part */
 
         tmp0 = ws[8*0];
@@ -336,7 +341,7 @@ static void idct4v(int *ws, int cols)
 }
 
 /* horizontal-pass 4-point IDCT */
-static void idct4h(int *ws, unsigned char *out, int rows, int rowstep)
+static void idct4h(int16_t *ws, unsigned char *out, int rows, int rowstep)
 {
     int tmp0, tmp2, tmp10, tmp12;
     int z1, z2, z3;
@@ -375,7 +380,7 @@ static void idct4h(int *ws, unsigned char *out, int rows, int rowstep)
 }
 
 /* vertical-pass 8-point IDCT */
-static void idct8v(int *ws, int cols)
+static void idct8v(int16_t *ws, int cols)
 {
     long tmp0, tmp1, tmp2, tmp3;
     long tmp10, tmp11, tmp12, tmp13;
@@ -469,7 +474,7 @@ static void idct8v(int *ws, int cols)
 }
 
 /* horizontal-pass 8-point IDCT */
-static void idct8h(int *ws, unsigned char *out, int rows, int rowstep)
+static void idct8h(int16_t *ws, unsigned char *out, int rows, int rowstep)
 {
     long tmp0, tmp1, tmp2, tmp3;
     long tmp10, tmp11, tmp12, tmp13;
@@ -580,7 +585,7 @@ static void idct8h(int *ws, unsigned char *out, int rows, int rowstep)
 
 #ifdef HAVE_LCD_COLOR
 /* vertical-pass 16-point IDCT */
-static void idct16v(int *ws, int cols)
+static void idct16v(int16_t *ws, int cols)
 {
     long tmp0, tmp1, tmp2, tmp3, tmp10, tmp11, tmp12, tmp13;
     long tmp20, tmp21, tmp22, tmp23, tmp24, tmp25, tmp26, tmp27;
@@ -687,7 +692,7 @@ static void idct16v(int *ws, int cols)
 }
 
 /* horizontal-pass 16-point IDCT */
-static void idct16h(int *ws, unsigned char *out, int rows, int rowstep)
+static void idct16h(int16_t *ws, unsigned char *out, int rows, int rowstep)
 {
     long tmp0, tmp1, tmp2, tmp3, tmp10, tmp11, tmp12, tmp13;
     long tmp20, tmp21, tmp22, tmp23, tmp24, tmp25, tmp26, tmp27;
@@ -812,19 +817,18 @@ static void idct16h(int *ws, unsigned char *out, int rows, int rowstep)
 #endif
 
 struct idct_entry {
-    int v_scale;
-    int h_scale;
-    void (*v_idct)(int *ws, int cols);
-    void (*h_idct)(int *ws, unsigned char *out, int rows, int rowstep);
+    int scale;
+    void (*v_idct)(int16_t *ws, int cols);
+    void (*h_idct)(int16_t *ws, unsigned char *out, int rows, int rowstep);
 };
 
 struct idct_entry idct_tbl[] = {
-    { PASS1_BITS, CONST_BITS, NULL, idct1h },
-    { PASS1_BITS, CONST_BITS, idct2v, idct2h },
-    { 0, 0, idct4v, idct4h },
-    { 0, 0, idct8v, idct8h },
+    { PASS1_BITS, NULL, idct1h },
+    { PASS1_BITS, idct2v, idct2h },
+    { 0, idct4v, idct4h },
+    { 0, idct8v, idct8h },
 #ifdef HAVE_LCD_COLOR
-    { 0, 0, idct16v, idct16h },
+    { 0, idct16v, idct16h },
 #endif
 };
 
@@ -1506,20 +1510,14 @@ INLINE void fix_huff_tables(struct jpeg *p_jpeg)
  */
 INLINE void fix_quant_tables(struct jpeg *p_jpeg)
 {
-    int shift, i, x, y, a;
+    int shift, i, j;
     for (i = 0; i < 2; i++)
     {
-        shift = idct_tbl[p_jpeg->v_scale[i]].v_scale +
-            idct_tbl[p_jpeg->h_scale[i]].h_scale;
+        shift = idct_tbl[p_jpeg->v_scale[i]].scale;
         if (shift)
         {
-            a = 0;
-            for (y = 0; y < (int)BIT_N(p_jpeg->h_scale[i]); y++)
-            {
-                for (x = 0; x < (int)BIT_N(p_jpeg->v_scale[i]); x++)
-                    p_jpeg->quanttable[i][zig[a+x]] <<= shift;
-                a += 8;
-            }
+            for (j = 0; j < 64; j++)
+                p_jpeg->quanttable[i][j] <<= shift;
         }
     }
 }
@@ -1780,7 +1778,7 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
         store_offs[p_jpeg->store_pos[2]] = b_width << p_jpeg->v_scale[0];
         store_offs[p_jpeg->store_pos[3]] = store_offs[1] + store_offs[2];
 
-        int block[128]; /* decoded DCT coefficients */
+        int16_t block[128]; /* decoded DCT coefficients */
         for (x = 0; x < p_jpeg->x_mbl; x++)
         {
             int blkn;
@@ -1804,13 +1802,13 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
 #ifdef HAVE_LCD_COLOR
                     p_jpeg->last_dc_val[ci] += s;
                     /* output it (assumes zag[0] = 0) */
-                    block[0] = p_jpeg->last_dc_val[ci] *
-                        p_jpeg->quanttable[!!ci][0];
+                    block[0] = MULTIPLY16(p_jpeg->last_dc_val[ci],
+                        p_jpeg->quanttable[!!ci][0]);
 #else
                     p_jpeg->last_dc_val += s;
                     /* output it (assumes zag[0] = 0) */
-                    block[0] = p_jpeg->last_dc_val *
-                        p_jpeg->quanttable[0][0];
+                    block[0] = MULTIPLY16(p_jpeg->last_dc_val,
+                        p_jpeg->quanttable[0][0]);
 #endif
                     /* coefficient buffer must be cleared */
                     MEMSET(block+1, 0, p_jpeg->zero_need[!!ci] * sizeof(int));
@@ -1830,7 +1828,7 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
                             if (a <= zag[p_jpeg->k_need[!!ci]] && (a & 7) <=
                                 (zag[p_jpeg->k_need[!!ci]] & 7))
                             {
-                                r *= p_jpeg->quanttable[!!ci][k];
+                                r = MULTIPLY16(r, p_jpeg->quanttable[!!ci][k]);
                                 block[zag[k]] = r ;
                             }
                         }
