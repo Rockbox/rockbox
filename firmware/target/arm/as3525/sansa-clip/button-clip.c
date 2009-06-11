@@ -7,6 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
+ * Copyright (C) 2009 Bertrik Sikken
  * Copyright (C) 2008 François Dinel
  * Copyright (C) 2008 Rafaël Carré
  *
@@ -22,71 +23,103 @@
 #include "button-target.h"
 #include "as3525.h"
 
+/*  The Sansa Clip uses a button matrix that is scanned by selecting one of
+    three rows and reading back the button states from the columns.
+
+    In this driver, the row is changed at each call (i.e. once per tick).
+    In one tick, column data from one row is read back and then the next row
+    is selected for the following tick. This mechanism ensures that there is
+    plenty time between selecting a row and reading the columns, avoiding the
+    need for explicit delays.
+*/
+
+
 void button_init_device(void)
 {
     GPIOA_DIR &= ~((1<<7) | (1<<3));
     GPIOB_DIR &= ~((1<<2) | (1<<1) | (1<<0));
-    GPIOC_PIN(4) = 0x00;
-    GPIOC_PIN(5) = 0x00;
-    GPIOC_PIN(6) = 0x00;
+    GPIOC_PIN(4) = 0;
+    GPIOC_PIN(5) = 0;
+    GPIOC_PIN(6) = 0;
     GPIOC_DIR |= ((1<<6) | (1<<5) | (1<<4));
+    
+    /* get initial readings */
+    button_read_device();
+    button_read_device();
+    button_read_device();
 }
 
 int button_read_device(void)
 {
-    int result = 0;
+    static int row = 0;
+    static int buttons = 0;
 
     if(button_hold())
-        return result;
+        return 0;
 
     /* direct GPIO connections */
-
     if (GPIOA_PIN(7))
-        result |= BUTTON_POWER;
+        buttons |= BUTTON_POWER;
+    else
+        buttons &= ~BUTTON_POWER;
 
     /* This is a keypad using C4-C6 as columns and B0-B2 as rows */
-    GPIOC_PIN(4) = (1<<4);
-    asm volatile("nop\nnop\nnop\nnop\nnop\n"); /* small delay */
+    switch (row) {
 
-    (void)GPIOB_PIN(0); /* C4B0 is unused */
+    case 0:
+        buttons &= ~(BUTTON_VOL_UP | BUTTON_UP);
 
-    if (GPIOB_PIN(1))
-        result |= BUTTON_VOL_UP;
+        (void)GPIOB_PIN(0); /* C4B0 is unused */
 
-    if (GPIOB_PIN(2))
-        result |= BUTTON_UP;
+        if (GPIOB_PIN(1))
+            buttons |= BUTTON_VOL_UP;
 
-    GPIOC_PIN(4) = 0x00;
+        if (GPIOB_PIN(2))
+            buttons |= BUTTON_UP;
 
-    GPIOC_PIN(5) = (1<<5);
-    asm volatile("nop\nnop\nnop\nnop\nnop\n"); /* small delay */
+        GPIOC_PIN(4) = 0;
+        GPIOC_PIN(5) = (1<<5);
+        row++;
+        break;
 
-    if (GPIOB_PIN(0))
-        result |= BUTTON_LEFT;
+    case 1:
+        buttons &= ~(BUTTON_LEFT | BUTTON_SELECT | BUTTON_RIGHT);
 
-    if (GPIOB_PIN(1))
-        result |= BUTTON_SELECT;
+        if (GPIOB_PIN(0))
+            buttons |= BUTTON_LEFT;
 
-    if (GPIOB_PIN(2))
-        result |= BUTTON_RIGHT;
+        if (GPIOB_PIN(1))
+            buttons |= BUTTON_SELECT;
 
-    GPIOC_PIN(5) = 0x00;
+        if (GPIOB_PIN(2))
+            buttons |= BUTTON_RIGHT;
 
-    GPIOC_PIN(6) = (1<<6);
-    asm volatile("nop\nnop\nnop\nnop\nnop\n"); /* small delay */
+        GPIOC_PIN(5) = 0;
+        GPIOC_PIN(6) = (1<<6);
+        row++;
+        break;
 
-    if (GPIOB_PIN(0))
-        result |= BUTTON_DOWN;
+    case 2:
+        buttons &= ~(BUTTON_DOWN | BUTTON_VOL_DOWN | BUTTON_HOME);
 
-    if (GPIOB_PIN(1))
-        result |= BUTTON_VOL_DOWN;
+        if (GPIOB_PIN(0))
+            buttons |= BUTTON_DOWN;
 
-    if (GPIOB_PIN(2))
-        result |= BUTTON_HOME;
+        if (GPIOB_PIN(1))
+            buttons |= BUTTON_VOL_DOWN;
 
-    GPIOC_PIN(6) = 0x00;
+        if (GPIOB_PIN(2))
+            buttons |= BUTTON_HOME;
 
-    return result;
+        GPIOC_PIN(6) = 0;
+        GPIOC_PIN(4) = (1<<4);
+
+    default:
+        row = 0;
+        break;
+    }
+
+    return buttons;
 }
 
 bool button_hold(void)
