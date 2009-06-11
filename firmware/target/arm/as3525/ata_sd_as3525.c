@@ -571,50 +571,55 @@ static int sd_select_bank(signed char bank)
     unsigned char card_data[512];
     int ret;
 
-    ret = sd_wait_for_state(INTERNAL_AS3525, SD_TRAN);
-    if (ret < 0)
-        return ret - 2;
+    do {
+        /* The ISR will set this to true if an error occurred */
+        retry = false;
 
-    if(!send_cmd(INTERNAL_AS3525, SD_SWITCH_FUNC, 0x80ffffef, MCI_ARG, NULL))
-        return -1;
+        ret = sd_wait_for_state(INTERNAL_AS3525, SD_TRAN);
+        if (ret < 0)
+            return ret - 2;
 
-    mci_delay();
+        if(!send_cmd(INTERNAL_AS3525, SD_SWITCH_FUNC, 0x80ffffef, MCI_ARG, NULL))
+            return -1;
 
-    if(!send_cmd(INTERNAL_AS3525, 35, 0, MCI_NO_FLAGS, NULL))
-        return -2;
+        mci_delay();
 
-    mci_delay();
+        if(!send_cmd(INTERNAL_AS3525, 35, 0, MCI_NO_FLAGS, NULL))
+            return -2;
 
-    memset(card_data, 0, 512);
-    if(bank == -1)
-    {   /* enable bank switching */
-        card_data[0] = 16;
-        card_data[1] = 1;
-        card_data[2] = 10;
-    }
-    else
-        card_data[0] = bank;
+        mci_delay();
 
-    dma_retain();
-    dma_enable_channel(0, card_data, MCI_FIFO(INTERNAL_AS3525), DMA_PERI_SD,
-        DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
+        memset(card_data, 0, 512);
+        if(bank == -1)
+        {   /* enable bank switching */
+            card_data[0] = 16;
+            card_data[1] = 1;
+            card_data[2] = 10;
+        }
+        else
+            card_data[0] = bank;
 
-    MCI_DATA_TIMER(INTERNAL_AS3525) = SD_MAX_WRITE_TIMEOUT;
-    MCI_DATA_LENGTH(INTERNAL_AS3525) = 512;
-    MCI_DATA_CTRL(INTERNAL_AS3525) =  (1<<0) /* enable */   |
-                            (0<<1) /* transfer direction */ |
-                            (1<<3) /* DMA */                |
-                            (9<<4) /* 2^9 = 512 */ ;
+        dma_retain();
+        dma_enable_channel(0, card_data, MCI_FIFO(INTERNAL_AS3525), DMA_PERI_SD,
+            DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
 
-    wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
+        MCI_DATA_TIMER(INTERNAL_AS3525) = SD_MAX_WRITE_TIMEOUT;
+        MCI_DATA_LENGTH(INTERNAL_AS3525) = 512;
+        MCI_DATA_CTRL(INTERNAL_AS3525) =  (1<<0) /* enable */   |
+                                (0<<1) /* transfer direction */ |
+                                (1<<3) /* DMA */                |
+                                (9<<4) /* 2^9 = 512 */ ;
 
-    dma_release();
+        wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
-    mci_delay();
+        dma_release();
 
-    ret = sd_wait_for_state(INTERNAL_AS3525, SD_TRAN);
-    if (ret < 0)
-        return ret - 4;
+        mci_delay();
+
+        ret = sd_wait_for_state(INTERNAL_AS3525, SD_TRAN);
+        if (ret < 0)
+            return ret - 4;
+    } while(retry);
 
     card_info[INTERNAL_AS3525].current_bank = (bank == -1) ? 0 : bank;
 
@@ -670,7 +675,7 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
             write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
         unsigned long bank_start = start;
 
-        /* Interrupt handler might set this to true during transfer */
+        /* The ISR will set this to true if an error occurred */
         retry = false;
 
         /* Only switch banks for internal storage */
