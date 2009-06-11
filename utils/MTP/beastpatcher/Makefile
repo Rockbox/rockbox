@@ -19,6 +19,9 @@ LIBS = /usr/lib/libmtp.a /usr/lib/libusb.a
 CFLAGS += $(shell printf \
 	'\#include <libmtp.h>\nlibmtp version: LIBMTP_VERSION\n' | \
 	gcc -E -P - -o - | grep -q '^libmtp version: 0\.2' && echo '-DOLDMTP')
+CFLAGS += $(shell printf \
+	'\#include <libmtp.h>\nlibmtp version: LIBMTP_VERSION\n' | \
+	gcc -E -P - -o - | grep -q '^libmtp version: 0\.2\.[0-5]' && echo '-DREALLYOLDMTP')
 endif
 WINLIBS = ../MTP_DLL.dll
 

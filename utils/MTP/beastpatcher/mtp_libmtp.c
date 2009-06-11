@@ -78,11 +78,14 @@ int mtp_scan(struct mtp_info_t* mtp_info)
     else 
     {
         /* NOTE: These strings are filled with zeros in mtp_init() */
-
+#ifndef REALLYOLDMTP
         if ((str = LIBMTP_Get_Manufacturername(mtp_info->device)))
         {
             strncpy(mtp_info->manufacturer, str, sizeof(mtp_info->manufacturer)-1);
         }
+#else
+        strcpy(mtp_info->manufacturer, "(unknown manufacturer)");
+#endif
 
         if ((str = LIBMTP_Get_Modelname(mtp_info->device)))
         {
