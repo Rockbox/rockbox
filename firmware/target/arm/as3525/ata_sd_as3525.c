@@ -98,6 +98,10 @@ static void init_pl180_controller(const int drive);
 
 static tSDCardInfo card_info[NUM_VOLUMES];
 
+/* maximum timeouts recommanded in the SD Specification v2.00 */
+#define SD_MAX_READ_TIMEOUT     ((AS3525_PCLK_FREQ) / 1000 * 100) /* 100 ms */
+#define SD_MAX_WRITE_TIMEOUT    ((AS3525_PCLK_FREQ) / 1000 * 250) /* 250 ms */
+
 /* for compatibility */
 static long last_disk_activity = -1;
 
@@ -595,7 +599,7 @@ static int sd_select_bank(signed char bank)
     dma_enable_channel(0, card_data, MCI_FIFO(INTERNAL_AS3525), DMA_PERI_SD,
         DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
 
-    MCI_DATA_TIMER(INTERNAL_AS3525) = 0xffffffff;/* FIXME: arbitrary */
+    MCI_DATA_TIMER(INTERNAL_AS3525) = SD_MAX_WRITE_TIMEOUT;
     MCI_DATA_LENGTH(INTERNAL_AS3525) = 512;
     MCI_DATA_CTRL(INTERNAL_AS3525) =  (1<<0) /* enable */   |
                             (0<<1) /* transfer direction */ |
@@ -718,7 +722,11 @@ static int sd_transfer_sectors(IF_MV2(int drive,) unsigned long start,
                 (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
-        MCI_DATA_TIMER(drive) = 0x1000000; /* FIXME: arbitrary */
+        /* FIXME : we should check if the timeouts calculated from the card's
+         * CSD are lower, and use them if it is the case
+         * Note : the OF doesn't seem to use them anyway */
+        MCI_DATA_TIMER(drive) = write ?
+                SD_MAX_WRITE_TIMEOUT : SD_MAX_READ_TIMEOUT;
         MCI_DATA_LENGTH(drive) = transfer * card_info[drive].block_size;
         MCI_DATA_CTRL(drive) =  (1<<0) /* enable */                     |
                                 (!write<<1) /* transfer direction */    |
