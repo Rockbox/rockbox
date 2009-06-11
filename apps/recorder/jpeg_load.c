@@ -253,6 +253,11 @@ INLINE unsigned range_limit(int value)
 #define BUFAC           227
 #define COMPONENT_SHIFT  15
 
+/* Some of the below have inline ASM optimizations of the loop contents. To
+   make comparison with the C versions easier, the C variable names are used
+   in comments whenever intermediate values are labeled.
+*/
+
 /* horizontal-pass 1-point IDCT */
 static void idct1h(int16_t *ws, unsigned char *out, int rows, int rowstep)
 {
@@ -303,6 +308,64 @@ static void idct4v(int16_t *ws, int cols)
     int col;
     for (col = 0; col < cols; col++, ws++)
     {
+#if defined(CPU_ARM)
+        int t0, t1, t2, t3, t4;
+#if ARM_ARCH <= 4
+        int t5;
+#endif
+        asm volatile(
+            "ldrsh %[t4], [%[ws]]\n\t"         /* t4 = tmp0 (ws[8*0]) */
+            "ldrsh %[t1], [%[ws], #32]\n\t"    /* t1 = tmp2 (ws[8*2]) */
+            "ldrsh %[t2], [%[ws], #16]\n\t"    /* t2 = z2 (ws[8*1]) */
+            "add   %[t0], %[t4], %[t1]\n\t"    /* t0 = tmp10 >> 2
+                                                  (tmp0 + tmp2) */
+            "sub   %[t1], %[t4], %[t1]\n\t"    /* t1 = tmp12 >> 2
+                                                  (tmp0 - tmp2) */
+            "ldrsh %[t3], [%[ws], #48]\n\t"    /* t3 = z3 (ws[8*3] */
+            "add   %[t4], %[t2], %[t3]\n\t"    /* t4 = z2 + z3 */
+#if ARM_ARCH > 4
+            "smulbb %[t4], %[c1], %[t4]\n\t"
+            "add    %[t4], %[t4], #1024\n\t"   /* t4 = z1 */
+            "smlatb %[t3], %[c2c3], %[t3], %[t4]\n\t"
+            "smlabb %[t2], %[c2c3], %[t2], %[t4]\n\t"
+            "mov   %[t3], %[t3], asr #11\n\t"  /* t3 = tmp0 */
+            "mov   %[t2], %[t2], asr #11\n\t"  /* t2 = tmp2 */
+#else
+            "add   %[t5], %[t4], %[t4], lsl #3\n\t"
+            "rsb   %[t4], %[t4], %[t5], lsl #4\n\t"
+            "rsb   %[t4], %[t4], %[t4], lsl #5\n\t"
+            "add   %[t4], %[t4], #1024\n\t" /*z1*/
+            "mla   %[t3], %[c2], %[t3], %[t4]\n\t"
+            "mla   %[t2], %[c3], %[t2], %[t4]\n\t"
+            "mov   %[t3], %[t3], asr #11\n\t"  /* t3 = tmp0 */
+            "mov   %[t2], %[t2], asr #11\n\t"  /* t2 = tmp2 */
+#endif
+            "add   %[t4], %[t2], %[t0], lsl #2\n\t" /* t4 = tmp10 + tmp2 */
+            "rsb   %[t0], %[t2], %[t0], lsl #2\n\t" /* t0 = tmp10 - tmp2 */
+            "add   %[t2], %[t3], %[t1], lsl #2\n\t" /* t2 = tmp12 + tmp0 */
+            "rsb   %[t3], %[t3], %[t1], lsl #2\n\t" /* t3 = tmp12 - tmp0 */
+            "strh  %[t4], [%[ws]]\n\t"
+            "strh  %[t0], [%[ws], #48]\n\t"
+            "strh  %[t2], [%[ws], #16]\n\t"
+            "strh  %[t3], [%[ws], #32]\n\t"
+            : [t0] "=&r" (t0),
+              [t1] "=&r" (t1),
+              [t2] "=&r" (t2),
+              [t3] "=&r" (t3),
+              [t4] "=&r" (t4)
+#if ARM_ARCH <= 4
+              ,[t5] "=&r" (t5)
+#endif
+            : [ws] "r" (ws),
+#if ARM_ARCH > 4
+              [c1]   "r" (FIX_0_541196100),
+              [c2c3] "r" (((-FIX_1_847759065)<<16)|FIX_0_765366865)
+#else
+              [c2] "r" (-FIX_1_847759065),
+              [c3]  "r" (FIX_0_765366865)
+#endif
+        );
+#else
         int tmp0, tmp2, tmp10, tmp12;
         int z1, z2, z3;
         /* Even part */
@@ -332,17 +395,91 @@ static void idct4v(int16_t *ws, int cols)
         ws[8*3] = (int) (tmp10 - tmp2);
         ws[8*1] = (int) (tmp12 + tmp0);
         ws[8*2] = (int) (tmp12 - tmp0);
+#endif
     }
 }
 
 /* horizontal-pass 4-point IDCT */
 static void idct4h(int16_t *ws, unsigned char *out, int rows, int rowstep)
 {
-    int tmp0, tmp2, tmp10, tmp12;
-    int z1, z2, z3;
     int row;
     for (row = 0; row < rows; row++, out += rowstep, ws += 8)
     {
+#if defined(CPU_ARM)
+        int t0, t1, t2, t3, t4;
+#if ARM_ARCH <= 4
+        int t5;
+#endif
+        asm volatile(
+            "ldrsh %[t4], [%[ws]]\n\t"               /* t4 = tmp0 (ws[0]) */
+            "ldrsh %[t1], [%[ws], #4]\n\t"           /* t1 = tmp2 (ws[2]) */
+            "add   %[t4], %[t4], #16\n\t"            /* add rounding to DC */
+            "add   %[t4], %[t4], #4096\n\t"          /* pre-add offset */
+            "ldrsh %[t2], [%[ws], #2]\n\t"           /* t2 = z2 (ws[1]) */
+            "add   %[t0], %[t4], %[t1]\n\t"          /* t0 = tmp10 >> 13
+                                                        (tmp0 + tmp2) */
+            "sub   %[t1], %[t4], %[t1]\n\t"          /* t1 = tmp12 >> 13
+                                                        (tmp0 - tmp2) */
+            "ldrsh %[t3], [%[ws], #6]\n\t"           /* t3 = z3 (ws[3] */
+            "add   %[t4], %[t2], %[t3]\n\t"          /* t4 = z2 + z3 */
+#if ARM_ARCH > 4
+            "smulbb %[t4], %[c1], %[t4]\n\t"
+            "smlatb %[t3], %[c2c3], %[t3], %[t4]\n\t"
+            "smlabb %[t2], %[c2c3], %[t2], %[t4]\n\t"
+#else
+            "add   %[t5], %[t4], %[t4], lsl #3\n\t"
+            "rsb   %[t4], %[t4], %[t5], lsl #4\n\t"
+            "rsb   %[t4], %[t4], %[t4], lsl #5\n\t"  /* t4 = z1 */
+            "mla   %[t3], %[c2], %[t3], %[t4]\n\t"
+            "mla   %[t2], %[c3], %[t2], %[t4]\n\t"
+#endif
+            "add   %[t4], %[t2], %[t0], lsl #13\n\t" /* t4 = tmp10 + tmp2 */
+            "rsb   %[t0], %[t2], %[t0], lsl #13\n\t" /* t0 = tmp10 - tmp2 */
+            "add   %[t2], %[t3], %[t1], lsl #13\n\t" /* t2 = tmp12 + tmp0 */
+            "rsb   %[t3], %[t3], %[t1], lsl #13\n\t" /* t3 = tmp12 - tmp0 */
+            "mov   %[t4], %[t4], asr #18\n\t"        /* descale results */
+            "mov   %[t0], %[t0], asr #18\n\t"
+            "mov   %[t2], %[t2], asr #18\n\t"
+            "mov   %[t3], %[t3], asr #18\n\t"
+            "cmp   %[t4], #255\n\t"                  /* range limit results */
+            "mvnhi %[t4], %[t4], asr #31\n\t"
+            "cmp   %[t0], #255\n\t"
+            "mvnhi %[t0], %[t0], asr #31\n\t"
+            "cmp   %[t2], #255\n\t"
+            "mvnhi %[t2], %[t2], asr #31\n\t"
+            "cmp   %[t3], #255\n\t"
+            "mvnhi %[t3], %[t3], asr #31\n\t"
+            "cmp   %[t4], #255\n\t"
+            "mvnhi %[t4], %[t4], asr #31\n\t"
+            "strb  %[t4], [%[out]]\n\t"
+            "strb  %[t0], [%[out], %[o3]]\n\t"
+            "strb  %[t2], [%[out], %[o1]]\n\t"
+            "strb  %[t3], [%[out], %[o2]]\n\t"
+            : [t0] "=&r" (t0),
+              [t1] "=&r" (t1),
+              [t2] "=&r" (t2),
+              [t3] "=&r" (t3),
+              [t4] "=&r" (t4)
+#if ARM_ARCH <= 4
+
+              ,[t5] "=&r" (t5)
+#endif
+            : [ws]  "r" (ws),
+              [out] "r" (out),
+              [o1]  "i" (JPEG_PIX_SZ),
+              [o2]  "i" (JPEG_PIX_SZ*2),
+              [o3]  "i" (JPEG_PIX_SZ*3),
+#if ARM_ARCH > 4
+              [c1]   "r" (FIX_0_541196100),
+              [c2c3] "r" (((-FIX_1_847759065)<<16)|FIX_0_765366865)
+#else
+              [c2] "r" (-FIX_1_847759065),
+              [c3] "r" (FIX_0_765366865)
+#endif
+        );
+#else
+        int tmp0, tmp2, tmp10, tmp12;
+        int z1, z2, z3;
         /* Even part */
 
         tmp0 = (int) ws[0] + (ONE << (PASS1_BITS + 2)
@@ -359,7 +496,7 @@ static void idct4h(int16_t *ws, unsigned char *out, int rows, int rowstep)
         z3 = (int) ws[3];
 
         z1 = MULTIPLY16(z2 + z3, FIX_0_541196100);
-        tmp0 = z1 + MULTIPLY16(z3, - FIX_1_847759065);
+        tmp0 = z1 - MULTIPLY16(z3, FIX_1_847759065);
         tmp2 = z1 + MULTIPLY16(z2, FIX_0_765366865);
 
         /* Final output stage */
@@ -372,6 +509,7 @@ static void idct4h(int16_t *ws, unsigned char *out, int rows, int rowstep)
             DS_OUT));
         out[JPEG_PIX_SZ*2] = range_limit((int) RIGHT_SHIFT(tmp12 - tmp0,
             DS_OUT));
+#endif
     }
 }
 
