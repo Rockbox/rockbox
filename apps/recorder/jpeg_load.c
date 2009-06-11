@@ -123,8 +123,6 @@ INLINE unsigned range_limit(int value)
 #if CONFIG_CPU == SH7034
     unsigned tmp;
     asm (  /* Note: Uses knowledge that only low byte of result is used */
-        "mov     #-128,%[t]  \n"
-        "sub     %[t],%[v]   \n"  /* value -= -128; equals value += 128; */
         "extu.b  %[v],%[t]   \n"
         "cmp/eq  %[v],%[t]   \n"  /* low byte == whole number ? */
         "bt      1f          \n"  /* yes: no overflow */
@@ -139,7 +137,6 @@ INLINE unsigned range_limit(int value)
 #elif defined(CPU_COLDFIRE)
     /* Note: Uses knowledge that only the low byte of the result is used */
     asm (
-        "add.l   #128,%[v]   \n"  /* value += 128; */
         "cmp.l   #255,%[v]   \n"  /* overflow? */
         "bls.b   1f          \n"  /* no: return value */
         /* yes: set low byte to appropriate boundary */
@@ -152,7 +149,6 @@ INLINE unsigned range_limit(int value)
 #elif defined(CPU_ARM)
     /* Note: Uses knowledge that only the low byte of the result is used */
     asm (
-        "add     %[v], %[v], #128    \n"  /* value += 128 */
         "cmp     %[v], #255          \n"  /* out of range 0..255? */
         "mvnhi   %[v], %[v], asr #31 \n"  /* yes: set all bits to ~(sign_bit) */
         : /* outputs */
@@ -160,8 +156,6 @@ INLINE unsigned range_limit(int value)
     );
     return value;
 #else
-    value += 128;
-
     if ((unsigned)value <= 255)
         return value;
 
@@ -265,7 +259,7 @@ static void idct1h(int16_t *ws, unsigned char *out, int rows, int rowstep)
     int row;
     for (row = 0; row < rows; row++)
     {
-        *out = range_limit((int) DESCALE(*ws, 3 + PASS1_BITS));
+        *out = range_limit(128 + (int) DESCALE(*ws, 3 + PASS1_BITS));
         out += rowstep;
         ws += 8;
     }
@@ -291,7 +285,8 @@ static void idct2h(int16_t *ws, unsigned char *out, int rows, int rowstep)
     int row;
     for (row = 0; row < rows; row++)
     {
-        int tmp1 = ws[0] + (ONE << (PASS1_BITS + 2));
+        int tmp1 = ws[0] + (ONE << (PASS1_BITS + 2))
+                   + (128 << (PASS1_BITS + 3));
         int tmp2 = ws[1];
         out[JPEG_PIX_SZ*0] = range_limit((int) RIGHT_SHIFT(tmp1 + tmp2,
             PASS1_BITS + 3));
@@ -350,7 +345,8 @@ static void idct4h(int16_t *ws, unsigned char *out, int rows, int rowstep)
     {
         /* Even part */
 
-        tmp0 = (int) ws[0] + (ONE << (PASS1_BITS + 2));
+        tmp0 = (int) ws[0] + (ONE << (PASS1_BITS + 2)
+               + (128 << (PASS1_BITS + 3));
         tmp2 = (int) ws[2];
 
         tmp10 = (tmp0 + tmp2) << CONST_BITS;
@@ -495,7 +491,7 @@ static void idct8h(int16_t *ws, unsigned char *out, int rows, int rowstep)
            | ws[4] | ws[5] | ws[6] | ws[7]) == 0)
         {
             /* AC terms all zero */
-            unsigned char dcval = range_limit((int) DESCALE((long) ws[0],
+            unsigned char dcval = range_limit(128 + (int) DESCALE((long) ws[0],
                 PASS1_BITS+3));
 
             out[JPEG_PIX_SZ*0] = dcval;
@@ -520,7 +516,8 @@ static void idct8h(int16_t *ws, unsigned char *out, int rows, int rowstep)
         tmp2 = z1 + MULTIPLY16(z3, - FIX_1_847759065);
         tmp3 = z1 + MULTIPLY16(z2, FIX_0_765366865);
 
-        z4 = (long) ws[0] + (ONE << (PASS1_BITS + 2));
+        z4 = (long) ws[0] + (ONE << (PASS1_BITS + 2))
+             + (128 << (PASS1_BITS + 3));
         z4 <<= CONST_BITS;
         z5 = (long) ws[4] << CONST_BITS;
         tmp0 = z4 + z5;
@@ -703,7 +700,8 @@ static void idct16h(int16_t *ws, unsigned char *out, int rows, int rowstep)
         /* Even part */
 
         /* Add fudge factor here for final descale. */
-        tmp0 = (long) ws[0] + (ONE << (PASS1_BITS+2));
+        tmp0 = (long) ws[0] + (ONE << (PASS1_BITS+2))
+               + (128 << (PASS1_BITS + 3));
         tmp0 <<= CONST_BITS;
 
         z1 = (long) ws[4];
