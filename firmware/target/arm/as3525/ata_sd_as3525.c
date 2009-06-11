@@ -441,7 +441,7 @@ static void init_pl180_controller(const int drive)
     /* setup isr for microsd monitoring */
     VIC_INT_ENABLE |= (INTERRUPT_GPIOA);
     /* clear previous irq */
-    GPIOA_IC |= (1<<2);
+    GPIOA_IC = (1<<2);
     /* enable edge detecting */
     GPIOA_IS &= ~(1<<2);
     /* detect both raising and falling edges */
