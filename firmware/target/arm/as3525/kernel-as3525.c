@@ -61,19 +61,7 @@ void INT_TIMER2(void)
 
 void tick_start(unsigned int interval_in_ms)
 {
-    int phi = 0;                            /* prescaler bits */
-    int prescale = 1;
     int cycles = KERNEL_TIMER_FREQ / 1000 * interval_in_ms;
-
-    while(cycles > 0x10000)
-    {
-        phi++;
-        prescale <<= 4;
-        cycles >>= 4;
-    }
-
-    if(prescale > 256)
-        panicf("%s : interval too big", __func__);
 
     CGU_PERI |= CGU_TIMER2_CLOCK_ENABLE;    /* enable peripheral */
     VIC_INT_ENABLE |= INTERRUPT_TIMER2;     /* enable interrupt */
@@ -81,6 +69,10 @@ void tick_start(unsigned int interval_in_ms)
     TIMER2_LOAD = TIMER2_BGLOAD = cycles;   /* timer period */
 
     /* /!\ bit 4 (reserved) must not be modified
-     * periodic mode, interrupt enabled, 16 bits counter */
-    TIMER2_CONTROL = (TIMER2_CONTROL & (1<<4)) | 0xe0 | (phi<<2);
+     * periodic mode, interrupt enabled, no prescale, 32 bits counter */
+    TIMER2_CONTROL = (TIMER2_CONTROL & (1<<4)) |
+                     TIMER_ENABLE |
+                     TIMER_PERIODIC |
+                     TIMER_INT_ENABLE |
+                     TIMER_32_BIT;
 }

@@ -109,23 +109,17 @@ void TIMER1_ISR(void)
 
 static bool timer_set(long cycles, bool start)
 {
-#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || CONFIG_CPU == AS3525
+#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
     int phi = 0; /* bits for the prescaler */
     int prescale = 1;
 
-#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
-#define PRESCALE_STEP 1
-#else /* CONFIG_CPU == AS3525 */
-#define PRESCALE_STEP 4
-#endif
-
     while (cycles > 0x10000)
     {   /* work out the smallest prescaler that makes it fit */
-#if CONFIG_CPU == SH7034 || CONFIG_CPU == AS3525
+#if CONFIG_CPU == SH7034
         phi++;
 #endif
-        prescale <<= PRESCALE_STEP;
-        cycles >>= PRESCALE_STEP;
+        prescale <<= 1;
+        cycles >>= 1;
     }
 #endif
 
@@ -178,10 +172,6 @@ static bool timer_set(long cycles, bool start)
 
     return true;
 #elif CONFIG_CPU == AS3525
-    /* XXX: 32 bits cycles could be used */
-    if (prescale > 256 || cycles > 0x10000)
-        return false;
-
     if (start)
     {
         if (pfn_unregister != NULL)
@@ -193,8 +183,12 @@ static bool timer_set(long cycles, bool start)
 
     TIMER1_LOAD = TIMER1_BGLOAD = cycles;
     /* /!\ bit 4 (reserved) must not be modified
-     * periodic mode, interrupt enabled, 16 bits counter */
-    TIMER1_CONTROL = (TIMER1_CONTROL & (1<<4)) | 0xe0 | (phi<<2);
+     * periodic mode, interrupt enabled, no prescale, 32 bits counter */
+    TIMER1_CONTROL = (TIMER2_CONTROL & (1<<4)) |
+                     TIMER_ENABLE |
+                     TIMER_PERIODIC |
+                     TIMER_INT_ENABLE |
+                     TIMER_32_BIT;
     return true;
 #elif defined CPU_COLDFIRE
     if (prescale > 4096/CPUFREQ_MAX_MULT)
