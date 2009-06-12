@@ -1,4 +1,3 @@
-
 /***************************************************************************
  *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
@@ -32,6 +31,9 @@
 #include "eq_menu.h"
 #include "exported_menus.h"
 #include "menu_common.h"
+#include "splash.h"
+#include "kernel.h"
+#include "dsp.h"
 
 /***********************************/
 /*    SOUND MENU                   */
@@ -57,14 +59,14 @@ MENUITEM_SETTING(treble, &global_settings.treble,
 MENUITEM_SETTING(treble_cutoff, &global_settings.treble_cutoff, NULL);
 #endif
 MENUITEM_SETTING(balance, &global_settings.balance, NULL);
-MENUITEM_SETTING(channel_config, &global_settings.channel_config, 
+MENUITEM_SETTING(channel_config, &global_settings.channel_config,
 #if CONFIG_CODEC == SWCODEC
     lowlatency_callback
 #else
     NULL
 #endif
 );
-MENUITEM_SETTING(stereo_width, &global_settings.stereo_width, 
+MENUITEM_SETTING(stereo_width, &global_settings.stereo_width,
 #if CONFIG_CODEC == SWCODEC
     lowlatency_callback
 #else
@@ -86,7 +88,21 @@ MENUITEM_SETTING(stereo_width, &global_settings.stereo_width,
     MAKE_MENU(crossfeed_menu,ID2P(LANG_CROSSFEED), NULL, Icon_NOICON,
               &crossfeed, &crossfeed_direct_gain, &crossfeed_cross_gain,
               &crossfeed_hf_attenuation, &crossfeed_hf_cutoff);
-              
+
+static int timestretch_callback(int action,const struct menu_item_ex *this_item)
+{
+    switch (action)
+    {
+        case ACTION_EXIT_MENUITEM: /* on exit */
+            if (global_settings.timestretch_enabled && !dsp_timestretch_enabled())
+                splash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
+            break;
+    }
+    lowlatency_callback(action, this_item);
+    return action;
+}
+    MENUITEM_SETTING(timestretch_enabled,
+                     &global_settings.timestretch_enabled, timestretch_callback);
     MENUITEM_SETTING(dithering_enabled,
                      &global_settings.dithering_enabled, lowlatency_callback);
 #endif
@@ -120,7 +136,8 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
 #endif
           &balance,&channel_config,&stereo_width
 #if CONFIG_CODEC == SWCODEC
-         ,&crossfeed_menu, &equalizer_menu, &dithering_enabled
+          ,&crossfeed_menu, &equalizer_menu, &dithering_enabled
+          ,&timestretch_enabled
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
          ,&loudness,&avc,&superbass,&mdb_enable,&mdb_strength

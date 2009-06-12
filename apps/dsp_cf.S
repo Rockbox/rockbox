@@ -191,7 +191,7 @@ dsp_downsample:
 
 /****************************************************************************
  * int dsp_upsample(int count, struct dsp_data *dsp,
- *                  int32_t *src[], int32_t *dst[])
+ *                  const int32_t *src[], int32_t *dst[])
  */
     .section    .text
     .align      2
@@ -395,7 +395,7 @@ channels_process_sound_chan_karaoke:
 
 /****************************************************************************
  * void sample_output_stereo(int count, struct dsp_data *data,
- *                               int32_t *src[], int16_t *dst)
+ *                           const int32_t *src[], int16_t *dst)
  *
  * Framework based on the ubiquitous Rockbox line transfer logic for
  * Coldfire CPUs.
@@ -517,7 +517,7 @@ sample_output_stereo:
 
 /****************************************************************************
  * void sample_output_mono(int count, struct dsp_data *data,
- *                         int32_t *src[], int16_t *dst)
+ *                         const int32_t *src[], int16_t *dst)
  *
  * Same treatment as sample_output_stereo but for one channel.
  */

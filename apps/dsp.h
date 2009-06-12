@@ -164,5 +164,9 @@ void sound_set_pitch(int r);
 int sound_get_pitch(void);
 int dsp_callback(int msg, intptr_t param);
 void dsp_dither_enable(bool enable);
+void dsp_timestretch_enable(bool enable);
+void dsp_set_timestretch(int percent);
+bool dsp_timestretch_enabled(void);
+int dsp_get_timestretch(void);
 
 #endif

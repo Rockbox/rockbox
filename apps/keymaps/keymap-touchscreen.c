@@ -206,6 +206,8 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_TOGGLE_MODE,    BUTTON_BOTTOMRIGHT,                BUTTON_NONE },
     { ACTION_PS_RESET,          BUTTON_CENTER,                     BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_TOPLEFT,                    BUTTON_NONE },
+    { ACTION_PS_SLOWER,         BUTTON_MIDLEFT|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_PS_FASTER,         BUTTON_MIDRIGHT|BUTTON_REPEAT,     BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_PITCHSCREEN)
 }; /* button_context_pitchcreen */
 

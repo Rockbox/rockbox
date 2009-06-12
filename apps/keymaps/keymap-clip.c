@@ -182,19 +182,19 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
 }; /* button_context_settings_right_is_inc */
 
 static const struct button_mapping button_context_pitchscreen[]  = {
-    { ACTION_PS_INC_SMALL,      BUTTON_RIGHT,                 BUTTON_NONE },
-    { ACTION_PS_INC_BIG,        BUTTON_RIGHT|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_PS_DEC_SMALL,      BUTTON_LEFT,               BUTTON_NONE },
-    { ACTION_PS_DEC_BIG,        BUTTON_LEFT|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT,               BUTTON_NONE },
-    { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,    BUTTON_NONE },
-    { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,              BUTTON_NONE },
-    { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RIGHT|BUTTON_REL,   BUTTON_NONE },
-    { ACTION_PS_TOGGLE_MODE,    BUTTON_HOME,                BUTTON_NONE },
-    { ACTION_PS_RESET,          BUTTON_SELECT,             BUTTON_NONE },
-    { ACTION_PS_EXIT,           BUTTON_POWER,              BUTTON_NONE },
-    { ACTION_PS_EXIT,           BUTTON_UP,                 BUTTON_NONE },
-
+    { ACTION_PS_INC_SMALL,      BUTTON_UP,                      BUTTON_NONE },
+    { ACTION_PS_INC_BIG,        BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_PS_DEC_SMALL,      BUTTON_DOWN,                    BUTTON_NONE },
+    { ACTION_PS_DEC_BIG,        BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },   
+    { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT,                    BUTTON_NONE },
+    { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,         BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,                   BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RIGHT|BUTTON_REL,        BUTTON_NONE },
+    { ACTION_PS_TOGGLE_MODE,    BUTTON_HOME,                    BUTTON_NONE },
+    { ACTION_PS_RESET,          BUTTON_SELECT,                  BUTTON_NONE },
+    { ACTION_PS_EXIT,           BUTTON_POWER,                   BUTTON_NONE },
+    { ACTION_PS_SLOWER,         BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_PS_FASTER,         BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_pitchscreen */
 

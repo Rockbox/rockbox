@@ -12468,3 +12468,37 @@
     *: "Prevent Track Skipping"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Timestretch"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Timestretch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Speed"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Speed"
+  </voice>
+</phrase>

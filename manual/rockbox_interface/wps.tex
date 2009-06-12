@@ -239,44 +239,78 @@ Delete the currently playing file.
 \nopt{player}{
   \subsubsection{\label{sec:pitchscreen}Pitch}
   
-  The \setting{Pitch Screen} allows you to change the pitch and (at the same
-  time) the playback speed of your \dap. The pitch value can be adjusted
-  between 50\% and 200\%. 50\% means half the normal playback speed and the
-  pitch that is an octave lower than the normal pitch. 200\% means double
-  playback speed and the pitch that is an octave higher than the normal pitch.
-  It is not possible to change the pitch without changing the playback speed and
-  vice versa. Changing the pitch can be done in two modes: procentual and
-  semitone. Initially (after the \dap{} is switched on), procentual mode
-  is active.
-  
-  \begin{table}
-    \begin{btnmap}{}{}
-      \ActionPsToggleMode
-      & Toggle pitch changing mode \\
-      %
-      \ActionPsIncSmall{} / \ActionPsDecSmall
-      & Increase / Decrease pitch by 0.1\% (in procentual mode) or a semitone
-        (in semitone mode)\\
-      %
-      \ActionPsIncBig{} / \ActionPsDecBig
-      & Increase / Decrease pitch by 1\% (in procentual mode) or a semitone
-        (in semitone mode)\\
-      %
-      \ActionPsNudgeRight{} / \ActionPsNudgeLeft
-      & Temporarily increase / decrease pitch by 2.0\% \\
-      %
-      \ActionPsReset
-      & Reset pitch to 100\% \\
-      %
-      \ActionPsExit
-      & Leave the Pitch Screen \\
-      %
-    \end{btnmap}
-  \end{table}
+  The \setting{Pitch Screen} allows you to change the pitch and the playback 
+  speed of your \dap. The pitch value can be adjusted between 50\% and 200\%.
+  50\% means half the normal playback speed and the pitch that is an octave lower 
+  than the normal pitch. 200\% means double playback speed and the pitch that 
+  is an octave higher than the normal pitch.  
 
-  \opt{MASCODEC}{
+  \opt{masf}{
+    Changing the pitch can be done in two modes: procentual and semitone.
+    Initially (after the \dap{} is switched on), procentual mode is active.
+
+    \begin{table}
+      \begin{btnmap}{}{}
+        \ActionPsToggleMode
+        & Toggle pitch changing mode \\
+        %
+        \ActionPsIncSmall{} / \ActionPsDecSmall
+        & Increase / Decrease pitch by 0.1\% (in procentual mode) or a semitone
+          (in semitone mode)\\
+        %
+        \ActionPsIncBig{} / \ActionPsDecBig
+        & Increase / Decrease pitch by 1\% (in procentual mode) or a semitone
+          (in semitone mode)\\
+        %
+        \ActionPsNudgeLeft{} / \ActionPsNudgeRight
+        & Temporarily change pitch by 2.0\% (beatmatch) \\
+        %
+        \ActionPsReset
+        & Reset pitch to 100\% \\
+        %
+        \ActionPsExit
+        & Leave the Pitch Screen \\
+        %
+      \end{btnmap}
+    \end{table}
+
     \warn{Changing the pitch can cause audible 'Artifacts' or 'Dropouts'.}
   }
+
+  \opt{swcodec}{
+    Changing the pitch can be done in three modes: procentual, semitone and 
+    timestretch. Initially (after the \dap{} is switched on), procentual mode is active.
+
+    Timestretch mode allows you to change the playback speed of your recording without 
+    affecting the pitch, and vice versa.  To access this you must enable the \setting{Timestretch} 
+    option in \setting{Sound Settings} and reboot.
+  
+    \begin{table}
+      \begin{btnmap}{}{}
+        \ActionPsToggleMode
+        & Toggle pitch changing mode \\
+        %
+        \ActionPsIncSmall{} / \ActionPsDecSmall
+        & Increase / Decrease pitch by 0.1\% (in procentual mode) or a semitone
+          (in semitone mode)\\
+        %
+        \ActionPsIncBig{} / \ActionPsDecBig
+        & Increase / Decrease pitch by 1\% (in procentual mode) or a semitone
+          (in semitone mode)\\
+        %
+        \ActionPsNudgeLeft{} / \ActionPsNudgeRight
+        & Temporarily change pitch by 2.0\% (beatmatch), or modify speed (in timestretch mode) \\
+        %
+        \ActionPsReset
+        & Reset pitch and speed to 100\% \\
+        %
+        \ActionPsExit
+        & Leave the Pitch Screen \\
+        %
+      \end{btnmap}
+    \end{table}
+  }
+
 }
 
 %********************QUICKSCREENS***********************************************

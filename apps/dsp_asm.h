@@ -54,9 +54,9 @@ void dsp_apply_gain(int count, struct dsp_data *data, int32_t *buf[]);
 
 #ifdef DSP_HAVE_ASM_RESAMPLING
 int dsp_upsample(int count, struct dsp_data *data,
-                 int32_t *src[], int32_t *dst[]);
+                 const int32_t *src[], int32_t *dst[]);
 int dsp_downsample(int count, struct dsp_data *data,
-                   int32_t *src[], int32_t *dst[]);
+                   const int32_t *src[], int32_t *dst[]);
 #endif /* DSP_HAVE_ASM_RESAMPLING */
 
 #ifdef DSP_HAVE_ASM_SOUND_CHAN_MONO
@@ -73,12 +73,12 @@ void channels_process_sound_chan_karaoke(int count, int32_t *buf[]);
 
 #ifdef DSP_HAVE_ASM_SAMPLE_OUTPUT_STEREO
 void sample_output_stereo(int count, struct dsp_data *data,
-                          int32_t *src[], int16_t *dst);
+                          const int32_t *src[], int16_t *dst);
 #endif
 
 #ifdef DSP_HAVE_ASM_SAMPLE_OUTPUT_MONO
 void sample_output_mono(int count, struct dsp_data *data,
-                        int32_t *src[], int16_t *dst);
+                        const int32_t *src[], int16_t *dst);
 #endif
 
 #endif /* _DSP_ASM_H */

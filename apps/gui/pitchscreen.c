@@ -36,12 +36,13 @@
 #include "system.h"
 #include "misc.h"
 #include "pitchscreen.h"
+#if CONFIG_CODEC == SWCODEC
+#include "tdspeed.h"
+#endif
 
-#define PITCH_MODE_ABSOLUTE 1
-#define PITCH_MODE_SEMITONE -PITCH_MODE_ABSOLUTE
+
 #define ICON_BORDER 12 /* icons are currently 7x8, so add ~2 pixels  */
                        /*   on both sides when drawing */
-                          
 
 #define PITCH_MAX         2000
 #define PITCH_MIN         500
@@ -49,8 +50,14 @@
 #define PITCH_BIG_DELTA   10
 #define PITCH_NUDGE_DELTA 20
 
-
-static int pitch_mode = PITCH_MODE_ABSOLUTE; /* 1 - absolute, -1 - semitone */
+static enum
+{
+    PITCH_MODE_ABSOLUTE,
+    PITCH_MODE_SEMITONE,
+#if CONFIG_CODEC == SWCODEC
+    PITCH_MODE_TIMESTRETCH,
+#endif
+} pitch_mode = PITCH_MODE_ABSOLUTE;
 
 enum
 {
@@ -83,8 +90,8 @@ static void pitchscreen_fix_viewports(struct viewport *parent,
 
 /* must be called before pitchscreen_draw, or within
  * since it neither clears nor updates the display */
-static void pitchscreen_draw_icons (struct screen *display,
-                                    struct viewport *parent)
+static void pitchscreen_draw_icons(struct screen *display,
+                                   struct viewport *parent)
 {
     display->set_viewport(parent);
     display->mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
@@ -102,25 +109,29 @@ static void pitchscreen_draw_icons (struct screen *display,
     display->update_viewport();
 }
 
-static void pitchscreen_draw (struct screen *display, int max_lines,
-        struct viewport pitch_viewports[PITCH_ITEM_COUNT], int pitch)
+static void pitchscreen_draw(struct screen *display, int max_lines,
+                             struct viewport pitch_viewports[PITCH_ITEM_COUNT],
+                             int pitch
+#if CONFIG_CODEC == SWCODEC
+                             ,int speed
+#endif
+                             )
 {
     unsigned char* ptr;
-    unsigned char buf[32];
-    int width_val, w, h;
+    char buf[32];
+    int w, h;
     bool show_lang_pitch;
 
-     /* Hide "Pitch up/Pitch down" for a small screen */
+     /* "Pitch up/Pitch down" - hide for a small screen */
     if (max_lines >= 5)
     {
         /* UP: Pitch Up */
         display->set_viewport(&pitch_viewports[PITCH_TOP]);
-        if (pitch_mode == PITCH_MODE_ABSOLUTE) {
-            ptr = str(LANG_PITCH_UP);
-        } else {
+        if (pitch_mode == PITCH_MODE_SEMITONE)
             ptr = str(LANG_PITCH_UP_SEMITONE);
-        }
-        display->getstringsize(ptr,&w,&h);
+        else
+            ptr = str(LANG_PITCH_UP);
+        display->getstringsize(ptr, &w, &h);
         display->clear_viewport();
         /* draw text */
         display->putsxy((pitch_viewports[PITCH_TOP].width / 2) -
@@ -129,81 +140,125 @@ static void pitchscreen_draw (struct screen *display, int max_lines,
 
         /* DOWN: Pitch Down */
         display->set_viewport(&pitch_viewports[PITCH_BOTTOM]);
-        if (pitch_mode == PITCH_MODE_ABSOLUTE) {
-            ptr = str(LANG_PITCH_DOWN);
-        } else {
+        if (pitch_mode == PITCH_MODE_SEMITONE)
             ptr = str(LANG_PITCH_DOWN_SEMITONE);
-        }
-        display->getstringsize(ptr,&w,&h);
+        else
+            ptr = str(LANG_PITCH_DOWN);
+        display->getstringsize(ptr, &w, &h);
         display->clear_viewport();
         /* draw text */
         display->putsxy((pitch_viewports[PITCH_BOTTOM].width / 2) -
                 (w / 2), 0, ptr);
         display->update_viewport();
     }
+
+    /* Middle section */
     display->set_viewport(&pitch_viewports[PITCH_MID]);
-
-    snprintf((char *)buf, sizeof(buf), "%s", str(LANG_PITCH));
-    display->getstringsize(buf,&w,&h);
-    /* lets hide LANG_PITCH for smaller screens */
     display->clear_viewport();
+    int width_used = 0;
+
+    /* Middle section upper line - hide for a small screen */
     if ((show_lang_pitch = (max_lines >= 3)))
-        display->putsxy((pitch_viewports[PITCH_MID].width / 2) - (w / 2),
-                0, buf);
-
-    /* "XXX.X%" */
-    snprintf((char *)buf, sizeof(buf), "%d.%d%%",
-            pitch / 10, pitch % 10 );
-    display->getstringsize(buf,&width_val,&h);
-    display->putsxy((pitch_viewports[PITCH_MID].width / 2) - (width_val / 2),
-            (show_lang_pitch? h : h/2), buf);
-
-    /* What's wider? LANG_PITCH or the value?
-     * Only interesting if LANG_PITCH is actually drawn */
-    if (show_lang_pitch && width_val > w)
-        w = width_val;
-
-    /* Let's treat '+' and '-' as equally wide
-     * This saves a getstringsize call
-     * Also, it wouldn't look nice if -2% shows up, but +2% not */
-    display->getstringsize("+2%",&width_val,&h);
-    w += width_val*2;
-    /* hide +2%/-2% for a narrow screens */
-    if (w <= pitch_viewports[PITCH_MID].width)
     {
-        /* RIGHT: +2% */
-        display->putsxy(pitch_viewports[PITCH_MID].width - width_val, h /2, "+2%");
-        /* LEFT: -2% */
-        display->putsxy(0, h / 2, "-2%");
+#if CONFIG_CODEC == SWCODEC
+        if (pitch_mode != PITCH_MODE_TIMESTRETCH)
+        {
+#endif
+            /* LANG_PITCH */
+            snprintf(buf, sizeof(buf), "%s", str(LANG_PITCH));
+#if CONFIG_CODEC == SWCODEC
+        }
+        else
+        {
+            /* Pitch:XXX.X% */
+            snprintf(buf, sizeof(buf), "%s:%d.%d%%", str(LANG_PITCH),
+                     pitch / 10, pitch % 10);
+        }
+#endif
+        display->getstringsize(buf, &w, &h);
+        display->putsxy((pitch_viewports[PITCH_MID].width / 2) - (w / 2),
+                        0, buf);
+        if (w > width_used)
+            width_used = w;
+    }
+
+    /* Middle section lower line */
+#if CONFIG_CODEC == SWCODEC
+    if (pitch_mode != PITCH_MODE_TIMESTRETCH)
+    {
+#endif
+        /* "XXX.X%" */
+        snprintf(buf, sizeof(buf), "%d.%d%%",
+             pitch / 10, pitch % 10);
+#if CONFIG_CODEC == SWCODEC
+    }
+    else
+    {
+        /* "Speed:XXX%" */
+        snprintf(buf, sizeof(buf), "%s:%d%%", str(LANG_SPEED), speed);
+    }
+#endif
+    display->getstringsize(buf, &w, &h);
+    display->putsxy((pitch_viewports[PITCH_MID].width / 2) - (w / 2),
+        (show_lang_pitch ? h : h/2), buf);
+    if (w > width_used)
+        width_used = w;
+
+    /* Middle section left/right labels */
+    const char *leftlabel = "-2%";
+    const char *rightlabel = "+2%";
+#if CONFIG_CODEC == SWCODEC
+    if (pitch_mode == PITCH_MODE_TIMESTRETCH)
+    {
+        leftlabel = "<<";
+        rightlabel = ">>";
+    }
+#endif
+
+    /* Only display if they fit */
+    display->getstringsize(leftlabel, &w, &h);
+    width_used += w;
+    display->getstringsize(rightlabel, &w, &h);
+    width_used += w;
+
+    if (width_used <= pitch_viewports[PITCH_MID].width)
+    {
+        display->putsxy(0, h / 2, leftlabel);
+        display->putsxy(pitch_viewports[PITCH_MID].width - w, h /2, rightlabel);
     }
     display->update_viewport();
     display->set_viewport(NULL);
 }
 
-static int pitch_increase(int pitch, int delta, bool allow_cutoff)
+static int pitch_increase(int pitch, int pitch_delta, bool allow_cutoff)
 {
     int new_pitch;
 
-    if (delta < 0) {
-        if (pitch + delta >= PITCH_MIN) {
-            new_pitch = pitch + delta;
-        } else {
-            if (!allow_cutoff) {
+    if (pitch_delta < 0)
+    {
+        if (pitch + pitch_delta >= PITCH_MIN)
+            new_pitch = pitch + pitch_delta;
+        else
+        {
+            if (!allow_cutoff)
                 return pitch;
-            }
             new_pitch = PITCH_MIN;
         }
-    } else if (delta > 0) {
-        if (pitch + delta <= PITCH_MAX) {
-            new_pitch = pitch + delta;
-        } else {
-            if (!allow_cutoff) {
+    }
+    else if (pitch_delta > 0)
+    {
+        if (pitch + pitch_delta <= PITCH_MAX)
+            new_pitch = pitch + pitch_delta;
+        else
+        {
+            if (!allow_cutoff)
                 return pitch;
-            }
             new_pitch = PITCH_MAX;
         }
-    } else {
-        /* delta == 0 -> no real change */
+    }
+    else
+    {
+        /* pitch_delta == 0 -> no real change */
         return pitch;
     }
     sound_set_pitch(new_pitch);
@@ -234,10 +289,13 @@ static int pitch_increase_semitone(int pitch, bool up)
     uint32_t tmp;
     uint32_t round_fct; /* How much to scale down at the end */
     tmp = pitch;
-    if (up) {
+    if (up)
+    {
         tmp = tmp * PITCH_SEMITONE_FACTOR;
         round_fct = PITCH_K_FCT;
-    } else {
+    }
+    else
+    {
         tmp = (tmp * PITCH_KN_FCT) / PITCH_SEMITONE_FACTOR;
         round_fct = PITCH_N_FCT;
     }
@@ -256,7 +314,12 @@ int gui_syncpitchscreen_run(void)
 {
     int button, i;
     int pitch = sound_get_pitch();
-    int new_pitch, delta = 0;
+#if CONFIG_CODEC == SWCODEC
+    int speed = dsp_get_timestretch();
+    int maintain_speed_pitch = speed * pitch; /* speed * pitch to maintain */
+#endif
+    int new_pitch;
+    int pitch_delta = 0;
     bool nudged = false;
     bool exit = false;
     /* should maybe be passed per parameter later, not needed for now */
@@ -283,58 +346,118 @@ int gui_syncpitchscreen_run(void)
     {
         FOR_NB_SCREENS(i)
             pitchscreen_draw(&screens[i], max_lines[i],
-                              pitch_viewports[i], pitch);
-        button = get_action(CONTEXT_PITCHSCREEN,HZ);
-        switch (button) {
+                              pitch_viewports[i], pitch
+#if CONFIG_CODEC == SWCODEC
+                              , speed
+#endif
+                              );
+        button = get_action(CONTEXT_PITCHSCREEN, HZ);
+        switch (button)
+        {
             case ACTION_PS_INC_SMALL:
-                delta = PITCH_SMALL_DELTA;
+                pitch_delta = PITCH_SMALL_DELTA;
                 break;
 
             case ACTION_PS_INC_BIG:
-                delta = PITCH_BIG_DELTA;
+                pitch_delta = PITCH_BIG_DELTA;
                 break;
 
             case ACTION_PS_DEC_SMALL:
-                delta = -PITCH_SMALL_DELTA;
+                pitch_delta = -PITCH_SMALL_DELTA;
                 break;
 
             case ACTION_PS_DEC_BIG:
-                delta = -PITCH_BIG_DELTA;
+                pitch_delta = -PITCH_BIG_DELTA;
                 break;
 
             case ACTION_PS_NUDGE_RIGHT:
-                new_pitch = pitch_increase(pitch, PITCH_NUDGE_DELTA, false);
-                nudged = (new_pitch != pitch);
-                pitch = new_pitch;
+#if CONFIG_CODEC == SWCODEC
+                if (pitch_mode != PITCH_MODE_TIMESTRETCH)
+                {
+#endif
+                    new_pitch = pitch_increase(pitch, PITCH_NUDGE_DELTA, false);
+                    nudged = (new_pitch != pitch);
+                    pitch = new_pitch;
+                    break;
+#if CONFIG_CODEC == SWCODEC
+                }
+
+            case ACTION_PS_FASTER:
+                if (pitch_mode == PITCH_MODE_TIMESTRETCH)
+                {
+                    if (speed < SPEED_MAX)
+                    {
+                        speed++;
+                        dsp_set_timestretch(speed);
+                        maintain_speed_pitch = speed * pitch;
+                    }
+                }
                 break;
+#endif
 
             case ACTION_PS_NUDGE_RIGHTOFF:
-                if (nudged) {
+                if (nudged)
+                {
                     pitch = pitch_increase(pitch, -PITCH_NUDGE_DELTA, false);
+                    nudged = false;
                 }
-                nudged = false;
                 break;
 
             case ACTION_PS_NUDGE_LEFT:
-                new_pitch = pitch_increase(pitch, -PITCH_NUDGE_DELTA, false);
-                nudged = (new_pitch != pitch);
-                pitch = new_pitch;
+#if CONFIG_CODEC == SWCODEC
+                if (pitch_mode != PITCH_MODE_TIMESTRETCH)
+                {
+#endif
+                    new_pitch = pitch_increase(pitch, -PITCH_NUDGE_DELTA, false);
+                    nudged = (new_pitch != pitch);
+                    pitch = new_pitch;
+                    break;
+#if CONFIG_CODEC == SWCODEC
+                }
+
+            case ACTION_PS_SLOWER:
+                if (pitch_mode == PITCH_MODE_TIMESTRETCH)
+                {
+                    if (speed > SPEED_MIN)
+                    {
+                        speed--;
+                        dsp_set_timestretch(speed);
+                        maintain_speed_pitch = speed * pitch;
+                    }
+                }
                 break;
+#endif
 
             case ACTION_PS_NUDGE_LEFTOFF:
-                if (nudged) {
+                if (nudged)
+                {
                     pitch = pitch_increase(pitch, PITCH_NUDGE_DELTA, false);
+                    nudged = false;
                 }
-                nudged = false;
                 break;
 
             case ACTION_PS_RESET:
                 pitch = 1000;
-                sound_set_pitch( pitch );
+                sound_set_pitch(pitch);
+#if CONFIG_CODEC == SWCODEC
+                speed = 100;
+                dsp_set_timestretch(speed);
+                maintain_speed_pitch = speed * pitch;
+#endif
                 break;
 
             case ACTION_PS_TOGGLE_MODE:
-                pitch_mode = -pitch_mode;
+                ++pitch_mode;
+#if CONFIG_CODEC == SWCODEC
+                if (dsp_timestretch_enabled())
+                {
+                    if (pitch_mode > PITCH_MODE_TIMESTRETCH)
+                        pitch_mode = PITCH_MODE_ABSOLUTE;
+                    break;
+                }
+#endif
+                if (pitch_mode > PITCH_MODE_SEMITONE)
+                    pitch_mode = PITCH_MODE_ABSOLUTE;
                 break;
 
             case ACTION_PS_EXIT:
@@ -342,19 +465,32 @@ int gui_syncpitchscreen_run(void)
                 break;
 
             default:
-                if(default_event_handler(button) == SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
                     return 1;
                 break;
         }
-        if(delta)
+        if (pitch_delta)
         {
-            if (pitch_mode == PITCH_MODE_ABSOLUTE) {
-                pitch = pitch_increase(pitch, delta, true);
-            } else {
-                pitch = pitch_increase_semitone(pitch, delta > 0);
+            if (pitch_mode == PITCH_MODE_SEMITONE)
+                pitch = pitch_increase_semitone(pitch, pitch_delta > 0);
+            else
+                pitch = pitch_increase(pitch, pitch_delta, true);
+#if CONFIG_CODEC == SWCODEC
+            if (pitch_mode == PITCH_MODE_TIMESTRETCH)
+            {
+                /* Set speed to maintain time dimension */
+                /* i.e. increase pitch, slow down speed */
+                int new_speed = maintain_speed_pitch / pitch;
+                if (new_speed >= SPEED_MIN && new_speed <= SPEED_MAX)
+                {
+                    speed = new_speed;
+                    dsp_set_timestretch(speed);
+                }
             }
-
-            delta = 0;
+            else
+                maintain_speed_pitch = speed * pitch;
+#endif
+            pitch_delta = 0;
         }
     }
 #if CONFIG_CODEC == SWCODEC

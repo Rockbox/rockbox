@@ -260,6 +260,8 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_TOGGLE_MODE,    BUTTON_POWER,                     BUTTON_NONE },
     { ACTION_PS_RESET,          BUTTON_PLAY,                      BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_LEFT,                      BUTTON_NONE },
+    { ACTION_PS_SLOWER,         BUTTON_REW|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_PS_FASTER,         BUTTON_FF|BUTTON_REPEAT,          BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_pitchscreen */
@@ -274,6 +276,8 @@ static const struct button_mapping remote_button_context_pitchscreen[]  = {
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_RC_FF,                     BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RC_FF|BUTTON_REL,          BUTTON_NONE },
     { ACTION_PS_RESET,          BUTTON_RC_PLAY,                   BUTTON_NONE },
+    { ACTION_PS_SLOWER,         BUTTON_RC_REW|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_PS_FASTER,         BUTTON_RC_FF|BUTTON_REPEAT,       BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_pitchscreen */

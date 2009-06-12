@@ -159,6 +159,8 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_TOGGLE_MODE,    BUTTON_F1,                  BUTTON_NONE },
     { ACTION_PS_RESET,          BUTTON_ON,                  BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_OFF,                 BUTTON_NONE },
+    { ACTION_PS_SLOWER,         BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_PS_FASTER,         BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */

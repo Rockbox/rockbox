@@ -126,6 +126,7 @@ pcmbuf.c
 playback.c
 codecs.c
 dsp.c
+tdspeed.c
 #ifdef HAVE_RECORDING
 enc_config.c
 #ifndef SIMULATOR

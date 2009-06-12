@@ -32,22 +32,19 @@
 #include "replaygain.h"
 #include "misc.h"
 #include "debug.h"
+#include "tdspeed.h"
+#include "buffer.h"
 
 /* 16-bit samples are scaled based on these constants. The shift should be
  * no more than 15.
  */
-#define WORD_SHIFT          12
-#define WORD_FRACBITS       27
+#define WORD_SHIFT              12
+#define WORD_FRACBITS           27
 
-#define NATIVE_DEPTH        16
-/* If the buffer sizes change, check the assembly code! */
-#define SAMPLE_BUF_COUNT    256
-#define RESAMPLE_BUF_COUNT  (256 * 4)   /* Enough for 11,025 Hz -> 44,100 Hz*/
-#define DEFAULT_GAIN        0x01000000
-#define SAMPLE_BUF_LEFT_CHANNEL 0
-#define SAMPLE_BUF_RIGHT_CHANNEL (SAMPLE_BUF_COUNT/2)
-#define RESAMPLE_BUF_LEFT_CHANNEL 0
-#define RESAMPLE_BUF_RIGHT_CHANNEL (RESAMPLE_BUF_COUNT/2)
+#define NATIVE_DEPTH            16
+/* If the small buffer size changes, check the assembly code! */
+#define SMALL_SAMPLE_BUF_COUNT  256
+#define DEFAULT_GAIN            0x01000000
 
 /* enums to index conversion properly with stereo mode and other settings */
 enum
@@ -101,7 +98,7 @@ struct dsp_data
     struct resample_data resample_data; /* 08h */
     int32_t clip_min;                   /* 18h */
     int32_t clip_max;                   /* 1ch */
-    int32_t gain;                       /* 20h - Note that this is in S8.23 format. */ 
+    int32_t gain;                       /* 20h - Note that this is in S8.23 format. */
                                         /* 24h */
 };
 
@@ -140,11 +137,12 @@ struct eq_state
 
 /* Typedefs keep things much neater in this case */
 typedef void (*sample_input_fn_type)(int count, const char *src[],
-                                     int32_t *dst[]);    
+                                     int32_t *dst[]);
 typedef int (*resample_fn_type)(int count, struct dsp_data *data,
-                                int32_t *src[], int32_t *dst[]);
+                                const int32_t *src[], int32_t *dst[]);
 typedef void (*sample_output_fn_type)(int count, struct dsp_data *data,
-                                      int32_t *src[], int16_t *dst);
+                                      const int32_t *src[], int16_t *dst);
+
 /* Single-DSP channel processing in place */
 typedef void (*channels_process_fn_type)(int count, int32_t *buf[]);
 /* DSP local channel processing in place */
@@ -163,6 +161,9 @@ struct dsp_config
     int  sample_depth;
     int  sample_bytes;
     int  stereo_mode;
+    bool tdspeed_enabled; /* User has enabled timestretch */
+    int  tdspeed_percent; /* Speed % */
+    bool tdspeed_active;  /* Timestretch is in use */
     int  frac_bits;
 #ifdef HAVE_SW_TONE_CONTROLS
     /* Filter struct for software bass/treble controls */
@@ -218,16 +219,31 @@ static long album_peak;
 static long replaygain;
 static bool crossfeed_enabled;
 
-#define audio_dsp (dsp_conf[CODEC_IDX_AUDIO])
-#define voice_dsp (dsp_conf[CODEC_IDX_VOICE])
+#define AUDIO_DSP (dsp_conf[CODEC_IDX_AUDIO])
+#define VOICE_DSP (dsp_conf[CODEC_IDX_VOICE])
 
 /* The internal format is 32-bit samples, non-interleaved, stereo. This
  * format is similar to the raw output from several codecs, so the amount
  * of copying needed is minimized for that case.
  */
 
-int32_t sample_buf[SAMPLE_BUF_COUNT] IBSS_ATTR;
-static int32_t resample_buf[RESAMPLE_BUF_COUNT] IBSS_ATTR;
+#define RESAMPLE_RATIO          4 /* Enough for 11,025 Hz -> 44,100 Hz */
+
+static int32_t small_sample_buf[SMALL_SAMPLE_BUF_COUNT] IBSS_ATTR;
+static int32_t small_resample_buf[SMALL_SAMPLE_BUF_COUNT * RESAMPLE_RATIO] IBSS_ATTR;
+
+static int32_t *big_sample_buf = NULL;
+static int32_t *big_resample_buf = NULL;
+static int big_sample_buf_count = -1;  /* -1=unknown, 0=not available */
+
+static int sample_buf_count;
+static int32_t *sample_buf;
+static int32_t *resample_buf;
+
+#define SAMPLE_BUF_LEFT_CHANNEL 0
+#define SAMPLE_BUF_RIGHT_CHANNEL (sample_buf_count/2)
+#define RESAMPLE_BUF_LEFT_CHANNEL 0
+#define RESAMPLE_BUF_RIGHT_CHANNEL (sample_buf_count/2 * RESAMPLE_RATIO)
 
 #if 0
 /* Clip sample to arbitrary limits where range > 0 and min + range = max */
@@ -260,8 +276,66 @@ int sound_get_pitch(void)
 void sound_set_pitch(int permille)
 {
     pitch_ratio = permille;
-    dsp_configure(&audio_dsp, DSP_SWITCH_FREQUENCY,
-                  audio_dsp.codec_frequency);
+    dsp_configure(&AUDIO_DSP, DSP_SWITCH_FREQUENCY,
+                  AUDIO_DSP.codec_frequency);
+}
+
+void tdspeed_setup(struct dsp_config *dspc)
+{
+    if (dspc == &AUDIO_DSP)
+    {
+        dspc->tdspeed_active = false;
+        if (!dspc->tdspeed_enabled)
+            return;
+        if (dspc->tdspeed_percent == 0)
+            dspc->tdspeed_percent = 100;
+        if (!tdspeed_init(
+            dspc->codec_frequency == 0 ? NATIVE_FREQUENCY : dspc->codec_frequency,
+            dspc->stereo_mode != STEREO_MONO,
+            dspc->tdspeed_percent))
+            return;
+        if (dspc->tdspeed_percent == 100 || big_sample_buf_count <= 0)
+            return;
+        dspc->tdspeed_active = true;
+    }
+}
+
+void dsp_timestretch_enable(bool enable)
+{
+    if (enable)
+    {
+        /* Set up timestretch buffers on first enable */
+        if (big_sample_buf_count < 0)
+        {
+            big_sample_buf_count = SMALL_SAMPLE_BUF_COUNT * RESAMPLE_RATIO;
+            big_sample_buf = small_resample_buf;
+            big_resample_buf = (int32_t *) buffer_alloc(big_sample_buf_count * RESAMPLE_RATIO * sizeof(int32_t));
+        }
+    }
+    else
+    {
+        /* If not enabled at startup, buffers will never be available */
+        if (big_sample_buf_count < 0)
+            big_sample_buf_count = 0;
+    }
+    AUDIO_DSP.tdspeed_enabled = enable;
+    tdspeed_setup(&AUDIO_DSP);
+}
+
+void dsp_set_timestretch(int percent)
+{
+    AUDIO_DSP.tdspeed_percent = percent;
+    tdspeed_setup(&AUDIO_DSP);
+}
+
+int dsp_get_timestretch()
+{
+    return AUDIO_DSP.tdspeed_percent;
+}
+
+bool dsp_timestretch_enabled()
+{
+    return (AUDIO_DSP.tdspeed_enabled && big_sample_buf_count > 0);
 }
 
 /* Convert count samples to the internal format, if needed.  Updates src
@@ -403,10 +477,11 @@ static void sample_input_new_format(struct dsp_config *dsp)
     dsp->input_samples = sample_input_functions[convert];
 }
 
+
 #ifndef DSP_HAVE_ASM_SAMPLE_OUTPUT_MONO
 /* write mono internal format to output format */
 static void sample_output_mono(int count, struct dsp_data *data,
-                               int32_t *src[], int16_t *dst)
+                               const int32_t *src[], int16_t *dst)
 {
     const int32_t *s0 = src[0];
     const int scale = data->output_scale;
@@ -425,7 +500,7 @@ static void sample_output_mono(int count, struct dsp_data *data,
 /* write stereo internal format to output format */
 #ifndef DSP_HAVE_ASM_SAMPLE_OUTPUT_STEREO
 static void sample_output_stereo(int count, struct dsp_data *data,
-                                 int32_t *src[], int16_t *dst)
+                                 const int32_t *src[], int16_t *dst)
 {
     const int32_t *s0 = src[0];
     const int32_t *s1 = src[1];
@@ -448,7 +523,7 @@ static void sample_output_stereo(int count, struct dsp_data *data,
  * This function handles mono and stereo outputs.
  */
 static void sample_output_dithered(int count, struct dsp_data *data,
-                                   int32_t *src[], int16_t *dst)
+                                   const int32_t *src[], int16_t *dst)
 {
     const int32_t mask = dither_mask;
     const int32_t bias = dither_bias;
@@ -462,7 +537,7 @@ static void sample_output_dithered(int count, struct dsp_data *data,
     for (ch = 0; ch < data->num_channels; ch++)
     {
         struct dither_data * const dither = &dither_data[ch];
-        int32_t *s = src[ch];
+        const int32_t *s = src[ch];
         int i;
 
         for (i = 0, d = &dst[ch]; i < count; i++, s++, d += 2)
@@ -540,7 +615,7 @@ static void sample_output_new_format(struct dsp_config *dsp)
 
     int out = dsp->data.num_channels - 1;
 
-    if (dsp == &audio_dsp && dither_enabled)
+    if (dsp == &AUDIO_DSP && dither_enabled)
         out += 2;
 
     dsp->output_samples = sample_output_functions[out];
@@ -552,7 +627,7 @@ static void sample_output_new_format(struct dsp_config *dsp)
  */
 #ifndef DSP_HAVE_ASM_RESAMPLING
 static int dsp_downsample(int count, struct dsp_data *data,
-                          int32_t *src[], int32_t *dst[])
+                          const int32_t *src[], int32_t *dst[])
 {
     int ch = data->num_channels - 1;
     uint32_t delta = data->resample_data.delta;
@@ -565,9 +640,9 @@ static int dsp_downsample(int count, struct dsp_data *data,
         /* Just initialize things and not worry too much about the relatively
          * uncommon case of not being able to spit out a sample for the frame.
          */
-        int32_t *s = src[ch];
+        const int32_t *s = src[ch];
         int32_t last = data->resample_data.last_sample[ch];
-        
+
         data->resample_data.last_sample[ch] = s[count - 1];
         d = dst[ch];
         phase = data->resample_data.phase;
@@ -593,7 +668,7 @@ static int dsp_downsample(int count, struct dsp_data *data,
 }
 
 static int dsp_upsample(int count, struct dsp_data *data,
-                        int32_t *src[], int32_t *dst[])
+                        const int32_t *src[], int32_t *dst[])
 {
     int  ch = data->num_channels - 1;
     uint32_t delta = data->resample_data.delta;
@@ -603,11 +678,10 @@ static int dsp_upsample(int count, struct dsp_data *data,
     /* Rolled channel loop actually showed slightly faster. */
     do
     {
-        /* Should always be able to output a sample for a ratio up to
-           RESAMPLE_BUF_COUNT / SAMPLE_BUF_COUNT. */
-        int32_t *s = src[ch];
+        /* Should always be able to output a sample for a ratio up to RESAMPLE_RATIO */
+        const int32_t *s = src[ch];
         int32_t last = data->resample_data.last_sample[ch];
-        
+
         data->resample_data.last_sample[ch] = s[count - 1];
         d = dst[ch];
         phase = data->resample_data.phase;
@@ -638,7 +712,7 @@ static int dsp_upsample(int count, struct dsp_data *data,
 
 static void resampler_new_delta(struct dsp_config *dsp)
 {
-    dsp->data.resample_data.delta = (unsigned long) 
+    dsp->data.resample_data.delta = (unsigned long)
         dsp->frequency * 65536LL / NATIVE_FREQUENCY;
 
     if (dsp->frequency == NATIVE_FREQUENCY)
@@ -669,7 +743,7 @@ static inline int resample(struct dsp_config *dsp, int count, int32_t *src[])
         &resample_buf[RESAMPLE_BUF_RIGHT_CHANNEL],
     };
 
-    count = dsp->resample(count, &dsp->data, src, dst);
+    count = dsp->resample(count, &dsp->data, (const int32_t **)src, dst);
 
     src[0] = dst[0];
     src[1] = dst[dsp->data.num_channels - 1];
@@ -686,7 +760,7 @@ static void dither_init(struct dsp_config *dsp)
 
 void dsp_dither_enable(bool enable)
 {
-    struct dsp_config *dsp = &audio_dsp;
+    struct dsp_config *dsp = &AUDIO_DSP;
     dither_enabled = enable;
     sample_output_new_format(dsp);
 }
@@ -705,7 +779,7 @@ static void apply_crossfeed(int count, int32_t *buf[])
     int32_t *coefs = &crossfeed_data.coefs[0];
     int32_t gain = crossfeed_data.gain;
     int32_t *di = crossfeed_data.index;
- 
+
     int32_t acc;
     int32_t left, right;
     int i;
@@ -734,7 +808,7 @@ static void apply_crossfeed(int count, int32_t *buf[])
         /* Now add the attenuated direct sound and write to outputs */
         buf[0][i] = FRACMUL(left, gain) + hist_r[1];
         buf[1][i] = FRACMUL(right, gain) + hist_l[1];
- 
+
         /* Wrap delay line index if bigger than delay line size */
         if (di >= delay + 13*2)
             di = delay;
@@ -754,7 +828,7 @@ static void apply_crossfeed(int count, int32_t *buf[])
 void dsp_set_crossfeed(bool enable)
 {
     crossfeed_enabled = enable;
-    audio_dsp.apply_crossfeed = (enable && audio_dsp.data.num_channels > 1)
+    AUDIO_DSP.apply_crossfeed = (enable && AUDIO_DSP.data.num_channels > 1)
                                     ? apply_crossfeed : NULL;
 }
 
@@ -815,17 +889,17 @@ static void set_gain(struct dsp_config *dsp)
     dsp->data.gain = DEFAULT_GAIN;
 
     /* Replay gain not relevant to voice */
-    if (dsp == &audio_dsp && replaygain)
+    if (dsp == &AUDIO_DSP && replaygain)
     {
         dsp->data.gain = replaygain;
     }
-    
+
     if (dsp->eq_process && eq_precut)
     {
         dsp->data.gain =
             (long) (((int64_t) dsp->data.gain * eq_precut) >> 24);
     }
-    
+
     if (dsp->data.gain == DEFAULT_GAIN)
     {
         dsp->data.gain = 0;
@@ -846,7 +920,7 @@ static void set_gain(struct dsp_config *dsp)
 void dsp_set_eq_precut(int precut)
 {
     eq_precut = get_replaygain_int(precut * -10);
-    set_gain(&audio_dsp);
+    set_gain(&AUDIO_DSP);
 }
 
 /**
@@ -867,10 +941,10 @@ void dsp_set_eq_coefs(int band)
     cutoff = 0xffffffff / NATIVE_FREQUENCY * (*setting++);
     q = *setting++;
     gain = *setting++;
-    
+
     if (q == 0)
         q = 1;
-    
+
     /* NOTE: The coef functions assume the EMAC unit is in fractional mode,
        which it should be, since we're executed from the main thread. */
 
@@ -903,7 +977,7 @@ static void eq_process(int count, int32_t *buf[])
         EQ_PEAK_SHIFT,   /* peaking    */
         EQ_SHELF_SHIFT,  /* high shelf */
     };
-    unsigned int channels = audio_dsp.data.num_channels;
+    unsigned int channels = AUDIO_DSP.data.num_channels;
     int i;
 
     /* filter configuration currently is 1 low shelf filter, 3 band peaking
@@ -925,14 +999,14 @@ static void eq_process(int count, int32_t *buf[])
  */
 void dsp_set_eq(bool enable)
 {
-    audio_dsp.eq_process = enable ? eq_process : NULL;
-    set_gain(&audio_dsp);
+    AUDIO_DSP.eq_process = enable ? eq_process : NULL;
+    set_gain(&AUDIO_DSP);
 }
 
 static void dsp_set_stereo_width(int value)
 {
     long width, straight, cross;
-    
+
     width = value * 0x7fffff / 100;
 
     if (value <= 100)
@@ -1039,14 +1113,14 @@ static void dsp_set_channel_config(int value)
     };
 
     if ((unsigned)value >= ARRAYLEN(channels_process_functions) ||
-        audio_dsp.stereo_mode == STEREO_MONO)
+        AUDIO_DSP.stereo_mode == STEREO_MONO)
     {
         value = SOUND_CHAN_STEREO;
     }
 
     /* This doesn't apply to voice */
     channels_mode = value;
-    audio_dsp.channels_process = channels_process_functions[value];
+    AUDIO_DSP.channels_process = channels_process_functions[value];
 }
 
 #if CONFIG_CODEC == SWCODEC
@@ -1057,10 +1131,10 @@ static void set_tone_controls(void)
     filter_bishelf_coefs(0xffffffff/NATIVE_FREQUENCY*200,
                          0xffffffff/NATIVE_FREQUENCY*3500,
                          bass, treble, -prescale,
-                         audio_dsp.tone_filter.coefs);
+                         AUDIO_DSP.tone_filter.coefs);
     /* Sync the voice dsp coefficients */
-    memcpy(&voice_dsp.tone_filter.coefs, audio_dsp.tone_filter.coefs,
-           sizeof (voice_dsp.tone_filter.coefs));
+    memcpy(&VOICE_DSP.tone_filter.coefs, AUDIO_DSP.tone_filter.coefs,
+           sizeof (VOICE_DSP.tone_filter.coefs));
 }
 #endif
 
@@ -1069,7 +1143,8 @@ static void set_tone_controls(void)
  */
 int dsp_callback(int msg, intptr_t param)
 {
-    switch (msg) {
+    switch (msg)
+    {
 #ifdef HAVE_SW_TONE_CONTROLS
     case DSP_CALLBACK_SET_PRESCALE:
         prescale = param;
@@ -1112,7 +1187,6 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
     static long last_yield;
     long tick;
     int written = 0;
-    int samples;
 
 #if defined(CPU_COLDFIRE)
     /* set emac unit for dsp processing, and save old macsr, we're running in
@@ -1132,43 +1206,58 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
        will be preloaded to be used for the call if not. */
     while (count > 0)
     {
-        samples = MIN(SAMPLE_BUF_COUNT/2, count);
+        int samples = MIN(sample_buf_count/2, count);
         count -= samples;
 
         dsp->input_samples(samples, src, tmp);
 
-        if (dsp->apply_gain)
-            dsp->apply_gain(samples, &dsp->data, tmp);
+        if (dsp->tdspeed_active)
+            samples = tdspeed_doit(tmp, samples);
 
-        if (dsp->resample && (samples = resample(dsp, samples, tmp)) <= 0)
-            break; /* I'm pretty sure we're downsampling here */
+        int chunk_offset = 0;
+        while (samples > 0)
+        {
+            int32_t *t2[2];
+            t2[0] = tmp[0]+chunk_offset;
+            t2[1] = tmp[1]+chunk_offset;
 
-        if (dsp->apply_crossfeed)
-            dsp->apply_crossfeed(samples, tmp);
+            int chunk = MIN(sample_buf_count/2, samples);
+            chunk_offset += chunk;
+            samples -= chunk;
 
-        if (dsp->eq_process)
-            dsp->eq_process(samples, tmp);
+            if (dsp->apply_gain)
+                dsp->apply_gain(chunk, &dsp->data, t2);
+
+            if (dsp->resample && (chunk = resample(dsp, chunk, t2)) <= 0)
+                break; /* I'm pretty sure we're downsampling here */
+
+            if (dsp->apply_crossfeed)
+                dsp->apply_crossfeed(chunk, t2);
+
+            if (dsp->eq_process)
+                dsp->eq_process(chunk, t2);
 
 #ifdef HAVE_SW_TONE_CONTROLS
-        if ((bass | treble) != 0)
-            eq_filter(tmp, &dsp->tone_filter, samples,
+            if ((bass | treble) != 0)
+                eq_filter(t2, &dsp->tone_filter, chunk,
                       dsp->data.num_channels, FILTER_BISHELF_SHIFT);
 #endif
 
-        if (dsp->channels_process)
-            dsp->channels_process(samples, tmp);
+            if (dsp->channels_process)
+                dsp->channels_process(chunk, t2);
 
-        dsp->output_samples(samples, &dsp->data, tmp, (int16_t *)dst);
+            dsp->output_samples(chunk, &dsp->data, (const int32_t **)t2, (int16_t *)dst);
 
-        written += samples;
-        dst += samples * sizeof (int16_t) * 2;
-        
-        /* yield at least once each tick */
-        tick = current_tick;
-        if (TIME_AFTER(tick, last_yield))
-        {
-            last_yield = tick;
-            yield();
+            written += chunk;
+            dst += chunk * sizeof (int16_t) * 2;
+
+            /* yield at least once each tick */
+            tick = current_tick;
+            if (TIME_AFTER(tick, last_yield))
+            {
+                last_yield = tick;
+                yield();
+            }
         }
     }
 
@@ -1188,6 +1277,20 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 /* dsp_input_size MUST be called afterwards */
 int dsp_output_count(struct dsp_config *dsp, int count)
 {
+    if(!dsp->tdspeed_active)
+    {
+        sample_buf = small_sample_buf;
+        resample_buf = small_resample_buf;
+        sample_buf_count = SMALL_SAMPLE_BUF_COUNT;
+    }
+    else
+    {
+        sample_buf = big_sample_buf;
+        sample_buf_count = big_sample_buf_count;
+        resample_buf = big_resample_buf;
+    }
+    if(dsp->tdspeed_active)
+        count = tdspeed_est_output_size();
     if (dsp->resample)
     {
         count = (int)(((unsigned long)count * NATIVE_FREQUENCY
@@ -1195,12 +1298,12 @@ int dsp_output_count(struct dsp_config *dsp, int count)
     }
 
     /* Now we have the resampled sample count which must not exceed
-     * RESAMPLE_BUF_COUNT/2 to avoid resample buffer overflow. One
+     * RESAMPLE_BUF_RIGHT_CHANNEL to avoid resample buffer overflow. One
      * must call dsp_input_count() to get the correct input sample
      * count.
      */
-    if (count > RESAMPLE_BUF_COUNT/2)
-        count = RESAMPLE_BUF_COUNT/2;
+    if (count > RESAMPLE_BUF_RIGHT_CHANNEL)
+        count = RESAMPLE_BUF_RIGHT_CHANNEL;
 
     return count;
 }
@@ -1221,6 +1324,9 @@ int dsp_input_count(struct dsp_config *dsp, int count)
                       dsp->data.resample_data.delta) >> 16);
     }
 
+    if(dsp->tdspeed_active)
+        count = tdspeed_est_input_size(count);
+
     return count;
 }
 
@@ -1234,7 +1340,7 @@ static void dsp_update_functions(struct dsp_config *dsp)
 {
     sample_input_new_format(dsp);
     sample_output_new_format(dsp);
-    if (dsp == &audio_dsp)
+    if (dsp == &AUDIO_DSP)
         dsp_set_crossfeed(crossfeed_enabled);
 }
 
@@ -1246,9 +1352,9 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
         switch (value)
         {
         case CODEC_IDX_AUDIO:
-            return (intptr_t)&audio_dsp;
+            return (intptr_t)&AUDIO_DSP;
         case CODEC_IDX_VOICE:
-            return (intptr_t)&voice_dsp;
+            return (intptr_t)&VOICE_DSP;
         default:
             return (intptr_t)NULL;
         }
@@ -1262,12 +1368,13 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
            if we're called from the main audio thread. Voice UI thread should
            not need this feature.
          */
-        if (dsp == &audio_dsp)
+        if (dsp == &AUDIO_DSP)
             dsp->frequency = pitch_ratio * dsp->codec_frequency / 1000;
         else
             dsp->frequency = dsp->codec_frequency;
 
         resampler_new_delta(dsp);
+        tdspeed_setup(dsp);
         break;
 
     case DSP_SET_SAMPLE_DEPTH:
@@ -1290,13 +1397,14 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
 
         dsp->data.output_scale = dsp->frac_bits + 1 - NATIVE_DEPTH;
         sample_input_new_format(dsp);
-        dither_init(dsp); 
+        dither_init(dsp);
         break;
 
     case DSP_SET_STEREO_MODE:
         dsp->stereo_mode = value;
         dsp->data.num_channels = value == STEREO_MONO ? 1 : 2;
         dsp_update_functions(dsp);
+        tdspeed_setup(dsp);
         break;
 
     case DSP_RESET:
@@ -1310,7 +1418,7 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
         dsp->data.clip_min = -((1 << WORD_FRACBITS));
         dsp->codec_frequency = dsp->frequency = NATIVE_FREQUENCY;
 
-        if (dsp == &audio_dsp)
+        if (dsp == &AUDIO_DSP)
         {
             track_gain = 0;
             album_gain = 0;
@@ -1321,6 +1429,7 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
 
         dsp_update_functions(dsp);
         resampler_new_delta(dsp);
+        tdspeed_setup(dsp);
         break;
 
     case DSP_FLUSH:
@@ -1328,25 +1437,26 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
                sizeof (dsp->data.resample_data));
         resampler_new_delta(dsp);
         dither_init(dsp);
+        tdspeed_setup(dsp);
         break;
 
     case DSP_SET_TRACK_GAIN:
-        if (dsp == &audio_dsp)
+        if (dsp == &AUDIO_DSP)
             dsp_set_gain_var(&track_gain, value);
         break;
 
     case DSP_SET_ALBUM_GAIN:
-        if (dsp == &audio_dsp)
+        if (dsp == &AUDIO_DSP)
             dsp_set_gain_var(&album_gain, value);
         break;
 
     case DSP_SET_TRACK_PEAK:
-        if (dsp == &audio_dsp)
+        if (dsp == &AUDIO_DSP)
             dsp_set_gain_var(&track_peak, value);
         break;
 
     case DSP_SET_ALBUM_PEAK:
-        if (dsp == &audio_dsp)
+        if (dsp == &AUDIO_DSP)
             dsp_set_gain_var(&album_peak, value);
         break;
 
@@ -1403,5 +1513,5 @@ void dsp_set_replaygain(void)
 
     /* Store in S8.23 format to simplify calculations. */
     replaygain = gain;
-    set_gain(&audio_dsp);
+    set_gain(&AUDIO_DSP);
 }

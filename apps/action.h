@@ -211,6 +211,8 @@ enum {
     ACTION_PS_TOGGLE_MODE,
     ACTION_PS_RESET,
     ACTION_PS_EXIT, /* _STD_* isnt going to work here */
+    ACTION_PS_SLOWER,
+    ACTION_PS_FASTER,
     
     /* yesno screen */
     ACTION_YESNO_ACCEPT,
