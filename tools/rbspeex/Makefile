@@ -45,7 +45,7 @@ DIRS =
 
 all: ../rbspeexenc ../rbspeexdec
 
-$(DEPFILE): $(SOURCES) $(OUT)
+$(DEPFILE): $(SOURCES)
 	$(SILENT)rm -f $(DEPFILE)
 	$(SILENT)(for each in $(SOURCES) x; do \
 	    if test "x" != "$$each"; then \
