@@ -321,11 +321,14 @@ whichadvanced () {
   if [ "$memory" = "2" ]; then
     printf ", (8)MB MOD"
   fi
-  if [ "$modelname" = "h120" ]; then
-    printf ", (R)TC MOD"
-  fi
   if [ "$t_model" = "ondio" ]; then
     printf ", (B)acklight MOD"
+  fi
+  if [ "$modelname" = "m5" ]; then
+    printf ", (F)M radio MOD"
+  fi
+  if [ "$modelname" = "h120" ]; then
+    printf ", (R)TC MOD"
   fi
   echo ""
 
@@ -372,19 +375,27 @@ whichadvanced () {
           cont=0
         fi
         ;;
+      [Bb])
+        if [ "$t_model" = "ondio" ]; then
+          have_backlight="#define HAVE_BACKLIGHT"
+          echo "Backlight functions enabled"
+        else
+          cont=0
+        fi
+        ;;
+      [Ff])
+        if [ "$modelname" = "m5" ]; then
+          have_fmradio_in="#define HAVE_FMRADIO_IN"
+          echo "FM radio functions enabled"
+        else
+          cont=0
+        fi
+        ;;
       [Rr])
         if [ "$modelname" = "h120" ]; then
           config_rtc="#define CONFIG_RTC RTC_DS1339_DS3231"
           have_rtc_alarm="#define HAVE_RTC_ALARM"
           echo "RTC functions enabled (DS1339/DS3231)"
-        else
-          cont=0
-        fi
-        ;;
-      [Bb])
-        if [ "$t_model" = "ondio" ]; then
-          have_backlight="#define HAVE_BACKLIGHT"
-          echo "Backlight functions enabled"
         else
           cont=0
         fi
@@ -2516,6 +2527,7 @@ sed > autoconf.h \
  -e "s,@have_rtc_alarm@,$have_rtc_alarm,g" \
  -e "s,@RBDIR@,${rbdir},g" \
  -e "s,@have_backlight@,$have_backlight,g" \
+ -e "s,@have_fmradio_in@,$have_fmradio_in,g" \
 <<EOF
 /* This header was made by configure */
 #ifndef __BUILD_AUTOCONF_H
@@ -2527,12 +2539,15 @@ sed > autoconf.h \
 /* Define this if you build rockbox to support the logf logging and display */
 #undef ROCKBOX_HAS_LOGF
 
+/* optional define for a backlight modded Ondio */
+@have_backlight@
+
+/* optional define for FM radio mod for iAudio M5 */
+@have_fmradio_in@
+
 /* optional defines for RTC mod for h1x0 */
 @config_rtc@
 @have_rtc_alarm@
-
-/* optional define for a backlight modded Ondio */
-@have_backlight@
 
 /* root of Rockbox */
 #define ROCKBOX_DIR "/@RBDIR@"

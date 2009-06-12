@@ -18,6 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 #include "system.h"
 #include "cpu.h"
 #include "audio.h"
@@ -41,8 +42,13 @@ void audio_input_mux(int source, unsigned flags)
 {
     /* Prevent pops from unneeded switching */
     static int last_source = AUDIO_SRC_PLAYBACK;
-    
+#ifdef HAVE_FMRADIO_IN
+    static bool last_recording = false;
+
+    bool recording = flags & SRCF_RECORDING;
+#else
     (void)flags;
+#endif
 
     switch (source)
     {
@@ -74,11 +80,59 @@ void audio_input_mux(int source, unsigned flags)
                 coldfire_set_dataincontrol((3 << 14) | (4 << 3));
             }
         break;
+
+#ifdef HAVE_FMRADIO_IN
+        case AUDIO_SRC_FMRADIO:             /* recording and playback */
+            if (!recording)
+                audiohw_set_recvol(23, 23, AUDIO_GAIN_LINEIN);
+
+            /* I2S recording and analog playback */
+            if (source == last_source && recording == last_recording)
+                break;
+
+            last_recording = recording;
+
+            if (recording)
+            {
+                /* Int. when 6 samples in FIFO, PDIR2 src = iis1RcvData */
+                coldfire_set_dataincontrol((3 << 14) | (4 << 3));
+                audiohw_enable_recording(false); /* source line */
+            }
+            else
+            {
+                audiohw_disable_recording();
+                audiohw_set_monitor(true);       /* analog bypass */
+                coldfire_set_dataincontrol(0);
+            }
+        break;
+#endif /* HAVE_FMRADIO_IN */
     } /* end switch */
 
-    or_l((1 << 29), &GPIO_OUT);     /* Line In */
+    /* set line multiplexer */
+#ifdef IAUDIO_M3
+#ifdef HAVE_FMRADIO_IN
+    if (source == AUDIO_SRC_FMRADIO)
+        and_l(~(1 << 25), &GPIO1_OUT);  /* FM radio */
+    else
+#endif
+        or_l((1 << 25), &GPIO1_OUT);    /* Line In */
+
+    or_l((1 << 25), &GPIO1_ENABLE);
+    or_l((1 << 25), &GPIO1_FUNCTION);
+
+#else /* iAudio M5, X5 */
+#ifdef HAVE_FMRADIO_IN
+    if (source == AUDIO_SRC_FMRADIO)
+        and_l(~(1 << 29), &GPIO_OUT);   /* FM radio */
+    else
+#endif
+        or_l((1 << 29), &GPIO_OUT);     /* Line In */
+
     or_l((1 << 29), &GPIO_ENABLE);
     or_l((1 << 29), &GPIO_FUNCTION);
 
+#endif /* iAudio M5, X5 */
+
     last_source = source;
 } /* audio_input_mux */
+

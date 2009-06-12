@@ -16,7 +16,11 @@
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
+#ifdef HAVE_FMRADIO_IN /* FM modded M5 */
+#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | SRC_CAP_FMRADIO)
+#else /* stock M5 */
 #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN)
+#endif
 
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
@@ -108,6 +112,12 @@
 
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
+
+#ifdef HAVE_FMRADIO_IN /* FM modded M5 */
+/* FM Tuner */
+#define CONFIG_TUNER       TEA5767
+#define CONFIG_TUNER_XTAL  32768
+#endif
 
 #define HAVE_TLV320
 

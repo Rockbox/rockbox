@@ -66,8 +66,10 @@ void power_off(void)
     asm("halt");
 }
 
+#if (CONFIG_TUNER & TEA5767)
 bool tuner_power(bool status)
 {
     (void)status;
     return true;
 }
+#endif
