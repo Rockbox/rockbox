@@ -111,7 +111,8 @@ static int handle_usb_events(void)
     while(1)
     {
         int button;
-#if defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID)
+/* Disable HID handling for the release */
+#if 0 /*defined(HAVE_USBSTACK) && defined(USB_ENABLE_HID) */
         bool hid_enabled = usb_core_driver_enabled(USB_DRIVER_HID);
 
         if (hid_enabled)

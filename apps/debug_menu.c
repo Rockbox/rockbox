@@ -2608,7 +2608,8 @@ static bool toggle_usb_serial(void)
 }
 #endif
 
-#ifdef USB_ENABLE_HID
+/* Disable HID handling for the release */
+#if 0
 static bool hid_send_cmd(consumer_usage_page_t cmd, char *msg)
 {
     (void)msg;
@@ -2792,7 +2793,8 @@ static const struct the_menu_item menuitems[] = {
 #if defined(ROCKBOX_HAS_LOGF) && defined(USB_ENABLE_SERIAL)
         {"USB Serial driver (logf)", toggle_usb_serial },
 #endif
-#if defined(USB_ENABLE_HID)
+/* Disable HID handling for the release */
+#if 0
         {"USB HID play/pause", usb_hid_send_play_pause },
         {"USB HID stop", usb_hid_send_stop },
         {"USB HID prev track", usb_hid_send_scan_previous_track },
