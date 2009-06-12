@@ -146,7 +146,7 @@ int beastpatcher(void)
         return 1;
     }
 
-    printf("[INFO] Found device \"%s - %s\"\n", mtp_info.manufacturer, 
+    printf("[INFO] Found device \"%s - %s\"\n", mtp_info.manufacturer,
                                                 mtp_info.modelname);
     printf("[INFO] Device version: \"%s\"\n",mtp_info.version);
 
@@ -162,11 +162,11 @@ int beastpatcher(void)
 
             if (fwbuf == NULL)
                 return 1;
-            
+
             if (mtp_send_firmware(&mtp_info, fwbuf, fwsize) == 0)
             {
                 fprintf(stderr,"[INFO] Bootloader installed successfully.\n");
-            } 
+            }
             else
             {
                 fprintf(stderr,"[ERR]  Bootloader install failed.\n");

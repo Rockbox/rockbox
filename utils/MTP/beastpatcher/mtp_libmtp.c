@@ -211,6 +211,7 @@ int mtp_send_file(struct mtp_info_t* mtp_info, const char* filename)
     ret = mtp_send_fileptr(mtp_info, fwfile, sb.st_size);
 
     fclose(fwfile);
+
     return ret;
 }
 

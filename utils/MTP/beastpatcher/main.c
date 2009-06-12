@@ -38,16 +38,17 @@
  ****************************************************************************/
 
 #include <stdio.h>
+#include <string.h>
 #include "beastpatcher.h"
 #include "mtp_common.h"
 
 #if defined(__WIN32__) || defined(_WIN32)
 #include <windows.h>
+#include "../MTP_DLL/MTP_DLL.h"
 #endif
 
 #define VERSION "1.0 with v1 bootloader"
 
-#include "../MTP_DLL/MTP_DLL.h"
 
 static void print_usage(void)
 {
@@ -56,7 +57,7 @@ static void print_usage(void)
     fprintf(stderr,"Where [action] is one of the following options:\n");
     fprintf(stderr,"  -i,   --install (default)\n");
     fprintf(stderr,"  -h,   --help\n");
-	fprintf(stderr,"  -s,   --send              nk.bin\n");
+    fprintf(stderr,"  -s,   --send              nk.bin\n");
     fprintf(stderr,"\n");
 }
 
@@ -65,27 +66,30 @@ int main(int argc, char* argv[])
 {
     int res;
     char yesno[4];
-	struct mtp_info_t mtp_info;
+    struct mtp_info_t mtp_info;
 
-	fprintf(stderr,"beastpatcher v" VERSION " - (C) 2009 by the Rockbox developers\n");
+    fprintf(stderr,"beastpatcher v" VERSION " - (C) 2009 by the Rockbox developers\n");
     fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
     fprintf(stderr,"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 
-	if(argc == 1 || strcmp(argv[1],"-i")==0 || strcmp(argv[1],"--install")==0) {
-		res = beastpatcher();
-		/* don't ask for enter if started with command line arguments */
-		if(argc == 1) {
-			printf("\nPress ENTER to exit beastpatcher: ");
-			fgets(yesno,4,stdin);
-		}
-	}
-	else if((argc > 2) && ((strcmp(argv[1],"-s")==0) || (strcmp(argv[1],"--send")==0))) {
+    if(argc == 1 || strcmp(argv[1],"-i")==0 || strcmp(argv[1],"--install")==0) {
+        res = beastpatcher();
+        /* don't ask for enter if started with command line arguments */
+        if(argc == 1) {
+            printf("\nPress ENTER to exit beastpatcher: ");
+            fgets(yesno,4,stdin);
+        }
+    }
+    else if((argc > 2) && ((strcmp(argv[1],"-s")==0) || (strcmp(argv[1],"--send")==0))) {
+        mtp_init(&mtp_info);
+        mtp_scan(&mtp_info);
         res = mtp_send_file(&mtp_info, argv[2]);
-	}
-	else {
-	    print_usage();
+        mtp_finished(&mtp_info);
+    }
+    else {
+        print_usage();
         res = -1;
-	}
+    }
 
     return res;
 }
