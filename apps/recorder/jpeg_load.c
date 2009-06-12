@@ -482,7 +482,7 @@ static void idct4h(int16_t *ws, unsigned char *out, int rows, int rowstep)
         int z1, z2, z3;
         /* Even part */
 
-        tmp0 = (int) ws[0] + (ONE << (PASS1_BITS + 2)
+        tmp0 = (int) ws[0] + (ONE << (PASS1_BITS + 2))
                + (128 << (PASS1_BITS + 3));
         tmp2 = (int) ws[2];
 
