@@ -64,12 +64,15 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
     vp->x = 0;
     vp->width = screens[screen].lcdwidth;
 
-    vp->y = showing_bars(screen)?STATUSBAR_HEIGHT:0;
-    vp->height = screens[screen].lcdheight - vp->y;
 #ifdef HAVE_LCD_BITMAP
     vp->drawmode = DRMODE_SOLID;
     vp->font = FONT_UI; /* default to UI to discourage SYSFONT use */
+
+    vp->y = showing_bars(screen)?STATUSBAR_HEIGHT:0;
+#else
+    vp->y = 0;
 #endif
+    vp->height = screens[screen].lcdheight - vp->y;
 
 #ifdef HAVE_REMOTE_LCD
     /* We only need this test if there is a remote LCD */
