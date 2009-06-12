@@ -447,7 +447,7 @@ static const struct button_mapping remote_button_context_pitchscreen[]  = {
     { ACTION_PS_RESET,          BUTTON_RC_PLAY|BUTTON_REL,        BUTTON_RC_PLAY },
     { ACTION_PS_TOGGLE_MODE,    BUTTON_RC_PLAY|BUTTON_REPEAT,     BUTTON_RC_PLAY },
     { ACTION_PS_EXIT,           BUTTON_RC_DSP|BUTTON_REL,         BUTTON_RC_DSP },
-    { ACTION_PS_SLOWER,         BUTTON_RC_RW|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_PS_SLOWER,         BUTTON_RC_REW|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_PS_FASTER,         BUTTON_RC_FF|BUTTON_REPEAT,       BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
