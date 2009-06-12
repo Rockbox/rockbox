@@ -55,18 +55,6 @@
 #include "mtp_common.h"
 #include "bootimg.h"
 
-#define VERSION "1.0 with v1 bootloader"
-
-void print_usage(void)
-{
-    fprintf(stderr,"Usage: beastpatcher [action]\n");
-    fprintf(stderr,"\n");
-    fprintf(stderr,"Where [action] is one of the following options:\n");
-    fprintf(stderr,"        --install (default)\n");
-    fprintf(stderr,"  -?,   --help\n");
-    fprintf(stderr,"\n");
-}
-
 /* Code to create a single-boot bootloader.
    Based on tools/gigabeats.c by Will Robertson.  
 */
@@ -139,26 +127,12 @@ static void create_single_boot(unsigned char* boot, int bootlen,
     return;
 }
 
-int beastpatcher(int argc, char* argv[])
+int beastpatcher(void)
 {
     char yesno[4];
     unsigned char* fwbuf;
     int fwsize;
     struct mtp_info_t mtp_info;
-
-    (void)argv;
-
-    fprintf(stderr,"beastpatcher v" VERSION " - (C) 2009 by the Rockbox developers\n");
-    fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
-    fprintf(stderr,"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
-
-    /* No options are currently implemented, so just display help if any are 
-       provided. */
-
-    if (argc > 1) {
-        print_usage();
-        return 1;
-    }
 
     if (mtp_init(&mtp_info) < 0) {
         fprintf(stderr,"[ERR]  Can not init MTP\n");
@@ -212,16 +186,3 @@ int beastpatcher(int argc, char* argv[])
     return 0;
 }
 
-
-int main(int argc, char* argv[])
-{
-    int res;
-    char yesno[4];
-
-    res = beastpatcher(argc, argv);
-
-    printf("\nPress ENTER to exit beastpatcher: ");
-    fgets(yesno,4,stdin);
-
-    return res;
-}

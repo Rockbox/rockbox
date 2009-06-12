@@ -189,6 +189,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\main.c"
+				>
+			</File>
+			<File
 				RelativePath="..\mtp_win32.c"
 				>
 			</File>
@@ -198,6 +202,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\beastpatcher.h"
+				>
+			</File>
 			<File
 				RelativePath="..\bootimg.h"
 				>

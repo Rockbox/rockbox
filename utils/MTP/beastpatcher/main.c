@@ -1,4 +1,4 @@
-/***************************************************************************
+/*
  *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
@@ -37,35 +37,57 @@
  *
  ****************************************************************************/
 
-#ifndef _MTP_COMMON_H
-#define _MTP_COMMON_H
+#include <stdio.h>
+#include "beastpatcher.h"
+#include "mtp_common.h"
 
 #if defined(__WIN32__) || defined(_WIN32)
-#else
-#include "libmtp.h"
+#include <windows.h>
 #endif
 
-struct mtp_info_t
+#define VERSION "1.0 with v1 bootloader"
+
+#include "../MTP_DLL/MTP_DLL.h"
+
+static void print_usage(void)
 {
-    /* Generic data */
-    char manufacturer[200];
-    char modelname[200];
-    char version[200];
+    fprintf(stderr,"Usage: beastpatcher [action]\n");
+    fprintf(stderr,"\n");
+    fprintf(stderr,"Where [action] is one of the following options:\n");
+    fprintf(stderr,"  -i,   --install (default)\n");
+    fprintf(stderr,"  -h,   --help\n");
+	fprintf(stderr,"  -s,   --send              nk.bin\n");
+    fprintf(stderr,"\n");
+}
 
-    /* OS-Specific data */
-#if defined(__WIN32__) || defined(_WIN32)
-#else
-    LIBMTP_mtpdevice_t *device;
-#endif
-};
 
-/* Common functions for both libMTP and win32 */
+int main(int argc, char* argv[])
+{
+    int res;
+    char yesno[4];
+	struct mtp_info_t mtp_info;
 
-int mtp_init(struct mtp_info_t* mtp_info);
-int mtp_finished(struct mtp_info_t* mtp_info);
-int mtp_scan(struct mtp_info_t* mtp_info);
-int mtp_send_firmware(struct mtp_info_t* mtp_info, unsigned char* fwbuf,
-                      int fwsize);
-int mtp_send_file(struct mtp_info_t* mtp_info, const char* filename);
+	fprintf(stderr,"beastpatcher v" VERSION " - (C) 2009 by the Rockbox developers\n");
+    fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
+    fprintf(stderr,"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
 
-#endif /* !_MTP_COMMON_H */
+	if(argc == 1 || strcmp(argv[1],"-i")==0 || strcmp(argv[1],"--install")==0) {
+		res = beastpatcher();
+		/* don't ask for enter if started with command line arguments */
+		if(argc == 1) {
+			printf("\nPress ENTER to exit beastpatcher: ");
+			fgets(yesno,4,stdin);
+		}
+	}
+	else if((argc > 2) && ((strcmp(argv[1],"-s")==0) || (strcmp(argv[1],"--send")==0))) {
+        res = mtp_send_file(&mtp_info, argv[2]);
+	}
+	else {
+	    print_usage();
+        res = -1;
+	}
+
+    return res;
+}
+
+

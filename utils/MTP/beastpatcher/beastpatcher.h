@@ -1,4 +1,4 @@
-/***************************************************************************
+/*
  *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
@@ -37,35 +37,9 @@
  *
  ****************************************************************************/
 
-#ifndef _MTP_COMMON_H
-#define _MTP_COMMON_H
+#ifndef BEASTPATCHER_H
+#define BEASTPATCHER_H
 
-#if defined(__WIN32__) || defined(_WIN32)
-#else
-#include "libmtp.h"
+int beastpatcher(void);
+
 #endif
-
-struct mtp_info_t
-{
-    /* Generic data */
-    char manufacturer[200];
-    char modelname[200];
-    char version[200];
-
-    /* OS-Specific data */
-#if defined(__WIN32__) || defined(_WIN32)
-#else
-    LIBMTP_mtpdevice_t *device;
-#endif
-};
-
-/* Common functions for both libMTP and win32 */
-
-int mtp_init(struct mtp_info_t* mtp_info);
-int mtp_finished(struct mtp_info_t* mtp_info);
-int mtp_scan(struct mtp_info_t* mtp_info);
-int mtp_send_firmware(struct mtp_info_t* mtp_info, unsigned char* fwbuf,
-                      int fwsize);
-int mtp_send_file(struct mtp_info_t* mtp_info, const char* filename);
-
-#endif /* !_MTP_COMMON_H */

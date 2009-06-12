@@ -44,11 +44,17 @@
 #include <stdlib.h>
 #include <wchar.h>
 #include <windows.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <tchar.h>
 
 #include "mtp_common.h"
 
 #include "../MTP_DLL/MTP_DLL.h"
+
+
+static int filesize(const char* filename);
+
 
 int mtp_init(struct mtp_info_t* mtp_info)
 {
@@ -87,7 +93,7 @@ static void callback(unsigned int progress, unsigned int max)
 {
     int percent = (progress * 100) / max;
 
-    printf("Progress: %u of %u (%d%%)\r", progress, max, percent);
+	printf("[INFO] Progress: %u of %u (%d%%)\r", progress, max, percent);
     fflush(stdout);
 }
 
@@ -154,21 +160,19 @@ int mtp_send_firmware(struct mtp_info_t* mtp_info, unsigned char* fwbuf,
     tmp = (LPWSTR)malloc(_tcslen(szTempName)*2+1);
     mbstowcs(tmp, (char*)szTempName, _tcslen(szTempName)*2+1);
     
-    fprintf(stderr, "[INFO]  Sending firmware...\n");
+    fprintf(stderr, "[INFO] Sending firmware...\n");
     if (mtp_sendnk(tmp, fwsize, &callback))
     {
+		fprintf(stderr, "\n");
         fprintf(stderr, "[INFO] Firmware sent successfully\n");
         ret = 0;
     }
     else
     {
+		fprintf(stderr, "\n");
         fprintf(stderr, "[ERR]  Error occured during sending.\n");
         ret = -1;
     }
-        
-    /* Keep the progress line onscreen */
-    printf("\n");
-
     free(tmp);
 
     if (!DeleteFile(szTempName))
@@ -177,3 +181,51 @@ int mtp_send_firmware(struct mtp_info_t* mtp_info, unsigned char* fwbuf,
     return ret;
 }
 
+
+int mtp_send_file(struct mtp_info_t* mtp_info, const char* filename)
+{
+	wchar_t *fn;
+
+	fn = (LPWSTR)malloc(strlen(filename)*2+1);
+	mbstowcs(fn, filename, strlen(filename)*2+1);
+
+    if (mtp_init(mtp_info) < 0) {
+        fprintf(stderr,"[ERR]  Can not init MTP\n");
+        return 1;
+    }
+    /* Scan for attached MTP devices. */
+    if (mtp_scan(mtp_info) < 0)
+    {
+        fprintf(stderr,"[ERR]  No devices found\n");
+        return 1;
+    }
+
+	fprintf(stderr, "[INFO] Sending firmware...\n");
+	if (mtp_sendnk(fn, filesize(filename), &callback))
+	{
+		/* keep progress on screen */
+		printf("\n");
+		fprintf(stderr, "[INFO] Firmware sent successfully\n");
+		return 0;
+	}
+	else
+	{
+		fprintf(stderr, "[ERR]  Error occured during sending.\n");
+		return -1;
+	}
+	mtp_finished(mtp_info);
+}
+
+
+static int filesize(const char* filename)
+{
+	struct _stat sb;
+	int res;
+
+	res = _stat(filename, &sb);
+	if(res == -1) {
+		fprintf(stderr, "Error getting filesize!\n");
+		return -1;
+	}
+	return sb.st_size;
+}

@@ -47,6 +47,8 @@
 #include "libmtp.h"
 #include "mtp_common.h"
 
+static int mtp_send_fileptr(struct mtp_info_t* mtp_info, FILE* fwfile, size_t fwsize);
+
 int mtp_init(struct mtp_info_t* mtp_info)
 {
     /* Fill the info struct with zeros - mainly for the strings */
@@ -74,8 +76,8 @@ int mtp_scan(struct mtp_info_t* mtp_info)
     if (mtp_info->device == NULL)
     {
         return -1;
-    } 
-    else 
+    }
+    else
     {
         /* NOTE: These strings are filled with zeros in mtp_init() */
 #ifndef REALLYOLDMTP
@@ -117,7 +119,6 @@ static int progress(uint64_t const sent, uint64_t const total,
 int mtp_send_firmware(struct mtp_info_t* mtp_info, unsigned char* fwbuf,
                       int fwsize)
 {
-    LIBMTP_file_t *genfile;
     int ret;
     size_t n;
     FILE* fwfile;
@@ -142,6 +143,20 @@ int mtp_send_firmware(struct mtp_info_t* mtp_info, unsigned char* fwbuf,
     /* Reset file pointer */
     fseek(fwfile, SEEK_SET, 0);
 
+    ret = mtp_send_fileptr(mtp_info, fwfile, fwsize);
+
+    /* Close the temporary file - this also deletes it. */
+    fclose(fwfile);
+
+    return 0;
+}
+
+
+static int mtp_send_fileptr(struct mtp_info_t* mtp_info, FILE* fwfile, size_t fwsize)
+{
+    LIBMTP_file_t* genfile;
+    int ret;
+
     /* Prepare for uploading firmware */
     genfile = LIBMTP_new_file_t();
     genfile->filetype = LIBMTP_FILETYPE_FIRMWARE;
@@ -149,10 +164,10 @@ int mtp_send_firmware(struct mtp_info_t* mtp_info, unsigned char* fwbuf,
     genfile->filesize = fwsize;
 
 #ifdef OLDMTP
-    ret = LIBMTP_Send_File_From_File_Descriptor(mtp_info->device, 
+    ret = LIBMTP_Send_File_From_File_Descriptor(mtp_info->device,
             fileno(fwfile), genfile, progress, NULL, 0);
 #else
-    ret = LIBMTP_Send_File_From_File_Descriptor(mtp_info->device, 
+    ret = LIBMTP_Send_File_From_File_Descriptor(mtp_info->device,
             fileno(fwfile), genfile, progress, NULL);
 #endif
 
@@ -167,8 +182,35 @@ int mtp_send_firmware(struct mtp_info_t* mtp_info, unsigned char* fwbuf,
     /* Cleanup */
     LIBMTP_destroy_file_t(genfile);
 
-    /* Close the temporary file - this also deletes it. */
-    fclose(fwfile);
-
-    return 0;
+    return ret;
 }
+
+
+int mtp_send_file(struct mtp_info_t* mtp_info, const char* filename)
+{
+    FILE* fwfile;
+    int ret;
+#ifdef _LARGEFILE64_SOURCE
+    struct stat64 sb;
+    ret = stat64(filename, &sb);
+#else
+    struct stat sb;
+    ret = stat(filename, &sb);
+#endif
+    if (ret == -1)
+    {
+        perror("[ERR]  ");
+    }
+
+    fwfile = fopen(filename, "r");
+    if (fwfile == NULL)
+    {
+        fprintf(stderr,"[ERR]  Could not create temporary file.\n");
+        return -1;
+    }
+    ret = mtp_send_fileptr(mtp_info, fwfile, sb.st_size);
+
+    fclose(fwfile);
+    return ret;
+}
+
