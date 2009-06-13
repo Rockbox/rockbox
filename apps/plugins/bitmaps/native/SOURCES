@@ -86,7 +86,11 @@ jackpot_slots.30x420x1.bmp
 
 /* Bubbles */
 #ifdef HAVE_LCD_COLOR
-#if (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240)
+#if ((LCD_WIDTH >= 640) && (LCD_HEIGHT >= 480)) || \
+    ((LCD_WIDTH >= 480) && (LCD_HEIGHT >= 640))
+bubbles_emblem.640x480x16.bmp
+bubbles_background.640x480x16.bmp
+#elif (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240)
 bubbles_emblem.320x240x16.bmp
 bubbles_background.320x240x16.bmp
 #elif (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 320)
@@ -257,7 +261,22 @@ flipit_tokens.16x26x1.bmp
 
 /* Invadrox */
 #if defined HAVE_LCD_COLOR
-#if LCD_WIDTH >= 220
+#if LCD_WIDTH >= 480
+invadrox_aliens.24x24x16.bmp
+invadrox_alien_explode.13x7x16.bmp
+invadrox_ships.16x24x16.bmp
+invadrox_bombs.9x42x16.bmp
+invadrox_shield.22x16x16.bmp
+invadrox_ufo.16x7x16.bmp
+invadrox_ufo_explode.21x8x16.bmp
+invadrox_numbers.50x7x16.bmp
+#if LCD_WIDTH == 480
+invadrox_background.480x640x16.bmp
+#elif LCD_WIDTH == 640
+invadrox_background.640x480x16.bmp
+#endif
+
+#elif LCD_WIDTH >= 220
 invadrox_aliens.24x24x16.bmp
 invadrox_alien_explode.13x7x16.bmp
 invadrox_ships.16x24x16.bmp
@@ -273,6 +292,7 @@ invadrox_background.240x320x16.bmp
 #elif LCD_WIDTH == 220
 invadrox_background.220x176x16.bmp
 #endif
+
 #elif LCD_WIDTH >= 160
 invadrox_aliens.16x15x16.bmp
 invadrox_alien_explode.10x5x16.bmp
@@ -329,6 +349,9 @@ jewels.220x176x16.bmp
 jewels.320x240x16.bmp
 #elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
 jewels.320x240x16.bmp
+#elif   ((LCD_WIDTH == 640) && (LCD_HEIGHT == 480)) || \
+        ((LCD_WIDTH == 480) && (LCD_HEIGHT == 640))
+jewels.640x480x16.bmp
 #endif
 
 /* Minesweeper */
@@ -544,7 +567,11 @@ sokoban_tiles.4x4x1.bmp
 
 /* Solitaire and Blackjack */
 #ifdef HAVE_LCD_COLOR
-#if LCD_WIDTH >= 320
+#if LCD_WIDTH >= 640
+card_back.74x98x16.bmp
+card_deck.962x392x16.bmp
+solitaire_suitsi.74x392x16.bmp
+#elif LCD_WIDTH >= 320
 card_back.37x49x16.bmp
 card_deck.481x196x16.bmp
 solitaire_suitsi.37x196x16.bmp
@@ -683,6 +710,10 @@ superdom_boarditems.176x132x16.bmp
 superdom_boarditems.320x240x16.bmp
 #elif (LCD_WIDTH == 240 && LCD_HEIGHT >= 320)
 superdom_boarditems.240x320x16.bmp
+#elif (LCD_WIDTH == 480 && LCD_HEIGHT == 640) 
+superdom_boarditems.480x640x16.bmp
+#elif (LCD_WIDTH == 640 && LCD_HEIGHT == 480) 
+superdom_boarditems.640x480x16.bmp
 #endif
 #endif
 
@@ -712,6 +743,8 @@ sliding_puzzle.132x132x16.bmp
 sliding_puzzle.176x176x16.bmp
 #elif SMALLER_DIMENSION <= 240
 sliding_puzzle.240x240x16.bmp
+#elif SMALLER_DIMENSION <= 480
+sliding_puzzle.480x480x16.bmp
 #endif
 #elif (LCD_DEPTH > 1)
 #if SMALLER_DIMENSION <= 96

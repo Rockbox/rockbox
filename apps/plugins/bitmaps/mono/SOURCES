@@ -22,6 +22,9 @@ bubbles_bubble.220x176x1.bmp
 #elif ((LCD_WIDTH == 320) && (LCD_HEIGHT == 240)) || \
       ((LCD_WIDTH == 240) && (LCD_HEIGHT >= 320))
 bubbles_bubble.320x240x1.bmp
+#elif   ((LCD_WIDTH == 640) && (LCD_HEIGHT == 480)) || \
+        ((LCD_WIDTH == 480) && (LCD_HEIGHT == 640))
+bubbles_bubble.640x480x1.bmp
 #endif
 
 /* Flip it */
