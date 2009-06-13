@@ -31,8 +31,6 @@
  */
 
 
-#include "stdafx.h"
-
 #include <windows.h>
 #include "mswmdm_i.c"
 #include "mswmdm.h"
@@ -120,7 +118,7 @@ static int mtp_close(struct mtp_if* mtp)
 	return 0;
 }
 
-__declspec(dllexport) int mtp_description(wchar_t* name, wchar_t* manufacturer, DWORD* version)
+MTP_DLL_API int mtp_description(wchar_t* name, wchar_t* manufacturer, DWORD* version)
 {
 	HRESULT hr;
 	int num = 0;
@@ -177,7 +175,7 @@ __declspec(dllexport) int mtp_description(wchar_t* name, wchar_t* manufacturer, 
 	return (num > 0) ? num : -1;
 }
 
-__declspec(dllexport) int mtp_sendnk(LPWSTR file, int filesize, void (*callback)(unsigned int progress, unsigned int max))
+MTP_DLL_API int mtp_sendnk(LPWSTR file, int filesize, void (*callback)(unsigned int progress, unsigned int max))
 {
 	HRESULT hr;
 	bool return_value = false;

@@ -45,7 +45,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
@@ -121,7 +121,7 @@
 				AdditionalIncludeDirectories="c:\wmsdk\wmfsdk95\include;c:\wmsdk\wmfsdk95\wmdm\inc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;MTP_DLL_EXPORTS"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
@@ -170,7 +170,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="echo Copying $(TargetName) dll / lib to ..&#x0D;&#x0A;copy /Y &quot;$(InputDir)$(ConfigurationName)\$(TargetFileName)&quot; &quot;$(InputDir)..\&quot;&#x0D;&#x0A;copy /Y &quot;$(InputDir)$(ConfigurationName)\$(TargetName).lib&quot; &quot;$(InputDir)..\&quot;"
+				CommandLine="echo Copying $(TargetName) dll / lib to ..&#x0D;&#x0A;copy /Y &quot;$(InputDir)$(ConfigurationName)\$(TargetFileName)&quot; &quot;$(InputDir)..\&quot;&#x0D;&#x0A;copy /Y &quot;$(InputDir)$(ConfigurationName)\$(TargetName).lib&quot; &quot;$(InputDir)..\&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -194,26 +194,6 @@
 				RelativePath=".\progresshelper.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\stdafx.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -226,10 +206,6 @@
 			</File>
 			<File
 				RelativePath=".\progresshelper.h"
-				>
-			</File>
-			<File
-				RelativePath=".\stdafx.h"
 				>
 			</File>
 		</Filter>

@@ -2,10 +2,14 @@
 #ifndef MTP_DLL_H
 #define MTP_DLL_H
 
+#ifndef MTP_NODLL
 #ifdef MTP_DLL_EXPORTS
 #define MTP_DLL_API __declspec(dllexport)
 #else
 #define MTP_DLL_API __declspec(dllimport)
+#endif
+#else
+#define MTP_DLL_API
 #endif
 
 #ifdef __cplusplus
