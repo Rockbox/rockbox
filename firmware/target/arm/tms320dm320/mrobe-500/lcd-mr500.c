@@ -63,10 +63,8 @@ void lcd_sleep()
 		memset16(FRAME, 0xFFFF, LCD_WIDTH*LCD_HEIGHT);
 		sleep(HZ/5);
         /* Disabling these saves another ~15mA */
-        IO_OSD_OSDWINMD0&=  ~(0x01);
-		IO_VID_ENC_VMOD &=  ~(0x01);
-		
-//		IO_CLK_MOD1     &=  ~(0x0018);
+        IO_OSD_OSDWINMD0    &= ~(0x01);
+		IO_VID_ENC_VMOD     &= ~(0x01);
     	
     	/* Disabling the LCD saves ~50mA */
     	IO_GIO_BITCLR2=1<<4;
@@ -79,13 +77,11 @@ void lcd_awake(void)
     if (!lcd_on)
     {
     	lcd_on=true;
-    	
-//	    IO_CLK_MOD1     |=  0x0018;
-    	IO_OSD_OSDWINMD0|=  0x01;
-		IO_VID_ENC_VMOD |=  0x01;
+    	IO_OSD_OSDWINMD0    |= 0x01;
+		IO_VID_ENC_VMOD     |= 0x01;
 	
 		sleep(2);
-        IO_GIO_BITSET2=1<<4;
+        IO_GIO_BITSET2      = 1<<4;
         
         lcd_update();
         
@@ -113,121 +109,121 @@ void lcd_init_device(void)
     /* Clear the Frame */
     memset16(FRAME, 0x0000, LCD_WIDTH*LCD_HEIGHT);
 
-	IO_OSD_OSDWINMD0&=~(0x0001);
-	IO_OSD_VIDWINMD&=~(0x0001);
+	IO_OSD_OSDWINMD0    &= ~(0x0001);
+	IO_OSD_VIDWINMD     &= ~(0x0001);
 
 	/* Setup the LCD controller */
-	IO_VID_ENC_VMOD=0x2014;
-	IO_VID_ENC_VDCTL=0x2000;
-	IO_VID_ENC_VDPRO=0x0000;
-	IO_VID_ENC_SYNCTL=0x100E;
-	IO_VID_ENC_HSPLS=1; /* HSYNC pulse width */
-	IO_VID_ENC_VSPLS=1; /* VSYNC pulse width */
+	IO_VID_ENC_VMOD     = 0x2014;
+	IO_VID_ENC_VDCTL    = 0x2000;
+	IO_VID_ENC_VDPRO    = 0x0000;
+	IO_VID_ENC_SYNCTL   = 0x100E;
+	IO_VID_ENC_HSPLS    = 1; /* HSYNC pulse width */
+	IO_VID_ENC_VSPLS    = 1; /* VSYNC pulse width */
 	
 	/* These calculations support 640x480 and 320x240 (based on OF) */
-	IO_VID_ENC_HINT=LCD_NATIVE_WIDTH+LCD_NATIVE_WIDTH/3;
-	IO_VID_ENC_HSTART=LCD_NATIVE_WIDTH/6; /* Front porch */
-	IO_VID_ENC_HVALID=LCD_NATIVE_WIDTH; /* Data valid */
-	IO_VID_ENC_VINT=LCD_NATIVE_HEIGHT+7;
-	IO_VID_ENC_VSTART=3;
-	IO_VID_ENC_VVALID=LCD_NATIVE_HEIGHT;
+	IO_VID_ENC_HINT     = LCD_NATIVE_WIDTH+LCD_NATIVE_WIDTH/3;
+	IO_VID_ENC_HSTART   = LCD_NATIVE_WIDTH/6;   /* Back porch */
+	IO_VID_ENC_HVALID   = LCD_NATIVE_WIDTH;     /* Data valid */
+	IO_VID_ENC_VINT     = LCD_NATIVE_HEIGHT+8;
+	IO_VID_ENC_VSTART   = 2;
+	IO_VID_ENC_VVALID   = LCD_NATIVE_HEIGHT;
 	
-	IO_VID_ENC_HSDLY=0x0000;
-	IO_VID_ENC_VSDLY=0x0000;
-	IO_VID_ENC_YCCTL=0x0000;
-	IO_VID_ENC_RGBCTL=0x0000;
-	IO_VID_ENC_RGBCLP=0xFF00;
-	IO_VID_ENC_LNECTL=0x0000;
-	IO_VID_ENC_CULLLNE=0x0000;
-	IO_VID_ENC_LCDOUT=0x0000;
-	IO_VID_ENC_BRTS=0x0000;
-	IO_VID_ENC_BRTW=0x0000;
-	IO_VID_ENC_ACCTL=0x0000;
-	IO_VID_ENC_PWMP=0x0000;
-	IO_VID_ENC_PWMW=0x0000;
+	IO_VID_ENC_HSDLY    = 0x0000;
+	IO_VID_ENC_VSDLY    = 0x0000;
+	IO_VID_ENC_YCCTL    = 0x0000;
+	IO_VID_ENC_RGBCTL   = 0x0000;
+	IO_VID_ENC_RGBCLP   = 0xFF00;
+	IO_VID_ENC_LNECTL   = 0x0000;
+	IO_VID_ENC_CULLLNE  = 0x0000;
+	IO_VID_ENC_LCDOUT   = 0x0000;
+	IO_VID_ENC_BRTS     = 0x0000;
+	IO_VID_ENC_BRTW     = 0x0000;
+	IO_VID_ENC_ACCTL    = 0x0000;
+	IO_VID_ENC_PWMP     = 0x0000;
+	IO_VID_ENC_PWMW     = 0x0000;
 	
-	IO_VID_ENC_DCLKPTN0=0x0001;
+	IO_VID_ENC_DCLKPTN0 = 0x0001;
 
 	/* Setup the display */
-    IO_OSD_MODE=0x00ff;
+    IO_OSD_MODE         = 0x00ff;
     
-    IO_OSD_ATRMD=0x0000;
-    IO_OSD_RECTCUR=0x0000;
+    IO_OSD_ATRMD        = 0x0000;
+    IO_OSD_RECTCUR      = 0x0000;
     
-    IO_OSD_BASEPX=IO_VID_ENC_HSTART;
-    IO_OSD_BASEPY=IO_VID_ENC_VSTART;
+    IO_OSD_BASEPX       = IO_VID_ENC_HSTART;
+    IO_OSD_BASEPY       = IO_VID_ENC_VSTART;
     
-    addr = ((int)FRAME-CONFIG_SDRAM_START) / 32;
+    addr                = ((int)FRAME-CONFIG_SDRAM_START) / 32;
 
     /* Setup the OSD windows */
     
     /* Used for 565 RGB */
-    IO_OSD_OSDWINMD0=0x30C0;
+    IO_OSD_OSDWINMD0    = 0x30C0;
 
-    IO_OSD_OSDWIN0OFST=LCD_NATIVE_WIDTH / 16;
+    IO_OSD_OSDWIN0OFST  = LCD_NATIVE_WIDTH / 16;
     
-    IO_OSD_OSDWINADH=addr >> 16;
-    IO_OSD_OSDWIN0ADL=addr & 0xFFFF;
+    IO_OSD_OSDWINADH    = addr >> 16;
+    IO_OSD_OSDWIN0ADL   = addr & 0xFFFF;
 
-    IO_OSD_OSDWIN0XP=0;
-    IO_OSD_OSDWIN0YP=0;
+    IO_OSD_OSDWIN0XP    = 0;
+    IO_OSD_OSDWIN0YP    = 0;
     
     /* read from OF */
-    IO_OSD_OSDWIN0XL=LCD_NATIVE_WIDTH;
-    IO_OSD_OSDWIN0YL=LCD_NATIVE_HEIGHT;
+    IO_OSD_OSDWIN0XL    = LCD_NATIVE_WIDTH;
+    IO_OSD_OSDWIN0YL    = LCD_NATIVE_HEIGHT;
     
     /* Unused */
-    IO_OSD_OSDWINMD1=0x10C0;
+    IO_OSD_OSDWINMD1    = 0x10C0;
     
 #if LCD_NATIVE_WIDTH%32!=0
-    IO_OSD_OSDWIN1OFST=LCD_NATIVE_WIDTH / 32+1;
+    IO_OSD_OSDWIN1OFST  = LCD_NATIVE_WIDTH / 32+1;
 #else
-    IO_OSD_OSDWIN1OFST=LCD_NATIVE_WIDTH / 32;
+    IO_OSD_OSDWIN1OFST  = LCD_NATIVE_WIDTH / 32;
 #endif
 
-    IO_OSD_OSDWIN1ADL=addr & 0xFFFF;
+    IO_OSD_OSDWIN1ADL   = addr & 0xFFFF;
     
-    IO_OSD_OSDWIN1XP=0;
-    IO_OSD_OSDWIN1YP=0;
+    IO_OSD_OSDWIN1XP    = 0;
+    IO_OSD_OSDWIN1YP    = 0;
     
-    IO_OSD_OSDWIN1XL=LCD_NATIVE_WIDTH;
-    IO_OSD_OSDWIN1YL=LCD_NATIVE_HEIGHT;
+    IO_OSD_OSDWIN1XL    = LCD_NATIVE_WIDTH;
+    IO_OSD_OSDWIN1YL    = LCD_NATIVE_HEIGHT;
     
-    IO_OSD_VIDWINMD=0x0002;
+    IO_OSD_VIDWINMD     = 0x0002;
     
-    addr = ((int)FRAME2-CONFIG_SDRAM_START) / 32;
+    addr                = ((int)FRAME2-CONFIG_SDRAM_START) / 32;
     
     /* This is a bit messy, the LCD transfers appear to happen in chunks of 32
      * pixels. (based on OF)
      */
 #if LCD_NATIVE_WIDTH%32!=0
-    IO_OSD_VIDWIN0OFST=LCD_NATIVE_WIDTH / 32+1;
+    IO_OSD_VIDWIN0OFST  = LCD_NATIVE_WIDTH / 32+1;
 #else
-    IO_OSD_VIDWIN0OFST=LCD_NATIVE_WIDTH / 32;
+    IO_OSD_VIDWIN0OFST  = LCD_NATIVE_WIDTH / 32;
 #endif
     
-    IO_OSD_VIDWINADH=addr >> 16;
-    IO_OSD_VIDWIN0ADL=addr & 0xFFFF;
+    IO_OSD_VIDWINADH    = addr >> 16;
+    IO_OSD_VIDWIN0ADL   = addr & 0xFFFF;
     
-    IO_OSD_VIDWIN0XP=0;
-    IO_OSD_VIDWIN0YP=0;
+    IO_OSD_VIDWIN0XP    = 0;
+    IO_OSD_VIDWIN0YP    = 0;
     
-    IO_OSD_VIDWIN0XL=LCD_NATIVE_WIDTH;
-    IO_OSD_VIDWIN0YL=LCD_NATIVE_HEIGHT;
+    IO_OSD_VIDWIN0XL    = LCD_NATIVE_WIDTH;
+    IO_OSD_VIDWIN0YL    = LCD_NATIVE_HEIGHT;
 
     /* Set pin 36 and 35 (LCD POWER and LCD RESOLUTION) to an output */
-    IO_GIO_DIR2&=!(3<<3);
+    IO_GIO_DIR2         &= ~(3<<3);
     
 #if LCD_NATIVE_HEIGHT > 320
 	/* Set LCD resolution to VGA */
-    IO_GIO_BITSET2=1<<3;
+    IO_GIO_BITSET2      = 1<<3;
 #else
 	/* Set LCD resolution to QVGA */
-	IO_GIO_BITCLR2=1<<3;
+	IO_GIO_BITCLR2      = 1<<3;
 #endif
 
-	IO_OSD_OSDWINMD0|=0x01;
-	IO_VID_ENC_VMOD|=0x01;
+	IO_OSD_OSDWINMD0    |= 0x01;
+	IO_VID_ENC_VMOD     |= 0x01;
 }
 
 #if defined(HAVE_LCD_MODES)
@@ -236,30 +232,30 @@ void lcd_set_mode(int mode)
 	if(mode==LCD_MODE_YUV)
 	{
 		/* Turn off the RGB buffer and enable the YUV buffer */
-		IO_OSD_OSDWINMD0 |=0x04;
-		IO_OSD_VIDWINMD  |=0x01;
+		IO_OSD_OSDWINMD0    |= 0x04;
+		IO_OSD_VIDWINMD     |= 0x01;
 		memset16(FRAME2, 0x0080, LCD_NATIVE_HEIGHT*(LCD_NATIVE_WIDTH+LCD_FUDGE));
 	}
 	else if(mode==LCD_MODE_RGB565)
 	{
 		/* Turn on the RGB window, set it to 16 bit and turn YUV window off */
-		IO_OSD_VIDWINMD  &=~(0x01);
-		IO_OSD_OSDWIN0OFST=LCD_NATIVE_WIDTH / 16;
-    	IO_OSD_OSDWINMD0 |=(1<<13);
-    	IO_OSD_OSDWINMD0 &=~0x04;
+		IO_OSD_VIDWINMD     &= ~(0x01);
+		IO_OSD_OSDWIN0OFST  =  LCD_NATIVE_WIDTH / 16;
+    	IO_OSD_OSDWINMD0    |= (1<<13);
+    	IO_OSD_OSDWINMD0    &= ~0x04;
     	lcd_clear_display();
 	}
 	else if(mode==LCD_MODE_PAL256)
 	{
 #if LCD_NATIVE_WIDTH%32!=0
-        IO_OSD_OSDWIN0OFST=LCD_NATIVE_WIDTH / 32+1;
+        IO_OSD_OSDWIN0OFST  = LCD_NATIVE_WIDTH / 32+1;
 #else
-        IO_OSD_OSDWIN0OFST=LCD_NATIVE_WIDTH / 32;
+        IO_OSD_OSDWIN0OFST  = LCD_NATIVE_WIDTH / 32;
 #endif
 
-        IO_OSD_VIDWINMD  &=~(0x01);
-        IO_OSD_OSDWINMD0 &=~(1<<13);
-		IO_OSD_OSDWINMD0 |=0x01;
+        IO_OSD_VIDWINMD     &= ~(0x01);
+        IO_OSD_OSDWINMD0    &= ~(1<<13);
+		IO_OSD_OSDWINMD0    |= 0x01;
 	}
 }
 #endif
@@ -346,35 +342,36 @@ void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
 	char *dst=(char *)FRAME+x+y*(LCD_NATIVE_WIDTH+LCD_FUDGE);
 	
-	src=src+src_x+src_y*LCD_NATIVE_WIDTH;
-	while(height--);
+	src = src+src_x+src_y*LCD_WIDTH;
+	while(height--)
 	{
-		memcpy ( dst, src, width);
+		memcpy(dst, src, width);
 		
-		dst=dst+(LCD_NATIVE_WIDTH-x+LCD_FUDGE); 
-		src+=width;
+		dst = dst + ((LCD_WIDTH -x +LCD_FUDGE)); 
+		src = src + (LCD_WIDTH - x);
 	}
 	
 #else
-	char *dst=(char *)FRAME
-	    + (LCD_NATIVE_WIDTH+LCD_FUDGE)*(LCD_NATIVE_HEIGHT-1)
-	    - (LCD_NATIVE_WIDTH+LCD_FUDGE)*x + y;
+    char *dst=(char *)FRAME
+        + (LCD_NATIVE_WIDTH+LCD_FUDGE)*(LCD_NATIVE_HEIGHT-1)
+        - (LCD_NATIVE_WIDTH+LCD_FUDGE)*x + y;
 	
-	src=src+src_x+src_y*LCD_WIDTH;
-	while(height--)
-	{
-	    register char *c_dst=dst;
-	    register int c_width=width;
-	    
-		while (c_width--)
-		{
-		    *c_dst=*src++;
-		    c_dst=c_dst-(LCD_NATIVE_WIDTH+LCD_FUDGE);
-		} 
-		
-		dst++;
-		src+=LCD_WIDTH-width;
-	}
+    src=src+src_x+src_y*LCD_WIDTH;
+
+    while(height--)
+    {
+        register char *c_dst=dst;
+        register int c_width=width;
+
+        while (c_width--)
+        {
+            *c_dst = *src++;
+            c_dst -= (LCD_NATIVE_WIDTH+LCD_FUDGE);
+        } 
+
+        dst++;
+        src+=LCD_WIDTH-width;
+    }
 #endif
 }
 

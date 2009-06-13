@@ -24,6 +24,7 @@
 
 #include <stdbool.h>
 #include <SDL.h>
+#include "config.h"
 
 /* colour definitions are R, G, B */
 
@@ -162,6 +163,7 @@
 #define UI_LCD_POSY                 90 /* y position of lcd */
 
 #elif defined(MROBE_500)
+#if LCD_WIDHT==320
 #define UI_TITLE                    "Olympus M:Robe 500"
 #define UI_WIDTH                    450 /* width of GUI window */
 #define UI_HEIGHT                   350 /* height of GUI window */
@@ -169,6 +171,15 @@
 #define UI_LCD_POSY                 30 /* y position of lcd */
 #define UI_REMOTE_POSX              50  /* x position of remote lcd */
 #define UI_REMOTE_POSY              325 /* y position of remote lcd */
+#else
+#define UI_TITLE                    "Olympus M:Robe 500"
+#define UI_WIDTH                    900 /* width of GUI window */
+#define UI_HEIGHT                   748 /* height of GUI window */
+#define UI_LCD_POSX                 131 /* x position of lcd */
+#define UI_LCD_POSY                 59  /* y position of lcd */
+#define UI_REMOTE_POSX              165 /* x position of remote lcd */
+#define UI_REMOTE_POSY              718 /* y position of remote lcd */
+#endif
 
 #elif defined(IRIVER_H10)
 #define UI_TITLE                    "iriver H10 20Gb"

@@ -423,29 +423,29 @@ void USB_DEVICE(void) {
         M66591_INTSTAT_NRDY, M66591_INTSTAT_EMP);
 
     /* VBUS (connected) interrupt */
-	while ( M66591_INTSTAT_MAIN & (1<<15) ) {
-	    M66591_INTSTAT_MAIN &= ~(1<<15);
-	
-	    /* If device is not clocked, interrupt flag must be set manually */
-	    if ( !(M66591_TRN_CTRL & (1<<10)) ) {
-		    M66591_INTSTAT_MAIN |= (1<<15);
-	    }
-	}
-	
-	/* Resume interrupt: This is not used. Extra logic needs to be added similar
-	 *  to the VBUS interrupt incase the PHY clock is not running.
-	 */
-	if(M66591_INTSTAT_MAIN & (1<<14)) {
-	    M66591_INTSTAT_MAIN &= ~(1<<14);
-	    logf("mxx: RESUME");
-	}
-	
-	/* Device state transition interrupt: Not used, but useful for debugging */
-	if(M66591_INTSTAT_MAIN & (1<<12)) {
-	    M66591_INTSTAT_MAIN &= ~(1<<12);
-	    logf("mxx: DEV state CHANGE=%d", 
-	        ((M66591_INTSTAT_MAIN & (0x07<<4)) >> 4) );
-	}
+    while ( M66591_INTSTAT_MAIN & (1<<15) ) {
+        M66591_INTSTAT_MAIN &= ~(1<<15);
+
+        /* If device is not clocked, interrupt flag must be set manually */
+        if ( !(M66591_TRN_CTRL & (1<<10)) ) {
+            M66591_INTSTAT_MAIN |= (1<<15);
+        }
+    }
+
+    /* Resume interrupt: This is not used. Extra logic needs to be added similar
+    *  to the VBUS interrupt incase the PHY clock is not running.
+    */
+    if(M66591_INTSTAT_MAIN & (1<<14)) {
+        M66591_INTSTAT_MAIN &= ~(1<<14);
+        logf("mxx: RESUME");
+    }
+
+    /* Device state transition interrupt: Not used, but useful for debugging */
+    if(M66591_INTSTAT_MAIN & (1<<12)) {
+        M66591_INTSTAT_MAIN &= ~(1<<12);
+        logf("mxx: DEV state CHANGE=%d", 
+        ((M66591_INTSTAT_MAIN & (0x07<<4)) >> 4) );
+    }
 
     /* Control transfer stage interrupt */
     if(M66591_INTSTAT_MAIN & (1<<11)) {
@@ -721,30 +721,30 @@ void usb_drv_exit(void) {
      *  Reference Manual Rev 1.00, p. 78.
      */
 
-	/* Detach notification to PC (disable D+ pull-up) */
-	M66591_TRN_CTRL &= ~(1<<4);
+    /* Detach notification to PC (disable D+ pull-up) */
+    M66591_TRN_CTRL &= ~(1<<4);
 
-	/* Software reset */
-	M66591_TRN_CTRL &= ~0x01;
+    /* Software reset */
+    M66591_TRN_CTRL &= ~0x01;
 
-	/* Disable internal clock supply */
-	M66591_TRN_CTRL &= ~(1<<10);
-	udelay(3);
+    /* Disable internal clock supply */
+    M66591_TRN_CTRL &= ~(1<<10);
+    udelay(3);
 
-	/* Disable PLL */
-	M66591_TRN_CTRL &= ~(1<<11);
-	udelay(3);
+    /* Disable PLL */
+    M66591_TRN_CTRL &= ~(1<<11);
+    udelay(3);
 
-	/* Disable internal reference clock */
-	M66591_TRN_CTRL &= ~(1<<12);
-	udelay(3);
+    /* Disable internal reference clock */
+    M66591_TRN_CTRL &= ~(1<<12);
+    udelay(3);
 
-	/* Disable oscillation buffer, reenable USB operation */
-	M66591_TRN_CTRL &= ~(1<<13);
-	
-	M66591_TRN_CTRL |= 0x01;
+    /* Disable oscillation buffer, reenable USB operation */
+    M66591_TRN_CTRL &= ~(1<<13);
 
-	logf("mxx: detached");
+    M66591_TRN_CTRL |= 0x01;
+
+    logf("mxx: detached");
 }
 
 /* This function begins a transmit (on an IN endpoint), it should not block
