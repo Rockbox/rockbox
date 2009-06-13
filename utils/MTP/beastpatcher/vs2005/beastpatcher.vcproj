@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE"
+				AdditionalIncludeDirectories="c:\wmsdk\wmfsdk95\include;c:\wmsdk\wmfsdk95\wmdm\inc"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;MTP_NODLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="0"
@@ -62,8 +62,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\MTP_DLL.lib"
+				AdditionalDependencies="mssachlp.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="c:\wmsdk\wmfsdk95\lib,c:\wmsdk\wmfsdk95\wmdm\lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -119,8 +120,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(InputDir)\..&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE"
+				AdditionalIncludeDirectories="c:\wmsdk\wmfsdk95\include;c:\wmsdk\wmfsdk95\wmdm\inc"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;MTP_NODLL"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -138,8 +139,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\MTP_DLL.lib"
+				AdditionalDependencies="mssachlp.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="c:\wmsdk\wmfsdk95\lib,c:\wmsdk\wmfsdk95\wmdm\lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -185,10 +187,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\bootimg.c"
-				>
-			</File>
-			<File
 				RelativePath="..\main.c"
 				>
 			</File>
@@ -196,6 +194,26 @@
 				RelativePath="..\mtp_win32.c"
 				>
 			</File>
+			<Filter
+				Name="MTP"
+				>
+				<File
+					RelativePath="..\..\MTP_DLL\mtp_wrapper.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\MTP_DLL\progresshelper.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Generated"
+				>
+				<File
+					RelativePath="..\bootimg.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -207,10 +225,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\bootimg.h"
-				>
-			</File>
-			<File
 				RelativePath="..\mtp_common.h"
 				>
 			</File>
@@ -218,6 +232,26 @@
 				RelativePath="..\pstdint.h"
 				>
 			</File>
+			<Filter
+				Name="MTP"
+				>
+				<File
+					RelativePath="..\..\MTP_DLL\MTP_DLL.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\MTP_DLL\progresshelper.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Generated"
+				>
+				<File
+					RelativePath="..\bootimg.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
