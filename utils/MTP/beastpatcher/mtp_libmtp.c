@@ -205,7 +205,7 @@ int mtp_send_file(struct mtp_info_t* mtp_info, const char* filename)
     fwfile = fopen(filename, "r");
     if (fwfile == NULL)
     {
-        fprintf(stderr,"[ERR]  Could not create temporary file.\n");
+        fprintf(stderr,"[ERR]  Could not open file.\n");
         return -1;
     }
     ret = mtp_send_fileptr(mtp_info, fwfile, sb.st_size);

@@ -56,7 +56,7 @@
 #include "bootimg.h"
 
 /* Code to create a single-boot bootloader.
-   Based on tools/gigabeats.c by Will Robertson.  
+   Based on tools/gigabeats.c by Will Robertson.
 */
 
 /* Entry point (and load address) for the main Rockbox bootloader */
@@ -83,7 +83,7 @@ static void create_single_boot(unsigned char* boot, int bootlen,
 {
     unsigned char* buf;
 
-    /* 15 bytes for header, 16 for signature bypass, 
+    /* 15 bytes for header, 16 for signature bypass,
      * 12 for record header, size of bootloader, 12 for footer */
     *fwsize = 15 + 16 + 12 + bootlen + 12;
     *fwbuf = malloc(*fwsize);
@@ -106,7 +106,7 @@ static void create_single_boot(unsigned char* boot, int bootlen,
 
     /* If the value below is too small, the update will attempt to flash.
      * Be careful when changing this (leaving it as is won't cause issues) */
-    put_uint32le(0xCC0CD8, buf+11); 
+    put_uint32le(0xCC0CD8, buf+11);
 
     /* Step 3: Add the signature bypass record */
     put_uint32le(0x88065A10, buf+15);
@@ -183,6 +183,33 @@ int beastpatcher(void)
 
     mtp_finished(&mtp_info);
 
+    return 0;
+}
+
+
+int sendfirm(const char* filename)
+{
+    struct mtp_info_t mtp_info;
+
+    if (mtp_init(&mtp_info) < 0) {
+        fprintf(stderr,"[ERR]  Can not init MTP\n");
+        return 1;
+    }
+
+    /* Scan for attached MTP devices. */
+    if (mtp_scan(&mtp_info) < 0)
+    {
+        fprintf(stderr,"[ERR]  No devices found\n");
+        return 1;
+    }
+
+    printf("[INFO] Found device \"%s - %s\"\n", mtp_info.manufacturer,
+                                                mtp_info.modelname);
+    printf("[INFO] Device version: \"%s\"\n",mtp_info.version);
+
+    mtp_send_file(&mtp_info, filename);
+
+    mtp_finished(&mtp_info);
     return 0;
 }
 

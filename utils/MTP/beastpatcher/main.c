@@ -66,7 +66,6 @@ int main(int argc, char* argv[])
 {
     int res;
     char yesno[4];
-    struct mtp_info_t mtp_info;
 
     fprintf(stderr,"beastpatcher v" VERSION " - (C) 2009 by the Rockbox developers\n");
     fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
@@ -81,10 +80,7 @@ int main(int argc, char* argv[])
         }
     }
     else if((argc > 2) && ((strcmp(argv[1],"-s")==0) || (strcmp(argv[1],"--send")==0))) {
-        mtp_init(&mtp_info);
-        mtp_scan(&mtp_info);
-        res = mtp_send_file(&mtp_info, argv[2]);
-        mtp_finished(&mtp_info);
+        res = sendfirm(argv[2]);
     }
     else {
         print_usage();
