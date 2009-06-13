@@ -364,7 +364,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     else menu = start_menu;
 
     /* if hide_bars is true, assume parent has been fixed before passed into
-     * this function, e.g. with viewport_set_defaults(parent, screen, true) */
+     * this function, e.g. with viewport_set_defaults(parent, screen) */
     init_menu_lists(menu, &lists, selected, true, parent);
     vps = *(lists.parent);
     in_stringlist = ((menu->flags&MENU_TYPE_MASK) == MT_RETURN_ID);
