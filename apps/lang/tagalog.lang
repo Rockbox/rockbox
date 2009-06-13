@@ -1877,7 +1877,7 @@
     *: "Track Gain if Shuffling"
  </source>
  <dest>
-    *: "Landas ng tubo kong balasahin"
+    *: "Landas ng tubo kung balasahin"
  </dest>
  <voice>
     *: "Track Gain if Shuffling"
@@ -6000,7 +6000,7 @@
  </dest>
  <voice>
     *: none
-    recording: "What to do when Splitting"
+    recording: "Ano gawin kung hatiin"
  </voice>
 </phrase>
 <phrase>
@@ -6119,7 +6119,7 @@
  </dest>
  <voice>
     *: none
-    recording: "Directory"
+    recording: "Listahan"
  </voice>
 </phrase>
 <phrase>
@@ -6153,7 +6153,7 @@
  </dest>
  <voice>
     *: none
-    recording: "Set As Recording Directory"
+    recording: "Ilagay Listahan ng rekording"
  </voice>
 </phrase>
 <phrase>
@@ -6170,7 +6170,7 @@
  </dest>
  <voice>
     *: none
-    recording: "Clear Recording Directory"
+    recording: "Alisin Listahan ng rekording"
  </voice>
 </phrase>
 <phrase>
