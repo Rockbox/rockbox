@@ -209,9 +209,11 @@ static void sdram_init(void)
 
     MPMC_DYNAMIC_CONTROL = 0x82; /* SDRAM MODE, MPMCCLKOUT runs continuously */
 
-    /* this part is required, if you know why please explain */
-    unsigned int tmp = *(volatile unsigned int*)(0x30000000+0x2300*MEM);
-    (void)tmp; /* we just need to read from this location */
+    /* program the SDRAM mode register */
+    /* FIXME: details the exact settings of mode register */
+    asm volatile(
+        "ldr r4, [%0]\n"
+        : : "p"(0x30000000+0x2300*MEM) : "r4");
 
     MPMC_DYNAMIC_CONTROL = 0x2; /* SDRAM NORMAL, MPMCCLKOUT runs continuously */
 
